@@ -45,6 +45,7 @@ typedef struct texElt
 {
     char		*name;
     char		*namebump;
+    int         mipmap; // Not yet used.
     unsigned int	texid;
     struct texElt	*next;
 } tTexElt;
@@ -242,7 +243,8 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
     tTrackSeg 		*lastSeg = NULL;
     tTrackSeg 		*mseg;
     int 		nbvert;
-    tdble 		width, wi2;
+    tdble 		width;
+    //tdble       wi2; // Never used.
     tdble 		anz, ts = 0;
     tdble               radiusr, radiusl;
     tdble 		step;
@@ -317,11 +319,11 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
     GroupNb = Track->nseg;
     
     width = Track->width;
-    wi2 = width / 2.0;
+    //wi2 = width / 2.0; // Never used.
 
     trkpos.type = TR_LPOS_MAIN;
 
-#define SETTEXTURE(texname, texnamebump, mipmap) do {			\
+#define SETTEXTURE(texname, texnamebump, _mipmap) do {			\
 	int found = 0;							\
 	curTexElt = texList;						\
 	if (curTexElt == NULL) {					\
@@ -330,7 +332,8 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 	    texList = curTexElt;					\
 	    curTexElt->name = strdup(texname);				\
 	    curTexElt->namebump = strdup(texnamebump);			\
-	    curTexElt->texid = GenTexId++;				\
+	    curTexElt->mipmap = _mipmap;				\
+    curTexElt->texid = GenTexId++;				\
 	} else {							\
 	    do {							\
 		curTexElt = curTexElt->next;				\
@@ -345,8 +348,9 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		texList->next = curTexElt;				\
 		texList = curTexElt;					\
 		curTexElt->name = strdup(texname);			\
-	    	curTexElt->namebump = strdup(texnamebump);		\
-	        curTexElt->texid = GenTexId++;				\
+        curTexElt->namebump = strdup(texnamebump);		\
+        curTexElt->mipmap = _mipmap;				\
+        curTexElt->texid = GenTexId++;				\
 	    }								\
 	}								\
 	curTexId = curTexElt->texid;					\

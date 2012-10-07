@@ -405,7 +405,9 @@ SimCarCollideZ(tCar *car)
         car->DynGCg.pos.z -= gc_height_difference;
     } else if (gc_height_difference > 100) {
         car->DynGCg.pos.z = RtTrackHeightL(&(car->trkPos)) + 100;
+        // FIXME: Wasn't car->DynGCg.vel.z intended the 2nd time ?
         car->DynGCg.vel.x = car->DynGCg.vel.y = car->DynGCg.vel.y = 
+            // FIXME: Wasn't car->DynGC.vel.z intended the 2nd time ?
             car->DynGC.vel.x = car->DynGC.vel.y = car->DynGC.vel.y = 0.0;
         // Translate angular momentum to angular velocity
         // NOTE: This translation is done again in SimCarAddAngularVelocity()

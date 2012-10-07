@@ -196,14 +196,18 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 {
 	
 	ALfloat listener_pos[3];
+#ifdef USE_OPENAL_DOPPLER
 	ALfloat listener_speed[3];
+#endif
 	ALfloat listener_orientation[6];
     static const ALfloat zeros[] = {0.0f, 0.0f, 0.0f};
 	
 	int i;
 	for (i = 0; i<3; i++) {
 		listener_pos[i] = p_obs[i];
+#ifdef USE_OPENAL_DOPPLER
 		listener_speed[i] = 0;// u_obs[i]; // TODO: Try restoring this, needed !
+#endif
 		listener_orientation[i] = c_obs[i];
 		listener_orientation[i+3] = a_obs[i];
 	}

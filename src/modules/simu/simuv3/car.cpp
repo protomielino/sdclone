@@ -343,9 +343,6 @@ SimCarUpdateSpeed(tCar *car)
     t3Dd original;
     t3Dd updated;
     //t3Dd angles;
-    tdble	mass;
-    mass = car->mass + car->fuel;
-
     
     {
         // fuel consumption
@@ -524,7 +521,9 @@ SimCarUpdatePos(tCar *car)
 
         if (gc_height_difference < 0) {
             car->DynGCg.pos.z = RtTrackHeightL(&(car->trkPos)) + 1;
+            // FIXME: Wasn't car->DynGCg.vel.z intended the 2nd time ?
             car->DynGCg.vel.x = car->DynGCg.vel.y = car->DynGCg.vel.y = 
+                // FIXME: Wasn't car->DynGC.vel.z intended the 2nd time ?
                 car->DynGC.vel.x = car->DynGC.vel.y = car->DynGC.vel.y = 0.0;
             car->DynGCg.vel.ax = car->DynGC.vel.ax = 
                 car->DynGCg.vel.ay = car->DynGC.vel.ay = 
@@ -532,7 +531,9 @@ SimCarUpdatePos(tCar *car)
             car->rot_mom[0] = car->rot_mom[1] = car->rot_mom[2] = 0.0;
         } else if (gc_height_difference > 100) {
             car->DynGCg.pos.z = RtTrackHeightL(&(car->trkPos)) + 50;
+            // FIXME: Wasn't car->DynGCg.vel.z intended the 2nd time ?
             car->DynGCg.vel.x = car->DynGCg.vel.y = car->DynGCg.vel.y = 
+                // FIXME: Wasn't car->DynGC.vel.z intended the 2nd time ?
                 car->DynGC.vel.x = car->DynGC.vel.y = car->DynGC.vel.y = 0.0;
             car->DynGCg.vel.ax = car->DynGC.vel.ax = 
                 car->DynGCg.vel.ay = car->DynGC.vel.ay = 

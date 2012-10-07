@@ -305,7 +305,7 @@ UpdtScrollList(void)
     while((str = GfuiScrollListExtractElement(ScrHandle, ScrollList, 0, (void**)&tmp)) != NULL) {
     }
     for (i = 0; i < (int)PlayersInfo.size(); i++) {
-		GfuiScrollListInsertElement(ScrHandle, ScrollList, PlayersInfo[i]->dispName(), i, (void*)i);
+		GfuiScrollListInsertElement(ScrHandle, ScrollList, PlayersInfo[i]->dispName(), i, (void*)(long)i);
     }
 
     if (CurrPlayer != PlayersInfo.end()) {

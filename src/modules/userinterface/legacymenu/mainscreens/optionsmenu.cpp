@@ -33,6 +33,10 @@
 
 static void *MenuHandle = NULL;
 
+// Select Monitor (true) or Display (false) menu.
+#define MonitorMenu false
+
+#if (!MonitorMenu)
 
 static void
 onDisplayMenuActivate(void * /* dummy */)
@@ -40,11 +44,15 @@ onDisplayMenuActivate(void * /* dummy */)
     GfuiScreenActivate(DisplayMenuInit(MenuHandle));
 }
 
+#else
+
 static void
 onMonitorMenuActivate(void * /* dummy */)
 {
     GfuiScreenActivate(MonitorMenuInit(MenuHandle));
 }
+
+#endif
 
 static void
 onGraphMenuActivate(void * /* dummy */)
@@ -94,7 +102,7 @@ OptionsMenuInit(void *prevMenu)
 
     GfuiMenuCreateStaticControls(MenuHandle, param);
     
-#if 0 // SDW hack to get access to Monitor menu, doesn't have a defined position yet
+#if (MonitorMenu) // SDW hack to get access to Monitor menu, doesn't have a defined position yet
     GfuiMenuCreateButtonControl(MenuHandle, param, "display", NULL, onMonitorMenuActivate);
 #else
     GfuiMenuCreateButtonControl(MenuHandle, param, "display", NULL, onDisplayMenuActivate);

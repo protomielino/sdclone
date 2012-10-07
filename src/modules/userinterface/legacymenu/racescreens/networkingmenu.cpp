@@ -290,10 +290,8 @@ UpdateNetworkPlayers()
 		else
 			bEveryoneReadyToRace = false;
 
-		bool bLocalPlayer = false;
 		if (strcmp(NetGetNetwork()->GetDriverName(),name)==0)
 		{
-			bLocalPlayer = true;
 			pColor = &green[0];
 			g_strCar = strRealCar;
 			//Make sure checkbox matches ready state

@@ -645,7 +645,7 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
 	Cmd[i].labelId = GfuiMenuCreateLabelControl(ScrHandle,param,Cmd[i].name);
 	std::string strCmdEdit(Cmd[i].name);
 	strCmdEdit += " button";
-	Cmd[i].Id = GfuiMenuCreateButtonControl(ScrHandle,param,strCmdEdit.c_str(),(void*)i,onPush,NULL,(tfuiCallback)NULL,onFocusLost);
+	Cmd[i].Id = GfuiMenuCreateButtonControl(ScrHandle,param,strCmdEdit.c_str(),(void*)(long)i,onPush,NULL,(tfuiCallback)NULL,onFocusLost);
 	}
     
     /* Steer Sensibility label and associated editbox */

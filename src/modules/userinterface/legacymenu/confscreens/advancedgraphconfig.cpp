@@ -35,8 +35,8 @@
 
 static const char* BackgroundTypeValues[] = { GR_ATT_BGSKY_RING, GR_ATT_BGSKY_LAND };
 static const int NbBackgroundTypeValues = sizeof(BackgroundTypeValues) / sizeof(BackgroundTypeValues[0]);
-static const char* SpectatorValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_ATT_AGR_FULL, GR_ATT_AGR_HIGH };
-static const int NbSpectatorValues = sizeof(SpectatorValues) / sizeof(SpectatorValues[0]);
+//static const char* SpectatorValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_ATT_AGR_FULL, GR_ATT_AGR_HIGH };
+//static const int NbSpectatorValues = sizeof(SpectatorValues) / sizeof(SpectatorValues[0]);
 static const char* ForestValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_ATT_AGR_FULL, GR_ATT_AGR_HIGH };
 static const int NbForestValues = sizeof(ForestValues) / sizeof(ForestValues[0]);
 static const char* TreeValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_ATT_AGR_FULL, GR_ATT_AGR_HIGH };
@@ -52,7 +52,7 @@ static int	TreeLabelId, TreeLeftButtonId, TreeRightButtonId;
 static int	ParkingLabelId, ParkingLeftButtonId, ParkingRightButtonId;
 
 static int	BackgroundTypeIndex = 0;
-static int	SpectatorIndex = 0;
+//static int	SpectatorsIndex = 0;
 static int	ForestIndex = 0;
 static int	TreeIndex = 0;
 static int	ParkingIndex = 0;

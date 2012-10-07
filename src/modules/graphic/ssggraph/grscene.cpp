@@ -376,7 +376,7 @@ void grCustomizePits(void)
         // First, top vertex of the triangle strip
 		{
 			sgVec2 tex = { -0.7, 1.1 };
-			sgVec3 vtx = { x2, y2, z2 + 4.8 };
+			sgVec3 vtx = { x2, y2, z2 + 4.8f };
 			pit_tex->add(tex);
 			pit_vtx->add(vtx);
 		}
@@ -397,7 +397,7 @@ void grCustomizePits(void)
         // Second, top vertex of the triangle strip
  		{
 			sgVec2 tex = { -0.7 + 2.0, 1.1 };
-			sgVec3 vtx = { x2, y2, z2 + 4.8 };
+			sgVec3 vtx = { x2, y2, z2 + 4.8f };
 			pit_tex->add(tex);
 			pit_vtx->add(vtx);
 		}
@@ -527,7 +527,7 @@ void grCustomizePits(void)
         // First, top vertex
         {
           sgVec2 tex = { 0.0, 0.25 };
-          sgVec3 vtx = { x1, y1, z1 + 0.9 };
+          sgVec3 vtx = { x1, y1, z1 + 0.9f };
           pit_tex1->add(tex);
           pit_vtx1->add(vtx);
         }
@@ -543,7 +543,7 @@ void grCustomizePits(void)
         // Second, top vertex
         {
           sgVec2 tex = { 1.0, 0.25 };
-          sgVec3 vtx = { x2, y2, z2 + 0.9 };
+          sgVec3 vtx = { x2, y2, z2 + 0.9f };
           pit_tex1->add(tex);
           pit_vtx1->add(vtx);
         }
@@ -590,8 +590,8 @@ void grCustomizePits(void)
 
         // First, top vertex
         {
-          sgVec2 tex = { 0.0, (bHasLogo ? 0.33 : 0.25) };
-          sgVec3 vtx = { x2, y2, z2 + 0.9 };
+          sgVec2 tex = { 0.0, (bHasLogo ? 0.33f : 0.25f) };
+          sgVec3 vtx = { x2, y2, z2 + 0.9f };
           pit_tex2->add(tex);
           pit_vtx2->add(vtx);
         }
@@ -606,8 +606,8 @@ void grCustomizePits(void)
 
         // Second, top vertex
         {
-          sgVec2 tex = { 1.0, (bHasLogo ? 0.33 : 0.25) };
-          sgVec3 vtx = { x3, y3, z3 + 0.9 };
+          sgVec2 tex = { 1.0, (bHasLogo ? 0.33f : 0.25f) };
+          sgVec3 vtx = { x3, y3, z3 + 0.9f };
           pit_tex2->add(tex);
           pit_vtx2->add(vtx);
         }
@@ -638,7 +638,7 @@ void grCustomizePits(void)
         // First, top vertex
         {
           sgVec2 tex = { 0.0, 0.25 };
-          sgVec3 vtx = { x3, y3, z3 + 0.9 };
+          sgVec3 vtx = { x3, y3, z3 + 0.9f };
           pit_tex3->add(tex);
           pit_vtx3->add(vtx);
         }
@@ -654,7 +654,7 @@ void grCustomizePits(void)
         // Second, top vertex
         {
           sgVec2 tex = { 1.0, 0.25 };
-          sgVec3 vtx = { x4, y4, z4 + 0.9 };
+          sgVec3 vtx = { x4, y4, z4 + 0.9f };
           pit_tex3->add(tex);
           pit_vtx3->add(vtx);
         }

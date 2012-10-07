@@ -368,11 +368,7 @@ grInitBackground()
 		//TheSky->modifyVisibility( visibility, 0);
 		TheSky->setVisibility( grVisibility ); // Visibility in meters
 
-		const GLfloat fog_exp_density = m_log01 / grVisibility;
-        const GLfloat fog_exp2_density = sqrt_m_log01 / grVisibility;
-
 		//Setup overall light level according to rain if any
-		
 		grUpdateLight();
 
 		glLightModelfv( GL_LIGHT_MODEL_AMBIENT, Black);
@@ -865,8 +861,6 @@ grPreDrawSky(tSituation* s, float fogStart, float fogEnd)
 
 	if (grSkyDomeDistance && grTrack->skyversion > 0) 
 	{
-		//const GLfloat fog_exp2_density = (float)sqrt_m_log01 / TheSky->getVisibility();
-		const GLfloat fog_exp_density = m_log01 / TheSky->getVisibility();
         const GLfloat fog_exp2_density = sqrt_m_log01 / TheSky->getVisibility();
 		glEnable(GL_FOG);
 		//glFogf(GL_FOG_START, fogStart);
@@ -1059,7 +1053,6 @@ void grUpdateLight( void )
 
 	if (sol_angle > 1.0) 
 	{
-		float sun2 = sqrt(sol_angle);
 		if (grVisibility > 1000 && cloudsTextureIndex < 8)
 		{
 			CloudsColor[0] = CloudsColor[0] * sun_color[0];

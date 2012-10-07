@@ -317,7 +317,8 @@ void spacing(int e, int n)
 int insert_node(double x, double y, double z, int spac,
 		int prev_n, int prev_s_mark, int mark, int next_s_mark, int next_n)
 {
-    int    i,j,k,e,ei,ej,ek, s,si,sj,sk;
+    int    i,j,k,e,ej,ek, s,si,sj,sk;
+    //int   ei;
     double sx, sy;
 
     Nn++;          /* one new node */
@@ -356,7 +357,7 @@ int insert_node(double x, double y, double z, int spac,
     i  = elem[e].i;
     j  = elem[e].j;
     k  = elem[e].k;
-    ei = elem[e].ei;
+    //ei = elem[e].ei; // Never used
     ej = elem[e].ej;
     ek = elem[e].ek; 
     si = elem[e].si;
@@ -1948,7 +1949,7 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
     tTrackSeg 	*mseg;
     tTrkLocPos 	trkpos;
     tdble	x, y;
-    tdble 	radiusr, radiusl;
+    //tdble 	radiusr, radiusl; // Never used
     struct nod	*point2;
     int		nb_relief_vtx, nb_relief_seg;
 
@@ -2017,7 +2018,7 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
 		step = TrackStep / (mseg->radiusr);
 		anz = seg->angle[TR_ZS] + step;
 		ts = step;
-		radiusr = seg->radiusr;
+		//radiusr = seg->radiusr; // Never used
 		trkpos.seg = seg;
 		trkpos.toRight = 0;
 		while (anz < seg->angle[TR_ZE]) {
@@ -2033,7 +2034,7 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
 		step = TrackStep / (mseg->radiusl);
 		anz = seg->angle[TR_ZS] - step;
 		ts = step;
-		radiusr = seg->radiusr;
+		// radiusr = seg->radiusr; // Never used
 		trkpos.seg = seg;
 		trkpos.toRight = 0;
 		while (anz > seg->angle[TR_ZE]) {
@@ -2100,7 +2101,7 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
 		step = TrackStep / (mseg->radiusr);
 		anz = seg->angle[TR_ZS] + step;
 		ts = step;
-		radiusl = seg->radiusl;
+		//radiusl = seg->radiusl; // Never used
 		trkpos.seg = seg;
 		while (anz < seg->angle[TR_ZE]) {
 		    trkpos.toStart = ts;
@@ -2116,7 +2117,7 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
 		step = TrackStep / (mseg->radiusl);
 		anz = seg->angle[TR_ZS] - step;
 		ts = step;
-		radiusl = seg->radiusl;
+		//radiusl = seg->radiusl; // Never used
 		trkpos.seg = seg;
 		while (anz > seg->angle[TR_ZE]) {
 		    trkpos.toStart = ts;

@@ -26,17 +26,18 @@ SimTransmissionConfig(tCar *car)
 {
     void		*hdle = car->params;
     tCarElt		*carElt = car->carElt;
-    tdble		clutchI;
+    //tdble		clutchI; // Never used
     tTransmission	*trans = &(car->transmission);
     tClutch		*clutch = &(trans->clutch);
     tDifferential	*differential;
     const char		*transType;
     int			i, j;
-    tdble		gRatio, fRatio, gEff, fEff;
+    tdble		gRatio, fRatio, gEff;
+    //tdble       fEff; // Never used
     tdble		gearI;
     char		path[256];
 
-    clutchI		= GfParmGetNum(hdle, SECT_CLUTCH, PRM_INERTIA, (char*)NULL, 0.12f);
+    //clutchI		= GfParmGetNum(hdle, SECT_CLUTCH, PRM_INERTIA, (char*)NULL, 0.12f);
     transType		= GfParmGetStr(hdle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
     clutch->releaseTime	= GfParmGetNum(hdle, SECT_GEARBOX, PRM_SHIFTTIME, (char*)NULL, 0.2f);
 
@@ -62,19 +63,19 @@ SimTransmissionConfig(tCar *car)
 		SimDifferentialConfig(hdle, SECT_REARDIFFERENTIAL, &(trans->differential[TRANS_REAR_DIFF]));
 		trans->type = TRANS_RWD;
 		fRatio = trans->differential[TRANS_REAR_DIFF].ratio;
-		fEff   = trans->differential[TRANS_REAR_DIFF].efficiency;
+		//fEff   = trans->differential[TRANS_REAR_DIFF].efficiency;
     } else if (strcmp(VAL_TRANS_FWD, transType) == 0) {
 		SimDifferentialConfig(hdle, SECT_FRNTDIFFERENTIAL, &(trans->differential[TRANS_FRONT_DIFF]));
 		trans->type = TRANS_FWD;
 		fRatio = trans->differential[TRANS_FRONT_DIFF].ratio;
-		fEff   = trans->differential[TRANS_FRONT_DIFF].efficiency;
+		//fEff   = trans->differential[TRANS_FRONT_DIFF].efficiency;
     } else if (strcmp(VAL_TRANS_4WD, transType) == 0) {
 		SimDifferentialConfig(hdle, SECT_FRNTDIFFERENTIAL, &(trans->differential[TRANS_FRONT_DIFF]));
 		SimDifferentialConfig(hdle, SECT_REARDIFFERENTIAL, &(trans->differential[TRANS_REAR_DIFF]));
 		SimDifferentialConfig(hdle, SECT_CENTRALDIFFERENTIAL, &(trans->differential[TRANS_CENTRAL_DIFF]));
 		trans->type = TRANS_4WD;
 		fRatio = trans->differential[TRANS_CENTRAL_DIFF].ratio;
-		fEff   = trans->differential[TRANS_FRONT_DIFF].efficiency * trans->differential[TRANS_CENTRAL_DIFF].efficiency * trans->differential[TRANS_REAR_DIFF].efficiency;
+		//fEff   = trans->differential[TRANS_FRONT_DIFF].efficiency * trans->differential[TRANS_CENTRAL_DIFF].efficiency * trans->differential[TRANS_REAR_DIFF].efficiency;
     }
 
     trans->gearbox.gearMax = 0;

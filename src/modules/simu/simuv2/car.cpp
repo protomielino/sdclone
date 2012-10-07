@@ -239,9 +239,6 @@ static void
 SimCarUpdateSpeed(tCar *car)
 {
 	tdble	Cosz, Sinz;
-	tdble	mass;
-	
-	mass = car->mass + car->fuel;
 		
 	Cosz = car->Cosz;
 	Sinz = car->Sinz;
@@ -305,13 +302,9 @@ static void
 SimCarUpdatePos(tCar *car)
 {
 	tdble vx, vy;
-	tdble accx, accy;
 	
 	vx = car->DynGCg.vel.x;
 	vy = car->DynGCg.vel.y;
-	
-	accx = car->DynGCg.acc.x;
-	accy = car->DynGCg.acc.y;
 	
 	car->DynGCg.pos.x += vx * SimDeltaTime;
 	car->DynGCg.pos.y += vy * SimDeltaTime;
