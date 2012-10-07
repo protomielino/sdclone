@@ -43,7 +43,7 @@
 #include <enet/enet.h>
 #endif
 
-#define MAXNETWORKPLAYERS 8
+#define MAXNETWORKPLAYERS 16
 //Port used for network play
 #define SPEEDDREAMSPORT 28500
 #define SPEEDDREAMSPEERPORT 28501

@@ -113,7 +113,7 @@ static void onHostPlayerReady(tCheckBoxInfo* pInfo)
 static void EnableMenuClientButtons(bool bChecked)
 {
 	// Disable/enable menu selections
-	const int isEnabled = bChecked ? GFUI_ENABLE : GFUI_DISABLE;
+	const int isEnabled = bChecked ? GFUI_DISABLE : GFUI_ENABLE;
 	GfuiEnable(racemanMenuHdle, g_CarSetupButtonId, isEnabled);
 	GfuiEnable(racemanMenuHdle, g_DisconnectButtonId, isEnabled);
 }
