@@ -48,6 +48,11 @@ cGrCamera::getDist2 (tCarElt *car)
     return dx * dx + dy * dy;
 }
 
+float
+cGrCamera::getAspectRatio()
+{
+    return screen->getViewRatio();
+}
 
 static void
 grMakeLookAtMat4 ( sgMat4 dst, const sgVec3 eye, const sgVec3 center, const sgVec3 up )
@@ -116,7 +121,7 @@ void cGrPerspCamera::setProjection(void)
     // tan and atan functions operate on angles in radians. Also,
     // we're only interested in half the viewing angle.
 
-    float fovx = atan(screen->getViewRatio() / spanaspect * tan(fovy * M_PI / 360.0)) * 360.0 / M_PI;
+    float fovx = atan(getAspectRatio() / spanaspect * tan(fovy * M_PI / 360.0)) * 360.0 / M_PI;
     grContext.setFOV(fovx, fovy);
     grContext.setNearFar(fnear, ffar);
 }
@@ -493,6 +498,7 @@ cGrCarCamMirror::cGrCarCamMirror(cGrScreen *myscreen, int id, int drawCurr, int 
     : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 1,
          myfovy, myfovymin, myfovymax,
          myfnear, myffar, myfogstart, myfogend)
+    , origFovY(myfovy)
 {
 }
 
@@ -550,7 +556,6 @@ void cGrCarCamMirror::adaptScreenSize()
     vpy = screen->getScrY();
     vpw = screen->getScrW();
     vph = screen->getScrH();
-    vp_aspectratio = double(vph)/vpw;
 
     // mirror width adjusted to fit board size
     int boardW = screen->getBoardWidth();
@@ -559,35 +564,23 @@ void cGrCarCamMirror::adaptScreenSize()
     my = vpy +  5 * vph / 6 - vph / 10;
     mw = vpw * boardW /200;
     mh = vph / 6;
-    m_centery = my + mh/2;
+
+    aspectRatio = float(mw) / mh;
+
+    limitFov();
 }
 
 void cGrCarCamMirror::beforeDraw (void)
 {
     glFrontFace( GL_CW );
 
-    /* The aspect ratio of the mirror is probably not the same
-     * as the real aspect ratio. Thus we do the following:
-     * 1) set up the mirror viewport with the same aspect ratio
-     *   as the real scene
-     * 2) scissor the area of the actual mirror
-     *
-     * The viewport in 1) will be the same as the actual mirror,
-     * but with the height adjusted to fit the real aspect ratio.
-     * For that the mirror's height is calculated by multiplying
-     * the mirror's width with the real aspect ratio.
-     * To get the lower-left corner of the mirror's viewport half
-     * of that new height is subtracted from the mirror center's
-     * y-coordinate.
-     */
-
-    double mvph = mw * vp_aspectratio;
-    int mvpy = m_centery - (mvph/2);
-
-    glViewport(mx, mvpy, mw, mvph);
-
+    // Scissor needed with Nouveau driver
     glEnable(GL_SCISSOR_TEST);
     glScissor(mx, my, mw, mh);
+    glViewport(mx, my, mw, mh);
+
+    // make mirror in front of everything by forcing overdrawing of everything
+    glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void cGrCarCamMirror::afterDraw (void)
@@ -597,6 +590,11 @@ void cGrCarCamMirror::afterDraw (void)
     glViewport(vpx, vpy, vpw, vph);
 
     glFrontFace( GL_CCW );
+}
+
+void cGrCarCamMirror::limitFov(void)
+{
+    fovy = origFovY / getAspectRatio();
 }
 
 // cGrCarCamInsideFixedCar ================================================================

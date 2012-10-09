@@ -77,6 +77,14 @@ class cGrCamera
 
     virtual float getLODFactor(float x, float y, float z) = 0;	/* Get the LOD factor for an object located at x,y,z */
 
+    /** Retrieve the aspect ratio of this camera. This is used in
+     *  cGrPerspCamera::setProjection() to calculate the fov.
+     *  Usually this is simply the screen's aspect ratio. But for example the mirror's cam
+     *  has another aspect ratio, which needs to be taken into account when setting up the
+     *  view.
+     */
+    virtual float getAspectRatio();
+
     /* Set the camera view */
     void action(void) {
 	setProjection();
@@ -167,11 +175,11 @@ class cGrPerspCamera : public cGrCamera
 		   float myfnear, float myffar = 1500.0, float myfogstart = 1400.0, float myfogend = 1500.0);
     
     virtual void update(tCarElt *car, tSituation *s) = 0;	/* Change the camera if necessary */
-    void setProjection(void);
-    void setModelView(void);
-    void loadDefaults(char *attr);
+    virtual void setProjection(void);
+    virtual void setModelView(void);
+    virtual void loadDefaults(char *attr);
     void setViewOffset(float newOffset);
-    void setZoom(int cmd);
+    virtual void setZoom(int cmd);
     float getLODFactor(float x, float y, float z);
     float getFogStart(void) { return fogstart; }
     float getFogEnd(void) { return fogend; }
@@ -187,7 +195,7 @@ class cGrPerspCamera : public cGrCamera
 	return (cGrPerspCamera *)cGrCamera::next();
     }
 
-   void limitFov(void)  {}
+   virtual void limitFov(void)  {}
    void onSelect(tCarElt *car, tSituation *s) {}
 
    virtual float getFovY(void) {
@@ -221,7 +229,7 @@ class cGrOrthoCamera : public cGrCamera
     void update(tCarElt *car, tSituation *s) { }
     float getLODFactor(float x, float y, float z) { return 1; }
     void loadDefaults(char *attr) { }
-    void setZoom(int cmd) { }
+    virtual void setZoom(int cmd) { }
     void onSelect(tCarElt *car, tSituation *s) {}
 };
 
@@ -247,9 +255,9 @@ class cGrCarCamMirror : public cGrPerspCamera
 {
  protected:
     int		vpx, vpy, vpw, vph;	/* viewport size */
-    double  vp_aspectratio;     /* viewport aspect ratio: vph/vpw */
     int		mx, my, mw, mh;		/* drawing area */
-    int     m_centery;          /* y-coordinate of the mirror's center point */
+    float   aspectRatio;        /* the aspect ratio of the mirror: mw / mh */
+    float   origFovY;           /* fovy set using constructor */
     
  public:
     cGrCarCamMirror(cGrScreen *myscreen, int id, int drawCurr, int drawBG,
@@ -259,6 +267,8 @@ class cGrCarCamMirror : public cGrPerspCamera
 
     void update (tCarElt *car, tSituation *s);
 
+    virtual float getAspectRatio() { return aspectRatio; }
+
     void setViewport (int x, int y, int w, int h);
     void setScreenPos (int x, int y, int w, int h);
 
@@ -267,9 +277,12 @@ class cGrCarCamMirror : public cGrPerspCamera
     virtual void beforeDraw(void);
     virtual void afterDraw(void);
 
+
     /** Called by cGrScreen::activate() after the screen updated it's screen size.
      *  Cameras should use the cGrCamera::screen property to get the updated information. */
     void adaptScreenSize();
+
+    virtual void limitFov(void);
 };
 
 
