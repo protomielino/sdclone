@@ -347,13 +347,20 @@ void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
 		GfParmWriteFile(NULL, grHandle, "Graph");
 		curCam->onSelect(curCar, s);
 	}
-	
-	glEnable(GL_SCISSOR_TEST);
-	glViewport(scrx, scry, scrw, scrh);
-	glScissor(scrx, scry, scrw, scrh);
-	dispCam = curCam;
-	camDraw(s);
-	glDisable(GL_SCISSOR_TEST);
+
+	if (grNbActiveScreens > 1) {
+		// only need to scissor with split screens (to prevent a problem with Nouvuea driver)
+		glEnable(GL_SCISSOR_TEST);
+		glViewport(scrx, scry, scrw, scrh);
+		glScissor(scrx, scry, scrw, scrh);
+		dispCam = curCam;
+		camDraw(s);
+		glDisable(GL_SCISSOR_TEST);
+	} else {
+		glViewport(scrx, scry, scrw, scrh);
+		dispCam = curCam;
+		camDraw(s);
+	}
 
 	/* Mirror */
 	if (mirrorFlag && curCam->isMirrorAllowed ()) {
@@ -378,11 +385,17 @@ void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
 	glDisable(GL_TEXTURE_2D);
 	
 	TRACE_GL("cGrScreen::update glDisable(GL_DEPTH_TEST)");
-	glEnable(GL_SCISSOR_TEST);
-	glScissor(scrx + (scrw * (100 - boardWidth)/200), scry, scrw * boardWidth / 100, scrh);
-	board->refreshBoard(s, frameInfo, curCar,
+	if (boardWidth != 100) {
+		// Only need to scissor if board does not occupy whole (split) screen
+		glEnable(GL_SCISSOR_TEST);
+		glScissor(scrx + (scrw * (100 - boardWidth)/200), scry, scrw * boardWidth / 100, scrh);
+		board->refreshBoard(s, frameInfo, curCar,
 						grNbActiveScreens > 1 && grGetCurrentScreen() == this);
-	glDisable(GL_SCISSOR_TEST);
+		glDisable(GL_SCISSOR_TEST);
+	} else {
+		board->refreshBoard(s, frameInfo, curCar,
+						grNbActiveScreens > 1 && grGetCurrentScreen() == this);
+	}
 	TRACE_GL("cGrScreen::update display boards");
 	
 	GfProfStopProfile("grDisp**");
