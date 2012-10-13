@@ -1,8 +1,8 @@
 /***************************************************************************
                  isoundengine.h -- Interface for sound engines
 
-    created              : Mon Mar 28 19:48:14 CEST 2011
-    copyright            : (C) 2011 by Jean-Philippe Meuret                         
+    created              : Mon Jul 28 19:48:14 CEST 2012
+    copyright            : (C) 2012 by Gaëtan André
     web                  : http://www.speed-dreams.org
     version              : $Id$
  ***************************************************************************/
@@ -34,10 +34,9 @@ class ISoundEngine
 {
 public:
  
- 	//virtual void mute(bool bOn = true) = 0;
-	virtual void initSound(struct Situation* s) = 0;
-	virtual void shutdownSound() = 0;
-	virtual void refreshSound(struct Situation *s, SoundCam *camera) = 0;
+    virtual void init(struct Situation* s) = 0;
+    virtual void shutdown() = 0;
+    virtual void refresh(struct Situation *s, SoundCam *camera) = 0;
 	virtual void mute(bool bOn = true) = 0;
 };
  

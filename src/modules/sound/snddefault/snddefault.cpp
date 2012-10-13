@@ -69,13 +69,13 @@ sndDefault::~sndDefault()
 
 // Implementation of ISoundEngine ****************************************
 
-void sndDefault::initSound(Situation* s){
+void sndDefault::init(Situation* s){
     grInitSound(s,s->_ncars);
 }
-void sndDefault::shutdownSound(){
+void sndDefault::shutdown(){
     grShutdownSound();
 }
-void sndDefault::refreshSound(Situation *s, SoundCam	*camera){
+void sndDefault::refresh(Situation *s, SoundCam	*camera){
     grRefreshSound(s, camera);
 }
 

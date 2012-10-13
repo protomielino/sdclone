@@ -162,7 +162,7 @@ void LegacyMenu::quit() {
 void LegacyMenu::shutdown() {
     // Shutdown graphics in case relevant and not already done.
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL) {
-	shutdownSound();
+        shutdownSound();
         unloadCarsGraphics();
         shutdownGraphicsView();
         unloadTrackGraphics();
@@ -301,7 +301,7 @@ void LegacyMenu::onRaceSimulationReady() {
         addLoadingMessage("Loading graphics for all cars ...");
 
         loadCarsGraphics(_piRaceEngine->outData()->s);
-        _piSoundEngine->initSound(_piRaceEngine->outData()->s);
+        _piSoundEngine->init(_piRaceEngine->outData()->s);
     }
 }
 
@@ -530,7 +530,7 @@ void LegacyMenu::redrawGraphicsView(struct Situation* pSituation) {
         return;
 
     _piGraphicsEngine->redrawView(pSituation);
-    _piSoundEngine->refreshSound(pSituation,_piGraphicsEngine->getCurCam());
+    _piSoundEngine->refresh(pSituation,_piGraphicsEngine->getCurCam());
     
 }
 
@@ -539,7 +539,7 @@ void LegacyMenu::shutdownSound() {
         return;
 
     if (_bfGraphicsState & eCarsLoaded) {
-        _piSoundEngine->shutdownSound();
+        _piSoundEngine->shutdown();
     }
 }
 

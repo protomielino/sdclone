@@ -22,7 +22,6 @@
 #include "ssggraph.h"
 
 #include "grmain.h"
-//#include "grsound.h"
 #include "grtexture.h"
 
 
@@ -119,12 +118,6 @@ void SsgGraph::shutdownView() {
     ::shutdownView();
 }
 
-// Implementation of ISoundEngine ****************************************
-
-/*void SsgGraph::mute(bool bOn)
-{
-        ::grMuteSound(bOn);
-}*/
 
 SoundCam * SsgGraph::getCurCam() {
     SoundCam *cam = new SoundCam;
