@@ -139,5 +139,5 @@ SoundCam * OsgGraph::getCurCam()
     cam->Speedv = gcam->getSpeedv();
     cam->Posv = gcam->getPosv();*/
   
-    //return cam;
+    return 0; //return cam;
 }
