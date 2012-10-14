@@ -85,19 +85,19 @@ OsgGraph::~OsgGraph()
 bool OsgGraph::loadTrack(tTrack* pTrack)
 {
 	//GfLogDebug("SsgGraph::loadTrack\n");
-	//return ::initTrack(pTrack) == 0;
+	return true;//return ::initTrack(pTrack) == 0;
 }
 
 bool OsgGraph::loadCars(tSituation* pSituation)
 { 
 	//GfLogDebug("SsgGraph::loadCars\n");
-	//return ::initCars(pSituation) == 0;
+	return true; //return ::initCars(pSituation) == 0;
 }
 
 bool OsgGraph::setupView(int x, int y, int width, int height, void* pMenuScreen)
 {
 	//GfLogDebug("SsgGraph::setupView\n");
-	//return ::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
+	return true; //return ::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
 }
 
 void OsgGraph::redrawView(tSituation* pSituation)
@@ -137,7 +137,7 @@ SoundCam * OsgGraph::getCurCam()
     cam->Centerv = gcam->getCenterv();
     cam->Upv = gcam->getUpv();
     cam->Speedv = gcam->getSpeedv();
-    cam->Posv = gcam->getPosv();
+    cam->Posv = gcam->getPosv();*/
   
-    return cam;*/
+    //return cam;
 }
