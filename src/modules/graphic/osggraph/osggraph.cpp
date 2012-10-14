@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file                     : osggraph.cpp
+    file                 : osggraph.cpp
     created              : Thu Aug 17 23:19:19 CEST 2000
-    copyright           : (C) 2012 by Xavier Bertaux
-    email                  :  torcs@free.fr
-    version              : $Id: osggraph.cpp 3741 2011-07-21 22:29:34Z pouillot $
+    copyright            : (C) 2012 by Xavier Bertaux
+    email                : bertauxx@yahoo.fr
+    version              : $Id: osggraph.cpp 3741 2011-07-21 22:29:34Z torcs-ng $
 
  ***************************************************************************/
 
@@ -19,7 +19,7 @@
 
 #include "osggraph.h"
 
-#include "osgMain.h"
+#include "OsgMain.h"
 //#include "grsound.h"
 //#include "grtexture.h"
 
@@ -85,24 +85,24 @@ OsgGraph::~OsgGraph()
 bool OsgGraph::loadTrack(tTrack* pTrack)
 {
 	//GfLogDebug("SsgGraph::loadTrack\n");
-	return ::initTrack(pTrack) == 0;
+	//return ::initTrack(pTrack) == 0;
 }
 
 bool OsgGraph::loadCars(tSituation* pSituation)
 { 
 	//GfLogDebug("SsgGraph::loadCars\n");
-	return ::initCars(pSituation) == 0;
+	//return ::initCars(pSituation) == 0;
 }
 
 bool OsgGraph::setupView(int x, int y, int width, int height, void* pMenuScreen)
 {
 	//GfLogDebug("SsgGraph::setupView\n");
-	return ::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
+	//return ::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
 }
 
 void OsgGraph::redrawView(tSituation* pSituation)
 {
-	::refresh(pSituation);
+	//::refresh(pSituation);
 }
 
 // void OsgGraph::bendCar(int index, sgVec3 poc, sgVec3 force, int count)
@@ -113,25 +113,25 @@ void OsgGraph::redrawView(tSituation* pSituation)
 void OsgGraph::unloadCars()
 {
 	//GfLogDebug("SsgGraph::unloadCars\n");
-	::shutdownCars();
+	//::shutdownCars();
 }
 
 void OsgGraph::unloadTrack()
 {
 	//GfLogDebug("SsgGraph::unloadTrack\n");
-	::shutdownTrack();
+	//::shutdownTrack();
 }
 
 void OsgGraph::shutdownView()
 {
 	//GfLogDebug("SsgGraph::shutdownView\n");
-	::shutdownView();
+	//::shutdownView();
 }
 
 // Implementation of ISoundEngine ****************************************
 SoundCam * OsgGraph::getCurCam() 
 {
-    SoundCam *cam = new SoundCam;
+    /*SoundCam *cam = new SoundCam;
     osgCamera *gcam = osgGetCurCamera();
 
     cam->Centerv = gcam->getCenterv();
@@ -139,5 +139,5 @@ SoundCam * OsgGraph::getCurCam()
     cam->Speedv = gcam->getSpeedv();
     cam->Posv = gcam->getPosv();
   
-    return cam;
+    return cam;*/
 }
