@@ -6,7 +6,7 @@
 
 #include <vector>
 #include <string>
-#include <string.h>
+#include <string.h>		// to removed on OSG 3.2
 #include <iostream>
 #include <stdlib.h>
 #include <sstream>

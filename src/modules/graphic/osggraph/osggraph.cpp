@@ -97,7 +97,7 @@ bool OsgGraph::loadCars(tSituation* pSituation)
 bool OsgGraph::setupView(int x, int y, int width, int height, void* pMenuScreen)
 {
 	//GfLogDebug("SsgGraph::setupView\n");
-	return true; //return ::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
+	return ::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
 }
 
 void OsgGraph::redrawView(tSituation* pSituation)
