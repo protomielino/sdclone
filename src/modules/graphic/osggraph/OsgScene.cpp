@@ -204,6 +204,8 @@ grLoadScene(tTrack *track)
 {
 	void		*hndl = grTrackHandle;
 	const char		*acname;
+	
+	grTrack = track;
 	//ssgEntity		*desc;
 
 	/*if (maxTextureUnits == 0) {
@@ -233,7 +235,9 @@ grLoadScene(tTrack *track)
 
 	std::string strTPath = GetDataDir();
 	sprintf(buf, "tracks/%s/%s;data/textures;data/img;.", grTrack->category, grTrack->internalname);
+	//GfOut("strPath = %s\n", acname);
 	strTPath+=buf;
+	//strTPath+="tracks/speedway/milky-five";
 	SetTexturePaths(strTPath.c_str());
 	
 	//ssgTexturePath(buf);
@@ -241,7 +245,8 @@ grLoadScene(tTrack *track)
 	//ssgModelPath(buf);
 
 	std::string strPath = GetDataDir();
-	strPath+=buf;
+	sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
+	//strPath+="tracks/speedway/milky-five";
 	strPath+="/";
 	strPath+=acname;
 	//GetOSG()->ClearScene();
