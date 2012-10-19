@@ -1,6 +1,8 @@
 #include "OsgLoader.h"
 //#include "ReaderWriterACC.h"
 
+#include <tgf.hpp>
+
 osgLoader::osgLoader(void)
 {
 	m_pOpt = new osgDB::ReaderWriter::Options();
@@ -45,6 +47,7 @@ osg::Node *osgLoader::Load3dFile(std::string strFile)
 	{
 		pNode = osgDB::readNodeFile(strFile, m_pOpt);
 	}	
-
+	
+	GfOut("le test %d \n",pNode);
 	return pNode;
 }

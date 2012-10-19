@@ -174,11 +174,12 @@ void setViewer(osg::ref_ptr<osgViewer::Viewer> msV)
 
 bool LoadTrack(std::string strTrack)
 {
+	GfOut("Chemin Track : %s\n", strTrack.c_str());
 	osgLoader loader;
 	loader.AddSearchPath(m_strTexturePath);
 	osg::Node *pTrack = loader.Load3dFile(strTrack);
 
- 	//osgDB::writeNodeFile(*pTrack,"c:\\users\\gavin\\mytrack.osg");
+ 	//osgDB::writeNodeFile(*pTrack,"mytrack.osg");
 
 	if (pTrack)
 	{
@@ -198,6 +199,19 @@ bool LoadTrack(std::string strTrack)
 
 	return true;
 }
+
+/*void grOSG::SetCamera(osg::Matrixf projMat,osg::Matrixf modelMat)
+{
+	m_pCamera->setProjectionMatrix(projMat);
+	m_pCamera->setViewMatrix(modelMat);
+}
+
+void grOSG::SetCamera(osg::Vec3 center,osg::Vec3 eye,osg::Vec3 up,float fov,float aspect,float znear,float zfar)
+{
+
+	m_pCamera->setProjectionMatrixAsPerspective(fov,aspect,znear,zfar);
+	m_pCamera->setViewMatrixAsLookAt(eye,center,up);
+}*/
 
 int
 grLoadScene(tTrack *track)
@@ -246,6 +260,7 @@ grLoadScene(tTrack *track)
 
 	std::string strPath = GetDataDir();
 	sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
+	strPath+=buf;
 	//strPath+="tracks/speedway/milky-five";
 	strPath+="/";
 	strPath+=acname;
