@@ -1,4 +1,4 @@
-#pragma once
+#include <string.h>	// to remove with OSG 3.2
 
 #include <osgDB/FileNameUtils>
 #include <osgDB/Registry>

@@ -74,6 +74,7 @@ extern void grShutdownScene(void);
 extern void grCustomizePits(void);
 //extern void grDrawBackground(class cGrCamera *, class cGrBackgroundCam *bgCam);
 extern void grUpdateTime(tSituation *s);
+extern void setViewer(osg::ref_ptr<osgViewer::Viewer> msV);
 
 //TODO: What is this??? kilo
 #ifdef GUIONS

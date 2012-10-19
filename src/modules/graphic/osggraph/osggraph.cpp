@@ -85,7 +85,7 @@ OsgGraph::~OsgGraph()
 bool OsgGraph::loadTrack(tTrack* pTrack)
 {
 	//GfLogDebug("SsgGraph::loadTrack\n");
-	return true;//return ::initTrack(pTrack) == 0;
+	return ::initTrack(pTrack) == 0;
 }
 
 bool OsgGraph::loadCars(tSituation* pSituation)
@@ -102,7 +102,7 @@ bool OsgGraph::setupView(int x, int y, int width, int height, void* pMenuScreen)
 
 void OsgGraph::redrawView(tSituation* pSituation)
 {
-	//::refresh(pSituation);
+	::refresh(pSituation);
 }
 
 // void OsgGraph::bendCar(int index, sgVec3 poc, sgVec3 force, int count)

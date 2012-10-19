@@ -32,6 +32,7 @@
 //#include "grcar.h"
 //#include "grscreen.h"
 //#include "grscene.h"
+#include "OsgScene.h"
 //#include "grsound.h"
 //#include "grloadac.h"
 //#include "grutil.h"
@@ -450,8 +451,9 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     //m_start_tick = m_timer.tick();
 
     m_sceneViewer = new osgViewer::Viewer();
+    setViewer(m_sceneViewer);
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = m_sceneViewer->setUpViewerAsEmbeddedInWindow(0, 0, grWinw, grWinh);
-    //m_sceneViewer->realize();
+    m_sceneViewer->realize();
 
 	/*// Create the screens and initialize each board.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
@@ -505,12 +507,14 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 }
 
 
-/*int
+int
 refresh(tSituation *s)
 {
-    int	i;
+    //int	i;
+    m_sceneViewer->frame();
+}
 
-    GfProfStartProfile("refresh");
+    /*GfProfStartProfile("refresh");
 
 	// Compute FPS indicators every second.
     frameInfo.nInstFrames++;
@@ -685,29 +689,31 @@ shutdownCars(void)
 	if (nFPSTotalSeconds > 0)
 		GfLogTrace("Average frame rate: %.2f F/s\n",
 				   (double)frameInfo.nTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - fFPSPrevInstTime));
-}
+}*/
 
 int
 initTrack(tTrack *track)
 {
 	// The inittrack does as well init the context, that is highly inconsistent, IMHO.
 	// TODO: Find a solution to init the graphics first independent of objects.
-	grContext.makeCurrent();
+	//grContext.makeCurrent();
 
 	setupOpenGLFeatures();
     
-	grssgSetCurrentOptions(&options);
+	//grssgSetCurrentOptions(&options);
 
 	// Now, do the real track loading job.
 	grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	if (grNbActiveScreens > 0)
+	/*if (grNbActiveScreens > 0)
 		return grLoadScene(track);
 
-	return -1;
+	 return -1;*/
+    //m_sceneViewer->setSceneData();
+    return grLoadScene(track);
 }
 
 
-void
+/*void
 shutdownTrack(void)
 {
 	// Do the real track termination job.
@@ -723,9 +729,9 @@ shutdownTrack(void)
 	options.endLoad();
 	
 	grShutdownState();
-}
+}*/
 
-void
+/*void
 shutdownView(void)
 {
 	for (int i = 0; i < GR_NB_MAX_SCREEN; i++)

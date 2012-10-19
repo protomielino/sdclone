@@ -167,6 +167,11 @@ OsgInitScene(void)
 
 //static ssgLoaderOptionsEx	options;
 
+void setViewer(osg::ref_ptr<osgViewer::Viewer> msV)
+{
+    m_sceneViewer = msV;
+}
+
 bool LoadTrack(std::string strTrack)
 {
 	osgLoader loader;
@@ -211,9 +216,9 @@ grLoadScene(tTrack *track)
 		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 	}//if grHandle
 
-	skydynamic = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOME, (char*)NULL, skydynamic);
-	TimeDyn = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICTIME, (char*)NULL, TimeDyn);
-	WeatherDyn = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICWEATHER, (char*)NULL, WeatherDyn);
+	//skydynamic = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOME, (char*)NULL, skydynamic);
+	//TimeDyn = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICTIME, (char*)NULL, TimeDyn);
+	//WeatherDyn = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICWEATHER, (char*)NULL, WeatherDyn);
 			
 	//acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
 	/*if ((grTrack->Timeday == 1) && (grTrack->skyversion > 0)) // If night in quickrace, practice or network mode
@@ -227,11 +232,12 @@ grLoadScene(tTrack *track)
 	}
 
 	std::string strTPath = GetDataDir();
-	strTPath+="data/textures";
-	SetTexturePaths(strTPath.c_str());
 	sprintf(buf, "tracks/%s/%s;data/textures;data/img;.", grTrack->category, grTrack->internalname);
+	strTPath+=buf;
+	SetTexturePaths(strTPath.c_str());
+	
 	//ssgTexturePath(buf);
-	sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
+	//sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 	//ssgModelPath(buf);
 
 	std::string strPath = GetDataDir();
