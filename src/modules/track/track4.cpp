@@ -1053,7 +1053,7 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 					GfLogDebug("\n");
 
 					for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
-						curSeg2 = NULL;
+						curSeg = curSeg2 = NULL;
 
 						switch(pits->side) {
 							case TR_RGT:
@@ -1074,17 +1074,23 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 						}//switch pits->side
 
 						if ((mSeg != pitStart->prev) && (mSeg != pitEnd->next)) {
-							curSeg->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
+							if (curSeg) {
+								curSeg->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
+							}
 							if (curSeg2) {
 								curSeg2->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
 							}
 						} else if (mSeg == pitStart->prev) {
-							curSeg->raceInfo |= TR_PITSTART;
+							if (curSeg) {
+								curSeg->raceInfo |= TR_PITSTART;
+							}
 							if (curSeg2) {
 								curSeg2->raceInfo |= TR_PITSTART;
 							}
 						} else if (mSeg == pitEnd->next) {
-							curSeg->raceInfo |= TR_PITEND;
+							if (curSeg) {
+								curSeg->raceInfo |= TR_PITEND;
+							}
 							if (curSeg2) {
 								curSeg2->raceInfo |= TR_PITEND;
 							}
