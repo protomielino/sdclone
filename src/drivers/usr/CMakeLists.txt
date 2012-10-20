@@ -12,7 +12,7 @@ SET(ROBOT_INTERFACE LEGACY WELCOME
                     usr_ls2
                     usr_36GP
                     usr_rs
-					usr_lp1
+                    usr_lp1
                     )
 
 SET(ROBOT_SOURCES
@@ -48,12 +48,14 @@ ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.0.0 SOVERSION 1.0.0
 ###################
 # USR core
 ###################
-SET(ROBOT_SUBDIRS 1
-                  tracks)
 
-ROBOT_DATA(NAME ${ROBOT_NAME} PREFIX src
-           #FILES README
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+# FIXME: These folders aren't there (anymore ?) ; remove ?
+#SET(ROBOT_SUBDIRS 1
+#                  tracks)
+
+#ROBOT_DATA(NAME ${ROBOT_NAME} PREFIX src
+#           #FILES README
+#           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
 
 
 ###################
@@ -97,12 +99,12 @@ ROBOT_DATA(NAME usr_ls1 PREFIX usr_ls1
 ###################
 # USR_LS2
 ###################
-SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8 9 10 11 12 13 14
+SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8
                   ls2-bavaria-g3gtr ls2-boxer-96rsr
                   ls2-cavallo-360r ls2-condor-c400r
 		  ls2-morley-r900 ls2-sprite-gts
 		  ls2-vortex-gt ls2-lynx-xkr
-                  tracks)
+                  )
 
 ROBOT_DATA(NAME usr_ls2 PREFIX usr_ls2
            FILES usr_ls2.xml default.xml logo.rgb readme.txt
