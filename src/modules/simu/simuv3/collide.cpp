@@ -86,7 +86,6 @@ SimCarCollideZ(tCar *car)
     t3Dd        rel_car_normal;
     tdble       dotProd;
     tWheel      *wheel;
-    bool upside_down = false;
     tdble corner_factor = 0.9f; // how much to shrink the bounding box
 
     if (car->collide_timer < 10.0) {
@@ -110,10 +109,8 @@ SimCarCollideZ(tCar *car)
     // Increment the upside down timer.  This can be used later to
     // remove cars that have been upside down for too long.
     if (rel_car_normal.z > 0) {
-        upside_down = false;
         car->upside_down_timer = 0.0f;
     } else {
-        upside_down = true;
         car->upside_down_timer += (float)(0.01*SimDeltaTime);
     }
 
@@ -405,10 +402,8 @@ SimCarCollideZ(tCar *car)
         car->DynGCg.pos.z -= gc_height_difference;
     } else if (gc_height_difference > 100) {
         car->DynGCg.pos.z = RtTrackHeightL(&(car->trkPos)) + 100;
-        // FIXME: Wasn't car->DynGCg.vel.z intended the 2nd time ?
-        car->DynGCg.vel.x = car->DynGCg.vel.y = car->DynGCg.vel.y = 
-            // FIXME: Wasn't car->DynGC.vel.z intended the 2nd time ?
-            car->DynGC.vel.x = car->DynGC.vel.y = car->DynGC.vel.y = 0.0;
+        car->DynGCg.vel.x = car->DynGCg.vel.y = car->DynGCg.vel.z = 
+            car->DynGC.vel.x = car->DynGC.vel.y = car->DynGC.vel.z = 0.0;
         // Translate angular momentum to angular velocity
         // NOTE: This translation is done again in SimCarAddAngularVelocity()
         car->DynGCg.vel.ax = car->DynGC.vel.ax = 
