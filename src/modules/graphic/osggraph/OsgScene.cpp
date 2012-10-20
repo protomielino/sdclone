@@ -70,7 +70,7 @@ osg::Node *Load3dFile(std::string strFile);
 bool LoadTrack(std::string strTrack);
 
 std::string m_strTexturePath;
-osg::ref_ptr<osg::MatrixTransform> m_sceneroot;
+osg::ref_ptr<osg::Group> m_sceneroot;
 osg::ref_ptr<osg::Group> m_carroot;
 osg::ref_ptr<osgViewer::Viewer> m_sceneViewer;
 osg::Timer m_timer;
@@ -172,10 +172,21 @@ void setViewer(osg::ref_ptr<osgViewer::Viewer> msV)
     m_sceneViewer = msV;
 }
 
+void setSceneRoot(osg::ref_ptr<osg::Group> root)
+{
+	m_sceneroot = root;
+}
+
+void ClearScene(void)
+{
+	m_sceneroot->removeChildren(0, m_sceneroot->getNumChildren());	
+}
+
 bool LoadTrack(std::string strTrack)
 {
 	GfOut("Chemin Track : %s\n", strTrack.c_str());
 	osgLoader loader;
+	//osg::ref_ptr<osg::Group> m_sceneroot = new osg::Group;
 	loader.AddSearchPath(m_strTexturePath);
 	osg::Node *pTrack = loader.Load3dFile(strTrack);
 
@@ -220,6 +231,8 @@ grLoadScene(tTrack *track)
 	const char		*acname;
 	
 	grTrack = track;
+	osg::ref_ptr<osg::Group> m_sceneroot = new osg::Group;
+	setSceneRoot(m_sceneroot);
 	//ssgEntity		*desc;
 
 	/*if (maxTextureUnits == 0) {
@@ -249,25 +262,20 @@ grLoadScene(tTrack *track)
 
 	std::string strTPath = GetDataDir();
 	sprintf(buf, "tracks/%s/%s;data/textures;data/img;.", grTrack->category, grTrack->internalname);
-	//GfOut("strPath = %s\n", acname);
 	strTPath+=buf;
-	//strTPath+="tracks/speedway/milky-five";
 	SetTexturePaths(strTPath.c_str());
-	
-	//ssgTexturePath(buf);
-	//sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
-	//ssgModelPath(buf);
 
 	std::string strPath = GetDataDir();
 	sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 	strPath+=buf;
-	//strPath+="tracks/speedway/milky-five";
 	strPath+="/";
 	strPath+=acname;
-	//GetOSG()->ClearScene();
+	//ClearScene();
 	//osgBackground back;
 	//GetOSG()->SetBackGround(back.CreateBackground(grTrack));
 	LoadTrack(strPath);
+	
+	//GfOut("Track = %d\n", m_sceneroot);
 	//desc = grssgLoadAC3D(acname, NULL);
 	//LandAnchor->addKid(desc);
 

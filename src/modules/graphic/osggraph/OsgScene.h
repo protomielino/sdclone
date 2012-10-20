@@ -43,6 +43,8 @@ extern int grWrldZ;
 extern int grWrldMaxSize;
 extern tTrack *grTrack;
 
+//extern osg::ref_ptr<osg::Group> m_sceneroot;
+extern osg::ref_ptr<osg::Group> m_carroot;
 /*extern ssgRoot *TheScene;
 extern ssgBranch *SunAnchor;
 extern ssgBranch *LandAnchor;
@@ -75,6 +77,8 @@ extern void grCustomizePits(void);
 //extern void grDrawBackground(class cGrCamera *, class cGrBackgroundCam *bgCam);
 extern void grUpdateTime(tSituation *s);
 extern void setViewer(osg::ref_ptr<osgViewer::Viewer> msV);
+extern void ClearScene(void);
+extern void setSceneRoot(osg::ref_ptr<osg::Group> root);
 
 //TODO: What is this??? kilo
 #ifdef GUIONS
