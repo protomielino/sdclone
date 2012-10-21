@@ -42,7 +42,8 @@
 //#include "grbackground.h"
 
 
-//extern osg::ref_ptr<osgViewer::Viewer> m_sceneViewer;
+//osg::ref_ptr<osgViewer::Viewer> m_sceneViewer;
+//osg::ref_ptr<osg::Group> m_sceneroot;
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;
 
@@ -445,6 +446,9 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     frameInfo.nTotalFrames = 0;
 	fFPSPrevInstTime = GfTimeClock();
     nFPSTotalSeconds = 0;
+    //osg::Vec3 eye, center, up;
+    //eye = { 10.0f, 10.0f, 0.5f};
+    //center = { 50.0f, 20.0f, 0.05f};
     
     //tdble grLodFactorValue = 1.0;
     
@@ -453,7 +457,15 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     m_sceneViewer = new osgViewer::Viewer();
     setViewer(m_sceneViewer);
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = m_sceneViewer->setUpViewerAsEmbeddedInWindow(0, 0, grWinw, grWinh);
+    m_sceneViewer->getCamera()->setName("Cam one");
+    //m_sceneViewer->getCamera()->setViewMatrix( viewMatrix );
+    //m_sceneViewer->getCamera()->setProjectionMatrix( projectionMatrix );
+    m_sceneViewer->getCamera()->setViewport(new osg::Viewport(0, 0, grWinw, grWinh));
+    //m_sceneViewer->getCamera()->getViewMatrixAsLookAt(eye, center, up);
+    m_sceneViewer->getCamera()->setGraphicsContext(gw.get());
     m_sceneViewer->realize();
+    
+    //m_sceneViewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
 
 	/*// Create the screens and initialize each board.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
@@ -499,7 +511,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 
 	GfLogInfo("Current screen is #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
 
-    //grInitScene();
+    OsgInitScene();
 
     //grLodFactorValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, 1.0);
 
@@ -512,6 +524,8 @@ refresh(tSituation *s)
 {
     //int	i;
     m_sceneViewer->frame();
+    
+    return 0;
 }
 
     /*GfProfStartProfile("refresh");

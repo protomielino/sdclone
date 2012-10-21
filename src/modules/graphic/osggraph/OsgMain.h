@@ -21,6 +21,7 @@
 #define _OSGMAIN_H_
 
 #include <osgViewer/Viewer>
+#include <osg/Camera>
 
 #include <graphic.h>
 #include <raceman.h>	//tSituation

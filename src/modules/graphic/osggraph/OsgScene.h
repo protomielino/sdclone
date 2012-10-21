@@ -67,7 +67,7 @@ extern grMultiTexState	*grEnvShadowStateOnCars;*/
 
 
 //!Public interface
-extern int grInitScene(void);
+extern int OsgInitScene(void);
 extern int grLoadScene(tTrack *track);
 extern void grDrawScene(float speedcar, tSituation *s);
 extern void SetTexturePaths(const char *pszPath);

@@ -29,6 +29,9 @@
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
 #include <osgDB/Registry>
+#include <osg/Light>
+#include <osg/LightSource>
+#include <osg/Camera>
 
 #include "OsgLoader.h"
 #include "OsgMain.h"
@@ -77,6 +80,8 @@ osg::Timer m_timer;
 osg::Timer_t m_start_tick;
 osg::Matrix m_ModelMat;
 osg::Matrix m_ProjMat;
+
+osg::Vec3 eye,center,up;
 
 /*ssgStateSelector *grEnvSelector = NULL;
 grMultiTexState	*grEnvState = NULL;
@@ -160,7 +165,20 @@ int
 OsgInitScene(void)
 {
 	void *hndl = grTrackHandle;
-
+	
+    // create a local light.
+    osg::Light* myLight2 = new osg::Light;
+    myLight2->setLightNum(1);
+    myLight2->setPosition(osg::Vec4(0.0f, 0.0f, 0.0f,1.0f));
+    myLight2->setAmbient(osg::Vec4(0.0f, 1.0f, 1.0f, 1.0f));
+    myLight2->setDiffuse(osg::Vec4(0.0f, 1.0f, 1.0f, 1.0f));
+    myLight2->setConstantAttenuation(1.0f);
+    
+    
+    //myLight2->setLinearAttenuation(2.0f/m_sceneroot);
+    
+	m_sceneViewer->setSceneData( m_sceneroot.get() );		
+    m_sceneViewer->getCamera()->setCullingMode( m_sceneViewer->getCamera()->getCullingMode() & ~osg::CullStack::SMALL_FEATURE_CULLING);
   	return 0;
 }//grInitScene
 
@@ -198,11 +216,12 @@ bool LoadTrack(std::string strTrack)
 		optimizer.optimize(pTrack); 
 		osg::Matrixf mat;
 		//Rotate track model 90 degrees to match the way plib loader works
-		mat = mat.rotate(osg::inDegrees(90.0), osg::X_AXIS);
-		osg::MatrixTransform *pTrans = new osg::MatrixTransform(mat);
-		pTrans->addChild(pTrack);
-		pTrans->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
-		m_sceneroot->addChild(pTrans);
+		//mat = mat.rotate(osg::inDegrees(90.0), osg::X_AXIS);
+		//osg::MatrixTransform *pTrans = new osg::MatrixTransform(mat);
+		//pTrans->addChild(pTrack);
+		//pTrans->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
+		pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
+		m_sceneroot->addChild(pTrack);
 		
 	}
 	else
