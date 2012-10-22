@@ -523,6 +523,13 @@ int
 refresh(tSituation *s)
 {
     //int	i;
+    tCarElt *car = s->cars[0];
+
+    osg::Camera * camera = m_sceneViewer->getCamera();
+
+    camera->setViewMatrixAsLookAt(
+                osg::Vec3(car->_pos_X,car->_pos_Z,-car->_pos_Y),osg::Vec3(car->_pos_X+5*cos(car->_yaw),car->_pos_Z,-car->_pos_Y-5*sin	(car->_yaw)), osg::Vec3(0,1,0));
+    //camera->setProjectionMatrixAsPerspective(45,16/9,0.6,100.0);
     m_sceneViewer->frame();
     
     return 0;
@@ -578,13 +585,14 @@ refresh(tSituation *s)
 initCars(tSituation *s)
 {
 	char buf[256];
-    char	idx[16];
-    int		index;
-    int		i;
-    tCarElt 	*elt;
-    void	*hdle;
+    	char	idx[16];
+    	int	index;
+    	int	i;
+    	tCarElt *elt;
+    	void	*hdle;
 
-    TRACE_GL("initCars: start");
+    GfOut("initCars: start");
+    //osg::ref_ptr<osg::Group> cars = osg::Group;
 
     if (!grHandle)
     {
@@ -592,16 +600,16 @@ initCars(tSituation *s)
         grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     }
 
-    grInitCommonState();
-    grInitCarlight(s->_ncars);
-    grMaxDammage = (tdble)s->_maxDammage;
+    //grInitCommonState();
+    //grInitCarlight(s->_ncars);
+    //grMaxDammage = (tdble)s->_maxDammage;
     grNbCars = s->_ncars;
 
-    grCustomizePits();
+    //grCustomizePits();
 
     grCarInfo = (tgrCarInfo*)calloc(s->_ncars, sizeof(tgrCarInfo));
 
-	for (i = 0; i < s->_ncars; i++) {
+	/*for (i = 0; i < s->_ncars; i++) {
 		elt = s->cars[i];*/
 		/* Car pre-initialization */
 		//grPreInitCar(elt);
@@ -609,10 +617,10 @@ initCars(tSituation *s)
 		//grInitShadow(elt);
 		/* Skidmarks init */
 		//grInitSkidmarks(elt);
-	/*}
+	/*}*/
 
-    grNbActiveScreens = 0;
-    for (i = 0; i < s->_ncars; i++) {
+    //grNbActiveScreens = 0;
+    /*for (i = 0; i < s->_ncars; i++) {
 	elt = s->cars[i];
 	index = elt->index;
 	hdle = elt->_paramsHandle;
@@ -625,15 +633,40 @@ initCars(tSituation *s)
 	else
 		sprintf(idx, "Robots/index/%d", elt->_driverIndex);
 
-	grCarInfo[index].iconColor[0] = GfParmGetNum(hdle, idx, "red",   (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "red",   NULL, 0));
+	/*grCarInfo[index].iconColor[0] = GfParmGetNum(hdle, idx, "red",   (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "red",   NULL, 0));
 	grCarInfo[index].iconColor[1] = GfParmGetNum(hdle, idx, "green", (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "green", NULL, 0));
 	grCarInfo[index].iconColor[2] = GfParmGetNum(hdle, idx, "blue",  (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "blue",  NULL, 0));
-	grCarInfo[index].iconColor[3] = 1.0;
-	grInitCar(elt);
+	grCarInfo[index].iconColor[3] = 1.0;*/
+	//grInitCar(elt);
+	
+     //osgLoader loader;
+     //osg::ref_ptr<osg::Group> m_sceneroot = new osg::Group;
+     //loader.AddSearchPath(m_strTexturePath);
+     //osg::Node *pCar = loader.Load3dFile(strTrack);
+ 
+     //osgDB::writeNodeFile(*pTrack,"mytrack.osg");
+
+    /*if (pTrack)
+    {
+        osgUtil::Optimizer optimizer;
+        optimizer.optimize(pTrack);
+
+        osg::ref_ptr<osg::Transform> transform = osg::Transform;
+        osg::Matrix R = osg::Matrix::rotate (elt->_pitch,elt->yaw,elt->roll);
+        osg::Matrix T = osg::Matrix::rotate (elt->_pos_X,elt->_pos_Z,-elt->_pos_Y);
+        transform->setMatrix(T*R);
+        transform->addChild(pCar);
+
+        cars->addChild(transform);
+    }
+
+    osg::ref_ptr<osg::Group>  gr = m_sceneViewer->getSceneData();
+
+    gr->addChild(cars);*/
 
 	// Pre-assign each human driver (if any) to a different screen
 	// (set him as the "current driver" for this screen).
-	if (grNbActiveScreens < GR_NB_MAX_SCREEN
+	/*if (grNbActiveScreens < GR_NB_MAX_SCREEN
 		&& elt->_driverType == RM_DRV_HUMAN && !elt->_networkPlayer) 
 	{
 	    grScreens[grNbActiveScreens]->setCurrentCar(elt);
@@ -649,22 +682,22 @@ initCars(tSituation *s)
 	// Initialize the cameras for all the screens.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
 	grScreens[i]->initCams(s);
-    }
+    }*/
 
-    TRACE_GL("initCars: end");
+    //GfOut("initCars: end");
 
 	// Initialize other stuff.
-    grInitSmoke(s->_ncars);
+    /*grInitSmoke(s->_ncars);
     grInitSound(s, s->_ncars);
     grTrackLightInit();
 
 	// Setup the screens (= OpenGL viewports) inside the physical game window.
-    grAdaptScreenSize();
+    grAdaptScreenSize();*/
 
-    return 0; // true;
-}
+    //return 0; // true;
+//}
 
-void
+/*void
 shutdownCars(void)
 {
 	int i;
