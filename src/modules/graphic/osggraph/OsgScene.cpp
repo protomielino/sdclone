@@ -17,13 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
-/*#ifdef WIN32
-#include <windows.h>
-#include <GL/gl.h>
-#include <GL/glext.h>
-#endif*/
-
 #include <osgUtil/Optimizer>
 #include <osg/MatrixTransform>
 #include <osgDB/ReadFile>
@@ -37,18 +30,8 @@
 #include "OsgMain.h"
 #include "OsgScene.h"
 
-
 #include <glfeatures.h>	//gluXXX
 #include <robottools.h>	//RtXXX()
-
-
-
-//#include "grcam.h"	//cGrBackgroundCam
-/*#include "grutil.h"
-#include "grssgext.h"
-#include "grrain.h"
-
-#include "osgBackground.h"*/
 
 #define MAX_BODIES	2
 #define MAX_CLOUDS	3
@@ -74,6 +57,7 @@ bool LoadTrack(std::string strTrack);
 
 std::string m_strTexturePath;
 osg::ref_ptr<osg::Group> m_sceneroot;
+osg::ref_ptr<osg::Node> m_background;
 osg::ref_ptr<osg::Group> m_carroot;
 osg::ref_ptr<osgViewer::Viewer> m_sceneViewer;
 osg::Timer m_timer;
@@ -101,6 +85,15 @@ ssgBranch *CarlightAnchor = NULL;
 ssgBranch *TrackLightAnchor = NULL;
 ssgBranch *ThePits = NULL;*/
 
+unsigned grSkyDomeDistance = 0;
+static unsigned grNbCloudLayers = 0;
+
+static bool grDynamicSkyDome = false;
+static int grBackgroundType = 0;
+static float grMax_Visibility = 0.0f;
+
+static const unsigned SkyDomeDistThresh = 12000; // No dynamic sky below that value.
+
 static int RainBool = 0;
 static int skydynamic = 0;
 static int TimeDyn = 0;
@@ -112,6 +105,9 @@ static GLuint BackgroundList = 0;
 static GLuint BackgroundTex = 0;
 static GLuint BackgroundList2;
 static GLuint BackgroundTex2;
+
+static bool grBGSky = false;
+static bool grBGType = false;
 
 //static ssgRoot *TheBackground = NULL;
 //static ssgaSky *Sky = NULL;
@@ -145,7 +141,6 @@ static sgVec4 scene_specular;
 static const double m_log01 = -log( 0.01 );
 static const double sqrt_m_log01 = sqrt( m_log01 );
 static char buf[1024];
-//static void initBackground(void);
 //static void grDrawRain(void);
 
 //extern ssgEntity *grssgLoadAC3D(const char *fname, const ssgLoaderOptions* options);
@@ -172,16 +167,55 @@ OsgInitScene(void)
     myLight2->setPosition(osg::Vec4(0.0f, 0.0f, 0.0f,1.0f));
     myLight2->setAmbient(osg::Vec4(0.0f, 1.0f, 1.0f, 1.0f));
     myLight2->setDiffuse(osg::Vec4(0.0f, 1.0f, 1.0f, 1.0f));
-    myLight2->setConstantAttenuation(1.0f);
-    
+    myLight2->setConstantAttenuation(1.0f);    
     
     //myLight2->setLinearAttenuation(2.0f/m_sceneroot);
     
 	m_sceneViewer->setSceneData( m_sceneroot.get() );		
     m_sceneViewer->getCamera()->setCullingMode( m_sceneViewer->getCamera()->getCullingMode() & ~osg::CullStack::SMALL_FEATURE_CULLING);
+    
   	return 0;
 }//grInitScene
 
+void
+grLoadBackgroundGraphicsOptions()
+{
+	// Sky dome / background.
+	grSkyDomeDistance =
+		(unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, 0, 0) + 0.5);
+	if (grSkyDomeDistance > 0 && grSkyDomeDistance < SkyDomeDistThresh)
+		grSkyDomeDistance = SkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
+	
+	grDynamicSkyDome = grSkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), 
+						GR_ATT_DYNAMICSKYDOME_ENABLED) == 0; 
+
+	GfLogInfo("Graphic options : Sky dome : distance = %u m, dynamic = %s\n",
+			  grSkyDomeDistance, grDynamicSkyDome ? "true" : "false");
+			
+	// Cloud layers.
+	grNbCloudLayers = (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
+
+	GfLogInfo("Graphic options : Number of cloud layers : %u\n", grNbCloudLayers);
+
+	grMax_Visibility =
+		(unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, 0, 0));
+
+
+}
+
+static void
+grLoadGraphicsOptions()
+{
+	char buf[256];
+	
+	if (!grHandle)
+	{
+		sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
+		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+	}//if grHandle
+
+	grLoadBackgroundGraphicsOptions();
+}
 
 //static ssgLoaderOptionsEx	options;
 
@@ -231,6 +265,26 @@ bool LoadTrack(std::string strTrack)
 	return true;
 }
 
+bool LoadBackground(std::string strTrack)
+{
+	GfOut("Chemin background : %s\n", strTrack.c_str());
+	osgLoader loader;
+	GfOut("Chemin Textures : %s\n", m_strTexturePath.c_str());
+	loader.AddSearchPath(m_strTexturePath);
+	osg::Node *m_background = loader.Load3dFile(strTrack);
+
+	if (m_background)
+	{
+		m_sceneroot->addChild(m_background);
+		
+	}
+	else
+		return false;
+
+	return true;
+}
+
+
 /*void grOSG::SetCamera(osg::Matrixf projMat,osg::Matrixf modelMat)
 {
 	m_pCamera->setProjectionMatrix(projMat);
@@ -254,6 +308,9 @@ grLoadScene(tTrack *track)
 	osg::ref_ptr<osg::Group> m_sceneroot = new osg::Group;
 	setSceneRoot(m_sceneroot);
 	//ssgEntity		*desc;
+	
+	// Load graphics options.
+	grLoadGraphicsOptions();
 
 	/*if (maxTextureUnits == 0) {
 		InitMultiTex();
@@ -265,9 +322,11 @@ grLoadScene(tTrack *track)
 		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 	}//if grHandle
 
-	//skydynamic = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOME, (char*)NULL, skydynamic);
-	//TimeDyn = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICTIME, (char*)NULL, TimeDyn);
-	//WeatherDyn = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICWEATHER, (char*)NULL, WeatherDyn);
+	/* Determine the world limits */
+	grWrldX = (int)(track->max.x - track->min.x + 1);
+	grWrldY = (int)(track->max.y - track->min.y + 1);
+	grWrldZ = (int)(track->max.z - track->min.z + 1);
+	grWrldMaxSize = (int)(MAX(MAX(grWrldX, grWrldY), grWrldZ));
 			
 	//acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
 	/*if ((grTrack->Timeday == 1) && (grTrack->skyversion > 0)) // If night in quickrace, practice or network mode
@@ -277,7 +336,41 @@ grLoadScene(tTrack *track)
   	GfOut("ACname = %s\n", acname);
 	if (strlen(acname) == 0) 
 	{
+		GfLogError("No specified track 3D model file\n");
 		return -1;
+	}
+	
+	if (grSkyDomeDistance > 0 && grTrack->skyversion > 0)
+	{
+		grBGSky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
+		if (grBGSky)
+		{
+			grBGType = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), GR_ATT_BGSKY_LAND) == 0;
+			if (grBGType)
+			{
+				std::string strTPath = GetDataDir();
+				strTPath+="data/textures";
+				SetTexturePaths(strTPath.c_str());
+
+				std::string strPath = GetDataDir();
+				sprintf(buf, "tracks/%s/%s/land.ac", grTrack->category, grTrack->internalname);
+				strPath+=buf;
+				LoadBackground(strPath);
+			}
+			else
+			{ 
+				std::string strTPath = GetDataDir();
+				sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
+				strTPath+=buf;
+				strTPath+="/";
+				SetTexturePaths(strTPath.c_str());
+
+				std::string strPath = GetDataDir();
+				//sprintf(buf, "tracks/%s/%s/background-sky.ac", grTrack->category, grTrack->internalname);
+				strPath+="data/objects/background-sky.ac";
+				LoadBackground(strPath);				
+			}
+		}
 	}
 
 	std::string strTPath = GetDataDir();
@@ -300,6 +393,8 @@ grLoadScene(tTrack *track)
 	//GfOut("Track = %d\n", m_sceneroot);
 	//desc = grssgLoadAC3D(acname, NULL);
 	//LandAnchor->addKid(desc);
+	
+	//m_sceneroot->addChild(m_background);
 
 	return 0;
 }//grLoadScene
@@ -308,7 +403,7 @@ void
 grDrawScene(float speedcar, tSituation *s) 
 //grDrawScene(void)
 {	
-	
+
 }//grDrawScene
 
 

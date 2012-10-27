@@ -528,8 +528,8 @@ refresh(tSituation *s)
     osg::Camera * camera = m_sceneViewer->getCamera();
 
     camera->setViewMatrixAsLookAt(
-                osg::Vec3(car->_pos_X,car->_pos_Z,-car->_pos_Y),osg::Vec3(car->_pos_X+5*cos(car->_yaw),car->_pos_Z,-car->_pos_Y-5*sin	(car->_yaw)), osg::Vec3(0,1,0));
-    //camera->setProjectionMatrixAsPerspective(45,16/9,0.6,100.0);
+                osg::Vec3(car->_pos_X,car->_pos_Z + 0.9 ,-car->_pos_Y), osg::Vec3(car->_pos_X+5*cos(car->_yaw), car->_pos_Z + 1.2, -car->_pos_Y-5*sin(car->_yaw)), osg::Vec3(0,1,0));
+    camera->setProjectionMatrixAsPerspective(55,16/9,0.1,100.0);
     m_sceneViewer->frame();
     
     return 0;

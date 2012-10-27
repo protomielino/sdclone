@@ -34,8 +34,6 @@
 
 #include <track.h>	//tTrack
 #include <raceman.h> // tSituation
-//#include "grmultitexstate.h"
-
 
 extern int grWrldX;
 extern int grWrldY;
@@ -43,24 +41,8 @@ extern int grWrldZ;
 extern int grWrldMaxSize;
 extern tTrack *grTrack;
 
-//extern osg::ref_ptr<osg::Group> m_sceneroot;
+extern osg::ref_ptr<osg::Group> m_sceneroot;
 extern osg::ref_ptr<osg::Group> m_carroot;
-/*extern ssgRoot *TheScene;
-extern ssgBranch *SunAnchor;
-extern ssgBranch *LandAnchor;
-extern ssgBranch *CarsAnchor;
-extern ssgBranch *ShadowAnchor;
-extern ssgBranch *PitsAnchor;
-extern ssgBranch *SmokeAnchor;
-extern ssgBranch *SkidAnchor;
-extern ssgBranch *CarlightAnchor;
-extern ssgBranch *TrackLightAnchor;
-extern ssgBranch *ThePits;
-
-extern ssgStateSelector	*grEnvSelector;
-extern grMultiTexState	*grEnvState;
-extern grMultiTexState	*grEnvShadowState;
-extern grMultiTexState	*grEnvShadowStateOnCars;*/
 
 //class cGrCamera;
 //class cGrBackgroundCam;

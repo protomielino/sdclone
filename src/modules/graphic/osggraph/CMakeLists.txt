@@ -1,10 +1,10 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
 SET(OSGGRAPH_HEADERS AccGeode.h AccException.h ReaderWriterACC.h
-			OsgLoader.h OsgScene.h OsgMain.h osggraph.h)
+						OsgLoader.h OsgScene.h OsgMain.h osggraph.h)
 			
 SET(OSGGRAPH_SOURCES AccGeode.cpp AccException.cpp ReaderWriterACC.cpp
-			OsgLoader.cpp OsgScene.cpp OsgMain.cpp osggraph.cpp)
+						OsgLoader.cpp OsgScene.cpp OsgMain.cpp osggraph.cpp)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)
