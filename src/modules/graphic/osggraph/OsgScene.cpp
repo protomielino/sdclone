@@ -205,6 +205,7 @@ bool LoadTrack(std::string strTrack)
 	GfOut("Chemin Track : %s\n", strTrack.c_str());
 	osgLoader loader;
 	//osg::ref_ptr<osg::Group> m_sceneroot = new osg::Group;
+	GfOut("Chemin Textures : %s\n", m_strTexturePath.c_str());
 	loader.AddSearchPath(m_strTexturePath);
 	osg::Node *pTrack = loader.Load3dFile(strTrack);
 
@@ -280,8 +281,10 @@ grLoadScene(tTrack *track)
 	}
 
 	std::string strTPath = GetDataDir();
-	sprintf(buf, "tracks/%s/%s;data/textures;data/img;.", grTrack->category, grTrack->internalname);
-	strTPath+=buf;
+	//sprintf(buf, "tracks/%s/%s:", grTrack->category, grTrack->internalname);
+	//strTPath+=buf;
+	//sprintf(buf, "%sdata/textures", GetDataDir());
+	strTPath+="data/textures";
 	SetTexturePaths(strTPath.c_str());
 
 	std::string strPath = GetDataDir();
