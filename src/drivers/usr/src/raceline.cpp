@@ -1316,7 +1316,7 @@ void LRaceLine::ComputeSpeed(int rl)
   for (int i = Divs-1; --i >= 0;)
    tSpeed[rf][i] = tmpSpeed[i];
 
-  delete tmpSpeed;
+  delete[] tmpSpeed;
  }
 } 
 
