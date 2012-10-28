@@ -4,7 +4,7 @@
     created              : Fri Dec 23 17:35:18 CET 2011
     copyright            : (C) 2011 Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: OpenALMusicPlayer.cpp,v 1.1.2.2 2012/01/03 23:35:12 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

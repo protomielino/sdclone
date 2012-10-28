@@ -7,7 +7,7 @@
     created              : Fri Dec 23 17:35:18 CET 2011
     copyright            : (C) 2011 Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: OggSoundStream.h,v 1.1.2.2 2011/12/29 09:23:24 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
