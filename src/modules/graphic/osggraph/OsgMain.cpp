@@ -457,6 +457,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     m_sceneViewer = new osgViewer::Viewer();
     setViewer(m_sceneViewer);
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = m_sceneViewer->setUpViewerAsEmbeddedInWindow(0, 0, grWinw, grWinh);
+    //m_sceneViewer.addEventHandler(new osgViewer::StatsHandler);
     m_sceneViewer->getCamera()->setName("Cam one");
     //m_sceneViewer->getCamera()->setViewMatrix( viewMatrix );
     //m_sceneViewer->getCamera()->setProjectionMatrix( projectionMatrix );
@@ -526,10 +527,10 @@ refresh(tSituation *s)
     tCarElt *car = s->cars[0];
 
     osg::Camera * camera = m_sceneViewer->getCamera();
-
+	camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
     camera->setViewMatrixAsLookAt(
                 osg::Vec3(car->_pos_X,car->_pos_Z + 0.9 ,-car->_pos_Y), osg::Vec3(car->_pos_X+5*cos(car->_yaw), car->_pos_Z + 1.2, -car->_pos_Y-5*sin(car->_yaw)), osg::Vec3(0,1,0));
-    camera->setProjectionMatrixAsPerspective(55,16/9,0.1,100.0);
+    camera->setProjectionMatrixAsPerspective(55, 4/3, 1, 12000.0);
     m_sceneViewer->frame();
     
     return 0;
