@@ -15,47 +15,18 @@
 <!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
 
 <params name="sc-cavallo-360" type="template" mode="mw">
-
-	<section name="Gearbox">
-		<section name="gears">
-			<section name="r">
-				<attnum name="ratio" val="-2.0"/>
-			</section>
-			<section name="1">
-				<attnum name="ratio" val="3.26"/>
-			</section>
-			<section name="2">
-				<attnum name="ratio" val="2.08"/>
-			</section>
-			<section name="3">
-				<attnum name="ratio" val="1.59"/>
-			</section>
-			<section name="4">
-				<attnum name="ratio" val="1.12"/>
-			</section>
-			<section name="5">
-				<attnum name="ratio" val="0.90"/>
-			</section>
-			<section name="6">
-				<attnum name="ratio" val="0.96"/>
-			</section>
-		</section>
-	</section>
-
 	<section name="private">
 		<attnum name="fuelperlap" val="1.3"/>
 		<attnum name="base speed" val="7.00"/>
 		<attnum name="base brake" val="2.00"/>
-		<attnum name="revs change up" val="0.82"/>
-		<attnum name="revs change down" val="0.72"/>
+		<attnum name="revs change up" val="0.80"/>
+		<attnum name="revs change down" val="0.70"/>
 		<attnum name="int margin" min="0" max="2" val="1.1"/>
 		<attnum name="ext margin" min="0" max="2" val="1.5"/>
-		<attnum name="exit boost factor" min="-20" max="20" val="1.05"/>
+		<attnum name="exit boost factor" min="-20" max="20" val="1.0"/>
 		<attnum name="slope factor" val="0.1"/>
 		<attnum name="brake mu" val="0.50"/>
-
 	</section>
-
 </params>
 
 
