@@ -456,6 +456,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 
     m_sceneViewer = new osgViewer::Viewer();
     setViewer(m_sceneViewer);
+    m_sceneViewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = m_sceneViewer->setUpViewerAsEmbeddedInWindow(0, 0, grWinw, grWinh);
     //m_sceneViewer.addEventHandler(new osgViewer::StatsHandler);
     m_sceneViewer->getCamera()->setName("Cam one");
@@ -466,7 +467,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     m_sceneViewer->getCamera()->setGraphicsContext(gw.get());
     m_sceneViewer->realize();
     
-    //m_sceneViewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
+
 
 	/*// Create the screens and initialize each board.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
