@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef _OSGGRMAIN_H_
+#ifndef _OSGMAIN_H_
 #define _OSGMAIN_H_
 
 #include <osgViewer/Viewer>
@@ -26,15 +26,13 @@
 #include <graphic.h>
 #include <raceman.h>	//tSituation
 
-//#include "grcam.h"
-
-
+#include "CameraGroup.h"
 
 extern int grWinx, grWiny, grWinw, grWinh;
 extern int grVectFlag;
 extern int grVectDispFlag[];
 
-extern double grCurTime;
+extern double grCurTime, ratio;
 
 extern void *grHandle;
 extern void *grTrackHandle;

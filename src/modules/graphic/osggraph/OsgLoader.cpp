@@ -15,7 +15,7 @@ osgLoader::~osgLoader(void)
 void osgLoader::AddSearchPath(std::string strPath)
 {
 
-		m_pOpt->getDatabasePathList().push_back(strPath);
+		m_pOpt->getDatabasePathList().push_front(strPath);
 }
 
 osg::ref_ptr<osg::Image> osgLoader::LoadImageFile(std::string strFile)

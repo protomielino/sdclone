@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "OsgMain.h"
+#include "OsgMath.h"
 //#include "grOSG.h"
 //#include <osgViewer/Viewer>
 
@@ -66,6 +67,7 @@ tdble grLodFactorValue = 1.0;
 static cGrFrameInfo frameInfo;
 static double fFPSPrevInstTime;   // Last "instant" FPS refresh time
 static unsigned nFPSTotalSeconds; // Total duration since initView
+double ratio = 0.0f;
 
 // Mouse coords graphics backend to screen ratios.
 static float fMouseRatioX, fMouseRatioY;
@@ -436,6 +438,8 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     grWiny = y;
     grWinw = width;
     grWinh = height;
+    
+    ratio = width/height;
 
     fMouseRatioX = width / 640.0;
     fMouseRatioY = height / 480.0;
@@ -446,9 +450,6 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     frameInfo.nTotalFrames = 0;
 	fFPSPrevInstTime = GfTimeClock();
     nFPSTotalSeconds = 0;
-    //osg::Vec3 eye, center, up;
-    //eye = { 10.0f, 10.0f, 0.5f};
-    //center = { 50.0f, 20.0f, 0.05f};
     
     //tdble grLodFactorValue = 1.0;
     
@@ -458,13 +459,10 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     setViewer(m_sceneViewer);
     m_sceneViewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = m_sceneViewer->setUpViewerAsEmbeddedInWindow(0, 0, grWinw, grWinh);
-    //m_sceneViewer.addEventHandler(new osgViewer::StatsHandler);
     m_sceneViewer->getCamera()->setName("Cam one");
-    //m_sceneViewer->getCamera()->setViewMatrix( viewMatrix );
-    //m_sceneViewer->getCamera()->setProjectionMatrix( projectionMatrix );
     m_sceneViewer->getCamera()->setViewport(new osg::Viewport(0, 0, grWinw, grWinh));
-    //m_sceneViewer->getCamera()->getViewMatrixAsLookAt(eye, center, up);
     m_sceneViewer->getCamera()->setGraphicsContext(gw.get());
+    m_sceneViewer->getCamera()->setProjectionMatrixAsPerspective(67.5, ratio, 1, 12000.0);
     m_sceneViewer->realize();
     
 
@@ -511,7 +509,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)GR_NEXT_SCREEN, grChangeScreen, NULL);
     GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);*/
 
-	GfLogInfo("Current screen is #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
+    GfLogInfo("Current screen is #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
 
     OsgInitScene();
 
@@ -524,17 +522,55 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 int
 refresh(tSituation *s)
 {
-    //int	i;
-    tCarElt *car = s->cars[0];
-
-    osg::Camera * camera = m_sceneViewer->getCamera();
-	camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-    camera->setViewMatrixAsLookAt(
-                osg::Vec3(car->_pos_X,car->_pos_Z + 0.9 ,-car->_pos_Y), osg::Vec3(car->_pos_X+5*cos(car->_yaw), car->_pos_Z + 1.2, -car->_pos_Y-5*sin(car->_yaw)), osg::Vec3(0,1,0));
-    camera->setProjectionMatrixAsPerspective(55, grWinw/grWinh, 1, 12000.0);
-    m_sceneViewer->frame();
+    	//int	i;
+    	tCarElt *car = s->cars[0];
     
-    return 0;
+	osg::Vec3 eye, center, up, speed, P, p;
+	float offset = 0;
+	int Speed = 0;
+	
+	p[0] = car->_pos_X+ car->_drvPos_x;
+	p[1] = car->_pos_Y+car->_drvPos_y;
+	p[2] = car->_pos_Z+car->_drvPos_z;
+	osgXformPnt3(p, car->_posMat);
+	
+	eye[0] = p[0];
+	eye[1] = p[2];
+	eye[2] = -p[1];
+
+	// Compute offset angle and bezel compensation)
+	/*if (spansplit && viewOffset) {
+		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
+			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
+		fovy = spanfovy;
+	}*/
+
+	P[0] = (car->_pos_X + 30.0 * cos(car->_glance + offset+car->_yaw));
+	P[1] = -(car->_pos_Y - 30.0 * sin(car->_glance + offset-car->_yaw));
+	P[2] = car->_pos_Z+car->_yaw;
+	osgXformPnt3(P, car->_posMat);
+
+	center[0] = P[0];
+	center[1] = P[2];
+	center[2] = P[1];
+	
+	up[0] = car->_posMat[2][0];
+	up[1] = car->_posMat[2][2];
+	up[2] = car->_posMat[2][1];
+
+	speed[0] = car->pub.DynGCg.vel.x;
+	speed[1] = car->pub.DynGCg.vel.y;
+	speed[2] = car->pub.DynGCg.vel.z;
+
+	Speed = car->_speed_x * 3.6;
+
+	osg::Camera * camera = m_sceneViewer->getCamera();
+	camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+    	//camera->setProjectionMatrixAsPerspective(67.5, ratio, 1, 12000.0);
+    	camera->setViewMatrixAsLookAt( eye, center, osg::Vec3(0,1,0));
+    	m_sceneViewer->frame();
+    
+    	return 0;
 }
 
     /*GfProfStartProfile("refresh");
