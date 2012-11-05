@@ -26,7 +26,7 @@
 #include <graphic.h>
 #include <raceman.h>	//tSituation
 
-#include "CameraGroup.h"
+//#include "CameraGroup.h"
 
 extern int grWinx, grWiny, grWinw, grWinh;
 extern int grVectFlag;
