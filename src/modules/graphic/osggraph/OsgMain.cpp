@@ -462,7 +462,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     m_sceneViewer->getCamera()->setName("Cam one");
     m_sceneViewer->getCamera()->setViewport(new osg::Viewport(0, 0, grWinw, grWinh));
     m_sceneViewer->getCamera()->setGraphicsContext(gw.get());
-    m_sceneViewer->getCamera()->setProjectionMatrixAsPerspective(67.5, ratio, 1, 12000.0);
+    m_sceneViewer->getCamera()->setProjectionMatrixAsPerspective(67.5, static_cast<double>(ratio), 1, 12000.0);
     m_sceneViewer->realize();
     
 
