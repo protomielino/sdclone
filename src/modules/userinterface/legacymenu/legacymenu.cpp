@@ -28,6 +28,7 @@
 #include <tgf.hpp>
 #include <portability.h>
 #include <tgfclient.h>
+#include <musicplayer.h>
 
 #include <race.h>
 #include <racemanagers.h>
@@ -302,6 +303,7 @@ void LegacyMenu::onRaceSimulationReady() {
 
         loadCarsGraphics(_piRaceEngine->outData()->s);
         _piSoundEngine->init(_piRaceEngine->outData()->s);
+        pauseMenuMusic();
     }
 }
 
@@ -332,6 +334,7 @@ void LegacyMenu::onRaceInterrupted() {
 void LegacyMenu::onRaceFinishing() {
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL) {
  	shutdownSound();
+        resumeMenuMusic(1);
         unloadCarsGraphics();
         shutdownGraphicsView();
         unloadTrackGraphics();

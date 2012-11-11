@@ -40,6 +40,7 @@
 #include "tgfclient.h"
 #include "gui.h"
 #include "guimenu.h"
+#include "musicplayer.h"
 
 
 tGfuiScreen	*GfuiScreen;	/* current screen */
@@ -115,6 +116,7 @@ gfuiInit(void)
 	gfuiInitLabel();
 	gfuiInitHelp();
 	gfuiInitMenu();
+	startMenuMusic();
 
 	//gfctrlJoyInit(); // Not here ; done later on the fly, when really needed.
 }
@@ -123,6 +125,7 @@ void
 gfuiShutdown(void)
 {
 	gfctrlJoyShutdown();
+	stopMenuMusic();
 }
 
 GfuiColor 
@@ -1099,4 +1102,3 @@ GfuiSwapBuffers(void)
 {
 	SDL_GL_SwapBuffers();
 }
-

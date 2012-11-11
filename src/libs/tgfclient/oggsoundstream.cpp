@@ -19,7 +19,7 @@
 
 /* Concrete implementation for ogg sound streams */
 
-#include "OggSoundStream.h"
+#include "oggsoundstream.h"
 #include <tgf.h>
 
 OggSoundStream::OggSoundStream(char* path):
@@ -62,7 +62,7 @@ OggSoundStream::~OggSoundStream()
 
 
 
-bool OggSoundStream::read(char* buffer, const int bufferSize, int* resultSize, const char* error)
+bool OggSoundStream::read(char* buffer, const int bufferSize, int* resultSize, const char*& error)
 {
 	if (!isValid()) {
 		error = "OggSoundStream: Invalid, no data available.";

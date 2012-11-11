@@ -111,6 +111,22 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 
 	# Open AL.
 	_FIND_3RDPARTY_DEPENDENCY(OPENAL AL/al.h "" openal32 ${ROOT_DIR} "")
+
+	# Menu Music requires ogg, vorbis, and vorbisfile 
+	# this option may be removed after Menu Music becomes on by default
+	# and these libs become part of Official 3rdParty package
+	IF(OPTION_MENU_MUSIC)
+	
+		# OGG.
+		_FIND_3RDPARTY_DEPENDENCY(OGG ogg/ogg.h "" libogg ${ROOT_DIR} "")
+
+		# Vorbis.
+		_FIND_3RDPARTY_DEPENDENCY(VORBIS vorbis/vorbisfile.h "" libvorbis ${ROOT_DIR} "")
+
+		# VorbisFile.
+		_FIND_3RDPARTY_DEPENDENCY(VORBISFILE vorbis/vorbisfile.h "" libvorbisfile ${ROOT_DIR} "")
+	
+	ENDIF(OPTION_MENU_MUSIC)
 	
 	# ENet.
 	_FIND_3RDPARTY_DEPENDENCY(ENET enet/enet.h "" enet ${ROOT_DIR} "")
@@ -220,7 +236,7 @@ MACRO(_FIND_3RDPARTY_DLL PACKAGE_NAME LINK_LIBRARY NAME_HINTS DLL_PATHNAME_VAR)
 	ENDFOREACH(_LIB_NAME ${NAME_HINTS})
 
 	IF(NOT ${_DLL_PATHNAME_VAR})
-		#MESSAGE(STATUS "Could not find 3rdParty DLL in ${NAME_HINTS} for ${PACKAGE_NAME}")
+		MESSAGE(STATUS "Could not find 3rdParty DLL in ${NAME_HINTS} for ${PACKAGE_NAME}")
 	ENDIF(NOT ${_DLL_PATHNAME_VAR})
 
 ENDMACRO(_FIND_3RDPARTY_DLL DLL_PATHNAME)
@@ -231,6 +247,22 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY)
 
 	_FIND_3RDPARTY_DLL("OpenAL" "${OPENAL_LIBRARY}" "OpenAL32" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+
+	# Menu Music requires ogg, vorbis, and vorbisfile 
+	# this option may be removed after Menu Music becomes on by default
+	# and these libs become part of Official 3rdParty package
+	IF(OPTION_MENU_MUSIC)
+	
+		_FIND_3RDPARTY_DLL("OGG" "${OGG_LIBRARY}" "libogg;libogg-0" _DLL_PATHNAME)
+		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+
+		_FIND_3RDPARTY_DLL("VORBIS" "${VORBIS_LIBRARY}" "libvorbis;libvorbis-0" _DLL_PATHNAME)
+		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+
+		_FIND_3RDPARTY_DLL("VORBISFILE" "${VORBISFILE_LIBRARY}" "libvorbisfile;libvorbisfile-3" _DLL_PATHNAME)
+		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+
+	ENDIF(OPTION_MENU_MUSIC)
 
 	_FIND_3RDPARTY_DLL("SDL" "${SDL_LIBRARY}" "SDL" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")

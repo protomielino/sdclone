@@ -19,17 +19,26 @@
 
 #include "musicplayer.h"
 
-#include <GL/glut.h>
+//#include <GL/glut.h>
 #include <string.h>
 #include <tgf.h>
+#include "tgfclient.h"
 #include <portability.h>
 
-#include "OggSoundStream.h"
-#include "OpenALMusicPlayer.h"
+#if MENU_MUSIC
+#include "oggsoundstream.h"
+#include "openalmusicplayer.h"
+ 
+ 
+static void playMenuMusic(int /* value */);
 
 
-static bool isEnabled()
-{
+ static bool isEnabled()
+ {
+	// TODO - fix this (needs UI)
+	return true;
+	
+#if 0
 	const int BUFSIZE = 1024;
 	char buf[BUFSIZE];
 	snprintf(buf, BUFSIZE, "%s%s", GetLocalDir(), MM_SOUND_PARM_CFG);
@@ -43,11 +52,13 @@ static bool isEnabled()
 	}
 	
 	GfParmReleaseHandle(handle);
+
 	return enabled;
+#endif
 }
 
 
-// Path relative to CWD, e.g "data/music/torcs1.ogg"
+// Path relative to CWD, e.g "data/music/main.ogg"
 static SoundStream* getMenuSoundStream(char* oggFilePath)
 {
 	static OggSoundStream stream(oggFilePath);
@@ -59,37 +70,80 @@ static OpenALMusicPlayer* getMusicPlayer()
 {
 	const int BUFSIZE = 1024;
 	char oggFilePath[BUFSIZE];
-	strncpy(oggFilePath, "data/music/torcs1.ogg", BUFSIZE);
+	
+	// TODO - get from config??
+	strncpy(oggFilePath, "data/music/main.ogg", BUFSIZE);
 
 	static OpenALMusicPlayer player(getMenuSoundStream(oggFilePath));
 	return &player;
 }
 
+// TODO rethink...
+static Uint32 sdlTimerFunc(Uint32 interval, void* /* pEvLoopPriv */)
+{
+	playMenuMusic(0);
+	return 1;
+	//return 0;
+}
 
+// TODO clean this up
+SDL_TimerID timerId = 0;
 static void playMenuMusic(int /* value */)
 {
-	const int nextcallinms = 100;
+	const int nextcallinms = 200;
 	
 	OpenALMusicPlayer* player = getMusicPlayer();
 	if (player->playAndManageBuffer()) {
-		glutTimerFunc(nextcallinms, playMenuMusic, 0);
+		if(timerId == 0){
+			timerId = SDL_AddTimer(nextcallinms, sdlTimerFunc, (void*)NULL);
+		}
+		//glutTimerFunc(nextcallinms, playMenuMusic, 0);
 	}
 }
-
-
+#endif
 void startMenuMusic()
 {
+#if MENU_MUSIC
 	if (isEnabled()) {
 		OpenALMusicPlayer* player = getMusicPlayer();
 		player->start();
 		playMenuMusic(0);
 	}
+#endif
 }
 
 
 void stopMenuMusic()
 {
+#if MENU_MUSIC
+	if(timerId != 0){
+		SDL_RemoveTimer(timerId);
+		timerId = 0;
+	}
 	OpenALMusicPlayer* player = getMusicPlayer();
 	player->stop();
 	player->rewind();
+#endif
+}
+
+void pauseMenuMusic()
+{
+#if MENU_MUSIC
+		if(timerId != 0){
+		SDL_RemoveTimer(timerId);
+		timerId = 0;
+		}
+		OpenALMusicPlayer* player = getMusicPlayer();
+		player->pause();
+#endif
+}
+
+void resumeMenuMusic(int sourceId)
+{
+#if MENU_MUSIC
+	if (isEnabled()) {
+	getMusicPlayer()->resume(sourceId);
+	playMenuMusic(0);
+	}
+#endif
 }

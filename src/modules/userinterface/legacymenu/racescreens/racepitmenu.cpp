@@ -180,6 +180,8 @@ RmCheckPitRequest()
 		// Mute sound.
 		if (LegacyMenu::self().soundEngine())
 			LegacyMenu::self().soundEngine()->mute(true);
+		
+		// TODO pit music??
 
 		// First, stop the race engine.
 		LmRaceEngine().stop();

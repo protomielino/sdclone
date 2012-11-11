@@ -151,6 +151,37 @@ MACRO(CHECK_LIBRARIES)
 		MESSAGE(STATUS "Looking for library OpenAL - NOT found")
 	ENDIF(OPENAL_FOUND)
 
+	IF(OPTION_MENU_MUSIC)
+
+		# Ogg
+		Find_Package(OGG)
+		IF(OGG_FOUND)
+			SET(HAVE_LIBOGG 1)
+			MESSAGE(STATUS "Looking for library Ogg - found")
+		ELSE(OGG_FOUND)
+			MESSAGE(STATUS "Looking for library Ogg - NOT found")
+		ENDIF(OGG_FOUND)
+
+		# Vorbis
+		Find_Package(VORBIS)
+		IF(VORBIS_FOUND)
+			SET(HAVE_LIBVORBIS 1)
+			MESSAGE(STATUS "Looking for library Vorbis - found")
+		ELSE(VORBIS_FOUND)
+			MESSAGE(STATUS "Looking for library Vorbis - NOT found")
+		ENDIF(VORBIS_FOUND)
+
+		# VorbisFile
+		Find_Package(VORBISFILE)
+		IF(VORBISFILE_FOUND)
+			SET(HAVE_LIBVORBISFILE 1)
+			MESSAGE(STATUS "Looking for library VorbisFile - found")
+		ELSE(VORBISFILE_FOUND)
+			MESSAGE(STATUS "Looking for library VorbisFile - NOT found")
+		ENDIF(VORBISFILE_FOUND)
+
+	ENDIF(OPTION_MENU_MUSIC)
+
 	# ENet
 	Find_Package(ENET)
 

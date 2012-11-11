@@ -34,6 +34,7 @@ I - Pre-requisites
   Linux: Be carefull to compile plib with -fPIC on AMD64 if you run a 64 bit version.
 - OpenAL soft 1.5 / 1.6 / 1.11 / 1.14 (http://connect.creativelabs.com/openal)
    (Torcs modified 0.0.8 from www.torcs.org also used to work in the past).
+- libOGG 1.3 or newer and libVorbis 1.3 or newer (optional for the moment, will soon get mandatory)
 - ENet 1.3.2/4 (http://enet.bespin.org)
   Linux: Be careful to compile ENet with -fPIC on AMD64 if you run a 64 bit build.
 - Expat 2 (can be skipped for the moment, but won't anymore soon)
@@ -171,6 +172,7 @@ The Speed Dreams Team.
         - CMAKE_PREFIX_PATH:STRING :
             Path prefixes for additional 3rdParty libraries (def:empty)
             (use /usr/local if you compiled some 3rdParty libs yourself).
+
         - CMAKE_INSTALL_PREFIX:PATH :
             Install path for Speed Dreams (def: /usr/local)
 
@@ -183,6 +185,10 @@ The Speed Dreams Team.
 			Note: This is not set by default, because Free Solid 2 dev is not yet available
 			      on most Linux distros (only Fedora is working on this right now, AFAIK, 2012, July)
 				  Ask the dev team for any hint about building it ...
+
+        - OPTION_MENU_MUSIC:BOOL :
+            Enable building with the new Menu Music enabled (def: OFF)
+            Note: This requires libogg, libvorbis, and libvorbisfile (these dependencies are new for 2.1)
 
         - OPTION_TRACE:BOOL :
             Full run-time traces if ON (def: ON)

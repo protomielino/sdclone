@@ -19,13 +19,14 @@
 
 #include <stdio.h>
 #include <tgf.h>
-#include "OpenALMusicPlayer.h"
+#include "openalmusicplayer.h"
 
 const int OpenALMusicPlayer::BUFFERSIZE = 4096*64;
 
 OpenALMusicPlayer::OpenALMusicPlayer(SoundStream* soundStream):
 	device(NULL),
 	context(NULL),
+   previouscontext(NULL),
 	source(0),
 	stream(soundStream),
 	ready(false)
@@ -55,7 +56,7 @@ void OpenALMusicPlayer::stop()
 	
 	alSourceStop(source);
     
-	int queued;
+	int queued = 0;
 	
 	alGetSourcei(source, AL_BUFFERS_QUEUED, &queued);
 	while (queued--) {
@@ -69,7 +70,8 @@ void OpenALMusicPlayer::stop()
     alDeleteBuffers(2, buffers);
     check();
 	
-	alcMakeContextCurrent(NULL);
+	//alcMakeContextCurrent(previouscontext);
+ //  previouscontext = NULL;
 	alcDestroyContext(context);
 	alcCloseDevice(device);
 	
@@ -93,7 +95,7 @@ bool OpenALMusicPlayer::initContext()
 		GfError("OpenALMusicPlayer: OpenAL could not create contect for device\n");
 		return false;
 	}
-
+   previouscontext = alcGetCurrentContext();
 	alcMakeContextCurrent(context);
 	alcGetError(device);
 	
@@ -205,9 +207,25 @@ void OpenALMusicPlayer::start()
 	}
 }
 
+void OpenALMusicPlayer::pause()
+{
+	alSourceStop(source);
+	if(previouscontext == NULL){
+		previouscontext = alcGetCurrentContext();
+	}
+	alcMakeContextCurrent(previouscontext);
+	//previouscontext = NULL;
+}
 
-
-
+void OpenALMusicPlayer::resume(int flag)
+{
+	alcMakeContextCurrent(context);
+	alSourcePlay(source);
+	if(flag == 1){
+		previouscontext = NULL;
+	}
+	
+}
 void OpenALMusicPlayer::rewind()
 {
 	stream->rewind();
@@ -222,7 +240,7 @@ bool OpenALMusicPlayer::playAndManageBuffer()
 		return false;
 	}
 	
-	int processed;
+	int processed = 0;
 	bool active = true;
 
 	alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);

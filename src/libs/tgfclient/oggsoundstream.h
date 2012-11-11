@@ -25,7 +25,7 @@
 #define OV_EXCLUDE_STATIC_CALLBACKS
 
 #include <vorbis/vorbisfile.h>
-#include "SoundStream.h"
+#include "soundstream.h"
 
 class OggSoundStream : public SoundStream
 {
@@ -36,7 +36,7 @@ class OggSoundStream : public SoundStream
 		virtual int getRateInHz() { return rateInHz; }
 		virtual SoundFormat getSoundFormat() { return format; }
 		
-		virtual bool read(char* buffer, const int bufferSize, int* resultSize, const char* error);
+		virtual bool read(char* buffer, const int bufferSize, int* resultSize, const char*& error);
 		virtual void rewind();
 		virtual void display();
 		virtual bool isValid() { return valid; }

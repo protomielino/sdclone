@@ -17,6 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-/* Intherface for sound streams */
+/* Interface for sound streams */
 
-#include "SoundStream.h"
+#include "soundstream.h"

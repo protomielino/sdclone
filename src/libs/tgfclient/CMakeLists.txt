@@ -7,6 +7,8 @@ ADD_SDLIB_INCLUDEDIR(tgf math portability)
 ADD_SDL_INCLUDEDIR()
 ADD_JPEG_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
+ADD_OPENAL_INCLUDEDIR()
+ADD_VORBIS_INCLUDEDIR()
 
 
 SET(TGFCLIENT_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
@@ -15,8 +17,17 @@ SET(TGFCLIENT_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
                       guilabel.cpp guiobject.cpp guiscrollist.cpp 
                       guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
                       guiscreen.cpp guieventloop.cpp guiapplication.cpp 
+                      musicplayer.cpp musicplayer.h 
                       glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h )
 SET(TGFCLIENT_OTHER_SOURCES guimenutest.xml screen.xml)
+
+# Note: Menu music sources needed ONLY if menu music enabled.
+IF(OPTION_MENU_MUSIC)
+    SET(TGFCLIENT_SOURCES ${TGFCLIENT_SOURCES} 
+                          soundstream.cpp soundstream.h 
+                          oggsoundstream.cpp oggsoundstream.h 
+                          openalmusicplayer.cpp openalmusicplayer.h )
+ENDIF(OPTION_MENU_MUSIC)
 
 #disable developer warning
 IF (COMMAND CMAKE_POLICY)
@@ -51,6 +62,22 @@ ADD_JPEG_LIBRARY(tgfclient)
 IF(OPENGL_FOUND)
     TARGET_LINK_LIBRARIES(tgfclient ${OPENGL_LIBRARY})
 ENDIF(OPENGL_FOUND)
+
+IF(OPENAL_FOUND)
+    TARGET_LINK_LIBRARIES(tgfclient ${OPENAL_LIBRARY})
+ENDIF(OPENAL_FOUND)
+
+IF(OPTION_MENU_MUSIC)
+   IF(VORBIS_FOUND)
+       TARGET_LINK_LIBRARIES(tgfclient ${VORBIS_LIBRARY})
+   ENDIF(VORBIS_FOUND)
+   IF(VORBISFILE_FOUND)
+       TARGET_LINK_LIBRARIES(tgfclient ${VORBISFILE_LIBRARY})
+   ENDIF(VORBISFILE_FOUND)
+   IF(OGG_FOUND)
+       TARGET_LINK_LIBRARIES(tgfclient ${OGG_LIBRARY})
+   ENDIF(OGG_FOUND)
+ENDIF(OPTION_MENU_MUSIC)
 
 ADD_PLIB_LIBRARY(tgfclient ul sg js)
 ADD_SDL_LIBRARY(tgfclient)

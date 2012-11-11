@@ -22,7 +22,7 @@
 
 #include <AL/al.h>
 #include <AL/alc.h>
-#include "SoundStream.h"
+#include "soundstream.h"
 
 class OpenALMusicPlayer
 {
@@ -32,6 +32,8 @@ class OpenALMusicPlayer
 		
 		virtual void start();
 		virtual void stop();
+      virtual void pause();
+      virtual void resume(int flag);
 		virtual void rewind();
 		virtual bool playAndManageBuffer();
 
@@ -46,6 +48,7 @@ class OpenALMusicPlayer
 		
 		ALCdevice* device;
 		ALCcontext* context;
+      ALCcontext* previouscontext;
 		ALuint source;								// audio source 
 		ALuint buffers[2];							// front and back buffers
 		
