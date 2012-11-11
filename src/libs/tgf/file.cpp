@@ -110,7 +110,7 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 	// TODO: Use GfFileGetDirName
 	strncpy(buf, pszTgtName, strlen(pszTgtName)+1);
 #ifdef WIN32
-	for (int i = 0; i < maxBufSize && buf[i] != '\0'; i++)
+	for (size_t i = 0; i < maxBufSize && buf[i] != '\0'; i++)
 		if (buf[i] == '\\')
 			buf[i] = '/';
 #endif

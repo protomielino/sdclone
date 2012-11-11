@@ -20,12 +20,14 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+#ifdef _MSC_VER
+#pragma warning (disable: 4251)
+#endif
 
 #ifdef _WIN32
 	#ifndef DLLEXPORT
 		#define DLLEXPORT __declspec(dllexport)
 	#endif
-#pragma warning (disable: 4251)
 #else
        #ifndef DLLEXPORT
                #define DLLEXPORT
