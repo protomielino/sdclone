@@ -24,14 +24,15 @@
 #pragma warning (disable: 4251)
 #endif
 
-#ifdef _WIN32
-	#ifndef DLLEXPORT
-		#define DLLEXPORT __declspec(dllexport)
-	#endif
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef networking_EXPORTS
+#  define NETWORKING_API __declspec(dllexport)
+# else
+#  define NETWORKING_API __declspec(dllimport)
+# endif
 #else
-       #ifndef DLLEXPORT
-               #define DLLEXPORT
-       #endif
+# define NETWORKING_API
 #endif
 
 #include <string>
@@ -143,7 +144,7 @@ struct CarStatusPacked
 
 
 //Holds driver values 
-class DLLEXPORT NetDriver
+class NETWORKING_API NetDriver
 {
 public:
 	NetDriver();
@@ -173,7 +174,7 @@ struct CarSetup
 struct SDL_mutex;
 
 //Put data here that is read by the network thread and the main thread
-class DLLEXPORT NetMutexData
+class NETWORKING_API NetMutexData
 {
 public:
 	NetMutexData();
@@ -192,7 +193,7 @@ public:
 };
 
 //Put data here that is read by the network thread and the main thread
-class DLLEXPORT NetServerMutexData 
+class NETWORKING_API NetServerMutexData 
 {
 public:
 	void Init();
@@ -206,7 +207,7 @@ public:
 	std::vector<NetDriver> m_vecNetworkPlayers;
 };
 
-class DLLEXPORT NetNetwork
+class NETWORKING_API NetNetwork
 {
 public:
 	NetNetwork();
@@ -307,7 +308,7 @@ protected:
 
 };
 
-class DLLEXPORT NetClient: public NetNetwork
+class NETWORKING_API NetClient: public NetNetwork
 {
 public:
 	NetClient();
@@ -368,7 +369,7 @@ protected:
 
 };
 
-class DLLEXPORT NetServer : public NetNetwork
+class NETWORKING_API NetServer : public NetNetwork
 {
 public:
 	NetServer();
@@ -435,22 +436,21 @@ protected:
 	std::vector<NetDriver> m_vecWaitForPlayers;
 
     ENetHost * m_pServer;
-
-
 };
 
 
 bool AddNetworkTimer();
 bool RemoveNetworkTimer();
 
-extern DLLEXPORT void NetSetServer(bool bStatus);
-extern DLLEXPORT void NetSetClient(bool bStatus);
-extern DLLEXPORT bool NetIsServer();
-extern DLLEXPORT bool NetIsClient();
+extern NETWORKING_API void NetSetServer(bool bStatus);
+extern NETWORKING_API void NetSetClient(bool bStatus);
+extern NETWORKING_API bool NetIsServer();
+extern NETWORKING_API bool NetIsClient();
 
-extern DLLEXPORT NetServer *NetGetServer();
-extern DLLEXPORT NetClient *NetGetClient();
-extern DLLEXPORT NetNetwork *NetGetNetwork();
+extern NETWORKING_API NetServer *NetGetServer();
+extern NETWORKING_API NetClient *NetGetClient();
+extern NETWORKING_API NetNetwork *NetGetNetwork();
+
 void NetworkListen();
 
 bool AddressMatch(ENetAddress &a1,ENetAddress &a2);
