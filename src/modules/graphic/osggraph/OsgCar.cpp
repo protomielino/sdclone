@@ -40,6 +40,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
     const char *param;
     int lg;
     char path[256];
+    
+    strncpy(car->_masterModel, GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_TEMPLATE, ""), MAX_NAME_LEN - 1);
+	car->_masterModel[MAX_NAME_LEN - 1] = 0;
    // grssgLoaderOptions options;
   //  sgVec3 lightPos;
    // int lightNum;
@@ -62,7 +65,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
     const bool bMasterModel = strlen(car->_masterModel) != 0;
 
     GfOut("[gr] Init(%d) car %s for driver %s index %d\n", index, car->_carName, car->_modName, car->_driverIndex);
-
+	GfOut("[gr] Init(%d) car %s MasterModel name\n", index, car->_masterModel);
 
     lg = 0;
     lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
@@ -121,25 +124,31 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
     //GfOut("HEHEHHEHEHEHHEHHEH %s\n",path);
     //carEntity = grssgCarLoadAC3D(param, NULL, index);
     std::string strPath = GetDataDir();
-    sprintf(buf, "cars/%s/%s.acc", car->_carName, car->_carName);
+    if (bMasterModel)
+    	sprintf(buf, "cars/%s/%s.acc", car->_masterModel, car->_masterModel);
+    else
+        sprintf(buf, "cars/%s/%s.acc", car->_carName, car->_carName);
+        
     strPath+=buf;
     osgLoader loader;
-    //GfOut("Chemin Textures : %s\n", m_strTexturePath.c_str());
-    //loader.AddSearchPath(m_strTexturePath);
-    //osg::Node *pCar = loader.Load3dFile("/usr/local/share/games/speed-dreams-2/cars/mp1-cavallo-tr06/mp1-cavallo-tr06-lod1.acc");
-    osg::Node *pCar = loader.Load3dFile(strPath);
+    std::string strTPath = GetDataDir();
+    sprintf(buf, "drivers/%s/%d/", car->_modName, car->_driverIndex);
+    strTPath += buf;
+    GfOut("Chemin Textures : %s\n", strTPath.c_str());
+    loader.AddSearchPath(strTPath);
+    osg::Node *pCar = loader.Load3dFile(strPath, true);
 
     osg::Vec3 p;
 
     p[0] = car->_pos_X;//+ car->_drvPos_x;
     p[1] = car->_pos_Y;//+car->_drvPos_y;
     p[2] = car->_pos_Z;//+car->_drvPos_z;
-   // osgXformPnt3(p, car->_posMat);
+    //osgXformPnt3(p, car->_posMat);
 
 
     osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
-   /* transform1->setMatrix( osg::Matrix::translate(p[0],p[1], p[2]) );*/
-   // transform1->setMatrix( osg::Matrix(flatten(car->pub.posMat)) );
+    /* transform1->setMatrix( osg::Matrix::translate(p[0],p[1], p[2]) );*/
+    // transform1->setMatrix( osg::Matrix(flatten(car->pub.posMat)) );
     transform1->addChild(pCar);
     //osgcars->addChild(transform1.get());
     //GfOut("LE POINTEUR %d\n",osgcars.get());

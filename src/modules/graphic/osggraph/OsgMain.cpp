@@ -444,8 +444,6 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     grWinw = width;
     grWinh = height;
     
-    ratio = width/height;
-
     fMouseRatioX = width / 640.0;
     fMouseRatioY = height / 480.0;
 
@@ -467,7 +465,8 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     m_sceneViewer->getCamera()->setName("Cam one");
     m_sceneViewer->getCamera()->setViewport(new osg::Viewport(0, 0, grWinw, grWinh));
     m_sceneViewer->getCamera()->setGraphicsContext(gw.get());
-    m_sceneViewer->getCamera()->setProjectionMatrixAsPerspective(67.5, static_cast<double>(ratio), 0.1, 12000.0);
+    m_sceneViewer->getCamera()->setProjectionMatrixAsPerspective(67.5f, static_cast<double>(grWinw / grWinh), 0.2f, 9000.0f);
+    //m_sceneViewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
     m_sceneViewer->realize();
     
 
@@ -482,8 +481,8 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	grSetZoom, NULL);
     GfuiAddKey(screen, '*',            "Zoom Default", (void*)GR_ZOOM_DFLT,	grSetZoom, NULL);*/
 
-    GfuiAddKey( 0, GFUIK_PAGEUP,   "Select Previous Car", (void*)0, grPrevCar, NULL);
-    GfuiAddKey( 0, GFUIK_PAGEDOWN, "Select Next Car",     (void*)0, grNextCar, NULL);
+    //GfuiAddKey( 0, GFUIK_PAGEUP,   "Select Previous Car", (void*)0, grPrevCar, NULL);
+    //GfuiAddKey( 0, GFUIK_PAGEDOWN, "Select Next Car",     (void*)0, grNextCar, NULL);
 
     /*GfuiAddKey(screen, GFUIK_F2,       "Driver Views",      (void*)0, grSelectCamera, NULL);
     GfuiAddKey(screen, GFUIK_F3,       "Car Views",         (void*)1, grSelectCamera, NULL);
@@ -527,18 +526,18 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 int
 refresh(tSituation *s)
 {
-    	//int	i;
-        int nb = s->_ncars;
-        tCarElt *car = s->cars[nb-1];
+    //int	i;
+    int nb = s->_ncars;
+    tCarElt *car = s->cars[nb-1];
     
 	osg::Vec3 eye, center, up, speed, P, p;
 	float offset = 0;
 	int Speed = 0;
 	
-	p[0] = car->_pos_X+ car->_drvPos_x;
-	p[1] = car->_pos_Y+car->_drvPos_y;
-	p[2] = car->_pos_Z+car->_drvPos_z;
-   // osgXformPnt3(p, car->_posMat);
+	p[0] = car->_pos_X + car->_drvPos_x;
+	p[1] = car->_pos_Y + car->_drvPos_y;
+	p[2] = car->_pos_Z + car->_drvPos_z;
+    osgXformPnt3(p, car->_posMat);
 	
 	eye[0] = p[0];
     eye[1] = p[1];
@@ -551,10 +550,10 @@ refresh(tSituation *s)
 		fovy = spanfovy;
 	}*/
 
-	P[0] = (car->_pos_X + 30.0 * cos(car->_glance + offset+car->_yaw));
-    P[1] = (car->_pos_Y + 30.0 * sin(car->_glance + offset+car->_yaw));
-	P[2] = car->_pos_Z+car->_yaw;
-    //osgXformPnt3(P, car->_posMat);
+	P[0] = (car->_pos_X + 30.0 * cos(car->_glance + offset + car->_yaw));
+    P[1] = (car->_pos_Y + 30.0 * sin(car->_glance + offset + car->_yaw));
+	P[2] = car->_pos_Z + car->_yaw;
+    osgXformPnt3(P, car->_posMat);
 
 	center[0] = P[0];
     center[1] = P[1];
@@ -572,9 +571,7 @@ refresh(tSituation *s)
 
 	osg::Camera * camera = m_sceneViewer->getCamera();
 	camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-    	//camera->setProjectionMatrixAsPerspective(67.5, ratio, 1, 12000.0);
-    camera->setViewMatrixAsLookAt( eye, center, osg::Vec3(0,0,1));
-
+    camera->setViewMatrixAsLookAt( eye, center, up);
 
     cars.updateCars();
 
@@ -807,9 +804,11 @@ initTrack(tTrack *track)
     return grLoadScene(track);
 }
 
-int  initCars(tSituation *s){
+int  initCars(tSituation *s)
+{
     m_sceneroot->addChild(cars.loadCars(s));
     GfOut("All cars loaded\n");
+    
     return 0;
 }
 

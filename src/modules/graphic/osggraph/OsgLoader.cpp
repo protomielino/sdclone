@@ -18,7 +18,7 @@ osgLoader::~osgLoader(void)
 void osgLoader::AddSearchPath(std::string strPath)
 {
 
-		m_pOpt->getDatabasePathList().push_front(strPath);
+		m_pOpt->getDatabasePathList().push_back(strPath);
 }
 
 osg::ref_ptr<osg::Image> osgLoader::LoadImageFile(std::string strFile)
@@ -32,10 +32,13 @@ osg::ref_ptr<osg::Image> osgLoader::LoadImageFile(std::string strFile)
 	return Image;
 }
 
-osg::Node *osgLoader::Load3dFile(std::string strFile)
+osg::Node *osgLoader::Load3dFile(std::string strFile, bool car)
 {
 	osg::Node *pNode = NULL;	
 	std::string ext = osgDB::getFileExtension(strFile);
+	if (car)
+		m_ACCReader.SetCar(true);
+		
     if (ext == "acc" || ext == "ac")
 	{
 		//Use custom ACC file loader

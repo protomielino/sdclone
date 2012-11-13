@@ -261,7 +261,7 @@ bool LoadTrack(std::string strTrack)
 	osgLoader loader;
 	GfOut("Chemin Textures : %s\n", m_strTexturePath.c_str());
 	loader.AddSearchPath(m_strTexturePath);
-	osg::Node *pTrack = loader.Load3dFile(strTrack);
+	osg::Node *pTrack = loader.Load3dFile(strTrack, false);
 
  	//osgDB::writeNodeFile(*pTrack,"mytrack.osg");
 
@@ -301,7 +301,7 @@ bool LoadBackground(std::string strTrack)
 	osgLoader loader;
 	GfOut("Chemin Textures : %s\n", m_strTexturePath.c_str());
 	loader.AddSearchPath(m_strTexturePath);
-	osg::Node *m_background = loader.Load3dFile(strTrack);
+	osg::Node *m_background = loader.Load3dFile(strTrack, false);
 
 	if (m_background)
 	{
