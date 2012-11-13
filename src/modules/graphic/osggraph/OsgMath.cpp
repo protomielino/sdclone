@@ -16,26 +16,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+#include <osg/Vec3>
 
-#ifndef _OSGMATH_H_
-#define _OSGMATH_H_
+#include "OsgMath.h"
 
 
-typedef float osgMat3[3][3];
-typedef float osgMat4[4][4];
 
-struct osgCoord
+void osgXformPnt3(osg::Vec3 dst, const osg::Vec3 src, const osgMat4 mat)
 {
-	osg::Vec3 xyz ;
-	osg::Vec3 hpr ;
-};
-
-extern void osgXformPnt3( osg::Vec3 dst, const osg::Vec3 src, const osgMat4 mat );
-
-inline void osgXformPnt3( osg::Vec3 dst, const osgMat4 mat ) { osgXformPnt3 ( dst, dst, mat ); }
-
-void osgXformPnt3(osg::Vec3 dst, const osg::Vec3 src, const osgMat4 mat);
-/*{
 	float t0 = src[0];
 	float t1 = src[1];
 	float t2 = src[2];
@@ -43,6 +31,6 @@ void osgXformPnt3(osg::Vec3 dst, const osg::Vec3 src, const osgMat4 mat);
 	dst[0] = t0*mat[0][0] + t1*mat[1][0] + t2*mat[2][0] + mat[3][0];	
 	dst[1] = t0*mat[0][1] + t1*mat[1][1] + t2*mat[2][1] + mat[3][1];	
 	dst[2] = t0*mat[0][2] + t1*mat[1][2] + t2*mat[2][2] + mat[3][2];
-}*/
+}
 
-#endif /* _OSGMATH_H_ */
+

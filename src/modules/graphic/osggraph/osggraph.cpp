@@ -90,6 +90,7 @@ bool OsgGraph::loadTrack(tTrack* pTrack)
 
 bool OsgGraph::loadCars(tSituation* pSituation)
 { 
+    initCars(pSituation);
 	//GfLogDebug("SsgGraph::loadCars\n");
 	return true; //return ::initCars(pSituation) == 0;
 }

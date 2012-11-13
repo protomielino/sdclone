@@ -1,5 +1,7 @@
 #include <string.h>	// to remove with OSG 3.2
 
+#include<string.h>
+
 #include <osgDB/FileNameUtils>
 #include <osgDB/Registry>
 #include <osgDB/ReadFile>

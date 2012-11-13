@@ -172,9 +172,23 @@ OsgInitScene(void)
     
     //myLight2->setLinearAttenuation(2.0f/m_sceneroot);
     
-	m_sceneViewer->setSceneData( m_sceneroot.get() );		
+   /* osg::ref_ptr<osg::MatrixTransform> rot = new osg::MatrixTransform;
+    osg::Matrix mat( 1.0f, 0.0f,0.0f, 0.0f,
+                     0.0f, 0.0f,1.0f, 0.0f,
+                     0.0f, -1.0f,0.0f,  0.0f,
+                     0.0f, 0.0f,0.0f,  1.0f );
+    rot->setMatrix(mat);
+    rot->addChild(m_sceneroot.get());*/
+
+    m_sceneViewer->setSceneData(m_sceneroot.get());
     m_sceneViewer->getCamera()->setCullingMode( m_sceneViewer->getCamera()->getCullingMode() & ~osg::CullStack::SMALL_FEATURE_CULLING);
     
+
+    osg::Group *g = new osg::Group;
+    m_carroot = g;
+
+    GfOut("LE POINTEUR %d\n",m_carroot.get());
+
   	return 0;
 }//grInitScene
 
@@ -228,6 +242,12 @@ void setViewer(osg::ref_ptr<osgViewer::Viewer> msV)
 void setSceneRoot(osg::ref_ptr<osg::Group> root)
 {
 	m_sceneroot = root;
+  //  m_sceneroot->addChild(m_carroot.get());
+}
+
+void setCarRoot(osg::ref_ptr<osg::Group> root)
+{
+    m_carroot = root;
 }
 
 void ClearScene(void)
@@ -249,14 +269,24 @@ bool LoadTrack(std::string strTrack)
 	{
 		osgUtil::Optimizer optimizer;
 		optimizer.optimize(pTrack); 
-		osg::Matrixf mat;
+        //osg::Matrixf mat;
 		//Rotate track model 90 degrees to match the way plib loader works
-		//mat = mat.rotate(osg::inDegrees(90.0), osg::X_AXIS);
-		//osg::MatrixTransform *pTrans = new osg::MatrixTransform(mat);
-		//pTrans->addChild(pTrack);
-		//pTrans->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
-		pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
-		m_sceneroot->addChild(pTrack);
+        //mat = mat.rotate(osg::inDegrees(90.0), osg::X_AXIS);
+        //osg::MatrixTransform *pTrans = new osg::MatrixTransform(mat);
+        //pTrans->addChild(pTrack);
+        //pTrans->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
+        //pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
+
+       /* osg::ref_ptr<osg::MatrixTransform> rot = new osg::MatrixTransform;
+            osg::Matrix mat( 1.0f, 0.0f,0.0f, 0.0f,
+                             0.0f, 0.0f,1.0f, 0.0f,
+                             0.0f, -1.0f,0.0f,  0.0f,
+                             0.0f, 0.0f,0.0f,  1.0f );
+            rot->setMatrix(mat);
+            rot->addChild(pTrack);
+*/
+
+        m_sceneroot->addChild(pTrack);
 		
 	}
 	else

@@ -19,6 +19,8 @@
 
 #include "OsgMain.h"
 #include "OsgMath.h"
+#include "OsgCar.h"
+
 //#include "grOSG.h"
 //#include <osgViewer/Viewer>
 
@@ -30,9 +32,9 @@
 //#include "grshadow.h"
 //#include "grskidmarks.h"
 //#include "grsmoke.h"
-//#include "grcar.h"
+#include "OsgCar.h"
 //#include "grscreen.h"
-//#include "grscene.h"
+#include "OsgScene.h"
 #include "OsgScene.h"
 //#include "grsound.h"
 //#include "grloadac.h"
@@ -47,6 +49,9 @@
 //osg::ref_ptr<osg::Group> m_sceneroot;
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;
+
+SDCars cars;
+
 
 int grMaxTextureUnits = 0;
 
@@ -462,7 +467,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     m_sceneViewer->getCamera()->setName("Cam one");
     m_sceneViewer->getCamera()->setViewport(new osg::Viewport(0, 0, grWinw, grWinh));
     m_sceneViewer->getCamera()->setGraphicsContext(gw.get());
-    m_sceneViewer->getCamera()->setProjectionMatrixAsPerspective(67.5, static_cast<double>(ratio), 1, 12000.0);
+    m_sceneViewer->getCamera()->setProjectionMatrixAsPerspective(67.5, static_cast<double>(ratio), 0.1, 12000.0);
     m_sceneViewer->realize();
     
 
@@ -523,7 +528,8 @@ int
 refresh(tSituation *s)
 {
     	//int	i;
-    	tCarElt *car = s->cars[0];
+        int nb = s->_ncars;
+        tCarElt *car = s->cars[nb-1];
     
 	osg::Vec3 eye, center, up, speed, P, p;
 	float offset = 0;
@@ -532,11 +538,11 @@ refresh(tSituation *s)
 	p[0] = car->_pos_X+ car->_drvPos_x;
 	p[1] = car->_pos_Y+car->_drvPos_y;
 	p[2] = car->_pos_Z+car->_drvPos_z;
-	osgXformPnt3(p, car->_posMat);
+   // osgXformPnt3(p, car->_posMat);
 	
 	eye[0] = p[0];
-	eye[1] = p[2];
-	eye[2] = -p[1];
+    eye[1] = p[1];
+    eye[2] = p[2];
 
 	// Compute offset angle and bezel compensation)
 	/*if (spansplit && viewOffset) {
@@ -546,17 +552,17 @@ refresh(tSituation *s)
 	}*/
 
 	P[0] = (car->_pos_X + 30.0 * cos(car->_glance + offset+car->_yaw));
-	P[1] = -(car->_pos_Y - 30.0 * sin(car->_glance + offset-car->_yaw));
+    P[1] = (car->_pos_Y + 30.0 * sin(car->_glance + offset+car->_yaw));
 	P[2] = car->_pos_Z+car->_yaw;
-	osgXformPnt3(P, car->_posMat);
+    //osgXformPnt3(P, car->_posMat);
 
 	center[0] = P[0];
-	center[1] = P[2];
-	center[2] = P[1];
+    center[1] = P[1];
+    center[2] = P[2];
 	
 	up[0] = car->_posMat[2][0];
-	up[1] = car->_posMat[2][2];
-	up[2] = car->_posMat[2][1];
+    up[1] = car->_posMat[2][1];
+    up[2] = car->_posMat[2][2];
 
 	speed[0] = car->pub.DynGCg.vel.x;
 	speed[1] = car->pub.DynGCg.vel.y;
@@ -567,10 +573,14 @@ refresh(tSituation *s)
 	osg::Camera * camera = m_sceneViewer->getCamera();
 	camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
     	//camera->setProjectionMatrixAsPerspective(67.5, ratio, 1, 12000.0);
-    	camera->setViewMatrixAsLookAt( eye, center, osg::Vec3(0,1,0));
-    	m_sceneViewer->frame();
+    camera->setViewMatrixAsLookAt( eye, center, osg::Vec3(0,0,1));
+
+
+    cars.updateCars();
+
+    m_sceneViewer->frame();
     
-    	return 0;
+    return 0;
 }
 
     /*GfProfStartProfile("refresh");
@@ -797,6 +807,11 @@ initTrack(tTrack *track)
     return grLoadScene(track);
 }
 
+int  initCars(tSituation *s){
+    m_sceneroot->addChild(cars.loadCars(s));
+    GfOut("All cars loaded\n");
+    return 0;
+}
 
 /*void
 shutdownTrack(void)

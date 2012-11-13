@@ -61,6 +61,7 @@ extern void grUpdateTime(tSituation *s);
 extern void setViewer(osg::ref_ptr<osgViewer::Viewer> msV);
 extern void ClearScene(void);
 extern void setSceneRoot(osg::ref_ptr<osg::Group> root);
+extern void setCarRoot(osg::ref_ptr<osg::Group> root);
 
 //TODO: What is this??? kilo
 #ifdef GUIONS
