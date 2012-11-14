@@ -1,11 +1,8 @@
 #include <osg/MatrixTransform>
 
-
-
 #include "OsgLoader.h"
 #include "OsgCar.h"
 #include "OsgMath.h"
-
 
 /*float * flatten(float mat[4][4]){
     float res[16];
@@ -19,8 +16,6 @@
     return res;
 
 }*/
-
-
 
 osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
 {
@@ -177,6 +172,14 @@ void SDCar::updateCar()
     //this->car_branch->setMatrix(osg::Matrix(flatten(car->pub.posMat)));
 }
 
+SDCars::SDCars(void)
+{
+	cars_branch = new osg::Group;
+}
+
+SDCars::~SDCars(void)
+{
+}
 
 void SDCars::addSDCar(SDCar * car)
 {

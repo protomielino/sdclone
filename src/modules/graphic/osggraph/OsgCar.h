@@ -19,14 +19,15 @@ class SDCars
 {
     private :
         std::vector<SDCar *> the_cars;
-        osg::ref_ptr<osg::Group> cars_branch = new osg::Group;
+        osg::ref_ptr<osg::Group> cars_branch;
         tSituation * situation;
 
         void addSDCar(SDCar * car);
 
     public :
 
-
+	SDCars(void);
+	~SDCars(void);
 
         osg::ref_ptr<osg::Node> loadCars(tSituation * pSituation);
         void updateCars();
