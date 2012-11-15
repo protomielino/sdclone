@@ -161,14 +161,35 @@ void SDCar::updateCar()
     p[1] = car->_pos_Y;//+car->_drvPos_y;
     p[2] = car->_pos_Z;//+car->_drvPos_z;
 
-    osg::Matrix Ry = osg::Matrix::rotate(car->_yaw,osg::Z_AXIS);
+
+
+
+    /*for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            GfOut("%f ",car->_posMat[i][j]);
+        }
+        GfOut("\n");
+    }
+    /*GfOut("_________\n");*/
+
+    osg::Matrix mat(car->_posMat[0][0],car->_posMat[0][1],car->_posMat[0][2],car->_posMat[0][3],
+                    car->_posMat[1][0],car->_posMat[1][1],car->_posMat[1][2],car->_posMat[1][3],
+                    car->_posMat[2][0],car->_posMat[2][1],car->_posMat[2][2],car->_posMat[2][3],
+                    car->_posMat[3][0],car->_posMat[3][1],car->_posMat[3][2],car->_posMat[3][3]
+
+            );
+
+    /*osg::Matrix Ry = osg::Matrix::rotate(car->_yaw,osg::Z_AXIS);
     osg::Matrix Rp = osg::Matrix::rotate(-car->_pitch,osg::X_AXIS);
     osg::Matrix Rr = osg::Matrix::rotate(car->_roll,osg::Y_AXIS);
     osg::Matrix T = osg::Matrix::translate(p[0],p[1], p[2]);
-    Rr.mult(Ry,Rr);
-    Rp.mult(Rr,Rp);
-    T.mult(Rp,T);
-    this->car_branch->setMatrix(T);
+    osg::Matrix tmp1(4,4);
+    osg::Matrix tmp2(4,4);
+    osg::Matrix tmp3(4,4);
+    Rr.mult(Ry,tmp1);
+    Rp.mult(tmp1,tmp2);
+    T.mult(tmp2,tmp3);*/
+    this->car_branch->setMatrix(mat);
     //this->car_branch->setMatrix(osg::Matrix(flatten(car->pub.posMat)));
 }
 
