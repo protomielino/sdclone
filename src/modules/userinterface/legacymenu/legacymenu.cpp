@@ -302,8 +302,9 @@ void LegacyMenu::onRaceSimulationReady() {
         addLoadingMessage("Loading graphics for all cars ...");
 
         loadCarsGraphics(_piRaceEngine->outData()->s);
-        _piSoundEngine->init(_piRaceEngine->outData()->s);
         pauseMenuMusic();
+        addLoadingMessage("Loading sound effects for all cars ...");
+        _piSoundEngine->init(_piRaceEngine->outData()->s);
     }
 }
 

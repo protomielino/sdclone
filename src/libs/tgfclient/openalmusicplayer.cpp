@@ -26,7 +26,6 @@ const int OpenALMusicPlayer::BUFFERSIZE = 4096*64;
 OpenALMusicPlayer::OpenALMusicPlayer(SoundStream* soundStream):
 	device(NULL),
 	context(NULL),
-   previouscontext(NULL),
 	source(0),
 	stream(soundStream),
 	ready(false)
@@ -70,8 +69,6 @@ void OpenALMusicPlayer::stop()
     alDeleteBuffers(2, buffers);
     check();
 	
-	//alcMakeContextCurrent(previouscontext);
- //  previouscontext = NULL;
 	alcDestroyContext(context);
 	alcCloseDevice(device);
 	
@@ -95,7 +92,6 @@ bool OpenALMusicPlayer::initContext()
 		GfError("OpenALMusicPlayer: OpenAL could not create contect for device\n");
 		return false;
 	}
-   previouscontext = alcGetCurrentContext();
 	alcMakeContextCurrent(context);
 	alcGetError(device);
 	
@@ -210,21 +206,11 @@ void OpenALMusicPlayer::start()
 void OpenALMusicPlayer::pause()
 {
 	alSourceStop(source);
-	if(previouscontext == NULL){
-		previouscontext = alcGetCurrentContext();
-	}
-	alcMakeContextCurrent(previouscontext);
-	//previouscontext = NULL;
 }
 
 void OpenALMusicPlayer::resume(int flag)
 {
-	alcMakeContextCurrent(context);
 	alSourcePlay(source);
-	if(flag == 1){
-		previouscontext = NULL;
-	}
-	
 }
 void OpenALMusicPlayer::rewind()
 {
