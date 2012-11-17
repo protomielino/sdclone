@@ -1,6 +1,7 @@
 #ifndef _OSGCAR_H_
 #define _OSGCAR_H_
 
+#include <car.h>
 #include <raceman.h>
 #include <osg/Group>
 #include <vector>

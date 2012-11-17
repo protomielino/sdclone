@@ -20,6 +20,27 @@
 #ifndef _OSGMATH_H_
 #define _OSGMATH_H_
 
+#define SD_ZERO  0.0
+#define SD_HALF  0.5
+#define SD_ONE   1.0
+#define SD_TWO   2.0
+#define SD_THREE 3.0
+#define SD_FOUR  4.0
+#define SD_45    45.0
+#define SD_60    60.0
+#define SD_90    90.0
+#define SD_180   180.0
+#define SD_MAX   DBL_MAX
+
+#ifndef M_PI
+#define SD_PI  3.1415926535f
+#else
+#define SD_PI  ((float) M_PI)
+#endif
+
+#define SD_DEGREES_TO_RADIANS  (SD_PI/SD_180)
+#define SD_RADIANS_TO_DEGREES  (SD_180/SD_PI)
+
 
 typedef float osgMat3[3][3];
 typedef float osgMat4[4][4];
@@ -31,8 +52,23 @@ struct osgCoord
 };
 
 extern void osgXformPnt3( osg::Vec3 dst, const osg::Vec3 src, const osgMat4 mat );
-
+extern void osgMakeCoordMat4 ( osgMat4 m, const float x, const float y, const float z, const float h, const float p, const float r );
 inline void osgXformPnt3( osg::Vec3 dst, const osgMat4 mat ) { osgXformPnt3 ( dst, dst, mat ); }
+
+inline float sdASin ( float s )
+                { return (float) asin (s) * SD_RADIANS_TO_DEGREES ; }
+inline float sdACos ( float s )
+                { return (float) acos (s) * SD_RADIANS_TO_DEGREES ; }
+inline float sdATan ( float s )
+                { return (float) atan (s) * SD_RADIANS_TO_DEGREES ; }
+inline float sdATan2 ( float y, float x )
+                { return (float) atan2 ( y,x ) * SD_RADIANS_TO_DEGREES ; }
+inline float sdSin ( float s )
+                { return (float)sin (s * SD_DEGREES_TO_RADIANS) ; }
+inline float sdCos ( float s )
+                { return (float)cos (s * SD_DEGREES_TO_RADIANS) ; }
+inline float sdTan ( float s )
+                { return (float)tan (s * SD_DEGREES_TO_RADIANS) ; }
 
 
 #endif /* _OSGMATH_H_ */

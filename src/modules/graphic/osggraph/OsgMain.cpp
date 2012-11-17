@@ -465,7 +465,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     m_sceneViewer->getCamera()->setName("Cam one");
     m_sceneViewer->getCamera()->setViewport(new osg::Viewport(0, 0, grWinw, grWinh));
     m_sceneViewer->getCamera()->setGraphicsContext(gw.get());
-    m_sceneViewer->getCamera()->setProjectionMatrixAsPerspective(67.5f, static_cast<double>(grWinw / grWinh), 0.2f, 9000.0f);
+    m_sceneViewer->getCamera()->setProjectionMatrixAsPerspective(67.5f, static_cast<double>((float)grWinw / (float)grWinh), 0.2f, 9000.0f);
     //m_sceneViewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
     m_sceneViewer->realize();
     
