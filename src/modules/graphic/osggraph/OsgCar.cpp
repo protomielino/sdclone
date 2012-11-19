@@ -4,19 +4,6 @@
 #include "OsgCar.h"
 #include "OsgMath.h"
 
-/*float * flatten(float mat[4][4]){
-    float res[16];
-    for(int i=0;i<16;i++){
-        res[i] = mat[i/4][i%4];
-        GfOut("%d ",mat[i/4][i%4]);
-        if(i%4==3)
-           GfOut("\n");
-    }
-     GfOut("________\n");
-    return res;
-
-}*/
-
 osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
 {
     this->car = car;
@@ -106,18 +93,13 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
 
     lg += snprintf(buf + lg, nMaxTexPathSize - lg, "data/textures");
 
-  //  ssgModelPath(buf);
-  //  ssgTexturePath(buf);
-
     /* loading raw car level 0*/
     selIndex = 0; 	/* current selector index */
     snprintf(buf, nMaxTexPathSize, "%s.ac",
              bMasterModel ? car->_masterModel : car->_carName); /* default car 3D model file */
     snprintf(path, 256, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
     param = GfParmGetStr(handle, path, PRM_CAR, buf);
-    //grCarInfo[index].LODThreshold[selIndex] = GfParmGetNum(handle, path, PRM_THRESHOLD, NULL, 0.0);
-    //GfOut("HEHEHHEHEHEHHEHHEH %s\n",path);
-    //carEntity = grssgCarLoadAC3D(param, NULL, index);
+
     std::string strPath = GetDataDir();
     if (bMasterModel)
     	sprintf(buf, "cars/%s/%s.acc", car->_masterModel, car->_masterModel);
@@ -138,15 +120,10 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
     p[0] = car->_pos_X;//+ car->_drvPos_x;
     p[1] = car->_pos_Y;//+car->_drvPos_y;
     p[2] = car->_pos_Z;//+car->_drvPos_z;
-    //osgXformPnt3(p, car->_posMat);
-
 
     osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
-    /* transform1->setMatrix( osg::Matrix::translate(p[0],p[1], p[2]) );*/
-    // transform1->setMatrix( osg::Matrix(flatten(car->pub.posMat)) );
     transform1->addChild(pCar);
-    //osgcars->addChild(transform1.get());
-    //GfOut("LE POINTEUR %d\n",osgcars.get());
+
     GfOut("loaded car %d",pCar);
     this->car_branch = transform1;
     return this->car_branch;
@@ -161,36 +138,12 @@ void SDCar::updateCar()
     p[1] = car->_pos_Y;//+car->_drvPos_y;
     p[2] = car->_pos_Z;//+car->_drvPos_z;
 
-
-
-
-    /*for(int i=0;i<4;i++){
-        for(int j=0;j<4;j++){
-            GfOut("%f ",car->_posMat[i][j]);
-        }
-        GfOut("\n");
-    }
-    /*GfOut("_________\n");*/
-
     osg::Matrix mat(car->_posMat[0][0],car->_posMat[0][1],car->_posMat[0][2],car->_posMat[0][3],
                     car->_posMat[1][0],car->_posMat[1][1],car->_posMat[1][2],car->_posMat[1][3],
                     car->_posMat[2][0],car->_posMat[2][1],car->_posMat[2][2],car->_posMat[2][3],
-                    car->_posMat[3][0],car->_posMat[3][1],car->_posMat[3][2],car->_posMat[3][3]
+                    car->_posMat[3][0],car->_posMat[3][1],car->_posMat[3][2],car->_posMat[3][3]);
 
-            );
-
-    /*osg::Matrix Ry = osg::Matrix::rotate(car->_yaw,osg::Z_AXIS);
-    osg::Matrix Rp = osg::Matrix::rotate(-car->_pitch,osg::X_AXIS);
-    osg::Matrix Rr = osg::Matrix::rotate(car->_roll,osg::Y_AXIS);
-    osg::Matrix T = osg::Matrix::translate(p[0],p[1], p[2]);
-    osg::Matrix tmp1(4,4);
-    osg::Matrix tmp2(4,4);
-    osg::Matrix tmp3(4,4);
-    Rr.mult(Ry,tmp1);
-    Rp.mult(tmp1,tmp2);
-    T.mult(tmp2,tmp3);*/
     this->car_branch->setMatrix(mat);
-    //this->car_branch->setMatrix(osg::Matrix(flatten(car->pub.posMat)));
 }
 
 SDCars::SDCars(void)
