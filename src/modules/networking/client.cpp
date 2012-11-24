@@ -716,7 +716,7 @@ void NetClient::ReadTimePacket(ENetPacket *pPacket)
 	m_lag = (curTime-m_packetsendtime)/2.0;
 	GfLogTrace ("Connection lag is %lf seconds\n",m_lag);
 
-	double time;
+	double time = 0;
 
         PackedBuffer msg(pPacket->data, pPacket->dataLength);
         GfLogTrace("ReadTimePacket: packed data length=%d\n",
@@ -740,8 +740,8 @@ void NetClient::ReadFilePacket(ENetPacket *pPacket)
 	short len;
 	size_t writeSize;
 	char file[255];
-	unsigned int filesize;
-        char *filedata;
+	unsigned int filesize = 0;
+        char *filedata = 0;
 
 	memset(file, 0, sizeof file);
 
@@ -772,9 +772,12 @@ void NetClient::ReadFilePacket(ENetPacket *pPacket)
 	FILE *pFile = fopen(filepath,"w+b");
 	GfLogTrace("Reading file packet: File- %s\n",filepath);
 
-	writeSize = fwrite(filedata, filesize, 1, pFile);
-	if( writeSize <= 0 )
-		GfLogTrace("Not all bytes are send to file");
+	if (filedata && filesize > 0)
+	{
+		writeSize = fwrite(filedata, filesize, 1, pFile);
+		if( writeSize <= 0 )
+			GfLogTrace("Not all bytes are send to file");
+	}
 	fclose(pFile);
 
         delete [] filedata;

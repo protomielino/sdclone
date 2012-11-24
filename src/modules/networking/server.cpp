@@ -604,7 +604,7 @@ void NetServer::ReadDriverReadyPacket(ENetPacket *pPacket)
 {
     GfLogTrace ("Read Driver Ready Packet\n"); 
 	
-	int idx;
+	int idx = 0;
 	bool bReady;
 
         PackedBuffer msg(pPacket->data, pPacket->dataLength);
@@ -623,7 +623,8 @@ void NetServer::ReadDriverReadyPacket(ENetPacket *pPacket)
         }
 	
 	NetMutexData *pNData = LockNetworkData();
-	pNData->m_vecReadyStatus[idx-1] = bReady;
+	if (idx > 0)
+		pNData->m_vecReadyStatus[idx-1] = bReady;
 	UnlockNetworkData();
 
 	SendDriversReadyPacket();
