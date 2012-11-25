@@ -18,28 +18,25 @@
  ***************************************************************************/
 
 #include <osg/MatrixTransform>
+//#include <osg/Node>
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
 #include <osgDB/Registry>
 
-#include "OsgBackground.h"
+#include "OsgScenery.h"
 
 SDBackground::SDBackground(void)
 {
-	type = 0;
-	sceneX = 0;
-	sceneY = 0;
-	m_background = new osg::Group;
 }
 
 SDBackground::~SDBackground(void)
 {
 }
 
-osg::Node *SDBackground::build(int type, int grWrldX, int grWrldY, const std::string TrackPath)
+osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, const std::string TrackPath)
 {
-	sceneX = grWrldX;
-	sceneY = grWrldY;
+	_sceneX = grWrldX;
+	_sceneY = grWrldY;
 	int land = type;
 	
 	std::string strTmpPath = GetDataDir();
@@ -47,11 +44,13 @@ osg::Node *SDBackground::build(int type, int grWrldX, int grWrldY, const std::st
 	strPath = strPath+strTmpPath+"data/textures";
 	strPath = strPath+TrackPath;
 	
-	m_background = osgDB::readNodeFile(strPath);
+	osg::Node *m_background = osgDB::readNodeFile(strPath);
 	
 	if (!type)
 	{
-		pre_transform = new osg::MatrixTransform;
-		
+		_background_transform = new osg::MatrixTransform;
+		_background_transform->addChild( m_background );
+	}
+}
 	
 	

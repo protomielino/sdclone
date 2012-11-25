@@ -26,7 +26,6 @@
 #include <raceman.h> // tSituation
 
 #include "OsgLoader.h"
-#include "OsgBackground.h"
 
 class	SDBackground;
 //class	SDSpectators;
@@ -38,19 +37,23 @@ class	SDScenery;
 
 class SDBackground
 {
-private:
 	osg::ref_ptr<osg::Group> _background;
-	osg::MatrixTransform	 _background_transform;
+	osg::ref_ptr<osg::MatrixTransform>	 _background_transform;
 	
-	double	_centerX;
-	double 	_centerY;
+	double	_sceneX;
+	double 	_sceneY;
 	bool	_type;
 	
-public:	
-	void SDBackground(void);
-	void ~SDBackground(void);
-	void build(bool type, int X, int Y, tTrack *track);
-	void reposition(_centerX, _centerY);	
+public:
+	
+	// Constructor	
+	SDBackground(void);
+	
+	// Destructor
+	~SDBackground(void);
+	
+	osg::Node *build(bool type, int X, int Y, const std::string strTrack);
+	void reposition(int X, int Y);	
 };
 
 /*class SDSpectators
@@ -88,6 +91,7 @@ private:
 	//SDSpectators	*m_spectators;
 	//SDTrees		*m_trees;
 	osg::ref_ptr<osg::Group> _scenery;
+	osg::ref_ptr<osg::Group> _background;
 	
 	int	_grWrldX;
 	int _grWrldY;
@@ -119,17 +123,18 @@ public:
 	/* Destructor */
 	~SDScenery(void);
 	
-	int		LoadScene(tTrack *track);
+	void 	LoadScene(tTrack *track);
 	void	CreatePit(tTrack *track);
 	//void	addSpectators(SDSpectators->build(number, tTrack *track));
 	//void	addTrees(SDTrees->build(tTrack *track));
 	void 	ShutdownScene(void);
+	//void	
 	
 	//osg::Node* getPreRoot() { return pre_root.get(); }
 
 	//osg::ref_ptr<osg::Group>	getSDScenery { return _scenery };
 	//osg::Group	getSDBackground { return SDBackground->getbackground; }
-	osg::Group getSceneroot { return _scenery; }
+	osg::Node* getSceneroot() { return _scenery.get(); }
 };
 
 #endif //_OSGSCENERY_H_

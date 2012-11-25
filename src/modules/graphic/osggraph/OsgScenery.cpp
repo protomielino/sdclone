@@ -26,7 +26,7 @@
 #include <osg/LightSource>
 #include <osg/Camera>
 
-#include "OsgLoader.h"
+//#include "OsgLoader.h"
 #include "OsgMain.h"
 #include "OsgScenery.h"
 
@@ -46,8 +46,8 @@ SDScenery::SDScenery(void)
 	
 	_bgtype = false;
 	
-	_scenery = 0;
-	_background = 0;
+	_scenery = new osg::Group;
+	_background = new osg::Group;
 	//_spectators = 0;
 	//_trees = 0;
 	//_pits = 0;	
@@ -65,6 +65,7 @@ void SDScenery::LoadScene(tTrack *track)
 {	
 	void		*hndl = grTrackHandle;
 	const char	*acname;
+	char 		buf[256];
 	
 	m_background = new SDBackground;
 	_scenery = new osg::Group;
@@ -98,9 +99,6 @@ void SDScenery::LoadScene(tTrack *track)
     std::string PathTmp = GetDataDir();   
     //filePathList.push_back(path_list[i]);
 	
-	std::string PathTmp = GetDataDir();   
-    //filePathList.push_back(path_list[i]);
-	
 	if (grSkyDomeDistance > 0 && grTrack->skyversion > 0)
 	{
 		grBGSky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
@@ -110,7 +108,7 @@ void SDScenery::LoadScene(tTrack *track)
 			std::string strPath = PathTmp;
 			sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 			strPath += buf;
-			_scenery = addkid(m_background->buid(grBGType, _grWrldX, _grWrldY, strPath));
+			_scenery->addChild(m_background->buid(grBGType, _grWrldX, _grWrldY, strPath));
 		}
 	}
 
