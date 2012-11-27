@@ -20,33 +20,22 @@
 #ifndef _OSGRENDER_H_
 #define _OSGRENDER_H_
 
-#define SKYBIN 1
-#define TRACKBIN 2
+#include <osg/Group>
 
 #include <track.h>	//tTrack
 #include <raceman.h> // tSituation
-
-extern int grWrldX;
-extern int grWrldY;
-extern int grWrldZ;
-extern int grWrldMaxSize;
-extern tTrack *grTrack;
-
-extern osg::ref_ptr<osg::Group> m_sceneroot;
-extern osg::ref_ptr<osg::Group> m_carroot;
 
 class SDRender
 {
 private:
 	osg::ref_ptr<osg::Group> m_sceneroot;
 	osg::ref_ptr<osg::Group> m_carroot;
-	osg::ref_ptr<osg::Viewer> m_viewer;
 	
 public:
 	SDRender(void);
 	~SDRender(void);
 	
-	void Init(osg::Group *root);
+	void Init(osg::ref_ptr<osg::Group> root);
 	void Update(float speedcar, tSituation *s);
 	void UpdateTime(tSituation *s);
 }

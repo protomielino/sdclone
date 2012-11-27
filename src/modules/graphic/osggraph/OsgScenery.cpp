@@ -117,7 +117,7 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 	std::string strPath = GetDataDir();
 	sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 	strPath+=buf;
-    _strTexturePath = strPath;
+    	_strTexturePath = strPath;
 	strPath+="/";	
 	strPath+=acname;
 
