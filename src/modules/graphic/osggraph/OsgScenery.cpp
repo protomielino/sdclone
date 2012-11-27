@@ -26,9 +26,11 @@
 #include <osg/LightSource>
 #include <osg/Camera>
 
-//#include "OsgLoader.h"
+
 #include "OsgMain.h"
 #include "OsgScenery.h"
+
+#include "OsgLoader.h"
 
 #include <glfeatures.h>	//gluXXX
 #include <robottools.h>	//RtXXX()
@@ -43,6 +45,7 @@ SDScenery::SDScenery(void)
 	_nb_cloudlayer = 0;
 	_DynamicSkyDome = 0;
 	_SkyDomeDistance = 0;
+	_SkyDomeDistThresh = 12000;
 	
 	_bgtype = false;
 	
@@ -61,7 +64,7 @@ SDScenery::~SDScenery(void)
 	//delete	m_pits;
 }
 
-void SDScenery::LoadScene(tTrack *track)
+osg::Node* SDScenery::LoadScene(tTrack *track)
 {	
 	void		*hndl = grTrackHandle;
 	const char	*acname;
@@ -91,7 +94,6 @@ void SDScenery::LoadScene(tTrack *track)
 	if (strlen(acname) == 0) 
 	{
 		GfLogError("No specified track 3D model file\n");
-		return -1;
 	}	
 	
     osgDB::FilePathList filePathList = osgDB::Registry::instance()->getDataFilePathList();
@@ -99,57 +101,50 @@ void SDScenery::LoadScene(tTrack *track)
     std::string PathTmp = GetDataDir();   
     //filePathList.push_back(path_list[i]);
 	
-	if (grSkyDomeDistance > 0 && grTrack->skyversion > 0)
+	if (_SkyDomeDistance > 0 && grTrack->skyversion > 0)
 	{
-		grBGSky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
-		if (grBGSky)
+		_bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
+		if (_bgsky)
 		{
-			grBGType = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), GR_ATT_BGSKY_LAND) == 0;
+			_bgtype = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), GR_ATT_BGSKY_LAND) == 0;
 			std::string strPath = PathTmp;
 			sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 			strPath += buf;
-			_scenery->addChild(m_background->buid(grBGType, _grWrldX, _grWrldY, strPath));
+			_scenery->addChild(m_background->build(_bgtype, _grWrldX, _grWrldY, strPath));
 		}
 	}
 
 	std::string strPath = GetDataDir();
 	sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 	strPath+=buf;
-	strTPath = strPath;
-	filePathList.push_back(strTPath);
+    _strTexturePath = strPath;
 	strPath+="/";	
 	strPath+=acname;
-	
-	strTPath = PathTmp;
-	strTPath+="data/textures";
-	filePathList.push_back(strTPath);
 
 	LoadTrack(strPath);
 
-	return 0;
+	return _scenery;
 }
 	
-void SDScenery::LoadBackgroundGraphicsOptions()
+void SDScenery::LoadSkyOptions()
 {
 	// Sky dome / background.
-	grSkyDomeDistance =
-		(unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, 0, 0) + 0.5);
-	if (grSkyDomeDistance > 0 && grSkyDomeDistance < SkyDomeDistThresh)
-		grSkyDomeDistance = SkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
+	_SkyDomeDistance = (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, 0, 0) + 0.5);
+	if (_SkyDomeDistance > 0 && _SkyDomeDistance < _SkyDomeDistThresh)
+		_SkyDomeDistance = _SkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
 	
-	grDynamicSkyDome = grSkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), 
+	_DynamicSkyDome = _SkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), 
 						GR_ATT_DYNAMICSKYDOME_ENABLED) == 0; 
 
 	GfLogInfo("Graphic options : Sky dome : distance = %u m, dynamic = %s\n",
-			  grSkyDomeDistance, grDynamicSkyDome ? "true" : "false");
+			  _SkyDomeDistance, _DynamicSkyDome ? "true" : "false");
 			
 	// Cloud layers.
-	grNbCloudLayers = (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
+	//grNbCloudLayers = (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
 
-	GfLogInfo("Graphic options : Number of cloud layers : %u\n", grNbCloudLayers);
+	//GfLogInfo("Graphic options : Number of cloud layers : %u\n", grNbCloudLayers);
 
-	grMax_Visibility =
-		(unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, 0, 0));
+	_max_visibility = (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, 0, 0));
 }
 
 void SDScenery::LoadGraphicsOptions()
@@ -162,10 +157,10 @@ void SDScenery::LoadGraphicsOptions()
 		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 	}//if grHandle
 
-	LoadBackgroundGraphicsOptions();
+	LoadSkyOptions();
 }
 
-void SDScenery::ClearScene(void)
+void SDScenery::ShutdownScene(void)
 {
 	_scenery->removeChildren(0, _scenery->getNumChildren());	
 }
@@ -174,28 +169,19 @@ bool SDScenery::LoadTrack(std::string strTrack)
 {
 	GfOut("Chemin Track : %s\n", strTrack.c_str());
 	osgLoader loader;
-	GfOut("Chemin Textures : %s\n", m_strTexturePath.c_str());
-	loader.AddSearchPath(m_strTexturePath);
-	osg::Node *pTrack = loader.Load3dFile(strTrack);
+	GfOut("Chemin Textures : %s\n", _strTexturePath.c_str());
+	loader.AddSearchPath(_strTexturePath);
+	osg::Node *pTrack = loader.Load3dFile(strTrack, false);
 
 	if (pTrack)
 	{
 		osgUtil::Optimizer optimizer;
 		optimizer.optimize(pTrack); 
 		pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
-		m_sceneroot->addChild(pTrack);		
+		_scenery->addChild(pTrack);		
 	}
 	else
 		return false;
 
 	return true;
-}
-
-void SDScenery::ShutdownScene(void)
-{
-}//grShutdownScene
-
-void SDScenery::SetTexturePaths(const char *pszPath)
-{
-	m_strTexturePath = pszPath;
 }

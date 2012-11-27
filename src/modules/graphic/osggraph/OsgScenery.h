@@ -25,7 +25,7 @@
 #include <track.h>	//tTrack
 #include <raceman.h> // tSituation
 
-#include "OsgLoader.h"
+#include <osg/Group>
 
 class	SDBackground;
 //class	SDSpectators;
@@ -101,17 +101,20 @@ private:
 	int _nb_cloudlayer;
 	int _DynamicSkyDome;
 	int _SkyDomeDistance;
+	int _SkyDomeDistThresh;
 	
 	bool _bgtype;
+	bool _bgsky;
 
 	//_spectators = 0;
 	//_trees = 0;
-	//_pits = 0;	
+	//_pits = 0;
+	std::string _strTexturePath;	
 	
 	tTrack 		*grTrack;
-	osgLoader	*TheScene;
 	
 	void LoadGraphicsOptions();
+	void LoadSkyOptions();
 	void CustomizePits(void);
 	bool LoadTrack(std::string strTrack);
 	
@@ -123,7 +126,7 @@ public:
 	/* Destructor */
 	~SDScenery(void);
 	
-	void 	LoadScene(tTrack *track);
+	osg::Node *LoadScene(tTrack *track);
 	void	CreatePit(tTrack *track);
 	//void	addSpectators(SDSpectators->build(number, tTrack *track));
 	//void	addTrees(SDTrees->build(tTrack *track));
@@ -134,7 +137,6 @@ public:
 
 	//osg::ref_ptr<osg::Group>	getSDScenery { return _scenery };
 	//osg::Group	getSDBackground { return SDBackground->getbackground; }
-	osg::Node* getSceneroot() { return _scenery.get(); }
 };
 
 #endif //_OSGSCENERY_H_

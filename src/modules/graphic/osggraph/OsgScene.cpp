@@ -263,31 +263,11 @@ bool LoadTrack(std::string strTrack)
 	loader.AddSearchPath(m_strTexturePath);
 	osg::Node *pTrack = loader.Load3dFile(strTrack, false);
 
- 	//osgDB::writeNodeFile(*pTrack,"mytrack.osg");
-
 	if (pTrack)
 	{
 		osgUtil::Optimizer optimizer;
 		optimizer.optimize(pTrack); 
-        //osg::Matrixf mat;
-		//Rotate track model 90 degrees to match the way plib loader works
-        //mat = mat.rotate(osg::inDegrees(90.0), osg::X_AXIS);
-        //osg::MatrixTransform *pTrans = new osg::MatrixTransform(mat);
-        //pTrans->addChild(pTrack);
-        //pTrans->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
-        //pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
-
-       /* osg::ref_ptr<osg::MatrixTransform> rot = new osg::MatrixTransform;
-            osg::Matrix mat( 1.0f, 0.0f,0.0f, 0.0f,
-                             0.0f, 0.0f,1.0f, 0.0f,
-                             0.0f, -1.0f,0.0f,  0.0f,
-                             0.0f, 0.0f,0.0f,  1.0f );
-            rot->setMatrix(mat);
-            rot->addChild(pTrack);
-*/
-
-        m_sceneroot->addChild(pTrack);
-		
+        m_sceneroot->addChild(pTrack);		
 	}
 	else
 		return false;
@@ -349,9 +329,11 @@ grLoadScene(tTrack *track)
 	{
 		GfLogError("No specified track 3D model file\n");
 		return -1;
-	}	
+	}
 	
-    osgDB::FilePathList filePathList = osgDB::Registry::instance()->getDataFilePathList();
+	osgLoader loader;
+	
+    //osgDB::FilePathList filePathList = osgDB::Registry::instance()->getDataFilePathList();
     //filePathList.push_back(globals->get_fg_root());
     
     std::string PathTmp = GetDataDir();   
@@ -366,49 +348,53 @@ grLoadScene(tTrack *track)
 			if (grBGType)
 			{
 				std::string strTPath = PathTmp;
-				sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
+				sprintf(buf, "tracks/%s/%s/", grTrack->category, grTrack->internalname);
 				strTPath+=buf;
 				//filePathList.push_back(strTPath);
-				SetTexturePaths(strTPath.c_str());
+				loader.AddSearchPath(strTPath);
+				//SetTexturePaths(strTPath.c_str());
 				
 				strTPath = PathTmp;
 				strTPath+="data/objects";
+				loader.AddSearchPath(strTPath);
 				//filePathList.push_back(strTPath);
-				SetTexturePaths(strTPath.c_str());
+				//SetTexturePaths(strTPath.c_str());
 				
 				strTPath = PathTmp;
 				strTPath+="data/textures";
+				loader.AddSearchPath(strTPath);
 				//filePathList.push_back(strTPath);
-				SetTexturePaths(strTPath.c_str());
+				//SetTexturePaths(strTPath.c_str());
 				
 				//osgDB::Registry::instance()->getDataFilePathList() = filePathList;
 				//SetTexturePaths(filePathList);
 
-				std::string strPath = GetDataDir();
-				sprintf(buf, "tracks/%s/%s/land.ac", grTrack->category, grTrack->internalname);
-				strPath+=buf;
+				std::string strPath;
+				//sprintf(buf, "land.ac", grTrack->category, grTrack->internalname);
+				strPath+="land.ac";
 				LoadBackground(strPath);
 			}
 			else
 			{ 
 				std::string strTPath = PathTmp;
-				sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
+				sprintf(buf, "tracks/%s/%s/", grTrack->category, grTrack->internalname);
 				strTPath+=buf;
-				strTPath+="/";
+				loader.AddSearchPath(strTPath);
 				//filePathList.push_back(strTPath);
-				SetTexturePaths(strTPath.c_str());
+				//SetTexturePaths(strTPath.c_str());
 				
 				strTPath = PathTmp;
 				strTPath+="data/objects";
+				loader.AddSearchPath(strTPath);
 				//filePathList.push_back(strTPath);
-				SetTexturePaths(strTPath.c_str());
+				//SetTexturePaths(strTPath.c_str());
 				
 				//osgDB::Registry::instance()->getDataFilePathList() = filePathList;
 				//SetTexturePaths(filePathList);				
 
-				std::string strPath = GetDataDir();
+				std::string strPath;
 				//sprintf(buf, "tracks/%s/%s/background-sky.ac", grTrack->category, grTrack->internalname);
-				strPath+="data/objects/background-sky.ac";
+				strPath+="background-sky.ac";
 				LoadBackground(strPath);				
 			}
 		}
@@ -419,25 +405,26 @@ grLoadScene(tTrack *track)
 	//strTPath+=buf;
 	//sprintf(buf, "%sdata/textures", GetDataDir());
 	std::string strPath = GetDataDir();
-	sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
+	sprintf(buf, "tracks/%s/%s/", grTrack->category, grTrack->internalname);
 	strPath+=buf;
 	strTPath = strPath;
-	filePathList.push_back(strTPath);
-	strPath+="/";	
-	strPath+=acname;
+	//filePathList.push_back(strTPath);
+	loader.AddSearchPath(strTPath);
+	//strPath+="/";	
+	//strPath+=acname;
 	
 	strTPath = PathTmp;
 	//sprintf(buf, "tracks/%s/%s:", grTrack->category, grTrack->internalname);
 	//strTPath+=buf;
 	//sprintf(buf, "%sdata/textures", GetDataDir());
 	strTPath+="data/textures";
-	filePathList.push_back(strTPath);
+	loader.AddSearchPath(strTPath);
 	//SetTexturePaths(strTPath.c_str());
 	
 	//osgDB::Registry::instance()->getDataFilePathList() = filePathList;
 	//SetTexturePaths(filePathList);
 
-	LoadTrack(strPath);
+	LoadTrack(acname);
 	
 	//GfOut("Track = %d\n", m_sceneroot);
 	//desc = grssgLoadAC3D(acname, NULL);

@@ -39,12 +39,15 @@ osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, const std::s
 	_sceneY = grWrldY;
 	int land = type;
 	
-	std::string strTmpPath = GetDataDir();
-	std::string strPath = strTmpPath +"data/objets";
-	strPath = strPath+strTmpPath+"data/textures";
-	strPath = strPath+TrackPath;
+	std::string LocalPath = GetDataDir();
 	
-	osg::Node *m_background = osgDB::readNodeFile(strPath);
+	osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
+    pathList.push_back(TrackPath);
+    pathList.push_back(LocalPath+"data/objects");
+    pathList.push_back(LocalPath+"data/textures");
+    osgDB::Registry::instance()->setDataFilePathList(pathList);
+	
+	osg::Node *m_background = osgDB::readNodeFile("background-sky.ac");
 	
 	if (!type)
 	{
