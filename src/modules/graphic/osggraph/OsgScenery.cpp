@@ -26,7 +26,6 @@
 #include <osg/LightSource>
 #include <osg/Camera>
 
-
 #include "OsgMain.h"
 #include "OsgScenery.h"
 
@@ -70,6 +69,8 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 	const char	*acname;
 	char 		buf[256];
 	
+	GfOut("Initialisation class SDScenery\n");
+	
 	m_background = new SDBackground;
 	_scenery = new osg::Group;
 	grTrack = track;
@@ -96,17 +97,14 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 		GfLogError("No specified track 3D model file\n");
 	}	
 	
-    osgDB::FilePathList filePathList = osgDB::Registry::instance()->getDataFilePathList();
-    
-    std::string PathTmp = GetDataDir();   
-    //filePathList.push_back(path_list[i]);
+    	std::string PathTmp = GetDataDir();   
 	
 	if (_SkyDomeDistance > 0 && grTrack->skyversion > 0)
 	{
 		_bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
 		if (_bgsky)
 		{
-			_bgtype = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), GR_ATT_BGSKY_LAND) == 0;
+			_bgtype = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), 						GR_ATT_BGSKY_LAND) == 0;
 			std::string strPath = PathTmp;
 			sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 			strPath += buf;
