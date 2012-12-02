@@ -45,17 +45,24 @@ osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, const std::s
    	pathList.push_back(TrackPath);
     	pathList.push_back(LocalPath+"data/objects");
     	pathList.push_back(LocalPath+"data/textures");
-    	osgDB::Registry::instance()->setDataFilePathList(pathList);
+    	osgDB::Registry::instance()->setDataFilePathList(pathList);	
 	
-	osg::Node *m_background = osgDB::readNodeFile("background-sky.ac");
-	
+	_background_transform = new osg::MatrixTransform;
+	osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+                         0.0f, -1.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f);
+                         	
 	if (!land)
 	{
-		_background_transform = new osg::MatrixTransform;
+		osg::Node *m_background = osgDB::readNodeFile("background-sky.ac");
+		_background_transform->setMatrix(mat);
 		_background_transform->addChild( m_background );
 	}
-	
-	return m_background;
+	else
+	{
+		osg::Node *m_background = osgDB::readNodeFile("land.ac");
+		_background_transform->setMatrix(mat);
+		_background_transform->addChild( m_background );
+	}
+		
+    	return _background_transform.get();
 }
-	
-	
