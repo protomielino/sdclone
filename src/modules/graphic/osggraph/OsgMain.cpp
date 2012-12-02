@@ -467,7 +467,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     
     //m_start_tick = m_timer.tick();
 
-    osg::ref_ptr<osgViewer::Viewer> m_sceneViewer = new osgViewer::Viewer();
+	m_sceneViewer = new osgViewer::Viewer();
     m_sceneViewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = m_sceneViewer->setUpViewerAsEmbeddedInWindow(0, 0, grWinw, grWinh);
     m_sceneViewer->getCamera()->setName("Cam one");
