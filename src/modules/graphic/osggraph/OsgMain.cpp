@@ -17,25 +17,25 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "OsgMain.h"
-#include "OsgMath.h"
-#include "OsgCar.h"
-
 //#include "grOSG.h"
-//#include <osgViewer/Viewer>
+#include <osgViewer/Viewer>
+#include <osg/Group>
 
 #include <glfeatures.h> // GfglFeatures
 #include <robot.h>	//ROB_SECT_ARBITRARY
 #include <graphic.h>
 
+#include "OsgMain.h"
+#include "OsgCar.h"
+#include "OsgScenery.h"
+#include "OsgRender.h"
+#include "OsgMath.h"
+
 
 //#include "grshadow.h"
 //#include "grskidmarks.h"
 //#include "grsmoke.h"
-#include "OsgCar.h"
 //#include "grscreen.h"
-#include "OsgScene.h"
-#include "OsgScene.h"
 //#include "grsound.h"
 //#include "grloadac.h"
 //#include "grutil.h"
@@ -45,13 +45,21 @@
 //#include "grbackground.h"
 
 
+
 //osg::ref_ptr<osgViewer::Viewer> m_sceneViewer;
 //osg::ref_ptr<osg::Group> m_sceneroot;
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;
 
-SDCars cars;
+SDCars *cars = NULL;
+SDScenery *scenery = NULL;
+SDRender *render = NULL;
 
+static osg::ref_ptr<osg::Group> m_sceneroot;
+static osg::ref_ptr<osg::Group> m_carroot;
+static osg::ref_ptr<osgViewer::Viewer> m_sceneViewer;
+static osg::Timer m_timer;
+static osg::Timer_t m_start_tick;
 
 int grMaxTextureUnits = 0;
 
@@ -437,6 +445,7 @@ grNextCar(void * /* dummy */)
 int
 initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
+    render = new SDRender;
     int i;
 
     grWinx = x;
@@ -458,8 +467,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     
     //m_start_tick = m_timer.tick();
 
-    m_sceneViewer = new osgViewer::Viewer();
-    setViewer(m_sceneViewer);
+    osg::ref_ptr<osgViewer::Viewer> m_sceneViewer = new osgViewer::Viewer();
     m_sceneViewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = m_sceneViewer->setUpViewerAsEmbeddedInWindow(0, 0, grWinw, grWinh);
     m_sceneViewer->getCamera()->setName("Cam one");
@@ -515,7 +523,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 
     GfLogInfo("Current screen is #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
 
-    OsgInitScene();
+    render->Init(m_sceneroot, m_sceneViewer);
 
     //grLodFactorValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, 1.0);
 
@@ -573,7 +581,7 @@ refresh(tSituation *s)
 	camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
     camera->setViewMatrixAsLookAt( eye, center, up);
 
-    cars.updateCars();
+    cars->updateCars();
 
     m_sceneViewer->frame();
     
@@ -791,22 +799,27 @@ initTrack(tTrack *track)
 	//grContext.makeCurrent();
 
 	setupOpenGLFeatures();
-    
+	
 	//grssgSetCurrentOptions(&options);
 
 	// Now, do the real track loading job.
 	grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	/*if (grNbActiveScreens > 0)
-		return grLoadScene(track);
+		return grLoadScene(track);*/
+		
+	scenery = new SDScenery;
+	m_sceneroot = new osg::Group();
+	m_sceneroot->addChild(scenery->LoadScene(track));
 
-	 return -1;*/
+	 //return -1;*/
     //m_sceneViewer->setSceneData();
-    return grLoadScene(track);
+    return 0;
 }
 
 int  initCars(tSituation *s)
 {
-    m_sceneroot->addChild(cars.loadCars(s));
+    cars = new SDCars;
+    m_sceneroot->addChild(cars->loadCars(s));
     GfOut("All cars loaded\n");
     
     return 0;

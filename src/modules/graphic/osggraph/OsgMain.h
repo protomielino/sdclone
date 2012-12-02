@@ -20,6 +20,7 @@
 #ifndef _OSGMAIN_H_
 #define _OSGMAIN_H_
 
+#include <osg/Group>
 #include <osgViewer/Viewer>
 #include <osg/Camera>
 
@@ -60,9 +61,10 @@ extern int grNbActiveScreens;
 
 //extern class cGrScreen *grScreens[];
 //extern class cGrScreen* grGetCurrentScreen(void);
-extern osg::ref_ptr<osgViewer::Viewer> m_sceneViewer;
-extern	osg::Timer m_timer;
-extern	osg::Timer_t m_start_tick;
+
+class SDScenery;
+class SDCars;
+class SDRender;
 
 //static 
 

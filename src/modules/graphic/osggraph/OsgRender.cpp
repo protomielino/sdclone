@@ -68,13 +68,6 @@ void SDRender::Init(osg::ref_ptr<osg::Group> scene, osg::ref_ptr<osgViewer::View
     myLight2->setSpecular(osg::Vec4(0.5f, 0.5f, 0.5f, 1.0f));
     myLight2->setConstantAttenuation(1.0f);    
 
-    viewer->setSceneData(scene.get());
-    viewer->getCamera()->setCullingMode( viewer->getCamera()->getCullingMode() & ~osg::CullStack::SMALL_FEATURE_CULLING);
-    
-
-    osg::Group *g = new osg::Group;
-    m_carroot = g;
-
     GfOut("LE POINTEUR %d\n",m_carroot.get());
 
   	//return 0;
