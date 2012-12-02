@@ -47,6 +47,7 @@ SDScenery::SDScenery(void)
 	_SkyDomeDistThresh = 12000;
 	
 	_bgtype = false;
+	_bgsky =  false;
 	
 	_scenery = new osg::Group;
 	_background = new osg::Group;
@@ -109,6 +110,7 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 			sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 			strPath += buf;
 			_scenery->addChild(m_background->build(_bgtype, _grWrldX, _grWrldY, strPath));
+			GfOut("Background loaded\n");
 		}
 	}
 
