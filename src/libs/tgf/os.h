@@ -40,6 +40,7 @@ typedef double (*tfTimeClock)(void);
 /* System interface */
 typedef unsigned (*tfSysGetNumberOfCPUs)(void);
 typedef bool (*tfSysSetThreadAffinity)(int nCPUId);
+typedef bool (*tfSysGetOSInfo)(std::string&, int&, int&, int&, int&);
 
 typedef struct {
     tfModLoad			modLoad;
@@ -53,6 +54,7 @@ typedef struct {
     tfTimeClock			timeClock;
     tfSysSetThreadAffinity	sysSetThreadAffinity;
     tfSysGetNumberOfCPUs	sysGetNumberOfCPUs;
+    tfSysGetOSInfo		sysGetOSInfo;
 } tGfOs;
 
 TGF_API extern tGfOs GfOs;

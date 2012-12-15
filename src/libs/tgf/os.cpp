@@ -79,12 +79,28 @@ unsigned GfGetNumberOfCPUs()
 
 /* Force the current thread to run on the specified CPU.
 *   @param nCPUId the index in [0, # of actual CPUs on the system [ (any other value will actually reset the thread affinity to the "system" affinity mask, meaning no special processor / core assignement)
-*   @return true if any error occured, false otherwise
+*   @return false if any error occurred, false otherwise
  */
 bool GfSetThreadAffinity(int nCPUId)
 {
     if (GfOs.sysSetThreadAffinity) {
 	return GfOs.sysSetThreadAffinity(nCPUId);
+    } else {
+	return false;
+    }
+}
+
+/* Get some info about the running OS.
+*   @param strName target string  for the OS name
+*   @param nMajor  target OS major version integer
+*   @param nMinor  target OS minor version integer
+*   @param nBits   target OS number of bits (32 or 64) integer
+*   @return false if any error occurred, false otherwise
+ */
+bool GfGetOSInfo(std::string& strName, int& nMajor, int& nMinor, int& nPatch, int& nBits)
+{
+    if (GfOs.sysGetOSInfo) {
+    return GfOs.sysGetOSInfo(strName, nMajor, nMinor, nPatch, nBits);
     } else {
 	return false;
     }

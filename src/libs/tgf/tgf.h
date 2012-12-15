@@ -45,6 +45,7 @@
 
 #include "modinfo.h" // Don't move this include line : needs TGF_API definition.
 
+#include <string>
 
 /** Floating point type used everywhere.
     @ingroup definitions
@@ -508,6 +509,7 @@ TGF_API bool GfSetThreadAffinity(int nCPUId);
 
 TGF_API void GfSleep(double seconds);
 
+TGF_API bool GfGetOSInfo(std::string& strName, int& nMajor, int& nMinor, int& nPatch, int& nBits);
 
 /***************************
  * Run-time dirs accessors *

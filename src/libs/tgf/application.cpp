@@ -72,6 +72,35 @@ GfApplication::GfApplication(const char* pszName, const char* pszVersion, const 
 	// Initialize the gaming framework.
 	GfInit();
 
+	// Trace current OS information.
+	std::string strName;
+	int nMajor, nMinor, nPatch, nBits;
+	if (GfGetOSInfo(strName, nMajor, nMinor, nPatch, nBits))
+	{
+		GfLogInfo("Current OS is %s", (strName.empty() ? "unknown" : strName.c_str()));
+		if (nMajor >= 0)
+		{
+			GfLogInfo(" (R%d", nMajor);
+			if (nMinor >= 0)
+			{
+				GfLogInfo(".%d", nMinor);
+				if (nPatch >= 0)
+					GfLogInfo(".%d", nPatch);
+			}
+		}
+		if (nBits >= 0)
+		{
+			if (nMajor >= 0)
+				GfLogInfo(", ");
+			else
+				GfLogInfo(" (");
+			GfLogInfo("%d bits", nBits);
+		}
+		if (nMajor >= 0 || nBits >= 0)
+			GfLogInfo(")");
+		GfLogInfo("\n");
+	}
+	
 	// Trace build information.
 	GfLogInfo("Built on %s\n", SD_BUILD_INFO_SYSTEM);
 	GfLogInfo("  with CMake %s, '%s' generator\n",
@@ -173,13 +202,13 @@ void GfApplication::restart()
 
 	// Restart the process, using same command line args.
 	// 1) The process executable path-name is the 1st arg left untouched.
-    GfLogInfo("Restarting :\n");
-    GfLogInfo("  Command : %s\n", _lstArgs.front().c_str());
+	GfLogInfo("Restarting :\n");
+	GfLogInfo("  Command : %s\n", _lstArgs.front().c_str());
 
 	// 2) Allocate and populate the args array (last arg must be a null pointer).
 	// TODO: Add an API for filtering the args (some might not be relevant for a restart).
-    GfLogInfo("  Args    : ");
-    char** apszArgs = (char**)malloc(sizeof(char*) * (_lstArgs.size() + 1));
+	GfLogInfo("  Args    : ");
+	char** apszArgs = (char**)malloc(sizeof(char*) * (_lstArgs.size() + 1));
 
 	unsigned nArgInd = 0;
 	std::list<std::string>::const_iterator itArg;
@@ -212,18 +241,18 @@ void GfApplication::restart()
 		nArgInd++;
 	}
 	apszArgs[nArgInd] = 0;
-    GfLogInfo("...\n\n");
+	GfLogInfo("...\n\n");
 	
-    // 3) Exec the command with its args (replacing current process).
-    const int retcode = execvp(_lstArgs.front().c_str(), apszArgs);
+	// 3) Exec the command with its args (replacing current process).
+	const int retcode = execvp(_lstArgs.front().c_str(), apszArgs);
 
-    // If the restart was successfull, we never get there ... But if it failed ...
-    GfLogError("Failed to restart (exit code %d, %s)\n", retcode, strerror(errno));
-    for (nArgInd = 0; apszArgs[nArgInd]; nArgInd++)
+	// If the restart was successfull, we never get there ... But if it failed ...
+	GfLogError("Failed to restart (exit code %d, %s)\n", retcode, strerror(errno));
+	for (nArgInd = 0; apszArgs[nArgInd]; nArgInd++)
 		free(apszArgs[nArgInd]);
-    free(apszArgs);
-    
-    exit(1);
+	free(apszArgs);
+	
+	exit(1);
 }
 
 void GfApplication::printUsage(const char* pszErrMsg) const
