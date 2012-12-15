@@ -22,13 +22,13 @@ from menu import Menu
 # Main menu
 class MenuStandard(Menu):
 
-	def __init__(self, clsMenuCredits): #, clsMenuProfiles, clsMenuOptions):
+	def __init__(self, clsMenuCredits, clsMenuOptions): #, clsMenuProfiles):
 	
 		Menu.__init__(self)
 
 		self.clsMenuCredits = clsMenuCredits
+		self.clsMenuOptions = clsMenuOptions
 		#self.clsMenuProfiles = clsMenuProfiles
-		#self.clsMenuOptions = clsMenuOptions
 		
 		self.menuCredits = None
 		self.menuProfiles = None
@@ -44,7 +44,7 @@ class MenuStandard(Menu):
 		if not layout:
 
 			# Specific to these menus.
-			btnCredits = PyCEGUI.WindowManager.getSingleton().createWindow("SDMockupLook/Button", name + "/BtnCredits")
+			btnCredits = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/Button", name + "/BtnCredits")
 			btnCredits.setText("Credits")
 			btnCredits.setTooltipText("Thanks to all contributors !")
 			btnCredits.setXPosition(PyCEGUI.UDim(0.3, 0.0))
@@ -56,7 +56,7 @@ class MenuStandard(Menu):
 			window.addChildWindow(btnCredits)
 
 			# Specific to these menus.
-			btnProfiles = PyCEGUI.WindowManager.getSingleton().createWindow("SDMockupLook/Button", name + "/BtnProfiles")
+			btnProfiles = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/Button", name + "/BtnProfiles")
 			btnProfiles.setText("Profiles")
 			btnProfiles.setTooltipText("Configure player input controls / profiles")
 			btnProfiles.setXPosition(PyCEGUI.UDim(0.45, 0.0))
@@ -68,7 +68,7 @@ class MenuStandard(Menu):
 			window.addChildWindow(btnProfiles)
 
 			# Specific to these menus.
-			btnOptions = PyCEGUI.WindowManager.getSingleton().createWindow("SDMockupLook/Button", name + "/BtnOptions")
+			btnOptions = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/Button", name + "/BtnOptions")
 			btnOptions.setText("Options")
 			btnOptions.setTooltipText("Settings for display, graphics, simulation ...")
 			btnOptions.setXPosition(PyCEGUI.UDim(0.60, 0.0))
@@ -80,7 +80,7 @@ class MenuStandard(Menu):
 			window.addChildWindow(btnOptions)
 
 			# Specific to these menus.
-			btnExit = PyCEGUI.WindowManager.getSingleton().createWindow("SDMockupLook/Button", name + "/BtnExit")
+			btnExit = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/Button", name + "/BtnExit")
 			btnExit.setText("Exit")
 			btnExit.setTooltipText("Exit from the game")
 			btnExit.setXPosition(PyCEGUI.UDim(0.75, 0.0))
@@ -120,14 +120,12 @@ class MenuStandard(Menu):
 	# Handlers
 	def onCreditsButtonClicked(self, args):
 
-		print("onCreditsButtonClicked")
 		if not self.menuCredits:
 			self.menuCredits = self.clsMenuCredits()
 			self.menuCredits.initialize()
 			self.menuCredits.setup()
 
-		self.menuCredits.activate(previous=self)
-		
+		self.menuCredits.activate(previous=self)		
 
 	def onProfilesButtonClicked(self, args):
 
@@ -135,7 +133,12 @@ class MenuStandard(Menu):
 
 	def onOptionsButtonClicked(self, args):
 
-		print("onOptionsButtonClicked")
+		if not self.menuOptions:
+			self.menuOptions = self.clsMenuOptions()
+			self.menuOptions.initialize()
+			self.menuOptions.setup()
+
+		self.menuOptions.activate(previous=self)
 
 	def onExitButtonClicked(self, args):
 

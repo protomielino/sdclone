@@ -47,9 +47,9 @@ class GUI(object):
 	def initializeDefaults(self):
 		
 		sm = PyCEGUI.SchemeManager.getSingleton()
-		sm.create('mockuplook.scheme')
-		PyCEGUI.System.getSingleton().setDefaultMouseCursor('SDMockupLook', 'MouseArrow')
-		PyCEGUI.System.getSingleton().setDefaultTooltip('SDMockupLook/Tooltip')
+		sm.create('ceguidemo.scheme')
+		PyCEGUI.System.getSingleton().setDefaultMouseCursor('CEGUIDemo', 'MouseArrow')
+		PyCEGUI.System.getSingleton().setDefaultTooltip('CEGUIDemo/Tooltip')
 
 	# Initialize
 	def initialize(self):

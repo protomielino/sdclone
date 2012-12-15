@@ -58,20 +58,20 @@ II- Installation
        Note: Actually tested on Linux Mint Debian Edition (AMD 64, Update Pack 5), 
              with Python 2.7.3rc1, PyCEGUI 0.7.7 and PyOpenGL 3.0.1
 
-  2 - Install SD-CEGUI mockup
+  2 - Install SD-CEGUI demo
 
      Download the sources from here :
 
-       http://speed-dreams.svn.sourceforge.net/viewvc/speed-dreams/trunk/src/tools/ceguimockup
+       http://speed-dreams.svn.sourceforge.net/viewvc/speed-dreams/trunk/src/tools/ceguidemo
        (using the "Download GNU tarball at the bottom of the page, 
         and then extracting its contents to where you like)
 
      or check them out with a subversion client :
 
-       cd ceguimockup
-       svn checkout https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/trunk/tools/ceguimockup .     
+       cd ceguidemo
+       svn checkout https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/trunk/tools/ceguidemo .     
  
-  3 - Run SD-CEGUI mockup
+  3 - Run SD-CEGUI demo
 
      a - Windows
 
@@ -80,7 +80,7 @@ II- Installation
      b - Linux
 
        Run the following command in a terminal :
-         python <path/to>/ceguimockup/main.py
+         python <path/to>/ceguidemo/main.py
 
 
 A - Build CEGUI 0.7.7 from sources

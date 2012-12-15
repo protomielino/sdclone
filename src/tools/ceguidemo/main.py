@@ -4,7 +4,7 @@
 
 """Application entry point.
 
-A mockup app. for testing CEGUI as a future possible GUI library for Speed Dreams,
+A demo. app. for testing CEGUI as a future possible GUI library for Speed Dreams,
 built on top of PyCEGUI and PyOpenGL.
 
 """

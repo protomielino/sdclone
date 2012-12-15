@@ -39,7 +39,7 @@ class Menu(object):
 			winMgr = PyCEGUI.WindowManager.getSingleton()
 			if background:
 
-				window = winMgr.createWindow('SDMockupLook/StaticImage', name)
+				window = winMgr.createWindow('CEGUIDemo/StaticImage', name)
 
 				# 1.a) Disable standard background
 				window.setProperty("BackgroundEnabled", "false")
@@ -49,7 +49,7 @@ class Menu(object):
 
 			else:
 
-				window = winMgr.createWindow('SDMockupLook/FrameWindow', name)
+				window = winMgr.createWindow('CEGUIDemo/FrameWindow', name)
 
 			# 1.d) Set area rectangle
 			window.setArea(PyCEGUI.UDim(0, 0), PyCEGUI.UDim(0, 0),
@@ -60,18 +60,18 @@ class Menu(object):
 
 			# 2) Logo image
 			imgSetMgr = PyCEGUI.ImagesetManager.getSingleton()
-			imgSetMgr.createFromImageFile("LogoImage", "sd-logo.png")
-			imgLogo = winMgr.createWindow('SDMockupLook/StaticImage', name + "/ImgLogo")
+			imgSetMgr.createFromImageFile("Logo", "sd-logo.png")
+			imgLogo = winMgr.createWindow('CEGUIDemo/StaticImage', name + "/ImgLogo")
 			imgLogo.setArea(PyCEGUI.UDim(0, 0), PyCEGUI.UDim(0, 0),
 						 PyCEGUI.UDim(0.3, 0), PyCEGUI.UDim(0.25, 0))
 			imgLogo.setProperty("FrameEnabled", "false")
 			imgLogo.setProperty("BackgroundEnabled", "false")
-			imgLogo.setProperty("Image", "set:LogoImage image:full_image")
+			imgLogo.setProperty("Image", "set:Logo image:full_image")
 
 			window.addChildWindow(imgLogo)
 
 			# 3) Title
-			txtTitle = winMgr.createWindow('SDMockupLook/PageTitle', name + "/TxtTitle")
+			txtTitle = winMgr.createWindow('CEGUIDemo/PageTitle', name + "/TxtTitle")
 			txtTitle.setArea(PyCEGUI.UDim(0.2, 0), PyCEGUI.UDim(0.1, 0),
 						  PyCEGUI.UDim(0.7, 0), PyCEGUI.UDim(0.1, 0))
 			txtTitle.setText(title or "<undefined title>")
@@ -83,7 +83,7 @@ class Menu(object):
 			window.addChildWindow(txtTitle)
 
 			# 4) Frame rate indicator
-			txtFrameRate = winMgr.createWindow('SDMockupLook/StaticText', name + "/TxtFrameRate")
+			txtFrameRate = winMgr.createWindow('CEGUIDemo/StaticText', name + "/TxtFrameRate")
 			txtFrameRate.setArea(PyCEGUI.UDim(0.95, 0), PyCEGUI.UDim(0.01, 0),
 							  PyCEGUI.UDim(0.04, 0), PyCEGUI.UDim(0.03, 0))
 			txtFrameRate.setText("--.-")

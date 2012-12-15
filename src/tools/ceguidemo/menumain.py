@@ -19,13 +19,17 @@ from configuration import TheConfig
 # Import: Menu
 from menustandard import MenuStandard
 from menucredits import MenuCredits
+from menuoptions import MenuOptions
+from menurace import MenuRace
 
 # Main menu
 class MenuMain(MenuStandard):
 
 	def __init__(self):
 
-		MenuStandard.__init__(self, MenuCredits) #, MenuProfiles, MenuOptions)
+		MenuStandard.__init__(self, MenuCredits, MenuOptions) #, MenuProfiles, )
+
+		self.menuRace = None
 	
 	# Initialize
 	def initialize(self):
@@ -43,7 +47,7 @@ class MenuMain(MenuStandard):
 			window = MenuStandard.initialize(self, name=name, title="Welcome", background="SplashMain")
 
 			# Specific to this menu.
-			btnPractice = PyCEGUI.WindowManager.getSingleton().createWindow("SDMockupLook/MainButton", name + "/BtnPractice")
+			btnPractice = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/MainButton", name + "/BtnPractice")
 			btnPractice.setText("Practice")
 			btnPractice.setTooltipText("A free practice session for one player on one track")
 			btnPractice.setXPosition(PyCEGUI.UDim(0.22, 0.0))
@@ -54,7 +58,7 @@ class MenuMain(MenuStandard):
 
 			window.addChildWindow(btnPractice)
 
-			btnQuickRace = PyCEGUI.WindowManager.getSingleton().createWindow("SDMockupLook/MainButton", name + "/BtnQuickRace")
+			btnQuickRace = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/MainButton", name + "/BtnQuickRace")
 			btnQuickRace.setText("QuickRace")
 			btnQuickRace.setTooltipText("A race on one track, with no qualifying session")
 			btnQuickRace.setXPosition(PyCEGUI.UDim(0.22, 0.0))
@@ -65,7 +69,7 @@ class MenuMain(MenuStandard):
 
 			window.addChildWindow(btnQuickRace)
 
-			btnSingleEvent = PyCEGUI.WindowManager.getSingleton().createWindow("SDMockupLook/MainButton", name + "/BtnSingleEvent")
+			btnSingleEvent = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/MainButton", name + "/BtnSingleEvent")
 			btnSingleEvent.setText("SingleEvent")
 			btnSingleEvent.setTooltipText("A race on one track, with various qualifying schemes")
 			btnSingleEvent.setXPosition(PyCEGUI.UDim(0.22, 0.0))
@@ -77,7 +81,7 @@ class MenuMain(MenuStandard):
 
 			window.addChildWindow(btnSingleEvent)
 
-			cbxSingleEvent = PyCEGUI.WindowManager.getSingleton().createWindow("SDMockupLook/Combobox", name + "/CbxSingleEvent.SubType")
+			cbxSingleEvent = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/Combobox", name + "/CbxSingleEvent.SubType")
 			cbxSingleEvent.setTooltipText("Select the type of single event race")
 			cbxSingleEvent.setXPosition(PyCEGUI.UDim(0.40, 0.0))
 			cbxSingleEvent.setYPosition(PyCEGUI.UDim(0.50, 0.0))
@@ -97,7 +101,7 @@ class MenuMain(MenuStandard):
 		self.lstItemsSingleEvent = []
 		for subType in ("Endurance", "Challenge", "1936 Grand Prix", "LS1 Challenge"):
 			itemCbx = PyCEGUI.ListboxTextItem(subType)
-			itemCbx.setSelectionBrushImage("SDMockupLook", "MultiListSelectionBrush")
+			itemCbx.setSelectionBrushImage("CEGUIDemo", "MultiListSelectionBrush")
 			self.cbxSingleEvent.addItem(itemCbx)
 			self.lstItemsSingleEvent.append(itemCbx) # Avoid its being GC'd at return !
 
@@ -124,11 +128,24 @@ class MenuMain(MenuStandard):
 	def onPracticeButtonClicked(self, args):
 
 		print("onPracticeButtonClicked")
+		self.activateRaceMenu()
 
 	def onQuickRaceButtonClicked(self, args):
 
 		print("onQuickRaceButtonClicked")
+		self.activateRaceMenu()
 
 	def onSingleEventButtonClicked(self, args):
 
 		print("onSingleEventButtonClicked")
+		self.activateRaceMenu()
+
+	def activateRaceMenu(self):
+
+		if not self.menuRace:
+			self.menuRace = MenuRace()
+			self.menuRace.initialize()
+			self.menuRace.setup()
+
+		self.menuRace.activate(previous=self)		
+
