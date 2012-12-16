@@ -163,18 +163,18 @@
             </AutoWindow>
         </Window>
         <Window Name="MenuOptions/CkxFullScreen" Type="CEGUIDemo/Checkbox">
-            <Property Name="UnifiedAreaRect" Value="{{0.55,0},{0.35,0},{0.6,0},{0.42,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.55,0},{0.35,0},{0.70,0},{0.45,0}}" />
             <Property Name="Font" Value="MenuSmall" />
         </Window>
         <Window Name="MenuOptions/RbnVInitBest" Type="CEGUIDemo/RadioButton">
-            <Property Name="UnifiedAreaRect" Value="{{0.55,0},{0.45,0},{0.65,0},{0.52,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.55,0},{0.45,0},{0.70,0},{0.55,0}}" />
             <Property Name="Font" Value="MenuMedium" />
             <Property Name="Text" Value="Best" />
             <Property Name="GroupID" Value="1" />
             <Property Name="Tooltip" Value="Enable best supported features" />
         </Window>
         <Window Name="MenuOptions/RbnVInitCompat" Type="CEGUIDemo/RadioButton">
-            <Property Name="UnifiedAreaRect" Value="{{0.65,0},{0.45,0},{0.8,0},{0.52,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.65,0},{0.45,0},{0.80,0},{0.55,0}}" />
             <Property Name="Font" Value="MenuMedium" />
             <Property Name="Text" Value="Compatible" />
             <Property Name="GroupID" Value="1" />
@@ -217,11 +217,17 @@
             <Property Name="MaxTextLength" Value="4" />
             <Property Name="TextFormatting" Value="RightAligned" />
         </Window>
-        <Window Name="MenuOptions/BtnBack" Type="CEGUIDemo/Button">
-            <Property Name="UnifiedAreaRect" Value="{{0.43,0},{0.9,0},{0.58,0},{0.95,0}}" />
+		<Window Name="MenuOptions/BtnAccept" Type="CEGUIDemo/Button">
+            <Property Name="UnifiedAreaRect" Value="{{0.23,0},{0.9,0},{0.38,0},{0.95,0}}" />
             <Property Name="Font" Value="MenuMedium" />
-            <Property Name="Text" Value="Back" />
-            <Property Name="Tooltip" Value="Back to main benu" />
+            <Property Name="Text" Value="Accept" />
+            <Property Name="Tooltip" Value="Accept changes and go back to main benu" />
+        </Window>
+		<Window Name="MenuOptions/BtnCancel" Type="CEGUIDemo/Button">
+            <Property Name="UnifiedAreaRect" Value="{{0.63,0},{0.9,0},{0.78,0},{0.95,0}}" />
+            <Property Name="Font" Value="MenuMedium" />
+            <Property Name="Text" Value="Cancel" />
+            <Property Name="Tooltip" Value="Revert changes and go back to main benu" />
         </Window>
     </Window>
 </GUILayout>

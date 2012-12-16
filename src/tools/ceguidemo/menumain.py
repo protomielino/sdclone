@@ -20,7 +20,7 @@ from configuration import TheConfig
 from menustandard import MenuStandard
 from menucredits import MenuCredits
 from menuoptions import MenuOptions
-from menurace import MenuRace
+from menutrackselect import MenuTrackSelect
 
 # Main menu
 class MenuMain(MenuStandard):
@@ -29,7 +29,7 @@ class MenuMain(MenuStandard):
 
 		MenuStandard.__init__(self, MenuCredits, MenuOptions) #, MenuProfiles, )
 
-		self.menuRace = None
+		self.menuTrackSelect = None
 	
 	# Initialize
 	def initialize(self):
@@ -128,24 +128,24 @@ class MenuMain(MenuStandard):
 	def onPracticeButtonClicked(self, args):
 
 		print("onPracticeButtonClicked")
-		self.activateRaceMenu()
+		self.activateTrackSelectMenu()
 
 	def onQuickRaceButtonClicked(self, args):
 
 		print("onQuickRaceButtonClicked")
-		self.activateRaceMenu()
+		self.activateTrackSelectMenu()
 
 	def onSingleEventButtonClicked(self, args):
 
 		print("onSingleEventButtonClicked")
-		self.activateRaceMenu()
+		self.activateTrackSelectMenu()
 
-	def activateRaceMenu(self):
+	def activateTrackSelectMenu(self):
 
-		if not self.menuRace:
-			self.menuRace = MenuRace()
-			self.menuRace.initialize()
-			self.menuRace.setup()
+		if not self.menuTrackSelect:
+			self.menuTrackSelect = MenuTrackSelect()
+			self.menuTrackSelect.initialize()
+			self.menuTrackSelect.setup()
 
-		self.menuRace.activate(previous=self)		
+		self.menuTrackSelect.activate(previous=self)
 

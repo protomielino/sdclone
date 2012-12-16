@@ -3,7 +3,8 @@
 	<Imageset Filename="ceguidemolook.imageset" />
 	<Imageset Filename="sd-logo.imageset" />
 	<Imageset Filename="splash-main.imageset" />
-	<Imageset Filename="splash-race.imageset" />
+	<Imageset Filename="splash-trackselect.imageset" />
+	<Imageset Filename="splash-carselect.imageset" />
 	<Imageset Filename="splash-credits.imageset" />
 	<Imageset Filename="splash-options.imageset" />
 	<Font Name="MenuSmall" Filename="menu-small.font" />

@@ -7,13 +7,15 @@
             <Item path="datafiles/imagesets/splash-credits.imageset" type="file" />
             <Item path="datafiles/imagesets/splash-main.imageset" type="file" />
             <Item path="datafiles/imagesets/splash-options.imageset" type="file" />
-            <Item path="datafiles/imagesets/splash-race.imageset" type="file" />
+			<Item path="datafiles/imagesets/splash-carselect.imageset" type="file" />
+			<Item path="datafiles/imagesets/splash-trackselect.imageset" type="file" />
         </Item>
         <Item name="Layouts" type="folder">
             <Item path="datafiles/layouts/menucredits.layout" type="file" />
             <Item path="datafiles/layouts/menumain.layout" type="file" />
             <Item path="datafiles/layouts/menuoptions.layout" type="file" />
-            <Item path="datafiles/layouts/menurace.layout" type="file" />
+			<Item path="datafiles/layouts/menucarselect.layout" type="file" />
+			<Item path="datafiles/layouts/menutrackselect.layout" type="file" />
         </Item>
         <Item name="Schemes" type="folder">
             <Item path="datafiles/schemes/ceguidemo.scheme" type="file" />

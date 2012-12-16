@@ -1,4 +1,0 @@
-<?xml version="1.0" ?>
-<Imageset Name="SplashRace" AutoScaled="true" Imagefile="splash-race.jpg" NativeHorzRes="800" NativeVertRes="600">
-    <Image Name="everything" Height="800" Width="1280" XPos="0" YPos="0" />
-</Imageset>

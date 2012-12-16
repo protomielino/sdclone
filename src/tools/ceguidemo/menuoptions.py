@@ -30,35 +30,27 @@ class MenuOptions(Menu):
 	def initialize(self):
 
 		name = "MenuOptions"
-
-		# Use layout if specified.
-		if TheConfig.useLayouts:
-			
-			window = Menu.initialize(self, name=name, title="Options", layout="menuoptions")
-			
-		else:
-			
-			# If no layout specified, go on building up the menu through code.
-			window = Menu.initialize(self, name=name, title="Options", background="SplashOptions")
-
-			# Specific to this menu.
-			winMgr = PyCEGUI.WindowManager.getSingleton()
-
-			btnBack = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/Button", name + "/BtnBack")
-			btnBack.setText("Back")
-			btnBack.setTooltipText("Back to the main menu")
-			btnBack.setXPosition(PyCEGUI.UDim(0.43, 0.0))
-			btnBack.setYPosition(PyCEGUI.UDim(0.9, 0.0))
-			btnBack.setWidth(PyCEGUI.UDim(0.15, 0.0))
-			btnBack.setHeight(PyCEGUI.UDim(0.05, 0.0))
-			btnBack.setProperty("Font", "MenuMedium")
-
-			window.addChildWindow(btnBack)
+		
+		# No code written for this menu : use mandatory layout.
+		window = Menu.initialize(self, name=name, title="Options", layout="menuoptions")
 
 		# Retrieve window descendants created here.
-		self.btnBack = window.getChild(name + "/BtnBack")
+		self.btnAccept = window.getChild(name + "/BtnAccept")
+		self.btnCancel = window.getChild(name + "/BtnCancel")
+		self.cbxWinSize = window.getChild(name + "/CbxWindowSize")
 		
-		# Complete widget initialization (whatever creation mode : code or .layout).
+		# Complete widget initialization.
+		self.cbxWinSizeItems = []
+		cbxItem = PyCEGUI.ListboxTextItem(" 800 x  512")
+		self.cbxWinSize.addItem(cbxItem)
+		self.cbxWinSizeItems.append(cbxItem)
+		cbxItem = PyCEGUI.ListboxTextItem("1280 x  800")
+		self.cbxWinSize.addItem(cbxItem)
+		self.cbxWinSizeItems.append(cbxItem)
+		cbxItem = PyCEGUI.ListboxTextItem("1680 x 1050")
+		self.cbxWinSize.addItem(cbxItem)
+		self.cbxWinSizeItems.append(cbxItem)
+
 		# TODO.
 
 		return window
@@ -72,10 +64,16 @@ class MenuOptions(Menu):
 		Menu.connectHandlers(self)
 
 		# Specific connections.
-		self.btnBack.subscribeEvent(PyCEGUI.PushButton.EventClicked, self, "onBackButtonClicked")
+		self.btnCancel.subscribeEvent(PyCEGUI.PushButton.EventClicked, self, "onCancelButtonClicked")
+		self.btnAccept.subscribeEvent(PyCEGUI.PushButton.EventClicked, self, "onAcceptButtonClicked")
 
-	def onBackButtonClicked(self, args):
+	def onCancelButtonClicked(self, args):
 
-		print("onBackButtonClicked")
+		print("onCancelButtonClicked")
+		self.back()
+
+	def onAcceptButtonClicked(self, args):
+
+		print("onAcceptButtonClicked")
 		self.back()
 

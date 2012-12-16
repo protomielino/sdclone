@@ -18,12 +18,12 @@
     <Image Height="16" Name="ButtonLeftHighlight" Width="12" XPos="68" YPos="56" />
     <Image Height="16" Name="ButtonMiddleHighlight" Width="12" XPos="82" YPos="56" />
     <Image Height="16" Name="ButtonRightHighlight" Width="12" XPos="96" YPos="56" />
-    <Image Height="12" Name="CheckboxNormal" Width="12" XPos="110" YPos="2" />
-    <Image Height="12" Name="CheckboxHover" Width="12" XPos="110" YPos="30" />
-    <Image Height="12" Name="CheckboxMark" Width="12" XPos="110" YPos="16" />
-    <Image Height="12" Name="RadioButtonNormal" Width="12" XPos="124" YPos="2" />
-    <Image Height="12" Name="RadioButtonHover" Width="12" XPos="124" YPos="30" />
-    <Image Height="12" Name="RadioButtonMark" Width="12" XPos="124" YPos="16" />
+    <Image Height="24" Name="CheckboxNormal" Width="24" XPos="110" YPos="1" />
+    <Image Height="24" Name="CheckboxHover" Width="24" XPos="110" YPos="51" />
+    <Image Height="24" Name="CheckboxMark" Width="24" XPos="110" YPos="26" />
+    <Image Height="12" Name="RadioButtonNormal" Width="12" XPos="241" YPos="190" />
+    <Image Height="12" Name="RadioButtonHover" Width="12" XPos="241" YPos="218" />
+    <Image Height="12" Name="RadioButtonMark" Width="12" XPos="241" YPos="204" />
     <Image Height="16" Name="TitlebarLeft" Width="8" XPos="68" YPos="2" />
     <Image Height="16" Name="TitlebarMiddle" Width="8" XPos="78" YPos="2" />
     <Image Height="16" Name="TitlebarRight" Width="8" XPos="88" YPos="2" />
