@@ -26,6 +26,8 @@
 #include <io.h>
 #include <windows.h>
 
+#include <portability.h>
+
 #include "tgf.h"
 #include "os.h"
 
