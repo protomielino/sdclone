@@ -2,9 +2,9 @@
 
     file        : human.h
     created     : Sat May 10 19:12:46 CEST 2003
-    copyright   : (C) 2003 by Eric Espi�                        
+    copyright   : (C) 2003 by Eric Espie
     email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -31,6 +31,10 @@
 #include <car.h>
 
 
+typedef enum { eTransAuto, eTransSeq, eTransGrid, eTransHbox } eTransmission;
+
+typedef enum { eRWD, eFWD, e4WD } eDriveTrain;
+
 typedef struct HumanContext
 {
     int		NbPitStops;
@@ -55,6 +59,7 @@ typedef struct HumanContext
     int		ParamAbs;
     int		RelButNeutral;
     int		SeqShftAllowNeutral;
+    int		SeqShftAllowReverse;
     int		AutoReverse;
     int		drivetrain;
 		int   autoClutch;

@@ -516,7 +516,7 @@ void newrace(int index, tCarElt* car, tSituation *s)
 		HCtx[idx]->autoClutch = 0;
 
 	//Setup Keyboard map
-	for (i = 0;i<nbCmdControl;i++)
+	for (i = 0;i<NbCmdControl;i++)
 	{
 		if (cmd[i].type == GFCTRL_TYPE_KEYBOARD)
 		{
@@ -556,7 +556,7 @@ updateKeys(int index)
 	for (idx = 0; idx < (int)HCtx.size(); idx++) {
 		if (HCtx[idx]) {
 			cmd = HCtx[idx]->CmdControl;
-			for (i = 0; i < nbCmdControl; i++) {
+			for (i = 0; i < NbCmdControl; i++) {
 				if (cmd[i].type == GFCTRL_TYPE_KEYBOARD) {
 					key = lookUpKeyMap(cmd[i].val);
 					if (currentKey[key] == GFUI_KEY_DOWN) {
@@ -646,7 +646,7 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 	{
 		HCtx[idx]->ParamAbs = 1 - HCtx[idx]->ParamAbs;
 		sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
-		GfParmSetStr(PrefHdle, sstring, HM_ATT_ABS, Yn[1 - HCtx[idx]->ParamAbs]);
+		GfParmSetStr(PrefHdle, sstring, HM_ATT_ABS, Yn[1 - HCtx[idx]->ParamAbs].c_str());
 		GfParmWriteFile(NULL, PrefHdle, "Human");
 	}
 
@@ -655,7 +655,7 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 	{
 		HCtx[idx]->ParamAsr = 1 - HCtx[idx]->ParamAsr;
 		sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
-		GfParmSetStr(PrefHdle, sstring, HM_ATT_ASR, Yn[1 - HCtx[idx]->ParamAsr]);
+		GfParmSetStr(PrefHdle, sstring, HM_ATT_ASR, Yn[1 - HCtx[idx]->ParamAsr].c_str());
 		GfParmWriteFile(NULL, PrefHdle, "Human");
 	}
 
@@ -1286,7 +1286,7 @@ static int pitcmd(int index, tCarElt* car, tSituation *s)
 
 	if (HCtx[idx]) {
 		cmd = HCtx[idx]->CmdControl;
-		for (i = 0; i < nbCmdControl; i++) {
+		for (i = 0; i < NbCmdControl; i++) {
 			if (cmd[i].type == GFCTRL_TYPE_KEYBOARD) {
 				const int key = lookUpKeyMap(cmd[i].val);
 				keyInfo[key].state = GFUI_KEY_UP;
