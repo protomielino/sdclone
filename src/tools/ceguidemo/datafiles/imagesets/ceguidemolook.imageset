@@ -9,21 +9,21 @@
     <Image Height="24" Name="WindowTopRight" Width="5" XPos="34" YPos="68" />
     <Image Height="24" Name="WindowBottomLeft" Width="5" XPos="2" YPos="120" />
     <Image Height="24" Name="WindowBottomRight" Width="5" XPos="34" YPos="120" />
-    <Image Height="16" Name="ButtonLeftNormal" Width="12" XPos="68" YPos="20" />
-    <Image Height="16" Name="ButtonMiddleNormal" Width="12" XPos="82" YPos="20" />
-    <Image Height="16" Name="ButtonRightNormal" Width="12" XPos="96" YPos="20" />
-    <Image Height="16" Name="ButtonLeftPushed" Width="12" XPos="68" YPos="38" />
-    <Image Height="16" Name="ButtonMiddlePushed" Width="12" XPos="82" YPos="38" />
-    <Image Height="16" Name="ButtonRightPushed" Width="12" XPos="96" YPos="38" />
-    <Image Height="16" Name="ButtonLeftHighlight" Width="12" XPos="68" YPos="56" />
-    <Image Height="16" Name="ButtonMiddleHighlight" Width="12" XPos="82" YPos="56" />
-    <Image Height="16" Name="ButtonRightHighlight" Width="12" XPos="96" YPos="56" />
-    <Image Height="24" Name="CheckboxNormal" Width="24" XPos="110" YPos="1" />
-    <Image Height="24" Name="CheckboxHover" Width="24" XPos="110" YPos="51" />
-    <Image Height="24" Name="CheckboxMark" Width="24" XPos="110" YPos="26" />
-    <Image Height="12" Name="RadioButtonNormal" Width="12" XPos="241" YPos="190" />
-    <Image Height="12" Name="RadioButtonHover" Width="12" XPos="241" YPos="218" />
-    <Image Height="12" Name="RadioButtonMark" Width="12" XPos="241" YPos="204" />
+    <Image Height="16" Name="ButtonLeftNormal" Width="12" XPos="1" YPos="295" />
+    <Image Height="16" Name="ButtonMiddleNormal" Width="12" XPos="15" YPos="295" />
+    <Image Height="16" Name="ButtonRightNormal" Width="12" XPos="29" YPos="295" />
+    <Image Height="16" Name="ButtonLeftPushed" Width="12" XPos="1" YPos="313" />
+    <Image Height="16" Name="ButtonMiddlePushed" Width="12" XPos="15" YPos="313" />
+    <Image Height="16" Name="ButtonRightPushed" Width="12" XPos="29" YPos="313" />
+    <Image Height="16" Name="ButtonLeftHighlight" Width="12" XPos="1" YPos="331" />
+    <Image Height="16" Name="ButtonMiddleHighlight" Width="12" XPos="15" YPos="331" />
+    <Image Height="16" Name="ButtonRightHighlight" Width="12" XPos="29" YPos="331" />
+    <Image Height="24" Name="CheckboxNormal" Width="24" XPos="134" YPos="219" />
+    <Image Height="24" Name="CheckboxHover" Width="24" XPos="134" YPos="269" />
+    <Image Height="24" Name="CheckboxMark" Width="24" XPos="134" YPos="244" />
+    <Image Height="12" Name="RadioButtonNormal" Width="24" XPos="159" YPos="219" />
+    <Image Height="12" Name="RadioButtonHover" Width="24" XPos="159" YPos="269" />
+    <Image Height="12" Name="RadioButtonMark" Width="24" XPos="159" YPos="244" />
     <Image Height="16" Name="TitlebarLeft" Width="8" XPos="68" YPos="2" />
     <Image Height="16" Name="TitlebarMiddle" Width="8" XPos="78" YPos="2" />
     <Image Height="16" Name="TitlebarRight" Width="8" XPos="88" YPos="2" />
@@ -104,23 +104,23 @@
     <Image Height="7" Name="ListboxBottomRight" Width="7" XPos="62" YPos="99" />
     <Image Height="6" Name="ListboxBackdrop" Width="6" XPos="52" YPos="89" />
     <Image Height="16" Name="ListboxSelectionBrush" Width="16" XPos="8" YPos="70" />
-    <Image Height="16" Name="ComboboxEditLeft" Width="8" XPos="138" YPos="2" />
-    <Image Height="16" Name="ComboboxEditMiddle" Width="8" XPos="148" YPos="2" />
-    <Image Height="16" Name="ComboboxListButtonNormal" Width="16" XPos="158" YPos="2" />
-    <Image Height="16" Name="ComboboxListButtonHover" Width="16" XPos="158" YPos="20" />
-    <Image Height="8" Name="ComboboxListLeft" Width="8" XPos="138" YPos="48" />
-    <Image Height="8" Name="ComboboxListRight" Width="8" XPos="158" YPos="48" />
-    <Image Height="8" Name="ComboboxListTop" Width="8" XPos="148" YPos="48" />
-    <Image Height="8" Name="ComboboxListBottom" Width="8" XPos="148" YPos="58" />
-    <Image Height="8" Name="ComboboxListTopLeft" Width="8" XPos="138" YPos="38" />
-    <Image Height="8" Name="ComboboxListTopRight" Width="8" XPos="158" YPos="38" />
-    <Image Height="8" Name="ComboboxListBottomLeft" Width="8" XPos="138" YPos="58" />
-    <Image Height="8" Name="ComboboxListBottomRight" Width="8" XPos="158" YPos="58" />
-    <Image Height="8" Name="ComboboxListBackdrop" Width="8" XPos="148" YPos="48" />
-    <Image Height="16" Name="ComboboxSelectionBrush" Width="16" XPos="8" YPos="70" />
-    <Image Height="1" Name="ComboboxDividerLeft" Width="14" XPos="138" YPos="68" />
-    <Image Height="1" Name="ComboboxDividerMiddle" Width="8" XPos="154" YPos="68" />
-    <Image Height="1" Name="ComboboxDividerRight" Width="14" XPos="164" YPos="68" />
+    <Image Height="16" Name="ComboboxEditLeft" Width="8" XPos="185" YPos="219" />
+    <Image Height="16" Name="ComboboxEditMiddle" Width="8" XPos="195" YPos="219" />
+    <Image Height="16" Name="ComboboxListButtonNormal" Width="16" XPos="205" YPos="219" />
+    <Image Height="16" Name="ComboboxListButtonHover" Width="16" XPos="205" YPos="237" />
+    <Image Height="8" Name="ComboboxListLeft" Width="8" XPos="185" YPos="265" />
+    <Image Height="8" Name="ComboboxListRight" Width="8" XPos="205" YPos="265" />
+    <Image Height="8" Name="ComboboxListTop" Width="8" XPos="195" YPos="265" />
+    <Image Height="8" Name="ComboboxListBottom" Width="8" XPos="195" YPos="275" />
+    <Image Height="8" Name="ComboboxListTopLeft" Width="8" XPos="185" YPos="255" />
+    <Image Height="8" Name="ComboboxListTopRight" Width="8" XPos="205" YPos="255" />
+    <Image Height="8" Name="ComboboxListBottomLeft" Width="8" XPos="185" YPos="275" />
+    <Image Height="8" Name="ComboboxListBottomRight" Width="8" XPos="205" YPos="275" />
+    <Image Height="8" Name="ComboboxListBackdrop" Width="8" XPos="195" YPos="265" />
+    <Image Height="16" Name="ComboboxSelectionBrush" Width="16" XPos="8" YPos="287" />
+    <Image Height="1" Name="ComboboxDividerLeft" Width="14" XPos="185" YPos="285" />
+    <Image Height="1" Name="ComboboxDividerMiddle" Width="8" XPos="201" YPos="285" />
+    <Image Height="1" Name="ComboboxDividerRight" Width="14" XPos="211" YPos="285" />
     <Image Height="12" Name="HeaderBarBackdropNormal" Width="10" XPos="230" YPos="163" />
     <Image Height="12" Name="HeaderBarBackdropHover" Width="10" XPos="230" YPos="163" />
     <Image Height="16" Name="HeaderBarSplitterNormal" Width="3" XPos="225" YPos="92" />
@@ -241,10 +241,10 @@
     <Image Height="5" Name="PopupMenuArrowLeft" Width="5" XPos="179" YPos="210" />
     <Image Height="11" Name="TreeListClosed" Width="7" XPos="175" YPos="111" />
     <Image Height="7" Name="TreeListOpened" Width="11" XPos="164" YPos="111" />
-    <Image Height="16" Name="MainButtonNormal" Width="40" XPos="92" YPos="161" />
-    <Image Height="16" Name="MainButtonPushed" Width="40" XPos="92" YPos="179" />
-    <Image Height="16" Name="MainButtonHighlight" Width="40" XPos="92" YPos="197" />
-    <Image Height="3" Name="TitleBackdrop" Width="128" XPos="0" YPos="253" />
+    <Image Height="16" Name="MainButtonNormal" Width="128" XPos="1" YPos="242" />
+    <Image Height="16" Name="MainButtonPushed" Width="128" XPos="1" YPos="260" />
+    <Image Height="16" Name="MainButtonHighlight" Width="128" XPos="1" YPos="278" />
+    <Image Height="3" Name="TitleBackdrop" Width="128" XPos="1" YPos="255" />
     <Image Height="16" Name="ArrowDownNormal" Width="14" XPos="1" YPos="227" />
     <Image Height="16" Name="ArrowDownHighlight" Width="14" XPos="17" YPos="227" />
     <Image Height="16" Name="ArrowDownPushed" Width="14" XPos="33" YPos="227" />

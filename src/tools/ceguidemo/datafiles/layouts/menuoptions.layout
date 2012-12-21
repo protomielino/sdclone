@@ -167,19 +167,21 @@
             <Property Name="Font" Value="MenuSmall" />
         </Window>
         <Window Name="MenuOptions/RbnVInitBest" Type="CEGUIDemo/RadioButton">
-            <Property Name="UnifiedAreaRect" Value="{{0.55,0},{0.45,0},{0.70,0},{0.55,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.55,0},{0.45,0},{0.70,0},{0.50,0}}" />
             <Property Name="Font" Value="MenuMedium" />
             <Property Name="Text" Value="Best" />
             <Property Name="GroupID" Value="1" />
-            <Property Name="Tooltip" Value="Enable best supported features" />
+            <Property Name="Tooltip" Value="Best supported video features, might not work" />
+            <Property Name="AlwaysOnTop" Value="True" />
         </Window>
         <Window Name="MenuOptions/RbnVInitCompat" Type="CEGUIDemo/RadioButton">
-            <Property Name="UnifiedAreaRect" Value="{{0.65,0},{0.45,0},{0.80,0},{0.55,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.65,0},{0.45,0},{0.80,0},{0.50,0}}" />
             <Property Name="Font" Value="MenuMedium" />
             <Property Name="Text" Value="Compatible" />
             <Property Name="GroupID" Value="1" />
             <Property Name="Selected" Value="True" />
             <Property Name="Tooltip" Value="Default video features, maximum compatibility" />
+            <Property Name="AlwaysOnTop" Value="True" />
         </Window>
         <Window Name="MenuOptions/SldPrecipDens" Type="CEGUIDemo/Slider">
             <Property Name="UnifiedAreaRect" Value="{{0.45,0},{0.4,0},{0.52,0},{0.7,0}}" />

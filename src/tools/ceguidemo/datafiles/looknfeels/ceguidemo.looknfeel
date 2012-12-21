@@ -207,7 +207,7 @@
                     <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
                 </Area>
                 <Image imageset="CEGUIDemo" image="RadioButtonNormal" />
-                <VertFormat type="CentreAligned" />
+                <VertFormat type="Stretched" />
                 <HorzFormat type="LeftAligned" />
             </ImageryComponent>
         </ImagerySection>
@@ -220,7 +220,7 @@
                     <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
                 </Area>
                 <Image imageset="CEGUIDemo" image="RadioButtonHover" />
-                <VertFormat type="CentreAligned" />
+                <VertFormat type="Stretched" />
                 <HorzFormat type="LeftAligned" />
             </ImageryComponent>
         </ImagerySection>
@@ -233,7 +233,7 @@
                     <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
                 </Area>
                 <Image imageset="CEGUIDemo" image="RadioButtonMark" />
-                <VertFormat type="CentreAligned" />
+                <VertFormat type="Stretched" />
                 <HorzFormat type="LeftAligned" />
             </ImageryComponent>
         </ImagerySection>
