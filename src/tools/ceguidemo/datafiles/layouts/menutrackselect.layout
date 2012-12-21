@@ -113,7 +113,7 @@
         <Window Name="MenuTrackSelect/BtnNext" Type="CEGUIDemo/Button">
             <Property Name="UnifiedAreaRect" Value="{{0.75,0},{0.9,0},{0.9,0},{0.95,0}}" />
             <Property Name="Font" Value="MenuMedium" />
-            <Property Name="Text" Value="Start" />
+            <Property Name="Text" Value="Next" />
             <Property Name="Tooltip" Value="Select you car for the race" />
         </Window>
         <Window Name="MenuTrackSelect/MclTracks" Type="CEGUIDemo/MultiColumnList">

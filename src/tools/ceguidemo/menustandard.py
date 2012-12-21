@@ -145,9 +145,9 @@ class MenuStandard(Menu):
 		print("Exiting (on exit button) ...")
 		sys.exit(0)
 
-	def onKeyDown(self, keyArgs):
+	def onCharacterKey(self, keyArgs):
 
-		print "MenuStandard.onKeyDown:", keyArgs
+		print "MenuStandard.onCharacterKey: scan=%d, " % (keyArgs.scancode, )
 		if keyArgs.scancode == PyCEGUI.Key.Escape:
 
 			keyArgs.handled += 1

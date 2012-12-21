@@ -19,6 +19,9 @@ import PyCEGUI
 from errors import InitializationError
 from menumain import MenuMain
 
+# Import: Configuration
+from configuration import TheConfig
+
 
 # GUI
 class GUI(object):
@@ -26,30 +29,38 @@ class GUI(object):
 	# Initialize: Resources
 	def initializeResources(self):
 		
-		rp = PyCEGUI.System.getSingleton().getResourceProvider()
-		rp.setResourceGroupDirectory('schemes', './datafiles/schemes')
-		rp.setResourceGroupDirectory('imagesets', './datafiles/imagesets')
-		rp.setResourceGroupDirectory('fonts', './datafiles/fonts')
-		rp.setResourceGroupDirectory('layouts', './datafiles/layouts')
-		rp.setResourceGroupDirectory('looknfeels', './datafiles/looknfeel')
-		rp.setResourceGroupDirectory('schemas', './datafiles/xml_schemas')
-		PyCEGUI.Imageset.setDefaultResourceGroup('imagesets')
-		PyCEGUI.Font.setDefaultResourceGroup('fonts')
-		PyCEGUI.Scheme.setDefaultResourceGroup('schemes')
-		PyCEGUI.WidgetLookManager.setDefaultResourceGroup('looknfeels')
-		PyCEGUI.WindowManager.setDefaultResourceGroup('layouts')
+		if not TheConfig.useConfigFile:
 		
-		parser = PyCEGUI.System.getSingleton().getXMLParser()
-		if parser.isPropertyPresent('SchemaDefaultResourceGroup'):
-			parser.setProperty('SchemaDefaultResourceGroup', 'schemas')
+			rp = PyCEGUI.System.getSingleton().getResourceProvider()
+			rp.setResourceGroupDirectory('schemes', './datafiles/schemes')
+			rp.setResourceGroupDirectory('imagesets', './datafiles/imagesets')
+			rp.setResourceGroupDirectory('fonts', './datafiles/fonts')
+			rp.setResourceGroupDirectory('layouts', './datafiles/layouts')
+			rp.setResourceGroupDirectory('looknfeels', './datafiles/looknfeels')
+			rp.setResourceGroupDirectory('schemas', './datafiles/xml_schemas')
+			PyCEGUI.Imageset.setDefaultResourceGroup('imagesets')
+			PyCEGUI.Font.setDefaultResourceGroup('fonts')
+			PyCEGUI.Scheme.setDefaultResourceGroup('schemes')
+			PyCEGUI.WidgetLookManager.setDefaultResourceGroup('looknfeels')
+			PyCEGUI.WindowManager.setDefaultResourceGroup('layouts')
+
+		# Doesn't seem actually useful ...
+		#parser = PyCEGUI.System.getSingleton().getXMLParser()
+		#if parser.isPropertyPresent('SchemaDefaultResourceGroup'):
+		#	parser.setProperty('SchemaDefaultResourceGroup', 'schemas')
 
 	# Initialize: Defaults
 	def initializeDefaults(self):
 		
-		sm = PyCEGUI.SchemeManager.getSingleton()
-		sm.create('ceguidemo.scheme')
-		PyCEGUI.System.getSingleton().setDefaultMouseCursor('CEGUIDemo', 'MouseArrow')
-		PyCEGUI.System.getSingleton().setDefaultTooltip('CEGUIDemo/Tooltip')
+		#sm = PyCEGUI.SchemeManager.getSingleton()
+		#sm.create('ceguidemo.scheme')
+
+		if not TheConfig.useConfigFile:
+		
+			sm = PyCEGUI.SchemeManager.getSingleton()
+			sm.create('ceguidemo.scheme')
+			PyCEGUI.System.getSingleton().setDefaultMouseCursor('CEGUIDemo', 'MouseArrow')
+			PyCEGUI.System.getSingleton().setDefaultTooltip('CEGUIDemo/Tooltip')
 
 	# Initialize
 	def initialize(self):

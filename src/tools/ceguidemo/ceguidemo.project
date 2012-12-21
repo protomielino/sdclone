@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project CEGUIDefaultResolution="800x600" CEGUIVersion="0.7" baseDirectory="." fontsPath="datafiles/fonts" imagesetsPath="datafiles/imagesets" layoutsPath="datafiles/layouts" looknfeelsPath="datafiles/looknfeel" schemesPath="datafiles/schemes" version="CEED Project 1" xmlSchemasPath="datafiles/xml_schemas">
+<Project CEGUIDefaultResolution="800x600" CEGUIVersion="0.7" baseDirectory="." fontsPath="datafiles/fonts" imagesetsPath="datafiles/imagesets" layoutsPath="datafiles/layouts" looknfeelsPath="datafiles/looknfeels" schemesPath="datafiles/schemes" version="CEED Project 1" xmlSchemasPath="datafiles/xml_schemas">
     <Items>
         <Item name="ImageSets" type="folder">
             <Item path="datafiles/imagesets/ceguidemolook.imageset" type="file" />

@@ -148,4 +148,3 @@ class MenuMain(MenuStandard):
 			self.menuTrackSelect.setup()
 
 		self.menuTrackSelect.activate(previous=self)
-

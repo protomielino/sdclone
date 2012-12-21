@@ -64,5 +64,7 @@ if __name__ == '__main__':
 	for arg in sys.argv:
 		if arg in ('-l', '--layout'):
 			TheConfig.useLayouts = True
+		if arg in ('-c', '--config'):
+			TheConfig.useConfigFile = True
 
 	sys.exit(main())

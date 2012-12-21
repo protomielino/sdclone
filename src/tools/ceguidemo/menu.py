@@ -118,7 +118,7 @@ class Menu(object):
 
 		# Event subscriptions :
 		# * keyboard : Does not work.
-		self.window.subscribeEvent(PyCEGUI.Window.EventKeyDown, self, 'onKeyDown');
+		self.window.subscribeEvent(PyCEGUI.Window.EventCharacterKey, self, 'onCharacterKey');
 			
 		# * window update (for the frame rate indicator).
 		self.window.subscribeEvent(PyCEGUI.Window.EventWindowUpdated, self, 'onUpdate');
@@ -160,3 +160,8 @@ class Menu(object):
 			self.txtFrameRate.setText("%4.1f" % (self.nFrames / elapsed))
 			self.nFrames = 0
 			self.lastTime = thisTime
+
+	def onCharacterKey(self, keyArgs):
+		
+		pass # Just in case not specialised in actual class.
+

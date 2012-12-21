@@ -21,11 +21,14 @@ from OpenGL.GLUT import *
 
 # Import: PyCEGUI
 import PyCEGUI
-from PyCEGUIOpenGLRenderer import OpenGLRenderer as Renderer
+from PyCEGUIOpenGLRenderer import OpenGLRenderer
 
 # Import: User
 from constants import *
 from errors import InitializationError
+
+# Import: Configuration
+from configuration import TheConfig
 
 
 # Video
@@ -48,7 +51,16 @@ class Video(object):
 	# Initialize: PyCEGUI
 	def initializePyCEGUI(self):
 		
-		self.renderer = Renderer.bootstrapSystem()
+		if TheConfig.useConfigFile:
+		
+			# Needed for CEGUI config. file support
+			self.renderer = OpenGLRenderer.create()
+			PyCEGUI.System.create(self.renderer, None, None, None, None, "datafiles/cegui.config")
+			
+		else:
+		
+			# Simpler way, but no possible config. file
+			self.renderer = OpenGLRenderer.bootstrapSystem()
 
 	# Initialize
 	def initialize(self):
