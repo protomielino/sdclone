@@ -3129,6 +3129,7 @@
     ***************************************************
     -->
     <WidgetLook name="CEGUIDemo/Tooltip">
+        <Property name="Font" value="ToolTip" />
         <NamedArea name="TextArea">
             <Area>
                 <Dim type="LeftEdge" ><ImageDim imageset="CEGUIDemo" image="TooltipLeftEdge" dimension="Width" /></Dim>

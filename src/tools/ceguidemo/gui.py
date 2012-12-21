@@ -52,15 +52,13 @@ class GUI(object):
 	# Initialize: Defaults
 	def initializeDefaults(self):
 		
-		#sm = PyCEGUI.SchemeManager.getSingleton()
-		#sm.create('ceguidemo.scheme')
-
 		if not TheConfig.useConfigFile:
 		
 			sm = PyCEGUI.SchemeManager.getSingleton()
 			sm.create('ceguidemo.scheme')
 			PyCEGUI.System.getSingleton().setDefaultMouseCursor('CEGUIDemo', 'MouseArrow')
 			PyCEGUI.System.getSingleton().setDefaultTooltip('CEGUIDemo/Tooltip')
+			PyCEGUI.System.getSingleton().setDefaultFont('MenuNormal')
 
 	# Initialize
 	def initialize(self):

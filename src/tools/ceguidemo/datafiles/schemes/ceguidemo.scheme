@@ -12,6 +12,7 @@
 	<Font Name="MenuNormal" Filename="menu-normal.font" />
 	<Font Name="MenuBig" Filename="menu-big.font" />
 	<Font Name="TextSmall" Filename="text-small.font" />
+	<Font Name="ToolTip" Filename="tooltip.font" />
 	<LookNFeel Filename="ceguidemo.looknfeel" />
 	<WindowRendererSet Filename="CEGUIFalagardWRBase" />
 	<FalagardMapping WindowType="CEGUIDemo/Button"      TargetType="CEGUI/PushButton"  Renderer="Falagard/Button"       LookNFeel="CEGUIDemo/Button" />
