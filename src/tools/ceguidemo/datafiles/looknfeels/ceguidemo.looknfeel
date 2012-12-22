@@ -1390,10 +1390,10 @@
 
     <!--
     ***************************************************
-        CEGUIDemo/SliderThumb
+        CEGUIDemo/VertSliderThumb
     ***************************************************
     -->
-    <WidgetLook name="CEGUIDemo/SliderThumb">
+    <WidgetLook name="CEGUIDemo/VertSliderThumb">
         <Property name="VertFree" value="True" />
         <Property name="MouseInputPropagationEnabled" value="True" />
         <ImagerySection name="normal">
@@ -1448,10 +1448,10 @@
 
     <!--
     ***************************************************
-        CEGUIDemo/Slider
+        CEGUIDemo/VerticalSlider
     ***************************************************
     -->
-    <WidgetLook name="CEGUIDemo/Slider">
+    <WidgetLook name="CEGUIDemo/VerticalSlider">
         <Property name="VerticalSlider" value="True" />
         <Property name="MouseButtonDownAutoRepeat" value="True" />
         <Property name="WantsMultiClickEvents" value="False" />
@@ -1463,7 +1463,7 @@
                 <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
             </Area>
         </NamedArea>
-        <Child  type="CEGUIDemo/SliderThumb" nameSuffix="__auto_thumb__">
+        <Child  type="CEGUIDemo/VertSliderThumb" nameSuffix="__auto_thumb__">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
@@ -2208,12 +2208,14 @@
     <WidgetLook name="CEGUIDemo/Spinner">
         <Child  type="CEGUIDemo/Editbox" nameSuffix="__auto_editbox__">
             <Area>
-                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="LeftEdge" >
+                     <ImageDim imageset="CEGUIDemo" image="SpinnerUpNormal" dimension="Width" />
+                </Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="RightEdge" >
                     <UnifiedDim scale="1" type="RightEdge">
                         <DimOperator op="Subtract">
-                            <ImageDim imageset="CEGUIDemo" image="VertScrollUpNormal" dimension="Width" />
+                            <ImageDim imageset="CEGUIDemo" image="SpinnerDownNormal" dimension="Width" />
                         </DimOperator>
                     </UnifiedDim>
                 </Dim>
@@ -2224,25 +2226,25 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><ImageDim imageset="CEGUIDemo" image="VertScrollUpNormal" dimension="Width" /></Dim>
-                <Dim type="Height" ><UnifiedDim scale="0.5" type="Height" /></Dim>
+                <Dim type="Width" ><ImageDim imageset="CEGUIDemo" image="SpinnerUpNormal" dimension="Width" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
-            <HorzAlignment type="RightAligned" />
-            <Property name="NormalImage" value="set:CEGUIDemo image:VertScrollUpNormal" />
-            <Property name="HoverImage" value="set:CEGUIDemo image:VertScrollUpHover" />
-            <Property name="PushedImage" value="set:CEGUIDemo image:VertScrollUpNormal" />
+            <HorzAlignment type="LeftAligned" />
+            <Property name="NormalImage" value="set:CEGUIDemo image:SpinnerUpNormal" />
+            <Property name="HoverImage" value="set:CEGUIDemo image:SpinnerUpHover" />
+            <Property name="PushedImage" value="set:CEGUIDemo image:SpinnerUpPushed" />
         </Child>
         <Child  type="CEGUIDemo/ImageButton" nameSuffix="__auto_decbtn__">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="TopEdge" ><UnifiedDim scale="0.5" type="TopEdge" /></Dim>
-                <Dim type="Width" ><ImageDim imageset="CEGUIDemo" image="VertScrollUpNormal" dimension="Width" /></Dim>
-                <Dim type="Height" ><UnifiedDim scale="0.5" type="Height" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><ImageDim imageset="CEGUIDemo" image="SpinnerUpNormal" dimension="Width" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
             <HorzAlignment type="RightAligned" />
-            <Property name="NormalImage" value="set:CEGUIDemo image:VertScrollDownNormal" />
-            <Property name="HoverImage" value="set:CEGUIDemo image:VertScrollDownHover" />
-            <Property name="PushedImage" value="set:CEGUIDemo image:VertScrollDownNormal" />
+            <Property name="NormalImage" value="set:CEGUIDemo image:SpinnerDownNormal" />
+            <Property name="HoverImage" value="set:CEGUIDemo image:SpinnerDownHover" />
+            <Property name="PushedImage" value="set:CEGUIDemo image:SpinnerDownPushed" />
         </Child>
         <StateImagery name="Enabled" />
         <StateImagery name="Disabled" />
@@ -5120,6 +5122,137 @@
         </StateImagery>
     </WidgetLook>
 
+    <!--
+    ***************************************************
+        CEGUIDemo/HorizSliderThumb
+    ***************************************************
+    -->
+    <WidgetLook name="CEGUIDemo/HorizSliderThumb">
+        <Property name="HorzFree" value="True" />
+        <Property name="MouseInputPropagationEnabled" value="True" />
+        <ImagerySection name="label">
+            <TextComponent>
+                <Area>
+                    <Dim type="TopEdge">
+                        <AbsoluteDim value="0" />
+                    </Dim>
+                    <Dim type="LeftEdge">
+                        <AbsoluteDim value="3" />
+                    </Dim>
+                    <Dim type="RightEdge">
+                        <UnifiedDim scale="0.3" type="RightEdge" />
+                    </Dim>
+                    <Dim type="BottomEdge">
+                        <UnifiedDim scale="0.5" type="BottomEdge" />
+                    </Dim>
+                </Area>
+            </TextComponent>
+        </ImagerySection>
+        <ImagerySection name="normal">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
+                </Area>
+                <Image imageset="CEGUIDemo" image="HorizSliderThumbNormal" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <ImagerySection name="hover">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
+                </Area>
+                <Image imageset="CEGUIDemo" image="HorizSliderThumbHover" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Normal">
+            <Layer>
+                <Section section="label" />
+                <Section section="normal" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Hover">
+            <Layer>
+                <Section section="label" />
+                <Section section="hover" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Pushed">
+            <Layer>
+                <Section section="label" />
+                <Section section="hover" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="label" />
+                <Section section="normal">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <!--
+    ***************************************************
+        CEGUIDemo/HorizontalSlider
+    ***************************************************
+    -->
+    <WidgetLook name="CEGUIDemo/HorizontalSlider">
+        <Property name="VerticalSlider" value="False" />
+        <Property name="MouseButtonDownAutoRepeat" value="True" />
+        <Property name="WantsMultiClickEvents" value="False" />
+        <NamedArea name="ThumbTrackArea">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
+                <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
+            </Area>
+        </NamedArea>
+        <Child  type="CEGUIDemo/HorizSliderThumb" nameSuffix="__auto_thumb__">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><ImageDim imageset="CEGUIDemo" image="HorizSliderThumbNormal" dimension="Width" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
+            </Area>
+        </Child>
+        <ImagerySection name="main">
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="3" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1.0" offset="-6" type="Height" /></Dim>
+                </Area>
+                <Image imageset="CEGUIDemo" image="HorizSliderBody" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="main" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="main">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
 
 </Falagard>
 

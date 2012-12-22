@@ -4,7 +4,6 @@
         <Property Name="Image" Value="set:SplashOptions image:everything" />
         <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
         <Property Name="FrameEnabled" Value="False" />
-        <Property Name="MouseCursorImage" Value="CEGUIDemo/MouseArrow" />
         <Property Name="BackgroundEnabled" Value="False" />
         <Window Name="MenuOptions/ImgLogo" Type="CEGUIDemo/StaticImage">
             <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{0.3,0},{0.25,0}}" />
@@ -17,6 +16,7 @@
             <Property Name="UnifiedAreaRect" Value="{{0.22,0},{0.1,0},{0.92,0},{0.2,0}}" />
             <Property Name="Font" Value="MenuBig" />
             <Property Name="Text" Value="Graphics Options" />
+            <Property Name="TextColours" Value="tl:FFFFFFFF tr:FFFFFFFF bl:FFC0C0C0 br:FF606060" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
             <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />
             <Property Name="FrameEnabled" Value="False" />
@@ -165,6 +165,7 @@
         <Window Name="MenuOptions/CkxFullScreen" Type="CEGUIDemo/Checkbox">
             <Property Name="UnifiedAreaRect" Value="{{0.55,0},{0.35,0},{0.70,0},{0.45,0}}" />
             <Property Name="Font" Value="MenuSmall" />
+            <Property Name="Tooltip" Value="Check for full-screen window" />
         </Window>
         <Window Name="MenuOptions/RbnVInitBest" Type="CEGUIDemo/RadioButton">
             <Property Name="UnifiedAreaRect" Value="{{0.55,0},{0.45,0},{0.70,0},{0.50,0}}" />
@@ -172,22 +173,21 @@
             <Property Name="Text" Value="Best" />
             <Property Name="GroupID" Value="1" />
             <Property Name="Tooltip" Value="Best supported video features, might not work" />
-            <Property Name="AlwaysOnTop" Value="True" />
         </Window>
         <Window Name="MenuOptions/RbnVInitCompat" Type="CEGUIDemo/RadioButton">
-            <Property Name="UnifiedAreaRect" Value="{{0.65,0},{0.45,0},{0.80,0},{0.50,0}}" />
+            <Property Name="UnifiedAreaRect" Value="{{0.70,0},{0.45,0},{0.85,0},{0.50,0}}" />
             <Property Name="Font" Value="MenuMedium" />
             <Property Name="Text" Value="Compatible" />
             <Property Name="GroupID" Value="1" />
             <Property Name="Selected" Value="True" />
             <Property Name="Tooltip" Value="Default video features, maximum compatibility" />
-            <Property Name="AlwaysOnTop" Value="True" />
         </Window>
-        <Window Name="MenuOptions/SldPrecipDens" Type="CEGUIDemo/Slider">
-            <Property Name="UnifiedAreaRect" Value="{{0.45,0},{0.4,0},{0.52,0},{0.7,0}}" />
+        <Window Name="MenuOptions/SldPrecipDens" Type="CEGUIDemo/HorizontalSlider">
+            <Property Name="UnifiedAreaRect" Value="{{0.55,0},{0.55,0},{0.90,0},{0.60,0}}" />
             <Property Name="MaximumValue" Value="100" />
-            <Property Name="ClickStepSize" Value="10" />
-            <Property Name="AutoRenderingSurface" Value="True" />
+            <Property Name="ClickStepSize" Value="5" />
+			<Property Name="CurrentValue" Value="30" />
+			<Property Name="Text" Value="xxx" />
         </Window>
         <Window Name="MenuOptions/SpnMaxSkids" Type="CEGUIDemo/Spinner">
             <Property Name="UnifiedAreaRect" Value="{{0.55,0},{0.75,0},{0.9,0},{0.82,0}}" />
@@ -223,13 +223,13 @@
             <Property Name="UnifiedAreaRect" Value="{{0.23,0},{0.9,0},{0.38,0},{0.95,0}}" />
             <Property Name="Font" Value="MenuMedium" />
             <Property Name="Text" Value="Accept" />
-            <Property Name="Tooltip" Value="Accept changes and go back to main benu" />
+            <Property Name="Tooltip" Value="Accept changes and go back to main menu" />
         </Window>
 		<Window Name="MenuOptions/BtnCancel" Type="CEGUIDemo/Button">
             <Property Name="UnifiedAreaRect" Value="{{0.63,0},{0.9,0},{0.78,0},{0.95,0}}" />
             <Property Name="Font" Value="MenuMedium" />
             <Property Name="Text" Value="Cancel" />
-            <Property Name="Tooltip" Value="Revert changes and go back to main benu" />
+            <Property Name="Tooltip" Value="Revert changes and go back to main menu" />
         </Window>
     </Window>
 </GUILayout>

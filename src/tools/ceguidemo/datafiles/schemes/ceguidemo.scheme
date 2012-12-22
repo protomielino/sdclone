@@ -47,8 +47,10 @@
 	<FalagardMapping WindowType="CEGUIDemo/ListHeader"        TargetType="CEGUI/ListHeader"        Renderer="Falagard/ListHeader"        LookNFeel="CEGUIDemo/ListHeader" />
 	<FalagardMapping WindowType="CEGUIDemo/ListHeaderSegment" TargetType="CEGUI/ListHeaderSegment" Renderer="Falagard/ListHeaderSegment" LookNFeel="CEGUIDemo/ListHeaderSegment" />
 	<FalagardMapping WindowType="CEGUIDemo/MultiColumnList"   TargetType="CEGUI/MultiColumnList"   Renderer="Falagard/MultiColumnList"   LookNFeel="CEGUIDemo/MultiColumnList" />
-	<FalagardMapping WindowType="CEGUIDemo/Slider"      TargetType="CEGUI/Slider"      Renderer="Falagard/Slider"  LookNFeel="CEGUIDemo/Slider" />
-	<FalagardMapping WindowType="CEGUIDemo/SliderThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button"  LookNFeel="CEGUIDemo/SliderThumb" />
+	<FalagardMapping WindowType="CEGUIDemo/HorizontalSlider"      TargetType="CEGUI/Slider"      Renderer="Falagard/Slider"  LookNFeel="CEGUIDemo/HorizontalSlider" />
+	<FalagardMapping WindowType="CEGUIDemo/VerticalSlider"      TargetType="CEGUI/Slider"      Renderer="Falagard/Slider"  LookNFeel="CEGUIDemo/VerticalSlider" />
+	<FalagardMapping WindowType="CEGUIDemo/HorizSliderThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button"  LookNFeel="CEGUIDemo/HorizSliderThumb" />
+	<FalagardMapping WindowType="CEGUIDemo/VertSliderThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button"  LookNFeel="CEGUIDemo/VertSliderThumb" />
 	<FalagardMapping WindowType="CEGUIDemo/ScrollablePane" TargetType="CEGUI/ScrollablePane" Renderer="Falagard/ScrollablePane" LookNFeel="CEGUIDemo/ScrollablePane" />
 	<FalagardMapping WindowType="CEGUIDemo/Spinner" TargetType="CEGUI/Spinner" Renderer="Falagard/Default" LookNFeel="CEGUIDemo/Spinner" />
 	<FalagardMapping WindowType="CEGUIDemo/Tooltip" TargetType="CEGUI/Tooltip" Renderer="Falagard/Tooltip" LookNFeel="CEGUIDemo/Tooltip" />
