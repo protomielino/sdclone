@@ -430,7 +430,7 @@
     <WidgetLook name="CEGUIDemo/Editbox">
         <PropertyDefinition name="NormalTextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
         <PropertyDefinition name="SelectedTextColour" initialValue="FF000000" redrawOnWrite="true" />
-        <PropertyDefinition name="ActiveSelectionColour" initialValue="FF607FFF" redrawOnWrite="true" />
+        <PropertyDefinition name="ActiveSelectionColour" initialValue="FF3FFFEE" redrawOnWrite="true" />
         <PropertyDefinition name="InactiveSelectionColour" initialValue="FF808080" redrawOnWrite="true" />
         <Property name="MouseCursorImage" value="set:CEGUIDemo image:MouseTextBar" />
         <NamedArea name="TextArea">
@@ -2067,7 +2067,7 @@
     <WidgetLook name="CEGUIDemo/ComboEditbox">
         <PropertyDefinition name="NormalTextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
         <PropertyDefinition name="SelectedTextColour" initialValue="FF000000" redrawOnWrite="true" />
-        <PropertyDefinition name="ActiveSelectionColour" initialValue="FF607FFF" redrawOnWrite="true" />
+        <PropertyDefinition name="ActiveSelectionColour" initialValue="FF3FFFEE" redrawOnWrite="true" />
         <PropertyDefinition name="InactiveSelectionColour" initialValue="FF808080" redrawOnWrite="true" />
         <Property name="MouseCursorImage" value="set:CEGUIDemo image:MouseTextBar" />
         <NamedArea name="TextArea">
@@ -2157,7 +2157,7 @@
     <WidgetLook name="CEGUIDemo/Combobox">
         <PropertyLinkDefinition name="NormalEditTextColour" widget="__auto_editbox__" targetProperty="NormalTextColour" initialValue="FFFFFFFF" />
         <PropertyLinkDefinition name="SelectedEditTextColour" widget="__auto_editbox__" targetProperty="SelectedTextColour" initialValue="FF000000" />
-        <PropertyLinkDefinition name="ActiveEditSelectionColour" widget="__auto_editbox__" targetProperty="ActiveSelectionColour" initialValue="FF6060FF" />
+        <PropertyLinkDefinition name="ActiveEditSelectionColour" widget="__auto_editbox__" targetProperty="ActiveSelectionColour" initialValue="FF3FFFEE" />
         <PropertyLinkDefinition name="InactiveEditSelectionColour" widget="__auto_editbox__" targetProperty="InactiveSelectionColour" initialValue="FF808080" />
         <Child  type="CEGUIDemo/ComboEditbox" nameSuffix="__auto_editbox__">
             <Area>
@@ -3132,6 +3132,9 @@
     -->
     <WidgetLook name="CEGUIDemo/Tooltip">
         <Property name="Font" value="ToolTip" />
+        <Property name="HoverTime" value="1.0" />
+        <Property name="DisplayTime" value="5.0" />
+        <Property name="FadeTime" value="1.0" />
         <NamedArea name="TextArea">
             <Area>
                 <Dim type="LeftEdge" ><ImageDim imageset="CEGUIDemo" image="TooltipLeftEdge" dimension="Width" /></Dim>
@@ -4667,7 +4670,7 @@
         <PropertyDefinition name="TextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
         <PropertyDefinition name="SelectedTextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
         <PropertyDefinition name="SelectionBrush" initialValue="set:CEGUIDemo image:ListboxSelectionBrush" redrawOnWrite="true" />
-        <PropertyDefinition name="SelectionColour" initialValue="FF4444AA" redrawOnWrite="true" />
+        <PropertyDefinition name="SelectionColour" initialValue="FF3FFFEE" redrawOnWrite="true" />
         <Property name="Selectable" value="True" />
         <Property name="MouseInputPropagationEnabled" value="True" />
         <NamedArea name="ContentSize">

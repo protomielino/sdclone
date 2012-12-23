@@ -56,7 +56,7 @@
     <Image Height="16" Name="SpinnerUpNormal" Width="14" XPos="65" YPos="227" />
     <Image Height="16" Name="SpinnerUpHover" Width="14" XPos="81" YPos="227" />
     <Image Height="16" Name="SpinnerUpPushed" Width="14" XPos="97" YPos="227" />
-    <Image Height="16" Name="TextSelectionBrush" Width="16" XPos="8" YPos="70" />
+    <Image Height="16" Name="TextSelectionBrush" Width="16" XPos="234" YPos="238" />
     <Image Height="8" Name="VertScrollTop" Width="20" XPos="182" YPos="2" />
     <Image Height="8" Name="VertScrollMiddle" Width="20" XPos="182" YPos="12" />
     <Image Height="8" Name="VertScrollBottom" Width="20" XPos="182" YPos="22" />
@@ -108,11 +108,11 @@
     <Image Height="7" Name="ListboxBottomLeft" Width="7" XPos="41" YPos="99" />
     <Image Height="7" Name="ListboxBottomRight" Width="7" XPos="62" YPos="99" />
     <Image Height="6" Name="ListboxBackdrop" Width="6" XPos="52" YPos="89" />
-    <Image Height="16" Name="ListboxSelectionBrush" Width="16" XPos="8" YPos="70" />
-    <Image Height="16" Name="ComboboxEditLeft" Width="8" XPos="185" YPos="219" />
-    <Image Height="16" Name="ComboboxEditMiddle" Width="8" XPos="195" YPos="219" />
-    <Image Height="16" Name="ComboboxListButtonNormal" Width="16" XPos="205" YPos="219" />
-    <Image Height="16" Name="ComboboxListButtonHover" Width="16" XPos="205" YPos="237" />
+    <Image Height="16" Name="ListboxSelectionBrush" Width="16" XPos="234" YPos="238" />
+    <Image Height="18" Name="ComboboxEditLeft" Width="9" XPos="184" YPos="218" />
+    <Image Height="18" Name="ComboboxEditMiddle" Width="8" XPos="195" YPos="218" />
+    <Image Height="18" Name="ComboboxListButtonNormal" Width="17" XPos="205" YPos="218" />
+    <Image Height="18" Name="ComboboxListButtonHover" Width="17" XPos="205" YPos="236" />
     <Image Height="8" Name="ComboboxListLeft" Width="8" XPos="185" YPos="265" />
     <Image Height="8" Name="ComboboxListRight" Width="8" XPos="205" YPos="265" />
     <Image Height="8" Name="ComboboxListTop" Width="8" XPos="195" YPos="265" />
@@ -122,10 +122,7 @@
     <Image Height="8" Name="ComboboxListBottomLeft" Width="8" XPos="185" YPos="275" />
     <Image Height="8" Name="ComboboxListBottomRight" Width="8" XPos="205" YPos="275" />
     <Image Height="8" Name="ComboboxListBackdrop" Width="8" XPos="195" YPos="265" />
-    <Image Height="16" Name="ComboboxSelectionBrush" Width="16" XPos="8" YPos="287" />
-    <Image Height="1" Name="ComboboxDividerLeft" Width="14" XPos="185" YPos="285" />
-    <Image Height="1" Name="ComboboxDividerMiddle" Width="8" XPos="201" YPos="285" />
-    <Image Height="1" Name="ComboboxDividerRight" Width="14" XPos="211" YPos="285" />
+    <Image Height="16" Name="ComboboxSelectionBrush" Width="16" XPos="234" YPos="238" />
     <Image Height="12" Name="HeaderBarBackdropNormal" Width="10" XPos="230" YPos="163" />
     <Image Height="12" Name="HeaderBarBackdropHover" Width="10" XPos="230" YPos="163" />
     <Image Height="16" Name="HeaderBarSplitterNormal" Width="3" XPos="225" YPos="92" />
@@ -141,7 +138,7 @@
     <Image Height="7" Name="MultiListBottomLeft" Width="7" XPos="170" YPos="102" />
     <Image Height="7" Name="MultiListBottomRight" Width="7" XPos="191" YPos="102" />
     <Image Height="6" Name="MultiListBackdrop" Width="6" XPos="181" YPos="92" />
-    <Image Height="14" Name="MultiListSelectionBrush" Width="14" XPos="9" YPos="71" />
+    <Image Height="14" Name="MultiListSelectionBrush" Width="14" XPos="235" YPos="239" />
     <Image Height="12" Name="AltProgressLeft" Width="8" XPos="71" YPos="88" />
     <Image Height="12" Name="AltProgressMiddle" Width="8" XPos="81" YPos="88" />
     <Image Height="12" Name="AltProgressRight" Width="8" XPos="91" YPos="88" />
@@ -215,15 +212,15 @@
     <Image Height="7" Name="TabButtonLowerLeftSelected" Width="7" XPos="41" YPos="99" />
     <Image Height="7" Name="TabButtonLowerRightSelected" Width="7" XPos="62" YPos="99" />
     <Image Height="6" Name="TabButtonMiddleSelected" Width="6" XPos="52" YPos="89" />
-    <Image Height="4" Name="TooltipTopLeft" Width="4" XPos="61" YPos="160" />
-    <Image Height="4" Name="TooltipTopRight" Width="5" XPos="85" YPos="160" />
-    <Image Height="5" Name="TooltipBottomLeft" Width="4" XPos="61" YPos="184" />
-    <Image Height="5" Name="TooltipBottomRight" Width="5" XPos="85" YPos="184" />
-    <Image Height="6" Name="TooltipLeftEdge" Width="4" XPos="61" YPos="171" />
-    <Image Height="6" Name="TooltipRightEdge" Width="5" XPos="85" YPos="171" />
-    <Image Height="4" Name="TooltipTopEdge" Width="6" XPos="72" YPos="160" />
-    <Image Height="5" Name="TooltipBottomEdge" Width="6" XPos="72" YPos="184" />
-    <Image Height="6" Name="TooltipMiddle" Width="6" XPos="72" YPos="171" />
+    <Image Height="4" Name="TooltipTopLeft" Width="4" XPos="43" YPos="313" />
+    <Image Height="4" Name="TooltipTopRight" Width="5" XPos="67" YPos="313" />
+    <Image Height="5" Name="TooltipBottomLeft" Width="4" XPos="43" YPos="337" />
+    <Image Height="5" Name="TooltipBottomRight" Width="5" XPos="67" YPos="337" />
+    <Image Height="6" Name="TooltipLeftEdge" Width="4" XPos="43" YPos="324" />
+    <Image Height="6" Name="TooltipRightEdge" Width="5" XPos="67" YPos="324" />
+    <Image Height="4" Name="TooltipTopEdge" Width="6" XPos="54" YPos="313" />
+    <Image Height="5" Name="TooltipBottomEdge" Width="6" XPos="54" YPos="337" />
+    <Image Height="6" Name="TooltipMiddle" Width="6" XPos="54" YPos="324" />
     <Image Height="2" Name="MenuTopLeft" Width="2" XPos="166" YPos="204" />
     <Image Height="2" Name="MenuTopRight" Width="3" XPos="175" YPos="204" />
     <Image Height="3" Name="MenuBottomLeft" Width="2" XPos="166" YPos="213" />

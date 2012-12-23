@@ -46,15 +46,15 @@ class MenuTrackSelect(MenuStandard):
 
 		# Complete widget initialization.
 		self.cbxCatItems = []
-		cbxItem = PyCEGUI.ListboxTextItem("Grand Prix")
-		self.cbxCat.addItem(cbxItem)
-		self.cbxCatItems.append(cbxItem)
-		cbxItem = PyCEGUI.ListboxTextItem("Road")
-		self.cbxCat.addItem(cbxItem)
-		self.cbxCatItems.append(cbxItem)
-		cbxItem = PyCEGUI.ListboxTextItem("Dirt")
-		self.cbxCat.addItem(cbxItem)
-		self.cbxCatItems.append(cbxItem)
+		for cat in ("Grand Prix", "Road", "Dirt"):
+			cbxItem = PyCEGUI.ListboxTextItem(cat)
+			cbxItem.setSelectionBrushImage("CEGUIDemo", "ComboboxSelectionBrush")
+			cbxItem.setSelectionColours(0xFF3FFFEE)
+			self.cbxCat.addItem(cbxItem)
+			self.cbxCat.setText(cbxItem.getText())
+			self.cbxCatItems.append(cbxItem) # Avoid its being GC'd at return !
+			if cat.startswith("Grand"):
+				self.cbxCat.setText(cbxItem.getText())
 
 		# TODO.
 

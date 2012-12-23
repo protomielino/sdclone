@@ -11,6 +11,7 @@
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
             <Property Name="FrameEnabled" Value="False" />
             <Property Name="BackgroundEnabled" Value="False" />
+            <Property Name="Tooltip" Value="What a nice logo !" />
         </Window>
         <Window Name="MenuCredits/TxtTitle" Type="CEGUIDemo/PageTitle">
             <Property Name="UnifiedAreaRect" Value="{{0.22,0},{0.1,0},{0.92,0},{0.2,0}}" />

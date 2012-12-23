@@ -41,15 +41,14 @@ class MenuOptions(Menu):
 		
 		# Complete widget initialization.
 		self.cbxWinSizeItems = []
-		cbxItem = PyCEGUI.ListboxTextItem(" 800 x  512")
-		self.cbxWinSize.addItem(cbxItem)
-		self.cbxWinSizeItems.append(cbxItem)
-		cbxItem = PyCEGUI.ListboxTextItem("1280 x  800")
-		self.cbxWinSize.addItem(cbxItem)
-		self.cbxWinSizeItems.append(cbxItem)
-		cbxItem = PyCEGUI.ListboxTextItem("1680 x 1050")
-		self.cbxWinSize.addItem(cbxItem)
-		self.cbxWinSizeItems.append(cbxItem)
+		for size in (" 800 x  512", "1024 x  640", "1280 x  800", "1680 x 1050"):
+			cbxItem = PyCEGUI.ListboxTextItem(size)
+			cbxItem.setSelectionBrushImage("CEGUIDemo", "ComboboxSelectionBrush")
+			cbxItem.setSelectionColours(0xFF3FFFEE)
+			self.cbxWinSize.addItem(cbxItem)
+			self.cbxWinSizeItems.append(cbxItem) # Avoid its being GC'd at return !
+			if size.startswith("1024"):
+				self.cbxWinSize.setText(cbxItem.getText())
 
 		# TODO.
 

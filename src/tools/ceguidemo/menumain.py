@@ -100,10 +100,11 @@ class MenuMain(MenuStandard):
 		# Complete widget initialization (whatever creation mode : code or .layout).
 		self.lstItemsSingleEvent = []
 		for subType in ("Endurance", "Challenge", "1936 Grand Prix", "LS1 Challenge"):
-			itemCbx = PyCEGUI.ListboxTextItem(subType)
-			itemCbx.setSelectionBrushImage("CEGUIDemo", "MultiListSelectionBrush")
-			self.cbxSingleEvent.addItem(itemCbx)
-			self.lstItemsSingleEvent.append(itemCbx) # Avoid its being GC'd at return !
+			cbxItem = PyCEGUI.ListboxTextItem(subType)
+			cbxItem.setSelectionBrushImage("CEGUIDemo", "ComboboxSelectionBrush")
+			cbxItem.setSelectionColours(0xFF3FFFEE)
+			self.cbxSingleEvent.addItem(cbxItem)
+			self.lstItemsSingleEvent.append(cbxItem) # Avoid its being GC'd at return !
 
 		itemCbx = self.cbxSingleEvent.findItemWithText("Challenge", None) # Get the "Challenge" item
 		itemCbx.setSelected(True); # Select this item

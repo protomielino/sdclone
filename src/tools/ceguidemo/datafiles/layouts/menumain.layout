@@ -11,6 +11,7 @@
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
             <Property Name="FrameEnabled" Value="False" />
             <Property Name="BackgroundEnabled" Value="False" />
+            <Property Name="Tooltip" Value="What a nice logo !" />
         </Window>
         <Window Name="MenuMain/TxtTitle" Type="CEGUIDemo/PageTitle">
             <Property Name="UnifiedAreaRect" Value="{{0.22,0},{0.1,0},{0.92,0},{0.2,0}}" />
@@ -124,12 +125,12 @@
         </Window>
         <Window Name="MenuMain/CbxSingleEvent.SubType" Type="CEGUIDemo/Combobox">
             <Property Name="UnifiedAreaRect" Value="{{0.4,0},{0.5,0},{0.7,0},{0.66,0}}" />
+            <Property Name="ReadOnly" Value="True" />
             <Property Name="Font" Value="MenuMedium" />
             <Property Name="Text" Value="Challenge" />
+            <Property Name="Tooltip" Value="Select the Single Event race type" />
             <AutoWindow NameSuffix="__auto_editbox__">
                 <Property Name="Font" Value="MenuMedium" />
-                <Property Name="Text" Value="Challenge" />
-                <Property Name="ActiveSelectionColour" Value="FF6060FF" />
             </AutoWindow>
             <AutoWindow NameSuffix="__auto_droplist__">
                 <Property Name="Font" Value="MenuMedium" />

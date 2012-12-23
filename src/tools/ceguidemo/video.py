@@ -43,7 +43,7 @@ class Video(object):
 		
 		glutInit()
 		glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA)
-		glutInitWindowSize(1024, 768)
+		glutInitWindowSize(1024, 640)
 		glutInitWindowPosition(-1, -1)
 		glutCreateWindow(NAME_ROOT_WINDOW)
 		glutSetCursor(GLUT_CURSOR_NONE)

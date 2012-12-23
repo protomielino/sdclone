@@ -11,6 +11,7 @@
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
             <Property Name="FrameEnabled" Value="False" />
             <Property Name="BackgroundEnabled" Value="False" />
+            <Property Name="Tooltip" Value="What a nice logo !" />
         </Window>
         <Window Name="MenuTrackSelect/TxtTitle" Type="CEGUIDemo/PageTitle">
             <Property Name="UnifiedAreaRect" Value="{{0.22,0},{0.1,0},{0.92,0},{0.2,0}}" />
@@ -137,7 +138,6 @@
                 <Property Name="Font" Value="MenuNormal" />
                 <Property Name="ReadOnly" Value="True" />
                 <Property Name="Tooltip" Value="Choose the category of the track" />
-                <Property Name="ActiveSelectionColour" Value="FF6060FF" />
             </AutoWindow>
             <AutoWindow NameSuffix="__auto_droplist__">
                 <Property Name="Font" Value="MenuNormal" />
