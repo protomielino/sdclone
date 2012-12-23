@@ -103,13 +103,12 @@ class Menu(object):
 		self.txtTitle = window.getChild(name + "/TxtTitle")
 		self.txtFrameRate = window.getChild(name + "/TxtFrameRate")
 
+		# Trace info. about children.
+		#print "Menu: Children (n=%d) :" % self.window.getChildCount()
+		#for chldInd in range(self.window.getChildCount()):
+		#	print "  #%d : name=%r" % (chldInd, self.window.getChildAtIdx(chldInd).getName())
+
 		return window
-
-	def onKeyDown(self, keyArgs):
-
-		# Nothing special to do here (see derived classes)
-		print "Menu.onKeyDown:", keyArgs
-		return False # Or True ?
 
 	# connectHandlers
 	# - Wrapper method to define the subscription/listener relationships.
@@ -118,7 +117,7 @@ class Menu(object):
 
 		# Event subscriptions :
 		# * keyboard : Does not work.
-		self.window.subscribeEvent(PyCEGUI.Window.EventCharacterKey, self, 'onCharacterKey');
+		self.window.subscribeEvent(PyCEGUI.Window.EventKeyDown, self, 'onKeyDown');
 			
 		# * window update (for the frame rate indicator).
 		self.window.subscribeEvent(PyCEGUI.Window.EventWindowUpdated, self, 'onUpdate');
@@ -141,6 +140,9 @@ class Menu(object):
 		# Initialize frame rate data.
 		self.nFrames = 0
 		self.lastTime = glutGet(GLUT_ELAPSED_TIME)
+		
+		# Give focus to the root window (needed for EventKeyDown being received).
+		self.window.activate()
 
 	# Return to the previous menu.
 	def back(self):
@@ -161,7 +163,8 @@ class Menu(object):
 			self.nFrames = 0
 			self.lastTime = thisTime
 
-	def onCharacterKey(self, keyArgs):
+	def onKeyDown(self, keyArgs):
 		
-		pass # Just in case not specialised in actual class.
-
+		# Just in case not specialised in actual class.
+		print "Menu.onKeyDown: sc=", keyArgs.scancode
+		return False # Or True ?

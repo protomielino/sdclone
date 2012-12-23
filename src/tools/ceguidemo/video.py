@@ -34,6 +34,10 @@ from configuration import TheConfig
 # Video
 class Video(object):
 
+	def __del__(self):
+	
+		OpenGLRenderer.destroySystem()
+	
 	# Initialize: OpenGL
 	def initializeOpenGL(self):
 		

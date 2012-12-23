@@ -104,10 +104,6 @@ class MenuStandard(Menu):
 	# - If there are a lot, it may behoove the coder to encapsulate them in methods, then call those methods here.
 	def connectHandlers(self):
 
-		print "Menu: Children (n=%d) :" % self.window.getChildCount()
-		for chldInd in range(self.window.getChildCount()):
-			print "  #%d : name=%r" % (chldInd, self.window.getChildAtIdx(chldInd).getName())
-
 		# Inherited connections.
 		Menu.connectHandlers(self)
 
@@ -145,9 +141,9 @@ class MenuStandard(Menu):
 		print("Exiting (on exit button) ...")
 		sys.exit(0)
 
-	def onCharacterKey(self, keyArgs):
+	def onKeyDown(self, keyArgs):
 
-		print "MenuStandard.onCharacterKey: scan=%d, " % (keyArgs.scancode, )
+		print "MenuStandard.onKeyDown: sc=%d, " % (keyArgs.scancode, )
 		if keyArgs.scancode == PyCEGUI.Key.Escape:
 
 			keyArgs.handled += 1
