@@ -23,4 +23,4 @@ MINOR_VERSION = '0'
 FULL_VERSION = '.'.join([MAJOR_VERSION, MINOR_VERSION])
 
 # Name: Root window
-NAME_ROOT_WINDOW = 'Speed Dreams GEGUI mock-up %s' % FULL_VERSION
+NAME_ROOT_WINDOW = 'Speed Dreams GEGUI demo %s' % FULL_VERSION

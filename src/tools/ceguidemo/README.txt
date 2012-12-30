@@ -1,3 +1,20 @@
+Document outline :
+
+ I  - Introduction
+ II - Installation
+    1 - Pre-requisites
+      a - Windows
+      b - Linux
+    2 - Install SD-CEGUI demo
+    3 - Run SD-CEGUI demo
+      a - Windows
+      b - Linux
+    4 - Known issues
+
+ A - Build CEGUI 0.7.7 from sources
+ B - Install CEED from sources
+
+
 I - Introduction
 -----------------
 
@@ -55,7 +72,7 @@ II- Installation
 
        * CEED (CEGUI Unified Editor, currently under development)
 
-       Note: Actually tested on Linux Mint Debian Edition (AMD 64, Update Pack 5), 
+       Note: Actually tested on Linux Mint Debian Edition (AMD 64, Update Pack 5/6), 
              with Python 2.7.3rc1, PyCEGUI 0.7.7 and PyOpenGL 3.0.1
 
   2 - Install SD-CEGUI demo
@@ -81,6 +98,15 @@ II- Installation
 
        Run the following command in a terminal :
          python <path/to>/ceguidemo/main.py
+
+  4 - Known issues
+
+     * Keyboard events seem to be received by menus even when they are hidden or deactivated,
+       which gives the following : hit Esc in the Options menu, and you'll quit this menu,
+       falling back to the main menu, which will immediately open the "Really quit ?" dialog,
+       as if you had hit Esc in the main menu
+       (Windows, CEGUI 0.7.5 / Linux, CEGUI 0.7.7)
+     * 
 
 
 A - Build CEGUI 0.7.7 from sources
@@ -114,7 +140,7 @@ Add /usr/local/lib to /etc/ld.so.conf.d/x86_64-linux-gnu.conf
 
 sudo ldconfig
 
-A - Install CEED from sources
+B - Install CEED from sources
 -------------------------------------------------
  
 Warning : Only tested under LMDE UP5, might need some changes to fit your distro.

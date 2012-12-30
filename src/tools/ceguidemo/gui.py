@@ -37,12 +37,15 @@ class GUI(object):
 			rp.setResourceGroupDirectory('fonts', './datafiles/fonts')
 			rp.setResourceGroupDirectory('layouts', './datafiles/layouts')
 			rp.setResourceGroupDirectory('looknfeels', './datafiles/looknfeels')
+			rp.setResourceGroupDirectory('animations', './datafiles/animations')
 			rp.setResourceGroupDirectory('schemas', './datafiles/xml_schemas')
+
 			PyCEGUI.Imageset.setDefaultResourceGroup('imagesets')
 			PyCEGUI.Font.setDefaultResourceGroup('fonts')
 			PyCEGUI.Scheme.setDefaultResourceGroup('schemes')
 			PyCEGUI.WidgetLookManager.setDefaultResourceGroup('looknfeels')
 			PyCEGUI.WindowManager.setDefaultResourceGroup('layouts')
+			PyCEGUI.AnimationManager.setDefaultResourceGroup('animations')
 
 		# Doesn't seem actually useful ...
 		#parser = PyCEGUI.System.getSingleton().getXMLParser()
@@ -59,6 +62,9 @@ class GUI(object):
 			PyCEGUI.System.getSingleton().setDefaultMouseCursor('CEGUIDemo', 'MouseArrow')
 			PyCEGUI.System.getSingleton().setDefaultTooltip('CEGUIDemo/Tooltip')
 			PyCEGUI.System.getSingleton().setDefaultFont('MenuNormal')
+		
+		# Can't get this done through XML (.scheme)'
+		PyCEGUI.AnimationManager.getSingleton().loadAnimationsFromXML('animations.xml')
 
 	# Initialize
 	def initialize(self):
@@ -72,19 +78,14 @@ class GUI(object):
 			
 			raise InitializationError(msg)
 
-	# Setup
+	# Setup: Interface
 	# - Important: the instance of `Menu` has to be bound to this object; if it is
 	# a local variable (read: destroyed when it goes out of scope), exceptions will be raised
 	# about the `buttonClicked` method not existing. This is a drawback of the type of setup
 	# this example uses, and as a consequence of Python being a garbage collected language.
-	def setup(self):
+	def setupInterface(self):
 		
 		self.menu = MenuMain()
 		self.menu.initialize()
 		self.menu.setup()
 		self.menu.activate()
-
-	# Setup: Interface
-	def setupInterface(self):
-		
-		self.setup()

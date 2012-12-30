@@ -107,8 +107,8 @@ class MenuMain(MenuStandard):
 			self.lstItemsSingleEvent.append(cbxItem) # Avoid its being GC'd at return !
 
 		itemCbx = self.cbxSingleEvent.findItemWithText("Challenge", None) # Get the "Challenge" item
-		itemCbx.setSelected(True); # Select this item
-		self.cbxSingleEvent.setText(itemCbx.getText()); # Copy the item's text into the Editbox
+		itemCbx.setSelected(True) # Select this item
+		self.cbxSingleEvent.setText(itemCbx.getText()) # Copy the item's text into the Editbox
 
 		return window
 		
@@ -128,17 +128,14 @@ class MenuMain(MenuStandard):
 	# Handler: buttonClicked
 	def onPracticeButtonClicked(self, args):
 
-		print("onPracticeButtonClicked")
 		self.activateTrackSelectMenu()
 
 	def onQuickRaceButtonClicked(self, args):
 
-		print("onQuickRaceButtonClicked")
 		self.activateTrackSelectMenu()
 
 	def onSingleEventButtonClicked(self, args):
 
-		print("onSingleEventButtonClicked")
 		self.activateTrackSelectMenu()
 
 	def activateTrackSelectMenu(self):
@@ -148,4 +145,4 @@ class MenuMain(MenuStandard):
 			self.menuTrackSelect.initialize()
 			self.menuTrackSelect.setup()
 
-		self.menuTrackSelect.activate(previous=self)
+		self.switchTo(self.menuTrackSelect)

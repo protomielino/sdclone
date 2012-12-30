@@ -1,11 +1,11 @@
 <GUILayout>
-    <Window Name="MenuCredits" Type="CEGUIDemo/StaticImage">
+    <Window Name="MenuCarSelect" Type="CEGUIDemo/StaticImage">
         <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
-        <Property Name="Image" Value="set:SplashCredits image:everything" />
+        <Property Name="Image" Value="set:SplashCarSelect image:everything" />
         <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
         <Property Name="FrameEnabled" Value="False" />
         <Property Name="BackgroundEnabled" Value="False" />
-        <Window Name="MenuCredits/ImgLogo" Type="CEGUIDemo/StaticImage">
+        <Window Name="MenuCarSelect/ImgLogo" Type="CEGUIDemo/StaticImage">
             <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{0.3,0},{0.25,0}}" />
             <Property Name="Image" Value="set:Logo image:everything" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
@@ -13,10 +13,10 @@
             <Property Name="BackgroundEnabled" Value="False" />
             <Property Name="Tooltip" Value="What a nice logo !" />
         </Window>
-        <Window Name="MenuCredits/TxtTitle" Type="CEGUIDemo/PageTitle">
+        <Window Name="MenuCarSelect/TxtTitle" Type="CEGUIDemo/PageTitle">
             <Property Name="UnifiedAreaRect" Value="{{0.22,0},{0.1,0},{0.92,0},{0.2,0}}" />
             <Property Name="Font" Value="MenuBig" />
-            <Property Name="Text" Value="Credits" />
+            <Property Name="Text" Value="Select a car" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
             <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />
             <Property Name="FrameEnabled" Value="False" />
@@ -45,7 +45,7 @@
                 </AutoWindow>
             </AutoWindow>
         </Window>
-        <Window Name="MenuCredits/TxtFrameRate" Type="CEGUIDemo/StaticText">
+        <Window Name="MenuCarSelect/TxtFrameRate" Type="CEGUIDemo/StaticText">
             <Property Name="UnifiedAreaRect" Value="{{0.95,0},{0.01,0},{0.99,0},{0.04,0}}" />
             <Property Name="Font" Value="TextSmall" />
             <Property Name="Text" Value="99.9" />
@@ -81,65 +81,41 @@
                 </AutoWindow>
             </AutoWindow>
         </Window>
-        <Window Name="MenuCredits/MclTable" Type="CEGUIDemo/MultiColumnList">
-            <Property Name="UnifiedAreaRect" Value="{{0.1,0},{0.3,0},{0.9,0},{0.8,0}}" />
-            <Property Name="Font" Value="TextSmall" />
-            <Property Name="Tooltip" Value="Details about contributions" />
-            <Property Name="ColumnsMovable" Value="False" />
-            <Property Name="ColumnsSizable" Value="False" />
-            <Property Name="SortSettingEnabled" Value="False" />
-            <AutoWindow NameSuffix="__auto_listheader__">
-                <Property Name="Tooltip" Value="Details about contributions" />
-                <Property Name="ColumnsMovable" Value="False" />
-                <Property Name="ColumnsSizable" Value="False" />
-                <Property Name="SortSettingEnabled" Value="False" />
-            </AutoWindow>
-            <AutoWindow NameSuffix="__auto_hscrollbar__">
-                <Property Name="Tooltip" Value="Details about contributions" />
-                <AutoWindow NameSuffix="__auto_incbtn__">
-                    <Property Name="Tooltip" Value="Details about contributions" />
-                </AutoWindow>
-                <AutoWindow NameSuffix="__auto_decbtn__">
-                    <Property Name="Tooltip" Value="Details about contributions" />
-                </AutoWindow>
-                <AutoWindow NameSuffix="__auto_thumb__">
-                    <Property Name="Tooltip" Value="Details about contributions" />
-                </AutoWindow>
-            </AutoWindow>
-            <AutoWindow NameSuffix="__auto_vscrollbar__">
-                <Property Name="Tooltip" Value="Details about contributions" />
-                <AutoWindow NameSuffix="__auto_incbtn__">
-                    <Property Name="Tooltip" Value="Details about contributions" />
-                </AutoWindow>
-                <AutoWindow NameSuffix="__auto_decbtn__">
-                    <Property Name="Tooltip" Value="Details about contributions" />
-                </AutoWindow>
-                <AutoWindow NameSuffix="__auto_thumb__">
-                    <Property Name="Tooltip" Value="Details about contributions" />
-                </AutoWindow>
-            </AutoWindow>
+        <Window Name="MenuCarSelect/BtnCredits" Type="CEGUIDemo/Button">
+            <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0,0},{0.43,0},{0.05,0}}" />
+            <Property Name="Font" Value="MenuMedium" />
+            <Property Name="Text" Value="Credits" />
+            <Property Name="Tooltip" Value="Thanks to all contributors !" />
         </Window>
-        <Window Name="MenuCredits/BtnPrevPage" Type="CEGUIDemo/ImageButton">
-            <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.7,0},{0.97,0},{0.8,0}}" />
-            <Property Name="HoverImage" Value="set:CEGUIDemo image:ArrowUpHighlight" />
-            <Property Name="NormalImage" Value="set:CEGUIDemo image:ArrowUpNormal" />
-            <Property Name="PushedImage" Value="set:CEGUIDemo image:ArrowUpPushed" />
-            <Property Name="DisabledImage" Value="set:CEGUIDemo image:ArrowUpDisabled" />
-            <Property Name="Tooltip" Value="Previous credits page" />
+        <Window Name="MenuCarSelect/BtnProfiles" Type="CEGUIDemo/Button">
+            <Property Name="UnifiedAreaRect" Value="{{0.45,0},{0,-1},{0.58,0},{0.05,-1}}" />
+            <Property Name="Font" Value="MenuMedium" />
+            <Property Name="Text" Value="Profiles" />
+            <Property Name="Tooltip" Value="Configure player input controls / profiles" />
         </Window>
-        <Window Name="MenuCredits/BtnNextPage" Type="CEGUIDemo/ImageButton">
-            <Property Name="UnifiedAreaRect" Value="{{0.9,0},{0.8,0},{0.97,0},{0.9,0}}" />
-            <Property Name="HoverImage" Value="set:CEGUIDemo image:ArrowDownHighlight" />
-            <Property Name="NormalImage" Value="set:CEGUIDemo image:ArrowDownNormal" />
-            <Property Name="PushedImage" Value="set:CEGUIDemo image:ArrowDownPushed" />
-            <Property Name="DisabledImage" Value="set:CEGUIDemo image:ArrowDownDisabled" />
-            <Property Name="Tooltip" Value="Next credits page" />
+        <Window Name="MenuCarSelect/BtnOptions" Type="CEGUIDemo/Button">
+            <Property Name="UnifiedAreaRect" Value="{{0.6,0},{0,0},{0.73,0},{0.05,0}}" />
+            <Property Name="Font" Value="MenuMedium" />
+            <Property Name="Text" Value="Options" />
+            <Property Name="Tooltip" Value="Settings for display, graphics, simulation ..." />
         </Window>
-        <Window Name="MenuCredits/BtnBack" Type="CEGUIDemo/Button">
-            <Property Name="UnifiedAreaRect" Value="{{0.43,0},{0.9,0},{0.58,0},{0.95,0}}" />
+        <Window Name="MenuCarSelect/BtnExit" Type="CEGUIDemo/Button">
+            <Property Name="UnifiedAreaRect" Value="{{0.75,0},{0,0},{0.88,0},{0.05,0}}" />
+            <Property Name="Font" Value="MenuMedium" />
+            <Property Name="Text" Value="Exit" />
+            <Property Name="Tooltip" Value="Exit from the game" />
+        </Window>
+        <Window Name="MenuCarSelect/BtnBack" Type="CEGUIDemo/Button">
+            <Property Name="UnifiedAreaRect" Value="{{0.1,0},{0.9,0},{0.25,0},{0.95,0}}" />
             <Property Name="Font" Value="MenuMedium" />
             <Property Name="Text" Value="Back" />
             <Property Name="Tooltip" Value="Back to main benu" />
+        </Window>
+        <Window Name="MenuCarSelect/BtnStart" Type="CEGUIDemo/Button">
+            <Property Name="UnifiedAreaRect" Value="{{0.75,0},{0.9,0},{0.9,0},{0.95,0}}" />
+            <Property Name="Font" Value="MenuMedium" />
+            <Property Name="Text" Value="Start" />
+            <Property Name="Tooltip" Value="Start the race" />
         </Window>
     </Window>
 </GUILayout>

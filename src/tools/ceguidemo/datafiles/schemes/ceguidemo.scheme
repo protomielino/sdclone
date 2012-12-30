@@ -7,12 +7,15 @@
 	<Imageset Filename="splash-carselect.imageset" />
 	<Imageset Filename="splash-credits.imageset" />
 	<Imageset Filename="splash-options.imageset" />
+	<Imageset Filename="splash-okcancel.imageset" />
 	<Font Name="MenuSmall" Filename="menu-small.font" />
 	<Font Name="MenuMedium" Filename="menu-medium.font" />
 	<Font Name="MenuNormal" Filename="menu-normal.font" />
 	<Font Name="MenuBig" Filename="menu-big.font" />
 	<Font Name="TextSmall" Filename="text-small.font" />
 	<Font Name="ToolTip" Filename="tooltip.font" />
+	<!-- <Animations Filename="animations.xml" /> Not understood, ignored -->
+	<!-- <Animation Filename="animations.xml" /> Not understood, ignored -->
 	<LookNFeel Filename="ceguidemo.looknfeel" />
 	<WindowRendererSet Filename="CEGUIFalagardWRBase" />
 	<FalagardMapping WindowType="CEGUIDemo/Button"      TargetType="CEGUI/PushButton"  Renderer="Falagard/Button"       LookNFeel="CEGUIDemo/Button" />
@@ -63,5 +66,5 @@
 	
 	<FalagardMapping WindowType="CEGUIDemo/MainButton"      TargetType="CEGUI/PushButton"  Renderer="Falagard/Button"       LookNFeel="CEGUIDemo/MainButton" />
 	<FalagardMapping WindowType="CEGUIDemo/PageTitle"      TargetType="DefaultWindow"  Renderer="Falagard/StaticText"       LookNFeel="CEGUIDemo/PageTitle" />
-	  
+
 </GUIScheme>

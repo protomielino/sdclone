@@ -17,6 +17,7 @@ import PyCEGUI
 
 # Import: Menu
 from menu import Menu
+from dialogs import DialogOKCancel
 
 
 # Main menu
@@ -116,12 +117,7 @@ class MenuStandard(Menu):
 	# Handlers
 	def onCreditsButtonClicked(self, args):
 
-		if not self.menuCredits:
-			self.menuCredits = self.clsMenuCredits()
-			self.menuCredits.initialize()
-			self.menuCredits.setup()
-
-		self.menuCredits.activate(previous=self)		
+		self.switchTo(self.clsMenuCredits.getSingleton())
 
 	def onProfilesButtonClicked(self, args):
 
@@ -129,28 +125,28 @@ class MenuStandard(Menu):
 
 	def onOptionsButtonClicked(self, args):
 
-		if not self.menuOptions:
-			self.menuOptions = self.clsMenuOptions()
-			self.menuOptions.initialize()
-			self.menuOptions.setup()
-
-		self.menuOptions.activate(previous=self)
+		self.switchTo(self.clsMenuOptions.getSingleton())
 
 	def onExitButtonClicked(self, args):
 
-		print("Exiting (on exit button) ...")
-		sys.exit(0)
+		DialogOKCancel.getSingleton().show(self.window, self.onOKCancelClosed, "Really quit ?")
+
+	def onOKCancelClosed(self, reallyQuit=False):
+
+		if reallyQuit:
+			print("Exiting (on exit button) ...")
+			sys.exit(0)
 
 	def onKeyDown(self, keyArgs):
 
 		print "MenuStandard.onKeyDown: sc=%d, " % (keyArgs.scancode, )
 		if keyArgs.scancode == PyCEGUI.Key.Escape:
 
-			keyArgs.handled += 1
-			print("Exiting (on Escape key) ...")
-			sys.exit(0)
+			keyArgs.handled = True
+			self.onExitButtonClicked(keyArgs)
+			#print("Exiting (on Escape key) ...")
+			#sys.exit(0)
 
-			#return True
+			return True
 
 		return False
-

@@ -168,6 +168,21 @@
                 </Section>
             </Layer>
         </StateImagery>
+		<AnimationDefinition name="RotateIn" duration="0.6" replayMode="once">
+			<Affector property="XRotation" interpolator="float">
+				<KeyFrame position="0" value="0" />
+				<KeyFrame position="0.3" value="180" progression="quadratic decelerating" />
+				<KeyFrame position="0.6" value="360" progression="quadratic accelerating" />
+			</Affector>
+			<Subscription event="MouseEntersArea" action="Start" />
+		</AnimationDefinition>
+		<AnimationDefinition name="RotateOut" duration="0.3" replayMode="once">
+			<Affector property="XRotation" interpolator="float">
+				<KeyFrame position="0" sourceProperty="XRotation" />
+				<KeyFrame position="0.3" value="0" progression="quadratic decelerating" />
+			</Affector>
+			<Subscription event="MouseEntersArea" action="Start" />
+		</AnimationDefinition>
     </WidgetLook>
 
     <!--
@@ -2072,9 +2087,9 @@
         <Property name="MouseCursorImage" value="set:CEGUIDemo image:MouseTextBar" />
         <NamedArea name="TextArea">
             <Area>
-                <Dim type="LeftEdge" ><AbsoluteDim value="5" /></Dim>
+                <Dim type="LeftEdge" ><AbsoluteDim value="3" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="5" /></Dim>
-                <Dim type="RightEdge" ><UnifiedDim scale="1.0" offset="-5" type="RightEdge" /></Dim>
+                <Dim type="RightEdge" ><UnifiedDim scale="1.0" offset="-3" type="RightEdge" /></Dim>
                 <Dim type="BottomEdge" ><UnifiedDim scale="1.0" offset="-5" type="BottomEdge" /></Dim>
             </Area>
         </NamedArea>
@@ -2166,7 +2181,7 @@
                 <Dim type="RightEdge" >
                     <UnifiedDim scale="1" type="RightEdge">
                         <DimOperator op="Subtract">
-                            <FontDim type="LineSpacing" padding="10" />
+                            <FontDim type="LineSpacing" padding="5" />
                         </DimOperator>
                     </UnifiedDim>
                 </Dim>
@@ -2221,6 +2236,7 @@
                 </Dim>
                 <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
+            <Property name="TextFormatting" value="RightAligned" />
         </Child>
         <Child  type="CEGUIDemo/ImageButton" nameSuffix="__auto_incbtn__">
             <Area>
@@ -3082,7 +3098,8 @@
                     <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
                     <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
                 </Area>
-                <Image type="TopLeftCorner" imageset="CEGUIDemo" image="MultiLineEditboxTopLeft" />
+                <!--
+				<Image type="TopLeftCorner" imageset="CEGUIDemo" image="MultiLineEditboxTopLeft" />
                 <Image type="TopRightCorner" imageset="CEGUIDemo" image="MultiLineEditboxTopRight" />
                 <Image type="BottomLeftCorner" imageset="CEGUIDemo" image="MultiLineEditboxBottomLeft" />
                 <Image type="BottomRightCorner" imageset="CEGUIDemo" image="MultiLineEditboxBottomRight" />
@@ -3091,6 +3108,7 @@
                 <Image type="TopEdge" imageset="CEGUIDemo" image="MultiLineEditboxTop" />
                 <Image type="BottomEdge" imageset="CEGUIDemo" image="MultiLineEditboxBottom" />
                 <Image type="Background" imageset="CEGUIDemo" image="MultiLineEditboxBackdrop" />
+				-->
             </FrameComponent>
         </ImagerySection>
         <ImagerySection name="Carat">
@@ -4761,12 +4779,12 @@
         </StateImagery>
     </WidgetLook>
 
-<!--
-/**********************************************************************************************************
-	CEGUIDemo/Tree
-***********************************************************************************************************/
--->
-<WidgetLook name="CEGUIDemo/Tree">
+    <!--
+    /**********************************************************************************************************
+     CEGUIDemo/Tree
+     ***********************************************************************************************************/
+    -->
+    <WidgetLook name="CEGUIDemo/Tree">
         <Property name="SelectionBrushImage" value="set:CEGUIDemo image:GenericBrush" />
         <Property name="NormalTextColour" value="FF000000" />
         <Property name="SelectedTextColour" value="FFFFFFFF" />
@@ -5020,6 +5038,22 @@
                 </Section>
             </Layer>
         </StateImagery>
+		<AnimationDefinition name="FadeIn" duration="0.5" replayMode="once">
+			<Affector property="Alpha" interpolator="float">
+				<KeyFrame position="0" value="0" />
+				<KeyFrame position="0.5" value="1" progression="quadratic accelerating" />
+			</Affector>
+			<Subscription event="MouseEntersArea" action="Start" />
+			<Subscription event="MouseLeavesArea" action="Pause" />
+		</AnimationDefinition>
+		<AnimationDefinition name="UnFadeOut" duration="0.5" replayMode="once">
+			<Affector property="Alpha" interpolator="float">
+				<KeyFrame position="0" sourceProperty="Alpha" />
+				<KeyFrame position="0.5" value="1" progression="quadratic decelerating" />
+			</Affector>
+			<Subscription event="MouseLeavesArea" action="Start" />
+			<Subscription event="MouseEntersArea" action="Pause" />
+		</AnimationDefinition>
     </WidgetLook>
 
     <!--

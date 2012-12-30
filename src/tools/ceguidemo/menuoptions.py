@@ -22,6 +22,19 @@ from menu import Menu
 # Main menu
 class MenuOptions(Menu):
 
+	singleton = None
+
+	def getSingleton():
+	
+		if not MenuOptions.singleton:
+			MenuOptions.singleton = MenuOptions()
+			MenuOptions.singleton.initialize()
+			MenuOptions.singleton.setup()
+			
+		return MenuOptions.singleton
+
+	getSingleton = staticmethod(getSingleton)
+
 	def __init__(self):
 
 		Menu.__init__(self)
@@ -68,11 +81,23 @@ class MenuOptions(Menu):
 
 	def onCancelButtonClicked(self, args):
 
-		print("onCancelButtonClicked")
+		print("Options : Cancelled.")
 		self.back()
 
 	def onAcceptButtonClicked(self, args):
 
-		print("onAcceptButtonClicked")
+		print("Options : Accepted.")
 		self.back()
 
+	def onKeyDown(self, keyArgs):
+
+		if keyArgs.scancode == PyCEGUI.Key.Escape:
+			keyArgs.handled += 1
+			self.onCancelButtonClicked(keyArgs)
+			return True
+		elif keyArgs.scancode == PyCEGUI.Key.Return:
+			keyArgs.handled += 1
+			self.onAcceptButtonClicked(keyArgs)
+			return True
+
+		return False

@@ -32,15 +32,15 @@
     <Image Height="16" Name="NewTitlebarRight" Width="12" XPos="92" YPos="127" />
     <Image Height="16" Name="SysAreaMiddle" Width="12" XPos="107" YPos="127" />
     <Image Height="16" Name="SysAreaRight" Width="13" XPos="122" YPos="127" />
-    <Image Height="6" Name="StaticLeft" Width="6" XPos="41" YPos="89" />
-    <Image Height="6" Name="StaticRight" Width="6" XPos="63" YPos="89" />
-    <Image Height="6" Name="StaticTop" Width="6" XPos="52" YPos="78" />
-    <Image Height="6" Name="StaticBottom" Width="6" XPos="52" YPos="100" />
-    <Image Height="6" Name="StaticTopLeft" Width="6" XPos="41" YPos="78" />
-    <Image Height="6" Name="StaticTopRight" Width="6" XPos="63" YPos="78" />
-    <Image Height="6" Name="StaticBottomLeft" Width="6" XPos="41" YPos="100" />
-    <Image Height="6" Name="StaticBottomRight" Width="6" XPos="63" YPos="100" />
-    <Image Height="6" Name="StaticBackdrop" Width="6" XPos="52" YPos="89" />
+    <Image Height="6" Name="StaticLeft" Width="6" XPos="74" YPos="324" />
+    <Image Height="6" Name="StaticRight" Width="6" XPos="96" YPos="324" />
+    <Image Height="6" Name="StaticTop" Width="6" XPos="85" YPos="313" />
+    <Image Height="6" Name="StaticBottom" Width="6" XPos="85" YPos="335" />
+    <Image Height="6" Name="StaticTopLeft" Width="6" XPos="74" YPos="313" />
+    <Image Height="6" Name="StaticTopRight" Width="6" XPos="96" YPos="313" />
+    <Image Height="6" Name="StaticBottomLeft" Width="6" XPos="74" YPos="335" />
+    <Image Height="6" Name="StaticBottomRight" Width="6" XPos="96" YPos="335" />
+    <Image Height="6" Name="StaticBackdrop" Width="6" XPos="85" YPos="324" />
     <Image Height="12" Name="ProgressBarLeft" Width="7" XPos="71" YPos="74" />
     <Image Height="12" Name="ProgressBarMiddle" Width="6" XPos="80" YPos="74" />
     <Image Height="12" Name="ProgressBarRight" Width="6" XPos="88" YPos="74" />
@@ -243,10 +243,10 @@
     <Image Height="5" Name="PopupMenuArrowLeft" Width="5" XPos="179" YPos="210" />
     <Image Height="11" Name="TreeListClosed" Width="7" XPos="175" YPos="111" />
     <Image Height="7" Name="TreeListOpened" Width="11" XPos="164" YPos="111" />
-    <Image Height="16" Name="MainButtonNormal" Width="128" XPos="1" YPos="242" />
-    <Image Height="16" Name="MainButtonPushed" Width="128" XPos="1" YPos="260" />
+    <Image Height="16" Name="MainButtonNormal" Width="128" XPos="1" YPos="244" />
+    <Image Height="16" Name="MainButtonPushed" Width="128" XPos="1" YPos="261" />
     <Image Height="16" Name="MainButtonHighlight" Width="128" XPos="1" YPos="278" />
-    <Image Height="3" Name="TitleBackdrop" Width="128" XPos="1" YPos="255" />
+    <Image Height="3" Name="TitleBackdrop" Width="128" XPos="1" YPos="257" />
     <Image Height="16" Name="ArrowDownNormal" Width="14" XPos="1" YPos="227" />
     <Image Height="16" Name="ArrowDownHighlight" Width="14" XPos="17" YPos="227" />
     <Image Height="16" Name="ArrowDownPushed" Width="14" XPos="33" YPos="227" />

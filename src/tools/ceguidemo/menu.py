@@ -73,7 +73,7 @@ class Menu(object):
 			# 3) Title
 			txtTitle = winMgr.createWindow('CEGUIDemo/PageTitle', name + "/TxtTitle")
 			txtTitle.setArea(PyCEGUI.UDim(0.2, 0), PyCEGUI.UDim(0.1, 0),
-						  PyCEGUI.UDim(0.7, 0), PyCEGUI.UDim(0.1, 0))
+							 PyCEGUI.UDim(0.7, 0), PyCEGUI.UDim(0.1, 0))
 			txtTitle.setText(title or "<undefined title>")
 			txtTitle.setTooltipText("Yeah, this is the title of the menu !")
 			txtTitle.setProperty("Font", "MenuBig")
@@ -108,46 +108,84 @@ class Menu(object):
 		#for chldInd in range(self.window.getChildCount()):
 		#	print "  #%d : name=%r" % (chldInd, self.window.getChildAtIdx(chldInd).getName())
 
+		# Setup animations.
+		self.animFadeIn = PyCEGUI.AnimationManager.getSingleton().instantiateAnimation("MenuFadeIn")
+		self.animFadeIn.setTargetWindow(self.window)
+		#self.animFadeIn.start()
+		#self.animFadeOut = PyCEGUI.AnimationManager.getSingleton().instantiateAnimation("MenuFadeOut")
+		#self.animFadeOut.setTargetWindow(self.window)
+		#self.animFadeOut.start()
+
 		return window
 
-	# connectHandlers
 	# - Wrapper method to define the subscription/listener relationships.
 	# - If there are a lot, it may behoove the coder to encapsulate them in methods, then call those methods here.
 	def connectHandlers(self):
 
 		# Event subscriptions :
-		# * keyboard : Does not work.
-		self.window.subscribeEvent(PyCEGUI.Window.EventKeyDown, self, 'onKeyDown');
+		# * keyboard.
+		self.window.subscribeEvent(PyCEGUI.Window.EventKeyDown, self, 'onKeyDown')
 			
 		# * window update (for the frame rate indicator).
-		self.window.subscribeEvent(PyCEGUI.Window.EventWindowUpdated, self, 'onUpdate');
+		self.window.subscribeEvent(PyCEGUI.Window.EventWindowUpdated, self, 'onUpdate')
+		
+	#def disconnectHandlers(self):
 
+	#	self.window.removeEvent(PyCEGUI.Window.EventKeyDown)
+	#	self.window.removeEvent(PyCEGUI.Window.EventWindowUpdated)
+		
 	# Setup
 	def setup(self):
 
-		# Connect the handlers
 		self.connectHandlers()
 
+		# Debug : Seems that EventActivated is only fired once ever !
+		self.window.subscribeEvent(PyCEGUI.Window.EventActivated, self, 'onActivated')
+		
+		self.window.subscribeEvent(PyCEGUI.Window.EventActivated, self, 'onDeactivated')
+
+	# Activate
+	def deactivate(self):
+
+		print "%s.deactivate" % self.__class__.__name__
+		
+		# Detach.
+		#self.disconnectHandlers()
+		self.window.setMutedState(True)
+		self.window.hide()
+		self.window.deactivate()
+	
 	# Activate
 	def activate(self, previous=None):
+	
+		print "%s.activate" % self.__class__.__name__
 
-		# Attach
+		# Attach new.
 		PyCEGUI.System.getSingleton().setGUISheet(self.window)
-		
-		# Save previous menu (in case we need to return to this one).
-		self.prevMenu = previous
+		#self.connectHandlers()
+		self.window.setMutedState(False)
+		self.window.show()
+		self.window.activate() # Set focus (needed for EventKeyDown being received).
+
+		# Save previous menu if specified (in case we need to return to this one).
+		if previous:
+			self.prevMenu = previous
 
 		# Initialize frame rate data.
 		self.nFrames = 0
 		self.lastTime = glutGet(GLUT_ELAPSED_TIME)
 		
-		# Give focus to the root window (needed for EventKeyDown being received).
-		self.window.activate()
+	# Return to the previous menu.
+	def switchTo(self, menu):
+	
+		self.deactivate()
+		menu.activate(previous=self)
 
 	# Return to the previous menu.
 	def back(self):
 	
 		if self.prevMenu:
+			self.deactivate()
 			self.prevMenu.activate()
 		else:
 			print "Warning: No previous menu to return to ; ignoring."
@@ -167,4 +205,17 @@ class Menu(object):
 		
 		# Just in case not specialised in actual class.
 		print "Menu.onKeyDown: sc=", keyArgs.scancode
-		return False # Or True ?
+		return False
+		
+	# Debug : Seems that EventActivated is only fired once ever !
+	def onActivated(self, args):
+			
+		print "%s.onActivated" % self.__class__.__name__
+		#self.connectHandlers()
+		return False
+
+	def onDeactivated(self, args):
+			
+		print "%s.onDeactivated" % self.__class__.__name__
+		#self.disconnectHandlers()
+		return False

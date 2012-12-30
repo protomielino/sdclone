@@ -22,6 +22,19 @@ from menu import Menu
 # Main menu
 class MenuCredits(Menu):
 
+	singleton = None
+
+	def getSingleton():
+	
+		if not MenuCredits.singleton:
+			MenuCredits.singleton = MenuCredits()
+			MenuCredits.singleton.initialize()
+			MenuCredits.singleton.setup()
+			
+		return MenuCredits.singleton
+
+	getSingleton = staticmethod(getSingleton)
+
 	def __init__(self):
 
 		Menu.__init__(self)
@@ -55,9 +68,9 @@ class MenuCredits(Menu):
 			btnPrev = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/ImageButton", name + "/BtnPrevPage")
 			btnPrev.setTooltipText("Previous credits page")
 			btnPrev.setXPosition(PyCEGUI.UDim(0.9, 0.0))
-			btnPrev.setYPosition(PyCEGUI.UDim(0.73, 0.0))
+			btnPrev.setYPosition(PyCEGUI.UDim(0.7, 0.0))
 			btnPrev.setWidth(PyCEGUI.UDim(0.07, 0.0))
-			btnPrev.setHeight(PyCEGUI.UDim(0.07, 0.0))
+			btnPrev.setHeight(PyCEGUI.UDim(0.1, 0.0))
 			btnPrev.setProperty("NormalImage", "set:CEGUIDemo image:ArrowUpNormal")
 			btnPrev.setProperty("HoverImage", "set:CEGUIDemo image:ArrowUpHighlight")
 			btnPrev.setProperty("PushedImage", "set:CEGUIDemo image:ArrowUpPushed")
@@ -70,7 +83,7 @@ class MenuCredits(Menu):
 			btnNext.setXPosition(PyCEGUI.UDim(0.9, 0.0))
 			btnNext.setYPosition(PyCEGUI.UDim(0.8, 0.0))
 			btnNext.setWidth(PyCEGUI.UDim(0.07, 0.0))
-			btnNext.setHeight(PyCEGUI.UDim(0.07, 0.0))
+			btnNext.setHeight(PyCEGUI.UDim(0.1, 0.0))
 			btnNext.setProperty("NormalImage", "set:CEGUIDemo image:ArrowDownNormal")
 			btnNext.setProperty("HoverImage", "set:CEGUIDemo image:ArrowDownHighlight")
 			btnNext.setProperty("PushedImage", "set:CEGUIDemo image:ArrowDownPushed")
@@ -141,6 +154,12 @@ class MenuCredits(Menu):
 
 	def onBackButtonClicked(self, args):
 
-		print("onBackButtonClicked")
 		self.back()
 
+	def onKeyDown(self, keyArgs):
+
+		if keyArgs.scancode in (PyCEGUI.Key.Escape, PyCEGUI.Key.Return):
+			self.onBackButtonClicked(keyArgs)
+			return True
+
+		return False
