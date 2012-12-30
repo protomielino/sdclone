@@ -29,7 +29,7 @@
 #include <robot.h>
 #include <network.h>
 
-#include "raceengine.h"
+#include "standardgame.h"
 
 #include "raceutil.h" // RmGetFeaturesList
 #include "racesituation.h"
@@ -112,7 +112,7 @@ void ReRaceAbort()
 	ReShutdownUpdaters();
 
 	RePhysicsEngine().shutdown();
-	RaceEngine::self().unloadPhysicsEngine();
+	StandardGame::self().unloadPhysicsEngine();
 
 	ReUI().onRaceFinishing();
 
@@ -624,7 +624,7 @@ ReRaceRealStart(void)
 	void* carHdle;
 
 	// Load the physics engine
-	if (!RaceEngine::self().loadPhysicsEngine())
+	if (!StandardGame::self().loadPhysicsEngine())
 		return RM_ERROR;
 
 	// Get the session display mode (default to "All sessions" ones, or else "normal").

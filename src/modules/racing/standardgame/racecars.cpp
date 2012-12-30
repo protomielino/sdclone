@@ -32,7 +32,7 @@
 #include <robottools.h>
 #include <teammanager.h>
 
-#include "raceengine.h"
+#include "standardgame.h"
 
 #include "racesituation.h"
 #include "raceupdate.h"

@@ -34,7 +34,7 @@
 #include <config.h>
 #endif
 
-#include <raceengine.h>
+#include <iraceengine.h>
 #include <iuserinterface.h>
 
 
@@ -138,14 +138,26 @@ main(int argc, char *argv[])
 		piUserItf = pmodUserItf->getInterface<IUserInterface>();
 	}
 
- 	// Initialize the race engine and the user interface modules.
-	if (piUserItf)
+	// Load the race engine module (the "standard game" one, for the moment).
+	ossModLibName.str("");
+	ossModLibName << GfLibDir() << "modules/racing/standardgame" << '.' << DLLEXT;
+	GfModule* pmodRaceEngine = GfModule::load(ossModLibName.str());
+
+	// Check that it implements IRaceEngine.
+	IRaceEngine* piRaceEngine = 0;
+	if (pmodRaceEngine)
 	{
-		RaceEngine::self().setUserInterface(*piUserItf);
-		piUserItf->setRaceEngine(RaceEngine::self());
+		piRaceEngine = pmodRaceEngine->getInterface<IRaceEngine>();
+	}
+
+	// Connect the race engine and the user interface modules.
+	if (piUserItf && piRaceEngine)
+	{
+		piRaceEngine->setUserInterface(*piUserItf);
+		piUserItf->setRaceEngine(*piRaceEngine);
 	}
 	
-	if (piUserItf)
+	if (piUserItf && piRaceEngine)
 	{
 		// Enter the user interface.
 		if (piUserItf->activate())
@@ -154,14 +166,12 @@ main(int argc, char *argv[])
 			pApp->eventLoop()();
 		}
 		
-		// Shutdown the user interface.
+		// Shutdown and unload the user interface and race engine modules.
 		piUserItf->shutdown();
-
-		// Shutdown the race engine.
-		RaceEngine::self().shutdown();
+		piRaceEngine->shutdown();
 		
-		// Unload the user interface module.
 		GfModule::unload(pmodUserItf);
+		GfModule::unload(pmodRaceEngine);
 	}
 
 	// Done with the app instance.
@@ -169,12 +179,12 @@ main(int argc, char *argv[])
 	delete pApp;
 	
  	// That's all (but trace what we are doing).
-	if (piUserItf)
+	if (piUserItf && piRaceEngine)
 		GfLogInfo("Exiting normally from %s.\n", strAppName.c_str());
 	else
 		std::cerr << "Exiting from " << strAppName
 				  << " after some error occurred (see above)." << std::endl;
 	
-	return piUserItf ? 0 : 1;
+	return (piUserItf && piRaceEngine) ? 0 : 1;
 }
 

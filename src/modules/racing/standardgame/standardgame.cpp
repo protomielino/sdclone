@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file        : raceengine.cpp
+    file        : standardgame.cpp
     copyright   : (C) 2010 by Jean-Philippe Meuret                        
     email       : pouillot@users.sourceforge.net   
     version     : $Id$                                  
@@ -17,7 +17,7 @@
  ***************************************************************************/
  
 /** @file    
-    		The race engine implementation of its IRaceEngine interface
+    		The standard game race engine module
     @version    $Id$
 */
 
@@ -38,28 +38,54 @@
 #include "racestate.h"
 #include "raceupdate.h"
 
-#include "raceengine.h"
+#include "standardgame.h"
 
 
 // The singleton.
-RaceEngine* RaceEngine::_pSelf = 0;
+StandardGame* StandardGame::_pSelf = 0;
 
-RaceEngine& RaceEngine::self()
+int openGfModule(const char* pszShLibName, void* hShLibHandle)
 {
-	if (!_pSelf)
-		_pSelf = new RaceEngine;
-	
+	// Instanciate the (only) module instance.
+	StandardGame::_pSelf = new StandardGame(pszShLibName, hShLibHandle);
+
+	// Register it to the GfModule module manager if OK.
+	if (StandardGame::_pSelf)
+		GfModule::register_(StandardGame::_pSelf);
+
+	// Report about success or error.
+	return StandardGame::_pSelf ? 0 : 1;
+}
+
+int closeGfModule()
+{
+	// Unregister it from the GfModule module manager.
+	if (StandardGame::_pSelf)
+		GfModule::unregister(StandardGame::_pSelf);
+
+	// Delete the (only) module instance.
+	delete StandardGame::_pSelf;
+	StandardGame::_pSelf = 0;
+
+	// Report about success or error.
+	return 0;
+}
+
+StandardGame& StandardGame::self()
+{
+	// Pre-condition : 1 successfull openGfModule call.
 	return *_pSelf;
 }
 
-RaceEngine::RaceEngine()
-: _piUserItf(0), _piTrkLoader(0), _piPhysEngine(0), _pRace(new GfRace())
+StandardGame::StandardGame(const std::string& strShLibName, void* hShLibHandle)
+: GfModule(strShLibName, hShLibHandle),
+  _piUserItf(0), _piTrkLoader(0), _piPhysEngine(0), _pRace(new GfRace())
 {
-	GfData::initialize();
+	GfData::initialize(); // ???? Shouldn't this move elsewhere ? (main ?)
 }
 
 // Implementation of IRaceEngine.
-void RaceEngine::reset(void)
+void StandardGame::reset(void)
 {
 	GfLogInfo("Resetting race engine.\n");
 
@@ -90,7 +116,7 @@ void RaceEngine::reset(void)
 	GfTracks::self()->setTrackLoader(_piTrkLoader);
 }
 
-void RaceEngine::cleanup(void)
+void StandardGame::cleanup(void)
 {
 	GfLogInfo("Cleaning up race engine.\n");
 
@@ -125,17 +151,17 @@ void RaceEngine::cleanup(void)
 	}
 }
 
-void RaceEngine::shutdown(void)
+void StandardGame::shutdown(void)
 {
 	// Destroy the race engine itself.
 	delete _pSelf;
 	_pSelf = 0;
 
 	// Shutdown the data layer.
-	GfData::shutdown();
+	GfData::shutdown();  // ???? Shouldn't this move elsewhere ? (main ?)
 }
 
-RaceEngine::~RaceEngine()
+StandardGame::~StandardGame()
 {
 	cleanup();
 
@@ -144,127 +170,127 @@ RaceEngine::~RaceEngine()
 	delete _pRace;
 }
 
-void RaceEngine::setUserInterface(IUserInterface& userItf)
+void StandardGame::setUserInterface(IUserInterface& userItf)
 {
 	_piUserItf = &userItf;
 }
 
-void RaceEngine::initializeState(void *prevMenu)
+void StandardGame::initializeState(void *prevMenu)
 {
 	::ReStateInit(prevMenu);
 }
 
-void RaceEngine::updateState(void)
+void StandardGame::updateState(void)
 {
 	::ReStateManage();
 }
 
-void RaceEngine::applyState(int state)
+void StandardGame::applyState(int state)
 {
 	::ReStateApply((void*)(long)state);
 }
 
-void RaceEngine::selectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans)
+void StandardGame::selectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans)
 {
 	::ReRaceSelectRaceman(pRaceMan, bKeepHumans);
 }
 
-void RaceEngine::restoreRace(void* hparmResults)
+void StandardGame::restoreRace(void* hparmResults)
 {
 	::ReRaceRestore(hparmResults);
 }
 
-void RaceEngine::configureRace(bool bInteractive)
+void StandardGame::configureRace(bool bInteractive)
 {
 	::ReRaceConfigure(bInteractive);
 }
 
 //************************************************************
-void RaceEngine::startNewRace()
+void StandardGame::startNewRace()
 {
 	::ReStartNewRace();
 }
 
-void RaceEngine::resumeRace()
+void StandardGame::resumeRace()
 {
 	::ReResumeRace();
 }
 
 //************************************************************
-void RaceEngine::startRace()
+void StandardGame::startRace()
 {
 	// TODO: Process error status ?
 	(void)::ReRaceRealStart();
 }
 
-void RaceEngine::abandonRace()
+void StandardGame::abandonRace()
 {
 	::ReRaceAbandon();
 }
 
-void RaceEngine::abortRace()
+void StandardGame::abortRace()
 {
 	::ReRaceAbort();
 }
 
-void RaceEngine::skipRaceSession()
+void StandardGame::skipRaceSession()
 {
 	::ReRaceSkipSession();
 }
 
-void RaceEngine::restartRace()
+void StandardGame::restartRace()
 {
 	::ReRaceRestart();
 }
 
 //************************************************************
-void RaceEngine::start(void)
+void StandardGame::start(void)
 {
 	::ReStart();
 }
 
-void RaceEngine::stop(void)
+void StandardGame::stop(void)
 {
 	::ReStop();
 }
 
 #ifdef SD_DEBUG
-void RaceEngine::step(double dt)
+void StandardGame::step(double dt)
 {
 	::ReOneStep(dt);
 }
 #endif
 
 //************************************************************
-GfRace* RaceEngine::race()
+GfRace* StandardGame::race()
 {
 	return _pRace;
 }
 
-const GfRace* RaceEngine::race() const
+const GfRace* StandardGame::race() const
 {
 	return _pRace;
 }
 
 // TODO: Remove when safe dedicated setters ready.
-tRmInfo* RaceEngine::inData()
+tRmInfo* StandardGame::inData()
 {
 	return ReSituation::self().data(); // => ReInfo
 }
 
-const tRmInfo* RaceEngine::outData() const
+const tRmInfo* StandardGame::outData() const
 {
 	return ::ReOutputSituation();
 }
 
 // Accessor to the user interface.
-IUserInterface& RaceEngine::userInterface()
+IUserInterface& StandardGame::userInterface()
 {
 	return *_piUserItf;
 }
 
 // Physics engine management.
-bool RaceEngine::loadPhysicsEngine()
+bool StandardGame::loadPhysicsEngine()
 {
     // Load the Physics engine module if not already done.
 	if (_piPhysEngine)
@@ -303,7 +329,7 @@ bool RaceEngine::loadPhysicsEngine()
 	return _piPhysEngine ? true : false;
 }
 
-void RaceEngine::unloadPhysicsEngine()
+void StandardGame::unloadPhysicsEngine()
 {
     // Unload the Physics engine module if not already done.
 	if (!_piPhysEngine)
@@ -316,13 +342,13 @@ void RaceEngine::unloadPhysicsEngine()
 }
 
 // Accessor to the track loader.
-ITrackLoader& RaceEngine::trackLoader()
+ITrackLoader& StandardGame::trackLoader()
 {
 	return *_piTrkLoader;
 }
 
 // Accessor to the physics engine.
-IPhysicsEngine& RaceEngine::physicsEngine()
+IPhysicsEngine& StandardGame::physicsEngine()
 {
 	return *_piPhysEngine;
 }
@@ -331,17 +357,17 @@ IPhysicsEngine& RaceEngine::physicsEngine()
 //************************************************************
 // WIP : dedicated situation setters.
 
-bool RaceEngine::setSchedulingSpecs(double fSimuRate, double fOutputRate)
+bool StandardGame::setSchedulingSpecs(double fSimuRate, double fOutputRate)
 {
 	return ::ReSetSchedulingSpecs(fSimuRate, fOutputRate);
 }
 
-void RaceEngine::accelerateTime(double fMultFactor)
+void StandardGame::accelerateTime(double fMultFactor)
 {
 	ReSituation::self().accelerateTime(fMultFactor);
 }
 
-void RaceEngine::setPitCommand(int nCarIndex, const struct CarPitCmd* pPitCmd)
+void StandardGame::setPitCommand(int nCarIndex, const struct CarPitCmd* pPitCmd)
 {
 	ReSituation::self().setPitCommand(nCarIndex, pPitCmd);
 }

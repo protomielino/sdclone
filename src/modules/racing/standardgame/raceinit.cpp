@@ -39,7 +39,7 @@
 #include <racemanagers.h>
 #include <race.h>
 
-#include "raceengine.h"
+#include "standardgame.h"
 
 #include "racesituation.h"
 #include "racemain.h"
@@ -93,7 +93,7 @@ ReExit(void)
 {
 	// Stop and cleanup the race engine.
 	ReStop();
-	RaceEngine::self().cleanup();
+	StandardGame::self().cleanup();
 	
 	// Notify the user interface.
 	ReUI().quit();
@@ -119,7 +119,7 @@ ReRaceSelectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans)
 	ReInfo->_reFilename = pRaceMan->getId().c_str();
 
 	// (Re-)initialize the currrent race configuration from the selected race manager.
-	RaceEngine::self().race()->load(pRaceMan, bKeepHumans);
+	StandardGame::self().race()->load(pRaceMan, bKeepHumans);
 }
 
 // Start configuring the race
@@ -128,7 +128,7 @@ ReRaceConfigure(bool bInteractive)
 {
 	// Update race engine info.
 	ReInfo->mainParams = ReInfo->params =
-		RaceEngine::self().race()->getManager()->getDescriptorHandle();
+		StandardGame::self().race()->getManager()->getDescriptorHandle();
 	
 	GfParmRemoveVariable(ReInfo->params, "/", "humanInGroup");
 	GfParmSetVariable(ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
@@ -144,7 +144,7 @@ ReRaceRestore(void* hparmResults)
 {
 	// Update race engine info in order to set it in the exact state
 	// it was in when the race mode was saved.
-	GfRace* pRace = RaceEngine::self().race();
+	GfRace* pRace = StandardGame::self().race();
 	ReInfo->mainParams = pRace->getManager()->getDescriptorHandle();
 	ReInfo->mainResults = pRace->getResultsDescriptorHandle();
 	if (!pRace->getManager()->hasSubFiles())
@@ -183,7 +183,7 @@ void
 ReStartNewRace()
 {
 	// Save the race settings to the race manager file is anything changed.
-	GfRace* pRace = RaceEngine::self().race();
+	GfRace* pRace = StandardGame::self().race();
 	if (pRace->isDirty())
 	{
 		pRace->store(); // Save data to params.
@@ -823,7 +823,7 @@ void
 ReRaceCleanup(void)
 {
   RePhysicsEngine().shutdown();
-  RaceEngine::self().unloadPhysicsEngine();
+  StandardGame::self().unloadPhysicsEngine();
 
   ReStoreRaceResults(ReInfo->_reRaceName);
 

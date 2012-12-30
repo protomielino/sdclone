@@ -31,7 +31,7 @@
 #include <portability.h>
 #include <robot.h>
 
-#include "raceengine.h"
+#include "standardgame.h"
 
 #include "racesituation.h"
 #include "racestate.h"

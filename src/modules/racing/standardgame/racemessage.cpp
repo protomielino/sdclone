@@ -29,7 +29,7 @@
 
 #include <raceman.h>
 
-#include "raceengine.h"
+#include "standardgame.h"
 
 #include "racemessage.h"
 

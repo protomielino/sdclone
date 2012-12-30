@@ -24,7 +24,7 @@
 
 #include <network.h>
 
-#include "raceengine.h"
+#include "standardgame.h"
 
 #include "racesituation.h"
 #include "racenetwork.h"

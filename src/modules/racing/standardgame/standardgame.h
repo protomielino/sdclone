@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file        : raceengine.h
+    file        : standardgame.h
     copyright   : (C) 2010 by Jean-Philippe Meuret                        
     email       : pouillot@users.sourceforge.net   
     version     : $Id$                                  
@@ -17,31 +17,38 @@
  ***************************************************************************/
  
 /** @file    
-    		The race engine implementation of its IRaceEngine interface
+    		The standard game race engine module
     @version    $Id$
 */
 
-#ifndef _RACEENGINE_H_
-#define _RACEENGINE_H_
+#ifndef _STANDARDGAME_H_
+#define _STANDARDGAME_H_
 
 #include <iphysicsengine.h>
 #include <iraceengine.h>
 #include <itrackloader.h>
 
+#include <tgf.hpp>
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
-# ifdef RACEENGINE_DLL
-#  define RACEENGINE_API __declspec(dllexport)
+# ifdef STANDARDGAME_DLL
+#  define STANDARDGAME_API __declspec(dllexport)
 # else
-#  define RACEENGINE_API __declspec(dllimport)
+#  define STANDARDGAME_API __declspec(dllimport)
 # endif
 #else
-# define RACEENGINE_API
+# define STANDARDGAME_API
 #endif
 
+// The C interface of the module.
+extern "C" int STANDARDGAME_API openGfModule(const char* pszShLibName, void* hShLibHandle);
+extern "C" int STANDARDGAME_API closeGfModule();
 
-class RACEENGINE_API RaceEngine : public IRaceEngine
+// The module main class
+// (Singleton, inherits GfModule, and implements IRaceEngine).
+
+class STANDARDGAME_API StandardGame : public GfModule, public IRaceEngine
 {
 public:
 
@@ -91,14 +98,7 @@ public:
 	virtual void setPitCommand(int nCarIndex, const struct CarPitCmd* pPitCmd);
 	
 	// Accessor to the singleton.
-	static RaceEngine& self();
-
-	// Accessor to the user interface.
-	IUserInterface& userInterface();
-
-	// Physics engine management.
-	bool loadPhysicsEngine();
-	void unloadPhysicsEngine();
+	static StandardGame& self();
 
 	// Accessor to the track loader.
 	ITrackLoader& trackLoader();
@@ -106,16 +106,29 @@ public:
 	// Accessor to the physics engine.
 	IPhysicsEngine& physicsEngine();
 
+	// Physics engine management.
+	bool loadPhysicsEngine();
+	void unloadPhysicsEngine();
+
+	// Destructor.
+	virtual ~StandardGame();
+
+	// Accessor to the user interface.
+	IUserInterface& userInterface();
+
 protected:
 
-	// Protected constructor and destructor : clients can not use them.
-	RaceEngine();
-	virtual ~RaceEngine();
+	// Protected constructor to avoid instanciation outside (but friends).
+	StandardGame(const std::string& strShLibName, void* hShLibHandle);
+	
+	// Make the C interface functions nearly member functions.
+	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
+	friend int closeGfModule();
 	
 protected:
 
 	// The singleton.
-	static RaceEngine* _pSelf;
+	static StandardGame* _pSelf;
 
 	// The user interface.
 	IUserInterface* _piUserItf;
@@ -133,19 +146,19 @@ protected:
 //! Shortcut to the user interface.
 inline extern IUserInterface& ReUI()
 {
-	return RaceEngine::self().userInterface();
+	return StandardGame::self().userInterface();
 }
 				  
 //! Shortcut to the physics engine.
 inline extern IPhysicsEngine& RePhysicsEngine()
 {
-	return RaceEngine::self().physicsEngine();
+	return StandardGame::self().physicsEngine();
 }
 				  
 //! Shortcut to the track loader.
 inline extern ITrackLoader& ReTrackLoader()
 {
-	return RaceEngine::self().trackLoader();
+	return StandardGame::self().trackLoader();
 }
 				  
-#endif /* _RACEENGINE_H_ */ 
+#endif /* _STANDARDGAME_H_ */ 

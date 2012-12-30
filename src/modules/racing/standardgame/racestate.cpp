@@ -24,7 +24,7 @@
 
 #include <raceman.h>
 
-#include "raceengine.h"
+#include "standardgame.h"
 
 #include "racesituation.h"
 #include "racemain.h"

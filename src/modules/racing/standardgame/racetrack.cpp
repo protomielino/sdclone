@@ -34,7 +34,7 @@
 
 #include <tracks.h>
 
-#include "raceengine.h"
+#include "standardgame.h"
 
 #include "racesituation.h"
 #include "raceinit.h"
