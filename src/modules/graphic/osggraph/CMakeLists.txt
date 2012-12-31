@@ -2,11 +2,12 @@ INCLUDE(../../../../cmake/macros.cmake)
 
 SET(OSGGRAPH_HEADERS AccGeode.h AccException.h ReaderWriterACC.h
                      OsgLoader.h OsgScenery.h OsgRender.h OsgMath.h OsgMain.h
-                     osggraph.h OsgCar.h)
+                     osggraph.h OsgCar.h OsgWheel.h OsgBrake.h)
 			
 SET(OSGGRAPH_SOURCES AccGeode.cpp AccException.cpp ReaderWriterACC.cpp
                      OsgLoader.cpp OsgBackground.cpp OsgScenery.cpp OsgRender.cpp
-                     OsgMath.cpp OsgMain.cpp osggraph.cpp OsgCar.cpp)
+                     OsgMath.cpp OsgMain.cpp osggraph.cpp OsgCar.cpp OsgWheel.cpp
+                     OsgBrake.cpp)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)

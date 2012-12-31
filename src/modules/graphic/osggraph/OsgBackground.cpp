@@ -27,16 +27,15 @@
 
 SDBackground::SDBackground(void)
 {
+    //un test
 }
 
 SDBackground::~SDBackground(void)
 {
 }
 
-osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, const std::string TrackPath)
+osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const std::string TrackPath)
 {
-	_sceneX = grWrldX;
-	_sceneY = grWrldY;
 	bool land = type;
 	
 	std::string LocalPath = GetDataDir();
@@ -54,6 +53,9 @@ osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, const std::s
 	if (!land)
 	{
 		osg::Node *m_background = osgDB::readNodeFile("background-sky.ac");
+		//_background_transform->setMatrix(mat);
+		osg::Matrix t = osg::Matrix::translate(grWrldX /2, grWrldY /2, grWrldZ /2);
+		mat = mat * t;
 		_background_transform->setMatrix(mat);
 		_background_transform->addChild( m_background );
 	}

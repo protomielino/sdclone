@@ -1,8 +1,27 @@
-#include <osg/MatrixTransform>
+/***************************************************************************
 
+    file                 : OsgCar.cpp
+    created              : Mon Aug 21 18:24:02 CEST 2012
+    copyright            : (C) 2012 by Gaetan André
+    email                : gaetan.andre@gmail.com
+    version              : $Id$
+
+***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+#include <osg/MatrixTransform>
+#include <osg/Switch>
 #include "OsgLoader.h"
 #include "OsgCar.h"
 #include "OsgMath.h"
+
 
 osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
 {
@@ -22,6 +41,10 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
     const char *param;
     int lg;
     char path[256];
+    
+    osgLoader loader;
+    std::string TmpPath = GetDataDir();
+    std::string strTPath;
     
     strncpy(car->_masterModel, GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_TEMPLATE, ""), MAX_NAME_LEN - 1);
 	car->_masterModel[MAX_NAME_LEN - 1] = 0;
@@ -47,51 +70,84 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
     const bool bMasterModel = strlen(car->_masterModel) != 0;
 
     GfOut("[gr] Init(%d) car %s for driver %s index %d\n", index, car->_carName, car->_modName, car->_driverIndex);
-	GfOut("[gr] Init(%d) car %s MasterModel name\n", index, car->_masterModel);
+    GfOut("[gr] Init(%d) car %s MasterModel name\n", index, car->_masterModel);
 
-    lg = 0;
-    lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
-                   GfLocalDir(), car->_modName, car->_driverIndex, car->_carName);
-    if (bMasterModel)
-        lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
-                       GfLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
-
-    lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d;",
+    snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/%d/",
                    GfLocalDir(), car->_modName, car->_driverIndex);
+    strTPath = TmpPath+buf;
+    loader.AddSearchPath(strTPath);    
 
-    lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
+    snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/%s/",
                    GfLocalDir(), car->_modName, car->_carName);
+    strTPath = TmpPath+buf;
+    loader.AddSearchPath(strTPath);
+    
     if (bMasterModel)
-        lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
+    {
+        	snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/%s/",
                        GfLocalDir(), car->_modName, car->_masterModel);
+        	strTPath = TmpPath+buf;
+    		loader.AddSearchPath(strTPath);
+    }        
 
-    lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s;",
+    snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/",
                    GfLocalDir(), car->_modName);
+    strTPath = TmpPath+buf;
+    loader.AddSearchPath(strTPath);
 
-    lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
+    snprintf(buf, nMaxTexPathSize, "drivers/%s/%d/%s/",
                    car->_modName, car->_driverIndex, car->_carName);
+    strTPath = TmpPath+buf;
+    loader.AddSearchPath(strTPath);
+    
     if (bMasterModel)
-        lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
+    {
+	lg += snprintf(buf, nMaxTexPathSize, "drivers/%s/%d/%s/",
                        car->_modName, car->_driverIndex, car->_masterModel);
-
-    lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s/%d;",
+	strTPath = TmpPath+buf;
+    	loader.AddSearchPath(strTPath);
+    }
+    
+    snprintf(buf, nMaxTexPathSize, "drivers/%s/%d/",
                    car->_modName, car->_driverIndex);
+    strTPath = TmpPath+buf;
+    loader.AddSearchPath(strTPath);
 
-    lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s/%s;",
+    snprintf(buf, nMaxTexPathSize, "drivers/%s/%s/",
                    car->_modName, car->_carName);
+    strTPath = TmpPath+buf;
+    loader.AddSearchPath(strTPath);
+    
     if (bMasterModel)
-        lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s/%s;",
+    {
+        snprintf(buf, nMaxTexPathSize, "drivers/%s/%s/",
                        car->_modName, car->_masterModel);
+        strTPath = TmpPath+buf;
+    	loader.AddSearchPath(strTPath);
+    }
 
-    lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s;", car->_modName);
+    snprintf(buf, nMaxTexPathSize, "drivers/%s/", car->_modName);
+    strTPath = TmpPath+buf;
+    loader.AddSearchPath(strTPath);
 
-    lg += snprintf(buf + lg, nMaxTexPathSize - lg, "cars/%s;", car->_carName);
+    snprintf(buf, nMaxTexPathSize, "cars/%s/", car->_carName);
+    strTPath = TmpPath+buf;
+    loader.AddSearchPath(strTPath);
+    
     if (bMasterModel)
-        lg += snprintf(buf + lg, nMaxTexPathSize - lg, "cars/%s;", car->_masterModel);
+    {
+        snprintf(buf, nMaxTexPathSize, "cars/%s/", car->_masterModel);
+        strTPath = TmpPath+buf;
+        loader.AddSearchPath(strTPath);
+    }
 
-    lg += snprintf(buf + lg, nMaxTexPathSize - lg, "data/objects;");
+    snprintf(buf, nMaxTexPathSize, "data/objects/");
+    strTPath = TmpPath+buf;
+    loader.AddSearchPath(strTPath);
 
-    lg += snprintf(buf + lg, nMaxTexPathSize - lg, "data/textures");
+    snprintf(buf, nMaxTexPathSize, "data/textures/");
+    strTPath = TmpPath+buf;
+    loader.AddSearchPath(strTPath);
 
     /* loading raw car level 0*/
     selIndex = 0; 	/* current selector index */
@@ -107,12 +163,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
         sprintf(buf, "cars/%s/%s.acc", car->_carName, car->_carName);
         
     strPath+=buf;
-    osgLoader loader;
-    std::string strTPath = GetDataDir();
-    sprintf(buf, "drivers/%s/%d/", car->_modName, car->_driverIndex);
-    strTPath += buf;
     GfOut("Chemin Textures : %s\n", strTPath.c_str());
-    loader.AddSearchPath(strTPath);
     osg::Node *pCar = loader.Load3dFile(strPath, true);
 
     osg::Vec3 p;
@@ -126,9 +177,11 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
 
     GfOut("loaded car %d",pCar);
     this->car_branch = transform1;
+
+    this->car_branch->addChild(wheels.initWheels(car,handle));
+    
     return this->car_branch;
 }
-
 
 void SDCar::updateCar()
 {
@@ -143,8 +196,12 @@ void SDCar::updateCar()
                     car->_posMat[2][0],car->_posMat[2][1],car->_posMat[2][2],car->_posMat[2][3],
                     car->_posMat[3][0],car->_posMat[3][1],car->_posMat[3][2],car->_posMat[3][3]);
 
+    wheels.updateWheels();
+
     this->car_branch->setMatrix(mat);
 }
+
+
 
 SDCars::SDCars(void)
 {
@@ -170,7 +227,6 @@ osg::ref_ptr<osg::Node> SDCars::loadCars(tSituation * pSituation)
         SDCar * car = new SDCar;
         this->addSDCar(car);
         this->cars_branch->addChild(car->loadCar(elt));
-
     }
     
     return cars_branch;
@@ -184,4 +240,3 @@ void SDCars::updateCars()
         (*it)->updateCar();
     }
 }
-

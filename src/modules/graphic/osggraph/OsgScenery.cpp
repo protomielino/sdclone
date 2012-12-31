@@ -105,11 +105,11 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 		_bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
 		if (_bgsky)
 		{
-			_bgtype = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), 						GR_ATT_BGSKY_LAND) == 0;
+			_bgtype = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), GR_ATT_BGSKY_LAND) == 0;
 			std::string strPath = PathTmp;
 			sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 			strPath += buf;
-			_scenery->addChild(m_background->build(_bgtype, _grWrldX, _grWrldY, strPath));
+			_scenery->addChild(m_background->build(_bgtype, _grWrldX, _grWrldY, _grWrldZ, strPath));
 			GfOut("Background loaded\n");
 		}
 	}
@@ -167,10 +167,17 @@ void SDScenery::ShutdownScene(void)
 
 bool SDScenery::LoadTrack(std::string strTrack)
 {
+	char buf[4096];
 	GfOut("Chemin Track : %s\n", strTrack.c_str());
 	osgLoader loader;
 	GfOut("Chemin Textures : %s\n", _strTexturePath.c_str());
 	loader.AddSearchPath(_strTexturePath);
+	
+	std::string strTPath = GetDataDir();
+	snprintf(buf, 4096, "data/textures/");
+    	strTPath += buf;
+    	loader.AddSearchPath(strTPath);
+    	
 	osg::Node *pTrack = loader.Load3dFile(strTrack, false);
 
 	if (pTrack)

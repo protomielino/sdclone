@@ -86,7 +86,7 @@ osg::Node* SDStars::build( int num, const osg::Vec3 star_data[], double star_dis
     return geode;
 }
 
-bool SDStars::reposition( osg::Vec3 p, double angle )
+bool SDStars::reposition( osg::Vec3f& p, double angle )
 {
   sgMat4 T1, GST;
   sgVec3 axis;
@@ -114,7 +114,6 @@ bool SDStars::repaint( double sun_angle, int num, const osg::Vec3 star_data[] )
 
     int phase;
 
-    // determine which star structure to draw
     if ( sun_angle > (SGD_PI_2 + 10.0 * SGD_DEGREES_TO_RADIANS ) ) 
     {
         factor = 1.0;

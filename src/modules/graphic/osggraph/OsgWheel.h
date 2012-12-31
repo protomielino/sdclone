@@ -1,9 +1,9 @@
 /***************************************************************************
 
-    file                 : OsgCar.h
+    file                 : OsgWheel.h
     created              : Mon Aug 21 18:24:02 CEST 2012
-    copyright            : (C) 2012 by Gaétan André
-    email                : gaetan.andré@gmail.com
+    copyright            : (C) 2012 by Gaëtan André
+    email                : gaetan.andre@gmail.com
     version              : $Id$
 
 ***************************************************************************/
@@ -17,46 +17,32 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef _OSGCAR_H_
-#define _OSGCAR_H_
+#ifndef _OSGWHEEL_H_
+#define _OSGWHEEL_H_
 
 #include <car.h>
 #include <raceman.h>
 #include <osg/Group>
+#include <osg/Node>
+#include <osg/Switch>
+#include <osg/MatrixTransform>
 #include <vector>
 
-#include "OsgWheel.h"
+#include "OsgBrake.h"
 
-class SDCar
+class SDWheels
 {
     private :
-        osg::ref_ptr<osg::MatrixTransform> car_branch;
         tCarElt *car;
-        SDWheels wheels;
-     //   osg::ref_ptr<osg::MatrixTransform> wheels[4];
-       // osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
+        osg::ref_ptr<osg::Switch> wheels_switches[4];
+        osg::ref_ptr<osg::MatrixTransform> wheels[4];       
+        SDBrakes brakes;
+        osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
+
 
     public :
-        osg::ref_ptr<osg::Node> loadCar(tCarElt *car);
-        void updateCar();
-};
-
-class SDCars
-{
-    private :
-        std::vector<SDCar *> the_cars;
-        osg::ref_ptr<osg::Group> cars_branch;
-        tSituation * situation;
-
-        void addSDCar(SDCar * car);
-
-    public :
-
-	SDCars(void);
-	~SDCars(void);
-
-        osg::ref_ptr<osg::Node> loadCars(tSituation * pSituation);
-        void updateCars();
+        osg::ref_ptr<osg::Node> initWheels(tCarElt *car,void * handle);
+        void updateWheels();
 };
 
 

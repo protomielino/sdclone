@@ -40,8 +40,6 @@ class SDBackground
 	osg::ref_ptr<osg::Group> _background;
 	osg::ref_ptr<osg::MatrixTransform>	 _background_transform;
 	
-	double	_sceneX;
-	double 	_sceneY;
 	bool	_type;
 	
 public:
@@ -52,7 +50,7 @@ public:
 	// Destructor
 	~SDBackground(void);
 	
-	osg::Node *build(bool type, int X, int Y, const std::string strTrack);
+	osg::Node *build(bool type, int X, int Y, int Z, const std::string strTrack);
 	void reposition(int X, int Y);	
 };
 
