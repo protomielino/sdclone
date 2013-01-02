@@ -187,9 +187,9 @@ MACRO(CHECK_LIBRARIES)
 
 	IF(ENET_FOUND)
 		SET(HAVE_LIBENET 1)
-		MESSAGE(STATUS "Looking for library ENET - found")
+		MESSAGE(STATUS "Looking for library ENet - found")
 	ELSE(ENET_FOUND)
-		MESSAGE(STATUS "Looking for library ENET - NOT found")
+		MESSAGE(STATUS "Looking for library ENet - NOT found")
 	ENDIF(ENET_FOUND)
 
 	# OpenGL
@@ -250,18 +250,20 @@ MACRO(CHECK_LIBRARIES)
 	ENDIF(SDL_FOUND)
 	
 	# OSG
-	IF(OPTION_3RDPARTY_OPENSCENEGRAPH)
+	IF(OPTION_OSGGRAPH)
 	
-		Find_Package(OPENSCENEGRAPH)
+		IF(NOT OPENSCENEGRAPH_FOUND)
+			Find_Package(OpenSceneGraph REQUIRED osgDB osgViewer osgGA osgUtil osgFX)
+		ENDIF()
 
 		IF(OPENSCENEGRAPH_FOUND)
 			SET(HAVE_LIBOPENSCENEGRAPH 1)
-			MESSAGE(STATUS "Looking for library OPENSCENEGRAPH - found")
+			MESSAGE(STATUS "Looking for library OpenScenGraph - found")
 		ELSE(OPENSCENEGRAPH_FOUND)
-			MESSAGE(STATUS "Looking for library OPENSCENEGRAPH - NOT found")
+			MESSAGE(STATUS "Looking for library OpenScenGraph - NOT found")
 		ENDIF(OPENSCENEGRAPH_FOUND)
 		
-	ENDIF(OPTION_3RDPARTY_OPENSCENEGRAPH)
+	ENDIF(OPTION_OSGGRAPH)
 
 	# Expat
 	IF(OPTION_3RDPARTY_EXPAT)
@@ -270,9 +272,9 @@ MACRO(CHECK_LIBRARIES)
 
 		IF(EXPAT_FOUND)
 			SET(HAVE_LIBEXPAT 1)
-			MESSAGE(STATUS "Looking for library EXPAT - found")
+			MESSAGE(STATUS "Looking for library Expat - found")
 		ELSE(EXPAT_FOUND)
-			MESSAGE(STATUS "Looking for library EXPAT - NOT found")
+			MESSAGE(STATUS "Looking for library Expat - NOT found")
 		ENDIF(EXPAT_FOUND)
 		
 	ENDIF(OPTION_3RDPARTY_EXPAT)
@@ -284,9 +286,9 @@ MACRO(CHECK_LIBRARIES)
 
 		IF(SOLID_FOUND)
 			SET(HAVE_LIBSOLID 1)
-			MESSAGE(STATUS "Looking for library SOLID - found")
+			MESSAGE(STATUS "Looking for library Solid - found")
 		ELSE(SOLID_FOUND)
-			MESSAGE(STATUS "Looking for library SOLID - NOT found")
+			MESSAGE(STATUS "Looking for library Solid - NOT found")
 		ENDIF(SOLID_FOUND)
 		
 	ENDIF(OPTION_3RDPARTY_SOLID)

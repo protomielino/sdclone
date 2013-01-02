@@ -36,6 +36,7 @@ SET(SSGGRAPH_OTHER_SOURCES graph.xml)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)
+
 ADD_PLIB_INCLUDEDIR()
 ADD_SDL_INCLUDEDIR()
 
@@ -65,12 +66,10 @@ ENDIF(UNIX OR MINGW)
 
 ADD_PLIB_LIBRARY(ssggraph ul sg sl ssg ssgaux)
 ADD_SDL_LIBRARY(ssggraph)
+ADD_OPENGL_LIBRARY(ssggraph)
 
 ADD_SDLIB_LIBRARY(ssggraph portability tgf tgfclient robottools)
 
-IF(OPENGL_FOUND)
-    TARGET_LINK_LIBRARIES(ssggraph ${OPENGL_LIBRARY})
-ENDIF(OPENGL_FOUND)
-
 SD_INSTALL_FILES(DATA config USER config FILES graph.xml)
+
 SD_INSTALL_FILES(LIB modules/graphic TARGETS ssggraph)

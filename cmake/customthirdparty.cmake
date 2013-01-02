@@ -17,9 +17,10 @@
 ############################################################################
 
 # @file     Custom 3rdParty location handling for some Windows builds
-#           (standard CMake Find<package> macros can't find it,
-#            so we needed another solution).
-# @author   Brian Gavin
+#           (standard CMake Find<package> macros can't find it, or don't do
+#            it the way we need, so we needed another solution).
+#           Heavily based on OpenScenGraph cmake scripts.
+# @author   Brian Gavin, Jean-Philippe Meuret
 # @version  $Id$
 
 ################################################################################################
@@ -58,7 +59,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCY DEP_NAME INCLUDE_FILE INCLUDE_SUBDIRS LIBRARY_NA
 	  NO_DEFAULT_PATH
 	)
 	MARK_AS_ADVANCED("${DEP_NAME}_INCLUDE_DIR")
-	#MESSAGE(STATUS " ${DEP_NAME}_INCLUDE_DIR = '${${DEP_NAME}_INCLUDE_DIR}'")
+	#MESSAGE(STATUS "${DEP_NAME}_INCLUDE_DIR = '${${DEP_NAME}_INCLUDE_DIR}'")
 	
 	# Find library files
 	SET(MY_PATH_LIB )
@@ -131,8 +132,9 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	# ENet.
 	_FIND_3RDPARTY_DEPENDENCY(ENET enet/enet.h "" enet ${ROOT_DIR} "")
 	
-	#OpenSceneGraph
-	IF(OPTION_3RDPARTY_OSG)
+	# OpenSceneGraph
+	IF(OPTION_OSGGRAPH)
+	
 		_FIND_3RDPARTY_DEPENDENCY(OPENTHREADS OpenThreads/Thread "" OpenThreads ${ROOT_DIR} "")
 		_FIND_3RDPARTY_DEPENDENCY(OSGDB osgDB/fstream "" osgDB ${ROOT_DIR} "")
 		_FIND_3RDPARTY_DEPENDENCY(OSGFX osgFX/version "" osgFX ${ROOT_DIR} "")
@@ -140,7 +142,25 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 		_FIND_3RDPARTY_DEPENDENCY(OSG osg/viewport "" osg ${ROOT_DIR} "")
 		_FIND_3RDPARTY_DEPENDENCY(OSGVIEWER osgViewer/api/Win32/GraphicsHandleWin32 "" osgViewer ${ROOT_DIR} "")
 		_FIND_3RDPARTY_DEPENDENCY(OSGUTIL osgUtil/Optimizer "" osgUtil ${ROOT_DIR} "")
-	ENDIF(OPTION_3RDPARTY_OSG)	
+		
+		# If everything found, set things as if it was Find_Package(OpenSceneGraph) which had did it,
+		# in order CHECK_LIBRARIES does not call it again.
+		IF(OPENTHREADS_FOUND AND OSGDB_FOUND AND OSGFX_FOUND AND OSGGA_FOUND
+		   AND OSG_FOUND AND OSGVIEWER_FOUND AND OSGUTIL_FOUND)
+
+			SET(OPENSCENEGRAPH_FOUND "YES")
+			
+			SET(OPENSCENEGRAPH_INCLUDE_DIRS "${OSG_INCLUDE_DIR}") # We assume they are all together.
+			SET(OPENSCENEGRAPH_LIBRARIES "${OPENTHREADS_LIBRARY};${OSGDB_LIBRARY};${OSGFX_LIBRARY}")
+			SET(OPENSCENEGRAPH_LIBRARIES "${OPENSCENEGRAPH_LIBRARIES};${OSGGA_LIBRARY};${OSG_LIBRARY}")
+			SET(OPENSCENEGRAPH_LIBRARIES "${OPENSCENEGRAPH_LIBRARIES};${OSGVIEWER_LIBRARY};${OSGUTIL_LIBRARY}")
+			
+			MESSAGE(STATUS "OPENSCENEGRAPH_INCLUDE_DIRS=${OPENSCENEGRAPH_INCLUDE_DIRS}")
+			MESSAGE(STATUS "OPENSCENEGRAPH_LIBRARIES=${OPENSCENEGRAPH_LIBRARIES}")
+
+		ENDIF()
+		
+	ENDIF(OPTION_OSGGRAPH)	
 	
 	# Expat : Replaces bundled libs/txml (that will soon be removed).
 	IF(OPTION_3RDPARTY_EXPAT)
@@ -201,43 +221,67 @@ ENDMACRO(SD_FIND_CUSTOM_3RDPARTY)
 # Under Windows, install needed 3rd party DLLs close to Speed Dreams executable
 # (but stay compatible with the old 2.0.0 3rd party package which had less DLLs inside)
 
-MACRO(_FIND_3RDPARTY_DLL PACKAGE_NAME LINK_LIBRARY NAME_HINTS DLL_PATHNAME_VAR)
+# Find the full path-name of the 3rd party DLL corresponding to the given 3rd party link library
+#
+# Parameters :
+# * LIB_PATH_NAMES : The link library (or list of link libraries) path-name.
+# * LIB_NAME_HINTS : Hints for retrieving in LIB_PATH_NAMES the only lib we are taking care of,
+#                    and for retrieving on disk the corresponding DLL.
+# * DLL_NAME_PREFIXES : Possible prefixes (to the lib name hint) for retrieving the DLL.
+#                       Note: the empty "" prefix is always tried at the end.
+#                       Ex: "lib;xx" for "lib" and "xx" prefixes.
+# * DLL_PATHNAME_VAR : Name of the output variable for the retrieved DLL path-name.
 
-	FIND_PACKAGE(${PACKAGE_NAME})
+MACRO(_FIND_3RDPARTY_DLL LIB_PATH_NAMES LIB_NAME_HINTS DLL_NAME_PREFIXES DLL_PATHNAME_VAR)
 
-	FOREACH(_LIB_NAME ${NAME_HINTS})
+	FOREACH(_LIB_NAME_HINT ${LIB_NAME_HINTS})
 
-		# Must handle the case of multiple libs listed in ${LINK_LIBRARY}
-		SET(_LIB_PATHNAME ${LINK_LIBRARY})
-		FOREACH(_LIB_PATHNAME_ ${LINK_LIBRARY})
-			IF(${_LIB_PATHNAME_} MATCHES "${_LIB_NAME}\\.")
+		# Must handle the case of multiple libs listed in ${LIB_PATH_NAMES} :
+		# Use LIB_NAME_HINTS to retrieve the one we are interested in here.
+		SET(_LIB_PATHNAME ${LIB_PATH_NAMES})
+		FOREACH(_LIB_PATHNAME_ ${LIB_PATH_NAMES})
+			IF(${_LIB_PATHNAME_} MATCHES "${_LIB_NAME_HINT}\\.")
 				SET(_LIB_PATHNAME ${_LIB_PATHNAME_})
 				BREAK()
-			ENDIF(${_LIB_PATHNAME_} MATCHES "${_LIB_NAME}\\.")
-		ENDFOREACH(_LIB_PATHNAME_ ${LINK_LIBRARY})
+			ENDIF(${_LIB_PATHNAME_} MATCHES "${_LIB_NAME_HINT}\\.")
+		ENDFOREACH(_LIB_PATHNAME_ ${LIB_PATH_NAMES})
 
-		# Got 1 link library pathname : check if any corresponding DLL around.
+		# Got the link library pathname : check if any corresponding DLL around (try all prefixes).
+		# 1) Check the empty prefix
+		#    (CMake ignores it when specified at the beginning of DLL_NAME_PREFIXES ... bull shit).
 		GET_FILENAME_COMPONENT(_LIB_PATH "${_LIB_PATHNAME}" PATH)
-		SET(${DLL_PATHNAME_VAR} "${_LIB_PATH}/../bin/${_LIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-		#MESSAGE(STATUS "Trying 3rdParty DLL ${${DLL_PATHNAME_VAR}} for ${PACKAGE_NAME}")
-		IF(NOT EXISTS "${${DLL_PATHNAME_VAR}}")
-			SET(_LIB_NAME "${CMAKE_SHARED_LIBRARY_PREFIX}${_LIB_NAME}")
-			SET(${DLL_PATHNAME_VAR} "${_LIB_PATH}/../bin/${_LIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-			#MESSAGE(STATUS "Trying 3rdParty DLL ${${DLL_PATHNAME_VAR}} for ${PACKAGE_NAME}")
-		ENDIF(NOT EXISTS "${${DLL_PATHNAME_VAR}}")
-		#MESSAGE(STATUS "XX ${${DLL_PATHNAME_VAR}} <= ${LINK_LIBRARY} : ${_LIB_NAME} in ${_LIB_PATH}")
+		SET(${DLL_PATHNAME_VAR} "${_LIB_PATH}/../bin/${_LIB_NAME_HINT}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+		#MESSAGE(STATUS "Trying 3rdParty DLL ${${DLL_PATHNAME_VAR}}")
 		IF(EXISTS "${${DLL_PATHNAME_VAR}}")
-			#MESSAGE(STATUS "Found 3rdParty DLL ${${DLL_PATHNAME_VAR}} for ${PACKAGE_NAME}")
-			BREAK()
+			MESSAGE(STATUS "Will install 3rdParty DLL ${${DLL_PATHNAME_VAR}}")
+			BREAK() # First found is the one.
 		ELSE(EXISTS "${${DLL_PATHNAME_VAR}}")
 			UNSET(${DLL_PATHNAME_VAR})
 		ENDIF(EXISTS "${${DLL_PATHNAME_VAR}}")
 
-	ENDFOREACH(_LIB_NAME ${NAME_HINTS})
+		# 2) Check other (specified) prefixes.
+		FOREACH(_DLL_NAME_PREFIX ${DLL_NAME_PREFIXES})
+			SET(${DLL_PATHNAME_VAR} "${_LIB_PATH}/../bin/${_DLL_NAME_PREFIX}${_LIB_NAME_HINT}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+			#MESSAGE(STATUS "Trying 3rdParty DLL ${${DLL_PATHNAME_VAR}}")
+			IF(EXISTS "${${DLL_PATHNAME_VAR}}")
+				BREAK() # First found is the one.
+			ELSE(EXISTS "${${DLL_PATHNAME_VAR}}")
+				UNSET(${DLL_PATHNAME_VAR})
+			ENDIF(EXISTS "${${DLL_PATHNAME_VAR}}")
+		ENDFOREACH(_DLL_NAME_PREFIX ${DLL_NAME_PREFIXES})
 
-	IF(NOT ${_DLL_PATHNAME_VAR})
-		MESSAGE(STATUS "Could not find 3rdParty DLL in ${NAME_HINTS} for ${PACKAGE_NAME}")
-	ENDIF(NOT ${_DLL_PATHNAME_VAR})
+		IF(EXISTS "${${DLL_PATHNAME_VAR}}")
+			MESSAGE(STATUS "Will install 3rdParty DLL ${${DLL_PATHNAME_VAR}}")
+			BREAK() # First found is the one.
+		ELSE(EXISTS "${${DLL_PATHNAME_VAR}}")
+			UNSET(${DLL_PATHNAME_VAR})
+		ENDIF(EXISTS "${${DLL_PATHNAME_VAR}}")
+
+	ENDFOREACH(_LIB_NAME_HINT ${LIB_NAME_HINTS})
+
+	#IF(NOT EXISTS "${${DLL_PATHNAME_VAR}}")
+	#	MESSAGE(STATUS "Could not find 3rdParty DLL for lib ${LIB_NAME_HINTS} (prefixes ${DLL_NAME_PREFIXES})")
+	#ENDIF()
 
 ENDMACRO(_FIND_3RDPARTY_DLL DLL_PATHNAME)
 
@@ -245,7 +289,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY)
 
 	SET(_THIRDPARTY_DLL_PATHNAMES)
 
-	_FIND_3RDPARTY_DLL("OpenAL" "${OPENAL_LIBRARY}" "OpenAL32" _DLL_PATHNAME)
+	_FIND_3RDPARTY_DLL("${OPENAL_LIBRARY}" "OpenAL32" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	# Menu Music requires ogg, vorbis, and vorbisfile 
@@ -253,51 +297,87 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY)
 	# and these libs become part of Official 3rdParty package
 	IF(OPTION_MENU_MUSIC)
 	
-		_FIND_3RDPARTY_DLL("OGG" "${OGG_LIBRARY}" "libogg;libogg-0" _DLL_PATHNAME)
+		_FIND_3RDPARTY_DLL("${OGG_LIBRARY}" "libogg;libogg-0" "" _DLL_PATHNAME)
 		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
-		_FIND_3RDPARTY_DLL("VORBIS" "${VORBIS_LIBRARY}" "libvorbis;libvorbis-0" _DLL_PATHNAME)
+		_FIND_3RDPARTY_DLL("${VORBIS_LIBRARY}" "libvorbis;libvorbis-0" "" _DLL_PATHNAME)
 		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
-		_FIND_3RDPARTY_DLL("VORBISFILE" "${VORBISFILE_LIBRARY}" "libvorbisfile;libvorbisfile-3" _DLL_PATHNAME)
+		_FIND_3RDPARTY_DLL("${VORBISFILE_LIBRARY}" "libvorbisfile;libvorbisfile-3" "" _DLL_PATHNAME)
 		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	ENDIF(OPTION_MENU_MUSIC)
 
-	_FIND_3RDPARTY_DLL("SDL" "${SDL_LIBRARY}" "SDL" _DLL_PATHNAME)
+	_FIND_3RDPARTY_DLL("${SDL_LIBRARY}" "SDL" ";lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	IF(OPTION_3RDPARTY_EXPAT)
 
-		_FIND_3RDPARTY_DLL("EXPAT" "${EXPAT_LIBRARY}" "expat;expat-1" _DLL_PATHNAME)
+		_FIND_3RDPARTY_DLL("${EXPAT_LIBRARY}" "expat;expat-1" "lib" _DLL_PATHNAME)
 		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	ENDIF(OPTION_3RDPARTY_EXPAT)
 	
-	IF(OPTION_3RDPARTY_OSG)
+	IF(OPTION_OSGGRAPH)
 
-		_FIND_3RDPARTY_DLL("OSG" "${OSG_LIBRARY}" "osg" _DLL_PATHNAME)
-		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+		# DLLs whose libs we link with.
+		SET(_OSG_DLLS_NAME_HINTS "OpenThreads;osgDB;osgFX;osgGA;osgViewer;osgUtil;osg")
+		FOREACH(_LIB_NAME ${OPENSCENEGRAPH_LIBRARIES})
+			FOREACH(_NAME_HINT ${_OSG_DLLS_NAME_HINTS})
+				IF("${_LIB_NAME}" MATCHES "${_NAME_HINT}\\.")
+					_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" "lib;ot12-;osg80-" _DLL_PATHNAME)
+					SET(_NAME_HINT_ "${_NAME_HINT}") # For later (see below DLLs we don't link with).
+					SET(_LIB_NAME_ "${_LIB_NAME}") # For later (see below DLLs we don't link with).
+					SET(_DLL_PATHNAME_ "${_DLL_PATHNAME}") # For later (see below plugins).
+					BREAK()
+				ENDIF()
+			ENDFOREACH()
+			LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+		ENDFOREACH()
 
-	ENDIF(OPTION_3RDPARTY_OSG)
+		# Other needed DLLs we don't link with.
+		# We use _LIB_NAME_ as a template, and _NAME_HINT_ as the string to replace inside. 
+		SET(_EXTRA_OSG_DLLS_NAME_HINTS "osgText") # ';'-separated list
+		FOREACH(_NAME_HINT ${_EXTRA_OSG_DLLS_NAME_HINTS})
+			STRING(REPLACE "${_NAME_HINT_}" "${_NAME_HINT}" _LIB_NAME "${_LIB_NAME_}")
+			_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" ";lib;ot12-;osg80-" _DLL_PATHNAME)
+			LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+		ENDFOREACH()
+		
+		# Plugins : Complete the list right below according to the actual needs.
+		# TODO: Find a way to install them in the osgPlugins-xxx subdir (works as is, but ...)
+		SET(_OSG_PLUGIN_NAME_HINTS "glsl;jpeg;png;rgb") # ';'-separated list
+		GET_FILENAME_COMPONENT(_OSG_PLUGINS_DIR "${_DLL_PATHNAME_}" PATH)
+		FILE(GLOB_RECURSE _OSG_PLUGIN_NAMES "${_OSG_PLUGINS_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+		FOREACH(_NAME_HINT ${_OSG_PLUGIN_NAME_HINTS})
+			FOREACH(_PLUGIN_NAME ${_OSG_PLUGIN_NAMES})
+				IF("${_PLUGIN_NAME}" MATCHES "osgPlugins.*/.*${_NAME_HINT}\\.")
+					LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_PLUGIN_NAME}")
+					MESSAGE(STATUS "Will install 3rdParty plugin ${_PLUGIN_NAME}")
+					BREAK()
+				ENDIF()
+			ENDFOREACH()
+		ENDFOREACH()
+		
+	ENDIF(OPTION_OSGGRAPH)
 
 	IF(OPTION_3RDPARTY_SOLID)
 
-		_FIND_3RDPARTY_DLL("SOLID" "${SOLID_SOLID_LIBRARY}" "solid" _DLL_PATHNAME)
+		_FIND_3RDPARTY_DLL("${SOLID_SOLID_LIBRARY}" "solid" "lib" _DLL_PATHNAME)
 		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
-		_FIND_3RDPARTY_DLL("SOLID" "${SOLID_BROAD_LIBRARY}" "broad" _DLL_PATHNAME)
+		_FIND_3RDPARTY_DLL("${SOLID_BROAD_LIBRARY}" "broad" "lib" _DLL_PATHNAME)
 		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	ENDIF(OPTION_3RDPARTY_SOLID)
 
-	_FIND_3RDPARTY_DLL("ZLIB" "${ZLIB_LIBRARY}" "zlib" _DLL_PATHNAME)
+	_FIND_3RDPARTY_DLL("${ZLIB_LIBRARY}" "zlib" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
-	_FIND_3RDPARTY_DLL("PNG" "${PNG_LIBRARY}" "png" _DLL_PATHNAME)
+	_FIND_3RDPARTY_DLL("${PNG_LIBRARY}" "png" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
-	_FIND_3RDPARTY_DLL("JPEG" "${JPEG_LIBRARY}" "jpeg-8" _DLL_PATHNAME)
+	_FIND_3RDPARTY_DLL("${JPEG_LIBRARY}" "jpeg;jpeg-8" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	#MESSAGE(STATUS "3rdParty dependencies : Will install ${_THIRDPARTY_DLL_PATHNAMES}")

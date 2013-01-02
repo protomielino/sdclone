@@ -81,6 +81,8 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
       SET(OPTION_UNLOAD_SSGGRAPH true CACHE BOOL "If false, never unload ssggraph module (useful on some Linuxes to avoid XOrg crashes)")  
     ENDIF(UNIX)
 
+	SET(OPTION_OSGGRAPH false CACHE BOOL "Build OpenScenGraph-based WIP osggraph graphics module")
+	
     SET(OPTION_AUTOVERSION true CACHE BOOL "Enable automatic computation of the version from SVN source tree")
     
     # Custom 3rdParty location for some Windows builds (standard CMake Find<package> macros
