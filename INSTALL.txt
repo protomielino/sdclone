@@ -178,17 +178,23 @@ The Speed Dreams Team.
 
         - OPTION_3RDPARTY_EXPAT:BOOL :
             Enable building against 3rd party Expat 2 library, rather than bundled txml (def: ON)
-			Disable if "Expat 2 dev" is not available for your distro (which is very unlikely).
+            Disable if "Expat 2 dev" is not available for your distro (which is very unlikely).
 
         - OPTION_3RDPARTY_SOLID:BOOL :
             Enable building against 3rd party Free Solid 2 library, rather than bundled one (def: OFF)
-			Note: This is not set by default, because Free Solid 2 dev is not yet available
-			      on most Linux distros (only Fedora is working on this right now, AFAIK, 2012, July)
-				  Ask the dev team for any hint about building it ...
+            Note: This is not set by default, because Free Solid 2 dev is not yet available
+                  on most Linux distros (only Fedora is working on this right now, AFAIK, 2012, July)
+                  Ask the dev team for any hint about building it ...
 
         - OPTION_MENU_MUSIC:BOOL :
             Enable building with the new Menu Music enabled (def: OFF)
-            Note: This requires libogg, libvorbis, and libvorbisfile (these dependencies are new for 2.1)
+            Note: This requires new 3rd party libs : libogg, libvorbis, and libvorbisfile
+
+        - OPTION_OSGGRAPH:BOOL :
+            Enable building of the WIP new OpenSceneGraph-based graphics module 'osggraph' (def: OFF)
+            Note: This requires new 3rd party libs : OpenSceneGraph
+            Hint: Once built, to load it at race-time, substitute 'ssggraph' by 'osggraph'
+                  in <user settings>/config/raceengine.xml
 
         - OPTION_TRACE:BOOL :
             Full run-time traces if ON (def: ON)
@@ -309,7 +315,7 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
       
         Note: See II.2.a above about which packages you really need.
 
-	  or 
+      or 
 
       Get the latest trunk from SVN (needed for building with MinGW : was not supported by 2.0.0).
 
@@ -427,6 +433,8 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
   f.  Download the "MinGW 4.7.0" release of the Speed Dreams "3rdParty" binary package from SF.net
         http://sourceforge.net/projects/speed-dreams/files/3rd%20party/MinGW%204.7.0/
       (it contains necessary 3rd party libs compiled with/for MinGW 4.7.0)
+      Note: If you plan to also build and run the new OpenSceneGraph-base graphics module (osggraph),
+            you should also download the "OSG extension" of this 3rdparty package (same location).
 
   g.  Install it in the right folder :
 
@@ -434,6 +442,8 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
 
          $ cd /usr
          $ tar xvfz .../3rdParty-2.1-win32-mingw470-g-O2.tar.gz
+         # And if you plan to build osggraph (see above) :
+         $ tar xvfz .../3rdParty-2.1-osg-win32-mingw470-O2.tar.gz
 
          Note: this will populate the MSYS /usr/local tree, just as under Linux :-)
 
@@ -446,7 +456,9 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
         - open 3rdParty-2.1-win32-mingw470-g-O2.tar.gz in your favorite archive manager
           (7zip is an excellent tool for this : http://www.7-zip.org/),
         - extract the whole "local" folder into the "sd" folder,
+        - (same for 3rdParty-2.1-osg-win32-mingw470-O2.tar.gz if needed)
         - rename it to "3rdParty".
+
 
   h.  Run CMake to configure the build (here we assume CMake 2.8, but newer versions should work) :
 
@@ -458,6 +470,8 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
         $ /c/Program\ Files/CMake\ 2.8/bin/cmake -G "MSYS Makefiles" -DOPTION_OFFICIAL_ONLY:BOOL=On -DCMAKE_PREFIX_PATH:STRING=/usr/local -DCMAKE_BUILD_TYPE:STRING=Release ..
 
         Note: The 'Release' build gives you -O3-optimised binaries.
+
+        Note: See II.2.c above for more about possible / useful CMake arguments.
 
       Or
 
@@ -474,9 +488,9 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
                 (ex: <path to CMakeLists.txt/../build)
           . Next
           . Run CMake page :  use :
-	         + CMake generator : "MinGW generator" (mandatory choice here !)
-	         + CMake arguments : 
-	             -DOPTION_OFFICIAL_ONLY:BOOL=On -DCMAKE_BUILD_TYPE:STRING=Release
+             + CMake generator : "MinGW generator" (mandatory choice here !)
+             + CMake arguments : 
+                 -DOPTION_OFFICIAL_ONLY:BOOL=On -DCMAKE_BUILD_TYPE:STRING=Release
              + Click on the Run CMake button
 
              Note: See II.2.c above for more about possible / useful CMake arguments.
@@ -501,10 +515,10 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
 
       * If you are using QtCreator (solution 2) :
 
-	    You can also use standard CMake GUI to do this before opening the master CMakeLists.txt in QtCreator,
-	    but you have to first add C:\MinGW\bin to your PATH environment variable
-		otherwise CMake GUI won't propose you the "MinGW generator", which is the one you have to use
-		("MSYS makefiles" does not work with QtCreator).
+        You can also use standard CMake GUI to do this before opening the master CMakeLists.txt in QtCreator,
+        but you have to first add C:\MinGW\bin to your PATH environment variable
+        otherwise CMake GUI won't propose you the "MinGW generator", which is the one you have to use
+        ("MSYS makefiles" does not work with QtCreator).
 
         - See below 2)f.g.h for how to use CMake GUI, but BEWARE, you have to select
           the "MinGW generator" as the "compiler" (mandatory choice).
@@ -513,7 +527,7 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
 
           Note: Apart from "won't build" or "won't install" message (don't care),
           all should go smoothly, especially the detection of the 3rd party libraries.
-	  
+      
         - Start QtCreator,
         - File / Open a file or project ...
         - Browse and select the master CMakeLists.txt of Speed Dreams
@@ -525,8 +539,8 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
           . Next
           . Run CMake page : you normally don't need to change anything,
             as QtCreator read it from the CMake generated CMakeCache.txt file :
-	         + CMake generator : "MinGW generator" (mandatory choice here !)
-	         + CMake arguments : <leave empty>
+             + CMake generator : "MinGW generator" (mandatory choice here !)
+             + CMake arguments : <leave empty>
              + Click on the Run CMake button
                (Yes, CMake already ran, but needed again because ... hmmm ...
                 TODO : discover and then explain why :-)
@@ -577,8 +591,8 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
 
       * If you are using QtCreator :
 
-	    - "Build / Compile all" through the menu
-	  
+        - "Build / Compile all" through the menu
+      
   k.  Run (and debug) Speed Dreams
 
       * Of course you can simply double click on the installed speed-dreams-2.exe executable
@@ -655,13 +669,13 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
 
  Note: Building from SVN repo at SF.net :
        From trunk@r4790, there's CMake support for a new MSVC 2005 3rd party binary package,
-	   with updated releases of the dependencies, + 2 new ones : Expat 2 and FreeSOLID 2,
-	   coming there in order to replace the bundled versions (txml and simuv2.1/SOLID-2.0),
-	   in order SD becomes compatible with FOSS Linux distros (like Fedora, Debian, ...).
-	   See http://sourceforge.net/projects/speed-dreams/files/3rd%20party/MSVC%202005/post-2.0.0
-	   (and http://sourceforge.net/projects/speed-dreams/files/3rd%20party/Sources/post-2.0.0),
-	   along with "II - Linux installation from sources" for some more tips about CMake options.
-	   
+       with updated releases of the dependencies, + 2 new ones : Expat 2 and FreeSOLID 2,
+       coming there in order to replace the bundled versions (txml and simuv2.1/SOLID-2.0),
+       in order SD becomes compatible with FOSS Linux distros (like Fedora, Debian, ...).
+       See http://sourceforge.net/projects/speed-dreams/files/3rd%20party/MSVC%202005/post-2.0.0
+       (and http://sourceforge.net/projects/speed-dreams/files/3rd%20party/Sources/post-2.0.0),
+       along with "II - Linux installation from sources" for some more tips about CMake options.
+       
 
 3) MS VC++ 6 : No more supported.
 
