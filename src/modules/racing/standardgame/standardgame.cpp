@@ -81,7 +81,6 @@ StandardGame::StandardGame(const std::string& strShLibName, void* hShLibHandle)
 : GfModule(strShLibName, hShLibHandle),
   _piUserItf(0), _piTrkLoader(0), _piPhysEngine(0), _pRace(new GfRace())
 {
-	GfData::initialize(); // ???? Shouldn't this move elsewhere ? (main ?)
 }
 
 // Implementation of IRaceEngine.
@@ -118,8 +117,6 @@ void StandardGame::reset(void)
 
 void StandardGame::cleanup(void)
 {
-	GfLogInfo("Cleaning up race engine.\n");
-
 	// Internal cleanup.
 	::ReCleanup();
 
@@ -153,21 +150,15 @@ void StandardGame::cleanup(void)
 
 void StandardGame::shutdown(void)
 {
-	// Destroy the race engine itself.
-	delete _pSelf;
-	_pSelf = 0;
+	GfLogInfo("Shutting down StandardGame race engine.\n");
 
-	// Shutdown the data layer.
-	GfData::shutdown();  // ???? Shouldn't this move elsewhere ? (main ?)
+	cleanup();
+
+	delete _pRace;
 }
 
 StandardGame::~StandardGame()
 {
-	cleanup();
-
-	GfLogInfo("Shutting down race engine.\n");
-
-	delete _pRace;
 }
 
 void StandardGame::setUserInterface(IUserInterface& userItf)

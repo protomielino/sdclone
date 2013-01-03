@@ -23,6 +23,7 @@
 
 #include <portability.h>
 #include <tgfclient.h>
+#include <tgfdata.h>
 
 #ifdef WIN32
 #ifndef HAVE_CONFIG_H
@@ -138,6 +139,9 @@ main(int argc, char *argv[])
 		piUserItf = pmodUserItf->getInterface<IUserInterface>();
 	}
 
+	// Initialize the data layer (needed by any race engine module).
+	GfData::initialize();
+
 	// Load the race engine module (the "standard game" one, for the moment).
 	ossModLibName.str("");
 	ossModLibName << GfLibDir() << "modules/racing/standardgame" << '.' << DLLEXT;
@@ -172,6 +176,9 @@ main(int argc, char *argv[])
 		
 		GfModule::unload(pmodUserItf);
 		GfModule::unload(pmodRaceEngine);
+		
+		// Shutdown the data layer.
+		GfData::shutdown();
 	}
 
 	// Done with the app instance.
