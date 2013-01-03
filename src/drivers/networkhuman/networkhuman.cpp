@@ -1092,6 +1092,12 @@ static void drive_mt(int index, tCarElt* car, tSituation *s)
 	int idx = index - 1;
 	tControlCmd	*cmd;
 
+	if (NetGetNetwork())
+	{
+		if (g_activeDriver!=idx)
+			return
+	}
+
 	cmd = HCtx[idx]->CmdControl;
 
 	common_drive(index, car, s);
