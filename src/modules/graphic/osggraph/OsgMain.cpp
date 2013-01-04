@@ -534,7 +534,25 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 int
 refresh(tSituation *s)
 {
-    	//int	i;
+    // Compute F/S indicators every second.
+    frameInfo.nInstFrames++;
+    frameInfo.nTotalFrames++;
+    const double dCurTime = GfTimeClock();
+    const double dDeltaTime = dCurTime - fFPSPrevInstTime;
+    if (dDeltaTime > 1.0) {
+        ++nFPSTotalSeconds;
+        fFPSPrevInstTime = dCurTime;
+        frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
+        frameInfo.nInstFrames = 0;
+        frameInfo.fAvgFps = (double)frameInfo.nTotalFrames / nFPSTotalSeconds;
+        // Trace F/S every 5 seconds.
+        if (nFPSTotalSeconds % 5 == 2)
+            GfLogTrace("Frame rate (F/s) : Instant = %.1f (Average %.1f)\n",
+                       frameInfo.fInstFps, frameInfo.fAvgFps);
+    }
+
+
+    //int	i;
     	int nb = s->_ncars;
     	tCarElt *car = s->cars[nb-1];
     
@@ -601,18 +619,6 @@ refresh(tSituation *s)
 
     /*GfProfStartProfile("refresh");
 
-	// Compute FPS indicators every second.
-    frameInfo.nInstFrames++;
-	frameInfo.nTotalFrames++;
-    const double dCurTime = GfTimeClock();
-	const double dDeltaTime = dCurTime - fFPSPrevInstTime;
-    if (dDeltaTime > 1.0) {
-		++nFPSTotalSeconds;
-		fFPSPrevInstTime = dCurTime;
-		frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
-		frameInfo.nInstFrames = 0;
-		frameInfo.fAvgFps = (double)frameInfo.nTotalFrames / nFPSTotalSeconds;
-    }
 
     TRACE_GL("refresh: start");
 
@@ -761,10 +767,10 @@ initCars(tSituation *s)
     //return 0; // true;
 //}
 
-/*void
+void
 shutdownCars(void)
 {
-	int i;
+/*	int i;
 
 	GfOut("-- shutdownCars\n");
 	grShutdownSound(grNbCars);
@@ -796,11 +802,13 @@ shutdownCars(void)
 	for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
 		grScreens[i]->setCurrentCar(NULL);
 	}
+    */
 
+    // Trace final mean F/s.
 	if (nFPSTotalSeconds > 0)
 		GfLogTrace("Average frame rate: %.2f F/s\n",
 				   (double)frameInfo.nTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - fFPSPrevInstTime));
-}*/
+}
 
 int
 initTrack(tTrack *track)

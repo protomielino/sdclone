@@ -114,7 +114,7 @@ void OsgGraph::redrawView(tSituation* pSituation)
 void OsgGraph::unloadCars()
 {
 	//GfLogDebug("SsgGraph::unloadCars\n");
-	//::shutdownCars();
+    ::shutdownCars();
 }
 
 void OsgGraph::unloadTrack()
