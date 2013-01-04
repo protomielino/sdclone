@@ -1095,7 +1095,7 @@ static void drive_mt(int index, tCarElt* car, tSituation *s)
 	if (NetGetNetwork())
 	{
 		if (g_activeDriver!=idx)
-			return
+			return;
 	}
 
 	cmd = HCtx[idx]->CmdControl;
