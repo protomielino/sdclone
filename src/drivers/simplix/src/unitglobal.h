@@ -12,7 +12,7 @@
 // Last changed : 2013.01.06
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.05.000
+// Version      : 3.05.001
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -413,6 +413,7 @@ enum
 //#define PRV_ACCEL_FILTER     "accel filter"
 #define PRV_ACCEL_OUT        "accel out"
 #define PRV_ACCEL_DELTA      "accel delta"
+#define PRV_ACCEL_DELTA_RAIN "accel delta rain"
 #define PRV_FORCE_LANE       "force lane"         // Force lane for tests
 #define PRV_SKILL            "skill"              // Car specific skilling
 

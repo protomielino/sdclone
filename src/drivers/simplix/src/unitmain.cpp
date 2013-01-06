@@ -11,10 +11,11 @@
 // Last changed : 2013.01.06
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.05.000
+// Version      : 3.05.001
 //--------------------------------------------------------------------------*
-// V3.05.000 (SimuV2.1):
+// V3.05.001 (SimuV2.1):
 // Separated hairpin calculations
+// Driving while rain with ls2-bavaria-g3gtr
 //--------------------------------------------------------------------------*
 // V3.04.000 (SimuV2.1):
 // Skilling for career mode

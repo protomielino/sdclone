@@ -12,7 +12,7 @@
 // Last changed : 2013.01.06
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.05.000
+// Version      : 3.05.001
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -341,6 +341,7 @@ TDriver::TDriver(int Index):
   oTestLane(0),
   oUseFilterAccel(false),
   oDeltaAccel(0.05f),
+  oDeltaAccelRain(0.025f),
   oUseAccelOut(false),
   oSideScaleMu(0.97f),
   oSideScaleBrake(0.97f),
@@ -618,6 +619,7 @@ void TDriver::AdjustDriving(
 	  UseFilterAccel();
   */
   oDeltaAccel = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_DELTA,0,oDeltaAccel);
+  oDeltaAccelRain = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_DELTA_RAIN,0,oDeltaAccelRain);
 
   oOmegaAhead = Param.Fix.oLength;
   oInitialBrakeCoeff = oBrakeCoeff[0];
@@ -3476,8 +3478,16 @@ double TDriver::FilterBrakeSpeed(double Brake)
 //--------------------------------------------------------------------------*
 double TDriver::FilterAccel(double Accel)
 {
-  if (Accel > oLastAccel + oDeltaAccel)
-	Accel = MIN(1.0,oLastAccel + oDeltaAccel);
+  if (oRain)
+  {
+    if (Accel > oLastAccel + oDeltaAccelRain)
+	  Accel = MIN(1.0,oLastAccel + oDeltaAccelRain);
+  }
+  else
+  {
+    if (Accel > oLastAccel + oDeltaAccel)
+	  Accel = MIN(1.0,oLastAccel + oDeltaAccel);
+  }
   return Accel;
 }
 //==========================================================================*
