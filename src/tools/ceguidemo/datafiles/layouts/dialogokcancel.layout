@@ -33,7 +33,7 @@
             </Window>
             <Window Name="DialogOKCancel/ImgBackground/TxtMessage" Type="CEGUIDemo/MultiLineEditbox">
                 <Property Name="UnifiedAreaRect" Value="{{0.1,0},{0.35,0},{0.9,0},{0.75,0}}" />
-                <Property Name="Font" Value="MenuNormal" />
+                <Property Name="Font" Value="MenuBig" />
                 <Property Name="Text">Here takes place the message you'd like to have the user carefully read and understand before deciding ;-)
 </Property>
                 <Property Name="ReadOnly" Value="True" />

@@ -15,7 +15,7 @@
         </Window>
         <Window Name="MenuCredits/TxtTitle" Type="CEGUIDemo/PageTitle">
             <Property Name="UnifiedAreaRect" Value="{{0.22,0},{0.1,0},{0.92,0},{0.2,0}}" />
-            <Property Name="Font" Value="MenuBig" />
+            <Property Name="Font" Value="MenuTitle" />
             <Property Name="Text" Value="Credits" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
             <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />

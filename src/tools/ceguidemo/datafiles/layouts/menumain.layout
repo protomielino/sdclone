@@ -15,7 +15,7 @@
         </Window>
         <Window Name="MenuMain/TxtTitle" Type="CEGUIDemo/PageTitle">
             <Property Name="UnifiedAreaRect" Value="{{0.22,0},{0.1,0},{0.92,0},{0.2,0}}" />
-            <Property Name="Font" Value="MenuBig" />
+            <Property Name="Font" Value="MenuTitle" />
             <Property Name="Text" Value="Welcome" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
             <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />
@@ -107,19 +107,19 @@
         </Window>
         <Window Name="MenuMain/BtnPractice" Type="CEGUIDemo/MainButton">
             <Property Name="UnifiedAreaRect" Value="{{0.22,0},{0.3,0},{0.82,0},{0.37,0}}" />
-            <Property Name="Font" Value="MenuNormal" />
+            <Property Name="Font" Value="MenuBig" />
             <Property Name="Text" Value="Practice" />
             <Property Name="Tooltip" Value="A free practice session for one player on one track" />
         </Window>
         <Window Name="MenuMain/BtnQuickRace" Type="CEGUIDemo/MainButton">
             <Property Name="UnifiedAreaRect" Value="{{0.22,0},{0.37,0},{0.82,0},{0.44,0}}" />
-            <Property Name="Font" Value="MenuNormal" />
+            <Property Name="Font" Value="MenuBig" />
             <Property Name="Text" Value="Quick Race" />
             <Property Name="Tooltip" Value="A race on one track, with no qualifying session" />
         </Window>
         <Window Name="MenuMain/BtnSingleEvent" Type="CEGUIDemo/MainButton">
             <Property Name="UnifiedAreaRect" Value="{{0.22,0},{0.44,0},{0.82,0},{0.51,0}}" />
-            <Property Name="Font" Value="MenuNormal" />
+            <Property Name="Font" Value="MenuBig" />
             <Property Name="Text" Value="Single Event" />
             <Property Name="Tooltip" Value="A race on one track, with various qualifying schemes" />
         </Window>

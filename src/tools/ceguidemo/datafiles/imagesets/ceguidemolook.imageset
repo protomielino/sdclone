@@ -109,10 +109,10 @@
     <Image Height="7" Name="ListboxBottomRight" Width="7" XPos="62" YPos="99" />
     <Image Height="6" Name="ListboxBackdrop" Width="6" XPos="52" YPos="89" />
     <Image Height="16" Name="ListboxSelectionBrush" Width="16" XPos="234" YPos="238" />
-    <Image Height="18" Name="ComboboxEditLeft" Width="9" XPos="184" YPos="218" />
-    <Image Height="18" Name="ComboboxEditMiddle" Width="8" XPos="195" YPos="218" />
-    <Image Height="18" Name="ComboboxListButtonNormal" Width="17" XPos="205" YPos="218" />
-    <Image Height="18" Name="ComboboxListButtonHover" Width="17" XPos="205" YPos="236" />
+    <Image Height="16" Name="ComboboxEditLeft" Width="9" XPos="185" YPos="219" />
+    <Image Height="16" Name="ComboboxEditMiddle" Width="8" XPos="195" YPos="219" />
+    <Image Height="16" Name="ComboboxListButtonNormal" Width="16" XPos="205" YPos="219" />
+    <Image Height="16" Name="ComboboxListButtonHover" Width="16" XPos="205" YPos="237" />
     <Image Height="8" Name="ComboboxListLeft" Width="8" XPos="185" YPos="265" />
     <Image Height="8" Name="ComboboxListRight" Width="8" XPos="205" YPos="265" />
     <Image Height="8" Name="ComboboxListTop" Width="8" XPos="195" YPos="265" />

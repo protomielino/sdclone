@@ -12,10 +12,11 @@
 	<Font Name="MenuMedium" Filename="menu-medium.font" />
 	<Font Name="MenuNormal" Filename="menu-normal.font" />
 	<Font Name="MenuBig" Filename="menu-big.font" />
+	<Font Name="MenuTitle" Filename="menu-title.font" />
 	<Font Name="TextSmall" Filename="text-small.font" />
 	<Font Name="ToolTip" Filename="tooltip.font" />
-	<!-- <Animations Filename="animations.xml" /> Not understood, ignored -->
-	<!-- <Animation Filename="animations.xml" /> Not understood, ignored -->
+	<!-- <Animations Filename="animations.xml" /> Not understood, ignored (0.7.5 & 0.7.7) -->
+	<!-- <Animation Filename="animations.xml" /> Not understood, ignored (0.7.5 & 0.7.7)-->
 	<LookNFeel Filename="ceguidemo.looknfeel" />
 	<WindowRendererSet Filename="CEGUIFalagardWRBase" />
 	<FalagardMapping WindowType="CEGUIDemo/Button"      TargetType="CEGUI/PushButton"  Renderer="Falagard/Button"       LookNFeel="CEGUIDemo/Button" />

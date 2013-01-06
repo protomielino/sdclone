@@ -76,7 +76,7 @@ class Menu(object):
 							 PyCEGUI.UDim(0.7, 0), PyCEGUI.UDim(0.1, 0))
 			txtTitle.setText(title or "<undefined title>")
 			txtTitle.setTooltipText("Yeah, this is the title of the menu !")
-			txtTitle.setProperty("Font", "MenuBig")
+			txtTitle.setProperty("Font", "MenuTitle")
 			txtTitle.setProperty("FrameEnabled", "false")
 			txtTitle.setProperty("BackgroundEnabled", "true")
 

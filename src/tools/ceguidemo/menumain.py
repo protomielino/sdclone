@@ -54,7 +54,7 @@ class MenuMain(MenuStandard):
 			btnPractice.setYPosition(PyCEGUI.UDim(0.3, 0.0))
 			btnPractice.setWidth(PyCEGUI.UDim(0.6, 0.0))
 			btnPractice.setHeight(PyCEGUI.UDim(0.07, 0.0))
-			btnPractice.setProperty("Font", "MenuNormal")
+			btnPractice.setProperty("Font", "MenuBig")
 
 			window.addChildWindow(btnPractice)
 
@@ -65,7 +65,7 @@ class MenuMain(MenuStandard):
 			btnQuickRace.setYPosition(PyCEGUI.UDim(0.37, 0.0))
 			btnQuickRace.setWidth(PyCEGUI.UDim(0.6, 0.0))
 			btnQuickRace.setHeight(PyCEGUI.UDim(0.07, 0.0))
-			btnQuickRace.setProperty("Font", "MenuNormal")
+			btnQuickRace.setProperty("Font", "MenuBig")
 
 			window.addChildWindow(btnQuickRace)
 
@@ -76,7 +76,7 @@ class MenuMain(MenuStandard):
 			btnSingleEvent.setYPosition(PyCEGUI.UDim(0.44, 0.0))
 			btnSingleEvent.setWidth(PyCEGUI.UDim(0.6, 0.0))
 			btnSingleEvent.setHeight(PyCEGUI.UDim(0.07, 0.0))
-			btnSingleEvent.setProperty("Font", "MenuNormal")
+			btnSingleEvent.setProperty("Font", "MenuBig")
 			#btnSingleEvent.setEnabled(False)
 
 			window.addChildWindow(btnSingleEvent)
