@@ -9,10 +9,10 @@
 // 
 // File         : unitpit.cpp
 // Created      : 2007.02.20
-// Last changed : 2011.06.07
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.01.06
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.02.000
+// Version      : 3.05.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem erweiterten Robot-Tutorial bt
 //
@@ -318,7 +318,7 @@ void TPitLane::SmoothPitPath
 
   // Smooth pit path
   float BumpMode = (float) Param.oCarParam.oScaleBump;
-  SmoothPath(Param,TClothoidLane::TOptions(BumpMode));
+  SmoothPath(Param,TClothoidLane::TOptions(1.0,BumpMode));
 }
 //==========================================================================*
 

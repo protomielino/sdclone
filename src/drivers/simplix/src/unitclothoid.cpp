@@ -9,10 +9,10 @@
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.07
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.01.06
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.02.000
+// Version      : 3.05.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -46,17 +46,17 @@
 //
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
-// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
+// Wer die Dateien verwendet erkennt an, dass fï¿½r Fehler, Schï¿½den,
+// Folgefehler oder Folgeschï¿½den keine Haftung ï¿½bernommen wird.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
 //
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// Im ï¿½brigen gilt fï¿½r die Nutzung und/oder Weitergabe die
 // GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
+// Version 2 oder nach eigener Wahl eine spï¿½tere Version.
 //--------------------------------------------------------------------------*
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -91,6 +91,7 @@ void TClothoidLane::MakeSmoothPath(
   const TOptions& Opts)
 {
   TCarParam& CarParam = Param.oCarParam;
+  oBase = Opts.Base;
 
   if (Opts.MaxR < FLT_MAX)
     LaneType = ltLeft;
@@ -174,6 +175,8 @@ bool TClothoidLane::LoadSmoothPath(
   const TOptions& Opts)
 {
   TCarParam& CarParam = Param.oCarParam;
+  oBase = Opts.Base;
+
   if (Opts.Side)
     CarParam = Param.oCarParam2;
   TLane::Initialise(Track, Param.Fix, CarParam, Opts.MaxL, Opts.MaxR);
@@ -189,6 +192,8 @@ void TClothoidLane::SmoothPath(
   const TParam& Param, 
   const TOptions& Opts)
 {
+  oBase = Opts.Base;
+
   int FwdRange = 110;
   CalcFwdAbsCrv(FwdRange);
 
@@ -360,10 +365,10 @@ void TClothoidLane::SmoothBetween(int Step, double BumpMod)
 	  if (J >= Count)
 	    J = 0;
 
-//	  TVec3d P0 = L0->Point;
-//	  TVec3d P1 = L1->Point;
-//	  TVec3d P2 = L2->Point;
-//	  TVec3d P3 = L3->Point;
+	  TVec3d P0 = L0->Point;
+	  TVec3d P1 = L1->Point;
+	  TVec3d P2 = L2->Point;
+	  TVec3d P3 = L3->Point;
 
 	  double T = L0->Offset + L1->Offset + L2->Offset;
 	  L1->Offset = (float) (T/3);
@@ -545,13 +550,13 @@ void TClothoidLane::Optimise
 	{
 	  if (fabs(Crv0) < fabs(Crv1) && fabs(Crv1) * 1.02 < fabs(Crv2))
 	  {
-		Crv1 *= Factor;
-		Crv0 *= Factor;
+		Crv1 *= Factor/oBase;
+		Crv0 *= Factor/oBase;
 	  }
 	  else if(fabs(Crv0) > fabs(Crv1) * 1.02 && fabs(Crv1) > fabs(Crv2))
 	  {
-		Crv1 *= Factor;
-		Crv0 *= Factor;
+		Crv1 *= Factor*oBase;
+		Crv0 *= Factor*oBase;
 	  }
 	}
   }
@@ -772,29 +777,29 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
 void TClothoidLane::SavePointsToFile(const char* TrackLoad)
 {
   FILE* F = fopen(TrackLoad, "wb");
-  //bool error = false; // Set but not used (see below).
+  bool error = false;
   size_t writeSize;
   if (F == 0)
     return;
 
   int K = 0;
   writeSize = fwrite(&K,sizeof(int),1,F);
-//  if( writeSize < 1)
-//    error = true;
+  if( writeSize < 1)
+    error = true;
   int Version = RL_VERSION;
   writeSize = fwrite(&Version,sizeof(int),1,F);
-//  if( writeSize < 1)
-//    error = true;
+  if( writeSize < 1)
+    error = true;
 
   int Weather = GetWeather();
   writeSize = fwrite(&Weather,sizeof(int),1,F);
-//  if( writeSize < 1)
-//    error = true;
+  if( writeSize < 1)
+    error = true;
 
   int N = oTrack->Count();
   writeSize = fwrite(&N,sizeof(int),1,F);
-//  if( writeSize < 1)
-//    error = true;
+  if( writeSize < 1)
+    error = true;
 
   //GfOut("\n\n\nsizeof(TPathPt): %d\n\n\n",sizeof(TPathPt));
   void* Start = &(oPathPoints[0]);
@@ -804,8 +809,8 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   for (int I = 0; I < N; I++)
   {
     writeSize = fwrite(&(oPathPoints[I]),UsedLen,1,F);
-//    if( writeSize < 1)
-//      error = true;
+    if( writeSize < 1)
+      error = true;
   }
   fclose(F);
 }

@@ -9,10 +9,10 @@
 //
 // File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2011.11.20
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.01.06
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.03.000
+// Version      : 3.05.000
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -94,7 +94,7 @@
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 125 // Force new calculation
+#define RL_VERSION 126 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*
@@ -446,6 +446,7 @@ enum
 #define PRV_PIT_TEST_STOP    "pit test stop" 
 
 #define PRV_BUMP_MODE        "bump mode"          // bump detection model
+#define PRV_BASE_MODE        "base mode"          // base detection model
 
 #define PRV_SCALE__BRAKE     "scale_brake"        // Scale brake force
 #define PRV_SCALE_BRAKE      "scale brake"        // Scale brake force

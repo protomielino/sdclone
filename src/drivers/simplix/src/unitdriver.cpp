@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.01.16
-// Copyright    : © 2007-2012 Wolf-Dieter Beelitz
+// Last changed : 2013.01.06
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.04.000
+// Version      : 3.05.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -336,6 +336,7 @@ TDriver::TDriver(int Index):
   oTeamEnabled(true),
   oPitSharing(false),
   oTeamIndex(0),
+  oBase(1.0),
   oBumpMode(1),
   oTestLane(0),
   oUseFilterAccel(false),
@@ -514,6 +515,8 @@ void TDriver::AdjustDriving(
 
   oJumpOffset =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_JUMP_OFFSET,NULL,(float) oJumpOffset);
+  oBase =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BASE_MODE,NULL,oBase);
   oBumpMode =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BUMP_MODE,NULL,oBumpMode);
   Param.oCarParam.oScaleBump =
@@ -1451,7 +1454,8 @@ void TDriver::Drive()
   GfOut("v:(%.1f)%.1f km/h A1:%.3f A2:%.3f CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,TrackTurnangle1,TrackTurnangle2,oLanePoint.Crvz);
   GfOut("v:(%.1f)%.1f km/h CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz);
   GfOut("#A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
-  GfOut("#v:(%.2f)%.1f km/h Radius:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1.0/oLanePoint.Crv);
+  GfOut("#v:(%.2f)%.2f km/h Radius:%.4fm (%.4f)\n",oTargetSpeed*3.6,oCurrSpeed*3.6,fabs(1.0/oLanePoint.Crv),fabs(oLanePoint.Crv));
+  GfOut("#v:(%.2f)%.2f km/h Radius:%.4fm (%.4f)\n",oTargetSpeed*3.6,oCurrSpeed*3.6,fabs(1.0/oLanePoint.Crv),fabs(oLanePoint.Crv));
  */
 }
 //==========================================================================*
@@ -1601,7 +1605,7 @@ void TDriver::FindRacinglines()
     //GfOut("# ... make smooth path ...\n");
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
-	  TClothoidLane::TOptions(oBumpMode));
+	  TClothoidLane::TOptions(oBase,oBumpMode));
 #ifdef EXPORT_RACINGLINE
     oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
 #endif
@@ -1612,24 +1616,24 @@ void TDriver::FindRacinglines()
     if (!oRacingLine[oRL_FREE].LoadSmoothPath    // Load a smooth path
 	  (oTrackLoadQualify,
 	  &oTrackDesc, Param,                        // as main racingline
-	  TClothoidLane::TOptions(oBumpMode)))
+	  TClothoidLane::TOptions(oBase,oBumpMode)))
 	{
       //GfOut("# ... make smooth path ...\n");
       oRacingLine[oRL_FREE].MakeSmoothPath       // Calculate a smooth path
 	    (&oTrackDesc, Param,                     // as main racingline
-	    TClothoidLane::TOptions(oBumpMode));
+	    TClothoidLane::TOptions(oBase,oBumpMode));
       oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoadQualify);
 	}
   }
   else if (!oRacingLine[oRL_FREE].LoadSmoothPath // Load a smooth path
 	  (oTrackLoad,
 	  &oTrackDesc, Param,                        // as main racingline
-	  TClothoidLane::TOptions(oBumpMode)))
+	  TClothoidLane::TOptions(oBase,oBumpMode)))
   {
     //GfOut("# ... make smooth path ...\n");
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
-	  TClothoidLane::TOptions(oBumpMode));
+	  TClothoidLane::TOptions(oBase,oBumpMode));
 #ifdef EXPORT_RACINGLINE
     oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
 #endif
@@ -1654,13 +1658,13 @@ void TDriver::FindRacinglines()
     if (!oRacingLine[oRL_LEFT].LoadSmoothPath    // Load a smooth path
 	  (oTrackLoadLeft,                           // to be used as
 	  &oTrackDesc, Param,                        // avoid to left racingline
-	    TClothoidLane::TOptions(oBumpMode, FLT_MAX, -oAvoidWidth, true)))
+	    TClothoidLane::TOptions(oBase,oBumpMode, FLT_MAX, -oAvoidWidth, true)))
 	{
       //GfOut("# ... make avoid path left ...\n");
 
       oRacingLine[oRL_LEFT].MakeSmoothPath       // Avoid to left racingline
 	    (&oTrackDesc, Param,
-		TClothoidLane::TOptions(oBumpMode, FLT_MAX, -oAvoidWidth, true));
+		TClothoidLane::TOptions(oBase,oBumpMode, FLT_MAX, -oAvoidWidth, true));
 #ifdef EXPORT_RACINGLINE
       oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
 #endif
@@ -1675,13 +1679,13 @@ void TDriver::FindRacinglines()
 	if (!oRacingLine[oRL_RIGHT].LoadSmoothPath   // Load a smooth path
 	  (oTrackLoadRight,                          // to be used as
 	  &oTrackDesc, Param,                        // avoid to right racingline
-  	    TClothoidLane::TOptions(oBumpMode, -oAvoidWidth, FLT_MAX, true)))
+  	    TClothoidLane::TOptions(oBase,oBumpMode, -oAvoidWidth, FLT_MAX, true)))
 	{
       //GfOut("# ... make avoid path right ...\n");
 
 	  oRacingLine[oRL_RIGHT].MakeSmoothPath      // Avoid to right racingline
 	    (&oTrackDesc, Param,
-  	    TClothoidLane::TOptions(oBumpMode, -oAvoidWidth, FLT_MAX, true));
+  	    TClothoidLane::TOptions(oBase, oBumpMode, -oAvoidWidth, FLT_MAX, true));
 #ifdef EXPORT_RACINGLINE
       oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
 #endif
@@ -2273,8 +2277,8 @@ void TDriver::InitAdaptiveShiftLevels()
   double maxTq = 0;
   double rpmMaxTq = 0;
   double maxPw = 0;
-  //double rpmMaxPw = 0; // Set but not used (see below)
-  //double TqAtMaxPw = 0; // Set but not used (see below)
+  double rpmMaxPw = 0;
+  double TqAtMaxPw = 0;
   DataPoints = (TDataPoints *) malloc(IMax * sizeof(TDataPoints));
   TDataPoints *Data;
   for (I = 0; I < IMax; I++)
@@ -2295,9 +2299,9 @@ void TDriver::InitAdaptiveShiftLevels()
 			&& (Data->rads * Edesc[I+1].tq > maxPw)
 			&& (Data->rads < RevsLimiter))
 	{
-	  //TqAtMaxPw = Edesc[I+1].tq;
+	  TqAtMaxPw = Edesc[I+1].tq;
 	  maxPw = Data->rads * Edesc[I+1].tq;
-	  //rpmMaxPw = Data->rads;
+	  rpmMaxPw = Data->rads;
 	}
 
 	Data->a = (Edesc[I+1].tq - Edesc[I].tq)
@@ -3799,9 +3803,9 @@ double TDriver::CalcCrv(double Crv)
 //==========================================================================*
 // Calculate the hairpin
 //--------------------------------------------------------------------------*
-double TDriver::CalcHairpin(double Crv)
+double TDriver::CalcHairpin(double Speed, double AbsCrv)
 {
-    return (this->*CalcHairpinFoo)(Crv);
+    return (this->*CalcHairpinFoo)(Speed, AbsCrv);
 }
 //==========================================================================*
 
@@ -3914,9 +3918,69 @@ double TDriver::CalcCrv_simplix_36GP(double Crv)
 //==========================================================================*
 // If not used for a carset
 //--------------------------------------------------------------------------*
-double TDriver::CalcHairpin_simplix_Identity(double Crv)
+double TDriver::CalcHairpin_simplix_Identity(double Speed, double AbsCrv)
 {
-  return 1.0;
+  return Speed;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Old Default function
+//--------------------------------------------------------------------------*
+double TDriver::CalcHairpin_simplix(double Speed, double AbsCrv)
+{
+
+  if (TDriver::UseGPBrakeLimit)
+  {
+    if (fabs(AbsCrv) > 1/15.0)
+      Speed *= 0.20;                             // Filter hairpins
+    else if (fabs(AbsCrv) > 1/25.0)
+      Speed *= 0.30;                             // Filter hairpins
+    else if (fabs(AbsCrv) > 1/40.0)
+      Speed *= 0.70;                             // Filter hairpins
+    else if (fabs(AbsCrv) > 1/45.0)
+      Speed *= 0.84;                             // Filter hairpins
+    else if (Speed > 112)                        // (111,11 m/s = 400 km/h)
+      Speed = 112;                                 
+  }
+  else
+  {
+    if (fabs(AbsCrv) > 1/40.0)
+      Speed *= 0.70;                             // Filter hairpins
+    else if (fabs(AbsCrv) > 1/45.0)
+      Speed *= 0.84;                             // Filter hairpins
+    else if (Speed > 112)                        // (111,11 m/s = 400 km/h)
+      Speed = 112;                                 
+  }
+
+  if (AbsCrv < 1/10.0)
+  {
+	if (TDriver::UseGPBrakeLimit)
+	{
+      if (Speed < 6.0)
+    	  Speed = 6.0;
+	}
+	else
+	{
+      if (Speed < 12.0)
+    	  Speed = 12.0;
+	}
+  }
+  else
+  {
+	if (TDriver::UseGPBrakeLimit)
+	{
+      if (Speed < 3.0)
+        Speed = 3.0;
+	}
+	else
+	{
+      if (Speed < 12.0)
+    	  Speed = 12.0;
+	}
+  }
+
+  return Speed;
 }
 //==========================================================================*
 
@@ -3976,42 +4040,20 @@ double TDriver::CalcFriction_simplix_TRB1(const double Crv)
 double TDriver::CalcFriction_simplix_LS1(const double Crv)
 {
   double AbsCrv = fabs(Crv);
-/*
-  if (AbsCrv > 1/12.0)
-	oXXX = 0.60;
-  else if ((AbsCrv > 1/15.0) && (oXXX > 0.65))
-	oXXX = 0.65;
-  else if ((AbsCrv > 1/18.0) && (oXXX > 0.75))
-	oXXX = 0.75;
-  else if ((AbsCrv > 1/19.0) && (oXXX > 0.83))
-	oXXX = 0.83;
-  else if ((AbsCrv > 1/20.0) && (oXXX > 0.90))
-	oXXX = 0.90;
-  else
-	oXXX = MIN(1.0,oXXX+0.0003);
-*/
-  oXXX = 1.0;
   double FrictionFactor = 0.95;
 
   if (AbsCrv > 0.10) 
-//    FrictionFactor = 0.44;
     FrictionFactor = 0.86;
   else if (AbsCrv > 0.045)
-//    FrictionFactor = 0.74;
     FrictionFactor = 0.88;
   else if (AbsCrv > 0.03)
-//    FrictionFactor = 0.83;
     FrictionFactor = 0.90;
   else if (AbsCrv > 0.02)
-//    FrictionFactor = 0.92;
     FrictionFactor = 0.92;
   else if (AbsCrv > 0.01)
-//    FrictionFactor = 0.93;
     FrictionFactor = 0.94;
-  else if (AbsCrv > 0.005)
-    FrictionFactor = 0.95;
 
-  return FrictionFactor * oXXX;
+  return FrictionFactor;
 }
 //==========================================================================*
 
@@ -4024,35 +4066,35 @@ double TDriver::CalcFriction_simplix_LS2(const double Crv)
 
   if (AbsCrv > 1/12.0)
 	oXXX = 0.60;
-  else if ((AbsCrv > 1/15.0) && (oXXX > 0.65))
-	oXXX = 0.65;
-  else if ((AbsCrv > 1/18.0) && (oXXX > 0.75))
-	oXXX = 0.75;
-  else if ((AbsCrv > 1/19.0) && (oXXX > 0.83))
-	oXXX = 0.83;
-  else if ((AbsCrv > 1/20.0) && (oXXX > 0.90))
+  else if ((AbsCrv > 1/15.0) && (oXXX > 0.70))
+	oXXX = 0.70;
+  else if ((AbsCrv > 1/18.0) && (oXXX > 0.80))
+	oXXX = 0.80;
+  else if ((AbsCrv > 1/19.0) && (oXXX > 0.90))
 	oXXX = 0.90;
+  else if ((AbsCrv > 1/20.0) && (oXXX > 0.99))
+	oXXX = 0.99;
   else
 	oXXX = MIN(1.0,oXXX+0.0003);
 
-    double FrictionFactor = 0.95;
+  double FrictionFactor = 1.0;
 
-  if (AbsCrv > 0.10)
-    FrictionFactor = 0.44;
-  else if (AbsCrv > 0.05)
-    FrictionFactor = 0.53;
+  if (AbsCrv > 0.10) 
+    FrictionFactor = 0.84;
   else if (AbsCrv > 0.045)
-    FrictionFactor = 0.74;
+    FrictionFactor = 0.85;
   else if (AbsCrv > 0.03)
-    FrictionFactor = 0.83;
-  else if (AbsCrv > 0.02)
-    FrictionFactor = 0.92;
+    FrictionFactor = 0.86;
+  else if (AbsCrv > 0.012)
+    FrictionFactor = 1.0;
   else if (AbsCrv > 0.01)
-    FrictionFactor = 0.93;
+    FrictionFactor = 1.01;
+  else if (AbsCrv > 0.0075)
+    FrictionFactor = 1.015;
   else if (AbsCrv > 0.005)
-    FrictionFactor = 0.95;
+    FrictionFactor = 1.025;
 
-  return FrictionFactor * oXXX;
+  return oXXX * FrictionFactor;
 }
 
 //==========================================================================*

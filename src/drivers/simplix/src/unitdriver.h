@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2011.01.16
-// Copyright    : © 2007-2012 Wolf-Dieter Beelitz
+// Last changed : 2013.01.06
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.04.000
+// Version      : 3.05.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -394,6 +394,7 @@ private:
 	bool oTeamEnabled;
     bool oPitSharing;	                         // Flag: Pitsharing activated
 	int oTeamIndex;                              // Index of car in Teams arrays;
+	float oBase;                                 //
 	float oBumpMode;                             //
 	int oTestLane;
     bool oUseFilterAccel;
@@ -451,12 +452,12 @@ private:
 	void CalcSkilling();
 	double CalcFriction(const double Crv);
 	double CalcCrv(double Crv);
-	double CalcHairpin(double Crv);
+	double CalcHairpin(double Speed, double AbsCrv);
 
 	void (TDriver::*CalcSkillingFoo)();
 	double (TDriver::*CalcFrictionFoo)(const double Crv);
 	double (TDriver::*CalcCrvFoo)(double Crv);
-	double (TDriver::*CalcHairpinFoo)(double Crv);
+	double (TDriver::*CalcHairpinFoo)(double Speed, double AbsCrv);
 
 	void CalcSkilling_simplix();
 	void CalcSkilling_simplix_LS1();
@@ -478,7 +479,8 @@ private:
 	double CalcCrv_simplix_LS1(double Crv);
 	double CalcCrv_simplix_LP1(double Crv);
 
-	double CalcHairpin_simplix_Identity(double Crv); 
+	double CalcHairpin_simplix_Identity(double Speed, double AbsCrv); 
+	double CalcHairpin_simplix(double Speed, double AbsCrv); 
 
 	void UseFilterAccel(){oUseFilterAccel = true;};
 	void UseAccelOut(){oUseAccelOut = true;};

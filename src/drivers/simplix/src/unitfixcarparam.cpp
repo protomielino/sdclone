@@ -9,10 +9,10 @@
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.09.07
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.01.06
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.03.000
+// Version      : 3.05.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -413,57 +413,7 @@ double TFixCarParam::CalcMaxSpeed
    Den = 0.00001;
 
   double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(Crv0)) / Den);
-
-  if (TDriver::UseGPBrakeLimit)
-  {
-    if (fabs(AbsCrv) > 1/15.0)
-      Speed *= 0.20;                             // Filter hairpins
-    else if (fabs(AbsCrv) > 1/25.0)
-      Speed *= 0.30;                             // Filter hairpins
-    else if (fabs(AbsCrv) > 1/40.0)
-      Speed *= 0.70;                             // Filter hairpins
-    else if (fabs(AbsCrv) > 1/45.0)
-      Speed *= 0.84;                             // Filter hairpins
-    else if (Speed > 112)                        // (111,11 m/s = 400 km/h)
-      Speed = 112;                                 
-  }
-  else
-  {
-    if (fabs(AbsCrv) > 1/40.0)
-      Speed *= 0.70;                             // Filter hairpins
-    else if (fabs(AbsCrv) > 1/45.0)
-      Speed *= 0.84;                             // Filter hairpins
-    else if (Speed > 112)                        // (111,11 m/s = 400 km/h)
-      Speed = 112;                                 
-  }
-
-  if (AbsCrv0 < 1/10.0)
-  {
-	if (TDriver::UseGPBrakeLimit)
-	{
-      if (Speed < 6.0)
-    	  Speed = 6.0;
-	}
-	else
-	{
-      if (Speed < 12.0)
-    	  Speed = 12.0;
-	}
-  }
-  else
-  {
-	if (TDriver::UseGPBrakeLimit)
-	{
-      if (Speed < 3.0)
-        Speed = 3.0;
-	}
-	else
-	{
-      if (Speed < 12.0)
-    	  Speed = 12.0;
-	}
-  }
-
+  Speed = oDriver->CalcHairpin(Speed,AbsCrv);
   return Speed;
 }
 //==========================================================================*
