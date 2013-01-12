@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : ssggraph.cpp
+    file                 : snddefault.cpp 
     created              : Thu Aug 17 23:19:19 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
@@ -20,48 +20,48 @@
 #include "snddefault.h"
 #include "grsound.h"
 
-// The SsgGraph: singleton.
-sndDefault* sndDefault::_pSelf = 0;
+// The SndDefault singleton.
+SndDefault* SndDefault::_pSelf = 0;
 
 int openGfModule(const char* pszShLibName, void* hShLibHandle)
 {
 	// Instanciate the (only) module instance.
-	sndDefault::_pSelf = new sndDefault(pszShLibName, hShLibHandle);
+	SndDefault::_pSelf = new SndDefault(pszShLibName, hShLibHandle);
 
 	// Register it to the GfModule module manager if OK.
-	if (sndDefault::_pSelf)
-		GfModule::register_(sndDefault::_pSelf);
+	if (SndDefault::_pSelf)
+		GfModule::register_(SndDefault::_pSelf);
 
 	// Report about success or error.
-	return sndDefault::_pSelf ? 0 : 1;
+	return SndDefault::_pSelf ? 0 : 1;
 }
 
 int closeGfModule()
 {
 	// Unregister it from the GfModule module manager.
-	if (sndDefault::_pSelf)
-		GfModule::unregister(sndDefault::_pSelf);
+	if (SndDefault::_pSelf)
+		GfModule::unregister(SndDefault::_pSelf);
 	
 	// Delete the (only) module instance.
-	delete sndDefault::_pSelf;
-	sndDefault::_pSelf = 0;
+	delete SndDefault::_pSelf;
+	SndDefault::_pSelf = 0;
 
 	// Report about success or error.
 	return 0;
 }
 
-sndDefault& sndDefault::self()
+SndDefault& SndDefault::self()
 {
 	// Pre-condition : 1 successfull openGfModule call.
 	return *_pSelf;
 }
 
-sndDefault::sndDefault(const std::string& strShLibName, void* hShLibHandle)
+SndDefault::SndDefault(const std::string& strShLibName, void* hShLibHandle)
 : GfModule(strShLibName, hShLibHandle)
 {
 }
 
-sndDefault::~sndDefault()
+SndDefault::~SndDefault()
 {
 	// Terminate the PLib SSG layer.
 	//delete _pDefaultSSGLoaderOptions;
@@ -69,17 +69,17 @@ sndDefault::~sndDefault()
 
 // Implementation of ISoundEngine ****************************************
 
-void sndDefault::init(Situation* s){
+void SndDefault::init(Situation* s){
     grInitSound(s,s->_ncars);
 }
-void sndDefault::shutdown(){
+void SndDefault::shutdown(){
     grShutdownSound();
 }
-void sndDefault::refresh(Situation *s, SoundCam	*camera){
+void SndDefault::refresh(Situation *s, Camera	*camera){
     grRefreshSound(s, camera);
 }
 
-void sndDefault::mute(bool bOn)
+void SndDefault::mute(bool bOn)
 {
 	::grMuteSound(bOn);
 }

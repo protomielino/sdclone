@@ -36,7 +36,6 @@
 //#include "grskidmarks.h"
 //#include "grsmoke.h"
 //#include "grscreen.h"
-//#include "grsound.h"
 //#include "grloadac.h"
 //#include "grutil.h"
 //#include "grcarlight.h"
@@ -622,10 +621,6 @@ refresh(tSituation *s)
 
     TRACE_GL("refresh: start");
 
-    GfProfStartProfile("grRefreshSound*");
-    grRefreshSound(s, grGetCurrentScreen()->getCurCamera());
-    GfProfStopProfile("grRefreshSound*");
-
 	// Moved car collision damage propagation from grcar::grDrawCar.
 	// Because it has to be done only once per graphics update, whereas grDrawCar
 	// is called once for each car and for each screen.
@@ -758,7 +753,6 @@ initCars(tSituation *s)
 
 	// Initialize other stuff.
     /*grInitSmoke(s->_ncars);
-    grInitSound(s, s->_ncars);
     grTrackLightInit();
 
 	// Setup the screens (= OpenGL viewports) inside the physical game window.
@@ -773,7 +767,6 @@ shutdownCars(void)
 /*	int i;
 
 	GfOut("-- shutdownCars\n");
-	grShutdownSound(grNbCars);
 	if (grNbCars) {
 		grShutdownBoardCar();
 		grShutdownSkidmarks();

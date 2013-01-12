@@ -20,7 +20,6 @@
 #include "osggraph.h"
 
 #include "OsgMain.h"
-//#include "grsound.h"
 //#include "grtexture.h"
 
 
@@ -129,10 +128,9 @@ void OsgGraph::shutdownView()
 	//::shutdownView();
 }
 
-// Implementation of ISoundEngine ****************************************
-SoundCam * OsgGraph::getCurCam() 
+Camera* OsgGraph::getCurCam() 
 {
-    /*SoundCam *cam = new SoundCam;
+    Camera *cam = 0; /*new Camera;
     osgCamera *gcam = osgGetCurCamera();
 
     cam->Centerv = gcam->getCenterv();
@@ -140,5 +138,5 @@ SoundCam * OsgGraph::getCurCam()
     cam->Speedv = gcam->getSpeedv();
     cam->Posv = gcam->getPosv();*/
   
-    return 0; //return cam;
+    return cam;
 }

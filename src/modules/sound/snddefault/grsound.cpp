@@ -19,10 +19,11 @@
 
 #include "grsound.h"
 
+#include <sound.h>
+
 #include "OpenalSoundInterface.h"
 #include "PlibSoundInterface.h"
 #include "CarSoundData.h"
-#include <graphic.h>
 
 static int soundInitialized = 0;
 
@@ -33,9 +34,9 @@ enum SoundMode {DISABLED, OPENAL_MODE, PLIB_MODE};
 
 static enum SoundMode sound_mode = OPENAL_MODE;
 
-static const char *soundDisabledStr = GR_ATT_SOUND_STATE_DISABLED;
-static const char *soundOpenALStr = GR_ATT_SOUND_STATE_OPENAL;
-static const char *soundPlibStr = GR_ATT_SOUND_STATE_PLIB;
+static const char *soundDisabledStr = SND_ATT_SOUND_STATE_DISABLED;
+static const char *soundOpenALStr = SND_ATT_SOUND_STATE_OPENAL;
+static const char *soundPlibStr = SND_ATT_SOUND_STATE_PLIB;
 
 void grInitSound(tSituation* s, int ncars)
 {
@@ -43,10 +44,10 @@ void grInitSound(tSituation* s, int ncars)
 
 	// Check if we want sound (sound.xml).
 	char fnbuf[1024];
-	sprintf(fnbuf, "%s%s", GfLocalDir(), GR_SOUND_PARM_CFG);
+	sprintf(fnbuf, "%s%s", GfLocalDir(), SND_PARAM_FILE);
 	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-	const char *optionName = GfParmGetStr(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_STATE, soundOpenALStr);
-	float global_volume = GfParmGetNum(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_VOLUME, "%", 100.0f);
+	const char *optionName = GfParmGetStr(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_STATE, soundOpenALStr);
+	float global_volume = GfParmGetNum(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_VOLUME, "%", 100.0f);
 	if (!strcmp(optionName, soundDisabledStr)) {
 		sound_mode = DISABLED;
 	} else if (!strcmp(optionName, soundOpenALStr)) {
@@ -178,7 +179,7 @@ grShutdownSound()
 
 
 void
-grRefreshSound(tSituation *s, SoundCam	*camera)
+grRefreshSound(tSituation *s, Camera* camera)
 {
 	if (sound_mode == DISABLED) {
 		return;
@@ -210,7 +211,6 @@ grRefreshSound(tSituation *s, SoundCam	*camera)
 
 		sound_interface->update (car_sound_data, s->_ncars, 
 					 *p_camera, *u_camera, c_camera, *a_camera);
-		free(camera); //ssggraph use the variables pointed by camera, we do not want do free them.
 	}
 
 }

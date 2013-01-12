@@ -28,7 +28,8 @@
 // The SsgGraph: singleton.
 SsgGraph* SsgGraph::_pSelf = 0;
 
-int openGfModule(const char* pszShLibName, void* hShLibHandle) {
+int openGfModule(const char* pszShLibName, void* hShLibHandle)
+{
     // Instanciate the (only) module instance.
     SsgGraph::_pSelf = new SsgGraph(pszShLibName, hShLibHandle);
 
@@ -40,7 +41,8 @@ int openGfModule(const char* pszShLibName, void* hShLibHandle) {
     return SsgGraph::_pSelf ? 0 : 1;
 }
 
-int closeGfModule() {
+int closeGfModule()
+{
     // Unregister it from the GfModule module manager.
     if (SsgGraph::_pSelf)
         GfModule::unregister(SsgGraph::_pSelf);
@@ -53,13 +55,15 @@ int closeGfModule() {
     return 0;
 }
 
-SsgGraph& SsgGraph::self() {
+SsgGraph& SsgGraph::self()
+{
     // Pre-condition : 1 successfull openGfModule call.
     return *_pSelf;
 }
 
 SsgGraph::SsgGraph(const std::string& strShLibName, void* hShLibHandle)
-: GfModule(strShLibName, hShLibHandle) {
+: GfModule(strShLibName, hShLibHandle)
+{
     // Override the default SSG loader options object with our's
     // (workaround try for ssggraph crash at re-load time).
     _pDefaultSSGLoaderOptions = new ssgLoaderOptions;
@@ -72,29 +76,34 @@ SsgGraph::SsgGraph(const std::string& strShLibName, void* hShLibHandle)
     grRegisterCustomSGILoader();
 }
 
-SsgGraph::~SsgGraph() {
+SsgGraph::~SsgGraph()
+{
     // Terminate the PLib SSG layer.
     delete _pDefaultSSGLoaderOptions;
 }
 
 // Implementation of IGraphicsEngine ****************************************
 
-bool SsgGraph::loadTrack(tTrack* pTrack) {
+bool SsgGraph::loadTrack(tTrack* pTrack)
+{
     //GfLogDebug("SsgGraph::loadTrack\n");
     return ::initTrack(pTrack) == 0;
 }
 
-bool SsgGraph::loadCars(tSituation* pSituation) {
+bool SsgGraph::loadCars(tSituation* pSituation)
+{
     //GfLogDebug("SsgGraph::loadCars\n");
     return ::initCars(pSituation) == 0;
 }
 
-bool SsgGraph::setupView(int x, int y, int width, int height, void* pMenuScreen) {
+bool SsgGraph::setupView(int x, int y, int width, int height, void* pMenuScreen)
+{
     //GfLogDebug("SsgGraph::setupView\n");
     return ::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
 }
 
-void SsgGraph::redrawView(tSituation* pSituation) {
+void SsgGraph::redrawView(tSituation* pSituation)
+{
     ::refresh(pSituation);
 }
 
@@ -103,32 +112,34 @@ void SsgGraph::redrawView(tSituation* pSituation) {
 // 	::bendCar(index, poc, force, count);
 // }
 
-void SsgGraph::unloadCars() {
+void SsgGraph::unloadCars()
+{
     //GfLogDebug("SsgGraph::unloadCars\n");
     ::shutdownCars();
 }
 
-void SsgGraph::unloadTrack() {
+void SsgGraph::unloadTrack()
+{
     //GfLogDebug("SsgGraph::unloadTrack\n");
     ::shutdownTrack();
 }
 
-void SsgGraph::shutdownView() {
+void SsgGraph::shutdownView()
+{
     //GfLogDebug("SsgGraph::shutdownView\n");
     ::shutdownView();
 }
 
 
-SoundCam * SsgGraph::getCurCam() {
-    SoundCam *cam = new SoundCam;
+Camera* SsgGraph::getCurCam()
+{
+    Camera *cam = new Camera;
     cGrCamera *gcam = grGetCurCamera();
 
     cam->Centerv = gcam->getCenterv();
     cam->Upv = gcam->getUpv();
     cam->Speedv = gcam->getSpeedv();
     cam->Posv = gcam->getPosv();
-
   
     return cam;
-
 }

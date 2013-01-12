@@ -20,15 +20,7 @@
  #define __ISOUNDENGINE__H__
 
 
-typedef float sndVec3[3];
-
-struct SoundCam
-{
-    sndVec3 * Posv;
-    sndVec3 * Speedv;
-    sndVec3 * Centerv;
-    sndVec3 * Upv;
-};
+#include "camera.h"
 
 class ISoundEngine 
 {
@@ -36,8 +28,8 @@ public:
  
     virtual void init(struct Situation* s) = 0;
     virtual void shutdown() = 0;
-    virtual void refresh(struct Situation *s, SoundCam *camera) = 0;
-	virtual void mute(bool bOn = true) = 0;
+    virtual void refresh(struct Situation *s, Camera *camera) = 0;
+    virtual void mute(bool bOn = true) = 0;
 };
  
  #endif // __ISOUNDENGINE__H__

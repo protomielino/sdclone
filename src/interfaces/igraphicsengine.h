@@ -21,10 +21,10 @@
     @version	$Id$
 */
 
-#include "isoundengine.h"
-
 #ifndef __IGRAPHICSENGINE__H__
 #define __IGRAPHICSENGINE__H__
+
+#include "camera.h"
 
 class IGraphicsEngine
 {
@@ -37,7 +37,9 @@ public:
 	virtual void shutdownView() = 0;
 	virtual void unloadCars() = 0;
 	virtual void unloadTrack() = 0;
-        virtual SoundCam *getCurCam() = 0;
+
+	// Return the current (end-user) camera, as a new instance (caller must delete after use).
+	virtual Camera *getCurCam() = 0;
 
 	//virtual void bendCar(int index, sgVec3 poc, sgVec3 force, int count = 0) = 0;
 };

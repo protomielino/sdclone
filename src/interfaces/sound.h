@@ -1,10 +1,9 @@
-// -*- Mode: c++ -*-
 /***************************************************************************
 
-    file                 : grsound.h
-    created              : Thu Aug 17 23:57:35 CEST 2000
-    copyright            : (C) 2000-2004 by Eric Espie, Christos Dimitrakakis
-    email                : torcs@free.fr
+    file                 : sound.h
+    created              : Sun Jan 13 10:58:45 CET 2013
+    copyright            : (C) 2013 by Jean-Philippe
+    web                  : www.speed-dreams.org
     version              : $Id$
 
  ***************************************************************************/
@@ -17,16 +16,28 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+ 
+ 
+#ifndef _SOUND_H_
+#define _SOUND_H_
 
-#ifndef _GRSOUND_H_
-#define _GRSOUND_H_
+#define SND_PARAM_FILE                "config/sound.xml"
 
-#include <isoundengine.h>
-#include <raceman.h>	//tSituation
+#define SND_SCT_SOUND                 "Sound Settings"
 
-extern void grInitSound(tSituation* s, int ncars);
-extern void grShutdownSound();
-extern void grRefreshSound(tSituation *s, Camera *camera);
-extern void grMuteSound(bool bOn = true);
+#define SND_ATT_SOUND_STATE           "state"
+#define SND_ATT_SOUND_STATE_PLIB      "plib"
+#define SND_ATT_SOUND_STATE_OPENAL	  "openal"
+#define SND_ATT_SOUND_STATE_DISABLED  "disabled"
+#define SND_ATT_SOUND_VOLUME          "volume"
 
-#endif /* _GRSOUND_H_ */ 
+#define MM_SCT_SOUND                    "Menu Music"
+
+#define MM_ATT_SOUND_ENABLE             "enable"
+#define MM_VAL_SOUND_ENABLED            "enabled"
+#define MM_VAL_SOUND_DISABLED           "disabled"
+
+#endif /* _SOUND_H_ */ 
+
+
+

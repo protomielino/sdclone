@@ -62,7 +62,7 @@ class SSGGRAPH_API SsgGraph : public GfModule, public IGraphicsEngine
 	virtual void shutdownView();
 	virtual void unloadCars();
 	virtual void unloadTrack();
-    virtual SoundCam *getCurCam();
+	virtual Camera* getCurCam();
 
 
 

@@ -27,16 +27,15 @@
 #include <cstring>
 
 #include <tgfclient.h>
-#include <graphic.h>
+#include <sound.h>
 
 #include "soundconfig.h"
-#include "gui.h"
 
 
 // list of options.
-static const char *soundOptionList[] = {GR_ATT_SOUND_STATE_OPENAL,
-								  GR_ATT_SOUND_STATE_PLIB,
-								  GR_ATT_SOUND_STATE_DISABLED};
+static const char *soundOptionList[] = {SND_ATT_SOUND_STATE_OPENAL,
+								  SND_ATT_SOUND_STATE_PLIB,
+								  SND_ATT_SOUND_STATE_DISABLED};
 static const int nbOptions = sizeof(soundOptionList) / sizeof(soundOptionList[0]);
 static int curOption = 0;
 
@@ -60,9 +59,9 @@ static void readSoundCfg(void)
 	char buf[1024];
 
 	// Sound interface.
-	sprintf(buf, "%s%s", GfLocalDir(), GR_SOUND_PARM_CFG);
+	sprintf(buf, "%s%s", GfLocalDir(), SND_PARAM_FILE);
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-	optionName = GfParmGetStr(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_STATE, soundOptionList[0]);
+	optionName = GfParmGetStr(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_STATE, soundOptionList[0]);
 
 	for (i = 0; i < nbOptions; i++) {
 		if (strcmp(optionName, soundOptionList[i]) == 0) {
@@ -74,7 +73,7 @@ static void readSoundCfg(void)
 	GfuiLabelSetText(scrHandle, SoundOptionId, soundOptionList[curOption]);
 
 	// Sound volume.
-	VolumeValue = GfParmGetNum(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_VOLUME, "%", 100.0f);
+	VolumeValue = GfParmGetNum(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_VOLUME, "%", 100.0f);
 	if (VolumeValue>100.0f) {
 		VolumeValue = 100.0f;
 	} 
@@ -96,16 +95,15 @@ static void saveSoundOption(void *)
 	GfuiUnSelectCurrent();
 
 	char buf[1024];
-	sprintf(buf, "%s%s", GfLocalDir(), GR_SOUND_PARM_CFG);
+	sprintf(buf, "%s%s", GfLocalDir(), SND_PARAM_FILE);
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-	GfParmSetStr(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_STATE, soundOptionList[curOption]);
-	GfParmSetNum(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_VOLUME, "%", VolumeValue);
+	GfParmSetStr(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_STATE, soundOptionList[curOption]);
+	GfParmSetNum(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_VOLUME, "%", VolumeValue);
 	GfParmWriteFile(NULL, paramHandle, "sound");
 	GfParmReleaseHandle(paramHandle);
 
 	// Return to previous screen.
 	GfuiScreenActivate(prevHandle);
-	return;
 }
 
 
@@ -114,7 +112,7 @@ static void changeSoundState(void *vp)
 {
 	curOption = (curOption + (int)(long)vp + nbOptions) % nbOptions;
 
-    GfuiLabelSetText(scrHandle, SoundOptionId, soundOptionList[curOption]);
+	GfuiLabelSetText(scrHandle, SoundOptionId, soundOptionList[curOption]);
 }
 
 // Volume

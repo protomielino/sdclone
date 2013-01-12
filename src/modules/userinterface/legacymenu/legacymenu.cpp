@@ -44,7 +44,8 @@
 // The LegacyMenu singleton.
 LegacyMenu* LegacyMenu::_pSelf = 0;
 
-int openGfModule(const char* pszShLibName, void* hShLibHandle) {
+int openGfModule(const char* pszShLibName, void* hShLibHandle)
+{
     // Instanciate the (only) module instance.
     LegacyMenu::_pSelf = new LegacyMenu(pszShLibName, hShLibHandle);
 
@@ -56,7 +57,8 @@ int openGfModule(const char* pszShLibName, void* hShLibHandle) {
     return LegacyMenu::_pSelf ? 0 : 1;
 }
 
-int closeGfModule() {
+int closeGfModule()
+{
     // Unregister it from the GfModule module manager.
     if (LegacyMenu::_pSelf)
         GfModule::unregister(LegacyMenu::_pSelf);
@@ -69,7 +71,8 @@ int closeGfModule() {
     return 0;
 }
 
-LegacyMenu& LegacyMenu::self() {
+LegacyMenu& LegacyMenu::self()
+{
     // Pre-condition : 1 successfull openGfModule call.
     return *_pSelf;
 }
@@ -79,7 +82,8 @@ LegacyMenu::LegacyMenu(const std::string& strShLibName, void* hShLibHandle)
 _hscrReUpdateStateHook(0), _hscrGame(0), _bfGraphicsState(0) {
 }
 
-bool LegacyMenu::backLoad() {
+bool LegacyMenu::backLoad()
+{
     GfLogTrace("Pre-loading menu and game data ...\n");
 
     // Pre-load the main and race select menus
@@ -96,11 +100,13 @@ bool LegacyMenu::backLoad() {
     return true;
 }
 
-bool LegacyMenu::activateMainMenu() {
+bool LegacyMenu::activateMainMenu()
+{
     return MainMenuRun() == 0;
 }
 
-bool LegacyMenu::startRace() {
+bool LegacyMenu::startRace()
+{
     // Get the race to start.
     std::string strRaceToStart;
     if (!GfApp().hasOption("startrace", strRaceToStart))
@@ -132,7 +138,8 @@ bool LegacyMenu::startRace() {
 
 // Implementation of IUserInterface ****************************************
 
-bool LegacyMenu::activate() {
+bool LegacyMenu::activate()
+{
     bool (*fnSplashBackWork)(void) = LegacyMenu::backLoad;
     bool (*fnOnSplashClosed)(void) = 0;
     bool bInteractive = true;
@@ -155,12 +162,14 @@ bool LegacyMenu::activate() {
     return SplashScreen(fnSplashBackWork, fnOnSplashClosed, bInteractive);
 }
 
-void LegacyMenu::quit() {
+void LegacyMenu::quit()
+{
     // Quit the event loop next time.
     GfuiApp().eventLoop().postQuit();
 }
 
-void LegacyMenu::shutdown() {
+void LegacyMenu::shutdown()
+{
     // Shutdown graphics in case relevant and not already done.
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL) {
         shutdownSound();
@@ -176,7 +185,8 @@ void LegacyMenu::shutdown() {
     ::RmShutdownReUpdateStateHook();
 }
 
-void LegacyMenu::activateLoadingScreen() {
+void LegacyMenu::activateLoadingScreen()
+{
     tRmInfo* pReInfo = _piRaceEngine->inData();
 
     char pszTitle[128];
@@ -189,23 +199,28 @@ void LegacyMenu::activateLoadingScreen() {
     ::RmLoadingScreenStart(pszTitle, "data/img/splash-raceload.jpg");
 }
 
-void LegacyMenu::addLoadingMessage(const char* pszText) {
+void LegacyMenu::addLoadingMessage(const char* pszText)
+{
     ::RmLoadingScreenSetText(pszText);
 }
 
-void LegacyMenu::shutdownLoadingScreen() {
+void LegacyMenu::shutdownLoadingScreen()
+{
     ::RmLoadingScreenShutdown();
 }
 
-void LegacyMenu::onRaceConfiguring() {
+void LegacyMenu::onRaceConfiguring()
+{
     ::RmRacemanMenu();
 }
 
-void LegacyMenu::onRaceEventInitializing() {
+void LegacyMenu::onRaceEventInitializing()
+{
     activateLoadingScreen();
 }
 
-bool LegacyMenu::onRaceEventStarting(bool careerNonHumanGroup) {
+bool LegacyMenu::onRaceEventStarting(bool careerNonHumanGroup)
+{
     tRmInfo* pReInfo = _piRaceEngine->inData();
     if (GfParmGetEltNb(pReInfo->params, RM_SECT_TRACKS) > 1) {
         if (!careerNonHumanGroup) {
@@ -223,7 +238,8 @@ bool LegacyMenu::onRaceEventStarting(bool careerNonHumanGroup) {
     return true; // Tell the race engine state automaton to go on looping.
 }
 
-void LegacyMenu::onRaceInitializing() {
+void LegacyMenu::onRaceInitializing()
+{
     // Activate the loading screen at the start of sessions,
     // that is at race session and timed practice or qualifying sessions,
     // and for the first car in non-timed practice or qualifying sessions.
@@ -240,7 +256,8 @@ void LegacyMenu::onRaceInitializing() {
     }
 }
 
-bool LegacyMenu::onRaceStarting() {
+bool LegacyMenu::onRaceStarting()
+{
     // Switch to Start Race menu only if required (no loading screen in this case).
     tRmInfo* pReInfo = _piRaceEngine->inData();
     const bool bNeedStartMenu =
@@ -258,7 +275,8 @@ bool LegacyMenu::onRaceStarting() {
     return bNeedStartMenu ? false : true;
 }
 
-void LegacyMenu::onRaceLoadingDrivers() {
+void LegacyMenu::onRaceLoadingDrivers()
+{
     // Create the game screen according to the actual display mode.
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL)
         _hscrGame = ::RmScreenInit();
@@ -274,7 +292,8 @@ void LegacyMenu::onRaceLoadingDrivers() {
     }
 }
 
-void LegacyMenu::onRaceDriversLoaded() {
+void LegacyMenu::onRaceDriversLoaded()
+{
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL) {
         // It must be done after the cars are loaded and the track is loaded.
         // The track will be unloaded if the event ends.
@@ -293,7 +312,8 @@ void LegacyMenu::onRaceDriversLoaded() {
     }
 }
 
-void LegacyMenu::onRaceSimulationReady() {
+void LegacyMenu::onRaceSimulationReady()
+{
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL) {
         // Initialize the graphics view.
         setupGraphicsView();
@@ -308,7 +328,8 @@ void LegacyMenu::onRaceSimulationReady() {
     }
 }
 
-void LegacyMenu::onRaceStarted() {
+void LegacyMenu::onRaceStarted()
+{
     // Shutdown the loading screen if not already done.
     shutdownLoadingScreen();
 
@@ -316,12 +337,15 @@ void LegacyMenu::onRaceStarted() {
     GfuiScreenActivate(_hscrGame);
 }
 
-void LegacyMenu::onRaceResuming() {
+void LegacyMenu::onRaceResuming()
+{
     // Start the standings menu.
     showStandings();
 }
 
-void LegacyMenu::onLapCompleted(int nLapIndex) {
+void LegacyMenu::onLapCompleted(int nLapIndex)
+{
+
     if (nLapIndex <= 0)
         return;
 
@@ -332,7 +356,8 @@ void LegacyMenu::onRaceInterrupted() {
     ::RmStopRaceMenu();
 }
 
-void LegacyMenu::onRaceFinishing() {
+void LegacyMenu::onRaceFinishing()
+{
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL) {
  	shutdownSound();
         resumeMenuMusic(1);
@@ -345,7 +370,8 @@ void LegacyMenu::onRaceFinishing() {
     }
 }
 
-bool LegacyMenu::onRaceFinished(bool bEndOfSession) {
+bool LegacyMenu::onRaceFinished(bool bEndOfSession)
+{
     tRmInfo* pReInfo = _piRaceEngine->inData();
 
     // Display the results of the session for all the competitors
@@ -373,7 +399,8 @@ bool LegacyMenu::onRaceFinished(bool bEndOfSession) {
     return true;
 }
 
-void LegacyMenu::onRaceEventFinishing() {
+void LegacyMenu::onRaceEventFinishing()
+{
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL) {
         unloadTrackGraphics();
 
@@ -381,7 +408,8 @@ void LegacyMenu::onRaceEventFinishing() {
     }
 }
 
-void LegacyMenu::showStandings() {
+void LegacyMenu::showStandings()
+{
     // Create the "Race Engine update state" hook if not already done.
     if (!_hscrReUpdateStateHook)
         _hscrReUpdateStateHook = ::RmInitReUpdateStateHook();
@@ -393,7 +421,8 @@ void LegacyMenu::showStandings() {
     ::RmShowStandings(_hscrGame, _piRaceEngine->inData(), 0);
 }
 
-bool LegacyMenu::onRaceEventFinished(bool bMultiEvent, bool careerNonHumanGroup) {
+bool LegacyMenu::onRaceEventFinished(bool bMultiEvent, bool careerNonHumanGroup)
+{
     // Only display the standings if both:
     // * there are multiple races for this championship
     // * the results are relevant for the user (do not display in Career mode in non-human groups)
@@ -412,41 +441,50 @@ bool LegacyMenu::onRaceEventFinished(bool bMultiEvent, bool careerNonHumanGroup)
     return true;
 }
 
-void LegacyMenu::setResultsTableTitles(const char* pszTitle, const char* pszSubTitle) {
+void LegacyMenu::setResultsTableTitles(const char* pszTitle, const char* pszSubTitle)
+{
     ::RmResScreenSetTitles(pszTitle, pszSubTitle);
 }
 
-void LegacyMenu::setResultsTableHeader(const char* pszHeader) {
+void LegacyMenu::setResultsTableHeader(const char* pszHeader)
+{
     ::RmResScreenSetHeader(pszHeader);
 }
 
-void LegacyMenu::addResultsTableRow(const char* pszText) {
+void LegacyMenu::addResultsTableRow(const char* pszText)
+{
     ::RmResScreenAddText(pszText);
 }
 
-void LegacyMenu::setResultsTableRow(int nIndex, const char* pszText, bool bHighlight) {
+void LegacyMenu::setResultsTableRow(int nIndex, const char* pszText, bool bHighlight)
+{
     ::RmResScreenSetText(pszText, nIndex, bHighlight ? 1 : 0);
 }
 
-void LegacyMenu::removeResultsTableRow(int nIndex) {
+void LegacyMenu::removeResultsTableRow(int nIndex)
+{
     ::RmResScreenRemoveText(nIndex);
 }
 
-int LegacyMenu::getResultsTableRowCount() const {
+int LegacyMenu::getResultsTableRowCount() const
+{
     return ::RmResGetRows();
 }
 
-void LegacyMenu::eraseResultsTable() {
+void LegacyMenu::eraseResultsTable()
+{
     ::RmResEraseScreen();
 }
 
-void LegacyMenu::activateGameScreen() {
+void LegacyMenu::activateGameScreen()
+{
     GfuiScreenActivate(_hscrGame);
 }
 
 // Graphics&Sound engine control =====================================================
 
-bool LegacyMenu::initializeGraphics() {
+bool LegacyMenu::initializeGraphics()
+{
     // Check if the module is already loaded, and do nothing more if so.
     if (_piGraphicsEngine)
         return true;
@@ -471,7 +509,8 @@ bool LegacyMenu::initializeGraphics() {
     return _piGraphicsEngine  != 0;
 }
 
-bool LegacyMenu::initializeSound(){
+bool LegacyMenu::initializeSound()
+{
 	 // Check if the module is already loaded, and do nothing more if so.
     if (_piSoundEngine)
         return true;
@@ -494,7 +533,8 @@ bool LegacyMenu::initializeSound(){
     return _piSoundEngine != 0;
 }
 
-bool LegacyMenu::loadTrackGraphics(struct Track* pTrack) {
+bool LegacyMenu::loadTrackGraphics(struct Track* pTrack)
+{
     if (!_piGraphicsEngine)
         return false;
 
@@ -503,7 +543,8 @@ bool LegacyMenu::loadTrackGraphics(struct Track* pTrack) {
     return _piGraphicsEngine->loadTrack(pTrack);
 }
 
-bool LegacyMenu::loadCarsGraphics(struct Situation* pSituation) {
+bool LegacyMenu::loadCarsGraphics(struct Situation* pSituation)
+{
     if (!_piGraphicsEngine)
         return false;
 
@@ -514,7 +555,8 @@ bool LegacyMenu::loadCarsGraphics(struct Situation* pSituation) {
     return _piGraphicsEngine ? _piGraphicsEngine->loadCars(pSituation) : false;
 }
 
-bool LegacyMenu::setupGraphicsView() {
+bool LegacyMenu::setupGraphicsView()
+{
     // Initialize the graphics view.
     if (!_piGraphicsEngine)
         return false;
@@ -529,45 +571,57 @@ bool LegacyMenu::setupGraphicsView() {
     return _piGraphicsEngine->setupView((sw - vw) / 2, (sh - vh) / 2, vw, vh, _hscrGame);
 }
 
-void LegacyMenu::redrawGraphicsView(struct Situation* pSituation) {
+void LegacyMenu::redrawGraphicsView(struct Situation* pSituation)
+{
     if (!_piGraphicsEngine)
         return;
 
+    // Update graphics view.
     _piGraphicsEngine->redrawView(pSituation);
-    _piSoundEngine->refresh(pSituation,_piGraphicsEngine->getCurCam());
-    
+
+    // Update sound "view".
+    Camera* pCam = _piGraphicsEngine->getCurCam();
+    _piSoundEngine->refresh(pSituation, pCam);
+    delete pCam;
 }
 
-void LegacyMenu::shutdownSound() {
+void LegacyMenu::shutdownSound()
+{
     if (!_piSoundEngine)
         return;
 
-    if (_bfGraphicsState & eCarsLoaded) {
+    if (_bfGraphicsState & eCarsLoaded)
+    {
         _piSoundEngine->shutdown();
     }
 }
 
-void LegacyMenu::unloadCarsGraphics() {
+void LegacyMenu::unloadCarsGraphics()
+{
     if (!_piGraphicsEngine)
         return;
 
-    if (_bfGraphicsState & eCarsLoaded) {
+    if (_bfGraphicsState & eCarsLoaded)
+    {
         _piGraphicsEngine->unloadCars();
         _bfGraphicsState &= ~eCarsLoaded;
     }
 }
 
-void LegacyMenu::unloadTrackGraphics() {
+void LegacyMenu::unloadTrackGraphics()
+{
     if (!_piGraphicsEngine)
         return;
 
-    if (_bfGraphicsState & eTrackLoaded) {
+    if (_bfGraphicsState & eTrackLoaded)
+    {
         _piGraphicsEngine->unloadTrack();
         _bfGraphicsState &= ~eTrackLoaded;
     }
 }
 
-void LegacyMenu::shutdownGraphicsView() {
+void LegacyMenu::shutdownGraphicsView()
+{
     if (!_piGraphicsEngine)
         return;
 
@@ -577,7 +631,8 @@ void LegacyMenu::shutdownGraphicsView() {
     }
 }
 
-void LegacyMenu::shutdownGraphics(bool bUnloadModule) {
+void LegacyMenu::shutdownGraphics(bool bUnloadModule)
+{
     // Do nothing if the module has already been unloaded.
     if (!_piGraphicsEngine)
         return;
@@ -602,24 +657,28 @@ void LegacyMenu::shutdownGraphics(bool bUnloadModule) {
 
 //=========================================================================
 
-void LegacyMenu::setRaceEngine(IRaceEngine& raceEngine) {
+void LegacyMenu::setRaceEngine(IRaceEngine& raceEngine)
+{
     _piRaceEngine = &raceEngine;
 }
 
 // Accessor to the race engine.
 
-IRaceEngine& LegacyMenu::raceEngine() {
+IRaceEngine& LegacyMenu::raceEngine()
+{
     return *_piRaceEngine;
 }
 
 // Accessor to the graphics engine.
 
-IGraphicsEngine* LegacyMenu::graphicsEngine() {
+IGraphicsEngine* LegacyMenu::graphicsEngine()
+{
     return _piGraphicsEngine;
 }
 
 // Accessor to the sound engine.
 
-ISoundEngine* LegacyMenu::soundEngine() {
+ISoundEngine* LegacyMenu::soundEngine()
+{
     return _piSoundEngine;
 }

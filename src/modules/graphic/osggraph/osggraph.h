@@ -25,7 +25,6 @@
 #define _OSGGRAPH_H_
 
 #include <igraphicsengine.h>
-#include <isoundengine.h>
 
 #include <tgf.hpp>
 
@@ -49,7 +48,7 @@ extern "C" int OSGGRAPH_API openGfModule(const char* pszShLibName, void* hShLibH
 extern "C" int OSGGRAPH_API closeGfModule();
 
 // The module main class
-// (Singleton, inherits GfModule, and implements IGraphicsEngine and ISoundEngine).
+// (Singleton, inherits GfModule, and implements IGraphicsEngine).
 class OSGGRAPH_API OsgGraph : public GfModule, public IGraphicsEngine
 {
  public:
@@ -63,7 +62,7 @@ class OSGGRAPH_API OsgGraph : public GfModule, public IGraphicsEngine
 	virtual void shutdownView();
 	virtual void unloadCars();
 	virtual void unloadTrack();
-	virtual SoundCam *getCurCam();
+	virtual Camera *getCurCam();
 
 	// Accessor to the singleton.
 	static OsgGraph& self();

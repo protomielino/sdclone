@@ -19,10 +19,10 @@
 
 #include "musicplayer.h"
 
-//#include <GL/glut.h>
-#include <string.h>
+#include <cstring>
 #include <tgf.h>
 #include "tgfclient.h"
+#include <sound.h>
 #include <portability.h>
 
 #if MENU_MUSIC
@@ -41,7 +41,7 @@ static void playMenuMusic(int /* value */);
 #if 0
 	const int BUFSIZE = 1024;
 	char buf[BUFSIZE];
-	snprintf(buf, BUFSIZE, "%s%s", GetLocalDir(), MM_SOUND_PARM_CFG);
+	snprintf(buf, BUFSIZE, "%s%s", GetLocalDir(), SND_PARAM_FILE);
 	bool enabled = false;
 	
 	void *handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);

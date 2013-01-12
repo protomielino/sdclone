@@ -1,14 +1,10 @@
-#ifndef __musicplayer_h__
-#define __musicplayer_h__
-
 /***************************************************************************
+                 camera.h -- A generic camera
 
-    file                 : musicplayer.h
-    created              : Fri Dec 23 17:35:18 CET 2011
-    copyright            : (C) 2011 Bernhard Wymann
-    email                : berniw@bluewin.ch
+    created              : Sun Jan 6 19:48:14 CEST 2013
+    copyright            : (C) 2013 by Gaëtan André
+    web                  : http://www.speed-dreams.org
     version              : $Id$
-
  ***************************************************************************/
 
 /***************************************************************************
@@ -20,20 +16,18 @@
  *                                                                         *
  ***************************************************************************/
 
-// DLL exported symbols declarator for Windows.
-#ifdef WIN32
-# ifdef TGFCLIENT_DLL
-#  define TGFCLIENT_API __declspec(dllexport)
-# else
-#  define TGFCLIENT_API __declspec(dllimport)
-# endif
-#else
-# define TGFCLIENT_API
-#endif
+#ifndef __CAMERA__H__
+#define __CAMERA__H__
 
-TGFCLIENT_API void startMenuMusic();
-TGFCLIENT_API void stopMenuMusic();
-TGFCLIENT_API void pauseMenuMusic();
-TGFCLIENT_API void resumeMenuMusic(int sourceId);
+typedef float sndVec3[3];
 
-#endif //__musicplayer_h__
+struct Camera
+{
+    sndVec3 * Posv;
+    sndVec3 * Speedv;
+    sndVec3 * Centerv;
+    sndVec3 * Upv;
+};
+
+ 
+#endif // __CAMERA__H__
