@@ -28,11 +28,11 @@
 
 #include "OsgMain.h"
 #include "OsgScenery.h"
-
 #include "OsgLoader.h"
 
 #include <glfeatures.h>	//gluXXX
 #include <robottools.h>	//RtXXX()
+#include <portability.h>
 
 SDScenery::SDScenery(void)
 {

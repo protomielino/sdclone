@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "osggraph.h"
+#include "OsgGraph.h"
 
 #include "OsgMain.h"
 //#include "grtexture.h"
@@ -83,20 +83,20 @@ OsgGraph::~OsgGraph()
 // Implementation of IGraphicsEngine ****************************************
 bool OsgGraph::loadTrack(tTrack* pTrack)
 {
-	//GfLogDebug("SsgGraph::loadTrack\n");
+	GfLogDebug("OsgGraph::loadTrack\n");
 	return ::initTrack(pTrack) == 0;
 }
 
 bool OsgGraph::loadCars(tSituation* pSituation)
 { 
     initCars(pSituation);
-	//GfLogDebug("SsgGraph::loadCars\n");
-	return true; //return ::initCars(pSituation) == 0;
+	GfLogDebug("OsgGraph::loadCars\n");
+	/*return true;*/ return ::initCars(pSituation) == 0;
 }
 
 bool OsgGraph::setupView(int x, int y, int width, int height, void* pMenuScreen)
 {
-	//GfLogDebug("SsgGraph::setupView\n");
+	GfLogDebug("OsgGraph::setupView\n");
 	return ::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
 }
 

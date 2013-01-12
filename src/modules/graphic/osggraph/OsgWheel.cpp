@@ -1,5 +1,6 @@
-#include "OsgLoader.h"
+#include <portability.h>
 
+#include "OsgLoader.h"
 #include "OsgWheel.h"
 
 osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)

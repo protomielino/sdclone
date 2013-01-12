@@ -18,6 +18,8 @@
  ***************************************************************************/
 #include <osg/MatrixTransform>
 #include <osg/Switch>
+#include <portability.h>
+
 #include "OsgLoader.h"
 #include "OsgCar.h"
 #include "OsgMath.h"

@@ -1,7 +1,9 @@
 #include<osg/Geometry>
 
+#include <portability.h>
 
 #include "OsgBrake.h"
+#include "OsgMath.h"
 
 
 void SDBrakes::setCar(tCarElt * car){
@@ -30,25 +32,25 @@ int i,j;
         //grCarInfo[m_CarIndex].wheelselectorO[wheel_index] = pWheelSwitch;
 
         int brakeBranch = 32;
-        float brakeAngle = 2.0 * M_PI / (tdble)brakeBranch;
+        float brakeAngle = 2.0 * SD_PI / (tdble)brakeBranch;
         float brakeOffset = 0.1;
 
         switch(wheelIndex)
         {
         case FRNT_RGT:
-            curAngle = -(M_PI / 2.0 + brakeAngle);
+            curAngle = -(SD_PI / 2.0 + brakeAngle);
             b_offset = brakeOffset - car->_tireWidth(wheelIndex) / 2.0;
             break;
         case FRNT_LFT:
-            curAngle = -(M_PI / 2.0 + brakeAngle);
+            curAngle = -(SD_PI / 2.0 + brakeAngle);
             b_offset = car->_tireWidth(wheelIndex) / 2.0 - brakeOffset;
             break;
         case REAR_RGT:
-            curAngle = (M_PI / 2.0 - brakeAngle);
+            curAngle = (SD_PI / 2.0 - brakeAngle);
             b_offset = brakeOffset - car->_tireWidth(wheelIndex) / 2.0;
             break;
         case REAR_LFT:
-            curAngle = (M_PI / 2.0 - brakeAngle);
+            curAngle = (SD_PI / 2.0 - brakeAngle);
             b_offset = car->_tireWidth(wheelIndex) / 2.0 - brakeOffset;
             break;
         }
@@ -68,7 +70,7 @@ int i,j;
         hubRadius = car->_brakeDiskRadius(wheelIndex) * 0.6;
         for (i = 0; i < brakeBranch; i++)
         {
-            alpha = (float)i * 2.0 * M_PI / (float)(brakeBranch - 1);
+            alpha = (float)i * 2.0 * SD_PI / (float)(brakeBranch - 1);
             vtx[0] = hubRadius * cos(alpha);
             vtx[1] = b_offset;
             vtx[2] = hubRadius * sin(alpha);
@@ -115,7 +117,7 @@ int i,j;
 
         for (i = 0; i < (brakeBranch / 2 + 2); i++)
         {
-            alpha = curAngle + (float)i * 2.0 * M_PI / (float)(brakeBranch - 1);
+            alpha = curAngle + (float)i * 2.0 * SD_PI / (float)(brakeBranch - 1);
             vtx[0] = car->_brakeDiskRadius(wheelIndex) * cos(alpha);
             vtx[1] = b_offset;
             vtx[2] = car->_brakeDiskRadius(wheelIndex) * sin(alpha);
@@ -160,7 +162,7 @@ int i,j;
 
         for (i = 0; i < (brakeBranch / 2 - 2); i++)
         {
-            alpha = - curAngle + (float)i * 2.0 * M_PI / (float)(brakeBranch - 1);
+            alpha = - curAngle + (float)i * 2.0 * SD_PI / (float)(brakeBranch - 1);
             vtx[0] = (car->_brakeDiskRadius(wheelIndex) + 0.02) * cos(alpha);
             vtx[1] = b_offset;
             vtx[2] = (car->_brakeDiskRadius(wheelIndex) + 0.02) * sin(alpha);
