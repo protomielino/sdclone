@@ -9,9 +9,9 @@
             <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{0.3,0},{0.25,0}}" />
             <Property Name="Image" Value="set:Logo image:everything" />
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="Tooltip" Value="What a nice logo !" />
             <Property Name="FrameEnabled" Value="False" />
             <Property Name="BackgroundEnabled" Value="False" />
-            <Property Name="Tooltip" Value="What a nice logo !" />
         </Window>
         <Window Name="MenuCarSelect/TxtTitle" Type="CEGUIDemo/PageTitle">
             <Property Name="UnifiedAreaRect" Value="{{0.22,0},{0.1,0},{0.92,0},{0.2,0}}" />
@@ -20,30 +20,6 @@
             <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
             <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />
             <Property Name="FrameEnabled" Value="False" />
-            <AutoWindow NameSuffix="__auto_hscrollbar__">
-                <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />
-                <AutoWindow NameSuffix="__auto_incbtn__">
-                    <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />
-                </AutoWindow>
-                <AutoWindow NameSuffix="__auto_decbtn__">
-                    <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />
-                </AutoWindow>
-                <AutoWindow NameSuffix="__auto_thumb__">
-                    <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />
-                </AutoWindow>
-            </AutoWindow>
-            <AutoWindow NameSuffix="__auto_vscrollbar__">
-                <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />
-                <AutoWindow NameSuffix="__auto_incbtn__">
-                    <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />
-                </AutoWindow>
-                <AutoWindow NameSuffix="__auto_decbtn__">
-                    <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />
-                </AutoWindow>
-                <AutoWindow NameSuffix="__auto_thumb__">
-                    <Property Name="Tooltip" Value="Yeah, this is the title of the menu !" />
-                </AutoWindow>
-            </AutoWindow>
         </Window>
         <Window Name="MenuCarSelect/TxtFrameRate" Type="CEGUIDemo/StaticText">
             <Property Name="UnifiedAreaRect" Value="{{0.95,0},{0.01,0},{0.99,0},{0.04,0}}" />
@@ -56,31 +32,7 @@
             <Property Name="HorzFormatting" Value="RightAligned" />
             <Property Name="VertFormatting" Value="TopAligned" />
             <Property Name="BackgroundEnabled" Value="False" />
-            <AutoWindow NameSuffix="__auto_hscrollbar__">
-                <Property Name="Tooltip" Value="Frame rate (F/s)" />
-                <AutoWindow NameSuffix="__auto_incbtn__">
-                    <Property Name="Tooltip" Value="Frame rate (F/s)" />
-                </AutoWindow>
-                <AutoWindow NameSuffix="__auto_decbtn__">
-                    <Property Name="Tooltip" Value="Frame rate (F/s)" />
-                </AutoWindow>
-                <AutoWindow NameSuffix="__auto_thumb__">
-                    <Property Name="Tooltip" Value="Frame rate (F/s)" />
-                </AutoWindow>
-            </AutoWindow>
-            <AutoWindow NameSuffix="__auto_vscrollbar__">
-                <Property Name="Tooltip" Value="Frame rate (F/s)" />
-                <AutoWindow NameSuffix="__auto_incbtn__">
-                    <Property Name="Tooltip" Value="Frame rate (F/s)" />
-                </AutoWindow>
-                <AutoWindow NameSuffix="__auto_decbtn__">
-                    <Property Name="Tooltip" Value="Frame rate (F/s)" />
-                </AutoWindow>
-                <AutoWindow NameSuffix="__auto_thumb__">
-                    <Property Name="Tooltip" Value="Frame rate (F/s)" />
-                </AutoWindow>
-            </AutoWindow>
-        </Window>
+       </Window>
         <Window Name="MenuCarSelect/BtnCredits" Type="CEGUIDemo/Button">
             <Property Name="UnifiedAreaRect" Value="{{0.3,0},{0,0},{0.43,0},{0.05,0}}" />
             <Property Name="Font" Value="MenuMedium" />
@@ -116,6 +68,55 @@
             <Property Name="Font" Value="MenuMedium" />
             <Property Name="Text" Value="Start" />
             <Property Name="Tooltip" Value="Start the race" />
+        </Window>
+        <Window Name="MenuCarSelect/LblTopSpeed" Type="CEGUIDemo/StaticText">
+            <Property Name="UnifiedAreaRect" Value="{{0.47,0},{0.25,0},{0.60,0},{0.30,0}}" />
+            <Property Name="Font" Value="MenuMedium" />
+            <Property Name="Text" Value="Top speed:" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="FrameEnabled" Value="False" />
+            <Property Name="BackgroundEnabled" Value="False" />
+        </Window>
+        <Window Name="MenuCarSelect/LblAcceleration" Type="CEGUIDemo/StaticText">
+            <Property Name="UnifiedAreaRect" Value="{{0.47,0},{0.30,0},{0.60,0},{0.35,0}}" />
+            <Property Name="Font" Value="MenuMedium" />
+            <Property Name="Text" Value="Acceleration:" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="FrameEnabled" Value="False" />
+            <Property Name="BackgroundEnabled" Value="False" />
+        </Window>
+        <Window Name="MenuCarSelect/LblCornering" Type="CEGUIDemo/StaticText">
+            <Property Name="UnifiedAreaRect" Value="{{0.47,0},{0.35,0},{0.60,0},{0.40,0}}" />
+            <Property Name="Font" Value="MenuMedium" />
+            <Property Name="Text" Value="Cornering:" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="FrameEnabled" Value="False" />
+            <Property Name="BackgroundEnabled" Value="False" />
+        </Window>
+        <Window Name="MenuCarSelect/ImgCarPreview" Type="CEGUIDemo/StaticImage">
+            <Property Name="UnifiedAreaRect" Value="{{0.47,0},{0.45,0},{0.95,0},{0.85,0}}" />
+            <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+            <Property Name="Tooltip" Value="Preview of the cars and skin" />
+            <Property Name="FrameEnabled" Value="False" />
+            <Property Name="BackgroundEnabled" Value="False" />
+        </Window>
+        <Window Name="MenuCarSelect/TreCars" Type="CEGUIDemo/Tree">
+            <Property Name="UnifiedAreaRect" Value="{{0.10,0},{0.25,0},{0.40,0},{0.80,0}}" />
+        </Window>
+        <Window Name="MenuCarSelect/PrbTopSpeed" Type="CEGUIDemo/HorizontalVUMeter">
+            <Property Name="UnifiedAreaRect" Value="{{0.60,0},{0.26,0},{0.95,0},{0.29,0}}" />
+            <Property Name="StepSize" Value="0.01" />
+            <Property Name="Tooltip" Value="Top speed rating" />
+        </Window>
+        <Window Name="MenuCarSelect/PrbAcceleration" Type="CEGUIDemo/HorizontalVUMeter">
+            <Property Name="UnifiedAreaRect" Value="{{0.60,0},{0.31,0},{0.95,0},{0.34,0}}" />
+            <Property Name="StepSize" Value="0.01" />
+            <Property Name="Tooltip" Value="Acceleration rating (power to mass ratio)" />
+        </Window>
+        <Window Name="MenuCarSelect/PrbCornering" Type="CEGUIDemo/HorizontalVUMeter">
+            <Property Name="UnifiedAreaRect" Value="{{0.60,0},{0.36,0},{0.95,0},{0.39,0}}" />
+            <Property Name="StepSize" Value="0.01" />
+            <Property Name="Tooltip" Value="Cornering rating (inverse of inertia)" />
         </Window>
     </Window>
 </GUILayout>

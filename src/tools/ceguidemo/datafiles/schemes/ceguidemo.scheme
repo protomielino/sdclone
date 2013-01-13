@@ -34,12 +34,11 @@
 	<FalagardMapping WindowType="CEGUIDemo/AlternateProgressBar" TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="CEGUIDemo/AltProgressBar" />
 	<FalagardMapping WindowType="CEGUIDemo/ProgressBar"          TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="CEGUIDemo/ProgressBar" />
 	<FalagardMapping WindowType="CEGUIDemo/VUMeter"              TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="CEGUIDemo/VUMeter" />
+	<FalagardMapping WindowType="CEGUIDemo/HorizontalVUMeter"              TargetType="CEGUI/ProgressBar" Renderer="Falagard/ProgressBar" LookNFeel="CEGUIDemo/HorizontalVUMeter" />
 	<FalagardMapping WindowType="CEGUIDemo/VerticalScrollbar"   TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="CEGUIDemo/VerticalScrollbar" />
 	<FalagardMapping WindowType="CEGUIDemo/HorizontalScrollbar" TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="CEGUIDemo/HorizontalScrollbar" />
 	<FalagardMapping WindowType="CEGUIDemo/VerticalScrollbarThumb"   TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="CEGUIDemo/VerticalScrollbarThumb" />
 	<FalagardMapping WindowType="CEGUIDemo/HorizontalScrollbarThumb" TargetType="CEGUI/Thumb" Renderer="Falagard/Button" LookNFeel="CEGUIDemo/HorizontalScrollbarThumb" />
-	<FalagardMapping WindowType="CEGUIDemo/LargeVerticalScrollbar"      TargetType="CEGUI/Scrollbar" Renderer="Falagard/Scrollbar" LookNFeel="CEGUIDemo/LargeVerticalScrollbar" />
-	<FalagardMapping WindowType="CEGUIDemo/LargeVerticalScrollbarThumb" TargetType="CEGUI/Thumb"     Renderer="Falagard/Button"    LookNFeel="CEGUIDemo/LargeVerticalScrollbarThumb" />
 	<FalagardMapping WindowType="CEGUIDemo/TabButton"  TargetType="CEGUI/TabButton"  Renderer="Falagard/TabButton"  LookNFeel="CEGUIDemo/TabButton" />
 	<FalagardMapping WindowType="CEGUIDemo/TabControl" TargetType="CEGUI/TabControl" Renderer="Falagard/TabControl" LookNFeel="CEGUIDemo/TabControl" />
 	<FalagardMapping WindowType="CEGUIDemo/TabContentPane"    TargetType="DefaultWindow"    Renderer="Falagard/Default"    LookNFeel="CEGUIDemo/TabContentPane" />

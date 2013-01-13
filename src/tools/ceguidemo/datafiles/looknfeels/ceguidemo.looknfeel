@@ -1163,7 +1163,7 @@
 
     <!--
     ***************************************************
-        CEGUIDemo/AlternateProgressBar
+        CEGUIDemo/AltProgressBar
     ***************************************************
     -->
     <WidgetLook name="CEGUIDemo/AltProgressBar">
@@ -1529,9 +1529,9 @@
                     <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
                     <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
                 </Area>
-                <Image type="LeftEdge" imageset="CEGUIDemo" image="MiniHorzScrollThumbLeftNormal" />
-                <Image type="RightEdge" imageset="CEGUIDemo" image="MiniHorzScrollThumbRightNormal" />
-                <Image type="Background" imageset="CEGUIDemo" image="MiniHorzScrollThumbMiddleNormal" />
+                <Image type="LeftEdge" imageset="CEGUIDemo" image="HorzScrollThumbLeftNormal" />
+                <Image type="RightEdge" imageset="CEGUIDemo" image="HorzScrollThumbRightNormal" />
+                <Image type="Background" imageset="CEGUIDemo" image="HorzScrollThumbMiddleNormal" />
             </FrameComponent>
         </ImagerySection>
         <ImagerySection name="hover">
@@ -1542,9 +1542,22 @@
                     <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
                     <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
                 </Area>
-                <Image type="LeftEdge" imageset="CEGUIDemo" image="MiniHorzScrollThumbLeftHover" />
-                <Image type="RightEdge" imageset="CEGUIDemo" image="MiniHorzScrollThumbRightHover" />
-                <Image type="Background" imageset="CEGUIDemo" image="MiniHorzScrollThumbMiddleHover" />
+                <Image type="LeftEdge" imageset="CEGUIDemo" image="HorzScrollThumbLeftHover" />
+                <Image type="RightEdge" imageset="CEGUIDemo" image="HorzScrollThumbRightHover" />
+                <Image type="Background" imageset="CEGUIDemo" image="HorzScrollThumbMiddleHover" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="pushed">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
+                </Area>
+                <Image type="LeftEdge" imageset="CEGUIDemo" image="HorzScrollThumbLeftPushed" />
+                <Image type="RightEdge" imageset="CEGUIDemo" image="HorzScrollThumbRightPushed" />
+                <Image type="Background" imageset="CEGUIDemo" image="HorzScrollThumbMiddlePushed" />
             </FrameComponent>
         </ImagerySection>
         <StateImagery name="Normal">
@@ -1559,7 +1572,7 @@
         </StateImagery>
         <StateImagery name="Pushed">
             <Layer>
-                <Section section="normal" />
+                <Section section="pushed" />
             </Layer>
         </StateImagery>
         <StateImagery name="Disabled">
@@ -1579,12 +1592,22 @@
     <WidgetLook name="CEGUIDemo/HorizontalScrollbar">
         <NamedArea name="ThumbTrackArea">
             <Area>
-                <Dim type="LeftEdge" ><ImageDim imageset="CEGUIDemo" image="MiniHorzScrollLeftNormal" dimension="Width" /></Dim>
+                <Dim type="LeftEdge" >
+                    <ImageDim imageset="CEGUIDemo" image="HorzScrollLeftNormal" dimension="Width" >
+                        <DimOperator op="Multiply">
+                            <AbsoluteDim value="2" />
+                        </DimOperator>
+                    </ImageDim>
+                </Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="RightEdge" >
                     <UnifiedDim scale="1.0" type="RightEdge">
                         <DimOperator op="Subtract">
-                            <ImageDim imageset="CEGUIDemo" image="MiniHorzScrollRightNormal" dimension="Width" />
+                            <ImageDim imageset="CEGUIDemo" image="HorzScrollRightNormal" dimension="Width" >
+                                <DimOperator op="Multiply">
+                                    <AbsoluteDim value="2" />
+                                </DimOperator>
+                            </ImageDim>
                         </DimOperator>
                     </UnifiedDim>
                 </Dim>
@@ -1595,49 +1618,76 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><ImageDim imageset="CEGUIDemo" image="MiniHorzScrollRightNormal" dimension="Width" /></Dim>
+                <Dim type="Width" >
+                    <ImageDim imageset="CEGUIDemo" image="HorzScrollRightNormal" dimension="Width" >
+                        <DimOperator op="Multiply">
+                            <AbsoluteDim value="2" />
+                        </DimOperator>
+                    </ImageDim>
+                </Dim>
                 <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
             <HorzAlignment type="RightAligned" />
-            <Property name="NormalImage" value="set:CEGUIDemo image:MiniHorzScrollRightNormal" />
-            <Property name="HoverImage" value="set:CEGUIDemo image:MiniHorzScrollRightHover" />
-            <Property name="PushedImage" value="set:CEGUIDemo image:MiniHorzScrollRightNormal" />
+            <Property name="HorzImageFormatting" value="Stretched" />
+            <Property name="VertImageFormatting" value="Stretched" />
+            <Property name="NormalImage" value="set:CEGUIDemo image:HorzScrollRightNormal" />
+            <Property name="HoverImage" value="set:CEGUIDemo image:HorzScrollRightHover" />
+            <Property name="PushedImage" value="set:CEGUIDemo image:HorzScrollRightPushed" />
         </Child>
         <Child  type="CEGUIDemo/ImageButton" nameSuffix="__auto_decbtn__">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><ImageDim imageset="CEGUIDemo" image="MiniHorzScrollLeftNormal" dimension="Width" /></Dim>
+                <Dim type="Width" >
+                    <ImageDim imageset="CEGUIDemo" image="HorzScrollLeftNormal" dimension="Width" >
+                        <DimOperator op="Multiply">
+                            <AbsoluteDim value="2" />
+                        </DimOperator>
+                    </ImageDim>
+                </Dim>
                 <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
-            <Property name="NormalImage" value="set:CEGUIDemo image:MiniHorzScrollLeftNormal" />
-            <Property name="HoverImage" value="set:CEGUIDemo image:MiniHorzScrollLeftHover" />
-            <Property name="PushedImage" value="set:CEGUIDemo image:MiniHorzScrollLeftNormal" />
+            <HorzAlignment type="LeftAligned" />
+            <Property name="HorzImageFormatting" value="Stretched" />
+            <Property name="VertImageFormatting" value="Stretched" />
+            <Property name="NormalImage" value="set:CEGUIDemo image:HorzScrollLeftNormal" />
+            <Property name="HoverImage" value="set:CEGUIDemo image:HorzScrollLeftHover" />
+            <Property name="PushedImage" value="set:CEGUIDemo image:HorzScrollLeftPushed" />
         </Child>
         <Child  type="CEGUIDemo/HorizontalScrollbarThumb" nameSuffix="__auto_thumb__">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="0.1" type="Width" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="0.2" type="Width" /></Dim>
                 <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
-            <Property name="UnifiedMinSize" value="{{0,25},{0,0}}" />
+            <Property name="UnifiedMinSize" value="{{0,20},{0,0}}" />
         </Child>
         <ImagerySection name="main">
             <ImageryComponent>
                 <Area>
-                    <Dim type="LeftEdge" ><ImageDim imageset="CEGUIDemo" image="MiniHorzScrollLeftNormal" dimension="Width" /></Dim>
+                    <Dim type="LeftEdge" >
+                        <ImageDim imageset="CEGUIDemo" image="HorzScrollLeftNormal" dimension="Width" >
+                            <DimOperator op="Multiply">
+                                <AbsoluteDim value="2" />
+                            </DimOperator>
+                        </ImageDim>
+                    </Dim>
                     <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
                     <Dim type="RightEdge" >
                         <UnifiedDim scale="1.0" type="RightEdge">
                             <DimOperator op="Subtract">
-                                <ImageDim imageset="CEGUIDemo" image="MiniHorzScrollRightNormal" dimension="Width" />
+                                <ImageDim imageset="CEGUIDemo" image="HorzScrollRightNormal" dimension="Width" >
+                                    <DimOperator op="Multiply">
+                                        <AbsoluteDim value="2" />
+                                    </DimOperator>
+                                </ImageDim>
                             </DimOperator>
                         </UnifiedDim>
                     </Dim>
                     <Dim type="BottomEdge" ><UnifiedDim scale="1.0" type="BottomEdge" /></Dim>
                 </Area>
-                <Image imageset="CEGUIDemo" image="MiniHorzScrollBarSegment" />
+                <Image imageset="CEGUIDemo" image="HorzScrollBarSegment" />
                 <VertFormat type="CentreAligned" />
                 <HorzFormat type="Stretched" />
             </ImageryComponent>
@@ -1672,9 +1722,9 @@
                     <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
                     <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
                 </Area>
-                <Image type="TopEdge" imageset="CEGUIDemo" image="MiniVertScrollThumbTopNormal" />
-                <Image type="BottomEdge" imageset="CEGUIDemo" image="MiniVertScrollThumbBottomNormal" />
-                <Image type="Background" imageset="CEGUIDemo" image="MiniVertScrollThumbMiddleNormal" />
+                <Image type="TopEdge" imageset="CEGUIDemo" image="VertScrollThumbTopNormal" />
+                <Image type="BottomEdge" imageset="CEGUIDemo" image="VertScrollThumbBottomNormal" />
+                <Image type="Background" imageset="CEGUIDemo" image="VertScrollThumbMiddleNormal" />
             </FrameComponent>
         </ImagerySection>
         <ImagerySection name="hover">
@@ -1685,9 +1735,22 @@
                     <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
                     <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
                 </Area>
-                <Image type="TopEdge" imageset="CEGUIDemo" image="MiniVertScrollThumbTopHover" />
-                <Image type="BottomEdge" imageset="CEGUIDemo" image="MiniVertScrollThumbBottomHover" />
-                <Image type="Background" imageset="CEGUIDemo" image="MiniVertScrollThumbMiddleHover" />
+                <Image type="TopEdge" imageset="CEGUIDemo" image="VertScrollThumbTopHover" />
+                <Image type="BottomEdge" imageset="CEGUIDemo" image="VertScrollThumbBottomHover" />
+                <Image type="Background" imageset="CEGUIDemo" image="VertScrollThumbMiddleHover" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="pushed">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
+                </Area>
+                <Image type="TopEdge" imageset="CEGUIDemo" image="VertScrollThumbTopPushed" />
+                <Image type="BottomEdge" imageset="CEGUIDemo" image="VertScrollThumbBottomPushed" />
+                <Image type="Background" imageset="CEGUIDemo" image="VertScrollThumbMiddlePushed" />
             </FrameComponent>
         </ImagerySection>
         <StateImagery name="Normal">
@@ -1702,7 +1765,7 @@
         </StateImagery>
         <StateImagery name="Pushed">
             <Layer>
-                <Section section="normal" />
+                <Section section="pushed" />
             </Layer>
         </StateImagery>
         <StateImagery name="Disabled">
@@ -1724,12 +1787,22 @@
         <NamedArea name="ThumbTrackArea">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="TopEdge" ><ImageDim imageset="CEGUIDemo" image="MiniVertScrollUpNormal" dimension="Height" /></Dim>
+                <Dim type="TopEdge" >
+                    <ImageDim imageset="CEGUIDemo" image="VertScrollUpNormal" dimension="Height" >
+                        <DimOperator op="Multiply">
+                            <AbsoluteDim value="2" />
+                        </DimOperator>
+                    </ImageDim>
+                </Dim>
                 <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
                 <Dim type="BottomEdge" >
                     <UnifiedDim scale="1.0" type="BottomEdge">
                         <DimOperator op="Subtract">
-                            <ImageDim imageset="CEGUIDemo" image="MiniVertScrollDownNormal" dimension="Height" />
+                            <ImageDim imageset="CEGUIDemo" image="VertScrollDownNormal" dimension="Height" >
+                                <DimOperator op="Multiply">
+                                    <AbsoluteDim value="2" />
+                                </DimOperator>
+                            </ImageDim>
                         </DimOperator>
                     </UnifiedDim>
                 </Dim>
@@ -1740,48 +1813,75 @@
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
-                <Dim type="Height" ><ImageDim imageset="CEGUIDemo" image="MiniVertScrollDownNormal" dimension="Height" /></Dim>
+                <Dim type="Height" >
+                    <ImageDim imageset="CEGUIDemo" image="VertScrollDownNormal" dimension="Height" >
+                        <DimOperator op="Multiply">
+                            <AbsoluteDim value="2" />
+                        </DimOperator>
+                    </ImageDim>
+				</Dim>
             </Area>
             <VertAlignment type="BottomAligned" />
-            <Property name="NormalImage" value="set:CEGUIDemo image:MiniVertScrollDownNormal" />
-            <Property name="HoverImage" value="set:CEGUIDemo image:MiniVertScrollDownHover" />
-            <Property name="PushedImage" value="set:CEGUIDemo image:MiniVertScrollDownNormal" />
+            <Property name="HorzImageFormatting" value="Stretched" />
+            <Property name="VertImageFormatting" value="Stretched" />
+            <Property name="NormalImage" value="set:CEGUIDemo image:VertScrollDownNormal" />
+            <Property name="HoverImage" value="set:CEGUIDemo image:VertScrollDownHover" />
+            <Property name="PushedImage" value="set:CEGUIDemo image:VertScrollDownPushed" />
         </Child>
         <Child  type="CEGUIDemo/ImageButton" nameSuffix="__auto_decbtn__">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
-                <Dim type="Height" ><ImageDim imageset="CEGUIDemo" image="MiniVertScrollUpNormal" dimension="Height" /></Dim>
+                <Dim type="Height" >
+                    <ImageDim imageset="CEGUIDemo" image="VertScrollUpNormal" dimension="Height" >
+                        <DimOperator op="Multiply">
+                            <AbsoluteDim value="2" />
+                        </DimOperator>
+                    </ImageDim>
+				</Dim>
             </Area>
-            <Property name="NormalImage" value="set:CEGUIDemo image:MiniVertScrollUpNormal" />
-            <Property name="HoverImage" value="set:CEGUIDemo image:MiniVertScrollUpHover" />
-            <Property name="PushedImage" value="set:CEGUIDemo image:MiniVertScrollUpNormal" />
+            <VertAlignment type="TopAligned" />
+            <Property name="HorzImageFormatting" value="Stretched" />
+            <Property name="VertImageFormatting" value="Stretched" />
+            <Property name="NormalImage" value="set:CEGUIDemo image:VertScrollUpNormal" />
+            <Property name="HoverImage" value="set:CEGUIDemo image:VertScrollUpHover" />
+            <Property name="PushedImage" value="set:CEGUIDemo image:VertScrollUpPushed" />
         </Child>
         <Child  type="CEGUIDemo/VerticalScrollbarThumb" nameSuffix="__auto_thumb__">
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
-                <Dim type="Height" ><UnifiedDim scale="0.1" type="Height" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="0.2" type="Height" /></Dim>
             </Area>
-            <Property name="UnifiedMinSize" value="{{0,0},{0,25}}" />
+            <Property name="UnifiedMinSize" value="{{0,0},{0,20}}" />
         </Child>
         <ImagerySection name="main">
             <ImageryComponent>
                 <Area>
                     <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
-                    <Dim type="TopEdge" ><ImageDim imageset="CEGUIDemo" image="MiniVertScrollUpNormal" dimension="Height" /></Dim>
+                    <Dim type="TopEdge" >
+                        <ImageDim imageset="CEGUIDemo" image="VertScrollUpNormal" dimension="Height" >
+                            <DimOperator op="Multiply">
+                                <AbsoluteDim value="2" />
+                            </DimOperator>
+                        </ImageDim>
+                    </Dim>
                     <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
                     <Dim type="BottomEdge" >
                         <UnifiedDim scale="1.0" type="BottomEdge">
                             <DimOperator op="Subtract">
-                                <ImageDim imageset="CEGUIDemo" image="MiniVertScrollDownNormal" dimension="Height" />
+                                <ImageDim imageset="CEGUIDemo" image="VertScrollDownNormal" dimension="Height" >
+                                    <DimOperator op="Multiply">
+                                        <AbsoluteDim value="2" />
+                                    </DimOperator>
+                                </ImageDim>
                             </DimOperator>
                         </UnifiedDim>
                     </Dim>
                 </Area>
-                <Image imageset="CEGUIDemo" image="MiniVertScrollBarSegment" />
+                <Image imageset="CEGUIDemo" image="VertScrollBarSegment" />
                 <VertFormat type="Stretched" />
                 <HorzFormat type="CentreAligned" />
             </ImageryComponent>
@@ -1890,8 +1990,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="1" offset="-12" type="Width" /></Dim>
-                <Dim type="Height" ><AbsoluteDim value="12" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
             </Area>
             <VertAlignment type="BottomAligned" />
         </Child>
@@ -1899,8 +1999,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><AbsoluteDim value="12" /></Dim>
-                <Dim type="Height" ><UnifiedDim scale="1" offset="-12" type="Height" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
             <HorzAlignment type="RightAligned" />
         </Child>
@@ -2027,8 +2127,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="1" offset="-12" type="Width" /></Dim>
-                <Dim type="Height" ><AbsoluteDim value="12" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
             </Area>
             <VertAlignment type="BottomAligned" />
         </Child>
@@ -2036,8 +2136,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><AbsoluteDim value="12" /></Dim>
-                <Dim type="Height" ><UnifiedDim scale="1" offset="-12" type="Height" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
             <HorzAlignment type="RightAligned" />
         </Child>
@@ -2584,8 +2684,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="1" offset="-12" type="Width" /></Dim>
-                <Dim type="Height" ><AbsoluteDim value="12" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
             </Area>
             <VertAlignment type="BottomAligned" />
         </Child>
@@ -2593,8 +2693,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><AbsoluteDim value="12" /></Dim>
-                <Dim type="Height" ><UnifiedDim scale="1" offset="-12" type="Height" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
             <HorzAlignment type="RightAligned" />
         </Child>
@@ -2934,8 +3034,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="1" offset="-12" type="Width" /></Dim>
-                <Dim type="Height" ><AbsoluteDim value="12" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
             </Area>
             <VertAlignment type="BottomAligned" />
         </Child>
@@ -2943,8 +3043,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><WidgetDim widget="__auto_listheader__" dimension="BottomEdge" /></Dim>
-                <Dim type="Width" ><AbsoluteDim value="12" /></Dim>
-                <Dim type="BottomEdge" ><UnifiedDim scale="1" offset="-12" type="BottomEdge" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+                <Dim type="BottomEdge" ><UnifiedDim scale="1" type="BottomEdge" /></Dim>
             </Area>
             <HorzAlignment type="RightAligned" />
         </Child>
@@ -3077,8 +3177,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="1" offset="-12" type="Width" /></Dim>
-                <Dim type="Height" ><AbsoluteDim value="12" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
             </Area>
             <VertAlignment type="BottomAligned" />
         </Child>
@@ -3086,8 +3186,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><AbsoluteDim value="12" /></Dim>
-                <Dim type="Height" ><UnifiedDim scale="1" offset="-12" type="Height" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
             <HorzAlignment type="RightAligned" />
         </Child>
@@ -3298,8 +3398,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="1" offset="-12" type="Width" /></Dim>
-                <Dim type="Height" ><AbsoluteDim value="12" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
             </Area>
             <VertAlignment type="BottomAligned" />
             <Property name="NonClient" value="True" />
@@ -3308,8 +3408,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><AbsoluteDim value="12" /></Dim>
-                <Dim type="Height" ><UnifiedDim scale="1" offset="-12" type="Height" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
             <HorzAlignment type="RightAligned" />
             <Property name="NonClient" value="True" />
@@ -4226,241 +4326,6 @@
 
     <!--
     ***************************************************
-        CEGUIDemo/LargeVerticalScrollbarThumb
-    ***************************************************
-    -->
-    <WidgetLook name="CEGUIDemo/LargeVerticalScrollbarThumb">
-        <Property name="VertFree" value="True" />
-        <Property name="MouseInputPropagationEnabled" value="True" />
-        <ImagerySection name="normal">
-            <ImageryComponent>
-                <Area>
-                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
-                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                    <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
-                    <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
-                </Area>
-                <Image imageset="CEGUIDemo" image="VertScrollThumbNormal" />
-                <VertFormat type="Stretched" />
-                <HorzFormat type="Stretched" />
-            </ImageryComponent>
-        </ImagerySection>
-        <ImagerySection name="hover">
-            <ImageryComponent>
-                <Area>
-                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
-                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                    <Dim type="Width" ><UnifiedDim scale="1.0" type="Width" /></Dim>
-                    <Dim type="Height" ><UnifiedDim scale="1.0" type="Height" /></Dim>
-                </Area>
-                <Image imageset="CEGUIDemo" image="VertScrollThumbHover" />
-                <VertFormat type="Stretched" />
-                <HorzFormat type="Stretched" />
-            </ImageryComponent>
-        </ImagerySection>
-        <StateImagery name="Normal">
-            <Layer>
-                <Section section="normal" />
-            </Layer>
-        </StateImagery>
-        <StateImagery name="Hover">
-            <Layer>
-                <Section section="hover" />
-            </Layer>
-        </StateImagery>
-        <StateImagery name="Pushed">
-            <Layer>
-                <Section section="normal" />
-            </Layer>
-        </StateImagery>
-        <StateImagery name="Disabled">
-            <Layer>
-                <Section section="normal">
-                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
-                </Section>
-            </Layer>
-        </StateImagery>
-    </WidgetLook>
-
-    <!--
-    ***************************************************
-        CEGUIDemo/LargeVerticalScrollbar
-    ***************************************************
-    -->
-    <WidgetLook name="CEGUIDemo/LargeVerticalScrollbar">
-        <Property name="VerticalScrollbar" value="True" />
-        <NamedArea name="ThumbTrackArea">
-            <Area>
-                <Dim type="LeftEdge" ><UnifiedDim scale="0.325" type="LeftEdge" /></Dim>
-                <Dim type="TopEdge" >
-                    <WidgetDim widget="__auto_decbtn__" dimension="Height">
-                        <DimOperator op="Add">
-                            <ImageDim imageset="CEGUIDemo" image="VertScrollTop" dimension="Height">
-                                <DimOperator op="Multiply">
-                                    <AbsoluteDim value="0.5" />
-                                </DimOperator>
-                            </ImageDim>
-                        </DimOperator>
-                    </WidgetDim>
-                </Dim>
-                <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
-                <Dim type="BottomEdge" >
-                    <UnifiedDim scale="1.0" type="BottomEdge">
-                        <DimOperator op="Subtract">
-                            <WidgetDim widget="__auto_decbtn__" dimension="Height">
-                                <DimOperator op="Add">
-                                    <ImageDim imageset="CEGUIDemo" image="VertScrollTop" dimension="Height">
-                                        <DimOperator op="Multiply">
-                                            <AbsoluteDim value="0.5" />
-                                        </DimOperator>
-                                    </ImageDim>
-                                </DimOperator>
-                            </WidgetDim>
-                        </DimOperator>
-                    </UnifiedDim>
-                </Dim>
-            </Area>
-        </NamedArea>
-        <Child  type="CEGUIDemo/ImageButton" nameSuffix="__auto_incbtn__">
-            <Area>
-                <Dim type="LeftEdge" ><UnifiedDim scale="0.25" type="LeftEdge" /></Dim>
-                <Dim type="TopEdge" >
-                    <AbsoluteDim value="-1">
-                        <DimOperator op="Multiply">
-                            <ImageDim imageset="CEGUIDemo" image="VertScrollTop" dimension="Height">
-                                <DimOperator op="Multiply">
-                                    <AbsoluteDim value="0.5" />
-                                </DimOperator>
-                            </ImageDim>
-                        </DimOperator>
-                    </AbsoluteDim>
-                </Dim>
-                <Dim type="Width" ><UnifiedDim scale="0.6" type="Width" /></Dim>
-                <Dim type="Height" >
-                    <UnifiedDim scale="0.6" type="Width">
-                        <DimOperator op="Multiply">
-                            <ImageDim imageset="CEGUIDemo" image="VertScrollUpNormal" dimension="Width">
-                                <DimOperator op="Divide">
-                                    <ImageDim imageset="CEGUIDemo" image="VertScrollUpNormal" dimension="Height"/>
-                                </DimOperator>
-                            </ImageDim>
-                        </DimOperator>
-                    </UnifiedDim>
-                </Dim>
-            </Area>
-            <VertAlignment type="BottomAligned" />
-            <Property name="NormalImage" value="set:CEGUIDemo image:VertScrollDownNormal" />
-            <Property name="HoverImage" value="set:CEGUIDemo image:VertScrollDownHover" />
-            <Property name="PushedImage" value="set:CEGUIDemo image:VertScrollDownNormal" />
-        </Child>
-        <Child  type="CEGUIDemo/ImageButton" nameSuffix="__auto_decbtn__">
-            <Area>
-                <Dim type="LeftEdge" ><UnifiedDim scale="0.25" type="LeftEdge" /></Dim>
-                <Dim type="TopEdge">
-                    <ImageDim imageset="CEGUIDemo" image="VertScrollTop" dimension="Height">
-                        <DimOperator op="Multiply">
-                            <AbsoluteDim value="0.5" />
-                        </DimOperator>
-                    </ImageDim>
-                </Dim>
-                <Dim type="Width" ><UnifiedDim scale="0.6" type="Width" /></Dim>
-                <Dim type="Height" >
-                    <UnifiedDim scale="0.6" type="Width">
-                        <DimOperator op="Multiply">
-                            <ImageDim imageset="CEGUIDemo" image="VertScrollUpNormal" dimension="Width">
-                                <DimOperator op="Divide">
-                                    <ImageDim imageset="CEGUIDemo" image="VertScrollUpNormal" dimension="Height"/>
-                                </DimOperator>
-                            </ImageDim>
-                        </DimOperator>
-                    </UnifiedDim>
-                </Dim>
-            </Area>
-            <Property name="NormalImage" value="set:CEGUIDemo image:VertScrollUpNormal" />
-            <Property name="HoverImage" value="set:CEGUIDemo image:VertScrollUpHover" />
-            <Property name="PushedImage" value="set:CEGUIDemo image:VertScrollUpNormal" />
-        </Child>
-        <Child  type="CEGUIDemo/LargeVerticalScrollbarThumb" nameSuffix="__auto_thumb__">
-            <Area>
-                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="0.4" type="Width" /></Dim>
-                <Dim type="Height" >
-                    <UnifiedDim scale="0.4" type="Width">
-                        <DimOperator op="Multiply">
-                            <ImageDim imageset="CEGUIDemo" image="VertScrollThumbNormal" dimension="Height">
-                                <DimOperator op="Divide">
-                                    <ImageDim imageset="CEGUIDemo" image="VertScrollThumbNormal" dimension="Width"/>
-                                </DimOperator>
-                            </ImageDim>
-                        </DimOperator>
-                    </UnifiedDim>
-                </Dim>
-            </Area>
-        </Child>
-        <ImagerySection name="main">
-            <FrameComponent>
-                <Area>
-                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
-                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
-                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
-                </Area>
-                <Image type="TopEdge" imageset="CEGUIDemo" image="VertScrollTop" />
-                <Image type="BottomEdge" imageset="CEGUIDemo" image="VertScrollBottom" />
-                <Image type="Background" imageset="CEGUIDemo" image="VertScrollMiddle" />
-            </FrameComponent>
-            <ImageryComponent>
-                <Area>
-                    <Dim type="LeftEdge" ><UnifiedDim scale="0.45" type="LeftEdge" /></Dim>
-                    <Dim type="TopEdge" >
-                        <WidgetDim widget="__auto_decbtn__" dimension="Height">
-                            <DimOperator op="Add">
-                                <ImageDim imageset="CEGUIDemo" image="VertScrollTop" dimension="Height">
-                                    <DimOperator op="Multiply">
-                                        <AbsoluteDim value="0.5" />
-                                    </DimOperator>
-                                </ImageDim>
-                            </DimOperator>
-                        </WidgetDim>
-                    </Dim>
-                    <Dim type="RightEdge" ><UnifiedDim scale="1.0" type="RightEdge" /></Dim>
-                    <Dim type="BottomEdge" >
-                        <UnifiedDim scale="1.0" type="BottomEdge">
-                            <DimOperator op="Subtract">
-                                <WidgetDim widget="__auto_decbtn__" dimension="Height">
-                                    <DimOperator op="Add">
-                                        <ImageDim imageset="CEGUIDemo" image="VertScrollTop" dimension="Height">
-                                            <DimOperator op="Multiply">
-                                                <AbsoluteDim value="0.5" />
-                                            </DimOperator>
-                                        </ImageDim>
-                                    </DimOperator>
-                                </WidgetDim>
-                            </DimOperator>
-                        </UnifiedDim>
-                    </Dim>
-                </Area>
-                <Image imageset="CEGUIDemo" image="VertScrollBarSegment" />
-                <VertFormat type="Tiled" />
-            </ImageryComponent>
-        </ImagerySection>
-        <StateImagery name="Enabled">
-            <Layer>
-                <Section section="main" />
-            </Layer>
-        </StateImagery>
-        <StateImagery name="Disabled">
-            <Layer>
-                <Section section="main">
-                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
-                </Section>
-            </Layer>
-        </StateImagery>
-    </WidgetLook>
-
-    <!--
-    ***************************************************
         CEGUIDemo/ImageButton
     ***************************************************
     -->
@@ -4632,8 +4497,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="1" offset="-12" type="Width" /></Dim>
-                <Dim type="Height" ><AbsoluteDim value="12" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
             </Area>
             <VertAlignment type="BottomAligned" />
             <Property name="NonClient" value="True" />
@@ -4642,7 +4507,7 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><AbsoluteDim value="12" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
                 <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
             <HorzAlignment type="RightAligned" />
@@ -4786,11 +4651,12 @@
      ***********************************************************************************************************/
     -->
     <WidgetLook name="CEGUIDemo/Tree">
-        <Property name="SelectionBrushImage" value="set:CEGUIDemo image:GenericBrush" />
-        <Property name="NormalTextColour" value="FF000000" />
-        <Property name="SelectedTextColour" value="FFFFFFFF" />
-        <Property name="ActiveSelectionColour" value="FF607FFF" />
-        <Property name="InactiveSelectionColour" value="FF808080" />
+        <PropertyDefinition name="NormalTextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
+        <PropertyDefinition name="SelectedTextColour" initialValue="FF000000" redrawOnWrite="true" />
+        <PropertyDefinition name="ActiveSelectionColour" initialValue="FF607FFF" redrawOnWrite="true" />
+        <PropertyDefinition name="InactiveSelectionColour" initialValue="FF808080" redrawOnWrite="true" />
+		<!-- FrameColours does not work (0.7.6) -->
+        <PropertyDefinition name="FrameColours" initialValue="tl:FFFFFFFF tr:FFFFFFFF bl:FFFFFFFF br:FFFFFFFF" redrawOnWrite="true" />
         <NamedArea name="ItemRenderingArea">
             <Area>
                 <Dim type="LeftEdge" ><ImageDim imageset="CEGUIDemo" image="WindowLeftEdge" dimension="Width" /></Dim>
@@ -4813,19 +4679,19 @@
         </NamedArea>
         <Child  type="CEGUIDemo/HorizontalScrollbar" nameSuffix="__auto_hscrollbar__">
             <Area>
-                <Dim type="LeftEdge" ><AbsoluteDim value="5" /></Dim>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="1" offset="-25" type="Width" /></Dim>
-                <Dim type="Height" ><AbsoluteDim value="10" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
             </Area>
             <VertAlignment type="BottomAligned" />
         </Child>
         <Child  type="CEGUIDemo/VerticalScrollbar" nameSuffix="__auto_vscrollbar__">
             <Area>
-                <Dim type="LeftEdge" ><AbsoluteDim value="-5" /></Dim>
-                <Dim type="TopEdge" ><AbsoluteDim value="5" /></Dim>
-                <Dim type="Width" ><AbsoluteDim value="10" /></Dim>
-                <Dim type="Height" ><UnifiedDim scale="1" offset="-10" type="Height" /></Dim>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
             <HorzAlignment type="RightAligned" />
         </Child>
@@ -4838,8 +4704,8 @@
                     <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
                 </Area>
                 <Image imageset="CEGUIDemo" image="TreeListClosed" />
-              <!--  <VertFormat type="Stretched" />
-                <HorzFormat type="Stretched" /> -->
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
             </ImageryComponent>
         </ImagerySection>
         <ImagerySection name="CloseTreeButton">
@@ -4858,14 +4724,14 @@
         <StateImagery name="Enabled">
             <Layer>
                 <Section look="CEGUIDemo/StaticShared" section="frame">
-                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                    <Colours topLeft="00000000" topRight="00000000" bottomLeft="00000000" bottomRight="00000000" />
                 </Section>
             </Layer>
         </StateImagery>
         <StateImagery name="Disabled">
             <Layer>
                 <Section look="CEGUIDemo/StaticShared" section="frame">
-                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                    <Colours topLeft="00000000" topRight="00000000" bottomLeft="00000000" bottomRight="00000000" />
                 </Section>
             </Layer>
         </StateImagery>
@@ -5099,8 +4965,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><UnifiedDim scale="1" offset="-12" type="Width" /></Dim>
-                <Dim type="Height" ><AbsoluteDim value="12" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><AbsoluteDim value="20" /></Dim>
             </Area>
             <VertAlignment type="BottomAligned" />
         </Child>
@@ -5108,8 +4974,8 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                <Dim type="Width" ><AbsoluteDim value="12" /></Dim>
-                <Dim type="Height" ><UnifiedDim scale="1" offset="-12" type="Height" /></Dim>
+                <Dim type="Width" ><AbsoluteDim value="20" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
             </Area>
             <HorzAlignment type="RightAligned" />
         </Child>
@@ -5286,6 +5152,73 @@
         <StateImagery name="Disabled">
             <Layer>
                 <Section section="main">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+            </Layer>
+        </StateImagery>
+    </WidgetLook>
+
+    <!--
+    ***************************************************
+        CEGUIDemo/HorizontalVUMeter
+    ***************************************************
+    -->
+    <WidgetLook name="CEGUIDemo/HorizontalVUMeter">
+        <NamedArea name="ProgressArea">
+            <Area>
+                <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+            </Area>
+        </NamedArea>
+        <ImagerySection name="frame">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image type="LeftEdge" imageset="CEGUIDemo" image="HorizontalVUMeterLeft" />
+                <Image type="RightEdge" imageset="CEGUIDemo" image="HorizontalVUMeterRight" />
+                <Image type="Background" imageset="CEGUIDemo" image="HorizontalVUMeterMiddle" />
+                <HorzFormat type="Tiled" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="progress_lights" >
+            <ImageryComponent>
+                <Area>
+                    <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
+                </Area>
+                <Image imageset="CEGUIDemo" image="HorizontalVUMeterLitSegment" />
+                <VertFormat type="Stretched" />
+                <HorzFormat type="Stretched" />
+            </ImageryComponent>
+        </ImagerySection>
+        <StateImagery name="Enabled">
+            <Layer>
+                <Section section="frame" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="Disabled">
+            <Layer>
+                <Section section="frame">
+                    <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
+                </Section>
+            </Layer>
+        </StateImagery>
+        <StateImagery name="EnabledProgress">
+            <Layer>
+                <Section section="progress_lights" />
+            </Layer>
+        </StateImagery>
+        <StateImagery name="DisabledProgress">
+            <Layer>
+                <Section section="progress_lights">
                     <Colours topLeft="FF7F7F7F" topRight="FF7F7F7F" bottomLeft="FF7F7F7F" bottomRight="FF7F7F7F" />
                 </Section>
             </Layer>

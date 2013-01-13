@@ -32,44 +32,44 @@ class MenuTrackSelect(MenuStandard):
 	{
 		"Grand Prix Circuits" : \
 		{
-		"Karwada" : Track(name="Karwada",
-						  description="A well-known, fast and curvy circuit in Japan",
-						  authors="Andrew Sumner, Echkard M. Jaeger",
-						  length=6205, width=12, nPits=28,
-						  outline="outline-karwada.png", preview="preview-karwada.jpg"),
-		"Espie" : Track(name="Espie",
-						  description="An international racing circuit in France",
-						  authors="Eric Espie, Andrew Sumner, Echkard M. Jaeger",
-						  length=4441, width=13, nPits=20,
-						  outline="outline-espie.png", preview="preview-espie.jpg")
+			"Karwada" : Track(name="Karwada",
+							  description="A well-known, fast and curvy circuit in Japan",
+							  authors="Andrew Sumner, Echkard M. Jaeger",
+							  length=6205, width=12, nPits=28,
+							  outline="outline-karwada.png", preview="preview-karwada.jpg"),
+			"Espie" : Track(name="Espie",
+							description="An international racing circuit in France",
+							authors="Eric Espie, Andrew Sumner, Echkard M. Jaeger",
+							length=4441, width=13, nPits=20,
+							outline="outline-espie.png", preview="preview-espie.jpg")
 		},
 		
 		"Dirt" : \
 		{
-		"Garguree" : Track(name="Garguree",
-						  description="A blast trough the australian country side with many hoops and a lot of dust",
-						  authors="Andrew Sumner",
-						  length=2206, width=10, nPits=16,
-						  outline="outline-garguree.png", preview="preview-garguree.jpg"),
-		"Mud Hell" : Track(name="Mud Hell",
-						  description="An all-muddy track you'll probably never forget",
-						  authors="Devel 666",
-						  length=56220, width=8, nPits=16,
-						  outline="outline-mudhell.png", preview="preview-mudhell.jpg")
+			"Garguree" : Track(name="Garguree",
+							   description="A blast trough the australian country side with many hoops and a lot of dust",
+							   authors="Andrew Sumner",
+							   length=2206, width=10, nPits=16,
+							   outline="outline-garguree.png", preview="preview-garguree.jpg"),
+			"Mud Hell" : Track(name="Mud Hell",
+							   description="An all-muddy track you'll probably never forget",
+							   authors="Devel 666",
+							   length=56220, width=8, nPits=16,
+							   outline="outline-mudhell.png", preview="preview-mudhell.jpg")
 		},
 		
 		"Road Tracks" : \
 		{
-		"Autodromo Lombaro" : Track(name="Autodromo Lombaro",
-						  description="An Italian race track with a 'bus stop'-like chicane",
-						  authors="Eric Espie, Bernhard Wymann, Echkard M. Jaeger",
-						  length=3244, width=15, nPits=20,
-						  outline="outline-lombaro.png", preview="preview-lombaro.jpg"),
-		"Olethros Road" : Track(name="Olethros Road",
-						  description="A Greek narrow country road with dangerously bumpy sections",
-						  authors="Christos Dimitrikakis, Echkard M. Jaeger",
-						  length=6283, width=10, nPits=20,
-						  outline="outline-olethros.png", preview="preview-olethros.jpg")
+			"Autodromo Lombaro" : Track(name="Autodromo Lombaro",
+										description="An Italian race track with a 'bus stop'-like chicane",
+										authors="Eric Espie, Bernhard Wymann, Echkard M. Jaeger",
+										length=3244, width=15, nPits=20,
+										outline="outline-lombaro.png", preview="preview-lombaro.jpg"),
+			"Olethros Road" : Track(name="Olethros Road",
+									description="A Greek narrow country road with dangerously bumpy sections",
+									authors="Christos Dimitrikakis, Echkard M. Jaeger",
+									length=6283, width=10, nPits=20,
+									outline="outline-olethros.png", preview="preview-olethros.jpg")
 		}
 	}
 
