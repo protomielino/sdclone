@@ -43,6 +43,8 @@ I - Pre-requisites
 - zlib
 - jpeg
 
+And also Open Scene Graph 3.x if you plan to build the work-in-progress next generation "osggraph" 3D graphics engine module.
+
 WARNING: Under Windows, be carefull to compile anything for multi-threaded DLL integration (/MD[d])
 
 
@@ -280,6 +282,11 @@ The Speed Dreams Team.
   Runtime options : type this command to get them explained :
 
     $ speed-dreams-2 --help
+
+  Note: Running the next-generation graphics module "osggraph" :
+        There's currently no GUI for selecting the graphics engine ;
+        you have to manually change the "graphic" attribute of the "Modules" section
+        in <user settings>/config/raceengine.xml, and give it the "osggraph" value.
 
 5 - Known run-time issues :
 
@@ -675,7 +682,10 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
        See http://sourceforge.net/projects/speed-dreams/files/3rd%20party/MSVC%202005/post-2.0.0
        (and http://sourceforge.net/projects/speed-dreams/files/3rd%20party/Sources/post-2.0.0),
        along with "II - Linux installation from sources" for some more tips about CMake options.
-       
+      
+ Note: If you plan to build "osggraph", you can try to extract the Open Scene Graph 3.x binaries
+       (get the ones for your version of MSVC) from Alpha Pixel in you 3rdParty folder :
+         http://www.alphapixel.com/osg/downloads/free-openscenegraph-binary-downloads
 
 3) MS VC++ 6 : No more supported.
 
