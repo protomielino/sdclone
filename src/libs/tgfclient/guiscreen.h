@@ -155,21 +155,6 @@
 // Open GL detection specs
 #define GFSCR_SECT_GLDETSPECS			"OpenGL Detection Specs"
 
-// Dash colours
-#define GFSCR_SECT_DASHSETTINGS	"Dash settings"
-
-#define GFSCR_DASH_COLORS	"colors"
-
-#define GFSCR_ELT_NORMALCLR		"normal color"
-#define GFSCR_ELT_DANGERCLR		"danger color"
-#define GFSCR_ELT_OKCLR			"OK color"
-#define GFSCR_ELT_ERRORCLR		"error color"
-#define GFSCR_ELT_INACTIVECLR	"inactive text color"
-#define GFSCR_ELT_EMPHASIZEDCLR	"emphasized color"
-#define GFSCR_ELT_AHEADCLR		"car ahead color"
-#define GFSCR_ELT_ARCADECLR		"arcade color"
-#define GFSCR_ELT_BACKGROUNDCLR	"dash panel background color"
-
 #endif /* _GUISCREEN_H_ */
 
 

@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../../../libs/tgf/params.dtd">
 
-<params name="graph" type="param" mode="mw" version="1.8">
+<params name="graph" type="param" mode="mw" version="1.9">
   <section name="Graphic">
     <attnum name="smoke value" val="300"/>
     <attnum name="smoke interval" val="0.01"/>
@@ -103,6 +103,91 @@
       <attnum name="camera head list" val="0"/>
       <attnum name="board width" val="100"/>
       <attnum name="speedometer vertical position" val="0"/>
+    </section>
+  </section>
+
+
+  <section name="Dash settings">
+    <section name="colors">
+      <!-- Usual dash text -->
+      <section name="normal color">
+        <attnum name="red" val="1.0"/>
+        <attnum name="green" val="1.0"/>
+        <attnum name="blue" val="1.0"/>
+        <attnum name="alpha" val="1.0"/>
+      </section>
+
+      <!-- Low fuel, high damage -->
+      <section name="danger color">
+        <attnum name="red" val="1.0"/>
+        <attnum name="green" val="0.0"/>
+        <attnum name="blue" val="0.0"/>
+        <attnum name="alpha" val="1.0"/>
+      </section>
+
+      <!-- Damage OK -->
+      <section name="OK color">
+        <attnum name="red" val="0.0"/>
+        <attnum name="green" val="1.0"/>
+        <attnum name="blue" val="0.0"/>
+        <attnum name="alpha" val="1.0"/>
+      </section>
+
+      <!-- Some kind of lap time math problem -->
+      <section name="error color">
+        <attnum name="red" val="1.0"/>
+        <attnum name="green" val="0.0"/>
+        <attnum name="blue" val="1.0"/>
+        <attnum name="alpha" val="1.0"/>
+      </section>
+
+      <!-- ABS/SPD/TCS OFF -->
+      <section name="inactive text color">
+        <attnum name="red" val="0.3"/>
+        <attnum name="green" val="0.3"/>
+        <attnum name="blue" val="0.3"/>
+        <attnum name="alpha" val="1.0"/>
+      </section>
+
+      <!-- Lap count, pilot name, current car on map, ABS/SPD/TCS ON -->
+      <section name="emphasized color">
+        <attnum name="red" val="1.0"/>
+        <attnum name="green" val="0.878"/>
+        <attnum name="blue" val="0.0"/>
+        <attnum name="alpha" val="1.0"/>
+      </section>
+
+      <!-- Cars on map and board ahead of current car -->
+      <section name="car ahead color">
+        <attnum name="red" val="0.31"/>
+        <attnum name="green" val="0.968"/>
+        <attnum name="blue" val="0.933"/>
+        <attnum name="alpha" val="1.0"/>
+      </section>
+
+      <!-- Cars on map and board behind the current car -->
+      <section name="car behind color">
+        <attnum name="red" val="0.054"/>
+        <attnum name="green" val="0.227"/>
+        <attnum name="blue" val="0.439"/>
+        <attnum name="alpha" val="1.0"/>
+      </section>
+
+      <!-- Almost all text in arcade mode -->
+      <section name="arcade color">
+        <attnum name="red" val="0.9"/>
+        <attnum name="green" val="0.9"/>
+        <attnum name="blue" val="0.15"/>
+        <attnum name="alpha" val="1.0"/>
+      </section>
+
+      <!-- Panel backgrounds (leaderboard, driver info) -->
+      <section name="dash panel background color">
+        <attnum name="red" val="0.039"/>
+        <attnum name="green" val="0.086"/>
+        <attnum name="blue" val="0.184"/>
+        <attnum name="alpha" val="0.8"/>
+      </section>
     </section>
   </section>
 

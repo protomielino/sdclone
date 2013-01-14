@@ -785,3 +785,13 @@ void cGrTrackMap::initColors()
 	behindCarColor[2] = 0.439;
 	behindCarColor[3] = 1.0;
 }
+
+void cGrTrackMap::initColors(const float *current_color,
+                                const float *ahead_color,
+                                const float *behind_color) {
+  for (int i = 0; i < 4; ++i) {
+      currentCarColor[i] = current_color[i];
+      aheadCarColor[i] = ahead_color[i];
+      behindCarColor[i] = behind_color[i];
+  }
+}

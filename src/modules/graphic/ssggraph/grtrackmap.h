@@ -148,6 +148,7 @@ class cGrTrackMap
 
 		// Setus up colors.
 		void initColors();
+		void initColors(const float *current_color, const float *ahead_color, const float *behind_color);
 
 		void checkAndSetMinimum(float &currentmin, float &value);
 		void checkAndSetMaximum(float &currentmax, float &value);

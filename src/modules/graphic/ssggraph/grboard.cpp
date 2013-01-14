@@ -54,7 +54,8 @@ static const int BUFSIZE = 256;
 cGrBoard::cGrBoard(int myid) :
     normal_color_(NULL), danger_color_(NULL), ok_color_(NULL),
     error_color_(NULL), inactive_color_(NULL), emphasized_color_(NULL),
-    ahead_color_(NULL), arcade_color_(NULL), background_color_(NULL)
+    ahead_color_(NULL), behind_color_(NULL), arcade_color_(NULL),
+    background_color_(NULL)
 {
   id = myid;
   trackMap = NULL;
@@ -78,6 +79,7 @@ cGrBoard::~cGrBoard()
   delete [] inactive_color_;
   delete [] emphasized_color_;
   delete [] ahead_color_;
+  delete [] behind_color_;
   delete [] arcade_color_;
   delete [] background_color_;
 }
@@ -86,9 +88,9 @@ cGrBoard::~cGrBoard()
 void
 cGrBoard::loadDefaults(const tCarElt *curCar)
 {
-  //Load dash colours from screen.xml
+  //Load dash colours from graph.xml
   char path[1024];
-  snprintf(path, sizeof(path), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+  snprintf(path, sizeof(path), "%s%s", GfLocalDir(), GR_PARAM_FILE);
   void *hdle = GfParmReadFile(path, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
   ReadDashColor(hdle, GFSCR_ELT_NORMALCLR,      &normal_color_);
@@ -98,6 +100,7 @@ cGrBoard::loadDefaults(const tCarElt *curCar)
   ReadDashColor(hdle, GFSCR_ELT_INACTIVECLR,    &inactive_color_);
   ReadDashColor(hdle, GFSCR_ELT_EMPHASIZEDCLR,  &emphasized_color_);
   ReadDashColor(hdle, GFSCR_ELT_AHEADCLR,       &ahead_color_);
+  ReadDashColor(hdle, GFSCR_ELT_BEHINDCLR,      &behind_color_);
   ReadDashColor(hdle, GFSCR_ELT_ARCADECLR,      &arcade_color_);
   ReadDashColor(hdle, GFSCR_ELT_BACKGROUNDCLR,  &background_color_);
 
@@ -262,13 +265,13 @@ cGrBoard::grDispGGraph()
 
   // Draw the static blue thin cross and vertical segment.
   glBegin(GL_LINES);
-  glColor4f(1.0, 1.0, 1.0, 1.0);
-  glVertex2f(X1-50, Y1);
-  glVertex2f(X1+50, Y1);
-  glVertex2f(X1, Y1-50);
-  glVertex2f(X1, Y1+50);
+  glColor4fv(ahead_color_);
+  glVertex2f(X1 - 50, Y1);
+  glVertex2f(X1 + 50, Y1);
+  glVertex2f(X1, Y1 - 50);
+  glVertex2f(X1, Y1 + 50);
   glVertex2f(XC, YC);
-  glVertex2f(XC, YC+100);
+  glVertex2f(XC, YC + 100);
   glEnd();
 
   // Draw the throttle gauge (vertical thick segment, starting in X1,Y1,
@@ -276,26 +279,36 @@ cGrBoard::grDispGGraph()
   static const tdble THNSS = 2.0f;
 
   glBegin(GL_QUADS);
-  glColor4f(0.0, 0.0, 1.0, 1.0);
+  glColor4fv(behind_color_);
+
+  // red if at least one wheel is slipping, blue otherwise).
+  // a) Detect wheel slip, and change current color to red if so.
+  for (int xx = 0; xx < 4; ++xx) {
+    if (fabs(car_->_speed_x)
+        - fabs(car_->_wheelSpinVel(xx) * car_->_wheelRadius(xx)) < -5.0f) {
+      glColor4fv(danger_color_);
+      break;
+    }
+  }
   glVertex2f(X1 - THNSS, Y1);
   glVertex2f(X1 + THNSS, Y1);
   glVertex2f(X1 + THNSS, Y1 + car_->ctrl.accelCmd * 50.0f);
   glVertex2f(X1 - THNSS, Y1 + car_->ctrl.accelCmd * 50.0f);
 
+  // Back to normal blue color.
+  glColor4fv(behind_color_);
+
   // Draw the brake gauge (vertical thick segment, starting in X1,Y1,
   // going downward, length proportional to the brake command,
   // red if at least one wheel is blocking/blocked, blue otherwise).
   // a) Detect wheel blocking, and change current color to red if so.
-  for (int xx = 0; xx < 4; ++xx)
-  {
+  for (int xx = 0; xx < 4; ++xx) {
     if (fabs(car_->_speed_x)
-        - fabs(car_->_wheelSpinVel(xx) * car_->_wheelRadius(xx)) >  5.0f)
-    {
-      glColor4f(1.0, 0.0, 0.0, 1.0);
+        - fabs(car_->_wheelSpinVel(xx) * car_->_wheelRadius(xx)) > 5.0f) {
+      glColor4fv(danger_color_);
       break;
     }
   }
-
   // b) Draw the gauge.
   glVertex2f(X1 - THNSS, Y1);
   glVertex2f(X1 + THNSS, Y1);
@@ -303,17 +316,29 @@ cGrBoard::grDispGGraph()
   glVertex2f(X1 - THNSS, Y1 - car_->ctrl.brakeCmd * 50.0f);
 
   // Back to normal blue color.
-  glColor4f(0.0, 0.0, 1.0, 1.0);
+  glColor4fv(behind_color_);
 
   // Draw the steer gauge (horizontal thick segment, starting in X1,Y1,
   // going left or right according to the direction,
   // length proportional to the steer command).
+
+  for (int xx = 0; xx < 2; ++xx) {
+    if (fabs(car_->_wheelSlipSide(xx)) > 5.0) {
+      glColor4fv(danger_color_);
+      break;
+    }
+  }
+
   glVertex2f(X1, Y1 - THNSS);
   glVertex2f(X1, Y1 + THNSS);
   glVertex2f(X1 - car_->ctrl.steer * 50.0f, Y1 + THNSS);
   glVertex2f(X1 - car_->ctrl.steer * 50.0f, Y1 - THNSS);
 
-  // Draw the clutch gauge (vertical thick segment, starting in xc, yc,
+  // Back to normal blue color.
+  glColor4fv(behind_color_);
+
+
+  // Draw the clutch gauge (vertical thick segment, starting in XC, YC,
   // going upwards, length proportional to the clutch command).
   glVertex2f(XC - THNSS, YC);
   glVertex2f(XC + THNSS, YC);
@@ -328,7 +353,7 @@ cGrBoard::grDispGGraph()
   const tdble Y2 = car_->_DynGC.acc.x / 9.81f * 25.0f + Y1;
 
   glBegin(GL_LINES);
-  glColor4f(1.0, 0.0, 0.0, 1.0);
+  glColor4fv(emphasized_color_);
   glVertex2f(X1, Y1);
   glVertex2f(X2, Y2);
   glEnd();

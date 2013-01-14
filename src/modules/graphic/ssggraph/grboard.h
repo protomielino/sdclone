@@ -95,6 +95,7 @@ private:
     float *inactive_color_;
     float *emphasized_color_;
     float *ahead_color_;
+    float *behind_color_;
     float *arcade_color_;
     float *background_color_;
 
