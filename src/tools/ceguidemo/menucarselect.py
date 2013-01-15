@@ -22,6 +22,7 @@ from menustandard import MenuStandard
 from menucredits import MenuCredits
 from menuoptions import MenuOptions
 from menuprofiles import MenuProfiles
+from menuresults import MenuResults
 
 # Car selection menu
 class MenuCarSelect(MenuStandard):
@@ -63,6 +64,8 @@ class MenuCarSelect(MenuStandard):
 
 		MenuStandard.__init__(self, MenuCredits, MenuOptions, MenuProfiles)
 	
+		self.menuResults = None
+
 	# Initialize
 	def initialize(self):
 
@@ -138,11 +141,15 @@ class MenuCarSelect(MenuStandard):
 	# Handler: buttonClicked
 	def onStartButtonClicked(self, args):
 
-		print("onStartButtonClicked")
+		if not self.menuResults:
+			self.menuResults = MenuResults()
+			self.menuResults.initialize()
+			self.menuResults.setup()
+
+		self.menuResults.activate(previous=self)
 
 	def onBackButtonClicked(self, args):
 
-		print("onBackButtonClicked")
 		self.back()
 		
 	def onTreeSelectionChanged(self, args):

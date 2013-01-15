@@ -26,6 +26,19 @@ from menutrackselect import MenuTrackSelect
 # Main menu
 class MenuMain(MenuStandard):
 
+	singleton = None
+
+	def instance():
+	
+		if not MenuMain.singleton:
+			MenuMain.singleton = MenuMain()
+			MenuMain.singleton.initialize()
+			MenuMain.singleton.setup()
+			
+		return MenuMain.singleton
+
+	instance = staticmethod(instance)
+
 	def __init__(self):
 
 		MenuStandard.__init__(self, MenuCredits, MenuOptions, MenuProfiles)

@@ -2834,7 +2834,7 @@
                     <Dim type="LeftEdge" >
                         <ImageDim imageset="CEGUIDemo" image="HeaderBarSortUp" dimension="Width">
                             <DimOperator op="Add">
-                                <AbsoluteDim value="5" />
+                                <AbsoluteDim value="3" />
                             </DimOperator>
                         </ImageDim>
                     </Dim>
@@ -2842,7 +2842,7 @@
                     <Dim type="RightEdge" ><UnifiedDim scale="1" type="RightEdge" /></Dim>
                     <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
                 </Area>
-                <VertFormat type="CentreAligned" />
+                <VertFormat type="LeftAligned" />
             </TextComponent>
         </ImagerySection>
         <StateImagery name="Normal">
@@ -2936,6 +2936,7 @@
     ***************************************************
     -->
     <WidgetLook name="CEGUIDemo/MultiColumnList">
+        <PropertyLinkDefinition name="HeaderFont" widget="__auto_listheader__" targetProperty="Font" />
         <NamedArea name="ItemRenderingArea">
             <Area>
                 <Dim type="LeftEdge" ><ImageDim imageset="CEGUIDemo" image="MultiListLeft" dimension="Width" /></Dim>
@@ -3020,11 +3021,11 @@
             <Area>
                 <Dim type="LeftEdge" ><AbsoluteDim value="2" /></Dim>
                 <Dim type="TopEdge" ><AbsoluteDim value="2" /></Dim>
-                <Dim type="RightEdge" ><UnifiedDim scale="1" offset="-2" type="RightEdge" /></Dim>
+                <Dim type="RightEdge" ><UnifiedDim scale="1" type="RightEdge" /></Dim>
                 <Dim type="Height" >
                     <FontDim type="LineSpacing">
                         <DimOperator op="Multiply">
-                            <AbsoluteDim value="1.5" />
+                            <AbsoluteDim value="1.2" />
                         </DimOperator>
                     </FontDim>
                 </Dim>

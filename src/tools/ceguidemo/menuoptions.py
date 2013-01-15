@@ -19,7 +19,7 @@ from configuration import TheConfig
 # Import: Menu
 from menu import Menu
 
-# Main menu
+# Options menu
 class MenuOptions(Menu):
 
 	singleton = None

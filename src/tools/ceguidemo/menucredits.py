@@ -19,7 +19,7 @@ from configuration import TheConfig
 # Import: Menu
 from menu import Menu
 
-# Main menu
+# Credit menu
 class MenuCredits(Menu):
 
 	singleton = None

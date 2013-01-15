@@ -89,7 +89,6 @@
     <Image Height="12" Name="HorzScrollRightNormal" Width="14" XPos="236" YPos="322" />
     <Image Height="12" Name="HorzScrollRightHover" Width="14" XPos="236" YPos="338" />
     <Image Height="12" Name="HorzScrollRightPushed" Width="14" XPos="236" YPos="354" />
-
     <Image Height="48" Name="VertSliderBody" Width="9" XPos="223" YPos="219" />
     <Image Height="6" Name="VertSliderThumbNormal" Width="15" XPos="217" YPos="268" />
     <Image Height="6" Name="VertSliderThumbHover" Width="15" XPos="217" YPos="276" />

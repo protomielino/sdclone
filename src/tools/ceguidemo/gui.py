@@ -79,13 +79,6 @@ class GUI(object):
 			raise InitializationError(msg)
 
 	# Setup: Interface
-	# - Important: the instance of `Menu` has to be bound to this object; if it is
-	# a local variable (read: destroyed when it goes out of scope), exceptions will be raised
-	# about the `buttonClicked` method not existing. This is a drawback of the type of setup
-	# this example uses, and as a consequence of Python being a garbage collected language.
 	def setupInterface(self):
 		
-		self.menu = MenuMain()
-		self.menu.initialize()
-		self.menu.setup()
-		self.menu.activate()
+		MenuMain.instance().activate()

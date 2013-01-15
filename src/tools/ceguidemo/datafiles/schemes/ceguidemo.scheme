@@ -15,6 +15,7 @@
 	<Font Name="MenuBig" Filename="menu-big.font" />
 	<Font Name="MenuTitle" Filename="menu-title.font" />
 	<Font Name="TextSmall" Filename="text-small.font" />
+	<Font Name="TextNormal" Filename="text-normal.font" />
 	<Font Name="ToolTip" Filename="tooltip.font" />
 	<!-- <Animations Filename="animations.xml" /> Not understood, ignored (0.7.5 & 0.7.7) -->
 	<!-- <Animation Filename="animations.xml" /> Not understood, ignored (0.7.5 & 0.7.7)-->

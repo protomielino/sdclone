@@ -20,7 +20,7 @@ from menu import Menu
 from dialogs import DialogOKCancel
 
 
-# Main menu
+# Standard menu
 class MenuStandard(Menu):
 
 	def __init__(self, clsMenuCredits, clsMenuOptions, clsMenuProfiles):

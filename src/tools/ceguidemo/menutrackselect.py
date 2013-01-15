@@ -143,7 +143,6 @@ class MenuTrackSelect(MenuStandard):
 
 		self.menuCarSelect.activate(previous=self)
 
-
 	def onBackButtonClicked(self, args):
 
 		self.back()

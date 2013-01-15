@@ -220,9 +220,16 @@ class Input(object):
 			else:
 				PyCEGUI.System.getSingleton().injectMouseButtonDown(PyCEGUI.RightButton)
 
-		# An `else` clause could also go here to perform some arbitrary action on unhandled
-		# mouse input; this is left as an exercise for the reader. Instead, we just implicitly
-		# ignore it.
+		elif button == GLUT_MIDDLE_BUTTON:
+			if state == GLUT_UP:
+				PyCEGUI.System.getSingleton().injectMouseButtonUp(PyCEGUI.MiddleButton)
+			else:
+				PyCEGUI.System.getSingleton().injectMouseButtonDown(PyCEGUI.MiddleButton)
+
+		# Do what we can about the poor GLUT mouse wheel support ...
+		elif button in (3, 4):
+			if state != GLUT_UP: # Ignore redundant UP events.
+				PyCEGUI.System.getSingleton().injectMouseWheelChange((3.5 - button) / 2)
 		
 		return False
 
