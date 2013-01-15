@@ -35,9 +35,10 @@ public:
 	SDRender(void);
 	~SDRender(void);
 	
-	void Init(osg::ref_ptr<osg::Group> root, osg::ref_ptr<osgViewer::Viewer> view);
+    void Init(osg::ref_ptr<osgViewer::Viewer> view);
 	void Update(float speedcar, tSituation *s);
 	void UpdateTime(tSituation *s);
+    void UpdateLight(void);
 };
 
 #endif //_OSGRENDER_H_

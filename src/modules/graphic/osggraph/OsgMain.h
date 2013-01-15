@@ -20,9 +20,9 @@
 #ifndef _OSGMAIN_H_
 #define _OSGMAIN_H_
 
-#include <osg/Group>
-#include <osgViewer/Viewer>
-#include <osg/Camera>
+//#include <osg/Group>
+//#include <osgViewer/Viewer>
+//#include <osg/Camera>
 
 #include <graphic.h>
 #include <raceman.h>	//tSituation
@@ -65,6 +65,7 @@ extern int grNbActiveScreens;
 class SDScenery;
 class SDCars;
 class SDRender;
+class SDViewer;
 
 //static 
 
@@ -79,7 +80,7 @@ class SDRender;
 
 extern tdble grLodFactorValue;
 
-class cGrFrameInfo
+class SDFrameInfo
 {
  public:
 	double fInstFps;        // "Instant" frame rate (average along a 1 second shifting window).

@@ -29,6 +29,7 @@
 #include "OsgCar.h"
 #include "OsgScenery.h"
 #include "OsgRender.h"
+#include "OsgView.h"
 #include "OsgMath.h"
 
 
@@ -53,6 +54,7 @@
 SDCars *cars = NULL;
 SDScenery *scenery = NULL;
 SDRender *render = NULL;
+SDViewer *viewer = NULL;
 
 static osg::ref_ptr<osg::Group> m_sceneroot;
 static osg::ref_ptr<osg::Group> m_carroot;
@@ -76,7 +78,7 @@ int grWinx, grWiny, grWinw, grWinh;
 tdble grLodFactorValue = 1.0;
 
 // Frame/FPS info.
-static cGrFrameInfo frameInfo;
+static SDFrameInfo frameInfo;
 static double fFPSPrevInstTime;   // Last "instant" FPS refresh time
 static unsigned nFPSTotalSeconds; // Total duration since initView
 double ratio = 0.0f;
@@ -424,15 +426,15 @@ grSelectBoard(void *vp)
 }*/
 
 static void
-grPrevCar(void * /* dummy */)
+SDPrevCar(void * /* dummy */)
 {
-    //return 0; //grGetCurrentScreen()->selectPrevCar();
+    viewer->selectPrevCar();
 }
 
 static void
-grNextCar(void * /* dummy */)
+SDNextCar(void * /* dummy */)
 {
-    //return 0; //grGetCurrentScreen()->selectNextCar();
+    viewer->selectNextCar();
 }
 
 //static void*/
@@ -445,6 +447,7 @@ int
 initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
     render = new SDRender;
+    viewer = new SDViewer;
     int i;
 
     grWinx = x;
@@ -475,7 +478,8 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     m_sceneViewer->getCamera()->setProjectionMatrixAsPerspective(67.5f, static_cast<double>((float)grWinw / (float)grWinh), 0.1f, 12000.0f);
     //m_sceneViewer->realize();
     
-
+    m_sceneViewer->setSceneData(m_sceneroot);
+    render->Init(m_sceneViewer);
 
 	/*// Create the screens and initialize each board.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
@@ -487,8 +491,8 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	grSetZoom, NULL);
     GfuiAddKey(screen, '*',            "Zoom Default", (void*)GR_ZOOM_DFLT,	grSetZoom, NULL);*/
 
-    //GfuiAddKey( 0, GFUIK_PAGEUP,   "Select Previous Car", (void*)0, grPrevCar, NULL);
-    //GfuiAddKey( 0, GFUIK_PAGEDOWN, "Select Next Car",     (void*)0, grNextCar, NULL);
+    GfuiAddKey( screen, GFUIK_PAGEUP,   "Select Previous Car", (void*)0, SDPrevCar, NULL);
+    GfuiAddKey( screen, GFUIK_PAGEDOWN, "Select Next Car",     (void*)0, SDNextCar, NULL);
 
     /*GfuiAddKey(screen, GFUIK_F2,       "Driver Views",      (void*)0, grSelectCamera, NULL);
     GfuiAddKey(screen, GFUIK_F3,       "Car Views",         (void*)1, grSelectCamera, NULL);
@@ -521,9 +525,6 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 
     GfLogInfo("Current screen is #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
 
-    render->Init(m_sceneroot, m_sceneViewer);
-    m_sceneViewer->setSceneData(m_sceneroot);
-
     //grLodFactorValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, 1.0);
 
     return 0; // true;
@@ -554,7 +555,8 @@ refresh(tSituation *s)
 
     //int	i;
     int nb = s->_ncars;
-    tCarElt *car = s->cars[nb-1];
+    viewer->update(s, &frameInfo);
+    tCarElt *car = viewer->getCurrentCar();
     
     cars->updateCars();
     
@@ -831,9 +833,18 @@ initTrack(tTrack *track)
 
 int  initCars(tSituation *s)
 {
+	char buf[256];
     cars = new SDCars;
     m_sceneroot->addChild(cars->loadCars(s));
     GfOut("All cars loaded\n");
+    
+    if (!grHandle)
+    {
+        sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
+        grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    }
+
+    viewer->Init(s);
     
     return 0;
 }

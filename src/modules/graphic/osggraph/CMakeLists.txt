@@ -1,11 +1,14 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
-SET(OSGGRAPH_HEADERS AccGeode.h AccException.h ReaderWriterACC.h
+SET(OSGGRAPH_HEADERS OsgVectorArrayAdapter.h OsgColor.h 
+					 AccGeode.h AccException.h ReaderWriterACC.h
                      OsgLoader.h OsgScenery.h OsgRender.h OsgMath.h OsgMain.h
+                     OsgView.h
                      OsgGraph.h OsgCar.h OsgWheel.h OsgBrake.h)
 			
 SET(OSGGRAPH_SOURCES AccGeode.cpp AccException.cpp ReaderWriterACC.cpp
-                     OsgLoader.cpp OsgBackground.cpp OsgScenery.cpp OsgRender.cpp
+                     OsgLoader.cpp OsgBackground.cpp OsgScenery.cpp 
+                     OsgView.cpp OsgRender.cpp
                      OsgMath.cpp OsgMain.cpp OsgGraph.cpp OsgCar.cpp OsgWheel.cpp
                      OsgBrake.cpp)
 
