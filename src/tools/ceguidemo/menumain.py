@@ -20,6 +20,7 @@ from configuration import TheConfig
 from menustandard import MenuStandard
 from menucredits import MenuCredits
 from menuoptions import MenuOptions
+from menuprofiles import MenuProfiles
 from menutrackselect import MenuTrackSelect
 
 # Main menu
@@ -27,7 +28,7 @@ class MenuMain(MenuStandard):
 
 	def __init__(self):
 
-		MenuStandard.__init__(self, MenuCredits, MenuOptions) #, MenuProfiles, )
+		MenuStandard.__init__(self, MenuCredits, MenuOptions, MenuProfiles)
 
 		self.menuTrackSelect = None
 	

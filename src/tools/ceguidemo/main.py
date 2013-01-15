@@ -35,7 +35,7 @@ def main():
 		inp.initialize()
 		gui.initialize()
 	except InitializationError as error:
-		print error
+		print(error)
 		return 1
 
 	# Setup the interface

@@ -104,9 +104,9 @@ class Menu(object):
 		self.txtFrameRate = window.getChild(name + "/TxtFrameRate")
 
 		# Trace info. about children.
-		#print "Menu: Children (n=%d) :" % self.window.getChildCount()
+		#print("Menu: Children (n=%d) :" % self.window.getChildCount())
 		#for chldInd in range(self.window.getChildCount()):
-		#	print "  #%d : name=%r" % (chldInd, self.window.getChildAtIdx(chldInd).getName())
+		#	print("  #%d : name=%r" % (chldInd, self.window.getChildAtIdx(chldInd).getName()))
 
 		# Setup animations.
 		self.animFadeIn = PyCEGUI.AnimationManager.getSingleton().instantiateAnimation("MenuFadeIn")
@@ -147,7 +147,7 @@ class Menu(object):
 	# Activate
 	def deactivate(self):
 
-		print "%s.deactivate" % self.__class__.__name__
+		print("%s.deactivate" % self.__class__.__name__)
 		
 		# Detach.
 		#self.disconnectHandlers()
@@ -158,7 +158,7 @@ class Menu(object):
 	# Activate
 	def activate(self, previous=None):
 	
-		print "%s.activate" % self.__class__.__name__
+		print("%s.activate" % self.__class__.__name__)
 
 		# Attach new.
 		PyCEGUI.System.getSingleton().setGUISheet(self.window)
@@ -188,7 +188,7 @@ class Menu(object):
 			self.deactivate()
 			self.prevMenu.activate()
 		else:
-			print "Warning: No previous menu to return to ; ignoring."
+			print("Warning: No previous menu to return to ; ignoring.")
 
 	# Update frame rate indicator.
 	def onUpdate(self, winArgs): # Bug: Not an UpdateEventArgs, but a WindowEventArgs !
@@ -204,18 +204,18 @@ class Menu(object):
 	def onKeyDown(self, keyArgs):
 		
 		# Just in case not specialised in actual class.
-		print "Menu.onKeyDown: sc=", keyArgs.scancode
+		print("Menu.onKeyDown: sc=", keyArgs.scancode)
 		return False
 		
 	# Debug : Seems that EventActivated is only fired once ever !
 	def onActivated(self, args):
 			
-		print "%s.onActivated" % self.__class__.__name__
+		print("%s.onActivated" % self.__class__.__name__)
 		#self.connectHandlers()
 		return False
 
 	def onDeactivated(self, args):
 			
-		print "%s.onDeactivated" % self.__class__.__name__
+		print("%s.onDeactivated" % self.__class__.__name__)
 		#self.disconnectHandlers()
 		return False

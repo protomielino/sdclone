@@ -21,6 +21,7 @@ from configuration import TheConfig
 from menustandard import MenuStandard
 from menucredits import MenuCredits
 from menuoptions import MenuOptions
+from menuprofiles import MenuProfiles
 
 # Car selection menu
 class MenuCarSelect(MenuStandard):
@@ -60,7 +61,7 @@ class MenuCarSelect(MenuStandard):
 
 	def __init__(self):
 
-		MenuStandard.__init__(self, MenuCredits, MenuOptions) #, MenuProfiles, )
+		MenuStandard.__init__(self, MenuCredits, MenuOptions, MenuProfiles)
 	
 	# Initialize
 	def initialize(self):
@@ -146,7 +147,6 @@ class MenuCarSelect(MenuStandard):
 		
 	def onTreeSelectionChanged(self, args):
 	
-		print("onTreeSelectionChanged")
 		treeItem = args.treeItem
 		if treeItem and treeItem.getID() in self.dictTreeItemID2Car:
 			car = self.dictTreeItemID2Car[treeItem.getID()]

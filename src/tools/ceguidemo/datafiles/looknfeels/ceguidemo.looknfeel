@@ -1900,7 +1900,7 @@
         </StateImagery>
     </WidgetLook>
 
-    <!--
+    <!-- WARNING: Deprecated, rather use the more powerful ItemListbox !
     ***************************************************
         CEGUIDemo/Listbox
     ***************************************************
@@ -4545,7 +4545,7 @@
     </WidgetLook>
 
 
-    <!--
+    <!-- An item of the ItemListbox
     ***************************************************
         CEGUIDemo/ListboxItem
     ***************************************************
@@ -4555,6 +4555,7 @@
         <PropertyDefinition name="SelectedTextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
         <PropertyDefinition name="SelectionBrush" initialValue="set:CEGUIDemo image:ListboxSelectionBrush" redrawOnWrite="true" />
         <PropertyDefinition name="SelectionColour" initialValue="FF3FFFEE" redrawOnWrite="true" />
+        <PropertyDefinition name="HorzLabelFormatting" initialValue="LeftAligned" redrawOnWrite="true" />
         <Property name="Selectable" value="True" />
         <Property name="MouseInputPropagationEnabled" value="True" />
         <NamedArea name="ContentSize">
@@ -4589,6 +4590,7 @@
                         <UnifiedDim scale="1" type="BottomEdge" />
                     </Dim>
                 </Area>
+                <HorzFormatProperty name="HorzLabelFormatting" />
             </TextComponent>
         </ImagerySection>
         <ImagerySection name="selection">
@@ -4747,8 +4749,8 @@
         <PropertyDefinition name="NormalTextColour" initialValue="FFFFFFFF" redrawOnWrite="true" />
         <PropertyDefinition name="PushedTextColour" initialValue="FF69FFF6" redrawOnWrite="true" />
         <PropertyDefinition name="DisabledTextColour" initialValue="FF7F7F7F" redrawOnWrite="true" />
-        <PropertyDefinition name="VertLabelFormatting" initialValue="CentreAligned" />
-        <PropertyDefinition name="HorzLabelFormatting" initialValue="LeftAligned" />
+        <PropertyDefinition name="VertLabelFormatting" initialValue="CentreAligned" redrawOnWrite="true" />
+        <PropertyDefinition name="HorzLabelFormatting" initialValue="LeftAligned" redrawOnWrite="true" />
         <PropertyDefinition name="NormalImage" initialValue="" redrawOnWrite="true" />
         <PropertyDefinition name="HoverImage" initialValue="" redrawOnWrite="true" />
         <PropertyDefinition name="PushedImage" initialValue="" redrawOnWrite="true" />

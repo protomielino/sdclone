@@ -23,13 +23,13 @@ from dialogs import DialogOKCancel
 # Main menu
 class MenuStandard(Menu):
 
-	def __init__(self, clsMenuCredits, clsMenuOptions): #, clsMenuProfiles):
+	def __init__(self, clsMenuCredits, clsMenuOptions, clsMenuProfiles):
 	
 		Menu.__init__(self)
 
 		self.clsMenuCredits = clsMenuCredits
 		self.clsMenuOptions = clsMenuOptions
-		#self.clsMenuProfiles = clsMenuProfiles
+		self.clsMenuProfiles = clsMenuProfiles
 		
 		self.menuCredits = None
 		self.menuProfiles = None
@@ -121,7 +121,7 @@ class MenuStandard(Menu):
 
 	def onProfilesButtonClicked(self, args):
 
-		print("onProfilesButtonClicked")
+		self.switchTo(self.clsMenuProfiles.getSingleton())
 
 	def onOptionsButtonClicked(self, args):
 
@@ -139,7 +139,7 @@ class MenuStandard(Menu):
 
 	def onKeyDown(self, keyArgs):
 
-		print "MenuStandard.onKeyDown: sc=%d, " % (keyArgs.scancode, )
+		print("MenuStandard.onKeyDown: sc=%d, " % keyArgs.scancode)
 		if keyArgs.scancode == PyCEGUI.Key.Escape:
 
 			keyArgs.handled = True

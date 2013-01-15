@@ -17,6 +17,7 @@
             <Item path="datafiles/layouts/menumain.layout" type="file" />
             <Item path="datafiles/layouts/menuoptions.layout" type="file" />
             <Item path="datafiles/layouts/menutrackselect.layout" type="file" />
+            <Item path="datafiles/layouts/menuprofiles.layout" type="file" />
         </Item>
         <Item name="Schemes" type="folder">
             <Item path="datafiles/schemes/ceguidemo.scheme" type="file" />

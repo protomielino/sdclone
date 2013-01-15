@@ -7,6 +7,7 @@
 	<Imageset Filename="splash-carselect.imageset" />
 	<Imageset Filename="splash-credits.imageset" />
 	<Imageset Filename="splash-options.imageset" />
+	<Imageset Filename="splash-profiles.imageset" />
 	<Imageset Filename="splash-okcancel.imageset" />
 	<Font Name="MenuSmall" Filename="menu-small.font" />
 	<Font Name="MenuMedium" Filename="menu-medium.font" />

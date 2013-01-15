@@ -57,7 +57,6 @@
     <Image Height="16" Name="SpinnerUpHover" Width="14" XPos="81" YPos="227" />
     <Image Height="16" Name="SpinnerUpPushed" Width="14" XPos="97" YPos="227" />
     <Image Height="16" Name="TextSelectionBrush" Width="16" XPos="234" YPos="238" />
-
     <Image Height="40" Name="VertScrollBarSegment" Width="2" XPos="158" YPos="313" />
     <Image Height="10" Name="VertScrollThumbTopNormal" Width="16" XPos="140" YPos="313" />
     <Image Height="20" Name="VertScrollThumbMiddleNormal" Width="16" XPos="140" YPos="323" />
@@ -74,7 +73,6 @@
     <Image Height="16" Name="VertScrollUpNormal" Width="14" XPos="65" YPos="227" />
     <Image Height="16" Name="VertScrollUpHover" Width="14" XPos="81" YPos="227" />
     <Image Height="16" Name="VertScrollUpPushed" Width="14" XPos="97" YPos="227" />
-
     <Image Height="2" Name="HorzScrollBarSegment" Width="40" XPos="162" YPos="367" />
     <Image Height="16" Name="HorzScrollThumbLeftNormal" Width="10" XPos="162" YPos="349" />
     <Image Height="16" Name="HorzScrollThumbMiddleNormal" Width="20" XPos="172" YPos="349" />
@@ -98,15 +96,15 @@
     <Image Height="9" Name="HorizSliderBody" Width="48" XPos="57" YPos="301" />
     <Image Height="15" Name="HorizSliderThumbNormal" Width="6" XPos="50" YPos="295" />
     <Image Height="15" Name="HorizSliderThumbHover" Width="6" XPos="42" YPos="295" />
-    <Image Height="6" Name="ListboxLeft" Width="7" XPos="41" YPos="89" />
-    <Image Height="6" Name="ListboxRight" Width="7" XPos="62" YPos="89" />
-    <Image Height="7" Name="ListboxTop" Width="6" XPos="52" YPos="78" />
-    <Image Height="7" Name="ListboxBottom" Width="6" XPos="52" YPos="99" />
-    <Image Height="7" Name="ListboxTopLeft" Width="7" XPos="41" YPos="78" />
-    <Image Height="7" Name="ListboxTopRight" Width="7" XPos="62" YPos="78" />
-    <Image Height="7" Name="ListboxBottomLeft" Width="7" XPos="41" YPos="99" />
-    <Image Height="7" Name="ListboxBottomRight" Width="7" XPos="62" YPos="99" />
-    <Image Height="6" Name="ListboxBackdrop" Width="6" XPos="52" YPos="89" />
+    <Image Height="6" Name="ListboxLeft" Width="7" XPos="45" YPos="362" />
+    <Image Height="6" Name="ListboxRight" Width="7" XPos="66" YPos="362" />
+    <Image Height="7" Name="ListboxTop" Width="6" XPos="56" YPos="351" />
+    <Image Height="7" Name="ListboxBottom" Width="6" XPos="56" YPos="372" />
+    <Image Height="7" Name="ListboxTopLeft" Width="7" XPos="45" YPos="351" />
+    <Image Height="7" Name="ListboxTopRight" Width="7" XPos="66" YPos="351" />
+    <Image Height="7" Name="ListboxBottomLeft" Width="7" XPos="45" YPos="372" />
+    <Image Height="7" Name="ListboxBottomRight" Width="7" XPos="66" YPos="372" />
+    <Image Height="6" Name="ListboxBackdrop" Width="6" XPos="56" YPos="362" />
     <Image Height="16" Name="ListboxSelectionBrush" Width="16" XPos="234" YPos="238" />
     <Image Height="16" Name="ComboboxEditLeft" Width="9" XPos="185" YPos="219" />
     <Image Height="16" Name="ComboboxEditMiddle" Width="8" XPos="195" YPos="219" />
@@ -259,4 +257,12 @@
     <Image Height="16" Name="HorizontalVUMeterMiddle" Width="20" XPos="113" YPos="295" />
     <Image Height="16" Name="HorizontalVUMeterRight" Width="8" XPos="135" YPos="295" />
     <Image Height="16" Name="HorizontalVUMeterLitSegment" Width="64" XPos="145" YPos="295" />
+    <Image Height="24" Name="IconAddNormal" Width="24" XPos="1" YPos="382" />
+    <Image Height="24" Name="IconAddHighlight" Width="24" XPos="26" YPos="382" />
+    <Image Height="24" Name="IconAddPushed" Width="24" XPos="51" YPos="382" />
+    <Image Height="24" Name="IconAddDisabled" Width="24" XPos="76" YPos="382" />
+    <Image Height="24" Name="IconRemoveNormal" Width="24" XPos="101" YPos="382" />
+    <Image Height="24" Name="IconRemoveHighlight" Width="24" XPos="126" YPos="382" />
+    <Image Height="24" Name="IconRemovePushed" Width="24" XPos="151" YPos="382" />
+    <Image Height="24" Name="IconRemoveDisabled" Width="24" XPos="176" YPos="382" />
 </Imageset>

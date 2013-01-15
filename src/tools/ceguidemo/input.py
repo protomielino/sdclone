@@ -146,15 +146,18 @@ class Input(object):
 				if not key['is_held']:
 					key['is_held'] = True
 					PyCEGUI.System.getSingleton().injectKeyDown(key['scancode'])
+					print("handleModifierKeys: Down %s" % name)
 			elif key['is_held']:
 				key['is_held'] = False
 				PyCEGUI.System.getSingleton().injectKeyUp(key['scancode'])
+				print("handleModifierKeys: Up %s " % name)
 
 	# Handler: Normal Key Down
 	def handlerNormalKeyDown(self, key, x, y):
 
-		key = key.encode('ascii', 'ignore')
 		self.handleModifierKeys()
+
+		key = key.encode('ascii', 'ignore')
 		scancode = self.ascii2Scancode(key)
 		if scancode:
 			PyCEGUI.System.getSingleton().injectKeyDown(int(scancode))
@@ -165,8 +168,9 @@ class Input(object):
 	# Handler: Normal Key Up
 	def handlerNormalKeyUp(self, key, x, y):
 
-		key = key.encode('ascii', 'ignore')
 		self.handleModifierKeys()
+
+		key = key.encode('ascii', 'ignore')
 		scancode = self.ascii2Scancode(key)
 		if scancode:
 			PyCEGUI.System.getSingleton().injectKeyDown(int(scancode))
@@ -178,6 +182,7 @@ class Input(object):
 	def handlerSpecialKeyDown(self, key, x, y):
 
 		self.handleModifierKeys()
+
 		scancode = self.special2Scancode(key)
 		if scancode:
 			PyCEGUI.System.getSingleton().injectKeyDown(int(scancode))
@@ -188,6 +193,7 @@ class Input(object):
 	def handlerSpecialKeyUp(self, key, x, y):
 
 		self.handleModifierKeys()
+
 		scancode = self.special2Scancode(key)
 		if scancode:
 			PyCEGUI.System.getSingleton().injectKeyUp(int(scancode))
@@ -196,6 +202,8 @@ class Input(object):
 
 	# Handler: Mouse Button
 	def handlerMouseButton(self, button, state, x, y):
+
+		self.handleModifierKeys()
 
 		if button == GLUT_LEFT_BUTTON:
 			if state == GLUT_UP:

@@ -21,6 +21,7 @@ from configuration import TheConfig
 from menustandard import MenuStandard
 from menucredits import MenuCredits
 from menuoptions import MenuOptions
+from menuprofiles import MenuProfiles
 from menucarselect import MenuCarSelect
 
 # Track selection menu
@@ -75,7 +76,7 @@ class MenuTrackSelect(MenuStandard):
 
 	def __init__(self):
 
-		MenuStandard.__init__(self, MenuCredits, MenuOptions) #, MenuProfiles, )
+		MenuStandard.__init__(self, MenuCredits, MenuOptions, MenuProfiles)
 
 		self.menuCarSelect = None
 	
@@ -151,7 +152,7 @@ class MenuTrackSelect(MenuStandard):
 		
 		selCatName = self.cbxCat.getSelectedItem().getText()
 
-		print "onCatChanged(%s)" % selCatName
+		#print("onCatChanged(%s)" % selCatName)
 
 		# Re-initialise track combo-box.
 		self.cbxTrack.clearAllSelections()
@@ -176,7 +177,7 @@ class MenuTrackSelect(MenuStandard):
 		selCatName = self.cbxCat.getSelectedItem().getText()
 		selTrackName = self.cbxTrack.getSelectedItem().getText()
 
-		print "onTrackChanged(cat=%s, track=%s)" % (selCatName, selTrackName)
+		#print("onTrackChanged(cat=%s, track=%s)" % (selCatName, selTrackName))
 		
 		track = self.Tracks[selCatName][selTrackName]
 
