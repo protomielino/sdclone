@@ -45,5 +45,4 @@ class SDWheels
         void updateWheels();
 };
 
-
 #endif /* _OSGCAR_H_ */

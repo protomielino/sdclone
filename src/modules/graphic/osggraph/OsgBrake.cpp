@@ -5,42 +5,39 @@
 #include "OsgBrake.h"
 #include "OsgMath.h"
 
-
-void SDBrakes::setCar(tCarElt * car){
+void SDBrakes::setCar(tCarElt * car)
+{
     this->car = car;
 }
 
-osg::ref_ptr<osg::Geode> SDBrakes::initBrake(int wheelIndex){
+osg::ref_ptr<osg::Geode> SDBrakes::initBrake(int wheelIndex)
+{
     float	alpha;
-        osg::Vec3 vtx;
-        osg::Vec4 clr;
-        osg::Vec3 nrm;
-        osg::Vec2 tex;
-        float	b_offset = 0;
-        tdble	curAngle = 0.0;
-int i,j;
-
-
-
+    osg::Vec3 vtx;
+    osg::Vec4 clr;
+    osg::Vec3 nrm;
+    osg::Vec2 tex;
+    float	b_offset = 0;
+    tdble	curAngle = 0.0;
+	int i,j;
 
     osg::ref_ptr<osg::Geode> pBrake = new osg::Geode;
 
+    pBrake->setName("Brake Assembly");
+    // pWheel->addChild(pBrake);
 
-        pBrake->setName("Brake Assembly");
-       // pWheel->addChild(pBrake);
+    //grCarInfo[m_CarIndex].wheelselectorO[wheel_index] = pWheelSwitch;
 
-        //grCarInfo[m_CarIndex].wheelselectorO[wheel_index] = pWheelSwitch;
+    int brakeBranch = 32;
+    float brakeAngle = 2.0 * SD_PI / (tdble)brakeBranch;
+    float brakeOffset = 0.1;
 
-        int brakeBranch = 32;
-        float brakeAngle = 2.0 * SD_PI / (tdble)brakeBranch;
-        float brakeOffset = 0.1;
-
-        switch(wheelIndex)
-        {
-        case FRNT_RGT:
-            curAngle = -(SD_PI / 2.0 + brakeAngle);
-            b_offset = brakeOffset - car->_tireWidth(wheelIndex) / 2.0;
-            break;
+    switch(wheelIndex)
+    {
+		case FRNT_RGT:
+			curAngle = -(SD_PI / 2.0 + brakeAngle);
+			b_offset = brakeOffset - car->_tireWidth(wheelIndex) / 2.0;
+			break;
         case FRNT_LFT:
             curAngle = -(SD_PI / 2.0 + brakeAngle);
             b_offset = car->_tireWidth(wheelIndex) / 2.0 - brakeOffset;
@@ -145,15 +142,12 @@ int i,j;
         pBDisc->setColorBinding(osg::Geometry::BIND_OVERALL);
         pBDisc->setColorArray(brk_clr);
 
-
-
-        //brkColorO[wheelIndex] = brk_clr;
+		//brkColorO[wheelIndex] = brk_clr;
 
         pBrake->addDrawable(pBDisc);
 
         this->brake_disks[wheelIndex] = pBDisc;
        // GfOut("BRAAAAAAAAAAAKE  The pointer : %d\n",this->brake_disks[wheelIndex].get());
-
 
         /* Brake caliper */
         osg::Vec3Array *cal_vtx = new osg::Vec3Array();
@@ -198,8 +192,10 @@ int i,j;
         return pBrake;
 }
 
-void SDBrakes::updateBrakes(){ // TODO clean unused memory ... free pointers if needed
-    for(int i=0;i<4;i++){
+void SDBrakes::updateBrakes()
+{ // TODO clean unused memory ... free pointers if needed
+    for(int i=0;i<4;i++)
+	{
         osg::Vec4 clr;
         osg::Vec4Array *cal_clr = new osg::Vec4Array();
 
@@ -210,6 +206,5 @@ void SDBrakes::updateBrakes(){ // TODO clean unused memory ... free pointers if 
         cal_clr->push_back(clr);
 
        this->brake_disks[i]->setColorArray(cal_clr);
-
     }
 }

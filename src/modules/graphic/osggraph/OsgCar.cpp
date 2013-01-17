@@ -24,7 +24,6 @@
 #include "OsgCar.h"
 #include "OsgMath.h"
 
-
 osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
 {
     this->car = car;
@@ -104,9 +103,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
     
     if (bMasterModel)
     {
-	lg += snprintf(buf, nMaxTexPathSize, "drivers/%s/%d/%s/",
+		lg += snprintf(buf, nMaxTexPathSize, "drivers/%s/%d/%s/",
                        car->_modName, car->_driverIndex, car->_masterModel);
-	strTPath = TmpPath+buf;
+		strTPath = TmpPath+buf;
     	loader.AddSearchPath(strTPath);
     }
     
@@ -202,8 +201,6 @@ void SDCar::updateCar()
 
     this->car_branch->setMatrix(mat);
 }
-
-
 
 SDCars::SDCars(void)
 {

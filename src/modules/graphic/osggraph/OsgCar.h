@@ -51,13 +51,11 @@ class SDCars
         void addSDCar(SDCar * car);
 
     public :
-
-	SDCars(void);
-	~SDCars(void);
+		SDCars(void);
+		~SDCars(void);
 
         osg::ref_ptr<osg::Node> loadCars(tSituation * pSituation);
         void updateCars();
 };
-
 
 #endif /* _OSGCAR_H_ */

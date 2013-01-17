@@ -63,13 +63,13 @@ SDRender::~SDRender(void)
 void SDRender::Init(osg::ref_ptr<osgViewer::Viewer> viewer)
 {
     RealRoot = dynamic_cast<osg::Group*>(viewer->getSceneData());
-    osg::StateSet* rootStateSet = new osg::StateSet;
+    osg::StateSet* rootStateSet = RealRoot->getOrCreateStateSet();
     RealRoot->setStateSet(rootStateSet);
 	osg::Group* lightGroup = new osg::Group;
 	
     osg::Light* myLight2 = new osg::Light;
     myLight2->setLightNum(1);
-    myLight2->setPosition(osg::Vec4(100.0f, -3220.0f, 300.0f, 1.0f));
+    myLight2->setPosition(osg::Vec4(-100.0f, -3220.0f, -100.0f, 1.0f));
     myLight2->setAmbient(osg::Vec4(0.2f, 0.2f, 0.2f, 1.0f));
     myLight2->setDiffuse(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
     myLight2->setSpecular(osg::Vec4(0.5f, 0.5f, 0.5f, 1.0f));

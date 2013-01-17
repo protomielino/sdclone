@@ -20,10 +20,8 @@
 #ifndef _OSGBRAKE_H_
 #define _OSGBRAKE_H_
 
-
 #include <osg/Geode>
 #include <car.h>
-
 
 class SDBrakes
 {
@@ -31,12 +29,10 @@ class SDBrakes
         tCarElt *car;
         osg::ref_ptr<osg::Geometry> brake_disks[4];
 
-
     public :
         void setCar(tCarElt * car);
         osg::ref_ptr<osg::Geode> initBrake(int wheelIndex);
         void updateBrakes();
 };
-
 
 #endif /* _OSGBRAKE_H_ */
