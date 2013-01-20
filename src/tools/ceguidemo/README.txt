@@ -43,6 +43,7 @@ II- Installation
        * PyOpenGL 3.0.1 (or newer)
          from http://pypi.python.org/pypi/PyOpenGL/3.0.1
 
+       Optional, only needed to develop CEGUI demo app., not to simply run it :
        * last snapshot of CEED (CEGUI Unified Editor, currently under development)
          from http://sourceforge.net/projects/crayzedsgui/files/CEED
 		 
@@ -70,6 +71,7 @@ II- Installation
 
        * PyOpenGL 3.0.1 (or newer)
 
+       Optional, only needed to develop CEGUI demo app., not to simply run it :
        * CEED (CEGUI Unified Editor, currently under development)
 
        Note: Actually tested on Linux Mint Debian Edition (AMD 64, Update Pack 5/6), 
@@ -97,7 +99,7 @@ II- Installation
      b - Linux
 
        Run the following command in a terminal :
-         python <path/to>/ceguidemo/main.py
+         python <path/to>/ceguidemo/main.py -l -c
 
   4 - Known issues
 
