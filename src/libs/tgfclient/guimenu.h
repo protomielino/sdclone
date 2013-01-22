@@ -40,6 +40,7 @@ extern bool gfuiMenuGetBoolean(const char* pszValue, bool bDefault = false);
 #define GFMNU_SECT_DYNAMIC_CONTROLS	"dynamic controls"
 #define GFMNU_SECT_TEMPLATE_CONTROLS	"template controls"
 #define GFMNU_SECT_PROPERTIES	"properties"
+#define GFMNU_SECT_MUSIC	"music"
 
 #define GFMNU_ATTR_TYPE "type"
 
@@ -116,6 +117,8 @@ extern bool gfuiMenuGetBoolean(const char* pszValue, bool bDefault = false);
 #define GFMNU_VAL_LEFT "left"
 #define GFMNU_VAL_RIGHT "right"
 #define GFMNU_VAL_CENTER "center"
+
+#define GFMNU_ATTR_MUSIC_FILE "music file"
 
 #endif /* __MENU__H__ */ 
 

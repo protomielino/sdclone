@@ -95,6 +95,12 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels)
 	}
 
 	OSI_MAX_SOURCES = sources;
+
+#ifdef MENU_MUSIC
+	// Reserve three sources for music
+	OSI_MAX_SOURCES -= 3;
+#endif
+
 	OSI_MAX_STATIC_SOURCES = MAX(0, OSI_MAX_SOURCES - OSI_MIN_DYNAMIC_SOURCES);
 
 	// Figure out the number of buffers.

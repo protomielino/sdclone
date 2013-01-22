@@ -31,7 +31,6 @@
 #include <portability.h>
 #include <tgf.hpp>
 #include <tgfclient.h>
-#include <musicplayer.h>
 
 #include <isoundengine.h>
 #include <raceman.h>
@@ -391,8 +390,6 @@ rmScreenActivate(void * /* dummy */)
 	// If not paused ...
     if (!rmRacePaused)
 	{
-      pauseMenuMusic();
-
 		// Reset normal sound volume.
 		if (LegacyMenu::self().soundEngine())
 			LegacyMenu::self().soundEngine()->mute(false);
@@ -413,8 +410,6 @@ rmRacePause(void * /* vboard */)
 {
     if (rmRacePaused)
 	{
-		pauseMenuMusic();
-
 		if (LegacyMenu::self().soundEngine())
 			LegacyMenu::self().soundEngine()->mute(false);
 
@@ -434,8 +429,6 @@ rmRacePause(void * /* vboard */)
 	{
 		if (LegacyMenu::self().soundEngine())
 			LegacyMenu::self().soundEngine()->mute(true);
-
-		resumeMenuMusic(0);
 
 		LmRaceEngine().stop();
 
@@ -544,8 +537,6 @@ rmOpenHelpScreen(void * /* dummy */)
 	if (LegacyMenu::self().soundEngine())
 		LegacyMenu::self().soundEngine()->mute(true);
 	
-	resumeMenuMusic(0);
-
 	GfuiHelpScreen(rmScreenHandle, RmBackToRaceHookInit());
 }
 

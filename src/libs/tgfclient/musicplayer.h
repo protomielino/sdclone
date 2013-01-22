@@ -20,6 +20,12 @@
  *                                                                         *
  ***************************************************************************/
 
+//#define MM_SOUND_PARM_CFG			"config/sound.xml"
+//#define MM_SCT_SOUND				"Menu Music"
+//#define MM_ATT_SOUND_ENABLE			"enable"
+//#define MM_VAL_SOUND_ENABLED		"enabled"
+//#define MM_VAL_SOUND_DISABLED		"disabled"
+
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
 # ifdef TGFCLIENT_DLL
@@ -33,7 +39,7 @@
 
 TGFCLIENT_API void startMenuMusic();
 TGFCLIENT_API void stopMenuMusic();
-TGFCLIENT_API void pauseMenuMusic();
-TGFCLIENT_API void resumeMenuMusic(int sourceId);
+//TGFCLIENT_API void pauseMenuMusic();
+TGFCLIENT_API void resumeMenuMusic(char* filename);
 
 #endif //__musicplayer_h__

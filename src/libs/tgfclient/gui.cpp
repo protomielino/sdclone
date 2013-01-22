@@ -594,6 +594,8 @@ GfuiScreenActivate(void *screen)
 		GfuiScreen->onDeactivate(GfuiScreen->userDeactData);
 	
 	GfuiScreen = (tGfuiScreen*)screen;
+
+	resumeMenuMusic(GfuiScreen->musicFilename);
 	
   	GfuiApp().eventLoop().setKeyboardDownCB(gfuiKeyboardDown);
 	GfuiApp().eventLoop().setKeyboardUpCB(gfuiKeyboardUp);
@@ -745,6 +747,9 @@ GfuiScreenRelease(void *scr)
 			free(curKey);
 			curKey = nextKey;
 		} while (curKey != screen->userKeys);
+	}
+	if(screen->musicFilename != NULL) {
+		free(screen->musicFilename);
 	}
 	free(screen);
 }
@@ -1065,6 +1070,28 @@ GfuiScreenAddBgImg(void *scr, const char *filename)
 	//       and we request this 2^N x 2^P enforcment by passing &pow2Width and &pow2Height.
 	screen->bgImage =
 		GfTexReadTexture(filename, &screen->bgWidth, &screen->bgHeight, &pow2Width, &pow2Height);
+}
+
+/** Add the background music for the given screen.
+    @ingroup	screen
+    @param	scr		Screen
+    @param	filename	file name of the music (OGG)
+    @return	None.
+
+ */
+void
+GfuiScreenAddMusic(void *scr, const char *filename)
+{
+	tGfuiScreen	*screen = (tGfuiScreen*)scr;
+	if(screen->musicFilename != NULL) {
+		free(screen->musicFilename);
+	}
+	if(0 != filename){
+		screen->musicFilename = (char*)malloc(1+strlen(filename));
+		if(0 != screen->musicFilename){
+			strcpy(screen->musicFilename, filename);
+		}
+	}
 }
 
 /** Initialize window position

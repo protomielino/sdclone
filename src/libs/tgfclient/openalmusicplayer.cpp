@@ -26,6 +26,7 @@ const int OpenALMusicPlayer::BUFFERSIZE = 4096*64;
 OpenALMusicPlayer::OpenALMusicPlayer(SoundStream* soundStream):
 	device(NULL),
 	context(NULL),
+	originalcontext(NULL),
 	source(0),
 	stream(soundStream),
 	ready(false)
@@ -41,6 +42,15 @@ OpenALMusicPlayer::~OpenALMusicPlayer()
 {
 	if (ready) {
 		stop();
+	}
+	if(originalcontext == NULL) {
+		alcMakeContextCurrent(0);
+		alcDestroyContext(context);
+		alcCloseDevice(device);
+	}
+	if(stream) {
+		delete stream;
+		stream = NULL;
 	}
 }
 
@@ -68,9 +78,8 @@ void OpenALMusicPlayer::stop()
     check();
     alDeleteBuffers(2, buffers);
     check();
-	
-	alcDestroyContext(context);
-	alcCloseDevice(device);
+
+
 	
 	ready = false;
 }
@@ -80,21 +89,23 @@ void OpenALMusicPlayer::stop()
 
 bool OpenALMusicPlayer::initContext()
 {
-	device = alcOpenDevice(NULL);
-	if( device == NULL ) {
-		GfError("OpenALMusicPlayer: OpenAL could not open device\n");
-		return false;
-	}
+	originalcontext = alcGetCurrentContext();
+	if(originalcontext == NULL) {
+		device = alcOpenDevice(NULL);
+		if( device == NULL ) {
+			GfError("OpenALMusicPlayer: OpenAL could not open device\n");
+			return false;
+		}
 
-	context = alcCreateContext(device, NULL);
-	if(context == NULL) {
-		alcCloseDevice(device);
-		GfError("OpenALMusicPlayer: OpenAL could not create contect for device\n");
-		return false;
+		context = alcCreateContext(device, NULL);
+		if(context == NULL) {
+			alcCloseDevice(device);
+			GfError("OpenALMusicPlayer: OpenAL could not create contect for device\n");
+			return false;
+		}
+		alcMakeContextCurrent(context);
+		alcGetError(device);
 	}
-	alcMakeContextCurrent(context);
-	alcGetError(device);
-	
 	return check();
 }
 
@@ -205,12 +216,16 @@ void OpenALMusicPlayer::start()
 
 void OpenALMusicPlayer::pause()
 {
-	alSourceStop(source);
+	if(isPlaying()) {
+		alSourceStop(source);
+	}
 }
 
 void OpenALMusicPlayer::resume(int flag)
 {
-	alSourcePlay(source);
+	if(!isPlaying()) {
+		alSourcePlay(source);
+	}
 }
 void OpenALMusicPlayer::rewind()
 {

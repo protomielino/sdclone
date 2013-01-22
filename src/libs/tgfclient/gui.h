@@ -330,6 +330,9 @@ typedef struct
 
     /* Screen type */
     int			onlyCallback;
+
+    /* Ogg music file to play while screen is displayed */
+    char		*musicFilename;
 } tGfuiScreen;
 
 

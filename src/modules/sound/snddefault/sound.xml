@@ -14,9 +14,14 @@
 
 <!DOCTYPE params SYSTEM "../../../libs/tgf/params.dtd">
 
-<params name="sound" type="param" mode="mw">
+<params name="sound" type="param" mode="mw" version="1.1">
 	<section name="Sound Settings">
 		<attstr name="state" val="openal"/>
 		<attnum name="volume" unit="%" val="100"/>
+	</section>
+	<section name="Music Settings">
+		<attstr name="music state" val="enabled"/>
+		<attstr name="default music" val="data/music/main.ogg"/>
+		<attnum name="music volume" unit="%" val="100"/>
 	</section>
 </params>

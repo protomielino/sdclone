@@ -256,6 +256,13 @@ createStaticImage(void* hscr, void* hparm, const char* pszName)
 
 	return id;
 }
+static int 
+createMusic(void* hscr, void* hparm)
+{
+	const char* pszMusic = GfParmGetStr(hparm, GFMNU_SECT_MUSIC, GFMNU_ATTR_MUSIC_FILE, 0);
+	GfuiScreenAddMusic(hscr, pszMusic);
+	return 1;
+}
 
 static int 
 createBackgroundImage(void* hscr, void* hparm, const char* pszName)
@@ -946,7 +953,9 @@ GfuiMenuCreateStaticControls(void* hscr, void* hparm)
 						 buf, pszType);
 		}
     }
-
+	 
+	 // TODO comment
+	 createMusic(hscr,hparm);
     return true;
 }
 

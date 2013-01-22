@@ -293,6 +293,7 @@ TGFCLIENT_API void GfuiHelpScreen(void *targetScreen);
 TGFCLIENT_API void GfuiHelpScreen(void *targetScreen, void *returnScreen);
 TGFCLIENT_API void GfuiScreenShot(void *notused);
 TGFCLIENT_API void GfuiScreenAddBgImg(void *scr, const char *filename);
+TGFCLIENT_API void GfuiScreenAddMusic(void *scr, const char *filename);
 TGFCLIENT_API void GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction);
 TGFCLIENT_API void GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction);
 TGFCLIENT_API void GfuiInitWindowPositionAndSize(int x, int y, int w, int h);

@@ -48,6 +48,7 @@ class OpenALMusicPlayer
 		
 		ALCdevice* device;
 		ALCcontext* context;
+		ALCcontext* originalcontext;
 		ALuint source;								// audio source 
 		ALuint buffers[2];							// front and back buffers
 		

@@ -31,11 +31,17 @@
 #define SND_ATT_SOUND_STATE_DISABLED  "disabled"
 #define SND_ATT_SOUND_VOLUME          "volume"
 
-#define MM_SCT_SOUND                    "Menu Music"
+#define SND_SCT_MUSIC                 "Music Settings"
 
-#define MM_ATT_SOUND_ENABLE             "enable"
-#define MM_VAL_SOUND_ENABLED            "enabled"
-#define MM_VAL_SOUND_DISABLED           "disabled"
+//#define MM_ATT_SOUND_ENABLE             "enable"
+//#define MM_VAL_SOUND_ENABLED            "enabled"
+//#define MM_VAL_SOUND_DISABLED           "disabled"
+
+#define SND_ATT_MUSIC_VOLUME           "music volume"
+#define SND_ATT_MUSIC_STATE            "music state"
+#define SND_VAL_MUSIC_STATE_ENABLED    "enabled"
+#define SND_VAL_MUSIC_STATE_DISABLED   "disabled"
+#define SND_ATT_MUSIC_DEFAULT_MUSIC    "default music"
 
 #endif /* _SOUND_H_ */ 
 

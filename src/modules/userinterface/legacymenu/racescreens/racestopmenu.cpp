@@ -240,8 +240,6 @@ RmStopRaceMenu()
 	if (LegacyMenu::self().soundEngine())
 		LegacyMenu::self().soundEngine()->mute();
 
-	resumeMenuMusic(0);
-	
 	if (!strcmp(GfParmGetStr(params, pszRaceName, RM_ATTR_ALLOW_RESTART, RM_VAL_NO), RM_VAL_NO)) 
 	{
 		if (strcmp(GfParmGetStr(params, pszRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 
