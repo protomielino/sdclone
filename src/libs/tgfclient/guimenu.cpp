@@ -954,7 +954,10 @@ GfuiMenuCreateStaticControls(void* hscr, void* hparm)
 		}
     }
 	 
-	 // TODO comment
+	 // while not truly a static control (visually), each menu/screen can have
+	 // background music. As 'GfuiMenuCreateStaticControls()' is called on load
+	 // of each menu, this was deemed the least intrusive place to add the
+	 // music filename to the screen's struct.
 	 createMusic(hscr,hparm);
     return true;
 }

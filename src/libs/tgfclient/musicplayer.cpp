@@ -110,7 +110,7 @@ static void playMenuMusic(int /* value */)
 	}
 }
 #endif
-void startMenuMusic()
+void initMusic()
 {
 #if MENU_MUSIC
 	readConfig();
@@ -124,7 +124,7 @@ void startMenuMusic()
 }
 
 
-void stopMenuMusic()
+void shutdownMusic()
 {
 #if MENU_MUSIC
 	if(timerId != 0){
@@ -173,7 +173,7 @@ void pauseMenuMusic()
 
 }
 #endif
-void resumeMenuMusic(char* filename)
+void playMusic(char* filename)
 {
 #if MENU_MUSIC
 	if (isEnabled()) {

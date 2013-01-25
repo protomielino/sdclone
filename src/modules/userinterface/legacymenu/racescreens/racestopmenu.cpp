@@ -16,7 +16,6 @@
  ***************************************************************************/
 
 #include <tgfclient.h>
-#include <musicplayer.h>
 
 #include <isoundengine.h>
 

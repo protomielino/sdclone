@@ -37,9 +37,8 @@
 # define TGFCLIENT_API
 #endif
 
-TGFCLIENT_API void startMenuMusic();
-TGFCLIENT_API void stopMenuMusic();
-//TGFCLIENT_API void pauseMenuMusic();
-TGFCLIENT_API void resumeMenuMusic(char* filename);
+TGFCLIENT_API void initMusic();
+TGFCLIENT_API void shutdownMusic();
+TGFCLIENT_API void playMusic(char* filename);
 
 #endif //__musicplayer_h__

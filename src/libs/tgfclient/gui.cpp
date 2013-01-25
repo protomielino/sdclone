@@ -116,7 +116,7 @@ gfuiInit(void)
 	gfuiInitLabel();
 	gfuiInitHelp();
 	gfuiInitMenu();
-	startMenuMusic();
+	initMusic();
 
 	//gfctrlJoyInit(); // Not here ; done later on the fly, when really needed.
 }
@@ -125,7 +125,7 @@ void
 gfuiShutdown(void)
 {
 	gfctrlJoyShutdown();
-	stopMenuMusic();
+	shutdownMusic();
 }
 
 GfuiColor 
@@ -595,7 +595,7 @@ GfuiScreenActivate(void *screen)
 	
 	GfuiScreen = (tGfuiScreen*)screen;
 
-	resumeMenuMusic(GfuiScreen->musicFilename);
+	playMusic(GfuiScreen->musicFilename);
 	
   	GfuiApp().eventLoop().setKeyboardDownCB(gfuiKeyboardDown);
 	GfuiApp().eventLoop().setKeyboardUpCB(gfuiKeyboardUp);
