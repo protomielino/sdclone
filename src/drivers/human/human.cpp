@@ -964,7 +964,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	car->_steerCmd = leftSteer + rightSteer;
 
-#define GLANCERATE 12 	// speed at which the driver turns his head, radians per sec -> ~1/3s to full glance
+#define GLANCERATE 3 	// speed at which the driver turns his head, ~1/3s to full glance
 	newGlance = car->_glance;
 
 	if ((cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_LEFTGLANCE].val])
@@ -981,10 +981,10 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		newGlance = newGlance + GLANCERATE * s->deltaTime;
 	} else if (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_AXIS && joyInfo->ax[cmd[CMD_RIGHTGLANCE].val] > cmd[CMD_RIGHTGLANCE].min)
 	{
-		newGlance = joyInfo->ax[cmd[CMD_RIGHTGLANCE].val] * 2*PI/3;
+		newGlance = joyInfo->ax[cmd[CMD_RIGHTGLANCE].val];
         } else if (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_JOY_AXIS && joyInfo->ax[cmd[CMD_LEFTGLANCE].val] < cmd[CMD_LEFTGLANCE].max)
 	{
-		newGlance = joyInfo->ax[cmd[CMD_LEFTGLANCE].val] * 2*PI/3;
+		newGlance = joyInfo->ax[cmd[CMD_LEFTGLANCE].val];
 	} else {
 		// return view to center
 		car->_oldglance = 0;
@@ -998,9 +998,9 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		}
 	}
 
-	// limit glance to 120 degrees either way
-	if (newGlance > 2*PI/3) newGlance=2*PI/3;
-	if (newGlance < -2*PI/3) newGlance=-2*PI/3;
+	// limit glance
+	if (newGlance > 1) newGlance=1;
+	if (newGlance < -1) newGlance=-1;
 
 	// Limit twitching between values
 	if (newGlance != 0) {
