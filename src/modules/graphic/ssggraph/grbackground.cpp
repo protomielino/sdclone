@@ -909,21 +909,41 @@ grPostDrawSky(void)
 void
 grUpdateSky(double currentTime, double accelTime)
 {
-	// Nothing to do if static sky dome, or race not started.
-	if (!grDynamicSkyDome)
-		return;
-
-	if (currentTime < 0)
-		return;
-	
 	// Detect first call (in order to initialize "last times").
 	static bool bInitialized = false;
 	static double lastTimeHighSpeed = 0;
 	static int lastTimeLowSpeed = 0;
+
+	// Nothing to do if static sky dome, or race not started.
+	if (!grDynamicSkyDome)
+		return;
+
+	if (currentTime < 0) {
+		bInitialized = false;
+		return;
+	}
+	
 	if (!bInitialized)
 	{
+		if (grSkyDomeDistance && grTrack->skyversion > 0) {
+			// Ensure the sun and moon positions are reset
+			const int timeOfDay = (int)grTrack->local.timeofday;
+			GLfloat sunAscension = grTrack->local.sunascension;
+			grSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
+
+			const float moonAscension = grTrack->local.sunascension;
+			grMoonDeclination = grUpdateMoonPos(timeOfDay);
+
+			TheSky->setSD( DEG2RAD(grSunDeclination));
+			TheSky->setSRA( sunAscension );
+
+			TheSky->setMD( DEG2RAD(grMoonDeclination) );
+			TheSky->setMRA( DEG2RAD(moonAscension) );
+		}
+
 		lastTimeHighSpeed = currentTime;
 		lastTimeLowSpeed = 60 * (int)floor(accelTime / 60.0);
+
 		bInitialized = true;
 		return;
 	}
