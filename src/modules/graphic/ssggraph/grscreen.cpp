@@ -55,6 +55,7 @@ cGrScreen::cGrScreen(int myid)
 	memset(cams, 0, sizeof(cams));
 	viewRatio = 1.33;
 	cars = 0;
+	viewOffset = 0;
 	
 	scrx = 0;
 	scry = 0;
@@ -119,6 +120,7 @@ void cGrScreen::activate(int x, int y, int w, int h, float v)
 	scry = y;
 	scrw = w;
 	scrh = h;
+	viewOffset = v;
 	
 	if (boardCam) delete boardCam;
 
@@ -197,6 +199,46 @@ void cGrScreen::selectCamera(long cam)
 		curCam = (cGrPerspCamera*)GF_TAILQ_FIRST(&cams[curCamHead]);
 	}
 
+	curCam->setViewOffset(viewOffset);
+	saveCamera();
+}
+
+int cGrScreen::getNthCamera(void)
+{
+	int i = 0;
+	cGrCamera* testCam = (cGrPerspCamera*)GF_TAILQ_FIRST(&cams[curCamHead]);
+
+	// walk the cam list
+	while (1) {
+		if (testCam == curCam)
+			return i;
+
+		testCam = testCam->next();
+		i++;
+	}
+}
+
+void cGrScreen::selectNthCamera(long cam, int nthCam)
+{
+	int i = 0;
+	curCamHead = cam;
+	curCam = (cGrPerspCamera*)GF_TAILQ_FIRST(&cams[curCamHead]);
+
+	while (i < nthCam) {
+		curCam = curCam->next();
+		if (curCam == (cGrPerspCamera*)GF_TAILQ_END(&cams[cam])){
+			curCam = (cGrPerspCamera*)GF_TAILQ_FIRST(&cams[curCamHead]);
+			break;
+		}
+		i++;
+	}
+
+	curCam->setViewOffset(viewOffset);
+	saveCamera();
+}
+
+void cGrScreen::saveCamera(void)
+{
 	sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
 	GfParmSetStr(grHandle, path, GR_ATT_CUR_DRV, curCar->_name);
 	GfParmSetNum(grHandle, path, GR_ATT_CAM, (char*)NULL, (tdble)curCam->getId());

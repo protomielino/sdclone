@@ -57,6 +57,7 @@ class cGrScreen {
 		int mirrorFlag;
 	
 		void loadParams(tSituation *s);			// Load from parameters files.
+		void saveCamera(void);
 
 	public:
 		cGrScreen(int id);
@@ -71,6 +72,9 @@ class cGrScreen {
 		void updateCurrent(tSituation *s);
 
 		void selectCamera(long cam);
+		void selectNthCamera(long cam, int nthCam);
+		int getNthCamera(void);
+		float getViewOffset(void) { return viewOffset; }
 		void selectBoard(const long brd);
 		void selectTrackMap();
 	

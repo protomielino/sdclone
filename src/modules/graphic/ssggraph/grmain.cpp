@@ -400,6 +400,19 @@ static void
 grSelectCamera(void *vp)
 {
     grGetCurrentScreen()->selectCamera((long)vp);
+
+    // For SpanSplit ensure screens change together
+    if (grNbSpanSplit && grGetCurrentScreen()->getViewOffset() ) {
+        long cam;
+        int i, subcam;
+
+	cam = (long) vp; // grGetCurrentScreen()->getCurCamera();
+	subcam = grGetCurrentScreen()->getNthCamera();
+
+        for (i=0; i < grNbActiveScreens; i++)
+    		if (grScreens[i]->getViewOffset() )
+		            grScreens[i]->selectNthCamera(cam, subcam);
+    }
 }
 
 cGrCamera * grGetCurCamera() 
