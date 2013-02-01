@@ -137,7 +137,9 @@ void cGrScreen::activate(int x, int y, int w, int h, float v)
 
 	if (curCam) {
 		curCam->limitFov ();
+#if 0	//SDW
 		curCam->setZoom (GR_ZOOM_DFLT);
+#endif
 		curCam->setViewOffset(v);
 	}
 	active = true;

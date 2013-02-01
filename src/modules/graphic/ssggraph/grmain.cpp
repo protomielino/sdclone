@@ -69,6 +69,7 @@ static float fMouseRatioX, fMouseRatioY;
 // Number of active screens.
 int grNbActiveScreens = 1;
 int grNbArrangeScreens = 0;
+int grNbSpanSplit = 0;
 
 // Current screen index.
 static int nCurrentScreenIndex = 0;
@@ -125,8 +126,10 @@ grAdaptScreenSize(void)
 	{
 		default:
 		case 1:
+			// Hack to allow span-split to function OK
+			if (grNbArrangeScreens > 1) grNbArrangeScreens = 0;
+
 			// Always Full window.
-			grNbArrangeScreens = 0;
 			grScreens[0]->activate(grWinx, grWiny, grWinw, grWinh, 0.0);
 			for (i=1; i < GR_NB_MAX_SCREEN; i++)
 				grScreens[i]->deactivate();
@@ -337,12 +340,18 @@ grSplitScreen(void *vp)
 		case GR_SPLIT_ADD:
 			if (grNbActiveScreens < GR_NB_MAX_SCREEN)
 				grNbActiveScreens++;
-				grNbArrangeScreens=0;
+				if (grNbSpanSplit) 
+					grNbArrangeScreens=1;
+				else
+					grNbArrangeScreens=0;
 			break;
 		case GR_SPLIT_REM:
 			if (grNbActiveScreens > 1)
 				grNbActiveScreens--;
-				grNbArrangeScreens=0;
+				if (grNbSpanSplit) 
+					grNbArrangeScreens=1;
+				else
+					grNbArrangeScreens=0;
 			break;
 		case GR_SPLIT_ARR:
 			grNbArrangeScreens++;
@@ -556,6 +565,7 @@ initCars(tSituation *s)
     int		i;
     tCarElt 	*elt;
     void	*hdle;
+    const char *pszSpanSplit;
 
     TRACE_GL("initCars: start");
 
@@ -618,6 +628,11 @@ initCars(tSituation *s)
 	// Load the real number of active screens and the arrangment.
 	grNbActiveScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, 1.0);
 	grNbArrangeScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_ARR_SCREENS, NULL, 1.0);
+
+
+	/* Check whether view should be spanned across vertical splits */
+	pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_MONITOR, GR_ATT_SPANSPLIT, GR_VAL_NO);
+	grNbSpanSplit = strcmp(pszSpanSplit, GR_VAL_YES) ? 0 : 1;
 
 	// Initialize the cameras for all the screens.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
