@@ -156,6 +156,7 @@ void cGrScreen::selectTrackMap()
 	
 	sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
 	GfParmSetNum(grHandle, path, GR_ATT_MAP, NULL, (tdble)viewmode);
+
 	/* save also as user's preference if human */
 	if (curCar->_driverType == RM_DRV_HUMAN) {
 		sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
@@ -169,6 +170,7 @@ void cGrScreen::switchMirror(void)
 	mirrorFlag = 1 - mirrorFlag;
 	sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
 	GfParmSetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
+
 	/* save also as user's preference if human */
 	if (curCar->_driverType == RM_DRV_HUMAN) {
 		sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
@@ -451,6 +453,7 @@ void cGrScreen::loadParams(tSituation *s)
 	int i;
 	class cGrCamera *cam;
 	const char *carName;
+	const char *pszSpanSplit;
 
 	// Initialize the screen "current car" if not already done.
 	sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
@@ -482,13 +485,18 @@ void cGrScreen::loadParams(tSituation *s)
 	}
 
 	// Load "current camera" settings (attached to the "current car").
-	sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
 	curCamHead	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, 9);
 	camNum	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM, NULL, 0);
 	mirrorFlag	= (int)GfParmGetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
-	curCamHead	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM_HEAD, NULL, (tdble)curCamHead);
-	camNum	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM, NULL, (tdble)camNum);
-	mirrorFlag	= (int)GfParmGetNum(grHandle, path2, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
+
+	// Only apply driver preferences when not spanning split screens
+	pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_MONITOR, GR_ATT_SPANSPLIT, GR_VAL_NO);
+	if (strcmp(pszSpanSplit, GR_VAL_YES)) {
+		sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
+		curCamHead	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM_HEAD, NULL, (tdble)curCamHead);
+		camNum	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM, NULL, (tdble)camNum);
+		mirrorFlag	= (int)GfParmGetNum(grHandle, path2, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
+	}
 
 	// Get board width (needed for scissor)
 	boardWidth      = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARDWIDTH, NULL, 100);

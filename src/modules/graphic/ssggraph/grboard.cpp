@@ -92,6 +92,7 @@ cGrBoard::loadDefaults(const tCarElt *curCar)
   char path[1024];
   snprintf(path, sizeof(path), "%s%s", GfLocalDir(), GR_PARAM_FILE);
   void *hdle = GfParmReadFile(path, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+  const char *pszSpanSplit;
 
   ReadDashColor(hdle, GFSCR_ELT_NORMALCLR,      &normal_color_);
   ReadDashColor(hdle, GFSCR_ELT_DANGERCLR,      &danger_color_);
@@ -122,7 +123,9 @@ cGrBoard::loadDefaults(const tCarElt *curCar)
   trackMap->setViewMode((int)GfParmGetNum(grHandle, path, GR_ATT_MAP,
                                 NULL, trackMap->getDefaultViewMode()));
 
-  if (curCar->_driverType == RM_DRV_HUMAN) {
+  // Only apply driver preferences when not spanning split screens
+  pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_MONITOR, GR_ATT_SPANSPLIT, GR_VAL_NO);
+  if (strcmp(pszSpanSplit, GR_VAL_YES) && curCar->_driverType == RM_DRV_HUMAN) {
     snprintf(path, sizeof(path), "%s/%s", GR_SCT_DISPMODE, curCar->_name);
     debugFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_DEBUG, NULL, debugFlag);
     boardFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARD, NULL, boardFlag);
