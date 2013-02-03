@@ -385,7 +385,7 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
            . -geometry 120x40
            . -sl 9999
          - change MSYS Shell shortcut command : msys.bat --rxvt
-       * vim (text editor for Linux geeks) : mingw-get install msys-vim
+       * vim (text elditor for Linux geeks) : mingw-get install msys-vim
        * patch : mingw-get install msys-patch
        * xargs and co : mingw-get install msys-findutils
        * bzip2 : mingw-get install msys-bzip2
@@ -683,9 +683,13 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
        (and http://sourceforge.net/projects/speed-dreams/files/3rd%20party/Sources/post-2.0.0),
        along with "II - Linux installation from sources" for some more tips about CMake options.
       
- Note: If you plan to build "osggraph", you can try to extract the Open Scene Graph 3.x binaries
-       (get the ones for your version of MSVC) from Alpha Pixel in you 3rdParty folder :
+ Note: If you plan to build "osggraph", extract the Open Scene Graph 3.x binaries
+       from Alpha Pixel in your 3rdParty folder ; get the ones for your own version of MSVC :
          http://www.alphapixel.com/osg/downloads/free-openscenegraph-binary-downloads
+       And after building and installing SD, don't forget to manually copy libpng13.dll
+       from the Open Scene Graph package to SD "bin" install folder
+       (because Alpha Pixel's OSG libs are dynamically linked to libpng, which is neither the case
+        for the remainder of our 3rd party MSVC 2005 package, nor for SD itself).
 
 3) MS VC++ 6 : No more supported.
 
