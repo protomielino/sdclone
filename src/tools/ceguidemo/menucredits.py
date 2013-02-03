@@ -24,7 +24,7 @@ class MenuCredits(Menu):
 
 	singleton = None
 
-	def getSingleton():
+	def instance():
 	
 		if not MenuCredits.singleton:
 			MenuCredits.singleton = MenuCredits()
@@ -33,7 +33,7 @@ class MenuCredits(Menu):
 			
 		return MenuCredits.singleton
 
-	getSingleton = staticmethod(getSingleton)
+	instance = staticmethod(instance)
 
 	def __init__(self):
 

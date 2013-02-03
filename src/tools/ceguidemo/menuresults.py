@@ -16,12 +16,14 @@ import PyCEGUI
 # Import: Configuration
 from configuration import TheConfig
 
-# Import: Menu
+# Import: Menus
 from menu import Menu
+from menumanager import MenuManager
 
 # Results menu
 class MenuResults(Menu):
 
+	# Static data.
 	CIdRank = 0
 	CIdAdvance = 1
 	CIdDriver = 2
@@ -44,9 +46,10 @@ class MenuResults(Menu):
 		(6, -4, "Don Nelson", "USR", "Lynx 220", "39:15:559", "1:20.602", 36, 285, 4500, 4),
 	]
 
+	# Singleton pattern.
 	singleton = None
 
-	def getSingleton():
+	def instance():
 	
 		if not MenuResults.singleton:
 			MenuResults.singleton = MenuResults()
@@ -55,7 +58,7 @@ class MenuResults(Menu):
 			
 		return MenuResults.singleton
 
-	getSingleton = staticmethod(getSingleton)
+	instance = staticmethod(instance)
 
 	def __init__(self):
 
@@ -119,7 +122,7 @@ class MenuResults(Menu):
 
 	def onContinueButtonClicked(self, args):
 
-		self.back()
+		self.switchTo(MenuManager.get("Main"))
 
 	def onKeyDown(self, keyArgs):
 

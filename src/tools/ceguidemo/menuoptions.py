@@ -24,7 +24,7 @@ class MenuOptions(Menu):
 
 	singleton = None
 
-	def getSingleton():
+	def instance():
 	
 		if not MenuOptions.singleton:
 			MenuOptions.singleton = MenuOptions()
@@ -33,7 +33,7 @@ class MenuOptions(Menu):
 			
 		return MenuOptions.singleton
 
-	getSingleton = staticmethod(getSingleton)
+	instance = staticmethod(instance)
 
 	def __init__(self):
 

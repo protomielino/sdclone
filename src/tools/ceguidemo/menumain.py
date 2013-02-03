@@ -16,16 +16,14 @@ import PyCEGUI
 # Import: Configuration
 from configuration import TheConfig
 
-# Import: Menu
+# Import: Menus
 from menustandard import MenuStandard
-from menucredits import MenuCredits
-from menuoptions import MenuOptions
-from menuprofiles import MenuProfiles
-from menutrackselect import MenuTrackSelect
+from menumanager import MenuManager
 
 # Main menu
 class MenuMain(MenuStandard):
 
+	# Singleton pattern.
 	singleton = None
 
 	def instance():
@@ -41,10 +39,8 @@ class MenuMain(MenuStandard):
 
 	def __init__(self):
 
-		MenuStandard.__init__(self, MenuCredits, MenuOptions, MenuProfiles)
+		MenuStandard.__init__(self)
 
-		self.menuTrackSelect = None
-	
 	# Initialize
 	def initialize(self):
 
@@ -142,21 +138,12 @@ class MenuMain(MenuStandard):
 	# Handler: buttonClicked
 	def onPracticeButtonClicked(self, args):
 
-		self.activateTrackSelectMenu()
+		self.switchTo(MenuManager.get("TrackSelect"))
 
 	def onQuickRaceButtonClicked(self, args):
 
-		self.activateTrackSelectMenu()
+		self.switchTo(MenuManager.get("TrackSelect"))
 
 	def onSingleEventButtonClicked(self, args):
 
-		self.activateTrackSelectMenu()
-
-	def activateTrackSelectMenu(self):
-
-		if not self.menuTrackSelect:
-			self.menuTrackSelect = MenuTrackSelect()
-			self.menuTrackSelect.initialize()
-			self.menuTrackSelect.setup()
-
-		self.switchTo(self.menuTrackSelect)
+		self.switchTo(MenuManager.get("TrackSelect"))

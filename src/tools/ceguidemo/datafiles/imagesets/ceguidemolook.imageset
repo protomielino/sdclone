@@ -41,11 +41,10 @@
     <Image Height="6" Name="StaticBottomLeft" Width="6" XPos="74" YPos="335" />
     <Image Height="6" Name="StaticBottomRight" Width="6" XPos="96" YPos="335" />
     <Image Height="6" Name="StaticBackdrop" Width="6" XPos="85" YPos="324" />
-    <Image Height="12" Name="ProgressBarLeft" Width="7" XPos="71" YPos="74" />
-    <Image Height="12" Name="ProgressBarMiddle" Width="6" XPos="80" YPos="74" />
-    <Image Height="12" Name="ProgressBarRight" Width="6" XPos="88" YPos="74" />
-    <Image Height="12" Name="ProgressBarDimSegment" Width="8" XPos="96" YPos="74" />
-    <Image Height="12" Name="ProgressBarLitSegment" Width="8" XPos="106" YPos="74" />
+    <Image Height="12" Name="ProgressBarLeft" Width="8" XPos="75" YPos="355" />
+    <Image Height="12" Name="ProgressBarMiddle" Width="8" XPos="83" YPos="355" />
+    <Image Height="12" Name="ProgressBarRight" Width="8" XPos="91" YPos="355" />
+    <Image Height="12" Name="ProgressBarLitSegment" Width="8" XPos="100" YPos="355" />
     <Image Height="18" Name="EditBoxLeft" Width="4" XPos="234" YPos="219" />
     <Image Height="18" Name="EditBoxMiddle" Width="4" XPos="240" YPos="219" />
     <Image Height="18" Name="EditBoxRight" Width="4" XPos="246" YPos="219" />

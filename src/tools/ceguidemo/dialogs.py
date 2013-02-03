@@ -26,7 +26,7 @@ class DialogOKCancel(object):
 
 	singleton = None
 
-	def getSingleton():
+	def instance():
 	
 		if not DialogOKCancel.singleton:
 			DialogOKCancel.singleton = DialogOKCancel()
@@ -35,7 +35,7 @@ class DialogOKCancel(object):
 			
 		return DialogOKCancel.singleton
 
-	getSingleton = staticmethod(getSingleton)
+	instance = staticmethod(instance)
 	
 	def __init__(self):
 

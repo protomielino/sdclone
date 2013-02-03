@@ -17,7 +17,8 @@ import PyCEGUI
 
 # Import: User
 from errors import InitializationError
-from menumain import MenuMain
+from menufactory import MenuFactory
+from menumanager import MenuManager
 
 # Import: Configuration
 from configuration import TheConfig
@@ -74,11 +75,13 @@ class GUI(object):
 			self.initializeResources()
 			self.initializeDefaults()
 			
+			MenuFactory.initialize()
+		
 		except Exception, msg:
 			
 			raise InitializationError(msg)
 
 	# Setup: Interface
 	def setupInterface(self):
-		
-		MenuMain.instance().activate()
+
+		MenuManager.get("Main").activate()

@@ -15,25 +15,20 @@ import sys
 # Import: PyCEGUI
 import PyCEGUI
 
-# Import: Menu
+# Import: Menus and dialogs
 from menu import Menu
 from dialogs import DialogOKCancel
+
+# Import: MenuManager
+from menumanager import MenuManager
 
 
 # Standard menu
 class MenuStandard(Menu):
 
-	def __init__(self, clsMenuCredits, clsMenuOptions, clsMenuProfiles):
+	def __init__(self):
 	
 		Menu.__init__(self)
-
-		self.clsMenuCredits = clsMenuCredits
-		self.clsMenuOptions = clsMenuOptions
-		self.clsMenuProfiles = clsMenuProfiles
-		
-		self.menuCredits = None
-		self.menuProfiles = None
-		self.menuOptions = None
 
 	# Initialize
 	def initialize(self, name, title=None, layout=None, background=None):
@@ -117,19 +112,19 @@ class MenuStandard(Menu):
 	# Handlers
 	def onCreditsButtonClicked(self, args):
 
-		self.switchTo(self.clsMenuCredits.getSingleton())
+		self.switchTo(MenuManager.get("Credits"))
 
 	def onProfilesButtonClicked(self, args):
 
-		self.switchTo(self.clsMenuProfiles.getSingleton())
+		self.switchTo(MenuManager.get("Profiles"))
 
 	def onOptionsButtonClicked(self, args):
 
-		self.switchTo(self.clsMenuOptions.getSingleton())
+		self.switchTo(MenuManager.get("Options"))
 
 	def onExitButtonClicked(self, args):
 
-		DialogOKCancel.getSingleton().show(self.window, self.onOKCancelClosed, "Really quit ?")
+		DialogOKCancel.instance().show(self.window, self.onOKCancelClosed, "Really quit ?")
 
 	def onOKCancelClosed(self, reallyQuit=False):
 

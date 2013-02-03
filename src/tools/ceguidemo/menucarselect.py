@@ -18,15 +18,14 @@ import PyCEGUI
 from configuration import TheConfig
 
 # Import: Menu
-from menustandard import MenuStandard
-from menucredits import MenuCredits
-from menuoptions import MenuOptions
-from menuprofiles import MenuProfiles
-from menuresults import MenuResults
+from menustandard import MenuStandard 
+from menumanager import MenuManager
+
 
 # Car selection menu
 class MenuCarSelect(MenuStandard):
 
+	# Static cars data.
 	Car = collections.namedtuple("Car", "name, topSpeed, acceleration, cornering, skins")
 
 	Cars = \
@@ -60,12 +59,24 @@ class MenuCarSelect(MenuStandard):
 		}
 	}
 
+	# Singleton pattern.
+	singleton = None
+
+	def instance():
+	
+		if not MenuCarSelect.singleton:
+			MenuCarSelect.singleton = MenuCarSelect()
+			MenuCarSelect.singleton.initialize()
+			MenuCarSelect.singleton.setup()
+			
+		return MenuCarSelect.singleton
+
+	instance = staticmethod(instance)
+
 	def __init__(self):
 
-		MenuStandard.__init__(self, MenuCredits, MenuOptions, MenuProfiles)
+		MenuStandard.__init__(self)
 	
-		self.menuResults = None
-
 	# Initialize
 	def initialize(self):
 
@@ -141,12 +152,7 @@ class MenuCarSelect(MenuStandard):
 	# Handler: buttonClicked
 	def onStartButtonClicked(self, args):
 
-		if not self.menuResults:
-			self.menuResults = MenuResults()
-			self.menuResults.initialize()
-			self.menuResults.setup()
-
-		self.menuResults.activate(previous=self)
+		self.switchTo(MenuManager.get("Loading"))
 
 	def onBackButtonClicked(self, args):
 

@@ -22,9 +22,10 @@ from menu import Menu
 # Profiles menu
 class MenuProfiles(Menu):
 
+	# Singleton pattern.
 	singleton = None
 
-	def getSingleton():
+	def instance():
 	
 		if not MenuProfiles.singleton:
 			MenuProfiles.singleton = MenuProfiles()
@@ -33,7 +34,7 @@ class MenuProfiles(Menu):
 			
 		return MenuProfiles.singleton
 
-	getSingleton = staticmethod(getSingleton)
+	instance = staticmethod(instance)
 
 	def __init__(self):
 

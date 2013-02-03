@@ -19,14 +19,13 @@ from configuration import TheConfig
 
 # Import: Menu
 from menustandard import MenuStandard
-from menucredits import MenuCredits
-from menuoptions import MenuOptions
-from menuprofiles import MenuProfiles
-from menucarselect import MenuCarSelect
+from menumanager import MenuManager
+
 
 # Track selection menu
 class MenuTrackSelect(MenuStandard):
 
+	# Static data.
 	Track = collections.namedtuple("Track", "name, description, authors, length, width, nPits, outline, preview")
 	
 	Tracks = \
@@ -74,12 +73,24 @@ class MenuTrackSelect(MenuStandard):
 		}
 	}
 
+	# Singleton pattern.
+	singleton = None
+
+	def instance():
+	
+		if not MenuTrackSelect.singleton:
+			MenuTrackSelect.singleton = MenuTrackSelect()
+			MenuTrackSelect.singleton.initialize()
+			MenuTrackSelect.singleton.setup()
+			
+		return MenuTrackSelect.singleton
+
+	instance = staticmethod(instance)
+
 	def __init__(self):
 
-		MenuStandard.__init__(self, MenuCredits, MenuOptions, MenuProfiles)
+		MenuStandard.__init__(self)
 
-		self.menuCarSelect = None
-	
 	# Initialize
 	def initialize(self):
 
@@ -136,12 +147,7 @@ class MenuTrackSelect(MenuStandard):
 	# Handler: buttonClicked
 	def onNextButtonClicked(self, args):
 
-		if not self.menuCarSelect:
-			self.menuCarSelect = MenuCarSelect()
-			self.menuCarSelect.initialize()
-			self.menuCarSelect.setup()
-
-		self.menuCarSelect.activate(previous=self)
+		self.switchTo(MenuManager.get("CarSelect"))
 
 	def onBackButtonClicked(self, args):
 

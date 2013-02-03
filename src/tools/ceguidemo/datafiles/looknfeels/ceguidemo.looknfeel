@@ -1,4 +1,8 @@
 <?xml version="1.0" ?>
+<!-- 
+  CEGUI demo application look & feel for checking if CEGUI could be used for Speed Dreams menus
+  Note: Heavily based on Falagard's look & feel (from CEGUI 0.7.5).
+-->
 <Falagard>
     <!--
     ***************************************************

@@ -171,10 +171,6 @@ class Menu(object):
 		if previous:
 			self.prevMenu = previous
 
-		# Initialize frame rate data.
-		self.nFrames = 0
-		self.lastTime = glutGet(GLUT_ELAPSED_TIME)
-		
 	# Return to the previous menu.
 	def switchTo(self, menu):
 	
@@ -193,13 +189,13 @@ class Menu(object):
 	# Update frame rate indicator.
 	def onUpdate(self, winArgs): # Bug: Not an UpdateEventArgs, but a WindowEventArgs !
 	
-		thisTime = glutGet(GLUT_ELAPSED_TIME)
-		elapsed = (thisTime - self.lastTime) / 1000.0
+		self.currTime = glutGet(GLUT_ELAPSED_TIME)
+		elapsed = (self.currTime - self.lastTime) / 1000.0
 		self.nFrames += 1
 		if elapsed >= 1.0: # Skidding mean for each second
 			self.txtFrameRate.setText("%4.1f" % (self.nFrames / elapsed))
 			self.nFrames = 0
-			self.lastTime = thisTime
+			self.lastTime = self.currTime
 
 	def onKeyDown(self, keyArgs):
 		
@@ -211,7 +207,13 @@ class Menu(object):
 	def onActivated(self, args):
 			
 		print("%s.onActivated" % self.__class__.__name__)
+
 		#self.connectHandlers()
+
+		# Initialize frame rate data.
+		self.nFrames = 0
+		self.currTime = self.lastTime = glutGet(GLUT_ELAPSED_TIME)
+		
 		return False
 
 	def onDeactivated(self, args):
