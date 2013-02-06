@@ -29,10 +29,9 @@
 
 static char path[1024];
 
-static int spansplit;
 static float spanfovy;
 static float bezelcomp;
-static int spanaspect;
+static float spanaspect;
 static tdble spanA;
 
 static double lastTime;
@@ -170,11 +169,10 @@ float cGrPerspCamera::getLODFactor(float x, float y, float z) {
 
 void cGrPerspCamera::setViewOffset(float newOffset)
 {
-    if (spansplit && newOffset) {
-        viewOffset = newOffset;
+    if (newOffset)
 	spanfovy = fovy;
-    } else
-        viewOffset = 0;
+
+    viewOffset = newOffset;
 }
 
 void cGrPerspCamera::setZoom(int cmd)
@@ -215,7 +213,7 @@ void cGrPerspCamera::setZoom(int cmd)
 
     limitFov();
 
-    if (spansplit && viewOffset)
+    if (viewOffset)
 	spanfovy = fovy;
 
     sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, screen->getCurCamHead(), getId());
@@ -314,7 +312,7 @@ class cGrCarCamInsideDriverEye : public cGrPerspCamera
 	eye[2] = p[2];
 
 	// Compute offset angle and bezel compensation)
-	if (spansplit && viewOffset) {
+	if (viewOffset) {
 		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
 			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
@@ -386,7 +384,7 @@ class cGrCarCamInsideDynDriverEye : public cGrCarCamInsideDriverEye
 	eye[2] = p[2];
 
 	// Compute offset angle and bezel compensation)
-	if (spansplit && viewOffset) {
+	if (viewOffset) {
 		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
 			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
@@ -400,7 +398,7 @@ class cGrCarCamInsideDynDriverEye : public cGrCarCamInsideDriverEye
 	tdble A = 0;
 
 	// We want uniform movement across split screens when 'spanning'
-	if (spansplit && viewOffset && lastTime == s->currentTime) {
+	if (viewOffset && lastTime == s->currentTime) {
 		A = spanA;
 	} else {
 		A = car->_yaw;
@@ -432,7 +430,7 @@ class cGrCarCamInsideDynDriverEye : public cGrCarCamInsideDriverEye
 	tdble A = 0;
 
 	// We want uniform movement across split screens when 'spanning'
-	if (spansplit && viewOffset && lastTime == s->currentTime) {
+	if (viewOffset && lastTime == s->currentTime) {
 		A = spanA;
 	} else {
 		A = car->_yaw;
@@ -617,7 +615,7 @@ class cGrCarCamInsideFixedCar : public cGrPerspCamera
 	eye[2] = p[2];
  
 	// Compute offset angle and bezel compensation)
-	if (spansplit && viewOffset) {
+	if (viewOffset) {
 		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
 			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
@@ -672,7 +670,7 @@ class cGrCarCamInfrontFixedCar : public cGrPerspCamera
 	eye[2] = p[2];
  
 	// Compute offset angle and bezel compensation)
-	if (spansplit && viewOffset) {
+	if (viewOffset) {
 		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
 			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
@@ -729,7 +727,7 @@ class cGrCarCamBehindFixedCar : public cGrPerspCamera
 	eye[2] = p[2];
 
 	// Compute offset angle and bezel compensation)
-	if (spansplit && viewOffset) {
+	if (viewOffset) {
 		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
 			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
@@ -801,7 +799,7 @@ class cGrCarCamBehindReverse : public cGrPerspCamera
 	eye[2] = p[2];
  
 	// Compute offset angle and bezel compensation)
-	if (spansplit && viewOffset) {
+	if (viewOffset) {
 		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
 			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
@@ -857,7 +855,7 @@ class cGrCarCamBehind : public cGrPerspCamera
 	tdble A;
 
 	// We want uniform movement across split screens when 'spanning'
-	if (spansplit && viewOffset && lastTime == s->currentTime) {
+	if (viewOffset && lastTime == s->currentTime) {
 		A = spanA;
 	} else {
 		A = car->_yaw;
@@ -1496,7 +1494,6 @@ class cGrCarCamRoadFly : public cGrPerspCamera
 
     void onSelect(tCarElt *car, tSituation *s)
     {
-        printf ("%f select\n", s->currentTime);
 	timer = 0;
 	current = -1;
     }
@@ -1775,16 +1772,18 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     int			c;
     class cGrCamera	*cam;
     
-    /* Check whether view should be spanned across vertical splits */
-    const char *pszSpanSplit =
-        GfParmGetStr(grHandle, GR_SCT_MONITOR, GR_ATT_SPANSPLIT, GR_VAL_NO);
-    spansplit = strcmp(pszSpanSplit, GR_VAL_YES) ? 0 : 1;
-
-    bezelcomp = (float)GfParmGetNum(grHandle, GR_SCT_MONITOR, GR_ATT_BEZELCOMP, NULL, 120);
+    /* Check Bezel compensation - used when spaning view across multiple splits */
+    bezelcomp = (float)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_BEZELCOMP, "%", 110);
 
     const char *pszMonitorType =
-	GfParmGetStr(grHandle, GR_SCT_MONITOR, GR_ATT_MONITOR, GR_VAL_MONITOR_16BY9);
-    spanaspect = strcmp(pszMonitorType, GR_VAL_MONITOR_16BY9) ? 1.3333 : 1.7777;
+	GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_MONITOR, GR_VAL_MONITOR_16BY9);
+
+    if (strcmp(pszMonitorType, GR_VAL_MONITOR_16BY9) == 0)
+        spanaspect = 1.7777;
+    if (strcmp(pszMonitorType, GR_VAL_MONITOR_4BY3) == 0)
+        spanaspect = 1.3333 ;
+    if (strcmp(pszMonitorType, GR_VAL_MONITOR_NONE) == 0)
+        spanaspect = 1;
 
     /* Scene Cameras */
     c = 0;

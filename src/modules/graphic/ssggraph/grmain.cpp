@@ -69,7 +69,7 @@ static float fMouseRatioX, fMouseRatioY;
 // Number of active screens.
 int grNbActiveScreens = 1;
 int grNbArrangeScreens = 0;
-int grNbSpanSplit = 0;
+int grSpanSplit = 0;
 
 // Current screen index.
 static int nCurrentScreenIndex = 0;
@@ -145,8 +145,8 @@ grAdaptScreenSize(void)
 				break;
 			case 1:
 				// Left & Right half of the window
-				grScreens[0]->activate(grWinx,              grWiny, grWinw / 2, grWinh, -0.5 + 10);
-				grScreens[1]->activate(grWinx + grWinw / 2, grWiny, grWinw / 2, grWinh, 0.5 + 10);
+				grScreens[0]->activate(grWinx,              grWiny, grWinw / 2, grWinh, grSpanSplit * (-0.5 + 10));
+				grScreens[1]->activate(grWinx + grWinw / 2, grWiny, grWinw / 2, grWinh, grSpanSplit * (0.5 + 10));
 				break;
 			case 2:
 				// 33/66% Left/Right 
@@ -175,9 +175,9 @@ grAdaptScreenSize(void)
 				break;
 			case 1:
 				// All side by side
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 3,   grWinh, -1 + 10);
-				grScreens[1]->activate(grWinx + grWinw / 3,   grWiny, grWinw / 3,   grWinh, 0.0 + 10);
-				grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny, grWinw / 3,   grWinh, 1 + 10);
+				grScreens[0]->activate(grWinx,                grWiny, grWinw / 3,   grWinh, grSpanSplit * (-1 + 10));
+				grScreens[1]->activate(grWinx + grWinw / 3,   grWiny, grWinw / 3,   grWinh, grSpanSplit * (0.0 + 10));
+				grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny, grWinw / 3,   grWinh, grSpanSplit * (1 + 10));
 				break;
 			case 2:
 				// Left/Right above wide
@@ -226,10 +226,10 @@ grAdaptScreenSize(void)
 				break;
 			case 1:
 				// All side by side
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 4,   grWinh, -1.5 + 10);
-				grScreens[1]->activate(grWinx + grWinw / 4,   grWiny, grWinw / 4,   grWinh, -0.5 + 10);
-				grScreens[2]->activate(grWinx + grWinw * 2/4, grWiny, grWinw / 4,   grWinh, 0.5 + 10);
-				grScreens[3]->activate(grWinx + grWinw * 3/4, grWiny, grWinw / 4,   grWinh, 1.5 + 10);
+				grScreens[0]->activate(grWinx,                grWiny, grWinw / 4,   grWinh, grSpanSplit * (-1.5 + 10));
+				grScreens[1]->activate(grWinx + grWinw / 4,   grWiny, grWinw / 4,   grWinh, grSpanSplit * (-0.5 + 10));
+				grScreens[2]->activate(grWinx + grWinw * 2/4, grWiny, grWinw / 4,   grWinh, grSpanSplit * (0.5 + 10));
+				grScreens[3]->activate(grWinx + grWinw * 3/4, grWiny, grWinw / 4,   grWinh, grSpanSplit * (1.5 + 10));
 				break;
 			case 2:
 				// Left/Middle/Right above wide
@@ -291,11 +291,11 @@ grAdaptScreenSize(void)
 				break;
 			case 1:
 				// All side by side
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 5,   grWinh, -2.0 + 10);
-				grScreens[1]->activate(grWinx + grWinw / 5,   grWiny, grWinw / 5,   grWinh, -1.0 + 10);
-				grScreens[2]->activate(grWinx + grWinw * 2/5, grWiny, grWinw / 5,   grWinh, 0.0 + 10);
-				grScreens[3]->activate(grWinx + grWinw * 3/5, grWiny, grWinw / 5,   grWinh, 1.0 + 10);
-				grScreens[4]->activate(grWinx + grWinw * 4/5, grWiny, grWinw / 5,   grWinh, 2.0 + 10);
+				grScreens[0]->activate(grWinx,                grWiny, grWinw / 5,   grWinh, grSpanSplit * (-2.0 + 10));
+				grScreens[1]->activate(grWinx + grWinw / 5,   grWiny, grWinw / 5,   grWinh, grSpanSplit * (-1.0 + 10));
+				grScreens[2]->activate(grWinx + grWinw * 2/5, grWiny, grWinw / 5,   grWinh, grSpanSplit * (0.0 + 10));
+				grScreens[3]->activate(grWinx + grWinw * 3/5, grWiny, grWinw / 5,   grWinh, grSpanSplit * (1.0 + 10));
+				grScreens[4]->activate(grWinx + grWinw * 4/5, grWiny, grWinw / 5,   grWinh, grSpanSplit * (2.0 + 10));
 				break;
 			}
 			for (i=5; i < GR_NB_MAX_SCREEN; i++)
@@ -316,12 +316,12 @@ grAdaptScreenSize(void)
 				break;
 			case 1:
 				// All side by side
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 6,   grWinh, -2.5 + 10);
-				grScreens[1]->activate(grWinx + grWinw / 6,   grWiny, grWinw / 6,   grWinh, -1.5 + 10);
-				grScreens[2]->activate(grWinx + grWinw * 2/6, grWiny, grWinw / 6,   grWinh, -0.5 + 10);
-				grScreens[3]->activate(grWinx + grWinw * 3/6, grWiny, grWinw / 6,   grWinh, 0.5 + 10);
-				grScreens[4]->activate(grWinx + grWinw * 4/6, grWiny, grWinw / 6,   grWinh, 1.5 + 10);
-				grScreens[5]->activate(grWinx + grWinw * 5/6, grWiny, grWinw / 6,   grWinh, 2.5 + 10);
+				grScreens[0]->activate(grWinx,                grWiny, grWinw / 6,   grWinh, grSpanSplit * (-2.5 + 10));
+				grScreens[1]->activate(grWinx + grWinw / 6,   grWiny, grWinw / 6,   grWinh, grSpanSplit * (-1.5 + 10));
+				grScreens[2]->activate(grWinx + grWinw * 2/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (-0.5 + 10));
+				grScreens[3]->activate(grWinx + grWinw * 3/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (0.5 + 10));
+				grScreens[4]->activate(grWinx + grWinw * 4/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (1.5 + 10));
+				grScreens[5]->activate(grWinx + grWinw * 5/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (2.5 + 10));
 				break;
 			}
 			for (i=6; i < GR_NB_MAX_SCREEN; i++)
@@ -340,7 +340,7 @@ grSplitScreen(void *vp)
 		case GR_SPLIT_ADD:
 			if (grNbActiveScreens < GR_NB_MAX_SCREEN)
 				grNbActiveScreens++;
-				if (grNbSpanSplit) 
+				if (grSpanSplit) 
 					grNbArrangeScreens=1;
 				else
 					grNbArrangeScreens=0;
@@ -348,7 +348,7 @@ grSplitScreen(void *vp)
 		case GR_SPLIT_REM:
 			if (grNbActiveScreens > 1)
 				grNbActiveScreens--;
-				if (grNbSpanSplit) 
+				if (grSpanSplit) 
 					grNbArrangeScreens=1;
 				else
 					grNbArrangeScreens=0;
@@ -402,11 +402,11 @@ grSelectCamera(void *vp)
     grGetCurrentScreen()->selectCamera((long)vp);
 
     // For SpanSplit ensure screens change together
-    if (grNbSpanSplit && grGetCurrentScreen()->getViewOffset() ) {
+    if (grSpanSplit && grGetCurrentScreen()->getViewOffset() ) {
         long cam;
         int i, subcam;
 
-	cam = (long) vp; // grGetCurrentScreen()->getCurCamera();
+	cam = (long) vp;
 	subcam = grGetCurrentScreen()->getNthCamera();
 
         for (i=0; i < grNbActiveScreens; i++)
@@ -644,8 +644,8 @@ initCars(tSituation *s)
 
 
 	/* Check whether view should be spanned across vertical splits */
-	pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_MONITOR, GR_ATT_SPANSPLIT, GR_VAL_NO);
-	grNbSpanSplit = strcmp(pszSpanSplit, GR_VAL_YES) ? 0 : 1;
+	pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
+	grSpanSplit = strcmp(pszSpanSplit, GR_VAL_YES) ? 0 : 1;
 
 	// Initialize the cameras for all the screens.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {

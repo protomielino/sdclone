@@ -490,7 +490,7 @@ void cGrScreen::loadParams(tSituation *s)
 	mirrorFlag	= (int)GfParmGetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
 
 	// Only apply driver preferences when not spanning split screens
-	pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_MONITOR, GR_ATT_SPANSPLIT, GR_VAL_NO);
+	pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
 	if (strcmp(pszSpanSplit, GR_VAL_YES)) {
 		sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
 		curCamHead	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM_HEAD, NULL, (tdble)curCamHead);

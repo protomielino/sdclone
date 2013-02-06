@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../../../libs/tgf/params.dtd">
 
-<params name="graph" type="param" mode="mw" version="1.10">
+<params name="graph" type="param" mode="mw" version="1.11">
   <section name="Graphic">
     <attnum name="smoke value" val="300"/>
     <attnum name="smoke interval" val="0.01"/>
@@ -37,6 +37,8 @@
 	<attstr name="forest LOD" val="none"/>
 	<attstr name="tree LOD" val="none"/>
 	<attstr name="parking LOD" val="none"/>
+    <attstr name="span splits" val="no"/>
+    <attnum name="bezel compensation" unit="%" val="110"/>
   </section>
 
   <section name="Playable Cameras Distance of Views">
@@ -190,11 +192,4 @@
       </section>
     </section>
   </section>
-
-  <section name="Monitor">
-    <attstr name="monitor type" val="16by9"/>
-    <attstr name="span splits" val="no"/>
-    <attnum name="bezel compensation" val="110"/>
-  </section>
-
 </params>

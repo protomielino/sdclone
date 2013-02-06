@@ -103,8 +103,9 @@
 
 #define GR_SCT_MONITOR		"Monitor"
 #define GR_ATT_MONITOR		"monitor type"
-#define GR_VAL_MONITOR_16BY9		"16by9"
-#define GR_VAL_MONITOR_4BY3		"4by3"
+#define GR_VAL_MONITOR_16BY9		"16:9"
+#define GR_VAL_MONITOR_4BY3		"4:3"
+#define GR_VAL_MONITOR_NONE		"None"
 #define GR_ATT_SPANSPLIT		"span splits"
 #define GR_VAL_YES		"yes"
 #define GR_VAL_NO		"no"

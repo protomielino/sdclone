@@ -124,7 +124,7 @@ cGrBoard::loadDefaults(const tCarElt *curCar)
                                 NULL, trackMap->getDefaultViewMode()));
 
   // Only apply driver preferences when not spanning split screens
-  pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_MONITOR, GR_ATT_SPANSPLIT, GR_VAL_NO);
+  pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
   if (strcmp(pszSpanSplit, GR_VAL_YES) && curCar->_driverType == RM_DRV_HUMAN) {
     snprintf(path, sizeof(path), "%s/%s", GR_SCT_DISPMODE, curCar->_name);
     debugFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_DEBUG, NULL, debugFlag);

@@ -43,6 +43,10 @@ static const char* TreeValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_ATT_A
 static const int NbTreeValues = sizeof(TreeValues) / sizeof(TreeValues[0]);
 static const char* ParkingValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_ATT_AGR_FULL, GR_ATT_AGR_HIGH };
 static const int NbParkingValues = sizeof(ParkingValues) / sizeof(ParkingValues[0]);
+static const char* SpansplitValues[] = { GR_VAL_NO, GR_VAL_YES };
+static const int NbSpansplitValues = sizeof(SpansplitValues) / sizeof(SpansplitValues[0]);
+static const char* MonitorValues[] = { GR_VAL_MONITOR_16BY9, GR_VAL_MONITOR_4BY3, GR_VAL_MONITOR_NONE };
+static const int NbMonitorValues = sizeof(MonitorValues) / sizeof(MonitorValues[0]);
 
 static void	*ScrHandle = NULL;
 
@@ -50,12 +54,18 @@ static int	BackgroundTypeLabelId, BackgroundTypeLeftButtonId, BackgroundTypeRigh
 static int	ForestLabelId, ForestLeftButtonId, ForestRightButtonId;
 static int	TreeLabelId, TreeLeftButtonId, TreeRightButtonId;
 static int	ParkingLabelId, ParkingLeftButtonId, ParkingRightButtonId;
+static int	SpansplitLabelId, SpansplitLeftButtonId, SpansplitRightButtonId;
+static int	MonitorLabelId, MonitorLeftButtonId, MonitorRightButtonId;
 
 static int	BackgroundTypeIndex = 0;
 //static int	SpectatorsIndex = 0;
 static int	ForestIndex = 0;
 static int	TreeIndex = 0;
 static int	ParkingIndex = 0;
+static int	SpansplitIndex = 0;
+static float	BezelValue = 110.0f;
+static int	BezelValueId;
+static int	MonitorIndex = 0;
 
 static char	buf[512];
 
@@ -116,6 +126,41 @@ loadOptions()
 		}
 	}
 
+	SpansplitIndex = 0; // Default value index, in case file value not found in list.
+	const char* pszSpansplit =
+		GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
+	for (int i = 0; i < NbSpansplitValues; i++) 
+	{
+		if (!strcmp(pszSpansplit, SpansplitValues[i]))
+		{
+			SpansplitIndex = i;
+			break;
+		}
+	}
+
+	BezelValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_BEZELCOMP, "%", 110.0f);
+	if (BezelValue>150.0f) {
+		BezelValue = 150.0f;
+	} 
+	else if (BezelValue < 50.0f) {
+		BezelValue = 50.0f;
+	}
+
+	sprintf(buf, "%g", BezelValue);
+	GfuiEditboxSetString(ScrHandle, BezelValueId, buf);
+
+	MonitorIndex = 0; // Default value index, in case file value not found in list.
+	const char* pszMonitor =
+		GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_MONITOR, GR_VAL_MONITOR_16BY9);
+	for (int i = 0; i < NbMonitorValues; i++) 
+	{
+		if (!strcmp(pszMonitor, MonitorValues[i]))
+		{
+			MonitorIndex = i;
+			break;
+		}
+	}
+
     GfParmReleaseHandle(grHandle);
 }
 
@@ -132,6 +177,9 @@ saveOptions()
 	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_AGR_FOREST, ForestValues[ForestIndex]);
 	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_AGR_TREE, TreeValues[TreeIndex]);
 	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_AGR_PARKING, ParkingValues[ParkingIndex]);
+	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, SpansplitValues[SpansplitIndex]);
+	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_BEZELCOMP, "%", BezelValue);
+	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_MONITOR, MonitorValues[MonitorIndex]);
     
     GfParmWriteFile(NULL, grHandle, "graph");
     
@@ -172,6 +220,38 @@ onChangeParking(void* vp)
     GfuiLabelSetText(ScrHandle, ParkingLabelId, ParkingValues[ParkingIndex]);
 } 
 
+static void
+onChangeSpansplit(void* vp)
+{
+    const long delta = (long)vp;
+    SpansplitIndex = (SpansplitIndex + NbSpansplitValues + delta) % NbSpansplitValues;
+    GfuiLabelSetText(ScrHandle, SpansplitLabelId, SpansplitValues[SpansplitIndex]);
+
+    GfuiEnable(ScrHandle, BezelValueId, SpansplitIndex ? GFUI_ENABLE : GFUI_DISABLE);
+} 
+
+static void
+onChangeBezel(void * )
+{
+    char* val = GfuiEditboxGetString(ScrHandle, BezelValueId);
+    sscanf(val, "%g", &BezelValue);
+    if (BezelValue > 150.0f)
+		BezelValue = 150.0f;
+    else if (BezelValue < 50.0f)
+		BezelValue = 50.0f;
+	
+    char buf[32];
+    sprintf(buf, "%g", BezelValue);
+    GfuiEditboxSetString(ScrHandle, BezelValueId, buf);
+}
+
+static void
+onChangeMonitor(void* vp)
+{
+    const long delta = (long)vp;
+    MonitorIndex = (MonitorIndex + NbMonitorValues + delta) % NbMonitorValues;
+    GfuiLabelSetText(ScrHandle, MonitorLabelId, MonitorValues[MonitorIndex]);
+} 
 
 static void
 onActivate(void* /* dummy */)
@@ -183,6 +263,9 @@ onActivate(void* /* dummy */)
 	onChangeForest(0);
 	onChangeTree(0);
 	onChangeParking(0);	
+	onChangeSpansplit(0);	
+	onChangeBezel(0);	
+	onChangeMonitor(0);	
 }
 
 static void
@@ -238,6 +321,20 @@ AdvancedGraphMenuInit(void* prevMenu)
     ParkingRightButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, param, "parkingrightarrow", (void*)1, onChangeParking);
     ParkingLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "parkinglabel");
+
+	SpansplitLeftButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, param, "spansplitleftarrow", (void*)-1, onChangeSpansplit);
+    SpansplitRightButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, param, "spansplitrightarrow", (void*)1, onChangeSpansplit);
+    SpansplitLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "spansplitlabel");
+
+    BezelValueId = GfuiMenuCreateEditControl(ScrHandle, param, "bezeledit", NULL, NULL, onChangeBezel);
+
+	MonitorLeftButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, param, "monitorleftarrow", (void*)-1, onChangeMonitor);
+    MonitorRightButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, param, "monitorrightarrow", (void*)1, onChangeMonitor);
+    MonitorLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "monitorlabel");
 
     GfuiMenuCreateButtonControl(ScrHandle, param, "ApplyButton", prevMenu, onAccept);
     GfuiMenuCreateButtonControl(ScrHandle, param, "CancelButton", prevMenu, onCancel);
