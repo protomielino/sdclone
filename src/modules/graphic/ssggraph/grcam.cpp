@@ -805,7 +805,7 @@ class cGrCarCamBehindReverse : public cGrPerspCamera
 		fovy = spanfovy;
 	}
 
-	P[0] = car->_bonnetPos_x + 30.0 * cos(offset);
+	P[0] = car->_bonnetPos_x - (car->_dimension_x/2) + 30.0 * cos(offset);
 	P[1] = car->_bonnetPos_y + 30.0 * sin(offset);
 	P[2] = car->_bonnetPos_z;
 	sgXformPnt3(P, car->_posMat);

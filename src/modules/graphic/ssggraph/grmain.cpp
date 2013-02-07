@@ -435,13 +435,35 @@ grSelectTrackMap(void * /* vp */)
 static void
 grPrevCar(void * /* dummy */)
 {
-    grGetCurrentScreen()->selectPrevCar();
+    // For SpanSplit ensure screens change together
+    if (grSpanSplit && grGetCurrentScreen()->getViewOffset() ) {
+        int i;
+        tCarElt *car = grGetCurrentScreen()->getCurrentCar();
+
+        for (i=0; i < grNbActiveScreens; i++)
+            if (grScreens[i]->getViewOffset() ) {
+                grScreens[i]->setCurrentCar(car);
+                grScreens[i]->selectPrevCar();
+            }
+    } else
+        grGetCurrentScreen()->selectPrevCar();
 }
 
 static void
 grNextCar(void * /* dummy */)
 {
-    grGetCurrentScreen()->selectNextCar();
+    // For SpanSplit ensure screens change together
+    if (grSpanSplit && grGetCurrentScreen()->getViewOffset() ) {
+        int i;
+        tCarElt *car = grGetCurrentScreen()->getCurrentCar();
+
+        for (i=0; i < grNbActiveScreens; i++)
+            if (grScreens[i]->getViewOffset() ) {
+                grScreens[i]->setCurrentCar(car);
+                grScreens[i]->selectNextCar();
+            }
+    } else
+        grGetCurrentScreen()->selectNextCar();
 }
 
 static void
