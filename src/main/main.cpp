@@ -35,6 +35,7 @@
 #include <config.h>
 #endif
 
+#include <raceman.h> // RACE_ENG_CFG 
 #include <iraceengine.h>
 #include <iuserinterface.h>
 
@@ -142,9 +143,14 @@ main(int argc, char *argv[])
 	// Initialize the data layer (needed by any race engine module).
 	GfData::initialize();
 
-	// Load the race engine module (the "standard game" one, for the moment).
+	// Load the race engine module (specified in the user settings : raceengine.xml file).
+	std::ostringstream ossParm;
+	ossParm << GfLocalDir() << RACE_ENG_CFG;
+	void* hREParams =
+		GfParmReadFile(ossParm.str().c_str(), GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	ossModLibName.str("");
-	ossModLibName << GfLibDir() << "modules/racing/standardgame" << '.' << DLLEXT;
+	const char* pszModName = GfParmGetStr(hREParams, "Modules", "racing", "standardgame");
+	ossModLibName << GfLibDir() << "modules/racing/" << pszModName << '.' << DLLEXT;
 	GfModule* pmodRaceEngine = GfModule::load(ossModLibName.str());
 
 	// Check that it implements IRaceEngine.

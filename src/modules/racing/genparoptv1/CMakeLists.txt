@@ -1,20 +1,20 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
-#PROJECT(standardgame)
+#PROJECT(genparoptv1)
 
-SET(_SOURCES standardgame.cpp
+SET(_SOURCES genparoptv1.cpp
              racecareer.cpp raceupdate.cpp racenetwork.cpp racecars.cpp
              raceinit.cpp racemain.cpp
              racetrack.cpp raceresults.cpp racesimusimu.cpp 
              racestate.cpp racesituation.cpp racemessage.cpp
              raceutil.cpp)
-SET(_HEADERS standardgame.h 
+SET(_HEADERS genparoptv1.h 
              racecareer.h raceupdate.h racenetwork.h racecars.h
              raceinit.h 
              racetrack.h raceresults.h racesimusimu.h 
              racestate.h racesituation.h racemessage.h
              raceutil.h)
-SET(_OTHER_SOURCES raceengine.xml raceresults.xsl)
+SET(_OTHER_SOURCES )
 
 ADD_INTERFACE_INCLUDEDIR()
 
@@ -30,7 +30,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
-    ADD_DEFINITIONS(-DSTANDARDGAME_DLL)
+    ADD_DEFINITIONS(-DGENPAROPTV1_DLL)
 ENDIF(WIN32)
     
 IF(MSVC)
@@ -39,19 +39,15 @@ IF(MSVC)
 ENDIF(MSVC)
 
 # Note: Other source files  and headers needed for having them available in IDEs.
-ADD_LIBRARY(standardgame SHARED ${_SOURCES} ${_HEADERS} ${_OTHER_SOURCES})
+ADD_LIBRARY(genparoptv1 SHARED ${_SOURCES} ${_HEADERS} ${_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
-#SET_TARGET_PROPERTIES(standardgame PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
+#SET_TARGET_PROPERTIES(genparoptv1 PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 IF(UNIX OR MINGW)
-    SET_TARGET_PROPERTIES(standardgame PROPERTIES PREFIX "")
+    SET_TARGET_PROPERTIES(genparoptv1 PROPERTIES PREFIX "")
 ENDIF(UNIX OR MINGW)
 
-ADD_SDLIB_LIBRARY(standardgame portability tgf tgfdata robottools networking)
+ADD_SDLIB_LIBRARY(genparoptv1 portability tgf tgfdata robottools networking)
 
-SD_INSTALL_FILES(DATA config FILES raceresults.xsl)
-
-SD_INSTALL_FILES(DATA config USER config FILES raceengine.xml)
-
-SD_INSTALL_FILES(LIB modules/racing TARGETS standardgame)
+SD_INSTALL_FILES(LIB modules/racing TARGETS genparoptv1)

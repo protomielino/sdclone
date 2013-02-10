@@ -2,9 +2,9 @@
 <!-- 
     file        : raceengine.xml
     created     : Sat Nov 16 19:39:26 CET 2002
-    copyright   : (C) 2002 by Eric Espi�                         
-    email       : Eric.Espie@torcs.org   
-    version     : $Id$                                  
+    copyright   : (C) 2002 by Eric Espie
+    email       : Eric.Espie@torcs.org
+    version     : $Id$
 -->
 
 <!--    This program is free software; you can redistribute it and/or modify  -->
@@ -14,9 +14,10 @@
 
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
 
-<params name="" type="template" mode="mw" version="1.5">
+<params name="" type="template" mode="mw" version="1.6">
 
   <section name="Modules">
+    <attstr name="racing" val="standardgame"/>
     <attstr name="track" val="track"/>
     <attstr name="simu" val="simuv2.1"/>
     <attstr name="graphic" val="ssggraph"/>

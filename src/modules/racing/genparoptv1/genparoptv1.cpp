@@ -1,9 +1,9 @@
 /***************************************************************************
 
-    file        : standardgame.cpp
-    copyright   : (C) 2010 by Jean-Philippe Meuret                        
-    email       : pouillot@users.sourceforge.net   
-    version     : $Id$                                  
+    file        : genparoptv1.cpp
+    copyright   : (C) 2012 by Wolf-Dieter Beelitz
+    email       : pouillot@users.sourceforge.net
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -17,7 +17,8 @@
  ***************************************************************************/
  
 /** @file    
-    		The standard game race engine module
+  		A race engine module designed for optimising car and AI driver setups
+		(parameters) through a genetic algorithm
     @version    $Id$
 */
 
@@ -38,55 +39,55 @@
 #include "racestate.h"
 #include "raceupdate.h"
 
-#include "standardgame.h"
+#include "genparoptv1.h"
 
 
 // The singleton.
-StandardGame* StandardGame::_pSelf = 0;
+GenParOptV1* GenParOptV1::_pSelf = 0;
 
 int openGfModule(const char* pszShLibName, void* hShLibHandle)
 {
 	// Instanciate the (only) module instance.
-	StandardGame::_pSelf = new StandardGame(pszShLibName, hShLibHandle);
+	GenParOptV1::_pSelf = new GenParOptV1(pszShLibName, hShLibHandle);
 
 	// Register it to the GfModule module manager if OK.
-	if (StandardGame::_pSelf)
-		GfModule::register_(StandardGame::_pSelf);
+	if (GenParOptV1::_pSelf)
+		GfModule::register_(GenParOptV1::_pSelf);
 
 	// Report about success or error.
-	return StandardGame::_pSelf ? 0 : 1;
+	return GenParOptV1::_pSelf ? 0 : 1;
 }
 
 int closeGfModule()
 {
 	// Unregister it from the GfModule module manager.
-	if (StandardGame::_pSelf)
-		GfModule::unregister(StandardGame::_pSelf);
+	if (GenParOptV1::_pSelf)
+		GfModule::unregister(GenParOptV1::_pSelf);
 
 	// Delete the (only) module instance.
-	delete StandardGame::_pSelf;
-	StandardGame::_pSelf = 0;
+	delete GenParOptV1::_pSelf;
+	GenParOptV1::_pSelf = 0;
 
 	// Report about success or error.
 	return 0;
 }
 
-StandardGame& StandardGame::self()
+GenParOptV1& GenParOptV1::self()
 {
 	// Pre-condition : 1 successfull openGfModule call.
 	return *_pSelf;
 }
 
-StandardGame::StandardGame(const std::string& strShLibName, void* hShLibHandle)
+GenParOptV1::GenParOptV1(const std::string& strShLibName, void* hShLibHandle)
 : GfModule(strShLibName, hShLibHandle),
   _piUserItf(0), _piTrkLoader(0), _piPhysEngine(0), _pRace(new GfRace())
 {
 }
 
 // Implementation of IRaceEngine.
-void StandardGame::reset(void)
+void GenParOptV1::reset(void)
 {
-	GfLogInfo("Resetting StandardGame race engine.\n");
+	GfLogInfo("Resetting GenParOptV1 race engine.\n");
 
 	// Cleanup everything in case no yet done.
 	cleanup();
@@ -115,7 +116,7 @@ void StandardGame::reset(void)
 	GfTracks::self()->setTrackLoader(_piTrkLoader);
 }
 
-void StandardGame::cleanup(void)
+void GenParOptV1::cleanup(void)
 {
 	// Internal cleanup.
 	::ReCleanup();
@@ -148,140 +149,140 @@ void StandardGame::cleanup(void)
 	}
 }
 
-void StandardGame::shutdown(void)
+void GenParOptV1::shutdown(void)
 {
-	GfLogInfo("Shutting down StandardGame race engine.\n");
+	GfLogInfo("Shutting down GenParOptV1 race engine.\n");
 
 	cleanup();
 
 	delete _pRace;
 }
 
-StandardGame::~StandardGame()
+GenParOptV1::~GenParOptV1()
 {
 }
 
-void StandardGame::setUserInterface(IUserInterface& userItf)
+void GenParOptV1::setUserInterface(IUserInterface& userItf)
 {
 	_piUserItf = &userItf;
 }
 
-void StandardGame::initializeState(void *prevMenu)
+void GenParOptV1::initializeState(void *prevMenu)
 {
 	::ReStateInit(prevMenu);
 }
 
-void StandardGame::updateState(void)
+void GenParOptV1::updateState(void)
 {
 	::ReStateManage();
 }
 
-void StandardGame::applyState(int state)
+void GenParOptV1::applyState(int state)
 {
 	::ReStateApply((void*)(long)state);
 }
 
-void StandardGame::selectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans)
+void GenParOptV1::selectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans)
 {
 	::ReRaceSelectRaceman(pRaceMan, bKeepHumans);
 }
 
-void StandardGame::restoreRace(void* hparmResults)
+void GenParOptV1::restoreRace(void* hparmResults)
 {
 	::ReRaceRestore(hparmResults);
 }
 
-void StandardGame::configureRace(bool bInteractive)
+void GenParOptV1::configureRace(bool bInteractive)
 {
 	::ReRaceConfigure(bInteractive);
 }
 
 //************************************************************
-void StandardGame::startNewRace()
+void GenParOptV1::startNewRace()
 {
 	::ReStartNewRace();
 }
 
-void StandardGame::resumeRace()
+void GenParOptV1::resumeRace()
 {
 	::ReResumeRace();
 }
 
 //************************************************************
-void StandardGame::startRace()
+void GenParOptV1::startRace()
 {
 	// TODO: Process error status ?
 	(void)::ReRaceRealStart();
 }
 
-void StandardGame::abandonRace()
+void GenParOptV1::abandonRace()
 {
 	::ReRaceAbandon();
 }
 
-void StandardGame::abortRace()
+void GenParOptV1::abortRace()
 {
 	::ReRaceAbort();
 }
 
-void StandardGame::skipRaceSession()
+void GenParOptV1::skipRaceSession()
 {
 	::ReRaceSkipSession();
 }
 
-void StandardGame::restartRace()
+void GenParOptV1::restartRace()
 {
 	::ReRaceRestart();
 }
 
 //************************************************************
-void StandardGame::start(void)
+void GenParOptV1::start(void)
 {
 	::ReStart();
 }
 
-void StandardGame::stop(void)
+void GenParOptV1::stop(void)
 {
 	::ReStop();
 }
 
 #ifdef SD_DEBUG
-void StandardGame::step(double dt)
+void GenParOptV1::step(double dt)
 {
 	::ReOneStep(dt);
 }
 #endif
 
 //************************************************************
-GfRace* StandardGame::race()
+GfRace* GenParOptV1::race()
 {
 	return _pRace;
 }
 
-const GfRace* StandardGame::race() const
+const GfRace* GenParOptV1::race() const
 {
 	return _pRace;
 }
 
 // TODO: Remove when safe dedicated setters ready.
-tRmInfo* StandardGame::inData()
+tRmInfo* GenParOptV1::inData()
 {
 	return ReSituation::self().data(); // => ReInfo
 }
 
-const tRmInfo* StandardGame::outData() const
+const tRmInfo* GenParOptV1::outData() const
 {
 	return ::ReOutputSituation();
 }
 
 // Accessor to the user interface.
-IUserInterface& StandardGame::userInterface()
+IUserInterface& GenParOptV1::userInterface()
 {
 	return *_piUserItf;
 }
 
 // Physics engine management.
-bool StandardGame::loadPhysicsEngine()
+bool GenParOptV1::loadPhysicsEngine()
 {
     // Load the Physics engine module if not already done.
 	if (_piPhysEngine)
@@ -320,7 +321,7 @@ bool StandardGame::loadPhysicsEngine()
 	return _piPhysEngine ? true : false;
 }
 
-void StandardGame::unloadPhysicsEngine()
+void GenParOptV1::unloadPhysicsEngine()
 {
     // Unload the Physics engine module if not already done.
 	if (!_piPhysEngine)
@@ -333,13 +334,13 @@ void StandardGame::unloadPhysicsEngine()
 }
 
 // Accessor to the track loader.
-ITrackLoader& StandardGame::trackLoader()
+ITrackLoader& GenParOptV1::trackLoader()
 {
 	return *_piTrkLoader;
 }
 
 // Accessor to the physics engine.
-IPhysicsEngine& StandardGame::physicsEngine()
+IPhysicsEngine& GenParOptV1::physicsEngine()
 {
 	return *_piPhysEngine;
 }
@@ -348,17 +349,17 @@ IPhysicsEngine& StandardGame::physicsEngine()
 //************************************************************
 // WIP : dedicated situation setters.
 
-bool StandardGame::setSchedulingSpecs(double fSimuRate, double fOutputRate)
+bool GenParOptV1::setSchedulingSpecs(double fSimuRate, double fOutputRate)
 {
 	return ::ReSetSchedulingSpecs(fSimuRate, fOutputRate);
 }
 
-void StandardGame::accelerateTime(double fMultFactor)
+void GenParOptV1::accelerateTime(double fMultFactor)
 {
 	ReSituation::self().accelerateTime(fMultFactor);
 }
 
-void StandardGame::setPitCommand(int nCarIndex, const struct CarPitCmd* pPitCmd)
+void GenParOptV1::setPitCommand(int nCarIndex, const struct CarPitCmd* pPitCmd)
 {
 	ReSituation::self().setPitCommand(nCarIndex, pPitCmd);
 }
