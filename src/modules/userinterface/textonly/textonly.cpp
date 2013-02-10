@@ -86,37 +86,35 @@ TextOnlyUI::TextOnlyUI(const std::string& strShLibName, void* hShLibHandle)
 // Implementation of IUserInterface ****************************************
 bool TextOnlyUI::activate()
 {
-	// Get the race to start.
-	std::string strRaceToStart;
-	if (!GfApp().hasOption("startrace", strRaceToStart) || strRaceToStart.empty())
-		return false; // Should never happen (checked in main).
-
-	// And run it if there's such a race manager.
-	GfRaceManager* pSelRaceMan = GfRaceManagers::self()->getRaceManager(strRaceToStart);
-	if (pSelRaceMan)
-	{
-		// Initialize the race engine.
-		raceEngine().reset();
-
-		// Give the selected race manager to the race engine.
-		raceEngine().selectRaceman(pSelRaceMan, /*bKeepHumans=*/false);
+    // Get the race to start.
+    std::string strRaceToStart;
+	(void)GfApp().hasOption("startrace", strRaceToStart); // Should always be true (see main).
 		
-		// Configure the new race (no user interaction needed).
-		raceEngine().configureRace(/* bInteractive */ false);
-
-		// Force "result-only" mode for all the sessions of the race with initial "normal" mode
-		// (don't change the ones with "simu simu" mode).
-		raceEngine().race()->forceResultsOnly();
-
-		// Start the race engine state automaton
-		raceEngine().startNewRace();
-	}
-	else
+    // Check if it's an available one, and refuse activation if not.
+	GfRaceManager* pSelRaceMan =  GfRaceManagers::self()->getRaceManager(strRaceToStart);
+    if (!pSelRaceMan)
 	{
-		GfLogError("No such race manager '%s'\n", strRaceToStart.c_str());
+        GfLogError("No such race type '%s'\n", strRaceToStart.c_str());
 		
 		return false;
 	}
+
+	// Otherwise, run the selected race.
+	// * Initialize the race engine.
+	raceEngine().reset();
+
+	// * Give the selected race manager to the race engine.
+	raceEngine().selectRaceman(pSelRaceMan, /*bKeepHumans=*/false);
+		
+	// * Configure the new race (no user interaction needed).
+	raceEngine().configureRace(/* bInteractive */ false);
+
+	// * Force "result-only" mode for all the sessions of the race with initial "normal" mode
+	//   (don't change the ones with "simu simu" mode).
+	raceEngine().race()->forceResultsOnly();
+
+	// * Start the race engine state automaton
+	raceEngine().startNewRace();
 
 	return true;
 }
