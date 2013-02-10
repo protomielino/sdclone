@@ -14,7 +14,7 @@ SET(_HEADERS standardgame.h
              racetrack.h raceresults.h racesimusimu.h 
              racestate.h racesituation.h racemessage.h
              raceutil.h)
-SET(_OTHER_SOURCES raceengine.xml raceresults.xsl)
+SET(_OTHER_SOURCES )
 
 ADD_INTERFACE_INCLUDEDIR()
 
@@ -49,9 +49,5 @@ IF(UNIX OR MINGW)
 ENDIF(UNIX OR MINGW)
 
 ADD_SDLIB_LIBRARY(standardgame portability tgf tgfdata robottools networking)
-
-SD_INSTALL_FILES(DATA config FILES raceresults.xsl)
-
-SD_INSTALL_FILES(DATA config USER config FILES raceengine.xml)
 
 SD_INSTALL_FILES(LIB modules/racing TARGETS standardgame)

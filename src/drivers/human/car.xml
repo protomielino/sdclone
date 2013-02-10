@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
 
-<params name="default car">
+<params name="default car" version="1.0">
 
 
 </params>

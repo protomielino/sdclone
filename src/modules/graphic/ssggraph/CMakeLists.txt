@@ -32,7 +32,7 @@ SET(SSGGRAPH_SOURCES grMoonpos.cpp
                      grvtxtable.cpp grrain.cpp
                      ssggraph.cpp)
 
-SET(SSGGRAPH_OTHER_SOURCES graph.xml)
+SET(SSGGRAPH_OTHER_SOURCES )
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)
@@ -69,7 +69,5 @@ ADD_SDL_LIBRARY(ssggraph)
 ADD_OPENGL_LIBRARY(ssggraph)
 
 ADD_SDLIB_LIBRARY(ssggraph portability tgf tgfclient robottools)
-
-SD_INSTALL_FILES(DATA config USER config FILES graph.xml)
 
 SD_INSTALL_FILES(LIB modules/graphic TARGETS ssggraph)

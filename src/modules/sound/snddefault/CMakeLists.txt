@@ -1,20 +1,20 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
-SET(SNDDEFAULT_SOURCES snddefault.cpp 
+SET(_SOURCES snddefault.cpp 
                        CarSoundData.cpp
                        Sound.cpp PlibSound.cpp OpenalSound.cpp
                        SoundInterface.cpp
                        PlibSoundInterface.cpp 
                        OpenalSoundInterface.cpp 
                        grsound.cpp)
-SET(SNDDEFAULT_HEADERS snddefault.h 
+SET(_HEADERS snddefault.h 
                        CarSoundData.h 
                        Sound.h PlibSound.h OpenalSound.h
                        SoundInterface.h
                        PlibSoundInterface.h 
                        OpenalSoundInterface.h 
                        grsound.h)
-SET(SNDDEFAULT_OTHER_SOURCES sound.xml) 
+SET(_OTHER_SOURCES ) 
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)
@@ -37,7 +37,7 @@ IF(MSVC)
 ENDIF(MSVC)
 
 # Note: Headers and other source files needed for having them available in IDEs.
-ADD_LIBRARY(snddefault SHARED ${SNDDEFAULT_SOURCES} ${SNDDEFAULT_HEADERS} ${SNDDEFAULT_OTHER_SOURCES})
+ADD_LIBRARY(snddefault SHARED ${_SOURCES} ${_HEADERS} ${_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(snddefault PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
@@ -59,5 +59,4 @@ IF(OPENGL_FOUND)
     TARGET_LINK_LIBRARIES(snddefault ${OPENGL_LIBRARY})
 ENDIF(OPENGL_FOUND)
 
-SD_INSTALL_FILES(DATA config USER config FILES sound.xml)
 SD_INSTALL_FILES(LIB modules/sound TARGETS snddefault)
