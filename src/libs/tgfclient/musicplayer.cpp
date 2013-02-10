@@ -37,7 +37,7 @@ static const char *musicDisabledStr = SND_VAL_MUSIC_STATE_DISABLED;
 
 static bool enabled = true;
 static char currentMusicfile[MAX_MUSIC_PATH] = {0};
-static char nextMusicfile[MAX_MUSIC_PATH] = {0};
+//static char nextMusicfile[MAX_MUSIC_PATH] = {0};
 static char defaultMusic[MAX_MUSIC_PATH] = {0}; //"data/music/main.ogg";
 
 #define NOMUSIC "None"
@@ -116,7 +116,7 @@ void initMusic()
 	readConfig();
 	if (isEnabled()) {
 		mapMutex = SDL_CreateMutex();
-		OpenALMusicPlayer* player = getMusicPlayer(defaultMusic);
+		(void)getMusicPlayer(defaultMusic);
 		strcpy(currentMusicfile,defaultMusic);
 		playMenuMusic(0);
 	}
@@ -230,8 +230,6 @@ void setDefaultMusic(const char* filename)
 #if MENU_MUSIC
 static void readConfig()
 {
-	char buf[256];
-
 	// Check if we want music (sound.xml).
 	char fnbuf[1024];
 	sprintf(fnbuf, "%s%s", GfLocalDir(), SND_PARAM_FILE);

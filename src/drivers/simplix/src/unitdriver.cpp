@@ -2279,8 +2279,8 @@ void TDriver::InitAdaptiveShiftLevels()
   double maxTq = 0;
   double rpmMaxTq = 0;
   double maxPw = 0;
-  double rpmMaxPw = 0;
-  double TqAtMaxPw = 0;
+  //double rpmMaxPw = 0;
+  //double TqAtMaxPw = 0;
   DataPoints = (TDataPoints *) malloc(IMax * sizeof(TDataPoints));
   TDataPoints *Data;
   for (I = 0; I < IMax; I++)
@@ -2301,9 +2301,9 @@ void TDriver::InitAdaptiveShiftLevels()
 			&& (Data->rads * Edesc[I+1].tq > maxPw)
 			&& (Data->rads < RevsLimiter))
 	{
-	  TqAtMaxPw = Edesc[I+1].tq;
+	  //TqAtMaxPw = Edesc[I+1].tq;
 	  maxPw = Data->rads * Edesc[I+1].tq;
-	  rpmMaxPw = Data->rads;
+	  //rpmMaxPw = Data->rads;
 	}
 
 	Data->a = (Edesc[I+1].tq - Edesc[I].tq)

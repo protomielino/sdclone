@@ -105,8 +105,6 @@ HmReadPrefs(const int index)
     const char	*prm;
     const char	*defaultSettings;
     char	sstring[1024];
-    int		cmd;
-    float	tmp;
     tCtrlRef	*ref;
     int		i;
     const int		idx = index - 1;

@@ -365,10 +365,10 @@ void TClothoidLane::SmoothBetween(int Step, double BumpMod)
 	  if (J >= Count)
 	    J = 0;
 
-	  TVec3d P0 = L0->Point;
-	  TVec3d P1 = L1->Point;
-	  TVec3d P2 = L2->Point;
-	  TVec3d P3 = L3->Point;
+	  //TVec3d P0 = L0->Point;
+	  //TVec3d P1 = L1->Point;
+	  //TVec3d P2 = L2->Point;
+	  //TVec3d P3 = L3->Point;
 
 	  double T = L0->Offset + L1->Offset + L2->Offset;
 	  L1->Offset = (float) (T/3);
@@ -811,6 +811,10 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
     writeSize = fwrite(&(oPathPoints[I]),UsedLen,1,F);
     if( writeSize < 1)
       error = true;
+  }
+  if (error)
+  {
+	  GfOut("TClothoidLane::SavePointsToFile(%s) : Some error occured\n", TrackLoad);
   }
   fclose(F);
 }
