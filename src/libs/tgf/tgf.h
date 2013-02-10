@@ -338,10 +338,16 @@ TGF_API int GfParmSetCurStr(void *handle, const char *path, const char *key, con
 
 /* get num parameter value */
 TGF_API tdble GfParmGetNum(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
+/* get min of num parameter value */
+TGF_API tdble GfParmGetNumMin(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
+/* get max of num parameter value */
+TGF_API tdble GfParmGetNumMax(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
 /* get num parameter value */
 TGF_API tdble GfParmGetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
 /* set num parameter value */
 TGF_API int GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, tdble val);
+/* set num parameter value with min an max */
+TGF_API int GfParmSetNumEx(void *handle, char *path, char *key, char *unit, tdble val, tdble min, tdble max);
 /* set num parameter value */
 TGF_API int GfParmSetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble val);
 
@@ -444,6 +450,7 @@ TGF_API void GfLogWarning(const char *pszFmt, ...);
 TGF_API void GfLogInfo(const char *pszFmt, ...);
 TGF_API void GfLogTrace(const char *pszFmt, ...);
 TGF_API void GfLogDebug(const char *pszFmt, ...);
+TGF_API void GfLogOpt(const char *pszFmt, ...);
 
 TGF_API void GfLogMessage(int nLevel, const char *pszFmt, ...);
 TGF_API void GfLogSetFile(const char* pszFileName);
@@ -459,6 +466,7 @@ static inline void GfLogNothing(const char *pszFmt, ...) {};
 #define GfLogInfo GfLogNothing
 #define GfLogTrace GfLogNothing
 #define GfLogDebug GfLogNothing
+#define GfLogOpt GfLogNothing
 
 static inline void GfLogMessage(int nLevel, const char *pszFmt, ...) {};
 #define GfLogSetFile(pszFileName)

@@ -26,6 +26,8 @@
 #ifndef _RACEMAIN_H_
 #define _RACEMAIN_H_
 
+#include "genetic.h"
+
 extern bool ReHumanInGroup();
 
 extern int  ReConfigure();
@@ -37,6 +39,10 @@ extern int  ReRaceStop();
 extern int  ReRaceEnd();
 extern int  RePostRace();
 extern int  ReRaceEventShutdown();
+
+extern void ReImportGeneticParameters(tgenResult* MyResults);
+extern int  ReEvolution(double Scale);
+extern void ReEvolutionCleanup();
 
 extern void ReRaceAbandon();
 extern void ReRaceAbort();

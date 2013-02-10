@@ -28,6 +28,7 @@
 
 #include <robot.h>
 #include <network.h>
+#include <time.h>
 
 #include "genparoptv1.h"
 
@@ -41,10 +42,16 @@
 #include "racetrack.h" // ReTrackInit, ReTrackUpdate
 
 #include "teammanager.h"
+#include "genetic.h"
 
 #include "racemain.h"
 
-
+// DEBUG
+#define DIV 1024
+#define WIDTH 7
+DWORDLONG lastFreeMem = 0;
+int OptiCounter = 0;
+tgenResult* TGeneticParameter::MyResults; 
 
 typedef struct
 {
@@ -931,6 +938,24 @@ ReRaceEnd(void)
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 	const char *sessionName = ReInfo->_reRaceName;
+	tgenResult *MyResults = TGeneticParameter::MyResults;
+
+//	if (genOptimization)
+	{
+		// Optimization ...
+		MyResults->car = ReInfo->s->cars[0];
+		MyResults->DamagesTotal = MyResults->car->_dammage;
+		MyResults->TopSpeed = MyResults->car->_topSpeed;
+//		MyResults->MinSpeed = MyResults->car->_minSpeed;
+		MyResults->MinSpeed = 0;
+		if (MyResults->car->_bestLapTime > 0)
+			MyResults->BestLapTime = MyResults->car->_bestLapTime;
+		else
+			MyResults->BestLapTime = 99*60;
+
+		MyResults->WeightedBestLapTime = MyResults->BestLapTime + MyResults->WeightOfDamages * MyResults->DamagesTotal * 0.007f;
+		// ... Optimization
+	}
 
 	ReShutdownUpdaters();
 
@@ -970,7 +995,9 @@ ReRaceEnd(void)
 	}
 	
 	// Determine the new race state automation mode.
-	const bool bGoOn = ReUI().onRaceFinished(bEndOfSession);
+//	const bool bGoOn = ReUI().onRaceFinished(bEndOfSession);
+	const bool bGoOn = true; // Always set RM_SYNC
+	bEndOfSession = true;    // Always set RM_NEXT_STEP
 	
 	return (bEndOfSession ? RM_NEXT_STEP : RM_NEXT_RACE) | (bGoOn ? RM_SYNC : RM_ASYNC);
 }
@@ -1112,4 +1139,467 @@ ReRaceEventShutdown(void)
 
 	return mode;
 }
+
+
+void
+ReImportGeneticParameters(tgenResult *MyResults)
+{
+	GfLogOpt("\n\nReImportGeneticParameters\n\n");
+
+	// Setup pointer to structure
+	TGeneticParameter::MyResults = MyResults;
+
+	// Initialize flags
+	MyResults->First = true;
+	MyResults->Second = false;
+
+	// Initialize values
+	MyResults->TotalWeight = 0.0;
+ 	MyResults->NextIdx = 0;
+
+	// Get race type
+	// 0: Race; 1: Qualifying
+    MyResults->Type = (int) GfParmGetNum(MyResults->Handle, 
+		"wdbee private", "qualification", 0, 0);
+	MyResults->MaxFuel = (float) GfParmGetNum(MyResults->Handle, 
+		"wdbee private", "max fuel", 0, (float) 60.0);
+
+	// Build path to meta data file
+	char buf[261];
+    snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-%s.xml",
+      GetLocalDir(),MyResults->RobotName,MyResults->CarType,MyResults->TrackName);
+
+	// Build path to meta data file
+	void *MetaDataFile = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+    if (!MetaDataFile)
+		return;
+
+	// Read table of content of meta data file
+	TGeneticParameterTOC* TOC = new TGeneticParameterTOC(MetaDataFile);
+	TOC->Get();
+
+	// Store number of parameter groups defined
+	MyResults->NbrOfParts = TOC->ParamsGroupCount;
+
+	// We need at least one part to store the offset as index to the last global parameter
+	// Allocate memory for list of parts
+	if (MyResults->NbrOfParts < 1)
+  	  MyResults->Part = new tgenPart[1];
+	else
+	  MyResults->Part = new tgenPart[MyResults->NbrOfParts];
+
+	// Offset to first parameter of the first group
+	MyResults->Part[0].Offset = TOC->GlobalParamCount;
+	// How to handle damage as time penalty
+	MyResults->WeightOfDamages = TOC->WeightOfDamages;
+
+	// Initialize counter for number of parameters
+	int NumberOfParameters = TOC->GlobalParamCount;
+
+	// Loop over all local parameter groups
+	for (int I = 0; I < MyResults->NbrOfParts; I++)
+	{
+		// Read number of parameters defined in the current group
+		char buf[64];
+	    snprintf(buf,sizeof(buf),"part/%d/counter",I+1);
+		TGeneticParameterCounter* GroupParam = new TGeneticParameterCounter(
+			MetaDataFile,"Group Params Count", buf, "counter");
+
+		// Read number of sections defined in the first local parameter group
+		TGeneticParameterCounter* TrackParam = new TGeneticParameterCounter(
+			MyResults->Handle, "Track Params Count", "wdbee private", "track param count");
+
+		// Store the data to the list of parts
+		MyResults->Part[I].Active = GroupParam->Active;
+		MyResults->Part[I].Count = GroupParam->Count;
+		MyResults->Part[I].NbrOfSect = TrackParam->Count;
+	
+		NumberOfParameters += GroupParam->Count * TrackParam->Count;
+
+		delete TrackParam;
+		delete GroupParam;
+	}
+
+	// NumberOfParameters now defines the total number of parameters
+	// Allocate a list of pointers, one for each parameter
+	// GP ist the owner of the allocated memory
+	MyResults->GP = (TGeneticParameter**) new TGeneticParameter*[NumberOfParameters];
+	TGeneticParameter* NewGP = NULL;
+
+
+	// Import global parameters data
+
+	// Initialize robot and car parameters
+    for (int I = 0; I < TOC->GlobalParamCount; I++)
+	{
+		NewGP = new TGeneticParameter();
+		NewGP->Handle = MetaDataFile;
+		// Read meta data from mete data file
+		NewGP->Get(NULL,I);  
+		if (NewGP->Active)			// if parameter is set active
+		{
+			if (TOC->GetInitialVal)	// and the flag is set
+			{						// we read the starting value from the opened car setup file
+				NewGP->GetVal(MyResults->Handle);
+			}
+			//NewGP->DisplayParameter();
+			// Calculate the total of the inidividual parameter weights to define 100% propability
+			MyResults->TotalWeight = MyResults->TotalWeight + NewGP->Weight;
+			// Store parameter at the owner
+			MyResults->GP[MyResults->NextIdx++] = NewGP;
+		}
+		else 
+		  delete NewGP; // If not active free memory
+
+	}
+
+	// This is the true offset to the first local parameter 
+	// (may be different caused by inactive parameters)
+	MyResults->Part[0].Offset = MyResults->NextIdx;
+
+
+	// Import local parameters data
+
+	// Loop over all parts
+	for (int I = 0; I < MyResults->NbrOfParts; I++)
+	{
+		if (MyResults->Part[I].Active) // If the counter is set to active
+		{	// we look for the details
+			MyResults->Part[I].Offset = MyResults->NextIdx;
+
+			// Prepare the section depending on the part number
+			char buf[64];
+			snprintf(buf,sizeof(buf),"part/%d/parameter",I+1);
+
+			// Loop over all sections in the group
+			for (int J = 0; J < MyResults->Part[I].NbrOfSect; J++)
+			{
+				// Loop over all parameters in the part
+				for (int K = 0; K < MyResults->Part[I].Count; K++)
+				{
+					NewGP = new TGeneticParameter;
+					NewGP->Handle = MetaDataFile;
+					NewGP->Get(buf,K+1);
+					if (!NewGP->Active)
+						NewGP->Weight = 0;
+					//NewGP->DisplayParameter();
+					MyResults->TotalWeight = MyResults->TotalWeight + NewGP->Weight;
+					MyResults->GP[MyResults->NextIdx++] = NewGP;
+				}
+			}
+		}
+	}
+
+	delete TOC;
+
+	GfParmReleaseHandle(MetaDataFile);
+}
+
+void
+ReEvolutionCleanup()
+{
+	// Setup pointer to structure
+	tgenResult *MyResults = TGeneticParameter::MyResults;
+
+	// Free all parameters allocated
+	for (int I = 0; I < MyResults->NextIdx; I++)
+	{
+		delete MyResults->GP[I];
+	}
+
+	// Free list of pointers allocated
+	delete [] MyResults->GP;
+
+	// Free list of strutures allocated
+	delete [] MyResults->Part;
+
+	// Release file handle
+	GfParmReleaseHandle(MyResults->Handle);
+
+}
+
+int
+ParameterIndex(tgenResult *MyResults, float Parameter)
+{
+	// Identify parameter index from total of parameter weight up to here
+	float Total = 0.0;
+
+	for (int I = 0; I < MyResults->NextIdx; I++)
+	{
+		Total += MyResults->GP[I]->Weight;
+
+		// If we are in the allowed range and the parameter is not selected already
+		if ((Total > Parameter) && (!MyResults->GP[I]->Selected))
+			return I; // we will select it
+	}
+
+	return -1; // Parameter already selected or out of range
+}
+
+int
+ReEvolution(double Scale)
+{
+	/* */
+	MEMORYSTATUSEX statex;
+	statex.dwLength = sizeof (statex);
+	printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+	GlobalMemoryStatusEx (&statex);
+	printf (TEXT("0. There are  %*I64d KB\n"), WIDTH, lastFreeMem);
+	DWORDLONG FreeMem = statex.ullAvailPhys/DIV;
+	printf (TEXT("1. There are  %*I64d KB\n"), WIDTH, FreeMem);
+	DWORDLONG diff = lastFreeMem - statex.ullAvailPhys/DIV;
+	printf (TEXT("=. Difference %*I64d KB\n"), WIDTH, diff);
+	lastFreeMem = statex.ullAvailPhys/DIV;
+	/* */
+	//_tgf_mallocBalance(); // For Debug check allocation/free balance
+
+	// Setup shortcuts
+	tgenResult *MyResults = TGeneticParameter::MyResults;
+	TGeneticParameter* Param = MyResults->GP[0];
+	void* Handle = MyResults->Handle; 
+
+	// Optimization status
+	int Status = -1;
+
+	// Define local variables
+	int P = 0;
+	double TotalLapTime = 0;
+
+	// Count the loops
+	OptiCounter++;
+
+	// Start with small changes
+	if (OptiCounter < 3)
+		Scale /= 1000.0;
+
+	if (MyResults->First) // Run once
+	{
+		// First race is done with the initial parameters to get the reference laptime
+		GfLogOpt("\n# Start optimization\n\n");
+
+		srand((unsigned)time(NULL));	// Initialize the random number generator
+		MyResults->Second = true;		// Set flag to identify next loop
+
+		if (MyResults->Type == 1)	// Setup race mode depending parameters
+		{
+			// Qualifying, fuel at start has to be calculated by the consumer robot
+			GfLogOpt("# Qualifying\n");
+			GfParmSetNumEx(Handle, "wdbee private", "qualification", // Mode = qualifying
+				(char*) NULL, 1.0, 0.0, 1.0);
+			GfParmSetNumEx(Handle, "wdbee private", "start fuel",    // Calculate fuel needed
+				(char*) NULL, (float) -1.0, -1.0, MyResults->MaxFuel);
+		}
+		else
+		{
+			// Race, fuel at start is set to max allowed to make the car as heavy as possible
+			GfLogOpt("# Race\n");
+			GfParmSetNumEx(Handle, "wdbee private", "qualification", // Mode race
+				(char*) NULL, 0.0, 0.0, 1.0);
+			GfParmSetNumEx(Handle, "wdbee private", "start fuel",    // Set fuel to max
+				(char*) NULL, MyResults->MaxFuel, -1.0, MyResults->MaxFuel);
+		}
+	}
+	else
+	{
+		if (MyResults->Second)	// First race was done with the initial parameters
+		{						// So we know the initial lap time as reference
+			TotalLapTime = MyResults->BestTotalLapTime = MyResults->BestLapTime;
+			GfLogOpt("# Initial Lap Time: %g\n",TotalLapTime);
+			MyResults->Second = false; // Run once
+		}
+
+		GfLogOpt("\n");
+		GfLogOpt("Scale: %g\n",Scale); // Show current random variation scaling
+			
+		TotalLapTime = MyResults->QualifyingLapTime = MyResults->BestLapTime;
+		GfLogOpt("# Total Lap Time: %g\n",TotalLapTime);
+		if (TotalLapTime < MyResults->BestTotalLapTime)
+		{
+			Status = 2; // New opt
+			MyResults->BestTotalLapTime = TotalLapTime;
+			MyResults->LastWeightedBestLapTime = MyResults->WeightedBestLapTime;
+			MyResults->LastBestLapTime = MyResults->BestLapTime;
+			MyResults->LastDamagesTotal = MyResults->DamagesTotal;	
+			MyResults->LastTopSpeed = MyResults->TopSpeed;
+			MyResults->LastMinSpeed = MyResults->MinSpeed;
+
+			// Store new optimal parameters
+ 			for (int I = 0; I < MyResults->NextIdx; I++)
+				MyResults->GP[I]->LastVal = MyResults->GP[I]->OptVal = MyResults->GP[I]->Val;
+
+			char buf[255];
+			snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.opt",
+			MyResults->RobotName,MyResults->CarType,MyResults->TrackName);
+			GfParmWriteFileSDHeader (buf, Handle, (char*) NULL,"Wolf-Dieter Beelitz");
+//			GfParmWriteFile (buf, Handle, (char*) NULL);
+		}
+		else if (0.99 * TotalLapTime < MyResults->BestTotalLapTime)
+		{
+			Status = 1; // Next try based on the last parameters
+		}
+		else
+		{
+			Status = 0; // Next try based on the last optimal parameters
+			MyResults->DamagesTotal = MyResults->LastDamagesTotal;	
+			MyResults->WeightedBestLapTime = MyResults->LastWeightedBestLapTime;
+			MyResults->BestLapTime = MyResults->LastBestLapTime;
+			MyResults->TopSpeed = MyResults->LastTopSpeed;
+			MyResults->MinSpeed = MyResults->LastMinSpeed;
+
+			for (int I = 0; I < MyResults->NextIdx; I++)
+				MyResults->GP[I]->Val = MyResults->GP[I]->OptVal;
+
+			GfLogOpt("#- old Best Lap Time: %g\n",MyResults->BestLapTime);
+		}
+
+		// Next Race -> try other parameters
+		double change; 
+		for (int I = 0; I < MyResults->NextIdx; I++)
+			MyResults->GP[I]->Selected = false;
+
+		double RandomFloat = (6.0 * rand())/RAND_MAX;
+		int N = (int) (1 + RandomFloat);
+		for (int I = 0; I < N; I++)
+		{
+			do
+			{
+				double OldValue;
+				RandomFloat = (1.0 * rand())/RAND_MAX - 0.5;
+				double factor = MIN(1.0,1.1 * Scale) * RandomFloat;
+
+				RandomFloat = (1.0 * rand())/RAND_MAX;
+				float Parameter = (float)((MyResults->TotalWeight - 0.00001) * RandomFloat); 
+				change = 0.0; 
+
+				// While first races only use global parameters
+				if ((Parameter > MyResults->Part[0].Offset) && (OptiCounter < 3))
+					continue;
+
+				if (Parameter < MyResults->TotalWeight)
+				{
+					P = ParameterIndex(MyResults,Parameter);
+					if (P == -1)
+					{
+						do
+						{
+							Parameter = Parameter + 1;
+							if (Parameter > MyResults->TotalWeight)
+								Parameter = Parameter - MyResults->TotalWeight;
+							P = ParameterIndex(MyResults,Parameter);
+						} while (P == -1);
+					}
+					{
+						//GfLogOpt("\nParameter: %g (Factor: %g) P: %d\n\n",Parameter,factor,P);
+						Param = MyResults->GP[P];
+						Param->Tries += 1;
+						double change0 = Param->Scale * factor; 
+						change = ((int) (Param->Round * change0)/Param->Round);
+//						GfLogOpt("%s: (%g<%g<%g): %g * %g = %g -> %g\n",Param->oLabel,Param->Min,Param->Val,Param->Max,Param->Scale,factor,change0,change);
+						OldValue = Param->Val;
+						Param->Val += (float) change;
+						if (Param->Val < Param->Min)
+						{
+//     						GfLogOpt("%s: = Min (%g)\n",Param->oLabel,Param->Val);
+							Param->Val = Param->Min;
+						}
+						else if (Param->Val > Param->Max)
+						{
+//     						GfLogOpt("%s: = Max (%g)\n",Param->oLabel,Param->Val);
+							Param->Val = Param->Max;
+						}
+						if (fabs(OldValue - Param->Val) < 0.00000001) 
+						{
+// 							GfLogOpt("%s: Change too small %g\n",Param->oLabel,fabs(OldValue - Param->Val));
+							change = 0.0;
+						}
+						else
+						{
+							GfLogOpt("%s: Val: %g (Change: %g)\n",Param->oLabel,Param->Val,change);
+							Param->Selected = true;
+							Param->Changed += 1;
+							Param->DisplayParameter();
+						}
+					}
+
+					Scale += 0.0001;
+					Scale *= 1.1;
+				}
+				else
+					Scale += 0.0001;
+
+			} while (fabs(change) < 0.0000001);
+		}
+	}
+/*
+	for (int I = 0; I < MyResults->Part[0].Offset; I++)
+	{
+		if (MyResults->GP[I]->Active)
+			MyResults->GP[I]->DisplayStatistik();
+	}
+*/
+	if (Status == 2)
+	{
+		GfLogOpt("\n\n#+ New Best Lap Time: %g\a\n\n\n",MyResults->BestTotalLapTime);
+	}
+	else if (Status == 1)
+	{
+		GfLogOpt("\n#~ Total Lap Time: %g(%g)\n\n",TotalLapTime,MyResults->BestTotalLapTime);
+	}
+	else if (Status == 0)
+	{
+		GfLogOpt("\n#= Total Lap Time: %g(%g)\n\n",TotalLapTime,MyResults->BestTotalLapTime);
+	}
+/*
+	for (int I = 0; I < MyResults->Part[0].Offset; I++)
+	{
+		if (MyResults->GP[I]->Active)
+			MyResults->GP[I]->DisplayParameter();
+	}
+*/
+	if (!MyResults->First)  // First race is done with the initial parameters
+	{
+		// Export global parameter data
+		for (int I = 0; I < MyResults->Part[0].Offset; I++)
+		{
+			if (MyResults->GP[I]->Active)
+				MyResults->GP[I]->SetVal(Handle);
+		}
+
+		// Export local parameter data
+
+		// Loop over all parts
+		for (int I = 0; I < MyResults->NbrOfParts; I++)
+		{
+			if (MyResults->Part[I].Active)
+			{
+				// Loop over all sections
+				for (int J = 0; J < MyResults->Part[I].NbrOfSect; J++)
+				{
+					// Loop over all parameters per section
+					for (int K = 0; K < MyResults->Part[I].Count; K++)
+					{
+						int Index = MyResults->Part[I].Offset + MyResults->Part[I].Count * J + K;
+						if (MyResults->GP[Index]->Active)
+						  MyResults->GP[Index]->SetVal(Handle,J+1);
+					}
+				}
+			}
+		}
+
+		char buf[255];
+		snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
+		MyResults->RobotName,MyResults->CarType,MyResults->TrackName);
+		GfParmWriteFileSDHeader (buf, Handle, (char*) NULL, "Wolf-Dieter Beelitz");
+//		GfParmWriteFile (NULL, Handle, (char*) NULL);
+
+	}
+
+	// Reset flag
+	MyResults->First = false;
+
+	printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+
+	return RM_SYNC;
+}
+
 

@@ -19,7 +19,7 @@
 			<section name="0">
 				<attstr name="name" val="wdbee"></attstr>
 				<attstr name="desc" val="Testdriver"></attstr>
-				<attstr name="team" val="wdbee"></attstr>
+				<attstr name="team" val="simplix_ls2"></attstr>
 				<attstr name="author" val=""></attstr>
 				<attstr name="car name" val="ls2-bavaria-g3gtr"></attstr>
 				<attnum name="race number" val="1"></attnum>

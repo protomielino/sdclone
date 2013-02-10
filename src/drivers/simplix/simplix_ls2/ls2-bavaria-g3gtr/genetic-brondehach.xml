@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    file          : drivers/blacky_2012/car3-trb1/genetic-template
+    created       : 01/29/13
+    last modified : 01/29/13
+    copyright     : (C) 2010-2013 Wolf-Dieter Beelitz
+
+    SVN version   : $Id:$
+-->
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+<!DOCTYPE params SYSTEM "params.dtd">
+
+<!-- META DATA FOR GENETIC PARAMETER OPTIMIZATION -->
+<params name="genetic optimization">
+  <!-- TABLE OF CONTENT -->
+  <section name="table of content">
+    <attnum name="major version" val="1"/>
+    <attnum name="minor version" val="0"/>
+    <attstr name="robot" val="simplix_ls2"/>
+    <attstr name="car type" val="ls2-bavaria-g3gtr"/>
+    <attnum name="global param count" val="20"/>
+    <attnum name="params group count" val="0"/>
+    <attnum name="weight of damages" val="1.0"/>
+  </section>
+  <!-- END OF TABLE OF CONTENT -->
+
+  <!-- META DATA OF GLOBAL PARAMETERS -->
+  <section name="global">
+    <!-- META DATA OF FIRST GLOBAL PARAMETER -->
+    <section name="0">
+      <attnum name="active" val="1"/>
+      <attstr name="label" val="Scale Brakes"/>
+      <attstr name="section" val="simplix private"/>
+      <attstr name="parameter" val="scale brake"/>
+      <attnum name="range" min="0.5" max="1.5" val="0.7"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="0.1"/>
+      <attnum name="round" val="100"/>
+    </section>
+
+    <!-- META DATA OF NEXT GLOBAL PARAMETER -->
+    <section name="1">
+      <attnum name="active" val="1"/>
+      <attstr name="label" val="Scale Speed "/>
+      <attstr name="section" val="simplix private"/>
+      <attstr name="parameter" val="scale mu"/>
+      <attnum name="range" min="0.5" max="1.5" val="0.7"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="0.1"/>
+      <attnum name="round" val="100"/>
+    </section>
+
+    <!-- ... -->
+    <section name="2">
+      <attnum name="active" val="1"/>
+      <attstr name="label" val="Scale Bumps "/>
+      <attstr name="section" val="simplix private"/>
+      <attstr name="parameter" val="scale bump"/>
+      <attnum name="range" min="0.001" max="0.6" val="0.3"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="0.05"/>
+      <attnum name="round" val="1000"/>
+    </section>
+
+    <section name="3">
+      <attnum name="active" val="1"/>
+      <attstr name="label" val="F-Wing      "/>
+      <attstr name="section" val="Front Wing"/>
+      <attstr name="parameter" val="angle"/>
+      <attstr name="unit" val="deg"/>
+      <attnum name="range" min="6" max="10" unit="deg" val="9.0"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="0.5"/>
+      <attnum name="round" val="100"/>
+    </section>
+
+    <section name="4">
+      <attnum name="active" val="1"/>
+      <attstr name="label" val="R-Wing      "/>
+      <attstr name="section" val="Rear Wing"/>
+      <attstr name="parameter" val="angle"/>
+      <attstr name="unit" val="deg"/>
+      <attnum name="range" min="2" max="20" unit="deg" val="14.94"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="0.5"/>
+      <attnum name="round" val="100"/>
+    </section>
+
+    <section name="5">
+      <attnum name="active" val="1"/>
+      <attstr name="label" val="Differential"/>
+      <attstr name="section" val="Rear Differential"/>
+      <attstr name="parameter" val="ratio"/>
+      <attnum name="range" min="2" max="5" val="3.96"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="0.1"/>
+      <attnum name="round" val="1000"/>
+    </section>
+
+    <section name="6">
+      <attnum name="active" val="1"/>
+      <attstr name="label" val="BrakeRepart."/>
+      <attstr name="section" val="Brake System"/>
+      <attstr name="parameter" val="front-rear brake repartition"/>
+      <attnum name="range" min="0.5" max="0.7" val="0.5604"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="0.1"/>
+      <attnum name="round" val="10000"/>
+    </section>
+
+    <section name="7">
+      <attnum name="active" val="1"/>
+      <attstr name="label" val="MxBrakePress"/>
+      <attstr name="section" val="Brake System"/>
+      <attstr name="parameter" val="max pressure"/>
+      <attstr name="unit" val="kPa"/>
+      <attnum name="range" min="10000" max="23000" unit="kPa" val="22000"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="500"/>
+      <attnum name="round" val="0.01"/>
+    </section>
+
+    <section name="8">
+      <attnum name="active" val="1"/>
+      <attstr name="label" val="FAntiRollBar"/>
+      <attstr name="section" val="Front Anti-Roll Bar"/>
+      <attstr name="parameter" val="spring"/>
+      <attstr name="unit" val="kN/m"/>
+      <attnum name="range" min="0" max="50" unit="kN/m" val="23"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="500"/>
+      <attnum name="round" val="1"/>
+    </section>
+
+    <section name="9">
+      <attnum name="active" val="1"/>
+      <attstr name="label" val="RAntiRollBar"/>
+      <attstr name="section" val="Rear Anti-Roll Bar"/>
+      <attstr name="parameter" val="spring"/>
+      <attstr name="unit" val="kN/m"/>
+      <attnum name="range" min="0" max="50" unit="kN/m" val="18"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="500"/>
+      <attnum name="round" val="1"/>
+    </section>
+
+    <section name="10">
+      <attnum name="active" val="1"/>
+      <attnum name="twosided" val="1"/>
+      <attstr name="label" val="F-Suspension"/>
+      <attstr name="section" val="Front %s Suspension"/>
+      <attstr name="parameter" val="spring"/>
+      <attstr name="unit" val="kN/m"/>
+      <attnum name="range" min="10" max="300" unit="kN/m" val="69.80"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="100"/>
+      <attnum name="round" val="1"/>
+    </section>
+
+    <section name="11">
+      <attnum name="active" val="1"/>
+      <attnum name="twosided" val="1"/>
+      <attstr name="label" val="F-SlowBump  "/>
+      <attstr name="section" val="Front %s Suspension"/>
+      <attstr name="parameter" val="slow bump"/>
+      <attstr name="unit" val="kN/m/s"/>
+      <attnum name="range" min="1" max="100" unit="kN/m/s" val="9.3"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="20"/>
+      <attnum name="round" val="1"/>
+    </section>
+
+    <section name="12">
+      <attnum name="active" val="1"/>
+      <attnum name="twosided" val="1"/>
+      <attstr name="label" val="F-SlowRebnd "/>
+      <attstr name="section" val="Front %s Suspension"/>
+      <attstr name="parameter" val="slow rebound"/>
+      <attstr name="unit" val="kN/m/s"/>
+      <attnum name="range" min="1" max="100" unit="kN/m/s" val="14.3"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="20"/>
+      <attnum name="round" val="1"/>
+    </section>
+
+    <section name="13">
+      <attnum name="active" val="1"/>
+      <attnum name="twosided" val="1"/>
+      <attstr name="label" val="F-FastBump  "/>
+      <attstr name="section" val="Front %s Suspension"/>
+      <attstr name="parameter" val="fast bump"/>
+      <attstr name="unit" val="kN/m/s"/>
+      <attnum name="range" min="1" max="100" unit="kN/m/s" val="7"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="20"/>
+      <attnum name="round" val="1"/>
+    </section>
+
+    <section name="14">
+      <attnum name="active" val="1"/>
+      <attnum name="twosided" val="1"/>
+      <attstr name="label" val="F-FastRebnd "/>
+      <attstr name="section" val="Front %s Suspension"/>
+      <attstr name="parameter" val="fast rebound"/>
+      <attstr name="unit" val="kN/m/s"/>
+      <attnum name="range" min="1" max="100" unit="kN/m/s" val="2.1"/>/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="20"/>
+      <attnum name="round" val="1"/>
+    </section>
+
+    <section name="15">
+      <attnum name="active" val="1"/>
+      <attnum name="twosided" val="1"/>
+      <attstr name="label" val="R-Suspension"/>
+      <attstr name="section" val="Rear %s Suspension"/>
+      <attstr name="parameter" val="spring"/>
+      <attstr name="unit" val="kN/m"/>
+      <attnum name="range" min="10" max="300" unit="kN/m" val="4.8"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="100"/>
+      <attnum name="round" val="1"/>
+    </section>
+
+    <section name="16">
+      <attnum name="active" val="1"/>
+      <attnum name="twosided" val="1"/>
+      <attstr name="label" val="R-SlowBump  "/>
+      <attstr name="section" val="Rear %s Suspension"/>
+      <attstr name="parameter" val="slow bump"/>
+      <attstr name="unit" val="kN/m/s"/>
+      <attnum name="range" min="1" max="100" unit="kN/m/s" val="7.7"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="20"/>
+      <attnum name="round" val="1"/>
+    </section>
+
+    <section name="17">
+      <attnum name="active" val="1"/>
+      <attnum name="twosided" val="1"/>
+      <attstr name="label" val="R-SlowRebnd "/>
+      <attstr name="section" val="Rear %s Suspension"/>
+      <attstr name="parameter" val="slow rebound"/>
+      <attstr name="unit" val="kN/m/s"/>
+      <attnum name="range" min="1" max="100" unit="kN/m/s" val="11.8"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="20"/>
+      <attnum name="round" val="1"/>
+    </section>
+
+    <section name="18">
+      <attnum name="active" val="1"/>
+      <attnum name="twosided" val="1"/>
+      <attstr name="label" val="R-FastBump  "/>
+      <attstr name="section" val="Rear %s Suspension"/>
+      <attstr name="parameter" val="fast bump"/>
+      <attstr name="unit" val="kN/m/s"/>
+      <attnum name="range" min="1" max="100" unit="kN/m/s" val="2.6"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="20"/>
+      <attnum name="round" val="1"/>
+    </section>
+
+    <section name="19">
+      <attnum name="active" val="1"/>
+      <attnum name="twosided" val="1"/>
+      <attstr name="label" val="R-FastRebnd "/>
+      <attstr name="section" val="Rear %s Suspension"/>
+      <attstr name="parameter" val="fast rebound"/>
+      <attstr name="unit" val="kN/m/s"/>
+      <attnum name="range" min="1" max="100" unit="kN/m/s" val="3.9"/>
+      <attnum name="weight" val="2"/>
+      <attnum name="scale" val="20"/>
+      <attnum name="round" val="1"/>
+    </section>
+
+  </section>
+  <!-- END OF META DATA OF GLOBAL PARAMETERS -->
+
+  <!-- START OF META DATA OF LOCAL PARAMETERS -->
+  <section name="part">
+    <!-- META DATA OF FIRST PART OF LOCAL PARAMETERS -->
+    <section name="1">
+      <!-- META DATA OF COUNTER OF PARAMETERS PER SECTION IN THIS PART -->
+      <section name="counter">
+        <attnum name="active" val="0"/>
+        <attstr name="name" val="trac param count"/>
+        <attstr name="section" val="simplix private"/>
+        <attstr name="parameter" val="track param count"/>
+        <attnum name="counter" val="4"/>
+      </section>
+
+      <!-- META DATA OF PARAMETERS IN THIS PART -->
+      <section name="parameter">
+        <!-- META DATA OF FIRST PARAMETER IN THIS PART -->
+        <section name="1">
+          <attnum name="active" val="1"/>
+          <attstr name="label" val="Apex        "/>
+          <attstr name="section" val="simplix private/param seg"/>
+          <attstr name="parameter" val="apex"/>
+          <attnum name="range" min="0.97" max="0.998" val="0.9977"/>
+          <attnum name="weight" val="1"/>
+          <attnum name="scale" val="0.01"/>
+          <attnum name="round" val="100000"/>
+        </section>
+
+        <!-- META DATA OF NEXT PARAMETER IN THIS PART -->
+        <section name="2">
+          <attnum name="active" val="1"/>
+          <attstr name="label" val="Factor      "/>
+          <attstr name="section" val="simplix private/param seg"/>
+          <attstr name="parameter" val="factor"/>
+          <attnum name="range" min="1" max="1.1" val="1.0047"/>
+          <attnum name="weight" val="1"/>
+          <attnum name="scale" val="0.01"/>
+          <attnum name="round" val="100000"/>
+        </section>
+
+        <!-- ... -->
+        <section name="3">
+          <attnum name="active" val="1"/>
+          <attstr name="label" val="Friction    "/>
+          <attstr name="section" val="simplix private/param seg"/>
+          <attstr name="parameter" val="scale friction"/>
+          <attnum name="range" min="0.8" max="1.2" val="1"/>
+          <attnum name="weight" val="1"/>
+          <attnum name="scale" val="0.1"/>
+          <attnum name="round" val="1000"/>
+        </section>
+
+        <section name="4">
+          <attnum name="active" val="1"/>
+          <attstr name="label" val="Braking     "/>
+          <attstr name="section" val="simplix private/param seg"/>
+          <attstr name="parameter" val="scale braking"/>
+          <attnum name="range" min="0.8" max="1.2" val="1"/>
+          <attnum name="weight" val="1"/>
+          <attnum name="scale" val="0.1"/>
+          <attnum name="round" val="1000"/>
+        </section>
+
+      </section>
+      <!-- END OF PARAMETERS IN THIS PART -->
+
+    </section>
+    <!-- END OF META DATA FOR THIS PART -->
+
+    <!-- META DATA OF NEXT PART OF LOCAL PARAMETERS -->
+    <!-- ... -->
+    <!-- END OF META DATA FOR THIS PART -->
+
+  </section>
+  <!-- END OF META DATA -->
+</params>

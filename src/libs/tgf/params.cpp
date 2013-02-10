@@ -1732,9 +1732,12 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name, c
 
   	      fputs ("<!--\n", fout);
   	      fputs ("    file          : ", fout);
-		  strncpy(buf,file,strlen(file)-4);
-		  buf[strlen(file)-4] = 0;
-  	      fputs (buf, fout);
+		  if (file)
+		  {
+			strncpy(buf,file,strlen(file)-4);
+			buf[strlen(file)-4] = 0;
+			fputs (buf, fout);
+		  }
   	      fputs ("\n    created       : ", fout);
 		  fputs (time_buf, fout);
   	      fputs ("\n    last modified : ", fout);
@@ -2763,6 +2766,108 @@ GfParmGetNum (void *handle, char const *path, const char *key, const char *unit,
 
 
 
+/** Get min of a numerical parameter in a config file.
+    @ingroup	paramsdata
+    @param	handle	handle of parameters	
+    @param	path	path of param
+    @param	key	key name	
+    @param	unit	unit to convert the result to (NULL if SI wanted)	
+    @param	deflt	default string	
+    @return	parameter value
+ */
+tdble
+GfParmGetNumMin (void *handle, char const *path, const char *key, const char *unit, tdble deflt)
+{
+	struct parmHandle *parmHandle = (struct parmHandle *)handle;
+
+	if (parmHandle == NULL)
+		return deflt;
+
+	struct parmHeader *conf;
+	struct param *param;
+	tdble min;
+
+	if (parmHandle->magic != PARM_MAGIC) {
+		GfFatal ("GfParmGetNumMin: bad handle (%p)\n", parmHandle);
+		return deflt;
+	}
+
+	conf = parmHandle->conf;
+
+	if (parmHandle->magic != PARM_MAGIC) 
+	{
+		GfFatal ("GfParmGetNum: bad handle (%p)\n", parmHandle);
+		return deflt;
+	}
+
+	param = getParamByName (conf, path, key, 0);
+	if (!param ||  (param->type != P_NUM)) 
+    {
+		return deflt;
+    }
+
+	min = param->min;
+
+	if (unit) 
+	{
+		return GfParmSI2Unit(unit, min);
+	}
+	
+    return min;
+}
+
+/** Get max of a numerical parameter in a config file.
+    @ingroup	paramsdata
+    @param	handle	handle of parameters	
+    @param	path	path of param
+    @param	key	key name	
+    @param	unit	unit to convert the result to (NULL if SI wanted)	
+    @param	deflt	default string	
+    @return	parameter value
+ */
+tdble
+GfParmGetNumMax (void *handle, char const *path, const char *key, const char *unit, tdble deflt)
+{
+	struct parmHandle *parmHandle = (struct parmHandle *)handle;
+
+	if (parmHandle == NULL)
+		return deflt;
+
+	struct parmHeader *conf;
+	struct param *param;
+	tdble max;
+
+	if (parmHandle->magic != PARM_MAGIC) {
+		GfFatal ("GfParmGetNum: bad handle (%p)\n", parmHandle);
+		return deflt;
+	}
+
+	conf = parmHandle->conf;
+
+	if (parmHandle->magic != PARM_MAGIC) 
+	{
+		GfFatal ("GfParmGetNum: bad handle (%p)\n", parmHandle);
+		return deflt;
+	}
+
+	param = getParamByName (conf, path, key, 0);
+	if (!param ||  (param->type != P_NUM)) 
+    {
+		return deflt;
+    }
+
+	max = param->max;
+
+	if (unit) 
+	{
+		return GfParmSI2Unit(unit, max);
+	}
+	
+    return max;
+}
+
+
+
 /** Get a numerical parameter in a config file.
     @ingroup	paramslist
     @param	handle	handle of parameters	
@@ -2822,7 +2927,7 @@ int
 GfParmIsFormula (void *handle, char const *path, char const *key)
 {
     struct parmHandle *parmHandle = (struct parmHandle *)handle;
-    struct parmHeader *conf;
+	struct parmHeader *conf;
     struct section	*section;
     struct param	*param;
 
@@ -2857,7 +2962,7 @@ char*
 GfParmGetFormula (void *handle, char const *path, char const *key)
 {
     struct parmHandle *parmHandle = (struct parmHandle *)handle;
-    struct parmHeader *conf;
+	struct parmHeader *conf;
     struct section	*section;
     struct param	*param;
 
@@ -2892,7 +2997,7 @@ char*
 GfParmGetCurFormula (void *handle, char const *path, char const *key)
 {
     struct parmHandle *parmHandle = (struct parmHandle *)handle;
-    struct parmHeader *conf;
+	struct parmHeader *conf;
     struct section	*section;
     struct param	*param;
 
@@ -3056,6 +3161,8 @@ GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, 
 	
 	return 0;
 }
+
+
 
 /** Set a numerical parameter in a config file.
     @ingroup	paramsdata

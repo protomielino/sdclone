@@ -44,9 +44,9 @@
 
 
 // Log levels.
-enum { gfLogFatal = 0, gfLogError, gfLogWarning, gfLogInfo, gfLogTrace, gfLogDebug };
+enum { gfLogFatal = 0, gfLogOpt, gfLogError, gfLogWarning, gfLogInfo, gfLogTrace, gfLogDebug }; // Keep gfLogOpt be first, used only in separate race engine
 
-static const char* gfLogLevelNames[] = { "Fatal", "Error", "Warning", "Info", "Trace", "Debug"};
+static const char* gfLogLevelNames[] = { "Fatal", "Optimisation", "Error", "Warning", "Info", "Trace", "Debug"};
 
 
 // Log stream.
@@ -287,6 +287,27 @@ void GfLogDebug(const char *pszFmt, ...)
         va_end(vaArgs);
 		fflush(gfLogStream);
 		gfLogNeedLineHeader = strrchr(pszFmt, '\n') ? true : false;
+    }
+}
+
+void GfLogOpt(const char *pszFmt, ...)
+{
+    if (gfLogLevelThreshold >= gfLogOpt)
+    {
+/*
+		if (gfLogNeedLineHeader)
+		{
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+            fprintf(gfLogStream, "%s Optimis.", pszClock);
+			free(pszClock);
+		}
+*/
+        va_list vaArgs;
+        va_start(vaArgs, pszFmt);
+        vfprintf(gfLogStream, pszFmt, vaArgs);
+        va_end(vaArgs);
+		fflush(gfLogStream);
+//		gfLogNeedLineHeader = strrchr(pszFmt, '\n') ? true : false;
     }
 }
 
