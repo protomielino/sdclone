@@ -357,7 +357,7 @@ void LegacyMenu::onRaceInterrupted() {
 void LegacyMenu::onRaceFinishing()
 {
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL) {
- 	shutdownSound();
+		shutdownSound();
         unloadCarsGraphics();
         shutdownGraphicsView();
         unloadTrackGraphics();
@@ -487,18 +487,16 @@ bool LegacyMenu::initializeGraphics()
         return true;
 
     // Load the graphics module
-    std::ostringstream ossModLibName;
-    ossModLibName << GfLibDir() << "modules/graphic/"
-            << GfParmGetStr(_piRaceEngine->inData()->_reParam, "Modules", "graphic", "")
-            << '.' << DLLEXT;
-    GfModule* pmodGrEngine = GfModule::load(ossModLibName.str());
+	const char* pszModName =
+		GfParmGetStr(_piRaceEngine->inData()->_reParam, "Modules", "graphic", "ssggraph");
+    GfModule* pmodGrEngine = GfModule::load("graphic", pszModName);
 
     // Check that it implements IGraphicsEngine.
     if (pmodGrEngine)
         _piGraphicsEngine = pmodGrEngine->getInterface<IGraphicsEngine > ();
     if (pmodGrEngine && !_piGraphicsEngine) {
         GfModule::unload(pmodGrEngine);
-        GfLogError("IGraphicsEngine not implemented by %s\n", ossModLibName.str().c_str());
+        GfLogError("IGraphicsEngine not implemented by %s\n", pszModName);
     }
 
     _bfGraphicsState = 0;
@@ -513,18 +511,16 @@ bool LegacyMenu::initializeSound()
         return true;
 
     // Load the sound module
-    std::ostringstream oSSModLibName;
-    oSSModLibName << GfLibDir() << "modules/sound/"
-            << GfParmGetStr(_piRaceEngine->inData()->_reParam, "Modules", "sound", "")
-            << '.' << DLLEXT;
-    GfModule* pmodGrEngineS = GfModule::load(oSSModLibName.str());
+	const char* pszModName =
+		GfParmGetStr(_piRaceEngine->inData()->_reParam, "Modules", "sound", "snddefault");
+    GfModule* pmodGrEngineS = GfModule::load("sound", pszModName);
 
     // Check that it implements IGraphicsEngine.
     if (pmodGrEngineS)
         _piSoundEngine = pmodGrEngineS->getInterface<ISoundEngine > ();
     if (pmodGrEngineS && !_piSoundEngine) {
         GfModule::unload(pmodGrEngineS);
-        GfLogError("ISoundEngine not implemented by %s\n", oSSModLibName.str().c_str());
+        GfLogError("ISoundEngine not implemented by %s\n", pszModName);
     }
 
     return _piSoundEngine != 0;

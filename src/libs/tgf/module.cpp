@@ -22,6 +22,8 @@
     @ingroup	module
 */
 
+#include <sstream>
+
 #include "tgf.hpp"
 
 #ifdef WIN32
@@ -135,6 +137,26 @@ GfModule* GfModule::load(const std::string& strShLibName)
 	GfLogTrace("Module %s loaded\n", strShLibName.c_str());
 
 	return _mapModulesByLibName[strShLibName];
+}
+
+bool GfModule::isPresent(const std::string& strModCatName, const std::string& strModName)
+{
+	std::ostringstream ossModLibPathName;
+	
+	ossModLibPathName << GfLibDir() << "modules/" << strModCatName << "/"
+					  <<  strModName << '.' << DLLEXT;
+
+	return GfFileExists(ossModLibPathName.str().c_str());
+}
+
+GfModule* GfModule::load(const std::string& strModCatName, const std::string& strModName)
+{
+	std::ostringstream ossModLibPathName;
+	
+	ossModLibPathName << GfLibDir() << "modules/" << strModCatName << "/"
+					  <<  strModName << '.' << DLLEXT;
+
+	return load(ossModLibPathName.str());
 }
 
 bool GfModule::unload(GfModule*& pModule)

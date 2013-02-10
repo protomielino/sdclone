@@ -95,12 +95,10 @@ void StandardGame::reset(void)
 	::ReReset();
 
 	// Load and initialize the track loader module.
-	std::ostringstream ossModLibName;
 	const char* pszModName =
-		GfParmGetStr(ReSituation::self().data()->_reParam, "Modules", "track", "");
+		GfParmGetStr(ReSituation::self().data()->_reParam, "Modules", "track", "track");
 	GfLogInfo("Loading '%s' track loader ...\n", pszModName);
-	ossModLibName << GfLibDir() << "modules/track/" << pszModName << '.' << DLLEXT;
-	GfModule* pmodTrkLoader = GfModule::load(ossModLibName.str());
+	GfModule* pmodTrkLoader = GfModule::load("track", pszModName);
 
 	// Check that it implements ITrackLoader.
 	if (pmodTrkLoader)
@@ -294,24 +292,20 @@ bool StandardGame::loadPhysicsEngine()
 
 	// 2) Check if the module is really there, and fall back to the default one if not
 	//    Note : The default module is supposed to be always there.
-	std::ostringstream ossModLibName;
-	ossModLibName << GfLibDir() << "modules/simu/" << strModName << '.' << DLLEXT;
-	if (!GfFileExists(ossModLibName.str().c_str()))
+	if (!GfModule::isPresent("simu", strModName.c_str()))
 	{
 		GfLogWarning("User settings %s physics engine module not found ; "
 					 "falling back to %s\n", strModName.c_str(), pszDefaultModName);
 		strModName = pszDefaultModName;
-		ossModLibName.str("");
-		ossModLibName << GfLibDir() << "modules/simu/" << strModName << '.' << DLLEXT;
 	}
 
 	// 3) Load it.
 	std::ostringstream ossLoadMsg;
-	ossLoadMsg << "Loading physics engine (" << strModName<< ") ...";
+	ossLoadMsg << "Loading physics engine (" << strModName << ") ...";
 	if (_piUserItf)
 		_piUserItf->addLoadingMessage(ossLoadMsg.str().c_str());
 
-	GfModule* pmodPhysEngine = GfModule::load(ossModLibName.str());
+	GfModule* pmodPhysEngine = GfModule::load("simu", strModName.c_str());
 	if (pmodPhysEngine)
 		_piPhysEngine = pmodPhysEngine->getInterface<IPhysicsEngine>();
 	if (pmodPhysEngine && !_piPhysEngine)

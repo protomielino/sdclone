@@ -54,8 +54,14 @@ class TGF_API GfModule
 {
  public: // Services for the code that is client of the module.
 
-	//! Load a module from the given module library file.
+	//! Load a module from the given library file path and name (relative to GfLibDir()).
 	static GfModule* load(const std::string& strShLibName);
+
+	//! Check if a module from the given category and name is really installed (using default path GfLibDir()/modules).
+	static bool isPresent(const std::string& strModCatName, const std::string& strModName);
+
+	//! Load a module from the given category and name (using default path GfLibDir()/modules).
+	static GfModule* load(const std::string& strModCatName, const std::string& strModName);
 
 	//! Delete a module and unload the associated library (supposed to contain no other module).
 	static bool unload(GfModule*& pModule);
