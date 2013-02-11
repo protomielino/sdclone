@@ -110,10 +110,11 @@ typedef struct Situation {
 #define RE_STATE_RACE_STOP		8
 #define RE_STATE_RACE_END		9
 #define RE_STATE_POST_RACE		10
-#define RE_STATE_EVENT_SHUTDOWN		11
-#define RE_STATE_SHUTDOWN		12
-#define RE_STATE_ERROR			13
-#define RE_STATE_EXIT			14
+#define RE_STATE_EVENT_SHUTDOWN	11
+#define RE_STATE_EVOLUTION		12
+#define RE_STATE_SHUTDOWN		13
+#define RE_STATE_ERROR			14
+#define RE_STATE_EXIT			15
 
 /** Race Engine Car Information about the race */
 typedef struct 
