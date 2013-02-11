@@ -47,9 +47,12 @@
 #include "racemain.h"
 
 // DEBUG
+/*
 #define DIV 1024
 #define WIDTH 7
 DWORDLONG lastFreeMem = 0;
+*/
+
 int OptiCounter = 0;
 tgenResult* TGeneticParameter::MyResults; 
 
@@ -1339,10 +1342,11 @@ ParameterIndex(tgenResult *MyResults, float Parameter)
 int
 ReEvolution(double Scale)
 {
-	/* */
+	printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
+	/* 
 	MEMORYSTATUSEX statex;
 	statex.dwLength = sizeof (statex);
-	printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 	GlobalMemoryStatusEx (&statex);
 	printf (TEXT("0. There are  %*I64d KB\n"), WIDTH, lastFreeMem);
 	DWORDLONG FreeMem = statex.ullAvailPhys/DIV;
@@ -1350,8 +1354,9 @@ ReEvolution(double Scale)
 	DWORDLONG diff = lastFreeMem - statex.ullAvailPhys/DIV;
 	printf (TEXT("=. Difference %*I64d KB\n"), WIDTH, diff);
 	lastFreeMem = statex.ullAvailPhys/DIV;
-	/* */
-	//_tgf_mallocBalance(); // For Debug check allocation/free balance
+	_tgf_mallocBalance(); // For Debug check allocation/free balance
+	*/
+
 
 	// Setup shortcuts
 	tgenResult *MyResults = TGeneticParameter::MyResults;
