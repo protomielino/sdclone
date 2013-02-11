@@ -144,6 +144,7 @@ ReStateManage(void)
                   snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/%s.xml",
 		            GetLocalDir(),MyResults.RobotName,MyResults.CarType,MyResults.TrackName);
                   MyResults.Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+				  MyResults.GetInitialVal = true;
 
 				  // In case the car setup file does not exist ...
 				  if (!MyResults.Handle)
@@ -153,12 +154,23 @@ ReStateManage(void)
 		              GetLocalDir(),MyResults.RobotName,MyResults.CarType);
                     void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
 
-					// ... to create it.
-                    snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/%s.xml",
-		              GetLocalDir(),MyResults.RobotName,MyResults.CarType,MyResults.TrackName);
-//                    GfParmWriteFileHeader (buf, Handle, (char*) NULL,"Wolf-Dieter Beelitz");
-                    GfParmWriteFile (buf, Handle, (char*) NULL);
+					if (Handle) // ... if existing ...
+					{			// ... to create it.
+						snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
+						MyResults.RobotName,MyResults.CarType,MyResults.TrackName);
+						GfParmWriteFileSDHeader (buf, Handle, MyResults.CarType, "Wolf-Dieter Beelitz");
+					}
+					else		// ... else create an empty setup file
+					{			
+   					    snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/%s.xml",
+			              GetLocalDir(),MyResults.RobotName,MyResults.CarType,MyResults.TrackName);
+				        void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
+						snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
+						MyResults.RobotName,MyResults.CarType,MyResults.TrackName);
+						GfParmWriteFileSDHeader (buf, Handle, MyResults.CarType, "Wolf-Dieter Beelitz");
+						MyResults.GetInitialVal = false;
+					}
 					GfParmReleaseHandle(Handle);
 
 					// Open created car type track setup file

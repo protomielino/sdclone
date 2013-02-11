@@ -201,7 +201,7 @@ int TGeneticParameter::Get(const char* Part, int Index)
 	Round = GfParmGetNum(Handle, ParamSection, "round", 0, Round);
 
     Range = Max - Min;
-	LastVal = OptVal = Val;
+	Def = LastVal = OptVal = Val;
 
 	return 0;
 };
@@ -228,7 +228,7 @@ int TGeneticParameter::GetVal(void* SetupHandle, int Index)
 	else
 		Val = GfParmGetNum(SetupHandle, oSection, oParameter, oUnit, Val);
 
-	LastVal = OptVal = Val;
+	Def = LastVal = OptVal = Val;
 
 	return 0;
 };

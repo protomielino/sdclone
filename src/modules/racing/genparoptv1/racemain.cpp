@@ -1160,22 +1160,30 @@ ReImportGeneticParameters(tgenResult *MyResults)
 	MyResults->TotalWeight = 0.0;
  	MyResults->NextIdx = 0;
 
+	MyResults->Type = 0;
 	// Get race type
 	// 0: Race; 1: Qualifying
-    MyResults->Type = (int) GfParmGetNum(MyResults->Handle, 
-		"wdbee private", "qualification", 0, 0);
-	MyResults->MaxFuel = (float) GfParmGetNum(MyResults->Handle, 
-		"wdbee private", "max fuel", 0, (float) 60.0);
+    //MyResults->Type = (int) GfParmGetNum(MyResults->Handle, 
+	//	"simplix private", "qualification", 0, 0);
+
+	// Setup path to car type file
+	char buf[261];
+	snprintf(buf,sizeof(buf),"%scars/%s/%s.xml",
+	GetDataDir(),MyResults->CarType,MyResults->CarType);
+	void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+
+	MyResults->MaxFuel = (float) GfParmGetNum(Handle, 
+		"Car", "fuel tank", "l", (float) 60.0);
+	GfParmReleaseHandle(Handle);
 
 	// Build path to meta data file
-	char buf[261];
     snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-%s.xml",
       GetLocalDir(),MyResults->RobotName,MyResults->CarType,MyResults->TrackName);
 
-	// Build path to meta data file
+	// Read meta data file
 	void *MetaDataFile = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
     if (!MetaDataFile)
-		return;
+		return;  // TODO: Error handling
 
 	// Read table of content of meta data file
 	TGeneticParameterTOC* TOC = new TGeneticParameterTOC(MetaDataFile);
@@ -1198,6 +1206,11 @@ ReImportGeneticParameters(tgenResult *MyResults)
 
 	// Initialize counter for number of parameters
 	int NumberOfParameters = TOC->GlobalParamCount;
+
+	// Check the state we found opening the track setup file:
+	// If we created an empty file, we cannot get the initial values from it!
+	if (!MyResults->GetInitialVal)
+		TOC->GetInitialVal = false;
 
 	// Loop over all local parameter groups
 	for (int I = 0; I < MyResults->NbrOfParts; I++)
@@ -1384,23 +1397,24 @@ ReEvolution(double Scale)
 
 		srand((unsigned)time(NULL));	// Initialize the random number generator
 		MyResults->Second = true;		// Set flag to identify next loop
-
+/*
 		if (MyResults->Type == 1)	// Setup race mode depending parameters
 		{
 			// Qualifying, fuel at start has to be calculated by the consumer robot
 			GfLogOpt("# Qualifying\n");
-			GfParmSetNumEx(Handle, "wdbee private", "qualification", // Mode = qualifying
+			GfParmSetNumEx(Handle, "simplix private", "qualification", // Mode = qualifying
 				(char*) NULL, 1.0, 0.0, 1.0);
-			GfParmSetNumEx(Handle, "wdbee private", "start fuel",    // Calculate fuel needed
+			GfParmSetNumEx(Handle, "simplix private", "start fuel",    // Calculate fuel needed
 				(char*) NULL, (float) -1.0, -1.0, MyResults->MaxFuel);
 		}
 		else
+*/
 		{
 			// Race, fuel at start is set to max allowed to make the car as heavy as possible
-			GfLogOpt("# Race\n");
-			GfParmSetNumEx(Handle, "wdbee private", "qualification", // Mode race
-				(char*) NULL, 0.0, 0.0, 1.0);
-			GfParmSetNumEx(Handle, "wdbee private", "start fuel",    // Set fuel to max
+			GfLogOpt("# Race\n\n");
+			//GfParmSetNumEx(Handle, "simplix private", "qualification", // Mode race
+			//	(char*) NULL, 0.0, 0.0, 1.0);
+			GfParmSetNumEx(Handle, "simplix private", "start fuel",    // Set fuel to max
 				(char*) NULL, MyResults->MaxFuel, -1.0, MyResults->MaxFuel);
 		}
 	}
@@ -1435,8 +1449,7 @@ ReEvolution(double Scale)
 			char buf[255];
 			snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.opt",
 			MyResults->RobotName,MyResults->CarType,MyResults->TrackName);
-			GfParmWriteFileSDHeader (buf, Handle, (char*) NULL,"Wolf-Dieter Beelitz");
-//			GfParmWriteFile (buf, Handle, (char*) NULL);
+			GfParmWriteFileSDHeader (buf, Handle, MyResults->CarType, "Wolf-Dieter Beelitz");
 		}
 		else if (0.99 * TotalLapTime < MyResults->BestTotalLapTime)
 		{
@@ -1594,8 +1607,7 @@ ReEvolution(double Scale)
 		char buf[255];
 		snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
 		MyResults->RobotName,MyResults->CarType,MyResults->TrackName);
-		GfParmWriteFileSDHeader (buf, Handle, (char*) NULL, "Wolf-Dieter Beelitz");
-//		GfParmWriteFile (NULL, Handle, (char*) NULL);
+		GfParmWriteFileSDHeader (buf, Handle, MyResults->CarType, "Wolf-Dieter Beelitz");
 
 	}
 

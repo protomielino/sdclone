@@ -1327,7 +1327,7 @@ static char* handleEntities(char *s, const char* val)
  *	@image html output-state.png
  */
 static int
-xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */)
+xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */, bool forceMinMax = false)
 {
     struct parmOutput	*outCtrl = &(parmHandle->outCtrl);
    	struct parmHeader	*conf = parmHandle->conf;
@@ -1450,14 +1450,40 @@ xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */)
 
 			s = buffer;
 			s += sprintf (s, "%s<attnum name=\"%s\"", outCtrl->indent, curParam->name);
+
 			if (curParam->unit)
 			{
-			    if ((curParam->min != curParam->valnum) && (curParam->min != -FLT_MAX)) 
+			    s += sprintf (s, " unit=\"%s\"",curParam->unit);
+			}
+
+			if (((forceMinMax) || (curParam->min != curParam->valnum)) && (curParam->min != -FLT_MAX)) 
+		    {
+				s += sprintf (s, " min=\"%g\"",
+				GfParmSI2Unit (curParam->unit, curParam->min));
+		    }
+
+		    if (((forceMinMax) || (curParam->max != curParam->valnum)) && (curParam->max != FLT_MAX)) 
+		    {
+				s += sprintf (s, " max=\"%g\"", 
+				GfParmSI2Unit (curParam->unit, curParam->max));
+		    }
+
+			if (curParam->unit)
+			{
+			    s += sprintf (s, " val=\"%g\"/>\n",	GfParmSI2Unit (curParam->unit, curParam->valnum));
+			} else 
+			{
+			    s += sprintf (s, " val=\"%g\"/>\n", curParam->valnum);
+			}
+/*
+			if (curParam->unit)
+			{
+			    if (((forceMinMax) || (curParam->min != curParam->valnum)) && (curParam->min != -FLT_MAX)) 
 			    {
 				s += sprintf (s, " min=\"%g\"",
 					GfParmSI2Unit (curParam->unit, curParam->min));
 			    }
-			    if ((curParam->max != curParam->valnum) && (curParam->max != FLT_MAX)) 
+			    if (((forceMinMax) || (curParam->max != curParam->valnum)) && (curParam->max != FLT_MAX)) 
 			    {
 				s += sprintf (s, " max=\"%g\"", 
 					GfParmSI2Unit (curParam->unit, curParam->max));
@@ -1467,17 +1493,18 @@ xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */)
 				curParam->unit, GfParmSI2Unit (curParam->unit, curParam->valnum));
 			} else 
 			{
-			    if ((curParam->min != curParam->valnum) && (curParam->min != -FLT_MAX)) 
+			    if (((forceMinMax) || (curParam->min != curParam->valnum)) && (curParam->min != -FLT_MAX)) 
 			    {
 				s += sprintf (s, " min=\"%g\"", curParam->min);
 			    }
-			    if ((curParam->max != curParam->valnum) && (curParam->max != FLT_MAX)) 
+			    if (((forceMinMax) || (curParam->max != curParam->valnum)) && (curParam->max != FLT_MAX)) 
 			    {
 				s += sprintf (s, " max=\"%g\"", curParam->max);
 			    }
 
 			    s += sprintf (s, " val=\"%g\"/>\n", curParam->valnum);
 			}
+*/
 			outCtrl->curParam = GF_TAILQ_NEXT (curParam, linkParam);
 			return 1;
 	    	  }
@@ -1712,7 +1739,8 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name, c
     handle->outCtrl.curParam = NULL;
 
 	bool First = true;
-    while (xmlGetOuputLine (handle, line, sizeof (line))) 
+	// Set forceMinMax default parameter true to get always the min and max attribute!
+    while (xmlGetOuputLine (handle, line, sizeof (line), true)) 
 	{
 	  fputs (line, fout);
       if (First)
@@ -1742,7 +1770,7 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name, c
 		  fputs (time_buf, fout);
   	      fputs ("\n    last modified : ", fout);
 		  fputs (time_buf, fout);
-		  snprintf(buf,sizeof(buf),"\n    copyright     : (C) 2010 %s\n",author);
+		  snprintf(buf,sizeof(buf),"\n    copyright     : (C) 2010-2013 %s\n",author);
   	      fputs (buf, fout);
   	      fputs ("\n", fout);
 		  snprintf(buf,sizeof(buf),"    SVN version   : $%s$\n","Id:"); // Written in a way that is not replaced here

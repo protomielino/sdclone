@@ -101,6 +101,7 @@ typedef struct genResult
 	float TotalWeight;		// Total of parameters individual weight
 	bool First;				// First race with unchanged parameters
 	bool Second;			// Second race initializing optimization
+	bool GetInitialVal;		// Allow to get initial value from setup
 
 	// Race result data
 	int DamagesTotal;		// Total of damages taken in race
