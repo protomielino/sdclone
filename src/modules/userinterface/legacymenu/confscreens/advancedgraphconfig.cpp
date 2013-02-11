@@ -63,8 +63,12 @@ static int	ForestIndex = 0;
 static int	TreeIndex = 0;
 static int	ParkingIndex = 0;
 static int	SpansplitIndex = 0;
-static float	BezelValue = 110.0f;
-static int	BezelValueId;
+static float	BezelComp = 110.0f;
+static int	BezelCompId;
+static float	ScreenDist = 1.0f;
+static int	ScreenDistId;
+static float	ArcRatio = 1.0f;
+static int	ArcRatioId;
 static int	MonitorIndex = 0;
 
 static char	buf[512];
@@ -138,16 +142,38 @@ loadOptions()
 		}
 	}
 
-	BezelValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_BEZELCOMP, "%", 110.0f);
-	if (BezelValue>150.0f) {
-		BezelValue = 150.0f;
+	BezelComp = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_BEZELCOMP, "%", 110.0f);
+	if (BezelComp > 150.0f) {
+		BezelComp = 150.0f;
 	} 
-	else if (BezelValue < 50.0f) {
-		BezelValue = 50.0f;
+	else if (BezelComp < 50.0f) {
+		BezelComp = 50.0f;
 	}
 
-	sprintf(buf, "%g", BezelValue);
-	GfuiEditboxSetString(ScrHandle, BezelValueId, buf);
+	sprintf(buf, "%g", BezelComp);
+	GfuiEditboxSetString(ScrHandle, BezelCompId, buf);
+
+	ScreenDist = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SCREENDIST, NULL, 1.0f);
+	if (ScreenDist > 5.0f) {
+		ScreenDist = 5.0f;
+	} 
+	else if (ScreenDist < 0.0f) {
+		ScreenDist = 0.0f;
+	}
+
+	sprintf(buf, "%g", ScreenDist);
+	GfuiEditboxSetString(ScrHandle, ScreenDistId, buf);
+
+	ArcRatio = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_ARCRATIO, NULL, 1.0f);
+	if (ArcRatio > 1.0f) {
+		ArcRatio = 1.0f;
+	} 
+	else if (ArcRatio < 0.0f) {
+		ArcRatio = 0.0f;
+	}
+
+	sprintf(buf, "%g", ArcRatio);
+	GfuiEditboxSetString(ScrHandle, ArcRatioId, buf);
 
 	MonitorIndex = 0; // Default value index, in case file value not found in list.
 	const char* pszMonitor =
@@ -178,7 +204,9 @@ saveOptions()
 	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_AGR_TREE, TreeValues[TreeIndex]);
 	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_AGR_PARKING, ParkingValues[ParkingIndex]);
 	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, SpansplitValues[SpansplitIndex]);
-	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_BEZELCOMP, "%", BezelValue);
+	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_BEZELCOMP, "%", BezelComp);
+	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SCREENDIST, NULL, ScreenDist);
+	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_ARCRATIO, NULL, ArcRatio);
 	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_MONITOR, MonitorValues[MonitorIndex]);
     
     GfParmWriteFile(NULL, grHandle, "graph");
@@ -227,22 +255,54 @@ onChangeSpansplit(void* vp)
     SpansplitIndex = (SpansplitIndex + NbSpansplitValues + delta) % NbSpansplitValues;
     GfuiLabelSetText(ScrHandle, SpansplitLabelId, SpansplitValues[SpansplitIndex]);
 
-    GfuiEnable(ScrHandle, BezelValueId, SpansplitIndex ? GFUI_ENABLE : GFUI_DISABLE);
+    GfuiEnable(ScrHandle, BezelCompId, SpansplitIndex ? GFUI_ENABLE : GFUI_DISABLE);
+    GfuiEnable(ScrHandle, ScreenDistId, SpansplitIndex ? GFUI_ENABLE : GFUI_DISABLE);
+    GfuiEnable(ScrHandle, ArcRatioId, SpansplitIndex ? GFUI_ENABLE : GFUI_DISABLE);
 } 
 
 static void
-onChangeBezel(void * )
+onChangeBezelComp(void * )
 {
-    char* val = GfuiEditboxGetString(ScrHandle, BezelValueId);
-    sscanf(val, "%g", &BezelValue);
-    if (BezelValue > 150.0f)
-		BezelValue = 150.0f;
-    else if (BezelValue < 50.0f)
-		BezelValue = 50.0f;
+    char* val = GfuiEditboxGetString(ScrHandle, BezelCompId);
+    sscanf(val, "%g", &BezelComp);
+    if (BezelComp > 150.0f)
+		BezelComp = 150.0f;
+    else if (BezelComp < 50.0f)
+		BezelComp = 50.0f;
 	
     char buf[32];
-    sprintf(buf, "%g", BezelValue);
-    GfuiEditboxSetString(ScrHandle, BezelValueId, buf);
+    sprintf(buf, "%g", BezelComp);
+    GfuiEditboxSetString(ScrHandle, BezelCompId, buf);
+}
+
+static void
+onChangeScreenDist(void * )
+{
+    char* val = GfuiEditboxGetString(ScrHandle, ScreenDistId);
+    sscanf(val, "%g", &ScreenDist);
+    if (ScreenDist > 25.0f)
+		ScreenDist = 25.0f;
+    else if (ScreenDist < 0.1f)
+		ScreenDist = 0.1f;
+	
+    char buf[32];
+    sprintf(buf, "%g", ScreenDist);
+    GfuiEditboxSetString(ScrHandle, ScreenDistId, buf);
+}
+
+static void
+onChangeArcRatio(void * )
+{
+    char* val = GfuiEditboxGetString(ScrHandle, ArcRatioId);
+    sscanf(val, "%g", &ArcRatio);
+    if (ArcRatio > 1.0f)
+		ArcRatio = 1.0f;
+    else if (ArcRatio < 0.0f)
+		ArcRatio = 0.0f;
+	
+    char buf[32];
+    sprintf(buf, "%g", ArcRatio);
+    GfuiEditboxSetString(ScrHandle, ArcRatioId, buf);
 }
 
 static void
@@ -264,7 +324,9 @@ onActivate(void* /* dummy */)
 	onChangeTree(0);
 	onChangeParking(0);	
 	onChangeSpansplit(0);	
-	onChangeBezel(0);	
+	onChangeBezelComp(0);	
+	onChangeScreenDist(0);	
+	onChangeArcRatio(0);	
 	onChangeMonitor(0);	
 }
 
@@ -328,7 +390,11 @@ AdvancedGraphMenuInit(void* prevMenu)
 		GfuiMenuCreateButtonControl(ScrHandle, param, "spansplitrightarrow", (void*)1, onChangeSpansplit);
     SpansplitLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "spansplitlabel");
 
-    BezelValueId = GfuiMenuCreateEditControl(ScrHandle, param, "bezeledit", NULL, NULL, onChangeBezel);
+    BezelCompId = GfuiMenuCreateEditControl(ScrHandle, param, "bezelcompedit", NULL, NULL, onChangeBezelComp);
+
+    ScreenDistId = GfuiMenuCreateEditControl(ScrHandle, param, "screendistedit", NULL, NULL, onChangeScreenDist);
+
+    ArcRatioId = GfuiMenuCreateEditControl(ScrHandle, param, "arcratioedit", NULL, NULL, onChangeArcRatio);
 
 	MonitorLeftButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, param, "monitorleftarrow", (void*)-1, onChangeMonitor);

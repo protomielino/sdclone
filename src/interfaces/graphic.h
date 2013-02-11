@@ -105,11 +105,13 @@
 #define GR_ATT_MONITOR		"monitor type"
 #define GR_VAL_MONITOR_16BY9		"16:9"
 #define GR_VAL_MONITOR_4BY3		"4:3"
-#define GR_VAL_MONITOR_NONE		"None"
-#define GR_ATT_SPANSPLIT		"span splits"
+#define GR_VAL_MONITOR_NONE		"none"
+#define GR_ATT_SPANSPLIT	"span splits"
 #define GR_VAL_YES		"yes"
 #define GR_VAL_NO		"no"
-#define GR_ATT_BEZELCOMP		"bezel compensation"
+#define GR_ATT_BEZELCOMP	"bezel compensation"
+#define GR_ATT_SCREENDIST	"screen distance"
+#define GR_ATT_ARCRATIO		"arc ratio"
 
 // Dash colours
 #define GFSCR_SECT_DASHSETTINGS	"Dash settings"

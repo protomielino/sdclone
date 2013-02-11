@@ -30,7 +30,9 @@
 static char path[1024];
 
 static float spanfovy;
-static float bezelcomp;
+static float bezelComp;
+static float screenDist;
+static float arcRatio;
 static float spanaspect;
 static tdble spanA;
 
@@ -108,6 +110,7 @@ cGrPerspCamera::cGrPerspCamera(class cGrScreen *myscreen, int id, int drawCurr, 
     fogend   = myfogend;
     
     viewOffset = 0;
+    spanOffset = 0;
 }
 
 void cGrPerspCamera::setProjection(void)
@@ -123,6 +126,14 @@ void cGrPerspCamera::setProjection(void)
     float fovx = atan(getAspectRatio() / spanaspect * tan(fovy * M_PI / 360.0)) * 360.0 / M_PI;
     grContext.setFOV(fovx, fovy);
     grContext.setNearFar(fnear, ffar);
+
+    // correct view for split screen spanning
+    if (viewOffset) {
+        sgFrustum * frus = grContext.getFrustum();
+
+        frus->setFrustum(frus->getLeft() + spanOffset, frus->getRight() + spanOffset, 
+            frus->getBot(), frus->getTop(), frus->getNear(), frus->getFar());
+    }
 }
 
 void cGrPerspCamera::setModelView(void)
@@ -167,12 +178,68 @@ float cGrPerspCamera::getLODFactor(float x, float y, float z) {
     return res;
 }
 
+float cGrPerspCamera::getSpanAngle(void)
+{
+    float angle = 0;
+
+    // check if already computed
+    if (fovy == spanfovy)
+	return spanAngle;
+
+    fovy = spanfovy;
+
+    //PreCalculate the spanOffset
+    if (viewOffset) {
+	//=2*$A$2*tan($D$2*$C$2/2)
+	float width = (bezelComp / 100) * screenDist * tan(screen->getViewRatio() / spanaspect * (spanfovy * M_PI / 360.0 * 2)) / 2;
+
+#if 1
+	// New method
+    	float fovxR;
+
+	if (arcRatio > 0) {
+		//=if($B$2=0,0,atan($A$5/(2*($A$2/$B$2)))*2)
+		fovxR = 2 * atan(width / (2 * screenDist / arcRatio));
+
+		//=A10*$B$5
+        	angle = (viewOffset - 10) * fovxR * 2;
+
+		//=if($B$2=0, A10*$A$5, abs(tan(B10)*($A$2-($A$2/$B$2)))/sqrt(tan(B10)^2+1))*if(A1>0,-1,1)
+		spanOffset = fabs(tan(angle) * (screenDist - (screenDist / arcRatio))) / sqrt((tan(angle) * tan(angle)) + 1); // / 2;
+
+		if (viewOffset < 10) spanOffset *= -1;
+	} else {
+		// monitors mounted flat on wall
+		spanOffset = (viewOffset - 10) * width / 2 ;
+	}
+#else
+	// Old method
+	angle = (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelComp - 100)/200)) *
+		atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
+
+	spanOffset = 0;
+#endif
+	spanAngle = angle;
+
+	GfLogInfo("ViewOffset %f : fovy %f, arcRatio %f => width %f, angle %f, SpanOffset %f\n", viewOffset, fovy, arcRatio, width, angle, spanOffset);
+    }
+
+    return angle;
+}
+
 void cGrPerspCamera::setViewOffset(float newOffset)
 {
-    if (newOffset)
-	spanfovy = fovy;
-
     viewOffset = newOffset;
+
+    //PreCalculate the spanAngle and spanOffset
+    if (newOffset) {
+	spanfovy = fovy;
+	fovy = 0;
+        spanAngle = getSpanAngle();
+    } else {
+	//spanAngle = 0;
+	spanOffset = 0;
+    }
 }
 
 void cGrPerspCamera::setZoom(int cmd)
@@ -213,8 +280,14 @@ void cGrPerspCamera::setZoom(int cmd)
 
     limitFov();
 
-    if (viewOffset)
+    if (viewOffset) {
 	spanfovy = fovy;
+	fovy = 0;
+    	spanAngle = getSpanAngle();
+    } else {
+	//spanAngle = 0;
+	spanOffset = 0;
+    }
 
     sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, screen->getCurCamHead(), getId());
     sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
@@ -313,9 +386,7 @@ class cGrCarCamInsideDriverEye : public cGrPerspCamera
 
 	// Compute offset angle and bezel compensation)
 	if (viewOffset) {
-		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
-			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
-		fovy = spanfovy;
+		offset += getSpanAngle();
 	}
 
 	P[0] = car->_drvPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset);
@@ -385,9 +456,7 @@ class cGrCarCamInsideDynDriverEye : public cGrCarCamInsideDriverEye
 
 	// Compute offset angle and bezel compensation)
 	if (viewOffset) {
-		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
-			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
-		fovy = spanfovy;
+		offset += getSpanAngle();
 	}
 
 	P[0] = car->_drvPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset);
@@ -616,9 +685,7 @@ class cGrCarCamInsideFixedCar : public cGrPerspCamera
  
 	// Compute offset angle and bezel compensation)
 	if (viewOffset) {
-		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
-			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
-		fovy = spanfovy;
+		offset += getSpanAngle();
 	}
 
 	P[0] = car->_bonnetPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset);
@@ -671,9 +738,7 @@ class cGrCarCamInfrontFixedCar : public cGrPerspCamera
  
 	// Compute offset angle and bezel compensation)
 	if (viewOffset) {
-		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
-			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
-		fovy = spanfovy;
+		offset += getSpanAngle();
 	}
 
 	P[0] = (car->_dimension_x / 2) + 30.0 * cos(2*PI/3 * car->_glance + offset);
@@ -728,9 +793,7 @@ class cGrCarCamBehindFixedCar : public cGrPerspCamera
 
 	// Compute offset angle and bezel compensation)
 	if (viewOffset) {
-		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
-			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
-		fovy = spanfovy;
+		offset += getSpanAngle();
 	}
 
 	P[0] = car->_drvPos_x - 6.0f * cos(PI * car->_glance) + 30.0 * cos(PI * car->_glance + offset);
@@ -800,9 +863,7 @@ class cGrCarCamBehindReverse : public cGrPerspCamera
  
 	// Compute offset angle and bezel compensation)
 	if (viewOffset) {
-		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
-			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
-		fovy = spanfovy;
+		offset += getSpanAngle();
 	}
 
 	P[0] = car->_bonnetPos_x - (car->_dimension_x/2) + 30.0 * cos(offset);
@@ -1773,7 +1834,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     class cGrCamera	*cam;
     
     /* Check Bezel compensation - used when spaning view across multiple splits */
-    bezelcomp = (float)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_BEZELCOMP, "%", 110);
+    bezelComp = (float)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_BEZELCOMP, "%", 110);
+    screenDist= (float)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SCREENDIST, NULL, 1);
+    arcRatio = (float)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_ARCRATIO, NULL, 1.0);
 
     const char *pszMonitorType =
 	GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_MONITOR, GR_VAL_MONITOR_16BY9);
