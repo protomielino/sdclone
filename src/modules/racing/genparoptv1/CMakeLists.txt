@@ -7,13 +7,13 @@ SET(_SOURCES genparoptv1.cpp
              raceinit.cpp racemain.cpp
              racetrack.cpp raceresults.cpp racesimusimu.cpp 
              racestate.cpp racesituation.cpp racemessage.cpp
-             raceutil.cpp)
+             raceutil.cpp genetic.cpp)
 SET(_HEADERS genparoptv1.h 
              racecareer.h raceupdate.h racenetwork.h racecars.h
              raceinit.h 
              racetrack.h raceresults.h racesimusimu.h 
              racestate.h racesituation.h racemessage.h
-             raceutil.h)
+             raceutil.h genetic.h geneticglobal.h)
 SET(_OTHER_SOURCES )
 
 ADD_INTERFACE_INCLUDEDIR()
