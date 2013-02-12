@@ -63,10 +63,12 @@ class TGeneticParameter;		// Optimization parameter
 //  
 typedef struct genPart
 {
-	int Offset;		// Index offset of first parameter
-	int NbrOfSect;	// Number of sections in this part
-	int Count;		// Number of parameters per section
-	bool Active;	// Block active
+	int Offset;			// Index offset of first parameter
+	int NbrOfSect;		// Number of sections in this part
+	int Count;			// Number of parameters per section
+	bool Active;		// Block active
+	char* Parameter;	// Name of attribute
+	char* Subsection;	// Name of subsection
 } tgenPart;
 
 //
@@ -100,7 +102,6 @@ typedef struct genResult
 	float MaxFuel;			// Default = 60
 	float TotalWeight;		// Total of parameters individual weight
 	bool First;				// First race with unchanged parameters
-	bool Second;			// Second race initializing optimization
 	bool GetInitialVal;		// Allow to get initial value from setup
 
 	// Race result data
@@ -109,7 +110,7 @@ typedef struct genResult
 	double WeightOfDamages;	// Factor to weight damages as time penalties
 
 	// In case we handle a set of different race types
-	double QualifyingLapTime;	// Laptime while qualifying
+	//double QualifyingLapTime;	// Laptime while qualifying
 	double RaceLapTime;			// Laptime while race
 
 	double BestTotalLapTime;	// Best laptime in the current race
@@ -133,8 +134,10 @@ typedef struct genResult
 	char RobotNameBuffer[4096];	// Buffer for robotname
 
 	// Counters
-	int NextIdx;      // Index to next parameter
-	int NbrOfParts;   // Number of parts used
+	int MaxSelected;// Max nuber of parameters to select
+	int NbrOfParam;	// Index to next parameter
+	int NextIdx;    // Index to next parameter
+	int NbrOfParts; // Number of parts used
 
 	// Parts
     tgenPart* Part;   // Pointer to first part structure
@@ -181,10 +184,12 @@ class TGeneticParameter
 	int Set(	// Write meta data to the configuration file
 		const char* Part, int Index); 
 	int Get(	// Read meta data from the configuration file
-		const char* Part, int Index); 
+//		const char* Part, int Index); 
+		const char* Part = NULL); 
 
 	int GetVal(	// Read initial value from setup file
-		void* SetupHandle, int Index = 0); 
+//		void* SetupHandle, int Index = 0); 
+		void* SetupHandle, bool Local = false); 
 	int SetVal(	// Write data to car setup file 
 		void* SetupHandle, int Index = 0);
 
@@ -201,7 +206,7 @@ class TGeneticParameter
 
 	float Def;		// Default value to use if not specified
 
-	float Weight;	// Weigth/TotalWeight = propability to be selected
+	float Weight;	// Weigth/TotalWeight = probability to be selected
 	float Range;	// Range (Max - Min)
 	float Scale;	// Scale random variation
 	float Round;	// Define rounding to avoid minimal parameter changes
@@ -221,8 +226,25 @@ class TGeneticParameter
 	bool LeftRight;
 
 	// Common data (class variables)
+	static bool First;				// Internal state for import of sections
+	static bool FirstValue;			// Internal state for import of sections
 	static tgenResult* MyResults;	// Pointer to structore with all data
 									// needed for optimization
+
+	// Set internal state flags
+	static void Reset()
+	{
+		First = true;
+		FirstValue = true;
+	}
+
+	// Clear internal state flags
+	static void Skipped()
+	{
+		First = false;
+		FirstValue = false;
+	}
+
 };
 
 
@@ -240,11 +262,12 @@ class TGeneticParameterCounter
 	TGeneticParameterCounter();			// Default constructor
 	TGeneticParameterCounter			// Constructor
 	(
-		void* MetaDataFile,				// Handle to read the data from
-		const char* Label = NULL,		// Short label for console output
-		const char* Section = NULL,		// Section to pick up data in the xml file
-		const char* Parameter = NULL,	// Name of data line to use 
-		int DefCount = 0				// Default value
+		void* MetaDataFile,					// Handle to read the data from
+		const char* ShortLabel = NULL,		// Short label for console output
+		const char* SectionName = NULL,		// Section to pick up data in the xml file
+		const char* ParameterName = NULL,	// Name of data line to use 
+		int DefCount = 0,					// Default value
+		const char* SubSectionName = NULL	// Subsection to pick up data in the xml file
 	);
 
 	virtual ~TGeneticParameterCounter(); // Destructor
@@ -259,9 +282,10 @@ class TGeneticParameterCounter
 	int Def;			// Default value to use if not specified
 	int Count;			// Current value
 
-	char *oLabel;
-	char *oSection;
-	char *oParameter;
+	char *Label;
+	char *Section;
+	char *Subsection;
+	char *Parameter;
 
 };
 
@@ -280,6 +304,7 @@ class TGeneticParameterTOC
 	TGeneticParameterTOC			// Constructor
 	(
 		void* MetaDataFile,			// Handle to read /write data
+		char* Private = NULL,		// Name of private data section
 		int NbrOfGlobalParams = 0,	// Number of global genetic parameters
 		int MbrOfParamsGroups = 0,	// Number of local parameters groups
 		float WeightDamages = 1.0,	// Weight of damages as time penalty
@@ -293,6 +318,7 @@ class TGeneticParameterTOC
 
   public:
 	void* Handle;					// Handle to read /write data
+	char* Private;					// Name of private data section
 	int GlobalParamCount;			// Number of global genetic parameters
 	int ParamsGroupCount;			// Number of local parameters groups
 	float WeightOfDamages;	        // Weight of damages as time penalty

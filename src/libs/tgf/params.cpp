@@ -1475,48 +1475,18 @@ xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */, bo
 			{
 			    s += sprintf (s, " val=\"%g\"/>\n", curParam->valnum);
 			}
-/*
-			if (curParam->unit)
-			{
-			    if (((forceMinMax) || (curParam->min != curParam->valnum)) && (curParam->min != -FLT_MAX)) 
-			    {
-				s += sprintf (s, " min=\"%g\"",
-					GfParmSI2Unit (curParam->unit, curParam->min));
-			    }
-			    if (((forceMinMax) || (curParam->max != curParam->valnum)) && (curParam->max != FLT_MAX)) 
-			    {
-				s += sprintf (s, " max=\"%g\"", 
-					GfParmSI2Unit (curParam->unit, curParam->max));
-			    }
-
-			    s += sprintf (s, " unit=\"%s\" val=\"%g\"/>\n",
-				curParam->unit, GfParmSI2Unit (curParam->unit, curParam->valnum));
-			} else 
-			{
-			    if (((forceMinMax) || (curParam->min != curParam->valnum)) && (curParam->min != -FLT_MAX)) 
-			    {
-				s += sprintf (s, " min=\"%g\"", curParam->min);
-			    }
-			    if (((forceMinMax) || (curParam->max != curParam->valnum)) && (curParam->max != FLT_MAX)) 
-			    {
-				s += sprintf (s, " max=\"%g\"", curParam->max);
-			    }
-
-			    s += sprintf (s, " val=\"%g\"/>\n", curParam->valnum);
-			}
-*/
 			outCtrl->curParam = GF_TAILQ_NEXT (curParam, linkParam);
 			return 1;
-	    	  }
+		}
 
 	case 6:			/* Parse sub-section list */
 	    	curSection = GF_TAILQ_FIRST (&(outCtrl->curSection->subSectionList));
-	   	 if (curSection) 
+	   	if (curSection) 
 		{
 			outCtrl->curSection = curSection;
 			outCtrl->state = 4;
 			break;
-	   	 }
+	   	}
 	    	outCtrl->state = 7;
 	    	break;
 
@@ -2138,7 +2108,7 @@ GfParmSI2Unit (const char *unit, tdble val)
 
 
 
-/** Get the pararmeters name
+/** Get the parameters name
     @ingroup	paramsdata
     @param	handle	Handle on the parameters
     @return	Name
@@ -2156,7 +2126,7 @@ GfParmGetName (void *handle)
     return parmHandle->conf->name;
 }
 
-/** Get the pararmeters name
+/** Get the parameters name
     @ingroup	paramsdata
     @param	handle	Handle on the parameters
     @return	major version number
@@ -2174,7 +2144,7 @@ GfParmGetMajorVersion (void *handle)
     return parmHandle->conf->major;
 }
 
-/** Get the pararmeters name
+/** Get the parameters name
     @ingroup	paramsdata
     @param	handle	Handle on the parameters
     @return	Name
@@ -2193,7 +2163,7 @@ GfParmGetMinorVersion (void *handle)
 }
 
 
-/** Get the pararmeters file name
+/** Get the parameters file name
     @ingroup	paramsfile
     @param	handle	Handle on the parameters
     @return	File Name
@@ -2945,6 +2915,102 @@ GfParmGetCurNum (void *handle, const char *path, const char *key, const char *un
     return  val;
 }
 
+
+
+/** Get min of a numerical parameter in a config file.
+    @ingroup	paramslist
+    @param	handle	handle of parameters	
+    @param	path	path of param
+    @param	key	key name	
+    @param	unit	unit to convert the result to (NULL if SI wanted)	
+    @param	deflt	default string	
+    @return	parameter value
+ */
+tdble
+GfParmGetCurNumMin (void *handle, const char *path, const char *key, const char *unit, tdble deflt)
+{
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
+    struct section	*section;
+    struct param	*param;
+	tdble min;
+
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
+		return deflt;
+	}
+
+	conf = parmHandle->conf;
+
+	section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+    if ((!section) || (!section->curSubSection)) {
+	return deflt;
+    }
+
+    param = getParamByName (conf, section->curSubSection->fullName, key, 0);
+    if (!param || (param->type != P_NUM && param->type != P_FORM)) 
+    {
+	return deflt;
+    }
+
+	min = param->min;
+
+	if (unit) 
+	{
+		return GfParmSI2Unit(unit, min);
+	}
+	
+    return min;
+}
+
+
+
+/** Get max of a numerical parameter in a config file.
+    @ingroup	paramslist
+    @param	handle	handle of parameters	
+    @param	path	path of param
+    @param	key	key name	
+    @param	unit	unit to convert the result to (NULL if SI wanted)	
+    @param	deflt	default string	
+    @return	parameter value
+ */
+tdble
+GfParmGetCurNumMax (void *handle, const char *path, const char *key, const char *unit, tdble deflt)
+{
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
+    struct section	*section;
+    struct param	*param;
+    tdble max;
+
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
+		return deflt;
+	}
+
+	conf = parmHandle->conf;
+
+	section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+    if ((!section) || (!section->curSubSection)) {
+	return deflt;
+    }
+
+    param = getParamByName (conf, section->curSubSection->fullName, key, 0);
+    if (!param || (param->type != P_NUM && param->type != P_FORM)) 
+    {
+	return deflt;
+    }
+
+	max = param->max;
+
+	if (unit) 
+	{
+		return GfParmSI2Unit(unit, max);
+	}
+	
+    return max;
+}
+
 /** This function returns TRUE if the entry is a formula, and FALSE otherwise
     @param	handle	handle of parameters	
     @param	path	path of param
@@ -3206,7 +3272,7 @@ GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, 
     @warning	The key is created is necessary
  */
 int
-GfParmSetNumEx(void *handle, char *path, char *key, char *unit, tdble val, tdble min, tdble max)
+GfParmSetNumEx(void *handle, const char *path, const char *key, const char *unit, tdble val, tdble min, tdble max)
 {
     struct parmHandle *parmHandle = (struct parmHandle *)handle;
     struct parmHeader *conf;

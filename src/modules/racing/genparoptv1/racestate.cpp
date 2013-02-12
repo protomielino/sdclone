@@ -58,7 +58,7 @@ ReStateManage(void)
 
       genLoops = 1000;
 
-	  MyResults.QualifyingLapTime = FLT_MAX;
+	  //MyResults.QualifyingLapTime = FLT_MAX;
 	  MyResults.RaceLapTime = FLT_MAX;
 	  MyResults.BestTotalLapTime = FLT_MAX;
 
