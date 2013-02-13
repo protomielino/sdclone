@@ -1230,8 +1230,14 @@ ReImportGeneticParameters(tgenResult *MyResults)
 			MyResults->Handle, "Track Params Count", TOC->Private, "track param count");
 
 		// Store the data to the list of parts
-		MyResults->Part[I].Parameter = strdup(TrackParam->Parameter);
-		MyResults->Part[I].Subsection = strdup(GroupParam->Subsection);
+		if (TrackParam->Parameter)
+			MyResults->Part[I].Parameter = strdup(TrackParam->Parameter);
+		else
+			MyResults->Part[I].Parameter = NULL;
+		if (GroupParam->Subsection)
+			MyResults->Part[I].Subsection = strdup(GroupParam->Subsection);
+		else
+			MyResults->Part[I].Subsection = NULL;
 		MyResults->Part[I].Active = GroupParam->Active;
 		MyResults->Part[I].Count = GroupParam->Count;
 		MyResults->Part[I].NbrOfSect = TrackParam->Count;
@@ -1431,7 +1437,7 @@ ReEvolution(double Scale)
 {
 	printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-	/* 
+	/* DEBUG, ONLY FOR WINDOWS
 	MEMORYSTATUSEX statex;
 	statex.dwLength = sizeof (statex);
 	GlobalMemoryStatusEx (&statex);
@@ -1443,7 +1449,6 @@ ReEvolution(double Scale)
 	lastFreeMem = statex.ullAvailPhys/DIV;
 	_tgf_mallocBalance(); // For Debug check allocation/free balance
 	*/
-
 
 	// Setup shortcuts
 	tgenResult *MyResults = TGeneticParameter::MyResults;
@@ -1459,15 +1464,12 @@ ReEvolution(double Scale)
 	double OldValue;
 	double TotalLapTime = 0;
 
-	// Count the loops
-	OptiCounter++;
-
 	TotalLapTime = MyResults->BestLapTime;
 
 	if (MyResults->First) // First race was done using the initial parameters
 	{
 		// First race is done with the initial parameters to get the reference laptime
-		GfLogOpt("# Initial Lap Time : %g\n",TotalLapTime);
+		GfLogOpt("Initial Lap Time : %g\n",TotalLapTime);
 
 		// Get range for number of parameters to select for variation
 		MyResults->MaxSelected = MIN(8,MyResults->NbrOfParam);
@@ -1476,13 +1478,15 @@ ReEvolution(double Scale)
 	}
 	else
 	{
-		GfLogOpt("# Total Lap Time   : %g\n",TotalLapTime);
+		// Count the loops
+		OptiCounter++;
 	}
 
 	/* Optimisation */
 	if (TotalLapTime < MyResults->BestTotalLapTime)
 	{
 		Status = 2; // New opt
+		GfLogOpt("New best Lap Time: %g\n",TotalLapTime);
 
 		MyResults->BestTotalLapTime = TotalLapTime;
 		MyResults->LastWeightedBestLapTime = MyResults->WeightedBestLapTime;
@@ -1499,14 +1503,17 @@ ReEvolution(double Scale)
 		snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.opt",
 		  MyResults->RobotName,MyResults->CarType,MyResults->TrackName);
 		GfParmWriteFileSDHeader (buf, Handle, MyResults->CarType, "Wolf-Dieter Beelitz");
+		GfLogOpt("Stored to .opt\n");
 	}
 	else if (0.99 * TotalLapTime < MyResults->BestTotalLapTime)
 	{
 		Status = 1; // Next try based on the last parameters
+		GfLogOpt("Total Lap Time   : %g\n",TotalLapTime);
 	}
 	else
 	{
 		Status = 0; // Next try based on the last optimal parameters
+		GfLogOpt("Total Lap Time   : %g\n",TotalLapTime);
 
 		MyResults->DamagesTotal = MyResults->LastDamagesTotal;	
 		MyResults->WeightedBestLapTime = MyResults->LastWeightedBestLapTime;
@@ -1517,8 +1524,8 @@ ReEvolution(double Scale)
 		for (int I = 0; I < MyResults->NextIdx; I++)
 			MyResults->GP[I]->Val = MyResults->GP[I]->OptVal;
 
-		GfLogOpt("# Back to last .opt\n");
-		GfLogOpt("# Old Best Lap Time: %g\n",MyResults->BestLapTime);
+		GfLogOpt("Back to last .opt\n");
+		GfLogOpt("Old Best Lap Time: %g\n",MyResults->BestLapTime);
 	}
 
 	if (MyResults->First)

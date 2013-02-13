@@ -28,7 +28,7 @@
 
 //  
 // Genetic parameters are handled in a single array 
-// (see TGeneticParameter** GP;).
+// (See TGeneticParameter** GP;).
 //
 // At start there are global parameters. 
 // Global parameters are car setup parameters like wing angles 
@@ -47,7 +47,7 @@
 // sections defined in a part.
 // 
 // To store these information we use a strucure per part.
-//
+// (See tgenPart).
 
 //
 // Forewarding of classes
@@ -184,11 +184,9 @@ class TGeneticParameter
 	int Set(	// Write meta data to the configuration file
 		const char* Part, int Index); 
 	int Get(	// Read meta data from the configuration file
-//		const char* Part, int Index); 
 		const char* Part = NULL); 
 
 	int GetVal(	// Read initial value from setup file
-//		void* SetupHandle, int Index = 0); 
 		void* SetupHandle, bool Local = false); 
 	int SetVal(	// Write data to car setup file 
 		void* SetupHandle, int Index = 0);
@@ -328,4 +326,3 @@ class TGeneticParameterTOC
 //==========================================================================*
 
 #endif /* __GENETIC_H__ */
-

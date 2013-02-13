@@ -79,10 +79,22 @@ TGeneticParameter::TGeneticParameter
 	Handle = MetaDataFile;
     Active = true;
 
-	oLabel = strdup(Label);
-	oSection = strdup(Section);
-	oParameter = strdup(Parameter);
-	if (Unit != 0)
+	if (Label)
+		oLabel = strdup(Label);
+	else
+		oLabel = NULL;
+
+	if (Section)
+		oSection = strdup(Section);
+	else
+		oSection = NULL;
+
+	if (Parameter)
+		oParameter = strdup(Parameter);
+	else
+		oParameter = NULL;
+
+	if (Unit)
 	  oUnit = strdup(Unit);
 	else
   	  oUnit = NULL;
@@ -189,23 +201,34 @@ int TGeneticParameter::Get(const char* Part)
 	char* Value = (char *) GfParmGetCurStr(Handle, ParamSection, "label", oLabel);
 	if (oLabel)
 		free((void *) oLabel);
-	oLabel = strdup(Value);
+	if (Value)
+		oLabel = strdup(Value);
+	else
+		oLabel = NULL;
 
 	Value = (char *) GfParmGetCurStr(Handle, ParamSection, "section", oSection);
 	if (oSection)
 		free((void *) oSection);
-	oSection = strdup(Value);
+	if (Value)
+		oSection = strdup(Value);
+	else
+		oSection = NULL;
 
 	Value = (char *) GfParmGetCurStr(Handle, ParamSection, "parameter", oParameter);
 	if (oParameter)
 		free((void *) oParameter);
-	oParameter = strdup(Value);
+	if (Value)
+		oParameter = strdup(Value);
+	else
+		oParameter = NULL;
 
 	Value = (char *) GfParmGetCurStr(Handle, ParamSection, "unit", oUnit);
 	if (oUnit)
 		free((void *) oUnit);
-	oUnit = strdup(Value);
-
+	if (Value)
+		oUnit = strdup(Value);
+	else
+		oUnit = NULL;
 
 	Min = GfParmGetCurNumMin(Handle, ParamSection, "range", oUnit, Min);
 	Max = GfParmGetCurNumMax(Handle, ParamSection, "range", oUnit, Max);
@@ -222,7 +245,6 @@ int TGeneticParameter::Get(const char* Part)
 };
 
 // Read initial value from setup file
-//int TGeneticParameter::GetVal(void* SetupHandle, int Index)
 int TGeneticParameter::GetVal(void* SetupHandle, bool Local)
 {
 	char ParamSection[64];
@@ -325,8 +347,15 @@ TGeneticParameterCounter::TGeneticParameterCounter
 {
 	Handle = MetaDataFile;
 
-	Label = strdup(ShortLabel);
-	Section = strdup(SectionName);
+	if (ShortLabel)
+		Label = strdup(ShortLabel);
+	else
+		Label = NULL;
+
+	if (SectionName)
+		Section = strdup(SectionName);
+	else
+		Section = NULL;
 
 	if (SubsectionName)
 		Subsection = strdup(SubsectionName);
@@ -384,22 +413,34 @@ int TGeneticParameterCounter::Get(int Index)
 	char* Value = (char *) GfParmGetStr(Handle, ParamSection, "name", Label);
 	if (Label)
 		free((void *) Label);
-	Label = strdup(Value);
+	if (Value)
+		Label = strdup(Value);
+	else
+		Label = NULL;
 
 	Value = (char *) GfParmGetStr(Handle, ParamSection, "section", NULL);
 	if (Section)
 		free((void *) Section);
-	Section = strdup(Value);
+	if (Value)
+		Section = strdup(Value);
+	else
+		Section = NULL;
 
 	Value = (char *) GfParmGetStr(Handle, ParamSection, "subsection", NULL);
 	if (Subsection)
 		free((void *) Subsection);
-	Subsection = strdup(Value);
+	if (Value)
+		Subsection = strdup(Value);
+	else
+		Subsection = NULL;
 
 	Value = (char *) GfParmGetStr(Handle, ParamSection, "parameter", NULL);
 	if (Parameter)
 		free((void *) Parameter);
-	Parameter = strdup(Value);
+	if (Value)
+		Parameter = strdup(Value);
+	else
+		Parameter = NULL;
 
 	Count = (int) GfParmGetNum(Handle, ParamSection, "counter", 0, (float) Count);
 
@@ -431,7 +472,10 @@ TGeneticParameterTOC::TGeneticParameterTOC
 )
 {
 	Handle = MetaDataFile;
-	Private = strdup(PrivateSection);
+	if (PrivateSection)
+		Private = strdup(PrivateSection);
+	else
+		Private = NULL;
 	GlobalParamCount = NbrOfGlobalParams;     
 	ParamsGroupCount = NbrOfParamsGroups;
 	WeightOfDamages = WeightDamages;
@@ -469,8 +513,14 @@ int TGeneticParameterTOC::Set()
 // Read table of content from configuration file 
 int TGeneticParameterTOC::Get() 
 {
-	Private = strdup(GfParmGetStr(Handle, 
-		"table of content", "private", "simplix private"));
+	char* Value = (char*) GfParmGetStr(Handle, 
+		"table of content", "private", "simplix private");
+	if (Private)
+		free(Private);
+	if (Value)
+		Private = strdup(Value);
+	else
+		Private = NULL;
 	GlobalParamCount = (int) GfParmGetNum(Handle, 
 		"table of content", "global param count", 0, (float) GlobalParamCount);
 	ParamsGroupCount = (int) GfParmGetNum(Handle, 
