@@ -82,8 +82,8 @@
       <attstr name="unit" val="kN/m"/>
       <attnum name="range" min="0" max="50" unit="kN/m" val="10"/>
       <attnum name="weight" val="2"/>
-      <attnum name="scale" val="500"/>
-      <attnum name="round" val="1"/>
+      <attnum name="scale" val="5"/>
+      <attnum name="round" val="100"/>
     </section>
 
     <section name="Car parameter 4">
@@ -94,8 +94,8 @@
       <attstr name="unit" val="kN/m"/>
       <attnum name="range" min="0" max="50" unit="kN/m" val="18"/>
       <attnum name="weight" val="2"/>
-      <attnum name="scale" val="500"/>
-      <attnum name="round" val="1"/>
+      <attnum name="scale" val="5"/>
+      <attnum name="round" val="100"/>
     </section>
 
     <section name="Car parameter 5">
@@ -107,8 +107,8 @@
       <attstr name="unit" val="kN/m"/>
       <attnum name="range" min="10" max="300" unit="kN/m" val="63.40"/>
       <attnum name="weight" val="2"/>
-      <attnum name="scale" val="100"/>
-      <attnum name="round" val="1"/>
+      <attnum name="scale" val="1"/>
+      <attnum name="round" val="100"/>
     </section>
 
     <section name="Car parameter 6">
@@ -120,8 +120,8 @@
       <attstr name="unit" val="kN/m/s"/>
       <attnum name="range" min="1" max="100" unit="kN/m/s" val="9.3"/>
       <attnum name="weight" val="2"/>
-      <attnum name="scale" val="20"/>
-      <attnum name="round" val="1"/>
+      <attnum name="scale" val="0.2"/>
+      <attnum name="round" val="100"/>
     </section>
 
     <section name="Car parameter 7">
@@ -133,8 +133,8 @@
       <attstr name="unit" val="kN/m/s"/>
       <attnum name="range" min="1" max="100" unit="kN/m/s" val="14.3"/>
       <attnum name="weight" val="2"/>
-      <attnum name="scale" val="20"/>
-      <attnum name="round" val="1"/>
+      <attnum name="scale" val="0.2"/>
+      <attnum name="round" val="100"/>
     </section>
 
     <section name="Car parameter 8">
@@ -146,8 +146,8 @@
       <attstr name="unit" val="kN/m/s"/>
       <attnum name="range" min="1" max="100" unit="kN/m/s" val="2.1"/>
       <attnum name="weight" val="2"/>
-      <attnum name="scale" val="20"/>
-      <attnum name="round" val="1"/>
+      <attnum name="scale" val="0.2"/>
+      <attnum name="round" val="100"/>
     </section>
 
     <section name="Car parameter 9">
@@ -159,8 +159,8 @@
       <attstr name="unit" val="kN/m/s"/>
       <attnum name="range" min="1" max="100" unit="kN/m/s" val="4.8"/>
       <attnum name="weight" val="2"/>
-      <attnum name="scale" val="20"/>
-      <attnum name="round" val="1"/>
+      <attnum name="scale" val="0.2"/>
+      <attnum name="round" val="100"/>
     </section>
 
     <section name="Car parameter 10">
@@ -172,8 +172,8 @@
       <attstr name="unit" val="kN/m"/>
       <attnum name="range" min="10" max="300" unit="kN/m" val="53.4"/>
       <attnum name="weight" val="2"/>
-      <attnum name="scale" val="100"/>
-      <attnum name="round" val="1"/>
+      <attnum name="scale" val="1"/>
+      <attnum name="round" val="100"/>
     </section>
 
     <section name="Car parameter 11">
@@ -185,8 +185,8 @@
       <attstr name="unit" val="kN/m/s"/>
       <attnum name="range" min="1" max="100" unit="kN/m/s" val="7.7"/>
       <attnum name="weight" val="2"/>
-      <attnum name="scale" val="20"/>
-      <attnum name="round" val="1"/>
+      <attnum name="scale" val="0.2"/>
+      <attnum name="round" val="100"/>
     </section>
 
     <section name="Car parameter 12">
@@ -198,8 +198,8 @@
       <attstr name="unit" val="kN/m/s"/>
       <attnum name="range" min="1" max="100" unit="kN/m/s" val="11.8"/>
       <attnum name="weight" val="2"/>
-      <attnum name="scale" val="20"/>
-      <attnum name="round" val="1"/>
+      <attnum name="scale" val="0.2"/>
+      <attnum name="round" val="100"/>
     </section>
 
     <section name="Car parameter 13">
@@ -211,8 +211,8 @@
       <attstr name="unit" val="kN/m/s"/>
       <attnum name="range" min="1" max="100" unit="kN/m/s" val="2.6"/>
       <attnum name="weight" val="2"/>
-      <attnum name="scale" val="20"/>
-      <attnum name="round" val="1"/>
+      <attnum name="scale" val="0.2"/>
+      <attnum name="round" val="100"/>
     </section>
 
     <section name="Car parameter 14">
@@ -224,8 +224,8 @@
       <attstr name="unit" val="kN/m/s"/>
       <attnum name="range" min="1" max="100" unit="kN/m/s" val="3.9"/>
       <attnum name="weight" val="2"/>
-      <attnum name="scale" val="20"/>
-      <attnum name="round" val="1"/>
+      <attnum name="scale" val="0.2"/>
+      <attnum name="round" val="100"/>
     </section>
 
 	<!-- FROM HERE ON THE PARAMETERS MAY BE NOT AVAILABLE FOR THE CAR -->
@@ -310,7 +310,7 @@
     <section name="1">
       <!-- META DATA OF COUNTER OF PARAMETERS PER SECTION IN THIS PART -->
       <section name="counter">
-        <attnum name="active" val="1"/>
+        <attnum name="active" val="0"/>
         <attstr name="name" val="Track param count"/>
         <attstr name="section" val="simplix private"/>
         <attstr name="subsection" val="param seg"/>
