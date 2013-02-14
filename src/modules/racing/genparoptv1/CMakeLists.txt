@@ -13,7 +13,7 @@ SET(_HEADERS genparoptv1.h
              raceinit.h 
              racetrack.h raceresults.h racesimusimu.h 
              racestate.h racesituation.h racemessage.h
-             raceutil.h genetic.h geneticglobal.h)
+             raceutil.h genetic.h)
 SET(_OTHER_SOURCES )
 
 ADD_INTERFACE_INCLUDEDIR()

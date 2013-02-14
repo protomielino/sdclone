@@ -33,11 +33,11 @@
 #include "raceupdate.h"
 #include "raceresults.h"
 #include "portability.h"
-#include "genetic.h"
-#include "geneticglobal.h"
 
 #include "racestate.h"
 
+// State flag for run once initialisation
+bool genOptNeedInit = true;
 
 // State Automaton Init
 void
@@ -50,44 +50,12 @@ ReStateInit(void *prevMenu)
 void
 ReStateManage(void)
 {
-	if (genOptInit)
-	{
-      MyResults.TrackName = &(MyResults.TrackNameBuffer[0]);
-      MyResults.CarType = &(MyResults.CarTypeBuffer[0]);
-      MyResults.RobotName = &(MyResults.RobotNameBuffer[0]);
-
-      genLoops = 1000;
-
-	  //MyResults.QualifyingLapTime = FLT_MAX;
-	  MyResults.RaceLapTime = FLT_MAX;
-	  MyResults.BestTotalLapTime = FLT_MAX;
-
-	  MyResults.WeightedBestLapTime = FLT_MAX;
-	  MyResults.LastWeightedBestLapTime = FLT_MAX;
-
-	  MyResults.BestLapTime = FLT_MAX;
-	  MyResults.LastBestLapTime = FLT_MAX;
-
-	  MyResults.DamagesTotal = 0;
-	  MyResults.LastDamagesTotal = 0;
-
-	  MyResults.MinSpeed = FLT_MAX;
-	  MyResults.LastMinSpeed = FLT_MAX;
-
-	  MyResults.TopSpeed = 0;
-	  MyResults.LastTopSpeed = 0;
-
-	}
-
 	int mode = RM_SYNC | RM_NEXT_STEP;
 
 	do {
 		switch (ReInfo->_reState) {
 			case RE_STATE_CONFIG:
 				GfLogInfo("%s now in CONFIG state\n", ReInfo->_reName);
-				genOptimization = true;
-				if (genOptimization)
-					genLoops = 1;
 				// Race configuration
 				mode = ReConfigure();
 				if (mode & RM_NEXT_STEP) {
@@ -98,12 +66,6 @@ ReStateManage(void)
 			case RE_STATE_EVENT_INIT:
 				GfLogInfo("%s now in EVENT_INIT state\n", ReInfo->_reName);
 				// Load the event description (track and drivers list)
-//	if (OptiCounter2 == 4)
-//		_tgf_memCheck(false, true);
-//	if (OptiCounter2 == 6)
-//		_tgf_memCheck(false, false);
-//	OptiCounter2++;
-//	_tgf_memLoop(OptiCounter2);
 				mode = ReRaceEventInit();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_PRE_RACE;
@@ -125,64 +87,11 @@ ReStateManage(void)
 			case RE_STATE_RACE_START:
 				GfLogInfo("%s now in RACE_START state\n", ReInfo->_reName);
 				mode = ReRaceStart();
-				
-				if (genOptInit)
+				if (genOptNeedInit)
 				{
-				  genOptInit = false;
-
-				  // Setup pointer to car data and track, car type and robot name
-				  MyResults.car = ReInfo->s->cars[0];
-  			      snprintf(MyResults.TrackNameBuffer, sizeof(MyResults.TrackNameBuffer),
-					"%s", ReInfo->track->internalname);
-  			      snprintf(MyResults.CarTypeBuffer, sizeof(MyResults.CarTypeBuffer),
-					"%s", ReInfo->s->cars[0]->_carName);
-  			      snprintf(MyResults.RobotNameBuffer, sizeof(MyResults.RobotNameBuffer),
-					"%s", ReInfo->s->cars[0]->_teamname);
-                
-				  // Setup path to car setup file
-	              char buf[255];
-                  snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/%s.xml",
-		            GetLocalDir(),MyResults.RobotName,MyResults.CarType,MyResults.TrackName);
-                  MyResults.Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-				  MyResults.GetInitialVal = true;
-
-				  // In case the car setup file does not exist ...
-				  if (!MyResults.Handle)
-				  {
-				    // ... use default setup file ...
-   				    snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/default.xml",
-		              GetLocalDir(),MyResults.RobotName,MyResults.CarType);
-                    void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-
-					if (Handle) // ... if existing ...
-					{			// ... to create it.
-						snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
-						MyResults.RobotName,MyResults.CarType,MyResults.TrackName);
-						GfParmWriteFileSDHeader (buf, Handle, MyResults.CarType, "Wolf-Dieter Beelitz");
-					}
-					else		// ... else create an empty setup file
-					{			
-   					    snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/%s.xml",
-			              GetLocalDir(),MyResults.RobotName,MyResults.CarType,MyResults.TrackName);
-				        void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-
-						snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
-						MyResults.RobotName,MyResults.CarType,MyResults.TrackName);
-						GfParmWriteFileSDHeader (buf, Handle, MyResults.CarType, "Wolf-Dieter Beelitz");
-						MyResults.GetInitialVal = false;
-					}
-					GfParmReleaseHandle(Handle);
-
-					// Open created car type track setup file
-					snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/%s.xml",
-		              GetLocalDir(),MyResults.RobotName,MyResults.CarType,MyResults.TrackName);
-				    MyResults.Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-
-				  }
-
-  				  ReImportGeneticParameters(&MyResults);
+					ReInitialiseGeneticOptimisation();
+					genOptNeedInit = false;
 				}
-
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_NETWORK_WAIT;
 					GfLogInfo("%s now in NETWORK_WAIT state\n", ReInfo->_reName);
@@ -240,14 +149,15 @@ ReStateManage(void)
 
 			case RE_STATE_EVOLUTION:
 				GfLogInfo("RaceEngine: state = RE_STATE_EVOLUTION\n");
-				if (genOptimization)
-		  			mode = ReEvolution(genLoops * genLoops / 1000000.0);
-				if ((genOptimization) && (genLoops--))
+	  			mode = ReEvolution();
+				// Setup short cut
+				if (mode & RM_NEXT_STEP) {
 				  /* Back to optimization */
 				  ReInfo->_reState = RE_STATE_EVENT_INIT;
-				else
+				} else {
 				  /* Next step */
 				  ReInfo->_reState = RE_STATE_SHUTDOWN;
+				}
 				break;
 
 			case RE_STATE_EVENT_SHUTDOWN:
@@ -262,7 +172,7 @@ ReStateManage(void)
 
 			case RE_STATE_SHUTDOWN:
 				GfLogInfo("%s now in SHUTDOWN state\n", ReInfo->_reName);
-				ReEvolutionCleanup();
+				ReCleanupGeneticOptimisation();
 				// Back to the race manager menu
 				ReInfo->_reState = RE_STATE_CONFIG;
 				mode = RM_SYNC;
@@ -275,6 +185,7 @@ ReStateManage(void)
 				// TODO: Define another screen showing the error messages instead of
 				// only having it in the console window!
 				GfLogInfo("%s now in ERROR state\n", ReInfo->_reName);
+				ReCleanupGeneticOptimisation();
 				// Back to race manager menu
 				ReInfo->_reState = RE_STATE_CONFIG;
 				mode = RM_SYNC;

@@ -33,8 +33,7 @@
 //
 
 // Class variables
-bool TGeneticParameter::First = true;
-bool TGeneticParameter::FirstValue = true;
+tgenData TGeneticParameter::Data;	// Structure with all data
 
 // Default constructor
 TGeneticParameter::TGeneticParameter():
@@ -178,7 +177,7 @@ int TGeneticParameter::Set(const char* Part, int Index)
 };
 
 // Read parameter meta data from xml file
-int TGeneticParameter::Get(const char* Part)
+int TGeneticParameter::Get(bool First, const char* Part)
 {
 	char ParamSection[64];
 
@@ -245,17 +244,16 @@ int TGeneticParameter::Get(const char* Part)
 };
 
 // Read initial value from setup file
-int TGeneticParameter::GetVal(void* SetupHandle, bool Local)
+int TGeneticParameter::GetVal(void* SetupHandle, bool First, bool Local)
 {
 	char ParamSection[64];
 	sprintf(ParamSection,"%s",oSection);
 
 	if (Local)
 	{
-		if (FirstValue)
+		if (First)
 		{
 			GfParmListSeekFirst(Handle, ParamSection);
-			FirstValue = false;
 		}
 		else
 			GfParmListSeekNext(Handle, ParamSection);
@@ -320,13 +318,12 @@ int TGeneticParameter::SetVal(void* SetupHandle, int Index)
 
 
 //
-// Class Genetic Parameter Counter
+// Class Genetic Parameter Part
 //
 
 // Default constructor
-TGeneticParameterCounter::TGeneticParameterCounter():
+TGeneticParameterPart::TGeneticParameterPart():
 	Handle(0),
-	Count(0),
 	Label(NULL),
 	Section(NULL),
 	Subsection(NULL),
@@ -335,13 +332,12 @@ TGeneticParameterCounter::TGeneticParameterCounter():
 };
 
 // Constructor
-TGeneticParameterCounter::TGeneticParameterCounter
+TGeneticParameterPart::TGeneticParameterPart
 (
 	void* MetaDataFile,
 	const char *ShortLabel,
 	const char *SectionName,
 	const char *ParameterName,
-	int DefCount,
 	const char *SubsectionName
 )
 {
@@ -365,20 +361,14 @@ TGeneticParameterCounter::TGeneticParameterCounter
 	if (ParameterName)
 		Parameter = strdup(ParameterName);
 	else
-		Parameter = strdup("counter");
+		Parameter = strdup("track param count");
 
-	Def = DefCount;
 	Active = 0 < GfParmGetNum(Handle, 
 		Section, "active", 0, (float) Active);
-	Count = (int) GfParmGetNum(Handle, 
-		Section, Parameter, 0, (float) DefCount);
-
-	if (Count < 0)
-		Count = -Count;
 };
 
 // Destructor
-TGeneticParameterCounter::~TGeneticParameterCounter()
+TGeneticParameterPart::~TGeneticParameterPart()
 {
 	free ((void *) Label);
 	free ((void *) Section);
@@ -386,27 +376,26 @@ TGeneticParameterCounter::~TGeneticParameterCounter()
 	free ((void *) Parameter);
 };
 
-// Write counter meta data to xml file
-int TGeneticParameterCounter::Set(int Index)
+// Write meta data of part to xml file
+int TGeneticParameterPart::Set(int Index)
 {
 	char ParamSection[64];
-	sprintf(ParamSection,"part/%d/counter",Index);
+	sprintf(ParamSection,"part/%d/definition",Index);
 
 	GfParmSetNum(Handle, ParamSection, "active", 0, (float) Active);
 	GfParmSetStr(Handle, ParamSection, "name", Label);
 	GfParmSetStr(Handle, ParamSection, "section", Section);
 	GfParmSetStr(Handle, ParamSection, "subsection", Subsection);
 	GfParmSetStr(Handle, ParamSection, "parameter", Parameter);
-	GfParmSetNum(Handle, ParamSection, "counter", 0, (float) Count);
 
 	return 0;
 };
 
-// Read counter meta data from xml file
-int TGeneticParameterCounter::Get(int Index)
+// Read meta data of from xml file
+int TGeneticParameterPart::Get(int Index)
 {
 	char ParamSection[64];
-	sprintf(ParamSection,"part/%d/counter",Index);
+	sprintf(ParamSection,"part/%d/definition",Index);
 
 	Active = 0 < GfParmGetNum(Handle, ParamSection, "active", 0, (float) Active);
 
@@ -442,8 +431,6 @@ int TGeneticParameterCounter::Get(int Index)
 	else
 		Parameter = NULL;
 
-	Count = (int) GfParmGetNum(Handle, ParamSection, "counter", 0, (float) Count);
-
 	return 0;
 };
 
@@ -455,8 +442,11 @@ int TGeneticParameterCounter::Get(int Index)
 // Default constructor
 TGeneticParameterTOC::TGeneticParameterTOC():
 	Handle(0),
-	GlobalParamCount(0),     
-	ParamsGroupCount(0)
+	Private(NULL),
+	OptimisationLoops(1000),
+	ParamsGroupCount(0),
+	WeightOfDamages(1.0f),
+	GetInitialVal(true)
 {
 };        
 
@@ -465,7 +455,7 @@ TGeneticParameterTOC::TGeneticParameterTOC
 (
 	void* MetaDataFile,			// Handle to read/write data
 	char* PrivateSection,		// Name of private data section
-	int NbrOfGlobalParams,		// Number of global genetic parameters
+	int Loops,					// Number of optimisation loops
 	int NbrOfParamsGroups,		// Number of local parameters groups
 	float WeightDamages,		// Weight of damages
 	bool InitialVal				// get initial value from setup file
@@ -476,7 +466,7 @@ TGeneticParameterTOC::TGeneticParameterTOC
 		Private = strdup(PrivateSection);
 	else
 		Private = NULL;
-	GlobalParamCount = NbrOfGlobalParams;     
+	OptimisationLoops = Loops; 
 	ParamsGroupCount = NbrOfParamsGroups;
 	WeightOfDamages = WeightDamages;
 	GetInitialVal = InitialVal;
@@ -495,7 +485,7 @@ int TGeneticParameterTOC::Set()
 	GfParmSetStr(Handle, 
 		"table of content", "private", Private);
 	GfParmSetNum(Handle, 
-		"table of content", "global param count", 0, (float) GlobalParamCount);
+		"table of content", "optimisation loops", 0, (float) OptimisationLoops);
 	GfParmSetNum(Handle, 
 		"table of content", "params group count", 0, (float) ParamsGroupCount);
 	GfParmSetNum(Handle, 
@@ -521,8 +511,8 @@ int TGeneticParameterTOC::Get()
 		Private = strdup(Value);
 	else
 		Private = NULL;
-	GlobalParamCount = (int) GfParmGetNum(Handle, 
-		"table of content", "global param count", 0, (float) GlobalParamCount);
+	OptimisationLoops = (int) GfParmGetNum(Handle, 
+		"table of content", "optimisation loops", 0, (float) OptimisationLoops);
 	ParamsGroupCount = (int) GfParmGetNum(Handle, 
 		"table of content", "params group count", 0, (float) ParamsGroupCount);
 	WeightOfDamages = GfParmGetNum(Handle, 

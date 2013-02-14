@@ -40,9 +40,10 @@ extern int  ReRaceEnd();
 extern int  RePostRace();
 extern int  ReRaceEventShutdown();
 
-extern void ReImportGeneticParameters(tgenResult* MyResults);
-extern int  ReEvolution(double Scale);
-extern void ReEvolutionCleanup();
+extern void ReInitialiseGeneticOptimisation();
+extern void ReImportGeneticParameters();
+extern int  ReEvolution();
+extern void ReCleanupGeneticOptimisation();
 
 extern void ReRaceAbandon();
 extern void ReRaceAbort();
