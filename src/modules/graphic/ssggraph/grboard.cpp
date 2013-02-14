@@ -32,6 +32,7 @@
 #include "grcar.h"        // grCarInfo
 #include "grutil.h"       // grWriteTime
 #include "grloadac.h"     // grssgSetCurrentOptions
+#include "grscreen.h"
 
 using std::string;
 
@@ -231,11 +232,20 @@ cGrBoard::grDispDebug(const tSituation *s, const cGrFrameInfo* frame)
     snprintf(buf, sizeof(buf),  "Frm: %u", frame->nTotalFrames);
     GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, x2, y);
 
-    // Display simulation time in 2nd row, 1st column
+    // Display current fovy in 2nd row, 1st column
     y -= dy;
-    snprintf(buf, sizeof(buf),  "Time: %.f", s->currentTime);
-    GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, x, y);
+    cGrScreen *curScreen = grGetCurrentScreen();
+    if (curScreen) {
+      cGrCamera *curCam = curScreen->getCurCamera();
+      if (curCam) {
+        snprintf(buf, sizeof(buf), "FovY: %2.1f", curCam->getFovY());
+        GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, x, y);
+      }
+    }
 
+    // Display simulation time in 2nd row, 2nd column
+    snprintf(buf, sizeof(buf),  "Time: %.f", s->currentTime);
+    GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, x2, y);
   } else if (debugFlag == 3) {
     // Only display detailed information in Debug Mode > 1
     // Display segment name in 2nd column
