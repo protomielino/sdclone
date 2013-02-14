@@ -147,7 +147,7 @@
     <attnum name="pit test stop" min="0" max="1" val="0"/>
     <attnum name="qualification" min="0" max="1" val="0"/>
     <attnum name="reserve" unit="m" min="0" max="20000" val="2000"/>
-    <attnum name="start fuel" min="-1" max="100" val="-1"/>
+    <attnum name="start fuel" min="-1" max="100" val="100"/>
     <attnum name="fuelper100km" min="1" max="100" val="80"/>
     <attnum name="accel out" min="0" max="1" val="1"/>
     <attnum name="base mode" min="0.5" max="1.5" val="0.98"/>
