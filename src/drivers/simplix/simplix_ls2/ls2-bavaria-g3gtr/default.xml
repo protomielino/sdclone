@@ -185,7 +185,7 @@
 
             <!-- Use this parameters to setup the car's fuel strategy -->
 		<attnum name="reserve" unit="m" min="0.0" max="20000.0" val="2000"/>
-		<attnum name="start fuel" min="-1" max="60.0" val="-1"/>
+		<attnum name="start fuel" min="-1" max="100.0" val="-1"/>
 		<attnum name="fuelper100km" min="1.0" max="100.0" val="80.0"/>
 
             <!-- Use the parameters below to tune the robots 
