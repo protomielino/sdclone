@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file    networkin
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -27,7 +27,6 @@
 #include <portability.h>
 
 #include <robot.h>
-#include <network.h>
 #include <time.h>
 #include <car.h>
 
@@ -35,7 +34,6 @@
 
 #include "raceutil.h" // RmGetFeaturesList
 #include "racesituation.h"
-#include "racecareer.h"
 #include "raceinit.h"
 #include "raceupdate.h"
 #include "raceresults.h"
@@ -128,9 +126,6 @@ void ReRaceAbort()
 
 	ReRaceCleanDrivers();
 
-	if (NetGetNetwork())
-		NetGetNetwork()->Disconnect();
-
 	FREEZ(ReInfo->_reCarInfo);
 	
 	if (ReInfo->params != ReInfo->mainParams)
@@ -154,35 +149,6 @@ ReRaceEventInit(void)
 	void *mainParams = ReInfo->mainParams;
 	void *params = ReInfo->params;
 
-	const bool careerMode = strcmp(GfParmGetStr(ReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES) == 0;
-	
-	/* Career mode : Look if it is necessary to open another file */
-	if (strcmp(GfParmGetStr(mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES) == 0)
-	{
-		/* Close previous params */
-		if (params != mainParams)
-			GfParmReleaseHandle(params);
-
-		/* Read the new params */
-		ReInfo->params = GfParmReadFile( GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
-		GfLogTrace("Career : New params file is %s (from main results file)\n",
-				   GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, ""));
-		if (!ReInfo->params)
-			GfLogWarning( "Career : MainResults params weren't read correctly\n" );
-
-		/* Close previous results */
-		if (ReInfo->results != ReInfo->mainResults)
-		{
-			GfParmWriteFile(NULL, ReInfo->results, NULL);
-			GfParmReleaseHandle(ReInfo->results);
-		}
-
-		/* Read the new results */
-		ReInfo->results = GfParmReadFile( GfParmGetStr( ReInfo->params, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, ""), GFPARM_RMODE_STD );
-		if (!ReInfo->results)
-			GfLogWarning( "Career : New results weren't read correctly\n" );
-	}
-
 	// Initialize the race session name.
 	ReInfo->_reRaceName = ReGetCurrentRaceName();
 	GfLogInfo("Starting new event (%s session)\n", ReInfo->_reRaceName);
@@ -195,9 +161,7 @@ ReRaceEventInit(void)
 	
 	ReEventInitResults();
 
-	const bool bGoOnLooping = ReUI().onRaceEventStarting(careerMode && !ReHumanInGroup());
-
-	return (bGoOnLooping ? RM_SYNC : RM_ASYNC) | RM_NEXT_STEP;
+	return RM_SYNC | RM_NEXT_STEP;
 }
 
 /* parse advanced starting order strings */
@@ -756,10 +720,7 @@ ReRaceRealStart(void)
 	// More initializations.
 	ReInfo->_reTimeMult = 1.0;
 	ReInfo->_reLastRobTime = -1.0;
-	if (NetGetNetwork())
-		ReInfo->s->currentTime = GfTimeClock() - NetGetNetwork()->GetRaceStartTime();
-	else
-		ReInfo->s->currentTime = -2.0;	// We start 2 seconds before the real race start
+	ReInfo->s->currentTime = -2.0;	// We start 2 seconds before the real race start
 	ReInfo->s->deltaTime = RCM_MAX_DT_SIMU;
 	ReInfo->s->_raceState = RM_RACE_STARTING;
 
@@ -773,15 +734,6 @@ ReRaceRealStart(void)
 
 	// Notify the UI that the race simulation is ready now.
 	ReUI().onRaceSimulationReady();
-
-	// Initialize the network if needed.
-	if (NetGetNetwork())
-	{
-		ReUI().addLoadingMessage("Preparing online race ...");
-		
-		NetGetNetwork()->RaceInit(ReOutputSituation()->s);
-		NetGetNetwork()->SetRaceActive(true);
-	}
 
 	// Notify the UI that the race is now started.
 	ReUI().addLoadingMessage("Ready.");
@@ -965,9 +917,6 @@ ReRaceEnd(void)
 	
 	ReRaceCleanup();
 
-	if (NetGetNetwork())
-		NetGetNetwork()->RaceDone();
-
 	// If we are at the end of a qualification or practice session for a competitor,
 	// select the next competitor : it is his turn for the same session.
 	// If no more competitor, this is the end of the session for all the competitors.
@@ -1040,13 +989,12 @@ RePostRace(void)
 int
 ReRaceEventShutdown(void)
 {
-	char buf[64];
 	int curTrkIdx;
 	void *params = ReInfo->params;
 	int nbTrk;
 	void *results = ReInfo->results;
 	int curRaceIdx;
-	bool careerMode = false;
+//	bool careerMode = false;
 	bool first = true;
 
 	// Notify the UI that the race event is finishing now.
@@ -1056,85 +1004,28 @@ ReRaceEventShutdown(void)
 	ReTrackShutdown();
 
 	// Determine the track of the next event to come, if not the last one
-	// and, if Career mode, prepare race params / results for the next event or season.
-	do {
-		nbTrk = GfParmGetEltNb(params, RM_SECT_TRACKS);
-		curRaceIdx =(int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
-		curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
+	nbTrk = GfParmGetEltNb(params, RM_SECT_TRACKS);
+	curRaceIdx =(int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
+	curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
 
-		if (curRaceIdx == 1) {
-			if (curTrkIdx < nbTrk) {
-				// Next track.
-				curTrkIdx++;
-			} else if (curTrkIdx >= nbTrk) {
-				// Back to the beginning.
-				curTrkIdx = 1;
-			}
+	if (curRaceIdx == 1) {
+		if (curTrkIdx < nbTrk) {
+			// Next track.
+			curTrkIdx++;
+		} else if (curTrkIdx >= nbTrk) {
+			// Back to the beginning.
+			curTrkIdx = 1;
 		}
+	}
 
-		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, (tdble)curTrkIdx);
-
-		// Career mode.
-		if (!strcmp(GfParmGetStr(ReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES)) {
-			careerMode = true;
-			const bool lastRaceOfRound = strcmp(GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_LASTSUBFILE, RM_VAL_YES), RM_VAL_YES) == 0;
-
-			// Previous file <= Current file.
-			GfParmSetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_PREV_FILE,
-						 GfParmGetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, ""));
-			// Current file <= Next file.
-			GfParmSetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE,
-						 GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_NEXTSUBFILE, ""));
-			
-			GfParmWriteFile(NULL, ReInfo->mainResults, NULL);
-			
-			/* Check if the next competition has a free weekend */
-			if( !first ) {
-				/* Close old params */
-				GfParmWriteFile( NULL, results, NULL );
-				GfParmReleaseHandle( results );
-				GfParmReleaseHandle( params );
-			}//if !first
-			
-			/* Open params of next race */
-			params = GfParmReadFile( GfParmGetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
-			if( !params )
-				break;
-			results = GfParmReadFile( GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, ""), GFPARM_RMODE_STD );
-			if( !results ) {
-				GfParmReleaseHandle( results );
-				break;
-			}
-	
-			if (lastRaceOfRound && curTrkIdx == 1) {
-				ReCareerNextSeason();
-			}
-			if ((int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1) == 1) {
-				GfParmListClean(results, RE_SECT_STANDINGS);
-				GfParmWriteFile(NULL, results, NULL);
-			}
-	
-			/* Check if it is free */
-			snprintf( buf, sizeof(buf), "%s/%d", RM_SECT_TRACKS,
-					  (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1) );
-			if( !strcmp(GfParmGetStr(params, buf, RM_ATTR_NAME, "free"), "free") == 0) {
-				/* Not a free weekend */
-				GfParmReleaseHandle( results );
-				GfParmReleaseHandle( params );
-				break;
-			}
-			first = false;
-		} else {
-			// Normal mode (no subfiles, so free weekends possible, so nothing to check)
-			break;
-		}
-	} while( true );
+	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, (tdble)curTrkIdx);
 
 	// Determine new race state automaton mode.
-	int mode = (curTrkIdx != 1 || careerMode) ? RM_NEXT_RACE : RM_NEXT_STEP;
-	bool careerNonHumanGroup = careerMode && !ReHumanInGroup();
+	int mode = (curTrkIdx != 1) ? RM_NEXT_RACE : RM_NEXT_STEP;
 
-	mode |= ReUI().onRaceEventFinished(nbTrk != 1, careerNonHumanGroup) ? RM_SYNC : RM_ASYNC;;
+	//mode |= ReUI().onRaceEventFinished(nbTrk != 1, careerNonHumanGroup) ? RM_SYNC : RM_ASYNC;;
+
+	mode |= RM_SYNC;
 	
 	if (mode & RM_NEXT_STEP)
 		FREEZ(ReInfo->_reCarInfo);
@@ -1542,7 +1433,8 @@ ReEvolution()
 	if (TotalLapTime < Data->BestTotalLapTime)
 	{
 		Status = 2; // New opt
-		GfLogOpt("New best Lap Time: %g\n",TotalLapTime);
+		if (!Data->First)
+			GfLogOpt("New best Lap Time: %g\n",TotalLapTime);
 
 		Data->BestTotalLapTime = TotalLapTime;
 		Data->LastWeightedBestLapTime = Data->WeightedBestLapTime;

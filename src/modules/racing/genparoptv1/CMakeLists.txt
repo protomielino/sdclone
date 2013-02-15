@@ -3,13 +3,13 @@ INCLUDE(../../../../cmake/macros.cmake)
 #PROJECT(genparoptv1)
 
 SET(_SOURCES genparoptv1.cpp
-             racecareer.cpp raceupdate.cpp racenetwork.cpp racecars.cpp
+             racecareer.cpp raceupdate.cpp racecars.cpp
              raceinit.cpp racemain.cpp
              racetrack.cpp raceresults.cpp racesimusimu.cpp 
              racestate.cpp racesituation.cpp racemessage.cpp
              raceutil.cpp genetic.cpp)
 SET(_HEADERS genparoptv1.h 
-             racecareer.h raceupdate.h racenetwork.h racecars.h
+             racecareer.h raceupdate.h racecars.h
              raceinit.h 
              racetrack.h raceresults.h racesimusimu.h 
              racestate.h racesituation.h racemessage.h
@@ -18,7 +18,7 @@ SET(_OTHER_SOURCES )
 
 ADD_INTERFACE_INCLUDEDIR()
 
-ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfdata networking)
+ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfdata)
 
 ADD_PLIB_INCLUDEDIR()
 ADD_SDL_INCLUDEDIR()
@@ -48,6 +48,6 @@ IF(UNIX OR MINGW)
     SET_TARGET_PROPERTIES(genparoptv1 PROPERTIES PREFIX "")
 ENDIF(UNIX OR MINGW)
 
-ADD_SDLIB_LIBRARY(genparoptv1 portability tgf tgfdata robottools networking)
+ADD_SDLIB_LIBRARY(genparoptv1 portability tgf tgfdata robottools)
 
 SD_INSTALL_FILES(LIB modules/racing TARGETS genparoptv1)

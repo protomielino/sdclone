@@ -27,7 +27,6 @@
 
 #include <portability.h>
 #include <raceman.h>
-#include <network.h>
 #include <robot.h>
 #include <robottools.h>
 #include <teammanager.h>
@@ -539,9 +538,6 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					//        and is thus considered a real lap, whereas it is not).
 					car->_laps++;
 
-					if (NetGetNetwork())
-						NetGetNetwork()->SendLapStatusPacket(car);
-
 					car->_remainingLaps--;
 					if (car->_pos == 1 && s->currentTime < s->_totTime
 						&& s->_raceType == RM_TYPE_RACE)
@@ -635,10 +631,6 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 								snprintf(msg, sizeof(msg), "Winner %s", car->_name);
 								msg[sizeof(msg)-1] = 0; // Some snprintf implementations fail to do so.
 								ReSituation::self().setRaceMessage(msg, 10, /*big=*/true);
-								if (NetGetServer())
-								{
-									NetGetServer()->SetFinishTime(s->currentTime+FINISHDELAY);
-								}
 							} else {
 								const char *numSuffix = "th";
 								if (abs(12 - car->_pos) > 1) { /* leave suffix as 'th' for 11 to 13 */

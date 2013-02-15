@@ -29,7 +29,6 @@
 #include "racesituation.h"
 #include "racemain.h"
 #include "raceinit.h"
-#include "racenetwork.h"
 #include "raceupdate.h"
 #include "raceresults.h"
 #include "portability.h"
@@ -93,15 +92,6 @@ ReStateManage(void)
 					genOptNeedInit = false;
 				}
 				if (mode & RM_NEXT_STEP) {
-					ReInfo->_reState = RE_STATE_NETWORK_WAIT;
-					GfLogInfo("%s now in NETWORK_WAIT state\n", ReInfo->_reName);
-				}
-				break;
-
-			case RE_STATE_NETWORK_WAIT:
-				mode = ReNetworkWaitReady();
-				if (mode & RM_NEXT_STEP) {
-					// Not an online race, or else all online players ready
 					ReInfo->_reState = RE_STATE_RACE;
 					GfLogInfo("%s now in RACE state\n", ReInfo->_reName);
 				}

@@ -30,7 +30,6 @@
 #include <SDL_thread.h>
 
 #include <portability.h>
-#include <network.h>
 #include <robot.h>
 #include <raceman.h>
 
@@ -41,7 +40,6 @@
 
 #include "raceresults.h"
 #include "racemessage.h"
-#include "racenetwork.h"
 
 
 // The singleton.
@@ -227,22 +225,6 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 	// Race messages life cycle management.
 	ReRaceMsgManage(pCurrReInfo);
 	
-	if (NetGetNetwork())
-	{
-		// Resync clock in case computer falls behind
-		if (s->currentTime < 0.0)
-		{
-			s->currentTime = GfTimeClock() - NetGetNetwork()->GetRaceStartTime();
-		}
-
-		if (s->currentTime < -2.0)
-		{
-			std::ostringstream ossMsg;
-			ossMsg << "Race will start in " << -(int)s->currentTime << " seconds";
-			ReRaceMsgSetBig(pCurrReInfo, ossMsg.str().c_str());
-		}
-	}
-
 	//GfLogDebug("ReSituationUpdater::runOneStep: currTime=%.3f\n", s->currentTime);
 	if (s->currentTime >= -2.0 && s->currentTime < deltaTimeIncrement - 2.0) {
 		ReRaceMsgSetBig(pCurrReInfo, "Ready", 1.0);
@@ -311,10 +293,6 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 	}
 	GfSchedEndEvent("raceupdate", "robots");
 	GfProfStopProfile("rbDrive*");
-
-
-	if (NetGetNetwork())
-		ReNetworkOneStep();
 
 	GfProfStartProfile("physicsEngine.update*");
 	GfSchedBeginEvent("raceupdate", "physics");
@@ -399,9 +377,6 @@ int ReSituationUpdater::threadLoop()
 		
 			GfProfStopProfile("reOneStep*");
 		
-			// Send car physics to network if needed
-			if (NetGetNetwork())
-				NetGetNetwork()->SendCarControlsPacket(pCurrReInfo->s);
 		}
 		
 		// 3) If not time to terminate, and not running, do nothing.
@@ -919,9 +894,6 @@ void ReSituationUpdater::computeCurrentStep()
 
 	GfProfStopProfile("reOneStep*");
 		
-	// Send car physics to network if needed
-	if (NetGetNetwork())
-		NetGetNetwork()->SendCarControlsPacket(pCurrReInfo->s);
 }
 
 bool ReSituationUpdater::setSchedulingSpecs(double fSimuRate, double fOutputRate)

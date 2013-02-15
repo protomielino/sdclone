@@ -22,8 +22,6 @@
     @version	$Id$
 */
 
-#include <network.h>
-
 #include "genparoptv1.h"
 
 #include "racesituation.h"

@@ -35,7 +35,6 @@
 #include "raceresults.h"
 #include "racesimusimu.h"
 #include "racesituation.h"
-#include "racenetwork.h"
 
 #include "raceupdate.h"
 
@@ -100,8 +99,6 @@ int reMainUpdater::operator()(void)
 	{
 		_pSituationUpdater->runOneStep(RCM_MAX_DT_SIMU);
     }
-
-	ReNetworkCheckEndOfRace();
 
 	GfProfStopProfile("ReUpdate");
 
