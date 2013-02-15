@@ -157,21 +157,21 @@ int TGeneticParameter::Set(const char* Part, int Index)
 {
 	char ParamSection[64];
 	if (Part == NULL)
-	  sprintf(ParamSection,"global/%d",Index);
+	  sprintf(ParamSection,"%s/%d",SECT_GLOBAL,Index);
 	else
 	  sprintf(ParamSection,"%s/%d",Part,Index);
 
-	GfParmSetNum(Handle, ParamSection, "active", 0, (float) Active);
-	GfParmSetNum(Handle, ParamSection, "twosided", 0, (float) LeftRight);
+	GfParmSetNum(Handle, ParamSection, PRM_ACTIVE, 0, (float) Active);
+	GfParmSetNum(Handle, ParamSection, PRM_TWOSIDE, 0, (float) LeftRight);
 
-	GfParmSetStr(Handle, ParamSection, "label", oLabel);
-	GfParmSetStr(Handle, ParamSection, "section", oSection);
-	GfParmSetStr(Handle, ParamSection, "parameter", oParameter);
-	GfParmSetStr(Handle, ParamSection, "unit", oUnit);
-	GfParmSetNumEx(Handle, ParamSection, "range", oUnit, Val, Min, Max);
-	GfParmSetNum(Handle, ParamSection, "weight", 0, Weight);
-	GfParmSetNum(Handle, ParamSection, "scale", 0, Scale);
-	GfParmSetNum(Handle, ParamSection, "round", 0, Round);
+	GfParmSetStr(Handle, ParamSection, PRM_LABEL, oLabel);
+	GfParmSetStr(Handle, ParamSection, PRM_SECT, oSection);
+	GfParmSetStr(Handle, ParamSection, PRM_PRM, oParameter);
+	GfParmSetStr(Handle, ParamSection, PRM_UNIT, oUnit);
+	GfParmSetNumEx(Handle, ParamSection, PRM_RANGE, oUnit, Val, Min, Max);
+	GfParmSetNum(Handle, ParamSection, PRM_WEIGHT, 0, Weight);
+	GfParmSetNum(Handle, ParamSection, PRM_SCALE, 0, Scale);
+	GfParmSetNum(Handle, ParamSection, PRM_ROUND, 0, Round);
 
 	return 0;
 };
@@ -182,7 +182,7 @@ int TGeneticParameter::Get(bool First, const char* Part)
 	char ParamSection[64];
 
 	if (Part == NULL)
-	  sprintf(ParamSection,"global");
+	  sprintf(ParamSection,SECT_GLOBAL);
 	else
 	  sprintf(ParamSection,"%s",Part);
 
@@ -194,10 +194,10 @@ int TGeneticParameter::Get(bool First, const char* Part)
 	else
 		GfParmListSeekNext(Handle, ParamSection);
 
-	Active = 0 < GfParmGetCurNum(Handle, ParamSection, "active", 0, 1);
-	LeftRight = 0 < GfParmGetCurNum(Handle, ParamSection, "twosided", 0, 0);
+	Active = 0 < GfParmGetCurNum(Handle, ParamSection, PRM_ACTIVE, 0, 1);
+	LeftRight = 0 < GfParmGetCurNum(Handle, ParamSection, PRM_TWOSIDE, 0, 0);
 
-	char* Value = (char *) GfParmGetCurStr(Handle, ParamSection, "label", oLabel);
+	char* Value = (char *) GfParmGetCurStr(Handle, ParamSection, PRM_LABEL, oLabel);
 	if (oLabel)
 		free((void *) oLabel);
 	if (Value)
@@ -205,7 +205,7 @@ int TGeneticParameter::Get(bool First, const char* Part)
 	else
 		oLabel = NULL;
 
-	Value = (char *) GfParmGetCurStr(Handle, ParamSection, "section", oSection);
+	Value = (char *) GfParmGetCurStr(Handle, ParamSection, PRM_SECT, oSection);
 	if (oSection)
 		free((void *) oSection);
 	if (Value)
@@ -213,7 +213,7 @@ int TGeneticParameter::Get(bool First, const char* Part)
 	else
 		oSection = NULL;
 
-	Value = (char *) GfParmGetCurStr(Handle, ParamSection, "parameter", oParameter);
+	Value = (char *) GfParmGetCurStr(Handle, ParamSection, PRM_PRM, oParameter);
 	if (oParameter)
 		free((void *) oParameter);
 	if (Value)
@@ -221,7 +221,7 @@ int TGeneticParameter::Get(bool First, const char* Part)
 	else
 		oParameter = NULL;
 
-	Value = (char *) GfParmGetCurStr(Handle, ParamSection, "unit", oUnit);
+	Value = (char *) GfParmGetCurStr(Handle, ParamSection, PRM_UNIT, oUnit);
 	if (oUnit)
 		free((void *) oUnit);
 	if (Value)
@@ -229,13 +229,13 @@ int TGeneticParameter::Get(bool First, const char* Part)
 	else
 		oUnit = NULL;
 
-	Min = GfParmGetCurNumMin(Handle, ParamSection, "range", oUnit, Min);
-	Max = GfParmGetCurNumMax(Handle, ParamSection, "range", oUnit, Max);
-	Val = GfParmGetCurNum(Handle, ParamSection, "range", oUnit, Val);
+	Min = GfParmGetCurNumMin(Handle, ParamSection, PRM_RANGE, oUnit, Min);
+	Max = GfParmGetCurNumMax(Handle, ParamSection, PRM_RANGE, oUnit, Max);
+	Val = GfParmGetCurNum(Handle, ParamSection, PRM_RANGE, oUnit, Val);
 
-	Weight = GfParmGetCurNum(Handle, ParamSection, "weight", 0, Weight);
-	Scale = GfParmGetCurNum(Handle, ParamSection, "scale", 0, Scale);
-	Round = GfParmGetCurNum(Handle, ParamSection, "round", 0, Round);
+	Weight = GfParmGetCurNum(Handle, ParamSection, PRM_WEIGHT, 0, Weight);
+	Scale = GfParmGetCurNum(Handle, ParamSection, PRM_SCALE, 0, Scale);
+	Round = GfParmGetCurNum(Handle, ParamSection, PRM_ROUND, 0, Round);
 
     Range = Max - Min;
 	Def = LastVal = OptVal = Val;
@@ -261,10 +261,10 @@ int TGeneticParameter::GetVal(void* SetupHandle, bool First, bool Local)
 		if (LeftRight)
 		{
 			char SideParam[64];
-			sprintf(SideParam,ParamSection,"Left");
+			sprintf(SideParam,ParamSection,SECT_PH_LEFT);
 			Val = GfParmGetCurNum(SetupHandle, SideParam, oParameter, oUnit, Val);
 
-			sprintf(SideParam,ParamSection,"Right");
+			sprintf(SideParam,ParamSection,SECT_PH_RGHT);
 			Val = (Val + GfParmGetCurNum(SetupHandle, SideParam, oParameter, oUnit, Val)) / 2;
 
 		}
@@ -277,10 +277,10 @@ int TGeneticParameter::GetVal(void* SetupHandle, bool First, bool Local)
 		if (LeftRight)
 		{
 			char SideParam[64];
-			sprintf(SideParam,ParamSection,"Left");
+			sprintf(SideParam,ParamSection,SECT_PH_LEFT);
 			Val = GfParmGetNum(SetupHandle, SideParam, oParameter, oUnit, Val);
 
-			sprintf(SideParam,ParamSection,"Right");
+			sprintf(SideParam,ParamSection,SECT_PH_RGHT);
 			Val = (Val + GfParmGetNum(SetupHandle, SideParam, oParameter, oUnit, Val)) / 2;
 
 		}
@@ -306,10 +306,10 @@ int TGeneticParameter::SetVal(void* SetupHandle, int Index)
 	{
 		char SideParam[64];
 
-		sprintf(SideParam,ParamSection,"Left");
+		sprintf(SideParam,ParamSection,SECT_PH_LEFT);
 		GfParmSetNumEx(SetupHandle, SideParam, oParameter, oUnit, Val, Min, Max);
 
-		sprintf(SideParam,ParamSection,"Right");
+		sprintf(SideParam,ParamSection,SECT_PH_RGHT);
 		return GfParmSetNumEx(SetupHandle, SideParam, oParameter, oUnit, Val, Min, Max);
 	}
 	else
@@ -364,7 +364,7 @@ TGeneticParameterPart::TGeneticParameterPart
 		Parameter = strdup("track param count");
 
 	Active = 0 < GfParmGetNum(Handle, 
-		Section, "active", 0, (float) Active);
+		Section, PRM_ACTIVE, 0, (float) Active);
 };
 
 // Destructor
@@ -380,13 +380,13 @@ TGeneticParameterPart::~TGeneticParameterPart()
 int TGeneticParameterPart::Set(int Index)
 {
 	char ParamSection[64];
-	sprintf(ParamSection,"part/%d/definition",Index);
+	sprintf(ParamSection,"%s/%d/%s",SECT_LOCAL,Index,SECT_DEFINE);
 
-	GfParmSetNum(Handle, ParamSection, "active", 0, (float) Active);
-	GfParmSetStr(Handle, ParamSection, "name", Label);
-	GfParmSetStr(Handle, ParamSection, "section", Section);
-	GfParmSetStr(Handle, ParamSection, "subsection", Subsection);
-	GfParmSetStr(Handle, ParamSection, "parameter", Parameter);
+	GfParmSetNum(Handle, ParamSection, PRM_ACTIVE, 0, (float) Active);
+	GfParmSetStr(Handle, ParamSection, PRM_NAME, Label);
+	GfParmSetStr(Handle, ParamSection, PRM_SECT, Section);
+	GfParmSetStr(Handle, ParamSection, PRM_SUBSECT, Subsection);
+	GfParmSetStr(Handle, ParamSection, PRM_PRM, Parameter);
 
 	return 0;
 };
@@ -395,11 +395,11 @@ int TGeneticParameterPart::Set(int Index)
 int TGeneticParameterPart::Get(int Index)
 {
 	char ParamSection[64];
-	sprintf(ParamSection,"part/%d/definition",Index);
+	sprintf(ParamSection,"%s/%d/%s",SECT_LOCAL,Index,SECT_DEFINE);
 
-	Active = 0 < GfParmGetNum(Handle, ParamSection, "active", 0, (float) Active);
+	Active = 0 < GfParmGetNum(Handle, ParamSection, PRM_ACTIVE, 0, (float) Active);
 
-	char* Value = (char *) GfParmGetStr(Handle, ParamSection, "name", Label);
+	char* Value = (char *) GfParmGetStr(Handle, ParamSection, PRM_NAME, Label);
 	if (Label)
 		free((void *) Label);
 	if (Value)
@@ -407,7 +407,7 @@ int TGeneticParameterPart::Get(int Index)
 	else
 		Label = NULL;
 
-	Value = (char *) GfParmGetStr(Handle, ParamSection, "section", NULL);
+	Value = (char *) GfParmGetStr(Handle, ParamSection, PRM_SECT, NULL);
 	if (Section)
 		free((void *) Section);
 	if (Value)
@@ -415,7 +415,7 @@ int TGeneticParameterPart::Get(int Index)
 	else
 		Section = NULL;
 
-	Value = (char *) GfParmGetStr(Handle, ParamSection, "subsection", NULL);
+	Value = (char *) GfParmGetStr(Handle, ParamSection, PRM_SUBSECT, NULL);
 	if (Subsection)
 		free((void *) Subsection);
 	if (Value)
@@ -423,7 +423,7 @@ int TGeneticParameterPart::Get(int Index)
 	else
 		Subsection = NULL;
 
-	Value = (char *) GfParmGetStr(Handle, ParamSection, "parameter", NULL);
+	Value = (char *) GfParmGetStr(Handle, ParamSection, PRM_PRM, NULL);
 	if (Parameter)
 		free((void *) Parameter);
 	if (Value)
@@ -442,9 +442,9 @@ int TGeneticParameterPart::Get(int Index)
 // Default constructor
 TGeneticParameterTOC::TGeneticParameterTOC():
 	Handle(0),
+	Author(NULL),
 	Private(NULL),
 	OptimisationLoops(1000),
-	ParamsGroupCount(0),
 	WeightOfDamages(1.0f),
 	GetInitialVal(true)
 {
@@ -454,20 +454,23 @@ TGeneticParameterTOC::TGeneticParameterTOC():
 TGeneticParameterTOC::TGeneticParameterTOC           
 (
 	void* MetaDataFile,			// Handle to read/write data
+	char* AuthorName,			// Name of author of setup
 	char* PrivateSection,		// Name of private data section
 	int Loops,					// Number of optimisation loops
-	int NbrOfParamsGroups,		// Number of local parameters groups
 	float WeightDamages,		// Weight of damages
 	bool InitialVal				// get initial value from setup file
 )
 {
 	Handle = MetaDataFile;
+	if (AuthorName)
+		Author = strdup(AuthorName);
+	else
+		Author = NULL;
 	if (PrivateSection)
 		Private = strdup(PrivateSection);
 	else
 		Private = NULL;
 	OptimisationLoops = Loops; 
-	ParamsGroupCount = NbrOfParamsGroups;
 	WeightOfDamages = WeightDamages;
 	GetInitialVal = InitialVal;
 };
@@ -477,25 +480,26 @@ TGeneticParameterTOC::~TGeneticParameterTOC()
 {
 	// free allocated mem
 	free(Private);
+	free(Author);
 }
 
 // Write table of content to configuration file 
 int TGeneticParameterTOC::Set()
 {
 	GfParmSetStr(Handle, 
-		"table of content", "private", Private);
+		SECT_TOC, PRM_AUTHOR, Author);
+	GfParmSetStr(Handle, 
+		SECT_TOC, PRM_PRIVATE, Private);
 	GfParmSetNum(Handle, 
-		"table of content", "optimisation loops", 0, (float) OptimisationLoops);
+		SECT_TOC, PRM_LOOPS, 0, (float) OptimisationLoops);
 	GfParmSetNum(Handle, 
-		"table of content", "params group count", 0, (float) ParamsGroupCount);
-	GfParmSetNum(Handle, 
-		"table of content", "weight of damages", 0, (float) WeightOfDamages);
+		SECT_TOC, PRM_DAMAGES, 0, (float) WeightOfDamages);
 	if (GetInitialVal)
 	  GfParmSetNum(Handle, 
-	  	"table of content", "get initial value", 0, 1);
+	  	SECT_TOC, PRM_INITIAL, 0, 1);
 	else
 	  GfParmSetNum(Handle, 
-	  	"table of content", "get initial value", 0, 0);
+	  	SECT_TOC, PRM_INITIAL, 0, 0);
 
 	return 0;
 }; 
@@ -504,21 +508,29 @@ int TGeneticParameterTOC::Set()
 int TGeneticParameterTOC::Get() 
 {
 	char* Value = (char*) GfParmGetStr(Handle, 
-		"table of content", "private", "simplix private");
+		SECT_TOC, PRM_AUTHOR, "Wolf-Dieter Beelitz");
+	if (Author)
+		free(Author);
+	if (Value)
+		Author = strdup(Value);
+	else
+		Author = NULL;
+
+	Value = (char*) GfParmGetStr(Handle, 
+		SECT_TOC, PRM_PRIVATE, "simplix private");
 	if (Private)
 		free(Private);
 	if (Value)
 		Private = strdup(Value);
 	else
 		Private = NULL;
+
 	OptimisationLoops = (int) GfParmGetNum(Handle, 
-		"table of content", "optimisation loops", 0, (float) OptimisationLoops);
-	ParamsGroupCount = (int) GfParmGetNum(Handle, 
-		"table of content", "params group count", 0, (float) ParamsGroupCount);
+		SECT_TOC, PRM_LOOPS, 0, (float) OptimisationLoops);
 	WeightOfDamages = GfParmGetNum(Handle, 
-		"table of content", "weight of damages", 0, (float) WeightOfDamages);
+		SECT_TOC, PRM_DAMAGES, 0, (float) WeightOfDamages);
 	GetInitialVal = 0 < GfParmGetNum(Handle, 
-		"table of content", "get initial value", 0, 1);
+		SECT_TOC, PRM_INITIAL, 0, 1);
 
 	return 0;
 }; 

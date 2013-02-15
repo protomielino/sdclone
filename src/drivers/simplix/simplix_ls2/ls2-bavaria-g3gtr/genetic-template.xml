@@ -15,22 +15,22 @@
 <!-- <!DOCTYPE params SYSTEM "params.dtd"> -->
 
 <!-- META DATA FOR GENETIC PARAMETER OPTIMIZATION -->
-<params name="genetic optimization">
+<params name="Genetic Optimization">
   <!-- TABLE OF CONTENT -->
-  <section name="table of content">
+  <section name="Table of Content">
     <attnum name="major version" val="1"/>
     <attnum name="minor version" val="0"/>
     <attstr name="robot" val="simplix_ls2"/>
     <attstr name="car type" val="ls2-bavaria-g3gtr"/>
     <attstr name="private" val="simplix private"/>
-    <attnum name="params group count" val="1"/>
     <attnum name="weight of damages" val="1.0"/>
     <attnum name="get initial value" val="1"/>
+    <attstr name="author" val="Wolf-Dieter Beelitz"/>
   </section>
   <!-- END OF TABLE OF CONTENT -->
 
   <!-- META DATA OF GLOBAL PARAMETERS -->
-  <section name="global">
+  <section name="Global">
 	  
     <!-- FIRST GROUP OF META DATA OF GLOBAL PARAMETERS -->
     <!-- CAR TYPE SPECIFIC PARAMETERS DEFINED AT RULES -->
@@ -304,12 +304,12 @@
   <!-- WITH SEPARATE LOCAL DEFINED PARA. -->
 
   <!-- START OF META DATA OF LOCAL PARAMETERS -->
-  <section name="part">
+  <section name="Local Groups">
     <!-- META DATA OF FIRST PART OF LOCAL PARAMETERS -->
     <section name="1">
       <!-- META DATA OF COUNTER OF PARAMETERS PER SECTION IN THIS PART -->
-      <section name="definition">
-        <attnum name="active" val="0"/>
+      <section name="Definition">
+        <attnum name="active" val="1"/>
         <attstr name="name" val="Track param count"/>
         <attstr name="section" val="simplix private"/>
         <attstr name="subsection" val="param seg"/>
@@ -317,7 +317,7 @@
       </section>
 
       <!-- META DATA OF PARAMETERS IN THIS PART -->
-      <section name="parameter">
+      <section name="Parameter">
         <!-- META DATA OF FIRST PARAMETER IN THIS PART -->
         <section name="Local robot parameter 1">
           <attnum name="active" val="1"/>

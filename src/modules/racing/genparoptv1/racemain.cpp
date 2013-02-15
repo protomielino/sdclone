@@ -29,6 +29,7 @@
 #include <robot.h>
 #include <network.h>
 #include <time.h>
+#include <car.h>
 
 #include "genparoptv1.h"
 
@@ -1149,6 +1150,7 @@ ReInitialiseGeneticOptimisation()
 	Data->TrackName = &(Data->TrackNameBuffer[0]);
 	Data->CarType = &(Data->CarTypeBuffer[0]);
 	Data->RobotName = &(Data->RobotNameBuffer[0]);
+	Data->AuthorName = &(Data->AuthorNameBuffer[0]);
 
 	//MyResults.QualifyingLapTime = FLT_MAX;
 	Data->RaceLapTime = FLT_MAX;
@@ -1197,7 +1199,7 @@ ReInitialiseGeneticOptimisation()
 		{			// ... to create it.
 			snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
 				Data->RobotName,Data->CarType,Data->TrackName);
-			GfParmWriteFileSDHeader (buf, Handle, Data->CarType, "Wolf-Dieter Beelitz");
+			GfParmWriteFileSDHeader (buf, Handle, Data->CarType, Data->AuthorName);
 		}
 		else		// ... else create an empty setup file
 		{			
@@ -1207,7 +1209,7 @@ ReInitialiseGeneticOptimisation()
 
 			snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
 				Data->RobotName,Data->CarType,Data->TrackName);
-			GfParmWriteFileSDHeader (buf, Handle, Data->CarType, "Wolf-Dieter Beelitz");
+			GfParmWriteFileSDHeader (buf, Handle, Data->CarType, Data->AuthorName);
 			Data->GetInitialVal = false;
 		}
 		GfParmReleaseHandle(Handle);
@@ -1222,6 +1224,13 @@ ReInitialiseGeneticOptimisation()
 	ReImportGeneticParameters();
 }
 
+int GetNumberOfSubsections(void* Handle, char* Section)
+{
+	if (GfParmExistsSection(Handle,Section))
+		return GfParmGetEltNb(Handle,Section);
+	else
+		return 0;
+}
 
 void
 ReImportGeneticParameters()
@@ -1246,68 +1255,73 @@ ReImportGeneticParameters()
     //Data->Type = (int) GfParmGetNum(Data->Handle, 
 	//	"simplix private", "qualification", 0, 0);
 
-	// Get tank capacity from car type setup file
-	// Setup path to car type file
-	snprintf(buf,sizeof(buf),"%scars/%s/%s.xml",
-		GetDataDir(),Data->CarType,Data->CarType);
-	void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-	Data->MaxFuel = (float) GfParmGetNum(Handle, 
-		"Car", "fuel tank", "l", (float) 60.0);
-	GfParmReleaseHandle(Handle);
-
-	// Store tank capacity as initial fuel
-	GfParmSetNumEx(Data->Handle, "simplix private", "start fuel",    
-		(char*) NULL, Data->MaxFuel, -1.0, Data->MaxFuel);
-
 	// Build path to meta data file
     snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-%s.xml",
       GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName);
 
 	// Read meta data file
-	void *MetaDataFile = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-    if (!MetaDataFile)
-		assert( 0 );
+	void* MetaDataFile = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+	if (!MetaDataFile)
+	{
+		// Build path to meta data file
+		snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-template.xml",
+		GetLocalDir(),Data->RobotName,Data->CarType);
+
+		// Read meta data file
+		MetaDataFile = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+		if (!MetaDataFile)
+			assert( 0 );
+	}
 
 	// Read table of content of meta data file
 	TGeneticParameterTOC* TOC = new TGeneticParameterTOC(MetaDataFile);
 	TOC->Get();
 	Data->Loops = TOC->OptimisationLoops;
 
-	// Check section "global"
-	Data->NbrOfParam = 0;
-	if (GfParmExistsSection(MetaDataFile,"global"))
-	{
-		// Get real number of global parameters
-		Data->NbrOfParam = GfParmGetEltNb(MetaDataFile,"global");
-	}
+	// Update author name
+	snprintf(Data->AuthorName,sizeof(Data->AuthorNameBuffer),"%s",TOC->Author);
 
-	// Store number of parameter groups defined
-	Data->NbrOfParts = TOC->ParamsGroupCount;  // TODO: Replace counter by reading the true value
+	// How to handle damage as time penalty
+	Data->WeightOfDamages = TOC->WeightOfDamages;
 
-	// We need at least one part to store the offset as index to the last global parameter
+	// If switched off in meta data, disable reading of initial values
+	if (!TOC->GetInitialVal)
+		Data->GetInitialVal = false;
+
+	// Get tank capacity from car type setup file
+	snprintf(buf,sizeof(buf),"%scars/%s/%s.xml",
+		GetDataDir(),Data->CarType,Data->CarType);
+	void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+	Data->MaxFuel = (float) GfParmGetNum(Handle, 
+		SECT_CAR, PRM_TANK, "l", (float) 60.0);
+	GfParmReleaseHandle(Handle);
+
+	// Store tank capacity as initial fuel
+	GfParmSetNumEx(Data->Handle, TOC->Private, PRM_FUEL,    
+		(char*) NULL, Data->MaxFuel, -1.0, Data->MaxFuel);
+
+	Data->NbrOfParam = GetNumberOfSubsections(MetaDataFile,SECT_GLOBAL);
+	Data->NbrOfParts = GetNumberOfSubsections(MetaDataFile,SECT_LOCAL);
+
+	// We need at least one part to store the offset 
+	// as index to the last global parameter
+	// and to keep the number of global parameters!
 	// Allocate memory for list of parts
 	if (Data->NbrOfParts < 1)
   	  Data->Part = new tgenPart[1];
 	else
 	  Data->Part = new tgenPart[Data->NbrOfParts];
 
-	// Estimation for the offset to first parameter of the first group
+	// Keep the number of global parameters
 	Data->Part[0].Offset = Data->NbrOfParam;
-	// How to handle damage as time penalty
-	Data->WeightOfDamages = TOC->WeightOfDamages;
-
-	// Check the state we found opening the track setup file:
-	// If we created an empty file, we cannot get the initial values from it!
-	if (!Data->GetInitialVal)
-		TOC->GetInitialVal = false;
 
 	// Loop over all local parameter groups
 	for (int I = 0; I < Data->NbrOfParts; I++)
 	{
 		// Read parameters defined in the current group
-	    snprintf(buf,sizeof(buf),"part/%d/definition",I+1);
+	    snprintf(buf,sizeof(buf),"%s/%d/%s",SECT_LOCAL,I+1,SECT_DEFINE);
 		TGeneticParameterPart* GroupParam = new TGeneticParameterPart(
-			MetaDataFile,"Group Params Count", buf);
+			MetaDataFile,"Group Params", buf);
 		GroupParam->Get(1+I);
 		Data->Part[I].Active = GroupParam->Active;
 
@@ -1316,18 +1330,11 @@ ReImportGeneticParameters()
 		{
 			// Read section parameters form car setup file 
 			TGeneticParameterPart* TrackParam = new TGeneticParameterPart(
-				Data->Handle, "Track Params Count", TOC->Private, GroupParam->Parameter);
+				Data->Handle, "Track Params", TOC->Private, GroupParam->Parameter);
 
-			// Prepare the section depending on the part number
-			snprintf(buf,sizeof(buf),"part/%d/parameter",I+1);
-
-			// Check section defined in buf
-			Data->Part[I].Count = 0;
-			if (GfParmExistsSection(MetaDataFile,buf))
-			{
-				// Get real number of local parameters in this part
-				Data->Part[I].Count = GfParmGetEltNb(MetaDataFile,buf);
-			}
+			// Get number of parts defined in the meta data configuration
+			snprintf(buf,sizeof(buf),"%s/%d/%s",SECT_LOCAL,I+1,SECT_PARAM);
+			Data->Part[I].Count = GetNumberOfSubsections(MetaDataFile,buf);
 
 			// Store the data to the list of parts
 			if (TrackParam->Parameter)
@@ -1339,15 +1346,9 @@ ReImportGeneticParameters()
 			else
 				Data->Part[I].Subsection = NULL;
 
-			// Get real number of local sections defined in the car setup
-			Data->Part[I].NbrOfSect = 0;
-			snprintf(buf,sizeof(buf),"%s/%s",TOC->Private,Data->Part[I].Subsection);
-			if (GfParmExistsSection(Data->Handle,buf))
-			{
-				// Get real number of local sections defined in the car setup
-				Data->Part[I].NbrOfSect = GfParmGetEltNb(Data->Handle,buf);
-			}
-	
+			// Get number of local sections defined in the car setup
+			Data->Part[I].NbrOfSect = GetNumberOfSubsections(Data->Handle,buf);
+			// Update number of parameters
 			Data->NbrOfParam += Data->Part[I].Count * Data->Part[I].NbrOfSect;
 
 			delete TrackParam;
@@ -1358,7 +1359,7 @@ ReImportGeneticParameters()
 	// NbrOfParam now defines the total number of parameters
 	// Allocate a list of pointers, one for each parameter
 	// GP is the owner of the allocated memory
-	Data->GP = (TGeneticParameter**) new TGeneticParameter*[Data->NbrOfParam];
+	Data->GP = (TGeneticParameter**) new TGeneticParameter* [Data->NbrOfParam];
 	TGeneticParameter* NewGP = NULL;
 
 	//
@@ -1374,7 +1375,7 @@ ReImportGeneticParameters()
 		NewGP->Get(I == 0);  
 		if (NewGP->Active)			// if parameter is set active
 		{
-			if (TOC->GetInitialVal)	// and the flag is set
+			if (Data->GetInitialVal)// and the flag is set
 			{						// we read the starting value from the opened car setup file
 				NewGP->GetVal(Data->Handle, (I == 0));
 			}
@@ -1406,7 +1407,7 @@ ReImportGeneticParameters()
 			Data->Part[I].Offset = Data->NextIdx;
 
 			// Prepare the section depending on the part number
-			snprintf(buf,sizeof(buf),"part/%d/parameter",I+1);
+			snprintf(buf,sizeof(buf),"%s/%d/%s",SECT_LOCAL,I+1,SECT_PARAM);
 
 			// Loop over all sections in the group
 			for (int J = 0; J < Data->Part[I].NbrOfSect; J++)
@@ -1421,7 +1422,7 @@ ReImportGeneticParameters()
 					if (!NewGP->Active)		// If parameter is not active ...
 						NewGP->Weight = 0;	// ... do not use the weight
 
-					if (TOC->GetInitialVal)	// if possible ...
+					if (Data->GetInitialVal)// if possible ...
 					{						// ... read the starting value from car setup file
 						NewGP->GetVal(Data->Handle,(K == 0),true);
 					}
@@ -1557,7 +1558,7 @@ ReEvolution()
 		char buf[255];
 		snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.opt",
 		  Data->RobotName,Data->CarType,Data->TrackName);
-		GfParmWriteFileSDHeader (buf, Handle, Data->CarType, "Wolf-Dieter Beelitz");
+		GfParmWriteFileSDHeader (buf, Handle, Data->CarType, Data->AuthorName);
 		GfLogOpt("Stored to .opt\n");
 	}
 	else if (0.99 * TotalLapTime < Data->BestTotalLapTime)
@@ -1591,8 +1592,7 @@ ReEvolution()
 	//
 	// Next Race -> try other parameters
 	//
-	GfLogOpt("\nRandom parameter variation\n");
-	GfLogOpt("Scale: %g\n",Scale); // Show current random variation scaling
+	GfLogOpt("\nRandom parameter variation scale: %g\n",Scale); 
 
 	// Reset selection flags
 	for (int I = 0; I < Data->NextIdx; I++)
@@ -1742,7 +1742,8 @@ ReEvolution()
 	char buf[255];
 	snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
 	Data->RobotName,Data->CarType,Data->TrackName);
-	GfParmWriteFileSDHeader (buf, Handle, Data->CarType, "Wolf-Dieter Beelitz");
+	//GfParmWriteFileSDHeader (buf, Handle, Data->CarType, "Wolf-Dieter Beelitz");
+	GfParmWriteFileSDHeader (buf, Handle, Data->CarType, Data->AuthorName);
 
 	printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 

@@ -418,7 +418,7 @@ enum
 #define PRV_SKILL            "skill"              // Car specific skilling
 
 #define PRV_MAX_FUEL         "max fuel"
-#define PRV_START_FUEL       "start fuel"
+#define PRV_START_FUEL       "initial fuel"
 #define PRV_MIN_LAPS         "min laps"
 #define PRV_LENGTH_MARGIN	 "length margin"
 #define PRV_QUALIFICATION    "qualification"      // Practice as qualifying

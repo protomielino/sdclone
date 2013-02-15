@@ -179,14 +179,21 @@
 
       <!-- Robot parameters >>> -->
 	<section name="simplix private">
+            <!-- Switch on = val>0 / off = -1 fuel consumption calculation -->
+		<attnum name="initial fuel" min="-1" max="100.0" val="-1"/>
+
+            <!-- Use this parameters to scale basic driving -->
+		<attnum name="scale brake" min="0" max="2" val="0.98"/>
+		<attnum name="scale mu" min="0" max="5" val="0.80"/>
+    		<attnum name="scale bump" min="0" max="0.6" val="0.3"/>
+
+            <!-- Use this parameters to setup the car's fuel strategy -->
+		<attnum name="fuelper100km" min="1.0" max="100.0" val="80.0"/>
+		<attnum name="reserve" unit="m" min="0.0" max="20000.0" val="2000"/>
+
             <!-- Use this parameters to test the car's pitting -->
 		<attnum name="pit test stop" min="0" max="1" val="0"/>
 		<attnum name="qualification" min="0" max="1" val="0"/>
-
-            <!-- Use this parameters to setup the car's fuel strategy -->
-		<attnum name="reserve" unit="m" min="0.0" max="20000.0" val="2000"/>
-		<attnum name="start fuel" min="-1" max="100.0" val="-1"/>
-		<attnum name="fuelper100km" min="1.0" max="100.0" val="80.0"/>
 
             <!-- Use the parameters below to tune the robots 
                  detection of the car's limits -->
@@ -202,11 +209,8 @@
 		<attnum name="lookaheadfactor" min="0.0" max="0.5" val="0.10"/>
 		<attnum name="scale steer" min="0.1" max="2.0" val="0.8"/>
 		<attnum name="brake limit" val="-9.9"/>
-		<attnum name="scale brake" min="0" max="2" val="0.98"/>
-		<attnum name="scale mu" min="0" max="5" val="0.80"/>
 		<attnum name="scale brake rain" min="0" max="1" val="0.85"/>
 		<attnum name="scale mu rain" min="0" max="1" val="0.85"/>
-    		<attnum name="scale bump" min="0" max="0.6" val="0.3"/>
     		<attnum name="scale bump outer" val="0.45"/>
 
             <!-- Use the parameters below to tune the robots 

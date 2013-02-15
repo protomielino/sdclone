@@ -26,6 +26,35 @@
 
 #include "car.h"
 
+// Additional section and parameter definitions
+#define SECT_TOC		"Table of Content"
+#define SECT_GLOBAL		"Global"
+#define SECT_LOCAL		"Local Groups"
+#define SECT_DEFINE		"Definition"
+#define SECT_PARAM		"Parameter"
+
+#define SECT_PH_LEFT	"Left"
+#define SECT_PH_RGHT	"Right"
+
+#define PRM_ACTIVE		"active"
+#define PRM_TWOSIDE		"twosided"
+#define PRM_LABEL		"label"
+#define PRM_SECT		"section"
+#define PRM_SUBSECT		"subsection"
+#define PRM_PRM			"parameter"
+#define PRM_UNIT		"unit"
+#define PRM_RANGE		"range"
+#define PRM_WEIGHT		"weight"
+#define PRM_SCALE		"scale"
+#define PRM_ROUND		"round"
+#define PRM_NAME		"name"
+
+#define PRM_AUTHOR		"author"
+#define PRM_PRIVATE		"private"
+#define PRM_LOOPS		"optimisation loops"
+#define PRM_DAMAGES		"weight of damages"
+#define PRM_INITIAL		"get initial value"
+
 //  
 // Genetic parameters are handled in a single array 
 // (See TGeneticParameter** GP;).
@@ -96,6 +125,7 @@ typedef struct genData
 	char* TrackName;		// name of the track selected
 	char* CarType;			// car type to create path to setup file
 	char* RobotName;		// robot name to create path to setup
+	char* AuthorName;		// name of author of setup
 
 	// Strategic data, car setup depending on optimization state
     int Type;				// 0: race; 1: qualifying
@@ -145,6 +175,7 @@ typedef struct genData
 	char TrackNameBuffer[261];	// Buffer for trackname 
 	char CarTypeBuffer[261];	// Buffer for car type
 	char RobotNameBuffer[261];	// Buffer for robotname
+	char AuthorNameBuffer[261];	// Buffer name of setup author
 
 } tgenData;
 
@@ -283,9 +314,9 @@ class TGeneticParameterTOC
 	TGeneticParameterTOC			// Constructor
 	(
 		void* MetaDataFile,			// Handle to read /write data
+		char* Author = NULL,		// Name of author of setup
 		char* Private = NULL,		// Name of private data section
 		int Loops = 1000,			// Number of optimisation loops
-		int MbrOfParamsGroups = 0,	// Number of local parameters groups
 		float WeightDamages = 1.0,	// Weight of damages as time penalty
 		bool GetInitialVal = true   // Read initial value from setup
 	);
@@ -297,9 +328,9 @@ class TGeneticParameterTOC
 
   public:
 	void* Handle;					// Handle to read /write data
+	char* Author;					// Name of author of setup
 	char* Private;					// Name of private data section
 	int OptimisationLoops;			// Number of optimisation loops
-	int ParamsGroupCount;			// Number of local parameters groups
 	float WeightOfDamages;	        // Weight of damages as time penalty
 	bool GetInitialVal;				// Read initial value from setup
 
