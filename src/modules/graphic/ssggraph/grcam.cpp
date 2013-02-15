@@ -152,8 +152,8 @@ void cGrPerspCamera::setProjection(void)
 		right = ((spanOffset - halfwidth) * (dist - frus->getNear()) / dist) + halfwidth;
 
 #if 0
-	GfLogInfo("Adjusting Frustum %f : dist %f : left %f -> %1.12f, Right %f -> %1.12f, near %f\n",
-            spanOffset, dist,
+	GfLogInfo("Adjusting ViewOffset %f : Frustum %f : dist %f : left %f -> %1.12f, Right %f -> %1.12f, near %f\n",
+            viewOffset, spanOffset, dist,
             frus->getLeft(), left, //frus->getLeft() + spanOffset, 
             frus->getRight(), right, //frus->getRight() + spanOffset, 
             frus->getNear());
@@ -232,9 +232,10 @@ float cGrPerspCamera::getSpanAngle(void)
         	angle = (viewOffset - 10) * fovxR;
 
 		//=if($B$2=0,A10*$A$5,abs($A$2/$B$2)-$A$2)/sqrt(tan(radians(90)-B10)^2+1)*if(A10>0,-1,1)
-		spanOffset = fabs((screenDist / arcRatio) - screenDist) / sqrt((tan((M_PI/2) - angle) * tan((M_PI/2) - angle)) + 1);
+		spanOffset = fabs((screenDist / arcRatio) - screenDist) / sqrt((tan((M_PI/2) - angle) * tan((M_PI/2) - angle)) + 1) / 2;
 
 		if (viewOffset < 10) spanOffset *= -1;
+		if (arcRatio > 1) spanOffset *= -1;
 	} else {
 		// monitors mounted flat on wall
 		angle = 0;
@@ -770,8 +771,15 @@ class cGrCarCamInfrontFixedCar : public cGrPerspCamera
 		offset += getSpanAngle();
 	}
 
+#if 0 // SDW test
+	spanOffset = car->_glance * (viewOffset - 10) / 5;
+
+	P[0] = (car->_dimension_x / 2) + 30.0 * cos(offset);
+	P[1] = car->_bonnetPos_y - 30.0 * sin(offset);
+#else
 	P[0] = (car->_dimension_x / 2) + 30.0 * cos(2*PI/3 * car->_glance + offset);
 	P[1] = car->_bonnetPos_y - 30.0 * sin(2*PI/3 * car->_glance + offset);
+#endif
 	P[2] = car->_statGC_z;
 
 	sgXformPnt3(P, car->_posMat);

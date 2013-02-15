@@ -165,8 +165,8 @@ loadOptions()
 	GfuiEditboxSetString(ScrHandle, ScreenDistId, buf);
 
 	ArcRatio = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_ARCRATIO, NULL, 1.0f);
-	if (ArcRatio > 1.0f) {
-		ArcRatio = 1.0f;
+	if (ArcRatio > 2.0f) {
+		ArcRatio = 2.0f;
 	} 
 	else if (ArcRatio < 0.0f) {
 		ArcRatio = 0.0f;
@@ -295,8 +295,8 @@ onChangeArcRatio(void * )
 {
     char* val = GfuiEditboxGetString(ScrHandle, ArcRatioId);
     sscanf(val, "%g", &ArcRatio);
-    if (ArcRatio > 1.0f)
-		ArcRatio = 1.0f;
+    if (ArcRatio > 2.0f)
+		ArcRatio = 2.0f;
     else if (ArcRatio < 0.0f)
 		ArcRatio = 0.0f;
 	
