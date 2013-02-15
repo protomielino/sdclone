@@ -22,6 +22,7 @@
 #include "openalmusicplayer.h"
 
 const int OpenALMusicPlayer::BUFFERSIZE = 4096*64;
+const ALfloat OpenALMusicPlayer::FADESTEP = 0.01;
 
 OpenALMusicPlayer::OpenALMusicPlayer(SoundStream* soundStream):
 	device(NULL),
@@ -29,7 +30,9 @@ OpenALMusicPlayer::OpenALMusicPlayer(SoundStream* soundStream):
 	originalcontext(NULL),
 	source(0),
 	stream(soundStream),
-	ready(false)
+	ready(false),
+	maxVolume(1.0),
+	fadestate(FADEIN)
 {
 	buffers[0] = 0;
 	buffers[1] = 0;
@@ -244,6 +247,8 @@ bool OpenALMusicPlayer::playAndManageBuffer()
 	int processed = 0;
 	bool active = true;
 
+	doFade();
+
 	alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
 
 	while(processed--) {
@@ -287,4 +292,54 @@ bool OpenALMusicPlayer::startPlayback()
     alSourcePlay(source);
     
     return true;
+}
+
+void OpenALMusicPlayer::fadeout()
+{
+	fadestate = FADEOUT;
+}
+
+void OpenALMusicPlayer::fadein()
+{
+	fadestate = FADEIN;
+	alSourcef(source, AL_GAIN, 0.0f);
+}
+
+void OpenALMusicPlayer::setvolume(float volume)
+{
+	maxVolume = volume;
+}
+
+float OpenALMusicPlayer::getvolume()
+{
+	return maxVolume;
+}
+
+void OpenALMusicPlayer::doFade()
+{
+	ALfloat currentVol = 0.0;
+	switch(fadestate){
+		case FADEIN:
+			alGetSourcef(source, AL_GAIN, &currentVol);
+			currentVol += FADESTEP;
+			if(currentVol >= maxVolume){
+				currentVol = maxVolume;
+				fadestate = NONE;
+			}
+			alSourcef(source, AL_GAIN, currentVol);
+
+			break;
+		case FADEOUT:
+			alGetSourcef(source, AL_GAIN, &currentVol);
+			currentVol -= FADESTEP;
+			if(currentVol <= 0.0){
+				currentVol = 0.0;
+				fadestate = NONE;
+			}
+			alSourcef(source, AL_GAIN, currentVol);
+			break;
+		case NONE:
+			break;
+	}
+	
 }

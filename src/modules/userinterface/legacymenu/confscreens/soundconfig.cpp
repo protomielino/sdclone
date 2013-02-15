@@ -31,6 +31,9 @@
 
 #include "soundconfig.h"
 
+#if MENU_MUSIC
+#include "legacymenu.h"
+#endif
 
 // list of options.
 static const char *soundOptionList[] = {SND_ATT_SOUND_STATE_OPENAL,
@@ -45,6 +48,22 @@ static int SoundOptionId;
 // volume
 static float VolumeValue = 100.0f;
 static int VolumeValueId;
+
+#if MENU_MUSIC
+// list of music states.
+static const char *musicStateList[] = {SND_VAL_MUSIC_STATE_ENABLED,
+								  SND_VAL_MUSIC_STATE_DISABLED};
+static const int nbMusicStates = sizeof(musicStateList) / sizeof(musicStateList[0]);
+static int curMusicState = 0;
+
+// gui label id.
+static int MusicStateId;
+
+// volume
+static float MusicVolumeValue = 100.0f;
+static int MusicVolumeValueId;
+
+#endif
 
 // gui screen handles.
 static void *scrHandle = NULL;
@@ -84,6 +103,32 @@ static void readSoundCfg(void)
 	sprintf(buf, "%g", VolumeValue);
 	GfuiEditboxSetString(scrHandle, VolumeValueId, buf);
 
+#if MENU_MUSIC
+	optionName = GfParmGetStr(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_STATE, musicStateList[0]);
+
+	for (i = 0; i < nbMusicStates; i++) {
+		if (strcmp(optionName, musicStateList[i]) == 0) {
+			curMusicState = i;
+			break;
+		}
+	}
+
+	GfuiLabelSetText(scrHandle, MusicStateId, musicStateList[curMusicState]);
+
+	// Music volume.
+	MusicVolumeValue = GfParmGetNum(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_VOLUME, "%", 100.0f);
+	if (MusicVolumeValue>100.0f) {
+		MusicVolumeValue = 100.0f;
+	} 
+	else if (MusicVolumeValue < 0.0f) {
+		MusicVolumeValue = 0.0f;
+	}
+
+		sprintf(buf, "%g", MusicVolumeValue);
+	GfuiEditboxSetString(scrHandle, MusicVolumeValueId, buf);
+
+#endif
+
 	GfParmReleaseHandle(paramHandle);
 }
 
@@ -99,8 +144,22 @@ static void saveSoundOption(void *)
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	GfParmSetStr(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_STATE, soundOptionList[curOption]);
 	GfParmSetNum(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_VOLUME, "%", VolumeValue);
+
+#if MENU_MUSIC
+	GfParmSetStr(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_STATE, musicStateList[curMusicState]);
+	GfParmSetNum(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_VOLUME, "%", MusicVolumeValue);
+#endif
+
 	GfParmWriteFile(NULL, paramHandle, "sound");
 	GfParmReleaseHandle(paramHandle);
+
+#if MENU_MUSIC
+    // Shutdown the user interface.
+	LegacyMenu::self().shutdown();
+
+    // Restart the game.
+    GfuiApp().restart();
+#endif
 
 	// Return to previous screen.
 	GfuiScreenActivate(prevHandle);
@@ -130,6 +189,30 @@ static void changeVolume(void * )
     GfuiEditboxSetString(scrHandle, VolumeValueId, buf);
 }
 
+#if MENU_MUSIC
+// Toggle music state enabled/disabled.
+static void changeMusicState(void *vp)
+{
+	curMusicState = (curMusicState + (int)(long)vp + nbMusicStates) % nbMusicStates;
+
+	GfuiLabelSetText(scrHandle, MusicStateId, musicStateList[curMusicState]);
+}
+
+// Music Volume
+static void changeMusicVolume(void * )
+{
+    char* val = GfuiEditboxGetString(scrHandle, MusicVolumeValueId);
+    sscanf(val, "%g", &MusicVolumeValue);
+    if (MusicVolumeValue > 100.0f)
+		MusicVolumeValue = 100.0f;
+    else if (MusicVolumeValue < 0.0f)
+		MusicVolumeValue = 0.0f;
+	
+    char buf[32];
+    sprintf(buf, "%g", MusicVolumeValue);
+    GfuiEditboxSetString(scrHandle, MusicVolumeValueId, buf);
+}
+#endif
 static void onActivate(void * /* dummy */)
 {
 	readSoundCfg();
@@ -159,6 +242,23 @@ void* SoundMenuInit(void *prevMenu)
 	GfuiMenuCreateButtonControl(scrHandle,param,"CancelButton",prevMenu,GfuiScreenActivate);
 
 	VolumeValueId = GfuiMenuCreateEditControl(scrHandle,param,"volumeedit",NULL,NULL,changeVolume);
+
+
+#if MENU_MUSIC
+	// TODO remove this and uncomment the static controls in 'soundconfigmenu.xml'
+	// if/when Music is officially included
+	// HACK to allow CMake option 'OPTION_MENU_MUSIC' to show/hide these menu music labels
+	GfuiMenuCreateLabelControl(scrHandle,param,"musicstaticlabel");
+	GfuiMenuCreateLabelControl(scrHandle,param,"musicstaticvolume");
+	// end of code to remove
+
+	GfuiMenuCreateButtonControl(scrHandle,param,"musicleftarrow",(void*)-1,changeMusicState);
+	GfuiMenuCreateButtonControl(scrHandle,param,"musicrightarrow",(void*)1,changeMusicState);
+
+	MusicStateId = GfuiMenuCreateLabelControl(scrHandle,param,"musiclabel");
+
+	MusicVolumeValueId = GfuiMenuCreateEditControl(scrHandle,param,"musicvolumeedit",NULL,NULL,changeMusicVolume);
+#endif
 
 	GfParmReleaseHandle(param);
     

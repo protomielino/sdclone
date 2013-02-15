@@ -32,10 +32,14 @@ class OpenALMusicPlayer
 		
 		virtual void start();
 		virtual void stop();
-      virtual void pause();
-      virtual void resume(int flag);
+		virtual void pause();
+		virtual void resume(int flag);
 		virtual void rewind();
 		virtual bool playAndManageBuffer();
+		virtual void setvolume(float volume);
+		virtual float getvolume();
+		virtual void fadeout();
+		virtual void fadein();
 
 	protected:
 		virtual bool initContext();
@@ -45,15 +49,22 @@ class OpenALMusicPlayer
 		virtual bool startPlayback();
 		virtual bool isPlaying();
 		virtual bool streamBuffer(ALuint buffer);
+		virtual void doFade();
 		
 		ALCdevice* device;
 		ALCcontext* context;
 		ALCcontext* originalcontext;
 		ALuint source;								// audio source 
 		ALuint buffers[2];							// front and back buffers
+		ALfloat maxVolume;
+
+		typedef enum { NONE, FADEIN, FADEOUT } eFadeState;
+
+		eFadeState fadestate;
 		
 		SoundStream* stream;
 		bool ready;									// initialization sucessful
 		static const int BUFFERSIZE;
+		static const ALfloat FADESTEP;
 };
 #endif // __OpenALMusicPlayer_h__

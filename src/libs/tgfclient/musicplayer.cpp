@@ -39,6 +39,7 @@ static bool enabled = true;
 static char currentMusicfile[MAX_MUSIC_PATH] = {0};
 //static char nextMusicfile[MAX_MUSIC_PATH] = {0};
 static char defaultMusic[MAX_MUSIC_PATH] = {0}; //"data/music/main.ogg";
+static float maxMusicVolume = 1.0;
 
 #define NOMUSIC "None"
 std::map<std::string,OpenALMusicPlayer*> mapOpenAlPlayers;
@@ -74,6 +75,8 @@ static OpenALMusicPlayer* getMusicPlayer(char* oggFilePath)
 	if (itPlayers == mapOpenAlPlayers.end()) {
 		player = new OpenALMusicPlayer(getMenuSoundStream(oggFilePath));
 		mapOpenAlPlayers[oggFilePath] = player;
+		player->setvolume(maxMusicVolume);
+		//player->fadein();
 		player->start(); // Fade in
 	} else {
 		player = mapOpenAlPlayers[oggFilePath];
@@ -93,7 +96,7 @@ static Uint32 sdlTimerFunc(Uint32 interval, void* /* pEvLoopPriv */)
 SDL_TimerID timerId = 0;
 static void playMenuMusic(int /* value */)
 {
-	const int nextcallinms = 200;
+	const int nextcallinms = 100;
 	SDL_LockMutex(mapMutex);
 	std::map<std::string, OpenALMusicPlayer*>::const_iterator itPlayers = mapOpenAlPlayers.begin();
 	while(itPlayers != mapOpenAlPlayers.end()) {
@@ -180,24 +183,27 @@ void playMusic(char* filename)
 		OpenALMusicPlayer* player = NULL;
 		if(filename != NULL) {
 			if(0 == strcmp(NOMUSIC,filename)){
+				strcpy(currentMusicfile,filename);
 				pauseMenuMusic();
 				return;
 			}
 			if(0 != strcmp(currentMusicfile,filename)){
 				player = getMusicPlayer(currentMusicfile);
-				player->pause();
+				player->fadeout();
 				strcpy(currentMusicfile,filename);
 				GfLogInfo("Music changing to: %s \n", filename);
+				player = getMusicPlayer(filename);
+				player->fadein();
 			}
-			player = getMusicPlayer(filename);
 		} else {
 			if(0 != strcmp(currentMusicfile,defaultMusic)){
 				player = getMusicPlayer(currentMusicfile);
-				player->pause();
+				player->fadeout();
 				strcpy(currentMusicfile,defaultMusic);
 				GfLogInfo("Music changing to: %s \n", defaultMusic);
+				player = getMusicPlayer(defaultMusic);
+				player->fadein();
 			}
-			player = getMusicPlayer(defaultMusic);
 		}
 		if(player) {
 			player->resume(0);
@@ -236,7 +242,15 @@ static void readConfig()
 	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	const char *musicenabled = GfParmGetStr(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_STATE, musicDisabledStr);
 
-	//float music_volume = GfParmGetNum(paramHandle, GR_SCT_SOUND, SND_ATT_MUSIC_VOLUME, "%", 100.0f);
+	float music_volume = GfParmGetNum(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_VOLUME, "%", 100.0f);
+	if (music_volume>100.0f) {
+		music_volume = 100.0f;
+	} 
+	else if (music_volume < 0.0f) {
+		music_volume = 0.0f;
+	}
+	maxMusicVolume = music_volume/100.0f;
+
 	if (0 == strcmp(musicenabled, SND_VAL_MUSIC_STATE_ENABLED)) {
 		enabled = true;
 	} else {
@@ -259,3 +273,17 @@ static void readConfig()
 	paramHandle = NULL;
 }
 #endif
+
+void setMusicVolume(float vol)
+{
+#if MENU_MUSIC
+	if (vol < 0)
+		vol = 0.0f;
+	else if (vol > 1.0f)
+		vol = 1.0f;
+	
+	maxMusicVolume = vol;
+
+	GfLogInfo("Music maximum volume set to %.2f\n", maxMusicVolume);
+#endif
+}
