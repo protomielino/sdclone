@@ -2,17 +2,17 @@
 // unitclothoid.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 2.X
 //--------------------------------------------------------------------------*
 // Lane clothoide like
 // Fahrspur clothoidenähnlich
 //
 // File         : unitclothoid.h
 // Created      : 2007.11.17
-// Last changed : 2013.01.06
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.02.16
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.05.000
+// Version      : 3.06.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -85,18 +85,20 @@ class TClothoidLane : public TLane
 	struct TOptions
 	{
 	  double Base;
+	  double BaseFactor;
 	  double BumpMod;
 	  double MaxL;
 	  double MaxR;
 	  bool Side;
 	  bool Smooth;
 
-	  TOptions() : Base(1), BumpMod(1), MaxL(FLT_MAX), MaxR(FLT_MAX), Side(false), Smooth(false) {}
-	  TOptions(double BA, double BM, double ML = FLT_MAX, double MR = FLT_MAX, bool SI = false, bool SM = false):
-		Base(BA), BumpMod(BM), MaxL(ML), MaxR(MR), Side(SI), Smooth(SM) {}
+	  TOptions() : Base(1), BaseFactor(1.016f), BumpMod(1), MaxL(FLT_MAX), MaxR(FLT_MAX), Side(false), Smooth(false) {}
+	  TOptions(double BA, double BF, double BM, double ML = FLT_MAX, double MR = FLT_MAX, bool SI = false, bool SM = false):
+		Base(BA), BaseFactor(BF), BumpMod(BM), MaxL(ML), MaxR(MR), Side(SI), Smooth(SM) {}
 	};
 
     double oBase;
+    double oBaseFactor;
 
   public:
 	TClothoidLane();

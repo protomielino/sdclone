@@ -2,17 +2,17 @@
 // unitdriver.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 2.X
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
 // Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2013.01.06
+// Last changed : 2013.02.16
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.05.001
+// Version      : 3.06.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -394,7 +394,9 @@ private:
 	bool oTeamEnabled;
     bool oPitSharing;	                         // Flag: Pitsharing activated
 	int oTeamIndex;                              // Index of car in Teams arrays;
+	bool oGeneticOpti;
 	float oBase;                                 //
+	float oBaseScale;                            //
 	float oBumpMode;                             //
 	int oTestLane;
     bool oUseFilterAccel;
@@ -430,6 +432,7 @@ private:
     static float SkillingFactor;
 	static bool UseBrakeLimit;
 	static bool UseGPBrakeLimit;
+	static bool UseRacinglineParameters;
 	static float BrakeLimit;
 	static float BrakeLimitScale;
 	static float BrakeLimitBase;

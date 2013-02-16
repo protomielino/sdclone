@@ -2,17 +2,17 @@
 // unitpit.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 2.X
 //--------------------------------------------------------------------------*
 // Pit and pitlane
 // Box und Boxengasse
 // 
 // File         : unitpit.cpp
 // Created      : 2007.02.20
-// Last changed : 2013.01.06
+// Last changed : 2013.02.16
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.05.000
+// Version      : 3.06.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem erweiterten Robot-Tutorial bt
 //
@@ -318,7 +318,7 @@ void TPitLane::SmoothPitPath
 
   // Smooth pit path
   float BumpMode = (float) Param.oCarParam.oScaleBump;
-  SmoothPath(Param,TClothoidLane::TOptions(1.0,BumpMode));
+  SmoothPath(Param,TClothoidLane::TOptions(1.0,1.016f,BumpMode));
 }
 //==========================================================================*
 

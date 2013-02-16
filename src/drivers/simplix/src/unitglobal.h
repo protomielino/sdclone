@@ -2,17 +2,17 @@
 // unitglobal.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 2.X
 //--------------------------------------------------------------------------*
 // Global data types and definitions
 // Globale Datentypen und Definitionen
 //
 // File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2013.01.06
+// Last changed : 2013.02.16
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.05.001
+// Version      : 3.06.000
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -410,6 +410,8 @@ enum
 // ... Internal parameters
 
 // Parameters of this robot ...
+#define PRV_OPTI	         "genetic optimisation"
+
 //#define PRV_ACCEL_FILTER     "accel filter"
 #define PRV_ACCEL_OUT        "accel out"
 #define PRV_ACCEL_DELTA      "accel delta"
@@ -448,6 +450,7 @@ enum
 
 #define PRV_BUMP_MODE        "bump mode"          // bump detection model
 #define PRV_BASE_MODE        "base mode"          // base detection model
+#define PRV_BASE_SCLE        "base scale"         // base faktor
 
 #define PRV_SCALE__BRAKE     "scale_brake"        // Scale brake force
 #define PRV_SCALE_BRAKE      "scale brake"        // Scale brake force

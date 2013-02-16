@@ -2,19 +2,18 @@
 // unitdriver.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 2.X
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
 // Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.01.06
+// Last changed : 2013.02.16
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.05.001
+// Version      : 3.06.000
 //--------------------------------------------------------------------------*
-// Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
 //    Copyright: (C) 2000 by Eric Espie
 //    eMail    : torcs@free.fr
@@ -99,6 +98,7 @@ bool  TDriver::UseMPA1Skilling = false;            // Use mpa1 car skilling
 float TDriver::SkillingFactor = 0.1f;              // Skilling factor for career-mode
 bool  TDriver::UseBrakeLimit = false;              // Use brake limit
 bool  TDriver::UseGPBrakeLimit = false;            // Use brake limit GP36
+bool  TDriver::UseRacinglineParameters = false;    // Use racingline parameters
 float TDriver::BrakeLimit = -6;                    // Brake limit
 float TDriver::BrakeLimitBase = 0.025f;            // Brake limit base
 float TDriver::BrakeLimitScale = 25;               // Brake limit scale
@@ -336,7 +336,9 @@ TDriver::TDriver(int Index):
   oTeamEnabled(true),
   oPitSharing(false),
   oTeamIndex(0),
+  oGeneticOpti(false),
   oBase(1.0),
+  oBaseScale(1.016f),
   oBumpMode(1),
   oTestLane(0),
   oUseFilterAccel(false),
@@ -516,8 +518,15 @@ void TDriver::AdjustDriving(
 
   oJumpOffset =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_JUMP_OFFSET,NULL,(float) oJumpOffset);
-  oBase =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BASE_MODE,NULL,oBase);
+  if (TDriver::UseRacinglineParameters)
+  {
+	oGeneticOpti =
+	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_OPTI,NULL,oGeneticOpti) > 0;
+	oBase =
+	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BASE_MODE,NULL,oBase);
+	oBaseScale =
+	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BASE_SCLE,NULL,oBaseScale);
+  }
   oBumpMode =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BUMP_MODE,NULL,oBumpMode);
   Param.oCarParam.oScaleBump =
@@ -1607,39 +1616,44 @@ void TDriver::FindRacinglines()
     //GfOut("# ... make smooth path ...\n");
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
-	  TClothoidLane::TOptions(oBase,oBumpMode));
+	  TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode));
 #ifdef EXPORT_RACINGLINE
     oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
 #endif
-    oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
+	if (!oGeneticOpti)
+      oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
   else if (oSituation->_raceType == RM_TYPE_QUALIF)
   {
-    if (!oRacingLine[oRL_FREE].LoadSmoothPath    // Load a smooth path
+    if (oGeneticOpti || 
+	  !oRacingLine[oRL_FREE].LoadSmoothPath  // Load a smooth path
 	  (oTrackLoadQualify,
 	  &oTrackDesc, Param,                        // as main racingline
-	  TClothoidLane::TOptions(oBase,oBumpMode)))
+	  TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode)))
 	{
       //GfOut("# ... make smooth path ...\n");
       oRacingLine[oRL_FREE].MakeSmoothPath       // Calculate a smooth path
 	    (&oTrackDesc, Param,                     // as main racingline
-	    TClothoidLane::TOptions(oBase,oBumpMode));
-      oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoadQualify);
+	    TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode));
+  	  if (!oGeneticOpti)
+        oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoadQualify);
 	}
   }
-  else if (!oRacingLine[oRL_FREE].LoadSmoothPath // Load a smooth path
+  else if (oGeneticOpti || 
+	  !oRacingLine[oRL_FREE].LoadSmoothPath // Load a smooth path
 	  (oTrackLoad,
 	  &oTrackDesc, Param,                        // as main racingline
-	  TClothoidLane::TOptions(oBase,oBumpMode)))
+	  TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode)))
   {
     //GfOut("# ... make smooth path ...\n");
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
-	  TClothoidLane::TOptions(oBase,oBumpMode));
+	  TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode));
 #ifdef EXPORT_RACINGLINE
     oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
 #endif
-    oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
+	if (!oGeneticOpti)
+      oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
 
   if (Qualification)
@@ -1657,20 +1671,22 @@ void TDriver::FindRacinglines()
 	  oSideScaleBrake*Param.oCarParam.oScaleBrake; //   to be able to avoid
     Param.Fix.oBorderOuter += oSideBorderOuter;
 	
-    if (!oRacingLine[oRL_LEFT].LoadSmoothPath    // Load a smooth path
+    if (oGeneticOpti || 
+      !oRacingLine[oRL_LEFT].LoadSmoothPath      // Load a smooth path
 	  (oTrackLoadLeft,                           // to be used as
 	  &oTrackDesc, Param,                        // avoid to left racingline
-	    TClothoidLane::TOptions(oBase,oBumpMode, FLT_MAX, -oAvoidWidth, true)))
+	    TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode, FLT_MAX, -oAvoidWidth, true)))
 	{
       //GfOut("# ... make avoid path left ...\n");
 
       oRacingLine[oRL_LEFT].MakeSmoothPath       // Avoid to left racingline
 	    (&oTrackDesc, Param,
-		TClothoidLane::TOptions(oBase,oBumpMode, FLT_MAX, -oAvoidWidth, true));
+		TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode, FLT_MAX, -oAvoidWidth, true));
 #ifdef EXPORT_RACINGLINE
       oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
 #endif
-      oRacingLine[oRL_LEFT].SavePointsToFile(oTrackLoadLeft);
+	  if (!oGeneticOpti)
+        oRacingLine[oRL_LEFT].SavePointsToFile(oTrackLoadLeft);
 	}
 
   	Param.oCarParam2.oScaleBumpLeft =            // Adjust outer bump scale
@@ -1678,20 +1694,22 @@ void TDriver::FindRacinglines()
     Param.oCarParam2.oScaleBumpRight =           // Reset outer bump scale
 	  Param.oCarParam.oScaleBump;                //   to keep speed
 
-	if (!oRacingLine[oRL_RIGHT].LoadSmoothPath   // Load a smooth path
+    if (oGeneticOpti || 
+	  !oRacingLine[oRL_RIGHT].LoadSmoothPath     // Load a smooth path
 	  (oTrackLoadRight,                          // to be used as
 	  &oTrackDesc, Param,                        // avoid to right racingline
-  	    TClothoidLane::TOptions(oBase,oBumpMode, -oAvoidWidth, FLT_MAX, true)))
+  	    TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode, -oAvoidWidth, FLT_MAX, true)))
 	{
       //GfOut("# ... make avoid path right ...\n");
 
 	  oRacingLine[oRL_RIGHT].MakeSmoothPath      // Avoid to right racingline
 	    (&oTrackDesc, Param,
-  	    TClothoidLane::TOptions(oBase, oBumpMode, -oAvoidWidth, FLT_MAX, true));
+  	    TClothoidLane::TOptions(oBase,oBaseScale, oBumpMode, -oAvoidWidth, FLT_MAX, true));
 #ifdef EXPORT_RACINGLINE
       oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
 #endif
-      oRacingLine[oRL_RIGHT].SavePointsToFile(oTrackLoadRight);
+	  if (!oGeneticOpti)
+        oRacingLine[oRL_RIGHT].SavePointsToFile(oTrackLoadRight);
 	}
 
     double MaxPitDist = 0.0;

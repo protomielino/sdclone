@@ -55,6 +55,8 @@
 #define PRM_DAMAGES		"weight of damages"
 #define PRM_INITIAL		"get initial value"
 
+#define PRV_OPTI	    "genetic optimisation"
+
 //  
 // Genetic parameters are handled in a single array 
 // (See TGeneticParameter** GP;).
@@ -106,15 +108,6 @@ typedef struct genPart
 // This structure contains all values from the current race 
 // we need for genetic parameter optimization
 //
-// First section is a set of data to access the correct setup files
-// Second section contains strategic parameters for the learning
-// Third section provides some counters to access the genetic parameters
-// Next is a set of race results stored here to control the selection
-// Lasr contains the buffers for stings used
-//
-// At the end there is an placeholder array ([1]) to
-// easily getting the address of the list of parts defined.
-//
 typedef struct genData
 {
 	// Pointer to the current car
@@ -126,6 +119,7 @@ typedef struct genData
 	char* CarType;			// car type to create path to setup file
 	char* RobotName;		// robot name to create path to setup
 	char* AuthorName;		// name of author of setup
+	char* PrivateSection;	// name of robot private section
 
 	// Strategic data, car setup depending on optimization state
     int Type;				// 0: race; 1: qualifying
@@ -139,8 +133,6 @@ typedef struct genData
 	int LastDamagesTotal;	// Last total
 	double WeightOfDamages;	// Factor to weight damages as time penalties
 
-	// In case we handle a set of different race types
-	//double QualifyingLapTime;	// Laptime while qualifying
 	double RaceLapTime;			// Laptime while race
 
 	double BestTotalLapTime;	// Best laptime in the current race
@@ -160,10 +152,10 @@ typedef struct genData
 
 	// Counters
 	int Loops;		// Number of optimisation loops still to do
+	float Scale;	// Divisor for Scale factor
 	int MaxSelected;// Max number of parameters to select
 	int NbrOfParam;	// Number of parameters in total
 	int NbrOfParts; // Number of parts used
-	int NextIdx;    // Index to next parameter
 
 	// Parts
     tgenPart* Part;   // Pointer to first part structure
@@ -171,11 +163,12 @@ typedef struct genData
 	// Parameters
 	TGeneticParameter** GP; // Pointer to first parameter
 
-	// Buffers for strings	    // MAX_PATH = 260
-	char TrackNameBuffer[261];	// Buffer for trackname 
-	char CarTypeBuffer[261];	// Buffer for car type
-	char RobotNameBuffer[261];	// Buffer for robotname
-	char AuthorNameBuffer[261];	// Buffer name of setup author
+	// Buffers for strings			// MAX_PATH = 260
+	char TrackNameBuffer[261];		// Buffer for trackname 
+	char CarTypeBuffer[261];		// Buffer for car type
+	char RobotNameBuffer[261];		// Buffer for robotname
+	char AuthorNameBuffer[261];		// Buffer name of setup author
+	char PrivateSectionBuffer[261];	// Buffer name of setup author
 
 } tgenData;
 

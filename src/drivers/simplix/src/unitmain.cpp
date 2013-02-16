@@ -2,16 +2,20 @@
 // unitmain.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 2.X
 //--------------------------------------------------------------------------*
 // Interface to TORCS
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2013.01.06
+// Last changed : 2013.02.16
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.05.001
+// Version      : 3.06.000
+//--------------------------------------------------------------------------*
+// V3.06.000 (SimuV2.1)(Genetic Parameter Optimisation):
+// Additional parameter to control loading of racinglines
+// Renamed parameter "start fuel" to "initial fuel"
 //--------------------------------------------------------------------------*
 // V3.05.001 (SimuV2.1):
 // Separated hairpin calculations
@@ -306,6 +310,7 @@ void SetUpSimplix_sc()
     SetParameters(NBBOTS, "sc996");
     TDriver::UseSCSkilling = true;                 // Use supercar skilling
     TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
+	TDriver::UseRacinglineParameters = true;
 };
 //==========================================================================*
 
@@ -346,6 +351,7 @@ void SetUpSimplix_ls2()
 	SetParameters(NBBOTS, "ls2-bavaria-g3gtr");
     TDriver::AdvancedParameters = true;
     TDriver::UseBrakeLimit = true;
+	TDriver::UseRacinglineParameters = true;
     TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
 };
 //==========================================================================*
@@ -1075,6 +1081,7 @@ extern "C" int simplix_ls2(tModInfo *ModInfo)
   SetParameters(1, "ls2-bavaria-g3gtr");
   TDriver::AdvancedParameters = true;
   TDriver::UseBrakeLimit = true;
+  TDriver::UseRacinglineParameters = true;
   return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*

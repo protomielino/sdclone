@@ -2,17 +2,17 @@
 // unitclothoid.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 2.X
 //--------------------------------------------------------------------------*
 // Lane clothoide like
 // Fahrspur clothoidenï¿½hnlich
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.01.06
+// Last changed : 2013.02.16
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.05.000
+// Version      : 3.06.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -92,6 +92,7 @@ void TClothoidLane::MakeSmoothPath(
 {
   TCarParam& CarParam = Param.oCarParam;
   oBase = Opts.Base;
+  oBaseFactor = Opts.BaseFactor;
 
   if (Opts.MaxR < FLT_MAX)
     LaneType = ltLeft;
@@ -176,6 +177,7 @@ bool TClothoidLane::LoadSmoothPath(
 {
   TCarParam& CarParam = Param.oCarParam;
   oBase = Opts.Base;
+  oBaseFactor = Opts.BaseFactor;
 
   if (Opts.Side)
     CarParam = Param.oCarParam2;
@@ -193,6 +195,7 @@ void TClothoidLane::SmoothPath(
   const TOptions& Opts)
 {
   oBase = Opts.Base;
+  oBaseFactor = Opts.BaseFactor;
 
   int FwdRange = 110;
   CalcFwdAbsCrv(FwdRange);
@@ -616,7 +619,7 @@ void TClothoidLane::OptimisePath
 	  LFly = L3;  
 
 	  int Index = (K + Count - 3 * Step) % Count;
-      double Factor = 1.016f;
+      double Factor = oBaseFactor;
 
 	  if (LFly->CrvZ < UglyCrvZ)
 	  {

@@ -35,9 +35,6 @@
 
 #include "racestate.h"
 
-// State flag for run once initialisation
-bool genOptNeedInit = true;
-
 // State Automaton Init
 void
 ReStateInit(void *prevMenu)
@@ -86,11 +83,6 @@ ReStateManage(void)
 			case RE_STATE_RACE_START:
 				GfLogInfo("%s now in RACE_START state\n", ReInfo->_reName);
 				mode = ReRaceStart();
-				if (genOptNeedInit)
-				{
-					ReInitialiseGeneticOptimisation();
-					genOptNeedInit = false;
-				}
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_RACE;
 					GfLogInfo("%s now in RACE state\n", ReInfo->_reName);
