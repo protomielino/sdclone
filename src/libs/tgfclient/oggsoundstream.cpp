@@ -24,29 +24,29 @@
 
 OggSoundStream::OggSoundStream(char* path):
 	SoundStream(path),
-	valid(false),
-	rateInHz(0),
-	format(FORMAT_INVALID)
+	_valid(false),
+	_rateInHz(0),
+	_format(FORMAT_INVALID)
 {
 	int result;
  
-	if((result = ov_fopen(path, &oggStream)) < 0) {
-		GfError("OggSoundStream: Could not open Ogg stream: %s\n", errorString(result));
+	if((result = ov_fopen(path, &_oggStream)) < 0) {
+		GfLogError("OggSoundStream: Could not open Ogg stream: %s\n", errorString(result));
 		return;
 	}
 	
 	// fclose is not required here, the vorbis lib will take care of this on ov_clear.
 		
-	vorbis_info* vorbisInfo = ov_info(&oggStream, -1);
-	rateInHz = vorbisInfo->rate;
+	vorbis_info* vorbisInfo = ov_info(&_oggStream, -1);
+	_rateInHz = vorbisInfo->rate;
 
     if(vorbisInfo->channels == 1) {
-        format = FORMAT_MONO16;
+        _format = FORMAT_MONO16;
 	} else {
-        format = FORMAT_STEREO16;
+        _format = FORMAT_STEREO16;
 	}
 
-	valid = true;
+	_valid = true;
 }
 
 
@@ -55,7 +55,7 @@ OggSoundStream::OggSoundStream(char* path):
 OggSoundStream::~OggSoundStream()
 {
 	if (isValid()) {
-		ov_clear(&oggStream);
+		ov_clear(&_oggStream);
 	}
 }
 
@@ -73,7 +73,7 @@ bool OggSoundStream::read(char* buffer, const int bufferSize, int* resultSize, c
 	int result;
 
 	while(*resultSize < bufferSize) {
-		result = ov_read(&oggStream, buffer + *resultSize, bufferSize - *resultSize, 0, 2, 1, &section);
+		result = ov_read(&_oggStream, buffer + *resultSize, bufferSize - *resultSize, 0, 2, 1, &section);
 
 		if(result > 0) {
 			*resultSize += result;
@@ -83,7 +83,7 @@ bool OggSoundStream::read(char* buffer, const int bufferSize, int* resultSize, c
 				return false;
 			} else {
 				// Loop to the beginning of the stream
-				ov_time_seek(&oggStream, 0);
+				ov_time_seek(&_oggStream, 0);
 			}
 		}
 	}
@@ -102,11 +102,11 @@ bool OggSoundStream::read(char* buffer, const int bufferSize, int* resultSize, c
 void OggSoundStream::rewind()
 {
 	if (!isValid()) {
-		GfError("OggSoundStream: Invalid, no info available.\n");
+		GfLogError("OggSoundStream: Invalid, no info available.\n");
 		return;
 	}
 
-	ov_time_seek(&oggStream, 0);
+	ov_time_seek(&_oggStream, 0);
 }
 
 
@@ -115,25 +115,25 @@ void OggSoundStream::rewind()
 void OggSoundStream::display()
 {
 	if (!isValid()) {
-		GfError("OggSoundStream: Invalid, no info available.\n");
+		GfLogError("OggSoundStream: Invalid, no info available.\n");
 		return;
 	}
 	
-	vorbis_info* vorbisInfo = ov_info(&oggStream, -1);
-    vorbis_comment* vorbisComment = ov_comment(&oggStream, -1);
+	vorbis_info* vorbisInfo = ov_info(&_oggStream, -1);
+    vorbis_comment* vorbisComment = ov_comment(&_oggStream, -1);
 	
-	GfOut("version         %d\n", vorbisInfo->version);
-	GfOut("channels        %d\n", vorbisInfo->channels);
-	GfOut("rate (hz)       %ld\n", vorbisInfo->rate);
-	GfOut("bitrate upper   %ld\n", vorbisInfo->bitrate_upper);
-	GfOut("bitrate nominal %ld\n", vorbisInfo->bitrate_nominal);
-	GfOut("bitrate lower   %ld\n", vorbisInfo->bitrate_lower);
-	GfOut("bitrate window  %ld\n\n", vorbisInfo->bitrate_window);
-	GfOut("vendor          %s\n", vorbisComment->vendor);
+	GfLogInfo("version         %d\n", vorbisInfo->version);
+	GfLogInfo("channels        %d\n", vorbisInfo->channels);
+	GfLogInfo("rate (hz)       %ld\n", vorbisInfo->rate);
+	GfLogInfo("bitrate upper   %ld\n", vorbisInfo->bitrate_upper);
+	GfLogInfo("bitrate nominal %ld\n", vorbisInfo->bitrate_nominal);
+	GfLogInfo("bitrate lower   %ld\n", vorbisInfo->bitrate_lower);
+	GfLogInfo("bitrate window  %ld\n\n", vorbisInfo->bitrate_window);
+	GfLogInfo("vendor          %s\n", vorbisComment->vendor);
 
 	int i;
     for(i = 0; i < vorbisComment->comments; i++) {
-        GfOut("                %s\n", vorbisComment->user_comments[i]);
+        GfLogInfo("                %s\n", vorbisComment->user_comments[i]);
 	}
 }
 

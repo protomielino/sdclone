@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
+#include <cstdio>
 #include <tgf.h>
 #include "openalmusicplayer.h"
 
@@ -25,17 +25,17 @@ const int OpenALMusicPlayer::BUFFERSIZE = 4096*64;
 const ALfloat OpenALMusicPlayer::FADESTEP = 0.01;
 
 OpenALMusicPlayer::OpenALMusicPlayer(SoundStream* soundStream):
-	device(NULL),
-	context(NULL),
-	originalcontext(NULL),
-	source(0),
-	stream(soundStream),
-	ready(false),
-	maxVolume(1.0),
-	fadestate(FADEIN)
+	_device(NULL),
+	_context(NULL),
+	_originalcontext(NULL),
+	_source(0),
+	_maxVolume(1.0),
+	_fadestate(FADEIN),
+	_stream(soundStream),
+	_ready(false)
 {
-	buffers[0] = 0;
-	buffers[1] = 0;
+	_buffers[0] = 0;
+	_buffers[1] = 0;
 }
 
 
@@ -43,17 +43,17 @@ OpenALMusicPlayer::OpenALMusicPlayer(SoundStream* soundStream):
 
 OpenALMusicPlayer::~OpenALMusicPlayer()
 {
-	if (ready) {
+	if (_ready) {
 		stop();
 	}
-	if(originalcontext == NULL) {
+	if(_originalcontext == NULL) {
 		alcMakeContextCurrent(0);
-		alcDestroyContext(context);
-		alcCloseDevice(device);
+		alcDestroyContext(_context);
+		alcCloseDevice(_device);
 	}
-	if(stream) {
-		delete stream;
-		stream = NULL;
+	if(_stream) {
+		delete _stream;
+		_stream = NULL;
 	}
 }
 
@@ -62,29 +62,27 @@ OpenALMusicPlayer::~OpenALMusicPlayer()
 
 void OpenALMusicPlayer::stop()
 {
-	if (!ready) {
+	if (!_ready) {
 		return;
 	}
 	
-	alSourceStop(source);
+	alSourceStop(_source);
     
 	int queued = 0;
 	
-	alGetSourcei(source, AL_BUFFERS_QUEUED, &queued);
+	alGetSourcei(_source, AL_BUFFERS_QUEUED, &queued);
 	while (queued--) {
 		ALuint buffer;
-		alSourceUnqueueBuffers(source, 1, &buffer);
+		alSourceUnqueueBuffers(_source, 1, &buffer);
 		check();
 	}
 	
-    alDeleteSources(1, &source);
+    alDeleteSources(1, &_source);
     check();
-    alDeleteBuffers(2, buffers);
+    alDeleteBuffers(2, _buffers);
     check();
-
-
 	
-	ready = false;
+	_ready = false;
 }
 
 
@@ -92,22 +90,22 @@ void OpenALMusicPlayer::stop()
 
 bool OpenALMusicPlayer::initContext()
 {
-	originalcontext = alcGetCurrentContext();
-	if(originalcontext == NULL) {
-		device = alcOpenDevice(NULL);
-		if( device == NULL ) {
-			GfError("OpenALMusicPlayer: OpenAL could not open device\n");
+	_originalcontext = alcGetCurrentContext();
+	if(_originalcontext == NULL) {
+		_device = alcOpenDevice(NULL);
+		if(_device == NULL ) {
+			GfLogError("OpenALMusicPlayer: OpenAL could not open device\n");
 			return false;
 		}
 
-		context = alcCreateContext(device, NULL);
-		if(context == NULL) {
-			alcCloseDevice(device);
-			GfError("OpenALMusicPlayer: OpenAL could not create contect for device\n");
+		_context = alcCreateContext(_device, NULL);
+		if(_context == NULL) {
+			alcCloseDevice(_device);
+			GfLogError("OpenALMusicPlayer: OpenAL could not create contect for device\n");
 			return false;
 		}
-		alcMakeContextCurrent(context);
-		alcGetError(device);
+		alcMakeContextCurrent(_context);
+		alcGetError(_device);
 	}
 	return check();
 }
@@ -117,7 +115,7 @@ bool OpenALMusicPlayer::initContext()
 
 bool OpenALMusicPlayer::initBuffers()
 {
-	alGenBuffers(2, buffers);
+	alGenBuffers(2, _buffers);
 	return check();
 }
 
@@ -126,17 +124,17 @@ bool OpenALMusicPlayer::initBuffers()
 
 bool OpenALMusicPlayer::initSource()
 {
-    alGenSources(1, &source);
+    alGenSources(1, &_source);
     if (!check()) {
-		GfError("OpenALMusicPlayer: initSource failed to get sound source.\n");
+		GfLogError("OpenALMusicPlayer: initSource failed to get sound source.\n");
 		return false;
 	};
     
-    alSource3f(source, AL_POSITION,        0.0, 0.0, 0.0);
-    alSource3f(source, AL_VELOCITY,        0.0, 0.0, 0.0);
-    alSource3f(source, AL_DIRECTION,       0.0, 0.0, 0.0);
-    alSourcef (source, AL_ROLLOFF_FACTOR,  0.0          );
-    alSourcei (source, AL_SOURCE_RELATIVE, AL_TRUE      );
+    alSource3f(_source, AL_POSITION,        0.0, 0.0, 0.0);
+    alSource3f(_source, AL_VELOCITY,        0.0, 0.0, 0.0);
+    alSource3f(_source, AL_DIRECTION,       0.0, 0.0, 0.0);
+    alSourcef (_source, AL_ROLLOFF_FACTOR,  0.0          );
+    alSourcei (_source, AL_SOURCE_RELATIVE, AL_TRUE      );
 	
 	return true;
 }
@@ -149,7 +147,7 @@ bool OpenALMusicPlayer::check()
 	int error = alGetError();
 
 	if(error != AL_NO_ERROR) {
-		GfError("OpenALMusicPlayer: OpenAL error was raised: %d\n", error);
+		GfLogError("OpenALMusicPlayer: OpenAL error was raised: %d\n", error);
 		return false;
 	}
 
@@ -163,7 +161,7 @@ bool OpenALMusicPlayer::isPlaying()
 {
     ALenum state;
 	
-    alGetSourcei(source, AL_SOURCE_STATE, &state);    
+    alGetSourcei(_source, AL_SOURCE_STATE, &state);    
     return (state == AL_PLAYING);
 }
 
@@ -175,26 +173,26 @@ bool OpenALMusicPlayer::streamBuffer(ALuint buffer)
 	int size = 0;
 	const char* error = '\0';
 	
-	if (!stream->read(pcm, BUFFERSIZE, &size, error)) {
-		GfError("OpenALMusicPlayer: Stream read error: %s\n", error);
+	if (!_stream->read(pcm, BUFFERSIZE, &size, error)) {
+		GfLogError("OpenALMusicPlayer: Stream read error: %s\n", error);
 		return false;
-	} else {
-		int format;
-		switch (stream->getSoundFormat()) {
-			case SoundStream::FORMAT_MONO16:
-				format = AL_FORMAT_MONO16;
-				break;
-			case SoundStream::FORMAT_STEREO16:
-				format = AL_FORMAT_STEREO16;
-				break;
-			default:
-				GfError("OpenALMusicPlayer: Format error: \n");
-				return false;
-		}
-		
-		alBufferData(buffer, format, pcm, size, stream->getRateInHz());
-		return check();
 	}
+
+	int format;
+	switch (_stream->getSoundFormat()) {
+		case SoundStream::FORMAT_MONO16:
+			format = AL_FORMAT_MONO16;
+			break;
+		case SoundStream::FORMAT_STEREO16:
+			format = AL_FORMAT_STEREO16;
+			break;
+		default:
+			GfLogError("OpenALMusicPlayer: Format error: \n");
+			return false;
+	}
+	
+	alBufferData(buffer, format, pcm, size, _stream->getRateInHz());
+	return check();
 }
 
 
@@ -202,14 +200,14 @@ bool OpenALMusicPlayer::streamBuffer(ALuint buffer)
 
 void OpenALMusicPlayer::start()
 {
-	if (!ready) {
-		if (stream->getSoundFormat() == SoundStream::FORMAT_INVALID) {
-			GfError("OpenALMusicPlayer: Sound stream has invalid format\n");
+	if (!_ready) {
+		if (_stream->getSoundFormat() == SoundStream::FORMAT_INVALID) {
+			GfLogError("OpenALMusicPlayer: Sound stream has invalid format\n");
 			return;
 		}
 		
 		if (initContext() && initBuffers() && initSource()) {
-			ready = true;
+			_ready = true;
 			startPlayback();
 		}
 		
@@ -220,19 +218,19 @@ void OpenALMusicPlayer::start()
 void OpenALMusicPlayer::pause()
 {
 	if(isPlaying()) {
-		alSourceStop(source);
+		alSourceStop(_source);
 	}
 }
 
 void OpenALMusicPlayer::resume(int flag)
 {
 	if(!isPlaying()) {
-		alSourcePlay(source);
+		alSourcePlay(_source);
 	}
 }
 void OpenALMusicPlayer::rewind()
 {
-	stream->rewind();
+	_stream->rewind();
 }
 
 
@@ -240,7 +238,7 @@ void OpenALMusicPlayer::rewind()
 
 bool OpenALMusicPlayer::playAndManageBuffer()
 {
-	if (!ready) {
+	if (!_ready) {
 		return false;
 	}
 	
@@ -249,22 +247,22 @@ bool OpenALMusicPlayer::playAndManageBuffer()
 
 	doFade();
 
-	alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
+	alGetSourcei(_source, AL_BUFFERS_PROCESSED, &processed);
 
 	while(processed--) {
 		ALuint buffer;
 		
-		alSourceUnqueueBuffers(source, 1, &buffer);
+		alSourceUnqueueBuffers(_source, 1, &buffer);
 		check();
 		active = streamBuffer(buffer);
-		alSourceQueueBuffers(source, 1, &buffer);
+		alSourceQueueBuffers(_source, 1, &buffer);
 		check();
 	}
 
 	if (!active && !isPlaying()) {
 		// Try to reanimate playback
 		if(!startPlayback()) {
-			GfError("OpenALMusicPlayer: Cannot play stream.\n");
+			GfLogError("OpenALMusicPlayer: Cannot play stream.\n");
 		}
 	}
 	
@@ -280,63 +278,63 @@ bool OpenALMusicPlayer::startPlayback()
         return true;
 	}
 	
-    if(!streamBuffer(buffers[0])) {
+    if(!streamBuffer(_buffers[0])) {
         return false;
 	}
         
-    if(!streamBuffer(buffers[1])) {
+    if(!streamBuffer(_buffers[1])) {
         return false;
 	}
     
-    alSourceQueueBuffers(source, 2, buffers);
-    alSourcePlay(source);
+    alSourceQueueBuffers(_source, 2, _buffers);
+    alSourcePlay(_source);
     
     return true;
 }
 
 void OpenALMusicPlayer::fadeout()
 {
-	fadestate = FADEOUT;
+	_fadestate = FADEOUT;
 }
 
 void OpenALMusicPlayer::fadein()
 {
-	fadestate = FADEIN;
-	alSourcef(source, AL_GAIN, 0.0f);
+	_fadestate = FADEIN;
+	alSourcef(_source, AL_GAIN, 0.0f);
 }
 
 void OpenALMusicPlayer::setvolume(float volume)
 {
-	maxVolume = volume;
+	_maxVolume = volume;
 }
 
 float OpenALMusicPlayer::getvolume()
 {
-	return maxVolume;
+	return _maxVolume;
 }
 
 void OpenALMusicPlayer::doFade()
 {
 	ALfloat currentVol = 0.0;
-	switch(fadestate){
+	switch(_fadestate){
 		case FADEIN:
-			alGetSourcef(source, AL_GAIN, &currentVol);
+			alGetSourcef(_source, AL_GAIN, &currentVol);
 			currentVol += FADESTEP;
-			if(currentVol >= maxVolume){
-				currentVol = maxVolume;
-				fadestate = NONE;
+			if(currentVol >= _maxVolume){
+				currentVol = _maxVolume;
+				_fadestate = NONE;
 			}
-			alSourcef(source, AL_GAIN, currentVol);
+			alSourcef(_source, AL_GAIN, currentVol);
 
 			break;
 		case FADEOUT:
-			alGetSourcef(source, AL_GAIN, &currentVol);
+			alGetSourcef(_source, AL_GAIN, &currentVol);
 			currentVol -= FADESTEP;
 			if(currentVol <= 0.0){
 				currentVol = 0.0;
-				fadestate = NONE;
+				_fadestate = NONE;
 			}
-			alSourcef(source, AL_GAIN, currentVol);
+			alSourcef(_source, AL_GAIN, currentVol);
 			break;
 		case NONE:
 			break;

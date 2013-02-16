@@ -33,23 +33,23 @@ class OggSoundStream : public SoundStream
 		OggSoundStream(char* path);
 		virtual ~OggSoundStream();
 		
-		virtual int getRateInHz() { return rateInHz; }
-		virtual SoundFormat getSoundFormat() { return format; }
+		virtual int getRateInHz() { return _rateInHz; }
+		virtual SoundFormat getSoundFormat() { return _format; }
 		
 		virtual bool read(char* buffer, const int bufferSize, int* resultSize, const char*& error);
 		virtual void rewind();
 		virtual void display();
-		virtual bool isValid() { return valid; }
+		virtual bool isValid() { return _valid; }
 
 	protected:
 		
 	private:
 		const char* errorString(int code);
 		
-		OggVorbis_File	oggStream;
-		bool			valid;
-		int				rateInHz;
-		SoundFormat		format;
+		OggVorbis_File	_oggStream;
+		bool			_valid;
+		int				_rateInHz;
+		SoundFormat		_format;
 };
 
 #endif // __OggSoundStream_h__
