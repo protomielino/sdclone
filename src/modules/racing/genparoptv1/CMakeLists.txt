@@ -3,13 +3,13 @@ INCLUDE(../../../../cmake/macros.cmake)
 #PROJECT(genparoptv1)
 
 SET(_SOURCES genparoptv1.cpp
-             racecareer.cpp raceupdate.cpp racecars.cpp
+             raceupdate.cpp racecars.cpp
              raceinit.cpp racemain.cpp
              racetrack.cpp raceresults.cpp racesimusimu.cpp 
              racestate.cpp racesituation.cpp racemessage.cpp
              raceutil.cpp genetic.cpp)
 SET(_HEADERS genparoptv1.h 
-             racecareer.h raceupdate.h racecars.h
+             raceupdate.h racecars.h
              raceinit.h 
              racetrack.h raceresults.h racesimusimu.h 
              racestate.h racesituation.h racemessage.h
