@@ -41,19 +41,19 @@ TGeneticParameter::TGeneticParameter():
 	Active(false),
 	Min(FLT_MIN),
 	Max(FLT_MAX),
-	Def(0.0),
 	Val(0.0),
+	Def(0.0),
 	Weight(1.0),
 	Scale(1.0),
 	Round(1.0),
-	oLabel(NULL),
-	oSection(NULL),
-	oParameter(NULL),
-	oUnit(NULL),
 	Tries(0),
 	Changed(0),
 	Selected(false),
-	LeftRight(false)
+	LeftRight(false),
+	oLabel(NULL),
+	oSection(NULL),
+	oParameter(NULL),
+	oUnit(NULL)
 {
 	Range = Max - Min;
 };
@@ -168,7 +168,7 @@ int TGeneticParameter::Set(const char* Part, int Index)
 	GfParmSetStr(Handle, ParamSection, PRM_SECT, oSection);
 	GfParmSetStr(Handle, ParamSection, PRM_PRM, oParameter);
 	GfParmSetStr(Handle, ParamSection, PRM_UNIT, oUnit);
-	GfParmSetNumEx(Handle, ParamSection, PRM_RANGE, oUnit, Val, Min, Max);
+	GfParmSetNum(Handle, ParamSection, PRM_RANGE, oUnit, Val, Min, Max);
 	GfParmSetNum(Handle, ParamSection, PRM_WEIGHT, 0, Weight);
 	GfParmSetNum(Handle, ParamSection, PRM_SCALE, 0, Scale);
 	GfParmSetNum(Handle, ParamSection, PRM_ROUND, 0, Round);
@@ -300,20 +300,20 @@ int TGeneticParameter::SetVal(void* SetupHandle, int Index)
 	if (Index > 0)
 	  sprintf(ParamSection,"%s/%d",oSection,Index);
 	else
-	  sprintf(ParamSection,"%s",oSection,Index);
+	  sprintf(ParamSection,"%s",oSection);
 
 	if (LeftRight)
 	{
 		char SideParam[64];
 
 		sprintf(SideParam,ParamSection,SECT_PH_LEFT);
-		GfParmSetNumEx(SetupHandle, SideParam, oParameter, oUnit, Val, Min, Max);
+		GfParmSetNum(SetupHandle, SideParam, oParameter, oUnit, Val, Min, Max);
 
 		sprintf(SideParam,ParamSection,SECT_PH_RGHT);
-		return GfParmSetNumEx(SetupHandle, SideParam, oParameter, oUnit, Val, Min, Max);
+		return GfParmSetNum(SetupHandle, SideParam, oParameter, oUnit, Val, Min, Max);
 	}
 	else
-		return GfParmSetNumEx(SetupHandle, ParamSection, oParameter, oUnit, Val, Min, Max);
+		return GfParmSetNum(SetupHandle, ParamSection, oParameter, oUnit, Val, Min, Max);
 }
 
 

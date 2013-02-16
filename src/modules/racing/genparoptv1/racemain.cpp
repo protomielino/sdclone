@@ -146,9 +146,6 @@ void ReRaceSkipSession()
 int
 ReRaceEventInit(void)
 {
-	void *mainParams = ReInfo->mainParams;
-	void *params = ReInfo->params;
-
 	// Initialize the race session name.
 	ReInfo->_reRaceName = ReGetCurrentRaceName();
 	GfLogInfo("Starting new event (%s session)\n", ReInfo->_reRaceName);
@@ -277,7 +274,7 @@ ReParseStartingOrder(const char *StartingOrder, tReGridPart **pGridList, int nCa
 }
 
 // Find driver position in params/RM_SECT_DRIVERS based on module name and ID
-// returns with the driver position or -1 when not found or error
+// returns the driver position or -1 when not found or error
 int
 ReFindDriverIdx (const char *modulename, int idx)
 {
@@ -995,7 +992,7 @@ ReRaceEventShutdown(void)
 	void *results = ReInfo->results;
 	int curRaceIdx;
 //	bool careerMode = false;
-	bool first = true;
+//	bool first = true;
 
 	// Notify the UI that the race event is finishing now.
 	ReUI().onRaceEventFinishing();
@@ -1117,14 +1114,6 @@ ReInitialiseGeneticOptimisation()
 	ReImportGeneticParameters();
 }
 
-int GetNumberOfSubsections(void* Handle, char* Section)
-{
-	if (GfParmExistsSection(Handle,Section))
-		return GfParmGetEltNb(Handle,Section);
-	else
-		return 0;
-}
-
 void
 ReImportGeneticParameters()
 {
@@ -1193,15 +1182,15 @@ ReImportGeneticParameters()
 	GfParmReleaseHandle(Handle);
 
 	// Store tank capacity as initial fuel
-	GfParmSetNumEx(Data->Handle, Data->PrivateSection, PRM_FUEL,    
+	GfParmSetNum(Data->Handle, Data->PrivateSection, PRM_FUEL,    
 		(char*) NULL, Data->MaxFuel, -1.0, Data->MaxFuel);
 
 	// Set optimisation flag for robot
-	GfParmSetNumEx(Data->Handle, Data->PrivateSection, PRV_OPTI,    
+	GfParmSetNum(Data->Handle, Data->PrivateSection, PRV_OPTI,    
 		(char*) NULL, 1, 0, 1);
 
-	Data->NbrOfParam = GetNumberOfSubsections(MetaDataFile,SECT_GLOBAL);
-	Data->NbrOfParts = GetNumberOfSubsections(MetaDataFile,SECT_LOCAL);
+	Data->NbrOfParam = GfParmGetEltNb(MetaDataFile,SECT_GLOBAL);
+	Data->NbrOfParts = GfParmGetEltNb(MetaDataFile,SECT_LOCAL);
 
 	// We need at least one part to store the offset 
 	// as index to the last global parameter
@@ -1237,7 +1226,7 @@ ReImportGeneticParameters()
 
 			// Get number of parts defined in the meta data configuration
 			snprintf(buf,sizeof(buf),"%s/%d/%s",SECT_LOCAL,I+1,SECT_PARAM);
-			Data->Part[I].Count = GetNumberOfSubsections(MetaDataFile,buf);
+			Data->Part[I].Count = GfParmGetEltNb(MetaDataFile,buf);
 
 			// Store the data to the list of parts
 			if (TrackParam->Parameter)
@@ -1246,7 +1235,7 @@ ReImportGeneticParameters()
 				Data->Part[I].Subsection = strdup(GroupParam->Subsection);
 
 			// Get number of local sections defined in the car setup
-			Data->Part[I].NbrOfSect = GetNumberOfSubsections(Data->Handle,buf);
+			Data->Part[I].NbrOfSect = GfParmGetEltNb(Data->Handle,buf);
 			// Update number of parameters
 			Data->NbrOfParam += Data->Part[I].Count * Data->Part[I].NbrOfSect;
 
@@ -1397,12 +1386,12 @@ ReCleanupGeneticOptimisation()
 
 	printf ("Reset fuel control\n");
 	// Reset fuel control
-	GfParmSetNumEx(Handle, Data->PrivateSection, PRM_FUEL,    
+	GfParmSetNum(Handle, Data->PrivateSection, PRM_FUEL,    
 		(char*) NULL, -1, -1.0, Data->MaxFuel);
 
 	printf ("Reset optimisation flag for robot\n");
 	// Reset optimisation flag for robot
-	GfParmSetNumEx(Handle, Data->PrivateSection, PRV_OPTI,    
+	GfParmSetNum(Handle, Data->PrivateSection, PRV_OPTI,    
 		(char*) NULL, 0, 0, 1);
 
 	printf ("Set filename for use with local dir\n");
@@ -1486,6 +1475,9 @@ ReEvolution()
 
 	if (Data->First) // First race was done using the initial parameters
 	{
+#ifdef REPEATABLE_RANDOM // For testing only (not for production use)
+		srand((unsigned)time(NULL));	// Initialize the random number generator
+#endif
 		// First race is done with the initial parameters to get the reference laptime
 		GfLogOpt("Initial Lap Time : %g\n",TotalLapTime);
 

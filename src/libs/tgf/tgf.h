@@ -351,7 +351,7 @@ TGF_API tdble GfParmGetCurNumMax(void *handle, const char *path, const char *key
 /* set num parameter value */
 TGF_API int GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, tdble val);
 /* set num parameter value with min an max */
-TGF_API int GfParmSetNumEx(void *handle, const char *path, const char *key, const char *unit, tdble val, tdble min, tdble max);
+TGF_API int GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, tdble val, tdble min, tdble max);
 /* set num parameter value */
 TGF_API int GfParmSetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble val);
 

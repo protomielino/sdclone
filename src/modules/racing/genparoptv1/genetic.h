@@ -241,12 +241,12 @@ class TGeneticParameter
 	bool Selected;	// Parameter is in current selection 
 					// (to avoid multiple variations)
 
+	bool LeftRight;
+
 	char *oLabel;  
 	char *oSection;
 	char *oParameter;
 	char *oUnit;
-
-	bool LeftRight;
 
 	// Common data (class variables)
 	static tgenData Data;	// Structure with all data

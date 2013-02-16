@@ -3272,7 +3272,7 @@ GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, 
     @warning	The key is created is necessary
  */
 int
-GfParmSetNumEx(void *handle, const char *path, const char *key, const char *unit, tdble val, tdble min, tdble max)
+GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, tdble val, tdble min, tdble max)
 {
     struct parmHandle *parmHandle = (struct parmHandle *)handle;
     struct parmHeader *conf;
