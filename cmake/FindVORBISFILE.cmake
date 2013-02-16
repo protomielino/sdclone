@@ -40,7 +40,7 @@ IF(NOT APPLE)
   FIND_PATH(VORBISFILE_INCLUDE_DIR vorbis/vorbisfile.h
     HINTS ENV VORBISFILE_DIR
     PATH_SUFFIXES 
-	  include/vorbis include/VORBIS
+	  include/vorbis include/VORBIS include
     PATHS
 	  /usr /usr/local
     DOC "Non-Apple include dir for VORBISFILE")

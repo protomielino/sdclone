@@ -67,7 +67,7 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
   
     SET(OPTION_3RDPARTY_EXPAT true CACHE BOOL "Use 3rd party Expat library rather than bundled TXML")
 
-    SET(OPTION_MENU_MUSIC false CACHE BOOL "Enable Menu Music")
+    SET(OPTION_MENU_MUSIC true CACHE BOOL "Enable music play-back while navigating through the menus")
 
     # Enable building with 3rd party SOLID library under Windows, as we ship the binary package,
     # but not under Linux, where FreeSolid seems not to be available by default on most distros.

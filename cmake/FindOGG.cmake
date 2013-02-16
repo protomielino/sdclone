@@ -40,7 +40,7 @@ IF(NOT APPLE)
   FIND_PATH(OGG_INCLUDE_DIR ogg/ogg.h
     HINTS ENV OGG_DIR
     PATH_SUFFIXES 
-	  include/ogg include/OGG
+	  include/ogg include/OGG include
     PATHS
 	  /usr /usr/local
     DOC "Non-Apple include dir for OGG")
