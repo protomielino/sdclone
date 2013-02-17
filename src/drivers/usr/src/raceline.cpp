@@ -1945,7 +1945,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  if (!SteerMod)
  {
   // new, simpler steering method
-  vec2f target;
+  vec2f target(0,0);
   double carspeed = Mag(car->_speed_X, car->_speed_Y);
   double steertime = MIN(MaxSteerTime, MinSteerTime + MAX(0.0, carspeed-20.0)/30.0);
   //double lane2left = track->width * SRL[SRLidx].tLane[Next];
