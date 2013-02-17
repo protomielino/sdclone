@@ -9,10 +9,10 @@
 // 
 // File         : unitstrategy.cpp
 // Created      : 2007.02.20
-// Last changed : 2011.06.02
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.02.16
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.06.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -47,7 +47,6 @@
 // GNU GPL (General Public License)
 // Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
-//#undef SPEED_DREAMS
 
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -108,23 +107,12 @@ void TSimpleStrategy::Init(TDriver *Driver)
 //--------------------------------------------------------------------------*
 bool TSimpleStrategy::IsPitFree()
 {
-#ifdef SPEED_DREAMS
     bool IsFree = RtTeamIsPitFree(oDriver->TeamIndex());
 	if (IsFree)
 		GfOut("#%s pit is free (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
 	else
 		GfOut("#%s pit is locked (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
     return IsFree;
-#else
-  if (CarPit != NULL)
-  {
-	TTeamManager::TTeam* Team = oDriver->GetTeam();
-	if ((CarPit->pitCarIndex == TR_PIT_STATE_FREE)
-      && ((Team->PitState == CarDriverIndex) || (Team->PitState == PIT_IS_FREE)))
-      return true;
-  }
-  return false;
-#endif
 }
 //==========================================================================*
 
@@ -133,7 +121,6 @@ bool TSimpleStrategy::IsPitFree()
 //--------------------------------------------------------------------------*
 bool TSimpleStrategy::NeedPitStop()
 {
-#ifdef SPEED_DREAMS
   float FuelConsum;                              // Fuel consumption per m
   if (oFuelPerM == 0.0)                          // If still undefined
     FuelConsum = oExpectedFuelPerM;              //   use estimated value
@@ -141,96 +128,10 @@ bool TSimpleStrategy::NeedPitStop()
     FuelConsum = oFuelPerM;                      //   use it
 
   bool Result = RtTeamNeedPitStop(oDriver->TeamIndex(), FuelConsum, RepairWanted(cPIT_DAMMAGE));
-#else
-  if (CarPit == NULL)                            // Ist eine Box vorhanden?
-    return false;                                //   Wenn nicht, Pech!
-
-  double FuelConsum;                             // Spritverbrauch (pro m)
-  double FuelNeeded;                             // Für nächste Runde nötig
-
-  bool Result = false;                           // Annahme: Kein Boxenstopp
-
-  if (oDriver->oPitSharing)                      // Ist pitsharing aktiviert?
-  {                                              // Wenn ja,
-    if (!IsPitFree())                            //   ist die Box frei?
-	{
-	  //GfOut("#IsPitFree = false: %s (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
-      return Result;                             //   Wenn nicht, Pech!
-	}
-	//else
-	//  GfOut("#IsPitFree = true: %s (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
-  }
-  oRemainingDistance =                           // Restliche Strecke des
-    oRaceDistance - DistanceRaced;               //   Rennens ermitteln
-
-  oRemainingDistance -=                          // Verkürzt um Rückstand
-	oTrackLength * CarLapsBehindLeader;          //   auf den Führenden
-
-  if (oRemainingDistance > oTrackLength + 100)   // Wenn noch mehr km
-  {                                              //   zu fahren sind
-    if (oFuelPerM == 0.0)                        // Spritverbrauch pro m
-      FuelConsum = oExpectedFuelPerM;            //   schätzen
-    else                                         // oder den gemessenen
-      FuelConsum = oFuelPerM;                    //   Wert nehmen
-
-    FuelNeeded =                                 // Bedarf an Treibstoff
-      MIN(oTrackLength+oReserve,                 // Bis z. n. Boxenstopp oder
-	  oRemainingDistance+oReserve) * FuelConsum; // bis zum Ende des Rennens
-
-    if (CarFuel < FuelNeeded)                    // Wenn der Tankinhalt nicht
-	{
-      Result = true;                             //   reicht, tanken
-	  GfOut("#Pitstop by fuel: %s (%g<%g)\n",oDriver->GetBotName(),CarFuel,FuelNeeded);
-	}
-    else if (!oDriver->oPitSharing)              // Ist pitsharing aktiviert?
-    {
-  	  Result = false; 
-	}
-	else                                         // Ansonsten prüfen, für
-	{                                            //   welche Anzahl von Runden
-												 //   alle Teammitglieder
-												 //   noch Treibstoff haben
-      FuelNeeded = FuelConsum * oTrackLength;    // Treibstoff für eine Runde 
-	  int FuelForLaps =                          // Eigene Reichweite
-	    (int) (CarFuel / FuelNeeded - 1);        
-	  TTeamManager::TTeam* Team = oDriver->GetTeam();
-      Team->FuelForLaps[CarDriverIndex] = FuelForLaps;
-	  int MinLaps = Team->GetMinLaps(oCar);      // Mindestreichweite der anderen
-
-	  // Wenn Tanken, dann der, der weniger Runden weit kommen würde
-      if (FuelForLaps <= MinLaps) 
-      {                                      
-        if ((MinLaps < oMinLaps)
-		&& (RemainingLaps > FuelForLaps))
-	    {                                        // Nur Tanken, wenn nötig!
-          FuelNeeded = (oRemainingDistance + oReserve) * FuelConsum;
-          if (CarFuel < FuelNeeded)              // Wenn der Tankinhalt nicht
-	      {                                      // reicht, tanken
-            Result = true;
-			GfOut("#Pitstop by Teammate: %s (%d<=%d)\n",oDriver->GetBotName(),FuelForLaps,MinLaps);
-	      }
-        }
-	  }
-	}
-
-    if (RepairWanted(cPIT_DAMMAGE) > 0)          // Wenn die Schäden zu hoch
-	{                                            //   reparieren lassen
-       Result = true;
-	}
-  };
-#endif
 
   if (oDriver->oTestPitStop)                     // If defined, try
     Result = true;                               //   to stop in pit
 
-  if (Result)
-  {
-#ifdef SPEED_DREAMS
-#else
-	TTeamManager::TTeam* Team = oDriver->GetTeam();
-	Team->PitState = CarDriverIndex;             // Box reserviert
-#endif
-  }
   return Result;
 };
 //==========================================================================*
@@ -240,17 +141,8 @@ bool TSimpleStrategy::NeedPitStop()
 //--------------------------------------------------------------------------*
 void TAbstractStrategy::PitRelease()
 {
-#ifdef SPEED_DREAMS
   RtTeamReleasePit(oDriver->TeamIndex());
   CarRaceCmd = 0;
-#else
-  TTeamManager::TTeam* Team = oDriver->GetTeam();
-  if (Team->PitState == CarDriverIndex)          // Box für mich reserviert?
-  {
-    Team->PitState = PIT_IS_FREE;
-    CarRaceCmd = 0;
-  }
-#endif
 };
 //==========================================================================*
 

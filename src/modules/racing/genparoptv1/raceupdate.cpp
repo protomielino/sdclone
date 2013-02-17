@@ -33,7 +33,7 @@
 #include "genparoptv1.h"
 
 #include "raceresults.h"
-#include "racesimusimu.h"
+//#include "racesimusimu.h"
 #include "racesituation.h"
 
 #include "raceupdate.h"
@@ -79,12 +79,7 @@ int reMainUpdater::operator()(void)
 {
 	GfProfStartProfile("ReUpdate");
 
-	if (_pReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU)
-	{
-		// Simulate the simulation.
-		ReSimuSimu();
-	}
-	else if (_pReInfo->_displayMode & RM_DISP_MODE_NORMAL)
+	if (_pReInfo->_displayMode & RM_DISP_MODE_NORMAL)
 	{
 		// Get the situation for the previous step.
 		GfSchedBeginEvent("raceupdate", "situCopy");

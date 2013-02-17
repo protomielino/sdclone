@@ -9,7 +9,7 @@
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.02.16
+// Last changed : 2013.02.17
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.06.000
@@ -819,6 +819,40 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   {
 	  GfOut("TClothoidLane::SavePointsToFile(%s) : Some error occured\n", TrackLoad);
   }
+  fclose(F);
+}
+//==========================================================================*
+
+//==========================================================================*
+// Clear old racingline
+//--------------------------------------------------------------------------*
+void TClothoidLane::ClearRacingline(const char* TrackLoad)
+{
+  FILE* F = fopen(TrackLoad, "wb");
+  bool error = false;
+  size_t writeSize;
+  if (F == 0)
+    return;
+
+  int K = 0;
+  writeSize = fwrite(&K,sizeof(int),1,F);
+  if( writeSize < 1)
+    error = true;
+  int Version = 0; // Mark it as old
+  writeSize = fwrite(&Version,sizeof(int),1,F);
+  if( writeSize < 1)
+    error = true;
+
+  int Weather = GetWeather();
+  writeSize = fwrite(&Weather,sizeof(int),1,F);
+  if( writeSize < 1)
+    error = true;
+
+  int N = oTrack->Count();
+  writeSize = fwrite(&N,sizeof(int),1,F);
+  if( writeSize < 1)
+    error = true;
+
   fclose(F);
 }
 //==========================================================================*

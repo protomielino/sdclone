@@ -9,10 +9,10 @@
 //
 // File         : unitopponent.cpp
 // Created      : 2007.11.17
-// Last changed : 2011.11.20
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.02.16
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.03.000
+// Version      : 3.06.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -58,7 +58,6 @@
 // GNU GPL (General Public License)
 // Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
-//#undef SPEED_DREAMS
 
 #include <robottools.h>
 
@@ -135,20 +134,11 @@ TOpponent::TInfo& TOpponent::Info()
 //--------------------------------------------------------------------------*
 void TOpponent::Update(
   const PCarElt MyCar,
-#ifdef SPEED_DREAMS
-#else
-  PTeamManager TeamManager,
-#endif
   double MyDirX,
   double MyDirY,
   float &MinDistBack,
   double &MinTimeSlot)
 {
-#ifdef SPEED_DREAMS
-#else
-  oTeamManager = TeamManager;                    // Save Pointer
-#endif
-
   if((CarState & RM_CAR_STATE_NO_SIMU) &&        // omit cars out of race
     (CarState & RM_CAR_STATE_PIT) == 0 )         //   if not in pit
     return;
@@ -329,11 +319,7 @@ bool TOpponent::Classify(
     DistAhead = MIN(MAX(50, DistAhead), 200);    // view to min 50 max 200 m
 
   // Teammate?
-#ifdef SPEED_DREAMS
   if (RtIsTeamMate(MyCar,oCar))                  // If Opp. is teammate
-#else
-  if (oTeamManager->IsTeamMate(MyCar,oCar))      // If Opp. is teammate
-#endif
   {
     oInfo.Flags |= F_TEAMMATE;                   // Set teammate flag
     oInfo.TeamMateDamage = oCar->_dammage;       // Save his damages

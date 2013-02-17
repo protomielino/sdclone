@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.02.16
+// Last changed : 2013.02.17
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.06.000
@@ -63,7 +63,6 @@
 // Heap corruption -> do not use delete for oCarType, use free (oCarType)
 // 
 //--------------------------------------------------------------------------*
-//#undef SPEED_DREAMS
 
 #include <v2_t.h>
 #include <tgf.h>
@@ -273,7 +272,6 @@ TDriver::TDriver(int Index):
 //  oTclAccel(0.1),
 //  oTclAccelLast(1.0),
 //  oTclAccelFactor(0.1),
-  oSPEED_DREAMS(true),
   oTrackName(NULL),
   oTrackLoad(NULL),
   oTrackLoadQualify(NULL),
@@ -424,16 +422,13 @@ void TDriver::SetBotName(void* RobotSettings, char* Value)
     oCarType = NULL;
 
     char SectionBuffer[256];                     // Buffer
-#ifdef SPEED_DREAMS
-    char indexstr[32];
-#endif //SPEED_DREAMS
-    snprintf(SectionBuffer,BUFLEN,               // Build name of
+	char indexstr[32];
+
+	snprintf(SectionBuffer,BUFLEN,               // Build name of
         "%s/%s/%d"                               // section from
 	    ,ROB_SECT_ROBOTS,ROB_LIST_INDEX,oIndex); // Index of own driver
     char* Section = SectionBuffer;
 
-
-#ifdef SPEED_DREAMS 
 	// Modified to avoid memory leaks
 	// Speed dreams has a trick to find out the oCarType
     RtGetCarindexString(oIndex, "simplix", oExtended, indexstr, 32);
@@ -444,12 +439,6 @@ void TDriver::SetBotName(void* RobotSettings, char* Value)
         (RobotSettings                           // car type
         , Section                                // defined in corresponding
         , ROB_ATTR_CAR, DEFAULTCARTYPE));        // section, default car type
-#else // IF NOT SPEED_DREAMS use simplix way to do it
-	oCarType = strdup(GfParmGetStr               // Get pointer to
-      (RobotSettings                             // car type
-      , Section                                  // defined in corresponding
-      , ROB_ATTR_CAR, DEFAULTCARTYPE));          // section, default car type
-#endif //SPEED_DREAMS
 
 	oBotName = Value;                            // Get pointer to drv. name
 
@@ -1035,13 +1024,10 @@ void TDriver::InitTrack
   //GfOut("#\n\n\n#TDriver::InitTrack >>> \n\n\n");
 
   oTrack = Track;                                // save pointers
-#ifdef SPEED_DREAMS
   if (TrackLength < 2000)
 	RtTeamManagerLaps(3);
   else if (TrackLength < 3000)
 	RtTeamManagerLaps(2);
-#else
-#endif
 
   oSituation = Situation;
 
@@ -1515,16 +1501,8 @@ void TDriver::EndRace()
 //--------------------------------------------------------------------------*
 void TDriver::Shutdown()
 {
-#ifdef SPEED_DREAMS
 	RtTeamManagerDump();
 	RtTeamManagerRelease();
-#endif
-/*
-	GfOut("\n\n\n");
-	for (int I = 0; I < 7; I++)
-		GfOut("cTimeSum[%d]: %g msec\n",I,cTimeSum[I]);
-	GfOut("\n\n\n");
-*/
 }
 //==========================================================================*
 
@@ -1604,10 +1582,6 @@ void TDriver::FindRacinglines()
   if(oCommonData->Track != oTrackDesc.Track())   // New track?
   {
     oCommonData->Track = oTrackDesc.Track();     // Save pointer
-#ifdef SPEED_DREAMS
-#else
-    oCommonData->TeamManager.Clear();            // release old informations
-#endif
   }
 
   //GfOut("# ... load smooth path ...\n");
@@ -1620,7 +1594,9 @@ void TDriver::FindRacinglines()
 #ifdef EXPORT_RACINGLINE
     oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
 #endif
-	if (!oGeneticOpti)
+	if (oGeneticOpti)
+      oRacingLine[oRL_FREE].ClearRacingline(oTrackLoad);
+	else
       oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
   else if (oSituation->_raceType == RM_TYPE_QUALIF)
@@ -1635,7 +1611,9 @@ void TDriver::FindRacinglines()
       oRacingLine[oRL_FREE].MakeSmoothPath       // Calculate a smooth path
 	    (&oTrackDesc, Param,                     // as main racingline
 	    TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode));
-  	  if (!oGeneticOpti)
+  	  if (oGeneticOpti)
+        oRacingLine[oRL_FREE].ClearRacingline(oTrackLoadQualify);
+	  else
         oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoadQualify);
 	}
   }
@@ -1652,7 +1630,9 @@ void TDriver::FindRacinglines()
 #ifdef EXPORT_RACINGLINE
     oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
 #endif
-	if (!oGeneticOpti)
+	if (oGeneticOpti)
+      oRacingLine[oRL_FREE].ClearRacingline(oTrackLoad);
+	else
       oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
 
@@ -1685,7 +1665,9 @@ void TDriver::FindRacinglines()
 #ifdef EXPORT_RACINGLINE
       oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
 #endif
-	  if (!oGeneticOpti)
+	  if (oGeneticOpti)
+        oRacingLine[oRL_LEFT].ClearRacingline(oTrackLoadLeft);
+	  else
         oRacingLine[oRL_LEFT].SavePointsToFile(oTrackLoadLeft);
 	}
 
@@ -1708,7 +1690,9 @@ void TDriver::FindRacinglines()
 #ifdef EXPORT_RACINGLINE
       oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
 #endif
-	  if (!oGeneticOpti)
+	  if (oGeneticOpti)
+        oRacingLine[oRL_RIGHT].ClearRacingline(oTrackLoadRight);
+	  else
         oRacingLine[oRL_RIGHT].SavePointsToFile(oTrackLoadRight);
 	}
 
@@ -1749,15 +1733,9 @@ void TDriver::FindRacinglines()
 //--------------------------------------------------------------------------*
 void TDriver::TeamInfo()
 {
-#ifdef SPEED_DREAMS
   //RtTeamManagerShowInfo();
   oTeamIndex = RtTeamManagerIndex(oCar,oTrack,oSituation);
   RtTeamManagerDump();
-#else
-  oTeam = oCommonData->TeamManager.Add(oCar,oSituation);
-#endif
-  //GfOut("#\n# %s Team: %s Teamindex: %d\n#\n",
-  //	  oBotName, oCar->_teamname, oTeamIndex);
 }
 //==========================================================================*
 
@@ -1839,10 +1817,6 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
   for (int I = 0; I < oNbrCars; I++)
   {
 	oOpponents[I].Update(oCar,
-#ifdef SPEED_DREAMS
-#else
-	  &oCommonData->TeamManager, 
-#endif
 	  MyDomX, MyDomY, MinDistBack, MinTimeSlot);
   }
 

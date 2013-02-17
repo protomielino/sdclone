@@ -1,14 +1,13 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // unitmain.cpp
 //--------------------------------------------------------------------------*
-// TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 2.X
+// A robot for SPEED-DREAMS-Version 2.X
 //--------------------------------------------------------------------------*
-// Interface to TORCS
+// Interface to SPEED-DREAMS
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2013.02.16
+// Last changed : 2013.02.17
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.06.000
@@ -16,6 +15,9 @@
 // V3.06.000 (SimuV2.1)(Genetic Parameter Optimisation):
 // Additional parameter to control loading of racinglines
 // Renamed parameter "start fuel" to "initial fuel"
+// Deleted old teammanager
+// Clear old racingline if optimisation is used
+// Deleted old TORCS related code
 //--------------------------------------------------------------------------*
 // V3.05.001 (SimuV2.1):
 // Separated hairpin calculations
@@ -77,7 +79,6 @@
 // GNU GPL (General Public License)
 // Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
-//#undef SPEED_DREAMS
 
 #include <tgf.h>
 #include <track.h>
@@ -788,9 +789,8 @@ static void InitTrack(int Index,
 //--------------------------------------------------------------------------*
 static void NewRace(int Index, tCarElt* Car, tSituation *S)
 {
-#ifdef SPEED_DREAMS
   RtInitTimer(); // Check existance of Performance Counter Hardware
-#endif
+
   cInstances[Index-IndexOffset].cTicks = 0.0;               // Initialize counters
   cInstances[Index-IndexOffset].cMinTicks = FLT_MAX;        // and time data 
   cInstances[Index-IndexOffset].cMaxTicks = 0.0;
@@ -961,7 +961,7 @@ extern "C" int simplix(tModInfo *ModInfo)
   return simplixEntryPoint(ModInfo,RobotSettings);
 }
 //==========================================================================*
-
+/*
 //==========================================================================*
 // Schismatic entry point for simplix_mpa1
 //--------------------------------------------------------------------------*
@@ -1269,7 +1269,7 @@ extern "C" int my_simplix_9(tModInfo *ModInfo)
   return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
-
+*/
 //--------------------------------------------------------------------------*
 // end of file unitmain.cpp
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*

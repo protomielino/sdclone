@@ -36,11 +36,6 @@
 #ifndef _UNITGOBAL_H_
 #define _UNITGOBAL_H_
 
-#ifndef SPEED_DREAMS
-#define SPEED_DREAMS
-#endif
-//#undef SPEED_DREAMS
-
 // The great question, ...
 #if defined(WIN32) || defined(_WIN32)
 #include <windows.h>     // The rich world of windows and gates, ...
@@ -94,7 +89,7 @@
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 126 // Force new calculation
+#define RL_VERSION 127 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*
@@ -265,11 +260,7 @@ enum
 // ... my own planet
 
 // pit states ...
-#ifdef SPEED_DREAMS
 #define PIT_IS_FREE NULL
-#else
-#define PIT_IS_FREE (-1)
-#endif
 // ... pit states
 
 // Shortcuts for TORCS commands ...

@@ -37,7 +37,7 @@ extern int  ReRaceStop();
 extern int  ReRaceEnd();
 extern int  RePostRace();
 extern int  ReRaceEventShutdown();
-
+extern bool ReCleanupStandardgame();
 extern void ReRaceAbandon();
 extern void ReRaceAbort();
 extern void ReRaceSkipSession();

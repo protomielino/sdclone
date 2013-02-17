@@ -49,9 +49,6 @@
 
 #include "raceinit.h"
 
-// State flag for run once initialisation
-bool genOptNeedInit = true;
-
 static const char *aPszSkillLevelNames[] =
 	{ ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
 static const int NSkillLevels = (int)(sizeof(aPszSkillLevelNames)/sizeof(char*));
@@ -609,12 +606,8 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
         GfParmReleaseHandle (handle);
       }
 
-	  // Check: Do we have to initialize the optimisation?
-	  if (genOptNeedInit) // TODO: Reset Flag after optimisation!
-	  {
-		ReInitialiseGeneticOptimisation();
-		genOptNeedInit = false;
-	  }
+	  // Initialize the optimisation if needed
+	  ReInitialiseGeneticOptimisation();
 
       if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU))
       {

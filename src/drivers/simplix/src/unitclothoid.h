@@ -9,7 +9,7 @@
 //
 // File         : unitclothoid.h
 // Created      : 2007.11.17
-// Last changed : 2013.02.16
+// Last changed : 2013.02.17
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.06.000
@@ -121,6 +121,7 @@ class TClothoidLane : public TLane
 	   const TOptions& Opts);
 
     bool SaveToFile(const char* Filename);       // Save to file
+    void ClearRacingline(const char* TrackLoad);
     void SavePointsToFile(const char* TrackLoad);
     bool LoadPointsFromFile(const char* TrackLoad);
 

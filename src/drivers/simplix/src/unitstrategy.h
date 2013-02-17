@@ -9,10 +9,10 @@
 //
 // File         : unitstrategy.h
 // Created      : 2007.02.20
-// Last changed : 2011.06.02
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.02.16
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.06.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -50,8 +50,6 @@
 #ifndef _UNITSTRATEGY_H_
 #define _UNITSTRATEGY_H_
 
-//#undef SPEED_DREAMS
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -68,12 +66,6 @@
 #include "unitcommon.h"
 #include "unitdriver.h"
 #include "unitpit.h"
-
-#ifdef SPEED_DREAMS
-#include "teammanager.h"
-#else
-#endif
-
 
 //==========================================================================*
 // Basisklasse für Strategien zum Boxenstopp

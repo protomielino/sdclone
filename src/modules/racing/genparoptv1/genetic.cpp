@@ -128,8 +128,6 @@ TGeneticParameter::TGeneticParameter
 // Destructor
 TGeneticParameter::~TGeneticParameter()
 {
-    DisplayStatistik();
-
 	if (oLabel)
 		free((void *) oLabel);
 	if (oSection)

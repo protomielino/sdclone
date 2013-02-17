@@ -5,13 +5,13 @@ INCLUDE(../../../../cmake/macros.cmake)
 SET(_SOURCES genparoptv1.cpp
              raceupdate.cpp racecars.cpp
              raceinit.cpp racemain.cpp
-             racetrack.cpp raceresults.cpp racesimusimu.cpp 
+             racetrack.cpp raceresults.cpp 
              racestate.cpp racesituation.cpp racemessage.cpp
              raceutil.cpp genetic.cpp)
 SET(_HEADERS genparoptv1.h 
              raceupdate.h racecars.h
              raceinit.h 
-             racetrack.h raceresults.h racesimusimu.h 
+             racetrack.h raceresults.h
              racestate.h racesituation.h racemessage.h
              raceutil.h genetic.h)
 SET(_OTHER_SOURCES )

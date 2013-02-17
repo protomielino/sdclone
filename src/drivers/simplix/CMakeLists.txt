@@ -4,23 +4,14 @@ INCLUDE(../../../cmake/macros.cmake)
 SET(ROBOT_NAME "simplix")
 
 # Official-only simplix interface.
-SET(ROBOT_INTERFACE LEGACY WELCOME
-                    simplix_trb1a simplix_trb1b 
-                    simplix_sca simplix_scb 
-                    simplix_36GP 
-                    simplix_ls1 
-                    simplix_ls2 
-                    simplix_mp5 
-					simplix_lp1
-                    my_simplix_0 my_simplix_1 my_simplix_2 my_simplix_3 my_simplix_4
-                    my_simplix_5 my_simplix_6 my_simplix_7 my_simplix_8 my_simplix_9)
+SET(ROBOT_INTERFACE LEGACY WELCOME)
 
 # Work-in-progress / unofficial simplix interface.
-IF(NOT OPTION_OFFICIAL_ONLY)
-
-    SET(ROBOT_INTERFACE ${ROBOT_INTERFACE} simplix_mpa1)
-
-ENDIF()
+#IF(NOT OPTION_OFFICIAL_ONLY)
+#
+#    SET(ROBOT_INTERFACE ${ROBOT_INTERFACE} simplix_mpa1)
+#
+#ENDIF()
 
 SET(ROBOT_SOURCES 
     src/unitcarparam.cpp
@@ -71,8 +62,6 @@ SET(ROBOT_SOURCES
     src/unitstrategy.h
     src/unitsysfoo.cpp
     src/unitsysfoo.h
-    src/unitteammanager.cpp
-    src/unitteammanager.h
     src/unittmpcarparam.cpp
     src/unittmpcarparam.h
     src/unittrack.cpp

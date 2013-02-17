@@ -56,8 +56,6 @@
 #ifndef _UNITDRIVER_H_
 #define _UNITDRIVER_H_
 
-//#undef SPEED_DREAMS
-
 #include <track.h>
 #include <car.h>
 #include <robot.h>
@@ -77,11 +75,7 @@
 #include "unitpidctrl.h"
 #include "unitsysfoo.h"
 
-#ifdef SPEED_DREAMS
 #include "teammanager.h"
-#else
-#include "unitteammanager.h"
-#endif
 
 //==========================================================================*
 // Deklaration der Klasse TDriver
@@ -163,10 +157,6 @@ class TDriver
 	  (void* RobotSettings, char* Value);
 	inline void	SetCommonData                    // Set pointer to common data
 	  (TCommonData* CommonData, int RobotTyp);
-#ifdef SPEED_DREAMS
-#else
-	inline TTeamManager::TTeam* GetTeam();
-#endif
     inline char* GetBotName();
     inline float CurrSpeed();
     inline int TeamIndex();
@@ -236,10 +226,6 @@ private:
 	double oAvoidWidth;			                 // In m.
 	bool oGoToPit;                               // Enter pit flag
 	bool oCloseYourEyes;                         // Close your eyes for a while
-#ifdef SPEED_DREAMS
-#else
-	TTeamManager::TTeam* oTeam;                  // Team
-#endif
 
 	int	oDriveTrainType;                         // Drive train type
 	TPidController oPIDCLine;      	             // Controller for line error.
@@ -325,7 +311,6 @@ private:
 	double oTclAccelLast;                        // Historie
 	double oTclAccelFactor;                      // TCL acceleration scaling
 */
-	bool oSPEED_DREAMS;
 	char* oTrackName;                            // Name of track to drive on
 	char* oTrackLoad;                            // Name of track to drive on
 	char* oTrackLoadQualify;                     // Name of track to drive on
@@ -512,18 +497,6 @@ int TDriver::TeamIndex()
 void TDriver::SetCommonData
   (TCommonData* CommonData, int RobotTyp)
   {oCommonData = CommonData; oRobotTyp = RobotTyp;};
-//==========================================================================*
-
-//==========================================================================*
-// Get Team
-//--------------------------------------------------------------------------*
-#ifdef SPEED_DREAMS
-#else
-TTeamManager::TTeam* TDriver::GetTeam()
-{
-  return oTeam;
-}
-#endif
 //==========================================================================*
 
 //==========================================================================*

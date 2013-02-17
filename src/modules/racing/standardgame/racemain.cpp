@@ -44,7 +44,8 @@
 
 #include "racemain.h"
 
-
+// Initialise state
+bool NoCleanupNeeded = true;
 
 typedef struct
 {
@@ -109,6 +110,9 @@ void ReRaceAbandon()
 
 void ReRaceAbort()
 {
+	if (ReCleanupStandardgame())
+		return;
+
 	ReShutdownUpdaters();
 
 	RePhysicsEngine().shutdown();
@@ -128,6 +132,8 @@ void ReRaceAbort()
 		GfParmReleaseHandle(ReInfo->params);
 		ReInfo->params = ReInfo->mainParams;
 	}
+
+	NoCleanupNeeded = true;
 
 	// Return to race configuration step
 	ReStateApply((void*)RE_STATE_CONFIG);
@@ -184,6 +190,8 @@ ReRaceEventInit(void)
 	ReTrackInit();
 	
 	ReEventInitResults();
+
+	NoCleanupNeeded = false;
 
 	const bool bGoOnLooping = ReUI().onRaceEventStarting(careerMode && !ReHumanInGroup());
 
@@ -1110,6 +1118,20 @@ ReRaceEventShutdown(void)
 	if (mode & RM_NEXT_STEP)
 		FREEZ(ReInfo->_reCarInfo);
 
+	NoCleanupNeeded = true;
+
 	return mode;
 }
 
+bool
+ReCleanupStandardgame()
+{
+	if (NoCleanupNeeded)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}

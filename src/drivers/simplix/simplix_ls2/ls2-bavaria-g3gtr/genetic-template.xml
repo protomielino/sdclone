@@ -2,7 +2,7 @@
 <!--
     file          : drivers/simplix_ls2/ls2-bavaria-g3gtr/genetic-corkscrew
     created       : 02/10/13
-    last modified : 02/10/13
+    last modified : 02/17/13
     copyright     : (C) 2013 Wolf-Dieter Beelitz
 
     SVN version   : $Id:$
@@ -25,6 +25,7 @@
     <attstr name="private" val="simplix private"/>
     <attnum name="weight of damages" val="1.0"/>
     <attnum name="get initial value" val="1"/>
+    <attnum name="optimisation loops" val="1000"/>
     <attstr name="author" val="Wolf-Dieter Beelitz"/>
   </section>
   <!-- END OF TABLE OF CONTENT -->
@@ -37,7 +38,7 @@
     <!-- THESE PARAMETERS ARE USABLE FOR ALL CAR TYPES -->
 
     <!-- META DATA OF FIRST GLOBAL PARAMETER -->
-    <section name="Car parameter 0">
+    <section name="Transmission Ratio">
       <attnum name="active" val="1"/>
       <attstr name="label" val="Differential"/>
       <attstr name="section" val="Rear Differential"/>
@@ -49,7 +50,7 @@
     </section>
 
     <!-- META DATA OF NEXT GLOBAL PARAMETER -->
-    <section name="Car parameter 1">
+    <section name="Brake Balance">
       <attnum name="active" val="1"/>
       <attstr name="label" val="BrakeRepart."/>
       <attstr name="section" val="Brake System"/>
@@ -61,7 +62,7 @@
     </section>
 
     <!-- ... -->
-    <section name="Car parameter 2">
+    <section name="Brake Pressure">
       <attnum name="active" val="1"/>
       <attstr name="label" val="MxBrakePress"/>
       <attstr name="section" val="Brake System"/>
@@ -73,7 +74,7 @@
       <attnum name="round" val="0.01"/>
     </section>
 
-    <section name="Car parameter 3">
+    <section name="Front Bar">
       <attnum name="active" val="1"/>
       <attstr name="label" val="FAntiRollBar"/>
       <attstr name="section" val="Front Anti-Roll Bar"/>
@@ -85,7 +86,7 @@
       <attnum name="round" val="100"/>
     </section>
 
-    <section name="Car parameter 4">
+    <section name="Rear Bar">
       <attnum name="active" val="1"/>
       <attstr name="label" val="RAntiRollBar"/>
       <attstr name="section" val="Rear Anti-Roll Bar"/>
@@ -97,7 +98,7 @@
       <attnum name="round" val="100"/>
     </section>
 
-    <section name="Car parameter 5">
+    <section name="Front suspension">
       <attnum name="active" val="1"/>
       <attnum name="twosided" val="1"/>
       <attstr name="label" val="F-Suspension"/>
@@ -110,7 +111,7 @@
       <attnum name="round" val="100"/>
     </section>
 
-    <section name="Car parameter 6">
+    <section name="Front Slow Bump">
       <attnum name="active" val="1"/>
       <attnum name="twosided" val="1"/>
       <attstr name="label" val="F-SlowBump  "/>
@@ -123,7 +124,7 @@
       <attnum name="round" val="100"/>
     </section>
 
-    <section name="Car parameter 7">
+    <section name="Front Slow Rebound">
       <attnum name="active" val="1"/>
       <attnum name="twosided" val="1"/>
       <attstr name="label" val="F-SlowRebnd "/>
@@ -136,7 +137,7 @@
       <attnum name="round" val="100"/>
     </section>
 
-    <section name="Car parameter 8">
+    <section name="Front Fast Bump">
       <attnum name="active" val="1"/>
       <attnum name="twosided" val="1"/>
       <attstr name="label" val="F-FastBump  "/>
@@ -149,7 +150,7 @@
       <attnum name="round" val="100"/>
     </section>
 
-    <section name="Car parameter 9">
+    <section name="Front Fast Rebound">
       <attnum name="active" val="1"/>
       <attnum name="twosided" val="1"/>
       <attstr name="label" val="F-FastRebnd "/>
@@ -162,7 +163,7 @@
       <attnum name="round" val="100"/>
     </section>
 
-    <section name="Car parameter 10">
+    <section name="Rear suspension">
       <attnum name="active" val="1"/>
       <attnum name="twosided" val="1"/>
       <attstr name="label" val="R-Suspension"/>
@@ -175,7 +176,7 @@
       <attnum name="round" val="100"/>
     </section>
 
-    <section name="Car parameter 11">
+    <section name="Rear Slow Bump">
       <attnum name="active" val="1"/>
       <attnum name="twosided" val="1"/>
       <attstr name="label" val="R-SlowBump  "/>
@@ -188,7 +189,7 @@
       <attnum name="round" val="100"/>
     </section>
 
-    <section name="Car parameter 12">
+    <section name="Rear Slow Rebound">
       <attnum name="active" val="1"/>
       <attnum name="twosided" val="1"/>
       <attstr name="label" val="R-SlowRebnd "/>
@@ -201,7 +202,7 @@
       <attnum name="round" val="100"/>
     </section>
 
-    <section name="Car parameter 13">
+    <section name="Rear Fast Bump">
       <attnum name="active" val="1"/>
       <attnum name="twosided" val="1"/>
       <attstr name="label" val="R-FastBump  "/>
@@ -214,7 +215,7 @@
       <attnum name="round" val="100"/>
     </section>
 
-    <section name="Car parameter 14">
+    <section name="Rear Fast Rebound">
       <attnum name="active" val="1"/>
       <attnum name="twosided" val="1"/>
       <attstr name="label" val="R-FastRebnd "/>
@@ -231,7 +232,7 @@
     <!-- DEPENDING ON THE CAR TYPE DEFINITION, NO WINGS FOR SUPERCARS -->
 
 	<!-- IF THE CAR DOES NOT HAVE A REAR WING JUST RESET ACTIVE FLAG! -->
-	<section name="Optional car parameter 15">
+	<section name="Rear Wing">
 	  <attnum name="active" val="1"/>
 	  <attstr name="label" val="R-Wing      "/>
 	  <attstr name="section" val="Rear Wing"/>
@@ -244,7 +245,7 @@
 	</section>
 
 	<!-- IF THE CAR DOES NOT HAVE A FRONT WING JUST RESET ACTIVE FLAG -->
-	<section name="Optional car parameter 16">
+	<section name="Front Wing">
 	  <attnum name="active" val="1"/>
 	  <attstr name="label" val="F-Wing      "/>
 	  <attstr name="section" val="Front Wing"/>
@@ -257,11 +258,9 @@
 	</section>
 
 	<!-- FROM HERE ON THE PARAMETERS ARE ROBOT SPECIFIC DEFINED -->
-
 	<!-- (FOR SIMPLIX ROBOTS THERE ARE THREE BASIC PARAMETERS!) -->
 
-	<!-- SCALE OF BRAKING -->
-	<section name="Robot parameter 0">
+	<section name="Scale braking">
 	  <attnum name="active" val="1"/>
 	  <attstr name="label" val="Scale Brakes"/>
 	  <attstr name="section" val="simplix private"/>
@@ -272,8 +271,7 @@
 	  <attnum name="round" val="100"/>
 	</section>
 
-	<!-- SCALE OF CORNERING -->
-	<section name="Robot parameter 1">
+	<section name="Scale cornering">
 	  <attnum name="active" val="1"/>
 	  <attstr name="label" val="Scale Speed "/>
 	  <attstr name="section" val="simplix private"/>
@@ -284,8 +282,7 @@
 	  <attnum name="round" val="100"/>
 	</section>
 
-	<!-- SCALE OF BUMPS -->
-	<section name="Robot parameter 2">
+	<section name="Scale Bumps">
 	  <attnum name="active" val="1"/>
 	  <attstr name="label" val="Scale Bumps "/>
 	  <attstr name="section" val="simplix private"/>
@@ -309,7 +306,7 @@
     <section name="1">
       <!-- META DATA OF COUNTER OF PARAMETERS PER SECTION IN THIS PART -->
       <section name="Definition">
-        <attnum name="active" val="1"/>
+        <attnum name="active" val="0"/>
         <attstr name="name" val="Track param count"/>
         <attstr name="section" val="simplix private"/>
         <attstr name="subsection" val="param seg"/>
@@ -319,9 +316,9 @@
       <!-- META DATA OF PARAMETERS IN THIS PART -->
       <section name="Parameter">
         <!-- META DATA OF FIRST PARAMETER IN THIS PART -->
-        <section name="Local robot parameter 1">
+        <section name="Local Center of corner">
           <attnum name="active" val="1"/>
-          <attstr name="label" val="Apex        "/>
+          <attstr name="label" val="Base Mode   "/>
           <attstr name="section" val="simplix private/param seg"/>
           <attstr name="parameter" val="apex"/>
           <attnum name="range" min="0.97" max="0.998" val="0.9977"/>
@@ -330,10 +327,9 @@
           <attnum name="round" val="100000"/>
         </section>
 
-        <!-- META DATA OF NEXT PARAMETER IN THIS PART -->
-        <section name="Local robot parameter 2">
+        <section name="Local Curvature of Corner">
           <attnum name="active" val="1"/>
-          <attstr name="label" val="Factor      "/>
+          <attstr name="label" val="Base Scale  "/>
           <attstr name="section" val="simplix private/param seg"/>
           <attstr name="parameter" val="factor"/>
           <attnum name="range" min="1" max="1.1" val="1.0047"/>
@@ -342,8 +338,7 @@
           <attnum name="round" val="100000"/>
         </section>
 
-        <!-- ... -->
-        <section name="Local robot parameter 3">
+        <section name="Local Grip">
           <attnum name="active" val="1"/>
           <attstr name="label" val="Friction    "/>
           <attstr name="section" val="simplix private/param seg"/>
@@ -354,7 +349,7 @@
           <attnum name="round" val="1000"/>
         </section>
 
-        <section name="Local robot parameter 4">
+        <section name="Local Braking">
           <attnum name="active" val="1"/>
           <attstr name="label" val="Braking     "/>
           <attstr name="section" val="simplix private/param seg"/>

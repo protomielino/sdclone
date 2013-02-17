@@ -9,10 +9,10 @@
 //
 // File         : unitcommondata.h
 // Created      : 2007.11.17
-// Last changed : 2011.06.02
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.02.16
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.06.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -60,14 +60,8 @@
 #ifndef _UNITCOMMONDATA_H_
 #define _UNITCOMMONDATA_H_
 
-//#undef SPEED_DREAMS
-
 #include <track.h>
 #include "unitglobal.h"
-#ifdef SPEED_DREAMS
-#else
-#include "unitteammanager.h"
-#endif
 #include "unitclothoid.h"
 
 //==========================================================================*
@@ -80,10 +74,6 @@ class TCommonData
     ~TCommonData();                              // Destructor
 
   public:
-#ifdef SPEED_DREAMS
-#else
-    TTeamManager TeamManager;                    // Team manager 
-#endif
     PTrack Track;                                // TORCS Track data  
 };
 //==========================================================================*

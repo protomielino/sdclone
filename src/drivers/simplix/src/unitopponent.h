@@ -8,10 +8,10 @@
 //
 // File         : unitopponent.h
 // Created      : 2007.11.17
-// Last changed : 2011.06.02
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.02.16
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.06.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -55,18 +55,11 @@
 #ifndef _UNITOPPONENT_H_
 #define _UNITOPPONENT_H_
 
-//#undef SPEED_DREAMS
-
 #include <car.h>
 #include <raceman.h>
 
 #include "unitglobal.h"
 #include "unitcommon.h"
-
-#ifdef SPEED_DREAMS
-#else
-#include "unitteammanager.h"
-#endif
 
 //==========================================================================*
 // Class TOpponent
@@ -140,10 +133,6 @@ class TOpponent
 
 	void Update                                  // Update
 	  (const PCarElt MyCar,
-#ifdef SPEED_DREAMS
-#else
-	  PTeamManager TeamManager,
-#endif
       double MyDirX, double MyDirY,
       float &MinDistBack,
       double &MinTimeSlot);
@@ -160,10 +149,6 @@ class TOpponent
 	double oDeltaTime;                           // Simulation delta time
     int oIndex;                                  // Opponents cars index
 	TInfo oInfo;                                 // info of this opponent
-#ifdef SPEED_DREAMS
-#else
-    PTeamManager oTeamManager;                   // Teammanager
-#endif
 	double LapBackTimer;
 
 };

@@ -52,6 +52,8 @@
 DWORDLONG lastFreeMem = 0;
 */
 
+// State flag for run once initialisation
+bool genOptNeedInit = true;
 int OptiCounter = 0;
 
 typedef struct
@@ -96,6 +98,7 @@ int ReConfigure()
 
 void ReRaceAbandon()
 {
+	ReCleanupGeneticOptimisation();
 	// Notify the UI that the race event is finishing now.
 	ReUI().onRaceEventFinishing();
 
@@ -117,6 +120,9 @@ void ReRaceAbandon()
 
 void ReRaceAbort()
 {
+	if (ReCleanupGeneticOptimisation())
+		return;
+
 	ReShutdownUpdaters();
 
 	RePhysicsEngine().shutdown();
@@ -1033,6 +1039,11 @@ ReRaceEventShutdown(void)
 void
 ReInitialiseGeneticOptimisation()
 {
+	if (!genOptNeedInit)
+		return;
+
+	genOptNeedInit = false;
+
 	tgenData *Data = &TGeneticParameter::Data;
 
 	Data->TrackName = &(Data->TrackNameBuffer[0]);
@@ -1068,7 +1079,7 @@ ReInitialiseGeneticOptimisation()
 	snprintf(Data->CarTypeBuffer, sizeof(Data->CarTypeBuffer),
 		"%s", Data->car->_carName);
 	snprintf(Data->RobotNameBuffer, sizeof(Data->RobotNameBuffer),
-		"%s", Data->car->_teamname);
+		"%s", Data->car->_modName);
                 
 	// Setup path to car setup file
 	char buf[255];
@@ -1112,6 +1123,8 @@ ReInitialiseGeneticOptimisation()
 	}
 
 	ReImportGeneticParameters();
+
+	OptiCounter = 0;
 }
 
 void
@@ -1338,9 +1351,12 @@ ReImportGeneticParameters()
 
 }
 
-void
+bool
 ReCleanupGeneticOptimisation()
 {
+	if (genOptNeedInit)	// If still needed, ...
+		return true;	// ... we do not have to cleanup 
+
 	printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 	printf ("Cleanup\n");
 
@@ -1352,7 +1368,10 @@ ReCleanupGeneticOptimisation()
 	for (int I = 0; I < Data->NbrOfParam; I++)
 	{
 		if (Data->GP[I])
+		{
+		    Data->GP[I]->DisplayStatistik();
 			delete Data->GP[I];
+		}
 	}
 
 	printf ("Delete list of parameters\n");
@@ -1376,6 +1395,9 @@ ReCleanupGeneticOptimisation()
 	printf ("Release file handle\n");
 	// Release file handle
 	GfParmReleaseHandle(Data->Handle);
+
+	printf ("Reset need initialisation flag\n");
+	genOptNeedInit = true;
 
 	printf ("Setup path to best setup found\n");
 	// Setup path to best setup found
@@ -1418,6 +1440,7 @@ ReCleanupGeneticOptimisation()
 
 	printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
+	return false;
 }
 
 int
@@ -1491,6 +1514,7 @@ ReEvolution()
 	{
 		// Count the loops
 		OptiCounter++;
+		GfLogOpt("Loop %d (Still to do %d loops)\n",OptiCounter,Data->Loops);
 	}
 
 	/* Optimisation */

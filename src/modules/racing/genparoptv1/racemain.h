@@ -43,7 +43,7 @@ extern int  ReRaceEventShutdown();
 extern void ReInitialiseGeneticOptimisation();
 extern void ReImportGeneticParameters();
 extern int  ReEvolution();
-extern void ReCleanupGeneticOptimisation();
+extern bool ReCleanupGeneticOptimisation();
 
 extern void ReRaceAbandon();
 extern void ReRaceAbort();
