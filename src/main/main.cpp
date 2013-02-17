@@ -165,8 +165,6 @@ main(int argc, char *argv[])
 	
 	if (piUserItf && piRaceEngine)
 	{
-		bool AllowPlayerConfig = piRaceEngine->allowPlayerConfig();
-
 		// Enter the user interface.
 		if (piUserItf->activate())
 		{

@@ -243,7 +243,7 @@ void StandardGame::stop(void)
 	::ReStop();
 }
 
-bool StandardGame::allowPlayerConfig()
+bool StandardGame::supportsHumanDrivers()
 {
 	return true;
 }

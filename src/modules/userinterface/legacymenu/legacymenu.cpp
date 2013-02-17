@@ -86,11 +86,11 @@ bool LegacyMenu::backLoad()
 {
     GfLogTrace("Pre-loading menu and game data ...\n");
 
-	bool AllowPlayerConfig = LmRaceEngine().allowPlayerConfig();
+	bool SupportsHumanDrivers = LmRaceEngine().supportsHumanDrivers();
 
 	// Pre-load the main and race select menus
     // (to be able to get back to them, even when directly starting a given race).
-    if (!RmRaceSelectInit(MainMenuInit(AllowPlayerConfig)))
+    if (!RmRaceSelectInit(MainMenuInit(SupportsHumanDrivers)))
         return false;
 
     // Pre-load race managers, drivers, tracks, cars stuff.

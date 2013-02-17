@@ -244,7 +244,7 @@ void GenParOptV1::stop(void)
 	::ReStop();
 }
 
-bool GenParOptV1::allowPlayerConfig()
+bool GenParOptV1::supportsHumanDrivers()
 {
 	return false;
 }

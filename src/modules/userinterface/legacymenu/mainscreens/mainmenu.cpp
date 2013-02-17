@@ -94,7 +94,7 @@ onMainMenuActivate(void * /* dummy */)
  */
 
 void *
-MainMenuInit(bool AllowPlayerConfig)
+MainMenuInit(bool SupportsHumanDrivers)
 {
     // Initialize only once.
     if (MenuHandle)
@@ -112,7 +112,7 @@ MainMenuInit(bool AllowPlayerConfig)
     //Add buttons and create based on xml
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "race", NULL, onRaceSelectMenuActivate);
     //GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "weekend", NULL, onRaceWESelectMenuActivate);
-	if (AllowPlayerConfig)
+	if (SupportsHumanDrivers)
 		GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "configure", NULL, onPlayerConfigMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "options", NULL, onOptionsMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "credits", NULL, onCreditsMenuActivate);

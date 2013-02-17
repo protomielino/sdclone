@@ -82,7 +82,7 @@ public:
 	virtual void start();
 	virtual void stop();
 
-	virtual bool allowPlayerConfig();
+	virtual bool supportsHumanDrivers();
 
 #ifdef SD_DEBUG
 	virtual void step(double dt);

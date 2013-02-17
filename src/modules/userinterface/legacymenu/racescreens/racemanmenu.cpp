@@ -407,7 +407,7 @@ RmRacemanMenu()
 
 	const GfRaceManager* pRaceMan = LmRaceEngine().race()->getManager();
 	// Ask the RaceEngine what types of races should be allowed here
-	bool AllowPlayerConfig = LmRaceEngine().allowPlayerConfig();
+	bool SupportsHumanDrivers = LmRaceEngine().supportsHumanDrivers();
 
 
 	// Create screen, load menu XML descriptor and create static controls.
@@ -428,14 +428,14 @@ RmRacemanMenu()
 	// Create Configure race, Configure players and Back buttons.
 	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigureRaceButton",
 								NULL, RmConfigureRace);
-	if (AllowPlayerConfig)
+	if (SupportsHumanDrivers)
 		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigurePlayersButton",
 								NULL, rmOnPlayerConfig);
 	
 	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "BackButton",
 								RmRaceSelectMenuHandle, GfuiScreenActivate);
 
-	if (AllowPlayerConfig)
+	if (SupportsHumanDrivers)
 	{
 		// Create "Load / Resume / Save race" buttons.
 		SaveRaceConfigButtonId =
