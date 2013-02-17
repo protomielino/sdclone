@@ -57,6 +57,9 @@
 
 #define PRV_OPTI	    "genetic optimisation"
 
+// Define buffer size
+const int BUFSIZE = MAX_PATH; // = 260 in WINDef.h
+
 //  
 // Genetic parameters are handled in a single array 
 // (See TGeneticParameter** GP;).
@@ -121,6 +124,13 @@ typedef struct genData
 	char* AuthorName;		// name of author of setup
 	char* PrivateSection;	// name of robot private section
 
+	const char* LocalFileName;
+	const char* LocalOptFileName;
+	const char* GlobalFileName;
+	const char* GlobalOptFileName;
+
+	int WeatherCode;		// Weather
+
 	// Strategic data, car setup depending on optimization state
     int Type;				// 0: race; 1: qualifying
 	float MaxFuel;			// Default = 60
@@ -164,11 +174,16 @@ typedef struct genData
 	TGeneticParameter** GP; // Pointer to first parameter
 
 	// Buffers for strings			// MAX_PATH = 260
-	char TrackNameBuffer[261];		// Buffer for trackname 
-	char CarTypeBuffer[261];		// Buffer for car type
-	char RobotNameBuffer[261];		// Buffer for robotname
-	char AuthorNameBuffer[261];		// Buffer name of setup author
-	char PrivateSectionBuffer[261];	// Buffer name of setup author
+	char TrackNameBuffer[BUFSIZE+1];		// Buffer for trackname 
+	char CarTypeBuffer[BUFSIZE+1];		// Buffer for car type
+	char RobotNameBuffer[BUFSIZE+1];		// Buffer for robotname
+	char AuthorNameBuffer[BUFSIZE+1];		// Buffer name of setup author
+	char PrivateSectionBuffer[BUFSIZE+1];	// Buffer name of setup author
+
+	char LocalXML[BUFSIZE+1];
+	char LocalOPT[BUFSIZE+1];
+	char GlobalXML[BUFSIZE+1];
+	char GlobalOPT[BUFSIZE+1];
 
 } tgenData;
 

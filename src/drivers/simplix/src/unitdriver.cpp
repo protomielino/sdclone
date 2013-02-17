@@ -1041,6 +1041,8 @@ void TDriver::InitTrack
   const char* BaseParamPath = TDriver::ROBOT_DIR;
   const char* PathFilename = PathFilenameBuffer;
 
+  oWeatherCode = GetWeather();
+
   GetSkillingParameters(BaseParamPath,PathFilename);
 
   // Get the name of the track
@@ -1109,6 +1111,11 @@ void TDriver::InitTrack
   // Override params for car type with params of track
   snprintf(Buf,sizeof(Buf),"%s/%s/%s.xml",
     BaseParamPath,oCarType,oTrackName);
+  Handle = TUtils::MergeParamFile(Handle,Buf);
+
+  // Override params for car type with params of track and weather
+  snprintf(Buf,sizeof(Buf),"%s/%s/%s-%d.xml",
+    BaseParamPath,oCarType,oTrackName,oWeatherCode);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for car type on track with params of specific race type
@@ -1565,8 +1572,9 @@ void TDriver::InitDriveTrain()
 //--------------------------------------------------------------------------*
 int TDriver::GetWeather()
 {
-  tTrackSeg* Seg = oTrack->seg; 
-  return (int) (100000 * Seg->surface->kFriction);
+  return (oTrack->local.rain << 4) + oTrack->local.water;
+//  tTrackSeg* Seg = oTrack->seg; 
+//  return (int) (100000 * Seg->surface->kFriction);
 };
 //==========================================================================*
 

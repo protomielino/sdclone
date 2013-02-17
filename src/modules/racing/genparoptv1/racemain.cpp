@@ -56,6 +56,9 @@ DWORDLONG lastFreeMem = 0;
 bool genOptNeedInit = true;
 int OptiCounter = 0;
 
+// Buffer for short time use for filenames
+char buf[BUFSIZE+1]; // BUFSIZE defined in genetic.h to be = MAX_PATH
+
 typedef struct
 {
 	char *racename;
@@ -1036,6 +1039,42 @@ ReRaceEventShutdown(void)
 	return mode;
 }
 
+int GetWeather(tTrack* Track)
+{
+	return (Track->local.rain << 4) + Track->local.water;
+};
+
+const char* SetupGlobalFileName(char* buf, int size, tgenData* Data, const char* Ext)
+{
+	if (Data->WeatherCode == 0)
+	{
+		snprintf(buf,size,"%sdrivers/%s/%s/%s%s",
+			GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName,Ext);
+	}
+	else
+	{
+		snprintf(buf,size,"%sdrivers/%s/%s/%s-%d%s",
+			GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName,Data->WeatherCode,Ext);
+	}
+	return buf;
+}
+
+const char* SetupLocalFileName(char* buf, int size, tgenData* Data, const char* Ext)
+{
+	if (Data->WeatherCode == 0)
+	{
+		snprintf(buf, size, "drivers/%s/%s/%s%s",
+			Data->RobotName,Data->CarType,Data->TrackName,Ext);
+	}
+	else
+	{
+		snprintf(buf, size, "drivers/%s/%s/%s-%d%s",
+			Data->RobotName,Data->CarType,Data->TrackName,Data->WeatherCode,Ext);
+	}
+	return buf;
+}
+
+
 void
 ReInitialiseGeneticOptimisation()
 {
@@ -1080,46 +1119,42 @@ ReInitialiseGeneticOptimisation()
 		"%s", Data->car->_carName);
 	snprintf(Data->RobotNameBuffer, sizeof(Data->RobotNameBuffer),
 		"%s", Data->car->_modName);
-                
+
+	Data->WeatherCode = GetWeather(ReInfo->track);
+	if (Data->WeatherCode > 0)
+		Data->WeightOfDamages = 100;
+
 	// Setup path to car setup file
-	char buf[255];
-	snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/%s.xml",
-		GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName);
-	Data->Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+	Data->LocalFileName = SetupLocalFileName(Data->LocalXML, BUFSIZE, Data, ".xml");
+	Data->LocalOptFileName = SetupLocalFileName(Data->LocalOPT, BUFSIZE, Data, ".opt");
+	Data->GlobalFileName = SetupGlobalFileName(Data->GlobalXML, BUFSIZE, Data, ".xml");
+	Data->GlobalOptFileName = SetupGlobalFileName(Data->GlobalOPT, BUFSIZE, Data, ".opt");
+
+	Data->Handle = GfParmReadFile(Data->GlobalFileName, GFPARM_RMODE_REREAD);
 	Data->GetInitialVal = true;
 
 	// In case the car setup file does not exist ...
 	if (!Data->Handle)
 	{
 		// ... use default setup file ...
-		snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/default.xml",
-		GetLocalDir(),Data->RobotName,Data->CarType);
+		snprintf(buf,sizeof(BUFSIZE),"%sdrivers/%s/%s/default.xml",
+			GetLocalDir(),Data->RobotName,Data->CarType);
 		void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
 
 		if (Handle) // ... if existing ...
-		{			// ... to create it.
-			snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
-				Data->RobotName,Data->CarType,Data->TrackName);
-			GfParmWriteFileSDHeader (buf, Handle, Data->CarType, Data->AuthorName);
+		{			// ... use it to create a track specific setup file.
+			GfParmWriteFileSDHeader (Data->LocalFileName, Handle, Data->CarType, Data->AuthorName);
 		}
 		else		// ... else create an empty setup file
 		{			
-			snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/%s.xml",
-				GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName);
-			void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-
-			snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
-				Data->RobotName,Data->CarType,Data->TrackName);
-			GfParmWriteFileSDHeader (buf, Handle, Data->CarType, Data->AuthorName);
-			Data->GetInitialVal = false;
+			void* Handle = GfParmReadFile(Data->GlobalFileName, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+			GfParmWriteFileSDHeader (Data->LocalFileName, Handle, Data->CarType, Data->AuthorName);
+			Data->GetInitialVal = false; // No initial setup, we cannot read it
 		}
 		GfParmReleaseHandle(Handle);
 
 		// Open created car type track setup file
-		snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/%s.xml",
-			GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName);
-		Data->Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-
+		Data->Handle = GfParmReadFile(Data->GlobalFileName, GFPARM_RMODE_REREAD);
 	}
 
 	ReImportGeneticParameters();
@@ -1130,7 +1165,7 @@ ReInitialiseGeneticOptimisation()
 void
 ReImportGeneticParameters()
 {
-	char buf[261];
+	char buf[BUFSIZE];
 
 	GfLogOpt("\n\nReImportGeneticParameters\n\n");
 
@@ -1152,7 +1187,7 @@ ReImportGeneticParameters()
 
 	// Build path to meta data file
     snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-%s.xml",
-      GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName);
+		GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName);
 
 	// Read meta data file
 	void* MetaDataFile = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
@@ -1343,11 +1378,8 @@ ReImportGeneticParameters()
 
 	GfParmReleaseHandle(MetaDataFile);
 
-	snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
-		Data->RobotName,Data->CarType,Data->TrackName);
-
 	printf ("Write parameters to initial xml file\n");
-	GfParmWriteFileSDHeader (buf, Data->Handle, Data->CarType, Data->AuthorName);
+	GfParmWriteFileSDHeader (Data->LocalFileName, Data->Handle, Data->CarType, Data->AuthorName);
 
 }
 
@@ -1401,10 +1433,7 @@ ReCleanupGeneticOptimisation()
 
 	printf ("Setup path to best setup found\n");
 	// Setup path to best setup found
-	char buf[261];
-	snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/%s.opt",
-		GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName);
-	void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+	void* Handle = GfParmReadFile(Data->GlobalOptFileName, GFPARM_RMODE_REREAD);
 
 	printf ("Reset fuel control\n");
 	// Reset fuel control
@@ -1416,23 +1445,13 @@ ReCleanupGeneticOptimisation()
 	GfParmSetNum(Handle, Data->PrivateSection, PRV_OPTI,    
 		(char*) NULL, 0, 0, 1);
 
-	printf ("Set filename for use with local dir\n");
-	// Set filename for use with local dir
-	snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.opt",
-		Data->RobotName,Data->CarType,Data->TrackName);
-
 	printf ("Write parameters to opt file\n");
 	// Write parameters to opt file
-	GfParmWriteFileSDHeader (buf, Handle, Data->CarType, Data->AuthorName);
-
-	printf ("Set filename for use with local dir\n");
-	// Set filename for use with local dir
-	snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
-		Data->RobotName,Data->CarType,Data->TrackName);
+	GfParmWriteFileSDHeader (Data->LocalOptFileName, Handle, Data->CarType, Data->AuthorName);
 
 	printf ("Write parameters to xml file\n");
 	// Write parameters to xml file
-	GfParmWriteFileSDHeader (buf, Handle, Data->CarType, Data->AuthorName);
+	GfParmWriteFileSDHeader (Data->LocalFileName, Handle, Data->CarType, Data->AuthorName);
 
 	printf ("Release file handle\n");
 	// Release file handle
@@ -1535,10 +1554,7 @@ ReEvolution()
 		for (int I = 0; I < Data->NbrOfParam; I++)
 			Data->GP[I]->LastVal = Data->GP[I]->OptVal = Data->GP[I]->Val;
 
-		char buf[255];
-		snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.opt",
-		  Data->RobotName,Data->CarType,Data->TrackName);
-		GfParmWriteFileSDHeader (buf, Handle, Data->CarType, Data->AuthorName);
+		GfParmWriteFileSDHeader (Data->LocalOptFileName, Handle, Data->CarType, Data->AuthorName);
 		GfLogOpt("Stored to .opt\n");
 	}
 	else if (0.99 * TotalLapTime < Data->BestTotalLapTime)
@@ -1719,11 +1735,7 @@ ReEvolution()
 	} // Loop over all parts
 
 	// Write parameters to xml file
-	char buf[255];
-	snprintf(buf,sizeof(buf),"drivers/%s/%s/%s.xml",
-	Data->RobotName,Data->CarType,Data->TrackName);
-	//GfParmWriteFileSDHeader (buf, Handle, Data->CarType, "Wolf-Dieter Beelitz");
-	GfParmWriteFileSDHeader (buf, Handle, Data->CarType, Data->AuthorName);
+	GfParmWriteFileSDHeader (Data->LocalFileName, Handle, Data->CarType, Data->AuthorName);
 
 	printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
