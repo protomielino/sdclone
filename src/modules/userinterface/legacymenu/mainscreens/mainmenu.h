@@ -21,7 +21,7 @@
 #ifndef _MAINMENU_H_
 #define _MAINMENU_H_
 
-extern void* MainMenuInit(void);
+extern void* MainMenuInit(bool);
 extern int MainMenuRun(void);
 
 #endif /* _MAINMENU_H_ */ 

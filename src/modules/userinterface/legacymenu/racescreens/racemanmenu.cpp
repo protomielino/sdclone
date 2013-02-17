@@ -406,6 +406,9 @@ RmRacemanMenu()
 		GfuiScreenRelease(ScrHandle);
 
 	const GfRaceManager* pRaceMan = LmRaceEngine().race()->getManager();
+	// Ask the RaceEngine what types of races should be allowed here
+	bool AllowPlayerConfig = LmRaceEngine().allowPlayerConfig();
+
 
 	// Create screen, load menu XML descriptor and create static controls.
 	ScrHandle = GfuiScreenCreate(NULL, NULL, rmOnActivate, 
@@ -425,22 +428,26 @@ RmRacemanMenu()
 	// Create Configure race, Configure players and Back buttons.
 	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigureRaceButton",
 								NULL, RmConfigureRace);
-	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigurePlayersButton",
+	if (AllowPlayerConfig)
+		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigurePlayersButton",
 								NULL, rmOnPlayerConfig);
 	
 	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "BackButton",
 								RmRaceSelectMenuHandle, GfuiScreenActivate);
 
-	// Create "Load / Resume / Save race" buttons.
-	SaveRaceConfigButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "SaveRaceConfigButton",
+	if (AllowPlayerConfig)
+	{
+		// Create "Load / Resume / Save race" buttons.
+		SaveRaceConfigButtonId =
+			GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "SaveRaceConfigButton",
 									ScrHandle, rmOnSaveRaceToConfigFile);
-	LoadRaceConfigButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadRaceConfigButton",
+		LoadRaceConfigButtonId =
+			GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadRaceConfigButton",
 									ScrHandle, rmOnLoadRaceFromConfigFile);
-	LoadRaceResultsButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadRaceResultsButton",
+		LoadRaceResultsButtonId =
+			GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadRaceResultsButton",
 									ScrHandle, rmOnLoadRaceFromResultsFile);
+	}
 
 	// Create "Resume / Start race" buttons.
 	ResumeRaceButtonId =

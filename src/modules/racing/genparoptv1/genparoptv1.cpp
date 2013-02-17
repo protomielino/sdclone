@@ -244,6 +244,11 @@ void GenParOptV1::stop(void)
 	::ReStop();
 }
 
+bool GenParOptV1::allowPlayerConfig()
+{
+	return false;
+}
+
 #ifdef SD_DEBUG
 void GenParOptV1::step(double dt)
 {

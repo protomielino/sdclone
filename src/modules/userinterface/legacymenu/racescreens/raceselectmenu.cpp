@@ -123,7 +123,10 @@ RmRaceSelectInit(void *prevMenu)
 {
     if (RmRaceSelectMenuHandle) 
 		return RmRaceSelectMenuHandle;
-    
+
+	// Ask the RaceEngine what types of races should be allowed here
+	bool AllowPlayerConfig = LmRaceEngine().allowPlayerConfig();
+
     // Create screen, load menu XML descriptor and create static controls.
     RmRaceSelectMenuHandle = GfuiScreenCreate((float*)NULL, 
 											NULL, rmOnActivate, 
@@ -145,6 +148,12 @@ RmRaceSelectInit(void *prevMenu)
 
 		// Create the race manager type button.
 		std::string strButtonCtrlName(*itRaceManType);
+		if (!AllowPlayerConfig)
+		{
+			if (strButtonCtrlName != "Practice")
+				continue;
+		}
+
 		strButtonCtrlName.erase(std::remove(strButtonCtrlName.begin(), strButtonCtrlName.end(), ' '), strButtonCtrlName.end()); // Such a pain to remove spaces !
 		strButtonCtrlName += "Button";
 		GfuiMenuCreateButtonControl(RmRaceSelectMenuHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),

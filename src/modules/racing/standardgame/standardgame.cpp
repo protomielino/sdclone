@@ -243,6 +243,11 @@ void StandardGame::stop(void)
 	::ReStop();
 }
 
+bool StandardGame::allowPlayerConfig()
+{
+	return true;
+}
+
 #ifdef SD_DEBUG
 void StandardGame::step(double dt)
 {
