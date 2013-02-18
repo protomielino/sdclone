@@ -3497,12 +3497,6 @@ double TDriver::FilterAccel(double Accel)
 //--------------------------------------------------------------------------*
 double TDriver::FilterTCL(double Accel)
 {
-  if (!oRain)
-  {
-    //if (DistanceRaced < 50)                      // Not at start
-    //  return Accel;
-  }
-
   if(fabs(CarSpeedLong) < 0.001)                 // Only if driving faster
 	return Accel;
 
@@ -3540,10 +3534,13 @@ double TDriver::FilterTCL(double Accel)
   if (oRain) 
 	  Slip *= oTclFactor * (oRainIntensity * 0.25 + 1);
 
+  float AccelScale = 0.05f;
+  if (oRain)
+	  AccelScale = 0.01f;
+
   if (Slip > oTclSlip)                           // Decrease accel if needed
   {
-//	float MinAccel = (float) (0.2 * Accel);
-	float MinAccel = (float) (0.05 * Accel);
+	float MinAccel = (float) (AccelScale * Accel);
 	Accel -= MIN(Accel, (Slip - oTclSlip)/oTclRange);
 	Accel = MAX(MinAccel,Accel);
   }
@@ -3577,12 +3574,21 @@ double TDriver::FilterDrifting(double Accel)
   if(CarSpeedLong < SLOWSPEED)
     return Accel;
 
+  double Drifting = oDriftAngle;
+  double DriftFactor = oDriftFactor;
+
+  if (oRain)
+  {
+	Drifting *= 1.5;
+	DriftFactor *= 2;
+  }
+
   // Decrease accelleration while drifting
-  double DriftAngle = MAX(MIN(oDriftAngle * 1.75, PI - 0.01),-PI + 0.01);
+  double DriftAngle = MAX(MIN(Drifting * 1.75, PI - 0.01),-PI + 0.01);
   if (oDriftAngle > oLastDriftAngle)
-    Accel /= (oDriftFactor * 150 * ( 1 - cos(DriftAngle)));
+    Accel /= (DriftFactor * 150 * ( 1 - cos(DriftAngle)));
   else
-    Accel /= (oDriftFactor * 50 * ( 1 - cos(DriftAngle)));
+    Accel /= (DriftFactor * 50 * ( 1 - cos(DriftAngle)));
 
   return MIN(1.0,Accel);
 }

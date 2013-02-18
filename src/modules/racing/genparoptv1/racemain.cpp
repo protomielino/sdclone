@@ -1137,7 +1137,7 @@ ReInitialiseGeneticOptimisation()
 	if (!Data->Handle)
 	{
 		// ... use default setup file ...
-		snprintf(buf,sizeof(BUFSIZE),"%sdrivers/%s/%s/default.xml",
+		snprintf(buf,BUFSIZE,"%sdrivers/%s/%s/default.xml",
 			GetLocalDir(),Data->RobotName,Data->CarType);
 		void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
 
@@ -1165,8 +1165,6 @@ ReInitialiseGeneticOptimisation()
 void
 ReImportGeneticParameters()
 {
-	char buf[BUFSIZE];
-
 	GfLogOpt("\n\nReImportGeneticParameters\n\n");
 
 	// Setup pointer to structure
