@@ -58,7 +58,7 @@
 #define PRV_OPTI	    "genetic optimisation"
 
 // Define buffer size
-const int BUFSIZE = MAX_PATH; // = 260 in WINDef.h
+const int BUFSIZE = FILENAME_MAX; // = 260 in WINDef.h
 
 //  
 // Genetic parameters are handled in a single array 
