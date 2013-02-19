@@ -2,8 +2,8 @@
                                    TRACE                   
                              -------------------                                         
     created              : Fri Aug 13 22:32:45 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
+    copyright            : (C) 1999 by Eric Espie, 2010 by Jean-Philippe Meuret
+    web                  : www.speed-dreams.org
     version              : $Id$
                                   
  ***************************************************************************/
@@ -18,8 +18,7 @@
  ***************************************************************************/
 
 /** @file
-    Allow the trace in the file <tt>trace.txt</tt>
-    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
+    Tracing / logging system
     @version	$Id$
     @ingroup	trace
 */
@@ -29,10 +28,12 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
-#include <cassert>
+//#include <cassert>
 #include <cstring>
 #include <ctime>
 
+#include <map>
+				  
 #ifdef WIN32
 #include <windows.h>
 #include <windowsx.h>
@@ -43,144 +44,211 @@
 #include "tgf.hpp"
 
 
-// Log levels.
-enum { gfLogFatal = 0, gfLogOpt, gfLogError, gfLogWarning, gfLogInfo, gfLogTrace, gfLogDebug }; // Keep gfLogOpt be first, used only in separate race engine
+// Level names. Temporary "Optimisation".
+const char* GfLogger::astrLevelNames[] = { "Fatal", "Optimisation", "Error", "Warning", "Info", "Trace", "Debug"};
 
-static const char* gfLogLevelNames[] = { "Fatal", "Optimisation", "Error", "Warning", "Info", "Trace", "Debug"};
+// Logger instances.
+std::map<std::string, GfLogger*> gfMapLoggersByName;
 
+// Flag indicating if output is enabled (for all loggers).
+bool GfLogger::_bOutputEnabled = false;
 
-// Log stream.
-static FILE* gfLogStream = 0;
-
-// Log level threshold.
-static int gfLogLevelThreshold = -1;
-
-// Flag indicating if the last logged line ended with a new-line.
-static bool gfLogNeedLineHeader = true;
-
+// The default logger : created and initialized first of all (see GfLogger::setup() below).
+static const char* pszDefLoggerName = "default";
+GfLogger* GfPLogDefault = 0;
 
 void
-gfTraceInit(void)
+gfTraceInit(bool bWithLogging)
 {
-	gfLogNeedLineHeader = true;
-    GfLogSetLevelThreshold(TRACE_LEVEL);
-    GfLogSetStream(stderr);
+    GfLogger::setup(bWithLogging);
 }
 
-#ifdef TRACE_OUT
+// GfLogger class implementation ==================================================
 
-void GfLogSetStream(FILE* fStream)
+GfLogger& GfLogger::instance(const std::string& strName)
 {
-    if (fStream)
+	// If the specified logger does not exists yet, create it and put it into the map.
+	std::map<std::string, GfLogger*>::iterator itLog = gfMapLoggersByName.find(strName);
+	if (itLog == gfMapLoggersByName.end())
+	{
+        // Default settings (null stream if output disabled).
+		GfLogger* pLog =
+            (_bOutputEnabled ? new GfLogger(strName) : new GfLogger(strName, 0));
+		gfMapLoggersByName[strName] = pLog;
+
+		// Get again from the map : should never fail.
+		itLog = gfMapLoggersByName.find(strName);
+	}
+
+	return *(itLog->second);
+}
+
+void GfLogger::setup(bool bWithLogging)
+{
+    // Save global settings.
+    _bOutputEnabled = bWithLogging;
+
+	// Create the "default" logger and pre-initialize it with hard coded default settings
+	// (we need it for tracing stuff happening when completing initialization).
+	GfPLogDefault = &GfLogger::instance(pszDefLoggerName);
+
+	// Load logger settings and create loggers.
+	// TODO.
+}
+
+GfLogger::GfLogger()
+: _strName(""), _bfHdrCols(0), _pStream(0), _nLvlThresh(0), _bNeedsHeader(true)
+{
+}
+
+GfLogger::GfLogger(const std::string& strName, FILE* pFile, int nLvlThresh, unsigned bfHdrCols)
+: _strName(strName), _bfHdrCols(bfHdrCols), _pStream(pFile), _nLvlThresh(nLvlThresh),
+  _bNeedsHeader(true)
+{
+}
+
+GfLogger::~GfLogger()
+{
+	// Close stream if needed.
+	if (_pStream && _pStream != stderr && _pStream != stdout)
+		fclose(_pStream);
+}
+
+const std::string& GfLogger::name() const
+{
+	return _strName;
+}
+
+unsigned GfLogger::headerColumns() const
+{
+	return _bfHdrCols;
+}
+
+void GfLogger::setHeaderColumns(unsigned bfHdrCols)
+{
+	_bfHdrCols = bfHdrCols;
+}
+
+FILE* GfLogger::stream() const
+{
+	return _pStream;
+}
+
+void GfLogger::setStream(FILE* pFile)
+{
+    if (pFile)
     {
 		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-		fprintf(gfLogStream ? gfLogStream : stderr,
-				"%s Info    New trace stream : %p\n", pszClock, fStream);
+		fprintf(_pStream ? _pStream : stderr,
+				"%s Info    New trace stream : %p\n", pszClock, pFile);
 		free(pszClock);
-		fflush(gfLogStream ? gfLogStream : stderr);
+		fflush(_pStream ? _pStream : stderr);
 
 		// Close previous stream if needed.
-		if (gfLogStream && gfLogStream != stderr && gfLogStream != stdout)
-			fclose(gfLogStream);
+		if (_pStream && _pStream != stderr && _pStream != stdout)
+			fclose(_pStream);
 		
-		gfLogStream = fStream;
+		_pStream = pFile;
     }
     else
 	{
 		const int nErrNo = errno;
 		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-		fprintf(gfLogStream ? gfLogStream : stderr, 
+		fprintf(_pStream ? _pStream : stderr, 
 				"%s Error   GfLogSetStream : Null stream (%s)\n", pszClock, strerror(nErrNo));
 		free(pszClock);
-		fflush(gfLogStream ? gfLogStream : stderr);
+		fflush(_pStream ? _pStream : stderr);
 	}
 	
-    if (gfLogStream)
+    if (_pStream)
     {
         // Trace date and time.
 		time_t t = time(NULL);
 		struct tm *stm = localtime(&t);
 		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-		fprintf(gfLogStream, "%s Info    Date and time : %4d/%02d/%02d %02d:%02d:%02d\n",
+		fprintf(_pStream, "%s Info    Date and time : %4d/%02d/%02d %02d:%02d:%02d\n",
 				pszClock, stm->tm_year+1900, stm->tm_mon+1, stm->tm_mday,
 				stm->tm_hour, stm->tm_min, stm->tm_sec);
-		fprintf(gfLogStream, "%s Info    Version : %s\n", pszClock, GfApp().version().c_str());
+		fprintf(_pStream, "%s Info    Version : %s\n", pszClock, GfApp().version().c_str());
 
 		// Trace current trace level threshold.
-		fprintf(gfLogStream, "%s Info    Current trace level threshold : ", pszClock);
-		if (gfLogLevelThreshold >= gfLogFatal && gfLogLevelThreshold <= gfLogDebug)
-			fprintf(gfLogStream, "%s\n", gfLogLevelNames[gfLogLevelThreshold]);
+		fprintf(_pStream, "%s Info    Current trace level threshold : ", pszClock);
+		if (_nLvlThresh >= eFatal && _nLvlThresh <= eDebug)
+			fprintf(_pStream, "%s\n", astrLevelNames[_nLvlThresh]);
 		else
-			fprintf(gfLogStream, "Level%d\n", gfLogLevelThreshold);
+			fprintf(_pStream, "Level%d\n", _nLvlThresh);
 
 		// That's all.
-		fflush(gfLogStream);
+		fflush(_pStream);
 		free(pszClock);
     }
 }
 
-void GfLogSetFile(const char* pszFileName)
+void GfLogger::setStream(const std::string& strPathname)
 {
-	FILE* fStream = fopen(pszFileName, "w");
-    if (fStream)
+	FILE* pFile = fopen(strPathname.c_str(), "w");
+    if (pFile)
 	{
 		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-		fprintf(gfLogStream ? gfLogStream : stderr,
-				"%s Info    New trace file : %s\n", pszClock, pszFileName);
+		fprintf(_pStream ? _pStream : stderr,
+				"%s Info    New trace file : %s\n", pszClock, strPathname.c_str());
 		free(pszClock);
-		fflush(gfLogStream ? gfLogStream : stderr);
+		fflush(_pStream ? _pStream : stderr);
 		
-		GfLogSetStream(fStream);
+		setStream(pFile);
 	}
 	else
 	{
 		const int nErrNo = errno;
 		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-		fprintf(gfLogStream ? gfLogStream : stderr, 
-				"%s Error   GfLogSetFile(%s) : Failed to open file for writing (%s)\n",
-				pszClock, pszFileName, strerror(nErrNo));
+		fprintf(_pStream ? _pStream : stderr, 
+				"%s Error   GfLogger::setStream(%s) : Failed to open file for writing (%s)\n",
+				pszClock, strPathname.c_str(), strerror(nErrNo));
 		free(pszClock);
-		fflush(gfLogStream ? gfLogStream : stderr);
+		fflush(_pStream ? _pStream : stderr);
 	}
 }
 
-void GfLogSetLevelThreshold(int nLevel)
+int GfLogger::levelThreshold() const
 {
-    gfLogLevelThreshold = nLevel;
+	return _nLvlThresh;
+}
+
+void GfLogger::setLevelThreshold(int nLevel)
+{
+    _nLvlThresh = nLevel;
 
     // Trace new trace level threshold.
-    if (gfLogStream)
+    if (_pStream)
     {
 		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-		fprintf(gfLogStream, "%s Info    New trace level threshold : ", pszClock);
+		fprintf(_pStream, "%s Info    New trace level threshold : ", pszClock);
 		free(pszClock);
-		if (gfLogLevelThreshold >= gfLogFatal && gfLogLevelThreshold <= gfLogDebug)
-			fprintf(gfLogStream, "%s\n", gfLogLevelNames[gfLogLevelThreshold]);
+		if (_nLvlThresh >= eFatal && _nLvlThresh <= eDebug)
+			fprintf(_pStream, "%s\n", astrLevelNames[_nLvlThresh]);
 		else
-			fprintf(gfLogStream, "%d\n", gfLogLevelThreshold);
-		fflush(gfLogStream);
+			fprintf(_pStream, "%d\n", _nLvlThresh);
+		fflush(_pStream);
     }
 }
 
-#endif // TRACE_OUT
-
-void GfLogFatal(const char *pszFmt, ...)
+void GfLogger::fatal(const char *pszFmt, ...)
 {
 #ifdef TRACE_OUT
-    if (gfLogLevelThreshold >= gfLogFatal)
+    if (_pStream && _nLvlThresh >= eFatal)
     {
-		if (gfLogNeedLineHeader)
+		if (_bNeedsHeader)
 		{
 			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-            fprintf(gfLogStream, "%s Fatal   ", pszClock);
+            fprintf(_pStream, "%s Fatal   ", pszClock);
 			free(pszClock);
 		}
         va_list vaArgs;
         va_start(vaArgs, pszFmt);
-        vfprintf(gfLogStream, pszFmt, vaArgs);
+        vfprintf(_pStream, pszFmt, vaArgs);
         va_end(vaArgs);
-		fflush(gfLogStream);
-		gfLogNeedLineHeader = strrchr(pszFmt, '\n') ? true : false;
+		fflush(_pStream);
+		_bNeedsHeader = strrchr(pszFmt, '\n') ? true : false;
     }
 #endif // TRACE_OUT
 
@@ -195,186 +263,143 @@ void GfLogFatal(const char *pszFmt, ...)
 
 #ifdef TRACE_OUT
 
-void GfLogError(const char *pszFmt, ...)
+// Temporary.
+void GfLogger::optim(const char *pszFmt, ...)
 {
-    if (gfLogLevelThreshold >= gfLogError)
-    {
-        if (gfLogNeedLineHeader)
-		{
-			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-            fprintf(gfLogStream, "%s Error   ", pszClock);
-			free(pszClock);
-		}
-        va_list vaArgs;
-        va_start(vaArgs, pszFmt);
-        vfprintf(gfLogStream, pszFmt, vaArgs);
-        va_end(vaArgs);
-		fflush(gfLogStream);
-		gfLogNeedLineHeader = strrchr(pszFmt, '\n') ? true : false;
-    }
-}
-
-void GfLogWarning(const char *pszFmt, ...)
-{
-    if (gfLogLevelThreshold >= gfLogWarning)
-    {
-        if (gfLogNeedLineHeader)
-		{
-			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-            fprintf(gfLogStream, "%s Warning ", pszClock);
-			free(pszClock);
-		}
-        va_list vaArgs;
-        va_start(vaArgs, pszFmt);
-        vfprintf(gfLogStream, pszFmt, vaArgs);
-        va_end(vaArgs);
-		fflush(gfLogStream);
-		gfLogNeedLineHeader = strrchr(pszFmt, '\n') ? true : false;
-    }
-}
-
-void GfLogInfo(const char *pszFmt, ...)
-{
-    if (gfLogLevelThreshold >= gfLogInfo)
-    {
-        if (gfLogNeedLineHeader)
-		{
-			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-            fprintf(gfLogStream, "%s Info    ", pszClock);
-			free(pszClock);
-		}
-        va_list vaArgs;
-        va_start(vaArgs, pszFmt);
-        vfprintf(gfLogStream, pszFmt, vaArgs);
-        va_end(vaArgs);
-		fflush(gfLogStream);
-		gfLogNeedLineHeader = strrchr(pszFmt, '\n') ? true : false;
-    }
-}
-
-void GfLogTrace(const char *pszFmt, ...)
-{
-    if (gfLogLevelThreshold >= gfLogTrace)
-    {
-        if (gfLogNeedLineHeader)
-		{
-			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-            fprintf(gfLogStream, "%s Trace   ", pszClock);
-			free(pszClock);
-		}
-        va_list vaArgs;
-        va_start(vaArgs, pszFmt);
-        vfprintf(gfLogStream, pszFmt, vaArgs);
-        va_end(vaArgs);
-		fflush(gfLogStream);
-		gfLogNeedLineHeader = strrchr(pszFmt, '\n') ? true : false;
-    }
-}
-
-void GfLogDebug(const char *pszFmt, ...)
-{
-    if (gfLogLevelThreshold >= gfLogDebug)
-    {
-        if (gfLogNeedLineHeader)
-		{
-			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-            fprintf(gfLogStream, "%s Debug   ", pszClock);
-			free(pszClock);
-		}
-        va_list vaArgs;
-        va_start(vaArgs, pszFmt);
-        vfprintf(gfLogStream, pszFmt, vaArgs);
-        va_end(vaArgs);
-		fflush(gfLogStream);
-		gfLogNeedLineHeader = strrchr(pszFmt, '\n') ? true : false;
-    }
-}
-
-void GfLogOpt(const char *pszFmt, ...)
-{
-    if (gfLogLevelThreshold >= gfLogOpt)
+    if (_pStream && _nLvlThresh >= eOptim)
     {
 /*
-		if (gfLogNeedLineHeader)
+        if (_bNeedsHeader)
 		{
 			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-            fprintf(gfLogStream, "%s Optimis.", pszClock);
+            fprintf(_pStream, "%s Optimis.", pszClock);
 			free(pszClock);
 		}
 */
         va_list vaArgs;
         va_start(vaArgs, pszFmt);
-        vfprintf(gfLogStream, pszFmt, vaArgs);
+        vfprintf(_pStream, pszFmt, vaArgs);
         va_end(vaArgs);
-		fflush(gfLogStream);
-//		gfLogNeedLineHeader = strrchr(pszFmt, '\n') ? true : false;
+		fflush(_pStream);
+//		_bNeedsHeader = strrchr(pszFmt, '\n') ? true : false;
     }
 }
 
-void GfLogMessage(int nLevel, const char *pszFmt, ...)
+void GfLogger::error(const char *pszFmt, ...)
 {
-    if (gfLogLevelThreshold >= nLevel)
+    if (_pStream && _nLvlThresh >= eError)
     {
-		if (gfLogNeedLineHeader)
+        if (_bNeedsHeader)
 		{
 			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
-			if (nLevel >= gfLogFatal && nLevel <= gfLogDebug)
-				fprintf(gfLogStream, "%s %.7s ", gfLogLevelNames[nLevel], pszClock);
+            fprintf(_pStream, "%s Error   ", pszClock);
+			free(pszClock);
+		}
+        va_list vaArgs;
+        va_start(vaArgs, pszFmt);
+        vfprintf(_pStream, pszFmt, vaArgs);
+        va_end(vaArgs);
+		fflush(_pStream);
+		_bNeedsHeader = strrchr(pszFmt, '\n') ? true : false;
+    }
+}
+
+void GfLogger::warning(const char *pszFmt, ...)
+{
+    if (_pStream && _nLvlThresh >= eWarning)
+    {
+        if (_bNeedsHeader)
+		{
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+            fprintf(_pStream, "%s Warning ", pszClock);
+			free(pszClock);
+		}
+        va_list vaArgs;
+        va_start(vaArgs, pszFmt);
+        vfprintf(_pStream, pszFmt, vaArgs);
+        va_end(vaArgs);
+		fflush(_pStream);
+		_bNeedsHeader = strrchr(pszFmt, '\n') ? true : false;
+    }
+}
+
+void GfLogger::info(const char *pszFmt, ...)
+{
+    if (_pStream && _nLvlThresh >= eInfo)
+    {
+        if (_bNeedsHeader)
+		{
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+            fprintf(_pStream, "%s Info    ", pszClock);
+			free(pszClock);
+		}
+        va_list vaArgs;
+        va_start(vaArgs, pszFmt);
+        vfprintf(_pStream, pszFmt, vaArgs);
+        va_end(vaArgs);
+		fflush(_pStream);
+		_bNeedsHeader = strrchr(pszFmt, '\n') ? true : false;
+    }
+}
+
+void GfLogger::trace(const char *pszFmt, ...)
+{
+    if (_pStream && _nLvlThresh >= eTrace)
+    {
+        if (_bNeedsHeader)
+		{
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+            fprintf(_pStream, "%s Trace   ", pszClock);
+			free(pszClock);
+		}
+        va_list vaArgs;
+        va_start(vaArgs, pszFmt);
+        vfprintf(_pStream, pszFmt, vaArgs);
+        va_end(vaArgs);
+		fflush(_pStream);
+		_bNeedsHeader = strrchr(pszFmt, '\n') ? true : false;
+    }
+}
+
+void GfLogger::debug(const char *pszFmt, ...)
+{
+    if (_pStream && _nLvlThresh >= eDebug)
+    {
+        if (_bNeedsHeader)
+		{
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+            fprintf(_pStream, "%s Debug   ", pszClock);
+			free(pszClock);
+		}
+        va_list vaArgs;
+        va_start(vaArgs, pszFmt);
+        vfprintf(_pStream, pszFmt, vaArgs);
+        va_end(vaArgs);
+		fflush(_pStream);
+		_bNeedsHeader = strrchr(pszFmt, '\n') ? true : false;
+    }
+}
+
+void GfLogger::message(int nLevel, const char *pszFmt, ...)
+{
+    if (_pStream && _nLvlThresh >= nLevel)
+    {
+		if (_bNeedsHeader)
+		{
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+			if (nLevel >= eFatal && nLevel <= eDebug)
+				fprintf(_pStream, "%s %.7s ", astrLevelNames[nLevel], pszClock);
 			else
-				fprintf(gfLogStream, "%s Level%d ", pszClock, nLevel);
+				fprintf(_pStream, "%s Level%d ", pszClock, nLevel);
 			free(pszClock);
 		}
 		va_list vaArgs;
 		va_start(vaArgs, pszFmt);
-		vfprintf(gfLogStream, pszFmt, vaArgs);
+		vfprintf(_pStream, pszFmt, vaArgs);
 		va_end(vaArgs);
-		fflush(gfLogStream);
-		gfLogNeedLineHeader = strrchr(pszFmt, '\n') ? true : false;
+		fflush(_pStream);
+		_bNeedsHeader = strrchr(pszFmt, '\n') ? true : false;
     }
 }
 
 #endif // TRACE_OUT
-
-
-/* static FILE *outTrace = (FILE*)NULL; */
-
-/* static char TraceStr[1024]; */
-
-/** Print a message in the trace file.
-    The file is openned the first time
-    @ingroup	trace
-    @param	szTrc	message to trace
-*/
-/* void GfTrace(char *fmt, ...) */
-/* { */
-/*     va_list		ap; */
-/*     struct tm		*stm; */
-/*     time_t		t; */
-/*     char		*s = TraceStr; */
-
-/*     fprintf(stderr, "ERROR: "); */
-/*     va_start(ap, fmt); */
-/*     vfprintf(stderr, fmt, ap); */
-/*     va_end(ap); */
-/*     fflush(stderr); */
-
-/*     if (outTrace == NULL) { */
-/* 	if ((outTrace = fopen("trace.txt", "w+")) == NULL) { */
-/* 	    perror("trace.txt"); */
-/* 	    return; */
-/* 	} */
-/*     } */
-/*     t = time(NULL); */
-/*     stm = localtime(&t); */
-/*     s += sprintf(TraceStr, "%4d/%02d/%02d %02d:%02d:%02d ", */
-/* 		 stm->tm_year+1900, stm->tm_mon+1, stm->tm_mday, */
-/* 		 stm->tm_hour, stm->tm_min, stm->tm_sec); */
-
-/*     va_start(ap, fmt); */
-/*     vsnprintf(s, 1023 - strlen(TraceStr), fmt, ap); */
-/*     va_end(ap); */
-
-/*     fwrite(TraceStr, strlen(TraceStr), 1, outTrace); */
-/*     fflush(outTrace); */
-/* } */
-

@@ -35,12 +35,20 @@ class Application : public GfuiApplication
  public:
 
 	//! Constructor.
-	Application(int argc, char **argv)
-	: GfuiApplication("MenuView", "<no version>", "XML menu viewer", argc, argv)
+	Application()
+    : GfuiApplication("MenuView", "<no version>", "XML menu viewer")
 	{
-		// Help about the specific options.
+    }
+
+    //! Initialization.
+    virtual void initialize(bool bLoggingEnabled, int argc = 0, char **argv = 0)
+    {
+        // Base initialization first.
+        GfuiApplication::initialize(bLoggingEnabled, argc, argv);
+
+        // Help about the specific options.
 		addOptionsHelpSyntaxLine("<menu file>");
-		addOptionsHelpExplainLine("- <menu file> : the menu XML file to load");
+        addOptionsHelpExplainLine("- <menu file> : the menu XML file to load");
 	}
 
 	//! Parse the command line options.
@@ -88,7 +96,8 @@ class Application : public GfuiApplication
 int main(int argc, char *argv[])
 {
 	// Create the MenuView application
-	Application app(argc, argv);
+	Application app;
+	app.initialize(/*bLoggingEnabled=*/true, argc, argv);
 
 	// Parse the command line options
     if (!app.parseOptions())

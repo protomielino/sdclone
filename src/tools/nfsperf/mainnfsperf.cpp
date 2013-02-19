@@ -156,6 +156,11 @@ int main (int argc, char **argv)
 	perror (infile);
 	exit (1);
     }    
+
+    // Initialize the gaming framework
+    // (set bLoggingEnabled to true to enable logging = to get debug traces).
+    GfInit(/*bLoggingEnabled=*/false);
+
     if (catfile) {
 	param = GfParmReadFile (catfile, GFPARM_RMODE_STD);
     } else {

@@ -66,15 +66,14 @@ main(int argc, char *argv[])
 			break;
 		}
 
-	// Create the application (graphical or text-only UI).
+	// Create and initialize the application (graphical or text-only UI).
 	GfApplication* pApp;
 	if (bTextOnly)
-		pApp = new GfApplication("Speed Dreams", VERSION_LONG,
-								 "an Open Motorsport Sim", argc, argv);
+		pApp = new GfApplication("Speed Dreams", VERSION_LONG, "an Open Motorsport Sim");
 	else
-		pApp = new GfuiApplication("Speed Dreams", VERSION_LONG,
-								   "an Open Motorsport Sim", argc, argv);
-
+		pApp = new GfuiApplication("Speed Dreams", VERSION_LONG, "an Open Motorsport Sim");
+	pApp->initialize(/*bLoggingEnabled=*/true, argc, argv);
+	
 	// Register app. specific options and help text.
 	pApp->registerOption("s", "startrace", /* nHasValue = */ true);
 	pApp->registerOption("x", "textonly", /* nHasValue = */ false);

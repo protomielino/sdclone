@@ -33,6 +33,7 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <ostream>
 
 #include "tgf.h"
 
@@ -168,8 +169,7 @@ class TGF_API GfApplication
 	static GfApplication& self();
 	
 	//! Constructor.
-	GfApplication(const char* pszName, const char* pszVersion, const char* pszDesc,
-				  int argc = 0, char **argv = 0);
+    GfApplication(const char* pszName, const char* pszVersion, const char* pszDesc);
 
 	//! Destructor.
 	virtual ~GfApplication();
@@ -182,6 +182,9 @@ class TGF_API GfApplication
 	
 	//! Description accessor.
 	const std::string& description() const;
+
+	//! Initialization (when specializing, you must call base implementation first).
+    virtual void initialize(bool bLoggingEnabled, int argc = 0, char **argv = 0);
 
 	//! Add the given option to the automatically processed ones when parseOptions is called.
 	void registerOption(const std::string& strShortName,

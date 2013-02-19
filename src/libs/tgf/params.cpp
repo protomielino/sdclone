@@ -1189,7 +1189,6 @@ GfParmReadFileLocal(const char *file, int mode, bool neededFile)
 }
 
 /** Read a configuration file.
-    @note	Called by #gfInitThread
     @ingroup	conf
     @param	logHandle	log handle
     @param	file		name of the file to read or content if input is a buffer.

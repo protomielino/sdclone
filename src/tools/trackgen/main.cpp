@@ -106,9 +106,12 @@ class Application : public GfApplication
 public:
 
 	//! Constructor.
-	Application(int argc, char** argv);
+	Application();
 
-	//! Parse the command line options.
+    //! Initialization.
+    virtual void initialize(bool bLoggingEnabled, int argc = 0, char **argv = 0);
+
+    //! Parse the command line options.
 	// TODO: Move to the GfApplication way of parsing options ?
 	bool parseOptions();
 	
@@ -116,9 +119,16 @@ public:
 };
 
 //! Constructor.
-Application::Application(int argc, char** argv)
-: GfApplication("TrackGen", "1.5.2.1", "Terrain generator for tracks", argc, argv)
+Application::Application()
+: GfApplication("TrackGen", "1.5.2.1", "Terrain generator for tracks")
 {
+}
+
+void Application::initialize(bool bLoggingEnabled, int argc, char **argv)
+{
+	// Base initialization first.
+	GfApplication::initialize(bLoggingEnabled, argc, argv);
+	
 	// Specific options.
 	registerOption("c", "category", /* nHasValue = */ true);
 	registerOption("n", "name", /* nHasValue = */ true);
@@ -354,8 +364,9 @@ void Application::generate()
 
 int main(int argc, char **argv)
 {
-	// Create the application
-	Application app(argc, argv);
+	// Create and initialize the application
+	Application app;
+	app.initialize(/*bLoggingEnabled=*/true, argc, argv);
 	
 	// Parse the command line options
     if (!app.parseOptions())

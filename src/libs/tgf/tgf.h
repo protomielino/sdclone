@@ -175,7 +175,7 @@ typedef struct Forces
 /******************************
  * Gaming framework managment *
  ******************************/
-TGF_API void GfInit(void);
+TGF_API void GfInit(bool bWithLogging = true);
 TGF_API void GfShutdown(void);
 
 
@@ -431,11 +431,11 @@ TGF_API int GfParmSetCurFormulaf(void* hanlde, char const *formula, char const* 
 TGF_API void GfParmShutdown (void);
 
 /********************************************************************************
- * Log/Trace Interface                                                          *
+ * Logging / Tracing Interface                                                  *
  *  - Write formated string messages at run-time to the log stream,             *
  *    with automatic prepending of current time and trace level                 *
- *    (Ex: 12:27.35.267 Debug  My formated message)                             *
- *  - GfLogFatal also exits the program after logging the message
+ *    (Ex: 12:27:35.267 Debug  My formated message)                             *
+ *  - GfLogFatal also exits the program after logging the message               *
  *  - Messages are given an integer "level" = "criticity",                      *
  *    (0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ...)              *
  *  - Messages are actually logged into the stream only if their level          *
@@ -445,41 +445,134 @@ TGF_API void GfParmShutdown (void);
  *    but it can be changed at run-time to any other level.                     *
  ********************************************************************************/
 
-TGF_API void GfLogFatal(const char *pszFmt, ...);
+//****************************************
+// Logger class
+
+class TGF_API GfLogger
+{
+ public:
+
+	//! Trace level / criticity : enum or integer if > eDebug. Temporary eOptim.
+	enum { eFatal = 0, eOptim, eError, eWarning, eInfo, eTrace, eDebug };
+
+	//! Destructor.
+	virtual ~GfLogger();
+
+	//! Accessors.
+	const std::string& name() const;
+
+	int levelThreshold() const;
+	void setLevelThreshold(int nLevel);
+
+	enum { eNone=0, eTime=0x01, eLevel=0x02, eLogger=0x04, eAll=eTime|eLevel|eLogger };
+	unsigned headerColumns() const;
+	void setHeaderColumns(unsigned bfHdrCols);
+
+	FILE* stream() const;
+	void setStream(FILE* pFile);
+	void setStream(const std::string& strPathname);
+	
+	//! Tracing functions (name gives the trace level / criticity).
+	void fatal(const char *pszFmt, ...); // Warning : This one calls exit(1) at the end !
+#ifdef TRACE_OUT
+	void optim(const char *pszFmt, ...); // Temporary.
+	void error(const char *pszFmt, ...);
+	void warning(const char *pszFmt, ...);
+	void info(const char *pszFmt, ...);
+	void trace(const char *pszFmt, ...);
+	void debug(const char *pszFmt, ...);
+#else // TRACE_OUT
+	// The compiler should simply skip calls to these ...
+	inline void error(const char *pszFmt, ...) {};
+	inline void warning(const char *pszFmt, ...) {};
+	inline void info(const char *pszFmt, ...) {};
+	inline void trace(const char *pszFmt, ...) {};
+	inline void debug(const char *pszFmt, ...) {};
+#endif // TRACE_OUT
+
+	//! Generic tracing function (you must specify the level, enum or integer if > eDebug).
+#ifdef TRACE_OUT
+	void message(int nLevel, const char *pszFmt, ...);
+#else // TRACE_OUT
+	// The compiler should simply skip calls to this ...
+	inline void message(int nLevel, const char *pszFmt, ...) {};
+#endif // TRACE_OUT
+
+	//! Instance getter (you can't readily instanciate loggers).
+	static GfLogger& instance(const std::string& name);
+	
+	//! Setup the logging system (create and configure loggers from settings).
+    static void setup(bool bWithLogging = true);
+	
+ protected:
+
+	//! Constructors (protected in order to forbid direct instanciation).
+	GfLogger(); // Forced default constructor, to prevent the compiler to make it public.
+	GfLogger(const std::string& strName, FILE* pFile = stderr, int nLvlThresh = TRACE_LEVEL,
+			 unsigned bfHdrCols = GfLogger::eAll);
+
+ protected:
+
+	//! The logger name / id.
+	std::string _strName;
+	
+	//! The header columns to output in the target stream.
+	unsigned _bfHdrCols;
+
+	//! The target output stream.
+	FILE* _pStream;
+
+	//! The trace level threshold (less critical traces are not logged).
+	int _nLvlThresh;
+	
+	//! Flag indicating if the last logged line ended with a new-line.
+	bool _bNeedsHeader;
+	
+    //! Flag indicating if output is enabled (for all loggers).
+    static bool _bOutputEnabled;
+
+	//! Log level names (index = level enum or int value).
+	static const char* astrLevelNames[];
+};
+
+// The default logger.
+TGF_API extern GfLogger* GfPLogDefault;
+#define GfLogDefault (*GfPLogDefault)
+
+// Backward compatibility (for before GfLogger appeared, as long as not used readily everywhere).
+#define GfLogFatal GfLogDefault.fatal
 
 #ifdef TRACE_OUT
 
-TGF_API void GfLogError(const char *pszFmt, ...);
-TGF_API void GfLogWarning(const char *pszFmt, ...);
-TGF_API void GfLogInfo(const char *pszFmt, ...);
-TGF_API void GfLogTrace(const char *pszFmt, ...);
-TGF_API void GfLogDebug(const char *pszFmt, ...);
-TGF_API void GfLogOpt(const char *pszFmt, ...);
+// Temporary.
+#define GfLogOpt GfLogDefault.optim
 
-TGF_API void GfLogMessage(int nLevel, const char *pszFmt, ...);
-TGF_API void GfLogSetFile(const char* pszFileName);
-TGF_API void GfLogSetStream(FILE* fStream);
-TGF_API void GfLogSetLevelThreshold(int nLevel);
+#define GfLogError GfLogDefault.error
+#define GfLogWarning GfLogDefault.warning
+#define GfLogInfo GfLogDefault.info
+#define GfLogTrace GfLogDefault.trace
+#define GfLogDebug GfLogDefault.debug
+#define GfLogMessage GfLogDefault.message
+#define GfLogSetStream GfLogDefault.setStream
+#define GfLogSetLevelThreshold GfLogDefault.setLevelThreshold
 
 #else // TRACE_OUT
 
-static inline void GfLogNothing(const char *pszFmt, ...) {};
+#define GfLogError
+#define GfLogWarning
+#define GfLogInfo
+#define GfLogTrace
+#define GfLogDebug
+#define GfLogMessage
+#define GfLogSetStream
+#define GfLogSetLevelThreshold
 
-#define GfLogError GfLogNothing
-#define GfLogWarning GfLogNothing
-#define GfLogInfo GfLogNothing
-#define GfLogTrace GfLogNothing
-#define GfLogDebug GfLogNothing
-#define GfLogOpt GfLogNothing
-
-static inline void GfLogMessage(int nLevel, const char *pszFmt, ...) {};
-#define GfLogSetFile(pszFileName)
-#define GfLogSetStream(fStream)
-#define GfLogSetLevelThreshold(nLevel)
+// Temporary.
+#define GfLogOpt
 
 #endif // TRACE_OUT
 
-// Backward compatibility.
+// Backward compatibility for old TORCS inherited code (like robots).
 #define GfFatal GfLogFatal
 #define GfError GfLogError
 #define GfOut   GfLogInfo

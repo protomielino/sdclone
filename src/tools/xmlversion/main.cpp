@@ -218,8 +218,9 @@ int main( int argc, char **argv )
 		return 1; //Not enough arguments
 	}
 
-	// Uncomment to get debug traces.
-    //GfInit(); 
+    // Initialize the gaming framework
+    // (set bLoggingEnabled to true to enable logging = to get debug traces).
+    GfInit(/*bLoggingEnabled=*/false);
 
 	if( argc > 5 )
 		fprintf( stderr, "Warning: Too many arguments (should be 3 or 4). Ignoring extra ones.\n" );

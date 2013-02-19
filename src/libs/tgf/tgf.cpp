@@ -42,7 +42,7 @@
 #include "tgf.h"
 
 
-extern void gfTraceInit(void);
+extern void gfTraceInit(bool bWithLogging = true);
 extern void gfDirInit(void);
 extern void gfModInit(void);
 extern void gfOsInit(void);
@@ -438,14 +438,19 @@ char * _tgf_win_strdup(const char * str)
 
 /** Initialize the gaming framework.
     @ingroup	tgf
+    @param bWithLogging If false, inhibit logging output
     @return	None
  */
-void GfInit(void)
+void GfInit(bool bWithLogging)
 {
-	gfTraceInit();
+    gfTraceInit(bWithLogging);
+
 	gfDirInit();
+
 	gfModInit();
+
 	gfOsInit();
+
 	gfParamInit();
 
 	// Initialize random generator.
@@ -454,6 +459,43 @@ void GfInit(void)
 	// Initialize SDL and useful subsystems (some others may be initialized in tgfclient).
 	if (SDL_Init(SDL_INIT_TIMER) < 0)
 		GfLogFatal("Couldn't initialize SDL(timer) (%s)\n", SDL_GetError());
+
+    // Trace build information.
+    GfLogInfo("Built on %s\n", SD_BUILD_INFO_SYSTEM);
+    GfLogInfo("  with CMake %s, '%s' generator\n",
+              SD_BUILD_INFO_CMAKE_VERSION, SD_BUILD_INFO_CMAKE_GENERATOR);
+    GfLogInfo("  with %s %s compiler ('%s' configuration)\n",
+              SD_BUILD_INFO_COMPILER_NAME, SD_BUILD_INFO_COMPILER_VERSION,
+              SD_BUILD_INFO_CONFIGURATION);
+
+    // Trace current OS information.
+    std::string strName;
+    int nMajor, nMinor, nPatch, nBits;
+    if (GfGetOSInfo(strName, nMajor, nMinor, nPatch, nBits))
+    {
+        GfLogInfo("Current OS is %s", (strName.empty() ? "unknown" : strName.c_str()));
+        if (nMajor >= 0)
+        {
+            GfLogInfo(" (R%d", nMajor);
+            if (nMinor >= 0)
+            {
+                GfLogInfo(".%d", nMinor);
+                if (nPatch >= 0)
+                    GfLogInfo(".%d", nPatch);
+            }
+        }
+        if (nBits >= 0)
+        {
+            if (nMajor >= 0)
+                GfLogInfo(", ");
+            else
+                GfLogInfo(" (");
+            GfLogInfo("%d bits", nBits);
+        }
+        if (nMajor >= 0 || nBits >= 0)
+            GfLogInfo(")");
+        GfLogInfo("\n");
+    }
 }
 
 

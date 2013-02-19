@@ -757,12 +757,14 @@ class TGFCLIENT_API GfuiApplication : public GfApplication
  public:
 
 	//! Constructor.
-	GfuiApplication(const char* pszName, const char* pszVersion, const char* pszDesc,
-					int argc = 0, char** argv = 0);
+    GfuiApplication(const char* pszName, const char* pszVersion, const char* pszDesc);
 
 	//! Destructor.
 	virtual ~GfuiApplication();
 	
+	//! Initialization.
+    virtual void initialize(bool bLoggingEnabled, int argc = 0, char **argv = 0);
+
 	//! Parse the command line options (updates _lstOptionsLeft).
 	bool parseOptions();
 

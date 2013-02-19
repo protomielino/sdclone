@@ -19,11 +19,17 @@
 #include "tgfclient.h"
 
 
-GfuiApplication::GfuiApplication(const char* pszName, const char* pszVersion, const char* pszDesc,
-								 int argc, char **argv)
-: GfApplication((pszName ? pszName : "GfuiApplication"), pszVersion, pszDesc, argc, argv),
+GfuiApplication::GfuiApplication(const char* pszName, const char* pszVersion, const char* pszDesc)
+: GfApplication((pszName ? pszName : "GfuiApplication"), pszVersion, pszDesc),
   _bWindowUp(false)
 {
+}
+
+void GfuiApplication::initialize(bool bLoggingEnabled, int argc, char **argv)
+{
+	// Base initialization first.
+	GfApplication::initialize(bLoggingEnabled, argc, argv);
+	
 	// Register command line options.
 	registerOption("m", "hardmouse", /* nHasValue = */ false);
 	

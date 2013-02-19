@@ -54,8 +54,7 @@ GfApplication& GfApplication::self()
 	return *_pSelf;
 }
 
-GfApplication::GfApplication(const char* pszName, const char* pszVersion, const char* pszDesc,
-							 int argc, char **argv)
+GfApplication::GfApplication(const char* pszName, const char* pszVersion, const char* pszDesc)
 : _strName(pszName ? pszName : "GfApplication"), _strDesc(pszDesc ? pszDesc : ""),
   _strVersion(pszVersion ? pszVersion : ""), _pEventLoop(0)
 {
@@ -68,53 +67,19 @@ GfApplication::GfApplication(const char* pszName, const char* pszVersion, const 
 
 	// Register oneself as the one.
 	_pSelf = this;
-	
-	// Initialize the gaming framework.
-	GfInit();
+}
 
-	// Trace current OS information.
-	std::string strName;
-	int nMajor, nMinor, nPatch, nBits;
-	if (GfGetOSInfo(strName, nMajor, nMinor, nPatch, nBits))
-	{
-		GfLogInfo("Current OS is %s", (strName.empty() ? "unknown" : strName.c_str()));
-		if (nMajor >= 0)
-		{
-			GfLogInfo(" (R%d", nMajor);
-			if (nMinor >= 0)
-			{
-				GfLogInfo(".%d", nMinor);
-				if (nPatch >= 0)
-					GfLogInfo(".%d", nPatch);
-			}
-		}
-		if (nBits >= 0)
-		{
-			if (nMajor >= 0)
-				GfLogInfo(", ");
-			else
-				GfLogInfo(" (");
-			GfLogInfo("%d bits", nBits);
-		}
-		if (nMajor >= 0 || nBits >= 0)
-			GfLogInfo(")");
-		GfLogInfo("\n");
-	}
-	
-	// Trace build information.
-	GfLogInfo("Built on %s\n", SD_BUILD_INFO_SYSTEM);
-	GfLogInfo("  with CMake %s, '%s' generator\n",
-			  SD_BUILD_INFO_CMAKE_VERSION, SD_BUILD_INFO_CMAKE_GENERATOR);
-	GfLogInfo("  with %s %s compiler ('%s' configuration)\n",
-			  SD_BUILD_INFO_COMPILER_NAME, SD_BUILD_INFO_COMPILER_VERSION,
-			  SD_BUILD_INFO_CONFIGURATION);
-		
+void GfApplication::initialize(bool bLoggingEnabled, int argc, char **argv)
+{
 	// Store the command line args.
 	if (argv)
 		for (int i = 0; i < argc; i++)
 			_lstArgs.push_back(argv[i]);
 
-	// Register the command line options (to be parsed).
+    // Initialize the gaming framework.
+    GfInit(bLoggingEnabled);
+
+    // Register the command line options (to be parsed).
 	registerOption("h", "help", /* nHasValue = */ false);
 	registerOption("v", "version", /* nHasValue = */ false);
 	registerOption("l", "localdir", /* nHasValue = */ true);
@@ -403,7 +368,7 @@ bool GfApplication::parseOptions()
 			else if (itOpt->strValue == "stdout")
 				GfLogSetStream(stdout);
 			else
-				GfLogSetFile(itOpt->strValue.c_str());
+				GfLogSetStream(itOpt->strValue.c_str());
 		}
 		else
 		{
