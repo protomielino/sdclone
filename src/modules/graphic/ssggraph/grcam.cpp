@@ -129,7 +129,7 @@ void cGrPerspCamera::setProjection(void)
 
     // correct view for split screen spanning
     if (viewOffset != 0 && spanOffset != 0) {
-	float dist, halfwidth, left, right;
+	float dist, left, right;
 
         sgFrustum * frus = grContext.getFrustum();
 
@@ -139,29 +139,20 @@ void cGrPerspCamera::setProjection(void)
 	else
 		dist = screenDist;
 
-	halfwidth = frus->getLeft() * dist / frus->getNear();
-	if (spanOffset < halfwidth)
-		left = halfwidth - ((halfwidth - spanOffset) * (dist - frus->getNear()) / dist);
-	else
-		left = ((spanOffset - halfwidth) * (dist - frus->getNear()) / dist) + halfwidth;
-
-	halfwidth = frus->getRight() * dist / frus->getNear();
-	if (spanOffset < halfwidth)
-		right = halfwidth - ((halfwidth - spanOffset) * (dist - frus->getNear()) / dist);
-	else
-		right = ((spanOffset - halfwidth) * (dist - frus->getNear()) / dist) + halfwidth;
-
+	if (dist !=0) {
+		left = frus->getLeft() + (spanOffset * frus->getNear()/dist);
+		right = frus->getRight() + (spanOffset * frus->getNear()/dist);
 #if 0
-	GfLogInfo("Adjusting ViewOffset %f : Frustum %f : dist %f : left %f -> %1.12f, Right %f -> %1.12f, near %f\n",
-            viewOffset, spanOffset, dist,
-            frus->getLeft(), left, //frus->getLeft() + spanOffset, 
-            frus->getRight(), right, //frus->getRight() + spanOffset, 
-            frus->getNear());
+		GfLogInfo("Adjusting ViewOffset %f : Frustum %f : dist %f : left %f -> %1.12f, Right %f -> %1.12f, near %f\n",
+			viewOffset, spanOffset, dist,
+			frus->getLeft(), left, //frus->getLeft() + spanOffset, 
+			frus->getRight(), right, //frus->getRight() + spanOffset, 
+			frus->getNear());
 #endif
-
-        frus->setFrustum(left, right,
-		frus->getBot(), frus->getTop(),
-		frus->getNear(), frus->getFar());
+        	frus->setFrustum(left, right,
+			frus->getBot(), frus->getTop(),
+			frus->getNear(), frus->getFar());
+		}
     }
 }
 
@@ -232,14 +223,14 @@ float cGrPerspCamera::getSpanAngle(void)
         	angle = (viewOffset - 10) * fovxR;
 
 		//=if($B$2=0,A10*$A$5,abs($A$2/$B$2)-$A$2)/sqrt(tan(radians(90)-B10)^2+1)*if(A10>0,-1,1)
-		spanOffset = fabs((screenDist / arcRatio) - screenDist) / sqrt((tan((M_PI/2) - angle) * tan((M_PI/2) - angle)) + 1) / 2;
+		spanOffset = fabs((screenDist / arcRatio) - screenDist) / sqrt((tan((M_PI/2) - angle) * tan((M_PI/2) - angle)) + 1);
 
 		if (viewOffset < 10) spanOffset *= -1;
 		if (arcRatio > 1) spanOffset *= -1;
 	} else {
 		// monitors mounted flat on wall
 		angle = 0;
-		spanOffset = (viewOffset - 10) * width / 2;
+		spanOffset = (viewOffset - 10) * width;
 	}
 #else
 	// Old method
@@ -249,7 +240,6 @@ float cGrPerspCamera::getSpanAngle(void)
 	spanOffset = 0;
 #endif
 	spanAngle = angle;
-	if (fabs(spanOffset) < 0.0001) spanOffset = 0;
 
 	GfLogInfo("ViewOffset %f : fovy %f, arcRatio %f => width %f, angle %f, SpanOffset %f\n", viewOffset, fovy, arcRatio, width, angle, spanOffset);
     }
@@ -1962,7 +1952,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 				      0,	/* drawCurr */
 				      2,	/* drawBG mirrored */
 				      67.5,	/* fovy */
-				      50.0,	/* fovymin */
+				      10.0,	/* fovymin */
 				      95.0,	/* fovymax */
 				      0.3,	/* near */
 				      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
