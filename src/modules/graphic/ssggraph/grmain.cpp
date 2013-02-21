@@ -215,6 +215,15 @@ grAdaptScreenSize(void)
 			break;
 		case 4:
 			switch (grNbArrangeScreens) {
+			case 8:
+				// 3 side by side + 1 for rear view - only when spanning splits
+				if (grSpanSplit) {
+					grScreens[0]->activate(grWinx,                grWiny, grWinw / 4,   grWinh, grSpanSplit * (-1 + 10));
+					grScreens[1]->activate(grWinx + grWinw / 4,   grWiny, grWinw / 4,   grWinh, grSpanSplit * (0.0 + 10));
+					grScreens[2]->activate(grWinx + grWinw * 2/4, grWiny, grWinw / 4,   grWinh, grSpanSplit * (1 + 10));
+					grScreens[3]->activate(grWinx + grWinw * 3/4, grWiny, grWinw / 4,   grWinh, 0.0);
+					break;
+				} 
 			default:
 				grNbArrangeScreens = 0;
 			case 0:
@@ -273,13 +282,6 @@ grAdaptScreenSize(void)
 				grScreens[2]->activate(grWinx,              grWiny + grWinh / 3  , grWinw / 3,   grWinh / 3, 0.0);
 				grScreens[3]->activate(grWinx,              grWiny,                grWinw / 3,   grWinh / 3, 0.0);
 				break;
-			case 8:
-				// 3 side by side + 1 for rear view
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 4,   grWinh, grSpanSplit * (-1 + 10));
-				grScreens[1]->activate(grWinx + grWinw / 4,   grWiny, grWinw / 4,   grWinh, grSpanSplit * (0.0 + 10));
-				grScreens[2]->activate(grWinx + grWinw * 2/4, grWiny, grWinw / 4,   grWinh, grSpanSplit * (1 + 10));
-				grScreens[3]->activate(grWinx + grWinw * 3/4, grWiny, grWinw / 4,   grWinh, 0.0);
-				break;
 			}
 			for (i=4; i < GR_NB_MAX_SCREEN; i++)
 				grScreens[i]->deactivate();
@@ -310,6 +312,17 @@ grAdaptScreenSize(void)
 			break;
 		case 6:
 			switch (grNbArrangeScreens) {
+			case 2:
+				if (grSpanSplit) {
+					// five side by side + 1 for rear view - only when spanning splits
+					grScreens[0]->activate(grWinx,                grWiny, grWinw / 6,   grWinh, grSpanSplit * (-2.0 + 10));
+					grScreens[1]->activate(grWinx + grWinw / 6,   grWiny, grWinw / 6,   grWinh, grSpanSplit * (-1.0 + 10));
+					grScreens[2]->activate(grWinx + grWinw * 2/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (0.0 + 10));
+					grScreens[3]->activate(grWinx + grWinw * 3/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (1.0 + 10));
+					grScreens[4]->activate(grWinx + grWinw * 4/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (2.0 + 10));
+					grScreens[5]->activate(grWinx + grWinw * 5/6, grWiny, grWinw / 6,   grWinh, 0.0);
+					break;
+				}
 			default:
 				grNbArrangeScreens = 0;
 			case 0:
@@ -329,15 +342,6 @@ grAdaptScreenSize(void)
 				grScreens[3]->activate(grWinx + grWinw * 3/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (0.5 + 10));
 				grScreens[4]->activate(grWinx + grWinw * 4/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (1.5 + 10));
 				grScreens[5]->activate(grWinx + grWinw * 5/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (2.5 + 10));
-				break;
-			case 2:
-				// five side by side + 1 for rear view
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 6,   grWinh, grSpanSplit * (-2.0 + 10));
-				grScreens[1]->activate(grWinx + grWinw / 6,   grWiny, grWinw / 6,   grWinh, grSpanSplit * (-1.0 + 10));
-				grScreens[2]->activate(grWinx + grWinw * 2/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (0.0 + 10));
-				grScreens[3]->activate(grWinx + grWinw * 3/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (1.0 + 10));
-				grScreens[4]->activate(grWinx + grWinw * 4/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (2.0 + 10));
-				grScreens[5]->activate(grWinx + grWinw * 5/6, grWiny, grWinw / 6,   grWinh, 0.0);
 				break;
 			}
 			for (i=6; i < GR_NB_MAX_SCREEN; i++)
