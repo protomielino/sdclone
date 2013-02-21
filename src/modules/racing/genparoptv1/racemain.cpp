@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file    networkin
+/** @file    racemain
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
@@ -57,7 +57,7 @@ bool genOptNeedInit = true;
 int OptiCounter = 0;
 
 // Buffer for short time use for filenames
-char buf[BUFSIZE+1]; // BUFSIZE defined in genetic.h to be = MAX_PATH
+char buf[FILENAME_MAX+1]; // BUFSIZE defined in genetic.h to be = MAX_PATH
 
 typedef struct
 {
@@ -1059,22 +1059,6 @@ const char* SetupGlobalFileName(char* buf, int size, tgenData* Data, const char*
 	return buf;
 }
 
-const char* SetupLocalFileName(char* buf, int size, tgenData* Data, const char* Ext)
-{
-	if (Data->WeatherCode == 0)
-	{
-		snprintf(buf, size, "drivers/%s/%s/%s%s",
-			Data->RobotName,Data->CarType,Data->TrackName,Ext);
-	}
-	else
-	{
-		snprintf(buf, size, "drivers/%s/%s/%s-%d%s",
-			Data->RobotName,Data->CarType,Data->TrackName,Data->WeatherCode,Ext);
-	}
-	return buf;
-}
-
-
 void
 ReInitialiseGeneticOptimisation()
 {
@@ -1125,36 +1109,38 @@ ReInitialiseGeneticOptimisation()
 		Data->WeightOfDamages = 100;
 
 	// Setup path to car setup file
-	Data->LocalFileName = SetupLocalFileName(Data->LocalXML, BUFSIZE, Data, ".xml");
-	Data->LocalOptFileName = SetupLocalFileName(Data->LocalOPT, BUFSIZE, Data, ".opt");
-	Data->GlobalFileName = SetupGlobalFileName(Data->GlobalXML, BUFSIZE, Data, ".xml");
-	Data->GlobalOptFileName = SetupGlobalFileName(Data->GlobalOPT, BUFSIZE, Data, ".opt");
+	Data->XmlFileName = SetupGlobalFileName(Data->BufferXML, FILENAME_MAX, Data, ".xml");
+	Data->OptFileName = SetupGlobalFileName(Data->BufferOPT, FILENAME_MAX, Data, ".opt");
 
-	Data->Handle = GfParmReadFile(Data->GlobalFileName, GFPARM_RMODE_REREAD);
+	// Assume, we can read initial values
 	Data->GetInitialVal = true;
 
-	// In case the car setup file does not exist ...
+	// Try to open XML file ...
+	Data->Handle = GfParmReadFile(Data->XmlFileName, GFPARM_RMODE_REREAD);
+	Data->GetInitialVal = true;
+
+	// ... in case the car setup file does not exist ...
 	if (!Data->Handle)
 	{
 		// ... use default setup file ...
-		snprintf(buf,BUFSIZE,"%sdrivers/%s/%s/default.xml",
+		snprintf(buf,FILENAME_MAX,"%sdrivers/%s/%s/default.xml",
 			GetLocalDir(),Data->RobotName,Data->CarType);
 		void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
 
 		if (Handle) // ... if existing ...
 		{			// ... use it to create a track specific setup file.
-			GfParmWriteFileSDHeader (Data->LocalFileName, Handle, Data->CarType, Data->AuthorName);
+			GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
 		}
-		else		// ... else create an empty setup file
+		else		// ... else create an empty setup file.
 		{			
-			void* Handle = GfParmReadFile(Data->GlobalFileName, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-			GfParmWriteFileSDHeader (Data->LocalFileName, Handle, Data->CarType, Data->AuthorName);
+			void* Handle = GfParmReadFile(Data->XmlFileName, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+			GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
 			Data->GetInitialVal = false; // No initial setup, we cannot read it
 		}
 		GfParmReleaseHandle(Handle);
 
 		// Open created car type track setup file
-		Data->Handle = GfParmReadFile(Data->GlobalFileName, GFPARM_RMODE_REREAD);
+		Data->Handle = GfParmReadFile(Data->XmlFileName, GFPARM_RMODE_REREAD);
 	}
 
 	ReImportGeneticParameters();
@@ -1377,7 +1363,7 @@ ReImportGeneticParameters()
 	GfParmReleaseHandle(MetaDataFile);
 
 	printf ("Write parameters to initial xml file\n");
-	GfParmWriteFileSDHeader (Data->LocalFileName, Data->Handle, Data->CarType, Data->AuthorName);
+	GfParmWriteFileSDHeader (Data->XmlFileName, Data->Handle, Data->CarType, Data->AuthorName);
 
 }
 
@@ -1431,7 +1417,7 @@ ReCleanupGeneticOptimisation()
 
 	printf ("Setup path to best setup found\n");
 	// Setup path to best setup found
-	void* Handle = GfParmReadFile(Data->GlobalOptFileName, GFPARM_RMODE_REREAD);
+	void* Handle = GfParmReadFile(Data->OptFileName, GFPARM_RMODE_REREAD);
 
 	printf ("Reset fuel control\n");
 	// Reset fuel control
@@ -1445,11 +1431,11 @@ ReCleanupGeneticOptimisation()
 
 	printf ("Write parameters to opt file\n");
 	// Write parameters to opt file
-	GfParmWriteFileSDHeader (Data->LocalOptFileName, Handle, Data->CarType, Data->AuthorName);
+	GfParmWriteFileSDHeader (Data->OptFileName, Handle, Data->CarType, Data->AuthorName);
 
 	printf ("Write parameters to xml file\n");
 	// Write parameters to xml file
-	GfParmWriteFileSDHeader (Data->LocalFileName, Handle, Data->CarType, Data->AuthorName);
+	GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
 
 	printf ("Release file handle\n");
 	// Release file handle
@@ -1511,7 +1497,8 @@ ReEvolution()
 	double TotalLapTime = 0;
 	double Scale = Data->Loops * Data->Loops / Data->Scale;
 
-	TotalLapTime = Data->BestLapTime;
+	//TotalLapTime = Data->BestLapTime;
+	TotalLapTime = Data->WeightedBestLapTime;
 
 	if (Data->First) // First race was done using the initial parameters
 	{
@@ -1552,7 +1539,7 @@ ReEvolution()
 		for (int I = 0; I < Data->NbrOfParam; I++)
 			Data->GP[I]->LastVal = Data->GP[I]->OptVal = Data->GP[I]->Val;
 
-		GfParmWriteFileSDHeader (Data->LocalOptFileName, Handle, Data->CarType, Data->AuthorName);
+		GfParmWriteFileSDHeader (Data->OptFileName, Handle, Data->CarType, Data->AuthorName);
 		GfLogOpt("Stored to .opt\n");
 	}
 	else if (0.99 * TotalLapTime < Data->BestTotalLapTime)
@@ -1733,7 +1720,7 @@ ReEvolution()
 	} // Loop over all parts
 
 	// Write parameters to xml file
-	GfParmWriteFileSDHeader (Data->LocalFileName, Handle, Data->CarType, Data->AuthorName);
+	GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
 
 	printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 

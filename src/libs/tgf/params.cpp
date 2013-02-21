@@ -1678,7 +1678,9 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name, c
     }
 
 	conf = handle->conf;
+	char buf[255];
 
+/*
 	//use local dir
 	char buf[255];
 	sprintf(buf, "%s%s", GfLocalDir(),file);
@@ -1693,8 +1695,21 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name, c
     }
     
     fout = safeFOpen(filepath, "wb");
-    if (!fout) {
+	if (!fout) {
 	GfLogError ("gfParmWriteFileSDHeader: fopen (%s, \"wb\") failed\n", filepath);
+	return 1;
+    }
+*/
+	if (!file) {
+	file = conf->filename;
+	if (!file) {
+	    GfLogError ("GfParmWriteFileSDHeader: bad file name\n");
+	    return 1;
+	}
+    }
+    fout = safeFOpen(file, "wb");
+	if (!fout) {
+	GfLogError ("gfParmWriteFileSDHeader: fopen (%s, \"wb\") failed\n", file);
 	return 1;
     }
 
@@ -1731,8 +1746,18 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name, c
   	      fputs ("    file          : ", fout);
 		  if (file)
 		  {
-			strncpy(buf,file,strlen(file)-4);
-			buf[strlen(file)-4] = 0;
+			const char * ld = GfLocalDir();
+	        int n = strlen(ld);
+			if (strncmp(ld,file,n) == 0)
+			{
+			  strncpy(buf,&file[n],strlen(file)-n-4);
+			  buf[strlen(file)-n-4] = 0;
+			}
+			else
+			{
+			  strncpy(buf,file,strlen(file)-4);
+			  buf[strlen(file)-4] = 0;
+			}
 			fputs (buf, fout);
 		  }
   	      fputs ("\n    created       : ", fout);
