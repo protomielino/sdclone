@@ -23,7 +23,7 @@
     <attstr name="robot" val="simplix_sc"/>
     <attstr name="car type" val="sc-cavallo-360"/>
     <attstr name="private" val="simplix private"/>
-    <attnum name="weight of damages" val="5.0"/>
+    <attnum name="weight of damages" val="10.0"/>
     <attnum name="get initial value" val="1"/>
     <attnum name="optimisation loops" val="1000"/>
     <attstr name="author" val="Wolf-Dieter Beelitz"/>

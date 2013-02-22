@@ -901,21 +901,17 @@ ReRaceEnd(void)
 	const char *sessionName = ReInfo->_reRaceName;
 	tgenData *Data = &TGeneticParameter::Data;
 
-	{
-		// Optimization ...
-		Data->car = ReInfo->s->cars[0];
-		Data->DamagesTotal = Data->car->_dammage;
-		Data->TopSpeed = Data->car->_topSpeed;
-//		Data->MinSpeed = Data->car->_minSpeed;
-		Data->MinSpeed = 0;
-		if (Data->car->_bestLapTime > 0)
-			Data->BestLapTime = Data->car->_bestLapTime;
-		else
-			Data->BestLapTime = 99*60;
+	// Pick up optimization results ...
+	Data->car = ReInfo->s->cars[0];
 
-		Data->WeightedBestLapTime = Data->BestLapTime + Data->WeightOfDamages * Data->DamagesTotal * 0.007f;
-		// ... Optimization
-	}
+	Data->DamagesTotal = Data->car->_dammage;
+	if (Data->car->_bestLapTime > 0)
+		Data->BestLapTime = Data->car->_bestLapTime;
+	else
+		Data->BestLapTime = 99*60;
+
+	Data->WeightedBestLapTime = Data->BestLapTime + Data->WeightOfDamages * Data->DamagesTotal * 0.007f;
+	// ... pick up optimization results
 
 	ReShutdownUpdaters();
 
@@ -992,6 +988,9 @@ RePostRace(void)
 }
 
 
+//
+// Shutdown race engine
+//
 int
 ReRaceEventShutdown(void)
 {
@@ -1000,8 +999,6 @@ ReRaceEventShutdown(void)
 	int nbTrk;
 	void *results = ReInfo->results;
 	int curRaceIdx;
-//	bool careerMode = false;
-//	bool first = true;
 
 	// Notify the UI that the race event is finishing now.
 	ReUI().onRaceEventFinishing();
@@ -1039,11 +1036,17 @@ ReRaceEventShutdown(void)
 	return mode;
 }
 
+//
+// Build the well known weather code from rain and water at surface
+//
 int GetWeather(tTrack* Track)
 {
 	return (Track->local.rain << 4) + Track->local.water;
 };
 
+//
+// Prepare a buffer with the file name
+//
 const char* SetupGlobalFileName(char* buf, int size, tgenData* Data, const char* Ext)
 {
 	if (Data->WeatherCode == 0)
@@ -1059,6 +1062,9 @@ const char* SetupGlobalFileName(char* buf, int size, tgenData* Data, const char*
 	return buf;
 }
 
+//
+// Initialisation of Optimisation
+//
 void
 ReInitialiseGeneticOptimisation()
 {
@@ -1075,27 +1081,15 @@ ReInitialiseGeneticOptimisation()
 	Data->AuthorName = &(Data->AuthorNameBuffer[0]);
 	Data->PrivateSection = &(Data->PrivateSectionBuffer[0]);
 
-	//MyResults.QualifyingLapTime = FLT_MAX;
-	Data->RaceLapTime = FLT_MAX;
-	Data->BestTotalLapTime = FLT_MAX;
+	Data->BestLapTime = FLT_MAX;
 
 	Data->WeightedBestLapTime = FLT_MAX;
 	Data->LastWeightedBestLapTime = FLT_MAX;
 
-	Data->BestLapTime = FLT_MAX;
-	Data->LastBestLapTime = FLT_MAX;
-
 	Data->DamagesTotal = 0;
 	Data->LastDamagesTotal = 0;
 
-	Data->MinSpeed = FLT_MAX;
-	Data->LastMinSpeed = FLT_MAX;
-
-	Data->TopSpeed = 0;
-	Data->LastTopSpeed = 0;
-
 	// Setup pointer to car data and track, car type and robot name
-	//Data->car = ReInfo->s->cars[0];
 	Data->car = &ReInfo->carList[0];
 	snprintf(Data->TrackNameBuffer, sizeof(Data->TrackNameBuffer),
 		"%s", ReInfo->track->internalname);
@@ -1104,11 +1098,12 @@ ReInitialiseGeneticOptimisation()
 	snprintf(Data->RobotNameBuffer, sizeof(Data->RobotNameBuffer),
 		"%s", Data->car->_modName);
 
+	// Check weather conditions
 	Data->WeatherCode = GetWeather(ReInfo->track);
-	if (Data->WeatherCode > 0)
-		Data->WeightOfDamages = 100;
+	if (Data->WeatherCode > 0)		// In case of rain, ...
+		Data->WeightOfDamages = 100;// ... use a heigh weight for penalties
 
-	// Setup path to car setup file
+	// Setup path to car setup file (xml and opt)
 	Data->XmlFileName = SetupGlobalFileName(Data->BufferXML, FILENAME_MAX, Data, ".xml");
 	Data->OptFileName = SetupGlobalFileName(Data->BufferOPT, FILENAME_MAX, Data, ".opt");
 
@@ -1148,10 +1143,13 @@ ReInitialiseGeneticOptimisation()
 	OptiCounter = 0;
 }
 
+//
+// Before we can start, we have to pick up the configuration
+//
 void
 ReImportGeneticParameters()
 {
-	GfLogOpt("\n\nReImportGeneticParameters\n\n");
+	GfLogOpt("\n\nImport Genetic Parameters ...\n\n");
 
 	// Setup pointer to structure
 	tgenData *Data = &TGeneticParameter::Data;
@@ -1163,7 +1161,6 @@ ReImportGeneticParameters()
 	Data->TotalWeight = 0.0;
 	int NextIdx = 0;    // Index to next parameter
 
-	Data->Type = 0;
 	// For future use get race type
 	// 0: Race; 1: Qualifying
     //Data->Type = (int) GfParmGetNum(Data->Handle, 
@@ -1362,24 +1359,28 @@ ReImportGeneticParameters()
 
 	GfParmReleaseHandle(MetaDataFile);
 
-	printf ("Write parameters to initial xml file\n");
+	GfLogOpt("Write parameters to initial xml file\n");
 	GfParmWriteFileSDHeader (Data->XmlFileName, Data->Handle, Data->CarType, Data->AuthorName);
 
+	GfLogOpt("\n... Import Genetic Parameters\n\n");
 }
 
+//
+// We did it! Clean up
+//
 bool
 ReCleanupGeneticOptimisation()
 {
 	if (genOptNeedInit)	// If still needed, ...
 		return true;	// ... we do not have to cleanup 
 
-	printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-	printf ("Cleanup\n");
+	GfLogOpt("============================\n");
+	GfLogOpt("Cleanup\n");
 
 	// Setup pointer to structure
 	tgenData *Data = &TGeneticParameter::Data;
 
-	printf ("Delete parameters\n");
+	GfLogOpt("Delete parameters\n");
 	// Free all parameters allocated
 	for (int I = 0; I < Data->NbrOfParam; I++)
 	{
@@ -1390,11 +1391,11 @@ ReCleanupGeneticOptimisation()
 		}
 	}
 
-	printf ("Delete list of parameters\n");
+	GfLogOpt("Delete list of parameters\n");
 	// Free list of pointers allocated
 	delete [] Data->GP;
 
-	printf ("Delete strings of parts\n");
+	GfLogOpt("Delete strings of parts\n");
 	// Free all strings allocated
 	for (int I = 0; I < Data->NbrOfParts; I++)
 	{
@@ -1404,48 +1405,43 @@ ReCleanupGeneticOptimisation()
 			free(Data->Part[I].Subsection);
 	}
 
-	printf ("Delete list of parts\n");
-	// Free list of strutures allocated
+	GfLogOpt("Delete list of parts\n");
 	delete [] Data->Part;
 
-	printf ("Release file handle\n");
-	// Release file handle
+	GfLogOpt("Release file handle\n");
 	GfParmReleaseHandle(Data->Handle);
 
-	printf ("Reset need initialisation flag\n");
+	GfLogOpt("Reset need initialisation flag\n");
 	genOptNeedInit = true;
 
-	printf ("Setup path to best setup found\n");
-	// Setup path to best setup found
+	GfLogOpt("Setup path to best setup found\n");
 	void* Handle = GfParmReadFile(Data->OptFileName, GFPARM_RMODE_REREAD);
 
-	printf ("Reset fuel control\n");
-	// Reset fuel control
+	GfLogOpt("Reset fuel control\n");
 	GfParmSetNum(Handle, Data->PrivateSection, PRM_FUEL,    
 		(char*) NULL, -1, -1.0, Data->MaxFuel);
 
-	printf ("Reset optimisation flag for robot\n");
-	// Reset optimisation flag for robot
+	GfLogOpt("Reset optimisation flag for robot\n");
 	GfParmSetNum(Handle, Data->PrivateSection, PRV_OPTI,    
 		(char*) NULL, 0, 0, 1);
 
-	printf ("Write parameters to opt file\n");
-	// Write parameters to opt file
+	GfLogOpt("Write parameters to opt file\n");
 	GfParmWriteFileSDHeader (Data->OptFileName, Handle, Data->CarType, Data->AuthorName);
 
-	printf ("Write parameters to xml file\n");
-	// Write parameters to xml file
+	GfLogOpt("Write parameters to xml file\n");
 	GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
 
-	printf ("Release file handle\n");
-	// Release file handle
+	GfLogOpt("Release file handle\n");
 	GfParmReleaseHandle(Handle);
 
-	printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+	GfLogOpt("============================\n");
 
 	return false;
 }
 
+//
+// Idetification of parameter to select
+//
 int
 ParameterIndex(tgenData *Data, float Parameter)
 {
@@ -1464,117 +1460,12 @@ ParameterIndex(tgenData *Data, float Parameter)
 	return -1; // Parameter already selected or out of range
 }
 
-int
-ReEvolution()
+//
+// Selection and mutation
+//
+void
+SelectParameterAndMutation(tgenData *Data)
 {
-	printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-
-	/* DEBUG, ONLY FOR WINDOWS
-	MEMORYSTATUSEX statex;
-	statex.dwLength = sizeof (statex);
-	GlobalMemoryStatusEx (&statex);
-	printf (TEXT("0. There are  %*I64d KB\n"), WIDTH, lastFreeMem);
-	DWORDLONG FreeMem = statex.ullAvailPhys/DIV;
-	printf (TEXT("1. There are  %*I64d KB\n"), WIDTH, FreeMem);
-	DWORDLONG diff = lastFreeMem - statex.ullAvailPhys/DIV;
-	printf (TEXT("=. Difference %*I64d KB\n"), WIDTH, diff);
-	lastFreeMem = statex.ullAvailPhys/DIV;
-	_tgf_mallocBalance(); // For Debug check allocation/free balance
-	*/
-
-	// Setup shortcuts
-	tgenData *Data = &TGeneticParameter::Data;
-	TGeneticParameter* Param = Data->GP[0];
-	void* Handle = Data->Handle; 
-
-	// Optimization status
-	int Status = -1;
-
-	// Define local variables
-	int P = 0;
-	double Change; 
-	double OldValue;
-	double TotalLapTime = 0;
-	double Scale = Data->Loops * Data->Loops / Data->Scale;
-
-	//TotalLapTime = Data->BestLapTime;
-	TotalLapTime = Data->WeightedBestLapTime;
-
-	if (Data->First) // First race was done using the initial parameters
-	{
-#ifdef REPEATABLE_RANDOM // For testing only (not for production use)
-		srand((unsigned)time(NULL));	// Initialize the random number generator
-#endif
-		// First race is done with the initial parameters to get the reference laptime
-		GfLogOpt("Initial Lap Time : %g\n",TotalLapTime);
-
-		// Get range for number of parameters to select for variation
-		Data->MaxSelected = MIN(8,1 + Data->NbrOfParam / 2);
-		GfLogOpt("Nbr. of selected : %d\n",Data->MaxSelected);
-		if (Data->MaxSelected < 1)
-			assert( 0 );
-	}
-	else
-	{
-		// Count the loops
-		OptiCounter++;
-		GfLogOpt("Loop %d (Still to do %d loops)\n",OptiCounter,Data->Loops);
-	}
-
-	/* Optimisation */
-	if (TotalLapTime < Data->BestTotalLapTime)
-	{
-		Status = 2; // New opt
-		if (!Data->First)
-			GfLogOpt("New best Lap Time: %g\n",TotalLapTime);
-
-		Data->BestTotalLapTime = TotalLapTime;
-		Data->LastWeightedBestLapTime = Data->WeightedBestLapTime;
-		Data->LastBestLapTime = Data->BestLapTime;
-		Data->LastDamagesTotal = Data->DamagesTotal;	
-		Data->LastTopSpeed = Data->TopSpeed;
-		Data->LastMinSpeed = Data->MinSpeed;
-
-		// Store parameters
-		for (int I = 0; I < Data->NbrOfParam; I++)
-			Data->GP[I]->LastVal = Data->GP[I]->OptVal = Data->GP[I]->Val;
-
-		GfParmWriteFileSDHeader (Data->OptFileName, Handle, Data->CarType, Data->AuthorName);
-		GfLogOpt("Stored to .opt\n");
-	}
-	else if (0.99 * TotalLapTime < Data->BestTotalLapTime)
-	{
-		Status = 1; // Next try based on the last parameters
-		GfLogOpt("Total Lap Time   : %g (Best so far: %g)\n",TotalLapTime,Data->BestTotalLapTime);
-	}            
-	else
-	{
-		Status = 0; // Next try based on the last optimal parameters
-		GfLogOpt("Total Lap Time   : %g (Bad!)\n",TotalLapTime);
-
-		Data->DamagesTotal = Data->LastDamagesTotal;	
-		Data->WeightedBestLapTime = Data->LastWeightedBestLapTime;
-		Data->BestLapTime = Data->LastBestLapTime;
-		Data->TopSpeed = Data->LastTopSpeed;
-		Data->MinSpeed = Data->LastMinSpeed;
-
-		for (int I = 0; I < Data->NbrOfParam; I++)
-			Data->GP[I]->Val = Data->GP[I]->OptVal;
-
-		GfLogOpt("Back to last .opt\n");
-		GfLogOpt("Old Best Lap Time: %g\n",Data->BestLapTime);
-	}
-
-	if (Data->First)
-	{
-		GfLogOpt("\nStart Optimisation\n");
-	}
-
-	//
-	// Next Race -> try other parameters
-	//
-	GfLogOpt("\nRandom parameter variation scale: %g\n",Scale); 
-
 	// Reset selection flags
 	for (int I = 0; I < Data->NbrOfParam; I++)
 		Data->GP[I]->Selected = false;
@@ -1582,6 +1473,14 @@ ReEvolution()
 	// Select random number of parameters
 	double RandomFloat = (Data->MaxSelected * rand())/RAND_MAX;
 	int N = (int) (1 + RandomFloat);
+
+	TGeneticParameter* Param = Data->GP[0];
+	double Change; 
+	double OldValue;
+	int P = 0;
+
+	double Scale = Data->Loops * Data->Loops / Data->Scale;
+	GfLogOpt("\nRandom parameter variation scale: %g\n",Scale); 
 
 	// Loop over wanted selections
 	for (int I = 0; I < N; I++)
@@ -1591,18 +1490,25 @@ ReEvolution()
 			// Initialize
 			Change = 0.0; 
 
-			// Generate random variation factor
-			RandomFloat = (1.0 * rand())/RAND_MAX - 0.5;
-			double factor = MIN(1.0,1.1 * Scale) * RandomFloat;
-
+			//
+			// Selection:
 			// Generate random parameter index
 			RandomFloat = (1.0 * rand())/RAND_MAX;
 			float Parameter = (float)((Data->TotalWeight - 0.00001) * RandomFloat); 
 
+			//
+			// Mutation:
+			// Generate random variation factor 
+			// TODO: use generator for normal distributed random numbers
+			RandomFloat = (1.0 * rand())/RAND_MAX - 0.5;
+			double factor = MIN(1.0,1.1 * Scale) * RandomFloat;
+
 			// While first races only use global parameters
-			if ((Parameter > Data->Part[0].Offset) && (OptiCounter < 3))
+			if ((Parameter > Data->Part[0].Offset) && (OptiCounter < 10))
 				continue;
 
+			//
+			// Combined selection and mutation loop
 			// Check allowed range
 			if (Parameter < Data->TotalWeight)
 			{
@@ -1614,18 +1520,20 @@ ReEvolution()
 				{
 					do // Repeat until valid selection
 					{
-						// try next parameter instead
+						// Try next parameter instead
 						Parameter = Parameter + 1;
-						// If last was taken restart
+						// If last was taken restart search at first
 						if (Parameter > Data->TotalWeight)
 							Parameter = Parameter - Data->TotalWeight;
 						P = ParameterIndex(Data,Parameter);
+
+						// TODO: Avoid dead lock
 					} while (P == -1); // Repeat until valid selection
 				}
 
-				//GfLogOpt("\nParameter: %g (Factor: %g) P: %d\n\n",Parameter,factor,P);
+//				GfLogOpt("\nParameter: %g (Factor: %g) P: %d\n\n",Parameter,factor,P);
 
-				// get parameter from index
+				// Get parameter from index
 				Param = Data->GP[P];
 
 				// Statistics
@@ -1646,18 +1554,18 @@ ReEvolution()
 					Param->Val = Param->Min;
 				}
 				else if (Param->Val > Param->Max)
-				{	// use max instead
+				{	// Use max instead
 //					GfLogOpt("%s: = Max (%g)\n",Param->oLabel,Param->Val);
 					Param->Val = Param->Max;
 				}
 				if (fabs(OldValue - Param->Val) < 0.00000001) 
-				{	// no change after reading from xml file
+				{	// No change after reading from xml file
 //					GfLogOpt("%s: Change too small %g\n",Param->oLabel,fabs(OldValue - Param->Val));
 					Change = 0.0;
 				}
 				else
-				{	// successfully changed parameter
-					GfLogOpt("%s: Val: %g (Change: %g)\n",Param->oLabel,Param->Val,Change);
+				{	// Successfully changed parameter
+					GfLogOpt("%s: Val: %g (Change: %g)\n",Param->Label,Param->Val,Change);
 					Param->Selected = true;
 					Param->Changed += 1;
 					Param->DisplayParameter();
@@ -1671,66 +1579,196 @@ ReEvolution()
 				Scale += 0.0001;
 
 		} while (fabs(Change) < 0.0000001); // repeat if no change
-	} // Loop over selections
+	} // Loop until all selections are done with a rounded change > 0
 
-/*
+/*	// For Debug
+	//
+	// Report static of parameter usage
+	//
 	for (int I = 0; I < Data->Part[0].Offset; I++)
 	{
 		if (Data->GP[I]->Active)
 			Data->GP[I]->rDisplayStatistik();
 	}
 */
-/*
+/*  // For Debug
+	//
+	// Report parameter state
+	//
 	for (int I = 0; I < Data->Part[0].Offset; I++)
 	{
 		if (Data->GP[I]->Active)
 			Data->GP[I]->DisplayParameter();
 	}
 */
+
+}
+
+//
+// Optimisation Control
+//
+int
+ReEvolution()
+{
+	GfLogOpt(">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
+	/* DEBUG, ONLY FOR WINDOWS
+	// Check memory consumption
+	MEMORYSTATUSEX statex;
+	statex.dwLength = sizeof (statex);
+	GlobalMemoryStatusEx (&statex);
+	printf (TEXT("0. There are  %*I64d KB\n"), WIDTH, lastFreeMem);
+	DWORDLONG FreeMem = statex.ullAvailPhys/DIV;
+	printf (TEXT("1. There are  %*I64d KB\n"), WIDTH, FreeMem);
+	DWORDLONG diff = lastFreeMem - statex.ullAvailPhys/DIV;
+	printf (TEXT("=. Difference %*I64d KB\n"), WIDTH, diff);
+	lastFreeMem = statex.ullAvailPhys/DIV;
+	_tgf_mallocBalance(); // For Debug check allocation/free balance
+	*/
+
+	// Setup shortcuts
+	tgenData *Data = &TGeneticParameter::Data;
+	void* Handle = Data->Handle; 
+	double TotalLapTime = Data->WeightedBestLapTime;
+
+	if (Data->First) 
+	{
+		// Run once ...
+		
+		// For parameter selection we use the default generator 
+		// for equally distributed random numbers
+		// and it is initialized already by the SD code
+
+		// TODO: 
+		// Initialize a "private" random number generator for mutation
+		// This should be a generator for normal distributed random numbers
+		// srand_normal((unsigned)time(NULL));
+
+		// First race was done with the initial parameters to get the reference laptime
+		GfLogOpt("Initial Lap Time : %g\n",TotalLapTime);
+
+		// Get range for number of parameters to select for variation
+		Data->MaxSelected = MIN(8,1 + Data->NbrOfParam / 2);
+		GfLogOpt("Nbr. of selected : %d\n",Data->MaxSelected);
+		if (Data->MaxSelected < 1)
+			assert( 0 );
+
+		// ... run once
+	}
+	else
+	{
+		// Run always ...
+
+		// Count the loops and show the status
+		OptiCounter++;
+		GfLogOpt("Loop %d (Still to do %d loops)\n",OptiCounter,Data->Loops);
+
+		// ... run always
+	}
+
 	//
-	// Export global parameter data
+	// Check results of last race
 	//
-	// Loop over all global parameters
+	// TODO:
+	// Use additional results like 
+	// min speed, max yaw, fuel consumption, ...
+	if (TotalLapTime < Data->LastWeightedBestLapTime)
+	{
+		if (!Data->First)
+		{
+			// Wow, we got a new best lap time
+			GfLogOpt("New best Lap Time: %g\n",TotalLapTime);
+		}
+
+		// Push the result data to be reused in case of a back step later
+		Data->LastWeightedBestLapTime = Data->WeightedBestLapTime;
+		Data->LastDamagesTotal = Data->DamagesTotal;	
+
+		// Store current parameters to be reused in case of a back step later
+		for (int I = 0; I < Data->NbrOfParam; I++)
+			Data->GP[I]->LastVal = Data->GP[I]->OptVal = Data->GP[I]->Val;
+
+		// Write the best so far setup to the opt-file
+		GfParmWriteFileSDHeader (Data->OptFileName, Handle, Data->CarType, Data->AuthorName);
+		GfLogOpt("Stored to .opt\n");
+	}
+	else if (0.99 * TotalLapTime < Data->LastWeightedBestLapTime)
+	{
+		// We did not find a better set of parameters but we are not bad.
+		// Let's use the child to start the next search step of optimisation
+		GfLogOpt("Total Lap Time   : %g (Best so far: %g)\n",TotalLapTime,Data->LastWeightedBestLapTime);
+	}            
+	else
+	{
+		// We got a bad result.
+		// Let's use the remote anchestor to start the next search step of optimisation
+		GfLogOpt("Total Lap Time   : %g (Bad!)\n",TotalLapTime);
+
+		// Pop the stored result data
+		Data->WeightedBestLapTime = Data->LastWeightedBestLapTime;
+		Data->DamagesTotal = Data->LastDamagesTotal;	
+
+		// Pop the stored genetic parameter data
+		for (int I = 0; I < Data->NbrOfParam; I++)
+			Data->GP[I]->Val = Data->GP[I]->OptVal;
+
+		GfLogOpt("Back to last .opt\n");
+		GfLogOpt("Old Best Lap Time: %g\n",Data->WeightedBestLapTime);
+	}
+
+	if (Data->First)
+	{
+		// Run once ...
+		GfLogOpt("\nStart Optimisation\n");
+		// ... run once
+	}
+
+	//
+	// Next Race -> Selection and mutation of arameters
+	//
+	SelectParameterAndMutation(Data);
+
+	//
+	// Export global parameters to xml data
+	//
 	for (int I = 0; I < Data->Part[0].Offset; I++)
 	{
 		if (Data->GP[I]->Active)
 			Data->GP[I]->SetVal(Handle);
-	} // Loop over all global parameters
+	}
 
 	//
-	// Export local parameter data
+	// Export local parameters to xml data
 	//
-	// Loop over all parts
 	for (int I = 0; I < Data->NbrOfParts; I++)
 	{
 		if (Data->Part[I].Active)
 		{
-			// Loop over all sections
 			for (int J = 0; J < Data->Part[I].NbrOfSect; J++)
 			{
-				// Loop over all parameters per section
 				for (int K = 0; K < Data->Part[I].Count; K++)
 				{
 					int Index = Data->Part[I].Offset + Data->Part[I].Count * J + K;
 					if (Data->GP[Index]->Active)
 					  Data->GP[Index]->SetVal(Handle,J+1);
-				} // Loop over all parameters per section
-			} // Loop over all sections
-		} // if Active
-	} // Loop over all parts
+				}
+			}
+		}
+	}
 
-	// Write parameters to xml file
+	// Write xml data to file
 	GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
 
-	printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+	GfLogOpt("<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
-	// Reset flag
+	// Reset run once flag
 	Data->First = false;
 
+	// Check number of loops still to do
 	if (Data->Loops--)
-		return RM_SYNC | RM_NEXT_STEP;
+		return RM_SYNC | RM_NEXT_STEP;	// Next optimisation loop
 	else
-		return RM_SYNC;
+		return RM_SYNC;					// All planned loops are done!
 }
 
 

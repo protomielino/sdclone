@@ -7,7 +7,7 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2013.02.17
+// Last changed : 2013.02.22
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.06.000
@@ -16,7 +16,8 @@
 // Additional parameter to control loading of racinglines
 // Renamed parameter "start fuel" to "initial fuel"
 // Deleted old teammanager
-// Clear old racingline if optimisation is used
+// Clear old racingline if optimisation is working
+// Switch off skilling if optimisation is working
 // Deleted old TORCS related code
 //--------------------------------------------------------------------------*
 // V3.05.001 (SimuV2.1):

@@ -129,33 +129,32 @@ typedef struct genData
 	int WeatherCode;		// Well known for rain/water at track surface
 
 	// Strategic data, car setup depending on optimization state
-    int Type;				// 0: race; 1: qualifying
+    // int Type;			// 0: race; 1: qualifying
 	float MaxFuel;			// Default = 60
 	float TotalWeight;		// Total of parameters individual weight
 	bool First;				// First race with unchanged parameters
 	bool GetInitialVal;		// Allow to get initial value from setup
 
 	// Race result data
-	int DamagesTotal;		// Total of damages taken in race
-	int LastDamagesTotal;	// Last total
-	double WeightOfDamages;	// Factor to weight damages as time penalties
-
-	double RaceLapTime;			// Laptime while race
-
-	double BestTotalLapTime;	// Best laptime in the current race
-	double LastTotalLapTime;	// Last best value
-
+	double BestLapTime;				// Best laptime (without penalties)
 	double WeightedBestLapTime;	    // Best laptime increased by time penalty for damages
     double LastWeightedBestLapTime;	// Last best value
 
-	double BestLapTime;			// Best laptime
-    double LastBestLapTime;		// Last best value
+	int DamagesTotal;				// Total of damages taken in race
+	int LastDamagesTotal;			// Last total
+	double WeightOfDamages;			// Factor to weight damages as time penalties
 
-	double TopSpeed;			// Max velocity
-	double LastTopSpeed;		// Last max value
+	//double TopSpeed;				// Max velocity
+	//double LastTopSpeed;			// Last max value
 
-	double MinSpeed;			// Min velocity
-    double LastMinSpeed;		// Last min value
+	//double MinSpeed;				// Min velocity
+    //double LastMinSpeed;			// Last min value
+
+	//double MaxYaw; ...
+	//double LastMaxYaw; ...
+
+	//double FuelConsumption; ...
+	//double LastFuelConsumption; ...
 
 	// Counters
 	int Loops;		// Number of optimisation loops still to do
@@ -165,22 +164,19 @@ typedef struct genData
 	int NbrOfParts; // Number of parts used
 
 	// Parts
-    tgenPart* Part;   // Pointer to first part structure
+    tgenPart* Part;			// Pointer to first part structure
 
 	// Parameters
 	TGeneticParameter** GP; // Pointer to first parameter
 
-	// Buffers for strings			// MAX_PATH = 260
+	// Buffers for strings						// FILENAME_MAX = Windows(MAX_PATH = 260)
 	char TrackNameBuffer[FILENAME_MAX+1];		// Buffer for trackname 
-	char CarTypeBuffer[FILENAME_MAX+1];		// Buffer for car type
-	char RobotNameBuffer[FILENAME_MAX+1];		// Buffer for robotname
-	char AuthorNameBuffer[FILENAME_MAX+1];		// Buffer name of setup author
-	char PrivateSectionBuffer[FILENAME_MAX+1];	// Buffer name of setup author
-
-//	char LocalXML[FILENAME_MAX+1];
-//	char LocalOPT[FILENAME_MAX+1];
-	char BufferXML[FILENAME_MAX+1];
-	char BufferOPT[FILENAME_MAX+1];
+	char CarTypeBuffer[FILENAME_MAX+1];			// ... for car type
+	char RobotNameBuffer[FILENAME_MAX+1];		// ... for robotname
+	char AuthorNameBuffer[FILENAME_MAX+1];		// ... name of setup author
+	char PrivateSectionBuffer[FILENAME_MAX+1];	// ... name of setup author
+	char BufferXML[FILENAME_MAX+1];				// ... name of xml car setup file
+	char BufferOPT[FILENAME_MAX+1];				// ... name of opt car setup file
 
 } tgenData;
 
@@ -197,19 +193,19 @@ class TGeneticParameter
 	TGeneticParameter();  // Default construtor
 	TGeneticParameter     // Constructor
 	(
-		void* MetaDataFile,		// File handle to get the data
-		float MinDef,			// Defines the minimum allowed value
-		float ValDef,			// Defines the default value
-		float MaxDef,			// Defines the maximum allowed value
-		const char *Label,		// Gives a short label for console output
-		const char *Section,	// Section to be used reading in the setup file
-		const char *Parameter,	// Name of data line used reading in the setup file 
-		const char *Unit,		// Defines the unit used for the value
-		float ParamWeight,		// Weight of parameter for random selection
-		float ParamScale,		// Scales the random variation of the value
-		float ParamRound,		// Defines the rounding 
-								// (to be able to write it in xml without loss of information)
-		bool TwoSided = false	// If there are left and right parameters to be set
+		void* MetaDataFile,			// File handle to get the data
+		float MinDef,				// Defines the minimum allowed value
+		float ValDef,				// Defines the default value
+		float MaxDef,				// Defines the maximum allowed value
+		const char *LabelName,		// Gives a short label for console output
+		const char *SectionName,	// Section to be used reading in the setup file
+		const char *ParameterName,	// Name of data line used reading in the setup file 
+		const char *UnitName,		// Defines the unit used for the value
+		float ParamWeight,			// Weight of parameter for random selection
+		float ParamScale,			// Scales the random variation of the value
+		float ParamRound,			// Defines the rounding 
+									// (to be able to write it in xml without loss of information)
+		bool TwoSided = false		// If there are left and right parameters to be set
 
 	);
 
@@ -255,10 +251,10 @@ class TGeneticParameter
 
 	bool LeftRight;
 
-	char *oLabel;  
-	char *oSection;
-	char *oParameter;
-	char *oUnit;
+	char *Label;  
+	char *Section;
+	char *Parameter;
+	char *Unit;
 
 	// Common data (class variables)
 	static tgenData Data;	// Structure with all data

@@ -28,6 +28,8 @@
 		<attnum name="base mode" min="0.97" max="1.03" val="1.00"/>
 		<attnum name="base scale" min="1.00" max="1.05" val="1.016"/>
 
+		<attnum name="side mu" min="0.8" max="1.0" val="0.85"/>
+		<attnum name="side brake" min="0.8" max="1.0" val="0.85"/>
 		<attnum name="pit test stop" min="0" max="1" val="0"/>
 		<attnum name="qualification" min="0" max="1" val="0"/>
 		<attnum name="reserve" min="0.0" max="20000.0" val="2000"/>

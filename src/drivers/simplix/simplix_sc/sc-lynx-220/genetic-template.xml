@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    file          : drivers/simplix_sc/sc-lynx-220/genetic-template
+    file          : drivers/simplix_scsc-lynx-220/genetic-template
     created       : 02/18/13
     last modified : 02/18/13
     copyright     : (C) 2013 Wolf-Dieter Beelitz
@@ -23,7 +23,7 @@
     <attstr name="robot" val="simplix_sc"/>
     <attstr name="car type" val="sc-lynx-220"/>
     <attstr name="private" val="simplix private"/>
-    <attnum name="weight of damages" val="5.0"/>
+    <attnum name="weight of damages" val="10.0"/>
     <attnum name="get initial value" val="1"/>
     <attnum name="optimisation loops" val="1000"/>
     <attstr name="author" val="Wolf-Dieter Beelitz"/>

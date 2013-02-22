@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.02.17
+// Last changed : 2013.02.22
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.06.000
@@ -507,15 +507,17 @@ void TDriver::AdjustDriving(
 
   oJumpOffset =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_JUMP_OFFSET,NULL,(float) oJumpOffset);
+  oGeneticOpti =
+    GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_OPTI,NULL,oGeneticOpti) > 0;
+
   if (TDriver::UseRacinglineParameters)
   {
-	oGeneticOpti =
-	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_OPTI,NULL,oGeneticOpti) > 0;
 	oBase =
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BASE_MODE,NULL,oBase);
 	oBaseScale =
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BASE_SCLE,NULL,oBaseScale);
   }
+
   oBumpMode =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BUMP_MODE,NULL,oBumpMode);
   Param.oCarParam.oScaleBump =
@@ -893,19 +895,24 @@ void TDriver::GetSkillingParameters
   // Global skilling from Andrew Sumner ...
   // Check if skilling is enabled
   int SkillEnabled = 0;
-  snprintf(PathFilenameBuffer, BUFLEN,           // In default.xml
-    "%s/default.xml", BaseParamPath);            // of the robot
-  //GfOut("#PathFilename: %s\n", PathFilenameBuffer); // itself
-  void* SkillHandle = GfParmReadFile
-	(PathFilename, GFPARM_RMODE_REREAD);
-  if (SkillHandle)
+
+  // Do not skill if optimisation is working
+  if (!oGeneticOpti)
   {
-    SkillEnabled = (int) MAX(0,MIN(1,(int) GfParmGetNum(SkillHandle,
-	  "skilling", "enable", (char *) NULL, 0.0)));
-    //GfOut("#SkillEnabled %d\n",SkillEnabled);
-    oTeamEnabled =
-  	  GfParmGetNum(SkillHandle,"team","enable",0,(float) oTeamEnabled) != 0;
-    //GfOut("#oTeamEnabled %d\n",oTeamEnabled);
+	snprintf(PathFilenameBuffer, BUFLEN,           // In default.xml
+	  "%s/default.xml", BaseParamPath);            // of the robot
+	//GfOut("#PathFilename: %s\n", PathFilenameBuffer); // itself
+	void* SkillHandle = GfParmReadFile
+	  (PathFilename, GFPARM_RMODE_REREAD);
+	if (SkillHandle)
+	{
+	  SkillEnabled = (int) MAX(0,MIN(1,(int) GfParmGetNum(SkillHandle,
+	    "skilling", "enable", (char *) NULL, 0.0)));
+	  //GfOut("#SkillEnabled %d\n",SkillEnabled);
+	  oTeamEnabled =
+  		GfParmGetNum(SkillHandle,"team","enable",0,(float) oTeamEnabled) != 0;
+	  //GfOut("#oTeamEnabled %d\n",oTeamEnabled);
+	}
   }
 
   if (SkillEnabled > 0)                          // If skilling is enabled

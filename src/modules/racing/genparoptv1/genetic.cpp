@@ -50,10 +50,10 @@ TGeneticParameter::TGeneticParameter():
 	Changed(0),
 	Selected(false),
 	LeftRight(false),
-	oLabel(NULL),
-	oSection(NULL),
-	oParameter(NULL),
-	oUnit(NULL)
+	Label(NULL),
+	Section(NULL),
+	Parameter(NULL),
+	Unit(NULL)
 {
 	Range = Max - Min;
 };
@@ -65,10 +65,10 @@ TGeneticParameter::TGeneticParameter
 	float MinDef,
 	float ValDef,
 	float MaxDef,
-	const char *Label,
-	const char *Section,
-	const char *Parameter,
-	const char *Unit,
+	const char *LabelName,
+	const char *SectionName,
+	const char *ParameterName,
+	const char *UnitName,
 	float ParamWeight,
 	float ParamScale,
 	float ParamRound,
@@ -78,25 +78,25 @@ TGeneticParameter::TGeneticParameter
 	Handle = MetaDataFile;
     Active = true;
 
-	if (Label)
-		oLabel = strdup(Label);
+	if (LabelName)
+		Label = strdup(LabelName);
 	else
-		oLabel = NULL;
+		Label = NULL;
 
-	if (Section)
-		oSection = strdup(Section);
+	if (SectionName)
+		Section = strdup(SectionName);
 	else
-		oSection = NULL;
+		Section = NULL;
 
-	if (Parameter)
-		oParameter = strdup(Parameter);
+	if (ParameterName)
+		Parameter = strdup(ParameterName);
 	else
-		oParameter = NULL;
+		Parameter = NULL;
 
-	if (Unit)
-	  oUnit = strdup(Unit);
+	if (UnitName)
+		Unit = strdup(UnitName);
 	else
-  	  oUnit = NULL;
+  		Unit = NULL;
 
 	Min = GfParmGetNumMin(Handle, 
 		Section, Parameter, Unit, MinDef);
@@ -128,26 +128,26 @@ TGeneticParameter::TGeneticParameter
 // Destructor
 TGeneticParameter::~TGeneticParameter()
 {
-	if (oLabel)
-		free((void *) oLabel);
-	if (oSection)
-		free((void *) oSection);
-	if (oParameter)
-		free((void *) oParameter);
-	if (oUnit)
-		free((void *) oUnit);
+	if (Label)
+		free((void *) Label);
+	if (Section)
+		free((void *) Section);
+	if (Parameter)
+		free((void *) Parameter);
+	if (Unit)
+		free((void *) Unit);
 };
 
 // Display parameter definitions at console
 void TGeneticParameter::DisplayParameter()
 {
-	GfLogOpt("%s: Min=%g Val=%g Max=%g Def=%g W=%g S=%g ,R=1/%g\n",oLabel,Min,Val,Max,Def,Weight,Scale,Round);
+	GfLogOpt("%s: Min=%g Val=%g Max=%g Def=%g W=%g S=%g ,R=1/%g\n",Label,Min,Val,Max,Def,Weight,Scale,Round);
 };
 
 // Display parameter statistics at console
 void TGeneticParameter::DisplayStatistik()
 {
-	GfLogOpt("%s: N=%d M=%d (%g %%)\n",oLabel,Tries,Changed,(100.0 * Changed)/Tries);
+	GfLogOpt("%s: N=%d M=%d (%g %%)\n",Label,Tries,Changed,(100.0 * Changed)/Tries);
 };
 
 // Write parameter meta data to xml file
@@ -162,11 +162,11 @@ int TGeneticParameter::Set(const char* Part, int Index)
 	GfParmSetNum(Handle, ParamSection, PRM_ACTIVE, 0, (float) Active);
 	GfParmSetNum(Handle, ParamSection, PRM_TWOSIDE, 0, (float) LeftRight);
 
-	GfParmSetStr(Handle, ParamSection, PRM_LABEL, oLabel);
-	GfParmSetStr(Handle, ParamSection, PRM_SECT, oSection);
-	GfParmSetStr(Handle, ParamSection, PRM_PRM, oParameter);
-	GfParmSetStr(Handle, ParamSection, PRM_UNIT, oUnit);
-	GfParmSetNum(Handle, ParamSection, PRM_RANGE, oUnit, Val, Min, Max);
+	GfParmSetStr(Handle, ParamSection, PRM_LABEL, Label);
+	GfParmSetStr(Handle, ParamSection, PRM_SECT, Section);
+	GfParmSetStr(Handle, ParamSection, PRM_PRM, Parameter);
+	GfParmSetStr(Handle, ParamSection, PRM_UNIT, Unit);
+	GfParmSetNum(Handle, ParamSection, PRM_RANGE, Unit, Val, Min, Max);
 	GfParmSetNum(Handle, ParamSection, PRM_WEIGHT, 0, Weight);
 	GfParmSetNum(Handle, ParamSection, PRM_SCALE, 0, Scale);
 	GfParmSetNum(Handle, ParamSection, PRM_ROUND, 0, Round);
@@ -195,41 +195,41 @@ int TGeneticParameter::Get(bool First, const char* Part)
 	Active = 0 < GfParmGetCurNum(Handle, ParamSection, PRM_ACTIVE, 0, 1);
 	LeftRight = 0 < GfParmGetCurNum(Handle, ParamSection, PRM_TWOSIDE, 0, 0);
 
-	char* Value = (char *) GfParmGetCurStr(Handle, ParamSection, PRM_LABEL, oLabel);
-	if (oLabel)
-		free((void *) oLabel);
+	char* Value = (char *) GfParmGetCurStr(Handle, ParamSection, PRM_LABEL, Label);
+	if (Label)
+		free((void *) Label);
 	if (Value)
-		oLabel = strdup(Value);
+		Label = strdup(Value);
 	else
-		oLabel = NULL;
+		Label = NULL;
 
-	Value = (char *) GfParmGetCurStr(Handle, ParamSection, PRM_SECT, oSection);
-	if (oSection)
-		free((void *) oSection);
+	Value = (char *) GfParmGetCurStr(Handle, ParamSection, PRM_SECT, Section);
+	if (Section)
+		free((void *) Section);
 	if (Value)
-		oSection = strdup(Value);
+		Section = strdup(Value);
 	else
-		oSection = NULL;
+		Section = NULL;
 
-	Value = (char *) GfParmGetCurStr(Handle, ParamSection, PRM_PRM, oParameter);
-	if (oParameter)
-		free((void *) oParameter);
+	Value = (char *) GfParmGetCurStr(Handle, ParamSection, PRM_PRM, Parameter);
+	if (Parameter)
+		free((void *) Parameter);
 	if (Value)
-		oParameter = strdup(Value);
+		Parameter = strdup(Value);
 	else
-		oParameter = NULL;
+		Parameter = NULL;
 
-	Value = (char *) GfParmGetCurStr(Handle, ParamSection, PRM_UNIT, oUnit);
-	if (oUnit)
-		free((void *) oUnit);
+	Value = (char *) GfParmGetCurStr(Handle, ParamSection, PRM_UNIT, Unit);
+	if (Unit)
+		free((void *) Unit);
 	if (Value)
-		oUnit = strdup(Value);
+		Unit = strdup(Value);
 	else
-		oUnit = NULL;
+		Unit = NULL;
 
-	Min = GfParmGetCurNumMin(Handle, ParamSection, PRM_RANGE, oUnit, Min);
-	Max = GfParmGetCurNumMax(Handle, ParamSection, PRM_RANGE, oUnit, Max);
-	Val = GfParmGetCurNum(Handle, ParamSection, PRM_RANGE, oUnit, Val);
+	Min = GfParmGetCurNumMin(Handle, ParamSection, PRM_RANGE, Unit, Min);
+	Max = GfParmGetCurNumMax(Handle, ParamSection, PRM_RANGE, Unit, Max);
+	Val = GfParmGetCurNum(Handle, ParamSection, PRM_RANGE, Unit, Val);
 
 	Weight = GfParmGetCurNum(Handle, ParamSection, PRM_WEIGHT, 0, Weight);
 	Scale = GfParmGetCurNum(Handle, ParamSection, PRM_SCALE, 0, Scale);
@@ -245,7 +245,7 @@ int TGeneticParameter::Get(bool First, const char* Part)
 int TGeneticParameter::GetVal(void* SetupHandle, bool First, bool Local)
 {
 	char ParamSection[64];
-	sprintf(ParamSection,"%s",oSection);
+	sprintf(ParamSection,"%s",Section);
 
 	if (Local)
 	{
@@ -260,14 +260,14 @@ int TGeneticParameter::GetVal(void* SetupHandle, bool First, bool Local)
 		{
 			char SideParam[64];
 			sprintf(SideParam,ParamSection,SECT_PH_LEFT);
-			Val = GfParmGetCurNum(SetupHandle, SideParam, oParameter, oUnit, Val);
+			Val = GfParmGetCurNum(SetupHandle, SideParam, Parameter, Unit, Val);
 
 			sprintf(SideParam,ParamSection,SECT_PH_RGHT);
-			Val = (Val + GfParmGetCurNum(SetupHandle, SideParam, oParameter, oUnit, Val)) / 2;
+			Val = (Val + GfParmGetCurNum(SetupHandle, SideParam, Parameter, Unit, Val)) / 2;
 
 		}
 		else
-			Val = GfParmGetCurNum(SetupHandle, oSection, oParameter, oUnit, Val);
+			Val = GfParmGetCurNum(SetupHandle, Section, Parameter, Unit, Val);
 
 	}
 	else
@@ -276,14 +276,14 @@ int TGeneticParameter::GetVal(void* SetupHandle, bool First, bool Local)
 		{
 			char SideParam[64];
 			sprintf(SideParam,ParamSection,SECT_PH_LEFT);
-			Val = GfParmGetNum(SetupHandle, SideParam, oParameter, oUnit, Val);
+			Val = GfParmGetNum(SetupHandle, SideParam, Parameter, Unit, Val);
 
 			sprintf(SideParam,ParamSection,SECT_PH_RGHT);
-			Val = (Val + GfParmGetNum(SetupHandle, SideParam, oParameter, oUnit, Val)) / 2;
+			Val = (Val + GfParmGetNum(SetupHandle, SideParam, Parameter, Unit, Val)) / 2;
 
 		}
 		else
-			Val = GfParmGetNum(SetupHandle, oSection, oParameter, oUnit, Val);
+			Val = GfParmGetNum(SetupHandle, Section, Parameter, Unit, Val);
 	}
 
 	Def = LastVal = OptVal = Val;
@@ -296,22 +296,22 @@ int TGeneticParameter::SetVal(void* SetupHandle, int Index)
 {
 	char ParamSection[64];
 	if (Index > 0)
-	  sprintf(ParamSection,"%s/%d",oSection,Index);
+	  sprintf(ParamSection,"%s/%d",Section,Index);
 	else
-	  sprintf(ParamSection,"%s",oSection);
+	  sprintf(ParamSection,"%s",Section);
 
 	if (LeftRight)
 	{
 		char SideParam[64];
 
 		sprintf(SideParam,ParamSection,SECT_PH_LEFT);
-		GfParmSetNum(SetupHandle, SideParam, oParameter, oUnit, Val, Min, Max);
+		GfParmSetNum(SetupHandle, SideParam, Parameter, Unit, Val, Min, Max);
 
 		sprintf(SideParam,ParamSection,SECT_PH_RGHT);
-		return GfParmSetNum(SetupHandle, SideParam, oParameter, oUnit, Val, Min, Max);
+		return GfParmSetNum(SetupHandle, SideParam, Parameter, Unit, Val, Min, Max);
 	}
 	else
-		return GfParmSetNum(SetupHandle, ParamSection, oParameter, oUnit, Val, Min, Max);
+		return GfParmSetNum(SetupHandle, ParamSection, Parameter, Unit, Val, Min, Max);
 }
 
 
