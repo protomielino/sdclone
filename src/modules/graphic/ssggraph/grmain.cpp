@@ -621,6 +621,7 @@ initCars(tSituation *s)
     tCarElt 	*elt;
     void	*hdle;
     const char *pszSpanSplit;
+    int grNbSuggestedScreens = 0;
 
     TRACE_GL("initCars: start");
 
@@ -649,7 +650,6 @@ initCars(tSituation *s)
 		grInitSkidmarks(elt);
 	}
 
-    grNbActiveScreens = 0;
     for (i = 0; i < s->_ncars; i++) {
 	elt = s->cars[i];
 	index = elt->index;
@@ -671,23 +671,29 @@ initCars(tSituation *s)
 
 	// Pre-assign each human driver (if any) to a different screen
 	// (set him as the "current driver" for this screen).
-	if (grNbActiveScreens < GR_NB_MAX_SCREEN
+	if (grNbSuggestedScreens < GR_NB_MAX_SCREEN
 		&& elt->_driverType == RM_DRV_HUMAN && !elt->_networkPlayer) 
 	{
-	    grScreens[grNbActiveScreens]->setCurrentCar(elt);
-		GfLogTrace("Screen #%d : Assigned to %s\n", grNbActiveScreens, elt->_name);
-	    grNbActiveScreens++;
+	    grScreens[grNbSuggestedScreens]->setCurrentCar(elt);
+		GfLogTrace("Screen #%d : Assigned to %s\n", grNbSuggestedScreens, elt->_name);
+	    grNbSuggestedScreens++;
 	}
     }
-
-	// Load the real number of active screens and the arrangment.
-	grNbActiveScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, 1.0);
-	grNbArrangeScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_ARR_SCREENS, NULL, 1.0);
-
 
 	/* Check whether view should be spanned across vertical splits */
 	pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
 	grSpanSplit = strcmp(pszSpanSplit, GR_VAL_YES) ? 0 : 1;
+
+	if (grSpanSplit == 0 && grNbSuggestedScreens > 1) {
+		// Mulitplayer, so ignore the stored number of screens
+		grNbActiveScreens = grNbSuggestedScreens;
+		grNbArrangeScreens = 0;
+	} else {
+	     	// Load the real number of active screens and the arrangment.
+		grNbActiveScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, 1.0);
+		grNbArrangeScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_ARR_SCREENS, NULL, 0.0);
+	}
+
 
 	// Initialize the cameras for all the screens.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
