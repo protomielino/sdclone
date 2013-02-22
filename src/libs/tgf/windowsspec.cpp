@@ -31,10 +31,6 @@
 #include "tgf.h"
 #include "os.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable:4996) // std::_Copy_opt was declared as disaproved because unsafe
-#endif // _MSC_VER
-
 /*
 * Function
 *    windowsModLoad

@@ -111,9 +111,6 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     IF(MSVC)
 	
-      # Suppress bothering MSVC warnings
-      ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS)
-	  
       # Inhibit definition of Macros min(a,b) and max(a,b) for Windows MSVC builds,
       # as the names conflict with the template functions from standard template library
       ADD_DEFINITIONS(-DNOMINMAX)
@@ -178,9 +175,37 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     # GCC warnings (at least for the 4.x series, there are none by default).
     IF(CMAKE_COMPILER_IS_GNUCXX)
-      SET(_SD_WARN_OPTS "-Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers")
-      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_SD_WARN_OPTS}")
-      SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_SD_WARN_OPTS}")
+
+      # Add useful warnings / checks.
+      SET(_SD_WOPTS "-Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers")
+
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_SD_WOPTS}")
+      SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_SD_WOPTS}")
+
+    # MSVC warnings (default warning level 3 is not exactly what we want).
+    ELSEIF(MSVC)
+
+      # Suppress bothering MSVC warnings and add useful warnings / checks.
+      SET(_SD_WOPTS "/W4") # Better warning level (default seems to be 3).
+
+      # Level 3 useless/boring warnings.
+      SET(_SD_WOPTS "${_SD_WOPTS} /wd4251") # class XXX needs a DLL interface
+      SET(_SD_WOPTS "${_SD_WOPTS} /wd4996") # std::_Copy_opt disaproved because unsafe
+
+      # Level 4 useless/boring warnings.
+      SET(_SD_WOPTS "${_SD_WOPTS} /wd4100") # unreferenced formal parameter
+      SET(_SD_WOPTS "${_SD_WOPTS} /wd4127") # conditional expression is constant
+      SET(_SD_WOPTS "${_SD_WOPTS} /wd4201") # nonstandard extension used : nameless struct/union
+      SET(_SD_WOPTS "${_SD_WOPTS} /wd4706") # assignment within conditional expression
+
+      # Other useless warnings.
+      ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE 
+                      -D_CRT_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS)
+	  
+      # That's all.
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_SD_WOPTS}")
+      SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${_SD_WOPTS}")
+
     ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
   ENDIF(NOT _ALREADY_DONE)
