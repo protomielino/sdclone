@@ -941,6 +941,7 @@ class cGrCarCamBehind : public cGrPerspCamera
 
     void update(tCarElt *car, tSituation *s) {
 	tdble A;
+	float offset = 0;
 
 	// We want uniform movement across split screens when 'spanning'
 	if (viewOffset && lastTime == s->currentTime) {
@@ -962,8 +963,13 @@ class cGrCarCamBehind : public cGrPerspCamera
 	eye[1] = car->_pos_Y - dist * sin(A + PI * car->_glance);
 	eye[2] = RtTrackHeightG(car->_trkPos.seg, eye[0], eye[1]) + height;
 
-	center[0] = car->_pos_X + (10 - dist) * cos(A + PI * car->_glance);
-	center[1] = car->_pos_Y + (10 - dist) * sin(A + PI * car->_glance);
+	// Compute offset angle and bezel compensation)
+	if (viewOffset) {
+		offset += getSpanAngle();
+	}
+
+	center[0] = car->_pos_X - dist * cos(A + PI * car->_glance) + dist * cos(A + PI * car->_glance - offset);
+	center[1] = car->_pos_Y - dist * sin(A + PI * car->_glance) + dist * sin(A + PI * car->_glance - offset);
 	center[2] = car->_pos_Z;
 
 	speed[0] = car->pub.DynGCg.vel.x;
@@ -1023,6 +1029,7 @@ class cGrCarCamBehind2 : public cGrPerspCamera
 	eye[0] = x;
 	eye[1] = y;
 	eye[2] = RtTrackHeightG(car->_trkPos.seg, x, y) + 5.0;
+
 	center[0] = car->_pos_X;
 	center[1] = car->_pos_Y;
 	center[2] = car->_pos_Z;
@@ -1060,12 +1067,19 @@ class cGrCarCamFront : public cGrPerspCamera
     }
 
     void update(tCarElt *car, tSituation *s) {
+	float offset = 0;
+
 	eye[0] = car->_pos_X + dist * cos(car->_yaw + PI * car->_glance);
 	eye[1] = car->_pos_Y + dist * sin(car->_yaw + PI * car->_glance);
 	eye[2] = RtTrackHeightG(car->_trkPos.seg, eye[0], eye[1]) + 0.5;
 
-	center[0] = car->_pos_X;
-	center[1] = car->_pos_Y;
+	// Compute offset angle and bezel compensation)
+	if (viewOffset) {
+		offset += getSpanAngle();
+	}
+
+	center[0] = car->_pos_X + dist * cos(car->_yaw + PI * car->_glance) - dist * cos(car->_yaw + PI * car->_glance - offset);
+	center[1] = car->_pos_Y + dist * sin(car->_yaw + PI * car->_glance) - dist * sin(car->_yaw + PI * car->_glance - offset);
 	center[2] = car->_pos_Z;
 
 	speed[0] = car->pub.DynGCg.vel.x;
@@ -1342,6 +1356,7 @@ class cGrCarCamGoPro1 : public cGrPerspCamera
 
     void update(tCarElt *car, tSituation *s) {
 	sgVec3 P, p;
+	float offset = 0;
 	
 	p[0] = car->_drvPos_x;
 	p[1] = (car->_dimension_y / 2) + 0.1;
@@ -1352,8 +1367,13 @@ class cGrCarCamGoPro1 : public cGrPerspCamera
 	eye[1] = p[1];
 	eye[2] = p[2];
  
-	P[0] = 30;
-	P[1] = (car->_dimension_y / 2) + 0.1;
+	// Compute offset angle and bezel compensation)
+	if (viewOffset) {
+		offset += getSpanAngle();
+	}
+
+	P[0] = 30 * cos(offset);
+	P[1] = (car->_dimension_y / 2) + 0.1 - 30.0 * sin(offset);
 	P[2] = car->_statGC_z;
 
 	sgXformPnt3(P, car->_posMat);
@@ -1391,6 +1411,7 @@ class cGrCarCamGoPro2 : public cGrPerspCamera
 
     void update(tCarElt *car, tSituation *s) {
 	sgVec3 P, p;
+	float offset = 0;
 	
 	p[0] = car->_drvPos_x;
 	p[1] = 0 - (car->_dimension_y / 2) - 0.1;
@@ -1401,8 +1422,13 @@ class cGrCarCamGoPro2 : public cGrPerspCamera
 	eye[1] = p[1];
 	eye[2] = p[2];
  
-	P[0] = 30;
-	P[1] = 0 - (car->_dimension_y / 2) - 0.1;
+	// Compute offset angle and bezel compensation)
+	if (viewOffset) {
+		offset += getSpanAngle();
+	}
+
+	P[0] = 30 * cos(offset);
+	P[1] = 0 - (car->_dimension_y / 2) - 0.1 - 30.0 * sin(offset);
 	P[2] = car->_statGC_z;
 
 	sgXformPnt3(P, car->_posMat);
