@@ -73,6 +73,8 @@ typedef float tdble;
 #define freez FREEZ
 
 const double PI = 3.14159265358979323846;  /**< PI */
+const double PI_2 = PI/2; /**< PI/2 */
+const double PI_4 = PI/4; /**< PI/4 */
 const tdble G = 9.80665f; /**< m/s/s */
 
 /* conversion */

@@ -77,7 +77,6 @@ typedef struct {
     char	carName[MAX_NAME_LEN];	/**< Car object name */
     char	category[MAX_NAME_LEN];	/**< Car's category */
     int		raceNumber;		/**< Car's race number */
-	int		price;			/**<Car's Price */
     int		startRank;		/**< Car's starting position */
     int		driverType;		/**< Driver type */
     int		networkplayer;		/**< Network player */
@@ -119,7 +118,6 @@ typedef struct {
 #define _networkPlayer info.networkplayer   /**< short cut to tInitCar#networkplayer*/
 #define _skillLevel	info.skillLevel			/**< short cut to tInitCar#skillLevel */
 #define _raceNumber	info.raceNumber			/**< short cut to tInitCar#raceNumber */
-#define _Price		info.price				
 #define _startRank	info.startRank			/**< short cut to tInitCar#startRank */
 #define _dimension	info.dimension			/**< short cut to tInitCar#dimension */
 #define _dimension_x	info.dimension.x		/**< short cut to tInitCar#dimension.x */
@@ -409,34 +407,67 @@ typedef struct {
 #define _shutdownMemPool	priv.memoryPool.shutdown
 
 /** Info returned by driver during the race */
+/** New order to get better alignment, additional parameters for new features */
 typedef struct {
-    tdble	steer;	    /**< Steer command [-1.0, 1.0]  */
-    tdble	accelCmd;   /**< Accelerator command [0.0, 1.0] */
-    tdble	brakeCmd;   /**< Brake command [0.0, 1.0] */
-    tdble	clutchCmd;  /**< Clutch command [0.0, 1.0] */
-    int		gear;  	    /**< [-1,6] for gear selection */
-    int		raceCmd;    /**< command issued by the driver */
-#define RM_CMD_NONE		0	/**< No race command */
+    tdble	steer;	            /**< Steer command [-1.0, 1.0]  */
+    tdble	accelCmd;           /**< Accelerator command [0.0, 1.0] */
+    tdble	brakeCmd;           /**< Brake command [0.0, 1.0] */
+    tdble	clutchCmd;          /**< Clutch command [0.0, 1.0] */
+
+	// New commands for single wheel braking
+	tdble	brakeFrontLeftCmd;  /**< Brake front left command  [-1.0, 1.0] -1: do not use single wheel brake: 0: no brake; 1: max brake */
+    tdble	brakeFrontRightCmd; /**< Brake front right command [-1.0, 1.0] -1: do not use single wheel brake: 0: no brake; 1: max brake */
+    tdble	brakeRearLeftCmd;   /**< Brake rear left command   [-1.0, 1.0] -1: do not use single wheel brake: 0: no brake; 1: max brake */
+    tdble	brakeRearRightCmd;  /**< Brake rear right command  [-1.0, 1.0] -1: do not use single wheel brake: 0: no brake; 1: max brake */
+
+	// New commands for variable wings (incl. airbrake)
+    tdble	wingFrontCmd;       /**< Wing angle of attack front [0, PI/4: angle in rad] */
+    tdble	wingRearCmd;        /**< Wing angle of attack rear  [0, PI/4: angle in rad] */
+    tdble	reserved1;          /**< reserved for future use */
+    tdble	reserved2;          /**< reserved for future use */
+
+	int		gear;  	            /**< [-1,MAX_GEARS - 2] for gear selection */
+    int		raceCmd;            /**< command issued by the driver */
+#define RM_CMD_NONE		0	    /**< No race command */
 #define RM_CMD_PIT_ASKED	1	/**< Race command: Pit asked */
 #define RM_CMD_MAX_MSG_SIZE 32
-    char	msg[4][RM_CMD_MAX_MSG_SIZE];     /**< 4 lines of 31 characters : 0-1 from car, 2-3 from race engine */
-#define RM_MSG_LEN	31
-    float	msgColor[4]; /**< RGBA of text */
-    int		lightCmd;    /**< Lights command */
+
+	int		lightCmd;           /**< Lights command */
 #define RM_LIGHT_HEAD1		0x00000001	/**< head light 1 */
 #define RM_LIGHT_HEAD2		0x00000002	/**< head light 2 */
-    int		ebrakeCmd;   /**< Parking/Emergency Brake command */
+
+	int		ebrakeCmd;          /**< Parking/Emergency Brake command */
+
+	int	    wingControlMode;        /**< 0: No wing control; 1 fixed wing angles; 2 variable wing angles */
+	int	    singleWheelBrakeMode;   /**< 0: No single wheel brake; 1 single wheel brake mode */
+	int	    switch3;                /**< reserved for future use */
+	int	    telemetryMode;          /**< Define mode for telemetry output: 0: no output; 1: full output; ... see car.cpp SimCarUpdate2 */
+
+	char	msg[4][RM_CMD_MAX_MSG_SIZE];     /**< 4 lines of 31 characters : 0-1 from car, 2-3 from race engine */
+#define RM_MSG_LEN	31
+
+	float	msgColor[4]; /**< RGBA of text */
 } tCarCtrl;
 #define _steerCmd	ctrl.steer
 #define _accelCmd	ctrl.accelCmd
 #define _brakeCmd	ctrl.brakeCmd
 #define _clutchCmd	ctrl.clutchCmd
+
 #define _gearCmd	ctrl.gear
 #define _raceCmd	ctrl.raceCmd
-#define _msgCmd		ctrl.msg
-#define _msgColorCmd	ctrl.msgColor
 #define _lightCmd	ctrl.lightCmd
 #define _ebrakeCmd	ctrl.ebrakeCmd
+
+#define _brakeFLCmd	ctrl.brakeFrontLeftCmd
+#define _brakeFRCmd	ctrl.brakeFrontRightCmd
+#define _brakeRLCmd	ctrl.brakeRearLeftCmd
+#define _brakeRRCmd	ctrl.brakeRearRightCmd
+
+#define _wingFCmd	ctrl.wingFrontCmd
+#define _wingRCmd	ctrl.wingRearCmd
+
+#define _msgCmd		ctrl.msg
+#define _msgColorCmd	ctrl.msgColor
 
 struct RobotItf;
 
@@ -512,8 +543,7 @@ typedef struct CarElt
 #define SECT_LIGHT		"Light"
 
 /* Parameter names */
-#define PRM_CATEGORY	"category"
-#define PRM_PRICE		"price"
+#define PRM_CATEGORY		"category"
 #define PRM_LEN			"body length"
 #define PRM_WIDTH		"body width"
 #define PRM_OVERALLLEN		"overall length"
@@ -572,8 +602,9 @@ typedef struct CarElt
 #define PRM_BRKDIAM		"disk diameter"
 #define PRM_BRKAREA		"piston area"
 #define PRM_BRKREP		"front-rear brake repartition"
-#define PRM_BRKPRESS		"max pressure"
-#define PRM_EBRKPRESS		"emergency brake pressure"
+#define PRM_BRKPRESS	"max pressure"
+#define PRM_EBRKPRESS	"emergency brake pressure"
+#define PRM_BRKCOR		"brake correction"
 
 #define PRM_CX			"Cx"
 #define PRM_FCL			"front Clift"
@@ -629,6 +660,10 @@ typedef struct CarElt
 #define LST_DRIVER              "Driver"
 #define PRM_DRIVERSTEER         "steer"
 #define PRM_DRIVERMODEL         "driver"
+
+#define LST_REARWING            "RearWing"
+#define PRM_REARWINGANGLE       "angle"
+#define PRM_REARWINGMODEL       "rearwing"
 
 #define PRM_MIN_TQ_BIAS		"min torque bias"
 #define PRM_MAX_TQ_BIAS		"max torque bias"

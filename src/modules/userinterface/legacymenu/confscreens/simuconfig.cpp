@@ -39,7 +39,7 @@
 static const int DefaultSimuVersion = 1;
 static const char *SimuVersionList[] =
 	{RM_VAL_MOD_SIMU_V2, RM_VAL_MOD_SIMU_V2_1, RM_VAL_MOD_SIMU_V3};
-static const char *SimuVersionDispNameList[] = 	{"V2.0", "V2.1", "V3.0"};
+static const char *SimuVersionDispNameList[] = 	{"V2.0 (old)", "V2.1 (obsolete)", "V3.0 (incomplete)", "V4.0 (default)"};
 static const int NbSimuVersions = sizeof(SimuVersionList) / sizeof(SimuVersionList[0]);
 static int CurSimuVersion = DefaultSimuVersion;
 

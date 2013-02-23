@@ -2,17 +2,17 @@
 // unitdriver.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 2.X
+// A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
 // Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.02.22
+// Last changed : 2013.02.23
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.06.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 //
 //    Copyright: (C) 2000 by Eric Espie
@@ -230,9 +230,15 @@ TDriver::TDriver(int Index):
   // oTeamName
   // oRaceNumber
   oBrakeDiffInitial(2.0),
-  oBrakeForceMax(0.5),
+  oBrakeForceMax(0.5f),
+  oBrakeRep(0.5f),
+  oBrakeCorr(0.03f),
+  oBrakeFront(1.0f),
+  oBrakeRear(1.0f),
+  oBrakeLeft(1.0f),
+  oBrakeRight(1.0f),
   oBrakeScale(INITIAL_BRAKE_SCALE),
-  oInitialBrakeCoeff(0.5),
+  oInitialBrakeCoeff(0.5f),
   oCar(NULL),
   oSteerAngle(0.0f),
   oCarType(NULL),
@@ -286,6 +292,7 @@ TDriver::TDriver(int Index):
   oDeltaOffset(0.0),
   oDriftAngle(0.0),
   oLastDriftAngle(0.0),
+  oCosDriftAngle2(1.0),
   oDriftFactor(1.0),
   oLetPassSide(0),
   oOldTarget(0.0),
@@ -1091,6 +1098,18 @@ void TDriver::InitTrack
   oBrakeForceMax *= oBrakeScale/INITIAL_BRAKE_SCALE;
   //GfOut("#oBrakeForceMax    = %.3f\n",oBrakeForceMax);
 
+  oBrakeLeft = 1.0f;
+  oBrakeRight = 1.0f;
+  oBrakeRep =									 // Bremsdruckverteilung
+	GfParmGetNum(oCarHandle, (char*) SECT_BRKSYST, 
+      PRM_BRKREP, (char*)NULL, 0.5);
+  GfOut("# Brake repartition : %0.2f\n",oBrakeRep);
+
+  oBrakeCorr =
+	GfParmGetNum(oCarHandle, (char*) SECT_BRKSYST, 
+  	  PRM_BRKCOR, (char*)NULL, 0.03f);
+  GfOut("# Brake correction  : %0.2f\n",oBrakeCorr);
+
   // Next Params out of the own files
   PCarHandle Handle = NULL;                      // Start with  "empty file"
   char Buf[1024];                                // Multi purpose buffer
@@ -1365,6 +1384,25 @@ void TDriver::Drive()
 
   //cTimeSum[2] += RtDuration(StartTimeStamp);
 
+  if (oWingAngleRear != oWingAngleRearBrake)
+  {
+    if (oDriftAngle > PI/32)
+	{
+	  oWingAngleRear = oWingAngleRearMax;
+	}
+	else if (oDriftAngle < PI/64)
+	{
+	  oWingAngleRear = oWingAngleRearMin;
+	}
+  }
+  else
+  {
+	if (oDriftAngle < PI/64)
+      oWingAngleRear = oWingAngleRearMax;
+	else
+      oWingAngleRear = oWingAngleRearBrake;
+  }
+
   if (oSituation->_raceState & RM_RACE_PRESTART) 
   {
     oClutch = oClutchMax;
@@ -1414,6 +1452,9 @@ void TDriver::Drive()
     oBrake = FilterABS(oBrake);
   }
 
+  if (oBrake > 0.25)
+	oWingAngleRear = oWingAngleRearBrake;
+
   // Keep history
   oLastSteer = oSteer;
   oLastAccel = oAccel;
@@ -1426,6 +1467,22 @@ void TDriver::Drive()
   CarClutchCmd = (float) oClutch;
   CarGearCmd = oGear;
   CarSteerCmd = (float) oSteer;
+
+  // SIMUV4 ...
+
+  // Variable wing angle / airbrake
+  oCar->ctrl.wingControlMode = 2;
+  oCar->ctrl.wingFrontCmd = (float) oWingAngleFront; 
+  oCar->ctrl.wingRearCmd = (float) oWingAngleRear; 
+
+  // Single wheel brake
+  oCar->ctrl.singleWheelBrakeMode = 1;
+  oCar->ctrl.brakeFrontRightCmd = (float) (oBrake * oBrakeRep * oBrakeRight * oBrakeFront); 
+  oCar->ctrl.brakeFrontLeftCmd = (float) (oBrake * oBrakeRep * oBrakeLeft * oBrakeFront); 
+  oCar->ctrl.brakeRearRightCmd = (float) (oBrake * (1 - oBrakeRep) * oBrakeRight * oBrakeRear); 
+  oCar->ctrl.brakeRearLeftCmd = (float) (oBrake * (1 - oBrakeRep) * oBrakeLeft * oBrakeRear); 
+
+  // ... SIMUV4
 
 /** /
   if (oIndex == 10)
@@ -1820,6 +1877,8 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
 	atan2(CarSpeedY, CarSpeedX) - CarYaw;
   DOUBLE_NORM_PI_PI(oDriftAngle);                // normalized to +Pi .. -Pi
   oDriftAngle = fabs(oDriftAngle);               // drift angle needs no sign
+  double DriftAngle2 = MAX(MIN(oDriftAngle * 2, PI),-PI);
+  oCosDriftAngle2 = (float) cos(DriftAngle2);
 
   // Get direction of motion
   double MySpd = MAX(0.01,myhypot(CarSpeedX, CarSpeedY));
@@ -2019,6 +2078,12 @@ void TDriver::InitCa()
 	GfParmGetNum(oCarHandle, SECT_REARWING,
 	   PRM_WINGANGLE, (char*) NULL, 0.0f);
   //GfOut("#RearWingAngle %g\n",RearWingAngle * 180 / PI);
+
+  oWingAngleFront = FrontWingAngle;						
+  oWingAngleRear = RearWingAngle;						
+  oWingAngleRearMin = RearWingAngle;						
+  oWingAngleRearMax = 2.5f * RearWingAngle;						
+  oWingAngleRearBrake = (float) (0.9 * PI_4);						
 
   FrontWingArea = FrontWingArea * sin(FrontWingAngle);
   RearWingArea = RearWingArea * sin(RearWingAngle);
@@ -3440,11 +3505,62 @@ double TDriver::FilterABS(double Brake)
 //--------------------------------------------------------------------------*
 double TDriver::FilterBrake(double Brake)
 {
+  oBrakeRight = 1.0f;
+  oBrakeLeft = 1.0f;
+  oBrakeFront = 1.0f;
+  oBrakeRear = 1.0f;
+
   // If braking, decrease braking force while drifting
   if((CarSpeedLong > SLOWSPEED) && (Brake > 0.0))
   {
     double DriftAngle = MAX(MIN(oDriftAngle * 2, PI),-PI);
     Brake *= MAX(0.1, cos(DriftAngle));
+  }
+
+  // SimuV4
+  if((CarSpeedLong > SLOWSPEED) && (Brake > 0.0))
+  {
+	Brake *= (float) MAX(0.1, oCosDriftAngle2);
+	if (oDriftAngle > 4.0/180.0*PI)
+	{
+	  oBrakeLeft = 1.0f + 0.3f;
+	  oBrakeRight = 1.0f - 0.3f;
+	  oBrakeFront = 1.0f + oBrakeCorr;
+	  oBrakeRear = 1.0f - oBrakeCorr;
+	  //GfOut("BL+ BR- %.3f\n",oDriftAngle*180/PI);
+	}
+	else if (oDriftAngle > 2.0/180.0*PI)
+	{
+	  oBrakeLeft = 1.0f + 0.3f;
+	  oBrakeRight = 1.0f - 0.3f;
+	  oBrakeFront = 1.0f;
+	  oBrakeRear = 1.0f;
+	  //GfOut("BL+ BR- %.3f\n",oDriftAngle*180/PI);
+	}
+	else if (oDriftAngle < -4.0/180.0*PI)
+	{
+	  oBrakeRight = 1.0f + 0.3f;
+	  oBrakeLeft = 1.0f - 0.3f;
+	  oBrakeFront = 1.0f + oBrakeCorr;
+	  oBrakeRear = 1.0f - oBrakeCorr;
+	  //GfOut("BL- BR+ %.3f\n",oDriftAngle*180/PI);
+	}
+	else if (oDriftAngle < -2.0/180.0*PI)
+	{
+	  oBrakeRight = 1.0f + 0.3f;
+	  oBrakeLeft = 1.0f - 0.3f;
+	  oBrakeFront = 1.0f;
+	  oBrakeRear = 1.0f;
+	  //GfOut("BL- BR+ %.3f\n",oDriftAngle*180/PI);
+	}
+	else
+	{
+	  oBrakeRight = 1.0f;
+	  oBrakeLeft = 1.0f;
+	  oBrakeFront = 1.0f;
+	  oBrakeRear = 1.0f;
+	  //GfOut("BR = BL %.3f\n",oDriftAngle*180/PI);
+	}
   }
 
   if (oLastAccel > 0)

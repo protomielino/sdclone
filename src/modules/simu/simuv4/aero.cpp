@@ -33,6 +33,7 @@ SimAeroConfig(tCar *car)
     car->aero.Clift[1] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_RCL, (char*)NULL, 0.0f);
     car->aero.SCx2 = 0.645f * Cx * FrntArea;
     car->aero.Cd += car->aero.SCx2;
+    car->aero.CdBody = car->aero.Cd;
 }
 
 
@@ -119,7 +120,7 @@ SimWingConfig(tCar *car, int index)
     wing->Kz = 4.0f * wing->Kx;
 
     if (index == 1) {
-		car->aero.Cd -= wing->Kx*sin(wing->angle);
+		car->aero.Cd = car->aero.CdBody - wing->Kx*sin(wing->angle);
     }
 }
 
@@ -128,18 +129,37 @@ void
 SimWingUpdate(tCar *car, int index, tSituation* s)
 {
     tWing  *wing = &(car->wing[index]);
+
+	if (index == 1) {
+		// Check wing angle controller
+		if (car->ctrl->wingControlMode == 2)
+			// Update wing angle
+			wing->angle = car->ctrl->wingRearCmd;
+		car->aero.Cd = car->aero.CdBody - wing->Kx*sin(wing->angle);
+    }
+	else
+		// Check wing angle controller
+		if (car->ctrl->wingControlMode == 2)
+			// Update wing angle
+			wing->angle = car->ctrl->wingFrontCmd;
+
     tdble vt2 = car->airSpeed2;
 	// compute angle of attack
 	tdble aoa = atan2(car->DynGC.vel.z, car->DynGC.vel.x) + car->DynGCg.pos.ay;
 
     aoa += wing->angle;
+
     // the sinus of the angle of attack
     tdble sinaoa = sin(aoa);
 
     if (car->DynGC.vel.x > 0.0f) {
-        //make drag always negative and have a minimal angle of attack
+        // make drag always negative and have a minimal angle of attack
         wing->forces.x = (tdble) (wing->Kx * vt2 * (1.0f + (tdble)car->dammage / 10000.0) * MAX(fabs(sinaoa), 0.02));
-        wing->forces.z = wing->Kz * vt2 * sinaoa;
+		// If angle of attack is too large, no downforce, only drag
+		if (fabs(aoa) < PI_4)
+	        wing->forces.z = wing->Kz * vt2 * sinaoa;
+		else
+		    wing->forces.z = 0.0;
     } else {
         wing->forces.x = wing->forces.z = 0.0f;
     }

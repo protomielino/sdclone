@@ -73,7 +73,7 @@ SET(ROBOT_SOURCES
 )
 
 # Official-only simplix instances.
-SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_ls2 simplix_mp5 simplix_lp1)
+SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_ls2 simplix_mp5 simplix_lp1 simplix_ref)
 
 IF(NOT OPTION_OFFICIAL_ONLY)
 
@@ -168,6 +168,15 @@ SET(ROBOT_SUBDIRS 0 1 2 3 4 5
 
 ROBOT_DATA(NAME simplix_lp1 PREFIX simplix_lp1 
            FILES simplix_lp1.xml default.xml logo.rgb readme.txt
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)			   
+
+# simplix_ref
+SET(ROBOT_SUBDIRS 0
+                  ref-sector-p4
+                  )
+
+ROBOT_DATA(NAME simplix_ref PREFIX simplix_ref 
+           FILES simplix_ref.xml default.xml logo.rgb readme.txt
            SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)			   
 
 # Work-in-progress / unofficial simplix instances.

@@ -65,7 +65,9 @@ public:
 	float							lastDRMswitch;
 	ssgSelector				*driverSelector;
 	ssgSelector				*steerSelector;
+	ssgSelector				*rearwingSelector;
 	bool							driverSelectorinsg;
+	bool							rearwingSelectorinsg;
 	ssgStateSelector	*envSelector;
 	ssgTransform			*wheelPos[4];
 	ssgTransform			*wheelRot[4];

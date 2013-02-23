@@ -2,7 +2,7 @@
 // unitdriver.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 2.X
+// A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
 // Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
@@ -12,7 +12,7 @@
 // Last changed : 2013.02.16
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.06.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -266,8 +266,20 @@ private:
 	char* oBotName;                              // Name of driver
 	const char* oTeamName;                       // Name of team
 	int oRaceNumber;                             // Race number
+	double oWingAngleFront;                      // Front wing angle of attack
+	double oWingAngleRear;                       // Rear wing angle of attack
+	double oWingAngleRearMin;                    // Min rear wing angle of attack
+	double oWingAngleRearMax;                    // Max rear wing angle of attack
+	double oWingAngleRearBrake;					 // Air brake	
+
 	double oBrakeDiffInitial;                    // Initial difference to brake
 	double oBrakeForceMax;                       // Maximum braking force
+	double oBrakeRep;                            // Brake balance front/rear
+	double oBrakeCorr;                           // Brake balance correction
+	double oBrakeFront;							 // Brake factor front
+	double oBrakeRear;							 // Brake factor rear
+	double oBrakeLeft;                           // Brake factor left
+	double oBrakeRight;                          // Brake factor right
 	double oBrakeScale;                          // Brake force scaling
 	double oInitialBrakeCoeff;
 	PtCarElt oCar;                               // TORCS data for own car
@@ -326,7 +338,8 @@ private:
     double oDeltaOffset;                         // Delta to planned
     double oDriftAngle;                          // Drifting angle
     double oLastDriftAngle;                      // Historie
-    double oDriftFactor;                         // Drifting acceleration factor
+	double oCosDriftAngle2;
+	double oDriftFactor;                         // Drifting acceleration factor
     int oLetPassSide;                            // Go to side to let pass
 	double oOldTarget;
     bool oReduced;

@@ -1,7 +1,7 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // unitmain.cpp
 //--------------------------------------------------------------------------*
-// A robot for SPEED-DREAMS-Version 2.X
+// A robot for SPEED-DREAMS-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Interface to SPEED-DREAMS
 // 
@@ -10,7 +10,10 @@
 // Last changed : 2013.02.22
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.06.000
+// Version      : 4.00.000
+//--------------------------------------------------------------------------*
+// V4.00.000 (SimuV4)(Single Wheel Braking, Air Brake):
+// 
 //--------------------------------------------------------------------------*
 // V3.06.000 (SimuV2.1)(Genetic Parameter Optimisation):
 // Additional parameter to control loading of racinglines
@@ -387,6 +390,17 @@ void SetUpSimplix_lp1()
 //==========================================================================*
 
 //==========================================================================*
+// Schismatic entry point for simplix_ref
+//--------------------------------------------------------------------------*
+void SetUpSimplix_ref()
+{
+    cRobotType = RTYPE_SIMPLIX_REF;
+    SetParameters(NBBOTS, "ref.sector-p4");
+	TDriver::UseRacinglineParameters = true;
+};
+//==========================================================================*
+
+//==========================================================================*
 // Handle module entry for Speed Dreams Interface V1.00 (new fixed name scheme)
 //--------------------------------------------------------------------------*
 int moduleWelcomeV1_00
@@ -478,6 +492,8 @@ int moduleWelcomeV1_00
 		SetUpSimplix_mp5();
 	else if (strncmp(RobName," simplix_lp1", strlen("simplix_lp1")) == 0)
 		SetUpSimplix_lp1();
+	else if (strncmp(RobName," simplix_ref", strlen("simplix_ref")) == 0)
+		SetUpSimplix_ref();
 	else 
 		SetUpSimplix();
 

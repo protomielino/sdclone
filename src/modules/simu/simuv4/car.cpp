@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:05:43 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: car.cpp 4985 2012-10-07 16:15:40Z pouillot $
+    version              : $Id: car.cpp 4149 2011-11-14 23:17:19Z kakukri $
 
  ***************************************************************************/
 
@@ -246,6 +246,9 @@ static void
 SimCarUpdateSpeed(tCar *car)
 {
 	tdble	Cosz, Sinz;
+	tdble	mass;
+	
+	mass = car->mass + car->fuel;
 		
 	Cosz = car->Cosz;
 	Sinz = car->Sinz;
@@ -309,9 +312,13 @@ static void
 SimCarUpdatePos(tCar *car)
 {
 	tdble vx, vy;
+	tdble accx, accy;
 	
 	vx = car->DynGCg.vel.x;
 	vy = car->DynGCg.vel.y;
+	
+	accx = car->DynGCg.acc.x;
+	accy = car->DynGCg.acc.y;
 	
 	car->DynGCg.pos.x += vx * SimDeltaTime;
 	car->DynGCg.pos.y += vy * SimDeltaTime;
@@ -397,26 +404,94 @@ SimTelemetryOut(tCar *car)
 	int i;
 	tdble Fzf, Fzr;
 	
-	printf("-----------------------------\nCar: %d %s ---\n", car->carElt->index, car->carElt->_name);
-	printf("Seg: %d (%s)  Ts:%f  Tr:%f\n",
-		car->trkPos.seg->id, car->trkPos.seg->name, car->trkPos.toStart, car->trkPos.toRight);
-	printf("---\nMx: %f  My: %f  Mz: %f (N/m)\n", car->DynGC.acc.ax, car->DynGC.acc.ay, car->DynGC.acc.az);
-	printf("Wx: %f  Wy: %f  Wz: %f (rad/s)\n", car->DynGC.vel.ax, car->DynGC.vel.ay, car->DynGC.vel.az);
-	printf("Ax: %f  Ay: %f  Az: %f (rad)\n", car->DynGCg.pos.ax, car->DynGCg.pos.ay, car->DynGCg.pos.az);
-	printf("---\nAx: %f  Ay: %f  Az: %f (Gs)\n", car->DynGC.acc.x/9.81, car->DynGC.acc.y/9.81, car->DynGC.acc.z/9.81);
-	printf("Vx: %f  Vy: %f  Vz: %f (m/s)\n", car->DynGC.vel.x, car->DynGC.vel.y, car->DynGC.vel.z);
-	printf("Px: %f  Py: %f  Pz: %f (m)\n---\n", car->DynGCg.pos.x, car->DynGCg.pos.y, car->DynGCg.pos.z);
-	printf("As: %f\n---\n", sqrt(car->airSpeed2));
-	for (i = 0; i < 4; i++) {
-	printf("wheel %d - RH:%f susp:%f zr:%.2f ", i, car->wheel[i].rideHeight, car->wheel[i].susp.x, car->wheel[i].zRoad);
-	printf("sx:%f sa:%f w:%f ", car->wheel[i].sx, car->wheel[i].sa, car->wheel[i].spinVel);
-	printf("fx:%f fy:%f fz:%f\n", car->wheel[i].forces.x, car->wheel[i].forces.y, car->wheel[i].forces.z);
+	if (car->ctrl->telemetryMode == 1) // Full data output
+	{
+		printf("-----------------------------\nCar: %d %s ---\n", car->carElt->index, car->carElt->_name);
+		printf("Seg: %d (%s)  Ts:%f  Tr:%f\n",
+			car->trkPos.seg->id, car->trkPos.seg->name, car->trkPos.toStart, car->trkPos.toRight);
+		printf("---\nMx: %f  My: %f  Mz: %f (N/m)\n", car->DynGC.acc.ax, car->DynGC.acc.ay, car->DynGC.acc.az);
+		printf("Wx: %f  Wy: %f  Wz: %f (rad/s)\n", car->DynGC.vel.ax, car->DynGC.vel.ay, car->DynGC.vel.az);
+		printf("Ax: %f  Ay: %f  Az: %f (rad)\n", car->DynGCg.pos.ax, car->DynGCg.pos.ay, car->DynGCg.pos.az);
+		printf("---\nAx: %f  Ay: %f  Az: %f (Gs)\n", car->DynGC.acc.x/9.81, car->DynGC.acc.y/9.81, car->DynGC.acc.z/9.81);
+		printf("Vx: %f  Vy: %f  Vz: %f (m/s)\n", car->DynGC.vel.x, car->DynGC.vel.y, car->DynGC.vel.z);
+		printf("Px: %f  Py: %f  Pz: %f (m)\n---\n", car->DynGCg.pos.x, car->DynGCg.pos.y, car->DynGCg.pos.z);
+		printf("As: %f\n---\n", sqrt(car->airSpeed2));
+		for (i = 0; i < 4; i++) 
+		{
+			printf("wheel %d - RH:%f susp:%f zr:%.2f ", i, car->wheel[i].rideHeight, car->wheel[i].susp.x, car->wheel[i].zRoad);
+			printf("sx:%f sa:%f w:%f ", car->wheel[i].sx, car->wheel[i].sa, car->wheel[i].spinVel);
+			printf("fx:%f fy:%f fz:%f\n", car->wheel[i].forces.x, car->wheel[i].forces.y, car->wheel[i].forces.z);
+		}
+		Fzf = (tdble) ((car->aero.lift[0] + car->wing[0].forces.z) / 9.81);
+		Fzr = (tdble) ((car->aero.lift[1] + car->wing[1].forces.z) / 9.81);
+		printf("Aero Fx:%f Fz:%f Fzf=%f Fzr=%f ratio=%f\n", car->aero.drag / 9.81, Fzf + Fzr,
+			Fzf, Fzr, (Fzf + Fzr) / (car->aero.drag + 0.1) * 9.81);
 	}
-	Fzf = (tdble) ((car->aero.lift[0] + car->wing[0].forces.z) / 9.81);
-	Fzr = (tdble) ((car->aero.lift[1] + car->wing[1].forces.z) / 9.81);
-	printf("Aero Fx:%f Fz:%f Fzf=%f Fzr=%f ratio=%f\n", car->aero.drag / 9.81, Fzf + Fzr,
-		Fzf, Fzr, (Fzf + Fzr) / (car->aero.drag + 0.1) * 9.81);
-	
+	else if (car->ctrl->telemetryMode == 2)
+	{
+		// Mass from total and mass from wheels
+		float MassTotal = car->mass + car->fuel;
+		float mass = car->wheel[FRNT_RGT].weight0 + car->wheel[FRNT_LFT].weight0 + car->wheel[REAR_RGT].weight0 + car->wheel[REAR_LFT].weight0;
+		float massfactor = (mass + car->fuel*G) / mass;
+		float MassTotal2 = massfactor/G * (car->wheel[0].weight0 + car->wheel[1].weight0 + car->wheel[2].weight0 + car->wheel[3].weight0);
+
+		// Measurements of downforce at axles (Forces without part caused by weight)
+		float MeasurementFront = car->wheel[0].forces.z + car->wheel[1].forces.z - massfactor * (car->wheel[0].weight0 + car->wheel[1].weight0);
+		float MeasurementRear = car->wheel[2].forces.z + car->wheel[3].forces.z - massfactor * (car->wheel[2].weight0 + car->wheel[3].weight0);
+
+		float RideHeightFront = (car->wheel[0].rideHeight + car->wheel[1].rideHeight)/2;
+		float RideHeightRear = (car->wheel[2].rideHeight + car->wheel[3].rideHeight)/2;
+		float hm = 3 * (RideHeightFront + RideHeightRear);
+		hm = hm * hm;
+		hm = hm * hm;
+		hm = 2 * exp(-3 * hm);
+
+
+		printf("Car spd:%.1f km/h %.2f m/s air spd:%.2f m/s spd2:%.2f m2/s2\n", car->DynGC.vel.x*3.6f, car->DynGC.vel.x, sqrt(car->airSpeed2), car->airSpeed2);
+		printf("Car x:%.3f m z:%.3f m r:%.3f m zr:%.3f m\n", car->statGC.x, car->statGC.z, RideHeightRear, car->statGC.z + RideHeightRear);
+		
+		printf("Mass:%.0f kg fuel:%.2f kg total: %.2f kg / %.2f N\n", car->mass, car->fuel, MassTotal, MassTotal*G);
+		printf("Mass:%.2f kg Mass:%.2f kg Delta:%.5f kg\n", MassTotal, MassTotal2, MassTotal - MassTotal2);
+
+		printf("Ride height factor:%.3f\n", hm);
+
+		printf("Wheel f x:%.3f m z:%.3f m\n", car->wheel[0].staticPos.x, car->wheel[0].staticPos.z);
+		printf("Wheel r x:%.3f m z:%.3f m\n", car->wheel[2].staticPos.x, car->wheel[2].staticPos.z);
+
+		printf("Wheel f - RH:%.3f m ", RideHeightFront);
+		printf("Fx:%.3f Fz:%.3f N\n", car->wheel[0].forces.x + car->wheel[1].forces.x, MeasurementFront);
+		printf("Wheel r - RH:%.3f m ", RideHeightRear);
+		printf("Fx:%.3f Fz:%.3f N\n", car->wheel[2].forces.x + car->wheel[3].forces.x, MeasurementRear);
+
+		printf("Wheel f - Tq:%.3f Nm\n", car->wheel[0].torques.y + car->wheel[1].torques.y);
+		printf("Wheel r - Tq:%.3f Nm\n", car->wheel[2].torques.y + car->wheel[3].torques.y);
+		
+		printf("Wing f x:%.3f m z:%.3f m\n", car->wing[0].staticPos.x,car->wing[0].staticPos.z);
+		printf("Wing r x:%.3f m z:%.3f m\n", car->wing[1].staticPos.x,car->wing[1].staticPos.z);
+
+		tdble WFxf = (tdble) (car->wing[0].forces.x);
+		tdble WFzf = (tdble) (car->wing[0].forces.z);
+		printf("Wing f Fx:%.3f N Fz:%.3f N Fx:%.3f kg Fz:%.3f kg\n", WFxf, WFzf, WFxf/G, WFzf/G);
+
+		tdble WFxr = (tdble) (car->wing[1].forces.x);
+		tdble WFzr = (tdble) (car->wing[1].forces.z);
+		printf("Wing r Fx:%.3f N Fz:%.3f N Fx:%.3f kg Fz:%.3f kg\n", WFxr, WFzr, WFxr/G, WFzr/G);
+
+		Fzf = (tdble) ((car->aero.lift[0]*G + car->wing[0].forces.z));
+		Fzr = (tdble) ((car->aero.lift[1]*G + car->wing[1].forces.z));
+		tdble AFzf = (tdble) (car->aero.lift[0]*G);
+		tdble AFzr = (tdble) (car->aero.lift[1]*G);
+		printf("Aero Lift  Fzf=%.3f N Fzr=%.3f N Fz:%.3f N\n", AFzf, AFzr, AFzf + AFzr);
+		printf("Aero Wing  Fzf=%.3f N Fzr=%.3f N Fz:%.3f N\n", Fzf-AFzf, Fzr-AFzr, Fzf + Fzr - AFzf - AFzr);
+		printf("Aero Force Fzf=%.3f N Fzr=%.3f N Fz:%.3f N\n", Fzf, Fzr, Fzf + Fzr);
+
+		printf("Aero Drag  Fx:%.3f N\n", car->aero.drag);
+
+		printf("Downforce front:%.3f N\n", MeasurementFront);
+		printf("Downforce rear:%.3f N\n", MeasurementRear);
+		printf("Downforce total:%.3f N\n", MeasurementFront + MeasurementRear);
+
+	}
 }
 
 void
@@ -439,6 +514,8 @@ SimCarUpdate(tCar *car, tSituation * /* s */)
 void
 SimCarUpdate2(tCar *car, tSituation * /* s */)
 {
-    if (SimTelemetry == car->carElt->index) SimTelemetryOut(car);
+    if ((SimTelemetry == car->carElt->index) 
+		|| (car->ctrl->telemetryMode > 0))
+		SimTelemetryOut(car);
 }
 

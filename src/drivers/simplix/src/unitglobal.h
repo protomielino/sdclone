@@ -2,7 +2,7 @@
 // unitglobal.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 2.X
+// A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Global data types and definitions
 // Globale Datentypen und Definitionen
@@ -12,7 +12,7 @@
 // Last changed : 2013.02.16
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.06.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -104,6 +104,7 @@
 #define RTYPE_SIMPLIX_LS2  6					 // Robot type simplix_ls2
 #define RTYPE_SIMPLIX_MP5  7					 // Robot type simplix_mp5
 #define RTYPE_SIMPLIX_LP1  8					 // Robot type simplix_lp1
+#define RTYPE_SIMPLIX_REF  9					 // Robot type simplix_ref
 //==========================================================================*
 
 //==========================================================================*

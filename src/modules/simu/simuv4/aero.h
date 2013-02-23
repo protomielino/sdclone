@@ -29,7 +29,8 @@ typedef struct
     /* static */
     tdble	SCx2;
     tdble	Clift[2];	/* front & rear lift due to body not wings */
-    tdble	Cd;		/* for aspiration */
+    tdble	Cd;		    /* for aspiration */
+    tdble	CdBody;	    /* for aspiration, value without wings, for variable wing angles */
 } tAero;
 
 

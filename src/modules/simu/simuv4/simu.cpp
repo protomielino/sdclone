@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:07:53 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: simu.cpp 4918 2012-09-05 03:58:00Z mungewell $
+    version              : $Id: simu.cpp 3945 2011-10-07 13:38:15Z wdbee $
 
  ***************************************************************************/
 
@@ -62,12 +62,24 @@ ctrlCheck(tCar *car)
     if (isnan(car->ctrl->clutchCmd) || isinf(car->ctrl->clutchCmd)) car->ctrl->clutchCmd = 0;
     if (isnan(car->ctrl->steer) || isinf(car->ctrl->steer)) car->ctrl->steer = 0;
     if (isnan(car->ctrl->gear) || isinf(car->ctrl->gear)) car->ctrl->gear = 0;
+	if (isnan(car->ctrl->wingFrontCmd)) || isinf(car->ctrl->wingFrontCmd)) car->ctrl->wingFrontCmd = 0;
+	if (isnan(car->ctrl->wingRearCmd)) || isinf(car->ctrl->wingRearCmd)) car->ctrl->wingRearCmd = 0;
+	if (isnan(car->ctrl->brakeFrontLeftCmd)) || isinf(car->ctrl->brakeFrontLeftCmd)) car->ctrl->brakeFrontLeftCmd = 0;
+	if (isnan(car->ctrl->brakeFrontRightCmd)) || isinf(car->ctrl->brakeFrontRightCmd)) car->ctrl->brakeFrontRightCmd = 0;
+	if (isnan(car->ctrl->brakeRearLeftCmd)) || isinf(car->ctrl->brakeRearLeftCmd)) car->ctrl->brakeRearLeftCmd = 0;
+	if (isnan(car->ctrl->brakeRearRightCmd)) || isinf(car->ctrl->brakeRearRightCmd)) car->ctrl->brakeRearRightCmd = 0;
 #else
     if (isnan(car->ctrl->accelCmd)) car->ctrl->accelCmd = 0;
     if (isnan(car->ctrl->brakeCmd)) car->ctrl->brakeCmd = 0;
     if (isnan(car->ctrl->clutchCmd)) car->ctrl->clutchCmd = 0;
     if (isnan(car->ctrl->steer)) car->ctrl->steer = 0;
     if (isnan(car->ctrl->gear)) car->ctrl->gear = 0;
+	if (isnan(car->ctrl->wingFrontCmd)) car->ctrl->wingFrontCmd = 0;
+	if (isnan(car->ctrl->wingRearCmd)) car->ctrl->wingRearCmd = 0;
+	if (isnan(car->ctrl->brakeFrontLeftCmd)) car->ctrl->brakeFrontLeftCmd = 0;
+	if (isnan(car->ctrl->brakeFrontRightCmd)) car->ctrl->brakeFrontRightCmd = 0;
+	if (isnan(car->ctrl->brakeRearLeftCmd)) car->ctrl->brakeRearLeftCmd = 0;
+	if (isnan(car->ctrl->brakeRearRightCmd)) car->ctrl->brakeRearRightCmd = 0;
 #endif
 
     /* When the car is broken try to send it on the track side */
@@ -120,6 +132,19 @@ ctrlCheck(tCar *car)
     }
 
     clutch->transferValue = 1.0f - car->ctrl->clutchCmd;
+
+	if (car->ctrl->wingFrontCmd > (float) (PI_2)) {
+	car->ctrl->wingFrontCmd = (float) (PI_2);
+    } else if (car->ctrl->wingFrontCmd < 0.0) {
+	car->ctrl->wingFrontCmd = 0.0;
+    }
+
+	if (car->ctrl->wingRearCmd > (float) (PI_2)) {
+	car->ctrl->wingRearCmd = (float) (PI_2);
+    } else if (car->ctrl->wingRearCmd < 0.0) {
+	car->ctrl->wingRearCmd = 0.0;
+    }
+
 }
 
 /* Initial configuration */
@@ -344,10 +369,8 @@ SimUpdate(tSituation *s, double deltaTime)
 			}
 		}
 	
-		if (s->_raceState & RM_RACE_PRESTART && 
-				(car->carElt->_skillLevel < 3 || !(s->_features & RM_FEATURE_PENALTIES))) {
-			car->ctrl->brakeCmd = 1.0;
-			car->ctrl->clutchCmd = 1.0;
+		if (s->_raceState & RM_RACE_PRESTART) {
+			car->ctrl->gear = 0;
 		}
 	
 		CHECK(car);
@@ -360,7 +383,7 @@ SimUpdate(tSituation *s, double deltaTime)
 		SimEngineUpdateTq(car);
 		CHECK(car);
 	
-		if (!(s->_raceState & RM_RACE_PRESTART) || car->carElt->_skillLevel == 3) {
+		if (!(s->_raceState & RM_RACE_PRESTART)) {
 	
 			SimCarUpdateWheelPos(car);
 			CHECK(car);
@@ -391,7 +414,6 @@ SimUpdate(tSituation *s, double deltaTime)
 			SimCarUpdate(car, s);
 			CHECK(car);
 		} else {
-			SimTransmissionUpdate(car);
 			SimEngineUpdateRpm(car, 0.0);
 		}
 	}
