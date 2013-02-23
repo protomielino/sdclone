@@ -43,6 +43,7 @@
 #include <sys/param.h>
 #endif // WIN32
 
+#include "portability.h"
 #include "tgf.hpp"
 
 
