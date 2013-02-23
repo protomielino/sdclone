@@ -66,7 +66,7 @@ class TGFCLIENT_API GfglFeatures
 	// Check best supported OpenGL features, and store report to the config file
 	// (default = GFSCR_CONF_FILE). May restart the game.
 	bool checkBestSupport(int nWidth, int nHeight, int nDepth,
-						  bool bAlpha, bool bFullScreen, bool bBump, bool bStereo, void* hparmConfig = 0);
+                          bool bAlpha, bool bFullScreen, bool bBump, bool bStereo,int nAniFilt, void* hparmConfig = 0);
 
 	// Detect standard supported features. Don't restart the game.
 	// Precondiftion: SDL_setVideoMode(...)
@@ -99,7 +99,7 @@ class TGFCLIENT_API GfglFeatures
 		TextureNonPowerOf2, // GL_ARB_texture_non_power_of_two, in case mipmapping needed.
 		MultiTexturing, // GL_ARB_multitexture
 		MultiSampling, // GL_ARB_multisample
-		BumpMapping,   // Bump Mapping	
+        BumpMapping,   // Bump Mapping
 		StereoVision  // StereoVision
 	};
 	void select(EFeatureBool eFeature, bool bSelected);
@@ -113,7 +113,8 @@ class TGFCLIENT_API GfglFeatures
 		ColorDepth, AlphaDepth,
 		TextureMaxSize,
 		MultiTexturingUnits,
-		MultiSamplingSamples
+        MultiSamplingSamples,
+        AnisotropicFiltering
 	};
 	void select(EFeatureInt eFeature, int nSelectedValue);
 	int getSelected(EFeatureInt eFeature) const;
@@ -128,14 +129,14 @@ class TGFCLIENT_API GfglFeatures
 	GfglFeatures();
 
 	// Update supported OpenGL features according to the given frame buffer specs.
-	bool detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
-						   bool& bAlpha, bool& bBump, bool& bStereo, bool& bFullScreen);
+    bool detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
+                           bool& bAlpha, bool& bBump, bool& bStereo, bool& bFullScreen, int& nAniFilt);
 
 	bool loadSupport(int &nWidth, int &nHeight, int &nDepth,
-					 bool &bAlpha, bool &bFullScreen, bool &bBump, bool &bStereo, void* hparmConfig = 0);
+                     bool &bAlpha, bool &bFullScreen, bool &bBump, bool &bStereo, int &nAniFilt, void* hparmConfig = 0);
 
 	void storeSupport(int nWidth, int nHeight, int nDepth,
-					  bool bAlpha, bool bFullScreen, bool bBump, bool bStereo, void* hparmConfig = 0);
+                      bool bAlpha, bool bFullScreen, bool bBump, bool bStereo,int nAniFilt, void* hparmConfig = 0);
 
 	static void* openConfigFile();
 	static void closeConfigFile(void* hparmConfig, bool bWrite = false);

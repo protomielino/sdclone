@@ -109,6 +109,8 @@ cgrMultiTexState* cgrStateFactory::getMultiTexState(cgrMultiTexState::tfnTexSche
 */
 
 
+
+
 // SGI texture loading function.
 bool grLoadSGI(const char *fname, ssgTextureInfo* info)
 {
@@ -222,6 +224,8 @@ cgrSGIHeader::cgrSGIHeader(const char *fname, ssgTextureInfo* info)
 
 bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, int mipmap)
 {
+
+
 	if (!((xsize & (xsize-1))==0) || !((ysize & (ysize-1))==0)) {
 		ulSetError ( UL_WARNING, "Map is not a power-of-two in size!" ) ;
     	return false ;
@@ -380,6 +384,7 @@ bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, int mipmap)
 										GL_RGBA,
 								GL_UNSIGNED_BYTE, (GLvoid *) texels[i] ) ;
 
+
 			/*int compressed;
 			glGetTexLevelParameteriv(GL_TEXTURE_2D, map_level, GL_TEXTURE_COMPRESSED_ARB, &compressed);
 			if (compressed == GL_TRUE) {
@@ -396,6 +401,32 @@ bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, int mipmap)
 	}
 
 	return true;
+}
+
+void doAnisotropicFiltering(){
+    int aniS;
+    float aniD;
+
+    if(GfglFeatures::self().getSupported(GfglFeatures::AnisotropicFiltering)!=GfglFeatures::InvalidInt)
+    {
+        aniS = GfglFeatures::self().getSelected(GfglFeatures::AnisotropicFiltering);
+
+        GLfloat fLargest;
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &fLargest);
+
+        if(aniS ==1)
+        {
+            aniD = fLargest/2;
+        }
+        if(aniS==2)
+        {
+            aniD = fLargest;
+        }
+
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, aniD);/**/
+
+
+    }
 }
 
 bool grLoadPngTexture (const char *fname, ssgTextureInfo* info)
@@ -435,7 +466,11 @@ bool grLoadPngTexture (const char *fname, ssgTextureInfo* info)
 // 	tex = tex2;
 // #endif // WIN32
 
-	return grMakeMipMaps(tex, w, h, 4, mipmap) == TRUE ? true : false;
+    bool res = grMakeMipMaps(tex, w, h, 4, mipmap) == TRUE ? true : false;
+
+   doAnisotropicFiltering();
+
+    return res;
 }
 
 bool grLoadJpegTexture (const char *fname, ssgTextureInfo* info)
@@ -462,5 +497,10 @@ bool grLoadJpegTexture (const char *fname, ssgTextureInfo* info)
 
 	mipmap = doMipMap(fname, mipmap);
 
-	return grMakeMipMaps(tex, w, h, 4, mipmap) == TRUE ? true : false;
+
+    bool res = grMakeMipMaps(tex, w, h, 4, mipmap) == TRUE ? true : false;
+
+    doAnisotropicFiltering();
+
+    return res;
 }

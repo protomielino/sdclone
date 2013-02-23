@@ -93,8 +93,8 @@ static void setupOpenGLFeatures(void)
 	// Don't do it twice.
     if (bInitialized)
 		return;
-	
-	// Multi-texturing.
+
+    // Multi-texturing.
 	grMaxTextureUnits = 1;
 	if (GfglFeatures::self().isSelected(GfglFeatures::MultiTexturing))
 	{

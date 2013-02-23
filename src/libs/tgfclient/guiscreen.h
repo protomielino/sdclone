@@ -140,6 +140,12 @@
 #define GFSCR_ATT_STEREOVISION_ENABLED	"enabled"
 #define GFSCR_ATT_STEREOVISION_DISABLED	"disabled"
 
+#define GFSCR_ATT_ANISOTROPICFILTERING  "anisotropic filtering"
+#define GFSCR_ATT_ANISOTROPICFILTERING_HIGH  "high"
+#define GFSCR_ATT_ANISOTROPICFILTERING_MEDIUM  "medium"
+#define GFSCR_ATT_ANISOTROPICFILTERING_DISABLED  "disabled"
+
+
 #define GFSCR_ATT_MULTISAMPLINGSAMPLES		"multi-sampling samples"
 
 // Open GL auto-detected features

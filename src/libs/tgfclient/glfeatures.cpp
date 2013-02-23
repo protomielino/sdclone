@@ -177,11 +177,17 @@ void GfglFeatures::detectStandardSupport()
 		&& gfglIsOpenGLExtensionSupported("GL_ARB_imaging");
 	
 	_mapSupportedBool[BumpMapping] = bValue;
+
+
+    // 10) Anisotropic filtrering
+    bValue = gfglIsOpenGLExtensionSupported("GL_EXT_texture_filter_anisotropic");
+    _mapSupportedInt[AnisotropicFiltering] = bValue?2:InvalidInt;
+
 }
 
 // Best supported features detection for the given specs of the frame buffer.
 bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
-									 bool& bAlpha, bool& bFullScreen, bool& bBumpMapping, bool& bStereoVision)
+                                     bool& bAlpha, bool& bFullScreen, bool& bBumpMapping, bool& bStereoVision, int &nAniFilt)
 {
 	GfLogInfo("Detecting best supported features for a %dx%dx%d%s frame buffer.\n",
 			  nWidth, nHeight, nDepth, bFullScreen ? " full-screen" : "");
@@ -335,7 +341,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 }
 
 bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
-							   bool &bAlpha, bool &bFullScreen, bool &bBump, bool &bStereo, void* hparmConfig)
+                               bool &bAlpha, bool &bFullScreen, bool &bBump, bool &bStereo, int &nAniFilt,void* hparmConfig)
 {
 	// Clear support data.
 	_mapSupportedBool.clear();
@@ -351,6 +357,8 @@ bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
 		(int)GfParmGetNum(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_WIN_Y, pszNoUnit, 0);
     nDepth =
 		(int)GfParmGetNum(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_BPP, pszNoUnit, 0);
+    nAniFilt =
+        (int)GfParmGetNum(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_ANISOTROPICFILTERING, pszNoUnit, 0);
     bAlpha =
 		std::string(GfParmGetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_ALPHACHANNEL, GFSCR_VAL_NO))
 		== GFSCR_VAL_YES;
@@ -473,10 +481,18 @@ bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
 	// 11) Bump Mapping.
 	const std::string strBumpMapping =
 		GfParmGetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_BUMPMAPPING, "");
-	if (strTexComp == GFSCR_VAL_YES)
+    if (strTexComp == GFSCR_VAL_YES) //strTexComp ? Bug ?
 		_mapSupportedBool[BumpMapping] = true;
 	else if (strTexComp == GFSCR_VAL_NO)
 		_mapSupportedBool[BumpMapping] = false;
+
+    // 11) Anisotropic Filtering.
+    const int nAF =
+        (int)GfParmGetNum(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_ANISOTROPICFILTERING,
+                          pszNoUnit, (tdble)0);
+    if (nMaxTexSize > 0)
+        _mapSupportedInt[AnisotropicFiltering] =nAF;
+
 	
 	// Close config file if we open it.
 	if (!hparmConfig)
@@ -489,7 +505,7 @@ bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
 }
 
 void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
-								bool bAlpha, bool bFullScreen, bool bBump, bool bStereo, void* hparmConfig)
+                                bool bAlpha, bool bFullScreen, bool bBump, bool bStereo, int nAniFilt, void* hparmConfig)
 {
 	// Open the config file if not already done.
 	void* hparm = hparmConfig ? hparmConfig : openConfigFile();
@@ -514,7 +530,9 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 					 (tdble)nHeight);
 		GfParmSetNum(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_BPP, pszNoUnit,
 					 (tdble)nDepth);
-		GfParmSetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_ALPHACHANNEL,
+        GfParmSetNum(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_ANISOTROPICFILTERING, pszNoUnit,
+                     (tdble)nAniFilt);
+        GfParmSetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_ALPHACHANNEL,
 					 bAlpha ? GFSCR_VAL_YES : GFSCR_VAL_NO);
 		GfParmSetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_FSCR,
 					 bFullScreen ? GFSCR_VAL_YES : GFSCR_VAL_NO);
@@ -588,6 +606,13 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 		GfParmSetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_BUMPMAPPING,
 					 isSupported(BumpMapping) ? GFSCR_VAL_YES : GFSCR_VAL_NO);
 
+        // 12) Aniso Filtering
+        if (getSupported(AnisotropicFiltering) != InvalidInt)
+            GfParmSetNum(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_ANISOTROPICFILTERING, pszNoUnit,
+                         (tdble)getSupported(AnisotropicFiltering));
+        else
+            GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_ANISOTROPICFILTERING);
+
 	}		
 	
 	// Write new params to config file.
@@ -602,23 +627,23 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 }
 
 bool GfglFeatures::checkBestSupport(int nWidth, int nHeight, int nDepth,
-									bool bAlpha, bool bFullScreen, bool bBump, bool bStereo, void* hparmConfig)
+                                    bool bAlpha, bool bFullScreen, bool bBump, bool bStereo,int nAniFilt, void* hparmConfig)
 {
 	// Open the config file if not already done.
 	void* hparm = hparmConfig ? hparmConfig : openConfigFile();
 
 	// Get the frame buffer specs that are associated with the detected
 	// Open GL features in the config file, if any.
-	int nDetWidth, nDetHeight, nDetDepth;
+    int nDetWidth, nDetHeight, nDetDepth, nDetAni;
 	bool bDetFullScreen, bDetAlpha, bDetBump, bDetStereo;
 	bool bPrevSupportFound =
-		loadSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetBump, bDetStereo, hparm);
+        loadSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetBump, bDetStereo,nDetAni, hparm);
 
 	// Compare with the requested frame buffer specs
 	// and run a new supported feature detection if any diffference.
 	bool bSupportFound = true;
 	if (!bPrevSupportFound || nWidth != nDetWidth || nHeight != nDetHeight || nDepth != nDetDepth
-		|| bAlpha != bDetAlpha || bFullScreen != bDetFullScreen || bStereo != bDetStereo || bBump != bDetBump)
+        || bAlpha != bDetAlpha || bFullScreen != bDetFullScreen || bStereo != bDetStereo || bBump != bDetBump || nAniFilt!= nDetAni)
 	{
 		nDetWidth = nWidth;
 		nDetHeight = nHeight;
@@ -627,11 +652,12 @@ bool GfglFeatures::checkBestSupport(int nWidth, int nHeight, int nDepth,
 		bDetAlpha = bAlpha;
 		bDetStereo = bStereo;
 		bDetBump = bBump;
+        nDetAni = nAniFilt;
 		bSupportFound =
-			detectBestSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetBump, bDetStereo);
+            detectBestSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetBump, bDetStereo, nDetAni);
 
 		// Store support data in any case.
-		storeSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetBump, bDetStereo, hparm);
+        storeSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetBump, bDetStereo,nDetAni, hparm);
 
 		// If frame buffer specs supported, update relevant user settings and restart.
 		if (bSupportFound)
@@ -724,6 +750,8 @@ void GfglFeatures::dumpSupport() const
 			  isSupported(StereoVision) ? "Yes" : "No");
 	GfLogInfo("  Bump Mapping            : %s\n",
 			  isSupported(BumpMapping) ? "Yes" : "No");
+    GfLogInfo("  Anisotropic Filtering   : %d\n",
+              getSupported(AnisotropicFiltering));
 }
 
 // Load the selected OpenGL features from the config file.
@@ -809,6 +837,9 @@ void GfglFeatures::loadSelection(void* hparmConfig)
 									GFSCR_ATT_BUMPMAPPING_ENABLED))
 		   == GFSCR_ATT_BUMPMAPPING_ENABLED;
 
+    // 12) Anisotropic Filtering : load from config file.
+    _mapSelectedInt[AnisotropicFiltering] = (int)GfParmGetNum(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_ANISOTROPICFILTERING,
+                                    pszNoUnit, (tdble)getSupported(AnisotropicFiltering));
 	// Close config file if we open it.
 	if (!hparmConfig)
 		closeConfigFile(hparm);
@@ -880,6 +911,12 @@ void GfglFeatures::storeSelection(void* hparmConfig) const
 	GfParmSetStr(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_BUMPMAPPING,
 				 isSelected(BumpMapping)
 				 ? GFSCR_ATT_BUMPMAPPING_ENABLED : GFSCR_ATT_BUMPMAPPING_DISABLED);
+
+    if (getSupported(AnisotropicFiltering) != InvalidInt)
+        GfParmSetNum(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_ANISOTROPICFILTERING, pszNoUnit,
+                     (tdble)getSelected(AnisotropicFiltering));
+    else
+        GfParmRemove(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_ANISOTROPICFILTERING);
 	
 	// Write new params to config file.
 	GfParmWriteFile(NULL, hparm, "Screen");
@@ -919,6 +956,8 @@ void GfglFeatures::dumpSelection() const
 	GfLogInfo("\n");
 	GfLogInfo("  Stereo vision           : %s\n", isSelected(StereoVision) ? "On" : "Off");
 	GfLogInfo("  Bump Mapping            : %s\n", isSelected(BumpMapping) ? "On" : "Off");
+    GfLogInfo("  Anisotropic Filtering   : %d\n",
+              getSupported(AnisotropicFiltering));
 }
 
 // Bool features management.

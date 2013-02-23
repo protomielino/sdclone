@@ -76,6 +76,18 @@ static int MultiTextureLabelId;
 static int MultiTextureLeftButtonId;
 static int MultiTextureRightButtonId;
 
+//Anisotropic-filtering
+static const char *AAnisotropicFilteringTexts[] =
+    {GFSCR_ATT_ANISOTROPICFILTERING_DISABLED, GFSCR_ATT_ANISOTROPICFILTERING_MEDIUM,GFSCR_ATT_ANISOTROPICFILTERING_HIGH};
+static const int NAnisotropicFiltering =
+    sizeof(AAnisotropicFilteringTexts) / sizeof(AAnisotropicFilteringTexts[0]);
+static int NCurAnisotropicFilteringIndex = 0;
+
+static int AnisotropicFilteringLabelId;
+static int AnisotropicFilteringLeftButtonId;
+static int AnisotropicFilteringRightButtonId;
+
+
 // Multi-sampling (initialized in OpenGLMenuInit).
 static std::vector<std::string> VecMultiSampleTexts;
 static int NMultiSamples = 0;
@@ -113,6 +125,9 @@ static void onAccept(void *)
 	GfglFeatures::self().select(GfglFeatures::BumpMapping, strcmp(ABumpMappingTexts[NCurBumpMappingIndex],
 										GFSCR_ATT_BUMPMAPPING_ENABLED) ? false : true);
 
+
+    GfglFeatures::self().select(GfglFeatures::AnisotropicFiltering, NCurAnisotropicFilteringIndex);
+
 	// Store settings from the GL features layer to the screen.xml file.
 	GfglFeatures::self().storeSelection();
 	
@@ -121,7 +136,7 @@ static void onAccept(void *)
 
 	// But actually restart the game if the multi-sampling feature settings changed
 	// (we can't change this without re-initializing the video mode).
-	if (GfglFeatures::self().isSelected(GfglFeatures::MultiSampling) != BMultiSamplingWasSelected
+    if (GfglFeatures::self().isSelected(GfglFeatures::MultiSampling) != BMultiSamplingWasSelected
 		|| GfglFeatures::self().getSelected(GfglFeatures::MultiSamplingSamples) != BPrevMultiSamplingSamples)
 	{
 		// Shutdown the user interface.
@@ -129,7 +144,7 @@ static void onAccept(void *)
 		
 		// Restart the game.
 		GfuiApp().restart();
-	}
+    }
 }
 
 // Toggle texture compression state enabled/disabled.
@@ -174,11 +189,18 @@ static void changeMaxTextureSizeState(void *vp)
 	GfuiLabelSetText(ScrHandle, MaxTextureSizeLabelId, valuebuf);
 }
 
-// Toggle texture compression state enabled/disabled.
+// Toggle bumpmapping state enabled/disabled.
 static void changeBumpMappingState(void *vp)
 {
 	NCurBumpMappingIndex = (NCurBumpMappingIndex + (int)(long)vp + NBumpMapping) % NBumpMapping;
 	GfuiLabelSetText(ScrHandle, BumpMappingLabelId, ABumpMappingTexts[NCurBumpMappingIndex]);
+}
+
+// Toggle anisotropic filtering state enabled/disabled.
+static void changeAnisotropicFilteringState(void *vp)
+{
+    NCurAnisotropicFilteringIndex = (NCurAnisotropicFilteringIndex + (int)(long)vp + NAnisotropicFiltering) % NAnisotropicFiltering;
+    GfuiLabelSetText(ScrHandle, AnisotropicFilteringLabelId, AAnisotropicFilteringTexts[NCurAnisotropicFilteringIndex]);
 }
 
 
@@ -342,6 +364,23 @@ static void onActivate(void * /* dummy */)
 		GfuiEnable(ScrHandle, BumpMappingRightButtonId, GFUI_DISABLE);
 		GfuiLabelSetText(ScrHandle, BumpMappingLabelId, "Not supported");
 	}
+
+    // Initialize current state and GUI from the GL features layer.
+    // 7) Anisotropic Filtering.
+    int ani_sup= GfglFeatures::self().getSupported(GfglFeatures::AnisotropicFiltering);
+    if (ani_sup!=GfglFeatures::InvalidInt)
+    {
+        NCurAnisotropicFilteringIndex =
+                GfglFeatures::self().getSelected(GfglFeatures::AnisotropicFiltering);
+        GfuiLabelSetText(ScrHandle, AnisotropicFilteringLabelId,
+                         AAnisotropicFilteringTexts[NCurAnisotropicFilteringIndex]);
+    }
+    else
+    {
+        GfuiEnable(ScrHandle, AnisotropicFilteringLeftButtonId, GFUI_DISABLE);
+        GfuiEnable(ScrHandle, AnisotropicFilteringRightButtonId, GFUI_DISABLE);
+        GfuiLabelSetText(ScrHandle, AnisotropicFilteringLabelId, "Not supported");
+    }
 }
 
 // OpenGL menu
@@ -399,6 +438,16 @@ void* OpenGLMenuInit(void *prevMenu)
 		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "BumpMappingRightArrowButton", (void*)+1,
 							changeBumpMappingState);
 	BumpMappingLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"BumpMappingLabel");
+
+    // Anisotropic Filtering.
+    AnisotropicFilteringLeftButtonId =
+        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "AnisotropicFilteringLeftArrowButton", (void*)-1,
+                            changeAnisotropicFilteringState);
+    AnisotropicFilteringRightButtonId =
+        GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "AnisotropicFilteringRightArrowButton", (void*)+1,
+                            changeAnisotropicFilteringState);
+    AnisotropicFilteringLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"AnisotropicFilteringLabel");
+
 
 	GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"ApplyButton",NULL, onAccept);
 	GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"CancelButton",prevMenu, GfuiScreenActivate);
