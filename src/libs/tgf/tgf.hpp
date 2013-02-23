@@ -264,6 +264,9 @@ class TGF_API GfApplication
 		bool bFound;
 		std::string strValue;
 	public:
+		Option()
+		{
+		}
 		Option(const std::string& strShortName_, const std::string& strLongName_,
 			   bool bHasValue_ = false)
 			: strShortName(strShortName_), strLongName(strLongName_), bHasValue(bHasValue_),

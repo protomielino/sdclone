@@ -463,7 +463,7 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
 {
     const char* name;
     int	src, dst;
-    GfDriver *pDriver;
+    GfDriver *pDriver = 0;
     bool bSelect;
 
     // If the selected driver is in the Candidate scroll-list,
