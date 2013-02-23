@@ -1,10 +1,11 @@
+INCLUDE("../../../../cmake/macros.cmake")
+
 IF(NOT OPTION_3RDPARTY_SOLID)
-
-	ADD_SUBDIRECTORY(SOLID-2.0)
-
+	# BEFORE in order to prevent Windows 3rdParty/include/SOLID from taking the flag.
+	INCLUDE_DIRECTORIES(BEFORE ../simuv2.1/SOLID-2.0/include)
+ELSE(NOT OPTION_3RDPARTY_SOLID)
+	ADD_SOLID_INCLUDEDIR()
 ENDIF(NOT OPTION_3RDPARTY_SOLID)
-
-INCLUDE(../../../../cmake/macros.cmake)
 
 ADD_SDLIB_INCLUDEDIR(portability)
 
