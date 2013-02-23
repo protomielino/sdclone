@@ -42,7 +42,10 @@
 #include "genparoptv1.h"
 
 
-// The singleton.
+// The "Optim" logger instance (really initialised in GenParOptV1 constructor).
+GfLogger* RePLogOptim = 0;
+
+// The module singleton.
 GenParOptV1* GenParOptV1::_pSelf = 0;
 
 int openGfModule(const char* pszShLibName, void* hShLibHandle)
@@ -82,6 +85,8 @@ GenParOptV1::GenParOptV1(const std::string& strShLibName, void* hShLibHandle)
 : GfModule(strShLibName, hShLibHandle),
   _piUserItf(0), _piTrkLoader(0), _piPhysEngine(0), _pRace(new GfRace())
 {
+	// Initialise the "Optim" logger instance.
+	RePLogOptim = GfLogger::instance("Optim");
 }
 
 // Implementation of IRaceEngine.

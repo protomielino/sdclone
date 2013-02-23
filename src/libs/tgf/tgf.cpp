@@ -39,7 +39,7 @@
 
 #include <portability.h>
 
-#include "tgf.h"
+#include "tgf.hpp"
 
 
 extern void gfTraceInit(bool bWithLogging = true);

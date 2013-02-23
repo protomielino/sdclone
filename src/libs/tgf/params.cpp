@@ -2132,7 +2132,7 @@ GfParmSI2Unit (const char *unit, tdble val)
 
 
 
-/** Get the parameters name
+/** Get the name of the parameters (value of the "name" attribute of the root element).
     @ingroup	paramsdata
     @param	handle	Handle on the parameters
     @return	Name
@@ -2150,7 +2150,7 @@ GfParmGetName (void *handle)
     return parmHandle->conf->name;
 }
 
-/** Get the parameters name
+/** Get the major version of the parameters (value of the "version" attribute of the root element).
     @ingroup	paramsdata
     @param	handle	Handle on the parameters
     @return	major version number
@@ -2168,7 +2168,7 @@ GfParmGetMajorVersion (void *handle)
     return parmHandle->conf->major;
 }
 
-/** Get the parameters name
+/** Get the minor version of the parameters (value of the "version" attribute of the root element).
     @ingroup	paramsdata
     @param	handle	Handle on the parameters
     @return	Name
@@ -2267,12 +2267,10 @@ GfParmExistsSection (void *handle, const char *path)
 	return section != 0 ? 1 : 0;
 }
 
-
-
-/** Seek the first section element of a list.
+/** Seek the first sub-section element of a section.
     @ingroup	paramslist
     @param	handle	handle of parameters
-    @param	path	list path
+    @param	path	section path
     @return	0 Ok
     		<br>-1 Failed
     @see	GfParmListSeekNext
@@ -2301,10 +2299,10 @@ GfParmListSeekFirst (void *handle, const char *path)
     return 0;
 }
 
-/** Go to the next section element in the current list.
+/** Go to the next sub-section element in the current section.
     @ingroup	paramslist
     @param	handle	handle of parameters
-    @param	path	path of list
+    @param	path	path of the current section
     @return	0 Ok
     		<br>1 End of list reached
     		<br>-1 Failed
@@ -2494,15 +2492,14 @@ GfParmListClean (void *handle, const char *path)
 }
 
 
-/** Get the current element name.
+/** Get the name of the current sub-section of a section .
     @ingroup	paramslist
     @param	handle	handle of parameters
-    @param	path	path of list
-    @return	Name of the current element in the list
+    @param	path	path of the section
+    @return	Name of the current sub-section in the section
 		<br>NULL if failed
     @see	GfParmListSeekFirst	
     @see	GfParmListSeekNext
-    @note	String MUST be released by called.
  */
 char *
 GfParmListGetCurEltName (void *handle, const char *path)
@@ -2524,17 +2521,13 @@ GfParmListGetCurEltName (void *handle, const char *path)
 		return NULL;
 	}
 
-	//printf("WARNING: EVENTUALLY STRDUP ON USER SIDE REQUIRED!");
-
 	s = strrchr (section->curSubSection->fullName, '/');
 	if (s) {
 		s++;
 		return s;
-		//return strdup (s);
 	}
 
 	return section->curSubSection->fullName;
-	//return strdup (section->curSubSection->fullName);
 }
 
 

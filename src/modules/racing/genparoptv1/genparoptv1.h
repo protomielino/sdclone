@@ -165,4 +165,9 @@ inline extern ITrackLoader& ReTrackLoader()
 	return GenParOptV1::self().trackLoader();
 }
 				  
+// The "Optim" logger instance.
+extern GfLogger* RePLogOptim;
+#define ReLogOptim (*RePLogOptim)
+
+
 #endif /* _GENPAROPTV1_H_ */ 

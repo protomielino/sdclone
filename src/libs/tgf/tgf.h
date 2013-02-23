@@ -1,10 +1,10 @@
 /***************************************************************************
-                    tgf.h -- Interface file for The Gaming Framework                                    
+                    tgf.h -- Interface file for The Gaming Framework
                              -------------------                                         
     created              : Fri Aug 13 22:32:14 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -434,17 +434,21 @@ TGF_API void GfParmShutdown (void);
 
 /********************************************************************************
  * Logging / Tracing Interface                                                  *
- *  - Write formated string messages at run-time to the log stream,             *
- *    with automatic prepending of current time and trace level                 *
- *    (Ex: 12:27:35.267 Debug  My formated message)                             *
+ *  - Multiple loggers, enabling to separate and filter traces as desired,      *
+ *  - Write formated string messages at run-time to a log stream,               *
+ *    with automatic prepending of current time, logger name and trace level    *
+ *    (Ex: 12:27:35.267 MyLogger Debug  My formated message)                    *
  *  - GfLogFatal also exits the program after logging the message               *
  *  - Messages are given an integer "level" = "criticity",                      *
  *    (0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ...)              *
- *  - Messages are actually logged into the stream only if their level          *
+ *  - Messages are actually logged into the traget stream only if their level   *
  *    is lower than the current threshold,                                      *
- *  - Default stream is stderr, but it can be changed at run-time to any FILE*, *
+ *  - Default stream is stderr, but it can be changed at startup or at run-time *
+ *    to any FILE*, or any file from its path-name                              *
  *  - Default level threshold is #defined at compile time through TRACE_LEVEL,  *
- *    but it can be changed at run-time to any other level.                     *
+ *    but it can be changed at startup or at run-time to any other level.       *
+ *  - Each logger can be configured at startup through an XML file :            *
+ *    <user settings>/config/logging.xml (see source in data/config)            *
  ********************************************************************************/
 
 //****************************************
@@ -454,8 +458,8 @@ class TGF_API GfLogger
 {
  public:
 
-	//! Trace level / criticity : enum or integer if > eDebug. Temporary eOptim.
-	enum { eFatal = 0, eOptim, eError, eWarning, eInfo, eTrace, eDebug };
+	//! Trace level / criticity : enum or integer if > eDebug.
+	enum { eFatal = 0, eError, eWarning, eInfo, eTrace, eDebug };
 
 	//! Destructor.
 	virtual ~GfLogger();
@@ -466,18 +470,17 @@ class TGF_API GfLogger
 	int levelThreshold() const;
 	void setLevelThreshold(int nLevel);
 
-	enum { eNone=0, eTime=0x01, eLevel=0x02, eLogger=0x04, eAll=eTime|eLevel|eLogger };
+	enum { eNone=0, eTime=0x01, eLogger=0x02, eLevel=0x04, eAll=eTime|eLogger|eLevel };
 	unsigned headerColumns() const;
 	void setHeaderColumns(unsigned bfHdrCols);
 
 	FILE* stream() const;
-	void setStream(FILE* pFile);
+	void setStream(FILE* pFile, bool bLogFileChange=true);
 	void setStream(const std::string& strPathname);
 	
 	//! Tracing functions (name gives the trace level / criticity).
 	void fatal(const char *pszFmt, ...); // Warning : This one calls exit(1) at the end !
 #ifdef TRACE_OUT
-	void optim(const char *pszFmt, ...); // Temporary.
 	void error(const char *pszFmt, ...);
 	void warning(const char *pszFmt, ...);
 	void info(const char *pszFmt, ...);
@@ -501,17 +504,25 @@ class TGF_API GfLogger
 #endif // TRACE_OUT
 
 	//! Instance getter (you can't readily instanciate loggers).
-	static GfLogger& instance(const std::string& name);
+	static GfLogger* instance(const std::string& name);
 	
-	//! Setup the logging system (create and configure loggers from settings).
-    static void setup(bool bWithLogging = true);
+	//! Boot the logging system (only 1 logger set up : GfLogDefault, and with default settings).
+	static void boot(bool bWithLogging = true);
+	
+	//! Complete logging system initialisation (create and / or configure all loggers from XML settings).
+	static void setup();
 	
  protected:
 
 	//! Constructors (protected in order to forbid direct instanciation).
 	GfLogger(); // Forced default constructor, to prevent the compiler to make it public.
-	GfLogger(const std::string& strName, FILE* pFile = stderr, int nLvlThresh = TRACE_LEVEL,
-			 unsigned bfHdrCols = GfLogger::eAll);
+	GfLogger(const std::string& strName, FILE* pFile = stderr,
+			 int nLvlThresh = TRACE_LEVEL, unsigned bfHdrCols = GfLogger::eAll);
+	GfLogger(const std::string& strName, const std::string& strFilename,
+			 int nLvlThresh = TRACE_LEVEL, unsigned bfHdrCols = GfLogger::eAll);
+
+	// Output a line header with required columns, if not level-filtered out.
+	void putLineHeader(int nLevel);
 
  protected:
 
@@ -530,14 +541,17 @@ class TGF_API GfLogger
 	//! Flag indicating if the last logged line ended with a new-line.
 	bool _bNeedsHeader;
 	
-    //! Flag indicating if output is enabled (for all loggers).
-    static bool _bOutputEnabled;
-
-	//! Log level names (index = level enum or int value).
-	static const char* astrLevelNames[];
+	//! Flag indicating if output is enabled (for all loggers).
+	static bool _bOutputEnabled;
 };
 
-// The default logger.
+// The logging system run-time settings file (in GfLocalDir()).
+#define LOGGING_CFG "config/logging.xml"
+
+// The default logger : NEVER use it before GfInit has been called !
+// Note: This implementation through the GfPLogDefault variable initialised in GfLogger::boot()
+//       is more efficient than the following one, through a simple macro :
+//       #define GfLogDefault (*GfLogger::instance("Default"))
 TGF_API extern GfLogger* GfPLogDefault;
 #define GfLogDefault (*GfPLogDefault)
 
@@ -545,9 +559,6 @@ TGF_API extern GfLogger* GfPLogDefault;
 #define GfLogFatal GfLogDefault.fatal
 
 #ifdef TRACE_OUT
-
-// Temporary.
-#define GfLogOpt GfLogDefault.optim
 
 #define GfLogError GfLogDefault.error
 #define GfLogWarning GfLogDefault.warning
@@ -568,9 +579,6 @@ TGF_API extern GfLogger* GfPLogDefault;
 #define GfLogMessage
 #define GfLogSetStream
 #define GfLogSetLevelThreshold
-
-// Temporary.
-#define GfLogOpt
 
 #endif // TRACE_OUT
 
@@ -598,8 +606,8 @@ TGF_API int GfNearestPow2(int x);
 
 typedef struct 
 {
-    int		curNum;
-    tdble	val[GF_MEAN_MAX_VAL+1];
+	int		curNum;
+	tdble	val[GF_MEAN_MAX_VAL+1];
 } tMeanVal;
 
 TGF_API tdble gfMean(tdble v, tMeanVal *pvt, int n, int w);

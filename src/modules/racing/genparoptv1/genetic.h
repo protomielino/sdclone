@@ -336,6 +336,7 @@ class TGeneticParameterTOC
 	bool GetInitialVal;				// Read initial value from setup
 
 };
+
 //==========================================================================*
 
 #endif /* __GENETIC_H__ */

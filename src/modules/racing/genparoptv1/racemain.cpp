@@ -1149,7 +1149,7 @@ ReInitialiseGeneticOptimisation()
 void
 ReImportGeneticParameters()
 {
-	GfLogOpt("\n\nImport Genetic Parameters ...\n\n");
+	ReLogOptim.info("\n\nImport Genetic Parameters ...\n\n");
 
 	// Setup pointer to structure
 	tgenData *Data = &TGeneticParameter::Data;
@@ -1359,10 +1359,10 @@ ReImportGeneticParameters()
 
 	GfParmReleaseHandle(MetaDataFile);
 
-	GfLogOpt("Write parameters to initial xml file\n");
+	ReLogOptim.info("Write parameters to initial xml file\n");
 	GfParmWriteFileSDHeader (Data->XmlFileName, Data->Handle, Data->CarType, Data->AuthorName);
 
-	GfLogOpt("\n... Import Genetic Parameters\n\n");
+	ReLogOptim.info("\n... Import Genetic Parameters\n\n");
 }
 
 //
@@ -1374,13 +1374,13 @@ ReCleanupGeneticOptimisation()
 	if (genOptNeedInit)	// If still needed, ...
 		return true;	// ... we do not have to cleanup 
 
-	GfLogOpt("============================\n");
-	GfLogOpt("Cleanup\n");
+	ReLogOptim.info("============================\n");
+	ReLogOptim.info("Cleanup\n");
 
 	// Setup pointer to structure
 	tgenData *Data = &TGeneticParameter::Data;
 
-	GfLogOpt("Delete parameters\n");
+	ReLogOptim.info("Delete parameters\n");
 	// Free all parameters allocated
 	for (int I = 0; I < Data->NbrOfParam; I++)
 	{
@@ -1391,11 +1391,11 @@ ReCleanupGeneticOptimisation()
 		}
 	}
 
-	GfLogOpt("Delete list of parameters\n");
+	ReLogOptim.info("Delete list of parameters\n");
 	// Free list of pointers allocated
 	delete [] Data->GP;
 
-	GfLogOpt("Delete strings of parts\n");
+	ReLogOptim.info("Delete strings of parts\n");
 	// Free all strings allocated
 	for (int I = 0; I < Data->NbrOfParts; I++)
 	{
@@ -1405,36 +1405,36 @@ ReCleanupGeneticOptimisation()
 			free(Data->Part[I].Subsection);
 	}
 
-	GfLogOpt("Delete list of parts\n");
+	ReLogOptim.info("Delete list of parts\n");
 	delete [] Data->Part;
 
-	GfLogOpt("Release file handle\n");
+	ReLogOptim.info("Release file handle\n");
 	GfParmReleaseHandle(Data->Handle);
 
-	GfLogOpt("Reset need initialisation flag\n");
+	ReLogOptim.info("Reset need initialisation flag\n");
 	genOptNeedInit = true;
 
-	GfLogOpt("Setup path to best setup found\n");
+	ReLogOptim.info("Setup path to best setup found\n");
 	void* Handle = GfParmReadFile(Data->OptFileName, GFPARM_RMODE_REREAD);
 
-	GfLogOpt("Reset fuel control\n");
+	ReLogOptim.info("Reset fuel control\n");
 	GfParmSetNum(Handle, Data->PrivateSection, PRM_FUEL,    
 		(char*) NULL, -1, -1.0, Data->MaxFuel);
 
-	GfLogOpt("Reset optimisation flag for robot\n");
+	ReLogOptim.info("Reset optimisation flag for robot\n");
 	GfParmSetNum(Handle, Data->PrivateSection, PRV_OPTI,    
 		(char*) NULL, 0, 0, 1);
 
-	GfLogOpt("Write parameters to opt file\n");
+	ReLogOptim.info("Write parameters to opt file\n");
 	GfParmWriteFileSDHeader (Data->OptFileName, Handle, Data->CarType, Data->AuthorName);
 
-	GfLogOpt("Write parameters to xml file\n");
+	ReLogOptim.info("Write parameters to xml file\n");
 	GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
 
-	GfLogOpt("Release file handle\n");
+	ReLogOptim.info("Release file handle\n");
 	GfParmReleaseHandle(Handle);
 
-	GfLogOpt("============================\n");
+	ReLogOptim.info("============================\n");
 
 	return false;
 }
@@ -1480,7 +1480,7 @@ SelectParameterAndMutation(tgenData *Data)
 	int P = 0;
 
 	double Scale = Data->Loops * Data->Loops / Data->Scale;
-	GfLogOpt("\nRandom parameter variation scale: %g\n",Scale); 
+	ReLogOptim.info("\nRandom parameter variation scale: %g\n",Scale); 
 
 	// Loop over wanted selections
 	for (int I = 0; I < N; I++)
@@ -1531,7 +1531,7 @@ SelectParameterAndMutation(tgenData *Data)
 					} while (P == -1); // Repeat until valid selection
 				}
 
-//				GfLogOpt("\nParameter: %g (Factor: %g) P: %d\n\n",Parameter,factor,P);
+//				ReLogOptim.info("\nParameter: %g (Factor: %g) P: %d\n\n",Parameter,factor,P);
 
 				// Get parameter from index
 				Param = Data->GP[P];
@@ -1543,29 +1543,29 @@ SelectParameterAndMutation(tgenData *Data)
 				double Change0 = Param->Scale * factor; 
 				Change = ((int) (Param->Round * Change0)/Param->Round);
 
-//				GfLogOpt("%s: (%g<%g<%g): %g * %g = %g -> %g\n",Param->oLabel,Param->Min,Param->Val,Param->Max,Param->Scale,factor,Change0,Change);
+//				ReLogOptim.info("%s: (%g<%g<%g): %g * %g = %g -> %g\n",Param->oLabel,Param->Min,Param->Val,Param->Max,Param->Scale,factor,Change0,Change);
 
 				// Check allowed parameter min-max-range
 				OldValue = Param->Val;
 				Param->Val += (float) Change;
 				if (Param->Val < Param->Min)
 				{	// Use min instead
-//					GfLogOpt("%s: = Min (%g)\n",Param->oLabel,Param->Val);
+//					ReLogOptim.info("%s: = Min (%g)\n",Param->oLabel,Param->Val);
 					Param->Val = Param->Min;
 				}
 				else if (Param->Val > Param->Max)
 				{	// Use max instead
-//					GfLogOpt("%s: = Max (%g)\n",Param->oLabel,Param->Val);
+//					ReLogOptim.info("%s: = Max (%g)\n",Param->oLabel,Param->Val);
 					Param->Val = Param->Max;
 				}
 				if (fabs(OldValue - Param->Val) < 0.00000001) 
 				{	// No change after reading from xml file
-//					GfLogOpt("%s: Change too small %g\n",Param->oLabel,fabs(OldValue - Param->Val));
+//					ReLogOptim.info("%s: Change too small %g\n",Param->oLabel,fabs(OldValue - Param->Val));
 					Change = 0.0;
 				}
 				else
 				{	// Successfully changed parameter
-					GfLogOpt("%s: Val: %g (Change: %g)\n",Param->Label,Param->Val,Change);
+					ReLogOptim.info("%s: Val: %g (Change: %g)\n",Param->Label,Param->Val,Change);
 					Param->Selected = true;
 					Param->Changed += 1;
 					Param->DisplayParameter();
@@ -1610,7 +1610,7 @@ SelectParameterAndMutation(tgenData *Data)
 int
 ReEvolution()
 {
-	GfLogOpt(">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+	ReLogOptim.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
 	/* DEBUG, ONLY FOR WINDOWS
 	// Check memory consumption
@@ -1645,11 +1645,11 @@ ReEvolution()
 		// srand_normal((unsigned)time(NULL));
 
 		// First race was done with the initial parameters to get the reference laptime
-		GfLogOpt("Initial Lap Time : %g\n",TotalLapTime);
+		ReLogOptim.info("Initial Lap Time : %g\n",TotalLapTime);
 
 		// Get range for number of parameters to select for variation
 		Data->MaxSelected = MIN(8,1 + Data->NbrOfParam / 2);
-		GfLogOpt("Nbr. of selected : %d\n",Data->MaxSelected);
+		ReLogOptim.info("Nbr. of selected : %d\n",Data->MaxSelected);
 		if (Data->MaxSelected < 1)
 			assert( 0 );
 
@@ -1661,7 +1661,7 @@ ReEvolution()
 
 		// Count the loops and show the status
 		OptiCounter++;
-		GfLogOpt("Loop %d (Still to do %d loops)\n",OptiCounter,Data->Loops);
+		ReLogOptim.info("Loop %d (Still to do %d loops)\n",OptiCounter,Data->Loops);
 
 		// ... run always
 	}
@@ -1677,7 +1677,7 @@ ReEvolution()
 		if (!Data->First)
 		{
 			// Wow, we got a new best lap time
-			GfLogOpt("New best Lap Time: %g\n",TotalLapTime);
+			ReLogOptim.info("New best Lap Time: %g\n",TotalLapTime);
 		}
 
 		// Push the result data to be reused in case of a back step later
@@ -1690,19 +1690,19 @@ ReEvolution()
 
 		// Write the best so far setup to the opt-file
 		GfParmWriteFileSDHeader (Data->OptFileName, Handle, Data->CarType, Data->AuthorName);
-		GfLogOpt("Stored to .opt\n");
+		ReLogOptim.info("Stored to .opt\n");
 	}
 	else if (0.99 * TotalLapTime < Data->LastWeightedBestLapTime)
 	{
 		// We did not find a better set of parameters but we are not bad.
 		// Let's use the child to start the next search step of optimisation
-		GfLogOpt("Total Lap Time   : %g (Best so far: %g)\n",TotalLapTime,Data->LastWeightedBestLapTime);
+		ReLogOptim.info("Total Lap Time   : %g (Best so far: %g)\n",TotalLapTime,Data->LastWeightedBestLapTime);
 	}            
 	else
 	{
 		// We got a bad result.
 		// Let's use the remote anchestor to start the next search step of optimisation
-		GfLogOpt("Total Lap Time   : %g (Bad!)\n",TotalLapTime);
+		ReLogOptim.info("Total Lap Time   : %g (Bad!)\n",TotalLapTime);
 
 		// Pop the stored result data
 		Data->WeightedBestLapTime = Data->LastWeightedBestLapTime;
@@ -1712,14 +1712,14 @@ ReEvolution()
 		for (int I = 0; I < Data->NbrOfParam; I++)
 			Data->GP[I]->Val = Data->GP[I]->OptVal;
 
-		GfLogOpt("Back to last .opt\n");
-		GfLogOpt("Old Best Lap Time: %g\n",Data->WeightedBestLapTime);
+		ReLogOptim.info("Back to last .opt\n");
+		ReLogOptim.info("Old Best Lap Time: %g\n",Data->WeightedBestLapTime);
 	}
 
 	if (Data->First)
 	{
 		// Run once ...
-		GfLogOpt("\nStart Optimisation\n");
+		ReLogOptim.info("\nStart Optimisation\n");
 		// ... run once
 	}
 
@@ -1759,7 +1759,7 @@ ReEvolution()
 	// Write xml data to file
 	GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
 
-	GfLogOpt("<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+	ReLogOptim.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 	// Reset run once flag
 	Data->First = false;

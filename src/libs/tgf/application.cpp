@@ -23,6 +23,7 @@
 */
 
 #include <cerrno>
+#include <limits>
 #include <iostream>
 
 #ifdef WIN32
@@ -76,8 +77,14 @@ void GfApplication::initialize(bool bLoggingEnabled, int argc, char **argv)
 		for (int i = 0; i < argc; i++)
 			_lstArgs.push_back(argv[i]);
 
-    // Initialize the gaming framework.
-    GfInit(bLoggingEnabled);
+	// Initialize the gaming framework (beware: only GfLogDefault booted).
+	GfInit(bLoggingEnabled);
+
+    // Trace app. information.
+	GfLogInfo("%s %s", _strName.c_str(), _strVersion.c_str());
+	if (!_strDesc.empty())
+		GfLogInfo(" (%s)", _strDesc.c_str());
+	GfLogInfo("\n");
 
     // Register the command line options (to be parsed).
 	registerOption("h", "help", /* nHasValue = */ false);
@@ -309,6 +316,9 @@ bool GfApplication::parseOptions()
 	const char *pszDataDir = 0;
 	const char *pszBinDir = 0;
 
+	int nDefTraceLevel = std::numeric_limits<int>::min();
+	std::string strDefTraceStream;
+	
 	std::list<Option>::const_iterator itOpt;
 	for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
 	{
@@ -351,10 +361,7 @@ bool GfApplication::parseOptions()
 		// Trace level threshold (only #ifdef TRACE_OUT)
 		else if (itOpt->strLongName == "tracelevel")
 		{
-			int nTraceLevel;
-			if (sscanf(itOpt->strValue.c_str(), "%d", &nTraceLevel) == 1)
-				GfLogSetLevelThreshold(nTraceLevel);
-			else
+			if (sscanf(itOpt->strValue.c_str(), "%d", &nDefTraceLevel) < 1)
 			{
 				printUsage("Error: Could not convert trace level to an integer");
 				return false;
@@ -363,17 +370,12 @@ bool GfApplication::parseOptions()
 		// Target trace stream (only #ifdef TRACE_OUT)
 		else if (itOpt->strLongName == "tracestream")
 		{
-			if (itOpt->strValue == "stderr")
-				GfLogSetStream(stderr);
-			else if (itOpt->strValue == "stdout")
-				GfLogSetStream(stdout);
-			else
-				GfLogSetStream(itOpt->strValue.c_str());
+			strDefTraceStream = itOpt->strValue;
 		}
 		else
 		{
 			// If we get here, this is normal : the derived classes might have declared
-			// specific options.
+			// specific options that it'll parse itself later.
 		}
 	}
 
@@ -403,6 +405,13 @@ bool GfApplication::parseOptions()
 		return false;
 	}
 
+	// Complete logging system initialisation.
+	GfLogger::setup();
+	if (nDefTraceLevel != std::numeric_limits<int>::min())
+		GfLogDefault.setLevelThreshold(nDefTraceLevel);
+	if (!strDefTraceStream.empty())
+		GfLogDefault.setStream(strDefTraceStream);
+	
 	return true;
 }
 

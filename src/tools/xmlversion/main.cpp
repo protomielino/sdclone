@@ -219,7 +219,7 @@ int main( int argc, char **argv )
 	}
 
     // Initialize the gaming framework
-    // (set bLoggingEnabled to true to enable logging = to get debug traces).
+    // (pass true to GfInit to enable logging = to get debug traces).
     GfInit(/*bLoggingEnabled=*/false);
 
 	if( argc > 5 )

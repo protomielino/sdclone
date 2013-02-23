@@ -24,9 +24,11 @@
 
 #include <float.h>
 #include <tgf.h>
+#include <portability.h>
 
+#include "genparoptv1.h"
 #include "genetic.h"
-#include "portability.h"
+
 
 //
 // Class Genetic Parameter
@@ -141,13 +143,13 @@ TGeneticParameter::~TGeneticParameter()
 // Display parameter definitions at console
 void TGeneticParameter::DisplayParameter()
 {
-	GfLogOpt("%s: Min=%g Val=%g Max=%g Def=%g W=%g S=%g ,R=1/%g\n",Label,Min,Val,Max,Def,Weight,Scale,Round);
+	ReLogOptim.info("%s: Min=%g Val=%g Max=%g Def=%g W=%g S=%g ,R=1/%g\n",Label,Min,Val,Max,Def,Weight,Scale,Round);
 };
 
 // Display parameter statistics at console
 void TGeneticParameter::DisplayStatistik()
 {
-	GfLogOpt("%s: N=%d M=%d (%g %%)\n",Label,Tries,Changed,(100.0 * Changed)/Tries);
+	ReLogOptim.info("%s: N=%d M=%d (%g %%)\n",Label,Tries,Changed,(100.0 * Changed)/Tries);
 };
 
 // Write parameter meta data to xml file
