@@ -1101,12 +1101,12 @@ void TDriver::InitTrack
   oBrakeLeft = 1.0f;
   oBrakeRight = 1.0f;
   oBrakeRep =									 // Bremsdruckverteilung
-	GfParmGetNum(oCarHandle, (char*) SECT_BRKSYST, 
+	GfParmGetNum(CarHandle, (char*) SECT_BRKSYST, 
       PRM_BRKREP, (char*)NULL, 0.5);
   GfOut("# Brake repartition : %0.2f\n",oBrakeRep);
 
   oBrakeCorr =
-	GfParmGetNum(oCarHandle, (char*) SECT_BRKSYST, 
+	GfParmGetNum(CarHandle, (char*) SECT_BRKSYST, 
   	  PRM_BRKCOR, (char*)NULL, 0.03f);
   GfOut("# Brake correction  : %0.2f\n",oBrakeCorr);
 
