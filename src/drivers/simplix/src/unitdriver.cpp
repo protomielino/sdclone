@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.02.23
+// Last changed : 2013.02.24
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 4.00.000
@@ -98,6 +98,7 @@ float TDriver::SkillingFactor = 0.1f;              // Skilling factor for career
 bool  TDriver::UseBrakeLimit = false;              // Use brake limit
 bool  TDriver::UseGPBrakeLimit = false;            // Use brake limit GP36
 bool  TDriver::UseRacinglineParameters = false;    // Use racingline parameters
+bool  TDriver::UseWingControl = false;             // Use wing control parameters
 float TDriver::BrakeLimit = -6;                    // Brake limit
 float TDriver::BrakeLimitBase = 0.025f;            // Brake limit base
 float TDriver::BrakeLimitScale = 25;               // Brake limit scale
@@ -229,6 +230,12 @@ TDriver::TDriver(int Index):
   oBotName(NULL),
   // oTeamName
   // oRaceNumber
+  oWingControl(false),
+  oWingAngleFront(0), 
+  oWingAngleRear(0),  
+  oWingAngleRearMin(0),
+  oWingAngleRearMax(0), 
+  oWingAngleRearBrake(0),
   oBrakeDiffInitial(2.0),
   oBrakeForceMax(0.5f),
   oBrakeRep(0.5f),
@@ -438,7 +445,7 @@ void TDriver::SetBotName(void* RobotSettings, char* Value)
 
 	// Modified to avoid memory leaks
 	// Speed dreams has a trick to find out the oCarType
-    RtGetCarindexString(oIndex, "simplix", oExtended, indexstr, 32);
+    RtGetCarindexString(oIndex, "simplix", (char) oExtended, indexstr, 32);
     if( oExtended )
       oCarType = strdup( indexstr );
 	else // avoid empty car type
@@ -516,6 +523,8 @@ void TDriver::AdjustDriving(
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_JUMP_OFFSET,NULL,(float) oJumpOffset);
   oGeneticOpti =
     GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_OPTI,NULL,oGeneticOpti) > 0;
+
+  oWingControl = TDriver::UseWingControl;
 
   if (TDriver::UseRacinglineParameters)
   {
@@ -1127,11 +1136,18 @@ void TDriver::InitTrack
   GfOut("#\n");
   GfOut("#\n");
   GfOut("#\n");
-  double ScaleBrake = GfParmGetNum(Handle,TDriver::SECT_PRIV,
-	  PRV_SCALE__BRAKE,NULL,0.80f);
+
+  double ScaleBrake = 0.80f;
+  double ScaleMu = 0.95f;
+
+  if (Handle)
+  {
+    ScaleBrake = GfParmGetNum(Handle,TDriver::SECT_PRIV,
+	  PRV_SCALE__BRAKE,NULL,(float) ScaleBrake);
+    ScaleMu = GfParmGetNum(Handle,TDriver::SECT_PRIV,
+	  PRV_SCALE__MU,NULL,(float) ScaleMu);
+  }
   //GfOut("#ScaleBrake: %.1f\n",ScaleBrake);
-  double ScaleMu = GfParmGetNum(Handle,TDriver::SECT_PRIV,
-	  PRV_SCALE__MU,NULL,0.95f);
   //GfOut("#ScaleMu: %.1f\n",ScaleMu);
 
   // Override params for car type with params of track
@@ -1384,23 +1400,26 @@ void TDriver::Drive()
 
   //cTimeSum[2] += RtDuration(StartTimeStamp);
 
-  if (oWingAngleRear != oWingAngleRearBrake)
+  if (oWingControl)
   {
-    if (oDriftAngle > PI/32)
+	if (oWingAngleRear != oWingAngleRearBrake)
 	{
-	  oWingAngleRear = oWingAngleRearMax;
+		if (oDriftAngle > PI/32)
+		{
+			oWingAngleRear = oWingAngleRearMax;
+		}
+		else if (oDriftAngle < PI/64)
+		{
+			oWingAngleRear = oWingAngleRearMin;
+		}
 	}
-	else if (oDriftAngle < PI/64)
-	{
-	  oWingAngleRear = oWingAngleRearMin;
-	}
-  }
-  else
-  {
-	if (oDriftAngle < PI/64)
-      oWingAngleRear = oWingAngleRearMax;
 	else
-      oWingAngleRear = oWingAngleRearBrake;
+	{
+		if (oDriftAngle < PI/64)
+			oWingAngleRear = oWingAngleRearMax;
+		else
+			oWingAngleRear = oWingAngleRearBrake;
+	}
   }
 
   if (oSituation->_raceState & RM_RACE_PRESTART) 
@@ -1452,8 +1471,11 @@ void TDriver::Drive()
     oBrake = FilterABS(oBrake);
   }
 
-  if (oBrake > 0.25)
-	oWingAngleRear = oWingAngleRearBrake;
+  if (oWingControl)
+  {
+	if (oBrake > 0.25)
+		oWingAngleRear = oWingAngleRearBrake;
+  }
 
   // Keep history
   oLastSteer = oSteer;
@@ -1470,10 +1492,13 @@ void TDriver::Drive()
 
   // SIMUV4 ...
 
-  // Variable wing angle / airbrake
-  oCar->ctrl.wingControlMode = 2;
-  oCar->ctrl.wingFrontCmd = (float) oWingAngleFront; 
-  oCar->ctrl.wingRearCmd = (float) oWingAngleRear; 
+  if (oWingControl)
+  {
+	// Variable wing angle / airbrake
+	oCar->ctrl.wingControlMode = 2;
+	oCar->ctrl.wingFrontCmd = (float) oWingAngleFront; 
+	oCar->ctrl.wingRearCmd = (float) oWingAngleRear; 
+  }
 
   // Single wheel brake
   oCar->ctrl.singleWheelBrakeMode = 1;
@@ -2070,6 +2095,9 @@ void TDriver::InitCa()
   float FrontWingAngle =
 	GfParmGetNum(oCarHandle, SECT_FRNTWING,
 	  PRM_WINGANGLE, (char*) NULL, 0.0);
+//  bool FrontWingAngleVariable =
+//	GfParmGetNum(oCarHandle, SECT_FRNTWING,
+//	  PRM_WINGANGLEVARIABLE, (char*) NULL, 0) > 0;
   //GfOut("#FrontWingAngle %g\n",FrontWingAngle * 180 / PI);
   float RearWingArea =
 	GfParmGetNum(oCarHandle, SECT_REARWING,
@@ -2077,13 +2105,25 @@ void TDriver::InitCa()
   float RearWingAngle =
 	GfParmGetNum(oCarHandle, SECT_REARWING,
 	   PRM_WINGANGLE, (char*) NULL, 0.0f);
+//  bool RearWingAngleVariable =
+//	GfParmGetNum(oCarHandle, SECT_REARWING,
+//	   PRM_WINGANGLEVARIABLE, (char*) NULL, 0) > 0;
   //GfOut("#RearWingAngle %g\n",RearWingAngle * 180 / PI);
 
   oWingAngleFront = FrontWingAngle;						
   oWingAngleRear = RearWingAngle;						
-  oWingAngleRearMin = RearWingAngle;						
-  oWingAngleRearMax = 2.5f * RearWingAngle;						
-  oWingAngleRearBrake = (float) (0.9 * PI_4);						
+  if (oWingControl)
+  {
+    oWingAngleRearMin = RearWingAngle;						
+    oWingAngleRearMax = 2.5f * RearWingAngle;						
+    oWingAngleRearBrake = (float) (0.9 * PI_4);						
+  }
+  else
+  {
+    oWingAngleRearMin = RearWingAngle;						
+    oWingAngleRearMax = RearWingAngle;						
+    oWingAngleRearBrake = RearWingAngle;
+  }
 
   FrontWingArea = FrontWingArea * sin(FrontWingAngle);
   RearWingArea = RearWingArea * sin(RearWingAngle);

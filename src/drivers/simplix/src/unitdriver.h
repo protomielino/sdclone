@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2013.02.16
+// Last changed : 2013.02.24
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 4.00.000
@@ -266,6 +266,7 @@ private:
 	char* oBotName;                              // Name of driver
 	const char* oTeamName;                       // Name of team
 	int oRaceNumber;                             // Race number
+	bool oWingControl;							 // Enable wing control
 	double oWingAngleFront;                      // Front wing angle of attack
 	double oWingAngleRear;                       // Rear wing angle of attack
 	double oWingAngleRearMin;                    // Min rear wing angle of attack
@@ -431,6 +432,7 @@ private:
 	static bool UseBrakeLimit;
 	static bool UseGPBrakeLimit;
 	static bool UseRacinglineParameters;
+	static bool UseWingControl;
 	static float BrakeLimit;
 	static float BrakeLimitScale;
 	static float BrakeLimitBase;

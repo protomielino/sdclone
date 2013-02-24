@@ -9,7 +9,7 @@
 //
 // File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2013.02.16
+// Last changed : 2013.02.24
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 4.00.000
@@ -89,15 +89,15 @@
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 127 // Force new calculation
+#define RL_VERSION 128 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*
 // Global constants, to be changed for different wdbee-bots
 //--------------------------------------------------------------------------*
-#define RTYPE_SIMPLIX 0                          // Robot type simplix
+#define RTYPE_SIMPLIX      0                     // Robot type simplix
 #define RTYPE_SIMPLIX_TRB1 1                     // Robot type simplix_trb1
-#define RTYPE_SIMPLIX_SC 2                       // Robot type simplix_sc
+#define RTYPE_SIMPLIX_SC   2                     // Robot type simplix_sc
 #define RTYPE_SIMPLIX_36GP 3                     // Robot type simplix_36GP
 #define RTYPE_SIMPLIX_MPA1 4					 // Robot type simplix_mpa1
 #define RTYPE_SIMPLIX_LS1  5					 // Robot type simplix_ls1

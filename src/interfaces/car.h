@@ -612,6 +612,7 @@ typedef struct CarElt
 #define PRM_FRNTAREA		"front area"
 #define PRM_WINGAREA		"area"
 #define PRM_WINGANGLE		"angle"
+#define PRM_WINGANGLEVARIABLE "variable"
 
 /* Engine */
 #define PRM_REVSLIM		"revs limiter"

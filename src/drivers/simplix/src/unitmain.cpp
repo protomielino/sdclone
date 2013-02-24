@@ -176,12 +176,9 @@ static char BufPathXMLRel[BUFSIZE];              // Robot's xml-filename
 static const char* RobPathXMLRel = BufPathXMLRel;// relative to install. dir
 // Robot's absolute dir
 static char BufPathDir[BUFSIZE];                 // Robot's dir 
-//static const char* RobPathDir = BufPathDir;      // Pointer to robot's dir
 // Robot's absolute xml-filename
 static char BufPathXML[BUFSIZE];                 // Robot's xml-filename
 static const char* RobPathXML = BufPathXML;      // Pointer to xml-filename
-
-static void *RobotSettings;                      // Filehandle
 
 // Save start index offset from robot's xml file
 static int IndexOffset = 0;
@@ -225,7 +222,9 @@ static tInstanceInfo cInstances[MAXNBBOTS];
 //--------------------------------------------------------------------------*
 void* GetFileHandle(const char* RobotName)
 {
-    strncpy(BufName, RobotName, BUFSIZE);       // Save robot's name
+    void* RobotSettings = NULL;
+
+	strncpy(BufName, RobotName, BUFSIZE);       // Save robot's name
     snprintf(BufPathDirRel, BUFSIZE,             // Robot's directory  
 		"drivers/%s",RobotName);                 // relative to installation
     snprintf(BufPathXMLRel, BUFSIZE,             // Robot's xml-filename
@@ -397,6 +396,7 @@ void SetUpSimplix_ref()
     cRobotType = RTYPE_SIMPLIX_REF;
     SetParameters(NBBOTS, "ref.sector-p4");
 	TDriver::UseRacinglineParameters = true;
+	TDriver::UseWingControl = true;
 };
 //==========================================================================*
 
@@ -414,7 +414,7 @@ int moduleWelcomeV1_00
 	//	welcomeIn->itfVerMajor,welcomeIn->itfVerMinor);
 
 	// Get filehandle for robot's xml-file
-	void *RobotSettings = GetFileHandle(welcomeIn->name);
+	void* RobotSettings = GetFileHandle(welcomeIn->name);
 	// Let's look what we have to provide here
 	if (RobotSettings)
 	{
@@ -463,6 +463,7 @@ int moduleWelcomeV1_00
 				NBBOTS = I + 1;
 			}
 		}
+		GfParmReleaseHandle(RobotSettings);
 	}
 	else
 	{
@@ -490,9 +491,9 @@ int moduleWelcomeV1_00
 		SetUpSimplix_ls2();
 	else if (strncmp(RobName,"simplix_mp5",strlen("simplix_mp5")) == 0)
 		SetUpSimplix_mp5();
-	else if (strncmp(RobName," simplix_lp1", strlen("simplix_lp1")) == 0)
+	else if (strncmp(RobName,"simplix_lp1", strlen("simplix_lp1")) == 0)
 		SetUpSimplix_lp1();
-	else if (strncmp(RobName," simplix_ref", strlen("simplix_ref")) == 0)
+	else if (strncmp(RobName,"simplix_ref", strlen("simplix_ref")) == 0)
 		SetUpSimplix_ref();
 	else 
 		SetUpSimplix();
@@ -683,11 +684,14 @@ static int InitFuncPt(int Index, void *Pt)
   }
 #endif
 
-  cInstances[Index-IndexOffset].cRobot =                    // Create a driver
+  void* RobotSettings =								// Open robot team definition
+	  GetFileHandle(TDriver::MyBotName);
+
+  cInstances[Index-IndexOffset].cRobot =            // Create a driver
 	  new TDriver(Index-IndexOffset);
-  cInstances[Index-IndexOffset].cRobot->SetBotName          // Store customized name
-	  (RobotSettings,                            // Robot's xml-file
-	  &DriverNames[(Index-IndexOffset)*DRIVERLEN]);// not drivers xml-file!  
+  cInstances[Index-IndexOffset].cRobot->SetBotName  // Store customized name
+	  (RobotSettings,								// from Robot's xml-file and
+	  &DriverNames[(Index-IndexOffset)*DRIVERLEN]);	// not from drivers xml-file!  
 
   if (cRobotType == RTYPE_SIMPLIX)
   {
@@ -776,6 +780,16 @@ static int InitFuncPt(int Index, void *Pt)
     cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_LP1;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
+  }
+  else if (cRobotType == RTYPE_SIMPLIX_REF)
+  {
+    //GfOut("#cRobotType == RTYPE_SIMPLIX_REF\n");
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
     cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
@@ -978,315 +992,7 @@ extern "C" int simplix(tModInfo *ModInfo)
   return simplixEntryPoint(ModInfo,RobotSettings);
 }
 //==========================================================================*
-/*
-//==========================================================================*
-// Schismatic entry point for simplix_mpa1
-//--------------------------------------------------------------------------*
-extern "C" int simplix_mpa1(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("simplix_mpa1");
-  if (!RobotSettings)
-	  return -1;
 
-  SetParameters(10, "indycar01");
-  TDriver::AdvancedParameters = true;
-  TDriver::UseBrakeLimit = true;
-  TDriver::Learning = true;
-  TDriver::UseMPA1Skilling = true;            
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for simplix_trb1a
-//--------------------------------------------------------------------------*
-extern "C" int simplix_trb1a(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("simplix_trb1a");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "car1-trb1");
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for simplix_trb1b
-//--------------------------------------------------------------------------*
-extern "C" int simplix_trb1b(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("simplix_trb1b");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "car6-trb1");
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for simplix_sca
-//--------------------------------------------------------------------------*
-extern "C" int simplix_sca(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("simplix_sca");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "sc-996");
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for simplix_scb
-//--------------------------------------------------------------------------*
-extern "C" int simplix_scb(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("simplix_scb");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "sc-996");
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for simplix_36GP
-//--------------------------------------------------------------------------*
-extern "C" int simplix_36GP(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("simplix_36GP");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "36GP-alfa12c");
-  TDriver::AdvancedParameters = true;
-  TDriver::UseBrakeLimit = true;
-  TDriver::UseGPBrakeLimit = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for simplix_ls1
-//--------------------------------------------------------------------------*
-extern "C" int simplix_ls1(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("simplix_ls1");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "ls1-archer-r9");
-  TDriver::AdvancedParameters = true;
-  TDriver::UseBrakeLimit = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for simplix_ls2
-//--------------------------------------------------------------------------*
-extern "C" int simplix_ls2(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("simplix_ls2");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(1, "ls2-bavaria-g3gtr");
-  TDriver::AdvancedParameters = true;
-  TDriver::UseBrakeLimit = true;
-  TDriver::UseRacinglineParameters = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for simplix_mp5
-//--------------------------------------------------------------------------*
-extern "C" int simplix_mp5(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("simplix_mp5");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "mp5");
-  TDriver::AdvancedParameters = true;
-  TDriver::UseBrakeLimit = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for simplix_lp1
-//--------------------------------------------------------------------------*
-extern "C" int simplix_lp1(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("simplix_lp1");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "lp1-vieringe-vr8");
-  TDriver::AdvancedParameters = true;
-  TDriver::UseBrakeLimit = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for my_simplix_0
-//--------------------------------------------------------------------------*
-extern "C" int my_simplix_0(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("my_simplix_0");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "car1-trb1");
-  TDriver::AdvancedParameters = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for my_simplix_1
-//--------------------------------------------------------------------------*
-extern "C" int my_simplix_1(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("my_simplix_1");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "car1-trb1");
-  TDriver::AdvancedParameters = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for my_simplix_2
-//--------------------------------------------------------------------------*
-extern "C" int my_simplix_2(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("my_simplix_2");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "car1-trb1");
-  TDriver::AdvancedParameters = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for my_simplix_3
-//--------------------------------------------------------------------------*
-extern "C" int my_simplix_3(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("my_simplix_3");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "car1-trb1");
-  TDriver::AdvancedParameters = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for my_simplix_4
-//--------------------------------------------------------------------------*
-extern "C" int my_simplix_4(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("my_simplix_4");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "car1-trb1");
-  TDriver::AdvancedParameters = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for my_simplix_5
-//--------------------------------------------------------------------------*
-extern "C" int my_simplix_5(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("my_simplix_5");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "car1-trb1");
-  TDriver::AdvancedParameters = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for my_simplix_6
-//--------------------------------------------------------------------------*
-extern "C" int my_simplix_6(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("my_simplix_6");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "car1-trb1");
-  TDriver::AdvancedParameters = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for my_simplix_7
-//--------------------------------------------------------------------------*
-extern "C" int my_simplix_7(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("my_simplix_7");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "car1-trb1");
-  TDriver::AdvancedParameters = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for my_simplix_8
-//--------------------------------------------------------------------------*
-extern "C" int my_simplix_8(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("my_simplix_8");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "car1-trb1");
-  TDriver::AdvancedParameters = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-
-//==========================================================================*
-// Schismatic entry point for my_simplix_9
-//--------------------------------------------------------------------------*
-extern "C" int my_simplix_9(tModInfo *ModInfo)
-{
-  void *RobotSettings = GetFileHandle("my_simplix_9");
-  if (!RobotSettings)
-	  return -1;
-
-  SetParameters(10, "car1-trb1");
-  TDriver::AdvancedParameters = true;
-  return simplixEntryPoint(ModInfo,RobotSettings);
-};
-//==========================================================================*
-*/
 //--------------------------------------------------------------------------*
 // end of file unitmain.cpp
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
