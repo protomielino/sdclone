@@ -67,6 +67,17 @@ typedef struct HumanContext
     tControlCmd		*cmdControl;
     bool		mouseControlUsed;
     int			lightCmd;
+
+	// simuV4 ...
+    bool		useESP;
+    float		brakeRep;
+    float		brakeCorr;
+    float		brakeFront;
+    float		brakeRear;
+    float		brakeLeft;
+    float		brakeRight;
+	// ... simuV4
+
 } tHumanContext;
 
 extern std::vector<tHumanContext*> HCtx;

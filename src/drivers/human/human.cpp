@@ -186,6 +186,16 @@ InitFuncPt(int index, void *pt)
 	HCtx[idx]->antiLock = 1.0;
 	HCtx[idx]->antiSlip = 1.0;
 
+	// simuV4 ...
+    HCtx[idx]->useESP = false;
+    HCtx[idx]->brakeRep = 0.5f;
+    HCtx[idx]->brakeCorr = 0.03f;
+    HCtx[idx]->brakeFront = 1.0f;
+    HCtx[idx]->brakeRear = 1.0f;
+    HCtx[idx]->brakeLeft = 1.0f;
+    HCtx[idx]->brakeRight = 1.0f;
+	// ... simuV4
+
 	itf->rbNewTrack = initTrack;	/* give the robot the track view called */
 	/* for every track change or new race */
 	itf->rbNewRace  = newrace;
@@ -402,6 +412,12 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 	SetFuelAtRaceStart(track, carParmHandle, s, idx);
 
 	speedLimit = curTrack->pits.speedLimit;
+
+	// simuV4 ...
+	HCtx[idx]->brakeRep = GfParmGetNum(carHandle, (char*) SECT_BRKSYST, PRM_BRKREP, (char*)NULL, 0.5);
+    HCtx[idx]->brakeCorr = GfParmGetNum(carHandle, (char*) SECT_BRKSYST, PRM_BRKCOR, (char*)NULL, 0.0f);
+	HCtx[idx]->useESP = HCtx[idx]->brakeCorr != 0;
+	// ... simuV4
 
 	if(drvInfo) {
 		GfParmReleaseHandle(drvInfo);
@@ -1335,6 +1351,65 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	HCtx[idx]->lap = car->_laps;
 }//common_drive
 
+// simuV4 code ...
+static void
+common_brake(const int idx, tCarElt* car, tSituation *s)
+{
+	if(car->_brakeCmd > 0.0)
+	{
+		if (HCtx[idx]->useESP)
+		{
+			float DriftAngle = atan2(car->_speed_Y,car->_speed_X) - car->_yaw;
+			FLOAT_NORM_PI_PI(DriftAngle);            
+			DriftAngle = fabs(DriftAngle);		     
+
+			if (DriftAngle > 4.0/180.0*PI)
+			{
+				HCtx[idx]->brakeLeft = 1.0f + 0.3f;
+				HCtx[idx]->brakeRight = 1.0f - 0.3f;
+				HCtx[idx]->brakeFront = 1.0f + HCtx[idx]->brakeCorr;
+				HCtx[idx]->brakeRear = 1.0f - HCtx[idx]->brakeCorr;
+			}
+			else if (DriftAngle > 2.0/180.0*PI)
+			{
+				HCtx[idx]->brakeLeft = 1.0f + 0.3f;
+				HCtx[idx]->brakeRight = 1.0f - 0.3f;
+				HCtx[idx]->brakeFront = 1.0f;
+				HCtx[idx]->brakeRear = 1.0f;
+			}
+			else if (DriftAngle < -4.0/180.0*PI)
+			{
+				HCtx[idx]->brakeRight = 1.0f + 0.3f;
+				HCtx[idx]->brakeLeft = 1.0f - 0.3f;
+				HCtx[idx]->brakeFront = 1.0f + HCtx[idx]->brakeCorr;
+				HCtx[idx]->brakeRear = 1.0f - HCtx[idx]->brakeCorr;
+			}
+			else if (DriftAngle < -2.0/180.0*PI)
+			{
+				HCtx[idx]->brakeRight = 1.0f + 0.3f;
+				HCtx[idx]->brakeLeft = 1.0f - 0.3f;
+				HCtx[idx]->brakeFront = 1.0f;
+				HCtx[idx]->brakeRear = 1.0f;
+			}
+			else
+			{
+				HCtx[idx]->brakeRight = 1.0f;
+				HCtx[idx]->brakeLeft = 1.0f;
+				HCtx[idx]->brakeFront = 1.0f;
+				HCtx[idx]->brakeRear = 1.0f;
+			}
+
+			car->ctrl.singleWheelBrakeMode = 1;
+			car->ctrl.brakeFrontRightCmd = (float) (car->_brakeCmd * HCtx[idx]->brakeRep * HCtx[idx]->brakeRight * HCtx[idx]->brakeFront); 
+			car->ctrl.brakeFrontLeftCmd = (float) (car->_brakeCmd * HCtx[idx]->brakeRep * HCtx[idx]->brakeLeft * HCtx[idx]->brakeFront); 
+			car->ctrl.brakeRearRightCmd = (float) (car->_brakeCmd * (1 - HCtx[idx]->brakeRep) * HCtx[idx]->brakeRight * HCtx[idx]->brakeRear); 
+			car->ctrl.brakeRearLeftCmd = (float) (car->_brakeCmd * (1 - HCtx[idx]->brakeRep) * HCtx[idx]->brakeLeft * HCtx[idx]->brakeRear); 
+		}
+		else
+			car->ctrl.singleWheelBrakeMode = 0;
+	}
+}
+// ... simuV4 code
 
 static tdble
 getAutoClutch(const int idx, int gear, int newGear, tCarElt *car)
@@ -1532,6 +1607,9 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 
 	if (HCtx[idx]->autoClutch && car->_clutchCmd == 0.0f)
 		car->_clutchCmd = getAutoClutch(idx, car->_gear, car->_gearCmd, car);
+
+	common_brake(idx, car, s);
+
 }//drive_mt
 
 
@@ -1683,6 +1761,8 @@ drive_at(int index, tCarElt* car, tSituation *s)
 	/* Automatic clutch mode */
 	if (HCtx[idx]->autoClutch && car->_clutchCmd == 0.0f)
 	  car->_clutchCmd = getAutoClutch(idx, car->_gear, car->_gearCmd, car);
+
+	common_brake(idx, car, s);
 }//drive_at
 
 
