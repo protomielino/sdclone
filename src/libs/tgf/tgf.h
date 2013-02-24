@@ -464,19 +464,22 @@ class TGF_API GfLogger
 	//! Destructor.
 	virtual ~GfLogger();
 
-	//! Accessors.
+	//! Name.
 	const std::string& name() const;
 
+	//! Criticity level threshold (ascending level means descending criticity).
 	int levelThreshold() const;
 	void setLevelThreshold(int nLevel);
 
+	//! Output lines header columns selection (order not customisable, only there or not).
 	enum { eNone=0, eTime=0x01, eLogger=0x02, eLevel=0x04, eAll=eTime|eLogger|eLevel };
 	unsigned headerColumns() const;
 	void setHeaderColumns(unsigned bfHdrCols);
 
+	//! Output stream.
 	FILE* stream() const;
 	void setStream(FILE* pFile, bool bLogFileChange=true);
-	void setStream(const std::string& strPathname);
+	void setStream(const std::string& strPathname); // "stdout" or "stderr" also supported.
 	
 	//! Tracing functions (name gives the trace level / criticity).
 	void fatal(const char *pszFmt, ...); // Warning : This one calls exit(1) at the end !
