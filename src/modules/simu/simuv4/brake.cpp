@@ -62,10 +62,10 @@ SimBrakeSystemUpdate(tCar *car)
 
 	if (car->ctrl->singleWheelBrakeMode == 1)
 	{
-		car->wheel[FRNT_RGT].brake.pressure = brkSyst->coeff * car->ctrl->brakeFrontRightCmd; 
-		car->wheel[FRNT_LFT].brake.pressure = brkSyst->coeff * car->ctrl->brakeFrontLeftCmd;
-		car->wheel[REAR_RGT].brake.pressure = brkSyst->coeff * car->ctrl->brakeRearRightCmd;
-		car->wheel[REAR_LFT].brake.pressure = brkSyst->coeff * car->ctrl->brakeRearLeftCmd;
+		car->wheel[FRNT_RGT].brake.pressure = brkSyst->coeff * MIN(car->ctrl->brakeFrontRightCmd, brkSyst->rep); 
+		car->wheel[FRNT_LFT].brake.pressure = brkSyst->coeff * MIN(car->ctrl->brakeFrontLeftCmd, brkSyst->rep);
+		car->wheel[REAR_RGT].brake.pressure = brkSyst->coeff * MIN(car->ctrl->brakeRearRightCmd, (1-brkSyst->rep));
+		car->wheel[REAR_LFT].brake.pressure = brkSyst->coeff * MIN(car->ctrl->brakeRearLeftCmd, (1-brkSyst->rep));
 	}
 	else
 	{
