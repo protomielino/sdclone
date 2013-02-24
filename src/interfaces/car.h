@@ -370,6 +370,7 @@ typedef struct {
 	tCollisionState collision_state; /**< collision state ; Simu V3 only  */
     tMemPoolCar	memoryPool;
     tdble       driveSkill;           /**< Skill level for robots: 0.0 means as fast as possible; 10.0 means at a slower speed so players can easier win */
+    tdble       steerTq;        /**< torqu on steering wheel for force feedback */
 } tPrivCar;
 /* structure access */
 #define _fuelTotal priv.fuel_consumption_total
@@ -400,6 +401,7 @@ typedef struct {
 #define _smoke		priv.smoke
 #define _normal		priv.normal
 #define _coll2Pos	priv.collpos
+#define _steerTq	priv.steerTq
 
 #define _newTrackMemPool	priv.memoryPool.newTrack
 #define _newRaceMemPool		priv.memoryPool.newRace
