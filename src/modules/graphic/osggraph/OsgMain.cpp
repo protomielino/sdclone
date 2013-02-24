@@ -767,6 +767,8 @@ initCars(tSituation *s)
 void
 shutdownCars(void)
 {
+    delete cars;
+
 /*	int i;
 
 	GfOut("-- shutdownCars\n");
@@ -849,11 +851,13 @@ int  initCars(tSituation *s)
     return 0;
 }
 
-/*void
+void
 shutdownTrack(void)
 {
 	// Do the real track termination job.
-	grShutdownScene();
+    delete scenery;
+    //delete m_sceneroot;
+    //grShutdownScene();
 
 	if (grTrackHandle)
 	{
@@ -862,19 +866,21 @@ shutdownTrack(void)
 	}
 
 	// And then the context termination job (should not be there, see initTrack).
-	options.endLoad();
+    //options.endLoad();
 	
-	grShutdownState();
-}*/
+    //grShutdownState();
+}
 
-/*void
+void
 shutdownView(void)
 {
-	for (int i = 0; i < GR_NB_MAX_SCREEN; i++)
+    /*for (int i = 0; i < GR_NB_MAX_SCREEN; i++)
 	{
 		delete grScreens[i];
 		grScreens[i] = 0;
-	}
+    }*/
+    delete render;
+    delete viewer;
 }
 
 //void SsgGraph::bendCar(int index, sgVec3 poc, sgVec3 force, int count)

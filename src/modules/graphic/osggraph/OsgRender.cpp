@@ -22,19 +22,42 @@
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
 #include <osgDB/Registry>
+#include <osg/Fog>
 #include <osg/Light>
 #include <osg/LightSource>
 #include <osg/Camera>
 #include <osgViewer/Viewer>
+
 #include "OsgMain.h"
 #include "OsgRender.h"
+#include "OsgSky.h"
+#include "OsgMath.h"
 
 #include <glfeatures.h>	//gluXXX
 #include <robottools.h>	//RtXXX()
 
+
+static const double m_log01 = -log( 0.01 );
+static const double sqrt_m_log01 = sqrt( m_log01 );
+const GLfloat fog_exp2_density = sqrt_m_log01 / 11000;
+
+SDSky *thesky = NULL;
+tTrack *grTrack;
+
+unsigned SDSkyDomeDistance = 0;
+static unsigned SDNbCloudLayers = 0;
+
+// Some private global variables.
+//static int grDynamicWeather = 0;
+static bool SDDynamicSkyDome = false;
+static float SDSunDeclination = 0.0f;
+static float SDMoonDeclination = 0.0f;
+static float SDMax_Visibility = 0.0f;
+static double SDVisibility = 0.0f;
+
 #define MAX_BODIES	2
 #define MAX_CLOUDS	3
-#define NSTARS			1000
+#define NMaxStars	1000
 #define NPLANETS		0	//No planets displayed
 #define NB_BG_FACES	36	//Background faces
 #define BG_DIST			1.0f
@@ -43,6 +66,9 @@
 #define MORE_CLOUD 6
 #define SCARCE_CLOUD 5
 #define COVERAGE_CLOUD 8
+
+static osg::Vec3d *AStarsData = NULL;
+static osg::Vec3d *APlanetsData = NULL;
 
 static osg::ref_ptr<osg::Group> RealRoot = new osg::Group;
 
@@ -62,26 +88,118 @@ SDRender::~SDRender(void)
  */
 void SDRender::Init(osg::ref_ptr<osgViewer::Viewer> viewer)
 {
+    char buf[256];
+    void *hndl = grTrackHandle;
+
+    std::string path = "/opt/share/games/speed-dreams-2/data/";
+    thesky = new SDSky;
+    GfOut("SDSky class\n");
+    int grSkyDomeDistance = 12000;
+
+    int NStars = NMaxStars;
+    //if (AStarsData)
+        delete [] AStarsData;
+    AStarsData = new osg::Vec3d[NStars];
+    for(int i= 0; i < NStars; i++)
+    {
+        AStarsData[i][0] = SDRandom() * PI;
+        AStarsData[i][1] = SDRandom() * PI;
+        AStarsData[i][2] = SDRandom();
+    }//for i
+
+    GfLogInfo("  Stars (random) : %d\n", NStars);
+
+    int NPlanets = 0;
+    APlanetsData = NULL;
+
+    const int timeOfDay = (int)grTrack->local.timeofday;
+    const double domeSizeRatio = SDSkyDomeDistance / 80000.0;
+
+    thesky->build(path, SDSkyDomeDistance, SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance,
+                                                 NPlanets, APlanetsData, NStars, AStarsData );
+    GfOut("Build SKY\n");
+    GLfloat sunAscension = grTrack->local.sunascension;
+    SDSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
+
+    thesky->setSD( DEG2RAD(SDSunDeclination));
+    thesky->setSRA( sunAscension );
+
+    GfLogInfo("  Sun : time of day = %02d:%02d:%02d (declination = %.1f deg), "
+              "ascension = %.1f deg\n", timeOfDay / 3600, (timeOfDay % 3600) / 60, timeOfDay % 60,
+              SDSunDeclination, RAD2DEG(sunAscension));
+
+    if ( SDSunDeclination > 180 )
+        SDMoonDeclination = 3.0 + (rand() % 40);
+    else
+        SDMoonDeclination = (rand() % 270);
+
+    //SDMoonDeclination = grUpdateMoonPos(timeOfDay);
+    SDMoonDeclination = (rand() % 270);
+
+    const float moonAscension = grTrack->local.sunascension;
+
+    thesky->setMD( DEG2RAD(SDMoonDeclination) );
+    thesky->setMRA( DEG2RAD(moonAscension) );
+
+    GfLogInfo("  Moon : declination = %.1f deg, ascension = %.1f deg\n",
+              SDMoonDeclination, moonAscension);
+
+    // Set up the light source to the Sun position.
+    sgCoord sunPosition;
+    //TheSky->getSunPos(&sunPosition);
+    //light->setPosition(sunPosition.xyz);
+
+    // Initialize the whole sky dome.
+    osg::Vec3 viewPos;
+    //sgSetVec3(viewPos, grWrldX/2, grWrldY/2, 0);
+    //TheSky->repositionFlat( viewPos, 0, 0);*/
+
     RealRoot = dynamic_cast<osg::Group*>(viewer->getSceneData());
     osg::StateSet* rootStateSet = RealRoot->getOrCreateStateSet();
     RealRoot->setStateSet(rootStateSet);
 	osg::Group* lightGroup = new osg::Group;
+
+    //SDUpdateLight();
 	
     osg::Light* myLight2 = new osg::Light;
     myLight2->setLightNum(1);
-    myLight2->setPosition(osg::Vec4(-100.0f, -3220.0f, -100.0f, 1.0f));
+    myLight2->setPosition(osg::Vec4(-100.0f, -100.0f, -3220.0f, 1.0f));
     myLight2->setAmbient(osg::Vec4(0.2f, 0.2f, 0.2f, 1.0f));
-    myLight2->setDiffuse(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    myLight2->setSpecular(osg::Vec4(0.5f, 0.5f, 0.5f, 1.0f));
-    myLight2->setConstantAttenuation(1.0f);
+    myLight2->setDiffuse(osg::Vec4(0.8f, 0.8f, 0.8f, 1.0f));
+    myLight2->setSpecular(osg::Vec4(0.2f, 0.2f, 0.2f, 1.0f));
+    myLight2->setConstantAttenuation(0.9f);
     
-    osg::LightSource* lightS1 = new osg::LightSource;    
-    lightS1->setLight(myLight2);
-    lightS1->setLocalStateSetModes(osg::StateAttribute::ON); 
-    lightS1->setStateSetModes(*rootStateSet, osg::StateAttribute::ON);
-    lightGroup->addChild(lightS1);
-    
-    RealRoot->addChild(lightGroup);
+    //GfOut("Light\n");
+    osg::LightSource* sunLight = new osg::LightSource;   
+    //sunLight->getLight()->setDataVariance(Object::DYNAMIC);
+    sunLight->setLight(myLight2);
+    sunLight->setLocalStateSetModes(osg::StateAttribute::ON); 
+    sunLight->setStateSetModes(*rootStateSet, osg::StateAttribute::ON);
+    lightGroup->addChild(sunLight);
+
+    //GfOut("SunLight");
+
+	osg::Group *skyGroup = new osg::Group;
+	osg::StateSet* skySS = skyGroup->getOrCreateStateSet();
+	skySS->setMode(GL_LIGHT0, osg::StateAttribute::OFF);
+    skyGroup->addChild(thesky->getPreRoot());
+    //sunLight->addChild(skyGroup);
+    /*mRoot->addChild(sceneGroup);
+    mRoot->addChild(sunLight);*/
+
+    osg::Group *mRoot = new osg::Group;
+    mRoot->addChild(RealRoot);
+    mRoot->addChild(sunLight);
+    mRoot->addChild(lightGroup);
+
+    osg::Fog* mFog = new osg::Fog;
+    mFog->setMode( osg::Fog::EXP2 );
+    mFog->setColor( osg::Vec4( 0.8, 0.8, 0.8, 1) );
+    mFog->setDensity( fog_exp2_density );
+    //rootStateSet->SetState->setMode( mFog, osg::StateAttribute::ON );
+    rootStateSet->setAttributeAndModes(mFog);
+    rootStateSet->setMode( GL_FOG, osg::StateAttribute::ON );
+    viewer->setSceneData(mRoot);
 
     GfOut("LE POINTEUR %d\n",m_carroot.get());
 

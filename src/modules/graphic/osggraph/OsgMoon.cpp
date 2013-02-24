@@ -1,11 +1,12 @@
 /***************************************************************************
 
-    file        : OsgMoon.cpp
-    copyright   : (C) 2012 by Xavier Bertaux (based on SimGear code)
-    web         : http://www.speed-dreams.org
-    version     : $Id: OsgMoon.cpp 3162 2012-12-03 13:11:22Z torcs-ng $
+    file                 : OsgMoon.cpp
+    created              : Mon Aug 21 18:24:02 CEST 2012
+    copyright            : (C) 2012 by Xavier Bertaux
+    email                : bertauxx@yahoo.fr
+    version              : $Id$
 
- ***************************************************************************/
+***************************************************************************/
 
 /***************************************************************************
  *                                                                         *
@@ -29,12 +30,12 @@
 #include <osg/ShadeModel>
 #include <osg/TexEnv>
 #include <osg/Texture2D>
-#include <osgDB/Options>
+#include <osgDB/ReadFile>
 
-#include "OsgSphere.h"
-#include "OsgSky.h"
 #include "OsgMath.h"
 #include "OsgColor.h"
+#include "OsgSphere.h"
+#include "OsgMoon.h"
 
 // Constructor
 SDMoon::SDMoon( void ) :
@@ -42,25 +43,22 @@ SDMoon::SDMoon( void ) :
 {
 }
 
-
 // Destructor
 SDMoon::~SDMoon( void ) 
 {
 }
 
-
 // build the moon object
-osg::Node* SDMoon::build( const std::string path, double moon_size ) 
+osg::Node* SDMoon::build( std::string path, double moon_size )
 {
+    std::string TmpPath = path;
     osg::Node* orb = SDMakeSphere(moon_size, 15, 15);
     osg::StateSet* stateSet = orb->getOrCreateStateSet();
     stateSet->setRenderBinDetails(-5, "RenderBin");
 
-    // set up the orb state
-    osg::ref_ptr<osgDB::ReaderWriter::Options> options
-        = makeOptionsFromPath(path);
-
-    osg::Texture2D* texture = SGLoadTexture2D("moon.png", options.get());
+    path = TmpPath+"moon.png";
+    osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path);
+    osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
     stateSet->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
     osg::TexEnv* texEnv = new osg::TexEnv;
     texEnv->setMode(osg::TexEnv::MODULATE);
@@ -68,10 +66,14 @@ osg::Node* SDMoon::build( const std::string path, double moon_size )
 
     orb_material = new osg::Material;
     orb_material->setColorMode(osg::Material::DIFFUSE);
-    orb_material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(1, 1, 1, 1));
-    orb_material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(0, 0, 0, 1));
-    orb_material->setEmission(osg::Material::FRONT_AND_BACK,osg::Vec4(0, 0, 0, 1));
-    orb_material->setSpecular(osg::Material::FRONT_AND_BACK,osg::Vec4(0, 0, 0, 1));
+    orb_material->setDiffuse(osg::Material::FRONT_AND_BACK,
+                             osg::Vec4(1, 1, 1, 1));
+    orb_material->setAmbient(osg::Material::FRONT_AND_BACK,
+                             osg::Vec4(0, 0, 0, 1));
+    orb_material->setEmission(osg::Material::FRONT_AND_BACK,
+                              osg::Vec4(0, 0, 0, 1));
+    orb_material->setSpecular(osg::Material::FRONT_AND_BACK,
+                              osg::Vec4(0, 0, 0, 1));
     orb_material->setShininess(osg::Material::FRONT_AND_BACK, 0);
     stateSet->setAttribute(orb_material.get());
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::ON);
@@ -109,11 +111,11 @@ bool SDMoon::repaint( double moon_angle )
 
     prev_moon_angle = moon_angle;
 
-    float moon_factor = 4 * cos(moon_angle);
+    float moon_factor = 4*cos(moon_angle);
     
     if (moon_factor > 1) moon_factor = 1.0;
     if (moon_factor < -1) moon_factor = -1.0;
-    moon_factor = moon_factor / 2 + 0.5;
+    moon_factor = (moon_factor/2) + 0.5f;
     
     osg::Vec4 color;
     color[1] = sqrt(moon_factor);
@@ -129,11 +131,13 @@ bool SDMoon::repaint( double moon_angle )
     return true;
 }
 
-bool SDMoon::reposition( double rightAscension, double declination, double moon_dist )
+bool SDMoon::reposition( double rightAscension, double declination,
+			 double moon_dist )
 {
     osg::Matrix T2, RA, DEC;
 
-    RA.makeRotate(rightAscension - 90.0 * SGD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
+    RA.makeRotate(rightAscension - 90.0 * SD_DEGREES_TO_RADIANS,
+                  osg::Vec3(0, 0, 1));
     DEC.makeRotate(declination, osg::Vec3(1, 0, 0));
     T2.makeTranslate(osg::Vec3(0, moon_dist, 0));
 

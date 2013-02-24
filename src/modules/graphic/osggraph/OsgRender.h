@@ -25,11 +25,22 @@
 #include <track.h>	//tTrack
 #include <raceman.h> // tSituation
 
+class SDSky;
+
 class SDRender
 {
 private:
 	osg::ref_ptr<osg::Group> m_sceneroot;
 	osg::ref_ptr<osg::Group> m_carroot;
+
+    osg::Vec4 SkyColor;
+    osg::Vec4 BaseFogColor;
+    osg::Vec4 FogColor;
+    osg::Vec4 CloudsColor;
+
+    osg::Vec4 SceneAmbiant;
+    osg::Vec4 SceneDiffuse;
+    osg::Vec4 SceneSpecular;
 	
 public:
 	SDRender(void);

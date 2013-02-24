@@ -23,11 +23,11 @@
 namespace osggraph
 {
 template <typename Vector>
-class VectorArrayAdapter 
+class SDVectorArrayAdapter 
 {
 public:
 
-    VectorArrayAdapter(Vector& v, int rowStride, int baseOffset = 0,
+    SDVectorArrayAdapter(Vector& v, int rowStride, int baseOffset = 0,
         int rowOffset = 0):
         _v(v),  _rowStride(rowStride), _baseOffset(baseOffset),
         _rowOffset(rowOffset)

@@ -198,7 +198,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 				bool b;
 				if (strName == "GRILL1_s_0")
 					b = true;
-				if (!strncmp(strName.c_str(), "WI", 2)) 
+                if (!strncmp(strName.c_str(), "WI", 2))
 				{
 					group = m_transparentGroup;
 					m_bBlockTransparent = false;
@@ -374,7 +374,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     if (primitiveBins.size() <= matIdx) 
 					{
                         osg::notify(osg::FATAL) << "osgDB TORCS reader: invalid material number while reading object \""
-                                                << group->getName() << "\"" << std::endl;
+                                                << group->getName() << "\"1" << std::endl;
                         return group.release();
                     }
                     
@@ -384,7 +384,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     if (!primitiveBin) 
 					{
                         osg::notify(osg::FATAL) << "osgDB TORCS reader: unexpected primitive flags while reading object \""
-                                                << group->getName() << "\"" << std::endl;
+                                                << group->getName() << "\"2" << std::endl;
                         return group.release();
                     }
                     
@@ -393,7 +393,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     if (token != "refs") 
 					{
                         osg::notify(osg::FATAL) << "osgDB TORCS reader: expected refs line while reading object \""
-                                                << group->getName() << "\"" << std::endl;
+                                                << group->getName() << "\"3" << std::endl;
                         return group.release();
                     }
                     
@@ -402,7 +402,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     if (!stream) 
 					{
                         osg::notify(osg::FATAL) << "osgDB TORCS reader: could not read number of refs while reading object \""
-                                                << group->getName() << "\"" << std::endl;
+                                                << group->getName() << "\"4" << std::endl;
                         return group.release();
                     }
                     
@@ -419,7 +419,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                         if (vertexSet->size() <= index)
                         {
                             osg::notify(osg::FATAL) << "osgDB TORCS reader: invalid ref vertex index while reading object \""
-                                                    << group->getName() << "\"" << std::endl;
+                                                    << group->getName() << "\"5" << std::endl;
                             return group.release();
                         }
                         
@@ -544,8 +544,8 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 		else
 		{
 			std::string strUnknown = token;
-			osg::notify(osg::WARN) << "osgDB TORCS reader: unknown token refs line while reading object \""
-				<<" token:"<<token << "\"" << std::endl;
+            osg::notify(osg::WARN) << "osgDB TORCS reader: unknown token refs line while reading object \"6"
+                <<" token:"<< strUnknown << "\"" << std::endl;
 		}
 
 		if (!stream.good())
@@ -553,8 +553,8 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 			bool bBad = stream.bad();
 			bool bFail = stream.fail();
 			bool bEof = stream.eof();
-			osg::notify(osg::WARN) << "osgDB TORCS reader: token read error \""
-				<<" token:"<<token << "\"" << std::endl;
+            osg::notify(osg::WARN) << "osgDB TORCS reader: token read error \"7"
+                <<" token:"<< token << "\"" << std::endl;
 		}
     }    
 

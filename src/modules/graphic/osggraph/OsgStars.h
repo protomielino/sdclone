@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : OsgDome.h
+    file                 : OsgStars.h
     created              : Mon Aug 21 18:24:02 CEST 2012
     copyright            : (C) 2012 by Xavier Bertaux
     email                : bertauxx@yahoo.fr
@@ -17,42 +17,28 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef _OSGSKYDOME_H
-#define _OSGSKYDOME_H
+#ifndef _OSGSTARS_H_
+#define _OSGSTARS_H_
 
-#include <osg/ref_ptr>
 #include <osg/Array>
-#include <osg/MatrixTransform>
 
-namespace osg
+class SDStars
 {
-class DrawElementsUShort;
-}
+    osg::ref_ptr<osg::Vec4Array> cl;
+    int old_phase;
 
-class SDSkyDome
-{
-    osg::ref_ptr<osg::MatrixTransform> dome_transform;
-    double asl;
-
-    osg::ref_ptr<osg::Vec3Array> dome_vl;
-    osg::ref_ptr<osg::Vec3Array> dome_cl;
 public:
 
     // Constructor
-    SDSkyDome( void );
+    SDStars( void );
 
     // Destructor
-    ~SDSkyDome( void );
+    ~SDStars( void );
 
-    osg::Node *build( double hscale = 80000.0, double vscale = 80000.0 );
+    // initialize the stars structure
+    osg::Node* build( int num, const osg::Vec3d star_data[], double star_dist );
 
-    bool repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_color,
-                  const osg::Vec3f& fog_color, double sun_angle, double vis );
-
-    bool reposition( const osg::Vec3f& p, double asl,
-                     double lon, double lat, double spin );
-private:
-    void makeDome(int rings, int bands, osg::DrawElementsUShort& elements);
+    bool repaint( double sun_angle, int num, const osg::Vec3d star_data[] );
 };
 
-#endif // _OSGSKYDOME_H
+#endif // _OSGSTARS_H_

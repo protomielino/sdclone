@@ -1,11 +1,12 @@
 /***************************************************************************
 
-    file        : OsgSphere.h
-    copyright   : (C) 2012 by Xavier Bertaux (based on SimGear code)
-    web         : bertauxx@yahoo.fr
-    version     : $Id: OsgSphere.h 3162 2012-12-03 13:11:22Z torcs-ng $
+    file                 : OsgSphere.h
+    created              : Mon Aug 21 18:24:02 CEST 2012
+    copyright            : (C) 2012 by Xavier Bertaux
+    email                : bertauxx@yahoo.fr
+    version              : $Id$
 
- ***************************************************************************/
+***************************************************************************/
 
 /***************************************************************************
  *                                                                         *

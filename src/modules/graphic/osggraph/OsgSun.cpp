@@ -1,11 +1,12 @@
 /***************************************************************************
 
-    file        : OsgSun.cpp
-    copyright   : (C) 2012 by Xavier Bertaux (based on SimGear code)
-    web         : http://www.speed-dreams.org
-    version     : $Id: OsgSun.cpp 3162 2012-12-03 13:11:22Z torcs-ng $
+    file                 : OsgSun.cpp
+    created              : Mon Aug 21 18:24:02 CEST 2012
+    copyright            : (C) 2012 by Xavier Bertaux
+    email                : bertauxx@yahoo.fr
+    version              : $Id$
 
- ***************************************************************************/
+***************************************************************************/
 
 /***************************************************************************
  *                                                                         *
@@ -16,6 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <string>
 #include <osg/AlphaFunc>
 #include <osg/BlendFunc>
 #include <osg/Fog>
@@ -27,9 +29,10 @@
 #include <osg/Texture2D>
 #include <osgDB/ReadFile>
 
-#include "OsgSky.h"
-#include "OsgColors.h"
+#include "OsgColor.h"
+#include "OsgSun.h"
 #include "OsgMath.h"
+#include "OsgSphere.h"
 
 // Constructor
 SDSun::SDSun( void ) :
@@ -39,19 +42,14 @@ SDSun::SDSun( void ) :
 
 }
 
-
 // Destructor
 SDSun::~SDSun( void ) 
 {
 }
 
-
-// initialize the sun object and connect it into our scene graph root
-osg::Node* SDSun::build( const std::string path, double sun_size ) 
+osg::Node* SDSun::build( std::string path, double sun_size ) 
 {
-    osg::ref_ptr<osgDB::ReaderWriter::Options> options
-        = makeOptionsFromPath(path);
-
+    std::string TmpPath = path;
     sun_transform = new osg::MatrixTransform;
     osg::StateSet* stateSet = sun_transform->getOrCreateStateSet();
 
@@ -83,22 +81,23 @@ osg::Node* SDSun::build( const std::string path, double sun_size )
     stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
 
-    osg::Geode* geode = new osg::Geode;
-    stateSet = geode->getOrCreateStateSet();
+    osg::Node* sun = SDMakeSphere(sun_size, 15, 15);
+    stateSet = sun->getOrCreateStateSet();
 
     stateSet->setRenderBinDetails(-6, "RenderBin");
 
-    osg::Texture2D* texture = SGLoadTexture2D("sun.png", options.get());
+    path = TmpPath+"sun.png";
+    osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path);
+    osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
     stateSet->setTextureAttributeAndModes(0, texture);
 
-    // Build scenegraph
     sun_cl = new osg::Vec4Array;
     sun_cl->push_back(osg::Vec4(1, 1, 1, 1));
 
     scene_cl = new osg::Vec4Array;
     scene_cl->push_back(osg::Vec4(1, 1, 1, 1));
 
-    osg::Vec3Array* sun_vl = new osg::Vec3Array;
+    /*osg::Vec3Array* sun_vl = new osg::Vec3Array;
     sun_vl->push_back(osg::Vec3(-sun_size, 0, -sun_size));
     sun_vl->push_back(osg::Vec3(sun_size, 0, -sun_size));
     sun_vl->push_back(osg::Vec3(-sun_size, 0, sun_size));
@@ -118,17 +117,18 @@ osg::Node* SDSun::build( const std::string path, double sun_size )
     geometry->setNormalBinding(osg::Geometry::BIND_OFF);
     geometry->setTexCoordArray(0, sun_tl);
     geometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, 4));
-    geode->addDrawable(geometry);
+    geode->addDrawable(geometry);*/
 
-    sun_transform->addChild( geode );
+    sun_transform->addChild( sun );
 
-    // set up the inner-halo state
-    geode = new osg::Geode;
+    osg::Geode* geode = new osg::Geode;
     stateSet = geode->getOrCreateStateSet();
     stateSet->setRenderBinDetails(-7, "RenderBin");
     
-    texture = SGLoadTexture2D("inner_halo.png", options.get());
-    stateSet->setTextureAttributeAndModes(0, texture);
+    path = TmpPath+"inner_halo.png";
+    osg::ref_ptr<osg::Image> image2 = osgDB::readImageFile(path);
+    osg::ref_ptr<osg::Texture2D> texture2 = new osg::Texture2D(image2.get());
+    stateSet->setTextureAttributeAndModes(0, texture2);
 
     ihalo_cl = new osg::Vec4Array;
     ihalo_cl->push_back(osg::Vec4(1, 1, 1, 1));
@@ -146,7 +146,7 @@ osg::Node* SDSun::build( const std::string path, double sun_size )
     ihalo_tl->push_back(osg::Vec2(0, 1));
     ihalo_tl->push_back(osg::Vec2(1, 1));
 
-    geometry = new osg::Geometry;
+    osg::Geometry* geometry = new osg::Geometry;
     geometry->setUseDisplayList(false);
     geometry->setVertexArray(ihalo_vl);
     geometry->setColorArray(ihalo_cl.get());
@@ -162,13 +162,15 @@ osg::Node* SDSun::build( const std::string path, double sun_size )
     stateSet = geode->getOrCreateStateSet();
     stateSet->setRenderBinDetails(-8, "RenderBin");
 
-    texture = SGLoadTexture2D("outer_halo.png", options.get());
-    stateSet->setTextureAttributeAndModes(0, texture);
+    path = TmpPath+"outer_halo.png";
+    osg::ref_ptr<osg::Image> image3 = osgDB::readImageFile(path);
+    osg::ref_ptr<osg::Texture2D> texture3 = new osg::Texture2D(image3.get());
+    stateSet->setTextureAttributeAndModes(0, texture3);
 
     ohalo_cl = new osg::Vec4Array;
     ohalo_cl->push_back(osg::Vec4(1, 1, 1, 1));
 
-    double ohalo_size = sun_size * 8.0;
+    double ohalo_size = sun_size * 10.0;
     osg::Vec3Array* ohalo_vl = new osg::Vec3Array;
     ohalo_vl->push_back(osg::Vec3(-ohalo_size, 0, -ohalo_size));
     ohalo_vl->push_back(osg::Vec3(ohalo_size, 0, -ohalo_size));
@@ -205,7 +207,10 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         if (new_visibility < 100.0) new_visibility = 100.0;
         else if (new_visibility > 45000.0) new_visibility = 45000.0;
         visibility = new_visibility;
-        sun_exp2_punch_through = 2.0/log(visibility);
+
+        static const float sqrt_m_log01 = sqrt( -log( 0.01 ) );
+        sun_exp2_punch_through = sqrt_m_log01 / ( visibility * 15 );
+        //sun_exp2_punch_through = 2.0/log(visibility);
     }
 
     if ( prev_sun_angle != sun_angle ) 
@@ -223,17 +228,14 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         }
 
         double rel_humidity, density_avg;
+        rel_humidity = 0.5;
+        density_avg = 0.7;
 
-        if ( !env_node ) 
-        {
-            rel_humidity = 0.5;
-            density_avg = 0.7;
-        }
-        else 
+        /*else 
         {
             rel_humidity = env_node->getFloatValue( "relative-humidity" ); 
             density_avg =  env_node->getFloatValue( "atmosphere/density-tropo-avg" );
-        }
+        }*/
 
         osg::Vec4 i_halo_color, o_halo_color, scene_color, sun_color;
 
@@ -241,37 +243,54 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         
         red_scat_f = (aerosol_factor * path_distance * density_avg)/5E+07;
         red_scat_corr_f = sun_exp2_punch_through / (1 - red_scat_f);
-        sun_color[0] = 1;
+        sun_color[0] = 1 -red_scat_f;
+		i_halo_color[0] = 1 - (1.1 * red_scat_f);
+		o_halo_color[0] = 1 - (1.4 * red_scat_f);
         scene_color[0] = 1 - red_scat_f;
 
-        green_scat_f = (aerosol_factor * path_distance * density_avg)/8.8938E+06;
-        sun_color[1] = 1 - green_scat_f * red_scat_corr_f;
-        scene_color[1] = 1 - green_scat_f;
+        // Green - 546.1 nm
+		if (sun_declination > 5.0 || sun_declination < 2.0)
+		{
+			green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 5E+07;
+		}
+		else
+			green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 8.8938E+06;
 
+        sun_color[1] = 1 - green_scat_f * red_scat_corr_f;
+		i_halo_color[1] = 1 - (1.1 * (green_scat_f * red_scat_corr_f));
+		o_halo_color[1] = 1 - (1.4 * (green_scat_f * red_scat_corr_f));
+        scene_color[1] = 1 - green_scat_f;
+ 
+        // Blue - 435.8 nm
         blue_scat_f = (aerosol_factor * path_distance * density_avg)/3.607E+06;
         sun_color[2] = 1 - blue_scat_f * red_scat_corr_f;
+		i_halo_color[1] = 1 - (1.1 * (blue_scat_f * red_scat_corr_f));
+		o_halo_color[1] = 1 - (1.4 * (blue_scat_f * red_scat_corr_f));
         scene_color[2] = 1 - blue_scat_f;
 
+        // Alpha
         sun_color[3] = 1;
+		i_halo_color[3] = 1;
         scene_color[3] = 1;
 
+		o_halo_color[3] = blue_scat_f;
+		if ( ( new_visibility < 10000 ) &&  ( blue_scat_f > 1 ))
+		{
+			o_halo_color[3] = 2 - blue_scat_f;
+		}
+
         double saturation = 1 - ( rel_humidity / 200 );
+		sun_color[1] += (( 1 - saturation ) * ( 1 - sun_color[1] ));
+		sun_color[2] += (( 1 - saturation ) * ( 1 - sun_color[2] ));
+
+		i_halo_color[1] += (( 1 - saturation ) * ( 1 - i_halo_color[1] ));
+		i_halo_color[2] += (( 1 - saturation ) * ( 1 - i_halo_color[2] ));
+
+		o_halo_color[1] += (( 1 - saturation ) * ( 1 - o_halo_color[1] ));
+		o_halo_color[2] += (( 1 - saturation ) * ( 1 - o_halo_color[2] ));
+
         scene_color[1] += (( 1 - saturation ) * ( 1 - scene_color[1] ));
         scene_color[2] += (( 1 - saturation ) * ( 1 - scene_color[2] ));
-
-        if (sun_color[0] > 1.0) sun_color[0] = 1.0;
-        if (sun_color[0] < 0.0) sun_color[0] = 0.0;
-        if (sun_color[1] > 1.0) sun_color[1] = 1.0;
-        if (sun_color[1] < 0.0) sun_color[1] = 0.0;
-        if (sun_color[2] > 1.0) sun_color[2] = 1.0;
-        if (sun_color[2] < 0.0) sun_color[2] = 0.0;
-
-        if (scene_color[0] > 1.0) scene_color[0] = 1.0;
-        if (scene_color[0] < 0.0) scene_color[0] = 0.0;
-        if (scene_color[1] > 1.0) scene_color[1] = 1.0;
-        if (scene_color[1] < 0.0) scene_color[1] = 0.0;
-        if (scene_color[2] > 1.0) scene_color[2] = 1.0;
-        if (scene_color[2] < 0.0) scene_color[2] = 0.0;
 
         double scene_f = 0.5 * (1 / (1 - red_scat_f));
         double sun_f = 1.0 - scene_f;
@@ -284,13 +303,47 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         o_halo_color[1] = 0.2 * sun_color[1] + 0.8 * scene_color[1];
         o_halo_color[2] = 0.2 * sun_color[2] + 0.8 * scene_color[2];
         o_halo_color[3] = blue_scat_f;
+
         if ((visibility < 10000) && (blue_scat_f > 1)) 
-        {
+		{
             o_halo_color[3] = 2 - blue_scat_f;
         }
-        
+
         if (o_halo_color[3] > 1) o_halo_color[3] = 1;
         if (o_halo_color[3] < 0) o_halo_color[3] = 0;
+
+		// just to make sure we're in the limits
+		if ( sun_color[0] < 0 ) sun_color[0] = 0;
+		else if ( sun_color[0] > 1) sun_color[0] = 1;
+		if ( i_halo_color[0] < 0 ) i_halo_color[0] = 0;
+		else if ( i_halo_color[0] > 1) i_halo_color[0] = 1;
+		if ( o_halo_color[0] < 0 ) o_halo_color[0] = 0;
+		else if ( o_halo_color[0] > 1) o_halo_color[0] = 1;	
+		if (scene_color[0] < 0) scene_color[0] = 0;
+		else if (scene_color[0] > 1) scene_color[0] = 1;
+
+		if ( sun_color[1] < 0 ) sun_color[1] = 0;
+		else if ( sun_color[1] > 1) sun_color[1] = 1;
+		if ( i_halo_color[1] < 0 ) i_halo_color[1] = 0;
+		else if ( i_halo_color[1] > 1) i_halo_color[1] = 1;
+		if ( o_halo_color[1] < 0 ) o_halo_color[1] = 0;
+		else if ( o_halo_color[0] > 1) o_halo_color[1] = 1;
+		if (scene_color[1] < 0) scene_color[1] = 0;
+		else if (scene_color[1] > 1) scene_color[1] = 1;
+
+		if ( sun_color[2] < 0 ) sun_color[2] = 0;
+		else if ( sun_color[2] > 1) sun_color[2] = 1;
+		if ( i_halo_color[2] < 0 ) i_halo_color[2] = 0;
+		else if ( i_halo_color[2] > 1) i_halo_color[2] = 1;
+		if ( o_halo_color[2] < 0 ) o_halo_color[2] = 0;
+		else if ( o_halo_color[2] > 1) o_halo_color[2] = 1;
+		if ( o_halo_color[3] < 0 ) o_halo_color[3] = 0;
+		else if ( o_halo_color[3] > 1) o_halo_color[3] = 1;
+		if (scene_color[2] < 0) scene_color[2] = 0;
+		else if (scene_color[2] > 1) scene_color[2] = 1;
+		if (scene_color[3] < 0) scene_color[3] = 0;
+		else if (scene_color[3] > 1) scene_color[3] = 1;
+
 
         sd_gamma_correct_rgb( i_halo_color._v );
         sd_gamma_correct_rgb( o_halo_color._v );
@@ -313,17 +366,10 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
 bool SDSun::reposition( double rightAscension, double declination, 
                         double sun_dist, double lat, double alt_asl, double sun_angle)
 {
-    // GST - GMT sidereal time 
     osg::Matrix T2, RA, DEC;
 
-    // xglRotatef( ((SGD_RADIANS_TO_DEGREES * rightAscension)- 90.0),
-    //             0.0, 0.0, 1.0);
-    RA.makeRotate(rightAscension - 90*SGD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
-
-    // xglRotatef((SGD_RADIANS_TO_DEGREES * declination), 1.0, 0.0, 0.0);
+    RA.makeRotate(rightAscension - 90*SD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
     DEC.makeRotate(declination, osg::Vec3(1, 0, 0));
-
-    // xglTranslatef(0,sun_dist);
     T2.makeTranslate(osg::Vec3(0, sun_dist, 0));
 
     sun_transform->setMatrix(T2*DEC*RA);
@@ -332,7 +378,6 @@ bool SDSun::reposition( double rightAscension, double declination,
     if ( prev_sun_angle != sun_angle ) 
     {
       	if ( sun_angle == 0 ) sun_angle = 0.1;
-      	
         const double r_earth_pole = 6356752.314;
         const double r_tropo_pole = 6356752.314 + 8000;
         const double epsilon_earth2 = 6.694380066E-3;
@@ -341,42 +386,37 @@ bool SDSun::reposition( double rightAscension, double declination,
         double r_tropo = r_tropo_pole / sqrt ( 1 - ( epsilon_tropo2 * pow ( cos( lat ), 2 )));
         double r_earth = r_earth_pole / sqrt ( 1 - ( epsilon_earth2 * pow ( cos( lat ), 2 )));
  
-        double position_radius = r_earth + alt_asl;
+        double position_radius = r_earth;
 
-        double gamma =  SG_PI - sun_angle;
+        double gamma =  SD_PI - sun_angle;
         double sin_beta =  ( position_radius * sin ( gamma )  ) / r_tropo;
         
         if (sin_beta > 1.0) sin_beta = 1.0;
         
-        double alpha =  SG_PI - gamma - asin( sin_beta );
+        double alpha =  SD_PI - gamma - asin( sin_beta );
 
-        // OK, now let's calculate the distance the light travels
         path_distance = sqrt( pow( position_radius, 2 ) + pow( r_tropo, 2 )
                         - ( 2 * position_radius * r_tropo * cos( alpha ) ));
 
         double alt_half = sqrt( pow ( r_tropo, 2 ) + pow( path_distance / 2, 2 ) - r_tropo * path_distance * cos( asin( sin_beta )) ) - r_earth;
 
         if ( alt_half < 0.0 ) alt_half = 0.0;
-
-        // Push the data to the property tree, so it can be used in the enviromental code
-        if ( env_node )
+        /*if ( env_node )
         {
             env_node->setDoubleValue( "atmosphere/altitude-troposphere-top", r_tropo - r_earth );
             env_node->setDoubleValue( "atmosphere/altitude-half-to-sun", alt_half );
-      	}
+      	}*/
     }
 
     return true;
 }
 
-SGVec4f
-SDSun::get_color()
+osg::Vec4f SDSun::get_color()
 {
-    return SGVec4f((*sun_cl)[0][0], (*sun_cl)[0][1], (*sun_cl)[0][2], (*sun_cl)[0][3]);
+    return osg::Vec4f((*sun_cl)[0][0], (*sun_cl)[0][1], (*sun_cl)[0][2], (*sun_cl)[0][3]);
 }
 
-SGVec4f
-SDSun::get_scene_color()
+osg::Vec4f SDSun::get_scene_color()
 {
-    return SGVec4f((*scene_cl)[0][0], (*scene_cl)[0][1], (*scene_cl)[0][2], (*scene_cl)[0][3]);
+    return osg::Vec4f((*scene_cl)[0][0], (*scene_cl)[0][1], (*scene_cl)[0][2], (*scene_cl)[0][3]);
 }

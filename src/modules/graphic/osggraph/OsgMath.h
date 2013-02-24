@@ -17,6 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <stdlib.h>
 #ifndef _OSGMATH_H_
 #define _OSGMATH_H_
 
@@ -37,6 +38,15 @@
 #else
 #define SD_PI  ((float) SD_PI)
 #endif
+
+/** PI / 2 */
+#ifdef M_PI_2
+#  define  SD_PI_2  M_PI_2
+#else
+#  define  SD_PI_2  1.57079632679489661923
+#endif
+
+#define SD_2PI (float)SD_PI * (float)SD_PI
 
 #define SD_DEGREES_TO_RADIANS  (SD_PI/SD_180)
 #define SD_RADIANS_TO_DEGREES  (SD_180/SD_PI)
@@ -69,6 +79,12 @@ inline float sdCos ( float s )
                 { return (float)cos (s * SD_DEGREES_TO_RADIANS) ; }
 inline float sdTan ( float s )
                 { return (float)tan (s * SD_DEGREES_TO_RADIANS) ; }
+
+// return a random number between [0.0, 1.0)
+inline double SDRandom(void)
+{
+  return(rand() / (double)RAND_MAX);
+}
 
 
 #endif /* _OSGMATH_H_ */
