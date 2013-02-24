@@ -455,6 +455,7 @@ SimUpdate(tSituation *s, double deltaTime)
 		carElt->_fuel = car->fuel;
 		carElt->priv.collision |= car->collision;
 		carElt->_dammage = car->dammage;
+		carElt->_steerTq = -car->ctrl->steer; /*TODO: torque from Pacejka*/
 	}
 }
 
@@ -576,5 +577,6 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	carElt->_fuel = car->fuel;
 	carElt->priv.collision |= car->collision;
 	carElt->_dammage = car->dammage;
+	carElt->_steerTq = -car->ctrl->steer; /*TODO: torque from Pacejka*/
 }
 
