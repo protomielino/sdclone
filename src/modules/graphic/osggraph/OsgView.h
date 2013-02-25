@@ -19,9 +19,16 @@
 #ifndef _OSGVIEWER_H_
 #define _OSGVIEWER_H_
 
+
+
+
+
 #include <raceman.h>        //tSituation
 #include <car.h>			//tCarElt
 //#include "grcam.h"		//Cameras
+
+
+
 
 //class cGrBoard;
 class SDFrameInfo;
@@ -29,6 +36,9 @@ class SDFrameInfo;
 class SDViewer 
 {
 	protected:
+
+        osgViewer::View * view;
+
         int id;
 	
 		tCarElt	*curCar;		// Current car viewed.
@@ -61,7 +71,7 @@ class SDViewer
 		void loadParams(tSituation *s);			// Load from parameters files.
 
 	public:
-		SDViewer();
+        SDViewer(osgViewer::View * v);
 		~SDViewer();
 
         void Init(tSituation *s);
@@ -98,6 +108,8 @@ class SDViewer
 		inline int getScrY (void) { return scry; }
 		inline int getScrW (void) { return scrw; }
 		inline int getScrH (void) { return scrh; }
+
+        inline osgViewer::View *  getOsgView(void) { return view; }
 		//inline int getBoardWidth(void) { return boardWidth; }
 };
 

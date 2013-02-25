@@ -20,9 +20,6 @@
 #ifndef _OSGMAIN_H_
 #define _OSGMAIN_H_
 
-//#include <osg/Group>
-//#include <osgViewer/Viewer>
-//#include <osg/Camera>
 
 #include <graphic.h>
 #include <raceman.h>	//tSituation

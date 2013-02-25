@@ -17,7 +17,12 @@
  *                                                                         *
  ***************************************************************************/
 
+
+
+#include <osgViewer/View>
 #include <tgfclient.h>
+
+
 
 #include "OsgMain.h"
 #include "OsgView.h"
@@ -27,8 +32,9 @@ static char buf[1024];
 static char path[1024];
 static char path2[1024];
 
-SDViewer::SDViewer()
+SDViewer::SDViewer(osgViewer::View * v)
 {
+    view = v;
     id = 0;
 	curCar = NULL;
     //curCam = NULL;
@@ -76,6 +82,7 @@ void SDViewer::switchMirror(void)
 
 void SDViewer::Init(tSituation *s)
 {
+    view = new osgViewer::View();
     loadParams(s);
 }
 
@@ -146,6 +153,69 @@ void SDViewer::update(tSituation *s, const SDFrameInfo* frameInfo)
 		GfParmWriteFile(NULL, grHandle, "Graph");
         //curCam->onSelect(curCar, s);
 	}
+
+    //int	i;
+    int nb = s->_ncars;
+    //viewer->update(s, &frameInfo);
+    tCarElt *car = getCurrentCar();
+
+
+
+    osg::Vec3 eye, center, up, speed, P, p;
+    float offset = 0;
+    int Speed = 0;
+
+    p[0] = car->_drvPos_x;
+    p[1] = car->_drvPos_y;
+    p[2] = car->_drvPos_z;
+
+    float t0 = p[0];
+    float t1 = p[1];
+    float t2 = p[2];
+
+    p[0] = t0*car->_posMat[0][0] + t1*car->_posMat[1][0] + t2*car->_posMat[2][0] + car->_posMat[3][0];
+    p[1] = t0*car->_posMat[0][1] + t1*car->_posMat[1][1] + t2*car->_posMat[2][1] + car->_posMat[3][1];
+    p[2] = t0*car->_posMat[0][2] + t1*car->_posMat[1][2] + t2*car->_posMat[2][2] + car->_posMat[3][2];
+
+        //GfOut("Car X = %f - P0 = %f\n", car->_pos_X, P[0]);
+
+    eye[0] = p[0];
+    eye[1] = p[1];
+    eye[2] = p[2];
+
+
+    // Compute offset angle and bezel compensation)
+    /*if (spansplit && viewOffset) {
+        offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
+            atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
+        fovy = spanfovy;
+    }*/
+
+    P[0] = (car->_pos_X + 30.0 * cos(car->_glance + offset + car->_yaw));
+    P[1] = (car->_pos_Y + 30.0 * sin(car->_glance + offset + car->_yaw));
+    P[2] = car->_pos_Z + car->_yaw;
+        //osgXformPnt3(P, car->_posMat);
+
+    center[0] = P[0];
+    center[1] = P[1];
+    center[2] = P[2];
+
+    up[0] = car->_posMat[2][0];
+    up[1] = car->_posMat[2][1];
+    up[2] = car->_posMat[2][2];
+
+    speed[0] = car->pub.DynGCg.vel.x;
+    speed[1] = car->pub.DynGCg.vel.y;
+    speed[2] = car->pub.DynGCg.vel.z;
+
+    Speed = car->_speed_x * 3.6;
+
+    //osg::Camera * camera = m_sceneViewer->getCamera();
+
+    //view->getCamera()>setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+
+    view->getCamera()->setViewMatrixAsLookAt( eye, center, up);
+
 }
 
 void SDViewer::loadParams(tSituation *s)

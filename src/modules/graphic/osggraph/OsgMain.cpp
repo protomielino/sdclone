@@ -18,49 +18,40 @@
  ***************************************************************************/
 
 //#include "grOSG.h"
-#include <osgViewer/Viewer>
 #include <osg/Group>
+#include <osgViewer/View>
+#include <osgViewer/CompositeViewer>
 
 #include <glfeatures.h> // GfglFeatures
 #include <robot.h>	//ROB_SECT_ARBITRARY
 #include <graphic.h>
 
+
 #include "OsgMain.h"
 #include "OsgCar.h"
 #include "OsgScenery.h"
-#include "OsgRender.h"
-#include "OsgView.h"
+//#include "OsgRender.h"
 #include "OsgMath.h"
-
-
-//#include "grshadow.h"
-//#include "grskidmarks.h"
-//#include "grsmoke.h"
-//#include "grscreen.h"
-//#include "grloadac.h"
-//#include "grutil.h"
-//#include "grcarlight.h"
-//#include "grboard.h"
-//#include "grtracklight.h"
-//#include "grbackground.h"
+#include "OsgScreens.h"
 
 
 
-//osg::ref_ptr<osgViewer::Viewer> m_sceneViewer;
-//osg::ref_ptr<osg::Group> m_sceneroot;
+
+
+
+
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;
 
 SDCars *cars = NULL;
 SDScenery *scenery = NULL;
-SDRender *render = NULL;
-SDViewer *viewer = NULL;
+//SDRender *render = NULL;
+SDScreens * screens = NULL;
 
 static osg::ref_ptr<osg::Group> m_sceneroot;
 static osg::ref_ptr<osg::Group> m_carroot;
-static osg::ref_ptr<osgViewer::Viewer> m_sceneViewer;
 static osg::Timer m_timer;
-static osg::Timer_t m_start_tick;
+//static osg::Timer_t m_start_tick;
 
 int grMaxTextureUnits = 0;
 
@@ -138,21 +129,20 @@ static void setupOpenGLFeatures(void)
 static void
 SDPrevCar(void * /* dummy */)
 {
-    viewer->selectPrevCar();
+    //viewer->selectPrevCar();
 }
 
 static void
 SDNextCar(void * /* dummy */)
 {
-    viewer->selectNextCar();
+   // viewer->selectNextCar();
 }
 
 int
 initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
-    render = new SDRender;
-    viewer = new SDViewer;
-    int i;
+    //render = new SDRender();
+    screens = new SDScreens();
 
     grWinx = x;
     grWiny = y;
@@ -173,23 +163,15 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     
     //m_start_tick = m_timer.tick();
 
-    m_sceneViewer = new osgViewer::Viewer();
-    m_sceneViewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
-    osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = m_sceneViewer->setUpViewerAsEmbeddedInWindow(0, 0, grWinw, grWinh);
-    m_sceneViewer->getCamera()->setName("Cam one");
-    m_sceneViewer->getCamera()->setViewport(new osg::Viewport(0, 0, grWinw, grWinh));
-    m_sceneViewer->getCamera()->setGraphicsContext(gw.get());
-    m_sceneViewer->getCamera()->setProjectionMatrixAsPerspective(67.5f, static_cast<double>((float)grWinw / (float)grWinh), 0.1f, 12000.0f);
+    //render->Init(m_sceneViewer);
+
+
+    //m_sceneViewer->getUsage();
     //m_sceneViewer->realize();
     
-    m_sceneViewer->setSceneData(m_sceneroot);
-    render->Init(m_sceneViewer);
+    screens->Init(x,y,width,height,m_sceneroot);
 
-	/*// Create the screens and initialize each board.
-    for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-	 	grScreens[i] = new cGrScreen(i);
-		grScreens[i]->initBoard();
-    }*/
+
 
     /*GfuiAddKey(screen, GFUIK_END,      "Zoom Minimum", (void*)GR_ZOOM_MIN,	grSetZoom, NULL);
     GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	grSetZoom, NULL);
@@ -257,68 +239,10 @@ refresh(tSituation *s)
     }
 
 
-    //int	i;
-    int nb = s->_ncars;
-    viewer->update(s, &frameInfo);
-    tCarElt *car = viewer->getCurrentCar();
-    
     cars->updateCars();
-    
-	osg::Vec3 eye, center, up, speed, P, p;
-	float offset = 0;
-	int Speed = 0;
-	
-	p[0] = car->_drvPos_x;
-	p[1] = car->_drvPos_y;
-	p[2] = car->_drvPos_z;
-	
-	float t0 = p[0];
-	float t1 = p[1];
-	float t2 = p[2];
-	
-    p[0] = t0*car->_posMat[0][0] + t1*car->_posMat[1][0] + t2*car->_posMat[2][0] + car->_posMat[3][0];
-	p[1] = t0*car->_posMat[0][1] + t1*car->_posMat[1][1] + t2*car->_posMat[2][1] + car->_posMat[3][1];	
-	p[2] = t0*car->_posMat[0][2] + t1*car->_posMat[1][2] + t2*car->_posMat[2][2] + car->_posMat[3][2];
-    	
-    	//GfOut("Car X = %f - P0 = %f\n", car->_pos_X, P[0]);
-	
-	eye[0] = p[0];
-    eye[1] = p[1];
-    eye[2] = p[2];
+    screens->update(s,&frameInfo);
 
-	
-	// Compute offset angle and bezel compensation)
-	/*if (spansplit && viewOffset) {
-		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
-			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
-		fovy = spanfovy;
-	}*/
 
-	P[0] = (car->_pos_X + 30.0 * cos(car->_glance + offset + car->_yaw));
-    P[1] = (car->_pos_Y + 30.0 * sin(car->_glance + offset + car->_yaw));
-	P[2] = car->_pos_Z + car->_yaw;
-    	//osgXformPnt3(P, car->_posMat);
-
-	center[0] = P[0];
-    center[1] = P[1];
-    center[2] = P[2];
-	
-	up[0] = car->_posMat[2][0];
-    up[1] = car->_posMat[2][1];
-    up[2] = car->_posMat[2][2];
-
-	speed[0] = car->pub.DynGCg.vel.x;
-	speed[1] = car->pub.DynGCg.vel.y;
-	speed[2] = car->pub.DynGCg.vel.z;
-
-	Speed = car->_speed_x * 3.6;
-
-	osg::Camera * camera = m_sceneViewer->getCamera();
-	camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-    camera->setViewMatrixAsLookAt( eye, center, up);
-
-    if (!m_sceneViewer->done())
-        m_sceneViewer->frame();
     
     return 0;
 }
@@ -353,120 +277,6 @@ refresh(tSituation *s)
     return 0;
 }*/
 
-/*int
-initCars(tSituation *s)
-{
-	char buf[256];
-    	char	idx[16];
-    	int	index;
-    	int	i;
-    	tCarElt *elt;
-    	void	*hdle;
-
-    GfOut("initCars: start");
-    //osg::ref_ptr<osg::Group> cars = osg::Group;
-
-    if (!grHandle)
-    {
-        sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
-        grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    }
-
-    //grInitCommonState();
-    //grInitCarlight(s->_ncars);
-    //grMaxDammage = (tdble)s->_maxDammage;
-    grNbCars = s->_ncars;
-
-    //grCustomizePits();
-
-    grCarInfo = (tgrCarInfo*)calloc(s->_ncars, sizeof(tgrCarInfo));
-
-	/*for (i = 0; i < s->_ncars; i++) {
-		elt = s->cars[i];*/
-		/* Car pre-initialization */
-		//grPreInitCar(elt);
-		/* Shadow init (Should be done before the cars for display order) */
-		//grInitShadow(elt);
-		/* Skidmarks init */
-		//grInitSkidmarks(elt);
-	/*}*/
-
-    //grNbActiveScreens = 0;
-    /*for (i = 0; i < s->_ncars; i++) {
-	elt = s->cars[i];
-	index = elt->index;
-	hdle = elt->_paramsHandle;
-
-	// WARNING: This index hack on the human robot for the Career mode
-	//          does no more work with the new "welcome" module system
-	//          (the "normal" index has no more the 10 limit) ... TO BE FIXED !!!!!!!
-	if (elt->_driverType == RM_DRV_HUMAN && elt->_driverIndex > 10)
-		sprintf(idx, "Robots/index/%d", elt->_driverIndex - 11);
-	else
-		sprintf(idx, "Robots/index/%d", elt->_driverIndex);
-
-	/*grCarInfo[index].iconColor[0] = GfParmGetNum(hdle, idx, "red",   (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "red",   NULL, 0));
-	grCarInfo[index].iconColor[1] = GfParmGetNum(hdle, idx, "green", (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "green", NULL, 0));
-	grCarInfo[index].iconColor[2] = GfParmGetNum(hdle, idx, "blue",  (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "blue",  NULL, 0));
-	grCarInfo[index].iconColor[3] = 1.0;*/
-	//grInitCar(elt);
-	
-     //osgLoader loader;
-     //osg::ref_ptr<osg::Group> m_sceneroot = new osg::Group;
-     //loader.AddSearchPath(m_strTexturePath);
-     //osg::Node *pCar = loader.Load3dFile(strTrack);
- 
-     //osgDB::writeNodeFile(*pTrack,"mytrack.osg");
-
-    /*if (pTrack)
-    {
-        osgUtil::Optimizer optimizer;
-        optimizer.optimize(pTrack);
-
-        osg::ref_ptr<osg::Transform> transform = osg::Transform;
-        osg::Matrix R = osg::Matrix::rotate (elt->_pitch,elt->yaw,elt->roll);
-        osg::Matrix T = osg::Matrix::rotate (elt->_pos_X,elt->_pos_Z,-elt->_pos_Y);
-        transform->setMatrix(T*R);
-        transform->addChild(pCar);
-
-        cars->addChild(transform);
-    }
-
-    osg::ref_ptr<osg::Group>  gr = m_sceneViewer->getSceneData();
-
-    gr->addChild(cars);*/
-
-	// Pre-assign each human driver (if any) to a different screen
-	// (set him as the "current driver" for this screen).
-	/*if (grNbActiveScreens < GR_NB_MAX_SCREEN
-		&& elt->_driverType == RM_DRV_HUMAN && !elt->_networkPlayer) 
-	{
-	    grScreens[grNbActiveScreens]->setCurrentCar(elt);
-		GfLogTrace("Screen #%d : Assigned to %s\n", grNbActiveScreens, elt->_name);
-	    grNbActiveScreens++;
-	}
-    }
-
-	// Load the real number of active screens and the arrangment.
-	grNbActiveScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, 1.0);
-	grNbArrangeScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_ARR_SCREENS, NULL, 1.0);
-
-	// Initialize the cameras for all the screens.
-    for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-	grScreens[i]->initCams(s);
-    }*/
-
-    //GfOut("initCars: end");
-
-	// Initialize other stuff.
-    /*grInitSmoke(s->_ncars);
-    grTrackLightInit();
-
-	// Setup the screens (= OpenGL viewports) inside the physical game window.
-    grAdaptScreenSize();*/
-
-    //return 0; // true;
-//}
 
 void
 shutdownCars(void)
@@ -532,6 +342,8 @@ initTrack(tTrack *track)
 	m_sceneroot = new osg::Group();
 	m_sceneroot->addChild(scenery->LoadScene(track));
 
+
+
 	 //return -1;*/
     //m_sceneViewer->setSceneData();
     return 0;
@@ -543,6 +355,8 @@ int  initCars(tSituation *s)
     cars = new SDCars;
     m_sceneroot->addChild(cars->loadCars(s));
     GfOut("All cars loaded\n");
+
+    screens->InitCars(s);
     
     if (!grHandle)
     {
@@ -550,7 +364,7 @@ int  initCars(tSituation *s)
         grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     }
 
-    viewer->Init(s);
+   // viewer->Init(s);
     
     return 0;
 }
@@ -578,13 +392,8 @@ shutdownTrack(void)
 void
 shutdownView(void)
 {
-    /*for (int i = 0; i < GR_NB_MAX_SCREEN; i++)
-	{
-		delete grScreens[i];
-		grScreens[i] = 0;
-    }*/
-    delete render;
-    delete viewer;
+    //delete render;
+  //  delete viewer;
 }
 
 //void SsgGraph::bendCar(int index, sgVec3 poc, sgVec3 force, int count)

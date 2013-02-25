@@ -86,7 +86,7 @@ SDRender::~SDRender(void)
  * 
  * @return 0 if OK, -1 if something failed
  */
-void SDRender::Init(osg::ref_ptr<osgViewer::Viewer> viewer)
+void SDRender::Init(osgViewer::Viewer *viewer)
 {
     char buf[256];
     void *hndl = grTrackHandle;
