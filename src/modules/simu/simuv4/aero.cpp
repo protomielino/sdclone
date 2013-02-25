@@ -170,9 +170,9 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
 			}
 			else // 30 deg -> 90 deg smoothly reduced downforce 
 			{
-			    sinaoa = sin(aoa)-sin((aoa-PI_6)*(aoa-PI_6));
+				sinaoa = 0.25 * (1 - ((aoa-PI_3)/PI_6)*((aoa-PI_3)/PI_6)*((aoa-PI_3)/PI_6));
 			}
-			wing->forces.z = (float) wing->Kz * vt2 * sinaoa;
+			wing->forces.z = (float) MAX(0.0,wing->Kz * vt2 * sinaoa);
 		}
 	} 
 	else 
