@@ -411,16 +411,16 @@ typedef struct {
 /** Info returned by driver during the race */
 /** New order to get better alignment, additional parameters for new features */
 typedef struct {
-    tdble	steer;	            /**< Steer command [-1.0, 1.0]  */
-    tdble	accelCmd;           /**< Accelerator command [0.0, 1.0] */
-    tdble	brakeCmd;           /**< Brake command [0.0, 1.0] */
-    tdble	clutchCmd;          /**< Clutch command [0.0, 1.0] */
+    tdble	steer;	            /**< Steer command       [-1.0, 1.0]  */
+    tdble	accelCmd;           /**< Accelerator command [ 0.0, 1.0] */
+    tdble	brakeCmd;           /**< Brake command       [ 0.0, 1.0] */
+    tdble	clutchCmd;          /**< Clutch command      [ 0.0, 1.0] */
 
 	// New commands for single wheel braking
-	tdble	brakeFrontLeftCmd;  /**< Brake front left command  [-1.0, 1.0] -1: do not use single wheel brake: 0: no brake; 1: max brake */
-    tdble	brakeFrontRightCmd; /**< Brake front right command [-1.0, 1.0] -1: do not use single wheel brake: 0: no brake; 1: max brake */
-    tdble	brakeRearLeftCmd;   /**< Brake rear left command   [-1.0, 1.0] -1: do not use single wheel brake: 0: no brake; 1: max brake */
-    tdble	brakeRearRightCmd;  /**< Brake rear right command  [-1.0, 1.0] -1: do not use single wheel brake: 0: no brake; 1: max brake */
+	tdble	brakeFrontLeftCmd;  /**< Brake front left command  [0.0, 1.0] 0: no brake; 1: max brake */
+    tdble	brakeFrontRightCmd; /**< Brake front right command [0.0, 1.0] 0: no brake; 1: max brake */
+    tdble	brakeRearLeftCmd;   /**< Brake rear left command   [0.0, 1.0] 0: no brake; 1: max brake */
+    tdble	brakeRearRightCmd;  /**< Brake rear right command  [0.0, 1.0] 0: no brake; 1: max brake */
 
 	// New commands for variable wings (incl. airbrake)
     tdble	wingFrontCmd;       /**< Wing angle of attack front [0, PI/4: angle in rad] */
