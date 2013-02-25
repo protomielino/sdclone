@@ -145,6 +145,29 @@ ctrlCheck(tCar *car)
 	car->ctrl->wingRearCmd = 0.0;
     }
 
+	if (car->ctrl->brakeFrontLeftCmd < 0) {
+	car->ctrl->brakeFrontLeftCmd = 0;
+	} else if (car->ctrl->brakeFrontLeftCmd > 1.0f) { 
+	car->ctrl->brakeFrontLeftCmd = 1.0f;
+	} 
+
+	if (car->ctrl->brakeFrontRightCmd < 0) {
+	car->ctrl->brakeFrontRightCmd = 0;
+	} else if (car->ctrl->brakeFrontRightCmd > 1.0f) { 
+	car->ctrl->brakeFrontRightCmd = 1.0f;
+	} 
+
+	if (car->ctrl->brakeRearLeftCmd < 0) { 
+	car->ctrl->brakeRearLeftCmd = 0;
+	} else if (car->ctrl->brakeRearLeftCmd > 1.0f) { 
+	car->ctrl->brakeRearLeftCmd = 1.0f;
+	} 
+
+	if (car->ctrl->brakeRearRightCmd < 0) { 
+	car->ctrl->brakeRearRightCmd = 0;
+	} else if (car->ctrl->brakeRearRightCmd > 1.0f) { 
+	car->ctrl->brakeRearRightCmd = 1.0f;
+	} 
 }
 
 /* Initial configuration */

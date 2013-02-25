@@ -152,16 +152,26 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
     // the sinus of the angle of attack
     tdble sinaoa = sin(aoa);
 
-    if (car->DynGC.vel.x > 0.0f) {
+    if (car->DynGC.vel.x > 0.0f)
+	{
         // make drag always negative and have a minimal angle of attack
         wing->forces.x = (tdble) (wing->Kx * vt2 * (1.0f + (tdble)car->dammage / 10000.0) * MAX(fabs(sinaoa), 0.02));
 		// If angle of attack is too large, no downforce, only drag
-		if (fabs(aoa) < PI_4)
-	        wing->forces.z = wing->Kz * vt2 * sinaoa;
+		if (fabs(aoa) > PI_2)
+		{
+			wing->forces.z = 0.0;
+		}
 		else
-		    wing->forces.z = 0.0;
-    } else {
+		{
+			if (fabs(aoa) > PI_4)
+			{
+				aoa = (float) MIN(PI_4,MAX(0.0,(1.2 *(PI_2 - aoa)))); 
+			    sinaoa = sin(aoa);
+			}
+	        wing->forces.z = (float) MAX(0.0,wing->Kz * vt2 * sinaoa);
+		}
+	} 
+	else 
         wing->forces.x = wing->forces.z = 0.0f;
-    }
 }
 
