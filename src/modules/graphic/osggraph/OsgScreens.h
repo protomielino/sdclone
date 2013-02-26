@@ -23,7 +23,7 @@
 
 
 
-
+#include <osgViewer/Viewer>
 #include <raceman.h>        //tSituation
 #include "OsgView.h"
 
@@ -31,7 +31,7 @@
 class SDScreens
 {
     protected:
-        osgViewer::CompositeViewer *viewer;
+        osgViewer::Viewer *viewer;
         SDViewer * view;
 
 //		int mirrorFlag;

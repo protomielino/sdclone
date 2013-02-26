@@ -19,7 +19,7 @@
 
 
 
-#include <osgViewer/View>
+#include <osg/Camera>
 #include <tgfclient.h>
 
 
@@ -32,9 +32,9 @@ static char buf[1024];
 static char path[1024];
 static char path2[1024];
 
-SDViewer::SDViewer(osgViewer::View * v)
+SDViewer::SDViewer(osg::Camera * c)
 {
-    view = v;
+    cam = c;
     id = 0;
 	curCar = NULL;
     //curCam = NULL;
@@ -82,7 +82,6 @@ void SDViewer::switchMirror(void)
 
 void SDViewer::Init(tSituation *s)
 {
-    view = new osgViewer::View();
     loadParams(s);
 }
 
@@ -212,9 +211,9 @@ void SDViewer::update(tSituation *s, const SDFrameInfo* frameInfo)
 
     //osg::Camera * camera = m_sceneViewer->getCamera();
 
-    //view->getCamera()>setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+    cam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 
-    view->getCamera()->setViewMatrixAsLookAt( eye, center, up);
+    cam->setViewMatrixAsLookAt( eye, center, up);
 
 }
 

@@ -37,7 +37,7 @@ class SDViewer
 {
 	protected:
 
-        osgViewer::View * view;
+        osg::Camera * cam;
 
         int id;
 	
@@ -71,7 +71,7 @@ class SDViewer
 		void loadParams(tSituation *s);			// Load from parameters files.
 
 	public:
-        SDViewer(osgViewer::View * v);
+        SDViewer(osg::Camera * c);
 		~SDViewer();
 
         void Init(tSituation *s);
@@ -109,7 +109,7 @@ class SDViewer
 		inline int getScrW (void) { return scrw; }
 		inline int getScrH (void) { return scrh; }
 
-        inline osgViewer::View *  getOsgView(void) { return view; }
+        inline osg::Camera *  getOsgCam(void) { return cam; }
 		//inline int getBoardWidth(void) { return boardWidth; }
 };
 

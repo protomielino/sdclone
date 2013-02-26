@@ -20,16 +20,16 @@
 #include <tgfclient.h>
 
 
-#include <osgViewer/CompositeViewer>
-#include <osgViewer/GraphicsWindow>
 #include <osgViewer/Viewer>
+#include <osgViewer/GraphicsWindow>
+
 
 #include "OsgScreens.h"
 
 
 SDScreens::SDScreens()
 {
-    viewer = new osgViewer::CompositeViewer();
+    viewer = new osgViewer::Viewer();
 }
 
 void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group> m_sceneroot){
@@ -40,22 +40,23 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
     int grWinw = width;
     int grWinh = height;
 
-    osgViewer::View *  osgView = new osgViewer::View;
-
-    osgViewer::GraphicsWindow *gw = new osgViewer::GraphicsWindow();
-
-    viewer->addView(osgView);
 
 
 
-    view = new SDViewer(osgView);
+
+
+
+
+
+    view = new SDViewer(viewer->getCamera());
     viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
-    view->getOsgView()->setUpViewInWindow(0, 0, grWinw, grWinh,0);
-    osgView->getCamera()->setName("Cam one");
-    osgView->getCamera()->setViewport(new osg::Viewport(0, 0, grWinw, grWinh));
-    osgView->getCamera()->setGraphicsContext(gw);
-    osgView->getCamera()->setProjectionMatrixAsPerspective(67.5f, static_cast<double>((float)grWinw / (float)grWinh), 0.1f, 12000.0f);
-    osgView->setSceneData(m_sceneroot.get());
+    osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, grWinw, grWinh);
+    //view->getOsgView()->setUpViewInWindow(0, 0, grWinw, grWinh,0);
+    viewer->getCamera()->setName("Cam one");
+    viewer->getCamera()->setViewport(new osg::Viewport(0, 0, grWinw, grWinh));
+    viewer->getCamera()->setGraphicsContext(gw);
+    viewer->getCamera()->setProjectionMatrixAsPerspective(67.5f, static_cast<double>((float)grWinw / (float)grWinh), 0.1f, 12000.0f);
+    viewer->setSceneData(m_sceneroot.get());
     //viewer->realize();
 
 
@@ -71,7 +72,7 @@ void SDScreens::InitCars(tSituation *s){
 void SDScreens::update(tSituation * s,SDFrameInfo* fi){
     view->update(s,fi);
 
-    //if (!viewer->done())
+    if (!viewer->done())
         viewer->frame();
 }
 
