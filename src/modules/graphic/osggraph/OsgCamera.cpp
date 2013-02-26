@@ -29,6 +29,7 @@
 
 #include "OsgCamera.h"
 #include "OsgView.h"
+#include "OsgScenery.h"
 
 //static char path[1024];
 
@@ -297,6 +298,7 @@ void SDPerspCamera::setZoom(int cmd)
 {
     //char	buf[256];
 
+
     switch(cmd) {
     case GR_ZOOM_IN:
     if (fovy > 2) {
@@ -340,6 +342,7 @@ void SDPerspCamera::setZoom(int cmd)
     spanOffset = 0;
     }
 
+   this->setProjection();
    // sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, screen->getCameras()->getIntSelectedCamera(), getId());
     //sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
     //GfParmSetNum(grHandle, path, buf, (char*)NULL, (tdble)fovy);
@@ -888,6 +891,319 @@ protected:
     }
 };
 
+// cGrCarCamUp ================================================================
+
+class SDCarCamUp : public SDPerspCamera
+{
+ protected:
+    float distz;
+
+ public:
+    SDCarCamUp(SDView *myscreen, int id, int drawCurr, int drawBG,
+        float fovy, float fovymin, float fovymax,
+        float mydistz, int axis,
+        float fnear, float ffar = 1500.0,
+        float myfogstart = 1600.0, float myfogend = 1700.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+             fovymax, fnear, ffar, myfogstart, myfogend) {
+    distz = mydistz;
+    up[2] = 0;
+    switch (axis) {
+    case 0:
+        up[0] = 0;
+        up[1] = 1;
+        break;
+    case 1:
+        up[0] = 0;
+        up[1] = -1;
+        break;
+    case 2:
+        up[0] = 1;
+        up[1] = 0;
+        break;
+    case 3:
+        up[0] = -1;
+        up[1] = 0;
+        break;
+    default:
+        up[0] = 0;
+        up[1] = 1;
+        break;
+    }
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+    tdble x = car->_pos_X;
+    tdble y = car->_pos_Y;
+    tdble z = car->_pos_Z + distz;
+
+    eye[0] = x;
+    eye[1] = y;
+    eye[2] = z;
+    center[0] = x;
+    center[1] = y;
+    center[2] = car->_pos_Z;
+
+
+    speed[0] = car->pub.DynGCg.vel.x;
+    speed[1] = car->pub.DynGCg.vel.y;
+    speed[2] = car->pub.DynGCg.vel.z;
+
+    Speed = car->_speed_x * 3.6;
+    }
+};
+
+// cGrCarCamCenter ================================================================
+
+class SDCarCamCenter : public SDPerspCamera
+{
+ protected:
+    float distz;
+    float locfar;
+    float locfovy;
+
+ public:
+    SDCarCamCenter(SDView *myscreen, int id, int drawCurr, int drawBG,
+            float fovy, float fovymin, float fovymax,
+            float mydistz,
+            float fnear, float ffar = 1500.0,
+            float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+             fovymax, fnear, ffar, myfogstart, myfogend) {
+    distz = mydistz;
+    locfar = ffar;
+    locfovy = fovy;
+
+    eye[0] = grWrldX * 0.5;
+    eye[1] = grWrldY * 0.6;
+    eye[2] = distz;
+
+    up[0] = 0;
+    up[1] = 0;
+    up[2] = 1;
+    }
+
+    void loadDefaults(char *attr) {
+  /*  sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
+    locfovy = (float)GfParmGetNum(grHandle, path,
+                   attr, (char*)NULL, fovydflt);*/
+    }
+
+    void setZoom(int cmd) {
+    fovy = locfovy;
+    SDPerspCamera::setZoom(cmd);
+    locfovy = fovy;
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+    tdble	dx, dy, dz, dd;
+
+    center[0] = car->_pos_X;
+    center[1] = car->_pos_Y;
+    center[2] = car->_pos_Z;
+
+    dx = center[0] - eye[0];
+    dy = center[1] - eye[1];
+    dz = center[2] - eye[2];
+
+    dd = sqrt(dx*dx+dy*dy+dz*dz);
+
+    fnear = dz - 5;
+    if (fnear < 1) {
+        fnear = 1;
+    }
+    ffar  = dd + locfar;
+
+    fovy = RAD2DEG(atan2(locfovy, dd));
+
+    speed[0] = 0;
+    speed[1] = 0;
+    speed[2] = 0;
+
+    Speed = car->_speed_x * 3.6;
+    }
+};
+
+// SDCarCamLookAt ================================================================
+
+class SDCarCamLookAt : public SDPerspCamera
+{
+ protected:
+
+ public:
+    SDCarCamLookAt(SDView *myscreen, int id, int drawCurr, int drawBG,
+            float fovy, float fovymin, float fovymax,
+            int axis,
+            float eyex, float eyey, float eyez,
+            float centerx, float centery, float centerz,
+            float fnear, float ffar = 1500.0,
+            float myfogstart = 1600.0, float myfogend = 1700.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+             fovymax, fnear, ffar, myfogstart, myfogend) {
+
+    eye[0] = eyex;
+    eye[1] = eyey;
+    eye[2] = eyez;
+
+    center[0] = centerx;
+    center[1] = centery;
+    center[2] = centerz;
+
+    switch (axis) {
+    case 0:
+        up[0] = 0;
+        up[1] = 1;
+        up[2] = 0;
+        break;
+    case 1:
+        up[0] = 0;
+        up[1] = -1;
+        up[2] = 0;
+        break;
+    case 2:
+        up[0] = 1;
+        up[1] = 0;
+        up[2] = 0;
+        break;
+    case 3:
+        up[0] = -1;
+        up[1] = 0;
+        up[2] = 0;
+        break;
+    case 4:
+        up[0] = 0;
+        up[1] = 0;
+        up[2] = 1;
+        break;
+    case 5:
+        up[0] = 0;
+        up[1] = 0;
+        up[2] = -1;
+        break;
+    default:
+        up[0] = 0;
+        up[1] = 0;
+        up[2] = 1;
+        break;
+    }
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+    }
+};
+
+// cGrCarCamGoPro1 ================================================================
+
+class SDCarCamGoPro1 : public SDPerspCamera
+{
+ protected:
+
+ public:
+    SDCarCamGoPro1(SDView *myscreen, int id, int drawCurr, int drawBG,
+            float fovy, float fovymin, float fovymax,
+            float fnear, float ffar = 1500.0,
+            float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+             fovymax, fnear, ffar, myfogstart, myfogend) {
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+    sgVec3 P, p;
+    float offset = 0;
+
+    p[0] = car->_drvPos_x;
+    p[1] = (car->_dimension_y / 2) + 0.1;
+    p[2] = car->_statGC_z;
+    sgXformPnt3(p, car->_posMat);
+
+    eye[0] = p[0];
+    eye[1] = p[1];
+    eye[2] = p[2];
+
+    // Compute offset angle and bezel compensation)
+    if (viewOffset) {
+        offset += getSpanAngle();
+    }
+
+    P[0] = 30 * cos(offset);
+    P[1] = (car->_dimension_y / 2) + 0.1 - 30.0 * sin(offset);
+    P[2] = car->_statGC_z;
+
+    sgXformPnt3(P, car->_posMat);
+
+    center[0] = P[0];
+    center[1] = P[1];
+    center[2] = P[2];
+
+    up[0] = car->_posMat[2][0];
+    up[1] = car->_posMat[2][1];
+    up[2] = car->_posMat[2][2];
+
+    speed[0] =car->pub.DynGCg.vel.x;
+    speed[1] =car->pub.DynGCg.vel.y;
+    speed[2] =car->pub.DynGCg.vel.z;
+
+    Speed = car->_speed_x * 3.6;
+    }
+};
+
+// cGrCarCamGoPro2 ================================================================
+
+class SDCarCamGoPro2 : public SDPerspCamera
+{
+ protected:
+
+ public:
+    SDCarCamGoPro2(SDView*myscreen, int id, int drawCurr, int drawBG,
+            float fovy, float fovymin, float fovymax,
+            float fnear, float ffar = 1500.0,
+            float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+             fovymax, fnear, ffar, myfogstart, myfogend) {
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+    sgVec3 P, p;
+    float offset = 0;
+
+    p[0] = car->_drvPos_x;
+    p[1] = 0 - (car->_dimension_y / 2) - 0.1;
+    p[2] = car->_statGC_z;
+    sgXformPnt3(p, car->_posMat);
+
+    eye[0] = p[0];
+    eye[1] = p[1];
+    eye[2] = p[2];
+
+    // Compute offset angle and bezel compensation)
+    if (viewOffset) {
+        offset += getSpanAngle();
+    }
+
+    P[0] = 30 * cos(offset);
+    P[1] = 0 - (car->_dimension_y / 2) - 0.1 - 30.0 * sin(offset);
+    P[2] = car->_statGC_z;
+
+    sgXformPnt3(P, car->_posMat);
+
+    center[0] = P[0];
+    center[1] = P[1];
+    center[2] = P[2];
+
+    up[0] = car->_posMat[2][0];
+    up[1] = car->_posMat[2][1];
+    up[2] = car->_posMat[2][2];
+
+    speed[0] =car->pub.DynGCg.vel.x;
+    speed[1] =car->pub.DynGCg.vel.y;
+    speed[2] =car->pub.DynGCg.vel.z;
+
+    Speed = car->_speed_x * 3.6;
+    }
+};
+
+
+
 
 SDCamera::~SDCamera( void ){
 }
@@ -978,7 +1294,7 @@ SDCameras::SDCameras(SDView *c){
                                                                    fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
                                                                    ));
     id++;
-    /* TODO Repaircam F2 = just behind the car; camera looking back  */
+    /* TODO BUG F2 = just behind the car; camera looking back  */
     cameras[0].insert(cameras[0].end(),new SDCarCamBehindReverse(myscreen,
                                                                    id,
                                                                    0,	/* drawCurr */
@@ -1207,11 +1523,162 @@ SDCameras::SDCameras(SDView *c){
                                                         ));
     id++;
 
+    /* F5 - Views from above - list index 3 */
+    id=0;
 
-    //cameras.insert(cameras.end(),new SDCarCamInsideDriverEye(this->screen));
-    //cameras.insert(cameras.end(),new SDCarCamBehindFixedCar(this->screen));
+    /* cam F5 = car up 1 */
+    cameras[3].insert(cameras[3].end(),new SDCarCamUp(myscreen,
+                                                       id,
+                                                       1,	/* drawCurr */
+                                                       1,	/* drawBG  */
+                                                       //12.0,	/* fovy */
+                                                       37.5,	/* fovy */
+                                                       1.0,	/* fovymin */
+                                                       90.0,	/* fovymax */
+                                                       //300.0,	/* distz */
+                                                       200.0,	/* distz */
+                                                       0,		/* axis */
+                                                       //200.0,	/* near */
+                                                       100.0,	/* near */
+                                                       fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
+                                                       fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                       fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                       ));
+    id++;
+
+    /* cam F5 = car up 2 */
+    cameras[3].insert(cameras[3].end(),new SDCarCamUp(myscreen,
+                                                      id,
+                                                      1,	/* drawCurr */
+                                                      1,	/* drawBG  */
+                                                      //12.0,	/* fovy */
+                                                      37.5,	/* fovy */
+                                                      1.0,	/* fovymin */
+                                                      90.0,	/* fovymax */
+                                                      //300.0,	/* distz */
+                                                      250.0,	/* distz */
+                                                      1,		/* axis */
+                                                      200.0,	/* near */
+                                                      fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
+                                                      fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                      fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                      ));
+    id++;
+
+    /* cam F5 = car up 3 */
+    cameras[3].insert(cameras[3].end(),new SDCarCamUp(myscreen,
+                                                      id,
+                                                      1,	/* drawCurr */
+                                                      1,	/* drawBG  */
+                                                      //12.0,	/* fovy */
+                                                      37.5,	/* fovy */
+                                                      1.0,	/* fovymin */
+                                                      90.0,	/* fovymax */
+                                                      //300.0,	/* distz */
+                                                      350.0,	/* distz */
+                                                      2,		/* axis */
+                                                      200.0,	/* near */
+                                                      fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
+                                                      fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                      fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                      ));
+    id++;
+
+    /* cam F5 = car up 4 */
+    cameras[3].insert(cameras[3].end(),new SDCarCamUp(myscreen,
+                                                      id,
+                                                      1,	/* drawCurr */
+                                                      1,	/* drawBG  */
+                                                      //12.0,	/* fovy */
+                                                      37.5,	/* fovy */
+                                                      1.0,	/* fovymin */
+                                                      90.0,	/* fovymax */
+                                                      //300.0,	/* distz */
+                                                      400.0,	/* distz */
+                                                      3,		/* axis */
+                                                      200.0,	/* near */
+                                                      fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
+                                                      fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                      fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                      ));
+    id++;
+
+    /* F6 - index 4*/
+    id=0;
+
+    /* BUG TODO cam F6 = car from circuit centre */
+    cameras[4].insert(cameras[4].end(),new SDCarCamCenter(myscreen,
+                                                          id,
+                                                          1,	/* drawCurr */
+                                                          1,	/* drawBG  */
+                                                          21.0,	/* fovy */
+                                                          2.0,	/* fovymin */
+                                                          60.0,	/* fovymax */
+                                                          120.0,	/* distz */
+                                                          100.0,	/* near */
+                                                          fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
+                                                          fixedFar ? fixedFar/2 : 500.0 * fovFactor,/* fogstart */
+                                                          fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                          ));
+    id++;
+
+
+    /* F7 -index 5*/
+    id =0;
+    /* BUGGY too cam F7 = panoramic */
+    cameras[5].insert(cameras[5].end(),new SDCarCamLookAt(myscreen,
+                                                           id,
+                                                           1,		/* drawCurr */
+                                                           0,		/* drawBG  */
+                                                           74.0,		/* fovy */
+                                                           1.0,		/* fovymin */
+                                                           110.0,		/* fovymax */
+                                                           0,		/* up axis */
+                                                           grWrldX/2,	/* eyex */
+                                                           grWrldY/2,	/* eyey */
+                                                           MAX(grWrldX/2, grWrldY*4/3/2) + grWrldZ, /* eyez */
+                                                           grWrldX/2,	/* centerx */
+                                                           grWrldY/2,	/* centery */
+                                                           0,		/* centerz */
+                                                           10.0,		/* near */
+                                                           grWrldMaxSize * 2.0,	/* far */
+                                                           grWrldMaxSize * 10.0,	/* fogstart */
+                                                           grWrldMaxSize * 20.0	/* fogend */
+                                                           ));
+
+    /* F8 - GoPro like views-index 6*/
+    id=0;
+
+    cameras[6].insert(cameras[6].end(),new SDCarCamGoPro1(myscreen,
+                                                          id,
+                                                          1,	/* drawCurr */
+                                                          1,	/* drawBG  */
+                                                          67.5,	/* fovy */
+                                                          10.0,	/* fovymin */
+                                                          95.0,	/* fovymax */
+                                                          0.05,	/* near */
+                                                          fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+                                                          fixedFar ? fixedFar : 300.0 * fovFactor,	/* fogstart */
+                                                          fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
+                                                          ));
+    id++;
+    cameras[6].insert(cameras[6].end(),new SDCarCamGoPro2(myscreen,
+                                                           id,
+                                                           1,	/* drawCurr */
+                                                           1,	/* drawBG  */
+                                                           67.5,	/* fovy */
+                                                           10.0,	/* fovymin */
+                                                           95.0,	/* fovymax */
+                                                           0.05,	/* near */
+                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+                                                           fixedFar ? fixedFar : 300.0 * fovFactor,	/* fogstart */
+                                                           fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
+                                                           ));
+
+
     selectedCamera =0;
     selectedList=0;
+
 }
 
 SDCamera * SDCameras::getSelectedCamera(){

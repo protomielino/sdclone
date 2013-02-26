@@ -91,6 +91,11 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 	_grWrldZ = (int)(track->max.z - track->min.z + 1);
 	_grWrldMaxSize = (int)(MAX(MAX(_grWrldX, _grWrldY), _grWrldZ));
 
+    grWrldX = _grWrldX;
+    grWrldY = _grWrldY;
+    grWrldZ = _grWrldZ;
+    grWrldMaxSize = _grWrldMaxSize;
+
 	acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
   	GfOut("ACname = %s\n", acname);
 	if (strlen(acname) == 0) 

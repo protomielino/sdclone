@@ -82,6 +82,12 @@ public:
 	void build(tTrack *track);
 };*/
 
+static int	grWrldX;
+static int grWrldY;
+static int grWrldZ;
+static int	grWrldMaxSize;
+
+
 class SDScenery
 {
 private:
@@ -115,7 +121,8 @@ private:
 	void LoadSkyOptions();
 	void CustomizePits(void);
 	bool LoadTrack(std::string strTrack);
-	
+    //inline getGrWrldX(){return _grWrldX;}
+    //inline getGrWrldY(){return _grWrldX;}
 public:
 	
 	/* Constructor */
