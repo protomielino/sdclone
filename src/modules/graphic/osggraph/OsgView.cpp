@@ -32,6 +32,9 @@ static char buf[1024];
 static char path[1024];
 static char path2[1024];
 
+osg::Vec3 eye, center, up, speed;
+
+
 SDViewer::SDViewer(osg::Camera * c)
 {
     cam = c;
@@ -160,7 +163,7 @@ void SDViewer::update(tSituation *s, const SDFrameInfo* frameInfo)
 
 
 
-    osg::Vec3 eye, center, up, speed, P, p;
+    osg::Vec3 P, p;
     float offset = 0;
     int Speed = 0;
 
@@ -215,6 +218,14 @@ void SDViewer::update(tSituation *s, const SDFrameInfo* frameInfo)
 
     cam->setViewMatrixAsLookAt( eye, center, up);
 
+}
+
+Camera* SDViewer::getCamera(){
+    Camera * c = new Camera;
+    c->Centerv = &center._v;
+    c->Posv = &eye._v;
+    c->Upv = &up._v;
+    c->Speedv = &speed._v;
 }
 
 void SDViewer::loadParams(tSituation *s)

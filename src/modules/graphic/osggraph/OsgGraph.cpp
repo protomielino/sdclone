@@ -130,13 +130,6 @@ void OsgGraph::shutdownView()
 
 Camera* OsgGraph::getCurCam() 
 {
-    Camera *cam = 0; /*new Camera;
-    osgCamera *gcam = osgGetCurCamera();
 
-    cam->Centerv = gcam->getCenterv();
-    cam->Upv = gcam->getUpv();
-    cam->Speedv = gcam->getSpeedv();
-    cam->Posv = gcam->getPosv();*/
-  
-    return cam;
+    return getCamera();
 }

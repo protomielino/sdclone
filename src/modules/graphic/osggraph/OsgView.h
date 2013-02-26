@@ -22,7 +22,7 @@
 
 
 
-
+#include <camera.h>
 #include <raceman.h>        //tSituation
 #include <car.h>			//tCarElt
 //#include "grcam.h"		//Cameras
@@ -99,7 +99,9 @@ class SDViewer
 		void switchMirror(void);
 	
 		inline tCarElt *getCurrentCar(void) { return curCar; }
-		//inline cGrCamera* getCurCamera(void) { return curCam; }
+
+        //used for sound
+        Camera* getCamera();
         //inline float getViewRatio(void) { return viewRatio; }
 		//inline int getCurCamHead(void) { return curCamHead; }
         //inline bool isActive(void) { return active; }

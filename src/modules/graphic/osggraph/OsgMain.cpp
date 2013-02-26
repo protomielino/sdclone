@@ -401,3 +401,8 @@ shutdownView(void)
 //	if (grCarInfo) 
 //		grPropagateDamage (grCarInfo[index].carEntity, poc, force, count);
 //}*/
+
+
+Camera * getCamera(void){
+    return screens->getActiveView()->getCamera();
+}

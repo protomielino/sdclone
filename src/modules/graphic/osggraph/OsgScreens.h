@@ -46,6 +46,7 @@ class SDScreens
         void InitCars(tSituation *s);
         void update(tSituation *s,SDFrameInfo* fi);
 
+        inline SDViewer * getActiveView(){return view;}
 
 
 //		void activate(int x, int y, int w, int h, float v);
