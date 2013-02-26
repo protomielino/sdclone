@@ -129,13 +129,13 @@ static void setupOpenGLFeatures(void)
 static void
 SDPrevCar(void * /* dummy */)
 {
-    //viewer->selectPrevCar();
+    screens->getActiveView()->selectPrevCar();
 }
 
 static void
 SDNextCar(void * /* dummy */)
 {
-   // viewer->selectNextCar();
+    screens->getActiveView()->selectNextCar();
 }
 
 void SDSelectCamera(void * vp){

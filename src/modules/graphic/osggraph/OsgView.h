@@ -73,7 +73,7 @@ class SDView
 
         inline int getId(){return id;}
         inline void selectNextCar(void) { selectNextFlag = true; }
-        inline void selectPrevCar(void) {	selectPrevFlag = true; }
+        inline void selectPrevCar(void) { selectPrevFlag = true; }
 
         void switchMirror(void);
 

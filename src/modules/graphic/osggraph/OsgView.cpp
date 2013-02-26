@@ -135,8 +135,9 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
     //int	i;
    // int nb = s->_ncars;
     //viewer->update(s, &frameInfo);
+   // tCarElt *car = getCurrentCar();
     cameras->update(curCar,s);
-    //tCarElt *car = getCurrentCar();
+
 
 
 
