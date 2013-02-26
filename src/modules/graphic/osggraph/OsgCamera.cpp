@@ -798,11 +798,99 @@ class SDCarCamBehindReverse : public SDPerspCamera
     }
 };
 
+// cGrCarCamFront ================================================================
+
+class SDCarCamFront : public SDPerspCamera
+{
+ protected:
+    float dist;
+
+ public:
+    SDCarCamFront(SDView *myscreen, int id, int drawCurr, int drawBG,
+           float fovy, float fovymin, float fovymax,
+           float mydist, float fnear, float ffar = 1500.0,
+           float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+             fovymax, fnear, ffar, myfogstart, myfogend) {
+    dist = mydist;
+    up[0] = 0;
+    up[1] = 0;
+    up[2] = 1;
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+    float offset = 0;
+
+    eye[0] = car->_pos_X + dist * cos(car->_yaw + PI * car->_glance);
+    eye[1] = car->_pos_Y + dist * sin(car->_yaw + PI * car->_glance);
+    eye[2] = RtTrackHeightG(car->_trkPos.seg, eye[0], eye[1]) + 0.5;
+
+    // Compute offset angle and bezel compensation)
+    if (viewOffset) {
+        offset += getSpanAngle();
+    }
+
+    center[0] = car->_pos_X + dist * cos(car->_yaw + PI * car->_glance) - dist * cos(car->_yaw + PI * car->_glance - offset);
+    center[1] = car->_pos_Y + dist * sin(car->_yaw + PI * car->_glance) - dist * sin(car->_yaw + PI * car->_glance - offset);
+    center[2] = car->_pos_Z;
+
+    speed[0] = car->pub.DynGCg.vel.x;
+    speed[1] = car->pub.DynGCg.vel.y;
+    speed[2] = car->pub.DynGCg.vel.z;
+
+    Speed = car->_speed_x * 3.6;
+    }
+};
+
+// SCarCamSide ================================================================
+
+class SDCarCamSide : public SDPerspCamera
+{
+protected:
+    float distx;
+    float disty;
+    float distz;
+
+ public:
+    SDCarCamSide(class SDView *myscreen, int id, int drawCurr, int drawBG,
+          float fovy, float fovymin, float fovymax,
+          float mydistx, float mydisty, float mydistz,
+          float fnear, float ffar = 1500.0,
+          float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+             fovymax, fnear, ffar, myfogstart, myfogend) {
+    distx = mydistx;
+    disty = mydisty;
+    distz = mydistz;
+
+    up[0] = 0;
+    up[1] = 0;
+    up[2] = 1;
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+    tdble x = car->_pos_X + distx;
+    tdble y = car->_pos_Y + disty;
+    tdble z = car->_pos_Z + distz;
+
+    eye[0] = x;
+    eye[1] = y;
+    eye[2] = z;
+    center[0] = car->_pos_X;
+    center[1] = car->_pos_Y;
+    center[2] = car->_pos_Z;
+
+    speed[0] = car->pub.DynGCg.vel.x;
+    speed[1] = car->pub.DynGCg.vel.y;
+    speed[2] = car->pub.DynGCg.vel.z;
+
+    Speed = car->_speed_x * 3.6;
+    }
+};
+
 
 SDCamera::~SDCamera( void ){
 }
-
-
 
 
 
@@ -923,6 +1011,203 @@ SDCameras::SDCameras(SDView *c){
                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* fogend */
                                                           25.0	/* relaxation */
                                                           ));
+    id++;
+    /* cam F3 = car behind */
+    cameras[1].insert(cameras[1].end(),new SDCarCamBehind(myscreen,
+                                                           id,
+                                                           1,	/* drawCurr */
+                                                           1,	/* drawBG  */
+                                                           40.0,	/* fovy */
+                                                           5.0,	/* fovymin */
+                                                           95.0,	/* fovymax */
+                                                           8.0,	/* dist */
+                                                           .50,	/* height */
+                                                           .50,	/* near */
+                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+                                                           fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+                                                           fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
+                                                           ));
+
+    id++;
+    /* cam F3 = car reverse */
+    cameras[1].insert(cameras[1].end(),new SDCarCamFront(myscreen,
+                                                          id,
+                                                          1,	/* drawCurr */
+                                                          1,	/* drawBG  */
+                                                          40.0,	/* fovy */
+                                                          5.0,	/* fovymin */
+                                                          95.0,	/* fovymax */
+                                                          8.0,	/* dist */
+                                                          0.5,	/* near */
+                                                          fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+                                                          fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                          fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                          ));
+
+    id++;
+   /* cam F3 = behind the car, very near, looking forward */
+    cameras[1].insert(cameras[1].end(),new SDCarCamBehind(myscreen,
+                                                           id,
+                                                           1,	/* drawCurr */
+                                                           1,	/* drawBG  */
+                                                           40.0,	/* fovy */
+                                                           5.0,	/* fovymin */
+                                                           95.0,	/* fovymax */
+                                                           8.0,	/* dist */
+                                                           2.5,	/* height */
+                                                           1.0,	/* near */
+                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+                                                           fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* fogend */
+                                                           25.0	/* relaxation */
+                                                           ));
+
+    /* F4 - Tracking side/front/back shots -index list 2*/
+    id=0;
+
+    /* cam F4 = car side 1 */
+    cameras[2].insert(cameras[2].end(),new SDCarCamSide(myscreen,
+                                                         id,
+                                                         1,	/* drawCurr */
+                                                         1,	/* drawBG  */
+                                                         30.0,	/* fovy */
+                                                         5.0,	/* fovymin */
+                                                         60.0,	/* fovymax */
+                                                         0.0,	/* distx */
+                                                         -20.0,	/* disty */
+                                                         3.0,	/* distz */
+                                                         1.0,	/* near */
+                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                         ));
+    id++;
+    /* cam F4 = car side 2 */
+    cameras[2].insert(cameras[2].end(),new SDCarCamSide(myscreen,
+                                                         id,
+                                                         1,	/* drawCurr */
+                                                         1,	/* drawBG  */
+                                                         30.0,	/* fovy */
+                                                         5.0,	/* fovymin */
+                                                         60.0,	/* fovymax */
+                                                         0.0,	/* distx */
+                                                         20.0,	/* disty */
+                                                         3.0,	/* distz */
+                                                         1.0,	/* near */
+                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                         ));
+    id++;
+
+    /* cam F4 = car side 3 */
+    cameras[2].insert(cameras[2].end(),new SDCarCamSide(myscreen,
+                                                         id,
+                                                         1,	/* drawCurr */
+                                                         1,	/* drawBG  */
+                                                         30.0,	/* fovy */
+                                                         5.0,	/* fovymin */
+                                                         60.0,	/* fovymax */
+                                                         -20.0,	/* distx */
+                                                         0.0,	/* disty */
+                                                         3.0,	/* distz */
+                                                         1.0,	/* near */
+                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                         ));
+    id++;
+
+    /* cam F4 = car side 4 */
+    cameras[2].insert(cameras[2].end(),new SDCarCamSide(myscreen,
+                                                         id,
+                                                         1,	/* drawCurr */
+                                                         1,	/* drawBG  */
+                                                         30.0,	/* fovy */
+                                                         5.0,	/* fovymin */
+                                                         60.0,	/* fovymax */
+                                                         20.0,	/* distx */
+                                                         0.0,	/* disty */
+                                                         3.0,	/* distz */
+                                                         1.0,	/* near */
+                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                         ));
+    id++;
+
+    /* cam F4 = car side 5 */
+    cameras[2].insert(cameras[2].end(),new SDCarCamSide(myscreen,
+                                                         id,
+                                                         1,	/* drawCurr */
+                                                         1,	/* drawBG  */
+                                                         30.0,	/* fovy */
+                                                         5.0,	/* fovymin */
+                                                         60.0,	/* fovymax */
+                                                         0.0,	/* distx */
+                                                         -40.0,	/* disty */
+                                                         6.0,	/* distz */
+                                                         1.0,	/* near */
+                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                         ));
+    id++;
+    /* cam F4 = car side 6 */
+    cameras[2].insert(cameras[2].end(),new SDCarCamSide(myscreen,
+                                                         id,
+                                                         1,	/* drawCurr */
+                                                         1,	/* drawBG  */
+                                                         30.0,	/* fovy */
+                                                         5.0,	/* fovymin */
+                                                         60.0,	/* fovymax */
+                                                         0.0,	/* distx */
+                                                         40.0,	/* disty */
+                                                         6.0,	/* distz */
+                                                         1.0,	/* near */
+                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                         ));
+    id++;
+
+    /* cam F4 = car side 7 */
+    cameras[2].insert(cameras[2].end(),new SDCarCamSide(myscreen,
+                                                        id,
+                                                        1,	/* drawCurr */
+                                                        1,	/* drawBG  */
+                                                        30.0,	/* fovy */
+                                                        5.0,	/* fovymin */
+                                                        60.0,	/* fovymax */
+                                                        -40.0,	/* distx */
+                                                        0.0,	/* disty */
+                                                        6.0,	/* distz */
+                                                        1.0,	/* near */
+                                                        fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+                                                        fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                        fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                        ));
+    id++;
+
+    /* cam F4 = car side 8 */
+    cameras[2].insert(cameras[2].end(),new SDCarCamSide(myscreen,
+                                                        id,
+                                                        1,	/* drawCurr */
+                                                        1,	/* drawBG  */
+                                                        30.0,	/* fovy */
+                                                        5.0,	/* fovymin */
+                                                        60.0,	/* fovymax */
+                                                        40.0,	/* distx */
+                                                        0.0,	/* disty */
+                                                        6.0,	/* distz */
+                                                        1.0,	/* near */
+                                                        fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+                                                        fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                        fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                        ));
+    id++;
+
+
     //cameras.insert(cameras.end(),new SDCarCamInsideDriverEye(this->screen));
     //cameras.insert(cameras.end(),new SDCarCamBehindFixedCar(this->screen));
     selectedCamera =0;
@@ -935,19 +1220,20 @@ SDCamera * SDCameras::getSelectedCamera(){
 
 void SDCameras::nextCamera(int list){
     if(list == selectedList){
-        selectedCamera = (selectedCamera +1)%cameras[0].size();
-        cameras[selectedList][selectedCamera]->setProjection();
+        selectedCamera = (selectedCamera +1)%cameras[selectedList].size();
     }else{
         selectedCamera =0;
         selectedList = list;
     }
 
+    cameras[selectedList][selectedCamera]->setProjection();
+
 }
 
 void SDCameras::update(tCarElt * car, tSituation * s){
-    cameras[0][selectedCamera]->update(car,s);
+    cameras[selectedList][selectedCamera]->update(car,s);
 
-    cameras[0][selectedCamera]->setModelView();
+    cameras[selectedList][selectedCamera]->setModelView();
 }
 
 SDCameras::~SDCameras(){
