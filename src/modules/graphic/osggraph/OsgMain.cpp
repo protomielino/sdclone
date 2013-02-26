@@ -138,6 +138,11 @@ SDNextCar(void * /* dummy */)
    // viewer->selectNextCar();
 }
 
+void SDSelectCamera(void *){
+    screens->getActiveView()->getCameras()->nextCamera();
+}
+
+
 int
 initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
@@ -180,18 +185,18 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey( screen, GFUIK_PAGEUP,   "Select Previous Car", (void*)0, SDPrevCar, NULL);
     GfuiAddKey( screen, GFUIK_PAGEDOWN, "Select Next Car",     (void*)0, SDNextCar, NULL);
 
-    /*GfuiAddKey(screen, GFUIK_F2,       "Driver Views",      (void*)0, grSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F3,       "Car Views",         (void*)1, grSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F4,       "Side Car Views",    (void*)2, grSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F5,       "Up Car View",       (void*)3, grSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F6,       "Persp Car View",    (void*)4, grSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F7,       "All Circuit Views", (void*)5, grSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F8,       "Track View",        (void*)6, grSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F9,       "Track View Zoomed", (void*)7, grSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F10,      "Follow Car Zoomed", (void*)8, grSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F11,      "TV Director View",  (void*)9, grSelectCamera, NULL);
+    GfuiAddKey(screen, GFUIK_F2,       "Driver Views",      (void*)0, SDSelectCamera, NULL);
+    GfuiAddKey(screen, GFUIK_F3,       "Car Views",         (void*)1, SDSelectCamera, NULL);
+    GfuiAddKey(screen, GFUIK_F4,       "Side Car Views",    (void*)2, SDSelectCamera, NULL);
+    GfuiAddKey(screen, GFUIK_F5,       "Up Car View",       (void*)3, SDSelectCamera, NULL);
+    GfuiAddKey(screen, GFUIK_F6,       "Persp Car View",    (void*)4, SDSelectCamera, NULL);
+    GfuiAddKey(screen, GFUIK_F7,       "All Circuit Views", (void*)5, SDSelectCamera, NULL);
+    GfuiAddKey(screen, GFUIK_F8,       "Track View",        (void*)6, SDSelectCamera, NULL);
+    GfuiAddKey(screen, GFUIK_F9,       "Track View Zoomed", (void*)7, SDSelectCamera, NULL);
+    GfuiAddKey(screen, GFUIK_F10,      "Follow Car Zoomed", (void*)8, SDSelectCamera, NULL);
+    GfuiAddKey(screen, GFUIK_F11,      "TV Director View",  (void*)9, SDSelectCamera, NULL);
 
-    GfuiAddKey(screen, '5',            "Debug Info",        (void*)3, grSelectBoard, NULL);
+    /*GfuiAddKey(screen, '5',            "Debug Info",        (void*)3, grSelectBoard, NULL);
     GfuiAddKey(screen, '4',            "G/Cmd Graph",       (void*)4, grSelectBoard, NULL);
     GfuiAddKey(screen, '3',            "Leaders Board",     (void*)2, grSelectBoard, NULL);
     GfuiAddKey(screen, '2',            "Driver Counters",   (void*)1, grSelectBoard, NULL);

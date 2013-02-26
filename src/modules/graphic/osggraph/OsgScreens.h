@@ -32,7 +32,7 @@ class SDScreens
 {
     protected:
         osgViewer::Viewer *viewer;
-        SDViewer * view;
+        SDView * view;
 
 //		int mirrorFlag;
 //		void loadParams(tSituation *s);			// Load from parameters files.
@@ -46,7 +46,7 @@ class SDScreens
         void InitCars(tSituation *s);
         void update(tSituation *s,SDFrameInfo* fi);
 
-        inline SDViewer * getActiveView(){return view;}
+        inline SDView * getActiveView(){return view;}
 
 
 //		void activate(int x, int y, int w, int h, float v);

@@ -40,21 +40,15 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
     int grWinw = width;
     int grWinh = height;
 
+    view = new SDView(viewer->getCamera(),0,0,grWinw,grWinh);
 
-
-
-
-
-
-
-
-    view = new SDViewer(viewer->getCamera());
     viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, grWinw, grWinh);
     //view->getOsgView()->setUpViewInWindow(0, 0, grWinw, grWinh,0);
     viewer->getCamera()->setName("Cam one");
     viewer->getCamera()->setViewport(new osg::Viewport(0, 0, grWinw, grWinh));
     viewer->getCamera()->setGraphicsContext(gw);
+    viewer->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
     viewer->getCamera()->setProjectionMatrixAsPerspective(67.5f, static_cast<double>((float)grWinw / (float)grWinh), 0.1f, 12000.0f);
     viewer->setSceneData(m_sceneroot.get());
     //viewer->realize();

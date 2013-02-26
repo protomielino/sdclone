@@ -62,7 +62,7 @@ extern int grNbActiveScreens;
 class SDScenery;
 class SDCars;
 class SDRender;
-class SDViewer;
+class SDView;
 
 //static 
 
