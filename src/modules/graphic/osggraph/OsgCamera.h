@@ -30,6 +30,7 @@
 #define GR_ZOOM_MIN 	3
 #define GR_ZOOM_DFLT    4
 
+#define CAMERA_LISTS 10
 
 class SDCamera;
 class SDView;
@@ -38,13 +39,14 @@ class SDCameras{
 
 protected:
     SDView * screen;
-    std::vector<SDCamera *> cameras;
+    std::vector<SDCamera *> cameras[CAMERA_LISTS];
+    int selectedList;
     int selectedCamera;
 
 public:
     SDCameras(SDView *c);
     SDCamera * getSelectedCamera();
-    void nextCamera();
+    void nextCamera(int list);
     void update(tCarElt * car, tSituation * s);
     inline int getIntSelectedCamera(){return selectedCamera;}
     ~SDCameras();

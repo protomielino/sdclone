@@ -138,8 +138,9 @@ SDNextCar(void * /* dummy */)
    // viewer->selectNextCar();
 }
 
-void SDSelectCamera(void *){
-    screens->getActiveView()->getCameras()->nextCamera();
+void SDSelectCamera(void * vp){
+    long t = (long)vp;
+    screens->getActiveView()->getCameras()->nextCamera(t);
 }
 
 

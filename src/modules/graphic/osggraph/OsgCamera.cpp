@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include <osg/Camera>
+#include <osg/Matrix>
 
 #include <car.h>
 #include <raceman.h>
@@ -145,6 +146,11 @@ SDPerspCamera::SDPerspCamera(SDView *myscreen, int id, int drawCurr, int drawDrv
 
 void SDPerspCamera::setProjection(void)
 {
+
+
+
+    screen->getOsgCam()->setProjectionMatrixAsPerspective(fovy,screen->getViewRatio(),fnear,ffar);
+
     // PLib takes the field of view as angles in degrees. However, the
     // aspect ratio really aplies to lengths in the projection
     // plane. So we have to transform the fovy angle to a length in
@@ -204,7 +210,7 @@ void SDPerspCamera::loadDefaults(char *attr)
 float SDPerspCamera::getLODFactor(float x, float y, float z) {
     tdble	dx, dy, dz, dd;
     float	ang;
-    int		scrh, dummy;
+    int		scrh;//, dummy;
     float	res;
 
     dx = x - eye[0];
@@ -530,7 +536,7 @@ class SDCarCamInsideDynDriverEye : public SDCarCamInsideDriverEye
     }
 };
 
-// cGrCarCamBehind ================================================================
+// SDCarCamBehind ================================================================
 
 class SDCarCamBehind : public SDPerspCamera
 {
@@ -601,8 +607,196 @@ class SDCarCamBehind : public SDPerspCamera
     }
 };
 
+// SDCarCamInsideFixedCar ================================================================
+class SDCarCamInsideFixedCar : public SDPerspCamera
+{
+ public:
+    SDCarCamInsideFixedCar(SDView *myscreen, int id, int drawCurr, int drawBG,
+                float myfovy, float myfovymin, float myfovymax,
+                float myfnear, float myffar = 1500.0,
+                float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
+             myfovy, myfovymin, myfovymax,
+             myfnear, myffar, myfogstart, myfogend) {
+    }
 
+    void update(tCarElt *car, tSituation *s) {
+    sgVec3 P, p;
+    float offset = 0;
 
+    p[0] = car->_bonnetPos_x;
+    p[1] = car->_bonnetPos_y;
+    p[2] = car->_bonnetPos_z;
+    sgXformPnt3(p, car->_posMat);
+
+    eye[0] = p[0];
+    eye[1] = p[1];
+    eye[2] = p[2];
+
+    // Compute offset angle and bezel compensation)
+    if (viewOffset) {
+        offset += getSpanAngle();
+    }
+
+    P[0] = car->_bonnetPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset);
+    P[1] = car->_bonnetPos_y - 30.0 * sin(2*PI/3 * car->_glance + offset);
+    P[2] = car->_bonnetPos_z;
+    sgXformPnt3(P, car->_posMat);
+
+    center[0] = P[0];
+    center[1] = P[1];
+    center[2] = P[2];
+
+    up[0] = car->_posMat[2][0];
+    up[1] = car->_posMat[2][1];
+    up[2] = car->_posMat[2][2];
+
+    speed[0] =car->pub.DynGCg.vel.x;
+    speed[1] =car->pub.DynGCg.vel.y;
+    speed[2] =car->pub.DynGCg.vel.z;
+
+    Speed = car->_speed_x * 3.6;
+    }
+};
+
+// SDCarCamInfrontFixedCar ================================================================
+
+class SDCarCamInfrontFixedCar : public SDPerspCamera
+{
+ public:
+    SDCarCamInfrontFixedCar(SDView *myscreen, int id, int drawCurr, int drawBG,
+                float myfovy, float myfovymin, float myfovymax,
+                float myfnear, float myffar = 1500.0,
+                float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
+             myfovy, myfovymin, myfovymax,
+             myfnear, myffar, myfogstart, myfogend) {
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+    sgVec3 P, p;
+    float offset = 0;
+
+    p[0] = car->_dimension_x / 2;
+    p[1] = car->_bonnetPos_y;
+    p[2] = car->_statGC_z;
+    sgXformPnt3(p, car->_posMat);
+
+    eye[0] = p[0];
+    eye[1] = p[1];
+    eye[2] = p[2];
+
+    // Compute offset angle and bezel compensation)
+    if (viewOffset) {
+        offset += getSpanAngle();
+    }
+
+#if 0 // SDW test
+    spanOffset = car->_glance * (viewOffset - 10) / 5;
+
+    P[0] = (car->_dimension_x / 2) + 30.0 * cos(offset);
+    P[1] = car->_bonnetPos_y - 30.0 * sin(offset);
+#else
+    P[0] = (car->_dimension_x / 2) + 30.0 * cos(2*PI/3 * car->_glance + offset);
+    P[1] = car->_bonnetPos_y - 30.0 * sin(2*PI/3 * car->_glance + offset);
+#endif
+    P[2] = car->_statGC_z;
+
+    sgXformPnt3(P, car->_posMat);
+
+    center[0] = P[0];
+    center[1] = P[1];
+    center[2] = P[2];
+
+    up[0] = car->_posMat[2][0];
+    up[1] = car->_posMat[2][1];
+    up[2] = car->_posMat[2][2];
+
+    speed[0] =car->pub.DynGCg.vel.x;
+    speed[1] =car->pub.DynGCg.vel.y;
+    speed[2] =car->pub.DynGCg.vel.z;
+
+    Speed = car->_speed_x * 3.6;
+    }
+};
+
+// cGrCarCamBehindReverse ================================================================
+
+class SDCarCamBehindReverse : public SDPerspCamera
+{
+ public:
+    SDCarCamBehindReverse (SDView *myscreen, int id, int drawCurr, int drawBG,
+                float myfovy, float myfovymin, float myfovymax,
+                float myfnear, float myffar = 1500.0,
+                float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 0, drawBG, 0,
+             myfovy, myfovymin, myfovymax,
+             myfnear, myffar, myfogstart, myfogend) {
+    }
+
+    void setModelView(void)
+    {
+      //screen->getOsgCam()->setViewMatrixAsLookAt(eye,center,up);
+
+      //osg::Matrix m= screen->getOsgCam()->getViewMatrix();
+       osg::Matrix m;
+       m.makeLookAt(eye,center,up);
+      //float mirror[4][4];
+
+/*#define M(row,col)  mirror[row][col]
+      M(0,0) = 1.0;  M(0,1) = 0.0;  M(0,2) = 0.0;  M(0,3) = 0.0;
+      M(1,0) = 0.0;  M(1,1) =-1.0;  M(1,2) = 0.0;  M(1,3) = 0.0;
+      M(2,0) = 0.0;  M(2,1) = 0.0;  M(2,2) = 1.0;  M(2,3) = 0.0;
+      M(3,0) = 0.0;  M(3,1) = 0.0;  M(3,2) = 0.0;  M(3,3) = 1.0;
+#undef M*/
+      osg::Matrix mir(1,0,0,0,
+                      0,-1,0,0,
+                      0,0,1,0,
+                      0,0,0,1);
+      osg::Matrix res = m*mir;
+
+      screen->getOsgCam()->setViewMatrix(res);
+
+      //glFrontFace( GL_CW );
+    }
+
+    void update(tCarElt *car, tSituation *s)
+    {
+    sgVec3 P, p;
+    float offset = 0;
+
+    p[0] = car->_bonnetPos_x - (car->_dimension_x/2);
+    p[1] = car->_bonnetPos_y;
+    p[2] = car->_bonnetPos_z;
+    sgXformPnt3(p, car->_posMat);
+
+    eye[0] = p[0];
+    eye[1] = p[1];
+    eye[2] = p[2];
+
+    // Compute offset angle and bezel compensation)
+    if (viewOffset) {
+        offset += getSpanAngle();
+    }
+
+    P[0] = car->_bonnetPos_x - (car->_dimension_x/2) + 30.0 * cos(offset);
+    P[1] = car->_bonnetPos_y + 30.0 * sin(offset);
+    P[2] = car->_bonnetPos_z;
+    sgXformPnt3(P, car->_posMat);
+
+    center[0] = P[0];
+    center[1] = P[1];
+    center[2] = P[2];
+
+    up[0] = car->_posMat[2][0];
+    up[1] = car->_posMat[2][1];
+    up[2] = car->_posMat[2][2];
+
+    speed[0] =car->pub.DynGCg.vel.x;
+    speed[1] =car->pub.DynGCg.vel.y;
+    speed[2] =car->pub.DynGCg.vel.z;
+    }
+};
 
 
 SDCamera::~SDCamera( void ){
@@ -616,52 +810,144 @@ SDCamera::~SDCamera( void ){
 
 
 SDCameras::SDCameras(SDView *c){
+
+
+
+    // Get the factor of visibiity from the graphics settings and from the track.
+    //tdble fovFactor = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, (char*)NULL, 1.0);
+    //fovFactor *= GfParmGetNum(grTrackHandle, TRK_SECT_GRAPH, TRK_ATT_FOVFACT, (char*)NULL, 1.0);
+
+    tdble fovFactor =1;
+    tdble fixedFar =0;
+
+    // If sky dome is enabled, we have a "fixed far" cut plane.
+    // Warning: In theory, 2*grSkyDomeDistance+1 should be enough, but it is not (why ?).
+    //const tdble fixedFar = grSkyDomeDistance ? (2.1f * grSkyDomeDistance + 1.0f) : 0;
+
+    //GfLogTrace("Screen #%d : FOV = %.2f, Far=%.0f\n", id, fovFactor, fixedFar);
+
+
     screen = c;
-    cameras.insert(cameras.end(),new SDCarCamBehind(screen,
-                                                 1,
-                                                 1,	/* drawCurr */
-                                                 1,	/* drawBG  */
-                                                 40.0,	/* fovy */
-                                                 5.0,	/* fovymin */
-                                                 95.0,	/* fovymax */
-                                                 10.0,	/* dist */
-                                                 2.0,	/* height */
-                                                 1.0,	/* near */
-                                                 2000,	/* far */
-                                                 1000,	/* fogstart */
-                                                 1001,	/* fogend */
-                                                 25.0	/* relaxation */
-                                                 ));
-    cameras.insert(cameras.end(),new SDCarCamInsideDynDriverEye(screen,
-    2,
-    1,	/* drawCurr */
-    1,	/* drawBG  */
-    75.5,	/* fovy */
-    10.0,	/* fovymin */
-    95.0,	/* fovymax */
-    0.03,	/* near */
-    2000,	/* far */
-    1000,	/* fogstart */
-    1001	/* fogend */
-    ));
+    SDView * myscreen = screen;
+
+    int id=0;
+
+    /* F2 - First Person Views  - cameras index 0*/
+    /* cam F2 = inside, from the driver's eye, with head movements (driver's view) */
+    cameras[0].insert(cameras[0].end(),new SDCarCamInsideDynDriverEye(myscreen,
+                                                                 id,
+                                                                 1,	/* drawCurr */
+                                                                 1,	/* drawBG  */
+                                                                 75.5,	/* fovy */
+                                                                 10.0,	/* fovymin */
+                                                                 95.0,	/* fovymax */
+                                                                 0.03,	/* near */
+                                                                 fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+                                                                 fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+                                                                 fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
+                                                                 ));
+   id++;
+
+   /* cam F2 = inside, from the driver's eye, without head movements (driver's view) */
+    cameras[0].insert(cameras[0].end(),new SDCarCamInsideDriverEye(myscreen,
+                                                              id,
+                                                              1,	/* drawCurr */
+                                                              1,	/* drawBG  */
+                                                              75.5,	/* fovy */
+                                                              10.0,	/* fovymin */
+                                                              95.0,	/* fovymax */
+                                                              0.03,	/* near */
+                                                              fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+                                                              fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+                                                              fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
+                                                              ));
+    id++;
+    /* cam F2 = inside, from the board (bonnet view), fixed to the car */
+    cameras[0].insert(cameras[0].end(),new SDCarCamInsideFixedCar(myscreen,
+                                                                   id,
+                                                                   1,	/* drawCurr */
+                                                                   1,	/* drawBG  */
+                                                                   67.5,	/* fovy */
+                                                                   10.0,	/* fovymin */
+                                                                   95.0,	/* fovymax */
+                                                                   0.3,	/* near */
+                                                                   fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+                                                                   fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+                                                                   fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
+                                                                   ));
+    id++;
+    /* cam F2 = inside, from the board (bonnet view), fixed to the car */
+    cameras[0].insert(cameras[0].end(),new SDCarCamInfrontFixedCar(myscreen,
+                                                                   id,
+                                                                   1,	/* drawCurr */
+                                                                   1,	/* drawBG  */
+                                                                   67.5,	/* fovy */
+                                                                   10.0,	/* fovymin */
+                                                                   95.0,	/* fovymax */
+                                                                   0.3,	/* near */
+                                                                   fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+                                                                   fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+                                                                   fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
+                                                                   ));
+    id++;
+    /* TODO Repaircam F2 = just behind the car; camera looking back  */
+    cameras[0].insert(cameras[0].end(),new SDCarCamBehindReverse(myscreen,
+                                                                   id,
+                                                                   0,	/* drawCurr */
+                                                                   2,	/* drawBG  */
+                                                                   67.5,	/* fovy */
+                                                                   10.0,	/* fovymin */
+                                                                   95.0,	/* fovymax */
+                                                                   0.3,	/* near */
+                                                                   fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+                                                                   fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+                                                                   fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
+                                                                   ));
+
+    /* F3 - 3rd Person Views - cameras index 1*/
+    id=0;
+
+    /* cam F2 = behind the car, near, looking forward */
+    cameras[1].insert(cameras[1].end(),new SDCarCamBehind(myscreen,
+                                                          id,
+                                                          1,	/* drawCurr */
+                                                          1,	/* drawBG  */
+                                                          40.0,	/* fovy */
+                                                          5.0,	/* fovymin */
+                                                          95.0,	/* fovymax */
+                                                          10.0,	/* dist */
+                                                          2.0,	/* height */
+                                                          1.0,	/* near */
+                                                          fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+                                                          fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+                                                          fixedFar ? fixedFar : 600.0 * fovFactor,	/* fogend */
+                                                          25.0	/* relaxation */
+                                                          ));
     //cameras.insert(cameras.end(),new SDCarCamInsideDriverEye(this->screen));
     //cameras.insert(cameras.end(),new SDCarCamBehindFixedCar(this->screen));
     selectedCamera =0;
+    selectedList=0;
 }
 
 SDCamera * SDCameras::getSelectedCamera(){
-    return cameras[selectedCamera];
+    return cameras[selectedList][selectedCamera];
 }
 
-void SDCameras::nextCamera(){
-    selectedCamera = (selectedCamera +1)%cameras.size();
+void SDCameras::nextCamera(int list){
+    if(list == selectedList){
+        selectedCamera = (selectedCamera +1)%cameras[0].size();
+        cameras[selectedList][selectedCamera]->setProjection();
+    }else{
+        selectedCamera =0;
+        selectedList = list;
+    }
 
 }
 
 void SDCameras::update(tCarElt * car, tSituation * s){
-    cameras[selectedCamera]->update(car,s);
+    cameras[0][selectedCamera]->update(car,s);
 
-    cameras[selectedCamera]->setModelView();
+    cameras[0][selectedCamera]->setModelView();
 }
 
 SDCameras::~SDCameras(){
