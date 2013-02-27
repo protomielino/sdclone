@@ -249,11 +249,8 @@ refresh(tSituation *s)
                        frameInfo.fInstFps, frameInfo.fAvgFps);
     }
 
-
     cars->updateCars();
     screens->update(s,&frameInfo);
-
-
     
     return 0;
 }

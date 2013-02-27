@@ -23,9 +23,7 @@
 #include <osgViewer/Viewer>
 #include <osgViewer/GraphicsWindow>
 
-
 #include "OsgScreens.h"
-
 
 SDScreens::SDScreens()
 {
@@ -52,18 +50,15 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
     viewer->getCamera()->setProjectionMatrixAsPerspective(67.5f, static_cast<double>((float)grWinw / (float)grWinh), 0.1f, 12000.0f);
     viewer->setSceneData(m_sceneroot.get());
     //viewer->realize();
-
-
-
-
-
 }
 
-void SDScreens::InitCars(tSituation *s){
+void SDScreens::InitCars(tSituation *s)
+{
     view->Init(s);
 }
 
-void SDScreens::update(tSituation * s,SDFrameInfo* fi){
+void SDScreens::update(tSituation * s,SDFrameInfo* fi)
+{
     view->update(s,fi);
 
     if (!viewer->done())

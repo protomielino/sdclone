@@ -45,21 +45,21 @@ class SDSky;
 
 typedef struct 
 {
-	osg::Vec3d pos;
-    double spin;
-	double gst;
-	double sun_dist;
-	double moon_dist;
-	double sun_angle;
+  osg::Vec3d pos;
+  double spin;
+  double gst;
+  double sun_dist;
+  double moon_dist;
+  double sun_angle;
 } SDSkyState;
 
 typedef struct 
 {
-	osg::Vec3f sky_color;
-    osg::Vec3f adj_sky_color;
-    osg::Vec3f fog_color;
-	osg::Vec3f cloud_color;
-	double sun_angle, moon_angle;
+  osg::Vec3f sky_color;
+  osg::Vec3f adj_sky_color;
+  osg::Vec3f fog_color;
+  osg::Vec3f cloud_color;
+  double sun_angle, moon_angle;
 } SDSkyColor;
 
 class SDSky

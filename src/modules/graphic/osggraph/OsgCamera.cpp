@@ -66,11 +66,11 @@ Camera * SDCamera::getGenericCamera(){
     return c;
 }
 
-void SDCamera::update(tCarElt * car, tSituation * s){
-
+void SDCamera::update(tCarElt * car, tSituation * s)
+{
     osg::Vec3 P, p;
     float offset = 0;
-   // int Speed = 0;
+    // int Speed = 0;
 
     p[0] = car->_drvPos_x;
     p[1] = car->_drvPos_y;

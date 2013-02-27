@@ -55,7 +55,6 @@ osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)
     GfOut("THERE3\n");
 }
 
-
 osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const char * wheel_mod_name)
 {
     osgLoader loader;
@@ -100,9 +99,6 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
     whlsize->setMatrix(wheelsize);
     whlsize->addChild(wheels_switches[wheelIndex]);
 
-
-
-
     if(wheelIndex== FRNT_RGT ||wheelIndex== REAR_RGT )
     {
         osg::ref_ptr<osg::MatrixTransform> flipright = new osg::MatrixTransform;
@@ -120,24 +116,20 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
     //initiating brakes
     transform2->addChild(this->brakes.initBrake(wheelIndex));
 
-
     return transform2;
 }
 
 void SDWheels::updateWheels()
 {
-
-
     int j;
     static float maxVel[3] = { 20.0, 40.0, 70.0 };
     for(int i=0; i<4; i++)
     {
         osg::Matrix spinMatrix = osg::Matrix::rotate(car->priv.wheel[i].relPos.ay, osg::Y_AXIS);
 
-
         osg::Matrix posMatrix = osg::Matrix::translate(car->priv.wheel[i].relPos.x, car->priv.wheel[i].relPos.y, car->priv.wheel[i].relPos.z);
                         
-       osg::Matrix camberDirMatrix = osg::Matrix::rotate(car->priv.wheel[i].relPos.ax, osg::X_AXIS,//camber
+        osg::Matrix camberDirMatrix = osg::Matrix::rotate(car->priv.wheel[i].relPos.ax, osg::X_AXIS,//camber
                                          0.0, osg::Y_AXIS,
                                          car->priv.wheel[i].relPos.az, osg::Z_AXIS );//direction
 
@@ -146,15 +138,14 @@ void SDWheels::updateWheels()
         trans->setMatrix(spinMatrix);
         wheels[i]->setMatrix(posMatrix);
 
-
-        for (j = 0; j < 3; j++) {
-            if (fabs(car->_wheelSpinVel(i)) < maxVel[j])
-                break;
+        for (j = 0; j < 3; j++)
+        {
+          if (fabs(car->_wheelSpinVel(i)) < maxVel[j])
+            break;
         }
-        this->wheels_switches[i]->setSingleChildOn(j);
 
+        this->wheels_switches[i]->setSingleChildOn(j);
     }
 
     brakes.updateBrakes();
-
 }

@@ -42,13 +42,13 @@ SDView::SDView(osg::Camera * c, int x, int y, int width, int height)
     cam = c;
     cameras = new SDCameras(this);
     id = 0;
-	curCar = NULL;
-	selectNextFlag = false;
-	selectPrevFlag = false;
-	mirrorFlag = 1;
+    curCar = NULL;
+    /*selectNextFlag = false;
+    selectPrevFlag = false;
+    mirrorFlag = 1;*/
     //memset(cams, 0, sizeof(cams));
     //viewRatio = 1.33;
-	cars = 0;
+    cars = 0;
     selectNextFlag=false;
     selectPrevFlag=false;
     mirrorFlag=false;
@@ -137,10 +137,6 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
     //viewer->update(s, &frameInfo);
    // tCarElt *car = getCurrentCar();
     cameras->update(curCar,s);
-
-
-
-
 }
 
 Camera* SDView::getCamera(){
@@ -186,11 +182,11 @@ void SDView::loadParams(tSituation *s)
 
 	// Load "current camera" settings (attached to the "current car").
 	sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
-    GfOut("Driver Name Camera = %s\n", curCar->_name);
-    //curCamHead	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, 9);
+	GfOut("Driver Name Camera = %s\n", curCar->_name);
+	//curCamHead	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, 9);
 	camNum	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM, NULL, 0);
 	mirrorFlag	= (int)GfParmGetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
-    //curCamHead	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM_HEAD, NULL, (tdble)curCamHead);
+	//curCamHead	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM_HEAD, NULL, (tdble)curCamHead);
 	camNum	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM, NULL, (tdble)camNum);
 	mirrorFlag	= (int)GfParmGetNum(grHandle, path2, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
 }

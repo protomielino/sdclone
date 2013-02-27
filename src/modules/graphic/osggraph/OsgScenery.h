@@ -82,22 +82,21 @@ public:
 	void build(tTrack *track);
 };*/
 
-static int	grWrldX;
-static int grWrldY;
-static int grWrldZ;
-static int	grWrldMaxSize;
-
+static int  grWrldX;
+static int  grWrldY;
+static int  grWrldZ;
+static int  grWrldMaxSize;
 
 class SDScenery
 {
 private:
 	SDBackground	*m_background;
 	//SDSpectators	*m_spectators;
-	//SDTrees		*m_trees;
+	//SDTrees	*m_trees;
 	osg::ref_ptr<osg::Group> _scenery;
 	osg::ref_ptr<osg::Group> _background;
 	
-	int	_grWrldX;
+	int _grWrldX;
 	int _grWrldY;
 	int _grWrldZ;
 	int _grWrldMaxSize;
