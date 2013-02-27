@@ -752,7 +752,7 @@ class SDCarCamBehindReverse : public SDPerspCamera
       M(2,0) = 0.0;  M(2,1) = 0.0;  M(2,2) = 1.0;  M(2,3) = 0.0;
       M(3,0) = 0.0;  M(3,1) = 0.0;  M(3,2) = 0.0;  M(3,3) = 1.0;
 #undef M*/
-      osg::Matrix mir(-1,0,0,0,
+      osg::Matrix mir(1,0,0,0,
                       0,1,0,0,
                       0,0,-1,0,
                       0,0,0,1);
@@ -1530,7 +1530,7 @@ void SDCarCamMirror::setModelView(void)
    M(2,0) = 0.0;  M(2,1) = 0.0;  M(2,2) = 1.0;  M(2,3) = 0.0;
    M(3,0) = 0.0;  M(3,1) = 0.0;  M(3,2) = 0.0;  M(3,3) = 1.0;
 #undef M*/
-   osg::Matrix mir(-1,0,0,0,
+   osg::Matrix mir(1,0,0,0,
                    0,1,0,0,
                    0,0,-1,0,
                    0,0,0,1);
