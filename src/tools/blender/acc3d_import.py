@@ -379,11 +379,12 @@ class AC3DImport:
 			flag = lines[i].split()[1]
 			tristrip = False
 			trifan = False
+		
 			if ((flag=='0x14')|(flag=='0x24')|(flag=='0x34')):
 				tristrip = True
 
 			if flag =='0x30':
-               trifan = True;
+				trifan = True
 			
 			if len(flags) > 1:
 				flaghigh = int(flags[0])
@@ -492,8 +493,8 @@ class AC3DImport:
 						fuvs.append(fuvt)
 						fuvs2.append(fuvt2)
 					
-                        elif trifan==True:
-                                index = 1
+					elif trifan==True:
+						index = 1
 						while index<refs-2:
 							facet = []
 							fuvt = []
@@ -519,7 +520,7 @@ class AC3DImport:
 								uv2 = fuv2[index+1];
 								fuvt2.append(uv2)					
 						
-                            index+=2
+						index+=2
 					
 			elif flaglow: # it's a line or closed line, not a polygon
 				while len(face) >= 2:
