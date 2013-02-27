@@ -172,7 +172,7 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
 			{
 				sinaoa = 0.25 * (1 - ((aoa-PI_3)/PI_6)*((aoa-PI_3)/PI_6)*((aoa-PI_3)/PI_6));
 			}
-			wing->forces.z = (float) MAX(0.0,wing->Kz * vt2 * sinaoa);
+			wing->forces.z = (float) MIN(0.0,wing->Kz * vt2 * sinaoa);
 		}
 	} 
 	else 
