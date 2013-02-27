@@ -1202,8 +1202,500 @@ class SDCarCamGoPro2 : public SDPerspCamera
     }
 };
 
+// SDCarCamRoadZoom ================================================================
+
+class SDCarCamRoadZoom : public SDPerspCamera
+{
+ protected:
+    float locfar;
+    float locfovy;
+
+ public:
+    SDCarCamRoadZoom(SDView *myscreen, int id, int drawCurr, int drawBG,
+              float fovy, float fovymin, float fovymax,
+              float fnear, float ffar = 1500.0,
+              float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+             fovymax, fnear, ffar, myfogstart, myfogend) {
+    locfar = ffar;
+    locfovy = fovy;
+
+    up[0] = 0;
+    up[1] = 0;
+    up[2] = 1;
+    }
+
+    void loadDefaults(char *attr) {
+    /*sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
+    locfovy = (float)GfParmGetNum(grHandle, path,
+                   attr, (char*)NULL, fovydflt);*/
+    }
+
+    void setZoom(int cmd) {
+    fovy = locfovy;
+    SDPerspCamera::setZoom(cmd);
+    locfovy = fovy;
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+    tdble	dx, dy, dz, dd;
+    tRoadCam *curCam;
+
+    curCam = car->_trkPos.seg->cam;
+
+    if (curCam == NULL) {
+        eye[0] = grWrldX * 0.5;
+        eye[1] = grWrldY * 0.6;
+        eye[2] = 120;
+    } else {
+        eye[0] = curCam->pos.x;
+        eye[1] = curCam->pos.y;
+        eye[2] = curCam->pos.z;
+    }
+
+    center[0] = car->_pos_X;
+    center[1] = car->_pos_Y;
+    center[2] = car->_pos_Z;
+
+    dx = center[0] - eye[0];
+    dy = center[1] - eye[1];
+    dz = center[2] - eye[2];
+
+    dd = sqrt(dx*dx+dy*dy+dz*dz);
+
+    fnear = dz - 5;
+    if (fnear < 1) {
+        fnear = 1;
+    }
+    ffar  = dd + locfar;
+    fovy = RAD2DEG(atan2(locfovy, dd));
+    limitFov();
+
+    speed[0] = 0.0;
+    speed[1] = 0.0;
+    speed[2] = 0.0;
+    }
+};
+
+// SDCarCamRoadNoZoom ================================================================
+
+class SDCarCamRoadNoZoom : public SDPerspCamera
+{
+ protected:
+
+ public:
+    SDCarCamRoadNoZoom(SDView *myscreen, int id, int drawCurr, int drawBG,
+            float fovy, float fovymin, float fovymax,
+            float fnear, float ffar = 1500.0,
+            float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+             fovymax, fnear, ffar, myfogstart, myfogend) {
+    up[0] = 0;
+    up[1] = 0;
+    up[2] = 1;
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+    tRoadCam *curCam;
 
 
+    curCam = car->_trkPos.seg->cam;
+
+    if (curCam == NULL) {
+        eye[0] = grWrldX * 0.5;
+        eye[1] = grWrldY * 0.6;
+        eye[2] = 120;
+        center[2] = car->_pos_Z;
+    } else {
+        eye[0] = curCam->pos.x;
+        eye[1] = curCam->pos.y;
+        eye[2] = curCam->pos.z;
+        center[2] = curCam->pos.z;
+    }
+
+    center[0] = car->_pos_X;
+    center[1] = car->_pos_Y;
+    center[2] = car->_pos_Z;
+
+    speed[0] = 0.0;
+    speed[1] = 0.0;
+    speed[2] = 0.0;
+    }
+};
+
+// SDCarCamRoadFly ================================================================
+
+class SDCarCamRoadFly : public SDPerspCamera
+{
+ protected:
+    int current;
+    int timer;
+    float zOffset;
+    float gain;
+    float damp;
+    float offset[3];
+    double currenttime;
+ public:
+    SDCarCamRoadFly(SDView *myscreen, int id, int drawCurr, int drawBG,
+             float fovy, float fovymin, float fovymax,
+             float fnear, float ffar = 1500.0,
+             float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+             fovymax, fnear, ffar, myfogstart, myfogend) {
+    up[0] = 0;
+    up[1] = 0;
+    up[2] = 1;
+    timer = 0;
+    offset[0]=0.0;
+    offset[1]=0.0;
+    offset[2]=60.0;
+    current = -1;
+    currenttime = 0.0;
+    speed[0] = 0.0;
+    speed[1] = 0.0;
+    speed[2] = 0.0;
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+    float height;
+    float dt;
+
+    if (currenttime == 0.0) {
+        currenttime = s->currentTime;
+    }
+
+    if (currenttime == s->currentTime) {
+            return;
+        }
+
+        bool reset_camera = false;
+        dt = s->currentTime - currenttime;
+        currenttime = s->currentTime;
+        if (fabs(dt) > 1.0f) {
+            dt = 0.1f; // avoid overflow
+            reset_camera = true;
+        }
+
+        timer--;
+        if (timer<0) {
+            reset_camera = true;
+        }
+
+        if (current != car->index) {
+            /* the target car changed */
+            zOffset = 50.0;
+            current = car->index;
+            reset_camera = true;
+        } else {
+            zOffset = 0.0;
+        }
+
+        if ((timer <= 0) || (zOffset > 0.0)) {
+            timer = 500 + (int)(500.0*rand()/(RAND_MAX+1.0));
+            offset[0] = -0.5 + (rand()/(RAND_MAX+1.0));
+            offset[1] = -0.5 + (rand()/(RAND_MAX+1.0));
+            offset[2] = 10.0f + (50.0*rand()/(RAND_MAX+1.0)) + zOffset;
+            offset[0] = offset[0]*(offset[2]+1.0);
+            offset[1] = offset[1]*(offset[2]+1.0);
+            // follow the car more closely when low
+            gain = 300.0/(10.0f+offset[2]);
+            damp = 5.0f;
+        }
+
+
+        if (reset_camera) {
+            eye[0] = car->_pos_X + 50.0 + (50.0*rand()/(RAND_MAX+1.0));
+            eye[1] = car->_pos_Y + 50.0 + (50.0*rand()/(RAND_MAX+1.0));
+            eye[2] = car->_pos_Z + 50.0 + (50.0*rand()/(RAND_MAX+1.0));
+            speed[0] = speed[1] = speed[2] = 0.0f;
+        }
+
+        speed[0] += (gain*(offset[0]+car->_pos_X - eye[0]) - speed[0]*damp)*dt;
+        speed[1] += (gain*(offset[1]+car->_pos_Y - eye[1]) - speed[1]*damp)*dt;
+        speed[2] += (gain*(offset[2]+car->_pos_Z - eye[2]) - speed[2]*damp)*dt;
+
+        eye[0] = eye[0] + speed[0]*dt;
+        eye[1] = eye[1] + speed[1]*dt;
+        eye[2] = eye[2] + speed[2]*dt;
+
+        center[0] = (car->_pos_X);
+        center[1] = (car->_pos_Y);
+        center[2] = (car->_pos_Z);
+
+        // avoid going under the scene
+        //height = grGetHOT(eye[0], eye[1]) + 1.0;
+        height =1;
+        if (eye[2] < height) {
+            timer = 500 + (int)(500.0*rand()/(RAND_MAX+1.0));
+            offset[2] = height - car->_pos_Z + 1.0;
+            eye[2] = height;
+        }
+
+    }
+
+
+
+    void onSelect(tCarElt *car, tSituation *s)
+    {
+    timer = 0;
+    current = -1;
+    }
+
+};
+
+// cGrCarCamBehind2 ================================================================
+
+class SDCarCamBehind2 : public SDPerspCamera
+{
+    tdble PreA;
+
+ protected:
+    float dist;
+
+ public:
+    SDCarCamBehind2(SDView *myscreen, int id, int drawCurr, int drawBG,
+            float fovy, float fovymin, float fovymax,
+            float mydist, float fnear, float ffar = 1500.0,
+            float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+             fovymax, fnear, ffar, myfogstart, myfogend) {
+    dist = mydist;
+    PreA = 0.0;
+    up[0] = 0;
+    up[1] = 0;
+    up[2] = 1;
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+    tdble A;
+    tdble CosA;
+    tdble SinA;
+    tdble x;
+    tdble y;
+
+    A = RtTrackSideTgAngleL(&(car->_trkPos));
+    if (fabs(PreA - A) > fabs(PreA - A + 2*PI)) {
+        PreA += 2*PI;
+    } else if (fabs(PreA - A) > fabs(PreA - A - 2*PI)) {
+        PreA -= 2*PI;
+    }
+    RELAXATION(A, PreA, 5.0);
+    CosA = cos(A);
+    SinA = sin(A);
+    x = car->_pos_X - dist * CosA;
+    y = car->_pos_Y - dist * SinA;
+
+    eye[0] = x;
+    eye[1] = y;
+    eye[2] = RtTrackHeightG(car->_trkPos.seg, x, y) + 5.0;
+
+    center[0] = car->_pos_X;
+    center[1] = car->_pos_Y;
+    center[2] = car->_pos_Z;
+
+
+    speed[0] = car->pub.DynGCg.vel.x;
+    speed[1] = car->pub.DynGCg.vel.y;
+    speed[2] = car->pub.DynGCg.vel.z;
+
+    Speed = car->_speed_x * 3.6;
+
+    //grRain.drawPrecipitation(1, up[2], 0.0, 0.0, eye[2], eye[1], eye[0], Speed);
+    }
+};
+
+// cGrCarCamRoadZoomTVD ================================================================
+/*static tdble
+GetDistToStart(tCarElt *car)
+{
+    tTrackSeg	*seg;
+    tdble	lg;
+
+    seg = car->_trkPos.seg;
+    lg = seg->lgfromstart;
+
+    switch (seg->type) {
+    case TR_STR:
+    lg += car->_trkPos.toStart;
+    break;
+    default:
+    lg += car->_trkPos.toStart * seg->radius;
+    break;
+    }
+    return lg;
+}
+
+typedef struct
+{
+    double	prio;
+    int		viewable;
+    int		event;
+} tSchedView;
+
+class SDCarCamRoadZoomTVD : public SDCarCamRoadZoom
+{
+    tSchedView *schedView;
+    double camChangeInterval;
+    double camEventInterval;
+    double lastEventTime;
+    double lastViewTime;
+    tdble  proximityThld;
+    int		current;
+    int ncars;
+
+ public:
+    SDCarCamRoadZoomTVD(SDView *myscreen, int id, int drawCurr, int drawBG,
+             float fovy, float fovymin, float fovymax,
+             float fnear,int ncars, float ffar = 1500.0,
+             float myfogstart = 1400.0, float myfogend = 1500.0)
+    : SDCarCamRoadZoom(myscreen, id, drawCurr, drawBG, fovy, fovymin,
+                fovymax, fnear, ffar, myfogstart, myfogend) {
+    this->ncars = ncars;
+    schedView = (tSchedView *)calloc(ncars, sizeof(tSchedView));
+    if (!schedView) {
+        GfTrace("malloc error");
+        //GfScrShutdown();
+        exit (1);
+    }
+
+
+    lastEventTime = 0;
+    lastViewTime = 0;
+
+    current = -1;
+
+    /*camChangeInterval = GfParmGetNum(grHandle, GR_SCT_TVDIR, GR_ATT_CHGCAMINT, (char*)NULL, 10.0);
+    camEventInterval  = GfParmGetNum(grHandle, GR_SCT_TVDIR, GR_ATT_EVTINT, (char*)NULL, 1.0);
+    proximityThld     = GfParmGetNum(grHandle, GR_SCT_TVDIR, GR_ATT_PROXTHLD, (char*)NULL, 10.0);
+
+    }
+
+    ~SDCarCamRoadZoomTVD() { free(schedView); }
+
+    void update(tCarElt *car, tSituation *s) {
+    int grNbCars = ncars;
+    int	i, j;
+    int	curCar;
+    double	curPrio;
+    double	deltaEventTime = s->currentTime - lastEventTime;
+    double	deltaViewTime = s->currentTime - lastViewTime;
+    int	event = 0;
+
+    if (current == -1) {
+        current = 0;
+        for (i = 0; i < ncars; i++) {
+        if (car == s->cars[i]) {
+            current = i;
+            break;
+        }
+        }
+    }
+
+
+    /* Track events
+    if (deltaEventTime > camEventInterval) {
+
+        memset(schedView, 0, ncars * sizeof(tSchedView));
+        for (i = 0; i < grNbCars; i++) {
+        schedView[i].viewable = 1;
+        }
+
+        /*for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
+        if ((screen != grScreens[i]) && grScreens[i]->isActive()) {
+            car = grScreens[i]->getCurrentCar();
+            schedView[car->index].viewable = 0;
+            schedView[car->index].prio -= 10000;
+        }
+        }
+
+        for (i = 0; i < grNbCars; i++) {
+        tdble dist, fs;
+
+        car = s->cars[i];
+        schedView[car->index].prio += grNbCars - i;
+        fs = GetDistToStart(car);
+        if ((car->_state & RM_CAR_STATE_NO_SIMU) != 0) {
+            schedView[car->index].viewable = 0;
+        } else {
+            if ((fs > (grTrack->length - 200.0)) && (car->_remainingLaps == 0)) {
+            schedView[car->index].prio += 5 * grNbCars;
+            event = 1;
+            }
+        }
+
+        if ((car->_state & RM_CAR_STATE_NO_SIMU) == 0) {
+            dist = fabs(car->_trkPos.toMiddle) - grTrack->width / 2.0;
+            /* out of track
+            if (dist > 0) {
+            schedView[car->index].prio += grNbCars;
+            if (car->ctrl.raceCmd & RM_CMD_PIT_ASKED) {
+                schedView[car->index].prio += grNbCars;
+                event = 1;
+            }
+            }
+
+            for (j = i+1; j < grNbCars; j++) {
+            tCarElt *car2 = s->cars[j];
+            tdble fs2 = GetDistToStart(car2);
+            tdble d = fabs(fs2 - fs);
+
+            if ((car2->_state & RM_CAR_STATE_NO_SIMU) == 0) {
+                if (d < proximityThld) {
+                d = proximityThld - d;
+                schedView[car->index].prio  += d * grNbCars / proximityThld;
+                schedView[car2->index].prio += d * (grNbCars - 1) / proximityThld;
+                if (i == 0) {
+                    event = 1;
+                }
+                }
+            }
+            }
+
+            if (car->priv.collision) {
+            schedView[car->index].prio += grNbCars;
+            event = 1;
+            }
+        } else {
+            if (i == current) {
+            event = 1;	/* update view
+            }
+        }
+        }
+
+
+        /* change current car
+        if ((event && (deltaEventTime > camEventInterval)) || (deltaViewTime > camChangeInterval)) {
+        int	last_current = current;
+
+        curCar = 0;
+        curPrio = -1000000.0;
+        for (i = 0; i < grNbCars; i++) {
+
+            if ((schedView[i].prio > curPrio) && (schedView[i].viewable)) {
+            curPrio = schedView[i].prio;
+            curCar = i;
+            }
+        }
+        for (i = 0; i < grNbCars; i++) {
+            if (s->cars[i]->index == curCar) {
+            current = i;
+            break;
+            }
+        }
+        if (last_current != current) {
+            lastEventTime = s->currentTime;
+            lastViewTime = s->currentTime;
+        }
+        }
+    }
+
+    screen->setCurrentCar(s->cars[current]);
+
+    cGrCarCamRoadZoom::update(s->cars[current], s);
+    }
+};
+
+*/
 
 SDCamera::~SDCamera( void ){
 }
@@ -1213,7 +1705,8 @@ SDCamera::~SDCamera( void ){
 
 
 
-SDCameras::SDCameras(SDView *c){
+SDCameras::SDCameras(SDView *c, int ncars){
+    cameraHasChanged = false;
 
 
 
@@ -1674,7 +2167,84 @@ SDCameras::SDCameras(SDView *c){
                                                            fixedFar ? fixedFar : 300.0 * fovFactor,	/* fogstart */
                                                            fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
                                                            ));
+    /* F9 - TV like coverage -index 7*/
 
+    id=0;
+    //TODO correct when params class
+    /* cam F9 = road cam zoomed */
+    cameras[7].insert(cameras[7].end(),new SDCarCamRoadZoom(myscreen,
+                                                             id,
+                                                             1,		/* drawCurr */
+                                                             1,		/* drawBG  */
+                                                             9.0,	/* fovy */
+                                                             1.0,		/* fovymin */
+                                                             90.0,	/* fovymax */
+                                                             1.0,		/* near */
+                                                             fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+                                                             fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                             fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                             ));
+    id++;
+    //TODO correct when params class
+    /* cam F9 = road cam fixed fov */
+    cameras[7].insert(cameras[7].end(),new SDCarCamRoadNoZoom(myscreen,
+                                                               id,
+                                                               1,		/* drawCurr */
+                                                               1,		/* drawBG  */
+                                                               30.0,	/* fovy */
+                                                               5.0,	/* fovymin */
+                                                               60.0,	/* fovymax */
+                                                               1.0,	/* near */
+                                                               fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
+                                                               fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                               fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                               ));
+    /* F10 - Helicopter like views -index 8*/
+    id=0;
+    //TODO correct when params class
+    cameras[8].insert(cameras[8].end(),new SDCarCamRoadFly(myscreen,
+                                                            id,
+                                                            1,		/* drawCurr */
+                                                            1,		/* drawBG  */
+                                                            //17.0,	/* fovy */
+                                                            67.5,	/* fovy */
+                                                            1.0,		/* fovymin */
+                                                            90.0,	/* fovymax */
+                                                            1.0,		/* near */
+                                                            fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+                                                            fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                            fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                            ));
+    id++;
+    //TODO correct when params class
+    cameras[8].insert(cameras[8].end(),new SDCarCamBehind2(myscreen,
+                                                            id,
+                                                            1,	/* drawCurr */
+                                                            1,	/* drawBG  */
+                                                            40.0,	/* fovy */
+                                                            5.0,	/* fovymin */
+                                                            95.0,	/* fovymax */
+                                                            30.0,	/* dist */
+                                                            1.0,	/* near */
+                                                            fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+                                                            fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+                                                            fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+                                                            ));
+    /* F11 - The Directors cut -index 9 */
+    id=0;
+    //TODO correct when params class
+  /*  cameras[9].insert(cameras[9].end(),new SDCamRoadZoomTVD(myscreen,
+                                                                id,
+                                                                1,	/* drawCurr
+                                                                1,	/* drawBG
+                                                                9.0,	/* fovy
+                                                                1.0,	/* fovymin
+                                                                90.0,	/* fovymax
+                                                                1.0,	/* near
+                                                                ncars,
+                                                                fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far
+                                                                fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart
+                                                                fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend                                                                 ));*/
 
     selectedCamera =0;
     selectedList=0;
@@ -1693,11 +2263,18 @@ void SDCameras::nextCamera(int list){
         selectedList = list;
     }
 
+    cameraHasChanged = true;
+
     cameras[selectedList][selectedCamera]->setProjection();
 
 }
 
 void SDCameras::update(tCarElt * car, tSituation * s){
+    if(cameraHasChanged){
+       cameras[selectedList][selectedCamera]->onSelect(car,s);
+       cameraHasChanged = false;
+    }
+
     cameras[selectedList][selectedCamera]->update(car,s);
 
     cameras[selectedList][selectedCamera]->setModelView();

@@ -42,9 +42,10 @@ protected:
     std::vector<SDCamera *> cameras[CAMERA_LISTS];
     int selectedList;
     int selectedCamera;
+    bool cameraHasChanged;
 
 public:
-    SDCameras(SDView *c);
+    SDCameras(SDView *c,int ncars);
     SDCamera * getSelectedCamera();
     void nextCamera(int list);
     void update(tCarElt * car, tSituation * s);

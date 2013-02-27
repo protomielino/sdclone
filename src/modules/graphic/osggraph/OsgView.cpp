@@ -40,7 +40,7 @@ SDView::SDView(osg::Camera * c, int x, int y, int width, int height)
     this->width= width;
     this->height = height;
     cam = c;
-    cameras = new SDCameras(this);
+
     id = 0;
     curCar = NULL;
     /*selectNextFlag = false;
@@ -78,6 +78,7 @@ void SDView::switchMirror(void)
 
 void SDView::Init(tSituation *s)
 {
+    cameras = new SDCameras(this,s->_ncars);
     loadParams(s);
 }
 
