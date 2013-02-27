@@ -148,6 +148,9 @@ void SDSetZoom(void * vp){
     screens->getActiveView()->getCameras()->getSelectedCamera()->setZoom(t);
 }
 
+void SDSwitchMirror(void * vp){
+    screens->getActiveView()->switchMirror();
+}
 
 int
 initView(int x, int y, int width, int height, int /* flag */, void *screen)
@@ -206,9 +209,9 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, '4',            "G/Cmd Graph",       (void*)4, grSelectBoard, NULL);
     GfuiAddKey(screen, '3',            "Leaders Board",     (void*)2, grSelectBoard, NULL);
     GfuiAddKey(screen, '2',            "Driver Counters",   (void*)1, grSelectBoard, NULL);
-    GfuiAddKey(screen, '1',            "Driver Board",      (void*)0, grSelectBoard, NULL);
-    GfuiAddKey(screen, '9',            "Mirror",            (void*)0, grSwitchMirror, NULL);
-    GfuiAddKey(screen, '0',            "Arcade Board",      (void*)5, grSelectBoard, NULL);*/
+    GfuiAddKey(screen, '1',            "Driver Board",      (void*)0, grSelectBoard, NULL);*/
+    GfuiAddKey(screen, '9',            "Mirror",            (void*)0, SDSwitchMirror, NULL);
+    //GfuiAddKey(screen, '0',            "Arcade Board",      (void*)5, grSelectBoard, NULL);*/
     GfuiAddKey(screen, '+', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
     GfuiAddKey(screen, '=', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
     GfuiAddKey(screen, '-', GFUIM_CTRL, "Zoom Out",          (void*)GR_ZOOM_OUT, SDSetZoom, NULL);
@@ -290,6 +293,7 @@ void
 shutdownCars(void)
 {
     delete cars;
+    //delete m_carroot;
 
 /*	int i;
 
@@ -380,6 +384,7 @@ int  initCars(tSituation *s)
 void
 shutdownTrack(void)
 {
+    m_sceneroot->removeChildren(0,m_sceneroot->getNumChildren());
 	// Do the real track termination job.
     delete scenery;
     //delete m_sceneroot;
@@ -400,6 +405,7 @@ shutdownTrack(void)
 void
 shutdownView(void)
 {
+    delete screens;
     //delete render;
   //  delete viewer;
 }

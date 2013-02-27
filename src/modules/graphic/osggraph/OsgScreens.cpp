@@ -22,6 +22,7 @@
 
 #include <osgViewer/Viewer>
 #include <osgViewer/GraphicsWindow>
+#include <osg/GraphicsContext>
 
 #include "OsgScreens.h"
 
@@ -38,7 +39,9 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
     int grWinw = width;
     int grWinh = height;
 
-    view = new SDView(viewer->getCamera(),0,0,grWinw,grWinh);
+    osg::Camera * mirrorCam = new osg::Camera;
+
+    view = new SDView(viewer->getCamera(),0,0,grWinw,grWinh,mirrorCam);
 
     viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, grWinw, grWinh);
@@ -47,8 +50,27 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
     viewer->getCamera()->setViewport(new osg::Viewport(0, 0, grWinw, grWinh));
     viewer->getCamera()->setGraphicsContext(gw);
     viewer->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-    viewer->getCamera()->setProjectionMatrixAsPerspective(67.5f, static_cast<double>((float)grWinw / (float)grWinh), 0.1f, 12000.0f);
-    viewer->setSceneData(m_sceneroot.get());
+    //viewer->getCamera()->setProjectionMatrixAsPerspective(67.5f, static_cast<double>((float)grWinw / (float)grWinh), 0.1f, 12000.0f);
+
+
+    mirrorCam->setGraphicsContext(gw);
+    mirrorCam->setClearMask( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    //mirrorCam->setClearMask( GL_COLOR_BUFFER_BIT );
+    mirrorCam->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
+    //mirrorCam->setClearMask( GL_DEPTH_BUFFER_BIT );
+   // mirrorCam->setRenderOrder( osg::Camera::POST_RENDER );
+    //mirrorCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+    //mirrorCam->setProjectionMatrixAsPerspective(67.5f, static_cast<double>((float)grWinw / (float)grWinh), 0.1f, 12000.0f);
+
+
+    root = new osg::Group;
+    root->addChild(m_sceneroot);
+    root->addChild(mirrorCam);
+    mirrorCam->addChild(m_sceneroot);
+    //viewer->addSlave(mirrorCam);//,osg::Matrix(),osg::Matrix(),true);
+
+
+    viewer->setSceneData(root);
     //viewer->realize();
 }
 
@@ -67,6 +89,12 @@ void SDScreens::update(tSituation * s,SDFrameInfo* fi)
 
 SDScreens::~SDScreens()
 {
+    root.release();
+
+    //viewer->getSceneData();
+    //delete viewer->getSceneData();
+    delete view;
+    delete viewer;
 }
 
 

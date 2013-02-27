@@ -22,7 +22,7 @@
 
 
 
-
+#include <osg/Group>
 #include <osgViewer/Viewer>
 #include <raceman.h>        //tSituation
 #include "OsgView.h"
@@ -33,6 +33,7 @@ class SDScreens
     protected:
         osgViewer::Viewer *viewer;
         SDView * view;
+        osg::ref_ptr<osg::Group> root;
 
 //		int mirrorFlag;
 //		void loadParams(tSituation *s);			// Load from parameters files.

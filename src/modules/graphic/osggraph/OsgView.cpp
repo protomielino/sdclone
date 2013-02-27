@@ -33,13 +33,39 @@
 static char path[1024];
 static char path2[1024];
 
-SDView::SDView(osg::Camera * c, int x, int y, int width, int height)
+SDView::SDView(osg::Camera * c, int x, int y, int width, int height,
+               osg::Camera * mc)
 {
     this->x =x;
     this->y =y;
     this->width= width;
     this->height = height;
     cam = c;
+
+    mirrorCam = mc;
+    hasChangedMirrorFlag = false;
+    mirrorFlag = true;
+
+
+    tdble fovFactor =1;
+    tdble fixedFar =0;
+    mirror = new SDCarCamMirror(
+        this,
+        -1,
+        0,					// drawCurr
+        1,					// drawBG
+        50.0,				// fovy
+        0.0,				// fovymin
+        360.0,				// fovymax
+        0.3,				// near
+        fixedFar ? fixedFar : 300.0 * fovFactor, // far
+        fixedFar ? 2*fixedFar/3 : 200.0 * fovFactor,	// fogstart
+        fixedFar ? fixedFar : 300.0 * fovFactor	// fogend
+    );
+   // mirror->setProjection();
+
+
+
 
     id = 0;
     curCar = NULL;
@@ -57,13 +83,13 @@ SDView::SDView(osg::Camera * c, int x, int y, int width, int height)
 
 SDView::~SDView()
 {
-    //int i;
-	FREEZ(cars);
+    delete cameras;
 }
 
 void SDView::switchMirror(void)
 {
 	mirrorFlag = 1 - mirrorFlag;
+    hasChangedMirrorFlag = true;
 	sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
 	GfParmSetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
 
@@ -133,11 +159,30 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
         //curCam->onSelect(curCar, s);
 	}
 
+    if(hasChangedMirrorFlag){
+        hasChangedMirrorFlag =false;
+        this->de_activateMirror();
+    }
+
     //int	i;
    // int nb = s->_ncars;
     //viewer->update(s, &frameInfo);
    // tCarElt *car = getCurrentCar();
     cameras->update(curCar,s);
+    mirror->update(curCar,s);
+    mirror->setModelView();
+}
+
+void SDView::de_activateMirror(){
+    if(mirrorFlag){
+        if(cameras->getSelectedCamera()->getMirrorAllowed()){
+            this->mirrorCam->setNodeMask(1);
+        }else{
+            this->mirrorCam->setNodeMask(0);
+        }
+    }else{
+        this->mirrorCam->setNodeMask(0);
+    }
 }
 
 Camera* SDView::getCamera(){

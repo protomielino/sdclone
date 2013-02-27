@@ -68,7 +68,7 @@ Camera * SDCamera::getGenericCamera(){
 
 void SDCamera::update(tCarElt * car, tSituation * s)
 {
-    osg::Vec3 P, p;
+    /*osg::Vec3 P, p;
     float offset = 0;
     // int Speed = 0;
 
@@ -98,7 +98,7 @@ void SDCamera::update(tCarElt * car, tSituation * s)
         fovy = spanfovy;
     }*/
 
-    P[0] = (car->_pos_X + 30.0 * cos(car->_glance + offset + car->_yaw));
+    /*P[0] = (car->_pos_X + 30.0 * cos(car->_glance + offset + car->_yaw));
     P[1] = (car->_pos_Y + 30.0 * sin(car->_glance + offset + car->_yaw));
     P[2] = car->_pos_Z + car->_yaw;
         //osgXformPnt3(P, car->_posMat);
@@ -121,7 +121,7 @@ void SDCamera::update(tCarElt * car, tSituation * s)
 
    // osgCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 
-    //osgCam->setViewMatrixAsLookAt( eye, center, up);
+    //osgCam->setViewMatrixAsLookAt( eye, center, up);*/
 }
 
 // SdPerspCamera ================================================================
@@ -752,9 +752,9 @@ class SDCarCamBehindReverse : public SDPerspCamera
       M(2,0) = 0.0;  M(2,1) = 0.0;  M(2,2) = 1.0;  M(2,3) = 0.0;
       M(3,0) = 0.0;  M(3,1) = 0.0;  M(3,2) = 0.0;  M(3,3) = 1.0;
 #undef M*/
-      osg::Matrix mir(1,0,0,0,
-                      0,-1,0,0,
-                      0,0,1,0,
+      osg::Matrix mir(-1,0,0,0,
+                      0,1,0,0,
+                      0,0,-1,0,
                       0,0,0,1);
       osg::Matrix res = m*mir;
 
@@ -1504,6 +1504,127 @@ class SDCarCamBehind2 : public SDPerspCamera
     }
 };
 
+// cGrCarCamMirror ================================================================
+
+SDCarCamMirror::SDCarCamMirror(SDView *myscreen, int id, int drawCurr, int drawBG,
+        float myfovy, float myfovymin, float myfovymax,
+        float myfnear, float myffar,
+        float myfogstart, float myfogend)
+    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 1,
+         myfovy, myfovymin, myfovymax,
+         myfnear, myffar, myfogstart, myfogend)
+    , origFovY(myfovy)
+{
+    this->adaptScreenSize();
+}
+
+void SDCarCamMirror::setModelView(void)
+{
+    osg::Matrix m;
+    m.makeLookAt(eye,center,up);
+   //float mirror[4][4];
+
+/*#define M(row,col)  mirror[row][col]
+   M(0,0) = 1.0;  M(0,1) = 0.0;  M(0,2) = 0.0;  M(0,3) = 0.0;
+   M(1,0) = 0.0;  M(1,1) =-1.0;  M(1,2) = 0.0;  M(1,3) = 0.0;
+   M(2,0) = 0.0;  M(2,1) = 0.0;  M(2,2) = 1.0;  M(2,3) = 0.0;
+   M(3,0) = 0.0;  M(3,1) = 0.0;  M(3,2) = 0.0;  M(3,3) = 1.0;
+#undef M*/
+   osg::Matrix mir(-1,0,0,0,
+                   0,1,0,0,
+                   0,0,-1,0,
+                   0,0,0,1);
+   osg::Matrix res = m*mir;
+
+   screen->getOsgMirrorCam()->setViewMatrix(res);
+}
+
+void SDCarCamMirror::update(tCarElt *car, tSituation * /* s */)
+{
+    sgVec3 P, p;
+
+    P[0] = car->_bonnetPos_x - (car->_dimension_x/2); // behind car
+    P[1] = car->_bonnetPos_y;
+    P[2] = car->_bonnetPos_z;
+    sgXformPnt3(P, car->_posMat);
+
+    eye[0] = P[0];
+    eye[1] = P[1];
+    eye[2] = P[2];
+
+    p[0] = car->_bonnetPos_x + 30.0;
+    p[1] = car->_bonnetPos_y;
+    p[2] = car->_bonnetPos_z;
+    sgXformPnt3(p, car->_posMat);
+
+    center[0] = p[0];
+    center[1] = p[1];
+    center[2] = p[2];
+
+    up[0] = car->_posMat[2][0];
+    up[1] = car->_posMat[2][1];
+    up[2] = car->_posMat[2][2];
+
+    speed[0] =car->pub.DynGCg.vel.x;
+    speed[1] =car->pub.DynGCg.vel.y;
+    speed[2] =car->pub.DynGCg.vel.z;
+
+
+}
+
+void SDCarCamMirror::adaptScreenSize()
+{
+    vpx = screen->getScreenXPos();
+    vpy = screen->getScreenYPos();
+    vpw = screen->getScreenWidth();
+    vph = screen->getScreenHeight();
+
+    // mirror width adjusted to fit board size
+   // int boardW = screen->getBoardWidth();
+
+    int boardW =100;
+    mx = vpx + vpw / 2 - (vpw * boardW /400);
+    my = vpy +  5 * vph / 6 - vph / 10;
+    mw = vpw * boardW /200;
+    mh = vph / 6;
+
+    aspectRatio = float(mw) / mh;
+
+    limitFov();
+
+    screen->getOsgMirrorCam()->setProjectionMatrixAsPerspective(fovy,aspectRatio , this->fnear, ffar);
+
+    screen->getOsgMirrorCam()->setViewport(new osg::Viewport(mx,my,mw,mh));
+
+}
+
+/*void cGrCarCamMirror::beforeDraw (void)
+{
+    glFrontFace( GL_CW );
+
+    // Scissor needed with Nouveau driver
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(mx, my, mw, mh);
+    glViewport(mx, my, mw, mh);
+
+    // make mirror in front of everything by forcing overdrawing of everything
+    glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+void cGrCarCamMirror::afterDraw (void)
+{
+    glDisable(GL_SCISSOR_TEST);
+
+    glViewport(vpx, vpy, vpw, vph);
+
+    glFrontFace( GL_CCW );
+}*/
+
+void SDCarCamMirror::limitFov(void)
+{
+    fovy = origFovY / getAspectRatio();
+}
+
 // cGrCarCamRoadZoomTVD ================================================================
 /*static tdble
 GetDistToStart(tCarElt *car)
@@ -2244,11 +2365,13 @@ SDCameras::SDCameras(SDView *c, int ncars){
                                                                 ncars,
                                                                 fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far
                                                                 fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart
-                                                                fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend                                                                 ));*/
+                                                                fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend
+                                                                ));*/
 
     selectedCamera =0;
     selectedList=0;
 
+    cameras[selectedList][selectedCamera]->setProjection();
 }
 
 SDCamera * SDCameras::getSelectedCamera(){
@@ -2266,6 +2389,7 @@ void SDCameras::nextCamera(int list){
     cameraHasChanged = true;
 
     cameras[selectedList][selectedCamera]->setProjection();
+    this->screen->de_activateMirror();
 
 }
 
@@ -2281,5 +2405,10 @@ void SDCameras::update(tCarElt * car, tSituation * s){
 }
 
 SDCameras::~SDCameras(){
+    for(int i=0;i<CAMERA_LISTS;i++){
+        for(int j=0; j<cameras[j].size();j++){
+            delete cameras[i][j];
+        }
+    }
 }
 

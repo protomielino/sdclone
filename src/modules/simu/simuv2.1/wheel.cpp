@@ -241,7 +241,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 
 	// For debugging weather simultation on some tracks
 	#ifdef SD_DEBUG
-		GfLogDebug("Simu v2.1 kFriction : %f   ", wheel->trkPos.seg->surface->kFriction);
+        //GfLogDebug("Simu v2.1 kFriction : %f   ", wheel->trkPos.seg->surface->kFriction);
 	#endif
 
 	wheel->rollRes = wheel->forces.z * wheel->trkPos.seg->surface->kRollRes;

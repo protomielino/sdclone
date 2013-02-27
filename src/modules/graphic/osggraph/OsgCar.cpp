@@ -209,6 +209,9 @@ SDCars::SDCars(void)
 
 SDCars::~SDCars(void)
 {
+    for(int i=0;i<the_cars.size();i++){
+        delete the_cars[0];
+    }
 }
 
 void SDCars::addSDCar(SDCar * car)

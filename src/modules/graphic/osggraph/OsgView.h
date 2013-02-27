@@ -21,7 +21,6 @@
 
 
 
-
 #include <camera.h>
 #include <raceman.h>        //tSituation
 #include <car.h>			//tCarElt
@@ -38,6 +37,7 @@ class SDView
 	protected:
 
         osg::Camera * cam;
+        osg::Camera * mirrorCam;
 
         int id;
         int x, y, width, height;
@@ -48,8 +48,10 @@ class SDView
         bool selectNextFlag;
         bool selectPrevFlag;
         bool mirrorFlag;
+        bool hasChangedMirrorFlag;
 
         SDCameras *cameras;
+        SDCamera * mirror;
 	
 		//class cGrPerspCamera *curCam;			// The current camera.
 		//class cGrCarCamMirror *mirrorCam;		// The mirror camera.
@@ -62,8 +64,10 @@ class SDView
 	
 		void loadParams(tSituation *s);			// Load from parameters files.
 
+
 	public:
-        SDView(osg::Camera * c, int x , int y, int width , int height);
+        SDView(osg::Camera * c, int x , int y, int width , int height,
+               osg::Camera * mc);
         ~SDView();
 
         void Init(tSituation *s);
@@ -76,6 +80,7 @@ class SDView
         inline void selectPrevCar(void) { selectPrevFlag = true; }
 
         void switchMirror(void);
+        void de_activateMirror();
 
         inline tCarElt *getCurrentCar(void) { return curCar; }
         inline SDCameras *getCameras() { return cameras; }
@@ -85,6 +90,13 @@ class SDView
         Camera* getCamera();
 
         inline osg::Camera *  getOsgCam(void) { return cam; }
+        inline osg::Camera *  getOsgMirrorCam(void) { return mirrorCam; }
+
+        inline int  getScreenXPos(void) { return x; }
+        inline int  getScreenYPos(void) { return y; }
+
+        inline int  getScreenWidth(void) { return width; }
+        inline int  getScreenHeight(void) { return height; }
 
 
 };

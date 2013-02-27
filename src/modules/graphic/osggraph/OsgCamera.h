@@ -87,6 +87,7 @@ public:
     virtual float getLODFactor(float x, float y, float z) = 0;	/* Get the LOD factor for an object located at x,y,z */
 
     inline float getAspectRatio(){return 0.0;}
+    inline float getMirrorAllowed(){return mirrorAllowed;}
     //camera for sound
     Camera * getGenericCamera();
     //void update(tCarElt * car, tSituation * s);
@@ -140,6 +141,40 @@ class SDPerspCamera : public SDCamera
        return fovy;
    }
 
+};
+
+class SDCarCamMirror : public SDPerspCamera
+{
+ protected:
+    int		vpx, vpy, vpw, vph;	/* viewport size */
+    int		mx, my, mw, mh;		/* drawing area */
+    float   aspectRatio;        /* the aspect ratio of the mirror: mw / mh */
+    float   origFovY;           /* fovy set using constructor */
+
+ public:
+    SDCarCamMirror(SDView *myscreen, int id, int drawCurr, int drawBG,
+            float myfovy, float myfovymin, float myfovymax,
+            float myfnear, float myffar = 1500.0,
+                   float myfogstart = 1400.0, float myfogend = 1500.0);
+
+    void update (tCarElt *car, tSituation *s);
+
+    virtual float getAspectRatio() { return aspectRatio; }
+
+    void setViewport (int x, int y, int w, int h);
+    void setScreenPos (int x, int y, int w, int h);
+
+    virtual void setModelView(void);
+
+  //  virtual void beforeDraw(void);
+   // virtual void afterDraw(void);
+
+
+    /** Called by cGrScreen::activate() after the screen updated it's screen size.
+     *  Cameras should use the cGrCamera::screen property to get the updated information. */
+    void adaptScreenSize();
+
+    virtual void limitFov(void);
 };
 
 #endif // _OSGCAMERA_H_
