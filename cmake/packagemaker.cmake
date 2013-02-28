@@ -95,7 +95,7 @@ IF(WIN32)
     # Icon for the generated installer/uninstaller files.
     SET(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\icons\\\\icon.ico")
     #SET(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\icons\\\\icon.ico")
-    SET(CPACK_PACKAGE_ICON ${CMAKE_SOURCE_DIR}\\\\installer\\\\windows\\\\header.bmp)
+    SET(CPACK_PACKAGE_ICON ${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\img\\\\header.bmp)
     
     # Extra shortcuts to add in the start menu (a list of pairs : URL, Menu label).
     SET(CPACK_NSIS_MENU_LINKS 
