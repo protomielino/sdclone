@@ -82,11 +82,11 @@ public:
 	void build(tTrack *track);
 };*/
 
-static int  grWrldX;
-static int  grWrldY;
-static int  grWrldZ;
-static int  grWrldMaxSize;
-
+static int grWrldX=0;
+static int grWrldY=0;
+static int grWrldZ = 0;
+static int grWrldMaxSize=0;
+static 	tTrack *grTrack;
 class SDScenery
 {
 private:
@@ -96,11 +96,11 @@ private:
 	osg::ref_ptr<osg::Group> _scenery;
 	osg::ref_ptr<osg::Group> _background;
 	
-	int _grWrldX;
-	int _grWrldY;
-	int _grWrldZ;
-	int _grWrldMaxSize;
-	int _max_visibility;
+    int _grWrldX;
+    int _grWrldY;
+    int _grWrldZ;
+    int _grWrldMaxSize;
+    int _max_visibility;
 	int _nb_cloudlayer;
 	int _DynamicSkyDome;
 	int _SkyDomeDistance;
@@ -114,14 +114,14 @@ private:
 	//_pits = 0;
 	std::string _strTexturePath;	
 	
-	tTrack 		*grTrack;
+
 	
 	void LoadGraphicsOptions();
 	void LoadSkyOptions();
 	void CustomizePits(void);
 	bool LoadTrack(std::string strTrack);
-    //inline getGrWrldX(){return _grWrldX;}
-    //inline getGrWrldY(){return _grWrldX;}
+
+
 public:
 	
 	/* Constructor */
@@ -136,6 +136,11 @@ public:
 	//void	addTrees(SDTrees->build(tTrack *track));
 	void 	ShutdownScene(void);
 	//void	
+
+    inline static int getWorldX(){return grWrldX;}
+    inline static int getWorldY(){return grWrldY;}
+    inline static int getWorldZ(){return grWrldZ;}
+    inline static int getWorldMaxSize(){return grWrldMaxSize;}
 	
 	//osg::Node* getPreRoot() { return pre_root.get(); }
 

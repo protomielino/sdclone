@@ -108,6 +108,8 @@ void SDView::Init(tSituation *s)
     loadParams(s);
 }
 
+
+
 /* Update screen display */
 void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
 {

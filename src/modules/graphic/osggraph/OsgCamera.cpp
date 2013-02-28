@@ -30,8 +30,10 @@
 #include "OsgCamera.h"
 #include "OsgView.h"
 #include "OsgScenery.h"
+#include "OsgMain.h"
 
-//static char path[1024];
+static char path[1024];
+char 		buf[256];
 
 static float spanfovy;
 static float bezelComp;
@@ -200,10 +202,10 @@ void SDPerspCamera::setModelView(void)
 
 void SDPerspCamera::loadDefaults(char *attr)
 {
-   /* sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
+    sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
     fovy = (float)GfParmGetNum(grHandle, path,
                    attr, (char*)NULL, fovydflt);
-    limitFov();*/
+    limitFov();
 }
 
 
@@ -343,10 +345,10 @@ void SDPerspCamera::setZoom(int cmd)
     }
 
    this->setProjection();
-   // sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, screen->getCameras()->getIntSelectedCamera(), getId());
-    //sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
-    //GfParmSetNum(grHandle, path, buf, (char*)NULL, (tdble)fovy);
-    //GfParmWriteFile(NULL, grHandle, "Graph");
+   sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, screen->getCameras()->getIntSelectedCamera(), getId());
+   sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
+   GfParmSetNum(grHandle, path, buf, (char*)NULL, (tdble)fovy);
+   GfParmWriteFile(NULL, grHandle, "Graph");
 }
 
 
@@ -974,8 +976,8 @@ class SDCarCamCenter : public SDPerspCamera
     locfar = ffar;
     locfovy = fovy;
 
-    eye[0] = grWrldX * 0.5;
-    eye[1] = grWrldY * 0.6;
+    eye[0] = SDScenery::getWorldX() * 0.5;
+    eye[1] = SDScenery::getWorldY() * 0.6;
     eye[2] = distz;
 
     up[0] = 0;
@@ -984,9 +986,9 @@ class SDCarCamCenter : public SDPerspCamera
     }
 
     void loadDefaults(char *attr) {
-  /*  sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
+    sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
     locfovy = (float)GfParmGetNum(grHandle, path,
-                   attr, (char*)NULL, fovydflt);*/
+                   attr, (char*)NULL, fovydflt);
     }
 
     void setZoom(int cmd) {
@@ -1226,9 +1228,9 @@ class SDCarCamRoadZoom : public SDPerspCamera
     }
 
     void loadDefaults(char *attr) {
-    /*sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
+    sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
     locfovy = (float)GfParmGetNum(grHandle, path,
-                   attr, (char*)NULL, fovydflt);*/
+                   attr, (char*)NULL, fovydflt);
     }
 
     void setZoom(int cmd) {
@@ -1244,8 +1246,8 @@ class SDCarCamRoadZoom : public SDPerspCamera
     curCam = car->_trkPos.seg->cam;
 
     if (curCam == NULL) {
-        eye[0] = grWrldX * 0.5;
-        eye[1] = grWrldY * 0.6;
+        eye[0] = SDScenery::getWorldX() * 0.5;
+        eye[1] = SDScenery::getWorldY() * 0.6;
         eye[2] = 120;
     } else {
         eye[0] = curCam->pos.x;
@@ -1302,8 +1304,8 @@ class SDCarCamRoadNoZoom : public SDPerspCamera
     curCam = car->_trkPos.seg->cam;
 
     if (curCam == NULL) {
-        eye[0] = grWrldX * 0.5;
-        eye[1] = grWrldY * 0.6;
+        eye[0] = SDScenery::getWorldX() * 0.5;
+        eye[1] = SDScenery::getWorldY() * 0.6;
         eye[2] = 120;
         center[2] = car->_pos_Z;
     } else {
@@ -1625,8 +1627,8 @@ void SDCarCamMirror::limitFov(void)
     fovy = origFovY / getAspectRatio();
 }
 
-// cGrCarCamRoadZoomTVD ================================================================
-/*static tdble
+// SDCarCamRoadZoomTVD ================================================================
+static tdble
 GetDistToStart(tCarElt *car)
 {
     tTrackSeg	*seg;
@@ -1685,7 +1687,7 @@ class SDCarCamRoadZoomTVD : public SDCarCamRoadZoom
 
     current = -1;
 
-    /*camChangeInterval = GfParmGetNum(grHandle, GR_SCT_TVDIR, GR_ATT_CHGCAMINT, (char*)NULL, 10.0);
+    camChangeInterval = GfParmGetNum(grHandle, GR_SCT_TVDIR, GR_ATT_CHGCAMINT, (char*)NULL, 10.0);
     camEventInterval  = GfParmGetNum(grHandle, GR_SCT_TVDIR, GR_ATT_EVTINT, (char*)NULL, 1.0);
     proximityThld     = GfParmGetNum(grHandle, GR_SCT_TVDIR, GR_ATT_PROXTHLD, (char*)NULL, 10.0);
 
@@ -1713,7 +1715,7 @@ class SDCarCamRoadZoomTVD : public SDCarCamRoadZoom
     }
 
 
-    /* Track events
+    /* Track events*/
     if (deltaEventTime > camEventInterval) {
 
         memset(schedView, 0, ncars * sizeof(tSchedView));
@@ -1721,13 +1723,14 @@ class SDCarCamRoadZoomTVD : public SDCarCamRoadZoom
         schedView[i].viewable = 1;
         }
 
-        /*for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-        if ((screen != grScreens[i]) && grScreens[i]->isActive()) {
-            car = grScreens[i]->getCurrentCar();
+
+        //for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
+        //if ((screen != grScreens[i]) && grScreens[i]->isActive()) {
+            car = screen->getCurrentCar();
             schedView[car->index].viewable = 0;
             schedView[car->index].prio -= 10000;
-        }
-        }
+        //}
+        //}/
 
         for (i = 0; i < grNbCars; i++) {
         tdble dist, fs;
@@ -1735,18 +1738,24 @@ class SDCarCamRoadZoomTVD : public SDCarCamRoadZoom
         car = s->cars[i];
         schedView[car->index].prio += grNbCars - i;
         fs = GetDistToStart(car);
+
         if ((car->_state & RM_CAR_STATE_NO_SIMU) != 0) {
+
             schedView[car->index].viewable = 0;
         } else {
-            if ((fs > (grTrack->length - 200.0)) && (car->_remainingLaps == 0)) {
+
+
+            /*if ((fs > (grTrack->length - 200.0)) && (car->_remainingLaps == 0)) {
+
             schedView[car->index].prio += 5 * grNbCars;
             event = 1;
-            }
+            }*/
         }
 
+
         if ((car->_state & RM_CAR_STATE_NO_SIMU) == 0) {
-            dist = fabs(car->_trkPos.toMiddle) - grTrack->width / 2.0;
-            /* out of track
+            dist = fabs(car->_trkPos.toMiddle) ;//- grTrack->width / 2.0;
+            /* out of track*/
             if (dist > 0) {
             schedView[car->index].prio += grNbCars;
             if (car->ctrl.raceCmd & RM_CMD_PIT_ASKED) {
@@ -1778,13 +1787,13 @@ class SDCarCamRoadZoomTVD : public SDCarCamRoadZoom
             }
         } else {
             if (i == current) {
-            event = 1;	/* update view
+            event = 1;	/* update view*/
             }
         }
         }
 
 
-        /* change current car
+        /* change current car*/
         if ((event && (deltaEventTime > camEventInterval)) || (deltaViewTime > camChangeInterval)) {
         int	last_current = current;
 
@@ -1812,11 +1821,11 @@ class SDCarCamRoadZoomTVD : public SDCarCamRoadZoom
 
     screen->setCurrentCar(s->cars[current]);
 
-    cGrCarCamRoadZoom::update(s->cars[current], s);
+    SDCarCamRoadZoom::update(s->cars[current], s);
     }
 };
 
-*/
+
 
 SDCamera::~SDCamera( void ){
 }
@@ -1832,10 +1841,10 @@ SDCameras::SDCameras(SDView *c, int ncars){
 
 
     // Get the factor of visibiity from the graphics settings and from the track.
-    //tdble fovFactor = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, (char*)NULL, 1.0);
-    //fovFactor *= GfParmGetNum(grTrackHandle, TRK_SECT_GRAPH, TRK_ATT_FOVFACT, (char*)NULL, 1.0);
+    tdble fovFactor = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, (char*)NULL, 1.0);
+    fovFactor *= GfParmGetNum(grTrackHandle, TRK_SECT_GRAPH, TRK_ATT_FOVFACT, (char*)NULL, 1.0);
 
-    tdble fovFactor =1;
+    //tdble fovFactor =1;
     tdble fixedFar =0;
 
     // If sky dome is enabled, we have a "fixed far" cut plane.
@@ -2248,16 +2257,16 @@ SDCameras::SDCameras(SDView *c, int ncars){
                                                            1.0,		/* fovymin */
                                                            110.0,		/* fovymax */
                                                            0,		/* up axis */
-                                                           grWrldX/2,	/* eyex */
-                                                           grWrldY/2,	/* eyey */
-                                                           MAX(grWrldX/2, grWrldY*4/3/2) + grWrldZ, /* eyez */
-                                                           grWrldX/2,	/* centerx */
-                                                           grWrldY/2,	/* centery */
+                                                           SDScenery::getWorldX()/2,	/* eyex */
+                                                           SDScenery::getWorldY()/2,	/* eyey */
+                                                           MAX(SDScenery::getWorldX()/2, SDScenery::getWorldY()*4/3/2) + SDScenery::getWorldZ(), /* eyez */
+                                                           SDScenery::getWorldX()/2,	/* centerx */
+                                                           SDScenery::getWorldY()/2,	/* centery */
                                                            0,		/* centerz */
                                                            10.0,		/* near */
-                                                           grWrldMaxSize * 2.0,	/* far */
-                                                           grWrldMaxSize * 10.0,	/* fogstart */
-                                                           grWrldMaxSize * 20.0	/* fogend */
+                                                           SDScenery::getWorldMaxSize() * 2.0,	/* far */
+                                                           SDScenery::getWorldMaxSize()* 10.0,	/* fogstart */
+                                                           SDScenery::getWorldMaxSize() * 20.0	/* fogend */
                                                            ));
 
     /* F8 - GoPro like views-index 6*/
@@ -2354,22 +2363,23 @@ SDCameras::SDCameras(SDView *c, int ncars){
     /* F11 - The Directors cut -index 9 */
     id=0;
     //TODO correct when params class
-  /*  cameras[9].insert(cameras[9].end(),new SDCamRoadZoomTVD(myscreen,
+    cameras[9].insert(cameras[9].end(),new SDCarCamRoadZoomTVD(myscreen,
                                                                 id,
-                                                                1,	/* drawCurr
-                                                                1,	/* drawBG
-                                                                9.0,	/* fovy
-                                                                1.0,	/* fovymin
-                                                                90.0,	/* fovymax
-                                                                1.0,	/* near
+                                                                1,	// drawCurr
+                                                                1,	// drawBG
+                                                                9.0,	// fovy
+                                                                1.0,	// fovymin
+                                                                90.0,	// fovymax
+                                                                1.0,	// near
                                                                 ncars,
-                                                                fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far
-                                                                fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart
-                                                                fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend
-                                                                ));*/
+                                                                fixedFar ? fixedFar : 1000.0 * fovFactor,	// far
+                                                                fixedFar ? fixedFar/2 : 500.0 * fovFactor,	// fogstart
+                                                                fixedFar ? fixedFar : 1000.0 * fovFactor	// fogend
+                                                                ));
 
     selectedCamera =0;
     selectedList=0;
+
 
     cameras[selectedList][selectedCamera]->setProjection();
 }
@@ -2387,6 +2397,7 @@ void SDCameras::nextCamera(int list){
     }
 
     cameraHasChanged = true;
+
 
     cameras[selectedList][selectedCamera]->setProjection();
     this->screen->de_activateMirror();

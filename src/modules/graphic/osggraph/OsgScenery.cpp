@@ -40,6 +40,10 @@ SDScenery::SDScenery(void)
 	_grWrldY = 0;
 	_grWrldZ = 0;
 	_grWrldMaxSize = 0;
+    grWrldX = 0;
+    grWrldY = 0;
+    grWrldZ = 0;
+    grWrldMaxSize = 0;
 	_max_visibility = 0;
 	_nb_cloudlayer = 0;
 	_DynamicSkyDome = 0;
