@@ -69,6 +69,7 @@ class SDScreens
         void update(tSituation *s,SDFrameInfo* fi);
         void splitScreen(long p);
         void changeScreen(long p);
+        void changeCamera(long p);
 
         inline SDView * getActiveView(){return grScreens[nCurrentScreenIndex];}
 

@@ -102,6 +102,8 @@ class SDView
 
         inline float getViewOffset() {return viewOffset;}
 
+        void saveCamera();
+
         void activate(int x, int y, int width, int height,float v);
         void deactivate();
 

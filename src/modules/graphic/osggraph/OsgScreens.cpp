@@ -102,9 +102,43 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
 void SDScreens::InitCars(tSituation *s)
 {
 
+    char buf[256];
+    char	idx[16];
+    int		index;
+    int		i;
+    tCarElt 	*elt;
+    void	*hdle;
+    const char *pszSpanSplit;
+    int grNbSuggestedScreens = 0;
+
+
+
+    /* Check whether view should be spanned across vertical splits */
+    pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
+    grSpanSplit = strcmp(pszSpanSplit, GR_VAL_YES) ? 0 : 1;
+
+    if (grSpanSplit == 0 && grNbSuggestedScreens > 1) {
+        // Mulitplayer, so ignore the stored number of screens
+        grNbActiveScreens = grNbSuggestedScreens;
+        grNbArrangeScreens = 0;
+    } else {
+            // Load the real number of active screens and the arrangment.
+        grNbActiveScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, 1.0);
+        grNbArrangeScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_ARR_SCREENS, NULL, 0.0);
+    }
+
+
+    // Initialize the cameras for all the screens.
     for (int i=0; i<grScreens.size();i++){
         grScreens[i]->Init(s);
     }
+
+
+    // Setup the screens (= OpenGL viewports) inside the physical game window.
+    this->grAdaptScreenSize();
+
+
+
 
 }
 
@@ -400,6 +434,24 @@ void SDScreens::changeScreen(long p){
     GfLogInfo("Changing current screen to #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
 
 }
+
+void SDScreens::changeCamera(long p){
+
+    this->getActiveView()->getCameras()->nextCamera(p);
+
+    // For SpanSplit ensure screens change together
+    if (grSpanSplit && getActiveView()->getViewOffset() ) {
+        int i, camList,camNum;
+
+        getActiveView()->getCameras()->getIntSelectedListAndCamera(&camList,&camNum);
+
+
+        for (i=0; i < grNbActiveScreens; i++)
+            if (grScreens[i]->getViewOffset() )
+                grScreens[i]->getCameras()->selectCamera(camList,camNum);
+    }
+}
+
 SDScreens::~SDScreens()
 {
     for (int i=0;i< grScreens.size();i++){

@@ -29,9 +29,11 @@
 #include "OsgView.h"
 //#include "OsgCar.h"
 
-//static char buf[1024];
+static char buf[1024];
 static char path[1024];
 static char path2[1024];
+
+static int cpt=0;
 
 SDView::SDView(osg::Camera * c, int x, int y, int width, int height,
                osg::Camera * mc)
@@ -68,7 +70,8 @@ SDView::SDView(osg::Camera * c, int x, int y, int width, int height,
 
 
 
-    id = 0;
+    id = cpt;
+    cpt++;
     curCar = NULL;
     /*selectNextFlag = false;
     selectPrevFlag = false;
@@ -213,9 +216,11 @@ Camera* SDView::getCamera(){
 void SDView::loadParams(tSituation *s)
 {
 	int camNum;
+    int camList;
 	int i;
-	//class cGrCamera *cam;
-	const char *carName;
+    class cGrCamera *cam;
+    const char *carName;
+    const char *pszSpanSplit;
 
 	// Initialize the screen "current car" if not already done.
 	sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
@@ -247,13 +252,64 @@ void SDView::loadParams(tSituation *s)
 		GfLogTrace("Screen #%d : Assigned to %s\n", id, curCar->_name);
 	}
 
-	// Load "current camera" settings (attached to the "current car").
-	sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
-	GfOut("Driver Name Camera = %s\n", curCar->_name);
-	//curCamHead	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, 9);
-	camNum	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM, NULL, 0);
-	mirrorFlag	= (int)GfParmGetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
-	//curCamHead	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM_HEAD, NULL, (tdble)curCamHead);
-	camNum	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM, NULL, (tdble)camNum);
-	mirrorFlag	= (int)GfParmGetNum(grHandle, path2, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
+    // Load "current camera" settings (attached to the "current car").
+    camList	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, 9);
+    camNum	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM, NULL, 0);
+    mirrorFlag	= (int)GfParmGetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
+
+    // Only apply driver preferences when not spanning split screens
+    pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
+    if (strcmp(pszSpanSplit, GR_VAL_YES)) {
+        sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
+        camList	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM_HEAD, NULL, (tdble)camNum);
+        camNum	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM, NULL, (tdble)camList);
+        mirrorFlag	= (int)GfParmGetNum(grHandle, path2, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
+    }
+
+    // Get board width (needed for scissor)
+   /* boardWidth      = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARDWIDTH, NULL, 100);
+    if (boardWidth < 0 || boardWidth > 100)
+        boardWidth = 100;*/
+
+    // Retrieve the "current camera".
+    cameras->selectCamera(camList,camNum);
+
+    // Back to the default camera if not found (and save it as the new current one).
+
+
+    cameras->getIntSelectedListAndCamera(&camList,&camNum);
+    GfParmSetNum(grHandle, path, GR_ATT_CAM, NULL, (tdble)camNum);
+    GfParmSetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, (tdble)camList);
+
+
+    sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, camList, camNum);
+    cameras->getSelectedCamera()->loadDefaults(buf);
+    //drawCurrent = curCam->getDrawCurrent();
+   // board->loadDefaults(curCar);
+}
+
+void SDView::saveCamera(){
+    int camList,camNum;
+
+    cameras->getIntSelectedListAndCamera(&camList,&camNum);
+
+    sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
+    GfParmSetStr(grHandle, path, GR_ATT_CUR_DRV, curCar->_name);
+    GfParmSetNum(grHandle, path, GR_ATT_CAM, (char*)NULL, (tdble)camNum);
+    GfParmSetNum(grHandle, path, GR_ATT_CAM_HEAD, (char*)NULL, (tdble)camList);
+
+    /* save also as user's preference if human */
+    if (curCar->_driverType == RM_DRV_HUMAN) {
+        sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
+        GfParmSetNum(grHandle, path2, GR_ATT_CAM, (char*)NULL, (tdble)camNum);
+        GfParmSetNum(grHandle, path2, GR_ATT_CAM_HEAD, (char*)NULL, (tdble)camList);
+    }
+
+    sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, camList, camNum);
+    //would be save defaults ?
+    //curCam->loadDefaults(buf);
+    //drawCurrent = curCam->getDrawCurrent();
+    //curCam->limitFov ();
+    GfParmWriteFile(NULL, grHandle, "Graph");
+    GfLogDebug("Written screen=%d camList=%d camNum=%d\n",id,camList,camNum);
 }

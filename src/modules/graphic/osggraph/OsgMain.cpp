@@ -140,7 +140,7 @@ SDNextCar(void * /* dummy */)
 
 void SDSelectCamera(void * vp){
     long t = (long)vp;
-    screens->getActiveView()->getCameras()->nextCamera(t);
+    screens->changeCamera(t);
 }
 
 void SDSetZoom(void * vp){

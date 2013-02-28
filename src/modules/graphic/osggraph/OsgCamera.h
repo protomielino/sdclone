@@ -50,6 +50,14 @@ public:
     void nextCamera(int list);
     void update(tCarElt * car, tSituation * s);
     inline int getIntSelectedCamera(){return selectedCamera;}
+    void selectCamera(int list,int cam);
+    inline void getIntSelectedListAndCamera(int *list,int *cam){
+        *list = selectedList;
+        *cam = selectedCamera;
+    }
+
+    static void loadSpanValues();
+
     ~SDCameras();
 };
 
