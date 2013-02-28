@@ -597,37 +597,6 @@ newrace(int index, tCarElt* car, tSituation *s)
 		}//KEYBOARD
 
 	}//for i
-
-	// Check whether Grid Gearbox is already in gear
-	if (HCtx[idx]->transmission == eTransGrid)
-	{
-		/* default to neutral gear */
-		preGear = 0;
-
-		/* Select the right gear if any gear command activated */
-		updateKeys();
-
-		if (joyPresent) {
-			GfctrlJoyGetCurrentStates(joyInfo);
-		}
-
-		GfctrlMouseGetCurrentState(mouseInfo);
-
-		for (int i = CMD_GEAR_R; i <= CMD_GEAR_6; i++) {
-			if ((cmd[i].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[i].val])
-			    || (cmd[i].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[i].val])
-#if 0	//SDW fixme
-			    || (cmd[i].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[i].val)].state)
-#endif
-				)
-			{
-				preGear = i - CMD_GEAR_N;
-			}
-		}
-
-		GfOut("Gridbox Initial Gear %d\n", preGear);
-	}
-
 }//newrace
 
 
@@ -762,6 +731,28 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		} else cmd[dummy].deadZone = 0;
 	    }
 	}
+
+	// Allow Grid Gearbox to freely change as race starts
+	if (s->currentTime <= 0 && HCtx[idx]->transmission == eTransGrid)
+	{
+		/* default to neutral gear */
+		preGear = 0;
+
+		for (int i = CMD_GEAR_R; i <= CMD_GEAR_6; i++) {
+			if ((cmd[i].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[i].val])
+			    || (cmd[i].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[i].val])
+#if 0	//SDW fixme
+			    || (cmd[i].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[i].val)].state)
+#endif
+				)
+			{
+				preGear = i - CMD_GEAR_N;
+			}
+		}
+
+		GfOut("Gridbox Initial Gear %d\n", preGear);
+	}
+
 
 
 	if ((cmd[CMD_ABS].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_ABS].val])
