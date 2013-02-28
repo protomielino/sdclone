@@ -113,6 +113,37 @@ void SDScreens::InitCars(tSituation *s)
 
 
 
+    for (i = 0; i < s->_ncars; i++) {
+    elt = s->cars[i];
+    index = elt->index;
+    hdle = elt->_paramsHandle;
+
+    // WARNING: This index hack on the human robot for the Career mode
+    //          does no more work with the new "welcome" module system
+    //          (the "normal" index has no more the 10 limit) ... TO BE FIXED !!!!!!!
+    /*if (elt->_driverType == RM_DRV_HUMAN && elt->_driverIndex > 10)
+        sprintf(idx, "Robots/index/%d", elt->_driverIndex - 11);
+    else
+        sprintf(idx, "Robots/index/%d", elt->_driverIndex);
+
+    grCarInfo[index].iconColor[0] = GfParmGetNum(hdle, idx, "red",   (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "red",   NULL, 0));
+    grCarInfo[index].iconColor[1] = GfParmGetNum(hdle, idx, "green", (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "green", NULL, 0));
+    grCarInfo[index].iconColor[2] = GfParmGetNum(hdle, idx, "blue",  (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "blue",  NULL, 0));
+    grCarInfo[index].iconColor[3] = 1.0;
+    grInitCar(elt);*/
+
+    // Pre-assign each human driver (if any) to a different screen
+    // (set him as the "current driver" for this screen).
+    if (grNbSuggestedScreens < GR_NB_MAX_SCREEN
+        && elt->_driverType == RM_DRV_HUMAN && !elt->_networkPlayer)
+    {
+        grScreens[grNbSuggestedScreens]->setCurrentCar(elt);
+        GfLogTrace("Screen #%d : Assigned to %s\n", grNbSuggestedScreens, elt->_name);
+        grNbSuggestedScreens++;
+    }
+    }
+
+
     /* Check whether view should be spanned across vertical splits */
     pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
     grSpanSplit = strcmp(pszSpanSplit, GR_VAL_YES) ? 0 : 1;
