@@ -55,6 +55,7 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 static void drive_mt(int index, tCarElt* car, tSituation *s);
 static void drive_at(int index, tCarElt* car, tSituation *s);
 static void newrace(int index, tCarElt* car, tSituation *s);
+static void resumerace(int index, tCarElt* car, tSituation *s);
 static int  pitcmd(int index, tCarElt* car, tSituation *s);
 static void SetFuelAtRaceStart(tTrack *track, void **carParmHandle, tSituation *s, int idx);
 static char	sstring[1024];
@@ -199,6 +200,7 @@ InitFuncPt(int index, void *pt)
 	itf->rbNewTrack = initTrack;	/* give the robot the track view called */
 	/* for every track change or new race */
 	itf->rbNewRace  = newrace;
+	itf->rbResumeRace  = resumerace;
 
 	HmReadPrefs(index);
 
@@ -628,6 +630,13 @@ newrace(int index, tCarElt* car, tSituation *s)
 
 }//newrace
 
+
+void
+resumerace(int index, tCarElt* car, tSituation *s)
+{
+	// re-read the controls as they may have changed
+	HmReadPrefs(index);
+}
 
 static int
 lookUpKeyMap(int key)

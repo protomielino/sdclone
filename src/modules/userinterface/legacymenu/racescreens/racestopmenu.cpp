@@ -19,10 +19,15 @@
 
 #include <isoundengine.h>
 
+#include <playerconfig.h>
+
 #include "legacymenu.h"
 #include "exitmenu.h"
 #include "racescreens.h"
 extern RmProgressiveTimeModifier rmProgressiveTimeModifier;
+
+
+static void *hscreen = 0;
 
 // Abort race hook ******************************************************
 static void
@@ -108,7 +113,24 @@ rmRestartRaceHookInit()
 	return pvRestartRaceHookHandle;
 }
 
-// Quit race hook *****************************************************
+static void
+rmControlsHookActivate(void * /* dummy */)
+{
+	GfuiScreenActivate(PlayerConfigMenuInit(hscreen));
+}
+
+static void	*pvControlsHookHandle = 0;
+
+static void *
+rmControlsHookInit()
+{
+	if (!pvControlsHookHandle)
+		pvControlsHookHandle = GfuiHookCreate(0, rmControlsHookActivate);
+
+	return pvControlsHookHandle;
+}
+
+// Quit race hook ********
 static void	*rmStopScrHandle = 0;
 
 static void
@@ -131,7 +153,7 @@ rmQuitHookInit()
 
 // 2, 3, 4 or 5 buttons "Stop race" menu *****************************************
 
-static void *QuitHdle[5] = { 0, 0, 0, 0, 0 };
+static void *QuitHdle[6] = { 0, 0, 0, 0, 0, 0 };
 
 // Descriptor for 1 button.
 typedef struct {
@@ -146,7 +168,7 @@ static void*
 rmStopRaceMenu(const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
 {
     // Create screen, load menu XML descriptor and create static controls.
-    void *hscreen = GfuiScreenCreate(NULL, NULL, NULL, NULL, NULL, 1);
+    hscreen = GfuiScreenCreate(NULL, NULL, NULL, NULL, NULL, 1);
 
     void *hmenu = GfuiMenuLoad("stopracemenu.xml");
 
@@ -198,15 +220,17 @@ rmStopRaceMenu(const char *buttonRole1, void *screen1,
 			   const char *buttonRole2, void *screen2,
 			   const char *buttonRole3 = 0, void *screen3 = 0,
 			   const char *buttonRole4 = 0, void *screen4 = 0,
-			   const char *buttonRole5 = 0, void *screen5 = 0)
+			   const char *buttonRole5 = 0, void *screen5 = 0,
+			   const char *buttonRole6 = 0, void *screen6 = 0)
 {
-    const tButtonDesc aButtons[5] =
+    const tButtonDesc aButtons[6] =
     {
         { buttonRole1, screen1 },
         { buttonRole2, screen2 },
         { buttonRole3, screen3 },
         { buttonRole4, screen4 },
-        { buttonRole5, screen5 }
+        { buttonRole5, screen5 },
+        { buttonRole6, screen6 }
     };
 	
     int nButtons = 2;
@@ -217,7 +241,11 @@ rmStopRaceMenu(const char *buttonRole1, void *screen1,
 		{
 			nButtons++;
 			if (buttonRole5 && screen5)
+			{
 				nButtons++;
+				if (buttonRole6 && screen6)
+					nButtons++;
+			}
 		}
 	}
         
@@ -248,6 +276,7 @@ RmStopRaceMenu()
 				    ("resume", RmBackToRaceHookInit(),
 					 "skip", rmSkipSessionHookInit(),
 					 "abort", rmAbortRaceHookInit(),
+					 "controls", rmControlsHookInit(),
 					 "quit", rmQuitHookInit());
 		}
 		else 
@@ -256,6 +285,7 @@ RmStopRaceMenu()
 				rmStopRaceMenu
 				    ("resume", RmBackToRaceHookInit(),
 					 "abort", rmAbortRaceHookInit(),
+					 "controls", rmControlsHookInit(),
 					 "quit", rmQuitHookInit());
 		}
 	}
@@ -269,6 +299,7 @@ RmStopRaceMenu()
 					 "skip", rmSkipSessionHookInit(),
 					 "restart", rmRestartRaceHookInit(),
 					 "abort", rmAbortRaceHookInit(),
+					 "controls", rmControlsHookInit(),
 					 "quit", rmQuitHookInit());
 		}
 		else 
@@ -278,6 +309,7 @@ RmStopRaceMenu()
 				    ("resume", RmBackToRaceHookInit(),
 					 "restart", rmRestartRaceHookInit(),
 					 "abort", rmAbortRaceHookInit(),
+					 "controls", rmControlsHookInit(),
 					 "quit", rmQuitHookInit());
 		}
 	}
@@ -298,6 +330,9 @@ RmStopRaceMenuShutdown()
 	GfuiHookRelease(pvRestartRaceHookHandle);
 	pvRestartRaceHookHandle = 0;
 	
+	GfuiHookRelease(pvControlsHookHandle);
+	pvControlsHookHandle = 0;
+
 	GfuiHookRelease(pvQuitHookHandle);
 	pvQuitHookHandle = 0;
 }

@@ -511,10 +511,21 @@ ReSituationUpdater::~ReSituationUpdater()
 
 void ReSituationUpdater::start()
 {
+	int i;
+	tRobotItf *robot;
+	tSituation *s = ReInfo->s;
+
 	GfLogInfo("Starting race engine.\n");
 
 	// Lock the race engine data.
 	ReSituation::self().lock("ReSituationUpdater::start");
+
+	// Allow robots to run their start function
+	for (i = 0; i < s->_ncars; i++) {
+		robot = s->cars[i]->robot;
+		if (robot->rbResumeRace)
+			robot->rbResumeRace(robot->index, s->cars[i], s);
+	}
 
 	// Set the running flags.
     ReSituation::self().data()->_reRunning = 1;
