@@ -86,6 +86,7 @@ public:
 
     virtual float getLODFactor(float x, float y, float z) = 0;	/* Get the LOD factor for an object located at x,y,z */
 
+    virtual void setViewOffset(float newOffset)=0;
     inline float getAspectRatio(){return 0.0;}
     inline float getMirrorAllowed(){return mirrorAllowed;}
     //camera for sound

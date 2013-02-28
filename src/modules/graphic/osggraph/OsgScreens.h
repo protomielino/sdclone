@@ -25,16 +25,37 @@
 #include <osg/Group>
 #include <osgViewer/Viewer>
 #include <raceman.h>        //tSituation
+#include <vector>
 #include "OsgView.h"
 
+
+#define GR_SPLIT_ADD	0
+#define GR_SPLIT_REM	1
+#define GR_SPLIT_ARR	2
+
+#define GR_NEXT_SCREEN	0
+#define GR_PREV_SCREEN	1
+
+#define GR_NB_MAX_SCREEN 6
 
 class SDScreens
 {
     protected:
         osgViewer::Viewer *viewer;
-        SDView * view;
+        std::vector<SDView *> grScreens;
         osg::ref_ptr<osg::Group> root;
 
+        int grWinx;
+        int grWiny;
+        int grWinw;
+        int grWinh;
+
+        int grNbActiveScreens;
+        int grNbArrangeScreens;
+        bool grSpanSplit;
+        int nCurrentScreenIndex;
+
+        void grAdaptScreenSize();
 //		int mirrorFlag;
 //		void loadParams(tSituation *s);			// Load from parameters files.
 
@@ -46,8 +67,10 @@ class SDScreens
         void Init(int x, int y, int width, int height, osg::ref_ptr<osg::Group> m_sceneroot);
         void InitCars(tSituation *s);
         void update(tSituation *s,SDFrameInfo* fi);
+        void splitScreen(long p);
+        void changeScreen(long p);
 
-        inline SDView * getActiveView(){return view;}
+        inline SDView * getActiveView(){return grScreens[nCurrentScreenIndex];}
 
 
 //		void activate(int x, int y, int w, int h, float v);

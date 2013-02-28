@@ -152,6 +152,16 @@ void SDSwitchMirror(void * vp){
     screens->getActiveView()->switchMirror();
 }
 
+void SDSplitScreen(void * vp){
+    long t = (long)vp;
+    screens->splitScreen(t);
+}
+
+void SDChangeScreen(void * vp){
+    long t = (long)vp;
+    screens->changeScreen(t);
+}
+
 int
 initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
@@ -217,11 +227,11 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, '-', GFUIM_CTRL, "Zoom Out",          (void*)GR_ZOOM_OUT, SDSetZoom, NULL);
     GfuiAddKey(screen, '>',             "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
     GfuiAddKey(screen, '<',             "Zoom Out",          (void*)GR_ZOOM_OUT, SDSetZoom, NULL);
-    /*GfuiAddKey(screen, '(',            "Split Screen",   (void*)GR_SPLIT_ADD, grSplitScreen, NULL);
-    GfuiAddKey(screen, ')',            "UnSplit Screen", (void*)GR_SPLIT_REM, grSplitScreen, NULL);
-    GfuiAddKey(screen, '_',            "Split Screen Arrangement", (void*)GR_SPLIT_ARR, grSplitScreen, NULL);
-    GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)GR_NEXT_SCREEN, grChangeScreen, NULL);
-    GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);*/
+    GfuiAddKey(screen, '(',            "Split Screen",   (void*)GR_SPLIT_ADD, SDSplitScreen, NULL);
+    GfuiAddKey(screen, ')',            "UnSplit Screen", (void*)GR_SPLIT_REM, SDSplitScreen, NULL);
+    GfuiAddKey(screen, '_',            "Split Screen Arrangement", (void*)GR_SPLIT_ARR, SDSplitScreen, NULL);
+    GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)GR_NEXT_SCREEN, SDChangeScreen, NULL);
+    /*GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);*/
 
     GfLogInfo("Current screen is #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
 

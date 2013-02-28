@@ -41,6 +41,7 @@ class SDView
 
         int id;
         int x, y, width, height;
+        float viewOffset;
 	
 		tCarElt	*curCar;		// Current car viewed.
 		tCarElt	**cars;			// List of cars.
@@ -51,7 +52,7 @@ class SDView
         bool hasChangedMirrorFlag;
 
         SDCameras *cameras;
-        SDCamera * mirror;
+        SDCarCamMirror * mirror;
 	
 		//class cGrPerspCamera *curCam;			// The current camera.
 		//class cGrCarCamMirror *mirrorCam;		// The mirror camera.
@@ -62,6 +63,7 @@ class SDView
 		//class cGrBoard *board;					// The board.
 	
 	
+
 		void loadParams(tSituation *s);			// Load from parameters files.
 
 
@@ -97,6 +99,11 @@ class SDView
 
         inline int  getScreenWidth(void) { return width; }
         inline int  getScreenHeight(void) { return height; }
+
+        inline float getViewOffset() {return viewOffset;}
+
+        void activate(int x, int y, int width, int height,float v);
+        void deactivate();
 
 
 };

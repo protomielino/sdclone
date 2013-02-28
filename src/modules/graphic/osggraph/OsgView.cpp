@@ -40,6 +40,7 @@ SDView::SDView(osg::Camera * c, int x, int y, int width, int height,
     this->y =y;
     this->width= width;
     this->height = height;
+    viewOffset =0;
     cam = c;
 
     mirrorCam = mc;
@@ -78,7 +79,6 @@ SDView::SDView(osg::Camera * c, int x, int y, int width, int height,
     selectNextFlag=false;
     selectPrevFlag=false;
     mirrorFlag=false;
-	
 }
 
 SDView::~SDView()
@@ -175,7 +175,26 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
     mirror->setModelView();
 }
 
+void SDView::activate(int x, int y, int width, int height, float v){
+    this->x =x;
+    this->y =y;
+    this->width= width;
+    this->height = height;
+    cameras->getSelectedCamera()->setViewOffset(v);
+    viewOffset =v;
+    cam->setViewport(new osg::Viewport(x,y,width,height));
+    cameras->getSelectedCamera()->setProjection();
+    cam->setNodeMask(1);
+    this->de_activateMirror();
+}
+
+void SDView::deactivate(){
+    cam->setNodeMask(0);
+    mirrorCam->setNodeMask(0);
+}
+
 void SDView::de_activateMirror(){
+    mirror->adaptScreenSize();
     if(mirrorFlag){
         if(cameras->getSelectedCamera()->getMirrorAllowed()){
             this->mirrorCam->setNodeMask(1);

@@ -68,6 +68,10 @@ Camera * SDCamera::getGenericCamera(){
     return c;
 }
 
+void SDCamera::setViewOffset(float v){
+
+}
+
 void SDCamera::update(tCarElt * car, tSituation * s)
 {
     /*osg::Vec3 P, p;
@@ -2399,6 +2403,7 @@ void SDCameras::nextCamera(int list){
     cameraHasChanged = true;
 
 
+    cameras[selectedList][selectedCamera]->setViewOffset(screen->getViewOffset());
     cameras[selectedList][selectedCamera]->setProjection();
     this->screen->de_activateMirror();
 
