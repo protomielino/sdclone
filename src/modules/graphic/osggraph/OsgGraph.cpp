@@ -112,20 +112,20 @@ void OsgGraph::redrawView(tSituation* pSituation)
 
 void OsgGraph::unloadCars()
 {
-	//GfLogDebug("SsgGraph::unloadCars\n");
-    ::shutdownCars();
+	GfLogDebug("OsgGraph::unloadCars\n");
+    	::shutdownCars();
 }
 
 void OsgGraph::unloadTrack()
 {
-	//GfLogDebug("SsgGraph::unloadTrack\n");
-	//::shutdownTrack();
+	GfLogDebug("OsgGraph::unloadTrack\n");
+	::shutdownTrack();
 }
 
 void OsgGraph::shutdownView()
 {
-	//GfLogDebug("SsgGraph::shutdownView\n");
-	//::shutdownView();
+	GfLogDebug("OsgGraph::shutdownView\n");
+	::shutdownView();
 }
 
 Camera* OsgGraph::getCurCam() 
