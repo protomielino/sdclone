@@ -42,9 +42,9 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
 
 
     //intialising main screen
-    osg::Camera * mirrorCam = new osg::Camera;
+    osg::ref_ptr<osg::Camera> mirrorCam = new osg::Camera;
 
-    SDView * view = new SDView(viewer->getCamera(),0,0,grWinw,grWinh,mirrorCam);
+    SDView * view = new SDView(viewer->getCamera(),0,0,grWinw,grWinh,mirrorCam.get());
 
     viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, grWinw, grWinh);
@@ -66,7 +66,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
 
 
     //adding all otherer cams
-    osg::Camera * screenCam;
+    osg::ref_ptr<osg::Camera> screenCam;
     for(int i=1;i<GR_NB_MAX_SCREEN;i++){
         screenCam = new osg::Camera;
         screenCam->setGraphicsContext(gw);
@@ -83,7 +83,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
         mirrorCam->addChild(m_sceneroot);
         mirrorCam->setNodeMask(0);
 
-        view = new SDView(screenCam,0,0,grWinw,grWinh,mirrorCam);
+        view = new SDView(screenCam.get(),0,0,grWinw,grWinh,mirrorCam.get());
 
         grScreens.insert(grScreens.end(),view);
 

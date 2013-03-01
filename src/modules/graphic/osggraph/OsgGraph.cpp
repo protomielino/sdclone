@@ -118,14 +118,14 @@ void OsgGraph::unloadCars()
 
 void OsgGraph::unloadTrack()
 {
-	GfLogDebug("OsgGraph::unloadTrack\n");
-	::shutdownTrack();
+	//GfLogDebug("SsgGraph::unloadTrack\n");
+    ::shutdownTrack();
 }
 
 void OsgGraph::shutdownView()
 {
-	GfLogDebug("OsgGraph::shutdownView\n");
-	::shutdownView();
+	//GfLogDebug("SsgGraph::shutdownView\n");
+    ::shutdownView();
 }
 
 Camera* OsgGraph::getCurCam() 

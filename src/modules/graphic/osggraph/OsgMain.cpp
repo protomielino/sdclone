@@ -394,7 +394,7 @@ int  initCars(tSituation *s)
 void
 shutdownTrack(void)
 {
-    m_sceneroot->removeChildren(0,m_sceneroot->getNumChildren());
+    //m_sceneroot->removeChildren(0,m_sceneroot->getNumChildren());
 	// Do the real track termination job.
     delete scenery;
     //delete m_sceneroot;
