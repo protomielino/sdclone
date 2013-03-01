@@ -19,15 +19,10 @@
 #ifndef _OSGVIEWER_H_
 #define _OSGVIEWER_H_
 
-
-
 #include <camera.h>
-#include <raceman.h>        //tSituation
-#include <car.h>			//tCarElt
+#include <raceman.h>        	//tSituation
+#include <car.h>		//tCarElt
 #include "OsgCamera.h"		//SDCameras
-
-
-
 
 //class cGrBoard;
 class SDFrameInfo;
@@ -43,8 +38,8 @@ class SDView
         int x, y, width, height;
         float viewOffset;
 	
-		tCarElt	*curCar;		// Current car viewed.
-		tCarElt	**cars;			// List of cars.
+	tCarElt	*curCar;		// Current car viewed.
+	tCarElt	**cars;			// List of cars.
 
         bool selectNextFlag;
         bool selectPrevFlag;
@@ -54,29 +49,24 @@ class SDView
         SDCameras *cameras;
         SDCarCamMirror * mirror;
 	
-		//class cGrPerspCamera *curCam;			// The current camera.
-		//class cGrCarCamMirror *mirrorCam;		// The mirror camera.
-		//class cGrPerspCamera *dispCam;			// The display camera.
-		//class cGrOrthoCamera *boardCam;			// The board camera.
-		//class cGrBackgroundCam *bgCam;			// The background camera.
+	//class cGrPerspCamera *curCam;			// The current camera.
+	//class cGrCarCamMirror *mirrorCam;		// The mirror camera.
+	//class cGrPerspCamera *dispCam;			// The display camera.
+	//class cGrOrthoCamera *boardCam;			// The board camera.
+	//class cGrBackgroundCam *bgCam;			// The background camera.
 	
-		//class cGrBoard *board;					// The board.
+	//class cGrBoard *board;					// The board.
 	
-	
-
-		void loadParams(tSituation *s);			// Load from parameters files.
-
+	void loadParams(tSituation *s);			// Load from parameters files.
 
 	public:
-        SDView(osg::Camera * c, int x , int y, int width , int height,
-               osg::Camera * mc);
+        SDView(osg::Camera * c, int x , int y, int width , int height, osg::Camera * mc);
         ~SDView();
 
         void Init(tSituation *s);
         void update(tSituation *s, const SDFrameInfo* frameInfo);
 	
-		inline void setCurrentCar(tCarElt *newCurCar) { curCar = newCurCar; }
-
+	inline void setCurrentCar(tCarElt *newCurCar) { curCar = newCurCar; }
         inline int getId(){return id;}
         inline void selectNextCar(void) { selectNextFlag = true; }
         inline void selectPrevCar(void) { selectPrevFlag = true; }
@@ -106,8 +96,6 @@ class SDView
 
         void activate(int x, int y, int width, int height,float v);
         void deactivate();
-
-
 };
 
 #endif //_OSGVIEWER_H_

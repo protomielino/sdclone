@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file                 : grmain.cpp
+    file                 : OsgMain.cpp
     created              : Thu Aug 17 23:23:49 CEST 2000
-    copyright            : (C) 2000 by Eric Espie
-    email                : torcs@free.fr
-    version              : $Id: grmain.cpp 4712 2012-05-10 06:02:49Z mungewell $
+    copyright            : (C) 2013 by Xavier Bertaux
+    email                : bertauxx@yahoo.fr
+    version              : $Id: OsgMain.cpp 4712 2012-05-10 06:02:49Z mungewell $
 
  ***************************************************************************/
 
@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 //#include "grOSG.h"
+#include <osgUtil/Optimizer>
 #include <osg/Group>
 #include <osgViewer/View>
 #include <osgViewer/CompositeViewer>
@@ -26,19 +27,12 @@
 #include <robot.h>	//ROB_SECT_ARBITRARY
 #include <graphic.h>
 
-
 #include "OsgMain.h"
 #include "OsgCar.h"
 #include "OsgScenery.h"
 //#include "OsgRender.h"
 #include "OsgMath.h"
 #include "OsgScreens.h"
-
-
-
-
-
-
 
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;
@@ -126,44 +120,46 @@ static void setupOpenGLFeatures(void)
 	bInitialized = true;
 }
 
-static void
-SDPrevCar(void * /* dummy */)
+static void SDPrevCar(void * /* dummy */)
 {
     screens->getActiveView()->selectPrevCar();
 }
 
-static void
-SDNextCar(void * /* dummy */)
+static void SDNextCar(void * /* dummy */)
 {
     screens->getActiveView()->selectNextCar();
 }
 
-void SDSelectCamera(void * vp){
+void SDSelectCamera(void * vp)
+{
     long t = (long)vp;
     screens->changeCamera(t);
 }
 
-void SDSetZoom(void * vp){
+void SDSetZoom(void * vp)
+{
     long t = (long)vp;
     screens->getActiveView()->getCameras()->getSelectedCamera()->setZoom(t);
 }
 
-void SDSwitchMirror(void * vp){
+void SDSwitchMirror(void * vp)
+{
     screens->getActiveView()->switchMirror();
 }
 
-void SDSplitScreen(void * vp){
+void SDSplitScreen(void * vp)
+{
     long t = (long)vp;
     screens->splitScreen(t);
 }
 
-void SDChangeScreen(void * vp){
+void SDChangeScreen(void * vp)
+{
     long t = (long)vp;
     screens->changeScreen(t);
 }
 
-int
-initView(int x, int y, int width, int height, int /* flag */, void *screen)
+int initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
     //render = new SDRender();
     screens = new SDScreens();
@@ -180,22 +176,17 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     frameInfo.fAvgFps = 0.0;
     frameInfo.nInstFrames = 0;
     frameInfo.nTotalFrames = 0;
-	fFPSPrevInstTime = GfTimeClock();
+    fFPSPrevInstTime = GfTimeClock();
     nFPSTotalSeconds = 0;
     
-    //tdble grLodFactorValue = 1.0;
-    
+    //tdble grLodFactorValue = 1.0;    
     //m_start_tick = m_timer.tick();
-
     //render->Init(m_sceneViewer);
-
 
     //m_sceneViewer->getUsage();
     //m_sceneViewer->realize();
     
     screens->Init(x,y,width,height,m_sceneroot);
-
-
 
     /*GfuiAddKey(screen, GFUIK_END,      "Zoom Minimum", (void*)GR_ZOOM_MIN,	grSetZoom, NULL);
     GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	grSetZoom, NULL);
@@ -240,9 +231,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     return 0; // true;
 }
 
-
-int
-refresh(tSituation *s)
+int refresh(tSituation *s)
 {
     // Compute F/S indicators every second.
     frameInfo.nInstFrames++;
@@ -299,8 +288,7 @@ refresh(tSituation *s)
 }*/
 
 
-void
-shutdownCars(void)
+void shutdownCars(void)
 {
     delete cars;
     //delete m_carroot;
@@ -344,8 +332,7 @@ shutdownCars(void)
 				   (double)frameInfo.nTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - fFPSPrevInstTime));
 }
 
-int
-initTrack(tTrack *track)
+int initTrack(tTrack *track)
 {
 	// The inittrack does as well init the context, that is highly inconsistent, IMHO.
 	// TODO: Find a solution to init the graphics first independent of objects.
@@ -364,41 +351,40 @@ initTrack(tTrack *track)
 	m_sceneroot = new osg::Group();
 	m_sceneroot->addChild(scenery->LoadScene(track));
 
-
-
-	 //return -1;*/
-    //m_sceneViewer->setSceneData();
-    return 0;
+	//return -1;*/
+    	//m_sceneViewer->setSceneData();
+    	return 0;
 }
 
 int  initCars(tSituation *s)
 {
 	char buf[256];
-    cars = new SDCars;
-    m_sceneroot->addChild(cars->loadCars(s));
-    GfOut("All cars loaded\n");
+	cars = new SDCars;
+    	m_sceneroot->addChild(cars->loadCars(s));
+    	osgUtil::Optimizer optimizer;
+	optimizer.optimize(m_sceneroot); 
+    	GfOut("All cars loaded\n");
 
-    screens->InitCars(s);
+    	screens->InitCars(s);
     
-    if (!grHandle)
-    {
-        sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
-        grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    }
+    	if (!grHandle)
+    	{
+        	sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
+        	grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    	}
 
-   // viewer->Init(s);
+   	// viewer->Init(s);
     
-    return 0;
+    	return 0;
 }
 
-void
-shutdownTrack(void)
+void shutdownTrack(void)
 {
-    //m_sceneroot->removeChildren(0,m_sceneroot->getNumChildren());
+    	m_sceneroot->removeChildren(0,m_sceneroot->getNumChildren());
 	// Do the real track termination job.
-    delete scenery;
-    //delete m_sceneroot;
-    //grShutdownScene();
+    	delete scenery;
+   	m_sceneroot = 0;
+    	//grShutdownScene();
 
 	if (grTrackHandle)
 	{
@@ -407,9 +393,9 @@ shutdownTrack(void)
 	}
 
 	// And then the context termination job (should not be there, see initTrack).
-    //options.endLoad();
+    	//options.endLoad();
 	
-    //grShutdownState();
+    	//grShutdownState();
 }
 
 void
@@ -427,6 +413,7 @@ shutdownView(void)
 //}*/
 
 
-Camera * getCamera(void){
+Camera * getCamera(void)
+{
     return screens->getActiveView()->getCamera();
 }

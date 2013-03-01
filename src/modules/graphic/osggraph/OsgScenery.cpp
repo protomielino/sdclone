@@ -17,7 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <osgUtil/Optimizer>
 #include <osg/MatrixTransform>
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
@@ -191,8 +190,6 @@ bool SDScenery::LoadTrack(std::string strTrack)
 
 	if (pTrack)
 	{
-		osgUtil::Optimizer optimizer;
-		optimizer.optimize(pTrack); 
 		pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
 		_scenery->addChild(pTrack);		
 	}

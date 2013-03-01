@@ -19,15 +19,11 @@
 #ifndef _OSGSCREENS_H_
 #define _OSGSCREENS_H_
 
-
-
-
 #include <osg/Group>
 #include <osgViewer/Viewer>
 #include <raceman.h>        //tSituation
 #include <vector>
 #include "OsgView.h"
-
 
 #define GR_SPLIT_ADD	0
 #define GR_SPLIT_REM	1
@@ -63,7 +59,6 @@ class SDScreens
         SDScreens();
         ~SDScreens();
 
-
         void Init(int x, int y, int width, int height, osg::ref_ptr<osg::Group> m_sceneroot);
         void InitCars(tSituation *s);
         void update(tSituation *s,SDFrameInfo* fi);
@@ -73,12 +68,9 @@ class SDScreens
 
         inline SDView * getActiveView(){return grScreens[nCurrentScreenIndex];}
 
-
-//		void activate(int x, int y, int w, int h, float v);
-//		inline void deactivate(void) { active = false; }
-
-	
-//		inline void setCurrentCar(tCarElt *newCurCar) { curCar = newCurCar; }
+	// void activate(int x, int y, int w, int h, float v);
+	// inline void deactivate(void) { active = false; }	
+	// inline void setCurrentCar(tCarElt *newCurCar) { curCar = newCurCar; }
 };
 
 #endif //_OSGSCREENS_H_

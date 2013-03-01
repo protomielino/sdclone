@@ -17,13 +17,9 @@
  *                                                                         *
  ***************************************************************************/
 
-
-
 #include <osg/Camera>
 #include <tgfclient.h>
 #include <graphic.h>
-
-
 
 #include "OsgMain.h"
 #include "OsgView.h"
@@ -49,7 +45,6 @@ SDView::SDView(osg::Camera * c, int x, int y, int width, int height,
     hasChangedMirrorFlag = false;
     mirrorFlag = true;
 
-
     tdble fovFactor =1;
     tdble fixedFar =0;
     mirror = new SDCarCamMirror(
@@ -66,9 +61,6 @@ SDView::SDView(osg::Camera * c, int x, int y, int width, int height,
         fixedFar ? fixedFar : 300.0 * fovFactor	// fogend
     );
    // mirror->setProjection();
-
-
-
 
     id = cpt;
     cpt++;
@@ -92,7 +84,7 @@ SDView::~SDView()
 void SDView::switchMirror(void)
 {
 	mirrorFlag = 1 - mirrorFlag;
-    hasChangedMirrorFlag = true;
+    	hasChangedMirrorFlag = true;
 	sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
 	GfParmSetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
 
@@ -111,8 +103,6 @@ void SDView::Init(tSituation *s)
     loadParams(s);
 }
 
-
-
 /* Update screen display */
 void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
 {
@@ -130,7 +120,7 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
 			{
 				curCar = s->cars[i + 1];
 				carChanged = 1;
-                GfOut("Car Next\n");
+                		GfOut("Car Next\n");
 				break;
 			}
 		}
@@ -146,7 +136,7 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
 			{
 				curCar = s->cars[i - 1];
 				carChanged = 1;
-                GfOut("Car Previous\n");
+                		GfOut("Car Previous\n");
 				break;
 			}
 		}
@@ -159,26 +149,28 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
 		sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
 		GfParmSetStr(grHandle, path, GR_ATT_CUR_DRV, curCar->_name);
 		loadParams (s);
-        //board->setWidth(fakeWidth);
+        	//board->setWidth(fakeWidth);
 		GfParmWriteFile(NULL, grHandle, "Graph");
-        //curCam->onSelect(curCar, s);
+        	//curCam->onSelect(curCar, s);
 	}
 
-    if(hasChangedMirrorFlag){
-        hasChangedMirrorFlag =false;
-        this->de_activateMirror();
-    }
+    	if(hasChangedMirrorFlag)
+    	{
+        	hasChangedMirrorFlag =false;
+        	this->de_activateMirror();
+    	}
 
-    //int	i;
-   // int nb = s->_ncars;
-    //viewer->update(s, &frameInfo);
-   // tCarElt *car = getCurrentCar();
-    cameras->update(curCar,s);
-    mirror->update(curCar,s);
-    mirror->setModelView();
+    	//int	i;
+   	// int nb = s->_ncars;
+    	//viewer->update(s, &frameInfo);
+   	// tCarElt *car = getCurrentCar();
+    	cameras->update(curCar,s);
+    	mirror->update(curCar,s);
+    	mirror->setModelView();
 }
 
-void SDView::activate(int x, int y, int width, int height, float v){
+void SDView::activate(int x, int y, int width, int height, float v)
+{
     this->x =x;
     this->y =y;
     this->width= width;
@@ -191,36 +183,42 @@ void SDView::activate(int x, int y, int width, int height, float v){
     this->de_activateMirror();
 }
 
-void SDView::deactivate(){
+void SDView::deactivate()
+{
     cam->setNodeMask(0);
     mirrorCam->setNodeMask(0);
 }
 
-void SDView::de_activateMirror(){
+void SDView::de_activateMirror()
+{
     mirror->adaptScreenSize();
     if(mirrorFlag){
-        if(cameras->getSelectedCamera()->getMirrorAllowed()){
+        if(cameras->getSelectedCamera()->getMirrorAllowed())
+        {
             this->mirrorCam->setNodeMask(1);
-        }else{
+        }else
+        {
             this->mirrorCam->setNodeMask(0);
         }
-    }else{
+    }else
+    {
         this->mirrorCam->setNodeMask(0);
     }
 }
 
-Camera* SDView::getCamera(){
+Camera* SDView::getCamera()
+{
     return cameras->getSelectedCamera()->getGenericCamera();
 }
 
 void SDView::loadParams(tSituation *s)
 {
 	int camNum;
-    int camList;
+    	int camList;
 	int i;
-    class cGrCamera *cam;
-    const char *carName;
-    const char *pszSpanSplit;
+    	class cGrCamera *cam;
+    	const char *carName;
+    	const char *pszSpanSplit;
 
 	// Initialize the screen "current car" if not already done.
 	sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
@@ -252,43 +250,44 @@ void SDView::loadParams(tSituation *s)
 		GfLogTrace("Screen #%d : Assigned to %s\n", id, curCar->_name);
 	}
 
-    // Load "current camera" settings (attached to the "current car").
-    camList	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, 9);
-    camNum	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM, NULL, 0);
-    mirrorFlag	= (int)GfParmGetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
+    	// Load "current camera" settings (attached to the "current car").
+    	camList	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, 9);
+    	camNum	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM, NULL, 0);
+ 	mirrorFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
 
-    // Only apply driver preferences when not spanning split screens
-    pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
-    if (strcmp(pszSpanSplit, GR_VAL_YES)) {
-        sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
-        camList	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM_HEAD, NULL, (tdble)camNum);
-        camNum	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM, NULL, (tdble)camList);
-        mirrorFlag	= (int)GfParmGetNum(grHandle, path2, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
-    }
+    	// Only apply driver preferences when not spanning split screens
+    	pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
+    	if (strcmp(pszSpanSplit, GR_VAL_YES)) 
+    	{
+        	sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
+        	camList	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM_HEAD, NULL, (tdble)camNum);
+        	camNum	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM, NULL, (tdble)camList);
+        	mirrorFlag	= (int)GfParmGetNum(grHandle, path2, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
+    	}
 
-    // Get board width (needed for scissor)
-   /* boardWidth      = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARDWIDTH, NULL, 100);
-    if (boardWidth < 0 || boardWidth > 100)
-        boardWidth = 100;*/
+    	// Get board width (needed for scissor)
+   	/* boardWidth      = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARDWIDTH, NULL, 100);
+    	if (boardWidth < 0 || boardWidth > 100)
+        	boardWidth = 100;*/
 
-    // Retrieve the "current camera".
-    cameras->selectCamera(camList,camNum);
+    	// Retrieve the "current camera".
+    	cameras->selectCamera(camList,camNum);
 
-    // Back to the default camera if not found (and save it as the new current one).
-
-
-    cameras->getIntSelectedListAndCamera(&camList,&camNum);
-    GfParmSetNum(grHandle, path, GR_ATT_CAM, NULL, (tdble)camNum);
-    GfParmSetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, (tdble)camList);
+    	// Back to the default camera if not found (and save it as the new current one).
 
 
-    sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, camList, camNum);
-    cameras->getSelectedCamera()->loadDefaults(buf);
-    //drawCurrent = curCam->getDrawCurrent();
-   // board->loadDefaults(curCar);
+    	cameras->getIntSelectedListAndCamera(&camList,&camNum);
+    	GfParmSetNum(grHandle, path, GR_ATT_CAM, NULL, (tdble)camNum);
+    	GfParmSetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, (tdble)camList);
+
+    	sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, camList, camNum);
+    	cameras->getSelectedCamera()->loadDefaults(buf);
+    	//drawCurrent = curCam->getDrawCurrent();
+   	// board->loadDefaults(curCar);
 }
 
-void SDView::saveCamera(){
+void SDView::saveCamera()
+{
     int camList,camNum;
 
     cameras->getIntSelectedListAndCamera(&camList,&camNum);
@@ -299,7 +298,8 @@ void SDView::saveCamera(){
     GfParmSetNum(grHandle, path, GR_ATT_CAM_HEAD, (char*)NULL, (tdble)camList);
 
     /* save also as user's preference if human */
-    if (curCar->_driverType == RM_DRV_HUMAN) {
+    if (curCar->_driverType == RM_DRV_HUMAN) 
+    {
         sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
         GfParmSetNum(grHandle, path2, GR_ATT_CAM, (char*)NULL, (tdble)camNum);
         GfParmSetNum(grHandle, path2, GR_ATT_CAM_HEAD, (char*)NULL, (tdble)camList);
