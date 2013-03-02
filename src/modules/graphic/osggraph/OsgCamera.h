@@ -180,7 +180,7 @@ class SDCarCamMirror : public SDPerspCamera
 
 
     /** Called by cGrScreen::activate() after the screen updated it's screen size.
-     *  Cameras should use the cGrCamera::screen property to get the updated information. */
+     *  Cameras should use the SDCamera::screen property to get the updated information. */
     void adaptScreenSize();
 
     virtual void limitFov(void);

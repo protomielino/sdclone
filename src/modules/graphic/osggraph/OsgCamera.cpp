@@ -1669,8 +1669,8 @@ class SDCarCamRoadZoomTVD : public SDCarCamRoadZoom
         }
 
 
-        //for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-        //if ((screen != grScreens[i]) && grScreens[i]->isActive()) {
+        //for (i = 0; i < SD_NB_MAX_SCREEN; i++) {
+        //if ((screen != Screens[i]) && Screens[i]->isActive()) {
             car = screen->getCurrentCar();
             schedView[car->index].viewable = 0;
             schedView[car->index].prio -= 10000;

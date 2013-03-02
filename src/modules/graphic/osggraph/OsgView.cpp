@@ -216,7 +216,7 @@ void SDView::loadParams(tSituation *s)
 	int camNum;
     	int camList;
 	int i;
-    	class cGrCamera *cam;
+	//class SDCamera *cam;
     	const char *carName;
     	const char *pszSpanSplit;
 

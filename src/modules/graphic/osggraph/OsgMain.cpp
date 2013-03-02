@@ -55,11 +55,11 @@ int grNbCars = 0;
 void *grHandle = 0;
 void *grTrackHandle = 0;
 
-int grWinx, grWiny, grWinw, grWinh;
+int m_Winx, m_Winy, m_Winw, m_Winh;
 
 //tgrCarInfo *grCarInfo;
 //ssgContext grContext;
-//cGrScreen *grScreens[GR_NB_MAX_SCREEN];
+//cGrScreen *Screens[SD_NB_MAX_SCREEN];
 tdble grLodFactorValue = 1.0;
 
 // Frame/FPS info.
@@ -72,11 +72,11 @@ double ratio = 0.0f;
 static float fMouseRatioX, fMouseRatioY;
 
 // Number of active screens.
-int grNbActiveScreens = 1;
-int grNbArrangeScreens = 0;
+int m_NbActiveScreens = 1;
+int m_NbArrangeScreens = 0;
 
 // Current screen index.
-static int nCurrentScreenIndex = 0;
+static int m_CurrentScreenIndex = 0;
 
 //static grssgLoaderOptions options(/*bDoMipMap*/true);
 
@@ -164,10 +164,10 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     //render = new SDRender();
     screens = new SDScreens();
 
-    grWinx = x;
-    grWiny = y;
-    grWinw = width;
-    grWinh = height;
+    m_Winx = x;
+    m_Winy = y;
+    m_Winw = width;
+    m_Winh = height;
     
     fMouseRatioX = width / 640.0;
     fMouseRatioY = height / 480.0;
@@ -218,13 +218,13 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, '-', GFUIM_CTRL, "Zoom Out",          (void*)GR_ZOOM_OUT, SDSetZoom, NULL);
     GfuiAddKey(screen, '>',             "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
     GfuiAddKey(screen, '<',             "Zoom Out",          (void*)GR_ZOOM_OUT, SDSetZoom, NULL);
-    GfuiAddKey(screen, '(',            "Split Screen",   (void*)GR_SPLIT_ADD, SDSplitScreen, NULL);
-    GfuiAddKey(screen, ')',            "UnSplit Screen", (void*)GR_SPLIT_REM, SDSplitScreen, NULL);
-    GfuiAddKey(screen, '_',            "Split Screen Arrangement", (void*)GR_SPLIT_ARR, SDSplitScreen, NULL);
-    GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)GR_NEXT_SCREEN, SDChangeScreen, NULL);
+    GfuiAddKey(screen, '(',            "Split Screen",   (void*)SD_SPLIT_ADD, SDSplitScreen, NULL);
+    GfuiAddKey(screen, ')',            "UnSplit Screen", (void*)SD_SPLIT_REM, SDSplitScreen, NULL);
+    GfuiAddKey(screen, '_',            "Split Screen Arrangement", (void*)SD_SPLIT_ARR, SDSplitScreen, NULL);
+    GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)SD_NEXT_SCREEN, SDChangeScreen, NULL);
     /*GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);*/
 
-    GfLogInfo("Current screen is #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
+    GfLogInfo("Current screen is #%d (out of %d)\n", m_CurrentScreenIndex, m_NbActiveScreens);
 
     //grLodFactorValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, 1.0);
 
@@ -275,8 +275,8 @@ int refresh(tSituation *s)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GfProfStopProfile("grDrawBackground/glClear");
 
-    for (i = 0; i < grNbActiveScreens; i++) {
-		grScreens[i]->update(s, &frameInfo);
+    for (i = 0; i < m_NbActiveScreens; i++) {
+		Screens[i]->update(s, &frameInfo);
     }
 
     grUpdateSmoke(s->currentTime);
@@ -321,8 +321,8 @@ void shutdownCars(void)
 	GfParmReleaseHandle(grHandle);
 	grHandle = NULL;
 
-	for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-		grScreens[i]->setCurrentCar(NULL);
+	for (i = 0; i < SD_NB_MAX_SCREEN; i++) {
+		Screens[i]->setCurrentCar(NULL);
 	}
     */
 
@@ -344,7 +344,7 @@ int initTrack(tTrack *track)
 
 	// Now, do the real track loading job.
 	grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	/*if (grNbActiveScreens > 0)
+	/*if (m_NbActiveScreens > 0)
 		return grLoadScene(track);*/
 		
 	scenery = new SDScenery;

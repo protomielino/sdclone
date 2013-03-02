@@ -26,7 +26,7 @@
 
 //#include "CameraGroup.h"
 
-extern int grWinx, grWiny, grWinw, grWinh;
+extern int m_Winx, m_Winy, m_Winw, m_Winh;
 extern int grVectFlag;
 extern int grVectDispFlag[];
 
@@ -53,10 +53,10 @@ extern int grMaxTextureUnits;
 extern tdble grMaxDammage;
 
 // Number of active screens.
-extern int grNbActiveScreens;
+extern int m_NbActiveScreens;
 //extern osg::ref_ptr<osgViewer::Viewer> m_sceneViewer;
 
-//extern class cGrScreen *grScreens[];
+//extern class cGrScreen *Screens[];
 //extern class cGrScreen* grGetCurrentScreen(void);
 
 class SDScenery;
@@ -66,14 +66,14 @@ class SDView;
 
 //static 
 
-#define GR_SPLIT_ADD	0
-#define GR_SPLIT_REM	1
-#define GR_SPLIT_ARR	2
+#define SD_SPLIT_ADD	0
+#define SD_SPLIT_REM	1
+#define SD_SPLIT_ARR	2
 
-#define GR_NEXT_SCREEN	0
-#define GR_PREV_SCREEN	1
+#define SD_NEXT_SCREEN	0
+#define SD_PREV_SCREEN	1
 
-#define GR_NB_MAX_SCREEN 6
+#define SD_NB_MAX_SCREEN 6
 
 extern tdble grLodFactorValue;
 

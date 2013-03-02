@@ -25,33 +25,33 @@
 #include <vector>
 #include "OsgView.h"
 
-#define GR_SPLIT_ADD	0
-#define GR_SPLIT_REM	1
-#define GR_SPLIT_ARR	2
+#define SD_SPLIT_ADD	0
+#define SD_SPLIT_REM	1
+#define SD_SPLIT_ARR	2
 
-#define GR_NEXT_SCREEN	0
-#define GR_PREV_SCREEN	1
+#define SD_NEXT_SCREEN	0
+#define SD_PREV_SCREEN	1
 
-#define GR_NB_MAX_SCREEN 6
+#define SD_NB_MAX_SCREEN 6
 
 class SDScreens
 {
     protected:
         osgViewer::Viewer *viewer;
-        std::vector<SDView *> grScreens;
+        std::vector<SDView *> Screens;
         osg::ref_ptr<osg::Group> root;
 
-        int grWinx;
-        int grWiny;
-        int grWinw;
-        int grWinh;
+        int m_Winx;
+        int m_Winy;
+        int m_Winw;
+        int m_Winh;
 
-        int grNbActiveScreens;
-        int grNbArrangeScreens;
-        bool grSpanSplit;
-        int nCurrentScreenIndex;
+        int m_NbActiveScreens;
+        int m_NbArrangeScreens;
+        bool m_SpanSplit;
+        int m_CurrentScreenIndex;
 
-        void grAdaptScreenSize();
+        void AdaptScreenSize();
 //		int mirrorFlag;
 //		void loadParams(tSituation *s);			// Load from parameters files.
 
@@ -66,7 +66,7 @@ class SDScreens
         void changeScreen(long p);
         void changeCamera(long p);
 
-        inline SDView * getActiveView(){return grScreens[nCurrentScreenIndex];}
+        inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}
 
 	// void activate(int x, int y, int w, int h, float v);
 	// inline void deactivate(void) { active = false; }	
