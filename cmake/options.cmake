@@ -58,9 +58,6 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_TRACE_LEVEL "5" CACHE STRING "Trace level integer threshold, only if OPTION_TRACE (traces with higher level are not logged ; 0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ...)")
 
-    SET(OPTION_REPEATABLE_RANDOM false CACHE BOOL "Not for production use ; if On, enables repeatable random processes (srand is called multiple times)")
-    MARK_AS_ADVANCED(OPTION_REPEATABLE_RANDOM)
-  
     SET(OPTION_PROFILER false CACHE BOOL "Enable profiler")
   
     SET(OPTION_SCHEDULE_SPY false CACHE BOOL "Enable fine grained scheduling spy")
@@ -128,10 +125,6 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     IF(OPTION_TRACE_LEVEL)
       ADD_DEFINITIONS(-DTRACE_LEVEL=${OPTION_TRACE_LEVEL})
     ENDIF(OPTION_TRACE_LEVEL)
-
-    IF(OPTION_REPEATABLE_RANDOM)
-      ADD_DEFINITIONS(-DREPEATABLE_RANDOM)
-    ENDIF(OPTION_REPEATABLE_RANDOM)
 
     IF(OPTION_XRANDR)
       ADD_DEFINITIONS(-DUSE_RANDR_EXT)

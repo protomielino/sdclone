@@ -27,7 +27,6 @@
 
 #include <cstdio>
 #include <cerrno>
-#include <ctime>
 #include <cmath>
 #include <cstring>
 
@@ -452,9 +451,6 @@ void GfInit(bool bWithLogging)
 	gfOsInit();
 
 	gfParamInit();
-
-	// Initialize random generator.
-	srand((unsigned)time(NULL));
 
 	// Initialize SDL and useful subsystems (some others may be initialized in tgfclient).
 	if (SDL_Init(SDL_INIT_TIMER) < 0)

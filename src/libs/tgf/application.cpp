@@ -23,6 +23,7 @@
 */
 
 #include <cerrno>
+#include <ctime>
 #include <limits>
 #include <iostream>
 
@@ -95,6 +96,7 @@ void GfApplication::initialize(bool bLoggingEnabled, int argc, char **argv)
 	registerOption("D", "datadir", /* nHasValue = */ true);
 	registerOption("e", "tracelevel", /* nHasValue = */ true);
 	registerOption("t", "tracestream", /* nHasValue = */ true);
+	registerOption("n", "norandom", /* nHasValue = */ false);
 	
 	// Help about the command line options.
 	addOptionsHelpSyntaxLine("[-l|--localdir <dir path>] [-L|--libdir <dir path>]");
@@ -104,6 +106,7 @@ void GfApplication::initialize(bool bLoggingEnabled, int argc, char **argv)
 							 " [-t|--tracestream stdout|stderr|<file name>]");
 #endif
 	addOptionsHelpSyntaxLine("[-v|--version]");
+	addOptionsHelpSyntaxLine("[-n|--norandom]");
 	
 	addOptionsHelpExplainLine
 		("- locadir : Root dir of the tree where user settings files are stored");
@@ -123,11 +126,13 @@ void GfApplication::initialize(bool bLoggingEnabled, int argc, char **argv)
 		("            (default=" SD_DATADIR ")");
 #ifdef TRACE_OUT
 	addOptionsHelpExplainLine
-		("- tracelevel  : Maximum level of displayed traces");
+		("- tracelevel  : Maximum level of displayed traces for the default logger");
 	addOptionsHelpExplainLine
 		("                (0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ... ; default=5)");
 	addOptionsHelpExplainLine
-		("- tracestream : Target output stream for the traces (default=stderr)");
+		("- tracestream : Target output stream for the default logger (default=stderr)");
+	addOptionsHelpExplainLine
+		("- norandom : Force reproducible random sequences for every game session (default=off)");
 #endif
 }
 
@@ -319,6 +324,8 @@ bool GfApplication::parseOptions()
 	int nDefTraceLevel = std::numeric_limits<int>::min();
 	std::string strDefTraceStream;
 	
+	bool bTrueRandom = true;
+
 	std::list<Option>::const_iterator itOpt;
 	for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
 	{
@@ -372,6 +379,11 @@ bool GfApplication::parseOptions()
 		{
 			strDefTraceStream = itOpt->strValue;
 		}
+		// Initialize random generator or not.
+		else if (itOpt->strLongName == "norandom")
+		{
+			bTrueRandom = false;
+		}
 		else
 		{
 			// If we get here, this is normal : the derived classes might have declared
@@ -411,6 +423,19 @@ bool GfApplication::parseOptions()
 		GfLogDefault.setLevelThreshold(nDefTraceLevel);
 	if (!strDefTraceStream.empty())
 		GfLogDefault.setStream(strDefTraceStream);
+
+	
+	// Initialize random generator with "random" seed, or not (=> always same rand() sequence).
+	if (bTrueRandom)
+	{
+		GfLogInfo("Initializing random number generator for 'true randomness'\n");
+		srand((unsigned)time(0));
+	}
+	// Note: Never calling srand is equivalent to calling it once with seed=1.
+	else
+	{
+		GfLogInfo("Not initializing random number generator, for 'repeatable randomness'\n");
+	}
 	
 	return true;
 }
