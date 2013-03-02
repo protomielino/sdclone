@@ -181,7 +181,7 @@ float SDPerspCamera::getLODFactor(float x, float y, float z) {
     ang = DEG2RAD(fovy / 2.0);
     //GfScrGetSize(&dummy, &scrh, &dummy, &dummy);
 
-    res = (float)scrh / 2.0 / dd / tan(ang);
+    res = (float)screen->getScreenHeight() / 2.0 / dd / tan(ang);
     if (res < 0) {
     res = 0;
     }
@@ -2353,7 +2353,7 @@ void SDCameras::nextCamera(int list){
 }
 
 void SDCameras::selectCamera(int list,int cam){
-    if(list>=0 && list<CAMERA_LISTS && cam >=0 && cam<cameras[list].size()){
+    if(list>=0 && list< (int)CAMERA_LISTS && cam >=0 && cam<cameras[list].size()){
         selectedCamera = cam;
         selectedList = list;
     }else{
@@ -2384,7 +2384,7 @@ void SDCameras::update(tCarElt * car, tSituation * s){
 }
 
 SDCameras::~SDCameras(){
-    for(int i=0;i<CAMERA_LISTS;i++){
+    for(int i=0;i<(int)CAMERA_LISTS;i++){
         for(int j=0; j<cameras[i].size();j++){
             delete cameras[i][j];
         }
