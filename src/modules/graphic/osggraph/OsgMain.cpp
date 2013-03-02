@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 //#include "grOSG.h"
+#include <osgDB/Registry>
 #include <osgUtil/Optimizer>
 #include <osg/Group>
 #include <osgViewer/View>
@@ -383,7 +384,7 @@ void shutdownTrack(void)
     	m_sceneroot->removeChildren(0,m_sceneroot->getNumChildren());
 	// Do the real track termination job.
     	delete scenery;
-   	m_sceneroot = 0;
+        osgDB::Registry::instance()->clearObjectCache();
     	//grShutdownScene();
 
 	if (grTrackHandle)
