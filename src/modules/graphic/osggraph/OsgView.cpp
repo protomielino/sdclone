@@ -213,10 +213,10 @@ Camera* SDView::getCamera()
 
 void SDView::loadParams(tSituation *s)
 {
-	int camNum;
+		int camNum;
     	int camList;
-	int i;
-	//class SDCamera *cam;
+		int i;
+
     	const char *carName;
     	const char *pszSpanSplit;
 
@@ -253,7 +253,7 @@ void SDView::loadParams(tSituation *s)
     	// Load "current camera" settings (attached to the "current car").
     	camList	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, 9);
     	camNum	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM, NULL, 0);
- 	mirrorFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
+ 		mirrorFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
 
     	// Only apply driver preferences when not spanning split screens
     	pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
@@ -266,7 +266,7 @@ void SDView::loadParams(tSituation *s)
     	}
 
     	// Get board width (needed for scissor)
-   	/* boardWidth      = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARDWIDTH, NULL, 100);
+   		/* boardWidth      = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARDWIDTH, NULL, 100);
     	if (boardWidth < 0 || boardWidth > 100)
         	boardWidth = 100;*/
 
@@ -283,7 +283,7 @@ void SDView::loadParams(tSituation *s)
     	sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, camList, camNum);
     	cameras->getSelectedCamera()->loadDefaults(buf);
     	//drawCurrent = curCam->getDrawCurrent();
-   	// board->loadDefaults(curCar);
+   		// board->loadDefaults(curCar);
 }
 
 void SDView::saveCamera()
