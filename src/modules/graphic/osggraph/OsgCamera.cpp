@@ -114,7 +114,7 @@ void SDPerspCamera::setProjection(void)
     // we're only interested in half the viewing angle.
 
    // float fovx = atan(getAspectRatio() / spanaspect * tan(fovy * M_PI / 360.0)) * 360.0 / M_PI;
-   screen->getOsgCam()->setProjectionMatrixAsPerspective(fovy,screen->getViewRatio() / spanaspect,fnear,ffar);
+   screen->getOsgCam()->setProjectionMatrixAsPerspective(fovy,screen->getViewRatio() / spanaspect,fnear,41000.0);
 
     // grContext.setFOV(fovx, fovy);
     //grContext.setNearFar(fnear, ffar);
@@ -123,11 +123,12 @@ void SDPerspCamera::setProjection(void)
     if (viewOffset != 0 && spanOffset != 0) {
     float dist, left, right;
     double frnear,frfar,frtop,frbottom,frleft,frright;
+    frfar = 41000.0;
 
         //sgFrustum * frus = grContext.getFrustum();
    screen->getOsgCam()->getProjectionMatrixAsFrustum(frleft,frright,
                                                      frbottom,frtop,
-                                                     frnear,frfar);
+                                                     frnear, frfar);
 
 
     //=($A$2/$B$2)-((($A$2/$B$2)-$A$2)*cos(B10))
