@@ -43,20 +43,20 @@ SDScenery::SDScenery(void)
     grWrldY = 0;
     grWrldZ = 0;
     grWrldMaxSize = 0;
-	_max_visibility = 0;
-	_nb_cloudlayer = 0;
-	_DynamicSkyDome = 0;
-	_SkyDomeDistance = 0;
-	_SkyDomeDistThresh = 12000;
-	
+        _max_visibility = 0;
+        _nb_cloudlayer = 0;
+        _DynamicSkyDome = 0;
+        _SkyDomeDistance = 0;
+        _SkyDomeDistThresh = 12000;
+
 	_bgtype = false;
 	_bgsky =  false;
-	
+
 	_scenery = new osg::Group;
 	_background = new osg::Group;
 	//_spectators = 0;
 	//_trees = 0;
-	//_pits = 0;	
+	//_pits = 0;
 }
 
 SDScenery::~SDScenery(void)
@@ -68,21 +68,21 @@ SDScenery::~SDScenery(void)
 }
 
 osg::Node* SDScenery::LoadScene(tTrack *track)
-{	
+{
 	void		*hndl = grTrackHandle;
 	const char	*acname;
 	char 		buf[256];
-	
+
 	GfOut("Initialisation class SDScenery\n");
-	
+
 	m_background = new SDBackground;
 	_scenery = new osg::Group;
 	grTrack = track;
-	
+
 	// Load graphics options.
 	LoadGraphicsOptions();
 
-	if(grHandle == NULL) 
+	if(grHandle == NULL)
 	{
 		sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
 		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
@@ -99,15 +99,15 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
     grWrldZ = _grWrldZ;
     grWrldMaxSize = _grWrldMaxSize;
 
-	acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
-  	GfOut("ACname = %s\n", acname);
-	if (strlen(acname) == 0) 
-	{
-		GfLogError("No specified track 3D model file\n");
-	}	
-	
-    	std::string PathTmp = GetDataDir();   
-	
+        acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
+        GfOut("ACname = %s\n", acname);
+        if (strlen(acname) == 0)
+        {
+                GfLogError("No specified track 3D model file\n");
+        }
+
+        std::string PathTmp = GetDataDir();
+
 	if (_SkyDomeDistance > 0 && grTrack->skyversion > 0)
 	{
 		_bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
@@ -125,28 +125,38 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 	std::string strPath = GetDataDir();
 	sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 	strPath+=buf;
-    	_strTexturePath = strPath;
-	strPath+="/";	
-	strPath+=acname;
+	_strTexturePath = strPath;
 
-	LoadTrack(strPath);
+        osg::ref_ptr<osgDB::Options> options = new osgDB::Options();
+        options->getDatabasePathList().push_back(strPath);
+        std::string strTPath = GetDataDir();
+        snprintf(buf, 4096, "data/textures/");
+        strTPath += buf;
+        options->getDatabasePathList().push_back(strPath);
+
+	osg::Node* Track = osgDB::readNodeFile(acname, options);
+	_scenery->addChild(Track);
+
+	/*strPath+="/";
+	strPath+=acname;
+	LoadTrack(strPath);*/
 
 	return _scenery;
 }
-	
+
 void SDScenery::LoadSkyOptions()
 {
 	// Sky dome / background.
 	_SkyDomeDistance = (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, 0, 0) + 0.5);
 	if (_SkyDomeDistance > 0 && _SkyDomeDistance < _SkyDomeDistThresh)
 		_SkyDomeDistance = _SkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
-	
-	_DynamicSkyDome = _SkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), 
-						GR_ATT_DYNAMICSKYDOME_ENABLED) == 0; 
+
+	_DynamicSkyDome = _SkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED),
+						GR_ATT_DYNAMICSKYDOME_ENABLED) == 0;
 
 	GfLogInfo("Graphic options : Sky dome : distance = %u m, dynamic = %s\n",
 			  _SkyDomeDistance, _DynamicSkyDome ? "true" : "false");
-			
+
 	// Cloud layers.
 	//grNbCloudLayers = (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
 
@@ -158,7 +168,7 @@ void SDScenery::LoadSkyOptions()
 void SDScenery::LoadGraphicsOptions()
 {
 	char buf[256];
-	
+
 	if (!grHandle)
 	{
 		sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
@@ -170,31 +180,40 @@ void SDScenery::LoadGraphicsOptions()
 
 void SDScenery::ShutdownScene(void)
 {
-	_scenery->removeChildren(0, _scenery->getNumChildren());	
+	_scenery->removeChildren(0, _scenery->getNumChildren());
 }
 
 bool SDScenery::LoadTrack(std::string strTrack)
 {
 	char buf[4096];
 	GfOut("Chemin Track : %s\n", strTrack.c_str());
-	osgLoader loader;
-	GfOut("Chemin Textures : %s\n", _strTexturePath.c_str());
-	loader.AddSearchPath(_strTexturePath);
-	
-	std::string strTPath = GetDataDir();
-	snprintf(buf, 4096, "data/textures/");
-    	strTPath += buf;
-    	loader.AddSearchPath(strTPath);
-    	
-	osg::Node *pTrack = loader.Load3dFile(strTrack, false);
 
-	if (pTrack)
-	{
-		pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
-		_scenery->addChild(pTrack);		
-	}
-	else
-		return false;
+	//std::string ext = osgDB::getFileExtension(strTrack);
 
-	return true;
+	/*if (ext == "acc")
+	{*/
+	  osgLoader loader;
+	  GfOut("Chemin Textures : %s\n", _strTexturePath.c_str());
+	  loader.AddSearchPath(_strTexturePath);
+
+	  std::string strTPath = GetDataDir();
+	  snprintf(buf, 4096, "data/textures/");
+	  strTPath += buf;
+	  loader.AddSearchPath(strTPath);
+
+          osg::Node *pTrack = loader.Load3dFile(strTrack, false);
+        /*}
+        else*/
+        if (pTrack)
+        {
+                pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
+                //osgDB::writeNodeFile(*pTrack, "/home/xavier/track.osg");
+                _scenery->addChild(pTrack);
+        }
+        else
+                return false;
+                
+        
+
+        return true;
 }

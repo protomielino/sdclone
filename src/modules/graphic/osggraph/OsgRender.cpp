@@ -86,26 +86,28 @@ SDRender::~SDRender(void)
  * 
  * @return 0 if OK, -1 if something failed
  */
-void SDRender::Init(osgViewer::Viewer *viewer)
+void SDRender::Init(osg::Group *root)
 {
     char buf[256];
     void *hndl = grTrackHandle;
 
-    std::string path = "/opt/share/games/speed-dreams-2/data/";
-  /* thesky = new SDSky;
+    std::string datapath = GetDataDir();;
+    thesky = new SDSky;
     GfOut("SDSky class\n");
     int grSkyDomeDistance = 12000;
 
     int NStars = NMaxStars;
-    //if (AStarsData)
+    if (AStarsData)
         delete [] AStarsData;
+        
     AStarsData = new osg::Vec3d[NStars];
+    
     for(int i= 0; i < NStars; i++)
     {
         AStarsData[i][0] = SDRandom() * PI;
         AStarsData[i][1] = SDRandom() * PI;
         AStarsData[i][2] = SDRandom();
-    }//for i
+    }
 
     GfLogInfo("  Stars (random) : %d\n", NStars);
 
@@ -115,10 +117,9 @@ void SDRender::Init(osgViewer::Viewer *viewer)
     const int timeOfDay = (int)grTrack->local.timeofday;
     const double domeSizeRatio = SDSkyDomeDistance / 80000.0;
 
-   // thesky->build(path, SDSkyDomeDistance, SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance,
-    //                                             NPlanets, APlanetsData, NStars, AStarsData );
-    //GfOut("Build SKY\n");
-  /*  GLfloat sunAscension = grTrack->local.sunascension;
+    thesky->build(path, SDSkyDomeDistance, SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, NPlanets, APlanetsData, NStars, AStarsData );
+    GfOut("Build SKY\n");
+    GLfloat sunAscension = grTrack->local.sunascension;
     SDSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
     thesky->setSD( DEG2RAD(SDSunDeclination));
@@ -154,7 +155,7 @@ void SDRender::Init(osgViewer::Viewer *viewer)
     //sgSetVec3(viewPos, grWrldX/2, grWrldY/2, 0);
     //TheSky->repositionFlat( viewPos, 0, 0);*/
 
-  /*  RealRoot = dynamic_cast<osg::Group*>(viewer->getSceneData());
+    RealRoot = dynamic_cast<osg::Group*> root;
     osg::StateSet* rootStateSet = RealRoot->getOrCreateStateSet();
     RealRoot->setStateSet(rootStateSet);
 	osg::Group* lightGroup = new osg::Group;
@@ -169,25 +170,25 @@ void SDRender::Init(osgViewer::Viewer *viewer)
     myLight2->setSpecular(osg::Vec4(0.2f, 0.2f, 0.2f, 1.0f));
     myLight2->setConstantAttenuation(0.9f);
     
-    //GfOut("Light\n");
+    GfOut("Light\n");
     osg::LightSource* sunLight = new osg::LightSource;   
-    //sunLight->getLight()->setDataVariance(Object::DYNAMIC);
+    sunLight->getLight()->setDataVariance(Object::DYNAMIC);
     sunLight->setLight(myLight2);
     sunLight->setLocalStateSetModes(osg::StateAttribute::ON); 
     sunLight->setStateSetModes(*rootStateSet, osg::StateAttribute::ON);
     lightGroup->addChild(sunLight);
 
-    //GfOut("SunLight");
+    GfOut("SunLight");
 
-	osg::Group *skyGroup = new osg::Group;
-	osg::StateSet* skySS = skyGroup->getOrCreateStateSet();
-	skySS->setMode(GL_LIGHT0, osg::StateAttribute::OFF);
+    osg::Group *skyGroup = new osg::Group;
+    osg::StateSet* skySS = skyGroup->getOrCreateStateSet();
+    skySS->setMode(GL_LIGHT0, osg::StateAttribute::OFF);
     skyGroup->addChild(thesky->getPreRoot());
-    //sunLight->addChild(skyGroup);
-    /*mRoot->addChild(sceneGroup);
-    mRoot->addChild(sunLight);*/
-
-   /* osg::Group *mRoot = new osg::Group;
+    sunLight->addChild(skyGroup);
+    mRoot->addChild(sceneGroup);
+    mRoot->addChild(sunLight);
+  
+    osg::Group *mRoot = new osg::Group;
     mRoot->addChild(RealRoot);
     mRoot->addChild(sunLight);
     mRoot->addChild(lightGroup);
@@ -196,12 +197,12 @@ void SDRender::Init(osgViewer::Viewer *viewer)
     mFog->setMode( osg::Fog::EXP2 );
     mFog->setColor( osg::Vec4( 0.8, 0.8, 0.8, 1) );
     mFog->setDensity( fog_exp2_density );
-    //rootStateSet->SetState->setMode( mFog, osg::StateAttribute::ON );
+    rootStateSet->SetState->setMode( mFog, osg::StateAttribute::ON );
     rootStateSet->setAttributeAndModes(mFog);
     rootStateSet->setMode( GL_FOG, osg::StateAttribute::ON );
     viewer->setSceneData(mRoot);
 
-    GfOut("LE POINTEUR %d\n",m_carroot.get());*/
+    GfOut("LE POINTEUR %d\n",m_carroot.get());
 
   	//return 0;
 }//SDRender::Init
