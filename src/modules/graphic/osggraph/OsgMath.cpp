@@ -20,8 +20,6 @@
 
 #include "OsgMath.h"
 
-
-
 void osgXformPnt3(osg::Vec3 dst, const osg::Vec3 src, const osgMat4 mat)
 {
 	float t0 = src[0];

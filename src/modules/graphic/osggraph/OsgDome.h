@@ -16,7 +16,6 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
 #ifndef _OSGSKYDOME_H
 #define _OSGSKYDOME_H
 
@@ -24,12 +23,15 @@
 #include <osg/Array>
 #include <osg/MatrixTransform>
 
+#include "OsgReferenced.h"
+#include "OsgMath.h"
+
 namespace osg
 {
 class DrawElementsUShort;
 }
 
-class SDSkyDome
+class SDSkyDome : public SDReferenced 
 {
     osg::ref_ptr<osg::MatrixTransform> dome_transform;
     double asl;
@@ -45,14 +47,13 @@ public:
     ~SDSkyDome( void );
 
     osg::Node *build( double hscale = 80000.0, double vscale = 80000.0 );
-
     bool repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_color,
                   const osg::Vec3f& fog_color, double sun_angle, double vis );
 
-    bool reposition( const osg::Vec3f& p, double asl,
-                     double lon, double lat, double spin );
+    bool reposition( const osg::Vec3f& p, double asl, double lon, 
+    		     double lat, double spin );
 private:
     void makeDome(int rings, int bands, osg::DrawElementsUShort& elements);
 };
 
-#endif // _OSGSKYDOME_H
+#endif // OSGSKYDOME_H

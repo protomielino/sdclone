@@ -51,47 +51,47 @@ osg::Node* SDMakeSphere(double radius, int slices, int stacks)
         osg::Vec3Array* nl = new osg::Vec3Array;
         osg::Vec2Array* tl = new osg::Vec2Array;
 
-		rho = i * drho;
-		s = 0.0;
-		for ( j = 0; j <= slices; j++ ) 
-		{
-	    	double theta = (j == slices) ? 0.0 : j * dtheta;
-	    	double x = -sin(theta) * sin(rho);
-	    	double y = cos(theta) * sin(rho);
-	    	double z = nsign * cos(rho);
+	rho = i * drho;
+	s = 0.0;
+	for ( j = 0; j <= slices; j++ ) 
+	{
+	    double theta = (j == slices) ? 0.0 : j * dtheta;
+	    double x = -sin(theta) * sin(rho);
+	    double y = cos(theta) * sin(rho);
+	    double z = nsign * cos(rho);
 
             osg::Vec3 normal(x*nsign, y*nsign, z*nsign);
-	    	normal.normalize();
-	    	nl->push_back(normal);
+	    normal.normalize();
+	    nl->push_back(normal);
 
-	    	tl->push_back(osg::Vec2(s, t));
-	    	vl->push_back(osg::Vec3(x*radius, y*radius, z*radius));
+	    tl->push_back(osg::Vec2(s, t));
+	    vl->push_back(osg::Vec3(x*radius, y*radius, z*radius));
 
-	    	x = -sin(theta) * sin(rho+drho);
-	    	y = cos(theta) * sin(rho+drho);
-	    	z = nsign * cos(rho+drho);
+	    x = -sin(theta) * sin(rho+drho);
+	    y = cos(theta) * sin(rho+drho);
+	    z = nsign * cos(rho+drho);
 
             normal = osg::Vec3(x*nsign, y*nsign, z*nsign);
-	    	normal.normalize();
-	    	nl->push_back(normal);
+	    normal.normalize();
+	    nl->push_back(normal);
 
-	    	tl->push_back(osg::Vec2(s, t-dt));
-	    	s += ds;
+	    tl->push_back(osg::Vec2(s, t-dt));
+	    s += ds;
 
-	    	vl->push_back(osg::Vec3(x*radius, y*radius, z*radius));
-		}
+	    vl->push_back(osg::Vec3(x*radius, y*radius, z*radius));
+	}
 
-		if ( vl->size() != nl->size() ) 
-		{
+	if ( vl->size() != nl->size() ) 
+	{
             GfOut("bad sphere1\n");
 	    	//return -1;
-		}
+	}
 		
-		if ( vl->size() != tl->size() ) 
-		{
+	if ( vl->size() != tl->size() ) 
+	{
             GfOut("bad sphere2\n");
 	    	//return -1;
-		}
+	}
 
         osg::Vec4Array* cl = new osg::Vec4Array;
         cl->push_back(osg::Vec4(1, 1, 1, 1));
@@ -106,7 +106,7 @@ osg::Node* SDMakeSphere(double radius, int slices, int stacks)
         geometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, vl->size()));
         geode->addDrawable(geometry);
 
-		t -= dt;
+	t -= dt;
     }
 
     return geode;
