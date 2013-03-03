@@ -156,7 +156,7 @@ class TLane
 	void PropagateBreaking
 	  (int Step = 1);
 	void PropagatePitBreaking
-	  (float PitStopPos, float ScaleMu);
+	  (int Start, float PitStopPos, float ScaleMu);
 	void PropagateAcceleration
 	  (int Step = 1);
 	void CalcFwdAbsCrv

@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2013.02.24
+// Last changed : 2013.03.03
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 4.00.000
@@ -111,6 +111,7 @@ class TDriver
 	double GearRatio();                          // Get gear ratio
     void GearTronic();                           // GearTronic
     void InitCarModells();                       // Initialize Car modells
+	void InitBrake();
 	void InitCa();                               // Initialize Ca
 	void InitCw();                               // Initialize Cw
     void InitDriveTrain();                       // Initialize drive train
@@ -149,9 +150,8 @@ class TDriver
 	double SteerAngle                            // Get steer angle
 	  (TLanePoint& AheadLanePoint);
 
-	void BrakingForceRegulator();                // Regulate braking
-    void BrakingForceRegulatorAvoid();           // R. b. while avoiding
-    void BrakingForceRegulatorTraffic();         // R. b. in trafic
+	void BrakingForceController();               // PID controller 
+	void LearnBraking(double Pos);			     // Learn braking parameters
 
 	void SetBotName                              // Set name of bot
 	  (void* RobotSettings, char* Value);
@@ -228,6 +228,8 @@ private:
 	bool oCloseYourEyes;                         // Close your eyes for a while
 
 	int	oDriveTrainType;                         // Drive train type
+
+	TPidController oPIDCBrake;     	             // Controller for brake error
 	TPidController oPIDCLine;      	             // Controller for line error.
 	int	oFlying;				                 // Flag prepare landing 
 	int oNbrCars;                                // Nbr of cars in race
@@ -273,15 +275,19 @@ private:
 	double oWingAngleRearMax;                    // Max rear wing angle of attack
 	double oWingAngleRearBrake;					 // Air brake	
 
-	double oBrakeDiffInitial;                    // Initial difference to brake
-	double oBrakeForceMax;                       // Maximum braking force
+	double oBrakeMaxPressRatio;                  // Maximum brake press ratio
 	double oBrakeRep;                            // Brake balance front/rear
-	double oBrakeCorr;                           // Brake balance correction
+	double oBrakeCorrFR;                         // Brake balance correction front rear
+	double oBrakeCorrLR;                         // Brake balance correction left right
 	double oBrakeFront;							 // Brake factor front
 	double oBrakeRear;							 // Brake factor rear
 	double oBrakeLeft;                           // Brake factor left
 	double oBrakeRight;                          // Brake factor right
 	double oBrakeScale;                          // Brake force scaling
+	double oBrakeMaxTqFront;
+	double oBrakeMaxTqRear;
+	double oBrakeForce; 
+
 	double oInitialBrakeCoeff;
 	PtCarElt oCar;                               // TORCS data for own car
     float oSteerAngle;                           // Angle to steer
@@ -338,7 +344,8 @@ private:
 	double oWheelRadius;                         // Mean wheel radius
     double oDeltaOffset;                         // Delta to planned
     double oDriftAngle;                          // Drifting angle
-    double oLastDriftAngle;                      // Historie
+    double oAbsDriftAngle;                       // fabs(Drifting angle)
+    double oLastAbsDriftAngle;                   // Historie
 	double oCosDriftAngle2;
 	double oDriftFactor;                         // Drifting acceleration factor
     int oLetPassSide;                            // Go to side to let pass
@@ -347,6 +354,8 @@ private:
     double oFuelNeeded;
 	double oRepairNeeded;
 	float oSideReduction;
+	float oLastSideReduction;
+
 	double oMinDistLong;
 
 	int NBRRL;
@@ -475,6 +484,7 @@ private:
 	double CalcFriction_simplix_LS1(double Crv);
 	double CalcFriction_simplix_LS2(double Crv);
 	double CalcFriction_simplix_LP1(double Crv);
+	double CalcFriction_simplix_REF(double Crv);
 
 	double CalcCrv_simplix(double Crv);
 	double CalcCrv_simplix_Identity(double Crv);

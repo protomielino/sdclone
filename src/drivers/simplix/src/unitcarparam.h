@@ -8,10 +8,10 @@
 //
 // File         : unitcarparam.h
 // Created      : 2007.11.25
-// Last changed : 2011.06.07
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2014.02.26
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.02.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem Roboter mouse_2006
 //
@@ -65,6 +65,7 @@ class TCarParam
 	double oLimitSideWidth;                      // Use of sides limited to
 
 	double oUglyCrvZ;                            // Use stiff crv
+	double oBrakeForce;                          // Brake force max
 
 };
 //==========================================================================*

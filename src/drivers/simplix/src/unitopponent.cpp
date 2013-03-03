@@ -9,10 +9,10 @@
 //
 // File         : unitopponent.cpp
 // Created      : 2007.11.17
-// Last changed : 2013.02.16
+// Last changed : 2013.03.02
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.06.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -496,7 +496,7 @@ bool TOpponent::Classify(
  	    && (OpState.CarDistLong > -50))
 	  {
 		oInfo.Flags |= F_LAPPER;                 // Let opponent pass
-		//GfOut("F_LAPPER 1\n");
+		LogSimplix.debug("F_LAPPER 1\n");
 		/*
 		if (LapBackTimer == 0.0)
 		  oInfo.Flags |= F_LAPPER;                 // We are lapped

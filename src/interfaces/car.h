@@ -606,7 +606,8 @@ typedef struct CarElt
 #define PRM_BRKREP		"front-rear brake repartition"
 #define PRM_BRKPRESS	"max pressure"
 #define PRM_EBRKPRESS	"emergency brake pressure"
-#define PRM_BRKCOR		"brake correction"
+#define PRM_BRKCOR_LR	"brake corr lr"
+#define PRM_BRKCOR_FR	"brake corr fr"
 
 #define PRM_CX			"Cx"
 #define PRM_FCL			"front Clift"

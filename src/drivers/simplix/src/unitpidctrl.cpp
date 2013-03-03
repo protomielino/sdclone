@@ -2,16 +2,16 @@
 // unitpidctrl.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // PID Controller
 // 
 // File         : unitpidctrl.cpp
 // Created      : 2007.11.257
-// Last changed : 2011.06.02
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.03.02
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -43,7 +43,7 @@
 // Default constructor
 //--------------------------------------------------------------------------*
 TPidController::TPidController(): oLastPropValue(0), oTotal(0),
-  oMaxTotal(100), oTotalRate(0), oP(1),	oI(0), oD(0)
+  oMaxTotal(100), oMinTotal(-100), oTotalRate(0), oP(1),	oI(0), oD(0)
 {
 }
 //==========================================================================*
@@ -88,8 +88,8 @@ double TPidController::Sample(double PropValue, double DiffValue)
 
 	if (oTotal > oMaxTotal)
 	  oTotal = oMaxTotal;
-	else if (oTotal < -oMaxTotal)
-	  oTotal = -oMaxTotal;
+	else if (oTotal < oMinTotal)
+	  oTotal = oMinTotal;
 	
 	Cntrl += oTotal * oI;
   }

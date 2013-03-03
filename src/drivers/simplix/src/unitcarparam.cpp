@@ -8,10 +8,10 @@
 //
 // File         : unitcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.07
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.02.26
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.02.000
+// Version      : 4.02.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem Roboter mouse_2006
 //
@@ -86,6 +86,7 @@ TCarParam& TCarParam::operator= (const TCarParam& CarParam)
   oLimitSideUse = CarParam.oLimitSideUse;
   oLimitSideWidth = CarParam.oLimitSideWidth;
   oUglyCrvZ = CarParam.oUglyCrvZ;
+  oBrakeForce = CarParam.oBrakeForce;
 
   return *this;
 }

@@ -9,10 +9,10 @@
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.01.06
+// Last changed : 2013.03.03
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.05.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -249,8 +249,20 @@ double TFixCarParam::CalcBraking
 	  break;
   }
 
-  return U;
-/**/
+  double MidSpeed = (U + Speed)/2;
+
+  // Check brake
+  double BrakeDecel = CarParam.oScaleBrake * CarParam.oBrakeForce / oTmpCarParam->oMass;
+  double BrakeTargetSpeed = sqrt(MidSpeed * MidSpeed + 2 * BrakeDecel * Dist);
+  double ResultTargetSpeed = MIN(U,BrakeTargetSpeed);
+/*
+  if (U > BrakeTargetSpeed)
+    LogSimplix.info("U: %g > B: %g\n",U*3.6,BrakeTargetSpeed*3.6);
+  else
+    LogSimplix.error("U: %g < B: %g\n",U*3.6,BrakeTargetSpeed*3.6);
+*/
+	// Sanity check
+  return (float) MAX(ResultTargetSpeed,Speed);
 }
 //==========================================================================*
 
@@ -341,7 +353,15 @@ double	TFixCarParam::CalcBrakingPit
 	  break;
   }
 
-  return U;
+  double MidSpeed = (U + Speed)/2;
+
+  // Check brake
+  double BrakeDecel = 0.8 * CarParam.oScaleBrake * CarParam.oBrakeForce / oTmpCarParam->oMass;
+  double BrakeTargetSpeed = sqrt(MidSpeed * MidSpeed + 2 * BrakeDecel * Dist);
+  double ResultTargetSpeed = MIN(U,BrakeTargetSpeed);
+
+  // Sanity check
+  return (float) MAX(ResultTargetSpeed,Speed);
 }
 //==========================================================================*
 

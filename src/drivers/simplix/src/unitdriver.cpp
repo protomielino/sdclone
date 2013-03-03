@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.02.24
+// Last changed : 2013.03.03
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 4.00.000
@@ -22,7 +22,7 @@
 //
 //    Copyright: (C) 2002-2004 Bernhard Wymann
 //    eMail    : berniw@bluewin.ch
-//
+//f
 // dem Roboter delphin
 //
 //    Copyright: (C) 2006-2007 Wolf-Dieter Beelitz
@@ -196,6 +196,7 @@ TDriver::TDriver(int Index):
   oGoToPit(false),
   oCloseYourEyes(false),
   oDriveTrainType(cDT_RWD),
+  // oPIDCBrake;
   // oPIDCLine;
   oFlying(0),
   oNbrCars(0),
@@ -236,15 +237,18 @@ TDriver::TDriver(int Index):
   oWingAngleRearMin(0),
   oWingAngleRearMax(0), 
   oWingAngleRearBrake(0),
-  oBrakeDiffInitial(2.0),
-  oBrakeForceMax(0.5f),
+  oBrakeMaxPressRatio(0.85f),
   oBrakeRep(0.5f),
-  oBrakeCorr(0.03f),
+  oBrakeCorrLR(0.30f),
+  oBrakeCorrFR(0.03f),
   oBrakeFront(1.0f),
   oBrakeRear(1.0f),
   oBrakeLeft(1.0f),
   oBrakeRight(1.0f),
-  oBrakeScale(INITIAL_BRAKE_SCALE),
+  oBrakeScale(0.5),
+  oBrakeMaxTqFront(0.0),
+  oBrakeMaxTqRear(0.0),
+  oBrakeForce(0.0), 
   oInitialBrakeCoeff(0.5f),
   oCar(NULL),
   oSteerAngle(0.0f),
@@ -298,7 +302,8 @@ TDriver::TDriver(int Index):
   oWheelRadius(0),
   oDeltaOffset(0.0),
   oDriftAngle(0.0),
-  oLastDriftAngle(0.0),
+  oAbsDriftAngle(0.0),
+  oLastAbsDriftAngle(0.0),
   oCosDriftAngle2(1.0),
   oDriftFactor(1.0),
   oLetPassSide(0),
@@ -307,6 +312,7 @@ TDriver::TDriver(int Index):
   oFuelNeeded(0.0),
   oRepairNeeded(0.0),
   oSideReduction(1.0),
+  oLastSideReduction(1.0),
   oMinDistLong(FLT_MAX),
 
   NBRRL(0),
@@ -372,7 +378,7 @@ TDriver::TDriver(int Index):
   oFirstJump(true),
   oStartSteerFactor(0.0)
 {
-//  //GfOut("#TDriver::TDriver() >>>\n");
+  LogSimplix.debug("\n#TDriver::TDriver() >>>\n\n");
   int I;
   oIndex = Index;                                // Save own index
   oExtended =                                    // Determine if it 
@@ -382,6 +388,15 @@ TDriver::TDriver(int Index):
   oSysFooStuckX = new TSysFoo(1,128);            // Ringbuffer for X
   oSysFooStuckY = new TSysFoo(1,128);            // and Y coordinates
 
+  // Steering: Control offset from path
+  oPIDCLine.oP = 1.0;
+  oPIDCLine.oD = 10;
+
+  // Braking: Control speed difference
+  oPIDCBrake.oP = 0.42;
+  oPIDCBrake.oI = 0.001;
+  oPIDCBrake.oD = 0.88;
+  
   for (I = 0; I <= NBR_BRAKECOEFF; I++)          // Initialize braking
     oBrakeCoeff[I] = 0.5;
 
@@ -392,7 +407,7 @@ TDriver::TDriver(int Index):
 
   TDriver::LengthMargin = LENGTH_MARGIN;         // Initialize safty margin
 
-//  //GfOut("#<<< TDriver::TDriver()\n");
+  LogSimplix.debug("\n#<<< TDriver::TDriver()\n\n");
 }
 //==========================================================================*
 
@@ -401,11 +416,10 @@ TDriver::TDriver(int Index):
 //--------------------------------------------------------------------------*
 TDriver::~TDriver()
 {
-//  //GfOut("#TDriver::~TDriver() >>>\n");
+  LogSimplix.debug("\n#TDriver::~TDriver() >>>\n\n");
   delete [] oOpponents; 
   
   if (oCarType != NULL)
-//    delete oCarType; // CAUSES HEAP CORRUPTION ASSERTION
    	free(oCarType);
 
   if (oStrategy != NULL)
@@ -414,7 +428,7 @@ TDriver::~TDriver()
     delete oSysFooStuckX;
   if (oSysFooStuckY != NULL)
     delete oSysFooStuckY;
-//  //GfOut("#<<< TDriver::~TDriver()\n");
+  LogSimplix.debug("\n#<<< TDriver::~TDriver()\n\n");
 }
 //==========================================================================*
 
@@ -466,10 +480,10 @@ void TDriver::SetBotName(void* RobotSettings, char* Value)
       , Section, ROB_ATTR_RACENUM                // defined in corresponding
       , (char *) NULL, (tdble) oIndex + 1);      // section, index as default
 
-    //GfOut("#Bot name    : %s\n",oBotName);
-    //GfOut("#Team name   : %s\n",oTeamName);
-    //GfOut("#Car type    : %s\n",oCarType);
-    //GfOut("#Race number : %d\n",oRaceNumber);
+    LogSimplix.debug("#Bot name    : %s\n",oBotName);
+    LogSimplix.debug("#Team name   : %s\n",oTeamName);
+    LogSimplix.debug("#Car type    : %s\n",oCarType);
+    LogSimplix.debug("#Race number : %d\n",oRaceNumber);
 };
 //==========================================================================*
 
@@ -483,23 +497,23 @@ void TDriver::AdjustBrakes(PCarHandle Handle)
     TDriver::BrakeLimit = 
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BRAKE_LIMIT,0,
 	  (float) TDriver::BrakeLimit);
-    //GfOut("#BrakeLimit %g\n",TDriver::BrakeLimit);
+    LogSimplix.debug("#BrakeLimit %g\n",TDriver::BrakeLimit);
     TDriver::BrakeLimitBase = 
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BRAKE_LIMIT_BASE,0,
 	  (float) TDriver::BrakeLimitBase);
-    //GfOut("#BrakeLimitBase %g\n",TDriver::BrakeLimitBase);
+    LogSimplix.debug("#BrakeLimitBase %g\n",TDriver::BrakeLimitBase);
     TDriver::BrakeLimitScale = 
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BRAKE_LIMIT_SCALE,0,
 	  (float) TDriver::BrakeLimitScale);
-    //GfOut("#BrakeLimitScale %g\n",TDriver::BrakeLimitScale);
+    LogSimplix.debug("#BrakeLimitScale %g\n",TDriver::BrakeLimitScale);
     TDriver::SpeedLimitBase = 
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SPEED_LIMIT_BASE,0,
 	  (float) TDriver::SpeedLimitBase);
-    //GfOut("#SpeedLimitBase %g\n",TDriver::SpeedLimitBase);
+    LogSimplix.debug("#SpeedLimitBase %g\n",TDriver::SpeedLimitBase);
     TDriver::SpeedLimitScale = 
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SPEED_LIMIT_SCALE,0,
 	  (float) TDriver::SpeedLimitScale);
-    //GfOut("#SpeedLimitScale %g\n",TDriver::SpeedLimitScale);
+    LogSimplix.debug("#SpeedLimitScale %g\n",TDriver::SpeedLimitScale);
   }
 };
 //==========================================================================*
@@ -516,8 +530,7 @@ void TDriver::AdjustDriving(
     Param.oCarParam.oScaleBrake = ScaleBrake *
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BRAKE_Q,NULL,
 	  (float) Param.oCarParam.oScaleBrake);
-  //GfOut("#Scale Brake: %g\n",Param.oCarParam.oScaleBrake);
-  //Param.oCarParam.oScaleBrake -= 0.1;
+  LogSimplix.debug("#Scale Brake: %g\n",Param.oCarParam.oScaleBrake);
 
   oJumpOffset =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_JUMP_OFFSET,NULL,(float) oJumpOffset);
@@ -543,30 +556,30 @@ void TDriver::AdjustDriving(
     Param.oCarParam.oScaleBump;
   Param.oCarParam.oScaleBumpRight =
     Param.oCarParam.oScaleBump;
-  //GfOut("#Scale Bump: %g\n",Param.oCarParam.oScaleBump);
+  LogSimplix.debug("#Scale Bump: %g\n",Param.oCarParam.oScaleBump);
 
   Param.oCarParam.oScaleBumpOuter =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BUMPOUTER,NULL,
 	(float) Param.oCarParam.oScaleBump);
-  //GfOut("#Scale Bump Outer: %g\n",Param.oCarParam.oScaleBumpOuter);
+  LogSimplix.debug("#Scale Bump Outer: %g\n",Param.oCarParam.oScaleBumpOuter);
 
   Param.oCarParam.oLimitSideUse =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LIMIT_SIDE_USE,NULL,
 	(float) 0) > 0;
   if (Param.oCarParam.oLimitSideUse)
-    GfOut("#Limit side use: true\n");
+    LogSimplix.debug("#Limit side use: true\n");
   else
-    GfOut("#Limit side use: false\n");
+    LogSimplix.debug("#Limit side use: false\n");
 
   Param.oCarParam.oLimitSideWidth =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LIMIT_SIDE_WIDTH,NULL,
 	1.5f);
-  GfOut("#Limit side width: %g\n",Param.oCarParam.oLimitSideWidth);
+  LogSimplix.debug("#Limit side width: %g\n",Param.oCarParam.oLimitSideWidth);
 
   Param.oCarParam.oUglyCrvZ =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_UGLY_CRVZ,NULL,
 	-1.0);
-  GfOut("#Ugly CrvZ: %g\n",Param.oCarParam.oUglyCrvZ);
+  LogSimplix.debug("#Ugly CrvZ: %g\n",Param.oCarParam.oUglyCrvZ);
 
   Param.oCarParam.oScaleMu = ScaleMu *
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MU,NULL,
@@ -575,38 +588,37 @@ void TDriver::AdjustDriving(
     Param.oCarParam.oScaleMu = ScaleMu *
   	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MU_Q,NULL,
 	  (float) Param.oCarParam.oScaleMu);
-  //GfOut("#Scale Mu: %g\n",Param.oCarParam.oScaleMu);
-  //Param.oCarParam.oScaleMu -= 0.1;
+  LogSimplix.debug("#Scale Mu: %g\n",Param.oCarParam.oScaleMu);
 
   Param.oCarParam.oScaleMinMu =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MIN_MU,NULL,
 	(float) Param.oCarParam.oScaleMinMu);
-  //GfOut("#Scale Min Mu %g\n",Param.oCarParam.oScaleMinMu);
+  LogSimplix.debug("#Scale Min Mu %g\n",Param.oCarParam.oScaleMinMu);
 
   oSideScaleMu = 
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SIDE_MU,NULL,
 	oSideScaleMu);
-  //GfOut("#Side Scale Mu%g\n",oSideScaleMu);
+  LogSimplix.debug("#Side Scale Mu%g\n",oSideScaleMu);
 
   oScaleMuRain = 
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_RAIN_MU,NULL,
 	(float) oScaleMuRain);
-  //GfOut("#Scale Mu Rain%g\n",oScaleMuRain);
+  LogSimplix.debug("#Scale Mu Rain%g\n",oScaleMuRain);
 
   oSideScaleBrake = 
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SIDE_BRAKE,NULL,
 	oSideScaleBrake);
-  //GfOut("#Side Scale Brake%g\n",oSideScaleBrake);
+  LogSimplix.debug("#Side Scale Brake%g\n",oSideScaleBrake);
 
   oScaleBrakeRain = 
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_RAIN_BRAKE,NULL,
 	(float) oScaleBrakeRain);
-  //GfOut("#Scale Brake Rain%g\n",oScaleBrakeRain);
+  LogSimplix.debug("#Scale Brake Rain%g\n",oScaleBrakeRain);
 
   oAvoidScale =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_SCALE,0,
 	(float) oAvoidScale);
-  //GfOut("#oAvoidScale %g\n",oAvoidScale);
+  LogSimplix.debug("#oAvoidScale %g\n",oAvoidScale);
 
   if (oTrack->width < 11)
     oAvoidWidth = 0.5;
@@ -620,13 +632,13 @@ void TDriver::AdjustDriving(
   oAvoidWidth =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_WIDTH,0,
 	(float) oAvoidWidth);
-  //GfOut("#oAvoidWidth %g\n",oAvoidWidth);
+  LogSimplix.debug("#oAvoidWidth %g\n",oAvoidWidth);
 
   oLookAhead = Param.Fix.oLength;
   oLookAhead =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LOOKAHEAD,0,
 	(float) oLookAhead);
-  //GfOut("#oLookAhead %g\n",oLookAhead);
+  LogSimplix.debug("#oLookAhead %g\n",oLookAhead);
 
   if (GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_OUT,0,1) != 0)
 	  UseAccelOut();
@@ -645,66 +657,66 @@ void TDriver::AdjustDriving(
     Param.Fix.oBorderInner =
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BORDER_INNER,0,
 	  (float) Param.Fix.oBorderInner);
-    //GfOut("#Border Inner: %g\n",Param.Fix.oBorderInner);
+    LogSimplix.debug("#Border Inner: %g\n",Param.Fix.oBorderInner);
 
     Param.Fix.oBorderOuter =
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BORDER_OUTER,0,
 	  (float) Param.Fix.oBorderOuter);
-    //GfOut("#Border Outer: %g\n",Param.Fix.oBorderOuter);
+    LogSimplix.debug("#Border Outer: %g\n",Param.Fix.oBorderOuter);
 
     Param.Fix.oMaxBorderInner =
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_MAX_BORDER_INNER,0,
 	  (float) Param.Fix.oMaxBorderInner);
-    //GfOut("#Max Border Inner: %g\n",Param.Fix.oMaxBorderInner);
+    LogSimplix.debug("#Max Border Inner: %g\n",Param.Fix.oMaxBorderInner);
 
     Param.Fix.oBorderScale =
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BORDER_SCALE,0,
 	  (float) Param.Fix.oBorderScale);
-    //GfOut("#Border Scale: %g\n",Param.Fix.oBorderScale);
+    LogSimplix.debug("#Border Scale: %g\n",Param.Fix.oBorderScale);
 
     oFlyHeight =
       GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_FLY_HEIGHT,"m",
 	  (float) oFlyHeight);
-    //GfOut("#FLY_HEIGHT %g\n",oFlyHeight);
+    LogSimplix.debug("#FLY_HEIGHT %g\n",oFlyHeight);
 
     oLookAhead =
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LOOKAHEAD,0,
 	  (float) Param.Fix.oLength);
-    //GfOut("#LookAhead %g\n",oLookAhead);
+    LogSimplix.debug("#LookAhead %g\n",oLookAhead);
 
 	oOmegaAhead = Param.Fix.oLength;
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_OMEGAAHEAD,0,
 		  (float) Param.Fix.oLength);
-    //GfOut("#OmegaAhead %g\n",oOmegaAhead);
+    LogSimplix.debug("#OmegaAhead %g\n",oOmegaAhead);
 
     oOmegaAheadFactor =
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_OMEGAAHEADFACTOR,0,
 	  (float) oOmegaAheadFactor);
-    //GfOut("#OmegaAheadFactor %g\n",oOmegaAheadFactor);
+    LogSimplix.debug("#OmegaAheadFactor %g\n",oOmegaAheadFactor);
 
-	oInitialBrakeCoeff = oBrakeCoeff[0];
+	oInitialBrakeCoeff = 
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_INIT_BRAKE,0,
 		  (float) oBrakeCoeff[0]);
-    //GfOut("#oInitialBrakeCoeff %g\n",oInitialBrakeCoeff);
+    LogSimplix.debug("#oInitialBrakeCoeff %g\n",oInitialBrakeCoeff);
   }
 
   oLookAheadFactor =
     GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LOOKAHEADFACTOR,0,
 	(float)oLookAheadFactor);
-  //GfOut("#LookAheadFactor %g\n",oLookAheadFactor);
+  LogSimplix.debug("#LookAheadFactor %g\n",oLookAheadFactor);
 
   oScaleSteer =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_STEER,0,
 	(float) oScaleSteer);
-  //GfOut("#oScaleSteer %g\n",oScaleSteer);
+  LogSimplix.debug("#oScaleSteer %g\n",oScaleSteer);
 
   oStayTogether =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_STAY_TOGETHER,0,10);
-  //GfOut("#oStayTogether %g\n",oStayTogether);
+  LogSimplix.debug("#oStayTogether %g\n",oStayTogether);
 
   oCrvComp =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_CRV_COMP,0,1) != 0;
-  //GfOut("#oCrvComp %s\n",oCrvComp ? "true" : "false");
+  LogSimplix.debug("#oCrvComp %s\n",oCrvComp ? "true" : "false");
 
   for (int I = 0; I <= NBR_BRAKECOEFF; I++)      // Initialize braking
     oBrakeCoeff[I] = oInitialBrakeCoeff;
@@ -712,77 +724,77 @@ void TDriver::AdjustDriving(
   oTclRange =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TCL_RANGE,0,
 	(float)oTclRange);
-  //GfOut("#oTclRange %g\n",oTclRange);
+  LogSimplix.debug("#oTclRange %g\n",oTclRange);
 
   oTclSlip =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TCL_SLIP,0,
 	(float)oTclSlip);
-  //GfOut("#oTclSlip %g\n",oTclSlip);
+  LogSimplix.debug("#oTclSlip %g\n",oTclSlip);
 
   oTclFactor =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TCL_FACTOR,0,
 	(float)oTclFactor);
-  //GfOut("#oTclFactor %g\n",oTclFactor);
+  LogSimplix.debug("#oTclFactor %g\n",oTclFactor);
 /*
   oTclAccel =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TCL_ACCEL,0,
 	(float)oTclAccel);
-  //GfOut("#oTclAccel %g\n",oTclAccel);
+  LogSimplix.debug("#oTclAccel %g\n",oTclAccel);
 
   oTclAccelFactor =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TCL_ACCELFACTOR,0,
 	(float)oTclAccelFactor);
-  //GfOut("#oTclAccelFactor %g\n",oTclAccelFactor);
+  LogSimplix.debug("#oTclAccelFactor %g\n",oTclAccelFactor);
 */
   oDriftFactor =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_DRIFT_FACTOR,0,
 	(float)oDriftFactor);
-  //GfOut("#oDriftFactor %g\n",oDriftFactor);
+  LogSimplix.debug("#oDriftFactor %g\n",oDriftFactor);
 
   oAbsDelta =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ABS_DELTA,0,
 	(float)oAbsDelta);
-  //GfOut("#oAbsDelta %g\n",oAbsDelta);
+  LogSimplix.debug("#oAbsDelta %g\n",oAbsDelta);
 
   oAbsScale =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ABS_SCALE,0,
 	(float)oAbsScale);
-  //GfOut("#oAbsScale %g\n",oAbsScale);
+  LogSimplix.debug("#oAbsScale %g\n",oAbsScale);
 
   oClutchDelta =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_CLUTCH_DELTA,0,
 	(float)oClutchDelta);
-  //GfOut("#oClutchDelta %g\n",oClutchDelta);
+  LogSimplix.debug("#oClutchDelta %g\n",oClutchDelta);
 
   oClutchMax =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_CLUTCH_MAX,0,
 	(float)oClutchMax);
-  //GfOut("#oClutchMax %g\n",oClutchMax);
+  LogSimplix.debug("#oClutchMax %g\n",oClutchMax);
 
   oClutchRange =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_CLUTCH_RANGE,0,
 	(float)oClutchRange);
-  //GfOut("#oClutchRange %g\n",oClutchRange);
+  LogSimplix.debug("#oClutchRange %g\n",oClutchRange);
 
   oClutchRelease =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_CLUTCH_RELEASE,0,
 	(float)oClutchRelease);
-  //GfOut("#oClutchRelease %g\n",oClutchRelease);
+  LogSimplix.debug("#oClutchRelease %g\n",oClutchRelease);
 
   oEarlyShiftFactor =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_EARLY_SHIFT,0,
 	(float)oEarlyShiftFactor);
-  //GfOut("#oEarlyShiftFactor %g\n",oEarlyShiftFactor);
+  LogSimplix.debug("#oEarlyShiftFactor %g\n",oEarlyShiftFactor);
 
   oTeamEnabled =
     GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TEAM_ENABLE,0,
 	(float)oTeamEnabled) != 0;
-  //GfOut("#oTeamEnabled %d\n",oTeamEnabled);
+  LogSimplix.debug("#oTeamEnabled %d\n",oTeamEnabled);
 
   oDryCode = (int)
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_WEATHER_DRY,0,
 	(float)oDryCode);
-  //GfOut("#oDryCode %d\n",oDryCode);
+  LogSimplix.debug("#oDryCode %d\n",oDryCode);
   // ... Adjust driving
 };
 //==========================================================================*
@@ -795,68 +807,68 @@ void TDriver::AdjustPitting(PCarHandle Handle)
   // Adjust pitting ...
   Param.Pit.oUseFirstPit = (int)
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_USE_FIRST,0,1);
-  //GfOut("#oUseFirstPit %d\n",Param.Pit.oUseFirstPit);
+  LogSimplix.debug("#oUseFirstPit %d\n",Param.Pit.oUseFirstPit);
 
   Param.Pit.oUseSmoothPit = (int)
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_USE_SMOOTH,0,0);
-  //GfOut("#oUseSmoothPit %d\n",Param.Pit.oUseSmoothPit);
+  LogSimplix.debug("#oUseSmoothPit %d\n",Param.Pit.oUseSmoothPit);
 
   Param.Pit.oLaneEntryOffset =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PITLANE_ENTRY,0,
 	(float) Param.Pit.oLaneEntryOffset);
-  //GfOut("#oLaneEntryOffset %g\n",Param.Pit.oLaneEntryOffset);
+  LogSimplix.debug("#oLaneEntryOffset %g\n",Param.Pit.oLaneEntryOffset);
 
   Param.Pit.oLaneExitOffset =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PITLANE_EXIT,0,
 	(float) Param.Pit.oLaneExitOffset);
-  //GfOut("#oLaneExitOffset %g\n",Param.Pit.oLaneExitOffset);
+  LogSimplix.debug("#oLaneExitOffset %g\n",Param.Pit.oLaneExitOffset);
 
   Param.Pit.oEntryLong =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_ENTRY_LONG,0,0);
-  //GfOut("#oEntryLong %g\n",Param.Pit.oEntryLong);
+  LogSimplix.debug("#oEntryLong %g\n",Param.Pit.oEntryLong);
 
   Param.Pit.oExitLong =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_EXIT_LONG,0,0);
-  //GfOut("#oExitLong %g\n",Param.Pit.oExitLong);
+  LogSimplix.debug("#oExitLong %g\n",Param.Pit.oExitLong);
 
   Param.Pit.oExitLength =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_EXIT_LEN,0,0);
-  //GfOut("#oExitLength %g\n",Param.Pit.oExitLength);
+  LogSimplix.debug("#oExitLength %g\n",Param.Pit.oExitLength);
 
   Param.Pit.oLatOffset =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_LAT_OFFS,0,
 	(float) Param.Pit.oLatOffset);
-  //GfOut("#Lateral Pit Offset %f\n",Param.Pit.oLatOffset);
+  LogSimplix.debug("#Lateral Pit Offset %f\n",Param.Pit.oLatOffset);
 
   Param.Pit.oLongOffset =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_LONG_OFFS,0,
 	(float) Param.Pit.oLongOffset);
-  //GfOut("#Longitudinal Pit  Offset %f\n",Param.Pit.oLongOffset);
+  LogSimplix.debug("#Longitudinal Pit  Offset %f\n",Param.Pit.oLongOffset);
 
   Param.oCarParam.oScaleBrakePit =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_SCALE_BRAKE,0,
 	(float) MIN(1.0,Param.oCarParam.oScaleBrake));
-  //GfOut("#ScaleBrakePit %g\n",Param.oCarParam.oScaleBrakePit);
+  LogSimplix.debug("#ScaleBrakePit %g\n",Param.oCarParam.oScaleBrakePit);
 
   Param.Pit.oStoppingDist =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_STOP_DIST,0,1.5);
-  //GfOut("#oStoppingDist %g\n",Param.Pit.oStoppingDist);
+  LogSimplix.debug("#oStoppingDist %g\n",Param.Pit.oStoppingDist);
 
   Param.Fix.oPitBrakeDist =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_BRAKE_DIST,0,150.0);
-  //GfOut("#oPitBrakeDist %g\n",Param.Fix.oPitBrakeDist);
+  LogSimplix.debug("#oPitBrakeDist %g\n",Param.Fix.oPitBrakeDist);
 
   Param.Fix.oPitMinEntrySpeed =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_MINENTRYSPEED,0,24.5);
-  //GfOut("#oPitMinEntrySpeed %g\n",Param.Fix.oPitMinEntrySpeed);
+  LogSimplix.debug("#oPitMinEntrySpeed %g\n",Param.Fix.oPitMinEntrySpeed);
 
   Param.Fix.oPitMinExitSpeed =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_MINEXITSPEED,0,24.5);
-  //GfOut("#oPitMinExitSpeed %g\n",Param.Fix.oPitMinExitSpeed);
+  LogSimplix.debug("#oPitMinExitSpeed %g\n",Param.Fix.oPitMinExitSpeed);
 
   oTestPitStop = (int)
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_TEST_STOP,0,0);
-  GfOut("#TestPitStop %d\n",oTestPitStop);
+  LogSimplix.debug("#TestPitStop %d\n",oTestPitStop);
   // ... Adjust pitting
 };
 //==========================================================================*
@@ -871,32 +883,26 @@ void TDriver::AdjustSkilling(PCarHandle Handle)
   {
     oSkilling = false;
 	oSkill = 1.0;
-	//GfOut("#No skilling: Skill %g\n",oSkill);
+	LogSimplix.debug("#No skilling: Skill %g\n",oSkill);
     Param.Tmp.oSkill = oSkill;
   }
   else
   {
     oSkillOffset = MAX(0.0,MIN(10.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,
 		"offset skill", (char *) NULL, (float) oSkillOffset)));
-    //GfOut("#SkillOffset: %g\n", oSkillOffset);
+    LogSimplix.debug("#SkillOffset: %g\n", oSkillOffset);
     oSkillScale = MAX(0.0,MIN(10.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,
 		"scale skill", (char *) NULL, (float) oSkillScale)));
-    //GfOut("#SkillScale: %g\n", oSkillScale);
+    LogSimplix.debug("#SkillScale: %g\n", oSkillScale);
 
     oLookAhead = oLookAhead / (1+oSkillGlobal/24);
     oLookAheadFactor = oLookAheadFactor / (1+oSkillGlobal/24);
 
 	CalcSkilling();
-/*
-	if (Qualification)
-	{
-  	  oSkill *= 1.5;
-	  oSkillMax *= 1.5;
-	}
-*/
+
     Param.Tmp.oSkill = 1.0 + oSkill;
-	//GfOut("\n#>>>Skilling: Skill %g oSkillGlobal %g oSkillDriver %g oLookAhead %g oLookAheadFactor %g effSkill:%g\n\n",
-	//	oSkill,oSkillGlobal,oSkillDriver,oLookAhead,oLookAheadFactor,Param.Tmp.oSkill);
+	LogSimplix.debug("\n#>>>Skilling: Skill %g oSkillGlobal %g oSkillDriver %g oLookAhead %g oLookAheadFactor %g effSkill:%g\n\n",
+		oSkill,oSkillGlobal,oSkillDriver,oLookAhead,oLookAheadFactor,Param.Tmp.oSkill);
   }
   // ... Adjust skilling
 };
@@ -917,75 +923,74 @@ void TDriver::GetSkillingParameters
   {
 	snprintf(PathFilenameBuffer, BUFLEN,           // In default.xml
 	  "%s/default.xml", BaseParamPath);            // of the robot
-	//GfOut("#PathFilename: %s\n", PathFilenameBuffer); // itself
+	LogSimplix.debug("#PathFilename: %s\n", PathFilenameBuffer); // itself
 	void* SkillHandle = GfParmReadFile
 	  (PathFilename, GFPARM_RMODE_REREAD);
 	if (SkillHandle)
 	{
 	  SkillEnabled = (int) MAX(0,MIN(1,(int) GfParmGetNum(SkillHandle,
 	    "skilling", "enable", (char *) NULL, 0.0)));
-	  //GfOut("#SkillEnabled %d\n",SkillEnabled);
+	  LogSimplix.debug("#SkillEnabled %d\n",SkillEnabled);
 	  oTeamEnabled =
   		GfParmGetNum(SkillHandle,"team","enable",0,(float) oTeamEnabled) != 0;
-	  //GfOut("#oTeamEnabled %d\n",oTeamEnabled);
+	  LogSimplix.debug("#oTeamEnabled %d\n",oTeamEnabled);
 	}
   }
 
   if (SkillEnabled > 0)                          // If skilling is enabled
   {                                              // Get Skill level
 	oSkilling = true;                            // of TORCS-Installation
-    //GfOut("#Skilling: On\n");
+    LogSimplix.debug("#Skilling: On\n");
 
 	void* SkillHandle = NULL;
 
     snprintf(PathFilenameBuffer, BUFLEN,
 	  "%sconfig/raceman/extra/skill.xml",GetLocalDir());
-    //GfOut("#skill.xml: %s\n", PathFilename);
+    LogSimplix.debug("#skill.xml: %s\n", PathFilename);
     SkillHandle = GfParmReadFile
 	  (PathFilename, GFPARM_RMODE_REREAD);
     if (SkillHandle)
     {
       oSkillGlobal = MAX(0.0,MIN(10.0,GfParmGetNum(SkillHandle,
 		  "skill", "level", (char *) NULL, 10.0)));
-	  //GfOut("#LocalDir: SkillGlobal: %g\n", oSkillGlobal);
+	  LogSimplix.debug("#LocalDir: SkillGlobal: %g\n", oSkillGlobal);
     }
 	else
 	{
       snprintf(PathFilenameBuffer, BUFLEN,
 	    "%sconfig/raceman/extra/skill.xml",GetDataDir());
-      //GfOut("#skill.xml: %s\n", PathFilename);
+      LogSimplix.debug("#skill.xml: %s\n", PathFilename);
       SkillHandle = GfParmReadFile
 	    (PathFilename, GFPARM_RMODE_REREAD);
       if (SkillHandle)
       {
         oSkillGlobal = MAX(0.0,MIN(10.0,GfParmGetNum(SkillHandle,
 		  "skill", "level", (char *) NULL, 10.0)));
-		//GfOut("#DataDir: SkillGlobal: %g\n", oSkillGlobal);
+		LogSimplix.debug("#DataDir: SkillGlobal: %g\n", oSkillGlobal);
 	  }
     }
 
     // Get individual skilling
-    //int SkillEnabled = 0;
     snprintf(PathFilenameBuffer,BUFLEN,"%s/%d/skill.xml",
       BaseParamPath,oIndex);
-	//GfOut("#PathFilename: %s\n", PathFilenameBuffer); // itself
+	LogSimplix.debug("#PathFilename: %s\n", PathFilenameBuffer); // itself
     SkillHandle = GfParmReadFile
 	  (PathFilename, GFPARM_RMODE_REREAD);
     if (SkillHandle)
     {
       oSkillDriver = GfParmGetNum(SkillHandle,"skill","level",0,0.0);
       oSkillDriver = MIN(1.0, MAX(0.0, oSkillDriver));
-      //GfOut("#oSkillDriver: %g\n", oSkillDriver);
+      LogSimplix.debug("#oSkillDriver: %g\n", oSkillDriver);
 
       oDriverAggression = 
 	    GfParmGetNum(SkillHandle, "skill", "aggression", (char *)NULL, 0.0);
-      //GfOut("#oDriverAggression: %g\n", oDriverAggression);
+      LogSimplix.debug("#oDriverAggression: %g\n", oDriverAggression);
     }
   }
   else
   {
 	oSkilling = false;
-    //GfOut("#Skilling: Off\n");
+    LogSimplix.debug("#Skilling: Off\n");
   }
   // ... Global skilling from Andrew Sumner
 };
@@ -1004,7 +1009,7 @@ void TDriver::SetPathAndFilenameForRacinglines()
   oPathToWriteTo = PathToWriteToBuffer;
   if (GfDirCreate(oPathToWriteTo) == GF_DIR_CREATION_FAILED)
   {
-	  //GfOut("#Unable to create path for racinglines: >%s<",oPathToWriteTo);
+	  LogSimplix.debug("#Unable to create path for racinglines: >%s<",oPathToWriteTo);
   };
 
   snprintf(TrackLoadBuffer,sizeof(TrackLoadBuffer),"%s/%d-%s.trk",
@@ -1044,7 +1049,7 @@ void TDriver::InitTrack
   (PTrack Track, PCarHandle CarHandle,
   PCarSettings *CarSettings, PSituation Situation)
 {
-  //GfOut("#\n\n\n#TDriver::InitTrack >>> \n\n\n");
+  LogSimplix.debug("\n#TDriver::InitTrack >>> \n\n");
 
   oTrack = Track;                                // save pointers
   if (TrackLength < 2000)
@@ -1095,29 +1100,27 @@ void TDriver::InitTrack
   oMaxFuel = GfParmGetNum(CarHandle              // Maximal möglicher
     , SECT_CAR, PRM_TANK                         //   Tankinhalt
     , (char*) NULL, 100.0);
-  //GfOut("#oMaxFuel (TORCS)   = %.1f\n",oMaxFuel);
-
-  oMaxPressure = GfParmGetNum(CarHandle          // Maximal möglicher
-    , "Brake System", MAXPRESSURE                //   Bremsdruck
-    , (char*) NULL, (float) oMaxPressure);
-  //GfOut("#oMaxPressure       = %.1f\n",oMaxPressure);
-
-  oBrakeScale *= MAX(1.0,INITIAL_BRAKE_PRESSURE / oMaxPressure);
-  //GfOut("#oBrakeScale       = %.3f\n",oBrakeScale);
-  oBrakeForceMax *= oBrakeScale/INITIAL_BRAKE_SCALE;
-  //GfOut("#oBrakeForceMax    = %.3f\n",oBrakeForceMax);
+  LogSimplix.debug("#oMaxFuel (TORCS)   = %.1f\n",oMaxFuel);
 
   oBrakeLeft = 1.0f;
   oBrakeRight = 1.0f;
+  oBrakeFront = 1.0f;
+  oBrakeRear = 1.0f;
+
   oBrakeRep =									 // Bremsdruckverteilung
 	GfParmGetNum(CarHandle, (char*) SECT_BRKSYST, 
       PRM_BRKREP, (char*)NULL, 0.5);
-  GfOut("# Brake repartition : %0.2f\n",oBrakeRep);
+  LogSimplix.debug("#Brake repartition : %0.2f\n",oBrakeRep);
 
-  oBrakeCorr =
+  oBrakeCorrLR =
 	GfParmGetNum(CarHandle, (char*) SECT_BRKSYST, 
-  	  PRM_BRKCOR, (char*)NULL, 0.03f);
-  GfOut("# Brake correction  : %0.2f\n",oBrakeCorr);
+  	  PRM_BRKCOR_LR, (char*)NULL, 0.0f);
+  LogSimplix.debug("#Brake corr. L./R. : %0.2f\n",oBrakeCorrLR);
+
+  oBrakeCorrFR =
+	GfParmGetNum(CarHandle, (char*) SECT_BRKSYST, 
+      PRM_BRKCOR_FR, (char*)NULL, 0.0f);
+  LogSimplix.debug("#Brake corr. F./R. : %0.2f\n",oBrakeCorrFR);
 
   // Next Params out of the own files
   PCarHandle Handle = NULL;                      // Start with  "empty file"
@@ -1126,16 +1129,13 @@ void TDriver::InitTrack
   // Default params for car type (e.g. .../ROBOT_DIR/sc-petrol/default.xml)
   snprintf(Buf,sizeof(Buf),"%s/%s/default.xml",
     BaseParamPath,oCarType);
-  //GfOut("#Default params for car type: %s\n", Buf);
+  LogSimplix.debug("#Default params for car type: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for track (Pitting) 
   snprintf(Buf,sizeof(Buf),"%s/tracks/%s.xml",
     BaseParamPath,oTrackName);
   Handle = TUtils::MergeParamFile(Handle,Buf);
-  GfOut("#\n");
-  GfOut("#\n");
-  GfOut("#\n");
 
   double ScaleBrake = 0.80f;
   double ScaleMu = 0.95f;
@@ -1147,8 +1147,8 @@ void TDriver::InitTrack
     ScaleMu = GfParmGetNum(Handle,TDriver::SECT_PRIV,
 	  PRV_SCALE__MU,NULL,(float) ScaleMu);
   }
-  //GfOut("#ScaleBrake: %.1f\n",ScaleBrake);
-  //GfOut("#ScaleMu: %.1f\n",ScaleMu);
+  LogSimplix.debug("#ScaleBrake: %.1f\n",ScaleBrake);
+  LogSimplix.debug("#ScaleMu: %.1f\n",ScaleMu);
 
   // Override params for car type with params of track
   snprintf(Buf,sizeof(Buf),"%s/%s/%s.xml",
@@ -1179,10 +1179,25 @@ void TDriver::InitTrack
   *CarSettings = Handle;
 
   // Get the private parameters now.
+  oBrakeRep =									 // Bremsdruckverteilung
+	GfParmGetNum(Handle, (char*) SECT_BRKSYST, 
+      PRM_BRKREP, (char*)NULL, 0.5);
+  LogSimplix.debug("#Brake repartition : %0.2f\n",oBrakeRep);
+
+  oBrakeCorrLR =
+	GfParmGetNum(Handle, (char*) SECT_BRKSYST, 
+  	  PRM_BRKCOR_LR, (char*)NULL, 0.0f);
+  LogSimplix.debug("#Brake corr. L./R. : %0.2f\n",oBrakeCorrLR);
+
+  oBrakeCorrFR =
+	GfParmGetNum(Handle, (char*) SECT_BRKSYST, 
+      PRM_BRKCOR_FR, (char*)NULL, 0.0f);
+  LogSimplix.debug("#Brake corr. F./R. : %0.2f\n",oBrakeCorrFR);
+
   TDriver::LengthMargin =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,
 	PRV_LENGTH_MARGIN,0,LENGTH_MARGIN);
-  //GfOut("#LengthMargin %.2f\n",TDriver::LengthMargin);
+  LogSimplix.debug("#LengthMargin %.2f\n",TDriver::LengthMargin);
 
   // Check test flag:
   const char* ForceLane = GfParmGetStr(Handle,
@@ -1204,7 +1219,7 @@ void TDriver::InitTrack
       || (oSituation->_raceType == RM_TYPE_QUALIF))
 	{
 	  Qualification = true;
-	  //GfOut("#Qualification = True\n");
+	  LogSimplix.debug("#Qualification = True\n");
 	  NBRRL = 1;
 	}
   }
@@ -1247,17 +1262,17 @@ void TDriver::InitTrack
   float Reserve = GfParmGetNum(Handle            // Reserve in m
     , TDriver::SECT_PRIV, PRV_RESERVE
     , (char*) NULL, 2000);
-  //GfOut("#Reserve: %.0f\n",Reserve);
+  LogSimplix.debug("#Reserve: %.0f\n",Reserve);
   oStrategy->oReserve = Reserve;
   oFuelNeeded =
     oStrategy->SetFuelAtRaceStart                // Fueling and pitting
 	  (oTrack,CarSettings,oSituation,Fuel);      //   strategy
-  //GfOut("#oFuelNeeded: %.1f\n",oFuelNeeded);
+  LogSimplix.debug("#oFuelNeeded: %.1f\n",oFuelNeeded);
   // ... Setup initial fuel for race
 
   Meteorology();
 
-  //GfOut("#\n\n\n#<<< TDriver::InitTrack\n\n\n");
+  LogSimplix.debug("\n#<<< TDriver::InitTrack\n\n");
 }
 //==========================================================================*
 
@@ -1270,18 +1285,18 @@ bool TDriver::CheckPitSharing()
 
   if (OwnPit == NULL)                            // If pit is NULL
   {                                              // nothing to do
-	//GfOut("\n\nPit = NULL\n\n");                 // here
+	  LogSimplix.debug("\n\n#Pit = NULL\n\n");                 // here
 	return false;
   }
 
   if (OwnPit->freeCarIndex > 1)
   {
-  	  //GfOut("\n\nPitSharing = true\n\n");    
+	  LogSimplix.debug("\n\n#PitSharing = true\n\n");    
 	  return true;
   }
   else
   {
-  	  //GfOut("\n\nPitSharing = false\n\n");    
+	  LogSimplix.debug("\n\n#PitSharing = false\n\n");    
 	  return false;
   }
 }
@@ -1292,7 +1307,7 @@ bool TDriver::CheckPitSharing()
 //--------------------------------------------------------------------------*
 void TDriver::NewRace(PtCarElt Car, PSituation Situation)
 {
-  //GfOut("#>>> TDriver::NewRace()\n");
+  LogSimplix.debug("#>>> TDriver::NewRace()\n");
   oCar = Car;                                    // Save pointers to TORCS
   oCarHandle = CarCarHandle;                     // data of car, car param
   oSituation = Situation;                        // file and situation
@@ -1335,17 +1350,10 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
 	Param.Tmp.oSkill = oSkill;
   }
 /*
-  else if (oSkilling && (RM_TYPE_RACE == oSituation->_raceType))
-  {
-    Param.oCarParam.oScaleBrake -= 0.1;
-    Param.oCarParam.oScaleMu -= 0.1;
-  }
-*/
-/*
  for (int I = 0; I < 2; I++)
 	cTimeSum[I] = 0.0;
 */
-  //GfOut("#<<< TDriver::NewRace()\n");
+  LogSimplix.debug("#<<< TDriver::NewRace()\n");
 }
 //==========================================================================*
 
@@ -1385,8 +1393,6 @@ void TDriver::Drive()
   GetPosInfo(Pos,oLanePoint);                    // Info about pts on track
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
   oTargetSpeed = FilterStart(oTargetSpeed);      // Filter Start
-  if (oTargetSpeed < 5)
-	  oTargetSpeed = 5.0;
 
   //double TrackRollangle = oRacingLine[oRL_FREE].CalcTrackRollangle(Pos);
   //cTimeSum[0] += RtDuration(StartTimeStamp);
@@ -1404,18 +1410,18 @@ void TDriver::Drive()
   {
 	if (oWingAngleRear != oWingAngleRearBrake)
 	{
-		if (oDriftAngle > PI/32)
+		if (oAbsDriftAngle > PI/32)
 		{
 			oWingAngleRear = oWingAngleRearMax;
 		}
-		else if (oDriftAngle < PI/64)
+		else if (oAbsDriftAngle < PI/64)
 		{
 			oWingAngleRear = oWingAngleRearMin;
 		}
 	}
 	else
 	{
-		if (oDriftAngle < PI/64)
+		if (oAbsDriftAngle < PI/64)
 			oWingAngleRear = oWingAngleRearMax;
 		else
 			oWingAngleRear = oWingAngleRearBrake;
@@ -1428,21 +1434,8 @@ void TDriver::Drive()
   }
   else
   {
-    if(Close)                                    // If opponents are close
-    {
-	  BrakingForceRegulatorTraffic();            // Control breaking force
-    }
-    else if(oStrategy->GoToPit())                // Going to pitlane
-    {
-	  BrakingForceRegulatorTraffic();            // Control breaking force
-    }
-    else
-    {
-	  if (oAvoidRange == 0.0)                    // Still avoiding?
-        BrakingForceRegulator();                 // Control breaking force
-  	  else
-	    BrakingForceRegulatorAvoid();            // Control breaking force
-    }
+	LearnBraking(Pos);
+    BrakingForceController();
     Clutching();                                 // Tread/Release clutch
   }
   GearTronic();                                  // Shift if needed
@@ -1481,7 +1474,7 @@ void TDriver::Drive()
   oLastSteer = oSteer;
   oLastAccel = oAccel;
   oLastBrake = oBrake;
-  oLastDriftAngle = oDriftAngle;
+  oLastAbsDriftAngle = oAbsDriftAngle;
 
   // Tell TORCS what we want do do
   CarAccelCmd = (float) oAccel;
@@ -1506,15 +1499,22 @@ void TDriver::Drive()
   oCar->ctrl.brakeFrontLeftCmd = (float) (oBrake * oBrakeRep * oBrakeLeft * oBrakeFront); 
   oCar->ctrl.brakeRearRightCmd = (float) (oBrake * (1 - oBrakeRep) * oBrakeRight * oBrakeRear); 
   oCar->ctrl.brakeRearLeftCmd = (float) (oBrake * (1 - oBrakeRep) * oBrakeLeft * oBrakeRear); 
-
+/*
+  LogSimplix.error("#v:(%.1f)%.1f km/h (Q: %0.0f%%) (B: %0.0f%%)\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oCurrSpeed/oTargetSpeed*100,CarBrakeCmd*100);
+  LogSimplix.error("#fr:(%.2f)%% fl:(%.2f)%% rr:(%.2f)%% rl:(%.2f)%%)\n",
+	  100 * oCar->ctrl.brakeFrontRightCmd,
+	  100 * oCar->ctrl.brakeFrontLeftCmd,
+	  100 * oCar->ctrl.brakeRearRightCmd,
+	  100 * oCar->ctrl.brakeRearLeftCmd);
+*/
   // ... SIMUV4
 
 /** /
   if (oIndex == 10)
   {
 //    int Idx = oTrackDesc.IndexFromPos(Pos);
-//    GfOut("#%d: P:%.0f(%d) A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",oIndex,Pos,Idx,CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
-    GfOut("#A:%.4f B:%.4f C:%.4f S: %.4f G:%d\n",CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarSteerCmd,CarGearCmd);
+//    LogSimplix.trace("#%d: P:%.0f(%d) A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",oIndex,Pos,Idx,CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
+    LogSimplix.trace("#A:%.4f B:%.4f C:%.4f S: %.4f G:%d\n",CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarSteerCmd,CarGearCmd);
   }
 
   if (oDoAvoid)
@@ -1533,23 +1533,23 @@ void TDriver::Drive()
 
   //if ((oCurrSpeed < 100.0/3.6) && (CurrSimTime > 0) && (CurrSimTime < 10))
   //if (fabs(oLanePoint.Crv) > 1/50.0)
-  //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcHairpin_simplix_36GP(fabs(oLanePoint.Crv)));
+  //  LogSimplix.trace("#t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcHairpin_simplix_36GP(fabs(oLanePoint.Crv)));
   //else
-  //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)));
-  //GfOut("v:(%.1f)%.1f km/h\n",oTargetSpeed*3.6,oCurrSpeed*3.6);
-  //GfOut("v:(%.1f)%.1f km/h R:%.3f m c:%.3f 1/m z:%.3f 1/m\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1/oLanePoint.Crv,oLanePoint.Crv,oLanePoint.Crvz);
+  //  LogSimplix.trace("#t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)));
+  //LogSimplix.trace("#v:(%.1f)%.1f km/h\n",oTargetSpeed*3.6,oCurrSpeed*3.6);
+  //LogSimplix.trace("#v:(%.1f)%.1f km/h R:%.3f m c:%.3f 1/m z:%.3f 1/m\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1/oLanePoint.Crv,oLanePoint.Crv,oLanePoint.Crvz);
 /** /
   int Idx = oTrackDesc.IndexFromPos(Pos);
-  GfOut("#%d: P:%.0f(%d) A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",oIndex,Pos,Idx,CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
+  LogSimplix.trace("#%d: P:%.0f(%d) A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",oIndex,Pos,Idx,CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
   const int N = oTrackDesc.Count();
   double TrackTurnangle1 = oRacingLine[0].CalcTrackTurnangle((Idx + N - 30) % N, Idx);
   double TrackTurnangle2 = oRacingLine[0].CalcTrackTurnangle(Idx, (Idx + 30) % N);
-  GfOut("v:(%.1f)%.1f km/h A1:%.3f A2:%.3f CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,TrackTurnangle1,TrackTurnangle2,oLanePoint.Crvz);
-  GfOut("v:(%.1f)%.1f km/h CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz);
-  GfOut("#A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
-  GfOut("#v:(%.2f)%.2f km/h Radius:%.4fm (%.4f)\n",oTargetSpeed*3.6,oCurrSpeed*3.6,fabs(1.0/oLanePoint.Crv),fabs(oLanePoint.Crv));
-  GfOut("#v:(%.2f)%.2f km/h Radius:%.4fm (%.4f)\n",oTargetSpeed*3.6,oCurrSpeed*3.6,fabs(1.0/oLanePoint.Crv),fabs(oLanePoint.Crv));
- */
+  LogSimplix.trace("#v:(%.1f)%.1f km/h A1:%.3f A2:%.3f CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,TrackTurnangle1,TrackTurnangle2,oLanePoint.Crvz);
+  LogSimplix.trace("#v:(%.1f)%.1f km/h CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz);
+  LogSimplix.trace("#A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
+  LogSimplix.trace("#v:(%.2f)%.2f km/h Radius:%.4fm (%.4f)\n",oTargetSpeed*3.6,oCurrSpeed*3.6,fabs(1.0/oLanePoint.Crv),fabs(oLanePoint.Crv));
+  LogSimplix.trace("#v:(%.2f)%.2f km/h Radius:%.4fm (%.4f)\n",oTargetSpeed*3.6,oCurrSpeed*3.6,fabs(1.0/oLanePoint.Crv),fabs(oLanePoint.Crv));
+*/
 }
 //==========================================================================*
 
@@ -1568,10 +1568,10 @@ int TDriver::PitCmd()
 
 /* This info is now shown by SD
   if (oCar->pitcmd.repair > 0)                   // If repairing, show
-    GfOut("#%s repairing: %d damage\n",           // who and how much
+    LogSimplix.trace("#%s repairing: %d damage\n",           // who and how much
 	  oBotName,oCar->pitcmd.repair);
   if (oCar->pitcmd.fuel > 0.0)                   // If refueling
-    GfOut("#%s refueling: %.2f\n",                // show who and how much
+    LogSimplix.trace("#%s refueling: %.2f\n",                // show who and how much
 	  oBotName,oCar->pitcmd.fuel);
 */
   oFuelNeeded += oCar->pitcmd.fuel;
@@ -1586,9 +1586,9 @@ int TDriver::PitCmd()
 //--------------------------------------------------------------------------*
 void TDriver::EndRace()
 {
-  //GfOut("#TDriver::EndRace() >>>\n");
+  LogSimplix.debug("#TDriver::EndRace() >>>\n");
   oStrategy->PitRelease();                       // Release pit if eliminated
-  //GfOut("#<<< TDriver::EndRace()\n");
+  LogSimplix.debug("#<<< TDriver::EndRace()\n");
 }
 //==========================================================================*
 
@@ -1597,8 +1597,10 @@ void TDriver::EndRace()
 //--------------------------------------------------------------------------*
 void TDriver::Shutdown()
 {
-	RtTeamManagerDump();
-	RtTeamManagerRelease();
+  LogSimplix.debug("#TDriver::Shutdown() >>>\n");
+  RtTeamManagerDump();
+  RtTeamManagerRelease();
+  LogSimplix.debug("#TDriver::Shutdown() <<<\n");
 }
 //==========================================================================*
 
@@ -1644,6 +1646,8 @@ void TDriver::OwnCarOppIndex()
 //--------------------------------------------------------------------------*
 void TDriver::InitDriveTrain()
 {
+  LogSimplix.debug("\n#InitDriveTrain >>>\n\n");
+
   oDriveTrainType = cDT_RWD;                     // Assume rear wheel drive
   const char* TrainType =                        // but check it
 	GfParmGetStr(oCarHandle,
@@ -1653,6 +1657,8 @@ void TDriver::InitDriveTrain()
     oDriveTrainType = cDT_FWD;                   //   change mode
   else if (strcmp(TrainType, VAL_TRANS_4WD) == 0)// and if all wheel drive
     oDriveTrainType = cDT_4WD;                   //   too
+
+  LogSimplix.debug("\n#<<< InitDriveTrain\n\n");
 }
 //==========================================================================*
 
@@ -1672,19 +1678,19 @@ int TDriver::GetWeather()
 //--------------------------------------------------------------------------*
 void TDriver::FindRacinglines()
 {
-  //GfOut("#Update car parameters ...\n");
+  LogSimplix.debug("#Update car parameters ...\n");
   Param.Update();                                // update car parameters
 
-  //GfOut("# ... set track ...\n");
+  LogSimplix.debug("# ... set track ...\n");
   if(oCommonData->Track != oTrackDesc.Track())   // New track?
   {
     oCommonData->Track = oTrackDesc.Track();     // Save pointer
   }
 
-  //GfOut("# ... load smooth path ...\n");
+  LogSimplix.debug("# ... load smooth path ...\n");
   if (oSituation->_raceType == RM_TYPE_PRACTICE)
   {
-    //GfOut("# ... make smooth path ...\n");
+    LogSimplix.debug("# ... make smooth path ...\n");
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode));
@@ -1704,7 +1710,7 @@ void TDriver::FindRacinglines()
 	  &oTrackDesc, Param,                        // as main racingline
 	  TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode)))
 	{
-      //GfOut("# ... make smooth path ...\n");
+      LogSimplix.debug("# ... make smooth path ...\n");
       oRacingLine[oRL_FREE].MakeSmoothPath       // Calculate a smooth path
 	    (&oTrackDesc, Param,                     // as main racingline
 	    TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode));
@@ -1720,7 +1726,7 @@ void TDriver::FindRacinglines()
 	  &oTrackDesc, Param,                        // as main racingline
 	  TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode)))
   {
-    //GfOut("# ... make smooth path ...\n");
+    LogSimplix.debug("# ... make smooth path ...\n");
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode));
@@ -1754,7 +1760,7 @@ void TDriver::FindRacinglines()
 	  &oTrackDesc, Param,                        // avoid to left racingline
 	    TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode, FLT_MAX, -oAvoidWidth, true)))
 	{
-      //GfOut("# ... make avoid path left ...\n");
+      LogSimplix.debug("# ... make avoid path left ...\n");
 
       oRacingLine[oRL_LEFT].MakeSmoothPath       // Avoid to left racingline
 	    (&oTrackDesc, Param,
@@ -1779,7 +1785,7 @@ void TDriver::FindRacinglines()
 	  &oTrackDesc, Param,                        // avoid to right racingline
   	    TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode, -oAvoidWidth, FLT_MAX, true)))
 	{
-      //GfOut("# ... make avoid path right ...\n");
+      LogSimplix.debug("# ... make avoid path right ...\n");
 
 	  oRacingLine[oRL_RIGHT].MakeSmoothPath      // Avoid to right racingline
 	    (&oTrackDesc, Param,
@@ -1798,7 +1804,7 @@ void TDriver::FindRacinglines()
 	{
       for (int I = 0; I < NBRRL; I++)            // Adjust racinglines
       {                                          // using car parameters
-	    //GfOut("# ... adjust pit path %d ...\n",I);
+	    LogSimplix.debug("# ... adjust pit path %d ...\n",I);
         oStrategy->oPit->oPitLane[I].MakePath
 	      (oPitLoad[I],oStrategy,&oRacingLine[I], Param, I);
 
@@ -1811,7 +1817,7 @@ void TDriver::FindRacinglines()
 	  oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
 #endif
 	  oStrategy->oDistToSwitch = MaxPitDist + 125; // Distance to pit entry
-	  //GfOut("\n\nDist to switch: %.02f\n\n", oStrategy->oDistToSwitch);
+	  LogSimplix.debug("\n\n#Dist to switch: %.02f\n\n", oStrategy->oDistToSwitch);
 	}
   }
 
@@ -1821,7 +1827,7 @@ void TDriver::FindRacinglines()
     oRacingLine[I].PropagateBreaking(1);
     oRacingLine[I].PropagateAcceleration(1);
   }
-  //GfOut("# ... Done\n");
+  LogSimplix.debug("# ... Done\n");
 }
 //==========================================================================*
 
@@ -1841,6 +1847,8 @@ void TDriver::TeamInfo()
 //--------------------------------------------------------------------------*
 void TDriver::InitCarModells()
 {
+  LogSimplix.debug("\n#InitCarModells >>>\n");
+
   oCarParams[0] = &Param.oCarParam;              // Get pointers as array
   oCarParams[1] = &Param.oCarParam2;
   oCarParams[2] = &Param.oCarParam2;
@@ -1850,6 +1858,10 @@ void TDriver::InitCarModells()
   Param.SetEmptyMass(                            // Set car mass
 	GfParmGetNum(oCarHandle,
 	  SECT_CAR, PRM_MASS, NULL, 1000.0));
+
+  InitBrake();                                   // Brake
+
+  Param.oCarParam.oBrakeForce = oBrakeForce;
 
   InitCa();                                      // Ca
   InitCw();                                      // Cw
@@ -1861,10 +1873,14 @@ void TDriver::InitCarModells()
   Param.Tmp.oFuel = 0;                           // Still unfueld
   Param.Fix.oWidth = CarWidth;                   // width of car
   Param.oCarParam2 = Param.oCarParam;            // Copy to avoid set
+  Param.oCarParam2.oBrakeForce = oBrakeForce;
   Param.oCarParam2.oScaleMu =                    // Adjust mu scale to
 //	MIN(0.95, 0.9 * Param.oCarParam.oScaleMu);   //   be able to avoid
 	MIN(0.5, 0.9 * Param.oCarParam.oScaleMu);    //   be able to avoid
   Param.oCarParam3 = Param.oCarParam;            // Copy to pit set
+  Param.oCarParam3.oBrakeForce = oBrakeForce;
+
+  LogSimplix.debug("\n#<<< InitCarModells\n");
 }
 //==========================================================================*
 
@@ -1901,9 +1917,8 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
   oDriftAngle =                                  // Actual drift angle
 	atan2(CarSpeedY, CarSpeedX) - CarYaw;
   DOUBLE_NORM_PI_PI(oDriftAngle);                // normalized to +Pi .. -Pi
-  oDriftAngle = fabs(oDriftAngle);               // drift angle needs no sign
-  double DriftAngle2 = MAX(MIN(oDriftAngle * 2, PI),-PI);
-  oCosDriftAngle2 = (float) cos(DriftAngle2);
+  oAbsDriftAngle = fabs(oDriftAngle);            // Often used as fabs
+  oCosDriftAngle2 = (float) cos(MAX(MIN(oAbsDriftAngle * 2, PI),-PI));
 
   // Get direction of motion
   double MySpd = MAX(0.01,myhypot(CarSpeedX, CarSpeedY));
@@ -1927,8 +1942,10 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
     float MinFriction = MIN(WheelSegFriction(REAR_RGT),
 		WheelSegFriction(REAR_LFT));
 	oSideReduction = (float) MIN(1.0,MinFriction / CarFriction);
-	//GfOut("SideReduction: %g\n",oSideReduction);
+	if ((oSideReduction != 1) && (oSideReduction != oLastSideReduction))
+	  LogSimplix.debug("#SideReduction: %g\n",oSideReduction);
   }
+  oLastSideReduction = oSideReduction;
 }
 //==========================================================================*
 
@@ -1956,7 +1973,7 @@ void TDriver::DetectFlight()
   if (oFirstJump)
   {
     oJumpOffset = - oJumping - 0.03;
-	//GfOut("#oJumpOffset: %g\n",oJumpOffset);
+	LogSimplix.debug("#oJumpOffset: %g\n",oJumpOffset);
     oFirstJump = false;
   }
 
@@ -1969,8 +1986,8 @@ void TDriver::DetectFlight()
     oFlying--;
   }
 
-  //if (oJumping > 0)
-  //  //GfOut("#%g\n",oJumping);
+  if ((oJumping > 0) || (oFlying > 0))
+	  LogSimplix.debug("#oJumping: %g %d\n",oJumping,oFlying);
 }
 //==========================================================================*
 
@@ -1999,7 +2016,7 @@ void TDriver::Propagation(int lap)
   if (Param.Tmp.Needed()
 	  || ((oLastLap > 0) && (oLastLap < 5) && (oLastLap != lap)))
   {
-	//GfOut("\n\n\nPropagation\n\n\n");
+	  LogSimplix.debug("\n\n#Propagation\n\n");
     if (oLastLap > 5)
       TDriver::Learning = false;
 
@@ -2042,6 +2059,8 @@ double TDriver::Steering()
 //--------------------------------------------------------------------------*
 void TDriver::InitWheelRadius()
 {
+  LogSimplix.debug("\n#InitWheelRadius >>>\n\n");
+
   int Count = 0;
   oWheelRadius = 0.0;
 
@@ -2057,6 +2076,8 @@ void TDriver::InitWheelRadius()
     Count += 2;
   }
   oWheelRadius /= Count;
+
+  LogSimplix.debug("\n#<<< InitWheelRadius\n\n");
 }
 //==========================================================================*
 
@@ -2065,6 +2086,8 @@ void TDriver::InitWheelRadius()
 //--------------------------------------------------------------------------*
 void TDriver::InitTireMu()
 {
+  LogSimplix.debug("\n#InitTireMu >>>\n\n");
+
   int I;
 
   Param.Fix.oTyreMuFront = FLT_MAX;
@@ -2081,6 +2104,98 @@ void TDriver::InitTireMu()
 
   Param.Fix.oTyreMu =
 	MIN(Param.Fix.oTyreMuFront,Param.Fix.oTyreMuRear);
+
+  LogSimplix.debug("\n#<<< InitTireMu\n\n");
+}
+//==========================================================================*
+
+//==========================================================================*
+// Initialize brake
+//--------------------------------------------------------------------------*
+void TDriver::InitBrake()
+{
+	LogSimplix.debug("\n#Init Brake >>>\n\n");
+
+    float DiameterFront = 
+		GfParmGetNum(oCarHandle, (char*) SECT_FRNTRGTBRAKE, 
+			PRM_BRKDIAM, (char*)NULL, 0.2f);
+    float DiameterRear = 
+		GfParmGetNum(oCarHandle, (char*) SECT_REARRGTBRAKE, 
+			PRM_BRKDIAM, (char*)NULL, 0.2f);
+	LogSimplix.debug("#Brake diameter    : %0.3f m / %0.3f m\n",DiameterFront,DiameterRear);
+
+	float AreaFront = 
+		GfParmGetNum(oCarHandle, (char*) SECT_FRNTRGTBRAKE, 
+			PRM_BRKAREA, (char*)NULL, 0.002f);
+	float AreaRear = 
+		GfParmGetNum(oCarHandle, (char*) SECT_REARRGTBRAKE, 
+			PRM_BRKAREA, (char*)NULL, 0.002f);
+	LogSimplix.debug("#Brake area        : %0.5f m2 / %0.5f m2\n",AreaFront,AreaRear);
+
+	float MuFront
+		= GfParmGetNum(oCarHandle, (char*) SECT_FRNTRGTBRAKE, 
+			PRM_MU, (char*)NULL, 0.30f);
+	float MuRear
+		= GfParmGetNum(oCarHandle, (char*) SECT_REARRGTBRAKE, 
+			PRM_MU, (char*)NULL, 0.30f);
+	LogSimplix.debug("#Brake mu          : %0.5f / %0.5f\n",MuFront, MuRear);
+
+	float Rep =
+		GfParmGetNum(oCarHandle, (char*) SECT_BRKSYST, 
+			PRM_BRKREP, (char*)NULL, 0.5);
+	LogSimplix.debug("#Brake repartition : %0.2f\n",Rep);
+
+	float Press =
+		GfParmGetNum(oCarHandle, (char*) SECT_BRKSYST, 
+			PRM_BRKPRESS, (char*)NULL, 1000000);
+	LogSimplix.debug("#Brake pressure    : %0.0f\n",Press);
+
+    float MaxPressRatio = 
+		GfParmGetNum(oCarHandle, TDriver::SECT_PRIV, 
+			PRV_MAX_BRAKING, (char*)NULL, (float) oBrakeMaxPressRatio);
+	LogSimplix.debug("#Max press ratio   : %0.7f\n",MaxPressRatio);
+    
+    float BrakeCoeffFront = (float) (DiameterFront * 0.5 * AreaFront * MuFront);
+    float BrakeCoeffRear = (float) (DiameterRear * 0.5 * AreaRear * MuRear);
+	LogSimplix.debug("#Brake coefficient : %0.7f / %0.7f\n",BrakeCoeffFront,BrakeCoeffRear);
+
+	oBrakeMaxTqFront = MaxPressRatio * BrakeCoeffFront * Press * Rep;
+	LogSimplix.debug("#Brake torque front: %0.2f\n",oBrakeMaxTqFront);
+
+	oBrakeMaxTqRear = MaxPressRatio * BrakeCoeffRear * Press * (1 - Rep);
+	LogSimplix.debug("#Brake torque rear : %0.2f\n",oBrakeMaxTqRear);
+
+	oBrakeForce = (3*oBrakeMaxTqFront * (WheelRad(FRNT_LFT) + WheelRad(FRNT_RGT)) 
+		+ oBrakeMaxTqRear * (WheelRad(REAR_LFT) + WheelRad(REAR_RGT)))/4; 
+	LogSimplix.debug("#Brake force       : %0.2f\n",oBrakeForce);
+
+    oPIDCBrake.oP = 
+		GfParmGetNum(oCarHandle, TDriver::SECT_PRIV, 
+			"BC_P", (char*)NULL, (float) oPIDCBrake.oP);
+	LogSimplix.debug("#BC_P              : %0.5f\n",oPIDCBrake.oP);
+
+	oPIDCBrake.oI = 
+		GfParmGetNum(oCarHandle, TDriver::SECT_PRIV, 
+			"BC_I", (char*)NULL, (float) oPIDCBrake.oI);
+	LogSimplix.debug("#BC_I              : %0.5f\n",oPIDCBrake.oI);
+
+	oPIDCBrake.oD = 
+		GfParmGetNum(oCarHandle, TDriver::SECT_PRIV, 
+			"BC_D", (char*)NULL, (float) oPIDCBrake.oD);
+	LogSimplix.debug("#BC_D              : %0.5f\n",oPIDCBrake.oD);
+
+	oPIDCBrake.oMaxTotal = 
+		GfParmGetNum(oCarHandle, TDriver::SECT_PRIV, 
+			"BC_MAX", (char*)NULL, (float) oPIDCBrake.oMaxTotal);
+	LogSimplix.debug("#BC_MAX            : %0.5f\n",oPIDCBrake.oMaxTotal);
+
+	oPIDCBrake.oMinTotal = 
+		GfParmGetNum(oCarHandle, TDriver::SECT_PRIV, 
+			"BC_MIN", (char*)NULL, (float) oPIDCBrake.oMinTotal);
+	LogSimplix.debug("#BC_MIN            : %0.5f\n",oPIDCBrake.oMinTotal);
+
+	LogSimplix.debug("\n#<<< Init Brake\n\n");
+
 }
 //==========================================================================*
 
@@ -2089,6 +2204,7 @@ void TDriver::InitTireMu()
 //--------------------------------------------------------------------------*
 void TDriver::InitCa()
 {
+  LogSimplix.debug("\n#Init InitCa >>>\n\n");
   float FrontWingArea =
 	GfParmGetNum(oCarHandle, SECT_FRNTWING,
 	  PRM_WINGAREA, (char*) NULL, 0.0);
@@ -2098,7 +2214,7 @@ void TDriver::InitCa()
 //  bool FrontWingAngleVariable =
 //	GfParmGetNum(oCarHandle, SECT_FRNTWING,
 //	  PRM_WINGANGLEVARIABLE, (char*) NULL, 0) > 0;
-  //GfOut("#FrontWingAngle %g\n",FrontWingAngle * 180 / PI);
+  LogSimplix.debug("#FrontWingAngle %g\n",FrontWingAngle * 180 / PI);
   float RearWingArea =
 	GfParmGetNum(oCarHandle, SECT_REARWING,
 	  PRM_WINGAREA, (char*) NULL, 0.0f);
@@ -2108,7 +2224,7 @@ void TDriver::InitCa()
 //  bool RearWingAngleVariable =
 //	GfParmGetNum(oCarHandle, SECT_REARWING,
 //	   PRM_WINGANGLEVARIABLE, (char*) NULL, 0) > 0;
-  //GfOut("#RearWingAngle %g\n",RearWingAngle * 180 / PI);
+  LogSimplix.debug("#RearWingAngle %g\n",RearWingAngle * 180 / PI);
 
   oWingAngleFront = FrontWingAngle;						
   oWingAngleRear = RearWingAngle;						
@@ -2151,6 +2267,7 @@ void TDriver::InitCa()
   Param.Fix.oCaRearWing = 4 * 1.23 * RearWingArea;
   Param.Fix.oCaGroundEffect = H * CL;
 
+  LogSimplix.debug("\n#<<< Init InitCa\n\n");
 }
 //==========================================================================*
 
@@ -2159,6 +2276,8 @@ void TDriver::InitCa()
 //--------------------------------------------------------------------------*
 void TDriver::InitCw()
 {
+  LogSimplix.debug("\n#Init InitCw >>>\n\n");
+
   float Cx =
 	GfParmGetNum(oCarHandle,
 	SECT_AERODYNAMICS, PRM_CX, (char*) NULL, 0.0f);
@@ -2167,6 +2286,8 @@ void TDriver::InitCw()
 	SECT_AERODYNAMICS, PRM_FRNTAREA, (char*) NULL, 0.0f);
 
   Param.Fix.oCdBody = 0.645 * Cx * FrontArea;
+
+  LogSimplix.debug("\n#<<< Init InitCw\n\n");
 }
 //==========================================================================*
 
@@ -2328,7 +2449,7 @@ void TDriver::Meteorology()
 //--------------------------------------------------------------------------*
 void TDriver::InitAdaptiveShiftLevels()
 {
-  //GfOut("#TDriver::InitShiftLevels() >>>\n");
+  LogSimplix.debug("\n#InitAdaptiveShiftLevels >>>\n");
 
   struct tEdesc
   {
@@ -2423,9 +2544,9 @@ void TDriver::InitAdaptiveShiftLevels()
 	Data->b = Edesc[I].tq - Data->a * Edesc[I].rpm;
   }
 
-  //GfOut("#\n\n\n#oStartRPM: %g(%g)\n",oStartRPM*RpmFactor,oStartRPM);
-  //GfOut("#RevsLimiter: %g(%g)\n",RevsLimiter*RpmFactor,RevsLimiter);
-  //GfOut("#RevsMax: %g(%g)\n\n\n",RevsMax*RpmFactor,RevsMax);
+  LogSimplix.debug("\n\n\n#oStartRPM: %g(%g)\n",oStartRPM*RpmFactor,oStartRPM);
+  LogSimplix.debug("#RevsLimiter: %g(%g)\n",RevsLimiter*RpmFactor,RevsLimiter);
+  LogSimplix.debug("#RevsMax: %g(%g)\n\n\n",RevsMax*RpmFactor,RevsMax);
   
 
   for (I = 0; I < CarGearNbr - 1; I++)
@@ -2482,8 +2603,8 @@ void TDriver::InitAdaptiveShiftLevels()
 		{
           ToRpm[J] = RpmNext;
 		  oShift[J] = Rpm * 0.98;
-		  GfOut("#TqNext > Tq\n");
-  		  GfOut("#%d/%d: %g(%g) -> %g(%g)\n", J,I, Rpm*RpmFactor,Tq,RpmNext*RpmFactor,TqNext);
+		  LogSimplix.debug("#TqNext > Tq\n");
+  		  LogSimplix.debug("#%d/%d: %g(%g) -> %g(%g)\n", J,I, Rpm*RpmFactor,Tq,RpmNext*RpmFactor,TqNext);
 		  break;
 		}
  	    Rpm += 1;
@@ -2491,14 +2612,15 @@ void TDriver::InitAdaptiveShiftLevels()
 
   }
   
-  GfOut("#Gear change summary:\n");
+  LogSimplix.info("#Gear change summary:\n");
   for (J = 1; J < oLastGear; J++)
-    GfOut("#%d: Rpm: %g(%g) -> Rpm: %g(%g)\n",
+    LogSimplix.info("#%d: Rpm: %g(%g) -> Rpm: %g(%g)\n",
       J,oShift[J]*RpmFactor,oShift[J],ToRpm[J]*RpmFactor,ToRpm[J]);
 
   free(DataPoints);
   free(Edesc);
-  //GfOut("#<<< TDriver::InitShiftLevels()\n");
+
+  LogSimplix.debug("\n#<<< InitAdaptiveShiftLevels\n");
 }
 //==========================================================================*
 
@@ -2570,11 +2692,11 @@ void TDriver::GetLanePoint(int Path, double Pos, TLanePoint& LanePoint)
 {
 /*
   if (oStrategy->GoToPit()) 
-    GfOut("*");
+    LogSimplix.debug("*");
   else if (oStrategy->oPit->oPitLane[Path].ContainsPos(Pos)) 
-	GfOut("#");
+	LogSimplix.debug("#");
   else
-    GfOut("O");
+    LogSimplix.debug("O");
 */
   if (oStrategy->oPit != NULL 
 	&& oStrategy->oPit->HasPits()
@@ -2582,7 +2704,7 @@ void TDriver::GetLanePoint(int Path, double Pos, TLanePoint& LanePoint)
 	&& oStrategy->GoToPit() 
 	&& oStrategy->oPit->oPitLane[Path].ContainsPos(Pos))
   {
-    //GfOut("+");
+    //LogSimplix.debug("+");
     oStrategy->oPit->oPitLane[Path].GetLanePoint(Pos, LanePoint);
 	oLookScale = 0.05;
 	oOmegaScale = 0.2;
@@ -2595,7 +2717,7 @@ void TDriver::GetLanePoint(int Path, double Pos, TLanePoint& LanePoint)
 	&& oStrategy->oWasInPit
 	&& oStrategy->oPit->oPitLane[Path].ContainsPos(Pos))
   {
-    //GfOut("-");
+    //LogSimplix.debug("-");
     oStrategy->oPit->oPitLane[Path].GetLanePoint(Pos, LanePoint);
 	oLookScale = 0.02;
 	oOmegaScale = 0.2;
@@ -2605,7 +2727,7 @@ void TDriver::GetLanePoint(int Path, double Pos, TLanePoint& LanePoint)
   }
   else
   {
-    //GfOut("=");
+    //LogSimplix.debug("=");
     oRacingLine[Path].GetLanePoint(Pos, LanePoint);
 	oLookScale = oLookAheadFactor;
 	oOmegaScale = oOmegaAheadFactor;
@@ -2803,16 +2925,15 @@ double TDriver::UnstuckSteerAngle
 //==========================================================================*
 
 //==========================================================================*
-// Control brake press
+// Learn brake at current speed
 //--------------------------------------------------------------------------*
-void TDriver::BrakingForceRegulator()
+void TDriver::LearnBraking(double Pos)
 {
   if (TDriver::Learning)
   {
     Tdble Err = 0.0;
     if(oLastBrake && oLastTargetSpeed)
     {
-      double Pos = oTrackDesc.CalcPos(oCar);       // Get current track pos
       int PosIdx = oTrackDesc.IndexFromPos(Pos);
       if (PosIdx != oLastPosIdx)
 	  {
@@ -2821,8 +2942,7 @@ void TDriver::BrakingForceRegulator()
 	    if (fabs(Err) > 8.0)
   	    {
 	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
-//  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.5);
-  	      /*double Friction = */ oTrackDesc.LearnFriction(PosIdx, Delta, 0.9);
+  	      oTrackDesc.LearnFriction(PosIdx, Delta, 0.9);
 		  oLastPosIdx = PosIdx;
 	    }
   	  }
@@ -2831,158 +2951,35 @@ void TDriver::BrakingForceRegulator()
 		  MIN(2.0,oBrakeCoeff[oLastBrakeCoefIndex]));
     }
   }
+}
+//==========================================================================*
 
-  double Diff = oCurrSpeed - oTargetSpeed;
+//==========================================================================*
+// Brake force controller
+//--------------------------------------------------------------------------*
+void TDriver::BrakingForceController()
+{
+  int	B = (int) MIN(NBR_BRAKECOEFF,(floor(oCurrSpeed/2)));
+  double Diff = 2 * oBrakeCoeff[B] * (oCurrSpeed - oTargetSpeed);
 
-  if (Diff > 0.0)
+  oBrake = MIN(oBrakeMaxPressRatio,MAX(0.0,oPIDCBrake.Sample(Diff*Diff*Diff)));
+
+  if (Diff < 0)
   {
-    if (Diff > oBrakeDiffInitial)
-	{
-	  oAccel = 0;
-      oBrake = MIN(oBrakeForceMax,Diff * Diff / oBrakeScale);
-	}
-	else
-	{
-	  if (oTargetSpeed > 1)
-	  {
-	    oAccel = MIN(oAccel, 0.25);
-		oBrake = 0.0;
-	  }
-	  else
-	  {
-		oAccel = 0;
-		oBrake = 0.1;
-	  }
-	}
+    oBrake = 0;
   }
-
-  if ((oLastBrake > 0)
-	&& (oBrake > 0)
-	&& (Diff < 2))
+  else if ((oBrake > 0) && (Diff < 0.1))
   {
 	oBrake = 0;
 	oAccel = 0.06;
   }
 
-  oBrake *= (1 + MAX(0.0,(oCurrSpeed - 40.0)/40.0));
-  oLastTargetSpeed = oTargetSpeed;
-}
-//==========================================================================*
-
-//==========================================================================*
-// Control brake press while avoiding
-//--------------------------------------------------------------------------*
-void TDriver::BrakingForceRegulatorAvoid()
-{
-  if (TDriver::Learning)
+  if (oBrake > 0)
   {
-    Tdble Err = 0.0;
-    if(oLastBrake && oLastTargetSpeed)
-    {
-      double Pos = oTrackDesc.CalcPos(oCar);       // Get current track pos
-      int PosIdx = oTrackDesc.IndexFromPos(Pos);
-      if (PosIdx != oLastPosIdx)
-	  {
-	    double TargetSpeed = oTrackDesc.InitialTargetSpeed(PosIdx);
-        Err = (float) (oCurrSpeed - TargetSpeed);
-	    if (fabs(Err) > 8.0)
-  	    {
-	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
-//  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.5);
-  	      /*double Friction = */oTrackDesc.LearnFriction(PosIdx, Delta, 0.9);
-  		  oLastPosIdx = PosIdx;
-	    }
-	  }
-
-      oBrakeCoeff[oLastBrakeCoefIndex] += (float)(Err * 0.002);
-      oBrakeCoeff[oLastBrakeCoefIndex] = (float) MAX(0.5f,
-		  MIN(2.0,oBrakeCoeff[oLastBrakeCoefIndex]));
-	}
-  }
-
-  double Diff = oCurrSpeed - oTargetSpeed;
-
-  if (Diff > 0.0)
-  {
-    if (Diff > 1.0)
-	{
-	  oAccel = 0;
-      oBrake = MIN(oBrakeForceMax,Diff * Diff / oBrakeScale);
-	}
-	else
-	{
-	  if (oTargetSpeed > 1)
-	  {
-		oAccel = MIN(oAccel, 0.25);
-        oBrake = 0.0;
-	  }
-	  else
-	  {
-		oAccel = 0;
-		oBrake = 0.1;
-	  }
-	}
-  }
-
-  oBrake *= (1 + MAX(0.0,(oCurrSpeed - 40.0)/40.0));
-
-  if (oMinDistLong < 10.0)
-	oBrake *= 1.1;
-
-  oLastTargetSpeed = oTargetSpeed;
-}
-//==========================================================================*
-
-//==========================================================================*
-// Control brake press in traffic
-//--------------------------------------------------------------------------*
-void TDriver::BrakingForceRegulatorTraffic()
-{
-  if (TDriver::Learning)
-  {
-    Tdble Err = 0.0;
-    if(oLastBrake && oLastTargetSpeed)
-    {
-      double Pos = oTrackDesc.CalcPos(oCar);       // Get current track pos
-      int PosIdx = oTrackDesc.IndexFromPos(Pos);
-      if (PosIdx != oLastPosIdx)
-	  {
-	    double TargetSpeed = oTrackDesc.InitialTargetSpeed(PosIdx);
-        Err = (float) (oCurrSpeed - TargetSpeed);
-	    if (fabs(Err) > 8.0)
-  	    {
-	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
-  	      /*double Friction = */oTrackDesc.LearnFriction(PosIdx, Delta, 0.90);
-  		  oLastPosIdx = PosIdx;
-	    }
-	  }
-      oBrakeCoeff[oLastBrakeCoefIndex] += (float)(Err * 0.002);
-      oBrakeCoeff[oLastBrakeCoefIndex] = (float) MAX(0.5f,
-		  MIN(2.0,oBrakeCoeff[oLastBrakeCoefIndex]));
-    }
-  }
-
-  double Diff = oCurrSpeed - oTargetSpeed;
-
-  if (Diff > 0.0)
-  {
-	int	B = (int) MIN(NBR_BRAKECOEFF,(floor(oCurrSpeed/2)));
 	oAccel = 0;
-	oBrake = MAX(0, MIN(1.2 * oBrakeCoeff[B] * Diff * Diff, oBrakeForceMax));
-	oLastBrakeCoefIndex = B;
-	oLastTargetSpeed = 0;
-
-	if ((oBrake > 0) && (oBrake < oBrakeForceMax))
-	{
-	  if (oTargetSpeed > 0)
-		oLastTargetSpeed = oTargetSpeed;
-	}
+    //LogSimplix.error("#Diff: %.3f m/s B: %.3f %% T: %.1f R: %.3f %%\n",
+	//  Diff,oBrake*100,oPIDCBrake.oTotal,oBrakeMaxPressRatio);
   }
-
-  oBrake *= (1 + MAX(0.0,(oCurrSpeed - 40.0)/40.0));
-
-  if (oMinDistLong < 10.0)
-	oBrake *= 1.1;
 
   oLastTargetSpeed = oTargetSpeed;
 }
@@ -3124,7 +3121,7 @@ void TDriver::EvaluateCollisionFlags(
   {	
 	  IsLapper = true;
 	  Coll.LappersBehind |= OppInfo.State.CarDistLat < 0 ? F_LEFT : F_RIGHT;
-	  //GfOut("F_LAPPER 2\n");
+	  LogSimplix.debug("#F_LAPPER 2\n");
   }
 
   if (oTeamEnabled) 
@@ -3292,7 +3289,7 @@ void TDriver::Runaround(double Scale, double Target, bool DoAvoid)
 	oAvoidOffset = Target;                       // Target reached
  	oAvoidOffsetDelta = 0.0;                     // Stop changing
   }
-  //GfOut("Avoid R/O %.3f/%.3f\n",oAvoidRange,oAvoidOffset);
+  //LogSimplix.debug("#Avoid R/O %.3f/%.3f\n",oAvoidRange,oAvoidOffset);
 }
 //==========================================================================*
 
@@ -3550,48 +3547,41 @@ double TDriver::FilterBrake(double Brake)
   oBrakeFront = 1.0f;
   oBrakeRear = 1.0f;
 
-  // If braking, decrease braking force while drifting
-  if((CarSpeedLong > SLOWSPEED) && (Brake > 0.0))
-  {
-    double DriftAngle = MAX(MIN(oDriftAngle * 2, PI),-PI);
-    Brake *= MAX(0.1, cos(DriftAngle));
-  }
-
-  // SimuV4
+  // EPS system for use with SimuV4 ...
   if((CarSpeedLong > SLOWSPEED) && (Brake > 0.0))
   {
 	Brake *= (float) MAX(0.1, oCosDriftAngle2);
 	if (oDriftAngle > 4.0/180.0*PI)
 	{
-	  oBrakeLeft = 1.0f + 0.3f;
-	  oBrakeRight = 1.0f - 0.3f;
-	  oBrakeFront = 1.0f + oBrakeCorr;
-	  oBrakeRear = 1.0f - oBrakeCorr;
-	  //GfOut("BL+ BR- %.3f\n",oDriftAngle*180/PI);
+	  oBrakeLeft = 1.0f + oBrakeCorrLR;
+	  oBrakeRight = 1.0f - oBrakeCorrLR;
+	  oBrakeFront = 1.0f + oBrakeCorrFR;
+	  oBrakeRear = 1.0f - oBrakeCorrFR;
+	  LogSimplix.debug("#BL+ BR- %.3f deg\n",oDriftAngle*180/PI);
 	}
 	else if (oDriftAngle > 2.0/180.0*PI)
 	{
-	  oBrakeLeft = 1.0f + 0.3f;
-	  oBrakeRight = 1.0f - 0.3f;
+	  oBrakeLeft = 1.0f + oBrakeCorrLR;
+	  oBrakeRight = 1.0f - oBrakeCorrLR;
 	  oBrakeFront = 1.0f;
 	  oBrakeRear = 1.0f;
-	  //GfOut("BL+ BR- %.3f\n",oDriftAngle*180/PI);
+	  LogSimplix.debug("#BL+ BR- %.3f deg\n",oDriftAngle*180/PI);
 	}
 	else if (oDriftAngle < -4.0/180.0*PI)
 	{
-	  oBrakeRight = 1.0f + 0.3f;
-	  oBrakeLeft = 1.0f - 0.3f;
-	  oBrakeFront = 1.0f + oBrakeCorr;
-	  oBrakeRear = 1.0f - oBrakeCorr;
-	  //GfOut("BL- BR+ %.3f\n",oDriftAngle*180/PI);
+	  oBrakeRight = 1.0f + oBrakeCorrLR;
+	  oBrakeLeft = 1.0f - oBrakeCorrLR;
+	  oBrakeFront = 1.0f + oBrakeCorrFR;
+	  oBrakeRear = 1.0f - oBrakeCorrFR;
+	  LogSimplix.debug("#BL- BR+ %.3f deg\n",oDriftAngle*180/PI);
 	}
 	else if (oDriftAngle < -2.0/180.0*PI)
 	{
-	  oBrakeRight = 1.0f + 0.3f;
-	  oBrakeLeft = 1.0f - 0.3f;
+	  oBrakeRight = 1.0f + oBrakeCorrLR;
+	  oBrakeLeft = 1.0f - oBrakeCorrLR;
 	  oBrakeFront = 1.0f;
 	  oBrakeRear = 1.0f;
-	  //GfOut("BL- BR+ %.3f\n",oDriftAngle*180/PI);
+	  LogSimplix.debug("#BL- BR+ %.3f deg\n",oDriftAngle*180/PI);
 	}
 	else
 	{
@@ -3599,10 +3589,12 @@ double TDriver::FilterBrake(double Brake)
 	  oBrakeLeft = 1.0f;
 	  oBrakeFront = 1.0f;
 	  oBrakeRear = 1.0f;
-	  //GfOut("BR = BL %.3f\n",oDriftAngle*180/PI);
+	  //LogSimplix.debug("#BR = BL %.3f°\n",oDriftAngle*180/PI);
 	}
   }
+  // ... EPS system for use with SimuV4
 
+  // Limit the brake press a start of braking
   if (oLastAccel > 0)
     return MIN(0.10,Brake);
 
@@ -3723,7 +3715,7 @@ double TDriver::FilterLetPass(double Accel)
       Accel = MIN(Accel, 0.3);
 	else
       Accel = MIN(Accel, 0.5);
-    //GfOut("LetPass %g\n",Accel);
+	LogSimplix.debug("#LetPass %g\n",Accel);
   }
   return MIN(1.0,Accel);
 }
@@ -3737,7 +3729,7 @@ double TDriver::FilterDrifting(double Accel)
   if(CarSpeedLong < SLOWSPEED)
     return Accel;
 
-  double Drifting = oDriftAngle;
+  double Drifting = oAbsDriftAngle;
   double DriftFactor = oDriftFactor;
 
   if (oRain)
@@ -3748,7 +3740,7 @@ double TDriver::FilterDrifting(double Accel)
 
   // Decrease accelleration while drifting
   double DriftAngle = MAX(MIN(Drifting * 1.75, PI - 0.01),-PI + 0.01);
-  if (oDriftAngle > oLastDriftAngle)
+  if (oAbsDriftAngle > oLastAbsDriftAngle)
     Accel /= (DriftFactor * 150 * ( 1 - cos(DriftAngle)));
   else
     Accel /= (DriftFactor * 50 * ( 1 - cos(DriftAngle)));
@@ -3795,7 +3787,7 @@ bool TDriver::IsStuck()
     oSysFooStuckX->Reset();
     oSysFooStuckY->Reset();
     oStuckCounter--;                             //   decrement counter
-    //GfOut("#Driving back! %d\n",oStuckCounter);
+    LogSimplix.debug("#Driving back! %d\n",oStuckCounter);
     return true;                                 //   and drive
   }
 
@@ -3814,12 +3806,12 @@ bool TDriver::IsStuck()
 	if (oStuckCounter == 0)
 	{
       oStuckCounter = -UNSTUCK_COUNTER;          // Set counter
-	  //GfOut("#Set! %d\n",oStuckCounter);
+	  LogSimplix.debug("#Set! %d\n",oStuckCounter);
 	}
 
 	if (oStanding)                               // But if flag is set
 	{                                            //   it is planned!
-	  //GfOut("#Standing! %d\n",oStuckCounter);
+	  LogSimplix.debug("#Standing! %d\n",oStuckCounter);
 	  oSysFooStuckX->Reset();                    // Clear buffers
 	  oSysFooStuckY->Reset();                    //   of motion survey
       return false;                              //   and signal ok
@@ -3834,23 +3826,23 @@ bool TDriver::IsStuck()
 		if (oStuckCounter == 0)
 	    {
           oStuckCounter = UNSTUCK_COUNTER;       // Set counter
-  	      //GfOut("#Stuck1! %d\n",oStuckCounter);
+  	      LogSimplix.debug("#Stuck1! %d\n",oStuckCounter);
           return true;                           // give signal stuck
 	    }
-	    //GfOut("#Unstucking! %d\n",oStuckCounter);
+	    LogSimplix.debug("#Unstucking! %d\n",oStuckCounter);
         return false;                            //   and signal ok
 	  }
 	  else                                       // still stuck
 	  {
         oStuckCounter = UNSTUCK_COUNTER;         // Set counter
-  	    //GfOut("#Stuck1! %d\n",oStuckCounter);
+  	    LogSimplix.debug("#Stuck1! %d\n",oStuckCounter);
         return true;                             // give signal stuck
 	  }
 	}
     else                                         // if not
 	{
       oStuckCounter = UNSTUCK_COUNTER;           // Set counter
-	  //GfOut("#Stuck! %d\n",oStuckCounter);
+	  LogSimplix.debug("#Stuck! %d\n",oStuckCounter);
       return true;                               // give signal stuck
 	}
   }
@@ -3923,12 +3915,13 @@ double TDriver::CalcSkill(double TargetSpeed)
         oBrakeAdjustPerc -= 
 		  MIN(oSituation->deltaTime*2, oBrakeAdjustPerc - oBrakeAdjustTarget);
     }
-	//GfOut("TS: %g DAP: %g (%g)",
-	//  TargetSpeed,oDecelAdjustPerc,(1 - oDecelAdjustPerc/10));
+	LogSimplix.debug("#TS: %g DAP: %g (%g)",
+	  TargetSpeed,oDecelAdjustPerc,(1 - oDecelAdjustPerc/10));
     TargetSpeed *= (1 - oSkill/oSkillMax * oDecelAdjustPerc/20);
-	//GfOut("TS: %g\n",TargetSpeed);
+	LogSimplix.debug("#TS: %g\n",TargetSpeed);
+
+    LogSimplix.debug("#%g %g\n",oDecelAdjustPerc,(1 - oDecelAdjustPerc/10));
   }
-  //GfOut("%g %g\n",oDecelAdjustPerc,(1 - oDecelAdjustPerc/10));
   return TargetSpeed;
 }
 //==========================================================================*
@@ -4318,6 +4311,47 @@ double TDriver::CalcFriction_simplix_LP1(const double Crv)
   return FrictionFactor * oXXX;
 }
 
+//==========================================================================*
+
+//==========================================================================*
+// simplix
+//--------------------------------------------------------------------------*
+double TDriver::CalcFriction_simplix_REF(const double Crv)
+{
+  double AbsCrv = fabs(Crv);
+
+  if (AbsCrv > 1/12.0)
+	oXXX = 0.60;
+  else if ((AbsCrv > 1/15.0) && (oXXX > 0.65))
+	oXXX = 0.65;
+  else if ((AbsCrv > 1/18.0) && (oXXX > 0.75))
+	oXXX = 0.75;
+  else if ((AbsCrv > 1/19.0) && (oXXX > 0.83))
+	oXXX = 0.83;
+  else if ((AbsCrv > 1/20.0) && (oXXX > 0.90))
+	oXXX = 0.90;
+  else
+	oXXX = MIN(1.0,oXXX+0.0003);
+
+  double FrictionFactor = 0.95;
+
+  if (AbsCrv > 0.10)
+    FrictionFactor = 0.44;
+  else if (AbsCrv > 0.05)
+    FrictionFactor = 0.53;
+  else if (AbsCrv > 0.045)
+    FrictionFactor = 0.74;
+  else if (AbsCrv > 0.03)
+    FrictionFactor = 0.83;
+  else if (AbsCrv > 0.02)
+    FrictionFactor = 0.92;
+  else if (AbsCrv > 0.01)
+    FrictionFactor = 0.93;
+  else if (AbsCrv > 0.005)
+    FrictionFactor = 0.95;
+
+  return FrictionFactor * oXXX;
+}
 //==========================================================================*
 
 //==========================================================================*

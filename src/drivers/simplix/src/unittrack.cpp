@@ -10,10 +10,10 @@
 // 
 // File         : unittrack.cpp 
 // Created      : 2007.11.17
-// Last changed : 2011.06.07
+// Last changed : 2013.03.02
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.02.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Stellt Funktionen zur Streckenbeschreibung zur Verfügung
 //--------------------------------------------------------------------------*
@@ -449,18 +449,12 @@ void TTrackDescription::InitTrack
 	LastSeg = Seg;                               // Save last segment
     if (LastSeg->type != TR_STR)                 // if it was a curve
 	{                                            // save last type and
-	  //LastSegType = LastSeg->type;               // reset counter
 	  N = 0;
 	}
 	else                                         // increase counter
       N++;                                       //   on straights
 
-	//if (N > 10)                                  // After 10 sections 
-	//  LastSegType = LastSeg->type;               //   reset
-
     Seg = oSections[I].Seg;                      // Get torcs segment
-	//if (strncmp(Seg->name,"S7",2) == 0)
-	//  GfOut("%s\n",Seg->name);
 
 	double DistFromStart =                       // Distance from start
       oSections[I].DistFromStart;                //   of section
@@ -492,9 +486,6 @@ void TTrackDescription::InitTrack
 	  tTrackSeg* PSide = Seg->side[S];           // Side-segment
 	  if (PSide == NULL)                         // If NULL no side
 		continue;                                //   go to next segment
-
-	  //if (PSide->raceInfo & TR_SPEEDLIMIT) 
-	  //  GfOut("%s SL\n",Seg->name);
 
 	  double ExtraW = 0;                         // Initialize add. width
 	  double ExtraWpit = 0;                      // Initialize add. width

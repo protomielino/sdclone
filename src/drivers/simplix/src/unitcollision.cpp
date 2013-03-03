@@ -9,10 +9,10 @@
 //
 // File         : unitcollision.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.02
+// Last changed : 2013.03.02
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -101,7 +101,7 @@ double TCollision::AvoidTo
 	  Offset = 0.5 *                             // Offset is an estimate
 		(Coll.MinRSideDist - Coll.MinLSideDist)  //   of where this is.
 		- CarToMiddle;
-	  //GfOut("Go between0: %g\n",Offset);
+	  LogSimplix.debug("Go between0: %g\n",Offset);
 	}
 	else if (Coll.OppsAhead)                     // Opponents in front?
 	{ // Choose side that has potential of overtaking the car ahead
@@ -110,14 +110,14 @@ double TCollision::AvoidTo
 	  {
 		Offset = -(Coll.MinLDist - 0.5)          // Take remaining place           
 		  - CarToMiddle;
-		//GfOut("Go between1: %g\n",Offset);
+		LogSimplix.debug("Go between1: %g\n",Offset);
 	  }
 	  else if ((Coll.OppsAhead == F_RIGHT)       // Opponent ahead is right
 		&& (Flags == F_LEFT))                    //   and another left?
 	  {
 		Offset = (Coll.MinRDist - 0.5)           // Take remaining place           
 		  - CarToMiddle;
-		//GfOut("Go between2: %g\n",Offset);
+		LogSimplix.debug("Go between2: %g\n",Offset);
 	  }
 	  else if (Coll.OppsAhead == F_LEFT)         // Opponent ahead is left
 	  {
@@ -126,11 +126,11 @@ double TCollision::AvoidTo
 	      Offset = 0.5 *                         // Take remaining place           
 		    (3 - Coll.MinLSideDist)              
 		    - CarToMiddle;
-		  //GfOut("Go to right2: %g\n",Offset);
+		  LogSimplix.debug("Go to right2: %g\n",Offset);
 		}
 		else
 		{
-          //GfOut("AvoidTo1: %g\n",AvoidTo);
+          LogSimplix.debug("AvoidTo1: %g\n",AvoidTo);
 	      return AvoidTo;                        // Do not Avoid
 		}
 	  }
@@ -141,17 +141,17 @@ double TCollision::AvoidTo
 	      Offset = 0.5 *                         // Take remaining place           
 		    (Coll.MinRSideDist - 3)                 
 		    - CarToMiddle;
-		  //GfOut("Go to left2: %g\n",Offset);
+		  LogSimplix.debug("Go to left2: %g\n",Offset);
 		}
 		else
 		{
-          //GfOut("AvoidTo2: %g\n",AvoidTo);
+          LogSimplix.debug("AvoidTo2: %g\n",AvoidTo);
 	      return AvoidTo;                        // Do not Avoid
 		}
 	  }
 	  else
 	  {
-        //GfOut("AvoidTo3: %g\n",AvoidTo);
+        LogSimplix.debug("AvoidTo3: %g\n",AvoidTo);
 	    return AvoidTo;                          // Do not Avoid
 	  }
 	}
@@ -159,19 +159,19 @@ double TCollision::AvoidTo
 	{
 	  if ((Coll.MinLSideDist < 2.5) || (Coll.MinRSideDist < 2.5))
         DoAvoid = true;                          // Avoid to side
-/*
-      if (DoAvoid)
-        GfOut("DoAvoid AvoidTo4: %g\n",AvoidTo);
+
+	  if (DoAvoid)
+        LogSimplix.debug("DoAvoid AvoidTo4: %g\n",AvoidTo);
 	  else
-        GfOut("AvoidTo4: %g\n",AvoidTo);
-*/
+        LogSimplix.debug("AvoidTo4: %g\n",AvoidTo);
+
 	  return AvoidTo;                             
 	}
 
     DoAvoid = true;                              // Avoid to side
     Offset = Me.CalcPathTarget                   // Use offset to
       (DistanceFromStartLine, Offset);           //   find target
-    //GfOut("DoAvoid Offset1: %g\n",Offset);
+    LogSimplix.debug("DoAvoid Offset1: %g\n",Offset);
     return Offset; 
   }
   else // No opponents at side ...
@@ -184,13 +184,13 @@ double TCollision::AvoidTo
 	{
 	    Flags = F_LEFT;
 		Offset = Coll.AvoidSide;
-		//GfOut("Go to right: %g\n",Offset);
+		LogSimplix.debug("Go to right: %g\n",Offset);
 	}
 	else if (Coll.AvoidSide > 0)
 	{
 	    Flags = F_RIGHT;
 		Offset = Coll.AvoidSide;
-		//GfOut("Go to left: %g\n",Offset);
+		LogSimplix.debug("Go to left: %g\n",Offset);
 	}
 	// Third priority: Anyone behind?
 	else if (Coll.LappersBehind)                 // Lappers behind?
@@ -201,7 +201,7 @@ double TCollision::AvoidTo
 	    Flags =                                  // Use the side defined
 		  (Coll.NextSide < 0) ? F_LEFT : F_RIGHT;//   by collision
 		Offset = (Flags & F_LEFT) ? 1.0 : -1.0;
-		//GfOut("LappersBehind: %g\n",Offset);
+		LogSimplix.debug("LappersBehind: %g\n",Offset);
 	  }
 	}
 	// Fourth priority: More than one ahead?
@@ -209,23 +209,23 @@ double TCollision::AvoidTo
     { // cars on both sides ahead, so avoid closest (or slowest) car
       Flags = (Coll.MinLDist < Coll.MinRDist) ? F_LEFT : F_RIGHT; 
 	  Offset = (Flags & F_LEFT) ? 1.0 : -1.0;
-      //GfOut("(Coll.OppsAhead == (F_LEFT | F_RIGHT)): %g\n",Offset);
+      LogSimplix.debug("(Coll.OppsAhead == (F_LEFT | F_RIGHT)): %g\n",Offset);
 	}
 	// Fifth priority: Anyone ahead? 
     else if (Coll.OppsAhead)
 	{ // cars on one side ahead
       Flags = Coll.OppsAhead;
 	  Offset = (Flags & F_LEFT) ? 1.0 : -1.0;
-      //GfOut("(Coll.OppsAhead): %g\n",Offset);
+      LogSimplix.debug("(Coll.OppsAhead): %g\n",Offset);
 	}
 	else 
 	{
-      //GfOut("AvoidTo5: %g\n",AvoidTo);
+      //LogSimplix.debug("AvoidTo5: %g\n",AvoidTo);
       return AvoidTo;                            // Do not avoid
 	}
 
 	DoAvoid = true;                              // Flag avoid
-    //GfOut("DoAvoid Offset2: %g\n",Offset);
+    LogSimplix.debug("DoAvoid Offset2: %g\n",Offset);
     return Offset;                               // Use offset to find target
   }
 }

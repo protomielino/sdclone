@@ -9,10 +9,10 @@
 // 
 // File         : unitpit.cpp
 // Created      : 2007.02.20
-// Last changed : 2013.02.16
+// Last changed : 2013.03.02
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.06.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem erweiterten Robot-Tutorial bt
 //
@@ -141,7 +141,7 @@ TPit::TPit(TDriver *Driver)
 	oPitSpeedLimitSqr = oPitInfo->speedLimit*oPitInfo->speedLimit;
   }
   else
-    GfOut("\n\n\n SIMPLIX: NO PIT \n\n\n");
+    LogSimplix.debug("\n\n\n SIMPLIX: NO PIT \n\n\n");
 
   for (int I = 0; I < gNBR_RL; I++)
     oPitLane[I].Init(Driver->Car());
@@ -212,7 +212,7 @@ bool TPit::IsBetween(float FromStart)
 {
   if (oPitEntry <= oPitExit)
   {
-	GfOut("1. FromStart: %g\n",FromStart);
+	LogSimplix.debug("1. FromStart: %g\n",FromStart);
 	if (FromStart >= oPitEntry && FromStart <= oPitExit)
   	  return true;
 	else
@@ -221,7 +221,7 @@ bool TPit::IsBetween(float FromStart)
   else
   {
 	// Warning: TORCS reports sometimes negative values for "fromstart"!
-	GfOut("2. FromStart: %g\n",FromStart);
+	LogSimplix.debug("2. FromStart: %g\n",FromStart);
 	if (FromStart <= oPitExit || FromStart >= oPitEntry)
 	  return true;
 	else
@@ -335,7 +335,7 @@ void TPitLane::MakePath
   const tTrackOwnPit* Pit = CarPit;              // Get my pit
   if (Pit == NULL)                               // If pit is NULL
   {                                              // nothing to do
-	GfOut("\n\nPit = NULL\n\n");                 // here
+	LogSimplix.debug("\n\nPit = NULL\n\n");                 // here
 	return;
   }
 
@@ -461,12 +461,12 @@ void TPitLane::MakePath
   bool backward = true; 
   double SearchLength = PitInfo->pitExit->lgfromstart 
 	- PitInfo->pitEnd->lgfromstart;
-  //GfOut("ExitLength 0: %d %s %.3f %.3f %.3f\n",Seg->id,Seg->name,Seg->length,ExitLength,SearchLength);
+  //LogSimplix.debug("ExitLength 0: %d %s %.3f %.3f %.3f\n",Seg->id,Seg->name,Seg->length,ExitLength,SearchLength);
 
   if (SearchLength < 0)
 	SearchLength += oTrack->Length();
 
-  //GfOut("ExitLength 0: %d %s %.3f %.3f %.3f\n",Seg->id,Seg->name,Seg->length,ExitLength,SearchLength);
+  //LogSimplix.debug("ExitLength 0: %d %s %.3f %.3f %.3f\n",Seg->id,Seg->name,Seg->length,ExitLength,SearchLength);
 
   do
   {
@@ -486,7 +486,7 @@ void TPitLane::MakePath
 		if (NextSide != NULL)                    // available
 			AvailableWidth += NextSide->startWidth;
 
-        //GfOut("Side 1: %d %d %.3f\n",Seg->id,Side->style,Side->endWidth);
+        LogSimplix.debug("Side 1: %d %d %.3f\n",Seg->id,Side->style,Side->endWidth);
 	    if ((Side->style == TR_PLAN)             // In case of a barrier,
 			&& (AvailableWidth > CarWidth))      // pitwall or too small 
 */
@@ -499,7 +499,7 @@ void TPitLane::MakePath
 
 	if (NotUsableLength > SearchLength - 1.0)
 	{
-        //GfOut("NotUsableLength 1: %.3f\n",NotUsableLength);
+        LogSimplix.debug("NotUsableLength 1: %.3f\n",NotUsableLength);
 		backward = false;
 		break;
 	}
@@ -508,7 +508,7 @@ void TPitLane::MakePath
 	{
       Seg = Seg->prev;
 	  ExitLength += Seg->length;     
-	  //GfOut("ExitLength 1: %d %s %.3f %.3f\n",Seg->id,Seg->name,Seg->length,ExitLength);
+	  //LogSimplix.debug("ExitLength 1: %d %s %.3f %.3f\n",Seg->id,Seg->name,Seg->length,ExitLength);
 	}
 
   } while (!usable);
@@ -517,7 +517,7 @@ void TPitLane::MakePath
   {
     Seg = PitInfo->pitExit;
 	ExitLength = SearchLength;
-    //GfOut("ExitLength 2: %g\n",ExitLength);
+    //LogSimplix.debug("ExitLength 2: %g\n",ExitLength);
 	NotUsableLength = 0.0;
   }
 
@@ -532,9 +532,9 @@ void TPitLane::MakePath
 // To get more details look here 
 // > http://support.microsoft.com/kb/925792/en-us
   if (backward)   
-    GfOut("backward\n");
+    LogSimplix.debug("backward\n");
   else
-    GfOut("foreward\n");
+    LogSimplix.debug("foreward\n");
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
   do
@@ -555,7 +555,7 @@ void TPitLane::MakePath
 		break;
 
       ExitLength += Seg->length;               // add the length 
-	  //GfOut("ExitLength 3: %d %s %.3f %.3f (%d %d)\n",Seg->id,Seg->name,Seg->length,ExitLength,Side->style,Side->raceInfo);
+	  //LogSimplix.debug("ExitLength 3: %d %s %.3f %.3f (%d %d)\n",Seg->id,Seg->name,Seg->length,ExitLength,Side->style,Side->raceInfo);
 
   } while (Side != NULL);
 
@@ -833,7 +833,7 @@ void TPitLane::MakePath
 /*
   for (int I = 0; I < 9; I++)
   {
-	  GfOut("X[%d]: %g Y[%d]: %g S[%d]: %g\n",I,X[I],I,Y[I],I,S[I]);
+	  LogSimplix.debug("X[%d]: %g Y[%d]: %g S[%d]: %g\n",I,X[I],I,Y[I],I,S[I]);
   }
 */
   // Calculate the splines for entry and exit of pitlane
@@ -898,7 +898,7 @@ void TPitLane::MakePath
 	oPathPoints[I].Offset = (float) SplineY;    // Offset lateral to track
     oPathPoints[I].Point =                       // Recalculate points
 	  oPathPoints[I].CalcPt();                   // from offset
-	//GfOut("Spline: %g: %g/%g %g\n",TrackX,SplineX,oPathPoints[I].Offset,SplineY);
+	//LogSimplix.debug("Spline: %g: %g/%g %g\n",TrackX,SplineX,oPathPoints[I].Offset,SplineY);
   }
 
   // Prepare speed calculation with changed path (Simplix specific)
@@ -946,10 +946,10 @@ void TPitLane::MakePath
   oPitStopPos = oPathPoints[oStopIdx].Dist();
 
   // Set target speed at stop position
-  oPathPoints[oStopIdx].MaxSpeed = oPathPoints[oStopIdx].Speed = 1.0;
+  oPathPoints[oStopIdx].MaxSpeed = oPathPoints[oStopIdx].Speed = 0.01;
 
   // Calculate braking
-  PropagatePitBreaking((tdble) oPitStopPos,(tdble) Param.oCarParam.oScaleMu);
+  PropagatePitBreaking(oStopIdx, (tdble) oPitStopPos,(tdble) Param.oCarParam.oScaleMu);
 
   // Look for point to decide to go to pit
   Idx0 = oTrack->IndexFromPos(oPitEntryStartPos);
@@ -1034,7 +1034,7 @@ double TPitLane::DistToPitStop(double TrackPos, bool Pitting) const
 //	  dist = oPitStopPos - trackPos;
     RtDistToPit(oCar,oTrack->Track(),&DL,&DW);
     DL += (float)(oPitStopOffset - TRACKRES / 2);
-//	  GfOut("DistToPitStop: %g-%g=%g\n",dist,DL,dist-DL);
+//	  LogSimplix.debug("DistToPitStop: %g-%g=%g\n",dist,DL,dist-DL);
     Dist = DL;
   	if (Dist < 0)
 	  Dist += oTrack->Length();

@@ -411,6 +411,88 @@ Tdble Dist(const TVec3d &LHS, const TVec3d &RHS)
     + Sqr(LHS.y - RHS.y));
 };
 //==========================================================================*
+
+//==========================================================================*
+// Random number generator: Internal constants
+// Works if integer overflow is at 2^31 or heigher
+//--------------------------------------------------------------------------*
+//#define SD_RANDOM_SEED 0xfded
+//#define SD_RANDOM_A    9301
+//#define SD_RANDOM_C    49297
+//#define SD_RANDOM_M    233280
+//--------------------------------------------------------------------------*
+// Works if integer overflow is at 2^30 or heigher
+//--------------------------------------------------------------------------*
+#define SD_RANDOM_SEED 0xfded
+#define SD_RANDOM_A    8121
+#define SD_RANDOM_C    28411
+#define SD_RANDOM_M    134456
+unsigned int sd_randomSeed;
+//--------------------------------------------------------------------------*
+// For normally distributed random numbers
+//--------------------------------------------------------------------------*
+static int sd_flagHaveOne = 0;
+static double sd_secondRandomNumber;
+//==========================================================================*
+
+//==========================================================================*
+// Random number generator: Init. (Use seed = 0 to get always same sequence)
+//--------------------------------------------------------------------------*
+void sd_srand(unsigned int seed)
+{
+	sd_randomSeed = seed ? seed : SD_RANDOM_SEED;
+	return;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Random number generator: Get a random number [0 .. SD_RANDOM_M - 1]
+//--------------------------------------------------------------------------*
+unsigned int sd_randInt()
+{
+	sd_randomSeed = SD_RANDOM_A * sd_randomSeed + SD_RANDOM_C;
+	return (sd_randomSeed % SD_RANDOM_C);
+}
+//==========================================================================*
+
+//==========================================================================*
+// Random number generator: Get a random number [0 .. 1)
+//--------------------------------------------------------------------------*
+float sd_randFloat()
+{
+	sd_randomSeed = SD_RANDOM_A * sd_randomSeed + SD_RANDOM_C;
+	return ((float)(sd_randomSeed % SD_RANDOM_C) / (float) SD_RANDOM_C);
+}
+//==========================================================================*
+
+//==========================================================================*
+// Random number generator: Normally distributed random numbers
+//--------------------------------------------------------------------------*
+float sd_randNormalFloat()
+{
+	double fac, radius, val1, val2;
+
+	if (sd_flagHaveOne == 0)
+	{
+		do
+		{
+			val1 = 2.0 * sd_randFloat() - 1.0;
+			val2 = 2.0 * sd_randFloat() - 1.0;
+			radius = val1 * val1 + val2 * val2;
+		} while (radius >= 1.0);
+		fac = sqrt(-2.0 + log(radius)/radius);
+		sd_secondRandomNumber = val1 * fac;
+		sd_flagHaveOne = 1;
+		return (float)(val2*fac);
+	}
+	else
+	{
+		sd_flagHaveOne = 0;
+		return (float)(sd_secondRandomNumber);
+	}
+}
+//==========================================================================*
+
 //--------------------------------------------------------------------------*
 // end of file unitlinalg.cpp
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*

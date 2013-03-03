@@ -9,10 +9,10 @@
 //
 // File         : unitlane.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.07
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.03.02
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.02.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -533,12 +533,16 @@ void TLane::PropagatePitBreaking
 {
   /*const float base = 0.5f; */
   int Step = 1;
+  int L = 20;
   const int N = oTrack->Count();
+  const int M = Step * ((Len - 1) / Step);
 
-  for (int I = Step * ((2*Len - 1) / Step); I >= 0; I -= Step )
+  //LogSimplix.error("Start: %d (%g m)",Start,PitStopPos);
+
+  for (int I = M; I >= 0; I -= Step )
   {
-	int	P = (Start + I) % N;
-	int Q = (P + Step) % N;
+	int	P = (Start - 1 + I - M + N) % N;
+	int Q = (P + Step) % N; 
 
 	if (oPathPoints[P].Speed > oPathPoints[Q].Speed)
 	{
@@ -554,8 +558,13 @@ void TLane::PropagatePitBreaking
 
 	  double Factor = MIN(1.0,fabs(oPathPoints[Q].Dist() - PitStopPos) / oFixCarParam.oPitBrakeDist);
 	  double Friction = oTrack->Friction(P) * (Factor * ScaleMu + (1 - Factor) * oCarParam.oScaleBrakePit * ScaleMu);
+	  if (L)
+		Friction *= 0.9;
 
-	  double U = oFixCarParam.CalcBraking(
+	  //LogSimplix.debug("F %g: %g/%g )",Factor,oTrack->Friction(P),Friction);
+	  //LogSimplix.debug("SQ %g )",oPathPoints[Q].Speed);
+
+	  double U = oFixCarParam.CalcBrakingPit(
         oCarParam,
   		oPathPoints[P].Crv,
 		oPathPoints[P].CrvZ,
@@ -565,7 +574,15 @@ void TLane::PropagatePitBreaking
 		Dist,
 		Friction,
 		TrackRollAngle,
-		TrackTiltAngle);
+		TrackTiltAngle); 
+
+	  if (L) 
+	  {
+		  L--;
+		  double DeltaSpeed = (U - oPathPoints[Q].Speed);
+		  if (DeltaSpeed > 1.0)
+			  U = 1.0 + oPathPoints[Q].Speed;
+	  }
 
 	  if (oPathPoints[P].Speed > U)
 		oPathPoints[P].Speed = oPathPoints[P].AccSpd = U;
@@ -573,7 +590,8 @@ void TLane::PropagatePitBreaking
 	  if (oPathPoints[P].FlyHeight > 0.1)
 	    oPathPoints[P].Speed = oPathPoints[Q].Speed;
 
-      //GfOut("I:%d P:%d Q:%d F:%.3f U:%.2f S:%.2f\n",I,P,Q,Factor,U*3.6,oPathPoints[P].Speed*3.6);
+	  //LogSimplix.debug("SP %g\n)",oPathPoints[P].Speed);
+      //LogSimplix.debug("I:%d P:%d Q:%d F:%.3f U:%.2f S:%.2f\n",I,P,Q,Factor,U*3.6,oPathPoints[P].Speed*3.6);
 
 	}
   }
@@ -669,9 +687,9 @@ void TLane::PropagateBreaking
 // Propagate breaking
 //--------------------------------------------------------------------------*
 void TLane::PropagatePitBreaking
-  (float PitStopPos, float ScaleMu)
+  (int Start, float PitStopPos, float ScaleMu)
 {
-  PropagatePitBreaking( 0, oTrack->Count(), PitStopPos, ScaleMu);
+  PropagatePitBreaking( Start, oTrack->Count() - 20, PitStopPos, ScaleMu);
 }
 //==========================================================================*
 

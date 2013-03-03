@@ -417,7 +417,7 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 
 	// simuV4 ...
 	HCtx[idx]->brakeRep = GfParmGetNum(carHandle, (char*) SECT_BRKSYST, PRM_BRKREP, (char*)NULL, 0.5);
-    HCtx[idx]->brakeCorr = GfParmGetNum(carHandle, (char*) SECT_BRKSYST, PRM_BRKCOR, (char*)NULL, 0.0f);
+    HCtx[idx]->brakeCorr = GfParmGetNum(carHandle, (char*) SECT_BRKSYST, PRM_BRKCOR_FR, (char*)NULL, 0.0f);
 	HCtx[idx]->useESP = HCtx[idx]->brakeCorr != 0;
 	// ... simuV4
 
@@ -1361,7 +1361,6 @@ common_brake(const int idx, tCarElt* car, tSituation *s)
 		{
 			float DriftAngle = atan2(car->_speed_Y,car->_speed_X) - car->_yaw;
 			FLOAT_NORM_PI_PI(DriftAngle);            
-			DriftAngle = fabs(DriftAngle);		     
 
 			if (DriftAngle > 4.0/180.0*PI)
 			{

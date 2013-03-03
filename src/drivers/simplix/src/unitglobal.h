@@ -9,7 +9,7 @@
 //
 // File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2013.02.24
+// Last changed : 2013.03.03
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 4.00.000
@@ -85,11 +85,15 @@
 #include <car.h>     // TORCS
 #include <raceman.h> // TORCS
 
+// The "Simplix" logger instance.
+extern GfLogger* PLogSimplix;
+#define LogSimplix (*PLogSimplix)
+
 //==========================================================================*
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 128 // Force new calculation
+#define RL_VERSION 129 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*
@@ -378,7 +382,7 @@ enum
 #define MAXBLOCKED 9
 #define MAXPRESSURE "max pressure"
 #define INITIAL_BRAKE_PRESSURE 30000000.0
-#define INITIAL_BRAKE_SCALE 72.0
+#define INITIAL_BRAKE_SCALE 25.0
 
 #define X_StartEntry X[0]
 #define X_EndEntry X[1]
@@ -454,6 +458,7 @@ enum
 #define PRV_SCALE__MU        "scale_mu"           // Scale friction calculation 
 #define PRV_SCALE_FRICTION	 "scale friction"     // Scale friction calculation 
 #define PRV_SCALE_BRAKING	 "scale braking"      // Scale brake calculation 
+#define PRV_MAX_BRAKING	     "max braking"        // Max brake
 
 #define PRV_SCALE_BRAKE_Q    "qualy brake"        // Scale brake force for qualyfying
 #define PRV_SCALE_MU_Q       "qualy mu"           // Scale friction calculation for qualyfying 

@@ -9,10 +9,10 @@
 // 
 // File         : unitstrategy.cpp
 // Created      : 2007.02.20
-// Last changed : 2013.02.16
+// Last changed : 2013.03.02
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.06.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -109,9 +109,9 @@ bool TSimpleStrategy::IsPitFree()
 {
     bool IsFree = RtTeamIsPitFree(oDriver->TeamIndex());
 	if (IsFree)
-		GfOut("#%s pit is free (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
+		LogSimplix.debug("#%s pit is free (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
 	else
-		GfOut("#%s pit is locked (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
+		LogSimplix.debug("#%s pit is locked (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
     return IsFree;
 }
 //==========================================================================*
@@ -244,12 +244,12 @@ double TSimpleStrategy::SetFuelAtRaceStart
   oMaxFuel =            
 	  GfParmGetNum(*CarSettings,TDriver::SECT_PRIV,         // Maximal möglicher
 	PRV_MAX_FUEL,(char*) NULL,oMaxFuel);         //   Tankinhalt
-  //GfOut("#oMaxFuel (private) = %.1f\n",oMaxFuel);
+  LogSimplix.debug("#oMaxFuel (private) = %.1f\n",oMaxFuel);
 
   oStartFuel =            
 	GfParmGetNum(*CarSettings,TDriver::SECT_PRIV,         // Tankinhalt beim Start
 	PRV_START_FUEL,(char*) NULL,(float) oStartFuel);          
-  //GfOut("#oStartFuel (private) = %.1f\n",oStartFuel);
+  LogSimplix.debug("#oStartFuel (private) = %.1f\n",oStartFuel);
 
   if ((!TDriver::Qualification)                  // Fürs Rennen 
 	  && (oStartFuel > 0))
@@ -263,7 +263,7 @@ double TSimpleStrategy::SetFuelAtRaceStart
   oMinLaps = (int)           
 	  GfParmGetNum(*CarSettings,TDriver::SECT_PRIV, // Mindestanzahl an Runden
 	PRV_MIN_LAPS,(char*) NULL,(float) oMinLaps); //   die mit dem Tankinhalt
-  //GfOut("#oMinLaps (private) = %d\n",oMinLaps);  //   möglich sein müssen
+  LogSimplix.debug("#oMinLaps (private) = %d\n",oMinLaps);  //   möglich sein müssen
 
   if (Fuel == 0)                                 // Wenn nichts bekannt ist,
     Fuel = oMaxFuel;                             // Volltanken
@@ -443,16 +443,16 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	      CarAccelCmd =                          // a little throttle
 			  MAX(0.05f,CarAccelCmd);
 	      CarBrakeCmd = 0.0;                     // Start braking
-		  //GfOut("#PIT_ENTER: Wait %g (%g)\n",TrackPos,oDriver->CurrSpeed());
+		  LogSimplix.debug("#PIT_ENTER: Wait %g (%g)\n",TrackPos,oDriver->CurrSpeed());
 		}
 		else
-		  //GfOut("#PIT_ENTER: Wait %g\n",TrackPos);
+		  LogSimplix.debug("#PIT_ENTER: Wait %g\n",TrackPos);
 		break;
 	  }
 
 	  // We reached the poit to stopp
 	  oState = PIT_ASKED;
-  	  //GfOut("#PIT_ENTER: %g\n",TrackPos);
+  	  LogSimplix.debug("#PIT_ENTER: %g\n",TrackPos);
 
  	  // falls through...
 
@@ -460,7 +460,7 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  // We are still going to the pit
 	  if (oPit->oPitLane[0].CanStop(TrackPos))
 	  { // If we can stop a this position we start pit procedure
-  	    //GfOut("#PIT_ASKED: CanStop %g (%g)\n",TrackPos,oDriver->CurrSpeed());
+  	    LogSimplix.debug("#PIT_ASKED: CanStop %g (%g)\n",TrackPos,oDriver->CurrSpeed());
 		oDriver->oStanding = true;               // For motion survey!
         oPitTicker = 0;                          // Start service timer
 	    CarAccelCmd = 0;                         // release throttle
@@ -472,14 +472,14 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  { // We can't stop here (to early or to late)
 	    if (oPit->oPitLane[0].Overrun(TrackPos))
 		{ // if to late
-			//GfOut("#Overrun 1: %g\n",TrackPos);
+			LogSimplix.debug("#Overrun 1: %g\n",TrackPos);
 		  PitRelease();
 	      oState = PIT_EXIT_WAIT;
 	      // pit stop finished, need to exit pits now.
 		}
 		else
 		{
-		  //GfOut("#ToShort 1: %g\n",TrackPos);
+		  LogSimplix.debug("#ToShort 1: %g\n",TrackPos);
 	      if (oDriver->CurrSpeed() < 3)
 		  {
 	        CarAccelCmd =                        // a little throttle
@@ -496,7 +496,7 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  oPitTicker++;                              // Check time to start service
 	  if (oPitTicker > 10)                       // Check Timer
 	  { // If we have to wait
-		// GfOut("#oPitTicker: %d\n",oPitTicker);
+		LogSimplix.debug("#oPitTicker: %d\n",oPitTicker);
 		tTeamDriver* TeamDriver = RtTeamDriverByCar(oCar); 
 		short int Major = RtTeamManagerGetMajorVersion();
 		short int Minor = RtTeamManagerGetMinorVersion();
@@ -504,10 +504,10 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 		  && ((Major > NEEDED_MAJOR_VERSION) 
 		    || ((Major = NEEDED_MAJOR_VERSION) && (Minor >= NEEDED_MINOR_VERSION))))
 		{
-			//GfOut("#Pitting issues %s\n",oDriver->GetBotName());
-			//GfOut("#StillToGo : %.2f m\n",TeamDriver->StillToGo);
-			//GfOut("#MoreOffset: %.2f m\n",TeamDriver->MoreOffset);
-			//GfOut("#TooFastBy : %.2f m/s\n",TeamDriver->TooFastBy);
+			LogSimplix.debug("#Pitting issues %s\n",oDriver->GetBotName());
+			LogSimplix.debug("#StillToGo : %.2f m\n",TeamDriver->StillToGo);
+			LogSimplix.debug("#MoreOffset: %.2f m\n",TeamDriver->MoreOffset);
+			LogSimplix.debug("#TooFastBy : %.2f m/s\n",TeamDriver->TooFastBy);
 
 			// Learn from the response
 			if (fabs(TeamDriver->StillToGo) > 0.0)
@@ -518,12 +518,12 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	            CarAccelCmd =                    // a little throttle
 			      MAX(0.005f,CarAccelCmd);
 	            CarBrakeCmd = 0.0;                 // No braking
-  			    //GfOut("#Accel     : %.2f\n",CarAccelCmd);
+  			    LogSimplix.debug("#Accel     : %.2f\n",CarAccelCmd);
 			  }
 			  else
 			  {
 	            CarBrakeCmd = 0.1f;              // Braking
-  			    //GfOut("#Brake     : %.2f\n",CarBrakeCmd);
+  			    LogSimplix.debug("#Brake     : %.2f\n",CarBrakeCmd);
 			  }
 	          CarClutchCmd = 0.5;                // Press clutch
 			  if (TeamDriver->StillToGo > 0)
@@ -533,7 +533,7 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 			}
 			else
 			{
-// 			    GfOut("#Stopped\n");
+// 			    LogSimplix.debug("#Stopped\n");
 	            CarAccelCmd = 0.0;               // Stop throttle
 	            CarBrakeCmd = 1.0;               // Lock brake
 	            CarClutchCmd = 0.0;              // Release clutch
@@ -549,13 +549,13 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  }
 	  else if (oPit->oPitLane[0].Overrun(TrackPos))
 	  { // If we couldn't stop in place
-		  //GfOut("#Overrun 2: %g\n",TrackPos);
+		LogSimplix.debug("#Overrun 2: %g\n",TrackPos);
 	    PitRelease();                            // We have to release the pit
 	    oState = PIT_EXIT_WAIT;                  // for teammate
 	  }
 	  else
 	  { // There is nothing that hampers TORCS to service us
-  	    //GfOut("#PIT_SERVICE: %g (%g)\n",TrackPos,oDriver->CurrSpeed());
+  	    LogSimplix.debug("#PIT_SERVICE: %g (%g)\n",TrackPos,oDriver->CurrSpeed());
 		CarLightCmd = 0;                         // No lights on
         CarAccelCmd = 0;                         // No throttle
 	    CarBrakeCmd = 1.0;                       // Still braking
@@ -577,7 +577,7 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
         oPitStartTicker--;
         if (oPitStartTicker < 0)
 		{
-  		  //GfOut("#PIT_EXIT: mts%g (mdb%gm)\n",oMinTimeSlot,oMinDistBack);
+  		  LogSimplix.debug("#PIT_EXIT: mts%g (mdb%gm)\n",oMinTimeSlot,oMinDistBack);
 	      oState = PIT_EXIT;
 		}
 		CarLightCmd = RM_LIGHT_HEAD2;            // Only small lights on           

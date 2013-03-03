@@ -2,16 +2,16 @@
 // unitpidctrl.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // PID Controller
 //
-// File         : pidctrl.h
+// File         : unitpidctrl.h
 // Created      : 2007.11.25
-// Last changed : 2011.06.02
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.03.02
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -53,6 +53,7 @@ public:
 	double oLastPropValue;	// for calculating differential (if not supplied)
 	double oTotal;			// for integral.
 	double oMaxTotal;		// for integral.
+	double oMinTotal;		// for integral.
 	double oTotalRate;		// for integral.
 
 	double oP;

@@ -2,17 +2,17 @@
 // unitparam.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 2.X
 //--------------------------------------------------------------------------*
 // Container for parameters of car, lane, pit ...
 // Container für Parameter des Fahrzeugs, der Fahrspuren, der Box usw.
 // 
 // File         : unitparam.cpp
 // Created      : 2008.04.11
-// Last changed : 2011.06.02
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.02.26
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*

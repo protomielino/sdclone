@@ -9,10 +9,10 @@
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.02.17
+// Last changed : 2013.03.02
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.06.000
+// Version      : 4.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -103,7 +103,7 @@ void TClothoidLane::MakeSmoothPath(
 
   if (Opts.Side)
   {
-    //GfOut("Switch to CarParam2\n");
+    LogSimplix.debug("Switch to CarParam2\n");
     CarParam = Param.oCarParam2;
   }
   TLane::Initialise(Track, Param.Fix, CarParam, Opts.MaxL, Opts.MaxR);
@@ -119,10 +119,10 @@ void TClothoidLane::MakeSmoothPath(
   while (Step * 16 < Count)                      // Find largest step width
     Step *= 2;
 
-  //GfOut("OptimisePath:\n");
+  LogSimplix.debug("OptimisePath:\n");
   while (Step > 0)
   {
-	//GfOut("Step: %d\n",Step);
+	LogSimplix.debug("Step: %d\n",Step);
  	for (int I = 0; I < L; I++)
 	{
 		OptimisePath(Step, Delta, 0, Param.oCarParam.oUglyCrvZ);
@@ -132,7 +132,7 @@ void TClothoidLane::MakeSmoothPath(
 
   if (Opts.BumpMod)
   {
-    //GfOut("AnalyseBumps:\n");
+    LogSimplix.debug("AnalyseBumps:\n");
 	AnalyseBumps(false);
 	//AnalyseBumps(true);
 
@@ -141,7 +141,7 @@ void TClothoidLane::MakeSmoothPath(
 
 	while (Step > 0)
 	{
-	  //GfOut("Step: %d\n",Step);
+	  LogSimplix.debug("Step: %d\n",Step);
   	  for (int I = 0; I < L; I++)
 	  {
 		OptimisePath(Step, Delta, Opts.BumpMod, Param.oCarParam.oUglyCrvZ);
@@ -207,7 +207,7 @@ void TClothoidLane::SmoothPath(
   Step <<= ANALYSE_STEPS;
   while (Step > 0)
   {
-    //GfOut("Step: %d\n",Step);
+    LogSimplix.debug("Step: %d\n",Step);
     for (int I = 0; I < L; I++)
 	{
 	  OptimisePath(Step, Delta, Opts.BumpMod, Param.oCarParam.oUglyCrvZ);
@@ -279,7 +279,7 @@ void TClothoidLane::AnalyseBumps(bool DumpInfo)
 
 	  if ((I == 1) && DumpInfo)
 	  {
-		GfOut( "%4d v %3.0f crv %7.4f dt %.3f pz %5.2f sz %5.2f vz %5.2f -> h %5.2f\n",
+		LogSimplix.debug( "%4d v %3.0f crv %7.4f dt %.3f pz %5.2f sz %5.2f vz %5.2f -> h %5.2f\n",
 		  J, oPathPoints[J].AccSpd * 3.6, oPathPoints[J].Crv, Dt,
 		  Pz, Sz, Vz, oPathPoints[J].FlyHeight);
 	  }
@@ -471,7 +471,7 @@ void TClothoidLane::OptimiseLine
 
   LR.Add(oPathPoints[I].Point.GetXY());
 
-  //GfOut("OptimiseLine Index: %4d", Index);
+  LogSimplix.debug("OptimiseLine Index: %4d", Index);
 
   TVec2d P, V;
   LR.CalcLine(P, V);
@@ -631,7 +631,7 @@ void TClothoidLane::OptimisePath
 	  }
 	  else if (BumpMod == 2 && L3->FlyHeight > 0.1)
 	  {
-		//GfOut("OptimiseLine Index: %d\n",Index);
+		LogSimplix.debug("OptimiseLine Index: %d\n",Index);
 		OptimiseLine(Index, Step, 0.1, L3, L2, L4);
 	  }
 	  else
@@ -804,11 +804,11 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   if( writeSize < 1)
     error = true;
 
-  //GfOut("\n\n\nsizeof(TPathPt): %d\n\n\n",sizeof(TPathPt));
+  LogSimplix.debug("\n\n\nsizeof(TPathPt): %d\n\n\n",sizeof(TPathPt));
   void* Start = &(oPathPoints[0]);
   void* End = &(oPathPoints[0].MaxSpeed);
   int UsedLen = ((char *) End) - ((char *) Start);
-  //GfOut("\n\n\nUsedLen (TPathPt Part 1): %d\n\n\n",UsedLen);
+  LogSimplix.debug("\n\n\nUsedLen (TPathPt Part 1): %d\n\n\n",UsedLen);
   for (int I = 0; I < N; I++)
   {
     writeSize = fwrite(&(oPathPoints[I]),UsedLen,1,F);
@@ -817,7 +817,7 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   }
   if (error)
   {
-	  GfOut("TClothoidLane::SavePointsToFile(%s) : Some error occured\n", TrackLoad);
+	  LogSimplix.debug("TClothoidLane::SavePointsToFile(%s) : Some error occured\n", TrackLoad);
   }
   fclose(F);
 }
