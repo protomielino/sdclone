@@ -124,22 +124,44 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 
 	std::string strPath = GetDataDir();
 	sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
-	strPath+=buf;
-	_strTexturePath = strPath;
+	
+	std::string ext = osgDB::getFileExtension(acname);
+	
+	if (ext == "acc")
+	{
+		strPath+=buf;
+    		_strTexturePath = strPath;
+		strPath+="/";	
+		strPath+=acname;
 
-        osg::ref_ptr<osgDB::Options> options = new osgDB::Options();
-        options->getDatabasePathList().push_back(strPath);
-        std::string strTPath = GetDataDir();
-        snprintf(buf, 4096, "data/textures/");
-        strTPath += buf;
-        options->getDatabasePathList().push_back(strPath);
-
-	osg::Node* Track = osgDB::readNodeFile(acname, options);
-	_scenery->addChild(Track);
-
-	/*strPath+="/";
-	strPath+=acname;
-	LoadTrack(strPath);*/
+		LoadTrack(strPath);
+	}
+	else
+	{
+		strPath+=buf;
+        	osg::ref_ptr<osgDB::Options> options = new osgDB::Options();
+        	options->getDatabasePathList().push_back(strPath);
+        	std::string strTPath = GetDataDir();
+        	snprintf(buf, 4096, "data/textures/");
+        	strTPath += buf;
+        	options->getDatabasePathList().push_back(strTPath);
+        	osg::ref_ptr<osg::Node> pTrack = osgDB::readNodeFile(acname, options);
+        	
+        	if (ext =="ac")
+        	{
+        		osg::ref_ptr<osg::MatrixTransform> rot = new osg::MatrixTransform;
+    			osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f,
+                     			 0.0f,  0.0f, 1.0f, 0.0f,
+                     			 0.0f, -1.0f, 0.0f, 0.0f,
+                     			 0.0f,  0.0f, 0.0f, 1.0f);
+    			rot->setMatrix(mat);
+    			rot->addChild(pTrack);
+    			_scenery->addChild(rot);
+    			return _scenery;
+    		}
+    		
+		_scenery->addChild(pTrack);
+	}
 
 	return _scenery;
 }
@@ -187,33 +209,24 @@ bool SDScenery::LoadTrack(std::string strTrack)
 {
 	char buf[4096];
 	GfOut("Chemin Track : %s\n", strTrack.c_str());
+	osgLoader loader;
+	GfOut("Chemin Textures : %s\n", _strTexturePath.c_str());
+	loader.AddSearchPath(_strTexturePath);
+	
+	std::string strTPath = GetDataDir();
+	snprintf(buf, 4096, "data/textures/");
+    	strTPath += buf;
+    	loader.AddSearchPath(strTPath);
+    	
+	osg::Node *pTrack = loader.Load3dFile(strTrack, false);
 
-	//std::string ext = osgDB::getFileExtension(strTrack);
+	if (pTrack)
+	{
+		pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
+		_scenery->addChild(pTrack);		
+	}
+	else
+		return false;
 
-	/*if (ext == "acc")
-	{*/
-	  osgLoader loader;
-	  GfOut("Chemin Textures : %s\n", _strTexturePath.c_str());
-	  loader.AddSearchPath(_strTexturePath);
-
-	  std::string strTPath = GetDataDir();
-	  snprintf(buf, 4096, "data/textures/");
-	  strTPath += buf;
-	  loader.AddSearchPath(strTPath);
-
-          osg::Node *pTrack = loader.Load3dFile(strTrack, false);
-        /*}
-        else*/
-        if (pTrack)
-        {
-                pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
-                //osgDB::writeNodeFile(*pTrack, "/home/xavier/track.osg");
-                _scenery->addChild(pTrack);
-        }
-        else
-                return false;
-                
-        
-
-        return true;
+	return true;
 }

@@ -46,7 +46,7 @@ public:
 	SDRender(void);
 	~SDRender(void);
 	
-    void Init(osgViewer::Viewer * view);
+    void Init(osg::Group* root);
 	void Update(float speedcar, tSituation *s);
 	void UpdateTime(tSituation *s);
     void UpdateLight(void);

@@ -88,7 +88,7 @@ SDRender::~SDRender(void)
  */
 void SDRender::Init(osg::Group *root)
 {
-    char buf[256];
+   /* char buf[256];
     void *hndl = grTrackHandle;
 
     std::string datapath = GetDataDir();;
@@ -155,7 +155,7 @@ void SDRender::Init(osg::Group *root)
     //sgSetVec3(viewPos, grWrldX/2, grWrldY/2, 0);
     //TheSky->repositionFlat( viewPos, 0, 0);*/
 
-    RealRoot = dynamic_cast<osg::Group*> root;
+    /*RealRoot = dynamic_cast<osg::Group*> root;
     osg::StateSet* rootStateSet = RealRoot->getOrCreateStateSet();
     RealRoot->setStateSet(rootStateSet);
 	osg::Group* lightGroup = new osg::Group;
@@ -204,7 +204,7 @@ void SDRender::Init(osg::Group *root)
 
     GfOut("LE POINTEUR %d\n",m_carroot.get());
 
-  	//return 0;
+  	//return 0;*/
 }//SDRender::Init
 
 /*void grUpdateLight( void )

@@ -33,47 +33,46 @@ osg::ref_ptr<osg::Image> osgLoader::LoadImageFile(std::string strFile)
 
 osg::Node *osgLoader::Load3dFile(std::string strFile, bool car)
 {
-  osg::Node *pNode = NULL;
-  std::string ext = osgDB::getFileExtension(strFile);
-
-  if (ext == "acc")
-  {
-      if (car)
-        m_ACCReader.SetCar(true);
-
-      //Use custom ACC file loader
-      osgDB::ReaderWriter::ReadResult rr = m_ACCReader.readNode(strFile, m_pOpt);
-      GfOut("le test %d \n",rr.validNode());
-      if (rr.validNode())
-      {
-            osg::Node * nod = rr.takeNode();
-            osg::MatrixTransform * rot = new osg::MatrixTransform;
-            osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f,
+	osg::Node *pNode = NULL;	
+	std::string ext = osgDB::getFileExtension(strFile);
+	if (car)
+		m_ACCReader.SetCar(true);
+		
+    	if (ext == "acc")
+	{
+		//Use custom ACC file loader
+		osgDB::ReaderWriter::ReadResult rr = m_ACCReader.readNode(strFile, m_pOpt);
+       		GfOut("le test %d \n",rr.validNode());
+       		if (rr.validNode()) 
+       		{
+            		osg::Node * nod = rr.takeNode();
+            		osg::MatrixTransform * rot = new osg::MatrixTransform;
+            		osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f,
                              0.0f,  0.0f, 1.0f, 0.0f,
                              0.0f, -1.0f, 0.0f, 0.0f,
                              0.0f,  0.0f, 0.0f, 1.0f);
-            rot->setMatrix(mat);
-            rot->addChild(nod);
-
-            return rot;
-        }
-        else
-        {
-            return NULL;
-        }
-  }
-  else
-  {
-    pNode = osgDB::readNodeFile(strFile, m_pOpt);
-  }
-
-        osg::ref_ptr<osg::MatrixTransform> rot = new osg::MatrixTransform;
-        osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f,
+            		rot->setMatrix(mat);
+            		rot->addChild(nod);
+            		
+            		return rot;
+       		}
+        	else
+        	{
+            		return NULL;
+            	}
+	}
+	else 
+	{
+		pNode = osgDB::readNodeFile(strFile, m_pOpt);
+	}	
+	
+    	osg::ref_ptr<osg::MatrixTransform> rot = new osg::MatrixTransform;
+    	osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f,
                      0.0f,  0.0f, 1.0f, 0.0f,
                      0.0f, -1.0f, 0.0f, 0.0f,
                      0.0f,  0.0f, 0.0f, 1.0f);
-        rot->setMatrix(mat);
-        rot->addChild(pNode);
-
-        return rot.get();
+    	rot->setMatrix(mat);
+    	rot->addChild(pNode);
+	
+    	return rot.get();
 }
