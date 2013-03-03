@@ -30,11 +30,6 @@
 # define SDATOMIC_USE_MIPSPRO_BUILTINS
 #elif defined(_WIN32)
 # define SDATOMIC_USE_LIBRARY_FUNCTIONS
-/*#else
-The sledge hammer ...
-# define SDATOMIC_USE_LIBRARY_FUNCTIONS
-# define SDATOMIC_USE_MUTEX
-# include <simgear/threads/SGThread.hxx>*/
 #endif*/
 
 class SDAtomic
@@ -109,13 +104,10 @@ private:
   SDAtomic(const SDAtomic&);
   SDAtomic& operator=(const SDAtomic&);
 
-/*#if defined(SGATOMIC_USE_MUTEX)
-  mutable SGMutex mMutex;
-#endif*/
   unsigned mValue;
 };
 
-namespace speeddreams
+namespace osggraph
 {
 // Typesafe wrapper around SGSwappable
 template <typename T>

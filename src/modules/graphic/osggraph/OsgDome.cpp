@@ -200,8 +200,8 @@ inline void sd_clampColor(osg::Vec3& color)
 bool SDSkyDome::repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_color,
                     const osg::Vec3f& fog_color, double sun_angle, double vis )
 {
-    osg::Vec3f outer_param, outer_diff;
-    osg::Vec3f middle_param, middle_diff;
+    osg::Vec3f outer_param, outer_amt, outer_diff;
+    osg::Vec3f middle_param, middle_amt, middle_diff;
 
     // Check for sunrise/sunset condition
     if (sun_angle > 80) 
@@ -221,8 +221,8 @@ bool SDSkyDome::repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_colo
 	middle_diff = osg::Vec3f(0, 0, 0);
     }
     
-    osg::Vec3f outer_amt = outer_param;
-    osg::Vec3f middle_amt = middle_param;
+    outer_amt  = outer_param;
+    middle_amt = middle_param;
 
     const double cvf = osg::clampBelow(vis, 45000.0);
     const double vis_factor = osg::clampTo((vis - 1000.0) / 2000.0, 0.0, 1.0);
@@ -238,7 +238,7 @@ bool SDSkyDome::repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_colo
     
     for (int i = 0; i < halfBands+1; i++) 
     {
-        osg::Vec3f diff = (1, 1, 1); //mult(skyFogDelta, blueShift);
+        osg::Vec3f diff = mult(skyFogDelta, blueShift);
         diff *= (0.8 + saif - ((halfBands-i)/10));
         colors(2, i) = toOsg(sky_color -  diff * upperVisFactor);
         colors(3, i) = toOsg(sky_color - diff * middleVisFactor + middle_amt);

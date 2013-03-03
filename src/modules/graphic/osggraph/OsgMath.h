@@ -152,9 +152,9 @@ toOsg(const osg::Quat& q)
 { return osg::Quat(q[0], q[1], q[2], q[3]); }
 
 inline
-osg::Vec2f
-mult(const osg::Vec2f& v1, const osg::Vec2f& v2)
-{ return osg::Vec2f((v1(0)*v2(0)), (v1(1)*v2(1))); }
+osg::Vec3f
+mult(const osg::Vec3f& v1, const osg::Vec3f& v2, const osg::Vec3f& v3)
+{ return osg::Vec3f(v1(0)*v2(0), v1(1)*v2(1), v3(2)*v3(2)); }
 
 static
 float lerp(const osg::Vec3f& val0, const osg::Vec3f& val1, const float t)
