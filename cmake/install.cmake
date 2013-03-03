@@ -551,7 +551,7 @@ MACRO(SD_INSTALL_CAR CARNAME)
   SET(SDIC_FILES ${CARNAME}.xml ${ARGN})
 
   FILE(GLOB AC3D_FILES *.acc)
-  FILE(GLOB OSGT_FILES *.osgt)
+  FILE(GLOB OSGT_FILES *.osg)
   FILE(GLOB PNG_FILES *.png)
   FILE(GLOB DDS_FILES *.dds)
   FILE(GLOB JPG_FILES *.jpg)
@@ -572,7 +572,7 @@ MACRO(SD_INSTALL_TRACK TRACKNAME CATEGORY)
   # Among AC3D files, keep any .acc one, but exclude *-src.ac
   # and *.ac when a .acc with same name exists.
   FILE(GLOB ACC_FILES *.acc)
-  FILE(GLOB OSGT_FILES *.osgt)
+  FILE(GLOB OSGT_FILES *.osg)
   FILE(GLOB SRCAC_FILES *-src.ac)
   FILE(GLOB AC_FILES *.ac)
   FOREACH(AC_FILE ${AC_FILES})
