@@ -114,7 +114,7 @@ void SDPerspCamera::setProjection(void)
     // we're only interested in half the viewing angle.
 
    // float fovx = atan(getAspectRatio() / spanaspect * tan(fovy * M_PI / 360.0)) * 360.0 / M_PI;
-   screen->getOsgCam()->setProjectionMatrixAsPerspective(fovy,screen->getViewRatio() / spanaspect,fnear,41000.0);
+   screen->getOsgCam()->setProjectionMatrixAsPerspective(fovy,screen->getViewRatio() / spanaspect,fnear,ffar);
 
     // grContext.setFOV(fovx, fovy);
     //grContext.setNearFar(fnear, ffar);
@@ -123,7 +123,7 @@ void SDPerspCamera::setProjection(void)
     if (viewOffset != 0 && spanOffset != 0) {
     float dist, left, right;
     double frnear,frfar,frtop,frbottom,frleft,frright;
-    frfar = 41000.0;
+    //frfar = 41000.0;
 
         //sgFrustum * frus = grContext.getFrustum();
    screen->getOsgCam()->getProjectionMatrixAsFrustum(frleft,frright,
@@ -1792,7 +1792,7 @@ SDCameras::SDCameras(SDView *c, int ncars){
     fovFactor *= GfParmGetNum(grTrackHandle, TRK_SECT_GRAPH, TRK_ATT_FOVFACT, (char*)NULL, 1.0);
 
     //tdble fovFactor =1;
-    tdble fixedFar =0;
+    tdble fixedFar =41000.0;
 
     // If sky dome is enabled, we have a "fixed far" cut plane.
     // Warning: In theory, 2*grSkyDomeDistance+1 should be enough, but it is not (why ?).
