@@ -229,7 +229,7 @@ bool SDSkyDome::repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_colo
     const float upperVisFactor = 1.0 - vis_factor * (0.7 + 0.3 * cvf / 45000);
     const float middleVisFactor = 1.0 - vis_factor * (0.1 + 0.85 * cvf / 45000);
 
-    (*dome_cl)[0] = toOsg(sky_color);
+    (*dome_cl)[0] = sky_color;
     osggraph::SDVectorArrayAdapter<Vec3Array> colors(*dome_cl, numBands, 1);
     const double saif = sun_angle / SD_PI;
     static const osg::Vec3f blueShift(0.8, 1.0, 1.2);
@@ -238,13 +238,13 @@ bool SDSkyDome::repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_colo
     
     for (int i = 0; i < halfBands+1; i++) 
     {
-        osg::Vec3f diff = mult(skyFogDelta, blueShift);
+        osg::Vec3f diff = blueShift * skyFogDelta;
         diff *= (0.8 + saif - ((halfBands-i)/10));
-        colors(2, i) = toOsg(sky_color -  diff * upperVisFactor);
-        colors(3, i) = toOsg(sky_color - diff * middleVisFactor + middle_amt);
-        colors(4, i) = toOsg(fog_color + outer_amt);
-        colors(0, i) = lerp(toOsg(sky_color), colors(2, i), .3942);
-        colors(1, i) = lerp(toOsg(sky_color), colors(2, i), .7885);
+        colors(2, i) = sky_color -  diff * upperVisFactor; //toOsg(sky_color -  diff * upperVisFactor);
+        colors(3, i) = sky_color - diff * middleVisFactor + middle_amt; //toOsg(sky_color - diff * middleVisFactor + middle_amt);
+        colors(4, i) = fog_color + outer_amt; //toOsg(fog_color + outer_amt);
+        colors(0, i) = sky_color * 0.3942 + colors(2,i) * 0.3942; //lerp(toOsg(sky_color), colors(2, i), .3942);
+        colors(1, i) = sky_color * 0.7885 + colors(2,i) * 0.7885; //lerp(toOsg(sky_color), colors(2, i), .7885);
         for (int j = 0; j < numRings - 1; ++j)
             sd_clampColor(colors(j, i));
         outer_amt -= outer_diff;
@@ -261,7 +261,7 @@ bool SDSkyDome::repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_colo
                       numBands);
 
     for ( int i = 0; i < numBands; i++ )
-        colors(numRings - 1, i) = toOsg(fog_color);
+        colors(numRings - 1, i) = fog_color;//toOsg(fog_color);
     dome_cl->dirty();
     
     return true;
@@ -274,7 +274,7 @@ bool SDSkyDome::reposition( const osg::Vec3f& p, double _asl,
 
     osg::Matrix T, LON, LAT, SPIN;
 
-    T.makeTranslate( toOsg(p) );
+    T.makeTranslate( p );
     LON.makeRotate(lon, osg::Vec3(0, 0, 1));
     LAT.makeRotate(90.0 * SD_DEGREES_TO_RADIANS - lat, osg::Vec3(0, 1, 0));
     SPIN.makeRotate(spin, osg::Vec3(0, 0, 1));
