@@ -2977,8 +2977,8 @@ void TDriver::BrakingForceController()
   if (oBrake > 0)
   {
 	oAccel = 0;
-    //LogSimplix.error("#Diff: %.3f m/s B: %.3f %% T: %.1f R: %.3f %%\n",
-	//  Diff,oBrake*100,oPIDCBrake.oTotal,oBrakeMaxPressRatio);
+    LogSimplix.error("#Diff: %.3f m/s B: %.3f %% T: %.1f R: %.3f %%\n",
+	  Diff,oBrake*100,oPIDCBrake.oTotal,oBrakeMaxPressRatio);
   }
 
   oLastTargetSpeed = oTargetSpeed;
