@@ -35,7 +35,7 @@ SDSky::SDSky( void )
     ramp_down = 0.15;
     in_cloud  = -1;
 
-    //dome = 0;
+    dome = 0;
     sun = 0;
     moon = 0;
     planets = 0;
@@ -47,12 +47,12 @@ SDSky::SDSky( void )
     //clouds_3d_density = 0.8;
 
     pre_root = new osg::Group;
-    //pre_root->setNodeMask(simgear::BACKGROUND_BIT);
+    pre_root->setNodeMask(BACKGROUND_BIT);
     osg::StateSet* preStateSet = new osg::StateSet;
     preStateSet->setAttribute(new osg::Depth(osg::Depth::LESS, 0.0, 1.0, false));
     pre_root->setStateSet(preStateSet);
     //cloud_root = new osg::Group;
-    //cloud_root->setNodeMask(simgear::MODEL_BIT);
+    //cloud_root->setNodeMask(MODEL_BIT);
 
     pre_selector = new osg::Switch;
     pre_transform = new osg::Group;
@@ -62,7 +62,7 @@ SDSky::SDSky( void )
 // Destructor
 SDSky::~SDSky( void )
 {
-    //delete dome;
+    delete dome;
     delete sun;
     delete moon;
     delete planets;
@@ -71,17 +71,12 @@ SDSky::~SDSky( void )
     //delete post_root;
 }
 
-// initialize the sky and connect the components to the scene graph at
-// the provided branch
-/*void SDSky::build( double h_radius_m, double v_radius_m,
-                   double sun_size, double moon_size,
-                   const SGEphemeris& eph )*/
 void SDSky::build( std::string tex_path, double h_radius, double v_radius, double sun_size, double sun_dist,
       double moon_size, double moon_dist, int nplanets, osg::Vec3d *planet_data,
       int nstars, osg::Vec3d *star_data )
 {
-    /*dome = new SDSkyDome;
-    pre_transform->addChild( dome->build( h_radius_m, v_radius_m ));*/
+    dome = new SDSkyDome;
+    pre_transform->addChild( dome->build( h_radius_m, v_radius_m ));
 
     //pre_transform->addChild(_ephTransform.get());
     planets = new SDStars;
@@ -104,7 +99,6 @@ void SDSky::build( std::string tex_path, double h_radius, double v_radius, doubl
     pre_root->addChild( pre_selector.get());    
 }
 
-//bool SDSky::repaint( const SDSkyColor &sc, const SDEphemeris& eph )
 bool SDSky::repaint( osg::Vec4d sky_color, osg::Vec4d fog_color, osg::Vec4d cloud_color, double sol_angle,
                        double moon_angle, int nplanets, osg::Vec3d *planet_data,
                        int nstars, osg::Vec3d *star_data )
@@ -120,24 +114,26 @@ bool SDSky::repaint( osg::Vec4d sky_color, osg::Vec4d fog_color, osg::Vec4d clou
         sun->repaint( sol_angle, effective_visibility );
         moon->repaint( moon_angle );
 
-		/*for ( unsigned i = 0; i < cloud_layers.size(); ++i ) 
-		{
-            if (cloud_layers[i]->getCoverage() != SGCloudLayer::SG_CLOUD_CLEAR)
+	/*for ( unsigned i = 0; i < cloud_layers.size(); ++i ) 
+	{
+            if (cloud_layers[i]->getCoverage() != SDCloudLayer::SG_CLOUD_CLEAR)
             {
                 cloud_layers[i]->repaint( sc.cloud_color );
             }
-		}*/
+	}*/
     } else 
     {
 		// turn off sky
 		disable();
     }
-    /*SGCloudField::updateFog((double)effective_visibility,
-                            osg::Vec4f(toOsg(sc.fog_color), 1.0f));*/
+    /*SDCloudField::updateFog((double)effective_visibility,
+                            osg::Vec4f(sc.fog_color, 1.0f);*/
     return true;
 }
 
-bool SDSky::reposition( osg::Vec3 view_pos, osg::Vec3 zero_elev, osg::Vec3 view_up, double lon, double lat, double alt, double spin, double gst, double dt )
+bool SDSky::reposition( osg::Vec3& view_pos, osg::Vec3 zero_elev, osg::Vec3 view_up, 
+			double lon, double lat, double alt, double spin,
+			double gst, double dt )
 {
     double angle = gst * 15;
     //double angleRad = SGMiscd::deg2rad(angle);
@@ -158,7 +154,7 @@ bool SDSky::reposition( osg::Vec3 view_pos, osg::Vec3 zero_elev, osg::Vec3 view_
     //dome->reposition( zero_elev, alt, lon, lat, st.spin );
 
     /*osg::Matrix m = osg::Matrix::rotate(angleRad, osg::Vec3(0, 0, -1));
-    m.postMultTranslate(toOsg(st.pos));
+    m.postMultTranslate(st.pos);
     _ephTransform->setMatrix(m);
 
     double sun_ra = eph.getSunRightAscension();
@@ -171,7 +167,7 @@ bool SDSky::reposition( osg::Vec3 view_pos, osg::Vec3 zero_elev, osg::Vec3 view_
 
     /*for ( unsigned i = 0; i < cloud_layers.size(); ++i ) 
     {
-        if ( cloud_layers[i]->getCoverage() != SGCloudLayer::SG_CLOUD_CLEAR ) 
+        if ( cloud_layers[i]->getCoverage() != SDCloudLayer::SG_CLOUD_CLEAR ) 
         {
             cloud_layers[i]->reposition( zero_elev, view_up, lon, lat, alt, dt);
         } else
@@ -206,7 +202,7 @@ int SDSky::get_cloud_layer_count () const
 
 double SDSky::get_3dCloudDensity() const 
 {
-    return SGNewCloud::getDensity();
+    return SDNewCloud::getDensity();
 }
 
 void SDSky::set_3dCloudDensity(double density)
@@ -216,7 +212,7 @@ void SDSky::set_3dCloudDensity(double density)
 
 float SDSky::get_3dCloudVisRange() const 
 {
-    return SGCloudField::getVisRange();
+    return SDCloudField::getVisRange();
 }
 
 void SDSky::set_3dCloudVisRange(float vis)
@@ -230,7 +226,7 @@ void SDSky::set_3dCloudVisRange(float vis)
 
 void SDSky::texture_path( const string& path ) 
 {
-	tex_path = SGPath( path );
+	tex_path =  path;
 }*/
 
 void SDSky::modify_vis( float alt, float time_factor ) 

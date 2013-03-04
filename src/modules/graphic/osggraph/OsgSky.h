@@ -31,7 +31,7 @@
 #include "OsgMoon.h"
 #include "OsgSun.h"
 #include "OsgStars.h"
-#include "OsgSharedPtr.h"
+//#include "OsgSharedPtr.h"
 
 using std::vector;
 
@@ -62,15 +62,21 @@ typedef struct
   double sun_angle, moon_angle;
 } SDSkyColor;
 
+enum NodeMask 
+{
+    BACKGROUND_BIT = (1 << 11),
+    MODEL_BIT = (1 << 12),
+};
+
 class SDSky
 {
 private:
-    //typedef std::vector<SGSharedPtr<SGCloudLayer> > layer_list_type;
+    //typedef std::vector<SDSharedPtr<SDCloudLayer> > layer_list_type;
     //typedef layer_list_type::iterator layer_list_iterator;
     //typedef layer_list_type::const_iterator layer_list_const_iterator;
 
     // components of the sky
-    //SDSharedPtr<SGSkyDome> dome;
+    SDSkyDome> dome;
     SDSun* sun;
     SDMoon* moon;
     SDStars* planets;
