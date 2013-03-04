@@ -96,13 +96,12 @@ The Speed Dreams Team.
       and that we'll extract them in the "2.0.0-r4687" folder
       (you can do as you like, but we'll use this folder in the explanations below).
 
-  b - uncompress the tarballs :
-
+  b - extract the tarballs :
 
       Whatever the chosen option (1 or 2) :
       
       $ cd $HOME/sd
-      $ mkdir 
+      $ mkdir 2.0.0-r4687
       $ cd 2.0.0-r4687
       $ for file in ../*.xz; do tar xvfa $file; done
       
@@ -127,7 +126,7 @@ The Speed Dreams Team.
 
     2. run CMake :
 
-      - for a Release build using default 3rd party libs
+      - for a Release (optimised) build using default 3rd party libs
 
         Option 1 (full contents) :
         $ cmake -D OPTION_OFFICIAL_ONLY:BOOL=ON ..
@@ -142,8 +141,8 @@ The Speed Dreams Team.
           Example :
 
             $ cmake -D SD_LOCALDIR:STRING=~/dev/.sd-settings \
-                    -D CMAKE_PREFIX_PATH:STRING=/usr/local
-                    -D CMAKE_BUILD_TYPE:STRING=Debug
+                    -D CMAKE_PREFIX_PATH:STRING=/usr/local \
+                    -D CMAKE_BUILD_TYPE:STRING=Debug ..
 
         or else you can use ccmake to change the variables interactively :
 
@@ -267,8 +266,8 @@ The Speed Dreams Team.
 
     $ speed-dreams-2
       
-  If /usr/local/games not already in your PATH variable, you may want to add it ; to do so,
-  simply add the line "export PATH=$PATH:/usr/local/games" to your  ~/.bashrc file ;
+  If /usr/local/games is not already in your PATH variable, you probably want to add it ;
+  to do so, simply add the line "export PATH=$PATH:/usr/local/games" to your  ~/.bashrc file ;
   you can use :
 
     $ echo "export PATH=$PATH:/usr/local/games" >> ~/.bashrc" for that
@@ -310,7 +309,8 @@ The Speed Dreams Team.
 III - Windows installation from sources
 ---------------------------------------
 
-Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wight be needed for newer / wider versions.
+Note that these instructions work under Windows XP 32 SP2/SP3 ; 
+some tweaks might be needed for newer / wider versions.
 
 0) Initial steps, common to all build methods
 
@@ -350,7 +350,7 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
 
   d.  Install MinGW (and optionaly MSYS)
 
-     Following the instructions of http://www.mingw.org/wiki/Getting_Started
+     Here's a simpler version of the instructions of http://www.mingw.org/wiki/Getting_Started
      (example here for the official release of 2012, April, featuring gcc 4.7.0) :
 
      * Download and run the latest mingw-get-inst version from 
@@ -359,16 +359,14 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
      * Select the directory where to install MinGW, remembering the advice
        that the path to this directory should not contain any spaces.
        => C:\MinGW
+     * Select the "Download latest repository catalogues" option
+       in order to get the latest Gcc (4.7.0 as of now)
+       (if you choose "Use pre-packaged catalogues", you'll get an old Gcc 4.6.2,
+        which is _not_ compatible with the below mentioned 3rd party binary package.
      * Select the minimal set of components to install :
+       * C compiler (always)
        * C++ compiler (always)
        * MSYS (if you don't plan to use QtCreator).
-     *  When installing MinGW with the setup wizard, it asks you :
-          Use pre-packaged catalogues or download the latest version?
-           1) Use pre-packaged catalogues 20120426
-           2) Download latest repository catalogues
-         => select the 2nd choice (for getting Gcc 4.7.0),
-            not the default 1st one, that'll give you the old Gcc 4.6.2,
-            which is _not_ compatible with the below mentioned 3rd party binary package.
 
      If you installed MSYS, then you might be interested in the following,
      otherwise, skip it and go to e.
@@ -589,18 +587,28 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
           . click on the "Add the deployment step" button, and select "Make",
           . add the "install" argument to the default "mingw32-make.exe" command.       
 
-  j.  Build and install
+  j.  Build
 
       * If you are using MSYS, in the MSYS shell :
 
         $ make # use -j2 or even -j4 if you own a dual/quad-core CPU
+
+      * If you are using QtCreator :
+
+        - "Build / Compile all" through the menu (or Shift-Ctrl-B)
+      
+  k.  Install
+
+      * If you are using MSYS, in the MSYS shell :
+
         $ make install
 
       * If you are using QtCreator :
 
-        - "Build / Compile all" through the menu
+        you have to "Run" Speed Dreams (no separate Install function :-(,
+        it'll install le software before running it (see i. above)
       
-  k.  Run (and debug) Speed Dreams
+  l.  Run (and debug) Speed Dreams
 
       * Of course you can simply double click on the installed speed-dreams-2.exe executable
         (should be in /speed-dreams-2-build/bin with default CMake settings) ...
@@ -645,8 +653,8 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
       * "Where to build the binaries" to c:\gamesources\speed-dreams\src-2.0.0\build
         (if you follow the folder specs above).
   g.  Press "Configure" button, answer "Yes, create the ...\build folder",
-      select the compiler and don't change the "Use native compilers" option.
-      Press the "Configure" button again, until the "OK" button is no more greyed.
+      select the right MSVC compiler version and don't change the "Use native compilers" option.
+      Press the "Configure" button again, until the "Generate" button is no more greyed.
   h.  Press the "Generate" button.  CMake will generate the solution file "speed-dreams-2.sln"
       and associated project files (*.vcproj) in the ...\build folder
       (Note : .sln/.vcproj are OK for MSVC 2005, but you might get other files extensions
