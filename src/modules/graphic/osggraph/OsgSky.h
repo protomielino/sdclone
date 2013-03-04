@@ -27,7 +27,7 @@
 #include <osg/Node>
 #include <osg/Switch>
 
-//#include "OsgDome.h"
+#include "OsgDome.h"
 #include "OsgMoon.h"
 #include "OsgSun.h"
 #include "OsgStars.h"
@@ -128,7 +128,7 @@ public:
                   double moon_angle, int nplanets, osg::Vec3d *planet_data,
                   int nstars, osg::Vec3d *star_data);
     //bool reposition( const SDSkyState &st/*, const SDEphemeris& eph*/, double dt = 0.0 );
-    bool reposition(osg::Vec3 view_pos, osg::Vec3 zero_elev, osg::Vec3 view_up, double lon, double lat, double alt, double spin, double gst, double dt);
+    bool reposition(osg::Vec3& view_pos, osg::Vec3 zero_elev, osg::Vec3 view_up, double lon, double lat, double alt, double spin, double gst, double dt);
  
     void modify_vis( float alt, float time_factor );
 

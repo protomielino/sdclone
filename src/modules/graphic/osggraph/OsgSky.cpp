@@ -76,7 +76,7 @@ void SDSky::build( std::string tex_path, double h_radius, double v_radius, doubl
       int nstars, osg::Vec3d *star_data )
 {
     dome = new SDSkyDome;
-    pre_transform->addChild( dome->build( h_radius_m, v_radius_m ));
+    pre_transform->addChild( dome->build( h_radius, v_radius ));
 
     //pre_transform->addChild(_ephTransform.get());
     planets = new SDStars;
