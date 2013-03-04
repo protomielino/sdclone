@@ -154,6 +154,42 @@ const std::string& GfApplication::version() const
 void GfApplication::updateUserSettings()
 {
 	GfFileSetup();
+	
+	// Complete logging system initialisation
+	// 1) Reparse the relevant options if present.
+	int nDefTraceLevel = std::numeric_limits<int>::min();
+	std::string strDefTraceStream;
+
+	std::list<Option>::const_iterator itOpt;
+	for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+	{
+		// Not found in the command line => ignore / default value.
+		if (!itOpt->bFound)
+			continue;
+		
+		// Trace level threshold (only #ifdef TRACE_OUT)
+		if (itOpt->strLongName == "tracelevel")
+		{
+			if (sscanf(itOpt->strValue.c_str(), "%d", &nDefTraceLevel) < 1)
+			{
+				printUsage("Error: Could not convert trace level to an integer.");
+				nDefTraceLevel = std::numeric_limits<int>::min();
+			}
+		}
+		// Target trace stream (only #ifdef TRACE_OUT)
+		else if (itOpt->strLongName == "tracestream")
+		{
+			strDefTraceStream = itOpt->strValue;
+		}
+	}
+
+	// 2) Take the options into account.
+	// Note: Not achieved earlier because we need one of the user settings files : logging.xml.
+	GfLogger::setup();
+	if (nDefTraceLevel != std::numeric_limits<int>::min())
+		GfLogDefault.setLevelThreshold(nDefTraceLevel);
+	if (!strDefTraceStream.empty())
+		GfLogDefault.setStream(strDefTraceStream);
 }
 
 void GfApplication::setEventLoop(GfEventLoop* pEventLoop)
@@ -321,9 +357,6 @@ bool GfApplication::parseOptions()
 	const char *pszDataDir = 0;
 	const char *pszBinDir = 0;
 
-	int nDefTraceLevel = std::numeric_limits<int>::min();
-	std::string strDefTraceStream;
-	
 	bool bTrueRandom = true;
 
 	std::list<Option>::const_iterator itOpt;
@@ -365,20 +398,6 @@ bool GfApplication::parseOptions()
 		{
 			pszDataDir = GfSetDataDir(itOpt->strValue.c_str());
 		}
-		// Trace level threshold (only #ifdef TRACE_OUT)
-		else if (itOpt->strLongName == "tracelevel")
-		{
-			if (sscanf(itOpt->strValue.c_str(), "%d", &nDefTraceLevel) < 1)
-			{
-				printUsage("Error: Could not convert trace level to an integer");
-				return false;
-			}
-		}
-		// Target trace stream (only #ifdef TRACE_OUT)
-		else if (itOpt->strLongName == "tracestream")
-		{
-			strDefTraceStream = itOpt->strValue;
-		}
 		// Initialize random generator or not.
 		else if (itOpt->strLongName == "norandom")
 		{
@@ -417,14 +436,6 @@ bool GfApplication::parseOptions()
 		return false;
 	}
 
-	// Complete logging system initialisation.
-	GfLogger::setup();
-	if (nDefTraceLevel != std::numeric_limits<int>::min())
-		GfLogDefault.setLevelThreshold(nDefTraceLevel);
-	if (!strDefTraceStream.empty())
-		GfLogDefault.setStream(strDefTraceStream);
-
-	
 	// Initialize random generator with "random" seed, or not (=> always same rand() sequence).
 	if (bTrueRandom)
 	{
