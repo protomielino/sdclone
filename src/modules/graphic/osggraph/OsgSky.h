@@ -76,7 +76,7 @@ private:
     //typedef layer_list_type::const_iterator layer_list_const_iterator;
 
     // components of the sky
-    SDSkyDome> dome;
+    SDSkyDome* dome;
     SDSun* sun;
     SDMoon* moon;
     SDStars* planets;
