@@ -157,6 +157,14 @@ SimCarConfig(tCar *car)
 	car->corner[REAR_LFT].pos.x = (tdble) (- car->dimension.x * .5 - car->statGC.x);
 	car->corner[REAR_LFT].pos.y = (tdble) (overallwidth * .5 - car->statGC.y);
 	car->corner[REAR_LFT].pos.z = 0;
+	
+	/* set wing positions */
+	if (car->features & FEAT_AEROTOCG) {
+		for (i = 0; i < 2; i++) {
+			car->wing[i].staticPos.x -= car->statGC.x;
+			car->wing[i].staticPos.y -= car->statGC.y;
+		}
+	}
 }
 
 
