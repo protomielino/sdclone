@@ -543,6 +543,7 @@ typedef struct CarElt
 #define SECT_GROBJECTS		"Graphic Objects"
 #define SECT_EXHAUST		"Exhaust"
 #define SECT_LIGHT		"Light"
+#define SECT_FEATURES		"Features"
 
 /* Parameter names */
 #define PRM_CATEGORY		"category"
@@ -765,6 +766,17 @@ typedef struct CarElt
 #define SEM_COLLISION_Z			0x08
 #define SEM_COLLISION_Z_CRASH	0x10
 
+/* features */
+#define PRM_AEROTOCG		"shifting aero coordinates"
+#define PRM_SLOWGRIP		"fixed low speed grip"
+#define PRM_REALGEARCHANGE	"realistic gear change"
+#define PRM_REVLIMIT		"realistic rev limiter"
+#define VAL_YES			"yes"
+#define VAL_NO			"no"
+#define FEAT_AEROTOCG		0x01 //shift aero coordinates with the CG
+#define FEAT_SLOWGRIP		0x02 //fix magic formula divergence at low speeds
+#define FEAT_REALGEARCHANGE	0x04 //neutral between old and new gears without autoclutch
+#define FEAT_REVLIMIT		0x08 //rev drop when hitting the limit
 
 #endif /* __CARV1_H__ */ 
 
