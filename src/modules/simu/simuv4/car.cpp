@@ -37,7 +37,27 @@ SimCarConfig(tCar *car)
 	tdble	overallwidth;
 	int		i;
 	tCarElt	*carElt = car->carElt;
+	const char *enabling;
 	
+	/* get features first */
+	car->features = 0;
+	enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_AEROTOCG, VAL_NO);
+	if (strcmp(enabling, VAL_YES) == 0) {
+		car->features = car->features | FEAT_AEROTOCG;
+	}
+	enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_SLOWGRIP, VAL_NO);
+	if (strcmp(enabling, VAL_YES) == 0) {
+		car->features = car->features | FEAT_SLOWGRIP;
+	}
+	enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_REALGEARCHANGE, VAL_NO);
+	if (strcmp(enabling, VAL_YES) == 0) {
+		car->features = car->features | FEAT_REALGEARCHANGE;
+	}
+	enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_REVLIMIT, VAL_NO);
+	if (strcmp(enabling, VAL_YES) == 0) {
+		car->features = car->features | FEAT_REVLIMIT;
+	}
+	/* continue with car parameters */
 	car->dimension.x = GfParmGetNum(hdle, SECT_CAR, PRM_LEN, (char*)NULL, 4.7f);
 	car->dimension.y = GfParmGetNum(hdle, SECT_CAR, PRM_WIDTH, (char*)NULL, 1.9f);
 	overallwidth     = GfParmGetNum(hdle, SECT_CAR, PRM_OVERALLWIDTH, (char*)NULL, car->dimension.y);
