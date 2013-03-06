@@ -14,8 +14,15 @@
 
 <!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
 
-<params name="default car" version="1.0">
+<params name="default car" version="1.1">
 
+<!-- Enabling new simuv4 features -->
+	<section name="Features">
+		<attstr name="shifting aero coordinates" in="yes,no" val="yes"/>
+        <attstr name="fixed low speed grip" in="yes,no" val="yes"/>
+        <attstr name="realistic gear change" in="yes,no" val="yes"/>
+        <attstr name="realistic rev limiter" in="yes,no" val="yes"/>
+	</section>
 
 </params>
 
