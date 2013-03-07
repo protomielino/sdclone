@@ -43,6 +43,7 @@
 static void *ScrHandle = NULL;
 static void	*PrevScrHandle = NULL;
 static void	*PrefHdle = NULL;
+static int	SaveOnExit = 0;
 
 static tCtrlMouseInfo MouseInfo;
 static char	CurrentSection[256];
@@ -605,7 +606,7 @@ DevCalibrate(void * /* dummy */)
 
 /* */
 void *
-ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode)
+ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode, int saveOnExit)
 {
     int	i;
 
@@ -614,6 +615,7 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     PrevScrHandle = prevMenu;
 
     PrefHdle = prefHdle;
+    SaveOnExit = saveOnExit;
 
     /* Select current player section in the players preferences */
     sprintf(CurrentSection, "%s/%s/%u", HM_SECT_PREF, HM_LIST_DRV, index);
@@ -807,4 +809,8 @@ void ControlPutSettings(void *prefHdle, unsigned index, tGearChangeMode gearChan
 	    GfParmSetNum(prefHdle, CurrentSection, Cmd[iCmd].powName, NULL, Cmd[iCmd].pow);
 	}
     }
+
+    if (SaveOnExit)
+        GfParmWriteFile(NULL, PrefHdle, "preferences");
+
 }

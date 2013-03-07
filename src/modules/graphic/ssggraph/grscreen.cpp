@@ -165,6 +165,15 @@ void cGrScreen::selectTrackMap()
 	GfParmWriteFile(NULL, grHandle, "Graph");
 }
 
+void cGrScreen::setCurrentCar(tCarElt *newCurCar)
+{
+	curCar = newCurCar; 
+
+	sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
+	GfParmSetStr(grHandle, path, GR_ATT_CUR_DRV, curCar->_name);
+	GfParmWriteFile(NULL, grHandle, "Graph");
+}
+
 void cGrScreen::switchMirror(void)
 {
 	mirrorFlag = 1 - mirrorFlag;
@@ -482,6 +491,9 @@ void cGrScreen::loadParams(tSituation *s)
 		}
 		
 		GfLogTrace("Screen #%d : Assigned to %s\n", id, curCar->_name);
+
+		GfParmSetStr(grHandle, path, GR_ATT_CUR_DRV, curCar->_name);
+		GfParmWriteFile(NULL, grHandle, "Graph");
 	}
 
 	// Load "current camera" settings (attached to the "current car").

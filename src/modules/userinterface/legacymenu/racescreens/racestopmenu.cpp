@@ -20,14 +20,21 @@
 #include <isoundengine.h>
 
 #include <playerconfig.h>
+#include <controlconfig.h>
 
 #include "legacymenu.h"
 #include "exitmenu.h"
 #include "racescreens.h"
+
+#include <graphic.h>
+#include <playerpref.h>
+#include <robot.h>
+
 extern RmProgressiveTimeModifier rmProgressiveTimeModifier;
 
 
 static void *hscreen = 0;
+static int curPlayerIdx = 0;
 
 // Abort race hook ******************************************************
 static void
@@ -116,7 +123,32 @@ rmRestartRaceHookInit()
 static void
 rmControlsHookActivate(void * /* dummy */)
 {
+#if 0
 	GfuiScreenActivate(PlayerConfigMenuInit(hscreen));
+#else
+	void *prHandle;
+	char buf[100];
+	const char *str;
+	tGearChangeMode gearChangeMode;
+
+	sprintf(buf, "%s%s", GfLocalDir(), HM_PREF_FILE);
+	prHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+
+	snprintf(buf, sizeof(buf), "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, curPlayerIdx);
+	str = GfParmGetStr(prHandle, buf, HM_ATT_TRANS, HM_VAL_AUTO);
+
+	if (!strcmp(str, HM_VAL_AUTO)) {
+		gearChangeMode = GEAR_MODE_AUTO;
+	} else if (!strcmp(str, HM_VAL_GRID)) {
+		gearChangeMode = GEAR_MODE_GRID;
+	} else if (!strcmp(str, HM_VAL_HBOX)) {
+		gearChangeMode = GEAR_MODE_HBOX;
+	} else {
+		gearChangeMode = GEAR_MODE_SEQ;
+	}
+
+	GfuiScreenActivate(ControlMenuInit(hscreen, prHandle, curPlayerIdx, gearChangeMode, 1));
+#endif
 }
 
 static void	*pvControlsHookHandle = 0;
@@ -263,56 +295,88 @@ RmStopRaceMenu()
 	void* params = LmRaceEngine().outData()->params;
 	const char* pszRaceName = LmRaceEngine().outData()->_reRaceName;
 
+	const char *buttonRole[6];
+	void *screen[6];
+	int i;
+
+#if 1
+	int j;
+	void *grHandle;
+	void *hdHandle;
+	char buf[100];
+	const char *cur_name;
+	const char *test_name;
+
+	sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
+	grHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+
+	sprintf(buf, "%s%s", GfLocalDir(), HM_DRV_FILE);
+	hdHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+#endif
+
 	// Mute sound.
 	if (LegacyMenu::self().soundEngine())
 		LegacyMenu::self().soundEngine()->mute();
 
-	if (!strcmp(GfParmGetStr(params, pszRaceName, RM_ATTR_ALLOW_RESTART, RM_VAL_NO), RM_VAL_NO)) 
+	for(i=0; i < 6; i++) {
+		buttonRole[i] = "";
+		screen[i] = NULL;
+	}
+
+	// Build list of options
+	i = 0;
+	buttonRole[i] = "resume";
+	screen[i++] = RmBackToRaceHookInit();
+
+	if (strcmp(GfParmGetStr(params, pszRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 
 	{
-		if (strcmp(GfParmGetStr(params, pszRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 
-		{
-			rmStopScrHandle =
-				rmStopRaceMenu
-				    ("resume", RmBackToRaceHookInit(),
-					 "skip", rmSkipSessionHookInit(),
-					 "abort", rmAbortRaceHookInit(),
-					 "controls", rmControlsHookInit(),
-					 "quit", rmQuitHookInit());
-		}
-		else 
-		{
-			rmStopScrHandle =
-				rmStopRaceMenu
-				    ("resume", RmBackToRaceHookInit(),
-					 "abort", rmAbortRaceHookInit(),
-					 "controls", rmControlsHookInit(),
-					 "quit", rmQuitHookInit());
+		buttonRole[i] = "skip"; 
+		screen[i++] = rmSkipSessionHookInit();
+	}
+
+	if (strcmp(GfParmGetStr(params, pszRaceName, RM_ATTR_ALLOW_RESTART, RM_VAL_NO), RM_VAL_NO)) 
+	{
+		buttonRole[i] = "restart"; 
+		screen[i++] = rmRestartRaceHookInit();
+	}
+
+	buttonRole[i] = "abort";
+	screen[i++] = rmAbortRaceHookInit();
+
+#if 1
+	// get current driver
+	j = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_CUR_SCREEN, NULL, 0.0);
+	snprintf(buf, sizeof(buf), "%s/%d", GR_SCT_DISPMODE, j);
+	cur_name = GfParmGetStr(grHandle, buf, GR_ATT_CUR_DRV, "not found");
+	GfLogInfo("Current driver (on active split screen) is '%s'\n", cur_name);
+
+	// Attempt to find a human driver
+	for (j=0; ; j++) {
+		snprintf(buf, sizeof(buf), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, j+1);
+		test_name = GfParmGetStr(hdHandle, buf, ROB_ATTR_NAME, "");
+
+		if (strlen(test_name) == 0) break;
+
+		if (strcmp(cur_name, test_name) == 0) {
+			GfLogInfo("Matching human driver found, setting index to %d.\n", j+1);
+			curPlayerIdx = j+1;
+		
+			buttonRole[i] = "controls";
+			screen[i++] = rmControlsHookInit();
+			break;
 		}
 	}
-	else 
-	{
-		if (strcmp(GfParmGetStr(params, pszRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 
-		{
-			rmStopScrHandle =
-				rmStopRaceMenu
-				    ("resume", RmBackToRaceHookInit(),
-					 "skip", rmSkipSessionHookInit(),
-					 "restart", rmRestartRaceHookInit(),
-					 "abort", rmAbortRaceHookInit(),
-					 "controls", rmControlsHookInit(),
-					 "quit", rmQuitHookInit());
-		}
-		else 
-		{
-			rmStopScrHandle =
-				rmStopRaceMenu
-				    ("resume", RmBackToRaceHookInit(),
-					 "restart", rmRestartRaceHookInit(),
-					 "abort", rmAbortRaceHookInit(),
-					 "controls", rmControlsHookInit(),
-					 "quit", rmQuitHookInit());
-		}
-	}
+#endif
+
+	buttonRole[i] = "quit";
+	screen[i++] = rmQuitHookInit();
+
+	rmStopScrHandle = rmStopRaceMenu(buttonRole[0], screen[0],
+			   buttonRole[1], screen[1],
+			   buttonRole[2], screen[2],
+			   buttonRole[3], screen[3],
+			   buttonRole[4], screen[4],
+			   buttonRole[5], screen[5]);
 }
 
 void

@@ -378,8 +378,10 @@ grSplitScreen(void *vp)
     }
 
 	// Ensure current screen index stays in the righ range.
-	if (nCurrentScreenIndex >= grNbActiveScreens)
+	if (nCurrentScreenIndex >= grNbActiveScreens) {
 		nCurrentScreenIndex = grNbActiveScreens - 1;
+		GfParmSetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_CUR_SCREEN, NULL, nCurrentScreenIndex);
+	}
 
 	// Save nb of active screens to user settings.
     GfParmSetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, grNbActiveScreens);
@@ -401,7 +403,11 @@ grChangeScreen(void *vp)
 			nCurrentScreenIndex = (nCurrentScreenIndex - 1 + grNbActiveScreens) % grNbActiveScreens;
 			break;
     }
-	GfLogInfo("Changing current screen to #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
+
+    GfLogInfo("Changing current screen to #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
+
+    GfParmSetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_CUR_SCREEN, NULL, nCurrentScreenIndex);
+    GfParmWriteFile(NULL, grHandle, "Graph");
 }
 
 class cGrScreen *
@@ -683,6 +689,7 @@ initCars(tSituation *s)
 	/* Check whether view should be spanned across vertical splits */
 	pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
 	grSpanSplit = strcmp(pszSpanSplit, GR_VAL_YES) ? 0 : 1;
+	nCurrentScreenIndex = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_CUR_SCREEN, NULL, nCurrentScreenIndex);
 
 	if (grSpanSplit == 0 && grNbSuggestedScreens > 1) {
 		// Mulitplayer, so ignore the stored number of screens
@@ -694,11 +701,19 @@ initCars(tSituation *s)
 		grNbArrangeScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_ARR_SCREENS, NULL, 0.0);
 	}
 
+	// Ensure current screen index stays in the righ range.
+	if (nCurrentScreenIndex >= grNbActiveScreens) {
+		nCurrentScreenIndex = grNbActiveScreens - 1;
+		GfParmSetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_CUR_SCREEN, NULL, nCurrentScreenIndex);
+	}
 
 	// Initialize the cameras for all the screens.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
 	grScreens[i]->initCams(s);
     }
+
+    //Write back to file
+    GfParmWriteFile(NULL, grHandle, "Graph");
 
     TRACE_GL("initCars: end");
 

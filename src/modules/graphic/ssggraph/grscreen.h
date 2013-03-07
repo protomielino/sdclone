@@ -78,7 +78,7 @@ class cGrScreen {
 		void selectBoard(const long brd);
 		void selectTrackMap();
 	
-		inline void setCurrentCar(tCarElt *newCurCar) { curCar = newCurCar; }
+		void setCurrentCar(tCarElt *newCurCar);
 
 		void initCams(tSituation *s);
 		void initBoard(void);
