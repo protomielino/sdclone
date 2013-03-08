@@ -123,7 +123,20 @@ private:
 
 class TextureData
 {
-  public:
+
+private:
+    osg::ref_ptr<osg::TexEnv> mModulateTexEnv;
+    osg::ref_ptr<osg::Texture2D> mTexture2DClamp;
+    osg::ref_ptr<osg::Texture2D> mTexture2DRepeat;
+    osg::ref_ptr<osg::Texture2D> mTexture2DClamp2;
+    osg::ref_ptr<osg::Image> mImage;
+    osg::ref_ptr<osg::Image> mImage2;
+    bool mTranslucent;
+    bool mRepeat;
+    float mAlphaClamp;
+    bool mCar;
+
+public:
     TextureData() :
         mTranslucent(false),
         mRepeat(true),
@@ -232,17 +245,7 @@ class TextureData
 		if (mAlphaClamp>0.0f)
 			setAlphaClamp(stateSet,mAlphaClamp);
     }
-private:
-    osg::ref_ptr<osg::TexEnv> mModulateTexEnv;
-    osg::ref_ptr<osg::Texture2D> mTexture2DClamp;
-    osg::ref_ptr<osg::Texture2D> mTexture2DRepeat;
-	osg::ref_ptr<osg::Texture2D> mTexture2DClamp2;
-    osg::ref_ptr<osg::Image> mImage;
-	osg::ref_ptr<osg::Image> mImage2;
-    bool mTranslucent;
-	float mAlphaClamp;
-    bool mRepeat;
-	bool mCar;
+
 };
 
 class FileData

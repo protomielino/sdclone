@@ -108,8 +108,7 @@ public:
     }
 
     // Destructor
-    ~SDCamera();
-
+    virtual ~SDCamera(){}
 };
 
 class SDPerspCamera : public SDCamera

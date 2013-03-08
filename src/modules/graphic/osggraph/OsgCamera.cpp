@@ -170,7 +170,7 @@ void SDPerspCamera::loadDefaults(char *attr)
 float SDPerspCamera::getLODFactor(float x, float y, float z) {
     tdble	dx, dy, dz, dd;
     float	ang;
-    int		scrh;//, dummy;
+   // int		scrh;//, dummy;
     float	res;
 
     dx = x - eye[0];
@@ -1773,14 +1773,6 @@ class SDCarCamRoadZoomTVD : public SDCarCamRoadZoom
 
 
 
-SDCamera::~SDCamera( void ){
-}
-
-
-
-
-
-
 SDCameras::SDCameras(SDView *c, int ncars){
     cameraHasChanged = false;
 
@@ -2354,7 +2346,7 @@ void SDCameras::nextCamera(int list){
 }
 
 void SDCameras::selectCamera(int list,int cam){
-    if(list>=0 && list< (int)CAMERA_LISTS && cam >=0 && cam<cameras[list].size()){
+    if(list>=0 && list< (int)CAMERA_LISTS && cam >=0 && cam<(int)(cameras[list].size())){
         selectedCamera = cam;
         selectedList = list;
     }else{
@@ -2386,7 +2378,7 @@ void SDCameras::update(tCarElt * car, tSituation * s){
 
 SDCameras::~SDCameras(){
     for(int i=0;i<(int)CAMERA_LISTS;i++){
-        for(int j=0; j<cameras[i].size();j++){
+        for(uint j=0; j<cameras[i].size();j++){
             delete cameras[i][j];
         }
     }

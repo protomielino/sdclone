@@ -45,15 +45,15 @@ SDSky *thesky = NULL;
 tTrack *grTrack;
 
 unsigned SDSkyDomeDistance = 0;
-static unsigned SDNbCloudLayers = 0;
+//static unsigned SDNbCloudLayers = 0;
 
 // Some private global variables.
 //static int grDynamicWeather = 0;
-static bool SDDynamicSkyDome = false;
-static float SDSunDeclination = 0.0f;
-static float SDMoonDeclination = 0.0f;
-static float SDMax_Visibility = 0.0f;
-static double SDVisibility = 0.0f;
+//static bool SDDynamicSkyDome = false;
+//static float SDSunDeclination = 0.0f;
+//static float SDMoonDeclination = 0.0f;
+//static float SDMax_Visibility = 0.0f;
+//static double SDVisibility = 0.0f;
 
 #define MAX_BODIES	2
 #define MAX_CLOUDS	3
@@ -67,8 +67,8 @@ static double SDVisibility = 0.0f;
 #define SCARCE_CLOUD 5
 #define COVERAGE_CLOUD 8
 
-static osg::Vec3d *AStarsData = NULL;
-static osg::Vec3d *APlanetsData = NULL;
+//static osg::Vec3d *AStarsData = NULL;
+//static osg::Vec3d *APlanetsData = NULL;
 
 static osg::ref_ptr<osg::Group> RealRoot = new osg::Group;
 

@@ -195,9 +195,9 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 			
 			if (m_bCar)
 			{
-				bool b;
-				if (strName == "GRILL1_s_0")
-					b = true;
+                //bool b;
+                /*if (strName == "GRILL1_s_0")
+                    b = true;*/
                 if (!strncmp(strName.c_str(), "WI", 2))
 				{
 					group = m_transparentGroup;
@@ -355,10 +355,10 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     
                     stream >> token;
                     unsigned flags = strtol(token.c_str(), NULL, 0);
-					unsigned v = flags &0xF;
-					bool bNotStrip = false;
-					if (v!=4)
-						bNotStrip = false;
+                    //unsigned v = flags &0xF;
+                    //bool bNotStrip = false;
+                    /*if (v!=4)
+                        bNotStrip = false;*/
                     
                     stream >> token;
                     if (token != "mat") 
@@ -409,7 +409,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     // in case this is an invalid refs count for this primitive
                     // read further, but do not store that primitive
                     bool acceptPrimitive = primitiveBin->beginPrimitive(nRefs);
-					int UVCount = 1;
+                    //int UVCount = 1;
 					
                     for (unsigned i = 0; i < nRefs; ++i) 
 					{
@@ -435,14 +435,14 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 						texCoord[1] = atof(pch);
 						pch = strtok (NULL, " ");
 
-						UVCount = 1;
+                        //UVCount = 1;
 						if (pch)
 						{
 							texCoord2[0] = atof(pch);
 							pch = strtok (NULL, " ");
 							texCoord2[1] = atof(pch);
 							pch = strtok (NULL, " ");
-							UVCount = 2;
+                            //UVCount = 2;
 						}
 						
 						if (pch)
@@ -451,7 +451,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 							pch = strtok (NULL, " ");
 							texCoord3[1] = atof(pch);
 							pch = strtok (NULL, " ");
-							UVCount = 3;
+                            //UVCount = 3;
 						}
 					
                         if (!stream) 
@@ -519,7 +519,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 							group->addChild(k);
                     }
                 }
-				bool bFinished = true;
+                //bool bFinished = true;
             }
             else if (objectType == ac3d::ObjectTypeLight) 
 			{ // add a light source to the scene 1 Nov 2003
@@ -550,9 +550,9 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 
 		if (!stream.good())
 		{
-			bool bBad = stream.bad();
-			bool bFail = stream.fail();
-			bool bEof = stream.eof();
+            //bool bBad = stream.bad();
+            //bool bFail = stream.fail();
+            //bool bEof = stream.eof();
             osg::notify(osg::WARN) << "osgDB TORCS reader: token read error \"7"
                 <<" token:"<< token << "\"" << std::endl;
 		}
@@ -560,9 +560,9 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 
 	if (!stream.good())
 	{
-		bool bBad = stream.bad();
-		bool bFail = stream.fail();
-		bool bEof = stream.eof();
+        //bool bBad = stream.bad();
+        //bool bFail = stream.fail();
+        //bool bEof = stream.eof();
 	}
 	
     return group.release();

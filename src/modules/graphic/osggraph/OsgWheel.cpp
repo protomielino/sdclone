@@ -50,9 +50,6 @@ osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)
 
     return group;
 
-    //thik to flip left wheels
-
-    GfOut("THERE3\n");
 }
 
 osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const char * wheel_mod_name)

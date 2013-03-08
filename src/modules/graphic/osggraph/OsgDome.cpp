@@ -234,7 +234,7 @@ bool SDSkyDome::repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_colo
     const double saif = sun_angle / SD_PI;
     static const osg::Vec3f blueShift(0.8, 1.0, 1.2);
     const osg::Vec3f skyFogDelta = sky_color - fog_color;
-    const osg::Vec3f sunSkyDelta = sun_color - sky_color;
+   // const osg::Vec3f sunSkyDelta = sun_color - sky_color;
     
     for (int i = 0; i < halfBands+1; i++) 
     {

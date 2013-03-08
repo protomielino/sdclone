@@ -135,7 +135,7 @@ bool SDSky::reposition( osg::Vec3& view_pos, osg::Vec3 zero_elev, osg::Vec3 view
 			double lon, double lat, double alt, double spin,
 			double gst, double dt )
 {
-    double angle = gst * 15;
+    //double angle = gst * 15;
     //double angleRad = SGMiscd::deg2rad(angle);
 
     //osg::Vec3f zero_elev, view_up;
@@ -239,7 +239,7 @@ void SDSky::modify_vis( float alt, float time_factor )
 		float thickness = cloud_layers[i]->getThickness_m();
         float transition = cloud_layers[i]->getTransition_m();*/
 
-		double ratio = 1.0;
+        //double ratio = 1.0;
 
         /*if ( cloud_layers[i]->getCoverage() == SGCloudLayer::SG_CLOUD_CLEAR ) 
         {

@@ -96,18 +96,18 @@ void SDScreens::InitCars(tSituation *s)
 {
     //char buf[256];
     //char	idx[16];
-    int		index;
+    //int		index;
     int		i;
     tCarElt 	*elt;
-    void	*hdle;
+    //void	*hdle;
     const char *pszSpanSplit;
     int grNbSuggestedScreens = 0;
 
     for (i = 0; i < s->_ncars; i++) 
     {
     	elt = s->cars[i];
-    	index = elt->index;
-   	hdle = elt->_paramsHandle;
+        //index = elt->index;
+        //hdle = elt->_paramsHandle;
 
     	// WARNING: This index hack on the human robot for the Career mode
     	//          does no more work with the new "welcome" module system

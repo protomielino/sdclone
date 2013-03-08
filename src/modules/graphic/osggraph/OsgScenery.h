@@ -86,7 +86,7 @@ static int grWrldX=0;
 static int grWrldY=0;
 static int grWrldZ = 0;
 static int grWrldMaxSize=0;
-static 	tTrack *grTrack;
+
 class SDScenery
 {
 private:

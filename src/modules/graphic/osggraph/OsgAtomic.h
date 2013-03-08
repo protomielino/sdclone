@@ -30,7 +30,7 @@
 # define SDATOMIC_USE_MIPSPRO_BUILTINS
 #elif defined(_WIN32)
 # define SDATOMIC_USE_LIBRARY_FUNCTIONS
-#endif*/
+#endif
 
 class SDAtomic
 {

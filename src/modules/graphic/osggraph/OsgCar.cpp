@@ -31,7 +31,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
     static const int nMaxTexPathSize = 4096;
     char buf[nMaxTexPathSize];
     int index;
-    int selIndex;
+    //int selIndex;
    // ssgEntity *carEntity;
    // ssgSelector *LODSel;
     /* ssgBranchCb		*branchCb; */
@@ -39,8 +39,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
   //  int nranges;
   //  int i, j;
     void *handle;
-    const char *param;
-    int lg;
+    //const char *param;
+    int lg =0;
     char path[256];
     
     osgLoader loader;
@@ -151,11 +151,11 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
     loader.AddSearchPath(strTPath);
 
     /* loading raw car level 0*/
-    selIndex = 0; 	/* current selector index */
+  //  selIndex = 0; 	/* current selector index */
     snprintf(buf, nMaxTexPathSize, "%s.ac",
              bMasterModel ? car->_masterModel : car->_carName); /* default car 3D model file */
     snprintf(path, 256, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
-    param = GfParmGetStr(handle, path, PRM_CAR, buf);
+   // param = GfParmGetStr(handle, path, PRM_CAR, buf);
 
     std::string strPath = GetDataDir();
     if (bMasterModel)
@@ -209,7 +209,7 @@ SDCars::SDCars(void)
 
 SDCars::~SDCars(void)
 {
-    for(int i=0;i<the_cars.size();i++){
+    for(uint i=0;i<the_cars.size();i++){
         delete the_cars[0];
     }
 }

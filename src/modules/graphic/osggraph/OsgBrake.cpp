@@ -19,7 +19,7 @@ osg::ref_ptr<osg::Geode> SDBrakes::initBrake(int wheelIndex)
     osg::Vec2 tex;
     float	b_offset = 0;
     tdble	curAngle = 0.0;
-	int i,j;
+    int i;
 
     osg::ref_ptr<osg::Geode> pBrake = new osg::Geode;
 

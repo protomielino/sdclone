@@ -33,6 +33,8 @@
 #include <robottools.h>	//RtXXX()
 #include <portability.h>
 
+static 	tTrack *grTrack;
+
 SDScenery::SDScenery(void)
 {
 	_grWrldX = 0;
@@ -77,7 +79,7 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 
 	m_background = new SDBackground;
 	_scenery = new osg::Group;
-	grTrack = track;
+    grTrack = track;
 
 	// Load graphics options.
 	LoadGraphicsOptions();
