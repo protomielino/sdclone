@@ -210,7 +210,7 @@ SDCars::SDCars(void)
 SDCars::~SDCars(void)
 {
     for(uint i=0;i<the_cars.size();i++){
-        delete the_cars[0];
+        delete the_cars[i];
     }
 }
 
