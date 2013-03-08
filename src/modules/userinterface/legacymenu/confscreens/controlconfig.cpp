@@ -610,10 +610,17 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
 {
     int	i;
 
+    /* Don't recreate screen if already done */
+    if (ScrHandle) {
+	if (PrevScrHandle != prevMenu) 
+		// Need to re-create screen as parent has changed
+		GfuiScreenRelease(ScrHandle);
+	 else
+		return ScrHandle;
+    }
+
     ReloadValues = 1;
-
     PrevScrHandle = prevMenu;
-
     PrefHdle = prefHdle;
     SaveOnExit = saveOnExit;
 
@@ -622,11 +629,6 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
 
     /* Set specified gear changing mode for current player */
     GearChangeMode = gearChangeMode;
-
-    /* Don't recreate screen if already done */
-    if (ScrHandle) {
-	return ScrHandle;
-    }
 
     /* Initialize joysticks array */
     for (int jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++)

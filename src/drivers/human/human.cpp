@@ -603,8 +603,28 @@ newrace(int index, tCarElt* car, tSituation *s)
 void
 resumerace(int index, tCarElt* car, tSituation *s)
 {
+	const int idx = index - 1;
+	tControlCmd	*cmd = HCtx[idx]->cmdControl;
+
 	// re-read the controls as they may have changed
 	HmReadPrefs(index);
+
+	// Setup Keyboard map (key code => index of the associated command in keyInfo / lastReadKeyState).
+	keyIndex = 0;
+	mapKeys.clear();
+
+	for (int i = 0; i < NbCmdControl; i++)
+	{
+		if (cmd[i].type == GFCTRL_TYPE_KEYBOARD)
+		{
+			if (mapKeys.find(cmd[i].val) == mapKeys.end())
+			{
+				mapKeys[cmd[i].val] = keyIndex;
+				keyIndex++;
+			}
+		}//KEYBOARD
+
+	}//for i
 }
 
 static int
