@@ -46,7 +46,7 @@ SDView::SDView(osg::Camera * c, int x, int y, int width, int height,
     mirrorFlag = true;
 
     tdble fovFactor =1;
-    tdble fixedFar =0;
+    tdble fixedFar =41000.0;
     mirror = new SDCarCamMirror(
         this,
         -1,

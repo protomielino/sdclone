@@ -77,6 +77,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
         mirrorCam->setGraphicsContext(gw);
         mirrorCam->setClearMask( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         mirrorCam->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
+        mirrorCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
         mirrorCam->addChild(m_sceneroot);
         mirrorCam->setNodeMask(0);
 
