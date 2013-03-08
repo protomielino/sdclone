@@ -119,7 +119,10 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 			std::string strPath = PathTmp;
 			sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 			strPath += buf;
-			_scenery->addChild(m_background->build(_bgtype, _grWrldX, _grWrldY, _grWrldZ, strPath));
+            osg::Node * bg= m_background->build(_bgtype, _grWrldX, _grWrldY, _grWrldZ, strPath);
+            bg->getOrCreateStateSet()->setRenderingHint(
+                        osg::StateSet::OPAQUE_BIN );
+            _scenery->addChild(bg);
 			GfOut("Background loaded\n");
 		}
 	}
