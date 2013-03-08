@@ -198,15 +198,15 @@
     <Image Height="7" Name="TabButtonLowerRightNormal" Width="7" XPos="62" YPos="99" />
     <Image Height="7" Name="TabButtonLowerRight2Normal" Width="7" XPos="187" YPos="195" />
     <Image Height="6" Name="TabButtonMiddleNormal" Width="6" XPos="52" YPos="89" />
-    <Image Height="6" Name="TabButtonLeftSelected" Width="7" XPos="41" YPos="89" />
-    <Image Height="6" Name="TabButtonRightSelected" Width="7" XPos="62" YPos="89" />
-    <Image Height="7" Name="TabButtonUpperSelected" Width="6" XPos="52" YPos="78" />
-    <Image Height="6" Name="TabButtonLowerSelected" Width="6" XPos="52" YPos="89" />
-    <Image Height="7" Name="TabButtonUpperLeftSelected" Width="7" XPos="41" YPos="78" />
-    <Image Height="7" Name="TabButtonUpperRightSelected" Width="7" XPos="62" YPos="78" />
-    <Image Height="7" Name="TabButtonLowerLeftSelected" Width="7" XPos="41" YPos="99" />
-    <Image Height="7" Name="TabButtonLowerRightSelected" Width="7" XPos="62" YPos="99" />
-    <Image Height="6" Name="TabButtonMiddleSelected" Width="6" XPos="52" YPos="89" />
+    <Image Height="6" Name="TabButtonLeftSelected" Width="7" XPos="62" YPos="172" />
+    <Image Height="6" Name="TabButtonRightSelected" Width="7" XPos="83" YPos="172" />
+    <Image Height="7" Name="TabButtonUpperSelected" Width="6" XPos="73" YPos="161" />
+    <Image Height="6" Name="TabButtonLowerSelected" Width="6" XPos="73" YPos="172" />
+    <Image Height="7" Name="TabButtonUpperLeftSelected" Width="7" XPos="62" YPos="161" />
+    <Image Height="7" Name="TabButtonUpperRightSelected" Width="7" XPos="83" YPos="161" />
+    <Image Height="7" Name="TabButtonLowerLeftSelected" Width="7" XPos="62" YPos="182" />
+    <Image Height="7" Name="TabButtonLowerRightSelected" Width="7" XPos="83" YPos="182" />
+    <Image Height="6" Name="TabButtonMiddleSelected" Width="6" XPos="73" YPos="172" />
     <Image Height="4" Name="TooltipTopLeft" Width="4" XPos="43" YPos="313" />
     <Image Height="4" Name="TooltipTopRight" Width="5" XPos="67" YPos="313" />
     <Image Height="5" Name="TooltipBottomLeft" Width="4" XPos="43" YPos="337" />

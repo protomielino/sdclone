@@ -3457,7 +3457,7 @@
                 <Image type="TopLeftCorner" imageset="CEGUIDemo" image="TabButtonUpperLeftNormal" />
                 <Image type="TopRightCorner" imageset="CEGUIDemo" image="TabButtonUpperRightNormal" />
                 <Image type="BottomLeftCorner" imageset="CEGUIDemo" image="TabButtonLowerLeftNormal" />
-                <Image type="BottomRightCorner" imageset="CEGUIDemo" image="TabButtonLowerRight2Normal" />
+                <Image type="BottomRightCorner" imageset="CEGUIDemo" image="TabButtonLowerRightNormal" />
                 <Image type="LeftEdge" imageset="CEGUIDemo" image="TabButtonLeftNormal" />
                 <Image type="RightEdge" imageset="CEGUIDemo" image="TabButtonRightNormal" />
                 <Image type="TopEdge" imageset="CEGUIDemo" image="TabButtonUpperNormal" />
@@ -3473,7 +3473,7 @@
                     <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
                     <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
                 </Area>
-                <Image type="TopLeftCorner" imageset="CEGUIDemo" image="TabButtonUpperLeft2Normal" />
+                <Image type="TopLeftCorner" imageset="CEGUIDemo" image="TabButtonUpperLeftNormal" />
                 <Image type="TopRightCorner" imageset="CEGUIDemo" image="TabButtonUpperRightNormal" />
                 <Image type="BottomLeftCorner" imageset="CEGUIDemo" image="TabButtonLowerLeftNormal" />
                 <Image type="BottomRightCorner" imageset="CEGUIDemo" image="TabButtonLowerRightNormal" />
@@ -3495,7 +3495,7 @@
                 <Image type="TopLeftCorner" imageset="CEGUIDemo" image="TabButtonUpperLeftNormal" />
                 <Image type="TopRightCorner" imageset="CEGUIDemo" image="TabButtonUpperRightNormal" />
                 <Image type="BottomLeftCorner" imageset="CEGUIDemo" image="TabButtonLowerLeftNormal" />
-                <Image type="BottomRightCorner" imageset="CEGUIDemo" image="TabButtonLowerRight2Normal" />
+                <Image type="BottomRightCorner" imageset="CEGUIDemo" image="TabButtonLowerRightNormal" />
                 <Image type="LeftEdge" imageset="CEGUIDemo" image="TabButtonLeftNormal" />
                 <Image type="RightEdge" imageset="CEGUIDemo" image="TabButtonRightNormal" />
                 <Image type="TopEdge" imageset="CEGUIDemo" image="TabButtonUpperNormal" />
@@ -3511,7 +3511,7 @@
                     <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
                     <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
                 </Area>
-                <Image type="TopLeftCorner" imageset="CEGUIDemo" image="TabButtonUpperLeft2Normal" />
+                <Image type="TopLeftCorner" imageset="CEGUIDemo" image="TabButtonUpperLeftNormal" />
                 <Image type="TopRightCorner" imageset="CEGUIDemo" image="TabButtonUpperRightNormal" />
                 <Image type="BottomLeftCorner" imageset="CEGUIDemo" image="TabButtonLowerLeftNormal" />
                 <Image type="BottomRightCorner" imageset="CEGUIDemo" image="TabButtonLowerRightNormal" />

@@ -44,100 +44,76 @@ class MenuCredits(Menu):
 
 		name = "MenuCredits"
 
-		# Use layout if specified.
-		if TheConfig.useLayouts:
-			
-			window = Menu.initialize(self, name=name, title="Credits", layout="menucredits")
-			
-		else:
-			
-			# If no layout specified, go on building up the menu through code.
-			window = Menu.initialize(self, name=name, title="Credits", background="SplashCredits")
+		# No code written for this menu : use mandatory layout.
+		window = Menu.initialize(self, name=name, title="Credits", layout="menucredits")
 
-			# Specific to this menu.
-			winMgr = PyCEGUI.WindowManager.getSingleton()
-			mclTable = winMgr.createWindow("CEGUIDemo/MultiColumnList", name + "/MclTable")
-			mclTable.setXPosition(PyCEGUI.UDim(0.1, 0.0))
-			mclTable.setYPosition(PyCEGUI.UDim(0.3, 0.0))
-			mclTable.setWidth(PyCEGUI.UDim(0.8, 0.0))
-			mclTable.setHeight(PyCEGUI.UDim(0.5, 0.0))
-			mclTable.setProperty("Font", "TextSmall")
-
-			window.addChildWindow(mclTable)
-
-			btnPrev = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/ImageButton", name + "/BtnPrevPage")
-			btnPrev.setTooltipText("Previous credits page")
-			btnPrev.setXPosition(PyCEGUI.UDim(0.9, 0.0))
-			btnPrev.setYPosition(PyCEGUI.UDim(0.7, 0.0))
-			btnPrev.setWidth(PyCEGUI.UDim(0.07, 0.0))
-			btnPrev.setHeight(PyCEGUI.UDim(0.1, 0.0))
-			btnPrev.setProperty("NormalImage", "set:CEGUIDemo image:ArrowUpNormal")
-			btnPrev.setProperty("HoverImage", "set:CEGUIDemo image:ArrowUpHighlight")
-			btnPrev.setProperty("PushedImage", "set:CEGUIDemo image:ArrowUpPushed")
-			btnPrev.setProperty("DisabledImage", "set:CEGUIDemo image:ArrowUpDisabled")
-
-			window.addChildWindow(btnPrev)
-
-			btnNext = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/ImageButton", name + "/BtnNextPage")
-			btnNext.setTooltipText("Next credits page")
-			btnNext.setXPosition(PyCEGUI.UDim(0.9, 0.0))
-			btnNext.setYPosition(PyCEGUI.UDim(0.8, 0.0))
-			btnNext.setWidth(PyCEGUI.UDim(0.07, 0.0))
-			btnNext.setHeight(PyCEGUI.UDim(0.1, 0.0))
-			btnNext.setProperty("NormalImage", "set:CEGUIDemo image:ArrowDownNormal")
-			btnNext.setProperty("HoverImage", "set:CEGUIDemo image:ArrowDownHighlight")
-			btnNext.setProperty("PushedImage", "set:CEGUIDemo image:ArrowDownPushed")
-			btnNext.setProperty("DisabledImage", "set:CEGUIDemo image:ArrowDownDisabled")
-
-			window.addChildWindow(btnNext)
-
-			btnBack = PyCEGUI.WindowManager.getSingleton().createWindow("CEGUIDemo/Button", name + "/BtnBack")
-			btnBack.setText("Back")
-			btnBack.setTooltipText("Back to the main menu")
-			btnBack.setXPosition(PyCEGUI.UDim(0.43, 0.0))
-			btnBack.setYPosition(PyCEGUI.UDim(0.9, 0.0))
-			btnBack.setWidth(PyCEGUI.UDim(0.15, 0.0))
-			btnBack.setHeight(PyCEGUI.UDim(0.05, 0.0))
-			btnBack.setProperty("Font", "MenuMedium")
-
-			window.addChildWindow(btnBack)
-
-		# Retrieve window descendants created here.
-		self.mclTable = window.getChild(name + "/MclTable")
-		self.btnPrev = window.getChild(name + "/BtnPrevPage")
-		self.btnNext = window.getChild(name + "/BtnNextPage")
+		# Retrieve window descendants created till there.
+		self.tacCred = window.getChild(name + "/TacCredits")
 		self.btnBack = window.getChild(name + "/BtnBack")
 		
-		# Complete widget initialization (whatever creation mode : code or .layout).
-		# TODO.
-		self.mclTable.addColumn("Name / Role", 0, PyCEGUI.UDim(0.35, 0))
-		self.mclTable.addColumn("Main contributions / Contact", 1, PyCEGUI.UDim(0.65, 0))
+		# Ehrrrr ... well, not much ...
+		winMgr = PyCEGUI.WindowManager.getSingleton()
+		tabInd = 0
+		self.mclTables = []
+		for tabText in ("Development Team", "Contributors",
+						"Third party libs and tools", "Pre-fork contributors (TORCS)"):
+			tabPane = winMgr.createWindow("CEGUIDemo/TabContentPane",
+										  name + "/TapCredits%d" % tabInd)
+			self.tacCred.addTab(tabPane)
+			tabPane.setText(tabText)
+			tabPane.setXPosition(PyCEGUI.UDim(0, 0))
+			tabPane.setYPosition(PyCEGUI.UDim(0, 0))
+			tabPane.setWidth(PyCEGUI.UDim(1, 0))
+			tabPane.setHeight(PyCEGUI.UDim(1, 0))
+			mclTable = winMgr.createWindow("CEGUIDemo/MultiColumnList",
+										   name + "/MclTable%d" % tabInd)
+			tabPane.addChildWindow(mclTable)
+			mclTable.setXPosition(PyCEGUI.UDim(0, 0))
+			mclTable.setYPosition(PyCEGUI.UDim(0, 0))
+			mclTable.setWidth(PyCEGUI.UDim(1, 0))
+			mclTable.setHeight(PyCEGUI.UDim(1, 0))
+			mclTable.setProperty("Font", "TextSmall")
+			mclTable.setProperty("ColumnsMovable", "False")
+			mclTable.setProperty("ColumnsSizable", "True")
+			mclTable.setProperty("SortSettingEnabled", "False")
+			mclTable.addColumn("Name / Role", 0, PyCEGUI.UDim(0.35, 0))
+			mclTable.addColumn("Main contributions / Contact", 1, PyCEGUI.UDim(0.65, 0))
+			self.mclTables.append(mclTable)
 
+			tabInd += 1
+
+		# Retrieve window descendants created here.
+		self.tacCred = window.getChild(name + "/TacCredits")
+		self.btnBack = window.getChild(name + "/BtnBack")
+		
+		# Complete widget initialization.
+		# TODO.
 		# Note: Keep a reference to each listbox item,
 		# otherwise they get garbage collected at the end of this function,
 		# and then CEGUI crashes of course (see below : self.lbItems.append).
 		self.lbItems = []
-		for i in range(5):
+		for tabInd in range(len(self.mclTables)):
+			for i in range(8):
 
-			rowId = self.mclTable.addRow()
+				rowId = self.mclTables[tabInd].addRow()
 
-			lbItem = PyCEGUI.ListboxTextItem("my name")
-			self.mclTable.setItem(lbItem, 0, rowId)
-			self.lbItems.append(lbItem)
+				lbItem = PyCEGUI.ListboxTextItem("my name")
+				self.mclTables[tabInd].setItem(lbItem, 0, rowId)
+				self.lbItems.append(lbItem)
 
-			lbItem = PyCEGUI.ListboxTextItem("my role")
-			self.mclTable.setItem(lbItem, 1, rowId)
-			self.lbItems.append(lbItem)
+				lbItem = PyCEGUI.ListboxTextItem("my role")
+				self.mclTables[tabInd].setItem(lbItem, 1, rowId)
+				self.lbItems.append(lbItem)
 
-			rowId = self.mclTable.addRow()
+				rowId = self.mclTables[tabInd].addRow()
 
-			lbItem = PyCEGUI.ListboxTextItem("my contribs")
-			self.mclTable.setItem(lbItem, 0, rowId)
-			self.lbItems.append(lbItem)
+				lbItem = PyCEGUI.ListboxTextItem("my contribs")
+				self.mclTables[tabInd].setItem(lbItem, 0, rowId)
+				self.lbItems.append(lbItem)
 
-			lbItem = PyCEGUI.ListboxTextItem("my web site")
-			self.mclTable.setItem(lbItem, 1, rowId)
-			self.lbItems.append(lbItem)
+				lbItem = PyCEGUI.ListboxTextItem("my web site")
+				self.mclTables[tabInd].setItem(lbItem, 1, rowId)
+				self.lbItems.append(lbItem)
 
 		return window
 
