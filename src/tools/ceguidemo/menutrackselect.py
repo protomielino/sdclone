@@ -138,6 +138,7 @@ class MenuTrackSelect(MenuStandard):
 		MenuStandard.connectHandlers(self)
 
 		# Specific connections.
+		self.window.subscribeEvent(PyCEGUI.Window.EventSized, self, "onWindowSized")
 		self.btnBack.subscribeEvent(PyCEGUI.PushButton.EventClicked, self, "onBackButtonClicked")
 		self.btnNext.subscribeEvent(PyCEGUI.PushButton.EventClicked, self, "onNextButtonClicked")
 		
@@ -182,7 +183,7 @@ class MenuTrackSelect(MenuStandard):
 		selCatName = self.cbxCat.getSelectedItem().getText()
 		selTrackName = self.cbxTrack.getSelectedItem().getText()
 
-		#print("onTrackChanged(cat=%s, track=%s)" % (selCatName, selTrackName))
+		print("onTrackChanged(cat=%s, track=%s)" % (selCatName, selTrackName))
 		
 		track = self.Tracks[selCatName][selTrackName]
 
@@ -192,11 +193,49 @@ class MenuTrackSelect(MenuStandard):
 		self.txtNPits.setText("%d m" % track.nPits)
 		self.txtAuthors.setText(track.authors)
 
+		# Update outline image.
 		imgSetMgr = PyCEGUI.ImagesetManager.getSingleton()
 		#if not imgSetMgr.???(track.outline):
 		imgSetMgr.createFromImageFile(track.outline, track.outline)
 		self.imgOutline.setProperty("Image", "set:%s image:full_image" % track.outline)
-		
+
+		# Update background image, respecting its aspect ratio through clipping.
 		#if not imgSetMgr.???(track.preview):
-		imgSetMgr.createFromImageFile(track.preview, track.preview)
+		self.imgSetPreview = imgSetMgr.createFromImageFile(track.preview, track.preview)
+		self.onWindowSized(PyCEGUI.WindowEventArgs(self.window))
+
+	def onWindowSized(self, args):
+
+		selCatName = self.cbxCat.getSelectedItem().getText()
+		selTrackName = self.cbxTrack.getSelectedItem().getText()
+		track = self.Tracks[selCatName][selTrackName]
+
+		# Update background image clipping, according to new window size,
+		# as we want to keep its aspect ratio.
+		# Note the image assignment to the always existing "full_image" one
+		# before undefining the target "undeformed" : prevents crashes :-)
+		imgSize = self.imgSetPreview.getNativeResolution()
+		clipX, clipY = self.getPreviewClipping(imgSize)
 		self.window.setProperty("Image", "set:%s image:full_image" % track.preview)
+		self.imgSetPreview.undefineImage("undeformed")
+		self.imgSetPreview.defineImage("undeformed", PyCEGUI.Vector2(clipX, clipY),
+									   PyCEGUI.Size(imgSize.d_width - 2*clipX, imgSize.d_height - 2*clipY),
+									   PyCEGUI.Vector2(0,0))
+		self.window.setProperty("Image", "set:%s image:undeformed" % track.preview)
+
+	def getPreviewClipping(self, imgSize):
+
+		winSize = self.window.getPixelSize()
+		rFactor = (float(imgSize.d_width) / imgSize.d_height) \
+				  / (float(winSize.d_width) / winSize.d_height)
+		if rFactor >= 1:
+			clipX = int(imgSize.d_width * (rFactor - 1.0) / 2.0)
+			clipY = 0
+		else:
+			clipX = 0
+			clipY = int(imgSize.d_height * (1.0 - rFactor) / 2.0)
+		print("winSize=(%d,%d), imgSize=(%d,%d), r=%f" \
+			  % (winSize.d_width, winSize.d_height, imgSize.d_width, imgSize.d_height, rFactor))
+		print("clipRect=(%d,%d,%d,%d)" % (clipX, clipY, imgSize.d_width - clipX, imgSize.d_height - clipY))
+
+		return clipX, clipY
