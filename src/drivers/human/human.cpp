@@ -377,16 +377,20 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 		carname = GfParmGetStr(curCars, sstring, "car name", carname.c_str());
 	}//if curCars
 
-	snprintf(sstring, sizeof(sstring), "%sdrivers/human/cars/%s/default.xml", GfLocalDir(), carname.c_str());
+	snprintf(sstring, sizeof(sstring), "%s/drivers/human/car.xml", GfLocalDir());
 	*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 
-	if (!*carParmHandle) {
-		snprintf(sstring, sizeof(sstring), "%s/drivers/human/car.xml", GfLocalDir());
-		*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
+	snprintf(sstring, sizeof(sstring), "%sdrivers/human/cars/%s/default.xml", GfLocalDir(), carname.c_str());
+	void *newhandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
+	if (newhandle) {
+		*carParmHandle = (*carParmHandle)
+			? GfParmMergeHandles(*carParmHandle, newhandle,
+				(GFPARM_MMODE_SRC|GFPARM_MMODE_DST|GFPARM_MMODE_RELSRC|GFPARM_MMODE_RELDST))
+			: newhandle;
 	}
 
 	snprintf(sstring, sizeof(sstring), "%sdrivers/human/cars/%s/%s.xml", GfLocalDir(), carname.c_str(), trackname);
-	void *newhandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
+	newhandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 	if (newhandle) {
 		*carParmHandle = (*carParmHandle)
 			? GfParmMergeHandles(*carParmHandle, newhandle,
