@@ -184,12 +184,15 @@ void playMusic(char* filename)
 		if(filename != NULL) {
 			if(0 == strcmp(NOMUSIC,filename)){
 				strcpy(currentMusicfile,filename);
+				GfLogInfo("Music changing to: %s \n", filename);
 				pauseMenuMusic();
 				return;
 			}
 			if(0 != strcmp(currentMusicfile,filename)){
-				player = getMusicPlayer(currentMusicfile);
-				player->fadeout();
+				if(0 != strcmp(NOMUSIC,currentMusicfile)){
+					player = getMusicPlayer(currentMusicfile);
+					player->fadeout();
+				}
 				strcpy(currentMusicfile,filename);
 				GfLogInfo("Music changing to: %s \n", filename);
 				player = getMusicPlayer(filename);
@@ -197,8 +200,10 @@ void playMusic(char* filename)
 			}
 		} else {
 			if(0 != strcmp(currentMusicfile,defaultMusic)){
-				player = getMusicPlayer(currentMusicfile);
-				player->fadeout();
+				if(0 != strcmp(NOMUSIC,currentMusicfile)){
+					player = getMusicPlayer(currentMusicfile);
+					player->fadeout();
+				}
 				strcpy(currentMusicfile,defaultMusic);
 				GfLogInfo("Music changing to: %s \n", defaultMusic);
 				player = getMusicPlayer(defaultMusic);
