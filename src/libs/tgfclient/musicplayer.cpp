@@ -37,7 +37,6 @@ static const char *musicDisabledStr = SND_VAL_MUSIC_STATE_DISABLED;
 
 static bool enabled = true;
 static char currentMusicfile[MAX_MUSIC_PATH] = {0};
-//static char nextMusicfile[MAX_MUSIC_PATH] = {0};
 static char defaultMusic[MAX_MUSIC_PATH] = {0}; //"data/music/main.ogg";
 static float maxMusicVolume = 1.0;
 
@@ -46,13 +45,12 @@ std::map<std::string,OpenALMusicPlayer*> mapOpenAlPlayers;
  
 static SDL_mutex *mapMutex = NULL;
 
-static void playMenuMusic(int /* value */);
+static void playMenuMusic();
 static void pauseMenuMusic();
 static void readConfig();
 
  static bool isEnabled()
  {
-	// TODO - fix this (needs UI)
 	return enabled;
 }
 
@@ -76,8 +74,7 @@ static OpenALMusicPlayer* getMusicPlayer(char* oggFilePath)
 		player = new OpenALMusicPlayer(getMenuSoundStream(oggFilePath));
 		mapOpenAlPlayers[oggFilePath] = player;
 		player->setvolume(maxMusicVolume);
-		//player->fadein();
-		player->start(); // Fade in
+		player->start();
 	} else {
 		player = mapOpenAlPlayers[oggFilePath];
 	}
@@ -85,16 +82,14 @@ static OpenALMusicPlayer* getMusicPlayer(char* oggFilePath)
 	return player;
 }
 
-// TODO rethink...
 static Uint32 sdlTimerFunc(Uint32 interval, void* /* pEvLoopPriv */)
 {
-	playMenuMusic(0);
+	playMenuMusic();
 	return 1;
 }
 
-// TODO clean this up
 SDL_TimerID timerId = 0;
-static void playMenuMusic(int /* value */)
+static void playMenuMusic()
 {
 	const int nextcallinms = 100;
 	SDL_LockMutex(mapMutex);
@@ -121,7 +116,7 @@ void initMusic()
 		mapMutex = SDL_CreateMutex();
 		(void)getMusicPlayer(defaultMusic);
 		strcpy(currentMusicfile,defaultMusic);
-		playMenuMusic(0);
+		playMenuMusic();
 	}
 #endif
 }
@@ -211,9 +206,9 @@ void playMusic(char* filename)
 			}
 		}
 		if(player) {
-			player->resume(0);
+			player->resume();
 		}
-		playMenuMusic(0);
+		playMenuMusic();
 	}
 #endif
 }
@@ -228,7 +223,6 @@ void setDefaultMusic(const char* filename)
 				GfLogInfo("Default Music changing to: %s \n", filename);
 			}
 		} else {
-			// log error
 			GfLogError("Default Music File Path too long. [  %s  ]\n", filename);
 		}
 	} else {
@@ -241,7 +235,6 @@ void setDefaultMusic(const char* filename)
 #if MENU_MUSIC
 static void readConfig()
 {
-	// Check if we want music (sound.xml).
 	char fnbuf[1024];
 	sprintf(fnbuf, "%s%s", GfLocalDir(), SND_PARAM_FILE);
 	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);

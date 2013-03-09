@@ -33,7 +33,7 @@ class OpenALMusicPlayer
 		virtual void start();
 		virtual void stop();
 		virtual void pause();
-		virtual void resume(int flag);
+		virtual void resume();
 		virtual void rewind();
 		virtual bool playAndManageBuffer();
 		virtual void setvolume(float volume);

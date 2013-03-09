@@ -222,7 +222,7 @@ void OpenALMusicPlayer::pause()
 	}
 }
 
-void OpenALMusicPlayer::resume(int flag)
+void OpenALMusicPlayer::resume()
 {
 	if(!isPlaying()) {
 		alSourcePlay(_source);
