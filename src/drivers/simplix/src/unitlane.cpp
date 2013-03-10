@@ -533,7 +533,7 @@ void TLane::PropagatePitBreaking
 {
   /*const float base = 0.5f; */
   int Step = 1;
-  int L = 20;
+  int L = 30;
   const int N = oTrack->Count();
   const int M = Step * ((Len - 1) / Step);
 
@@ -580,8 +580,8 @@ void TLane::PropagatePitBreaking
 	  {
 		  L--;
 		  double DeltaSpeed = (U - oPathPoints[Q].Speed);
-		  if (DeltaSpeed > 1.0)
-			  U = 1.0 + oPathPoints[Q].Speed;
+		  if (DeltaSpeed > 0.5)
+			  U = 0.5 + oPathPoints[Q].Speed;
 	  }
 
 	  if (oPathPoints[P].Speed > U)
