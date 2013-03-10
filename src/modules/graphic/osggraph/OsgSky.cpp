@@ -72,7 +72,7 @@ SDSky::SDSky( void )
 // Destructor
 SDSky::~SDSky( void )
 {
-    //delete dome;
+    delete dome;
     delete sun;
     delete moon;
     delete planets;
@@ -84,8 +84,8 @@ SDSky::~SDSky( void )
 void SDSky::build( std::string tex_path, double h_radius, double v_radius, double sun_size, double sun_dist,
       double moon_size, double moon_dist, int nplanets, osg::Vec3d *planet_data,
       int nstars, osg::Vec3d *star_data )
-{/*
-    dome = new SDSkyDome;
+{
+    /*dome = new SDSkyDome;
     pre_transform->addChild( dome->build( h_radius, v_radius ));*/
 
     //pre_transform->addChild(_ephTransform.get());
@@ -144,7 +144,21 @@ bool SDSky::repaint( osg::Vec4d sky_color, osg::Vec4d fog_color, osg::Vec4d clou
 bool SDSky::reposition( osg::Vec3& view_pos, double spin, /*double gst,*/
                         double dt )
 {
-    //double angle = gst * 15;
+  //int i;
+  double angle;
+  double rotation;
+  osg::Vec3d pos;
+
+  sun->reposition( view_pos, 0 );
+  moon->reposition( view_pos, 0 );
+
+  //sun->getSunPosition ( & pos );
+  calc_celestial_angles( pos, view_pos, angle, rotation );
+  sun->setSunAngle( angle );
+  sun->setSunRotation( rotation );
+
+
+  //double angle = gst * 15;
     //double angleRad = SGMiscd::deg2rad(angle);
 
     //osg::Vec3f zero_elev, view_up;

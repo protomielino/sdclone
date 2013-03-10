@@ -44,7 +44,7 @@ SDMoon::SDMoon( void ) :
 }
 
 // Destructor
-SDMoon::~SDMoon( void ) 
+SDMoon::~SDMoon( void )
 {
 }
 
@@ -104,7 +104,7 @@ osg::Node* SDMoon::build( std::string path, double moon_size )
     return moon_transform.get();
 }
 
-bool SDMoon::repaint( double moon_angle ) 
+bool SDMoon::repaint( double moon_angle )
 {
     if (prev_moon_angle == moon_angle)
         return true;
@@ -112,18 +112,18 @@ bool SDMoon::repaint( double moon_angle )
     prev_moon_angle = moon_angle;
 
     float moon_factor = 4*cos(moon_angle);
-    
+
     if (moon_factor > 1) moon_factor = 1.0;
     if (moon_factor < -1) moon_factor = -1.0;
     moon_factor = (moon_factor/2) + 0.5f;
-    
+
     osg::Vec4 color;
     color[1] = sqrt(moon_factor);
     color[0] = sqrt(color[1]);
     color[2] = moon_factor * moon_factor;
     color[2] *= color[2];
     color[3] = 1.0;
-    
+
     sd_gamma_correct_rgb( color._v );
 
     orb_material->setDiffuse(osg::Material::FRONT_AND_BACK, color);
@@ -131,14 +131,15 @@ bool SDMoon::repaint( double moon_angle )
     return true;
 }
 
-bool SDMoon::reposition( double rightAscension, double declination,
-			 double moon_dist )
+bool SDMoon::reposition( osg::Vec3d p, double moon_dist )
 {
-    osg::Matrix T2, RA, DEC;
+    osg::Matrix T1, T2, RA, DEC;
 
-    RA.makeRotate(rightAscension - 90.0 * SD_DEGREES_TO_RADIANS,
+    T1.makeTranslate(p[0], p[1]+moon_dist, p[2]);
+
+    RA.makeRotate(moonAscension - 90.0 * SD_DEGREES_TO_RADIANS,
                   osg::Vec3(0, 0, 1));
-    DEC.makeRotate(declination, osg::Vec3(1, 0, 0));
+    DEC.makeRotate(moondeclination, osg::Vec3(1, 0, 0));
     T2.makeTranslate(osg::Vec3(0, moon_dist, 0));
 
     moon_transform->setMatrix(T2*DEC*RA);

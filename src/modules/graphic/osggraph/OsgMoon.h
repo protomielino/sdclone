@@ -49,7 +49,7 @@ public:
     osg::Node *build( std::string path, double moon_size );
 
     bool repaint( double moon_angle );
-    bool reposition( double rightAscension, double declination, double moon_dist  );
+    bool reposition( osg::Vec3d p, double angle  );
 
     void setMoonAngle (double angle) { moon_angle = angle; }
     double getMoonAngle () { return moon_angle; }

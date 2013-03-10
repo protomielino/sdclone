@@ -86,7 +86,6 @@ private:
     osg::ref_ptr<osg::Group> pre_root, cloud_root;
     osg::ref_ptr<osg::Switch> pre_selector;
     osg::ref_ptr<osg::Group> pre_transform;
-    //osg::ref_ptr<osg::MatrixTransform> _ephTransform;
 
     // visibility
     float visibility;
@@ -119,15 +118,10 @@ public:
           double moon_size, double moon_dist, int nplanets, osg::Vec3d *planet_data,
           int nstars, osg::Vec3d *star_data );
 
-    /*void build( double h_radius_m, double v_radius_m,
-                double sun_size, double moon_size,
-                const SGEphemeris& eph);*/
-
-    //bool repaint( const SDSkyColor &sc/*, const SDEphemeris& eph*/ );
-    bool repaint (osg::Vec4d sky_color, osg::Vec4d fog_color, osg::Vec4d cloud_color, double sol_angle,
+    bool repaint (osg::Vec4d sky_color, osg::Vec4d fog_color, osg::Vec4d cloud_color, double sun_angle,
                   double moon_angle, int nplanets, osg::Vec3d *planet_data,
                   int nstars, osg::Vec3d *star_data);
-    //bool reposition( const SDSkyState &st/*, const SDEphemeris& eph*/, double dt = 0.0 );
+
     bool reposition(osg::Vec3 &view_pos,  double spin, /*double gst,*/ double dt);
 
     void modify_vis( float alt, float time_factor );

@@ -43,11 +43,11 @@ SDSun::SDSun( void ) :
 }
 
 // Destructor
-SDSun::~SDSun( void ) 
+SDSun::~SDSun( void )
 {
 }
 
-osg::Node* SDSun::build( std::string path, double sun_size ) 
+osg::Node* SDSun::build( std::string path, double sun_size )
 {
     std::string TmpPath = path;
     sun_transform = new osg::MatrixTransform;
@@ -56,7 +56,7 @@ osg::Node* SDSun::build( std::string path, double sun_size )
     osg::TexEnv* texEnv = new osg::TexEnv;
     texEnv->setMode(osg::TexEnv::MODULATE);
     stateSet->setTextureAttribute(0, texEnv, osg::StateAttribute::ON);
- 
+
     osg::Material* material = new osg::Material;
     material->setColorMode(osg::Material::AMBIENT_AND_DIFFUSE);
     material->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(0,0,0,1));
@@ -124,7 +124,7 @@ osg::Node* SDSun::build( std::string path, double sun_size )
     osg::Geode* geode = new osg::Geode;
     stateSet = geode->getOrCreateStateSet();
     stateSet->setRenderBinDetails(-7, "RenderBin");
-    
+
     path = TmpPath+"inner_halo.png";
     osg::ref_ptr<osg::Image> image2 = osgDB::readImageFile(path);
     osg::ref_ptr<osg::Texture2D> texture2 = new osg::Texture2D(image2.get());
@@ -157,7 +157,7 @@ osg::Node* SDSun::build( std::string path, double sun_size )
     geode->addDrawable(geometry);
 
     sun_transform->addChild( geode );
-    
+
     geode = new osg::Geode;
     stateSet = geode->getOrCreateStateSet();
     stateSet->setRenderBinDetails(-8, "RenderBin");
@@ -200,9 +200,9 @@ osg::Node* SDSun::build( std::string path, double sun_size )
     return sun_transform.get();
 }
 
-bool SDSun::repaint( double sun_angle, double new_visibility ) 
+bool SDSun::repaint( double sun_angle, double new_visibility )
 {
-    if ( visibility != new_visibility ) 
+    if ( visibility != new_visibility )
     {
         if (new_visibility < 100.0) new_visibility = 100.0;
         else if (new_visibility > 45000.0) new_visibility = 45000.0;
@@ -213,16 +213,16 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         //sun_exp2_punch_through = 2.0/log(visibility);
     }
 
-    if ( prev_sun_angle != sun_angle ) 
+    if ( prev_sun_angle != sun_angle )
     {
         prev_sun_angle = sun_angle;
 
         double aerosol_factor;
-        if ( visibility < 100 ) 
+        if ( visibility < 100 )
         {
             aerosol_factor = 8000;
         }
-        else 
+        else
         {
             aerosol_factor = 80.5 / log( visibility / 99.9 );
         }
@@ -231,24 +231,24 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         rel_humidity = 0.5;
         density_avg = 0.7;
 
-        /*else 
+        /*else
         {
-            rel_humidity = env_node->getFloatValue( "relative-humidity" ); 
+            rel_humidity = env_node->getFloatValue( "relative-humidity" );
             density_avg =  env_node->getFloatValue( "atmosphere/density-tropo-avg" );
         }*/
 
         osg::Vec4 i_halo_color, o_halo_color, scene_color, sun_color;
 
         double red_scat_f, red_scat_corr_f, green_scat_f, blue_scat_f;
-        
+
         red_scat_f = (aerosol_factor * path_distance * density_avg)/5E+07;
         red_scat_corr_f = sun_exp2_punch_through / (1 - red_scat_f);
         sun_color[0] = 1 -red_scat_f;
-		i_halo_color[0] = 1 - (1.1 * red_scat_f);
-		o_halo_color[0] = 1 - (1.4 * red_scat_f);
+                i_halo_color[0] = 1 - (1.1 * red_scat_f);
+                o_halo_color[0] = 1 - (1.4 * red_scat_f);
         scene_color[0] = 1 - red_scat_f;
 
-        // Green - 546.1 nm
+	// Green - 546.1 nm
 		if (sun_declination > 5.0 || sun_declination < 2.0)
 		{
 			green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 5E+07;
@@ -256,21 +256,21 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
 		else
 			green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 8.8938E+06;
 
-        sun_color[1] = 1 - green_scat_f * red_scat_corr_f;
+	sun_color[1] = 1 - green_scat_f * red_scat_corr_f;
 		i_halo_color[1] = 1 - (1.1 * (green_scat_f * red_scat_corr_f));
 		o_halo_color[1] = 1 - (1.4 * (green_scat_f * red_scat_corr_f));
-        scene_color[1] = 1 - green_scat_f;
- 
+	scene_color[1] = 1 - green_scat_f;
+
         // Blue - 435.8 nm
         blue_scat_f = (aerosol_factor * path_distance * density_avg)/3.607E+06;
         sun_color[2] = 1 - blue_scat_f * red_scat_corr_f;
-		i_halo_color[1] = 1 - (1.1 * (blue_scat_f * red_scat_corr_f));
-		o_halo_color[1] = 1 - (1.4 * (blue_scat_f * red_scat_corr_f));
+                i_halo_color[1] = 1 - (1.1 * (blue_scat_f * red_scat_corr_f));
+                o_halo_color[1] = 1 - (1.4 * (blue_scat_f * red_scat_corr_f));
         scene_color[2] = 1 - blue_scat_f;
 
         // Alpha
         sun_color[3] = 1;
-		i_halo_color[3] = 1;
+                i_halo_color[3] = 1;
         scene_color[3] = 1;
 
 		o_halo_color[3] = blue_scat_f;
@@ -279,7 +279,7 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
 			o_halo_color[3] = 2 - blue_scat_f;
 		}
 
-        double saturation = 1 - ( rel_humidity / 200 );
+	double saturation = 1 - ( rel_humidity / 200 );
 		sun_color[1] += (( 1 - saturation ) * ( 1 - sun_color[1] ));
 		sun_color[2] += (( 1 - saturation ) * ( 1 - sun_color[2] ));
 
@@ -304,10 +304,10 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         o_halo_color[2] = 0.2 * sun_color[2] + 0.8 * scene_color[2];
         o_halo_color[3] = blue_scat_f;
 
-        if ((visibility < 10000) && (blue_scat_f > 1)) 
+	if ((visibility < 10000) && (blue_scat_f > 1))
 		{
-            o_halo_color[3] = 2 - blue_scat_f;
-        }
+	    o_halo_color[3] = 2 - blue_scat_f;
+	}
 
         if (o_halo_color[3] > 1) o_halo_color[3] = 1;
         if (o_halo_color[3] < 0) o_halo_color[3] = 0;
@@ -318,7 +318,7 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
 		if ( i_halo_color[0] < 0 ) i_halo_color[0] = 0;
 		else if ( i_halo_color[0] > 1) i_halo_color[0] = 1;
 		if ( o_halo_color[0] < 0 ) o_halo_color[0] = 0;
-		else if ( o_halo_color[0] > 1) o_halo_color[0] = 1;	
+		else if ( o_halo_color[0] > 1) o_halo_color[0] = 1;
 		if (scene_color[0] < 0) scene_color[0] = 0;
 		else if (scene_color[0] > 1) scene_color[0] = 1;
 
@@ -347,7 +347,7 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
 
         sd_gamma_correct_rgb( i_halo_color._v );
         sd_gamma_correct_rgb( o_halo_color._v );
-        sd_gamma_correct_rgb( scene_color._v );    
+        sd_gamma_correct_rgb( scene_color._v );
         sd_gamma_correct_rgb( sun_color._v );
 
         (*sun_cl)[0] = sun_color;
@@ -363,36 +363,37 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
     return true;
 }
 
-bool SDSun::reposition( double rightAscension, double declination, 
-                        double sun_dist, double lat, double alt_asl, double sun_angle)
+bool SDSun::reposition( osg::Vec3d p, double sun_angle)
 {
-    osg::Matrix T2, RA, DEC;
+    osg::Matrix T1, T2, RA, DEC;
 
-    RA.makeRotate(rightAscension - 90*SD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
-    DEC.makeRotate(declination, osg::Vec3(1, 0, 0));
+    T1.makeTranslate(p[0], p[1]+ sun_dist, p[2]);
+
+    RA.makeRotate(sun_right_ascension - 90*SD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
+    DEC.makeRotate(sun_declination, osg::Vec3(1, 0, 0));
     T2.makeTranslate(osg::Vec3(0, sun_dist, 0));
 
     sun_transform->setMatrix(T2*DEC*RA);
 
     // Suncolor related things:
-    if ( prev_sun_angle != sun_angle ) 
+    if ( prev_sun_angle != sun_angle )
     {
-      	if ( sun_angle == 0 ) sun_angle = 0.1;
+        if ( sun_angle == 0 ) sun_angle = 0.1;
         const double r_earth_pole = 6356752.314;
         const double r_tropo_pole = 6356752.314 + 8000;
         const double epsilon_earth2 = 6.694380066E-3;
         const double epsilon_tropo2 = 9.170014946E-3;
 
-        double r_tropo = r_tropo_pole / sqrt ( 1 - ( epsilon_tropo2 * pow ( cos( lat ), 2 )));
-        double r_earth = r_earth_pole / sqrt ( 1 - ( epsilon_earth2 * pow ( cos( lat ), 2 )));
- 
+        double r_tropo = r_tropo_pole / sqrt ( 1 - ( epsilon_tropo2 * pow ( cos( 0.0 ), 2 )));
+        double r_earth = r_earth_pole / sqrt ( 1 - ( epsilon_earth2 * pow ( cos( 0.0 ), 2 )));
+
         double position_radius = r_earth;
 
         double gamma =  SD_PI - sun_angle;
         double sin_beta =  ( position_radius * sin ( gamma )  ) / r_tropo;
-        
+
         if (sin_beta > 1.0) sin_beta = 1.0;
-        
+
         double alpha =  SD_PI - gamma - asin( sin_beta );
 
         path_distance = sqrt( pow( position_radius, 2 ) + pow( r_tropo, 2 )
@@ -405,7 +406,7 @@ bool SDSun::reposition( double rightAscension, double declination,
         {
             env_node->setDoubleValue( "atmosphere/altitude-troposphere-top", r_tropo - r_earth );
             env_node->setDoubleValue( "atmosphere/altitude-half-to-sun", alt_half );
-      	}*/
+        }*/
     }
 
     return true;

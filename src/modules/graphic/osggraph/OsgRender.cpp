@@ -97,9 +97,10 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     grTrack = track;
 
     std::string datapath = GetDataDir();
+    datapath +="/";
     thesky = new SDSky;
     GfOut("SDSky class\n");
-    int grSkyDomeDistance = 12000;
+    int SDSkyDomeDistance = 12000;
 
     int NStars = NMaxStars;
     if (AStarsData)
@@ -126,7 +127,9 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
 
     GfLogInfo("  domeSizeRation : %d\n", domeSizeRatio);
 
-    thesky->build(datapath, SDSkyDomeDistance, SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, NPlanets, APlanetsData, NStars, AStarsData );
+    thesky->build(datapath, SDSkyDomeDistance, SDSkyDomeDistance, 2000*domeSizeRatio,
+                  SDSkyDomeDistance, 2000*domeSizeRatio, SDSkyDomeDistance, NPlanets,
+                  APlanetsData, NStars, AStarsData );
     GfOut("Build SKY\n");
     GLfloat sunAscension = grTrack->local.sunascension;
     SDSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
@@ -144,7 +147,7 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
         SDMoonDeclination = (rand() % 270);
 
     //SDMoonDeclination = grUpdateMoonPos(timeOfDay);
-    SDMoonDeclination = (rand() % 270);
+    SDMoonDeclination = 18.0; /*(rand() % 270);*/
 
     const float moonAscension = grTrack->local.sunascension;
 
@@ -162,9 +165,10 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     // Initialize the whole sky dome.
     double r_WrldX = SDScenery::getWorldX();
     double r_WrldY = SDScenery::getWorldY();
-    osg::Vec3 viewPos(r_WrldX /2, r_WrldY, 0.0);
+    osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0);
 
     thesky->reposition( viewPos, 0, 0);
+    //thesky->repaint()
 
     osg::Group* sceneGroup = new osg::Group;
     sceneGroup->addChild(m_sceneroot);
