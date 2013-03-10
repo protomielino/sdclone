@@ -164,7 +164,7 @@ MACRO(ROBOT_MODULE)
   # Link/Run-time dependencies
   ADD_PLIB_LIBRARY(${RBM_NAME} sg)
 
-  ADD_SDLIB_LIBRARY(${RBM_NAME} portability robottools)
+  ADD_SDLIB_LIBRARY(${RBM_NAME} portability tgf robottools)
 
   # Install target robot module shared library
   SD_INSTALL_FILES(LIB drivers/${RBM_NAME} TARGETS ${RBM_NAME})
