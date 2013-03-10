@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.03.03
+// Last changed : 2013.03.04
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 4.00.000
@@ -2962,7 +2962,8 @@ void TDriver::BrakingForceController()
   int	B = (int) MIN(NBR_BRAKECOEFF,(floor(oCurrSpeed/2)));
   double Diff = 2 * oBrakeCoeff[B] * (oCurrSpeed - oTargetSpeed);
 
-  oBrake = MIN(oBrakeMaxPressRatio,MAX(0.0,oPIDCBrake.Sample(Diff*Diff*Diff)));
+  oBrake = oPIDCBrake.Sample(Diff*Diff*Diff);
+  oBrake = MIN(oBrakeMaxPressRatio,MAX(0.0,oBrake));
 
   if (Diff < 0)
   {
