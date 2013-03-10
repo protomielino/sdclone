@@ -176,29 +176,23 @@ MACRO(ROBOT_MODULE)
 
     FOREACH(CLONENAME ${RBM_CLONENAMES})
     
-      # Check contents if specified (because SD_INSTALL_FILES(LIB ...) doesn't do it itself).
-      IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${CLONENAME} OR OPTION_CHECK_CONTENTS)
-      
-        SET(CLONE_MODLOC ${CLONENAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
-        IF(FALSE)
-        #IF(UNIX)
-          # Might not work with GCC 4.5 or + (see above) 
-          ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                             COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC}.${RBM_VERSION})
-          ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                             COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_VERSION} ${CLONE_MODLOC}.${RBM_SOVERSION}
-                             COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC})
-          SD_INSTALL_FILES(LIB drivers/${CLONENAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR}
-                           FILES ${CLONE_MODLOC} ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC}.${RBM_VERSION} )
-        ELSE()
-          ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                             COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC})
-          SD_INSTALL_FILES(LIB drivers/${CLONENAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR}
-                           FILES ${CLONE_MODLOC})
-        ENDIF()
+      SET(CLONE_MODLOC ${CLONENAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+      IF(FALSE) #IF(UNIX)
+        # Might not work with GCC 4.5 or + (see above) 
+        ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC}.${RBM_VERSION})
+        ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_VERSION} ${CLONE_MODLOC}.${RBM_SOVERSION}
+                           COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC})
+        SD_INSTALL_FILES(LIB drivers/${CLONENAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+                         FILES ${CLONE_MODLOC} ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC}.${RBM_VERSION} )
+      ELSE()
+        ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC})
+        SD_INSTALL_FILES(LIB drivers/${CLONENAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+                         FILES ${CLONE_MODLOC})
+      ENDIF()
         
-      ENDIF() # Contents checking.
-      
     ENDFOREACH(CLONENAME ${RBM_CLONENAMES})
     
   ENDIF()

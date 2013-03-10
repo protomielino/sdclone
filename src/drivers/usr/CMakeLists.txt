@@ -45,4 +45,4 @@ ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.0.0 SOVERSION 1.0.0
               CLONENAMES ${ROBOT_CLONES})
 
 # For data associated to the ubiquirous USR robot module and its clones,
-# see data/drivers/usr/CMakeLists.txt
+# see data/drivers/usr*/CMakeLists.txt

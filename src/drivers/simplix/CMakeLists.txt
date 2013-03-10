@@ -89,4 +89,4 @@ ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.3.0 SOVERSION 1.0.0
              CLONENAMES ${ROBOT_CLONES})
 
 # For data associated to the ubiquitous robot module and its clones,
-# see data/drivers/simplix/CMakeLists.txt
+# see data/drivers/simplix*/CMakeLists.txt
