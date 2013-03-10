@@ -587,7 +587,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
     /* Retrieve and load car specs : merge car default specs,
        category specs and driver modifications (=> handle) */
     /* Read Car model specifications */
-    snprintf(buf, sizeof(buf), "cars/%s/%s.xml", elt->_carName, elt->_carName);
+    snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", elt->_carName, elt->_carName);
     carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
     if (category) {
@@ -596,7 +596,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       strncpy(elt->_category, category, MAX_NAME_LEN - 1);
       elt->_category[MAX_NAME_LEN - 1] = 0;
       /* Read Car Category specifications */
-      snprintf(buf2, sizeof(buf2), "categories/%s.xml", elt->_category);
+      snprintf(buf2, sizeof(buf2), "cars/categories/%s.xml", elt->_category);
       cathdle = GfParmReadFile(buf2, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	  int errorcode = 0;
       if ((errorcode = GfParmCheckHandle(cathdle, carhdle))) 

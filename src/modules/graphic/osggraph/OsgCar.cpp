@@ -131,13 +131,13 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
 
-    snprintf(buf, nMaxTexPathSize, "cars/%s/", car->_carName);
+    snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
     
     if (bMasterModel)
     {
-        snprintf(buf, nMaxTexPathSize, "cars/%s/", car->_masterModel);
+        snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_masterModel);
         strTPath = TmpPath+buf;
         loader.AddSearchPath(strTPath);
     }
@@ -159,9 +159,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
 
     std::string strPath = GetDataDir();
     if (bMasterModel)
-    	sprintf(buf, "cars/%s/%s.acc", car->_masterModel, car->_masterModel);
+    	sprintf(buf, "cars/models/%s/%s.acc", car->_masterModel, car->_masterModel);
     else
-        sprintf(buf, "cars/%s/%s.acc", car->_carName, car->_carName);
+        sprintf(buf, "cars/models/%s/%s.acc", car->_carName, car->_carName);
         
     strPath+=buf;
     GfOut("Chemin Textures : %s\n", strTPath.c_str());

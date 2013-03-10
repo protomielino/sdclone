@@ -705,7 +705,7 @@ ReRaceRealStart(void)
 	// Load drivers for the race
 	for (i = 0; i < s->_ncars; i++)
 	{
-		snprintf(buf, sizeof(buf), "cars/%s/%s.xml",
+		snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml",
 				 s->cars[i]->_carName, s->cars[i]->_carName);
 		carHdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 		snprintf(buf, sizeof(buf), "Loading %s driver (%s) ...",

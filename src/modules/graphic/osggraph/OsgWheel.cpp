@@ -64,7 +64,7 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
     
-    snprintf(buf, 4096, "cars/%s/", car->_carName);
+    snprintf(buf, 4096, "cars/models/%s/", car->_carName);
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
     GfOut("Chemin Textures : %s\n", strTPath.c_str());

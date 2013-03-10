@@ -817,7 +817,7 @@ std::vector<GfDriverSkin> GfDriver::getPossibleSkins(const std::string& strAltCa
 	getPossibleSkinsInFolder(strCarId, ossDirPath.str(), vecPossSkins);
 
 	ossDirPath.str("");
-	ossDirPath << "cars/" << strCarId;
+	ossDirPath << "cars/models/" << strCarId;
 	getPossibleSkinsInFolder(strCarId, ossDirPath.str(), vecPossSkins);
 
 	// If we have at least 1 skin, make sure that, if the standard one is inside,
@@ -846,7 +846,7 @@ std::vector<GfDriverSkin> GfDriver::getPossibleSkins(const std::string& strAltCa
 		
 		GfDriverSkin stdSkin;
 		std::ostringstream ossPreviewName;
-		ossPreviewName << "cars/" << strCarId << '/' << strCarId << pszPreviewTexSufx;
+		ossPreviewName << "cars/models/" << strCarId << '/' << strCarId << pszPreviewTexSufx;
 		stdSkin.setCarPreviewFileName(ossPreviewName.str());
 
 		if (!GfFileExists(ossPreviewName.str().c_str()))

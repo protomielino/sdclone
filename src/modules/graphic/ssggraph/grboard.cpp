@@ -21,7 +21,6 @@
 
 #include <plib/ssg.h>
 #include <portability.h>    // snprintf
-//#include <glfeatures.h>
 #include <robottools.h>     // RELAXATION
 
 #include <algorithm>        // remove
@@ -1346,9 +1345,9 @@ void grInitBoardCar(tCarElt *car)
 
   lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s;", car->_modName);
 
-  lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/%s;", car->_carName);
+  lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_carName);
   if (bMasterModel)
-    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/%s;", car->_masterModel);
+    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_masterModel);
 
   lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "data/textures");
 

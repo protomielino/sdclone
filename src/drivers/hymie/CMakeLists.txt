@@ -7,8 +7,7 @@ SET(ROBOT_SOURCES ${ROBOT_NAME}.cpp cardata.cpp  correct.cpp  driver.cpp
 	correct.h  driver.h  learn.h  linalg.h  name.h  opponent.h  pit.h
 	spline.h  strategy.h)
 
-SET(ROBOT_FILES)
-SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8 9 10 sc-boxer-96 sc-spirit-300 sc-cavallo-360 sc-fmc-gt4 sc-lynx-220 sc-murasama-nsx svg)
+ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 1.0.0 SOVERSION 1.0.0
+             SOURCES ${ROBOT_SOURCES})
 
-ROBOT(NAME ${ROBOT_NAME} SOURCES ${ROBOT_SOURCES} FILES ${ROBOT_FILES} SUBDIRS ${ROBOT_SUBDIRS})
-
+# For data associated to the robot module, see data/drivers/hymie/CMakeLists.txt

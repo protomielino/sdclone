@@ -277,7 +277,7 @@ ReStoreRaceResults(const char *race)
 			
 				GfParmSetStr(results, path, RE_ATTR_NAME, car->_name);
 			
-				snprintf(buf, sizeof(buf), "cars/%s/%s.xml", car->_carName, car->_carName);
+				snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
 				carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 				carName = GfParmGetName(carparam);
 			
@@ -314,7 +314,7 @@ ReStoreRaceResults(const char *race)
 				car = s->cars[0];
 				snprintf(path, sizeof(path), "%s/%s/%s", ReInfo->track->name, RE_SECT_RESULTS, race);
 				GfParmSetStr(results, path, RM_ATTR_DRVNAME, car->_name);
-				snprintf(buf, sizeof(buf), "cars/%s/%s.xml", car->_carName, car->_carName);
+				snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
 				carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 				carName = GfParmGetName(carparam);
 				GfParmSetStr(results, path, RE_ATTR_CAR, carName);
@@ -371,7 +371,7 @@ ReStoreRaceResults(const char *race)
 				snprintf(path, sizeof(path), "%s/%s/%s/%s/%d", ReInfo->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, i + 1);
 				GfParmSetStr(results, path, RE_ATTR_NAME, car->_name);
 				
-				snprintf(buf, sizeof(buf), "cars/%s/%s.xml", car->_carName, car->_carName);
+				snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
 				carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 				carName = GfParmGetName(carparam);
 				
@@ -408,7 +408,7 @@ ReStoreRaceResults(const char *race)
 				
 					GfParmSetStr(results, path, RE_ATTR_NAME, car->_name);
 				
-					snprintf(buf, sizeof(buf), "cars/%s/%s.xml", car->_carName, car->_carName);
+					snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
 					carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 					carName = GfParmGetName(carparam);
 				
@@ -526,7 +526,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 		ReUI().eraseResultsTable();
 		maxLines = ReUI().getResultsTableRowCount();
 		
-		snprintf(buf, sizeof(buf), "cars/%s/%s.xml", car->_carName, car->_carName);
+		snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
 		carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 		carName = GfParmGetName(carparam);
 
@@ -596,7 +596,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 		
 		for (xx = 0; xx < nCars; ++xx) {
 			car = ReInfo->s->cars[ xx ];
-			snprintf(buf, sizeof(buf), "cars/%s/%s.xml", car->_carName, car->_carName);
+			snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
 			carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 			carName = strdup(GfParmGetName(carparam));
 			GfParmReleaseHandle(carparam);
@@ -658,7 +658,7 @@ ReUpdateRaceCurRes()
 
     for (xx = 0; xx < ncars; ++xx) {
     	car = ReInfo->s->cars[ xx ];
-        snprintf(buf, sizeof(buf), "cars/%s/%s.xml", car->_carName, car->_carName);
+        snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
         carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
         carName = strdup(GfParmGetName(carparam));
         GfParmReleaseHandle(carparam);

@@ -78,7 +78,7 @@ GfCars::GfCars()
 	_pPrivate = new Private;
 
 	// Get the list of sub-dirs in the "cars" folder.
-	tFList* lstFolders = GfDirGetList("cars");
+	tFList* lstFolders = GfDirGetList("cars/models");
 	if (!lstFolders)
 	{
 		GfLogFatal("No car available in the 'cars' folder\n");
@@ -100,7 +100,7 @@ GfCars::GfCars()
 		const char* pszCarId = pFolder->name;
 			
 		std::ostringstream ossCarFileName;
-		ossCarFileName << "cars/" << pszCarId << '/' << pszCarId << PARAMEXT;
+		ossCarFileName << "cars/models/" << pszCarId << '/' << pszCarId << PARAMEXT;
 		void* hparmCar = GfParmReadFile(ossCarFileName.str().c_str(), GFPARM_RMODE_STD);
 		if (!hparmCar)
 		{
@@ -116,7 +116,7 @@ GfCars::GfCars()
 		{
 			// Little optimization : don't load category file if same as the previous car's.
 			std::ostringstream ossCatFileName;
-			ossCatFileName << "categories/" << strCatId << PARAMEXT;
+			ossCatFileName << "cars/categories/" << strCatId << PARAMEXT;
 			void* hparmCat = GfParmReadFile(ossCatFileName.str().c_str(), GFPARM_RMODE_STD);
 			if (!hparmCat)
 			{

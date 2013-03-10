@@ -187,7 +187,7 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
 			void* carHdle = 0;
             if (carName)
             {
-                snprintf(path, sizeof(path), "cars/%s/%s.xml", carName, carName);
+                snprintf(path, sizeof(path), "cars/models/%s/%s.xml", carName, carName);
                 carHdle = GfParmReadFile(path, GFPARM_RMODE_STD);
                 carName = GfParmGetName(carHdle);
 			}

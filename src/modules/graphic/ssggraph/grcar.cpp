@@ -387,7 +387,7 @@ initWheel(tCarElt *car, int wheel_index, const char *wheel_mod_name)
 void
 grInitShadow(tCarElt *car)
 {
-	char		buf[256];
+	char		buf[512];
 	const char	*shdTexName;
 	int			i;
 	float		x;
@@ -400,9 +400,9 @@ grInitShadow(tCarElt *car)
 	ssgNormalArray	*shd_nrm = new ssgNormalArray(1);
 	ssgTexCoordArray	*shd_tex = new ssgTexCoordArray(GR_SHADOW_POINTS+1);
 
-	snprintf(buf, 256, "cars/%s;", car->_carName);
+	snprintf(buf, sizeof(buf), "cars/models/%s;", car->_carName);
 	if (strlen(car->_masterModel) > 0) // Add the master model path if we are using a template.
-		snprintf(buf + strlen(buf), 256 - strlen(buf), "cars/%s;", car->_masterModel);
+		snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "cars/models/%s;", car->_masterModel);
 		
 	grFilePath = buf;
 
@@ -693,9 +693,9 @@ grInitCar(tCarElt *car)
 
 	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s;", car->_modName);
 
-	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/%s;", car->_carName);
+	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_carName);
 	if (bMasterModel)
-		lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/%s;", car->_masterModel);
+		lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_masterModel);
 
 	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "data/textures");
 
@@ -761,9 +761,9 @@ grInitCar(tCarElt *car)
 
 	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s;", car->_modName);
 
-	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "cars/%s;", car->_carName);
+	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_carName);
 	if (bMasterModel)
-		lg += snprintf(buf + lg, nMaxTexPathSize - lg, "cars/%s;", car->_masterModel);
+		lg += snprintf(buf + lg, nMaxTexPathSize - lg, "cars/models/%s;", car->_masterModel);
 	
 	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "data/objects;");
 
