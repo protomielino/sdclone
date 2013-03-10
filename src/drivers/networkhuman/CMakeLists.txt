@@ -11,6 +11,6 @@ ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION ${VERSION} SOVERSION 0.0.0
              INTERFACE WELCOME
              SOURCES ${ROBOT_SOURCES})
 
-ADD_SDLIB_LIBRARY(${ROBOT_NAME} tgf tgfclient networking)
+ADD_SDLIB_LIBRARY(${ROBOT_NAME} tgfclient networking)
 
 # For data associated to the robot module, see data/drivers/networkhuman/CMakeLists.txt
