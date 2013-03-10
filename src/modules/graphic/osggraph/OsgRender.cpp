@@ -97,7 +97,7 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     grTrack = track;
 
     std::string datapath = GetDataDir();
-    datapath +="/";
+    //datapath +="/";
     thesky = new SDSky;
     GfOut("SDSky class\n");
     int SDSkyDomeDistance = 12000;
@@ -147,9 +147,9 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
         SDMoonDeclination = (rand() % 270);
 
     //SDMoonDeclination = grUpdateMoonPos(timeOfDay);
-    SDMoonDeclination = 18.0; /*(rand() % 270);*/
+    SDMoonDeclination = 22.0; /*(rand() % 270);*/
 
-    const float moonAscension = grTrack->local.sunascension;
+    const float moonAscension = grTrack->local.sunascension - 180.0;
 
     thesky->setMD( DEG2RAD(SDMoonDeclination) );
     thesky->setMRA( DEG2RAD(moonAscension) );

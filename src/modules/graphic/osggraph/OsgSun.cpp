@@ -86,7 +86,7 @@ osg::Node* SDSun::build( std::string path, double sun_size )
 
     stateSet->setRenderBinDetails(-6, "RenderBin");
 
-    path = TmpPath+"sun.png";
+    path = TmpPath+"data/textures/sun.png";
     osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path);
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
     stateSet->setTextureAttributeAndModes(0, texture);
@@ -125,7 +125,7 @@ osg::Node* SDSun::build( std::string path, double sun_size )
     stateSet = geode->getOrCreateStateSet();
     stateSet->setRenderBinDetails(-7, "RenderBin");
 
-    path = TmpPath+"inner_halo.png";
+    path = TmpPath+"data/textures/inner_halo.png";
     osg::ref_ptr<osg::Image> image2 = osgDB::readImageFile(path);
     osg::ref_ptr<osg::Texture2D> texture2 = new osg::Texture2D(image2.get());
     stateSet->setTextureAttributeAndModes(0, texture2);
@@ -162,7 +162,7 @@ osg::Node* SDSun::build( std::string path, double sun_size )
     stateSet = geode->getOrCreateStateSet();
     stateSet->setRenderBinDetails(-8, "RenderBin");
 
-    path = TmpPath+"outer_halo.png";
+    path = TmpPath+"data/textures/outer_halo.png";
     osg::ref_ptr<osg::Image> image3 = osgDB::readImageFile(path);
     osg::ref_ptr<osg::Texture2D> texture3 = new osg::Texture2D(image3.get());
     stateSet->setTextureAttributeAndModes(0, texture3);
@@ -367,13 +367,14 @@ bool SDSun::reposition( osg::Vec3d p, double sun_angle)
 {
     osg::Matrix T1, T2, RA, DEC;
 
+
+
+    RA.makeRotate(sun_right_ascension - 90 *SD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
+    DEC.makeRotate(sun_declination * SD_DEGREES_TO_RADIANS, osg::Vec3(1, 0, 0));
+    //T2.makeTranslate(osg::Vec3(0, sun_dist, 0));
     T1.makeTranslate(p[0], p[1]+ sun_dist, p[2]);
 
-    RA.makeRotate(sun_right_ascension - 90*SD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
-    DEC.makeRotate(sun_declination, osg::Vec3(1, 0, 0));
-    T2.makeTranslate(osg::Vec3(0, sun_dist, 0));
-
-    sun_transform->setMatrix(T2*DEC*RA);
+    sun_transform->setMatrix(T1*DEC*RA);
 
     // Suncolor related things:
     if ( prev_sun_angle != sun_angle )
