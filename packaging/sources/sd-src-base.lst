@@ -20,11 +20,9 @@ src/drivers/CMakeLists.txt
 src/drivers/usr/CMakeLists.txt
 src/drivers/usr/README
 src/drivers/usr/src
-src/drivers/usr/usr_sc
 
 src/drivers/simplix/CMakeLists.txt
 src/drivers/simplix/src
-src/drivers/simplix/simplix_sc
 
 src/drivers/kilo2008
 
@@ -34,13 +32,6 @@ src/interfaces
 src/libs
 src/main
 src/tools
-
-src/raceman/CMakeLists.txt
-src/raceman/extra
-src/raceman/practice.xml
-src/raceman/quickrace.xml
-src/raceman/singleevent-challenge.xml
-src/raceman/singleevent-endurance.xml
 
 src/modules/CMakeLists.txt
 src/modules/graphic
@@ -53,6 +44,26 @@ src/modules/userinterface
 
 data/CMakeLists.txt
 data/data
+
+data/config/CMakeLists.txt
+data/config/graph.xml
+data/config/logging.xml
+data/config/raceengine.xml
+data/config/raceresults.xsl
+data/config/screen.xml
+data/config/sound.xml
+
+data/config/raceman/CMakeLists.txt
+data/config/raceman/extra
+data/config/raceman/practice.xml
+data/config/raceman/quickrace.xml
+data/config/raceman/singleevent-challenge.xml
+data/config/raceman/singleevent-endurance.xml
+
+data/drivers/CMakeLists.txt
+data/drivers/kilo2008
+data/drivers/usr_sc
+data/drivers/simplix_sc
 
 data/cars/CMakeLists.txt
 data/cars/categories

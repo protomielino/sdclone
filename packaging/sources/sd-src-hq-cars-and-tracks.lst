@@ -1,19 +1,15 @@
-src/raceman/singleevent-36gp.xml
-src/raceman/singleevent-ls-gt1.xml
-src/raceman/championship.xml
-src/raceman/championship-supercars.xml
-src/raceman/championship-36gp.xml
-src/raceman/championship-ls-gt1.xml
+data/config/raceman/singleevent-36gp.xml
+data/config/raceman/singleevent-ls-gt1.xml
+data/config/raceman/championship.xml
+data/config/raceman/championship-supercars.xml
+data/config/raceman/championship-36gp.xml
+data/config/raceman/championship-ls-gt1.xml
 
-src/drivers/usr/usr_ls1
-src/drivers/usr/usr_36GP
+data/drivers/usr_ls1
+data/drivers/usr_36GP
 
-src/drivers/simplix/simplix_ls1
-src/drivers/simplix/simplix_36GP
-
-data/cars/CMakeLists.txt
-
-data/cars/models/CMakeLists.txt
+data/drivers/simplix_ls1
+data/drivers/simplix_36GP
 
 data/cars/models/ls1-archer-r9
 data/cars/models/ls1-newcastle-fury
@@ -30,8 +26,6 @@ data/cars/models/36gp-motorunion-typec
 data/cars/models/36gp-silber-w25b
 data/cars/models/36gp-tridenti-6c34
 data/cars/models/36gp-tridenti-v8ri
-
-data/tracks/CMakeLists.txt
 
 data/tracks/circuit/CMakeLists.txt
 
