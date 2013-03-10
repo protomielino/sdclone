@@ -480,7 +480,7 @@ float sd_randNormalFloat()
 			val2 = 2.0 * sd_randFloat() - 1.0;
 			radius = val1 * val1 + val2 * val2;
 		} while (radius >= 1.0);
-		fac = sqrt(-2.0 + log(radius)/radius);
+		fac = sqrt(-2.0 * log(radius)/radius);
 		sd_secondRandomNumber = val1 * fac;
 		sd_flagHaveOne = 1;
 		return (float)(val2*fac);
