@@ -33,23 +33,23 @@ private:
 	osg::ref_ptr<osg::Group> m_sceneroot;
 	osg::ref_ptr<osg::Group> m_carroot;
 
-    osg::Vec4 SkyColor;
-    osg::Vec4 BaseFogColor;
-    osg::Vec4 FogColor;
-    osg::Vec4 CloudsColor;
+        osg::Vec4 SkyColor;
+        osg::Vec4 BaseFogColor;
+        osg::Vec4 FogColor;
+        osg::Vec4 CloudsColor;
 
-    osg::Vec4 SceneAmbiant;
-    osg::Vec4 SceneDiffuse;
-    osg::Vec4 SceneSpecular;
-	
+        osg::Vec4 SceneAmbiant;
+        osg::Vec4 SceneDiffuse;
+        osg::Vec4 SceneSpecular;
+
 public:
 	SDRender(void);
 	~SDRender(void);
-	
-    void Init(osg::Group* root);
-	void Update(float speedcar, tSituation *s);
-	void UpdateTime(tSituation *s);
-    void UpdateLight(void);
+
+        osg::Node *Init(osg::Group* root, tTrack *track);
+        void Update(float speedcar, tSituation *s);
+        void UpdateTime(tSituation *s);
+        void UpdateLight(void);
 };
 
 #endif //_OSGRENDER_H_

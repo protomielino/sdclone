@@ -31,6 +31,7 @@
 #include "OsgMain.h"
 #include "OsgRender.h"
 #include "OsgSky.h"
+#include "OsgScenery.h"
 #include "OsgMath.h"
 
 #include <glfeatures.h>	//gluXXX
@@ -41,19 +42,22 @@ static const double m_log01 = -log( 0.01 );
 static const double sqrt_m_log01 = sqrt( m_log01 );
 const GLfloat fog_exp2_density = sqrt_m_log01 / 11000;
 
+static osg::ref_ptr<osg::Group> mRealRoot = new osg::Group;
+static osg::ref_ptr<osg::Group> mRoot = new osg::Group;
+
 SDSky *thesky = NULL;
-tTrack *grTrack;
+static tTrack *grTrack;
 
 unsigned SDSkyDomeDistance = 0;
 //static unsigned SDNbCloudLayers = 0;
 
 // Some private global variables.
 //static int grDynamicWeather = 0;
-//static bool SDDynamicSkyDome = false;
-//static float SDSunDeclination = 0.0f;
-//static float SDMoonDeclination = 0.0f;
-//static float SDMax_Visibility = 0.0f;
-//static double SDVisibility = 0.0f;
+static bool SDDynamicSkyDome = false;
+static float SDSunDeclination = 0.0f;
+static float SDMoonDeclination = 0.0f;
+static float SDMax_Visibility = 0.0f;
+static double SDVisibility = 0.0f;
 
 #define MAX_BODIES	2
 #define MAX_CLOUDS	3
@@ -67,8 +71,8 @@ unsigned SDSkyDomeDistance = 0;
 #define SCARCE_CLOUD 5
 #define COVERAGE_CLOUD 8
 
-//static osg::Vec3d *AStarsData = NULL;
-//static osg::Vec3d *APlanetsData = NULL;
+static osg::Vec3d *AStarsData = NULL;
+static osg::Vec3d *APlanetsData = NULL;
 
 static osg::ref_ptr<osg::Group> RealRoot = new osg::Group;
 
@@ -83,15 +87,16 @@ SDRender::~SDRender(void)
 /**
  * SDRender
  * Initialises a scene (ie a new view).
- * 
+ *
  * @return 0 if OK, -1 if something failed
  */
-void SDRender::Init(osg::Group *root)
+osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
 {
-   /* char buf[256];
+    //char buf[256];
     void *hndl = grTrackHandle;
+    grTrack = track;
 
-    std::string datapath = GetDataDir();;
+    std::string datapath = GetDataDir();
     thesky = new SDSky;
     GfOut("SDSky class\n");
     int grSkyDomeDistance = 12000;
@@ -99,9 +104,9 @@ void SDRender::Init(osg::Group *root)
     int NStars = NMaxStars;
     if (AStarsData)
         delete [] AStarsData;
-        
+
     AStarsData = new osg::Vec3d[NStars];
-    
+
     for(int i= 0; i < NStars; i++)
     {
         AStarsData[i][0] = SDRandom() * PI;
@@ -114,10 +119,14 @@ void SDRender::Init(osg::Group *root)
     int NPlanets = 0;
     APlanetsData = NULL;
 
+    GfLogInfo("  Planets : %d\n", NPlanets);
+
     const int timeOfDay = (int)grTrack->local.timeofday;
     const double domeSizeRatio = SDSkyDomeDistance / 80000.0;
 
-    thesky->build(path, SDSkyDomeDistance, SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, NPlanets, APlanetsData, NStars, AStarsData );
+    GfLogInfo("  domeSizeRation : %d\n", domeSizeRatio);
+
+    thesky->build(datapath, SDSkyDomeDistance, SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, NPlanets, APlanetsData, NStars, AStarsData );
     GfOut("Build SKY\n");
     GLfloat sunAscension = grTrack->local.sunascension;
     SDSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
@@ -151,60 +160,49 @@ void SDRender::Init(osg::Group *root)
     //light->setPosition(sunPosition.xyz);
 
     // Initialize the whole sky dome.
-    osg::Vec3 viewPos;
-    //sgSetVec3(viewPos, grWrldX/2, grWrldY/2, 0);
-    //TheSky->repositionFlat( viewPos, 0, 0);*/
+    double r_WrldX = SDScenery::getWorldX();
+    double r_WrldY = SDScenery::getWorldY();
+    osg::Vec3 viewPos(r_WrldX /2, r_WrldY, 0.0);
 
-    /*RealRoot = dynamic_cast<osg::Group*> root;
-    osg::StateSet* rootStateSet = RealRoot->getOrCreateStateSet();
-    RealRoot->setStateSet(rootStateSet);
-	osg::Group* lightGroup = new osg::Group;
+    thesky->reposition( viewPos, 0, 0);
 
-    //SDUpdateLight();
-	
-    osg::Light* myLight2 = new osg::Light;
-    myLight2->setLightNum(1);
-    myLight2->setPosition(osg::Vec4(-100.0f, -100.0f, -3220.0f, 1.0f));
-    myLight2->setAmbient(osg::Vec4(0.2f, 0.2f, 0.2f, 1.0f));
-    myLight2->setDiffuse(osg::Vec4(0.8f, 0.8f, 0.8f, 1.0f));
-    myLight2->setSpecular(osg::Vec4(0.2f, 0.2f, 0.2f, 1.0f));
-    myLight2->setConstantAttenuation(0.9f);
-    
-    GfOut("Light\n");
-    osg::LightSource* sunLight = new osg::LightSource;   
-    sunLight->getLight()->setDataVariance(Object::DYNAMIC);
-    sunLight->setLight(myLight2);
-    sunLight->setLocalStateSetModes(osg::StateAttribute::ON); 
-    sunLight->setStateSetModes(*rootStateSet, osg::StateAttribute::ON);
-    lightGroup->addChild(sunLight);
+    osg::Group* sceneGroup = new osg::Group;
+    sceneGroup->addChild(m_sceneroot);
+    //sceneGroup->setNodeMask(~simgear::BACKGROUND_BIT);
+    osg::StateSet* stateSet = sceneGroup->getOrCreateStateSet();
+    stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
-    GfOut("SunLight");
+    osg::LightSource* lightSource = new osg::LightSource;
+    lightSource->getLight()->setDataVariance(osg::Object::DYNAMIC);
+    // relative because of CameraView being just a clever transform node
+    lightSource->setReferenceFrame(osg::LightSource::RELATIVE_RF);
+    lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
+    //lightSource->setUpdateCallback(new FGLightSourceUpdateCallback);
 
-    osg::Group *skyGroup = new osg::Group;
+    // we need a white diffuse light for the phase of the moon
+    osg::LightSource* sunLight = new osg::LightSource;
+    sunLight->getLight()->setDataVariance(osg::Object::DYNAMIC);
+    sunLight->getLight()->setLightNum(1);
+    sunLight->setReferenceFrame(osg::LightSource::RELATIVE_RF);
+    sunLight->setLocalStateSetModes(osg::StateAttribute::ON);
+
+    osg::Group* skyGroup = new osg::Group;
     osg::StateSet* skySS = skyGroup->getOrCreateStateSet();
     skySS->setMode(GL_LIGHT0, osg::StateAttribute::OFF);
     skyGroup->addChild(thesky->getPreRoot());
     sunLight->addChild(skyGroup);
     mRoot->addChild(sceneGroup);
     mRoot->addChild(sunLight);
-  
-    osg::Group *mRoot = new osg::Group;
-    mRoot->addChild(RealRoot);
-    mRoot->addChild(sunLight);
-    mRoot->addChild(lightGroup);
 
-    osg::Fog* mFog = new osg::Fog;
-    mFog->setMode( osg::Fog::EXP2 );
-    mFog->setColor( osg::Vec4( 0.8, 0.8, 0.8, 1) );
-    mFog->setDensity( fog_exp2_density );
-    rootStateSet->SetState->setMode( mFog, osg::StateAttribute::ON );
-    rootStateSet->setAttributeAndModes(mFog);
-    rootStateSet->setMode( GL_FOG, osg::StateAttribute::ON );
-    viewer->setSceneData(mRoot);
+    // Clouds are added to the scene graph later
+    stateSet = m_sceneroot->getOrCreateStateSet();
+    stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
+    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::ON);
+    stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
-    GfOut("LE POINTEUR %d\n",m_carroot.get());
+    GfOut("LE POINTEUR %d\n",mRoot.get());
 
-  	//return 0;*/
+    return mRoot;
 }//SDRender::Init
 
 /*void grUpdateLight( void )

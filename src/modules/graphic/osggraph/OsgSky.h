@@ -43,7 +43,7 @@ class SDStars;
 class SDSkyDome;
 class SDSky;
 
-typedef struct 
+typedef struct
 {
   osg::Vec3d pos;
   double spin;
@@ -53,7 +53,7 @@ typedef struct
   double sun_angle;
 } SDSkyState;
 
-typedef struct 
+typedef struct
 {
   osg::Vec3f sky_color;
   osg::Vec3f adj_sky_color;
@@ -62,7 +62,7 @@ typedef struct
   double sun_angle, moon_angle;
 } SDSkyColor;
 
-enum NodeMask 
+enum NodeMask
 {
     BACKGROUND_BIT = (1 << 11),
     MODEL_BIT = (1 << 12),
@@ -122,29 +122,29 @@ public:
     /*void build( double h_radius_m, double v_radius_m,
                 double sun_size, double moon_size,
                 const SGEphemeris& eph);*/
-    
+
     //bool repaint( const SDSkyColor &sc/*, const SDEphemeris& eph*/ );
     bool repaint (osg::Vec4d sky_color, osg::Vec4d fog_color, osg::Vec4d cloud_color, double sol_angle,
                   double moon_angle, int nplanets, osg::Vec3d *planet_data,
                   int nstars, osg::Vec3d *star_data);
     //bool reposition( const SDSkyState &st/*, const SDEphemeris& eph*/, double dt = 0.0 );
-    bool reposition(osg::Vec3& view_pos, osg::Vec3 zero_elev, osg::Vec3 view_up, double lon, double lat, double alt, double spin, double gst, double dt);
- 
+    bool reposition(osg::Vec3 &view_pos,  double spin, /*double gst,*/ double dt);
+
     void modify_vis( float alt, float time_factor );
 
     osg::Node* getPreRoot() { return pre_root.get(); }
     osg::Node* getCloudRoot() { return cloud_root.get(); }
-    
+
     void texture_path( const std::string& path );
 
-    inline void enable() {  pre_selector->setValue(0, 1); }   
-    inline void disable() { pre_selector->setValue(0, 0); }   
+    inline void enable() {  pre_selector->setValue(0, 1); }
+    inline void disable() { pre_selector->setValue(0, 0); }
     inline osg::Vec4f get_sun_color() { return sun->get_color(); }
     inline osg::Vec4f get_scene_color() { return sun->get_scene_color(); }
-    
-    //void add_cloud_layer (SGCloudLayer * layer);   
-    //const SGCloudLayer * get_cloud_layer (int i) const;    
-    //SGCloudLayer * get_cloud_layer (int i);  
+
+    //void add_cloud_layer (SGCloudLayer * layer);
+    //const SGCloudLayer * get_cloud_layer (int i) const;
+    //SGCloudLayer * get_cloud_layer (int i);
     //int get_cloud_layer_count () const;
 
     void setMA(double angle) { moon->setMoonAngle(angle); }
