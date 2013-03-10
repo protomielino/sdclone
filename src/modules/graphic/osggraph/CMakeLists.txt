@@ -22,6 +22,9 @@ ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)
 ADD_SDL_INCLUDEDIR()
 ADD_OSG_INCLUDEDIR()
 
+# Temporary, but should not remain !
+ADD_PLIB_INCLUDEDIR()
+
 IF(COMMAND CMAKE_POLICY)
     CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
@@ -49,6 +52,9 @@ ENDIF(UNIX OR MINGW)
 ADD_OSG_LIBRARY(osggraph)
 ADD_SDL_LIBRARY(osggraph)
 ADD_OPENGL_LIBRARY(osggraph)
+
+# Temporary, but should not remain !
+ADD_PLIB_LIBRARY(osggraph ul sg)
 
 ADD_SDLIB_LIBRARY(osggraph tgf tgfclient robottools)
 

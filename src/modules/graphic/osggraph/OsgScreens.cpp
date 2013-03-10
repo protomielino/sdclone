@@ -152,7 +152,7 @@ void SDScreens::InitCars(tSituation *s)
     }
 
     // Initialize the cameras for all the screens.
-    for (uint i=0; i<Screens.size();i++)
+    for (unsigned i=0; i<Screens.size();i++)
     {
         Screens[i]->Init(s);
     }
@@ -163,7 +163,7 @@ void SDScreens::InitCars(tSituation *s)
 
 void SDScreens::update(tSituation * s,SDFrameInfo* fi)
 {
-    for (uint i=0;i< Screens.size();i++)
+    for (unsigned i=0;i< Screens.size();i++)
     {
         Screens[i]->update(s,fi);
     }
@@ -479,7 +479,7 @@ void SDScreens::changeCamera(long p)
 
 SDScreens::~SDScreens()
 {
-    for (uint i=0;i< Screens.size();i++)
+    for (unsigned i=0;i< Screens.size();i++)
     {
         delete Screens[i];
     }

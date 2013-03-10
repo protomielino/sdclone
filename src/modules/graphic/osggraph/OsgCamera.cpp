@@ -2378,7 +2378,7 @@ void SDCameras::update(tCarElt * car, tSituation * s){
 
 SDCameras::~SDCameras(){
     for(int i=0;i<(int)CAMERA_LISTS;i++){
-        for(uint j=0; j<cameras[i].size();j++){
+        for(unsigned j=0; j<cameras[i].size();j++){
             delete cameras[i][j];
         }
     }
