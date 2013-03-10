@@ -755,12 +755,12 @@ shutdownCars(void)
 		free(grCarInfo);
 	}
 
-	GfParmReleaseHandle(grHandle);
-	grHandle = NULL;
-
 	for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
 		grScreens[i]->setCurrentCar(NULL);
 	}
+
+	GfParmReleaseHandle(grHandle);
+	grHandle = NULL;
 
 	if (nFPSTotalSeconds > 0)
 		GfLogTrace("Average frame rate: %.2f F/s\n",

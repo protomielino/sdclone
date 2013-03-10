@@ -169,9 +169,12 @@ void cGrScreen::setCurrentCar(tCarElt *newCurCar)
 {
 	curCar = newCurCar; 
 
-	sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
-	GfParmSetStr(grHandle, path, GR_ATT_CUR_DRV, curCar->_name);
-	GfParmWriteFile(NULL, grHandle, "Graph");
+	if (curCar)
+	{
+		sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
+		GfParmSetStr(grHandle, path, GR_ATT_CUR_DRV, curCar->_name);
+		GfParmWriteFile(NULL, grHandle, "Graph");
+	}
 }
 
 void cGrScreen::switchMirror(void)
