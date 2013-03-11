@@ -116,8 +116,7 @@ bool SDSky::repaint( osg::Vec4d sky_color, osg::Vec4d fog_color, osg::Vec4d clou
     if ( effective_visibility > 1000.0 )
     {
                 enable();
-        /*dome->repaint( sc.adj_sky_color, sc.sky_color, sc.fog_color,
-                       sc.sun_angle, effective_visibility );*/
+        //dome->repaint( sun_color, sky_color, fog_color, sol_angle, effective_visibility );
 
         planets->repaint( sol_angle, nplanets, planet_data );
         stars->repaint( sol_angle, nstars, star_data);
@@ -145,17 +144,18 @@ bool SDSky::reposition( osg::Vec3& view_pos, double spin, /*double gst,*/
                         double dt )
 {
   //int i;
-  double angle;
-  double rotation;
-  osg::Vec3d pos;
+  //double angle;
+  //double rotation;
+  //osg::Vec3d pos;
 
   sun->reposition( view_pos, 0 );
   moon->reposition( view_pos, 0 );
+  //dome->reposition( view_pos, 0 );
 
   //sun->getSunPosition ( & pos );
-  calc_celestial_angles( pos, view_pos, angle, rotation );
-  sun->setSunAngle( angle );
-  sun->setSunRotation( rotation );
+  //calc_celestial_angles( pos, view_pos, angle, rotation );
+  //sun->setSunAngle( angle );
+  //sun->setSunRotation( rotation );
 
 
   //double angle = gst * 15;

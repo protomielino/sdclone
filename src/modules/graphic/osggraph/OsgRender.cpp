@@ -33,6 +33,7 @@
 #include "OsgSky.h"
 #include "OsgScenery.h"
 #include "OsgMath.h"
+#include "OsgColor.h"
 
 #include <glfeatures.h>	//gluXXX
 #include <robottools.h>	//RtXXX()
@@ -53,10 +54,10 @@ unsigned SDSkyDomeDistance = 0;
 
 // Some private global variables.
 //static int grDynamicWeather = 0;
-static bool SDDynamicSkyDome = false;
+//static bool SDDynamicSkyDome = false;
 static float SDSunDeclination = 0.0f;
 static float SDMoonDeclination = 0.0f;
-static float SDMax_Visibility = 0.0f;
+//static float SDMax_Visibility = 0.0f;
 static double SDVisibility = 0.0f;
 
 #define MAX_BODIES	2
@@ -73,6 +74,8 @@ static double SDVisibility = 0.0f;
 
 static osg::Vec3d *AStarsData = NULL;
 static osg::Vec3d *APlanetsData = NULL;
+static int NStars;
+static int NPlanets;
 
 static osg::ref_ptr<osg::Group> RealRoot = new osg::Group;
 
@@ -93,7 +96,7 @@ SDRender::~SDRender(void)
 osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
 {
     //char buf[256];
-    void *hndl = grTrackHandle;
+    //void *hndl = grTrackHandle;
     grTrack = track;
 
     std::string datapath = GetDataDir();
@@ -158,7 +161,7 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
               SDMoonDeclination, moonAscension);
 
     // Set up the light source to the Sun position.
-    sgCoord sunPosition;
+    //sgCoord sunPosition;
     //TheSky->getSunPos(&sunPosition);
     //light->setPosition(sunPosition.xyz);
 
@@ -168,6 +171,7 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0);
 
     thesky->reposition( viewPos, 0, 0);
+    UpdateLight();
     //thesky->repaint()
 
     osg::Group* sceneGroup = new osg::Group;
@@ -209,10 +213,10 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     return mRoot;
 }//SDRender::Init
 
-/*void grUpdateLight( void )
+void SDRender::UpdateLight( void )
 {
-    const float sol_angle = (float)TheSky->getSA();
-    const float moon_angle = (float)TheSky->getMA();
+    const float sol_angle = (float)thesky->getSA();
+    const float moon_angle = (float)thesky->getMA();
     float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
 
     if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
@@ -234,9 +238,9 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     SkyColor[1] = BaseSkyColor[1] * sky_brightness;
     SkyColor[2] = BaseSkyColor[2] * sky_brightness;
     SkyColor[3] = BaseSkyColor[3];
-    grUpdateFogColor(sol_angle);
+    UpdateFogColor(sol_angle);
 
-    sd_gamma_correct_rgb( SkyColor );
+    sd_gamma_correct_rgb( SkyColor._v );
 
     // 3a)cloud and fog color
     CloudsColor[0] = FogColor[0] = BaseFogColor[0] * sky_brightness;
@@ -245,14 +249,15 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     CloudsColor[3] = FogColor[3] = BaseFogColor[3];
 
     //grUpdateFogColor(sol_angle);
-    sd_gamma_correct_rgb( CloudsColor );
+    sd_gamma_correct_rgb( CloudsColor._v );
 
 
-    float *sun_color = TheSky->get_sun_color();
+    osg::Vec4f sun_color = thesky->get_sun_color();
+    //float *sun_color = suncolor[0][0];
 
     if (sol_angle > 1.0)
     {
-        if (grVisibility > 1000 && cloudsTextureIndex < 8)
+        if (SDVisibility > 1000 /*&& cloudsTextureIndex < 8*/)
         {
             CloudsColor[0] = CloudsColor[0] * sun_color[0];
             CloudsColor[1] = CloudsColor[1] * sun_color[1];
@@ -266,19 +271,19 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
         }
     }
 
-    sd_gamma_correct_rgb( CloudsColor );
+    sd_gamma_correct_rgb( CloudsColor._v );
 
     // 3b) repaint the sky (simply update geometrical, color, ... state, no actual redraw)
-    TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle, moon_angle,
+    thesky->repaint(SkyColor, FogColor, CloudsColor, sol_angle, moon_angle,
                     NPlanets, APlanetsData, NStars, AStarsData);
 
     // 3c) update the main light position (it's at the sun position !)
-    sgCoord solpos;
+    /*sgCoord solpos;
     TheSky->getSunPos(&solpos);
-    ssgGetLight(0)-> setPosition(solpos.xyz);
+    ssgGetLight(0)-> setPosition(solpos.xyz);*/
 
     // 3c) update scene colors.
-    if (SDVisibility > 1000 && cloudsTextureIndex < 8)
+    if (SDVisibility > 1000 /*&& cloudsTextureIndex < 8*/)
     {
         SceneAmbiant[0] = (sun_color[0]*0.25f + CloudsColor[0]*0.75f) * sky_brightness;
         SceneAmbiant[1] = (sun_color[1]*0.25f + CloudsColor[1]*0.75f) * sky_brightness;
@@ -314,13 +319,13 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     }
 }//grUpdateLight
 
-void grUpdateFogColor(double sol_angle)
+void SDRender::UpdateFogColor(double sol_angle)
 {
     double rotation;
 
     // first determine the difference between our view angle and local
     // direction to the sun
-    rotation = -(TheSky->getSR() + SGD_PI);
+    rotation = -(thesky->getSR() + SGD_PI);
     while ( rotation < 0 )
     {
         rotation += SD_2PI;
@@ -332,9 +337,9 @@ void grUpdateFogColor(double sol_angle)
 
     // revert to unmodified values before usign them.
     //
-    float *sun_color = TheSky->get_sun_color();
+    osg::Vec4f sun_color = thesky->get_sun_color();
 
-    sd_gamma_correct_rgb( BaseFogColor );
+    sd_gamma_correct_rgb( BaseFogColor._v );
 
     // Calculate the fog color in the direction of the sun for
     // sunrise/sunset effects.
@@ -347,7 +352,7 @@ void grUpdateFogColor(double sol_angle)
     // at the opposite direction of this effect. Take in account
     // the current visibility.
     //
-    float av = TheSky->getVisibility();
+    float av = thesky->get_visibility();
     if (av > 45000)
        av = 45000;
 
@@ -364,10 +369,10 @@ void grUpdateFogColor(double sol_angle)
     FogColor[0] = rf3 * BaseFogColor[0] + rf2 * s_red;
     FogColor[1] = rf3 * BaseFogColor[1] + rf2 * s_green;
     FogColor[2] = rf3 * BaseFogColor[2] + rf2 * s_blue;
-    sd_gamma_correct_rgb( FogColor );
+    sd_gamma_correct_rgb( FogColor._v );
 
     // make sure the colors have their original value before they are being
     // used by the rest of the program.
     //
-    sd_gamma_correct_rgb( BaseFogColor );
-}*/
+    sd_gamma_correct_rgb( BaseFogColor._v );
+}

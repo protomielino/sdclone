@@ -116,10 +116,10 @@ grInitBackground()
 	char buf[256];
 	void *hndl = grTrackHandle;
 	ssgLight *light = ssgGetLight(0);
-	
+
 	// If no realistic sky dome requested, or if the track skyversion doesn't support it,
 	// we set up a static - texture-based - background
-	if (!grSkyDomeDistance || grTrack->skyversion < 1) 
+	if (!grSkyDomeDistance || grTrack->skyversion < 1)
 	{
 		GfLogInfo("Setting up static background (mono-texture sky and landscape)\n");
 
@@ -166,7 +166,7 @@ grInitBackground()
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 		glEnable(GL_DEPTH_TEST);
-		
+
 		if (!TheSun && grTrack->local.rain == 0)
 		{
 			ssgaLensFlare *sun_obj = new ssgaLensFlare();
@@ -176,10 +176,10 @@ grInitBackground()
 			SunAnchor->addKid(TheSun);
 		}
 	}
-	
+
 	// If realistic sky dome is requested,
 	// we create the Sun, the Moon, some stars and the clouds
-	else 
+	else
 	{
 		GfLogInfo("Setting up realistic %s sky dome :\n", grDynamicSkyDome ? "dynamic" : "static");
 
@@ -195,7 +195,7 @@ grInitBackground()
 		if (AStarsData)
 			delete [] AStarsData;
 		AStarsData = new sgdVec3[NStars];
-		for(int i= 0; i < NStars; i++) 
+		for(int i= 0; i < NStars; i++)
 		{
 			AStarsData[i][0] = grRandom() * PI;
 			AStarsData[i][1] = grRandom() * PI;
@@ -203,7 +203,7 @@ grInitBackground()
 		}//for i
 
 		GfLogInfo("  Stars (random) : %d\n", NStars);
-		
+
 		//No planets
 		NPlanets = 0;
 		APlanetsData = NULL;
@@ -212,12 +212,12 @@ grInitBackground()
 		const double domeSizeRatio = grSkyDomeDistance / 80000.0;
 
 		GfLogInfo("  Planets : %d\n", NPlanets);
-		
+
 		//Build the sky
 		TheSky	= new cGrSky;
 		TheSky->build(grSkyDomeDistance, grSkyDomeDistance, 2000 * domeSizeRatio, grSkyDomeDistance, 2000 * domeSizeRatio, grSkyDomeDistance,
 			NPlanets, APlanetsData, NStars, AStarsData );
-		
+
 		//Add the Sun itself
 		GLfloat sunAscension = grTrack->local.sunascension;
 		grSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
@@ -226,7 +226,7 @@ grInitBackground()
 		TheSky->setSRA( sunAscension );
 
 		GfLogInfo("  Sun : time of day = %02d:%02d:%02d (declination = %.1f deg), "
-		          "ascension = %.1f deg\n", 
+			  "ascension = %.1f deg\n",
 				  timeOfDay / 3600, (timeOfDay % 3600) / 60, timeOfDay % 60,
 				  grSunDeclination, RAD2DEG(sunAscension));
 
@@ -238,7 +238,7 @@ grInitBackground()
 		grMoonDeclination = grUpdateMoonPos(timeOfDay);
 
 		const float moonAscension = grTrack->local.sunascension;
-		
+
 		TheSky->setMD( DEG2RAD(grMoonDeclination) );
 		TheSky->setMRA( DEG2RAD(moonAscension) );
 
@@ -272,9 +272,9 @@ grInitBackground()
 											  100 / domeSizeRatio, 100 / domeSizeRatio);
 			cloudLayers[0]->setSpeed(wind);
 			cloudLayers[0]->setDirection(45);
-			
+
 			GfLogInfo("   * layer 1 : speed=60, direction=45, texture=%s\n", buf);
-			
+
 		}
 		else if (grNbCloudLayers == 2)
 		{
@@ -293,7 +293,7 @@ grInitBackground()
 											  100 / domeSizeRatio, 100 / domeSizeRatio);
 			cloudLayers[1]->setSpeed(60);
 			cloudLayers[1]->setDirection(45);
-			
+
 			GfLogInfo("   * layer 2 : speed=60, direction=45, texture=%s\n", buf);
 
 		}
@@ -323,24 +323,24 @@ grInitBackground()
 											  100 / domeSizeRatio, 100 / domeSizeRatio);
 			cloudLayers[2]->setSpeed(80);
 			cloudLayers[2]->setDirection(45);
-			
+
 			GfLogInfo("   * layer 3 : speed=80, direction=45, texture=%s\n", buf);
 		}
 
 		// Set up the light source to the Sun position.
 		sgCoord sunPosition;
 		TheSky->getSunPos(&sunPosition);
-    	light->setPosition(sunPosition.xyz);
+		light->setPosition(sunPosition.xyz);
 
 		// Initialize the whole sky dome.
 		sgVec3 viewPos;
 		sgSetVec3(viewPos, grWrldX/2, grWrldY/2, 0);
-		TheSky->repositionFlat( viewPos, 0, 0);    
+		TheSky->repositionFlat( viewPos, 0, 0);
 
 		//Setup visibility according to rain if any
 		// TODO: Does visibility really decrease when rain gets heavier ????
 		//float visibility = 0.0f;
-		switch (grTrack->local.rain)	
+		switch (grTrack->local.rain)
 		{
 			case TR_RAIN_NONE:
 				//visibility = 0.0f;
@@ -364,7 +364,7 @@ grInitBackground()
 				grVisibility = 12000.0;
 				break;
 		}//switch Rain
-		
+
 		//TheSky->modifyVisibility( visibility, 0);
 		TheSky->setVisibility( grVisibility ); // Visibility in meters
 
@@ -375,12 +375,12 @@ grInitBackground()
 		ssgGetLight(0) -> setColour( GL_AMBIENT, SceneAmbiant);
 		ssgGetLight(0) -> setColour( GL_DIFFUSE, SceneDiffuse);
 		ssgGetLight(0) -> setColour( GL_SPECULAR, SceneSpecular);
-	}//else grSkyDomeDistance 
+	}//else grSkyDomeDistance
 
 	/* GUIONS GL_TRUE */
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_FALSE);
 
-#ifdef GL_SEPARATE_SPECULAR_COLOR 
+#ifdef GL_SEPARATE_SPECULAR_COLOR
 	glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,GL_SEPARATE_SPECULAR_COLOR);
 #else
 	#ifdef GL_SEPARATE_SPECULAR_COLOR_EXT
@@ -398,15 +398,15 @@ grLoadBackgroundGraphicsOptions()
 		(unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, 0, 0) + 0.5);
 	if (grSkyDomeDistance > 0 && grSkyDomeDistance < SkyDomeDistThresh)
 		grSkyDomeDistance = SkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
-	
-	grDynamicSkyDome = grSkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), GR_ATT_DYNAMICSKYDOME_ENABLED) == 0; 
+
+	grDynamicSkyDome = grSkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), GR_ATT_DYNAMICSKYDOME_ENABLED) == 0;
 
 	GfLogInfo("Graphic options : Sky dome : distance = %u m, dynamic = %s\n",
 			  grSkyDomeDistance, grDynamicSkyDome ? "true" : "false");
 
 	// Dynamic weather.
 	//grDynamicWeather = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_grDynamicWeather, (char*)NULL, grDynamicWeather);
-			
+
 	// Cloud layers.
 	grNbCloudLayers =
 		(unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
@@ -462,7 +462,7 @@ grLoadBackground()
 
 		z1 = -0.5;
 		z2 = 1.0;
-	
+
 		grBackgroundType = graphic->bgtype;
 		switch (grBackgroundType) {
 			case TR_BACKGROUND_TYPE_0: //-----------------------------------------------------------
@@ -472,14 +472,14 @@ grLoadBackground()
 				bg_nrm = new ssgNormalArray(1);
 				bg_clr->add(clr);
 				bg_nrm->add(nrm);
-	
+
 				for (i = 0; i < NbBackgroundFaces + 1; i++) {
 					alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
 					texLen = (float)i / (float)NbBackgroundFaces;
 
 					x = BackgroundDistance * cos(alpha);
 					y = BackgroundDistance * sin(alpha);
-	    
+
 					vtx[0] = x;
 					vtx[1] = y;
 					vtx[2] = z1;
@@ -496,7 +496,7 @@ grLoadBackground()
 					tex[1] = 1.0;
 					bg_tex->add(tex);
 				}//for i
-			
+
 				bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
 				bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
 				bg_st->disable(GL_LIGHTING);
@@ -516,10 +516,10 @@ grLoadBackground()
 				for (i = 0; i < NbBackgroundFaces / 4 + 1; i++) {
 					alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
 					texLen = (float)i / (float)NbBackgroundFaces;
-	    
+
 					x = BackgroundDistance * cos(alpha);
 					y = BackgroundDistance * sin(alpha);
-	    
+
 					vtx[0] = x;
 					vtx[1] = y;
 					vtx[2] = z1;
@@ -536,7 +536,7 @@ grLoadBackground()
 					tex[1] = 0.5;
 					bg_tex->add(tex);
 				}//for i
-		
+
 				bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
 				bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
 				bg_st->disable(GL_LIGHTING);
@@ -555,10 +555,10 @@ grLoadBackground()
 				for (i = NbBackgroundFaces/4; i < NbBackgroundFaces / 2 + 1; i++) {
 					alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
 					texLen = (float)i / (float)NbBackgroundFaces;
-	    
+
 					x = BackgroundDistance * cos(alpha);
 					y = BackgroundDistance * sin(alpha);
-				
+
 					vtx[0] = x;
 					vtx[1] = y;
 					vtx[2] = z1;
@@ -575,7 +575,7 @@ grLoadBackground()
 					tex[1] = 1.0;
 					bg_tex->add(tex);
 				}//for i
-			
+
 				bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
 				bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
 				bg_st->disable(GL_LIGHTING);
@@ -595,10 +595,10 @@ grLoadBackground()
 				for (i = NbBackgroundFaces / 2; i < 3 * NbBackgroundFaces / 4 + 1; i++) {
 					alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
 					texLen = (float)i / (float)NbBackgroundFaces;
-	    
+
 					x = BackgroundDistance * cos(alpha);
 					y = BackgroundDistance * sin(alpha);
-	    
+
 					vtx[0] = x;
 					vtx[1] = y;
 					vtx[2] = z1;
@@ -615,7 +615,7 @@ grLoadBackground()
 					tex[1] = 0.5;
 					bg_tex->add(tex);
 				}//for i
-	
+
 				bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
 				bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
 				bg_st->disable(GL_LIGHTING);
@@ -635,10 +635,10 @@ grLoadBackground()
 				for(i = 3 * NbBackgroundFaces / 4; i < NbBackgroundFaces + 1; i++) {
 					alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
 					texLen = (float)i / (float)NbBackgroundFaces;
-				
+
 					x = BackgroundDistance * cos(alpha);
 					y = BackgroundDistance * sin(alpha);
-				
+
 					vtx[0] = x;
 					vtx[1] = y;
 					vtx[2] = z1;
@@ -655,7 +655,7 @@ grLoadBackground()
 					tex[1] = 1.0;
 					bg_tex->add(tex);
 				}//for i
-		
+
 				bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
 				bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
 				bg_st->disable(GL_LIGHTING);
@@ -679,10 +679,10 @@ grLoadBackground()
 				for (i = 0; i < NbBackgroundFaces + 1; i++) {
 					alpha = (double)i * 2 * PI / (double)NbBackgroundFaces;
 					texLen = 1.0 - (float)i / (float)NbBackgroundFaces;
-	    
+
 					x = BackgroundDistance * cos(alpha);
 					y = BackgroundDistance * sin(alpha);
-	    
+
 					vtx[0] = x;
 					vtx[1] = y;
 					vtx[2] = z1;
@@ -699,7 +699,7 @@ grLoadBackground()
 					tex[1] = 1.0;
 					bg_tex->add(tex);
 				}//for i
-	
+
 				bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
 				bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
 				bg_st->disable(GL_LIGHTING);
@@ -712,7 +712,7 @@ grLoadBackground()
 				GfLogError("Unsupported background type %d\n", graphic->bgtype);
 				break;
 		}//switch grBackgroundType
-		
+
 		if (!SunAnchor && grTrack->local.rain == 0) {
 			// Lens Flares when no sky dome (realistic sky dome will use another system when ready).
 			SunAnchor = new ssgBranch;
@@ -728,7 +728,7 @@ grLoadBackground()
 		else if(grTrack->local.clouds >= NCloudsTextureIndices)
 			grTrack->local.clouds = NCloudsTextureIndices - 1;
 	}
-	
+
 	// Environment Mapping Settings
 	// 1) Horizontal reflexions of the track objects (env.png & co)
 	bool bUseEnvPng = false;   // Avoid crash with missing env.rgb files (i.e. Wheel-1)
@@ -737,7 +737,7 @@ grLoadBackground()
 	for (i = 0; i < graphic->envnb; i++) {
 		GfLogTrace("Loading #%d track-specific env. mapping image :\n", i+1);
 		envst = (ssgSimpleState*)grSsgLoadTexState(graphic->env[i]);
-        // Avoid crash with missing env.rgb files (i.e. Wheel-1)
+	// Avoid crash with missing env.rgb files (i.e. Wheel-1)
 		if (!envst) {
 			GfLogWarning("Failed : trying fallback env.png\n");
 			envst = (ssgSimpleState*)grSsgLoadTexState("env.png");
@@ -754,8 +754,8 @@ grLoadBackground()
 		envst->deRef();
 	}//for i
 
-	grEnvSelector->selectStep(0); //mandatory !!!
-  
+        grEnvSelector->selectStep(0); //mandatory !!!
+
 	// Avoid crash with missing env.rgb files (i.e. Wheel-1)
 	GfLogTrace("Loading global env. mapping image :\n");
 	if (bUseEnvPng)
@@ -805,13 +805,13 @@ grLoadBackground()
 		GfScrShutdown();
 		exit(-1);
 	}//if grEnvShadowState
-    
+
 	// 3) Vertical shadows of track objects on the cars (shadow2.png)
 	GfLogTrace("Loading track shadows mapping image :\n");
 	grEnvShadowStateOnCars = grSsgEnvTexState("shadow2.png", cgrMultiTexState::modulate);
 	if(!grEnvShadowStateOnCars)
 		grEnvShadowStateOnCars = grSsgEnvTexState("shadow2.rgb", cgrMultiTexState::modulate);
-  
+
 	if(!grEnvShadowStateOnCars)
 		GfLogWarning("shadow2.png/rgb not found ; no shadow mapping on cars for this track\n");
 }//grLoadBackground
@@ -821,13 +821,13 @@ void grLoadBackgroundSky(void)
 	char buf2[256];
 	const char		*bgsky;
 	ssgEntity		*desc2;
-	
+
 	bgsky = "background-sky.ac";
 	snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/textures;.", grTrack->category, grTrack->internalname);
 	ssgTexturePath(buf2);
 	snprintf(buf2, sizeof(buf2), "data/objects");
 	ssgModelPath(buf2);
-		
+
 	desc2 = grssgLoadAC3D(bgsky, NULL);
 	BackSkyAnchor->addKid(desc2);
 
@@ -842,26 +842,26 @@ void grLoadBackgroundLand(void)
 	char buf2[256];
 	const char		*bgsky;
 	ssgEntity		*desc2;
-	
+
 	bgsky = "land.ac";
 	snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/textures;.", grTrack->category, grTrack->internalname);
 	ssgTexturePath(buf2);
 	snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/objects;.", grTrack->category, grTrack->internalname);
 	ssgModelPath(buf2);
-		
+
 	desc2 = grssgLoadAC3D(bgsky, NULL);
 	BackSkyAnchor->addKid(desc2);
 }
 
 void
-grPreDrawSky(tSituation* s, float fogStart, float fogEnd) 
+grPreDrawSky(tSituation* s, float fogStart, float fogEnd)
 {
 	static const double m_log01 = -log( 0.01 );
 	static const double sqrt_m_log01 = sqrt( m_log01 );
 
-	if (grSkyDomeDistance && grTrack->skyversion > 0) 
+	if (grSkyDomeDistance && grTrack->skyversion > 0)
 	{
-        const GLfloat fog_exp2_density = sqrt_m_log01 / TheSky->getVisibility();
+	const GLfloat fog_exp2_density = sqrt_m_log01 / TheSky->getVisibility();
 		glEnable(GL_FOG);
 		//glFogf(GL_FOG_START, fogStart);
 		//glFogf(GL_FOG_END, fogEnd);
@@ -879,16 +879,16 @@ grPreDrawSky(tSituation* s, float fogStart, float fogEnd)
 		ssgGetLight(0)->setColour(GL_AMBIENT, SceneAmbiant);
 		ssgGetLight(0)->setColour(GL_DIFFUSE, SceneDiffuse);
 		ssgGetLight(0)->setColour(GL_SPECULAR, SceneSpecular);
-		
+
 	}
 }//grPreDrawSky
 
 void
-grDrawStaticBackground(cGrCamera *cam, cGrBackgroundCam *bgCam) 
+grDrawStaticBackground(cGrCamera *cam, cGrBackgroundCam *bgCam)
 {
 	if (!TheBackground)
 		return;
-	
+
 	TRACE_GL("grDrawStaticBackground: ssgCullAndDraw start");
 
 	bgCam->update(cam);
@@ -899,7 +899,7 @@ grDrawStaticBackground(cGrCamera *cam, cGrBackgroundCam *bgCam)
 }//grDrawStaticBackground
 
 void
-grPostDrawSky(void) 
+grPostDrawSky(void)
 {
 	if (grSkyDomeDistance && grTrack->skyversion > 0)
 		TheSky->postDraw(grSkyDomeDistance);
@@ -922,7 +922,7 @@ grUpdateSky(double currentTime, double accelTime)
 		bInitialized = false;
 		return;
 	}
-	
+
 	if (!bInitialized)
 	{
 		if (grSkyDomeDistance && grTrack->skyversion > 0) {
@@ -948,10 +948,10 @@ grUpdateSky(double currentTime, double accelTime)
 		return;
 	}
 
-	// At each call, update possibly high speed objects of the sky dome : the clouds.
- 	sgVec3 viewPos;
- 	sgSetVec3(viewPos, grWrldX/2, grWrldY/2, 0);
-	TheSky->repositionFlat(viewPos, 0, currentTime - lastTimeHighSpeed);    
+        // At each call, update possibly high speed objects of the sky dome : the clouds.
+        sgVec3 viewPos;
+        sgSetVec3(viewPos, grWrldX/2, grWrldY/2, 0);
+        TheSky->repositionFlat(viewPos, 0, currentTime - lastTimeHighSpeed);
 
 	// Now, we are done for high speed objects.
 	lastTimeHighSpeed = currentTime;
@@ -972,14 +972,14 @@ grUpdateSky(double currentTime, double accelTime)
 		grSunDeclination += deltaDecl;
 		if (grSunDeclination >= 360.0f)
 			grSunDeclination -= 360.0f;
-	
+
 		TheSky->setSD( DEG2RAD(grSunDeclination) );
 
 		// 2) Update moon position
 		grMoonDeclination += deltaDecl;
 		if (grMoonDeclination >= 360.0f)
 			grMoonDeclination -= 360.0f;
-	
+
 		TheSky->setMD( DEG2RAD(grMoonDeclination) );
 		lastTimeLowSpeed = nextTimeLowSpeed;
 	}
@@ -993,36 +993,36 @@ grUpdateSky(double currentTime, double accelTime)
 void
 grShutdownBackground(void)
 {
-	if (TheSky) 
+	if (TheSky)
 	{
 		delete TheSky;
 		TheSky = 0;
 	}
-	
+
 	if (TheSun)
 		TheSun = 0;
-	
+
 	if (SunAnchor)
 		SunAnchor = 0;
-		
+
 	if (BackSkyAnchor)
 		BackSkyAnchor = 0;
-	
+
 	if (grEnvState) {
 		ssgDeRefDelete(grEnvState);
 		grEnvState = 0;
 	}
-	
+
 	if (grEnvShadowState) {
 		ssgDeRefDelete(grEnvShadowState);
 		grEnvShadowState = 0;
 	}
-	
+
 	if (grEnvShadowStateOnCars) {
 		ssgDeRefDelete(grEnvShadowStateOnCars);
 		grEnvShadowStateOnCars = 0;
 	}
-	
+
 	if(grEnvSelector) {
 		delete grEnvSelector;
 		grEnvSelector = 0;
@@ -1042,7 +1042,7 @@ void grUpdateLight( void )
 		BaseFogColor[1] = 0.44f;
 		BaseFogColor[2] = 0.50f;
 
-		sky_brightness = (float)pow(sky_brightness, 0.5f);	
+		sky_brightness = (float)pow(sky_brightness, 0.5f);
 	}
 	else
 	{
@@ -1050,7 +1050,7 @@ void grUpdateLight( void )
 		BaseFogColor[1] = 0.84f;
 		BaseFogColor[2] = 1.00f;
 	}
-	
+
 	SkyColor[0] = BaseSkyColor[0] * sky_brightness;
 	SkyColor[1] = BaseSkyColor[1] * sky_brightness;
 	SkyColor[2] = BaseSkyColor[2] * sky_brightness;
@@ -1071,7 +1071,7 @@ void grUpdateLight( void )
 
 	float *sun_color = TheSky->get_sun_color();
 
-	if (sol_angle > 1.0) 
+	if (sol_angle > 1.0)
 	{
 		if (grVisibility > 1000 && cloudsTextureIndex < 8)
 		{
@@ -1110,7 +1110,7 @@ void grUpdateLight( void )
 		SceneDiffuse[1] = (sun_color[1]*0.25f + FogColor[1]*0.75f) * sky_brightness;
 		SceneDiffuse[2] = (sun_color[2]*0.25f + FogColor[2]*0.75f) * sky_brightness;
 		SceneDiffuse[3] = 1.0;
-	
+
 		SceneSpecular[0] = sun_color[0] * sky_brightness;
 		SceneSpecular[1] = sun_color[1] * sky_brightness;
 		SceneSpecular[2] = sun_color[2] * sky_brightness;
@@ -1127,7 +1127,7 @@ void grUpdateLight( void )
 		SceneDiffuse[1] = (sun_color[0]*0.25f + FogColor[1]*0.75f) * sky_brightness;
 		SceneDiffuse[2] = (sun_color[0]*0.25f + FogColor[2]*0.75f) * sky_brightness;
 		SceneDiffuse[3] = 1.0;
-	
+
 		SceneSpecular[0] = sun_color[0] * sky_brightness;
 		SceneSpecular[1] = sun_color[0] * sky_brightness;
 		SceneSpecular[2] = sun_color[0] * sky_brightness;
@@ -1135,20 +1135,20 @@ void grUpdateLight( void )
 	}
 }//grUpdateLight
 
-void grUpdateFogColor(double sol_angle) 
+void grUpdateFogColor(double sol_angle)
 {
     double rotation;
 
     // first determine the difference between our view angle and local
     // direction to the sun
     rotation = -(TheSky->getSR() + SGD_PI);
-    while ( rotation < 0 ) 
-	{
-		rotation += SGD_2PI;
+    while ( rotation < 0 )
+        {
+                rotation += SGD_2PI;
     }
-    while ( rotation > SGD_2PI ) 
-	{
-		rotation -= SGD_2PI;
+    while ( rotation > SGD_2PI )
+        {
+                rotation -= SGD_2PI;
     }
 
     // revert to unmodified values before usign them.

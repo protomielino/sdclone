@@ -37,6 +37,7 @@ private:
         osg::Vec4 BaseFogColor;
         osg::Vec4 FogColor;
         osg::Vec4 CloudsColor;
+        osg::Vec4 BaseSkyColor;
 
         osg::Vec4 SceneAmbiant;
         osg::Vec4 SceneDiffuse;
@@ -50,6 +51,7 @@ public:
         void Update(float speedcar, tSituation *s);
         void UpdateTime(tSituation *s);
         void UpdateLight(void);
+        void UpdateFogColor(double angle);
 };
 
 #endif //_OSGRENDER_H_

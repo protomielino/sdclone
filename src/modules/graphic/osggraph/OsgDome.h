@@ -50,8 +50,7 @@ public:
     bool repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_color,
                   const osg::Vec3f& fog_color, double sun_angle, double vis );
 
-    bool reposition( const osg::Vec3f& p, double asl, double lon,
-                     double lat, double spin );
+    bool reposition( const osg::Vec3f& p, double spin );
 private:
     void makeDome(int rings, int bands, osg::DrawElementsUShort& elements);
 };

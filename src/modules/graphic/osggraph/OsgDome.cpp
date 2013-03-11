@@ -68,13 +68,13 @@ static const float bottom_radius = 0.9922;
 static const float bottom_elev = -0.1240;
 
 // Constructor
-SDSkyDome::SDSkyDome( void ) 
+SDSkyDome::SDSkyDome( void )
 {
     asl = 0;
 }
 
 // Destructor
-SDSkyDome::~SDSkyDome( void ) 
+SDSkyDome::~SDSkyDome( void )
 {
 }
 
@@ -99,11 +99,11 @@ void SDSkyDome::makeDome(int rings, int bands, DrawElementsUShort& elements)
     std::back_insert_iterator<DrawElementsUShort> pusher
         = std::back_inserter(elements);
     GridIndex grid(*dome_vl, numBands, 1);
-    for (int i = 0; i < bands; i += 2) 
+    for (int i = 0; i < bands; i += 2)
     {
-        *pusher = 0;  *pusher = grid(0, i);  *pusher = grid(0, i + 1);  
+        *pusher = 0;  *pusher = grid(0, i);  *pusher = grid(0, i + 1);
         // down a band
-        for (int j = 0; j < rings - 1; ++j) 
+        for (int j = 0; j < rings - 1; ++j)
         {
             *pusher = grid(j, i);  *pusher = grid(j, i + 1);
             *pusher = grid(j + 1, i + 1);
@@ -111,7 +111,7 @@ void SDSkyDome::makeDome(int rings, int bands, DrawElementsUShort& elements)
             *pusher =  grid(j + 1, i);
         }
         // and up the next one
-        for (int j = rings - 1; j > 0; --j) 
+        for (int j = rings - 1; j > 0; --j)
         {
             *pusher = grid(j, i + 1);  *pusher = grid(j - 1, i + 1);
             *pusher = grid(j, (i + 2) % bands);
@@ -123,7 +123,7 @@ void SDSkyDome::makeDome(int rings, int bands, DrawElementsUShort& elements)
     }
 }
 
-osg::Node* SDSkyDome::build( double hscale, double vscale ) 
+osg::Node* SDSkyDome::build( double hscale, double vscale )
 {
     osg::Geode* geode = new osg::Geode;
 
@@ -149,12 +149,12 @@ osg::Node* SDSkyDome::build( double hscale, double vscale )
     (*dome_vl)[0].set(0.0, 0.0, center_elev * vscale);
     osggraph::SDVectorArrayAdapter<Vec3Array> vertices(*dome_vl, numBands, 1);
 
-    for ( int i = 0; i < numBands; ++i ) 
+    for ( int i = 0; i < numBands; ++i )
     {
         double theta = (i * 30) * SD_DEGREES_TO_RADIANS;
         double sTheta = hscale*sin(theta);
         double cTheta = hscale*cos(theta);
-        for (int j = 0; j < numRings; ++j) 
+        for (int j = 0; j < numRings; ++j)
         {
             vertices(j, i).set(cTheta * domeParams[j].radius,
                                sTheta * domeParams[j].radius,
@@ -182,7 +182,7 @@ osg::Node* SDSkyDome::build( double hscale, double vscale )
     return dome_transform.get();
 }
 
-static void sd_fade_to_black(osg::Vec3 sky_color[], float asl, int count) 
+static void sd_fade_to_black(osg::Vec3 sky_color[], float asl, int count)
 {
     const float ref_asl = 10000.0f;
     const float d = exp( - asl / ref_asl );
@@ -204,23 +204,23 @@ bool SDSkyDome::repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_colo
     osg::Vec3f middle_param, middle_amt, middle_diff;
 
     // Check for sunrise/sunset condition
-    if (sun_angle > 80) 
+    if (sun_angle > 80)
     {
         double sunAngleFactor = 10.0 - fabs(90.0 - sun_angle);
         static const osg::Vec3f outerConstant(1.0 / 20.0, 1.0 / 40.0, -1.0 / 30.0);
         static const osg::Vec3f middleConstant(1.0 / 40.0, 1.0 / 80.0, 0.0);
         outer_param =  outerConstant * sunAngleFactor;
         middle_param =  middleConstant * sunAngleFactor;
-	outer_diff = outer_param * (1.0 / 6.0);
-	middle_diff = middle_param * (1.0 / 6.0);
-    } else 
+        outer_diff = outer_param * (1.0 / 6.0);
+        middle_diff = middle_param * (1.0 / 6.0);
+    } else
     {
         outer_param = osg::Vec3f(0, 0, 0);
-	middle_param = osg::Vec3f(0, 0, 0);
-	outer_diff = osg::Vec3f(0, 0, 0);
-	middle_diff = osg::Vec3f(0, 0, 0);
+        middle_param = osg::Vec3f(0, 0, 0);
+        outer_diff = osg::Vec3f(0, 0, 0);
+        middle_diff = osg::Vec3f(0, 0, 0);
     }
-    
+
     outer_amt  = outer_param;
     middle_amt = middle_param;
 
@@ -235,10 +235,10 @@ bool SDSkyDome::repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_colo
     static const osg::Vec3f blueShift(0.8, 1.0, 1.2);
     const osg::Vec3f skyFogDelta = sky_color - fog_color;
    // const osg::Vec3f sunSkyDelta = sun_color - sky_color;
-    
-    for (int i = 0; i < halfBands+1; i++) 
+
+    for (int i = 0; i < halfBands+1; i++)
     {
-        osg::Vec3f diff = componentMultiply(blueShift,skyFogDelta);
+        osg::Vec3f diff = componentMultiply(blueShift, skyFogDelta);
         diff *= (0.8 + saif - ((halfBands-i)/10));
         colors(2, i) = sky_color -  diff * upperVisFactor; //toOsg(sky_color -  diff * upperVisFactor);
         colors(3, i) = sky_color - diff * middleVisFactor + middle_amt; //toOsg(sky_color - diff * middleVisFactor + middle_amt);
@@ -263,23 +263,22 @@ bool SDSkyDome::repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_colo
     for ( int i = 0; i < numBands; i++ )
         colors(numRings - 1, i) = fog_color;//toOsg(fog_color);
     dome_cl->dirty();
-    
+
     return true;
 }
 
-bool SDSkyDome::reposition( const osg::Vec3f& p, double _asl, 
-			    double lon, double lat, double spin ) 
+bool SDSkyDome::reposition( const osg::Vec3f& p, double spin )
 {
-    asl = _asl;
+   // asl = _asl;
 
     osg::Matrix T, LON, LAT, SPIN;
 
     T.makeTranslate( p );
-    LON.makeRotate(lon, osg::Vec3(0, 0, 1));
-    LAT.makeRotate(90.0 * SD_DEGREES_TO_RADIANS - lat, osg::Vec3(0, 1, 0));
+    //LON.makeRotate(lon, osg::Vec3(0, 0, 1));
+    //LAT.makeRotate(90.0 * SD_DEGREES_TO_RADIANS - lat, osg::Vec3(0, 1, 0));
     SPIN.makeRotate(spin, osg::Vec3(0, 0, 1));
 
-    dome_transform->setMatrix( SPIN*LAT*LON*T );
-    
+    dome_transform->setMatrix( SPIN*T );
+
     return true;
 }

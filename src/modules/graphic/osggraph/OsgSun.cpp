@@ -29,6 +29,8 @@
 #include <osg/Texture2D>
 #include <osgDB/ReadFile>
 
+#include <tgf.h>
+
 #include "OsgColor.h"
 #include "OsgSun.h"
 #include "OsgMath.h"
@@ -98,28 +100,6 @@ osg::Node* SDSun::build( std::string path, double dist, double sun_size )
 
     scene_cl = new osg::Vec4Array;
     scene_cl->push_back(osg::Vec4(1, 1, 1, 1));
-
-    /*osg::Vec3Array* sun_vl = new osg::Vec3Array;
-    sun_vl->push_back(osg::Vec3(-sun_size, 0, -sun_size));
-    sun_vl->push_back(osg::Vec3(sun_size, 0, -sun_size));
-    sun_vl->push_back(osg::Vec3(-sun_size, 0, sun_size));
-    sun_vl->push_back(osg::Vec3(sun_size, 0, sun_size));
-
-    osg::Vec2Array* sun_tl = new osg::Vec2Array;
-    sun_tl->push_back(osg::Vec2(0, 0));
-    sun_tl->push_back(osg::Vec2(1, 0));
-    sun_tl->push_back(osg::Vec2(0, 1));
-    sun_tl->push_back(osg::Vec2(1, 1));
-
-    osg::Geometry* geometry = new osg::Geometry;
-    geometry->setUseDisplayList(false);
-    geometry->setVertexArray(sun_vl);
-    geometry->setColorArray(sun_cl.get());
-    geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
-    geometry->setNormalBinding(osg::Geometry::BIND_OFF);
-    geometry->setTexCoordArray(0, sun_tl);
-    geometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, 4));
-    geode->addDrawable(geometry);*/
 
     sun_transform->addChild( sun );
 
@@ -233,63 +213,57 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         rel_humidity = 0.5;
         density_avg = 0.7;
 
-        /*else
-        {
-            rel_humidity = env_node->getFloatValue( "relative-humidity" );
-            density_avg =  env_node->getFloatValue( "atmosphere/density-tropo-avg" );
-        }*/
-
         osg::Vec4 i_halo_color, o_halo_color, scene_color, sun_color;
 
         double red_scat_f, red_scat_corr_f, green_scat_f, blue_scat_f;
 
-        red_scat_f = (aerosol_factor * path_distance * density_avg)/5E+07;
+        red_scat_f = (aerosol_factor * path_distance * density_avg) / 5E+07;
         red_scat_corr_f = sun_exp2_punch_through / (1 - red_scat_f);
         sun_color[0] = 1 -red_scat_f;
-                i_halo_color[0] = 1 - (1.1 * red_scat_f);
-                o_halo_color[0] = 1 - (1.4 * red_scat_f);
+        i_halo_color[0] = 1 - (1.1 * red_scat_f);
+        o_halo_color[0] = 1 - (1.4 * red_scat_f);
         scene_color[0] = 1 - red_scat_f;
 
 	// Green - 546.1 nm
-		if (sun_declination > 5.0 || sun_declination < 2.0)
-		{
-			green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 5E+07;
-		}
-		else
-			green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 8.8938E+06;
+	if (sun_declination > 5.0 || sun_declination < 2.0)
+	{
+	    green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 5E+07;
+	}
+	else
+	  green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 8.8938E+06;
 
 	sun_color[1] = 1 - green_scat_f * red_scat_corr_f;
-		i_halo_color[1] = 1 - (1.1 * (green_scat_f * red_scat_corr_f));
-		o_halo_color[1] = 1 - (1.4 * (green_scat_f * red_scat_corr_f));
+	i_halo_color[1] = 1 - (1.1 * (green_scat_f * red_scat_corr_f));
+	o_halo_color[1] = 1 - (1.4 * (green_scat_f * red_scat_corr_f));
 	scene_color[1] = 1 - green_scat_f;
 
         // Blue - 435.8 nm
-        blue_scat_f = (aerosol_factor * path_distance * density_avg)/3.607E+06;
+        blue_scat_f = (aerosol_factor * path_distance * density_avg) / 3.607E+06;
         sun_color[2] = 1 - blue_scat_f * red_scat_corr_f;
-                i_halo_color[1] = 1 - (1.1 * (blue_scat_f * red_scat_corr_f));
-                o_halo_color[1] = 1 - (1.4 * (blue_scat_f * red_scat_corr_f));
+        i_halo_color[1] = 1 - (1.1 * (blue_scat_f * red_scat_corr_f));
+        o_halo_color[1] = 1 - (1.4 * (blue_scat_f * red_scat_corr_f));
         scene_color[2] = 1 - blue_scat_f;
 
         // Alpha
         sun_color[3] = 1;
-                i_halo_color[3] = 1;
+        i_halo_color[3] = 1;
         scene_color[3] = 1;
 
-		o_halo_color[3] = blue_scat_f;
-		if ( ( new_visibility < 10000 ) &&  ( blue_scat_f > 1 ))
-		{
-			o_halo_color[3] = 2 - blue_scat_f;
-		}
+        o_halo_color[3] = blue_scat_f;
+        if ( ( new_visibility < 10000 ) &&  ( blue_scat_f > 1 ))
+        {
+            o_halo_color[3] = 2 - blue_scat_f;
+        }
 
 	double saturation = 1 - ( rel_humidity / 200 );
-		sun_color[1] += (( 1 - saturation ) * ( 1 - sun_color[1] ));
-		sun_color[2] += (( 1 - saturation ) * ( 1 - sun_color[2] ));
+	sun_color[1] += (( 1 - saturation ) * ( 1 - sun_color[1] ));
+	sun_color[2] += (( 1 - saturation ) * ( 1 - sun_color[2] ));
 
-		i_halo_color[1] += (( 1 - saturation ) * ( 1 - i_halo_color[1] ));
-		i_halo_color[2] += (( 1 - saturation ) * ( 1 - i_halo_color[2] ));
+	i_halo_color[1] += (( 1 - saturation ) * ( 1 - i_halo_color[1] ));
+	i_halo_color[2] += (( 1 - saturation ) * ( 1 - i_halo_color[2] ));
 
-		o_halo_color[1] += (( 1 - saturation ) * ( 1 - o_halo_color[1] ));
-		o_halo_color[2] += (( 1 - saturation ) * ( 1 - o_halo_color[2] ));
+	o_halo_color[1] += (( 1 - saturation ) * ( 1 - o_halo_color[1] ));
+	o_halo_color[2] += (( 1 - saturation ) * ( 1 - o_halo_color[2] ));
 
         scene_color[1] += (( 1 - saturation ) * ( 1 - scene_color[1] ));
         scene_color[2] += (( 1 - saturation ) * ( 1 - scene_color[2] ));
@@ -307,45 +281,44 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         o_halo_color[3] = blue_scat_f;
 
 	if ((visibility < 10000) && (blue_scat_f > 1))
-		{
+	{
 	    o_halo_color[3] = 2 - blue_scat_f;
 	}
 
         if (o_halo_color[3] > 1) o_halo_color[3] = 1;
         if (o_halo_color[3] < 0) o_halo_color[3] = 0;
 
-		// just to make sure we're in the limits
-		if ( sun_color[0] < 0 ) sun_color[0] = 0;
-		else if ( sun_color[0] > 1) sun_color[0] = 1;
-		if ( i_halo_color[0] < 0 ) i_halo_color[0] = 0;
-		else if ( i_halo_color[0] > 1) i_halo_color[0] = 1;
-		if ( o_halo_color[0] < 0 ) o_halo_color[0] = 0;
-		else if ( o_halo_color[0] > 1) o_halo_color[0] = 1;
-		if (scene_color[0] < 0) scene_color[0] = 0;
-		else if (scene_color[0] > 1) scene_color[0] = 1;
+        // just to make sure we're in the limits
+        if ( sun_color[0] < 0 ) sun_color[0] = 0;
+        else if ( sun_color[0] > 1) sun_color[0] = 1;
+        if ( i_halo_color[0] < 0 ) i_halo_color[0] = 0;
+        else if ( i_halo_color[0] > 1) i_halo_color[0] = 1;
+        if ( o_halo_color[0] < 0 ) o_halo_color[0] = 0;
+        else if ( o_halo_color[0] > 1) o_halo_color[0] = 1;
+        if (scene_color[0] < 0) scene_color[0] = 0;
+        else if (scene_color[0] > 1) scene_color[0] = 1;
 
-		if ( sun_color[1] < 0 ) sun_color[1] = 0;
-		else if ( sun_color[1] > 1) sun_color[1] = 1;
-		if ( i_halo_color[1] < 0 ) i_halo_color[1] = 0;
-		else if ( i_halo_color[1] > 1) i_halo_color[1] = 1;
-		if ( o_halo_color[1] < 0 ) o_halo_color[1] = 0;
-		else if ( o_halo_color[0] > 1) o_halo_color[1] = 1;
-		if (scene_color[1] < 0) scene_color[1] = 0;
-		else if (scene_color[1] > 1) scene_color[1] = 1;
+        if ( sun_color[1] < 0 ) sun_color[1] = 0;
+        else if ( sun_color[1] > 1) sun_color[1] = 1;
+        if ( i_halo_color[1] < 0 ) i_halo_color[1] = 0;
+        else if ( i_halo_color[1] > 1) i_halo_color[1] = 1;
+        if ( o_halo_color[1] < 0 ) o_halo_color[1] = 0;
+        else if ( o_halo_color[0] > 1) o_halo_color[1] = 1;
+        if (scene_color[1] < 0) scene_color[1] = 0;
+        else if (scene_color[1] > 1) scene_color[1] = 1;
 
-		if ( sun_color[2] < 0 ) sun_color[2] = 0;
-		else if ( sun_color[2] > 1) sun_color[2] = 1;
-		if ( i_halo_color[2] < 0 ) i_halo_color[2] = 0;
-		else if ( i_halo_color[2] > 1) i_halo_color[2] = 1;
-		if ( o_halo_color[2] < 0 ) o_halo_color[2] = 0;
-		else if ( o_halo_color[2] > 1) o_halo_color[2] = 1;
-		if ( o_halo_color[3] < 0 ) o_halo_color[3] = 0;
-		else if ( o_halo_color[3] > 1) o_halo_color[3] = 1;
-		if (scene_color[2] < 0) scene_color[2] = 0;
-		else if (scene_color[2] > 1) scene_color[2] = 1;
-		if (scene_color[3] < 0) scene_color[3] = 0;
-		else if (scene_color[3] > 1) scene_color[3] = 1;
-
+        if ( sun_color[2] < 0 ) sun_color[2] = 0;
+        else if ( sun_color[2] > 1) sun_color[2] = 1;
+        if ( i_halo_color[2] < 0 ) i_halo_color[2] = 0;
+        else if ( i_halo_color[2] > 1) i_halo_color[2] = 1;
+        if ( o_halo_color[2] < 0 ) o_halo_color[2] = 0;
+        else if ( o_halo_color[2] > 1) o_halo_color[2] = 1;
+        if ( o_halo_color[3] < 0 ) o_halo_color[3] = 0;
+        else if ( o_halo_color[3] > 1) o_halo_color[3] = 1;
+        if (scene_color[2] < 0) scene_color[2] = 0;
+        else if (scene_color[2] > 1) scene_color[2] = 1;
+        if (scene_color[3] < 0) scene_color[3] = 0;
+        else if (scene_color[3] > 1) scene_color[3] = 1;
 
         sd_gamma_correct_rgb( i_halo_color._v );
         sd_gamma_correct_rgb( o_halo_color._v );
@@ -367,13 +340,10 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
 
 bool SDSun::reposition( osg::Vec3d p, double sun_angle)
 {
-    osg::Matrix T1, T2, RA, DEC;
-
-
+    osg::Matrix T1, RA, DEC;
 
     RA.makeRotate((float)(sun_right_ascension - 90 *SD_DEGREES_TO_RADIANS) , osg::Vec3(0, 0, 1));
     DEC.makeRotate((float)(sun_declination), osg::Vec3(1, 0, 0));
-    //T2.makeTranslate(osg::Vec3(0, sun_dist, 0));
     T1.makeTranslate(0, sun_dist, 0);
 
     osg::Matrix R = T1*DEC*RA;
@@ -382,12 +352,17 @@ bool SDSun::reposition( osg::Vec3d p, double sun_angle)
     osg::Vec4f pos = R*osg::Vec4f(0.0,0.0,0.0,1.0);
     sun_position = osg::Vec3f(pos._v[0],pos._v[1],pos._v[2]);
 
+    GfOut("Sun Position : %f - %f - %f\n", pos._v[0], pos._v[1], pos._v[2]);
+
     osg::Vec3f upos = osg::Vec3f(sun_position);
     osg::Vec3f uplan = osg::Vec3f(sun_position._v[0],0.0,sun_position._v[2]);
     upos.normalize();
     uplan.normalize();
 
     sun_angle_to_scene = acos(upos*uplan);
+    sun_angle = 1.05; //sun_angle_to_scene;
+
+    GfOut("Sun Angle = %d\n", sun_angle);
 
     // Suncolor related things:
     if ( prev_sun_angle != sun_angle )
@@ -416,11 +391,6 @@ bool SDSun::reposition( osg::Vec3d p, double sun_angle)
         double alt_half = sqrt( pow ( r_tropo, 2 ) + pow( path_distance / 2, 2 ) - r_tropo * path_distance * cos( asin( sin_beta )) ) - r_earth;
 
         if ( alt_half < 0.0 ) alt_half = 0.0;
-        /*if ( env_node )
-        {
-            env_node->setDoubleValue( "atmosphere/altitude-troposphere-top", r_tropo - r_earth );
-            env_node->setDoubleValue( "atmosphere/altitude-half-to-sun", alt_half );
-        }*/
     }
 
     return true;
