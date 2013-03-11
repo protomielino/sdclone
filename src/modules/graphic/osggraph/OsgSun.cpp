@@ -376,7 +376,18 @@ bool SDSun::reposition( osg::Vec3d p, double sun_angle)
     //T2.makeTranslate(osg::Vec3(0, sun_dist, 0));
     T1.makeTranslate(0, sun_dist, 0);
 
-    sun_transform->setMatrix(T1*DEC*RA);
+    osg::Matrix R = T1*DEC*RA;
+    sun_transform->setMatrix(R);
+
+    osg::Vec4f pos = R*osg::Vec4f(0.0,0.0,0.0,1.0);
+    sun_position = osg::Vec3f(pos._v[0],pos._v[1],pos._v[2]);
+
+    osg::Vec3f upos = osg::Vec3f(sun_position);
+    osg::Vec3f uplan = osg::Vec3f(sun_position._v[0],0.0,sun_position._v[2]);
+    upos.normalize();
+    uplan.normalize();
+
+    sun_angle_to_scene = acos(upos*uplan);
 
     // Suncolor related things:
     if ( prev_sun_angle != sun_angle )

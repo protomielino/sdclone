@@ -227,7 +227,7 @@ bool SDScenery::LoadTrack(std::string strTrack)
 
 	if (pTrack)
 	{
-		pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
+        pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
 		_scenery->addChild(pTrack);		
 	}
 	else

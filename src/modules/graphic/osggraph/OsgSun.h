@@ -37,6 +37,7 @@ class SDSun
     double prev_sun_angle;
     double sun_angle;
     double sun_rotation;
+    double sun_angle_to_scene;
 
     // used by reposition
     double sun_right_ascension;
@@ -44,6 +45,7 @@ class SDSun
     double sun_dist;
     double path_distance;
     double sun_exp2_punch_through;
+    osg::Vec3f sun_position;
 
 public:
 
@@ -82,6 +84,8 @@ public:
 
     void setSunDistance( double dist ) { sun_dist = dist; }
     double getSunDistance() { return sun_dist; }
+
+    osg::Vec3f getSunPosition(){return sun_position;}
 };
 
 #endif // _OSGSUN_H_
