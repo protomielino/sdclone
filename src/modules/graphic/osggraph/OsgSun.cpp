@@ -371,12 +371,12 @@ bool SDSun::reposition( osg::Vec3d p, double sun_angle)
 
 
 
-    RA.makeRotate(sun_right_ascension - 90 *SD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
-    DEC.makeRotate(sun_declination * SD_DEGREES_TO_RADIANS, osg::Vec3(1, 0, 0));
+    RA.makeRotate((float)(sun_right_ascension - 90 *SD_DEGREES_TO_RADIANS) , osg::Vec3(0, 0, 1));
+    DEC.makeRotate((float)(sun_declination), osg::Vec3(1, 0, 0));
     //T2.makeTranslate(osg::Vec3(0, sun_dist, 0));
-    T1.makeTranslate(p[0], p[1]+ sun_dist, p[2]);
+    T1.makeTranslate(0, sun_dist, 0);
 
-    sun_transform->setMatrix(DEC*RA*T1);
+    sun_transform->setMatrix(T1*DEC*RA);
 
     // Suncolor related things:
     if ( prev_sun_angle != sun_angle )

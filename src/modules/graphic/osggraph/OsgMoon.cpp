@@ -139,11 +139,11 @@ bool SDMoon::reposition( osg::Vec3d p, double angle )
     osg::Matrix T1, T2, RA, DEC;
 
     RA.makeRotate(moonAscension - 90.0 * SD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
-    DEC.makeRotate(moondeclination * SD_DEGREES_TO_RADIANS, osg::Vec3(1, 0, 0));
+    DEC.makeRotate(moondeclination, osg::Vec3(1, 0, 0));
     //T2.makeTranslate(osg::Vec3(0, moon_dist, 0));
-    T1.makeTranslate(p[0], p[1]+moon_dist, p[2]);
+    T1.makeTranslate(0, moon_dist, 0);
 
-    moon_transform->setMatrix(DEC*RA*T1);
+    moon_transform->setMatrix(T1*DEC*RA);
 
     return true;
 }
