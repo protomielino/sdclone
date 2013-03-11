@@ -158,7 +158,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
     }  // for i
   } else {  // if robot settings XML could not be read
     // For schismatic robots NBBOTS is unknown! Handle error here
-    NBBOTS = 1;
+    NBBOTS = 0;
   }  // if pRobotSettings
 
   setupKilo2008();
