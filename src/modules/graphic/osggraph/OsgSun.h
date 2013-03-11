@@ -53,7 +53,7 @@ public:
     // Destructor
     ~SDSun( void );
 
-    osg::Node* build( std::string path, double sun_size );
+    osg::Node* build( std::string path, double dist, double sun_size );
 
     bool repaint( double sun_angle, double new_visibility );
     bool reposition( osg::Vec3d p, double angle);

@@ -47,7 +47,7 @@ SDSun::~SDSun( void )
 {
 }
 
-osg::Node* SDSun::build( std::string path, double sun_size )
+osg::Node* SDSun::build( std::string path, double dist, double sun_size )
 {
     std::string TmpPath = path;
     sun_transform = new osg::MatrixTransform;
@@ -80,6 +80,8 @@ osg::Node* SDSun::build( std::string path, double sun_size )
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
     stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
+
+    sun_dist = dist;
 
     osg::Node* sun = SDMakeSphere(sun_size, 15, 15);
     stateSet = sun->getOrCreateStateSet();
@@ -374,7 +376,7 @@ bool SDSun::reposition( osg::Vec3d p, double sun_angle)
     //T2.makeTranslate(osg::Vec3(0, sun_dist, 0));
     T1.makeTranslate(p[0], p[1]+ sun_dist, p[2]);
 
-    sun_transform->setMatrix(T1*DEC*RA);
+    sun_transform->setMatrix(DEC*RA*T1);
 
     // Suncolor related things:
     if ( prev_sun_angle != sun_angle )

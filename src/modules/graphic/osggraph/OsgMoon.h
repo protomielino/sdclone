@@ -46,7 +46,7 @@ public:
     ~SDMoon( void );
 
     // build the moon object
-    osg::Node *build( std::string path, double moon_size );
+    osg::Node *build( std::string path, double dist, double size );
 
     bool repaint( double moon_angle );
     bool reposition( osg::Vec3d p, double angle  );

@@ -98,11 +98,11 @@ void SDSky::build( std::string tex_path, double h_radius, double v_radius, doubl
     //_ephTransform->addChild( stars->build(eph.getNumStars(), eph.getStars(), h_radius));
 
     moon = new SDMoon;
-    pre_transform->addChild( moon->build( tex_path, moon_size));
+    pre_transform->addChild( moon->build( tex_path, moon_dist, moon_size));
     //_ephTransform->addChild( moon->build(tex_path, moon_size) );
 
     sun = new SDSun;
-    pre_transform->addChild( sun->build( tex_path, moon_size));
+    pre_transform->addChild( sun->build( tex_path, sun_dist, sun_size));
     //_ephTransform->addChild( oursun->build(tex_path, sun_size, property_tree_node ) );
 
     pre_selector->addChild( pre_transform.get());

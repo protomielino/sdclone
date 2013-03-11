@@ -147,9 +147,9 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
         SDMoonDeclination = (rand() % 270);
 
     //SDMoonDeclination = grUpdateMoonPos(timeOfDay);
-    SDMoonDeclination = 22.0; /*(rand() % 270);*/
+    //SDMoonDeclination = 22.0; /*(rand() % 270);*/
 
-    const float moonAscension = grTrack->local.sunascension - 180.0;
+    const float moonAscension = grTrack->local.sunascension;
 
     thesky->setMD( DEG2RAD(SDMoonDeclination) );
     thesky->setMRA( DEG2RAD(moonAscension) );

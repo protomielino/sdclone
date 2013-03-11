@@ -49,12 +49,15 @@ SDMoon::~SDMoon( void )
 }
 
 // build the moon object
-osg::Node* SDMoon::build( std::string path, double moon_size )
+osg::Node* SDMoon::build( std::string path, double dist, double size )
 {
     std::string TmpPath = path;
-    osg::Node* orb = SDMakeSphere(moon_size, 15, 15);
+    osg::Node* orb = SDMakeSphere(size, 15, 15);
     osg::StateSet* stateSet = orb->getOrCreateStateSet();
     stateSet->setRenderBinDetails(-5, "RenderBin");
+
+    moon_size = size;
+    moon_dist = dist;
 
     path = TmpPath+"data/textures/moon.rgba";
     osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path);
@@ -131,7 +134,7 @@ bool SDMoon::repaint( double moon_angle )
     return true;
 }
 
-bool SDMoon::reposition( osg::Vec3d p, double moon_dist )
+bool SDMoon::reposition( osg::Vec3d p, double angle )
 {
     osg::Matrix T1, T2, RA, DEC;
 
@@ -140,7 +143,7 @@ bool SDMoon::reposition( osg::Vec3d p, double moon_dist )
     //T2.makeTranslate(osg::Vec3(0, moon_dist, 0));
     T1.makeTranslate(p[0], p[1]+moon_dist, p[2]);
 
-    moon_transform->setMatrix(T1*DEC*RA);
+    moon_transform->setMatrix(DEC*RA*T1);
 
     return true;
 }
