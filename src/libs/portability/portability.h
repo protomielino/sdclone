@@ -98,7 +98,12 @@ PORTABILITY_API char *strtok_r(char *str, const char *delim, char **nextp);
 
 #define isnan _isnan
 
-#define snprintf _snprintf
+// Ticket #663 - MSVC implementation of snprintf is not safe
+// We provide our own version of the function,
+// that ensures 0 ending for the string.
+#include <cstdarg>
+#include <cstdio>
+#define snprintf SD_snprintf
 
 #define access _access
 
