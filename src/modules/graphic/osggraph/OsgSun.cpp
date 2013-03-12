@@ -349,10 +349,10 @@ bool SDSun::reposition( osg::Vec3d p, double sun_angle)
     osg::Matrix R = T1*DEC*RA;
     sun_transform->setMatrix(R);
 
-    osg::Vec4f pos = R*osg::Vec4f(0.0,0.0,0.0,1.0);
+    osg::Vec4f pos = osg::Vec4f(0.0,0.0,0.0,1.0)*R;
     sun_position = osg::Vec3f(pos._v[0],pos._v[1],pos._v[2]);
 
-    GfOut("Sun Position : %f - %f - %f\n", pos._v[0], pos._v[1], pos._v[2]);
+    GfOut("Sun Position : %f  %f  %f %f %f\n", pos._v[0], pos._v[1], pos._v[2],sun_dist,pos.length());
 
     osg::Vec3f upos = osg::Vec3f(sun_position);
     osg::Vec3f uplan = osg::Vec3f(sun_position._v[0],0.0,sun_position._v[2]);
@@ -360,9 +360,9 @@ bool SDSun::reposition( osg::Vec3d p, double sun_angle)
     uplan.normalize();
 
     sun_angle_to_scene = acos(upos*uplan);
-    sun_angle = 1.05; //sun_angle_to_scene;
+    sun_angle = sun_angle_to_scene;
 
-    GfOut("Sun Angle = %d\n", sun_angle);
+    GfOut("Sun Angle = %f\n", sun_angle);
 
     // Suncolor related things:
     if ( prev_sun_angle != sun_angle )
