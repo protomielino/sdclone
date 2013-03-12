@@ -93,7 +93,8 @@ PORTABILITY_API char *strtok_r(char *str, const char *delim, char **nextp);
 // * MSVC    6 : 1200 <= _MSC_VER < 1300
 // * MSVC 2003 : 1300 <= _MSC_VER < 1400
 // * MSVC 2005 : 1400 <= _MSC_VER < 1500
-// * MSVC 2008 : 1500 <= _MSC_VER
+// * MSVC 2008 : 1500 <= _MSC_VER < 1600
+// * MSVC 2010 : 1600 <= _MSC_VER
 #ifdef _MSC_VER
 
 #define isnan _isnan
@@ -101,6 +102,8 @@ PORTABILITY_API char *strtok_r(char *str, const char *delim, char **nextp);
 // Ticket #663 - MSVC implementation of snprintf is not safe
 // We provide our own version of the function,
 // that ensures 0 ending for the string.
+PORTABILITY_API int SD_snprintf(char *str, size_t size, const char *format, ...);
+
 #include <cstdarg>
 #include <cstdio>
 #define snprintf SD_snprintf
