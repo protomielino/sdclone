@@ -225,7 +225,7 @@ bool SDSkyDome::repaint( const Vec3f& sky_color,
     middle_amt = middle_param;
 
     const double cvf = osg::clampBelow(vis, 45000.0);
-    const double vis_factor = osg::clampTo((vis - 1000.0) / 2000.0, 0.0, 1.0);
+    const double vis_factor = (vis - 1000.0) / 2000.0; //osg::clampTo((vis - 1000.0) / 2000.0, 0.0, 1.0);
     const float upperVisFactor = 1.0 - vis_factor * (0.7 + 0.3 * cvf / 45000);
     const float middleVisFactor = 1.0 - vis_factor * (0.1 + 0.85 * cvf / 45000);
 
