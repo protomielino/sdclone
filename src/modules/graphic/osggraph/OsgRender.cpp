@@ -219,6 +219,8 @@ void SDRender::UpdateLight( void )
     const float moon_angle = (float)thesky->getMA();
     float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
 
+    GfOut("Sun Angle in Render = %f\n", sol_angle);
+
     if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
     {
         BaseFogColor[0] = 0.42f;

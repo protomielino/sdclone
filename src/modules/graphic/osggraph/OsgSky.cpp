@@ -24,16 +24,6 @@
 #include <osg/StateSet>
 #include <osg/Depth>
 
-// Used for rise/set effects (flat earth - no rotation of skydome considered here )
-void calc_celestial_angles( const osg::Vec3 body, const osg::Vec3 view, double& angle, double& rotation )
-{
-  osg::Vec3 pos(body[0]-view[0], body[1]-view[1], body[2]-view[2]);
-  //sgSubVec3(pos, body, view);
-
-  angle = (90*SD_DEGREES_TO_RADIANS) - atan2(pos[2], sqrt(pos[0]*pos[0] + pos[1]*pos[1]));
-  rotation = (90*SD_DEGREES_TO_RADIANS) - atan2(pos[0], pos[1]);
-}
-
 // Constructor
 SDSky::SDSky( void )
 {
@@ -85,8 +75,8 @@ void SDSky::build( std::string tex_path, double h_radius, double v_radius, doubl
       double moon_size, double moon_dist, int nplanets, osg::Vec3d *planet_data,
       int nstars, osg::Vec3d *star_data )
 {
-    /*dome = new SDSkyDome;
-    pre_transform->addChild( dome->build( h_radius, v_radius ));*/
+    dome = new SDSkyDome;
+    pre_transform->addChild( dome->build( h_radius, v_radius ));
 
     //pre_transform->addChild(_ephTransform.get());
     planets = new SDStars;
@@ -109,17 +99,15 @@ void SDSky::build( std::string tex_path, double h_radius, double v_radius, doubl
     pre_root->addChild( pre_selector.get());
 }
 
-bool SDSky::repaint( osg::Vec4d sky_color, osg::Vec4d fog_color, osg::Vec4d cloud_color, double sol_angle,
+bool SDSky::repaint( osg::Vec3f& sky_color, osg::Vec3f& fog_color, osg::Vec3f& cloud_color, double sol_angle,
                        double moon_angle, int nplanets, osg::Vec3d *planet_data,
                        int nstars, osg::Vec3d *star_data )
 {
     if ( effective_visibility > 1000.0 )
     {
                 enable();
-        //dome->repaint( sun_color, sky_color, fog_color, sol_angle, effective_visibility );
+        dome->repaint( sky_color, fog_color, sol_angle, effective_visibility );
 
-        planets->repaint( sol_angle, nplanets, planet_data );
-        stars->repaint( sol_angle, nstars, star_data);
         sun->repaint( sol_angle, effective_visibility );
         moon->repaint( moon_angle );
 
@@ -130,6 +118,9 @@ bool SDSky::repaint( osg::Vec4d sky_color, osg::Vec4d fog_color, osg::Vec4d clou
 		cloud_layers[i]->repaint( sc.cloud_color );
 	    }
 	}*/
+
+        planets->repaint( sol_angle, nplanets, planet_data );
+        stars->repaint( sol_angle, nstars, star_data);
     } else
     {
                 // turn off sky
@@ -143,14 +134,9 @@ bool SDSky::repaint( osg::Vec4d sky_color, osg::Vec4d fog_color, osg::Vec4d clou
 bool SDSky::reposition( osg::Vec3& view_pos, double spin, /*double gst,*/
                         double dt )
 {
-  //int i;
-  //double angle;
-  //double rotation;
-  //osg::Vec3d pos;
-
-  sun->reposition( view_pos, 0 );
+  sun->reposition( view_pos );
   moon->reposition( view_pos, 0 );
-  //dome->reposition( view_pos, 0 );
+  dome->reposition( view_pos, 0 );
 
   //sun->getSunPosition ( & pos );
   //calc_celestial_angles( pos, view_pos, angle, rotation );

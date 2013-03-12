@@ -175,14 +175,14 @@ osg::Node* SDSkyDome::build( double hscale, double vscale )
     geom->addPrimitiveSet(domeElements);
     geode->addDrawable(geom);
     // force a repaint of the sky colors with ugly defaults
-    repaint(osg::Vec3f(1, 1, 1), osg::Vec3f(1, 1, 1), osg::Vec3f(1, 1, 1), 0.0, 5000.0 );
+    repaint(osg::Vec3f(1.0, 1.0, 1.0), osg::Vec3f(1.0, 1.0, 1.0), 0.0, 5000.0 );
     dome_transform = new osg::MatrixTransform;
     dome_transform->addChild(geode);
 
     return dome_transform.get();
 }
 
-static void sd_fade_to_black(osg::Vec3 sky_color[], float asl, int count)
+static void sd_fade_to_black(osg::Vec3f sky_color[], float asl, int count)
 {
     const float ref_asl = 10000.0f;
     const float d = exp( - asl / ref_asl );
@@ -197,8 +197,8 @@ inline void sd_clampColor(osg::Vec3& color)
     color.z() = osg::clampTo(color.z(), 0.0f, 1.0f);
 }
 
-bool SDSkyDome::repaint( const osg::Vec3f& sun_color, const osg::Vec3f& sky_color,
-                    const osg::Vec3f& fog_color, double sun_angle, double vis )
+bool SDSkyDome::repaint( const Vec3f& sky_color,
+                    const Vec3f& fog_color, double sun_angle, double vis )
 {
     osg::Vec3f outer_param, outer_amt, outer_diff;
     osg::Vec3f middle_param, middle_amt, middle_diff;
@@ -274,8 +274,6 @@ bool SDSkyDome::reposition( const osg::Vec3f& p, double spin )
     osg::Matrix T, LON, LAT, SPIN;
 
     T.makeTranslate( p );
-    //LON.makeRotate(lon, osg::Vec3(0, 0, 1));
-    //LAT.makeRotate(90.0 * SD_DEGREES_TO_RADIANS - lat, osg::Vec3(0, 1, 0));
     SPIN.makeRotate(spin, osg::Vec3(0, 0, 1));
 
     dome_transform->setMatrix( SPIN*T );

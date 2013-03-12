@@ -58,17 +58,10 @@ public:
     osg::Node* build( std::string path, double dist, double sun_size );
 
     bool repaint( double sun_angle, double new_visibility );
-    bool reposition( osg::Vec3d p, double angle);
+    bool reposition( osg::Vec3d p);
 
     osg::Vec4f get_color();
     osg::Vec4f get_scene_color();
-
-    /*void getSunPosition (sgCoord p)
-    {
-                sgMat4 Xform;
-                sun_transform->getTransform(Xform);
-                sgSetCoord(p, Xform);
-    }*/
 
     void setSunAngle(double angle) { sun_angle = angle; }
     double getSunAngle() { return sun_angle; }

@@ -338,7 +338,7 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
     return true;
 }
 
-bool SDSun::reposition( osg::Vec3d p, double sun_angle)
+bool SDSun::reposition( osg::Vec3d p/*, double angle*/)
 {
     osg::Matrix T1, RA, DEC;
 

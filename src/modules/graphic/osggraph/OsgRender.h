@@ -33,15 +33,15 @@ private:
 	osg::ref_ptr<osg::Group> m_sceneroot;
 	osg::ref_ptr<osg::Group> m_carroot;
 
-        osg::Vec4 SkyColor;
-        osg::Vec4 BaseFogColor;
-        osg::Vec4 FogColor;
-        osg::Vec4 CloudsColor;
-        osg::Vec4 BaseSkyColor;
+        osg::Vec3f SkyColor;
+        osg::Vec3f BaseFogColor;
+        osg::Vec3f FogColor;
+        osg::Vec3f CloudsColor;
+        osg::Vec3f BaseSkyColor;
 
-        osg::Vec4 SceneAmbiant;
-        osg::Vec4 SceneDiffuse;
-        osg::Vec4 SceneSpecular;
+        osg::Vec4f SceneAmbiant;
+        osg::Vec4f SceneDiffuse;
+        osg::Vec4f SceneSpecular;
 
 public:
 	SDRender(void);

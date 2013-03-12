@@ -30,6 +30,8 @@
 #include <osg/ShadeModel>
 #include <osg/Node>
 
+#include <tgf.h>
+
 //#include "OsgConstants.h"
 #include "OsgStars.h"
 #include "OsgMath.h"
@@ -41,12 +43,12 @@ old_phase(-1)
 }
 
 // Destructor
-SDStars::~SDStars( void ) 
+SDStars::~SDStars( void )
 {
 }
 
 // initialize the stars object and connect it into our scene graph root
-osg::Node* SDStars::build( int num, const osg::Vec3d star_data[], double star_dist ) 
+osg::Node* SDStars::build( int num, const osg::Vec3d star_data[], double star_dist )
 {
     osg::Geode* geode = new osg::Geode;
     osg::StateSet* stateSet = geode->getOrCreateStateSet();
@@ -62,11 +64,11 @@ osg::Node* SDStars::build( int num, const osg::Vec3d star_data[], double star_di
     stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
     stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
-    
+
     cl = new osg::Vec4Array;
     osg::Vec3Array* vl = new osg::Vec3Array;
 
-    for ( int i = 0; i < num; ++i ) 
+    for ( int i = 0; i < num; ++i )
     {
         vl->push_back(osg::Vec3(star_dist * cos( star_data[i][0])
                                 * cos( star_data[i][1] ),
@@ -93,7 +95,9 @@ bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
     double mag, nmag, alpha, factor, cutoff;
     int phase;
 
-    if ( sun_angle > (SD_PI_2 + 10.0 * SD_DEGREES_TO_RADIANS ) ) 
+    GfOut("Sun Angle in Stars = %f\n", sun_angle);
+
+    if ( sun_angle > (SD_PI_2 + 10.0 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 1.0;
         cutoff = 4.5;
@@ -103,27 +107,27 @@ bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
         factor = 1.0;
         cutoff = 3.8;
         phase = 1;
-    } else if ( sun_angle > (SD_PI_2 + 7.5 * SD_DEGREES_TO_RADIANS ) ) 
+    } else if ( sun_angle > (SD_PI_2 + 7.5 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.95;
         cutoff = 3.1;
         phase = 2;
-    } else if ( sun_angle > (SD_PI_2 + 7.0 * SD_DEGREES_TO_RADIANS ) ) 
+    } else if ( sun_angle > (SD_PI_2 + 7.0 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.9;
         cutoff = 2.4;
         phase = 3;
-    } else if ( sun_angle > (SD_PI_2 + 6.5 * SD_DEGREES_TO_RADIANS ) ) 
+    } else if ( sun_angle > (SD_PI_2 + 6.5 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.85;
         cutoff = 1.8;
         phase = 4;
-    } else if ( sun_angle > (SD_PI_2 + 6.0 * SD_DEGREES_TO_RADIANS ) ) 
+    } else if ( sun_angle > (SD_PI_2 + 6.0 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.8;
         cutoff = 1.2;
         phase = 5;
-    } else if ( sun_angle > (SD_PI_2 + 5.5 * SD_DEGREES_TO_RADIANS ) ) 
+    } else if ( sun_angle > (SD_PI_2 + 5.5 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.75;
         cutoff = 0.6;
@@ -135,18 +139,18 @@ bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
         phase = 7;
     }
 
-    if( phase != old_phase ) 
+    if( phase != old_phase )
     {
         old_phase = phase;
-        for ( int i = 0; i < num; ++i ) 
+        for ( int i = 0; i < num; ++i )
         {
             mag = star_data[i][2];
-            if ( mag < cutoff ) 
+            if ( mag < cutoff )
             {
                 nmag = ( 4.5 - mag ) / 5.5;
                 alpha = nmag * 0.85 + 0.15;
                 alpha *= factor;
-            } else 
+            } else
             {
                 alpha = 0.0;
             }
@@ -155,12 +159,11 @@ bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
             if (alpha < 0.0) { alpha = 0.0; }
 
             (*cl)[i] = osg::Vec4(1, 1, 1, alpha);
-
         }
         cl->dirty();
-    } else 
+    } else
     {
-		// cout << "  no phase change, skipping" << endl;
+                // cout << "  no phase change, skipping" << endl;
     }
 
     return true;

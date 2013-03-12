@@ -118,7 +118,7 @@ public:
           double moon_size, double moon_dist, int nplanets, osg::Vec3d *planet_data,
           int nstars, osg::Vec3d *star_data );
 
-    bool repaint (osg::Vec4d sky_color, osg::Vec4d fog_color, osg::Vec4d cloud_color, double sun_angle,
+    bool repaint (osg::Vec3f &sky_color, osg::Vec3f &fog_color, osg::Vec3f &cloud_color, double sun_angle,
                   double moon_angle, int nplanets, osg::Vec3d *planet_data,
                   int nstars, osg::Vec3d *star_data);
 
