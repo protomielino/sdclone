@@ -2,8 +2,8 @@
 
     file        : raceinit.cpp
     created     : Sat Nov 16 10:34:35 CET 2002
-    copyright   : (C) 2002 by Eric Espie                       
-    email       : eric.espie@torcs.org   
+    copyright   : (C) 2002 by Eric Espie
+    email       : eric.espie@torcs.org
     version     : $Id$
  ***************************************************************************/
 
@@ -369,7 +369,7 @@ initPits(void)
       }
 
       // Assign cars to pits. Inefficient (O(n*n)), but just at initialization, so do not care.
-      // One pit can just host cars of one team (this matches with the reality) 
+      // One pit can just host cars of one team (this matches with the reality)
       for (i = 0; i < ReInfo->s->_ncars; i++) {
         // Find pit for the cars team.
         tCarElt *car = &(ReInfo->carList[i]);
@@ -487,7 +487,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
     curRobot->rbShutdown = NULL;
     curRobot->index      = 0;
   }
-  
+
   /* Retrieve and load the robotXML file :
      1) from user settings dir (local dir)
      2) from installed data dir */
@@ -531,11 +531,15 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 
     //snprintf(path, sizeof(path), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
     snprintf( path2, sizeof(path2), "%s/%s/%d/%d", RM_SECT_DRIVERINFO, elt->_modName, normal_carname ? 0 : 1, elt->_moduleIndex );
-    if (normal_carname || elt->_driverType == RM_DRV_HUMAN)
+    if (normal_carname || elt->_driverType == RM_DRV_HUMAN) {
       strncpy(elt->_name, GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "none"), MAX_NAME_LEN - 1);
-    else
+      strncpy(elt->_sname, GfParmGetStr(robhdle, path, ROB_ATTR_SNAME, "none"), MAX_NAME_LEN - 1);
+    } else {
       strncpy(elt->_name, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_NAME, "none"), MAX_NAME_LEN - 1);
+      strncpy(elt->_sname, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_SNAME, "none"), MAX_NAME_LEN - 1);
+    }
     elt->_name[MAX_NAME_LEN - 1] = 0;
+    elt->_sname[MAX_NAME_LEN - 1] = 0;
 
     teamname = GfParmGetStr(robhdle, path, ROB_ATTR_TEAM, "none");
     teamname = GfParmGetStr(ReInfo->params, path2, ROB_ATTR_TEAM, teamname ); //Use the name in params if it has a team name
@@ -549,7 +553,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
     else
       strncpy(elt->_carName, GfParmGetStr(ReInfo->params, path2, RM_ATTR_CARNAME, ""), MAX_NAME_LEN - 1);
     elt->_carName[MAX_NAME_LEN - 1] = 0; /* XML file name */
-    
+
     // Load custom skin name and targets from race info (if specified).
     snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, listindex);
     if (GfParmGetStr(ReInfo->params, path2, RM_ATTR_SKINNAME, 0))
@@ -801,7 +805,7 @@ ReInitCars(void)
   ReInfo->s->_ncars = nCars;
   FREEZ(ReInfo->s->cars);
   ReInfo->s->cars = (tCarElt **)calloc(nCars, sizeof(tCarElt *));
-  for (i = 0; i < nCars; i++) 
+  for (i = 0; i < nCars; i++)
   {
     ReInfo->s->cars[i] = &(ReInfo->carList[i]);
   }

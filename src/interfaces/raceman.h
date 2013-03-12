@@ -462,6 +462,7 @@ typedef struct RmInfo
 #define RE_SECT_TEAMINFO	"Team Info"		
 
 #define RE_ATTR_NAME		"name"
+#define RE_ATTR_SNAME		"short name"
 #define RE_ATTR_CAR		"car"
 #define RE_ATTR_MODULE		"module"
 #define RE_ATTR_IDX		"idx"

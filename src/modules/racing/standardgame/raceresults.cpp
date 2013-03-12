@@ -74,14 +74,14 @@ ReInitResults(void)
 		stm->tm_mday,
 		stm->tm_hour,
 		stm->tm_min);
-	
+
 	ReInfo->results = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	ReInfo->mainResults = ReInfo->results;
 	results = ReInfo->results;
 	GfParmSetNum(results, RE_SECT_HEADER, RE_ATTR_DATE, NULL, (tdble)t);
 	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
 	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
-	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);	
+	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 }
 
 void
@@ -276,7 +276,8 @@ ReStoreRaceResults(const char *race)
 					car->_laps = s->_totLaps + 1;
 			
 				GfParmSetStr(results, path, RE_ATTR_NAME, car->_name);
-			
+				GfParmSetStr(results, path, RE_ATTR_SNAME, car->_sname);
+
 				snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
 				carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 				carName = GfParmGetName(carparam);
@@ -341,6 +342,8 @@ ReStoreRaceResults(const char *race)
 								ReInfo->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, i + 1);
 						GfParmSetStr(results, path2, RE_ATTR_NAME,
 									 GfParmGetStr(results, path, RE_ATTR_NAME, ""));
+						GfParmSetStr(results, path2, RE_ATTR_SNAME,
+									 GfParmGetStr(results, path, RE_ATTR_SNAME, ""));
 						GfParmSetStr(results, path2, RE_ATTR_CAR,
 									 GfParmGetStr(results, path, RE_ATTR_CAR, ""));
 						GfParmSetNum(results, path2, RE_ATTR_BEST_LAP_TIME, NULL,
@@ -370,11 +373,12 @@ ReStoreRaceResults(const char *race)
 				/* insert after */
 				snprintf(path, sizeof(path), "%s/%s/%s/%s/%d", ReInfo->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, i + 1);
 				GfParmSetStr(results, path, RE_ATTR_NAME, car->_name);
-				
+				GfParmSetStr(results, path, RE_ATTR_SNAME, car->_sname);
+
 				snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
 				carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 				carName = GfParmGetName(carparam);
-				
+
 				GfParmSetStr(results, path, RE_ATTR_CAR, carName);
 				GfParmSetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, (tdble)car->_bestLapTime);
 				GfParmSetStr(results, path, RE_ATTR_MODULE, car->_modName);
@@ -408,6 +412,7 @@ ReStoreRaceResults(const char *race)
 				
 					GfParmSetStr(results, path, RE_ATTR_NAME, car->_name);
 				
+					GfParmSetStr(results, path, RE_ATTR_SNAME, car->_sname);
 					snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", car->_carName, car->_carName);
 					carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 					carName = GfParmGetName(carparam);

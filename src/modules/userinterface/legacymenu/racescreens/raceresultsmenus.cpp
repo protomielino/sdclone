@@ -277,9 +277,9 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
 								   buf, GFUI_TPL_X, y, GFUI_TPL_FONTID, GFUI_TPL_WIDTH,
 								   GFUI_TPL_ALIGN, GFUI_TPL_MAXLEN, aColor);
 
-        //Driver name
+        //Driver short name
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "DriverName", true, // From template.
-								   GfParmGetStr(results, path, RE_ATTR_NAME, ""), GFUI_TPL_X, y);
+								   GfParmGetStr(results, path, RE_ATTR_SNAME, ""), GFUI_TPL_X, y);
 
         //Driver type
         const std::string strModName = GfParmGetStr(results, path, RE_ATTR_MODULE, "");
@@ -419,9 +419,9 @@ rmQualifResults(void *prevHdle, tRmInfo *info, const char* pszTitle, int start)
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Rank", true, // From template.
 								   buf, GFUI_TPL_X, y);
 
-        //Driver name
+        //Driver short name
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "DriverName", true, // From template.
-								   GfParmGetStr(results, path, RE_ATTR_NAME, ""), GFUI_TPL_X, y);
+								   GfParmGetStr(results, path, RE_ATTR_SNAME, ""), GFUI_TPL_X, y);
 
         //Driver type
         const std::string strModName = GfParmGetStr(results, path, RE_ATTR_MODULE, "");
@@ -560,15 +560,15 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 	const int nbCars = (int)GfParmGetEltNb(results, RE_SECT_STANDINGS);
 	for (i = start; i < MIN(start + nMaxLines, nbCars); i++) {
 		snprintf(path, sizeof(path), "%s/%d", RE_SECT_STANDINGS, i + 1);
-		
+
         //Rank
         snprintf(buf, sizeof(buf), "%d", i+1);
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Rank", true, // From template.
 								   buf, GFUI_TPL_X, y);
 
-        //Driver name
+        //Driver short name
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "DriverName", true, // From template.
-								   GfParmGetStr(results, path, RE_ATTR_NAME, ""), GFUI_TPL_X, y);
+								   GfParmGetStr(results, path, RE_ATTR_SNAME, ""), GFUI_TPL_X, y);
 
         //Driver type
         const std::string strModName = GfParmGetStr(results, path, RE_ATTR_MODULE, "");
