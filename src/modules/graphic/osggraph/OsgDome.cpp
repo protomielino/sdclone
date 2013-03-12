@@ -271,7 +271,7 @@ bool SDSkyDome::reposition( const osg::Vec3f& p, double spin )
 {
    // asl = _asl;
 
-    osg::Matrix T, LON, LAT, SPIN;
+    osg::Matrix T, SPIN;
 
     T.makeTranslate( p );
     SPIN.makeRotate(spin, osg::Vec3(0, 0, 1));
