@@ -595,7 +595,7 @@ cGrBoard::grDispCarBoard2(const tSituation *s)
   // Display car ahead and diff
   color = ahead_color_;
   if (car_->_pos != 1) {
-    snprintf(buf, sizeof(buf), "%s", s->cars[car_->_pos - 2]->_name);
+    snprintf(buf, sizeof(buf), "%s", s->cars[car_->_pos - 2]->_sname);
     GfuiDrawString(buf, color, GFUI_FONT_SMALL_C, x, y);
     if (s->_raceType == RM_TYPE_RACE) {
       if (s->cars[car_->_pos - 2]->_laps == car_->_laps) {
@@ -623,7 +623,7 @@ cGrBoard::grDispCarBoard2(const tSituation *s)
   // Display car behind and diff
   color = normal_color_;  //white
   if (car_->_pos != s->_ncars) {
-    snprintf(buf, sizeof(buf), "%s", s->cars[car_->_pos]->_name);
+    snprintf(buf, sizeof(buf), "%s", s->cars[car_->_pos]->_sname);
     GfuiDrawString(buf, color, GFUI_FONT_SMALL_C, x, y);
     if (s->_raceType == RM_TYPE_RACE) {
       if (s->cars[car_->_pos]->_laps == car_->_laps) {
@@ -856,8 +856,8 @@ cGrBoard::grDispLeaderBoard(const tSituation *s)
       else
         color = normal_color_;
 
-      // Driver position + name
-      snprintf(buf, sizeof(buf), "%3d: %s", i + 1, s->cars[i]->_name);
+      // Driver position + short name
+      snprintf(buf, sizeof(buf), "%3d: %s", i + 1, s->cars[i]->_sname);
       GfuiDrawString(buf, color, GFUI_FONT_SMALL_C, x, y);
 
       // Display driver time / time behind leader / laps behind leader
@@ -1066,7 +1066,7 @@ cGrBoard::grDispArcade(const tSituation *s)
                 width, GFUI_ALIGN_HR);
 
   // Display driver name
-  snprintf(buf, sizeof(buf), "%s", car_->_name);
+  snprintf(buf, sizeof(buf), "%s", car_->_sname);
   GfuiDrawString(buf, arcade_color_, GFUI_FONT_LARGE_C, x, y,
                 width, GFUI_ALIGN_HC);
 
@@ -1585,8 +1585,8 @@ cGrBoard::grDispLeaderBoardScroll(const tSituation *s)
       color = (i == current)
         ? emphasized_color_ : grCarInfo[s->cars[i]->index].iconColor;
 
-      // Driver position + name
-      snprintf(buf, sizeof(buf), "%3d: %s", i + 1, s->cars[i]->_name);
+      // Driver position + short name
+      snprintf(buf, sizeof(buf), "%3d: %s", i + 1, s->cars[i]->_sname);
       GfuiDrawString(buf, color, GFUI_FONT_SMALL_C, x, y);
 
       // Display driver time / time behind leader / laps behind leader
