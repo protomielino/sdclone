@@ -169,6 +169,9 @@ void cGrScreen::setCurrentCar(tCarElt *newCurCar)
 {
 	curCar = newCurCar; 
 
+	// probably don't want to clear entry in 'graph.xml'
+	if (newCurCar == NULL) return;
+
 	if (curCar)
 	{
 		sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
