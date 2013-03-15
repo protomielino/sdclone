@@ -1627,11 +1627,6 @@ cGrBoard::grDispLeaderBoardScroll(const tSituation *s)
 void
 cGrBoard::grDispLeaderBoardScrollLine(const tSituation *s)
 {
-  // At the start of the race or when first engaging this mode,
-  // we generate the 3-letter names to be used
-  if (iTimer == 0 || iStringStart == 0 || sShortNames.size() == 0)
-    grMakeThreeLetterNames(s);
-
   // At first, get the current time and rebuild the ScrollLine text
   if (iTimer == 0 || s->currentTime < iTimer) {
     iTimer = s->currentTime;
@@ -1651,7 +1646,7 @@ cGrBoard::grDispLeaderBoardScrollLine(const tSituation *s)
       // Driver position + name
       osRoster.width(3);
       osRoster << (i + 1);
-      osRoster << ": " << sShortNames[i];
+      osRoster << ": " << s->cars[i]->_cname;
 
       // Display driver time / time behind leader / laps behind leader
       string sEntry = grGenerateLeaderBoardEntry(s->cars[i], s, (i == 0));
@@ -1763,54 +1758,6 @@ cGrBoard::grGenerateLeaderBoardEntry(const tCarElt *car, const tSituation* s,
 
   return buf;
 }
-
-
-/**
- * grMakeThreeLetterNames
- *
- * Let's build an array of 3-letter name abbreviations (sShortNames).
- * As we follow original name order, this array can be indexed
- * the same as the original names' array.
- *
- * @param s situation provided by SD
- */
-void
-cGrBoard::grMakeThreeLetterNames(const tSituation *s)
-{
-  // Build up two arrays of the original and the short names, same order.
-  sShortNames.clear();
-  std::vector<string> origNames;
-  for (int i = 0; i < s->_ncars; i++) {  // Loop over each name in the race
-    string st(s->cars[i]->_name);
-    origNames.push_back(st);
-    remove(st.begin(), st.end(), ' ');  // Remove spaces
-    sShortNames.push_back(st.substr(0, 3));  // Cut to 3 characters
-  }  // for i
-  // Copy to hold original 3-letter names, for search
-  std::vector<string> origShortNames(sShortNames);
-
-  // Check for matching names
-  for (unsigned int i = 0; i < sShortNames.size(); i++) {
-    string sSearch(origShortNames[i]);
-    for (unsigned int j = i + 1; j < sShortNames.size(); j++) {
-      if (sSearch == origShortNames[j]) {  // Same 3-letter name found
-        // Let's find the first mismatching character
-        unsigned int k;
-        for (k = 0;
-                k < std::min(origNames[i].size(), origNames[j].size());
-                ++k) {
-          if (origNames[i][k] != origNames[j][k]) break;
-        }   // for k
-        // Set 3rd char of the short name to the mismatching char (or last one).
-        // It is the driver designer's responsibility from now on
-        // to provide some unsimilarities between driver names.
-        sShortNames[i][2] = origNames[i][k];
-        sShortNames[j][2] = origNames[j][k];
-      }  // if sSearch
-    }   // for j
-  }     // for i
-    // 3-letter name array ready to use!
-}   // grMakeThreeLetterName
 
 
 /**

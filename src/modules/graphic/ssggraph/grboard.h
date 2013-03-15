@@ -47,12 +47,11 @@ class cGrBoard
     int centerAnchor;
     int rightAnchor;
     int speedoRise;
-    std::vector<std::string> sShortNames;
     // Scrolling leaderboard variables
     int iStart;
     double iTimer;
     int iStringStart;
-    std::string st;     // This is the line we will display in the bottom
+    std::string st;     // This is the line we will display in the top
 
  private:
     void grDispDebug(const tSituation *s, const cGrFrameInfo* frame);
@@ -83,7 +82,6 @@ class cGrBoard
                         double &time, int *laps_different, float **color);
     void grGetLapsTime(const tSituation *s, char* result,
                         char const** label) const;
-    void grMakeThreeLetterNames(const tSituation *s);
     void grSetupDrawingArea(int xl, int yb, int xr, int yt) const;
 
 private:
