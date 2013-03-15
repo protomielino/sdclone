@@ -88,6 +88,7 @@ typedef struct RobotItf {
 
 #define ROB_ATTR_NAME		"name"
 #define ROB_ATTR_SNAME		"short name"
+#define ROB_ATTR_CODE		"code name" //3-letter abbreviated name
 #define ROB_ATTR_TEAM		"team"
 #define ROB_ATTR_DESC		"desc"
 #define ROB_ATTR_AUTHOR		"author"
