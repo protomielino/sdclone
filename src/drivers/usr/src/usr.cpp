@@ -333,24 +333,25 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
   } else {
     // For schismatic robots NBBOTS is unknown!
     // Handle error here
-    NBBOTS = 1;
+    NBBOTS = 0;
+    // But this is not considered a real failure of moduleWelcome !
   }
   GfOut("NBBOTS: %d (of %d)\n", NBBOTS, MAXNBBOTS);
 
   if (strncmp(robot_name, "usr_trb1", strlen("usr_trb1")) == 0)
-		SetupUSR_trb1();
+    SetupUSR_trb1();
   else if (strncmp(robot_name,"usr_sc", strlen("usr_sc")) == 0)
-		SetupUSR_sc();
+    SetupUSR_sc();
   else if (strncmp(robot_name,"usr_ls1", strlen("usr_ls1")) == 0)
-		SetupUSR_ls1();
+    SetupUSR_ls1();
   else if (strncmp(robot_name,"usr_ls2", strlen("usr_ls2")) == 0)
-		SetupUSR_ls2();
+    SetupUSR_ls2();
   else if (strncmp(robot_name,"usr_36GP", strlen("usr_36GP")) == 0)
-		SetupUSR_36GP();
+    SetupUSR_36GP();
   else if (strncmp(robot_name,"usr_rs", strlen("usr_rs")) == 0)
-		SetupUSR_rs();
+    SetupUSR_rs();
   else if (strncmp(robot_name,"usr_lp1", strlen("usr_lp1")) == 0)
-		SetupUSR_lp1();
+    SetupUSR_lp1();
 
   // Set max nb of interfaces to return.
   welcomeOut->maxNbItf = NBBOTS;

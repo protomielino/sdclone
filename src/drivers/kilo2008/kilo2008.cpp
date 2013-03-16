@@ -159,6 +159,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
   } else {  // if robot settings XML could not be read
     // For schismatic robots NBBOTS is unknown! Handle error here
     NBBOTS = 0;
+    // But this is not considered a real failure of moduleWelcome !
   }  // if pRobotSettings
 
   setupKilo2008();
@@ -226,9 +227,9 @@ extern "C" int kilo2008(tModInfo *modInfo) {
 
 
 // Module exit point (TORCS backward compatibility scheme).
-extern "C" int kiloShutdown() {
+extern "C" int kilo2008Shut() {
   return moduleTerminate();
-}  // kiloShutdown
+}  // kilo2008Shut
 
 
 // Module interface initialization.

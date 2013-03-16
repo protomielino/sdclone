@@ -502,8 +502,7 @@ int moduleWelcomeV1_00
 			GetLocalDir(),GetDataDir(),RobPathXMLRel);
 
 		NBBOTS = 0;
-	    welcomeOut->maxNbItf = NBBOTS;
-	    return -1;
+		// But this is not considered a real failure of moduleWelcome !
 	}
 
 	// Handle additional settings for wellknown identities
