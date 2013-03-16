@@ -177,6 +177,8 @@ SimCarUpdateForces(tCar *car)
 	tdble	SinTheta;
 	tdble	Cosz, Sinz;
 	tdble	v, R, Rv, Rm, Rx, Ry;
+	tdble	carspeed;
+	tdble	desiredF, desiredTq;
 	
 	Cosz = car->Cosz = cos(car->DynGCg.pos.az);
 	Sinz = car->Sinz = sin(car->DynGCg.pos.az);
@@ -255,6 +257,24 @@ SimCarUpdateForces(tCar *car)
 	} else {
 		Rm = (tdble) (SIGN(car->DynGCg.vel.az) * R * car->wheelbase / 2.0);
 	}
+	F.M.z -= Rm;
+	
+	/* simulate sticking when car almost stationary */
+	carspeed = car->DynGC.vel.x * car->DynGC.vel.x 
+	      + car->DynGC.vel.y * car->DynGC.vel.y + car->DynGC.vel.z * car->DynGC.vel.z;
+	if ((car->features & FEAT_SLOWGRIP) && ( carspeed < 0.1 ) ) {
+		w = -w; //make it positive
+		/* desired force to stop sideway slide */
+		desiredF = - m * car->DynGC.vel.y / SimDeltaTime;
+		if ( (fabs(desiredF - F.F.y)) < w ) {F.F.y = desiredF;}
+		else if ( (desiredF - F.F.y) > 0.0 ) {F.F.y += w;}
+		else {F.F.y -= w;}
+		/* desired torque to stop yaw */
+		desiredTq = - car->DynGC.vel.az / ( SimDeltaTime * car->Iinv.z );
+		if ( (fabs(desiredTq - F.M.z)) < 0.5 * w * car->wheelbase) {F.M.z = desiredTq;}
+		else if ( (desiredTq - F.M.z) > 0.0 ) {F.M.z += 0.5 * w * car->wheelbase;}
+		else {F.M.z -= 0.5 * w * car->wheelbase;}
+	}
 	
 	/* compute accelerations */
 	car->DynGC.acc.x = F.F.x * minv;
@@ -267,7 +287,7 @@ SimCarUpdateForces(tCar *car)
 	
 	car->DynGCg.acc.ax = car->DynGC.acc.ax = F.M.x * car->Iinv.x;
 	car->DynGCg.acc.ay = car->DynGC.acc.ay = F.M.y * car->Iinv.y;
-	car->DynGCg.acc.az = car->DynGC.acc.az = (F.M.z - Rm) * car->Iinv.z;
+	car->DynGCg.acc.az = car->DynGC.acc.az = F.M.z * car->Iinv.z;
 }
 
 static void
