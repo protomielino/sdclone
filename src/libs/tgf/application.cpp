@@ -100,6 +100,7 @@ void GfApplication::initialize(bool bLoggingEnabled, int argc, char **argv)
 	
 	// Help about the command line options.
 	addOptionsHelpSyntaxLine("[-v|--version]");
+	addOptionsHelpSyntaxLine("[-h|--help]");
 	addOptionsHelpSyntaxLine("[-lc|--localdir <dir path>] [-ld|--libdir <dir path>]");
 	addOptionsHelpSyntaxLine("[-bd|--bindir <dir path>] [-dd|--datadir <dir path>]");
 #ifdef TRACE_OUT
