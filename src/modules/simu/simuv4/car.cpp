@@ -232,7 +232,7 @@ SimCarUpdateForces(tCar *car)
 	}
 	
 	/* Rolling Resistance */
-	v = sqrt(car->DynGCg.vel.x * car->DynGCg.vel.x + car->DynGCg.vel.y * car->DynGCg.vel.y);
+	v = car->DynGC.vel.xy;
 	R = 0;
 	for (i = 0; i < 4; i++) {
 		R += car->wheel[i].rollRes;
@@ -249,8 +249,10 @@ SimCarUpdateForces(tCar *car)
 	} else {
 		Rv = 0;
 	}
-	Rx = Rv * car->DynGCg.vel.x;
-	Ry = Rv * car->DynGCg.vel.y;
+	Rx = Rv * car->DynGC.vel.x;
+	Ry = Rv * car->DynGC.vel.y;
+	F.F.x -= Rx;
+	F.F.y -= Ry;
 	
 	if ((R * car->wheelbase / 2.0 * car->Iinv.z) > fabs(car->DynGCg.vel.az)) {
 		Rm = car->DynGCg.vel.az / car->Iinv.z;
@@ -281,8 +283,8 @@ SimCarUpdateForces(tCar *car)
 	car->DynGC.acc.y = F.F.y * minv;
 	car->DynGC.acc.z = F.F.z * minv;
 	
-	car->DynGCg.acc.x = (F.F.x * Cosz - F.F.y * Sinz - Rx) * minv;
-	car->DynGCg.acc.y = (F.F.x * Sinz + F.F.y * Cosz - Ry) * minv;
+	car->DynGCg.acc.x = (F.F.x * Cosz - F.F.y * Sinz) * minv;
+	car->DynGCg.acc.y = (F.F.x * Sinz + F.F.y * Cosz) * minv;
 	car->DynGCg.acc.z = car->DynGC.acc.z;
 	
 	car->DynGCg.acc.ax = car->DynGC.acc.ax = F.M.x * car->Iinv.x;
