@@ -88,25 +88,25 @@ void GfApplication::initialize(bool bLoggingEnabled, int argc, char **argv)
 	GfLogInfo("\n");
 
     // Register the command line options (to be parsed).
-	registerOption("h", "help", /* nHasValue = */ false);
-	registerOption("v", "version", /* nHasValue = */ false);
-	registerOption("l", "localdir", /* nHasValue = */ true);
-	registerOption("L", "libdir", /* nHasValue = */ true);
-	registerOption("B", "bindir", /* nHasValue = */ true);
-	registerOption("D", "datadir", /* nHasValue = */ true);
-	registerOption("e", "tracelevel", /* nHasValue = */ true);
-	registerOption("t", "tracestream", /* nHasValue = */ true);
-	registerOption("n", "norandom", /* nHasValue = */ false);
+	registerOption("h",  "help", /* nHasValue = */ false);
+	registerOption("v",  "version", /* nHasValue = */ false);
+	registerOption("lc", "localdir", /* nHasValue = */ true);
+	registerOption("ld", "libdir", /* nHasValue = */ true);
+	registerOption("bd", "bindir", /* nHasValue = */ true);
+	registerOption("dd", "datadir", /* nHasValue = */ true);
+	registerOption("tl", "tracelevel", /* nHasValue = */ true);
+	registerOption("ts", "tracestream", /* nHasValue = */ true);
+	registerOption("nr", "norandom", /* nHasValue = */ false);
 	
 	// Help about the command line options.
-	addOptionsHelpSyntaxLine("[-l|--localdir <dir path>] [-L|--libdir <dir path>]");
-	addOptionsHelpSyntaxLine("[-B|--bindir <dir path>] [-D|--datadir <dir path>]");
-#ifdef TRACE_OUT
-	addOptionsHelpSyntaxLine("[-e|--tracelevel <integer>]"
-							 " [-t|--tracestream stdout|stderr|<file name>]");
-#endif
 	addOptionsHelpSyntaxLine("[-v|--version]");
-	addOptionsHelpSyntaxLine("[-n|--norandom]");
+	addOptionsHelpSyntaxLine("[-lc|--localdir <dir path>] [-ld|--libdir <dir path>]");
+	addOptionsHelpSyntaxLine("[-bd|--bindir <dir path>] [-dd|--datadir <dir path>]");
+#ifdef TRACE_OUT
+	addOptionsHelpSyntaxLine("[-tl|--tracelevel <integer>]"
+							 " [-ts|--tracestream stdout|stderr|<file name>]");
+#endif
+	addOptionsHelpSyntaxLine("[-nr|--norandom]");
 	
 	addOptionsHelpExplainLine
 		("- locadir : Root dir of the tree where user settings files are stored");
