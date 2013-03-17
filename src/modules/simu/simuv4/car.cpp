@@ -177,7 +177,6 @@ SimCarUpdateForces(tCar *car)
 	tdble	SinTheta;
 	tdble	Cosz, Sinz;
 	tdble	v, R, Rv, Rm, Rx, Ry;
-	tdble	carspeed;
 	tdble	desiredF, desiredTq;
 	
 	Cosz = car->Cosz = cos(car->DynGCg.pos.az);
@@ -251,6 +250,7 @@ SimCarUpdateForces(tCar *car)
 	}
 	Rx = Rv * car->DynGC.vel.x;
 	Ry = Rv * car->DynGC.vel.y;
+
 	F.F.x -= Rx;
 	F.F.y -= Ry;
 	
@@ -262,9 +262,7 @@ SimCarUpdateForces(tCar *car)
 	F.M.z -= Rm;
 	
 	/* simulate sticking when car almost stationary */
-	carspeed = car->DynGC.vel.x * car->DynGC.vel.x 
-	      + car->DynGC.vel.y * car->DynGC.vel.y + car->DynGC.vel.z * car->DynGC.vel.z;
-	if ((car->features & FEAT_SLOWGRIP) && ( carspeed < 0.1 ) ) {
+	if ((car->features & FEAT_SLOWGRIP) && ( v < 0.1 ) ) {
 		w = -w; //make it positive
 		/* desired force to stop sideway slide */
 		desiredF = - m * car->DynGC.vel.y / SimDeltaTime;
@@ -276,8 +274,15 @@ SimCarUpdateForces(tCar *car)
 		if ( (fabs(desiredTq - F.M.z)) < 0.5 * w * car->wheelbase) {F.M.z = desiredTq;}
 		else if ( (desiredTq - F.M.z) > 0.0 ) {F.M.z += 0.5 * w * car->wheelbase;}
 		else {F.M.z -= 0.5 * w * car->wheelbase;}
+		/* desired force to really stop the car when braking to 0 */
+		if ( (car->ctrl->brakeCmd > 0.05) && (fabs(car->DynGC.vel.x) < 0.02) ) {
+			desiredF = - m * car->DynGC.vel.x / SimDeltaTime;
+			if ( (fabs(desiredF - F.F.x)) < w ) {F.F.x = desiredF;}
+			else if ( (desiredF - F.F.x) > 0.0 ) {F.F.x += w;}
+			else {F.F.x -= w;}
+		}
 	}
-	
+	//printf(" Fx=%g dF=%g Fy=%g dTq=%g Mz=%g\n",F.F.x,desiredF,F.F.y,desiredTq,F.M.z);
 	/* compute accelerations */
 	car->DynGC.acc.x = F.F.x * minv;
 	car->DynGC.acc.y = F.F.y * minv;

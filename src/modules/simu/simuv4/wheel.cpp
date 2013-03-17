@@ -207,7 +207,11 @@ void SimWheelUpdateForce(tCar *car, int index)
 	if ((wheel->state & SIM_SUSP_EXT) != 0) {
 		sx = sy = 0.0f;
 	} else if (v < 0.000001f) {
-		sx = wrl;
+		if (car->features & FEAT_SLOWGRIP) {
+			sx = -wrl;
+		} else {
+			sx = wrl;
+		}
 		sy = 0.0f;
 	} else {
 		if (car->features & FEAT_SLOWGRIP) {
@@ -258,8 +262,13 @@ void SimWheelUpdateForce(tCar *car, int index)
 		Fn -= F * sy / s;
 	}
 
-	FLOAT_RELAXATION2(Fn, wheel->preFn, 50.0f);
-	FLOAT_RELAXATION2(Ft, wheel->preFt, 50.0f);
+	if (car->features & FEAT_SLOWGRIP) {
+		wheel->preFn = Fn;
+		wheel->preFt = Ft;
+	} else {
+		FLOAT_RELAXATION2(Fn, wheel->preFn, 50.0f);
+		FLOAT_RELAXATION2(Ft, wheel->preFt, 50.0f);
+	}
 
 	wheel->relPos.az = waz;
 
@@ -304,7 +313,20 @@ SimWheelUpdateRotation(tCar *car)
 		wheel->torques.z = deltan * wheel->sinax;
 		/*update rotation*/
 		wheel->spinVel = wheel->in.spinVel;
-		FLOAT_RELAXATION2(wheel->spinVel, wheel->prespinVel, 50.0f);
+		
+		if ( (car->features & FEAT_SLOWGRIP) && ( wheel->brake.Tq == 0.0) ) {
+			/* prevent wheelspin value oscillating around wheel tangential velocity */
+			tdble waz = wheel->steer + wheel->staticPos.az;
+			tdble vt = wheel->bodyVel.x * cos(waz) + wheel->bodyVel.y * sin(waz);
+			tdble wrl = wheel->spinVel * wheel->radius;
+			tdble oldwrl = wheel->prespinVel * wheel->radius;
+			if( (vt-wrl)*(vt-oldwrl) < 0.0 ) {
+				wheel->spinVel = vt / wheel->radius;
+			}
+			wheel->prespinVel = wheel->spinVel;
+		} else {
+			FLOAT_RELAXATION2(wheel->spinVel, wheel->prespinVel, 50.0f);
+		}
 
 		wheel->relPos.ay += wheel->spinVel * SimDeltaTime;
 		FLOAT_NORM_PI_PI(wheel->relPos.ay);
