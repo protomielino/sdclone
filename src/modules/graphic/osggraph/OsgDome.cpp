@@ -204,8 +204,8 @@ bool SDSkyDome::repaint( const Vec3f& sky_color,
    osg::Vec3f middle_param, middle_diff;
 
    // Check for sunrise/sunset condition
-   sun_angle = osg::RadiansToDegrees(sun_angle);
-   if (sun_angle > 80)
+   //sun_angle = osg::RadiansToDegrees(sun_angle);
+   if (sun_angle > 80.0)
    {
        // 0.0 - 0.4
        double sunAngleFactor = 10.0 - fabs(90.0 - sun_angle);

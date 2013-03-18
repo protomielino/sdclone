@@ -38,20 +38,21 @@ class	SDScenery;
 class SDBackground
 {
 	osg::ref_ptr<osg::Group> _background;
+	osg::ref_ptr<osg::Group> _scenery;
 	osg::ref_ptr<osg::MatrixTransform>	 _background_transform;
-	
+
 	bool	_type;
-	
+
 public:
-	
-	// Constructor	
+
+	// Constructor
 	SDBackground(void);
-	
+
 	// Destructor
 	~SDBackground(void);
-	
+
 	osg::Node *build(bool type, int X, int Y, int Z, const std::string strTrack);
-	void reposition(int X, int Y);	
+	void reposition(int X, int Y);
 };
 
 /*class SDSpectators
@@ -59,7 +60,7 @@ public:
 private:
 
 	osg::ref_prt<osg::Node>	_spectators;
-	
+
 	int	_number;
 
 public:
@@ -74,7 +75,7 @@ class SDTrees
 private:
 
 	osg::ref_ptr<osg::Node> _trees;
-	
+
 public:
 
 	void SDTrees(void);
@@ -95,27 +96,27 @@ private:
 	//SDTrees	*m_trees;
 	osg::ref_ptr<osg::Group> _scenery;
 	osg::ref_ptr<osg::Group> _background;
-	
+
     int _grWrldX;
     int _grWrldY;
     int _grWrldZ;
     int _grWrldMaxSize;
     int _max_visibility;
-	int _nb_cloudlayer;
-	int _DynamicSkyDome;
-	int _SkyDomeDistance;
-	int _SkyDomeDistThresh;
-	
+        int _nb_cloudlayer;
+        int _DynamicSkyDome;
+        int _SkyDomeDistance;
+        int _SkyDomeDistThresh;
+
 	bool _bgtype;
 	bool _bgsky;
 
 	//_spectators = 0;
 	//_trees = 0;
 	//_pits = 0;
-	std::string _strTexturePath;	
-	
+	std::string _strTexturePath;
 
-	
+
+
 	void LoadGraphicsOptions();
 	void LoadSkyOptions();
 	void CustomizePits(void);
@@ -123,26 +124,26 @@ private:
 
 
 public:
-	
+
 	/* Constructor */
 	SDScenery(void);
-	
+
 	/* Destructor */
 	~SDScenery(void);
-	
+
 	osg::Node *LoadScene(tTrack *track);
 	void	CreatePit(tTrack *track);
 	//void	addSpectators(SDSpectators->build(number, tTrack *track));
 	//void	addTrees(SDTrees->build(tTrack *track));
 	void 	ShutdownScene(void);
-	//void	
+	//void
 
     inline static int getWorldX(){return grWrldX;}
     inline static int getWorldY(){return grWrldY;}
     inline static int getWorldZ(){return grWrldZ;}
     inline static int getWorldMaxSize(){return grWrldMaxSize;}
-	
-	//osg::Node* getPreRoot() { return pre_root.get(); }
+
+        //osg::Node* getPreRoot() { return pre_root.get(); }
 
 	//osg::ref_ptr<osg::Group>	getSDScenery { return _scenery };
 	//osg::Group	getSDBackground { return SDBackground->getbackground; }
