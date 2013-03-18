@@ -62,7 +62,7 @@ static double SDVisibility = 0.0f;
 
 #define MAX_BODIES	2
 #define MAX_CLOUDS	3
-#define NMaxStars	1000
+#define NMaxStars	3000
 #define NPLANETS		0	//No planets displayed
 #define NB_BG_FACES	36	//Background faces
 #define BG_DIST			1.0f
@@ -72,10 +72,14 @@ static double SDVisibility = 0.0f;
 #define SCARCE_CLOUD 5
 #define COVERAGE_CLOUD 8
 
+static const osg::Vec4 BaseSkyColor ( 0.31f, 0.43f, 0.69f, 1.0f );
+
 static osg::Vec3d *AStarsData = NULL;
 static osg::Vec3d *APlanetsData = NULL;
 static int NStars;
 static int NPlanets;
+static float sol_angle;
+static float moon_angle;
 
 static osg::ref_ptr<osg::Group> RealRoot = new osg::Group;
 
@@ -105,7 +109,7 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     GfOut("SDSky class\n");
     int SDSkyDomeDistance = 12000;
 
-    int NStars = NMaxStars;
+    NStars = NMaxStars;
     if (AStarsData)
         delete [] AStarsData;
 
@@ -120,7 +124,7 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
 
     GfLogInfo("  Stars (random) : %d\n", NStars);
 
-    int NPlanets = 0;
+    NPlanets = 0;
     APlanetsData = NULL;
 
     GfLogInfo("  Planets : %d\n", NPlanets);
@@ -172,7 +176,8 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
 
     thesky->reposition( viewPos, 0, 0);
     UpdateLight();
-    //thesky->repaint()
+    thesky->repaint(SkyColor, FogColor, CloudsColor, sol_angle, moon_angle, NPlanets,
+                    APlanetsData, NStars, AStarsData);
 
     osg::Group* sceneGroup = new osg::Group;
     sceneGroup->addChild(m_sceneroot);
@@ -215,8 +220,8 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
 
 void SDRender::UpdateLight( void )
 {
-    const float sol_angle = (float)thesky->getSA();
-    const float moon_angle = (float)thesky->getMA();
+    sol_angle = (float)thesky->getSA();
+    moon_angle = (float)thesky->getMA();
     float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
 
     GfOut("Sun Angle in Render = %f\n", sol_angle);

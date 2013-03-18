@@ -62,10 +62,10 @@ cGrSky::~cGrSky( void )
 
 
 void cGrSky::build( double h_radius, double v_radius,
-					 double sun_size, double sun_dist, 
+					 double sun_size, double sun_dist,
 					 double moon_size, double moon_dist,
 				     int nplanets, sgdVec3 *planet_data,
-                     int nstars, sgdVec3 *star_data )
+		     int nstars, sgdVec3 *star_data )
 {
   delete dome;
   delete sun;
@@ -148,23 +148,23 @@ bool cGrSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 	double angle;
 	double rotation;
 	sgCoord pos;
-	
+
 	// Calc angles for rise/set effects
 
 	sun->reposition( view_pos, 0 );
 	moon->reposition( view_pos, 0 );
 
     sun->getSunPosition ( & pos );
-	calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
+    calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
     sun->setSunAngle( angle );
     sun->setSunRotation( rotation );
 
-	moon->getMoonPosition ( & pos );
-	calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
+    moon->getMoonPosition ( & pos );
+    calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
     moon->setMoonAngle( angle );
     moon->setMoonRotation( rotation );
 
-	for ( i = 0; i < clouds.getNum (); i++ ) 
+	for ( i = 0; i < clouds.getNum (); i++ )
 	{
 		clouds.get(i)->repositionFlat( view_pos, dt );
 	}
@@ -203,7 +203,7 @@ bool cGrSky::repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, do
 {
   int i;
 
-  if ( effective_visibility > 300.0 ) 
+  if ( effective_visibility > 300.0 )
   {
     // turn on sky
     enable();
@@ -221,7 +221,7 @@ bool cGrSky::repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, do
     stars->repaint( sol_angle, nstars, star_data );
 
   }
-  else 
+  else
   {
     // turn off sky
     disable();
@@ -242,11 +242,11 @@ void cGrSky::postDraw( float alt )
 	// Sort clouds in order of distance from alt (furthest to closest)
 	int i, j;
 	int num = clouds.getNum ();
-	if ( num > 0 ) 
+	if ( num > 0 )
 	{
 		// Initialise cloud index
 		int *index = new int [ num ];
-		for ( i = 0; i < num; i++ ) 
+		for ( i = 0; i < num; i++ )
 		{
 			index [i] = i;
 		}
@@ -271,7 +271,7 @@ void cGrSky::postDraw( float alt )
 
 		float slop = 5.0; // if we are closer than this to a cloud layer, don't draw cloud
 
-		for ( int i = 0; i < num; i++ ) 
+		for ( int i = 0; i < num; i++ )
 		{
 			cGrCloudLayer *cloud = clouds.get(index[i]);
 
@@ -291,11 +291,11 @@ void cGrSky::modifyVisibility( float alt, float time_factor )
 {
   float effvis = visibility;
 
-  for ( int i = 0; i < clouds.getNum (); ++i ) 
+  for ( int i = 0; i < clouds.getNum (); ++i )
   {
     cGrCloudLayer *cloud = clouds.get(i);
 
-    if ( cloud->isEnabled() ) 
+    if ( cloud->isEnabled() )
     {
       float asl = cloud->getElevation();
       float thickness = cloud->getThickness();
@@ -303,27 +303,27 @@ void cGrSky::modifyVisibility( float alt, float time_factor )
 
       float ratio = 1.0;
 
-      if ( alt < asl - transition ) 
+      if ( alt < asl - transition )
       {
         // below cloud layer
         ratio = 1.0;
       }
-      else if ( alt < asl ) 
+      else if ( alt < asl )
       {
         // in lower transition
         ratio = (asl - alt) / transition;
       }
-      else if ( alt < asl + thickness ) 
+      else if ( alt < asl + thickness )
       {
         // in cloud layer
         ratio = 0.0;
       }
-      else if ( alt < asl + thickness + transition ) 
+      else if ( alt < asl + thickness + transition )
       {
         // in upper transition
         ratio = (alt - (asl + thickness)) / transition;
       }
-      else 
+      else
       {
         // above cloud layer
         ratio = 1.0;
@@ -332,56 +332,56 @@ void cGrSky::modifyVisibility( float alt, float time_factor )
       // accumulate effects from multiple cloud layers
       effvis *= ratio;
 
-      if ( ratio < 1.0 ) 
+      if ( ratio < 1.0 )
       {
-        if ( ! in_puff ) 
-	{
+        if ( ! in_puff )
+        {
           // calc chance of entering cloud puff
           double rnd = grRandom();
           double chance = rnd * rnd * rnd;
-          if ( chance > 0.95 ) 
-	  { 
+          if ( chance > 0.95 )
+          {
             in_puff = true;
             puff_length = grRandom() * 2.0; // up to 2 seconds
             puff_progression = 0.0;
-	  }
-	}
+          }
+        }
 
-        if ( in_puff ) 
+	if ( in_puff )
 	{
-          // modify actual_visibility based on puff envelope
-          if ( puff_progression <= ramp_up ) 
+	  // modify actual_visibility based on puff envelope
+	  if ( puff_progression <= ramp_up )
 	  {
-            double x = 0.5 * SGD_PI * puff_progression / ramp_up;
-            double factor = 1.0 - sin( x );
-            effvis = (float)(effvis * factor);
+	    double x = 0.5 * SGD_PI * puff_progression / ramp_up;
+	    double factor = 1.0 - sin( x );
+	    effvis = (float)(effvis * factor);
 	  }
-	  else if ( puff_progression >= ramp_up + puff_length ) 
-     	  {
-            double x = 0.5 * SGD_PI * 
-              (puff_progression - (ramp_up + puff_length)) /
-              ramp_down;
-            double factor = sin( x );
-            effvis = (float)(effvis * factor);
+	  else if ( puff_progression >= ramp_up + puff_length )
+	  {
+	    double x = 0.5 * SGD_PI *
+	      (puff_progression - (ramp_up + puff_length)) /
+	      ramp_down;
+	    double factor = sin( x );
+	    effvis = (float)(effvis * factor);
 	  }
-	  else 
+	  else
   	  {
             effvis = 0.0;
-	  }
+          }
 
           puff_progression += time_factor;
 
-          if ( puff_progression > puff_length + ramp_up + ramp_down) 
+	  if ( puff_progression > puff_length + ramp_up + ramp_down)
 	  {
-            in_puff = false; 
+	    in_puff = false;
 	  }
 	}
 
         // never let visibility drop below 25 meters
-        if ( effvis <= 25.0 ) 
-	{
+        if ( effvis <= 25.0 )
+        {
           effvis = 25.0;
-	}
+        }
        }
      }
   } // for

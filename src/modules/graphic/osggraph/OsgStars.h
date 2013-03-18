@@ -24,7 +24,7 @@
 
 class SDStars
 {
-    osg::ref_ptr<osg::Vec4Array> cl;
+    osg::ref_ptr<osg::Vec4Array> stars_cl;
     int old_phase;
 
 public:

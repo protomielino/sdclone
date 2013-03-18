@@ -37,8 +37,7 @@
 #include "OsgMath.h"
 
 // Constructor
-SDStars::SDStars( void ) :
-old_phase(-1)
+SDStars::SDStars( void ) : old_phase(-1)
 {
 }
 
@@ -65,7 +64,7 @@ osg::Node* SDStars::build( int num, const osg::Vec3d star_data[], double star_di
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
     stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
 
-    cl = new osg::Vec4Array;
+    stars_cl = new osg::Vec4Array;
     osg::Vec3Array* vl = new osg::Vec3Array;
 
     for ( int i = 0; i < num; ++i )
@@ -75,13 +74,13 @@ osg::Node* SDStars::build( int num, const osg::Vec3d star_data[], double star_di
                                 star_dist * sin( star_data[i][0])
                                 * cos( star_data[i][1] ),
                                 star_dist * sin( star_data[i][1])));
-        cl->push_back(osg::Vec4(1, 1, 1, 1));
+        stars_cl->push_back(osg::Vec4(1, 1, 1, 1));
     }
 
     osg::Geometry* geometry = new osg::Geometry;
     geometry->setUseDisplayList(false);
     geometry->setVertexArray(vl);
-    geometry->setColorArray(cl.get());
+    geometry->setColorArray(stars_cl.get());
     geometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
     geometry->setNormalBinding(osg::Geometry::BIND_OFF);
     geometry->addPrimitiveSet(new osg::DrawArrays(GL_POINTS, 0, vl->size()));
@@ -89,6 +88,18 @@ osg::Node* SDStars::build( int num, const osg::Vec3d star_data[], double star_di
 
     return geode;
 }
+
+/*bool cGrStars::reposition( osg::Vec3f& p, double angle )
+{
+  osg::Matrix T, SPIN;
+  T.makeTranslate( p );
+  SPIN.makeRotate(spin, osg::Vec3(0, 0, 1));
+
+     star_transform->setMatrix( SPIN*T );
+
+  return true;
+}*/
+
 
 bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
 {
@@ -102,44 +113,54 @@ bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
         factor = 1.0;
         cutoff = 4.5;
         phase = 0;
+        //GfOut("Stars = %f\n", 10.0f);
     } else if ( sun_angle > (SD_PI_2 + 8.8 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 1.0;
         cutoff = 3.8;
         phase = 1;
+        //GfOut("Stars = %f\n", 8.0f);
     } else if ( sun_angle > (SD_PI_2 + 7.5 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.95;
         cutoff = 3.1;
         phase = 2;
+        //GfOut("Stars = %f\n", 7.5f);
     } else if ( sun_angle > (SD_PI_2 + 7.0 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.9;
         cutoff = 2.4;
         phase = 3;
+        //GfOut("Stars = %f\n", 7.0f);
     } else if ( sun_angle > (SD_PI_2 + 6.5 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.85;
         cutoff = 1.8;
         phase = 4;
+        //GfOut("Stars = %f\n", 6.5f);
     } else if ( sun_angle > (SD_PI_2 + 6.0 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.8;
         cutoff = 1.2;
         phase = 5;
+        //GfOut("Stars = %f\n", 6.0f);
     } else if ( sun_angle > (SD_PI_2 + 5.5 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.75;
         cutoff = 0.6;
         phase = 6;
+        //GfOut("Stars = %f\n", 5.5f);
     } else
     {
         factor = 0.7;
         cutoff = 0.0;
         phase = 7;
+        //GfOut("Stars default\n");
     }
 
-    if( phase != old_phase )
+    GfOut("Phase = %d - old_phase = %d\n", phase, old_phase);
+
+    if ( phase != old_phase )
     {
         old_phase = phase;
         for ( int i = 0; i < num; ++i )
@@ -150,20 +171,24 @@ bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
                 nmag = ( 4.5 - mag ) / 5.5;
                 alpha = nmag * 0.85 + 0.15;
                 alpha *= factor;
-            } else
+                //GfOut("Alpha = %f\n", alpha);
+            }
+            else
             {
                 alpha = 0.0;
+                //GfOut("Stars desactivée\n");
             }
 
             if (alpha > 1.0) { alpha = 1.0; }
             if (alpha < 0.0) { alpha = 0.0; }
 
-            (*cl)[i] = osg::Vec4(1, 1, 1, alpha);
+            (*stars_cl)[i] = osg::Vec4f(1.0f, 1.0f, 1.0f, (float)alpha);
         }
-        cl->dirty();
-    } else
+        stars_cl->dirty();
+    }
+    else
     {
-                // cout << "  no phase change, skipping" << endl;
+                //GfOut("  no phase change, skipping\n");
     }
 
     return true;

@@ -200,71 +200,76 @@ inline void sd_clampColor(osg::Vec3& color)
 bool SDSkyDome::repaint( const Vec3f& sky_color,
                     const Vec3f& fog_color, double sun_angle, double vis )
 {
-    osg::Vec3f outer_param, outer_amt, outer_diff;
-    osg::Vec3f middle_param, middle_amt, middle_diff;
+   osg::Vec3f outer_param, outer_diff;
+   osg::Vec3f middle_param, middle_diff;
 
-    // Check for sunrise/sunset condition
-    if (sun_angle > 80)
-    {
-        double sunAngleFactor = 10.0 - fabs(90.0 - sun_angle);
-        static const osg::Vec3f outerConstant(1.0 / 20.0, 1.0 / 40.0, -1.0 / 30.0);
-        static const osg::Vec3f middleConstant(1.0 / 40.0, 1.0 / 80.0, 0.0);
-        outer_param =  outerConstant * sunAngleFactor;
-        middle_param =  middleConstant * sunAngleFactor;
-        outer_diff = outer_param * (1.0 / 6.0);
-        middle_diff = middle_param * (1.0 / 6.0);
-    } else
-    {
-        outer_param = osg::Vec3f(0, 0, 0);
-        middle_param = osg::Vec3f(0, 0, 0);
-        outer_diff = osg::Vec3f(0, 0, 0);
-        middle_diff = osg::Vec3f(0, 0, 0);
-    }
+   // Check for sunrise/sunset condition
+   GfOut("Sun Angle in Dome = %f\n", sun_angle);
 
-    outer_amt  = outer_param;
-    middle_amt = middle_param;
+   if (sun_angle > 80)
+   {
+       // 0.0 - 0.4
+       double sunAngleFactor = 10.0 - fabs(90.0 - sun_angle);
+       static const osg::Vec3f outerConstant(1.0 / 20.0, 1.0 / 40.0, -1.0 / 30.0);
+       static const osg::Vec3f middleConstant(1.0 / 40.0, 1.0 / 80.0, 0.0);
+       outer_param = outerConstant * sunAngleFactor;
+       middle_param = middleConstant * sunAngleFactor;
+       outer_diff = outer_param * (1.0 / 6.0);
+       middle_diff = middle_param * (1.0 / 6.0);
+   } else
+   {
+       outer_param = osg::Vec3f(0, 0, 0);
+       middle_param = osg::Vec3f(0, 0, 0);
+       outer_diff = osg::Vec3f(0, 0, 0);
+       middle_diff = osg::Vec3f(0, 0, 0);
+   }
+   /*GfOut("  outer_red_param = %.2f  outer_red_diff = %.2f\n",
+         outer_red_param, outer_red_diff);*/
 
-    const double cvf = osg::clampBelow(vis, 45000.0);
-    const double vis_factor = (vis - 1000.0) / 2000.0; //osg::clampTo((vis - 1000.0) / 2000.0, 0.0, 1.0);
-    const float upperVisFactor = 1.0 - vis_factor * (0.7 + 0.3 * cvf / 45000);
-    const float middleVisFactor = 1.0 - vis_factor * (0.1 + 0.85 * cvf / 45000);
+   osg::Vec3f outer_amt = outer_param;
+   osg::Vec3f middle_amt = middle_param;
 
-    (*dome_cl)[0] = sky_color;
-    osggraph::SDVectorArrayAdapter<Vec3Array> colors(*dome_cl, numBands, 1);
-    const double saif = sun_angle / SD_PI;
-    static const osg::Vec3f blueShift(0.8, 1.0, 1.2);
-    const osg::Vec3f skyFogDelta = sky_color - fog_color;
-   // const osg::Vec3f sunSkyDelta = sun_color - sky_color;
+   const double cvf = osg::clampBelow(vis, 45000.0);
+   const double vis_factor = osg::clampTo((vis - 1000.0) / 2000.0, 0.0, 1.0);
+   const float upperVisFactor = 1.0 - vis_factor * (0.7 + 0.3 * cvf/45000);
+   const float middleVisFactor = 1.0 - vis_factor * (0.1 + 0.85 * cvf/45000);
 
-    for (int i = 0; i < halfBands+1; i++)
-    {
-        osg::Vec3f diff = componentMultiply(blueShift, skyFogDelta);
-        diff *= (0.8 + saif - ((halfBands-i)/10));
-        colors(2, i) = sky_color -  diff * upperVisFactor; //toOsg(sky_color -  diff * upperVisFactor);
-        colors(3, i) = sky_color - diff * middleVisFactor + middle_amt; //toOsg(sky_color - diff * middleVisFactor + middle_amt);
-        colors(4, i) = fog_color + outer_amt; //toOsg(fog_color + outer_amt);
-        colors(0, i) = sky_color * 0.3942 + colors(2,i) * 0.3942; //lerp(toOsg(sky_color), colors(2, i), .3942);
-        colors(1, i) = sky_color * 0.7885 + colors(2,i) * 0.7885; //lerp(toOsg(sky_color), colors(2, i), .7885);
-        for (int j = 0; j < numRings - 1; ++j)
-            sd_clampColor(colors(j, i));
-        outer_amt -= outer_diff;
-        middle_amt -= middle_diff;
-    }
+   (*dome_cl)[0] = sky_color;
+   SDVectorArrayAdapter<Vec3Array> colors(*dome_cl, numBands, 1);
+   const double saif = sun_angle/SD_PI;
+   static const osg::Vec3f blueShift(0.8, 1.0, 1.2);
+   const osg::Vec3f skyFogDelta = sky_color - fog_color;
+   //const osg::Vec3f sunSkyDelta = sun_color - sky_color;
 
-    for (int i = halfBands+1; i < numBands; ++i)
-        for (int j = 0; j < 5; ++j)
-            colors(j, i) = colors(j, numBands - i);
+   for (int i = 0; i < halfBands+1; i++)
+   {
+      osg::Vec3f diff = componentMultiply(skyFogDelta, blueShift);
+       diff *= (0.8 + saif - ((halfBands-i)/10));
+       colors(2, i) = sky_color - diff * upperVisFactor;
+       colors(3, i) = sky_color - diff * middleVisFactor + middle_amt;
+       colors(4, i) = fog_color + outer_amt;
+       colors(0, i) = sky_color * (1.0 - .3942) + colors(2, i) * .3942;
+       colors(1, i) = sky_color * (1.0 - 7885) + colors(2, i) * .7885;
+       for (int j = 0; j < numRings - 1; ++j)
+           sd_clampColor(colors(j, i));
+       outer_amt -= outer_diff;
+       middle_amt -= middle_diff;
+   }
 
-    sd_fade_to_black(&(*dome_cl)[0], asl * center_elev, 1);
-    for (int i = 0; i < numRings - 1; ++i)
-        sd_fade_to_black(&colors(i, 0), (asl+0.05f) * domeParams[i].elev,
-                      numBands);
+   for (int i = halfBands+1; i < numBands; ++i)
+       for (int j = 0; j < 5; ++j)
+           colors(j, i) = colors(j, numBands - i);
 
-    for ( int i = 0; i < numBands; i++ )
-        colors(numRings - 1, i) = fog_color;//toOsg(fog_color);
-    dome_cl->dirty();
+   sd_fade_to_black(&(*dome_cl)[0], asl * center_elev, 1);
+   for (int i = 0; i < numRings - 1; ++i)
+       sd_fade_to_black(&colors(i, 0), (asl+0.05f) * domeParams[i].elev,
+                     numBands);
 
-    return true;
+   for ( int i = 0; i < numBands; i++ )
+       colors(numRings - 1, i) = fog_color;
+   dome_cl->dirty();
+
+   return true;
 }
 
 bool SDSkyDome::reposition( const osg::Vec3f& p, double spin )

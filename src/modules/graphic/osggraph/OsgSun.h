@@ -58,7 +58,7 @@ public:
     osg::Node* build( std::string path, double dist, double sun_size );
 
     bool repaint( double sun_angle, double new_visibility );
-    bool reposition( osg::Vec3d p);
+    bool reposition( osg::Vec3d p, double angle);
 
     osg::Vec4f get_color();
     osg::Vec4f get_scene_color();

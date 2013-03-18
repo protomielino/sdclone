@@ -24,6 +24,19 @@
 #include <osg/StateSet>
 #include <osg/Depth>
 
+// Used for rise/set effects (flat earth - no rotation of skydome considered here )
+void calc_celestial_angles( const osg::Vec3f& body, const osg::Vec3f& view, double& angle, double& rotation )
+{
+	osg::Vec3f pos = body - view;
+	/*pos.x() = body.x() - view.x();
+	pos.y() = body.y() - view.y();
+	pos.z() = body.z() - view.z();*/
+	//sgSubVec3(pos, body, view);
+	angle = (90*SD_DEGREES_TO_RADIANS) - atan2(pos[2], sqrt(pos[0]*pos[0] + pos[1]*pos[1]));
+	rotation = (90*SD_DEGREES_TO_RADIANS) - atan2(pos[0], pos[1]);
+}
+
+
 // Constructor
 SDSky::SDSky( void )
 {
@@ -105,7 +118,7 @@ bool SDSky::repaint( osg::Vec3f& sky_color, osg::Vec3f& fog_color, osg::Vec3f& c
 {
     if ( effective_visibility > 1000.0 )
     {
-                enable();
+        enable();
         dome->repaint( sky_color, fog_color, sol_angle, effective_visibility );
 
         sun->repaint( sol_angle, effective_visibility );
@@ -120,7 +133,7 @@ bool SDSky::repaint( osg::Vec3f& sky_color, osg::Vec3f& fog_color, osg::Vec3f& c
 	}*/
 
         planets->repaint( sol_angle, nplanets, planet_data );
-        stars->repaint( sol_angle, nstars, star_data);
+        stars->repaint( sol_angle, nstars, star_data );
     } else
     {
                 // turn off sky
@@ -134,9 +147,18 @@ bool SDSky::repaint( osg::Vec3f& sky_color, osg::Vec3f& fog_color, osg::Vec3f& c
 bool SDSky::reposition( osg::Vec3& view_pos, double spin, /*double gst,*/
                         double dt )
 {
-  sun->reposition( view_pos );
+  double angle;
+  double rotation;
+
+  sun->reposition( view_pos, 0 );
   moon->reposition( view_pos, 0 );
-  dome->reposition( view_pos, 0 );
+
+  osg::Vec3f sunpos = sun->getSunPosition ();
+  calc_celestial_angles( sunpos, view_pos, angle, rotation );
+  sun->setSunAngle( angle );
+  sun->setSunRotation( rotation );
+
+  dome->reposition( view_pos, angle );
 
   //sun->getSunPosition ( & pos );
   //calc_celestial_angles( pos, view_pos, angle, rotation );

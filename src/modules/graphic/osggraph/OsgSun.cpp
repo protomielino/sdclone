@@ -215,14 +215,14 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
 
         osg::Vec4 i_halo_color, o_halo_color, scene_color, sun_color;
 
-        double red_scat_f, red_scat_corr_f, green_scat_f, blue_scat_f;
+        double red_scat_f, /*red_scat_corr_f,*/ green_scat_f, blue_scat_f;
 
         red_scat_f = (aerosol_factor * path_distance * density_avg) / 5E+07;
-        red_scat_corr_f = sun_exp2_punch_through / (1 - red_scat_f);
+        //red_scat_corr_f = sun_exp2_punch_through / (1 - red_scat_f);
         sun_color[0] = 1 -red_scat_f;
         i_halo_color[0] = 1 - (1.1 * red_scat_f);
         o_halo_color[0] = 1 - (1.4 * red_scat_f);
-        scene_color[0] = 1 - red_scat_f;
+        //scene_color[0] = 1 - red_scat_f;
 
 	// Green - 546.1 nm
 	if (sun_declination > 5.0 || sun_declination < 2.0)
@@ -338,21 +338,23 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
     return true;
 }
 
-bool SDSun::reposition( osg::Vec3d p/*, double angle*/)
+bool SDSun::reposition( osg::Vec3d p, double angle)
 {
-    osg::Matrix T1, RA, DEC;
+    osg::Matrix T1, RA, DEC, T2, GST;
 
+    T1.makeTranslate(p);
+    GST.makeRotate((float)(angle), osg::Vec3(0.0, 0.0, -1.0));
     RA.makeRotate((float)(sun_right_ascension - 90 *SD_DEGREES_TO_RADIANS) , osg::Vec3(0, 0, 1));
     DEC.makeRotate((float)(sun_declination), osg::Vec3(1, 0, 0));
-    T1.makeTranslate(0, sun_dist, 0);
+    T2.makeTranslate(0, sun_dist, 0);
 
-    osg::Matrix R = T1*DEC*RA;
+    osg::Matrix R = T2*T1*GST*DEC*RA;
     sun_transform->setMatrix(R);
 
     osg::Vec4f pos = osg::Vec4f(0.0,0.0,0.0,1.0)*R;
     sun_position = osg::Vec3f(pos._v[0],pos._v[1],pos._v[2]);
 
-    GfOut("Sun Position : %f  %f  %f %f %f\n", pos._v[0], pos._v[1], pos._v[2],sun_dist,pos.length());
+    GfOut("Sun Position in Sun: %f  %f  %f %f %f\n", pos._v[0], pos._v[1], pos._v[2],sun_dist,pos.length());
 
     osg::Vec3f upos = osg::Vec3f(sun_position);
     osg::Vec3f uplan = osg::Vec3f(sun_position._v[0],0.0,sun_position._v[2]);
@@ -360,7 +362,7 @@ bool SDSun::reposition( osg::Vec3d p/*, double angle*/)
     uplan.normalize();
 
     sun_angle_to_scene = acos(upos*uplan);
-    sun_angle = sun_angle_to_scene;
+    //sun_angle = sun_angle_to_scene;
 
     GfOut("Sun Angle = %f\n", sun_angle);
 
