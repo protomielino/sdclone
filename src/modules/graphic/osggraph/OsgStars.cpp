@@ -106,59 +106,47 @@ bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
     double mag, nmag, alpha, factor, cutoff;
     int phase;
 
-    GfOut("Sun Angle in Stars = %f\n", sun_angle);
-
     if ( sun_angle > (SD_PI_2 + 10.0 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 1.0;
         cutoff = 4.5;
         phase = 0;
-        //GfOut("Stars = %f\n", 10.0f);
     } else if ( sun_angle > (SD_PI_2 + 8.8 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 1.0;
         cutoff = 3.8;
         phase = 1;
-        //GfOut("Stars = %f\n", 8.0f);
     } else if ( sun_angle > (SD_PI_2 + 7.5 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.95;
         cutoff = 3.1;
         phase = 2;
-        //GfOut("Stars = %f\n", 7.5f);
     } else if ( sun_angle > (SD_PI_2 + 7.0 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.9;
         cutoff = 2.4;
         phase = 3;
-        //GfOut("Stars = %f\n", 7.0f);
     } else if ( sun_angle > (SD_PI_2 + 6.5 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.85;
         cutoff = 1.8;
         phase = 4;
-        //GfOut("Stars = %f\n", 6.5f);
     } else if ( sun_angle > (SD_PI_2 + 6.0 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.8;
         cutoff = 1.2;
         phase = 5;
-        //GfOut("Stars = %f\n", 6.0f);
-    } else if ( sun_angle > (SD_PI_2 + 5.5 * SD_DEGREES_TO_RADIANS ) )
+     } else if ( sun_angle > (SD_PI_2 + 5.5 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.75;
         cutoff = 0.6;
         phase = 6;
-        //GfOut("Stars = %f\n", 5.5f);
     } else
     {
         factor = 0.7;
         cutoff = 0.0;
         phase = 7;
-        //GfOut("Stars default\n");
     }
-
-    GfOut("Phase = %d - old_phase = %d\n", phase, old_phase);
 
     if ( phase != old_phase )
     {
@@ -171,12 +159,10 @@ bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
                 nmag = ( 4.5 - mag ) / 5.5;
                 alpha = nmag * 0.85 + 0.15;
                 alpha *= factor;
-                //GfOut("Alpha = %f\n", alpha);
             }
             else
             {
                 alpha = 0.0;
-                //GfOut("Stars desactivée\n");
             }
 
             if (alpha > 1.0) { alpha = 1.0; }

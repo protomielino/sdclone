@@ -240,8 +240,8 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         // Blue - 435.8 nm
         blue_scat_f = (aerosol_factor * path_distance * density_avg) / 3.607E+06;
         sun_color[2] = 1 - blue_scat_f /* red_scat_corr_f*/;
-        i_halo_color[1] = 1 - (1.1 * (blue_scat_f /* red_scat_corr_f*/));
-        o_halo_color[1] = 1 - (1.4 * (blue_scat_f /* red_scat_corr_f*/));
+        i_halo_color[2] = 1 - (1.1 * (blue_scat_f /* red_scat_corr_f*/));
+        o_halo_color[2] = 1 - (1.4 * (blue_scat_f /* red_scat_corr_f*/));
         //scene_color[2] = 1 - blue_scat_f;
 
         // Alpha
@@ -295,8 +295,6 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         else if ( i_halo_color[0] > 1) i_halo_color[0] = 1;
         if ( o_halo_color[0] < 0 ) o_halo_color[0] = 0;
         else if ( o_halo_color[0] > 1) o_halo_color[0] = 1;
-        /*if (scene_color[0] < 0) scene_color[0] = 0;
-        else if (scene_color[0] > 1) scene_color[0] = 1;*/
 
         if ( sun_color[1] < 0 ) sun_color[1] = 0;
         else if ( sun_color[1] > 1) sun_color[1] = 1;
@@ -304,8 +302,6 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         else if ( i_halo_color[1] > 1) i_halo_color[1] = 1;
         if ( o_halo_color[1] < 0 ) o_halo_color[1] = 0;
         else if ( o_halo_color[0] > 1) o_halo_color[1] = 1;
-        /*if (scene_color[1] < 0) scene_color[1] = 0;
-        else if (scene_color[1] > 1) scene_color[1] = 1;*/
 
         if ( sun_color[2] < 0 ) sun_color[2] = 0;
         else if ( sun_color[2] > 1) sun_color[2] = 1;
@@ -315,20 +311,13 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         else if ( o_halo_color[2] > 1) o_halo_color[2] = 1;
         if ( o_halo_color[3] < 0 ) o_halo_color[3] = 0;
         else if ( o_halo_color[3] > 1) o_halo_color[3] = 1;
-        /*if (scene_color[2] < 0) scene_color[2] = 0;
-        else if (scene_color[2] > 1) scene_color[2] = 1;
-        if (scene_color[3] < 0) scene_color[3] = 0;
-        else if (scene_color[3] > 1) scene_color[3] = 1;*/
 
         sd_gamma_correct_rgb( i_halo_color._v );
         sd_gamma_correct_rgb( o_halo_color._v );
-        //sd_gamma_correct_rgb( scene_color._v );
         sd_gamma_correct_rgb( sun_color._v );
 
         (*sun_cl)[0] = sun_color;
         sun_cl->dirty();
-        //(*scene_cl)[0] = scene_color;
-        //scene_cl->dirty();
         (*ihalo_cl)[0] = i_halo_color;
         ihalo_cl->dirty();
         (*ohalo_cl)[0] = o_halo_color;
@@ -354,17 +343,12 @@ bool SDSun::reposition( osg::Vec3d p, double angle)
     osg::Vec4f pos = osg::Vec4f(0.0,0.0,0.0,1.0)*R;
     sun_position = osg::Vec3f(pos._v[0],pos._v[1],pos._v[2]);
 
-    GfOut("Sun Position in Sun: %f  %f  %f %f %f\n", pos._v[0], pos._v[1], pos._v[2],sun_dist,pos.length());
-
-    osg::Vec3f upos = osg::Vec3f(sun_position);
+    /*osg::Vec3f upos = osg::Vec3f(sun_position);
     osg::Vec3f uplan = osg::Vec3f(sun_position._v[0],0.0,sun_position._v[2]);
     upos.normalize();
     uplan.normalize();
 
-    sun_angle_to_scene = acos(upos*uplan);
-    //sun_angle = sun_angle_to_scene;
-
-    GfOut("Sun Angle = %f\n", sun_angle);
+    sun_angle_to_scene = acos(upos*uplan);*/
 
     // Suncolor related things:
     if ( prev_sun_angle != sun_angle )

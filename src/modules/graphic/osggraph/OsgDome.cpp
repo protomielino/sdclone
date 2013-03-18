@@ -204,8 +204,7 @@ bool SDSkyDome::repaint( const Vec3f& sky_color,
    osg::Vec3f middle_param, middle_diff;
 
    // Check for sunrise/sunset condition
-   GfOut("Sun Angle in Dome = %f\n", sun_angle);
-
+   sun_angle = osg::RadiansToDegrees(sun_angle);
    if (sun_angle > 80)
    {
        // 0.0 - 0.4
@@ -223,8 +222,6 @@ bool SDSkyDome::repaint( const Vec3f& sky_color,
        outer_diff = osg::Vec3f(0, 0, 0);
        middle_diff = osg::Vec3f(0, 0, 0);
    }
-   /*GfOut("  outer_red_param = %.2f  outer_red_diff = %.2f\n",
-         outer_red_param, outer_red_diff);*/
 
    osg::Vec3f outer_amt = outer_param;
    osg::Vec3f middle_amt = middle_param;
