@@ -131,7 +131,7 @@ public:
 	/* Destructor */
 	~SDScenery(void);
 
-	osg::Node *LoadScene(tTrack *track);
+    osg::ref_ptr<osg::Node> LoadScene(tTrack *track);
 	void	CreatePit(tTrack *track);
 	//void	addSpectators(SDSpectators->build(number, tTrack *track));
 	//void	addTrees(SDTrees->build(tTrack *track));

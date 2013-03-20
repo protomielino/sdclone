@@ -349,8 +349,8 @@ int initTrack(tTrack *track)
 
 	scenery = new SDScenery;
 	render = new SDRender;
-	osg::ref_ptr<osg::Group> sceneroot = new osg::Group();
-	m_sceneroot = new osg::Group();
+	osg::ref_ptr<osg::Group> sceneroot = new osg::Group;
+	m_sceneroot = new osg::Group;
 	sceneroot->addChild(scenery->LoadScene(track));
 
 	m_sceneroot->addChild(render->Init(sceneroot, track));

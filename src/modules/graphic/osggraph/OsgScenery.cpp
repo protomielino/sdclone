@@ -69,7 +69,7 @@ SDScenery::~SDScenery(void)
 	//delete	m_pits;
 }
 
-osg::Node* SDScenery::LoadScene(tTrack *track)
+osg::ref_ptr<osg::Node> SDScenery::LoadScene(tTrack *track)
 {
 	void		*hndl = grTrackHandle;
 	const char	*acname;
@@ -119,9 +119,8 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 			std::string strPath = PathTmp;
 			sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 			strPath += buf;
-            osg::Node * bg= m_background->build(_bgtype, _grWrldX, _grWrldY, _grWrldZ, strPath);
-            bg->getOrCreateStateSet()->setRenderingHint(
-                        osg::StateSet::OPAQUE_BIN );
+            osg::ref_ptr<osg::Node> bg= m_background->build(_bgtype, _grWrldX, _grWrldY, _grWrldZ, strPath);
+            bg->getOrCreateStateSet()->setRenderingHint( osg::StateSet::OPAQUE_BIN );
             _scenery->addChild(bg);
 			GfOut("Background loaded\n");
 		}
@@ -135,7 +134,7 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 	if (ext == "acc")
 	{
 		strPath+=buf;
-    		_strTexturePath = strPath;
+        _strTexturePath = strPath;
 		strPath+="/";	
 		strPath+=acname;
 
@@ -144,26 +143,26 @@ osg::Node* SDScenery::LoadScene(tTrack *track)
 	else
 	{
 		strPath+=buf;
-        	osg::ref_ptr<osgDB::Options> options = new osgDB::Options();
-        	options->getDatabasePathList().push_back(strPath);
-        	std::string strTPath = GetDataDir();
-        	snprintf(buf, 4096, "data/textures/");
-        	strTPath += buf;
-        	options->getDatabasePathList().push_back(strTPath);
-        	osg::ref_ptr<osg::Node> pTrack = osgDB::readNodeFile(acname, options);
+        osg::ref_ptr<osgDB::Options> options = new osgDB::Options();
+        options->getDatabasePathList().push_back(strPath);
+        std::string strTPath = GetDataDir();
+        snprintf(buf, 4096, "data/textures/");
+        strTPath += buf;
+        options->getDatabasePathList().push_back(strTPath);
+        osg::ref_ptr<osg::Node> pTrack = osgDB::readNodeFile(acname, options);
         	
-        	if (ext =="ac")
-        	{
-        		osg::ref_ptr<osg::MatrixTransform> rot = new osg::MatrixTransform;
-    			osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f,
+        if (ext =="ac")
+        {
+            osg::ref_ptr<osg::MatrixTransform> rot = new osg::MatrixTransform;
+            osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f,
                      			 0.0f,  0.0f, 1.0f, 0.0f,
                      			 0.0f, -1.0f, 0.0f, 0.0f,
                      			 0.0f,  0.0f, 0.0f, 1.0f);
-    			rot->setMatrix(mat);
-    			rot->addChild(pTrack);
-    			_scenery->addChild(rot);
-    			return _scenery;
-    		}
+            rot->setMatrix(mat);
+            rot->addChild(pTrack);
+            _scenery->addChild(rot);
+            return _scenery;
+        }
     		
 		_scenery->addChild(pTrack);
 	}
@@ -223,7 +222,7 @@ bool SDScenery::LoadTrack(std::string strTrack)
     	strTPath += buf;
     	loader.AddSearchPath(strTPath);
     	
-	osg::Node *pTrack = loader.Load3dFile(strTrack, false);
+    osg::ref_ptr<osg::Node> pTrack = loader.Load3dFile(strTrack, false);
 
 	if (pTrack)
 	{
