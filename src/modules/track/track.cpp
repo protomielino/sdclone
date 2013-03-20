@@ -23,7 +23,7 @@
 #include <ctime>
 #include <cmath>
 
-#include <raceman.h>
+//#include <raceman.h>	//TODO(kilo): not needed?
 #include <portability.h>
 
 #include "trackinc.h"
@@ -123,18 +123,9 @@ TrackBuildEx(const char *trackfile)
  * Remarks
  *	
  */
-static void 
-GetTrackHeader(void *TrackHandle)
-{
-    tTrackGraphicInfo	*graphic;
-    tTrackLocalInfo	*local;
-    const char		**env;
-
-    int			i;
-    char		buf[256];
-    const char		*s;
-    char		*cs;
-
+static void
+GetTrackHeader(void *TrackHandle) {
+    // Read header
     theTrack->name = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_NAME, "no name");
     theTrack->descr = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_DESCR, "no description");
     theTrack->version = (int)GfParmGetNum(TrackHandle, TRK_SECT_HDR, TRK_ATT_VERSION, (char*)NULL, 0);
@@ -143,52 +134,47 @@ GetTrackHeader(void *TrackHandle)
     theTrack->authors = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_AUTHOR, "none");
     theTrack->category = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_CAT, "road");
 
-	/* Local infos */
-    local = &theTrack->local;
-
+    // Read Local Info section
+    tTrackLocalInfo *local = &theTrack->local;
     local->station = GfParmGetStr(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_STATION, "LFPG");
     local->timezone = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_TIMEZONE, (char*)NULL, 0);
     local->anyrainlkhood = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_ANYRAINLKHD, (char*)NULL, 0);
     local->littlerainlkhood = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_LITTLERAINLKHD, (char*)NULL, 0);
     local->mediumrainlkhood = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_MEDIUMRAINLKHD, (char*)NULL, 0);
+    local->timeofday = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_TIMEOFDAY, (char*)NULL, (tdble)(15 * 3600 + 0 * 60 + 0)); // 15:00:00
+    local->sunascension = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_SUN_ASCENSION, (char*)NULL, 0.0f);
 
-	local->timeofday = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_TIMEOFDAY, (char*)NULL, (tdble)(15 * 3600 + 0 * 60 + 0)); // 15:00:00
-	local->sunascension = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_SUN_ASCENSION, (char*)NULL, 0.0f);
-
-	/* Graphic part */
-    graphic = &theTrack->graphic;
-
-	graphic->model3d = GfParmGetStr(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_3DDESC, 0);
-	graphic->background = GfParmGetStr(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BKGRND, "background.png");
-
+    // Read Graphic section
+    tTrackGraphicInfo *graphic = &theTrack->graphic;
+    graphic->model3d = GfParmGetStr(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_3DDESC, 0);
+    graphic->background = GfParmGetStr(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BKGRND, "background.png");
     graphic->bgtype = (int)GfParmGetNum(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BGTYPE, (char*)NULL, 0.0);
 
     graphic->bgColor[0] = (float)GfParmGetNum(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BGCLR_R, (char*)NULL, 0.0f);
     graphic->bgColor[1] = (float)GfParmGetNum(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BGCLR_G, (char*)NULL, 0.0f);
     graphic->bgColor[2] = (float)GfParmGetNum(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BGCLR_B, (char*)NULL, 0.1f);
-    
-    /* env map images */
+
+    // Environment map images
+    char buf[256];
     sprintf(buf, "%s/%s", TRK_SECT_GRAPH, TRK_LST_ENV);
     graphic->envnb = GfParmGetEltNb(TrackHandle, buf);
-    if (graphic->envnb < 1) 
-    {
-		graphic->envnb = 1;
-    }
+    if (graphic->envnb < 1)
+      graphic->envnb = 1;
+
     graphic->env = (const char**)calloc(graphic->envnb, sizeof(const char*));
-    env = graphic->env;
-    for (i = 1; i <= graphic->envnb; i++) 
-    {
-		sprintf(buf, "%s/%s/%d", TRK_SECT_GRAPH, TRK_LST_ENV, i);
-		*env = GfParmGetStr(TrackHandle, buf, TRK_ATT_ENVNAME, "env.png");
-		env ++;
+    const char **env = graphic->env;
+    for (int i = 1; i <= graphic->envnb; ++i) {
+      sprintf(buf, "%s/%s/%d", TRK_SECT_GRAPH, TRK_LST_ENV, i);
+      *env = GfParmGetStr(TrackHandle, buf, TRK_ATT_ENVNAME, "env.png");
+      ++env;
     }
 
+    // Track lights
     graphic->nb_lights = GfParmGetEltNb(TrackHandle, TRK_SECT_TRACKLIGHTS );
     GfLogDebug( "Number of lights: %d\n", graphic->nb_lights );
-    if (graphic->nb_lights > 0 )
-        graphic->lights = (tGraphicLightInfo*)malloc( sizeof( tGraphicLightInfo ) * graphic->nb_lights );
-    for (i = 0; i < graphic->nb_lights; ++i)
-    {
+    if (graphic->nb_lights > 0 ) {
+      graphic->lights = (tGraphicLightInfo*)malloc( sizeof( tGraphicLightInfo ) * graphic->nb_lights );
+      for (int i = 0; i < graphic->nb_lights; ++i) {
         sprintf(buf, "%s/%d/%s", TRK_SECT_TRACKLIGHTS, i + 1, TRK_SECT_TOPLEFT);
         graphic->lights[ i ].topleft.x = GfParmGetNum(TrackHandle, buf, TRK_ATT_X, (char*)NULL, 0.0f);
         graphic->lights[ i ].topleft.y = GfParmGetNum(TrackHandle, buf, TRK_ATT_Y, (char*)NULL, 0.0f);
@@ -202,40 +188,44 @@ GetTrackHeader(void *TrackHandle)
         graphic->lights[ i ].offTexture = strdup(GfParmGetStr(TrackHandle, buf, TRK_ATT_TEXTURE_OFF, ""));
         graphic->lights[ i ].index = (int)GfParmGetNum(TrackHandle, buf, TRK_ATT_INDEX, (char*)NULL, 0.0f);
         graphic->lights[ i ].role = 0;
-	if( strcmp( GfParmGetStr(TrackHandle, buf, TRK_ATT_ROLE, ""), "st_red" ) == 0 )
-	    graphic->lights[ i ].role = GR_TRACKLIGHT_START_RED;
-	else if( strcmp( GfParmGetStr(TrackHandle, buf, TRK_ATT_ROLE, ""), "st_green" ) == 0 )
-	    graphic->lights[ i ].role = GR_TRACKLIGHT_START_GREEN;
-	else if( strcmp( GfParmGetStr(TrackHandle, buf, TRK_ATT_ROLE, ""), "st_green_st" ) == 0 )
-	    graphic->lights[ i ].role = GR_TRACKLIGHT_START_GREENSTART;
-	else if( strcmp( GfParmGetStr(TrackHandle, buf, TRK_ATT_ROLE, ""), "st_yellow" ) == 0 )
-	    graphic->lights[ i ].role = GR_TRACKLIGHT_START_YELLOW;
+        if( strcmp( GfParmGetStr(TrackHandle, buf, TRK_ATT_ROLE, ""), "st_red" ) == 0 )
+          graphic->lights[ i ].role = GR_TRACKLIGHT_START_RED;
+        else if( strcmp( GfParmGetStr(TrackHandle, buf, TRK_ATT_ROLE, ""), "st_green" ) == 0 )
+          graphic->lights[ i ].role = GR_TRACKLIGHT_START_GREEN;
+        else if( strcmp( GfParmGetStr(TrackHandle, buf, TRK_ATT_ROLE, ""), "st_green_st" ) == 0 )
+          graphic->lights[ i ].role = GR_TRACKLIGHT_START_GREENSTART;
+        else if( strcmp( GfParmGetStr(TrackHandle, buf, TRK_ATT_ROLE, ""), "st_yellow" ) == 0 )
+          graphic->lights[ i ].role = GR_TRACKLIGHT_START_YELLOW;
         graphic->lights[ i ].red = GfParmGetNum(TrackHandle, buf, TRK_ATT_RED, (char*)NULL, 1.0f);
         graphic->lights[ i ].green = GfParmGetNum(TrackHandle, buf, TRK_ATT_GREEN, (char*)NULL, 1.0f);
         graphic->lights[ i ].blue = GfParmGetNum(TrackHandle, buf, TRK_ATT_BLUE, (char*)NULL, 1.0f);
+      }  // for i
+    }  // if nb_lights
+
+    theTrack->nseg = 0;
+
+    // Search for track filename, without any path info, eg: 'foo.xml'
+    const char *s = strrchr(theTrack->filename, '/');
+    if (s == NULL) {
+      s = theTrack->filename;
+    } else {
+      ++s;
     }
 
-	theTrack->nseg = 0;
+    // Internal name is track filename, without extension, eg: 'foo'
+    theTrack->internalname = strdup(s);
+    char *cs = strrchr(theTrack->internalname, '.');
+    if (cs != NULL) {
+      *cs = 0;
+    }
 
-	s = strrchr(theTrack->filename, '/');
-	if (s == NULL) {
-		s = theTrack->filename;
-	} else {
-		s++;
-	}
-
-	theTrack->internalname = strdup(s);
-	cs = strrchr(theTrack->internalname, '.');
-	if (cs != NULL) {
-		*cs = 0;
-	}
-
+    // Default turnmark is 1m*1m, right next to the track
     graphic->turnMarksInfo.height = GfParmGetNum(TrackHandle, TRK_SECT_TURNMARKS, TRK_ATT_HEIGHT, NULL, 1);
     graphic->turnMarksInfo.width  = GfParmGetNum(TrackHandle, TRK_SECT_TURNMARKS, TRK_ATT_WIDTH,  NULL, 1);
     graphic->turnMarksInfo.vSpace = GfParmGetNum(TrackHandle, TRK_SECT_TURNMARKS, TRK_ATT_VSPACE, NULL, 0);
     graphic->turnMarksInfo.hSpace = GfParmGetNum(TrackHandle, TRK_SECT_TURNMARKS, TRK_ATT_HSPACE, NULL, 0);
+}  // GetTrackHeader
 
-}
 
 /**
  * This function initialize some values which can only be done after the track is loaded.
@@ -257,6 +247,7 @@ FinishTrackLoading(void* TrackHandle)
 
 	if (theTrack->numberOfSectors < 0)
 		theTrack->numberOfSectors = 0;
+	//TODO(kilo): possible divison by zero!!!
 	if (theTrack->length / (double)theTrack->numberOfSectors < 100.0f )
 	{
 		theTrack->numberOfSectors = (int)floor( theTrack->length / 100.0f );
