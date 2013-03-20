@@ -275,8 +275,11 @@ SimCarUpdateForces(tCar *car)
 		else if ( (desiredTq - F.M.z) > 0.0 ) {F.M.z += 0.5 * w * car->wheelbase;}
 		else {F.M.z -= 0.5 * w * car->wheelbase;}
 		/* desired force to really stop the car when braking to 0 */
-		if ( (car->ctrl->brakeCmd > 0.05) && (fabs(car->DynGC.vel.x) < 0.02) ) {
+		if ( ((car->ctrl->brakeCmd > 0.05) || (car->ctrl->ebrakeCmd > 0.1) || (car->ctrl->brakeFrontLeftCmd > 0.02)
+		  || (car->ctrl->brakeFrontRightCmd > 0.02) || (car->ctrl->brakeRearLeftCmd > 0.02) || (car->ctrl->brakeRearRightCmd > 0.02) )
+		  && (car->ctrl->accelCmd * car->transmission.clutch.transferValue < 0.05) && (fabs(car->DynGC.vel.x) < 0.02) ) {
 			desiredF = - m * car->DynGC.vel.x / SimDeltaTime;
+			w *= 0.5;
 			if ( (fabs(desiredF - F.F.x)) < w ) {F.F.x = desiredF;}
 			else if ( (desiredF - F.F.x) > 0.0 ) {F.F.x += w;}
 			else {F.F.x -= w;}
