@@ -24,7 +24,27 @@
 #include "OsgCar.h"
 #include "OsgMath.h"
 
-osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
+/*static const char* vertSource = {
+"varying vec3 normal;\n"
+"void main()\n"
+"{\n"
+"gl_TexCoord[0] = gl_MultiTexCoord0;\n"
+"normal = normalize(gl_NormalMatrix * gl_Normal);\n"
+"gl_Position = ftransform();\n"
+"}\n"
+};
+
+static const char* fragSource = {
+"varying vec3 normal;\n"
+"uniform sampler2D diffusemap;\n"
+"void main()\n"
+"{\n"
+"gl_FragColor  = vec4(1.0,0.0,1.0,1.0) + texture2D(diffusemap, vec2(gl_TexCoord[0]));\n"
+"}\n"
+};*/
+
+osg::ref_ptr<osg::Node
+> SDCar::loadCar(tCarElt *car)
 {
     this->car = car;
    // static const char* pszTexFileExt = ".png";
@@ -166,6 +186,20 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car)
     strPath+=buf;
     GfOut("Chemin Textures : %s\n", strTPath.c_str());
     osg::Node *pCar = loader.Load3dFile(strPath, true);
+
+    osg::ref_ptr<osg::Shader> vertShader =
+    new osg::Shader( osg::Shader::VERTEX);
+    osg::ref_ptr<osg::Shader> fragShader =
+    new osg::Shader( osg::Shader::FRAGMENT);
+    vertShader->loadShaderSourceFromFile(TmpPath+"/data/shaders/car.vert");
+    fragShader->loadShaderSourceFromFile(TmpPath+"/data/shaders/car.frag");
+    osg::ref_ptr<osg::Program> program = new osg::Program;
+    program->addShader( vertShader.get() );
+    program->addShader( fragShader.get() );
+
+    osg::StateSet* stateset = pCar->getOrCreateStateSet();
+    stateset->setAttributeAndModes( program.get() );
+    stateset->addUniform(new osg::Uniform("diffusemap", 0 ));
 
     osg::Vec3 p;
 
