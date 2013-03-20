@@ -915,7 +915,8 @@ grUpdateSky(double currentTime, double accelTime)
 	static int lastTimeLowSpeed = 0;
 
 	// Nothing to do if static sky dome, or race not started.
-	if (!grDynamicSkyDome)
+	//if (!grDynamicSkyDome)	//TODO(kilo): find some meaning for this variable
+	if (!grSkyDomeDistance || grTrack->skyversion < 1)
 		return;
 
 	if (currentTime < 0) {
@@ -999,6 +1000,7 @@ grShutdownBackground(void)
 		TheSky = 0;
 	}
 
+//TODO(kilo): why not delete?
 	if (TheSun)
 		TheSun = 0;
 
