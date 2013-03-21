@@ -19,8 +19,7 @@
 #ifndef _OSGSCREENS_H_
 #define _OSGSCREENS_H_
 
-#include <osg/Group>
-#include <osgViewer/Viewer>
+
 #include <raceman.h>        //tSituation
 #include <vector>
 #include "OsgView.h"

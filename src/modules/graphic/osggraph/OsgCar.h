@@ -22,7 +22,6 @@
 
 #include <car.h>
 #include <raceman.h>
-#include <osg/Group>
 #include <vector>
 
 #include "OsgWheel.h"

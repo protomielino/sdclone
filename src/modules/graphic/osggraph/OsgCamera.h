@@ -97,6 +97,10 @@ public:
     virtual void setViewOffset(float newOffset)=0;
     inline float getAspectRatio(){return 0.0;}
     inline float getMirrorAllowed(){return mirrorAllowed;}
+    inline osg::Vec3 getCameraPosition(){
+        return center;
+    }
+
     //camera for sound
     Camera * getGenericCamera();
     //void update(tCarElt * car, tSituation * s);

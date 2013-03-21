@@ -16,35 +16,25 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
 #include <osg/MatrixTransform>
 #include <osg/Switch>
+#include <osg/Group>
+#include <osgViewer/Viewer>
 #include <portability.h>
 
 #include "OsgLoader.h"
 #include "OsgCar.h"
 #include "OsgMath.h"
+#include "OsgScreens.h"
+#include "OsgMain.h"
 
-/*static const char* vertSource = {
-"varying vec3 normal;\n"
-"void main()\n"
-"{\n"
-"gl_TexCoord[0] = gl_MultiTexCoord0;\n"
-"normal = normalize(gl_NormalMatrix * gl_Normal);\n"
-"gl_Position = ftransform();\n"
-"}\n"
-};
 
-static const char* fragSource = {
-"varying vec3 normal;\n"
-"uniform sampler2D diffusemap;\n"
-"void main()\n"
-"{\n"
-"gl_FragColor  = vec4(1.0,0.0,1.0,1.0) + texture2D(diffusemap, vec2(gl_TexCoord[0]));\n"
-"}\n"
-};*/
+osg::ref_ptr<osg::Program> program ;
+osg::Node *pCar;
 
-osg::ref_ptr<osg::Node
-> SDCar::loadCar(tCarElt *car)
+osg::ref_ptr<osg::Node>
+SDCar::loadCar(tCarElt *car)
 {
     this->car = car;
    // static const char* pszTexFileExt = ".png";
@@ -185,7 +175,7 @@ osg::ref_ptr<osg::Node
         
     strPath+=buf;
     GfOut("Chemin Textures : %s\n", strTPath.c_str());
-    osg::Node *pCar = loader.Load3dFile(strPath, true);
+    pCar = loader.Load3dFile(strPath, true);
 
     osg::ref_ptr<osg::Shader> vertShader =
     new osg::Shader( osg::Shader::VERTEX);
@@ -193,19 +183,18 @@ osg::ref_ptr<osg::Node
     new osg::Shader( osg::Shader::FRAGMENT);
     vertShader->loadShaderSourceFromFile(TmpPath+"/data/shaders/car.vert");
     fragShader->loadShaderSourceFromFile(TmpPath+"/data/shaders/car.frag");
-    osg::ref_ptr<osg::Program> program = new osg::Program;
+    program = new osg::Program;
     program->addShader( vertShader.get() );
     program->addShader( fragShader.get() );
 
-    osg::StateSet* stateset = pCar->getOrCreateStateSet();
-    stateset->setAttributeAndModes( program.get() );
-    stateset->addUniform(new osg::Uniform("diffusemap", 0 ));
 
-    osg::Vec3 p;
+
+
+    /*osg::Vec3 p;
 
     p[0] = car->_pos_X;//+ car->_drvPos_x;
     p[1] = car->_pos_Y;//+car->_drvPos_y;
-    p[2] = car->_pos_Z;//+car->_drvPos_z;
+    p[2] = car->_pos_Z;//+car->_drvPos_z;*/
 
     osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
     transform1->addChild(pCar);
@@ -234,6 +223,23 @@ void SDCar::updateCar()
     wheels.updateWheels();
 
     this->car_branch->setMatrix(mat);
+
+    SDScreens * scr= (SDScreens *)getScreens();
+    osg::Vec3 c = scr->getActiveView()->getCameras()->getSelectedCamera()->getCameraPosition();
+    osg::Matrix modelview = scr->getActiveView()->getOsgCam()->getViewMatrix();
+    osg::Vec4 v = osg::Vec4(c.x(),c.y(),c.z(),1.0);
+    osg::Vec4 pv = v*modelview;
+    osg::Vec4 lv = osg::Vec4(10.0,10.0,10.0,0.0);
+    lv =lv*modelview;
+    osg::StateSet* stateset = pCar->getOrCreateStateSet();
+    stateset->setAttributeAndModes( program.get() );
+    stateset->addUniform(new osg::Uniform("diffusemap", 0 ));
+    stateset->addUniform(new osg::Uniform("pv", osg::Vec3(pv.x(),pv.y(),pv.z())));
+    stateset->addUniform(new osg::Uniform("specularColor", osg::Vec4(1.0,1.0,1.0,1.0)));
+    stateset->addUniform(new osg::Uniform("lightvector", osg::Vec3(lv.x(),lv.y(),lv.z())));
+    stateset->addUniform(new osg::Uniform("lightpower", osg::Vec4(4.0,4.0,4.0,4.0)));
+    stateset->addUniform(new osg::Uniform("ambientColor", osg::Vec4(0.1,0.1,0.1,1.0)));
+    stateset->addUniform(new osg::Uniform("smoothness", 25.0f));
 }
 
 SDCars::SDCars(void)

@@ -19,6 +19,7 @@
 
 #include <tgfclient.h>
 
+
 #include <osgViewer/Viewer>
 #include <osgViewer/GraphicsWindow>
 #include <osg/GraphicsContext>

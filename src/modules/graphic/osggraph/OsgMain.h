@@ -59,10 +59,10 @@ extern int m_NbActiveScreens;
 //extern class cGrScreen *Screens[];
 //extern class cGrScreen* grGetCurrentScreen(void);
 
-class SDScenery;
+/*class SDScenery;
 class SDCars;
 class SDRender;
-class SDView;
+class SDView;*/
 
 //static 
 
@@ -86,4 +86,5 @@ class SDFrameInfo
 	unsigned nTotalFrames;  // Total nb of frames since initView
 };
 
+void * getScreens();
 #endif /* _OSGMAIN_H_ */ 

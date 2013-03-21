@@ -23,6 +23,8 @@
 #include <osg/Group>
 #include <osgViewer/View>
 #include <osgViewer/CompositeViewer>
+#include <osgViewer/Viewer>
+
 
 #include <glfeatures.h> // GfglFeatures
 #include <robot.h>	//ROB_SECT_ARBITRARY
@@ -42,6 +44,10 @@ SDCars *cars = NULL;
 SDScenery *scenery = NULL;
 SDRender *render = NULL;
 SDScreens * screens = NULL;
+
+void *getScreens(){
+    return screens;
+}
 
 static osg::ref_ptr<osg::Group> m_sceneroot;
 static osg::ref_ptr<osg::Group> m_carroot;
