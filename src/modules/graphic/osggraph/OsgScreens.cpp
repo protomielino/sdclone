@@ -40,7 +40,7 @@ public:
    {
         osg::Vec3 e;
         cam.getUserValue("eye",e);
-        GfOut("Camera DrawnHHERERE %d %f %f %F\n",&cam,e.x(),e.y(),e.z());
+     //   GfOut("Camera DrawnHHERERE %d %f %f %F\n",&cam,e.x(),e.y(),e.z());
      // traverse(node, nv);
    }
 };
