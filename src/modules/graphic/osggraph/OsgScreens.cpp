@@ -23,6 +23,7 @@
 #include <osgViewer/Viewer>
 #include <osgViewer/GraphicsWindow>
 #include <osg/GraphicsContext>
+#include <osg/ValueObject>
 
 #include "OsgScreens.h"
 #include "OsgMain.h"
@@ -35,9 +36,11 @@ SDScreens::SDScreens()
 class CameraDrawnCallback : public osg::Camera::DrawCallback
 {
 public:
-   virtual void operator()(osg::RenderInfo& renderInfo)
+   virtual void operator()(const osg::Camera& cam) const
    {
-        GfOut("Camera Drawn\n");
+        osg::Vec3 e;
+        cam.getUserValue("eye",e);
+        GfOut("Camera DrawnHHERERE %d %f %f %F\n",&cam,e.x(),e.y(),e.z());
      // traverse(node, nv);
    }
 };
@@ -61,7 +64,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
     viewer->getCamera()->setViewport(new osg::Viewport(0, 0, m_Winw, m_Winh));
     viewer->getCamera()->setGraphicsContext(gw);
     viewer->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR); 
-    viewer->getCamera()->setPreDrawCallback(new CameraDrawnCallback);
+    //viewer->getCamera()->setPreDrawCallback(new CameraDrawnCallback);
 
     mirrorCam->setGraphicsContext(gw);
     mirrorCam->setClearMask( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);

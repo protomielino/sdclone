@@ -26,12 +26,15 @@
 
 #include "OsgWheel.h"
 
+class SDCarShader;
+
 class SDCar
 {
     private :
         osg::ref_ptr<osg::MatrixTransform> car_branch;
         tCarElt *car;
         SDWheels wheels;
+        SDCarShader * shader;
      //   osg::ref_ptr<osg::MatrixTransform> wheels[4];
        // osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
 

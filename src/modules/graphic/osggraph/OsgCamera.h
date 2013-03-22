@@ -98,7 +98,7 @@ public:
     inline float getAspectRatio(){return 0.0;}
     inline float getMirrorAllowed(){return mirrorAllowed;}
     inline osg::Vec3 getCameraPosition(){
-        return center;
+        return eye;
     }
 
     //camera for sound

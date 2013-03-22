@@ -19,6 +19,7 @@
 
 #include <osg/Camera>
 #include <osg/Matrix>
+#include <osg/ValueObject>
 
 #include <car.h>
 #include <raceman.h>
@@ -156,6 +157,7 @@ void SDPerspCamera::setProjection(void)
 void SDPerspCamera::setModelView(void)
 {
   screen->getOsgCam()->setViewMatrixAsLookAt(eye,center,up);
+  screen->getOsgCam()->setUserValue("eye",eye);
 }
 
 void SDPerspCamera::loadDefaults(char *attr)
@@ -1486,6 +1488,7 @@ void SDCarCamMirror::setModelView(void)
    osg::Matrix res = m*mir;
 
    screen->getOsgMirrorCam()->setViewMatrix(res);
+   screen->getOsgCam()->setUserValue("eye",eye);
 }
 
 void SDCarCamMirror::update(tCarElt *car, tSituation * /* s */)
