@@ -87,4 +87,5 @@ class SDFrameInfo
 };
 
 void * getScreens();
+void * getRender();
 #endif /* _OSGMAIN_H_ */ 

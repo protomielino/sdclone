@@ -32,6 +32,17 @@ SDScreens::SDScreens()
     viewer = new osgViewer::Viewer();
 }
 
+class CameraDrawnCallback : public osg::Camera::DrawCallback
+{
+public:
+   virtual void operator()(osg::RenderInfo& renderInfo)
+   {
+        GfOut("Camera Drawn\n");
+     // traverse(node, nv);
+   }
+};
+
+
 void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group> m_sceneroot)
 {
     m_Winx = x;
@@ -49,7 +60,8 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
     //viewer->getCamera()->setName("Cam one");
     viewer->getCamera()->setViewport(new osg::Viewport(0, 0, m_Winw, m_Winh));
     viewer->getCamera()->setGraphicsContext(gw);
-    viewer->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+    viewer->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR); 
+    viewer->getCamera()->setPreDrawCallback(new CameraDrawnCallback);
 
     mirrorCam->setGraphicsContext(gw);
     mirrorCam->setClearMask( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -72,6 +84,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
         screenCam->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
         screenCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
         screenCam->addChild(m_sceneroot);
+        screenCam->setPreDrawCallback(new CameraDrawnCallback);
         screenCam->setNodeMask(0);
 
         mirrorCam = new osg::Camera;

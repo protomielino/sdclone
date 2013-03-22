@@ -173,6 +173,8 @@ public:
     inline float get_visibility() const { return effective_visibility; }
     inline void set_visibility( float v ) {	effective_visibility = visibility = (v <= 25.0) ? 25.0 : v; }
 
+    inline SDSun * getSun(){return sun;}
+
     //virtual double get_3dCloudDensity() const;
     //virtual void set_3dCloudDensity(double density);
     //virtual float get_3dCloudVisRange() const;

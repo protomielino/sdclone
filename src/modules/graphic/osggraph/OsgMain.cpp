@@ -49,6 +49,10 @@ void *getScreens(){
     return screens;
 }
 
+void *getRender(){
+    return render;
+}
+
 static osg::ref_ptr<osg::Group> m_sceneroot;
 static osg::ref_ptr<osg::Group> m_carroot;
 static osg::Timer m_timer;

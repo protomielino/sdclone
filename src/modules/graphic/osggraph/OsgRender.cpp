@@ -91,6 +91,10 @@ SDRender::~SDRender(void)
 {
 }
 
+SDSky * SDRender::getSky(){
+    return thesky;
+}
+
 /**
  * SDRender
  * Initialises a scene (ie a new view).

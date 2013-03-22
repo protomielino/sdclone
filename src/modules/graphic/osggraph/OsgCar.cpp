@@ -27,7 +27,9 @@
 #include "OsgCar.h"
 #include "OsgMath.h"
 #include "OsgScreens.h"
+#include "OsgRender.h"
 #include "OsgMain.h"
+#include "OsgSky.h"
 
 
 osg::ref_ptr<osg::Program> program ;
@@ -224,12 +226,17 @@ void SDCar::updateCar()
 
     this->car_branch->setMatrix(mat);
 
+    SDRender * ren = (SDRender *)getRender();
+    osg::Vec3f sun_pos= ren->getSky()->getSun()->getSunPosition();
+    osg::Vec4f sun_color = ren->getSky()->get_sun_color();
+    osg::Vec4f scene_color = ren->getSky()->get_scene_color();
+
     SDScreens * scr= (SDScreens *)getScreens();
     osg::Vec3 c = scr->getActiveView()->getCameras()->getSelectedCamera()->getCameraPosition();
     osg::Matrix modelview = scr->getActiveView()->getOsgCam()->getViewMatrix();
     osg::Vec4 v = osg::Vec4(c.x(),c.y(),c.z(),1.0);
     osg::Vec4 pv = v*modelview;
-    osg::Vec4 lv = osg::Vec4(10.0,10.0,10.0,0.0);
+    osg::Vec4 lv = osg::Vec4(sun_pos.x(),sun_pos.y(),sun_pos.z(),0.0);
     lv =lv*modelview;
     osg::StateSet* stateset = pCar->getOrCreateStateSet();
     stateset->setAttributeAndModes( program.get() );
@@ -237,8 +244,8 @@ void SDCar::updateCar()
     stateset->addUniform(new osg::Uniform("pv", osg::Vec3(pv.x(),pv.y(),pv.z())));
     stateset->addUniform(new osg::Uniform("specularColor", osg::Vec4(1.0,1.0,1.0,1.0)));
     stateset->addUniform(new osg::Uniform("lightvector", osg::Vec3(lv.x(),lv.y(),lv.z())));
-    stateset->addUniform(new osg::Uniform("lightpower", osg::Vec4(4.0,4.0,4.0,4.0)));
-    stateset->addUniform(new osg::Uniform("ambientColor", osg::Vec4(0.1,0.1,0.1,1.0)));
+    stateset->addUniform(new osg::Uniform("lightpower", osg::Vec4(4.0*sun_color.r(),4.0*sun_color.g(),4.0*sun_color.b(),4.0)));
+    stateset->addUniform(new osg::Uniform("ambientColor", scene_color));
     stateset->addUniform(new osg::Uniform("smoothness", 25.0f));
 }
 

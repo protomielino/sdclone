@@ -52,6 +52,7 @@ public:
         void UpdateTime(tSituation *s);
         void UpdateLight(void);
         void UpdateFogColor(double angle);
+        SDSky * getSky();
 };
 
 #endif //_OSGRENDER_H_
