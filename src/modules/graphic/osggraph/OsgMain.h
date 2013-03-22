@@ -88,4 +88,5 @@ class SDFrameInfo
 
 void * getScreens();
 void * getRender();
+void * getCars();
 #endif /* _OSGMAIN_H_ */ 

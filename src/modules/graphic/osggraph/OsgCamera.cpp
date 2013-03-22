@@ -710,6 +710,7 @@ class SDCarCamBehindReverse : public SDPerspCamera
       osg::Matrix res = m*mir;
 
       screen->getOsgCam()->setViewMatrix(res);
+      screen->getOsgCam()->setUserValue("eye",eye);
 
       //glFrontFace( GL_CW );
     }

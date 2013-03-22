@@ -53,6 +53,10 @@ void *getRender(){
     return render;
 }
 
+void * getCars(){
+    return cars;
+}
+
 static osg::ref_ptr<osg::Group> m_sceneroot;
 static osg::ref_ptr<osg::Group> m_carroot;
 static osg::Timer m_timer;

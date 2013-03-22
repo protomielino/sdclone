@@ -83,7 +83,7 @@ public :
         stateset->addUniform(shininess);
     }
 
-    void update(){
+    void update(osg::Vec3 c, osg::Matrix modelview){
 
 
         SDRender * ren = (SDRender *)getRender();
@@ -91,9 +91,9 @@ public :
         osg::Vec4f sun_color = ren->getSky()->get_sun_color();
         osg::Vec4f scene_color = ren->getSky()->get_scene_color();
 
-        SDScreens * scr= (SDScreens *)getScreens();
-        osg::Vec3 c = scr->getActiveView()->getCameras()->getSelectedCamera()->getCameraPosition();
-        osg::Matrix modelview = scr->getActiveView()->getOsgCam()->getViewMatrix();
+        //SDScreens * scr= (SDScreens *)getScreens();
+        //osg::Vec3 c = scr->getActiveView()->getCameras()->getSelectedCamera()->getCameraPosition();
+       // osg::Matrix modelview = scr->getActiveView()->getOsgCam()->getViewMatrix();
         osg::Vec4 v = osg::Vec4(c.x(),c.y(),c.z(),1.0);
         osg::Vec4 pv = v*modelview;
         osg::Vec4 lv = osg::Vec4(sun_pos.x(),sun_pos.y(),sun_pos.z(),0.0);
@@ -277,7 +277,11 @@ void SDCar::updateCar()
 
     this->car_branch->setMatrix(mat);
 
-    shader->update();
+
+}
+
+void SDCar::updateShadingParameters(osg::Vec3 eye,osg::Matrix modelview){
+    shader->update(eye,modelview);
 }
 
 SDCars::SDCars(void)
@@ -318,5 +322,13 @@ void SDCars::updateCars()
     for(it = the_cars.begin(); it!= the_cars.end(); it++)
     {
         (*it)->updateCar();
+    }
+}
+
+void SDCars::updateShadingParameters(osg::Vec3 eye,osg::Matrix modelview){
+    std::vector<SDCar *>::iterator it;
+    for(it = the_cars.begin(); it!= the_cars.end(); it++)
+    {
+        (*it)->updateShadingParameters(eye,modelview);
     }
 }
