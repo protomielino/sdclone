@@ -106,8 +106,25 @@ void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserData, bool freeName, 
  */
 bool GfDirExists(const char* pszName)
 {
+	if (!pszName || strlen(pszName) == 0)
+		return false;
+	
 	struct stat st;
-	return stat(pszName, &st) ? false : true;
+
+#ifdef WIN32
+	if (pszName[strlen(pszName)-1] == '/' || pszName[strlen(pszName)-1] == '\\')
+	{
+		// Windows stat() does not supports traling (anti-)slashes ... no comment please.
+		char* pszNameNoTrailSlash = strdup(pszName);
+		pszNameNoTrailSlash[strlen(pszName)-1] = 0;
+		GfLogDebug("XXXXXXXXXXX pszNameNoTrailSlash=%s\n", pszNameNoTrailSlash);
+		const bool bAnswer = (stat(pszNameNoTrailSlash, &st) ? false : true);
+		free(pszNameNoTrailSlash);
+		return bAnswer;
+	}
+	else
+#endif
+		return stat(pszName, &st) ? false : true;
 }
 
 /** Create a directory and the parents if needed

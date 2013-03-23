@@ -424,7 +424,7 @@ bool GfApplication::parseOptions()
 
 	// If the (installed) data dir. does not exists, may be it's because we are running
 	// without installing : try and use the _source_ data dir.
-	if (pszLocalDir && strlen(pszLocalDir) && !GfDirExists(pszDataDir))
+	if (pszDataDir && strlen(pszDataDir) && !GfDirExists(pszDataDir))
 	{
 		GfLogTrace("Installed data dir. '%s' not found, trying source data dir.\n", pszDataDir);
 		pszDataDir = GfSetDataDir(SD_DATADIR_SRC);

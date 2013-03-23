@@ -28,6 +28,7 @@
 MACRO(_GET_TARGET_REAL_PATHNAME TGT_NAME VAR_PATHNAME)
 
     GET_TARGET_PROPERTY(${VAR_PATHNAME} ${TGT_NAME} LOCATION)
+    MESSAGE(STATUS "GET_TARGET_REAL_PATHNAME(${TGT_NAME})=${${VAR_PATHNAME}}")
     IF(MSVC)
       STRING(REPLACE \"$(OutDir)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" ${VAR_PATHNAME} \${${VAR_PATHNAME}})
       STRING(REPLACE \"$(ConfigurationName)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" ${VAR_PATHNAME} \${${VAR_PATHNAME}})
@@ -65,7 +66,17 @@ ENDMACRO(SD_SETUP_SETTINGS_VERSION)
 MACRO(SD_UPDATE_SETTINGS_VERSION)
 
 	# Determine the full path-name of xmlversion.exe
-    _GET_TARGET_REAL_PATHNAME(xmlversion _XMLVER_EXE)
+    IF(FALSE AND WIN32)
+
+      # Does not work with MinGW at leat !?
+      MESSAGE(STATUS "CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}")
+      SET(_XMLVER_EXE "${CMAKE_BINARY_DIR}/${SD_BINDIR}/${CMAKE_EXECUTABLE_PREFIX}xmlversion${CMAKE_EXECUTABLE_SUFFIX}")
+
+    ELSE()
+
+      _GET_TARGET_REAL_PATHNAME(xmlversion _XMLVER_EXE)
+
+    ENDIF()
 
     # In order to run xmlversion.exe in the build tree (see below), under Windows,
     # we nearly always have to copy dependency DLLs next to it.
@@ -75,15 +86,32 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
 
 	  # Internal dependencies (needed in all cases).
       # TODO: Check if still needed after DLLs built in "standard" folders in build tree ????
-      _GET_TARGET_REAL_PATHNAME(_DLL_PATHNAME tgf)
+
+      IF(FALSE)
+
+      IF(WIN32)
+        SET(_DLL_PATHNAME "${CMAKE_BINARY_DIR}/${SD_BINDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}tgf${CMAKE_SHARED_LIBRARY_SUFFIX}")
+      ELSE()
+        _GET_TARGET_REAL_PATHNAME(_DLL_PATHNAME tgf)
+      ENDIF()
 	  LIST(APPEND _DLLS_TO_INSTALL ${_DLL_PATHNAME})
 
-      _GET_TARGET_REAL_PATHNAME(_DLL_PATHNAME portability)
+      IF(WIN32)
+        SET(_DLL_PATHNAME "${CMAKE_BINARY_DIR}/${SD_BINDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}portability${CMAKE_SHARED_LIBRARY_SUFFIX}")
+      ELSE()
+        _GET_TARGET_REAL_PATHNAME(_DLL_PATHNAME portability)
+      ENDIF()
 	  LIST(APPEND _DLLS_TO_INSTALL ${_DLL_PATHNAME})
 
       IF(NOT OPTION_3RDPARTY_EXPAT)
-        _GET_TARGET_REAL_PATHNAME(_DLL_PATHNAME txml)
+        IF(WIN32)
+          SET(_DLL_PATHNAME "${CMAKE_BINARY_DIR}/${SD_BINDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}txml${CMAKE_SHARED_LIBRARY_SUFFIX}")
+        ELSE()
+          _GET_TARGET_REAL_PATHNAME(_DLL_PATHNAME txml)
+        ENDIF()
 	    LIST(APPEND _DLLS_TO_INSTALL ${_DLL_PATHNAME})
+      ENDIF()
+
       ENDIF()
 
 	  # 3rd party dependencies
@@ -130,9 +158,15 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
       ENDIF(MINGW AND NOT CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
 
 	  # Copy the dependency DLLs found above.
-	  GET_FILENAME_COMPONENT(_XMLVER_DIR "${_XMLVER_EXE}" PATH)
 	  MESSAGE(STATUS "xmlversion : DLLs to install=${_DLLS_TO_INSTALL}")
-      FILE(COPY ${_DLLS_TO_INSTALL} DESTINATION "${_XMLVER_DIR}")
+      IF(_DLLS_TO_INSTALL)
+        FOREACH(_DLL ${_DLLS_TO_INSTALL})
+          ADD_CUSTOM_COMMAND(TARGET settings_versions PRE_BUILD
+                             COMMAND ${CMAKE_COMMAND} -E echo Copying "${_DLL}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
+                             COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
+                             COMMAND ${CMAKE_COMMAND} -E copy "${_DLL}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}")
+        ENDFOREACH()
+      ENDIF()
 
     ENDIF(WIN32)
 
@@ -148,8 +182,8 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
         SET(_USER_DIR ${_ARG})
         # Register file for run-time install/update at game startup
         # (through filesetup.cpp services)
-        ADD_CUSTOM_COMMAND(TARGET settings_versions
-                           COMMENT "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
+        ADD_CUSTOM_COMMAND(TARGET settings_versions POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E echo "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
                            COMMAND "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data")
         # Done for this {file, folder} couple, ready for next one.
         SET(_SRC_FILE)
