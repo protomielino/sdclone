@@ -19,7 +19,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 # Note: Headers needed for having them available in IDEs.
-ADD_LIBRARY(metar SHARED ${METAR_SOURCES} ${METAR_HEADERS})
+SD_ADD_LIBRARY(metar SHARED ${METAR_SOURCES} ${METAR_HEADERS})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(metar PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

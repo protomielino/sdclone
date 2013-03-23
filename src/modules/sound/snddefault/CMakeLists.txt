@@ -37,14 +37,10 @@ IF(MSVC)
 ENDIF(MSVC)
 
 # Note: Headers and other source files needed for having them available in IDEs.
-ADD_LIBRARY(snddefault SHARED ${_SOURCES} ${_HEADERS} ${_OTHER_SOURCES})
+SD_ADD_LIBRARY(snddefault MODULE ${_SOURCES} ${_HEADERS} ${_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(snddefault PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
-
-IF(UNIX OR MINGW)
-    SET_TARGET_PROPERTIES(snddefault PROPERTIES PREFIX "")
-ENDIF(UNIX OR MINGW)
 
 ADD_PLIB_LIBRARY(snddefault ul sg sl ssg ssgaux)
 ADD_SDL_LIBRARY(snddefault)

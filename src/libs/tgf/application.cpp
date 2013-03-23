@@ -421,15 +421,23 @@ bool GfApplication::parseOptions()
 		pszBinDir = GfSetBinDir(SD_BINDIR);
 	if (!(pszDataDir && strlen(pszDataDir)))
 		pszDataDir = GfSetDataDir(SD_DATADIR);
+
+	// If the (installed) data dir. does not exists, may be it's because we are running
+	// without installing : try and use the _source_ data dir.
+	if (pszLocalDir && strlen(pszLocalDir) && !GfDirExists(pszDataDir))
+	{
+		GfLogTrace("Installed data dir. '%s' not found, trying source data dir.\n", pszDataDir);
+		pszDataDir = GfSetDataDir(SD_DATADIR_SRC);
+	}
 	
 	// Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
 	if (!(pszLocalDir && strlen(pszLocalDir)) || !(pszLibDir && strlen(pszLibDir)) 
 		|| !(pszBinDir && strlen(pszBinDir)) || !(pszDataDir && strlen(pszDataDir)))
 	{
-		GfLogTrace("SD_LOCALDIR : '%s'\n", GfLocalDir());
-		GfLogTrace("SD_LIBDIR   : '%s'\n", GfLibDir());
-		GfLogTrace("SD_BINDIR   : '%s'\n", GfBinDir());
-		GfLogTrace("SD_DATADIR  : '%s'\n", GfDataDir());
+		GfLogTrace("User settings dir. : '%s'\n", GfLocalDir());
+		GfLogTrace("Libraries dir.     : '%s'\n", GfLibDir());
+		GfLogTrace("Binaries dir.      : '%s'\n", GfBinDir());
+		GfLogTrace("Data dir.          : '%s'\n", GfDataDir());
 		
 		GfLogError("Could not start %s :"
 				   " at least 1 of local/data/lib/bin dir is empty\n\n", _strName.c_str());

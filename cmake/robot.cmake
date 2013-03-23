@@ -153,13 +153,9 @@ MACRO(ROBOT_MODULE)
   ENDIF(MSVC)
 
   # The robot module is actually a shared library.
-  ADD_LIBRARY(${RBM_NAME} SHARED ${RBM_SOURCES})
+  SD_ADD_LIBRARY(${RBM_NAME} ROBOT ${RBM_SOURCES})
 
-  # Customize shared library versions and file prefix.
-  IF(UNIX OR MINGW) # No "lib" prefix under Linux / MinGW
-    SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES PREFIX "") 
-  ENDIF()
-
+  # Customize shared library versions.
   IF(UNIX) # Use ldconfig version naming scheme + no "lib" prefix under Linux
     # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
     #SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES VERSION ${RBM_VERSION})
@@ -183,20 +179,22 @@ MACRO(ROBOT_MODULE)
 
     FOREACH(CLONENAME ${RBM_CLONENAMES})
     
-      SET(CLONE_MODLOC ${CLONENAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+      SET(CLONE_MODLOC "${CMAKE_BINARY_DIR}/${SD_LIBDIR}/drivers/${CLONENAME}/${CLONENAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
       IF(FALSE) #IF(UNIX)
         # Might not work with GCC 4.5 or + (see above) 
         ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC}.${RBM_VERSION})
+                           COMMAND ${CMAKE_COMMAND} -E echo "Cloning ${RBM_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX} into ${CLONE_MODLOC}.${RBM_VERSION}"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MODLOC} ${CLONE_MODLOC}.${RBM_VERSION})
         ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
                            COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_VERSION} ${CLONE_MODLOC}.${RBM_SOVERSION}
                            COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC})
-        SD_INSTALL_FILES(LIB drivers/${CLONENAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+        SD_INSTALL_FILES(LIB drivers/${CLONENAME}
                          FILES ${CLONE_MODLOC} ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC}.${RBM_VERSION} )
       ELSE()
         ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC})
-        SD_INSTALL_FILES(LIB drivers/${CLONENAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+                           COMMAND ${CMAKE_COMMAND} -E echo "Cloning ${RBM_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX} into ${CLONE_MODLOC}"
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MODLOC} ${CLONE_MODLOC})
+        SD_INSTALL_FILES(LIB drivers/${CLONENAME}
                          FILES ${CLONE_MODLOC})
       ENDIF()
         

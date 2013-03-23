@@ -105,7 +105,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.h.in.cmake
 
 # Generate DOxygen configuration file
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/doxygenconfig.in.cmake
-	       ${CMAKE_CURRENT_BINARY_DIR}/doxygen_config @ONLY)
+               ${CMAKE_CURRENT_BINARY_DIR}/doxygen_config @ONLY)
 
 
 # Fictive = no-output target, for having source files available in IDEs.
@@ -115,12 +115,19 @@ ADD_CUSTOM_TARGET(rootdoc SOURCES ${_SOURCES})
 # Install top tree data files
 SD_INSTALL_FILES(DATA "/"  FILES ${_SOURCES})
 
+# Initialize user settings file management (before any of them is collected).
+SD_SETUP_SETTINGS_VERSION()
+
 # Sub-dirs to build ...					   
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(cmake)
 
-# Usefull for using SD as a robot development framework without building SD
+# After the user settings files have been collected,
+# Update (and then install) version.xml from their respective version.
+SD_UPDATE_SETTINGS_VERSION()
+
+# Usefull for using an installation of SD as a robot development framework without building it.
 INSTALL_SD_CMAKE()
 
 # Generate a 'make clobber'-like clobber.sh/.bat script in case of an in-source build.

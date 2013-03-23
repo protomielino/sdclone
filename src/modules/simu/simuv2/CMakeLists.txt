@@ -31,7 +31,7 @@ IF(MSVC)
 ENDIF(MSVC)
 
 # Note: Headers needed for having them available in IDEs.
-ADD_LIBRARY(simuv2 SHARED ${_SOURCES} ${_HEADERS})
+SD_ADD_LIBRARY(simuv2 MODULE ${_SOURCES} ${_HEADERS})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(simuv2 PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
@@ -39,10 +39,6 @@ ADD_LIBRARY(simuv2 SHARED ${_SOURCES} ${_HEADERS})
 ADD_SOLID_LIBRARY(simuv2) # Ignored if not OPTION_3RDPARTY_SOLID
 
 ADD_SDLIB_LIBRARY(simuv2 portability tgf robottools solid) # solid ignored if OPTION_3RDPARTY_SOLID
-
-IF(UNIX OR MINGW)
-    SET_TARGET_PROPERTIES(simuv2 PROPERTIES PREFIX "")
-ENDIF(UNIX OR MINGW)
 
 SD_INSTALL_FILES(LIB modules/simu TARGETS simuv2)
 

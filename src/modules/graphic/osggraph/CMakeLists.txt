@@ -40,14 +40,10 @@ IF(MSVC)
 ENDIF(MSVC)
 
 # Note: Other sources and headers needed for having them available in IDEs.
-ADD_LIBRARY(osggraph SHARED ${OSGGRAPH_SOURCES} ${OSGGRAPH_HEADERS} ${OSGGRAPH_OTHER_SOURCES})
+SD_ADD_LIBRARY(osggraph MODULE ${OSGGRAPH_SOURCES} ${OSGGRAPH_HEADERS} ${OSGGRAPH_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(osggraph PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
-
-IF(UNIX OR MINGW)
-    SET_TARGET_PROPERTIES(osggraph PROPERTIES PREFIX "")
-ENDIF(UNIX OR MINGW)
 
 ADD_OSG_LIBRARY(osggraph)
 ADD_SDL_LIBRARY(osggraph)

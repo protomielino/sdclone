@@ -179,6 +179,7 @@
 
 /* Run-time directories */
 #define SD_DATADIR "${SD_DATADIR}/"
+#define SD_DATADIR_SRC "${PROJECT_SOURCE_DIR}/data/"
 #define SD_LIBDIR "${SD_LIBDIR}/"
 #define SD_BINDIR "${SD_BINDIR}/"
 #define SD_LOCALDIR "${SD_LOCALDIR}/"

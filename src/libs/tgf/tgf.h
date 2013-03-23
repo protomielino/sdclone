@@ -264,6 +264,7 @@ typedef struct FList
     void		*userData;	/**< User data */
 } tFList;
 
+TGF_API bool GfDirExists(const char* pszName);
 TGF_API int GfDirCreate(const char *path);
 TGF_API tFList *GfDirGetList(const char *dir);
 TGF_API tFList *GfDirGetListFiltered(const char *dir, const char *prefix, const char *suffix);

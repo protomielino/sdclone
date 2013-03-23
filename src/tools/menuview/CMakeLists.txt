@@ -26,7 +26,7 @@ IF(MSVC)
 ENDIF(MSVC)
 
 # Note: Headers needed for having them available in IDEs.
-ADD_EXECUTABLE(${_TARGET_NAME} ${_SOURCES} ${_HEADERS})
+SD_ADD_EXECUTABLE(${_TARGET_NAME} ${_SOURCES} ${_HEADERS})
 
 ADD_SDLIB_LIBRARY(${_TARGET_NAME} portability robottools tgf tgfclient)
 

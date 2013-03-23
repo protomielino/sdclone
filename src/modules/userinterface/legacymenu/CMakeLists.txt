@@ -72,14 +72,10 @@ IF(COMMAND CMAKE_POLICY)
 ENDIF(COMMAND CMAKE_POLICY)
 
 # Note: Headers needed for having them available in IDEs.
-ADD_LIBRARY(legacymenu SHARED ${LEGACYMENU_SOURCES} ${LEGACYMENU_HEADERS})
+SD_ADD_LIBRARY(legacymenu MODULE ${LEGACYMENU_SOURCES} ${LEGACYMENU_HEADERS})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(legacymenu PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
-
-IF(UNIX OR MINGW)
-    SET_TARGET_PROPERTIES(legacymenu PROPERTIES PREFIX "")
-ENDIF(UNIX OR MINGW)
 
 ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata networking)
 

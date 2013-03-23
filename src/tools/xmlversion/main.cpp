@@ -138,7 +138,7 @@ static int process( const char* versionFile, const char* dataLocation,
 	path = (char*)malloc( sizeof(char) * 31 );
 	snprintf( path, 30, "versions/%d", index );
 
-	// Note : Data location is set to a relative path is specified such, absolute otherwise.
+	// Note : Data location is set to a relative path if specified such, absolute otherwise.
 	GfParmSetStr( versionHandle, path, "Data location", actualDataLoc);
 	GfParmSetStr( versionHandle, path, "Local location", userLocation );
 	GfParmSetNum( versionHandle, path, "Major version", NULL, (tdble)majorVer);
@@ -152,9 +152,11 @@ static int process( const char* versionFile, const char* dataLocation,
 	GfParmReleaseHandle( versionHandle );
 	GfParmReleaseHandle( xmlHandle );
 
-	fprintf(stderr, "xmlversion: Updated %s (file #%d %s (version %d.%d) => %s).\n",
-			versionFile, index, actualDataLoc, majorVer, minorVer, userLocation);
-
+	GfLogDebug("xmlversion: Updated %s (file #%d %s (version %d.%d) => %s).\n",
+			   versionFile, index, actualDataLoc, majorVer, minorVer, userLocation);
+	fprintf(stderr, "xmlversion: Updated %s for %s (version %d.%d)\n",
+			versionFile, actualDataLoc, majorVer, minorVer);
+	
 	return 0;
 }
 
@@ -206,7 +208,7 @@ int main( int argc, char **argv )
 		fprintf( stderr, "Usage: xmlversion version-file data-location local-location [datadir]\n\n" );
 		fprintf( stderr, "   version-file: The location of the version.xml file\n" );
 		fprintf( stderr, "   data-location: Path and filename to the location of installed xml-file\n" );
-		fprintf( stderr, "                   (relative to datadir if specified, otherwise absolute)\n\n" );
+		fprintf( stderr, "                   (absolute, or else relative to specified datadir)\n\n" );
 		fprintf( stderr, "   local-location: path and filename to the location of the local xml-file\n" );
 		fprintf( stderr, "                   (relative to the users local directory)\n\n" );
 		fprintf( stderr, "Usage: xmlversion -d version-file local-location\n\n" );

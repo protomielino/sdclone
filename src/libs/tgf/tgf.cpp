@@ -749,7 +749,7 @@ static char* makeRunTimeDirPath(const char* srcPath)
 		GfPathNormalizeDir(tgtPath, bufSize - 1);
 
 	if (!tgtPath)
-		GfLogFatal("Path '%s' too long ; could not make as a run-time path\n", srcPath);
+		GfLogFatal("Path '%s' too long ; could not make it a run-time path\n", srcPath);
 
 	return tgtPath;
 }

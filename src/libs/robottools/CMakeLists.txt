@@ -26,7 +26,7 @@ IF (COMMAND CMAKE_POLICY)
 ENDIF(COMMAND CMAKE_POLICY)
 
 # Note: Headers needed for having them available in IDEs.
-ADD_LIBRARY(robottools SHARED ${ROBOTTOOLS_SOURCES} ${ROBOTTOOLS_HEADERS})
+SD_ADD_LIBRARY(robottools SHARED ${ROBOTTOOLS_SOURCES} ${ROBOTTOOLS_HEADERS})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(robottools PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

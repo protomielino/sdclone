@@ -39,14 +39,10 @@ IF(MSVC)
 ENDIF(MSVC)
 
 # Note: Other source files  and headers needed for having them available in IDEs.
-ADD_LIBRARY(genparoptv1 SHARED ${_SOURCES} ${_HEADERS} ${_OTHER_SOURCES})
+SD_ADD_LIBRARY(genparoptv1 MODULE ${_SOURCES} ${_HEADERS} ${_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(genparoptv1 PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
-
-IF(UNIX OR MINGW)
-    SET_TARGET_PROPERTIES(genparoptv1 PROPERTIES PREFIX "")
-ENDIF(UNIX OR MINGW)
 
 ADD_SDLIB_LIBRARY(genparoptv1 portability tgf tgfdata robottools)
 

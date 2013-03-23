@@ -28,11 +28,11 @@ IF(MSVC)
         "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmt.lib")
 ENDIF(MSVC)
 
-ADD_EXECUTABLE(${_TARGET_NAME} ${_SOURCES})
+SD_ADD_EXECUTABLE(${_TARGET_NAME} ${_SOURCES})
 
 ADD_SDLIB_LIBRARY(${_TARGET_NAME} portability tgf tgfclient tgfdata)
 
-# Needed when using the "MinGW Makefiles" CMake generator (but not with the "MSYS Makefiles" one !?)
+# Needed when using the "MinGW Makefiles" CMake generator (but not with the "MSYS Makefiles" one !)
 IF(MINGW)
 	TARGET_LINK_LIBRARIES(${_TARGET_NAME} ${MINGW32_LIBRARY})
 ENDIF(MINGW)

@@ -74,7 +74,6 @@ IF(WIN32)
 ELSE(WIN32) #UNIX
   SET(SD_LOCALDIR "~/.speed-dreams-2" CACHE DOC "Where the user settings files should go")
 ENDIF(WIN32)
-MARK_AS_ADVANCED(SD_LOCALDIR)
 
 # Determine the default value of the tools executable file prefix.
 SET(SD_TOOLS_EXECPREFIX "sd2-" CACHE DOC "Prefix for the tools executable names")
@@ -182,6 +181,75 @@ MACRO(SD_ADD_SUBDIRECTORY DIR_PATH)
   ENDIF()
 
 ENDMACRO(SD_ADD_SUBDIRECTORY PATH)
+
+# Replacement of standard ADD_EXECUTABLE command (same interface).
+MACRO(SD_ADD_EXECUTABLE TARGET_NAME)
+
+  # Standard ADD_EXECUTABLE command.
+  ADD_EXECUTABLE(${TARGET_NAME} ${ARGN})
+
+  # Change target location (for running in build-tree without installing).
+  SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
+                        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_BINDIR})
+
+ENDMACRO(SD_ADD_EXECUTABLE TARGET_NAME)
+
+
+# Replacement of standard ADD_LIBRARY command,
+# in order to take care of :
+# * changing target location, for running in build-tree without installing,
+# * changing target name for modules and robot DLLs (no "lib" prefix).
+# Nearly same behaviour as standard ADD_LIBRARY, but :
+# * more library types (possible values for TARGET_TYPE arg) :
+#   - STATIC, SHARED, MODULE : no change,
+#   - ROBOT : same as MODULE for standard ADD_LIBRARY.
+# * TARGET_TYPE type arg is mandatory (no default).
+MACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
+
+  # Standard ADD_EXECUTABLE command.
+  IF(${TARGET_TYPE} STREQUAL "ROBOT")
+    ADD_LIBRARY(${TARGET_NAME} MODULE ${ARGN})
+  ELSE()
+    ADD_LIBRARY(${TARGET_NAME} ${TARGET_TYPE} ${ARGN})
+  ENDIF()
+
+  # Change target location (for running in build-tree without installing).
+  IF(${TARGET_TYPE} STREQUAL "SHARED")
+
+    SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
+                          RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_LIBDIR}/lib 
+                          LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_LIBDIR}/lib)
+
+  ELSEIF(${TARGET_TYPE} STREQUAL "MODULE")
+
+    GET_TARGET_PROPERTY(_MOD_LOC ${TARGET_NAME} LOCATION)
+    GET_FILENAME_COMPONENT(_MOD_TYPE ${_MOD_LOC} PATH)
+    GET_FILENAME_COMPONENT(_MOD_TYPE ${_MOD_TYPE} PATH)
+    GET_FILENAME_COMPONENT(_MOD_TYPE ${_MOD_TYPE} NAME)
+
+    SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
+                          RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_LIBDIR}/modules/${_MOD_TYPE}
+                          LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_LIBDIR}/modules/${_MOD_TYPE})
+
+    IF(UNIX OR MINGW)
+      SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES PREFIX "")
+    ENDIF(UNIX OR MINGW)
+
+  ELSEIF(${TARGET_TYPE} STREQUAL "ROBOT")
+
+    SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
+                          RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_LIBDIR}/drivers/${TARGET_NAME} 
+                          LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_LIBDIR}/drivers/${TARGET_NAME})
+
+    IF(UNIX OR MINGW)
+      SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES PREFIX "")
+    ENDIF(UNIX OR MINGW)
+
+  ENDIF()
+
+ENDMACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
+
+
 
 # Generate clobber.sh/bat shell script (remove _any_ build system generated file)
 MACRO(SD_GENERATE_CLOBBER_SCRIPT)

@@ -100,6 +100,17 @@ void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserData, bool freeName, 
 	list = NULL;
 }
 
+/** Check if a directory exists
+    @ingroup	dir
+    @param	pszName	Path-name of the directory
+    @return	true if the directory exists, false otherwise.
+ */
+bool GfDirExists(const char* pszName)
+{
+	struct stat st;
+	return stat(pszName, &st) ? false : true;
+}
+
 /** Create a directory and the parents if needed
     @ingroup	dir
     @param	dir	full directory path-name

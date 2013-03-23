@@ -40,7 +40,7 @@ ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(math tgf robottools)
 
 # Note: Headers needed for having them available in IDEs.
-ADD_LIBRARY(simuv4 SHARED ${SIMU_SOURCES} ${SIMU_HEADERS})
+SD_ADD_LIBRARY(simuv4 MODULE ${SIMU_SOURCES} ${SIMU_HEADERS})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(simuv2.1 PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
@@ -48,9 +48,5 @@ ADD_LIBRARY(simuv4 SHARED ${SIMU_SOURCES} ${SIMU_HEADERS})
 ADD_SOLID_LIBRARY(simuv4) # Ignored if not OPTION_3RDPARTY_SOLID
 
 ADD_SDLIB_LIBRARY(simuv4 portability tgf robottools solid) # solid ignored if not OPTION_3RDPARTY_SOLID
-
-IF(UNIX OR MINGW)
-    SET_TARGET_PROPERTIES(simuv4 PROPERTIES PREFIX "")
-ENDIF(UNIX OR MINGW)
 
 SD_INSTALL_FILES(LIB modules/simu TARGETS simuv4)

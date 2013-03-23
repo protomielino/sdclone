@@ -21,7 +21,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 # Note: Other sources and headers needed for having them available in IDEs.
-ADD_LIBRARY(learning SHARED ${LEARNING_SOURCES} ${LEARNING_HEADERS} ${LEARNING_OTHER_SOURCES})
+SD_ADD_LIBRARY(learning SHARED ${LEARNING_SOURCES} ${LEARNING_HEADERS} ${LEARNING_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(learning PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

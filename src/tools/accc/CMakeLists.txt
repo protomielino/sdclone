@@ -10,7 +10,7 @@ SET(ACCC_HEADERS accc.h)
 ADD_SDLIB_INCLUDEDIR(portability)
 
 # Note: Headers needed for having them available in IDEs.
-ADD_EXECUTABLE(${_TARGET_NAME} ${ACCC_SOURCES} ${ACCC_HEADERS})
+SD_ADD_EXECUTABLE(${_TARGET_NAME} ${ACCC_SOURCES} ${ACCC_HEADERS})
 
 ADD_SDLIB_LIBRARY(${_TARGET_NAME} portability)
 

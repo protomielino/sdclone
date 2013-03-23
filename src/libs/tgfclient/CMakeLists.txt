@@ -48,7 +48,7 @@ IF(MSVC)
 ENDIF(MSVC)
 
 # Note: Other sources needed for having them available in IDEs.
-ADD_LIBRARY(tgfclient SHARED ${_SOURCES} ${_OTHER_SOURCES})
+SD_ADD_LIBRARY(tgfclient SHARED ${_SOURCES} ${_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(tgfclient PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

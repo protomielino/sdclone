@@ -11,7 +11,8 @@ if (COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # Note: Headers needed for having them available in IDEs.
-ADD_LIBRARY(networking SHARED ${SD_NETWORK_SOURCES} ${SD_NETWORK_HEADERS})
+#TODO: Maje this a real (dynamically loadable) module, or move it to standard src/libs !
+SD_ADD_LIBRARY(networking SHARED ${SD_NETWORK_SOURCES} ${SD_NETWORK_HEADERS})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(networking PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

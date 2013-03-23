@@ -78,14 +78,29 @@ void GfFileSetup()
 	int major;
 	int minor;
 	struct stat st;
-
-	// Open data (installation) version.xml.
-	filenameLength = strlen(GfDataDir()) + 12 + 40;
+	const char* pszVersionFileName = "version.xml";
+	
+	// Try and open version.xml from GfDataDir() .
+	filenameLength = strlen(GfDataDir()) + strlen(pszVersionFileName) + 2;
 	filename = (char*)malloc( sizeof(char) * filenameLength );
-	sprintf( filename, "%sversion.xml", GfDataDir() );
+	sprintf( filename, "%s%s", GfDataDir(), pszVersionFileName );
 	dataVersionHandle = GfParmReadFile( filename, GFPARM_RMODE_STD );
+
+	// If it failed, let's try GfBinDir() (in case running from build tree, not installed one).
 	if( !dataVersionHandle )
 	{
+		free( filename );
+		filenameLength = strlen(GfBinDir()) + strlen(pszVersionFileName) + 2;
+		filename = (char*)malloc( sizeof(char) * filenameLength );
+		sprintf( filename, "%s%s", GfBinDir(), pszVersionFileName );
+		dataVersionHandle = GfParmReadFile( filename, GFPARM_RMODE_STD );
+	}
+	
+	// Exit if version.xml not found.
+	if( !dataVersionHandle )
+	{
+		GfLogWarning("No readable reference %s found ; will not check / update user settings",
+					 pszVersionFileName);
 		free( filename );
 		return;
 	}
@@ -93,6 +108,8 @@ void GfFileSetup()
 	// Exit if nothing inside.
 	if( GfParmListSeekFirst( dataVersionHandle, "versions" ) != 0 )
 	{
+		GfLogWarning("%s contains no user settings version info ; will not check / update user settings",
+					 filename);
 		free( filename );
 		GfParmReleaseHandle( dataVersionHandle );
 		return;
@@ -105,17 +122,19 @@ void GfFileSetup()
 	if( filenameLength < strlen(GfLocalDir()) + 12 )
 	{
 		free( filename );
-		filenameLength = strlen(GfLocalDir()) + 12 + 40;
+		filenameLength = strlen(GfLocalDir()) + strlen(pszVersionFileName) + 2;
 		filename = (char*)malloc( sizeof(char) * filenameLength );
 	}
 
-	sprintf( filename, "%sversion.xml", GfLocalDir() );
+	sprintf( filename, "%s%s", GfLocalDir(), pszVersionFileName );
 	anyLocalChange = !GfFileExists(filename);
 	localVersionHandle = GfParmReadFile( filename, GFPARM_RMODE_CREAT );
 
 	// Exit if open/creation failed.
 	if( !localVersionHandle )
 	{
+		GfLogWarning("%s not found / readable ; will not check / update user settings",
+					 filename);
 		free( filename );
 		GfParmReleaseHandle( dataVersionHandle );
 		return;
