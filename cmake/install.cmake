@@ -91,7 +91,7 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
 	  #  as in this case, these DLLs are installed in the standard Linux folder /usr/local/bin,
 	  #  which is in the PATH under MSYS).
 	  # TODO: Use Custom3rdParty macros for this (and thus avoid duplicate code) ?
-	  IF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
+	  IF(NOT CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
 
         IF(OPTION_3RDPARTY_EXPAT)
           FIND_PACKAGE(EXPAT)
@@ -115,19 +115,19 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
         SET(_DLL_PATHNAME ${_LIB_PATH}/../bin/${_LIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
 	    LIST(APPEND _DLLS_TO_INSTALL ${_DLL_PATHNAME})
 
-      ENDIF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
+      ENDIF(NOT CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
 
 	  # Compiler run-time dependencies
 	  # (neither needed for MinGW builds through the "MSYS Makefiles" generator,
 	  #  - same reason than for the 3rd party dependencies -
 	  #  nor for MSVC builds, where Visual Studio takes care itself of it).
 	  # TODO: Use Custom3rdParty macros for this (and thus avoid duplicate code) ?
-	  IF(MINGW AND NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
+	  IF(MINGW AND NOT CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
 
 	    LIST(APPEND _DLLS_TO_INSTALL "${_MINGW_BINDIR}/libstdc++-6.dll")
 		LIST(APPEND _DLLS_TO_INSTALL "${_MINGW_BINDIR}/libgcc_s_dw2-1.dll")
 
-      ENDIF(MINGW AND NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
+      ENDIF(MINGW AND NOT CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
 
 	  # Copy the dependency DLLs found above.
 	  GET_FILENAME_COMPONENT(_XMLVER_DIR "${_XMLVER_EXE}" PATH)

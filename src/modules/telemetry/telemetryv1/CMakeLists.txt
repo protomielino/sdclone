@@ -1,6 +1,9 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
-SET(TELEMETRY_SOURCES telemetryitf.cpp telemetry.cpp telemetry.def)
+SET(TELEMETRY_SOURCES telemetryitf.cpp telemetry.cpp)
+IF(MSVC)
+  SET(TELEMETRY_SOURCES ${TELEMETRY_SOURCES} telemetry.def)
+ENDIF()
 SET(TELEMETRY_HEADERS tlm.h)
 SET(TELEMETRY_OTHER_SOURCES telemetry.sh)
 

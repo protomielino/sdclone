@@ -23,14 +23,13 @@
     @ingroup	dir
 */
 
-#ifndef WIN32
-#include <sys/stat.h>
-#endif
 #include <cstdlib>
 #include <cerrno>
+#include <sys/stat.h>
+
+#include <portability.h>
 
 #include "tgf.h"
-#include "portability.h"
 #include "os.h"
 
 void
