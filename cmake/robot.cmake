@@ -125,15 +125,22 @@ MACRO(ROBOT_MODULE)
   ADD_SDLIB_INCLUDEDIR(learning math portability robottools tgf)
   ADD_PLIB_INCLUDEDIR()
 
-  # Generate / add .def file for MSVC compilers.
-  IF(MSVC)
-    IF(NOT RBM_HAS_INTERFACE OR NOT RBM_INTERFACE)
-      SET(RBM_INTERFACE "LEGACY_MIN")
+  # DLL export stuff under Windows (through a .def file or __declspec pragmas)
+  IF(WIN32)
+    # If an interface is specified, use the old way.
+    IF(RBM_HAS_INTERFACE AND RBM_INTERFACE)
+      IF(MSVC)
+        # For MSVC compilers, generate / add a .def file for legacy / welcome interface.
+        SET(ROBOT_DEF_FILE ${CMAKE_CURRENT_BINARY_DIR}/${RBM_NAME}_gen.def)
+        GENERATE_ROBOT_DEF_FILE(${RBM_NAME} ${ROBOT_DEF_FILE} ${RBM_INTERFACE})
+        SET(RBM_SOURCES ${RBM_SOURCES} ${ROBOT_DEF_FILE})
+      ENDIF()
+    # If no interface is specified, assume it's the new modern one.
+    ELSE()
+      # For any Windows compiler, use __declspec pragmas.
+      ADD_DEFINITIONS(-DROBOT_DLL)
     ENDIF()
-    SET(ROBOT_DEF_FILE ${CMAKE_CURRENT_BINARY_DIR}/${RBM_NAME}_gen.def)
-    GENERATE_ROBOT_DEF_FILE(${RBM_NAME} ${ROBOT_DEF_FILE} ${RBM_INTERFACE})
-    SET(RBM_SOURCES ${RBM_SOURCES} ${ROBOT_DEF_FILE})
-  ENDIF(MSVC)
+  ENDIF(WIN32)
 
   # Disable developer warning
   IF (COMMAND cmake_policy)
