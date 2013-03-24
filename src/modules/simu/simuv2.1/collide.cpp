@@ -688,7 +688,7 @@ SimCarCollideInit(tTrack *track)
 	// Hmm, why is caching disabled, are our objects too fast, so it does not work?
 	// TODO: understand this and reconsider caching.
 	dtDisableCaching();
-	dtSetTolerance(0.001);
+	dtSetTolerance((DT_Scalar)0.001);
 	
 	fixedid = 0;
 

@@ -56,7 +56,6 @@ bool RtInitTimer()
 #else
   return false;
 #endif
-  return false;
 }
 
 // Get timer frequency [Hz]

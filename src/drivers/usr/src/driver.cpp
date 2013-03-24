@@ -1891,7 +1891,8 @@ float Driver::getClutch()
 // move offset to allow for bends (if any)
 float Driver::adjustOffset(float offset)
 {
-return offset;
+  return offset;
+#if 0
   float adjustment = (float) (rldata->rInverse * 10);
   float width = (float) (car->_trkPos.seg->width * 0.75);
 
@@ -1938,6 +1939,7 @@ return offset;
   offset -= adjustment;
 
   return offset;
+#endif
 }
 
 // Compute target point for steering.
@@ -2077,6 +2079,7 @@ vec2f Driver::getTargetPoint(bool use_lookahead, double targetoffset)
     return s;
   }
 
+#if 0
   // all the BT code below is for steering into pits only.
   s.x = (seg->vertex[TR_SL].x + seg->vertex[TR_SR].x)/2;
   s.y = (seg->vertex[TR_SL].y + seg->vertex[TR_SR].y)/2;
@@ -2108,6 +2111,7 @@ vec2f Driver::getTargetPoint(bool use_lookahead, double targetoffset)
 
     return t;
   }
+#endif
 }
 
 
@@ -3662,6 +3666,7 @@ float Driver::filterTrk(float accel)
 {
   return accel;
 
+#if 0
   tTrackSeg* seg = car->_trkPos.seg;
 
   if (car->_speed_x < MAX_UNSTUCK_SPEED ||    // Too slow.
@@ -3693,6 +3698,7 @@ float Driver::filterTrk(float accel)
       }
     }
   }
+#endif
 }
 
 

@@ -196,7 +196,7 @@ bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDrive
     ENetEvent event;
 
     enet_address_set_host (& address, pAddress);
-    address.port = port;
+    address.port = (enet_uint16)port;
 	
     /* Initiate the connection, allocating the two channels 0 and 1. */
 	GfLogError ("Initiating network connection to host '%s:%d' ...\n", pAddress, port);
@@ -675,7 +675,7 @@ void NetClient::ReadAllDriverReadyPacket(ENetPacket *pPacket)
                 pNData->m_vecReadyStatus.clear();
                 pNData->m_vecReadyStatus.resize(rsize);
                 for (int i=0;i<rsize;i++)
-                        pNData->m_vecReadyStatus[i] = msg.unpack_int();
+					pNData->m_vecReadyStatus[i] = msg.unpack_int() ? true : false;
 
                 UnlockNetworkData();
                 SetRaceInfoChanged(true);

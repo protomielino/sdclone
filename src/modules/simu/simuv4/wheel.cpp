@@ -215,7 +215,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 		sy = 0.0f;
 	} else {
 		if (car->features & FEAT_SLOWGRIP) {
-			sx = (vt - wrl) / MAX(fabs(vt), 1.0); //avoid divergence
+			sx = (vt - wrl) / MAX(fabs(vt), 1.0f); //avoid divergence
 			sy = sin(sa);
 		} else {
 			sx = (vt - wrl) / fabs(vt);

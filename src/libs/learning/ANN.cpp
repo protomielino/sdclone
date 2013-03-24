@@ -751,6 +751,7 @@ real ANN_RBFBackpropagate(LISTITEM * p, real * d, bool use_eligibility, real TD)
 	}
 
 	return 0.0f;
+/*
 	//update weights
 	for (i = 0; i < l->n_inputs; i++) {
 		RBFConnection *c = &l->rbf[i * l->n_outputs];
@@ -766,6 +767,7 @@ real ANN_RBFBackpropagate(LISTITEM * p, real * d, bool use_eligibility, real TD)
 		}
 	}
 	return 0.0f;
+*/
 }
 
 /// Perform batch adaptation

@@ -22,7 +22,7 @@
 #include "openalmusicplayer.h"
 
 const int OpenALMusicPlayer::BUFFERSIZE = 4096*64;
-const ALfloat OpenALMusicPlayer::FADESTEP = 0.01;
+const ALfloat OpenALMusicPlayer::FADESTEP = 0.01f;
 
 OpenALMusicPlayer::OpenALMusicPlayer(SoundStream* soundStream):
 	_device(NULL),

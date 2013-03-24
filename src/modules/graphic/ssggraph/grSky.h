@@ -470,7 +470,7 @@ public:
 	inline float getVisibility() const { return effective_visibility; }
 	inline void setVisibility( float v ) 
 	{
-		effective_visibility = visibility = (v <= 25.0) ? 25.0 : v;
+		effective_visibility = visibility = (v <= 25.0f) ? 25.0f : v;
 	}
 };
 

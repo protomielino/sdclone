@@ -1213,7 +1213,7 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 				// choose a rearwing model to display
 				int curDRM = 0;
 				float curAngle = 0.0f;
-				int lastDRM = grCarInfo[index].DRMSelector->getSelect();
+				//int lastDRM = grCarInfo[index].DRMSelector->getSelect();
 	
 				for (i=0; i<grCarInfo[index].nDRM; i++)
 				{

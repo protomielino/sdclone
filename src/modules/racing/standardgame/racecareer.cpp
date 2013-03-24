@@ -100,12 +100,12 @@ static void ReCareerUtilManipString( char* string, int number, int bufLength )
 			break;
 		case 'A':
 			memmove( &(string[curPos]), &(string[curPos+1]), ( bufLength - curPos - 1 ) * sizeof( char ) );
-			string[curPos] = 'A' + number;
+			string[curPos] = (char)( 'A' + number );
 			++curPos;
 			break;
 		case 'a':
 			memmove( &(string[curPos]), &(string[curPos+1]), ( bufLength - curPos - 1 ) * sizeof( char ) );
-			string[curPos] = 'a' + number;
+			string[curPos] = (char)( 'a' + number );
 			++curPos;
 			break;
 		case '1':
@@ -120,7 +120,7 @@ static void ReCareerUtilManipString( char* string, int number, int bufLength )
 			if( curPos + numLength < bufLength ) {
 				memmove( &(string[curPos + numLength]), &(string[curPos + 2]), (bufLength - curPos - numLength) * sizeof( char ) );
 				for( xx = numLength - 1; xx >= 0; --xx ) {
-					string[ curPos + xx ] = '0' + ( num % 10 );
+					string[ curPos + xx ] = (char)( '0' + ( num % 10 ) );
 					num /= 10;
 				}
 				string[ bufLength - 1 ] = '\0';
@@ -436,7 +436,7 @@ static void* ReCareerNewClass( const char* filename, void *prevParam, void **fir
 		groupAlpha[ 0 ] = '_';
 		groupAlpha[ 2 ] = '\0';
 		for( xx = 0; xx < nbGroups; ++xx ) {
-			groupAlpha[ 1 ] = 'A' + xx;
+			groupAlpha[ 1 ] = (char)( 'A' + xx );
 			curParam = ReCareerNewGroup( filename, subparam, groupAlpha, nbDrivers / nbGroups + ( ( nbDrivers % nbGroups ) > xx ? 1 : 0 ),
 			                             totalTracks, xx );
 			if( curParam ) {

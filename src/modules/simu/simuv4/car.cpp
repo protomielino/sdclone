@@ -272,8 +272,8 @@ SimCarUpdateForces(tCar *car)
 		/* desired torque to stop yaw */
 		desiredTq = - car->DynGC.vel.az / ( SimDeltaTime * car->Iinv.z );
 		if ( (fabs(desiredTq - F.M.z)) < 0.5 * w * car->wheelbase) {F.M.z = desiredTq;}
-		else if ( (desiredTq - F.M.z) > 0.0 ) {F.M.z += 0.5 * w * car->wheelbase;}
-		else {F.M.z -= 0.5 * w * car->wheelbase;}
+		else if ( (desiredTq - F.M.z) > 0.0 ) {F.M.z += 0.5f * w * car->wheelbase;}
+		else {F.M.z -= 0.5f * w * car->wheelbase;}
 		/* desired force to really stop the car when braking to 0 */
 		if ( ((car->ctrl->brakeCmd > 0.05) || (car->ctrl->ebrakeCmd > 0.1) || (car->ctrl->brakeFrontLeftCmd > 0.02)
 		  || (car->ctrl->brakeFrontRightCmd > 0.02) || (car->ctrl->brakeRearLeftCmd > 0.02) || (car->ctrl->brakeRearRightCmd > 0.02) )

@@ -2387,13 +2387,13 @@ void computeObjectTriNorm(ob_t * object)
 int checkMustSmoothVector(point_t *n1, point_t *n2, point_t *t1, point_t *t2)
 {
     return FALSE;
-
+/*
     double dot, cos_angle;
     cos_angle = cos(smooth_angle * M_PI / 180.0);
     if (fabs(t1->x - t2->x) <= 0.05 && fabs(t1->y - t2->y) <= 0.05
             && fabs(t1->z - t2->z) <= 0.05)
     {
-        /* GUIONS */
+        // GUIONS
         dot = n1->x * n2->x + n1->y * n2->y + n1->z * n2->z;
         if (dot > cos_angle)
         {
@@ -2402,6 +2402,7 @@ int checkMustSmoothVector(point_t *n1, point_t *n2, point_t *t1, point_t *t2)
 
     }
     return FALSE;
+*/
 }
 
 void smoothTriNorm(ob_t * object)

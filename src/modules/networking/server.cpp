@@ -137,7 +137,7 @@ bool NetServer::Start(int port)
 
     m_address.host = ENET_HOST_ANY;
     /* Bind the server to port*/
-    m_address.port = port;
+    m_address.port = (enet_uint16)port;
 
 	assert(m_pServer ==NULL);
 
@@ -615,11 +615,12 @@ void NetServer::ReadDriverReadyPacket(ENetPacket *pPacket)
         {
                 msg.unpack_ubyte();
                 idx = msg.unpack_int();
-                bReady = msg.unpack_int();
+				bReady = msg.unpack_int() ? true : false;
         }
         catch (PackedBufferException &e)
         {
                 GfLogFatal("SendRaceSetupPacket: packed buffer error\n");
+				bReady = false;
         }
 	
 	NetMutexData *pNData = LockNetworkData();
@@ -658,7 +659,7 @@ void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
                 driver.blue = msg.unpack_float();
                 msg.unpack_string(driver.module, sizeof driver.module);
                 msg.unpack_string(driver.type, sizeof driver.type);
-                driver.client = msg.unpack_int();
+                driver.client = msg.unpack_int() ? true : false;
         }
         catch (PackedBufferException &e)
         {
@@ -809,7 +810,7 @@ void NetServer::SendFilePacket(const char *pszFile)
 	unsigned int filesize = size;
 	GfLogTrace("Server file size %u\n",filesize);
 
-	short namelen = strlen(pszFile);
+	short namelen = (short)strlen(pszFile);
 
         /* On 64 bit systems, the following calculates a buffer size that is
          * bigger than necessary, but that is safe. Better too big than too

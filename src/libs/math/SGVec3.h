@@ -146,7 +146,7 @@ SGVec3<float>::fromGeod(const SGGeod& geod)
 {
   SGVec3<double> cart;
   SGGeodesy::SGGeodToCart(geod, cart);
-  return SGVec3<float>(cart(0), cart(1), cart(2));
+  return SGVec3<float>((float)cart(0), (float)cart(1), (float)cart(2));
 }
 
 template<>
@@ -166,7 +166,7 @@ SGVec3<float>::fromGeoc(const SGGeoc& geoc)
 {
   SGVec3<double> cart;
   SGGeodesy::SGGeocToCart(geoc, cart);
-  return SGVec3<float>(cart(0), cart(1), cart(2));
+  return SGVec3<float>((float)cart(0), (float)cart(1), (float)cart(2));
 }
 
 /// Unary +, do nothing ...

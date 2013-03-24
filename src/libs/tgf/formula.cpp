@@ -1560,6 +1560,8 @@ static tFormAnswer func_op_compare( tFormNode *node, void *parmHandle, char cons
 		found = equal || ( smaller && greater );
 		result.boolean = ( arg1.boolean == arg2.boolean && equal ) ||
 		                 ( arg1.boolean != arg2.boolean && smaller && greater );
+	} else {
+		result.boolean = FALSE;
 	}
 
 	if( found ) {
@@ -1814,7 +1816,7 @@ static tFormAnswer func_toAlpha( tFormNode *node, void *parmHandle, char const *
 	result.string[ length ] = '\0';
 	//GfLogDebug( "result.string[ %d ] = \'\\0\'\n", length );
 	for( xx = length - 1; xx >= 0; --xx ) {
-		result.string[ xx ] = 'A' + ( number % 26 );
+		result.string[ xx ] = (char)( 'A' + ( number % 26 ) );
 		number -= number % 26;
 		number /= 26;
 	}

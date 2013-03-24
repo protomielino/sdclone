@@ -319,7 +319,7 @@ void grTrackLightInit()
 
 void grTrackLightUpdate( tSituation *s )
 {
-	char phase = ( (int)floor( fmod( s->currentTime + 120.0f, (double)0.3f ) / 0.3f ) % 2 ) + 1;
+	char phase = (char)( ( (int)floor( fmod( s->currentTime + 120.0f, (double)0.3f ) / 0.3f ) % 2 ) + 1 );
 	manageStartLights( &trackLights, s, phase );
 }
 

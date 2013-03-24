@@ -414,18 +414,19 @@ void doAnisotropicFiltering(){
         GLfloat fLargest;
         glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &fLargest);
 
-        if(aniS ==1)
-        {
-            aniD = fLargest/2;
-        }
-        if(aniS==2)
-        {
-            aniD = fLargest;
+        switch(aniS)
+		{
+			case 1:
+				aniD = fLargest/2;
+				break;
+			case 2:
+				aniD = fLargest;
+				break;
+			default:
+				aniD = 0;
         }
 
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, aniD);/**/
-
-
     }
 }
 

@@ -955,7 +955,7 @@ SimCarCollideInit(void)
 {
     dtSetDefaultResponse(SimCarCollideResponse, DT_SMART_RESPONSE, NULL);
     dtDisableCaching();
-    dtSetTolerance(0.001);
+    dtSetTolerance((DT_Scalar)0.001);
 }
 
 
