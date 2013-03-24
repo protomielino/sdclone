@@ -42,7 +42,7 @@ public:
         SDCars * cars = (SDCars*)getCars();
         osg::Vec3 e;
         cam.getUserValue("eye",e);
-        osg::Matrix mat = cam.getViewMatrix();
+        osg::Matrixf mat = cam.getViewMatrix();
         cars->updateShadingParameters(e,mat);
      //   GfOut("Camera DrawnHHERERE %d %f %f %F\n",&cam,e.x(),e.y(),e.z());
      // traverse(node, nv);

@@ -83,7 +83,7 @@ public :
         stateset->addUniform(shininess);
     }
 
-    void update(osg::Vec3 c, osg::Matrix modelview){
+    void update(osg::Vec3f c, osg::Matrixf modelview){
 
 
         SDRender * ren = (SDRender *)getRender();
@@ -94,16 +94,16 @@ public :
         //SDScreens * scr= (SDScreens *)getScreens();
         //osg::Vec3 c = scr->getActiveView()->getCameras()->getSelectedCamera()->getCameraPosition();
        // osg::Matrix modelview = scr->getActiveView()->getOsgCam()->getViewMatrix();
-        osg::Vec4 v = osg::Vec4(c.x(),c.y(),c.z(),1.0);
-        osg::Vec4 pv = v*modelview;
-        osg::Vec4 lv = osg::Vec4(sun_pos.x(),sun_pos.y(),sun_pos.z(),0.0);
+        osg::Vec4f v = osg::Vec4f(c.x(),c.y(),c.z(),1.0f);
+        osg::Vec4f pv = v*modelview;
+        osg::Vec4f lv = osg::Vec4(sun_pos.x(),sun_pos.y(),sun_pos.z(),0.0f);
         lv =lv*modelview;
 
 
-        this->viewPoint->set(osg::Vec3(pv.x(),pv.y(),pv.z()));
-        this->lightVector->set(osg::Vec3(lv.x(),lv.y(),lv.z()));
+        this->viewPoint->set(osg::Vec3f(pv.x(),pv.y(),pv.z()));
+        this->lightVector->set(osg::Vec3f(lv.x(),lv.y(),lv.z()));
         this->lightPower->set(sun_color);
-        this->ambientColor->set(scene_color*0.5);
+        this->ambientColor->set(scene_color*0.5f);
 
         //osg::StateSet* stateset = pCar->getOrCreateStateSet();
         //stateset->setAttributeAndModes( program.get() );
@@ -244,13 +244,10 @@ SDCar::loadCar(tCarElt *car)
     osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
     transform1->addChild(pCar);
 
-    GfOut("HERRE0\n");
 
     SDCarShader::initiateShaderProgram();
     this->shader = new SDCarShader(pCar);
 
-
-    GfOut("HERRE10\n");
 
     GfOut("loaded car %d",pCar);
     this->car_branch = transform1;
@@ -280,7 +277,7 @@ void SDCar::updateCar()
 
 }
 
-void SDCar::updateShadingParameters(osg::Vec3 eye,osg::Matrix modelview){
+void SDCar::updateShadingParameters(osg::Vec3f eye,osg::Matrixf modelview){
     shader->update(eye,modelview);
 }
 
@@ -325,7 +322,7 @@ void SDCars::updateCars()
     }
 }
 
-void SDCars::updateShadingParameters(osg::Vec3 eye,osg::Matrix modelview){
+void SDCars::updateShadingParameters(osg::Vec3f eye,osg::Matrixf modelview){
     std::vector<SDCar *>::iterator it;
     for(it = the_cars.begin(); it!= the_cars.end(); it++)
     {

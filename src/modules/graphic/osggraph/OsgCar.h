@@ -41,7 +41,7 @@ class SDCar
     public :
         osg::ref_ptr<osg::Node> loadCar(tCarElt *car);
         void updateCar();
-        void updateShadingParameters(osg::Vec3 eye,osg::Matrix modelview);
+        void updateShadingParameters(osg::Vec3f eye,osg::Matrixf modelview);
 };
 
 class SDCars
@@ -59,7 +59,7 @@ class SDCars
 
         osg::ref_ptr<osg::Node> loadCars(tSituation * pSituation);
         void updateCars();
-        void updateShadingParameters(osg::Vec3 eye,osg::Matrix modelview);
+        void updateShadingParameters(osg::Vec3f eye,osg::Matrixf modelview);
 };
 
 #endif /* _OSGCAR_H_ */
