@@ -176,7 +176,7 @@ void SDChangeScreen(void * vp)
 
 int initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
-    render = new SDRender();
+    //render = new SDRender();
     screens = new SDScreens();
 
     m_Winx = x;

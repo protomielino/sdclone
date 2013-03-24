@@ -67,6 +67,8 @@ SDScenery::~SDScenery(void)
 	//delete	m_spectators;
 	//delete	m_trees;
 	//delete	m_pits;
+    _background = NULL;
+    _scenery = NULL;
 }
 
 osg::ref_ptr<osg::Node> SDScenery::LoadScene(tTrack *track)
@@ -120,7 +122,9 @@ osg::ref_ptr<osg::Node> SDScenery::LoadScene(tTrack *track)
 			sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
 			strPath += buf;
             osg::ref_ptr<osg::Node> bg= m_background->build(_bgtype, _grWrldX, _grWrldY, _grWrldZ, strPath);
-            bg->getOrCreateStateSet()->setRenderingHint( osg::StateSet::OPAQUE_BIN );
+            osg::ref_ptr<osg::StateSet> bgstate = bg->getOrCreateStateSet();
+            bgstate->setRenderBinDetails(-1, "RenderBin");
+            //bg->getOrCreateStateSet()->setRenderingHint( osg::StateSet::OPAQUE_BIN );
             _scenery->addChild(bg);
 			GfOut("Background loaded\n");
 		}

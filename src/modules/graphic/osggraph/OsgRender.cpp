@@ -43,8 +43,8 @@ static const double m_log01 = -log( 0.01 );
 static const double sqrt_m_log01 = sqrt( m_log01 );
 const GLfloat fog_exp2_density = sqrt_m_log01 / 11000;
 
-static osg::ref_ptr<osg::Group> mRealRoot = new osg::Group;
-static osg::ref_ptr<osg::Group> mRoot = new osg::Group;
+//static osg::ref_ptr<osg::Group> mRealRoot = new osg::Group;
+//static osg::ref_ptr<osg::Group> mRoot = new osg::Group;
 
 SDSky *thesky = NULL;
 static tTrack *grTrack;
@@ -81,7 +81,7 @@ static int NPlanets;
 static float sol_angle;
 static float moon_angle;
 
-static osg::ref_ptr<osg::Group> RealRoot = new osg::Group;
+//static osg::ref_ptr<osg::Group> RealRoot = new osg::Group;
 
 SDRender::SDRender(void)
 {
@@ -89,6 +89,7 @@ SDRender::SDRender(void)
 
 SDRender::~SDRender(void)
 {
+    delete thesky;
 }
 
 SDSky * SDRender::getSky(){
@@ -101,7 +102,7 @@ SDSky * SDRender::getSky(){
  *
  * @return 0 if OK, -1 if something failed
  */
-osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
+osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
 {
     //char buf[256];
     //void *hndl = grTrackHandle;
@@ -184,6 +185,7 @@ osg::Node* SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
                     APlanetsData, NStars, AStarsData);
 
     osg::Group* sceneGroup = new osg::Group;
+    osg::ref_ptr<osg::Group> mRoot = new osg::Group;
     sceneGroup->addChild(m_sceneroot);
     //sceneGroup->setNodeMask(~simgear::BACKGROUND_BIT);
     osg::StateSet* stateSet = sceneGroup->getOrCreateStateSet();

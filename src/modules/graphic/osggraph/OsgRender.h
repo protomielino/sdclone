@@ -31,7 +31,7 @@ class SDRender
 {
 private:
 	osg::ref_ptr<osg::Group> m_sceneroot;
-	osg::ref_ptr<osg::Group> m_carroot;
+    //osg::ref_ptr<osg::Group> m_carroot;
 
         osg::Vec3f SkyColor;
         osg::Vec3f BaseFogColor;
@@ -47,7 +47,7 @@ public:
 	SDRender(void);
 	~SDRender(void);
 
-        osg::Node *Init(osg::Group* root, tTrack *track);
+        osg::ref_ptr<osg::Node> Init(osg::Group* root, tTrack *track);
         void Update(float speedcar, tSituation *s);
         void UpdateTime(tSituation *s);
         void UpdateLight(void);
