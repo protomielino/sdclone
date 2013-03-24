@@ -66,54 +66,17 @@ ENDMACRO(SD_SETUP_SETTINGS_VERSION)
 MACRO(SD_UPDATE_SETTINGS_VERSION)
 
 	# Determine the full path-name of xmlversion.exe
-    IF(MSVC)
+    SET(_XMLVER_EXE "${CMAKE_BINARY_DIR}/${SD_BINDIR}/${CMAKE_EXECUTABLE_PREFIX}xmlversion${CMAKE_EXECUTABLE_SUFFIX}")
 
-      # Does not work with MinGW at leat !?
-      MESSAGE(STATUS "CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}")
-      SET(_XMLVER_EXE "${CMAKE_BINARY_DIR}/${SD_BINDIR}/${CMAKE_EXECUTABLE_PREFIX}xmlversion${CMAKE_EXECUTABLE_SUFFIX}")
-
-    ELSE()
-
-      _GET_TARGET_REAL_PATHNAME(xmlversion _XMLVER_EXE)
-
-    ENDIF()
-    MESSAGE(STATUS "_XMLVER_EXE=${_XMLVER_EXE}")
+    #MESSAGE(STATUS "_XMLVER_EXE=${_XMLVER_EXE}")
 
     # In order to run xmlversion.exe in the build tree (see below), under Windows,
-    # we nearly always have to copy dependency DLLs next to it.
+    # we nearly always have to copy 3rd party dependency and compiler run-time DLLs next to it.
     IF(WIN32)
 
 	  SET(_DLLS_TO_INSTALL)
 
 	  # Internal dependencies (needed in all cases).
-      # TODO: Check if still needed after DLLs built in "standard" folders in build tree ????
-
-      IF(FALSE)
-
-      IF(WIN32)
-        SET(_DLL_PATHNAME "${CMAKE_BINARY_DIR}/${SD_BINDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}tgf${CMAKE_SHARED_LIBRARY_SUFFIX}")
-      ELSE()
-        _GET_TARGET_REAL_PATHNAME(_DLL_PATHNAME tgf)
-      ENDIF()
-	  LIST(APPEND _DLLS_TO_INSTALL ${_DLL_PATHNAME})
-
-      IF(WIN32)
-        SET(_DLL_PATHNAME "${CMAKE_BINARY_DIR}/${SD_BINDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}portability${CMAKE_SHARED_LIBRARY_SUFFIX}")
-      ELSE()
-        _GET_TARGET_REAL_PATHNAME(_DLL_PATHNAME portability)
-      ENDIF()
-	  LIST(APPEND _DLLS_TO_INSTALL ${_DLL_PATHNAME})
-
-      IF(NOT OPTION_3RDPARTY_EXPAT)
-        IF(WIN32)
-          SET(_DLL_PATHNAME "${CMAKE_BINARY_DIR}/${SD_BINDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}txml${CMAKE_SHARED_LIBRARY_SUFFIX}")
-        ELSE()
-          _GET_TARGET_REAL_PATHNAME(_DLL_PATHNAME txml)
-        ENDIF()
-	    LIST(APPEND _DLLS_TO_INSTALL ${_DLL_PATHNAME})
-      ENDIF()
-
-      ENDIF()
 
 	  # 3rd party dependencies
 	  # (not needed for MinGW builds through the "MSYS Makefiles" generator,
@@ -158,14 +121,19 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
 
       ENDIF(MINGW AND NOT CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
 
-	  # Copy the dependency DLLs found above.
-	  MESSAGE(STATUS "xmlversion : DLLs to install=${_DLLS_TO_INSTALL}")
+      # Copy the dependency DLLs found above.
+      #MESSAGE(STATUS "xmlversion : DLLs to install=${_DLLS_TO_INSTALL}")
       IF(_DLLS_TO_INSTALL)
+        SET(_TGT_DIR "${CMAKE_BINARY_DIR}/${SD_BINDIR}")
+        ADD_CUSTOM_COMMAND(TARGET settings_versions PRE_BUILD
+                             COMMAND ${CMAKE_COMMAND} -E echo Creating directory "${_TGT_DIR}"
+                             COMMAND ${CMAKE_COMMAND} -E make_directory "${_TGT_DIR}"
+                             VERBATIM)
         FOREACH(_DLL ${_DLLS_TO_INSTALL})
           ADD_CUSTOM_COMMAND(TARGET settings_versions PRE_BUILD
-                             COMMAND ${CMAKE_COMMAND} -E echo Copying "${_DLL}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
-                             COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
-                             COMMAND ${CMAKE_COMMAND} -E copy "${_DLL}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}")
+                             COMMAND ${CMAKE_COMMAND} -E echo Copying "${_DLL}" to "${_TGT_DIR}"
+                             COMMAND ${CMAKE_COMMAND} -E copy "${_DLL}" "${_TGT_DIR}"
+                             VERBATIM)
         ENDFOREACH()
       ENDIF()
 
@@ -174,6 +142,8 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
     # Update version.xml from the collected user settings files (see SD_INSTALL_FILES).
     GET_PROPERTY(_XMLVER_ARGS TARGET settings_versions PROPERTY XMLVERSION_ARGS)
     #MESSAGE(STATUS "SD_UPDATE_SETTINGS_VERSION : XMLVERSION_ARGS=${_XMLVER_ARGS}")
+    GET_FILENAME_COMPONENT(_XMLVER_DIR ${_XMLVER_EXE} PATH)
+    GET_FILENAME_COMPONENT(_XMLVER_NAME ${_XMLVER_EXE} NAME)
     SET(_SRC_FILE)
     FOREACH(_ARG ${_XMLVER_ARGS})
       #MESSAGE(STATUS "${_ARG}")
@@ -183,9 +153,19 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
         SET(_USER_DIR ${_ARG})
         # Register file for run-time install/update at game startup
         # (through filesetup.cpp services)
-        ADD_CUSTOM_COMMAND(TARGET settings_versions POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E echo "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
-                           COMMAND "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data")
+
+        IF(WIN32)
+          ADD_CUSTOM_COMMAND(TARGET settings_versions POST_BUILD
+                             WORKING_DIRECTORY "${_XMLVER_DIR}"
+                             COMMAND ${CMAKE_COMMAND} -E echo "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
+                             COMMAND "${_XMLVER_NAME}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
+                             VERBATIM)
+        ELSE(WIN32)
+          ADD_CUSTOM_COMMAND(TARGET settings_versions POST_BUILD
+                             COMMAND ${CMAKE_COMMAND} -E echo "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
+                             COMMAND "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
+                             VERBATIM)
+        ENDIF(WIN32)
         # Done for this {file, folder} couple, ready for next one.
         SET(_SRC_FILE)
       ENDIF()
@@ -336,12 +316,6 @@ MACRO(SD_INSTALL_FILES)
   IF(HAS_TARGETS)
 
     INSTALL(TARGETS ${TARGETS} DESTINATION ${DEST_ALL})
-
-	# While we are there, make the "settings_versions" target depend on each of them,
-    # (in case they install user settings files), in order settings_versions is built after them.
-    FOREACH(_TGT ${TARGETS})
-      ADD_DEPENDENCIES(settings_versions ${_TGT})
-    ENDFOREACH()
 
   ENDIF()
 

@@ -422,11 +422,15 @@ bool GfApplication::parseOptions()
 	if (!(pszDataDir && strlen(pszDataDir)))
 		pszDataDir = GfSetDataDir(SD_DATADIR);
 
-	// If the (installed) data dir. does not exists, may be it's because we are running
-	// without installing : try and use the _source_ data dir.
-	if (pszDataDir && strlen(pszDataDir) && !GfDirExists(pszDataDir))
+	// If the data dir. is not a run-time usable one, may be it's because we are running
+	// without installing : try and use the _source_ data dir (it _is_ run-time usable).
+	std::string strDataDirProof(pszDataDir);
+	// A run-time usable data dir has a "config/logging.xml" file inside.
+	strDataDirProof += LOGGING_CFG;
+	if (pszDataDir && strlen(pszDataDir) && !GfFileExists(strDataDirProof.c_str()))
 	{
-		GfLogTrace("Installed data dir. '%s' not found, trying source data dir.\n", pszDataDir);
+		GfLogTrace("Data dir. '%s' not run-time usable, trying source data dir.\n",
+				   pszDataDir);
 		pszDataDir = GfSetDataDir(SD_DATADIR_SRC);
 	}
 	

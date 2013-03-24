@@ -175,15 +175,25 @@ MACRO(ROBOT_MODULE)
   # Install clone robot modules shared libraries (use ldconfig version naming scheme under Linux)
   IF(RBM_HAS_CLONENAMES AND RBM_CLONENAMES)
   
-    GET_TARGET_PROPERTY(MODLOC ${RBM_NAME} LOCATION)
+    IF(WIN32)
+      GET_TARGET_PROPERTY(MODLOC ${RBM_NAME} RUNTIME_OUTPUT_DIRECTORY)
+  	  IF(NOT RUNTIME_OUTPUT_DIRECTORY)
+        GET_TARGET_PROPERTY(MODLOC ${RBM_NAME} LIBRARY_OUTPUT_DIRECTORY)
+  	  ENDIF()
+	  SET(MODLOC "${MODLOC}/${RBM_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    ELSE(WIN32)
+      GET_TARGET_PROPERTY(MODLOC ${RBM_NAME} LOCATION)
+    ENDIF(WIN32)
 
     FOREACH(CLONENAME ${RBM_CLONENAMES})
     
-      SET(CLONE_MODLOC "${CMAKE_BINARY_DIR}/${SD_LIBDIR}/drivers/${CLONENAME}/${CLONENAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+      SET(CLONE_MODDIR "${CMAKE_BINARY_DIR}/${SD_LIBDIR}/drivers/${CLONENAME}")
+      SET(CLONE_MODLOC "${CLONE_MODDIR}/${CLONENAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
       IF(FALSE) #IF(UNIX)
         # Might not work with GCC 4.5 or + (see above) 
         ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
                            COMMAND ${CMAKE_COMMAND} -E echo "Cloning ${RBM_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX} into ${CLONE_MODLOC}.${RBM_VERSION}"
+                           COMMAND ${CMAKE_COMMAND} -E make_directory "${CLONE_MODDIR}"
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MODLOC} ${CLONE_MODLOC}.${RBM_VERSION})
         ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
                            COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_VERSION} ${CLONE_MODLOC}.${RBM_SOVERSION}
@@ -192,7 +202,9 @@ MACRO(ROBOT_MODULE)
                          FILES ${CLONE_MODLOC} ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC}.${RBM_VERSION} )
       ELSE()
         ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E echo "Cloning ${RBM_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX} into ${CLONE_MODLOC}"
+                           COMMAND ${CMAKE_COMMAND} -E echo "Creating directory ${CLONE_MODDIR}"
+                           COMMAND ${CMAKE_COMMAND} -E make_directory "${CLONE_MODDIR}"
+                           COMMAND ${CMAKE_COMMAND} -E echo "Cloning ${RBM_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}=${MODLOC} into ${CLONE_MODLOC}"
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MODLOC} ${CLONE_MODLOC})
         SD_INSTALL_FILES(LIB drivers/${CLONENAME}
                          FILES ${CLONE_MODLOC})

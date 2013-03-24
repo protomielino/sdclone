@@ -23,3 +23,4 @@ IF(UNIX)
   TARGET_LINK_LIBRARIES(xmlversion dl)
 ENDIF(UNIX)
 
+# Note: we don't install xmlversion, as it's a only a build-time tool.

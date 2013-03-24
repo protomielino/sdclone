@@ -285,8 +285,9 @@ MACRO(_FIND_3RDPARTY_DLL LIB_PATH_NAMES LIB_NAME_HINTS DLL_NAME_PREFIXES DLL_PAT
 
 ENDMACRO(_FIND_3RDPARTY_DLL DLL_PATHNAME)
 
-MACRO(SD_INSTALL_CUSTOM_3RDPARTY)
+MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 
+	# 1) Find 3rd party DLL files to install.
 	SET(_THIRDPARTY_DLL_PATHNAMES)
 
 	_FIND_3RDPARTY_DLL("${OPENAL_LIBRARY}" "OpenAL32" "lib" _DLL_PATHNAME)
@@ -380,26 +381,48 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY)
 	_FIND_3RDPARTY_DLL("${JPEG_LIBRARY}" "jpeg;jpeg-8" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
+	# 2) Copy found 3rd party DLL files to the bin folder (for running without installing).
 	#MESSAGE(STATUS "3rdParty dependencies : Will install ${_THIRDPARTY_DLL_PATHNAMES}")
+    SET(_NOINST_DIR "${CMAKE_BINARY_DIR}/${SD_BINDIR}")
+    ADD_CUSTOM_COMMAND(TARGET ${TARGET_NAME} POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E make_directory "${_NOINST_DIR}"
+                       VERBATIM)
+    FOREACH(_DLL ${_THIRDPARTY_DLL_PATHNAMES})
+      ADD_CUSTOM_COMMAND(TARGET ${TARGET_NAME} POST_BUILD
+                         COMMAND ${CMAKE_COMMAND} -E echo Copying "${_DLL}" to "${_NOINST_DIR}"
+                         COMMAND ${CMAKE_COMMAND} -E copy "${_DLL}" "${_NOINST_DIR}"
+                         VERBATIM)
+    ENDFOREACH()
+
+	# 3) Install found 3rd party DLL files to the install folder.
 	SD_INSTALL_FILES(BIN FILES ${_THIRDPARTY_DLL_PATHNAMES})
 
-	# Make sure Windows compilers run-time libs are also installed.
+	# 4) Find Windows compilers run-time DLLs.
 	IF(MSVC)
 
-		# We do it ourselves, but use InstallRequiredSystemLibraries to figure out what they are
+		# We do it ourselves, but use InstallRequiredSystemLibraries to figure out which ones.
 		SET(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
 		INCLUDE(InstallRequiredSystemLibraries)
-		IF(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-			SD_INSTALL_FILES(BIN FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS})
-		ENDIF(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+		SET(_COMPILER_DLL_PATHNAMES "${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}")
 
 	ELSEIF(MINGW)
 
 		# Works with MinGW 4.4 and 4.7.
 		GET_FILENAME_COMPONENT(_MINGW_BINDIR "${CMAKE_CXX_COMPILER}" PATH)
-		SD_INSTALL_FILES(BIN FILES "${_MINGW_BINDIR}/libstdc++-6.dll" "${_MINGW_BINDIR}/libgcc_s_dw2-1.dll")
+		SET(_COMPILER_DLL_PATHNAMES "${_MINGW_BINDIR}/libstdc++-6.dll;${_MINGW_BINDIR}/libgcc_s_dw2-1.dll")
 
 	ENDIF(MSVC)
 
-ENDMACRO(SD_INSTALL_CUSTOM_3RDPARTY)
+	# 5) Copy found compiler DLL files to the bin folder (for running without installing).
+	FOREACH(_DLL ${_COMPILER_DLL_PATHNAMES})
+		ADD_CUSTOM_COMMAND(TARGET ${TARGET_NAME} POST_BUILD
+                 		   COMMAND ${CMAKE_COMMAND} -E echo Copying "${_DLL}" to "${_NOINST_DIR}"
+                 		   COMMAND ${CMAKE_COMMAND} -E copy "${_DLL}" "${_NOINST_DIR}"
+                 		   VERBATIM)
+	ENDFOREACH()
+
+	# 6) Install found compiler DLL files to the install folder.
+	SD_INSTALL_FILES(BIN FILES ${_COMPILER_DLL_PATHNAMES})
+
+ENDMACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 

@@ -195,14 +195,19 @@ MACRO(SD_ADD_EXECUTABLE TARGET_NAME)
     ADD_CUSTOM_COMMAND(TARGET ${TARGET_NAME} POST_BUILD
                        COMMAND ${CMAKE_COMMAND} -E echo Copying "${_TARGET_LOC}" to "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
                        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
-                       COMMAND ${CMAKE_COMMAND} -E copy "${_TARGET_LOC}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}")
+                       COMMAND ${CMAKE_COMMAND} -E copy "${_TARGET_LOC}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
+                       VERBATIM)
 
-  ELSE(WIN32)
+  ELSE()
 
     SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
                           RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_BINDIR})
 
   ENDIF()
+
+  # Make the "settings_versions" target depend on this target,
+  # in order settings_versions is built after them.
+  ADD_DEPENDENCIES(settings_versions ${TARGET_NAME})
 
 ENDMACRO(SD_ADD_EXECUTABLE TARGET_NAME)
 
@@ -230,11 +235,13 @@ MACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
 
     IF(WIN32)
 
+      # Why a different stuff than for MODULE or ROBOT ?
       GET_TARGET_PROPERTY(_TARGET_LOC ${TARGET_NAME} LOCATION)
       ADD_CUSTOM_COMMAND(TARGET ${TARGET_NAME} POST_BUILD
                          COMMAND ${CMAKE_COMMAND} -E echo Copying "${_TARGET_LOC}" to "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
                          COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
-                         COMMAND ${CMAKE_COMMAND} -E copy "${_TARGET_LOC}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}")
+                         COMMAND ${CMAKE_COMMAND} -E copy "${_TARGET_LOC}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
+                         VERBATIM)
 
     ELSE(WIN32)
 
@@ -246,14 +253,31 @@ MACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
 
   ELSEIF(${TARGET_TYPE} STREQUAL "MODULE")
 
-    GET_TARGET_PROPERTY(_MOD_LOC ${TARGET_NAME} LOCATION)
-    GET_FILENAME_COMPONENT(_MOD_TYPE ${_MOD_LOC} PATH)
-    GET_FILENAME_COMPONENT(_MOD_TYPE ${_MOD_TYPE} PATH)
-    GET_FILENAME_COMPONENT(_MOD_TYPE ${_MOD_TYPE} NAME)
+    GET_TARGET_PROPERTY(_TGT_LOC ${TARGET_NAME} LOCATION)
+    GET_FILENAME_COMPONENT(_TGT_TYPE ${_TGT_LOC} PATH)
+    GET_FILENAME_COMPONENT(_TGT_TYPE ${_TGT_TYPE} PATH)
+    IF(MSVC)
+      # Take care of the build config-specific Debug/Relesase/... folder.
+      GET_FILENAME_COMPONENT(_TGT_TYPE ${_TGT_TYPE} PATH)
+    ENDIF()
+    GET_FILENAME_COMPONENT(_TGT_TYPE ${_TGT_TYPE} NAME)
+
+    SET(_TGT_DIR "${CMAKE_BINARY_DIR}/${SD_LIBDIR}/modules/${_TGT_TYPE}")
 
     SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
-                          RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_LIBDIR}/modules/${_MOD_TYPE}
-                          LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_LIBDIR}/modules/${_MOD_TYPE})
+                          RUNTIME_OUTPUT_DIRECTORY ${_TGT_DIR}
+                          LIBRARY_OUTPUT_DIRECTORY ${_TGT_DIR})
+
+    IF(MSVC)
+
+      FOREACH(_CFG ${CMAKE_CONFIGURATION_TYPES})
+        STRING(TOUPPER ${_CFG} _CFG)
+        SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
+                              RUNTIME_OUTPUT_DIRECTORY_${_CFG} ${_TGT_DIR} 
+                              LIBRARY_OUTPUT_DIRECTORY_${_CFG} ${_TGT_DIR})
+      ENDFOREACH()
+
+    ENDIF()
 
     IF(UNIX OR MINGW)
       SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES PREFIX "")
@@ -261,15 +285,32 @@ MACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
 
   ELSEIF(${TARGET_TYPE} STREQUAL "ROBOT")
 
+    SET(_TGT_DIR "${CMAKE_BINARY_DIR}/${SD_LIBDIR}/drivers/${TARGET_NAME}")
+
     SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
-                          RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_LIBDIR}/drivers/${TARGET_NAME} 
-                          LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_LIBDIR}/drivers/${TARGET_NAME})
+                          RUNTIME_OUTPUT_DIRECTORY ${_TGT_DIR} 
+                          LIBRARY_OUTPUT_DIRECTORY ${_TGT_DIR})
+
+    IF(MSVC)
+
+      FOREACH(_CFG ${CMAKE_CONFIGURATION_TYPES})
+        STRING(TOUPPER ${_CFG} _CFG)
+        SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
+                              RUNTIME_OUTPUT_DIRECTORY_${_CFG} ${_TGT_DIR} 
+                              LIBRARY_OUTPUT_DIRECTORY_${_CFG} ${_TGT_DIR})
+      ENDFOREACH()
+
+    ENDIF()
 
     IF(UNIX OR MINGW)
       SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES PREFIX "")
     ENDIF(UNIX OR MINGW)
 
   ENDIF()
+
+  # Make the "settings_versions" target depend on this target,
+  # in order settings_versions is built after them.
+  ADD_DEPENDENCIES(settings_versions ${TARGET_NAME})
 
 ENDMACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
 
