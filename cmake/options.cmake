@@ -46,6 +46,16 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
   # Build options (do it only once).
   IF(NOT _ALREADY_DONE)
 
+    # Default build configuration.
+    IF(NOT MSVC)
+      IF(NOT CMAKE_BUILD_TYPE)
+        SET(CMAKE_BUILD_TYPE "Release" CACHE STRING
+            "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
+            FORCE)
+      ENDIF()
+      MESSAGE(STATUS "Build configuration : ${CMAKE_BUILD_TYPE}")
+    ENDIF(NOT MSVC)
+
     # CMake options.
     SET(OPTION_CHECK_CONTENTS false CACHE BOOL "Set to On if you don't want the build to be stopped by missing optional contents folders")
     MARK_AS_ADVANCED(OPTION_CHECK_CONTENTS)
