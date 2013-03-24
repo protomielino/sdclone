@@ -280,8 +280,8 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
     /* If init function not found, we have a problem ... */
     else
     {
-		GfLogError("GfModInitialize: Module init function %s not found ...  %s\n", 
-				soPath, dlerror());
+		GfLogError("GfModInitialize: Module init function %s not found\n", 
+				soPath);
 		initSts = -1;
     }
 
