@@ -17,6 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <SOLID/types.h>
+
 #include "sim.h"
 #include "timeanalysis.h"
 

@@ -115,9 +115,9 @@ bool GfDirExists(const char* pszName)
 	if (pszName[strlen(pszName)-1] == '/' || pszName[strlen(pszName)-1] == '\\')
 	{
 		// Windows stat() does not supports traling (anti-)slashes ... no comment please.
+		// TODO: Take of the possible _multiple_ trailing (anti-)slashes ...
 		char* pszNameNoTrailSlash = strdup(pszName);
 		pszNameNoTrailSlash[strlen(pszName)-1] = 0;
-		GfLogDebug("XXXXXXXXXXX pszNameNoTrailSlash=%s\n", pszNameNoTrailSlash);
 		const bool bAnswer = (stat(pszNameNoTrailSlash, &st) ? false : true);
 		free(pszNameNoTrailSlash);
 		return bAnswer;
