@@ -72,11 +72,13 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
 
     # In order to run xmlversion.exe in the build tree (see below), under Windows,
     # we nearly always have to copy 3rd party dependency and compiler run-time DLLs next to it.
+    # Note: Not really needed as speed-dreams-2 is built before settings_versions,
+    #       and so already did this job. But in case someone changes the build order ...
     IF(WIN32)
 
 	  SET(_DLLS_TO_INSTALL)
 
-	  # Internal dependencies (needed in all cases).
+	  # Internal dependencies : not needed, as we already generate them in SD_BINDIR.
 
 	  # 3rd party dependencies
 	  # (not needed for MinGW builds through the "MSYS Makefiles" generator,
@@ -116,6 +118,7 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
 	  # TODO: Use Custom3rdParty macros for this (and thus avoid duplicate code) ?
 	  IF(MINGW AND NOT CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
 
+		GET_FILENAME_COMPONENT(_MINGW_BINDIR "${CMAKE_CXX_COMPILER}" PATH)
 	    LIST(APPEND _DLLS_TO_INSTALL "${_MINGW_BINDIR}/libstdc++-6.dll")
 		LIST(APPEND _DLLS_TO_INSTALL "${_MINGW_BINDIR}/libgcc_s_dw2-1.dll")
 
@@ -144,31 +147,32 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
     #MESSAGE(STATUS "SD_UPDATE_SETTINGS_VERSION : XMLVERSION_ARGS=${_XMLVER_ARGS}")
     GET_FILENAME_COMPONENT(_XMLVER_DIR ${_XMLVER_EXE} PATH)
     GET_FILENAME_COMPONENT(_XMLVER_NAME ${_XMLVER_EXE} NAME)
+
     SET(_SRC_FILE)
     FOREACH(_ARG ${_XMLVER_ARGS})
+
       #MESSAGE(STATUS "${_ARG}")
       IF(NOT _SRC_FILE)
-        SET(_SRC_FILE ${_ARG})
-      ELSE()
-        SET(_USER_DIR ${_ARG})
-        # Register file for run-time install/update at game startup
-        # (through filesetup.cpp services)
 
-        IF(WIN32)
-          ADD_CUSTOM_COMMAND(TARGET settings_versions POST_BUILD
-                             WORKING_DIRECTORY "${_XMLVER_DIR}"
-                             COMMAND ${CMAKE_COMMAND} -E echo "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
-                             COMMAND "${_XMLVER_NAME}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
-                             VERBATIM)
-        ELSE(WIN32)
-          ADD_CUSTOM_COMMAND(TARGET settings_versions POST_BUILD
-                             COMMAND ${CMAKE_COMMAND} -E echo "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
-                             COMMAND "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
-                             VERBATIM)
-        ENDIF(WIN32)
+        SET(_SRC_FILE ${_ARG})
+
+      ELSE()
+
+        SET(_USER_DIR ${_ARG})
+
+        # Register file for run-time install/update at game startup, thanks to xmlversion
+        # (filesetup.cpp services will do the job at game startup).
+        ADD_CUSTOM_COMMAND(TARGET settings_versions POST_BUILD
+                           WORKING_DIRECTORY "${_XMLVER_DIR}"
+                           COMMAND ${CMAKE_COMMAND} -E echo "${_XMLVER_EXE}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
+                           COMMAND "${_XMLVER_NAME}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}/version.xml" "${_SRC_FILE}" "${_USER_DIR}" "${PROJECT_SOURCE_DIR}/data"
+                           VERBATIM)
+
         # Done for this {file, folder} couple, ready for next one.
         SET(_SRC_FILE)
+
       ENDIF()
+
     ENDFOREACH()
 
     # Install version.xml

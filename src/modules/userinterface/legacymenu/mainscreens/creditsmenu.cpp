@@ -83,7 +83,7 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 	static char	buf2[maxBufSize];
 
 	// Open and parse credits file
-	sprintf(buf, "%s%s", GfDataDir(), "credits.xml");
+	sprintf(buf, "%s%s", GfDataDir(), "data/credits.xml");
 	void* hparmCredits = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
 	if (!hparmCredits)
 		return 0;

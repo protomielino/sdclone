@@ -189,21 +189,20 @@ MACRO(SD_ADD_EXECUTABLE TARGET_NAME)
   ADD_EXECUTABLE(${TARGET_NAME} ${ARGN})
 
   # Change target location (for running in build-tree without installing).
-  IF(WIN32)
+  SET(_TGT_DIR "${CMAKE_BINARY_DIR}/${SD_BINDIR}")
 
-    GET_TARGET_PROPERTY(_TARGET_LOC ${TARGET_NAME} LOCATION)
-    ADD_CUSTOM_COMMAND(TARGET ${TARGET_NAME} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E echo Copying "${_TARGET_LOC}" to "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
-                       COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
-                       COMMAND ${CMAKE_COMMAND} -E copy "${_TARGET_LOC}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
-                       VERBATIM)
+  SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
+                        RUNTIME_OUTPUT_DIRECTORY ${_TGT_DIR})
 
-  ELSE()
+  IF(MSVC)
 
-    SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
-                          RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_BINDIR})
+    FOREACH(_CFG ${CMAKE_CONFIGURATION_TYPES})
+      STRING(TOUPPER ${_CFG} _CFG)
+      SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
+                            RUNTIME_OUTPUT_DIRECTORY_${_CFG} "${_TGT_DIR}")
+    ENDFOREACH()
 
-  ENDIF()
+  ENDIF(MSVC)
 
   # Make the "settings_versions" target depend on this target,
   # in order settings_versions is built after them.
@@ -230,25 +229,13 @@ MACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
     ADD_LIBRARY(${TARGET_NAME} ${TARGET_TYPE} ${ARGN})
   ENDIF()
 
-  # Change target location (for running in build-tree without installing).
+  # Determine target location (for running in build-tree without installing).
   IF(${TARGET_TYPE} STREQUAL "SHARED")
 
     IF(WIN32)
-
-      # Why a different stuff than for MODULE or ROBOT ?
-      GET_TARGET_PROPERTY(_TARGET_LOC ${TARGET_NAME} LOCATION)
-      ADD_CUSTOM_COMMAND(TARGET ${TARGET_NAME} POST_BUILD
-                         COMMAND ${CMAKE_COMMAND} -E echo Copying "${_TARGET_LOC}" to "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
-                         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
-                         COMMAND ${CMAKE_COMMAND} -E copy "${_TARGET_LOC}" "${CMAKE_BINARY_DIR}/${SD_BINDIR}"
-                         VERBATIM)
-
-    ELSE(WIN32)
-
-      SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
-                            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_LIBDIR}/lib 
-                            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${SD_LIBDIR}/lib)
-
+      SET(_TGT_DIR "${CMAKE_BINARY_DIR}/${SD_BINDIR}")
+    ELSE()
+      SET(_TGT_DIR "${CMAKE_BINARY_DIR}/${SD_LIBDIR}/lib")
     ENDIF()
 
   ELSEIF(${TARGET_TYPE} STREQUAL "MODULE")
@@ -257,50 +244,41 @@ MACRO(SD_ADD_LIBRARY TARGET_NAME TARGET_TYPE)
     GET_FILENAME_COMPONENT(_TGT_TYPE ${_TGT_LOC} PATH)
     GET_FILENAME_COMPONENT(_TGT_TYPE ${_TGT_TYPE} PATH)
     IF(MSVC)
-      # Take care of the build config-specific Debug/Relesase/... folder.
+      # Take care of the build config-specific Debug/Release/... folder.
       GET_FILENAME_COMPONENT(_TGT_TYPE ${_TGT_TYPE} PATH)
     ENDIF()
     GET_FILENAME_COMPONENT(_TGT_TYPE ${_TGT_TYPE} NAME)
 
     SET(_TGT_DIR "${CMAKE_BINARY_DIR}/${SD_LIBDIR}/modules/${_TGT_TYPE}")
 
-    SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
-                          RUNTIME_OUTPUT_DIRECTORY ${_TGT_DIR}
-                          LIBRARY_OUTPUT_DIRECTORY ${_TGT_DIR})
-
-    IF(MSVC)
-
-      FOREACH(_CFG ${CMAKE_CONFIGURATION_TYPES})
-        STRING(TOUPPER ${_CFG} _CFG)
-        SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
-                              RUNTIME_OUTPUT_DIRECTORY_${_CFG} ${_TGT_DIR} 
-                              LIBRARY_OUTPUT_DIRECTORY_${_CFG} ${_TGT_DIR})
-      ENDFOREACH()
-
-    ENDIF()
-
-    IF(UNIX OR MINGW)
-      SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES PREFIX "")
-    ENDIF(UNIX OR MINGW)
-
   ELSEIF(${TARGET_TYPE} STREQUAL "ROBOT")
 
     SET(_TGT_DIR "${CMAKE_BINARY_DIR}/${SD_LIBDIR}/drivers/${TARGET_NAME}")
 
-    SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
-                          RUNTIME_OUTPUT_DIRECTORY ${_TGT_DIR} 
-                          LIBRARY_OUTPUT_DIRECTORY ${_TGT_DIR})
+  ELSE()
 
-    IF(MSVC)
+    MESSSAGE(FATAL "Unsupported library type ${TARGET_TYPE} for ${TARGET_NAME}")
 
-      FOREACH(_CFG ${CMAKE_CONFIGURATION_TYPES})
-        STRING(TOUPPER ${_CFG} _CFG)
-        SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
-                              RUNTIME_OUTPUT_DIRECTORY_${_CFG} ${_TGT_DIR} 
-                              LIBRARY_OUTPUT_DIRECTORY_${_CFG} ${_TGT_DIR})
-      ENDFOREACH()
+  ENDIF()
 
-    ENDIF()
+  # Change target location (for running in build-tree without installing).
+  SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
+                        RUNTIME_OUTPUT_DIRECTORY "${_TGT_DIR}" 
+                        LIBRARY_OUTPUT_DIRECTORY "${_TGT_DIR}")
+
+  IF(MSVC)
+
+    FOREACH(_CFG ${CMAKE_CONFIGURATION_TYPES})
+      STRING(TOUPPER ${_CFG} _CFG)
+      SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES 
+                            RUNTIME_OUTPUT_DIRECTORY_${_CFG} "${_TGT_DIR}" 
+                            LIBRARY_OUTPUT_DIRECTORY_${_CFG} "${_TGT_DIR}")
+    ENDFOREACH()
+
+  ENDIF(MSVC)
+
+  # No prefix for module and robot DLLs.
+  IF(${TARGET_TYPE} STREQUAL "MODULE" OR ${TARGET_TYPE} STREQUAL "ROBOT")
 
     IF(UNIX OR MINGW)
       SET_TARGET_PROPERTIES(${TARGET_NAME} PROPERTIES PREFIX "")
