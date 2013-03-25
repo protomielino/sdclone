@@ -22,7 +22,7 @@
 //
 //    Copyright: (C) 2002-2004 Bernhard Wymann
 //    eMail    : berniw@bluewin.ch
-//f
+//
 // dem Roboter delphin
 //
 //    Copyright: (C) 2006-2007 Wolf-Dieter Beelitz
@@ -239,8 +239,8 @@ TDriver::TDriver(int Index):
   oWingAngleRearBrake(0),
   oBrakeMaxPressRatio(0.85f),
   oBrakeRep(0.5f),
-  oBrakeCorrLR(0.30f),
   oBrakeCorrFR(0.03f),
+  oBrakeCorrLR(0.30f),
   oBrakeFront(1.0f),
   oBrakeRear(1.0f),
   oBrakeLeft(1.0f),

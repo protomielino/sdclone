@@ -1212,7 +1212,7 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 			{
 				// choose a rearwing model to display
 				int curDRM = 0;
-				float curAngle = 0.0f;
+				//float curAngle = 0.0f;
 				//int lastDRM = grCarInfo[index].DRMSelector->getSelect();
 	
 				for (i=0; i<grCarInfo[index].nDRM; i++)
@@ -1224,7 +1224,7 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 					    && (grCarInfo[index].DRMThreshold[i] <= 10.0))
 					{
 						curDRM = i;
-						curAngle = grCarInfo[index].DRMThreshold[i];
+						//curAngle = grCarInfo[index].DRMThreshold[i];
 					}
 					else if ((wingangle > 10.0) 
 						&& (wingangle < 35.0)
@@ -1232,13 +1232,13 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 					    && (grCarInfo[index].DRMThreshold[i] <= 35.0))
 					{
 						curDRM = i;
-						curAngle = grCarInfo[index].DRMThreshold[i];
+						//curAngle = grCarInfo[index].DRMThreshold[i];
 					}
 					else if ((wingangle > 35.0) 
 					    && (grCarInfo[index].DRMThreshold[i] > 35.0))
 					{
 						curDRM = i;
-						curAngle = grCarInfo[index].DRMThreshold[i];
+						//curAngle = grCarInfo[index].DRMThreshold[i];
 					}
 				}
 		

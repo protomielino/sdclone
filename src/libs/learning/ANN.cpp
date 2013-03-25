@@ -727,11 +727,11 @@ real ANN_RBFBackpropagate(LISTITEM * p, real * d, bool use_eligibility, real TD)
 {
 	int i, j;
 	real f;
-	real a;
+//	real a;
 	Layer *l = (Layer *) p->obj;
 	LISTITEM *back = p->prev;
 	Layer *back_layer = NULL;
-	a = l->a;
+//	a = l->a;
 
 	if (back) {
 		back_layer = (Layer *) back->obj;
