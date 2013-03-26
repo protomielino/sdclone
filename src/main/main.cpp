@@ -128,7 +128,7 @@ main(int argc, char *argv[])
 
 	// Load the user interface module (graphical or text-only UI).
 	GfModule* pmodUserItf =
-		GfModule::load("userinterface", (bTextOnly ?  "textonly" : "legacymenu"));
+		GfModule::load("modules/userinterface", (bTextOnly ?  "textonly" : "legacymenu"));
 
 	// Check that it implements IUserInterface.
 	IUserInterface* piUserItf = 0;
@@ -146,7 +146,7 @@ main(int argc, char *argv[])
 	void* hREParams =
 		GfParmReadFile(ossParm.str().c_str(), GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	const char* pszModName = GfParmGetStr(hREParams, "Modules", "racing", "standardgame");
-	GfModule* pmodRaceEngine = GfModule::load("racing", pszModName);
+	GfModule* pmodRaceEngine = GfModule::load("modules/racing", pszModName);
 
 	// Check that it implements IRaceEngine.
 	IRaceEngine* piRaceEngine = 0;

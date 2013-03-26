@@ -58,14 +58,23 @@ class TGF_API GfModule
 	//! Load a module from the given library file path and name (relative to GfLibDir()).
 	static GfModule* load(const std::string& strShLibName);
 
-	//! Check if a module from the given category and name is really installed (using default path GfLibDir()/modules).
-	static bool isPresent(const std::string& strModCatName, const std::string& strModName);
+	//! Load a module from the given path (relative to GfLibDir()) and shared library name.
+	static GfModule* load(const std::string& strModPath, const std::string& strModName);
 
-	//! Load a module from the given category and name (using default path GfLibDir()/modules).
-	static GfModule* load(const std::string& strModCatName, const std::string& strModName);
+	//! Load the modules whose shared libraries are in a given folder (relative to GfLibDir()).
+	//! If bUseChildDirs, assume each library is in an own sub-folder and has same name,
+	//! otherwise load them from the given folder itself (and no other).
+	static std::vector<GfModule*> loadFromDir(const std::string& strDirPath, bool bUseChildDirs = true);
+
+	//! Check if a module the given path (relative to GfLibDir()) and shared library name
+	//! is really installed.
+	static bool isPresent(const std::string& strModPath, const std::string& strModName);
 
 	//! Delete a module and unload the associated library (supposed to contain no other module).
 	static bool unload(GfModule*& pModule);
+
+	//! Delete each module of the given list and unload the associated libraries (supposed to contain each only one module).
+	static bool unload(std::vector<GfModule*>& vecModules);
 
 	//! Get the module as a pointer to the given interface (aka "facet").
 	template <class Interface>

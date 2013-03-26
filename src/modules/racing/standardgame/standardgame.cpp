@@ -98,7 +98,7 @@ void StandardGame::reset(void)
 	const char* pszModName =
 		GfParmGetStr(ReSituation::self().data()->_reParam, "Modules", "track", "track");
 	GfLogInfo("Loading '%s' track loader ...\n", pszModName);
-	GfModule* pmodTrkLoader = GfModule::load("track", pszModName);
+	GfModule* pmodTrkLoader = GfModule::load("modules/track", pszModName);
 
 	// Check that it implements ITrackLoader.
 	if (pmodTrkLoader)
@@ -310,7 +310,7 @@ bool StandardGame::loadPhysicsEngine()
 	if (_piUserItf)
 		_piUserItf->addLoadingMessage(ossLoadMsg.str().c_str());
 
-	GfModule* pmodPhysEngine = GfModule::load("simu", strModName.c_str());
+	GfModule* pmodPhysEngine = GfModule::load("modules/simu", strModName.c_str());
 	if (pmodPhysEngine)
 		_piPhysEngine = pmodPhysEngine->getInterface<IPhysicsEngine>();
 	if (pmodPhysEngine && !_piPhysEngine)

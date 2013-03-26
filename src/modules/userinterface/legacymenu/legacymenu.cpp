@@ -528,7 +528,7 @@ bool LegacyMenu::initializeGraphics()
     // Load the graphics module
 	const char* pszModName =
 		GfParmGetStr(_piRaceEngine->inData()->_reParam, "Modules", "graphic", "ssggraph");
-    GfModule* pmodGrEngine = GfModule::load("graphic", pszModName);
+    GfModule* pmodGrEngine = GfModule::load("modules/graphic", pszModName);
 
     // Check that it implements IGraphicsEngine.
     if (pmodGrEngine)
@@ -553,7 +553,7 @@ bool LegacyMenu::initializeSound()
     // Load the sound module
 	const char* pszModName =
 		GfParmGetStr(_piRaceEngine->inData()->_reParam, "Modules", "sound", "snddefault");
-    GfModule* pmodGrEngineS = GfModule::load("sound", pszModName);
+    GfModule* pmodGrEngineS = GfModule::load("modules/sound", pszModName);
 
     // Check that it implements IGraphicsEngine.
     if (pmodGrEngineS)

@@ -149,14 +149,59 @@ bool GfModule::isPresent(const std::string& strModCatName, const std::string& st
 	return GfFileExists(ossModLibPathName.str().c_str());
 }
 
-GfModule* GfModule::load(const std::string& strModCatName, const std::string& strModName)
+GfModule* GfModule::load(const std::string& strModPathName, const std::string& strModName)
 {
 	std::ostringstream ossModLibPathName;
 	
-	ossModLibPathName << GfLibDir() << "modules/" << strModCatName << "/"
-					  <<  strModName << '.' << DLLEXT;
+	ossModLibPathName << GfLibDir() << strModPathName << "/" <<  strModName << '.' << DLLEXT;
 
 	return load(ossModLibPathName.str());
+}
+
+std::vector<GfModule*> GfModule::loadFromDir(const std::string& strDirPath,
+											 bool bUseChildDirs)
+{
+	std::vector<GfModule*> vecModules;
+
+	GfLogDebug("GfModule::loadFromDir(%s)\n", strDirPath.c_str());
+
+	// Get the list of files/sub-dirs in the folder.
+	tFList* lstFilesOrDirs = GfDirGetList(strDirPath.c_str());
+	if (lstFilesOrDirs)
+	{
+		// Filter module shared libraries and try and load each of them.
+		tFList* pFileOrDir = lstFilesOrDirs;
+		do 
+		{
+			// Ignore "." and ".." folders.
+			if (pFileOrDir->name[0] == '.') 
+				continue;
+			
+			GfLogDebug("  Examining %s\n", pFileOrDir->name);
+		
+			// Build module shared library path-name (consider only foders, not files).
+			std::ostringstream ossShLibPath;
+			ossShLibPath << strDirPath << '/' << pFileOrDir->name;
+			if (bUseChildDirs)
+				ossShLibPath << '/' << pFileOrDir->name;
+			ossShLibPath << DLLEXT;
+
+			// Check existence.
+			if (!GfFileExists(ossShLibPath.str().c_str()))
+				continue;
+
+			// Try and load.
+			GfModule* pModule = GfModule::load(ossShLibPath.str().c_str());
+			if (pModule)
+				vecModules.push_back(pModule);
+			else
+				GfLogWarning("Failed to load module %s\n", ossShLibPath.str().c_str());
+			
+		}
+		while ((pFileOrDir = pFileOrDir->next) != lstFilesOrDirs);
+	}
+	
+	return vecModules;
 }
 
 bool GfModule::unload(GfModule*& pModule)
@@ -192,6 +237,16 @@ bool GfModule::unload(GfModule*& pModule)
 	GfLogTrace("Module %s unloaded\n", strShLibName.c_str());
 
 	return true;
+}
+
+bool GfModule::unload(std::vector<GfModule*>& vecModules)
+{
+	bool bStatus = true;
+	std::vector<GfModule*>::iterator itMod;
+	for(itMod = vecModules.begin(); itMod != vecModules.end(); itMod++)
+		bStatus = bStatus && unload(*itMod);
+
+	return bStatus;
 }
 
 bool GfModule::register_(GfModule* pModule) // Can't use 'register' as it is a C++ keyword.
