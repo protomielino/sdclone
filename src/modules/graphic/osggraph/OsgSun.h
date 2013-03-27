@@ -59,6 +59,7 @@ public:
 
     bool repaint( double sun_angle, double new_visibility );
     bool reposition( osg::Vec3d p, double angle);
+    bool update_color_angle(double angle);
 
     osg::Vec4f get_color();
     osg::Vec4f get_scene_color();

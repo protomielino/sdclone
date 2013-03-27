@@ -139,8 +139,8 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
 
     GfLogInfo("  domeSizeRation : %d\n", domeSizeRatio);
 
-    thesky->build(datapath, SDSkyDomeDistance, SDSkyDomeDistance, 2000*domeSizeRatio,
-                  SDSkyDomeDistance, 2000*domeSizeRatio, SDSkyDomeDistance, NPlanets,
+    thesky->build(datapath, SDSkyDomeDistance, SDSkyDomeDistance, 1000,
+                  40000, 800, 30000, NPlanets,
                   APlanetsData, NStars, AStarsData );
     GfOut("Build SKY\n");
     GLfloat sunAscension = grTrack->local.sunascension;
@@ -177,7 +177,9 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     // Initialize the whole sky dome.
     double r_WrldX = SDScenery::getWorldX();
     double r_WrldY = SDScenery::getWorldY();
-    osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0);
+    double r_WrldZ = SDScenery::getWorldZ();
+    osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0 );
+    //osg::Vec3 viewPos(0.0, 0.0, 0.0 );
 
     thesky->reposition( viewPos, 0, 0);
     UpdateLight();

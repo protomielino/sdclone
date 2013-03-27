@@ -157,6 +157,7 @@ bool SDSky::reposition( osg::Vec3& view_pos, double spin, /*double gst,*/
   calc_celestial_angles( sunpos, view_pos, angle, rotation );
   sun->setSunAngle( angle );
   sun->setSunRotation( rotation );
+  sun->update_color_angle(angle);
 
   dome->reposition( view_pos, angle );
 

@@ -38,7 +38,7 @@
 
 // Constructor
 SDSun::SDSun( void ) :
-    visibility(-9999.0), prev_sun_angle(-9999.0), path_distance(60000.0),
+    visibility(-9999.0), prev_sun_angle(-9999.0), path_distance(0000.0),
     sun_exp2_punch_through(7.0e-06)
 {
 
@@ -90,10 +90,10 @@ osg::Node* SDSun::build( std::string path, double dist, double sun_size )
 
     stateSet->setRenderBinDetails(-6, "RenderBin");
 
-    /*path = TmpPath+"data/textures/sun.png";
+    path = TmpPath+"data/textures/sun.png";
     osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path);
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
-    stateSet->setTextureAttributeAndModes(0, texture);*/
+    stateSet->setTextureAttributeAndModes(0, texture);
 
     sun_cl = new osg::Vec4Array;
     sun_cl->push_back(osg::Vec4(1, 1, 1, 1));
@@ -144,7 +144,7 @@ osg::Node* SDSun::build( std::string path, double dist, double sun_size )
     stateSet = geode2->getOrCreateStateSet();
     stateSet->setRenderBinDetails(-8, "RenderBin");
 
-    path = TmpPath+"data/textures/outer_halo.png";
+    path = TmpPath+"data/textures/halo.png";
     osg::ref_ptr<osg::Image> image3 = osgDB::readImageFile(path);
     osg::ref_ptr<osg::Texture2D> texture3 = new osg::Texture2D(image3.get());
     stateSet->setTextureAttributeAndModes(0, texture3);
@@ -231,6 +231,8 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
 	}
 	else
 	  green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 8.8938E+06;
+
+    GfOut("Sun Déclination in Sun = %.1f deg - green_scat_f = %.4f - sun color = %.4f\n", sun_declination, green_scat_f, sun_color[0]);
 
 	sun_color[1] = 1 - green_scat_f /* red_scat_corr_f*/;
 	i_halo_color[1] = 1 - (1.1 * (green_scat_f /* red_scat_corr_f*/));
@@ -343,13 +345,11 @@ bool SDSun::reposition( osg::Vec3d p, double angle)
     osg::Vec4f pos = osg::Vec4f(0.0,0.0,0.0,1.0)*R;
     sun_position = osg::Vec3f(pos._v[0],pos._v[1],pos._v[2]);
 
-    /*osg::Vec3f upos = osg::Vec3f(sun_position);
-    osg::Vec3f uplan = osg::Vec3f(sun_position._v[0],0.0,sun_position._v[2]);
-    upos.normalize();
-    uplan.normalize();
+    return true;
+}
 
-    sun_angle_to_scene = acos(upos*uplan);*/
-
+bool SDSun::update_color_angle( double angle )
+{
     // Suncolor related things:
     if ( prev_sun_angle != sun_angle )
     {
@@ -373,6 +373,8 @@ bool SDSun::reposition( osg::Vec3d p, double angle)
 
         path_distance = sqrt( pow( position_radius, 2 ) + pow( r_tropo, 2 )
                         - ( 2 * position_radius * r_tropo * cos( alpha ) ));
+
+        GfOut("path distance = %.4f\n", path_distance);
 
         double alt_half = sqrt( pow ( r_tropo, 2 ) + pow( path_distance / 2, 2 ) - r_tropo * path_distance * cos( asin( sin_beta )) ) - r_earth;
 

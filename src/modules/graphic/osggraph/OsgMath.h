@@ -33,7 +33,7 @@
 #define SD_180   180.0
 #define SD_MAX   DBL_MAX
 
-#ifndef SD_PI
+#ifdef M_PI
 #define SD_PI  3.1415926535f
 #else
 #define SD_PI  ((float) SD_PI)
