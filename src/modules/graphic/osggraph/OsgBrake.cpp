@@ -147,7 +147,6 @@ osg::ref_ptr<osg::Geode> SDBrakes::initBrake(int wheelIndex)
         pBrake->addDrawable(pBDisc);
 
         this->brake_disks[wheelIndex] = pBDisc;
-       // GfOut("BRAAAAAAAAAAAKE  The pointer : %d\n",this->brake_disks[wheelIndex].get());
 
         /* Brake caliper */
         osg::Vec3Array *cal_vtx = new osg::Vec3Array();

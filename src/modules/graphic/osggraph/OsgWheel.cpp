@@ -10,15 +10,12 @@ osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)
 
     this->brakes.setCar(car);
 
-    GfOut("THERE1\n");
     const char *wheelFront3DModFileNamePrfx =
             GfParmGetStr(handle, SECT_GROBJECTS, PRM_FRONT_WHEEL_3D, "");
     const char *wheelRear3DModFileNamePrfx =
             GfParmGetStr(handle, SECT_GROBJECTS, PRM_REAR_WHEEL_3D, "");
     const char *wheel3DModFileNamePrfx =
             GfParmGetStr(handle, SECT_GROBJECTS, PRM_WHEEL_3D, "wheel");
-
-    GfOut("THERE2\n");
 
     if (*wheelFront3DModFileNamePrfx)
     {
