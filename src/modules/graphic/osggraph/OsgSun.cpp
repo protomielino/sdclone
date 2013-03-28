@@ -29,8 +29,6 @@
 #include <osg/Texture2D>
 #include <osgDB/ReadFile>
 
-#include <tgf.h>
-
 #include "OsgColor.h"
 #include "OsgSun.h"
 #include "OsgMath.h"
@@ -38,7 +36,7 @@
 
 // Constructor
 SDSun::SDSun( void ) :
-    visibility(-9999.0), prev_sun_angle(-9999.0), path_distance(0000.0),
+    visibility(-9999.0), prev_sun_angle(-9999.0), path_distance(60000.0),
     sun_exp2_punch_through(7.0e-06)
 {
 
@@ -192,7 +190,6 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
 
         static const float sqrt_m_log01 = sqrt( -log( 0.01 ) );
         sun_exp2_punch_through = sqrt_m_log01 / ( visibility * 15 );
-        //sun_exp2_punch_through = 2.0/log(visibility);
     }
 
     if ( prev_sun_angle != sun_angle )
@@ -220,28 +217,29 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         red_scat_f = (aerosol_factor * path_distance * density_avg) / 5E+07;
         //red_scat_corr_f = sun_exp2_punch_through / (1 - red_scat_f);
         sun_color[0] = 1 -red_scat_f;
+        //sun_color[0] = 1 - (1.1 * red_scat_f);
         i_halo_color[0] = 1 - (1.1 * red_scat_f);
         o_halo_color[0] = 1 - (1.4 * red_scat_f);
         //scene_color[0] = 1 - red_scat_f;
 
-	// Green - 546.1 nm
-	if (sun_declination > 5.0 || sun_declination < 2.0)
-	{
-	    green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 5E+07;
-	}
-	else
-	  green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 8.8938E+06;
+        // Green - 546.1 nm
+        if (sun_declination > 5.0 || sun_declination < 2.0)
+        {
+            green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 5E+07;
+        }
+        else
+            green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 8.8938E+06;
 
-    GfOut("Sun Déclination in Sun = %.1f deg - green_scat_f = %.4f - sun color = %.4f\n", sun_declination, green_scat_f, sun_color[0]);
-
-	sun_color[1] = 1 - green_scat_f /* red_scat_corr_f*/;
-	i_halo_color[1] = 1 - (1.1 * (green_scat_f /* red_scat_corr_f*/));
-	o_halo_color[1] = 1 - (1.4 * (green_scat_f /* red_scat_corr_f*/));
-	//scene_color[1] = 1 - green_scat_f;
+        sun_color[1] = 1 - green_scat_f /* red_scat_corr_f*/;
+        //sun_color[1] = 1 - (1.1 * (green_scat_f /* red_scat_corr_f*/));
+        i_halo_color[1] = 1 - (1.1 * (green_scat_f /* red_scat_corr_f*/));
+        o_halo_color[1] = 1 - (1.4 * (green_scat_f /* red_scat_corr_f*/));
+        //scene_color[1] = 1 - green_scat_f;
 
         // Blue - 435.8 nm
         blue_scat_f = (aerosol_factor * path_distance * density_avg) / 3.607E+06;
         sun_color[2] = 1 - blue_scat_f /* red_scat_corr_f*/;
+        //sun_color[2] = 1 - (1.1 * (blue_scat_f /* red_scat_corr_f*/));
         i_halo_color[2] = 1 - (1.1 * (blue_scat_f /* red_scat_corr_f*/));
         o_halo_color[2] = 1 - (1.4 * (blue_scat_f /* red_scat_corr_f*/));
         //scene_color[2] = 1 - blue_scat_f;
@@ -257,38 +255,15 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
             o_halo_color[3] = 2 - blue_scat_f;
         }
 
-	double saturation = 1 - ( rel_humidity / 200 );
-	sun_color[1] += (( 1 - saturation ) * ( 1 - sun_color[1] ));
-	sun_color[2] += (( 1 - saturation ) * ( 1 - sun_color[2] ));
+        double saturation = 1 - ( rel_humidity / 200 );
+        sun_color[1] += (( 1 - saturation ) * ( 1 - sun_color[1] ));
+        sun_color[2] += (( 1 - saturation ) * ( 1 - sun_color[2] ));
 
-	i_halo_color[1] += (( 1 - saturation ) * ( 1 - i_halo_color[1] ));
-	i_halo_color[2] += (( 1 - saturation ) * ( 1 - i_halo_color[2] ));
+        i_halo_color[1] += (( 1 - saturation ) * ( 1 - i_halo_color[1] ));
+        i_halo_color[2] += (( 1 - saturation ) * ( 1 - i_halo_color[2] ));
 
-	o_halo_color[1] += (( 1 - saturation ) * ( 1 - o_halo_color[1] ));
-	o_halo_color[2] += (( 1 - saturation ) * ( 1 - o_halo_color[2] ));
-
-        //scene_color[1] += (( 1 - saturation ) * ( 1 - scene_color[1] ));
-        //scene_color[2] += (( 1 - saturation ) * ( 1 - scene_color[2] ));
-
-        //double scene_f = 0.5 * (1 / (1 - red_scat_f));
-        //double sun_f = 1.0 - scene_f;
-        /*i_halo_color[0] = sun_f * sun_color[0] + scene_f * scene_color[0];
-        i_halo_color[1] = sun_f * sun_color[1] + scene_f * scene_color[1];
-        i_halo_color[2] = sun_f * sun_color[2] + scene_f * scene_color[2];
-        i_halo_color[3] = 1;
-
-        o_halo_color[0] = 0.2 * sun_color[0] + 0.8 * scene_color[0];
-        o_halo_color[1] = 0.2 * sun_color[1] + 0.8 * scene_color[1];
-        o_halo_color[2] = 0.2 * sun_color[2] + 0.8 * scene_color[2];
-        o_halo_color[3] = blue_scat_f;
-
-	if ((visibility < 10000) && (blue_scat_f > 1))
-	{
-	    o_halo_color[3] = 2 - blue_scat_f;
-	}
-
-        if (o_halo_color[3] > 1) o_halo_color[3] = 1;
-        if (o_halo_color[3] < 0) o_halo_color[3] = 0;*/
+        o_halo_color[1] += (( 1 - saturation ) * ( 1 - o_halo_color[1] ));
+        o_halo_color[2] += (( 1 - saturation ) * ( 1 - o_halo_color[2] ));
 
         // just to make sure we're in the limits
         if ( sun_color[0] < 0 ) sun_color[0] = 0;
@@ -373,8 +348,6 @@ bool SDSun::update_color_angle( double angle )
 
         path_distance = sqrt( pow( position_radius, 2 ) + pow( r_tropo, 2 )
                         - ( 2 * position_radius * r_tropo * cos( alpha ) ));
-
-        GfOut("path distance = %.4f\n", path_distance);
 
         double alt_half = sqrt( pow ( r_tropo, 2 ) + pow( path_distance / 2, 2 ) - r_tropo * path_distance * cos( asin( sin_beta )) ) - r_earth;
 
