@@ -567,9 +567,6 @@ extern "C" int moduleWelcome
 //--------------------------------------------------------------------------*
 extern "C" int moduleInitialize(tModInfo *ModInfo)
 {
-  // Initialise the "Simplix" logger instance.
-  LogSimplix.setHeaderColumns(0);
-
   LogSimplix.debug("\n#Initialize from %s ...\n",RobPathXML);
   LogSimplix.debug("#NBBOTS: %d (of %d)\n",NBBOTS,MAXNBBOTS);
 
