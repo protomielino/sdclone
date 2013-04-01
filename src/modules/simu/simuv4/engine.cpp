@@ -47,6 +47,7 @@ SimEngineConfig(tCar *car)
 	car->engine.exhaust_refract = 0.1f;
 	car->engine.Tq_response = 0.0f;
 	car->engine.I_joint = car->engine.I;
+	car->engine.timeInLimiter = 0.0f;
 
 	sprintf(idx, "%s/%s", SECT_ENGINE, ARR_DATAPTS);
 	car->engine.curve.nbPts = GfParmGetEltNb(hdle, idx);
@@ -151,7 +152,14 @@ SimEngineUpdateTq(tCar *car)
 		tdble alpha = car->ctrl->accelCmd;
         if (engine->rads > engine->revsLimiter) {
             alpha = 0.0;
+	    if (car->features & FEAT_REVLIMIT) {
+	        engine->timeInLimiter = 0.1;
+	    }
         }
+	if ( (car->features & FEAT_REVLIMIT) && (engine->timeInLimiter > 0.0f) ) {
+	    alpha = 0.0;
+	    engine->timeInLimiter -= SimDeltaTime;
+	}
 		tdble Tq_cur = (Tq_max + EngBrkK) * alpha;
 		engine->Tq = Tq_cur;
 		engine->Tq -= EngBrkK;

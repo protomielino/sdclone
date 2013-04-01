@@ -43,16 +43,17 @@ typedef struct
     tdble		revsMax;
     tdble		tickover;
     tdble		I;
-    tdble		rads;   /* revs in rad/s ... */
-    tdble		Tq;	/* output torque */
-    tdble       Tq_response; /* response Tq due to mismatch */
-    tdble       I_joint; /* joint inertia */
+    tdble		rads; /* revs in rad/s ... */
+    tdble		Tq; /* output torque */
+    tdble		Tq_response; /* response Tq due to mismatch */
+    tdble		I_joint; /* joint inertia */
     tdble		fuelcons;
     tdble		brakeCoeff; /* coefficient for constant engine brake */
     tdble		brakeLinCoeff; /* coefficient for RPM dependent engine brake */
-	tdble       pressure;
-	tdble       exhaust_pressure;
-	tdble       exhaust_refract;
+    tdble		pressure;
+    tdble		exhaust_pressure;
+    tdble		exhaust_refract;
+    tdble		timeInLimiter; /* time to still spend with fuel cut, in secundum */
 } tEngine;
 
 #endif /* _ENGINE_H_ */ 
