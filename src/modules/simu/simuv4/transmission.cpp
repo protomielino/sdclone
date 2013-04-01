@@ -38,7 +38,7 @@ SimTransmissionConfig(tCar *car)
 
     //clutchI		= GfParmGetNum(hdle, SECT_CLUTCH, PRM_INERTIA, (char*)NULL, 0.12f);
     transType		= GfParmGetStr(hdle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
-    clutch->releaseTime	= GfParmGetNum(hdle, SECT_GEARBOX, PRM_SHIFTTIME, (char*)NULL, 0.2f);
+    trans->gearbox.shiftTime = clutch->releaseTime = GfParmGetNum(hdle, SECT_GEARBOX, PRM_SHIFTTIME, (char*)NULL, 0.2f);
 
     fRatio = 0;
     gEff   = 0;
@@ -119,6 +119,8 @@ SimTransmissionConfig(tCar *car)
     clutch->timeToRelease = 0;
 
     trans->gearbox.gear = 0; /* neutral */
+    trans->gearbox.gearNext = 0;
+    trans->gearbox.timeToEngage = 0.0f;
     trans->curI = trans->freeI[1];
     switch(trans->type) {
     case TRANS_RWD:
@@ -178,11 +180,36 @@ SimGearboxUpdate(tCar *car)
     }
 
     trans->curI = trans->driveI[gearbox->gear + 1] * clutch->transferValue + trans->freeI[gearbox->gear +  1] * (1.0f - clutch->transferValue);
-    if (clutch->state == CLUTCH_RELEASING && gearbox->gear != car->ctrl->gear) { 
+    
+    if (car->features & FEAT_REALGEARCHANGE) {/* simuv4 new gear change code */
+	if ( (car->ctrl->gear != gearbox->gear) && (car->ctrl->gear <= gearbox->gearMax) && (car->ctrl->gear >= gearbox->gearMin) ) {
+	    /* initiate a shift, go to neutral */
+	    gearbox->gearNext = car->ctrl->gear;
+	    if (gearbox->timeToEngage <= 0.0f) {
+		if (gearbox->gearNext == 0) {gearbox->timeToEngage = 0.0f;} /* disengaging gears happens immediately */
+		else {gearbox->timeToEngage = gearbox->shiftTime * 0.67f;}
+		gearbox->gear = 0;
+		trans->curOverallRatio = trans->overallRatio[1];
+		trans->curI = trans->driveI[1] * clutch->transferValue + trans->freeI[1] * (1.0f - clutch->transferValue);
+	    }
+	}
+	
+	if (gearbox->timeToEngage > 0.0f) {
+	    gearbox->timeToEngage -= SimDeltaTime;
+	    if (gearbox->timeToEngage <= 0.0f) {
+		/* engage new gear */
+		gearbox->gear = gearbox->gearNext;
+		gearbox->gearNext = 0;
+		trans->curOverallRatio = trans->overallRatio[gearbox->gear+1];
+		trans->curI = trans->driveI[gearbox->gear + 1] * clutch->transferValue + trans->freeI[gearbox->gear +  1] * (1.0f - clutch->transferValue);
+	    }
+	}
+    } else {/* old gear change code */
+    	if (clutch->state == CLUTCH_RELEASING && gearbox->gear != car->ctrl->gear) { 
                 /* Fast change during clutch release, re-releasing it */ 
                 clutch->state = CLUTCH_RELEASED; 
-    }
-    if (clutch->state == CLUTCH_RELEASING) {
+    	}
+    	if (clutch->state == CLUTCH_RELEASING) {
 		clutch->timeToRelease -= SimDeltaTime;
 		if (clutch->timeToRelease <= 0.0f) {
 			clutch->state = CLUTCH_RELEASED;
@@ -200,7 +227,7 @@ SimGearboxUpdate(tCar *car)
 				}
 			}
 		}
-    } else if ((car->ctrl->gear > gearbox->gear)) {
+    	} else if ((car->ctrl->gear > gearbox->gear)) {
 		if (car->ctrl->gear <= gearbox->gearMax) {
 			gearbox->gear = car->ctrl->gear;
 			clutch->state = CLUTCH_RELEASING;
@@ -212,7 +239,7 @@ SimGearboxUpdate(tCar *car)
 			trans->curOverallRatio = trans->overallRatio[gearbox->gear+1];
 			trans->curI = trans->freeI[gearbox->gear+1];
 		}
-    } else if ((car->ctrl->gear < gearbox->gear)) {
+    	} else if ((car->ctrl->gear < gearbox->gear)) {
 		if (car->ctrl->gear >= gearbox->gearMin) {
 			gearbox->gear = car->ctrl->gear;
 			clutch->state = CLUTCH_RELEASING;
@@ -224,6 +251,7 @@ SimGearboxUpdate(tCar *car)
 			trans->curOverallRatio = trans->overallRatio[gearbox->gear+1];
 			trans->curI = trans->freeI[gearbox->gear+1];
 		}
+    	}
     }
 
 

@@ -31,6 +31,9 @@ typedef struct
     int		gear;
     int		gearMin;
     int		gearMax;
+    int		gearNext;
+    tdble   shiftTime; /* time of shifting in sec */
+    tdble   timeToEngage; /* time to engage gearNext, in sec */
 } tGearbox;
 
 typedef struct
