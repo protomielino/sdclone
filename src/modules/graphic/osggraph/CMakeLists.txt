@@ -38,7 +38,7 @@ ENDIF(WIN32)
 
 IF(MSVC)
    # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
-    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
+    SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
 ENDIF(MSVC)
 
 # Note: Other sources and headers needed for having them available in IDEs.

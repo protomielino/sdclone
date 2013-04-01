@@ -17,7 +17,7 @@ ENDIF(WIN32)
 
 IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
-    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
+    SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
 ENDIF(MSVC)
 
 SET(SIMU_SOURCES aero.cpp axle.cpp brake.cpp car.cpp categories.cpp
