@@ -1264,6 +1264,7 @@ ReImportGeneticParameters()
 				Data->Part[I].Subsection = strdup(GroupParam->Subsection);
 
 			// Get number of local sections defined in the car setup
+			snprintf(buf,sizeof(buf),"%s/%s",Data->PrivateSection,Data->Part[I].Subsection);
 			Data->Part[I].NbrOfSect = GfParmGetEltNb(Data->Handle,buf);
 			// Update number of parameters
 			Data->NbrOfParam += Data->Part[I].Count * Data->Part[I].NbrOfSect;
