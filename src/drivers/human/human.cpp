@@ -725,7 +725,9 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	GfScrGetSize(&scrw, &scrh, &dummy, &dummy);
 
+	int oldgear = car->_gearCmd;
 	memset(&(car->ctrl), 0, sizeof(tCarCtrl));
+	car->_gearCmd = oldgear;
 
 	car->_lightCmd = HCtx[idx]->lightCmd;
 
@@ -1479,7 +1481,7 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 
 	common_drive(index, car, s);
 
-	car->_gearCmd = car->_gear;
+	//Can it be left out? car->_gearCmd = car->_gear;
 	/* manual shift sequential */
 	if (HCtx[idx]->transmission == eTransSeq)
 	{
@@ -1664,7 +1666,7 @@ drive_at(int index, tCarElt* car, tSituation *s)
 	/* shift */
 	int gear = car->_gear;
 	gear += car->_gearOffset;
-	car->_gearCmd = car->_gear;
+	//can it be left out? car->_gearCmd = car->_gear;
 
 	if (!HCtx[idx]->autoReverse) {
 		/* manual shift */
