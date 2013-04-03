@@ -149,7 +149,7 @@ MACRO(ROBOT_MODULE)
 
   # Ignore some run-time libs to avoid MSVC link-time warnings and sometimes even crashes.
   IF(MSVC)
-      SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
+      SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
   ENDIF(MSVC)
 
   # The robot module is actually a shared library.
