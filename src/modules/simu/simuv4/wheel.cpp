@@ -309,7 +309,7 @@ SimWheelUpdateRotation(tCar *car)
 		/*update rotation*/
 		wheel->spinVel = wheel->in.spinVel;
 		
-		if ( (car->features & FEAT_SLOWGRIP) && ( wheel->brake.Tq == 0.0) ) {
+		if ( (car->features & FEAT_SLOWGRIP) && (wheel->brake.Tq == 0.0) && (car->ctrl->accelCmd * car->transmission.clutch.transferValue < 0.05) ) {
 			/* prevent wheelspin value oscillating around wheel tangential velocity */
 			tdble waz = wheel->steer + wheel->staticPos.az;
 			tdble vt = wheel->bodyVel.x * cos(waz) + wheel->bodyVel.y * sin(waz);
