@@ -174,6 +174,7 @@ public:
     inline void set_visibility( float v ) {	effective_visibility = visibility = (v <= 25.0) ? 25.0 : v; }
 
     inline SDSun * getSun(){return sun;}
+    inline osg::Vec3f sunposition() {return sun->getSunPosition();}
 
     //virtual double get_3dCloudDensity() const;
     //virtual void set_3dCloudDensity(double density);

@@ -59,7 +59,7 @@ osg::Node* SDMoon::build( std::string path, double dist, double size )
     moon_size = size;
     moon_dist = dist;
 
-    path = TmpPath+"data/textures/moon.rgba";
+    path = TmpPath+"data/textures/moon.png";
     osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path);
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
     stateSet->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
@@ -69,14 +69,10 @@ osg::Node* SDMoon::build( std::string path, double dist, double size )
 
     orb_material = new osg::Material;
     orb_material->setColorMode(osg::Material::DIFFUSE);
-    orb_material->setDiffuse(osg::Material::FRONT_AND_BACK,
-                             osg::Vec4(1, 1, 1, 1));
-    orb_material->setAmbient(osg::Material::FRONT_AND_BACK,
-                             osg::Vec4(0, 0, 0, 1));
-    orb_material->setEmission(osg::Material::FRONT_AND_BACK,
-                              osg::Vec4(0, 0, 0, 1));
-    orb_material->setSpecular(osg::Material::FRONT_AND_BACK,
-                              osg::Vec4(0, 0, 0, 1));
+    orb_material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(1, 1, 1, 1));
+    orb_material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(0, 0, 0, 1));
+    orb_material->setEmission(osg::Material::FRONT_AND_BACK,osg::Vec4(0, 0, 0, 1));
+    orb_material->setSpecular(osg::Material::FRONT_AND_BACK,osg::Vec4(0, 0, 0, 1));
     orb_material->setShininess(osg::Material::FRONT_AND_BACK, 0);
     stateSet->setAttribute(orb_material.get());
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::ON);

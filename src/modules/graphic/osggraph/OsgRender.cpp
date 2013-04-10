@@ -193,11 +193,23 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     osg::StateSet* stateSet = sceneGroup->getOrCreateStateSet();
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
+    osg::Material* material = new osg::Material;
+    material->setColorMode(osg::Material::OFF); // switch glColor usage off
+    // turn all lighting off
+    //material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(SceneAmbiant));
+    //material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(SceneDiffuse));
+    //material->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(SceneSpecular));
+    // except emission... in which we set the color we desire
+    //material->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(0.0,1.0f,0.0f,1.0f));
+    stateSet->setAttributeAndModes(material,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+    stateSet->setMode(GL_LIGHTING,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+
     osg::LightSource* lightSource = new osg::LightSource;
     lightSource->getLight()->setDataVariance(osg::Object::DYNAMIC);
     // relative because of CameraView being just a clever transform node
     lightSource->setReferenceFrame(osg::LightSource::RELATIVE_RF);
     lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
+
     //lightSource->setUpdateCallback(new FGLightSourceUpdateCallback);
 
     // we need a white diffuse light for the phase of the moon
@@ -206,6 +218,13 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     sunLight->getLight()->setLightNum(1);
     sunLight->setReferenceFrame(osg::LightSource::RELATIVE_RF);
     sunLight->setLocalStateSetModes(osg::StateAttribute::ON);
+    sunLight->getLight()->setAmbient(SceneAmbiant);
+    sunLight->getLight()->setDiffuse(SceneDiffuse);
+    sunLight->getLight()->setSpecular(SceneSpecular);
+
+    osg::Vec3f sun_position = thesky->sunposition();
+    osg::Vec4f position(sun_position, 0);
+    sunLight->getLight()->setPosition(position);
 
     osg::Group* skyGroup = new osg::Group;
     osg::StateSet* skySS = skyGroup->getOrCreateStateSet();
@@ -232,21 +251,21 @@ void SDRender::UpdateLight( void )
     moon_angle = (float)thesky->getMA();
     float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
 
-    GfOut("Sun Angle in Render = %f\n", sol_angle);
+    GfOut("Sun Angle in Render = %f - sky brightness = %f\n", sol_angle, sky_brightness);
 
     if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
     {
-        BaseFogColor[0] = 0.42f;
-        BaseFogColor[1] = 0.44f;
-        BaseFogColor[2] = 0.50f;
+        BaseFogColor[0] = 0.31f;
+        BaseFogColor[1] = 0.36f;
+        BaseFogColor[2] = 0.44f;
 
         sky_brightness = (float)pow(sky_brightness, 0.5f);
     }
     else
     {
-        BaseFogColor[0] = 0.84f;
-        BaseFogColor[1] = 0.84f;
-        BaseFogColor[2] = 1.00f;
+        BaseFogColor[0] = 0.63f;
+        BaseFogColor[1] = 0.72f;
+        BaseFogColor[2] = 0.88f;
     }
 
     SkyColor[0] = BaseSkyColor[0] * sky_brightness;
@@ -372,14 +391,14 @@ void SDRender::UpdateFogColor(double sol_angle)
        av = 45000;
 
     float avf = 0.87 - (45000 - av) / 83333.33;
-    float sif = 0.5 - cos( sol_angle * 2)/2;
+    float sif = 0.5 - cos( (sol_angle * SD_RADIANS_TO_DEGREES)* 2)/2;
 
     if (sif < 1e-4)
        sif = 1e-4;
 
     float rf1 = fabs((rotation - SD_PI) / SD_PI);             // 0.0 .. 1.0
-    float rf2 = avf * pow(rf1 * rf1, 1 /sif);
-    float rf3 = 0.94 - rf2;
+    float rf2 = avf * pow(rf1 * rf1, 1 /sif)* 1.0639;
+    float rf3 = 1.0 - rf2;
 
     FogColor[0] = rf3 * BaseFogColor[0] + rf2 * s_red;
     FogColor[1] = rf3 * BaseFogColor[1] + rf2 * s_green;

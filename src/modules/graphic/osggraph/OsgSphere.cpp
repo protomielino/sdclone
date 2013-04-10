@@ -17,7 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 #include <tgf.h>
-#include <iostream>
 
 #include <osg/Node>
 #include <osg/Geometry>
@@ -60,7 +59,7 @@ osg::Node* SDMakeSphere(double radius, int slices, int stacks)
 	    double y = cos(theta) * sin(rho);
 	    double z = nsign * cos(rho);
 
-            osg::Vec3 normal(x*nsign, y*nsign, z*nsign);
+        osg::Vec3 normal(x*nsign, y*nsign, z*nsign);
 	    normal.normalize();
 	    nl->push_back(normal);
 
@@ -71,7 +70,7 @@ osg::Node* SDMakeSphere(double radius, int slices, int stacks)
 	    y = cos(theta) * sin(rho+drho);
 	    z = nsign * cos(rho+drho);
 
-            normal = osg::Vec3(x*nsign, y*nsign, z*nsign);
+        normal = osg::Vec3(x*nsign, y*nsign, z*nsign);
 	    normal.normalize();
 	    nl->push_back(normal);
 
