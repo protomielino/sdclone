@@ -246,13 +246,13 @@ The Speed Dreams Team.
   For the moment, 
   - the developments for the next release are located in the trunk ; 
     you can checkout the current _development_ state through :
-     $ svn co https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/trunk sd-trunk
+     $ svn co https://svn.code.sf.net/p/speed-dreams/code/trunk sd-trunk
   - we make branches under the "branches" root dir ; as an exemple,
     you can get the "1.4.x" release maintenance branch current state through :
-     $ svn co https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/branches/1.4.x sd-1.4.x
+     $ svn co https://svn.code.sf.net/p/speed-dreams/code/branches/1.4.x sd-1.4.x
   - we make release tags under the "tags" root dir ; 
     as an exemple, you can get the "2.0.0 RC 1" pre-release through :
-     $ svn co https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-rc1 sd-2.0.0-rc1
+     $ svn co https://svn.code.sf.net/p/speed-dreams/code/tags/2.0.0-rc1 sd-2.0.0-rc1
 
   See configure, build and install method above (2)
   (note however that branches/1.4.x and tags/1.4.0 are not built through cmake :
