@@ -45,15 +45,18 @@ SDScenery *scenery = NULL;
 SDRender *render = NULL;
 SDScreens * screens = NULL;
 
-void *getScreens(){
+void *getScreens()
+{
     return screens;
 }
 
-void *getRender(){
+void *getRender()
+{
     return render;
 }
 
-void * getCars(){
+void * getCars()
+{
     return cars;
 }
 
@@ -107,11 +110,11 @@ PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
 // Set up OpenGL features from user settings.
 static void setupOpenGLFeatures(void)
 {
-        static bool bInitialized = false;
+    static bool bInitialized = false;
 
-        // Don't do it twice.
+    // Don't do it twice.
     if (bInitialized)
-                return;
+        return;
 
 	// Multi-texturing.
 	grMaxTextureUnits = 1;
