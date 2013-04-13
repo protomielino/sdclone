@@ -24,6 +24,7 @@
 #include <osgDB/Registry>
 #include <osg/Fog>
 #include <osg/Light>
+#include <osg/LightModel>
 #include <osg/LightSource>
 #include <osg/Camera>
 #include <osgViewer/Viewer>
@@ -196,11 +197,11 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     osg::Material* material = new osg::Material;
     material->setColorMode(osg::Material::OFF); // switch glColor usage off
     // turn all lighting off
-    //material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(SceneAmbiant));
-    //material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(SceneDiffuse));
-    //material->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(SceneSpecular));
+    //material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(0.7f, 0.7f, 0.7f, 1.0f));
+    //material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(0.7f, 0.7f, 0.7f, 1.0f));
+    //material->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(0.3f, 0.3f, 0.3f, 1.0f));
     // except emission... in which we set the color we desire
-    //material->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(0.0,1.0f,0.0f,1.0f));
+    //material->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(0.1, 0.1f,0.1f,1.0f));
     stateSet->setAttributeAndModes(material,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHTING,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
@@ -209,8 +210,13 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     // relative because of CameraView being just a clever transform node
     lightSource->setReferenceFrame(osg::LightSource::RELATIVE_RF);
     lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
+    lightSource->getLight()->setAmbient(osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
+    lightSource->getLight()->setDiffuse(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    lightSource->getLight()->setSpecular(osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
+    //sceneGroup->addChild(lightSource);
 
-    //lightSource->setUpdateCallback(new FGLightSourceUpdateCallback);
+    //assert(dynamic_cast<osg::LightSource*>(mRoot));
+    //osg::LightSource lightSource = static_cast<osg::LightSource*>(mRoot);
 
     // we need a white diffuse light for the phase of the moon
     osg::LightSource* sunLight = new osg::LightSource;
@@ -221,6 +227,7 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     sunLight->getLight()->setAmbient(SceneAmbiant);
     sunLight->getLight()->setDiffuse(SceneDiffuse);
     sunLight->getLight()->setSpecular(SceneSpecular);
+    sunLight->setStateSetModes(*stateSet,osg::StateAttribute::ON);
 
     osg::Vec3f sun_position = thesky->sunposition();
     osg::Vec4f position(sun_position, 0);
@@ -233,6 +240,7 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     sunLight->addChild(skyGroup);
     mRoot->addChild(sceneGroup);
     mRoot->addChild(sunLight);
+    mRoot->setStateSet(setFogState().get());
 
     // Clouds are added to the scene graph later
     stateSet = m_sceneroot->getOrCreateStateSet();
@@ -242,7 +250,7 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
 
     GfOut("LE POINTEUR %d\n",mRoot.get());
 
-    return mRoot;
+    return mRoot.get();
 }//SDRender::Init
 
 void SDRender::UpdateLight( void )
@@ -255,17 +263,17 @@ void SDRender::UpdateLight( void )
 
     if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
     {
-        BaseFogColor[0] = 0.31f;
-        BaseFogColor[1] = 0.36f;
-        BaseFogColor[2] = 0.44f;
+        BaseFogColor[0] = 0.42f;
+        BaseFogColor[1] = 0.44f;
+        BaseFogColor[2] = 0.50f;
 
         sky_brightness = (float)pow(sky_brightness, 0.5f);
     }
     else
     {
-        BaseFogColor[0] = 0.63f;
-        BaseFogColor[1] = 0.72f;
-        BaseFogColor[2] = 0.88f;
+        BaseFogColor[0] = 0.84f;
+        BaseFogColor[1] = 0.84f;
+        BaseFogColor[2] = 1.00f;
     }
 
     SkyColor[0] = BaseSkyColor[0] * sky_brightness;
@@ -351,7 +359,28 @@ void SDRender::UpdateLight( void )
         SceneSpecular[2] = sun_color[0] * sky_brightness;
         SceneSpecular[3] = 1.0;
     }
+
 }//grUpdateLight
+
+osg::ref_ptr< osg::StateSet> SDRender::setFogState()
+{
+    SceneFog[0] = FogColor[0];
+    SceneFog[1] = FogColor[1];
+    SceneFog[2] = FogColor[2];
+    SceneFog[3] = 0.5f;
+    osg::ref_ptr<osg::Fog> fog = new osg::Fog();    //The fog object
+    fog->setMode(osg::Fog::EXP2);                   //Fog type
+    fog->setDensity(0.0005);                        //Fog density
+    fog->setColor(SceneFog);                        //Fog color
+    fog->setStart(8000);                            //Start position of the fog - distance from the camera to the fog
+    fog->setEnd(12000);                             // maximum distance - where the fog terminates.
+    osg::ref_ptr< osg::StateSet> fogState (new osg::StateSet);
+    fogState->setAttributeAndModes(fog.get(),osg::StateAttribute::ON);
+    fogState->setMode(GL_FOG,osg::StateAttribute::ON);
+
+    return fogState;
+
+}
 
 void SDRender::UpdateFogColor(double sol_angle)
 {
@@ -391,14 +420,14 @@ void SDRender::UpdateFogColor(double sol_angle)
        av = 45000;
 
     float avf = 0.87 - (45000 - av) / 83333.33;
-    float sif = 0.5 - cos( (sol_angle * SD_RADIANS_TO_DEGREES)* 2)/2;
+    float sif = 0.5 - cos( sol_angle * 2)/2;
 
     if (sif < 1e-4)
        sif = 1e-4;
 
     float rf1 = fabs((rotation - SD_PI) / SD_PI);             // 0.0 .. 1.0
-    float rf2 = avf * pow(rf1 * rf1, 1 /sif)* 1.0639;
-    float rf3 = 1.0 - rf2;
+    float rf2 = avf * pow(rf1 * rf1, 1 /sif);
+    float rf3 = 0.94 - rf2;
 
     FogColor[0] = rf3 * BaseFogColor[0] + rf2 * s_red;
     FogColor[1] = rf3 * BaseFogColor[1] + rf2 * s_green;

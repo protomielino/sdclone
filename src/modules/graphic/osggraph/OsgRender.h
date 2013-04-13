@@ -42,6 +42,7 @@ private:
         osg::Vec4f SceneAmbiant;
         osg::Vec4f SceneDiffuse;
         osg::Vec4f SceneSpecular;
+        osg::Vec4f SceneFog;
 
 public:
 	SDRender(void);
@@ -52,6 +53,7 @@ public:
         void UpdateTime(tSituation *s);
         void UpdateLight(void);
         void UpdateFogColor(double angle);
+        osg::ref_ptr< osg::StateSet> setFogState();
         SDSky * getSky();
 };
 
