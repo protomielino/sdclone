@@ -31,10 +31,10 @@ ELSE(NOT OPTION_AUTOVERSION)
 	SET(HEAD_URL "$HeadURL$")
 
 	# Define regular expressions
-	SET(REGEX_TAG        "^\\$HeadURL:.*speed-dreams/tags/([^/\\$ ]*).*\\$$")
-	SET(REGEX_BUG_BRANCH "^\\$HeadURL:.*speed-dreams/branches/([0-9]+\\.[0-9]+)(\\.[xX])?/.*\\$$")
-	SET(REGEX_TRUNK      "^\\$HeadURL:.*speed-dreams/trunk/.*\\$$")
-	SET(REGEX_BRANCH     "^\\$HeadURL:.*speed-dreams/branches/([^/\\$ ]*).*\\$$")
+	SET(REGEX_TAG        "^\\$HeadURL:.*speed-dreams/code/tags/([^/\\$ ]*).*\\$$")
+	SET(REGEX_BUG_BRANCH "^\\$HeadURL:.*speed-dreams/code/branches/([0-9]+\\.[0-9]+)(\\.[xX])?/.*\\$$")
+	SET(REGEX_TRUNK      "^\\$HeadURL:.*speed-dreams/code/trunk/.*\\$$")
+	SET(REGEX_BRANCH     "^\\$HeadURL:.*speed-dreams/code/branches/([^/\\$ ]*).*\\$$")
 
 	# Check regular expressions
 	STRING(REGEX MATCH "${REGEX_TAG}"        VERSION_IS_TAG "${HEAD_URL}")
