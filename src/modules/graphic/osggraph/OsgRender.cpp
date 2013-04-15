@@ -93,7 +93,8 @@ SDRender::~SDRender(void)
     delete thesky;
 }
 
-SDSky * SDRender::getSky(){
+SDSky * SDRender::getSky()
+{
     return thesky;
 }
 
@@ -179,7 +180,7 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     double r_WrldX = SDScenery::getWorldX();
     double r_WrldY = SDScenery::getWorldY();
     double r_WrldZ = SDScenery::getWorldZ();
-    osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0 );
+    osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, r_WrldZ / 2 );
     //osg::Vec3 viewPos(0.0, 0.0, 0.0 );
 
     thesky->reposition( viewPos, 0, 0);
@@ -364,16 +365,17 @@ void SDRender::UpdateLight( void )
 
 osg::ref_ptr< osg::StateSet> SDRender::setFogState()
 {
+    static const double m_log01 = -log( 0.01 );
+    static const double sqrt_m_log01 = sqrt( m_log01 );
+    const GLfloat fog_exp2_density = sqrt_m_log01 / thesky->get_visibility();
     SceneFog[0] = FogColor[0];
     SceneFog[1] = FogColor[1];
     SceneFog[2] = FogColor[2];
-    SceneFog[3] = 0.5f;
+    SceneFog[3] = 1.0f;
     osg::ref_ptr<osg::Fog> fog = new osg::Fog();    //The fog object
     fog->setMode(osg::Fog::EXP2);                   //Fog type
-    fog->setDensity(0.0005);                        //Fog density
+    fog->setDensity(fog_exp2_density);                        //Fog density
     fog->setColor(SceneFog);                        //Fog color
-    fog->setStart(8000);                            //Start position of the fog - distance from the camera to the fog
-    fog->setEnd(12000);                             // maximum distance - where the fog terminates.
     osg::ref_ptr< osg::StateSet> fogState (new osg::StateSet);
     fogState->setAttributeAndModes(fog.get(),osg::StateAttribute::ON);
     fogState->setMode(GL_FOG,osg::StateAttribute::ON);
