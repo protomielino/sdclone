@@ -30,31 +30,46 @@ class SDSky;
 class SDRender
 {
 private:
-	osg::ref_ptr<osg::Group> m_sceneroot;
+    osg::ref_ptr<osg::Group> m_sceneroot;
     //osg::ref_ptr<osg::Group> m_carroot;
 
-        osg::Vec3f SkyColor;
-        osg::Vec3f BaseFogColor;
-        osg::Vec3f FogColor;
-        osg::Vec3f CloudsColor;
-        osg::Vec3f BaseSkyColor;
 
-        osg::Vec4f SceneAmbiant;
-        osg::Vec4f SceneDiffuse;
-        osg::Vec4f SceneSpecular;
-        osg::Vec4f SceneFog;
+    const osg::Vec4 BaseSkyColor;
+    osg::Vec4 BaseFogColor;
+    osg::Vec3f SkyColor;
+    osg::Vec3f FogColor;
+    osg::Vec3f CloudsColor;
+
+    osg::Vec4f SceneAmbiant;
+    osg::Vec4f SceneDiffuse;
+    osg::Vec4f SceneSpecular;
+    osg::Vec4f SceneFog;
+
+    float SDSunDeclination;
+    float SDMoonDeclination;
+    float SDMax_Visibility;
+    double SDVisibility;
+
+    osg::Vec3d *AStarsData;
+    osg::Vec3d *APlanetsData;
+    int NStars;
+    int NPlanets;
+    float sol_angle;
+    float moon_angle;
 
 public:
 	SDRender(void);
 	~SDRender(void);
 
-        osg::ref_ptr<osg::Node> Init(osg::Group* root, tTrack *track);
-        void Update(float speedcar, tSituation *s);
-        void UpdateTime(tSituation *s);
-        void UpdateLight(void);
-        void UpdateFogColor(double angle);
-        osg::ref_ptr< osg::StateSet> setFogState();
-        SDSky * getSky();
+    osg::ref_ptr<osg::Node> Init(osg::Group* root, tTrack *track);
+    osg::ref_ptr< osg::StateSet> setFogState();
+    void Update(float speedcar, tSituation *s);
+    void UpdateTime(tSituation *s);
+    void UpdateLight(void);
+    void UpdateFogColor(double angle);
+
+
+    SDSky * getSky();
 };
 
 #endif //_OSGRENDER_H_

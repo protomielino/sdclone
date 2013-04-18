@@ -353,11 +353,8 @@ int initTrack(tTrack *track)
 {
 	// The inittrack does as well init the context, that is highly inconsistent, IMHO.
 	// TODO: Find a solution to init the graphics first independent of objects.
-	//grContext.makeCurrent();
 
 	setupOpenGLFeatures();
-
-	//grssgSetCurrentOptions(&options);
 
 	// Now, do the real track loading job.
 	grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
@@ -367,23 +364,20 @@ int initTrack(tTrack *track)
 	scenery = new SDScenery;
 	render = new SDRender;
 	osg::ref_ptr<osg::Group> sceneroot = new osg::Group;
-	m_sceneroot = new osg::Group;
-	sceneroot->addChild(scenery->LoadScene(track));
-
+    m_sceneroot = new osg::Group;
+    sceneroot->addChild(scenery->LoadScene(track));
 	m_sceneroot->addChild(render->Init(sceneroot, track));
 
-        //return -1;*/
-        //m_sceneViewer->setSceneData();
-        return 0;
+    return 0;
 }
 
 int  initCars(tSituation *s)
 {
 	char buf[256];
 	cars = new SDCars;
-	m_sceneroot->addChild(cars->loadCars(s));
+    m_sceneroot->addChild(cars->loadCars(s));
 	osgUtil::Optimizer optimizer;
-	optimizer.optimize(m_sceneroot);
+    optimizer.optimize(m_sceneroot);
 	GfOut("All cars loaded\n");
 
 	screens->InitCars(s);

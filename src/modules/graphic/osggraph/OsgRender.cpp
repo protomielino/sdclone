@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
 
     file                 : OsgRender.cpp
     created              : Mon Aug 21 20:13:56 CEST 2012
@@ -39,11 +39,6 @@
 #include <glfeatures.h>	//gluXXX
 #include <robottools.h>	//RtXXX()
 
-
-static const double m_log01 = -log( 0.01 );
-static const double sqrt_m_log01 = sqrt( m_log01 );
-const GLfloat fog_exp2_density = sqrt_m_log01 / 11000;
-
 //static osg::ref_ptr<osg::Group> mRealRoot = new osg::Group;
 //static osg::ref_ptr<osg::Group> mRoot = new osg::Group;
 
@@ -56,10 +51,10 @@ unsigned SDSkyDomeDistance = 0;
 // Some private global variables.
 //static int grDynamicWeather = 0;
 //static bool SDDynamicSkyDome = false;
-static float SDSunDeclination = 0.0f;
+/*static float SDSunDeclination = 0.0f;
 static float SDMoonDeclination = 0.0f;
-//static float SDMax_Visibility = 0.0f;
-static double SDVisibility = 0.0f;
+static float SDMax_Visibility = 0.0f;
+static double SDVisibility = 0.0f;*/
 
 #define MAX_BODIES	2
 #define MAX_CLOUDS	3
@@ -73,19 +68,33 @@ static double SDVisibility = 0.0f;
 #define SCARCE_CLOUD 5
 #define COVERAGE_CLOUD 8
 
-static const osg::Vec4 BaseSkyColor ( 0.31f, 0.43f, 0.69f, 1.0f );
+/*static const osg::Vec4 BaseSkyColor ( 0.31, 0.43, 0.69, 1.0 );
 
 static osg::Vec3d *AStarsData = NULL;
 static osg::Vec3d *APlanetsData = NULL;
 static int NStars;
 static int NPlanets;
 static float sol_angle;
-static float moon_angle;
+static float moon_angle;*/
 
 //static osg::ref_ptr<osg::Group> RealRoot = new osg::Group;
 
 SDRender::SDRender(void)
 {
+    osg::Vec4 BaseSkyColor ( 0.31, 0.43, 0.69, 1.0 );
+    osg::Vec4 BaseFogColor ( 0.84, 0.84, 1.0, 1.0 );
+
+    //osg::Vec3d *AStarsData = NULL;
+    //osg::Vec3d *APlanetsData = NULL;
+
+    SDSunDeclination = 0.0f;
+    SDMoonDeclination = 0.0f;
+    SDMax_Visibility = 12000.0f;
+    SDVisibility = 0.0f;
+    NStars = 0;
+    NPlanets = 0;
+    sol_angle = 0.0;
+    moon_angle = 0.0;
 }
 
 SDRender::~SDRender(void)
@@ -139,6 +148,8 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     const int timeOfDay = (int)grTrack->local.timeofday;
     const double domeSizeRatio = SDSkyDomeDistance / 80000.0;
 
+    SDMax_Visibility = 20000.0f;
+
     GfLogInfo("  domeSizeRation : %d\n", domeSizeRatio);
 
     thesky->build(datapath, SDSkyDomeDistance, SDSkyDomeDistance, 1000,
@@ -171,17 +182,35 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     GfLogInfo("  Moon : declination = %.1f deg, ascension = %.1f deg\n",
               SDMoonDeclination, moonAscension);
 
-    // Set up the light source to the Sun position.
-    //sgCoord sunPosition;
-    //TheSky->getSunPos(&sunPosition);
-    //light->setPosition(sunPosition.xyz);
-
     // Initialize the whole sky dome.
     double r_WrldX = SDScenery::getWorldX();
     double r_WrldY = SDScenery::getWorldY();
-    double r_WrldZ = SDScenery::getWorldZ();
-    osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, r_WrldZ / 2 );
-    //osg::Vec3 viewPos(0.0, 0.0, 0.0 );
+    //double r_WrldZ = SDScenery::getWorldZ();
+    osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0 );
+
+    switch (grTrack->local.rain)
+    {
+        case TR_RAIN_NONE:
+            SDVisibility = 12100;
+            break;
+        case TR_RAIN_LITTLE:
+            SDVisibility = 800.0;
+            break;
+        case TR_RAIN_MEDIUM:
+            SDVisibility = 600.0;
+            break;
+        case TR_RAIN_HEAVY:
+            SDVisibility = 400.0;
+            break;
+        default:
+            GfLogWarning("Unsupported rain strength value %d (assuming none)",
+                         grTrack->local.rain);
+            SDVisibility = 12500.0;
+            break;
+    }//switch Rain
+
+    //TheSky->modifyVisibility( visibility, 0);
+    thesky->set_visibility( SDVisibility ); // Visibility in meters
 
     thesky->reposition( viewPos, 0, 0);
     UpdateLight();
@@ -197,12 +226,6 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
 
     osg::Material* material = new osg::Material;
     material->setColorMode(osg::Material::OFF); // switch glColor usage off
-    // turn all lighting off
-    //material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(0.7f, 0.7f, 0.7f, 1.0f));
-    //material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(0.7f, 0.7f, 0.7f, 1.0f));
-    //material->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(0.3f, 0.3f, 0.3f, 1.0f));
-    // except emission... in which we set the color we desire
-    //material->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(0.1, 0.1f,0.1f,1.0f));
     stateSet->setAttributeAndModes(material,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHTING,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
@@ -214,7 +237,7 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     lightSource->getLight()->setAmbient(osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
     lightSource->getLight()->setDiffuse(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
     lightSource->getLight()->setSpecular(osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
-    //sceneGroup->addChild(lightSource);
+    sceneGroup->addChild(lightSource);
 
     //assert(dynamic_cast<osg::LightSource*>(mRoot));
     //osg::LightSource lightSource = static_cast<osg::LightSource*>(mRoot);
@@ -241,10 +264,11 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     sunLight->addChild(skyGroup);
     mRoot->addChild(sceneGroup);
     mRoot->addChild(sunLight);
+    //mRoot->addChild(lightSource);
     mRoot->setStateSet(setFogState().get());
 
     // Clouds are added to the scene graph later
-    stateSet = m_sceneroot->getOrCreateStateSet();
+    stateSet = mRoot->getOrCreateStateSet();
     stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::ON);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
@@ -374,7 +398,8 @@ osg::ref_ptr< osg::StateSet> SDRender::setFogState()
     SceneFog[3] = 1.0f;
     osg::ref_ptr<osg::Fog> fog = new osg::Fog();    //The fog object
     fog->setMode(osg::Fog::EXP2);                   //Fog type
-    fog->setDensity(fog_exp2_density);                        //Fog density
+    fog->setDensity(fog_exp2_density);              //Fog density
+    fog->setEnd(thesky->get_visibility());
     fog->setColor(SceneFog);                        //Fog color
     osg::ref_ptr< osg::StateSet> fogState (new osg::StateSet);
     fogState->setAttributeAndModes(fog.get(),osg::StateAttribute::ON);
