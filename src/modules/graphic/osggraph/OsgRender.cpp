@@ -45,17 +45,6 @@
 SDSky *thesky = NULL;
 static tTrack *grTrack;
 
-unsigned SDSkyDomeDistance = 0;
-//static unsigned SDNbCloudLayers = 0;
-
-// Some private global variables.
-//static int grDynamicWeather = 0;
-//static bool SDDynamicSkyDome = false;
-/*static float SDSunDeclination = 0.0f;
-static float SDMoonDeclination = 0.0f;
-static float SDMax_Visibility = 0.0f;
-static double SDVisibility = 0.0f;*/
-
 #define MAX_BODIES	2
 #define MAX_CLOUDS	3
 #define NMaxStars	3000
@@ -68,24 +57,15 @@ static double SDVisibility = 0.0f;*/
 #define SCARCE_CLOUD 5
 #define COVERAGE_CLOUD 8
 
-/*static const osg::Vec4 BaseSkyColor ( 0.31, 0.43, 0.69, 1.0 );
-
-static osg::Vec3d *AStarsData = NULL;
-static osg::Vec3d *APlanetsData = NULL;
-static int NStars;
-static int NPlanets;
-static float sol_angle;
-static float moon_angle;*/
-
-//static osg::ref_ptr<osg::Group> RealRoot = new osg::Group;
-
 SDRender::SDRender(void)
 {
     osg::Vec4 BaseSkyColor ( 0.31, 0.43, 0.69, 1.0 );
     osg::Vec4 BaseFogColor ( 0.84, 0.84, 1.0, 1.0 );
 
-    //osg::Vec3d *AStarsData = NULL;
-    //osg::Vec3d *APlanetsData = NULL;
+    SDSkyDomeDistance = 0;
+    //SDNbCloudLayers = 0;
+    SDDynamicWeather = 0;
+    SDDynamicSkyDome = false;
 
     SDSunDeclination = 0.0f;
     SDMoonDeclination = 0.0f;
@@ -237,7 +217,7 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     lightSource->getLight()->setAmbient(osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
     lightSource->getLight()->setDiffuse(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
     lightSource->getLight()->setSpecular(osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
-    sceneGroup->addChild(lightSource);
+    //sceneGroup->addChild(lightSource);
 
     //assert(dynamic_cast<osg::LightSource*>(mRoot));
     //osg::LightSource lightSource = static_cast<osg::LightSource*>(mRoot);
@@ -344,11 +324,6 @@ void SDRender::UpdateLight( void )
     thesky->repaint(SkyColor, FogColor, CloudsColor, sol_angle, moon_angle,
                     NPlanets, APlanetsData, NStars, AStarsData);
 
-    // 3c) update the main light position (it's at the sun position !)
-    /*sgCoord solpos;
-    TheSky->getSunPos(&solpos);
-    ssgGetLight(0)-> setPosition(solpos.xyz);*/
-
     // 3c) update scene colors.
     if (SDVisibility > 1000 /*&& cloudsTextureIndex < 8*/)
     {
@@ -415,7 +390,7 @@ void SDRender::UpdateFogColor(double sol_angle)
 
     // first determine the difference between our view angle and local
     // direction to the sun
-    rotation = -(thesky->getSR() + SGD_PI);
+    rotation = -(thesky->getSR() + SD_PI);
     while ( rotation < 0 )
     {
         rotation += SD_2PI;

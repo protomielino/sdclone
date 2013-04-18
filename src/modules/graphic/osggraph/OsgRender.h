@@ -45,6 +45,10 @@ private:
     osg::Vec4f SceneSpecular;
     osg::Vec4f SceneFog;
 
+    unsigned SDSkyDomeDistance;
+    //unsigned SDNbCloudLayers;
+    int SDDynamicWeather;
+    bool SDDynamicSkyDome;
     float SDSunDeclination;
     float SDMoonDeclination;
     float SDMax_Visibility;
