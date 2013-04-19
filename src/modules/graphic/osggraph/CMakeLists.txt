@@ -2,15 +2,16 @@ INCLUDE(../../../../cmake/macros.cmake)
 
 SET(OSGGRAPH_HEADERS OsgVectorArrayAdapter.h OsgColor.h OsgAtomic.h
 		     		 OsgReferenced.h OsgSharedPtr.h OsgSphere.h OsgSun.h 
-                     OsgMoon.h OsgStars.h OsgDome.h #OsgCloud.h 
-                     OsgSky.h
+                     OsgMoon.h OsgStars.h OsgDome.h #OsgStateAttributeFactory.h
+                     OsgCloud.h OsgSky.h
 		     		 AccGeode.h AccException.h ReaderWriterACC.h
                      OsgLoader.h OsgScenery.h OsgRender.h OsgMath.h OsgMain.h
                      OsgView.h OsgGraph.h OsgCar.h OsgWheel.h OsgBrake.h 
                      OsgScreens.h OsgCamera.h)
 			
 SET(OSGGRAPH_SOURCES OsgSphere.cpp OsgSun.cpp OsgMoon.cpp OsgStars.cpp 
-                     OsgDome.cpp #OsgCloud.cpp 
+                     OsgDome.cpp #OsgStateAttributeFactory.cpp 
+                     OsgCloud.cpp 
                      OsgSky.cpp
                      AccGeode.cpp AccException.cpp
 		     		 ReaderWriterACC.cpp OsgLoader.cpp OsgBackground.cpp 

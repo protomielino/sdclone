@@ -50,6 +50,7 @@
 
 #define SD_DEGREES_TO_RADIANS  (SD_PI/SD_180)
 #define SD_RADIANS_TO_DEGREES  (SD_180/SD_PI)
+#define SD_EARTH_RAD 6378.155
 
 
 typedef float osgMat3[3][3];
