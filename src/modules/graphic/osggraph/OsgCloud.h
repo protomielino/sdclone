@@ -48,13 +48,6 @@ public:
         SD_MAX_CLOUD_COVERAGES
     };
 
-    static const std::string SD_CLOUD_OVERCAST_STRING; // "overcast"
-    static const std::string SD_CLOUD_BROKEN_STRING; // "broken"
-    static const std::string SD_CLOUD_SCATTERED_STRING; // "scattered"
-    static const std::string SD_CLOUD_FEW_STRING; // "few"
-    static const std::string SD_CLOUD_CIRRUS_STRING; // "cirrus"
-    static const std::string SD_CLOUD_CLEAR_STRING; // "clear"
-
     SDCloudLayer( const string &tex_path );
 
     ~SDCloudLayer( void );
@@ -78,11 +71,11 @@ public:
     Coverage getCoverage () const;
     void setCoverage (Coverage coverage);
 
-    const string & getCoverageString() const;
+    /*const string & getCoverageString() const;
     static const string & getCoverageString( Coverage coverage );
 
     static Coverage getCoverageType( const std::string & coverage );
-    void setCoverageString( const string & coverage );
+    void setCoverageString( const string & coverage );*/
 
     inline void setDirection(float dir)
     {

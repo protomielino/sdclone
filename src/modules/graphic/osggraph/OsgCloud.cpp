@@ -284,7 +284,7 @@ void SDCloudLayer::setCoverage (Coverage coverage)
     }
 }
 
-const std::string &SDCloudLayer::getCoverageString( Coverage coverage )
+/*const std::string &SDCloudLayer::getCoverageString( Coverage coverage )
 {
     switch( coverage )
     {
@@ -336,7 +336,7 @@ const std::string &SDCloudLayer::getCoverageString() const
 void SDCloudLayer::setCoverageString( const std::string &coverage )
 {
 	setCoverage( getCoverageType(coverage) );
-}
+}*/
 
 void SDCloudLayer::setTextureOffset(const osg::Vec2& offset)
 {
