@@ -27,15 +27,15 @@
 #include <osg/Node>
 #include <osg/Switch>
 
+#include "OsgCloud.h"
 #include "OsgDome.h"
 #include "OsgMoon.h"
 #include "OsgSun.h"
 #include "OsgStars.h"
-//#include "OsgSharedPtr.h"
 
 using std::vector;
 
-//class SDCloudLayer;
+class SDCloudLayer;
 //class SDCloudLayerList;
 class SDSun;
 class SDMoon;
@@ -71,9 +71,9 @@ enum NodeMask
 class SDSky
 {
 private:
-    //typedef std::vector<SDSharedPtr<SDCloudLayer> > layer_list_type;
-    //typedef layer_list_type::iterator layer_list_iterator;
-    //typedef layer_list_type::const_iterator layer_list_const_iterator;
+    typedef std::vector<SDCloudLayer *> layer_list_type;
+    typedef layer_list_type::iterator layer_list_iterator;
+    typedef layer_list_type::const_iterator layer_list_const_iterator;
 
     // components of the sky
     SDSkyDome* dome;
@@ -81,7 +81,7 @@ private:
     SDMoon* moon;
     SDStars* planets;
     SDStars* stars;
-    //layer_list_type cloud_layers;
+    layer_list_type cloud_layers;
 
     osg::ref_ptr<osg::Group> pre_root, cloud_root;
     osg::ref_ptr<osg::Switch> pre_selector;
@@ -90,6 +90,7 @@ private:
     // visibility
     float visibility;
     float effective_visibility;
+    float minimum_sky_visibility;
 
     int in_cloud;
     int cur_layer_pos;
@@ -136,10 +137,10 @@ public:
     inline osg::Vec4f get_sun_color() { return sun->get_color(); }
     inline osg::Vec4f get_scene_color() { return sun->get_scene_color(); }
 
-    //void add_cloud_layer (SGCloudLayer * layer);
-    //const SGCloudLayer * get_cloud_layer (int i) const;
-    //SGCloudLayer * get_cloud_layer (int i);
-    //int get_cloud_layer_count () const;
+    void add_cloud_layer (SDCloudLayer * layer);
+    const SDCloudLayer * get_cloud_layer (int i) const;
+    SDCloudLayer * get_cloud_layer (int i);
+    int get_cloud_layer_count () const;
 
     void setMA(double angle) { moon->setMoonAngle(angle); }
     double getMA() { return moon->getMoonAngle(); }

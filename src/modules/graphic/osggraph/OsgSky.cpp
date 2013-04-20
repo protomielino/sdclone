@@ -28,10 +28,6 @@
 void calc_celestial_angles( const osg::Vec3f& body, const osg::Vec3f& view, double& angle, double& rotation )
 {
 	osg::Vec3f pos = body - view;
-	/*pos.x() = body.x() - view.x();
-	pos.y() = body.y() - view.y();
-	pos.z() = body.z() - view.z();*/
-	//sgSubVec3(pos, body, view);
 	angle = (90*SD_DEGREES_TO_RADIANS) - atan2(pos[2], sqrt(pos[0]*pos[0] + pos[1]*pos[1]));
 	rotation = (90*SD_DEGREES_TO_RADIANS) - atan2(pos[0], pos[1]);
 }
@@ -54,7 +50,6 @@ SDSky::SDSky( void )
     planets = 0;
     stars = 0;
     pre_root = 0;
-    //post_root = 0;
 
     //clouds_3d_enabled = false;
     //clouds_3d_density = 0.8;
@@ -64,8 +59,8 @@ SDSky::SDSky( void )
     osg::StateSet* preStateSet = new osg::StateSet;
     preStateSet->setAttribute(new osg::Depth(osg::Depth::LESS, 0.0, 1.0, false));
     pre_root->setStateSet(preStateSet);
-    //cloud_root = new osg::Group;
-    //cloud_root->setNodeMask(MODEL_BIT);
+    cloud_root = new osg::Group;
+    cloud_root->setNodeMask(MODEL_BIT);
 
     pre_selector = new osg::Switch;
     pre_transform = new osg::Group;
@@ -124,13 +119,13 @@ bool SDSky::repaint( osg::Vec3f& sky_color, osg::Vec3f& fog_color, osg::Vec3f& c
         sun->repaint( sol_angle, effective_visibility );
         moon->repaint( moon_angle );
 
-	/*for ( unsigned i = 0; i < cloud_layers.size(); ++i )
-	{
-	    if (cloud_layers[i]->getCoverage() != SDCloudLayer::SG_CLOUD_CLEAR)
-	    {
-		cloud_layers[i]->repaint( sc.cloud_color );
-	    }
-	}*/
+        for ( unsigned i = 0; i < cloud_layers.size(); ++i )
+        {
+            if (cloud_layers[i]->getCoverage() != SDCloudLayer::SD_CLOUD_CLEAR)
+            {
+                cloud_layers[i]->repaint( cloud_color );
+            }
+        }
 
         planets->repaint( sol_angle, nplanets, planet_data );
         stars->repaint( sol_angle, nstars, star_data );
@@ -159,62 +154,31 @@ bool SDSky::reposition( osg::Vec3& view_pos, double spin, /*double gst,*/
   sun->setSunRotation( rotation );
   sun->update_color_angle(angle);
 
+  osg::Vec3f moonpos = moon->getMoonPosition();
+  calc_celestial_angles( moonpos, view_pos, angle, rotation );
+  moon->setMoonAngle( angle );
+  moon->setMoonRotation( rotation );
+
   dome->reposition( view_pos, angle );
 
-  //sun->getSunPosition ( & pos );
-  //calc_celestial_angles( pos, view_pos, angle, rotation );
-  //sun->setSunAngle( angle );
-  //sun->setSunRotation( rotation );
-
-
-  //double angle = gst * 15;
-    //double angleRad = SGMiscd::deg2rad(angle);
-
-    //osg::Vec3f zero_elev, view_up;
-    //double lon, lat, alt;
-
-    /*SGGeod geodZeroViewPos = SGGeod::fromGeodM(st.pos_geod, 0);
-    zero_elev = toVec3f( SGVec3d::fromGeod(geodZeroViewPos) );
-
-    SGQuatd hlOr = SGQuatd::fromLonLat(st.pos_geod);
-    view_up = toVec3f(hlOr.backTransform(-SGVec3d::e3()));
-
-    lon = st.pos_geod.getLongitudeRad();
-    lat = st.pos_geod.getLatitudeRad();
-    alt = st.pos_geod.getElevationM();*/
-
-    //dome->reposition( zero_elev, alt, lon, lat, st.spin );
-
-    /*osg::Matrix m = osg::Matrix::rotate(angleRad, osg::Vec3(0, 0, -1));
-    m.postMultTranslate(st.pos);
-    _ephTransform->setMatrix(m);
-
-    double sun_ra = eph.getSunRightAscension();
-    double sun_dec = eph.getSunDeclination();
-    sun->reposition( sun_ra, sun_dec, st.sun_dist, lat, alt, st.sun_angle );
-
-    double moon_ra = getMoonRightAscension();
-    double moon_dec = getMoonDeclination();
-    moon->reposition( moon_ra, moon_dec, st.moon_dist );*/
-
-    /*for ( unsigned i = 0; i < cloud_layers.size(); ++i )
-    {
-        if ( cloud_layers[i]->getCoverage() != SDCloudLayer::SG_CLOUD_CLEAR )
-        {
-            cloud_layers[i]->reposition( zero_elev, view_up, lon, lat, alt, dt);
-        } else
-          cloud_layers[i]->getNode()->setAllChildrenOff();
-    }*/
+  for ( unsigned i = 0; i < cloud_layers.size(); ++i )
+  {
+      if ( cloud_layers[i]->getCoverage() != SDCloudLayer::SD_CLOUD_CLEAR )
+      {
+        cloud_layers[i]->reposition( view_pos, dt);
+      } else
+        cloud_layers[i]->getNode()->setAllChildrenOff();
+    }
 
     return true;
 }
 
-/*void SDSky::add_cloud_layer( SDCloudLayer * layer )
+void SDSky::add_cloud_layer( SDCloudLayer * layer )
 {
     cloud_layers.push_back(layer);
     cloud_root->addChild(layer->getNode());
 
-    layer->set_enable3dClouds(clouds_3d_enabled);
+    //layer->set_enable3dClouds(clouds_3d_enabled);
 }
 
 const SDCloudLayer * SDSky::get_cloud_layer (int i) const
@@ -232,7 +196,7 @@ int SDSky::get_cloud_layer_count () const
     return cloud_layers.size();
 }
 
-double SDSky::get_3dCloudDensity() const
+/*double SDSky::get_3dCloudDensity() const
 {
     return SDNewCloud::getDensity();
 }
@@ -254,26 +218,26 @@ void SDSky::set_3dCloudVisRange(float vis)
     {
         cloud_layers[i]->get_layer3D()->applyVisRange();
     }
-}
+}*/
 
 void SDSky::texture_path( const string& path )
 {
-        tex_path =  path;
-}*/
+        const string tex_path =  path;
+}
 
 void SDSky::modify_vis( float alt, float time_factor )
 {
     float effvis = visibility;
 
-    /*for ( int i = 0; i < (int)cloud_layers.size(); ++i )
+    for ( int i = 0; i < (int)cloud_layers.size(); ++i )
     {
-                float asl = cloud_layers[i]->getElevation_m();
-                float thickness = cloud_layers[i]->getThickness_m();
-        float transition = cloud_layers[i]->getTransition_m();*/
+        float asl = cloud_layers[i]->getElevation_m();
+        float thickness = cloud_layers[i]->getThickness_m();
+        float transition = cloud_layers[i]->getTransition_m();
 
-        //double ratio = 1.0;
+        double ratio = 1.0;
 
-        /*if ( cloud_layers[i]->getCoverage() == SGCloudLayer::SG_CLOUD_CLEAR )
+        if ( cloud_layers[i]->getCoverage() == SDCloudLayer::SD_CLOUD_CLEAR )
         {
                 // less than 50% coverage -- assume we're in the clear for now
                 ratio = 1.0;
@@ -299,13 +263,13 @@ void SDSky::modify_vis( float alt, float time_factor )
                 ratio = 1.0;
                 }
 
-        if ( cloud_layers[i]->getCoverage() == SGCloudLayer::SG_CLOUD_CLEAR ||
-             cloud_layers[i]->get_layer3D()->defined3D)
+        if ( cloud_layers[i]->getCoverage() == SDCloudLayer::SD_CLOUD_CLEAR )/*||
+             cloud_layers[i]->get_layer3D()->defined3D)*/
         {
         } else if ( (cloud_layers[i]->getCoverage() ==
-                     SGCloudLayer::SG_CLOUD_FEW)
+                     SDCloudLayer::SD_CLOUD_FEW)
                     || (cloud_layers[i]->getCoverage() ==
-                        SGCloudLayer::SG_CLOUD_SCATTERED) )
+                        SDCloudLayer::SD_CLOUD_SCATTERED) )
         {
             float temp = ratio * 2.0;
             if ( temp > 1.0 ) { temp = 1.0; }
@@ -314,14 +278,14 @@ void SDSky::modify_vis( float alt, float time_factor )
         {
             cloud_layers[i]->setAlpha( 1.0 );
             effvis *= ratio;
-        }*/
+        }
 
         if ( effvis <= 25.0 )
         {
             effvis = 25.0;
         }
 
-    //}
+    }
 
     effective_visibility = effvis;
 }

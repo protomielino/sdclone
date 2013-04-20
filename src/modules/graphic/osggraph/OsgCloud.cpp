@@ -284,60 +284,6 @@ void SDCloudLayer::setCoverage (Coverage coverage)
     }
 }
 
-/*const std::string &SDCloudLayer::getCoverageString( Coverage coverage )
-{
-    switch( coverage )
-    {
-        case SD_CLOUD_OVERCAST:
-            return SD_CLOUD_OVERCAST_STRING;
-        case SD_CLOUD_BROKEN:
-            return SD_CLOUD_BROKEN_STRING;
-        case SD_CLOUD_SCATTERED:
-            return SD_CLOUD_SCATTERED_STRING;
-        case SD_CLOUD_FEW:
-            return SD_CLOUD_FEW_STRING;
-        case SD_CLOUD_CIRRUS:
-            return SD_CLOUD_CIRRUS_STRING;
-        case SD_CLOUD_CLEAR:
-		default:
-            return SD_CLOUD_CLEAR_STRING;
-	}
-}
-
-SDCloudLayer::Coverage
-SDCloudLayer::getCoverageType( const std::string &coverage )
-{
-    if( SD_CLOUD_OVERCAST_STRING == coverage )
-    {
-        return SD_CLOUD_OVERCAST;
-    } else if( SD_CLOUD_BROKEN_STRING == coverage )
-    {
-        return SD_CLOUD_BROKEN;
-    } else if( SD_CLOUD_SCATTERED_STRING == coverage )
-    {
-        return SD_CLOUD_SCATTERED;
-    } else if( SD_CLOUD_FEW_STRING == coverage )
-    {
-        return SD_CLOUD_FEW;
-    } else if( SD_CLOUD_CIRRUS_STRING == coverage )
-    {
-        return SD_CLOUD_CIRRUS;
-    } else
-    {
-        return SD_CLOUD_CLEAR;
-	}
-}
-
-const std::string &SDCloudLayer::getCoverageString() const
-{
-	return getCoverageString(layer_coverage);
-}
-
-void SDCloudLayer::setCoverageString( const std::string &coverage )
-{
-	setCoverage( getCoverageType(coverage) );
-}*/
-
 void SDCloudLayer::setTextureOffset(const osg::Vec2& offset)
 {
     osg::StateAttribute* attr = layer_root->getStateSet()

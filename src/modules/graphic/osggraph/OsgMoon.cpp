@@ -132,14 +132,19 @@ bool SDMoon::repaint( double moon_angle )
 
 bool SDMoon::reposition( osg::Vec3d p, double angle )
 {
-    osg::Matrix T1, T2, RA, DEC;
+    osg::Matrix T1, T2, GST, RA, DEC;
 
+    T1.makeTranslate(p);
+    GST.makeRotate((float)(angle), osg::Vec3(0.0, 0.0, -1.0));
     RA.makeRotate(moonAscension - 90.0 * SD_DEGREES_TO_RADIANS, osg::Vec3(0, 0, 1));
     DEC.makeRotate(moondeclination, osg::Vec3(1, 0, 0));
-    //T2.makeTranslate(osg::Vec3(0, moon_dist, 0));
-    T1.makeTranslate(0, moon_dist, 0);
+    T2.makeTranslate(osg::Vec3(0, moon_dist, 0));
 
-    moon_transform->setMatrix(T1*DEC*RA);
+    osg::Matrix R = T2*T1*GST*DEC*RA;
+    moon_transform->setMatrix(R);
+
+    osg::Vec4f pos = osg::Vec4f(0.0,0.0,0.0,1.0)*R;
+    moon_position = osg::Vec3f(pos._v[0],pos._v[1],pos._v[2]);
 
     return true;
 }

@@ -36,6 +36,7 @@ class SDMoon
     double moon_dist;
     double moonAscension;
     double moondeclination;
+    osg::Vec3f moon_position;
 
 public:
 
@@ -65,6 +66,9 @@ public:
 
     void setMoonDist ( double dist ) { moon_dist = dist; }
     double getMoonDist() { return moon_dist; }
+
+    osg::Vec3f getMoonPosition(){return moon_position;}
+
 };
 
 #endif // _OSGMOON_H
