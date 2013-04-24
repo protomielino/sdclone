@@ -63,7 +63,8 @@ SDRender::SDRender(void)
     osg::Vec4 BaseFogColor ( 0.84, 0.84, 1.0, 1.0 );
 
     SDSkyDomeDistance = 0;
-    //SDNbCloudLayers = 0;
+    SDSkyDomeDistThresh = 12000;
+    SDNbCloudLayers = 0;
     SDDynamicWeather = 0;
     SDDynamicSkyDome = false;
 
@@ -95,7 +96,7 @@ SDSky * SDRender::getSky()
  */
 osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
 {
-    //char buf[256];
+    char buf[256];
     //void *hndl = grTrackHandle;
     grTrack = track;
 
@@ -103,7 +104,29 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     //datapath +="/";
     thesky = new SDSky;
     GfOut("SDSky class\n");
-    int SDSkyDomeDistance = 12000;
+
+    // Sky dome / background.
+    SDSkyDomeDistance =
+        (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, 0, 0) + 0.5);
+    if (SDSkyDomeDistance > 0 && SDSkyDomeDistance < SDSkyDomeDistThresh)
+        SDSkyDomeDistance = SDSkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
+
+    SDDynamicSkyDome = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), GR_ATT_DYNAMICSKYDOME_ENABLED) == 0;
+
+    GfLogInfo("Graphic options : Sky dome : distance = %u m, dynamic = %s\n",
+              SDSkyDomeDistance, SDDynamicSkyDome ? "true" : "false");
+
+    // Dynamic weather.
+    //grDynamicWeather = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_grDynamicWeather, (char*)NULL, grDynamicWeather);
+
+    // Cloud layers.
+    SDNbCloudLayers =
+        (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
+
+    GfLogInfo("Graphic options : Number of cloud layers : %u\n", SDNbCloudLayers);
+
+    SDMax_Visibility =
+        (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, 0, 0));
 
     NStars = NMaxStars;
     if (AStarsData)
@@ -128,7 +151,7 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     const int timeOfDay = (int)grTrack->local.timeofday;
     const double domeSizeRatio = SDSkyDomeDistance / 80000.0;
 
-    SDMax_Visibility = 20000.0f;
+    //SDMax_Visibility = 20000.0f;
 
     GfLogInfo("  domeSizeRation : %d\n", domeSizeRatio);
 
@@ -171,7 +194,7 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     switch (grTrack->local.rain)
     {
         case TR_RAIN_NONE:
-            SDVisibility = 12100;
+            SDVisibility = SDMax_Visibility;
             break;
         case TR_RAIN_LITTLE:
             SDVisibility = 800.0;
@@ -185,7 +208,7 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
         default:
             GfLogWarning("Unsupported rain strength value %d (assuming none)",
                          grTrack->local.rain);
-            SDVisibility = 12500.0;
+            SDVisibility = 10000.0;
             break;
     }//switch Rain
 
@@ -285,7 +308,6 @@ void SDRender::UpdateLight( void )
     SkyColor[1] = BaseSkyColor[1] * sky_brightness;
     SkyColor[2] = BaseSkyColor[2] * sky_brightness;
     SkyColor[3] = BaseSkyColor[3];
-    UpdateFogColor(sol_angle);
 
     sd_gamma_correct_rgb( SkyColor._v );
 
@@ -295,6 +317,7 @@ void SDRender::UpdateLight( void )
     CloudsColor[2] = FogColor[2] = BaseFogColor[2] * sky_brightness;
     CloudsColor[3] = FogColor[3] = BaseFogColor[3];
 
+    UpdateFogColor(sol_angle);
     //grUpdateFogColor(sol_angle);
     sd_gamma_correct_rgb( CloudsColor._v );
 

@@ -46,7 +46,8 @@ private:
     osg::Vec4f SceneFog;
 
     unsigned SDSkyDomeDistance;
-    //unsigned SDNbCloudLayers;
+    unsigned SDNbCloudLayers;
+    unsigned SDSkyDomeDistThresh;
     int SDDynamicWeather;
     bool SDDynamicSkyDome;
     float SDSunDeclination;
@@ -71,7 +72,6 @@ public:
     void UpdateTime(tSituation *s);
     void UpdateLight(void);
     void UpdateFogColor(double angle);
-
 
     SDSky * getSky();
 };
