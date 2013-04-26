@@ -16,7 +16,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
+#include <portability.h>
 #include <stdlib.h>
 #ifndef _OSGMATH_H_
 #define _OSGMATH_H_
