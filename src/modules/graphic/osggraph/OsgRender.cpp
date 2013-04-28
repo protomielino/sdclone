@@ -208,11 +208,10 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
         default:
             GfLogWarning("Unsupported rain strength value %d (assuming none)",
                          grTrack->local.rain);
-            SDVisibility = 10000.0;
+            SDVisibility = 12000.0;
             break;
     }//switch Rain
 
-    //TheSky->modifyVisibility( visibility, 0);
     thesky->set_visibility( SDVisibility ); // Visibility in meters
 
     thesky->reposition( viewPos, 0, 0);
@@ -308,6 +307,7 @@ void SDRender::UpdateLight( void )
     SkyColor[1] = BaseSkyColor[1] * sky_brightness;
     SkyColor[2] = BaseSkyColor[2] * sky_brightness;
     SkyColor[3] = BaseSkyColor[3];
+    UpdateFogColor(sol_angle);
 
     sd_gamma_correct_rgb( SkyColor._v );
 
@@ -317,13 +317,11 @@ void SDRender::UpdateLight( void )
     CloudsColor[2] = FogColor[2] = BaseFogColor[2] * sky_brightness;
     CloudsColor[3] = FogColor[3] = BaseFogColor[3];
 
-    UpdateFogColor(sol_angle);
     //grUpdateFogColor(sol_angle);
     sd_gamma_correct_rgb( CloudsColor._v );
 
 
     osg::Vec4f sun_color = thesky->get_sun_color();
-    //float *sun_color = suncolor[0][0];
 
     if (sol_angle > 1.0)
     {
