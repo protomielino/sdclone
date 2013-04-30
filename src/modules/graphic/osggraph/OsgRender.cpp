@@ -227,9 +227,9 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
     osg::Material* material = new osg::Material;
-    material->setColorMode(osg::Material::OFF); // switch glColor usage off
-    stateSet->setAttributeAndModes(material,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
-    stateSet->setMode(GL_LIGHTING,osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+    //material->setColorMode(osg::Material::OFF); // switch glColor usage off
+    stateSet->setAttributeAndModes(material, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
     osg::LightSource* lightSource = new osg::LightSource;
     lightSource->getLight()->setDataVariance(osg::Object::DYNAMIC);
@@ -256,8 +256,10 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     sunLight->setStateSetModes(*stateSet,osg::StateAttribute::ON);
 
     osg::Vec3f sun_position = thesky->sunposition();
-    osg::Vec4f position(sun_position, 0);
+    osg::Vec3f sun_direction = -sun_position;
+    osg::Vec4f position(sun_position, 1.0f);
     sunLight->getLight()->setPosition(position);
+    sunLight->getLight()->setDirection(sun_direction);
 
     osg::Group* skyGroup = new osg::Group;
     osg::StateSet* skySS = skyGroup->getOrCreateStateSet();
@@ -265,9 +267,10 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     skyGroup->addChild(thesky->getPreRoot());
     sunLight->addChild(skyGroup);
     mRoot->addChild(sceneGroup);
+    mRoot->setStateSet(setFogState().get());
     mRoot->addChild(sunLight);
     //mRoot->addChild(lightSource);
-    mRoot->setStateSet(setFogState().get());
+
 
     // Clouds are added to the scene graph later
     stateSet = mRoot->getOrCreateStateSet();
@@ -395,11 +398,12 @@ osg::ref_ptr< osg::StateSet> SDRender::setFogState()
     osg::ref_ptr<osg::Fog> fog = new osg::Fog();    //The fog object
     fog->setMode(osg::Fog::EXP2);                   //Fog type
     fog->setDensity(fog_exp2_density);              //Fog density
-    fog->setEnd(thesky->get_visibility());
     fog->setColor(SceneFog);                        //Fog color
+    fog->setFogCoordinateSource(osg::Fog::FRAGMENT_DEPTH);
     osg::ref_ptr< osg::StateSet> fogState (new osg::StateSet);
-    fogState->setAttributeAndModes(fog.get(),osg::StateAttribute::ON);
-    fogState->setMode(GL_FOG,osg::StateAttribute::ON);
+    fogState->setAttributeAndModes(fog.get(), osg::StateAttribute::ON);
+
+    fogState->setMode(GL_FOG, osg::StateAttribute::ON);
 
     return fogState;
 
