@@ -203,7 +203,7 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
             SDVisibility = 600.0;
             break;
         case TR_RAIN_HEAVY:
-            SDVisibility = 400.0;
+            SDVisibility = 200.0;
             break;
         default:
             GfLogWarning("Unsupported rain strength value %d (assuming none)",
@@ -227,7 +227,7 @@ osg::ref_ptr<osg::Node> SDRender::Init(osg::Group *m_sceneroot, tTrack *track)
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
     osg::Material* material = new osg::Material;
-    //material->setColorMode(osg::Material::OFF); // switch glColor usage off
+    material->setColorMode(osg::Material::OFF); // switch glColor usage off
     stateSet->setAttributeAndModes(material, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
@@ -302,7 +302,7 @@ void SDRender::UpdateLight( void )
     else
     {
         BaseFogColor[0] = 0.84f;
-        BaseFogColor[1] = 0.84f;
+        BaseFogColor[1] = 0.87f;
         BaseFogColor[2] = 1.00f;
     }
 
