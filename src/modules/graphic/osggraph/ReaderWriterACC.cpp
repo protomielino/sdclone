@@ -348,7 +348,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 
 		    if (token != "SURF")
 					{
-			osg::notify(osg::FATAL) << "osgDB TORCS reader: expected SURF line while reading object \""
+            osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: expected SURF line while reading object \""
 						<< group->getName() << "\"!" << std::endl;
 			return group.release();
 		    }
@@ -363,7 +363,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     stream >> token;
                     if (token != "mat")
                                         {
-                        osg::notify(osg::FATAL) << "osgDB TORCS reader: expected mat line while reading object \""
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: expected mat line while reading object \""
                                                 << group->getName() << "\"!" << std::endl;
                         return group.release();
                     }
@@ -373,7 +373,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     stream >> matIdx;
                     if (primitiveBins.size() <= matIdx)
                                         {
-                        osg::notify(osg::FATAL) << "osgDB TORCS reader: invalid material number while reading object \""
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: invalid material number while reading object \""
                                                 << group->getName() << "\"1" << std::endl;
                         return group.release();
                     }
@@ -383,7 +383,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     primitiveBin = primitiveBins[matIdx].getOrCreatePrimitiveBin(flags, vertexSet.get());
                     if (!primitiveBin)
                                         {
-                        osg::notify(osg::FATAL) << "osgDB TORCS reader: unexpected primitive flags while reading object \""
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: unexpected primitive flags while reading object \""
                                                 << group->getName() << "\"2" << std::endl;
                         return group.release();
                     }
@@ -392,7 +392,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     stream >> token;
                     if (token != "refs")
                                         {
-                        osg::notify(osg::FATAL) << "osgDB TORCS reader: expected refs line while reading object \""
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: expected refs line while reading object \""
                                                 << group->getName() << "\"3" << std::endl;
                         return group.release();
                     }
@@ -401,7 +401,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     stream >> nRefs;
                     if (!stream)
                                         {
-                        osg::notify(osg::FATAL) << "osgDB TORCS reader: could not read number of refs while reading object \""
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read number of refs while reading object \""
                                                 << group->getName() << "\"4" << std::endl;
                         return group.release();
                     }
@@ -418,7 +418,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 			stream >> index;
 			if (vertexSet->size() <= index)
 			{
-			    osg::notify(osg::FATAL) << "osgDB TORCS reader: invalid ref vertex index while reading object \""
+                osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: invalid ref vertex index while reading object \""
 						    << group->getName() << "\"5" << std::endl;
 			    return group.release();
 			}
@@ -456,7 +456,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 
 			if (!stream)
 						{
-			    osg::notify(osg::WARN) << "osgDB TORCS reader: could not parse texture coords while reading object \""
+                osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: could not parse texture coords while reading object \""
 						   << group->getName() << "\" setting to (0,0)" << std::endl;
 			    stream.clear();
 			    std::string dummy;
@@ -501,7 +501,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     k = readObject(stream, fileData, transform*parentTransform, textureData);
                     if (k == 0)
                                         {
-                        osg::notify(osg::FATAL) << "osgDB TORCS reader: error reading child object" << std::endl;
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: error reading child object" << std::endl;
                         return group.release();
                     }
                     else
@@ -544,7 +544,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                 else
                 {
                         std::string strUnknown = token;
-            osg::notify(osg::WARN) << "osgDB TORCS reader: unknown token refs line while reading object \"6"
+            osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: unknown token refs line while reading object \"6"
                 <<" token:"<< strUnknown << "\"" << std::endl;
                 }
 
@@ -553,7 +553,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 	    //bool bBad = stream.bad();
 	    //bool bFail = stream.fail();
 	    //bool bEof = stream.eof();
-	    osg::notify(osg::WARN) << "osgDB TORCS reader: token read error \"7"
+        osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: token read error \"7"
 		<<" token:"<< token << "\"" << std::endl;
 		}
     }
@@ -575,7 +575,7 @@ osgDB::ReaderWriter::ReadResult ReaderWriterACC::readNode(const std::string& fil
 
     // GWM added Dec 2003 - get full path name (change in osgDB handling of files).
     std::string fileName = osgDB::findDataFile( file, options );
-    osg::notify(osg::INFO) << "osgDB TORCS reader: starting reading \"" << fileName << "\"" << std::endl;
+    osg::notify(osg::INFO) << "osgDB SPEED DREAMS reader: starting reading \"" << fileName << "\"" << std::endl;
 
     // Anders Backmann - correct return if path not found
     if (fileName.empty()) return ReadResult::FILE_NOT_FOUND;

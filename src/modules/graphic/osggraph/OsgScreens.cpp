@@ -111,7 +111,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group
     }
 
     viewer->setSceneData(root);
-    //viewer->realize();
+    viewer->realize();
 }
 
 void SDScreens::InitCars(tSituation *s)

@@ -102,10 +102,10 @@ private:
     int _grWrldZ;
     int _grWrldMaxSize;
     int _max_visibility;
-        int _nb_cloudlayer;
-        int _DynamicSkyDome;
-        int _SkyDomeDistance;
-        int _SkyDomeDistThresh;
+    int _nb_cloudlayer;
+    int _DynamicSkyDome;
+    int _SkyDomeDistance;
+    int _SkyDomeDistThresh;
 
 	bool _bgtype;
 	bool _bgsky;
@@ -114,8 +114,6 @@ private:
 	//_trees = 0;
 	//_pits = 0;
 	std::string _strTexturePath;
-
-
 
 	void LoadGraphicsOptions();
 	void LoadSkyOptions();

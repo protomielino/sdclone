@@ -161,13 +161,13 @@ public:
         std::string absFileName = osgDB::findDataFile(name, options);
         if (absFileName.empty())
         {
-            osg::notify(osg::FATAL) << "osgDB TORCS reader: could not find texture \"" << name << "\"" << std::endl;
+            osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not find texture \"" << name << "\"" << std::endl;
             return false;
         }
         mImage = osgDB::readRefImageFile(absFileName, options);
         if (!mImage.valid())
         {
-            osg::notify(osg::FATAL) << "osgDB TORCS reader: could not read texture \"" << name << "\"" << std::endl;
+            osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name << "\"" << std::endl;
             return false;
         }
 
@@ -187,7 +187,7 @@ public:
 			mImage2 = osgDB::readRefImageFile(absFileName, options);
 			if (!mImage2.valid())
 			{
-				osg::notify(osg::FATAL) << "osgDB TORCS reader: could not read texture \"" << name << "\"" << std::endl;
+                osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name << "\"" << std::endl;
 				return false;
 			}
 	        
@@ -402,7 +402,7 @@ public:
     {
          if (_vertices.size() <= i)
          {
-             osg::notify(osg::FATAL) << "osgDB TORCS reader: internal error, got invalid vertex index!" << std::endl;
+             osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: internal error, got invalid vertex index!" << std::endl;
              return VertexIndex(0, 0);
          }
         return VertexIndex(i, _vertices[i].addRefData(refData));
@@ -516,7 +516,7 @@ class LineBin : public PrimitiveBin
         // Check if we have enough for a line or someting broken ...
         if (nRefs < 2) 
 		{
-            osg::notify(osg::WARN) << "osgDB TORCS reader: detected line with less than 2 vertices!" << std::endl;
+            osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: detected line with less than 2 vertices!" << std::endl;
             return false;
         }
 
@@ -543,7 +543,7 @@ class LineBin : public PrimitiveBin
             type = osg::PrimitiveSet::LINE_STRIP;
         else 
 		{
-            osg::notify(osg::FATAL) << "osgDB TORCS reader: non surface flags in surface bin!" << std::endl;
+            osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: non surface flags in surface bin!" << std::endl;
             return false;
         }
         unsigned nRefs = _refs.size();
@@ -620,7 +620,7 @@ class SurfaceBin : public PrimitiveBin
         // Check if we have enough for a line or someting broken ...
         if (nRefs < 3) 
 		{
-            osg::notify(osg::WARN) << "osgDB TORCS reader: detected surface with less than 3 vertices!" << std::endl;
+            osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: detected surface with less than 3 vertices!" << std::endl;
             return false;
         }
         return true;
