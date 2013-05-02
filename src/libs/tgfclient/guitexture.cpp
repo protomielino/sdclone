@@ -188,7 +188,7 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 		return (unsigned char *)NULL;
 	}
 	
-	if (setjmp(png_jmpbuf(png_ptr)))
+	if (setjmp(png_jmpbuf(png_ptr))) // Compiler warning: not portable mix of setjmp and C++ object delete
 	{
 		// Free all of the memory associated with the png_ptr and info_ptr
 		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);

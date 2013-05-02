@@ -48,7 +48,7 @@
 //--------------------------------------------------------------------------*
 TCarParam::TCarParam():
   oScaleMu(0.8),
-  oScaleMinMu(0.8),
+  oScaleMinMu(0.95),
   oScaleBrake(0.8),
   oScaleBrakePit(1.0),
   oScaleBump(0.4f),

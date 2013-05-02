@@ -31,7 +31,8 @@ SimTransmissionConfig(tCar *car)
     tDifferential	*differential;
     const char		*transType;
     int			i, j;
-    tdble		gRatio, fRatio, gEff;
+    tdble		gRatio = 0; // Avoid compiler warning: usage of possibly uninitialized variable
+    tdble		fRatio, gEff;
     //tdble       fEff; // Never used
     tdble		gearI;
     char		path[256];
