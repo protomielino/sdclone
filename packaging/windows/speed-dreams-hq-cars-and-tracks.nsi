@@ -126,51 +126,51 @@ Section -Cars
   SetOverwrite on
 
   ; HQ / AI driven LD-GT1 car models
-  SetOutPath "$INSTDIR\data\cars\ls1-archer-r9"
-  File /r "${BUILD_INST_DIR}\data\cars\ls1-archer-r9\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls1-archer-r9"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls1-archer-r9\*.*"
 
-  ;SetOutPath "$INSTDIR\data\cars\ls1-cavallo-570s1"
-  ;File /r "${BUILD_INST_DIR}\data\cars\ls1-cavallo-570s1\*.*"
+  ;SetOutPath "$INSTDIR\data\cars\models\ls1-cavallo-570s1"
+  ;File /r "${BUILD_INST_DIR}\data\cars\models\ls1-cavallo-570s1\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls1-newcastle-fury"
-  File /r "${BUILD_INST_DIR}\data\cars\ls1-newcastle-fury\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls1-newcastle-fury"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls1-newcastle-fury\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls1-taipan-ltsr"
-  File /r "${BUILD_INST_DIR}\data\cars\ls1-taipan-ltsr\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls1-taipan-ltsr"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls1-taipan-ltsr\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls1-toro-rgt"
-  File /r "${BUILD_INST_DIR}\data\cars\ls1-toro-rgt\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls1-toro-rgt"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls1-toro-rgt\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls1-vulture-v6r"
-  File /r "${BUILD_INST_DIR}\data\cars\ls1-vulture-v6r\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls1-vulture-v6r"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls1-vulture-v6r\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls1-zentek-z7r"
-  File /r "${BUILD_INST_DIR}\data\cars\ls1-zentek-z7r\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls1-zentek-z7r"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls1-zentek-z7r\*.*"
 
   ; HQ / AI driven 36 Grand-Prix car models
-  SetOutPath "$INSTDIR\data\cars\36gp-century-r11b"
-  File /r "${BUILD_INST_DIR}\data\cars\36gp-century-r11b\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\36gp-century-r11b"
+  File /r "${BUILD_INST_DIR}\data\cars\models\36gp-century-r11b\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\36gp-ettore-t59"
-  File /r "${BUILD_INST_DIR}\data\cars\36gp-ettore-t59\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\36gp-ettore-t59"
+  File /r "${BUILD_INST_DIR}\data\cars\models\36gp-ettore-t59\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\36gp-milano-12c36"
-  File /r "${BUILD_INST_DIR}\data\cars\36gp-milano-12c36\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\36gp-milano-12c36"
+  File /r "${BUILD_INST_DIR}\data\cars\models\36gp-milano-12c36\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\36gp-milano-tipop3"
-  File /r "${BUILD_INST_DIR}\data\cars\36gp-milano-tipop3\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\36gp-milano-tipop3"
+  File /r "${BUILD_INST_DIR}\data\cars\models\36gp-milano-tipop3\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\36gp-motorunion-typec"
-  File /r "${BUILD_INST_DIR}\data\cars\36gp-motorunion-typec\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\36gp-motorunion-typec"
+  File /r "${BUILD_INST_DIR}\data\cars\models\36gp-motorunion-typec\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\36gp-silber-w25b"
-  File /r "${BUILD_INST_DIR}\data\cars\36gp-silber-w25b\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\36gp-silber-w25b"
+  File /r "${BUILD_INST_DIR}\data\cars\models\36gp-silber-w25b\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\36gp-tridenti-6c34"
-  File /r "${BUILD_INST_DIR}\data\cars\36gp-tridenti-6c34\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\36gp-tridenti-6c34"
+  File /r "${BUILD_INST_DIR}\data\cars\models\36gp-tridenti-6c34\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\36gp-tridenti-v8ri"
-  File /r "${BUILD_INST_DIR}\data\cars\36gp-tridenti-v8ri\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\36gp-tridenti-v8ri"
+  File /r "${BUILD_INST_DIR}\data\cars\models\36gp-tridenti-v8ri\*.*"
 
 SectionEnd
 

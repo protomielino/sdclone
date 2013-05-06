@@ -109,53 +109,53 @@ Section -Cars
 
   SetOverwrite on
 
-  SetOutPath "$INSTDIR\data\cars\mp5-fmc"
-  File /r "${BUILD_INST_DIR}\data\cars\mp5-fmc\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\mp5-fmc"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp5-fmc\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\mp5-fmc-drift"
-  File /r "${BUILD_INST_DIR}\data\cars\mp5-fmc-drift\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\mp5-fmc-drift"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp5-fmc-drift\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\mp5-fmc-speedy"
-  File /r "${BUILD_INST_DIR}\data\cars\mp5-fmc-speedy\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\mp5-fmc-speedy"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp5-fmc-speedy\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\rs1-citrus-cs4"
-  File /r "${BUILD_INST_DIR}\data\cars\rs1-citrus-cs4\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\rs1-citrus-cs4"
+  File /r "${BUILD_INST_DIR}\data\cars\models\rs1-citrus-cs4\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\rs1-fmc-centre"
-  File /r "${BUILD_INST_DIR}\data\cars\rs1-fmc-centre\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\rs1-fmc-centre"
+  File /r "${BUILD_INST_DIR}\data\cars\models\rs1-fmc-centre\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\rs1-kenji-08"
-  File /r "${BUILD_INST_DIR}\data\cars\rs1-kenji-08\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\rs1-kenji-08"
+  File /r "${BUILD_INST_DIR}\data\cars\models\rs1-kenji-08\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\rs2-fai-dot"
-  File /r "${BUILD_INST_DIR}\data\cars\rs2-fai-dot\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\rs2-fai-dot"
+  File /r "${BUILD_INST_DIR}\data\cars\models\rs2-fai-dot\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\rs2-lion-2m"
-  File /r "${BUILD_INST_DIR}\data\cars\rs2-lion-2m\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\rs2-lion-2m"
+  File /r "${BUILD_INST_DIR}\data\cars\models\rs2-lion-2m\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls2-bavaria-g3gtr"
-  File /r "${BUILD_INST_DIR}\data\cars\ls2-bavaria-g3gtr\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls2-bavaria-g3gtr"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls2-bavaria-g3gtr\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls2-boxer-96rsr"
-  File /r "${BUILD_INST_DIR}\data\cars\ls2-boxer-96rsr\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls2-boxer-96rsr"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls2-boxer-96rsr\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls2-cavallo-360r"
-  File /r "${BUILD_INST_DIR}\data\cars\ls2-cavallo-360r\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls2-cavallo-360r"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls2-cavallo-360r\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls2-condor-c400r"
-  File /r "${BUILD_INST_DIR}\data\cars\ls2-condor-c400r\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls2-condor-c400r"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls2-condor-c400r\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls2-lynx-xkr"
-  File /r "${BUILD_INST_DIR}\data\cars\ls2-lynx-xkr\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls2-lynx-xkr"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls2-lynx-xkr\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls2-morley-r900"
-  File /r "${BUILD_INST_DIR}\data\cars\ls2-morley-r900\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls2-morley-r900"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls2-morley-r900\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls2-sprite-gts"
-  File /r "${BUILD_INST_DIR}\data\cars\ls2-sprite-gts\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls2-sprite-gts"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls2-sprite-gts\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\ls2-vortex-gt"
-  File /r "${BUILD_INST_DIR}\data\cars\ls2-vortex-gt\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls2-vortex-gt"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls2-vortex-gt\*.*"
 
 SectionEnd
 

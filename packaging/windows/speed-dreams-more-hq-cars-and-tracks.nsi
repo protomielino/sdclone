@@ -102,29 +102,29 @@ Section -Cars
   SetOverwrite on
 
   ; HQ / AI driven TORCS Racing Board car models
-  SetOutPath "$INSTDIR\data\cars\trb1-boxer-trbrs"
-  File /r "${BUILD_INST_DIR}\data\cars\trb1-boxer-trbrs\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\trb1-boxer-trbrs"
+  File /r "${BUILD_INST_DIR}\data\cars\models\trb1-boxer-trbrs\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\trb1-cavallo-360rb"
-  File /r "${BUILD_INST_DIR}\data\cars\trb1-cavallo-360rb\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\trb1-cavallo-360rb"
+  File /r "${BUILD_INST_DIR}\data\cars\models\trb1-cavallo-360rb\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\trb1-sector-rb1"
-  File /r "${BUILD_INST_DIR}\data\cars\trb1-sector-rb1\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\trb1-sector-rb1"
+  File /r "${BUILD_INST_DIR}\data\cars\models\trb1-sector-rb1\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\trb1-silber-rblk"
-  File /r "${BUILD_INST_DIR}\data\cars\trb1-silber-rblk\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\trb1-silber-rblk"
+  File /r "${BUILD_INST_DIR}\data\cars\models\trb1-silber-rblk\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\trb1-spirit-rb1lt"
-  File /r "${BUILD_INST_DIR}\data\cars\trb1-spirit-rb1lt\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\trb1-spirit-rb1lt"
+  File /r "${BUILD_INST_DIR}\data\cars\models\trb1-spirit-rb1lt\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\trb1-taipan-rb1"
-  File /r "${BUILD_INST_DIR}\data\cars\trb1-taipan-rb1\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\trb1-taipan-rb1"
+  File /r "${BUILD_INST_DIR}\data\cars\models\trb1-taipan-rb1\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\trb1-vieringe-5rb"
-  File /r "${BUILD_INST_DIR}\data\cars\trb1-vieringe-5rb\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\trb1-vieringe-5rb"
+  File /r "${BUILD_INST_DIR}\data\cars\models\trb1-vieringe-5rb\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\trb1-zaxxon-rb"
-  File /r "${BUILD_INST_DIR}\data\cars\trb1-zaxxon-rb\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\trb1-zaxxon-rb"
+  File /r "${BUILD_INST_DIR}\data\cars\models\trb1-zaxxon-rb\*.*"
 
 SectionEnd
 

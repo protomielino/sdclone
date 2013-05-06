@@ -99,13 +99,17 @@ Section "!Base System" SEC01
   File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\track\*.*"
   SetOutPath "$INSTDIR\lib\modules\userinterface"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\userinterface\*.*"
+  SetOutPath "$INSTDIR\lib\modules\sound"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\sound\*.*"
+  SetOutPath "$INSTDIR\lib\modules\racing"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\racing\*.*"
 
   ; Core data files (sound, textures, menus, car categories, ...)
   SetOutPath "$INSTDIR\data"
   File "${BUILD_INST_DIR}\data\*.*"
 
-  SetOutPath "$INSTDIR\data\categories"
-  File /r "${BUILD_INST_DIR}\data\categories\*.*"
+  SetOutPath "$INSTDIR\data\cars\categories"
+  File /r "${BUILD_INST_DIR}\data\cars\categories\*.*"
 
   SetOutPath "$INSTDIR\data\config"
   File "${BUILD_INST_DIR}\data\config\*.*"
@@ -156,23 +160,23 @@ Section "!Base System" SEC01
   File /r /x *.lib "${BUILD_INST_DIR}\data\drivers\usr_sc\*.*"
 
   ; Base car models (only Supercars)
-  SetOutPath "$INSTDIR\data\cars\sc-boxer-96"
-  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\sc-boxer-96\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\sc-boxer-96"
+  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\models\sc-boxer-96\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\sc-cavallo-360"
-  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\sc-cavallo-360\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\sc-cavallo-360"
+  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\models\sc-cavallo-360\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\sc-fmc-gt4"
-  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\sc-fmc-gt4\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\sc-fmc-gt4"
+  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\models\sc-fmc-gt4\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\sc-lynx-220"
-  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\sc-lynx-220\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\sc-lynx-220"
+  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\models\sc-lynx-220\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\sc-murasama-nsx"
-  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\sc-murasama-nsx\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\sc-murasama-nsx"
+  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\models\sc-murasama-nsx\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\sc-spirit-300"
-  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\sc-spirit-300\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\sc-spirit-300"
+  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\models\sc-spirit-300\*.*"
 
   ; Base tracks (only Espie)
   SetOutPath "$INSTDIR\data\tracks\circuit\espie"
