@@ -272,21 +272,21 @@ void GfApplication::restart()
 void GfApplication::printUsage(const char* pszErrMsg) const
 {
 	if (pszErrMsg)
-		std::cerr << std::endl << "Error: " << pszErrMsg << std::endl << std::endl;
+		std::cout << std::endl << "Error: " << pszErrMsg << std::endl << std::endl;
 	
-	std::cerr << "Usage: " << _lstArgs.front() << " ..." << std::endl;
+	std::cout << "Usage: " << _lstArgs.front() << " ..." << std::endl;
 
 	std::list<std::string>::const_iterator itSynLine = _optionsHelp.lstSyntaxLines.begin();
 	while (itSynLine != _optionsHelp.lstSyntaxLines.end())
 	{
-		std::cerr << "         " << *itSynLine << std::endl;
+		std::cout << "         " << *itSynLine << std::endl;
 		itSynLine++;
 	}
 
 	std::list<std::string>::const_iterator itExplLine = _optionsHelp.lstExplainLines.begin();
 	while (itExplLine != _optionsHelp.lstExplainLines.end())
 	{
-		std::cerr << " " << *itExplLine << std::endl;
+		std::cout << " " << *itExplLine << std::endl;
 		itExplLine++;
 	}
 }
@@ -376,7 +376,7 @@ bool GfApplication::parseOptions()
 		// Version information
 		else if (itOpt->strLongName == "version")
 		{
-			std::cerr << _strName << ' ' << _strVersion << std::endl;
+			std::cout << _strName << ' ' << _strVersion << std::endl;
 			return false;
 		}
 		// Local dir (root dir of the tree where user settings files are stored)
