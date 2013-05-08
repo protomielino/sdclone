@@ -129,7 +129,7 @@ public:
 	/* Destructor */
 	~SDScenery(void);
 
-    osg::ref_ptr<osg::Node> LoadScene(tTrack *track);
+    void LoadScene(tTrack *track);
 	void	CreatePit(tTrack *track);
 	//void	addSpectators(SDSpectators->build(number, tTrack *track));
 	//void	addTrees(SDTrees->build(tTrack *track));
@@ -141,7 +141,7 @@ public:
     inline static int getWorldZ(){return grWrldZ;}
     inline static int getWorldMaxSize(){return grWrldMaxSize;}
 
-        //osg::Node* getPreRoot() { return pre_root.get(); }
+    osg::Node* getScene() { return _scenery.get(); }
 
 	//osg::ref_ptr<osg::Group>	getSDScenery { return _scenery };
 	//osg::Group	getSDBackground { return SDBackground->getbackground; }

@@ -39,7 +39,6 @@ SDSun::SDSun( void ) :
     visibility(-9999.0), prev_sun_angle(-9999.0), path_distance(60000.0),
     sun_exp2_punch_through(7.0e-06)
 {
-
 }
 
 // Destructor
@@ -83,12 +82,12 @@ osg::Node* SDSun::build( std::string path, double dist, double sun_size )
 
     sun_dist = dist;
 
-    osg::Node* sun = SDMakeSphere(sun_size, 15, 15);
-    stateSet = sun->getOrCreateStateSet();
+    osg::Geode* geode = new osg::Geode;
+    stateSet = geode->getOrCreateStateSet();
 
     stateSet->setRenderBinDetails(-6, "RenderBin");
 
-    path = TmpPath+"data/textures/sun.png";
+    path = TmpPath+"data/textures/inner_halo.png";
     osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path);
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
     stateSet->setTextureAttributeAndModes(0, texture);
@@ -99,10 +98,32 @@ osg::Node* SDSun::build( std::string path, double dist, double sun_size )
     scene_cl = new osg::Vec4Array;
     scene_cl->push_back(osg::Vec4(1, 1, 1, 1));
 
-    sun_transform->addChild( sun );
+    osg::Vec3Array* sun_vl = new osg::Vec3Array;
+    sun_vl->push_back(osg::Vec3(-sun_size, 0, -sun_size));
+    sun_vl->push_back(osg::Vec3(sun_size, 0, -sun_size));
+    sun_vl->push_back(osg::Vec3(-sun_size, 0, sun_size));
+    sun_vl->push_back(osg::Vec3(sun_size, 0, sun_size));
 
-    osg::Geode* geode = new osg::Geode;
-    stateSet = geode->getOrCreateStateSet();
+    osg::Vec2Array* sun_tl = new osg::Vec2Array;
+    sun_tl->push_back(osg::Vec2(0, 0));
+    sun_tl->push_back(osg::Vec2(1, 0));
+    sun_tl->push_back(osg::Vec2(0, 1));
+    sun_tl->push_back(osg::Vec2(1, 1));
+
+    osg::Geometry* geometry = new osg::Geometry;
+    geometry->setUseDisplayList(false);
+    geometry->setVertexArray(sun_vl);
+    geometry->setColorArray(sun_cl.get());
+    geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+    geometry->setNormalBinding(osg::Geometry::BIND_OFF);
+    geometry->setTexCoordArray(0, sun_tl);
+    geometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+    geode->addDrawable(geometry);
+
+    sun_transform->addChild( geode );
+
+    osg::Geode* geode1 = new osg::Geode;
+    stateSet = geode1->getOrCreateStateSet();
     stateSet->setRenderBinDetails(-7, "RenderBin");
 
     path = TmpPath+"data/textures/inner_halo.png";
@@ -126,7 +147,7 @@ osg::Node* SDSun::build( std::string path, double dist, double sun_size )
     ihalo_tl->push_back(osg::Vec2(0, 1));
     ihalo_tl->push_back(osg::Vec2(1, 1));
 
-    osg::Geometry* geometry = new osg::Geometry;
+    geometry = new osg::Geometry;
     geometry->setUseDisplayList(false);
     geometry->setVertexArray(ihalo_vl);
     geometry->setColorArray(ihalo_cl.get());
@@ -136,7 +157,7 @@ osg::Node* SDSun::build( std::string path, double dist, double sun_size )
     geometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, 4));
     geode->addDrawable(geometry);
 
-    sun_transform->addChild( geode );
+    sun_transform->addChild( geode1 );
 
     osg::Geode* geode2 = new osg::Geode;
     stateSet = geode2->getOrCreateStateSet();

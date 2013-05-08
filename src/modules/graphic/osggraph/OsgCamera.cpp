@@ -94,7 +94,6 @@ SDPerspCamera::SDPerspCamera(SDView *myscreen, int id, int drawCurr, int drawDrv
     fogstart = myfogstart;
     fogend   = myfogend;
 
-
     viewOffset = 0;
     spanOffset = 0;
 }

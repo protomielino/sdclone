@@ -71,7 +71,7 @@ SDScenery::~SDScenery(void)
     _scenery = NULL;
 }
 
-osg::ref_ptr<osg::Node> SDScenery::LoadScene(tTrack *track)
+void SDScenery::LoadScene(tTrack *track)
 {
 	void		*hndl = grTrackHandle;
 	const char	*acname;
@@ -165,13 +165,10 @@ osg::ref_ptr<osg::Node> SDScenery::LoadScene(tTrack *track)
             rot->setMatrix(mat);
             rot->addChild(pTrack);
             _scenery->addChild(rot);
-            return _scenery;
         }
     		
-		_scenery->addChild(pTrack);
+        _scenery->addChild(pTrack.get());
 	}
-
-	return _scenery;
 }
 
 void SDScenery::LoadSkyOptions()

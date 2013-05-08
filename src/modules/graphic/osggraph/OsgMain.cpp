@@ -60,6 +60,11 @@ void * getCars()
     return cars;
 }
 
+void * getScenery()
+{
+    return scenery;
+}
+
 static osg::ref_ptr<osg::Group> m_sceneroot = NULL;
 static osg::ref_ptr<osg::Group> m_carroot = NULL;
 static osg::Timer m_timer;
@@ -368,8 +373,9 @@ int initTrack(tTrack *track)
     sceneroot = new osg::Group;
     m_sceneroot = new osg::Group;
     m_sceneroot->removeChildren(0, m_sceneroot->getNumChildren());
-    sceneroot->addChild(scenery->LoadScene(track));
-	m_sceneroot->addChild(render->Init(sceneroot, track));
+    scenery->LoadScene(track);
+    render->Init(track);
+    m_sceneroot->addChild(render->getRoot());
 
     return 0;
 }

@@ -26,16 +26,17 @@
 #include <raceman.h> // tSituation
 
 class SDSky;
+class SDScenery;
 
 class SDRender
 {
 private:
-    osg::ref_ptr<osg::Group> m_sceneroot;
+    osg::ref_ptr<osg::Group> m_scene;
     //osg::ref_ptr<osg::Group> m_carroot;
 
 
-    const osg::Vec4 BaseSkyColor;
-    osg::Vec4 BaseFogColor;
+    osg::Vec3f BaseSkyColor;
+    osg::Vec3f BaseFogColor;
     osg::Vec3f SkyColor;
     osg::Vec3f FogColor;
     osg::Vec3f CloudsColor;
@@ -66,7 +67,7 @@ public:
 	SDRender(void);
 	~SDRender(void);
 
-    osg::ref_ptr<osg::Node> Init(osg::Group* root, tTrack *track);
+    void Init(tTrack *track);
     osg::ref_ptr< osg::StateSet> setFogState();
     void Update(float speedcar, tSituation *s);
     void UpdateTime(tSituation *s);
@@ -74,6 +75,7 @@ public:
     void UpdateFogColor(double angle);
 
     SDSky * getSky();
+    osg::Node* getRoot() { return m_scene.get(); }
 };
 
 #endif //_OSGRENDER_H_
