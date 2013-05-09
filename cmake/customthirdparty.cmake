@@ -326,7 +326,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 	IF(OPTION_OSGGRAPH)
 
 		# DLLs whose libs we link with.
-		SET(_OSG_DLLS_NAME_HINTS "OpenThreads;osgDB;osgFX;osgGA;osgViewer;osgUtil;osg")
+		SET(_OSG_DLLS_NAME_HINTS "OpenThreads;osgDB;osgFX;osgGA;osgParticle;osgShadow;osgViewer;osgUtil;osg;")
 		FOREACH(_LIB_NAME ${OPENSCENEGRAPH_LIBRARIES})
 			FOREACH(_NAME_HINT ${_OSG_DLLS_NAME_HINTS})
 				IF("${_LIB_NAME}" MATCHES "${_NAME_HINT}\\.")
