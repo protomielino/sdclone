@@ -95,7 +95,7 @@ SDSky * SDRender::getSky()
  */
 void SDRender::Init(tTrack *track)
 {
-    char buf[256];
+    //char buf[256];
     //void *hndl = grTrackHandle;
     grTrack = track;
 
@@ -149,8 +149,6 @@ void SDRender::Init(tTrack *track)
 
     const int timeOfDay = (int)grTrack->local.timeofday;
     const double domeSizeRatio = SDSkyDomeDistance / 80000.0;
-
-    //SDMax_Visibility = 20000.0f;
 
     GfLogInfo("  domeSizeRation : %d\n", domeSizeRatio);
 
@@ -224,7 +222,6 @@ void SDRender::Init(tTrack *track)
     osg::ref_ptr<osg::Group> sceneGroup = new osg::Group;
     osg::ref_ptr<osg::Group> mRoot = new osg::Group;
     sceneGroup->addChild(scenery->getScene());
-    //sceneGroup->setNodeMask(~simgear::BACKGROUND_BIT);
     osg::ref_ptr<osg::StateSet> stateSet = sceneGroup->getOrCreateStateSet();
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
@@ -235,16 +232,14 @@ void SDRender::Init(tTrack *track)
 
     osg::ref_ptr<osg::LightSource> lightSource = new osg::LightSource;
     lightSource->getLight()->setDataVariance(osg::Object::DYNAMIC);
+    lightSource->getLight()->setLightNum(0);
     // relative because of CameraView being just a clever transform node
     lightSource->setReferenceFrame(osg::LightSource::RELATIVE_RF);
     lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
     lightSource->getLight()->setAmbient(osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
-    lightSource->getLight()->setDiffuse(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    lightSource->getLight()->setDiffuse(osg::Vec4( 0.2f, 0.2f, 0.2f, 1.0f));
     lightSource->getLight()->setSpecular(osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
-    //sceneGroup->addChild(lightSource);
-
-    //assert(dynamic_cast<osg::LightSource*>(mRoot));
-    //osg::LightSource lightSource = static_cast<osg::LightSource*>(mRoot);
+    sceneGroup->addChild(lightSource);
 
     // we need a white diffuse light for the phase of the moon
     osg::ref_ptr<osg::LightSource> sunLight = new osg::LightSource;
@@ -271,8 +266,6 @@ void SDRender::Init(tTrack *track)
     mRoot->addChild(sceneGroup.get());
     mRoot->setStateSet(setFogState().get());
     mRoot->addChild(sunLight.get());
-    //mRoot->addChild(lightSource);
-
 
     // Clouds are added to the scene graph later
     stateSet = mRoot->getOrCreateStateSet();
@@ -284,15 +277,13 @@ void SDRender::Init(tTrack *track)
     m_scene->addChild(mRoot.get());
 
     GfOut("LE POINTEUR %d\n",mRoot.get());
-
-    //return mRoot.get();
 }//SDRender::Init
 
 void SDRender::UpdateLight( void )
 {
     sol_angle = (float)thesky->getSA();
     moon_angle = (float)thesky->getMA();
-    float deg = sol_angle * SD_RADIANS_TO_DEGREES;
+    //float deg = sol_angle * SD_RADIANS_TO_DEGREES;
     float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
 
     GfOut("Sun Angle in Render = %f - sky brightness = %f\n", sol_angle, sky_brightness);

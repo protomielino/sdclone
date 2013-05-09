@@ -416,11 +416,6 @@ void shutdownTrack(void)
 		GfParmReleaseHandle(grTrackHandle);
 		grTrackHandle = 0;
 	}
-
-        // And then the context termination job (should not be there, see initTrack).
-        //options.endLoad();
-
-        //grShutdownState();
 }
 
 void

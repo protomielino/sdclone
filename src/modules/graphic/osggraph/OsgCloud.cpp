@@ -674,6 +674,7 @@ bool SDCloudLayer::reposition( const osg::Vec3f& p, double dt )
 
             setTextureOffset(base);
             last_pos = p;
+            scale = layer_scale;
         }
     }
 

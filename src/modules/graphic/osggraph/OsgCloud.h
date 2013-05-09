@@ -86,7 +86,7 @@ public:
     inline float getDirection() { return direction; }
     inline void setSpeed(float sp)
     {
-        // cout << "cloud speed = " << sp << endl;
+        //Out("cloud speed = %f\n", sp);
         speed = sp;
     }
 
