@@ -50,7 +50,7 @@ public:
 };
 
 
-void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Group> m_sceneroot)
+void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node> m_sceneroot)
 {
     m_Winx = x;
     m_Winy = y;

@@ -58,7 +58,7 @@ class SDScreens
         SDScreens();
         ~SDScreens();
 
-        void Init(int x, int y, int width, int height, osg::ref_ptr<osg::Group> m_sceneroot);
+        void Init(int x, int y, int width, int height, osg::ref_ptr<osg::Node> m_sceneroot);
         void InitCars(tSituation *s);
         void update(tSituation *s,SDFrameInfo* fi);
         void splitScreen(long p);

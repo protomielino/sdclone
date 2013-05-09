@@ -65,8 +65,8 @@ void * getScenery()
     return scenery;
 }
 
-static osg::ref_ptr<osg::Group> m_sceneroot = NULL;
-static osg::ref_ptr<osg::Group> m_carroot = NULL;
+//static osg::ref_ptr<osg::Group> m_sceneroot = NULL;
+//static osg::ref_ptr<osg::Group> m_carroot = NULL;
 static osg::Timer m_timer;
 //static osg::Timer_t m_start_tick;
 
@@ -208,7 +208,7 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     //m_sceneViewer->getUsage();
     //m_sceneViewer->realize();
 
-    screens->Init(x,y,width,height,m_sceneroot);
+    screens->Init(x,y,width,height, render->getRoot());
 
     /*GfuiAddKey(screen, GFUIK_END,      "Zoom Minimum", (void*)GR_ZOOM_MIN,	grSetZoom, NULL);
     GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	grSetZoom, NULL);
@@ -364,18 +364,18 @@ int initTrack(tTrack *track)
 	// Now, do the real track loading job.
 	grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     osg::ref_ptr<osg::Group> sceneroot = NULL;
-    m_sceneroot = NULL;
+    //m_sceneroot = NULL;
 	/*if (m_NbActiveScreens > 0)
 		return grLoadScene(track);*/
 
 	scenery = new SDScenery;
 	render = new SDRender;
     sceneroot = new osg::Group;
-    m_sceneroot = new osg::Group;
-    m_sceneroot->removeChildren(0, m_sceneroot->getNumChildren());
+    //m_sceneroot = new osg::Group;
+    //m_sceneroot->removeChildren(0, m_sceneroot->getNumChildren());
     scenery->LoadScene(track);
     render->Init(track);
-    m_sceneroot->addChild(render->getRoot());
+    //m_sceneroot->addChild(render->getRoot());
 
     return 0;
 }
@@ -385,9 +385,9 @@ int  initCars(tSituation *s)
 	char buf[256];
 	cars = new SDCars;
     cars->loadCars(s);
-    m_sceneroot->addChild(cars->getCarsNode());
-	osgUtil::Optimizer optimizer;
-    optimizer.optimize(m_sceneroot);
+    render->addCars(cars->getCarsNode());
+    //osgUtil::Optimizer optimizer;
+    //optimizer.optimize(m_sceneroot);
 	GfOut("All cars loaded\n");
 
 	screens->InitCars(s);
@@ -406,10 +406,10 @@ int  initCars(tSituation *s)
 void shutdownTrack(void)
 {
     delete scenery;
-    m_sceneroot->removeChildren(0, m_sceneroot->getNumChildren());
+    //m_sceneroot->removeChildren(0, m_sceneroot->getNumChildren());
     // Do the real track termination job.
     osgDB::Registry::instance()->clearObjectCache();
-    m_sceneroot = NULL;
+    //m_sceneroot = NULL;
         //grShutdownScene();
 
 	if (grTrackHandle)

@@ -221,7 +221,10 @@ void SDRender::Init(tTrack *track)
 
     osg::ref_ptr<osg::Group> sceneGroup = new osg::Group;
     osg::ref_ptr<osg::Group> mRoot = new osg::Group;
+    m_RealRoot = new osg::Group;
     sceneGroup->addChild(scenery->getScene());
+    //m_CarRoot->addChild(cars->getCarsNode());
+    sceneGroup->addChild(m_CarRoot.get());
     osg::ref_ptr<osg::StateSet> stateSet = sceneGroup->getOrCreateStateSet();
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
@@ -273,11 +276,20 @@ void SDRender::Init(tTrack *track)
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::ON);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
-    m_scene = new osg::Group;
-    m_scene->addChild(mRoot.get());
+    m_RealRoot = new osg::Group;
+    m_RealRoot->addChild(mRoot.get());
 
     GfOut("LE POINTEUR %d\n",mRoot.get());
 }//SDRender::Init
+
+void SDRender::addCars(osg::Node* cars)
+{
+    m_CarRoot = new osg::Group;
+    m_CarRoot->addChild(cars);
+    m_RealRoot->addChild(m_CarRoot.get());
+    osgUtil::Optimizer optimizer;
+    optimizer.optimize(m_RealRoot.get());
+}
 
 void SDRender::UpdateLight( void )
 {
@@ -435,3 +447,92 @@ void SDRender::UpdateFogColor(double sol_angle)
     //
     sd_gamma_correct_rgb( BaseFogColor._v );
 }
+
+void SDRender::Update(double currentTime, double accelTime)
+{
+    // Detect first call (in order to initialize "last times").
+    static bool bInitialized = false;
+    static double lastTimeHighSpeed = 0;
+    static int lastTimeLowSpeed = 0;
+
+    // Nothing to do if static sky dome, or race not started.
+    //if (!grDynamicSkyDome)	//TODO(kilo): find some meaning for this variable
+    if (!SDSkyDomeDistance || grTrack->skyversion < 1)
+        return;
+
+    if (currentTime < 0)
+    {
+        bInitialized = false;
+        return;
+    }
+
+    if (!bInitialized)
+    {
+        if (SDSkyDomeDistance && grTrack->skyversion > 0)
+        {
+            // Ensure the sun and moon positions are reset
+            const int timeOfDay = (int)grTrack->local.timeofday;
+            GLfloat sunAscension = grTrack->local.sunascension;
+            SDSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
+
+            const float moonAscension = grTrack->local.sunascension;
+            //SDMoonDeclination = grUpdateMoonPos(timeOfDay);
+
+            thesky->setSD( DEG2RAD(SDSunDeclination));
+            thesky->setSRA( sunAscension );
+
+            thesky->setMD( DEG2RAD(SDMoonDeclination) );
+            thesky->setMRA( DEG2RAD(moonAscension) );
+        }
+
+        lastTimeHighSpeed = currentTime;
+        lastTimeLowSpeed = 60 * (int)floor(accelTime / 60.0);
+
+        bInitialized = true;
+        return;
+    }
+
+    // At each call, update possibly high speed objects of the sky dome : the clouds.
+    SDScenery * scenery = (SDScenery *)getScenery();
+    double r_WrldX = scenery->getWorldX();
+    double r_WrldY = scenery->getWorldY();
+    //double r_WrldZ = SDScenery::getWorldZ();
+    osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0 );
+    thesky->reposition(viewPos, 0, currentTime - lastTimeHighSpeed);
+
+    // Now, we are done for high speed objects.
+    lastTimeHighSpeed = currentTime;
+
+    // Check if time to update low speed objects : sun and moon (once every minute).
+    int nextTimeLowSpeed = 60 * (int)floor((accelTime + 60.0) / 60.0);
+    /*if (nextTimeLowSpeed == lastTimeLowSpeed)
+        return;*/
+    const float deltaTimeLowSpeed = (float)(nextTimeLowSpeed - lastTimeLowSpeed);
+    //lastTimeLowSpeed = nextTimeLowSpeed;
+
+    // Update sun and moon, and thus global lighting / coloring parameters of the scene.
+    //GfLogDebug("%f : Updating slow objects of the dynamic sky dome (sun and moon)\n", currentTime);
+    if (nextTimeLowSpeed != lastTimeLowSpeed)
+    {
+        // 1) Update sun position
+        const float deltaDecl = deltaTimeLowSpeed * 360.0f / (24.0f * 60.0f * 60.0f);
+        SDSunDeclination += deltaDecl;
+        if (SDSunDeclination >= 360.0f)
+            SDSunDeclination -= 360.0f;
+
+        thesky->setSD( DEG2RAD(SDSunDeclination) );
+
+        // 2) Update moon position
+        SDMoonDeclination += deltaDecl;
+        if (SDMoonDeclination >= 360.0f)
+            SDMoonDeclination -= 360.0f;
+
+        thesky->setMD( DEG2RAD(SDMoonDeclination) );
+        lastTimeLowSpeed = nextTimeLowSpeed;
+    }
+
+    // 3) Update scene color and light
+
+    UpdateLight();
+
+}//grUpdateSky

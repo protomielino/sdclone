@@ -31,8 +31,9 @@ class SDScenery;
 class SDRender
 {
 private:
+    osg::ref_ptr<osg::Group> m_RealRoot;
     osg::ref_ptr<osg::Group> m_scene;
-    //osg::ref_ptr<osg::Group> m_carroot;
+    osg::ref_ptr<osg::Group> m_CarRoot;
 
 
     osg::Vec3f BaseSkyColor;
@@ -69,13 +70,14 @@ public:
 
     void Init(tTrack *track);
     osg::ref_ptr< osg::StateSet> setFogState();
-    void Update(float speedcar, tSituation *s);
     void UpdateTime(tSituation *s);
     void UpdateLight(void);
+    void addCars(osg::Node* cars);
     void UpdateFogColor(double angle);
+    void Update(double currentTime, double accelTime);
 
     SDSky * getSky();
-    osg::Node* getRoot() { return m_scene.get(); }
+    osg::Node* getRoot() { return m_RealRoot.get(); }
 };
 
 #endif //_OSGRENDER_H_
