@@ -320,8 +320,8 @@ void SDRender::UpdateLight( void )
 
 
     osg::Vec4f suncolor = thesky->get_sun_color();
-    //osg::Vec3f sun_color = osg::Vec3f(suncolor._v[0], suncolor._v[1], suncolor._v[2]);
-    osg::Vec3f sun_color = osg::Vec3f(0.7f, 0.7f, 0.7f); // For Test !!!
+    osg::Vec3f sun_color = osg::Vec3f(suncolor._v[0], suncolor._v[1], suncolor._v[2]);
+    //osg::Vec3f sun_color = osg::Vec3f(0.7f, 0.7f, 0.7f); // For Test !!!
     GfOut("Sun Color in Render = %f R - %f V - %f B\n", sun_color._v[0], sun_color._v[1], sun_color._v[2]);
 
     if (sol_angle > 1.0)
