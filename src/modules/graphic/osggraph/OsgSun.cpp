@@ -385,5 +385,5 @@ osg::Vec4f SDSun::get_color()
 
 osg::Vec4f SDSun::get_scene_color()
 {
-    return osg::Vec4f((*scene_cl)[0][0], (*scene_cl)[0][1], (*scene_cl)[0][2], (*scene_cl)[0][3]);
+    return osg::Vec4f((*sun_cl)[0][0], (*sun_cl)[0][1], (*sun_cl)[0][2], (*sun_cl)[0][3]);
 }
