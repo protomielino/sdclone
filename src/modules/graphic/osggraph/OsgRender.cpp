@@ -28,6 +28,7 @@
 #include <osg/LightSource>
 #include <osg/Camera>
 #include <osgViewer/Viewer>
+#include <osgParticle/PrecipitationEffect>
 
 #include "OsgMain.h"
 #include "OsgRender.h"
@@ -188,20 +189,25 @@ void SDRender::Init(tTrack *track)
     double r_WrldY = scenery->getWorldY();
     //double r_WrldZ = SDScenery::getWorldZ();
     osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0 );
+    unsigned int SDRain = 0;
 
     switch (grTrack->local.rain)
     {
         case TR_RAIN_NONE:
             SDVisibility = SDMax_Visibility;
+            SDRain = 0;
             break;
         case TR_RAIN_LITTLE:
             SDVisibility = 800.0;
+            SDRain = 1;
             break;
         case TR_RAIN_MEDIUM:
             SDVisibility = 600.0;
+            SDRain = 2;
             break;
         case TR_RAIN_HEAVY:
             SDVisibility = 200.0;
+            SDRain = 3;
             break;
         default:
             GfLogWarning("Unsupported rain strength value %d (assuming none)",
@@ -222,11 +228,20 @@ void SDRender::Init(tTrack *track)
     osg::ref_ptr<osg::Group> sceneGroup = new osg::Group;
     osg::ref_ptr<osg::Group> mRoot = new osg::Group;
     m_RealRoot = new osg::Group;
+    osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;
+
+    if (SDRain > 0)
+    {
+        sceneGroup->addChild(precipitationEffect.get());
+    }
+
     sceneGroup->addChild(scenery->getScene());
     //m_CarRoot->addChild(cars->getCarsNode());
     sceneGroup->addChild(m_CarRoot.get());
     osg::ref_ptr<osg::StateSet> stateSet = sceneGroup->getOrCreateStateSet();
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
+    if (SDRain > 0)
+        stateSet->setAttributeAndModes(precipitationEffect->getFog());
 
     osg::ref_ptr<osg::Material> material = new osg::Material;
     material->setColorMode(osg::Material::OFF); // switch glColor usage off
