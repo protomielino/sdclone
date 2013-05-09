@@ -215,9 +215,11 @@ void SDRender::Init(tTrack *track)
     thesky->set_visibility( SDVisibility ); // Visibility in meters
 
     thesky->reposition( viewPos, 0, 0);
-    UpdateLight();
+    sol_angle = (float)thesky->getSA();
+    moon_angle = (float)thesky->getMA();
     thesky->repaint(SkyColor, FogColor, CloudsColor, sol_angle, moon_angle, NPlanets,
                     APlanetsData, NStars, AStarsData);
+    UpdateLight();
 
     osg::ref_ptr<osg::Group> sceneGroup = new osg::Group;
     osg::ref_ptr<osg::Group> mRoot = new osg::Group;
