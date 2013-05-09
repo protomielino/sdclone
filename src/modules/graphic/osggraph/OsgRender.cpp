@@ -56,6 +56,8 @@ static tTrack *grTrack;
 #define COVERAGE_CLOUD 8
 
 SDRender::SDRender(void)
+   :AStarsData(NULL),
+   APlanetsData(NULL)
 {
     BaseSkyColor = osg::Vec3f( 0.31f, 0.43f, 0.69f );
     BaseFogColor = osg::Vec3f( 0.84f, 0.84f, 1.0f );

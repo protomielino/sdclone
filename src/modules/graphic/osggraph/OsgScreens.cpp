@@ -30,6 +30,7 @@
 #include "OsgCar.h"
 
 SDScreens::SDScreens()
+   :m_CurrentScreenIndex(0)
 {
     viewer = new osgViewer::Viewer();
 }
