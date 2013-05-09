@@ -71,7 +71,7 @@ public :
         stateset->addUniform(diffuseMap);
         viewPoint = new osg::Uniform("pv",osg::Vec3());
         stateset->addUniform(viewPoint);
-        specularColor = new osg::Uniform("specularColor", osg::Vec4(0.8,0.8,0.8,1.0));
+        specularColor = new osg::Uniform("specularColor", osg::Vec4(0.8f,0.8f,0.8f,1.0f));
         stateset->addUniform(specularColor);
         lightVector = new osg::Uniform("lightvector",osg::Vec3());
         stateset->addUniform(lightVector);
@@ -91,6 +91,10 @@ public :
         osg::Vec4f sun_color = ren->getSky()->get_sun_color();
         osg::Vec4f scene_color = ren->getSky()->get_scene_color();
 
+       /* GfOut("Sun Position : %f %f %f\n",sun_pos._v[0],sun_pos._v[1],sun_pos._v[2]);
+        GfOut("Sun Color : %f %f %f %f\n",sun_color._v[0],sun_color._v[1],sun_color._v[2],sun_color._v[3]);
+        GfOut("Scene Color : %f %f %f %f\n",scene_color._v[0],scene_color._v[1],scene_color._v[2],scene_color._v[3]);
+    */
         //SDScreens * scr= (SDScreens *)getScreens();
         //osg::Vec3 c = scr->getActiveView()->getCameras()->getSelectedCamera()->getCameraPosition();
        // osg::Matrix modelview = scr->getActiveView()->getOsgCam()->getViewMatrix();
@@ -98,6 +102,12 @@ public :
         osg::Vec4f pv = v*modelview;
         osg::Vec4f lv = osg::Vec4(sun_pos.x(),sun_pos.y(),sun_pos.z(),0.0f);
         lv =lv*modelview;
+/*
+        GfOut("View Point : %f %f %f\n",pv.x(),pv.y(),pv.z());
+        GfOut("Light Vector  : %f %f %f\n",lv.x(),lv.y(),lv.z());
+  */
+    //  GfOut("Scene Color : %f %f %f %f\n",scene_color._v[0],scene_color._v[1],scene_color._v[2],scene_color._v[3]);
+
 
 
         this->viewPoint->set(osg::Vec3f(pv.x(),pv.y(),pv.z()));
@@ -298,7 +308,7 @@ void SDCars::addSDCar(SDCar * car)
     the_cars.insert(the_cars.end(),car);
 }
 
-osg::ref_ptr<osg::Node> SDCars::loadCars(tSituation * pSituation)
+void SDCars::loadCars(tSituation * pSituation)
 {
     tSituation *s = pSituation;
     this->situation = pSituation;
@@ -310,8 +320,9 @@ osg::ref_ptr<osg::Node> SDCars::loadCars(tSituation * pSituation)
         this->cars_branch->addChild(car->loadCar(elt));
     }
     
-    return cars_branch;
+    return;;
 }
+
 
 void SDCars::updateCars()
 {

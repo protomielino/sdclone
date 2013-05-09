@@ -384,7 +384,8 @@ int  initCars(tSituation *s)
 {
 	char buf[256];
 	cars = new SDCars;
-    m_sceneroot->addChild(cars->loadCars(s));
+    cars->loadCars(s);
+    m_sceneroot->addChild(cars->getCarsNode());
 	osgUtil::Optimizer optimizer;
     optimizer.optimize(m_sceneroot);
 	GfOut("All cars loaded\n");

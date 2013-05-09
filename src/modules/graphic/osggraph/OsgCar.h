@@ -57,9 +57,12 @@ class SDCars
 		SDCars(void);
 		~SDCars(void);
 
-        osg::ref_ptr<osg::Node> loadCars(tSituation * pSituation);
+        void loadCars(tSituation * pSituation);
         void updateCars();
         void updateShadingParameters(osg::Vec3f eye,osg::Matrixf modelview);
+        inline osg::ref_ptr<osg::Node> getCarsNode(){
+            return cars_branch;
+        }
 };
 
 #endif /* _OSGCAR_H_ */
