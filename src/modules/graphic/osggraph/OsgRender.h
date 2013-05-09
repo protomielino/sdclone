@@ -35,7 +35,6 @@ private:
     osg::ref_ptr<osg::Group> m_scene;
     osg::ref_ptr<osg::Group> m_CarRoot;
 
-
     osg::Vec3f BaseSkyColor;
     osg::Vec3f BaseFogColor;
     osg::Vec3f SkyColor;
@@ -74,7 +73,7 @@ public:
     void UpdateLight(void);
     void addCars(osg::Node* cars);
     void UpdateFogColor(double angle);
-    void Update(double currentTime, double accelTime);
+    void UpdateSky(double currentTime, double accelTime);
 
     SDSky * getSky();
     osg::Node* getRoot() { return m_RealRoot.get(); }

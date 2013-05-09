@@ -448,7 +448,7 @@ void SDRender::UpdateFogColor(double sol_angle)
     sd_gamma_correct_rgb( BaseFogColor._v );
 }
 
-void SDRender::Update(double currentTime, double accelTime)
+void SDRender::UpdateSky(double currentTime, double accelTime)
 {
     // Detect first call (in order to initialize "last times").
     static bool bInitialized = false;
@@ -505,10 +505,8 @@ void SDRender::Update(double currentTime, double accelTime)
 
     // Check if time to update low speed objects : sun and moon (once every minute).
     int nextTimeLowSpeed = 60 * (int)floor((accelTime + 60.0) / 60.0);
-    /*if (nextTimeLowSpeed == lastTimeLowSpeed)
-        return;*/
+
     const float deltaTimeLowSpeed = (float)(nextTimeLowSpeed - lastTimeLowSpeed);
-    //lastTimeLowSpeed = nextTimeLowSpeed;
 
     // Update sun and moon, and thus global lighting / coloring parameters of the scene.
     //GfLogDebug("%f : Updating slow objects of the dynamic sky dome (sun and moon)\n", currentTime);
@@ -532,7 +530,5 @@ void SDRender::Update(double currentTime, double accelTime)
     }
 
     // 3) Update scene color and light
-
     UpdateLight();
-
 }//grUpdateSky
