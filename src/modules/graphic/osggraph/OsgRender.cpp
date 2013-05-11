@@ -1,4 +1,4 @@
-﻿/***************************************************************************
+/***************************************************************************
 
     file                 : OsgRender.cpp
     created              : Mon Aug 21 20:13:56 CEST 2012
@@ -29,6 +29,9 @@
 #include <osg/Camera>
 #include <osgViewer/Viewer>
 #include <osgParticle/PrecipitationEffect>
+#include <osgShadow/ShadowedScene>
+#include <osgShadow/ViewDependentShadowMap>
+#include <osgShadow/ShadowMap>
 
 #include "OsgMain.h"
 #include "OsgRender.h"
@@ -67,6 +70,9 @@ SDRender::SDRender(void)
     SDNbCloudLayers = 0;
     SDDynamicWeather = 0;
     SDDynamicSkyDome = false;
+
+    rcvShadowMask = 0x1;
+    castShadowMask = 0x2;
 
     SDSunDeclination = 0.0f;
     SDMoonDeclination = 0.0f;
@@ -229,7 +235,12 @@ void SDRender::Init(tTrack *track)
 
     osg::ref_ptr<osg::Group> sceneGroup = new osg::Group;
     osg::ref_ptr<osg::Group> mRoot = new osg::Group;
+    osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
+    m_scene = new osg::Group;
+    m_CarRoot = new osg::Group;
     m_RealRoot = new osg::Group;
+    shadowRoot = new osgShadow::ShadowedScene;
+
     osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;
 
     if (SDRain > 0)
@@ -237,10 +248,15 @@ void SDRender::Init(tTrack *track)
         sceneGroup->addChild(precipitationEffect.get());
     }
 
-    sceneGroup->addChild(scenery->getScene());
+    m_scene->addChild(scenery->getScene());
+    m_scene->setNodeMask(rcvShadowMask);
+    sceneGroup->addChild(m_scene);
+    //sceneGroup->addChild(scenery->getScene());
     //m_CarRoot->addChild(cars->getCarsNode());
+    m_CarRoot->setNodeMask(castShadowMask);
     sceneGroup->addChild(m_CarRoot.get());
-    osg::ref_ptr<osg::StateSet> stateSet = sceneGroup->getOrCreateStateSet();
+    stateSet = new osg::StateSet;
+    stateSet = sceneGroup->getOrCreateStateSet();
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
     if (SDRain > 0)
         stateSet->setAttributeAndModes(precipitationEffect->getFog());
@@ -250,7 +266,7 @@ void SDRender::Init(tTrack *track)
     stateSet->setAttributeAndModes(material, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
-    osg::ref_ptr<osg::LightSource> lightSource = new osg::LightSource;
+    lightSource = new osg::LightSource;
     lightSource->getLight()->setDataVariance(osg::Object::DYNAMIC);
     lightSource->getLight()->setLightNum(0);
     // relative because of CameraView being just a clever transform node
@@ -262,7 +278,7 @@ void SDRender::Init(tTrack *track)
     sceneGroup->addChild(lightSource);
 
     // we need a white diffuse light for the phase of the moon
-    osg::ref_ptr<osg::LightSource> sunLight = new osg::LightSource;
+    sunLight = new osg::LightSource;
     sunLight->getLight()->setDataVariance(osg::Object::DYNAMIC);
     sunLight->getLight()->setLightNum(1);
     sunLight->setReferenceFrame(osg::LightSource::RELATIVE_RF);
@@ -278,8 +294,9 @@ void SDRender::Init(tTrack *track)
     sunLight->getLight()->setPosition(position);
     sunLight->getLight()->setDirection(sun_direction);
 
-    osg::ref_ptr<osg::Group> skyGroup = new osg::Group;
-    osg::ref_ptr<osg::StateSet> skySS = skyGroup->getOrCreateStateSet();
+    skyGroup = new osg::Group;
+    skySS = new osg::StateSet;
+    skySS = skyGroup->getOrCreateStateSet();
     skySS->setMode(GL_LIGHT0, osg::StateAttribute::OFF);
     skyGroup->addChild(thesky->getPreRoot());
     sunLight->addChild(skyGroup.get());
@@ -293,19 +310,39 @@ void SDRender::Init(tTrack *track)
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::ON);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
-    m_RealRoot = new osg::Group;
     m_RealRoot->addChild(mRoot.get());
 
     GfOut("LE POINTEUR %d\n",mRoot.get());
 }//SDRender::Init
 
+void SDRender::ShadowedScene()
+{
+    /*osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
+    vdsm->setLight(sunLight.get());
+    vdsm->setTextureSize(osg::Vec2s(2048, 2048));
+    vdsm->setTextureUnit(3);
+    //shadowRoot = new osgShadow::ShadowedScene;
+
+    shadowRoot->setShadowTechnique((vdsm.get()));
+    shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
+    shadowRoot->setCastsShadowTraversalMask(castShadowMask);
+    shadowRoot->addChild(m_scene.get());
+    shadowRoot->addChild(m_CarRoot.get());
+
+    m_RealRoot->addChild(shadowRoot.get());*/
+}
+
 void SDRender::addCars(osg::Node* cars)
 {
-    m_CarRoot = new osg::Group;
+    //m_CarRoot = new osg::Group;
     m_CarRoot->addChild(cars);
-    m_RealRoot->addChild(m_CarRoot.get());
+    //m_CarRoot->setNodeMask(castShadowMask);
+
     osgUtil::Optimizer optimizer;
-    optimizer.optimize(m_RealRoot.get());
+    optimizer.optimize(m_CarRoot.get());
+    optimizer.optimize(m_scene.get());
+
+    //ShadowedScene();
 }
 
 void SDRender::UpdateLight( void )
@@ -548,4 +585,16 @@ void SDRender::UpdateSky(double currentTime, double accelTime)
 
     // 3) Update scene color and light
     UpdateLight();
+
+    sunLight->getLight()->setAmbient(SceneAmbiant);
+    sunLight->getLight()->setDiffuse(SceneDiffuse);
+    sunLight->getLight()->setSpecular(SceneSpecular);
+    sunLight->setStateSetModes(*stateSet,osg::StateAttribute::ON);
+
+    osg::Vec3f sun_position = thesky->sunposition();
+    osg::Vec3f sun_direction = -sun_position;
+    osg::Vec4f position(sun_position, 1.0f);
+    sunLight->getLight()->setPosition(position);
+    sunLight->getLight()->setDirection(sun_direction);
+
 }//grUpdateSky

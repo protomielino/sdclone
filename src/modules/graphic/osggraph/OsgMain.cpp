@@ -274,6 +274,7 @@ int refresh(tSituation *s)
     }
 
     cars->updateCars();
+    render->UpdateSky(s->currentTime, s->accelTime);
     screens->update(s,&frameInfo);
 
     return 0;

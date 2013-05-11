@@ -21,6 +21,7 @@
 #define _OSGRENDER_H_
 
 #include <osg/Group>
+#include <osgShadow/ShadowedScene>
 
 #include <track.h>	 //tTrack
 #include <raceman.h> // tSituation
@@ -34,6 +35,15 @@ private:
     osg::ref_ptr<osg::Group> m_RealRoot;
     osg::ref_ptr<osg::Group> m_scene;
     osg::ref_ptr<osg::Group> m_CarRoot;
+    osg::ref_ptr<osg::Group> skyGroup;
+
+    osg::ref_ptr<osg::StateSet> stateSet;
+    osg::ref_ptr<osg::StateSet> skySS;
+
+    osg::ref_ptr<osg::LightSource> lightSource;
+    osg::ref_ptr<osg::LightSource> sunLight;
+
+    osg::ref_ptr<osgShadow::ShadowedScene> shadowRoot;
 
     osg::Vec3f BaseSkyColor;
     osg::Vec3f BaseFogColor;
@@ -49,6 +59,8 @@ private:
     unsigned SDSkyDomeDistance;
     unsigned SDNbCloudLayers;
     unsigned SDSkyDomeDistThresh;
+    unsigned int rcvShadowMask;
+    unsigned int castShadowMask;
     int SDDynamicWeather;
     bool SDDynamicSkyDome;
     float SDSunDeclination;
@@ -74,6 +86,7 @@ public:
     void addCars(osg::Node* cars);
     void UpdateFogColor(double angle);
     void UpdateSky(double currentTime, double accelTime);
+    void ShadowedScene(void);
 
     SDSky * getSky();
     osg::Node* getRoot() { return m_RealRoot.get(); }
