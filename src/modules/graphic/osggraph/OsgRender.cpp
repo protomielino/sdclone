@@ -30,7 +30,7 @@
 #include <osgViewer/Viewer>
 #include <osgParticle/PrecipitationEffect>
 #include <osgShadow/ShadowedScene>
-#include <osgShadow/ViewDependentShadowMap>
+//#include <osgShadow/ViewDependentShadowMap>
 #include <osgShadow/ShadowMap>
 
 #include "OsgMain.h"
