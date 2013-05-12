@@ -48,7 +48,13 @@ extern char *OrderString;
 extern int collapseObject;
 
 extern void loadAndGroup(char *OutputFileName);
-extern int loadAC(char * inputFilename, char * outputFilename, int saveIn);
+/** Loads the file with inputFilename to the global root_ob and root_material
+ *  variables and optionally outputs the loaded object to outputFilename
+ *  based on the current value of the global typeConvertion variable.
+ *
+ *  @returns 0 on success, a value != 0 on failure
+ */
+int loadAC(char * inputFilename, char * outputFilename = NULL);
 
 #define _AC3DTO3DS 1
 #define _3DSTOAC3D 2
@@ -145,6 +151,17 @@ typedef struct ob
 /** Creates an instance of the ob_t struct and zeroes it.
  */
 ob_t * obCreate();
+
+/** Free the given object. This will only free the resources of the
+ * object itself. It will not touch the object->next.
+ */
+void obFree(ob_t *o);
+
+/** Appends srcob to the end of the list given by destob.
+ *
+ * @return the new list: destob if it exists, else srcob itself.
+ */
+ob_t * obAppend(ob_t * destob, ob_t * srcob);
 
 /** Initializes the min and max properties of the given object
  *  must be set: numvertice, vertex
@@ -270,11 +287,22 @@ void computeObSurfCentroid(ob_t * ob, int obsurf, point_t * out);
 extern int typeConvertion;
 extern ob_t * root_ob;
 
-extern int terrainSplitOb(ob_t **object);
+/** Splits the given object and returns the split objects.
+ *
+ * The original object will not be modified.
+ */
+ob_t* splitOb(ob_t *object);
+
+/** Performs a terrain split on the given object and returns the split objects.
+ *
+ * The original object will not be modified.
+ */
+ob_t* terrainSplitOb(ob_t *object);
+
 extern int mergeSplitted(ob_t **object);
 extern int distSplit;
 
-/** Whether to split objects during loading, i.e. calls to loadAC() and loadACo().
+/** Whether to split objects during loading, i.e. calls to loadAC().
  *  The default behavior is to split them during loading
  *  (splitObjectsDuringLoad != 0). However, in loadAndGroup()
  *  we want to manually trigger the object splitting, i.e. just after setting up the
@@ -286,9 +314,7 @@ extern int splitObjectsDuringLoad;
 /** Go through all given objects, check whether a normal split or a terrain
  *  split is necessary and execute the split.
  */
-void splitObjects(ob_t** object);
-
-extern int freeobject(ob_t *o);
+ob_t * splitObjects(ob_t* object);
 double findDistmin(ob_t * ob1, ob_t *ob2);
 
 #define freez(x) {if ((x)) free((x)); }
