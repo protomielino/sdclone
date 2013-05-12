@@ -249,18 +249,18 @@ SDCar::loadCar(tCarElt *car)
 
     strPath+=buf;
     GfOut("Chemin Textures : %s\n", strTPath.c_str());
-    osg::Node * pCar = loader.Load3dFile(strPath, true);
+    osg::ref_ptr<osg::Node> pCar = loader.Load3dFile(strPath, true);
 
     osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
     transform1->addChild(pCar);
 
 
     SDCarShader::initiateShaderProgram();
-    this->shader = new SDCarShader(pCar);
+    this->shader = new SDCarShader(pCar.get());
 
 
-    GfOut("loaded car %d",pCar);
-    this->car_branch = transform1;
+    GfOut("loaded car %d",pCar.get());
+    this->car_branch = transform1.get();
 
     this->car_branch->addChild(wheels.initWheels(car,handle));
     

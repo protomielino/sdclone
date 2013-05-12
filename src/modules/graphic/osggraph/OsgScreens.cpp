@@ -503,6 +503,7 @@ SDScreens::~SDScreens()
 {
     root->removeChildren(0, root->getNumChildren());
     root = NULL;
+
     for (unsigned i=0;i< Screens.size();i++)
     {
         delete Screens[i];
@@ -512,4 +513,5 @@ SDScreens::~SDScreens()
     //delete viewer->getSceneData();
 
     delete viewer;
+    viewer = NULL;
 }

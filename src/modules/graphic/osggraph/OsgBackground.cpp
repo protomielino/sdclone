@@ -54,7 +54,7 @@ osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ,
                          	
 	if (!land)
 	{
-		osg::Node *m_background = osgDB::readNodeFile("background-sky.ac");
+        osg::ref_ptr<osg::Node> m_background = osgDB::readNodeFile("background-sky.ac");
 		//_background_transform->setMatrix(mat);
 		osg::Matrix t = osg::Matrix::translate(grWrldX /2, grWrldY /2, grWrldZ /2);
 		mat = mat * t;
@@ -63,7 +63,7 @@ osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ,
 	}
 	else
 	{
-		osg::Node *m_background = osgDB::readNodeFile("land.ac");
+        osg::ref_ptr<osg::Node> m_background = osgDB::readNodeFile("land.ac");
 		_background_transform->setMatrix(mat);
 		_background_transform->addChild( m_background );
 	}

@@ -36,7 +36,7 @@
 class SDScreens
 {
     protected:
-        osgViewer::Viewer *viewer;
+        osgViewer::Viewer* viewer;
         std::vector<SDView *> Screens;
         osg::ref_ptr<osg::Group> root;
 
