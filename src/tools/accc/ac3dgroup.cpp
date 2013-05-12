@@ -62,28 +62,28 @@ void loadAndGroup(char *OutputFileName)
     if (fileL0)
     {
         fprintf(stderr, "\nloading file %s\n", fileL0);
-        loadAC(fileL0, NULL, -1);
+        loadAC(fileL0);
         ob0 = root_ob;
         root_ob = NULL;
     }
     if (fileL1)
     {
         fprintf(stderr, "\nloading file %s\n", fileL1);
-        loadAC(fileL1, NULL, -1);
+        loadAC(fileL1);
         ob1 = root_ob;
         root_ob = NULL;
     }
     if (fileL2)
     {
         fprintf(stderr, "\nloading file %s\n", fileL2);
-        loadAC(fileL2, NULL, -1);
+        loadAC(fileL2);
         ob2 = root_ob;
         root_ob = NULL;
     }
     if (fileL3)
     {
         fprintf(stderr, "\nloading file %s\n", fileL3);
-        loadAC(fileL3, NULL, -1);
+        loadAC(fileL3);
         ob3 = root_ob;
         root_ob = NULL;
     }
@@ -96,7 +96,7 @@ void loadAndGroup(char *OutputFileName)
 
     collapseTextures(ob0, ob1, ob2, ob3);
 
-    splitObjects(&ob0);
+    ob0 = splitObjects(ob0);
 
     /* now make groups from ob0 */
 

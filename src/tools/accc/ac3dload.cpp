@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
 
  @author Christophe Guionneau
  @version    $Id$
@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <cstring>
+#include <sstream>
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -82,6 +83,41 @@ ob_t * obCreate()
     return ob;
 }
 
+void obFree(ob_t *o)
+{
+    freez(o->name);
+    freez(o->type);
+    freez(o->texture);
+    freez(o->vertex);
+    freez(o->norm);
+    freez(o->snorm);
+    freez(o->vertexarray);
+    freez(o->vertexarray1);
+    freez(o->vertexarray2);
+    freez(o->vertexarray3);
+    freez(o->textarray);
+    freez(o->textarray1);
+    freez(o->textarray2);
+    freez(o->textarray3);
+}
+
+ob_t * obAppend(ob_t * destob, ob_t * srcob)
+{
+    if(!destob)
+        return srcob;
+    if(!srcob)
+        return destob;
+
+    ob_t * curob = destob;
+
+    while(curob->next != NULL)
+        curob = curob->next;
+
+    curob->next = srcob;
+
+    return destob;
+}
+
 void obInitSpacialExtend(ob_t * ob)
 {
     ob->x_min = ob->y_min = ob->z_min = DBL_MAX;
@@ -121,7 +157,8 @@ void obCreateTextArrays(ob_t * ob)
     const int numEls = ob->numvertice * 2;
     const int elSize = sizeof(tcoord_t);
 
-    ob->textarray = (double *) calloc(numEls, elSize);
+    if(ob->vertexarray)
+        ob->textarray = (double *) calloc(numEls, elSize);
     if(ob->vertexarray1)
         ob->textarray1 = (double *) calloc(numEls, elSize);
     if(ob->vertexarray2)
@@ -145,7 +182,8 @@ void obCreateVertexArrays(ob_t * ob)
 {
     int numEls = ob->numsurf * 3;
 
-    ob->vertexarray = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
+    if(ob->texture)
+        ob->vertexarray = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
 
     if(ob->texture1)
         ob->vertexarray1 = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
@@ -159,8 +197,8 @@ void obCreateVertexArrays(ob_t * ob)
 
 void obCopyTextureNames(ob_t * destob, ob_t * srcob)
 {
-    destob->texture = strdup(srcob->texture);
-
+    if(srcob->texture)
+        destob->texture = strdup(srcob->texture);
     if(srcob->texture1)
         destob->texture1 = strdup(srcob->texture1);
     if(srcob->texture2)
@@ -171,6 +209,7 @@ void obCopyTextureNames(ob_t * destob, ob_t * srcob)
 
 void obSetVertexArraysIndex(ob_t * ob, int vaIdx, int newIndex)
 {
+
     ob->vertexarray[vaIdx].indice = newIndex;
 
     if(ob->vertexarray1)
@@ -342,9 +381,6 @@ ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj, ob_t * tmpob)
     retob->snorm = (point_t*) malloc(size_pts);
     memset(retob->snorm, 0, size_pts);
 
-    retob->name = (char *) malloc(strlen(srcobj->name) + 10);
-    memset(retob->name, 0, strlen(srcobj->name) + 10);
-
     /* assign data */
     createTexChannelArrays(retob, tmpob);
 
@@ -358,19 +394,19 @@ ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj, ob_t * tmpob)
     memcpy(retob->snorm, tmpob->snorm, size_pts);
     memcpy(retob->norm, tmpob->snorm, size_pts);
 
-    retob->texture = strdup(srcobj->texture);
-    if(srcobj->texture1)
-        retob->texture1 = strdup(srcobj->texture1);
-    if(srcobj->texture2)
-        retob->texture2 = strdup(srcobj->texture2);
-    if(srcobj->texture3)
-        retob->texture3 = strdup(srcobj->texture3);
-
-    sprintf(retob->name, "%s_s_%d", srcobj->name, splitid);
+    obCopyTextureNames(retob, srcobj);
 
     retob->numsurf = numtri;
     retob->numvert = numvert;
     retob->numvertice = numvert;
+
+    retob->type = strdup(srcobj->type);
+
+    /* special handling of name */
+    std::stringstream namestream;
+
+    namestream << srcobj->name << "_s_" << splitid;
+    retob->name = strdup(namestream.str().c_str());
 
     return retob;
 }
@@ -390,10 +426,13 @@ void copySingleVertexData(ob_t * destob, ob_t * srcob,
     tcoord_t * srcvert;
 
     /* channel 0 */
-    srcvert = &(srcob->vertexarray[srcvertidx]);
+    if(destob->textarray != NULL)
+    {
+        srcvert = &(srcob->vertexarray[srcvertidx]);
 
-    copyTexChannel(destob->textarray, destob->vertexarray, srcvert,
-            storedptidx, destptidx, destvertidx);
+        copyTexChannel(destob->textarray, destob->vertexarray, srcvert,
+                storedptidx, destptidx, destvertidx);
+    }
 
     /* channel 1 */
     if(destob->textarray1 != NULL)
@@ -651,36 +690,35 @@ int findIndice(int indice, int *oldva, int n)
     return -1;
 }
 
-int terrainSplitOb(ob_t **object)
+ob_t* terrainSplitOb(ob_t * object)
 {
     ob_t * tob = NULL;
     ob_t * tob0 = NULL;
-    ob_t * tobnext = (*object)->next;
 
-    printf("terrain splitting %s \n", (*object)->name);
-    if (((*object)->x_max - (*object)->x_min) < 2 * distSplit)
+    printf("terrain splitting %s \n", object->name);
+    if ((object->x_max - object->x_min) < 2 * distSplit)
         return 0;
-    if (((*object)->y_max - (*object)->y_min) < 2 * distSplit)
+    if ((object->y_max - object->y_min) < 2 * distSplit)
         return 0;
-    printf("terrain splitting %s started\n", (*object)->name);
+    printf("terrain splitting %s started\n", object->name);
 
-    int numSurf = (*object)->numsurf;
+    int numSurf = object->numsurf;
     int *oldSurfToNewObjMap = (int *) calloc(numSurf, sizeof(int));
 
     int numNewObjs = 0;
 
-    for (double curXPos = (*object)->x_min; curXPos < (*object)->x_max; curXPos += distSplit)
+    for (double curXPos = object->x_min; curXPos < object->x_max; curXPos += distSplit)
     {
-        for (double curYPos = (*object)->y_min; curYPos < (*object)->y_max; curYPos += distSplit)
+        for (double curYPos = object->y_min; curYPos < object->y_max; curYPos += distSplit)
         {
 
             int numTriFound = 0;
             int found_a_tri = 0;
 
-            for (int curObjSurf = 0; curObjSurf < (*object)->numsurf; curObjSurf++)
+            for (int curObjSurf = 0; curObjSurf < object->numsurf; curObjSurf++)
             {
                 point_t surfCentroid;
-                computeObSurfCentroid(*object, curObjSurf, &surfCentroid);
+                computeObSurfCentroid(object, curObjSurf, &surfCentroid);
 
                 if (surfCentroid.x >= curXPos && surfCentroid.x < curXPos + distSplit)
                 {
@@ -701,13 +739,13 @@ int terrainSplitOb(ob_t **object)
         }
 
     }
-    printf("found in %s : %d subsurfaces \n", (*object)->name, numNewObjs);
+    printf("found in %s : %d subsurfaces \n", object->name, numNewObjs);
 
     for (int curNewObj = 0; curNewObj < numNewObjs; curNewObj++)
     {
         int numNewSurf = 0;
         /* find the number of surface */
-        for (int curSurf = 0; curSurf < (*object)->numsurf; curSurf++)
+        for (int curSurf = 0; curSurf < object->numsurf; curSurf++)
         {
             if (oldSurfToNewObjMap[curSurf] != curNewObj)
                 continue;
@@ -719,27 +757,30 @@ int terrainSplitOb(ob_t **object)
         tob = obCreate();
 
         tob->numsurf = numNewSurf;
-        tob->attrSurf = (*object)->attrSurf;
-        tob->attrMat = (*object)->attrMat;
-        if ((*object)->data)
-            tob->data = strdup((*object)->data);
-        tob->name = (char *) malloc(strlen((*object)->name) + 10);
-        tob->type = strdup((*object)->type);
-        sprintf(tob->name, "%s__split__%d", (*object)->name, curNewObj);
+        tob->attrSurf = object->attrSurf;
+        tob->attrMat = object->attrMat;
+        if (object->data)
+            tob->data = strdup(object->data);
+        tob->type = strdup(object->type);
 
-        obCopyTextureNames(tob, *object);
+        /* special name handling */
+        std::stringstream namestream;
+        namestream << object->name << "__split__" << curNewObj;
+        tob->name = strdup(namestream.str().c_str());
+
+        obCopyTextureNames(tob, object);
 
         /* store the index data in tob's vertexarray */
 
         obCreateVertexArrays(tob);
 
         int curNewSurf = 0;
-        for (int curSurf = 0; curSurf < (*object)->numsurf; curSurf++)
+        for (int curSurf = 0; curSurf < object->numsurf; curSurf++)
         {
             if (oldSurfToNewObjMap[curSurf] != curNewObj)
                 continue;
 
-            copyVertexArraysSurface(tob, curNewSurf, *object, curSurf);
+            copyVertexArraysSurface(tob, curNewSurf, object, curSurf);
 
             curNewSurf++;
         }
@@ -752,14 +793,14 @@ int terrainSplitOb(ob_t **object)
          * we don't know the size, so we allocate the same number as in the
          * source object.
          */
-        point_t* pttmp = (point_t*) calloc((*object)->numvertice, sizeof(point_t));
-        point_t* snorm = (point_t*) calloc((*object)->numvertice, sizeof(point_t));
+        point_t* pttmp = (point_t*) calloc(object->numvertice, sizeof(point_t));
+        point_t* snorm = (point_t*) calloc(object->numvertice, sizeof(point_t));
 
         /* storedPtIdxArr: keep a list of the indices of points stored in the new object.
          * If an index is contained in storedPtIdxArr we don't store the point itself,
          * but only the index in the vertexarray of the new object.
          */
-        int* storedPtIdxArr = (int*) calloc((*object)->numvertice, sizeof(int));
+        int* storedPtIdxArr = (int*) calloc(object->numvertice, sizeof(int));
 
         int curNewPtIdx = 0;
         for (int curNewIdx = 0; curNewIdx < numNewSurf * 3; curNewIdx++)
@@ -771,8 +812,8 @@ int terrainSplitOb(ob_t **object)
             {
                 storedPtIdxArr[curNewPtIdx] = idx;
                 storedIdx = curNewPtIdx;
-                copyPoint(&(pttmp[curNewPtIdx]), &((*object)->vertex[idx]));
-                copyPoint(&(snorm[curNewPtIdx]), &((*object)->norm[idx]));
+                copyPoint(&(pttmp[curNewPtIdx]), &(object->vertex[idx]));
+                copyPoint(&(snorm[curNewPtIdx]), &(object->norm[idx]));
                 curNewPtIdx++;
             }
 
@@ -804,25 +845,15 @@ int terrainSplitOb(ob_t **object)
 
         obInitSpacialExtend(tob);
 
-        if (tob0 == NULL)
-        {
-            tob0 = tob;
-            tob0->next = tobnext;
-        }
-        else
-        {
-            tob->next = tob0;
-            tob0 = tob;
-        }
+        // prepend the new object to the list
+        tob0 = obAppend(tob, tob0);
 
     }
-    if (tob0 != NULL)
-        *object = tob0;
 
-    return 1;
+    return tob0;
 }
 
-int splitOb(ob_t **object)
+ob_t* splitOb(ob_t *object)
 {
     int *oldva = 0;
     int curtri = 0;
@@ -849,11 +880,10 @@ int splitOb(ob_t **object)
     ob_t * tob0 = NULL;
     int numob = 0;
     int firstTri = 0;
-    ob_t * tobnext = (*object)->next;
     int atleastone = 0;
     int curvert = 0;
 
-    orignumtris = (*object)->numsurf;
+    orignumtris = object->numsurf;
     orignumverts = orignumtris * 3;
 
     tri = (int *) calloc(orignumtris, sizeof(int));
@@ -864,7 +894,7 @@ int splitOb(ob_t **object)
     workob->snorm = (point_t *) calloc(orignumverts, sizeof(point_t));
 
     // create texture channels
-    createTexChannelArrays(workob, *object);
+    createTexChannelArrays(workob, object);
 
     while (mustcontinue == 1)
     {
@@ -890,7 +920,7 @@ int splitOb(ob_t **object)
                 /** find vertices of the triangle */
                 for(i = 0; i < 3; i++)
                 {
-                    copyTexCoord(&curvertex[i], &((*object)->vertexarray[curvert+i]));
+                    copyTexCoord(&curvertex[i], &(object->vertexarray[curvert+i]));
 
                     curstoredidx[i] = findIndice(curvertex[i].indice, oldva, numptstored);
                 }
@@ -934,17 +964,17 @@ int splitOb(ob_t **object)
 
                         if (curstoredidx[i] == -1)
                         {
-                            copyPoint(&(workob->vertex[numptstored]), &((*object)->vertex[curvertex[i].indice]));
-                            copyPoint(&(workob->snorm[numptstored]), &((*object)->norm[curvertex[i].indice]));
+                            copyPoint(&(workob->vertex[numptstored]), &(object->vertex[curvertex[i].indice]));
+                            copyPoint(&(workob->snorm[numptstored]), &(object->norm[curvertex[i].indice]));
 
-                            clearSavedInVertexArrayEntry(*object, curvert+i);
+                            clearSavedInVertexArrayEntry(object, curvert+i);
 
                             oldva[numptstored] = curvertex[i].indice; /* remember the value of the vertice already saved */
                             curstoredidx[i] = numptstored;
                             numptstored++;
                         }
 
-                        copySingleVertexData(workob, *object, curstoredidx[i],
+                        copySingleVertexData(workob, object, curstoredidx[i],
                                 oldnumptstored, numvertstored, curvert+i);
 
                         numvertstored++;
@@ -965,33 +995,23 @@ int splitOb(ob_t **object)
         workob->numvertice = numptstored;
         workob->numsurf = numvertstored/3;
 
-        tob = createObjectSplitCopy(numob++, *object, workob);
+        tob = createObjectSplitCopy(numob++, object, workob);
 
         attrSurf = tob->attrSurf;
         attrMat = tob->attrMat;
 
-        if (tob0 == NULL)
-        {
-            tob0 = tob;
-            tob0->next = tobnext;
-        }
-        else
-        {
-            tob->next = tob0;
-            tob0 = tob;
-        }
+        // prepend the new object to the list
+        tob0 = obAppend(tob, tob0);
 
         printf("numtri = %d on orignumtris =%d \n", numtristored, orignumtris);
 
     } // while (mustcontinue == 1)
 
-    *object = tob0;
-
     freez(tri);
     freez(oldva);
-    freeobject(workob);
+    obFree(workob);
 
-    return 0;
+    return tob0;
 }
 
 int doKids(char *Line, ob_t *object, mat_t *material)
@@ -1029,13 +1049,16 @@ int doKids(char *Line, ob_t *object, mat_t *material)
                 numrefstotal * 2 * sizeof(double));
         memcpy(object->next->surfrefs, tmpsurf, numrefs * sizeof(int));
         object->next->numvertice = numvertice;
+
         if ((object->next->name) == NULL)
         {
-            object->next->name = (char*) malloc(
-                    sizeof(char) + strlen(tmpname) + 5);
-            sprintf(object->next->name, "%s%d", tmpname, tmpIndice);
+            std::stringstream namestream;
+            namestream << tmpname << tmpIndice;
+            object->next->name = strdup(namestream.str().c_str());
+
             tmpIndice++;
         }
+
         if ((typeConvertion == _AC3DTOAC3DS
                 && (extendedStrips == 1 || extendedTriangles == 1))
                 || typeConvertion == _AC3DTOAC3DGROUP
@@ -1104,12 +1127,6 @@ int doName(char *Line, ob_t *object, mat_t *material)
     }
     sprintf(name, "%s", name2);
 
-    if (strlen(name) > 11)
-    {
-        fprintf(stderr, "truncating object name %s ", name);
-        name[11] = '\0';
-        fprintf(stderr, " to %s \n", name);
-    }
     /*sprintf(name,"terrain%d",tmpIndice2++);*/
     object->next->name = strdup(name);
     sprintf(tmpname, "%s", name);
@@ -1309,11 +1326,7 @@ int doRefs(char *Line, ob_t *object, mat_t *material)
         return (-1);
     }
     sscanf(p, "%d", &refs);
-    if (refs != 3)
-    {
-        fprintf(stderr, " ERROR : refs !=3\n");
-        exit(-1);
-    }
+
     numrefstotal += refs;
     numrefsFound = 1;
     tmpsurf[numrefs] = refs;
@@ -1392,41 +1405,62 @@ bool isTerrainSplit(ob_t* object)
     return false;
 }
 
-/** Go through all given objects, check whether a normal split or a terrain
- *  split is necessary and execute the split.
- */
-void splitObjects(ob_t** object)
+ob_t * splitObjects(ob_t* object)
 {
     if (NULL == object)
-        return;
+        return NULL;
 
-    ob_t ** current_ob = object;
+    /* The returned object. Contains all objects from the given
+     * object, split and non-split objects.
+     */
+    ob_t* newob = NULL;
 
-    for (; *current_ob != NULL; current_ob = &(**current_ob).next)
+    ob_t* current_ob = object;
+    while(current_ob != NULL)
     {
-        const char* objname = (**current_ob).name;
+        const char* objname = current_ob->name;
+        if(!objname)
+            objname = "";
 
-        if (isObjectSplit(*current_ob))
+        ob_t* next_ob = current_ob->next; // remember next one, cuz we'll modify current_ob
+        ob_t* splitob = NULL;
+
+        if (isObjectSplit(current_ob))
         {
-            printf(
-                    "Found in %s, a duplicate coord with not the same u,v, split is required\n",
-                    objname);
-            splitOb(current_ob);
-        }
-        else
-            printf("No split required for %s\n", objname);
+            printf("Found in %s, a duplicate coord with not the same u,v, split is required\n",
+                   objname);
 
-        if (isTerrainSplit(*current_ob))
+            splitob = splitOb(current_ob);
+        }
+        else if (isTerrainSplit(current_ob))
         {
             printf("Splitting surfaces of %s\n", objname);
-            terrainSplitOb(current_ob);
+
+            splitob = terrainSplitOb(current_ob);
+        }
+
+        if(splitob != NULL)
+        {
+            obFree(current_ob);
+            newob = obAppend(newob, splitob);
         }
         else
-            printf("No terrain split for %s\n", objname);
+        {
+            printf("No split required for %s\n", objname);
+
+            // Append only the single object, not the whole list.
+            // The others will be appended in this function one by one.
+            current_ob->next = NULL;
+            newob = obAppend(newob, current_ob);
+        }
+
+        current_ob = next_ob;
     }
+
+    return newob;
 }
 
-int loadAC(char * inputFilename, char * outputFilename, int saveIn)
+int loadAC(char * inputFilename, char * outputFilename)
 {
     /* saveIn : 0= 3ds , 1= obj , 2=ac3d grouped (track) , 3 = ac3d strips (cars) */
     char Line[256];
@@ -1505,126 +1539,44 @@ int loadAC(char * inputFilename, char * outputFilename, int saveIn)
     fclose(file);
     if(ret != 0)
     {
-        freeobject(current_ob);
+        obFree(current_ob);
         return ret;
     }
 
     root_ob = current_ob;
 
     if(splitObjectsDuringLoad != 0)
-        splitObjects(&root_ob);
+        root_ob = splitObjects(root_ob);
 
-    if (saveIn == -1)
-        return (0);
+    // --- perform file output ---
 
-    if (saveIn == 0)
+    if(!outputFilename)
+        return 0;
+
+    if (typeConvertion == _AC3DTOOBJ)
     {
-#ifdef _3DS
-        saveObin3DS(outputFilename, root_ob);
-#endif
+        computeSaveOBJ(outputFilename, root_ob);
     }
-    else if (saveIn == 1)
+    else if (typeConvertion == _AC3DTOAC3DM)
+    {
         computeSaveAC3DM(outputFilename, root_ob);
-    else if (saveIn == 3)
+    }
+    else if (typeConvertion == _AC3DTOAC3DS)
+    {
         computeSaveAC3DStrip(outputFilename, root_ob);
-    else
-        computeSaveOBJ(outputFilename, root_ob);
-    return (0);
-}
-
-int loadACo(char * inputFilename, char * outputFilename, int saveIn)
-{
-    char Line[256];
-    int ret = 0;
-    int (*doVerb)(char * Line, ob_t *object, mat_t * material);
-    FILE * file;
-    ob_t * current_ob;
-    mat_t * current_material;
-
-    if ((file = fopen(inputFilename, "r")) == NULL)
-    {
-        fprintf(stderr, "failed to open %s\n", inputFilename);
-        return (-1);
     }
-    if (fgets(Line, 256, file) == NULL)
+    else if (typeConvertion == _AC3DTOAC3D)
     {
-        fprintf(stderr, "failed to read first line of the file\n");
-        return (-1);
-    }
-    if (strnicmp(Line, AC3D, strlen(AC3D)))
-    {
-        fprintf(stderr, "unknown format %s \n", Line);
-        return (-1);
-    }
-
-    current_ob = root_ob = (ob_t*) malloc(sizeof(ob_t));
-    current_material = root_material = (mat_t *) malloc(sizeof(mat_t));
-    memset(current_ob, '\0', sizeof(ob_t));
-    memset(current_material, '\0', sizeof(mat_t));
-    root_ob->name = strdup("root");
-    root_material->name = strdup("root");
-    fprintf(stderr, "starting loading ...\n");
-    while (fgets(Line, sizeof(Line), file))
-    {
-        int i = 0;
-        /*fprintf(stderr,"parsing line: %s", Line);*/
-        doVerb = NULL;
-        while (1)
-        {
-            if (stricmp("END", verbTab[i].verb) == 0)
-                break;
-            if (strnicmp(Line, verbTab[i].verb, strlen(verbTab[i].verb)) == 0)
-            {
-                doVerb = verbTab[i].doVerb;
-                break;
-            }
-            i++;
-        }
-        if (numvertFound == 1 && doVerb == NULL)
-        {
-            ret = doGetVertex(Line, current_ob, current_material);
-            if(ret != 0)
-                break;
-        }
-        else if (numrefsFound == 1 && doVerb == NULL)
-        {
-            ret = doGetSurf(Line, current_ob, current_material);
-            if(ret != 0)
-                break;
-        }
-        else
-        {
-            if (doVerb == NULL)
-            {
-                fprintf(stderr, " Unknown verb %s\n", Line);
-                return (-1);
-            }
-            numvertFound = 0;
-            numrefsFound = 0;
-            ret = doVerb(Line, current_ob, current_material);
-            if(ret != 0)
-                break;
-        }
-    }
-    fclose(file);
-
-    if(ret != 0)
-    {
-        freeobject(current_ob);
-        return ret;
-    }
-
-    root_ob = current_ob;
-
-    if(splitObjectsDuringLoad != 0)
-        splitObjects(&root_ob);
-
-    printf("\nobjects loaded\nresaving in AC3D\n");
-    if (saveIn == 0)
         computeSaveAC3D(outputFilename, root_ob);
-    else
-        computeSaveOBJ(outputFilename, root_ob);
-    return (0);
+    }
+#ifdef _3DS
+    else if (typeConvertion == _AC3DTO3DS)
+    {
+        saveObin3DS(outputFilename, root_ob);
+    }
+#endif
+
+    return 0;
 }
 
 #ifdef _3DS
@@ -5028,7 +4980,7 @@ int mergeSplitted(ob_t **object)
                 tobP->next = tob0->next;
                 oo = tob0;
                 tob0 = tob0->next;
-                freeobject(oo);
+                obFree(oo);
                 k++;
                 continue;
             }
@@ -5155,25 +5107,6 @@ int mergeSplitted(ob_t **object)
     }
 
     return reduced;
-}
-
-int freeobject(ob_t *o)
-{
-    freez(o->name);
-    freez(o->type);
-    freez(o->texture);
-    freez(o->vertex);
-    freez(o->norm);
-    freez(o->snorm);
-    freez(o->vertexarray);
-    freez(o->vertexarray1);
-    freez(o->vertexarray2);
-    freez(o->vertexarray3);
-    freez(o->textarray);
-    freez(o->textarray1);
-    freez(o->textarray2);
-    freez(o->textarray3);
-    return 0;
 }
 
 int findPoint(point_t * vertexArray, int sizeVertexArray, point_t * theVertex)

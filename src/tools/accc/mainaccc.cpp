@@ -342,42 +342,22 @@ int main(int argc, char **argv)
     // fake_argv[2] = NULL;
 
     init_args(argc, argv);
-    extern int loadACo(char * inputFilename, char * outputFilename, int saveIn);
-    extern int loadAC(char * inputFilename, char * outputFilename, int saveIn);
 #ifdef _3DS
     extern int load3ds( char * inputFilename, char * outputFilename);
 #endif
 
-    if (typeConvertion == _AC3DTO3DS)
-    {
-        loadAC(InputFileName, OutputFileName, 0);
-    }
-    else if (typeConvertion == _3DSTOAC3D)
-    {
-#ifdef _3DS
-        load3ds( InputFileName, OutputFileName);
-#endif
-    }
-    else if (typeConvertion == _AC3DTOAC3D)
-    {
-        loadACo(InputFileName, OutputFileName, 0);
-    }
-    else if (typeConvertion == _AC3DTOOBJ)
-    {
-        loadAC(InputFileName, OutputFileName, 1);
-    }
-    else if (typeConvertion == _AC3DTOAC3DM)
-    {
-        loadAC(InputFileName, OutputFileName, 2);
-    }
-    else if (typeConvertion == _AC3DTOAC3DS)
-    {
-        loadAC(InputFileName, OutputFileName, 3);
-    }
-    else if (typeConvertion == _AC3DTOAC3DGROUP)
+    if (typeConvertion == _AC3DTOAC3DGROUP)
     {
         loadAndGroup(OutputFileName);
     }
+#ifdef _3DS
+    else if (typeConvertion == _3DSTOAC3D)
+    {
+        load3ds( InputFileName, OutputFileName);
+    }
+#endif
+    else
+        loadAC(InputFileName, OutputFileName);
 
     return 0;
 }
