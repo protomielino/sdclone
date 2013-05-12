@@ -75,6 +75,7 @@ SDSky::~SDSky( void )
     delete moon;
     delete planets;
     delete stars;
+    pre_root->removeChild(0, pre_root->getNumChildren());
     //delete pre_transform;
     //delete post_root;
 }

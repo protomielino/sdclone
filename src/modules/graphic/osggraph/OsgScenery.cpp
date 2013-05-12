@@ -45,17 +45,17 @@ SDScenery::SDScenery(void)
     grWrldY = 0;
     grWrldZ = 0;
     grWrldMaxSize = 0;
-        _max_visibility = 0;
-        _nb_cloudlayer = 0;
-        _DynamicSkyDome = 0;
-        _SkyDomeDistance = 0;
-        _SkyDomeDistThresh = 12000;
+    _max_visibility = 0;
+    _nb_cloudlayer = 0;
+    _DynamicSkyDome = 0;
+    _SkyDomeDistance = 0;
+    _SkyDomeDistThresh = 12000;
 
 	_bgtype = false;
 	_bgsky =  false;
 
-	_scenery = new osg::Group;
-	_background = new osg::Group;
+    _scenery = NULL;
+    _background = NULL;
 	//_spectators = 0;
 	//_trees = 0;
 	//_pits = 0;
@@ -125,7 +125,7 @@ void SDScenery::LoadScene(tTrack *track)
             osg::ref_ptr<osg::StateSet> bgstate = bg->getOrCreateStateSet();
             bgstate->setRenderBinDetails(-1, "RenderBin");
             //bg->getOrCreateStateSet()->setRenderingHint( osg::StateSet::OPAQUE_BIN );
-            _scenery->addChild(bg);
+            _scenery->addChild(bg.get());
 			GfOut("Background loaded\n");
 		}
 	}
@@ -164,7 +164,7 @@ void SDScenery::LoadScene(tTrack *track)
                      			 0.0f,  0.0f, 0.0f, 1.0f);
             rot->setMatrix(mat);
             rot->addChild(pTrack);
-            _scenery->addChild(rot);
+            _scenery->addChild(rot.get());
         }
     		
         _scenery->addChild(pTrack.get());
@@ -221,15 +221,15 @@ bool SDScenery::LoadTrack(std::string strTrack)
 	
 	std::string strTPath = GetDataDir();
 	snprintf(buf, 4096, "data/textures/");
-    	strTPath += buf;
-    	loader.AddSearchPath(strTPath);
+    strTPath += buf;
+    loader.AddSearchPath(strTPath);
     	
     osg::ref_ptr<osg::Node> pTrack = loader.Load3dFile(strTrack, false);
 
 	if (pTrack)
 	{
         pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
-		_scenery->addChild(pTrack);		
+        _scenery->addChild(pTrack.get());
 	}
 	else
 		return false;

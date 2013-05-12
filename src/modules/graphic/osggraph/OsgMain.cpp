@@ -68,7 +68,7 @@ void * getScenery()
 //static osg::ref_ptr<osg::Group> m_sceneroot = NULL;
 //static osg::ref_ptr<osg::Group> m_carroot = NULL;
 static osg::Timer m_timer;
-//static osg::Timer_t m_start_tick;
+static osg::Timer_t m_start_tick;
 
 int grMaxTextureUnits = 0;
 
@@ -315,6 +315,7 @@ void shutdownCars(void)
 {
     cars->unLoad();
     delete cars;
+    cars = NULL;
     //delete m_carroot;
 
 /*	int i;
@@ -372,12 +373,9 @@ int initTrack(tTrack *track)
 
 	scenery = new SDScenery;
 	render = new SDRender;
-    //sceneroot = new osg::Group;
-    //m_sceneroot = new osg::Group;
-    //m_sceneroot->removeChildren(0, m_sceneroot->getNumChildren());
+
     scenery->LoadScene(track);
     render->Init(track);
-    //m_sceneroot->addChild(render->getRoot());
 
     return 0;
 }
@@ -409,6 +407,7 @@ void shutdownTrack(void)
 {
     scenery->ShutdownScene();
     delete scenery;
+    scenery = NULL;
     // Do the real track termination job.
     osgDB::Registry::instance()->clearObjectCache();
     //m_sceneroot = NULL;
@@ -426,6 +425,8 @@ shutdownView(void)
 {
     delete screens;
     delete render;
+    screens = NULL;
+    render = NULL;
   //  delete viewer;
 }
 

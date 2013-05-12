@@ -78,9 +78,9 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     Screens.insert(Screens.end(),view);
 
     root = new osg::Group;
-    root->addChild(m_sceneroot);
+    root->addChild(m_sceneroot.get());
     root->addChild(mirrorCam);
-    mirrorCam->addChild(m_sceneroot);
+    mirrorCam->addChild(m_sceneroot.get());
 
     //adding all otherer cams
     osg::ref_ptr<osg::Camera> screenCam;
@@ -107,11 +107,11 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
 
         Screens.insert(Screens.end(),view);
 
-        root->addChild(screenCam);
-        root->addChild(mirrorCam);
+        root->addChild(screenCam.get());
+        root->addChild(mirrorCam.get());
     }
 
-    viewer->setSceneData(root);
+    viewer->setSceneData(root.get());
     viewer->realize();
 }
 
