@@ -340,3 +340,9 @@ void SDCars::updateShadingParameters(osg::Vec3f eye,osg::Matrixf modelview){
         (*it)->updateShadingParameters(eye,modelview);
     }
 }
+
+void SDCars::unLoad()
+{
+    cars_branch->removeChildren(0, cars_branch->getNumChildren());
+    cars_branch = NULL;
+}

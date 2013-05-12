@@ -32,6 +32,8 @@ SDBackground::SDBackground(void)
 
 SDBackground::~SDBackground(void)
 {
+    _background_transform->removeChildren(0, _background_transform->getNumChildren());
+    _background_transform = NULL;
 }
 
 osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const std::string TrackPath)
@@ -42,9 +44,9 @@ osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ,
 	
 	osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
    	pathList.push_back(TrackPath);
-    	pathList.push_back(LocalPath+"data/objects");
-    	pathList.push_back(LocalPath+"data/textures");
-    	osgDB::Registry::instance()->setDataFilePathList(pathList);	
+    pathList.push_back(LocalPath+"data/objects");
+    pathList.push_back(LocalPath+"data/textures");
+    osgDB::Registry::instance()->setDataFilePathList(pathList);
 	
 	_background_transform = new osg::MatrixTransform;
 	osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,

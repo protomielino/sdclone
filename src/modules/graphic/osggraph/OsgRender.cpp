@@ -87,8 +87,15 @@ SDRender::SDRender(void)
 
 SDRender::~SDRender(void)
 {
-    delete thesky;
+    m_scene->removeChildren(0, m_scene->getNumChildren());
+    m_CarRoot->removeChildren(0, m_CarRoot->getNumChildren());
+    skyGroup->removeChildren(0, skyGroup->getNumChildren());
+    m_RealRoot->removeChildren(0, m_RealRoot->getNumChildren());
     m_scene = NULL;
+    m_CarRoot = NULL;
+    skyGroup = NULL;
+    m_RealRoot = NULL;
+    delete thesky;
 }
 
 SDSky * SDRender::getSky()

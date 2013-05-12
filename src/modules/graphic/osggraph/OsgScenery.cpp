@@ -208,6 +208,7 @@ void SDScenery::LoadGraphicsOptions()
 void SDScenery::ShutdownScene(void)
 {
 	_scenery->removeChildren(0, _scenery->getNumChildren());
+    _scenery = NULL;
 }
 
 bool SDScenery::LoadTrack(std::string strTrack)

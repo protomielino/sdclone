@@ -501,6 +501,8 @@ void SDScreens::changeCamera(long p)
 
 SDScreens::~SDScreens()
 {
+    root->removeChildren(0, root->getNumChildren());
+    root = NULL;
     for (unsigned i=0;i< Screens.size();i++)
     {
         delete Screens[i];

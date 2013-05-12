@@ -313,6 +313,7 @@ int refresh(tSituation *s)
 
 void shutdownCars(void)
 {
+    cars->unLoad();
     delete cars;
     //delete m_carroot;
 
@@ -364,14 +365,14 @@ int initTrack(tTrack *track)
 
 	// Now, do the real track loading job.
 	grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    osg::ref_ptr<osg::Group> sceneroot = NULL;
+    //osg::ref_ptr<osg::Group> sceneroot = NULL;
     //m_sceneroot = NULL;
 	/*if (m_NbActiveScreens > 0)
 		return grLoadScene(track);*/
 
 	scenery = new SDScenery;
 	render = new SDRender;
-    sceneroot = new osg::Group;
+    //sceneroot = new osg::Group;
     //m_sceneroot = new osg::Group;
     //m_sceneroot->removeChildren(0, m_sceneroot->getNumChildren());
     scenery->LoadScene(track);
@@ -406,8 +407,8 @@ int  initCars(tSituation *s)
 
 void shutdownTrack(void)
 {
+    scenery->ShutdownScene();
     delete scenery;
-    //m_sceneroot->removeChildren(0, m_sceneroot->getNumChildren());
     // Do the real track termination job.
     osgDB::Registry::instance()->clearObjectCache();
     //m_sceneroot = NULL;
