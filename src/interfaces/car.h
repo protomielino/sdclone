@@ -301,6 +301,7 @@ typedef struct {
 	tdble Fx;
 	tdble Fy;
 	tdble Fz;
+	tdble effectiveMu;
 } tWheelState;
 /* structure access */
 #define _ride(i)	priv.wheel[i].relPos.z
@@ -316,6 +317,7 @@ typedef struct {
 #define _tyreT_mid(i) priv.wheel[i].temp_mid
 #define _tyreT_out(i) priv.wheel[i].temp_out
 #define _tyreCondition(i) priv.wheel[i].condition
+#define _tyreEffMu(i) priv.wheel[i].effectiveMu
 
 #define MAX_GEARS	10	/* including reverse and neutral */
 
@@ -586,7 +588,11 @@ typedef struct CarElt
 #define PRM_LOADFMAX		"load factor max"
 #define PRM_LOADFMIN		"load factor min"
 #define PRM_OPLOAD		"operating load"
-
+#define PRM_OPTTEMP		"optimal temperature"
+#define PRM_COLDMUFACTOR	"cold mu factor"
+#define PRM_HEATINGMULT		"heating multiplier"
+#define PRM_AIRCOOLINGMULT	"air cooling multiplier"
+#define PRM_SPEEDCOOLINGMULT	"speed cooling multiplier"
 
 #define PRM_SPR			"spring"
 #define PRM_SUSPCOURSE		"suspension course"
@@ -775,12 +781,14 @@ typedef struct CarElt
 #define PRM_SLOWGRIP		"fixed low speed grip"
 #define PRM_REALGEARCHANGE	"realistic gear change"
 #define PRM_REVLIMIT		"realistic rev limiter"
+#define PRM_TIRETEMPDEG		"tire temperature and degradation"
 #define VAL_YES			"yes"
 #define VAL_NO			"no"
 #define FEAT_AEROTOCG		0x01 //shift aero coordinates with the CG
 #define FEAT_SLOWGRIP		0x02 //fix magic formula divergence at low speeds
 #define FEAT_REALGEARCHANGE	0x04 //neutral between old and new gears without autoclutch
 #define FEAT_REVLIMIT		0x08 //rev drop when hitting the limit
+#define FEAT_TIRETEMPDEG	0x10 //tire temperature and degradation
 
 #endif /* __CARV1_H__ */ 
 
