@@ -24,6 +24,9 @@ static const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_RE
 static const char *SuspSect[4] = {SECT_FRNTRGTSUSP, SECT_FRNTLFTSUSP, SECT_REARRGTSUSP, SECT_REARLFTSUSP};
 static const char *BrkSect[4] = {SECT_FRNTRGTBRAKE, SECT_FRNTLFTBRAKE, SECT_REARRGTBRAKE, SECT_REARLFTBRAKE};
 
+tdble Tair = 273; //air temperature in K
+tdble Ttrack = 283; //track temperature in K
+
 void
 SimWheelConfig(tCar *car, int index)
 {
@@ -80,6 +83,16 @@ SimWheelConfig(tCar *car, int index)
 	wheel->relPos.z = wheel->radius - wheel->susp.spring.x0;
 	wheel->relPos.ay = wheel->relPos.az = 0.0f;
 	wheel->steer = 0.0f;
+	
+	/* temperature and degradation */
+	wheel->Ttire = Tair;
+	wheel->Topt = GfParmGetNum(hdle, WheelSect[index], PRM_OPTTEMP, (char*)NULL, 350.0f);
+	tdble coldmufactor = GfParmGetNum(hdle, WheelSect[index], PRM_COLDMUFACTOR, (char*)NULL, 1.0f);
+	coldmufactor = MIN(MAX(coldmufactor, 0.0f), 1.0f);
+	wheel->muTmult = (1 - coldmufactor) / ((wheel->Topt - Tair) * (wheel->Topt - Tair));
+	wheel->heatingm = GfParmGetNum(hdle, WheelSect[index], PRM_HEATINGMULT, (char*)NULL, 6e-5);
+	wheel->aircoolm = GfParmGetNum(hdle, WheelSect[index], PRM_AIRCOOLINGMULT, (char*)NULL, 12e-4);
+	wheel->speedcoolm = GfParmGetNum(hdle, WheelSect[index], PRM_SPEEDCOOLINGMULT, (char*)NULL, 0.25);
 
 	/* components */
 	SimSuspConfig(hdle, SuspSect[index], &(wheel->susp), wheel->weight0, x0);
@@ -158,6 +171,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 	tdble s, sa, sx, sy; // slip vector
 	tdble stmp, F, Bx;
 	tdble mu;
+	tdble tireCond = 1.0;
 	tdble reaction_force = 0.0f;
 	wheel->state = 0;
 
@@ -245,6 +259,12 @@ void SimWheelUpdateForce(tCar *car, int index)
 
 	// load sensitivity
 	mu = wheel->mu * (wheel->lfMin + (wheel->lfMax - wheel->lfMin) * exp(wheel->lfK * wheel->forces.z / wheel->opLoad));
+	
+	//temperature and degradation
+	if (car->features & FEAT_TIRETEMPDEG) {
+		tireCond = 1 - wheel->muTmult * (wheel->Ttire - wheel->Topt)*(wheel->Ttire - wheel->Topt);
+		mu *= tireCond;
+	}
 
 	F *= wheel->forces.z * mu * wheel->trkPos.seg->surface->kFriction;	/* coeff */
 
@@ -280,6 +300,24 @@ void SimWheelUpdateForce(tCar *car, int index)
 	car->carElt->_wheelSlipSide(index) = sy*v;
 	car->carElt->_wheelSlipAccel(index) = sx*v;
 	car->carElt->_reaction[index] = reaction_force;
+	car->carElt->_tyreEffMu(index) = mu;
+	
+	tdble Work = 0.0;
+	/* update tire temperature and degradation */
+	if (car->features & FEAT_TIRETEMPDEG) {
+		//heat from the work of friction
+		Work = (wheel->forces.x * (wrl * CosA - wheel->bodyVel.x)
+				+ wheel->forces.y * (wrl * SinA - wheel->bodyVel.y)) * SimDeltaTime;
+		wheel->Ttire += Work * wheel->heatingm;
+		//air cooling
+		wheel->Ttire -= wheel->aircoolm * (1 + wheel->speedcoolm * v) * (wheel->Ttire - Tair) * SimDeltaTime;
+		//filling carElt
+		car->carElt->_tyreT_in(index) = wheel->Ttire;
+		car->carElt->_tyreT_mid(index) = wheel->Ttire;
+		car->carElt->_tyreT_out(index) = wheel->Ttire;
+		car->carElt->_tyreCondition(index) = tireCond;
+	}
+	printf("T=%g, W=%g\n",wheel->Ttire,Work);
 }
 
 

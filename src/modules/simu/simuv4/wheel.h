@@ -77,6 +77,13 @@ typedef struct
     tdble	camber;		/* camber, negative toward exterior on both sides */
     tdble	pressure;	/* tire pressure */
 	tdble   rel_vel;    /* relative velocity - used for realstic suspension movement*/
+    
+    tdble   Ttire;      /* tire temperature in K */
+    tdble   Topt;       /* optimal temperature in K, where mu maximal */
+    tdble   muTmult;  /* mu = mumax * (1 - muTmult*(T-Topt)^2) */
+    tdble   heatingm;   /* heating multiplier */
+    tdble   aircoolm;   /* air cooling multiplier */
+    tdble   speedcoolm; /* how aircoolm increases with speed */
 
     tDynAxis	in;
     tDynAxis	feedBack;

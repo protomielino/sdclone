@@ -57,6 +57,11 @@ SimCarConfig(tCar *car)
 	if (strcmp(enabling, VAL_YES) == 0) {
 		car->features = car->features | FEAT_REVLIMIT;
 	}
+	enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_TIRETEMPDEG, VAL_NO);
+	if (strcmp(enabling, VAL_YES) == 0) {
+		car->features = car->features | FEAT_TIRETEMPDEG;
+	}
+	
 	/* continue with car parameters */
 	car->dimension.x = GfParmGetNum(hdle, SECT_CAR, PRM_LEN, (char*)NULL, 4.7f);
 	car->dimension.y = GfParmGetNum(hdle, SECT_CAR, PRM_WIDTH, (char*)NULL, 1.9f);
