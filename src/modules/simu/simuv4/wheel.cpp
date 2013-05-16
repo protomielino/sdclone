@@ -263,6 +263,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 	//temperature and degradation
 	if (car->features & FEAT_TIRETEMPDEG) {
 		tireCond = 1 - wheel->muTmult * (wheel->Ttire - wheel->Topt)*(wheel->Ttire - wheel->Topt);
+		tireCond = MAX(tireCond, 0.1);
 		mu *= tireCond;
 	}
 
