@@ -68,7 +68,7 @@ void * getScenery()
 //static osg::ref_ptr<osg::Group> m_sceneroot = NULL;
 //static osg::ref_ptr<osg::Group> m_carroot = NULL;
 static osg::Timer m_timer;
-static osg::Timer_t m_start_tick;
+//static osg::Timer_t m_start_tick;
 
 int grMaxTextureUnits = 0;
 
@@ -372,7 +372,7 @@ int initTrack(tTrack *track)
 		return grLoadScene(track);*/
 
 	scenery = new SDScenery;
-	render = new SDRender;
+    render = new SDRender;
 
     scenery->LoadScene(track);
     render->Init(track);
@@ -383,7 +383,7 @@ int initTrack(tTrack *track)
 int  initCars(tSituation *s)
 {
 	char buf[256];
-	cars = new SDCars;
+    cars = new SDCars;
     cars->loadCars(s);
     render->addCars(cars->getCarsNode());
     //osgUtil::Optimizer optimizer;

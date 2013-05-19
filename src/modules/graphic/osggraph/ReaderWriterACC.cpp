@@ -94,7 +94,7 @@ void ReaderWriterACC::SetCar(bool b)
 osg::Node* ReaderWriterACC::readFile(std::istream& stream, const osgDB::ReaderWriter::Options* options)
 {
     FileData fileData(options);
-        osg::Group *pWorld = new osg::Group;
+    osg::Group *pWorld = new osg::Group;
     osg::Matrix identityTransform;
 
 	while ((stream.good())&&(!stream.eof()))

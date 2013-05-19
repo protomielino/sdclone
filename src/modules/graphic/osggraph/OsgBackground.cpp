@@ -27,7 +27,6 @@
 
 SDBackground::SDBackground(void)
 {
-    //un test
 }
 
 SDBackground::~SDBackground(void)

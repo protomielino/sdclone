@@ -64,7 +64,8 @@ SDMakeState(const std::string &path, const char* colorTexture, const char* norma
     osg::StateSet *stateSet = new osg::StateSet;
 
     std::string TmpPath;
-    TmpPath = path+colorTexture;
+    TmpPath = path+"data/sky/"+colorTexture;
+    GfOut("Path Sky cloud color texture = %s\n", TmpPath.c_str());
     osg::ref_ptr<osg::Image> image = osgDB::readImageFile(TmpPath);
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
     stateSet->setTextureAttributeAndModes(0, texture);
@@ -105,7 +106,8 @@ SDMakeState(const std::string &path, const char* colorTexture, const char* norma
     //If the normal texture is given prepare a bumpmapping enabled state
     if (normalTexture)
     {
-       TmpPath = path+normalTexture;
+       TmpPath = path+"data/sky/"+normalTexture;
+       GfOut("Path Cloud normal texture = %s\n", TmpPath.c_str());
        osg::ref_ptr<osg::Image> image = osgDB::readImageFile(TmpPath);
        osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
        stateSet->setTextureAttributeAndModes(2, texture);
@@ -448,23 +450,23 @@ void SDCloudLayer::rebuild()
         layer_states[SD_CLOUD_OVERCAST] = state;
         state = SDMakeState(texture_path, "overcast_top.png", "overcast_top_n.png");
         layer_states2[SD_CLOUD_OVERCAST] = state;
-        
+
         state = SDMakeState(texture_path, "broken.png", "broken_n.png");
         layer_states[SD_CLOUD_BROKEN] = state;
         layer_states2[SD_CLOUD_BROKEN] = state;
-        
+
         state = SDMakeState(texture_path, "scattered.png", "scattered_n.png");
         layer_states[SD_CLOUD_SCATTERED] = state;
         layer_states2[SD_CLOUD_SCATTERED] = state;
-        
+
         state = SDMakeState(texture_path, "few.png", "few_n.png");
         layer_states[SD_CLOUD_FEW] = state;
         layer_states2[SD_CLOUD_FEW] = state;
-        
+
         state = SDMakeState(texture_path, "cirrus.png", "cirrus_n.png");
         layer_states[SD_CLOUD_CIRRUS] = state;
         layer_states2[SD_CLOUD_CIRRUS] = state;
-        
+
         layer_states[SD_CLOUD_CLEAR] = 0;
         layer_states2[SD_CLOUD_CLEAR] = 0;
 
@@ -499,7 +501,7 @@ void SDCloudLayer::rebuild()
     const float layer_to_core = (SD_EARTH_RAD * 1000 + layer_asl);
     const float layer_angle = 0.5 * layer_span / layer_to_core;
     const float border_to_core = layer_to_core * cos(layer_angle);
-    const float alt_diff = layer_to_core - border_to_core;
+    const float alt_diff = /*layer_asl * 1.5f;*/layer_to_core - border_to_core;
     
     for (int i = 0; i < 4; i++)
     {
@@ -585,6 +587,8 @@ void SDCloudLayer::rebuild()
         stateSet = static_cast<osg::StateSet*>(layer_states[layer_coverage]->clone(copyOp));
         stateSet->setDataVariance(osg::Object::DYNAMIC);
         group_bottom->setStateSet(stateSet);
+
+        GfOut("layer_states[layer_coverage]\n");
     }
 }
 

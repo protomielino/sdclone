@@ -74,6 +74,10 @@ private:
     int NPlanets;
     float sol_angle;
     float moon_angle;
+    float sky_brightness;
+
+    SDSky *thesky;
+    tTrack *SDTrack;
 
 public:
 	SDRender(void);
@@ -88,8 +92,10 @@ public:
     void UpdateSky(double currentTime, double accelTime);
     void ShadowedScene(void);
 
-    SDSky * getSky();
-    osg::Node* getRoot() { return m_RealRoot.get(); }
+    inline SDSky * getSky() { return thesky; }
+    osg::Group* getRoot() { return m_RealRoot.get(); }
+    osg::Group* getSceneRoot() { return m_scene.get(); }
+    osg::Group* getCarRoot() { return m_CarRoot.get(); }
 };
 
 #endif //_OSGRENDER_H_

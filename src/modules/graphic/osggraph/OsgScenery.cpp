@@ -33,8 +33,6 @@
 #include <robottools.h>	//RtXXX()
 #include <portability.h>
 
-static 	tTrack *grTrack;
-
 SDScenery::SDScenery(void)
 {
 	_grWrldX = 0;
@@ -59,6 +57,8 @@ SDScenery::SDScenery(void)
 	//_spectators = 0;
 	//_trees = 0;
 	//_pits = 0;
+
+    SDTrack = NULL;
 }
 
 SDScenery::~SDScenery(void)
@@ -67,8 +67,12 @@ SDScenery::~SDScenery(void)
 	//delete	m_spectators;
 	//delete	m_trees;
 	//delete	m_pits;
+
+    delete SDTrack;
+
     _background = NULL;
     _scenery = NULL;
+    SDTrack = NULL;
 }
 
 void SDScenery::LoadScene(tTrack *track)
@@ -79,9 +83,9 @@ void SDScenery::LoadScene(tTrack *track)
 
 	GfOut("Initialisation class SDScenery\n");
 
-	m_background = new SDBackground;
-	_scenery = new osg::Group;
-    grTrack = track;
+    m_background = new SDBackground;
+    _scenery = new osg::Group;
+    SDTrack = track;
 
 	// Load graphics options.
 	LoadGraphicsOptions();
@@ -93,9 +97,9 @@ void SDScenery::LoadScene(tTrack *track)
 	}//if grHandle
 
 	/* Determine the world limits */
-	_grWrldX = (int)(track->max.x - track->min.x + 1);
-	_grWrldY = (int)(track->max.y - track->min.y + 1);
-	_grWrldZ = (int)(track->max.z - track->min.z + 1);
+    _grWrldX = (int)(SDTrack->max.x - SDTrack->min.x + 1);
+    _grWrldY = (int)(SDTrack->max.y - SDTrack->min.y + 1);
+    _grWrldZ = (int)(SDTrack->max.z - SDTrack->min.z + 1);
 	_grWrldMaxSize = (int)(MAX(MAX(_grWrldX, _grWrldY), _grWrldZ));
 
     grWrldX = _grWrldX;
@@ -112,14 +116,14 @@ void SDScenery::LoadScene(tTrack *track)
 
         std::string PathTmp = GetDataDir();
 
-	if (_SkyDomeDistance > 0 && grTrack->skyversion > 0)
+    if (_SkyDomeDistance > 0 && SDTrack->skyversion > 0)
 	{
 		_bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
 		if (_bgsky)
 		{
 			_bgtype = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), GR_ATT_BGSKY_LAND) == 0;
 			std::string strPath = PathTmp;
-			sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
+            sprintf(buf, "tracks/%s/%s", SDTrack->category, SDTrack->internalname);
 			strPath += buf;
             osg::ref_ptr<osg::Node> bg= m_background->build(_bgtype, _grWrldX, _grWrldY, _grWrldZ, strPath);
             osg::ref_ptr<osg::StateSet> bgstate = bg->getOrCreateStateSet();
@@ -131,7 +135,7 @@ void SDScenery::LoadScene(tTrack *track)
 	}
 
 	std::string strPath = GetDataDir();
-	sprintf(buf, "tracks/%s/%s", grTrack->category, grTrack->internalname);
+    sprintf(buf, "tracks/%s/%s", SDTrack->category, SDTrack->internalname);
 	
 	std::string ext = osgDB::getFileExtension(acname);
 	
@@ -209,13 +213,15 @@ void SDScenery::ShutdownScene(void)
 {
 	_scenery->removeChildren(0, _scenery->getNumChildren());
     _scenery = NULL;
+
+    SDTrack = NULL;
 }
 
 bool SDScenery::LoadTrack(std::string strTrack)
 {
 	char buf[4096];
 	GfOut("Chemin Track : %s\n", strTrack.c_str());
-	osgLoader loader;
+    osgLoader loader;
 	GfOut("Chemin Textures : %s\n", _strTexturePath.c_str());
 	loader.AddSearchPath(_strTexturePath);
 	

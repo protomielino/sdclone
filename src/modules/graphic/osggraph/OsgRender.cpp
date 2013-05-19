@@ -43,9 +43,6 @@
 #include <glfeatures.h>	//gluXXX
 #include <robottools.h>	//RtXXX()
 
-SDSky *thesky = NULL;
-static tTrack *grTrack;
-
 #define MAX_BODIES	2
 #define MAX_CLOUDS	3
 #define NMaxStars	3000
@@ -82,7 +79,10 @@ SDRender::SDRender(void)
     NPlanets = 0;
     sol_angle = 0.0;
     moon_angle = 0.0;
+    sky_brightness = 0.0;
     m_scene = NULL;
+    thesky = NULL;
+    SDTrack = NULL;
 }
 
 SDRender::~SDRender(void)
@@ -91,16 +91,17 @@ SDRender::~SDRender(void)
     m_CarRoot->removeChildren(0, m_CarRoot->getNumChildren());
     skyGroup->removeChildren(0, skyGroup->getNumChildren());
     m_RealRoot->removeChildren(0, m_RealRoot->getNumChildren());
+    stateSet->getTextureAttributeList().clear();
+    stateSet->getTextureModeList().clear();
+
     m_scene = NULL;
     m_CarRoot = NULL;
     skyGroup = NULL;
     m_RealRoot = NULL;
-    delete thesky;
-}
 
-SDSky * SDRender::getSky()
-{
-    return thesky;
+    delete thesky;
+    thesky = NULL;
+    SDTrack = NULL;
 }
 
 /**
@@ -113,7 +114,7 @@ void SDRender::Init(tTrack *track)
 {
     //char buf[256];
     //void *hndl = grTrackHandle;
-    grTrack = track;
+    SDTrack = track;
 
     std::string datapath = GetDataDir();
     //datapath +="/";
@@ -163,7 +164,7 @@ void SDRender::Init(tTrack *track)
 
     GfLogInfo("  Planets : %d\n", NPlanets);
 
-    const int timeOfDay = (int)grTrack->local.timeofday;
+    const int timeOfDay = (int)SDTrack->local.timeofday;
     const double domeSizeRatio = SDSkyDomeDistance / 80000.0;
 
     GfLogInfo("  domeSizeRation : %d\n", domeSizeRatio);
@@ -172,7 +173,7 @@ void SDRender::Init(tTrack *track)
                   40000, 800, 30000, NPlanets,
                   APlanetsData, NStars, AStarsData );
     GfOut("Build SKY\n");
-    GLfloat sunAscension = grTrack->local.sunascension;
+    GLfloat sunAscension = SDTrack->local.sunascension;
     SDSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
     thesky->setSD( DEG2RAD(SDSunDeclination));
@@ -190,13 +191,33 @@ void SDRender::Init(tTrack *track)
     //SDMoonDeclination = grUpdateMoonPos(timeOfDay);
     //SDMoonDeclination = 22.0; /*(rand() % 270);*/
 
-    const float moonAscension = grTrack->local.sunascension;
+    const float moonAscension = SDTrack->local.sunascension;
 
     thesky->setMD( DEG2RAD(SDMoonDeclination) );
     thesky->setMRA( DEG2RAD(moonAscension) );
 
     GfLogInfo("  Moon : declination = %.1f deg, ascension = %.1f deg\n",
               SDMoonDeclination, moonAscension);
+
+    SDCloudLayer *layer = new SDCloudLayer(datapath);
+    layer->setCoverage(layer->SD_CLOUD_CIRRUS);
+    layer->setSpeed(30);
+    layer->setDirection(60);
+    layer->setElevation_m(6000);
+    layer->setSpan_m(SDSkyDomeDistance);
+    layer->setThickness_m(100 / domeSizeRatio);
+    layer->setTransition_m(100 / domeSizeRatio);
+    thesky->add_cloud_layer(layer);
+
+    SDCloudLayer *layer2 = new SDCloudLayer(datapath);
+    layer2->setCoverage(layer2->SD_CLOUD_FEW);
+    layer2->setSpeed(300);
+    layer2->setDirection(60);
+    layer2->setElevation_m(1000);
+    layer2->setSpan_m(SDSkyDomeDistance);
+    layer2->setThickness_m(100 / domeSizeRatio);
+    layer2->setTransition_m(100 / domeSizeRatio);
+    thesky->add_cloud_layer(layer2);
 
     // Initialize the whole sky dome.
     SDScenery * scenery = (SDScenery *)getScenery();
@@ -206,7 +227,81 @@ void SDRender::Init(tTrack *track)
     osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0 );
     unsigned int SDRain = 0;
 
-    switch (grTrack->local.rain)
+    /*for (int i = 0; i < MAX_CLOUDS; i++)
+    {
+        SDCloudLayer *layer = new SDCloudLayer(datapath);
+        thesky->add_cloud_layer(layer);
+    }*/
+
+    int weather = SDTrack->local.clouds;
+
+    /*else if (grNbCloudLayers == 1)
+    {
+        GfLogInfo("  Cloud cover : 3 layers\n");
+
+        int wind = (rand() % 200) + 100;
+
+        cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 2550,
+                                          100 / domeSizeRatio, 100 / domeSizeRatio);
+        cloudLayers[0]->setSpeed(wind);
+        cloudLayers[0]->setDirection(45);
+
+        GfLogInfo("   * layer 1 : speed=60, direction=45, texture=%s\n", buf);
+
+    }
+    else if (grNbCloudLayers == 2)
+    {
+        GfLogInfo("  Cloud cover : 2 layers\n");
+
+        snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", 1);
+        cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 3000,
+                                          100 / domeSizeRatio, 100 / domeSizeRatio);
+        cloudLayers[0]->setSpeed(30);
+        cloudLayers[0]->setDirection(40);
+
+        GfLogInfo("   * layer 1 : speed=30, direction=40, texture=%s\n", buf);
+
+        snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+        cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, 2000,
+                                          100 / domeSizeRatio, 100 / domeSizeRatio);
+        cloudLayers[1]->setSpeed(60);
+        cloudLayers[1]->setDirection(45);
+
+        GfLogInfo("   * layer 2 : speed=60, direction=45, texture=%s\n", buf);
+
+    }
+    else if (grNbCloudLayers == 3)
+    {
+        GfLogInfo("  Cloud cover : 3 layers\n");
+
+        snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", 1);
+        cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 3000,
+                                          100 / domeSizeRatio, 100 / domeSizeRatio);
+        int wind = (rand() % 40) + 60;
+        cloudLayers[0]->setSpeed(wind);
+        cloudLayers[0]->setDirection(40);
+
+        GfLogInfo("   * layer 1 : speed=30, direction=40, texture=%s\n", buf);
+
+        snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+        cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, 2000,
+                                          100 / domeSizeRatio, 100 / domeSizeRatio);
+        cloudLayers[1]->setSpeed(60);
+        cloudLayers[1]->setDirection(45);
+
+        GfLogInfo("   * layer 2 : speed=60, direction=45, texture=%s\n", buf);
+
+        snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+        cloudLayers[2] = TheSky->addCloud(buf, grSkyDomeDistance, 1000,
+                                          100 / domeSizeRatio, 100 / domeSizeRatio);
+        cloudLayers[2]->setSpeed(80);
+        cloudLayers[2]->setDirection(45);
+
+        GfLogInfo("   * layer 3 : speed=80, direction=45, texture=%s\n", buf);
+    }*/
+
+
+    switch (SDTrack->local.rain)
     {
         case TR_RAIN_NONE:
             SDVisibility = SDMax_Visibility;
@@ -226,7 +321,7 @@ void SDRender::Init(tTrack *track)
             break;
         default:
             GfLogWarning("Unsupported rain strength value %d (assuming none)",
-                         grTrack->local.rain);
+                         SDTrack->local.rain);
             SDVisibility = 12000.0;
             break;
     }//switch Rain
@@ -268,8 +363,12 @@ void SDRender::Init(tTrack *track)
     if (SDRain > 0)
         stateSet->setAttributeAndModes(precipitationEffect->getFog());
 
+    float emis = 0.5f * sky_brightness;
+    float ambian = 0.8f * sky_brightness;
     osg::ref_ptr<osg::Material> material = new osg::Material;
-    material->setColorMode(osg::Material::OFF); // switch glColor usage off
+    //material->setColorMode(osg::Material::OFF); // switch glColor usage off
+    material->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(emis, emis, emis, 1.0f));
+    material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(ambian, ambian, ambian, 1.0f));
     stateSet->setAttributeAndModes(material, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
@@ -310,12 +409,14 @@ void SDRender::Init(tTrack *track)
     mRoot->addChild(sceneGroup.get());
     mRoot->setStateSet(setFogState().get());
     mRoot->addChild(sunLight.get());
+    mRoot->addChild(thesky->getCloudRoot());
 
     // Clouds are added to the scene graph later
-    stateSet = mRoot->getOrCreateStateSet();
-    stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
-    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::ON);
-    stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
+    osg::ref_ptr<osg::StateSet> stateSet2 = new osg::StateSet;
+    stateSet2 = mRoot->getOrCreateStateSet();
+    stateSet2->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
+    stateSet2->setMode(GL_LIGHTING, osg::StateAttribute::ON);
+    stateSet2->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
     m_RealRoot->addChild(mRoot.get());
 
@@ -357,12 +458,12 @@ void SDRender::UpdateLight( void )
     sol_angle = (float)thesky->getSA();
     moon_angle = (float)thesky->getMA();
     //float deg = sol_angle * SD_RADIANS_TO_DEGREES;
-    float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
+    sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
 
     GfOut("Sun Angle in Render = %f - sky brightness = %f\n", sol_angle, sky_brightness);
 
 
-    if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
+    if (SDTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
     {
         BaseFogColor = osg::Vec3f(0.42f, 0.44f, 0.50f);
         sky_brightness = (float)pow(sky_brightness, 0.5f);
@@ -381,7 +482,7 @@ void SDRender::UpdateLight( void )
     // 3a)cloud and fog color
     CloudsColor = FogColor = BaseFogColor * sky_brightness;
 
-    //grUpdateFogColor(sol_angle);
+    //UpdateFogColor(sol_angle);
     sd_gamma_correct_rgb( CloudsColor._v );
 
 
@@ -426,7 +527,6 @@ void SDRender::UpdateLight( void )
         SceneSpecular = osg::Vec4f(sun_color._v[0] * sky_brightness, sun_color._v[0] * sky_brightness,
                                    sun_color._v[0] * sky_brightness, 1.0f);
     }
-
 }//grUpdateLight
 
 osg::ref_ptr< osg::StateSet> SDRender::setFogState()
@@ -447,7 +547,7 @@ osg::ref_ptr< osg::StateSet> SDRender::setFogState()
 
     fogState->setMode(GL_FOG, osg::StateAttribute::ON);
 
-    return fogState;
+    return fogState.get();
 
 }
 
@@ -518,8 +618,8 @@ void SDRender::UpdateSky(double currentTime, double accelTime)
 
     // Nothing to do if static sky dome, or race not started.
     //if (!grDynamicSkyDome)	//TODO(kilo): find some meaning for this variable
-    if (!SDSkyDomeDistance || grTrack->skyversion < 1)
-        return;
+    /*if (!SDSkyDomeDistance || SDTrack->skyversion < 1)
+        return;*/
 
     if (currentTime < 0)
     {
@@ -529,14 +629,14 @@ void SDRender::UpdateSky(double currentTime, double accelTime)
 
     if (!bInitialized)
     {
-        if (SDSkyDomeDistance && grTrack->skyversion > 0)
+        if (SDSkyDomeDistance && SDTrack->skyversion > 0)
         {
             // Ensure the sun and moon positions are reset
-            const int timeOfDay = (int)grTrack->local.timeofday;
-            GLfloat sunAscension = grTrack->local.sunascension;
+            const int timeOfDay = (int)SDTrack->local.timeofday;
+            GLfloat sunAscension = SDTrack->local.sunascension;
             SDSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
-            const float moonAscension = grTrack->local.sunascension;
+            const float moonAscension = SDTrack->local.sunascension;
             //SDMoonDeclination = grUpdateMoonPos(timeOfDay);
 
             thesky->setSD( DEG2RAD(SDSunDeclination));
@@ -597,6 +697,16 @@ void SDRender::UpdateSky(double currentTime, double accelTime)
     sunLight->getLight()->setDiffuse(SceneDiffuse);
     sunLight->getLight()->setSpecular(SceneSpecular);
     sunLight->setStateSetModes(*stateSet,osg::StateAttribute::ON);
+
+    float emis = 0.5f * sky_brightness;
+    float ambian = 0.8f * sky_brightness;
+
+    osg::ref_ptr<osg::Material> material = new osg::Material;
+    //material->setColorMode(osg::Material::OFF); // switch glColor usage off
+    material->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(emis, emis, emis, 1.0f));
+    material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(ambian, ambian, ambian, 1.0f));
+    stateSet->setAttributeAndModes(material, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
+    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
     osg::Vec3f sun_position = thesky->sunposition();
     osg::Vec3f sun_direction = -sun_position;

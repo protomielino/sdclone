@@ -43,7 +43,7 @@ class SDStars;
 class SDSkyDome;
 class SDSky;
 
-typedef struct
+/*typedef struct
 {
   osg::Vec3d pos;
   double spin;
@@ -60,7 +60,7 @@ typedef struct
   osg::Vec3f fog_color;
   osg::Vec3f cloud_color;
   double sun_angle, moon_angle;
-} SDSkyColor;
+} SDSkyColor;*/
 
 enum NodeMask
 {
@@ -141,6 +141,8 @@ public:
     const SDCloudLayer * get_cloud_layer (int i) const;
     SDCloudLayer * get_cloud_layer (int i);
     int get_cloud_layer_count () const;
+
+
 
     void setMA(double angle) { moon->setMoonAngle(angle); }
     double getMA() { return moon->getMoonAngle(); }

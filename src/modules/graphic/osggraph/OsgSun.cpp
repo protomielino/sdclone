@@ -87,7 +87,7 @@ osg::Node* SDSun::build( std::string path, double dist, double sun_size )
 
     stateSet->setRenderBinDetails(-6, "RenderBin");
 
-    path = TmpPath+"data/textures/inner_halo.png";
+    path = TmpPath+"data/sky/inner_halo.png";
     osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path);
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
     stateSet->setTextureAttributeAndModes(0, texture);
@@ -126,7 +126,7 @@ osg::Node* SDSun::build( std::string path, double dist, double sun_size )
     stateSet = geode1->getOrCreateStateSet();
     stateSet->setRenderBinDetails(-7, "RenderBin");
 
-    path = TmpPath+"data/textures/inner_halo.png";
+    path = TmpPath+"data/sky/inner_halo.png";
     osg::ref_ptr<osg::Image> image2 = osgDB::readImageFile(path);
     osg::ref_ptr<osg::Texture2D> texture2 = new osg::Texture2D(image2.get());
     stateSet->setTextureAttributeAndModes(0, texture2);
@@ -163,7 +163,7 @@ osg::Node* SDSun::build( std::string path, double dist, double sun_size )
     stateSet = geode2->getOrCreateStateSet();
     stateSet->setRenderBinDetails(-8, "RenderBin");
 
-    path = TmpPath+"data/textures/halo.png";
+    path = TmpPath+"data/sky/halo.png";
     osg::ref_ptr<osg::Image> image3 = osgDB::readImageFile(path);
     osg::ref_ptr<osg::Texture2D> texture3 = new osg::Texture2D(image3.get());
     stateSet->setTextureAttributeAndModes(0, texture3);

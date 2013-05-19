@@ -33,6 +33,7 @@ SDScreens::SDScreens()
    :m_CurrentScreenIndex(0)
 {
     viewer = new osgViewer::Viewer();
+    viewer->setSceneData(new osg::Group());
 }
 
 class CameraDrawnCallback : public osg::Camera::DrawCallback
@@ -509,7 +510,7 @@ SDScreens::~SDScreens()
         delete Screens[i];
     }
     //root.release();
-    //viewer->getSceneData();
+    viewer->setSceneData(new osg::Group());
     //delete viewer->getSceneData();
 
     delete viewer;

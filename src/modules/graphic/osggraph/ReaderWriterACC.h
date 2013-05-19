@@ -317,7 +317,7 @@ struct RefData
 		texCoord = _texCoord;
 		texCoord1 = _texCoord1;
 		texCoord2 = _texCoord2;
-	}
+    }
     osg::Vec2 texCoord;
 	osg::Vec2 texCoord1;
 	osg::Vec2 texCoord2;

@@ -31,6 +31,7 @@ class	SDBackground;
 //class	SDSpectators;
 //class	SDTrees;
 class	SDScenery;
+class   osgLoader;
 
 #define SKYBIN 1
 #define TRACKBIN 2
@@ -40,6 +41,8 @@ class SDBackground
 	osg::ref_ptr<osg::Group> _background;
 	osg::ref_ptr<osg::Group> _scenery;
 	osg::ref_ptr<osg::MatrixTransform>	 _background_transform;
+
+    tTrack *SDTrack;
 
 	bool	_type;
 
@@ -96,6 +99,8 @@ private:
 	//SDTrees	*m_trees;
 	osg::ref_ptr<osg::Group> _scenery;
 	osg::ref_ptr<osg::Group> _background;
+
+    tTrack *SDTrack;
 
     int _grWrldX;
     int _grWrldY;

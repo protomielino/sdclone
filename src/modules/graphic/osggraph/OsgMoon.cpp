@@ -59,7 +59,7 @@ osg::Node* SDMoon::build( std::string path, double dist, double size )
     moon_size = size;
     moon_dist = dist;
 
-    path = TmpPath+"data/textures/moon.png";
+    path = TmpPath+"data/sky/moon.png";
     osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path);
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
     stateSet->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
