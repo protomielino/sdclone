@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
+#include <tgf.h>
 #include "sim.h"
 
 static const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
@@ -318,7 +318,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 		car->carElt->_tyreT_out(index) = wheel->Ttire;
 		car->carElt->_tyreCondition(index) = tireCond;
 	}
-	printf("T=%g, W=%g\n",wheel->Ttire,Work);
+    GfOut("T=%g, W=%g\n",wheel->Ttire, Work);
 }
 
 
