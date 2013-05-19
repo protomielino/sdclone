@@ -53,7 +53,6 @@ SDScenery::SDScenery(void)
 	_bgsky =  false;
 
     _scenery = NULL;
-    _background = NULL;
 	//_spectators = 0;
 	//_trees = 0;
 	//_pits = 0;
@@ -70,7 +69,6 @@ SDScenery::~SDScenery(void)
 
     delete SDTrack;
 
-    _background = NULL;
     _scenery = NULL;
     SDTrack = NULL;
 }
@@ -125,11 +123,7 @@ void SDScenery::LoadScene(tTrack *track)
 			std::string strPath = PathTmp;
             sprintf(buf, "tracks/%s/%s", SDTrack->category, SDTrack->internalname);
 			strPath += buf;
-            osg::ref_ptr<osg::Node> bg= m_background->build(_bgtype, _grWrldX, _grWrldY, _grWrldZ, strPath);
-            osg::ref_ptr<osg::StateSet> bgstate = bg->getOrCreateStateSet();
-            bgstate->setRenderBinDetails(-1, "RenderBin");
-            //bg->getOrCreateStateSet()->setRenderingHint( osg::StateSet::OPAQUE_BIN );
-            _scenery->addChild(bg.get());
+            m_background->build(_bgtype, _grWrldX, _grWrldY, _grWrldZ, strPath);
 			GfOut("Background loaded\n");
 		}
 	}

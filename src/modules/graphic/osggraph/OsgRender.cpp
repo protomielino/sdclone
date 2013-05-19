@@ -351,6 +351,7 @@ void SDRender::Init(tTrack *track)
     }
 
     m_scene->addChild(scenery->getScene());
+    m_scene->addChild(scenery->getBackground());
     m_scene->setNodeMask(rcvShadowMask);
     sceneGroup->addChild(m_scene);
     //sceneGroup->addChild(scenery->getScene());
@@ -457,13 +458,12 @@ void SDRender::UpdateLight( void )
 {
     sol_angle = (float)thesky->getSA();
     moon_angle = (float)thesky->getMA();
-    //float deg = sol_angle * SD_RADIANS_TO_DEGREES;
     sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
 
     GfOut("Sun Angle in Render = %f - sky brightness = %f\n", sol_angle, sky_brightness);
 
 
-    if (SDTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
+    if (SDTrack->local.rain > 0)
     {
         BaseFogColor = osg::Vec3f(0.42f, 0.44f, 0.50f);
         sky_brightness = (float)pow(sky_brightness, 0.5f);

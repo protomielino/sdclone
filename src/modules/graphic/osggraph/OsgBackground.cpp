@@ -27,15 +27,16 @@
 
 SDBackground::SDBackground(void)
 {
+    _background = NULL;
 }
 
 SDBackground::~SDBackground(void)
 {
-    _background_transform->removeChildren(0, _background_transform->getNumChildren());
-    _background_transform = NULL;
+    _background->removeChildren(0, _background->getNumChildren());
+    _background = NULL;
 }
 
-osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const std::string TrackPath)
+void SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const std::string TrackPath)
 {
 	bool land = type;
 	
@@ -47,7 +48,7 @@ osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ,
     pathList.push_back(LocalPath+"data/textures");
     osgDB::Registry::instance()->setDataFilePathList(pathList);
 	
-	_background_transform = new osg::MatrixTransform;
+    osg::ref_ptr<osg::MatrixTransform> _background_transform = new osg::MatrixTransform;
 	osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
                          0.0f, -1.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f);
                          	
@@ -58,14 +59,18 @@ osg::Node *SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ,
 		osg::Matrix t = osg::Matrix::translate(grWrldX /2, grWrldY /2, grWrldZ /2);
 		mat = mat * t;
 		_background_transform->setMatrix(mat);
-		_background_transform->addChild( m_background );
+        _background_transform->addChild( m_background.get() );
 	}
 	else
 	{
         osg::ref_ptr<osg::Node> m_background = osgDB::readNodeFile("land.ac");
 		_background_transform->setMatrix(mat);
-		_background_transform->addChild( m_background );
+        _background_transform->addChild( m_background.get() );
 	}
-		
-    	return _background_transform.get();
+
+    osg::ref_ptr<osg::StateSet> bgstate = _background_transform->getOrCreateStateSet();
+    bgstate->setRenderBinDetails(-1, "RenderBin");
+
+    _background = new osg::Group;
+    _background->addChild(_background_transform.get());
 }

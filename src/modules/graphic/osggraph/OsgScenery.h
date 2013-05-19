@@ -38,9 +38,7 @@ class   osgLoader;
 
 class SDBackground
 {
-	osg::ref_ptr<osg::Group> _background;
-	osg::ref_ptr<osg::Group> _scenery;
-	osg::ref_ptr<osg::MatrixTransform>	 _background_transform;
+    osg::ref_ptr<osg::Group>	 _background;
 
     tTrack *SDTrack;
 
@@ -54,8 +52,10 @@ public:
 	// Destructor
 	~SDBackground(void);
 
-	osg::Node *build(bool type, int X, int Y, int Z, const std::string strTrack);
+    void build(bool type, int X, int Y, int Z, const std::string strTrack);
 	void reposition(int X, int Y);
+
+    osg::Group* getBackground() { return _background.get(); }
 };
 
 /*class SDSpectators
@@ -98,7 +98,6 @@ private:
 	//SDSpectators	*m_spectators;
 	//SDTrees	*m_trees;
 	osg::ref_ptr<osg::Group> _scenery;
-	osg::ref_ptr<osg::Group> _background;
 
     tTrack *SDTrack;
 
@@ -146,7 +145,8 @@ public:
     inline static int getWorldZ(){return grWrldZ;}
     inline static int getWorldMaxSize(){return grWrldMaxSize;}
 
-    osg::Node* getScene() { return _scenery.get(); }
+    osg::Group* getScene() { return _scenery.get(); }
+    osg::Group* getBackground() { return m_background->getBackground(); }
 
 	//osg::ref_ptr<osg::Group>	getSDScenery { return _scenery };
 	//osg::Group	getSDBackground { return SDBackground->getbackground; }
