@@ -360,7 +360,7 @@ void SDRender::Init(tTrack *track)
     m_CarRoot->setNodeMask(castShadowMask);
     sceneGroup->addChild(m_CarRoot.get());
     stateSet = new osg::StateSet;
-    stateSet = sceneGroup->getOrCreateStateSet();
+    stateSet = m_scene->getOrCreateStateSet();
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
     if (SDRain > 0)
         stateSet->setAttributeAndModes(precipitationEffect->getFog());
