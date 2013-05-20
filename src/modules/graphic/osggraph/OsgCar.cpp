@@ -242,18 +242,49 @@ SDCar::loadCar(tCarElt *car)
     // param = GfParmGetStr(handle, path, PRM_CAR, buf);
 
     std::string strPath = GetDataDir();
+
     if (bMasterModel)
         sprintf(buf, "cars/models/%s/%s.acc", car->_masterModel, car->_masterModel);
     else
         sprintf(buf, "cars/models/%s/%s.acc", car->_carName, car->_carName);
 
     strPath+=buf;
+
+    std::string name = car->_carName;
+
+    osg::ref_ptr<osg::Node> pCar = new osg::Node;
+
+    if (name != "ref-sphere-osg")
+    {
+        strPath+=buf;
+        GfOut("Chemin Textures : %s\n", strTPath.c_str());
+        pCar = loader.Load3dFile(strPath, true);
+        GfOut("Load Car ACC !\n");
+    }
+    else
+    {
+        //strPath+=buf;
+        osg::ref_ptr<osgDB::Options> options = new osgDB::Options();
+        options->getDatabasePathList().push_back(strPath);
+        std::string strTPath = GetDataDir();
+        snprintf(buf, 4096, "data/textures/");
+        strTPath += buf;
+        options->getDatabasePathList().push_back(strTPath);
+        snprintf(buf, 4096, "cars/models/ref-sphere-osg/");
+        strTPath = GetDataDir();
+        strTPath +=buf;
+        options->getDatabasePathList().push_back(strTPath);
+        GfOut("Load Car OSG !\n");
+        pCar = osgDB::readNodeFile("ref-sphere-osg.osg", options);
+    }
+
+
+    /*strPath+=buf;
     GfOut("Chemin Textures : %s\n", strTPath.c_str());
-    osg::ref_ptr<osg::Node> pCar = loader.Load3dFile(strPath, true);
+    osg::ref_ptr<osg::Node> pCar = loader.Load3dFile(strPath, true);*/
 
     osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
     transform1->addChild(pCar);
-
 
     SDCarShader::initiateShaderProgram();
     this->shader = new SDCarShader(pCar.get());
