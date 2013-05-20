@@ -111,7 +111,7 @@ public:
     }
 
     void rebuild();
-    //void set_enable3dClouds(bool enable);
+    void set_enable3dClouds(bool enable);
 
     bool repaint( const osg::Vec3f& fog_color );
     bool reposition(const osg::Vec3f& p, double dt );

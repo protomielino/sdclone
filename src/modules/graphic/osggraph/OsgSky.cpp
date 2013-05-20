@@ -17,6 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <tgf.h>
+
 #include "OsgSky.h"
 //#include "OsgCloudfield.h"
 //#include "OsgNewcloud.h"
@@ -51,7 +53,7 @@ SDSky::SDSky( void )
     stars = 0;
     pre_root = 0;
 
-    //clouds_3d_enabled = false;
+    clouds_3d_enabled = false;
     //clouds_3d_density = 0.8;
 
     pre_root = new osg::Group;
@@ -64,6 +66,7 @@ SDSky::SDSky( void )
 
     pre_selector = new osg::Switch;
     pre_transform = new osg::Group;
+
     //_ephTransform = new osg::MatrixTransform;
 }
 
@@ -76,6 +79,10 @@ SDSky::~SDSky( void )
     delete planets;
     delete stars;
     pre_root->removeChild(0, pre_root->getNumChildren());
+    for(unsigned i=0;i<cloud_layers.size();i++)
+    {
+        delete cloud_layers[i];
+    }
     //delete pre_transform;
     //delete post_root;
 }
@@ -84,6 +91,18 @@ void SDSky::build( std::string tex_path, double h_radius, double v_radius, doubl
       double moon_size, double moon_dist, int nplanets, osg::Vec3d *planet_data,
       int nstars, osg::Vec3d *star_data )
 {
+    delete dome;
+    delete planets;
+    delete stars;
+    delete moon;
+    delete sun;
+
+    pre_root->removeChild(0, pre_root->getNumChildren());
+    for(unsigned i=0;i<cloud_layers.size();i++)
+    {
+        delete cloud_layers[i];
+    }
+
     dome = new SDSkyDome;
     pre_transform->addChild( dome->build( h_radius, v_radius ));
 
@@ -112,7 +131,7 @@ bool SDSky::repaint( osg::Vec3f& sky_color, osg::Vec3f& fog_color, osg::Vec3f& c
                        double moon_angle, int nplanets, osg::Vec3d *planet_data,
                        int nstars, osg::Vec3d *star_data )
 {
-    if ( effective_visibility > 1000.0 )
+    if ( effective_visibility > 100.0 )
     {
         enable();
         dome->repaint( sky_color, fog_color, sol_angle, effective_visibility );
@@ -125,6 +144,7 @@ bool SDSky::repaint( osg::Vec3f& sky_color, osg::Vec3f& fog_color, osg::Vec3f& c
             if (cloud_layers[i]->getCoverage() != SDCloudLayer::SD_CLOUD_CLEAR)
             {
                 cloud_layers[i]->repaint( cloud_color );
+                GfOut("Repaint Cloud\n");
             }
         }
 
@@ -164,9 +184,10 @@ bool SDSky::reposition( osg::Vec3& view_pos, double spin, /*double gst,*/
 
   for ( unsigned i = 0; i < cloud_layers.size(); ++i )
   {
-      if ( cloud_layers[i]->getCoverage() != SDCloudLayer::SD_CLOUD_CLEAR )
+      if ( cloud_layers[i]->getCoverage() != SDCloudLayer::SD_CLOUD_CLEAR)
       {
         cloud_layers[i]->reposition( view_pos, dt);
+        GfOut("Affichage cloud\n");
       } else
         cloud_layers[i]->getNode()->setAllChildrenOff();
     }
@@ -177,9 +198,9 @@ bool SDSky::reposition( osg::Vec3& view_pos, double spin, /*double gst,*/
 void SDSky::add_cloud_layer( SDCloudLayer * layer )
 {
     cloud_layers.push_back(layer);
+    layer->set_enable3dClouds(clouds_3d_enabled);
     cloud_root->addChild(layer->getNode());
 
-    //layer->set_enable3dClouds(clouds_3d_enabled);
 }
 
 const SDCloudLayer * SDSky::get_cloud_layer (int i) const

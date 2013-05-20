@@ -207,6 +207,7 @@ void SDRender::Init(tTrack *track)
     layer->setSpan_m(SDSkyDomeDistance);
     layer->setThickness_m(100 / domeSizeRatio);
     layer->setTransition_m(100 / domeSizeRatio);
+    layer->setSpan_m(SDSkyDomeDistance);
     thesky->add_cloud_layer(layer);
 
     SDCloudLayer *layer2 = new SDCloudLayer(datapath);
@@ -214,9 +215,9 @@ void SDRender::Init(tTrack *track)
     layer2->setSpeed(300);
     layer2->setDirection(60);
     layer2->setElevation_m(1000);
-    layer2->setSpan_m(SDSkyDomeDistance);
     layer2->setThickness_m(100 / domeSizeRatio);
     layer2->setTransition_m(100 / domeSizeRatio);
+    layer2->setSpan_m(SDSkyDomeDistance);
     thesky->add_cloud_layer(layer2);
 
     // Initialize the whole sky dome.

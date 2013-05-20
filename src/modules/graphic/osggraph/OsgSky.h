@@ -102,10 +102,10 @@ private:
     double ramp_down;
 
     // 3D clouds enabled
-    //bool clouds_3d_enabled;
+    bool clouds_3d_enabled;
 
     // 3D cloud density
-    //double clouds_3d_density;
+    double clouds_3d_density;
 
 public:
 
@@ -141,8 +141,6 @@ public:
     const SDCloudLayer * get_cloud_layer (int i) const;
     SDCloudLayer * get_cloud_layer (int i);
     int get_cloud_layer_count () const;
-
-
 
     void setMA(double angle) { moon->setMoonAngle(angle); }
     double getMA() { return moon->getMoonAngle(); }

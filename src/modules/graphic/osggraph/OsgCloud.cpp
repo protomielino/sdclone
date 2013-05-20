@@ -513,8 +513,7 @@ void SDCloudLayer::rebuild()
         vl[i] = new osg::Vec3Array;
         cl[i] = new osg::Vec4Array;
         tl[i] = new osg::Vec2Array;
-      
-      
+            
         osg::Vec3 vertex(layer_span*(i-2)/2, -layer_span,
                          alt_diff * (sin(i*mpi) - 2));
         osg::Vec2 tc(layer_scale * i/4, 0.0f);
@@ -549,11 +548,8 @@ void SDCloudLayer::rebuild()
             tl[i]->push_back(tc);
         }
       
-        vertex = osg::Vec3(layer_span*(i-1)/2, layer_span,
-                         alt_diff * (sin((i+1)*mpi) - 2));
-      
-        tc = osg::Vec2(layer_scale * (i+1)/4, layer_scale);
-      
+        vertex = osg::Vec3(layer_span*(i-1)/2, layer_span, alt_diff * (sin((i+1)*mpi) - 2));
+        tc = osg::Vec2(layer_scale * (i+1)/4, layer_scale);      
         color = osg::Vec4(cloudColors[0], (i == 3) ? 0.0f : 0.15f );
       
         cl[i]->push_back( color );
@@ -687,15 +683,15 @@ bool SDCloudLayer::reposition( const osg::Vec3f& p, double dt )
     return true;
 }
 
-/*void SDCloudLayer::set_enable3dClouds(bool enable)
+void SDCloudLayer::set_enable3dClouds(bool enable)
 {
-    if (layer3D->isDefined3D() && enable)
+    if (/*layer3D->isDefined3D() &&*/ enable)
     {
-        cloud_root->setChildValue(layer3D->getNode(), true);
+        //cloud_root->setChildValue(layer3D->getNode(), true);
         cloud_root->setChildValue(layer_root.get(),   false);
     } else
     {
-        cloud_root->setChildValue(layer3D->getNode(), false);
+        //cloud_root->setChildValue(layer3D->getNode(), false);
         cloud_root->setChildValue(layer_root.get(),   true);
     }
-}*/
+}

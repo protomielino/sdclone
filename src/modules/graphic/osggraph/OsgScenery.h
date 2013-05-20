@@ -40,8 +40,6 @@ class SDBackground
 {
     osg::ref_ptr<osg::Group>	 _background;
 
-    tTrack *SDTrack;
-
 	bool	_type;
 
 public:
