@@ -89,7 +89,7 @@ public :
         SDRender * ren = (SDRender *)getRender();
         osg::Vec3f sun_pos= ren->getSky()->getSun()->getSunPosition();
         osg::Vec4f sun_color = ren->getSky()->get_sun_color();
-        osg::Vec4f scene_color = ren->getSky()->get_scene_color();
+        osg::Vec4f scene_color = ren->getSceneColor();
 
        /* GfOut("Sun Position : %f %f %f\n",sun_pos._v[0],sun_pos._v[1],sun_pos._v[2]);
         GfOut("Sun Color : %f %f %f %f\n",sun_color._v[0],sun_color._v[1],sun_color._v[2],sun_color._v[3]);
@@ -113,7 +113,7 @@ public :
         this->viewPoint->set(osg::Vec3f(pv.x(),pv.y(),pv.z()));
         this->lightVector->set(osg::Vec3f(lv.x(),lv.y(),lv.z()));
         this->lightPower->set(sun_color);
-        this->ambientColor->set(scene_color*0.5f);
+        this->ambientColor->set(scene_color);
 
         //osg::StateSet* stateset = pCar->getOrCreateStateSet();
         //stateset->setAttributeAndModes( program.get() );

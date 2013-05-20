@@ -27,7 +27,6 @@
 
 SDBackground::SDBackground(void)
 {
-    _background = NULL;
 }
 
 SDBackground::~SDBackground(void)

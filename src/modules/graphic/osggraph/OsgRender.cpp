@@ -62,6 +62,11 @@ SDRender::SDRender(void)
     BaseSkyColor = osg::Vec3f( 0.31f, 0.43f, 0.69f );
     BaseFogColor = osg::Vec3f( 0.84f, 0.84f, 1.0f );
 
+    Scene_ambiant = osg::Vec4f( 0.8f, 0.8f, 0.8f, 1.0f);
+    Scene_Specular = osg::Vec4f( 0.05f, 0.05f, 0.05f, 1.0f);
+    Scene_Diffuse = osg::Vec4f( 0.6f, 0.6f, 0.6f, 1.0f);
+    Scene_Emit = osg::Vec4f( 0.2f, 0.2f, 0.2f, 1.0f);
+
     SDSkyDomeDistance = 0;
     SDSkyDomeDistThresh = 12000;
     SDNbCloudLayers = 0;
@@ -369,8 +374,9 @@ void SDRender::Init(tTrack *track)
     float ambian = 0.8f * sky_brightness;
     osg::ref_ptr<osg::Material> material = new osg::Material;
     //material->setColorMode(osg::Material::OFF); // switch glColor usage off
+    Scene_ambiant = osg::Vec4f( ambian, ambian, ambian, 1.0f);
     material->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(emis, emis, emis, 1.0f));
-    material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(ambian, ambian, ambian, 1.0f));
+    material->setAmbient(osg::Material::FRONT_AND_BACK, Scene_ambiant);
     stateSet->setAttributeAndModes(material, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
@@ -702,10 +708,11 @@ void SDRender::UpdateSky(double currentTime, double accelTime)
     float emis = 0.5f * sky_brightness;
     float ambian = 0.8f * sky_brightness;
 
+    Scene_ambiant = osg::Vec4f(ambian, ambian, ambian, 1.0f);
     osg::ref_ptr<osg::Material> material = new osg::Material;
     //material->setColorMode(osg::Material::OFF); // switch glColor usage off
     material->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(emis, emis, emis, 1.0f));
-    material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(ambian, ambian, ambian, 1.0f));
+    material->setAmbient(osg::Material::FRONT_AND_BACK, Scene_ambiant);
     stateSet->setAttributeAndModes(material, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
@@ -716,3 +723,8 @@ void SDRender::UpdateSky(double currentTime, double accelTime)
     sunLight->getLight()->setDirection(sun_direction);
 
 }//grUpdateSky
+
+osg::Vec4f SDRender::getSceneColor(void)
+{
+    return Scene_ambiant;
+}

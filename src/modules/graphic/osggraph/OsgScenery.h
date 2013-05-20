@@ -132,10 +132,10 @@ public:
 	~SDScenery(void);
 
     void LoadScene(tTrack *track);
-	void	CreatePit(tTrack *track);
+    void CreatePit(tTrack *track);
 	//void	addSpectators(SDSpectators->build(number, tTrack *track));
 	//void	addTrees(SDTrees->build(tTrack *track));
-	void 	ShutdownScene(void);
+    void ShutdownScene(void);
 	//void
 
     inline static int getWorldX(){return grWrldX;}

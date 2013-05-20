@@ -56,6 +56,11 @@ private:
     osg::Vec4f SceneSpecular;
     osg::Vec4f SceneFog;
 
+    osg::Vec4f Scene_ambiant;
+    osg::Vec4f Scene_Diffuse;
+    osg::Vec4f Scene_Specular;
+    osg::Vec4f Scene_Emit;
+
     unsigned SDSkyDomeDistance;
     unsigned SDNbCloudLayers;
     unsigned SDSkyDomeDistThresh;
@@ -85,6 +90,7 @@ public:
 
     void Init(tTrack *track);
     osg::ref_ptr< osg::StateSet> setFogState();
+    osg::Vec4f getSceneColor(void);
     void UpdateTime(tSituation *s);
     void UpdateLight(void);
     void addCars(osg::Node* cars);
