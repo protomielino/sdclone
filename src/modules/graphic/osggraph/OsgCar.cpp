@@ -83,7 +83,7 @@ public :
         stateset->addUniform(shininess);
     }
 
-    void update(osg::Vec3f c, osg::Matrixf modelview){
+    void update(osg::Vec3f c, osg::Matrixf view){
 
 
         SDRender * ren = (SDRender *)getRender();
@@ -98,11 +98,16 @@ public :
         //SDScreens * scr= (SDScreens *)getScreens();
         //osg::Vec3 c = scr->getActiveView()->getCameras()->getSelectedCamera()->getCameraPosition();
        // osg::Matrix modelview = scr->getActiveView()->getOsgCam()->getViewMatrix();
+
+
+
+        //Wil have to check space coordinates !
         osg::Vec4f v = osg::Vec4f(c.x(),c.y(),c.z(),1.0f);
-        osg::Vec4f pv = v*modelview;
+        osg::Vec4f pv = v*view;
         osg::Vec4f lv = osg::Vec4(sun_pos.x(),sun_pos.y(),sun_pos.z(),0.0f);
-        lv =lv*modelview;
-/*
+        lv = lv*view;
+
+        /*
         GfOut("View Point : %f %f %f\n",pv.x(),pv.y(),pv.z());
         GfOut("Light Vector  : %f %f %f\n",lv.x(),lv.y(),lv.z());
   */
@@ -114,6 +119,8 @@ public :
         this->lightVector->set(osg::Vec3f(lv.x(),lv.y(),lv.z()));
         this->lightPower->set(sun_color);
         this->ambientColor->set(scene_color);
+        //this->mvmatrix->set(mvm);
+       // this->normalmatrix->set(m);
 
         //osg::StateSet* stateset = pCar->getOrCreateStateSet();
         //stateset->setAttributeAndModes( program.get() );
@@ -136,7 +143,7 @@ SDCar::loadCar(tCarElt *car)
     char buf[nMaxTexPathSize];
     int index;
     void *handle;
-    //const char *param;
+    //const char *param;,car_branch->getMatrix()
     int lg =0;
     char path[256];
     
@@ -319,6 +326,8 @@ void SDCar::updateCar()
 }
 
 void SDCar::updateShadingParameters(osg::Vec3f eye,osg::Matrixf modelview){
+
+
     shader->update(eye,modelview);
 }
 

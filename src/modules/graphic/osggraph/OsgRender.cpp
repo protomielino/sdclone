@@ -362,7 +362,7 @@ void SDRender::Init(tTrack *track)
     sceneGroup->addChild(m_scene);
     //sceneGroup->addChild(scenery->getScene());
     //m_CarRoot->addChild(cars->getCarsNode());
-    m_CarRoot->setNodeMask(castShadowMask);
+    //m_CarRoot->setNodeMask(castShadowMask);
     sceneGroup->addChild(m_CarRoot.get());
     stateSet = new osg::StateSet;
     stateSet = m_scene->getOrCreateStateSet();
@@ -433,7 +433,7 @@ void SDRender::Init(tTrack *track)
 
 void SDRender::ShadowedScene()
 {
-    /*osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
+    osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
     vdsm->setLight(sunLight.get());
     vdsm->setTextureSize(osg::Vec2s(2048, 2048));
     vdsm->setTextureUnit(3);
@@ -444,21 +444,23 @@ void SDRender::ShadowedScene()
     shadowRoot->setCastsShadowTraversalMask(castShadowMask);
     shadowRoot->addChild(m_scene.get());
     shadowRoot->addChild(m_CarRoot.get());
+    shadowRoot->addChild(sunLight.get());
 
-    m_RealRoot->addChild(shadowRoot.get());*/
+
+    m_RealRoot->addChild(shadowRoot.get());
 }
 
 void SDRender::addCars(osg::Node* cars)
 {
     //m_CarRoot = new osg::Group;
     m_CarRoot->addChild(cars);
-    //m_CarRoot->setNodeMask(castShadowMask);
+    m_CarRoot->setNodeMask(castShadowMask);
 
     osgUtil::Optimizer optimizer;
     optimizer.optimize(m_CarRoot.get());
     optimizer.optimize(m_scene.get());
 
-    //ShadowedScene();
+    ShadowedScene();
 }
 
 void SDRender::UpdateLight( void )
