@@ -433,7 +433,7 @@ void SDRender::Init(tTrack *track)
 
 void SDRender::ShadowedScene()
 {
-    osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
+    /*osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
     vdsm->setLight(sunLight.get());
     vdsm->setTextureSize(osg::Vec2s(2048, 2048));
     vdsm->setTextureUnit(3);
@@ -447,7 +447,7 @@ void SDRender::ShadowedScene()
     shadowRoot->addChild(sunLight.get());
 
 
-    m_RealRoot->addChild(shadowRoot.get());
+    m_RealRoot->addChild(shadowRoot.get());*/
 }
 
 void SDRender::addCars(osg::Node* cars)
@@ -460,7 +460,7 @@ void SDRender::addCars(osg::Node* cars)
     optimizer.optimize(m_CarRoot.get());
     optimizer.optimize(m_scene.get());
 
-    ShadowedScene();
+    //ShadowedScene();
 }
 
 void SDRender::UpdateLight( void )
