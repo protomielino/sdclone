@@ -421,7 +421,7 @@ void SDCar::updateCar()
     {
         osg::Vec3 vtx = *itr;
         osg::Vec4 tvtx = osg::Vec4(vtx,1.0f)*mat;
-        tvtx._v[2] = RtTrackHeightG(car->_trkPos.seg, tvtx.x(), tvtx.y());
+        tvtx._v[2] = RtTrackHeightG(car->_trkPos.seg, tvtx.x(), tvtx.y())+ 0.0699;
         osg::Matrix iv = osg::Matrix::inverse(mat);
         osg::Vec4 vtxw = tvtx*iv;
         vtxw._v[2] = vtxw.z();

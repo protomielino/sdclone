@@ -52,6 +52,7 @@ osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)
 
 osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const char * wheel_mod_name)
 {
+#if 1
     osgLoader loader;
     char wheel_file_name[32];
     char buf[4096];
@@ -84,7 +85,41 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
             wheels_switches[wheelIndex]->addChild(wheel,false);
         }
     }
+#else
+    char wheel_file_name[32];
+    char buf[4096];
 
+    std::string LocalPath = GetDataDir();
+
+    osg::ref_ptr<osgDB::Options> options = new::osgDB::ReaderWriter::Options();
+    //options = new osgDB::ReaderWriter::Options;
+    options->getDatabasePathList().push_back(LocalPath+"data/objects/");
+
+    snprintf(buf, 4096, "drivers/%s/%d/", car->_modName, car->_driverIndex);
+    options->getDatabasePathList().push_back(LocalPath+buf);
+
+    snprintf(buf, 4096, "cars/models/%s/", car->_carName);
+    options->getDatabasePathList().push_back(LocalPath+buf);
+
+    options->getDatabasePathList().push_back(LocalPath+"data/textures/");
+
+    wheels_switches[wheelIndex] = new osg::Switch;
+
+    // Load speed-dependant 3D wheel model if available
+    for(int j=0;j<4;j++)
+    {
+        osg::ref_ptr<osg::Node> wheel = 0;
+        if (wheel_mod_name && strlen(wheel_mod_name))
+        {
+            snprintf(wheel_file_name, 32, "%s%d.osg", wheel_mod_name, j);
+            wheel = osgDB::readNodeFile(wheel_file_name, options);
+            wheels_switches[wheelIndex]->addChild(wheel,false);
+        }
+    }
+
+    options->getDatabasePathList().clear();
+    options = NULL;
+#endif
 
     osg::ref_ptr<osg::MatrixTransform> whlsize = new osg::MatrixTransform;
     float wheelRadius = car->_rimRadius(wheelIndex) + car->_tireHeight(wheelIndex);
