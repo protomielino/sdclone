@@ -42,12 +42,8 @@ public:
    virtual void operator()(const osg::Camera& cam) const
    {
         SDCars * cars = (SDCars*)getCars();
-        osg::Vec3 e;
-        cam.getUserValue("eye",e);
         osg::Matrixf mat = cam.getViewMatrix();
-        cars->updateShadingParameters(e,mat);
-     //   GfOut("Camera DrawnHHERERE %d %f %f %F\n",&cam,e.x(),e.y(),e.z());
-     // traverse(node, nv);
+        cars->updateShadingParameters(mat);
    }
 };
 

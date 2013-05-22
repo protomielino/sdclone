@@ -156,7 +156,6 @@ void SDPerspCamera::setProjection(void)
 void SDPerspCamera::setModelView(void)
 {
   screen->getOsgCam()->setViewMatrixAsLookAt(eye,center,up);
-  screen->getOsgCam()->setUserValue("eye",eye);
 }
 
 void SDPerspCamera::loadDefaults(char *attr)

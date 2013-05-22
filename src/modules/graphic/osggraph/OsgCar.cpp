@@ -48,8 +48,7 @@ private :
     osg::Node *pCar;
     osg::StateSet* stateset;
     osg::Uniform * diffuseMap;
-    osg::Uniform * normalMap;
-    osg::Uniform * viewPoint;
+    //osg::Uniform * normalMap;
     osg::Uniform * specularColor;
     osg::Uniform * lightVector;
     osg::Uniform * lightPower;
@@ -79,8 +78,6 @@ public :
         stateset->addUniform(diffuseMap);
        // normalMap = new osg::Uniform("normalmap", 1 );
        // stateset->addUniform(normalMap);
-        viewPoint = new osg::Uniform("pv",osg::Vec3());
-        stateset->addUniform(viewPoint);
         specularColor = new osg::Uniform("specularColor", osg::Vec4(0.8f,0.8f,0.8f,1.0f));
         stateset->addUniform(specularColor);
         lightVector = new osg::Uniform("lightvector",osg::Vec3());
@@ -89,12 +86,11 @@ public :
         stateset->addUniform(lightPower);
         ambientColor =new osg::Uniform("ambientColor",osg::Vec4());
         stateset->addUniform(ambientColor);
-        shininess = new osg::Uniform("smoothness", 128.0f);
+        shininess = new osg::Uniform("smoothness", 300.0f);
         stateset->addUniform(shininess);
     }
 
-    void update(osg::Vec3f c, osg::Matrixf view){
-
+    void update(osg::Matrixf view){
 
         SDRender * ren = (SDRender *)getRender();
         osg::Vec3f sun_pos= ren->getSky()->getSun()->getSunPosition();
@@ -111,9 +107,6 @@ public :
 
 
 
-        //Wil have to check space coordinates !
-        osg::Vec4f v = osg::Vec4f(c.x(),c.y(),c.z(),1.0f);
-        osg::Vec4f pv = v*view;
         osg::Vec4f lv = osg::Vec4(sun_pos.x(),sun_pos.y(),sun_pos.z(),0.0f);
         lv = lv*view;
 
@@ -121,11 +114,9 @@ public :
         GfOut("View Point : %f %f %f\n",pv.x(),pv.y(),pv.z());
         GfOut("Light Vector  : %f %f %f\n",lv.x(),lv.y(),lv.z());
   */
+       //GfOut("View Point : %f %f %f\n",pv.x(),pv.y(),pv.z());
     //  GfOut("Scene Color : %f %f %f %f\n",scene_color._v[0],scene_color._v[1],scene_color._v[2],scene_color._v[3]);
 
-
-
-        this->viewPoint->set(osg::Vec3f(pv.x(),pv.y(),pv.z()));
         this->lightVector->set(osg::Vec3f(lv.x(),lv.y(),lv.z()));
         this->lightPower->set(sun_color);
         this->ambientColor->set(scene_color);
@@ -329,7 +320,7 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car){
     std::string TmpPath = GetDataDir();
 
 
-    GfOut("\n################## LOADING SHADOW ###############################\n");
+  //  GfOut("\n################## LOADING SHADOW ###############################\n");
 
     std::string shadowTextureName = GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_SHADOW_TEXTURE, "");
 
@@ -340,7 +331,7 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car){
     std::string dir = buf;
     shadowTextureName = TmpPath +dir+shadowTextureName;
 
-    GfOut("\n lepath = %s\n",shadowTextureName.c_str());
+   // GfOut("\n lepath = %s\n",shadowTextureName.c_str());
 
     osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
     osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
@@ -401,7 +392,7 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car){
     shadowVertices = vertices;
 
 
-    GfOut("\n################## LOADED SHADOW ###############################\n");
+  //  GfOut("\n################## LOADED SHADOW ###############################\n");
 
     return root;
 
@@ -425,6 +416,7 @@ void SDCar::updateCar()
     //ugly computation, order to chec
     osg::Vec3Array::iterator itr;
     itr = shadowVertices->begin();
+
     while (itr != shadowVertices->end())
     {
         osg::Vec3 vtx = *itr;
@@ -442,10 +434,10 @@ void SDCar::updateCar()
 
 }
 
-void SDCar::updateShadingParameters(osg::Vec3f eye,osg::Matrixf modelview){
+void SDCar::updateShadingParameters(osg::Matrixf modelview){
 
 
-    shader->update(eye,modelview);
+    shader->update(modelview);
 }
 
 SDCars::SDCars(void)
@@ -490,11 +482,11 @@ void SDCars::updateCars()
     }
 }
 
-void SDCars::updateShadingParameters(osg::Vec3f eye,osg::Matrixf modelview){
+void SDCars::updateShadingParameters(osg::Matrixf modelview){
     std::vector<SDCar *>::iterator it;
     for(it = the_cars.begin(); it!= the_cars.end(); it++)
     {
-        (*it)->updateShadingParameters(eye,modelview);
+        (*it)->updateShadingParameters(modelview);
     }
 }
 
