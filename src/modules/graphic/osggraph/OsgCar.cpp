@@ -22,7 +22,14 @@
 #include <osg/Group>
 #include <osgViewer/Viewer>
 #include <osg/Program>
+#include <osg/Geode>
+#include <osg/Geometry>
 #include <portability.h>
+#include <osg/Texture2D>
+#include <osg/BlendFunc>
+#include <osgDB/ReadFile>
+
+#include <robottools.h>
 
 #include "OsgLoader.h"
 #include "OsgCar.h"
@@ -41,6 +48,7 @@ private :
     osg::Node *pCar;
     osg::StateSet* stateset;
     osg::Uniform * diffuseMap;
+    osg::Uniform * normalMap;
     osg::Uniform * viewPoint;
     osg::Uniform * specularColor;
     osg::Uniform * lightVector;
@@ -69,6 +77,8 @@ public :
 
         diffuseMap = new osg::Uniform("diffusemap", 0 );
         stateset->addUniform(diffuseMap);
+       // normalMap = new osg::Uniform("normalmap", 1 );
+       // stateset->addUniform(normalMap);
         viewPoint = new osg::Uniform("pv",osg::Vec3());
         stateset->addUniform(viewPoint);
         specularColor = new osg::Uniform("specularColor", osg::Vec4(0.8f,0.8f,0.8f,1.0f));
@@ -281,7 +291,7 @@ SDCar::loadCar(tCarElt *car)
         strTPath = GetDataDir();
         strTPath +=buf;
         options->getDatabasePathList().push_back(strTPath);
-        GfOut("Load Car OSG !\n");
+       // GfOut("Load Car OSG !\n");
         pCar = osgDB::readNodeFile("ref-sphere-osg.osg", options);
     }
 
@@ -297,12 +307,104 @@ SDCar::loadCar(tCarElt *car)
     this->shader = new SDCarShader(pCar.get());
 
 
-    GfOut("loaded car %d",pCar.get());
+   // GfOut("loaded car %d",pCar.get());
     this->car_branch = transform1.get();
 
     this->car_branch->addChild(wheels.initWheels(car,handle));
-    
+    this->car_branch->addChild(this->initOcclusionQuad(car));
+
     return this->car_branch;
+}
+
+#define GR_SHADOW_POINTS 6
+#define MULT 1.1
+osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car){
+
+    osg::Vec3f vtx;
+    osg::Vec2f tex;
+    float x;
+    int i;
+
+    char buf[512];
+    std::string TmpPath = GetDataDir();
+
+
+    GfOut("\n################## LOADING SHADOW ###############################\n");
+
+    std::string shadowTextureName = GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_SHADOW_TEXTURE, "");
+
+    snprintf(buf, sizeof(buf), "cars/models/%s/", car->_carName);
+    if (strlen(car->_masterModel) > 0) // Add the master model path if we are using a template.
+        snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), "cars/models/%s/", car->_masterModel);
+
+    std::string dir = buf;
+    shadowTextureName = TmpPath +dir+shadowTextureName;
+
+    GfOut("\n lepath = %s\n",shadowTextureName.c_str());
+
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+    osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
+    vtx._v[2] = 0.0;
+    for (i = 0, x = car->_dimension_x * MULT / 2.0; i < GR_SHADOW_POINTS / 2;
+         i++, x -= car->_dimension_x * MULT / (float)(GR_SHADOW_POINTS - 2) * 2.0) {
+
+        vtx._v[0] = x;
+        tex._v[0] = 1.0 - (float)i / (float)((GR_SHADOW_POINTS - 2) / 2.0);
+
+        vtx._v[1] = -car->_dimension_y * MULT / 2.0;
+        vertices->push_back(vtx);
+        tex._v[1] = 0.0;
+        texcoords->push_back(tex);
+
+        vtx._v[1] = car->_dimension_y * MULT / 2.0;
+    vertices->push_back(vtx);
+        tex._v[1] = 1.0;
+        texcoords->push_back(tex);
+    }
+  //  vertices->push_back( osg::Vec3(0.0f, 10.0f, 0.0f) );
+  //  vertices->push_back( osg::Vec3(10.0f, 0.0f, 0.0f) );
+   // vertices->push_back( osg::Vec3(10.0f, 0.0f, 10.0f) );
+    //vertices->push_back( osg::Vec3(10.0f, 0.0f, 10.0f) );
+
+    osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
+    normals->push_back( osg::Vec3(0.0f,0.0f, 1.0f) );
+
+    osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
+    colors->push_back( osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+
+    osg::ref_ptr<osg::Geometry> quad = new osg::Geometry;
+    quad->setVertexArray( vertices.get() );
+    quad->setNormalArray( normals.get() );
+    quad->setNormalBinding( osg::Geometry::BIND_OVERALL );
+    quad->setColorArray( colors.get() );
+    quad->setColorBinding( osg::Geometry::BIND_OVERALL );
+    quad->setTexCoordArray( 0, texcoords.get() );
+    quad->addPrimitiveSet( new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, vertices->size()) );
+
+    quad->setDataVariance(osg::Object::DYNAMIC);
+
+    osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
+    osg::ref_ptr<osg::Image> image = osgDB::readImageFile(shadowTextureName);
+    texture->setImage( image.get() );
+
+    osg::ref_ptr<osg::BlendFunc> blendFunc = new osg::BlendFunc;
+    blendFunc->setFunction( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+    osg::ref_ptr<osg::Geode> root = new osg::Geode;
+    root->addDrawable( quad.get() );
+
+    osg::StateSet* stateset = root->getOrCreateStateSet();
+    stateset->setTextureAttributeAndModes(0, texture.get() );
+    stateset->setAttributeAndModes( blendFunc );
+    stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN );
+
+    shadowVertices = vertices;
+
+
+    GfOut("\n################## LOADED SHADOW ###############################\n");
+
+    return root;
+
 }
 
 void SDCar::updateCar()
@@ -319,6 +421,21 @@ void SDCar::updateCar()
             car->_posMat[3][0],car->_posMat[3][1],car->_posMat[3][2],car->_posMat[3][3]);
 
     wheels.updateWheels();
+
+    //ugly computation, order to chec
+    osg::Vec3Array::iterator itr;
+    itr = shadowVertices->begin();
+    while (itr != shadowVertices->end())
+    {
+        osg::Vec3 vtx = *itr;
+        osg::Vec4 tvtx = osg::Vec4(vtx,1.0f)*mat;
+        tvtx._v[2] = RtTrackHeightG(car->_trkPos.seg, tvtx.x(), tvtx.y());
+        osg::Matrix iv = osg::Matrix::inverse(mat);
+        osg::Vec4 vtxw = tvtx*iv;
+        vtxw._v[2] = vtxw.z();
+        itr->set(vtxw.x(), vtxw.y(), vtxw.z());
+        itr++;
+    }
 
     this->car_branch->setMatrix(mat);
 
