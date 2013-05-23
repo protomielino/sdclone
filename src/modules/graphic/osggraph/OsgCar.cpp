@@ -27,6 +27,7 @@
 #include <portability.h>
 #include <osg/Texture2D>
 #include <osg/BlendFunc>
+#include <osg/Depth>
 #include <osgDB/ReadFile>
 
 #include <robottools.h>
@@ -302,9 +303,13 @@ SDCar::loadCar(tCarElt *car)
     this->car_branch = transform1.get();
 
     this->car_branch->addChild(wheels.initWheels(car,handle));
-    this->car_branch->addChild(this->initOcclusionQuad(car));
 
-    return this->car_branch;
+
+    this->car_root = new osg::Group;
+    car_root->addChild(car_branch);
+    this->car_root->addChild(this->initOcclusionQuad(car));
+
+    return this->car_root;
 }
 
 #define GR_SHADOW_POINTS 6
@@ -363,7 +368,7 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car){
     osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
     colors->push_back( osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
 
-    osg::ref_ptr<osg::Geometry> quad = new osg::Geometry;
+    quad = new osg::Geometry;
     quad->setVertexArray( vertices.get() );
     quad->setNormalArray( normals.get() );
     quad->setNormalBinding( osg::Geometry::BIND_OVERALL );
@@ -413,23 +418,20 @@ void SDCar::updateCar()
 
     wheels.updateWheels();
 
-    //ugly computation, order to chec
-    osg::Vec3Array::iterator itr;
-    itr = shadowVertices->begin();
-
-    while (itr != shadowVertices->end())
-    {
-        osg::Vec3 vtx = *itr;
-        osg::Vec4 tvtx = osg::Vec4(vtx,1.0f)*mat;
-        tvtx._v[2] = RtTrackHeightG(car->_trkPos.seg, tvtx.x(), tvtx.y())+ 0.0699;
-        osg::Matrix iv = osg::Matrix::inverse(mat);
-        osg::Vec4 vtxw = tvtx*iv;
-        vtxw._v[2] = vtxw.z();
-        itr->set(vtxw.x(), vtxw.y(), vtxw.z());
-        itr++;
-    }
-
     this->car_branch->setMatrix(mat);
+
+
+    //ugly computation,
+    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+    for(uint i=0;i<shadowVertices->size();i++)
+    {
+        osg::Vec3 vtx = (*shadowVertices.get())[i];
+        osg::Vec4 vtx_world = osg::Vec4(vtx,1.0f)*mat;
+        vtx_world._v[2] = RtTrackHeightG(car->_trkPos.seg, vtx_world.x(), vtx_world.y()); //0.01 needed, we have to sort out why
+        vertices->push_back(osg::Vec3(vtx_world.x(), vtx_world.y(), vtx_world.z()));
+
+    }
+    quad->setVertexArray(vertices);
 
 
 }

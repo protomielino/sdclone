@@ -32,10 +32,12 @@ class SDCar
 {
     private :
         osg::ref_ptr<osg::MatrixTransform> car_branch;
+        osg::ref_ptr<osg::Group> car_root;
         tCarElt *car;
         SDWheels wheels;
         SDCarShader * shader;
         osg::ref_ptr<osg::Vec3Array> shadowVertices;
+        osg::ref_ptr<osg::Geometry> quad;
      //   osg::ref_ptr<osg::MatrixTransform> wheels[4];
        // osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
         osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
