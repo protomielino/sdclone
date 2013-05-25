@@ -296,6 +296,7 @@ typedef struct {
     tdble rollRes;              /**< rolling resistance, useful for sound */
 	tdble   temp_in, temp_mid, temp_out;
 	tdble   condition;
+	tdble slipNorm; /* normalized slip, the variable of Magic Formula */
 	tdble slipSide;
 	tdble slipAccel;
 	tdble Fx;
@@ -308,6 +309,7 @@ typedef struct {
 #define _brakeTemp(i)	priv.wheel[i].brakeTemp
 #define _wheelSpinVel(i) priv.wheel[i].spinVel
 #define _wheelSeg(i)	priv.wheel[i].seg
+#define _wheelSlipNorm(i) priv.wheel[i].slipNorm
 #define _wheelSlipSide(i) priv.wheel[i].slipSide
 #define _wheelSlipAccel(i) priv.wheel[i].slipAccel
 #define _wheelFx(i) priv.wheel[i].Fx
@@ -589,10 +591,15 @@ typedef struct CarElt
 #define PRM_LOADFMIN		"load factor min"
 #define PRM_OPLOAD		"operating load"
 #define PRM_OPTTEMP		"optimal temperature"
+#define PRM_INITTEMP		"initial temperature"
 #define PRM_COLDMUFACTOR	"cold mu factor"
 #define PRM_HEATINGMULT		"heating multiplier"
 #define PRM_AIRCOOLINGMULT	"air cooling multiplier"
 #define PRM_SPEEDCOOLINGMULT	"speed cooling multiplier"
+#define PRM_WEARRATE		"wear rate multiplier"
+#define PRM_FALLOFFTREADDEPTH	"falloff tread depth"
+#define PRM_FALLOFFGRIPMULT	"falloff grip multiplier"
+#define PRM_REMAININGGRIPMULT	"remaining grip multiplier"
 
 #define PRM_SPR			"spring"
 #define PRM_SUSPCOURSE		"suspension course"
