@@ -137,8 +137,7 @@ public :
     }
 };
 
-osg::ref_ptr<osg::Node>
-SDCar::loadCar(tCarElt *car)
+osg::Node *SDCar::loadCar(tCarElt *car)
 {
     this->car = car;
     static const int nMaxTexPathSize = 4096;
@@ -303,6 +302,8 @@ SDCar::loadCar(tCarElt *car)
     this->car_branch = transform1.get();
 
     this->car_branch->addChild(wheels.initWheels(car,handle));
+    /*this->car_branch->getOrCreateStateSet()->setMode
+            ( GL_DEPTH_TEST, osg::StateAttribute::PROTECTED|osg::StateAttribute::ON );*/
 
 
     this->car_root = new osg::Group;
@@ -325,8 +326,7 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car){
     char buf[512];
     std::string TmpPath = GetDataDir();
 
-
-  //  GfOut("\n################## LOADING SHADOW ###############################\n");
+    //  GfOut("\n################## LOADING SHADOW ###############################\n");
 
     std::string shadowTextureName = GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_SHADOW_TEXTURE, "");
 
@@ -354,14 +354,10 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car){
         texcoords->push_back(tex);
 
         vtx._v[1] = car->_dimension_y * MULT / 2.0;
-    vertices->push_back(vtx);
+        vertices->push_back(vtx);
         tex._v[1] = 1.0;
         texcoords->push_back(tex);
     }
-  //  vertices->push_back( osg::Vec3(0.0f, 10.0f, 0.0f) );
-  //  vertices->push_back( osg::Vec3(10.0f, 0.0f, 0.0f) );
-   // vertices->push_back( osg::Vec3(10.0f, 0.0f, 10.0f) );
-    //vertices->push_back( osg::Vec3(10.0f, 0.0f, 10.0f) );
 
     osg::ref_ptr<osg::Vec3Array> normals = new osg::Vec3Array;
     normals->push_back( osg::Vec3(0.0f,0.0f, 1.0f) );
@@ -391,17 +387,16 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car){
     root->addDrawable( quad.get() );
 
     osg::StateSet* stateset = root->getOrCreateStateSet();
+    //stateset->setMode( GL_DEPTH_TEST, osg::StateAttribute::OFF );
     stateset->setTextureAttributeAndModes(0, texture.get() );
     stateset->setAttributeAndModes( blendFunc );
     stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN );
 
     shadowVertices = vertices;
 
+    //  GfOut("\n################## LOADED SHADOW ###############################\n");
 
-  //  GfOut("\n################## LOADED SHADOW ###############################\n");
-
-    return root;
-
+    return root.get();
 }
 
 void SDCar::updateCar()
@@ -421,7 +416,6 @@ void SDCar::updateCar()
 
     this->car_branch->setMatrix(mat);
 
-
     //ugly computation,
     if (SHADOW_TECHNIQUE == 0)
     {
@@ -438,7 +432,6 @@ void SDCar::updateCar()
 }
 
 void SDCar::updateShadingParameters(osg::Matrixf modelview){
-
 
     shader->update(modelview);
 }
@@ -474,7 +467,6 @@ void SDCars::loadCars(tSituation * pSituation)
     
     return;;
 }
-
 
 void SDCars::updateCars()
 {

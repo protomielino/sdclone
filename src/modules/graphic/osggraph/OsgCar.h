@@ -38,12 +38,12 @@ class SDCar
         SDCarShader * shader;
         osg::ref_ptr<osg::Vec3Array> shadowVertices;
         osg::ref_ptr<osg::Geometry> quad;
-     //   osg::ref_ptr<osg::MatrixTransform> wheels[4];
-       // osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
+        //osg::ref_ptr<osg::MatrixTransform> wheels[4];
+        //osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
         osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
 
     public :
-        osg::ref_ptr<osg::Node> loadCar(tCarElt *car);
+        osg::Node *loadCar(tCarElt *car);
         void updateCar();
         void updateShadingParameters(osg::Matrixf modelview);
 };
