@@ -26,6 +26,8 @@
 #include <track.h>	 //tTrack
 #include <raceman.h> // tSituation
 
+#define SHADOW_TECHNIQUE 0
+
 class SDSky;
 class SDScenery;
 

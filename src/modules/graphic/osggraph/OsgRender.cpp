@@ -30,7 +30,14 @@
 #include <osgViewer/Viewer>
 #include <osgParticle/PrecipitationEffect>
 #include <osgShadow/ShadowedScene>
-//#include <osgShadow/ViewDependentShadowMap>
+#include <osgShadow/ShadowVolume>
+#include <osgShadow/ShadowTexture>
+#include <osgShadow/ShadowMap>
+#include <osgShadow/SoftShadowMap>
+#include <osgShadow/ParallelSplitShadowMap>
+#include <osgShadow/LightSpacePerspectiveShadowMap>
+#include <osgShadow/StandardShadowMap>
+#include <osgShadow/ViewDependentShadowMap>
 #include <osgShadow/ShadowMap>
 
 #include "OsgMain.h"
@@ -433,21 +440,27 @@ void SDRender::Init(tTrack *track)
 
 void SDRender::ShadowedScene()
 {
-    /*osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
-    vdsm->setLight(sunLight.get());
-    vdsm->setTextureSize(osg::Vec2s(2048, 2048));
-    vdsm->setTextureUnit(3);
-    //shadowRoot = new osgShadow::ShadowedScene;
+    if (SHADOW_TECHNIQUE == 1)
+    {
+        osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
+        vdsm->setLight(sunLight.get());
+        vdsm->setTextureSize(osg::Vec2s(4096, 4096));
+        vdsm->setTextureUnit(1);
+        shadowRoot = new osgShadow::ShadowedScene;
+        osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
+        settings->setReceivesShadowTraversalMask(rcvShadowMask);
+        settings->setCastsShadowTraversalMask(castShadowMask);
+        shadowRoot->setShadowTechnique((vdsm.get()));
+    }
 
-    shadowRoot->setShadowTechnique((vdsm.get()));
-    shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
-    shadowRoot->setCastsShadowTraversalMask(castShadowMask);
     shadowRoot->addChild(m_scene.get());
     shadowRoot->addChild(m_CarRoot.get());
     shadowRoot->addChild(sunLight.get());
+    shadowRoot->addChild(thesky->getCloudRoot());
 
+    m_RealRoot->removeChild(0, m_RealRoot->getNumChildren());
 
-    m_RealRoot->addChild(shadowRoot.get());*/
+    m_RealRoot->addChild(shadowRoot.get());
 }
 
 void SDRender::addCars(osg::Node* cars)
@@ -460,7 +473,8 @@ void SDRender::addCars(osg::Node* cars)
     optimizer.optimize(m_CarRoot.get());
     optimizer.optimize(m_scene.get());
 
-    //ShadowedScene();
+    if (SHADOW_TECHNIQUE > 0)
+        ShadowedScene();
 }
 
 void SDRender::UpdateLight( void )

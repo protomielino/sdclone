@@ -307,7 +307,8 @@ SDCar::loadCar(tCarElt *car)
 
     this->car_root = new osg::Group;
     car_root->addChild(car_branch);
-    this->car_root->addChild(this->initOcclusionQuad(car));
+    if (SHADOW_TECHNIQUE == 0)
+        this->car_root->addChild(this->initOcclusionQuad(car));
 
     return this->car_root;
 }
@@ -422,18 +423,18 @@ void SDCar::updateCar()
 
 
     //ugly computation,
-    osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-    for(uint i=0;i<shadowVertices->size();i++)
+    if (SHADOW_TECHNIQUE == 0)
     {
-        osg::Vec3 vtx = (*shadowVertices.get())[i];
-        osg::Vec4 vtx_world = osg::Vec4(vtx,1.0f)*mat;
-        vtx_world._v[2] = RtTrackHeightG(car->_trkPos.seg, vtx_world.x(), vtx_world.y()); //0.01 needed, we have to sort out why
-        vertices->push_back(osg::Vec3(vtx_world.x(), vtx_world.y(), vtx_world.z()));
-
+        osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
+        for(uint i=0;i<shadowVertices->size();i++)
+        {
+            osg::Vec3 vtx = (*shadowVertices.get())[i];
+            osg::Vec4 vtx_world = osg::Vec4(vtx,1.0f)*mat;
+            vtx_world._v[2] = RtTrackHeightG(car->_trkPos.seg, vtx_world.x(), vtx_world.y()); //0.01 needed, we have to sort out why
+            vertices->push_back(osg::Vec3(vtx_world.x(), vtx_world.y(), vtx_world.z()));
+        }
+        quad->setVertexArray(vertices);
     }
-    quad->setVertexArray(vertices);
-
-
 }
 
 void SDCar::updateShadingParameters(osg::Matrixf modelview){
