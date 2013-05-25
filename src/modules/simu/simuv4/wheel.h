@@ -80,10 +80,16 @@ typedef struct
     
     tdble   Ttire;      /* tire temperature in K */
     tdble   Topt;       /* optimal temperature in K, where mu maximal */
-    tdble   muTmult;  /* mu = mumax * (1 - muTmult*(T-Topt)^2) */
+    tdble   Tinit;      /* initial tire temperature, right after pit or at start */
+    tdble   muTmult;    /* mu = mumax * (1 - muTmult*(T-Topt)^2) */
     tdble   heatingm;   /* heating multiplier */
     tdble   aircoolm;   /* air cooling multiplier */
     tdble   speedcoolm; /* how aircoolm increases with speed */
+    tdble   wearrate; /* degradation multiplier */
+    tdble   treadDepth; /* tread depth, between 0 and 1 */
+    tdble   critTreadDepth; /* critical tread depth, when grip falls off suddenly */
+    tdble   muTDmult[2]; /* mu is multiplied by muTDmult[i]*treadDepth+muTDoffset[i] */
+    tdble   muTDoffset[2];
 
     tDynAxis	in;
     tDynAxis	feedBack;
