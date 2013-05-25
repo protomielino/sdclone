@@ -37,8 +37,7 @@
 #include <osgShadow/ParallelSplitShadowMap>
 #include <osgShadow/LightSpacePerspectiveShadowMap>
 #include <osgShadow/StandardShadowMap>
-#include <osgShadow/ViewDependentShadowMap>
-#include <osgShadow/ShadowMap>
+//#include <osgShadow/ViewDependentShadowMap>
 
 #include "OsgMain.h"
 #include "OsgRender.h"
