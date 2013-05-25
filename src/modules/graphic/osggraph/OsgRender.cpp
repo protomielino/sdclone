@@ -37,7 +37,7 @@
 #include <osgShadow/ParallelSplitShadowMap>
 #include <osgShadow/LightSpacePerspectiveShadowMap>
 #include <osgShadow/StandardShadowMap>
-#include <osgShadow/ViewDependentShadowMap>
+//#include <osgShadow/ViewDependentShadowMap>
 
 #include "OsgMain.h"
 #include "OsgRender.h"
@@ -453,14 +453,26 @@ void SDRender::ShadowedScene()
     }
     else if (SHADOW_TECHNIQUE  == 2)
     {
-        osg::ref_ptr<osgShadow::ViewDependentShadowMap> vdsm = new osgShadow::ViewDependentShadowMap;
-        //vdsm->setLight(sunLight.get());
-        //vdsm->setTextureSize(osg::Vec2s(4096, 4096));
+        osg::ref_ptr<osgShadow::SoftShadowMap> vdsm = new osgShadow::SoftShadowMap;
+        vdsm->setLight(sunLight.get());
+        vdsm->setTextureSize(osg::Vec2s(4096, 4096));
+        vdsm->setTextureUnit(1);
         shadowRoot = new osgShadow::ShadowedScene;
         osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
         settings->setReceivesShadowTraversalMask(rcvShadowMask);
         settings->setCastsShadowTraversalMask(castShadowMask);
         shadowRoot->setShadowTechnique((vdsm.get()));
+    }
+    else if (SHADOW_TECHNIQUE == 3)
+    {
+        osg::ref_ptr<osgShadow::ShadowVolume> sv = new osgShadow::ShadowVolume;
+        sv->setDynamicShadowVolumes(TRUE);
+        sv->setDrawMode(osgShadow::ShadowVolumeGeometry::STENCIL_TWO_PASS);
+        shadowRoot = new osgShadow::ShadowedScene;
+        osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
+        settings->setReceivesShadowTraversalMask(rcvShadowMask);
+        settings->setCastsShadowTraversalMask(castShadowMask);
+        shadowRoot->setShadowTechnique((sv.get()));
     }
 
     shadowRoot->addChild(m_scene.get());
