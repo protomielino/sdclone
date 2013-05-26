@@ -365,11 +365,10 @@ void SDRender::Init(tTrack *track)
     m_scene->addChild(scenery->getScene());
     m_scene->addChild(scenery->getBackground());
     m_scene->setNodeMask(rcvShadowMask);
+
     sceneGroup->addChild(m_scene);
-    //sceneGroup->addChild(scenery->getScene());
-    //m_CarRoot->addChild(cars->getCarsNode());
-    //m_CarRoot->setNodeMask(castShadowMask);
     sceneGroup->addChild(m_CarRoot.get());
+
     stateSet = new osg::StateSet;
     stateSet = m_scene->getOrCreateStateSet();
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
@@ -453,26 +452,28 @@ void SDRender::ShadowedScene()
     }
     else if (SHADOW_TECHNIQUE  == 2)
     {
-        osg::ref_ptr<osgShadow::SoftShadowMap> vdsm = new osgShadow::SoftShadowMap;
-        vdsm->setLight(sunLight.get());
-        vdsm->setTextureSize(osg::Vec2s(4096, 4096));
-        vdsm->setTextureUnit(1);
+        osg::ref_ptr<osgShadow::SoftShadowMap> ssm = new osgShadow::SoftShadowMap;
+        ssm->setLight(sunLight.get());
+        ssm->setTextureSize(osg::Vec2s(2048, 2048));
+        ssm->setSoftnessWidth(1.0f);
         shadowRoot = new osgShadow::ShadowedScene;
         //osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
         shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
         shadowRoot->setCastsShadowTraversalMask(castShadowMask);
-        shadowRoot->setShadowTechnique((vdsm.get()));
+        shadowRoot->setShadowTechnique((ssm.get()));
     }
     else if (SHADOW_TECHNIQUE == 3)
     {
-        osg::ref_ptr<osgShadow::ShadowVolume> sv = new osgShadow::ShadowVolume;
-        sv->setDynamicShadowVolumes(TRUE);
-        sv->setDrawMode(osgShadow::ShadowVolumeGeometry::STENCIL_TWO_PASS);
+        osg::ref_ptr<osgShadow::ParallelSplitShadowMap> pssm =
+                new osgShadow::ParallelSplitShadowMap(NULL, 3);
+        pssm->setTextureResolution(2048);
+        pssm->setMinNearDistanceForSplits(0.25);
+        pssm->setMaxFarDistance(512.0);
+        pssm->setPolygonOffset(osg::Vec2(10.0f, 20.0f));
         shadowRoot = new osgShadow::ShadowedScene;
-        //osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
         shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
         shadowRoot->setCastsShadowTraversalMask(castShadowMask);
-        shadowRoot->setShadowTechnique((sv.get()));
+        shadowRoot->setShadowTechnique((pssm.get()));
     }
 
     shadowRoot->addChild(m_scene.get());
