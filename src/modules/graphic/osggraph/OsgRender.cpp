@@ -467,13 +467,33 @@ void SDRender::ShadowedScene()
         osg::ref_ptr<osgShadow::ParallelSplitShadowMap> pssm =
                 new osgShadow::ParallelSplitShadowMap(NULL, 3);
         pssm->setTextureResolution(2048);
-        pssm->setMinNearDistanceForSplits(0.25);
-        pssm->setMaxFarDistance(512.0);
+        pssm->setMinNearDistanceForSplits(0.25f);
+        pssm->setMaxFarDistance(1024.0f);
         pssm->setPolygonOffset(osg::Vec2(10.0f, 20.0f));
         shadowRoot = new osgShadow::ShadowedScene;
         shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
         shadowRoot->setCastsShadowTraversalMask(castShadowMask);
         shadowRoot->setShadowTechnique((pssm.get()));
+    }
+    else if (SHADOW_TECHNIQUE == 4)
+    {
+        osg::ref_ptr<osgShadow::LightSpacePerspectiveShadowMapCB> lspsm =
+           new osgShadow::LightSpacePerspectiveShadowMapCB;
+
+        unsigned int baseTexUnit = 0;
+        unsigned int shadowTexUnit = 1;
+
+        lspsm->setMinLightMargin(10.0f);
+        lspsm->setMaxFarPlane(1024.0f);
+        lspsm->setTextureSize(osg::Vec2s(4096, 4096));
+        lspsm->setShadowTextureCoordIndex(shadowTexUnit);
+        lspsm->setShadowTextureUnit(shadowTexUnit);
+        lspsm->setBaseTextureCoordIndex(baseTexUnit);
+        lspsm->setBaseTextureUnit(baseTexUnit);
+        shadowRoot = new osgShadow::ShadowedScene;
+        shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
+        shadowRoot->setCastsShadowTraversalMask(castShadowMask);
+        shadowRoot->setShadowTechnique((lspsm.get()));
     }
 
     shadowRoot->addChild(m_scene.get());
