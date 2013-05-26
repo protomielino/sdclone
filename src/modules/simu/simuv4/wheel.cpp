@@ -341,7 +341,6 @@ void SimWheelUpdateForce(tCar *car, int index)
 		car->carElt->_tyreT_out(index) = wheel->Ttire;
 		car->carElt->_tyreCondition(index) = tireCond;
 	}
-    GfOut("T=%g, d=%g, W=%g, tC=%g\n",wheel->Ttire, wheel->treadDepth, Work, tireCond);
 }
 
 
