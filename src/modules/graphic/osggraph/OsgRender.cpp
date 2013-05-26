@@ -440,10 +440,12 @@ void SDRender::ShadowedScene()
 {
     if (SHADOW_TECHNIQUE == 1)
     {
+        unsigned int shadowTexUnit = 1;
+
         osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
         vdsm->setLight(sunLight.get());
         vdsm->setTextureSize(osg::Vec2s(4096, 4096));
-        vdsm->setTextureUnit(1);
+        vdsm->setTextureUnit(shadowTexUnit);
         shadowRoot = new osgShadow::ShadowedScene;
         //osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
         shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
@@ -481,7 +483,7 @@ void SDRender::ShadowedScene()
            new osgShadow::LightSpacePerspectiveShadowMapCB;
 
         unsigned int baseTexUnit = 0;
-        unsigned int shadowTexUnit = 1;
+        unsigned int shadowTexUnit = 3;
 
         lspsm->setMinLightMargin(10.0f);
         lspsm->setMaxFarPlane(1024.0f);
@@ -516,7 +518,7 @@ void SDRender::addCars(osg::Node* cars)
     optimizer.optimize(m_CarRoot.get());
     optimizer.optimize(m_scene.get());
 
-    if (SHADOW_TECHNIQUE > 0)
+    if (SHADOW_TECHNIQUE > 0 & SDVisibility > 4000)
         ShadowedScene();
 }
 
