@@ -245,7 +245,7 @@ void SDRender::Init(tTrack *track)
         thesky->add_cloud_layer(layer);
     }*/
 
-    int weather = SDTrack->local.clouds;
+    //int weather = SDTrack->local.clouds;
 
     /*else if (grNbCloudLayers == 1)
     {
@@ -468,7 +468,7 @@ void SDRender::ShadowedScene()
     {
         osg::ref_ptr<osgShadow::ParallelSplitShadowMap> pssm =
                 new osgShadow::ParallelSplitShadowMap(NULL, 3);
-        pssm->setTextureResolution(2048);
+        pssm->setTextureResolution(4096);
         pssm->setMinNearDistanceForSplits(0.25f);
         pssm->setMaxFarDistance(1024.0f);
         pssm->setPolygonOffset(osg::Vec2(10.0f, 20.0f));
@@ -518,7 +518,7 @@ void SDRender::addCars(osg::Node* cars)
     optimizer.optimize(m_CarRoot.get());
     optimizer.optimize(m_scene.get());
 
-    if (SHADOW_TECHNIQUE > 0 & SDVisibility > 4000)
+    if ((SHADOW_TECHNIQUE > 0) & (SDVisibility > 4000))
         ShadowedScene();
 }
 
