@@ -470,7 +470,7 @@ void SDRender::ShadowedScene()
                 new osgShadow::ParallelSplitShadowMap(NULL, 3);
         pssm->setTextureResolution(4096);
         pssm->setMinNearDistanceForSplits(0.25f);
-        pssm->setMaxFarDistance(1024.0f);
+        pssm->setMaxFarDistance(512);
         pssm->setPolygonOffset(osg::Vec2(10.0f, 20.0f));
         shadowRoot = new osgShadow::ShadowedScene;
         shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
