@@ -420,7 +420,7 @@ void SDCar::updateCar()
     if (SHADOW_TECHNIQUE == 0)
     {
         osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
-        for(uint i=0;i<shadowVertices->size();i++)
+        for(unsigned int i=0;i<shadowVertices->size();i++)
         {
             osg::Vec3 vtx = (*shadowVertices.get())[i];
             osg::Vec4 vtx_world = osg::Vec4(vtx,1.0f)*mat;

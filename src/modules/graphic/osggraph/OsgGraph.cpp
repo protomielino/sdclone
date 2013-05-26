@@ -118,13 +118,13 @@ void OsgGraph::unloadCars()
 
 void OsgGraph::unloadTrack()
 {
-    GfLogDebug("SsgGraph::unloadTrack\n");
+    GfLogDebug("OsgGraph::unloadTrack\n");
     ::shutdownTrack();
 }
 
 void OsgGraph::shutdownView()
 {
-    GfLogDebug("SsgGraph::shutdownView\n");
+    GfLogDebug("OsgGraph::shutdownView\n");
     ::shutdownView();
 }
 

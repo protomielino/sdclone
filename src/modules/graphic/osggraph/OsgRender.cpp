@@ -446,9 +446,9 @@ void SDRender::ShadowedScene()
         vdsm->setTextureSize(osg::Vec2s(4096, 4096));
         vdsm->setTextureUnit(1);
         shadowRoot = new osgShadow::ShadowedScene;
-        osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
-        settings->setReceivesShadowTraversalMask(rcvShadowMask);
-        settings->setCastsShadowTraversalMask(castShadowMask);
+        //osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
+        shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
+        shadowRoot->setCastsShadowTraversalMask(castShadowMask);
         shadowRoot->setShadowTechnique((vdsm.get()));
     }
     else if (SHADOW_TECHNIQUE  == 2)
@@ -458,9 +458,9 @@ void SDRender::ShadowedScene()
         vdsm->setTextureSize(osg::Vec2s(4096, 4096));
         vdsm->setTextureUnit(1);
         shadowRoot = new osgShadow::ShadowedScene;
-        osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
-        settings->setReceivesShadowTraversalMask(rcvShadowMask);
-        settings->setCastsShadowTraversalMask(castShadowMask);
+        //osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
+        shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
+        shadowRoot->setCastsShadowTraversalMask(castShadowMask);
         shadowRoot->setShadowTechnique((vdsm.get()));
     }
     else if (SHADOW_TECHNIQUE == 3)
@@ -469,9 +469,9 @@ void SDRender::ShadowedScene()
         sv->setDynamicShadowVolumes(TRUE);
         sv->setDrawMode(osgShadow::ShadowVolumeGeometry::STENCIL_TWO_PASS);
         shadowRoot = new osgShadow::ShadowedScene;
-        osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
-        settings->setReceivesShadowTraversalMask(rcvShadowMask);
-        settings->setCastsShadowTraversalMask(castShadowMask);
+        //osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
+        shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
+        shadowRoot->setCastsShadowTraversalMask(castShadowMask);
         shadowRoot->setShadowTechnique((sv.get()));
     }
 
