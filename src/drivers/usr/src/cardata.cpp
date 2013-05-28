@@ -140,48 +140,48 @@ float SingleCardata::getSpeed(tCarElt *car, float ltrackangle)
 
 void SingleCardata::init( CarElt *pcar )
 {
- car = pcar;
- for (int i=0; i<4; i++)
- {
-  corner1[i].ax = corner2[i].ax = car->_corner_x(i);
-  corner1[i].ay = corner2[i].ay = car->_corner_y(i);
- }
- lastspeed[0].ax = lastspeed[1].ax = lastspeed[2].ax = car->_speed_X;
- lastspeed[0].ay = lastspeed[1].ay = lastspeed[2].ay = car->_speed_Y;
+	car = pcar;
+	for (int i=0; i<4; i++)
+	{
+		corner1[i].ax = corner2[i].ax = car->_corner_x(i);
+		corner1[i].ay = corner2[i].ay = car->_corner_y(i);
+	}
+	lastspeed[0].ax = lastspeed[1].ax = lastspeed[2].ax = car->_speed_X;
+	lastspeed[0].ay = lastspeed[1].ay = lastspeed[2].ay = car->_speed_Y;
 }
-
 
 Cardata::Cardata(tSituation *s)
 {
 	ncars = s->_ncars;
 	data = new SingleCardata[ncars];
 	int i;
-	for (i = 0; i < ncars; i++) {
+	for (i = 0; i < ncars; i++) 
+	{
 		data[i].init(s->cars[i]);
 	}
 }
 
-
 Cardata::~Cardata()
 {
-	delete [] data;
+  delete [] data;
 }
-
 
 void Cardata::update()
 {
-	int i;
-	for (i = 0; i < ncars; i++) {
-		data[i].update();
-	}
+  int i;
+  for (i = 0; i < ncars; i++)
+  {
+    data[i].update();
+  }
 }
-
 
 SingleCardata *Cardata::findCar(tCarElt *car)
 {
 	int i;
-	for (i = 0; i < ncars; i++) {
-		if (data[i].thisCar(car)) {
+	for (i = 0; i < ncars; i++) 
+	{
+		if (data[i].thisCar(car)) 
+		{
 			return &data[i];
 		}
 	}

@@ -107,7 +107,9 @@
 #define PRV_ABS_RANGE         "abs range"
 #define PRV_OVERSTEER_ASR     "oversteer asr"
 #define PRV_BRAKE_MU          "brake mu"
+#define PRV_BRAKE_SCALE       "brake scale"
 #define PRV_FUEL_PER_LAP      "fuel per lap"
+#define PRV_FUEL_PER_SECOND   "fuel per second"
 #define PRV_YAW_RATE_ACCEL    "yaw rate accel"
 #define PRV_MAX_FUEL          "max fuel"
 #define PRV_BRAKE_MARGIN      "brake margin"
@@ -119,6 +121,7 @@
 
 #define BT_SECT_PRIV "private"
 #define BT_ATT_FUELPERLAP "fuelperlap"
+#define BT_ATT_FUELPERSECOND "fuelpersecond"
 #define BT_ATT_MUFACTOR "mufactor"
 #define BT_ATT_PITTIME "pittime"
 #define BT_ATT_BESTLAP "bestlap"

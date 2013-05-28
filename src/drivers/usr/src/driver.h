@@ -142,6 +142,7 @@ class Driver {
 		int isAlone();
 		void SetRandomSeed( unsigned int seed );
 		unsigned int getRandom();
+        unsigned int getWeather();
 		float stuckSteering( float steercmd );
 
 		// Per robot global data.
@@ -157,6 +158,7 @@ class Driver {
 		float AbsRange;
 		float OversteerASR;
 		float BrakeMu;
+        float BrakeScale;
 		float YawRateAccel;
 		int AccelMod;
 		unsigned int random_seed;
@@ -299,6 +301,8 @@ class Driver {
 		int cmd_gear;
 		float cmd_clutch;
 		float cmd_light;
+
+        unsigned int rain;
 
 		float (Driver::*GET_DRIVEN_WHEEL_SPEED)();
 		static Cardata *cardata;		// Data about all cars shared by all instances.

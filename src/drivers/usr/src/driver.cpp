@@ -200,7 +200,8 @@ Driver::Driver(int index, const int robot_type) :
     cmd_steer(0.0f),
     cmd_gear(0),
     cmd_clutch(0.0f),
-    cmd_light(0.0f)
+    cmd_light(0.0f),
+    rain(0)
 {
   INDEX = index;
   
@@ -289,14 +290,17 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
   // load the global skill level, range 0 - 10
   snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetLocalDir());
   void *skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
-  if(!skillHandle) {
+  if(!skillHandle)
+  {
     snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetDataDir());
     skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
   }//if !skillHandle
   
-  if (skillHandle) {
+  if (skillHandle)
+  {
     global_skill = GfParmGetNum(skillHandle, (char *)SECT_SKILL, (char *)PRV_SKILL_LEVEL, (char *) NULL, 10.0f);
   }
+
   global_skill = MAX(0.0f, MIN(10.0f, global_skill));
 
   //load the driver skill level, range 0 - 1
@@ -333,46 +337,57 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     if (p) *p = '\0';
   }
 
-  snprintf(buffer, BUFSIZE, "drivers/%s/%s/default.xml", robot_name, carName);
+  rain = getWeather();
+
+  if (rain == 0)
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/default.xml", robot_name, carName);
+  else if (rain == 1)
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/default-r1.xml", robot_name, carName);
+  else if (rain == 2)
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/default-r2.xml", robot_name, carName);
+  else if (rain == 3)
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/default-r3.xml", robot_name, carName);
+
   *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
   void *newhandle;
 
-#if 0
-  switch (s->_raceType) {
-    case RM_TYPE_PRACTICE:
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/practice/%s.xml", robot_name, carName, trackname);
-      break;
-    case RM_TYPE_QUALIF:
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/qualifying/%s.xml", robot_name, carName, trackname);
-      break;
-    case RM_TYPE_RACE:
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/race/%s.xml", robot_name, carName, trackname);
-      break;
-    default:
-      break;
-  }
-#endif
-  snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
+  if (rain == 0)
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
+  else if (rain == 1)
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-r1.xml", robot_name, carName, trackname);
+  else if (rain == 2)
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-r2.xml", robot_name, carName, trackname);
+  else if (rain == 3)
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-r3.xml", robot_name, carName, trackname);
 
   newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
   if (newhandle)
   {
-    if (*carParmHandle)
-      *carParmHandle = GfParmMergeHandles(*carParmHandle, newhandle, (GFPARM_MMODE_SRC|GFPARM_MMODE_DST|GFPARM_MMODE_RELSRC|GFPARM_MMODE_RELDST));
-    else
-      *carParmHandle = newhandle;
-  }
-  else
-  {
-    snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
-    newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-    if (newhandle)
-    {
       if (*carParmHandle)
         *carParmHandle = GfParmMergeHandles(*carParmHandle, newhandle, (GFPARM_MMODE_SRC|GFPARM_MMODE_DST|GFPARM_MMODE_RELSRC|GFPARM_MMODE_RELDST));
       else
         *carParmHandle = newhandle;
-    }
+  }
+  else
+  {
+      if (rain == 0)
+          snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
+      else if (rain == 1)
+          snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-r1.xml", robot_name, carName, trackname);
+      else if (rain == 2)
+          snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-r2.xml", robot_name, carName, trackname);
+      else if (rain == 3)
+          snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-r3.xml", robot_name, carName, trackname);
+
+      //snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
+      newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+      if (newhandle)
+      {
+        if (*carParmHandle)
+          *carParmHandle = GfParmMergeHandles(*carParmHandle, newhandle, (GFPARM_MMODE_SRC|GFPARM_MMODE_DST|                   GFPARM_MMODE_RELSRC|GFPARM_MMODE_RELDST));
+        else
+          *carParmHandle = newhandle;
+      }
   }
 
   // Create a pit stop strategy object.
@@ -410,8 +425,9 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
   NoTeamWaiting = (int) GfParmGetNum( *carParmHandle, SECT_PRIVATE, PRV_NO_TEAM_WAITING, (char *)NULL, 1.0f );
   TeamWaitTime = GfParmGetNum( *carParmHandle, SECT_PRIVATE, PRV_TEAM_WAIT_TIME, (char *)NULL, 0.0f);
   YawRateAccel = GfParmGetNum( *carParmHandle, SECT_PRIVATE, PRV_YAW_RATE_ACCEL, (char *)NULL, 0.0f);
+  BrakeScale = GfParmGetNum( *carParmHandle, SECT_PRIVATE, PRV_BRAKE_SCALE, (char *)NULL, 1.0f);
 
-  double brkpressure = GfParmGetNum( *carParmHandle, SECT_BRKSYST, PRM_BRKPRESS, (char *) NULL, 0.0f ) / 1000;
+  double brkpressure = (GfParmGetNum( *carParmHandle, SECT_BRKSYST, PRM_BRKPRESS, (char *) NULL, 0.0f ) / 1000) * BrakeScale;
         brakeratio -= MIN(0.5, MAX(0.0, brkpressure - 20000.0) / 100000);
 
   for (i=0; i<6; i++)
@@ -469,7 +485,8 @@ void Driver::LoadDAT( tSituation *s, char *carname, char *trackname )
  FILE *fp;
  char buffer[1024+1];
 
- switch (s->_raceType) {
+ switch (s->_raceType)
+ {
   case RM_TYPE_PRACTICE:
    snprintf(buffer, 1024, "drivers/%s/%s/practice/%s.dat", robot_name, carname, trackname);
    break;
@@ -503,8 +520,8 @@ void Driver::LoadDAT( tSituation *s, char *carname, char *trackname )
   char *p = buffer + (len-1);
   while (p >= buffer && (*p == 10 || *p == 13))
   {
-   *p = 0;
-   p--;
+    *p = 0;
+    p--;
   }
   if (p <= buffer)
    continue;
@@ -1015,13 +1032,11 @@ void Driver::shutdown()
 #endif
 }
 
-
 /***************************************************************************
  *
  * utility functions
  *
 ***************************************************************************/
-
 
 void Driver::computeRadius(float *radius)
 {
@@ -1032,44 +1047,52 @@ void Driver::computeRadius(float *radius)
   currentseg = startseg;
 
   do {
-    if (currentseg->type == TR_STR) {
+    if (currentseg->type == TR_STR)
+    {
       lastsegtype = TR_STR;
       radius[currentseg->id] = FLT_MAX;
-    } else {
-      if (currentseg->type != lastsegtype) {
+    } else
+    {
+      if (currentseg->type != lastsegtype)
+      {
         float arc = 0.0f;
         tTrackSeg *s = currentseg;
         lastsegtype = currentseg->type;
 
-        while (s->type == lastsegtype && arc < PI/2.0f) {
+        while (s->type == lastsegtype && arc < PI/2.0f)
+        {
           arc += s->arc;
           s = s->next;
         }
+
         lastturnarc = (float) (arc/(PI/2.0f));
       }
+
       radius[currentseg->id] = (float) (currentseg->radius + currentseg->width/2.0)/lastturnarc;
     }
+
     currentseg = currentseg->next;
   } while (currentseg != startseg);
 
 }
 
-
 // Compute the length to the end of the segment.
 float Driver::getDistToSegEnd()
 {
-  if (car->_trkPos.seg->type == TR_STR) {
+  if (car->_trkPos.seg->type == TR_STR)
+  {
     return car->_trkPos.seg->length - car->_trkPos.toStart;
-  } else {
+  } else
+  {
     return (car->_trkPos.seg->arc - car->_trkPos.toStart)*car->_trkPos.seg->radius;
   }
 }
 
-
 // Compute fitting acceleration.
 float Driver::getAccel()
 {
-  if (car->_gear > 0) {
+  if (car->_gear > 0)
+  {
     accelcmd = MIN(1.0f, accelcmd);
 
     if (pit->getInPit() && car->_brakeCmd == 0.0f)
@@ -1092,11 +1115,11 @@ float Driver::getAccel()
       accelcmd = MAX(0.0f, MIN(accelcmd, 1.0f - currentspeed/100.0f * fabs(angle)));
 
     return accelcmd;
-  } else {
+  } else
+  {
     return 1.0;
   }
 }
-
 
 // If we get lapped reduce accelerator.
 float Driver::filterOverlap(float accel)
@@ -1108,7 +1131,8 @@ float Driver::filterOverlap(float accel)
     return accel;
   }
 
-  for (i = 0; i < opponents->getNOpponents(); i++) {
+  for (i = 0; i < opponents->getNOpponents(); i++)
+  {
     if (opponent[i].getState() & OPP_LETPASS) 
     {
       return accel*0.4f;
@@ -3660,7 +3684,6 @@ float Driver::filterTCL_4WD()
       car->_wheelRadius(REAR_LFT)) / 4.0f;
 }
 
-
 // Hold car on the track.
 float Driver::filterTrk(float accel)
 {
@@ -3712,3 +3735,38 @@ float Driver::brakedist(float allowedspeed, float mu)
   return (float)((-log((c + v2sqr*d)/(c + v1sqr*d))/(2.0f*d)) + 1.0);
 }
 
+unsigned int Driver::getWeather()
+{
+    // Detect Weather condition track
+     tTrackSeg *Seg;
+     tTrackSurface *Surf;
+     float mRainIntensity = 0.0f;
+     unsigned int mRain = 0;
+
+     Seg = track->seg;
+
+     for ( int I = 0; I < track->nseg; I++)
+     {
+         Surf = Seg->surface;
+         mRainIntensity = MAX(mRainIntensity, Surf->kFrictionDry / Surf->kFriction);
+         Seg = Seg->next;
+     }
+
+     mRainIntensity -= 1;
+     GfOut("#mRainIntensity BIPBIP: %g\n", mRainIntensity);
+
+     if (mRainIntensity > 0)
+     {
+         if (mRainIntensity > 0 && mRainIntensity < 0.2)
+             mRain = 1;
+         else if (mRainIntensity > 0.2 && mRainIntensity < 0.4)
+             mRain = 2;
+         else if (mRainIntensity > 0.4)
+             mRain = 3;
+     }
+     else
+         mRain = 0;
+
+     GfOut("#Rain BIPBIP: %d\n", mRain);
+     return mRain;
+}

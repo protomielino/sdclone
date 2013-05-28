@@ -35,23 +35,24 @@
 #include "linalg.h"
 
 
-class SingleCardata {
-	public:
-		void init(CarElt *car);
+class SingleCardata
+{
+  public:
+  void init(CarElt *car);
 
-		inline float getSpeedInTrackDirection() { return speed; }
-		inline float getWidthOnTrack() { return width; }
-		inline float getLengthOnTrack() { return length; }
-		inline float getTrackangle() { return trackangle; }
-		inline float getCarAngle() { return angle; }
-		inline float getTrueSpeed() { return truespeed; }
+  inline float getSpeedInTrackDirection() { return speed; }
+  inline float getWidthOnTrack() { return width; }
+  inline float getLengthOnTrack() { return length; }
+  inline float getTrackangle() { return trackangle; }
+  inline float getCarAngle() { return angle; }
+  inline float getTrueSpeed() { return truespeed; }
 
-		inline bool thisCar(tCarElt *car) { return (car == this->car); }
-                inline tPosd *getCorner1() { return corner1; }
-                inline tPosd *getCorner2() { return corner2; }
-                inline tPosd *getLastSpeed() { return lastspeed; }
-                inline double getSpeedDeltaX() { return (car->_speed_X - lastspeed[1].ax)*0.7 + (lastspeed[1].ax-lastspeed[2].ax)/4; }
-                inline double getSpeedDeltaY() { return (car->_speed_Y - lastspeed[1].ay)*0.7 + (lastspeed[1].ay-lastspeed[2].ay)/4; }
+  inline bool thisCar(tCarElt *car) { return (car == this->car); }
+  inline tPosd *getCorner1() { return corner1; }
+  inline tPosd *getCorner2() { return corner2; }
+  inline tPosd *getLastSpeed() { return lastspeed; }
+  inline double getSpeedDeltaX() { return (car->_speed_X - lastspeed[1].ax)*0.7 + (lastspeed[1].ax-lastspeed[2].ax)/4; }
+        inline double getSpeedDeltaY() { return (car->_speed_Y - lastspeed[1].ay)*0.7 + (lastspeed[1].ay-lastspeed[2].ay)/4; }
 		inline float toLftWall() { return tolftwall; }
 		inline float toRgtWall() { return torgtwall; }
 		inline float getDistFromStart() { return car->_distFromStartLine; }
@@ -72,9 +73,9 @@ class SingleCardata {
 		float tolftwall;        // how far to the nearest left barrier
 		float torgtwall;        // how far to the nearest Right barrier
 
-                tPosd corner1[4];
-                tPosd corner2[4];
-                tPosd lastspeed[3];
+        tPosd corner1[4];
+        tPosd corner2[4];
+        tPosd lastspeed[3];
 
 		tCarElt *car;		// For identification.
 };
