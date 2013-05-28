@@ -29,7 +29,6 @@
 
 #define MAX_MUSIC_PATH 1024
 
-#if MENU_MUSIC
 #include "oggsoundstream.h"
 #include "openalmusicplayer.h"
  
@@ -107,10 +106,9 @@ static void playMenuMusic()
 		timerId = SDL_AddTimer(nextcallinms, sdlTimerFunc, (void*)NULL);
 	}
 }
-#endif
+
 void initMusic()
 {
-#if MENU_MUSIC
 	readConfig();
 	if (isEnabled()) {
 		mapMutex = SDL_CreateMutex();
@@ -118,13 +116,11 @@ void initMusic()
 		strcpy(currentMusicfile,defaultMusic);
 		playMenuMusic();
 	}
-#endif
 }
 
 
 void shutdownMusic()
 {
-#if MENU_MUSIC
 	if(timerId != 0){
 		SDL_RemoveTimer(timerId);
 		timerId = 0;
@@ -147,11 +143,8 @@ void shutdownMusic()
 	SDL_UnlockMutex(mapMutex);
 	SDL_DestroyMutex(mapMutex);
 	mapMutex = NULL;
-
-
-#endif
 }
-#if MENU_MUSIC
+
 void pauseMenuMusic()
 {
 
@@ -170,10 +163,9 @@ void pauseMenuMusic()
 		
 
 }
-#endif
+
 void playMusic(char* filename)
 {
-#if MENU_MUSIC
 	if (isEnabled()) {
 		OpenALMusicPlayer* player = NULL;
 		if(filename != NULL) {
@@ -210,12 +202,10 @@ void playMusic(char* filename)
 		}
 		playMenuMusic();
 	}
-#endif
 }
 
 void setDefaultMusic(const char* filename)
 {
-#if MENU_MUSIC
 	if(0 != filename){
 		if(strlen(filename) < MAX_MUSIC_PATH){
 			if(0 != strcmp(defaultMusic,filename)){
@@ -229,10 +219,8 @@ void setDefaultMusic(const char* filename)
 		defaultMusic[0] = 0;
 		GfLogInfo("Default Music changing to: %s \n", "NULL");
 	}
-#endif
 }
 
-#if MENU_MUSIC
 static void readConfig()
 {
 	char fnbuf[1024];
@@ -270,11 +258,9 @@ static void readConfig()
 	GfParmReleaseHandle(paramHandle);
 	paramHandle = NULL;
 }
-#endif
 
 void setMusicVolume(float vol)
 {
-#if MENU_MUSIC
 	if (vol < 0)
 		vol = 0.0f;
 	else if (vol > 1.0f)
@@ -283,5 +269,4 @@ void setMusicVolume(float vol)
 	maxMusicVolume = vol;
 
 	GfLogInfo("Music maximum volume set to %.2f\n", maxMusicVolume);
-#endif
 }

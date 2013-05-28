@@ -187,10 +187,6 @@ The Speed Dreams Team.
                   on most Linux distros (only Fedora is working on this right now, AFAIK, 2012, July)
                   Ask the dev team for any hint about building it ...
 
-        - OPTION_MENU_MUSIC:BOOL :
-            Enable building with the new Menu Music enabled (def: OFF)
-            Note: This requires new 3rd party libs : libogg, libvorbis, and libvorbisfile
-
         - OPTION_OSGGRAPH:BOOL :
             Enable building of the WIP new OpenSceneGraph-based graphics module 'osggraph' (def: OFF)
             Note: This requires new 3rd party libs : OpenSceneGraph

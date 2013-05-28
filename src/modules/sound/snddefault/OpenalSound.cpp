@@ -302,9 +302,7 @@ void OpenalSound::resume()
 {
 	if (paused) {
 		paused = false;
-#ifdef MENU_MUSIC
 		alSourcePlay (source);
-#endif
 	}
 }
 
@@ -313,9 +311,7 @@ void OpenalSound::pause()
 {
 	if (!paused) {
 		paused = true;
-#ifdef MENU_MUSIC
 		alSourcePause (source);
-#endif
 	}
 }
 

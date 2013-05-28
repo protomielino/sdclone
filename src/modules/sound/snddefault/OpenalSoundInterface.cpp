@@ -40,10 +40,8 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels)
 	ALfloat zeroes[] = { 0.0f, 0.0f,  0.0f };
 	ALfloat front[]  = { 0.0f, 0.0f,  1.0f, 0.0f, 1.0f, 0.0f };
 
-#ifdef MENU_MUSIC
 	originalcontext = alcGetCurrentContext();
 	if(originalcontext == NULL){
-#endif
 	dev = alcOpenDevice( NULL );
 	if( dev == NULL ) {
 		GfLogError("OpenAL: Could not open device (alcOpenDevice failed)\n");
@@ -61,9 +59,8 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels)
 
 	alcMakeContextCurrent( cc );
 	alcGetError(dev);
-#ifdef MENU_MUSIC
 	}
-#endif
+
 	alGetError();
 
 	// Figure out the number of possible sources, watch out for an API update, perhaps
@@ -96,10 +93,8 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels)
 
 	OSI_MAX_SOURCES = sources;
 
-#ifdef MENU_MUSIC
 	// Reserve three sources for music
 	OSI_MAX_SOURCES -= 3;
-#endif
 
 	OSI_MAX_STATIC_SOURCES = MAX(0, OSI_MAX_SOURCES - OSI_MIN_DYNAMIC_SOURCES);
 
@@ -181,17 +176,13 @@ OpenalSoundInterface::~OpenalSoundInterface()
 	}
 	delete [] engpri;
 
-#ifdef MENU_MUSIC
 if(originalcontext == NULL){
-#endif
 	alcMakeContextCurrent(0);
 	alcDestroyContext(cc);
 
 	if (!alcCloseDevice(dev))
 		GfLogError("Failed to close OpenAL device: %s\n", alcGetString(dev, alcGetError(dev)));
-#ifdef MENU_MUSIC
 	}
-#endif
 
 	if (car_src) {
 		delete [] car_src;
@@ -214,11 +205,9 @@ Sound* OpenalSoundInterface::addSample (const char* filename, int flags, bool lo
 	
 void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgVec3 p_obs, sgVec3 u_obs, sgVec3 c_obs, sgVec3 a_obs)
 {
-#ifdef MENU_MUSIC
 	if(silent){
 		return;
 	}
-#endif
 
 	ALfloat listener_pos[3];
 #ifdef USE_OPENAL_DOPPLER
@@ -472,7 +461,6 @@ void OpenalSoundInterface::mute(bool bOn)
 {
 	SoundInterface::mute(bOn);
 
-#ifdef MENU_MUSIC
 	if(bOn){
 		for (unsigned int i=0; i<sound_list.size(); i++) {
 			sound_list[i]->pause();
@@ -484,8 +472,4 @@ void OpenalSoundInterface::mute(bool bOn)
 			sound_list[i]->resume();
 		}
 	}
-#else
-	// Needed in case update() is not called right after this.
-	alListenerf(AL_GAIN, getGlobalGain());
-#endif
 }

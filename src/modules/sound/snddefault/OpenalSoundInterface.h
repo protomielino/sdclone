@@ -44,9 +44,7 @@ class OpenalSoundInterface : public SoundInterface
 	
 	SoundSource* car_src;
 	SoundSource tyre_src[4];
-#ifdef MENU_MUSIC
 	ALCcontext* originalcontext;
-#endif
 	ALCcontext* cc;
 	ALCdevice* dev;
 	int OSI_MAX_BUFFERS;

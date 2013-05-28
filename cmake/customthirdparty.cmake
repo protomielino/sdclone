@@ -114,20 +114,14 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	_FIND_3RDPARTY_DEPENDENCY(OPENAL AL/al.h "" openal32 ${ROOT_DIR} "")
 
 	# Menu Music requires ogg, vorbis, and vorbisfile 
-	# this option may be removed after Menu Music becomes on by default
-	# and these libs become part of Official 3rdParty package
-	IF(OPTION_MENU_MUSIC)
-	
-		# OGG.
-		_FIND_3RDPARTY_DEPENDENCY(OGG ogg/ogg.h "" libogg ${ROOT_DIR} "")
+	# OGG.
+	_FIND_3RDPARTY_DEPENDENCY(OGG ogg/ogg.h "" libogg ${ROOT_DIR} "")
 
-		# Vorbis.
-		_FIND_3RDPARTY_DEPENDENCY(VORBIS vorbis/vorbisfile.h "" libvorbis ${ROOT_DIR} "")
+	# Vorbis.
+	_FIND_3RDPARTY_DEPENDENCY(VORBIS vorbis/vorbisfile.h "" libvorbis ${ROOT_DIR} "")
 
-		# VorbisFile.
-		_FIND_3RDPARTY_DEPENDENCY(VORBISFILE vorbis/vorbisfile.h "" libvorbisfile ${ROOT_DIR} "")
-	
-	ENDIF(OPTION_MENU_MUSIC)
+	# VorbisFile.
+	_FIND_3RDPARTY_DEPENDENCY(VORBISFILE vorbis/vorbisfile.h "" libvorbisfile ${ROOT_DIR} "")
 	
 	# ENet.
 	_FIND_3RDPARTY_DEPENDENCY(ENET enet/enet.h "" enet ${ROOT_DIR} "")
@@ -298,20 +292,15 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	# Menu Music requires ogg, vorbis, and vorbisfile 
-	# this option may be removed after Menu Music becomes on by default
-	# and these libs become part of Official 3rdParty package
-	IF(OPTION_MENU_MUSIC)
-	
-		_FIND_3RDPARTY_DLL("${OGG_LIBRARY}" "libogg;libogg-0" "" _DLL_PATHNAME)
-		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+	_FIND_3RDPARTY_DLL("${OGG_LIBRARY}" "libogg;libogg-0" "" _DLL_PATHNAME)
+	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
-		_FIND_3RDPARTY_DLL("${VORBIS_LIBRARY}" "libvorbis;libvorbis-0" "" _DLL_PATHNAME)
-		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+	_FIND_3RDPARTY_DLL("${VORBIS_LIBRARY}" "libvorbis;libvorbis-0" "" _DLL_PATHNAME)
+	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
-		_FIND_3RDPARTY_DLL("${VORBISFILE_LIBRARY}" "libvorbisfile;libvorbisfile-3" "" _DLL_PATHNAME)
-		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+	_FIND_3RDPARTY_DLL("${VORBISFILE_LIBRARY}" "libvorbisfile;libvorbisfile-3" "" _DLL_PATHNAME)
+	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
-	ENDIF(OPTION_MENU_MUSIC)
 
 	_FIND_3RDPARTY_DLL("${SDL_LIBRARY}" "SDL" ";lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")

@@ -21,13 +21,10 @@ SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
              glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h )
 SET(_OTHER_SOURCES guimenutest.xml)
 
-# Note: Menu music sources needed ONLY if menu music enabled.
-IF(OPTION_MENU_MUSIC)
-    SET(_SOURCES ${_SOURCES} 
-                 soundstream.cpp soundstream.h 
-                 oggsoundstream.cpp oggsoundstream.h 
-                 openalmusicplayer.cpp openalmusicplayer.h )
-ENDIF(OPTION_MENU_MUSIC)
+SET(_SOURCES ${_SOURCES} 
+            soundstream.cpp soundstream.h 
+            oggsoundstream.cpp oggsoundstream.h 
+            openalmusicplayer.cpp openalmusicplayer.h )
 
 #disable developer warning
 IF (COMMAND CMAKE_POLICY)
@@ -67,17 +64,15 @@ IF(OPENAL_FOUND)
     TARGET_LINK_LIBRARIES(tgfclient ${OPENAL_LIBRARY})
 ENDIF(OPENAL_FOUND)
 
-IF(OPTION_MENU_MUSIC)
-   IF(VORBIS_FOUND)
-       TARGET_LINK_LIBRARIES(tgfclient ${VORBIS_LIBRARY})
-   ENDIF(VORBIS_FOUND)
-   IF(VORBISFILE_FOUND)
-       TARGET_LINK_LIBRARIES(tgfclient ${VORBISFILE_LIBRARY})
-   ENDIF(VORBISFILE_FOUND)
-   IF(OGG_FOUND)
-       TARGET_LINK_LIBRARIES(tgfclient ${OGG_LIBRARY})
-   ENDIF(OGG_FOUND)
-ENDIF(OPTION_MENU_MUSIC)
+IF(VORBIS_FOUND)
+      TARGET_LINK_LIBRARIES(tgfclient ${VORBIS_LIBRARY})
+ENDIF(VORBIS_FOUND)
+IF(VORBISFILE_FOUND)
+      TARGET_LINK_LIBRARIES(tgfclient ${VORBISFILE_LIBRARY})
+ENDIF(VORBISFILE_FOUND)
+IF(OGG_FOUND)
+      TARGET_LINK_LIBRARIES(tgfclient ${OGG_LIBRARY})
+ENDIF(OGG_FOUND)
 
 ADD_PLIB_LIBRARY(tgfclient ul sg js)
 ADD_SDL_LIBRARY(tgfclient)
