@@ -32,8 +32,8 @@
 
 #include<tgf.h>
 
-#include "../OsgUtil/OsgMath.h"
-#include "../OsgUtil/OsgVectorArrayAdapter.h"
+#include "OsgUtil/OsgMath.h"
+#include "OsgUtil/OsgVectorArrayAdapter.h"
 #include "OsgDome.h"
 
 using namespace osg;

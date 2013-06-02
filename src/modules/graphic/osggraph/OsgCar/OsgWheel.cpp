@@ -1,6 +1,6 @@
 #include <portability.h>
 
-#include "../OsgLoader/OsgLoader.h"
+#include "OsgLoader/OsgLoader.h"
 #include "OsgWheel.h"
 #include <osgDB/WriteFile>
 

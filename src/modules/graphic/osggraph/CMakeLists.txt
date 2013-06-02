@@ -70,6 +70,8 @@ SET(OSGGRAPH_SOURCES OsgUtil/OsgSphere.cpp
 		     OsgMain.cpp
 		     )
 
+INCLUDE_DIRECTORIES(OsgUtil OsgSky OsgLoader OsgWorld OsgFX OsgView OsgCar .)
+
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)
 

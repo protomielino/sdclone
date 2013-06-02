@@ -39,12 +39,12 @@
 #include <osgShadow/StandardShadowMap>
 //#include <osgShadow/ViewDependentShadowMap>
 
-#include "../OsgMain.h"
+#include "OsgMain.h"
 #include "OsgRender.h"
-#include "../OsgSky/OsgSky.h"
-#include "../OsgWorld/OsgScenery.h"
-#include "../OsgUtil/OsgMath.h"
-#include "../OsgUtil/OsgColor.h"
+#include "OsgSky/OsgSky.h"
+#include "OsgWorld/OsgScenery.h"
+#include "OsgUtil/OsgMath.h"
+#include "OsgUtil/OsgColor.h"
 
 #include <glfeatures.h>	//gluXXX
 #include <robottools.h>	//RtXXX()

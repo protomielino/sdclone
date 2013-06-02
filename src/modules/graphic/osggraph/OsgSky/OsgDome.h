@@ -23,8 +23,8 @@
 #include <osg/Array>
 #include <osg/MatrixTransform>
 
-#include "../OsgUtil/OsgReferenced.h"
-#include "../OsgUtil/OsgMath.h"
+#include "OsgUtil/OsgReferenced.h"
+#include "OsgUtil/OsgMath.h"
 
 namespace osg
 {

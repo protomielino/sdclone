@@ -32,13 +32,13 @@
 
 #include <robottools.h>
 
-#include "../OsgLoader/OsgLoader.h"
+#include "OsgLoader/OsgLoader.h"
 #include "OsgCar.h"
-#include "../OsgUtil/OsgMath.h"
-#include "../OsgView/OsgScreens.h"
-#include "../OsgFX/OsgRender.h"
-#include "../OsgMain.h"
-#include "../OsgSky/OsgSky.h"
+#include "OsgUtil/OsgMath.h"
+#include "OsgView/OsgScreens.h"
+#include "OsgFX/OsgRender.h"
+#include "OsgMain.h"
+#include "OsgSky/OsgSky.h"
 
 
 

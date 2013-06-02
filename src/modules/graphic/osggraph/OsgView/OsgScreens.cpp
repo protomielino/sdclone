@@ -26,8 +26,8 @@
 #include <osg/ValueObject>
 
 #include "OsgScreens.h"
-#include "../OsgMain.h"
-#include "../OsgCar/OsgCar.h"
+#include "OsgMain.h"
+#include "OsgCar/OsgCar.h"
 
 SDScreens::SDScreens()
    :m_CurrentScreenIndex(0)

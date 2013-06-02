@@ -21,7 +21,7 @@
 #include <tgfclient.h>
 #include <graphic.h>
 
-#include "../OsgMain.h"
+#include "OsgMain.h"
 #include "OsgView.h"
 //#include "OsgCar.h"
 
