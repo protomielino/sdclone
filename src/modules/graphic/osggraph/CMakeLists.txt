@@ -1,22 +1,74 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
-SET(OSGGRAPH_HEADERS OsgVectorArrayAdapter.h OsgColor.h OsgAtomic.h
-                     OsgReferenced.h #OsgSharedPtr.h 
-		     OsgSphere.h OsgSun.h OsgMoon.h OsgStars.h OsgDome.h 
-			#OsgStateAttributeFactory.h
-                     OsgCloud.h OsgSky.h
-                     AccGeode.h AccException.h ReaderWriterACC.h
-                     OsgLoader.h OsgScenery.h OsgRender.h OsgMath.h OsgMain.h
-                     OsgView.h OsgGraph.h OsgCar.h OsgWheel.h OsgBrake.h 
-                     OsgScreens.h OsgCamera.h)
+SET(OSGGRAPH_HEADERS OsgUtil/OsgVectorArrayAdapter.h
+	             OsgUtil/OsgColor.h
+		     OsgUtil/OsgAtomic.h
+                     OsgUtil/OsgReferenced.h 
+		     #OsgUtil/OsgSharedPtr.h
+		     #OsgUtil/OsgStateAttributeFactory.h 
+		     OsgUtil/OsgSphere.h 
+		     OsgUtil/OsgMath.h
+
+                     OsgSky/OsgSun.h 
+                     OsgSky/OsgMoon.h 
+                     OsgSky/OsgStars.h 
+                     OsgSky/OsgDome.h 
+                     OsgSky/OsgCloud.h
+		     OsgSky/OsgSky.h
+                     
+		     OsgLoader/AccGeode.h
+		     OsgLoader/AccException.h
+		     OsgLoader/ReaderWriterACC.h
+                     OsgLoader/OsgLoader.h
+
+		     OsgWorld/OsgScenery.h
+
+		     OsgFX/OsgRender.h
+                       
+                     OsgView/OsgView.h  	
+                     OsgView/OsgScreens.h 
+                     OsgView/OsgCamera.h
+
+		     OsgCar/OsgCar.h 
+		     OsgCar/OsgWheel.h 
+		     OsgCar/OsgBrake.h
+
+		     OsgGraph.h
+		     OsgMain.h
+                     )
 			
-SET(OSGGRAPH_SOURCES OsgSphere.cpp OsgSun.cpp OsgMoon.cpp OsgStars.cpp 
-                     OsgDome.cpp #OsgStateAttributeFactory.cpp 
-                     OsgCloud.cpp OsgSky.cpp AccGeode.cpp AccException.cpp
-                     ReaderWriterACC.cpp OsgLoader.cpp OsgBackground.cpp
-                     OsgScenery.cpp OsgView.cpp OsgRender.cpp
-                     OsgMath.cpp OsgMain.cpp OsgGraph.cpp OsgCar.cpp OsgWheel.cpp
-                     OsgBrake.cpp OsgScreens.cpp OsgCamera.cpp)
+SET(OSGGRAPH_SOURCES OsgUtil/OsgSphere.cpp 
+                     #OsgUtil/OsgStateAttributeFactory.cpp 
+		     OsgUtil/OsgMath.cpp
+
+		     OsgSky/OsgSun.cpp 
+		     OsgSky/OsgMoon.cpp 
+		     OsgSky/OsgStars.cpp 
+                     OsgSky/OsgDome.cpp  
+                     OsgSky/OsgCloud.cpp 
+                     OsgSky/OsgSky.cpp 
+
+                     OsgLoader/AccGeode.cpp 
+                     OsgLoader/AccException.cpp
+                     OsgLoader/ReaderWriterACC.cpp 
+                     OsgLoader/OsgLoader.cpp 
+
+                     OsgWorld/OsgBackground.cpp
+                     OsgWorld/OsgScenery.cpp 
+
+		     OsgFX/OsgRender.cpp
+
+                     OsgView/OsgView.cpp 
+                     OsgView/OsgScreens.cpp
+		     OsgView/OsgCamera.cpp
+
+		     OsgCar/OsgCar.cpp 
+		     OsgCar/OsgWheel.cpp
+                     OsgCar/OsgBrake.cpp
+
+		     OsgGraph.cpp
+		     OsgMain.cpp
+		     )
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)

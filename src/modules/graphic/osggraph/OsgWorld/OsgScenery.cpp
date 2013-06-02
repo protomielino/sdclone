@@ -25,9 +25,9 @@
 #include <osg/LightSource>
 #include <osg/Camera>
 
-#include "OsgMain.h"
+#include "../OsgMain.h"
 #include "OsgScenery.h"
-#include "OsgLoader.h"
+#include "../OsgLoader/OsgLoader.h"
 
 #include <glfeatures.h>	//gluXXX
 #include <robottools.h>	//RtXXX()

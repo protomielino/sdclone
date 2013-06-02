@@ -31,8 +31,8 @@
 
 #include "OsgCamera.h"
 #include "OsgView.h"
-#include "OsgScenery.h"
-#include "OsgMain.h"
+#include "../OsgWorld/OsgScenery.h"
+#include "../OsgMain.h"
 
 static char path[1024];
 char 		buf[256];

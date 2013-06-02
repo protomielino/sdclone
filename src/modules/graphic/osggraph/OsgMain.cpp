@@ -31,11 +31,11 @@
 #include <graphic.h>
 
 #include "OsgMain.h"
-#include "OsgCar.h"
-#include "OsgScenery.h"
-#include "OsgRender.h"
-#include "OsgMath.h"
-#include "OsgScreens.h"
+#include "OsgCar/OsgCar.h"
+#include "OsgWorld/OsgScenery.h"
+#include "OsgFX/OsgRender.h"
+#include "OsgUtil/OsgMath.h"
+#include "OsgView/OsgScreens.h"
 
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;

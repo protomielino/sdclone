@@ -32,13 +32,13 @@
 
 #include <robottools.h>
 
-#include "OsgLoader.h"
+#include "../OsgLoader/OsgLoader.h"
 #include "OsgCar.h"
-#include "OsgMath.h"
-#include "OsgScreens.h"
-#include "OsgRender.h"
-#include "OsgMain.h"
-#include "OsgSky.h"
+#include "../OsgUtil/OsgMath.h"
+#include "../OsgView/OsgScreens.h"
+#include "../OsgFX/OsgRender.h"
+#include "../OsgMain.h"
+#include "../OsgSky/OsgSky.h"
 
 
 
@@ -81,12 +81,15 @@ public :
        // stateset->addUniform(normalMap);
         specularColor = new osg::Uniform("specularColor", osg::Vec4(0.8f,0.8f,0.8f,1.0f));
         stateset->addUniform(specularColor);
-        lightVector = new osg::Uniform("lightvector",osg::Vec3());
+        /*lightVector = new osg::Uniform("lightvector",osg::Vec3());
         stateset->addUniform(lightVector);
         lightPower = new osg::Uniform("lightpower",osg::Vec4());
         stateset->addUniform(lightPower);
         ambientColor =new osg::Uniform("ambientColor",osg::Vec4());
-        stateset->addUniform(ambientColor);
+        stateset->addUniform(ambientColor);*/
+        lightVector = stateset->getOrCreateUniform("lightvector",osg::Uniform::FLOAT_VEC3);
+        lightPower = stateset->getOrCreateUniform("lightpower",osg::Uniform::FLOAT_VEC4);
+        ambientColor = stateset->getOrCreateUniform("ambientColor",osg::Uniform::FLOAT_VEC4);
         shininess = new osg::Uniform("smoothness", 300.0f);
         stateset->addUniform(shininess);
     }
@@ -117,6 +120,15 @@ public :
   */
        //GfOut("View Point : %f %f %f\n",pv.x(),pv.y(),pv.z());
     //  GfOut("Scene Color : %f %f %f %f\n",scene_color._v[0],scene_color._v[1],scene_color._v[2],scene_color._v[3]);
+
+        osg::Uniform::Type t1 = lightVector->getType();
+        osg::Uniform::Type t2 = lightPower->getType();
+        osg::Uniform::Type t3 = ambientColor->getType();
+
+        GfOut("LV (vec3) %s, LP (vec4) %s, AC(vec4), %s\n",
+              osg::Uniform::getTypename(t1),osg::Uniform::getTypename(t2),osg::Uniform::getTypename(t3));
+
+
 
         this->lightVector->set(osg::Vec3f(lv.x(),lv.y(),lv.z()));
         this->lightPower->set(sun_color);

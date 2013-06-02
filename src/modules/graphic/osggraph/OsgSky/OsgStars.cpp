@@ -34,7 +34,7 @@
 
 //#include "OsgConstants.h"
 #include "OsgStars.h"
-#include "OsgMath.h"
+#include "../OsgUtil/OsgMath.h"
 
 // Constructor
 SDStars::SDStars( void ) : old_phase(-1)

@@ -32,9 +32,9 @@
 #include <osg/Texture2D>
 #include <osgDB/ReadFile>
 
-#include "OsgMath.h"
-#include "OsgColor.h"
-#include "OsgSphere.h"
+#include "../OsgUtil/OsgMath.h"
+#include "../OsgUtil/OsgColor.h"
+#include "../OsgUtil/OsgSphere.h"
 #include "OsgMoon.h"
 
 // Constructor

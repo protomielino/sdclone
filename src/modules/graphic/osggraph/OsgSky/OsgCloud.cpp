@@ -37,7 +37,7 @@
 
 #include <tgf.h>
 
-#include "OsgMath.h"
+#include "../OsgUtil/OsgMath.h"
 //#include "OsgNewcloud.h"
 //#include "OsgCloudfield.h"
 //#include "OsgStateAttributeFactory.h"

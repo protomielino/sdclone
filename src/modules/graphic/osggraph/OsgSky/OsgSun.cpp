@@ -29,10 +29,10 @@
 #include <osg/Texture2D>
 #include <osgDB/ReadFile>
 
-#include "OsgColor.h"
+#include "../OsgUtil/OsgColor.h"
 #include "OsgSun.h"
-#include "OsgMath.h"
-#include "OsgSphere.h"
+#include "../OsgUtil/OsgMath.h"
+#include "../OsgUtil/OsgSphere.h"
 
 // Constructor
 SDSun::SDSun( void ) :

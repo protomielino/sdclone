@@ -3,7 +3,7 @@
 #include <portability.h>
 
 #include "OsgBrake.h"
-#include "OsgMath.h"
+#include "../OsgUtil/OsgMath.h"
 
 void SDBrakes::setCar(tCarElt * car)
 {
