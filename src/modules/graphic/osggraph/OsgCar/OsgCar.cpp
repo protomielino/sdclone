@@ -48,13 +48,13 @@ class SDCarShader{
 private :
     osg::Node *pCar;
     osg::StateSet* stateset;
-    osg::Uniform * diffuseMap;
+    osg::ref_ptr<osg::Uniform> diffuseMap;
     //osg::Uniform * normalMap;
-    osg::Uniform * specularColor;
-    osg::Uniform * lightVector;
-    osg::Uniform * lightPower;
-    osg::Uniform * ambientColor;
-    osg::Uniform * shininess;
+    osg::ref_ptr<osg::Uniform> specularColor;
+    osg::ref_ptr<osg::Uniform> lightVector;
+    osg::ref_ptr<osg::Uniform> lightPower;
+    osg::ref_ptr<osg::Uniform> ambientColor;
+    osg::ref_ptr<osg::Uniform> shininess;
 
 public :
     static void initiateShaderProgram(){
@@ -130,9 +130,9 @@ public :
 
 
 
-        this->lightVector->set(osg::Vec3f(lv.x(),lv.y(),lv.z()));
-        this->lightPower->set(sun_color);
-        this->ambientColor->set(scene_color);
+        lightVector->set(osg::Vec3f(lv.x(),lv.y(),lv.z()));
+        lightPower->set(sun_color);
+        ambientColor->set(scene_color);
         //this->mvmatrix->set(mvm);
        // this->normalmatrix->set(m);
 
