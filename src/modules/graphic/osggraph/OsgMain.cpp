@@ -182,6 +182,11 @@ void SDChangeScreen(void * vp)
     screens->changeScreen(t);
 }
 
+void SDToggleHUD(void * vp)
+{
+    screens->toggleDebugHUD();
+}
+
 int initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
     //render = new SDRender();
@@ -227,6 +232,8 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_F9,       "Track View Zoomed", (void*)7, SDSelectCamera, NULL);
     GfuiAddKey(screen, GFUIK_F10,      "Follow Car Zoomed", (void*)8, SDSelectCamera, NULL);
     GfuiAddKey(screen, GFUIK_F11,      "TV Director View",  (void*)9, SDSelectCamera, NULL);
+
+    GfuiAddKey(screen, GFUIK_F12,      "Activate DEBUG HUD",  (void*)9, SDToggleHUD, NULL);
 
     /*GfuiAddKey(screen, '5',            "Debug Info",        (void*)3, grSelectBoard, NULL);
     GfuiAddKey(screen, '4',            "G/Cmd Graph",       (void*)4, grSelectBoard, NULL);

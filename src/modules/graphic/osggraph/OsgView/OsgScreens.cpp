@@ -32,6 +32,7 @@
 SDScreens::SDScreens()
    :m_CurrentScreenIndex(0)
 {
+    debugHUD = new SDDebugHUD();
     viewer = new osgViewer::Viewer();
     viewer->setSceneData(new osg::Group());
 }
@@ -107,6 +108,8 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
         root->addChild(screenCam.get());
         root->addChild(mirrorCam.get());
     }
+
+    root->addChild(debugHUD->getRootCamera());
 
     viewer->setSceneData(root.get());
     viewer->realize();
@@ -496,6 +499,11 @@ void SDScreens::changeCamera(long p)
     }
 }
 
+void SDScreens::toggleDebugHUD(){
+    debugHUD->toggleHUD();
+}
+
+
 SDScreens::~SDScreens()
 {
     root->removeChildren(0, root->getNumChildren());
@@ -510,5 +518,6 @@ SDScreens::~SDScreens()
     //delete viewer->getSceneData();
 
     delete viewer;
+    delete debugHUD;
     viewer = NULL;
 }

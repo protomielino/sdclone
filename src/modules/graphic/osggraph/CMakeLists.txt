@@ -28,6 +28,7 @@ SET(OSGGRAPH_HEADERS OsgUtil/OsgVectorArrayAdapter.h
                      OsgView/OsgView.h  	
                      OsgView/OsgScreens.h 
                      OsgView/OsgCamera.h
+		     OsgView/OsgDebugHUD.h
 
 		     OsgCar/OsgCar.h 
 		     OsgCar/OsgWheel.h 
@@ -61,6 +62,7 @@ SET(OSGGRAPH_SOURCES OsgUtil/OsgSphere.cpp
                      OsgView/OsgView.cpp 
                      OsgView/OsgScreens.cpp
 		     OsgView/OsgCamera.cpp
+		     OsgView/OsgDebugHUD.cpp
 
 		     OsgCar/OsgCar.cpp 
 		     OsgCar/OsgWheel.cpp

@@ -24,6 +24,8 @@
 #include <vector>
 #include "OsgView.h"
 
+#include "OsgDebugHUD.h"
+
 #define SD_SPLIT_ADD	0
 #define SD_SPLIT_REM	1
 #define SD_SPLIT_ARR	2
@@ -39,6 +41,7 @@ class SDScreens
         osgViewer::Viewer* viewer;
         std::vector<SDView *> Screens;
         osg::ref_ptr<osg::Group> root;
+        SDDebugHUD * debugHUD;
 
         int m_Winx;
         int m_Winy;
@@ -64,6 +67,7 @@ class SDScreens
         void splitScreen(long p);
         void changeScreen(long p);
         void changeCamera(long p);
+        void toggleDebugHUD();
 
         inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}
 
