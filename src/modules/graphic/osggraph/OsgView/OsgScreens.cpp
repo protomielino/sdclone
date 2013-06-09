@@ -26,6 +26,9 @@
 #include <osg/ValueObject>
 
 #include "OsgScreens.h"
+
+#include "OsgDebugHUD.h"
+#include "OsgFX/OsgReflectionMapping.h"
 #include "OsgMain.h"
 #include "OsgCar/OsgCar.h"
 
@@ -51,6 +54,9 @@ public:
 
 void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node> m_sceneroot)
 {
+
+    reflectionMapping = new SDReflectionMapping(this,m_sceneroot);
+
     m_Winx = x;
     m_Winy = y;
     m_Winw = width;
@@ -109,6 +115,9 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
         root->addChild(mirrorCam.get());
     }
 
+
+    root->addChild(reflectionMapping->getCameras());
+    debugHUD->setTexture(reflectionMapping->getReflectionMap());
     root->addChild(debugHUD->getRootCamera());
 
     viewer->setSceneData(root.get());
@@ -189,6 +198,9 @@ void SDScreens::update(tSituation * s,SDFrameInfo* fi)
     {
         Screens[i]->update(s,fi);
     }
+
+    reflectionMapping->update();
+
 
     if (!viewer->done())
         viewer->frame();

@@ -24,7 +24,8 @@
 #include <vector>
 #include "OsgView.h"
 
-#include "OsgDebugHUD.h"
+class SDDebugHUD;
+class SDReflectionMapping;
 
 #define SD_SPLIT_ADD	0
 #define SD_SPLIT_REM	1
@@ -42,6 +43,7 @@ class SDScreens
         std::vector<SDView *> Screens;
         osg::ref_ptr<osg::Group> root;
         SDDebugHUD * debugHUD;
+        SDReflectionMapping * reflectionMapping;
 
         int m_Winx;
         int m_Winy;

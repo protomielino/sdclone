@@ -16,26 +16,32 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef _OSGDEBUGHUD_H_
-#define _OSGDEBUGHUD_H_
+#ifndef _OSGREFLECTIONMAPPING_H_
+#define _OSGREFLECTIONMAPPING_H_
 
+#include <osg/Texture2D>
 
-class SDDebugHUD
+class SDReflectionMapping
 {
     private:
-        osg::ref_ptr<osg::Camera> HUD_camera;
+        osg::ref_ptr<osg::Group> cameras;
+        osg::ref_ptr<osg::Camera> camera;
+        osg::ref_ptr<osg::Texture2D> map;
+        SDScreens * screens;
 
     public:
-        void toggleHUD();
-        void setTexture(osg::ref_ptr<osg::Texture2D> map);
-        SDDebugHUD();
-        ~SDDebugHUD();
-
-        inline osg::ref_ptr<osg::Camera> getRootCamera(){
-            return HUD_camera;
+        SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m_sceneroot);
+        inline osg::ref_ptr<osg::Group> getCameras(){
+            return cameras;
+        }
+        inline osg::ref_ptr<osg::Texture2D> getReflectionMap(){
+            return map;
         }
 
+        void update();
+
+        ~SDReflectionMapping();
 
 };
 
-#endif //_OSGDEBUGHUD_H_
+#endif //_OSGREFLECTIONMAPPING_H_
