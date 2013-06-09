@@ -116,7 +116,8 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     }
 
 
-    root->addChild(reflectionMapping->getCameras());
+    root->addChild(reflectionMapping->getCamerasRoot());
+    //debugHUD->setTexture(reflectionMapping->getMap());
     debugHUD->setTexture(reflectionMapping->getReflectionMap());
     root->addChild(debugHUD->getRootCamera());
 

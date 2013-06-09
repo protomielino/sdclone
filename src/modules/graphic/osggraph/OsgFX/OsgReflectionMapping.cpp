@@ -34,31 +34,44 @@ SDReflectionMapping::SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m
 
     screens=s;
 
-    map = new osg::Texture2D;
-    map->setTextureSize( 256, 256 );
-    map->setInternalFormat( GL_RGB );
+    reflectionMap = new osg::TextureCubeMap;
+    reflectionMap->setTextureSize( 256, 256 );
+    reflectionMap->setInternalFormat( GL_RGB );
 
-    camera = new osg::Camera;
-    camera->setViewport( 0, 0, 256, 256 );
-    camera->setClearColor( osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
-    camera->setClearMask( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
+    camerasRoot = new osg::Group;
 
-    camera->setRenderOrder( osg::Camera::PRE_RENDER );
-    camera->setRenderTargetImplementation(
-    osg::Camera::FRAME_BUFFER_OBJECT );
-    camera->attach( osg::Camera::COLOR_BUFFER, map.get() );
-
-    camera->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
-    camera->addChild( m_sceneroot );
+    for(int i=0;i<6;i++){
+        map = new osg::Texture2D;
+        map->setTextureSize( 256, 256 );
+        map->setInternalFormat( GL_RGB );
 
 
-    //camera->setProjectionMatrixAsOrtho(-1,1,-1,1,0,1000000);
+        osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+        camera->setViewport( 0, 0, 256, 256 );
+        camera->setClearColor( osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+        camera->setClearMask( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
 
-    camera->setProjectionMatrixAsPerspective(45.0,1.0,1.0,1000000.0);
+        camera->setRenderOrder( osg::Camera::PRE_RENDER );
+        camera->setRenderTargetImplementation(
+        osg::Camera::FRAME_BUFFER_OBJECT );
+        camera->attach( osg::Camera::COLOR_BUFFER, reflectionMap,0,i );
 
-    cameras = new osg::Group;
+        camera->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
+        camera->addChild( m_sceneroot );
 
-    cameras->addChild(camera);
+
+        //camera->setProjectionMatrixAsOrtho(-1,1,-1,1,0,1000000);
+
+        camera->setProjectionMatrixAsPerspective(45.0,1.0,1.0,1000000.0);
+        camerasRoot->addChild(camera);
+        cameras.push_back(camera);
+
+        reflectionMap->setImage(i,map->getImage());
+
+  }
+
+
+
 }
 
 
@@ -93,10 +106,9 @@ void SDReflectionMapping::update(){
     up[1] = car->_posMat[2][1];
     up[2] = car->_posMat[2][2];
 
-
-
-    camera->setViewMatrixAsLookAt(eye,center,up);
-
+    for(uint i=0;i<cameras.size();i++){
+        cameras[i]->setViewMatrixAsLookAt(eye,center,up);
+    }
 }
 
 SDReflectionMapping::~SDReflectionMapping(){

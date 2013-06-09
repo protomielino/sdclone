@@ -19,22 +19,28 @@
 #ifndef _OSGREFLECTIONMAPPING_H_
 #define _OSGREFLECTIONMAPPING_H_
 
+#include <osg/TextureCubeMap>
 #include <osg/Texture2D>
 
 class SDReflectionMapping
 {
     private:
-        osg::ref_ptr<osg::Group> cameras;
-        osg::ref_ptr<osg::Camera> camera;
-        osg::ref_ptr<osg::Texture2D> map;
+        osg::ref_ptr<osg::Group> camerasRoot;
+        std::vector< osg::ref_ptr<osg::Camera> > cameras;
+        osg::ref_ptr<osg::TextureCubeMap> reflectionMap;
         SDScreens * screens;
+
+        osg::ref_ptr<osg::Texture2D> map;
 
     public:
         SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m_sceneroot);
-        inline osg::ref_ptr<osg::Group> getCameras(){
-            return cameras;
+        inline osg::ref_ptr<osg::Group> getCamerasRoot(){
+            return camerasRoot;
         }
-        inline osg::ref_ptr<osg::Texture2D> getReflectionMap(){
+        inline osg::ref_ptr<osg::TextureCubeMap> getReflectionMap(){
+            return reflectionMap;
+        }
+        inline osg::ref_ptr<osg::Texture2D> getMap(){
             return map;
         }
 

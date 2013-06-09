@@ -3,6 +3,7 @@
 #include <osg/Geometry>
 #include <osg/Geode>
 #include <osg/Texture2D>
+#include <osg/TextureCubeMap>
 
 #include "OsgDebugHUD.h"
 
@@ -28,6 +29,16 @@ SDDebugHUD::SDDebugHUD(){
 void SDDebugHUD::setTexture(osg::ref_ptr<osg::Texture2D> map){
     osg::StateSet* stateset = HUD_camera->getOrCreateStateSet();
     stateset->setTextureAttributeAndModes( 0,map);
+}
+
+void SDDebugHUD::setTexture(osg::ref_ptr<osg::TextureCubeMap> map){
+    osg::StateSet* stateset = HUD_camera->getOrCreateStateSet();
+    osg::ref_ptr<osg::Texture2D> lm = new osg::Texture2D;
+    lm->setTextureSize( 256, 256 );
+    lm->setInternalFormat( GL_RGB );
+    lm->setDataVariance(osg::Object::DYNAMIC);
+    lm->setImage(map->getImage(3));
+    stateset->setTextureAttributeAndModes( 0,lm);
 }
 
 void SDDebugHUD::toggleHUD(){
