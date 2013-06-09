@@ -233,7 +233,7 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_F10,      "Follow Car Zoomed", (void*)8, SDSelectCamera, NULL);
     GfuiAddKey(screen, GFUIK_F11,      "TV Director View",  (void*)9, SDSelectCamera, NULL);
 
-    GfuiAddKey(screen, GFUIK_F12,      "Activate DEBUG HUD",  (void*)9, SDToggleHUD, NULL);
+    GfuiAddKey(screen, 'h',            "Activate DEBUG HUD",  (void*)0, SDToggleHUD, NULL);
 
     /*GfuiAddKey(screen, '5',            "Debug Info",        (void*)3, grSelectBoard, NULL);
     GfuiAddKey(screen, '4',            "G/Cmd Graph",       (void*)4, grSelectBoard, NULL);
