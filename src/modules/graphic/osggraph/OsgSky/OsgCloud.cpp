@@ -34,6 +34,7 @@
 #include <osg/TexMat>
 #include <osg/Fog>
 #include <osgDB/ReadFile>
+#include <osgFX/BumpMapping>
 
 #include <tgf.h>
 
