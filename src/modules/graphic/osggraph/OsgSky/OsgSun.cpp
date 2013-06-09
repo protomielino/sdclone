@@ -32,7 +32,6 @@
 #include "OsgUtil/OsgColor.h"
 #include "OsgSun.h"
 #include "OsgUtil/OsgMath.h"
-#include "OsgUtil/OsgSphere.h"
 
 // Constructor
 SDSun::SDSun( void ) :

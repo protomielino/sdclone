@@ -34,7 +34,7 @@
 
 #include "OsgUtil/OsgMath.h"
 #include "OsgUtil/OsgColor.h"
-#include "OsgUtil/OsgSphere.h"
+#include "OsgSphere.h"
 #include "OsgMoon.h"
 
 // Constructor

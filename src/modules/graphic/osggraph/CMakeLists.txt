@@ -6,10 +6,10 @@ SET(OSGGRAPH_HEADERS OsgUtil/OsgVectorArrayAdapter.h
                      OsgUtil/OsgReferenced.h 
 		     #OsgUtil/OsgSharedPtr.h
 		     #OsgUtil/OsgStateAttributeFactory.h 
-		     OsgUtil/OsgSphere.h 
 		     OsgUtil/OsgMath.h
 
-                     OsgSky/OsgSun.h 
+                     OsgSky/OsgSphere.h
+		     OsgSky/OsgSun.h 
                      OsgSky/OsgMoon.h 
                      OsgSky/OsgStars.h 
                      OsgSky/OsgDome.h 
@@ -39,10 +39,10 @@ SET(OSGGRAPH_HEADERS OsgUtil/OsgVectorArrayAdapter.h
 		     OsgMain.h
                      )
 			
-SET(OSGGRAPH_SOURCES OsgUtil/OsgSphere.cpp 
-                     #OsgUtil/OsgStateAttributeFactory.cpp 
+SET(OSGGRAPH_SOURCES #OsgUtil/OsgStateAttributeFactory.cpp 
 		     OsgUtil/OsgMath.cpp
 
+		     OsgSky/OsgSphere.cpp
 		     OsgSky/OsgSun.cpp 
 		     OsgSky/OsgMoon.cpp 
 		     OsgSky/OsgStars.cpp 
