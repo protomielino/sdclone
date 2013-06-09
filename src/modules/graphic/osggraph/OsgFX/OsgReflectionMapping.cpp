@@ -106,7 +106,7 @@ void SDReflectionMapping::update(){
     up[1] = car->_posMat[2][1];
     up[2] = car->_posMat[2][2];
 
-    for(uint i=0;i<cameras.size();i++){
+    for(unsigned int i=0;i<cameras.size();i++){
         cameras[i]->setViewMatrixAsLookAt(eye,center,up);
     }
 }
