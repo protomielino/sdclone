@@ -49,7 +49,7 @@ private :
     osg::Node *pCar;
     osg::StateSet* stateset;
     osg::ref_ptr<osg::Uniform> diffuseMap;
-    //osg::Uniform * normalMap;
+    osg::Uniform * reflectionMap;
     osg::ref_ptr<osg::Uniform> specularColor;
     osg::ref_ptr<osg::Uniform> lightVector;
     osg::ref_ptr<osg::Uniform> lightPower;
@@ -77,8 +77,8 @@ public :
 
         diffuseMap = new osg::Uniform("diffusemap", 0 );
         stateset->addUniform(diffuseMap);
-       // normalMap = new osg::Uniform("normalmap", 1 );
-       // stateset->addUniform(normalMap);
+        reflectionMap = new osg::Uniform("reflectionmap", 2 );
+        stateset->addUniform(reflectionMap);
         specularColor = new osg::Uniform("specularColor", osg::Vec4(0.8f,0.8f,0.8f,1.0f));
         stateset->addUniform(specularColor);
         /*lightVector = new osg::Uniform("lightvector",osg::Vec3());
@@ -323,6 +323,8 @@ osg::Node *SDCar::loadCar(tCarElt *car)
     if (SHADOW_TECHNIQUE == 0)
         this->car_root->addChild(this->initOcclusionQuad(car));
 
+   // car_root->setNodeMask(1);
+
     return this->car_root;
 }
 
@@ -411,6 +413,18 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car){
     return root.get();
 }
 
+void SDCar::deactivateCar(tCarElt*car){
+    if(this->car == car){
+        this->car_root->setNodeMask(0);
+    }
+}
+
+void SDCar::activateCar(tCarElt*car){
+    if(this->car == car){
+        this->car_root->setNodeMask(1);
+    }
+}
+
 void SDCar::updateCar()
 {
     osg::Vec3 p;
@@ -448,6 +462,10 @@ void SDCar::updateShadingParameters(osg::Matrixf modelview){
     shader->update(modelview);
 }
 
+void SDCar::setReflectionMap(osg::ref_ptr<osg::TextureCubeMap> map){
+    car_branch->getOrCreateStateSet()->setTextureAttributeAndModes(2,map,osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
+}
+
 SDCars::SDCars(void)
 {
     cars_branch = new osg::Group;
@@ -479,6 +497,37 @@ void SDCars::loadCars(tSituation * pSituation)
     
     return;;
 }
+
+void SDCars::deactivateCar(tCarElt*car){
+    std::vector<SDCar *>::iterator it;
+    for(it = the_cars.begin(); it!= the_cars.end(); it++)
+    {
+        (*it)->deactivateCar(car);
+    }
+}
+
+void SDCars::activateCar(tCarElt*car){
+    std::vector<SDCar *>::iterator it;
+    for(it = the_cars.begin(); it!= the_cars.end(); it++)
+    {
+        (*it)->activateCar(car);
+    }
+}
+
+SDCar * SDCars::getCar(tCarElt*car){
+    std::vector<SDCar *>::iterator it;
+    SDCar * res;
+    for(it = the_cars.begin(); it!= the_cars.end(); it++)
+    {
+        if((*it)->isCar(car)){
+            res = *it;
+        }
+    }
+    return res;
+}
+
+
+
 
 void SDCars::updateCars()
 {

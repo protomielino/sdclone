@@ -24,6 +24,8 @@
 #include <raceman.h>
 #include <vector>
 
+#include <osg/TextureCubeMap>
+
 #include "OsgWheel.h"
 
 class SDCarShader;
@@ -42,10 +44,18 @@ class SDCar
         //osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
         osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
 
+
     public :
         osg::Node *loadCar(tCarElt *car);
+        void deactivateCar(tCarElt*car);
+        inline bool isCar(tCarElt*c){
+            return c==car;
+        }
+
+        void activateCar(tCarElt*car);
         void updateCar();
         void updateShadingParameters(osg::Matrixf modelview);
+        void setReflectionMap(osg::ref_ptr<osg::TextureCubeMap> map);
 };
 
 class SDCars
@@ -63,6 +73,9 @@ class SDCars
 
         void loadCars(tSituation * pSituation);
         void updateCars();
+        void deactivateCar(tCarElt*car);
+        void activateCar(tCarElt*car);
+        SDCar *getCar(tCarElt*car);
         void unLoad();
         void updateShadingParameters(osg::Matrixf modelview);
         osg::Node* getCarsNode(){ return cars_branch.get(); }

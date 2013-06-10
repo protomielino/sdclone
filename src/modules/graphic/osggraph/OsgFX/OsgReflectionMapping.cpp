@@ -25,9 +25,55 @@
 
 #include "OsgReflectionMapping.h"
 
+#include "OsgCar/OsgCar.h"
+#include "OsgMain.h"
+
 #include <car.h>
 
 
+
+class CameraPreCallback : public osg::Camera::DrawCallback
+{
+private:
+    tCarElt * car;
+public:
+
+    void setCar(tCarElt *c){
+        car = c;
+    }
+
+   virtual void operator()(const osg::Camera& cam) const
+   {
+
+        SDCars * cars = (SDCars *)getCars();
+
+        cars->deactivateCar(car);
+   }
+};
+
+class CameraPostCallback : public osg::Camera::DrawCallback
+{
+private:
+    tCarElt * car;
+public:
+
+    void setCar(tCarElt *c){
+        car = c;
+    }
+
+
+
+   virtual void operator()(const osg::Camera& cam) const
+   {
+
+        SDCars * cars = (SDCars *)getCars();
+
+        cars->activateCar(car);
+   }
+};
+
+CameraPreCallback * pre_cam = new CameraPreCallback;
+CameraPostCallback * post_cam = new CameraPostCallback;
 
 
 SDReflectionMapping::SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m_sceneroot){
@@ -36,7 +82,7 @@ SDReflectionMapping::SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m
 
     reflectionMap = new osg::TextureCubeMap;
     reflectionMap->setTextureSize( 256, 256 );
-    reflectionMap->setInternalFormat( GL_RGB );
+    reflectionMap->setInternalFormat( GL_RGBA);
 
     camerasRoot = new osg::Group;
 
@@ -46,6 +92,7 @@ SDReflectionMapping::SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m
         osg::ref_ptr<osg::Camera> camera = new osg::Camera;
         camera->setViewport( 0, 0, 256, 256 );
         camera->setClearMask( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
+        //camera->setClearColor(osg::Vec4(0.0,0.0,0.0,1.0));
 
         camera->setRenderOrder( osg::Camera::PRE_RENDER );
         camera->setRenderTargetImplementation(
@@ -55,6 +102,9 @@ SDReflectionMapping::SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m
         camera->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
         camera->addChild( m_sceneroot );
 
+        camera->setPreDrawCallback(pre_cam);
+         camera->setPostDrawCallback(post_cam);
+
 
         //camera->setProjectionMatrixAsOrtho(,1,-1,1,0,1000000);
 
@@ -62,18 +112,32 @@ SDReflectionMapping::SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m
         //camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
         camerasRoot->addChild(camera);
         cameras.push_back(camera);
+        //camera->setNodeMask(0);
 
 
   }
 
+    //cameras[4]->setNodeMask(1);
 
 
 }
 
-
+bool st = false;
 void SDReflectionMapping::update(){
 
     tCarElt * car = screens->getActiveView()->getCurrentCar();
+
+    SDCars * cars = (SDCars *)getCars();
+    SDCar * sdcar = cars->getCar(car);
+
+    if(!st){
+        sdcar->setReflectionMap(reflectionMap);
+        st =true;
+    }
+
+    pre_cam->setCar(car);
+    post_cam->setCar(car);
+
     sgVec3 P, p;
     osg::Vec3 eye,center,up;
 
