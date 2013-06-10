@@ -132,6 +132,8 @@ void SDReflectionMapping::update(){
 
     tCarElt * car = screens->getActiveView()->getCurrentCar();
 
+    osg::Camera * viewCam = screens->getActiveView()->getOsgCam();
+
     SDCars * cars = (SDCars *)getCars();
     SDCar * sdcar = cars->getCar(car);
 
@@ -172,7 +174,12 @@ void SDReflectionMapping::update(){
     up[2] = car->_posMat[2][2];
 
 
-    cameras[osg::TextureCubeMap::POSITIVE_Z]->setViewMatrixAsLookAt(eye,center,up);
+    osg::Matrix n = osg::Matrix(-1.0,0.0,0.0,0.0,
+                               0.0,1.0,0.0,0.0,
+                               0.0,0.0,1.0,0.0,
+                               0.0,0.0,0.0,1.0);
+
+    cameras[osg::TextureCubeMap::POSITIVE_Z]->setViewMatrix(osg::Matrix::translate(-eye)*osg::Matrix::rotate(viewCam->getViewMatrix().getRotate())*n);
     osg::Matrix mat = cameras[osg::TextureCubeMap::POSITIVE_Z]->getViewMatrix();
 
     osg::Matrix negX = osg::Matrix::rotate(osg::inDegrees(-90.0),osg::Y_AXIS);
