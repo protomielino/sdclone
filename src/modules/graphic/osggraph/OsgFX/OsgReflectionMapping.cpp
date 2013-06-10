@@ -82,7 +82,12 @@ SDReflectionMapping::SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m
 
     reflectionMap = new osg::TextureCubeMap;
     reflectionMap->setTextureSize( 256, 256 );
-    reflectionMap->setInternalFormat( GL_RGBA);
+    reflectionMap->setInternalFormat( GL_RGB);
+    reflectionMap->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+    reflectionMap->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+    reflectionMap->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_EDGE);
+    reflectionMap->setFilter(osg::TextureCubeMap::MIN_FILTER,osg::TextureCubeMap::LINEAR);
+    reflectionMap->setFilter(osg::TextureCubeMap::MAG_FILTER,osg::TextureCubeMap::LINEAR);
 
     camerasRoot = new osg::Group;
 
@@ -158,7 +163,7 @@ void SDReflectionMapping::update(){
     P[2] = car->_drvPos_z;
     sgXformPnt3(P, car->_posMat);
 
-    center[0] = P[0];
+    center[0] =  P[0];
     center[1] = P[1];
     center[2] = P[2];
 

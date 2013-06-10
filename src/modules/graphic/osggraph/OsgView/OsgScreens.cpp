@@ -82,6 +82,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     Screens.insert(Screens.end(),view);
 
     root = new osg::Group;
+        root->addChild(reflectionMapping->getCamerasRoot());
     root->addChild(m_sceneroot.get());
     root->addChild(mirrorCam);
     mirrorCam->addChild(m_sceneroot.get());
@@ -116,7 +117,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     }
 
 
-    root->addChild(reflectionMapping->getCamerasRoot());
+
     //debugHUD->setTexture(reflectionMapping->getMap());
     debugHUD->setTexture(reflectionMapping->getReflectionMap());
     root->addChild(debugHUD->getRootCamera());
