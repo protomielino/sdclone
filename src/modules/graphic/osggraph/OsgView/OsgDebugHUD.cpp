@@ -10,12 +10,35 @@
 
 
 SDDebugHUD::SDDebugHUD(){
+    osg::Geometry* geom;
+    osg::ref_ptr<osg::Vec3Array> texcoords;
 
-    osg::Geometry* geom = osg::createTexturedQuadGeometry(
-        osg::Vec3(), osg::Vec3(0.5f,0.0f,0.0f), osg::Vec3(0.0f,0.7f,0.0f),
-    0.0f,0.0f,1.0f,1.0f);
-    osg::ref_ptr<osg::Geode> quad = new osg::Geode;
+      osg::ref_ptr<osg::Geode> quad = new osg::Geode;
+
+    float zoom = 0.5f;
+
+    //neg Z
+    geom = osg::createTexturedQuadGeometry(
+    osg::Vec3(-1.0f,-1.0f,0.0f), osg::Vec3(0.5f,0.0f,0.0f), osg::Vec3(0.0f,0.7f,0.0f));
+    texcoords = new osg::Vec3Array;
+    texcoords->push_back( osg::Vec3(1.0f, -1.0f,-zoom) );
+    texcoords->push_back( osg::Vec3(1.0f, 1.0f,-zoom) );
+    texcoords->push_back( osg::Vec3(-1.0f, 1.0f,-zoom) );
+    texcoords->push_back( osg::Vec3(-1.0f,-1.0f,-zoom) );
+    geom->setTexCoordArray(0,texcoords);
     quad->addDrawable( geom );
+
+    //negX
+    geom = osg::createTexturedQuadGeometry(
+    osg::Vec3(-0.3f,-1.0f,0.0f), osg::Vec3(0.5f,0.0f,0.0f), osg::Vec3(0.0f,0.7f,0.0f));
+    texcoords = new osg::Vec3Array;
+    texcoords->push_back( osg::Vec3(-1.0f,-1.0f,zoom) );
+    texcoords->push_back( osg::Vec3(-1.0f, 1.0f,zoom) );
+    texcoords->push_back( osg::Vec3(1.0f, 1.0f,zoom) );
+    texcoords->push_back( osg::Vec3(1.0f, -1.0f,zoom) );
+    geom->setTexCoordArray(0,texcoords);
+    quad->addDrawable( geom );
+
 
     HUD_camera = new osg::Camera;
     HUD_camera->setClearMask( GL_DEPTH_BUFFER_BIT );
@@ -33,12 +56,12 @@ void SDDebugHUD::setTexture(osg::ref_ptr<osg::Texture2D> map){
 
 void SDDebugHUD::setTexture(osg::ref_ptr<osg::TextureCubeMap> map){
     osg::StateSet* stateset = HUD_camera->getOrCreateStateSet();
-    osg::ref_ptr<osg::Texture2D> lm = new osg::Texture2D;
+   /* osg::ref_ptr<osg::Texture2D> lm = new osg::Texture2D;
     lm->setTextureSize( 256, 256 );
     lm->setInternalFormat( GL_RGB );
     lm->setDataVariance(osg::Object::DYNAMIC);
-    lm->setImage(map->getImage(3));
-    stateset->setTextureAttributeAndModes( 0,lm);
+    lm->setImage(map->getImage(3));*/
+    stateset->setTextureAttributeAndModes( 0,map);
 }
 
 void SDDebugHUD::toggleHUD(){

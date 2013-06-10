@@ -41,14 +41,10 @@ SDReflectionMapping::SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m
     camerasRoot = new osg::Group;
 
     for(int i=0;i<6;i++){
-        map = new osg::Texture2D;
-        map->setTextureSize( 256, 256 );
-        map->setInternalFormat( GL_RGB );
 
 
         osg::ref_ptr<osg::Camera> camera = new osg::Camera;
         camera->setViewport( 0, 0, 256, 256 );
-        camera->setClearColor( osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
         camera->setClearMask( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
 
         camera->setRenderOrder( osg::Camera::PRE_RENDER );
@@ -60,13 +56,13 @@ SDReflectionMapping::SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m
         camera->addChild( m_sceneroot );
 
 
-        //camera->setProjectionMatrixAsOrtho(-1,1,-1,1,0,1000000);
+        //camera->setProjectionMatrixAsOrtho(,1,-1,1,0,1000000);
 
-        camera->setProjectionMatrixAsPerspective(45.0,1.0,1.0,1000000.0);
+        camera->setProjectionMatrixAsPerspective(90.0,1.0,1.0,1000000.0);
+        //camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
         camerasRoot->addChild(camera);
         cameras.push_back(camera);
 
-        reflectionMap->setImage(i,map->getImage());
 
   }
 
@@ -106,9 +102,27 @@ void SDReflectionMapping::update(){
     up[1] = car->_posMat[2][1];
     up[2] = car->_posMat[2][2];
 
-    for(unsigned int i=0;i<cameras.size();i++){
+
+    cameras[osg::TextureCubeMap::POSITIVE_Z]->setViewMatrixAsLookAt(eye,center,up);
+    osg::Matrix mat = cameras[osg::TextureCubeMap::POSITIVE_Z]->getViewMatrix();
+
+    osg::Matrix negX = osg::Matrix::rotate(osg::inDegrees(-90.0),osg::Y_AXIS);
+    osg::Matrix negZ = osg::Matrix::rotate(osg::inDegrees(-180.0),osg::Y_AXIS);
+    osg::Matrix posX = osg::Matrix::rotate(osg::inDegrees(90.0),osg::Y_AXIS);
+
+    osg::Matrix negY= osg::Matrix::rotate(osg::inDegrees(-90.0),osg::X_AXIS);
+    osg::Matrix posY= osg::Matrix::rotate(osg::inDegrees(90.0),osg::X_AXIS);
+
+    cameras[osg::TextureCubeMap::NEGATIVE_X]->setViewMatrix(mat*negX);
+    cameras[osg::TextureCubeMap::NEGATIVE_Z]->setViewMatrix(mat*negZ);
+    cameras[osg::TextureCubeMap::POSITIVE_X]->setViewMatrix(mat*posX);
+
+    cameras[osg::TextureCubeMap::NEGATIVE_Y]->setViewMatrix(mat*negY);
+    cameras[osg::TextureCubeMap::POSITIVE_Y]->setViewMatrix(mat*posY);
+
+    /*for(unsigned int i=0;i<cameras.size();i++){
         cameras[i]->setViewMatrixAsLookAt(eye,center,up);
-    }
+    }*/
 }
 
 SDReflectionMapping::~SDReflectionMapping(){

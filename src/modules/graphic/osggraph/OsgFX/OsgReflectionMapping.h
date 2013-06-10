@@ -30,7 +30,6 @@ class SDReflectionMapping
         osg::ref_ptr<osg::TextureCubeMap> reflectionMap;
         SDScreens * screens;
 
-        osg::ref_ptr<osg::Texture2D> map;
 
     public:
         SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m_sceneroot);
@@ -39,9 +38,6 @@ class SDReflectionMapping
         }
         inline osg::ref_ptr<osg::TextureCubeMap> getReflectionMap(){
             return reflectionMap;
-        }
-        inline osg::ref_ptr<osg::Texture2D> getMap(){
-            return map;
         }
 
         void update();
