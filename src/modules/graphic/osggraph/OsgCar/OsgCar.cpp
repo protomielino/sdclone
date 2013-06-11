@@ -46,10 +46,10 @@ static osg::ref_ptr<osg::Program> program ;
 
 class SDCarShader{
 private :
-    osg::Node *pCar;
-    osg::StateSet* stateset;
+    osg::ref_ptr<osg::Node> pCar;
+    osg::ref_ptr<osg::StateSet> stateset;
     osg::ref_ptr<osg::Uniform> diffuseMap;
-    osg::Uniform * reflectionMap;
+    osg::ref_ptr<osg::Uniform> reflectionMap;
     osg::ref_ptr<osg::Uniform> specularColor;
     osg::ref_ptr<osg::Uniform> lightVector;
     osg::ref_ptr<osg::Uniform> lightPower;
