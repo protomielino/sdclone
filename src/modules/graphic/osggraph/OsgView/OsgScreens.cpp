@@ -55,8 +55,6 @@ public:
 void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node> m_sceneroot)
 {
 
-    reflectionMapping = new SDReflectionMapping(this,m_sceneroot);
-
     m_Winx = x;
     m_Winy = y;
     m_Winw = width;
@@ -82,7 +80,9 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     Screens.insert(Screens.end(),view);
 
     root = new osg::Group;
-        root->addChild(reflectionMapping->getCamerasRoot());
+    prerenderRoot = new osg::Group;
+    root->addChild(prerenderRoot);
+       // root->addChild(reflectionMapping->getCamerasRoot());
     root->addChild(m_sceneroot.get());
     root->addChild(mirrorCam);
     mirrorCam->addChild(m_sceneroot.get());
@@ -119,7 +119,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
 
 
     //debugHUD->setTexture(reflectionMapping->getMap());
-    debugHUD->setTexture(reflectionMapping->getReflectionMap());
+    // debugHUD->setTexture(reflectionMapping->getReflectionMap());
     root->addChild(debugHUD->getRootCamera());
 
     viewer->setSceneData(root.get());
@@ -201,8 +201,10 @@ void SDScreens::update(tSituation * s,SDFrameInfo* fi)
         Screens[i]->update(s,fi);
     }
 
-    reflectionMapping->update();
 
+    SDCars * cars = (SDCars *)getCars();
+    tCarElt * c = this->getActiveView()->getCurrentCar();
+    this->debugHUD->setTexture(cars->getCar(c)->getReflectionMap()->getReflectionMap());
 
     if (!viewer->done())
         viewer->frame();
@@ -515,6 +517,11 @@ void SDScreens::changeCamera(long p)
 
 void SDScreens::toggleDebugHUD(){
     debugHUD->toggleHUD();
+}
+
+void SDScreens::registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node){
+    //TODO : multi-screen support of this feature
+    prerenderRoot->addChild(node);
 }
 
 

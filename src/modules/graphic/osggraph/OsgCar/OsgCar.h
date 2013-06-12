@@ -27,8 +27,8 @@
 #include <osg/TextureCubeMap>
 
 #include "OsgWheel.h"
-
-class SDCarShader;
+#include "OsgFX/OsgShader.h"
+#include "OsgFX/OsgReflectionMapping.h"
 
 class SDCar
 {
@@ -38,11 +38,14 @@ class SDCar
         tCarElt *car;
         SDWheels wheels;
         SDCarShader * shader;
+        SDReflectionMapping * reflectionMapping;
         osg::ref_ptr<osg::Vec3Array> shadowVertices;
         osg::ref_ptr<osg::Geometry> quad;
         //osg::ref_ptr<osg::MatrixTransform> wheels[4];
         //osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
         osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
+
+        void setReflectionMap(osg::ref_ptr<osg::TextureCubeMap> map);
 
 
     public :
@@ -51,11 +54,14 @@ class SDCar
         inline bool isCar(tCarElt*c){
             return c==car;
         }
+        inline SDReflectionMapping * getReflectionMap(){
+            return reflectionMapping;
+        }
 
         void activateCar(tCarElt*car);
         void updateCar();
         void updateShadingParameters(osg::Matrixf modelview);
-        void setReflectionMap(osg::ref_ptr<osg::TextureCubeMap> map);
+
 };
 
 class SDCars

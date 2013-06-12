@@ -25,6 +25,7 @@ SET(OSGGRAPH_HEADERS OsgUtil/OsgVectorArrayAdapter.h
 
 		     OsgFX/OsgRender.h
 		     OsgFX/OsgReflectionMapping.h
+                     OsgFX/OsgShader.h
                        
                      OsgView/OsgView.h  	
                      OsgView/OsgScreens.h 
@@ -60,6 +61,7 @@ SET(OSGGRAPH_SOURCES #OsgUtil/OsgStateAttributeFactory.cpp
 
 		     OsgFX/OsgRender.cpp
 		     OsgFX/OsgReflectionMapping.cpp
+                     OsgFX/OsgShader.cpp
 
                      OsgView/OsgView.cpp 
                      OsgView/OsgScreens.cpp

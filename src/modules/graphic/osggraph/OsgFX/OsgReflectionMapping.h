@@ -22,20 +22,22 @@
 #include <osg/TextureCubeMap>
 #include <osg/Texture2D>
 
+#include <car.h>
+
 class SDReflectionMapping
 {
     private:
         osg::ref_ptr<osg::Group> camerasRoot;
         std::vector< osg::ref_ptr<osg::Camera> > cameras;
         osg::ref_ptr<osg::TextureCubeMap> reflectionMap;
-        SDScreens * screens;
-
-
-    public:
-        SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m_sceneroot);
+        tCarElt * car;
         inline osg::ref_ptr<osg::Group> getCamerasRoot(){
             return camerasRoot;
         }
+
+    public:
+        SDReflectionMapping(tCarElt *c);
+
         inline osg::ref_ptr<osg::TextureCubeMap> getReflectionMap(){
             return reflectionMap;
         }

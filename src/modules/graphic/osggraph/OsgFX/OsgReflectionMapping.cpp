@@ -26,6 +26,7 @@
 #include "OsgReflectionMapping.h"
 
 #include "OsgCar/OsgCar.h"
+#include "OsgRender.h"
 #include "OsgMain.h"
 
 #include <car.h>
@@ -76,9 +77,11 @@ CameraPreCallback * pre_cam = new CameraPreCallback;
 CameraPostCallback * post_cam = new CameraPostCallback;
 
 
-SDReflectionMapping::SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m_sceneroot){
+SDReflectionMapping::SDReflectionMapping(tCarElt *c):car(c){
 
-    screens=s;
+    SDRender * render = (SDRender *)getRender();
+    osg::ref_ptr<osg::Node> m_sceneroot =  render->getRoot();
+
 
     reflectionMap = new osg::TextureCubeMap;
     reflectionMap->setTextureSize( 256, 256 );
@@ -107,8 +110,8 @@ SDReflectionMapping::SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m
         camera->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
         camera->addChild( m_sceneroot );
 
-        camera->setPreDrawCallback(pre_cam);
-         camera->setPostDrawCallback(post_cam);
+      //  camera->setPreDrawCallback(pre_cam);
+       //  camera->setPostDrawCallback(post_cam);
 
 
         //camera->setProjectionMatrixAsOrtho(,1,-1,1,0,1000000);
@@ -122,25 +125,18 @@ SDReflectionMapping::SDReflectionMapping(SDScreens *s, osg::ref_ptr<osg::Node> m
 
   }
 
+     SDScreens * screens = (SDScreens*)getScreens();
+     screens->registerViewDependantPreRenderNode(this->getCamerasRoot());
+
     //cameras[4]->setNodeMask(1);
 
 
 }
 
-bool st = false;
 void SDReflectionMapping::update(){
 
-    tCarElt * car = screens->getActiveView()->getCurrentCar();
-
+    SDScreens * screens = (SDScreens*)getScreens();
     osg::Camera * viewCam = screens->getActiveView()->getOsgCam();
-
-    SDCars * cars = (SDCars *)getCars();
-    SDCar * sdcar = cars->getCar(car);
-
-    if(!st){
-        sdcar->setReflectionMap(reflectionMap);
-        st =true;
-    }
 
     pre_cam->setCar(car);
     post_cam->setCar(car);
@@ -160,7 +156,7 @@ void SDReflectionMapping::update(){
     eye[2] = p[2];
 
 
-    P[0] = car->_drvPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset);
+  /*  P[0] = car->_drvPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset);
     P[1] = car->_bonnetPos_y - 30.0 * sin(2*PI/3 * car->_glance + offset);
     P[2] = car->_drvPos_z;
     sgXformPnt3(P, car->_posMat);
@@ -171,7 +167,7 @@ void SDReflectionMapping::update(){
 
     up[0] = car->_posMat[2][0];
     up[1] = car->_posMat[2][1];
-    up[2] = car->_posMat[2][2];
+    up[2] = car->_posMat[2][2];*/
 
 
     osg::Matrix n = osg::Matrix(-1.0,0.0,0.0,0.0,

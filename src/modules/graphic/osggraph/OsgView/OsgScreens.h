@@ -42,8 +42,9 @@ class SDScreens
         osgViewer::Viewer* viewer;
         std::vector<SDView *> Screens;
         osg::ref_ptr<osg::Group> root;
+        osg::ref_ptr<osg::Group> prerenderRoot;
         SDDebugHUD * debugHUD;
-        SDReflectionMapping * reflectionMapping;
+
 
         int m_Winx;
         int m_Winy;
@@ -69,6 +70,7 @@ class SDScreens
         void splitScreen(long p);
         void changeScreen(long p);
         void changeCamera(long p);
+        void registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node);
         void toggleDebugHUD();
 
         inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}
