@@ -362,9 +362,16 @@ void SDRender::Init(tTrack *track)
         sceneGroup->addChild(precipitationEffect.get());
     }
 
-    m_scene->addChild(scenery->getScene());
-    m_scene->addChild(scenery->getBackground());
-    m_scene->setNodeMask(rcvShadowMask);
+    osg::ref_ptr<osg::Group> scene = new osg::Group;
+    osg::ref_ptr<osg::Group> background = new osg::Group;
+    scene->addChild(scenery->getScene());
+    background->addChild(scenery->getBackground());
+    scene->setNodeMask( rcvShadowMask );
+    background->setNodeMask(~(rcvShadowMask | castShadowMask));
+
+    m_scene->addChild(scene);
+    m_scene->addChild(background);
+    //m_scene->setNodeMask(rcvShadowMask);
 
     sceneGroup->addChild(m_scene);
     sceneGroup->addChild(m_CarRoot.get());
@@ -418,6 +425,7 @@ void SDRender::Init(tTrack *track)
     skySS = skyGroup->getOrCreateStateSet();
     skySS->setMode(GL_LIGHT0, osg::StateAttribute::OFF);
     skyGroup->addChild(thesky->getPreRoot());
+    skyGroup->setNodeMask(~(castShadowMask | rcvShadowMask));
     sunLight->addChild(skyGroup.get());
     mRoot->addChild(sceneGroup.get());
     mRoot->setStateSet(setFogState().get());
