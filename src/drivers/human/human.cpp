@@ -95,6 +95,7 @@ static int lastReadKeyState[GFUIK_MAX+1];
 static tKeyInfo keyInfo[GFUIK_MAX+1];
 
 static bool firstTime = false;
+static int resumeIndex = 0;
 static tdble lastKeyUpdate = -10.0;
 
 void *PrefHdle = NULL;
@@ -146,6 +147,8 @@ shutdown(const int index)
 		GfuiKeyEventRegisterCurrent(0);
 		firstTime = false;
 	}//if firstTime
+
+	resumeIndex = 0;
 }//shutdown
 
 
@@ -614,8 +617,13 @@ resumerace(int index, tCarElt* car, tSituation *s)
 	HmReadPrefs(index);
 
 	// Setup Keyboard map (key code => index of the associated command in keyInfo / lastReadKeyState).
-	keyIndex = 0;
-	mapKeys.clear();
+	if (index > resumeIndex) {
+		// must be first time after start/resume (index counts down)
+		GfOut("Clearing Keyboard map (index %d)\n", index);
+		keyIndex = 0;
+		mapKeys.clear();
+	}
+	resumeIndex = index;
 
 	for (int i = 0; i < NbCmdControl; i++)
 	{

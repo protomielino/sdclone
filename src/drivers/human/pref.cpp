@@ -85,7 +85,11 @@ HmReadPrefs(const int index)
 	const int	idx = index - 1;
 	tControlCmd	*cmdCtrl;
 
-	cmdCtrl = HCtx[idx]->cmdControl = (tControlCmd *) calloc (NbCmdControl, sizeof (tControlCmd));
+	if (HCtx[idx]->cmdControl == NULL) {
+		GfOut("malloc control array index %d:\n", index);
+		HCtx[idx]->cmdControl = (tControlCmd *) calloc (NbCmdControl, sizeof (tControlCmd));
+	}
+	cmdCtrl = HCtx[idx]->cmdControl;
 	memcpy(cmdCtrl, CmdControlRef, NbCmdControl * sizeof (tControlCmd));
 
 	sprintf(sstring, "%s%s", GfLocalDir(), HM_PREF_FILE);
@@ -128,7 +132,7 @@ HmReadPrefs(const int index)
 	defaultSettings = controlList[i].settings;
 	
 	/* Command Settings */
-	GfOut("Command settings :\n");
+	GfOut("Command settings for index %d:\n", index);
 	for (int cmd = 0; cmd < NbCmdControl; cmd++) {
 		
 		prm = GfctrlGetNameByRef(cmdCtrl[cmd].type, cmdCtrl[cmd].val);
