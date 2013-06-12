@@ -1726,6 +1726,7 @@ class cGrCarCamRoadZoomTVD : public cGrCarCamRoadZoom
     double lastViewTime;
     tdble  proximityThld;
     int		current;
+    int		curCar;
 
  public:
     cGrCarCamRoadZoomTVD(class cGrScreen *myscreen, int id, int drawCurr, int drawBG,
@@ -1744,6 +1745,7 @@ class cGrCarCamRoadZoomTVD : public cGrCarCamRoadZoom
 	lastEventTime = 0;
 	lastViewTime = 0;
 
+	curCar = 0;
 	current = -1;
 
 	camChangeInterval = GfParmGetNum(grHandle, GR_SCT_TVDIR, GR_ATT_CHGCAMINT, (char*)NULL, 10.0);
@@ -1755,7 +1757,7 @@ class cGrCarCamRoadZoomTVD : public cGrCarCamRoadZoom
 
     void update(tCarElt *car, tSituation *s) {
 	int	i, j;
-	int	curCar;
+	int	newCar;
 	double	curPrio;
 	double	deltaEventTime = s->currentTime - lastEventTime;
 	double	deltaViewTime = s->currentTime - lastViewTime;
@@ -1847,17 +1849,17 @@ class cGrCarCamRoadZoomTVD : public cGrCarCamRoadZoom
 	    if ((event && (deltaEventTime > camEventInterval)) || (deltaViewTime > camChangeInterval)) {
 		int	last_current = current;
 
-		curCar = 0;
+		newCar = 0;
 		curPrio = -1000000.0;
 		for (i = 0; i < grNbCars; i++) {
 	    
 		    if ((schedView[i].prio > curPrio) && (schedView[i].viewable)) {
 			curPrio = schedView[i].prio;
-			curCar = i;
+			newCar = i;
 		    }
 		}
 		for (i = 0; i < grNbCars; i++) {
-		    if (s->cars[i]->index == curCar) {
+		    if (s->cars[i]->index == newCar) {
 			current = i;
 			break;
 		    }
@@ -1869,7 +1871,10 @@ class cGrCarCamRoadZoomTVD : public cGrCarCamRoadZoom
 	    }
 	}
 
-	screen->setCurrentCar(s->cars[current]);
+	if (newCar != curCar) {    
+		screen->setCurrentCar(s->cars[current]);
+		curCar = newCar;
+	}
 	
 	cGrCarCamRoadZoom::update(s->cars[current], s);
     }
