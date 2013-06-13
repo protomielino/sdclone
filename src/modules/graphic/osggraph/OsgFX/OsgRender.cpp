@@ -239,80 +239,6 @@ void SDRender::Init(tTrack *track)
     osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0 );
     unsigned int SDRain = 0;
 
-    /*for (int i = 0; i < MAX_CLOUDS; i++)
-    {
-        SDCloudLayer *layer = new SDCloudLayer(datapath);
-        thesky->add_cloud_layer(layer);
-    }*/
-
-    //int weather = SDTrack->local.clouds;
-
-    /*else if (grNbCloudLayers == 1)
-    {
-        GfLogInfo("  Cloud cover : 3 layers\n");
-
-        int wind = (rand() % 200) + 100;
-
-        cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 2550,
-                                          100 / domeSizeRatio, 100 / domeSizeRatio);
-        cloudLayers[0]->setSpeed(wind);
-        cloudLayers[0]->setDirection(45);
-
-        GfLogInfo("   * layer 1 : speed=60, direction=45, texture=%s\n", buf);
-
-    }
-    else if (grNbCloudLayers == 2)
-    {
-        GfLogInfo("  Cloud cover : 2 layers\n");
-
-        snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", 1);
-        cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 3000,
-                                          100 / domeSizeRatio, 100 / domeSizeRatio);
-        cloudLayers[0]->setSpeed(30);
-        cloudLayers[0]->setDirection(40);
-
-        GfLogInfo("   * layer 1 : speed=30, direction=40, texture=%s\n", buf);
-
-        snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-        cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, 2000,
-                                          100 / domeSizeRatio, 100 / domeSizeRatio);
-        cloudLayers[1]->setSpeed(60);
-        cloudLayers[1]->setDirection(45);
-
-        GfLogInfo("   * layer 2 : speed=60, direction=45, texture=%s\n", buf);
-
-    }
-    else if (grNbCloudLayers == 3)
-    {
-        GfLogInfo("  Cloud cover : 3 layers\n");
-
-        snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", 1);
-        cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 3000,
-                                          100 / domeSizeRatio, 100 / domeSizeRatio);
-        int wind = (rand() % 40) + 60;
-        cloudLayers[0]->setSpeed(wind);
-        cloudLayers[0]->setDirection(40);
-
-        GfLogInfo("   * layer 1 : speed=30, direction=40, texture=%s\n", buf);
-
-        snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-        cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, 2000,
-                                          100 / domeSizeRatio, 100 / domeSizeRatio);
-        cloudLayers[1]->setSpeed(60);
-        cloudLayers[1]->setDirection(45);
-
-        GfLogInfo("   * layer 2 : speed=60, direction=45, texture=%s\n", buf);
-
-        snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-        cloudLayers[2] = TheSky->addCloud(buf, grSkyDomeDistance, 1000,
-                                          100 / domeSizeRatio, 100 / domeSizeRatio);
-        cloudLayers[2]->setSpeed(80);
-        cloudLayers[2]->setDirection(45);
-
-        GfLogInfo("   * layer 3 : speed=80, direction=45, texture=%s\n", buf);
-    }*/
-
-
     switch (SDTrack->local.rain)
     {
         case TR_RAIN_NONE:
@@ -324,7 +250,7 @@ void SDRender::Init(tTrack *track)
             SDRain = 1;
             break;
         case TR_RAIN_MEDIUM:
-            SDVisibility = 600.0;
+            SDVisibility = 400.0;
             SDRain = 2;
             break;
         case TR_RAIN_HEAVY:

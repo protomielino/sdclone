@@ -1,9 +1,27 @@
+/***************************************************************************
+
+    file        : OsgShader.cpp
+    created     : Sat Feb 2013 15:52:19 CEST 2013
+    copyright   : (C) 2013 by Gaëtan André
+    email       : gaetan.andre@gmail.com
+    version     : $Id$
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
 #include "OsgRender.h"
 
 #include <osg/Program>
 #include <osg/Node>
 #include <osg/Uniform>
-#include <raceman.h>
+#include <tgf.h>
 
 #include "OsgMain.h"
 #include "OsgShader.h"

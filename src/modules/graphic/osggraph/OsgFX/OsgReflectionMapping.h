@@ -37,15 +37,13 @@ class SDReflectionMapping
 
     public:
         SDReflectionMapping(tCarElt *c);
+        ~SDReflectionMapping();
 
         inline osg::ref_ptr<osg::TextureCubeMap> getReflectionMap(){
             return reflectionMap;
         }
 
         void update();
-
-        ~SDReflectionMapping();
-
 };
 
 #endif //_OSGREFLECTIONMAPPING_H_
