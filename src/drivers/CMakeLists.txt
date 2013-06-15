@@ -3,13 +3,12 @@ INCLUDE(../../cmake/macros.cmake)
 # Official robots.
 SD_ADD_SUBDIRECTORY(human)
 SD_ADD_SUBDIRECTORY(kilo2008)
+SD_ADD_SUBDIRECTORY(networkhuman)
 SD_ADD_SUBDIRECTORY(simplix)
 SD_ADD_SUBDIRECTORY(usr)
 
 # Work-in-progress / unofficial robots.
-IF(NOT OPTION_OFFICIAL_ONLY)
-
-  SD_ADD_SUBDIRECTORY(networkhuman)
+IF(NOT OPTION_OFFICIAL_ONLY
 
   # Template robot (new framework).
   SD_ADD_SUBDIRECTORY(template)
