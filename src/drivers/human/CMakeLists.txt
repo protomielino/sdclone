@@ -1,16 +1,15 @@
 INCLUDE(../../../cmake/macros.cmake)
 
 SET(ROBOT_NAME "human")
+SET(ROBOT_INTERFACE WELCOME)
+SET(ROBOT_SOURCES ${ROBOT_NAME}.cpp)
 
-SET(ROBOT_SOURCES ${ROBOT_NAME}.cpp pref.cpp human.h pref.h)
+ADD_SDLIB_INCLUDEDIR(robottools tgfclient)
 
-ADD_SDLIB_INCLUDEDIR(tgfclient)
-ADD_SDL_INCLUDEDIR()
-
-ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION ${VERSION} SOVERSION 1.0.0
-             INTERFACE WELCOME
+ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 1.0.0 SOVERSION 1.0.0
+             INTERFACE ${ROBOT_INTERFACE}
              SOURCES ${ROBOT_SOURCES})
 
-ADD_SDLIB_LIBRARY(${ROBOT_NAME} tgfclient)
+ADD_SDLIB_LIBRARY(${ROBOT_NAME} robottools tgfclient)
 
 # For data associated to the robot module, see data/drivers/human/CMakeLists.txt

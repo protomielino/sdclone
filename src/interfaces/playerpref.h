@@ -165,6 +165,33 @@
 #define HM_ATT_JOY_PREF_ANY1 5
 #define HM_ATT_JOY_PREF_LAST 6
 
+#define	CMD_UP_SHFT	0
+#define	CMD_DN_SHFT	1
+#define	CMD_ASR		2
+#define	CMD_ABS		3
+#define	CMD_GEAR_R	4
+#define	CMD_GEAR_N	5
+#define	CMD_GEAR_1	6
+#define	CMD_GEAR_2	7
+#define	CMD_GEAR_3	8
+#define	CMD_GEAR_4	9
+#define	CMD_GEAR_5	10
+#define	CMD_GEAR_6	11
+#define CMD_THROTTLE	12
+#define CMD_BRAKE	13
+#define CMD_LEFTSTEER	14
+#define CMD_RIGHTSTEER	15
+#define CMD_LIGHT1	16
+#define CMD_CLUTCH	17
+#define CMD_SPDLIM	18
+#define CMD_EBRAKE	19
+#define	CMD_HBOX_X	20
+#define	CMD_HBOX_Y	21
+#define CMD_LEFTGLANCE	22
+#define CMD_RIGHTGLANCE	23
+
+#define CMD_END_OF_LIST 23	/* Change this to same value as last item */
+
 #endif /* _PLAYERPREF_H_ */ 
 
 

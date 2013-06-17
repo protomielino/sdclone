@@ -30,10 +30,10 @@
 
 #include <tgf.hpp>
 #include <tgfclient.h>
+#include <playerpref.h>
 
 #include "controlconfig.h"
 #include "joy2butconfig.h"
-#include "../../../../drivers/human/pref.h"
 
 
 // Constants.
