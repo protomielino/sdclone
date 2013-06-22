@@ -1499,6 +1499,9 @@ void TDriver::Drive()
   oCar->ctrl.brakeFrontLeftCmd = (float) (oBrake * oBrakeRep * oBrakeLeft * oBrakeFront); 
   oCar->ctrl.brakeRearRightCmd = (float) (oBrake * (1 - oBrakeRep) * oBrakeRight * oBrakeRear); 
   oCar->ctrl.brakeRearLeftCmd = (float) (oBrake * (1 - oBrakeRep) * oBrakeLeft * oBrakeRear); 
+
+  //LogSimplix.error("#v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv);
+
 /*
   LogSimplix.error("#v:(%.1f)%.1f km/h (Q: %0.0f%%) (B: %0.0f%%)\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oCurrSpeed/oTargetSpeed*100,CarBrakeCmd*100);
   LogSimplix.error("#fr:(%.2f)%% fl:(%.2f)%% rr:(%.2f)%% rl:(%.2f)%%)\n",
@@ -4036,6 +4039,18 @@ double TDriver::CalcCrv_simplix_Identity(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_SC(double Crv)
 {
+    if (fabs(Crv) > 1/25.0)
+      return 1.5;                                // Filter narrow turns
+	else
+      return 1.0;
+}
+//==========================================================================*
+/*
+//==========================================================================*
+// simplix_sc
+//--------------------------------------------------------------------------*
+double TDriver::CalcCrv_simplix_SC(double Crv)
+{
   double Offset = 1300;
 
   if (oCrvComp)
@@ -4049,7 +4064,7 @@ double TDriver::CalcCrv_simplix_SC(double Crv)
     return 1.0;
 }
 //==========================================================================*
-/*
+
 //==========================================================================*
 // simplix_36GP
 //--------------------------------------------------------------------------*
