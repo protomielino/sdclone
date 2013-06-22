@@ -161,7 +161,7 @@ GfuiHelpScreen(void *targetScreen, void *returnScreen)
     
 
     // Create Back button.
-    GfuiMenuCreateButtonControl(scrHandle, hmenu, "backbutton", targetScreen, GfuiScreenReplace);
+    GfuiMenuCreateButtonControl(scrHandle, hmenu, "backbutton", returnScreen, GfuiScreenReplace);
 
     // Create version label.
     const int versionId = GfuiMenuCreateLabelControl(scrHandle, hmenu, "versionlabel");
