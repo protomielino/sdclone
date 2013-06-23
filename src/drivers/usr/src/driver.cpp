@@ -3344,10 +3344,13 @@ void Driver::GetSteerPoint( double lookahead, vec2f *rt, double offset, double t
 // Reduces the brake value such that it fits the speed (more downforce -> more braking).
 float Driver::filterBrakeSpeed(float brake)
 {
-  float weight = (CARMASS + car->_fuel)*G;
-  float maxForce = weight + CA*MAX_SPEED*MAX_SPEED;
-  float force = weight + CA*currentspeedsqr;
-  return brake*force/maxForce;
+    if (CA < 0.01)
+      return brake;
+
+    float weight = (CARMASS + car->_fuel)*G;
+    float maxForce = weight + CA*MAX_SPEED*MAX_SPEED;
+    float force = weight + CA*currentspeedsqr;
+    return brake*force/maxForce;
 }
 
 
@@ -3623,14 +3626,19 @@ float Driver::filterTCL(float accel)
 // Traction Control (TCL) setup.
 void Driver::initTCLfilter()
 {
-  char *traintype = (char *) GfParmGetStr(car->_carHandle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
-  if (strcmp(traintype, VAL_TRANS_RWD) == 0) {
-    GET_DRIVEN_WHEEL_SPEED = &Driver::filterTCL_RWD;
-  } else if (strcmp(traintype, VAL_TRANS_FWD) == 0) {
-    GET_DRIVEN_WHEEL_SPEED = &Driver::filterTCL_FWD;
-  } else if (strcmp(traintype, VAL_TRANS_4WD) == 0) {
-    GET_DRIVEN_WHEEL_SPEED = &Driver::filterTCL_4WD;
-  }
+    char *traintype = (char *) GfParmGetStr(car->_carHandle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
+    if (strcmp(traintype, VAL_TRANS_RWD) == 0)
+    {
+        GET_DRIVEN_WHEEL_SPEED = &Driver::filterTCL_RWD;
+    }
+    else if (strcmp(traintype, VAL_TRANS_FWD) == 0)
+    {
+        GET_DRIVEN_WHEEL_SPEED = &Driver::filterTCL_FWD;
+    }
+    else if (strcmp(traintype, VAL_TRANS_4WD) == 0)
+    {
+        GET_DRIVEN_WHEEL_SPEED = &Driver::filterTCL_4WD;
+    }
 }
 
 
@@ -3666,7 +3674,7 @@ float Driver::filterTCL_FWD()
 // TCL filter plugin for all wheel driven cars.
 float Driver::filterTCL_4WD()
 {
-  return ((car->_wheelSpinVel(FRNT_RGT) + car->_wheelSpinVel(FRNT_LFT)) *
+    return ((car->_wheelSpinVel(FRNT_RGT) + car->_wheelSpinVel(FRNT_LFT)) *
       car->_wheelRadius(FRNT_LFT) +
        (car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) *
       car->_wheelRadius(REAR_LFT)) / 4.0f;
@@ -3716,11 +3724,11 @@ float Driver::filterTrk(float accel)
 // Compute the needed distance to brake.
 float Driver::brakedist(float allowedspeed, float mu)
 {
-  float c = mu*G;
-  float d = (CA*mu + CW)/mass;
-  float v1sqr = currentspeedsqr;
-  float v2sqr = allowedspeed*allowedspeed;
-  return (float)((-log((c + v2sqr*d)/(c + v1sqr*d))/(2.0f*d)) + 1.0);
+    float c = mu*G;
+    float d = (CA*mu + CW)/mass;
+    float v1sqr = currentspeedsqr;
+    float v2sqr = allowedspeed*allowedspeed;
+    return (float)((-log((c + v2sqr*d)/(c + v1sqr*d))/(2.0f*d)) + 1.0);
 }
 
 //==========================================================================*
