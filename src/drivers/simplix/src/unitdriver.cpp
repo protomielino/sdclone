@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.03.04
+// Last changed : 2013.06.13
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.000
+// Version      : 4.00.001
 //--------------------------------------------------------------------------*
 //
 //    Copyright: (C) 2000 by Eric Espie
@@ -2981,7 +2981,7 @@ void TDriver::BrakingForceController()
   if (oBrake > 0)
   {
 	oAccel = 0;
-    LogSimplix.error("#Diff: %.3f m/s B: %.3f %% T: %.1f R: %.3f %%\n",
+    LogSimplix.debug("#Diff: %.3f m/s B: %.3f %% T: %.1f R: %.3f %%\n",
 	  Diff,oBrake*100,oPIDCBrake.oTotal,oBrakeMaxPressRatio);
   }
 

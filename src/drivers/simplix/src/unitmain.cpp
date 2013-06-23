@@ -7,10 +7,14 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2013.03.03
+// Last changed : 2013.06.23
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.000
+// Version      : 4.00.01
+//--------------------------------------------------------------------------*
+// V4.00.001:
+// Modifications for Supercars
+// Slow down at narrow turns more than normal (Needed for Aalborg)
 //--------------------------------------------------------------------------*
 // V4.00.000 (SimuV4)(Single Wheel Braking, Air Brake):
 // New Logging used
