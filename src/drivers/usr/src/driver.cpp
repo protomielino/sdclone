@@ -201,7 +201,7 @@ Driver::Driver(int index, const int robot_type) :
     cmd_gear(0),
     cmd_clutch(0.0f),
     cmd_light(0.0f),
-    rain(0)
+    mRain(0)
 {
   INDEX = index;
   
@@ -337,28 +337,20 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     if (p) *p = '\0';
   }
 
-  rain = getWeather();
+  mRain = getWeather();
 
-  if (rain == 0)
+  if (mRain == 0)
       snprintf(buffer, BUFSIZE, "drivers/%s/%s/default.xml", robot_name, carName);
-  else if (rain == 1)
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/default-r1.xml", robot_name, carName);
-  else if (rain == 2)
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/default-r2.xml", robot_name, carName);
-  else if (rain == 3)
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/default-r3.xml", robot_name, carName);
+  else
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/default-%d.xml",robot_name, carName, mRain);
 
   *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
   void *newhandle;
 
-  if (rain == 0)
+  if (mRain == 0)
       snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
-  else if (rain == 1)
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-r1.xml", robot_name, carName, trackname);
-  else if (rain == 2)
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-r2.xml", robot_name, carName, trackname);
-  else if (rain == 3)
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-r3.xml", robot_name, carName, trackname);
+  else
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-%d.xml",robot_name, carName, trackname, mRain);
 
   newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
   if (newhandle)
@@ -370,14 +362,10 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
   }
   else
   {
-      if (rain == 0)
+      if (mRain == 0)
           snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
-      else if (rain == 1)
-          snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-r1.xml", robot_name, carName, trackname);
-      else if (rain == 2)
-          snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-r2.xml", robot_name, carName, trackname);
-      else if (rain == 3)
-          snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-r3.xml", robot_name, carName, trackname);
+      else
+          snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-%d.xml",robot_name, carName, trackname, mRain);
 
       //snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
       newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
@@ -3735,13 +3723,21 @@ float Driver::brakedist(float allowedspeed, float mu)
   return (float)((-log((c + v2sqr*d)/(c + v1sqr*d))/(2.0f*d)) + 1.0);
 }
 
-unsigned int Driver::getWeather()
+//==========================================================================*
+// Estimate weather
+//--------------------------------------------------------------------------*
+int Driver::getWeather()
+{
+    return (track->local.rain << 4) + track->local.water;
+}
+
+void Driver::Meteorology()
 {
     // Detect Weather condition track
      tTrackSeg *Seg;
      tTrackSurface *Surf;
      float mRainIntensity = 0.0f;
-     unsigned int mRain = 0;
+     mRain = getWeather();
 
      Seg = track->seg;
 
@@ -3753,20 +3749,15 @@ unsigned int Driver::getWeather()
      }
 
      mRainIntensity -= 1;
-     GfOut("#mRainIntensity BIPBIP: %g\n", mRainIntensity);
+     GfOut("#mRainIntensity USR: %g\n", mRainIntensity);
 
      if (mRainIntensity > 0)
      {
-         if (mRainIntensity > 0 && mRainIntensity < 0.2)
-             mRain = 1;
-         else if (mRainIntensity > 0.2 && mRainIntensity < 0.4)
-             mRain = 2;
-         else if (mRainIntensity > 0.4)
-             mRain = 3;
+         //mRain = true;
+         TclSlip = MIN(TclSlip, 2.0);
      }
      else
          mRain = 0;
 
      GfOut("#Rain BIPBIP: %d\n", mRain);
-     return mRain;
 }

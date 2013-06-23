@@ -142,7 +142,8 @@ class Driver {
 		int isAlone();
 		void SetRandomSeed( unsigned int seed );
 		unsigned int getRandom();
-        unsigned int getWeather();
+        int getWeather();
+        void Meteorology();
 		float stuckSteering( float steercmd );
 
 		// Per robot global data.
@@ -175,6 +176,7 @@ class Driver {
 		int prefer_side;
 		int allowcorrecting;
 		int pitpos;
+
 		float prevspeedangle;		// the angle of the speed vector relative to trackangle, > 0.0 points to right.
 		float speedangle;		// the angle of the speed vector relative to trackangle, > 0.0 points to right.
 		float angle;
@@ -185,6 +187,7 @@ class Driver {
 		float lastNSasteer, lastNSksteer;
 		float avgaccel_x;
 		double wheelz[4];
+
 		tCarElt *car;			// Pointer to tCarElt struct.
 		LRaceLine *raceline; // pointer to the raceline instance
 
@@ -302,7 +305,7 @@ class Driver {
 		float cmd_clutch;
 		float cmd_light;
 
-        unsigned int rain;
+        int mRain;
 
 		float (Driver::*GET_DRIVEN_WHEEL_SPEED)();
 		static Cardata *cardata;		// Data about all cars shared by all instances.
