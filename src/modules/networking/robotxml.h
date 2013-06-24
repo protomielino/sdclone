@@ -1,10 +1,10 @@
-// -*- Mode: c++ -*-
 /***************************************************************************
-    file                 : robotxml.h
-    created              : July 2009
-    copyright            : (C) 2009 Brian Gavin
-    web                  : speed-dreams.sourceforge.net
-    version              : $Id$
+
+file                 : robotxml.h
+created              : July 2009
+copyright            : (C) 2009 Brian Gavin
+web                  : speed-dreams.sourceforge.net
+version              : $Id$
 
  ***************************************************************************/
 
@@ -27,10 +27,10 @@
 class RobotXml
 {
 public:
-	RobotXml();
-	
-	bool CreateRobotFile(const char*pRobotName,std::vector<NetDriver> &vecDriver);
-	bool ReadRobotDrivers(const char*pRobotName,std::vector<NetDriver> &vecDrivers);
+    RobotXml();
+
+    bool CreateRobotFile(const char*pRobotName,std::vector<NetDriver> &vecDriver);
+    bool ReadRobotDrivers(const char*pRobotName,std::vector<NetDriver> &vecDrivers);
 };
 
 #endif // ROBOTXML_H
