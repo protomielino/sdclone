@@ -4039,7 +4039,7 @@ double TDriver::CalcCrv_simplix_Identity(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_SC(double Crv)
 {
-    if (fabs(Crv) > 1/25.0)
+    if (fabs(Crv) > 1/50.0)
       return 1.5;                                // Filter narrow turns
 	else
       return 1.0;
