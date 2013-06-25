@@ -10,10 +10,10 @@
 // 
 // File         : unittrack.cpp 
 // Created      : 2007.11.17
-// Last changed : 2013.03.02
+// Last changed : 2013.06.25
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.000
+// Version      : 4.00.002
 //--------------------------------------------------------------------------*
 // Stellt Funktionen zur Streckenbeschreibung zur Verfügung
 //--------------------------------------------------------------------------*
@@ -601,9 +601,9 @@ void TTrackDescription::InitTrack
 			  }
 			  else
 			  {
-			    WCurb = MIN(WCurb,CarParam.oLimitSideWidth);
+			    WCurb = MIN(WCurb,CarParam.oLimitSideWidth/2);
 			    W = MIN(W,CarParam.oLimitSideWidth);
-			    ExtraW = MIN(ExtraW,CarParam.oLimitSideWidth);
+			    ExtraW = MIN(ExtraW,CarParam.oLimitSideWidth/2);
 			  }
 			  Done = true;
 			}
@@ -618,9 +618,9 @@ void TTrackDescription::InitTrack
 			}
 			else
 		    {
-			  WCurb = MIN(WCurb,CarParam.oLimitSideWidth);
+			  WCurb = MIN(WCurb,CarParam.oLimitSideWidth/2);
 			  W = MIN(W,CarParam.oLimitSideWidth);
-			  ExtraW = MIN(ExtraW,CarParam.oLimitSideWidth);
+			  ExtraW = MIN(ExtraW,CarParam.oLimitSideWidth/2);
 			}
 			Done = true;
 		  }

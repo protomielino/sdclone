@@ -9,10 +9,10 @@
 //
 // File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2013.06.23
+// Last changed : 2013.06.25
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.001
+// Version      : 4.00.002
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -467,6 +467,7 @@ enum
 #define PRV_SCALE_STEER	     "scale steer"
 
 #define PRV_UGLY_CRVZ        "ugly crvz"          // Use stiff crv
+#define PRV_SLOW_RADIUS      "slow radius"        // Radius to start slow down 
 
 #define PRV_SIDE_MU          "side mu"            // Scale friction calculation for sides
 #define PRV_RAIN_MU          "scale mu rain"      // Scale friction calculation for sides

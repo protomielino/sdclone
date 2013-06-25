@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.06.13
+// Last changed : 2013.06.25
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.001
+// Version      : 4.00.002
 //--------------------------------------------------------------------------*
 //
 //    Copyright: (C) 2000 by Eric Espie
@@ -314,6 +314,7 @@ TDriver::TDriver(int Index):
   oSideReduction(1.0),
   oLastSideReduction(1.0),
   oMinDistLong(FLT_MAX),
+  oSlowRadius(1.0),
 
   NBRRL(0),
   oRL_FREE(0),
@@ -565,7 +566,7 @@ void TDriver::AdjustDriving(
 
   Param.oCarParam.oLimitSideUse =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LIMIT_SIDE_USE,NULL,
-	(float) 0) > 0;
+	(float) 1) > 0;
   if (Param.oCarParam.oLimitSideUse)
     LogSimplix.debug("#Limit side use: true\n");
   else
@@ -580,6 +581,11 @@ void TDriver::AdjustDriving(
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_UGLY_CRVZ,NULL,
 	-1.0);
   LogSimplix.debug("#Ugly CrvZ: %g\n",Param.oCarParam.oUglyCrvZ);
+
+  oSlowRadius =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SLOW_RADIUS,NULL,
+	oSlowRadius);
+  LogSimplix.debug("#Slow Radius: %g\n",oSlowRadius);
 
   Param.oCarParam.oScaleMu = ScaleMu *
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MU,NULL,
@@ -4039,7 +4045,7 @@ double TDriver::CalcCrv_simplix_Identity(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_SC(double Crv)
 {
-    if (fabs(Crv) > 1/50.0)
+    if (fabs(Crv) > 1/oSlowRadius)
       return 1.5;                                // Filter narrow turns
 	else
       return 1.0;

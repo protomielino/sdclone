@@ -7,14 +7,16 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2013.06.23
+// Last changed : 2013.06.25
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.01
+// Version      : 4.00.02
 //--------------------------------------------------------------------------*
-// V4.00.001:
+// V4.00.002:
 // Modifications for Supercars
 // Slow down at narrow turns more than normal (Needed for Aalborg)
+// Individual parameter SlowRadius
+// Limit side use to inner side to halve of outer side
 //--------------------------------------------------------------------------*
 // V4.00.000 (SimuV4)(Single Wheel Braking, Air Brake):
 // New Logging used
