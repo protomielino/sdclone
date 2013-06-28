@@ -9,10 +9,10 @@
 //
 // File         : unitstrategy.h
 // Created      : 2007.02.20
-// Last changed : 2013.02.16
+// Last changed : 2013.06.25
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.06.000
+// Version      : 4.00.002
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -117,6 +117,7 @@ class TAbstractStrategy
 	virtual bool GoToPit() = 0;
 	virtual bool StartPitEntry(float& Ratio) = 0;
 	virtual bool StopPitEntry(float Offset) = 0;
+    void Statistics();
 
 	void PitRelease();
 	int GetState(){return oState;};

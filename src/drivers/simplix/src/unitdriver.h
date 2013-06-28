@@ -203,6 +203,7 @@ private:
     unsigned int getRandom();
 	double CalcSkill(double TargetSpeed);
     bool CheckPitSharing();
+	bool SaveToFile();
 
 
 private:
@@ -317,7 +318,11 @@ private:
     PSituation oSituation;                       // TORCS data fpr situation
 	double oStartDistance;                       // max Dist. raced while starting
 	double oStartRPM;
-    int oStuckCounter;                           // Tick counter
+    float oRevsLimiter;
+	float oMaxTorque;
+	float oFuelCons;
+
+	int oStuckCounter;                           // Tick counter
     PSysFoo oSysFooStuckX;                       // Positionsüberwachung in X
     PSysFoo oSysFooStuckY;                       // und Y
 	float oTrackAngle;                           // Direction of track

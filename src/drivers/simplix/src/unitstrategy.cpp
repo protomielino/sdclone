@@ -9,10 +9,10 @@
 // 
 // File         : unitstrategy.cpp
 // Created      : 2007.02.20
-// Last changed : 2013.03.02
+// Last changed : 2013.06.25
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.000
+// Version      : 4.00.002
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -613,6 +613,14 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
  	  break;
   }
 }
+//==========================================================================*
+
+//==========================================================================*
+// Statistics
+//--------------------------------------------------------------------------*
+void TAbstractStrategy::Statistics()
+{
+};
 //==========================================================================*
 // end of file unitstrategy.cpp
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*

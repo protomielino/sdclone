@@ -172,6 +172,7 @@ void TDriver::InterpolatePointInfo
 
 //  P0.Crv = TUtils::InterpCurvature(P0.Crv, P1.Crv, Q);
   P0.Crv = TUtils::InterpCurvature(P0.Crv, P1.Crv, (1 - Q));
+  P0.Crvz = TUtils::InterpCurvature(P0.Crvz, P1.Crvz, (1 - Q));
   DOUBLE_NORM_PI_PI(DeltaOAngle);
   P0.Angle = P0.Angle + DeltaOAngle * (1 - Q);
   P0.Offset = Q * P0.Offset + (1 - Q) * P1.Offset;
@@ -278,6 +279,9 @@ TDriver::TDriver(int Index):
   oSituation(NULL),
   oStartDistance(150.0),
   oStartRPM(100.0),
+  oRevsLimiter(0.0),
+  oMaxTorque(0.0),
+  oFuelCons(1.0),
   oStuckCounter(0),
   oSysFooStuckX(NULL),
   oSysFooStuckY(NULL),
@@ -394,9 +398,11 @@ TDriver::TDriver(int Index):
   oPIDCLine.oD = 10;
 
   // Braking: Control speed difference
-  oPIDCBrake.oP = 0.42;
-  oPIDCBrake.oI = 0.001;
-  oPIDCBrake.oD = 0.88;
+  oPIDCBrake.oP = 3.0;
+  oPIDCBrake.oI = 0.0;
+  oPIDCBrake.oD = 20.0;
+  oPIDCBrake.oMaxTotal = 1.0;
+  oPIDCBrake.oMinTotal = 0.0;
   
   for (I = 0; I <= NBR_BRAKECOEFF; I++)          // Initialize braking
     oBrakeCoeff[I] = 0.5;
@@ -530,7 +536,7 @@ void TDriver::AdjustDriving(
   if(Qualification)
     Param.oCarParam.oScaleBrake = ScaleBrake *
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BRAKE_Q,NULL,
-	  (float) Param.oCarParam.oScaleBrake);
+	  (float) (Param.oCarParam.oScaleBrake / ScaleBrake));
   LogSimplix.debug("#Scale Brake: %g\n",Param.oCarParam.oScaleBrake);
 
   oJumpOffset =
@@ -557,12 +563,12 @@ void TDriver::AdjustDriving(
     Param.oCarParam.oScaleBump;
   Param.oCarParam.oScaleBumpRight =
     Param.oCarParam.oScaleBump;
-  LogSimplix.debug("#Scale Bump: %g\n",Param.oCarParam.oScaleBump);
+  LogSimplix.error("#Scale Bump: %g\n",Param.oCarParam.oScaleBump);
 
   Param.oCarParam.oScaleBumpOuter =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BUMPOUTER,NULL,
 	(float) Param.oCarParam.oScaleBump);
-  LogSimplix.debug("#Scale Bump Outer: %g\n",Param.oCarParam.oScaleBumpOuter);
+  LogSimplix.error("#Scale Bump Outer: %g\n",Param.oCarParam.oScaleBumpOuter);
 
   Param.oCarParam.oLimitSideUse =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LIMIT_SIDE_USE,NULL,
@@ -593,7 +599,7 @@ void TDriver::AdjustDriving(
   if(Qualification)
     Param.oCarParam.oScaleMu = ScaleMu *
   	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MU_Q,NULL,
-	  (float) Param.oCarParam.oScaleMu);
+	  (float) (Param.oCarParam.oScaleMu / ScaleMu));
   LogSimplix.debug("#Scale Mu: %g\n",Param.oCarParam.oScaleMu);
 
   Param.oCarParam.oScaleMinMu =
@@ -1108,6 +1114,11 @@ void TDriver::InitTrack
     , (char*) NULL, 100.0);
   LogSimplix.debug("#oMaxFuel (TORCS)   = %.1f\n",oMaxFuel);
 
+  oFuelCons = GfParmGetNum(CarHandle             // Fuel consumption factor
+    , SECT_ENGINE, PRM_FUELCONS                     
+    , (char*) NULL, 1.0);
+  LogSimplix.debug("#oFuelCons (TORCS)  = %.2f\n",oFuelCons);
+
   oBrakeLeft = 1.0f;
   oBrakeRight = 1.0f;
   oBrakeFront = 1.0f;
@@ -1143,8 +1154,8 @@ void TDriver::InitTrack
     BaseParamPath,oTrackName);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
-  double ScaleBrake = 0.80f;
-  double ScaleMu = 0.95f;
+  double ScaleBrake = 1.0;
+  double ScaleMu = 1.0;
 
   if (Handle)
   {
@@ -1397,6 +1408,7 @@ void TDriver::Drive()
   double Pos = oTrackDesc.CalcPos(oCar);         // Get current pos on track
 
   GetPosInfo(Pos,oLanePoint);                    // Info about pts on track
+  //LogSimplix.error("#v:(%.1f)%.1f km/h Z:%.3f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz);
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
   oTargetSpeed = FilterStart(oTargetSpeed);      // Filter Start
 
@@ -1597,6 +1609,7 @@ void TDriver::EndRace()
 {
   LogSimplix.debug("#TDriver::EndRace() >>>\n");
   oStrategy->PitRelease();                       // Release pit if eliminated
+  oStrategy->Statistics();                       // Do some calculations  
   LogSimplix.debug("#<<< TDriver::EndRace()\n");
 }
 //==========================================================================*
@@ -1609,6 +1622,7 @@ void TDriver::Shutdown()
   LogSimplix.debug("#TDriver::Shutdown() >>>\n");
   RtTeamManagerDump();
   RtTeamManagerRelease();
+  SaveToFile();
   LogSimplix.debug("#TDriver::Shutdown() <<<\n");
 }
 //==========================================================================*
@@ -1757,6 +1771,8 @@ void TDriver::FindRacinglines()
   {
     Param.oCarParam2.oScaleBumpRight =           // Adjust outer bump scale
 	  Param.oCarParam.oScaleBumpOuter;           //   to be able to avoid
+    Param.oCarParam2.oScaleBumpLeft =            // Reset outer bump scale
+	  Param.oCarParam.oScaleBump;                //   to keep speed
 	Param.oCarParam2.oScaleMu =                  // Adjust mu scale
 	  oSideScaleMu*Param.oCarParam.oScaleMu;     //   to be able to avoid
 	Param.oCarParam2.oScaleBrake =               // Adjust brake scale
@@ -1836,6 +1852,7 @@ void TDriver::FindRacinglines()
     oRacingLine[I].PropagateBreaking(1);
     oRacingLine[I].PropagateAcceleration(1);
   }
+  //oRacingLine[0].Dump();
   LogSimplix.debug("# ... Done\n");
 }
 //==========================================================================*
@@ -2475,7 +2492,7 @@ void TDriver::InitAdaptiveShiftLevels()
 
   float RevsMax;
   float Tickover;
-  float RevsLimiter;
+//  float RevsLimiter;
   double RpmFactor = 30 / PI;                    // Unit conversion
 
   char	idx[64];
@@ -2488,7 +2505,7 @@ void TDriver::InitAdaptiveShiftLevels()
   Tickover = GfParmGetNum(oCarHandle, SECT_ENGINE,
 	  PRM_TICKOVER, (char*)NULL, 150);
 
-  RevsLimiter = GfParmGetNum(oCarHandle, SECT_ENGINE,
+  oRevsLimiter = GfParmGetNum(oCarHandle, SECT_ENGINE,
 	  PRM_REVSLIM, (char*)NULL, 800);
 
   Edesc = (struct tEdesc*) malloc((IMax + 1) * sizeof(struct tEdesc));
@@ -2532,7 +2549,7 @@ void TDriver::InitAdaptiveShiftLevels()
 	Data->rads = Edesc[I+1].rpm;
 	if ((Data->rads >= Tickover)
 			&& (Edesc[I+1].tq > maxTq)
-			&& (Data->rads < RevsLimiter))
+			&& (Data->rads < oRevsLimiter))
 	{
 	  maxTq = Edesc[I+1].tq;
 	  rpmMaxTq = Data->rads;
@@ -2541,7 +2558,7 @@ void TDriver::InitAdaptiveShiftLevels()
 	}
 	if ((Data->rads >= Tickover)
 			&& (Data->rads * Edesc[I+1].tq > maxPw)
-			&& (Data->rads < RevsLimiter))
+			&& (Data->rads < oRevsLimiter))
 	{
 	  //TqAtMaxPw = Edesc[I+1].tq;
 	  maxPw = Data->rads * Edesc[I+1].tq;
@@ -2554,7 +2571,7 @@ void TDriver::InitAdaptiveShiftLevels()
   }
 
   LogSimplix.debug("\n\n\n#oStartRPM: %g(%g)\n",oStartRPM*RpmFactor,oStartRPM);
-  LogSimplix.debug("#RevsLimiter: %g(%g)\n",RevsLimiter*RpmFactor,RevsLimiter);
+  LogSimplix.debug("#RevsLimiter: %g(%g)\n",oRevsLimiter*RpmFactor,oRevsLimiter);
   LogSimplix.debug("#RevsMax: %g(%g)\n\n\n",RevsMax*RpmFactor,RevsMax);
   
 
@@ -2568,9 +2585,9 @@ void TDriver::InitAdaptiveShiftLevels()
   int J;
   for (J = 0; J < CarGearNbr; J++)
     if (TDriver::UseGPBrakeLimit)
-      oShift[J] = RevsLimiter * 0.90; //0.87;
+      oShift[J] = oRevsLimiter * 0.90; //0.87;
 	else
-      oShift[J] = RevsLimiter * 0.974;
+      oShift[J] = oRevsLimiter * 0.974;
 
   for (J = 1; J < oLastGear; J++)
   {
@@ -2582,7 +2599,7 @@ void TDriver::InitAdaptiveShiftLevels()
       double GearRatioNext;
       ToRpm[J] = 0.0;
 
-      while (Rpm <= RevsLimiter)
+      while (Rpm <= oRevsLimiter)
 	  {
 		for (I = 0; I < IMax; I++)
 		{
@@ -2620,7 +2637,7 @@ void TDriver::InitAdaptiveShiftLevels()
 	  }
 
   }
-  
+
   LogSimplix.info("#Gear change summary:\n");
   for (J = 1; J < oLastGear; J++)
     LogSimplix.info("#%d: Rpm: %g(%g) -> Rpm: %g(%g)\n",
@@ -2628,6 +2645,9 @@ void TDriver::InitAdaptiveShiftLevels()
 
   free(DataPoints);
   free(Edesc);
+
+  oRevsLimiter = (float) (oRevsLimiter * RpmFactor);
+  oMaxTorque = (float) (maxTq);
 
   LogSimplix.debug("\n#<<< InitAdaptiveShiftLevels\n");
 }
@@ -4449,6 +4469,46 @@ void TDriver::CalcSkilling_simplix_LP1()
 	oSkillGlobal = oSkillGlobal/10.0;
 	oSkillDriver = oSkillDriver/3.0;
 	oSkill = oSkillScale * (oSkillGlobal + oSkillDriver) + oSkillOffset;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Protokoll to file
+//--------------------------------------------------------------------------*
+bool TDriver::SaveToFile()
+{
+  FILE* F = 0;
+  char buf[BUFLEN+1];
+  char* PathFilename = buf;
+
+  snprintf(buf, BUFLEN, "%s/Statistics-%s.txt", 
+  	oPathToWriteTo,oCar->_name);
+
+  F = fopen(PathFilename, "w");
+
+  if (F == 0)
+    return false;
+
+  fprintf(F, "%s: %7.2f km/h ( %7.2f m/s / %d laps / %g m / %15.2f s)\n",
+	  oCar->_name,oCar->_distRaced/CurrSimTime/1000*3600,oCar->_distRaced/CurrSimTime,oCar->_laps,oCar->_distRaced,CurrSimTime);
+  fprintf(F, "Dammages: %.0f (%.0f per lap / Repair: %.0f / Dammage remaining: %d)\n",
+	  oCar->_dammage + oRepairNeeded, (oCar->_dammage + oRepairNeeded)/oCar->_laps, oRepairNeeded, oCar->_dammage);
+
+  double CarFactor = oFuelCons*oFuelCons*oFuelCons*sqrt(oMaxTorque)*oRevsLimiter/10000.0;
+  double FuelCons = (oFuelNeeded - oCar->_fuel)/oCar->_distRaced*100000;
+  double TrackScale = FuelCons / CarFactor;
+  double Estimation = CarFactor * 2.1;
+
+  fprintf(F, "Fuel consumtion: %.2f kg/100km (Fuel remaining: %.2f kg / Fuel filled in: %.2f kg / Fuel consumed: %.2f kg)\n",
+	  FuelCons, oCar->_fuel, oFuelNeeded,oFuelNeeded - oCar->_fuel);
+  fprintf(F, "Fuel Consumption Factor^3: %.3f * Sqrt(Max Trq): %.3f * RPM Limit: %.0f / 10000 = CarFactor %.3f\n",
+	  oFuelCons*oFuelCons*oFuelCons, sqrt(oMaxTorque),oRevsLimiter,CarFactor);
+  fprintf(F, "Fuel estimated: %.1f kg/100km Fuel consumtion: %.3f kg/100km = CarFactor %.3f * TrackScale %.3f\n",
+	  Estimation,FuelCons, CarFactor, TrackScale);
+
+  fclose(F);
+
+  return true;
 }
 //==========================================================================*
 

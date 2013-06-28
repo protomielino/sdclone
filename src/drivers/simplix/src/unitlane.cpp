@@ -170,6 +170,9 @@ bool TLane::GetLanePoint(double TrackPos, TLanePoint& LanePoint) const
   LanePoint.Index = Idx0;
   LanePoint.Crv = (1.0 - Tx) * Crv1 + Tx * Crv2;
   LanePoint.Crvz = (1.0 - Tx) * Crv1z + Tx * Crv2z;
+
+  //LogSimplix.error("#0:%.3f 1:%.3f 2:%.3f 3:%.3f CZ1:%.3f CZ2:%.3f CZ:%.3f\n",P0.z,P1.z,P2.z,P3.z,Crv1z,Crv2z,LanePoint.Crvz);
+
   LanePoint.T = Tx;
   LanePoint.Offset =
 	(oPathPoints[Idx0].Offset)
@@ -287,7 +290,7 @@ void TLane::Initialise
 	  oPathPoints[I].Sec = &Sec;
 	  oPathPoints[I].Center = Sec.Center;
 	  oPathPoints[I].Crv = 0;
-	  oPathPoints[I].CrvZ	= 0;
+	  oPathPoints[I].CrvZ = 0;
 	  oPathPoints[I].Offset = 0.0;
 	  oPathPoints[I].Point = oPathPoints[I].CalcPt();
 	  oPathPoints[I].MaxSpeed	= 10;
@@ -430,21 +433,24 @@ void TLane::CalcMaxSpeeds
   {
 	int P = (Start + I) % N;
 	int Q = (P + 1) % N;
-
+	int O1 = (P + N - 12) % N;
+	int O2 = (P + 12) % N;
+    double CrvZ1 = MIN(0.0,oPathPoints[O1].CrvZ) * 1000;
+    double CrvZ2 = MIN(0.0,oPathPoints[O2].CrvZ) * 1000;
     TVec3d Delta = oPathPoints[P].CalcPt() - oPathPoints[Q].CalcPt();
     double Dist = TUtils::VecLenXY(Delta);
     double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
     double TrackTiltAngle = 1.1 * atan2(Delta.z, Dist);
-    double Factor = 1.0;
+
+	double CrvZ = ((CrvZ1+CrvZ2) * fabs(CrvZ1+CrvZ2)) / 10000;
+    CrvZ = oPathPoints[Q].CrvZ;
 		 
 	double Speed = oFixCarParam.CalcMaxSpeed(
       oCarParam,
       oPathPoints[P].Crv,
-//      oPathPoints[P].CrvRated,
       oPathPoints[Q].Crv,
-//      oPathPoints[Q].CrvRated,
-	  oPathPoints[P].CrvZ,
-	  oTrack->Friction(P)*Factor,
+	  CrvZ,
+	  oTrack->Friction(P),
   	  TrackRollAngle,
   	  TrackTiltAngle);
 
@@ -473,6 +479,21 @@ void TLane::CalcMaxSpeeds
 	oPathPoints[P].AccSpd = Speed;
 	if (TDriver::FirstPropagation)
 	  oTrack->InitialTargetSpeed(P,Speed);
+  }
+}
+//==========================================================================*
+
+//==========================================================================*
+// Dump
+//--------------------------------------------------------------------------*
+void TLane::Dump()
+{
+  const int N = oTrack->Count();
+
+  for (int I = 0; I < N; I++)
+  {
+	int P = I % N;
+    LogSimplix.error("#%d %.3f\n",I,oPathPoints[P].CrvZ);
   }
 }
 //==========================================================================*

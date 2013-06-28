@@ -134,6 +134,7 @@ class TLane
 
 	const TPathPt& PathPoints(int Index) const;
 
+	void Dump();
 	void CalcCurvaturesXY
 	  (int Start, int Step = 1);
 	void CalcCurvaturesZ
