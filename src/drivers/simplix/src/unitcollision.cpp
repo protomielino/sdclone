@@ -93,16 +93,33 @@ double TCollision::AvoidTo
   if (Coll.OppsAtSide)                           // Opponents at side?
   {
     int Flags = Coll.OppsAtSide;                 // Get corresponding flags
-    double Offset;                               // Calc target by offset
+	double Offset;
 
     AvoidTo = (Flags & F_LEFT) ? 1.0 : -1.0;     // Go away from opponent
-    if (Flags == (F_LEFT | F_RIGHT))             // Opps on both sides?
+
+	if (Flags == (F_LEFT | F_RIGHT))             // Opps on both sides?
 	{                                            //   Then use middle
 	  Offset = 0.5 *                             // Offset is an estimate
 		(Coll.MinRSideDist - Coll.MinLSideDist)  //   of where this is.
 		- CarToMiddle;
-	  LogSimplix.debug("Go between0: %g\n",Offset);
 	}
+	else
+	{
+	  if (AvoidTo > 0)
+	  {
+		  double B = Coll.MinLSideDist + oCar->pub.trkPos.toRight;
+		  double W = oCar->pub.trkPos.toLeft + oCar->pub.trkPos.toRight;
+		  Offset = (W - B)/2;
+	  }
+	  else
+	  {
+		  double B = Coll.MinRSideDist + oCar->pub.trkPos.toLeft;
+		  double W = oCar->pub.trkPos.toLeft + oCar->pub.trkPos.toRight;
+		  Offset = -(W - B)/2;
+	  }
+	}
+
+/*
 	else if (Coll.OppsAhead)                     // Opponents in front?
 	{ // Choose side that has potential of overtaking the car ahead
 	  if ((Coll.OppsAhead == F_LEFT)             // Opponent ahead is left  
@@ -167,7 +184,7 @@ double TCollision::AvoidTo
 
 	  return AvoidTo;                             
 	}
-
+*/
     DoAvoid = true;                              // Avoid to side
     Offset = Me.CalcPathTarget                   // Use offset to
       (DistanceFromStartLine, Offset);           //   find target
