@@ -7,10 +7,10 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2013.06.25
-// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
+// Last changed : 2013.06.30
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.02
+// Version      : 4.00.002
 //--------------------------------------------------------------------------*
 // V4.00.002:
 // Modifications for Supercars
@@ -355,6 +355,7 @@ void SetUpSimplix_ls1()
     //TDriver::UseBrakeLimit = true;
     TDriver::UseBrakeLimit = false;
     TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
+	TDriver::UseRacinglineParameters = true;
 };
 //==========================================================================*
 
@@ -803,10 +804,8 @@ static int InitFuncPt(int Index, void *Pt)
   {
     LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_LS1\n");
     cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_LS1;
-//    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_TRB1;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
-//    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
     cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);

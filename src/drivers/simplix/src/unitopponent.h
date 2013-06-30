@@ -8,10 +8,10 @@
 //
 // File         : unitopponent.h
 // Created      : 2007.11.17
-// Last changed : 2013.02.16
-// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
+// Last changed : 2013.06.29
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.06.000
+// Version      : 4.00.002
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -105,6 +105,8 @@ class TOpponent
 
 	  int Flags;
 
+	  double MinOppDistance;
+	  double CloseLatchTime;
 	  double AvoidLatchTime;
 	  double CatchTime;
 	  double CatchSpeed;
@@ -149,7 +151,6 @@ class TOpponent
 	double oDeltaTime;                           // Simulation delta time
     int oIndex;                                  // Opponents cars index
 	TInfo oInfo;                                 // info of this opponent
-	double LapBackTimer;
 
 };
 //==========================================================================*

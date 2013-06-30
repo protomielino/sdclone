@@ -9,10 +9,10 @@
 //
 // File         : unitcollision.h
 // Created      : 2007.11.17
-// Last changed : 2011.06.02
+// Last changed : 2013.06.30
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 4.00.002
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -87,6 +87,7 @@ class TCollision
 	  int OppsAhead;                             // Opponents ahead?
 	  int OppsAtSide;                            // Opponents at side?
 	  double TargetSpeed;                        // Adjusted target speed
+	  double MinOppDistance;                     // Min distance to opponent
 	  double AvoidSide;                          // Avoid to side
 	  bool Blocked[MAXBLOCKED];
 
@@ -102,6 +103,7 @@ class TCollision
 		OppsAhead(0),
 		OppsAtSide(0),
 		TargetSpeed(500),
+  	    MinOppDistance(1000),
   	    AvoidSide(0.0)
 	  {
         for (int I = 0; I < MAXBLOCKED; I++)

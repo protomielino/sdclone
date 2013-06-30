@@ -445,9 +445,15 @@ float Opponent::getDistToSegStart()
 // Update overlaptimers of opponents.
 void Opponent::updateOverlapTimer(tSituation *s, tCarElt *mycar, int alone)
 {
-	if ((car->race.laps > mycar->race.laps && (team != TEAM_FRIEND || mycar->_dammage > car->_dammage + 2000)) ||
-  	    (alone && (team == TEAM_FRIEND) && mycar->_dammage > car->_dammage + 2000)) 
+	// If there is an opponent overlapping near by (60 m), let him go imediately
+	if ((car->race.laps > mycar->race.laps) && (team != TEAM_FRIEND) && (mycar->_distFromStartLine - car->_distFromStartLine < 60))
+	  overlaptimer =  (tdble) (OVERLAP_WAIT_TIME + s->deltaTime);
+	else
 	{
+	  // Other cases
+  	  if ((car->race.laps > mycar->race.laps && (mycar->_dammage > car->_dammage + 2000)) ||
+  	    (alone && (team == TEAM_FRIEND) && mycar->_dammage > car->_dammage + 2000)) 
+	  {
 		if (getState() & (OPP_BACK | OPP_SIDE)) {
 			overlaptimer += (tdble) s->deltaTime;
 		} else if (getState() & OPP_FRONT) {
@@ -459,10 +465,10 @@ void Opponent::updateOverlapTimer(tSituation *s, tCarElt *mycar, int alone)
 				overlaptimer += (tdble) s->deltaTime;
 			}
 		}
-	} else {
+	  } else {
 		overlaptimer = 0.0;
+	  }
 	}
-
 	lastyr = car->_yaw_rate;
 }
 

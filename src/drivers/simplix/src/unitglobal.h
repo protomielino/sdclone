@@ -93,7 +93,7 @@ extern GfLogger* PLogSimplix;
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 131 // Force new calculation
+#define RL_VERSION 132 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*

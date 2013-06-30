@@ -2696,6 +2696,9 @@ fprintf(stderr,"%s BEHIND %s (%d %d %d %d)\n",car->_name,ocar->_name,((o->getSta
         }
   
         myoffset = (float) (MAX(minoffset, MIN(maxoffset, myoffset)));
+if (DebugMsg & debug_overtake)
+fprintf(stderr,"%s BEHIND %s (%g)\n",car->_name,ocar->_name,myoffset);
+
       } 
     }
   }
@@ -3762,7 +3765,7 @@ void Driver::Meteorology()
      if (mRainIntensity > 0)
      {
          //mRain = true;
-         TclSlip = MIN(TclSlip, 2.0);
+         TclSlip = (float) MIN(TclSlip, 2.0);
      }
      else
          mRain = 0;

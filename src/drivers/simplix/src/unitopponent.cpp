@@ -9,10 +9,10 @@
 //
 // File         : unitopponent.cpp
 // Created      : 2007.11.17
-// Last changed : 2013.03.02
-// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
+// Last changed : 2013.06.30
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.000
+// Version      : 4.00.002
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -96,7 +96,6 @@ void TOpponent::Initialise
   oIndex = Index;                                // Opponents cars index
 
   oInfo.Clear();                                 // Reset all information
-  LapBackTimer = 0.0;                            // Don't delay
 }
 //==========================================================================*
 
@@ -232,12 +231,6 @@ void TOpponent::Update(
 	    MinTimeSlot = T;
     }
   }
-  /*
-  if ((RelPos > 0) && (RelPos < 50))             // We just lapped back
-    LapBackTimer = 60.0;                         //   delay granting letpass
-  else if (RelPos < -50)                         // else if distance is too
-    LapBackTimer = 0.0;                          //   long, forget it
-  */
 }
 //==========================================================================*
 
@@ -253,6 +246,7 @@ bool TOpponent::Classify(
   // Initialization
   bool Result = false;
   oInfo.Flags = 0;                               // Reset Opps. flags
+  oInfo.MinOppDistance = 1000;
   oInfo.CarDistLong = INT_MAX;
 
   // Classification needed?
@@ -316,7 +310,9 @@ bool TOpponent::Classify(
 	MAX(30, MyState.Speed * MyState.Speed / 30); //   depending on my speed
 
   if ((oInfo.Flags & F_DANGEROUS) == 0)          // If not dangerouse, limit
-    DistAhead = MIN(MAX(50, DistAhead), 200);    // view to min 50 max 200 m
+//    DistAhead = MIN(MAX(50, DistAhead), 200);    // view to min 50 max 200 m
+//    DistAhead = MIN(MAX(30, DistAhead), 100);    // view to min 30 max 100 m
+    DistAhead = MIN(MAX(30, DistAhead), 50);    // view to min 30 max 50 m
 
   // Teammate?
   if (RtIsTeamMate(MyCar,oCar))                  // If Opp. is teammate
@@ -325,15 +321,42 @@ bool TOpponent::Classify(
     oInfo.TeamMateDamage = oCar->_dammage;       // Save his damages
   }
 
-  // Near?
-  if (OpState.RelPos < DistAhead && OpState.RelPos > -30)
+  // Check Lappers
+  if (OpState.RelPos < DistAhead && OpState.RelPos > -60)
+  {
+	if (OpState.RelPos < 0)
+	{
+		if (fabs(OpState.CarDistLat) < OpState.MinDistLat)
+  			oInfo.Flags |= F_BEHIND;             // Opp. is behind
+		oInfo.Flags |= F_REAR;                   // Opp. at rear
+	}
+
+	if ((oInfo.Flags & (F_REAR | F_AT_SIDE))
+	  && (MyCar->_laps < CarLaps)
+	  && (MyCar->_laps > 1)
+ 	  && (OpState.CarDistLong > -60))
+	{
+	  oInfo.Flags |= F_LAPPER;                 // Let opponent pass
+	  LogSimplix.debug("F_LAPPER 1\n");
+	}
+  }
+
+  if (OpState.RelPos < DistAhead && OpState.RelPos > -15)
   {
     oInfo.Flags |= F_TRAFFIC;                    // Classify situation as traffic
 
     double OpVelLong =                           // Opps. longitudinal speed
 	  MyState.Speed + OpState.CarDiffVelLong;    //   relative to me
 
-	if (OpState.CarDistLong > OpState.MinDistLong)
+	// Aside?
+    if ((OpState.CarDistLong > -1.5)
+	  && (OpState.CarDistLong < 5.0))
+	{
+      oInfo.Flags |= F_AT_SIDE;                  // Set flags
+	  oInfo.Flags |= (OpState.CarDistLong > 0)   // In front or behind?
+	    ? F_FRONT : F_REAR;
+	}
+	else if (OpState.CarDistLong > OpState.MinDistLong)
 	{
       oInfo.Flags |= F_AHEAD | F_FRONT;          // Opp. is in front of me
       oInfo.CarDistLong = OpState.CarDistLong;
@@ -489,24 +512,6 @@ bool TOpponent::Classify(
 		  }
 		}
 	  }
-
-	  if ((oInfo.Flags & (F_REAR | F_AT_SIDE))
-		&& (MyCar->_laps < CarLaps)
-		&& (MyCar->_laps > 1)
- 	    && (OpState.CarDistLong > -50))
-	  {
-		oInfo.Flags |= F_LAPPER;                 // Let opponent pass
-		LogSimplix.debug("F_LAPPER 1\n");
-		/*
-		if (LapBackTimer == 0.0)
-		  oInfo.Flags |= F_LAPPER;                 // We are lapped
-		else
-		{
-          LapBackTimer -= oDeltaTime;
-	      LapBackTimer = MAX(0.0,LapBackTimer);
-		}
-		*/
-	  }
 	}
 
 	if ((0 < OpState.CarDistLong)
@@ -515,6 +520,18 @@ bool TOpponent::Classify(
 	{
   	  oInfo.Flags |= F_CLOSE;                    // Opp is close by
 	}
+
+	if ((OpState.CarDistLong > -5.0) && (OpState.CarDistLong < 20))
+	{
+  	  oInfo.Flags |= F_CLOSE;                 // Opp is close by
+	  oInfo.CloseLatchTime = 5;
+	  oInfo.MinOppDistance = MAX(0,MIN(oInfo.MinOppDistance,OpState.CarDistLong));
+	}
+    else if (oInfo.CloseLatchTime > 0)
+	{
+  	  oInfo.Flags |= F_CLOSE;                 // Opp was close by
+	}
+
   }
   else if (OpState.RelPos < 0)
   {

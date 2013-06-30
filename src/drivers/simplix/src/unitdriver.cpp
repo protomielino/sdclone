@@ -9,8 +9,8 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.06.25
-// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
+// Last changed : 2013.06.30
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 4.00.002
 //--------------------------------------------------------------------------*
@@ -3033,6 +3033,7 @@ void TDriver::EvaluateCollisionFlags(
   PCarElt OppCar = oOpponents[I].Car();          // TORCS opponents car data
 
   Coll.Flags |= OppInfo.Flags;                   // subsume collision flags
+  Coll.MinOppDistance = MIN(Coll.MinOppDistance,OppInfo.MinOppDistance);
   for (int I = 0; I < MAXBLOCKED; I++)
     Coll.Blocked[I] |= OppInfo.Blocked[I];       // subsume blocked flags
 
@@ -3074,8 +3075,8 @@ void TDriver::EvaluateCollisionFlags(
 	  IgnoreTeamMate = false;
 	}
 
-	OppInfo.AvoidLatchTime = 
-		MAX(0, OppInfo.AvoidLatchTime - oSituation->deltaTime);
+	OppInfo.AvoidLatchTime = MAX(0, OppInfo.AvoidLatchTime - oSituation->deltaTime);
+	OppInfo.CloseLatchTime = MAX(0, OppInfo.CloseLatchTime - oSituation->deltaTime);
 
 	double MaxSpdCrv = Param.Fix.CalcMaxSpeedCrv();
 	double ColTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 1.2;
@@ -3477,7 +3478,12 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
   oTargetSpeed = CalcSkill(TargetSpeed);
   // ... Skilling from Andrew Sumner
 
-  IsClose = (Coll.Flags & F_CLOSE) != 0;         // Set, opponent is close 
+  IsClose = (Coll.Flags & F_CLOSE) != 0;         // Set flag, if opponent is close by
+  if ((IsClose) && (DistanceRaced > 200))
+  {
+    double F = MAX(0,20 - Coll.MinOppDistance) / 20;
+	oTargetSpeed *= (F * 0.98f + (1 - F));  
+  }
 
   if (oFlying)                                   // We can't do anything
     return;                                      //   now, we are flying!
@@ -3742,9 +3748,9 @@ double TDriver::FilterLetPass(double Accel)
   if (oLetPass)
   {
     if (oTreatTeamMateAsLapper)
-      Accel = MIN(Accel, 0.3);
+      Accel = MIN(Accel, 0.2);
 	else
-      Accel = MIN(Accel, 0.5);
+      Accel = MIN(Accel, 0.4);
 	LogSimplix.debug("#LetPass %g\n",Accel);
   }
   return MIN(1.0,Accel);
@@ -3771,9 +3777,9 @@ double TDriver::FilterDrifting(double Accel)
   // Decrease accelleration while drifting
   double DriftAngle = MAX(MIN(Drifting * 1.75, PI - 0.01),-PI + 0.01);
   if (oAbsDriftAngle > oLastAbsDriftAngle)
-    Accel /= (DriftFactor * 150 * ( 1 - cos(DriftAngle)));
+    Accel /= MAX(1.0,(DriftFactor * 150 * ( 1 - cos(DriftAngle))));
   else
-    Accel /= (DriftFactor * 50 * ( 1 - cos(DriftAngle)));
+    Accel /= MAX(1.0,(DriftFactor * 50 * ( 1 - cos(DriftAngle))));
 
   return MIN(1.0,Accel);
 }
