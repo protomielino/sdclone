@@ -339,10 +339,10 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
   mRain = getWeather();
 
-  if (mRain == 0)
+  //if (mRain == 0)
       snprintf(buffer, BUFSIZE, "drivers/%s/%s/default.xml", robot_name, carName);
-  else
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/default-%d.xml",robot_name, carName, mRain);
+  /*else
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/default-%d.xml",robot_name, carName, mRain);*/
 
   *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
   void *newhandle;
