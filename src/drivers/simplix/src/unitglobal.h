@@ -9,10 +9,10 @@
 //
 // File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2013.06.25
+// Last changed : 2013.07.05
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.002
+// Version      : 4.01.000
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -93,7 +93,7 @@ extern GfLogger* PLogSimplix;
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 132 // Force new calculation
+#define RL_VERSION 133 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*
@@ -520,6 +520,7 @@ enum
 #define PRV_TEAM_ENABLE      "team enable"       // default 1
 
 #define PRV_WEATHER_DRY      "dry code"          // default 1.0    
+#define PRV_SHOW_PLOT        "show plot"          
 // ... Parameters of this robot
 
 // Parameter candidates ...

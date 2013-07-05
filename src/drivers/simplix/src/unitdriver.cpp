@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.06.30
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.07.05
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.002
+// Version      : 4.01.000
 //--------------------------------------------------------------------------*
 //
 //    Copyright: (C) 2000 by Eric Espie
@@ -345,6 +345,7 @@ TDriver::TDriver(int Index):
   oRandomSeed(0),
   oIndex(0),
   oTestPitStop(0),
+  oShowPlot(false),
   //LengthMargin
   //Qualification
   oStanding(true),
@@ -563,12 +564,12 @@ void TDriver::AdjustDriving(
     Param.oCarParam.oScaleBump;
   Param.oCarParam.oScaleBumpRight =
     Param.oCarParam.oScaleBump;
-  LogSimplix.error("#Scale Bump: %g\n",Param.oCarParam.oScaleBump);
+  LogSimplix.debug("#Scale Bump: %g\n",Param.oCarParam.oScaleBump);
 
   Param.oCarParam.oScaleBumpOuter =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BUMPOUTER,NULL,
 	(float) Param.oCarParam.oScaleBump);
-  LogSimplix.error("#Scale Bump Outer: %g\n",Param.oCarParam.oScaleBumpOuter);
+  LogSimplix.debug("#Scale Bump Outer: %g\n",Param.oCarParam.oScaleBumpOuter);
 
   Param.oCarParam.oLimitSideUse =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LIMIT_SIDE_USE,NULL,
@@ -1216,6 +1217,14 @@ void TDriver::InitTrack
 	PRV_LENGTH_MARGIN,0,LENGTH_MARGIN);
   LogSimplix.debug("#LengthMargin %.2f\n",TDriver::LengthMargin);
 
+  oShowPlot =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,
+	PRV_SHOW_PLOT,0,0) > 0;
+  if (oShowPlot)
+	  LogSimplix.debug("#Show plot: 1\n");
+  else
+	  LogSimplix.debug("#Show plot: 0\n");
+
   // Check test flag:
   const char* ForceLane = GfParmGetStr(Handle,
 	TDriver::SECT_PRIV,PRV_FORCE_LANE,"F");    
@@ -1408,7 +1417,6 @@ void TDriver::Drive()
   double Pos = oTrackDesc.CalcPos(oCar);         // Get current pos on track
 
   GetPosInfo(Pos,oLanePoint);                    // Info about pts on track
-  //LogSimplix.error("#v:(%.1f)%.1f km/h Z:%.3f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz);
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
   oTargetSpeed = FilterStart(oTargetSpeed);      // Filter Start
 
@@ -1518,59 +1526,13 @@ void TDriver::Drive()
   oCar->ctrl.brakeRearRightCmd = (float) (oBrake * (1 - oBrakeRep) * oBrakeRight * oBrakeRear); 
   oCar->ctrl.brakeRearLeftCmd = (float) (oBrake * (1 - oBrakeRep) * oBrakeLeft * oBrakeRear); 
 
-  //LogSimplix.error("#v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv);
-
-/*
-  LogSimplix.error("#v:(%.1f)%.1f km/h (Q: %0.0f%%) (B: %0.0f%%)\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oCurrSpeed/oTargetSpeed*100,CarBrakeCmd*100);
-  LogSimplix.error("#fr:(%.2f)%% fl:(%.2f)%% rr:(%.2f)%% rl:(%.2f)%%)\n",
-	  100 * oCar->ctrl.brakeFrontRightCmd,
-	  100 * oCar->ctrl.brakeFrontLeftCmd,
-	  100 * oCar->ctrl.brakeRearRightCmd,
-	  100 * oCar->ctrl.brakeRearLeftCmd);
-*/
   // ... SIMUV4
 
-/** /
-  if (oIndex == 10)
-  {
-//    int Idx = oTrackDesc.IndexFromPos(Pos);
-//    LogSimplix.trace("#%d: P:%.0f(%d) A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",oIndex,Pos,Idx,CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
-    LogSimplix.trace("#A:%.4f B:%.4f C:%.4f S: %.4f G:%d\n",CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarSteerCmd,CarGearCmd);
-  }
-
-  if (oDoAvoid)
-    CarLightCmd = RM_LIGHT_HEAD2;                // Only small lights on
-  else
-    CarLightCmd = RM_LIGHT_HEAD1;                // Only big lights on
-
-  CarLightCmd =                                  // All front lights on
-    RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
-*/
   CarLightCmd =                                  // All front lights on
     RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;             // All rear lights on
 
   if (!Qualification)                            // Don't use pit while
     oStrategy->CheckPitState(0.6f);              //  qualification
-
-  //if ((oCurrSpeed < 100.0/3.6) && (CurrSimTime > 0) && (CurrSimTime < 10))
-  //if (fabs(oLanePoint.Crv) > 1/50.0)
-  //  LogSimplix.trace("#t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcHairpin_simplix_36GP(fabs(oLanePoint.Crv)));
-  //else
-  //  LogSimplix.trace("#t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)));
-  //LogSimplix.trace("#v:(%.1f)%.1f km/h\n",oTargetSpeed*3.6,oCurrSpeed*3.6);
-  //LogSimplix.trace("#v:(%.1f)%.1f km/h R:%.3f m c:%.3f 1/m z:%.3f 1/m\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1/oLanePoint.Crv,oLanePoint.Crv,oLanePoint.Crvz);
-/** /
-  int Idx = oTrackDesc.IndexFromPos(Pos);
-  LogSimplix.trace("#%d: P:%.0f(%d) A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",oIndex,Pos,Idx,CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
-  const int N = oTrackDesc.Count();
-  double TrackTurnangle1 = oRacingLine[0].CalcTrackTurnangle((Idx + N - 30) % N, Idx);
-  double TrackTurnangle2 = oRacingLine[0].CalcTrackTurnangle(Idx, (Idx + 30) % N);
-  LogSimplix.trace("#v:(%.1f)%.1f km/h A1:%.3f A2:%.3f CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,TrackTurnangle1,TrackTurnangle2,oLanePoint.Crvz);
-  LogSimplix.trace("#v:(%.1f)%.1f km/h CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz);
-  LogSimplix.trace("#A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
-  LogSimplix.trace("#v:(%.2f)%.2f km/h Radius:%.4fm (%.4f)\n",oTargetSpeed*3.6,oCurrSpeed*3.6,fabs(1.0/oLanePoint.Crv),fabs(oLanePoint.Crv));
-  LogSimplix.trace("#v:(%.2f)%.2f km/h Radius:%.4fm (%.4f)\n",oTargetSpeed*3.6,oCurrSpeed*3.6,fabs(1.0/oLanePoint.Crv),fabs(oLanePoint.Crv));
-*/
 }
 //==========================================================================*
 
@@ -2862,6 +2824,26 @@ void TDriver::GetPathToLeftAndRight
 //==========================================================================*
 
 //==========================================================================*
+// Calculate distance between racingline left and right
+//--------------------------------------------------------------------------*
+void TDriver::DistBetweenRL(
+  const PCarElt pCar, double& OL, double& OR, double& O)
+{
+  TLanePoint PointInfo;
+  double Pos = pCar->_distFromStartLine;
+
+  GetLanePoint(oRL_FREE,Pos,PointInfo);
+  O = PointInfo.Offset;
+
+  GetLanePoint(oRL_LEFT,Pos,PointInfo);
+  OL = PointInfo.Offset;
+
+  GetLanePoint(oRL_RIGHT,Pos,PointInfo);
+  OR = PointInfo.Offset;
+}
+//==========================================================================*
+
+//==========================================================================*
 // Steering angle
 //--------------------------------------------------------------------------*
 double TDriver::SteerAngle(TLanePoint& AheadPointInfo)
@@ -3037,13 +3019,16 @@ void TDriver::EvaluateCollisionFlags(
   for (int I = 0; I < MAXBLOCKED; I++)
     Coll.Blocked[I] |= OppInfo.Blocked[I];       // subsume blocked flags
 
+  double ToL = 0.0;
+  double ToR = 0.0;
+
   if (OppInfo.GotFlags(F_FRONT))                 // Is opponent in front
   {
     if (oMinDistLong > OppInfo.CarDistLong)
 	  oMinDistLong = OppInfo.CarDistLong;
 
-	if (OppInfo.GotFlags(F_COLLIDE)
-	  && (OppInfo.CatchDecel > 12.5 * CarFriction))
+	if (OppInfo.GotFlags(F_COLLIDE))
+//	  && (OppInfo.CatchDecel > 12.5 * CarFriction))
 	  Coll.TargetSpeed = MIN(Coll.TargetSpeed, OppInfo.CatchSpeed);
 
 	if (OppInfo.Flags & (F_COLLIDE | F_CATCHING))
@@ -3100,19 +3085,18 @@ void TDriver::EvaluateCollisionFlags(
 	  (OppInfo.AvoidLatchTime > 0 
 	  || Catching || OppInfo.GotFlags(F_DANGEROUS)))
 	{
-	  double ToL, ToR;
-
-	  GetPathToLeftAndRight(OppCar, ToL, ToR);
+      GetPathToLeftAndRight(OppCar, ToL, ToR);
 	  ToL += OppInfo.State.TrackVelLat * OppInfo.CatchTime;
 	  ToR -= OppInfo.State.TrackVelLat * OppInfo.CatchTime;
-	  bool SpaceL = ToL > OppInfo.State.MinDistLat + 0.75;// + 0.25;
-	  bool SpaceR = ToR > OppInfo.State.MinDistLat + 0.75;// + 0.25;
+	  bool SpaceL = ToL > OppInfo.State.MinDistLat + 0.25;
+	  bool SpaceR = ToR > OppInfo.State.MinDistLat + 0.25;
 	  bool AvoidL = OppInfo.State.CarDistLat < 0 && SpaceR;
 	  bool AvoidR = OppInfo.State.CarDistLat > 0 && SpaceL;
 
 	  if (Catching)
-//	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 0.5 : 0.1;
+	  {
 	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 2.0 : 1.0;
+	  }
 
 	  if (fabs(Crv) < MaxSpdCrv)
 	  {
@@ -3126,26 +3110,34 @@ void TDriver::EvaluateCollisionFlags(
 	  if (AvoidL)
 	  {
 		Coll.OppsAhead |= F_LEFT;
-		Coll.MinLDist = MIN(OppInfo.State.CarAvgVelLong, Coll.MinLDist);
 	  }
 
 	  if (AvoidR)
 	  {
 		Coll.OppsAhead |= F_RIGHT;
-		Coll.MinRDist = MIN(OppInfo.State.CarAvgVelLong, Coll.MinRDist);
 	  }
+
+	  Coll.ToL = MIN(Coll.ToL,ToL);
+	  Coll.ToR = MIN(Coll.ToR,ToR);
 	}
   }
 
   if (OppInfo.GotFlags(F_AT_SIDE))               // Is Opponent at side
   {
-	Coll.OppsAtSide |= OppInfo.State.CarDistLat < 0 ? F_LEFT : F_RIGHT;
+    Coll.OppsAtSide |= OppInfo.State.CarDistLat < 0 ? F_LEFT : F_RIGHT;
+
 	if (OppInfo.State.CarDistLat < 0)
-	  Coll.MinLSideDist = MIN(Coll.MinLSideDist,
+	{
+	  double MinLSideDist = MIN(Coll.MinLSideDist,
 	    -OppInfo.State.CarDistLat - OppInfo.State.MinDistLat);
+	  Coll.MinLSideDist = MinLSideDist;
+	}
 	else
-	  Coll.MinRSideDist = MIN(Coll.MinRSideDist,
+	{
+	  double MinRSideDist = MIN(Coll.MinRSideDist,
 	    OppInfo.State.CarDistLat - OppInfo.State.MinDistLat);
+	  Coll.MinRSideDist = MinRSideDist;
+	}
   }
 
   if (OppInfo.Flags & F_LAPPER)
@@ -3337,13 +3329,19 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
 	for (int J = 0; J < MAXBLOCKED; J++)		 //   all lanes
 	  oOpponents[I].Info().Blocked[J] = false;
 
+  double OppToMiddle = -1000;
+  double MinDistToCarInFront = TrackLength;
+
   for (I = 0; I < oNbrCars; I++)                 // Get info about imminent
   {                                              //   collisions from
-      oOpponents[I].Classify(                    //   all opponents depending
+      bool CarInFront = oOpponents[I].Classify(  //   all opponents depending
 	  oCar,                                      //   on data of own car
 	  MyState,                                   //   my own state,
+	  MinDistToCarInFront,
 	  /*oStrategy->OutOfPitlane(),*/             //   In pitlane?
 	  oMaxAccel.Estimate(CarSpeedLong));         //   Estimate accelleration
+	  if (CarInFront)
+		OppToMiddle = oOpponents[I].Car()->pub.trkPos.toMiddle;
   }
 
   // Place to subsume the collision flags from all opponents
@@ -3421,10 +3419,11 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
 
   TCollision RunAround;                          // to runaround we have to 
   double Target = 0.0;                           // decide which way to take
+  double TempTarget = 0.0;                       // decide which way to take
   float Ratio = 0.0;
 
   Target = RunAround.AvoidTo                     // Which way we should take
-    (Coll,oCar,*this,oDoAvoid);                  //   depending on opponents
+    (Coll,oCar,*this,oDoAvoid,TempTarget);       //   depending on opponents
 
   float ExitOffset = float
 	(oStrategy->oPit->oDistToPitEnd 
@@ -3490,7 +3489,51 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
 
   double HalfWidth = oTrackDesc.Width() / 2;     // Half width of track
   double Scale =                                 // Scale reaction
-	oAvoidScale /(oAvoidWidth + HalfWidth);
+    oAvoidScale /(oAvoidWidth + HalfWidth);
+
+  if (oShowPlot)
+  {
+    /* Plotter >>> */
+    double OR = 0.0;
+    double OL = 0.0;
+    double O = 0.0;
+    DistBetweenRL(oCar,OL,OR,O);
+
+    const int BLEN = 128;
+    int B = BLEN/2-1;
+    char buf[BLEN];
+    for (I = 0; I < BLEN; I++)
+	  buf[I] = ' ';
+
+    buf[BLEN - 1] = 0;
+    buf[0] = 'T';         // Track left edge
+    buf[BLEN - 2] = 'T';  // Track rigth edge
+    buf[BLEN/2-1] = 'M';  // Middle of the track 
+    I = (int) MAX(0,MIN(BLEN - 2,(B - B*OL/HalfWidth)));
+    buf[I] = 'L';         // Left racingline
+    I = (int) MAX(0,MIN(BLEN - 2,(B - B*OR/HalfWidth)));
+    buf[I] = 'R';         // Right racingline 
+    I = (int) MAX(0,MIN(BLEN - 2,(B - B*O/HalfWidth)));
+    buf[I] = '.';         // Racingline
+
+    if (OppToMiddle > -1000)
+    {
+      I = (int) MAX(0,MIN(BLEN - 2,(B + B*OppToMiddle/HalfWidth)));
+      buf[I] = 'O';       // Next opponent in front
+    }
+
+    if (TempTarget != 0)
+    {
+      I = (int) MAX(0,MIN(BLEN - 2,(B - B*TempTarget/HalfWidth)));
+      buf[I] = 'x';       // Offset
+    }
+
+    I = (int) MAX(0,MIN(BLEN - 2,(B + B*CarToMiddle/HalfWidth)));
+    buf[I] = '*';         // Car
+
+    LogSimplix.error("%s\n",buf);
+    /* Plotter <<< */
+  }
 
   Runaround(Scale,Target,oDoAvoid);              // around most urg.obstacle
 }

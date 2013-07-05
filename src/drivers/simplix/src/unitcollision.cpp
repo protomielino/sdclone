@@ -9,10 +9,10 @@
 //
 // File         : unitcollision.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.06.30
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.07.05
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.002
+// Version      : 4.01.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -85,7 +85,7 @@ TCollision::~TCollision()
 //--------------------------------------------------------------------------*
 double TCollision::AvoidTo
   (const TCollInfo& Coll, 
-  const PCarElt oCar, TDriver& Me, bool& DoAvoid)
+  const PCarElt oCar, TDriver& Me, bool& DoAvoid, double& TempOffset)
 {
   int Flags = 0; 
   double AvoidTo = 0.0;                          // Undefined side
@@ -97,8 +97,6 @@ double TCollision::AvoidTo
     Flags = Coll.OppsAtSide;                     // Get corresponding flags
     AvoidTo = (Flags & F_LEFT) ? 1.0 : -1.0;     // Go away from opponent
 	LogSimplix.debug("OppsAtSide: %g\n",AvoidTo);
-//	if (Me.oIndex == 8)
-//	  LogSimplix.error("OppsAtSide: %g\n",AvoidTo);
   }
   else // No opponents at side ...
   {
@@ -112,36 +110,26 @@ double TCollision::AvoidTo
 		  (Coll.NextSide < 0) ? F_LEFT : F_RIGHT;//   by collision
 		AvoidTo = (Flags & F_LEFT) ? 1.0 : -1.0;
 		LogSimplix.debug("LappersBehind: %g\n",AvoidTo);
-//	    if (Me.oIndex == 4)
-//	      LogSimplix.error("LappersBehind: %g\n",AvoidTo);
 	  }
 	  else
 	  {
 		AvoidTo = (Flags & F_LEFT) ? 1.0 : -1.0;
 		LogSimplix.debug("Lapper Behind: %g\n",AvoidTo);
-//	    if (Me.oIndex == 4)
-//	      LogSimplix.error("Lapper Behind: %g\n",AvoidTo);
 	  }
 	}
 	// Third priority: More than one ahead?
     else if (Coll.OppsAhead == (F_LEFT | F_RIGHT))
     { // cars on both sides ahead, so avoid closest (or slowest) car
-      Flags = (Coll.MinLDist < Coll.MinRDist) ? F_LEFT : F_RIGHT; 
-	  //Flags == (F_LEFT | F_RIGHT);
+      Flags = (Coll.MinLSideDist < Coll.MinRSideDist) ? F_LEFT : F_RIGHT; 
 	  AvoidTo = (Flags & F_LEFT) ? 1.0 : -1.0;
 	  LogSimplix.debug("(Coll.OppsAhead == (F_LEFT | F_RIGHT)): %g\n",AvoidTo);
-//	  if (Me.oIndex == 8)
-//	    LogSimplix.error("(Coll.OppsAhead == (F_LEFT | F_RIGHT)): %g\n",AvoidTo);
 	}
 	// Fourth priority: Anyone ahead? 
     else if (Coll.OppsAhead)
 	{ // cars on one side ahead
-      Flags = Coll.OppsAhead;
-//	  AvoidTo = (Flags & F_LEFT) ? 1.0 : -1.0;
-	  AvoidTo = (Flags & F_TRK_LEFT) ? -1.0 : 1.0;
+      Flags = Coll.Flags;
+	  AvoidTo = (Flags & F_TRK_LEFT) ? 1.0 : -1.0;
       LogSimplix.debug("(Coll.OppsAhead): %g\n",AvoidTo);
-//	  if (Me.oIndex == 8)
-//	    LogSimplix.error("(Coll.OppsAhead): %g\n",AvoidTo);
 	}
 	else 
 	{
@@ -153,38 +141,39 @@ double TCollision::AvoidTo
 
   // We have to avoid
   DoAvoid = true;                              // Avoid to side
+  double O = 0.0;
 
   if (Flags == (F_LEFT | F_RIGHT))             // Opps on both sides?
   {                                            //   Then use middle
-    Offset = 0.5 *                             // Offset is an estimate
-  	(Coll.MinRSideDist - Coll.MinLSideDist)  //   of where this is.
+    TempOffset = 0.5 *                         // Offset is an estimate
+  	(Coll.MinRSideDist - Coll.MinLSideDist)    //   of where this is.
   	- CarToMiddle;
   }
   else
   {
+    double OR = 0.0;
+    double OL = 0.0;
+    Me.DistBetweenRL(oCar,OL,OR,O);
     if (AvoidTo > 0)
     {
-  	  double B = Coll.MinLSideDist + oCar->pub.trkPos.toRight;
-	  double W = oCar->pub.trkPos.toLeft + oCar->pub.trkPos.toRight;
-	  Offset = (W - B)/2;
+  	  double B = Coll.ToR - 2.0;
+	  TempOffset = OR - B/2;
+	  if (TempOffset < O)
+		TempOffset = O;
     }
     else if (AvoidTo < 0)
     {
-	  double B = Coll.MinRSideDist + oCar->pub.trkPos.toLeft;
-	  double W = oCar->pub.trkPos.toLeft + oCar->pub.trkPos.toRight;
-	  Offset = -(W - B)/2;
+	  double B = Coll.ToL - 2.0;
+	  TempOffset = B/2 + OL;
+	  if (TempOffset > O)
+		TempOffset = O;
     }
   }
 
-//  if (Me.oIndex == 8)
-//    LogSimplix.error("DoAvoid Offset: %g\n",Offset);
-
   Offset = Me.CalcPathTarget                   // Use offset to
-    (DistanceFromStartLine, Offset);           //   find target
+    (DistanceFromStartLine, TempOffset);       //   find target
 
-  LogSimplix.debug("DoAvoid Offset: %g\n",Offset);
-//  if (Me.oIndex == 8)
-//    LogSimplix.error("DoAvoid Offset: %g\n",Offset);
+  LogSimplix.debug("DoAvoid Offset: S%g(I%g;D%g)\n",Offset,O+CarToMiddle,Offset-(O+CarToMiddle));
 
   return Offset; 
 }

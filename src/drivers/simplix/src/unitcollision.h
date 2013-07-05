@@ -9,10 +9,10 @@
 //
 // File         : unitcollision.h
 // Created      : 2007.11.17
-// Last changed : 2013.06.30
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.07.05
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.002
+// Version      : 4.01.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -80,8 +80,6 @@ class TCollision
 	  int LappersBehind;                         // Lappers behind?
 	  double MinLSideDist;                        
 	  double MinRSideDist;
-	  double MinLDist;                           // Min dist. left side
-	  double MinRDist;                           // Min dist. right side
 	  double CarDistLong;
       int NextSide;                              // Side of next curve
 	  int OppsAhead;                             // Opponents ahead?
@@ -89,6 +87,8 @@ class TCollision
 	  double TargetSpeed;                        // Adjusted target speed
 	  double MinOppDistance;                     // Min distance to opponent
 	  double AvoidSide;                          // Avoid to side
+	  double ToL;								 // Distance to left raciongline
+	  double ToR;                                // Distance to right raciongline
 	  bool Blocked[MAXBLOCKED];
 
 	  TCollInfo():                                // Default constructor
@@ -96,15 +96,15 @@ class TCollision
 		LappersBehind(0),
 		MinLSideDist(INT_MAX),
 		MinRSideDist(INT_MAX),
-		MinLDist(INT_MAX),
-		MinRDist(INT_MAX),
 		CarDistLong(INT_MAX),
 		NextSide(0),
 		OppsAhead(0),
 		OppsAtSide(0),
 		TargetSpeed(500),
   	    MinOppDistance(1000),
-  	    AvoidSide(0.0)
+  	    AvoidSide(0.0),
+	    ToL(100),	
+	    ToR(100)        
 	  {
         for (int I = 0; I < MAXBLOCKED; I++)
   	      Blocked[I] = false;
@@ -119,7 +119,8 @@ class TCollision
 	  (const TCollInfo& CollInfo,                //   to avoid collision
 	  const PCarElt Car, 
 	  TDriver& Me,
-	  bool& AvoidAhead);
+	  bool& AvoidAhead, 
+	  double& TempOffset);
 };
 //==========================================================================*
 #endif // _UNITCOLLISION_H_

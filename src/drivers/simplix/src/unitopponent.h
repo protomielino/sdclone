@@ -8,10 +8,10 @@
 //
 // File         : unitopponent.h
 // Created      : 2007.11.17
-// Last changed : 2013.06.29
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.07.05
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.002
+// Version      : 4.01.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -75,8 +75,13 @@ class TOpponent
 	  double TrackVelLat;	// Vel. lateral to track.
 	  double TrackYaw;
 
-	  double CarDistLong;
-	  double CarDistLat;
+	  double CarDistLong;                        // Longitudinal dist. to. opp.
+
+	  // Lateral distance to opponent
+	  double CarDistLat;                          
+	  // CarDistLat > 0: Opponent is a the left side
+	  // CarDistLat < 0: Opponent is a the right
+
 	  double CarDiffVelLong;
 	  double CarDiffVelLat;
 
@@ -142,6 +147,7 @@ class TOpponent
 	bool Classify                                // Classification of opponents
 	  (const PCarElt MyCar,
 	  const TState& MyState,
+	  double& MinDistToCarInFront,
 	  /*bool OutOfPitlane,*/
 	  double MyMaxAccX);
 
@@ -151,6 +157,7 @@ class TOpponent
 	double oDeltaTime;                           // Simulation delta time
     int oIndex;                                  // Opponents cars index
 	TInfo oInfo;                                 // info of this opponent
+	double oMinCarDistLong;                      // Min dist to car in front
 
 };
 //==========================================================================*

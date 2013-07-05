@@ -9,10 +9,10 @@
 //
 // File         : unitopponent.cpp
 // Created      : 2007.11.17
-// Last changed : 2013.06.30
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2013.07.05
+// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.002
+// Version      : 4.01.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -240,6 +240,7 @@ void TOpponent::Update(
 bool TOpponent::Classify(
 	const PCarElt MyCar,
 	const TState& MyState,
+	double& MinDistToCarInFront,
 /*	bool OutOfPitLane,*/
 	double MyMaxAccX)
 {
@@ -262,6 +263,12 @@ bool TOpponent::Classify(
 
   // Where is he relative to me and to track
   const TState& OpState = oInfo.State;           // Copy of Opps. state
+
+  if ((OpState.RelPos > 0) && (OpState.RelPos < 50) && (OpState.CarDistLong < MinDistToCarInFront))
+  {
+	  MinDistToCarInFront = OpState.CarDistLong;
+	  Result = true;
+  }
 
   oInfo.Flags |= (OpState.CarDistLat < 0)        // Is Opp. left or right
 	 ? F_LEFT : F_RIGHT;                         //   of me?
@@ -341,6 +348,9 @@ bool TOpponent::Classify(
 	}
   }
 
+//  if ((fabs(OpState.CarDistLat) < 10) && (fabs(OpState.CarDistLong) < 30))
+//	  LogSimplix.error("Lat: %g Long: %g\n",OpState.CarDistLat,OpState.CarDistLong);
+  
   if (OpState.RelPos < DistAhead && OpState.RelPos > -15)
   {
     oInfo.Flags |= F_TRAFFIC;                    // Classify situation as traffic
@@ -348,16 +358,22 @@ bool TOpponent::Classify(
     double OpVelLong =                           // Opps. longitudinal speed
 	  MyState.Speed + OpState.CarDiffVelLong;    //   relative to me
 
+//	LogSimplix.error("RelPos: %g DistAhead: %g OpVelLong: %g\n",OpState.RelPos,DistAhead,OpVelLong);
 	// Aside?
-    if ((OpState.CarDistLong > -1.5)
-	  && (OpState.CarDistLong < 5.0))
+//    if ((OpState.CarDistLong > -3.5)
+//	  && (OpState.CarDistLong < 10.0))
+    if ((OpState.CarDistLong > -5)
+	  && (OpState.CarDistLong < 20.0))
 	{
       oInfo.Flags |= F_AT_SIDE;                  // Set flags
 	  oInfo.Flags |= (OpState.CarDistLong > 0)   // In front or behind?
 	    ? F_FRONT : F_REAR;
+//	  LogSimplix.error("F_AT_SIDE\n");
 	}
-	else if (OpState.CarDistLong > OpState.MinDistLong)
+//	else if (OpState.CarDistLong > OpState.MinDistLong)
+	if (OpState.CarDistLong > OpState.MinDistLong)
 	{
+//	  LogSimplix.error("F_AHEAD | F_FRONT\n");
       oInfo.Flags |= F_AHEAD | F_FRONT;          // Opp. is in front of me
       oInfo.CarDistLong = OpState.CarDistLong;
 
@@ -377,8 +393,7 @@ bool TOpponent::Classify(
         oInfo.Flags |= F_CATCHING;               // Classify as catching
 
         double CatchOffset = RelPar.CalcY(T);    // Offset when Opp. is reached
-        //CatchOffset = RelPar.CalcY(T);           // Offset when Opp. is reached
-        oInfo.CatchTime = T;                     // Save time to catch
+		oInfo.CatchTime = T;                     // Save time to catch
         oInfo.CatchSpeed =                       // Select estimate from distance
 	      (OpState.CarDistLong < 15)             // If near, relative to me
 		  ? OpVelLong : OpState.TrackVelLong;    // If far, relative to track
@@ -392,10 +407,10 @@ bool TOpponent::Classify(
 
         oInfo.CatchDecel = MAX(0, Decel);        // Save reasonable values only
 
-//        if (fabs(CatchOffset) < OpState.MinDistLat + 0.5)
-        if (fabs(CatchOffset) < OpState.MinDistLat + 0.1)
+        if ((fabs(CatchOffset) < OpState.MinDistLat + 0.1) && (T < 3) && (OpState.RelPos < 30) && (oInfo.CatchDecel > 5))
 		{                                        // The offset will be to small
           oInfo.Flags |= F_COLLIDE;              // Classify as potential collision
+//   		  LogSimplix.error("F_COLLIDE 1 MinDistLat: %g CatchOffset: %g CatchTime: %g CatchDecel: %g\n",OpState.MinDistLat,CatchOffset,oInfo.CatchTime,oInfo.CatchDecel);
 
           if (OpState.CarDistLong < OpState.MinDistLong + 0.5)
             oInfo.CatchDecel = 999;              // Maximum decel. needed
@@ -403,15 +418,15 @@ bool TOpponent::Classify(
         else
 		{
           // See if we hit on the side while passing
-		  Q.Set(Acc/2, OpState.CarDiffVelLong, OpState.CarDistLong + OpState.MinDistLong);
+		  Q.Set(Acc/2, OpState.CarDiffVelLong, OpState.CarDistLong);
 
-          if (Q.SmallestNonNegativeRoot(T))      // Solution possible?
+		  if (Q.SmallestNonNegativeRoot(T))      // Solution possible?
 		  {
             CatchOffset = RelPar.CalcY(T);       // Offset when Opp. is passed
-            if ((fabs(CatchOffset) < OpState.MinDistLat + 0.5) // too near
-              || (CatchOffset * OpState.CarDistLat < 0)) // or overlapping
+            if (fabs(CatchOffset) < OpState.MinDistLat + 0.5) // too near
 			{
               oInfo.Flags |= F_COLLIDE;          // Classify as potential collision
+//		      LogSimplix.error("F_COLLIDE 2 MinDistLat: %g CatchOffset: %g T: %g CarDistLat: %g\n",OpState.MinDistLat,CatchOffset,T,OpState.CarDistLat);
 			}
 		  }
 		}
@@ -437,6 +452,7 @@ bool TOpponent::Classify(
 	{
 	  if (OpState.CarDistLong < -OpState.MinDistLong)
 	  {                                          // Opp. is behind
+//  	    LogSimplix.error("F_BEHIND | F_REAR\n");
 		oInfo.Flags |= F_BEHIND | F_REAR;        // Set corresponding flags
 
 		if (OpState.CarDiffVelLong < 0)          // If Opp. is faster
@@ -449,10 +465,11 @@ bool TOpponent::Classify(
 	  }
 	  else                                       // Opp is at side
 	  {
+//  	    LogSimplix.error("F_AT_SIDE 2\n");
 		if ((oInfo.Flags & F_TEAMMATE) == 0)
 		  oInfo.Flags |= F_AT_SIDE;              // Set flags
 		else
-		  if (fabs(OpState.CarDistLong) < OpState.MinDistLong - TDriver::LengthMargin)
+//		  if (fabs(OpState.CarDistLong) < OpState.MinDistLong - TDriver::LengthMargin)
 		    oInfo.Flags |= F_AT_SIDE;            // Set flags
 
 		oInfo.Flags |= (OpState.CarDistLong > 0) // In front or behind?
@@ -464,6 +481,7 @@ bool TOpponent::Classify(
 		if (fabs(OpState.CarDistLat) < OpState.MinDistLat)
 		{
 		  oInfo.Flags |= F_COLLIDE;              // Colliding!
+//          LogSimplix.error("F_COLLIDE 3\n");
 		  oInfo.CatchTime = 0;                   // Now!
 		  oInfo.CatchSpeed =                     //
 			(OpState.CarDistLong > AheadDist)
@@ -485,8 +503,8 @@ bool TOpponent::Classify(
 		  {
 			double RelSpd = (OpState.MinDistLong - OpState.CarDistLong) / T;
 			oInfo.Flags |= F_COLLIDE;
+//            LogSimplix.error("F_COLLIDE 4\n");
 			oInfo.CatchTime = T;
-//			oInfo.CatchSpeed = OpVelLong - 3;
 			oInfo.CatchSpeed = OpVelLong;
 			oInfo.CatchDecel = (MyState.Speed - (OpVelLong - RelSpd)) / T;
 		  }
@@ -505,8 +523,8 @@ bool TOpponent::Classify(
 		  {
 			double RelSpd = (OpState.MinDistLong + OpState.CarDistLong) / T;
 			oInfo.Flags |= F_COLLIDE;
+//            LogSimplix.error("F_COLLIDE 5\n");
 			oInfo.CatchTime = T;
-//			oInfo.CatchSpeed = OpVelLong - 3;
 			oInfo.CatchSpeed = OpVelLong;
 			oInfo.CatchDecel = (MyState.Speed - (OpVelLong - RelSpd)) / T;
 		  }

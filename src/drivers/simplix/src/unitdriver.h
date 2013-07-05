@@ -145,6 +145,9 @@ class TDriver
 	  (double pos, double offs);
 	void GetPathToLeftAndRight                   // Get width to sides
 	  (const PCarElt Car, double& toL, double& toR);
+	void DistBetweenRL(                        // Get width 
+      const PCarElt pCar, 
+	  double& OL, double& OR, double& O);
     void OwnCarOppIndex();                       // Get own index
 
 	double SteerAngle                            // Get steer angle
@@ -393,6 +396,7 @@ private:
   public:
 	int oIndex;                                  // index of own driver
     int oTestPitStop;                            // Test pit stop
+	bool oShowPlot;
 
 	static double LengthMargin;                  // Length margin
 	static bool Qualification;                   // Flag qualifying
