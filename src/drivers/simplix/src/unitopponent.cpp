@@ -362,7 +362,7 @@ bool TOpponent::Classify(
 	// Aside?
 //    if ((OpState.CarDistLong > -3.5)
 //	  && (OpState.CarDistLong < 10.0))
-    if ((OpState.CarDistLong > -5)
+    if ((OpState.CarDistLong > -1.5)
 	  && (OpState.CarDistLong < 20.0))
 	{
       oInfo.Flags |= F_AT_SIDE;                  // Set flags

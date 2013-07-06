@@ -170,7 +170,6 @@ void TDriver::InterpolatePointInfo
 {
   double DeltaOAngle = P1.Angle - P0.Angle;
 
-//  P0.Crv = TUtils::InterpCurvature(P0.Crv, P1.Crv, Q);
   P0.Crv = TUtils::InterpCurvature(P0.Crv, P1.Crv, (1 - Q));
   P0.Crvz = TUtils::InterpCurvature(P0.Crvz, P1.Crvz, (1 - Q));
   DOUBLE_NORM_PI_PI(DeltaOAngle);
@@ -192,6 +191,7 @@ TDriver::TDriver(int Index):
   oScaleSteer(1.0),
   oStayTogether(10.0),
   oCrvComp(true),
+  oMinSpeedFirstKm(0.0),
   oAvoidScale(8.0),
   oAvoidWidth(0.5),
   oGoToPit(false),
@@ -300,7 +300,7 @@ TDriver::TDriver(int Index):
   oTrackLoadRight(NULL),
   //oPitLoad
   oTrack(NULL),
-  oTolerance(2.0),
+  oTolerance(0.10),
   //oLanePoint
   oUnstucking(false),
   oWheelRadius(0),
@@ -627,6 +627,11 @@ void TDriver::AdjustDriving(
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_RAIN_BRAKE,NULL,
 	(float) oScaleBrakeRain);
   LogSimplix.debug("#Scale Brake Rain%g\n",oScaleBrakeRain);
+
+  oMinSpeedFirstKm =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_FIRST_KM,0,
+	(float) oMinSpeedFirstKm);
+  LogSimplix.error("#Min speed first km %g\n",oMinSpeedFirstKm);
 
   oAvoidScale =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_SCALE,0,
@@ -2156,7 +2161,7 @@ void TDriver::InitBrake()
 	oBrakeForce = (3*oBrakeMaxTqFront * (WheelRad(FRNT_LFT) + WheelRad(FRNT_RGT)) 
 		+ oBrakeMaxTqRear * (WheelRad(REAR_LFT) + WheelRad(REAR_RGT)))/4; 
 	LogSimplix.debug("#Brake force       : %0.2f\n",oBrakeForce);
-
+/*
     oPIDCBrake.oP = 
 		GfParmGetNum(oCarHandle, TDriver::SECT_PRIV, 
 			"BC_P", (char*)NULL, (float) oPIDCBrake.oP);
@@ -2181,7 +2186,7 @@ void TDriver::InitBrake()
 		GfParmGetNum(oCarHandle, TDriver::SECT_PRIV, 
 			"BC_MIN", (char*)NULL, (float) oPIDCBrake.oMinTotal);
 	LogSimplix.debug("#BC_MIN            : %0.5f\n",oPIDCBrake.oMinTotal);
-
+*/
 	LogSimplix.debug("\n#<<< Init Brake\n\n");
 
 }
@@ -3124,6 +3129,7 @@ void TDriver::EvaluateCollisionFlags(
 
   if (OppInfo.GotFlags(F_AT_SIDE))               // Is Opponent at side
   {
+    oAvoidRange = 1.0;
     Coll.OppsAtSide |= OppInfo.State.CarDistLat < 0 ? F_LEFT : F_RIGHT;
 
 	if (OppInfo.State.CarDistLat < 0)
@@ -3478,7 +3484,7 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
   // ... Skilling from Andrew Sumner
 
   IsClose = (Coll.Flags & F_CLOSE) != 0;         // Set flag, if opponent is close by
-  if ((IsClose) && (DistanceRaced > 200))
+  if ((IsClose) && (DistanceRaced > 400))
   {
     double F = MAX(0,20 - Coll.MinOppDistance) / 20;
 	oTargetSpeed *= (F * 0.98f + (1 - F));  
@@ -3500,20 +3506,34 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
     DistBetweenRL(oCar,OL,OR,O);
 
     const int BLEN = 128;
+    const int BULEN = BLEN+3;
     int B = BLEN/2-1;
-    char buf[BLEN];
-    for (I = 0; I < BLEN; I++)
+    char buf[BULEN];
+    char buf2[2*BULEN];
+
+    for (I = 0; I < BULEN; I++)
 	  buf[I] = ' ';
 
-    buf[BLEN - 1] = 0;
+    buf[BULEN - 1] = 0;   // Terminate string
+
     buf[0] = 'T';         // Track left edge
     buf[BLEN - 2] = 'T';  // Track rigth edge
     buf[BLEN/2-1] = 'M';  // Middle of the track 
-    I = (int) MAX(0,MIN(BLEN - 2,(B - B*OL/HalfWidth)));
+/*
+	I = (int) MAX(0,MIN(BLEN - 2,(B - B*OL/HalfWidth)));
     buf[I] = 'L';         // Left racingline
     I = (int) MAX(0,MIN(BLEN - 2,(B - B*OR/HalfWidth)));
     buf[I] = 'R';         // Right racingline 
-    I = (int) MAX(0,MIN(BLEN - 2,(B - B*O/HalfWidth)));
+*/
+	double Delta = (O - OL) * oAvoidRange;
+    I = (int) MAX(0,MIN(BLEN - 2,(B - B*(O-Delta)/HalfWidth)));
+    buf[I] = 'L';         // Racingline
+
+	Delta = (O - OR) * oAvoidRange;
+    I = (int) MAX(0,MIN(BLEN - 2,(B - B*(O-Delta)/HalfWidth)));
+    buf[I] = 'R';         // Racingline
+
+	I = (int) MAX(0,MIN(BLEN - 2,(B - B*O/HalfWidth)));
     buf[I] = '.';         // Racingline
 
     if (OppToMiddle > -1000)
@@ -3531,7 +3551,14 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
     I = (int) MAX(0,MIN(BLEN - 2,(B + B*CarToMiddle/HalfWidth)));
     buf[I] = '*';         // Car
 
-    LogSimplix.error("%s\n",buf);
+	if (oDoAvoid)
+      buf[BLEN+1] = 'A';
+	else
+      buf[BLEN+1] = '-';
+
+	sprintf(buf2,"%s AVR:%.2f AVO:%.2f TS:%.2f CS:%.2f",buf,oAvoidRange,oAvoidOffset,oTargetSpeed*3.6,oCurrSpeed*3.6);
+
+    LogSimplix.error("%s\n",buf2);
     /* Plotter <<< */
   }
 
@@ -3549,6 +3576,9 @@ double TDriver::FilterStart(double Speed)
   {
     double Offset = 0.01;
     Speed *= MAX(0.6,(1.0 - (oCar->race.pos - 1) * Offset));
+
+	if (oCar->race.pos == 1)
+		Speed = MAX(oMinSpeedFirstKm / 3.6f,Speed);
   }
 
   // For unknown tracks do not limit speed to much
@@ -3837,7 +3867,7 @@ double TDriver::FilterTrack(double Accel)
   {
 	if (fabs(oDeltaOffset) > oTolerance)         // Check offset difference
 	  Accel *= (float)                           //   Decrease acceleration
-	    (MAX(1.0 - (fabs(oDeltaOffset) - oTolerance) * 0.2, 0.4));
+	    (MAX(1.0 - (fabs(oDeltaOffset) - oTolerance) * 0.4, 0.2));
 
     Accel *= oSideReduction;
   }

@@ -226,7 +226,8 @@ private:
 	double oScaleSteer;                          // scale steering
 	double oStayTogether;			             // Dist in m.
 	bool oCrvComp;   			                 // Crv compensation
-	double oAvoidScale;			                 // scale avoiding 
+    double oMinSpeedFirstKm;
+    double oAvoidScale;			                 // scale avoiding 
 	double oAvoidWidth;			                 // In m.
 	bool oGoToPit;                               // Enter pit flag
 	bool oCloseYourEyes;                         // Close your eyes for a while

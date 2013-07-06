@@ -156,17 +156,23 @@ double TCollision::AvoidTo
     Me.DistBetweenRL(oCar,OL,OR,O);
     if (AvoidTo > 0)
     {
-  	  double B = Coll.ToR - 2.0;
-	  TempOffset = OR - B/2;
+	  TempOffset = OR;
+/*
+  	  double B = MAX(0.0,Coll.ToR - 4.0);
+	  TempOffset = OR - B/3;
 	  if (TempOffset < O)
 		TempOffset = O;
+*/
     }
     else if (AvoidTo < 0)
     {
-	  double B = Coll.ToL - 2.0;
-	  TempOffset = B/2 + OL;
+	  TempOffset = OL;
+/*
+	  double B = MAX(0.0,Coll.ToL - 4.0);
+	  TempOffset = OL + B/3;
 	  if (TempOffset > O)
 		TempOffset = O;
+*/
     }
   }
 

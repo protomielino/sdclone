@@ -474,6 +474,7 @@ enum
 #define PRV_SIDE_BRAKE       "side brake"         // Scale brake calculation for sides
 #define PRV_RAIN_BRAKE       "scale brake rain"   // Scale brake calculation for sides
 
+#define PRV_FIRST_KM         "first km"
 #define PRV_AVOID_SCALE		 "avoid scale"
 #define PRV_AVOID_WIDTH		 "avoid width"
 
