@@ -411,8 +411,8 @@ fprintf(stderr," FRONTFAST\n");
 			if (distance <= 0.5 && fabs(cardist) < 6.0 && mspeed < ospeed+distance)
 			{
 				int collide = testCollision(driver, 0.0, 0.1);
-if (DebugMsg & debug_brake)
-fprintf(stderr,"%s - %s FRONTFAST COLLIDE=%d\n",mycar->_name,car->_name,collide);
+				if (DebugMsg & debug_brake)
+					fprintf(stderr,"%s - %s FRONTFAST COLLIDE=%d\n",mycar->_name,car->_name,collide);
 	
 				if (collide)
 					state |= (OPP_COLL | OPP_SIDE_COLL);

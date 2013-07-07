@@ -372,7 +372,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
       if (newhandle)
       {
         if (*carParmHandle)
-          *carParmHandle = GfParmMergeHandles(*carParmHandle, newhandle, (GFPARM_MMODE_SRC|GFPARM_MMODE_DST|                   GFPARM_MMODE_RELSRC|GFPARM_MMODE_RELDST));
+          *carParmHandle = GfParmMergeHandles(*carParmHandle, newhandle, (GFPARM_MMODE_SRC|GFPARM_MMODE_DST| GFPARM_MMODE_RELSRC|GFPARM_MMODE_RELDST));
         else
           *carParmHandle = newhandle;
       }
