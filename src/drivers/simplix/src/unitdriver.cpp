@@ -1152,12 +1152,13 @@ void TDriver::InitTrack
   // Default params for car type (e.g. .../ROBOT_DIR/sc-petrol/default.xml)
   snprintf(Buf,sizeof(Buf),"%s/%s/default.xml",
     BaseParamPath,oCarType);
-  LogSimplix.debug("#Default params for car type: %s\n", Buf);
+  LogSimplix.error("#Default params for car type: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for track (Pitting) 
   snprintf(Buf,sizeof(Buf),"%s/tracks/%s.xml",
     BaseParamPath,oTrackName);
+  LogSimplix.error("#Override params for track (Pitting): %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   double ScaleBrake = 1.0;
@@ -1176,16 +1177,19 @@ void TDriver::InitTrack
   // Override params for car type with params of track
   snprintf(Buf,sizeof(Buf),"%s/%s/%s.xml",
     BaseParamPath,oCarType,oTrackName);
+  LogSimplix.error("#Override params for car type with params of track: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for car type with params of track and weather
   snprintf(Buf,sizeof(Buf),"%s/%s/%s-%d.xml",
     BaseParamPath,oCarType,oTrackName,oWeatherCode);
+  LogSimplix.error("#Override params for car type with params of track and weather: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for car type on track with params of specific race type
   snprintf(Buf,sizeof(Buf),"%s/%s/%s-%s.xml",
     BaseParamPath,oCarType,oTrackName,RaceType[oSituation->_raceType]);
+  LogSimplix.error("#Override params for car type on track with params of specific race type: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for car type on track with driver on track
@@ -1196,16 +1200,29 @@ void TDriver::InitTrack
   // Override params for driver on track with params of specific race type
   snprintf(Buf,sizeof(Buf),"%s/%d/%s-%s.xml",
     BaseParamPath,oIndex,oTrackName,RaceType[oSituation->_raceType]);
+  LogSimplix.error("#Override params for driver on track with params of specific race type: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Setup the car param handle to be returned
   *CarSettings = Handle;
+  
+  char tempbuf [1024];
+  sprintf(tempbuf,"%s/DEBUG1.xml",GetLocalDir());
+  GfParmWriteFileSDHeader(tempbuf,Handle, "DEBUG", "WDB");
 
   // Get the private parameters now.
   oBrakeRep =									 // Bremsdruckverteilung
 	GfParmGetNum(Handle, (char*) SECT_BRKSYST, 
-      PRM_BRKREP, (char*)NULL, 0.5);
-  LogSimplix.debug("#Brake repartition : %0.2f\n",oBrakeRep);
+      PRM_BRKREP, (char*)NULL, 0.6);
+
+  float Press =
+	GfParmGetNum(Handle, (char*) SECT_BRKSYST, 
+	  PRM_BRKPRESS, (char*)NULL, 1000000);
+
+  LogSimplix.error("#=========================\n");
+  LogSimplix.error("#Brake repartition : %0.2f\n",oBrakeRep);
+  LogSimplix.error("#Brake pressure    : %0.0f\n",Press);
+  LogSimplix.error("#=========================\n");
 
   oBrakeCorrLR =
 	GfParmGetNum(Handle, (char*) SECT_BRKSYST, 
@@ -1816,6 +1833,8 @@ void TDriver::FindRacinglines()
   for (int I = 0; I < NBRRL; I++)
   {
     oRacingLine[I].CalcMaxSpeeds(1);
+//    LogSimplix.error("# SmoothSpeeds ..................\n");
+//    oRacingLine[I].SmoothSpeeds();
     oRacingLine[I].PropagateBreaking(1);
     oRacingLine[I].PropagateAcceleration(1);
   }
@@ -2133,15 +2152,21 @@ void TDriver::InitBrake()
 			PRM_MU, (char*)NULL, 0.30f);
 	LogSimplix.debug("#Brake mu          : %0.5f / %0.5f\n",MuFront, MuRear);
 
+    char tempbuf [1024];
+    sprintf(tempbuf,"%s/DEBUG2.xml",GetLocalDir());
+	GfParmWriteFileSDHeader(tempbuf,oCarHandle, "DEBUG", "WDB");
+
 	float Rep =
 		GfParmGetNum(oCarHandle, (char*) SECT_BRKSYST, 
 			PRM_BRKREP, (char*)NULL, 0.5);
-	LogSimplix.debug("#Brake repartition : %0.2f\n",Rep);
 
 	float Press =
 		GfParmGetNum(oCarHandle, (char*) SECT_BRKSYST, 
 			PRM_BRKPRESS, (char*)NULL, 1000000);
-	LogSimplix.debug("#Brake pressure    : %0.0f\n",Press);
+	LogSimplix.error("############################\n");
+	LogSimplix.error("#Brake repartition : %0.2f\n",Rep);
+	LogSimplix.error("#Brake pressure    : %0.0f\n",Press);
+	LogSimplix.error("############################\n");
 
     float MaxPressRatio = 
 		GfParmGetNum(oCarHandle, TDriver::SECT_PRIV, 
@@ -3129,7 +3154,9 @@ void TDriver::EvaluateCollisionFlags(
 
   if (OppInfo.GotFlags(F_AT_SIDE))               // Is Opponent at side
   {
-    oAvoidRange = 1.0;
+//    if (!(OppInfo.Flags & F_FRONT))
+//      oAvoidRange = MAX(0.5,oAvoidRange);
+
     Coll.OppsAtSide |= OppInfo.State.CarDistLat < 0 ? F_LEFT : F_RIGHT;
 
 	if (OppInfo.State.CarDistLat < 0)
@@ -3151,6 +3178,12 @@ void TDriver::EvaluateCollisionFlags(
 	  IsLapper = true;
 	  Coll.LappersBehind |= OppInfo.State.CarDistLat < 0 ? F_LEFT : F_RIGHT;
 	  LogSimplix.debug("#F_LAPPER 2\n");
+  }
+
+  if (OppInfo.Flags & F_LAPPER)
+  {	
+	  Coll.OppsBehindFaster |= OppInfo.State.CarDistLat < 0 ? F_LEFT : F_RIGHT;
+	  LogSimplix.debug("#F_BEHIND_FASTER\n");
   }
 
   if (oTeamEnabled) 
@@ -3362,6 +3395,8 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
   TLanePoint PointInfo;                          // Infos to point
   GetLanePoint                                   //   own position
 	(oRL_FREE,DistanceFromStartLine,PointInfo);
+  int SecIndex = 
+	oTrackDesc.IndexFromPos(DistanceFromStartLine);
 
   for (I = 0; I < oNbrCars; I++)                 // Loop all opponents
   {
@@ -3556,7 +3591,8 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
 	else
       buf[BLEN+1] = '-';
 
-	sprintf(buf2,"%s AVR:%.2f AVO:%.2f TS:%.2f CS:%.2f",buf,oAvoidRange,oAvoidOffset,oTargetSpeed*3.6,oCurrSpeed*3.6);
+//	sprintf(buf2,"%s AVR:%.2f AVO:%.2f TS:%.2f CS:%.2f",buf,oAvoidRange,oAvoidOffset,oTargetSpeed*3.6,oCurrSpeed*3.6);
+	sprintf(buf2,"%s %04.4d R:%.2f O:%.2f TS:%.2f CS:%.2f",buf,SecIndex,oAvoidRange,oAvoidOffset,oTargetSpeed*3.6,oCurrSpeed*3.6);
 
     LogSimplix.error("%s\n",buf2);
     /* Plotter <<< */

@@ -363,7 +363,7 @@ bool TOpponent::Classify(
 //    if ((OpState.CarDistLong > -3.5)
 //	  && (OpState.CarDistLong < 10.0))
     if ((OpState.CarDistLong > -1.5)
-	  && (OpState.CarDistLong < 20.0))
+	  && (OpState.CarDistLong < 10.0))
 	{
       oInfo.Flags |= F_AT_SIDE;                  // Set flags
 	  oInfo.Flags |= (OpState.CarDistLong > 0)   // In front or behind?
@@ -457,10 +457,13 @@ bool TOpponent::Classify(
 
 		if (OpState.CarDiffVelLong < 0)          // If Opp. is faster
 		{
-		  oInfo.Flags |= F_CATCHING;             // Set flag
+//		  oInfo.Flags |= F_CATCHING;             // Set flag
 		  oInfo.CatchTime =                      // estimate time to catch
 			(OpState.CarDistLong + OpState.MinDistLong) / OpState.CarDiffVelLong;
 		  oInfo.CatchSpeed = OpVelLong;          // Save Opps. speed
+		  if ((oInfo.CatchTime < 1)              // Catches me in less than 2 secs  
+            && (fabs(OpState.CarDistLat) > OpState.MinDistLat))
+		    oInfo.Flags |= F_BEHIND_FASTER;      // Set flags
 		}
 	  }
 	  else                                       // Opp is at side

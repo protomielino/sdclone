@@ -249,7 +249,8 @@ enum
   F_LAPPER			= 0x040000,	// it's lapping us
   F_BEING_LAPPED	= 0x080000,	// we're lapping it
   F_DANGEROUS		= 0x100000, // ugly!
-  F_PREVIEWSLOW		= 0x1000000  // ugly!
+  F_BEHIND_FASTER   = 0x200000, // behind and faster
+  F_PREVIEWSLOW		= 0x1000000 // ugly!
 };
 //==========================================================================*
 
@@ -381,6 +382,7 @@ enum
 #define UNSTUCK_COUNTER 90
 #define MAXBLOCKED 9
 #define MAXPRESSURE "max pressure"
+#define RELPRESSURE "front-rear brake repartition"
 #define INITIAL_BRAKE_PRESSURE 30000000.0
 #define INITIAL_BRAKE_SCALE 25.0
 

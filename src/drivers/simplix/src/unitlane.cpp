@@ -484,6 +484,30 @@ void TLane::CalcMaxSpeeds
 //==========================================================================*
 
 //==========================================================================*
+// Smooth speeds
+//--------------------------------------------------------------------------*
+void TLane::SmoothSpeeds()
+{
+  const int N = oTrack->Count();
+
+  for (int I = 0; I < N; I++)
+  {
+	int P = I % N;
+	int Q = (P + 2) % N;
+
+	double Speed = oPathPoints[Q].Speed;
+	if (oPathPoints[P].Speed < Speed)
+	{
+      LogSimplix.error("# Speed %g <= %g\n",oPathPoints[P].Speed,Speed);
+  	  oPathPoints[P].MaxSpeed = Speed;
+	  oPathPoints[P].Speed = Speed;
+	  oPathPoints[P].AccSpd = Speed;
+	}
+  }
+}
+//==========================================================================*
+
+//==========================================================================*
 // Dump
 //--------------------------------------------------------------------------*
 void TLane::Dump()

@@ -131,6 +131,13 @@ double TCollision::AvoidTo
 	  AvoidTo = (Flags & F_TRK_LEFT) ? 1.0 : -1.0;
       LogSimplix.debug("(Coll.OppsAhead): %g\n",AvoidTo);
 	}
+	// Fifth priority: Anyone behind faster? 
+    else if (Coll.OppsBehindFaster)
+	{ 
+      Flags = Coll.Flags;
+	  AvoidTo = (Flags & F_TRK_LEFT) ? 1.0 : -1.0;
+      LogSimplix.debug("(Coll.OppsBehindFaster): %g\n",AvoidTo);
+	}
 	else 
 	{
       //LogSimplix.debug("AvoidTo5: %g\n",AvoidTo);

@@ -84,6 +84,7 @@ class TCollision
       int NextSide;                              // Side of next curve
 	  int OppsAhead;                             // Opponents ahead?
 	  int OppsAtSide;                            // Opponents at side?
+	  int OppsBehindFaster;                      // Opponents behind faster?
 	  double TargetSpeed;                        // Adjusted target speed
 	  double MinOppDistance;                     // Min distance to opponent
 	  double AvoidSide;                          // Avoid to side
@@ -100,6 +101,7 @@ class TCollision
 		NextSide(0),
 		OppsAhead(0),
 		OppsAtSide(0),
+	    OppsBehindFaster(0),
 		TargetSpeed(500),
   	    MinOppDistance(1000),
   	    AvoidSide(0.0),
