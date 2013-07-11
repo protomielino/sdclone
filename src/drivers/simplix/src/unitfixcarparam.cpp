@@ -339,7 +339,7 @@ double	TFixCarParam::CalcBrakingPit
 	double Acc = CarParam.oScaleBrakePit * Ftanroad 
 	  / oTmpCarParam->oMass;
 
-	if (TDriver::UseBrakeLimit)
+	//if (TDriver::UseBrakeLimit)
 	{
 	  double Radius = 1.0 / fabs(Crv);
 	  double factor = MIN(1.0,MAX(0.39, (Radius - 190.0) / 100.0));

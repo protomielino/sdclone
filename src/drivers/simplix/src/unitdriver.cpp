@@ -564,12 +564,14 @@ void TDriver::AdjustDriving(
     Param.oCarParam.oScaleBump;
   Param.oCarParam.oScaleBumpRight =
     Param.oCarParam.oScaleBump;
-  LogSimplix.debug("#Scale Bump: %g\n",Param.oCarParam.oScaleBump);
+  LogSimplix.error("#-------------------------------------------\n");
+  LogSimplix.error("#Scale Bump: %g\n",Param.oCarParam.oScaleBump);
 
   Param.oCarParam.oScaleBumpOuter =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BUMPOUTER,NULL,
 	(float) Param.oCarParam.oScaleBump);
-  LogSimplix.debug("#Scale Bump Outer: %g\n",Param.oCarParam.oScaleBumpOuter);
+  LogSimplix.error("#Scale Bump Outer: %g\n",Param.oCarParam.oScaleBumpOuter);
+  LogSimplix.error("#-------------------------------------------\n");
 
   Param.oCarParam.oLimitSideUse =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LIMIT_SIDE_USE,NULL,
@@ -850,7 +852,7 @@ void TDriver::AdjustPitting(PCarHandle Handle)
   LogSimplix.debug("#oExitLong %g\n",Param.Pit.oExitLong);
 
   Param.Pit.oExitLength =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_EXIT_LEN,0,0);
+	-GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_EXIT_LEN,0,0);
   LogSimplix.debug("#oExitLength %g\n",Param.Pit.oExitLength);
 
   Param.Pit.oLatOffset =
@@ -1213,7 +1215,7 @@ void TDriver::InitTrack
   // Get the private parameters now.
   oBrakeRep =									 // Bremsdruckverteilung
 	GfParmGetNum(Handle, (char*) SECT_BRKSYST, 
-      PRM_BRKREP, (char*)NULL, 0.6);
+      PRM_BRKREP, (char*)NULL, 0.6f);
 
   float Press =
 	GfParmGetNum(Handle, (char*) SECT_BRKSYST, 
@@ -2727,9 +2729,13 @@ void TDriver::GetLanePoint(int Path, double Pos, TLanePoint& LanePoint)
   {
     //LogSimplix.debug("+");
     oStrategy->oPit->oPitLane[Path].GetLanePoint(Pos, LanePoint);
-	oLookScale = 0.05;
+//	oLookScale = 0.05;
+//	oOmegaScale = 0.2;
+//	oLookBase = Param.Fix.oLength / 4;
+//	oOmegaBase = Param.Fix.oLength / 2;
+	oLookScale = 0.02;
 	oOmegaScale = 0.2;
-	oLookBase = Param.Fix.oLength / 4;
+	oLookBase = Param.Fix.oLength / 10;
 	oOmegaBase = Param.Fix.oLength / 2;
 	oGoToPit = true;
   }
@@ -3474,7 +3480,7 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
   {
 	if (!oDoAvoid)                               // If no avoiding needed
 	{
-      Target = - Ratio * PitSide();                // Bring us to the correct
+      Target = - Ratio * PitSide();              // Bring us to the correct
 	  oDoAvoid = true;                           // side to make pit stop
 	}
   }
@@ -3482,7 +3488,7 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
   {
 	if (!oDoAvoid)                               // If no avoiding needed
 	{
-      Target = - PitSide();                        // Bring us to the correct
+      Target = - PitSide();                      // Bring us to the correct
 	  oDoAvoid = true;                           // side to make pit stop
 	}
   }

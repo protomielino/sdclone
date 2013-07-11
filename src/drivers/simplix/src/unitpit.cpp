@@ -369,7 +369,7 @@ void TPitLane::MakePath
   // braking parameters. The simplix allows a manual fine tuning using some
   // additional parameters.
   oStoppingDist = Param.Pit.oStoppingDist;       // Distance to brake
-  oPitStopOffset = Param.Pit.oLongOffset;        // Offset for fine tuning
+  oPitStopOffset = -Param.Pit.oLongOffset;       // Offset for fine tuning
   oCarParam.oScaleBrake =                        // Limit brake to be used
 	MAX(0.10f,CarParam.oScaleBrake);             //   in pitlane
   oCarParam.oScaleMu =                           // Scale friction estimation
@@ -932,7 +932,7 @@ void TPitLane::MakePath
 
   // Section at pit stop
   oStopIdx = Idx0 = oTrack->IndexFromPos(StopPos);
-
+/*
   // Set speed to restart faster or at Aalborg
   for (I = 0; I < 15; I++)
   {
@@ -941,7 +941,7 @@ void TPitLane::MakePath
 	  oPathPoints[Idx0].Speed = 
 	    PitInfo->speedLimit - 0.5;
   }
-
+*/
   // This is where we stop in track coordinates
   oPitStopPos = oPathPoints[oStopIdx].Dist();
 

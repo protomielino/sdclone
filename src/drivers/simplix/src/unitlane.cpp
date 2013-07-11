@@ -578,7 +578,7 @@ void TLane::PropagatePitBreaking
 {
   /*const float base = 0.5f; */
   int Step = 1;
-  int L = 30;
+  int L = 10;
   const int N = oTrack->Count();
   const int M = Step * ((Len - 1) / Step);
 
@@ -604,7 +604,7 @@ void TLane::PropagatePitBreaking
 	  double Factor = MIN(1.0,fabs(oPathPoints[Q].Dist() - PitStopPos) / oFixCarParam.oPitBrakeDist);
 	  double Friction = oTrack->Friction(P) * (Factor * ScaleMu + (1 - Factor) * oCarParam.oScaleBrakePit * ScaleMu);
 	  if (L)
-		Friction *= 0.9;
+		Friction *= 0.5;
 
 	  //LogSimplix.debug("F %g: %g/%g )",Factor,oTrack->Friction(P),Friction);
 	  //LogSimplix.debug("SQ %g )",oPathPoints[Q].Speed);
@@ -632,8 +632,9 @@ void TLane::PropagatePitBreaking
 	  if (oPathPoints[P].Speed > U)
 		oPathPoints[P].Speed = oPathPoints[P].AccSpd = U;
 
-	  if (oPathPoints[P].FlyHeight > 0.1)
-	    oPathPoints[P].Speed = oPathPoints[Q].Speed;
+	  if (!L) 
+	    if (oPathPoints[P].FlyHeight > 0.1)
+	      oPathPoints[P].Speed = oPathPoints[Q].Speed;
 
 	  //LogSimplix.debug("SP %g\n)",oPathPoints[P].Speed);
       //LogSimplix.debug("I:%d P:%d Q:%d F:%.3f U:%.2f S:%.2f\n",I,P,Q,Factor,U*3.6,oPathPoints[P].Speed*3.6);
