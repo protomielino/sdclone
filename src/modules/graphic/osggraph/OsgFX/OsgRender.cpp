@@ -417,6 +417,7 @@ void SDRender::ShadowedScene()
            new osgShadow::LightSpacePerspectiveShadowMapCB;
 
         unsigned int baseTexUnit = 0;
+		unsigned int baseTexUnit2 = 1;
         unsigned int shadowTexUnit = 3;
 
         lspsm->setMinLightMargin(10.0f);
@@ -424,7 +425,9 @@ void SDRender::ShadowedScene()
         lspsm->setTextureSize(osg::Vec2s(4096, 4096));
         lspsm->setShadowTextureCoordIndex(shadowTexUnit);
         lspsm->setShadowTextureUnit(shadowTexUnit);
+        lspsm->setBaseTextureCoordIndex(baseTexUnit2);
         lspsm->setBaseTextureCoordIndex(baseTexUnit);
+
         lspsm->setBaseTextureUnit(baseTexUnit);
         shadowRoot = new osgShadow::ShadowedScene;
         shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
