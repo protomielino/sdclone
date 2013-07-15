@@ -803,7 +803,7 @@ static int InitFuncPt(int Index, void *Pt)
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
     cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.00f);
-    //cInstances[Index-IndexOffset].cRobot->UseFilterAccel();
+    cInstances[Index-IndexOffset].cRobot->UseFilterAccel();
   }
   else if (cRobotType == RTYPE_SIMPLIX_LS1)
   {

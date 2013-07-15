@@ -122,7 +122,7 @@ tdble CliftFromAoA(tWing* wing)
 		//fprintf(stderr,"a: %g\n",wing->a);
 		double s = sin(wing->a/180.0*PI);
 		//fprintf(stderr,"s: %g\n",s);
-		return (tdble)((s * s * (wing->CliftMax + wing->d) - wing->d) * wing->Kx);
+		return (tdble)(s * s * (wing->CliftMax + wing->d) - wing->d);
 	}
 	else
 	{
@@ -224,7 +224,7 @@ SimWingConfig(tCar *car, int index)
 	}
 	else /* if (wing->WingType == 1) */
 	{
-        wing->Kz = CliftFromAoA(wing);
+        wing->Kz = CliftFromAoA(wing) * wing->Kx;
 		fprintf(stderr,"Kz: %g Kx: %g\n",wing->Kz,wing->Kx);
 
 		if (index == 0)
@@ -297,7 +297,8 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
 		else // if (wing->WingType == 1)
 		{
 			wing->forces.x = (tdble) (wing->Kx * vt2 * (1.0f + (tdble)car->dammage / 10000.0) * MAX(fabs(sin(aoa - wing->AoAatZRad)), 0.02));
-			wing->forces.z = (tdble) MIN(0.0,vt2 * CliftFromAoA(wing));
+			wing->forces.z = (tdble) MIN(0.0,wing->Kx* vt2 * CliftFromAoA(wing));
+			// fprintf(stderr,"%d fz: %g (%g)\n",index,wing->forces.z,CliftFromAoA(wing));
 		}
 	} 
 	else 

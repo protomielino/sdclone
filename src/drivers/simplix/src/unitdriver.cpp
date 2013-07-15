@@ -2396,7 +2396,7 @@ void TDriver::InitCa()
   	  if (index == 0)
         FrontWingArea = FrontWingArea * sin(FrontWingAngle - wing->AoAatZRad);
 	  else
-       RearWingArea = RearWingArea * sin(RearWingAngle - wing->AoAatZRad);
+        RearWingArea = RearWingArea * sin(RearWingAngle - wing->AoAatZRad);
 
 	}
   }
