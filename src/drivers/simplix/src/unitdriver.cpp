@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.07.05
+// Last changed : 2013.07.15
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 4.01.000
@@ -366,6 +366,7 @@ TDriver::TDriver(int Index):
   oBase(1.0),
   oBaseScale(1.016f),
   oBumpMode(1),
+  oTelemetrieMode(0),  
   oTestLane(0),
   oUseFilterAccel(false),
   oDeltaAccel(0.05f),
@@ -556,6 +557,10 @@ void TDriver::AdjustDriving(
 	oBaseScale =
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BASE_SCLE,NULL,oBaseScale);
   }
+
+  oTelemetrieMode = (int)
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TELE_MODE,NULL,(tdble) oTelemetrieMode);
+  LogSimplix.error("#Telemetrie Mode: %d\n",oTelemetrieMode);
 
   oBumpMode =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BUMP_MODE,NULL,oBumpMode);
@@ -1534,6 +1539,7 @@ void TDriver::Drive()
   CarClutchCmd = (float) oClutch;
   CarGearCmd = oGear;
   CarSteerCmd = (float) oSteer;
+  CarSteerTelemetrie = oTelemetrieMode;
 
   // SIMUV4 ...
 
@@ -2658,7 +2664,7 @@ void TDriver::InitAdaptiveShiftLevels()
   //double TqAtMaxPw = 0;
   DataPoints = (TDataPoints *) malloc(IMax * sizeof(TDataPoints));
   TDataPoints *Data;
-  for (I = 0; I < IMax; I++)
+  for (I = 0; I < IMax - 1; I++)
   {
 	Data = &DataPoints[I];
 

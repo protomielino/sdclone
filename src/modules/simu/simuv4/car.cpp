@@ -555,6 +555,35 @@ SimTelemetryOut(tCar *car)
 		printf("Downforce total:%.3f N\n", MeasurementFront + MeasurementRear);
 
 	}
+	else if (car->ctrl->telemetryMode == 3)
+	{
+	  for (i = 0; i < 4; i++)
+	  {
+		/* forces */
+		fprintf(stderr,"%d: fx:%.1f N  fy:%.1f N  fz:%.1f N\n", i, car->wheel[i].forces.x, car->wheel[i].forces.y, car->wheel[i].forces.z);
+	  }
+	}
+	else if (car->ctrl->telemetryMode == 4)
+	{
+		/* Balances */ 
+		double ForceFront = car->wheel[0].forces.x + car->wheel[1].forces.x;
+		double ForceRear  = car->wheel[2].forces.x + car->wheel[3].forces.x;
+		double ForceRight = car->wheel[0].forces.x + car->wheel[2].forces.x;
+		double ForceLeft  = car->wheel[1].forces.x + car->wheel[3].forces.x;
+	    fprintf(stderr,"BxFR%+7.1f%% BxLR%+7.1f%% ", 100.0 * ForceFront / (ForceFront + ForceRear), 100.0 * ForceLeft / (ForceLeft + ForceRight));
+
+		ForceFront = car->wheel[0].forces.y + car->wheel[1].forces.y;
+		ForceRear  = car->wheel[2].forces.y + car->wheel[3].forces.y;
+		ForceRight = car->wheel[0].forces.y + car->wheel[2].forces.y;
+		ForceLeft  = car->wheel[1].forces.y + car->wheel[3].forces.y;
+	    fprintf(stderr,"ByFR%+7.1f%% ByLR%+7.1f%% ", 100.0 * ForceFront / (ForceFront + ForceRear), 100.0 * ForceLeft / (ForceLeft + ForceRight));
+
+		ForceFront = car->wheel[0].forces.z + car->wheel[1].forces.z;
+		ForceRear  = car->wheel[2].forces.z + car->wheel[3].forces.z;
+		ForceRight = car->wheel[0].forces.z + car->wheel[2].forces.z;
+		ForceLeft  = car->wheel[1].forces.z + car->wheel[3].forces.z;
+	    fprintf(stderr,"BzFR%+7.1f%% BzLR%+7.1f%%\n", 100.0 * ForceFront / (ForceFront + ForceRear), 100.0 * ForceLeft / (ForceLeft + ForceRight));
+	}
 }
 
 void

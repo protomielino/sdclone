@@ -479,6 +479,9 @@ typedef struct {
 #define _msgCmd		ctrl.msg
 #define _msgColorCmd	ctrl.msgColor
 
+#define _telemetryMode ctrl.telemetryMode
+#define _singleWheelBrakeMode ctrl.singleWheelBrakeMode
+
 struct RobotItf;
 
 /** Command issued by the car during pit stop */

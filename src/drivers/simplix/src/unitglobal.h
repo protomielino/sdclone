@@ -9,7 +9,7 @@
 //
 // File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2013.07.05
+// Last changed : 2013.07.15
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 4.01.000
@@ -277,6 +277,8 @@ enum
 #define CarSteerCmd (oCar->_steerCmd)
 #define CarRaceCmd (oCar->_raceCmd)
 #define CarLightCmd (oCar->_lightCmd)
+#define CarSteerTelemetrie (oCar->_telemetryMode)
+#define CarSingleWheelBrakeMode (oCar->_singleWheelBrakeMode)
 // ... Shortcuts for TORCS
 
 // Shortcuts for TORCS ...
@@ -445,6 +447,8 @@ enum
 #define PRV_PIT_MINENTRYSPEED "pit min entry speed"
 #define PRV_PIT_MINEXITSPEED "pit min exit speed"
 #define PRV_PIT_TEST_STOP    "pit test stop" 
+
+#define PRV_TELE_MODE        "telemetrie mode"    // enable telemetrie output
 
 #define PRV_BUMP_MODE        "bump mode"          // bump detection model
 #define PRV_BASE_MODE        "base mode"          // base detection model

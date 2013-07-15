@@ -419,6 +419,7 @@ private:
 	float oBase;                                 //
 	float oBaseScale;                            //
 	float oBumpMode;                             //
+	int oTelemetrieMode;                         //
 	int oTestLane;
     bool oUseFilterAccel;
 	float oDeltaAccel;                           //
