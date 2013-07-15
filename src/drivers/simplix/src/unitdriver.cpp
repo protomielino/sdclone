@@ -1369,7 +1369,6 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
   oCarHandle = CarCarHandle;                     // data of car, car param
   oSituation = Situation;                        // file and situation
   oLastGear = CarGearNbr - 1;                    // Save index of last gear
-
   // 
   OwnCarOppIndex();                              // Find own opponent index
 
@@ -1450,6 +1449,7 @@ void TDriver::Drive()
   GetPosInfo(Pos,oLanePoint);                    // Info about pts on track
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
   oTargetSpeed = FilterStart(oTargetSpeed);      // Filter Start
+  //fprintf(stderr,"oTargetSpeed %.2f km/h\n",oTargetSpeed*3.6),
 
   //double TrackRollangle = oRacingLine[oRL_FREE].CalcTrackRollangle(Pos);
   //cTimeSum[0] += RtDuration(StartTimeStamp);
@@ -1519,6 +1519,9 @@ void TDriver::Drive()
     oBrake = FilterBrake(oBrake);
     oBrake = FilterBrakeSpeed(oBrake);
     oBrake = FilterABS(oBrake);
+	//if (oBrake > 0.10)
+	//  oClutch = 0.4;
+
   }
 
   if (oWingControl)
@@ -2235,23 +2238,25 @@ tdble F(tWing* wing)
 tdble CliftFromAoA(tWing* wing)
 {
 	tdble angle = (tdble) (wing->angle * 180/PI);
-	//fprintf(stderr,"wing->angle: %g rad = angle: %g deg\n",wing->angle,angle);
+	fprintf(stderr,"wing->angle: %g rad = angle: %g deg\n",wing->angle,angle);
 
 	wing->Kz_org = 4.0f * wing->Kx;
+
+	double s = 0;
 
 	if (angle <= wing->AoAatMax)
 	{
 		wing->a = wing->f * (angle + wing->AoAOffset);
-		//fprintf(stderr,"a: %g\n",wing->a);
-		double s = sin(wing->a/180.0*PI);
-		//fprintf(stderr,"s: %g\n",s);
-		return (tdble)((s * s * (wing->CliftMax + wing->d) - wing->d) * wing->Kx);
+		fprintf(stderr,"a: %g\n",wing->a);
+		s = sin(wing->a/180.0*PI);
+		fprintf(stderr,"s: %g\n",s);
+		return (tdble)(s * s * (wing->CliftMax + wing->d) - wing->d);
 	}
 	else
 	{
 		wing->a = (angle - wing->AoAatMax - 90.0f);
-		//fprintf(stderr,"a: %g F(a): %g\n",wing->a,F(wing));
-		return (tdble)((wing->CliftMax - F(wing) * (wing->CliftMax - wing->CliftAsymp)) * wing->Kx);
+		fprintf(stderr,"a: %g F(a): %g\n",wing->a,F(wing));
+		return (tdble)(wing->CliftMax - F(wing) * (wing->CliftMax - wing->CliftAsymp));
 	}
 }
 
@@ -2300,9 +2305,9 @@ void TDriver::InitCa()
     oWingAngleRearBrake = RearWingAngle;
   }
 
-  FrontWingArea = FrontWingArea * sin(FrontWingAngle);
-  RearWingArea = RearWingArea * sin(RearWingAngle);
-  float WingCd = (float) (1.23 * (FrontWingArea + RearWingArea));
+  float FrontWingAreaCd = FrontWingArea * sin(FrontWingAngle);
+  float RearWingAreaCd = RearWingArea * sin(RearWingAngle);
+  float WingCd = (float) (1.23 * (FrontWingAreaCd + RearWingAreaCd));
   Param.Fix.oCdWing = WingCd;
 
   float CL =
@@ -2322,28 +2327,46 @@ void TDriver::InitCa()
   H = H*H;
   H = (float) (2.0 * exp(-3.0 * H));
   Param.Fix.oCa = H * CL + 4.0 * WingCd;
-  Param.Fix.oCaFrontWing = 4 * 1.23 * FrontWingArea;
-  Param.Fix.oCaRearWing = 4 * 1.23 * RearWingArea;
+  Param.Fix.oCaFrontWing = 4 * 1.23 * FrontWingAreaCd;
+  Param.Fix.oCaRearWing = 4 * 1.23 * RearWingAreaCd;
   Param.Fix.oCaGroundEffect = H * CL;
 
 //>>> simuv4
+  double CliftFrnt = 0;
+  double CliftRear = 0;
+  double MeanCliftFromAoA = 0;
+  const char* w = NULL;
+  int WingType = 0;
+  double phi;
+  double sinphi;
+  double sinphi2;
+
   for (int index = 0; index < 2; index++)
   {	  
-    const char * w = GfParmGetStr(oCarHandle, WingSect[index], PRM_WINGTYPE, "FLAT");
-
-	tWing *wing = &(oWing[index]);
-
-    wing->WingType = 0; // Default if nothing is contained in the wing section
+    w = GfParmGetStr(oCarHandle, WingSect[index], PRM_WINGTYPE, "FLAT");
 
 	if (strncmp(w,"FLAT",4) == 0)
-	  wing->WingType = 0;
+	  WingType = 0;
 	else if (strncmp(w,"PROFILE",7) == 0)
-	  wing->WingType = 1;
+	  WingType = 1;
 	// ...
 
-    if (wing->WingType == 1)
-    {
+	if (WingType == 1)
+	{
+	  tWing *wing = &(oWing[index]);
+	  wing->WingType = WingType;
+
 	  WingTypeProfile = true;
+
+  	  if (index == 0)
+	  {
+		wing->angle = FrontWingAngle;
+	  }
+	  else
+	  {
+		wing->angle = RearWingAngle;
+	  }
+	  fprintf(stderr,"wing->angle: %g\n",wing->angle*180/PI);
 
 	  fprintf(stderr,"index: %d\n",index);
 	  fprintf(stderr,"WingType: %d\n",wing->WingType);
@@ -2384,34 +2407,49 @@ void TDriver::InitCa()
 	  /* Scale factor for angle */
 	  wing->f = (tdble) (90.0 / (wing->AoAatMax + wing->AoAOffset));			
 	  fprintf(stderr,"f: %g\n",wing->f);
-	  double phi = wing->f * (wing->AoAOffset);
+	  phi = wing->f * (wing->AoAOffset);
 	  fprintf(stderr,"phi: %g deg\n",phi);
 	  phi *= PI / 180;
 	  fprintf(stderr,"phi: %g rad\n",phi);
-	  double sinphi = sin(phi);
+	  sinphi = sin(phi);
 	  fprintf(stderr,"sinphi: %g\n",sinphi);
-	  double sinphi2 = sinphi * sinphi;
+	  sinphi2 = sinphi * sinphi;
 
 	  /* Scale at AoA = 0 */
 	  wing->d = (tdble) (1.8f * (sinphi2 * wing->CliftMax - wing->CliftZero));	
 	  fprintf(stderr,"d: %g\n",wing->d);
 
-      Param.Fix.oCaFrontWing = CliftFromAoA(wing) * 1.23 * FrontWingArea;
-      Param.Fix.oCaRearWing = CliftFromAoA(wing) * 1.23 * RearWingArea;
-
   	  if (index == 0)
-        FrontWingArea = FrontWingArea * sin(FrontWingAngle - wing->AoAatZRad);
+	  {
+        CliftFrnt = CliftFromAoA(wing);
+	    fprintf(stderr,"CliftFrnt: %g\n",CliftFrnt);
+        FrontWingAreaCd = FrontWingArea * sin(FrontWingAngle - wing->AoAatZRad);
+        Param.Fix.oCaFrontWing = CliftFrnt * 1.23 * FrontWingAreaCd;
+        MeanCliftFromAoA = CliftFrnt;
+	  }
 	  else
-        RearWingArea = RearWingArea * sin(RearWingAngle - wing->AoAatZRad);
+	  {
+        CliftRear = CliftFromAoA(wing);
+	    fprintf(stderr,"CliftFrnt: %g\n",CliftRear);
+        RearWingAreaCd = RearWingArea * sin(RearWingAngle - wing->AoAatZRad);
+        Param.Fix.oCaRearWing = CliftRear * 1.23 * RearWingAreaCd;
+		if (CliftFrnt > 0)
+		{
+          MeanCliftFromAoA += CliftRear;
+          MeanCliftFromAoA /= 2;
+		}
+		else
+          MeanCliftFromAoA = CliftRear;
+	  }
 
 	}
   }
 
-  if (WingTypeProfile == 1)
+  if (WingTypeProfile)
   {
-    WingCd = (float) (1.23 * (FrontWingArea + RearWingArea));
+    WingCd = (float) (1.23 * (FrontWingAreaCd + RearWingAreaCd));
     Param.Fix.oCdWing = WingCd;
-    Param.Fix.oCa = H * CL + 4.0 * WingCd;
+    Param.Fix.oCa = H * CL + MeanCliftFromAoA * WingCd;
   }
 //<<< simuv4
 
@@ -2664,7 +2702,7 @@ void TDriver::InitAdaptiveShiftLevels()
   //double TqAtMaxPw = 0;
   DataPoints = (TDataPoints *) malloc(IMax * sizeof(TDataPoints));
   TDataPoints *Data;
-  for (I = 0; I < IMax - 1; I++)
+  for (I = 0; I < IMax; I++)
   {
 	Data = &DataPoints[I];
 
