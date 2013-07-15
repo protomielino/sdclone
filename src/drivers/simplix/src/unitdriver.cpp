@@ -2243,7 +2243,7 @@ tdble CliftFromAoA(tWing* wing)
 	}
 	else
 	{
-		wing->a = (angle - wing->AoAatZero - wing->AoAatMax - 90.0f);
+		wing->a = (angle - wing->AoAatMax - 90.0f);
 		//fprintf(stderr,"a: %g F(a): %g\n",wing->a,F(wing));
 		return (tdble)((wing->CliftMax - F(wing) * (wing->CliftMax - wing->CliftAsymp)) * wing->Kx);
 	}
