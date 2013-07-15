@@ -92,20 +92,20 @@ SimWheelConfig(tCar *car, int index)
 	tdble coldmufactor = GfParmGetNum(hdle, WheelSect[index], PRM_COLDMUFACTOR, (char*)NULL, 1.0f);
 	coldmufactor = MIN(MAX(coldmufactor, 0.0f), 1.0f);
 	wheel->muTmult = (1 - coldmufactor) / ((wheel->Topt - Tair) * (wheel->Topt - Tair));
-	wheel->heatingm = GfParmGetNum(hdle, WheelSect[index], PRM_HEATINGMULT, (char*)NULL, 6e-5);
-	wheel->aircoolm = GfParmGetNum(hdle, WheelSect[index], PRM_AIRCOOLINGMULT, (char*)NULL, 12e-4);
-	wheel->speedcoolm = GfParmGetNum(hdle, WheelSect[index], PRM_SPEEDCOOLINGMULT, (char*)NULL, 0.25);
-	wheel->wearrate = GfParmGetNum(hdle, WheelSect[index], PRM_WEARRATE, (char*)NULL, 1.5e-8);
+	wheel->heatingm = GfParmGetNum(hdle, WheelSect[index], PRM_HEATINGMULT, (char*)NULL, (tdble) 6e-5);
+	wheel->aircoolm = GfParmGetNum(hdle, WheelSect[index], PRM_AIRCOOLINGMULT, (char*)NULL, (tdble) 12e-4);
+	wheel->speedcoolm = GfParmGetNum(hdle, WheelSect[index], PRM_SPEEDCOOLINGMULT, (char*)NULL, (tdble) 0.25);
+	wheel->wearrate = GfParmGetNum(hdle, WheelSect[index], PRM_WEARRATE, (char*)NULL, (tdble) 1.5e-8);
 	wheel->wearrate = MIN(MAX(wheel->wearrate, 0.0f), 0.1f);
-	wheel->critTreadDepth = GfParmGetNum(hdle, WheelSect[index], PRM_FALLOFFTREADDEPTH, (char*)NULL, 0.03);
+	wheel->critTreadDepth = GfParmGetNum(hdle, WheelSect[index], PRM_FALLOFFTREADDEPTH, (char*)NULL, (tdble) 0.03);
 	wheel->critTreadDepth = MIN(MAX(wheel->critTreadDepth, 0.0001f), 0.9999f);
-	wheel->muTDoffset[0] = GfParmGetNum(hdle, WheelSect[index], PRM_REMAININGGRIPMULT, (char*)NULL, 0.5);
+	wheel->muTDoffset[0] = GfParmGetNum(hdle, WheelSect[index], PRM_REMAININGGRIPMULT, (char*)NULL, (tdble) 0.5);
 	wheel->muTDoffset[0] = MIN(MAX(wheel->muTDoffset[0], 0.1f), 1.0f);
-	wheel->muTDoffset[1] = GfParmGetNum(hdle, WheelSect[index], PRM_FALLOFFGRIPMULT, (char*)NULL, 0.85);
+	wheel->muTDoffset[1] = GfParmGetNum(hdle, WheelSect[index], PRM_FALLOFFGRIPMULT, (char*)NULL, (tdble) 0.85);
 	wheel->muTDoffset[1] = MIN(MAX(wheel->muTDoffset[1], 0.1f), 1.0f);
 	/* calculate parameters for straight mu(TreadDepth) sections */
 	wheel->muTDmult[0] = (wheel->muTDoffset[1] - wheel->muTDoffset[0]) / wheel->critTreadDepth;
-	wheel->muTDmult[1] = (1.0 - wheel->muTDoffset[1]) / (1.0 - wheel->critTreadDepth);
+	wheel->muTDmult[1] = (tdble) ((1.0 - wheel->muTDoffset[1]) / (1.0 - wheel->critTreadDepth));
 	wheel->muTDoffset[1] = wheel->muTDoffset[1] - wheel->muTDmult[1] * wheel->critTreadDepth;
 
 	/* components */
@@ -282,7 +282,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 		} else {
 			tireCond *= wheel->muTDmult[0] * wheel->treadDepth + wheel->muTDoffset[0];
 		}
-		tireCond = MAX(tireCond, 0.1);
+		tireCond = (tdble) MAX(tireCond, 0.1);
 		mu *= tireCond;
 	}
 

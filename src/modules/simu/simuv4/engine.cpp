@@ -153,7 +153,7 @@ SimEngineUpdateTq(tCar *car)
         if (engine->rads > engine->revsLimiter) {
             alpha = 0.0;
 	    if (car->features & FEAT_REVLIMIT) {
-	        engine->timeInLimiter = 0.1;
+	        engine->timeInLimiter = 0.1f;
 	    }
         }
 	if ( (car->features & FEAT_REVLIMIT) && (engine->timeInLimiter > 0.0f) ) {

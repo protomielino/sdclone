@@ -59,6 +59,7 @@
 #include <track.h>
 #include <car.h>
 #include <robot.h>
+#include <..\..\modules\simu\simuv4\aero.h>
 
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -221,6 +222,7 @@ private:
 	TClothoidLane oRacingLine[gNBR_RL];          // Racinglines
 
 	TCarParam* oCarParams[3];                    // Array of pointers to parameter sets
+	tWing oWing[2];
 
 	double oFlyHeight;                           // fly height
 	double oScaleSteer;                          // scale steering

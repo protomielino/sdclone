@@ -635,6 +635,17 @@ typedef struct CarElt
 #define PRM_WINGANGLE		"angle"
 #define PRM_WINGANGLEVARIABLE "variable"
 
+#define PRM_WINGTYPE	"wing type"
+#define PRM_AOAATMAX	"aoa at max"
+#define PRM_AOAATZERO	"aoa at zero"
+#define PRM_AOAOFFSET	"aoa offset"
+
+#define PRM_CLMAX		"clift max"
+#define PRM_CLATZERO	"clift at zero"
+#define PRM_CLASYMP		"clift asymptotic"
+#define PRM_DELAYDECREASE	"clift delay"
+#define PRM_CURVEDECREASE	"clift curve"
+
 /* Engine */
 #define PRM_REVSLIM		"revs limiter"
 #define PRM_REVSMAX		"revs maxi"

@@ -1590,7 +1590,6 @@ void LRaceLine::GetRLSteerPoint( vec2f *rt, double *offset, double time )
 
 void LRaceLine::GetSteerPoint( double lookahead, vec2f *rt, double offset, double time )
 {
-
  int maxcount = int(lookahead / DivLength + 1);
  int count = 0;
  //tTrackSeg *seg = car->_trkPos.seg;
@@ -2219,6 +2218,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
 double LRaceLine::getAvoidSteer(double offset, LRaceLineData *data)
 {
+ offset *= 1.3;
  double steer = 0.0;
 
  vec2f target;
