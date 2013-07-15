@@ -35,7 +35,7 @@ osg::Node* SDMakeSphere(double radius, int slices, int stacks)
     osg::Geode* geode = new osg::Geode;
 
     drho = SD_PI / (float) stacks;
-    dtheta = SD_2PI / (float) slices;
+    dtheta = (2.0 * SD_PI) / (float) slices;
 
     ds = 1.0 / slices;
     dt = 1.0 / stacks;
