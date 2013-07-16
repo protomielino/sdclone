@@ -366,6 +366,8 @@ private:
 	double oRepairNeeded;
 	float oSideReduction;
 	float oLastSideReduction;
+    double oAirBrakeLatchTime;
+
 
 	double oMinDistLong;
 	float oSlowRadius;

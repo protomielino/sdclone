@@ -319,6 +319,7 @@ TDriver::TDriver(int Index):
   oRepairNeeded(0.0),
   oSideReduction(1.0),
   oLastSideReduction(1.0),
+  oAirBrakeLatchTime(0.0),
   oMinDistLong(FLT_MAX),
   oSlowRadius(1.0),
 
@@ -1478,10 +1479,13 @@ void TDriver::Drive()
 	}
 	else
 	{
-		if (oAbsDriftAngle < PI/64)
-			oWingAngleRear = oWingAngleRearMax;
-		else
-			oWingAngleRear = oWingAngleRearBrake;
+		if (oAirBrakeLatchTime == 0)
+		{
+			if (oAbsDriftAngle < PI/64)
+				oWingAngleRear = oWingAngleRearMax;
+			else
+				oWingAngleRear = oWingAngleRearBrake;
+		}
 	}
   }
 
@@ -1526,8 +1530,21 @@ void TDriver::Drive()
 
   if (oWingControl)
   {
-	if (oBrake > 0.25)
-		oWingAngleRear = oWingAngleRearBrake;
+	if (oWingAngleRear != oWingAngleRearBrake)
+	{
+		if ((oBrake > 0.25) && (oCurrSpeed > 180/3.6f))
+		{
+			oWingAngleRear = oWingAngleRearBrake;
+			oAirBrakeLatchTime = 0.5;
+		}
+	}
+	else
+	{
+		if ((oBrake > 0.25) && (oCurrSpeed > 100/3.6f))
+		{
+			oAirBrakeLatchTime = 0.5;
+		}
+	}
   }
 
   // Keep history
@@ -1916,6 +1933,8 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
 {
   oCar = Car;                                    // Update pointers
   oSituation = S;
+
+  oAirBrakeLatchTime = MAX(0, oAirBrakeLatchTime - oSituation->deltaTime);
 
   // Shortcuts
   oCurrSpeed = myhypot(CarSpeedLong, CarSpeedLat); // Save currend speed
