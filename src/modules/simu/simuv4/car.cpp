@@ -570,19 +570,25 @@ SimTelemetryOut(tCar *car)
 		double ForceRear  = car->wheel[2].forces.x + car->wheel[3].forces.x;
 		double ForceRight = car->wheel[0].forces.x + car->wheel[2].forces.x;
 		double ForceLeft  = car->wheel[1].forces.x + car->wheel[3].forces.x;
-	    fprintf(stderr,"BxFR%+7.1f%% BxLR%+7.1f%% ", 100.0 * ForceFront / (ForceFront + ForceRear), 100.0 * ForceLeft / (ForceLeft + ForceRight));
+		double ForceTotal1 = MAX(0.1,fabs(ForceFront) + fabs(ForceRear));
+		double ForceTotal2 = MAX(0.1,fabs(ForceLeft) + fabs(ForceRight));
+	    fprintf(stderr,"BxFR%+7.1f%% BxLR%+7.1f%% ", 100.0 * ForceFront / (ForceTotal1), 100.0 * ForceLeft / (ForceTotal2));
 
 		ForceFront = car->wheel[0].forces.y + car->wheel[1].forces.y;
 		ForceRear  = car->wheel[2].forces.y + car->wheel[3].forces.y;
 		ForceRight = car->wheel[0].forces.y + car->wheel[2].forces.y;
 		ForceLeft  = car->wheel[1].forces.y + car->wheel[3].forces.y;
-	    fprintf(stderr,"ByFR%+7.1f%% ByLR%+7.1f%% ", 100.0 * ForceFront / (ForceFront + ForceRear), 100.0 * ForceLeft / (ForceLeft + ForceRight));
+		ForceTotal1 = MAX(0.1,fabs(ForceFront) + fabs(ForceRear));
+		ForceTotal2 = MAX(0.1,fabs(ForceLeft) + fabs(ForceRight));
+	    fprintf(stderr,"ByFR%+7.1f%% ByLR%+7.1f%% ", 100.0 * ForceFront / (ForceTotal1), 100.0 * ForceLeft / (ForceTotal2));
 
 		ForceFront = car->wheel[0].forces.z + car->wheel[1].forces.z;
 		ForceRear  = car->wheel[2].forces.z + car->wheel[3].forces.z;
 		ForceRight = car->wheel[0].forces.z + car->wheel[2].forces.z;
 		ForceLeft  = car->wheel[1].forces.z + car->wheel[3].forces.z;
-	    fprintf(stderr,"BzFR%+7.1f%% BzLR%+7.1f%%\n", 100.0 * ForceFront / (ForceFront + ForceRear), 100.0 * ForceLeft / (ForceLeft + ForceRight));
+		ForceTotal1 = MAX(0.1,fabs(ForceFront) + fabs(ForceRear));
+		ForceTotal2 = MAX(0.1,fabs(ForceLeft) + fabs(ForceRight));
+	    fprintf(stderr,"BzFR%+7.1f%% BzLR%+7.1f%%\n", 100.0 * ForceFront / (ForceTotal1), 100.0 * ForceLeft / (ForceTotal2));
 	}
 }
 

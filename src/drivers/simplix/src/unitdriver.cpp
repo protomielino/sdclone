@@ -1561,6 +1561,8 @@ void TDriver::Drive()
   CarSteerCmd = (float) oSteer;
   CarSteerTelemetrie = oTelemetrieMode;
 
+  if (oTelemetrieMode == 4)
+	  fprintf(stderr,"A%+7.2f%% B%+7.2f%% C%+7.2f%% S%+7.2f%% G:%d\n",100*oAccel,100*oBrake,100*oClutch,100*oSteer,oGear);
   // SIMUV4 ...
 
   if (oWingControl)
@@ -3117,8 +3119,10 @@ double TDriver::SteerAngle(TLanePoint& AheadPointInfo)
   Angle += AvgK * oScaleSteer;
 
   // control offset from path.
-  oPIDCLine.oP = 1.0;
-  oPIDCLine.oD = 10;
+//  oPIDCLine.oP = 1.0;
+//  oPIDCLine.oD = 10;
+  oPIDCLine.oP = 1.2;
+  oPIDCLine.oD = 12;
   if (oStartSteerFactor < 0.15)
     oStartSteerFactor += 0.0002;
   double Factor = MIN(0.15,oStartSteerFactor);

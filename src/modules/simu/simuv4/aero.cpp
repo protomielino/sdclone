@@ -154,62 +154,68 @@ SimWingConfig(tCar *car, int index)
 	  wing->WingType = 0;
 	else if (strncmp(w,"PROFILE",7) == 0)
 	  wing->WingType = 1;
+	else if (strncmp(w,"THIN",2) == 0)
+	  wing->WingType = 2; // Kristof: For your new model
 	// ...
 
-	fprintf(stderr,"index: %d\n",index);
-	fprintf(stderr,"WingType: %d\n",wing->WingType);
+	if (wing->WingType = 1)
+	{
+		fprintf(stderr,"index: %d\n",index);
+		fprintf(stderr,"WingType: %d\n",wing->WingType);
 
-	/* [deg] Angle of Attack at the maximum of coefficient of lift */
-	wing->AoAatMax = GfParmGetNum(hdle, WingSect[index], PRM_AOAATMAX, (char*) "deg", 90);	
-	fprintf(stderr,"AoAatMax: %g\n",wing->AoAatMax);
+		/* [deg] Angle of Attack at the maximum of coefficient of lift */
+		wing->AoAatMax = GfParmGetNum(hdle, WingSect[index], PRM_AOAATMAX, (char*) "deg", 90);	
+		fprintf(stderr,"AoAatMax: %g\n",wing->AoAatMax);
 
-	/* [deg] Angle of Attack at coefficient of lift = 0 (-30 < AoAatZero < 0) */
-	wing->AoAatZero = GfParmGetNum(hdle, WingSect[index], PRM_AOAATZERO, (char*) "deg", 0);
-	fprintf(stderr,"AoAatZero: %g\n",wing->AoAatZero);
-	wing->AoAatZRad = (tdble) (wing->AoAatZero/180*PI);
+		/* [deg] Angle of Attack at coefficient of lift = 0 (-30 < AoAatZero < 0) */
+		wing->AoAatZero = GfParmGetNum(hdle, WingSect[index], PRM_AOAATZERO, (char*) "deg", 0);
+		fprintf(stderr,"AoAatZero: %g\n",wing->AoAatZero);
+		wing->AoAatZRad = (tdble) (wing->AoAatZero/180*PI);
 
-	/* [deg] Offset for Angle of Attack */
-	wing->AoAOffset = GfParmGetNum(hdle, WingSect[index], PRM_AOAOFFSET, (char*) "deg", 0);	
-	fprintf(stderr,"AoAOffset: %g\n",wing->AoAOffset);
+		/* [deg] Offset for Angle of Attack */
+		wing->AoAOffset = GfParmGetNum(hdle, WingSect[index], PRM_AOAOFFSET, (char*) "deg", 0);	
+		fprintf(stderr,"AoAOffset: %g\n",wing->AoAOffset);
 
-	/* Maximum of coefficient of lift (0 < CliftMax < 4) */
-	wing->CliftMax = GfParmGetNum(hdle, WingSect[index], PRM_CLMAX, (char*)NULL, 4);
-	fprintf(stderr,"CliftMax: %g\n",wing->CliftMax);
+		/* Maximum of coefficient of lift (0 < CliftMax < 4) */
+		wing->CliftMax = GfParmGetNum(hdle, WingSect[index], PRM_CLMAX, (char*)NULL, 4);
+		fprintf(stderr,"CliftMax: %g\n",wing->CliftMax);
 
-	/* Coefficient of lift at Angle of Attack = 0 */
-	wing->CliftZero = GfParmGetNum(hdle, WingSect[index], PRM_CLATZERO, (char*)NULL, 0);
-	fprintf(stderr,"CliftZero: %g\n",wing->CliftZero);
+		/* Coefficient of lift at Angle of Attack = 0 */
+		wing->CliftZero = GfParmGetNum(hdle, WingSect[index], PRM_CLATZERO, (char*)NULL, 0);
+		fprintf(stderr,"CliftZero: %g\n",wing->CliftZero);
 
-	/* Asymptotic coefficient of lift at large Angle of Attack */
-	wing->CliftAsymp = GfParmGetNum(hdle, WingSect[index], PRM_CLASYMP, (char*)NULL, wing->CliftMax);
-	fprintf(stderr,"CliftAsymp: %g\n",wing->CliftAsymp);
+		/* Asymptotic coefficient of lift at large Angle of Attack */
+		wing->CliftAsymp = GfParmGetNum(hdle, WingSect[index], PRM_CLASYMP, (char*)NULL, wing->CliftMax);
+		fprintf(stderr,"CliftAsymp: %g\n",wing->CliftAsymp);
 
-	/* Delay of decreasing */
-	wing->b = GfParmGetNum(hdle, WingSect[index], PRM_DELAYDECREASE, (char*)NULL, 20);			
-	fprintf(stderr,"b: %g\n",wing->b);
+		/* Delay of decreasing */
+		wing->b = GfParmGetNum(hdle, WingSect[index], PRM_DELAYDECREASE, (char*)NULL, 20);			
+		fprintf(stderr,"b: %g\n",wing->b);
 
-	/* Curvature of start of decreasing */
-	wing->c = GfParmGetNum(hdle, WingSect[index], PRM_CURVEDECREASE, (char*)NULL, 2);						
-	fprintf(stderr,"c: %g\n",wing->c);
+		/* Curvature of start of decreasing */
+		wing->c = GfParmGetNum(hdle, WingSect[index], PRM_CURVEDECREASE, (char*)NULL, 2);						
+		fprintf(stderr,"c: %g\n",wing->c);
 
-	/* Scale factor for angle */
-	wing->f = (tdble) (90.0 / (wing->AoAatMax + wing->AoAOffset));			
-	fprintf(stderr,"f: %g\n",wing->f);
-	double phi = wing->f * (wing->AoAOffset);
-	fprintf(stderr,"phi: %g deg\n",phi);
-	phi *= PI / 180;
-	fprintf(stderr,"phi: %g rad\n",phi);
-	double sinphi = sin(phi);
-	fprintf(stderr,"sinphi: %g\n",sinphi);
-	double sinphi2 = sinphi * sinphi;
+		/* Scale factor for angle */
+		wing->f = (tdble) (90.0 / (wing->AoAatMax + wing->AoAOffset));			
+		fprintf(stderr,"f: %g\n",wing->f);
+		double phi = wing->f * (wing->AoAOffset);
+		fprintf(stderr,"phi: %g deg\n",phi);
+		phi *= PI / 180;
+		fprintf(stderr,"phi: %g rad\n",phi);
+		double sinphi = sin(phi);
+		fprintf(stderr,"sinphi: %g\n",sinphi);
+		double sinphi2 = sinphi * sinphi;
 
-	/* Scale at AoA = 0 */
-	wing->d = (tdble) (1.8f * (sinphi2 * wing->CliftMax - wing->CliftZero));	
-	fprintf(stderr,"d: %g\n",wing->d);
+		/* Scale at AoA = 0 */
+		wing->d = (tdble) (1.8f * (sinphi2 * wing->CliftMax - wing->CliftZero));	
+		fprintf(stderr,"d: %g\n",wing->d);
+	}
+	else if (wing->WingType = 2)
+	{
+		// Kristof: Get parameters for the new modell
+	}
 
-//<<< simuv4
-
-//>>> simuv4
 	wing->Kx = -1.23f * area;
 
     if (wing->WingType == 0)
@@ -222,7 +228,7 @@ SimWingConfig(tCar *car, int index)
 			fprintf(stderr,"car->aero.Cd: %g angle: %g\n",car->aero.Cd,wing->angle*180/PI);
 		}
 	}
-	else /* if (wing->WingType == 1) */
+	else if (wing->WingType == 1) 
 	{
         wing->Kz = CliftFromAoA(wing) * wing->Kx;
 		fprintf(stderr,"Kz: %g Kx: %g\n",wing->Kz,wing->Kx);
@@ -237,6 +243,10 @@ SimWingConfig(tCar *car, int index)
 			car->aero.Cd -= (tdble)(wing->Kx*sin(wing->angle - wing->AoAatZRad));
 			fprintf(stderr,"car->aero.Cd: %g wing->Kx: %g wing->angle: %g wing->AoAatZero: %g\n",car->aero.Cd,wing->Kx,wing->angle*180/PI,wing->AoAatZero);
 		}
+	}
+	else /* if (wing->WingType == 2) */
+	{
+		// Kristof: Do calculations needed for initialisation
 	}
 }
 
@@ -294,11 +304,15 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
 				wing->forces.z = (tdble) MIN(0.0,wing->Kz * vt2 * sinaoa);
 			}
 		}
-		else // if (wing->WingType == 1)
+		else if (wing->WingType == 1)
 		{
 			wing->forces.x = (tdble) (wing->Kx * vt2 * (1.0f + (tdble)car->dammage / 10000.0) * MAX(fabs(sin(aoa - wing->AoAatZRad)), 0.02));
 			wing->forces.z = (tdble) MIN(0.0,wing->Kx* vt2 * CliftFromAoA(wing));
 			// fprintf(stderr,"%d fz: %g (%g)\n",index,wing->forces.z,CliftFromAoA(wing));
+		}
+		else /* if (wing->WingType == 2) */
+		{
+			// Kristof: Do calculations while simulation
 		}
 	} 
 	else 
