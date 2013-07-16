@@ -1015,16 +1015,16 @@ grInitCar(tCarElt *car)
 	// Separate rear wing models for animation according to rear wing angle ...
 	snprintf(path, 256, "%s/%s", SECT_GROBJECTS, LST_REARWING);
 	nranges = GfParmGetEltNb(handle, path) + 1;
-	grCarInfo[index].nDRM = nranges - 1;
-	grCarInfo[index].DRMSelector = NULL;
+	grCarInfo[index].nDRM2 = nranges - 1;
+	grCarInfo[index].DRMSelector2 = NULL;
 
 	if (nranges > 1)
 	{
 		// We have at least one separate rearwing model to add...
 		ssgEntity *rearwingEntity;
-		ssgSelector *DRMSel;
-		grCarInfo[index].DRMSelector = DRMSel = new ssgSelector;
-		grCarInfo[index].carTransform->addKid(DRMSel);
+		ssgSelector *DRMSel2;
+		grCarInfo[index].DRMSelector2 = DRMSel2 = new ssgSelector;
+		grCarInfo[index].carTransform->addKid(DRMSel2);
 	
 		selIndex = 0;
 
@@ -1037,7 +1037,7 @@ grInitCar(tCarElt *car)
 
 			snprintf(buf, nMaxTexPathSize, "%s/%s/%d", SECT_GROBJECTS, LST_REARWING, i);
 			param = GfParmGetStr(handle, buf, PRM_REARWINGMODEL, "");
-			grCarInfo[index].DRMThreshold[selIndex] = GfParmGetNum(handle, buf, PRM_REARWINGANGLE, NULL, 0.0);
+			grCarInfo[index].DRMThreshold2[selIndex] = GfParmGetNum(handle, buf, PRM_REARWINGANGLE, NULL, 0.0);
 
 			tdble xpos = GfParmGetNum(handle, buf, PRM_XPOS, NULL, 0.0);
 			tdble ypos = GfParmGetNum(handle, buf, PRM_YPOS, NULL, 0.0);
@@ -1046,27 +1046,27 @@ grInitCar(tCarElt *car)
 			rearwingLoc->setTransform( &rearwingpos);
 
 			rearwingEntity = grssgCarLoadAC3D(param, NULL, index);
-			DBG_SET_NAME(rearwingEntity, "DRM", index, i-1);
+			DBG_SET_NAME(rearwingEntity, "DRM2", index, i-1);
 
 			rearwingLoc->addKid(rearwingEntity);
 
 			rearwingBody->addKid(rearwingLoc);
-			DRMSel->addKid(rearwingBody);
-			grCarInfo[index].DRMSelectMask[i-1] = 1 << selIndex; 
+			DRMSel2->addKid(rearwingBody);
+			grCarInfo[index].DRMSelectMask2[i-1] = 1 << selIndex; 
 			selIndex++;
 		}
 		
 		// select a default rearwing - angle value of 0.0 is desired...
 		for (i = 1; i < nranges; i++)
 		{
-			if (grCarInfo[index].DRMThreshold[i-1] == 0.0f)
+			if (grCarInfo[index].DRMThreshold2[i-1] == 0.0f)
 			{
-				DRMSel->select( grCarInfo[index].DRMSelectMask[i-1] );
+				DRMSel2->select( grCarInfo[index].DRMSelectMask2[i-1] );
 				break;
 			}
 		}
 		if (i == nranges)
-			DRMSel->select( grCarInfo[index].DRMSelectMask[0] );
+			DRMSel2->select( grCarInfo[index].DRMSelectMask2[0] );
 	}
 
 	CarsAnchor->addKid(grCarInfo[index].carTransform);
@@ -1208,48 +1208,48 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 			grCarInfo[index].rearwingSelector->select(1);
 
 	 		// Animated rearwing model selection according to wing angle
-			if (grCarInfo[index].nDRM > 0)
+			if (grCarInfo[index].nDRM2 > 0)
 			{
 				// choose a rearwing model to display
 				int curDRM = 0;
 				//float curAngle = 0.0f;
 				//int lastDRM = grCarInfo[index].DRMSelector->getSelect();
 	
-				for (i=0; i<grCarInfo[index].nDRM; i++)
+				for (i=0; i<grCarInfo[index].nDRM2; i++)
 				{
 					float wingangle = car->_wingRCmd * 180 / PI;
 					if ((wingangle > 0.0) 
 						&& (wingangle < 10.0)
-					    && (grCarInfo[index].DRMThreshold[i] >= 0.0)
-					    && (grCarInfo[index].DRMThreshold[i] <= 10.0))
+					    && (grCarInfo[index].DRMThreshold2[i] >= 0.0)
+					    && (grCarInfo[index].DRMThreshold2[i] <= 10.0))
 					{
 						curDRM = i;
 						//curAngle = grCarInfo[index].DRMThreshold[i];
 					}
 					else if ((wingangle > 10.0) 
 						&& (wingangle < 35.0)
-					    && (grCarInfo[index].DRMThreshold[i] >= 10.0)
-					    && (grCarInfo[index].DRMThreshold[i] <= 35.0))
+					    && (grCarInfo[index].DRMThreshold2[i] >= 10.0)
+					    && (grCarInfo[index].DRMThreshold2[i] <= 35.0))
 					{
 						curDRM = i;
 						//curAngle = grCarInfo[index].DRMThreshold[i];
 					}
 					else if ((wingangle > 35.0) 
-					    && (grCarInfo[index].DRMThreshold[i] > 35.0))
+					    && (grCarInfo[index].DRMThreshold2[i] > 35.0))
 					{
 						curDRM = i;
 						//curAngle = grCarInfo[index].DRMThreshold[i];
 					}
 				}
 		
-				grCarInfo[index].DRMSelector->select( grCarInfo[index].DRMSelectMask[curDRM] );
+				grCarInfo[index].DRMSelector2->select( grCarInfo[index].DRMSelectMask2[curDRM] );
 			}
 		} 
 		else 
 		{
 			grCarInfo[index].rearwingSelector->select(0);
-			if (grCarInfo[index].nDRM > 0)
-				grCarInfo[index].DRMSelector->select(0);
+			if (grCarInfo[index].nDRM2 > 0)
+				grCarInfo[index].DRMSelector2->select(0);
 		}
 	}
 
