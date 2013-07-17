@@ -160,56 +160,56 @@ SimWingConfig(tCar *car, int index)
 
 	if (wing->WingType = 1)
 	{
-		fprintf(stderr,"index: %d\n",index);
-		fprintf(stderr,"WingType: %d\n",wing->WingType);
+		//fprintf(stderr,"index: %d\n",index);
+		//fprintf(stderr,"WingType: %d\n",wing->WingType);
 
 		/* [deg] Angle of Attack at the maximum of coefficient of lift */
 		wing->AoAatMax = GfParmGetNum(hdle, WingSect[index], PRM_AOAATMAX, (char*) "deg", 90);	
-		fprintf(stderr,"AoAatMax: %g\n",wing->AoAatMax);
+		//fprintf(stderr,"AoAatMax: %g\n",wing->AoAatMax);
 
 		/* [deg] Angle of Attack at coefficient of lift = 0 (-30 < AoAatZero < 0) */
 		wing->AoAatZero = GfParmGetNum(hdle, WingSect[index], PRM_AOAATZERO, (char*) "deg", 0);
-		fprintf(stderr,"AoAatZero: %g\n",wing->AoAatZero);
+		//fprintf(stderr,"AoAatZero: %g\n",wing->AoAatZero);
 		wing->AoAatZRad = (tdble) (wing->AoAatZero/180*PI);
 
 		/* [deg] Offset for Angle of Attack */
 		wing->AoAOffset = GfParmGetNum(hdle, WingSect[index], PRM_AOAOFFSET, (char*) "deg", 0);	
-		fprintf(stderr,"AoAOffset: %g\n",wing->AoAOffset);
+		//fprintf(stderr,"AoAOffset: %g\n",wing->AoAOffset);
 
 		/* Maximum of coefficient of lift (0 < CliftMax < 4) */
 		wing->CliftMax = GfParmGetNum(hdle, WingSect[index], PRM_CLMAX, (char*)NULL, 4);
-		fprintf(stderr,"CliftMax: %g\n",wing->CliftMax);
+		//fprintf(stderr,"CliftMax: %g\n",wing->CliftMax);
 
 		/* Coefficient of lift at Angle of Attack = 0 */
 		wing->CliftZero = GfParmGetNum(hdle, WingSect[index], PRM_CLATZERO, (char*)NULL, 0);
-		fprintf(stderr,"CliftZero: %g\n",wing->CliftZero);
+		//fprintf(stderr,"CliftZero: %g\n",wing->CliftZero);
 
 		/* Asymptotic coefficient of lift at large Angle of Attack */
 		wing->CliftAsymp = GfParmGetNum(hdle, WingSect[index], PRM_CLASYMP, (char*)NULL, wing->CliftMax);
-		fprintf(stderr,"CliftAsymp: %g\n",wing->CliftAsymp);
+		//fprintf(stderr,"CliftAsymp: %g\n",wing->CliftAsymp);
 
 		/* Delay of decreasing */
 		wing->b = GfParmGetNum(hdle, WingSect[index], PRM_DELAYDECREASE, (char*)NULL, 20);			
-		fprintf(stderr,"b: %g\n",wing->b);
+		//fprintf(stderr,"b: %g\n",wing->b);
 
 		/* Curvature of start of decreasing */
 		wing->c = GfParmGetNum(hdle, WingSect[index], PRM_CURVEDECREASE, (char*)NULL, 2);						
-		fprintf(stderr,"c: %g\n",wing->c);
+		//fprintf(stderr,"c: %g\n",wing->c);
 
 		/* Scale factor for angle */
 		wing->f = (tdble) (90.0 / (wing->AoAatMax + wing->AoAOffset));			
-		fprintf(stderr,"f: %g\n",wing->f);
+		//fprintf(stderr,"f: %g\n",wing->f);
 		double phi = wing->f * (wing->AoAOffset);
-		fprintf(stderr,"phi: %g deg\n",phi);
+		//fprintf(stderr,"phi: %g deg\n",phi);
 		phi *= PI / 180;
-		fprintf(stderr,"phi: %g rad\n",phi);
+		//fprintf(stderr,"phi: %g rad\n",phi);
 		double sinphi = sin(phi);
-		fprintf(stderr,"sinphi: %g\n",sinphi);
+		//fprintf(stderr,"sinphi: %g\n",sinphi);
 		double sinphi2 = sinphi * sinphi;
 
 		/* Scale at AoA = 0 */
 		wing->d = (tdble) (1.8f * (sinphi2 * wing->CliftMax - wing->CliftZero));	
-		fprintf(stderr,"d: %g\n",wing->d);
+		//fprintf(stderr,"d: %g\n",wing->d);
 	}
 	else if (wing->WingType = 2)
 	{
@@ -224,24 +224,24 @@ SimWingConfig(tCar *car, int index)
 	    if (index == 1)
 		{
 			car->aero.Cd = car->aero.CdBody - wing->Kx*sin(wing->angle);
-			fprintf(stderr,"Kz: %g Kx: %g\n",wing->Kz,wing->Kx);
-			fprintf(stderr,"car->aero.Cd: %g angle: %g\n",car->aero.Cd,wing->angle*180/PI);
+			//fprintf(stderr,"Kz: %g Kx: %g\n",wing->Kz,wing->Kx);
+			//fprintf(stderr,"car->aero.Cd: %g angle: %g\n",car->aero.Cd,wing->angle*180/PI);
 		}
 	}
 	else if (wing->WingType == 1) 
 	{
         wing->Kz = CliftFromAoA(wing) * wing->Kx;
-		fprintf(stderr,"Kz: %g Kx: %g\n",wing->Kz,wing->Kx);
+		//fprintf(stderr,"Kz: %g Kx: %g\n",wing->Kz,wing->Kx);
 
 		if (index == 0)
 		{
 			car->aero.Cd = (tdble)(car->aero.CdBody - wing->Kx*sin(wing->angle - wing->AoAatZRad));
-			fprintf(stderr,"car->aero.Cd: %g wing->Kx: %g angle: %g wing->AoAatZero: %g\n",car->aero.Cd,wing->Kx,wing->angle*180/PI,wing->AoAatZero);
+			//fprintf(stderr,"car->aero.Cd: %g wing->Kx: %g angle: %g wing->AoAatZero: %g\n",car->aero.Cd,wing->Kx,wing->angle*180/PI,wing->AoAatZero);
 		}
 		else
 		{
 			car->aero.Cd -= (tdble)(wing->Kx*sin(wing->angle - wing->AoAatZRad));
-			fprintf(stderr,"car->aero.Cd: %g wing->Kx: %g wing->angle: %g wing->AoAatZero: %g\n",car->aero.Cd,wing->Kx,wing->angle*180/PI,wing->AoAatZero);
+			//fprintf(stderr,"car->aero.Cd: %g wing->Kx: %g wing->angle: %g wing->AoAatZero: %g\n",car->aero.Cd,wing->Kx,wing->angle*180/PI,wing->AoAatZero);
 		}
 	}
 	else /* if (wing->WingType == 2) */

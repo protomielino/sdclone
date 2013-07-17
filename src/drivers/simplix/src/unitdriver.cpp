@@ -2259,7 +2259,7 @@ tdble F(tWing* wing)
 tdble CliftFromAoA(tWing* wing)
 {
 	tdble angle = (tdble) (wing->angle * 180/PI);
-	fprintf(stderr,"wing->angle: %g rad = angle: %g deg\n",wing->angle,angle);
+	//fprintf(stderr,"wing->angle: %g rad = angle: %g deg\n",wing->angle,angle);
 
 	wing->Kz_org = 4.0f * wing->Kx;
 
@@ -2268,15 +2268,15 @@ tdble CliftFromAoA(tWing* wing)
 	if (angle <= wing->AoAatMax)
 	{
 		wing->a = wing->f * (angle + wing->AoAOffset);
-		fprintf(stderr,"a: %g\n",wing->a);
+		//fprintf(stderr,"a: %g\n",wing->a);
 		s = sin(wing->a/180.0*PI);
-		fprintf(stderr,"s: %g\n",s);
+		//fprintf(stderr,"s: %g\n",s);
 		return (tdble)(s * s * (wing->CliftMax + wing->d) - wing->d);
 	}
 	else
 	{
 		wing->a = (angle - wing->AoAatMax - 90.0f);
-		fprintf(stderr,"a: %g F(a): %g\n",wing->a,F(wing));
+		//fprintf(stderr,"a: %g F(a): %g\n",wing->a,F(wing));
 		return (tdble)(wing->CliftMax - F(wing) * (wing->CliftMax - wing->CliftAsymp));
 	}
 }
@@ -2387,63 +2387,63 @@ void TDriver::InitCa()
 	  {
 		wing->angle = RearWingAngle;
 	  }
-	  fprintf(stderr,"wing->angle: %g\n",wing->angle*180/PI);
+	  //fprintf(stderr,"wing->angle: %g\n",wing->angle*180/PI);
 
-	  fprintf(stderr,"index: %d\n",index);
-	  fprintf(stderr,"WingType: %d\n",wing->WingType);
+	  //fprintf(stderr,"index: %d\n",index);
+	  //fprintf(stderr,"WingType: %d\n",wing->WingType);
 
 	  /* [deg] Angle of Attack at the maximum of coefficient of lift */
 	  wing->AoAatMax = GfParmGetNum(oCarHandle, WingSect[index], PRM_AOAATMAX, (char*) "deg", 90);	
-	  fprintf(stderr,"AoAatMax: %g\n",wing->AoAatMax);
+	  //fprintf(stderr,"AoAatMax: %g\n",wing->AoAatMax);
 
 	  /* [deg] Angle of Attack at coefficient of lift = 0 (-30 < AoAatZero < 0) */
 	  wing->AoAatZero = GfParmGetNum(oCarHandle, WingSect[index], PRM_AOAATZERO, (char*) "deg", 0);
-	  fprintf(stderr,"AoAatZero: %g\n",wing->AoAatZero);
+	  //fprintf(stderr,"AoAatZero: %g\n",wing->AoAatZero);
 	  wing->AoAatZRad = (tdble) (wing->AoAatZero/180*PI);
 
 	  /* [deg] Offset for Angle of Attack */
 	  wing->AoAOffset = GfParmGetNum(oCarHandle, WingSect[index], PRM_AOAOFFSET, (char*) "deg", 0);	
-	  fprintf(stderr,"AoAOffset: %g\n",wing->AoAOffset);
+	  //fprintf(stderr,"AoAOffset: %g\n",wing->AoAOffset);
 
 	  /* Maximum of coefficient of lift (0 < CliftMax < 4) */
 	  wing->CliftMax = GfParmGetNum(oCarHandle, WingSect[index], PRM_CLMAX, (char*)NULL, 4);
-	  fprintf(stderr,"CliftMax: %g\n",wing->CliftMax);
+	  //fprintf(stderr,"CliftMax: %g\n",wing->CliftMax);
 
 	  /* Coefficient of lift at Angle of Attack = 0 */
 	  wing->CliftZero = GfParmGetNum(oCarHandle, WingSect[index], PRM_CLATZERO, (char*)NULL, 0);
-	  fprintf(stderr,"CliftZero: %g\n",wing->CliftZero);
+	  //fprintf(stderr,"CliftZero: %g\n",wing->CliftZero);
 
 	  /* Asymptotic coefficient of lift at large Angle of Attack */
 	  wing->CliftAsymp = GfParmGetNum(oCarHandle, WingSect[index], PRM_CLASYMP, (char*)NULL, wing->CliftMax);
-	  fprintf(stderr,"CliftAsymp: %g\n",wing->CliftAsymp);
+	  //fprintf(stderr,"CliftAsymp: %g\n",wing->CliftAsymp);
 
 	  /* Delay of decreasing */
 	  wing->b = GfParmGetNum(oCarHandle, WingSect[index], PRM_DELAYDECREASE, (char*)NULL, 20);			
-	  fprintf(stderr,"b: %g\n",wing->b);
+	  //fprintf(stderr,"b: %g\n",wing->b);
 
 	  /* Curvature of start of decreasing */
 	  wing->c = GfParmGetNum(oCarHandle, WingSect[index], PRM_CURVEDECREASE, (char*)NULL, 2);						
-	  fprintf(stderr,"c: %g\n",wing->c);
+	  //fprintf(stderr,"c: %g\n",wing->c);
 
 	  /* Scale factor for angle */
 	  wing->f = (tdble) (90.0 / (wing->AoAatMax + wing->AoAOffset));			
-	  fprintf(stderr,"f: %g\n",wing->f);
+	  //fprintf(stderr,"f: %g\n",wing->f);
 	  phi = wing->f * (wing->AoAOffset);
-	  fprintf(stderr,"phi: %g deg\n",phi);
+	  //fprintf(stderr,"phi: %g deg\n",phi);
 	  phi *= PI / 180;
-	  fprintf(stderr,"phi: %g rad\n",phi);
+	  //fprintf(stderr,"phi: %g rad\n",phi);
 	  sinphi = sin(phi);
-	  fprintf(stderr,"sinphi: %g\n",sinphi);
+	  //fprintf(stderr,"sinphi: %g\n",sinphi);
 	  sinphi2 = sinphi * sinphi;
 
 	  /* Scale at AoA = 0 */
 	  wing->d = (tdble) (1.8f * (sinphi2 * wing->CliftMax - wing->CliftZero));	
-	  fprintf(stderr,"d: %g\n",wing->d);
+	  //fprintf(stderr,"d: %g\n",wing->d);
 
   	  if (index == 0)
 	  {
         CliftFrnt = CliftFromAoA(wing);
-	    fprintf(stderr,"CliftFrnt: %g\n",CliftFrnt);
+	    //fprintf(stderr,"CliftFrnt: %g\n",CliftFrnt);
         FrontWingAreaCd = FrontWingArea * sin(FrontWingAngle - wing->AoAatZRad);
         Param.Fix.oCaFrontWing = CliftFrnt * 1.23 * FrontWingAreaCd;
         MeanCliftFromAoA = CliftFrnt;
@@ -2451,7 +2451,7 @@ void TDriver::InitCa()
 	  else
 	  {
         CliftRear = CliftFromAoA(wing);
-	    fprintf(stderr,"CliftFrnt: %g\n",CliftRear);
+	    //fprintf(stderr,"CliftFrnt: %g\n",CliftRear);
         RearWingAreaCd = RearWingArea * sin(RearWingAngle - wing->AoAatZRad);
         Param.Fix.oCaRearWing = CliftRear * 1.23 * RearWingAreaCd;
 		if (CliftFrnt > 0)
