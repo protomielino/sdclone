@@ -111,7 +111,9 @@ SDRender::~SDRender(void)
     m_RealRoot = NULL;
 
     delete thesky;
+	delete scenery;
     thesky = NULL;
+	scenery = NULL;
     SDTrack = NULL;
 }
 
@@ -659,7 +661,7 @@ void SDRender::UpdateSky(double currentTime, double accelTime)
     }
 
     // At each call, update possibly high speed objects of the sky dome : the clouds.
-    SDScenery * scenery = (SDScenery *)getScenery();
+    scenery = (SDScenery *)getScenery();
     double r_WrldX = scenery->getWorldX();
     double r_WrldY = scenery->getWorldY();
     //double r_WrldZ = SDScenery::getWorldZ();

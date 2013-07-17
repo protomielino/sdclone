@@ -84,6 +84,7 @@ private:
     float sky_brightness;
 
     SDSky *thesky;
+	SDScenery *scenery;
     tTrack *SDTrack;
 
 public:
