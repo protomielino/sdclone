@@ -943,7 +943,7 @@ grUpdateSky(double currentTime, double accelTime)
 		}
 
 		lastTimeHighSpeed = currentTime;
-		lastTimeLowSpeed = 60 * (int)floor(accelTime / 60.0);
+		lastTimeLowSpeed = 60 * (int)floor((accelTime + 60.0) / 60.0);
 
 		bInitialized = true;
 		return;
