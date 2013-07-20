@@ -27,9 +27,9 @@ typedef struct
     tdble	lift[2];	/* front & rear lift force along car z axis */
 
     /* static */
-    tdble	SCx2;
+    //tdble	SCx2;       replaced by CdBody as initial Cd
     tdble	Clift[2];	/* front & rear lift due to body not wings */
-    tdble	Cd;		    /* for aspiration */
+    tdble	Cd;		    /* for aspiration, value updated depending on wing angles */
     tdble	CdBody;	    /* for aspiration, value without wings, for variable wing angles */
 } tAero;
 

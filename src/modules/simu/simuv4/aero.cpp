@@ -31,9 +31,8 @@ SimAeroConfig(tCar *car)
     FrntArea = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FRNTAREA, (char*)NULL, 2.5f);
     car->aero.Clift[0] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FCL, (char*)NULL, 0.0f);
     car->aero.Clift[1] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_RCL, (char*)NULL, 0.0f);
-    car->aero.SCx2 = 0.645f * Cx * FrntArea;
-    car->aero.Cd += car->aero.SCx2;
-    car->aero.CdBody = car->aero.Cd;
+    car->aero.CdBody = 0.645f * Cx * FrntArea;
+    car->aero.Cd = car->aero.CdBody;
 }
 
 
@@ -92,7 +91,7 @@ SimAeroUpdate(tCar *car, tSituation *s)
 	//tdble speed = sqrt(car->DynGC.vel.x*car->DynGC.vel.x + car->DynGC.vel.y*car->DynGC.vel.y);
 	//tdble cosa = 1.0f;
 	
-    car->aero.drag = (tdble) (-SIGN(car->DynGC.vel.x) * car->aero.SCx2 * v2 * (1.0f + (tdble)car->dammage / 10000.0f) * dragK * dragK);
+    car->aero.drag = (tdble) (-SIGN(car->DynGC.vel.x) * car->aero.CdBody * v2 * (1.0f + (tdble)car->dammage / 10000.0f) * dragK * dragK);
 
     hm = 1.5f * (car->wheel[0].rideHeight + car->wheel[1].rideHeight + car->wheel[2].rideHeight + car->wheel[3].rideHeight);
     hm = hm*hm;
