@@ -41,28 +41,28 @@ typedef struct
     tdble	Kx;
     tdble	Kz;
     tdble	Kz_org;
-	tdble	angle;
+    tdble	angle;
     
     /* static */
     t3Dd	staticPos;
 
 //>>> simuV4
     /* static for wings with const angle */
-	tdble	AoAatMax;	/* [deg] Angle of Attack at the maximum of coefficient of lift */
-	tdble	AoAatZero;	/* [deg] Angle of Attack at coefficient of lift = 0 (-30 < AoAatZero < 0) */
-	tdble	AoAatZRad;	/* [rad] Angle of Attack at coefficient of lift = 0 (-30 < AoAatZero < 0) */
-	tdble	AoAOffset;	/* [deg] Offset for Angle of Attack */
+    tdble	AoAatMax;	/* [deg] Angle of Attack at the maximum of coefficient of lift */
+    tdble	AoAatZero;	/* [deg] Angle of Attack at coefficient of lift = 0 (-30 < AoAatZero < 0) */
+    tdble	AoAatZRad;	/* [rad] Angle of Attack at coefficient of lift = 0 (-30 < AoAatZero < 0) */
+    tdble	AoAOffset;	/* [deg] Offset for Angle of Attack */
 
-	tdble	CliftMax;	/* Maximum of coefficient of lift (0 < CliftMax < 4) */
-	tdble	CliftZero;	/* Coefficient of lift at Angle of Attack = 0 */
-	tdble	CliftAsymp;	/* Asymptotic coefficient of lift at large Angle of Attack */
-	tdble	a;			/* [deg] Scaled angle at decreasing */
-	tdble	b;			/* Delay of decreasing */
-	tdble	c;			/* Curvature of start of decreasing */
-	tdble	d;			/* Scale at AoA = 0 */
-	tdble	f;			/* Scale factor */
+    tdble	CliftMax;	/* Maximum of coefficient of lift (0 < CliftMax < 4) */
+    tdble	CliftZero;	/* Coefficient of lift at Angle of Attack = 0 */
+    tdble	CliftAsymp;	/* Asymptotic coefficient of lift at large Angle of Attack */
+    tdble	a;			/* [deg] Scaled angle at decreasing */
+    tdble	b;			/* Delay of decreasing */
+    tdble	c;			/* Curvature of start of decreasing */
+    tdble	d;			/* Scale at AoA = 0 */
+    tdble	f;			/* Scale factor */
 
-	int		WingType;	/* 0=FLAT, 1=PROFILE, ... */
+    int		WingType;	/* -1=None, 0=FLAT, 1=PROFILE, ... */
 //<<< simuV4
 } tWing;
 

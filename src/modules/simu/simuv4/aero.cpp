@@ -140,7 +140,7 @@ SimWingConfig(tCar *car, int index)
     tdble area;
 
     area              = GfParmGetNum(hdle, WingSect[index], PRM_WINGAREA, (char*)NULL, 0);
-	wing->angle       = GfParmGetNum(hdle, WingSect[index], PRM_WINGANGLE, (char*)NULL, 0);
+    wing->angle       = GfParmGetNum(hdle, WingSect[index], PRM_WINGANGLE, (char*)NULL, 0);
     wing->staticPos.x = GfParmGetNum(hdle, WingSect[index], PRM_XPOS, (char*)NULL, 0);
     wing->staticPos.z = GfParmGetNum(hdle, WingSect[index], PRM_ZPOS, (char*)NULL, 0);
     wing->staticPos.y = 0.0;
@@ -150,15 +150,17 @@ SimWingConfig(tCar *car, int index)
 
     wing->WingType = 0; // Default if nothing is contained in the wing section
 
-	if (strncmp(w,"FLAT",4) == 0)
+	if (area == 0)
+	  wing->WingType = -1;
+	else if (strncmp(w,"FLAT",4) == 0)
 	  wing->WingType = 0;
 	else if (strncmp(w,"PROFILE",7) == 0)
 	  wing->WingType = 1;
-	else if (strncmp(w,"THIN",2) == 0)
+	else if (strncmp(w,"THIN",4) == 0)
 	  wing->WingType = 2; // Kristof: For your new model
 	// ...
 
-	if (wing->WingType = 1)
+	if (wing->WingType == 1)
 	{
 		//fprintf(stderr,"index: %d\n",index);
 		//fprintf(stderr,"WingType: %d\n",wing->WingType);
@@ -211,7 +213,7 @@ SimWingConfig(tCar *car, int index)
 		wing->d = (tdble) (1.8f * (sinphi2 * wing->CliftMax - wing->CliftZero));	
 		//fprintf(stderr,"d: %g\n",wing->d);
 	}
-	else if (wing->WingType = 2)
+	else if (wing->WingType == 2)
 	{
 		// Kristof: Get parameters for the new modell
 	}
@@ -255,6 +257,12 @@ void
 SimWingUpdate(tCar *car, int index, tSituation* s)
 {
     tWing  *wing = &(car->wing[index]);
+
+	/* return with 0 if no wing present */
+	if (wing->WingType == -1) {
+	    wing->forces.x = wing->forces.z = 0.0f;
+	    return;
+	}
 
 	if (index == 1) {
 		// Check wing angle controller
