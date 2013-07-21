@@ -649,6 +649,10 @@ typedef struct CarElt
 #define PRM_DELAYDECREASE	"clift delay"
 #define PRM_CURVEDECREASE	"clift curve"
 
+#define PRM_ANGLEOFSTALL	"angle of stall"
+#define PRM_STALLWIDTH		"stall width"
+#define PRM_ASPECTRATIO		"aspect ratio"
+
 /* Engine */
 #define PRM_REVSLIM		"revs limiter"
 #define PRM_REVSMAX		"revs maxi"

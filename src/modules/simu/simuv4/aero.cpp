@@ -21,6 +21,8 @@
 
 #include "sim.h"
 
+tdble rho = 2.0;//1.290; /* air density, prepeare for variable environment */
+
 void 
 SimAeroConfig(tCar *car)
 {
@@ -214,7 +216,13 @@ SimWingConfig(tCar *car, int index)
 	}
 	else if (wing->WingType == 2)
 	{
-		// Kristof: Get parameters for the new modell
+		wing->AoAatZero = GfParmGetNum(hdle, WingSect[index], PRM_AOAATZERO, (char*)NULL, 0);
+			wing->AoAatZero = MAX(MIN(wing->AoAatZero, 0), -PI_6);
+		wing->AoStall = GfParmGetNum(hdle, WingSect[index], PRM_ANGLEOFSTALL, (char*)NULL, PI_6*0.5);
+			wing->AoStall = MAX(MIN(wing->AoStall, PI_4), 0.017453293f);
+		wing->Stallw = GfParmGetNum(hdle, WingSect[index], PRM_STALLWIDTH, (char*)NULL, 0.034906585);
+			wing->Stallw = MAX(MIN(wing->Stallw, wing->AoStall), 0.017453293f);
+		wing->AR = GfParmGetNum(hdle, WingSect[index], PRM_ASPECTRATIO, (char*)NULL, 0);
 	}
 
 	wing->Kx = -1.23f * area;
@@ -245,9 +253,16 @@ SimWingConfig(tCar *car, int index)
 			//fprintf(stderr,"car->aero.Cd: %g wing->Kx: %g wing->angle: %g wing->AoAatZero: %g\n",car->aero.Cd,wing->Kx,wing->angle*180/PI,wing->AoAatZero);
 		}
 	}
-	else /* if (wing->WingType == 2) */
+	else if (wing->WingType == 2)
 	{
-		// Kristof: Do calculations needed for initialisation
+		if (wing->AR > 0.001) wing->Kz1 =  rho * area * PI * wing->AR / (wing->AR + 2);
+		    else wing->Kz1 = rho * area * PI;
+		wing->Kz2 = 0.5 * rho * area * 1.05;
+		wing->Kz3 = 0.5 * rho * area * 0.05;
+		wing->Kx1 = 0.5 * rho * area * 0.6;
+		wing->Kx2 = 0.5 * rho * area * 0.006;
+		wing->Kx3 = 0.5 * rho * area;
+		wing->Kx4 = 0.5 * rho * area * 0.9;
 	}
 }
 
@@ -282,7 +297,78 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
 
     aoa += wing->angle;
 
-    if (car->DynGC.vel.x > 0.0f)
+    if (wing->WingType == 2) //thin wing works for every direction
+	{
+	    tdble x;
+	    while (aoa > PI) aoa -= 2 * PI;
+	    while (aoa < -PI) aoa += 2 * PI;
+	    /* first calculate coefficients */
+	    if (aoa > PI_2)
+	    {
+		if (aoa > PI - wing->AoStall) wing->forces.x = wing->Kx1 * (PI - aoa) * (PI - aoa) + wing->Kx2;
+		else wing->forces.x = wing->Kx3 - wing->Kx4 * cos(2*aoa);
+		if (aoa > PI - wing->AoStall + wing->Stallw)
+		    {x = (tdble)0.0;}
+		else
+		{
+		    x = aoa - PI + wing->AoStall - wing->Stallw;
+		    x = x * x / (x * x + wing->Stallw * wing->Stallw);
+		}
+		wing->forces.z = -(1-x) * wing->Kz1 * (aoa - PI + wing->AoAatZero) - x * (wing->Kz2 * sin(2*aoa) + wing->Kz3);
+	    }
+	    else if (aoa > 0)
+	    {
+		if (aoa < wing->AoStall) wing->forces.x = wing->Kx1 * aoa * aoa + wing->Kx2;
+		else wing->forces.x = wing->Kx3 - wing->Kx4 * cos(2*aoa);
+		if (aoa < wing->AoStall - wing->Stallw)
+		    {x = (tdble)0.0;}
+		else
+		{
+		    x = aoa - wing->AoStall + wing->Stallw;
+		    x = x * x / (x * x + wing->Stallw * wing->Stallw);
+		}
+		wing->forces.z = -(1-x) * wing->Kz1 * (aoa - wing->AoAatZero) - x * (wing->Kz2 * sin(2*aoa) + wing->Kz3);
+	    }
+	    else if (aoa > -PI_2)
+	    {
+		if (aoa > -wing->AoStall) wing->forces.x = wing->Kx1 * aoa * aoa + wing->Kx2;
+		else wing->forces.x = wing->Kx3 - wing->Kx4 * cos(2*aoa);
+		if (aoa > -wing->AoStall + wing->Stallw)
+		    {x = (tdble)0.0;}
+		else
+		{
+		    x = aoa + wing->AoStall - wing->Stallw;
+		    x = x * x / (x * x + wing->Stallw * wing->Stallw);
+		}
+		wing->forces.z = -(1-x) * wing->Kz1 * (aoa - wing->AoAatZero) - x * (wing->Kz2 * sin(2*aoa) - wing->Kz3);
+	    }
+	    else
+	    {
+		if (aoa < wing->AoStall - PI) wing->forces.x = wing->Kx1 * (PI + aoa) * (PI + aoa) + wing->Kx2;
+		else wing->forces.x = wing->Kx3 - wing->Kx4 * cos(2*aoa);
+		if (aoa < wing->AoStall - wing->Stallw - PI)
+		    {x = (tdble)0.0;}
+		else
+		{
+		    x = aoa - wing->AoStall + wing->Stallw + PI;
+		    x = x * x / (x * x + wing->Stallw * wing->Stallw);
+		}
+		wing->forces.z = -(1-x) * wing->Kz1 * (aoa + wing->AoAatZero + PI) - x * (wing->Kz2 * sin(2*aoa) - wing->Kz3);
+	    }
+	    /* then multiply with the square of velocity */
+	    wing->forces.x *= - car->DynGC.vel.x * fabs(car->DynGC.vel.x);
+	    wing->forces.z *= vt2;
+	    
+	    /* add induced drag */
+	    if (wing->AR > 0.001)
+	    {
+		if (wing->forces.x > 0.0)
+			wing->forces.x += wing->forces.z * wing->forces.z / (wing->AR * 2.8274); //0.9*PI
+		else wing->forces.x -= wing->forces.z * wing->forces.z / (wing->AR * 2.8274);
+	    }
+	    wing->forces.x *= (1.0f + (tdble)car->dammage / 10000.0);
+	}
+    else if (car->DynGC.vel.x > 0.0f)
 	{
 		if (wing->WingType == 0)
 		{

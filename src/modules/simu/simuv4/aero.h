@@ -61,8 +61,15 @@ typedef struct
     tdble	c;			/* Curvature of start of decreasing */
     tdble	d;			/* Scale at AoA = 0 */
     tdble	f;			/* Scale factor */
+    
+    /* parameters for THIN wing model */
+    tdble   AoStall;    /* angle of stall =15 deg (1 < AoStall < 45 in degrees) */
+    tdble   Stallw;     /* stall width =2 deg, (1 < Stallw < AoStall) */
+    tdble   AR;         /* effective aspect ratio of wing, 0 means infinite, must be positive */
+    tdble   Kx1, Kx2, Kx3, Kx4;
+    tdble   Kz1, Kz2, Kz3;
 
-    int		WingType;	/* -1=None, 0=FLAT, 1=PROFILE, ... */
+    int		WingType;	/* -1=None, 0=FLAT, 1=PROFILE, 2=THIN... */
 //<<< simuV4
 } tWing;
 
