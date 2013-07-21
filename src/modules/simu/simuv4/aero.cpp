@@ -21,7 +21,7 @@
 
 #include "sim.h"
 
-tdble rho = 2.0;//1.290; /* air density, prepeare for variable environment */
+tdble rho = 1.290; /* air density, prepare for variable environment */
 
 void 
 SimAeroConfig(tCar *car)
