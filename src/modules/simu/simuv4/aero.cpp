@@ -355,9 +355,6 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
 		}
 		wing->forces.z = -(1-x) * wing->Kz1 * (aoa + wing->AoAatZero + PI) - x * (wing->Kz2 * sin(2*aoa) - wing->Kz3);
 	    }
-	    /* then multiply with the square of velocity */
-	    wing->forces.x *= - car->DynGC.vel.x * fabs(car->DynGC.vel.x);
-	    wing->forces.z *= vt2;
 	    
 	    /* add induced drag */
 	    if (wing->AR > 0.001)
@@ -366,6 +363,10 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
 			wing->forces.x += wing->forces.z * wing->forces.z / (wing->AR * 2.8274); //0.9*PI
 		else wing->forces.x -= wing->forces.z * wing->forces.z / (wing->AR * 2.8274);
 	    }
+	    
+	    /* then multiply with the square of velocity */
+	    wing->forces.x *= - car->DynGC.vel.x * fabs(car->DynGC.vel.x);
+	    wing->forces.z *= vt2;
 	    wing->forces.x *= (1.0f + (tdble)car->dammage / 10000.0);
 	}
     else if (car->DynGC.vel.x > 0.0f)
