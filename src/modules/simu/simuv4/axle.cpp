@@ -20,25 +20,30 @@
 #include "sim.h"
 
 static const char *AxleSect[2] = {SECT_FRNTAXLE, SECT_REARAXLE};
+static const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 
 void SimAxleConfig(tCar *car, int index)
 {
 	void	*hdle = car->params;
-	tdble	rollCenter;
+	tdble	rollCenter, x0r, x0l;
 	
 	tAxle *axle = &(car->axle[index]);
 	
 	axle->xpos = GfParmGetNum(hdle, AxleSect[index], PRM_XPOS, (char*)NULL, 0.0f);
 	axle->I    = GfParmGetNum(hdle, AxleSect[index], PRM_INERTIA, (char*)NULL, 0.15f);
+	x0r        = GfParmGetNum(hdle, WheelSect[index*2], PRM_RIDEHEIGHT, (char*)NULL, 0.20f);
+	x0l        = GfParmGetNum(hdle, WheelSect[index*2+1], PRM_RIDEHEIGHT, (char*)NULL, 0.20f);
 	rollCenter = GfParmGetNum(hdle, AxleSect[index], PRM_ROLLCENTER, (char*)NULL, 0.15f);
 	car->wheel[index*2].rollCenter = car->wheel[index*2+1].rollCenter = rollCenter;
 	
 	if (index == 0) {
 		SimSuspConfig(hdle, SECT_FRNTARB, &(axle->arbSusp), 0, 0);
 		axle->arbSusp.spring.K = -axle->arbSusp.spring.K;
+		SimSuspConfig(hdle, SECT_FRNTHEAVE, &(axle->heaveSusp), 0.0, 0.5*(x0r+x0l));
 	} else {
 		SimSuspConfig(hdle, SECT_REARARB, &(axle->arbSusp), 0, 0);
 		axle->arbSusp.spring.K = -axle->arbSusp.spring.K;
+		SimSuspConfig(hdle, SECT_REARHEAVE, &(axle->heaveSusp), 0.0, 0.5*(x0r+x0l));
 	}
 	
 	car->wheel[index*2].feedBack.I += (tdble) (axle->I / 2.0);
@@ -69,6 +74,13 @@ void SimAxleUpdate(tCar *car, int index)
 	car->wheel[index*2].axleFz =  + sgn * f;
 	// left
 	car->wheel[index*2+1].axleFz = - sgn * f;
+	
+	/* heave/center spring */
+	axle->heaveSusp.x = 0.5 * (stl + str);
+	SimSuspUpdate(&(axle->heaveSusp));
+	f = 0.5 * axle->heaveSusp.force;
+	car->wheel[index*2].axleFz += f;
+	car->wheel[index*2+1].axleFz += f;
 }
 
 

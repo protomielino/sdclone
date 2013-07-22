@@ -29,6 +29,7 @@ typedef struct
     tdble xpos;
 
     tSuspension arbSusp;	/* anti-roll bar */
+    tSuspension heaveSusp;  /* heave/3rd/central spring */
     tdble	wheight0;
 
     /* dynamic */
