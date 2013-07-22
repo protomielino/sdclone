@@ -255,14 +255,15 @@ SimWingConfig(tCar *car, int index)
 	}
 	else if (wing->WingType == 2)
 	{
-		if (wing->AR > 0.001) wing->Kz1 =  rho * area * PI * wing->AR / (wing->AR + 2);
-		    else wing->Kz1 = rho * area * PI;
-		wing->Kz2 = 0.5 * rho * area * 1.05;
-		wing->Kz3 = 0.5 * rho * area * 0.05;
-		wing->Kx1 = 0.5 * rho * area * 0.6;
-		wing->Kx2 = 0.5 * rho * area * 0.006;
-		wing->Kx3 = 0.5 * rho * area;
-		wing->Kx4 = 0.5 * rho * area * 0.9;
+		if (wing->AR > 0.001) wing->Kz1 =  2 * PI * wing->AR / (wing->AR + 2);
+		    else wing->Kz1 = 2 * PI;
+		wing->Kx = 0.5 * rho * area;
+		wing->Kz2 = 1.05;
+		wing->Kz3 = 0.05;
+		wing->Kx1 = 0.6;
+		wing->Kx2 = 0.006;
+		wing->Kx3 = 1.0;
+		wing->Kx4 = 0.9;
 	}
 }
 
@@ -364,10 +365,9 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
 		else wing->forces.x -= wing->forces.z * wing->forces.z / (wing->AR * 2.8274);
 	    }
 	    
-	    /* then multiply with the square of velocity */
-	    wing->forces.x *= - car->DynGC.vel.x * fabs(car->DynGC.vel.x);
-	    wing->forces.z *= vt2;
-	    wing->forces.x *= (1.0f + (tdble)car->dammage / 10000.0);
+	    /* then multiply with 0.5*rho*area and the square of velocity */
+	    wing->forces.x *= - car->DynGC.vel.x * fabs(car->DynGC.vel.x) * wing->Kx * (1.0f + (tdble)car->dammage / 10000.0);
+	    wing->forces.z *= wing->Kx * vt2;
 	}
     else if (car->DynGC.vel.x > 0.0f)
 	{
