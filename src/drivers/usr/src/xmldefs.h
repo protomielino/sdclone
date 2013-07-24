@@ -66,6 +66,7 @@
 #define PRV_END               "end"
 #define PRV_OFFTRACK_ALLOWED  "offtrack allowed"
 #define PRV_OFFTRACK_RLIMIT   "rough limit"
+#define PRV_AVOID_OFFSET      "avoid offset"
 
 // driver values
 #define PRV_PIT_DAMAGE        "pit damage"

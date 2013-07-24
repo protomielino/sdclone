@@ -33,8 +33,7 @@
 #include <robottools.h>
 #include <robot.h>
 
-#include "src/drivers/usr/src/driver.h"
-
+#include "driver.h"
 
 // Traditional TORCS Interface
 static void initTrack(int index, tTrack* track, void *carHandle,
@@ -50,14 +49,16 @@ extern "C" int usr(tModInfo *modInfo);
 // Speed Dreams Interface
 static const int BUFSIZE = 256;   // Buffer size for path/filename buffers
 static const int MAXNBBOTS = 20;  // Set value to max capacity
-static char const* defaultBotName[MAXNBBOTS] = {
+static char const* defaultBotName[MAXNBBOTS] =
+{
   "driver 1",  "driver 2",  "driver 3",  "driver 4",  "driver 5",
   "driver 6",  "driver 7",  "driver 8",  "driver 9",  "driver 10",
   "driver 11", "driver 12", "driver 13", "driver 14", "driver 15",
   "driver 16", "driver 17", "driver 18", "driver 19", "driver 20"
 };
 
-static char const* defaultBotDesc[MAXNBBOTS] = {
+static char const* defaultBotDesc[MAXNBBOTS] =
+{
   "driver 1",  "driver 2",  "driver 3",  "driver 4",  "driver 5",
   "driver 6",  "driver 7",  "driver 8",  "driver 9",  "driver 10",
   "driver 11", "driver 12", "driver 13", "driver 14", "driver 15",
@@ -96,7 +97,8 @@ static int robot_type;  //Decide if TRB, SC, GP36, LS or some other driver
 ////////////////////////////////////////////////////////////
 
 // Set robots's name
-static void setRobotName(const char *name) {
+static void setRobotName(const char *name)
+{
   strncpy(nameBuffer, name, BUFSIZE);
   GfOut("Robot Name: >%s<\n", robot_name);
 }
@@ -108,7 +110,8 @@ static void setRobotName(const char *name) {
 //  the global one, if the previous attempt failed.
 // @param
 // @return file handler for the robot XML file
-void* getFileHandle() {
+void* getFileHandle()
+{
   // First we try to use the directories relative to the installation path
   snprintf(pathBuffer, BUFSIZE, "%sdrivers/%s/%s.xml",
             GetLocalDir(), robot_name, robot_name);
@@ -116,7 +119,8 @@ void* getFileHandle() {
   // Test local installation path
   void *robot_settings = GfParmReadFile(xml_path, GFPARM_RMODE_STD);
 
-  if (!robot_settings) {
+  if (!robot_settings)
+  {
     // If not found, use global installation path
     snprintf(pathBuffer, BUFSIZE, "%sdrivers/%s/%s.xml",
             GetDataDir(), robot_name, robot_name);
@@ -132,48 +136,62 @@ void* getFileHandle() {
 ////////////////////////////////////////////////////////////
 
 // Schismatic init for usr_trb1
-void SetupUSR_trb1() {
+void SetupUSR_trb1()
+{
   // Add usr_trb1 specific initialization here
   robot_type = USR_TRB1;
 };
 
 // Schismatic init for usr_ls2
-void SetupUSR_ls2() {
+void SetupUSR_ls2()
+{
   // Add usr_ls2 specific initialization here
   robot_type = USR_LS2;
 };
 
 
 // Schismatic init for usr_sc
-void SetupUSR_sc() {
+void SetupUSR_sc()
+{
   // Add usr_sc specific initialization here
   robot_type = USR_SC;
 };
 
 
 // Schismatic init for usr_ls1
-void SetupUSR_ls1() {
+void SetupUSR_ls1()
+{
   // Add usr_ls1 specific initialization here
   robot_type = USR_LS1;
 };
 
 
 // Schismatic init for usr_36GP
-void SetupUSR_36GP() {
+void SetupUSR_36GP()
+{
   // Add usr_36GP specific initialization here
   robot_type = USR_36GP;
 };
 
 // Schismatic init for usr_rs
-void SetupUSR_rs() {
+void SetupUSR_rs()
+{
   // Add usr_RS specific initialization here
   robot_type = USR_RS;
 };
 
 // Schismatic init for usr_lp1
-void SetupUSR_lp1() {
+void SetupUSR_lp1()
+{
   // Add usr_LP1 specific initialization here
   robot_type = USR_LP1;
+};
+
+// Schismatic init for usr_mpa1
+void SetupUSR_mpa1()
+{
+  // Add usr_mpa1 specific initialization here
+  robot_type = USR_MPA1;
 };
 
 
@@ -182,12 +200,14 @@ void SetupUSR_lp1() {
 ////////////////////////////////////////////////////////////
 
 // Schismatic entry point for usr_trb1
-extern "C" int usr_trb1(tModInfo *ModInfo) {
+extern "C" int usr_trb1(tModInfo *ModInfo)
+{
   int ret = -1;
   setRobotName("usr_trb1");
   robot_type = USR_TRB1;
   void *robot_settings = getFileHandle();
-  if (robot_settings) {
+  if (robot_settings)
+  {
     ret = usr(ModInfo);
   }
   
@@ -210,12 +230,14 @@ extern "C" int usr_sc(tModInfo *ModInfo) {
 
 
 // Schismatic entry point for usr_ls2
-extern "C" int usr_ls2(tModInfo *ModInfo) {
+extern "C" int usr_ls2(tModInfo *ModInfo)
+{
   int ret = -1;
   setRobotName("usr_ls2");
   robot_type = USR_LS2;
   void *robot_settings = getFileHandle();
-  if (robot_settings) {
+  if (robot_settings)
+  {
     ret = usr(ModInfo);
   }
   
@@ -235,14 +257,30 @@ extern "C" int usr_ls1(tModInfo *ModInfo) {
   return ret;
 }
 
+// Schismatic entry point for usr_mpa1
+extern "C" int usr_mpa1(tModInfo *ModInfo)
+{
+  int ret = -1;
+  setRobotName("usr_mpa1");
+  robot_type = USR_MPA1;
+  void *robot_settings = getFileHandle();
+  if (robot_settings)
+  {
+    ret = usr(ModInfo);
+  }
+
+  return ret;
+}
 
 // Schismatic entry point for usr_36GP
-extern "C" int usr_36GP(tModInfo *ModInfo) {
+extern "C" int usr_36GP(tModInfo *ModInfo)
+{
   int ret = -1;
   setRobotName("usr_36GP");
   robot_type = USR_36GP;
   void *robot_settings = getFileHandle();
-  if (robot_settings) {
+  if (robot_settings)
+  {
     ret = usr(ModInfo);
   }
   
@@ -250,12 +288,14 @@ extern "C" int usr_36GP(tModInfo *ModInfo) {
 }
 
 // Schismatic entry point for usr_rs
-extern "C" int usr_rs(tModInfo *ModInfo) {
+extern "C" int usr_rs(tModInfo *ModInfo)
+{
   int ret = -1;
   setRobotName("usr_rs");
   robot_type = USR_RS;
   void *robot_settings = getFileHandle();
-  if (robot_settings) {
+  if (robot_settings)
+  {
     ret = usr(ModInfo);
   }
   
@@ -263,12 +303,14 @@ extern "C" int usr_rs(tModInfo *ModInfo) {
 }
 
 // Schismatic entry point for usr_LP1
-extern "C" int usr_lp1(tModInfo *ModInfo) {
+extern "C" int usr_lp1(tModInfo *ModInfo)
+{
   int ret = -1;
   setRobotName("usr_lp1");
   robot_type = USR_LP1;
   void *robot_settings = getFileHandle();
-  if (robot_settings) {
+  if (robot_settings)
+  {
     ret = usr(ModInfo);
   }
 
@@ -281,7 +323,8 @@ extern "C" int usr_lp1(tModInfo *ModInfo) {
 // Module entry point (new fixed name scheme), step #1.
 // Extended for use with schismatic robots
 extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
-                              tModWelcomeOut* welcomeOut) {
+                              tModWelcomeOut* welcomeOut)
+{
   // Save module name and loadDir, and determine module XML file pathname.
   setRobotName(welcomeIn->name);
 
@@ -290,7 +333,8 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
   GfOut("Robot XML-Path: %s\n\n", xml_path);
 
   // Let's look what we have to provide here
-  if (robot_settings) {
+  if (robot_settings)
+  {
     char section_buf[BUFSIZE];
     const char *section = section_buf;
     snprintf(section_buf, BUFSIZE, "%s/%s/%d",
@@ -301,17 +345,21 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
               ROB_ATTR_NAME, undefined);
 
     // Check whether index 0 is used as start index
-    if (strncmp(driver_name, undefined, strlen(undefined)) != 0) {
+    if (strncmp(driver_name, undefined, strlen(undefined)) != 0)
+    {
       // Teams xml file uses index 0, 1, ..., N - 1
       indexOffset = 0;
-    } else {
+    }
+    else
+    {
       // Teams xml file uses index 1, 2, ..., N
       indexOffset = 1;
     }
 
     // Loop over all possible drivers, clear all buffers,
     // save defined driver names and desc.
-    for (int i = 0; i < MAXNBBOTS; ++i) {
+    for (int i = 0; i < MAXNBBOTS; ++i)
+    {
       // Clear buffers
       memset(&DriverNames[i * DRIVERLEN], 0, DRIVERLEN);
       memset(&DriverDescs[i * DRIVERLEN], 0, DRIVERLEN);
@@ -321,7 +369,8 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
       const char *driver_name = GfParmGetStr(robot_settings, section,
                                             ROB_ATTR_NAME, undefined);
 
-      if (strncmp(driver_name, undefined, strlen(undefined)) != 0) {
+      if (strncmp(driver_name, undefined, strlen(undefined)) != 0)
+      {
         // This driver is defined in robot's xml-file
         strncpy(&DriverNames[i * DRIVERLEN], driver_name, DRIVERLEN - 1);
         const char *driver_desc = GfParmGetStr(robot_settings, section,
@@ -330,7 +379,9 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
         NBBOTS = i + 1;
       }
     }
-  } else {
+  }
+  else
+  {
     // For schismatic robots NBBOTS is unknown!
     // Handle error here
     NBBOTS = 0;
@@ -352,6 +403,9 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
     SetupUSR_rs();
   else if (strncmp(robot_name,"usr_lp1", strlen("usr_lp1")) == 0)
     SetupUSR_lp1();
+  else if (strncmp(robot_name,"usr_mpa1", strlen("usr_mpa1")) == 0)
+    SetupUSR_mpa1();
+
 
   // Set max nb of interfaces to return.
   welcomeOut->maxNbItf = NBBOTS;
@@ -361,14 +415,17 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
 
 
 // Module entry point (new fixed name scheme).
-extern "C" int moduleInitialize(tModInfo *modInfo) {
+extern "C" int moduleInitialize(tModInfo *modInfo)
+{
   GfOut("\n\nusr::moduleInitialize, from %s ...\n", xml_path);
   GfOut("NBBOTS: %d (of %d)\n", NBBOTS, MAXNBBOTS);
 
   // Clear all structures.
   memset(modInfo, 0, NBBOTS*sizeof(tModInfo));
   int i;
-  for (i = 0; i < NBBOTS; ++i) {
+
+  for (i = 0; i < NBBOTS; ++i)
+  {
     modInfo[i].name = &DriverNames[i * DRIVERLEN];
     modInfo[i].desc = &DriverDescs[i * DRIVERLEN];
     modInfo[i].fctInit = InitFuncPt;   // Init function.
@@ -383,14 +440,16 @@ extern "C" int moduleInitialize(tModInfo *modInfo) {
 
 
 // Module exit point (new fixed name scheme).
-extern "C" int moduleTerminate() {
+extern "C" int moduleTerminate()
+{
     GfOut("Terminated usr\n");
     return 0;
 }
 
 
 // Module interface initialization.
-static int InitFuncPt(int index, void *pt) {
+static int InitFuncPt(int index, void *pt)
+{
   tRobotItf *itf = reinterpret_cast<tRobotItf*>(pt);
 
   // Create robot instance for index.
@@ -408,19 +467,22 @@ static int InitFuncPt(int index, void *pt) {
 
 // Called for every track change or new race.
 static void initTrack(int index, tTrack* track, void *carHandle,
-                      void **carParmHandle, tSituation *s) {
+                      void **carParmHandle, tSituation *s)
+{
   driver[index-indexOffset]->initTrack(track, carHandle, carParmHandle, s);
 }
 
 
 // Start a new race.
-static void newRace(int index, tCarElt* car, tSituation *s) {
+static void newRace(int index, tCarElt* car, tSituation *s)
+{
   driver[index-indexOffset]->newRace(car, s);
 }
 
 
 // Drive during race.
-static void drive(int index, tCarElt* car, tSituation *s) {
+static void drive(int index, tCarElt* car, tSituation *s)
+{
   driver[index-indexOffset]->drive(s);
 }
 
@@ -432,13 +494,15 @@ static int pitcmd(int index, tCarElt* car, tSituation *s) {
 
 
 // End of the current race.
-static void endRace(int index, tCarElt *car, tSituation *s) {
+static void endRace(int index, tCarElt *car, tSituation *s)
+{
   driver[index-indexOffset]->endRace(s);
 }
 
 
 // Called before the module is unloaded.
-static void shutdown(int index) {
+static void shutdown(int index)
+{
   driver[index-indexOffset]->shutdown();
   delete driver[index-indexOffset];
 }
@@ -449,7 +513,8 @@ static void shutdown(int index) {
 ////////////////////////////////////////////////////////////
 
 // Module entry point (Torcs backward compatibility scheme).
-extern "C" int usr(tModInfo *modInfo) {
+extern "C" int usr(tModInfo *modInfo)
+{
   NBBOTS = 10;
   memset(DriverNames, 0, NBBOTS * DRIVERLEN);
   memset(DriverDescs, 0, NBBOTS * DRIVERLEN);
@@ -458,14 +523,16 @@ extern "C" int usr(tModInfo *modInfo) {
   void *robot_settings = getFileHandle();
 
   // Let's look what we have to provide here
-  if (robot_settings) {
+  if (robot_settings)
+  {
     char SectionBuf[BUFSIZE];
     char *Section = SectionBuf;
 
     snprintf(SectionBuf, BUFSIZE, "%s/%s/%d",
               ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
 
-    for (int i = 0; i < NBBOTS; ++i) {
+    for (int i = 0; i < NBBOTS; ++i)
+    {
       const char *DriverName = GfParmGetStr(robot_settings, Section,
                               ROB_ATTR_NAME, defaultBotName[i]);
       strncpy(&DriverNames[i * DRIVERLEN], DriverName, DRIVERLEN - 1);
@@ -479,6 +546,7 @@ extern "C" int usr(tModInfo *modInfo) {
 
 
 // Module exit point (Torcs backward compatibility scheme).
-extern "C" int usrShut() {
+extern "C" int usrShut()
+{
   return moduleTerminate();
 }

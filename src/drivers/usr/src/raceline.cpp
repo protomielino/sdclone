@@ -122,6 +122,7 @@ LRaceLine::LRaceLine() :
    ExitBoostX(1.0),
    AvoidExitBoost(0.0),
    AvoidExitBoostX(1.0),
+   AvoidOffset(1.3),
    RaceLineDebug(false),
    CW(0.0),
    wheelbase(0.0),
@@ -342,6 +343,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  roughlimit = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_OFFTRACK_RLIMIT, (char *)NULL, 0.80f );
  MaxSteerTime = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_MAX_STEER_TIME, (char *)NULL, 1.5f );
  MinSteerTime = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_MIN_STEER_TIME, (char *)NULL, 1.0f );
+ AvoidOffset = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AVOID_OFFSET, (char *)NULL, 1.3f);
  RaceLineDebug = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_RACELINE_DEBUG, (char *)NULL, 0.0f ) ? true : false;
  AccelCurveDampen =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_ACCEL_CURVE, (char *)NULL, 1.0f );
  BrakeCurveDampen =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_CURVE, (char *)NULL, 1.0f );
@@ -2218,7 +2220,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
 double LRaceLine::getAvoidSteer(double offset, LRaceLineData *data)
 {
- offset *= 1.3;
+ offset *= AvoidOffset;
  double steer = 0.0;
 
  vec2f target;

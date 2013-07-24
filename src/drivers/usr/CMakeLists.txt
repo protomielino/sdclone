@@ -10,6 +10,7 @@ SET(ROBOT_INTERFACE LEGACY WELCOME
                     usr_sc
                     usr_ls1
                     usr_ls2
+                    usr_mpa1
                     usr_36GP
                     usr_rs
                     usr_lp1
@@ -37,7 +38,7 @@ SET(ROBOT_SOURCES
   src/xmldefs.h)
 
 # Official-only USR instances.
-SET(ROBOT_CLONES usr_trb1 usr_sc usr_ls1 usr_ls2 usr_36GP usr_rs usr_lp1)
+SET(ROBOT_CLONES usr_trb1 usr_sc usr_ls1 usr_ls2 usr_mpa1 usr_36GP usr_rs usr_lp1)
 
 ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.0.0 SOVERSION 1.0.0
               INTERFACE ${ROBOT_INTERFACE} 

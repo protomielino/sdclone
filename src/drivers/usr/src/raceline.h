@@ -181,6 +181,7 @@ class LRaceLine {
   double ExitBoostX;
   double AvoidExitBoost;
   double AvoidExitBoostX;
+  double AvoidOffset;
   bool RaceLineDebug;
 
   double CW;
