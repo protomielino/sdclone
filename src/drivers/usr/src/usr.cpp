@@ -71,6 +71,8 @@ static const int DRIVERLEN = 32;
 static char DriverNames[DRIVERLEN * MAXNBBOTS];
 // Buffer for driver's descriptions defined in robot's xml-file
 static char DriverDescs[DRIVERLEN * MAXNBBOTS];
+// Buffer for car name defined in robot's xml-file
+static char CarNames[DRIVERLEN * MAXNBBOTS];
 // Array of drivers
 static Driver *driver[MAXNBBOTS];
 
@@ -363,6 +365,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
       // Clear buffers
       memset(&DriverNames[i * DRIVERLEN], 0, DRIVERLEN);
       memset(&DriverDescs[i * DRIVERLEN], 0, DRIVERLEN);
+      memset(&CarNames[i * DRIVERLEN], 0, DRIVERLEN);
 
       snprintf(section_buf, BUFSIZE, "%s/%s/%d",
                 ROB_SECT_ROBOTS, ROB_LIST_INDEX, i + indexOffset);
@@ -376,6 +379,11 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
         const char *driver_desc = GfParmGetStr(robot_settings, section,
                                             ROB_ATTR_DESC, defaultBotDesc[i]);
         strncpy(&DriverDescs[i * DRIVERLEN], driver_desc, DRIVERLEN - 1);
+
+        const char *car_name =
+                GfParmGetStr(robot_settings, section, ROB_ATTR_CAR, "nocar");
+        strncpy(&CarNames[i * DRIVERLEN], car_name, DRIVERLEN - 1);
+
         NBBOTS = i + 1;
       }
     }
@@ -454,6 +462,8 @@ static int InitFuncPt(int index, void *pt)
 
   // Create robot instance for index.
   driver[index-indexOffset] = new Driver(index, robot_type);
+  driver[index-indexOffset]->SetBotName(&CarNames[(index-indexOffset)*DRIVERLEN]);
+
   itf->rbNewTrack = initTrack;  // Give the robot the track view called.
   itf->rbNewRace  = newRace;    // Start a new race.
   itf->rbDrive    = drive;    // Drive during race.
@@ -461,6 +471,7 @@ static int InitFuncPt(int index, void *pt)
   itf->rbEndRace  = endRace;    // End of the current race.
   itf->rbShutdown = shutdown;   // Called before the module is unloaded.
   itf->index      = index;    // Index used if multiple interfaces.
+
   return 0;
 }
 

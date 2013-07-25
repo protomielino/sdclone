@@ -56,6 +56,8 @@ class Driver {
 		Driver(int index, const int robot_type);
 		~Driver();
 
+        void SetBotName(const char *Value);
+
 		// Callback functions called from Speed Dreams / TORCS.
 		void initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituation *s);
 		void newRace(tCarElt* car, tSituation *s);
@@ -148,6 +150,7 @@ class Driver {
 
 		// Per robot global data.
 		const char *robot_name;
+        const char *CarType;
 		int NoTeamWaiting;
 		float TeamWaitTime;
 		float truespeed;

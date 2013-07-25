@@ -93,6 +93,7 @@ Driver::Driver(int index, const int robot_type) :
     prevspeedangle(0.0f),
     speedangle(0.0f),
     angle(0.0f),
+
     mass(0.0f),
     maxfuel(0.0f),
     myoffset(0.0f),
@@ -266,6 +267,13 @@ Driver::~Driver()
 #define RANDOM_SEED 0xfded
 #define RANDOM_A    1664525
 #define RANDOM_C    1013904223
+#define BUFLEN 256
+
+void Driver::SetBotName(const char* Value)
+{
+    CarType = Value;
+    //GfOut("CarType = %s\n", CarType);
+};
 
 void Driver::SetRandomSeed(unsigned int seed)
 {
@@ -332,19 +340,19 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
   else
     strcpy(trackname, ptrackname);
 
-  char carName[256];
+  /*char carName[256];
   {
     char const *path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
     char const *key = PRM_CAR;
     strncpy( carName, GfParmGetStr(carHandle, path, key, ""), sizeof(carName) );
     char *p = strrchr(carName, '.');
     if (p) *p = '\0';
-  }
+  }*/
 
   mRain = getWeather();
 
   //if (mRain == 0)
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/default.xml", robot_name, carName);
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/default.xml", robot_name, CarType);
   /*else
       snprintf(buffer, BUFSIZE, "drivers/%s/%s/default-%d.xml",robot_name, carName, mRain);*/
 
@@ -352,9 +360,9 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
   void *newhandle;
 
   if (mRain == 0)
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, CarType, trackname);
   else
-      snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-%d.xml",robot_name, carName, trackname, mRain);
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-%d.xml",robot_name, CarType, trackname, mRain);
 
   newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
   if (newhandle)
@@ -367,9 +375,9 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
   else
   {
       if (mRain == 0)
-          snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
+          snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, CarType, trackname);
       else
-          snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-%d.xml",robot_name, carName, trackname, mRain);
+          snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-%d.xml",robot_name, CarType, trackname, mRain);
 
       //snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
       newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
