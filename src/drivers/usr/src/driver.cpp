@@ -272,7 +272,7 @@ Driver::~Driver()
 void Driver::SetBotName(const char* Value)
 {
     CarType = Value;
-    //GfOut("CarType = %s\n", CarType);
+    LogUSR.debug("#Car Name    : %s\n",CarType);
 };
 
 void Driver::SetRandomSeed(unsigned int seed)
@@ -340,15 +340,6 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
   else
     strcpy(trackname, ptrackname);
 
-  /*char carName[256];
-  {
-    char const *path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
-    char const *key = PRM_CAR;
-    strncpy( carName, GfParmGetStr(carHandle, path, key, ""), sizeof(carName) );
-    char *p = strrchr(carName, '.');
-    if (p) *p = '\0';
-  }*/
-
   mRain = getWeather();
 
   //if (mRain == 0)
@@ -379,7 +370,6 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
       else
           snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-%d.xml",robot_name, CarType, trackname, mRain);
 
-      //snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
       newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
       if (newhandle)
       {
@@ -975,15 +965,15 @@ void Driver::drive(tSituation *s)
 
     car->_clutchCmd = getClutch();
     if (DebugMsg & debug_steer)
-      fprintf(stderr,"%s %d/%d: ",car->_name,rldata->thisdiv,rldata->nextdiv);
+          LogUSR.debug("%s %d/%d: ", car->_name, rldata->thisdiv, rldata->nextdiv);
 
   }
 
   if (DebugMsg & debug_steer)
   {
     double skid = (car->_skid[0]+car->_skid[1]+car->_skid[2]+car->_skid[3])/2;
-    fprintf(stderr,"%d%c%c%c s%.2f k%.2f ss%.2f cl%.3f g%d->%d brk%.3f acc%.2f dec%.2f coll%.1f %c",mode,((mode==mode_avoiding)?'A':' '),(avoidmode==avoidleft?'L':(avoidmode==avoidright?'R':' ')),(mode==mode_correcting?'c':' '),car->_steerCmd,rldata->ksteer,stucksteer,correctlimit,car->_gear,car->_gearCmd,car->_brakeCmd,car->_accelCmd,rldata->decel,collision,(rldata->closing?'c':'e'));
-    fprintf(stderr," spd%.1f|k%.1f|a%.1f|t%.1f angle=%.2f/%.2f/%.2f yr=%.2f skid=%.2f acxy=%.2f/%.2f inv%.3f/%.3f slip=%.3f/%.3f %.3f/%.3f\n",(double)currentspeed,(double)rldata->speed,(double)rldata->avspeed,(double)getTrueSpeed(),angle,speedangle,rldata->rlangle,car->_yaw_rate,skid,car->_accel_x,car->_accel_y,nextCRinverse,rldata->mInverse,car->_wheelSpinVel(FRNT_RGT)*car->_wheelRadius(FRNT_RGT)-car->_speed_x,car->_wheelSpinVel(FRNT_LFT)*car->_wheelRadius(FRNT_LFT)-car->_speed_x,car->_wheelSpinVel(REAR_RGT)*car->_wheelRadius(REAR_RGT)-car->_speed_x,car->_wheelSpinVel(REAR_LFT)*car->_wheelRadius(REAR_LFT)-car->_speed_x);fflush(stderr);
+    LogUSR.debug("%d%c%c%c s%.2f k%.2f ss%.2f cl%.3f g%d->%d brk%.3f acc%.2f dec%.2f coll%.1f %c",mode,((mode==mode_avoiding)?'A':' '),(avoidmode==avoidleft?'L':(avoidmode==avoidright?'R':' ')),(mode==mode_correcting?'c':' '),car->_steerCmd,rldata->ksteer,stucksteer,correctlimit,car->_gear,car->_gearCmd,car->_brakeCmd,car->_accelCmd,rldata->decel,collision,(rldata->closing?'c':'e'));
+    LogUSR.debug(" spd%.1f|k%.1f|a%.1f|t%.1f angle=%.2f/%.2f/%.2f yr=%.2f skid=%.2f acxy=%.2f/%.2f inv%.3f/%.3f slip=%.3f/%.3f %.3f/%.3f\n",(double)currentspeed,(double)rldata->speed,(double)rldata->avspeed,(double)getTrueSpeed(),angle,speedangle,rldata->rlangle,car->_yaw_rate,skid,car->_accel_x,car->_accel_y,nextCRinverse,rldata->mInverse,car->_wheelSpinVel(FRNT_RGT)*car->_wheelRadius(FRNT_RGT)-car->_speed_x,car->_wheelSpinVel(FRNT_LFT)*car->_wheelRadius(FRNT_LFT)-car->_speed_x,car->_wheelSpinVel(REAR_RGT)*car->_wheelRadius(REAR_RGT)-car->_speed_x,car->_wheelSpinVel(REAR_LFT)*car->_wheelRadius(REAR_LFT)-car->_speed_x);
   }
 
   laststeer = car->_steerCmd;
@@ -1354,7 +1344,7 @@ void Driver::calcSkill()
     brake_adjust_perc += MIN(deltaTime*2, brake_adjust_targ - brake_adjust_perc);
    else
     brake_adjust_perc -= MIN(deltaTime*2, brake_adjust_perc - brake_adjust_targ);
-//fprintf(stderr,"skill: decel %.3f - %.3f, brake %.3f - %.3f\n",decel_adjust_perc,decel_adjust_targ,brake_adjust_perc,brake_adjust_targ);
+    LogUSR.debug("skill: decel %.3f - %.3f, brake %.3f - %.3f\n", decel_adjust_perc, decel_adjust_targ, brake_adjust_perc, brake_adjust_targ);
   }
 #endif
 }
@@ -1476,10 +1466,10 @@ float Driver::getSteer(tSituation *s)
         aligned_timer = simtime;
         steer = racesteer;
         if (DebugMsg & debug_steer)
-          fprintf(stderr,"ALIGNED steer_ok=%d avsteer=%.3f racest=%.3f\n",steer_ok,avoidsteer,racesteer);
+          LogUSR.debug("ALIGNED steer_ok=%d avsteer=%.3f racest=%.3f\n", steer_ok, avoidsteer, racesteer);
       }
       else if (DebugMsg & debug_steer)
-        fprintf(stderr,"NOT ALIGNED %d %d %d %d %.2f %.2f %.2f\n",angle_ok,yr_ok,(skid<0.1),steer_ok,avoidsteer,racesteer,laststeer);
+        LogUSR.debug("NOT ALIGNED %d %d %d %d %.2f %.2f %.2f\n", angle_ok, yr_ok, (skid<0.1), steer_ok, avoidsteer,racesteer,laststeer);
     }
 
     if (mode != mode_normal)
@@ -1586,7 +1576,7 @@ double Driver::calcSteer( double targetAngle, int rl )
 
   NORM_PI_PI(steer_direction);
   if (DebugMsg & debug_steer)
-    fprintf(stderr,"STEER tm%.2f off%.2f sd%.3f",car->_trkPos.toMiddle,myoffset,steer_direction);
+    LogUSR.debug("STEER tm%.2f off%.2f sd%.3f", car->_trkPos.toMiddle, myoffset, steer_direction);
 
   if (car->_speed_x > 10.0 && mode != mode_normal && mode != mode_pitting)
   {
@@ -1611,10 +1601,10 @@ double Driver::calcSteer( double targetAngle, int rl )
 
   steer = (steer_direction/car->_steerLock);
   if (DebugMsg & debug_steer)
-    fprintf(stderr,"/sd%.3f a%.3f",steer_direction,steer);
+    LogUSR.debug("/sd%.3f a%.3f", steer_direction, steer);
 
   if (DebugMsg & debug_steer)
-    fprintf(stderr," b%.3f",steer);
+    LogUSR.debug(" b%.3f", steer);
 
   lastNSasteer = (float)steer;
 
@@ -1642,7 +1632,7 @@ double Driver::calcSteer( double targetAngle, int rl )
 #endif  // old ki steering
 
   if (DebugMsg & debug_steer)
-    fprintf(stderr," d%.3f",steer);
+    LogUSR.debug(" d%.3f", steer);
 
   if (mode != mode_pitting)
     {
@@ -1683,7 +1673,7 @@ double Driver::calcSteer( double targetAngle, int rl )
 #endif
 
   if (DebugMsg & debug_steer)
-    fprintf(stderr," e%.3f\n",steer);
+    LogUSR.debug(" e%.3f\n", steer);
 
   return steer;
 }
@@ -1734,7 +1724,7 @@ float Driver::correctSteering( float avoidsteer, float racesteer )
   double climit = fabs(correctlimit * changelimit);
 
 if (DebugMsg & debug_steer)
-fprintf(stderr,"CORRECT: cl=%.3f/%.3f=%.3f as=%.3f rs=%.3f NS=%.3f",correctlimit,changelimit,climit,avoidsteer,racesteer,lastNSasteer);
+    LogUSR.debug("CORRECT: cl=%.3f/%.3f=%.3f as=%.3f rs=%.3f NS=%.3f",correctlimit,changelimit,climit,avoidsteer,racesteer,lastNSasteer);
   if (/*mode == mode_correcting &&*/ simtime > 2.0f)
   {
     // move steering towards racesteer...
@@ -1745,7 +1735,7 @@ fprintf(stderr,"CORRECT: cl=%.3f/%.3f=%.3f as=%.3f rs=%.3f NS=%.3f",correctlimit
         if (fabs(steer-racesteer) <= car->_speed_x / 2000)
         {
           //steer = (float) MIN(racesteer, steer + correctlimit);
-if (DebugMsg & debug_steer) fprintf(stderr," RA%.3f",racesteer);
+if (DebugMsg & debug_steer) LogUSR.debug(" RA%.3f", racesteer);
           steer = racesteer;
           lastNSasteer = (float)rldata->NSsteer;
         }
@@ -1753,7 +1743,7 @@ if (DebugMsg & debug_steer) fprintf(stderr," RA%.3f",racesteer);
         {
           steer = (float) MIN(racesteer, MAX(steer + climit, racesteer - fabs(correctlimit) + climit));
           lastNSasteer = (float) MIN(rldata->NSsteer, MAX(lastNSasteer, rldata->NSsteer + climit));
-if (DebugMsg & debug_steer) fprintf(stderr," MA%.3f",steer);
+if (DebugMsg & debug_steer) LogUSR.debug(" MA%.3f", steer);
         }
       }
       else
@@ -1763,13 +1753,13 @@ if (DebugMsg & debug_steer) fprintf(stderr," MA%.3f",steer);
           //steer = (float) MAX(racesteer, steer-climit);
           steer = racesteer;
           lastNSasteer = (float)rldata->NSsteer;
-if (DebugMsg & debug_steer) fprintf(stderr," RB%.3f",racesteer);
+if (DebugMsg & debug_steer) LogUSR.debug(" RB%.3f", racesteer);
         }
         else
         {
           steer = (float) MAX(racesteer, MIN(steer - fabs(climit), racesteer + fabs(correctlimit) + climit));
           lastNSasteer = (float) MAX(rldata->NSsteer, MIN(lastNSasteer, rldata->NSsteer + climit));
-if (DebugMsg & debug_steer) fprintf(stderr," MB%.3f",steer);
+if (DebugMsg & debug_steer) LogUSR.debug(" MB%.3f", steer);
         }
       }
     }
@@ -1802,12 +1792,12 @@ if (DebugMsg & debug_steer) fprintf(stderr," MB%.3f",steer);
       else
         //lastNSasteer = (float) MAX(rldata->NSsteer, lastNSasteer - (((155.0-speed)/10000) * correctspeed));
         lastNSasteer = (float) MAX(rldata->NSsteer, lastNSasteer - changelimit);
-if (DebugMsg & debug_steer) fprintf(stderr," I%.3f",steer);
+if (DebugMsg & debug_steer) LogUSR.debug(" I%.3f", steer);
     }
   
   }
 
-if (DebugMsg & debug_steer) fprintf(stderr," %.3f NS=%.3f\n",steer,lastNSasteer);
+if (DebugMsg & debug_steer) LogUSR.debug(" %.3f NS=%.3f\n", steer, lastNSasteer);
 
   return steer;
 }
@@ -2163,12 +2153,12 @@ bool Driver::canOvertake2( Opponent *o, int avoidingside )
   if (oAspeed >= o->getSpeed())  // speed on avoidside of opponent is fast enough
   {
     if (DebugMsg & debug_overtake)
-      fprintf(stderr,"-> %s: OVERTAKE2 ospd=%.1f oAspd=%.1f\n",ocar->_name,o->getSpeed(),oAspeed);
+      LogUSR.debug("-> %s: OVERTAKE2 ospd=%.1f oAspd=%.1f\n", ocar->_name, o->getSpeed(), oAspeed);
     return true;
   }
 
   if (DebugMsg & debug_overtake)
-    fprintf(stderr,"-> %s: FAIL2!!!! ospd=%.1f oAspd=%.1f\n",ocar->_name,o->getSpeed(),oAspeed);
+    LogUSR.debug("-> %s: FAIL2!!!! ospd=%.1f oAspd=%.1f\n", ocar->_name, o->getSpeed(), oAspeed);
 
   return false;
 }
@@ -2199,7 +2189,7 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
     // already overtaking a slower opponent
 
     if (DebugMsg & debug_overtake)
-      fprintf(stderr,"%.1f %s: IGNORE!!! spddiff=%.1f minspeed=%.1f\n",otry_factor,ocar->_name,speed-(ospeed+2*overtakecaution),*mincatchdist);
+      LogUSR.debug("%.1f %s: IGNORE!!! spddiff=%.1f minspeed=%.1f\n", otry_factor, ocar->_name, speed-(ospeed+2*overtakecaution),*mincatchdist);
 
     return false;
   }
@@ -2214,7 +2204,7 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
     *mincatchdist = speed - ospeed;
 
     if (DebugMsg & debug_overtake)
-      fprintf(stderr,"%.1f %s: OVERTAKE! spd=%.1f ospd=%.1f oAspd=%.1f ti=%.1f\n",otry_factor,ocar->_name,speed,ospeed+2*overtakecaution,oAspeed,o->getTimeImpact());
+      LogUSR.debug("%.1f %s: OVERTAKE! spd=%.1f ospd=%.1f oAspd=%.1f ti=%.1f\n", otry_factor, ocar->_name,speed,ospeed+2*overtakecaution,oAspeed,o->getTimeImpact());
 
     return true;
   }
@@ -2223,7 +2213,7 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
   // not worth the risk, ignore opponent
 
   if (DebugMsg & debug_overtake)
-    fprintf(stderr,"%.1f %s: FAIL!!!!! spd=%.1f ospd=%.1f oAspd=%.1f ti=%.1f\n",otry_factor,ocar->_name,speed,ospeed+2*overtakecaution,oAspeed,o->getTimeImpact());
+    LogUSR.debug("%.1f %s: FAIL!!!!! spd=%.1f ospd=%.1f oAspd=%.1f ti=%.1f\n",otry_factor,ocar->_name,speed,ospeed+2*overtakecaution,oAspeed,o->getTimeImpact());
 
   return false;
 }
@@ -2359,7 +2349,7 @@ float Driver::getOffset()
     {
       o = &opponent[i];
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s SIDE %s\n",car->_name,ocar->_name);fflush(stderr);
+    LogUSR.debug("%s SIDE %s\n", car->_name, ocar->_name);
       
       double sidedist = fabs(ocar->_trkPos.toLeft - car->_trkPos.toLeft);
       double sidemargin = opponent[i].getWidth()/2 + getWidth()/2 + 5.0f + MAX(fabs(rldata->rInverse), fabs(rldata->mInverse))*100;
@@ -2394,7 +2384,7 @@ fprintf(stderr,"%s SIDE %s\n",car->_name,ocar->_name);fflush(stderr);
           //  myoffset -= rldata->rInverse * 500 * IncFactor;
           avoidmovt = 1;
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s SIDE to Rgt %s, MOVING LEFT by %.3f, sm=%.3f sd=%.3f/%.3f sm-sd=%.3f mInv=%.3f\n",car->_name,ocar->_name,(float) (OVERTAKE_OFFSET_INC*lftinc*MAX(0.2f, MIN(1.5f, sdiff))),sidemargin,sidedist,sidedist2,sdiff,rldata->mInverse);fflush(stderr);
+    LogUSR.debug("%s SIDE to Rgt %s, MOVING LEFT by %.3f, sm=%.3f sd=%.3f/%.3f sm-sd=%.3f mInv=%.3f\n",car->_name,ocar->_name,(float) (OVERTAKE_OFFSET_INC*lftinc*MAX(0.2f, MIN(1.5f, sdiff))),sidemargin,sidedist,sidedist2,sdiff,rldata->mInverse);
         } else if (side <= 0.0) {
           double rinc = OVERTAKE_OFFSET_INC * (rgtinc * MAX(0.2, MIN(1.1, sdiff/4)) * 1.5);
           if (rldata->rInverse > 0.0)
@@ -2404,13 +2394,13 @@ fprintf(stderr,"%s SIDE to Rgt %s, MOVING LEFT by %.3f, sm=%.3f sd=%.3f/%.3f sm-
           //  myoffset -= rldata->rInverse * 500 * IncFactor;
           avoidmovt = 1;
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s SIDE to Lft %s, MOVING RIGHT by %.3f sm-sd=%.2f mo=%.3f\n",car->_name,ocar->_name,(OVERTAKE_OFFSET_INC*lftinc*MAX(1.0f, MIN(2.0f, sdiff))),sdiff,myoffset);fflush(stderr);
+    LogUSR.debug("%s SIDE to Lft %s, MOVING RIGHT by %.3f sm-sd=%.2f mo=%.3f\n",car->_name,ocar->_name,(OVERTAKE_OFFSET_INC*lftinc*MAX(1.0f, MIN(2.0f, sdiff))),sdiff,myoffset);
         }
 
         if (avoidmovt)
           sideratio = MIN(sidedist,sidedist2)/sidemargin;
 else if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s SIDE %s, NO MOVE %.1f\n",car->_name,ocar->_name,myoffset);fflush(stderr);
+LogUSR.debug("%s SIDE %s, NO MOVE %.1f\n", car->_name, ocar->_name, myoffset);
       }
       else if (sidedist > sidemargin+3.0)
       {
@@ -2423,7 +2413,7 @@ fprintf(stderr,"%s SIDE %s, NO MOVE %.1f\n",car->_name,ocar->_name,myoffset);ffl
         {
           myoffset -= (float) (OVERTAKE_OFFSET_INC*lftinc/4);
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s SIDE to Rgt %s, MOVING BACK TO RIGHT\n",car->_name,ocar->_name);fflush(stderr);
+    LogUSR.debug("%s SIDE to Rgt %s, MOVING BACK TO RIGHT\n", car->_name, ocar->_name);
           if (!avoidmode)
             avoidtime = MIN(simtime, avoidtime+deltaTime*0.5);
         }
@@ -2432,15 +2422,15 @@ fprintf(stderr,"%s SIDE to Rgt %s, MOVING BACK TO RIGHT\n",car->_name,ocar->_nam
         {
           myoffset += (float) (OVERTAKE_OFFSET_INC*rgtinc/4);
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s SIDE to Lft %s, MOVING BACK TO LEFT\n",car->_name,ocar->_name);fflush(stderr);
+    LogUSR.debug("%s SIDE to Lft %s, MOVING BACK TO LEFT\n", car->_name, ocar->_name);
           if (!avoidmode)
             avoidtime = MIN(simtime, avoidtime+deltaTime*0.5);
         }
 else if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s SIDE %s, NO MOVE %.1f\n",car->_name,ocar->_name,myoffset);fflush(stderr);
+    LogUSR.debug("%s SIDE %s, NO MOVE %.1f\n", car->_name, ocar->_name, myoffset);
       }
 else if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s SIDE %s, NO MOVE AT ALL! %.1f\n",car->_name,ocar->_name,myoffset);fflush(stderr);
+    LogUSR.debug("%s SIDE %s, NO MOVE AT ALL! %.1f\n", car->_name, ocar->_name, myoffset);
 
       if (ocar->_trkPos.toLeft > car->_trkPos.toLeft)
       {
@@ -2538,11 +2528,11 @@ fprintf(stderr,"%s SIDE %s, NO MOVE AT ALL! %.1f\n",car->_name,ocar->_name,myoff
             {
               int newside = checkSwitch(avoidingside, o, ocar);
 if (DebugMsg & debug_overtake)
-fprintf(stderr," AVOIDING A %c\n",(avoidingside==TR_LFT?'L':'R'));
+    LogUSR.debug(" AVOIDING A %c\n", (avoidingside==TR_LFT?'L':'R'));
               if (newside != avoidingside)
               {
 if (DebugMsg & debug_overtake)
-fprintf(stderr," SWITCH 1 from %c to %c\n",(avoidingside==TR_LFT?'L':'R'),(newside==TR_LFT?'L':'R'));
+    LogUSR.debug(" SWITCH 1 from %c to %c\n", (avoidingside==TR_LFT?'L':'R'),(newside==TR_LFT?'L':'R'));
                 avoidingside = newside;
                 thismustmove = true;
               }
@@ -2586,20 +2576,20 @@ fprintf(stderr," SWITCH 1 from %c to %c\n",(avoidingside==TR_LFT?'L':'R'),(newsi
               rinc += rInverse * 200 * IncFactor;
             myoffset -= (float) rinc;
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s LFT %s, MOVING RIGHT %.3f/%.3f -> %.3f (rgtinc=%.2f (%.2f) rinc=%.2f)\n",car->_name,ocar->_name,(float) (OVERTAKE_OFFSET_INC*rgtinc),rinc,myoffset,rgtinc,lftinc,rinc);
+    LogUSR.debug("%s LFT %s, MOVING RIGHT %.3f/%.3f -> %.3f (rgtinc=%.2f (%.2f) rinc=%.2f)\n", car->_name, ocar->_name, (float) (OVERTAKE_OFFSET_INC*rgtinc),rinc,myoffset,rgtinc,lftinc,rinc);
             avoidmovt = 1;
           }
           else if (sidedist > car->_dimension_y + ocar->_dimension_y + 4.0 &&
                    car->_trkPos.toRight < MIN(lane2right-1.0, 4.0 + fabs(nextCRinverse)*1000))
           {
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s LFT %s, MOVING BACK TO LEFT %.3f\n",car->_name,ocar->_name,(float) (OVERTAKE_OFFSET_INC*lftinc/2));
+    LogUSR.debug("%s LFT %s, MOVING BACK TO LEFT %.3f\n",car->_name,ocar->_name,(float) (OVERTAKE_OFFSET_INC*lftinc/2));
             myoffset += (float) (OVERTAKE_OFFSET_INC*lftinc)/2;
             if (!avoidmode)
               avoidtime = MIN(simtime, avoidtime+deltaTime);
           }
 else if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s LFT %s, HOLDING LINE\n",car->_name,ocar->_name);
+    LogUSR.debug("%s LFT %s, HOLDING LINE\n",car->_name,ocar->_name);
         }
         else // if (avoidingside == TR_RGT)
         {
@@ -2610,7 +2600,7 @@ fprintf(stderr,"%s LFT %s, HOLDING LINE\n",car->_name,ocar->_name);
                     (prefer_side == TR_LFT && car->_trkPos.toLeft > MIN(lane2left, 3.0 + nextCRinverse*1000)))
           {
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s RGT %s, MOVING LEFT %.3f\n",car->_name,ocar->_name,(float) (OVERTAKE_OFFSET_INC*lftinc));
+    LogUSR.debug("%s RGT %s, MOVING LEFT %.3f\n",car->_name,ocar->_name,(float) (OVERTAKE_OFFSET_INC*lftinc));
             double linc = OVERTAKE_OFFSET_INC * lftinc;
             if (rInverse < 0.0)
               linc -= rInverse * 200 * IncFactor;
@@ -2621,13 +2611,13 @@ fprintf(stderr,"%s RGT %s, MOVING LEFT %.3f\n",car->_name,ocar->_name,(float) (O
                    car->_trkPos.toLeft < MIN(lane2left-1.0, 4.0 + fabs(nextCRinverse)*1000))
           {
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s RGT %s, MOVING BACK TO RIGHT %.3f\n",car->_name,ocar->_name,(float) (OVERTAKE_OFFSET_INC*rgtinc/2));
+    LogUSR.debug("%s RGT %s, MOVING BACK TO RIGHT %.3f\n", car->_name, ocar->_name,(float) (OVERTAKE_OFFSET_INC*rgtinc/2));
             myoffset -= (float) (OVERTAKE_OFFSET_INC*rgtinc)/2;
             if (!avoidmode)
               avoidtime = MIN(simtime, avoidtime+deltaTime);
           }
 else if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s RGT %s, HOLDING LINE\n",car->_name,ocar->_name);
+    LogUSR.debug("%s RGT %s, HOLDING LINE\n", car->_name, ocar->_name);
         }
 
         {
@@ -2681,7 +2671,7 @@ fprintf(stderr,"%s RGT %s, HOLDING LINE\n",car->_name,ocar->_name);
         float side = car->_trkPos.toMiddle - ocar->_trkPos.toMiddle;
         float w = car->_trkPos.seg->width/WIDTHDIV-BORDER_OVERTAKE_MARGIN;
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s BEHIND %s (%d %d %d %d)\n",car->_name,ocar->_name,((o->getState() & OPP_LETPASS) && !o->isTeamMate()),(o->isTeamMate() && (car->_dammage - o->getDamage() > TEAM_DAMAGE_CHANGE_LEAD)),((o->getDistance() > -TEAM_REAR_DIST) && (o->getDistance() < -car->_dimension_x)),(car->race.laps == o->getCarPtr()->race.laps));
+    LogUSR.debug("%s BEHIND %s (%d %d %d %d)\n", car->_name, ocar->_name,((o->getState() & OPP_LETPASS) && !o->isTeamMate()),(o->isTeamMate() && (car->_dammage - o->getDamage() > TEAM_DAMAGE_CHANGE_LEAD)),((o->getDistance() > -TEAM_REAR_DIST) && (o->getDistance() < -car->_dimension_x)),(car->race.laps == o->getCarPtr()->race.laps));
         if (side > 0.0f) {
           if (myoffset < w) {
             myoffset += (float) (OVERTAKE_OFFSET_INC*lftinc);
@@ -2709,7 +2699,7 @@ fprintf(stderr,"%s BEHIND %s (%d %d %d %d)\n",car->_name,ocar->_name,((o->getSta
   
         myoffset = (float) (MAX(minoffset, MIN(maxoffset, myoffset)));
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"%s BEHIND %s (%g)\n",car->_name,ocar->_name,myoffset);
+LogUSR.debug("%s BEHIND %s (%g)\n", car->_name, ocar->_name, myoffset);
 
       } 
     }
@@ -2754,8 +2744,7 @@ end_getoffset:
     if (DebugMsg & debug_overtake)
       if (mode != mode_normal)
       {
-        fprintf(stderr,"mode=%d max=%.1f(%.1f) min=%.1f(%.1f) myoff=%.1f->%.1f->%.1f\n",mode,maxoffset,oldmax,minoffset,oldmin,car->_trkPos.toMiddle,mo,myoffset);
-        fflush(stderr);
+        LogUSR.debug("mode=%d max=%.1f(%.1f) min=%.1f(%.1f) myoff=%.1f->%.1f->%.1f\n",mode,maxoffset,oldmax,minoffset,oldmin,car->_trkPos.toMiddle,mo,myoffset);
       }
   }
   return myoffset;
@@ -2792,7 +2781,7 @@ int Driver::checkSwitch( int side, Opponent *o, tCarElt *ocar )
     {
       case TR_RGT:
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"CHECKSWITCH: Rgt - ti=%.2f dm=%.1f o=%.2f->%.2f m=%.2f->%.2f\n",t_impact,deltamult,ocar->_trkPos.toLeft,ocatchleft,car->_trkPos.toLeft,mcatchleft);
+    LogUSR.debug("CHECKSWITCH: Rgt - ti=%.2f dm=%.1f o=%.2f->%.2f m=%.2f->%.2f\n",t_impact,deltamult,ocar->_trkPos.toLeft,ocatchleft,car->_trkPos.toLeft,mcatchleft);
         if (nextCRinverse > 0.0)
           radius = 0.0;
         if ((side == prefer_side || 
@@ -2802,7 +2791,7 @@ fprintf(stderr,"CHECKSWITCH: Rgt - ti=%.2f dm=%.1f o=%.2f->%.2f m=%.2f->%.2f\n",
             track->width - ocatchleft > (car->_dimension_y + 3.0 + radius + speedchange))
         {
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"            Switch to his right (side=lft) - %d %d %d %d\n",(side==prefer_side),(ocatchleft<mcatchleft-1.5),(xdist>sdiff+ydist+MAX(0.0, angle*10)),(track->width-ocatchleft>(car->_dimension_y+3+radius+speedchange)));
+    LogUSR.debug("            Switch to his right (side=lft) - %d %d %d %d\n",(side==prefer_side),(ocatchleft<mcatchleft-1.5),(xdist>sdiff+ydist+MAX(0.0, angle*10)),(track->width-ocatchleft>(car->_dimension_y+3+radius+speedchange)));
           side = TR_LFT;
         }
         break;
@@ -2810,7 +2799,7 @@ fprintf(stderr,"            Switch to his right (side=lft) - %d %d %d %d\n",(sid
       case TR_LFT:
       default:
 if (DebugMsg & debug_overtake)
-fprintf(stderr,"CHECKSWITCH: Lft - ti=%.2f dm=%.1f o=%.2f->%.2f m=%.2f->%.2f\n",t_impact,deltamult,ocar->_trkPos.toLeft,ocatchleft,car->_trkPos.toLeft,mcatchleft);
+LogUSR.debug("CHECKSWITCH: Lft - ti=%.2f dm=%.1f o=%.2f->%.2f m=%.2f->%.2f\n",t_impact,deltamult,ocar->_trkPos.toLeft,ocatchleft,car->_trkPos.toLeft,mcatchleft);
         if (nextCRinverse < 0.0)
           radius = 0.0;
         if ((side == prefer_side || 

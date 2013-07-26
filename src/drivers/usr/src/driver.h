@@ -41,6 +41,9 @@
 #include "mod.h"
 #include "xmldefs.h"
 
+extern GfLogger* PLogUSR;
+#define LogUSR (*PLogUSR)
+
 class Opponents;
 class Opponent;
 class Pit;

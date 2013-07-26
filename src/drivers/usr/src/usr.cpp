@@ -93,6 +93,8 @@ char undefined[] = "undefined";
 
 static int robot_type;  //Decide if TRB, SC, GP36, LS or some other driver
 
+// The "USR" logger instance
+GfLogger* PLogUSR = 0;
 
 ////////////////////////////////////////////////////////////
 // Utility functions
@@ -327,6 +329,9 @@ extern "C" int usr_lp1(tModInfo *ModInfo)
 extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
                               tModWelcomeOut* welcomeOut)
 {
+  PLogUSR = GfLogger::instance("USR");
+  LogUSR.debug("\n#Interface Version: %d.%d\n",
+      welcomeIn->itfVerMajor,welcomeIn->itfVerMinor);
   // Save module name and loadDir, and determine module XML file pathname.
   setRobotName(welcomeIn->name);
 
