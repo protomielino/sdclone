@@ -198,7 +198,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 	if ((wheel->state & SIM_SUSP_EXT) == 0) {
 		wheel->forces.z = axleFz + wheel->susp.force;
 		reaction_force = wheel->forces.z;
-		wheel->rel_vel -= SimDeltaTime * wheel->susp.force / wheel->mass;
+		wheel->rel_vel -= SimDeltaTime * wheel->forces.z / wheel->mass;
 		if (wheel->forces.z < 0.0f) {
 			wheel->forces.z = 0.0f;
 		}
@@ -206,7 +206,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 		if (wheel->rel_vel < 0.0) {
             wheel->rel_vel = 0.0;
         }
-        wheel->rel_vel -= SimDeltaTime * wheel->susp.force / wheel->mass;
+        wheel->rel_vel -= SimDeltaTime * wheel->forces.z / wheel->mass;
 		wheel->forces.z = 0.0f;
 	}
 
