@@ -46,7 +46,7 @@ extern void SimUpdateSingleCar(int index, double deltaTime,tSituation *s);
 extern tDynPt* GetSimCarTable(int index);
 
 
-extern void SimAxleConfig(tCar *car, int index);
+extern void SimAxleConfig(tCar *car, int index, tdble weight0);
 extern void SimAxleUpdate(tCar *car, int index);
 
 extern void SimCarConfig(tCar *car);

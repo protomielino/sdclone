@@ -22,7 +22,7 @@
 static const char *AxleSect[2] = {SECT_FRNTAXLE, SECT_REARAXLE};
 static const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 
-void SimAxleConfig(tCar *car, int index)
+void SimAxleConfig(tCar *car, int index, tdble weight0)
 {
 	void	*hdle = car->params;
 	tdble	rollCenter, x0r, x0l;
@@ -39,11 +39,11 @@ void SimAxleConfig(tCar *car, int index)
 	if (index == 0) {
 		SimSuspConfig(hdle, SECT_FRNTARB, &(axle->arbSusp), 0, 0);
 		axle->arbSusp.spring.K = -axle->arbSusp.spring.K;
-		SimSuspConfig(hdle, SECT_FRNTHEAVE, &(axle->heaveSusp), 0.0, 0.5*(x0r+x0l));
+		SimSuspConfig(hdle, SECT_FRNTHEAVE, &(axle->heaveSusp), weight0, 0.5*(x0r+x0l));
 	} else {
 		SimSuspConfig(hdle, SECT_REARARB, &(axle->arbSusp), 0, 0);
 		axle->arbSusp.spring.K = -axle->arbSusp.spring.K;
-		SimSuspConfig(hdle, SECT_REARHEAVE, &(axle->heaveSusp), 0.0, 0.5*(x0r+x0l));
+		SimSuspConfig(hdle, SECT_REARHEAVE, &(axle->heaveSusp), weight0, 0.5*(x0r+x0l));
 	}
 	
 	car->wheel[index*2].feedBack.I += (tdble) (axle->I / 2.0);
@@ -56,10 +56,12 @@ void SimAxleConfig(tCar *car, int index)
 void SimAxleUpdate(tCar *car, int index)
 {
 	tAxle *axle = &(car->axle[index]);
-	tdble str, stl, sgn;
+	tdble str, stl, sgn, vtl, vtr;
 	
 	str = car->wheel[index*2].susp.x;
 	stl = car->wheel[index*2+1].susp.x;
+	vtr = car->wheel[index*2].susp.v;
+	vtl = car->wheel[index*2+1].susp.v;
 	
 	sgn = (tdble) (SIGN(stl - str));
 	axle->arbSusp.x = fabs(stl - str);		
@@ -77,6 +79,7 @@ void SimAxleUpdate(tCar *car, int index)
 	
 	/* heave/center spring */
 	axle->heaveSusp.x = 0.5 * (stl + str);
+	axle->heaveSusp.v = 0.5 * (vtl + vtr);
 	SimSuspUpdate(&(axle->heaveSusp));
 	f = 0.5 * axle->heaveSusp.force;
 	car->wheel[index*2].axleFz += f;
