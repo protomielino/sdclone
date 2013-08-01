@@ -62,6 +62,10 @@ SimCarConfig(tCar *car)
 	if (strcmp(enabling, VAL_YES) == 0) {
 		car->features = car->features | FEAT_TIRETEMPDEG;
 	}
+	enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_FIXEDWHEELFORCE, VAL_NO);
+	if (strcmp(enabling, VAL_YES) == 0) {
+		car->features = car->features | FEAT_FIXEDWHEELFORCE;
+	}
 	
 	/* continue with car parameters */
 	car->dimension.x = GfParmGetNum(hdle, SECT_CAR, PRM_LEN, (char*)NULL, 4.7f);
@@ -99,8 +103,12 @@ SimCarConfig(tCar *car)
 	for (i = 0; i < 4; i++) {
 		K[i] = GfParmGetNum(hdle, SuspSect[i], PRM_SPR, (char*)NULL, 175000.0f);
 	}
-	Kfheave = GfParmGetNum(hdle, SECT_FRNTHEAVE, PRM_SPR, (char*)NULL, 175000.0f);
-	Krheave = GfParmGetNum(hdle, SECT_REARHEAVE, PRM_SPR, (char*)NULL, 175000.0f);
+	Kfheave = GfParmGetNum(hdle, SECT_FRNTHEAVE, PRM_SPR, (char*)NULL, 0.0f);
+	Krheave = GfParmGetNum(hdle, SECT_REARHEAVE, PRM_SPR, (char*)NULL, 0.0f);
+	/* wheel force bugfix is needed for heave springs */
+	if ( (Kfheave > 0.0f) || (Krheave > 0.0f) ) 
+		{car->features = car->features | FEAT_FIXEDWHEELFORCE;}
+	
 	w = car->mass * G;
 	
 	wf0 = w * gcfr;

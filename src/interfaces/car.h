@@ -809,6 +809,7 @@ typedef struct CarElt
 #define PRM_REALGEARCHANGE	"realistic gear change"
 #define PRM_REVLIMIT		"realistic rev limiter"
 #define PRM_TIRETEMPDEG		"tire temperature and degradation"
+#define PRM_FIXEDWHEELFORCE	"fixed wheel force"
 #define VAL_YES			"yes"
 #define VAL_NO			"no"
 #define FEAT_AEROTOCG		0x01 //shift aero coordinates with the CG
@@ -816,6 +817,7 @@ typedef struct CarElt
 #define FEAT_REALGEARCHANGE	0x04 //neutral between old and new gears without autoclutch
 #define FEAT_REVLIMIT		0x08 //rev drop when hitting the limit
 #define FEAT_TIRETEMPDEG	0x10 //tire temperature and degradation
+#define FEAT_FIXEDWHEELFORCE	0x20 //fixed wheel force in SimWheelUpdateForce
 
 #endif /* __CARV1_H__ */ 
 
