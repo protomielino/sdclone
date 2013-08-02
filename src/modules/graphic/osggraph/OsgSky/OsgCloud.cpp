@@ -46,6 +46,14 @@
 
 using namespace osg;
 
+<<<<<<< .mine
+static osg::ref_ptr<osg::StateSet> layer_states[SDCloudLayer::SD_MAX_CLOUD_COVERAGES];
+static osg::ref_ptr<osg::StateSet> layer_states2[SDCloudLayer::SD_MAX_CLOUD_COVERAGES];
+static osg::ref_ptr<osg::TextureCubeMap> cubeMap;
+static bool state_initialized = false;
+
+=======
+>>>>>>> .r5649
 // make an StateSet for a cloud layer given the named texture
 static osg::StateSet*
 SDMakeState(const std::string &texture_path, const std::string &texture_name)
