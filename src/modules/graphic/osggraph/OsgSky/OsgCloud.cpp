@@ -46,26 +46,14 @@
 
 using namespace osg;
 
-static osg::ref_ptr<osg::StateSet> layer_states[SDCloudLayer::SD_MAX_CLOUD_COVERAGES];
-static osg::ref_ptr<osg::StateSet> layer_states2[SDCloudLayer::SD_MAX_CLOUD_COVERAGES];
-static osg::ref_ptr<osg::TextureCubeMap> cubeMap;
-static bool state_initialized = false;
-
-/*const std::string SGCloudLayer::SG_CLOUD_OVERCAST_STRING = "overcast";
-const std::string SGCloudLayer::SG_CLOUD_BROKEN_STRING = "broken";
-const std::string SGCloudLayer::SG_CLOUD_SCATTERED_STRING = "scattered";
-const std::string SGCloudLayer::SG_CLOUD_FEW_STRING = "few";
-const std::string SGCloudLayer::SG_CLOUD_CIRRUS_STRING = "cirrus";
-const std::string SGCloudLayer::SG_CLOUD_CLEAR_STRING = "clear";*/
-
 // make an StateSet for a cloud layer given the named texture
 static osg::StateSet*
-SDMakeState(const std::string &path, const char* colorTexture, const char* normalTexture)
+SDMakeState(const std::string &texture_path, const std::string &texture_name)
 {
     osg::StateSet *stateSet = new osg::StateSet;
 
     std::string TmpPath;
-    TmpPath = path+"data/sky/"+colorTexture;
+    TmpPath = texture_path+"data/sky/"+texture_name;
     GfOut("Path Sky cloud color texture = %s\n", TmpPath.c_str());
     osg::ref_ptr<osg::Image> image = osgDB::readImageFile(TmpPath);
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
@@ -104,27 +92,144 @@ SDMakeState(const std::string &path, const char* colorTexture, const char* norma
 
     stateSet->setMode(GL_LIGHT0, osg::StateAttribute::OFF);
 
-    //If the normal texture is given prepare a bumpmapping enabled state
-    if (normalTexture)
-    {
-       TmpPath = path+"data/sky/"+normalTexture;
-       GfOut("Path Cloud normal texture = %s\n", TmpPath.c_str());
-       osg::ref_ptr<osg::Image> image = osgDB::readImageFile(TmpPath);
-       osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
-       stateSet->setTextureAttributeAndModes(2, texture);
-       stateSet->setTextureMode(2, GL_TEXTURE_2D, osg::StateAttribute::ON);
-    }
-
-    return stateSet;
+    return stateSet.get();
 }
 
+SDCloudLayer::SDCloudLayer( void ) :
+layer_root(new osg::Group),
+layer_transform(new osg::MatrixTransform),
+  enabled(true),
+  layer_span(0.0),
+  layer_asl(0.0),
+  layer_thickness(0.0),
+  layer_transition(0.0),
+  layer_visibility(25.0),
+  scale(4000.0),
+  speed(0.0),
+  direction(0.0),
+  last_lon(0.0),
+  last_lat(0.0),
+  last_x(0.0),
+  last_y(0.0),
+  max_alpha(1.0)
+{
+  cl[0] = cl[1] = cl[2] = cl[3] = NULL;
+  vl[0] = vl[1] = vl[2] = vl[3] = NULL;
+  tl[0] = tl[1] = tl[2] = tl[3] = NULL;
+  layer[0] = layer[1] = layer[2] = layer[3] = NULL;
+
+  layer_root->addChild(layer_transform.get());
+}
+
+void
+SDCloudLayer::build( const std::string &cloud_tex_path, float span, float elevation, float thickness, float transition )
+{
+  ssgSimpleState *cloud_state = grCloudMakeState( cloud_tex_path );
+  build(cloud_state, span, elevation, thickness, transition);
+}
+
+void
+SDCloudLayer::build( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition )
+{
+  layer_span = span;
+  layer_asl = elevation;
+  layer_thickness = thickness;
+  layer_transition = transition;
+
+  scale = 4000.0;
+  last_lon = last_lat = -999.0f;
+  last_x = last_y = 0.0f;
+
+  sgVec2 base;
+  sgSetVec2( base, (float)grRandom(), (float)grRandom() );
+
+  // build the cloud layer
+  sgVec4 color;
+  sgVec3 vertex;
+  sgVec2 tc;
+
+  const float layer_scale = layer_span / scale;
+  const float mpi = SG_PI/4;
+  const float alt_diff = layer_asl * 1.5f;
+
+  for (int i = 0; i < 4; i++) 
+  {
+    if ( layer[i] != NULL ) 
+    {
+      layer_transform->removeKid(layer[i]); // automatic delete
+    }
+
+    vl[i] = new ssgVertexArray( 10 );
+    cl[i] = new ssgColourArray( 10 );
+    tl[i] = new ssgTexCoordArray( 10 );
+
+    sgSetVec3( vertex, layer_span*(i-2)/2, -layer_span,
+      (float)(alt_diff * (sin(i*mpi) - 2)) );
+
+    sgSetVec2( tc, base[0] + layer_scale * i/4, base[1] );
+
+    sgSetVec4( color, 1.0f, 1.0f, 1.0f, (i == 0) ? 0.0f : 0.15f );
+
+    cl[i]->add( color );
+    vl[i]->add( vertex );
+    tl[i]->add( tc );
+
+    for (int j = 0; j < 4; j++) 
+    {
+      sgSetVec3( vertex, layer_span*(i-1)/2, layer_span*(j-2)/2,
+        (float)(alt_diff * (sin((i+1)*mpi) + sin(j*mpi) - 2)) );
+
+      sgSetVec2( tc, base[0] + layer_scale * (i+1)/4,
+        base[1] + layer_scale * j/4 );
+
+      sgSetVec4( color, 1.0f, 1.0f, 1.0f,
+        ( (j == 0) || (i == 3)) ?  
+        ( (j == 0) && (i == 3)) ? 0.0f : 0.15f : 1.0f );
+
+      cl[i]->add( color );
+      vl[i]->add( vertex );
+      tl[i]->add( tc );
+
+      sgSetVec3( vertex, layer_span*(i-2)/2, layer_span*(j-1)/2,
+        (float)(alt_diff * (sin(i*mpi) + sin((j+1)*mpi) - 2)) );
+
+      sgSetVec2( tc, base[0] + layer_scale * i/4,
+        base[1] + layer_scale * (j+1)/4 );
+
+      sgSetVec4( color, 1.0f, 1.0f, 1.0f,
+        ((j == 3) || (i == 0)) ?
+        ((j == 3) && (i == 0)) ? 0.0f : 0.15f : 1.0f );
+      cl[i]->add( color );
+      vl[i]->add( vertex );
+      tl[i]->add( tc );
+    }
+
+    sgSetVec3( vertex, layer_span*(i-1)/2, layer_span, 
+      (float)(alt_diff * (sin((i+1)*mpi) - 2)) );
+
+    sgSetVec2( tc, base[0] + layer_scale * (i+1)/4,
+    base[1] + layer_scale );
+
+    sgSetVec4( color, 1.0f, 1.0f, 1.0f, (i == 3) ? 0.0f : 0.15f );
+
+    cl[i]->add( color );
+    vl[i]->add( vertex );
+    tl[i]->add( tc );
+
+    layer[i] = new ssgVtxTable(GL_TRIANGLE_STRIP, vl[i], NULL, tl[i], cl[i]);
+    layer_transform->addKid( layer[i] );
+
+    layer[i]->setState( cloud_state );
+  }
+
+  // force a repaint of the sky colors with arbitrary defaults
+  repaint( color );
+}
 // Constructor
 SDCloudLayer::SDCloudLayer( const string &tex_path ) :
-    cloud_root(new osg::Switch),
-    layer_root(new osg::Switch),
-    group_top(new osg::Group),
-    group_bottom(new osg::Group),
+    layer_root(new osg::Group),
     layer_transform(new osg::MatrixTransform),
+	enabled(true),
     cloud_alpha(1.0),
     texture_path(tex_path),
     layer_span(0.0),
@@ -207,6 +312,7 @@ SDCloudLayer::SDCloudLayer( const string &tex_path ) :
 // Destructor
 SDCloudLayer::~SDCloudLayer()
 {
+	delete layer_root;
   //delete layer3D;
 }
 

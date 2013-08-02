@@ -422,8 +422,8 @@ void grCustomizePits(void)
 
       // First we load the low wall's texture, as it is the same
       // for all the drivers
-      snprintf(buf, sizeof(buf), "data/textures");
-      const std::string strWallFileName = "tr-bar-gr.png";
+      snprintf(buf, sizeof(buf), "%sdata/textures", GfDataDir());
+      const std::string strWallFileName = "tr-wall-gr.png";
       ssgState *stWall = grSsgLoadTexStateEx(strWallFileName.c_str(), buf,
                                               FALSE, FALSE, FALSE);
       reinterpret_cast<ssgSimpleState*>(stWall)->setShininess(100);
@@ -472,7 +472,7 @@ void grCustomizePits(void)
 	  bHasLogo = true;
         } else {
           snprintf(buf, sizeof(buf), "data/textures");
-	  strLogoFileName = "tr-bar-gr";
+	  strLogoFileName = "tr-wall-gr";
 	  bHasLogo = false;
         }  // if act_pit->car[0]
 
