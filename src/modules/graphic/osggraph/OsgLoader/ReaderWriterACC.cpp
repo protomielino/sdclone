@@ -612,7 +612,8 @@ osgDB::ReaderWriter::ReadResult ReaderWriterACC::readNode(std::istream& fin, con
 
 osgDB::ReaderWriter::WriteResult ReaderWriterACC::writeNode(const osg::Node& node,const std::string& fileName, const Options* /*options*/)
 {
-    std::string ext = osgDB::getFileExtension(fileName);
+    //dummy
+   /* std::string ext = osgDB::getFileExtension(fileName);
     if (!acceptsExtension(ext)) return WriteResult::FILE_NOT_HANDLED;
     geodeVisitor vs; // this collects geodes.
     std::vector<unsigned int>iNumMaterials;
@@ -652,7 +653,7 @@ osgDB::ReaderWriter::WriteResult ReaderWriterACC::writeNode(const osg::Node& nod
         nfirstmat+=iNumMaterials[itr-glist.begin()];
     }
     fout.close();
-    return WriteResult::FILE_SAVED;
+    return WriteResult::FILE_SAVED;*/
 }
 
 osgDB::ReaderWriter::WriteResult ReaderWriterACC::writeNode(const osg::Node& node,std::ostream& fout, const Options* opts)
