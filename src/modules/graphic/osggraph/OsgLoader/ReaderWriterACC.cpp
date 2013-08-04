@@ -654,6 +654,7 @@ osgDB::ReaderWriter::WriteResult ReaderWriterACC::writeNode(const osg::Node& nod
     }
     fout.close();
     return WriteResult::FILE_SAVED;*/
+	return WriteResult::NOT_IMPLEMENTED;
 }
 
 osgDB::ReaderWriter::WriteResult ReaderWriterACC::writeNode(const osg::Node& node,std::ostream& fout, const Options* opts)
