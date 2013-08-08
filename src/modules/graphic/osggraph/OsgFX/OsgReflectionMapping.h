@@ -24,22 +24,29 @@
 
 #include <car.h>
 
+#define REFLECTIONMAPPING_OFF 0
+#define REFLECTIONMAPPING_STATIC 1
+#define REFLECTIONMAPPING_HYBRID 2
+#define REFLECTIONMAPPING_DYNAMIC 3
+
+class SDCar;
+
 class SDReflectionMapping
 {
     private:
         osg::ref_ptr<osg::Group> camerasRoot;
         std::vector< osg::ref_ptr<osg::Camera> > cameras;
-        osg::ref_ptr<osg::TextureCubeMap> reflectionMap;
-        tCarElt * car;
+        osg::ref_ptr<osg::Texture> reflectionMap;
+        SDCar *car;
         inline osg::ref_ptr<osg::Group> getCamerasRoot(){
             return camerasRoot;
         }
 
     public:
-        SDReflectionMapping(tCarElt *c);
+        SDReflectionMapping(SDCar *c);
         ~SDReflectionMapping();
 
-        inline osg::ref_ptr<osg::TextureCubeMap> getReflectionMap(){
+        inline osg::ref_ptr<osg::Texture> getReflectionMap(){
             return reflectionMap;
         }
 

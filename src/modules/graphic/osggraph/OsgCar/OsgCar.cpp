@@ -41,6 +41,8 @@
 #include "OsgSky/OsgSky.h"
 
 
+#include "OsgFX/OsgShader.h"
+#include "OsgFX/OsgReflectionMapping.h"
 
 
 
@@ -220,15 +222,31 @@ osg::Node *SDCar::loadCar(tCarElt *car)
    // car_root->setNodeMask(1);
 
 
-    this->shader = new SDCarShader(pCar.get());
+    this->shader = new SDCarShader(pCar.get(),this);
 
 
+    this->reflectionMappingMethod = REFLECTIONMAPPING_STATIC;
 
 
-    this->reflectionMapping = new SDReflectionMapping(car);
+    this->reflectionMapping = new SDReflectionMapping(this);
   //  this->setReflectionMap(reflectionMapping->getReflectionMap());
 
     return this->car_root;
+}
+
+bool SDCar::isCar(tCarElt*c){
+    return c==car;
+}
+SDReflectionMapping * SDCar::getReflectionMap(){
+    return reflectionMapping;
+}
+
+int SDCar::getReflectionMappingMethod(){
+    return reflectionMappingMethod;
+}
+
+tCarElt * SDCar::getCar(){
+    return car;
 }
 
 #define GR_SHADOW_POINTS 6
@@ -371,7 +389,7 @@ void SDCar::updateShadingParameters(osg::Matrixf modelview){
     shader->update(modelview);
 }
 
-void SDCar::setReflectionMap(osg::ref_ptr<osg::TextureCubeMap> map){
+void SDCar::setReflectionMap(osg::ref_ptr<osg::Texture> map){
     car_branch->getOrCreateStateSet()->setTextureAttributeAndModes(2,map,osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 }
 

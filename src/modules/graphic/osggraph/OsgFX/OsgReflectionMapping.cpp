@@ -23,11 +23,14 @@
 
 #include "OsgView/OsgScreens.h"
 
-#include "OsgReflectionMapping.h"
+
 
 #include "OsgCar/OsgCar.h"
 #include "OsgRender.h"
 #include "OsgMain.h"
+
+
+#include "OsgReflectionMapping.h"
 
 #include <car.h>
 
@@ -77,13 +80,16 @@ CameraPreCallback * pre_cam = new CameraPreCallback;
 CameraPostCallback * post_cam = new CameraPostCallback;
 
 
-SDReflectionMapping::SDReflectionMapping(tCarElt *c):car(c){
+SDReflectionMapping::SDReflectionMapping(SDCar *c):car(c){
 
     SDRender * render = (SDRender *)getRender();
     osg::ref_ptr<osg::Node> m_sceneroot =  render->getRoot();
 
 
+    osg::ref_ptr<osg::TextureCubeMap> reflectionMap;
+
     reflectionMap = new osg::TextureCubeMap;
+    this->reflectionMap =reflectionMap;
     reflectionMap->setTextureSize( 256, 256 );
     reflectionMap->setInternalFormat( GL_RGB);
     reflectionMap->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
@@ -135,16 +141,18 @@ SDReflectionMapping::SDReflectionMapping(tCarElt *c):car(c){
 
 void SDReflectionMapping::update(){
 
+    //TODO support for multi screen
+
     SDScreens * screens = (SDScreens*)getScreens();
     osg::Camera * viewCam = screens->getActiveView()->getOsgCam();
+
+    tCarElt * car = this->car->getCar();
 
     pre_cam->setCar(car);
     post_cam->setCar(car);
 
-    sgVec3 P, p;
+    sgVec3 p;
     osg::Vec3 eye,center,up;
-
-    float offset = 0;
 
     p[0] = car->_drvPos_x;
     p[1] = car->_bonnetPos_y;

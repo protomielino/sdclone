@@ -25,9 +25,10 @@
 
 #include "OsgMain.h"
 #include "OsgShader.h"
+#include "OsgCar/OsgCar.h"
 #include "OsgSky/OsgSky.h"
 
-SDCarShader::SDCarShader(osg::Node *car){
+SDCarShader::SDCarShader(osg::Node *car, SDCar *c){
 
     std::string TmpPath = GetDataDir();
     osg::ref_ptr<osg::Shader> vertShader =
@@ -41,26 +42,30 @@ SDCarShader::SDCarShader(osg::Node *car){
     program->addShader( fragShader.get() );
 
     pCar= car;
+    this->pSdCar = c;
     stateset = pCar->getOrCreateStateSet();
     stateset->setAttributeAndModes(program);
 
     diffuseMap = new osg::Uniform("diffusemap", 0 );
     stateset->addUniform(diffuseMap);
-    reflectionMap = new osg::Uniform("reflectionmap", 2 );
-    stateset->addUniform(reflectionMap);
     specularColor = new osg::Uniform("specularColor", osg::Vec4(0.8f,0.8f,0.8f,1.0f));
     stateset->addUniform(specularColor);
-    /*lightVector = new osg::Uniform("lightvector",osg::Vec3());
-    stateset->addUniform(lightVector);
-    lightPower = new osg::Uniform("lightpower",osg::Vec4());
-    stateset->addUniform(lightPower);
-    ambientColor =new osg::Uniform("ambientColor",osg::Vec4());
-    stateset->addUniform(ambientColor);*/
+
+
     lightVector = stateset->getOrCreateUniform("lightvector",osg::Uniform::FLOAT_VEC3);
     lightPower = stateset->getOrCreateUniform("lightpower",osg::Uniform::FLOAT_VEC4);
     ambientColor = stateset->getOrCreateUniform("ambientColor",osg::Uniform::FLOAT_VEC4);
     shininess = new osg::Uniform("smoothness", 300.0f);
     stateset->addUniform(shininess);
+
+    reflectionMappingMethod = new osg::Uniform("reflectionMappingMethod",pSdCar->getReflectionMappingMethod());
+    reflectionMapCube = new osg::Uniform("reflectionMapCube", 2 );
+    reflectionMap2DSampler = new osg::Uniform("reflectionMap2DSampler", 2 );
+    reflectionMapStaticOffsetCoords = stateset->getOrCreateUniform("reflectionMapStaticOffsetCoords",osg::Uniform::FLOAT_VEC3);
+
+    stateset->addUniform(reflectionMappingMethod);
+    stateset->addUniform(reflectionMap2DSampler);
+    stateset->addUniform(reflectionMapCube);
 }
 
 void SDCarShader::update(osg::Matrixf view){

@@ -16,23 +16,37 @@
  *                                                                         *
  ***************************************************************************/
 
+#ifndef _OSGSHADERS_H_
+#define _OSGSHADERS_H_
+
+class SDCar;
+
 class SDCarShader{
 private :
+
+    SDCar * pSdCar;
 
     osg::ref_ptr<osg::Program> program ;
 
     osg::ref_ptr<osg::Node> pCar;
+
     osg::ref_ptr<osg::StateSet> stateset;
     osg::ref_ptr<osg::Uniform> diffuseMap;
-    osg::ref_ptr<osg::Uniform> reflectionMap;
     osg::ref_ptr<osg::Uniform> specularColor;
     osg::ref_ptr<osg::Uniform> lightVector;
     osg::ref_ptr<osg::Uniform> lightPower;
     osg::ref_ptr<osg::Uniform> ambientColor;
     osg::ref_ptr<osg::Uniform> shininess;
 
+    osg::ref_ptr<osg::Uniform> reflectionMappingMethod;
+    osg::ref_ptr<osg::Uniform> reflectionMapCube;
+    osg::ref_ptr<osg::Uniform> reflectionMap2DSampler;
+    osg::ref_ptr<osg::Uniform> reflectionMapStaticOffsetCoords;
+
 
 public :
-    SDCarShader(osg::Node *car);
+    SDCarShader(osg::Node *car, SDCar *c);
     void update(osg::Matrixf view);
 };
+
+#endif //_OSGSHADERS_H_

@@ -27,8 +27,7 @@ class SDDebugHUD
 
     public:
         void toggleHUD();
-        void setTexture(osg::ref_ptr<osg::TextureCubeMap> map);
-        void setTexture(osg::ref_ptr<osg::Texture2D> map);
+        void setTexture(osg::ref_ptr<osg::Texture> map);
         SDDebugHUD();
         ~SDDebugHUD();
 
