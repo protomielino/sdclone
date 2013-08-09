@@ -48,6 +48,7 @@ typedef struct
 #define SIM_WH_SPINNING 4	/* the wheel is spinning */
 #define SIM_WH_LOCKED   8	/* the wheel is locked */
     tdble	axleFz;		/* force from axle (anti-roll bar) */
+    tdble   axleFz3rd;  /* force from axle (3rd/heave spring) */
     tTrkLocPos	trkPos;		/* current track position */
     tPosd	relPos;		/* relative pos / GC */
     tdble	sa;		/* slip angle */

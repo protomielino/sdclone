@@ -82,8 +82,8 @@ void SimAxleUpdate(tCar *car, int index)
 	axle->heaveSusp.v = 0.5 * (vtl + vtr);
 	SimSuspUpdate(&(axle->heaveSusp));
 	f = 0.5 * axle->heaveSusp.force;
-	car->wheel[index*2].axleFz += f;
-	car->wheel[index*2+1].axleFz += f;
+	car->wheel[index*2].axleFz3rd = f;
+	car->wheel[index*2+1].axleFz3rd = f;
 }
 
 
