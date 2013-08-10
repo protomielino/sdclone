@@ -527,6 +527,7 @@ grInitCar(tCarElt *car)
 	int selIndex;
 	ssgEntity *carEntity;
 	ssgSelector *LODSel;
+
 	/* ssgBranchCb		*branchCb; */
 	ssgTransform *wheel[4];
 	int nranges;
@@ -808,6 +809,20 @@ grInitCar(tCarElt *car)
 		grCarInfo[index].rearwingSelectorinsg = true;
 	} else {
 		grCarInfo[index].rearwingSelectorinsg = false;
+	}
+
+	/* Set a selector on the wing type*/
+	snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_WING_MODEL);
+	param = GfParmGetStr(handle, path, PRM_WING_1, NULL);
+	if (param)
+	{
+		if (grSpeedway)
+		{
+			param = GfParmGetStr(handle, path, PRM_WING_2, NULL);
+		}
+
+		ssgEntity *wingEntity = grssgCarLoadAC3D(param, NULL, index);
+		carBody->addKid(wingEntity);
 	}
 
 	DBG_SET_NAME(carEntity, "Body", index, -1);

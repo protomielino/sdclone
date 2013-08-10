@@ -46,6 +46,7 @@ int grWrldX;
 int grWrldY;
 int grWrldZ;
 int grWrldMaxSize;
+bool grSpeedway;
 static bool grBGSky = false;
 static bool grBGType = false;
 tTrack *grTrack;
@@ -193,6 +194,11 @@ grLoadScene(tTrack *track)
 	grWrldY = (int)(track->max.y - track->min.y + 1);
 	grWrldZ = (int)(track->max.z - track->min.z + 1);
 	grWrldMaxSize = (int)(MAX(MAX(grWrldX, grWrldY), grWrldZ));
+
+	if (strcmp(track->category, "speedway") == 0)
+		grSpeedway = true;
+	else
+		grSpeedway = false;
 
 	/* The track itself, and its landscape */
 	acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");

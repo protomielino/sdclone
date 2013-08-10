@@ -34,6 +34,7 @@ extern int grWrldX;
 extern int grWrldY;
 extern int grWrldZ;
 extern int grWrldMaxSize;
+extern bool grSpeedway;
 extern tTrack *grTrack;
 
 extern ssgRoot *TheScene;
