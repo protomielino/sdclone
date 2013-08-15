@@ -225,7 +225,7 @@ osg::Node *SDCar::loadCar(tCarElt *car)
     this->shader = new SDCarShader(pCar.get(),this);
 
 
-    this->reflectionMappingMethod = REFLECTIONMAPPING_STATIC;
+    this->reflectionMappingMethod = REFLECTIONMAPPING_OFF;
 
 
     this->reflectionMapping = new SDReflectionMapping(this);

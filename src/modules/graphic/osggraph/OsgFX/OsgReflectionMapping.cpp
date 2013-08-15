@@ -131,8 +131,11 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):car(c){
 
   }
 
-     SDScreens * screens = (SDScreens*)getScreens();
-     screens->registerViewDependantPreRenderNode(this->getCamerasRoot());
+
+
+     //ACTIVATE to enable Environment MApping <= temporary hack.
+    //SDScreens * screens = (SDScreens*)getScreens();
+    //screens->registerViewDependantPreRenderNode(this->getCamerasRoot());
 
     //cameras[4]->setNodeMask(1);
 
