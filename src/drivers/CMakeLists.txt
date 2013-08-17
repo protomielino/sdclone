@@ -10,9 +10,6 @@ SD_ADD_SUBDIRECTORY(usr)
 # Work-in-progress / unofficial robots.
 IF(NOT OPTION_OFFICIAL_ONLY)
 
-  # Template robot (new framework).
-  SD_ADD_SUBDIRECTORY(template)
-
   # Work-in-progress.
   #SD_ADD_SUBDIRECTORY(shadow)
 

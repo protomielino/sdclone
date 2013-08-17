@@ -158,6 +158,7 @@ GfModule* GfModule::load(const std::string& strModPathName, const std::string& s
 	return load(ossModLibPathName.str());
 }
 
+// TODO: Tests (not yet used, see #809).
 std::vector<GfModule*> GfModule::loadFromDir(const std::string& strDirPath,
 											 bool bUseChildDirs)
 {
@@ -239,6 +240,7 @@ bool GfModule::unload(GfModule*& pModule)
 	return true;
 }
 
+// TODO: Tests (not yet used, see #809).
 bool GfModule::unload(std::vector<GfModule*>& vecModules)
 {
 	bool bStatus = true;
