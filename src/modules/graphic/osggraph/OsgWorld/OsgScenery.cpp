@@ -141,7 +141,7 @@ void SDScenery::LoadScene(tTrack *track)
 		strPath+=acname;
 
 		LoadTrack(strPath);
-	}
+    }
 	else
 	{
 		strPath+=buf;
@@ -164,8 +164,10 @@ void SDScenery::LoadScene(tTrack *track)
             rot->addChild(pTrack);
             _scenery->addChild(rot.get());
         }
-    		
-        _scenery->addChild(pTrack.get());
+        else
+        {
+            _scenery->addChild(pTrack.get());
+        }
 	}
 }
 
@@ -230,6 +232,7 @@ bool SDScenery::LoadTrack(std::string strTrack)
 	{
         pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
         _scenery->addChild(pTrack.get());
+        osgDB::writeNodeFile(*pTrack,"/home/xavier/track.osgt");
 	}
 	else
 		return false;
