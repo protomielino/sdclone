@@ -38,9 +38,9 @@ def check_version(myfile):
 	# Return GIT revision
 	if _has_pygit and options.git:
 		repo = Repo(myfile)
-		commits = repo.commits(path=myfile, max_count=1)
-		if commits:
-			for line in commits[0].message.splitlines():
+		headcommit = repo.head.commit
+		if headcommit:
+			for line in headcommit.message.splitlines():
 				if line.startswith("git-svn-id:"):
 					return int(line.split("@", 1)[1].split(" ",1)[0])
 		else:
@@ -78,19 +78,20 @@ def get_screenshot(module, index, car, skin, skintargets):
 			j = i.find("section")
 	
 			# modify attributes
-			for k in list(j):
-				if k.attrib["name"] == "idx":
-					k.set("val", index)
-				if k.attrib["name"] == "module":
-					k.set("val", module)
-				if k.attrib["name"] == "skin targets":
-					k.set("val", skintargets)
-				if k.attrib["name"] == "skin name":
-					skin_done = True
-					if skin:
-						k.set("val", skin)
-					else:
-						j.remove(k)
+			if j is not None:
+				for k in list(j):
+					if k.attrib["name"] == "idx":
+						k.set("val", index)
+					if k.attrib["name"] == "module":
+						k.set("val", module)
+					if k.attrib["name"] == "skin targets":
+						k.set("val", skintargets)
+					if k.attrib["name"] == "skin name":
+						skin_done = True
+						if skin:
+							k.set("val", skin)
+						else:
+							j.remove(k)
 
 			if not skin_done and skin:
 				# Need to add skin attribute
