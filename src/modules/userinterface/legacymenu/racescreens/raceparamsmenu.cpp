@@ -252,11 +252,11 @@ rmChangeRain(void *vp)
 			cloudsComboEnabled = GFUI_DISABLE;
 			rmrpClouds = GfRace::eCloudsRandom;
 		}
-		else if (rmrpRain == GfRace::eRainReal) // Real rain => Real clouds.
+		/*else if (rmrpRain == GfRace::eRainReal) // Real rain => Real clouds.
 		{
 			cloudsComboEnabled = GFUI_DISABLE;
 			rmrpClouds = GfRace::eCloudsReal;
-		}
+		}*/
 		else if (rmrpRain != GfRace::eRainNone)
 		{
 			cloudsComboEnabled = GFUI_DISABLE;

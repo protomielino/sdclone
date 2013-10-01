@@ -46,7 +46,7 @@ static const float BackgroundDistance = 1.0f;
 
 static const unsigned SkyDomeDistThresh = 12000; // No dynamic sky below that value.
 
-static const int NMaxStars = 1000;
+static const int NMaxStars = 3200;
 static const int NMaxPlanets = 0; //No planets displayed for the moment
 static const int NMaxCloudLayers = 3;
 

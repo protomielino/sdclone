@@ -366,7 +366,7 @@ typedef struct RmInfo
 #define RM_VAL_CLOUDS_RANDOM	"random"
 #define RM_VAL_CLOUDS_REAL	"real"
 #define RM_VALS_CLOUDS { RM_VAL_CLOUDS_NONE, RM_VAL_CLOUDS_FEW, RM_VAL_CLOUDS_SCARCE, \
-                         RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_FULL, RM_VAL_CLOUDS_RANDOM, RM_VAL_CLOUDS_REAL }
+                         RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_FULL, RM_VAL_CLOUDS_RANDOM }
 
 #define RM_VAL_RAIN_NONE	"none"
 #define RM_VAL_RAIN_LITTLE	"little"
@@ -375,7 +375,7 @@ typedef struct RmInfo
 #define RM_VAL_RAIN_RANDOM	"random"
 #define RM_VAL_RAIN_REAL	"real"
 #define RM_VALS_RAIN { RM_VAL_RAIN_NONE, RM_VAL_RAIN_LITTLE, RM_VAL_RAIN_MEDIUM, \
-                       RM_VAL_RAIN_HEAVY, RM_VAL_RAIN_RANDOM, RM_VAL_RAIN_REAL }
+                       RM_VAL_RAIN_HEAVY, RM_VAL_RAIN_RANDOM }
 
 /* Movie capture */
 
