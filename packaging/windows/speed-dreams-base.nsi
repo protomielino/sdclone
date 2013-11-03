@@ -87,12 +87,13 @@ Section "!Base System" SEC01
   ; Executable and DLLs ... but no mod tool (see later)
   SetOutPath "$INSTDIR\bin"
   File /x sd-*.* /x *.lib "${BUILD_INST_DIR}\bin\*.*"
+  File /x libzlib.dll /x zlib1.dll "${BUILD_INST_DIR}\bin\*.*"
 
   ; Core loadable modules (physics and graphics engines, track loader, ...)
   SetOutPath "$INSTDIR\lib\modules\graphic"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\graphic\*.*"
   SetOutPath "$INSTDIR\lib\modules\simu"
-  File "${BUILD_INST_DIR}\lib\modules\simu\simuv2.1.dll"
+  File "${BUILD_INST_DIR}\lib\modules\simu\simuv4.dll"
   SetOutPath "$INSTDIR\lib\modules\telemetry"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\telemetry\*.*"
   SetOutPath "$INSTDIR\lib\modules\track"
@@ -103,6 +104,8 @@ Section "!Base System" SEC01
   File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\sound\*.*"
   SetOutPath "$INSTDIR\lib\modules\racing"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\racing\*.*"
+  ;SetOutPath "$INSTDIR\lib\modules\networking"
+  ;File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\networking\*.*"
 
   ; Core data files (sound, textures, menus, car categories, ...)
   SetOutPath "$INSTDIR\data"
@@ -122,6 +125,7 @@ Section "!Base System" SEC01
   File "${BUILD_INST_DIR}\data\config\raceman\quickrace.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\singleevent-challenge.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\singleevent-endurance.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\networkrace.xml"
 
   SetOutPath "$INSTDIR\data\data"
   File /r "${BUILD_INST_DIR}\data\data\*.*"
@@ -137,8 +141,8 @@ Section "!Base System" SEC01
   SetOutPath "$INSTDIR\lib\drivers\human"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\human\*.*"
 
-  ;SetOutPath "$INSTDIR\lib\drivers\networkhuman"
-  ;File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\networkhuman\*.*"
+  SetOutPath "$INSTDIR\lib\drivers\networkhuman"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\networkhuman\*.*"
 
   SetOutPath "$INSTDIR\lib\drivers\simplix_sc"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\simplix_sc\*.*"
@@ -150,8 +154,8 @@ Section "!Base System" SEC01
   SetOutPath "$INSTDIR\data\drivers\human"
   File /r /x *.lib "${BUILD_INST_DIR}\data\drivers\human\*.*"
 
-  ;SetOutPath "$INSTDIR\data\drivers\networkhuman"
-  ;File /r /x *.lib "${BUILD_INST_DIR}\data\drivers\networkhuman\*.*"
+  SetOutPath "$INSTDIR\data\drivers\networkhuman"
+  File /r /x *.lib "${BUILD_INST_DIR}\data\drivers\networkhuman\*.*"
 
   SetOutPath "$INSTDIR\data\drivers\simplix_sc"
   File /r /x *.lib "${BUILD_INST_DIR}\data\drivers\simplix_sc\*.*"
@@ -202,6 +206,7 @@ Section /o "Basic mod Tools" SEC02
   ; Tools executables
   SetOutPath "$INSTDIR\bin"
   File "${BUILD_INST_DIR}\bin\sd2-*.*"
+  File "${BUILD_INST_DIR}\bin\zlib1.dll"
   File "${BUILD_INST_DIR}\bin\*.lib"
 
   ; Cmake macros for robot developers

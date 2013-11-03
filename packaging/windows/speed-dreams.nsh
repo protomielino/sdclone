@@ -13,8 +13,8 @@
 !define VER_MINOR 1
 !define VER_PATCH 0
 !define VER_EXTRA ""
-!define VER_REVISION "r????"
-!define VER_RELDATE 20130408 ; Initial guess ;-)
+!define VER_REVISION "beta"
+!define VER_RELDATE 20131102 ; Initial guess ;-)
 
 !define GAME_SHORT_NAME "Speed Dreams"
 !define GAME_NAME "${GAME_SHORT_NAME} 2"

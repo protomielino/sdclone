@@ -61,8 +61,7 @@ Section -CoreBinaries
 
   ; Obsolete physics engines.
   SetOutPath "$INSTDIR\lib\modules\simu"
-  File "${BUILD_INST_DIR}\lib\modules\simu\simuv2.dll"
-  File "${BUILD_INST_DIR}\lib\modules\simu\simuv3.dll"
+  File "${BUILD_INST_DIR}\lib\modules\simu\simuv2.1.dll"
 
 SectionEnd
 
@@ -75,6 +74,14 @@ SectionEnd
 Section -Drivers
 
   SetOverwrite on
+
+  ; Warning: Must be here because kilo2008 also drivers the TRB1 cars.
+  SetOutPath "$INSTDIR\lib\drivers\kilo2008"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\kilo2008\*.*"
+  
+  ; Warning: Must be here because kilo2008 also drivers the TRB1 cars.
+  SetOutPath "$INSTDIR\data\drivers\kilo2008"
+  File /r "${BUILD_INST_DIR}\data\drivers\kilo2008\*.*"
 
 SectionEnd
 

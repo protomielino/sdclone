@@ -66,6 +66,7 @@ Section -CoreData
   File "${BUILD_INST_DIR}\data\config\raceman\championship.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-supercars.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-trb1.xml"
+    File "${BUILD_INST_DIR}\data\config\raceman\championship-mpa1.xml"
 
 SectionEnd
 
@@ -76,20 +77,30 @@ Section -Drivers
   ; Robots binaries
   SetOutPath "$INSTDIR\lib\drivers\simplix_trb1"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\simplix_trb1\*.*"
+  
+  ; Robots binaries
+  SetOutPath "$INSTDIR\lib\drivers\simplix_mpa1"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\simplix_mpa1\*.*"
 
   SetOutPath "$INSTDIR\lib\drivers\usr_trb1"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_trb1\*.*"
-
-  ; Warning: Must be here because kilo2008 also drivers the TRB1 cars.
-  SetOutPath "$INSTDIR\lib\drivers\kilo2008"
-  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\kilo2008\*.*"
+  
+  SetOutPath "$INSTDIR\lib\drivers\usr_mpa1"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_mpa1\*.*"
 
   ; Robots data files (car and track setups)
   SetOutPath "$INSTDIR\data\drivers\simplix_trb1"
   File /r "${BUILD_INST_DIR}\data\drivers\simplix_trb1\*.*"
+  
+  ; Robots data files (car and track setups)
+  SetOutPath "$INSTDIR\data\drivers\simplix_mpa1"
+  File /r "${BUILD_INST_DIR}\data\drivers\simplix_mpa1\*.*"
 
   SetOutPath "$INSTDIR\data\drivers\usr_trb1"
   File /r "${BUILD_INST_DIR}\data\drivers\usr_trb1\*.*"
+  
+  SetOutPath "$INSTDIR\data\drivers\usr_mpa1"
+  File /r "${BUILD_INST_DIR}\data\drivers\usr_mpa1\*.*"
 
   ; Warning: Must be here because kilo2008 also drivers the TRB1 cars.
   SetOutPath "$INSTDIR\data\drivers\kilo2008"
@@ -125,6 +136,22 @@ Section -Cars
 
   SetOutPath "$INSTDIR\data\cars\models\trb1-zaxxon-rb"
   File /r "${BUILD_INST_DIR}\data\cars\models\trb1-zaxxon-rb\*.*"
+  
+    ; HQ / AI driven MPA1 car models
+  SetOutPath "$INSTDIR\data\cars\models\mpa1-ffr"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mpa1-ffr\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mpa1-furia"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mpa1-furia\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mpa1-hartbill-2002"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mpa1-hartbill-2002\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mpa1-murasama"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mpa1-murasama\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mpa1-team-lynx"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mpa1-team-lynx\*.*"
 
 SectionEnd
 
@@ -152,12 +179,15 @@ Section -Tracks
 
   SetOutPath "$INSTDIR\data\tracks\road\lombaro"
   File /r "${BUILD_INST_DIR}\data\tracks\road\lombaro\*.*"
+    
+  SetOutPath "$INSTDIR\data\tracks\road\ole-road-1"
+  File /r "${BUILD_INST_DIR}\data\tracks\road\ole-road-1\*.*"
+  
+  SetOutPath "$INSTDIR\data\tracks\road\peters"
+  File /r "${BUILD_INST_DIR}\data\tracks\road\peters\*.*"
 
   SetOutPath "$INSTDIR\data\tracks\road\pinabashi"
   File /r "${BUILD_INST_DIR}\data\tracks\road\pinabashi\*.*"
-
-  SetOutPath "$INSTDIR\data\tracks\road\ole-road-1"
-  File /r "${BUILD_INST_DIR}\data\tracks\road\ole-road-1\*.*"
 
   SetOutPath "$INSTDIR\data\tracks\road\prenzlau"
   File /r "${BUILD_INST_DIR}\data\tracks\road\prenzlau\*.*"
@@ -165,10 +195,19 @@ Section -Tracks
   SetOutPath "$INSTDIR\data\tracks\road\salty"
   File /r "${BUILD_INST_DIR}\data\tracks\road\salty\*.*"
 
-  ; HQ (2) speedways 
+  ; HQ (2) speedways
+  SetOutPath "$INSTDIR\data\tracks\speedway\longpond"
+  File /r "${BUILD_INST_DIR}\data\tracks\speedway\longpond\*.*"
+  
+  SetOutPath "$INSTDIR\data\tracks\speedway\mile"
+  File /r "${BUILD_INST_DIR}\data\tracks\speedway\mile\*.*"
+
+   SetOutPath "$INSTDIR\data\tracks\speedway\milky-five"
+  File /r "${BUILD_INST_DIR}\data\tracks\speedway\milky-five\*.*" 
+  
   SetOutPath "$INSTDIR\data\tracks\speedway\newton"
   File /r "${BUILD_INST_DIR}\data\tracks\speedway\newton\*.*"
-
+  
 SectionEnd
 
 ; This function is called at installer startup.
