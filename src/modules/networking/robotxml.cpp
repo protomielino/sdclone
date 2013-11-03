@@ -41,6 +41,8 @@ bool RobotXml::CreateRobotFile(const char*pRobotName,std::vector<NetDriver> &vec
     {
         sprintf(path2, "Robots/index/%d",i+1);
         GfParmSetStr(params, path2, "name",vecDrivers[i].name);
+        GfParmSetStr(params, path2, "short name",vecDrivers[i].name);
+        GfParmSetStr(params, path2, "code name","PLA");
         GfParmSetStr(params, path2, "car name",vecDrivers[i].car);
         GfParmSetNum(params, path2, "race number", (char*)NULL,(tdble) vecDrivers[i].racenumber);
         GfParmSetNum(params, path2, "red", (char*)NULL, vecDrivers[i].red);

@@ -357,6 +357,8 @@ PutPlayerSettings(unsigned index)
 	
     // Human driver params
     GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_NAME, player->dispName());
+    GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_SNAME, player->dispName());
+    GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_CODE, "PLA");
     GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_CAR, player->defaultCarName());
     GfParmSetNum(PlayerHdle, drvSectionPath, ROB_ATTR_RACENUM, (char*)NULL, player->raceNumber());
     GfParmSetNum(PlayerHdle, drvSectionPath, ROB_ATTR_RED, (char*)NULL, player->color(0));
