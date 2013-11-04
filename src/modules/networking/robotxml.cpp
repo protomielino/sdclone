@@ -94,6 +94,8 @@ bool RobotXml::ReadRobotDrivers(const char*pRobotName,std::vector<NetDriver> &ve
         else 
             driver.client = false;
 
+        strncpy(driver.car, GfParmGetStr(params, path2, "short name", NULL), 64);
+        strncpy(driver.car, GfParmGetStr(params, path2, "code name",NULL), 3);
         strncpy(driver.car,GfParmGetStr(params, path2, "car name",NULL),64);
         strncpy(driver.type,GfParmGetStr(params, path2, "type",NULL),64);
         strncpy(driver.skilllevel,GfParmGetStr(params, path2, "skill level",NULL),64);
