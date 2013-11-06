@@ -209,7 +209,6 @@ Section /o "Basic mod Tools" SEC02
   ; Tools executables
   SetOutPath "$INSTDIR\bin"
   File "${BUILD_INST_DIR}\bin\sd2-*.*"
-  File "${BUILD_INST_DIR}\bin\zlib1.dll"
   File "${BUILD_INST_DIR}\bin\*.lib"
 
   ; Cmake macros for robot developers
