@@ -73,14 +73,8 @@ SET(ROBOT_SOURCES
 )
 
 # Official-only simplix instances.
-SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_ls2 simplix_mp5 simplix_lp1 simplix_ref)
-
-IF(NOT OPTION_OFFICIAL_ONLY)
-
-	# Work-in-progress / unofficial simplix instances.
-    SET(ROBOT_CLONES ${ROBOT_CLONES} simplix_mpa1)
-
-ENDIF()
+SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_ls2 simplix_mp5 
+			simplix_mpa1 simplix_lp1 simplix_ref)
 
 # The ubiquitous robot module and its clones.
 ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.3.0 SOVERSION 1.0.0
