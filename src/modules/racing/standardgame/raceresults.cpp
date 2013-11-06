@@ -49,6 +49,7 @@ static char path2[1024];
 typedef struct
 {
 	std::string drvName;
+	std::string shortname;
 	std::string modName;
 	std::string carName;
 	int         extended;
@@ -146,6 +147,7 @@ ReUpdateStandings(void)
 	{
 		snprintf(path2, sizeof(path2), "%s/%d", RE_SECT_STANDINGS, i + 1);
 		st.drvName = GfParmGetStr(results, path2, RE_ATTR_NAME, 0);
+		st.shortname = GfParmGetStr(results, path2, RE_ATTR_SNAME, 0);
 		st.modName = GfParmGetStr(results, path2, RE_ATTR_MODULE, 0);
 		st.carName = GfParmGetStr(results, path2, RE_ATTR_CAR, 0);
 		st.extended = (int)GfParmGetNum(results, path2, RM_ATTR_EXTENDED, NULL, 0);
@@ -169,6 +171,7 @@ ReUpdateStandings(void)
 		if(found == standings->end()) {
 			//No such driver in the standings, let's add it
 			st.drvName = drvName;
+			st.shortname = GfParmGetStr(results, path, RE_ATTR_SNAME, 0);
 			st.modName = GfParmGetStr(results, path, RE_ATTR_MODULE, 0);
 			st.carName = GfParmGetStr(results, path, RE_ATTR_CAR, 0);
 			st.extended = (int)GfParmGetNum(results, path, RM_ATTR_EXTENDED, NULL, 0);
@@ -188,6 +191,7 @@ ReUpdateStandings(void)
 	for(it = standings->begin(), i = 0; it != standings->end(); ++it, ++i) {
 		snprintf(path, sizeof(path), "%s/%d", RE_SECT_STANDINGS, i + 1);
 		GfParmSetStr(results, path, RE_ATTR_NAME, it->drvName.c_str());
+		GfParmSetStr(results, path, RE_ATTR_SNAME, it->shortname.c_str());
 		GfParmSetStr(results, path, RE_ATTR_MODULE, it->modName.c_str());
 		GfParmSetStr(results, path, RE_ATTR_CAR, it->carName.c_str());
 		GfParmSetNum(results, path, RE_ATTR_IDX, NULL, (tdble)it->drvIdx);
