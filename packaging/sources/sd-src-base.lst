@@ -3,7 +3,6 @@ COPYING.txt
 INSTALL.txt
 README.txt
 TODO.txt
-credits.xml
 
 doc/faq/faq.html
 doc/userman
@@ -43,6 +42,7 @@ src/modules/track
 src/modules/userinterface
 
 data/CMakeLists.txt
+data/credits.xml
 data/data
 
 data/config/CMakeLists.txt
@@ -61,7 +61,8 @@ data/config/raceman/singleevent-challenge.xml
 data/config/raceman/singleevent-endurance.xml
 
 data/drivers/CMakeLists.txt
-data/drivers/kilo2008
+data/drivers/human
+data/drivers/networkhuman
 data/drivers/usr_sc
 data/drivers/simplix_sc
 

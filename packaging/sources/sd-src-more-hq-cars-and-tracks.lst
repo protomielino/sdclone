@@ -1,10 +1,19 @@
 data/config/raceman/championship.xml
+data/config/raceman/championship-mpa1.xml
 data/config/raceman/championship-supercars.xml
 data/config/raceman/championship-trb1.xml
 
+data/drivers/usr_mpa1
 data/drivers/usr_trb1
 
+data/drivers/simplix_mpa1
 data/drivers/simplix_trb1
+
+data/cars/models/mpa1-furia
+data/cars/models/mpa1-ffr
+data/cars/models/mpa1-hartbill-2002
+data/cars/models/mpa1-murasama
+data/cars/models/mpa1-team-lynx
 
 data/cars/models/trb1-boxer-trbrs
 data/cars/models/trb1-cavallo-360rb
@@ -31,9 +40,15 @@ data/tracks/road/inuksuk
 data/tracks/road/lombaro
 data/tracks/road/pinabashi
 data/tracks/road/ole-road-1
+data/tracks/road/peters
+data/tracks/road/pinabashi
 data/tracks/road/prenzlau
 data/tracks/road/salty
 
 data/tracks/speedway/CMakeLists.txt
 
+data/tracks/speedway/longpond
+data/tracks/speedway/mile
+data/tracks/speedway/milky-five
 data/tracks/speedway/newton
+data/tracks/speedway/tennessee

@@ -1,9 +1,9 @@
-data/config/raceman/singleevent-36gp.xml
-data/config/raceman/singleevent-ls-gt1.xml
 data/config/raceman/championship.xml
 data/config/raceman/championship-supercars.xml
 data/config/raceman/championship-36gp.xml
 data/config/raceman/championship-ls-gt1.xml
+data/config/raceman/singleevent-36gp.xml
+data/config/raceman/singleevent-ls-gt1.xml
 
 data/drivers/usr_ls1
 data/drivers/usr_36GP
@@ -12,6 +12,7 @@ data/drivers/simplix_ls1
 data/drivers/simplix_36GP
 
 data/cars/models/ls1-archer-r9
+data/cars/models/ls1-cavallo-570s1
 data/cars/models/ls1-newcastle-fury
 data/cars/models/ls1-taipan-ltsr
 data/cars/models/ls1-toro-rgt
