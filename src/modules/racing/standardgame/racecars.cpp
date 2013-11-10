@@ -539,8 +539,8 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					//        and is thus considered a real lap, whereas it is not).
 					car->_laps++;
 
-					if (NetGetNetwork())
-						NetGetNetwork()->SendLapStatusPacket(car);
+					/*if (NetGetNetwork())
+						NetGetNetwork()->SendLapStatusPacket(car);*/
 
 					car->_remainingLaps--;
 					if (car->_pos == 1 && s->currentTime < s->_totTime
