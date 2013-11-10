@@ -155,7 +155,7 @@ public:
     int idx;
     char name[64];
 	char sname[64];
-	char cname[3];
+    char cname[4];
     char car[64];
     char team[64];
     char author[64];

@@ -296,6 +296,8 @@ bool NetClient::SendDriverInfoPacket(NetDriver *pDriver)
     GfLogTrace("->port=%d\n", pDriver->address.port);
     GfLogTrace("->idx=%d\n", pDriver->idx);
     GfLogTrace("->name=%s\n", pDriver->name);
+    GfLogTrace("->sname=%s\n", pDriver->sname);
+    GfLogTrace("->cname=%s\n", pDriver->cname);
     GfLogTrace("->car=%s\n", pDriver->car);
     GfLogTrace("->team=%s\n", pDriver->team);
     GfLogTrace("->author=%s\n", pDriver->author);
@@ -315,6 +317,8 @@ bool NetClient::SendDriverInfoPacket(NetDriver *pDriver)
         msg.pack_ubyte(PLAYERINFO_PACKET);
         msg.pack_int(pDriver->idx);
         msg.pack_string(pDriver->name, sizeof pDriver->name);
+        msg.pack_string(pDriver->sname, sizeof pDriver->sname);
+        msg.pack_string(pDriver->cname, sizeof pDriver->cname);
         msg.pack_string(pDriver->car, sizeof pDriver->car);
         msg.pack_string(pDriver->team, sizeof pDriver->team);
         msg.pack_string(pDriver->author, sizeof pDriver->author);

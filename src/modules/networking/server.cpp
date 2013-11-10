@@ -649,6 +649,8 @@ void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
         msg.unpack_ubyte();
         driver.idx = msg.unpack_int();
         msg.unpack_string(driver.name, sizeof driver.name);
+        msg.unpack_string(driver.sname, sizeof driver.sname);
+        msg.unpack_string(driver.cname, sizeof driver.cname);
         msg.unpack_string(driver.car, sizeof driver.car);
         msg.unpack_string(driver.team, sizeof driver.team);
         msg.unpack_string(driver.author, sizeof driver.author);

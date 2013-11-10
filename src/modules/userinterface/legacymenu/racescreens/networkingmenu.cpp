@@ -887,6 +887,10 @@ GetHumanDriver(NetDriver &driver,int index)
 	char path2[256];
 	sprintf(path2, "Robots/index/%d",index);
 	strncpy(driver.name,GfParmGetStr(params, path2, "name",NULL),64);
+    strncpy(driver.sname, GfParmGetStr(params, path2,
+                   ROB_ATTR_SNAME, NULL), 64);
+    strncpy(driver.cname, GfParmGetStr(params, path2,
+                   ROB_ATTR_CODE, NULL), 4);
 	strncpy(driver.car,GfParmGetStr(params, path2, "car name",NULL),64);
 	strncpy(driver.type,GfParmGetStr(params, path2, "type",NULL),64);
 	strncpy(driver.skilllevel,GfParmGetStr(params, path2, "skill level",NULL),64);
