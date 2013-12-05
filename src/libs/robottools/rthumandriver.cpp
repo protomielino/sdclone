@@ -1165,12 +1165,14 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
             || (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_LEFTGLANCE].deadZone != 0))
     {
         newGlance = newGlance - GLANCERATE * s->deltaTime;
+    	if (newGlance < -0.5) newGlance=-0.5;
     } else if ((cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_RIGHTGLANCE].val])
             || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_RIGHTGLANCE].val])
             || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_RIGHTGLANCE].val)].state)
             || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_RIGHTGLANCE].deadZone != 0))
     { 
         newGlance = newGlance + GLANCERATE * s->deltaTime;
+    	if (newGlance > 0.5) newGlance=0.5;
     } else if (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_AXIS && joyInfo->ax[cmd[CMD_RIGHTGLANCE].val] > cmd[CMD_RIGHTGLANCE].min)
     {
         newGlance = joyInfo->ax[cmd[CMD_RIGHTGLANCE].val];
