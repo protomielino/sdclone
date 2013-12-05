@@ -652,7 +652,9 @@ void NetClient::ConnectToDriver(NetDriver driver)
     }
     else
     {
-        GfLogWarning("Failed to connect to peer!\n");
+        //char hostName[256];
+        //enet_address_get_host_ip (&event.peer->address,hostName,256);
+        GfLogWarning("Failed to connect to peer! (%X)\n", &event.peer->address);
         return;
     }
 

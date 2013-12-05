@@ -165,6 +165,7 @@ public:
     char module[64];
     char type[64];
     bool client;
+    bool active;
 };
 
 //Holds car setup values
@@ -422,8 +423,8 @@ public:
     NetServerMutexData * LockServerData();
     void UnlockServerData();
 
-protected:
     void GenerateDriversForXML();
+protected:
     //Packets
     void ReadDriverInfoPacket(ENetPacket *ENetPacket, ENetPeer * pPeer);
     void ReadDriverReadyPacket(ENetPacket *pPacket);

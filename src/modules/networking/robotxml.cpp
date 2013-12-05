@@ -112,7 +112,6 @@ bool RobotXml::ReadRobotDrivers(const char*pRobotName,std::vector<NetDriver> &ve
         driver.address.port = (enet_uint16)GfParmGetNum(params, path2, "port",NULL,0);
         strncpy(driver.module,NETWORKROBOT,64);
         vecDrivers.push_back(driver);
-        printf("Adding driver \n");
     }
 
     GfParmReleaseHandle(params);

@@ -250,37 +250,35 @@ void NetServer::GenerateDriversForXML()
 
     const char *pName =GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 
-    int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
-
-    //Gather vector of all non human drivers
-    std::vector<NetDriver> vecRDrivers;
-    for (int i=1;i<=nCars;i++)
-    {
-        NetDriver driver;
-        ReadDriverData(driver,i,params);
-        if (strcmp(driver.module,NETWORKROBOT)	&& strcmp(driver.module,HUMANROBOT))
-            vecRDrivers.push_back(driver);
-    }
-
-    //Recreate drivers section robots first
-    char drvSec[256];
-    GfParmListClean(params, RM_SECT_DRIVERS);
-    for (int i=0;i<(int)vecRDrivers.size();i++)
-    {
-        int index = i+1;
-        sprintf(drvSec, "%s/%d", RM_SECT_DRIVERS, index);
-        GfParmSetNum(params, drvSec, RM_ATTR_IDX, (char*)NULL, (tdble)vecRDrivers[i].idx);
-        GfParmSetStr(params, drvSec, RM_ATTR_MODULE, vecRDrivers[i].module);
-    }
-
-    //And then add the networkhuman drivers
+    // We only want to add human drivers which don't already exist
     NetServerMutexData *pSData = LockServerData();
     for (int i=0;i<(int)pSData->m_vecNetworkPlayers.size();i++)
     {
-        int index = i+1+vecRDrivers.size();
-        sprintf(drvSec, "%s/%d", RM_SECT_DRIVERS, index);
-        GfParmSetNum(params, drvSec, RM_ATTR_IDX, (char*)NULL,(tdble) pSData->m_vecNetworkPlayers[i].idx);
-        GfParmSetStr(params, drvSec, RM_ATTR_MODULE, pSData->m_vecNetworkPlayers[i].module);
+        char path2[256];
+        int index = 1;
+        bool found = false;
+
+        // Skip the ones which aren't active
+	if (pSData->m_vecNetworkPlayers[i].active == false) continue;
+
+        while (!found) {
+            sprintf(path2, "%s/%d", RM_SECT_DRIVERS, index++);
+            if (GfParmExistsSection(params, path2) == 0) {
+                // driver not found, so add them at the end
+                GfLogInfo("Adding driver %s to XML\n", pSData->m_vecNetworkPlayers[i].name);
+                GfParmSetNum(params, path2, RM_ATTR_IDX, (char*)NULL,(tdble) pSData->m_vecNetworkPlayers[i].idx);
+                GfParmSetStr(params, path2, RM_ATTR_MODULE, pSData->m_vecNetworkPlayers[i].module);
+
+                // should also write skin information
+                break;
+            }
+
+            if ((tdble)pSData->m_vecNetworkPlayers[i].idx == GfParmGetNum(params, path2, RM_ATTR_IDX, NULL,1.0) &&
+                    strcmp(pSData->m_vecNetworkPlayers[i].module, GfParmGetStr(params, path2, RM_ATTR_MODULE,NULL)) == 0) {
+                GfLogInfo("Found driver %s in XML\n", pSData->m_vecNetworkPlayers[i].name);
+                found = true;
+            }
+        }
     }
 
     UnlockServerData();
@@ -293,9 +291,16 @@ void NetServer::SetLocalDrivers()
 {
     m_setLocalDrivers.clear();
 
-    m_driverIdx = GetDriverIdx();
-    GfLogTrace("Adding Human start rank: %i\n",m_driverIdx);
-    m_setLocalDrivers.insert(m_driverIdx-1);
+    // add all local drivers
+    NetServerMutexData *pSData = LockServerData();
+    for (int i=0;i<(int)pSData->m_vecNetworkPlayers.size();i++)
+    {
+        if(pSData->m_vecNetworkPlayers[i].client == false) {
+            m_setLocalDrivers.insert(i);
+            GfLogTrace("Adding Human start rank: %i\n",i);
+        }
+    }
+    UnlockServerData();
 
     assert(m_strRaceXMLFile!="");
 
@@ -662,6 +667,7 @@ void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
         msg.unpack_string(driver.module, sizeof driver.module);
         msg.unpack_string(driver.type, sizeof driver.type);
         driver.client = msg.unpack_int() ? true : false;
+        driver.active = true;
     }
     catch (PackedBufferException &e)
     {
@@ -669,8 +675,8 @@ void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
     }
 
     GfLogTrace("ReadDriverInfoPacket: driver\n");
-    GfLogTrace(".host=%d\n", driver.address.host);
-    GfLogTrace(".port=%d\n", driver.address.port);
+    GfLogTrace(".host=%X\n", pPeer->address.host);
+    GfLogTrace(".port=%d\n", pPeer->address.port);
     GfLogTrace(".idx=%d\n", driver.idx);
     GfLogTrace(".name=%s\n", driver.name);
     GfLogTrace(".car=%s\n", driver.car);
@@ -691,6 +697,12 @@ void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
     {
         if (strcmp(driver.name,pSData->m_vecNetworkPlayers[i].name)==0)
         {
+            // check to see if existing client is just updating details
+            if (pPeer->address.host == pSData->m_vecNetworkPlayers[i].address.host) {
+                GfLogInfo("Client driver updated details\n");
+                break;
+            }
+
             SendPlayerRejectedPacket(pPeer,"Player name already used. Please choose a different name.");
             UnlockServerData();
             return;
