@@ -34,6 +34,8 @@
 #include <raceman.h>
 #include <robot.h>
 #include <race.h>
+#include <racemanagers.h>
+#include <tracks.h>
 #include <cars.h>
 #include <drivers.h>
 #include <network.h>
@@ -300,10 +302,11 @@ UpdateNetworkPlayers()
 		}
 		NetGetServer()->UnlockServerData();
 	} else {
+#if 1
 		// Client XML files already written to disk - this works but is not the best solution....
 		GfDrivers::self()->reload();
-		tRmInfo* reInfo = LmRaceEngine().inData();
 		LmRaceEngine().race()->load(LmRaceEngine().race()->getManager(), true);
+#endif
 	}
 
 	//Update track info
@@ -314,6 +317,10 @@ UpdateNetworkPlayers()
 
 	sprintf(buf, "%s", strTrackName.c_str());
 	GfuiLabelSetText(racemanMenuHdle,g_trackHd,buf);
+
+	//Store current track - client needs this
+	GfTrack* PCurTrack = GfTracks::self()->getTrackWithName(buf);
+	LmRaceEngine().race()->getManager()->setEventTrack(0, PCurTrack);
 	
 	int laps = (int)GfParmGetNum(reInfo->params, reInfo->_reName,"laps", "", 1);
 	sprintf(buf, "%i", laps);
