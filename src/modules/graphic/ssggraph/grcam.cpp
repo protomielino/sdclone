@@ -1757,7 +1757,7 @@ class cGrCarCamRoadZoomTVD : public cGrCarCamRoadZoom
 
     void update(tCarElt *car, tSituation *s) {
 	int	i, j;
-	int	newCar;
+	int	newCar = 0;
 	double	curPrio;
 	double	deltaEventTime = s->currentTime - lastEventTime;
 	double	deltaViewTime = s->currentTime - lastViewTime;
