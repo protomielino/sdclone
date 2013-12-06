@@ -611,7 +611,6 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     int	i;
 
     ReloadValues = 1;
-    PrevScrHandle = prevMenu;
     PrefHdle = prefHdle;
     SaveOnExit = saveOnExit;
 
@@ -629,6 +628,8 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
 	 else
 		return ScrHandle;
     }
+
+    PrevScrHandle = prevMenu;
 
     /* Initialize joysticks array */
     for (int jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++)
