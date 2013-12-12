@@ -26,7 +26,7 @@ python check_car_skins.py -c $cars $versioning $config $run $proc
 python check_robot_skins.py -d $drivers/usr_36GP -c $cars $versioning $config $run $proc usr_36GP.xml
 python check_robot_skins.py -d $drivers/usr_ls1  -c $cars $versioning $config $run $proc usr_ls1.xml
 python check_robot_skins.py -d $drivers/usr_ls2  -c $cars $versioning $config $run $proc usr_ls2.xml
-python check_robot_skins.py -d $drivers/usr_ls1  -c $cars $versioning $config $run $proc usr_lp1.xml
+python check_robot_skins.py -d $drivers/usr_lp1  -c $cars $versioning $config $run $proc usr_lp1.xml
 python check_robot_skins.py -d $drivers/usr_mpa1 -c $cars $versioning $config $run $proc usr_mpa1.xml
 python check_robot_skins.py -d $drivers/usr_sc   -c $cars $versioning $config $run $proc usr_sc.xml
 python check_robot_skins.py -d $drivers/usr_trb1 -c $cars $versioning $config $run $proc usr_trb1.xml
