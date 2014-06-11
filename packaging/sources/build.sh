@@ -18,7 +18,7 @@
 # (at your option) any later version.
 
 # Check if we are on top of an SD source tree
-if [ -f CMakeLists.txt -a -f credits.xml -a -d cmake -a -d data -a -d src ] ; then
+if [ -f CMakeLists.txt -a -f data/data/credits.xml -a -d cmake -a -d data -a -d src ] ; then
 
   echo "Building $1 source packages (`date`) ..."
   

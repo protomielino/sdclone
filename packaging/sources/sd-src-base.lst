@@ -35,14 +35,16 @@ src/tools
 src/modules/CMakeLists.txt
 src/modules/graphic
 src/modules/networking
+src/modules/racing
 src/modules/simu/CMakeLists.txt
 src/modules/simu/simuv2.1
+src/modules/simu/simuv4
+src/modules/sound
 src/modules/telemetry
 src/modules/track
 src/modules/userinterface
 
 data/CMakeLists.txt
-data/credits.xml
 data/data
 
 data/config/CMakeLists.txt
