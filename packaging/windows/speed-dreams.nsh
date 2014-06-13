@@ -9,17 +9,40 @@
 ;        the Free Software Foundation; either version 2 of the License, or
 ;        (at your option) any later version.
 
-!define VER_MAJOR 2
-!define VER_MINOR 1
-!define VER_PATCH 0
-!define VER_EXTRA ""
-!define VER_REVISION "beta"
-!define VER_RELDATE 20131102 ; Initial guess ;-)
+!ifndef VER_MAJOR
+   !define VER_MAJOR 2
+!endif
+
+!ifndef VER_MINOR
+   !define VER_MINOR 1
+!endif
+
+!ifndef VER_PATCH
+   !define VER_PATCH 0
+!endif
+
+!ifndef VER_EXTRA
+   !define VER_EXTRA ""
+!endif
+
+;!echo "VER_EXTRA = ${VER_EXTRA}"
+
+!ifndef VER_REVISION
+   !define VER_REVISION ""
+!endif
+
+; Create TODAY variable containing today's date in the format we use
+!define /date TODAY "%Y%m%d"
+
+!ifndef VER_RELDATE
+   !define VER_RELDATE ${TODAY} ; Initial guess ;-)
+   ;!define VER_RELDATE 20131102 ; Initial guess ;-)
+!endif
 
 !define GAME_SHORT_NAME "Speed Dreams"
-!define GAME_NAME "${GAME_SHORT_NAME} 2"
+!define GAME_NAME "${GAME_SHORT_NAME} ${VER_MAJOR}"
 !define GAME_SHORT_FS_NAME "speed-dreams"
-!define GAME_FS_NAME "${GAME_SHORT_FS_NAME}-2"
+!define GAME_FS_NAME "${GAME_SHORT_FS_NAME}-${VER_MAJOR}"
 !define GAME_SUBTITLE "'an Open Motorsport Sim'"
 !define GAME_VERSION "${VER_MAJOR}.${VER_MINOR}.${VER_PATCH}${VER_EXTRA}"
 !define GAME_VERSIONNED_NAME "${GAME_SHORT_NAME} ${GAME_VERSION}"
@@ -27,8 +50,8 @@
 !define GAME_LONG_NAME "${GAME_SHORT_NAME} ${GAME_LONG_VERSION}"
 !define GAME_PUBLISHER "the Speed Dreams Team"
 !define GAME_WEB_SITE "http://www.speed-dreams.org"
-!define GAME_BUG_TRACKER "http://sourceforge.net/apps/trac/speed-dreams/report/3"
-!define GAME_DOWNLOAD_URL "http://sourceforge.net/projects/speed-dreams/files/2.1.0"
+!define GAME_BUG_TRACKER "http://http://sourceforge.net/p/speed-dreams/tickets/
+!define GAME_DOWNLOAD_URL "http://sourceforge.net/projects/speed-dreams/files/${VER_MAJOR}.${VER_MINOR}.${VER_PATCH}"
 !define COMMUNITY_WEB_SITE "http://community.speed-dreams.org"
 
 !define GAME_ROOT_REGKEY "HKLM"
@@ -37,7 +60,9 @@
 !define GAME_DIR_REGKEY "Software\${GAME_PUBLISHER}\${GAME_NAME}"
 
 ; Folder where the build system installed everything
-!define BUILD_INST_DIR "\${GAME_FS_NAME}-build"
+!ifndef BUILD_INST_DIR
+   !define BUILD_INST_DIR "\${GAME_FS_NAME}-build"
+!endif
 
 ; Default target installation folder
 !define INST_INST_DIR_SUFFIX "${GAME_SHORT_FS_NAME}-${GAME_VERSION}"
