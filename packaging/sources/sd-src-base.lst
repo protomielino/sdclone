@@ -30,7 +30,14 @@ src/drivers/human
 src/interfaces
 src/libs
 src/main
-src/tools
+
+src/tools/CMakeLists.txt
+src/tools/accc
+src/tools/blender
+src/tools/nfs2ac
+src/tools/nfsperf
+src/tools/trackgen
+src/tools/xmlversion
 
 src/modules/CMakeLists.txt
 src/modules/graphic

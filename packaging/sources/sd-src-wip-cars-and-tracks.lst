@@ -31,6 +31,9 @@ data/cars/models/ls2-morley-r900
 data/cars/models/ls2-sprite-gts
 data/cars/models/ls2-vortex-gt
 
+data/cars/models/sc-kanagawa-z35gts
+data/cars/models/sc-kongei-kk8s
+
 data/tracks/circuit/CMakeLists.txt
 
 data/tracks/circuit/goldstone-sand
