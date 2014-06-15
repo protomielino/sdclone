@@ -1,15 +1,12 @@
-Top TODO list (some may be included in 2.0.0, some others not):
+Top TODO list (some may be included in 2.1.0, some others not):
 ---------------------------------------------------------------
 
 Note: This material is not yet integrated into our Wiki, but should.
       See http://sourceforge.net/apps/trac/speed-dreams, Developers corner.
 
 Cars:
-- move RGB files to PNG for lower disk footprint
 - improve damage management (see Andrews ideas in the the devel list,
   under the title "Thoughts on collision damage").
-- fix too high wheel inertia on many (if not all) models.
-  See the devel list post "Low speeds".
 
 Menus:
 - enable intuitive double-click for "Select/Unselect" action in the scroll-lists
@@ -42,7 +39,7 @@ Program:
   and the designer-shipped one for high level (increase its details : more round wheels).
   => rather rewrite the graphics engine from scratch with some modern engine
      like OSG, Ogre3D, Irrlicht ...
-- replay feature - Work in progress by Adam Skoblinski (no news for at least 1 year now)
+- replay feature - Work in progress by Simon Mungewell
 
 Other:
 - finish the Mac OS X port (with CMake) : ~95% done.  Compiles completely but does not run. 
@@ -50,13 +47,11 @@ Other:
 - think about how to integrate Haruna's fictious racing teams backstories in the game
   (ex: LS1 in 'LS1 team "backstories" (for fun)' devel list post)
 
-TODO for 2.0.0 or after (some are current on sdl-port and career branches)
+TODO for 2.1.0 or after (some are current on sdl-port and career branches)
 --------------------------------------------------------------------------
 
 Cars:
-- move textures to PNG for saving disk space / download time
 - create / setup new LMP1 car set (Andrew)
-- setup new MPA1 (RL = Indy) car set (converted by Xavier from GP4 game)
 - complete / setup MP1 (RL = F1) car set (including Formula One by Andrew Sumner,
   F1-torcs by Vincente Marti, and models converted by Xavier from GP4 game)
   BUT: what about Manfariel's F1 2009 models?
