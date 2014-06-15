@@ -1,0 +1,23 @@
+Speed Dreams 2.1.0 Release notes
+================================
+
+I - Main changes since 1.4.0 (overall sum-up)
+-----------------------------------------------------------------
+
+ Physics
+ *Simuv4 : a better Simuv2.1, to make it obvious this our latest and greatest simulation engine
+   * single wheel braking and air braking for robots
+   * added a feature system to introduce new features and still keeping old robot setups working
+   * fix wheels oscillating and cars sliding at low speed
+   * more realistic, fuel-cut type rev-limiter
+   * more realistic gear change model as a feature, by default it is off because it does not work well with grid shifting
+   * a qualitative tire temperature and tire wear model as a feature, by default it is off, 
+   * 2 new wing type models: profile wing, and thin wing
+   * experimental support for 3rd or heave spring and damper
+
+ Cars
+ * new physics for MPA1 carset, based on good ol' Champcar racing
+ * improved LS1 Cavallo physics
+ * improved Supercars physics: reworked Lynx, Cavallo and Murasama; some more improvements on the others
+
+
