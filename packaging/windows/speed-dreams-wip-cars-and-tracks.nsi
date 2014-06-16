@@ -69,6 +69,9 @@ Section -CoreData
   File "${BUILD_INST_DIR}\data\config\raceman\career.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\career_supercars.xmls"
   File "${BUILD_INST_DIR}\data\config\raceman\career_ls1.xmls"
+  
+  ; Moved from 'speed-dreams-base.nsi' for version 2.1.0
+  File "${BUILD_INST_DIR}\data\config\raceman\networkrace.xml"
 
 SectionEnd
 

@@ -125,7 +125,9 @@ Section "!Base System" SEC01
   File "${BUILD_INST_DIR}\data\config\raceman\quickrace.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\singleevent-challenge.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\singleevent-endurance.xml"
-  File "${BUILD_INST_DIR}\data\config\raceman\networkrace.xml"
+
+  ; Moved to 'speed-dreams-wip-cars-and-tracks.nsi' for version 2.1.0
+  ;File "${BUILD_INST_DIR}\data\config\raceman\networkrace.xml"
 
   SetOutPath "$INSTDIR\data\data"
   File /r "${BUILD_INST_DIR}\data\data\*.*"
