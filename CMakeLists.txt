@@ -109,7 +109,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/doxygenconfig.in.cmake
 
 
 # Fictive = no-output target, for having source files available in IDEs.
-SET(_SOURCES CHANGES.txt COPYING.txt INSTALL.txt README.txt TODO.txt)
+SET(_SOURCES CHANGES.txt COPYING.txt INSTALL.txt README.txt)
 ADD_CUSTOM_TARGET(rootdoc SOURCES ${_SOURCES} data/data/credits.xml)
 
 # Install top tree data files
