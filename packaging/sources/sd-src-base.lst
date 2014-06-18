@@ -25,6 +25,7 @@ src/drivers/simplix/src
 src/drivers/kilo2008
 
 src/drivers/human
+src/drivers/networkhuman
 
 src/interfaces
 src/libs
