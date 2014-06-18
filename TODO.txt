@@ -39,7 +39,7 @@ Program:
   and the designer-shipped one for high level (increase its details : more round wheels).
   => rather rewrite the graphics engine from scratch with some modern engine
      like OSG, Ogre3D, Irrlicht ...
-- replay feature - Work in progress by Simon Mungewell
+- replay feature - Work in progress by Simon Wood (Mungewell)
 
 Other:
 - finish the Mac OS X port (with CMake) : ~95% done.  Compiles completely but does not run. 

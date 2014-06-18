@@ -81,7 +81,7 @@ Section "!Base System" SEC01
   SetOutPath "$INSTDIR"
   File /oname=licence.txt "${BUILD_INST_DIR}\data\COPYING.txt"
   File /oname=changes.txt "${BUILD_INST_DIR}\data\CHANGES.txt"
-  File /oname=todo.txt "${BUILD_INST_DIR}\data\TODO.txt"
+  ;File /oname=todo.txt "${BUILD_INST_DIR}\data\TODO.txt"
   File /oname=readme.txt readme_for_user.txt
 
   ; Executable and DLLs ... but no mod tool (see later)
