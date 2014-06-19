@@ -22,6 +22,8 @@ data/cars/models/rs1-kenji-08
 data/cars/models/rs2-fai-dot
 data/cars/models/rs2-lion-2m
 
+data/cars/models/ls1-cavallo-570s1
+
 data/cars/models/ls2-bavaria-g3gtr
 data/cars/models/ls2-boxer-96rsr
 data/cars/models/ls2-cavallo-360r
@@ -67,3 +69,4 @@ data/tracks/speedway/e-speedway
 data/tracks/speedway/e-track-5
 data/tracks/speedway/f-speedway
 data/tracks/speedway/sunshine
+data/tracks/speedway/tennessee
