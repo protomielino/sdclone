@@ -160,6 +160,9 @@ Section -Cars
   SetOutPath "$INSTDIR\data\cars\models\ls2-vortex-gt"
   File /r "${BUILD_INST_DIR}\data\cars\models\ls2-vortex-gt\*.*"
 
+  SetOutPath "$INSTDIR\data\cars\models\ls1-cavallo-570s1"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls1-cavallo-570s1\*.*"
+
 SectionEnd
 
 Section -Tracks
