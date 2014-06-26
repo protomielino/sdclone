@@ -257,6 +257,7 @@ SectionEnd
 
 Section -Shortcuts
 
+  SetShellVarContext all
   ; Start menu entries
   CreateDirectory "$SMPROGRAMS\${GAME_VERSIONNED_NAME}"
 
@@ -326,6 +327,7 @@ SectionEnd
 
 Section Uninstall
 
+   SetShellVarContext all
   ;SetAutoClose true
 
   ; Start menu entries.   
