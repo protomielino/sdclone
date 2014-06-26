@@ -89,4 +89,5 @@ data/tracks/CMakeLists.txt
 data/tracks/circuit/CMakeLists.txt
 data/tracks/circuit/espie
 
+packaging/appdata
 
