@@ -6,7 +6,7 @@ The whole distribution is licensed according to the GPL 2+ and the Free Art Lice
 Installation instructions
 -------------------------
 
-Among the 5 binary packages (speed-dreams-xxxx-2.0.0-r4687-win32-setup.exe),
+Among the 5 binary packages (speed-dreams-xxxx-2.1.0-rYYYY-win32-setup.exe),
 only the "base" one is mandatory : it contains the core components of the game.
 It is also a kind of "demo" package, as it also ships 1 track (Espie)
 and 1 car set (the Supercars), plus the relevant AI drivers :
@@ -42,7 +42,7 @@ You need more now, as Speed Dreams is constantly improving visual rendering :
 - CPU        : at least 1 GHz ; better with 1.5 or 2.0 GHz
 - RAM        : from at least 512 Mb (Win XP 32) to 2Gb (Win Vista 32) ; better with 1 to 3 Gb
 
-For more details, see http://sourceforge.net/apps/trac/speed-dreams/wiki/HardSoftRequirements
+For more details, see http://sourceforge.net/p/speed-dreams/wiki/HardSoftRequirements
 
 Moreover: Make sure that you have installed the latest sound and graphics drivers.
 
@@ -51,14 +51,14 @@ Running the game
 
 - Read the "User manual" :
   * Simon's great online tutorial videos http://www.youtube.com/user/mungewell/feed?feature=context
-  * WIP online manual http://sourceforge.net/apps/trac/speed-dreams/wiki/SD2.0Manual
+  * WIP online manual http://sourceforge.net/p/speed-dreams/wiki/SD2.0Manual
   * Windows : Start menu / Programs / Speed Dreams x.y.z / User Manual
     (Note: Now out-dated, as was written for 1.4.0 ...)  
   * Others (soon available online at http://www.speed-dreams.org) :
     - source distribution : open speed-dreams-x.y.z-src/doc/userman/how_to_drive.html 
       in a web browser
     - SubVersion repository : download a GNU tarball of the user manual here :
-        http://speed-dreams.svn.sourceforge.net/viewvc/speed-dreams/tags/x.y.z/doc/userman
+        http://speed-dreams.svn.sourceforge.net/p/speed-dreams/code/HEAD/tree/tags/x.y.z/doc/userman
       then uncompress it and finally open how_to_drive.html in a web browser
       (Note: Now out-dated, as was written for 1.4.0)  
 
