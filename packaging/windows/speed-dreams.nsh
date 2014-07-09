@@ -14,7 +14,7 @@
 !endif
 
 !ifndef VER_MINOR
-   !define VER_MINOR 1
+   !define VER_MINOR 2
 !endif
 
 !ifndef VER_PATCH
