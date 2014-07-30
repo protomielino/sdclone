@@ -74,6 +74,10 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
   
     SET(OPTION_3RDPARTY_EXPAT true CACHE BOOL "Use 3rd party Expat library rather than bundled TXML")
 
+    SET(OPTION_3RDPARTY_SQLITE3 false CACHE BOOL "Use SQLite3 as database for record/replay")
+
+    SET(OPTION_3RDPARTY_SQLITE3 false CACHE BOOL "Use SQLite3 as database for record/replay")
+
     # Enable building with 3rd party SOLID library under Windows, as we ship the binary package,
     # but not under Linux, where FreeSolid seems not to be available by default on most distros.
     IF(WIN32)
@@ -149,6 +153,14 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     IF(OPTION_3RDPARTY_EXPAT)
       ADD_DEFINITIONS(-DTHIRD_PARTY_EXPAT)
     ENDIF(OPTION_3RDPARTY_EXPAT)
+
+    IF(OPTION_3RDPARTY_SQLITE3)
+      ADD_DEFINITIONS(-DTHIRD_PARTY_SQLITE3)
+    ENDIF(OPTION_3RDPARTY_SQLITE3)
+
+    IF(OPTION_3RDPARTY_SQLITE3)
+      ADD_DEFINITIONS(-DTHIRD_PARTY_SQLITE3)
+    ENDIF(OPTION_3RDPARTY_SQLITE3)
 
     IF(OPTION_3RDPARTY_SOLID)
       ADD_DEFINITIONS(-DTHIRD_PARTY_SOLID)

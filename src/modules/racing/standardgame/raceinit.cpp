@@ -28,10 +28,15 @@
 #include <sstream>
 #include <map>
 
+#ifdef THIRD_PARTY_SQLITE3
+#include <sqlite3.h>
+#endif
+
 #include <raceman.h>
 #include <robot.h>
 #include <teammanager.h>
 #include <robottools.h>
+#include <replay.h>
 
 #include <portability.h>
 #include <tgf.hpp>
@@ -60,6 +65,13 @@ tModList *ReRacingRobotsModList = 0;
 
 // The race situation
 tRmInfo	*ReInfo = 0;
+
+int replayRecord;
+double replayTimestamp;
+#ifdef THIRD_PARTY_SQLITE3
+sqlite3 *replayDB;
+sqlite3_stmt *replayBlobs[50];
+#endif
 
 // Race Engine reset
 void
@@ -463,7 +475,13 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 
   /* good robot found */
   curModInfo = &((*(ReInfo->robModList))->modInfo[modindex]);
-  GfLogInfo("Driver's name: %s\n", curModInfo->name);
+
+#if 0 //SDW
+  if (replayReplay)
+    GfLogInfo("Driver in car %d being driven by replay\n", carindex);
+  else
+#endif
+    GfLogInfo("Driver's name: %s\n", curModInfo->name);
 
   isHuman = strcmp( cardllname, "human" ) == 0 || strcmp( cardllname, "networkhuman" ) == 0;
 
@@ -475,7 +493,14 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
   curRobot = (tRobotItf*)calloc(1, sizeof(tRobotItf));
 
   /* ... and initialize the driver */
+#if 0 // SDW
+  if (replayReplay) {
+    // Register against the Replay driver (which does nothing)
+    curModInfo->fctInit(carindex, (void*)(curRobot));
+  } else if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU)) {
+#else
   if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU)) {
+#endif
     curModInfo->fctInit(robotIdx, (void*)(curRobot));
   } else {
     curRobot->rbNewTrack = NULL;
@@ -650,7 +675,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       }
       else
         handle = NULL;
-      if (handle) {
+      if (handle && !replayReplay) {
 		GfLogTrace("Checking/Merging %s specific setup into %s setup.\n",
 				   curModInfo->name, elt->_carName);
         if (GfParmCheckHandle(carhdle, handle)) {
@@ -728,7 +753,14 @@ ReInitCars(void)
     snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i);
     robotModuleName = GfParmGetStr(ReInfo->params, path, RM_ATTR_MODULE, "");
     robotIdx = (int)GfParmGetNum(ReInfo->params, path, RM_ATTR_IDX, NULL, 0);
-    snprintf(path, sizeof(path), "%sdrivers/%s/%s.%s", GfLibDir(), robotModuleName, robotModuleName, DLLEXT);
+
+#if 0 // SDW
+    if (replayReplay)
+      // Register against the Replay driver
+      snprintf(path, sizeof(path), "%sdrivers/replay/replay.%s", GfLibDir(), DLLEXT);
+    else
+#endif
+      snprintf(path, sizeof(path), "%sdrivers/%s/%s.%s", GfLibDir(), robotModuleName, robotModuleName, DLLEXT);
 
     /* Load the robot shared library */
     if (GfModLoad(CAR_IDENT, path, ReInfo->robModList)) 
@@ -805,13 +837,91 @@ ReInitCars(void)
     GfLogInfo("%d driver(s) ready to race\n", nCars);
   }
 
+  if (replayReplay)
+    replayRecord = 0;
+  else {
+        char buf[1024];
+	const char *replayRateSchemeName;
+        snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
+
+        void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+        replayRateSchemeName = GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_REPLAY_RATE, "0");
+        GfParmReleaseHandle(paramHandle);
+
+	replayRecord = atoi(replayRateSchemeName);
+  }
+
+  if (replayRecord || replayReplay) {
+    int result;
+
+#ifdef THIRD_PARTY_SQLITE3
+    result = sqlite3_open("/tmp/race.sqlite", &replayDB);
+    if (result) {
+      GfLogError("Replay: Unable to open Database: %s\n", sqlite3_errmsg(replayDB));
+      sqlite3_close(replayDB);
+      replayDB = NULL;
+    } else {
+      GfLogInfo("Replay: Database Opened 0x8%8.8X\n", replayDB);
+
+      if (replayRecord)
+        GfLogInfo("Replay: Record Timestep = %f\n", 1/(float)replayRecord);
+
+      if (replayReplay)
+        GfLogInfo("Replay: Playback from file\n");
+
+      /* speed up database by turning of synchronous behaviour/etc */
+      sqlite3_exec(replayDB, "PRAGMA synchronous = OFF", NULL, NULL, NULL);
+      sqlite3_exec(replayDB, "PRAGMA journal_mode = OFF", NULL, NULL, NULL);
+      sqlite3_exec(replayDB, "PRAGMA count_changes = OFF", NULL, NULL, NULL);
+#if 0 // This pragma seems to prevent re-opening the sqlite3 database
+      sqlite3_exec(replayDB, "PRAGMA locking_mode = EXCLUSIVE", NULL, NULL, NULL);
+#endif
+      sqlite3_exec(replayDB, "PRAGMA default_temp_store = MEMORY", NULL, NULL, NULL);
+
+      //replayBlobs = (sqlite3_stmt *) calloc(nCars, sizeof(void *)); //sqlite3_stmt));
+
+      replayTimestamp = -5;
+      ghostcarActive = 0;
+    }
+#endif
+  }
+
   ReInfo->s->_ncars = nCars;
   FREEZ(ReInfo->s->cars);
   ReInfo->s->cars = (tCarElt **)calloc(nCars, sizeof(tCarElt *));
   for (i = 0; i < nCars; i++)
   {
     ReInfo->s->cars[i] = &(ReInfo->carList[i]);
+
+#ifdef THIRD_PARTY_SQLITE3
+    //open a table for each car
+    if (replayDB) {
+      char command[200];
+      int result;
+
+      if (replayRecord) {
+        sprintf(command, "DROP TABLE IF EXISTS car%d", i);
+        result = sqlite3_exec(replayDB, command, 0, 0, 0);
+        if (result) GfLogInfo("Replay: Unable to drop table car%d: %s\n", i, sqlite3_errmsg(replayDB));
+      }
+
+      sprintf(command, "CREATE TABLE IF NOT EXISTS car%d (timestamp, lap, datablob BLOB)", i);
+      result = sqlite3_exec(replayDB, command, 0, 0, 0);
+      if (result) {
+         GfLogInfo("Replay: Unable to create table car%d: %s\n", i, sqlite3_errmsg(replayDB));
+         exit(0);
+      }
+
+      if (replayReplay) {
+        // Build index to allow faster read access
+        sprintf(command, "CREATE UNIQUE INDEX IF NOT EXISTS index%d ON car%d (timestamp)", i, i);
+        result = sqlite3_exec(replayDB, command, 0, 0, 0);
+        if (result) GfLogInfo("Replay: Unable to create index car%d: %s\n", i, sqlite3_errmsg(replayDB));
+      }
+    }
+#endif
   }
+
   ReInfo->_rePitRequester = 0;
 
   // TODO: reconsider splitting the call into one for cars, track and maybe other objects.
@@ -836,6 +946,15 @@ ReRaceCleanup(void)
   ReStoreRaceResults(ReInfo->_reRaceName);
 
   ReRaceCleanDrivers();
+
+#ifdef THIRD_PARTY_SQLITE3
+  GfLogInfo("Replay: Database closed\n");
+  if (replayDB)
+    sqlite3_close(replayDB);
+
+  replayDB = NULL;
+#endif
+  replayRecord = 0;
 }
 
 

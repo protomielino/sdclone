@@ -238,12 +238,23 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 	}
 
 	// Update times.
-	pCurrReInfo->_reCurTime += deltaTimeIncrement * pCurrReInfo->_reTimeMult; /* "Real" time */
+	pCurrReInfo->_reCurTime += deltaTimeIncrement * fabs(pCurrReInfo->_reTimeMult); /* "Real" time */
+#if 0
 	s->currentTime += deltaTimeIncrement; /* Simulated time */
+#else
+	if (pCurrReInfo->_reTimeMult > 0)
+		s->currentTime += deltaTimeIncrement;
+	else
+		s->currentTime -= deltaTimeIncrement;
+#endif
 
 	if (s->currentTime < 0) {
-		/* no simu yet */
-		pCurrReInfo->s->_raceState = RM_RACE_PRESTART;
+		if (pCurrReInfo->_reTimeMult < 0)
+			/* Revert to forward time x1 */
+			pCurrReInfo->_reTimeMult = 1;
+		else
+			/* no simu yet */
+			pCurrReInfo->s->_raceState = RM_RACE_PRESTART;
 	} else if (pCurrReInfo->s->_raceState == RM_RACE_PRESTART) {
 		pCurrReInfo->s->_raceState = RM_RACE_RUNNING;
 		s->currentTime = 0.0; /* resynchronize */

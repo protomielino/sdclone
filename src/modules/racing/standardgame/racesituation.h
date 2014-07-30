@@ -133,6 +133,12 @@ private:
 	//! (Deep) Copy the given situation.
 	struct RmInfo* copySituation(struct RmInfo*& pTarget, const struct RmInfo* pSource);
 
+	// Record the situation to a replay database
+	void replaySituation(struct RmInfo*& pTarget);
+
+	// Record the situation to a replay database
+	void ghostcarSituation(struct RmInfo*& pTarget);
+
 	//! Free the given situation
 	void freezSituation(struct RmInfo*& pSituation);
 	

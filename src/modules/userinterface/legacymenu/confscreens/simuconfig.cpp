@@ -38,8 +38,8 @@
 /* list of available simulation engine */
 static const int DefaultSimuVersion = 1;
 static const char *SimuVersionList[] =
-	{RM_VAL_MOD_SIMU_V2, RM_VAL_MOD_SIMU_V2_1, RM_VAL_MOD_SIMU_V3, RM_VAL_MOD_SIMU_V4};
-static const char *SimuVersionDispNameList[] = 	{"V2.0 (old)", "V2.1 (obsolete)", "V3.0 (incomplete)", "V4.0 (default)"};
+	{RM_VAL_MOD_SIMU_V2, RM_VAL_MOD_SIMU_V2_1, RM_VAL_MOD_SIMU_V3, RM_VAL_MOD_SIMU_V4, RM_VAL_MOD_SIMU_REPLAY};
+static const char *SimuVersionDispNameList[] = 	{"V2.0", "V2.1", "V3.0", "V4.0", "Replay"};
 static const int NbSimuVersions = sizeof(SimuVersionList) / sizeof(SimuVersionList[0]);
 static int CurSimuVersion = DefaultSimuVersion;
 
@@ -54,10 +54,17 @@ static const int NbThreadAffinitySchemes = sizeof(ThreadAffinitySchemeList) / si
 static int CurMultiThreadScheme = 0;    // Auto
 static int CurThreadAffinityScheme = 0; // On
 
+/* list of available replay record schemes */
+static const char *ReplaySchemeList[] = {RM_VAL_REPLAY_OFF, RM_VAL_REPLAY_LOW, RM_VAL_REPLAY_NORMAL, RM_VAL_REPLAY_HIGH, RM_VAL_REPLAY_PERFECT};
+static const char *ReplaySchemeDispNameList[] = 	{"off", "Low", "Normal", "High", "Perfect"};
+static const int NbReplaySchemes = sizeof(ReplaySchemeList) / sizeof(ReplaySchemeList[0]);
+static int CurReplayScheme = 0;
+
 /* gui label ids */
 static int SimuVersionId;
 static int MultiThreadSchemeId;
 static int ThreadAffinitySchemeId;
+static int ReplayRateSchemeId;
 
 /* gui screen handles */
 static void *ScrHandle = NULL;
@@ -69,6 +76,7 @@ static void loadSimuCfg(void)
 	const char *simuVersionName;
 	const char *multiThreadSchemeName;
 	const char *threadAffinitySchemeName;
+	const char *replayRateSchemeName;
 	int i;
 
 	char buf[1024];
@@ -112,11 +120,28 @@ static void loadSimuCfg(void)
 		}
 	}
 
+	// Replay Rate
+#ifdef THIRD_PARTY_SQLITE3
+	replayRateSchemeName = GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_REPLAY_RATE, ReplaySchemeList[0]);
+	for (i = 0; i < NbReplaySchemes; i++) {
+		if (strcmp(replayRateSchemeName, ReplaySchemeList[i]) == 0) {
+			CurReplayScheme = i;
+			break;
+		}
+	}
+#else
+	CurReplayScheme = 0;
+#endif
+
 	GfParmReleaseHandle(paramHandle);
 
 	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionDispNameList[CurSimuVersion]);
 	GfuiLabelSetText(ScrHandle, MultiThreadSchemeId, MultiThreadSchemeList[CurMultiThreadScheme]);
 	GfuiLabelSetText(ScrHandle, ThreadAffinitySchemeId, ThreadAffinitySchemeList[CurThreadAffinityScheme]);
+	GfuiLabelSetText(ScrHandle, ReplayRateSchemeId, ReplaySchemeDispNameList[CurReplayScheme]);
+#ifndef THIRD_PARTY_SQLITE3
+	GfuiEnable(ScrHandle, ReplayRateSchemeId, GFUI_DISABLE);
+#endif
 }
 
 
@@ -130,6 +155,7 @@ static void storeSimuCfg(void * /* dummy */)
 	GfParmSetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, SimuVersionList[CurSimuVersion]);
 	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_MULTI_THREADING, MultiThreadSchemeList[CurMultiThreadScheme]);
 	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_THREAD_AFFINITY, ThreadAffinitySchemeList[CurThreadAffinityScheme]);
+	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_REPLAY_RATE, ReplaySchemeList[CurReplayScheme]);
 	GfParmWriteFile(NULL, paramHandle, "raceengine");
 	GfParmReleaseHandle(paramHandle);
 	
@@ -182,6 +208,17 @@ onChangeThreadAffinityScheme(void *vp)
 }
 
 
+/* Change the replay rate scheme */
+static void
+onChangeReplayRateScheme(void *vp)
+{
+	CurReplayScheme =
+		(CurReplayScheme + NbReplaySchemes + (int)(long)vp) % NbReplaySchemes;
+	
+	GfuiLabelSetText(ScrHandle, ReplayRateSchemeId, ReplaySchemeDispNameList[CurReplayScheme]);
+}
+
+
 static void onActivate(void * /* dummy */)
 {
     loadSimuCfg();
@@ -217,6 +254,12 @@ SimuMenuInit(void *prevMenu)
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "threadaffleftarrow", (void*)-1, onChangeThreadAffinityScheme);
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "threadaffrightarrow", (void*)1, onChangeThreadAffinityScheme);
 	
+    ReplayRateSchemeId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "replayratelabel");
+#ifdef THIRD_PARTY_SQLITE3
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "replayrateleftarrow", (void*)-1, onChangeReplayRateScheme);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "replayraterightarrow", (void*)1, onChangeReplayRateScheme);
+#endif
+
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "ApplyButton", PrevScrHandle, storeSimuCfg);
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "CancelButton", PrevScrHandle, GfuiScreenActivate);
 

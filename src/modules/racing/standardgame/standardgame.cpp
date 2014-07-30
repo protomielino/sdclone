@@ -31,6 +31,7 @@
 #include <tgfdata.h>
 #include <race.h>
 #include <tracks.h>
+#include <replay.h>
 
 #include "racesituation.h"
 #include "racemain.h"
@@ -40,6 +41,7 @@
 
 #include "standardgame.h"
 
+int replayReplay;
 
 // The singleton.
 StandardGame* StandardGame::_pSelf = 0;
@@ -315,6 +317,13 @@ bool StandardGame::loadPhysicsEngine()
 		_piPhysEngine = pmodPhysEngine->getInterface<IPhysicsEngine>();
 	if (pmodPhysEngine && !_piPhysEngine)
 		GfModule::unload(pmodPhysEngine);
+
+	// don't record if we're 'replaying'
+	printf("Checking type of SIMU\n");
+	if (strcmp(RM_VAL_MOD_SIMU_REPLAY, strModName.c_str()) == 0)
+		replayReplay = 1;
+	else
+		replayReplay = 0;
 
 	return _piPhysEngine ? true : false;
 }

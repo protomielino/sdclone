@@ -31,6 +31,7 @@
 #include <robot.h>
 #include <robottools.h>
 #include <teammanager.h>
+#include <replay.h>
 
 #include "standardgame.h"
 
@@ -39,6 +40,12 @@
 #include "raceresults.h"
 #include "racecars.h"
 
+int ghostcarActive;
+double ghostcarTimeOffset;
+tReplayElt curGhostcarData, nextGhostcarData;
+#ifdef THIRD_PARTY_SQLITE3
+sqlite3_stmt *ghostcarBlob;
+#endif
 
 /* Compute Pit stop time */
 void
@@ -166,6 +173,7 @@ reCarsApplyRaceRules(tCarElt *car)
 	// to enjoy the landscape.
 	// Also - don't remove cars that are currently being repaired in pits
 	// TODO: Make it configurable.
+
 	if ((car->_curLapTime > 84.5 + ReInfo->track->length/10.0) &&
 	    !(car->_state & RM_CAR_STATE_PIT) &&
 	    (car->_driverType != RM_DRV_HUMAN))
@@ -560,7 +568,9 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 						}
 						if ((car->_lastLapTime < car->_bestLapTime) || (car->_bestLapTime == 0)) {
 							car->_bestLapTime = car->_lastLapTime;
+							car->_bestLap = car->_laps - 1;
 							memcpy(car->_bestSplitTime, car->_curSplitTime, sizeof(double)*(ReInfo->track->numberOfSectors - 1) );
+
 							if (s->_raceType != RM_TYPE_RACE && s->_ncars > 1)
 							{
 								/* Best lap time is made better : update times behind leader */
@@ -677,6 +687,34 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					return;
 				}
 
+#if 0 //def THIRD_PARTY_SQLITE3
+				// Re-read the best lap for ghostcar
+				if (replayDB != NULL && car->_bestLap) {
+					char command[200];
+					int result;
+
+					GfLogInfo("Re-reading best lap\n");
+					sprintf(command, "SELECT datablob FROM car0 where lap=%d", car->_bestLap);
+					result = sqlite3_prepare_v2(replayDB, command, -1, &ghostcarBlob, 0);
+
+					if (result) {
+						GfLogInfo("Unable to read ghostlap %d: %s\n", car->_bestLap, sqlite3_errmsg(replayDB));
+					} else {
+						// read the first 2 records
+						result = sqlite3_step(ghostcarBlob);
+						if (result == SQLITE_ROW) {
+							memcpy(&curGhostcarData, sqlite3_column_blob(ghostcarBlob, 0), sizeof(tReplayElt));
+						}
+						result = sqlite3_step(ghostcarBlob);
+						if (result == SQLITE_ROW) {
+							memcpy(&nextGhostcarData, sqlite3_column_blob(ghostcarBlob, 0), sizeof(tReplayElt));
+						}
+
+						ghostcarTimeOffset = s->currentTime - curGhostcarData.currentTime;
+						ghostcarActive = 1;
+					}
+				}
+#endif
 			} else {
 				info->lapFlag--;
 			}

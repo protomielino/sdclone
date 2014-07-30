@@ -177,6 +177,7 @@ typedef struct {
     double		curTime;
     tdble		topSpeed;
     int			laps;
+    int			bestLap;
     int			nbPitStops;
     int			remainingLaps;
     int			pos;
@@ -204,6 +205,7 @@ typedef struct {
 #define _curTime		race.curTime
 #define _topSpeed		race.topSpeed
 #define _laps			race.laps
+#define _bestLap		race.bestLap
 #define _nbPitStops		race.nbPitStops
 #define _remainingLaps		race.remainingLaps
 #define _pos			race.pos
