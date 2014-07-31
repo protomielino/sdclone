@@ -119,6 +119,7 @@ static void drive(int index, tCarElt* car, tSituation *s)
 static int pitcmd(int index, tCarElt* car, tSituation *s)
 {
 	//return driver[index-1]->pitCommand(s);
+   return 0;
 }
 
 
