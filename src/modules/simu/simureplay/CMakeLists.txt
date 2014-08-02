@@ -12,12 +12,12 @@ ADD_SDLIB_INCLUDEDIR(portability)
 
 IF(WIN32)
 	# DLL export stuff under Windows (to avoid .def file)
-    ADD_DEFINITIONS(-DSIMUVREPLAY_DLL)
+    ADD_DEFINITIONS(-DSIMUREPLAY_DLL)
 ENDIF(WIN32)
 
 IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
-    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
+    SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
 ENDIF(MSVC)
 
 SET(SIMU_SOURCES simu.cpp simureplay.cpp)
