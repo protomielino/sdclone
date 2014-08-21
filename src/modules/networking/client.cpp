@@ -417,7 +417,7 @@ double NetClient::WaitForRaceStart()
 
 void NetClient::ReadStartTimePacket(ENetPacket *pPacket)
 {
-    GfLogTrace("Recieved the start race Packet\n");
+    GfLogTrace("Received the start race Packet\n");
     //double time = GfTimeClock();
 
     PackedBuffer msg(pPacket->data, pPacket->dataLength);
@@ -583,7 +583,7 @@ void NetClient::ReadPacket(ENetEvent event)
 
 void NetClient::ReadPrepareToRacePacket(ENetPacket *pPacket)
 {
-    GfLogTrace("Recieved the start race Packet\n");
+    GfLogTrace("Received the start race Packet\n");
 
     //unsigned char packetId = pPacket->data[0];
 
@@ -691,7 +691,7 @@ void NetClient::ReadAllDriverReadyPacket(ENetPacket *pPacket)
         GfLogFatal("ReadAllDriverReadyPacket: packed buffer error\n");
     }
 
-    GfLogTrace("Recieved All Driver Ready Packet\n");
+    GfLogTrace("Received All Driver Ready Packet\n");
 }
 
 void NetClient::ReadFinishTimePacket(ENetPacket *pPacket)
@@ -713,7 +713,7 @@ void NetClient::ReadFinishTimePacket(ENetPacket *pPacket)
         GfLogFatal("ReadFinishTimePacket: packed buffer error\n");
     }
 
-    GfOut("Recieved finish time packet\n");
+    GfOut("Received finish time packet\n");
 }
 
 void NetClient::ReadTimePacket(ENetPacket *pPacket)

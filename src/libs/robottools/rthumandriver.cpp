@@ -1975,7 +1975,7 @@ static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
             PRM_FUEL, NULL, 0.0f);
 
     if (initial_fuel) {
-        // If starting fuel is set up explicitely,
+        // If starting fuel is set up explicitly,
         // no use computing anything...
         fuel_requested = initial_fuel;
     } else {
@@ -1997,7 +1997,7 @@ static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
     }
 
     GfLogInfo("Human #%d : Starting race session with %.1f l of fuel (%s)\n",
-            idx, fuel_requested, initial_fuel ? "as explicitely stated" : "computed");
+            idx, fuel_requested, initial_fuel ? "as explicitly stated" : "computed");
 
     GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, NULL, fuel_requested);
 }  // SetFuelAtRaceStart

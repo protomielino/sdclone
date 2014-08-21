@@ -707,7 +707,7 @@ void NetNetwork::ReadCarStatusPacket(ENetPacket *pPacket)
                     {
                         GfLogTrace("Rejected car status from startRank %i\n",status.startRank);
                     }
-                    GfLogTrace("Recieved car status from startRank %i\n",status.startRank);
+                    GfLogTrace("Received car status from startRank %i\n",status.startRank);
                     break;
                 }
             }

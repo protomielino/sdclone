@@ -259,7 +259,7 @@ typedef void (*tfuiComboboxCallback)(tComboBoxInfo *);
 typedef void (*tfuiCheckboxCallback)(tCheckBoxInfo *);
 
 
-/* Event loop callback functions (should be called explicitely if the corresponding
+/* Event loop callback functions (should be called explicitly if the corresponding
    event loop callback is overriden after a call to GfuiActivateScreen */
 TGFCLIENT_API void GfuiDisplay(void);
 TGFCLIENT_API void GfuiDisplayNothing(void);
