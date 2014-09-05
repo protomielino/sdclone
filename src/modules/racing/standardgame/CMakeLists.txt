@@ -10,7 +10,7 @@ SET(_SOURCES standardgame.cpp
              raceutil.cpp)
 SET(_HEADERS standardgame.h 
              racecareer.h raceupdate.h racenetwork.h racecars.h
-             raceinit.h 
+             raceinit.h racemain.h
              racetrack.h raceresults.h racesimusimu.h 
              racestate.h racesituation.h racemessage.h
              raceutil.h)
