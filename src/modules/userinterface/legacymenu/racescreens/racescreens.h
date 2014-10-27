@@ -129,6 +129,14 @@ extern void RmResScreenRemoveText(int nRowIndex);
 extern int  RmResGetRows();
 extern void RmResEraseScreen();
 
+#ifdef STARTPAUSED
+extern void RmAddPreRacePauseItems();
+#endif
+
+#if COOLDOWN
+extern void RmAddCooldownItems();
+#endif
+
 // From networkingmenu.
 extern void RmNetworkClientMenu(void* pVoid);
 extern void RmNetworkMenu(void* /* dummy */);

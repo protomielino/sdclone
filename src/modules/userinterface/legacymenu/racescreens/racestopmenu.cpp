@@ -33,6 +33,9 @@
 
 extern RmProgressiveTimeModifier rmProgressiveTimeModifier;
 
+#ifdef STARTPAUSED
+extern bool rmPreRacePause;
+#endif
 
 static void *hscreen = 0;
 static int curPlayerIdx = 0;
@@ -88,7 +91,11 @@ rmBackToRaceHookActivate(void * /* dummy */)
 	LegacyMenu::self().activateGameScreen();
 
 	// Launch the "slow resume race" manager if non-blind mode.
+#ifdef STARTPAUSED
+	if ((!rmPreRacePause) &&  (LmRaceEngine().outData()->_displayMode == RM_DISP_MODE_NORMAL))
+#else
 	if (LmRaceEngine().outData()->_displayMode == RM_DISP_MODE_NORMAL)
+#endif
 		rmProgressiveTimeModifier.start();
 }
 

@@ -87,6 +87,14 @@ public:
 	virtual void step(double dt);
 #endif
 
+#ifdef STARTPAUSED
+	virtual void stopPreracePause();
+#endif
+
+#ifdef COOLDOWN
+	virtual void stopCooldown();
+#endif
+
 	virtual GfRace* race();
 	virtual const GfRace* race() const;
 	

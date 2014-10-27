@@ -60,11 +60,33 @@ static const char *ReplaySchemeDispNameList[] = 	{"off", "Low", "Normal", "High"
 static const int NbReplaySchemes = sizeof(ReplaySchemeList) / sizeof(ReplaySchemeList[0]);
 static int CurReplayScheme = 0;
 
+#ifdef STARTPAUSED
+/* list of available start paused schemes */
+static const char *StartPausedSchemeList[] = {RM_VAL_ON, RM_VAL_OFF};
+static const int NbStartPausedSchemes = sizeof(StartPausedSchemeList) / sizeof(StartPausedSchemeList[0]);
+static int CurStartPausedScheme = 0; // On
+#endif
+
+#ifdef COOLDOWN
+/* list of available cooldown schemes */
+static const char *CooldownSchemeList[] = {RM_VAL_ON, RM_VAL_OFF};
+static const int NbCooldownSchemes = sizeof(CooldownSchemeList) / sizeof(CooldownSchemeList[0]);
+static int CurCooldownScheme = 0; // On
+#endif
+
 /* gui label ids */
 static int SimuVersionId;
 static int MultiThreadSchemeId;
 static int ThreadAffinitySchemeId;
 static int ReplayRateSchemeId;
+
+#ifdef STARTPAUSED
+static int StartPausedSchemeId;
+#endif
+
+#ifdef COOLDOWN
+static int CooldownSchemeId;
+#endif
 
 /* gui screen handles */
 static void *ScrHandle = NULL;
@@ -77,6 +99,12 @@ static void loadSimuCfg(void)
 	const char *multiThreadSchemeName;
 	const char *threadAffinitySchemeName;
 	const char *replayRateSchemeName;
+#ifdef STARTPAUSED
+   const char *startPausedSchemeName;
+#endif
+#ifdef COOLDOWN
+   const char *cooldownSchemeName;
+#endif
 	int i;
 
 	char buf[1024];
@@ -133,6 +161,28 @@ static void loadSimuCfg(void)
 	CurReplayScheme = 0;
 #endif
 
+#ifdef STARTPAUSED
+	// startpaused
+	startPausedSchemeName = GfParmGetStr(paramHandle,RM_SECT_RACE_ENGINE, RM_ATTR_STARTPAUSED, StartPausedSchemeList[0]);
+	for (i = 0; i < NbStartPausedSchemes; i++) {
+		if (strcmp(startPausedSchemeName, StartPausedSchemeList[i]) == 0) {
+			CurStartPausedScheme = i;
+			break;
+		}
+	}
+#endif
+
+#ifdef COOLDOWN
+	// cooldown
+	cooldownSchemeName = GfParmGetStr(paramHandle,RM_SECT_RACE_ENGINE, RM_ATTR_COOLDOWN, CooldownSchemeList[0]);
+	for (i = 0; i < NbCooldownSchemes; i++) {
+		if (strcmp(cooldownSchemeName, CooldownSchemeList[i]) == 0) {
+			CurCooldownScheme = i;
+			break;
+		}
+	}
+#endif
+
 	GfParmReleaseHandle(paramHandle);
 
 	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionDispNameList[CurSimuVersion]);
@@ -141,6 +191,12 @@ static void loadSimuCfg(void)
 	GfuiLabelSetText(ScrHandle, ReplayRateSchemeId, ReplaySchemeDispNameList[CurReplayScheme]);
 #ifndef THIRD_PARTY_SQLITE3
 	GfuiEnable(ScrHandle, ReplayRateSchemeId, GFUI_DISABLE);
+#endif
+#ifdef STARTPAUSED
+   GfuiLabelSetText(ScrHandle, StartPausedSchemeId, StartPausedSchemeList[CurStartPausedScheme]);
+#endif
+#ifdef COOLDOWN
+   GfuiLabelSetText(ScrHandle, CooldownSchemeId, CooldownSchemeList[CurCooldownScheme]);
 #endif
 }
 
@@ -156,6 +212,12 @@ static void storeSimuCfg(void * /* dummy */)
 	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_MULTI_THREADING, MultiThreadSchemeList[CurMultiThreadScheme]);
 	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_THREAD_AFFINITY, ThreadAffinitySchemeList[CurThreadAffinityScheme]);
 	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_REPLAY_RATE, ReplaySchemeList[CurReplayScheme]);
+#ifdef STARTPAUSED
+   GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_STARTPAUSED, StartPausedSchemeList[CurStartPausedScheme]);
+#endif
+#ifdef COOLDOWN
+   GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_COOLDOWN, CooldownSchemeList[CurCooldownScheme]);
+#endif
 	GfParmWriteFile(NULL, paramHandle, "raceengine");
 	GfParmReleaseHandle(paramHandle);
 	
@@ -218,6 +280,29 @@ onChangeReplayRateScheme(void *vp)
 	GfuiLabelSetText(ScrHandle, ReplayRateSchemeId, ReplaySchemeDispNameList[CurReplayScheme]);
 }
 
+#ifdef STARTPAUSED
+/* Change the startpaused scheme */
+static void
+onChangeStartPausedScheme(void *vp)
+{
+	CurStartPausedScheme =
+		(CurStartPausedScheme + NbStartPausedSchemes + (int)(long)vp) % NbStartPausedSchemes;
+	
+	GfuiLabelSetText(ScrHandle, StartPausedSchemeId, StartPausedSchemeList[CurStartPausedScheme]);
+}
+#endif
+
+#ifdef COOLDOWN
+/* Change the cooldown scheme */
+static void
+onChangeCooldownScheme(void *vp)
+{
+	CurCooldownScheme =
+		(CurCooldownScheme + NbCooldownSchemes + (int)(long)vp) % NbCooldownSchemes;
+	
+	GfuiLabelSetText(ScrHandle, CooldownSchemeId, CooldownSchemeList[CurCooldownScheme]);
+}
+#endif
 
 static void onActivate(void * /* dummy */)
 {
@@ -258,6 +343,32 @@ SimuMenuInit(void *prevMenu)
 #ifdef THIRD_PARTY_SQLITE3
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "replayrateleftarrow", (void*)-1, onChangeReplayRateScheme);
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "replayraterightarrow", (void*)1, onChangeReplayRateScheme);
+#endif
+
+#ifdef STARTPAUSED
+    // TODO remove this and uncomment the static controls in 'simuconfigmenu.xml'
+    // if/when STARTPAUSED is officially included
+    // HACK to allow CMake option 'OPTION_START_PAUSED' to show/hide these labels
+    GfuiMenuCreateLabelControl(ScrHandle,menuDescHdle,"startpausedstaticlabel");
+    // end of code to remove
+
+    StartPausedSchemeId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "startpausedlabel");
+
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "startpausedleftarrow", (void*)-1, onChangeStartPausedScheme);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "startpausedrightarrow", (void*)1, onChangeStartPausedScheme);
+#endif
+
+#ifdef COOLDOWN
+    // TODO remove this and uncomment the static controls in 'simuconfigmenu.xml'
+    // if/when COOLDOWN is officially included
+    // HACK to allow CMake option 'OPTION_COOLDOWN' to show/hide these labels
+    GfuiMenuCreateLabelControl(ScrHandle,menuDescHdle,"cooldownstaticlabel");
+    // end of code to remove
+
+    CooldownSchemeId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "cooldownlabel");
+
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "cooldownleftarrow", (void*)-1, onChangeCooldownScheme);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "cooldownrightarrow", (void*)1, onChangeCooldownScheme);
 #endif
 
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "ApplyButton", PrevScrHandle, storeSimuCfg);

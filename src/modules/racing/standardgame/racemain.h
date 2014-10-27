@@ -27,10 +27,20 @@
 #define _RACEMAIN_H_
 
 extern bool ReHumanInGroup();
+#if defined(STARTPAUSED) || defined(COOLDOWN)
+extern bool ReSessionHasHuman();
+#endif
 
 extern int  ReConfigure();
 extern int  ReRaceEventInit();
 extern int  RePreRace();
+#ifdef STARTPAUSED
+extern int  RePreRacePause();
+#endif
+#ifdef COOLDOWN
+extern int ReRaceCooldown();
+extern void ReStopCooldown();
+#endif
 extern int  ReRaceStart();
 extern int  ReRaceRealStart();
 extern int  ReRaceStop();
@@ -42,6 +52,10 @@ extern void ReRaceAbandon();
 extern void ReRaceAbort();
 extern void ReRaceSkipSession();
 extern void ReRaceRestart();
+
+#ifdef STARTPAUSED
+extern void ReStopPreracePause();
+#endif
 
 #endif /* _RACEMAIN_H_ */ 
 

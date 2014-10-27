@@ -1010,6 +1010,81 @@ GfuiAddKey(void *scr, int key, int modifier, const char *descr, void *userData,
 	}
 }
 
+#ifdef STARTPAUSED
+/** Remove a Keyboard shortcut from the screen 
+	 @ingroup	gui
+	 @param	scr		Target screen
+	 @param	key		Key code : the ASCII code when possible (for 'a', '_', '[' ...), or else the tgfclient::GFUIK_* value for special keys) ; Always in [0, GFUIK_MAX]
+	 @param	modifier	Key modifiers (GFUIM_NONE or GFUIM_XX|GFUIM_YY|...)
+	 @param	descr		Description for help screen
+	 @return	true for success false if key not found
+ */
+ bool 
+GfuiRemoveKey(void *scr, int key, const char *descr)
+ {
+	 return GfuiRemoveKey(scr, key, GFUIM_NONE, descr);
+ }
+
+bool 
+GfuiRemoveKey(void *scr, int key, int modifier, const char *descr)
+{
+	bool bFound = false;
+
+	tGfuiScreen* screen = (tGfuiScreen*)scr;
+	if ((screen)&&(screen->userKeys))
+	{
+		tGfuiKey* prevKey = screen->userKeys;
+		tGfuiKey* checkKey = screen->userKeys;
+		do
+		{
+			// Try to find the key: the key, modifier, and description (descr) MUST match
+			if (checkKey->key == key && checkKey->modifier == modifier)
+			{
+				// if there are descriptions then they MUST match
+				if ((checkKey->descr) && (descr))
+				{
+					if (0 != strncmp(descr,checkKey->descr,strlen(descr)))
+					{
+						continue;
+					}
+				}
+
+				bFound = true;
+
+				// unlink the removed key
+				prevKey->next = checkKey->next;
+				
+				// First key in list
+				if (prevKey == screen->userKeys)
+				{
+					// only one key in list: set list to null
+					if (screen->userKeys == screen->userKeys->next)
+					{
+						screen->userKeys = 0;
+					}
+					else
+					{
+						// Goto the end of the list and set end->next to the new head of the list
+						tGfuiKey* lastKey = screen->userKeys;
+						while(lastKey->next != screen->userKeys)
+						{
+							lastKey = lastKey->next;
+						}
+						lastKey->next = screen->userKeys = prevKey->next;
+					}
+				}
+
+				// free the memory used by the removed key
+				FREEZ(checkKey->name);
+				FREEZ(checkKey->descr);
+				FREEZ(checkKey);
+				break;
+			}
+		} while (prevKey = checkKey,(checkKey = checkKey->next) != screen->userKeys);
+	}
+	return bFound;
+}
+#endif
 /** Enable/disable the key auto-repeat for the given screen.
     @ingroup	screen
     @param	scr		Screen

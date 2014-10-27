@@ -210,9 +210,30 @@ void StandardGame::resumeRace()
 //************************************************************
 void StandardGame::startRace()
 {
+#ifdef STARTPAUSED
+	int mode = ::ReRaceRealStart();
+	if(mode & RM_ERROR)
+	{
+		GfLogError("ReRaceRealStart() ERROR in RaceEngine::startRace() \n");
+		ReInfo->_reState = RE_STATE_ERROR;
+	}
+	else
+	{
+		// Maybe should be RE_STATE_NETWORK_WAIT
+		ReInfo->_reState = RE_STATE_PRE_RACE_PAUSE;
+	}
+#else
 	// TODO: Process error status ?
 	(void)::ReRaceRealStart();
+#endif
 }
+
+#if COOLDOWN
+void StandardGame::stopCooldown()
+{
+	::ReStopCooldown();
+}
+#endif
 
 void StandardGame::abandonRace()
 {
@@ -256,7 +277,12 @@ void StandardGame::step(double dt)
 	::ReOneStep(dt);
 }
 #endif
-
+#ifdef STARTPAUSED
+void StandardGame::stopPreracePause()
+{
+   ::ReStopPreracePause();
+}
+#endif
 //************************************************************
 GfRace* StandardGame::race()
 {

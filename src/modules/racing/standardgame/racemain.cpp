@@ -617,6 +617,43 @@ RePreRace(void)
 	return RM_SYNC | RM_NEXT_STEP;
 }
 
+#ifdef STARTPAUSED
+/* return state mode */
+int
+RePreRacePause(void)
+{
+	// by default: skip the PreRacePause (RM_NEXT_STEP)
+	int mode = RM_SYNC | RM_NEXT_STEP;
+
+	// Do NOT pause if Network Race
+	if(NULL != NetGetNetwork())
+	{
+		return mode;
+	}
+
+	// PreRacePause only applies in RM_DISP_MODE_NORMAL
+	if (RM_DISP_MODE_NORMAL == ReInfo->_displayMode)
+	{
+		// check if there is a human player AND if PreRacePause is enabled through the config
+		if ((ReSessionHasHuman()) && (true == ReUI().onRaceStartingPaused()))
+		{
+			mode = RM_ASYNC | RM_NEXT_STEP;
+			//ReStop();
+			ReSituation::self().setRaceMessage("Hit <Enter> to Start",-1/*always*/, /*big=*/true);
+			ReStop();
+		}
+	}
+	return mode;
+}
+
+void 
+ReStopPreracePause()
+{
+	ReSituation::self().setRaceMessage("", -1/*always*/, /*big=*/true);
+	::ReStart();
+}
+#endif
+
 /* return state mode */
 int
 ReRaceRealStart(void)
@@ -1135,3 +1172,55 @@ ReCleanupStandardgame()
 		return false;
 	}
 }
+
+#if defined(STARTPAUSED) || defined(COOLDOWN)
+bool 
+ReSessionHasHuman()
+{
+	// check if there is a human player...
+	bool hasHuman = false;
+	for (int i = 0; i < ReInfo->s->_ncars; i++)
+	{
+		if (ReInfo->s->cars[i]->_driverType == RM_DRV_HUMAN)
+		{
+			hasHuman = true;
+			break;
+		}
+	}
+	return hasHuman;
+}
+#endif
+#ifdef COOLDOWN
+int
+ReRaceCooldown()
+{
+	// by default: skip cooldown (RM_NEXT_STEP)
+	int mode = RM_ASYNC | RM_NEXT_STEP;
+
+	// Do NOT Cooldown if Network Race
+	if(NULL != NetGetNetwork())
+	{
+		return mode;
+	}
+
+	// cooldown only applies in RM_DISP_MODE_NORMAL
+	if (RM_DISP_MODE_NORMAL == ReInfo->_displayMode)
+	{
+		// check if there is a human player AND if cooldown is enabled through the UI
+		if ((ReSessionHasHuman()) && (true == ReUI().onRaceCooldownStarting()))
+		{
+			ReSituation::self().setRaceMessage("Hit <Enter> for Results", -1, /*big=*/true);
+			// enable cooldown
+			mode = RM_ASYNC;
+		}
+	}
+	return mode;
+}
+
+void 
+ReStopCooldown()
+{
+	ReStateApply((void*)RE_STATE_RACE_END);
+}
+
+#endif

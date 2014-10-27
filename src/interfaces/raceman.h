@@ -115,6 +115,12 @@ typedef struct Situation {
 #define RE_STATE_SHUTDOWN		13
 #define RE_STATE_ERROR			14
 #define RE_STATE_EXIT			15
+#ifdef STARTPAUSED
+#define RE_STATE_PRE_RACE_PAUSE	16
+#endif
+#ifdef COOLDOWN
+#define RE_STATE_RACE_COOLDOWN	17
+#endif
 
 /** Race Engine Car Information about the race */
 typedef struct 
@@ -435,6 +441,14 @@ typedef struct RmInfo
 #define RM_ATTR_MULTI_THREADING		"multi-threading"
 #define RM_ATTR_THREAD_AFFINITY		"thread affinity"
 #define RM_ATTR_REPLAY_RATE		"replay rate"
+
+#ifdef STARTPAUSED
+#define RM_ATTR_STARTPAUSED		"startpaused"
+#endif
+
+#ifdef COOLDOWN
+#define RM_ATTR_COOLDOWN		"cooldown"
+#endif
 
 #define RM_VAL_AUTO		"auto"
 #define RM_VAL_ON		"on"

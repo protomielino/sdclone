@@ -204,12 +204,20 @@ The Speed Dreams Team.
         - OPTION_UNLOAD_SSGGRAPH:BOOL :
             The 'ssggraph' graphics engine module will never be unloaded if OFF (def: ON)
             Usefull under some Linux configurations where this unloading badly crashes XOrg
-            (see http://sourceforge.net/apps/trac/speed-dreams/ticket/209),
+            (see http://sourceforge.net/p/speed-dreams/tickets/209),
             or simply makes SD crash because PLib is shipped as a set of shared libraries
-            (see http://sourceforge.net/apps/trac/speed-dreams/ticket/459).
+            (see http://sourceforge.net/p/speed-dreams/tickets/459).
  
         - OPTION_FORCE_DEBUG:BOOL :
             Enable debug symbols even in Release builds (def: OFF)
+            (see http://sourceforge.net/p/speed-dreams/tickets/356).
+
+        - OPTION_START_PAUSED:BOOL :
+            Begin the race in a 'Paused' state (def: OFF)
+            (see http://sourceforge.net/p/speed-dreams/tickets/356).
+
+        - OPTION_COOLDOWN:BOOL :
+            Allow driving after the race is complete (def: OFF)
 
         Tips reported about some issues :
         - sometimes, ENET_INCLUDE_DIR is not detected correctly, resulting in something like
@@ -299,7 +307,7 @@ The Speed Dreams Team.
   the available keyboard shorcuts.
 
   If you are stuck please report problems through speed-dreams-users mailing list
-  or our bug tracker at http://sourceforge.net/apps/trac/speed-dreams/report.
+  or our bug tracker at http://sourceforge.net/p/speed-dreams/tickets.
 
 
 III - Windows installation from sources
@@ -313,7 +321,7 @@ some tweaks might be needed for newer / wider versions.
   a.  Install CMake v2.6+ http://www.cmake.org/cmake/resources/software.html
 
   b.  Download the official Speed Dreams tarballs from SF.net
-        http://sourceforge.net/projects/speed-dreams/files/2.0.0
+        http://sourceforge.net/projects/speed-dreams/files/2.1.0
       (speed-dreams-src-<package>-<version>.tar.xz)
       
         Note: See II.2.a above about which packages you really need.

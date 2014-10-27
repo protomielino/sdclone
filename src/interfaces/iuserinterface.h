@@ -60,6 +60,14 @@ public:
 	virtual void onRaceEventFinishing() = 0;
 	virtual bool onRaceEventFinished(bool bMultiEvent, bool careerNonHuman) = 0;
 
+#ifdef STARTPAUSED
+	virtual bool onRaceStartingPaused() = 0;
+#endif
+
+#ifdef COOLDOWN
+	virtual bool onRaceCooldownStarting() = 0;
+#endif
+
 	// Loading messages management.
 	virtual void addLoadingMessage(const char* pszText) = 0;
 
