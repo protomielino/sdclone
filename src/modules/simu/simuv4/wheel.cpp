@@ -169,6 +169,18 @@ void SimWheelUpdateRide(tCar *car, int index)
 	
 	// update wheel brake
 	SimBrakeUpdate(car, wheel, &(wheel->brake));
+
+	// Option TCL ...
+	if (car->features & FEAT_TCLINSIMU)
+	{
+		if (index == 3) 
+		{	// After using the values for the last wheel
+			tEngine	*engine = &(car->engine);
+			engine->TCL = 1.0;			// Reset the TCL accel command
+			wheel->brake.TCLMin = 1.0;	// Reset the TCL brake command reference value
+		}
+	}
+	// ... Option TCL
 }
 
 
@@ -351,6 +363,52 @@ void SimWheelUpdateForce(tCar *car, int index)
 		car->carElt->_tyreT_out(index) = wheel->Ttire;
 		car->carElt->_tyreCondition(index) = tireCond;
 	}
+
+	// Option TCL ...
+	if (car->features & FEAT_TCLINSIMU)
+	{
+		tdble TCL_SlipScale = 0.1f;		// Make it be a parameter later
+		tdble TCL_BrakeScale = 1/60.0f;	// Make it be a parameter later
+		tdble TCL_AccelScale = 0.5f;	// Make it be a parameter later
+
+		tEngine	*engine = &(car->engine); // Get engine
+		if (sx < -TCL_SlipScale)          // Slip is over our limit
+		{	// Store the TCL_Brake command for this wheel
+			wheel->brake.TCL = 1 + TCL_BrakeScale/sx;
+			if (wheel->brake.TCLMin > wheel->brake.TCL)
+			{	// We need the minimum for all driven wheels later
+			engine->TCL = TCL_AccelScale * wheel->brake.TCL;
+			}
+		}
+		else
+		{	// Keep the minimum for all dSriven wheels
+		engine->TCL = (tdble) MIN(1.0,engine->TCL);
+		}
+	}
+    // ... Optional TCL
+
+	// Optional ABS ...
+	if (car->features & FEAT_ABSINSIMU)
+	{
+		tdble ABS_SlipScale = 0.1f;		// Make it be a parameter later
+		tdble ABS_BrakeScale = 1.0f;	// Make it be a parameter later
+
+		// If slip is over the limit, set brake command for this wheel
+		if (sx > ABS_SlipScale)			
+			wheel->brake.ABS = 1 - ABS_BrakeScale * sx;
+		else
+			wheel->brake.ABS = 1.0f;
+/**/
+		if (wheel->brake.EnableABS)
+		{
+			if (index == 0)
+				fprintf(stderr,"\nABS: %.1f %% ", wheel->brake.ABS * 100);
+			else
+				fprintf(stderr," %.1f %% ", wheel->brake.ABS * 100);
+		}
+/**/
+	}
+    // ... Optional ABS
 }
 
 

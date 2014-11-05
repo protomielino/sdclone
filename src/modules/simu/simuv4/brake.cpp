@@ -27,7 +27,30 @@ SimBrakeConfig(void *hdle, const char *section, tBrake *brake)
     diam     = GfParmGetNum(hdle, section, PRM_BRKDIAM, (char*)NULL, 0.2f);
     area     = GfParmGetNum(hdle, section, PRM_BRKAREA, (char*)NULL, 0.002f);
     mu       = GfParmGetNum(hdle, section, PRM_MU, (char*)NULL, 0.30f);
-    brake->coeff = (tdble) (diam * 0.5 * area * mu);
+
+	// Option TCL ...
+	//if (car->features & FEAT_TCLINSIMU)
+	{
+	    brake->TCL = 1.0f;
+		brake->TCLMin = 1.0f;
+	}
+	// ... Option TCL
+	// Option ABS ...
+	//if (car->features & FEAT_ABSINSIMU)
+	{
+		brake->ABS = 1.0f;
+		brake->EnableABS
+		     = GfParmGetNum(hdle, section, PRM_ABSINSIMU, (char*)NULL, 0.0f) > 0;
+/*
+		if (brake->EnableABS)
+			fprintf(stderr,"ABS: Enabled\n");
+		else
+			fprintf(stderr,"ABS: Disabled\n");
+*/
+	}
+	// ... Option ABS
+
+	brake->coeff = (tdble) (diam * 0.5 * area * mu);
 
     brake->I = GfParmGetNum(hdle, section, PRM_INERTIA, (char*)NULL, 0.13f);
     brake->radius = diam/2.0f;
@@ -37,6 +60,22 @@ void
 SimBrakeUpdate(tCar *car, tWheel *wheel, tBrake *brake)
 {
     brake->Tq = brake->coeff * brake->pressure;
+
+	// Option ABS ...
+	if (car->features & FEAT_ABSINSIMU)
+	{
+		if (brake->EnableABS)
+			brake->Tq *= brake->ABS;
+	}
+	// ... Option ABS
+	// Option TCL ...
+	if (car->features & FEAT_TCLINSIMU)
+	{
+		tdble TCL_BrakeScale = 400.0f; // Make it be a parameter later
+		if ((brake->TCLMin < 1.0) && (brake->TCLMin == brake->TCL))
+		  brake->Tq += TCL_BrakeScale/brake->TCL;
+	}
+	// ... Option TCL
 
     brake->temp -= (tdble) (fabs(car->DynGC.vel.x) * 0.0001 + 0.0002);
     if (brake->temp < 0 ) brake->temp = 0;

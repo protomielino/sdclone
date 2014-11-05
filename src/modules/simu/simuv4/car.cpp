@@ -27,6 +27,9 @@
 const tdble aMax = 1.0f; /*  */
 static const char *SuspSect[4] = {SECT_FRNTRGTSUSP, SECT_FRNTLFTSUSP, SECT_REARRGTSUSP, SECT_REARLFTSUSP};
 
+// The "Simu" logger instance
+GfLogger* PLogSimu = 0;
+
 void
 SimCarConfig(tCar *car)
 {
@@ -65,6 +68,14 @@ SimCarConfig(tCar *car)
 	enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_FIXEDWHEELFORCE, VAL_NO);
 	if (strcmp(enabling, VAL_YES) == 0) {
 		car->features = car->features | FEAT_FIXEDWHEELFORCE;
+	}
+	enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_TCLINSIMU, VAL_NO);
+	if (strcmp(enabling, VAL_YES) == 0) {
+		car->features = car->features | FEAT_TCLINSIMU;
+	}
+	enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
+	if (strcmp(enabling, VAL_YES) == 0) {
+		car->features = car->features | FEAT_ABSINSIMU;
 	}
 	
 	/* continue with car parameters */
@@ -114,10 +125,10 @@ SimCarConfig(tCar *car)
 	wf0 = w * gcfr;
 	wr0 = w * (1 - gcfr);
 	
-	car->wheel[FRNT_RGT].weight0 = wf0 * gcfrl * K[FRNT_RGT] / (K[FRNT_RGT] + 0.5*Kfheave);
-	car->wheel[FRNT_LFT].weight0 = wf0 * (1 - gcfrl) * K[FRNT_LFT] / (K[FRNT_LFT] + 0.5*Kfheave);
-	car->wheel[REAR_RGT].weight0 = wr0 * gcrrl * K[REAR_RGT] / (K[REAR_RGT] + 0.5*Krheave);
-	car->wheel[REAR_LFT].weight0 = wr0 * (1 - gcrrl) * K[REAR_LFT] / (K[REAR_LFT] + 0.5*Krheave);
+	car->wheel[FRNT_RGT].weight0 = wf0 * gcfrl * K[FRNT_RGT] / (K[FRNT_RGT] + 0.5f*Kfheave);
+	car->wheel[FRNT_LFT].weight0 = wf0 * (1 - gcfrl) * K[FRNT_LFT] / (K[FRNT_LFT] + 0.5f*Kfheave);
+	car->wheel[REAR_RGT].weight0 = wr0 * gcrrl * K[REAR_RGT] / (K[REAR_RGT] + 0.5f*Krheave);
+	car->wheel[REAR_LFT].weight0 = wr0 * (1 - gcrrl) * K[REAR_LFT] / (K[REAR_LFT] + 0.5f*Krheave);
 	
 	/*for (i = 0; i < 2; i++) {
 		SimAxleConfig(car, i, 0.0);

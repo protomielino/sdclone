@@ -49,6 +49,18 @@ SimEngineConfig(tCar *car)
 	car->engine.I_joint = car->engine.I;
 	car->engine.timeInLimiter = 0.0f;
 
+	// Option TCL ...
+	if (car->features & FEAT_TCLINSIMU)
+	{
+		car->engine.TCL        = 1.0f;
+		car->engine.EnableTCL  = GfParmGetNum(hdle, SECT_ENGINE, PRM_TCLINSIMU, (char*)NULL, 0.0f) > 0;
+		if (car->engine.EnableTCL)
+		  fprintf(stderr,"TCL: Enabled\n");
+		else
+			fprintf(stderr,"TCL: Disabled\n");
+	}
+	// ... Option TCL
+
 	sprintf(idx, "%s/%s", SECT_ENGINE, ARR_DATAPTS);
 	car->engine.curve.nbPts = GfParmGetEltNb(hdle, idx);
 	edesc = (struct tEdesc*)malloc((car->engine.curve.nbPts + 1) * sizeof(struct tEdesc));
@@ -156,6 +168,19 @@ SimEngineUpdateTq(tCar *car)
 	        engine->timeInLimiter = 0.1f;
 	    }
         }
+
+	// Option TCL ...
+	if (car->features & FEAT_TCLINSIMU)
+	{
+		if (engine->EnableTCL)
+			Tq_max *= engine->TCL;
+/*
+		if (engine->EnableTCL)
+			fprintf(stderr,"TCL: %.1f %%\n", engine->TCL * 100);
+*/
+	}
+	// ... Option TCL
+
 	if ( (car->features & FEAT_REVLIMIT) && (engine->timeInLimiter > 0.0f) ) {
 	    alpha = 0.0;
 	    engine->timeInLimiter -= SimDeltaTime;
