@@ -35,7 +35,7 @@ typedef struct
 	// Add variables here (tdble)
 	// TCL ...
 	tdble	TCL;		// TCL factor
-	tdble	TCLMin;		// Minimum of TCL factors at all wheels
+	//tdble	TCLMin;		// Minimum of TCL factors at all wheels
 	// ... TCL 
 	// ABS ...
 	tdble	ABS;		// ABS factor

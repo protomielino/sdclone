@@ -54,10 +54,12 @@ SimEngineConfig(tCar *car)
 	{
 		car->engine.TCL        = 1.0f;
 		car->engine.EnableTCL  = GfParmGetNum(hdle, SECT_ENGINE, PRM_TCLINSIMU, (char*)NULL, 0.0f) > 0;
+/*
 		if (car->engine.EnableTCL)
 		  fprintf(stderr,"TCL: Enabled\n");
 		else
 			fprintf(stderr,"TCL: Disabled\n");
+*/
 	}
 	// ... Option TCL
 
@@ -178,6 +180,7 @@ SimEngineUpdateTq(tCar *car)
 		if (engine->EnableTCL)
 			fprintf(stderr,"TCL: %.1f %%\n", engine->TCL * 100);
 */
+		engine->TCL = 1.0;	// Reset the TCL accel command
 	}
 	// ... Option TCL
 
