@@ -62,10 +62,14 @@ SimBrakeUpdate(tCar *car, tWheel *wheel, tBrake *brake)
     brake->Tq = brake->coeff * brake->pressure;
 
 	// Option ABS ...
-	if (car->features & FEAT_ABSINSIMU)
+//	if (car->features & FEAT_ABSINSIMU)
 	{
 		if (brake->EnableABS)
 			brake->Tq *= brake->ABS;
+/*
+		if (brake->EnableABS)
+			fprintf(stderr,"ABS: %.1f %%\n",brake->ABS * 100.0);
+*/
 	}
 	// ... Option ABS
 /*		

@@ -180,7 +180,7 @@ SimEngineUpdateTq(tCar *car)
 		if (engine->EnableTCL)
 			fprintf(stderr,"TCL: %.1f %%\n", engine->TCL * 100);
 */
-		engine->TCL = 1.0;	// Reset the TCL accel command
+		//engine->TCL = 1.0;	// Reset the TCL accel command
 	}
 	// ... Option TCL
 

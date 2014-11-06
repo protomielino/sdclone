@@ -170,7 +170,7 @@ void SimWheelUpdateRide(tCar *car, int index)
 	// update wheel brake
 	SimBrakeUpdate(car, wheel, &(wheel->brake));
 
-/*
+/**/
 	// Option TCL ...
 	if (car->features & FEAT_TCLINSIMU)
 	{
@@ -178,10 +178,10 @@ void SimWheelUpdateRide(tCar *car, int index)
 		{	// After using the values for the last wheel
 			tEngine	*engine = &(car->engine);
 			engine->TCL = 1.0;			// Reset the TCL accel command
-			wheel->brake.TCLMin = 1.0;	// Reset the TCL brake command reference value
+			//wheel->brake.TCLMin = 1.0;	// Reset the TCL brake command reference value
 		}
 	}
-*/
+/**/
 	// ... Option TCL
 }
 
@@ -371,7 +371,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 	{
 		tdble TCL_SlipScale = 0.1f;		// Make it be a parameter later
 		tdble TCL_BrakeScale = 1/60.0f;	// Make it be a parameter later
-		tdble TCL_AccelScale = 0.3f;	// Make it be a parameter later
+		tdble TCL_AccelScale = 0.9f;	// Make it be a parameter later
 
 		tEngine	*engine = &(car->engine); // Get engine
 		if (sx < -TCL_SlipScale)          // Slip is over our limit
