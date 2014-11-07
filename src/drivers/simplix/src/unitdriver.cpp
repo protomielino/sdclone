@@ -289,6 +289,8 @@ TDriver::TDriver(int Index):
   oSysFooStuckY(NULL),
   oTrackAngle(0.0),
   oTargetSpeed(0.0),
+  oCarHasABS(false),
+  oCarHasTCL(false),
   oTclRange(10.0),
   oTclSlip(1.6),
   oTclFactor(1.0),
@@ -748,6 +750,28 @@ void TDriver::AdjustDriving(
 
   for (int I = 0; I <= NBR_BRAKECOEFF; I++)      // Initialize braking
     oBrakeCoeff[I] = oInitialBrakeCoeff;
+
+  const char *enabling;
+
+  oCarHasABS = false;
+  enabling = GfParmGetStr(Handle, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
+  if (strcmp(enabling, VAL_YES) == 0) 
+  {
+    oCarHasABS = true;
+    LogSimplix.info("#oCarHasABS 1\n");
+  }
+  else
+    LogSimplix.info("#oCarHasABS 0\n");
+
+  oCarHasTCL = false;
+  enabling = GfParmGetStr(Handle, SECT_FEATURES, PRM_TCLINSIMU, VAL_NO);
+  if (strcmp(enabling, VAL_YES) == 0) 
+  {
+    oCarHasABS = true;
+    LogSimplix.info("#oCarHasTCL 1\n");
+  }
+  else
+    LogSimplix.info("#oCarHasTCL 0\n");
 
   oTclRange =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TCL_RANGE,0,
@@ -1449,7 +1473,8 @@ void TDriver::Drive()
 
   GetPosInfo(Pos,oLanePoint);                    // Info about pts on track
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
-  oTargetSpeed = FilterStart(oTargetSpeed);      // Filter Start
+  if (!oCarHasTCL)
+    oTargetSpeed = FilterStart(oTargetSpeed);    // Filter Start
   //fprintf(stderr,"oTargetSpeed %.2f km/h\n",oTargetSpeed*3.6),
 
   //double TrackRollangle = oRacingLine[oRL_FREE].CalcTrackRollangle(Pos);
@@ -1513,7 +1538,8 @@ void TDriver::Drive()
     oAccel = FilterLetPass(oAccel);
     oAccel = FilterDrifting(oAccel);
     oAccel = FilterTrack(oAccel);
-    oAccel = FilterTCL(oAccel);
+    if (!oCarHasTCL)
+      oAccel = FilterTCL(oAccel);
 	if (oUseFilterAccel)
       oAccel = FilterAccel(oAccel);
   }
@@ -1522,7 +1548,8 @@ void TDriver::Drive()
     // Filters for brake
     oBrake = FilterBrake(oBrake);
     oBrake = FilterBrakeSpeed(oBrake);
-    oBrake = FilterABS(oBrake);
+    if (!oCarHasABS)
+      oBrake = FilterABS(oBrake);
 	//if (oBrake > 0.10)
 	//  oClutch = 0.4;
 
