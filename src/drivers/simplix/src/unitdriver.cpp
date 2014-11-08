@@ -290,6 +290,7 @@ TDriver::TDriver(int Index):
   oTrackAngle(0.0),
   oTargetSpeed(0.0),
   oCarHasABS(false),
+  oCarHasESP(false),
   oCarHasTCL(false),
   oTclRange(10.0),
   oTclSlip(1.6),
@@ -563,7 +564,7 @@ void TDriver::AdjustDriving(
 
   oTelemetrieMode = (int)
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TELE_MODE,NULL,(tdble) oTelemetrieMode);
-  LogSimplix.error("#Telemetrie Mode: %d\n",oTelemetrieMode);
+  LogSimplix.info("#Telemetrie Mode: %d\n",oTelemetrieMode);
 
   oBumpMode =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BUMP_MODE,NULL,oBumpMode);
@@ -574,14 +575,14 @@ void TDriver::AdjustDriving(
     Param.oCarParam.oScaleBump;
   Param.oCarParam.oScaleBumpRight =
     Param.oCarParam.oScaleBump;
-  LogSimplix.error("#-------------------------------------------\n");
-  LogSimplix.error("#Scale Bump: %g\n",Param.oCarParam.oScaleBump);
+  LogSimplix.info("#-------------------------------------------\n");
+  LogSimplix.info("#Scale Bump: %g\n",Param.oCarParam.oScaleBump);
 
   Param.oCarParam.oScaleBumpOuter =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BUMPOUTER,NULL,
 	(float) Param.oCarParam.oScaleBump);
-  LogSimplix.error("#Scale Bump Outer: %g\n",Param.oCarParam.oScaleBumpOuter);
-  LogSimplix.error("#-------------------------------------------\n");
+  LogSimplix.info("#Scale Bump Outer: %g\n",Param.oCarParam.oScaleBumpOuter);
+  LogSimplix.info("#-------------------------------------------\n");
 
   Param.oCarParam.oLimitSideUse =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LIMIT_SIDE_USE,NULL,
@@ -643,7 +644,7 @@ void TDriver::AdjustDriving(
   oMinSpeedFirstKm =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_FIRST_KM,0,
 	(float) oMinSpeedFirstKm);
-  LogSimplix.error("#Min speed first km %g\n",oMinSpeedFirstKm);
+  LogSimplix.info("#Min speed first km %g\n",oMinSpeedFirstKm);
 
   oAvoidScale =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_SCALE,0,
@@ -758,20 +759,37 @@ void TDriver::AdjustDriving(
   if (strcmp(enabling, VAL_YES) == 0) 
   {
     oCarHasABS = true;
-    LogSimplix.info("#oCarHasABS 1\n");
+    LogSimplix.info("#Car has ABS yes\n");
   }
   else
-    LogSimplix.info("#oCarHasABS 0\n");
+    LogSimplix.info("#Car has ABS no\n");
+
+  oCarHasESP = false;
+  enabling = GfParmGetStr(Handle, SECT_FEATURES, PRM_ESPINSIMU, VAL_NO);
+  if (strcmp(enabling, VAL_YES) == 0) 
+  {
+    oCarHasESP = true;
+    LogSimplix.info("#Car has ESP yes\n");
+  }
+  else
+    LogSimplix.info("#Car has ESP no\n");
 
   oCarHasTCL = false;
   enabling = GfParmGetStr(Handle, SECT_FEATURES, PRM_TCLINSIMU, VAL_NO);
   if (strcmp(enabling, VAL_YES) == 0) 
   {
     oCarHasABS = true;
-    LogSimplix.info("#oCarHasTCL 1\n");
+    LogSimplix.info("#Car has TCL yes\n");
   }
   else
-    LogSimplix.info("#oCarHasTCL 0\n");
+    LogSimplix.info("#Car has TCL no\n");
+
+  // For test of simu options override switches here
+  /*
+  oCarHasABS = true;
+  oCarHasTCL = true;
+  oCarHasESP = true;
+  */
 
   oTclRange =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TCL_RANGE,0,
@@ -1186,13 +1204,13 @@ void TDriver::InitTrack
   // Default params for car type (e.g. .../ROBOT_DIR/sc-petrol/default.xml)
   snprintf(Buf,sizeof(Buf),"%s/%s/default.xml",
     BaseParamPath,oCarType);
-  LogSimplix.error("#Default params for car type: %s\n", Buf);
+  LogSimplix.info("#Default params for car type: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for track (Pitting) 
   snprintf(Buf,sizeof(Buf),"%s/tracks/%s.xml",
     BaseParamPath,oTrackName);
-  LogSimplix.error("#Override params for track (Pitting): %s\n", Buf);
+  LogSimplix.info("#Override params for track (Pitting): %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   double ScaleBrake = 1.0;
@@ -1211,19 +1229,19 @@ void TDriver::InitTrack
   // Override params for car type with params of track
   snprintf(Buf,sizeof(Buf),"%s/%s/%s.xml",
     BaseParamPath,oCarType,oTrackName);
-  LogSimplix.error("#Override params for car type with params of track: %s\n", Buf);
+  LogSimplix.info("#Override params for car type with params of track: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for car type with params of track and weather
   snprintf(Buf,sizeof(Buf),"%s/%s/%s-%d.xml",
     BaseParamPath,oCarType,oTrackName,oWeatherCode);
-  LogSimplix.error("#Override params for car type with params of track and weather: %s\n", Buf);
+  LogSimplix.info("#Override params for car type with params of track and weather: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for car type on track with params of specific race type
   snprintf(Buf,sizeof(Buf),"%s/%s/%s-%s.xml",
     BaseParamPath,oCarType,oTrackName,RaceType[oSituation->_raceType]);
-  LogSimplix.error("#Override params for car type on track with params of specific race type: %s\n", Buf);
+  LogSimplix.info("#Override params for car type on track with params of specific race type: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for car type on track with driver on track
@@ -1234,7 +1252,7 @@ void TDriver::InitTrack
   // Override params for driver on track with params of specific race type
   snprintf(Buf,sizeof(Buf),"%s/%d/%s-%s.xml",
     BaseParamPath,oIndex,oTrackName,RaceType[oSituation->_raceType]);
-  LogSimplix.error("#Override params for driver on track with params of specific race type: %s\n", Buf);
+  LogSimplix.info("#Override params for driver on track with params of specific race type: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Setup the car param handle to be returned
@@ -1253,10 +1271,10 @@ void TDriver::InitTrack
 	GfParmGetNum(Handle, (char*) SECT_BRKSYST, 
 	  PRM_BRKPRESS, (char*)NULL, 1000000);
 
-  LogSimplix.error("#=========================\n");
-  LogSimplix.error("#Brake repartition : %0.2f\n",oBrakeRep);
-  LogSimplix.error("#Brake pressure    : %0.0f\n",Press);
-  LogSimplix.error("#=========================\n");
+  LogSimplix.info("#=========================\n");
+  LogSimplix.info("#Brake repartition : %0.2f\n",oBrakeRep);
+  LogSimplix.info("#Brake pressure    : %0.0f\n",Press);
+  LogSimplix.info("#=========================\n");
 
   oBrakeCorrLR =
 	GfParmGetNum(Handle, (char*) SECT_BRKSYST, 
@@ -1546,7 +1564,8 @@ void TDriver::Drive()
   else
   {
     // Filters for brake
-    oBrake = FilterBrake(oBrake);
+    if (!oCarHasESP)
+      oBrake = FilterBrake(oBrake);
     oBrake = FilterBrakeSpeed(oBrake);
     if (!oCarHasABS)
       oBrake = FilterABS(oBrake);
@@ -1892,7 +1911,7 @@ void TDriver::FindRacinglines()
   for (int I = 0; I < NBRRL; I++)
   {
     oRacingLine[I].CalcMaxSpeeds(1);
-//    LogSimplix.error("# SmoothSpeeds ..................\n");
+//    LogSimplix.info("# SmoothSpeeds ..................\n");
 //    oRacingLine[I].SmoothSpeeds();
     oRacingLine[I].PropagateBreaking(1);
     oRacingLine[I].PropagateAcceleration(1);
@@ -2224,10 +2243,10 @@ void TDriver::InitBrake()
 	float Press =
 		GfParmGetNum(oCarHandle, (char*) SECT_BRKSYST, 
 			PRM_BRKPRESS, (char*)NULL, 1000000);
-	LogSimplix.error("############################\n");
-	LogSimplix.error("#Brake repartition : %0.2f\n",Rep);
-	LogSimplix.error("#Brake pressure    : %0.0f\n",Press);
-	LogSimplix.error("############################\n");
+	LogSimplix.info("############################\n");
+	LogSimplix.info("#Brake repartition : %0.2f\n",Rep);
+	LogSimplix.info("#Brake pressure    : %0.0f\n",Press);
+	LogSimplix.info("############################\n");
 
     float MaxPressRatio = 
 		GfParmGetNum(oCarHandle, TDriver::SECT_PRIV, 
@@ -3816,7 +3835,7 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
 //	sprintf(buf2,"%s AVR:%.2f AVO:%.2f TS:%.2f CS:%.2f",buf,oAvoidRange,oAvoidOffset,oTargetSpeed*3.6,oCurrSpeed*3.6);
 	sprintf(buf2,"%s %04.4d R:%.2f O:%.2f TS:%.2f CS:%.2f",buf,SecIndex,oAvoidRange,oAvoidOffset,oTargetSpeed*3.6,oCurrSpeed*3.6);
 
-    LogSimplix.error("%s\n",buf2);
+    LogSimplix.info("%s\n",buf2);
     /* Plotter <<< */
   }
 
@@ -3961,7 +3980,7 @@ double TDriver::FilterBrake(double Brake)
   }
   // ... EPS system for use with SimuV4
 
-  // Limit the brake press a start of braking
+  // Limit the brake press at start of braking
   if (oLastAccel > 0)
     return MIN(0.10,Brake);
 

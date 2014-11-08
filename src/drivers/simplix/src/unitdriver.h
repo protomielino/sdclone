@@ -334,6 +334,7 @@ private:
 	float oTrackAngle;                           // Direction of track
     double oTargetSpeed;                         // Target speed for speed controller
 	bool oCarHasABS;							 // Flag: Car has ABS in simu enabled
+	bool oCarHasESP;							 // Flag: Car has ESP in simu enabled
 	bool oCarHasTCL;							 // Flag: Car has TCL in simu enabled
 	double oTclRange;                            // TCL range
 	double oTclSlip;                             // Max TCL slip

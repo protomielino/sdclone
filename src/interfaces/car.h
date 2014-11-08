@@ -821,6 +821,7 @@ typedef struct CarElt
 #define PRM_FIXEDWHEELFORCE	"fixed wheel force"
 #define PRM_TCLINSIMU		"enable tcl"
 #define PRM_ABSINSIMU		"enable abs"
+#define PRM_ESPINSIMU		"enable esp"
 #define VAL_YES			"yes"
 #define VAL_NO			"no"
 #define FEAT_AEROTOCG		0x01 //shift aero coordinates with the CG
@@ -831,6 +832,7 @@ typedef struct CarElt
 #define FEAT_FIXEDWHEELFORCE	0x20 //fixed wheel force in SimWheelUpdateForce
 #define FEAT_TCLINSIMU		0x40 //TCL simulation with 500 Hz at single wheels and engine
 #define FEAT_ABSINSIMU		0x80 //ABS simulation with 500 Hz at single wheels
+#define FEAT_ESPINSIMU		0x100 //ESP simulation with 500 Hz at single wheels
 
 #endif /* __CARV1_H__ */ 
 

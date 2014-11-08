@@ -178,7 +178,6 @@ void SimWheelUpdateRide(tCar *car, int index)
 		{	// After using the values for the last wheel
 			tEngine	*engine = &(car->engine);
 			engine->TCL = 1.0;			// Reset the TCL accel command
-			//wheel->brake.TCLMin = 1.0;	// Reset the TCL brake command reference value
 		}
 	}
 /**/
@@ -369,24 +368,21 @@ void SimWheelUpdateForce(tCar *car, int index)
 	// Option TCL ...
 	if (car->features & FEAT_TCLINSIMU)
 	{
-		tdble TCL_SlipScale = 0.1f;		// Make it be a parameter later
-		tdble TCL_BrakeScale = 1/60.0f;	// Make it be a parameter later
+		tdble TCL_SlipScale = 1.00f;	// Make it be a parameter later
 		tdble TCL_AccelScale = 0.9f;	// Make it be a parameter later
 
 		tEngine	*engine = &(car->engine); // Get engine
 		if (sx < -TCL_SlipScale)          // Slip is over our limit
 		{	// Store the TCL_Brake command for this wheel
-			wheel->brake.TCL = 1 + TCL_BrakeScale/sx;
+			wheel->brake.TCL = -sx;
+			// Store the minimum TCL_Accel command for the engine
 			engine->TCL = (tdble) MIN(TCL_AccelScale * wheel->brake.TCL,engine->TCL);
-		}
-		else
-		{	// Keep the minimum for all dSriven wheels
-			engine->TCL = (tdble) MIN(1.0,engine->TCL);
-		}
+			// fprintf(stderr,"sx: %.1f TCL: %.3f %%\n",sx,wheel->brake.TCL);
+		};
 	}
-    // ... Optional TCL
+    // ... Option TCL
 
-	// Optional ABS ...
+	// Option ABS ...
 	if (car->features & FEAT_ABSINSIMU)
 	{
 		tdble ABS_SlipScale = 0.1f;		// Make it be a parameter later
@@ -407,7 +403,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 		}
 */
 	}
-    // ... Optional ABS
+    // ... Option ABS
 }
 
 
@@ -418,6 +414,8 @@ SimWheelUpdateRotation(tCar *car)
 	tWheel *wheel;
 	tdble deltan;
 	tdble cosaz, sinaz;
+
+	tdble maxslip = 0.0;
 
 	for (i = 0; i < 4; i++) {
 		wheel = &(car->wheel[i]);
@@ -454,7 +452,28 @@ SimWheelUpdateRotation(tCar *car)
 		wheel->relPos.ay += wheel->spinVel * SimDeltaTime;
 		FLOAT_NORM_PI_PI(wheel->relPos.ay);
 		car->carElt->_wheelSpinVel(i) = wheel->spinVel;
+
+		// Option TCL ...
+		if (car->features & FEAT_TCLINSIMU)
+		{
+
+			if (maxslip < wheel->brake.TCL)
+				maxslip = wheel->brake.TCL;
+		}
+		// ... Option TCL
 	}
+
+	// Option TCL ...
+	if (maxslip > 0.0)	
+	{
+		for (i = 0; i < 4; i++) 
+		{
+			wheel = &(car->wheel[i]);
+			if (wheel->brake.TCL != maxslip)
+				wheel->brake.TCL = 0.0;
+		}
+	}
+	// ... Option TCL
 }
 
 

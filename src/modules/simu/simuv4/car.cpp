@@ -77,6 +77,10 @@ SimCarConfig(tCar *car)
 	if (strcmp(enabling, VAL_YES) == 0) {
 		car->features = car->features | FEAT_ABSINSIMU;
 	}
+	enabling = GfParmGetStr(hdle, SECT_FEATURES, PRM_ESPINSIMU, VAL_NO);
+	if (strcmp(enabling, VAL_YES) == 0) {
+		car->features = car->features | FEAT_ESPINSIMU;
+	}
 	
 	/* continue with car parameters */
 	car->dimension.x = GfParmGetNum(hdle, SECT_CAR, PRM_LEN, (char*)NULL, 4.7f);
