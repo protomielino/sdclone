@@ -777,8 +777,8 @@ static int InitFuncPt(int Index, void *Pt)
     LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_SC\n");
     cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_SC;
-//    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
+//    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_SC;
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
     cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.10f);

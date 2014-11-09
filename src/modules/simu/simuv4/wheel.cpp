@@ -170,7 +170,6 @@ void SimWheelUpdateRide(tCar *car, int index)
 	// update wheel brake
 	SimBrakeUpdate(car, wheel, &(wheel->brake));
 
-/**/
 	// Option TCL ...
 	if (car->features & FEAT_TCLINSIMU)
 	{
@@ -180,7 +179,6 @@ void SimWheelUpdateRide(tCar *car, int index)
 			engine->TCL = 1.0;			// Reset the TCL accel command
 		}
 	}
-/**/
 	// ... Option TCL
 }
 
@@ -388,20 +386,11 @@ void SimWheelUpdateForce(tCar *car, int index)
 		tdble ABS_SlipScale = 0.1f;		// Make it be a parameter later
 		tdble ABS_BrakeScale = 1.0f;	// Make it be a parameter later
 
-		// If slip is over the limit, set brake command for this wheel
+		// If slip is over the limit, reduce brake command for this wheel
 		if (sx > ABS_SlipScale)			
-			wheel->brake.ABS = 1 - ABS_BrakeScale * sx;
+			wheel->brake.ABS = MAX(0.0,MIN(1.0,1 - ABS_BrakeScale * sx));
 		else
 			wheel->brake.ABS = 1.0f;
-/*
-		if (wheel->brake.EnableABS)
-		{
-			if (index == 0)
-				fprintf(stderr,"\nABS: %.1f %% ", wheel->brake.ABS * 100);
-			else
-				fprintf(stderr," %.1f %% ", wheel->brake.ABS * 100);
-		}
-*/
 	}
     // ... Option ABS
 }

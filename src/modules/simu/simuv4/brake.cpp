@@ -61,14 +61,10 @@ SimBrakeUpdate(tCar *car, tWheel *wheel, tBrake *brake)
     brake->Tq = brake->coeff * brake->pressure;
 
 	// Option ABS ...
-//	if (car->features & FEAT_ABSINSIMU)
+	if (car->features & FEAT_ABSINSIMU)
 	{
 		if (brake->EnableABS)
 			brake->Tq *= brake->ABS;
-/*
-		if (brake->EnableABS)
-			fprintf(stderr,"ABS: %.1f %%\n",brake->ABS * 100.0);
-*/
 	}
 	// ... Option ABS
 
@@ -77,9 +73,8 @@ SimBrakeUpdate(tCar *car, tWheel *wheel, tBrake *brake)
 	{
 		// Brake most spinning wheel
 		tdble TCL_BrakeScale = 125.0f;	// Make it be a parameter later
-		brake->Tq += TCL_BrakeScale * brake->TCL;
-		//fprintf(stderr,"TCL: %.1f %% Tq: %.0f Nm\n",brake->TCL * 100.0,brake->Tq);
-		brake->TCL = 0.0;
+		brake->Tq += (tdble) MAX(0.0,MIN(5000.0,TCL_BrakeScale * brake->TCL)); // Sanity check
+		brake->TCL = 0.0; // Reset for next timestep
 	}
 	// ... Option TCL
 
@@ -129,6 +124,12 @@ SimBrakeSystemUpdate(tCar *car)
 
 		if (car->ctrl->singleWheelBrakeMode == 1)
 		{
+			// Sanity check needed
+			car->ctrl->brakeFrontRightCmd = (tdble) MIN(1.0,MAX(0.0,car->ctrl->brakeFrontRightCmd));
+			car->ctrl->brakeFrontLeftCmd = (tdble) MIN(1.0,MAX(0.0,car->ctrl->brakeFrontLeftCmd));
+			car->ctrl->brakeRearRightCmd = (tdble) MIN(1.0,MAX(0.0,car->ctrl->brakeRearRightCmd));
+			car->ctrl->brakeRearLeftCmd = (tdble) MIN(1.0,MAX(0.0,car->ctrl->brakeRearRightCmd));
+
 			car->wheel[FRNT_RGT].brake.pressure = brkSyst->coeff * car->ctrl->brakeFrontRightCmd; 
 			car->wheel[FRNT_LFT].brake.pressure = brkSyst->coeff * car->ctrl->brakeFrontLeftCmd;
 			car->wheel[REAR_RGT].brake.pressure = brkSyst->coeff * car->ctrl->brakeRearRightCmd;
@@ -138,12 +139,19 @@ SimBrakeSystemUpdate(tCar *car)
 		else
 		{
 			tdble	ctrl = car->ctrl->brakeCmd;
+
 			if (absDriftAngle > driftAngleLimit)
 			{
-				car->wheel[FRNT_RGT].brake.pressure = (ctrl - brakeSide) * brkSyst->coeff * brkSyst->rep;
-				car->wheel[FRNT_LFT].brake.pressure = (ctrl + brakeSide) * brkSyst->coeff * brkSyst->rep;
-				car->wheel[REAR_RGT].brake.pressure = (ctrl - brakeSide - brakeBalance) * brkSyst->coeff * (1 - brkSyst->rep);
-				car->wheel[REAR_LFT].brake.pressure = (ctrl + brakeSide - brakeBalance) * brkSyst->coeff * (1 - brkSyst->rep);
+				// Sanity check needed
+				car->wheel[FRNT_RGT].brake.pressure = (tdble) MIN(1.0,MAX(0.0,ctrl - brakeSide));
+				car->wheel[FRNT_LFT].brake.pressure = (tdble) MIN(1.0,MAX(0.0,ctrl + brakeSide));
+				car->wheel[REAR_RGT].brake.pressure = (tdble) MIN(1.0,MAX(0.0,ctrl - brakeSide - brakeBalance));
+				car->wheel[REAR_LFT].brake.pressure = (tdble) MIN(1.0,MAX(0.0,ctrl + brakeSide - brakeBalance));
+
+				car->wheel[FRNT_RGT].brake.pressure *= brkSyst->coeff * brkSyst->rep;
+				car->wheel[FRNT_LFT].brake.pressure *= brkSyst->coeff * brkSyst->rep;
+				car->wheel[REAR_RGT].brake.pressure *= brkSyst->coeff * (1 - brkSyst->rep);
+				car->wheel[REAR_LFT].brake.pressure *= brkSyst->coeff * (1 - brkSyst->rep);
 			}
 			else
 			{

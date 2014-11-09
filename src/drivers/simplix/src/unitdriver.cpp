@@ -261,6 +261,7 @@ TDriver::TDriver(int Index):
   oClutchRange(0.82),
   oClutchRelease(0.5),
   oEarlyShiftFactor(1.0),
+  oShiftUp(1.0),
   oCurrSpeed(0),
   // oGearEff,
   oExtended(0),
@@ -856,6 +857,11 @@ void TDriver::AdjustDriving(
 	(float)oEarlyShiftFactor);
   LogSimplix.debug("#oEarlyShiftFactor %g\n",oEarlyShiftFactor);
 
+  oShiftUp =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SHIFT_UP,0,
+	(float)oShiftUp);
+  LogSimplix.debug("#oShiftUp %g\n",oShiftUp);
+
   oTeamEnabled =
     GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TEAM_ENABLE,0,
 	(float)oTeamEnabled) != 0;
@@ -1185,7 +1191,7 @@ void TDriver::InitTrack
   oBrakeRep =									 // Bremsdruckverteilung
 	GfParmGetNum(CarHandle, (char*) SECT_BRKSYST, 
       PRM_BRKREP, (char*)NULL, 0.5);
-  LogSimplix.debug("#Brake repartition : %0.2f\n",oBrakeRep);
+  LogSimplix.info("#Brake repartition : %0.2f\n",oBrakeRep);
 
   oBrakeCorrLR =
 	GfParmGetNum(CarHandle, (char*) SECT_BRKSYST, 
@@ -2815,6 +2821,15 @@ void TDriver::InitAdaptiveShiftLevels()
       oShift[J] = oRevsLimiter * 0.90; //0.87;
 	else
       oShift[J] = oRevsLimiter * 0.974;
+
+  if (oShiftUp < 1.0) 
+  {
+	for (J = 0; J < CarGearNbr; J++)
+      oShift[J] = oRevsLimiter * oShiftUp;
+
+    LogSimplix.debug("\n#<<< InitAdaptiveShiftLevels\n");
+	return;
+  }
 
   for (J = 1; J < oLastGear; J++)
   {

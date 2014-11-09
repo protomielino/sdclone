@@ -93,7 +93,7 @@ extern GfLogger* PLogSimplix;
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 134 // Force new calculation
+#define RL_VERSION 135 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*
@@ -523,6 +523,7 @@ enum
 #define PRV_CLUTCH_RANGE     "clutch range"      // default 0.82
 #define PRV_CLUTCH_RELEASE   "clutch release"    // default 0.4
 #define PRV_EARLY_SHIFT      "early shift"       // default 1.0
+#define PRV_SHIFT_UP         "shift up"          // default 1.0
 
 #define PRV_TEAM_ENABLE      "team enable"       // default 1
 

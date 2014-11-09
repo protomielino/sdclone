@@ -304,6 +304,7 @@ private:
 	double oClutchRange;
 	double oClutchRelease;
 	double oEarlyShiftFactor;
+	double oShiftUp;
 	double oCurrSpeed;                           // Currend speed
 	double oGearEff[MAX_GEARS];                  // Efficiency of gears
 	int oExtended;                               // Information if this robot is extended (oExtended = 1) or not (oExtended = 0).
