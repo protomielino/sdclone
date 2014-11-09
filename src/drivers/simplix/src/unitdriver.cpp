@@ -407,10 +407,10 @@ TDriver::TDriver(int Index):
   oPIDCLine.oD = 10;
 
   // Braking: Control speed difference
-  oPIDCBrake.oP = 3.0;
+  oPIDCBrake.oP = 20.0;
   oPIDCBrake.oI = 0.0;
-  oPIDCBrake.oD = 20.0;
-  oPIDCBrake.oMaxTotal = 1.0;
+  oPIDCBrake.oD = 30.0;
+  oPIDCBrake.oMaxTotal = 0.0;
   oPIDCBrake.oMinTotal = 0.0;
   
   for (I = 0; I <= NBR_BRAKECOEFF; I++)          // Initialize braking
