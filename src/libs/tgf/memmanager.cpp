@@ -49,10 +49,10 @@ static unsigned int GfMM_Counter = 0;	// Counter of memory blocks
 //
 void* operator new (size_t size)
 {
-#if defined(WIN32)
-	void* RetAddr = _ReturnAddress();
+#if defined(WIN32) // Has to be replaced by a definition of VC++ versus gcc
+	void* RetAddr = _ReturnAddress(); // VC++
 #else
-	void* RetAddr = _ReturnAddress();
+	void* RetAddr = __builtin_return_address (0);  // gcc
 #endif
 	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_NEW,RetAddr);
 }
@@ -74,10 +74,10 @@ void operator delete (void *b)
 
 void * _tgf_win_malloc(size_t size)
 {
-#if defined(WIN32)
-	void* RetAddr = _ReturnAddress();
+#if defined(WIN32) // Has to be replaced by a definition of VC++ versus gcc
+	void* RetAddr = _ReturnAddress(); // VC++
 #else
-	void* RetAddr = _ReturnAddress();
+	void* RetAddr = __builtin_return_address (0); // gcc
 #endif
 	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_MALLOC,RetAddr);
 }
