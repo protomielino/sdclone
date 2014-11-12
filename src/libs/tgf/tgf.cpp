@@ -42,6 +42,7 @@
 
 
 extern void gfTraceInit(bool bWithLogging = true);
+extern void gfTraceShutdown(void);
 extern void gfDirInit(void);
 extern void gfModInit(void);
 extern void gfOsInit(void);
@@ -519,6 +520,8 @@ void GfShutdown(void)
 	freez(gfDataDir);
 	freez(gfLibDir);
 	freez(gfBinDir);
+
+	gfTraceShutdown();
 }
 
 

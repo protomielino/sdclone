@@ -72,6 +72,21 @@ gfTraceInit(bool bWithLogging)
 	GfLogger::boot(bWithLogging);
 }
 
+// Delete all instances of all loggers created while running the program
+void
+gfTraceShutdown(void)
+{
+	// Iterator for all the loggers
+	std::map<std::string, GfLogger*>::iterator itLog;
+
+	// Delete all instances
+	for (itLog = gfMapLoggersByName.begin(); itLog != gfMapLoggersByName.end(); itLog++)
+		delete itLog->second;	// a map<x,y> iterator "points" to a pair<x,y> value
+
+	// Empty the map
+	gfMapLoggersByName.clear();
+}
+
 // GfLogger class implementation ==================================================
 
 // Factory method.

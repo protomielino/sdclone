@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2013.06.25
+// Last changed : 2014.11.09
 // Copyright    : © 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.002
+// Version      : 4.02.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -500,17 +500,13 @@ private:
 	void CalcSkilling_simplix_LP1();
 
 	double CalcFriction_simplix_Identity(double Crv);
-	double CalcFriction_simplix_TRB1(double Crv);
-	double CalcFriction_simplix_LS1(double Crv);
 	double CalcFriction_simplix_LS2(double Crv);
 	double CalcFriction_simplix_LP1(double Crv);
 	double CalcFriction_simplix_REF(double Crv);
 
-	double CalcCrv_simplix(double Crv);
+//	double CalcCrv_simplix(double Crv);
 	double CalcCrv_simplix_Identity(double Crv);
-	double CalcCrv_simplix_SC(double Crv);
 	double CalcCrv_simplix_36GP(double Crv);
-	double CalcCrv_simplix_LS1(double Crv);
 	double CalcCrv_simplix_LP1(double Crv);
 
 	double CalcHairpin_simplix_Identity(double Speed, double AbsCrv); 

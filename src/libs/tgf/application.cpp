@@ -472,6 +472,8 @@ void GfApplication::registerOption(const std::string& strShortName,
 	std::list<Option>::const_iterator itOpt;
 	for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
 	{
+		try
+		{
 		if (itOpt->strShortName == strShortName)
 		{
 			GfLogError("Can't register option -%s/--%s "
@@ -488,6 +490,12 @@ void GfApplication::registerOption(const std::string& strShortName,
 					   itOpt->strShortName.c_str(), itOpt->strLongName.c_str());
 			return;
 		}
+		}
+		catch (std::bad_exception)
+		{
+			GfLogError("GfApplication::registerOption -%s",strShortName.c_str());
+		}
+
 	}
 
 	// All's right : register.

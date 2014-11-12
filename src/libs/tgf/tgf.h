@@ -206,12 +206,19 @@ TGF_API void GfPoolFreePool(tMemoryPool* pool);
 TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 
 /*********************************
- * Memory debug tools            *
+ * Old memory debug tools        *
  *********************************/
 
 // <esppat>
 //#define TGF_ALLOC_DEBUG 1
-#if (defined(WIN32) && defined(TGF_ALLOC_DEBUG))
+//#if (defined(WIN32) && defined(TGF_ALLOC_DEBUG))
+
+/*********************************
+ * New memory debug tools        *
+ *********************************/
+// To enble the hunting for memory leaks uncomment the following line
+//#define __DEBUG_MEMORYMANAGER__
+#if (defined(WIN32) && defined(__DEBUG_MEMORYMANAGER__))
 
 #define malloc _tgf_win_malloc
 #define calloc _tgf_win_calloc
@@ -230,6 +237,7 @@ TGF_API char * _tgf_win_strdup(const char * str);
 
 #endif // WIN32
 // </esppat>
+
 
 /*********************************
  * Interface For Dynamic Modules *

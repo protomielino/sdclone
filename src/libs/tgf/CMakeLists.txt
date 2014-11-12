@@ -8,10 +8,10 @@ ADD_EXPAT_INCLUDEDIR()
 
 ADD_SDLIB_INCLUDEDIR(txml portability)
 
-SET(TGF_HEADERS os.h tgf.h tgf.hpp modinfo.h osspec.h)
+SET(TGF_HEADERS os.h tgf.h tgf.hpp modinfo.h osspec.h memmanager.h)
 SET(TGF_SOURCES application.cpp eventloop.cpp directory.cpp file.cpp filesetup.cpp 
                 formula.cpp hash.cpp module.cpp legacymodule.cpp modinfo.cpp os.cpp
-                params.cpp profiler.cpp schedulespy.cpp tgf.cpp trace.cpp)
+                params.cpp profiler.cpp schedulespy.cpp tgf.cpp trace.cpp memmanager.cpp)
 SET(TGF_OTHER_SOURCES params.dtd)
 
 IF(WIN32)

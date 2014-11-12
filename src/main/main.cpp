@@ -24,6 +24,7 @@
 #include <portability.h>
 #include <tgfclient.h>
 #include <tgfdata.h>
+#include <tgf.h>
 
 #ifdef WIN32
 #ifndef HAVE_CONFIG_H
@@ -39,6 +40,12 @@
 #include <iraceengine.h>
 #include <iuserinterface.h>
 
+// WDB test ...
+// Use the define to enable the memorymanager for hunting memory leaks 
+#ifdef __DEBUG_MEMORYMANAGER__
+#include "memmanager.h"
+#endif
+// ... WDB test
 
 /*
  * Function
@@ -57,6 +64,23 @@
 int
 main(int argc, char *argv[])
 {
+	// WDB test ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+
+	fprintf(stderr,"__DEBUG_MEMORYMANAGER__ enabled\n\n");
+	fprintf(stderr,"If debugging -> Attach to the process ... \n");
+	fprintf(stderr,"\nand than press [Enter] to start the program\n");
+	getchar();
+
+	// THIS HAS TO BE THE FIRST LINE OF CODE!!!
+	GfMemoryManagerAllocate();
+
+	// For hunting of corrupted memory blocks comment the following line
+	GfMemoryManagerSetup(4); // Add 4 bytes per block
+
+	#endif
+	// ... WDB test
+
 	// Look for the "text-only" option flag in the command-line args.
 	bool bTextOnly = false;
 	for (int i = 1; i < argc; i++)
@@ -192,7 +216,16 @@ main(int argc, char *argv[])
 	else
 		std::cerr << "Exiting from " << strAppName
 				  << " after some error occurred (see above)." << std::endl;
-	
+
+	// WDB test ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+
+	// THIS HAS TO BE THE LAST LINE OF CODE BEFORE RETURN!!!
+	GfMemoryManagerRelease();
+
+	#endif
+	// ... WDB test
+
 	return (piUserItf && piRaceEngine) ? 0 : 1;
 }
 

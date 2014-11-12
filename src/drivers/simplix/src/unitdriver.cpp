@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.07.15
-// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
+// Last changed : 2014.11.09
+// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.01.000
+// Version      : 4.02.000
 //--------------------------------------------------------------------------*
 //
 //    Copyright: (C) 2000 by Eric Espie
@@ -4381,7 +4381,7 @@ double TDriver::CalcHairpin(double Speed, double AbsCrv)
     return (this->*CalcHairpinFoo)(Speed, AbsCrv);
 }
 //==========================================================================*
-
+/*
 //==========================================================================*
 // simplix
 //--------------------------------------------------------------------------*
@@ -4401,7 +4401,7 @@ double TDriver::CalcCrv_simplix(double Crv)
 }
 
 //==========================================================================*
-
+*/
 //==========================================================================*
 // simplix
 //--------------------------------------------------------------------------*
@@ -4428,18 +4428,6 @@ double TDriver::CalcCrv_simplix_LP1(double Crv)
 double TDriver::CalcCrv_simplix_Identity(double Crv)
 {
   return 1.0;
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix_sc
-//--------------------------------------------------------------------------*
-double TDriver::CalcCrv_simplix_SC(double Crv)
-{
-    if (fabs(Crv) > 1/oSlowRadius)
-      return 1.5;                                // Filter narrow turns
-	else
-      return 1.0;
 }
 //==========================================================================*
 /*
@@ -4575,70 +4563,6 @@ double TDriver::CalcHairpin_simplix(double Speed, double AbsCrv)
 double TDriver::CalcFriction_simplix_Identity(const double Crv)
 {
   return 1.0;
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix
-//--------------------------------------------------------------------------*
-double TDriver::CalcFriction_simplix_TRB1(const double Crv)
-{
-  double AbsCrv = fabs(Crv);
-
-  if (AbsCrv > 1/12.0)
-	oXXX = 0.60;
-  else if ((AbsCrv > 1/15.0) && (oXXX > 0.65))
-	oXXX = 0.65;
-  else if ((AbsCrv > 1/18.0) && (oXXX > 0.75))
-	oXXX = 0.75;
-  else if ((AbsCrv > 1/19.0) && (oXXX > 0.83))
-	oXXX = 0.83;
-  else if ((AbsCrv > 1/20.0) && (oXXX > 0.90))
-	oXXX = 0.90;
-  else
-	oXXX = MIN(1.0,oXXX+0.0003);
-
-  double FrictionFactor = 0.95;
-
-  if (AbsCrv > 0.10)
-    FrictionFactor = 0.44;
-  else if (AbsCrv > 0.05)
-    FrictionFactor = 0.53;
-  else if (AbsCrv > 0.045)
-    FrictionFactor = 0.74;
-  else if (AbsCrv > 0.03)
-    FrictionFactor = 0.83;
-  else if (AbsCrv > 0.02)
-    FrictionFactor = 0.92;
-  else if (AbsCrv > 0.01)
-    FrictionFactor = 0.93;
-  else if (AbsCrv > 0.005)
-    FrictionFactor = 0.95;
-
-  return FrictionFactor * oXXX;
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix
-//--------------------------------------------------------------------------*
-double TDriver::CalcFriction_simplix_LS1(const double Crv)
-{
-  double AbsCrv = fabs(Crv);
-  double FrictionFactor = 0.95;
-
-  if (AbsCrv > 0.10) 
-    FrictionFactor = 0.86;
-  else if (AbsCrv > 0.045)
-    FrictionFactor = 0.88;
-  else if (AbsCrv > 0.03)
-    FrictionFactor = 0.90;
-  else if (AbsCrv > 0.02)
-    FrictionFactor = 0.92;
-  else if (AbsCrv > 0.01)
-    FrictionFactor = 0.94;
-
-  return FrictionFactor;
 }
 //==========================================================================*
 
