@@ -62,6 +62,16 @@ void swap32(unsigned int *p, unsigned int size)
 #endif
 #endif
 
+void gfuiFreeFonts(void)
+{
+	GfuiFontClass* font;
+	for ( int I = 0; I < GFUI_FONT_NB; I++)
+	{
+		font = gfuiFont[I];
+		delete font;
+	}
+}
+
 void gfuiLoadFonts(void)
 {
 	void *param;

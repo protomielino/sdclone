@@ -125,6 +125,7 @@ void
 gfuiShutdown(void)
 {
 	gfctrlJoyShutdown();
+	gfuiFreeFonts();
 	shutdownMusic();
 }
 

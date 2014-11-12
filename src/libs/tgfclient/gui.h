@@ -414,6 +414,7 @@ extern void gfuiReleaseCheckbox(tGfuiObject *obj);
 extern void gfuiReleaseProgressbar(tGfuiObject *obj);
 
 extern void gfuiLoadFonts(void);
+extern void gfuiFreeFonts(void);
 
 extern void gfuiEditboxKey(tGfuiObject *obj, int key, int modifier);
 
