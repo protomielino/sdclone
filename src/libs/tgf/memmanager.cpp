@@ -26,6 +26,11 @@
 #include "memmanager.h"
 #ifdef __DEBUG_MEMORYMANAGER__
 
+#include <stdio.h>
+#include <intrin.h>
+
+#pragma intrinsic(_ReturnAddress)
+
 //
 // Configuration (depending on the compiler)
 //
@@ -44,7 +49,12 @@ static unsigned int GfMM_Counter = 0;	// Counter of memory blocks
 //
 void* operator new (size_t size)
 {
-	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_NEW);
+#if defined(WIN32)
+	void* RetAddr = _ReturnAddress();
+#else
+	void* RetAddr = _ReturnAddress();
+#endif
+	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_NEW,RetAddr);
 }
 //
 
@@ -64,7 +74,12 @@ void operator delete (void *b)
 
 void * _tgf_win_malloc(size_t size)
 {
-	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_MALLOC);
+#if defined(WIN32)
+	void* RetAddr = _ReturnAddress();
+#else
+	void* RetAddr = _ReturnAddress();
+#endif
+	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_MALLOC,RetAddr);
 }
 
 void _tgf_win_free(void * b)
@@ -150,7 +165,7 @@ tMemoryManager* GfMemoryManager()
 //
 // Allocate memory
 //
-void* GfMemoryManagerAlloc (size_t size, unsigned int Type)
+void* GfMemoryManagerAlloc (size_t size, unsigned int Type, void* RetAddr)
 {
 	if (GfMemoryManagerRunning())
 	{
@@ -179,6 +194,7 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int Type)
 		c->Mark = MM_MARKER;
 		c->Type = Type;
 		c->Size = size;
+		c->ReturnAddress = RetAddr;
 		int ID = c->ID = GfMM_Counter++;
 
 		// Now we have here
@@ -197,11 +213,11 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int Type)
 		// b: (void*) official pointer to the new data block
 
 		// Hunting memory leaks ...
-#define	IDTOSTOP 56	// ID of block you are looking for
+#define	IDTOSTOP 6486	// ID of block you are looking for
 
 		if (ID == IDTOSTOP)
 		{
-			ID = 0;	// set breakepoint here 
+			ID = 0;	// set breakpoint here 
 					// to stop at allocation of 
 					// block with ID = IDTOSTOP
 		}
@@ -348,7 +364,7 @@ void GfMemoryManagerRelease()
 
 				if (ToFree->Type == 1)
 				{
-					fprintf(stderr,"%04.4d Block: %04.4d Size: %06.6d Type: new/delete\n",++n,ToFree->ID,ToFree->Size);
+					fprintf(stderr,"%04.4d Block: %04.4d Size: %06.6d ReturnAddress: %p Type: new/delete\n",++n,ToFree->ID,ToFree->Size,ToFree->ReturnAddress);
 					LeakSizeNewTotal += ToFree->Size;
 					if (MaxLeakSizeNewTotal < ToFree->Size)
 						MaxLeakSizeNewTotal = ToFree->Size;
@@ -356,7 +372,7 @@ void GfMemoryManagerRelease()
 				}
 				else
 				{
-					fprintf(stderr,"%04.4d Block: %04.4d Size: %06.6d Type: malloc/free\n",++n,ToFree->ID,ToFree->Size);
+					fprintf(stderr,"%04.4d Block: %04.4d Size: %06.6d ReturnAddress: %p Type: malloc/free\n",++n,ToFree->ID,ToFree->Size,ToFree->ReturnAddress);
 					LeakSizeMallocTotal += ToFree->Size;
 					if (MaxLeakSizeMallocTotal < ToFree->Size)
 						MaxLeakSizeMallocTotal = ToFree->Size;

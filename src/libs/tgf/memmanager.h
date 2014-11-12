@@ -52,7 +52,7 @@ TGF_API void GfMemoryManagerSetup(int AddedSpace);
 //
 
 // Memory manager worker functions
-void* GfMemoryManagerAlloc(size_t size, unsigned int type);
+void* GfMemoryManagerAlloc(size_t size, unsigned int type, void* RetAddr);
 void GfMemoryManagerFree(void* b, unsigned int type);
 //
 
@@ -63,6 +63,7 @@ typedef struct tDSMMLinkBlock
 {	
 	unsigned int Mark;		// Marker to identify it as tDSMMLinkBlock
 	int Size;				// Size of allocated block
+	void* ReturnAddress;    // Return address of new/malloc
 	tDSMMLinkBlock* Prev;	// Previous memory block
 	tDSMMLinkBlock* Next;	// Next memory block
 	unsigned int Type;		// Type of allocation

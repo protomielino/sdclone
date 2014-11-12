@@ -217,7 +217,7 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
  * New memory debug tools        *
  *********************************/
 // To enble the hunting for memory leaks uncomment the following line
-//#define __DEBUG_MEMORYMANAGER__
+#define __DEBUG_MEMORYMANAGER__
 #if (defined(WIN32) && defined(__DEBUG_MEMORYMANAGER__))
 
 #define malloc _tgf_win_malloc
