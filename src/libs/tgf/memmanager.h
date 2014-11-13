@@ -32,6 +32,8 @@ TGF_API bool GfMemoryManagerAllocate();	// Initialize memory manager
 TGF_API void GfMemoryManagerRelease();	// Release memory manager at Shutdown
 TGF_API bool GfMemoryManagerRunning();	// Is the memory manager running?
 TGF_API void GfMemoryManagerSetup(int AddedSpace);
+TGF_API void GfMemoryManagerDoAccept();
+TGF_API void GfMemoryManagerDoFree();
 //
 
 //
@@ -82,6 +84,7 @@ typedef struct
 	size_t Size;						// Size of memory manager
 	int State;							// State of memory manager
 	int AddedSpace;						// Number of bytes added to each block
+	bool DoNotFree;						// Do not free the blocks if flag is set
 
 } tMemoryManager;
 //

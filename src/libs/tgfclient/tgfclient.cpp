@@ -18,56 +18,53 @@
 
 #include "gui.h"
 
+// WDB test ...
+#ifdef __DEBUG_MEMORYMANAGER__
+
 // Avoid memory leaks ...
-int NumberOfScreens = -1;
+int NumberOfScreens = 0;
 tGfuiScreen* OwnerOfScreens[MAXSCREENS];
 
 void RegisterScreens(void* screen)
 {
-	if (++NumberOfScreens < MAXSCREENS)
-		OwnerOfScreens[NumberOfScreens] = (tGfuiScreen*) screen;
+	tGfuiScreen* _screen = (tGfuiScreen*) screen;
+	if (NumberOfScreens < MAXSCREENS)
+		OwnerOfScreens[NumberOfScreens++] = _screen;
 	else
 		GfLogInfo("NumberOfScreens: %d > MAXSCREENS\n", NumberOfScreens);
 }
 
 void FreeScreens()
 {
+	// For debugging purposes:
+	//doaccept(); // Do not free the blocks, just take it out of the list
+
 	for (int I = 0; I <= NumberOfScreens; I++)
 	{
+		// This screen is corrupted!
+		// TODO: Find out why
+		if (I == 2)
+			continue;
+
+		// Get the screen from the owner
 		tGfuiScreen* screen = OwnerOfScreens[I];
-		if (screen)
+		if (screen) 
 		{
-			tGfuiObject* object = screen->objects;
-			while (object)
-			{
-				tGfuiObject* release = object;
-				object = object->next;
-				if (object == release)
-					object = NULL;
-				if (object == screen->objects)
-					object = NULL;
-				gfuiReleaseObject(release);
-			}
-
-			tGfuiKey* key = screen->userKeys;
-			while (key)
-			{
-				tGfuiKey* relkey = key;
-				key = key->next;
-				if (key == relkey)
-					key = NULL;
-				if (key == screen->userKeys)
-					key = NULL;
-				free(relkey->name);
-				free(relkey->descr);
-				free(relkey);
-			}
-
-			free(screen);
+			GfuiScreenRelease(screen); // Free all resources
 		}
 	}
+
+	// Back to normal mode
+	dofree(); // Free the blocks
+
 }
 // ... Avoid memory leaks
+#else
+void RegisterScreens(void* screen){};
+void FreeScreens(){};
+#endif
+// ... WDB test
+
 
 void GfuiInit(void)
 {

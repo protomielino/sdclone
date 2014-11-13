@@ -75,8 +75,13 @@ main(int argc, char *argv[])
 	// THIS HAS TO BE THE FIRST LINE OF CODE!!!
 	GfMemoryManagerAllocate();
 
+	// Because there are some memory blocks that are allocated too small
+	// we get corrupted the following memory blocks.
+	// To avoid it, we can use an additional size (4 Bytes per block) 
+	// while allocation!
+	
 	// For hunting of corrupted memory blocks comment the following line
-	//GfMemoryManagerSetup(4); // Add 4 bytes per block
+	GfMemoryManagerSetup(4); // Add 4 bytes per block
 
 	#endif
 	// ... WDB test

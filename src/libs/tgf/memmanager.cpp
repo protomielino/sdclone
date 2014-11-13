@@ -26,10 +26,14 @@
 #include "memmanager.h"
 #ifdef __DEBUG_MEMORYMANAGER__
 
+#if defined(__MINGW32__)
+
+#else
 #include <stdio.h>
 #include <intrin.h>
 
 #pragma intrinsic(_ReturnAddress)
+#endif
 
 //
 // Configuration (depending on the compiler)
@@ -49,10 +53,10 @@ static unsigned int GfMM_Counter = 0;	// Counter of memory blocks
 //
 void* operator new (size_t size)
 {
-#if defined(WIN32) // Has to be replaced by a definition of VC++ versus gcc
-	void* RetAddr = _ReturnAddress(); // VC++
+#if defined(__MINGW32__)
+	void* RetAddr = __builtin_return_address (0); // gcc
 #else
-	void* RetAddr = __builtin_return_address (0);  // gcc
+	void* RetAddr = _ReturnAddress(); // VC++
 #endif
 	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_NEW,RetAddr);
 }
@@ -63,7 +67,15 @@ void* operator new (size_t size)
 //
 void operator delete (void *b)
 {
-	GfMemoryManagerFree(b, GF_MM_ALLOCTYPE_NEW);
+	if (GfMemoryManagerRunning())
+	{
+		if (GfMM->DoNotFree)
+			GfMemoryManagerAccept(b, GF_MM_ALLOCTYPE_NEW);
+		else
+			GfMemoryManagerFree(b, GF_MM_ALLOCTYPE_NEW);
+	}
+	else
+		GfMemoryManagerFree(b, GF_MM_ALLOCTYPE_NEW);
 }
 //
 
@@ -74,17 +86,25 @@ void operator delete (void *b)
 
 void * _tgf_win_malloc(size_t size)
 {
-#if defined(WIN32) // Has to be replaced by a definition of VC++ versus gcc
-	void* RetAddr = _ReturnAddress(); // VC++
-#else
+#if defined(__MINGW32__)
 	void* RetAddr = __builtin_return_address (0); // gcc
+#else
+	void* RetAddr = _ReturnAddress(); // VC++
 #endif
 	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_MALLOC,RetAddr);
 }
 
 void _tgf_win_free(void * b)
 {
-	GfMemoryManagerFree(b, GF_MM_ALLOCTYPE_MALLOC);
+	if (GfMemoryManagerRunning())
+	{
+		if (GfMM->DoNotFree)
+			GfMemoryManagerAccept(b, GF_MM_ALLOCTYPE_MALLOC);
+		else
+			GfMemoryManagerFree(b, GF_MM_ALLOCTYPE_MALLOC);
+	}
+	else
+		GfMemoryManagerFree(b, GF_MM_ALLOCTYPE_MALLOC);
 }
 
 void _tgf_win_accept(void * b)
@@ -152,6 +172,7 @@ tMemoryManager* GfMemoryManager()
 	MemoryManager->Size = sizeof(tMemoryManager);	
 	MemoryManager->State = GF_MM_STATE_NULL;     
 	MemoryManager->AddedSpace = 0;
+	MemoryManager->DoNotFree = false;
 
 	MemoryManager->RootOfList.Mark = MM_MARKER;
 	MemoryManager->RootOfList.Type = GF_MM_ALLOCTYPE_MEMMAN;
@@ -470,6 +491,24 @@ bool GfMemoryManagerRunning()
 		return true;
 	else
 		return false;
+}
+//
+
+//
+// Set DoNotFree flag for debugging
+//
+void GfMemoryManagerDoAccept()
+{
+	GfMM->DoNotFree = true;
+}
+//
+
+//
+// Set DoNotFree flag for debugging
+//
+void GfMemoryManagerDoFree()
+{
+	GfMM->DoNotFree = false;
 }
 
 #endif

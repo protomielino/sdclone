@@ -216,7 +216,7 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 /*********************************
  * New memory debug tools        *
  *********************************/
-// To enble the hunting for memory leaks uncomment the following line
+// To enable the hunting for memory leaks uncomment the following line
 //#define __DEBUG_MEMORYMANAGER__
 #if (defined(WIN32) && defined(__DEBUG_MEMORYMANAGER__))
 
@@ -225,6 +225,8 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 #define realloc _tgf_win_realloc
 #define free _tgf_win_free
 #define accept _tgf_win_accept
+#define doaccept GfMemoryManagerDoAccept
+#define dofree GfMemoryManagerDoFree
 #ifdef strdup
 #undef strdup
 #endif
@@ -236,6 +238,8 @@ TGF_API void * _tgf_win_realloc(void * memblock, size_t size);
 TGF_API void _tgf_win_free(void * memblock);
 TGF_API void _tgf_win_accept(void * memblock);
 TGF_API char * _tgf_win_strdup(const char * str);
+TGF_API void GfMemoryManagerDoAccept();
+TGF_API void GfMemoryManagerDoFree();
 
 #endif // WIN32
 // </esppat>
