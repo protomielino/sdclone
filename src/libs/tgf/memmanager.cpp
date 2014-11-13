@@ -217,7 +217,7 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int Type, void* RetAddr)
 		// b: (void*) official pointer to the new data block
 
 		// Hunting memory leaks ...
-#define	IDTOSTOP 272737	// ID of block you are looking for
+#define	IDTOSTOP 343884	// ID of block you are looking for
 
 		if (ID == IDTOSTOP)
 		{
@@ -271,7 +271,8 @@ void GfMemoryManagerFree (void *b, unsigned int type)
 
 		if (c->Type != type)
 		{
-			if (c->Mark = MM_MARKER)
+			fprintf(stderr,"Block address %p\n",c);
+			if (c->Mark == MM_MARKER)
 				fprintf(stderr,"operator delete called with data of wrong type\n");
 			else
 				fprintf(stderr,"operator delete wrong data\n");
@@ -280,10 +281,10 @@ void GfMemoryManagerFree (void *b, unsigned int type)
 		{
 			tDSMMLinkBlock* n = c->Next;
 			tDSMMLinkBlock* p = c->Prev;
-			if (c->Mark = MM_MARKER)
+			if (c->Mark == MM_MARKER)
 			{
 				p->Next = n;
-				if (n != NULL)
+				if ((n != NULL) && (n->Mark == MM_MARKER))
 					n->Prev = p;
 				GlobalFree(c);
 			}
@@ -319,7 +320,8 @@ void GfMemoryManagerAccept (void *b, unsigned int type)
 
 		if (c->Type != type)
 		{
-			if (c->Mark = MM_MARKER)
+			fprintf(stderr,"Block address %p\n",c);
+			if (c->Mark == MM_MARKER)
 				fprintf(stderr,"operator delete called with data of wrong type\n");
 			else
 				fprintf(stderr,"operator delete wrong data\n");
@@ -328,11 +330,11 @@ void GfMemoryManagerAccept (void *b, unsigned int type)
 		{
 			tDSMMLinkBlock* n = c->Next;
 			tDSMMLinkBlock* p = c->Prev;
-			if (c->Mark = MM_MARKER)
+			if (c->Mark == MM_MARKER)
 			{
 				fprintf(stderr,"accept block %d\n",c->ID);
 				p->Next = n;
-				if (n != NULL)
+				if ((n != NULL) && (n->Mark == MM_MARKER))
 					n->Prev = p;
 			}
 		}
@@ -414,7 +416,8 @@ void GfMemoryManagerRelease()
 
 				if (ToFree->Type == 1)
 				{
-					fprintf(stderr,"%04.4d Block: %04.4d Size: %06.6d ReturnAddress: %p Type: new/delete\n",++n,ToFree->ID,ToFree->Size,ToFree->ReturnAddress);
+					fprintf(stderr,"%04.4d Block: %04.4d Size: %06.6d ReturnAddress: %p BlockAddress: %p Type: new/delete\n",
+						++n,ToFree->ID,ToFree->Size,ToFree->ReturnAddress,ToFree);
 					LeakSizeNewTotal += ToFree->Size;
 					if (MaxLeakSizeNewTotal < ToFree->Size)
 						MaxLeakSizeNewTotal = ToFree->Size;
@@ -422,7 +425,8 @@ void GfMemoryManagerRelease()
 				}
 				else
 				{
-					fprintf(stderr,"%04.4d Block: %04.4d Size: %06.6d ReturnAddress: %p Type: malloc/free\n",++n,ToFree->ID,ToFree->Size,ToFree->ReturnAddress);
+					fprintf(stderr,"%04.4d Block: %04.4d Size: %06.6d ReturnAddress: %p BlockAddress: %p Type: malloc/free\n",
+						++n,ToFree->ID,ToFree->Size,ToFree->ReturnAddress,ToFree);
 					LeakSizeMallocTotal += ToFree->Size;
 					if (MaxLeakSizeMallocTotal < ToFree->Size)
 						MaxLeakSizeMallocTotal = ToFree->Size;

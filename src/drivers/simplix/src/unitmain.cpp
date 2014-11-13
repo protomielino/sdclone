@@ -636,8 +636,6 @@ extern "C" int moduleTerminate()
     free(DriverDescs); 
   DriverDescs = NULL;
 	
-  //delete PLogSimplix;
-
   return 0;
 }
 //==========================================================================*

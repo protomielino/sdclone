@@ -76,7 +76,7 @@ main(int argc, char *argv[])
 	GfMemoryManagerAllocate();
 
 	// For hunting of corrupted memory blocks comment the following line
-	GfMemoryManagerSetup(4); // Add 4 bytes per block
+	//GfMemoryManagerSetup(4); // Add 4 bytes per block
 
 	#endif
 	// ... WDB test
