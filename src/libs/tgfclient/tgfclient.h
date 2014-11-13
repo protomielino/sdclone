@@ -795,6 +795,11 @@ inline GfuiApplication& GfuiApp()
 	return dynamic_cast<GfuiApplication&>(GfApplication::self());
 }
 
+// TODO: Use dynamic array for OwnerOfScreens
+#define MAXSCREENS 100
+void RegisterScreens(void* screen);
+void FreeScreens();
+
 #endif /* __TGFCLIENT__H__ */
 
 

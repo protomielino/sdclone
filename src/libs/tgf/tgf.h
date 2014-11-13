@@ -224,6 +224,7 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 #define calloc _tgf_win_calloc
 #define realloc _tgf_win_realloc
 #define free _tgf_win_free
+#define accept _tgf_win_accept
 #ifdef strdup
 #undef strdup
 #endif
@@ -233,6 +234,7 @@ TGF_API void * _tgf_win_malloc(size_t size);
 TGF_API void * _tgf_win_calloc(size_t num, size_t size);
 TGF_API void * _tgf_win_realloc(void * memblock, size_t size);
 TGF_API void _tgf_win_free(void * memblock);
+TGF_API void _tgf_win_accept(void * memblock);
 TGF_API char * _tgf_win_strdup(const char * str);
 
 #endif // WIN32

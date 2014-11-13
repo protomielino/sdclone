@@ -705,6 +705,8 @@ GfuiScreenCreate(float *bgColor,
 	
 	screen->keyAutoRepeat = 1; // Default key auto-repeat on.
  
+	RegisterScreens(screen);
+
 	return (void*)screen;
 }
 

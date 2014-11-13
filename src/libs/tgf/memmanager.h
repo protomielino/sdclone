@@ -54,6 +54,7 @@ TGF_API void GfMemoryManagerSetup(int AddedSpace);
 // Memory manager worker functions
 void* GfMemoryManagerAlloc(size_t size, unsigned int type, void* RetAddr);
 void GfMemoryManagerFree(void* b, unsigned int type);
+void GfMemoryManagerAccept(void* b, unsigned int type);
 //
 
 // Block to link allocated memory blocks in a 

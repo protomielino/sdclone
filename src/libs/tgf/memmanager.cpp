@@ -87,6 +87,10 @@ void _tgf_win_free(void * b)
 	GfMemoryManagerFree(b, GF_MM_ALLOCTYPE_MALLOC);
 }
 
+void _tgf_win_accept(void * b)
+{
+	GfMemoryManagerAccept(b, GF_MM_ALLOCTYPE_MALLOC);
+}
 
 void * _tgf_win_calloc(size_t num, size_t size)
 {
@@ -213,7 +217,7 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int Type, void* RetAddr)
 		// b: (void*) official pointer to the new data block
 
 		// Hunting memory leaks ...
-#define	IDTOSTOP 6486	// ID of block you are looking for
+#define	IDTOSTOP 7815	// ID of block you are looking for
 
 		if (ID == IDTOSTOP)
 		{
@@ -243,7 +247,7 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int Type, void* RetAddr)
 //
 
 //
-// Override the global delete operator
+// Release memory
 //
 void GfMemoryManagerFree (void *b, unsigned int type)
 {
@@ -287,6 +291,52 @@ void GfMemoryManagerFree (void *b, unsigned int type)
 	}
 	else
 		GlobalFree(b); 
+}
+//
+
+//
+// Accept memory
+//
+void GfMemoryManagerAccept (void *b, unsigned int type)
+{
+	if (b == NULL)
+		return;
+
+	if (GfMemoryManagerRunning())
+	{
+		// Get start of data block ...
+		int* s = (int*) b;
+		tDSMMLinkBlock* c = (tDSMMLinkBlock*) --s;
+		c = --c;
+		// ... Get start of data block
+
+		// Now we have here
+		// b: (void*) official pointer to data block
+		// s: (in*) to size of allocated block
+		// c: (tDSMMLinkBlock*) to the current linked list data block
+		// n: (tDSMMLinkBlock*) to the next linked list data block
+		// p: (tDSMMLinkBlock*) to the previous linked list data block
+
+		if (c->Type != type)
+		{
+			if (c->Mark = MM_MARKER)
+				fprintf(stderr,"operator delete called with data of wrong type\n");
+			else
+				fprintf(stderr,"operator delete wrong data\n");
+		}
+		else
+		{
+			tDSMMLinkBlock* n = c->Next;
+			tDSMMLinkBlock* p = c->Prev;
+			if (c->Mark = MM_MARKER)
+			{
+				fprintf(stderr,"accept block %d\n",c->ID);
+				p->Next = n;
+				if (n != NULL)
+					n->Prev = p;
+			}
+		}
+	}
 }
 //
 

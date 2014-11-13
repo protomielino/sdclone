@@ -18,6 +18,56 @@
 
 #include "gui.h"
 
+// Avoid memory leaks ...
+int NumberOfScreens = -1;
+tGfuiScreen* OwnerOfScreens[MAXSCREENS];
+
+void RegisterScreens(void* screen)
+{
+	if (++NumberOfScreens < MAXSCREENS)
+		OwnerOfScreens[NumberOfScreens] = (tGfuiScreen*) screen;
+	else
+		GfLogInfo("NumberOfScreens: %d > MAXSCREENS\n", NumberOfScreens);
+}
+
+void FreeScreens()
+{
+	for (int I = 0; I <= NumberOfScreens; I++)
+	{
+		tGfuiScreen* screen = OwnerOfScreens[I];
+		if (screen)
+		{
+			tGfuiObject* object = screen->objects;
+			while (object)
+			{
+				tGfuiObject* release = object;
+				object = object->next;
+				if (object == release)
+					object = NULL;
+				if (object == screen->objects)
+					object = NULL;
+				gfuiReleaseObject(release);
+			}
+
+			tGfuiKey* key = screen->userKeys;
+			while (key)
+			{
+				tGfuiKey* relkey = key;
+				key = key->next;
+				if (key == relkey)
+					key = NULL;
+				if (key == screen->userKeys)
+					key = NULL;
+				free(relkey->name);
+				free(relkey->descr);
+				free(relkey);
+			}
+
+			free(screen);
+		}
+	}
+}
+// ... Avoid memory leaks
 
 void GfuiInit(void)
 {
@@ -27,6 +77,8 @@ void GfuiInit(void)
 void GfuiShutdown(void)
 {
     gfuiShutdown();
+
+	FreeScreens();
 	
 	GfScrShutdown();
 }
