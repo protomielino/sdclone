@@ -91,11 +91,13 @@ ReReset(void)
 // Race Engine cleanup
 void ReCleanup(void)
 {
+	ReSituation::terminate();
+
     if (!ReInfo)
         return;
 
 	// Free ReInfo memory.
-	ReSituation::terminate();
+	// ReSituation::terminate();
 	ReInfo = 0;
 }
 

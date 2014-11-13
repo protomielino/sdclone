@@ -188,7 +188,7 @@ void LegacyMenu::quit()
 
 void LegacyMenu::shutdown()
 {
-    // Shutdown graphics in case relevant and not already done.
+	// Shutdown graphics in case relevant and not already done.
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL)
 	{
         shutdownSound();

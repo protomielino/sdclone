@@ -217,7 +217,7 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int Type, void* RetAddr)
 		// b: (void*) official pointer to the new data block
 
 		// Hunting memory leaks ...
-#define	IDTOSTOP 7815	// ID of block you are looking for
+#define	IDTOSTOP 272737	// ID of block you are looking for
 
 		if (ID == IDTOSTOP)
 		{
