@@ -40,6 +40,11 @@ Program:
   => rather rewrite the graphics engine from scratch with some modern engine
      like OSG, Ogre3D, Irrlicht ...
 - replay feature - Work in progress by Simon Wood (Mungewell)
+- ABS, TCL, EPS implemented in simuV4 as optional feature per car type
+  Can be enabled/disabled by driver/robot in the setups.
+  TODO: Enable/Disable while driving as human player
+        Test the parameters used by human drivers (Same fo all cars at the moment)
+        If needed define car type specific parameters.
 
 Other:
 - finish the Mac OS X port (with CMake) : ~95% done.  Compiles completely but does not run. 
@@ -91,10 +96,12 @@ Program:
   should be able to use our CMake macro's, so we need to make some changes
   to these macros and install them in such way that a robot can find it
   during compilation.
-- Implement simple memory leak detection by overriding malloc, calloc, realloc, strdup,
-  free, new, delete ... etc in order to save informations about the caller
-  in the allocated block (use macros to override and __LINE__, __FILE__ ...
-  to collect infos about the called ... but there's the new/delete difficult case).
+- Done: Implemented simple memory leak detection by overriding 
+  malloc, calloc, realloc, strdup, free, new, delete ... etc 
+  in order to save informations about the caller in the allocated block.
+  To collect infos about the caller the return address is taken from the stack
+  ( __LINE__, __FILE__ ... cannot work without changing all the callers code)
+  (Solved and tested for VC++, outstanding of MinGW/gcc).
 - introduce human driver assistance features, like Line Assist System (LAS)
   and Instructor's Braking System (IBS) ;
   also improve human skill level management in order to prevent rookie players
