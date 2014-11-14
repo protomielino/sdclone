@@ -28,12 +28,12 @@
 //
 // Interface
 //
-TGF_API bool GfMemoryManagerAllocate();	// Initialize memory manager
-TGF_API void GfMemoryManagerRelease();	// Release memory manager at Shutdown
-TGF_API bool GfMemoryManagerRunning();	// Is the memory manager running?
+TGF_API bool GfMemoryManagerAllocate(void);	// Initialize memory manager
+TGF_API void GfMemoryManagerRelease(void);	// Release memory manager at Shutdown
+TGF_API bool GfMemoryManagerRunning(void);	// Is the memory manager running?
 TGF_API void GfMemoryManagerSetup(int AddedSpace);
-TGF_API void GfMemoryManagerDoAccept();
-TGF_API void GfMemoryManagerDoFree();
+TGF_API void GfMemoryManagerDoAccept(void);
+TGF_API void GfMemoryManagerDoFree(void);
 //
 
 //
@@ -45,25 +45,30 @@ TGF_API void GfMemoryManagerDoFree();
 #define GF_MM_STATE_INIT 1	// memory manager was initialized
 #define GF_MM_STATE_USED 2	// memory manager was used
 
+// Memory manager allocation types
 #define GF_MM_ALLOCTYPE_MEMMAN 0	// allocation for memory manager
 #define GF_MM_ALLOCTYPE_NEW 1		// allocation by new
 #define GF_MM_ALLOCTYPE_NEWARRAY 2	// allocation by new
 #define GF_MM_ALLOCTYPE_MALLOC 3	// allocation by calloc
 
-#define MM_MARKER_BEGIN 11223344
-#define MM_MARKER_ID 123456789
-#define MM_MARKER_END 44332211
+// Memory manager check markers
+#define MM_MARKER_BEGIN 11223344	// Value of marker at start of the block
+#define MM_MARKER_ID 123456789		// Value of marker in front of the ID
+#define MM_MARKER_END 44332211		// Value of marker at the end of the block
+
+// Memory manager histogram
+#define MAXBLOCKSIZE 4096	// Definition of the max block size for histogram
 //
 
 // Memory manager worker functions
-void* GfMemoryManagerAlloc(size_t size, unsigned int type, void* RetAddr);
+void* GfMemoryManagerAlloc(size_t size, unsigned int type, void* retAddr);
 void GfMemoryManagerFree(void* b, unsigned int type);
-void GfMemoryManagerAccept(void* b, unsigned int type);
+void GfMemoryManagerHist(size_t size);
 //
 
 // Block to link allocated memory blocks in a 
-// double linked list.
-//
+// double linked list and some additional flags to check
+// integrity of block at call of free
 typedef struct tDSMMLinkBlock
 {	
 	unsigned int Mark;		// Marker to identify it as tDSMMLinkBlock
@@ -88,6 +93,9 @@ typedef struct
 	int State;							// State of memory manager
 	int AddedSpace;						// Number of bytes added to each block
 	bool DoNotFree;						// Do not free the blocks if flag is set
+
+	unsigned int BigB;					// Number of big blocks requested
+	unsigned int Hist[MAXBLOCKSIZE];	// Histogram of the buufer sizes
 
 } tMemoryManager;
 //

@@ -212,14 +212,41 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 // <esppat>
 //#define TGF_ALLOC_DEBUG 1
 //#if (defined(WIN32) && defined(TGF_ALLOC_DEBUG))
+// </esppat>
 
-/*********************************
- * New memory debug tools        *
- *********************************/
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
+// New Memory Manager ...
+//----------------------------------------------------------------------------*
+
+//============================================================================*
+// Configuration for the new Memory Manager
+//----------------------------------------------------------------------------*
 // To enable the hunting for memory leaks uncomment the following line
 //#define __DEBUG_MEMORYMANAGER__
-#if (defined(WIN32) && defined(__DEBUG_MEMORYMANAGER__))
+#if defined(__DEBUG_MEMORYMANAGER__)
+// Use new Memory Manager ...
+	#if defined(WIN32)
+	// Windows ...
+		#if defined(__MINGW32__)
+		// MinGW ...
+			#define ExternC extern "C"
+		// ... MinGW
+		#else
+		// VC++ ...
+			#define ExternC
+		// ... VC++
+		#endif
+	// ... Windows
+	#else
+	// Linux ...
 
+	// ... Linux
+	#endif
+//============================================================================*
+
+//============================================================================*
+// Definitions of the replacements for the new Memory Manager
+//----------------------------------------------------------------------------*
 #define malloc _tgf_win_malloc
 #define calloc _tgf_win_calloc
 #define realloc _tgf_win_realloc
@@ -232,17 +259,26 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 #endif
 #define strdup _tgf_win_strdup
 #define _strdup _tgf_win_strdup
-TGF_API void * _tgf_win_malloc(size_t size);
-TGF_API void * _tgf_win_calloc(size_t num, size_t size);
-TGF_API void * _tgf_win_realloc(void * memblock, size_t size);
-TGF_API void _tgf_win_free(void * memblock);
-TGF_API void _tgf_win_accept(void * memblock);
-TGF_API char * _tgf_win_strdup(const char * str);
-TGF_API void GfMemoryManagerDoAccept();
-TGF_API void GfMemoryManagerDoFree();
+//============================================================================*
 
-#endif // WIN32
-// </esppat>
+//============================================================================*
+// Prototypes of the replacement functions for the new Memory Manager
+//----------------------------------------------------------------------------*
+ExternC TGF_API void* _tgf_win_malloc(size_t size);
+ExternC TGF_API void* _tgf_win_calloc(size_t num, size_t size);
+ExternC TGF_API void* _tgf_win_realloc(void * memblock, size_t size);
+ExternC TGF_API void _tgf_win_free(void * memblock);
+ExternC TGF_API void _tgf_win_accept(void * memblock);
+ExternC TGF_API char* _tgf_win_strdup(const char * str);
+ExternC TGF_API void GfMemoryManagerDoAccept();
+ExternC TGF_API void GfMemoryManagerDoFree();
+//============================================================================*
+
+// ... Use new Memroy Manager
+#endif // #if defined(__DEBUG_MEMORYMANAGER__))
+//----------------------------------------------------------------------------*
+// ... New Memory Manager
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 
 
 /*********************************

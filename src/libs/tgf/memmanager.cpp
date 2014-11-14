@@ -4,7 +4,7 @@
     created              : Wed Nov 12 17:54:00:00 CEST 2014
     copyright            : (C) 2014 by Wolf-Dieter Beelitz
     email                : wdb at wdbee.de
-    version              : $Id$
+    version              : $Id:$
  ***************************************************************************/
 
 /***************************************************************************
@@ -29,7 +29,7 @@
 		#include <windows.h>
 		#include <crtdbg.h>
 		#include <assert.h>
-		#define GetRetAddrs void* retAddr = __builtin_return_address(0)
+		#define GetRetAddrs __builtin_return_address(0)
 	// ... MinGW
 	#else
 	// VC++ ...
@@ -40,7 +40,7 @@
 		#include <intrin.h>
 		#pragma intrinsic(_ReturnAddress)
 		#undef ANSI_ISO	// Old VC++ versions returning NULL instead of exception
-		#define GetRetAddrs void* retAddr = _ReturnAddress()
+		#define GetRetAddrs _ReturnAddress()
 	// ... VC++
 	#endif
 // ... Windows
@@ -73,9 +73,10 @@ static unsigned int GfMM_Counter = 0;	// Counter of memory blocks
 //============================================================================*
 // API: Override the global new operator
 //----------------------------------------------------------------------------*
+//ExternC void* operator new (size_t size)
 void* operator new (size_t size)
 {
-	GetRetAddrs;
+	void* retAddr = GetRetAddrs;
 	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_NEW,retAddr);
 }
 //============================================================================*
@@ -83,7 +84,8 @@ void* operator new (size_t size)
 //============================================================================*
 // API: Override the global delete operator
 //----------------------------------------------------------------------------*
-void operator delete (void *b)
+//ExternC void operator delete (void* b)
+void operator delete (void* b)
 {
 	GfMemoryManagerFree(b, GF_MM_ALLOCTYPE_NEW);
 }
@@ -92,9 +94,9 @@ void operator delete (void *b)
 //============================================================================*
 // API: Override malloc
 //----------------------------------------------------------------------------*
-void * _tgf_win_malloc(size_t size)
+ExternC void* _tgf_win_malloc(size_t size)
 {
-	GetRetAddrs;
+	void* retAddr = GetRetAddrs;
 	return GfMemoryManagerAlloc(size,GF_MM_ALLOCTYPE_MALLOC,retAddr);
 }
 //============================================================================*
@@ -102,7 +104,7 @@ void * _tgf_win_malloc(size_t size)
 //============================================================================*
 // API: Override free
 //----------------------------------------------------------------------------*
-void _tgf_win_free(void * b)
+ExternC void _tgf_win_free(void* b)
 {
 	GfMemoryManagerFree(b, GF_MM_ALLOCTYPE_MALLOC);
 }
@@ -111,10 +113,10 @@ void _tgf_win_free(void * b)
 //============================================================================*
 // API: Override calloc
 //----------------------------------------------------------------------------*
-void * _tgf_win_calloc(size_t num, size_t size)
+ExternC void* _tgf_win_calloc(size_t num, size_t size)
 {
-	GetRetAddrs;
-	void * p = GfMemoryManagerAlloc(num * size,GF_MM_ALLOCTYPE_MALLOC,retAddr);
+	void* retAddr = GetRetAddrs;
+	void* p = GfMemoryManagerAlloc(num * size,GF_MM_ALLOCTYPE_MALLOC,retAddr);
 	memset(p, 0, num * size);
 	return p;
 }
@@ -123,9 +125,9 @@ void * _tgf_win_calloc(size_t num, size_t size)
 //============================================================================*
 // API: Override recalloc
 //----------------------------------------------------------------------------*
-void * _tgf_win_realloc(void * memblock, size_t size)
+ExternC void* _tgf_win_realloc(void* memblock, size_t size)
 {
-	GetRetAddrs;
+	void* retAddr = GetRetAddrs;
 
 	if (size == 0) 
 	{
@@ -133,7 +135,7 @@ void * _tgf_win_realloc(void * memblock, size_t size)
 		return NULL;
 	}
 
-	void * p = GfMemoryManagerAlloc(size,GF_MM_ALLOCTYPE_MALLOC,retAddr);
+	void* p = GfMemoryManagerAlloc(size,GF_MM_ALLOCTYPE_MALLOC,retAddr);
 	if (p == NULL) 
 	{
 		return NULL;
@@ -143,9 +145,14 @@ void * _tgf_win_realloc(void * memblock, size_t size)
 	{
 		if (GfMemoryManagerRunning())
 		{
-			size_t s = MIN(*(int*)((char*)memblock 
-				- sizeof(tDSMMLinkBlock) - sizeof(int) 
-				- GfMM->AddedSpace), (int)size);
+			// Needed additional space
+			int bsize = 
+				sizeof(tDSMMLinkBlock)	// Data of Memory Manager
+				+ sizeof(int)			// Requested size of the block	
+				+ sizeof(int)			// Marker to detect corrupted blocks	
+				+ GfMM->AddedSpace;		// Security margin for debugging
+
+			size_t s = MIN(*(int*)((char*) memblock - bsize), (int) size);
 
 			memcpy(p, memblock, s);
 		}
@@ -166,9 +173,9 @@ void * _tgf_win_realloc(void * memblock, size_t size)
 //============================================================================*
 // API: Override strdup
 //----------------------------------------------------------------------------*
-char * _tgf_win_strdup(const char * str)
+ExternC char * _tgf_win_strdup(const char * str)
 {
-	GetRetAddrs;
+	void* retAddr = GetRetAddrs;
 	
 	char * s = (char*) GfMemoryManagerAlloc(
 		strlen(str)+1,GF_MM_ALLOCTYPE_MALLOC,retAddr);
@@ -190,7 +197,7 @@ char * _tgf_win_strdup(const char * str)
 //============================================================================*
 // Create the one and only global memory manager (allocate memory for data)
 //----------------------------------------------------------------------------*
-tMemoryManager* GfMemoryManager()
+tMemoryManager* GfMemoryManager(void)
 {
     tMemoryManager* MemoryManager = (tMemoryManager*)  
 		malloc(sizeof(tMemoryManager));            
@@ -208,6 +215,10 @@ tMemoryManager* GfMemoryManager()
 	MemoryManager->RootOfList.BLID = GfMM_Counter++;	
 
 	MemoryManager->GarbageCollection = (tDSMMLinkBlock*) MemoryManager;
+
+	MemoryManager->BigB = 0;
+	for (int I = 0; I < MAXBLOCKSIZE; I++)
+		MemoryManager->Hist[I] = 0;
 
 	return MemoryManager;
 }
@@ -260,6 +271,9 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int type, void* retAddr)
 		c->IDMk = MM_MARKER_ID;
 		int ID = c->BLID = GfMM_Counter++;
 
+		// Update statistics
+		GfMemoryManagerHist(size);
+
 		// Get address to the marker at the end
 		char* e = (char*) c;
 		int* m = (int*) (e + bsize - sizeof(int));
@@ -275,7 +289,7 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int type, void* retAddr)
 		// Now we have here
 		// s: (int*) pointer to the size of the allocated block
 
-		void* b = (void *) ++s;
+		void* b = (void*) ++s;
 
 		// Now we have here
 		// b: (void*) official pointer to the new data block
@@ -313,7 +327,7 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int type, void* retAddr)
 //============================================================================*
 // Release memory
 //----------------------------------------------------------------------------*
-void GfMemoryManagerFree (void *b, unsigned int type)
+void GfMemoryManagerFree (void* b, unsigned int type)
 {
 	if (b == NULL)	// If already done
 		return;		//   return without action
@@ -323,12 +337,12 @@ void GfMemoryManagerFree (void *b, unsigned int type)
 		// Get start of data block ...
 		int* s = (int*) b;
 		tDSMMLinkBlock* c = (tDSMMLinkBlock*) --s;
-		c = --c;
+		--c;
 		// ... Get start of data block
 
 		// Now we have here
 		// b: (void*) official pointer to data block
-		// s: (in*) to size of allocated block
+		// s: (int*) to size of allocated block
 		// c: (tDSMMLinkBlock*) to the current linked list data block
 		// and will use
 		// n: (tDSMMLinkBlock*) to the next linked list data block
@@ -416,7 +430,7 @@ void GfMemoryManagerSetup(int AddedSpace)
 //============================================================================*
 // Initialize the global memory manager
 //----------------------------------------------------------------------------*
-bool GfMemoryManagerAllocate()
+bool GfMemoryManagerAllocate(void)
 {
 	if (GfMM == NULL)
 	{
@@ -439,7 +453,7 @@ bool GfMemoryManagerAllocate()
 //============================================================================*
 // Destroy the one and only global memory manager and it's allocated data
 //----------------------------------------------------------------------------*
-void GfMemoryManagerRelease()
+void GfMemoryManagerRelease(void)
 {
 	int LeakSizeTotal = 0;
 	int LeakSizeNewTotal = 0;
@@ -452,6 +466,7 @@ void GfMemoryManagerRelease()
     if (GfMM != NULL)                           
 	{
 		tDSMMLinkBlock* Block = GfMM->GarbageCollection;
+		tMemoryManager* MM = GfMM;                           
 		GfMM = NULL;                           
 
 		tDSMMLinkBlock* CurrentBlock = Block->Next;
@@ -506,12 +521,33 @@ void GfMemoryManagerRelease()
 
 		fprintf(stderr,"Max leak block size new/delete : %d [Byte]\n",MaxLeakSizeNewTotal);
 		fprintf(stderr,"Max leak block size malloc/free: %d [Byte]\n",MaxLeakSizeMallocTotal);
-		fprintf(stderr,"Max leak block size total      : %d [Byte]\n\n",MaxLeakSizeTotal);
+		fprintf(stderr,"Max leak block size total      : %d [Byte]\n",MaxLeakSizeTotal);
+
+		unsigned int total = MM->Hist[0];
+		for (int I = 1; I < MAXBLOCKSIZE; I++)
+			total += I * MM->Hist[I];
+
+		total /= (1024 * 1024); // Byte -> MB
+
+		fprintf(stderr,"\nTotal size of blocks requested : %d [MB]\n",total);
+
+		fprintf(stderr,"\nNumber of blocks     >= %d [Byte] : %d",MAXBLOCKSIZE,MM->BigB);
+		fprintf(stderr,"\nTotal size of blocks >= %d [Byte] : %.3f [kB]",MAXBLOCKSIZE,MM->Hist[0]/1024.0);
+		fprintf(stderr,"\nMean size of blocks  >= %d [Byte] : %.3f [kB]\n",MAXBLOCKSIZE,MM->Hist[0]/1024.0 / MM->BigB);
+
+		fprintf(stderr,"\nHistogram of block sizes < %d [Byte]:\n",MAXBLOCKSIZE);
+		fprintf(stderr,"\nBlocksize : Number of blocks requested\n");
+
+		for (int I = 1; I < MAXBLOCKSIZE; I++)
+		{
+			if (MM->Hist[I] > 0)
+				fprintf(stderr,"%04.4d      : %d\n",I,MM->Hist[I]);
+		}
 
 		delete(Block); // Delete the memory manager itself
 	}
 
-	fprintf(stderr,"Press [Enter] to close the program\n");
+	fprintf(stderr,"\nPress [Enter] to close the program\n");
 	getchar();
 }
 //============================================================================*
@@ -519,7 +555,7 @@ void GfMemoryManagerRelease()
 //============================================================================*
 // Check for Memory Manager running
 //----------------------------------------------------------------------------*
-bool GfMemoryManagerRunning()
+bool GfMemoryManagerRunning(void)
 {
 	if (GfMM != NULL)
 		return true;
@@ -531,7 +567,7 @@ bool GfMemoryManagerRunning()
 //============================================================================*
 // Set DoNotFree flag for debugging
 //----------------------------------------------------------------------------*
-void GfMemoryManagerDoAccept()
+void GfMemoryManagerDoAccept(void)
 {
 	GfMM->DoNotFree = true;
 }
@@ -540,9 +576,24 @@ void GfMemoryManagerDoAccept()
 //============================================================================*
 // Reset DoNotFree flag for debugging
 //----------------------------------------------------------------------------*
-void GfMemoryManagerDoFree()
+void GfMemoryManagerDoFree(void)
 {
 	GfMM->DoNotFree = false;
+}
+//============================================================================*
+	
+//============================================================================*
+// Update statistics
+//----------------------------------------------------------------------------*
+void GfMemoryManagerHist(size_t size)
+{
+	if (size < MAXBLOCKSIZE)
+		GfMM->Hist[size] += 1;
+	else
+	{
+		GfMM->BigB += 1;
+		GfMM->Hist[0] += size;
+	}
 }
 //============================================================================*
 
