@@ -1,3 +1,21 @@
+Speed Dreams 2.X.0
+================================
+
+ Physics
+ *Simuv4 : 
+   ABS, TCL, EPS implemented as integrated controller running with 500Hz and working
+   by braking single wheels/release throttle
+
+ Program
+ *New Memory Manager: 
+   Dumps a list of memory leaks at end of the program (incl. return address, block ID, block size)
+
+ Robots
+ *Simplix:
+  Can drive with supercars at wet tracks
+  Uses the ABS, TCL, EPS of simuV4 if enabled for the car (own functions otherwise)
+
+
 Speed Dreams 2.1.0 Release notes
 ================================
 
