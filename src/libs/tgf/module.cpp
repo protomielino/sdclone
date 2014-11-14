@@ -84,6 +84,7 @@ GfModule::GfModule(const std::string& strShLibName, void* hShLibHandle)
 
 GfModule::~GfModule()
 {
+	_mapModulesByLibName.clear(); // Avoid memory leaks
 }
 
 GfModule* GfModule::load(const std::string& strShLibName)

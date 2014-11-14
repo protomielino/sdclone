@@ -25,15 +25,42 @@
 int NumberOfScreens = 0;
 tGfuiScreen* OwnerOfScreens[MAXSCREENS];
 
+// Register all screens that are allocated
 void RegisterScreens(void* screen)
 {
 	tGfuiScreen* _screen = (tGfuiScreen*) screen;
+
+	// Find a deleted entry
+	for (int I = 0; I < NumberOfScreens; I++)
+	{
+		if (OwnerOfScreens[I] == NULL)
+		{
+			OwnerOfScreens[I] = _screen;
+			return;
+		}
+	}
+
 	if (NumberOfScreens < MAXSCREENS)
 		OwnerOfScreens[NumberOfScreens++] = _screen;
 	else
 		GfLogInfo("NumberOfScreens: %d > MAXSCREENS\n", NumberOfScreens);
 }
 
+// Unregister all screens that are released
+void UnregisterScreens(void* screen)
+{
+	// Find the entry
+	for (int I = 0; I <= NumberOfScreens; I++)
+	{
+		if (OwnerOfScreens[I] == screen)
+		{
+			OwnerOfScreens[I] = NULL;
+			return;
+		}
+	}
+}
+
+// Free screens that are stil allocated
 void FreeScreens()
 {
 	// For debugging purposes:
@@ -41,17 +68,10 @@ void FreeScreens()
 
 	for (int I = 0; I <= NumberOfScreens; I++)
 	{
-		// This screen is corrupted!
-		// TODO: Find out why
-		if (I == 2)
-			continue;
-
 		// Get the screen from the owner
 		tGfuiScreen* screen = OwnerOfScreens[I];
 		if (screen) 
-		{
 			GfuiScreenRelease(screen); // Free all resources
-		}
 	}
 
 	// Back to normal mode
@@ -62,6 +82,7 @@ void FreeScreens()
 #else
 void RegisterScreens(void* screen){};
 void FreeScreens(){};
+void UnregisterScreens(void* screen){};
 #endif
 // ... WDB test
 
@@ -75,6 +96,7 @@ void GfuiShutdown(void)
 {
     gfuiShutdown();
 
+	// Free screens that are stil allocated
 	FreeScreens();
 	
 	GfScrShutdown();

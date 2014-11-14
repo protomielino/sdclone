@@ -799,6 +799,7 @@ inline GfuiApplication& GfuiApp()
 #define MAXSCREENS 100
 void RegisterScreens(void* screen);
 void FreeScreens();
+void UnregisterScreens(void* screen);
 
 #endif /* __TGFCLIENT__H__ */
 

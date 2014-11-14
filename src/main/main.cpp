@@ -81,7 +81,7 @@ main(int argc, char *argv[])
 	// while allocation!
 	
 	// For hunting of corrupted memory blocks comment the following line
-	GfMemoryManagerSetup(4); // Add 4 bytes per block
+	//GfMemoryManagerSetup(4); // Add 4 bytes per block
 
 	#endif
 	// ... WDB test
@@ -214,7 +214,7 @@ main(int argc, char *argv[])
 	// Done with the app instance.
 	const std::string strAppName(pApp->name());
 	delete pApp;
-	
+
  	// That's all (but trace what we are doing).
 	if (piUserItf && piRaceEngine)
 		GfLogInfo("Exiting normally from %s.\n", strAppName.c_str());

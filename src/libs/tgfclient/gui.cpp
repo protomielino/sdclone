@@ -645,7 +645,7 @@ GfuiScreenReplace(void *screen)
 	tGfuiScreen	*oldScreen = GfuiScreen;
 
 	if (oldScreen) 
-		GfuiScreenRelease(oldScreen);
+//		GfuiScreenRelease(oldScreen);
 	GfuiScreenActivate(screen);
 }
 
@@ -723,6 +723,8 @@ GfuiScreenRelease(void *scr)
 	tGfuiKey *curKey;
 	tGfuiKey *nextKey;
 	tGfuiScreen *screen = (tGfuiScreen*)scr;
+
+	UnregisterScreens(screen);
 
 	if (GfuiScreen == screen) {
 		GfuiScreenDeactivate();

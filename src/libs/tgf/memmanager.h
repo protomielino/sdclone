@@ -4,7 +4,7 @@
     created              : Wed Nov 12 17:54:00:00 CEST 2014
     copyright            : (C) 2014 by Wolf-Dieter Beelitz
     email                : wdb at wdbee.de
-    version              : $Id: memmanager.h $
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -50,7 +50,9 @@ TGF_API void GfMemoryManagerDoFree();
 #define GF_MM_ALLOCTYPE_NEWARRAY 2	// allocation by new
 #define GF_MM_ALLOCTYPE_MALLOC 3	// allocation by calloc
 
-#define MM_MARKER 11223344
+#define MM_MARKER_BEGIN 11223344
+#define MM_MARKER_ID 123456789
+#define MM_MARKER_END 44332211
 //
 
 // Memory manager worker functions
@@ -66,11 +68,12 @@ typedef struct tDSMMLinkBlock
 {	
 	unsigned int Mark;		// Marker to identify it as tDSMMLinkBlock
 	int Size;				// Size of allocated block
-	void* ReturnAddress;    // Return address of new/malloc
+	void* RAdr;				// Return address of new/malloc
 	tDSMMLinkBlock* Prev;	// Previous memory block
 	tDSMMLinkBlock* Next;	// Next memory block
 	unsigned int Type;		// Type of allocation
-	unsigned int ID;		// ID of allocated memory block
+	unsigned int IDMk;		// Marker to check ID is still valid
+	unsigned int BLID;		// ID of allocated memory block
 
 } tDSMMLinkBlock;
 
