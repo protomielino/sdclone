@@ -227,6 +227,8 @@ tMemoryManager* GfMemoryManager(void)
 	MemoryManager->RootOfList.BLID = GfMM_Counter++;	
 
 	MemoryManager->GarbageCollection = (tDSMMLinkBlock*) MemoryManager;
+	MemoryManager->Allocated = 0;
+	MemoryManager->MaxAllocated = 0;
 
 	MemoryManager->BigB = 0;
 	for (int I = 0; I < MAXBLOCKSIZE; I++)
@@ -261,6 +263,10 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int type, void* retAddr)
 #else
 			return c;
 #endif
+		GfMM->Allocated += bsize;
+		GfMM->MaxAllocated = MAX(GfMM->MaxAllocated,GfMM->Allocated);
+		GfMM->Requested += size;
+		GfMM->MaxRequested = MAX(GfMM->MaxRequested,GfMM->Requested);
 
 		// Put block into the double linked list
 		if (GfMM->RootOfList.Next != NULL)
@@ -307,7 +313,7 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int type, void* retAddr)
 		// b: (void*) official pointer to the new data block
 
 		// Hunting memory leaks ...
-#define	IDTOSTOP 280452	// ID of block you are looking for
+#define	IDTOSTOP 464790	// ID of block you are looking for
 
 		if (ID == IDTOSTOP)
 		{
@@ -398,7 +404,11 @@ void GfMemoryManagerFree (void* b, unsigned int type)
 				c->BLID,c,c->Type);
 		}
 		else
-		{	// Take the block out of the double linked list
+		{	// Update counter
+			GfMM->Allocated -= bsize;
+			GfMM->Requested -= c->Size;
+
+			// Take the block out of the double linked list
 			tDSMMLinkBlock* n = c->Next;
 			tDSMMLinkBlock* p = c->Prev;
 			p->Next = n;
@@ -479,6 +489,10 @@ void GfMemoryManagerRelease(bool Dump)
 	{
 		tDSMMLinkBlock* Block = GfMM->GarbageCollection;
 		tMemoryManager* MM = GfMM;                           
+
+		fprintf(stderr,"\nCurrent size requested         : %d [Byte]",MM->Requested);
+		fprintf(stderr,"\nCurrent size allocated         : %d [Byte]\n",MM->Allocated);
+
 		GfMM = NULL;                           
 
 		tDSMMLinkBlock* CurrentBlock = Block->Next;
@@ -536,8 +550,17 @@ void GfMemoryManagerRelease(bool Dump)
 
 			fprintf(stderr,"Max leak block size new/delete : %d [Byte]\n",MaxLeakSizeNewTotal);
 			fprintf(stderr,"Max leak block size malloc/free: %d [Byte]\n",MaxLeakSizeMallocTotal);
-			fprintf(stderr,"Max leak block size total      : %d [Byte]\n",MaxLeakSizeTotal);
+			fprintf(stderr,"Max leak block size total      : %d [Byte]\n\n",MaxLeakSizeTotal);
 
+			fprintf(stderr,"Max size requested at one time : %.3f [MB]\n",MM->MaxRequested/(1024.0*1024));
+			fprintf(stderr,"Max size allocated at one time : %.3f [MB]\n",MM->MaxAllocated/(1024.0*1024));
+			fprintf(stderr,"Overhead for Memory Manager    : %.3f [MB]\n",(MM->MaxAllocated - MM->MaxRequested)/(1024.0*1024));
+			fprintf(stderr,"Mean overhead                  : %.6f [%%]\n",(100.0 * (MM->MaxAllocated - MM->MaxRequested))/MM->MaxRequested);
+
+			fprintf(stderr,"Remaining size requested       : %d [Byte]\n",MM->Requested);
+			fprintf(stderr,"Remaining size allocated       : %d [Byte]\n",MM->Allocated);
+
+			
 			fprintf(stderr,"\nPress [Enter] to show next part of info\n");
 
 			getchar(); // Stop to show leaks first

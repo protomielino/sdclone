@@ -93,6 +93,10 @@ typedef struct
 	int State;							// State of memory manager
 	int AddedSpace;						// Number of bytes added to each block
 	bool DoNotFree;						// Do not free the blocks if flag is set
+	unsigned int Allocated;				// Current total of allocated memory [Bytes]
+	unsigned int MaxAllocated;			// Maximum size of allocated memory at a time [Bytes]
+	unsigned int Requested;				// Current total of requested memory [Bytes]
+	unsigned int MaxRequested;			// Maximum size of requested memory at a time [Bytes]
 
 	unsigned int BigB;					// Number of big blocks requested
 	unsigned int Hist[MAXBLOCKSIZE];	// Histogram of the buufer sizes

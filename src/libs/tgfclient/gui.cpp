@@ -788,6 +788,7 @@ GfuiHookCreate(void *userDataOnActivate, tfuiCallback onActivate)
 void
 GfuiHookRelease(void *hook)
 {
+	UnregisterScreens(hook);
 	free(hook);
 }
 
