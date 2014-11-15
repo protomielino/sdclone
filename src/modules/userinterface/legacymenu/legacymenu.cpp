@@ -38,6 +38,7 @@
 #include "racescreens.h"
 
 #include "legacymenu.h"
+#include "displayconfig.h"
 
 
 // The LegacyMenu singleton.
@@ -61,6 +62,8 @@ int closeGfModule()
     // Unregister it from the GfModule module manager.
     if (LegacyMenu::_pSelf)
         GfModule::unregister(LegacyMenu::_pSelf);
+
+	DisplayMenuRelease();
 
     // Delete the (only) module instance.
     delete LegacyMenu::_pSelf;

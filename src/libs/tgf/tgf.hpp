@@ -238,6 +238,9 @@ class TGF_API GfApplication
 	//! Restart the app.
 	virtual void restart();
 
+	// Allow clean restart
+	void (*ReleaseData)();
+
  protected:
 
 	//! Print a short help about using the command line.

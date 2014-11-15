@@ -424,6 +424,11 @@ DisplayMenu::DisplayMenu()
 #endif	
 }
 
+DisplayMenu::~DisplayMenu()
+{
+	free(_aColorDepths);
+}
+
 bool DisplayMenu::initialize(void *pPreviousMenu)
 {
 	// Save the menu to return to.
@@ -515,6 +520,14 @@ void* DisplayMenuInit(void *pPreviousMenu)
 	}
 
 	return PDisplayMenu->getMenuHandle();
+}
+
+/** Relase the display options menu screen.
+    @ingroup	screen
+*/
+void DisplayMenuRelease(void)
+{
+	delete PDisplayMenu;
 }
 
 

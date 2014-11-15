@@ -33,6 +33,8 @@ class DisplayMenu : public GfuiMenuScreen
 public:
 
 	DisplayMenu();
+	~DisplayMenu();
+
 	bool initialize(void* pPreviousMenu);
 	
 	enum EDisplayMode { eFullScreen = 0, eWindowed = 1, nDisplayModes };
@@ -105,5 +107,6 @@ private:
 };
 
 extern void* DisplayMenuInit(void* pPreviousMenu);
+extern void DisplayMenuRelease(void);
 
 #endif //_DISPLAYCONFIG_H_

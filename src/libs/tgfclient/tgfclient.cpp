@@ -22,6 +22,7 @@
 #ifdef __DEBUG_MEMORYMANAGER__
 
 // Avoid memory leaks ...
+int NextScreenID = 0;
 int NumberOfScreens = 0;
 tGfuiScreen* OwnerOfScreens[MAXSCREENS];
 
@@ -29,6 +30,7 @@ tGfuiScreen* OwnerOfScreens[MAXSCREENS];
 void RegisterScreens(void* screen)
 {
 	tGfuiScreen* _screen = (tGfuiScreen*) screen;
+	_screen->ScreenID = ++NextScreenID;
 
 	// Find a deleted entry
 	for (int I = 0; I < NumberOfScreens; I++)
@@ -66,7 +68,7 @@ void FreeScreens()
 	// For debugging purposes:
 	//doaccept(); // Do not free the blocks, just take it out of the list
 
-	for (int I = 0; I <= NumberOfScreens; I++)
+	for (int I = 0; I < NumberOfScreens; I++)
 	{
 		// Get the screen from the owner
 		tGfuiScreen* screen = OwnerOfScreens[I];

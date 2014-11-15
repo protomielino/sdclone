@@ -775,6 +775,8 @@ GfuiHookCreate(void *userDataOnActivate, tfuiCallback onActivate)
 	screen->onActivate = onActivate;
 	screen->userActData = userDataOnActivate;
 	screen->onlyCallback = 1;
+
+	RegisterScreens(screen);
 	
 	return (void*)screen;
 }

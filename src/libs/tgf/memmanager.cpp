@@ -29,7 +29,7 @@
 		#include <windows.h>
 		#include <crtdbg.h>
 		#include <assert.h>
-		#define GetRetAddrs __builtin_return_address(0)
+		#define GetRetAddrs GCCRetAddrs
 	// ... MinGW
 	#else
 	// VC++ ...
@@ -40,7 +40,7 @@
 		#include <intrin.h>
 		#pragma intrinsic(_ReturnAddress)
 		#undef ANSI_ISO	// Old VC++ versions returning NULL instead of exception
-		#define GetRetAddrs _ReturnAddress()
+		#define GetRetAddrs _ReturnAddress
 	// ... VC++
 	#endif
 // ... Windows
@@ -62,6 +62,18 @@
 //----------------------------------------------------------------------------*
 static tMemoryManager* GfMM = NULL;		// The one and only memory manager!
 static unsigned int GfMM_Counter = 0;	// Counter of memory blocks
+//============================================================================*
+#if defined(__MINGW32__)
+//============================================================================*
+// GCC allows to set the level parameter, we use 0 to get the same as for VC++
+//----------------------------------------------------------------------------*
+void* GCCRetAddrs(void)
+{
+	return __builtin_return_address(0);
+}
+//============================================================================*
+#endif
+
 //----------------------------------------------------------------------------*
 // ... Implementation
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
@@ -76,7 +88,7 @@ static unsigned int GfMM_Counter = 0;	// Counter of memory blocks
 //ExternC void* operator new (size_t size)
 void* operator new (size_t size)
 {
-	void* retAddr = GetRetAddrs;
+	void* retAddr = GetRetAddrs();
 	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_NEW,retAddr);
 }
 //============================================================================*
@@ -96,7 +108,7 @@ void operator delete (void* b)
 //----------------------------------------------------------------------------*
 ExternC void* _tgf_win_malloc(size_t size)
 {
-	void* retAddr = GetRetAddrs;
+	void* retAddr = GetRetAddrs();
 	return GfMemoryManagerAlloc(size,GF_MM_ALLOCTYPE_MALLOC,retAddr);
 }
 //============================================================================*
@@ -115,7 +127,7 @@ ExternC void _tgf_win_free(void* b)
 //----------------------------------------------------------------------------*
 ExternC void* _tgf_win_calloc(size_t num, size_t size)
 {
-	void* retAddr = GetRetAddrs;
+	void* retAddr = GetRetAddrs();
 	void* p = GfMemoryManagerAlloc(num * size,GF_MM_ALLOCTYPE_MALLOC,retAddr);
 	memset(p, 0, num * size);
 	return p;
@@ -127,7 +139,7 @@ ExternC void* _tgf_win_calloc(size_t num, size_t size)
 //----------------------------------------------------------------------------*
 ExternC void* _tgf_win_realloc(void* memblock, size_t size)
 {
-	void* retAddr = GetRetAddrs;
+	void* retAddr = GetRetAddrs();
 
 	if (size == 0) 
 	{
@@ -175,7 +187,7 @@ ExternC void* _tgf_win_realloc(void* memblock, size_t size)
 //----------------------------------------------------------------------------*
 ExternC char * _tgf_win_strdup(const char * str)
 {
-	void* retAddr = GetRetAddrs;
+	void* retAddr = GetRetAddrs();
 	
 	char * s = (char*) GfMemoryManagerAlloc(
 		strlen(str)+1,GF_MM_ALLOCTYPE_MALLOC,retAddr);
@@ -295,7 +307,7 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int type, void* retAddr)
 		// b: (void*) official pointer to the new data block
 
 		// Hunting memory leaks ...
-#define	IDTOSTOP 371835	// ID of block you are looking for
+#define	IDTOSTOP 280452	// ID of block you are looking for
 
 		if (ID == IDTOSTOP)
 		{
@@ -453,7 +465,7 @@ bool GfMemoryManagerAllocate(void)
 //============================================================================*
 // Destroy the one and only global memory manager and it's allocated data
 //----------------------------------------------------------------------------*
-void GfMemoryManagerRelease(void)
+void GfMemoryManagerRelease(bool Dump)
 {
 	int LeakSizeTotal = 0;
 	int LeakSizeNewTotal = 0;
@@ -510,45 +522,56 @@ void GfMemoryManagerRelease(void)
 			}
 		}
 
-		fprintf(stderr,"\nMemory manager leak statistics:\n\n");
-
-		fprintf(stderr,"Number of allocated blocks     : %d\n",GfMM_Counter);
-		fprintf(stderr,"Number of memory leaks         : %d\n\n",n);
-
-		fprintf(stderr,"Total leak size new/delete     : %d [Byte]\n",LeakSizeNewTotal);
-		fprintf(stderr,"Total leak size malloc/free    : %d [Byte]\n",LeakSizeMallocTotal);
-		fprintf(stderr,"Total leak size total          : %d [Byte]\n\n",LeakSizeTotal);
-
-		fprintf(stderr,"Max leak block size new/delete : %d [Byte]\n",MaxLeakSizeNewTotal);
-		fprintf(stderr,"Max leak block size malloc/free: %d [Byte]\n",MaxLeakSizeMallocTotal);
-		fprintf(stderr,"Max leak block size total      : %d [Byte]\n",MaxLeakSizeTotal);
-
-		unsigned int total = MM->Hist[0];
-		for (int I = 1; I < MAXBLOCKSIZE; I++)
-			total += I * MM->Hist[I];
-
-		total /= (1024 * 1024); // Byte -> MB
-
-		fprintf(stderr,"\nTotal size of blocks requested : %d [MB]\n",total);
-
-		fprintf(stderr,"\nNumber of blocks     >= %d [Byte] : %d",MAXBLOCKSIZE,MM->BigB);
-		fprintf(stderr,"\nTotal size of blocks >= %d [Byte] : %.3f [kB]",MAXBLOCKSIZE,MM->Hist[0]/1024.0);
-		fprintf(stderr,"\nMean size of blocks  >= %d [Byte] : %.3f [kB]\n",MAXBLOCKSIZE,MM->Hist[0]/1024.0 / MM->BigB);
-
-		fprintf(stderr,"\nHistogram of block sizes < %d [Byte]:\n",MAXBLOCKSIZE);
-		fprintf(stderr,"\nBlocksize : Number of blocks requested\n");
-
-		for (int I = 1; I < MAXBLOCKSIZE; I++)
+		if (Dump)
+	
 		{
-			if (MM->Hist[I] > 0)
-				fprintf(stderr,"%04.4d      : %d\n",I,MM->Hist[I]);
+			fprintf(stderr,"\nMemory manager leak statistics:\n\n");
+
+			fprintf(stderr,"Number of allocated blocks     : %d\n",GfMM_Counter);
+			fprintf(stderr,"Number of memory leaks         : %d\n\n",n);
+	
+			fprintf(stderr,"Total leak size new/delete     : %d [Byte]\n",LeakSizeNewTotal);
+			fprintf(stderr,"Total leak size malloc/free    : %d [Byte]\n",LeakSizeMallocTotal);
+			fprintf(stderr,"Total leak size total          : %d [Byte]\n\n",LeakSizeTotal);
+
+			fprintf(stderr,"Max leak block size new/delete : %d [Byte]\n",MaxLeakSizeNewTotal);
+			fprintf(stderr,"Max leak block size malloc/free: %d [Byte]\n",MaxLeakSizeMallocTotal);
+			fprintf(stderr,"Max leak block size total      : %d [Byte]\n",MaxLeakSizeTotal);
+
+			fprintf(stderr,"\nPress [Enter] to show next part of info\n");
+
+			getchar(); // Stop to show leaks first
+
+			unsigned int total = MM->Hist[0];
+			for (int I = 1; I < MAXBLOCKSIZE; I++)
+				total += I * MM->Hist[I];
+
+			total /= (1024 * 1024); // Byte -> MB
+
+			fprintf(stderr,"\nTotal size of blocks requested : %d [MB]\n",total);
+
+			fprintf(stderr,"\nNumber of blocks     >= %d [Byte] : %d",MAXBLOCKSIZE,MM->BigB);
+			fprintf(stderr,"\nTotal size of blocks >= %d [Byte] : %.3f [kB]",MAXBLOCKSIZE,MM->Hist[0]/1024.0);
+			fprintf(stderr,"\nMean size of blocks  >= %d [Byte] : %.3f [kB]\n",MAXBLOCKSIZE,MM->Hist[0]/1024.0 / MM->BigB);
+
+			fprintf(stderr,"\nHistogram of block sizes < %d [Byte]:\n",MAXBLOCKSIZE);
+			fprintf(stderr,"\nBlocksize : Number of blocks requested\n");
+
+			for (int I = 1; I < MAXBLOCKSIZE; I++)
+			{
+				if (MM->Hist[I] > 0)
+					fprintf(stderr,"%04.4d      : %d\n",I,MM->Hist[I]);
+			}
 		}
 
 		delete(Block); // Delete the memory manager itself
 	}
 
-	fprintf(stderr,"\nPress [Enter] to close the program\n");
-	getchar();
+	if (Dump)
+	{
+		fprintf(stderr,"\nPress [Enter] to close the program\n");
+		getchar();
+	}
 }
 //============================================================================*
 

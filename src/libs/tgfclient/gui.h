@@ -298,6 +298,7 @@ typedef struct GfuiKey
 /* screen definition */
 typedef struct 
 {
+	int			ScreenID; /* Identify screen in registration */
     float		width, height; /* in menu/screen objects coordinate system */
     GfuiColor		bgColor; /* RGBA */
     GLuint		bgImage; /* Should always be 2^N x 2^P  (for low-end graphic hardwares) */

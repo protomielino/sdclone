@@ -41,9 +41,31 @@
 #include <iuserinterface.h>
 
 // WDB test ...
-// Use the define to enable the memorymanager for hunting memory leaks 
 #ifdef __DEBUG_MEMORYMANAGER__
 #include "memmanager.h"
+
+IUserInterface* piUserItf = 0;
+GfModule* pmodUserItf = NULL;
+IRaceEngine* piRaceEngine = 0;
+GfModule* pmodRaceEngine = NULL;
+
+void ReleaseData(void)
+{
+	if (piUserItf && piRaceEngine)
+	{
+		// Shutdown and unload the user interface and race engine modules.
+		piUserItf->shutdown();
+		piRaceEngine->shutdown();
+		
+		GfModule::unload(pmodUserItf);
+		GfModule::unload(pmodRaceEngine);
+		
+		// Shutdown the data layer.
+		//GfData::shutdown();  << causes crashes if called from here
+
+		GfMemoryManagerRelease(false); // Release the memeory manager without dump
+	}
+}
 #endif
 // ... WDB test
 
@@ -156,11 +178,19 @@ main(int argc, char *argv[])
 	}
 
 	// Load the user interface module (graphical or text-only UI).
+	// WDB test ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+	pmodUserItf =
+	#else
 	GfModule* pmodUserItf =
+	#endif
 		GfModule::load("modules/userinterface", (bTextOnly ?  "textonly" : "legacymenu"));
 
 	// Check that it implements IUserInterface.
+	#ifdef __DEBUG_MEMORYMANAGER__
+	#else
 	IUserInterface* piUserItf = 0;
+	#endif
 	if (pmodUserItf)
 	{
 		piUserItf = pmodUserItf->getInterface<IUserInterface>();
@@ -175,10 +205,18 @@ main(int argc, char *argv[])
 	void* hREParams =
 		GfParmReadFile(ossParm.str().c_str(), GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	const char* pszModName = GfParmGetStr(hREParams, "Modules", "racing", "standardgame");
+
+	#ifdef __DEBUG_MEMORYMANAGER__
+	pmodRaceEngine = GfModule::load("modules/racing", pszModName);
+	#else
 	GfModule* pmodRaceEngine = GfModule::load("modules/racing", pszModName);
+	#endif
 
 	// Check that it implements IRaceEngine.
+	#ifdef __DEBUG_MEMORYMANAGER__
+	#else
 	IRaceEngine* piRaceEngine = 0;
+	#endif
 	if (pmodRaceEngine)
 	{
 		piRaceEngine = pmodRaceEngine->getInterface<IRaceEngine>();
@@ -193,6 +231,11 @@ main(int argc, char *argv[])
 	
 	if (piUserItf && piRaceEngine)
 	{
+		#ifdef __DEBUG_MEMORYMANAGER__
+		// Allow to avoid memory leaks at restart
+		pApp->ReleaseData = &ReleaseData;
+		#endif
+
 		// Enter the user interface.
 		if (piUserItf->activate())
 		{

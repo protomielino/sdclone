@@ -38,6 +38,7 @@
 #endif
 
 #include <portability.h>
+#include "..\tgfdata\tgfdata.h"
 
 #include "tgf.hpp"
 
@@ -213,6 +214,12 @@ void GfApplication::restart()
 
 	// Delete the event loop if any.
 	delete _pEventLoop;
+	_pEventLoop = 0;
+
+	// Reset the Memory Manager
+	#ifdef __DEBUG_MEMORYMANAGER__
+	(*ReleaseData)();
+	#endif
 
 	// Restart the process, using same command line args.
 	// 1) The process executable path-name is the 1st arg left untouched.

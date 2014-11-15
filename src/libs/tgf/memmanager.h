@@ -29,7 +29,7 @@
 // Interface
 //
 TGF_API bool GfMemoryManagerAllocate(void);	// Initialize memory manager
-TGF_API void GfMemoryManagerRelease(void);	// Release memory manager at Shutdown
+TGF_API void GfMemoryManagerRelease(bool Dump = true);	// Release memory manager at Shutdown
 TGF_API bool GfMemoryManagerRunning(void);	// Is the memory manager running?
 TGF_API void GfMemoryManagerSetup(int AddedSpace);
 TGF_API void GfMemoryManagerDoAccept(void);
