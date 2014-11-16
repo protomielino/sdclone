@@ -21,7 +21,37 @@
 
 #include "sim.h"
 
-tdble rho = 1.290; /* air density, prepare for variable environment */
+tdble rho = 1.290f; /* air density, prepare for variable environment */
+
+// Christos plausibhility check ...
+tdble Max_Cl_given_Cd (tdble Cd)
+{
+    // if Cd = 1, then all air hitting the surface is stopped.
+    // In any case, horizontal speed of air particles is given by
+    tdble ux = 1 - Cd;
+    
+    // We assume no energy lost and thus can calculate the maximum
+    // possible vertical speed imparted to the paticles
+    tdble uy = sqrt(1 - ux*ux);
+
+    // So now Cl is just the imparted speed
+    return uy;
+}
+
+tdble Max_SCl_given_Cd (tdble Cd, tdble A)
+{
+    tdble Cl = Max_Cl_given_Cd (Cd);
+    return A * Cl * rho / 2.0f;
+}
+
+tdble MaximumLiftGivenDrag (tdble drag, tdble A)
+{
+    // We know the drag, C/2 \rho A.
+    // We must calculate the drag coefficient
+    tdble Cd = (drag / A) * 2.0f / rho;
+    return Max_SCl_given_Cd (Cd, A);
+}
+// ... Christos plausibhility check
 
 void 
 SimAeroConfig(tCar *car)
@@ -35,6 +65,44 @@ SimAeroConfig(tCar *car)
     car->aero.Clift[1] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_RCL, (char*)NULL, 0.0f);
     car->aero.CdBody = 0.645f * Cx * FrntArea;
     car->aero.Cd = car->aero.CdBody;
+
+    float max_lift = MaximumLiftGivenDrag (0.5f * rho * Cx * FrntArea, FrntArea);
+    float current_lift = 2.0f * (car->aero.Clift[0] + car->aero.Clift[1]);
+    if (current_lift > max_lift) 
+	{
+		if (car->features & FEAT_LIMITEDGROUNDEFFECT)
+		{
+			fprintf (stderr, "\n\nError: car %s, driver %s: lift coefficients (%f, %f), generate a lift of %f, while maximum theoretical value is %f -> CLift reduced\n\n",
+                 car->carElt->_carName,
+                 car->carElt->_name,
+                 car->aero.Clift[0],
+                 car->aero.Clift[1],
+                 current_lift,
+                 max_lift);
+			car->aero.Clift[0] *= max_lift/current_lift; 
+			car->aero.Clift[1] *= max_lift/current_lift;
+		}
+		else
+		{
+			fprintf (stderr, "\n\nWarning: car %s, driver %s: lift coefficients (%f, %f), generate a lift of %f, while maximum theoretical value is %f\n\n",
+                 car->carElt->_carName,
+                 car->carElt->_name,
+                 car->aero.Clift[0],
+                 car->aero.Clift[1],
+                 current_lift,
+                 max_lift);
+		}
+    }
+	else
+	{
+        fprintf (stderr, "\n\nInfo: car %s, driver %s: lift coefficients (%f, %f), generate a lift of %f, while maximum theoretical value is %f\n\n",
+                 car->carElt->_carName,
+                 car->carElt->_name,
+                 car->aero.Clift[0],
+                 car->aero.Clift[1],
+                 current_lift,
+                 max_lift);
+	}
 }
 
 
@@ -217,10 +285,10 @@ SimWingConfig(tCar *car, int index)
 	else if (wing->WingType == 2)
 	{
 		wing->AoAatZero = GfParmGetNum(hdle, WingSect[index], PRM_AOAATZERO, (char*)NULL, 0);
-			wing->AoAatZero = MAX(MIN(wing->AoAatZero, 0), -PI_6);
-		wing->AoStall = GfParmGetNum(hdle, WingSect[index], PRM_ANGLEOFSTALL, (char*)NULL, PI_6*0.5);
-			wing->AoStall = MAX(MIN(wing->AoStall, PI_4), 0.017453293f);
-		wing->Stallw = GfParmGetNum(hdle, WingSect[index], PRM_STALLWIDTH, (char*)NULL, 0.034906585);
+			wing->AoAatZero = MAX(MIN(wing->AoAatZero, 0), (tdble) -PI_6);
+		wing->AoStall = GfParmGetNum(hdle, WingSect[index], PRM_ANGLEOFSTALL, (char*)NULL, (tdble)(PI_6*0.5));
+			wing->AoStall = MAX(MIN(wing->AoStall, (tdble) PI_4), 0.017453293f);
+		wing->Stallw = GfParmGetNum(hdle, WingSect[index], PRM_STALLWIDTH, (char*)NULL, 0.034906585f);
 			wing->Stallw = MAX(MIN(wing->Stallw, wing->AoStall), 0.017453293f);
 		wing->AR = GfParmGetNum(hdle, WingSect[index], PRM_ASPECTRATIO, (char*)NULL, 0);
 	}
@@ -255,15 +323,15 @@ SimWingConfig(tCar *car, int index)
 	}
 	else if (wing->WingType == 2)
 	{
-		if (wing->AR > 0.001) wing->Kz1 =  2 * PI * wing->AR / (wing->AR + 2);
-		    else wing->Kz1 = 2 * PI;
-		wing->Kx = 0.5 * rho * area;
-		wing->Kz2 = 1.05;
-		wing->Kz3 = 0.05;
-		wing->Kx1 = 0.6;
-		wing->Kx2 = 0.006;
-		wing->Kx3 = 1.0;
-		wing->Kx4 = 0.9;
+		if (wing->AR > 0.001) wing->Kz1 = (tdble) (2 * PI * wing->AR / (wing->AR + 2));
+		    else wing->Kz1 = (tdble)(2 * PI);
+		wing->Kx = (tdble) (0.5 * rho * area);
+		wing->Kz2 = 1.05f;
+		wing->Kz3 = 0.05f;
+		wing->Kx1 = 0.6f;
+		wing->Kx2 = 0.006f;
+		wing->Kx3 = 1.0f;
+		wing->Kx4 = 0.9f;
 	}
 }
 
@@ -301,21 +369,21 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
     if (wing->WingType == 2) //thin wing works for every direction
 	{
 	    tdble x;
-	    while (aoa > PI) aoa -= 2 * PI;
-	    while (aoa < -PI) aoa += 2 * PI;
+	    while (aoa > PI) aoa -= (tdble) (2 * PI);
+	    while (aoa < -PI) aoa += (tdble) (2 * PI);
 	    /* first calculate coefficients */
 	    if (aoa > PI_2)
 	    {
-		if (aoa > PI - wing->AoStall) wing->forces.x = wing->Kx1 * (PI - aoa) * (PI - aoa) + wing->Kx2;
-		else wing->forces.x = wing->Kx3 - wing->Kx4 * cos(2*aoa);
+		if (aoa > PI - wing->AoStall) wing->forces.x = (tdble) (wing->Kx1 * (PI - aoa) * (PI - aoa) + wing->Kx2);
+		else wing->forces.x = (tdble) (wing->Kx3 - wing->Kx4 * cos(2*aoa));
 		if (aoa > PI - wing->AoStall + wing->Stallw)
 		    {x = (tdble)0.0;}
 		else
 		{
-		    x = aoa - PI + wing->AoStall - wing->Stallw;
-		    x = x * x / (x * x + wing->Stallw * wing->Stallw);
+		    x = (tdble) (aoa - PI + wing->AoStall - wing->Stallw);
+		    x = (tdble) (x * x / (x * x + wing->Stallw * wing->Stallw));
 		}
-		wing->forces.z = -(1-x) * wing->Kz1 * (aoa - PI + wing->AoAatZero) - x * (wing->Kz2 * sin(2*aoa) + wing->Kz3);
+		wing->forces.z = (tdble) (-(1-x) * wing->Kz1 * (aoa - PI + wing->AoAatZero) - x * (wing->Kz2 * sin(2*aoa) + wing->Kz3));
 	    }
 	    else if (aoa > 0)
 	    {
@@ -345,28 +413,28 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
 	    }
 	    else
 	    {
-		if (aoa < wing->AoStall - PI) wing->forces.x = wing->Kx1 * (PI + aoa) * (PI + aoa) + wing->Kx2;
+		if (aoa < wing->AoStall - PI) wing->forces.x = (tdble) (wing->Kx1 * (PI + aoa) * (PI + aoa) + wing->Kx2);
 		else wing->forces.x = wing->Kx3 - wing->Kx4 * cos(2*aoa);
 		if (aoa < wing->AoStall - wing->Stallw - PI)
 		    {x = (tdble)0.0;}
 		else
 		{
-		    x = aoa - wing->AoStall + wing->Stallw + PI;
+		    x = (tdble) (aoa - wing->AoStall + wing->Stallw + PI);
 		    x = x * x / (x * x + wing->Stallw * wing->Stallw);
 		}
-		wing->forces.z = -(1-x) * wing->Kz1 * (aoa + wing->AoAatZero + PI) - x * (wing->Kz2 * sin(2*aoa) - wing->Kz3);
+		wing->forces.z = (tdble) (-(1-x) * wing->Kz1 * (aoa + wing->AoAatZero + PI) - x * (wing->Kz2 * sin(2*aoa) - wing->Kz3));
 	    }
 	    
 	    /* add induced drag */
 	    if (wing->AR > 0.001)
 	    {
 		if (wing->forces.x > 0.0)
-			wing->forces.x += wing->forces.z * wing->forces.z / (wing->AR * 2.8274); //0.9*PI
-		else wing->forces.x -= wing->forces.z * wing->forces.z / (wing->AR * 2.8274);
+			wing->forces.x += (tdble) (wing->forces.z * wing->forces.z / (wing->AR * 2.8274)); //0.9*PI
+		else wing->forces.x -= (tdble) (wing->forces.z * wing->forces.z / (wing->AR * 2.8274));
 	    }
 	    
 	    /* then multiply with 0.5*rho*area and the square of velocity */
-	    wing->forces.x *= - car->DynGC.vel.x * fabs(car->DynGC.vel.x) * wing->Kx * (1.0f + (tdble)car->dammage / 10000.0);
+	    wing->forces.x *= (tdble)(- car->DynGC.vel.x * fabs(car->DynGC.vel.x) * wing->Kx * (1.0f + (tdble)car->dammage / 10000.0));
 	    wing->forces.z *= wing->Kx * vt2;
 	}
     else if (car->DynGC.vel.x > 0.0f)

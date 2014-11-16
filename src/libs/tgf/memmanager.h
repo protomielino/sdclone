@@ -22,91 +22,134 @@
 #include <cstdio>
 #include "tgf.h"
 
-// WDB test ...
+// Use new Memory Manager ...
 #ifdef __DEBUG_MEMORYMANAGER__
 
-//
-// Interface
-//
-TGF_API bool GfMemoryManagerAllocate(void);	// Initialize memory manager
-TGF_API void GfMemoryManagerRelease(bool Dump = true);	// Release memory manager at Shutdown
-TGF_API bool GfMemoryManagerRunning(void);	// Is the memory manager running?
-TGF_API void GfMemoryManagerSetup(int AddedSpace);
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
+// Interface ...
+//----------------------------------------------------------------------------*
+
+//============================================================================*
+// Data type WORD
+//----------------------------------------------------------------------------*
+#ifndef uint16
+#define uint16 unsigned short
+#endif
+//============================================================================*
+
+//============================================================================*
+// Data type BYTE
+//----------------------------------------------------------------------------*
+#ifndef uint8
+#define uint8 unsigned char
+#endif
+//============================================================================*
+
+//============================================================================*
+// Prototypes
+//----------------------------------------------------------------------------*
+TGF_API bool GfMemoryManagerInitialize(void);			
+// Release memory manager at Shutdown
+TGF_API void GfMemoryManagerRelease(bool Dump = true);	
+// Is the memory manager running?
+TGF_API bool GfMemoryManagerRunning(void);				
+// Setup parameters
+TGF_API void GfMemoryManagerSetup(int AddedSpace, uint16 Group = 0);	
+// Switch to debug mode:  keep the allocated blocks
 TGF_API void GfMemoryManagerDoAccept(void);
+// Switch to normal mode: free the blocks
 TGF_API void GfMemoryManagerDoFree(void);
-//
+// Set the Group ID used while allocation of blocks (old and new blocks)
+TGF_API void GfMemoryManagerSetGroup(uint16 Group);
+//============================================================================*
 
-//
-// Implementation
-//
+//----------------------------------------------------------------------------*
+// ... Interface
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
+// Implementation ...
+//----------------------------------------------------------------------------*
+
+//============================================================================*
 // Memory manager states
+//----------------------------------------------------------------------------*
 #define GF_MM_STATE_NULL 0	// memory manager was created
 #define GF_MM_STATE_INIT 1	// memory manager was initialized
 #define GF_MM_STATE_USED 2	// memory manager was used
+//============================================================================*
 
+//============================================================================*
 // Memory manager allocation types
+//----------------------------------------------------------------------------*
 #define GF_MM_ALLOCTYPE_MEMMAN 0	// allocation for memory manager
 #define GF_MM_ALLOCTYPE_NEW 1		// allocation by new
-#define GF_MM_ALLOCTYPE_NEWARRAY 2	// allocation by new
-#define GF_MM_ALLOCTYPE_MALLOC 3	// allocation by calloc
+#define GF_MM_ALLOCTYPE_MALLOC 2	// allocation by calloc
+//============================================================================*
 
+//============================================================================*
 // Memory manager check markers
-#define MM_MARKER_BEGIN 11223344	// Value of marker at start of the block
-#define MM_MARKER_ID 123456789		// Value of marker in front of the ID
-#define MM_MARKER_END 44332211		// Value of marker at the end of the block
+//----------------------------------------------------------------------------*
+#define MM_MARKER_BEGIN 170			// Marker: Start of the block (b 10101010)
+#define MM_MARKER_END 1431655765	// (b 01010101 01010101 01010101 01010101)
+//============================================================================*
 
+//============================================================================*
 // Memory manager histogram
-#define MAXBLOCKSIZE 4096	// Definition of the max block size for histogram
-//
+//----------------------------------------------------------------------------*
+//#define MAXBLOCKSIZE 4096	// Definition of the max block size for histogram
+#define MAXBLOCKSIZE 1024	// Definition of the max block size for histogram
+//============================================================================*
 
-// Memory manager worker functions
-void* GfMemoryManagerAlloc(size_t size, unsigned int type, void* retAddr);
-void GfMemoryManagerFree(void* b, unsigned int type);
+//============================================================================*
+// Prototypes of the Memory Manager worker functions
+//----------------------------------------------------------------------------*
+void* GfMemoryManagerAlloc(size_t size, uint8 type, void* retAddr);
+void GfMemoryManagerFree(void* b, uint8 type);
 void GfMemoryManagerHist(size_t size);
-//
+//============================================================================*
 
+//============================================================================*
 // Block to link allocated memory blocks in a 
 // double linked list and some additional flags to check
 // integrity of block at call of free
+//----------------------------------------------------------------------------*
 typedef struct tDSMMLinkBlock
 {	
-	unsigned int Mark;		// Marker to identify it as tDSMMLinkBlock
-	int Size;				// Size of allocated block
+	uint8 Mark;				// Marker to identify it as start of tDSMMLinkBlock
+	uint8 Type;				// Type of allocation
+	uint16 Grup;  			// Allocation group
+	unsigned int BLID;		// ID of allocated memory block
 	void* RAdr;				// Return address of new/malloc
 	tDSMMLinkBlock* Prev;	// Previous memory block
 	tDSMMLinkBlock* Next;	// Next memory block
-	unsigned int Type;		// Type of allocation
-	unsigned int IDMk;		// Marker to check ID is still valid
-	unsigned int BLID;		// ID of allocated memory block
-
+	unsigned int Size;		// Size of allocated block
 } tDSMMLinkBlock;
+//============================================================================*
 
-//
+//============================================================================*
 // Memory Manager
-//
+//----------------------------------------------------------------------------*
 typedef struct
 {
 	tDSMMLinkBlock RootOfList;			// Root of the double linked list
-	tDSMMLinkBlock* GarbageCollection;	// Double linked list of allocated memory blocks
-	size_t Size;						// Size of memory manager
-	int State;							// State of memory manager
-	int AddedSpace;						// Number of bytes added to each block
-	bool DoNotFree;						// Do not free the blocks if flag is set
-	unsigned int Allocated;				// Current total of allocated memory [Bytes]
-	unsigned int MaxAllocated;			// Maximum size of allocated memory at a time [Bytes]
-	unsigned int Requested;				// Current total of requested memory [Bytes]
-	unsigned int MaxRequested;			// Maximum size of requested memory at a time [Bytes]
+	tDSMMLinkBlock* GarbageCollection;	// Double linked list of allo. blocks
+	unsigned int Allocated;				// Current total of alloc. mem. [Bytes]
+	unsigned int MaxAllocated;			// Maximum size of alloc. mem. [Bytes]
+	unsigned int Requested;				// Current total of requested mem.
+	unsigned int MaxRequested;			// Maximum size of requested mem.
 
 	unsigned int BigB;					// Number of big blocks requested
 	unsigned int Hist[MAXBLOCKSIZE];	// Histogram of the buufer sizes
 
+	int State;							// State of memory manager
+	int AddedSpace;						// Number of bytes added to each block
+	uint16 Group;			  			// Allocation group
+	size_t Size;						// Size of memory manager
+	bool DoNotFree;						// Do not free blocks if flag is set
+
 } tMemoryManager;
-//
-
+//============================================================================*
 #endif // #ifdef __DEBUG_MEMORYMANAGER__
-// ... WDB test
-
+// ...  Use new Memory Manager
 #endif /* __MEMORYMANAGER__H__ */
-
-

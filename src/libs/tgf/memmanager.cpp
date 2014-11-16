@@ -89,7 +89,7 @@ void* GCCRetAddrs(void)
 void* operator new (size_t size)
 {
 	void* retAddr = GetRetAddrs();
-	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_NEW,retAddr);
+	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_NEW, retAddr);
 }
 //============================================================================*
 
@@ -109,7 +109,7 @@ void operator delete (void* b)
 ExternC void* _tgf_win_malloc(size_t size)
 {
 	void* retAddr = GetRetAddrs();
-	return GfMemoryManagerAlloc(size,GF_MM_ALLOCTYPE_MALLOC,retAddr);
+	return GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_MALLOC, retAddr);
 }
 //============================================================================*
 
@@ -128,7 +128,7 @@ ExternC void _tgf_win_free(void* b)
 ExternC void* _tgf_win_calloc(size_t num, size_t size)
 {
 	void* retAddr = GetRetAddrs();
-	void* p = GfMemoryManagerAlloc(num * size,GF_MM_ALLOCTYPE_MALLOC,retAddr);
+	void* p = GfMemoryManagerAlloc(num*size, GF_MM_ALLOCTYPE_MALLOC, retAddr);
 	memset(p, 0, num * size);
 	return p;
 }
@@ -147,7 +147,7 @@ ExternC void* _tgf_win_realloc(void* memblock, size_t size)
 		return NULL;
 	}
 
-	void* p = GfMemoryManagerAlloc(size,GF_MM_ALLOCTYPE_MALLOC,retAddr);
+	void* p = GfMemoryManagerAlloc(size, GF_MM_ALLOCTYPE_MALLOC, retAddr);
 	if (p == NULL) 
 	{
 		return NULL;
@@ -185,7 +185,7 @@ ExternC void* _tgf_win_realloc(void* memblock, size_t size)
 //============================================================================*
 // API: Override strdup
 //----------------------------------------------------------------------------*
-ExternC char * _tgf_win_strdup(const char * str)
+ExternC char * _tgf_win_strdup(const char* str)
 {
 	void* retAddr = GetRetAddrs();
 	
@@ -211,28 +211,38 @@ ExternC char * _tgf_win_strdup(const char * str)
 //----------------------------------------------------------------------------*
 tMemoryManager* GfMemoryManager(void)
 {
+	// Create the  Memory Manager
     tMemoryManager* MemoryManager = (tMemoryManager*)  
 		malloc(sizeof(tMemoryManager));            
 
-	MemoryManager->Size = sizeof(tMemoryManager);	
-	MemoryManager->State = GF_MM_STATE_NULL;     
-	MemoryManager->AddedSpace = 0;
-	MemoryManager->DoNotFree = false;
-
-	MemoryManager->RootOfList.Mark = MM_MARKER_BEGIN;
-	MemoryManager->RootOfList.Type = GF_MM_ALLOCTYPE_MEMMAN;
-	MemoryManager->RootOfList.Prev = NULL;
-	MemoryManager->RootOfList.Next = NULL;
-	MemoryManager->RootOfList.Size = sizeof(tMemoryManager);	
-	MemoryManager->RootOfList.BLID = GfMM_Counter++;	
-
+	// Set the pointer to the linking block
 	MemoryManager->GarbageCollection = (tDSMMLinkBlock*) MemoryManager;
+
+	// Initialize variables of the Memory Manager
 	MemoryManager->Allocated = 0;
 	MemoryManager->MaxAllocated = 0;
+	MemoryManager->Requested = 0;
+	MemoryManager->MaxRequested = 0;
 
 	MemoryManager->BigB = 0;
 	for (int I = 0; I < MAXBLOCKSIZE; I++)
 		MemoryManager->Hist[I] = 0;
+
+	MemoryManager->State = GF_MM_STATE_NULL;     
+	MemoryManager->AddedSpace = 0;
+	MemoryManager->Group = 0;
+	MemoryManager->Size = sizeof(tMemoryManager);	
+	MemoryManager->DoNotFree = false;
+
+	// Initialize variables of the Linking Block
+	MemoryManager->RootOfList.Mark = MM_MARKER_BEGIN;
+	MemoryManager->RootOfList.Type = GF_MM_ALLOCTYPE_MEMMAN;
+	MemoryManager->RootOfList.Grup = 0;
+	MemoryManager->RootOfList.BLID = GfMM_Counter++;	
+	MemoryManager->RootOfList.RAdr = NULL;
+	MemoryManager->RootOfList.Prev = NULL;
+	MemoryManager->RootOfList.Next = NULL;
+	MemoryManager->RootOfList.Size = sizeof(tMemoryManager);	
 
 	return MemoryManager;
 }
@@ -241,14 +251,13 @@ tMemoryManager* GfMemoryManager(void)
 //============================================================================*
 // Allocate memory
 //----------------------------------------------------------------------------*
-void* GfMemoryManagerAlloc (size_t size, unsigned int type, void* retAddr)
+void* GfMemoryManagerAlloc (size_t size, uint8 type, void* retAddr)
 {
 	if (GfMemoryManagerRunning())
 	{
 		// Need additional space for linked list and other data
 		int bsize = 
 			sizeof(tDSMMLinkBlock)	// Data of Memory Manager
-			+ sizeof(int)			// Requested size of the block	
 			+ size					// Space allocated for caller	
 			+ sizeof(int)			// Marker to detect corrupted blocks	
 			+ GfMM->AddedSpace;		// Security margin for debugging
@@ -286,7 +295,6 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int type, void* retAddr)
 		c->Type = type;
 		c->Size = size;
 		c->RAdr = retAddr;
-		c->IDMk = MM_MARKER_ID;
 		int ID = c->BLID = GfMM_Counter++;
 
 		// Update statistics
@@ -297,23 +305,10 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int type, void* retAddr)
 		int* m = (int*) (e + bsize - sizeof(int));
 		*m = MM_MARKER_END;
 
-		// Now we have here
-		// c: tDSMMLinkBlock* to the current linked list data block
-		// n: tDSMMLinkBlock* to the next linked list data block
-
-		int* s = (int *) ++c;
-		*s = size;
-
-		// Now we have here
-		// s: (int*) pointer to the size of the allocated block
-
-		void* b = (void*) ++s;
-
-		// Now we have here
-		// b: (void*) official pointer to the new data block
+		void* b = (void*) (c + 1);  //c is still pointing to the data
 
 		// Hunting memory leaks ...
-#define	IDTOSTOP 464790	// ID of block you are looking for
+#define	IDTOSTOP 6506	// ID of block you are looking for
 
 		if (ID == IDTOSTOP)
 		{
@@ -327,17 +322,7 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int type, void* retAddr)
 	}
 	else
 	{
-		int* b = (int*) GlobalAlloc(GMEM_FIXED, sizeof(int) + size); 
-		if (b == NULL)				// did malloc succeed?
-		{
-#ifdef ANSI_ISO
-			throw std::bad_alloc();	// ANSI/ISO compliant behavior
-#else
-			return b;
-#endif
-		}
-		*b = size;
-		return ++b;
+		return (void*) GlobalAlloc(GMEM_FIXED, size); 
 	}
 }
 //============================================================================*
@@ -345,7 +330,7 @@ void* GfMemoryManagerAlloc (size_t size, unsigned int type, void* retAddr)
 //============================================================================*
 // Release memory
 //----------------------------------------------------------------------------*
-void GfMemoryManagerFree (void* b, unsigned int type)
+void GfMemoryManagerFree (void* b, uint8 type)
 {
 	if (b == NULL)	// If already done
 		return;		//   return without action
@@ -353,24 +338,14 @@ void GfMemoryManagerFree (void* b, unsigned int type)
 	if (GfMemoryManagerRunning())
 	{
 		// Get start of data block ...
-		int* s = (int*) b;
-		tDSMMLinkBlock* c = (tDSMMLinkBlock*) --s;
-		--c;
+		tDSMMLinkBlock* c = ((tDSMMLinkBlock*) b - 1);
+//		--c;
 		// ... Get start of data block
-
-		// Now we have here
-		// b: (void*) official pointer to data block
-		// s: (int*) to size of allocated block
-		// c: (tDSMMLinkBlock*) to the current linked list data block
-		// and will use
-		// n: (tDSMMLinkBlock*) to the next linked list data block
-		// p: (tDSMMLinkBlock*) to the previous linked list data block
 
 		// Get address to the marker at the end
 		// Need additional space for linked list and other data
 		int bsize = 
 			sizeof(tDSMMLinkBlock)	// Data of Memory Manager
-			+ sizeof(int)			// Requested size of the block	
 			+ c->Size				// Space allocated for caller	
 			+ sizeof(int)			// Marker to detect corrupted blocks	
 			+ GfMM->AddedSpace;		// Security margin for debugging
@@ -382,19 +357,15 @@ void GfMemoryManagerFree (void* b, unsigned int type)
 		if ((c->Mark != MM_MARKER_BEGIN) || (*m != MM_MARKER_END))
 		{
 			// Block is corrupted
-			if (c->IDMk != MM_MARKER_ID)
-				fprintf(stderr,
-					"Called for corrupted block; %p;\n",c);
-			else
-				fprintf(stderr,
-					"Called for corrupted block; %d; at; %p;\n",c->BLID,c);
+			fprintf(stderr,
+				"Called for corrupted block; %d; at; %p;\n",c->BLID,c);
 
-		// Hunting corrupted blocks ...
-		if (c->BLID == IDTOSTOP)
-		{
-			c->BLID = 0; // set breakpoint here 
-		}
-		// ... Hunting corrupted blocks
+			// Hunting corrupted blocks ...
+			if (c->BLID == IDTOSTOP)
+			{
+				c->BLID = 0; // set breakpoint here 
+			}
+			// ... Hunting corrupted blocks
 		}
 		// Check call type (new/delete or malloc/free)
 		else if (c->Type != type) 
@@ -451,8 +422,9 @@ void GfMemoryManagerSetup(int AddedSpace)
 
 //============================================================================*
 // Initialize the global memory manager
+// Returns true if Manager was created, false if it existed before
 //----------------------------------------------------------------------------*
-bool GfMemoryManagerAllocate(void)
+bool GfMemoryManagerInitialize(void)
 {
 	if (GfMM == NULL)
 	{
@@ -465,7 +437,7 @@ bool GfMemoryManagerAllocate(void)
 		{
 			GfMemoryManagerRelease();
 			GfMM = NULL;     
-			return GfMemoryManagerAllocate();
+			return GfMemoryManagerInitialize();
 		}
 	}
 	return false;
@@ -474,24 +446,28 @@ bool GfMemoryManagerAllocate(void)
 
 //============================================================================*
 // Destroy the one and only global memory manager and it's allocated data
+// Dump = true: Dump info to console
 //----------------------------------------------------------------------------*
 void GfMemoryManagerRelease(bool Dump)
 {
-	int LeakSizeTotal = 0;
-	int LeakSizeNewTotal = 0;
-	int LeakSizeMallocTotal = 0;
+	unsigned int LeakSizeTotal = 0;
+	unsigned int LeakSizeNewTotal = 0;
+	unsigned int LeakSizeMallocTotal = 0;
 
-	int MaxLeakSizeTotal = 0;
-	int MaxLeakSizeNewTotal = 0;
-	int MaxLeakSizeMallocTotal = 0;
+	unsigned int MaxLeakSizeTotal = 0;
+	unsigned int MaxLeakSizeNewTotal = 0;
+	unsigned int MaxLeakSizeMallocTotal = 0;
 
     if (GfMM != NULL)                           
 	{
 		tDSMMLinkBlock* Block = GfMM->GarbageCollection;
 		tMemoryManager* MM = GfMM;                           
 
-		fprintf(stderr,"\nCurrent size requested         : %d [Byte]",MM->Requested);
-		fprintf(stderr,"\nCurrent size allocated         : %d [Byte]\n",MM->Allocated);
+		if (Dump)
+		{
+			fprintf(stderr,"\nCurrent size requested         : %d [Byte]",MM->Requested);
+			fprintf(stderr,"\nCurrent size allocated         : %d [Byte]\n",MM->Allocated);
+		}
 
 		GfMM = NULL;                           
 
@@ -511,9 +487,12 @@ void GfMemoryManagerRelease(bool Dump)
 
 				if (ToFree->Type == 1)
 				{
-					fprintf(stderr,
-						"%04.4d; Block; %04.4d; Size; %06.6d; ReturnTo; %p; Address; %p; new/delete;\n",
-						++n,ToFree->BLID,ToFree->Size,ToFree->RAdr,ToFree);
+					if (Dump)
+					{
+						fprintf(stderr,
+							"%04.4d; Block; %04.4d; Size; %06.6d; ReturnTo; %p; Address; %p; new/delete;\n",
+							++n,ToFree->BLID,ToFree->Size,ToFree->RAdr,ToFree);
+					}
 					LeakSizeNewTotal += ToFree->Size;
 					if (MaxLeakSizeNewTotal < ToFree->Size)
 						MaxLeakSizeNewTotal = ToFree->Size;
@@ -521,8 +500,11 @@ void GfMemoryManagerRelease(bool Dump)
 				}
 				else
 				{
-					fprintf(stderr,"%04.4d; Block; %04.4d; Size; %06.6d; ReturnTo; %p; Address; %p; malloc/free;\n",
-						++n,ToFree->BLID,ToFree->Size,ToFree->RAdr,ToFree);
+					if (Dump)
+					{
+						fprintf(stderr,"%04.4d; Block; %04.4d; Size; %06.6d; ReturnTo; %p; Address; %p; malloc/free;\n",
+							++n,ToFree->BLID,ToFree->Size,ToFree->RAdr,ToFree);
+					}
 					LeakSizeMallocTotal += ToFree->Size;
 					if (MaxLeakSizeMallocTotal < ToFree->Size)
 						MaxLeakSizeMallocTotal = ToFree->Size;
@@ -531,13 +513,15 @@ void GfMemoryManagerRelease(bool Dump)
 			}
 			else
 			{
-				fprintf(stderr,"%d Block corrupted\n",++n);
+				if (Dump)
+				{
+					fprintf(stderr,"%d Block corrupted\n",++n);
+				}
 				CurrentBlock = NULL;
 			}
 		}
 
 		if (Dump)
-	
 		{
 			fprintf(stderr,"\nMemory manager leak statistics:\n\n");
 
@@ -627,6 +611,15 @@ void GfMemoryManagerDoFree(void)
 	GfMM->DoNotFree = false;
 }
 //============================================================================*
+
+//============================================================================*
+// Set Group ID for allocation of blocks
+//----------------------------------------------------------------------------*
+void GfMemoryManagerSetGroup(uint16 Group)
+{
+	GfMM->Group = Group;
+}
+//============================================================================*
 	
 //============================================================================*
 // Update statistics
@@ -647,5 +640,4 @@ void GfMemoryManagerHist(size_t size)
 // ... Implementation
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 #endif
-// ... WDB test
 

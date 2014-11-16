@@ -222,7 +222,7 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 // Configuration for the new Memory Manager
 //----------------------------------------------------------------------------*
 // To enable the hunting for memory leaks uncomment the following line
-//#define __DEBUG_MEMORYMANAGER__
+#define __DEBUG_MEMORYMANAGER__
 #if defined(__DEBUG_MEMORYMANAGER__)
 // Use new Memory Manager ...
 	#if defined(WIN32)

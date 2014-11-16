@@ -1149,7 +1149,8 @@ ReInitialiseGeneticOptimisation()
 void
 ReImportGeneticParameters()
 {
-	ReLogOptim.info("\n\nImport Genetic Parameters ...\n\n");
+	ReLogOptim.info("\n\n");
+	ReLogOptim.info("Import Genetic Parameters ...\n\n");
 
 	// Setup pointer to structure
 	tgenData *Data = &TGeneticParameter::Data;
@@ -1363,7 +1364,8 @@ ReImportGeneticParameters()
 	ReLogOptim.info("Write parameters to initial xml file\n");
 	GfParmWriteFileSDHeader (Data->XmlFileName, Data->Handle, Data->CarType, Data->AuthorName);
 
-	ReLogOptim.info("\n... Import Genetic Parameters\n\n");
+	ReLogOptim.info("\n");
+	ReLogOptim.info("... Import Genetic Parameters\n\n");
 }
 
 //
@@ -1481,7 +1483,8 @@ SelectParameterAndMutation(tgenData *Data)
 	int P = 0;
 
 	double Scale = Data->Loops * Data->Loops / Data->Scale;
-	ReLogOptim.info("\nRandom parameter variation scale: %g\n",Scale); 
+	ReLogOptim.info("\n"); 
+	ReLogOptim.info("Random parameter variation scale: %g\n",Scale); 
 
 	// Loop over wanted selections
 	for (int I = 0; I < N; I++)
@@ -1532,7 +1535,8 @@ SelectParameterAndMutation(tgenData *Data)
 					} while (P == -1); // Repeat until valid selection
 				}
 
-//				ReLogOptim.info("\nParameter: %g (Factor: %g) P: %d\n\n",Parameter,factor,P);
+//				ReLogOptim.info("\n");
+//				ReLogOptim.info("Parameter: %g (Factor: %g) P: %d\n\n",Parameter,factor,P);
 
 				// Get parameter from index
 				Param = Data->GP[P];
@@ -1720,7 +1724,8 @@ ReEvolution()
 	if (Data->First)
 	{
 		// Run once ...
-		ReLogOptim.info("\nStart Optimisation\n");
+		ReLogOptim.info("\n");
+		ReLogOptim.info("Start Optimisation\n");
 		// ... run once
 	}
 

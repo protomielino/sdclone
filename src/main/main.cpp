@@ -40,34 +40,46 @@
 #include <iraceengine.h>
 #include <iuserinterface.h>
 
-// WDB test ...
+// If defined in tgf.h:
+// Use new Memory Manager ...
 #ifdef __DEBUG_MEMORYMANAGER__
 #include "memmanager.h"
 
+// Use global variables for debugging ...
 IUserInterface* piUserItf = 0;
 GfModule* pmodUserItf = NULL;
 IRaceEngine* piRaceEngine = 0;
 GfModule* pmodRaceEngine = NULL;
+// ... Use global variables for debugging
 
+// Garbage Collection in case of GfuiApp().restart();
 void ReleaseData(void)
 {
+	// Shortcut: Use Memory Manager as garbage collector
+	GfMemoryManagerRelease(false); // Release the memory manager without dump
+
+	/*
+	// For debugging only ...
 	if (piUserItf && piRaceEngine)
 	{
 		// Shutdown and unload the user interface and race engine modules.
-		piUserItf->shutdown();
-		piRaceEngine->shutdown();
+		// piUserItf->shutdown();
+		// piRaceEngine->shutdown();
 		
-		GfModule::unload(pmodUserItf);
-		GfModule::unload(pmodRaceEngine);
+		// GfModule::unload(pmodUserItf);
+		// GfModule::unload(pmodRaceEngine);
 		
 		// Shutdown the data layer.
-		//GfData::shutdown();  << causes crashes if called from here
+		// GfData::shutdown();  << causes crashes if called from here
 
-		GfMemoryManagerRelease(false); // Release the memeory manager without dump
+		// Shortcut: Use Memory Manager as garbage collector
+		GfMemoryManagerRelease(false); // Release the memory manager without dump
 	}
+	// ... For debugging only
+	*/
 }
-#endif
-// ... WDB test
+#endif 
+// ... Use new Memory Manager
 
 /*
  * Function
@@ -86,27 +98,32 @@ void ReleaseData(void)
 int
 main(int argc, char *argv[])
 {
-	// WDB test ...
-	#ifdef __DEBUG_MEMORYMANAGER__
 
+// If defined in tgf.h:
+// Use new Memory Manager ...
+#ifdef __DEBUG_MEMORYMANAGER__
+
+	#if defined(_DEBUG)
 	fprintf(stderr,"__DEBUG_MEMORYMANAGER__ enabled\n\n");
 	fprintf(stderr,"If debugging -> Attach to the process ... \n");
 	fprintf(stderr,"\nand than press [Enter] to start the program\n");
 	getchar();
+	#endif
 
-	// THIS HAS TO BE THE FIRST LINE OF CODE!!!
-	GfMemoryManagerAllocate();
+	// THIS HAS TO BE THE FIRST LINE OF CODE (except the console output)!!!
+	GfMemoryManagerInitialize();
 
-	// Because there are some memory blocks that are allocated too small
-	// we get corrupted the following memory blocks.
-	// To avoid it, we can use an additional size (4 Bytes per block) 
-	// while allocation!
-	
 	// For hunting of corrupted memory blocks comment the following line
 	//GfMemoryManagerSetup(4); // Add 4 bytes per block
-
-	#endif
-	// ... WDB test
+#else
+	// Use local variables ...
+	IUserInterface* piUserItf = 0;
+	GfModule* pmodUserItf = NULL;
+	IRaceEngine* piRaceEngine = 0;
+	GfModule* pmodRaceEngine = NULL;
+	// ... Use local variables
+#endif
+// ... Use new Memeory Manager
 
 	// Look for the "text-only" option flag in the command-line args.
 	bool bTextOnly = false;
@@ -178,19 +195,10 @@ main(int argc, char *argv[])
 	}
 
 	// Load the user interface module (graphical or text-only UI).
-	// WDB test ...
-	#ifdef __DEBUG_MEMORYMANAGER__
 	pmodUserItf =
-	#else
-	GfModule* pmodUserItf =
-	#endif
 		GfModule::load("modules/userinterface", (bTextOnly ?  "textonly" : "legacymenu"));
 
 	// Check that it implements IUserInterface.
-	#ifdef __DEBUG_MEMORYMANAGER__
-	#else
-	IUserInterface* piUserItf = 0;
-	#endif
 	if (pmodUserItf)
 	{
 		piUserItf = pmodUserItf->getInterface<IUserInterface>();
@@ -206,17 +214,9 @@ main(int argc, char *argv[])
 		GfParmReadFile(ossParm.str().c_str(), GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	const char* pszModName = GfParmGetStr(hREParams, "Modules", "racing", "standardgame");
 
-	#ifdef __DEBUG_MEMORYMANAGER__
 	pmodRaceEngine = GfModule::load("modules/racing", pszModName);
-	#else
-	GfModule* pmodRaceEngine = GfModule::load("modules/racing", pszModName);
-	#endif
 
 	// Check that it implements IRaceEngine.
-	#ifdef __DEBUG_MEMORYMANAGER__
-	#else
-	IRaceEngine* piRaceEngine = 0;
-	#endif
 	if (pmodRaceEngine)
 	{
 		piRaceEngine = pmodRaceEngine->getInterface<IRaceEngine>();
@@ -231,10 +231,8 @@ main(int argc, char *argv[])
 	
 	if (piUserItf && piRaceEngine)
 	{
-		#ifdef __DEBUG_MEMORYMANAGER__
-		// Allow to avoid memory leaks at restart
+		// Allow to use Garbage Collection in case of GfuiApp().restart();
 		pApp->ReleaseData = &ReleaseData;
-		#endif
 
 		// Enter the user interface.
 		if (piUserItf->activate())
@@ -265,14 +263,15 @@ main(int argc, char *argv[])
 		std::cerr << "Exiting from " << strAppName
 				  << " after some error occurred (see above)." << std::endl;
 
-	// WDB test ...
+	// If defined in tgf.h:
+	// Use new Memory Manager ...
 	#ifdef __DEBUG_MEMORYMANAGER__
 
 	// THIS HAS TO BE THE LAST LINE OF CODE BEFORE RETURN!!!
 	GfMemoryManagerRelease();
 
 	#endif
-	// ... WDB test
+	// ... Use new Memory Manager
 
 	return (piUserItf && piRaceEngine) ? 0 : 1;
 }

@@ -12,7 +12,7 @@
 // eMail        : wdb@wdbee.de
 // Version      : 4.02.000
 //--------------------------------------------------------------------------*
-// V4.01.000:
+// V4.01.000:Supercars.xml
 // New code for avoiding and overtaking 
 //--------------------------------------------------------------------------*
 // V4.00.002:
@@ -291,6 +291,8 @@ void SetUpSimplix()
     SetParameters(NBBOTS, "car1-trb1");
     TDriver::AdvancedParameters = true;
     TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
+	TDriver::UseWingControl = true;
+	TDriver::UseRacinglineParameters = true;
 };
 //==========================================================================*
 
@@ -330,6 +332,21 @@ void SetUpSimplix_sc()
     SetParameters(NBBOTS, "sc996");
     TDriver::UseSCSkilling = true;                 // Use supercar skilling
     TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
+	TDriver::UseRacinglineParameters = true;
+};
+//==========================================================================*
+
+//==========================================================================*
+// Schismatic entry point for simplix_srw
+//--------------------------------------------------------------------------*
+void SetUpSimplix_srw()
+{
+    cRobotType = RTYPE_SIMPLIX_SRW;
+    SetParameters(NBBOTS, "srw-sector-p4");
+    TDriver::AdvancedParameters = true;
+    TDriver::UseSCSkilling = true;          // Use supercar skilling
+    TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
+	TDriver::UseWingControl = true;
 	TDriver::UseRacinglineParameters = true;
 };
 //==========================================================================*
@@ -409,7 +426,7 @@ void SetUpSimplix_lp1()
 void SetUpSimplix_ref()
 {
     cRobotType = RTYPE_SIMPLIX_REF;
-    SetParameters(NBBOTS, "ref.sector-p4");
+    SetParameters(NBBOTS, "ref-sector-p4");
 	TDriver::UseRacinglineParameters = true;
 	TDriver::UseWingControl = true;
 };
@@ -776,6 +793,16 @@ static int InitFuncPt(int Index, void *Pt)
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
     cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.10f);
   }
+  else if (cRobotType == RTYPE_SIMPLIX_SRW)
+  {
+    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_SRW\n");
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.10f);
+  }
   else if (cRobotType == RTYPE_SIMPLIX_36GP)
   {
     LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_36GP\n");
@@ -842,11 +869,12 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_REF)
   {
     LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_REF\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_REF;
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
+//    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_REF;
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
 //    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
     cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
   }

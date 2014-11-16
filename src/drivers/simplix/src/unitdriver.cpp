@@ -1235,7 +1235,7 @@ void TDriver::InitTrack
   // Override params for car type with params of track
   snprintf(Buf,sizeof(Buf),"%s/%s/%s.xml",
     BaseParamPath,oCarType,oTrackName);
-  LogSimplix.info("#Override params for car type with params of track: %s\n", Buf);
+  LogSimplix.warning("#Override params for car type with params of track: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for car type with params of track and weather

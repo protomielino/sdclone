@@ -93,7 +93,7 @@ extern GfLogger* PLogSimplix;
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 135 // Force new calculation
+#define RL_VERSION 136 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*
@@ -109,6 +109,7 @@ extern GfLogger* PLogSimplix;
 #define RTYPE_SIMPLIX_MP5  7					 // Robot type simplix_mp5
 #define RTYPE_SIMPLIX_LP1  8					 // Robot type simplix_lp1
 #define RTYPE_SIMPLIX_REF  9					 // Robot type simplix_ref
+#define RTYPE_SIMPLIX_SRW  10                    // Robot type simplix_srw
 //==========================================================================*
 
 //==========================================================================*
