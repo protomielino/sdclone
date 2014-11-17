@@ -231,8 +231,10 @@ main(int argc, char *argv[])
 	
 	if (piUserItf && piRaceEngine)
 	{
+#ifdef __DEBUG_MEMORYMANAGER__
 		// Allow to use Garbage Collection in case of GfuiApp().restart();
 		pApp->ReleaseData = &ReleaseData;
+#endif
 
 		// Enter the user interface.
 		if (piUserItf->activate())
