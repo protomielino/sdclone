@@ -356,6 +356,7 @@ typedef struct {
     tWheelState	wheel[4];
     tPosd	corner[4];	/**< car's corners position */
     int		gear;	    	/**< current gear */
+    int		gearNext;    	/**< next gear while shiting */
     tdble	fuel;	    	/**< remaining fuel (liters) */
 	tdble   fuel_consumption_total; // l
 	tdble   fuel_consumption_instant; // l/100km (>100 means infinity)
@@ -402,6 +403,7 @@ typedef struct {
 #define _gearOffset	priv.gearOffset
 #define _fuel		priv.fuel
 #define _gear		priv.gear
+#define _gearNext	priv.gearNext
 #define _debug		priv.debug
 #define _skid		priv.skid
 #define _reaction	priv.reaction
