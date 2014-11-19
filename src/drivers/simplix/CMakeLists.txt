@@ -76,27 +76,12 @@ SET(ROBOT_SOURCES
 SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_srw simplix_trb1 simplix_ls1 simplix_ls2 simplix_mp5 
 			simplix_mpa1 simplix_lp1 simplix_ref)
 
-GET_TARGET_PROPERTY(MODLOC ${ROBOT_NAME} RUNTIME_OUTPUT_DIRECTORY)
-MESSAGE(STATUS "MODLOC =  ${MODLOC}")
-
 # The ubiquitous robot module and its clones.
 ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.3.0 SOVERSION 1.0.0
              INTERFACE ${ROBOT_INTERFACE}
              SOURCES ${ROBOT_SOURCES}
              CLONENAMES ${ROBOT_CLONES})
 
-GET_TARGET_PROPERTY(MODLOC ${ROBOT_NAME} RUNTIME_OUTPUT_DIRECTORY)
-MESSAGE(STATUS "RUNTIME_OUTPUT_DIRECTORY =  ${MODLOC}")
-MESSAGE(STATUS "_TGT_LOC =  ${_TGT_LOC}")
-GET_TARGET_PROPERTY(_TGT_LOC ${ROBOT_NAME} LOCATION)
-MESSAGE(STATUS "_TGT_LOC =  ${_TGT_LOC}")
-MESSAGE(STATUS "_TGT_DIR =  ${_TGT_DIR}")
-
-  SET_TARGET_PROPERTIES(${ROBOT_NAME} PROPERTIES 
-                        LOCATION ${MODLOC})
-
-                        GET_TARGET_PROPERTY(AVARIABLE ${ROBOT_NAME} LOCATION)
-MESSAGE(STATUS "AVARIABLE =  ${AVARIABLE}")
 
 # For data associated to the ubiquitous robot module and its clones,
 # see data/drivers/simplix*/CMakeLists.txt
