@@ -10,7 +10,7 @@
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
 // Last changed : 2013.03.02
-// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
+// Copyright    : 2007-2013 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 4.00.000
 //--------------------------------------------------------------------------*

@@ -264,6 +264,7 @@ private:
 	int oLastLap;                                // Last lap
 	double oClutch;                              // Clutching
 	int oGear;                                   // Gear
+	int oUsedGear;                               // Gear
 	double oSteer;                               // Steering
 	double oLastSteer;                           // Steering
 
@@ -309,6 +310,7 @@ private:
 	double oGearEff[MAX_GEARS];                  // Efficiency of gears
 	int oExtended;                               // Information if this robot is extended (oExtended = 1) or not (oExtended = 0).
 	int oLastGear;                               // Last gear
+	int oLastUsedGear;                           // Last used gear
     bool oLetPass;                               // Let opoonent pass
 	double oLookAhead;                           // Look ahead base value
 	double oLookAheadFactor;                     // Look ahead factor
@@ -434,6 +436,7 @@ private:
 	float oSideScaleMu;
 	float oSideScaleBrake;
 	float oSideBorderOuter;
+	float oSideBorderInner;
 	double oXXX;
 	bool oRain;
 	double oRainIntensity;
@@ -445,6 +448,7 @@ private:
     double oJumpOffset;                          // Offset for calculation of jumps
 	bool oFirstJump;
 	double oStartSteerFactor;
+	bool oCarHasTYC;							 // Flag: Car has tyre condition in simu enabled
 
 	static int NBBOTS;                           // Nbr of cars
     double CurrSimTime;                          // Current simulation time
@@ -453,6 +457,7 @@ private:
 	static const char* SECT_PRIV;                      // Private section
 	static const char* DEFAULTCARTYPE;                 // Default car type
 
+	static int RobotType;
 	static bool AdvancedParameters;
     static bool UseOldSkilling;
     static bool UseSCSkilling;
@@ -472,6 +477,7 @@ private:
 
 	void ScaleSide(float FactorMu, float FactorBrake);
 	void SideBorderOuter(float Factor);
+	void SideBorderInner(float Factor);
 
 	void AdjustBrakes(PCarHandle Handle);
 	void AdjustDriving(PCarHandle Handle, double ScaleBrake, double ScaleMu);
@@ -482,6 +488,8 @@ private:
     void Meteorology();
 	int GetWeather();
 
+	double WheelConditionFront();
+	double WheelConditionRear();
 	void CalcSkilling();
 	double CalcFriction(const double Crv);
 	double CalcCrv(double Crv);

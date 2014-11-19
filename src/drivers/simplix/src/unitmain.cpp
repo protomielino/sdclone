@@ -342,6 +342,7 @@ void SetUpSimplix_sc()
 void SetUpSimplix_srw()
 {
     cRobotType = RTYPE_SIMPLIX_SRW;
+	TDriver::RobotType = cRobotType;
     SetParameters(NBBOTS, "srw-sector-p4");
     TDriver::AdvancedParameters = true;
     TDriver::UseSCSkilling = true;          // Use supercar skilling
@@ -539,6 +540,8 @@ int moduleWelcomeV1_00
 		SetUpSimplix_trb1();
 	else if (strncmp(RobName,"simplix_sc",strlen("simplix_sc")) == 0)
 		SetUpSimplix_sc();
+	else if (strncmp(RobName,"simplix_srw",strlen("simplix_srw")) == 0)
+		SetUpSimplix_srw();
 	else if (strncmp(RobName,"simplix_36GP",strlen("simplix_36GP")) == 0)
 		SetUpSimplix_36GP();
 	else if (strncmp(RobName,"simplix_mpa1",strlen("simplix_mpa1")) == 0)
@@ -801,7 +804,8 @@ static int InitFuncPt(int Index, void *Pt)
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.10f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.30f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderInner(0.00f);
   }
   else if (cRobotType == RTYPE_SIMPLIX_36GP)
   {

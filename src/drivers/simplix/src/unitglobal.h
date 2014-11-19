@@ -344,7 +344,6 @@ enum
 #define WheelSegFriction(x) (oCar->_wheelSeg(x)->surface->kFriction)
 #define WheelSegRoughness(x) (oCar->_wheelSeg(x)->surface->kRoughness)
 #define WheelSegRollRes(x) (oCar->_wheelSeg(x)->surface->kRollRes)
-#define UsedGear (oCar->_gear)
 // ... Shortcuts for TORCS
 
 // Shortcuts for this robot ...

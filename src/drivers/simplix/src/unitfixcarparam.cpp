@@ -112,6 +112,13 @@ double TFixCarParam::CalcAcceleration(
   double TrackTiltAngle) const                   // Track tilt angle
 {
   double MU = Friction * oTyreMu;
+  if (oDriver->oCarHasTYC)
+  {
+    double WcF = oDriver->WheelConditionFront();
+    double WcR = oDriver->WheelConditionRear();
+    MU = MIN(WcF*MU,WcR*MU);
+  }
+
   double CD = oCdBody * 
 	(1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
 
@@ -186,12 +193,19 @@ double TFixCarParam::CalcBraking
   Friction *= oDriver->CalcFriction(Crv);
 
   double Mu = Friction * oTyreMu;
-  double Mu_F = Mu;
-  double Mu_R = Mu;
+  double MuF = Mu;
+  double MuR = Mu;
 
-  Mu_F = Friction * oTyreMuFront;
-  Mu_R = Friction * oTyreMuRear;
-  Mu = MIN(Mu_F,Mu_R);
+  MuF = Friction * oTyreMuFront;
+  MuR = Friction * oTyreMuRear;
+  if (oDriver->oCarHasTYC)
+  {
+    double WcF = oDriver->WheelConditionFront();
+    double WcR = oDriver->WheelConditionRear();
+    Mu = MIN(WcF*MuF,WcR*MuR);
+  }
+  else
+    Mu = MIN(MuF,MuR);
 
   // From SD:
   double Cd = oCdBody * 
@@ -221,7 +235,7 @@ double TFixCarParam::CalcBraking
 	double Ffrnt = oCaFrontWing * AvgV2;
 	double Frear = oCaRearWing * AvgV2;
 
-	Froad = 0.95 * Fdown * Mu + Ffrnt * Mu_F + Frear * Mu_R;
+	Froad = 0.95 * Fdown * Mu + Ffrnt * MuF + Frear * MuR;
 
 	double Flat  = oTmpCarParam->oMass * Glat;
 	double Ftan  = oTmpCarParam->oMass * Gtan - Cd * AvgV2;
@@ -291,12 +305,19 @@ double	TFixCarParam::CalcBrakingPit
   Friction *= oDriver->CalcFriction(Crv);
 
   double Mu = Friction * oTyreMu;
-  double Mu_F = Mu;
-  double Mu_R = Mu;
+  double MuF = Mu;
+  double MuR = Mu;
 
-  Mu_F = Friction * oTyreMuFront;
-  Mu_R = Friction * oTyreMuRear;
-  Mu = MIN(Mu_F,Mu_R);
+  MuF = Friction * oTyreMuFront;
+  MuR = Friction * oTyreMuRear;
+  if (oDriver->oCarHasTYC)
+  {
+    double WcF = oDriver->WheelConditionFront();
+    double WcR = oDriver->WheelConditionRear();
+    Mu = MIN(WcF*MuF,WcR*MuR);
+  }
+  else
+    Mu = MIN(MuF,MuR);
 
   // From TORCS:
   double Cd = oCdBody * 
@@ -325,7 +346,7 @@ double	TFixCarParam::CalcBrakingPit
 	double Ffrnt = oCaFrontWing * AvgV2;
 	double Frear = oCaRearWing * AvgV2;
 
-	Froad = Fdown * Mu + Ffrnt * Mu_F + Frear * Mu_R;
+	Froad = Fdown * Mu + Ffrnt * MuF + Frear * MuR;
 
 	double Flat  = oTmpCarParam->oMass * Glat;
 	double Ftan  = oTmpCarParam->oMass * Gtan - Cd * AvgV2;
@@ -423,7 +444,14 @@ double TFixCarParam::CalcMaxSpeed
 
   double MuF = Friction * oTyreMuFront * CarParam.oScaleMu;
   double MuR = Friction * oTyreMuRear * CarParam.oScaleMu;
-  Mu = MIN(MuF,MuR) / oTmpCarParam->oSkill;
+  if (oDriver->oCarHasTYC)
+  {
+    double WcF = oDriver->WheelConditionFront();
+    double WcR = oDriver->WheelConditionRear();
+    Mu = MIN(WcF*MuF,WcR*MuR) / oTmpCarParam->oSkill;
+  }
+  else
+    Mu = MIN(MuF,MuR) / oTmpCarParam->oSkill;
 
   Den = (AbsCrv - ScaleBump * CrvZ)
     - (oCaFrontWing * MuF + oCaRearWing * MuR 
