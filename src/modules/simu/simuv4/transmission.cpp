@@ -32,7 +32,8 @@ SimTransmissionConfig(tCar *car)
     const char		*transType;
     int			i, j;
     tdble		gRatio = 0; // Avoid compiler warning: usage of possibly uninitialized variable
-    tdble		fRatio, gEff;
+    tdble		fRatio = 0;
+	tdble		gEff = 0;
     //tdble       fEff; // Never used
     tdble		gearI;
     char		path[256];
@@ -40,9 +41,6 @@ SimTransmissionConfig(tCar *car)
     //clutchI		= GfParmGetNum(hdle, SECT_CLUTCH, PRM_INERTIA, (char*)NULL, 0.12f);
     transType		= GfParmGetStr(hdle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
     trans->gearbox.shiftTime = clutch->releaseTime = GfParmGetNum(hdle, SECT_GEARBOX, PRM_SHIFTTIME, (char*)NULL, 0.2f);
-
-    fRatio = 0;
-    gEff   = 0;
 
     /* Link between the differentials */
     for (j = 0; j < 2; j++) {

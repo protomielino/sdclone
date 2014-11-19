@@ -481,6 +481,7 @@ SimUpdate(tSituation *s, double deltaTime)
 			carElt->pub.corner[i] = car->corner[i].pos;
 		}
 		carElt->_gear = car->transmission.gearbox.gear;
+		carElt->_gearNext = car->transmission.gearbox.gearNext;
 		carElt->_enginerpm = car->engine.rads;
 		carElt->_fuel = car->fuel;
 		carElt->priv.collision |= car->collision;
@@ -603,6 +604,7 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 		carElt->pub.corner[i] = car->corner[i].pos;
 	}
 	carElt->_gear = car->transmission.gearbox.gear;
+	carElt->_gearNext = car->transmission.gearbox.gearNext;
 	carElt->_enginerpm = car->engine.rads;
 	carElt->_fuel = car->fuel;
 	carElt->priv.collision |= car->collision;
