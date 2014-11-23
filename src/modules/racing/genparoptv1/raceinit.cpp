@@ -49,6 +49,12 @@
 
 #include "raceinit.h"
 
+// Use new Memory Manager ...
+#ifdef __DEBUG_MEMORYMANAGER__
+#include "memmanager.h"
+#endif
+// ... Use new Memory Manager
+
 static const char *aPszSkillLevelNames[] =
 	{ ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
 static const int NSkillLevels = (int)(sizeof(aPszSkillLevelNames)/sizeof(char*));
@@ -128,9 +134,9 @@ ReRaceConfigure(bool bInteractive)
 	ReInfo->mainParams = ReInfo->params =
 		GenParOptV1::self().race()->getManager()->getDescriptorHandle();
 	
-	GfParmRemoveVariable(ReInfo->params, "/", "humanInGroup");
-	GfParmSetVariable(ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
-	
+//	GfParmRemoveVariable(ReInfo->params, "/", "humanInGroup");
+//	GfParmSetVariable(ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
+
 	// Enter CONFIG state and return to the race engine automaton if interactive mode.
 	if (bInteractive)
 		ReStateApply((void*)RE_STATE_CONFIG);
@@ -165,7 +171,7 @@ ReStartNewRace()
 	}
 
 	// Initialize the result system.
-	ReInitResults();
+	//ReInitResults();
 
 	// Enter EVENT_INIT state and return to the race engine automaton.
 	ReStateApply((void*)RE_STATE_EVENT_INIT);
@@ -672,20 +678,38 @@ ReInitCars(void)
   int robotIdx;
   void *robhdle;
   tCarElt *elt;
-  //const char *focused; // Never used.
-  //int focusedIdx; // Never used.
   void *params = ReInfo->params;
 
   /* Get the number of cars (= drivers) racing */
   nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS_RACING);
   GfLogTrace("Loading %d car(s)\n", nCars);
 
+  if (ReInfo)
+  {
+	// We have to release the data here!
+    for (int I = 0; I < nCars; I++)
+	{
+        tCarElt* car = &(ReInfo->carList[I]);
+		if (car)
+		{
+			if (car->priv.paramsHandle)
+				car->priv.paramsHandle = 0;
+
+			if (car->priv.carHandle)
+			{
+				GfParmReleaseHandle(car->priv.carHandle);
+				car->priv.carHandle = 0;
+			}
+		}
+		else
+			break;
+	}
+  }
+
   FREEZ(ReInfo->carList);
   ReInfo->carList = (tCarElt*)calloc(nCars, sizeof(tCarElt));
   FREEZ(ReInfo->rules);
   ReInfo->rules = (tRmCarRules*)calloc(nCars, sizeof(tRmCarRules));
-  //focused = GfParmGetStr(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
-  //focusedIdx = (int)GfParmGetNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, NULL, 0);
   index = 0;
 
   /* For each car/driver : */
@@ -736,22 +760,22 @@ ReInitCars(void)
     else 
     {
       GfLogTrace("Loading robot %s descriptor file\n", robotModuleName );
-      snprintf(buf, sizeof(buf), "%sdrivers/%s/%s.xml", GfLocalDir(), robotModuleName, robotModuleName);
+      snprintf(buf, sizeof(buf), "%sdrivers/%s/%s.xml", 
+		  GfLocalDir(), robotModuleName, robotModuleName);
       robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
       if (!robhdle) 
       {
-        snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", robotModuleName, robotModuleName);
+        snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", 
+			robotModuleName, robotModuleName);
         robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
       }
-      if (robhdle && ( strcmp( robotModuleName, "human" ) == 0 ) )
+      else if (robhdle && ( strcmp( GfParmGetStr( robhdle, 
+		  ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "foo" ), 
+		  GfParmGetStr( robhdle, 
+		  ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "bar" ) ) == 0 ) )
       {
-        /* Human driver */
-        elt = reLoadSingleCar( index, i, robotIdx - (*(ReInfo->robModList))->modInfo[0].index, robotIdx, FALSE, robotModuleName );
-      }
-      else if (robhdle && ( strcmp( GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "foo" ),
-                              GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "bar" ) ) == 0 ) )
-      {
-        elt = reLoadSingleCar( index, i, (*(ReInfo->robModList))->modInfoSize, robotIdx, FALSE, robotModuleName );
+        elt = reLoadSingleCar( index, i, (*(ReInfo->robModList))->modInfoSize, 
+			robotIdx, FALSE, robotModuleName );
       }
       else
         GfLogError("No descriptor for robot %s (2)\n", robotModuleName );
@@ -800,7 +824,7 @@ ReRaceCleanup(void)
   RePhysicsEngine().shutdown();
   GenParOptV1::self().unloadPhysicsEngine();
 
-  ReStoreRaceResults(ReInfo->_reRaceName);
+  //ReStoreRaceResults(ReInfo->_reRaceName);
 
   ReRaceCleanDrivers();
 }

@@ -9,10 +9,10 @@
 //
 // File         : unitstrategy.h
 // Created      : 2007.02.20
-// Last changed : 2013.06.25
-// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
+// Last changed : 2014.11.23
+// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.002
+// Version      : 4.03.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //

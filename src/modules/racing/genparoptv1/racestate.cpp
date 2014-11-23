@@ -35,6 +35,12 @@
 
 #include "racestate.h"
 
+// Use new Memory Manager ...
+#ifdef __DEBUG_MEMORYMANAGER__
+#include "memmanager.h"
+#endif
+// ... Use new Memory Manager
+
 // State Automaton Init
 void
 ReStateInit(void *prevMenu)
@@ -61,6 +67,15 @@ ReStateManage(void)
 
 			case RE_STATE_EVENT_INIT:
 				GfLogInfo("%s now in EVENT_INIT state\n", ReInfo->_reName);
+				// Use new Memory Manager ...
+				#ifdef __DEBUG_MEMORYMANAGER__
+				//fprintf(stderr,"Initialise memory manager tracking ...\n");
+				GfMemoryManagerSetGroup(1);
+				#endif
+				// ... Use new Memory Manager
+
+			case RE_STATE_EVENT_LOOP:
+				GfLogInfo("%s now in EVENT_INIT_LOOP state\n", ReInfo->_reName);
 				// Load the event description (track and drivers list)
 				mode = ReRaceEventInit();
 				if (mode & RM_NEXT_STEP) {
@@ -135,9 +150,16 @@ ReStateManage(void)
 				// Setup short cut
 				if (mode & RM_NEXT_STEP) {
 				  /* Back to optimization */
-				  ReInfo->_reState = RE_STATE_EVENT_INIT;
+				  ReInfo->_reState = RE_STATE_EVENT_LOOP;
 				} else {
 				  /* Next step */
+				  // Use new Memory Manager ...
+				  #ifdef __DEBUG_MEMORYMANAGER__
+				  fprintf(stderr,"... Reset memory manager tracking\n");
+				  GfMemoryManagerSetGroup(0);
+				  #endif
+				  // ... Use new Memory Manager
+
 				  ReInfo->_reState = RE_STATE_SHUTDOWN;
 				}
 				break;
@@ -155,6 +177,13 @@ ReStateManage(void)
 			case RE_STATE_SHUTDOWN:
 				GfLogInfo("%s now in SHUTDOWN state\n", ReInfo->_reName);
 				ReCleanupGeneticOptimisation();
+				ReInfo->_reState = RE_STATE_CLEANUP;
+				mode = RM_SYNC;
+				break;
+
+			case RE_STATE_CLEANUP:
+				GfLogInfo("%s now in CLEANUP state\n", ReInfo->_reName);
+				ReCleanupReInfo();
 				// Back to the race manager menu
 				ReInfo->_reState = RE_STATE_CONFIG;
 				mode = RM_SYNC;

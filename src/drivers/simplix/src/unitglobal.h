@@ -9,10 +9,10 @@
 //
 // File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2013.07.15
-// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
+// Last changed : 2014.11.23
+// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.01.000
+// Version      : 4.03.000
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -93,7 +93,7 @@ extern GfLogger* PLogSimplix;
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 136 // Force new calculation
+#define RL_VERSION 137 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*

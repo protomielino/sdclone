@@ -220,7 +220,7 @@ void LegacyMenu::activateLoadingScreen()
 	else
         snprintf(pszTitle, sizeof (pszTitle), "%s", pReInfo->_reName);
 
-    ::RmLoadingScreenStart(pszTitle, "data/img/splash-raceload.jpg");
+	::RmLoadingScreenStart(pszTitle, "data/img/splash-raceload.jpg");
 }
 
 void LegacyMenu::addLoadingMessage(const char* pszText)
@@ -309,10 +309,10 @@ bool LegacyMenu::onRaceStarting()
 
 void LegacyMenu::onRaceLoadingDrivers()
 {
-    // Create the game screen according to the actual display mode.
-    if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL)
-        _hscrGame = ::RmScreenInit();
-    else
+		// Create the game screen according to the actual display mode.
+		if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL)
+			_hscrGame = ::RmScreenInit();
+		else
         _hscrGame = ::RmResScreenInit();
 
     // If first driver (of a practice or qualifying) or race session,
@@ -321,7 +321,7 @@ void LegacyMenu::onRaceLoadingDrivers()
             || _piRaceEngine->inData()->s->_raceType == RM_TYPE_PRACTICE)
             || (int) GfParmGetNum(_piRaceEngine->inData()->results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1) == 1)
 	{
-        activateLoadingScreen();
+		activateLoadingScreen();
     }
 }
 
@@ -388,11 +388,11 @@ bool LegacyMenu::onRaceStartingPaused(){
 
 void LegacyMenu::onRaceStarted()
 {
-    // Shutdown the loading screen if not already done.
-    shutdownLoadingScreen();
+	// Shutdown the loading screen if not already done.
+	shutdownLoadingScreen();
 
-    // Activate the game screen.
-    GfuiScreenActivate(_hscrGame);
+	// Activate the game screen.
+	GfuiScreenActivate(_hscrGame);
 }
 
 void LegacyMenu::onRaceResuming()

@@ -45,6 +45,12 @@
 
 #include "racemain.h"
 
+// Use new Memory Manager ...
+#ifdef __DEBUG_MEMORYMANAGER__
+#include "memmanager.h"
+#endif
+// ... Use new Memory Manager
+
 // DEBUG
 /*
 #define DIV 1024
@@ -55,6 +61,8 @@ DWORDLONG lastFreeMem = 0;
 // State flag for run once initialisation
 bool genOptNeedInit = true;
 int OptiCounter = 0;
+unsigned short OptiBlockGroup = 0;
+bool SingleTrackOptimization = true;
 
 // Buffer for short time use for filenames
 char buf[FILENAME_MAX+1]; // BUFSIZE defined in genetic.h to be = MAX_PATH
@@ -156,7 +164,8 @@ int
 ReRaceEventInit(void)
 {
 	// Initialize the race session name.
-	ReInfo->_reRaceName = ReGetCurrentRaceName();
+	free((void*) (ReInfo->_reRaceName));
+	ReInfo->_reRaceName = strdup("Optimization"); //ReGetCurrentRaceName();
 	GfLogInfo("Starting new event (%s session)\n", ReInfo->_reRaceName);
 
 	ReUI().onRaceEventInitializing();
@@ -165,7 +174,7 @@ ReRaceEventInit(void)
 
 	ReTrackInit();
 	
-	ReEventInitResults();
+	//ReEventInitResults();
 
 	return RM_SYNC | RM_NEXT_STEP;
 }
@@ -311,24 +320,20 @@ RePreRace(void)
 	const char *raceName;
 	const char *raceType;
 	void *params = ReInfo->params;
-	void *results = ReInfo->results;
 	int curRaceIdx;
 	int timedLapsReplacement = 0;
-	char *prevRaceName;
 	
-	raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
+	raceName = ReInfo->_reRaceName;
 	
-	GfParmRemoveVariable (params, "/", "humanInGroup");
-	GfParmRemoveVariable (params, "/", "eventNb");
-	GfParmSetVariable (params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
-	GfParmSetVariable (params, "/", "eventNb", GfParmGetNum (ReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1.0 ) );
 	if (!raceName) {
 		return RM_ERROR;
 	}
 
 	if (strcmp(GfParmGetStr(params, raceName, RM_ATTR_ENABLED, RM_VAL_YES), RM_VAL_NO) == 0) {
 		GfLogTrace( "Race %s disabled\n",  raceName);
-		curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
+//		curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
+		curRaceIdx = 1;
+/*
 		if (curRaceIdx < GfParmGetEltNb(params, RM_SECT_RACES)) {
 			curRaceIdx++;
 			GfLogTrace( "Race %s is not the last one, but the #%d\n",  raceName, curRaceIdx);
@@ -336,9 +341,24 @@ RePreRace(void)
 	
 			return RM_SYNC | RM_NEXT_RACE;
 		}
-	
-		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
+*/	
+//		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
 		return RM_SYNC | RM_NEXT_RACE | RM_NEXT_STEP;
+	}
+
+	// Determine the number of tracks
+	int nbTrk = GfParmGetEltNb(params, RM_SECT_TRACKS);
+	if (nbTrk == 1)
+	{
+		// Optimize setup trackname.xml
+		SingleTrackOptimization = true;
+		ReUI().addLoadingMessage("Single Track Optimization");
+	}
+	else
+	{
+		// Optimize setup default.xml
+		SingleTrackOptimization = false;
+		ReUI().addLoadingMessage("Multi Track Optimization");
 	}
 
 	// Get session max dammages.
@@ -423,10 +443,6 @@ RePreRace(void)
 	// Initialize race state.
 	ReInfo->s->_raceState = 0;
 
-	// Cleanup results
-	snprintf(path, sizeof(path), "%s/%s/%s", ReInfo->track->name, RE_SECT_RESULTS, raceName);
-	GfParmListClean(results, path);
-
 	// Drivers starting order
 	// The starting order is decided here,
 	// then car indexes are stored in ReStartingOrderIdx, in the starting order.
@@ -450,16 +466,10 @@ RePreRace(void)
 	}
 	else
 	{
-		ReUI().addLoadingMessage("Determining Starting Order ...");
+		//ReUI().addLoadingMessage("Determining Starting Order ...");
 
-		const char* gridType =
-			GfParmGetStr(params, raceName, RM_ATTR_START_ORDER, RM_VAL_DRV_LIST_ORDER);
-		
 		int maxCars = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DRV, NULL, 100);
 		nCars = MIN(nCars, maxCars);
-		
-		tReGridPart *GridList = NULL;
-		int nGridList = 0;
 		
 		// Initialize the array of car indexes for starting order
 		if (ReStartingOrderIdx != NULL) {
@@ -471,121 +481,16 @@ RePreRace(void)
 			ReStartingOrderIdx[i] = -1;
 		}
 		
-		// Starting grid in the arrival order of the previous race (or qualification session)
-		if (!strcmp(gridType, RM_VAL_LAST_RACE_ORDER))
-		{
-			GfLogTrace("Starting grid in the order of the last race\n");
-			
-			prevRaceName = ReGetPrevRaceName(/* bLoop = */false);
-			if (!prevRaceName) {
-				return RM_ERROR;
-			}
+		GfLogTrace("Starting grid in the order of the driver list\n");
 
-			for (int i = 1; i < nCars + 1; i++) {
-				snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
-						 ReInfo->track->name, RE_SECT_RESULTS, prevRaceName, RE_SECT_RANK, i);
-				ReStartingOrderIdx[i-1] = 
-					ReFindDriverIdx (GfParmGetStr(results, path, RE_ATTR_MODULE, ""),
-									(int)GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0));
-			}
-		}
-		
-		// Starting grid in the reversed arrival order of the previous race
-		else if (!strcmp(gridType, RM_VAL_LAST_RACE_RORDER))
-		{
-			GfLogTrace("Starting grid in the reverse order of the last race\n");
-
-			prevRaceName = ReGetPrevRaceName(/* bLoop = */false);
-			if (!prevRaceName) {
-				return RM_ERROR;
-			}
-
-			for (int i = 1; i < nCars + 1; i++) {
-				snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
-						ReInfo->track->name, RE_SECT_RESULTS, prevRaceName, RE_SECT_RANK, nCars - i + 1);
-				ReStartingOrderIdx[i-1] = 
-					ReFindDriverIdx (GfParmGetStr(results, path, RE_ATTR_MODULE, ""),
-									(int)GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0));
-			}
-		}
-
-		// Starting grid as a mix from the results of earlier sessions
-		else if (ReParseStartingOrder(gridType, &GridList, nCars, nGridList))
-		{
-			GfLogTrace("Starting grid as a mix from the results of earlier sessions\n");
-			
-			int idx;
-			int gridpos = 1;
-			int carnr;
-			const char *modulename;
-			for (int i = 0; i < nGridList; i++) {
-				if (gridpos > nCars) {break;}
-				if (GridList[i].diffpos == -1) {//reversed
-					for ( int j = GridList[i].startpos; j >= GridList[i].endpos; j--) {
-						if (gridpos > nCars) {break;}
-						snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
-								ReInfo->track->name, RE_SECT_RESULTS, GridList[i].racename, RE_SECT_RANK, j);
-						idx = (int)GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0);
-						modulename = GfParmGetStr(results, path, RE_ATTR_MODULE, "");
-						carnr = ReFindDriverIdx(modulename, idx);
-						for (int k = 0; k < gridpos-1; k++) {
-							if ( carnr == ReStartingOrderIdx[k] ) {
-								//oops: same car twice
-								GfLogWarning("The same car appears twice in the advanced grid!\n");
-								carnr = -1;
-								break;
-							}
-						}
-						//adding car to the list
-						if (carnr != -1) {
-							ReStartingOrderIdx[gridpos-1] = carnr;
-							gridpos++;
-						}
-					}
-				} else if (GridList[i].diffpos == 1){//straight order
-					for ( int j = GridList[i].startpos; j <= GridList[i].endpos; j++) {
-						if (gridpos > nCars) {break;}
-						snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
-								ReInfo->track->name, RE_SECT_RESULTS, GridList[i].racename, RE_SECT_RANK, j);
-						idx = (int)GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0);
-						modulename = GfParmGetStr(results, path, RE_ATTR_MODULE, "");
-						carnr = ReFindDriverIdx(modulename, idx);
-						for (int k = 0; k < gridpos-1; k++) {
-							if ( carnr == ReStartingOrderIdx[k] ) {
-								//oops: same car twice
-								GfLogWarning("The same car appears twice in the advanced grid!\n");
-								carnr = -1;
-								break;
-							}
-						}
-						//adding car to the list
-						if (carnr != -1) {
-							ReStartingOrderIdx[gridpos-1] = carnr;
-							gridpos++;
-						}
-					}
-				}
-			}
-			//cleaning up memory
-			if (nGridList > 0){delete[] GridList;}
-		}
-
-		// Starting grid in the drivers list order
-		else
-		{
-			GfLogTrace("Starting grid in the order of the driver list\n");
-
-			for (int i = 1; i < nCars + 1; i++) {
-				snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS, i);
-				ReStartingOrderIdx[i-1] = 
-					ReFindDriverIdx (GfParmGetStr(params, path, RE_ATTR_MODULE, ""),
-									(int)GfParmGetNum(params, path, RE_ATTR_IDX, NULL, 0));
-			}
+		for (int i = 1; i < nCars + 1; i++) {
+			snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS, i);
+			ReStartingOrderIdx[i-1] = 
+				ReFindDriverIdx (GfParmGetStr(params, path, RE_ATTR_MODULE, ""),
+					(int)GfParmGetNum(params, path, RE_ATTR_IDX, NULL, 0));
 		}
 	}
 	
-	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1.0);
-
 	return RM_SYNC | RM_NEXT_STEP;
 }
 
@@ -596,80 +501,23 @@ ReRaceRealStart(void)
 	int i, j;
 	tRobotItf *robot;
 	tReCarInfo *carInfo;
-	char buf[128];
-	int foundHuman;
-	void *params = ReInfo->params;
+	//char buf[128];
+	//int foundHuman;
+	//void *params = ReInfo->params;
 	tSituation *s = ReInfo->s;
 	tMemoryPool oldPool = NULL;
-	void* carHdle;
+	//void* carHdle;
 
 	// Load the physics engine
 	if (!GenParOptV1::self().loadPhysicsEngine())
 		return RM_ERROR;
 
-	// Get the session display mode (default to "All sessions" ones, or else "normal").
-	std::string strDispMode =
-		GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, "");
-	if (strDispMode.empty())
-		strDispMode =
-			GfParmGetStr(params, RM_VAL_ANYRACE, RM_ATTR_DISPMODE, RM_VAL_VISIBLE);
+	// Set the session display mode
+	ReInfo->_displayMode = RM_DISP_MODE_NONE;
 
-	if (strDispMode == RM_VAL_INVISIBLE)
-		ReInfo->_displayMode = RM_DISP_MODE_NONE;
-	else if (strDispMode == RM_VAL_VISIBLE)
-		ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
-	else if (strDispMode == RM_VAL_SIMUSIMU)
-		ReInfo->_displayMode = RM_DISP_MODE_SIMU_SIMU;
-	else
-	{
-		GfLogError("Unsupported display mode '%s' loaded from race file ; "
-				   "assuming 'normal'\n", strDispMode.c_str());
-		ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
-	}
-
-	//GfLogDebug("ReRaceRealStart: Loaded dispMode=0x%x\n", ReInfo->_displayMode);
-	
-	// Check if there is a human in the driver list
-	foundHuman = ReHumanInGroup() ? 2 : 0;
-
-	// Reset SimuSimu bit if any human in the race.
-	// Note: Done here in order to make SimuSimu faster. 
-	if ((ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU) && foundHuman)
-	{
-		ReInfo->_displayMode &= ~RM_DISP_MODE_SIMU_SIMU;
-	}
-	
 	// Initialize & place cars
-	// Note: if SimuSimu display mode, robot->rbNewTrack isn't called. This is a lot faster.
 	if (ReInitCars())
 		return RM_ERROR;
-
-	// Check if there is a human in the current race
-	// Warning: Don't move this before ReInitCars (initializes s->cars).
-	for (i = 0; i < s->_ncars; i++) {
-		if (s->cars[i]->_driverType == RM_DRV_HUMAN) {
-			foundHuman = 1;
-			break;
-		}//if human
-	}//for i
-
-	// Force "normal" display mode if any human in the session
-	if (foundHuman == 1)
-	{
-		ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
-	}
-	// Force "result only" mode in Practice / Qualif. sessions without any human,
-	// but at least 1 in another session (why this ?), and SimuSimu bit on.
-	else if (foundHuman == 2 && (ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU)
-		     && (ReInfo->s->_raceType == RM_TYPE_QUALIF
-				 || ReInfo->s->_raceType == RM_TYPE_PRACTICE))
-	{
-		ReInfo->_displayMode = RM_DISP_MODE_NONE;
-	}
-
-	GfLogInfo("Display mode : %s\n",
-			  (ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU) ? "SimuSimu" :
-			  ((ReInfo->_displayMode & RM_DISP_MODE_NORMAL) ? "Normal" : "Results-only"));
 
 	// Notify the UI that it's "race loading time".
 	ReUI().onRaceLoadingDrivers();
@@ -677,22 +525,11 @@ ReRaceRealStart(void)
 	// Load drivers for the race
 	for (i = 0; i < s->_ncars; i++)
 	{
-		snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml",
-				 s->cars[i]->_carName, s->cars[i]->_carName);
-		carHdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
-		snprintf(buf, sizeof(buf), "Loading %s driver (%s) ...",
-				 s->cars[i]->_name, GfParmGetName(carHdle));
-		
-		ReUI().addLoadingMessage(buf);
-
-		if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU))
-		{
-			//Tell robots they are to start a new race
-			robot = s->cars[i]->robot;
-			GfPoolMove( &s->cars[i]->_newRaceMemPool, &oldPool );
-			robot->rbNewRace(robot->index, s->cars[i], s);
-			GfPoolFreePool( &oldPool );
-		}//if ! simusimu
+		//Tell robots they are to start a new race
+		robot = s->cars[i]->robot;
+		GfPoolMove( &s->cars[i]->_newRaceMemPool, &oldPool );
+		robot->rbNewRace(robot->index, s->cars[i], s);
+		GfPoolFreePool( &oldPool );
 	}//for i
 	
 	RtTeamManagerStart();
@@ -709,7 +546,7 @@ ReRaceRealStart(void)
 	}
 
 	// All cars start with max brakes on
-	ReUI().addLoadingMessage("Running Prestart ...");
+	//ReUI().addLoadingMessage("Running Prestart ...");
 	
 	for (i = 0; i < s->_ncars; i++)
 	{
@@ -719,9 +556,6 @@ ReRaceRealStart(void)
 
 	for (j = 0; j < (int)(1.0 / RCM_MAX_DT_SIMU); j++)
 		RePhysicsEngine().updateSituation(s, RCM_MAX_DT_SIMU);
-
-	// Initialize current result manager.
-	ReInitCurRes();
 
 	// More initializations.
 	ReInfo->_reTimeMult = 1.0;
@@ -739,10 +573,10 @@ ReRaceRealStart(void)
 	ReInitUpdaters();
 
 	// Notify the UI that the race simulation is ready now.
-	ReUI().onRaceSimulationReady();
+	//ReUI().onRaceSimulationReady();
 
 	// Notify the UI that the race is now started.
-	ReUI().addLoadingMessage("Ready.");
+	//ReUI().addLoadingMessage("Ready.");
 
 	ReUI().onRaceStarted();
 
@@ -820,7 +654,7 @@ ReRaceStart(void)
 	else
 	{
 		// For a race, add cars to the starting grid in the order stored in ReStartingOrderIdx.
-		ReUI().addLoadingMessage("Preparing Starting Grid ...");
+		//ReUI().addLoadingMessage("Preparing Starting Grid ...");
 		
 		int maxCars = (int)GfParmGetNum(params, sessionName, RM_ATTR_MAX_DRV, NULL, 100);
 		nCars = MIN(nCars, maxCars);
@@ -910,7 +744,10 @@ ReRaceEnd(void)
 	else
 		Data->BestLapTime = 99*60;
 
-	Data->WeightedBestLapTime = Data->BestLapTime + Data->WeightOfDamages * Data->DamagesTotal * 0.007f;
+	if (Data->WeightedBestLapTime == FLT_MAX)
+		Data->WeightedBestLapTime = Data->BestLapTime + Data->WeightOfDamages * Data->DamagesTotal * 0.007f;
+	else
+		Data->WeightedBestLapTime += Data->BestLapTime + Data->WeightOfDamages * Data->DamagesTotal * 0.007f;
 	// ... pick up optimization results
 
 	ReShutdownUpdaters();
@@ -941,10 +778,8 @@ ReRaceEnd(void)
 		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, (tdble)curDrvIdx);
 	}
 
-	// Calculate class points if we just finished a session.
 	if (bEndOfSession)
 	{
-		ReCalculateClassPoints (ReInfo->_reRaceName);
 	}
 	
 	// Determine the new race state automation mode.
@@ -959,6 +794,7 @@ ReRaceEnd(void)
 int
 RePostRace(void)
 {
+/*	
 	int curRaceIdx;
 	void *results = ReInfo->results;
 	void *params = ReInfo->params;
@@ -973,17 +809,17 @@ RePostRace(void)
 		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, (tdble)curRaceIdx);
 		
 		// Update standings in the results file.
-		ReUpdateStandings();
+		//ReUpdateStandings();
 		
 		return RM_SYNC | RM_NEXT_RACE;
 	}
 
 	// No more session in the event : update standings in the results file.
-	ReUpdateStandings();
+	//ReUpdateStandings();
 
 	// Next event if any will start with its first session.
 	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
-	
+*/	
 	return RM_SYNC | RM_NEXT_STEP;
 }
 
@@ -997,7 +833,7 @@ ReRaceEventShutdown(void)
 	int curTrkIdx;
 	void *params = ReInfo->params;
 	int nbTrk;
-	void *results = ReInfo->results;
+//	void *results = ReInfo->results;
 	int curRaceIdx;
 
 	// Notify the UI that the race event is finishing now.
@@ -1008,8 +844,10 @@ ReRaceEventShutdown(void)
 
 	// Determine the track of the next event to come, if not the last one
 	nbTrk = GfParmGetEltNb(params, RM_SECT_TRACKS);
-	curRaceIdx =(int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
-	curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
+//	curRaceIdx =(int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
+	curRaceIdx = 1;
+//	curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
+	curTrkIdx = (int) GfParmGetNum(params, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
 
 	if (curRaceIdx == 1) {
 		if (curTrkIdx < nbTrk) {
@@ -1021,12 +859,11 @@ ReRaceEventShutdown(void)
 		}
 	}
 
-	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, (tdble)curTrkIdx);
+//	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, (tdble)curTrkIdx);
+	GfParmSetNum(params, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, (tdble)curTrkIdx);
 
 	// Determine new race state automaton mode.
 	int mode = (curTrkIdx != 1) ? RM_NEXT_RACE : RM_NEXT_STEP;
-
-	//mode |= ReUI().onRaceEventFinished(nbTrk != 1, careerNonHumanGroup) ? RM_SYNC : RM_ASYNC;;
 
 	mode |= RM_SYNC;
 	
@@ -1049,16 +886,33 @@ int GetWeather(tTrack* Track)
 //
 const char* SetupGlobalFileName(char* buf, int size, tgenData* Data, const char* Ext)
 {
-	if (Data->WeatherCode == 0)
+	if (SingleTrackOptimization)
 	{
-		snprintf(buf,size,"%sdrivers/%s/%s/%s%s",
-			GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName,Ext);
+		if (Data->WeatherCode == 0)
+		{
+			snprintf(buf,size,"%sdrivers/%s/%s/%s%s",
+				GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName,Ext);
+		}
+		else
+		{
+			snprintf(buf,size,"%sdrivers/%s/%s/%s-%d%s",
+				GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName,Data->WeatherCode,Ext);
+		}
 	}
 	else
 	{
-		snprintf(buf,size,"%sdrivers/%s/%s/%s-%d%s",
-			GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName,Data->WeatherCode,Ext);
+		if (Data->WeatherCode == 0)
+		{	
+			snprintf(buf,size,"%sdrivers/%s/%s/default%s",
+				GetLocalDir(),Data->RobotName,Data->CarType,Ext);
+		}
+		else
+		{
+			snprintf(buf,size,"%sdrivers/%s/%s/%default-%d%s",
+				GetLocalDir(),Data->RobotName,Data->CarType,Data->WeatherCode,Ext);
+		}
 	}
+
 	return buf;
 }
 
@@ -1070,6 +924,13 @@ ReInitialiseGeneticOptimisation()
 {
 	if (!genOptNeedInit)
 		return;
+
+	// Use new Memory Manager ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+//	fprintf(stderr,"ReInitialiseGeneticOptimisation() ...\n");
+//	GfMemoryManagerSetGroup(++OptiBlockGroup);
+	#endif
+	// ... Use new Memory Manager
 
 	genOptNeedInit = false;
 
@@ -1110,32 +971,42 @@ ReInitialiseGeneticOptimisation()
 	// Assume, we can read initial values
 	Data->GetInitialVal = true;
 
-	// Try to open XML file ...
-	Data->Handle = GfParmReadFile(Data->XmlFileName, GFPARM_RMODE_REREAD);
-	Data->GetInitialVal = true;
-
-	// ... in case the car setup file does not exist ...
-	if (!Data->Handle)
+	if (SingleTrackOptimization)
 	{
-		// ... use default setup file ...
+		// Try to open XML file ...
+		Data->Handle = GfParmReadFile(Data->XmlFileName, GFPARM_RMODE_REREAD);
+		Data->GetInitialVal = true;
+
+		// ... in case the car setup file does not exist ...
+		if (!Data->Handle)
+		{
+			// ... use default setup file ...
+			snprintf(buf,FILENAME_MAX,"%sdrivers/%s/%s/default.xml",
+				GetLocalDir(),Data->RobotName,Data->CarType);
+			void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+
+			if (Handle) // ... if existing ...
+			{			// ... use it to create a track specific setup file.
+				GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
+			}
+			else		// ... else create an empty setup file.
+			{			
+				void* Handle = GfParmReadFile(Data->XmlFileName, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+				GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
+				Data->GetInitialVal = false; // No initial setup, we cannot read it
+			}
+			GfParmReleaseHandle(Handle);
+
+			// Open created car type track setup file
+			Data->Handle = GfParmReadFile(Data->XmlFileName, GFPARM_RMODE_REREAD);
+		}
+	}
+	else
+	{
 		snprintf(buf,FILENAME_MAX,"%sdrivers/%s/%s/default.xml",
 			GetLocalDir(),Data->RobotName,Data->CarType);
 		void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-
-		if (Handle) // ... if existing ...
-		{			// ... use it to create a track specific setup file.
-			GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
-		}
-		else		// ... else create an empty setup file.
-		{			
-			void* Handle = GfParmReadFile(Data->XmlFileName, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-			GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
-			Data->GetInitialVal = false; // No initial setup, we cannot read it
-		}
-		GfParmReleaseHandle(Handle);
-
-		// Open created car type track setup file
-		Data->Handle = GfParmReadFile(Data->XmlFileName, GFPARM_RMODE_REREAD);
+		Data->Handle = Handle;
 	}
 
 	ReImportGeneticParameters();
@@ -1151,6 +1022,13 @@ ReImportGeneticParameters()
 {
 	ReLogOptim.info("\n\n");
 	ReLogOptim.info("Import Genetic Parameters ...\n\n");
+	ReUI().addLoadingMessage("Import Genetic Parameters ...");
+
+	// Use new Memory Manager ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+//	GfMemoryManagerSetGroup(++OptiBlockGroup);
+	#endif
+	// ... Use new Memory Manager
 
 	// Setup pointer to structure
 	tgenData *Data = &TGeneticParameter::Data;
@@ -1166,23 +1044,34 @@ ReImportGeneticParameters()
 	// 0: Race; 1: Qualifying
     //Data->Type = (int) GfParmGetNum(Data->Handle, 
 	//	"simplix private", "qualification", 0, 0);
+	
+	if (SingleTrackOptimization)
+	{
+		// Build path to meta data file
+		snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-%s.xml",
+			GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName);
 
-	// Build path to meta data file
-    snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-%s.xml",
-		GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName);
+		// Read meta data file
+		void* MetaDataFile = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+		if (!MetaDataFile)
+		{
+			// Build path to meta data file
+			snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-template.xml",
+			GetLocalDir(),Data->RobotName,Data->CarType);
+		}
+	}
+	else
+	{
+		// Build path to meta data file
+		snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-template.xml",
+			GetLocalDir(),Data->RobotName,Data->CarType);
+	}
 
 	// Read meta data file
 	void* MetaDataFile = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
 	if (!MetaDataFile)
 	{
-		// Build path to meta data file
-		snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-template.xml",
-		GetLocalDir(),Data->RobotName,Data->CarType);
-
-		// Read meta data file
-		MetaDataFile = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-		if (!MetaDataFile)
-			assert( 0 );
+		assert( 0 );
 	}
 
 	// Read table of content of meta data file
@@ -1362,10 +1251,64 @@ ReImportGeneticParameters()
 	GfParmReleaseHandle(MetaDataFile);
 
 	ReLogOptim.info("Write parameters to initial xml file\n");
+	ReUI().addLoadingMessage("Write parameters to initial xml file");
 	GfParmWriteFileSDHeader (Data->XmlFileName, Data->Handle, Data->CarType, Data->AuthorName);
 
-	ReLogOptim.info("\n");
-	ReLogOptim.info("... Import Genetic Parameters\n\n");
+	// Use new Memory Manager ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+//	fprintf(stderr,"... ReImportGeneticParameters()\n");
+//	GfMemoryManagerSetGroup(++OptiBlockGroup);
+	#endif
+	// ... Use new Memory Manager
+
+//	ReLogOptim.info("\n");
+//	ReLogOptim.info("... Import Genetic Parameters\n\n");
+}
+
+//
+// Clean up
+//
+bool
+ReCleanupReInfo()
+{
+  if (ReInfo)
+  {
+//	char path[128];
+//	const char *raceName = ReInfo->_reRaceName; // = ReGetCurrentRaceName();
+    void *params = ReInfo->params;
+//    void *results = ReInfo->results;
+    int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
+
+	// We have to release the data here!
+    for (int I = 0; I < nCars; I++)
+	{
+        tCarElt* car = &(ReInfo->carList[I]);
+		if (car)
+		{
+			if (car->priv.paramsHandle)
+			{
+				//GfParmReleaseHandle(car->priv.paramsHandle);
+				car->priv.paramsHandle = 0;
+			}
+			if (car->priv.carHandle)
+			{
+				GfParmReleaseHandle(car->priv.carHandle);
+				car->priv.carHandle = 0;
+			}
+		}
+		else
+			break;
+	}
+
+//	GfParmRemoveVariable (params, "/", "humanInGroup");
+//	GfParmRemoveVariable (params, "/", "eventNb");
+//	snprintf(path, sizeof(path), "%s/%s/%s", ReInfo->track->name, RE_SECT_RESULTS, raceName);
+//	GfParmListClean(results, path);
+	GfParmListClean(params, RM_SECT_DRIVERS_RACING);
+	free((void*) (ReInfo->_reRaceName));
+  }
+
+  return false;
 }
 
 //
@@ -1438,6 +1381,14 @@ ReCleanupGeneticOptimisation()
 	GfParmReleaseHandle(Handle);
 
 	ReLogOptim.info("============================\n");
+
+	// Use new Memory Manager ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+//	fprintf(stderr,"... ReCleanupGeneticOptimisation()\n");
+	GfMemoryManagerSetGroup(0);
+	#endif
+	// ... Use new Memory Manager
+
 
 	return false;
 }
@@ -1617,6 +1568,13 @@ ReEvolution()
 {
 	ReLogOptim.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
+	// Use new Memory Manager ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+//	fprintf(stderr,"... ReEvolution() ...\n");
+//	GfMemoryManagerSetGroup(++OptiBlockGroup);
+	#endif
+	// ... Use new Memory Manager
+
 	/* DEBUG, ONLY FOR WINDOWS
 	// Check memory consumption
 	MEMORYSTATUSEX statex;
@@ -1769,6 +1727,9 @@ ReEvolution()
 
 	// Reset run once flag
 	Data->First = false;
+
+	// Initialize again
+	Data->WeightedBestLapTime = FLT_MAX;
 
 	// Check number of loops still to do
 	if (Data->Loops--)

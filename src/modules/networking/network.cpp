@@ -633,6 +633,7 @@ void NetNetwork::ReadLapStatusPacket(ENetPacket *pPacket)
             msg.length());
 
     LapStatus lstatus;
+	lstatus.startRank = 0; // Avoid compiler warnings
 
     try
     {

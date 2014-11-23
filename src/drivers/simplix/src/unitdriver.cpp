@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2014.11.09
+// Last changed : 2014.11.23
 // Copyright    : © 2007-2014 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.02.000
+// Version      : 4.03.000
 //--------------------------------------------------------------------------*
 //
 //    Copyright: (C) 2000 by Eric Espie
@@ -416,6 +416,11 @@ TDriver::TDriver(int Index):
   oPIDCBrake.oMaxTotal = 0.0;
   oPIDCBrake.oMinTotal = 0.0;
   
+  // StartRPM: Control engine revs while prestart
+  oPIDCStart.oP = 12.00;                         // Proportional factor
+  oPIDCStart.oI = 1.0;                           // Integrative factor
+  oPIDCStart.oD = 2.0;                           // Differential factor
+
   for (I = 0; I <= NBR_BRAKECOEFF; I++)          // Initialize braking
     oBrakeCoeff[I] = 0.5;
 
@@ -555,8 +560,6 @@ void TDriver::AdjustDriving(
 
   oJumpOffset =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_JUMP_OFFSET,NULL,(float) oJumpOffset);
-  oGeneticOpti =
-    GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_OPTI,NULL,oGeneticOpti) > 0;
 
   oWingControl = TDriver::UseWingControl;
 
@@ -765,40 +768,40 @@ void TDriver::AdjustDriving(
   if (strcmp(enabling, VAL_YES) == 0) 
   {
     oCarHasTYC = true;
-    LogSimplix.warning("#Car has TYC yes\n");
+    LogSimplix.info("#Car has TYC yes\n");
   }
   else
-    LogSimplix.warning("#Car has TYC no\n");
+    LogSimplix.info("#Car has TYC no\n");
 
   oCarHasABS = false;
   enabling = GfParmGetStr(Handle, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
   if (strcmp(enabling, VAL_YES) == 0) 
   {
     oCarHasABS = true;
-    LogSimplix.warning("#Car has ABS yes\n");
+    LogSimplix.info("#Car has ABS yes\n");
   }
   else
-    LogSimplix.warning("#Car has ABS no\n");
+    LogSimplix.info("#Car has ABS no\n");
 
   oCarHasESP = false;
   enabling = GfParmGetStr(Handle, SECT_FEATURES, PRM_ESPINSIMU, VAL_NO);
   if (strcmp(enabling, VAL_YES) == 0) 
   {
     oCarHasESP = true;
-    LogSimplix.warning("#Car has ESP yes\n");
+    LogSimplix.info("#Car has ESP yes\n");
   }
   else
-    LogSimplix.warning("#Car has ESP no\n");
+    LogSimplix.info("#Car has ESP no\n");
 
   oCarHasTCL = false;
   enabling = GfParmGetStr(Handle, SECT_FEATURES, PRM_TCLINSIMU, VAL_NO);
   if (strcmp(enabling, VAL_YES) == 0) 
   {
     oCarHasABS = true;
-    LogSimplix.warning("#Car has TCL yes\n");
+    LogSimplix.info("#Car has TCL yes\n");
   }
   else
-    LogSimplix.warning("#Car has TCL no\n");
+    LogSimplix.info("#Car has TCL no\n");
 
   // For test of simu options override switches here
   /*
@@ -1026,6 +1029,8 @@ void TDriver::GetSkillingParameters
   		GfParmGetNum(SkillHandle,"team","enable",0,(float) oTeamEnabled) != 0;
 	  LogSimplix.debug("#oTeamEnabled %d\n",oTeamEnabled);
 	}
+
+	GfParmReleaseHandle(SkillHandle);
   }
 
   if (SkillEnabled > 0)                          // If skilling is enabled
@@ -1077,6 +1082,8 @@ void TDriver::GetSkillingParameters
 	    GfParmGetNum(SkillHandle, "skill", "aggression", (char *)NULL, 0.0);
       LogSimplix.debug("#oDriverAggression: %g\n", oDriverAggression);
     }
+
+	GfParmReleaseHandle(SkillHandle);
   }
   else
   {
@@ -1161,8 +1168,6 @@ void TDriver::InitTrack
   const char* PathFilename = PathFilenameBuffer;
 
   oWeatherCode = GetWeather();
-
-  GetSkillingParameters(BaseParamPath,PathFilename);
 
   // Get the name of the track
   strncpy(TrackNameBuffer,                       // Copy name of track file
@@ -1250,7 +1255,7 @@ void TDriver::InitTrack
   // Override params for car type with params of track
   snprintf(Buf,sizeof(Buf),"%s/%s/%s.xml",
     BaseParamPath,oCarType,oTrackName);
-  LogSimplix.warning("#Override params for car type with params of track: %s\n", Buf);
+  LogSimplix.info("#Override params for car type with params of track: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for car type with params of track and weather
@@ -1278,6 +1283,11 @@ void TDriver::InitTrack
 
   // Setup the car param handle to be returned
   *CarSettings = Handle;
+
+  oGeneticOpti =
+    GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_OPTI,NULL,oGeneticOpti) > 0;
+
+  GetSkillingParameters(BaseParamPath,PathFilename);
   
   char tempbuf [1024];
   sprintf(tempbuf,"%s/DEBUG1.xml",GetLocalDir());
@@ -1502,10 +1512,21 @@ void TDriver::Drive()
   bool Close = false;                            // Assume free way to race
   oLetPass = false;                              // Assume no Lappers
 
-  oAccel = 1.0;                                  // Assume full throttle
+  if (oSituation->_raceState & RM_RACE_PRESTART)
+  {	// Prestart, save fuel, get max torque
+    oAccel = MAX(0.0,MIN(1.0,oPIDCStart.Sample((oStartRPM*1.1 - CarRpm)/CarRpmLimit)));
+  }
+  else
+  {
+	oAccel = 1.0;                                  // Assume full throttle
+  }
+
   oBrake = 0.0;                                  // Assume no braking
 
   //double StartTimeStamp = RtTimeStamp(); 
+
+  //if ((oCurrSpeed < 100/3.6) && (CurrSimTime < 5))
+  //  fprintf(stderr,"0 - %.1f km/h : %.2f sec\n",oCurrSpeed*3.6,CurrSimTime);
 
   DetectFlight();
   double Pos = oTrackDesc.CalcPos(oCar);         // Get current pos on track
@@ -2763,9 +2784,9 @@ void TDriver::InitAdaptiveShiftLevels()
   oRevsLimiter = GfParmGetNum(oCarHandle, SECT_ENGINE,
 	  PRM_REVSLIM, (char*)NULL, 800);
 
-  Edesc = (struct tEdesc*) malloc((IMax + 1) * sizeof(struct tEdesc));
-
   int I;
+
+  Edesc = (struct tEdesc*) malloc((IMax + 1) * sizeof(struct tEdesc));
 
   oShiftMargin = 0.9;                            //
   for (I = 0; I < MAX_GEARS; I++)
@@ -2829,7 +2850,6 @@ void TDriver::InitAdaptiveShiftLevels()
   LogSimplix.debug("#RevsLimiter: %g(%g)\n",oRevsLimiter*RpmFactor,oRevsLimiter);
   LogSimplix.debug("#RevsMax: %g(%g)\n\n\n",RevsMax*RpmFactor,RevsMax);
   
-
   for (I = 0; I < CarGearNbr - 1; I++)
   {
 	sprintf(idx, "%s/%s/%d", SECT_GEARBOX, ARR_GEARS, I+1);
@@ -2843,15 +2863,6 @@ void TDriver::InitAdaptiveShiftLevels()
       oShift[J] = oRevsLimiter * 0.90; //0.87;
 	else
       oShift[J] = oRevsLimiter * 0.974;
-
-  if (oShiftUp < 1.0) 
-  {
-	for (J = 0; J < CarGearNbr; J++)
-      oShift[J] = oRevsLimiter * oShiftUp;
-
-    LogSimplix.debug("\n#<<< InitAdaptiveShiftLevels\n");
-	return;
-  }
 
   for (J = 1; J < oLastGear; J++)
   {
@@ -2909,6 +2920,12 @@ void TDriver::InitAdaptiveShiftLevels()
 
   free(DataPoints);
   free(Edesc);
+
+  if (oShiftUp < 1.0) 
+  {
+	for (I = 0; I < CarGearNbr; I++)
+      oShift[I] = oRevsLimiter * oShiftUp;
+  }
 
   oRevsLimiter = (float) (oRevsLimiter * RpmFactor);
   oMaxTorque = (float) (maxTq);

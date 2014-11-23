@@ -60,7 +60,7 @@ ReTrackInit(void)
 	const char  *catName;
 
 	const int curTrkIdx =
-		(int)GfParmGetNum(ReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
+		(int)GfParmGetNum(ReInfo->params, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
 	snprintf(buf, sizeof(buf), "%s/%d", RM_SECT_TRACKS, curTrkIdx);
 	trackName = GfParmGetStr(ReInfo->params, buf, RM_ATTR_NAME, 0);
 	if (!trackName)

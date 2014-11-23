@@ -19,6 +19,10 @@
 #include "memmanager.h"
 #ifdef __DEBUG_MEMORYMANAGER__
 
+#include <portability.h>
+
+#include "tgf.h"
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // Configuration ...
 //----------------------------------------------------------------------------*
@@ -207,6 +211,112 @@ ExternC char * _tgf_win_strdup(const char* str)
 //----------------------------------------------------------------------------*
 
 //============================================================================*
+// Load configuration from configuration file
+//----------------------------------------------------------------------------*
+void GfMemoryManagerLoadFromFile(tMemoryManager* MM)
+{
+    char buf[255+1]; // MAX_XML_SECTION_NAME
+
+	char* XmlFileName = "E:\\Root\\SD\\SD_V2.2\\data\\memmanager.xml";
+
+	void* Handle = GfParmReadFile(XmlFileName, GFPARM_RMODE_REREAD, true, false);
+	if (Handle != NULL)
+	{
+
+		// Write header data
+		tdble version =
+			GfParmGetNum(Handle, "CONFIGURATION", "version", NULL, (tdble) MM_VERSION);
+		int maxBlockSize = (int)
+			GfParmGetNum(Handle, "CONFIGURATION", "max block size", NULL, (tdble) MAXBLOCKSIZE);
+		MM->AddedSpace = (int)
+			GfParmGetNum(Handle, "CONFIGURATION", "additional space", NULL, (tdble) MM->AddedSpace);
+		int sizeOfMemoryManager = (int)
+			GfParmGetNum(Handle, "CONFIGURATION", "size", NULL, (tdble) MM->Size);
+
+		if (maxBlockSize > MAXBLOCKSIZE)
+			maxBlockSize = MAXBLOCKSIZE;
+
+		// Read block data
+		for (int I = 0; I < maxBlockSize; I++)
+		{
+			tMMBlockStack* Stack = &(MM->StackBuffer.Stack[I]);
+
+			// Prepare the section depending on the part number
+			snprintf(buf,sizeof(buf),"BLOCK/%d",I);
+
+			Stack->Size = (int)
+				GfParmGetNum(Handle, buf, "block size", NULL, (tdble) Stack->Size);
+			MM->Capacity[I+1] = (int) 
+				(GfParmGetNum(Handle, buf, "capacity", NULL, 0));
+		}
+
+		// Release handle
+		GfParmReleaseHandle(Handle);
+	}
+}
+//============================================================================*
+
+//============================================================================*
+// Save needed number of blocks per block size into configuration file
+//----------------------------------------------------------------------------*
+void GfMemoryManagerSaveToFile(void)
+{
+    char buf[255+1]; // MAX_XML_SECTION_NAME
+
+	char* XmlFileName = ".\\memmanager.xml";
+	char* FileType = "Memory Manager Configuration File";
+	char* AuthorName = "Wolf-Dieter Beelitz";
+
+	void* Handle = GfParmReadFile(XmlFileName, GFPARM_RMODE_REREAD, true, false);
+	if (Handle == NULL)
+	{
+		// Create an empty file
+		Handle = GfParmReadFile(XmlFileName, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT, false, false);
+		// Write header to xml file
+		GfParmWriteFileSDHeader (XmlFileName, Handle, FileType, AuthorName, false);	
+		// Release handle
+		GfParmReleaseHandle(Handle);
+		// Open created car type track setup file
+		Handle = GfParmReadFile(XmlFileName, GFPARM_RMODE_REREAD, true, false);
+	}
+
+	// Write header data
+	GfParmSetNum(Handle, "CONFIGURATION", "version", NULL, MM_VERSION);
+	GfParmSetNum(Handle, "CONFIGURATION", "max block size", NULL, MAXBLOCKSIZE);
+	GfParmSetNum(Handle, "CONFIGURATION", "additional space", NULL, (tdble) GfMM->AddedSpace);
+	GfParmSetNum(Handle, "CONFIGURATION", "size", NULL, (tdble) GfMM->Size);
+
+	fprintf(stderr,"Capacity changes:\n");
+
+	// Write block data
+	for (int I = 0; I < MAXBLOCKSIZE; I++)
+	{
+		tMMBlockStack* Stack = &(GfMM->StackBuffer.Stack[I]);
+
+		// Prepare the section depending on the part number
+		snprintf(buf,sizeof(buf),"BLOCK/%d",I);
+
+		unsigned int Capacity = (int) MAX(GfMM->HistMax[I+1],GfMM->Capacity[I+1]);
+
+		// Write data
+		GfParmSetNum(Handle, buf, "block size", NULL, (tdble) Stack->Size, 0, MAXBLOCKSIZE);
+		GfParmSetNum(Handle, buf, "capacity", NULL, (tdble) Capacity, 0, 1024*64);
+		GfParmSetNum(Handle, buf, "planned", NULL, (tdble) GfMM->Capacity[I+1], 0, 1024*64);
+
+		if (Capacity != GfMM->Capacity[I+1])
+			fprintf(stderr,"block size %d capacity +%d\n",Stack->Size,Capacity - GfMM->Capacity[I+1]);
+	}
+
+	// Save data and header to xml file
+	GfParmWriteFileSDHeader (XmlFileName, Handle, FileType, AuthorName, false);	
+
+	// Release handle
+	GfParmReleaseHandle(Handle);
+
+}
+//============================================================================*
+
+//============================================================================*
 // Create the one and only global memory manager (allocate memory for data)
 //----------------------------------------------------------------------------*
 tMemoryManager* GfMemoryManager(void)
@@ -225,8 +335,11 @@ tMemoryManager* GfMemoryManager(void)
 	MemoryManager->MaxRequested = 0;
 
 	MemoryManager->BigB = 0;
-	for (int I = 0; I < MAXBLOCKSIZE; I++)
+	for (int I = 0; I <= MAXBLOCKSIZE; I++)
+	{
 		MemoryManager->Hist[I] = 0;
+		MemoryManager->HistMax[I] = 0;
+	}
 
 	MemoryManager->State = GF_MM_STATE_NULL;     
 	MemoryManager->AddedSpace = 0;
@@ -244,7 +357,70 @@ tMemoryManager* GfMemoryManager(void)
 	MemoryManager->RootOfList.Next = NULL;
 	MemoryManager->RootOfList.Size = sizeof(tMemoryManager);	
 
+	for (int I = 0; I < MAXBLOCKSIZE; I++)
+	{
+		MemoryManager->Capacity[I] = 0;
+	}
+
+	GfMemoryManagerLoadFromFile(MemoryManager);
+
+	for (int I = 0; I < MAXBLOCKSIZE; I++)
+	{
+		tMMBlockStack* Stack = &(MemoryManager->StackBuffer.Stack[I]);
+		Stack->Size = I + 1;
+		Stack->Count = MemoryManager->Capacity[I];
+		Stack->Index = 0;
+		Stack->Block = (tDSMMLinkBlock**) malloc (Stack->Count * sizeof(tDSMMLinkBlock*));
+		for (int J = 0; J < Stack->Count; J++)
+			Stack->Block[J] = NULL;
+	}
+
 	return MemoryManager;
+}
+//============================================================================*
+
+//============================================================================*
+// Add block to stack
+//----------------------------------------------------------------------------*
+void GfMemoryManagerBlockFree (size_t size, tDSMMLinkBlock* c)
+{
+	if ((size > 0) && (size <= MAXBLOCKSIZE))
+	{
+		tMMBlockStack* Stack = &(GfMM->StackBuffer.Stack[size-1]);
+		if (c->Size != Stack->Size)
+			assert(0);
+		if (Stack->Index < Stack->Count - 1)
+		{
+			Stack->Block[(Stack->Index)] = c;
+			++Stack->Index;
+			return;
+		}
+	}
+
+	GlobalFree(c);
+}
+//============================================================================*
+
+//============================================================================*
+// Get block from stack
+//----------------------------------------------------------------------------*
+tDSMMLinkBlock* GfMemoryManagerBlockAllocate (size_t size, size_t bsize)
+{
+	if ((size > 0) && (size <= MAXBLOCKSIZE))
+	{
+		tMMBlockStack* Stack = &(GfMM->StackBuffer.Stack[size-1]);
+		if (Stack->Index > 0)
+		{
+			Stack->Index--;
+			tDSMMLinkBlock* c =	Stack->Block[(Stack->Index)];
+			if (c->Size != size)
+				assert(0);
+			return c;
+		}
+	}
+
+	tDSMMLinkBlock* c = (tDSMMLinkBlock*) GlobalAlloc(GMEM_FIXED, bsize);
+	return c; 
 }
 //============================================================================*
 
@@ -263,7 +439,9 @@ void* GfMemoryManagerAlloc (size_t size, uint8 type, void* retAddr)
 			+ GfMM->AddedSpace;		// Security margin for debugging
 
 		// Allocate memory block
-		tDSMMLinkBlock* c = (tDSMMLinkBlock*) GlobalAlloc(GMEM_FIXED, bsize); 
+		//tDSMMLinkBlock* c = (tDSMMLinkBlock*) GlobalAlloc(GMEM_FIXED, bsize); 
+		tDSMMLinkBlock* c = GfMemoryManagerBlockAllocate(size, bsize);
+
 
 		// Check pointer to the block
 		if (c == NULL)				
@@ -295,10 +473,16 @@ void* GfMemoryManagerAlloc (size_t size, uint8 type, void* retAddr)
 		c->Type = type;
 		c->Size = size;
 		c->RAdr = retAddr;
+		c->Grup = GfMM->Group; // Set "color" of block
 		int ID = c->BLID = GfMM_Counter++;
-
+/*
+		// Dump the "colored" blocks
+		if (c->Grup > 0)
+			fprintf(stderr,"+ Color: %d ID: %d Size: %d Allocated at %p\n",
+			  c->Grup,c->BLID,c->Size,c->RAdr);
+*/
 		// Update statistics
-		GfMemoryManagerHist(size);
+		GfMemoryManagerHistAllocate(size);
 
 		// Get address to the marker at the end
 		char* e = (char*) c;
@@ -308,7 +492,7 @@ void* GfMemoryManagerAlloc (size_t size, uint8 type, void* retAddr)
 		void* b = (void*) (c + 1);  //c is still pointing to the data
 
 		// Hunting memory leaks ...
-#define	IDTOSTOP 6506	// ID of block you are looking for
+#define	IDTOSTOP 367876 // ID of block you are looking for
 
 		if (ID == IDTOSTOP)
 		{
@@ -353,19 +537,19 @@ void GfMemoryManagerFree (void* b, uint8 type)
 		char* e = (char*) c;
 		int* m = (int*) (e + bsize - sizeof(int));
 
+		// Hunting corrupted blocks ...
+		if (c->BLID == IDTOSTOP)
+		{
+			c->BLID = 0; // set breakpoint here 
+		}
+		// ... Hunting corrupted blocks
+
 		// Check block
 		if ((c->Mark != MM_MARKER_BEGIN) || (*m != MM_MARKER_END))
 		{
 			// Block is corrupted
 			fprintf(stderr,
 				"Called for corrupted block; %d; at; %p;\n",c->BLID,c);
-
-			// Hunting corrupted blocks ...
-			if (c->BLID == IDTOSTOP)
-			{
-				c->BLID = 0; // set breakpoint here 
-			}
-			// ... Hunting corrupted blocks
 		}
 		// Check call type (new/delete or malloc/free)
 		else if (c->Type != type) 
@@ -379,19 +563,28 @@ void GfMemoryManagerFree (void* b, uint8 type)
 			GfMM->Allocated -= bsize;
 			GfMM->Requested -= c->Size;
 
+			// Update statistics
+			GfMemoryManagerHistFree(c->Size);
+
 			// Take the block out of the double linked list
 			tDSMMLinkBlock* n = c->Next;
 			tDSMMLinkBlock* p = c->Prev;
 			p->Next = n;
 			if ((n != NULL) && (n->Mark == MM_MARKER_BEGIN))
 				n->Prev = p;
-
+/*
+			// Dump the "colored" blocks
+			if ( (GfMM->Group == 0) && (c->Grup > 0) )
+				fprintf(stderr,"- Color: %d ID: %d Size: %d Allocated at %p\n",
+				  c->Grup,c->BLID,c->Size,c->RAdr);
+*/
 			// Check release mode
 			if (GfMM->DoNotFree)
 				return;	// accept the leak for debugging
 
 			// Release the allocated memory
-			GlobalFree(c);
+			// GlobalFree(c);
+			GfMemoryManagerBlockFree(c->Size, c);
 		}
 	}
 	else
@@ -538,6 +731,8 @@ void GfMemoryManagerRelease(bool Dump)
 
 			fprintf(stderr,"Max size requested at one time : %.3f [MB]\n",MM->MaxRequested/(1024.0*1024));
 			fprintf(stderr,"Max size allocated at one time : %.3f [MB]\n",MM->MaxAllocated/(1024.0*1024));
+			fprintf(stderr,"Max size requested at one time : %d [B]\n",MM->MaxRequested);
+			fprintf(stderr,"Max size allocated at one time : %d [B]\n",MM->MaxAllocated);
 			fprintf(stderr,"Overhead for Memory Manager    : %.3f [MB]\n",(MM->MaxAllocated - MM->MaxRequested)/(1024.0*1024));
 			fprintf(stderr,"Mean overhead                  : %.6f [%%]\n",(100.0 * (MM->MaxAllocated - MM->MaxRequested))/MM->MaxRequested);
 
@@ -550,7 +745,7 @@ void GfMemoryManagerRelease(bool Dump)
 			getchar(); // Stop to show leaks first
 
 			unsigned int total = MM->Hist[0];
-			for (int I = 1; I < MAXBLOCKSIZE; I++)
+			for (int I = 1; I <= MAXBLOCKSIZE; I++)
 				total += I * MM->Hist[I];
 
 			total /= (1024 * 1024); // Byte -> MB
@@ -562,16 +757,22 @@ void GfMemoryManagerRelease(bool Dump)
 			fprintf(stderr,"\nMean size of blocks  >= %d [Byte] : %.3f [kB]\n",MAXBLOCKSIZE,MM->Hist[0]/1024.0 / MM->BigB);
 
 			fprintf(stderr,"\nHistogram of block sizes < %d [Byte]:\n",MAXBLOCKSIZE);
-			fprintf(stderr,"\nBlocksize : Number of blocks requested\n");
+			fprintf(stderr,"\nBlocksize : Number of blocks requested");
+			fprintf(stderr,"\n          : at same time  :  remaining\n");
 
-			for (int I = 1; I < MAXBLOCKSIZE; I++)
+			for (int I = 1; I <= MAXBLOCKSIZE; I++)
 			{
-				if (MM->Hist[I] > 0)
-					fprintf(stderr,"%04.4d      : %d\n",I,MM->Hist[I]);
+				if (MM->HistMax[I] > 0)
+					fprintf(stderr,"%4d      : %8d    : %d\n",I,MM->HistMax[I],MM->Hist[I]);
 			}
 		}
 
-		delete(Block); // Delete the memory manager itself
+		for (int I = 0; I < MAXBLOCKSIZE; I++)
+		{
+			tMMBlockStack* Stack = &(MM->StackBuffer.Stack[I]);
+			free(Stack->Block);
+		}
+		free(Block); // Delete the memory manager itself
 	}
 
 	if (Dump)
@@ -615,23 +816,45 @@ void GfMemoryManagerDoFree(void)
 //============================================================================*
 // Set Group ID for allocation of blocks
 //----------------------------------------------------------------------------*
-void GfMemoryManagerSetGroup(uint16 Group)
+uint16 GfMemoryManagerSetGroup(uint16 Group)
 {
+	uint16 LastColor = GfMM->Group;
 	GfMM->Group = Group;
+	return LastColor;
 }
 //============================================================================*
 	
 //============================================================================*
 // Update statistics
 //----------------------------------------------------------------------------*
-void GfMemoryManagerHist(size_t size)
+void GfMemoryManagerHistAllocate(size_t size)
 {
-	if (size < MAXBLOCKSIZE)
+	if (size <= MAXBLOCKSIZE)
+	{
 		GfMM->Hist[size] += 1;
+		GfMM->HistMax[size] = MAX(GfMM->HistMax[size],GfMM->Hist[size]);
+	}
 	else
 	{
 		GfMM->BigB += 1;
 		GfMM->Hist[0] += size;
+		GfMM->HistMax[0] = MAX(GfMM->HistMax[0],GfMM->Hist[0]);
+	}
+}
+//============================================================================*
+	
+//============================================================================*
+// Update statistics
+//----------------------------------------------------------------------------*
+void GfMemoryManagerHistFree(size_t size)
+{
+	if (size <= MAXBLOCKSIZE)
+	{
+		GfMM->Hist[size] -= 1;
+	}
+	else
+	{
+		GfMM->Hist[0] -= size;
 	}
 }
 //============================================================================*

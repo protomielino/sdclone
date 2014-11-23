@@ -693,6 +693,8 @@ int simplixEntryPoint(tModInfo *ModInfo, void *RobotSettings)
 	  strncpy(&DriverDescs[I*DESCRPLEN], DriverDesc, DESCRPLEN-1);
     }
 
+	GfParmReleaseHandle(RobotSettings);
+
     return moduleInitialize(ModInfo);
 }
 //==========================================================================*
@@ -882,6 +884,8 @@ static int InitFuncPt(int Index, void *Pt)
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
     cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
   }
+
+  GfParmReleaseHandle(RobotSettings);
 
   return 0;
 }

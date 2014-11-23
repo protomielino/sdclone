@@ -98,7 +98,7 @@ static void loadSimuCfg(void)
 	const char *simuVersionName;
 	const char *multiThreadSchemeName;
 	const char *threadAffinitySchemeName;
-	const char *replayRateSchemeName;
+//	const char *replayRateSchemeName;
 #ifdef STARTPAUSED
    const char *startPausedSchemeName;
 #endif
@@ -271,6 +271,7 @@ onChangeThreadAffinityScheme(void *vp)
 
 
 /* Change the replay rate scheme */
+/*
 static void
 onChangeReplayRateScheme(void *vp)
 {
@@ -279,7 +280,7 @@ onChangeReplayRateScheme(void *vp)
 	
 	GfuiLabelSetText(ScrHandle, ReplayRateSchemeId, ReplaySchemeDispNameList[CurReplayScheme]);
 }
-
+*/
 #ifdef STARTPAUSED
 /* Change the startpaused scheme */
 static void

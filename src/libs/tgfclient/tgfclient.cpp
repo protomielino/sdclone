@@ -18,8 +18,9 @@
 
 #include "gui.h"
 
-// WDB test ...
+// Use new Memory Manager ...
 #ifdef __DEBUG_MEMORYMANAGER__
+#include "memmanager.h"
 
 // Avoid memory leaks ...
 int NextScreenID = 0;
@@ -73,21 +74,81 @@ void FreeScreens()
 		// Get the screen from the owner
 		tGfuiScreen* screen = OwnerOfScreens[I];
 		if (screen) 
-			GfuiScreenRelease(screen); // Free all resources
+		{
+			fprintf(stderr,"Unreleased screen: %d\n",screen->ScreenID);
+			ScreenRelease(screen); // Free all resources
+		}
 	}
 
 	// Back to normal mode
 	dofree(); // Free the blocks
 
 }
+
+// Free screen
+void FreeScreen(void* screen)
+{
+	if (screen) 
+	{
+		tGfuiScreen* _screen = (tGfuiScreen*) screen;
+		fprintf(stderr,"Release screen: %d\n",_screen->ScreenID);
+		ScreenRelease(screen); // Free all resources
+	}
+}
+
+// Free screen
+void ScreenRelease(void* scr)
+{
+	tGfuiObject *curObject;
+	tGfuiObject *nextObject;
+	tGfuiKey *curKey;
+	tGfuiKey *nextKey;
+	tGfuiScreen *screen = (tGfuiScreen*)scr;
+
+	UnregisterScreens(screen);
+
+	if (GfuiScreen == screen) {
+		GfuiScreenDeactivate();
+	}
+
+	if (screen->bgImage != 0) {
+		glDeleteTextures(1, &screen->bgImage);
+	}
+
+	curObject = screen->objects;
+	if (curObject != NULL) {
+		do {
+			nextObject = curObject->next;
+			gfuiReleaseObject(curObject);
+			curObject = nextObject;
+		} while (curObject != screen->objects);
+	}
+
+	curKey = screen->userKeys;
+	if (curKey != NULL) {
+		do {
+			nextKey = curKey->next;
+			free(curKey->name);
+			free(curKey->descr);
+			free(curKey);
+			curKey = nextKey;
+		} while (curKey != screen->userKeys);
+	}
+	if(screen->musicFilename != NULL) {
+		free(screen->musicFilename);
+	}
+	free(screen);
+}
+
 // ... Avoid memory leaks
 #else
 void RegisterScreens(void* screen){};
 void FreeScreens(){};
+void FreeScreen(tGfuiScreen* screen){}
+void ScreenRelease(void* scr){}
 void UnregisterScreens(void* screen){};
 #endif
-// ... WDB test
-
+// ... Use new Memory Manager
 
 void GfuiInit(void)
 {

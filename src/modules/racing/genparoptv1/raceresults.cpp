@@ -449,11 +449,11 @@ ReInitCurRes()
 	{
 		if (ReInfo->s->_raceType == RM_TYPE_QUALIF)
 		{
-			ReUpdateQualifCurRes(ReInfo->s->cars[0]);
+			//ReUpdateQualifCurRes(ReInfo->s->cars[0]);
 		}
 		else if (ReInfo->s->_raceType == RM_TYPE_PRACTICE && ReInfo->s->_ncars > 1)
 		{
-			ReUpdatePracticeCurRes(ReInfo->s->cars[0]);
+			//ReUpdatePracticeCurRes(ReInfo->s->cars[0]);
 		}
 		else
 		{
@@ -500,7 +500,7 @@ ReUpdatePracticeCurRes(tCarElt *car, bool bForceNew)
 	}
 	else
 	{
-		ReUpdateQualifCurRes(car);
+		//ReUpdateQualifCurRes(car);
 	}
 }
 

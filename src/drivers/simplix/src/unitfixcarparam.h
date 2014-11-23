@@ -9,10 +9,10 @@
 //
 // File         : unitfixcarparam.h
 // Created      : 2007.11.25
-// Last changed : 2011.06.04
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2014.11.23
+// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.001
+// Version      : 4.03.000
 //--------------------------------------------------------------------------*
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:

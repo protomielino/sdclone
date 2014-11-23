@@ -103,16 +103,18 @@ typedef struct Situation {
 /** Race Engine states */
 #define RE_STATE_CONFIG			0
 #define RE_STATE_EVENT_INIT		1
+#define RE_STATE_EVENT_LOOP		2
 #define RE_STATE_PRE_RACE		3
-#define RE_STATE_RACE_START		5
-#define RE_STATE_NETWORK_WAIT   6
-#define RE_STATE_RACE			7
-#define RE_STATE_RACE_STOP		8
-#define RE_STATE_RACE_END		9
-#define RE_STATE_POST_RACE		10
-#define RE_STATE_EVENT_SHUTDOWN	11
-#define RE_STATE_EVOLUTION		12
-#define RE_STATE_SHUTDOWN		13
+#define RE_STATE_RACE_START		4
+#define RE_STATE_NETWORK_WAIT   5
+#define RE_STATE_RACE			6
+#define RE_STATE_RACE_STOP		7
+#define RE_STATE_RACE_END		8
+#define RE_STATE_POST_RACE		9
+#define RE_STATE_EVENT_SHUTDOWN	10
+#define RE_STATE_EVOLUTION		11
+#define RE_STATE_SHUTDOWN		12
+#define RE_STATE_CLEANUP		13
 #define RE_STATE_ERROR			14
 #define RE_STATE_EXIT			15
 #ifdef STARTPAUSED

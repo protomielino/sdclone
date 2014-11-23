@@ -40,6 +40,12 @@
 
 #include "tgf.hpp"
 
+// Use new Memory Manager ...
+#ifdef __DEBUG_MEMORYMANAGER__
+#include "memmanager.h"
+#endif
+// ... Use new Memory Manager
+
 
 extern void gfTraceInit(bool bWithLogging = true);
 extern void gfTraceShutdown(void);
@@ -245,6 +251,13 @@ void* GfPoolMalloc(size_t size, tMemoryPool* pool)
 	if( !pool )
 		return 0;
 
+	// Use new Memory Manager ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+	unsigned short Color = 99;
+	Color = GfMemoryManagerSetGroup(Color);
+	#endif
+	// ... Use new Memory Manager
+
 	/* Init tMemoryPool structure */
 	data = (tMemoryPoolItem*)malloc( sizeof(tMemoryPoolItem) + size );
 	data->prev = NULL;
@@ -258,6 +271,12 @@ void* GfPoolMalloc(size_t size, tMemoryPool* pool)
 		data->next->prev = data; /* ... and now has a previous item */
 	}
 	*pool = data;
+
+	// Use new Memory Manager ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+	GfMemoryManagerSetGroup(Color);
+	#endif
+	// ... Use new Memory Manager
 
 	return (void*)( data + 1 );
 }
@@ -274,6 +293,13 @@ void GfPoolFree(void* pointer)
 	if( !pointer )
 		return;
 
+	// Use new Memory Manager ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+	unsigned short Color = 99;
+	Color = GfMemoryManagerSetGroup(Color);
+	#endif
+	// ... Use new Memory Manager
+
 	if( data->next )
 		data->next->prev = data->prev;
 	if( data->prev )
@@ -287,6 +313,12 @@ void GfPoolFree(void* pointer)
 	}
 
 	free( data );
+
+	// Use new Memory Manager ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+	GfMemoryManagerSetGroup(Color);
+	#endif
+	// ... Use new Memory Manager
 }
 
 /**
@@ -302,6 +334,13 @@ void GfPoolFreePool(tMemoryPool* pool)
 	if( !pool )
 		return;
 
+	// Use new Memory Manager ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+	unsigned short Color = 99;
+	Color = GfMemoryManagerSetGroup(Color);
+	#endif
+	// ... Use new Memory Manager
+
 	cur = *pool;
 
 	/* Zero the pool */
@@ -314,6 +353,12 @@ void GfPoolFreePool(tMemoryPool* pool)
 
 		free( prev );
 	}
+
+	// Use new Memory Manager ...
+	#ifdef __DEBUG_MEMORYMANAGER__
+	GfMemoryManagerSetGroup(Color);
+	#endif
+	// ... Use new Memory Manager
 }
 
 /**

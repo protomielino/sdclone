@@ -44,6 +44,7 @@ extern void ReInitialiseGeneticOptimisation();
 extern void ReImportGeneticParameters();
 extern int  ReEvolution();
 extern bool ReCleanupGeneticOptimisation();
+extern bool ReCleanupReInfo();
 
 extern void ReRaceAbandon();
 extern void ReRaceAbort();

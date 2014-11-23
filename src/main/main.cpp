@@ -269,6 +269,8 @@ main(int argc, char *argv[])
 	// Use new Memory Manager ...
 	#ifdef __DEBUG_MEMORYMANAGER__
 
+	GfMemoryManagerSaveToFile();
+
 	// THIS HAS TO BE THE LAST LINE OF CODE BEFORE RETURN!!!
 	GfMemoryManagerRelease();
 

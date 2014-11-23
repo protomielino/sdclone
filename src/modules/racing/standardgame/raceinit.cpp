@@ -854,9 +854,9 @@ ReInitCars(void)
   }
 
   if (replayRecord || replayReplay) {
+#ifdef THIRD_PARTY_SQLITE3
     int result;
 
-#ifdef THIRD_PARTY_SQLITE3
     result = sqlite3_open("/tmp/race.sqlite", &replayDB);
     if (result) {
       GfLogError("Replay: Unable to open Database: %s\n", sqlite3_errmsg(replayDB));

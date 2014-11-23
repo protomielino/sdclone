@@ -316,7 +316,7 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 	GfProfStopProfile("physicsEngine.update*");
 	
 	ReCarsSortCars();
-
+/*
 	// Update results if a best lap changed
 	if (pCurrReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars > 1 && bestLapChanged)
 	{
@@ -325,6 +325,7 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 		else if (pCurrReInfo->s->_raceType == RM_TYPE_QUALIF)
 			ReUpdateQualifCurRes(pCurrReInfo->s->cars[0]);
 	}
+*/
 }
 
 int ReSituationUpdater::threadLoop(void* pUpdater)

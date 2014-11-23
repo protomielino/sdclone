@@ -150,7 +150,13 @@ RmRaceSelectInit(void *prevMenu)
 		std::string strButtonCtrlName(*itRaceManType);
 		if (!SupportsHumanDrivers)
 		{
-			if (strButtonCtrlName != "Practice")
+			if ((strButtonCtrlName != "Practice")
+				&& (strButtonCtrlName != "OptimizationMT"))
+				continue;
+		}
+		else
+		{
+			if (strButtonCtrlName == "OptimizationMT")
 				continue;
 		}
 

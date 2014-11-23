@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2014.11.09
-// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
+// Last changed : 2014.11.23
+// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.02.000
+// Version      : 4.03.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -237,7 +237,8 @@ private:
 	int	oDriveTrainType;                         // Drive train type
 
 	TPidController oPIDCBrake;     	             // Controller for brake error
-	TPidController oPIDCLine;      	             // Controller for line error.
+	TPidController oPIDCLine;      	             // Controller for line error
+	TPidController oPIDCStart;     	             // Controller for start error
 	int	oFlying;				                 // Flag prepare landing 
 	int oNbrCars;                                // Nbr of cars in race
 	int	oOwnOppIdx;                              // Index of own car in list of opponents

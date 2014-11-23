@@ -60,7 +60,9 @@ TGF_API void GfMemoryManagerDoAccept(void);
 // Switch to normal mode: free the blocks
 TGF_API void GfMemoryManagerDoFree(void);
 // Set the Group ID used while allocation of blocks (old and new blocks)
-TGF_API void GfMemoryManagerSetGroup(uint16 Group);
+TGF_API uint16 GfMemoryManagerSetGroup(uint16 Group);
+// Save configuration
+TGF_API void GfMemoryManagerSaveToFile(void);
 //============================================================================*
 
 //----------------------------------------------------------------------------*
@@ -70,6 +72,12 @@ TGF_API void GfMemoryManagerSetGroup(uint16 Group);
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // Implementation ...
 //----------------------------------------------------------------------------*
+
+//============================================================================*
+// Memory manager software version
+//----------------------------------------------------------------------------*
+#define MM_VERSION 1.0
+//============================================================================*
 
 //============================================================================*
 // Memory manager states
@@ -98,7 +106,9 @@ TGF_API void GfMemoryManagerSetGroup(uint16 Group);
 // Memory manager histogram
 //----------------------------------------------------------------------------*
 //#define MAXBLOCKSIZE 4096	// Definition of the max block size for histogram
-#define MAXBLOCKSIZE 1024	// Definition of the max block size for histogram
+//#define MAXBLOCKSIZE 1024	// Definition of the max block size for histogram
+//#define MAXBLOCKSIZE 64	// Definition of the max block size for histogram
+#define MAXBLOCKSIZE 512	// Definition of the max block size for histogram
 //============================================================================*
 
 //============================================================================*
@@ -106,7 +116,8 @@ TGF_API void GfMemoryManagerSetGroup(uint16 Group);
 //----------------------------------------------------------------------------*
 void* GfMemoryManagerAlloc(size_t size, uint8 type, void* retAddr);
 void GfMemoryManagerFree(void* b, uint8 type);
-void GfMemoryManagerHist(size_t size);
+void GfMemoryManagerHistAllocate(size_t size);
+void GfMemoryManagerHistFree(size_t size);
 //============================================================================*
 
 //============================================================================*
@@ -128,6 +139,28 @@ typedef struct tDSMMLinkBlock
 //============================================================================*
 
 //============================================================================*
+// Stack to handle blocks of a defined size
+//----------------------------------------------------------------------------*
+typedef struct tMMBlockStack
+{	
+	size_t Size;			// Blocksize handled here
+	int Count;				// Capacity of the stack
+	int Index;				// Number of available blocks contained - 1
+	tDSMMLinkBlock** Block;	// Pointer to an array of pointers of available b.
+} tMMBlockStack;
+//============================================================================*
+
+//============================================================================*
+// Array of stacks
+//----------------------------------------------------------------------------*
+typedef struct tMMStackBuffer
+{	
+	unsigned int MaxSize;			// Maximum blocksize that is handled here
+	tMMBlockStack Stack[MAXBLOCKSIZE]; 
+} tMMStackBuffer;
+//============================================================================*
+
+//============================================================================*
 // Memory Manager
 //----------------------------------------------------------------------------*
 typedef struct
@@ -139,14 +172,18 @@ typedef struct
 	unsigned int Requested;				// Current total of requested mem.
 	unsigned int MaxRequested;			// Maximum size of requested mem.
 
-	unsigned int BigB;					// Number of big blocks requested
-	unsigned int Hist[MAXBLOCKSIZE];	// Histogram of the buufer sizes
+	unsigned int BigB;						// Number of big blocks requested
+	unsigned int Capacity[MAXBLOCKSIZE+1];	// Histogram of the buffer sizes
+	unsigned int Hist[MAXBLOCKSIZE+1];		// Histogram of the buffer sizes
+	unsigned int HistMax[MAXBLOCKSIZE+1];	// Histogram of max at the same time
 
 	int State;							// State of memory manager
 	int AddedSpace;						// Number of bytes added to each block
 	uint16 Group;			  			// Allocation group
 	size_t Size;						// Size of memory manager
 	bool DoNotFree;						// Do not free blocks if flag is set
+
+	tMMStackBuffer StackBuffer;			// Buffer for stacks of blocks
 
 } tMemoryManager;
 //============================================================================*

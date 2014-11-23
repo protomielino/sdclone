@@ -84,6 +84,7 @@ SimAeroConfig(tCar *car)
 		}
 		else
 		{
+/*
 			fprintf (stderr, "\n\nWarning: car %s, driver %s: lift coefficients (%f, %f), generate a lift of %f, while maximum theoretical value is %f\n\n",
                  car->carElt->_carName,
                  car->carElt->_name,
@@ -91,10 +92,12 @@ SimAeroConfig(tCar *car)
                  car->aero.Clift[1],
                  current_lift,
                  max_lift);
+*/
 		}
     }
 	else
 	{
+/*
         fprintf (stderr, "\n\nInfo: car %s, driver %s: lift coefficients (%f, %f), generate a lift of %f, while maximum theoretical value is %f\n\n",
                  car->carElt->_carName,
                  car->carElt->_name,
@@ -102,6 +105,7 @@ SimAeroConfig(tCar *car)
                  car->aero.Clift[1],
                  current_lift,
                  max_lift);
+*/
 	}
 }
 

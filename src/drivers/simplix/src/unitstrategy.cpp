@@ -9,10 +9,10 @@
 // 
 // File         : unitstrategy.cpp
 // Created      : 2007.02.20
-// Last changed : 2013.06.25
-// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
+// Last changed : 2014.11.23
+// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 4.00.002
+// Version      : 4.03.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -127,7 +127,20 @@ bool TSimpleStrategy::NeedPitStop()
   else                                           // If known
     FuelConsum = oFuelPerM;                      //   use it
 
-  bool Result = RtTeamNeedPitStop(oDriver->TeamIndex(), FuelConsum, RepairWanted(cPIT_DAMMAGE));
+  bool Result = RtTeamNeedPitStop(oDriver->TeamIndex(), 
+	  FuelConsum, RepairWanted(cPIT_DAMMAGE));
+
+  if (oDriver->oCarHasTYC)
+  {
+	double WcF = oDriver->WheelConditionFront(); // Check tyre condition
+	double WcR = oDriver->WheelConditionRear();  // Pit stop needed if
+	if (MIN(WcF,WcR) < 0.90)                     // tyres are below 90%
+		LogSimplix.warning("Tyre condition F: %.3f R: %.3f (%s)\n",
+		WcF,WcR,oDriver->GetBotName());
+
+    if (MIN(WcF,WcR) < 0.88)                     // tyres are below 88%
+      Result = true;                             //   to stop in pit
+  }
 
   if (oDriver->oTestPitStop)                     // If defined, try
     Result = true;                               //   to stop in pit
