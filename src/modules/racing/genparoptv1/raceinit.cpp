@@ -745,11 +745,11 @@ ReInitCars(void)
 		  {
             GfLogError("No descriptor file for robot %s or parameter errors (1)\n", robotModuleName);
 			snprintf(buf, sizeof(buf), "Error: May be no driver, or some parameters are out of bound");
-	        ReUI().addLoadingMessage(buf);
+	        ReUI().addOptimizationMessage(buf);
 			snprintf(buf, sizeof(buf), "       Have a look at the console window for mode details about the error");
-	        ReUI().addLoadingMessage(buf);
+	        ReUI().addOptimizationMessage(buf);
 			snprintf(buf, sizeof(buf), "       Back to the config menu in 10 s ...");
-	        ReUI().addLoadingMessage(buf);
+	        ReUI().addOptimizationMessage(buf);
 			
 			// Wait some time to allow the user to read the message!
             GfSleep(10.0); // 10 seconds

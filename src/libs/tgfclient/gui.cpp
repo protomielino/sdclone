@@ -583,6 +583,17 @@ GfuiScreenIsActive(void *screen)
 	return GfuiScreen == screen;
 }
 
+/** Get the screen.
+    @ingroup	gui
+    @param	
+    @return	screen handle.
+ */
+void*
+GfuiGetScreen(void)
+{
+	return GfuiScreen;
+}
+
 /** Activate a screen and make it current.
     @ingroup	gui
     @param	screen	Screen to activate

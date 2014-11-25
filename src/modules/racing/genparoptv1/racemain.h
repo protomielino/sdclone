@@ -44,6 +44,8 @@ extern void ReInitialiseGeneticOptimisation();
 extern void ReImportGeneticParameters();
 extern int  ReEvolution();
 extern bool ReCleanupGeneticOptimisation();
+extern bool ReDisplayResults();
+extern int ReWaitForKeyPress();
 extern bool ReCleanupReInfo();
 
 extern void ReRaceAbandon();

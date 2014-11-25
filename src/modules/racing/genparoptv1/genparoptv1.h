@@ -29,7 +29,9 @@
 #include <iraceengine.h>
 #include <itrackloader.h>
 
+
 #include <tgf.hpp>
+#include "..\..\..\libs\tgfclient\tgfclient.h"
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
@@ -176,6 +178,5 @@ inline extern ITrackLoader& ReTrackLoader()
 // The "Optim" logger instance.
 extern GfLogger* RePLogOptim;
 #define ReLogOptim (*RePLogOptim)
-
 
 #endif /* _GENPAROPTV1_H_ */ 

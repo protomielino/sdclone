@@ -158,6 +158,12 @@ void TextOnlyUI::onRaceInitializing()
 	GfLogDebug("TextOnlyUI::onRaceInitializing()\n");
 }
 
+void TextOnlyUI::onOptimizationInitializing()
+{
+	// Actually nothing to do.
+	GfLogDebug("TextOnlyUI::onOptimizationInitializing()\n");
+}
+
 bool TextOnlyUI::onRaceStarting()
 {
 	GfLogDebug("TextOnlyUI::onRaceStarting()\n");
@@ -287,6 +293,19 @@ bool TextOnlyUI::onRaceEventFinished(bool bMultiEvent, bool careerNonHumanGroup)
 void TextOnlyUI::addLoadingMessage(const char* pszText)
 {
     GfLogTrace("%s\n", pszText);
+}
+
+void TextOnlyUI::addOptimizationMessage(const char* pszText)
+{
+    GfLogTrace("%s\n", pszText);
+}
+
+void TextOnlyUI::addOptimizationParameterMessage(int /* n */, char** /* Labels */, char** /* Values */, char** /* Ranges */)
+{
+}
+
+void TextOnlyUI::addOptimizationStatusMessage(int /* LoopsDone */, int /* LoopsRemaining */, double /* VariationScale */, double /* InitialLapTime */,  double /* TotalLapTime */,  double /* BestLapTime */)
+{
 }
 
 void TextOnlyUI::setResultsTableTitles(const char* pszTitle, const char* pszSubTitle)

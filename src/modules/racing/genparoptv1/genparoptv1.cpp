@@ -311,11 +311,12 @@ bool GenParOptV1::loadPhysicsEngine()
 	}
 
 	// 3) Load it.
+/*
 	std::ostringstream ossLoadMsg;
 	ossLoadMsg << "Loading physics engine (" << strModName << ") ...";
 	if (_piUserItf)
-		_piUserItf->addLoadingMessage(ossLoadMsg.str().c_str());
-
+		_piUserItf->addOptimizationMessage(ossLoadMsg.str().c_str());
+*/
 	GfModule* pmodPhysEngine = GfModule::load("modules/simu", strModName.c_str());
 	if (pmodPhysEngine)
 		_piPhysEngine = pmodPhysEngine->getInterface<IPhysicsEngine>();

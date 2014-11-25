@@ -177,6 +177,13 @@ ReStateManage(void)
 			case RE_STATE_SHUTDOWN:
 				GfLogInfo("%s now in SHUTDOWN state\n", ReInfo->_reName);
 				ReCleanupGeneticOptimisation();
+				ReInfo->_reState = RE_STATE_RESULTS;
+				mode = RM_SYNC;
+				break;
+
+			case RE_STATE_RESULTS:
+				GfLogInfo("%s now in RESULTS state\n", ReInfo->_reName);
+				ReDisplayResults();
 				ReInfo->_reState = RE_STATE_CLEANUP;
 				mode = RM_SYNC;
 				break;
@@ -185,7 +192,18 @@ ReStateManage(void)
 				GfLogInfo("%s now in CLEANUP state\n", ReInfo->_reName);
 				ReCleanupReInfo();
 				// Back to the race manager menu
-				ReInfo->_reState = RE_STATE_CONFIG;
+				ReInfo->_reState = RE_STATE_WAITFORKEYPRESS;
+				mode = RM_SYNC;
+				break;
+
+			case RE_STATE_WAITFORKEYPRESS:
+				GfLogInfo("%s now in WAITFORKEYPRESS state\n", ReInfo->_reName);
+				mode = ReWaitForKeyPress();
+				if (mode & RM_NEXT_STEP){
+					ReInfo->_reState = RE_STATE_CONFIG;
+				} else {
+					ReInfo->_reState = RE_STATE_WAITFORKEYPRESS;
+				}
 				mode = RM_SYNC;
 				break;
 

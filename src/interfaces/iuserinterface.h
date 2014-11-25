@@ -59,6 +59,7 @@ public:
 	virtual bool onRaceFinished(bool bEndOfSession) = 0;
 	virtual void onRaceEventFinishing() = 0;
 	virtual bool onRaceEventFinished(bool bMultiEvent, bool careerNonHuman) = 0;
+	virtual void onOptimizationInitializing() = 0;
 
 #ifdef STARTPAUSED
 	virtual bool onRaceStartingPaused() = 0;
@@ -70,6 +71,11 @@ public:
 
 	// Loading messages management.
 	virtual void addLoadingMessage(const char* pszText) = 0;
+	
+	// Optimiaztion messages management.
+	virtual void addOptimizationMessage(const char* pszText) = 0;
+    virtual void addOptimizationParameterMessage(int n, char** Labels, char** Values, char** Ranges) = 0;
+    virtual void addOptimizationStatusMessage(int LoopsDone, int LoopsRemaining, double VariationScale, double InitialLapTime,  double TotalLapTime,  double BestLapTime) = 0;
 
 	// Blind-race results table management.
 	virtual void setResultsTableTitles(const char* pszTitle, const char* pszSubTitle) = 0;

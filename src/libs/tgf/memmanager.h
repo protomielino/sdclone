@@ -173,6 +173,7 @@ typedef struct
 	unsigned int MaxRequested;			// Maximum size of requested mem.
 
 	unsigned int BigB;						// Number of big blocks requested
+	unsigned int BigBMax;					// Max at same time
 	unsigned int Capacity[MAXBLOCKSIZE+1];	// Histogram of the buffer sizes
 	unsigned int Hist[MAXBLOCKSIZE+1];		// Histogram of the buffer sizes
 	unsigned int HistMax[MAXBLOCKSIZE+1];	// Histogram of max at the same time

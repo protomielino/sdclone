@@ -36,6 +36,7 @@ SET(RACESCREENS_SOURCES ${RS}/raceselectmenu.cpp
                         ${RS}/trackselect.cpp ${RS}/driverselect.cpp ${RS}/garagemenu.cpp
                         ${RS}/raceparamsmenu.cpp
                         ${RS}/raceloadingmenu.cpp ${RS}/racerunningmenus.cpp
+                        ${RS}/raceoptimizationmenu.cpp 
                         ${RS}/racestopmenu.cpp ${RS}/racestartmenu.cpp ${RS}/racepitmenu.cpp 
                         ${RS}/raceresultsmenus.cpp ${RS}/racenexteventmenu.cpp)
 SET(RACESCREENS_HEADERS ${RS}/racescreens.h ${RS}/garagemenu.h) #${RS}/raceweekendscreens.h)

@@ -278,6 +278,7 @@ TGFCLIENT_API void* GfuiScreenCreate(float *bgColor = 0,
 TGFCLIENT_API void GfuiScreenRelease(void *screen);
 TGFCLIENT_API void GfuiScreenActivate(void *screen);
 TGFCLIENT_API int  GfuiScreenIsActive(void *screen);
+TGFCLIENT_API void* GfuiGetScreen(void);
 TGFCLIENT_API void GfuiScreenReplace(void *screen);
 TGFCLIENT_API void GfuiScreenDeactivate(void);
 TGFCLIENT_API void* GfuiHookCreate(void *userDataOnActivate, tfuiCallback onActivate);

@@ -114,14 +114,16 @@ typedef struct Situation {
 #define RE_STATE_EVENT_SHUTDOWN	10
 #define RE_STATE_EVOLUTION		11
 #define RE_STATE_SHUTDOWN		12
-#define RE_STATE_CLEANUP		13
-#define RE_STATE_ERROR			14
-#define RE_STATE_EXIT			15
+#define RE_STATE_RESULTS		13
+#define RE_STATE_CLEANUP		14
+#define RE_STATE_WAITFORKEYPRESS 15
+#define RE_STATE_ERROR			16
+#define RE_STATE_EXIT			17
 #ifdef STARTPAUSED
-#define RE_STATE_PRE_RACE_PAUSE	16
+#define RE_STATE_PRE_RACE_PAUSE	18
 #endif
 #ifdef COOLDOWN
-#define RE_STATE_RACE_COOLDOWN	17
+#define RE_STATE_RACE_COOLDOWN	19
 #endif
 
 /** Race Engine Car Information about the race */

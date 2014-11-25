@@ -149,7 +149,10 @@ void TGeneticParameter::DisplayParameter()
 // Display parameter statistics at console
 void TGeneticParameter::DisplayStatistik()
 {
+	char buf[80];
 	ReLogOptim.info("%s: N=%d M=%d (%g %%)\n",Label,Tries,Changed,(100.0 * Changed)/Tries);
+	snprintf(buf,sizeof(buf),"%s: N=%d M=%d (%.1f %%)",Label,Tries,Changed,(100.0 * Changed)/Tries);;
+	ReUI().addOptimizationMessage(buf); 
 };
 
 // Write parameter meta data to xml file

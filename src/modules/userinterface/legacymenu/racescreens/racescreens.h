@@ -81,6 +81,12 @@ extern void RmLoadingScreenStart(const char * /* text */, const char * /* bgimg 
 extern void RmLoadingScreenSetText(const char * /* text */);
 extern void RmLoadingScreenShutdown();
 
+extern void RmOptimizationScreenStart(const char * /* text */, const char * /* bgimg */);
+extern void RmOptimizationScreenSetText(const char * /* text */);
+extern void RmOptimizationScreenSetParameterText(int /* n */, char** /* label */, char** /* value */, char** /* range */);
+extern void RmOptimizationScreenSetStatusText(int, int, double, double, double, double);
+extern void RmOptimizationScreenShutdown();
+
 extern void RmGameScreen();
 
 extern void RmShowResults(void * /* prevHdle */, tRmInfo * /* info */);

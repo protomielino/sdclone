@@ -335,6 +335,7 @@ tMemoryManager* GfMemoryManager(void)
 	MemoryManager->MaxRequested = 0;
 
 	MemoryManager->BigB = 0;
+	MemoryManager->BigBMax = 0;
 	for (int I = 0; I <= MAXBLOCKSIZE; I++)
 	{
 		MemoryManager->Hist[I] = 0;
@@ -492,9 +493,14 @@ void* GfMemoryManagerAlloc (size_t size, uint8 type, void* retAddr)
 		void* b = (void*) (c + 1);  //c is still pointing to the data
 
 		// Hunting memory leaks ...
-#define	IDTOSTOP 367876 // ID of block you are looking for
-
-		if (ID == IDTOSTOP)
+#define	IDTOSTOP 428767 // ID of block you are looking for
+		char buf[10];
+		snprintf(buf,sizeof(buf),"%p",c->RAdr);
+		buf[0] = 'X';
+		buf[1] = 'X';
+		buf[2] = 'X';
+		buf[3] = 'X';
+		if ((ID == IDTOSTOP) || (strncmp(buf,"XXXXF19F",8) == 0))
 		{
 			ID = 0;	// set breakpoint here 
 					// to stop at allocation of 
@@ -752,18 +758,18 @@ void GfMemoryManagerRelease(bool Dump)
 
 			fprintf(stderr,"\nTotal size of blocks requested : %d [MB]\n",total);
 
-			fprintf(stderr,"\nNumber of blocks     >= %d [Byte] : %d",MAXBLOCKSIZE,MM->BigB);
-			fprintf(stderr,"\nTotal size of blocks >= %d [Byte] : %.3f [kB]",MAXBLOCKSIZE,MM->Hist[0]/1024.0);
-			fprintf(stderr,"\nMean size of blocks  >= %d [Byte] : %.3f [kB]\n",MAXBLOCKSIZE,MM->Hist[0]/1024.0 / MM->BigB);
+			fprintf(stderr,"\nNumber of blocks     >= %d [Byte] : %d",MAXBLOCKSIZE,MM->BigBMax);
+			fprintf(stderr,"\nTotal size of blocks >= %d [Byte] : %.3f [kB]",MAXBLOCKSIZE,MM->HistMax[0]/1024.0);
+			fprintf(stderr,"\nMean size of blocks  >= %d [Byte] : %.3f [kB]\n",MAXBLOCKSIZE,MM->HistMax[0]/1024.0 / MM->BigBMax);
 
 			fprintf(stderr,"\nHistogram of block sizes < %d [Byte]:\n",MAXBLOCKSIZE);
 			fprintf(stderr,"\nBlocksize : Number of blocks requested");
-			fprintf(stderr,"\n          : at same time  :  remaining\n");
+			fprintf(stderr,"\n          : at same time :  remaining\n");
 
 			for (int I = 1; I <= MAXBLOCKSIZE; I++)
 			{
 				if (MM->HistMax[I] > 0)
-					fprintf(stderr,"%4d      : %8d    : %d\n",I,MM->HistMax[I],MM->Hist[I]);
+					fprintf(stderr,"%4d      : %8d     : %d\n",I,MM->HistMax[I],MM->Hist[I]);
 			}
 		}
 
@@ -837,6 +843,7 @@ void GfMemoryManagerHistAllocate(size_t size)
 	else
 	{
 		GfMM->BigB += 1;
+		GfMM->BigBMax = MAX(GfMM->BigBMax,GfMM->BigB);
 		GfMM->Hist[0] += size;
 		GfMM->HistMax[0] = MAX(GfMM->HistMax[0],GfMM->Hist[0]);
 	}

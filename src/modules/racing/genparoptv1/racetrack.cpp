@@ -74,12 +74,12 @@ ReTrackInit(void)
 	ReInfo->track = ReTrackLoader().load(buf);
 
 	snprintf(buf, sizeof(buf), "Loading %s track", ReInfo->track->name);
-	ReUI().addLoadingMessage(buf);
+	ReUI().addOptimizationMessage(buf);
 
 	reTrackInitTimeOfDay();
 	reTrackInitWeather();
 
-	reTrackDump(ReInfo->track, 0);
+	//reTrackDump(ReInfo->track, 0);
 
 	return 0;
 }//ReTrackInit
@@ -96,7 +96,7 @@ reTrackDump(const tTrack *track, int verbose)
 	
 	snprintf(buf, sizeof(buf), "  by %s (%.0f m long, %.0f m wide) ...", 
 			 track->authors, track->length, track->width);
-	ReUI().addLoadingMessage(buf);
+	ReUI().addOptimizationMessage(buf);
 
 	GfLogInfo("++++++++++++ Track ++++++++++++\n");
 	GfLogInfo("Name     = %s\n", track->name);

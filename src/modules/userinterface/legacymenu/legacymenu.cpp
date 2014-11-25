@@ -233,8 +233,35 @@ void LegacyMenu::shutdownLoadingScreen()
     ::RmLoadingScreenShutdown();
 }
 
+void LegacyMenu::activateOptimizationScreen()
+{
+	::RmOptimizationScreenStart("Optimization", "data/img/splash-optimization.jpg");
+}
+
+void LegacyMenu::addOptimizationMessage(const char* pszText)
+{
+    ::RmOptimizationScreenSetText(pszText);
+}
+
+void LegacyMenu::addOptimizationParameterMessage(int n, char** Labels, char** Values, char** Ranges)
+{
+    ::RmOptimizationScreenSetParameterText(n,Labels,Values,Ranges);
+}
+
+void LegacyMenu::addOptimizationStatusMessage(
+	int LoopsDone, int LoopsRemaining, double VariationScale, double InitialLapTime, double TotalLapTime, double BestLapTime)
+{
+    ::RmOptimizationScreenSetStatusText(LoopsDone, LoopsRemaining, VariationScale, InitialLapTime, TotalLapTime, BestLapTime);
+}
+
+void LegacyMenu::shutdownOptimizationScreen()
+{
+    ::RmOptimizationScreenShutdown();
+}
+
 void LegacyMenu::onRaceConfiguring()
 {
+    ::RmOptimizationScreenShutdown();
     ::RmRacemanMenu();
 }
 
@@ -284,6 +311,12 @@ void LegacyMenu::onRaceInitializing()
 	{
         activateLoadingScreen();
     }
+}
+
+void LegacyMenu::onOptimizationInitializing()
+{
+    // Activate the screen at the start of sessions,
+    activateOptimizationScreen();
 }
 
 bool LegacyMenu::onRaceStarting()

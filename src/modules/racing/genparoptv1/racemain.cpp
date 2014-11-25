@@ -64,6 +64,19 @@ int OptiCounter = 0;
 unsigned short OptiBlockGroup = 0;
 bool SingleTrackOptimization = true;
 
+static char** ParameterNames = 0;
+static char** ParameterValues = 0;
+static char** ParameterRanges = 0;
+
+static int MaxSelected = 8;
+static int LoopsDone = 0;
+static int LoopsRemaining = 1000;
+static double VariationScale = 1.0;
+static double InitialLapTime = 0;
+static double TotalLapTime = 0;
+static double BestLapTime = 0;
+
+
 // Buffer for short time use for filenames
 char buf[FILENAME_MAX+1]; // BUFSIZE defined in genetic.h to be = MAX_PATH
 
@@ -167,8 +180,8 @@ ReRaceEventInit(void)
 	free((void*) (ReInfo->_reRaceName));
 	ReInfo->_reRaceName = strdup("Optimization"); //ReGetCurrentRaceName();
 	GfLogInfo("Starting new event (%s session)\n", ReInfo->_reRaceName);
-
-	ReUI().onRaceEventInitializing();
+    
+	ReUI().onOptimizationInitializing();
 	
 	ReInfo->s->_features = RmGetFeaturesList(ReInfo->params);
 
@@ -352,13 +365,13 @@ RePreRace(void)
 	{
 		// Optimize setup trackname.xml
 		SingleTrackOptimization = true;
-		ReUI().addLoadingMessage("Single Track Optimization");
+		//ReUI().addOptimizationMessage("Single Track Optimization");
 	}
 	else
 	{
 		// Optimize setup default.xml
 		SingleTrackOptimization = false;
-		ReUI().addLoadingMessage("Multi Track Optimization");
+		//ReUI().addOptimizationMessage("Multi Track Optimization");
 	}
 
 	// Get session max dammages.
@@ -466,7 +479,7 @@ RePreRace(void)
 	}
 	else
 	{
-		//ReUI().addLoadingMessage("Determining Starting Order ...");
+		//ReUI().addOptimizationMessage("Determining Starting Order ...");
 
 		int maxCars = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DRV, NULL, 100);
 		nCars = MIN(nCars, maxCars);
@@ -494,6 +507,13 @@ RePreRace(void)
 	return RM_SYNC | RM_NEXT_STEP;
 }
 
+/***************************************************************************/
+static void
+rmUpdateRaceEngine()
+{
+    GenParOptV1::self().updateState();
+}
+
 /* return state mode */
 int
 ReRaceRealStart(void)
@@ -518,9 +538,9 @@ ReRaceRealStart(void)
 	// Initialize & place cars
 	if (ReInitCars())
 		return RM_ERROR;
-
+//TEST::
 	// Notify the UI that it's "race loading time".
-	ReUI().onRaceLoadingDrivers();
+//	ReUI().onRaceLoadingDrivers();
 
 	// Load drivers for the race
 	for (i = 0; i < s->_ncars; i++)
@@ -546,7 +566,7 @@ ReRaceRealStart(void)
 	}
 
 	// All cars start with max brakes on
-	//ReUI().addLoadingMessage("Running Prestart ...");
+	//ReUI().addOptimizationMessage("Running Prestart ...");
 	
 	for (i = 0; i < s->_ncars; i++)
 	{
@@ -576,13 +596,22 @@ ReRaceRealStart(void)
 	//ReUI().onRaceSimulationReady();
 
 	// Notify the UI that the race is now started.
-	//ReUI().addLoadingMessage("Ready.");
+	//ReUI().addOptimizationMessage("Ready.");
 
-	ReUI().onRaceStarted();
+//TEST::
+//	ReUI().onRaceStarted();
+/**/
+	// Configure the event loop.
+	GfuiApp().eventLoop().setRecomputeCB(rmUpdateRaceEngine);
+	//GfuiApp().eventLoop().setRedisplayCB(rmResRedisplay);
 
+	// Resynchronize the race engine.
+	GenParOptV1::self().start();
+/**/
 	// And go on looping the race state automaton.
 	return RM_SYNC | RM_NEXT_STEP;
 }//ReRaceRealStart
+
 
 /* return state mode */
 int
@@ -612,7 +641,7 @@ ReRaceStart(void)
 	ReInfo->_reCarInfo =
 		(tReCarInfo*)calloc(GfParmGetEltNb(params, RM_SECT_DRIVERS), sizeof(tReCarInfo));
 
-	ReUI().onRaceInitializing();
+	// ReUI().onOptimizationInitializing();
 	
 	// Drivers starting order
 	int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
@@ -654,7 +683,7 @@ ReRaceStart(void)
 	else
 	{
 		// For a race, add cars to the starting grid in the order stored in ReStartingOrderIdx.
-		//ReUI().addLoadingMessage("Preparing Starting Grid ...");
+		//ReUI().addOptimizationMessage("Preparing Starting Grid ...");
 		
 		int maxCars = (int)GfParmGetNum(params, sessionName, RM_ATTR_MAX_DRV, NULL, 100);
 		nCars = MIN(nCars, maxCars);
@@ -752,9 +781,9 @@ ReRaceEnd(void)
 
 	ReShutdownUpdaters();
 
-	ReUI().onRaceFinishing();
+	//ReUI().onRaceFinishing();
 	
-	ReRaceCleanup();
+	ReRaceCleanup(); // TODO:: TEST Do not unload physics engine
 
 	// If we are at the end of a qualification or practice session for a competitor,
 	// select the next competitor : it is his turn for the same session.
@@ -837,10 +866,10 @@ ReRaceEventShutdown(void)
 	int curRaceIdx;
 
 	// Notify the UI that the race event is finishing now.
-	ReUI().onRaceEventFinishing();
+	// ReUI().onRaceEventFinishing();
 
 	// Shutdown track-physics-related stuff.
-	ReTrackShutdown();
+	// ReTrackShutdown();
 
 	// Determine the track of the next event to come, if not the last one
 	nbTrk = GfParmGetEltNb(params, RM_SECT_TRACKS);
@@ -1022,7 +1051,7 @@ ReImportGeneticParameters()
 {
 	ReLogOptim.info("\n\n");
 	ReLogOptim.info("Import Genetic Parameters ...\n\n");
-	ReUI().addLoadingMessage("Import Genetic Parameters ...");
+	ReUI().addOptimizationMessage("Import Genetic Parameters ...");
 
 	// Use new Memory Manager ...
 	#ifdef __DEBUG_MEMORYMANAGER__
@@ -1251,18 +1280,75 @@ ReImportGeneticParameters()
 	GfParmReleaseHandle(MetaDataFile);
 
 	ReLogOptim.info("Write parameters to initial xml file\n");
-	ReUI().addLoadingMessage("Write parameters to initial xml file");
+	ReUI().addOptimizationMessage("Write parameters to initial xml file");
 	GfParmWriteFileSDHeader (Data->XmlFileName, Data->Handle, Data->CarType, Data->AuthorName);
 
-	// Use new Memory Manager ...
-	#ifdef __DEBUG_MEMORYMANAGER__
-//	fprintf(stderr,"... ReImportGeneticParameters()\n");
-//	GfMemoryManagerSetGroup(++OptiBlockGroup);
-	#endif
-	// ... Use new Memory Manager
+	ParameterNames = (char**) calloc(8, sizeof(char*));
+	ParameterValues = (char**) calloc(8, sizeof(char*));
+	ParameterRanges = (char**) calloc(8, sizeof(char*));
 
-//	ReLogOptim.info("\n");
-//	ReLogOptim.info("... Import Genetic Parameters\n\n");
+
+	ReLogOptim.info("\n");
+	ReLogOptim.info("... Import Genetic Parameters\n\n");
+	ReUI().addOptimizationMessage("... Import Genetic Parameters");
+}
+
+//
+// Handle ESCAPE
+//
+static void escapeKey(int /* key */, int /* modifiers */, int /* x */, int /* y */)
+{
+	ReStateApply(RE_STATE_CONFIG);
+}
+
+//
+// Display results
+//
+bool
+ReDisplayResults()
+{
+	ReUI().addOptimizationMessage("++++++++++++++++++");
+	ReUI().addOptimizationMessage("Optimization finished");
+	ReUI().addOptimizationMessage("++++++++++++++++++");
+
+	for (int I = 0; I < 8; I++)
+	{
+		free(ParameterNames[I]);
+		ParameterNames[I] = NULL;
+		free(ParameterValues[I]);
+		ParameterValues[I] = NULL;
+		free(ParameterRanges[I]);
+		ParameterRanges[I] = NULL;
+	}
+
+	ReUI().addOptimizationStatusMessage(
+		OptiCounter, 0, VariationScale, InitialLapTime, TotalLapTime, BestLapTime);
+
+	ReUI().addOptimizationParameterMessage(
+		8, ParameterNames, ParameterValues, ParameterRanges);
+
+	GfuiDisplay();
+
+	return false;
+}
+
+//
+// Wait for key press
+//
+int
+ReWaitForKeyPress()
+{
+	SDL_Event event; // Event structure
+
+	while (SDL_PollEvent(&event))
+	{
+		switch(event.type)
+		{  
+			case SDL_KEYDOWN:
+				return RM_NEXT_STEP;
+		}
+	}
+	return 0;
 }
 
 //
@@ -1271,12 +1357,19 @@ ReImportGeneticParameters()
 bool
 ReCleanupReInfo()
 {
+	for (int I = 0; I < 8; I++)
+	{
+		freez(ParameterNames[I]);
+		freez(ParameterValues[I]);
+		freez(ParameterRanges[I]);
+	}
+	freez(ParameterNames);
+	freez(ParameterValues);
+	freez(ParameterRanges);
+
   if (ReInfo)
   {
-//	char path[128];
-//	const char *raceName = ReInfo->_reRaceName; // = ReGetCurrentRaceName();
     void *params = ReInfo->params;
-//    void *results = ReInfo->results;
     int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
 
 	// We have to release the data here!
@@ -1300,10 +1393,6 @@ ReCleanupReInfo()
 			break;
 	}
 
-//	GfParmRemoveVariable (params, "/", "humanInGroup");
-//	GfParmRemoveVariable (params, "/", "eventNb");
-//	snprintf(path, sizeof(path), "%s/%s/%s", ReInfo->track->name, RE_SECT_RESULTS, raceName);
-//	GfParmListClean(results, path);
 	GfParmListClean(params, RM_SECT_DRIVERS_RACING);
 	free((void*) (ReInfo->_reRaceName));
   }
@@ -1320,13 +1409,17 @@ ReCleanupGeneticOptimisation()
 	if (genOptNeedInit)	// If still needed, ...
 		return true;	// ... we do not have to cleanup 
 
-	ReLogOptim.info("============================\n");
 	ReLogOptim.info("Cleanup\n");
+	ReLogOptim.info("============================\n");
+	ReUI().addOptimizationMessage("Cleanup");
+	ReUI().addOptimizationMessage("============================");
 
 	// Setup pointer to structure
 	tgenData *Data = &TGeneticParameter::Data;
 
-	ReLogOptim.info("Delete parameters\n");
+	ReLogOptim.info("Variation Statistics\n");
+	ReUI().addOptimizationMessage("Variation Statistics");
+	ReUI().addOptimizationMessage("============================");
 	// Free all parameters allocated
 	for (int I = 0; I < Data->NbrOfParam; I++)
 	{
@@ -1336,12 +1429,16 @@ ReCleanupGeneticOptimisation()
 			delete Data->GP[I];
 		}
 	}
+	ReUI().addOptimizationMessage("============================");
 
+	ReLogOptim.info("Delete parameters\n");
 	ReLogOptim.info("Delete list of parameters\n");
+	//ReUI().addOptimizationMessage("Delete list of parameters");
 	// Free list of pointers allocated
 	delete [] Data->GP;
 
 	ReLogOptim.info("Delete strings of parts\n");
+	//ReUI().addOptimizationMessage("Delete strings of parts");
 	// Free all strings allocated
 	for (int I = 0; I < Data->NbrOfParts; I++)
 	{
@@ -1352,43 +1449,45 @@ ReCleanupGeneticOptimisation()
 	}
 
 	ReLogOptim.info("Delete list of parts\n");
+	//ReUI().addOptimizationMessage("Delete list of parts");
 	delete [] Data->Part;
 
 	ReLogOptim.info("Release file handle\n");
+	//ReUI().addOptimizationMessage("Release file handle");
 	GfParmReleaseHandle(Data->Handle);
 
 	ReLogOptim.info("Reset need initialisation flag\n");
+	//ReUI().addOptimizationMessage("Reset need initialisation flag");
 	genOptNeedInit = true;
 
 	ReLogOptim.info("Setup path to best setup found\n");
+	//ReUI().addOptimizationMessage("Setup path to best setup found");
 	void* Handle = GfParmReadFile(Data->OptFileName, GFPARM_RMODE_REREAD);
 
 	ReLogOptim.info("Reset fuel control\n");
+	//ReUI().addOptimizationMessage("Reset fuel control");
 	GfParmSetNum(Handle, Data->PrivateSection, PRM_FUEL,    
 		(char*) NULL, -1, -1.0, Data->MaxFuel);
 
 	ReLogOptim.info("Reset optimisation flag for robot\n");
+	//ReUI().addOptimizationMessage("Reset optimisation flag for robot");
 	GfParmSetNum(Handle, Data->PrivateSection, PRV_OPTI,    
 		(char*) NULL, 0, 0, 1);
 
 	ReLogOptim.info("Write parameters to opt file\n");
+	//ReUI().addOptimizationMessage("Write parameters to opt file");
 	GfParmWriteFileSDHeader (Data->OptFileName, Handle, Data->CarType, Data->AuthorName);
 
 	ReLogOptim.info("Write parameters to xml file\n");
+	//ReUI().addOptimizationMessage("Write parameters to xml file");
 	GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
 
 	ReLogOptim.info("Release file handle\n");
+	//ReUI().addOptimizationMessage("Release file handle");
 	GfParmReleaseHandle(Handle);
 
 	ReLogOptim.info("============================\n");
-
-	// Use new Memory Manager ...
-	#ifdef __DEBUG_MEMORYMANAGER__
-//	fprintf(stderr,"... ReCleanupGeneticOptimisation()\n");
-	GfMemoryManagerSetGroup(0);
-	#endif
-	// ... Use new Memory Manager
-
+	//ReUI().addOptimizationMessage("============================");
 
 	return false;
 }
@@ -1433,9 +1532,11 @@ SelectParameterAndMutation(tgenData *Data)
 	double OldValue;
 	int P = 0;
 
-	double Scale = Data->Loops * Data->Loops / Data->Scale;
+	VariationScale = Data->Loops * Data->Loops / Data->Scale;
 	ReLogOptim.info("\n"); 
-	ReLogOptim.info("Random parameter variation scale: %g\n",Scale); 
+	ReLogOptim.info("Random parameter variation scale: %g\n",VariationScale); 
+	snprintf(buf,sizeof(buf),"Random parameter variation scale: %g",VariationScale); 
+	ReUI().addOptimizationMessage(buf); 
 
 	// Loop over wanted selections
 	for (int I = 0; I < N; I++)
@@ -1456,7 +1557,7 @@ SelectParameterAndMutation(tgenData *Data)
 			// Generate random variation factor 
 			// TODO: use generator for normal distributed random numbers
 			RandomFloat = (1.0 * rand())/RAND_MAX - 0.5;
-			double factor = MIN(1.0,1.1 * Scale) * RandomFloat;
+			double factor = MIN(1.0,1.1 * VariationScale) * RandomFloat;
 
 			// While first races only use global parameters
 			if ((Parameter > Data->Part[0].Offset) && (OptiCounter < 10))
@@ -1486,8 +1587,10 @@ SelectParameterAndMutation(tgenData *Data)
 					} while (P == -1); // Repeat until valid selection
 				}
 
-//				ReLogOptim.info("\n");
-//				ReLogOptim.info("Parameter: %g (Factor: %g) P: %d\n\n",Parameter,factor,P);
+				//ReLogOptim.debug("\n");
+				//ReLogOptim.debug("Parameter: %g (Factor: %g) P: %d\n\n",Parameter,factor,P);
+				//snprintf(buf,sizeof(buf),"Parameter: %g (Factor: %g) P: %d",Parameter,factor,P);
+				//ReUI().addOptimizationMessage(buf); 
 
 				// Get parameter from index
 				Param = Data->GP[P];
@@ -1499,40 +1602,53 @@ SelectParameterAndMutation(tgenData *Data)
 				double Change0 = Param->Scale * factor; 
 				Change = ((int) (Param->Round * Change0)/Param->Round);
 
-//				ReLogOptim.info("%s: (%g<%g<%g): %g * %g = %g -> %g\n",Param->oLabel,Param->Min,Param->Val,Param->Max,Param->Scale,factor,Change0,Change);
+//				ReLogOptim.debug("%s: (%g<%g<%g): %g * %g = %g -> %g\n",Param->oLabel,Param->Min,Param->Val,Param->Max,Param->Scale,factor,Change0,Change);
 
 				// Check allowed parameter min-max-range
 				OldValue = Param->Val;
 				Param->Val += (float) Change;
 				if (Param->Val < Param->Min)
 				{	// Use min instead
-//					ReLogOptim.info("%s: = Min (%g)\n",Param->oLabel,Param->Val);
+//					ReLogOptim.debug("%s: = Min (%g)\n",Param->oLabel,Param->Val);
 					Param->Val = Param->Min;
 				}
 				else if (Param->Val > Param->Max)
 				{	// Use max instead
-//					ReLogOptim.info("%s: = Max (%g)\n",Param->oLabel,Param->Val);
+//					ReLogOptim.debug("%s: = Max (%g)\n",Param->oLabel,Param->Val);
 					Param->Val = Param->Max;
 				}
 				if (fabs(OldValue - Param->Val) < 0.00000001) 
 				{	// No change after reading from xml file
-//					ReLogOptim.info("%s: Change too small %g\n",Param->oLabel,fabs(OldValue - Param->Val));
+//					ReLogOptim.debug("%s: Change too small %g\n",Param->oLabel,fabs(OldValue - Param->Val));
 					Change = 0.0;
 				}
 				else
 				{	// Successfully changed parameter
 					ReLogOptim.info("%s: Val: %g (Change: %g)\n",Param->Label,Param->Val,Change);
+					snprintf(buf,sizeof(buf),"%s: Val: %g (Change: %g)",Param->Label,Param->Val,Change);
+					ReUI().addOptimizationMessage(buf); 
+					
 					Param->Selected = true;
 					Param->Changed += 1;
 					Param->DisplayParameter();
-				}
 
+					free(ParameterNames[I]);
+					ParameterNames[I] =  strdup(Param->Label);
+
+					snprintf(buf,sizeof(buf),"%g (Change: %g)",Param->Val,Change);
+					free(ParameterValues[I]);
+					ParameterValues[I] = strdup(buf);
+
+					snprintf(buf,sizeof(buf),"Min=%g Max=%g Def=%g W=%g S=%g ,R=1/%g",Param->Min,Param->Max,Param->Def,Param->Weight,Param->Scale,Param->Round);
+					free(ParameterRanges[I]);
+					ParameterRanges[I] = strdup(buf);
+				}
 				// Rescale
-				Scale += 0.0001;
-				Scale *= 1.1;
+				VariationScale += 0.0001;
+				VariationScale *= 1.1;
 			}
 			else
-				Scale += 0.0001;
+				VariationScale += 0.0001;
 
 		} while (fabs(Change) < 0.0000001); // repeat if no change
 	} // Loop until all selections are done with a rounded change > 0
@@ -1567,6 +1683,7 @@ int
 ReEvolution()
 {
 	ReLogOptim.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+	ReUI().addOptimizationMessage(">>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
 	// Use new Memory Manager ...
 	#ifdef __DEBUG_MEMORYMANAGER__
@@ -1592,7 +1709,8 @@ ReEvolution()
 	// Setup shortcuts
 	tgenData *Data = &TGeneticParameter::Data;
 	void* Handle = Data->Handle; 
-	double TotalLapTime = Data->WeightedBestLapTime;
+	//double TotalLapTime = Data->WeightedBestLapTime;
+	TotalLapTime = Data->WeightedBestLapTime;
 
 	if (Data->First) 
 	{
@@ -1609,13 +1727,23 @@ ReEvolution()
 
 		// First race was done with the initial parameters to get the reference laptime
 		ReLogOptim.info("Initial Lap Time : %g\n",TotalLapTime);
+		snprintf(buf,sizeof(buf),"Initial Lap Time : %g",TotalLapTime);
+		ReUI().addOptimizationMessage(buf); 
 
 		// Get range for number of parameters to select for variation
 		Data->MaxSelected = MIN(8,1 + Data->NbrOfParam / 2);
 		ReLogOptim.info("Nbr. of selected : %d\n",Data->MaxSelected);
+		snprintf(buf,sizeof(buf),"Nbr. of selected : %d",Data->MaxSelected);
+		ReUI().addOptimizationMessage(buf); 
 		if (Data->MaxSelected < 1)
 			assert( 0 );
 
+		MaxSelected = Data->MaxSelected;
+		InitialLapTime = TotalLapTime;
+		BestLapTime  = TotalLapTime;
+
+		ReUI().addOptimizationStatusMessage(
+			OptiCounter, Data->Loops, VariationScale, InitialLapTime, TotalLapTime, BestLapTime);
 		// ... run once
 	}
 	else
@@ -1625,7 +1753,8 @@ ReEvolution()
 		// Count the loops and show the status
 		OptiCounter++;
 		ReLogOptim.info("Loop %d (Still to do %d loops)\n",OptiCounter,Data->Loops);
-
+		snprintf(buf,sizeof(buf),"Loop %d (Still to do %d loops)",OptiCounter,Data->Loops);
+		ReUI().addOptimizationMessage(buf); 
 		// ... run always
 	}
 
@@ -1641,6 +1770,9 @@ ReEvolution()
 		{
 			// Wow, we got a new best lap time
 			ReLogOptim.info("New best Lap Time: %g\n",TotalLapTime);
+			snprintf(buf,sizeof(buf),"New best Lap Time: %g",TotalLapTime);
+			ReUI().addOptimizationMessage(buf); 
+			BestLapTime = TotalLapTime;
 		}
 
 		// Push the result data to be reused in case of a back step later
@@ -1654,18 +1786,25 @@ ReEvolution()
 		// Write the best so far setup to the opt-file
 		GfParmWriteFileSDHeader (Data->OptFileName, Handle, Data->CarType, Data->AuthorName);
 		ReLogOptim.info("Stored to .opt\n");
+		ReUI().addOptimizationMessage("Stored to .opt"); 
 	}
 	else if (0.99 * TotalLapTime < Data->LastWeightedBestLapTime)
 	{
 		// We did not find a better set of parameters but we are not bad.
 		// Let's use the child to start the next search step of optimisation
 		ReLogOptim.info("Total Lap Time   : %g (Best so far: %g)\n",TotalLapTime,Data->LastWeightedBestLapTime);
+		snprintf(buf,sizeof(buf),"Total Lap Time   : %g (Best so far: %g)",TotalLapTime,Data->LastWeightedBestLapTime);
+		ReUI().addOptimizationMessage(buf); 
+        BestLapTime = Data->LastWeightedBestLapTime;
 	}            
 	else
 	{
 		// We got a bad result.
 		// Let's use the remote anchestor to start the next search step of optimisation
 		ReLogOptim.info("Total Lap Time   : %g (Bad!)\n",TotalLapTime);
+		snprintf(buf,sizeof(buf),"Total Lap Time   : %g (Bad!)",TotalLapTime);
+		ReUI().addOptimizationMessage(buf); 
+        BestLapTime = Data->LastWeightedBestLapTime;
 
 		// Pop the stored result data
 		Data->WeightedBestLapTime = Data->LastWeightedBestLapTime;
@@ -1676,14 +1815,21 @@ ReEvolution()
 			Data->GP[I]->Val = Data->GP[I]->OptVal;
 
 		ReLogOptim.info("Back to last .opt\n");
+		ReUI().addOptimizationMessage("Back to last .opt"); 
 		ReLogOptim.info("Old Best Lap Time: %g\n",Data->WeightedBestLapTime);
+		snprintf(buf,sizeof(buf),"Old Best Lap Time: %g",Data->WeightedBestLapTime);
+		ReUI().addOptimizationMessage(buf); 
 	}
+
+	ReUI().addOptimizationStatusMessage(
+		OptiCounter, Data->Loops, VariationScale, InitialLapTime, TotalLapTime, BestLapTime);
 
 	if (Data->First)
 	{
 		// Run once ...
 		ReLogOptim.info("\n");
 		ReLogOptim.info("Start Optimisation\n");
+		ReUI().addOptimizationMessage("Start Optimisation"); 
 		// ... run once
 	}
 
@@ -1724,9 +1870,13 @@ ReEvolution()
 	GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
 
 	ReLogOptim.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+	ReUI().addOptimizationMessage("<<<<<<<<<<<<<<<<<<<<<<<<<<<<"); 
 
 	// Reset run once flag
 	Data->First = false;
+
+	ReUI().addOptimizationParameterMessage(
+		8, ParameterNames, ParameterValues, ParameterRanges);
 
 	// Initialize again
 	Data->WeightedBestLapTime = FLT_MAX;
