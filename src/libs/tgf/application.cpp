@@ -38,7 +38,6 @@
 #endif
 
 #include <portability.h>
-#include "..\tgfdata\tgfdata.h"
 
 #include "tgf.hpp"
 
