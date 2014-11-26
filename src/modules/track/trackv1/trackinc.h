@@ -28,6 +28,7 @@ extern void TrackShutdown(void);
 
 extern void ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext);
 extern void ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext);
+extern void ReadTrack5(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext);
 
 extern tRoadCam *TrackGetCamList(void);
 

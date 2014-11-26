@@ -66,6 +66,9 @@ TrackBuildv1(const char *trackfile)
 	break;
     case 4:
 	ReadTrack4(theTrack, TrackHandle, &theCamList, 0);
+   break;
+    case 5:
+	ReadTrack5(theTrack, TrackHandle, &theCamList, 0);
 	break;
     
     }
@@ -99,6 +102,9 @@ TrackBuildEx(const char *trackfile)
 			break;
     		case 4:
 			ReadTrack4(theTrack, TrackHandle, &theCamList, 1);
+         break;
+         case 5:
+         ReadTrack5(theTrack, TrackHandle, &theCamList, 1);
 			break;
 
     	}
