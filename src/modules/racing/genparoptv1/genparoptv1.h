@@ -31,7 +31,7 @@
 
 
 #include <tgf.hpp>
-#include "..\..\..\libs\tgfclient\tgfclient.h"
+#include <tgfclient.h>
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32

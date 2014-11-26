@@ -68,6 +68,7 @@ static char** ParameterNames = 0;
 static char** ParameterValues = 0;
 static char** ParameterRanges = 0;
 
+static int NbrSelected = 0;
 static int MaxSelected = 8;
 static int LoopsDone = 0;
 static int LoopsRemaining = 1000;
@@ -538,9 +539,9 @@ ReRaceRealStart(void)
 	// Initialize & place cars
 	if (ReInitCars())
 		return RM_ERROR;
-//TEST::
+
 	// Notify the UI that it's "race loading time".
-//	ReUI().onRaceLoadingDrivers();
+    // ReUI().onRaceLoadingDrivers();
 
 	// Load drivers for the race
 	for (i = 0; i < s->_ncars; i++)
@@ -598,16 +599,16 @@ ReRaceRealStart(void)
 	// Notify the UI that the race is now started.
 	//ReUI().addOptimizationMessage("Ready.");
 
-//TEST::
-//	ReUI().onRaceStarted();
-/**/
+
+    //ReUI().onRaceStarted();
+
 	// Configure the event loop.
 	GfuiApp().eventLoop().setRecomputeCB(rmUpdateRaceEngine);
 	//GfuiApp().eventLoop().setRedisplayCB(rmResRedisplay);
 
 	// Resynchronize the race engine.
 	GenParOptV1::self().start();
-/**/
+
 	// And go on looping the race state automaton.
 	return RM_SYNC | RM_NEXT_STEP;
 }//ReRaceRealStart
@@ -1294,14 +1295,6 @@ ReImportGeneticParameters()
 }
 
 //
-// Handle ESCAPE
-//
-static void escapeKey(int /* key */, int /* modifiers */, int /* x */, int /* y */)
-{
-	ReStateApply(RE_STATE_CONFIG);
-}
-
-//
 // Display results
 //
 bool
@@ -1526,6 +1519,7 @@ SelectParameterAndMutation(tgenData *Data)
 	// Select random number of parameters
 	double RandomFloat = (Data->MaxSelected * rand())/RAND_MAX;
 	int N = (int) (1 + RandomFloat);
+	NbrSelected = N;
 
 	TGeneticParameter* Param = Data->GP[0];
 	double Change; 
@@ -1876,7 +1870,7 @@ ReEvolution()
 	Data->First = false;
 
 	ReUI().addOptimizationParameterMessage(
-		8, ParameterNames, ParameterValues, ParameterRanges);
+		NbrSelected, ParameterNames, ParameterValues, ParameterRanges);
 
 	// Initialize again
 	Data->WeightedBestLapTime = FLT_MAX;

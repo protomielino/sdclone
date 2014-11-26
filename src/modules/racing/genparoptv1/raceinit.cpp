@@ -822,7 +822,7 @@ void
 ReRaceCleanup(void)
 {
   RePhysicsEngine().shutdown();
-  GenParOptV1::self().unloadPhysicsEngine();
+  //GenParOptV1::self().unloadPhysicsEngine();
 
   //ReStoreRaceResults(ReInfo->_reRaceName);
 

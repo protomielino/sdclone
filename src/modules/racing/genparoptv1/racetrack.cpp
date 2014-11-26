@@ -42,7 +42,7 @@
 
 
 // Local functions.
-static void reTrackDump(const tTrack *track, int verbose);
+//static void reTrackDump(const tTrack *track, int verbose);
 static void reTrackInitTimeOfDay(void);
 static void reTrackInitWeather(void);
 static void reTrackUpdatePhysics(void);
