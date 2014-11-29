@@ -29,6 +29,9 @@
 
 #include "trackinc.h"
 
+//TODO Joe
+// Move to D:\source\speed-dreams\src\interfaces\track.h 
+#define TRK_ATT_START_BEARING  "original bearing"
 
 static tdble	xmin, xmax, ymin, ymax, zmin, zmax;
 
@@ -1221,7 +1224,12 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
 		xr = xl = 0.0;
 		yr = 0.0;
 		yl = width;
-		alf = 0.0;
+		alf = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_START_BEARING, 0, FLOAT_DEG2RAD(0.0));
+		xr += wi2 * sin(alf);
+		xl = xr - width * sin(alf);
+		yr -= wi2 * cos(alf);
+		yl = yr + width * cos(alf);
+
 		zsl = zsr = zel = zer = zs = ze = 0.0;
 		stgt = etgt = 0.0;
 		stgtl = etgtl = 0.0;
