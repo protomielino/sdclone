@@ -682,7 +682,7 @@ static void OnActivateNetworkClient(void *)
 		} else {
 			// Ensure menu system knows about all cars
 			GfDrivers::self()->reload();
-			tRmInfo* reInfo = LmRaceEngine().inData();
+			// tRmInfo* reInfo = LmRaceEngine().inData(); // Never used
 			LmRaceEngine().race()->load(LmRaceEngine().race()->getManager(), true);
 		}
 	}
@@ -731,7 +731,7 @@ rmCarSettingsMenu(void *pMenu)
 
 	if (nDriverIdx > -1) {
 		NetDriver driver;
-		char newName[64];
+		// char newName[64]; Never used
 		char dname[256];
 
 		// check for car change

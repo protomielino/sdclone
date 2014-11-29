@@ -1092,6 +1092,7 @@ ReImportGeneticParameters()
 	}
 	else
 	{
+        // C:\Users\wdb\Documents\speed-dreams-2.settings\drivers\simplix_srw\srw-sector-p4
 		// Build path to meta data file
 		snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-template.xml",
 			GetLocalDir(),Data->RobotName,Data->CarType);

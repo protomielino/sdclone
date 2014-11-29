@@ -23,7 +23,7 @@
 
 tdble rho = 1.290f; /* air density, prepare for variable environment */
 
-// Christos plausibhility check ...
+// Christos plausibility check ...
 tdble Max_Cl_given_Cd (tdble Cd)
 {
     // if Cd = 1, then all air hitting the surface is stopped.

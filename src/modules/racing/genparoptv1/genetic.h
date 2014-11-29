@@ -37,7 +37,7 @@
 #define SECT_PH_RGHT	"Right"
 
 #define PRM_ACTIVE		"active"
-#define PRM_TWOSIDE		"twosided"
+#define PRM_TWOSIDE		"twosided" // 0: no 1: same sign; -1 opposite sign
 #define PRM_LABEL		"label"
 #define PRM_SECT		"section"
 #define PRM_SUBSECT		"subsection"
@@ -205,7 +205,7 @@ class TGeneticParameter
 		float ParamScale,			// Scales the random variation of the value
 		float ParamRound,			// Defines the rounding 
 									// (to be able to write it in xml without loss of information)
-		bool TwoSided = false		// If there are left and right parameters to be set
+		int TwoSided = 0			// If there are left and right parameters to be set
 
 	);
 
@@ -250,6 +250,7 @@ class TGeneticParameter
 					// (to avoid multiple variations)
 
 	bool LeftRight;
+	bool SameSign;
 
 	char *Label;  
 	char *Section;

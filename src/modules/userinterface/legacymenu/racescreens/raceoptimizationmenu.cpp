@@ -393,6 +393,18 @@ RmOptimizationScreenSetParameterText(int N, char** Labels, char** Values, char**
 			GfuiLabelSetText(HScreen, ParameterRangeIds[I], "");
 	}
 
+	for (int I = N; I < 8; I++)
+	{
+		freez(Parameters[I]);
+		GfuiLabelSetText(HScreen, ParameterIds[I], "");
+
+		freez(ParameterValues[I]);
+		GfuiLabelSetText(HScreen, ParameterValueIds[I], "");
+
+		freez(ParameterRanges[I]);
+		GfuiLabelSetText(HScreen, ParameterRangeIds[I], "");
+	}
+
 	if (!AnyTextDisplayed)
 	{
 	    void *hmenu = GfuiMenuLoad("optimizationscreen.xml");
