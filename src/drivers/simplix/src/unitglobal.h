@@ -1,7 +1,6 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // unitglobal.h
 //--------------------------------------------------------------------------*
-// TORCS: "The Open Racing Car Simulator"
 // A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Global data types and definitions
@@ -9,10 +8,10 @@
 //
 // File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2014.11.23
+// Last changed : 2014.11.29
 // Copyright    : © 2007-2014 Wolf-Dieter Beelitz
-// eMail        : wdb@wdbee.de
-// Version      : 4.03.000
+// eMail        : wdbee@users.sourceforge.net
+// Version      : 4.05.000
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -412,7 +411,7 @@ enum
 // Parameters of this robot ...
 #define PRV_OPTI	         "genetic optimisation"
 
-//#define PRV_ACCEL_FILTER     "accel filter"
+#define PRV_ACCEL_FILTER     "accel filter"
 #define PRV_ACCEL_OUT        "accel out"
 #define PRV_ACCEL_DELTA      "accel delta"
 #define PRV_ACCEL_DELTA_RAIN "accel delta rain"
@@ -428,6 +427,9 @@ enum
 #define PRV_BRAKE_LIMIT      "brake limit" 
 #define PRV_BRAKE_LIMIT_SCALE "brake limit scale" 
 #define PRV_BRAKE_LIMIT_BASE "brake limit base" 
+
+#define PRV_CAR_CHARACTER    "character" 
+#define PRV_PERFORMANCE		 "performance" 
 
 #define PRV_SPEED_LIMIT_SCALE "speed limit scale" 
 #define PRV_SPEED_LIMIT_BASE "speed limit base" 
@@ -524,6 +526,7 @@ enum
 #define PRV_CLUTCH_RELEASE   "clutch release"    // default 0.4
 #define PRV_EARLY_SHIFT      "early shift"       // default 1.0
 #define PRV_SHIFT_UP         "shift up"          // default 1.0
+#define PRV_SHIFT_MARGIN     "shift margin"      // default 0.9
 
 #define PRV_TEAM_ENABLE      "team enable"       // default 1
 

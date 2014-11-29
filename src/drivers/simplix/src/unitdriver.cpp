@@ -1,7 +1,6 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // unitdriver.cpp
 //--------------------------------------------------------------------------*
-// TORCS: "The Open Racing Car Simulator"
 // A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
@@ -9,10 +8,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2014.11.23
+// Last changed : 2014.11.29
 // Copyright    : © 2007-2014 Wolf-Dieter Beelitz
-// eMail        : wdb@wdbee.de
-// Version      : 4.03.000
+// eMail        : wdbee@users.sourceforge.net
+// Version      : 4.05.000
 //--------------------------------------------------------------------------*
 //
 //    Copyright: (C) 2000 by Eric Espie
@@ -26,12 +25,12 @@
 // dem Roboter delphin
 //
 //    Copyright: (C) 2006-2007 Wolf-Dieter Beelitz
-//    eMail    : wdb@wdbee.de
+//    eMail    : wdbee@users.sourceforge.net
 //
 // dem Roboter wdbee_2007
 //
 //    Copyright: (C) 2006-2007 Wolf-Dieter Beelitz
-//    eMail    : wdb@wdbee.de
+//    eMail    : wdbee@users.sourceforge.net
 //
 // und dem Roboter mouse_2006
 //
@@ -261,10 +260,16 @@ TDriver::TDriver(int Index):
   oClutchDelta(0.009),
   oClutchRange(0.82),
   oClutchRelease(0.5),
-  oEarlyShiftFactor(1.0),
-  oShiftUp(1.0),
   oCurrSpeed(0),
-  // oGearEff,
+/*
+    double oGearEff[MAX_GEARS];                  // Efficiency of gears
+    double oShift[MAX_GEARS];                    // Shift levels
+    double oShiftMargin[MAX_GEARS];              // Shift back margin
+	double oShiftUp[MAX_GEARS];                  // Shift by setup
+	double oEarlyShiftFactor;                    // Early shifting
+*/
+  oEarlyShiftFactor(1.0),
+  oShiftCounter(0),
   oExtended(0),
   oLastGear(0),
   oLetPass(false),
@@ -277,9 +282,6 @@ TDriver::TDriver(int Index):
   oOmegaAheadFactor(0.1),
   oOmegaAhead(5.0),
   oDistFromStart(0.0),
-  // oShift
-  oShiftMargin(0),
-  oShiftCounter(0),
   oSituation(NULL),
   oStartDistance(150.0),
   oStartRPM(100.0),
@@ -431,8 +433,6 @@ TDriver::TDriver(int Index):
 
   TDriver::LengthMargin = LENGTH_MARGIN;         // Initialize safty margin
 
-//  oLastUsedGear = 0;
-
   LogSimplix.debug("\n#<<< TDriver::TDriver()\n\n");
 }
 //==========================================================================*
@@ -454,6 +454,7 @@ TDriver::~TDriver()
     delete oSysFooStuckX;
   if (oSysFooStuckY != NULL)
     delete oSysFooStuckY;
+
   LogSimplix.debug("\n#<<< TDriver::~TDriver()\n\n");
 }
 //==========================================================================*
@@ -511,6 +512,63 @@ void TDriver::SetBotName(void* RobotSettings, char* Value)
     LogSimplix.debug("#Car type    : %s\n",oCarType);
     LogSimplix.debug("#Race number : %d\n",oRaceNumber);
 };
+//==========================================================================*
+
+//==========================================================================*
+// Adjust car characteristic
+//--------------------------------------------------------------------------*
+void TDriver::AdjustCarCharacteristic(PCarHandle Handle)
+{
+  char buf[BUFLEN];
+
+  for (int I = 0; I < ControlPoints; I++)
+  {
+	  X[I] = 10.0 * I;	// I * 10 m/s
+	  Y[I] = 1.0;		// 100%
+	  S[I] = 0.0;		// No gradient
+  }
+
+  for (int I = 0; I < ControlPoints; I++)
+  {
+	sprintf(buf, "%s/%s/%d", TDriver::SECT_PRIV, PRV_CAR_CHARACTER, I+1);
+    Y[I] = GfParmGetNum(Handle, buf, PRV_PERFORMANCE, (char*) NULL, 1.0);
+  }
+  CarCharacteristic.Init(ControlPoints, X, Y, S);
+
+  snprintf(buf, BUFLEN, "%sCharacteristic-%s.txt", 
+  	GetLocalDir(),oBotName);
+
+  SaveCharacteristicToFile(buf);
+};
+//==========================================================================*
+
+//==========================================================================*
+// Save characteristic to file
+//--------------------------------------------------------------------------*
+bool TDriver::SaveCharacteristicToFile(const char* Filename)
+{
+#ifdef mysecure
+  FILE* F;
+  int err = myfopen(&F, Filename, "w");
+#else
+  FILE* F = fopen(Filename, "w");
+#endif
+  if (F == 0)
+    return false;
+
+  for (int I = 0; I < 101; I++)
+  {
+    if (CarCharacteristic.IsValidX(I))
+	{
+      double Speed = CarCharacteristic.CalcOffset(I);
+	  fprintf(F, "%d; %-15.12g\n",I, Speed);
+	}
+  }
+
+  fclose(F);
+
+  return true;
+}
 //==========================================================================*
 
 //==========================================================================*
@@ -682,10 +740,10 @@ void TDriver::AdjustDriving(
 
   if (GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_OUT,0,1) != 0)
 	  UseAccelOut();
-  /*
+
   if (GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_FILTER,0,0) != 0)
 	  UseFilterAccel();
-  */
+
   oDeltaAccel = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_DELTA,0,oDeltaAccel);
   oDeltaAccelRain = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_DELTA_RAIN,0,oDeltaAccelRain);
 
@@ -875,10 +933,33 @@ void TDriver::AdjustDriving(
 	(float)oEarlyShiftFactor);
   LogSimplix.debug("#oEarlyShiftFactor %g\n",oEarlyShiftFactor);
 
-  oShiftUp =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SHIFT_UP,0,
-	(float)oShiftUp);
-  LogSimplix.debug("#oShiftUp %g\n",oShiftUp);
+  float ShiftUp =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SHIFT_UP,0,1);
+  LogSimplix.debug("#oShiftUp %g\n",ShiftUp);
+  oShiftUp[0] = ShiftUp;
+  oShiftUp[1] = ShiftUp;
+  oShiftUp[2] = ShiftUp;
+  oShiftUp[3] = ShiftUp;
+  oShiftUp[4] = ShiftUp;
+  oShiftUp[5] = ShiftUp;
+  oShiftUp[6] = ShiftUp;
+  oShiftUp[7] = ShiftUp;
+  oShiftUp[8] = 1.1 * ShiftUp;
+  oShiftUp[9] = 1.0;
+
+  float ShiftMargin =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SHIFT_MARGIN,0,0.9f);
+  LogSimplix.debug("#oShiftMargin %g\n",ShiftMargin);
+  oShiftMargin[0] = 0.0; // R
+  oShiftMargin[1] = 0.0; // N
+  oShiftMargin[2] = 0.8*ShiftMargin; // 1
+  oShiftMargin[3] = 0.8*ShiftMargin; // 2
+  oShiftMargin[4] = ShiftMargin; // 3
+  oShiftMargin[5] = ShiftMargin; // 4
+  oShiftMargin[6] = ShiftMargin; // 5
+  oShiftMargin[7] = ShiftMargin; // 6
+  oShiftMargin[8] = ShiftMargin; // 7
+  oShiftMargin[9] = ShiftMargin; // 8
 
   oTeamEnabled =
     GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TEAM_ENABLE,0,
@@ -1113,6 +1194,12 @@ void TDriver::SetPathAndFilenameForRacinglines()
   snprintf(TrackLoadBuffer,sizeof(TrackLoadBuffer),"%s/%d-%s.trk",
     oPathToWriteTo,oWeatherCode,oTrackName);
   oTrackLoad = TrackLoadBuffer;                  // Set pointer to buffer
+  if (strncmp(oTrackName,"e-track-4",9) == 0)
+	  oCrvZScale = 0.5;
+  else if (strncmp(oTrackName,"ole-road-1",10) == 0)
+	  oCrvZScale = 0.75;
+  else
+	  oCrvZScale = 0.05;
 
   snprintf(TrackLoadQualifyBuffer,sizeof(TrackLoadQualifyBuffer),
 	"%s/%d-%s.trq",oPathToWriteTo,oWeatherCode,oTrackName);
@@ -1360,6 +1447,7 @@ void TDriver::InitTrack
 	GfParmGetNum(Handle,SECT_CAR,PRM_LEN,0,4.5);
 
   AdjustBrakes(Handle);
+  AdjustCarCharacteristic(Handle);
   AdjustPitting(Handle);
   AdjustDriving(Handle,ScaleBrake,ScaleMu);
   AdjustSkilling(Handle);
@@ -1611,7 +1699,7 @@ void TDriver::Drive()
     oBrake = FilterBrakeSpeed(oBrake);
     if (!oCarHasABS)
       oBrake = FilterABS(oBrake);
-	  oBrake = FilterSkillBrake(oBrake);
+	oBrake = FilterSkillBrake(oBrake);
 	//if (oBrake > 0.10)
 	//  oClutch = 0.4;
 
@@ -2788,7 +2876,6 @@ void TDriver::InitAdaptiveShiftLevels()
 
   Edesc = (struct tEdesc*) malloc((IMax + 1) * sizeof(struct tEdesc));
 
-  oShiftMargin = 0.9;                            //
   for (I = 0; I < MAX_GEARS; I++)
   {
     oShift[I] = 2000.0;
@@ -2921,10 +3008,10 @@ void TDriver::InitAdaptiveShiftLevels()
   free(DataPoints);
   free(Edesc);
 
-  if (oShiftUp < 1.0) 
+  if (oShiftUp[1] < 1.0) 
   {
 	for (I = 0; I < CarGearNbr; I++)
-      oShift[I] = oRevsLimiter * oShiftUp;
+      oShift[I] = oRevsLimiter * oShiftUp[I];
   }
 
   oRevsLimiter = (float) (oRevsLimiter * RpmFactor);
@@ -2988,7 +3075,7 @@ void TDriver::GearTronic()
     else if(oUsedGear > 1)
 	{
       double PrevRpm =
-  	    oShift[oUsedGear-1] * oShiftMargin
+  	    oShift[oUsedGear-1] * oShiftMargin[oUsedGear]
 	    * GearRatio() / PrevGearRatio();
 
       if(GearRatio() * CarSpeedLong / oWheelRadius < PrevRpm)

@@ -1,7 +1,6 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // unitdriver.h
 //--------------------------------------------------------------------------*
-// TORCS: "The Open Racing Car Simulator"
 // A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
@@ -9,10 +8,10 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2014.11.23
+// Last changed : 2014.11.29
 // Copyright    : © 2007-2014 Wolf-Dieter Beelitz
-// eMail        : wdb@wdbee.de
-// Version      : 4.03.000
+// eMail        : wdbee@users.sourceforge.net
+// Version      : 4.05.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -27,12 +26,12 @@
 // dem Roboter delphin
 //
 //    Copyright: (C) 2006-2007 Wolf-Dieter Beelitz
-//    eMail    : wdb@wdbee.de
+//    eMail    : wdbee@users.sourceforge.net
 //
 // dem Roboter wdbee_2007
 //
 //    Copyright: (C) 2006-2007 Wolf-Dieter Beelitz
-//    eMail    : wdb@wdbee.de
+//    eMail    : wdbee@users.sourceforge.net
 //
 // und dem Roboter mouse_2006
 //
@@ -59,6 +58,7 @@
 #include <track.h>
 #include <car.h>
 #include <robot.h>
+//#include <aero.h>
 #include "../../../modules/simu/simuv4/aero.h"
 
 #include "unitglobal.h"
@@ -305,10 +305,13 @@ private:
 	double oClutchDelta;
 	double oClutchRange;
 	double oClutchRelease;
-	double oEarlyShiftFactor;
-	double oShiftUp;
 	double oCurrSpeed;                           // Currend speed
 	double oGearEff[MAX_GEARS];                  // Efficiency of gears
+    double oShift[MAX_GEARS];                    // Shift levels
+    double oShiftMargin[MAX_GEARS];              // Shift back margin
+	double oShiftUp[MAX_GEARS];                  // Shift by setup
+	double oEarlyShiftFactor;                    // Early shifting
+    int oShiftCounter;                           // Shift timer
 	int oExtended;                               // Information if this robot is extended (oExtended = 1) or not (oExtended = 0).
 	int oLastGear;                               // Last gear
 	int oLastUsedGear;                           // Last used gear
@@ -322,9 +325,6 @@ private:
 	double oOmegaAheadFactor;                    // Omega ahead factor
 	double oOmegaAhead;                          // Omega ahead base value
     double oDistFromStart;                       // Position along Track
-    double oShift[MAX_GEARS];                    // Shift levels
-    double oShiftMargin;                         // Shift back margin
-    int oShiftCounter;                           // Shift timer
     PSituation oSituation;                       // TORCS data fpr situation
 	double oStartDistance;                       // max Dist. raced while starting
 	double oStartRPM;
@@ -413,7 +413,9 @@ private:
 	static double LengthMargin;                  // Length margin
 	static bool Qualification;                   // Flag qualifying
 	bool oStanding;                              // Fahrzeug steht#
+	TCubicSpline CarCharacteristic;				 // Car characteristic 
 	TParam Param;                                // Parameters
+	double oCrvZScale;
 	double oFuelPer100km;                        //
 	double oMaxFuel;                             // tank capacity
 	double oMaxPressure;                         // brake pressure
@@ -451,6 +453,11 @@ private:
 	double oStartSteerFactor;
 	bool oCarHasTYC;							 // Flag: Car has tyre condition in simu enabled
 
+	static const int ControlPoints = 13;
+	double X[ControlPoints];
+	double Y[ControlPoints];
+	double S[ControlPoints];
+
 	static int NBBOTS;                           // Nbr of cars
     double CurrSimTime;                          // Current simulation time
 	static const char* MyBotName;                      // Name of this bot 
@@ -481,6 +488,8 @@ private:
 	void SideBorderInner(float Factor);
 
 	void AdjustBrakes(PCarHandle Handle);
+	void AdjustCarCharacteristic(PCarHandle Handle);
+	bool SaveCharacteristicToFile(const char* Filename);
 	void AdjustDriving(PCarHandle Handle, double ScaleBrake, double ScaleMu);
 	void AdjustPitting(PCarHandle Handle);
     void AdjustSkilling(PCarHandle Handle);

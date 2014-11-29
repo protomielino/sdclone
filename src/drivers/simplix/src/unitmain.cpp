@@ -1,18 +1,21 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // unitmain.cpp
 //--------------------------------------------------------------------------*
-// A robot for SPEED-DREAMS-Version 2.X simuV4
+// A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Interface to SPEED-DREAMS
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2014.11.09
-// Copyright    : © 2007-2013 Wolf-Dieter Beelitz
-// eMail        : wdb@wdbee.de
-// Version      : 4.02.000
+// Last changed : 2014.11.29
+// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
+// eMail        : wdbee@users.sourceforge.net
+// Version      : 4.05.000
 //--------------------------------------------------------------------------*
-// V4.01.000:Supercars.xml
+// V4.05.000:
+// New code for additional features of simuv4
+//--------------------------------------------------------------------------*
+// V4.01.000:
 // New code for avoiding and overtaking 
 //--------------------------------------------------------------------------*
 // V4.00.002:

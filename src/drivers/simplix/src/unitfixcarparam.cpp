@@ -1,20 +1,17 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // unitfixcarparam.cpp
 //--------------------------------------------------------------------------*
-// TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Constant parameters of the car and calculations with it
 // Unveränderliche Parameter des Fahrzeugs und Nebenrechnungen
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2014.11.23
+// Last changed : 2014.11.29
 // Copyright    : © 2007-2014 Wolf-Dieter Beelitz
-// eMail        : wdb@wdbee.de
-// Version      : 4.03.000
-//--------------------------------------------------------------------------*
-// Ein erweiterter TORCS-Roboters
+// eMail        : wdbee@users.sourceforge.net
+// Version      : 4.05.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem Roboter mouse_2006
 //
@@ -409,8 +406,9 @@ double TFixCarParam::CalcMaxSpeed
 
   double Mu;
 
-  double Cos = cos(TrackRollAngle);
+  double Cos = cos(TrackRollAngle)*cos(TrackTiltAngle);
   double Sin = sin(TrackRollAngle);
+  //double ICos = 0.125/cos(TrackTiltAngle);
 
   double AbsCrv0 = MAX(0.001, fabs(Crv0));
   double AbsCrv1 = MAX(0.001, fabs(Crv1));
@@ -418,7 +416,7 @@ double TFixCarParam::CalcMaxSpeed
   double factor = 1.0;
 
   if (AbsCrv < 1/200.0)
-	CrvZ *= 0.001;
+	CrvZ *= oDriver->oCrvZScale;
 
   if (AbsCrv > AbsCrv1)
   {
@@ -460,8 +458,15 @@ double TFixCarParam::CalcMaxSpeed
   if (Den < 0.00001)
    Den = 0.00001;
 
-  double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(Crv0)) / Den);
+  if (Sin * SGN(Crv0) < 0)
+	  Sin *= 8.0;
+  
+  double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(Crv0) + CrvZ) / Den);
+  if (oDriver->CarCharacteristic.IsValidX(Speed))
+    Speed *= oDriver->CarCharacteristic.CalcOffset(Speed);
+
   Speed = oDriver->CalcHairpin(Speed,AbsCrv);
+
   return Speed;
 }
 //==========================================================================*

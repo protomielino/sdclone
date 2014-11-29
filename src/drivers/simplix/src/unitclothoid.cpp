@@ -1,18 +1,17 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // unitclothoid.cpp
 //--------------------------------------------------------------------------*
-// TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 2.X
+// A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Lane clothoide like
-// Fahrspur clothoiden�hnlich
+// Fahrspur clothoiden ähnlich
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2013.03.02
-// Copyright    : 2007-2013 Wolf-Dieter Beelitz
-// eMail        : wdb@wdbee.de
-// Version      : 4.00.000
+// Last changed : 2014.11.29
+// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
+// eMail        : wdbee@users.sourceforge.net
+// Version      : 4.05.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -27,12 +26,12 @@
 // dem Roboter delphin
 //
 //    Copyright: (C) 2006-2007 Wolf-Dieter Beelitz
-//    eMail    : wdb@wdbee.de
+//    eMail    : wdbee@users.sourceforge.net
 //
 // dem Roboter wdbee_2007
 //
 //    Copyright: (C) 2006-2007 Wolf-Dieter Beelitz
-//    eMail    : wdb@wdbee.de
+//    eMail    : wdbee@users.sourceforge.net
 //
 // und dem Roboter mouse_2006
 //
