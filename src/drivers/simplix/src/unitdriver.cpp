@@ -79,7 +79,7 @@
 #include "unitstrategy.h"
 #include "unittrack.h"
 
-//#define EXPORT_RACINGLINE
+#define EXPORT_RACINGLINE
 
 //==========================================================================*
 // Statics
@@ -1621,6 +1621,7 @@ void TDriver::Drive()
 
   GetPosInfo(Pos,oLanePoint);                    // Info about pts on track
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
+  double InitialTS = oTargetSpeed;
   if (!oCarHasTCL)
     oTargetSpeed = FilterStart(oTargetSpeed);    // Filter Start
   //fprintf(stderr,"oTargetSpeed %.2f km/h\n",oTargetSpeed*3.6),
@@ -1741,6 +1742,9 @@ void TDriver::Drive()
 
   if (oTelemetrieMode == 4)
 	  fprintf(stderr,"A%+7.2f%% B%+7.2f%% C%+7.2f%% S%+7.2f%% G:%d\n",100*oAccel,100*oBrake,100*oClutch,100*oSteer,oGear);
+
+//  fprintf(stderr,"Pos:%+7.2f ITS%+7.2f TS%+7.2f CS%+7.2f wc: %g wemy: %g\n",Pos,InitialTS,oTargetSpeed,oCurrSpeed,oCar->_tyreCondition(0),oCar->_tyreEffMu(0));
+
 /*
   double Radius = 1/oLanePoint.Crv;
   fprintf(stderr,"R:%+7.2f\n",Radius);
@@ -1916,7 +1920,7 @@ void TDriver::FindRacinglines()
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode));
 #ifdef EXPORT_RACINGLINE
-    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk5");
 #endif
 	if (oGeneticOpti)
       oRacingLine[oRL_FREE].ClearRacingline(oTrackLoad);
@@ -1952,7 +1956,7 @@ void TDriver::FindRacinglines()
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode));
 #ifdef EXPORT_RACINGLINE
-    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.t5");
 #endif
 	if (oGeneticOpti)
       oRacingLine[oRL_FREE].ClearRacingline(oTrackLoad);
@@ -1990,7 +1994,7 @@ void TDriver::FindRacinglines()
 	    (&oTrackDesc, Param,
 		TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode, FLT_MAX, -oAvoidWidth, true));
 #ifdef EXPORT_RACINGLINE
-      oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
+      oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk5");
 #endif
 	  if (oGeneticOpti)
         oRacingLine[oRL_LEFT].ClearRacingline(oTrackLoadLeft);
@@ -2015,7 +2019,7 @@ void TDriver::FindRacinglines()
 	    (&oTrackDesc, Param,
   	    TClothoidLane::TOptions(oBase,oBaseScale, oBumpMode, -oAvoidWidth, FLT_MAX, true));
 #ifdef EXPORT_RACINGLINE
-      oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
+      oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk5");
 #endif
 	  if (oGeneticOpti)
         oRacingLine[oRL_RIGHT].ClearRacingline(oTrackLoadRight);
@@ -2036,9 +2040,9 @@ void TDriver::FindRacinglines()
           MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
 	  }
 #ifdef EXPORT_RACINGLINE
-	  oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
-	  oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
-	  oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
+	  oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk5");
+	  oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk5");
+	  oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk5");
 #endif
 	  oStrategy->oDistToSwitch = MaxPitDist + 125; // Distance to pit entry
 	  LogSimplix.debug("\n\n#Dist to switch: %.02f\n\n", oStrategy->oDistToSwitch);

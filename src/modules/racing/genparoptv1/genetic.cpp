@@ -3,7 +3,7 @@
     file        : genetic.cpp
     created     : Sun Nov 06 09:15:00 CET 2011
     copyright   : (C) 2011-2013 by Wolf-Dieter Beelitz
-    email       : wdb@wdbee.de
+    email       : wdbee@users.sourceforge.net
     version     : $Id: genetic.cpp 3657 2011-11-06 09:15:00Z wdbee $
  ***************************************************************************/
 
@@ -18,7 +18,7 @@
 
 /** @file   
     		Helper for parameter handling while optimizations
-    @author	<a href=mailto:wdb@wdbee.de>WDBee</a>
+    @author	<a href=mailto:wdbee@users.sourceforge.net>WDBee</a>
     @version	$Id: genetic.cpp 3657 2011-11-06 09:15:00Z wdbee $
 */
 

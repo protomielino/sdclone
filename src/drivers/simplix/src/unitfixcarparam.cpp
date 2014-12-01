@@ -458,10 +458,15 @@ double TFixCarParam::CalcMaxSpeed
   if (Den < 0.00001)
    Den = 0.00001;
 
-  if (Sin * SGN(Crv0) < 0)
+  if (AbsCrv > 0.01)
+  {
+	if (Sin * SGN(Crv0) < 0)
 	  Sin *= 8.0;
+  }
   
   double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(Crv0) + CrvZ) / Den);
+//  fprintf(stderr,"S:%g f:%g C:%g M:%g S:%g AbsCrv:%g Crv0:%d CrvZ:%g Den:%g\n",
+//	  Speed,factor,Cos,Mu,Sin,AbsCrv,SGN(Crv0),CrvZ,Den);
   if (oDriver->CarCharacteristic.IsValidX(Speed))
     Speed *= oDriver->CarCharacteristic.CalcOffset(Speed);
 

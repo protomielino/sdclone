@@ -3,7 +3,7 @@
                              -------------------                                         
     created              : Wed Nov 12 17:54:00:00 CEST 2014
     copyright            : (C) 2014 by Wolf-Dieter Beelitz
-    email                : wdb at wdbee.de
+    email                : wdbee@users.sourceforge.net
     version              : $Id:$
  ***************************************************************************/
 

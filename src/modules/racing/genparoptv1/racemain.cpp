@@ -116,6 +116,10 @@ ReHumanInGroup()
 
 int ReConfigure()
 {
+	// Set track 1 as starting track
+	void *params = ReInfo->params;
+	GfParmSetNum(params, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, (tdble)1);
+
 	ReUI().onRaceConfiguring();
 
 	return RM_ASYNC | RM_NEXT_STEP;

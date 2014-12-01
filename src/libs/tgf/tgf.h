@@ -247,18 +247,53 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 //============================================================================*
 // Definitions of the replacements for the new Memory Manager
 //----------------------------------------------------------------------------*
-#define malloc _tgf_win_malloc
-#define calloc _tgf_win_calloc
-#define realloc _tgf_win_realloc
-#define free _tgf_win_free
-#define accept _tgf_win_accept
-#define doaccept GfMemoryManagerDoAccept
-#define dofree GfMemoryManagerDoFree
-#ifdef strdup
-#undef strdup
+#if defined(WIN32)
+// Windows ...
+	#if defined(__MINGW32__)
+	// MinGW ...
+	#define malloc(x) _tgf_win_malloc((x))
+	#define calloc(x,y) _tgf_win_calloc((x),(y))
+	#define realloc(x,y) _tgf_win_realloc((x),(y))
+	#define free(x) _tgf_win_free((x))
+	#define doaccept() GfMemoryManagerDoAccept()
+	#define dofree() GfMemoryManagerDoFree()
+	#ifdef strdup
+	#undef strdup
+	#endif
+	#define strdup(x) _tgf_win_strdup((x))
+	#define _strdup(x) _tgf_win_strdup((x))
+	// ... MinGW
+	#else
+	// VC++ ...
+	#define malloc _tgf_win_malloc
+	#define calloc _tgf_win_calloc
+	#define realloc _tgf_win_realloc
+	#define free _tgf_win_free
+	#define doaccept() GfMemoryManagerDoAccept()
+	#define dofree() GfMemoryManagerDoFree()
+	#ifdef strdup
+	#undef strdup
+	#endif
+	#define strdup _tgf_win_strdup
+	#define _strdup _tgf_win_strdup
+	// ... VC++
 #endif
-#define strdup _tgf_win_strdup
-#define _strdup _tgf_win_strdup
+// ... Windows
+#else
+// Linux ...
+	#define malloc(x) _tgf_win_malloc((x))
+	#define calloc(x,y) _tgf_win_calloc((x),(y))
+	#define realloc(x,y) _tgf_win_realloc((x),(y))
+	#define free(x) _tgf_win_free((x))
+	#define doaccept() GfMemoryManagerDoAccept()
+	#define dofree() GfMemoryManagerDoFree()
+	#ifdef strdup
+	#undef strdup
+	#endif
+	#define strdup(x) _tgf_win_strdup((x))
+	#define _strdup(x) _tgf_win_strdup((x))
+// ... Linux
+#endif
 //============================================================================*
 
 //============================================================================*
@@ -268,7 +303,6 @@ ExternC TGF_API void* _tgf_win_malloc(size_t size);
 ExternC TGF_API void* _tgf_win_calloc(size_t num, size_t size);
 ExternC TGF_API void* _tgf_win_realloc(void * memblock, size_t size);
 ExternC TGF_API void _tgf_win_free(void * memblock);
-ExternC TGF_API void _tgf_win_accept(void * memblock);
 ExternC TGF_API char* _tgf_win_strdup(const char * str);
 ExternC TGF_API void GfMemoryManagerDoAccept();
 ExternC TGF_API void GfMemoryManagerDoFree();

@@ -3,7 +3,7 @@
     file                 : genetic.h
     created              : Tue Nov 04 17:45:00 CET 2010
     copyright            : (C) 2010-2013 by Wolf-Dieter Beelitz
-    email                : wdb@wdbee.de
+    email                : wdbee@users.sourceforge.net
 
  ***************************************************************************/
 
