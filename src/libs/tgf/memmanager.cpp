@@ -493,14 +493,14 @@ void* GfMemoryManagerAlloc (size_t size, uint8 type, void* retAddr)
 		void* b = (void*) (c + 1);  //c is still pointing to the data
 
 		// Hunting memory leaks ...
-#define	IDTOSTOP 428767 // ID of block you are looking for
+#define	IDTOSTOP 12144 // ID of block you are looking for
 		char buf[10];
 		snprintf(buf,sizeof(buf),"%p",c->RAdr);
 		buf[0] = 'X';
 		buf[1] = 'X';
 		buf[2] = 'X';
 		buf[3] = 'X';
-		if ((ID == IDTOSTOP) || (strncmp(buf,"XXXXF19F",8) == 0))
+		if ((ID == IDTOSTOP) || (strncmp(buf,"XXXX511C",8) == 0))
 		{
 			ID = 0;	// set breakpoint here 
 					// to stop at allocation of 
