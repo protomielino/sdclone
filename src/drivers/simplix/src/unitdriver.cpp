@@ -432,6 +432,7 @@ TDriver::TDriver(int Index):
   oRL_RIGHT = RL_RIGHT;
 
   TDriver::LengthMargin = LENGTH_MARGIN;         // Initialize safty margin
+  enableCarNeedsSinLong = false;
 
   LogSimplix.debug("\n#<<< TDriver::TDriver()\n\n");
 }
@@ -819,6 +820,21 @@ void TDriver::AdjustDriving(
   for (int I = 0; I <= NBR_BRAKECOEFF; I++)      // Initialize braking
     oBrakeCoeff[I] = oInitialBrakeCoeff;
 
+  oCrvZScale = 0.05;
+  if (strncmp(oTrackName,"e-track-4",9) == 0)
+	  oCrvZScale = 0.5;
+  else if (strncmp(oTrackName,"espie",5) == 0)
+	  enableCarNeedsSinLong = true;
+  else if (strncmp(oTrackName,"ole-road-1",10) == 0)
+	  oCrvZScale = 0.75;
+
+  oCarNeedsSinLong = false;
+  if (enableCarNeedsSinLong)
+  {
+	oCarNeedsSinLong = GfParmGetNum(Handle, 
+	  TDriver::SECT_PRIV, PRV_NEEDS_SIN, (char *) NULL, 0) > 0;
+  }
+
   const char *enabling;
 
   oCarHasTYC = false;
@@ -1194,12 +1210,6 @@ void TDriver::SetPathAndFilenameForRacinglines()
   snprintf(TrackLoadBuffer,sizeof(TrackLoadBuffer),"%s/%d-%s.trk",
     oPathToWriteTo,oWeatherCode,oTrackName);
   oTrackLoad = TrackLoadBuffer;                  // Set pointer to buffer
-  if (strncmp(oTrackName,"e-track-4",9) == 0)
-	  oCrvZScale = 0.5;
-  else if (strncmp(oTrackName,"ole-road-1",10) == 0)
-	  oCrvZScale = 0.75;
-  else
-	  oCrvZScale = 0.05;
 
   snprintf(TrackLoadQualifyBuffer,sizeof(TrackLoadQualifyBuffer),
 	"%s/%d-%s.trq",oPathToWriteTo,oWeatherCode,oTrackName);
@@ -1289,6 +1299,23 @@ void TDriver::InitTrack
     , SECT_ENGINE, PRM_FUELCONS                     
     , (char*) NULL, 1.0);
   LogSimplix.debug("#oFuelCons (TORCS)  = %.2f\n",oFuelCons);
+
+  tdble TireLimitFront = 0.0;
+  for (int I = 0; I < 2; I++)
+  {
+    TireLimitFront = MAX(TireLimitFront,
+		GfParmGetNum(CarHandle,WheelSect[I], 
+		PRM_FALLOFFGRIPMULT, (char*)NULL, (tdble) 0.85f));
+    LogSimplix.debug("#oTireLimitFront      = %.3f\n",TireLimitFront);
+  }
+  tdble TireLimitRear = 0.0;
+  for (int I = 2; I < 4; I++)
+  {
+    TireLimitRear = MAX(TireLimitRear,
+		GfParmGetNum(CarHandle,WheelSect[I], 
+		PRM_FALLOFFGRIPMULT, (char*)NULL, (tdble) 0.85f));
+    LogSimplix.debug("#oTireLimitRear       = %.3f\n",TireLimitRear);
+  }
 
   oBrakeLeft = 1.0f;
   oBrakeRight = 1.0f;
@@ -1956,7 +1983,7 @@ void TDriver::FindRacinglines()
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBase,oBaseScale,oBumpMode));
 #ifdef EXPORT_RACINGLINE
-    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.t5");
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk5");
 #endif
 	if (oGeneticOpti)
       oRacingLine[oRL_FREE].ClearRacingline(oTrackLoad);
@@ -2518,10 +2545,11 @@ void TDriver::InitCa()
   float WingCd = (float) (1.23 * (FrontWingAreaCd + RearWingAreaCd));
   Param.Fix.oCdWing = WingCd;
 
-  float CL =
+  float FCL =
 	GfParmGetNum(oCarHandle, SECT_AERODYNAMICS,
-	  PRM_FCL, (char*) NULL, 0.0f)
-	+ GfParmGetNum(oCarHandle, SECT_AERODYNAMICS,
+	  PRM_FCL, (char*) NULL, 0.0f);
+  float RCL =
+	GfParmGetNum(oCarHandle, SECT_AERODYNAMICS,
 	  PRM_RCL, (char*) NULL, 0.0f);
 
   float H = 0.0;
@@ -2534,10 +2562,11 @@ void TDriver::InitCa()
   H = H*H;
   H = H*H;
   H = (float) (2.0 * exp(-3.0 * H));
-  Param.Fix.oCa = H * CL + 4.0 * WingCd;
+  Param.Fix.oCa = H * (FCL + RCL) + 4.0 * WingCd;
   Param.Fix.oCaFrontWing = 4 * 1.23 * FrontWingAreaCd;
   Param.Fix.oCaRearWing = 4 * 1.23 * RearWingAreaCd;
-  Param.Fix.oCaGroundEffect = H * CL;
+  Param.Fix.oCaFrontGroundEffect = H * FCL;
+  Param.Fix.oCaRearGroundEffect = H * RCL;
 
 //>>> simuv4
   double CliftFrnt = 0;
@@ -2657,7 +2686,7 @@ void TDriver::InitCa()
   {
     WingCd = (float) (1.23 * (FrontWingAreaCd + RearWingAreaCd));
     Param.Fix.oCdWing = WingCd;
-    Param.Fix.oCa = H * CL + MeanCliftFromAoA * WingCd;
+    Param.Fix.oCa = H * (FCL + RCL) + MeanCliftFromAoA * WingCd;
   }
 //<<< simuv4
 
@@ -4510,20 +4539,42 @@ void TDriver::SideBorderInner(float Factor)
 //==========================================================================*
 
 //==========================================================================*
-// Calculate the skilling
+// 
 //--------------------------------------------------------------------------*
-double TDriver::WheelConditionFront()
+double TDriver::TyreConditionFront()
 {
   return MIN(oCar->_tyreCondition(0),oCar->_tyreCondition(1));
 }
 //==========================================================================*
 
 //==========================================================================*
-// Calculate the skilling
+// 
 //--------------------------------------------------------------------------*
-double TDriver::WheelConditionRear()
+double TDriver::TyreConditionRear()
 {
   return MIN(oCar->_tyreCondition(2),oCar->_tyreCondition(3));
+}
+//==========================================================================*
+
+//==========================================================================*
+// 
+//--------------------------------------------------------------------------*
+double TDriver::TyreTreadDepthFront()
+{
+  double Right = (oCar->_tyreTreadDepth(0) - oCar->_tyreCritTreadDepth(0));
+  double Left = (oCar->_tyreTreadDepth(1) - oCar->_tyreCritTreadDepth(1));
+  return 100 * MIN(Right,Left);
+}
+//==========================================================================*
+
+//==========================================================================*
+// 
+//--------------------------------------------------------------------------*
+double TDriver::TyreTreadDepthRear()
+{
+  double Right = (oCar->_tyreTreadDepth(2) - oCar->_tyreCritTreadDepth(2));
+  double Left = (oCar->_tyreTreadDepth(3) - oCar->_tyreCritTreadDepth(3));
+  return 100 * MIN(Right,Left);
 }
 //==========================================================================*
 

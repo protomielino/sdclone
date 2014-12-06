@@ -509,6 +509,7 @@ enum
 #define PRV_OMEGAAHEAD       "omegaahead"
 #define PRV_OMEGAAHEADFACTOR "omegaaheadfactor"
 #define PRV_INIT_BRAKE       "initial brake"     // Scale brake coeff
+#define PRV_NEEDS_SIN        "sin long"          // default false
 
 #define PRV_TCL_RANGE        "tcl range"         // default 10.0    
 #define PRV_TCL_SLIP         "tcl slip"          // default 1.6    

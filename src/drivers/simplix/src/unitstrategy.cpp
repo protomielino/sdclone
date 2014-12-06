@@ -59,6 +59,8 @@ const float TSimpleStrategy::cMAX_FUEL_PER_METER = 0.0008f;
 const int TSimpleStrategy::cPIT_DAMMAGE = 5000;
 const short int NEEDED_MAJOR_VERSION = 1;
 const short int NEEDED_MINOR_VERSION = 1;
+static const char *WheelSect[4] = 
+{SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 //==========================================================================*
 
 //==========================================================================*
@@ -98,6 +100,11 @@ void TSimpleStrategy::Init(TDriver *Driver)
 {
   oDriver = Driver;
   oPit = new TPit(Driver);
+
+  oTireLimitFront = oDriver->TyreTreadDepthFront();
+  oTireLimitRear = oDriver->TyreTreadDepthRear();
+  oDegradationPerLap = 0.0;
+  oLaps = 0;
 }
 //==========================================================================*
 
@@ -108,9 +115,11 @@ bool TSimpleStrategy::IsPitFree()
 {
     bool IsFree = RtTeamIsPitFree(oDriver->TeamIndex());
 	if (IsFree)
-		LogSimplix.debug("#%s pit is free (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
+		LogSimplix.debug("#%s pit is free (%d)\n",
+		  oDriver->GetBotName(),oDriver->TeamIndex());
 	else
-		LogSimplix.debug("#%s pit is locked (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
+		LogSimplix.debug("#%s pit is locked (%d)\n",
+		  oDriver->GetBotName(),oDriver->TeamIndex());
     return IsFree;
 }
 //==========================================================================*
@@ -131,14 +140,25 @@ bool TSimpleStrategy::NeedPitStop()
 
   if (oDriver->oCarHasTYC)
   {
-	double WcF = oDriver->WheelConditionFront(); // Check tyre condition
-	double WcR = oDriver->WheelConditionRear();  // Pit stop needed if
-	if (MIN(WcF,WcR) < 0.90)                     // tyres are below 90%
-		LogSimplix.warning("Tyre condition F: %.3f R: %.3f (%s)\n",
-		WcF,WcR,oDriver->GetBotName());
+	double TdF = oDriver->TyreTreadDepthFront(); // Check tyre condition
+	double TdR = oDriver->TyreTreadDepthRear();  // Pit stop needed if
+	oDegradationPerLap = (oLaps * oDegradationPerLap 
+	  + MAX(oTireLimitFront - TdF,oTireLimitRear - TdR));
+	oDegradationPerLap /= ++oLaps;
 
-    if (MIN(WcF,WcR) < 0.88)                     // tyres are below 88%
-      Result = true;                             //   to stop in pit
+	if (MIN(TdF,TdR) < 1.5 * oDegradationPerLap) // tyres become critical
+	{
+		LogSimplix.warning("Tyre condition D: %.1f%% F: %.1f%% R: %.1f%% (%s)\n",
+	    oDegradationPerLap,TdF,TdR,oDriver->GetBotName());
+
+	  if ((TdF < 1.1 * oDegradationPerLap) 
+		|| (TdR < 1.1 * oDegradationPerLap))
+	  {
+        Result = true;                           //   to stop in pit
+	  }
+	}
+	oTireLimitFront = TdF;
+	oTireLimitRear = TdR;
   }
 
   if (oDriver->oTestPitStop)                     // If defined, try

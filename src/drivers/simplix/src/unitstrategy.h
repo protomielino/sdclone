@@ -95,6 +95,10 @@ class TAbstractStrategy
 
 	double oDistToSwitch;                        // Dist to Pit
 	double oStartFuel;                           // Fuel at start
+	double oTireLimitFront;
+	double oTireLimitRear;
+	double oDegradationPerLap;
+	int oLaps;
 
 	TAbstractStrategy()
 	  :oState(PIT_NONE),oGoToPit(false),oCar(NULL),oTrack(NULL),oPit(NULL),oDriver(NULL),oDistToSwitch(100),oStartFuel(-1){};

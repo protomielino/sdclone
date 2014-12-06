@@ -297,7 +297,9 @@ typedef struct {
     tTrackSeg	*seg;		/**< Track segment where the wheel is */
     tdble rollRes;              /**< rolling resistance, useful for sound */
 	tdble   temp_in, temp_mid, temp_out;
-	tdble   condition;
+	tdble   condition;      /**< tire condition, between 0 and 1 */
+    tdble   treadDepth;     /**< tread depth, between 0 and 1 */
+    tdble   critTreadDepth; /**< critical tread depth, when grip falls off suddenly, between 0 and treadDepth */
 	tdble slipNorm; /* normalized slip, the variable of Magic Formula */
 	tdble slipSide;
 	tdble slipAccel;
@@ -321,6 +323,8 @@ typedef struct {
 #define _tyreT_mid(i) priv.wheel[i].temp_mid
 #define _tyreT_out(i) priv.wheel[i].temp_out
 #define _tyreCondition(i) priv.wheel[i].condition
+#define _tyreTreadDepth(i) priv.wheel[i].treadDepth
+#define _tyreCritTreadDepth(i) priv.wheel[i].critTreadDepth
 #define _tyreEffMu(i) priv.wheel[i].effectiveMu
 
 #define MAX_GEARS	10	/* including reverse and neutral */

@@ -105,7 +105,8 @@ class TFixCarParam
 	double oBorderScale;                         // Scale var. Buffer to inner
 	double oCa;                                  // Aerodynamic downforce constant
 	double oCaFrontWing;                         // Aerod. d. const. front wing
-	double oCaGroundEffect;                      // Aerod. d. const. ground effect
+	double oCaFrontGroundEffect;                 // Aerod. d. const. ground effect front
+	double oCaRearGroundEffect;                  // Aerod. d. const. ground effect rear
 	double oCaRearWing;                          // Aerod. d. const. rear wing
 	double oCdBody;                              // Aerodynamic drag constant car body
 	double oCdWing;	                             // Aerod. drag const. wings

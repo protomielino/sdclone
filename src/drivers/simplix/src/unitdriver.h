@@ -415,6 +415,8 @@ private:
 	bool oStanding;                              // Fahrzeug steht#
 	TCubicSpline CarCharacteristic;				 // Car characteristic 
 	TParam Param;                                // Parameters
+    bool enableCarNeedsSinLong;
+	bool oCarNeedsSinLong;
 	double oCrvZScale;
 	double oFuelPer100km;                        //
 	double oMaxFuel;                             // tank capacity
@@ -498,8 +500,10 @@ private:
     void Meteorology();
 	int GetWeather();
 
-	double WheelConditionFront();
-	double WheelConditionRear();
+	double TyreConditionFront();
+	double TyreConditionRear();
+	double TyreTreadDepthFront();
+	double TyreTreadDepthRear();
 	void CalcSkilling();
 	double CalcFriction(const double Crv);
 	double CalcCrv(double Crv);

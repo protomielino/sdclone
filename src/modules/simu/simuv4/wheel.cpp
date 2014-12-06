@@ -123,6 +123,8 @@ SimWheelConfig(tCar *car, int index)
 	if (car->features & FEAT_TIRETEMPDEG) {
 		// Assume new wheels
 		carElt->_tyreCondition(index) = 1.0;
+		car->carElt->_tyreTreadDepth(index) = wheel->treadDepth;
+		car->carElt->_tyreCritTreadDepth(index) = wheel->critTreadDepth;
 	}
 
 	wheel->mfC = (tdble)(2.0 - asin(RFactor) * 2.0 / PI);
@@ -365,6 +367,8 @@ void SimWheelUpdateForce(tCar *car, int index)
 		car->carElt->_tyreT_mid(index) = wheel->Ttire;
 		car->carElt->_tyreT_out(index) = wheel->Ttire;
 		car->carElt->_tyreCondition(index) = tireCond;
+		car->carElt->_tyreTreadDepth(index) = wheel->treadDepth;
+		car->carElt->_tyreCritTreadDepth(index) = wheel->critTreadDepth;
 	}
 
 	// Option TCL ...

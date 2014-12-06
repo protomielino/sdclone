@@ -430,17 +430,11 @@ void TLane::CalcMaxSpeeds
   {
 	int P = (Start + I) % N;
 	int Q = (P + 1) % N;
-	int O1 = (P + N - 12) % N;
-	int O2 = (P + 12) % N;
-    double CrvZ1 = MIN(0.0,oPathPoints[O1].CrvZ) * 1000;
-    double CrvZ2 = MIN(0.0,oPathPoints[O2].CrvZ) * 1000;
     TVec3d Delta = oPathPoints[P].CalcPt() - oPathPoints[Q].CalcPt();
     double Dist = TUtils::VecLenXY(Delta);
     double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
     double TrackTiltAngle = 1.1 * atan2(Delta.z, Dist);
-
-	double CrvZ = ((CrvZ1+CrvZ2) * fabs(CrvZ1+CrvZ2)) / 10000;
-    CrvZ = oPathPoints[Q].CrvZ;
+    double CrvZ = oPathPoints[Q].CrvZ;
 		 
 	double Speed = oFixCarParam.CalcMaxSpeed(
       oCarParam,
