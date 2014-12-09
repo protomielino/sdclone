@@ -261,6 +261,7 @@ TDriver::TDriver(int Index):
   oClutchRange(0.82),
   oClutchRelease(0.5),
   oCurrSpeed(0),
+  oAccelSpeed(40),
 /*
     double oGearEff[MAX_GEARS];                  // Efficiency of gears
     double oShift[MAX_GEARS];                    // Shift levels
@@ -1640,8 +1641,11 @@ void TDriver::Drive()
 
   //double StartTimeStamp = RtTimeStamp(); 
 
-  //if ((oCurrSpeed < 100/3.6) && (CurrSimTime < 5))
-  //  fprintf(stderr,"0 - %.1f km/h : %.2f sec\n",oCurrSpeed*3.6,CurrSimTime);
+  if (oCurrSpeed > oAccelSpeed/3.6)
+  {
+    fprintf(stderr,"0 - %.1f km/h : %.2f sec\n",oCurrSpeed*3.6,CurrSimTime);
+	oAccelSpeed += 20;
+  }
 
   DetectFlight();
   double Pos = oTrackDesc.CalcPos(oCar);         // Get current pos on track

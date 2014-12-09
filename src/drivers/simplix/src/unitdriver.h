@@ -306,6 +306,7 @@ private:
 	double oClutchRange;
 	double oClutchRelease;
 	double oCurrSpeed;                           // Currend speed
+	double oAccelSpeed;
 	double oGearEff[MAX_GEARS];                  // Efficiency of gears
     double oShift[MAX_GEARS];                    // Shift levels
     double oShiftMargin[MAX_GEARS];              // Shift back margin

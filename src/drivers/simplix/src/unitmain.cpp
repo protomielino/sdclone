@@ -363,8 +363,8 @@ void SetUpSimplix_36GP()
     cRobotType = RTYPE_SIMPLIX_36GP;
     SetParameters(NBBOTS, "36GP-alfa12c");
     TDriver::AdvancedParameters = true;
-    TDriver::UseBrakeLimit = true;
-    TDriver::UseGPBrakeLimit = true;
+    //TDriver::UseBrakeLimit = true;
+    //TDriver::UseGPBrakeLimit = true;
     TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
 };
 //==========================================================================*
@@ -817,11 +817,14 @@ static int InitFuncPt(int Index, void *Pt)
     LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_36GP\n");
     cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_36GP;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
+//    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_36GP;
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
+//    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.75f);
-    cInstances[Index-IndexOffset].cRobot->UseFilterAccel();
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.5f);
+    //cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.75f);
+    //cInstances[Index-IndexOffset].cRobot->UseFilterAccel();
   }  
   else if (cRobotType == RTYPE_SIMPLIX_MPA1)
   {
