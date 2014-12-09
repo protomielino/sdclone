@@ -823,7 +823,7 @@ void TDriver::AdjustDriving(
 
   oCrvZScale = 0.05;
   if (strncmp(oTrackName,"e-track-4",9) == 0)
-	  oCrvZScale = 0.5;
+	  oCrvZScale = 1.0;
   else if (strncmp(oTrackName,"espie",5) == 0)
 	  enableCarNeedsSinLong = true;
   else if (strncmp(oTrackName,"ole-road-1",10) == 0)
