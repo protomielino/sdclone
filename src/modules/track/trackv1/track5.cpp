@@ -32,6 +32,15 @@
 //TODO Joe
 // Move to D:\source\speed-dreams\src\interfaces\track.h 
 #define TRK_ATT_START_BEARING  "original bearing"
+#define TRK_ATT_START_X  "start X"
+#define TRK_ATT_START_Y  "start Y"
+#define TRK_ATT_START_Z  "start Z"
+#define TRK_ATT_MIN_X  "minimum X"
+#define TRK_ATT_MIN_Y  "minimum Y"
+#define TRK_ATT_MIN_Z  "minimum Z"
+#define TRK_ATT_EXTENT_X  "extent X"
+#define TRK_ATT_EXTENT_Y  "extent Y"
+#define TRK_ATT_EXTENT_Z  "extent Z"
 
 static tdble	xmin, xmax, ymin, ymax, zmin, zmax;
 
@@ -1224,13 +1233,15 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
 		xr = xl = 0.0;
 		yr = 0.0;
 		yl = width;
+      xr = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_START_X, (char*)NULL, 0.0);
+      yr = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_START_Y, (char*)NULL, 0.0);
 		alf = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_START_BEARING, 0, FLOAT_DEG2RAD(0.0));
 		xr += wi2 * sin(alf);
 		xl = xr - width * sin(alf);
 		yr -= wi2 * cos(alf);
 		yl = yr + width * cos(alf);
 
-		zsl = zsr = zel = zer = zs = ze = 0.0;
+		zsl = zsr = zel = zer = zs = ze = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_START_Z, (char*)NULL, 0.0);
 		stgt = etgt = 0.0;
 		stgtl = etgtl = 0.0;
 		stgtr = etgtr = 0.0;
@@ -1712,7 +1723,8 @@ void ReadTrack5(tTrack *theTrack, void *TrackHandle,
 	tTrkLocPos		trkPos;
 	char *segName;
 	
-	xmin = xmax = ymin = ymax = zmin = zmax = 0.0;
+	xmax = ymax = zmax = -99999999999.99f;
+	xmin = ymin = zmin = 99999999999.99f;
 
 	//Decide step length
 	GlobalStepLen = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_PROFSTEPSLEN, (char*)NULL, 0);
@@ -1794,6 +1806,13 @@ void ReadTrack5(tTrack *theTrack, void *TrackHandle,
 	    } while (curSeg->id != segId);
 	} while (GfParmListSeekNext(TrackHandle, TRK_SECT_CAM) == 0);
     }
+
+    xmin = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_MIN_X, (char*)NULL, xmin);
+    ymin = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_MIN_Y, (char*)NULL, ymin);
+    zmin = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_MIN_Z, (char*)NULL, zmin);
+    xmax = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_EXTENT_X, (char*)NULL, xmax);
+    ymax = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_EXTENT_Y, (char*)NULL, ymax);
+    zmax = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_EXTENT_Z, (char*)NULL, zmax);
 
     /* Update the coord to be positives */
     theTrack->min.x = 0;
