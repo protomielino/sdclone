@@ -1624,12 +1624,12 @@ xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */, bo
 
 /** Write a configuration buffer.
     @ingroup	conf
-    @param	logHandle	log handle
-    @param	parmHandle	Configuration handle
-    @param	buf		buffer to write the configuration
-    @param	size		buffer size
+    @param	handle	Configuration handle
+    @param	buf		buffer to write the configuration to
+    @param	size	buffer size (has to be > 0)
     @return	0 if OK
-    		<br>1 if Error
+			<br>-1 if data was truncated
+    		<br>1 if other error
 */
 int
 GfParmWriteBuf (void *handle, char *buf, int size)
@@ -1642,8 +1642,17 @@ GfParmWriteBuf (void *handle, char *buf, int size)
 
     if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
 		GfLogFatal ("GfParmWriteBuf: bad handle (%p)\n", parmHandle);
-		return 1;
+		return 1; // Error
     }
+
+    // Check buf for NULL before memcpy()ing to it later
+    if((buf == NULL) || (size <= 0)){
+       GfLogFatal ("GfParmWriteBuf: bad buf or size (%p) (%d) \n", buf,size);
+       return 1; // Error
+    }
+
+	// Clear buf to contain 0 for all chars
+	memset(buf,0,size);
 
     parmHandle->outCtrl.state = 0;
     parmHandle->outCtrl.curSection = NULL;
@@ -1653,16 +1662,20 @@ GfParmWriteBuf (void *handle, char *buf, int size)
 
     while (curSize && xmlGetOuputLine (parmHandle, line, sizeof (line))) {
 	len = strlen (line);
-	if (len > curSize) {
+	// We need space for the terminating 0, len has to be < curSize! 
+	if (len >= curSize) {
 	    len = curSize;
+		memcpy (s, line, len - 1);
+		// Don't fall through and return 0;
+		return -1; // This is an error: data has been truncated
 	}
 	memcpy (s, line, len);
 	s += len;
 	curSize -= len;
     }
-    buf [size - 1] = 0;
+    // buf [size - 1] = 0; redundant: memset(buf,0,size); and if(len >= curSize){...
     
-    return 0;
+    return 0; // Success
 }
 
 /** Set the dtd path and header if necessary
