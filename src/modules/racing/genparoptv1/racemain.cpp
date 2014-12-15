@@ -183,7 +183,8 @@ ReRaceEventInit(void)
 {
 	// Initialize the race session name.
 	free((void*) (ReInfo->_reRaceName));
-	ReInfo->_reRaceName = strdup("Optimization"); //ReGetCurrentRaceName();
+//	ReInfo->_reRaceName = strdup("Optimization"); //ReGetCurrentRaceName();
+	ReInfo->_reRaceName = strdup("Practice"); //ReGetCurrentRaceName();
 	GfLogInfo("Starting new event (%s session)\n", ReInfo->_reRaceName);
     
 	ReUI().onOptimizationInitializing();
@@ -626,7 +627,7 @@ ReRaceStart(void)
 	char path2[128];
 	const char *sessionName = ReInfo->_reRaceName;
 	void *params = ReInfo->params;
-	void *results = ReInfo->results;
+//	void *results = ReInfo->results;
 	int mode = 0;
 
 	// Trace race session identification (more to say for the Carer mode).
@@ -659,8 +660,9 @@ ReRaceStart(void)
 		GfLogError("No competitor in this race : cancelled.\n");
 		mode = RM_ERROR;
 	}
+/*
 	else if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
-		&& ReInfo->s->_totTime < 0.0f /* Timed session? */)
+		&& ReInfo->s->_totTime < 0.0f ) // Timed session?
 	//Checks if there is only one driver per session allowed, so practice, qualification without timed session. 
 	{
 		// non-timed Qualification or Practice session => 1 driver at a time = the "current" one.
@@ -685,6 +687,7 @@ ReRaceStart(void)
 			GfParmSetStr(params, path2, RM_ATTR_SKINNAME,
 						 GfParmGetStr(params, path, RM_ATTR_SKINNAME, ""));
 	}
+*/
 	else
 	{
 		// For a race, add cars to the starting grid in the order stored in ReStartingOrderIdx.
@@ -762,11 +765,11 @@ ReRaceStop(void)
 int
 ReRaceEnd(void)
 {
-	int curDrvIdx;
-	int nCars;
-	void *params = ReInfo->params;
-	void *results = ReInfo->results;
-	const char *sessionName = ReInfo->_reRaceName;
+//	int curDrvIdx;
+//	int nCars;
+//	void *params = ReInfo->params;
+//	void *results = ReInfo->results;
+//	const char *sessionName = ReInfo->_reRaceName;
 	tgenData *Data = &TGeneticParameter::Data;
 
 	// Pick up optimization results ...
@@ -794,6 +797,7 @@ ReRaceEnd(void)
 	// select the next competitor : it is his turn for the same session.
 	// If no more competitor, this is the end of the session for all the competitors.
 	bool bEndOfSession = true;
+/*
 	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
 		&& ReInfo->s->_totTime < 0.0f)
 	{
@@ -811,7 +815,7 @@ ReRaceEnd(void)
 
 		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, (tdble)curDrvIdx);
 	}
-
+*/
 	if (bEndOfSession)
 	{
 	}
