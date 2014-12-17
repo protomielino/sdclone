@@ -130,7 +130,7 @@ GfTracks::GfTracks()
 			const std::string strTrackFileName(ossFileName.str());
 			if (!GfFileExists(strTrackFileName.c_str()))
 			{
-				GfLogWarning("Ignoring track %s : %s not found\n",
+				GfLogInfo("Ignoring track %s : %s not found\n",
 							 pszTrackId, strTrackFileName.c_str());
 				continue;
 			}

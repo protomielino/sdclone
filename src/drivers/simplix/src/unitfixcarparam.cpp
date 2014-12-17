@@ -468,8 +468,11 @@ double TFixCarParam::CalcMaxSpeed
 
   if (AbsCrv > 0.002)
   {
-	if (Sin * SGN(Crv0) < 0)
-	  Sin *= 8.0;
+	  if (Sin * SGN(Crv0) < 0)
+	  {
+		  Sin *= 8.0;
+		  Sin = SGN(Sin) * MIN(0.05,fabs(Sin));
+	  }
   }
 
   double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(Crv0) + CrvZ) / Den);

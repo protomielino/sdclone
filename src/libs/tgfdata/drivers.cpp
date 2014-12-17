@@ -132,6 +132,14 @@ void GfDrivers::reload()
 		}
 		if (!hparmRobot)
 		{
+			// Do not waste log with drivers that do not exists or do not have to exist!
+			if (strncmp("dandroid",strModName.c_str(),8) == 0)
+				continue;
+			else if (strncmp("usr",strModName.c_str(),3) == 0)
+				continue;
+			else if (strncmp("replay",strModName.c_str(),6) == 0)
+				continue;
+
 			GfLogError("No usable '%s' driver (%s.xml not found or not readable)\n",
 					   strModName.c_str(), strModName.c_str());
 			continue;
@@ -143,7 +151,7 @@ void GfDrivers::reload()
 			// Ignore undefined drivers or showing an empty name
 			if (!pCurModule->modInfo[nItfInd].name || pCurModule->modInfo[nItfInd].name[0] == '\0')
 			{
-				GfLogWarning("Ignoring '%s' driver #%d (not defined or empty name)\n",
+				GfLogInfo("Ignoring '%s' driver #%d (not defined or empty name)\n",
 							 strModName.c_str(), nItfInd);
 				continue;
 			}
@@ -195,7 +203,7 @@ void GfDrivers::reload()
 							  << pCurModule->modInfo[nItfInd].index;
 				const char* pszCarId =
 					GfParmGetStr(hparmRobot, ossDrvSecPath.str().c_str(), ROB_ATTR_CAR, "");
-				GfLogWarning("Ignoring '%s' driver '%s' (#%d) (not defined or default car '%s' not available)\n",
+				GfLogInfo("Ignoring '%s' driver '%s' (#%d) (not defined or default car '%s' not available)\n",
 							 strModName.c_str(), pCurModule->modInfo[nItfInd].name,
 							 pCurModule->modInfo[nItfInd].index, pszCarId);
 			}
