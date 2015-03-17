@@ -120,13 +120,13 @@
 #define PRV_SKILL_LEVEL       "level"
 #define PRV_SKILL_AGGRO       "aggression"
 
-#define BT_SECT_PRIV "private"
-#define BT_ATT_FUELPERLAP "fuelperlap"
-#define BT_ATT_FUELPERSECOND "fuelpersecond"
-#define BT_ATT_MUFACTOR "mufactor"
-#define BT_ATT_PITTIME "pittime"
-#define BT_ATT_BESTLAP "bestlap"
-#define BT_ATT_WORSTLAP "worstlap"
-#define BT_ATT_TEAMMATE "teammate"
+#define BT_SECT_PRIV          "private"
+#define BT_ATT_FUELPERLAP     "fuelperlap"
+#define BT_ATT_FUELPERSECOND  "fuelpersecond"
+#define BT_ATT_MUFACTOR       "mufactor"
+#define BT_ATT_PITTIME        "pittime"
+#define BT_ATT_BESTLAP        "bestlap"
+#define BT_ATT_WORSTLAP       "worstlap"
+#define BT_ATT_TEAMMATE       "teammate"
 
 #endif

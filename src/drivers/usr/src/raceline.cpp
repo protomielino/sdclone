@@ -2220,12 +2220,21 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
 double LRaceLine::getAvoidSteer(double offset, LRaceLineData *data)
 {
- offset *= AvoidOffset;
- double steer = 0.0;
+    //GfLogDebug("USR Offset = %f\n", offset);
+    double speedoffset = AvoidOffset *((car->_speed_x *3.6)/ 100);
+    if (speedoffset < 1.0f)
+        speedoffset = 1.0f;
+    else if (speedoffset > AvoidOffset)
+        speedoffset = AvoidOffset ;
 
- vec2f target;
- double carspeed = Mag(car->_speed_X, car->_speed_Y);
- double steertime = MIN(MaxSteerTime, MinSteerTime + MAX(0.0, carspeed-20.0)/30.0);
+    offset *= speedoffset;
+    //offset *=AvoidOffset;
+    double steer = 0.0;
+
+    vec2f target;
+    double carspeed = Mag(car->_speed_X, car->_speed_Y);
+    //GfLogDebug("USR Car Speed = %f\n", car->_speed_x * 3.6);
+    double steertime = MIN(MaxSteerTime, MinSteerTime + MAX(0.0, carspeed-20.0)/30.0);
  if (data->followdist < 5.0)
 	 steertime = MIN(MaxSteerTime*1.1, steertime * 1.0 + (5.0 - data->followdist)/20);
  //double lane2left = track->width * SRL[SRLidx].tLane[Next];
