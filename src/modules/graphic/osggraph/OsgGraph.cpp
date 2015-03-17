@@ -62,6 +62,7 @@ OsgGraph& OsgGraph::self()
 OsgGraph::OsgGraph(const std::string& strShLibName, void* hShLibHandle)
 : GfModule(strShLibName, hShLibHandle)
 {
+    GfLogDebug("OsgGraph::Init\n");
 	// Override the default OSG loader options object with our's
 	// (workaround try for ssggraph crash at re-load time).
 	//_pDefaultOSGLoaderOptions = new osgLoaderOptions;
@@ -89,9 +90,8 @@ bool OsgGraph::loadTrack(tTrack* pTrack)
 
 bool OsgGraph::loadCars(tSituation* pSituation)
 { 
-    initCars(pSituation);
 	GfLogDebug("OsgGraph::loadCars\n");
-	/*return true;*/ return ::initCars(pSituation) == 0;
+    return ::initCars(pSituation) == 0;
 }
 
 bool OsgGraph::setupView(int x, int y, int width, int height, void* pMenuScreen)

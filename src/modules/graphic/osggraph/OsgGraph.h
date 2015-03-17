@@ -28,7 +28,7 @@
 
 #include <tgf.hpp>
 
-class osgLoaderOptions;
+//class osgLoaderOptions;
 
 
 // DLL exported symbols declarator for Windows.

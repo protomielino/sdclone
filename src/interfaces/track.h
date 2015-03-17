@@ -60,6 +60,7 @@
 #define TRK_SECT_GRAPH	"Graphic"
 
 #define TRK_ATT_3DDESC	"3d description"
+#define TRK_ATT_3DDESC2 "3d osg"
 //#define TRK_ATT_3DDESC_RAIN "3d description rain"
 //#define TRK_ATT_3DDESC_NIGHT "3d description night"
 //#define TRK_ATT_3DDESC_RAIN_NIGHT "3d description rain+night"
