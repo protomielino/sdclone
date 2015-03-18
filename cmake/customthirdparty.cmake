@@ -324,7 +324,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 		FOREACH(_LIB_NAME ${OPENSCENEGRAPH_LIBRARIES})
 			FOREACH(_NAME_HINT ${_OSG_DLLS_NAME_HINTS})
 				IF("${_LIB_NAME}" MATCHES "${_NAME_HINT}\\.")
-					_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" "lib;ot12-;osg80-;osg97-" _DLL_PATHNAME)
+					_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" "lib;ot12-;ot20-;osg80-;osg97-;osg100-;osg118-" _DLL_PATHNAME)
 					SET(_NAME_HINT_ "${_NAME_HINT}") # For later (see below DLLs we don't link with).
 					SET(_LIB_NAME_ "${_LIB_NAME}") # For later (see below DLLs we don't link with).
 					SET(_DLL_PATHNAME_ "${_DLL_PATHNAME}") # For later (see below plugins).
@@ -339,7 +339,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 		SET(_EXTRA_OSG_DLLS_NAME_HINTS "osgText") # ';'-separated list
 		FOREACH(_NAME_HINT ${_EXTRA_OSG_DLLS_NAME_HINTS})
 			STRING(REPLACE "${_NAME_HINT_}" "${_NAME_HINT}" _LIB_NAME "${_LIB_NAME_}")
-			_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" ";lib;ot12-;osg80-" _DLL_PATHNAME)
+			_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" ";lib;ot12-;ot20-;osg80-;osg97-;osg100-;osg118-" _DLL_PATHNAME)
 			LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 		ENDFOREACH()
 		
