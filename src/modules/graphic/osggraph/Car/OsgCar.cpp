@@ -46,7 +46,9 @@
 
 class SDRender;
 
-SDCar::SDCar(void)
+SDCar::SDCar(void) :
+    shader(NULL),
+    reflectionMapping(NULL)
 {
     car_root = new osg::Group;
 }
@@ -56,17 +58,8 @@ SDCar::~SDCar(void)
     car_root->removeChildren(0, car_root->getNumChildren());
     car_root = NULL;
 
-    //delete loader;
-
-    //delete wheels;
-    delete cockpit;
-    delete driver;
-    delete wing;
-    delete wing3;
     delete shader;
     delete reflectionMapping;
-
-    //free car;
 }
 
 osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned carshader)
@@ -361,7 +354,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
             double ypos = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0.0);
             double zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
             double angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
-            double steerMovt = GfParmGetNum(handle, path, PRM_SW_MOVT, NULL, 1.0);
+            //double steerMovt = GfParmGetNum(handle, path, PRM_SW_MOVT, NULL, 1.0);
 
             osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
             osg::Matrix rot = osg::Matrix::rotate(0.0, osg::X_AXIS, angl, osg::Y_AXIS, 0.0, osg::Z_AXIS );

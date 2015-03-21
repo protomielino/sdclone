@@ -52,10 +52,10 @@ class SDCar
         tCarElt     *car;
 
         SDWheels    wheels;
-        SDCockpit   *cockpit;
-        SDWing      *wing;
-        SDWing3     * wing3;
-        SDDriver    *driver;
+        //SDCockpit   *cockpit;
+        //SDWing      *wing;
+        //SDWing3     * wing3;
+        //SDDriver    *driver;
 
         SDCarShader *shader;
         SDReflectionMapping *reflectionMapping;
