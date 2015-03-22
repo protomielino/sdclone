@@ -818,7 +818,11 @@ grInitCar(tCarElt *car)
 	{
 		if (grSpeedway)
 		{
-			param = GfParmGetStr(handle, path, PRM_WING_2, NULL);
+            if (grSpeedwayshort)
+                param = GfParmGetStr(handle, path, PRM_WING_2, NULL);
+
+            else
+                param = GfParmGetStr(handle, path, PRM_WING_3, NULL);
 		}
 
 		ssgEntity *wingEntity = grssgCarLoadAC3D(param, NULL, index);

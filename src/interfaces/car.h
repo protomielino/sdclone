@@ -721,6 +721,7 @@ typedef struct CarElt
 #define SECT_WING_MODEL		"wing model"
 #define PRM_WING_1			"model 1"
 #define PRM_WING_2			"model 2"
+#define PRM_WING_3          "model 3"
 
 #define PRM_MIN_TQ_BIAS		"min torque bias"
 #define PRM_MAX_TQ_BIAS		"max torque bias"
