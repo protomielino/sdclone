@@ -106,7 +106,8 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 	// In TR_PIT_NO_BUILDING, the pit positions are located exactly the same,
 	// as in the TR_PIT_ON_TRACK_SIDE. It differs only later, showing/not showing
 	// the buildings.
-	switch (pits->type) {
+    switch (pits->type)
+    {
 		case TR_PIT_ON_TRACK_SIDE:
 		case TR_PIT_NO_BUILDING:
 			pits->driversPits = (tTrackOwnPit*)calloc(pits->nPitSeg, sizeof(tTrackOwnPit));
@@ -118,17 +119,21 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 			if (segName != 0) {
 				pitBuildingsStart = theTrack->seg;
 				found = false;
-				for(i = 0; i < theTrack->nseg; i++) {
-					if (!strcmp(segName, pitBuildingsStart->name)) {
+                for(i = 0; i < theTrack->nseg; i++)
+                {
+                    if (!strcmp(segName, pitBuildingsStart->name))
+                    {
 						found = true;
-					} else if (found) {
+                    } else if (found)
+                    {
 						pitBuildingsStart = pitBuildingsStart->next;
 						break;
 					}
 					pitBuildingsStart = pitBuildingsStart->prev;
 				}
 
-				if (!found) {
+                if (!found)
+                {
 					pitBuildingsStart = NULL;
 				}
 			}
@@ -142,16 +147,20 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 			offset = 0;
 			toStart = 0;
 			i = 0;
-			while (i < pits->nPitSeg) { 
-				if (changeSeg) {
+            while (i < pits->nPitSeg)
+            {
+                if (changeSeg)
+                {
 					changeSeg = false;
 					offset = 0;
 					curMainSeg = curMainSeg->next;
 
-					switch (pits->side) {
+                    switch (pits->side)
+                    {
 						case TR_RGT:
 							curPitSeg = curMainSeg->rside;
-							if (curPitSeg->rside) {
+                            if (curPitSeg->rside)
+                            {
 								offset = curPitSeg->width;
 								curPitSeg = curPitSeg->rside;
 							}
@@ -159,7 +168,8 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 							
 						case TR_LFT:
 							curPitSeg = curMainSeg->lside;
-							if (curPitSeg->lside) {
+                            if (curPitSeg->lside)
+                            {
 								offset = curPitSeg->width;
 								curPitSeg = curPitSeg->lside;
 							}
@@ -167,7 +177,8 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 					}
 
 					curPos.seg = curMainSeg;
-					if (toStart >= curMainSeg->length) {
+                    if (toStart >= curMainSeg->length)
+                    {
 						toStart -= curMainSeg->length;
 						changeSeg = true;
 						continue;
@@ -197,11 +208,12 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 				//TODO(kilo) get rid of following line when above feature is ready
 				curPos.toStart = toStart;
 
-				switch (pits->side) {
+                switch (pits->side)
+                {
 					case TR_RGT:
 						curPos.toRight  = -offset - RtTrackGetWidth(curPitSeg, toStart);
 						curPos.toLeft   = curMainSeg->width - curPos.toRight;
-						curPos.toMiddle = curMainSeg->width / 2.0 - curPos.toRight;
+                        curPos.toMiddle = - curMainSeg->width / 2.0 + curPos.toRight;
 						break;
 
 					case TR_LFT:
@@ -213,11 +225,14 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 
 				memcpy(&(pits->driversPits[i].pos), &curPos, sizeof(curPos));
 				toStart += pits->len;
-				if (toStart >= curMainSeg->length) {
+                if (toStart >= curMainSeg->length)
+                {
 					toStart -= curMainSeg->length;
 					changeSeg = true;
 				}
+
 			i++;
+
 			}//while i
 		break;
 
