@@ -246,20 +246,16 @@ MACRO(CHECK_LIBRARIES)
 	ENDIF(SDL_FOUND)
 	
 	# OSG
-	IF(OPTION_OSGGRAPH)
-	
-		IF(NOT OPENSCENEGRAPH_FOUND)
-			Find_Package(OpenSceneGraph REQUIRED osgDB osgViewer osgGA osgUtil osgFX osgParticle osgShadow)
-		ENDIF()
+	IF(NOT OPENSCENEGRAPH_FOUND)
+		Find_Package(OpenSceneGraph REQUIRED osgDB osgViewer osgGA osgUtil osgFX osgParticle osgShadow)
+	ENDIF()
 
-		IF(OPENSCENEGRAPH_FOUND)
-			SET(HAVE_LIBOPENSCENEGRAPH 1)
-			MESSAGE(STATUS "Looking for library OpenScenGraph - found")
-		ELSE(OPENSCENEGRAPH_FOUND)
-			MESSAGE(STATUS "Looking for library OpenScenGraph - NOT found")
-		ENDIF(OPENSCENEGRAPH_FOUND)
-		
-	ENDIF(OPTION_OSGGRAPH)
+	IF(OPENSCENEGRAPH_FOUND)
+		SET(HAVE_LIBOPENSCENEGRAPH 1)
+		MESSAGE(STATUS "Looking for library OpenScenGraph - found")
+	ELSE(OPENSCENEGRAPH_FOUND)
+		MESSAGE(STATUS "Looking for library OpenScenGraph - NOT found")
+	ENDIF(OPENSCENEGRAPH_FOUND)
 
 	# Expat
 	IF(OPTION_3RDPARTY_EXPAT)
