@@ -162,7 +162,7 @@ void SDScenery::LoadScene(tTrack *track)
             strPath+=buf;
 
             std::string strTPath = GetDataDir();
-            snprintf(buf, 4096, "data/textures/");
+            snprintf(buf, 255, "data/textures/");
             strTPath += buf;
             osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
             pathList.push_back(strPath);

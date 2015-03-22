@@ -35,6 +35,7 @@ SDSteer::~SDSteer(void)
 
 osg::ref_ptr<osg::Node> SDSteer::initSteer(tCarElt *car, void *handle, bool tracktype)
 {
+   return NULL;
     /*rcvShadowMask = 0x1;
     castShadowMask = 0x2;
     this->car = car;

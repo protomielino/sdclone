@@ -345,7 +345,11 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 		
 		# Plugins : Complete the list right below according to the actual needs.
 		# TODO: Find a way to install them in the osgPlugins-xxx subdir (works as is, but ...)
-		SET(_OSG_PLUGIN_NAME_HINTS "glsl;jpeg;png;rgb;dds;osgtgz;ac;osg;ive") # ';'-separated list
+		SET(_OSG_PLUGIN_NAME_HINTS "osgdb_ac;osgdb_dds;osgdb_glsl") # ';'-separated list
+      LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_ive;osgdb_jpeg;osgdb_osg")
+      LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_osga;osgdb_osgtgz;osgdb_png;osgdb_rgb")
+      LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_serializers_osg;osgdb_serializers_osgga;osgdb_serializers_osgparticle;osgdb_serializers_osgshadow;osgdb_serializers_osgviewer")
+
 		GET_FILENAME_COMPONENT(_OSG_PLUGINS_DIR "${_DLL_PATHNAME_}" PATH)
 		FILE(GLOB_RECURSE _OSG_PLUGIN_NAMES "${_OSG_PLUGINS_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
 		FOREACH(_NAME_HINT ${_OSG_PLUGIN_NAME_HINTS})

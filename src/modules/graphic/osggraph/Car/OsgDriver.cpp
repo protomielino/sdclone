@@ -18,7 +18,9 @@
  ***************************************************************************/
 
 /* Portability don't build with MingW 4.8 */
-//#include <portability.h>
+#ifdef _MSC_VER
+#include <portability.h>
+#endif // _MSC_VER
 
 #include "OsgLoader.h"
 #include "OsgDriver.h"
