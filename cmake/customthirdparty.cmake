@@ -132,38 +132,42 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	ENDIF(OPTION_3RDPARTY_SQLITE3)
 	
 	# OpenSceneGraph
-	_FIND_3RDPARTY_DEPENDENCY(OPENTHREADS OpenThreads/Thread "" OpenThreads ${ROOT_DIR} "")
-	_FIND_3RDPARTY_DEPENDENCY(OSGDB osgDB/fstream "" osgDB ${ROOT_DIR} "")
-	_FIND_3RDPARTY_DEPENDENCY(OSGFX osgFX/version "" osgFX ${ROOT_DIR} "")
-	_FIND_3RDPARTY_DEPENDENCY(OSGGA osgGA/export "" osgGA ${ROOT_DIR} "")
-	_FIND_3RDPARTY_DEPENDENCY(OSG osg/viewport "" osg ${ROOT_DIR} "")
-	_FIND_3RDPARTY_DEPENDENCY(OSGPARTICLE osgParticle/Particle "" osgParticle ${ROOT_DIR} "")
-	_FIND_3RDPARTY_DEPENDENCY(OSGSHADOW osgShadow/ShadowedScene "" osgShadow ${ROOT_DIR} "")
-	_FIND_3RDPARTY_DEPENDENCY(OSGVIEWER osgViewer/api/Win32/GraphicsHandleWin32 "" osgViewer ${ROOT_DIR} "")
-	_FIND_3RDPARTY_DEPENDENCY(OSGUTIL osgUtil/Optimizer "" osgUtil ${ROOT_DIR} "")
+	IF(OPTION_OSGGRAPH)
+	
+		_FIND_3RDPARTY_DEPENDENCY(OPENTHREADS OpenThreads/Thread "" OpenThreads ${ROOT_DIR} "")
+		_FIND_3RDPARTY_DEPENDENCY(OSGDB osgDB/fstream "" osgDB ${ROOT_DIR} "")
+		_FIND_3RDPARTY_DEPENDENCY(OSGFX osgFX/version "" osgFX ${ROOT_DIR} "")
+		_FIND_3RDPARTY_DEPENDENCY(OSGGA osgGA/export "" osgGA ${ROOT_DIR} "")
+		_FIND_3RDPARTY_DEPENDENCY(OSG osg/viewport "" osg ${ROOT_DIR} "")
+		_FIND_3RDPARTY_DEPENDENCY(OSGPARTICLE osgParticle/Particle "" osgParticle ${ROOT_DIR} "")
+		_FIND_3RDPARTY_DEPENDENCY(OSGSHADOW osgShadow/ShadowedScene "" osgShadow ${ROOT_DIR} "")
+		_FIND_3RDPARTY_DEPENDENCY(OSGVIEWER osgViewer/api/Win32/GraphicsHandleWin32 "" osgViewer ${ROOT_DIR} "")
+		_FIND_3RDPARTY_DEPENDENCY(OSGUTIL osgUtil/Optimizer "" osgUtil ${ROOT_DIR} "")
 		
-	# If everything found, set things as if it was Find_Package(OpenSceneGraph) which had did it,
-	# in order CHECK_LIBRARIES does not call it again.
-	IF(OPENTHREADS_FOUND AND OSGDB_FOUND AND OSGFX_FOUND AND OSGGA_FOUND
-		AND OSG_FOUND AND OSGVIEWER_FOUND AND OSGUTIL_FOUND AND OSGPARTICLE_FOUND
-		AND OSGSHADOW_FOUND)
+		# If everything found, set things as if it was Find_Package(OpenSceneGraph) which had did it,
+		# in order CHECK_LIBRARIES does not call it again.
+		IF(OPENTHREADS_FOUND AND OSGDB_FOUND AND OSGFX_FOUND AND OSGGA_FOUND
+		   AND OSG_FOUND AND OSGVIEWER_FOUND AND OSGUTIL_FOUND AND OSGPARTICLE_FOUND
+		   AND OSGSHADOW_FOUND)
 
-		SET(OPENSCENEGRAPH_FOUND "YES")
+			SET(OPENSCENEGRAPH_FOUND "YES")
 			
-		SET(OPENSCENEGRAPH_INCLUDE_DIRS "${OSG_INCLUDE_DIR}") # We assume they are all together.
-		SET(OPENSCENEGRAPH_LIBRARIES "${OPENTHREADS_LIBRARY};${OSGDB_LIBRARY};${OSGFX_LIBRARY}")
-		SET(OPENSCENEGRAPH_LIBRARIES "${OPENSCENEGRAPH_LIBRARIES};${OSGGA_LIBRARY};${OSG_LIBRARY}")
-		SET(OPENSCENEGRAPH_LIBRARIES "${OPENSCENEGRAPH_LIBRARIES};${OSGVIEWER_LIBRARY};${OSGUTIL_LIBRARY}")
-		SET(OPENSCENEGRAPH_LIBRARIES "${OPENSCENEGRAPH_LIBRARIES};${OSGPARTICLE_LIBRARY};${OSGSHADOW_LIBRARY}")
+			SET(OPENSCENEGRAPH_INCLUDE_DIRS "${OSG_INCLUDE_DIR}") # We assume they are all together.
+			SET(OPENSCENEGRAPH_LIBRARIES "${OPENTHREADS_LIBRARY};${OSGDB_LIBRARY};${OSGFX_LIBRARY}")
+			SET(OPENSCENEGRAPH_LIBRARIES "${OPENSCENEGRAPH_LIBRARIES};${OSGGA_LIBRARY};${OSG_LIBRARY}")
+			SET(OPENSCENEGRAPH_LIBRARIES "${OPENSCENEGRAPH_LIBRARIES};${OSGVIEWER_LIBRARY};${OSGUTIL_LIBRARY}")
+			SET(OPENSCENEGRAPH_LIBRARIES "${OPENSCENEGRAPH_LIBRARIES};${OSGPARTICLE_LIBRARY};${OSGSHADOW_LIBRARY}")
 			
-		MESSAGE(STATUS "OPENSCENEGRAPH_INCLUDE_DIRS=${OPENSCENEGRAPH_INCLUDE_DIRS}")
-		MESSAGE(STATUS "OPENSCENEGRAPH_LIBRARIES=${OPENSCENEGRAPH_LIBRARIES}")
+			MESSAGE(STATUS "OPENSCENEGRAPH_INCLUDE_DIRS=${OPENSCENEGRAPH_INCLUDE_DIRS}")
+			MESSAGE(STATUS "OPENSCENEGRAPH_LIBRARIES=${OPENSCENEGRAPH_LIBRARIES}")
 
-	ENDIF()
+		ENDIF()
+		
+	ENDIF(OPTION_OSGGRAPH)	
 	
 	# Expat : Replaces bundled libs/txml (that will soon be removed).
 	IF(OPTION_3RDPARTY_EXPAT)
-		_FIND_3RDPARTY_DEPENDENCY(EXPAT expat.h "" "expat;expat-1" ${ROOT_DIR} "")
+		_FIND_3RDPARTY_DEPENDENCY(EXPAT expat.h "" expat ${ROOT_DIR} "")
 	ENDIF(OPTION_3RDPARTY_EXPAT)
 	
 	# FreeSOLID : Replaces bundled modules/simu/.../SOLID2.0 (that will soon be removed).
@@ -176,7 +180,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	ENDIF(OPTION_3RDPARTY_SOLID)
 	
 	# JPEG.
-	_FIND_3RDPARTY_DEPENDENCY(JPEG jpeglib.h "" "jpeg_s;jpeg;jpeg-9" ${ROOT_DIR} "")
+	_FIND_3RDPARTY_DEPENDENCY(JPEG jpeglib.h "" "jpeg_s;jpeg" ${ROOT_DIR} "")
 	
 	# ZLib.
 	_FIND_3RDPARTY_DEPENDENCY(ZLIB zlib.h "" "z;zlib;zlib1" ${ROOT_DIR} "D")
@@ -313,44 +317,48 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 
 	ENDIF(OPTION_3RDPARTY_EXPAT)
 	
-	# DLLs whose libs we link with.
-	SET(_OSG_DLLS_NAME_HINTS "OpenThreads;osgDB;osgFX;osgGA;osgParticle;osgShadow;osgViewer;osgUtil;osg;")
-	FOREACH(_LIB_NAME ${OPENSCENEGRAPH_LIBRARIES})
-		FOREACH(_NAME_HINT ${_OSG_DLLS_NAME_HINTS})
-			IF("${_LIB_NAME}" MATCHES "${_NAME_HINT}\\.")
-				_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" "lib;ot20-;ot12-;osg100-;osg97-;osg80-" _DLL_PATHNAME)
-				SET(_NAME_HINT_ "${_NAME_HINT}") # For later (see below DLLs we don't link with).
-				SET(_LIB_NAME_ "${_LIB_NAME}") # For later (see below DLLs we don't link with).
-				SET(_DLL_PATHNAME_ "${_DLL_PATHNAME}") # For later (see below plugins).
-				BREAK()
-			ENDIF()
-		ENDFOREACH()
-		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
-	ENDFOREACH()
+	IF(OPTION_OSGGRAPH)
 
-	# Other needed DLLs we don't link with.
-	# We use _LIB_NAME_ as a template, and _NAME_HINT_ as the string to replace inside. 
-	SET(_EXTRA_OSG_DLLS_NAME_HINTS "osgText") # ';'-separated list
-	FOREACH(_NAME_HINT ${_EXTRA_OSG_DLLS_NAME_HINTS})
-		STRING(REPLACE "${_NAME_HINT_}" "${_NAME_HINT}" _LIB_NAME "${_LIB_NAME_}")
-		_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" ";lib;ot20-;ot12-;osg100-;osg97-;osg80-" _DLL_PATHNAME)
-		LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
-	ENDFOREACH()
-		
-	# Plugins : Complete the list right below according to the actual needs.
-	# TODO: Find a way to install them in the osgPlugins-xxx subdir (works as is, but ...)
-	SET(_OSG_PLUGIN_NAME_HINTS "glsl;jpeg;png;rgb;dds;osgtgz;ac;osg;ive") # ';'-separated list
-	GET_FILENAME_COMPONENT(_OSG_PLUGINS_DIR "${_DLL_PATHNAME_}" PATH)
-	FILE(GLOB_RECURSE _OSG_PLUGIN_NAMES "${_OSG_PLUGINS_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
-	FOREACH(_NAME_HINT ${_OSG_PLUGIN_NAME_HINTS})
-		FOREACH(_PLUGIN_NAME ${_OSG_PLUGIN_NAMES})
-			IF("${_PLUGIN_NAME}" MATCHES "osgPlugins.*/.*${_NAME_HINT}\\.")
-				LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_PLUGIN_NAME}")
-				MESSAGE(STATUS "Will install 3rdParty plugin ${_PLUGIN_NAME}")
-				BREAK()
-			ENDIF()
+		# DLLs whose libs we link with.
+		SET(_OSG_DLLS_NAME_HINTS "OpenThreads;osgDB;osgFX;osgGA;osgParticle;osgShadow;osgViewer;osgUtil;osg;")
+		FOREACH(_LIB_NAME ${OPENSCENEGRAPH_LIBRARIES})
+			FOREACH(_NAME_HINT ${_OSG_DLLS_NAME_HINTS})
+				IF("${_LIB_NAME}" MATCHES "${_NAME_HINT}\\.")
+					_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" "lib;ot12-;ot20-;osg80-;osg97-;osg100-;osg118-" _DLL_PATHNAME)
+					SET(_NAME_HINT_ "${_NAME_HINT}") # For later (see below DLLs we don't link with).
+					SET(_LIB_NAME_ "${_LIB_NAME}") # For later (see below DLLs we don't link with).
+					SET(_DLL_PATHNAME_ "${_DLL_PATHNAME}") # For later (see below plugins).
+					BREAK()
+				ENDIF()
+			ENDFOREACH()
+			LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 		ENDFOREACH()
-	ENDFOREACH()
+
+		# Other needed DLLs we don't link with.
+		# We use _LIB_NAME_ as a template, and _NAME_HINT_ as the string to replace inside. 
+		SET(_EXTRA_OSG_DLLS_NAME_HINTS "osgText") # ';'-separated list
+		FOREACH(_NAME_HINT ${_EXTRA_OSG_DLLS_NAME_HINTS})
+			STRING(REPLACE "${_NAME_HINT_}" "${_NAME_HINT}" _LIB_NAME "${_LIB_NAME_}")
+			_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" ";lib;ot12-;ot20-;osg80-;osg97-;osg100-;osg118-" _DLL_PATHNAME)
+			LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+		ENDFOREACH()
+		
+		# Plugins : Complete the list right below according to the actual needs.
+		# TODO: Find a way to install them in the osgPlugins-xxx subdir (works as is, but ...)
+		SET(_OSG_PLUGIN_NAME_HINTS "glsl;jpeg;png;rgb;dds;osgtgz;ac;osg;ive") # ';'-separated list
+		GET_FILENAME_COMPONENT(_OSG_PLUGINS_DIR "${_DLL_PATHNAME_}" PATH)
+		FILE(GLOB_RECURSE _OSG_PLUGIN_NAMES "${_OSG_PLUGINS_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+		FOREACH(_NAME_HINT ${_OSG_PLUGIN_NAME_HINTS})
+			FOREACH(_PLUGIN_NAME ${_OSG_PLUGIN_NAMES})
+				IF("${_PLUGIN_NAME}" MATCHES "osgPlugins.*/.*${_NAME_HINT}\\.")
+					LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_PLUGIN_NAME}")
+					MESSAGE(STATUS "Will install 3rdParty plugin ${_PLUGIN_NAME}")
+					BREAK()
+				ENDIF()
+			ENDFOREACH()
+		ENDFOREACH()
+		
+	ENDIF(OPTION_OSGGRAPH)
 
 	IF(OPTION_3RDPARTY_SOLID)
 
@@ -362,7 +370,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 
 	ENDIF(OPTION_3RDPARTY_SOLID)
 
-	_FIND_3RDPARTY_DLL("${ZLIB_LIBRARY}" "zlib;zlib1" "lib" _DLL_PATHNAME)
+	_FIND_3RDPARTY_DLL("${ZLIB_LIBRARY}" "zlib" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	_FIND_3RDPARTY_DLL("${PNG_LIBRARY}" "png;png15;png16" "lib" _DLL_PATHNAME)
