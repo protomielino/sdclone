@@ -167,7 +167,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	
 	# Expat : Replaces bundled libs/txml (that will soon be removed).
 	IF(OPTION_3RDPARTY_EXPAT)
-		_FIND_3RDPARTY_DEPENDENCY(EXPAT expat.h "" expat ${ROOT_DIR} "")
+		_FIND_3RDPARTY_DEPENDENCY(EXPAT expat.h "" "expat;expat-1" ${ROOT_DIR} "")
 	ENDIF(OPTION_3RDPARTY_EXPAT)
 	
 	# FreeSOLID : Replaces bundled modules/simu/.../SOLID2.0 (that will soon be removed).
@@ -180,7 +180,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	ENDIF(OPTION_3RDPARTY_SOLID)
 	
 	# JPEG.
-	_FIND_3RDPARTY_DEPENDENCY(JPEG jpeglib.h "" "jpeg_s;jpeg" ${ROOT_DIR} "")
+	_FIND_3RDPARTY_DEPENDENCY(JPEG jpeglib.h "" "jpeg_s;jpeg;jpeg-8;jpeg-9" ${ROOT_DIR} "")
 	
 	# ZLib.
 	_FIND_3RDPARTY_DEPENDENCY(ZLIB zlib.h "" "z;zlib;zlib1" ${ROOT_DIR} "D")
@@ -374,7 +374,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 
 	ENDIF(OPTION_3RDPARTY_SOLID)
 
-	_FIND_3RDPARTY_DLL("${ZLIB_LIBRARY}" "zlib" "lib" _DLL_PATHNAME)
+	_FIND_3RDPARTY_DLL("${ZLIB_LIBRARY}" "zlib;zlib1" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	_FIND_3RDPARTY_DLL("${PNG_LIBRARY}" "png;png15;png16" "lib" _DLL_PATHNAME)
