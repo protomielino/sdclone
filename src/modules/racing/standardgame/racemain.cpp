@@ -780,6 +780,7 @@ ReRaceRealStart(void)
 	{
 		memset(&(s->cars[i]->ctrl), 0, sizeof(tCarCtrl));
 		s->cars[i]->ctrl.brakeCmd = 1.0;
+        s->cars[i]->_commitBestLapTime = true;
 	}
 
 	for (j = 0; j < (int)(1.0 / RCM_MAX_DT_SIMU); j++)
