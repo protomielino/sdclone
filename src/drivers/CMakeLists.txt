@@ -7,13 +7,14 @@ SD_ADD_SUBDIRECTORY(kilo2008)
 SD_ADD_SUBDIRECTORY(networkhuman)
 SD_ADD_SUBDIRECTORY(simplix)
 SD_ADD_SUBDIRECTORY(usr)
-SD_ADD_SUBDIRECTORY(replay)
 
 # Work-in-progress / unofficial robots.
 IF(NOT OPTION_OFFICIAL_ONLY)
 
   # Work-in-progress.
-  #SD_ADD_SUBDIRECTORY(shadow)
+  SD_ADD_SUBDIRECTORY(shadow)
+
+  SD_ADD_SUBDIRECTORY(replay)
 
   # Obsolete (as robot samples).
   #SD_ADD_SUBDIRECTORY(bt)

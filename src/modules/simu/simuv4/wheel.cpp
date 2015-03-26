@@ -120,12 +120,13 @@ SimWheelConfig(tCar *car, int index)
 	carElt->_tireWidth(index) = tirewidth;
 	carElt->_brakeDiskRadius(index) = wheel->brake.radius;
 	carElt->_wheelRadius(index) = wheel->radius;
-	if (car->features & FEAT_TIRETEMPDEG) {
-		// Assume new wheels
-		carElt->_tyreCondition(index) = 1.0;
+    if (car->features & FEAT_TIRETEMPDEG)
+    {
+        // Assume new wheels
+        carElt->_tyreCondition(index) = 1.0;
 		car->carElt->_tyreTreadDepth(index) = wheel->treadDepth;
 		car->carElt->_tyreCritTreadDepth(index) = wheel->critTreadDepth;
-	}
+    }
 
 	wheel->mfC = (tdble)(2.0 - asin(RFactor) * 2.0 / PI);
 	wheel->mfB = Ca / wheel->mfC;
@@ -396,7 +397,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 
 		// If slip is over the limit, reduce brake command for this wheel
 		if (sx > ABS_SlipScale)			
-			wheel->brake.ABS = (tdble) MAX(0.0,MIN(1.0,1 - ABS_BrakeScale * sx));
+            wheel->brake.ABS = (tdble) MAX(0.0,MIN(1.0,1 - ABS_BrakeScale * sx));
 		else
 			wheel->brake.ABS = 1.0f;
 	}

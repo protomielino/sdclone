@@ -529,6 +529,3 @@ void DisplayMenuRelease(void)
 {
 	delete PDisplayMenu;
 }
-
-
-	

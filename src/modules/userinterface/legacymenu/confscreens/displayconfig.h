@@ -34,7 +34,7 @@ public:
 
 	DisplayMenu();
 	~DisplayMenu();
-
+	
 	bool initialize(void* pPreviousMenu);
 	
 	enum EDisplayMode { eFullScreen = 0, eWindowed = 1, nDisplayModes };
