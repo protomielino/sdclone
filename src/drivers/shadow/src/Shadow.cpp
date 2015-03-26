@@ -30,6 +30,7 @@
 #include <raceman.h>
 #include <robottools.h>
 #include <robot.h>
+#include <portability.h>
 
 #include "Vec3d.h"
 #include "Driver.h"
