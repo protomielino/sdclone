@@ -404,11 +404,16 @@ TGF_API void *GfParmReadFileLocal(const char *file, int mode, bool neededFile = 
 /* last optional parameter allows usage without logger be available */
 TGF_API void *GfParmReadFile(const char *file, int mode, bool neededFile = true, bool trace = true);
 
+TGF_API void *GfParmReadBuf(char *buffer);
+
 /* parameter file write */
 TGF_API int GfParmWriteFileLocal(const char *file, void* handle, const char *name);
 TGF_API int GfParmWriteFile(const char *file, void* handle, const char *name);
 /* last optional parameter allows usage without logger be available */
 TGF_API int GfParmWriteFileSDHeader(const char *file, void* handle, const char *name, const char *author, bool trace = true);
+/* write a parameter file to a supplied buffer */
+TGF_API int GfParmWriteBuf(void *handle, char *buf, int size);
+
 
 TGF_API char *GfParmGetName(void *handle);
 TGF_API char *GfParmGetFileName(void *handle);
