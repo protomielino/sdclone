@@ -10,9 +10,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-AveragedData::AveragedData(
-	int nBinsX, double minX, double maxX,
-	int nBinsY, double minY, double maxY )
+AveragedData::AveragedData(	int nBinsX, double minX, double maxX, int nBinsY, double minY, double maxY )
 :
 	m_xSize(nBinsX),
 	m_xMin(minX),

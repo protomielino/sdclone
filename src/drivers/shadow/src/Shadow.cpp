@@ -39,8 +39,7 @@
 static Shared   s_shared;
 
 // Traditional TORCS Interface
-static void initTrack(int index, tTrack* track, void *carHandle,
-                      void **carParmHandle, tSituation *s);
+static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
 static void newRace(int index, tCarElt* car, tSituation *s);
 static void drive(int index, tCarElt* car, tSituation *s);
 static int  pitcmd(int index, tCarElt* car, tSituation *s);
