@@ -374,11 +374,14 @@ RePreRace(void)
 
 	// Get session type (race, qualification or practice).
 	raceType = GfParmGetStr(params, raceName, RM_ATTR_TYPE, RM_VAL_RACE);
-	if (!strcmp(raceType, RM_VAL_RACE)) {
+	if (!strcmp(raceType, RM_VAL_RACE))
+	{
 		ReInfo->s->_raceType = RM_TYPE_RACE;
-	} else if (!strcmp(raceType, RM_VAL_QUALIF)) {
+	} else if (!strcmp(raceType, RM_VAL_QUALIF))
+	{
 		ReInfo->s->_raceType = RM_TYPE_QUALIF;
-	} else if (!strcmp(raceType, RM_VAL_PRACTICE)) {
+	} else if (!strcmp(raceType, RM_VAL_PRACTICE))
+	{
 		ReInfo->s->_raceType = RM_TYPE_PRACTICE;
 	}
 
