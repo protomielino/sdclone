@@ -203,10 +203,16 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 	int nFullScreen = bFullScreen ? 1 : 0;
 	int nStereoVision = bStereoVision ? 1 : 0;
 
+
 	while (!pWinSurface && nFullScreen >= 0)
 	{
 		GfLogTrace("Trying %s mode\n", nFullScreen ? "full-screen" : "windowed");
+
+#if SDL_MAJOR_VERSION >= 2
+		const int bfVideoMode = SDL_WINDOW_OPENGL | (nFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+#else
 		const int bfVideoMode = SDL_OPENGL | (nFullScreen ? SDL_FULLSCREEN : 0);
+#endif
 
 		nAlphaChannel = bAlpha ? 1 : 0;
 		while (!pWinSurface && nAlphaChannel >= 0)
@@ -239,7 +245,25 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 						GfLogTrace("Trying %dx anti-aliasing\n", nMaxMultiSamples);
 						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, nMaxMultiSamples);
+#if SDL_MAJOR_VERSION >= 2
+						SDL_SetWindowSize(GfuiWindow, nWidth, nHeight);
+
+						SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, 1, 9);
+						SDL_RenderPresent(renderer);
+
+						SDL_GLContext context;
+						context = SDL_GL_CreateContext(GfuiWindow);
+
+						pWinSurface = SDL_CreateRGBSurface(0, nWidth, nHeight, nCurrDepth,
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
+							0x00FF0000, 0x0000FF00, 0x000000FF,
+#else 
+							0x000000FF, 0x0000FF00, 0x00FF0000,
+#endif 
+							0x00000000); 
+#else
 						pWinSurface = SDL_SetVideoMode(nWidth, nHeight, nCurrDepth, bfVideoMode);
+#endif
 	
 						// Now check if we have a video mode, and if it actually features
 						// what we specified.
@@ -268,7 +292,25 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 					{
 						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+#if SDL_MAJOR_VERSION >= 2
+						SDL_SetWindowSize(GfuiWindow, nWidth, nHeight);
+
+						SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, 1, 9);
+						SDL_RenderPresent(renderer);
+
+						SDL_GLContext context;
+						context = SDL_GL_CreateContext(GfuiWindow);
+
+						pWinSurface = SDL_CreateRGBSurface(0, nWidth, nHeight, nCurrDepth,
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
+							0x00FF0000, 0x0000FF00, 0x000000FF,
+#else 
+							0x000000FF, 0x0000FF00, 0x00FF0000,
+#endif 
+							0x00000000); 
+#else
 						pWinSurface = SDL_SetVideoMode(nWidth, nHeight, nCurrDepth, bfVideoMode);
+#endif
 						if (!pWinSurface)
 							GfLogTrace("%d+%d bit double-buffer not supported\n",
 									   3*nCurrDepth/4, nCurrDepth/4);

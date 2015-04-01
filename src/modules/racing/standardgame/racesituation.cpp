@@ -507,6 +507,7 @@ ReSituationUpdater::ReSituationUpdater()
 	// Initialize termination flag.
 	_bTerminate = false;
 
+
 	if (_bThreaded)
 	{
 		// Initialize the race engine info (state + situation) pointer for the previous step.
@@ -516,7 +517,11 @@ ReSituationUpdater::ReSituationUpdater()
 		ReSituation::self().setThreadSafe(true);
 		
 		// Create and start the updater thread.
+#if SDL_MAJOR_VERSION >= 2
+		_pUpdateThread = SDL_CreateThread(ReSituationUpdater::threadLoop,"Update_thread",this);
+#else
 		_pUpdateThread = SDL_CreateThread(ReSituationUpdater::threadLoop, this);
+#endif
 	}
 	else
 	{

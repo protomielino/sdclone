@@ -43,6 +43,10 @@
 #include "musicplayer.h"
 
 
+#if SDL_MAJOR_VERSION >= 2
+SDL_Window* 	GfuiWindow;
+#endif
+
 tGfuiScreen	*GfuiScreen;	/* current screen */
 static int	GfuiMouseVisible = 1;
 tMouseInfo	GfuiMouse;
@@ -427,13 +431,18 @@ gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 		do 
 		{
 			curKey = curKey->next;
-
 			// Ignore Shift modifier when printable unicode,
 			// as the unicode generator already took care of it.
 			if (curKey->key == key
 				&& (curKey->modifier == modifier
+#if SDL_MAJOR_VERSION < 2
 					|| (curKey->modifier == (modifier & (~GFUIM_SHIFT))
-						&& key >= ' ' && key <= 'z')))
+						&& key >= ' ' && key <= 'z')
+#else
+				|| (curKey->modifier == (modifier & (~GFUIM_SHIFT))
+					&& isprint(key))
+#endif
+				))
 			{
 				if (curKey->onPress)
 					curKey->onPress(curKey->userData);
@@ -507,7 +516,11 @@ void GfuiMouseSetPos(int x, int y)
 {
 	if (GfuiScreen)
 	{
+#if SDL_MAJOR_VERSION >= 2
+		SDL_WarpMouseInWindow(GfuiWindow, x,y);
+#else
 		SDL_WarpMouse(x,y);
+#endif
 		GfuiMouse.X = (x - (ScrW - ViewW)/2) * (int)GfuiScreen->width / ViewW;
 		GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
 	}
@@ -523,7 +536,11 @@ gfuiMouseButton(int button, int state, int x, int y)
 		GfuiMouse.X = (x - (ScrW - ViewW)/2) * (int)GfuiScreen->width / ViewW;
 		GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
 
+#if SDL_MAJOR_VERSION >= 2
+		if (button == SDL_MOUSEWHEEL) {
+#else
 		if (button == SDL_BUTTON_WHEELUP || button == SDL_BUTTON_WHEELDOWN) {
+#endif
 			// Up/down happens very quickly, leaving no time for the system to see them 
 			// this just toggle every down event
 			if (state == SDL_PRESSED) {
@@ -616,10 +633,16 @@ GfuiScreenActivate(void *screen)
 	GfuiApp().eventLoop().setMousePassiveMotionCB(gfuiMousePassiveMotion);
 	GfuiApp().eventLoop().setRecomputeCB(0);
 
+#if SDL_MAJOR_VERSION < 2
 	if (GfuiScreen->keyAutoRepeat)
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	else
 		SDL_EnableKeyRepeat(0, 0);
+#endif
+#if SDL_JOYSTICK
+	GfuiApp().eventLoop().setJoystickAxisCB(GfctrlJoySetAxis);
+	GfuiApp().eventLoop().setJoystickButtonCB(GfctrlJoySetButton);
+#endif
 
 	if (GfuiScreen->onlyCallback == 0) 
 	{
@@ -1202,10 +1225,17 @@ GfuiInitWindowPositionAndSize(int x, int y, int w, int h)
 	// No need to resize, already done when setting the video mode.
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
-	if (SDL_GetWMInfo(&wmInfo))
-	{
+#if SDL_MAJOR_VERSION >= 2
+	if (SDL_GetWindowWMInfo(NULL, &wmInfo)) {
+#else
+	if (SDL_GetWMInfo(&wmInfo)) {
+#endif
 #ifdef WIN32
+#if SDL_MAJOR_VERSION >= 2
+		SetWindowPos(wmInfo.info.win.window, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
+#else
 		SetWindowPos(wmInfo.window, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
+#endif
 #else
 		// TODO.
 		GfLogWarning("GfuiInitWindowPositionAndSize not yet implemented under non-Windows OSes\n");
@@ -1221,5 +1251,9 @@ GfuiInitWindowPositionAndSize(int x, int y, int w, int h)
 void 
 GfuiSwapBuffers(void)
 {
+#if SDL_MAJOR_VERSION >= 2
+	SDL_GL_SwapWindow(GfuiWindow);
+#else
 	SDL_GL_SwapBuffers();
+#endif
 }
