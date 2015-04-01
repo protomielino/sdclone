@@ -25,7 +25,6 @@
 
 #include "OsgCamera.h"		//SDCameras
 
-//class cGrBoard;
 class SDFrameInfo;
 
 class SDView

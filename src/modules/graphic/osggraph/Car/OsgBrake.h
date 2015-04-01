@@ -33,9 +33,6 @@ private :
     unsigned int castShadowMask;
 
 public :
-    //SDBrakes(void);
-    //~SDBrakes(void);
-
     void setCar(tCarElt * car);
     osg::ref_ptr<osg::Geode> initBrake(int wheelIndex);
     void updateBrakes();

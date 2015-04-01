@@ -23,7 +23,6 @@
 
 #include "OsgMain.h"
 #include "OsgView.h"
-//#include "OsgCar.h"
 
 static char buf[1024];
 static char path[1024];
@@ -65,11 +64,6 @@ SDView::SDView(osg::Camera * c, int x, int y, int width, int height,
     id = cpt;
     cpt++;
     curCar = NULL;
-    /*selectNextFlag = false;
-    selectPrevFlag = false;
-    mirrorFlag = 1;*/
-    //memset(cams, 0, sizeof(cams));
-    //viewRatio = 1.33;
     cars = 0;
     selectNextFlag=false;
     selectPrevFlag=false;
@@ -146,7 +140,6 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
         loadParams (s);
         //board->setWidth(fakeWidth);
         GfParmWriteFile(NULL, grHandle, "Graph");
-        //curCam->onSelect(curCar, s);
     }
 
     if(hasChangedMirrorFlag)
@@ -155,10 +148,6 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
         this->de_activateMirror();
     }
 
-    //int	i;
-    // int nb = s->_ncars;
-    //viewer->update(s, &frameInfo);
-    // tCarElt *car = getCurrentCar();
     cameras->update(curCar,s);
     mirror->update(curCar,s);
     mirror->setModelView();
@@ -261,25 +250,16 @@ void SDView::loadParams(tSituation *s)
         mirrorFlag	= (int)GfParmGetNum(grHandle, path2, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
     }
 
-    // Get board width (needed for scissor)
-    /* boardWidth      = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARDWIDTH, NULL, 100);
-        if (boardWidth < 0 || boardWidth > 100)
-                boardWidth = 100;*/
-
     // Retrieve the "current camera".
     cameras->selectCamera(camList,camNum);
 
     // Back to the default camera if not found (and save it as the new current one).
-
-
     cameras->getIntSelectedListAndCamera(&camList,&camNum);
     GfParmSetNum(grHandle, path, GR_ATT_CAM, NULL, (tdble)camNum);
     GfParmSetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, (tdble)camList);
 
     sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, camList, camNum);
     cameras->getSelectedCamera()->loadDefaults(buf);
-    //drawCurrent = curCam->getDrawCurrent();
-    // board->loadDefaults(curCar);
 }
 
 void SDView::saveCamera()
@@ -302,10 +282,6 @@ void SDView::saveCamera()
     }
 
     sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, camList, camNum);
-    //would be save defaults ?
-    //curCam->loadDefaults(buf);
-    //drawCurrent = curCam->getDrawCurrent();
-    //curCam->limitFov ();
     GfParmWriteFile(NULL, grHandle, "Graph");
     GfLogDebug("Written screen=%d camList=%d camNum=%d\n",id,camList,camNum);
 }

@@ -36,23 +36,20 @@ SDPit::~SDPit(void)
 
 void SDPit::build(const std::string TrackPath)
 {
-	std::string LocalPath = GetDataDir();
-	
+    std::string LocalPath = GetDataDir();
+
     osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
     pathList.push_back(TrackPath);
     pathList.push_back(LocalPath+"data/textures");
     osgDB::Registry::instance()->setDataFilePathList(pathList);
-	
+
     osg::ref_ptr<osg::MatrixTransform> _pit_transform = new osg::MatrixTransform;
-	osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-                         0.0f, -1.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f);
+    osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+                     0.0f, -1.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f);
 
     osg::ref_ptr<osg::Node> m_pit = osgDB::readNodeFile("pit.ac");
     _pit_transform->setMatrix(mat);
     _pit_transform->addChild( m_pit.get() );
-
-    /*osg::ref_ptr<osg::StateSet> pitstate = _pit_transform->getOrCreateStateSet();
-    pitstate->setRenderBinDetails(-1, "RenderBin");*/
 
     _osgpit = new osg::Group;
     _osgpit->addChild(_pit_transform.get());

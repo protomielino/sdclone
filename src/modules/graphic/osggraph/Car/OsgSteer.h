@@ -28,16 +28,16 @@
 
 class SDSteer
 {
-    private :
-        tCarElt *car;
+private :
+    tCarElt *car;
 
-        unsigned int rcvShadowMask;
-        unsigned int castShadowMask;
+    unsigned int rcvShadowMask;
+    unsigned int castShadowMask;
 
-    public :
-        SDSteer();
-        ~SDSteer();
-        osg::ref_ptr<osg::Node> initSteer(tCarElt *car,void * handle, bool tracktype);
+public :
+    SDSteer();
+    ~SDSteer();
+    osg::ref_ptr<osg::Node> initSteer(tCarElt *car,void * handle, bool tracktype);
 };
 
 #endif /* _OSGSTEER_H_ */

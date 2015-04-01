@@ -95,12 +95,11 @@ osg::ref_ptr<osg::Switch> SDWing::initWing(tCarElt *car, void *handle, bool trac
         else
             pWing->setSingleChildOn(1);
 #if 1
-    std::string pWing_path = GetLocalDir();
-    pWing_path = pWing_path+"wing.osg";
-    osgDB::writeNodeFile( *pWing, pWing_path );
+        std::string pWing_path = GetLocalDir();
+        pWing_path = pWing_path+"wing.osg";
+        osgDB::writeNodeFile( *pWing, pWing_path );
 #endif
     }
 
     return pWing.get();
-
 }

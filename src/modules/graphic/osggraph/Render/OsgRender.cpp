@@ -46,14 +46,14 @@
 #include "OsgMath.h"
 #include "OsgColor.h"
 
-#include <glfeatures.h>	//gluXXX
-#include <robottools.h>	//RtXXX()
+#include <glfeatures.h>         //gluXXX
+#include <robottools.h>         //RtXXX()
 
 #define MAX_BODIES	2
 #define MAX_CLOUDS	3
 #define NMaxStars	3000
-#define NPLANETS		0	//No planets displayed
-#define NB_BG_FACES	36	//Background faces
+#define NPLANETS		0       //No planets displayed
+#define NB_BG_FACES	36          //Background faces
 #define BG_DIST			1.0f
 #define SKYDYNAMIC_THR	12000	//Skydynamic setting threshold. No dynamic sky below that.
 #define CLEAR_CLOUD 1
@@ -67,14 +67,14 @@ static const char* TexSizeValues[] = { GR_ATT_SHADOW_512, GR_ATT_SHADOW_1024, GR
 static const int NbTexSizeValues = sizeof(TexSizeValues) / sizeof(TexSizeValues[0]);
 static const char* QualityValues[] = { GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_ATT_AGR_FULL };
 static const int NbQualityValues = sizeof(QualityValues) / sizeof(QualityValues[0]);
-static const char* ShadersValues[] = { GR_VAL_NO, GR_VAL_YES };
+static const char* ShadersValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_ATT_AGR_FULL };
 static const int NbShadersValues = sizeof(ShadersValues) / sizeof(ShadersValues[0]);
 static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = {1, 3, 5, 7, 8};
 static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
 
 SDRender::SDRender(void)
-   :AStarsData(NULL),
-   APlanetsData(NULL)
+    :AStarsData(NULL),
+      APlanetsData(NULL)
 {
     BaseSkyColor = osg::Vec3f( 0.31f, 0.43f, 0.69f );
     BaseFogColor = osg::Vec3f( 0.84f, 0.84f, 1.0f );
@@ -138,8 +138,6 @@ SDRender::~SDRender(void)
  */
 void SDRender::Init(tTrack *track)
 {
-    //char buf[256];
-    //void *hndl = grTrackHandle;
     SDTrack = track;
 
     std::string datapath = GetDataDir();
@@ -162,12 +160,12 @@ void SDRender::Init(tTrack *track)
 
     // Cloud layers.
     SDNbCloudLayers =
-        (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
+            (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
 
     GfLogInfo("Graphic options : Number of cloud layers : %u\n", SDNbCloudLayers);
 
     SDMax_Visibility =
-        (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, 0, 0));
+            (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, 0, 0));
 
     ShadowIndex = 0; // Default value index, in case file value not found in list.
     const char* pszShadow =
@@ -235,9 +233,9 @@ void SDRender::Init(tTrack *track)
         }
     }
 
-   carsShader = 0; // Default value index, in case file value not found in list.
+    carsShader = 0; // Default value index, in case file value not found in list.
     const char* pszShaders =
-            GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SHADERS, GR_VAL_NO);
+            GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SHADERS, GR_ATT_AGR_NULL);
 
     for (int i = 0; i < NbShadersValues; i++)
     {
@@ -393,10 +391,8 @@ void SDRender::Init(tTrack *track)
     m_scene->addChild(scene.get());
     m_scene->addChild(cargroup.get());
     m_scene->addChild(background.get());
-    //m_scene->setNodeMask(rcvShadowMask);
 
     sceneGroup->addChild(m_scene.get());
-    //sceneGroup->addChild(m_CarRoot.get());
 
     stateSet = new osg::StateSet;
     stateSet = m_scene->getOrCreateStateSet();
@@ -459,7 +455,6 @@ void SDRender::Init(tTrack *track)
     mRoot->addChild(sceneGroup.get());
     mRoot->setStateSet(setFogState().get());
     mRoot->addChild(sunLight.get());
-   // mRoot->addChild(skyGroup.get());
 
     // Clouds are added to the scene graph later
     osg::ref_ptr<osg::StateSet> stateSet2 = new osg::StateSet;
@@ -469,13 +464,6 @@ void SDRender::Init(tTrack *track)
     stateSet2->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
     m_RealRoot->addChild(mRoot.get());
-
-
-#if 0
-    std::string ScenePath = GetLocalDir();
-    ScenePath = ScenePath+"scene.osg";
-    osgDB::writeNodeFile(*m_RealRoot, ScenePath);
-#endif
 
     GfOut("LE POINTEUR %d\n", mRoot.get());
 }//SDRender::Init
@@ -491,7 +479,6 @@ void SDRender::ShadowedScene()
         vdsm->setTextureSize(osg::Vec2s(ShadowTexSize, ShadowTexSize));
         vdsm->setTextureUnit(shadowTexUnit);
         shadowRoot = new osgShadow::ShadowedScene;
-        //osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
         shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
         shadowRoot->setCastsShadowTraversalMask(castShadowMask);
         shadowRoot->setShadowTechnique((vdsm.get()));
@@ -503,7 +490,6 @@ void SDRender::ShadowedScene()
         ssm->setTextureSize(osg::Vec2s(ShadowTexSize, ShadowTexSize));
         ssm->setSoftnessWidth(1.0f);
         shadowRoot = new osgShadow::ShadowedScene;
-        //osgShadow::ShadowSettings* settings = shadowRoot->getShadowSettings();
         shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
         shadowRoot->setCastsShadowTraversalMask(castShadowMask);
         shadowRoot->setShadowTechnique((ssm.get()));
@@ -524,7 +510,7 @@ void SDRender::ShadowedScene()
     else if (ShadowIndex == 4)
     {
         osg::ref_ptr<osgShadow::LightSpacePerspectiveShadowMapCB> lspsm =
-           new osgShadow::LightSpacePerspectiveShadowMapCB;
+                new osgShadow::LightSpacePerspectiveShadowMapCB;
 
         unsigned int baseTexUnit = 0;
         unsigned int shadowTexUnit = 3;
@@ -548,8 +534,6 @@ void SDRender::ShadowedScene()
 
         osg::ref_ptr<osgShadow::ShadowVolume> sv = new osgShadow::ShadowVolume;
         sv->setDynamicShadowVolumes(1);
-        //sv->setDrawMode(osgShadow::ShadowVolumeGeometry::STENCIL_TWO_SIDED);
-        //sv->setDrawMode(osgShadow::ShadowVolumeGeometry::STENCIL_TWO_PASS);
         sv->setDrawMode(osgShadow::ShadowVolumeGeometry::GEOMETRY);
 
         shadowRoot = new osgShadow::ShadowedScene;
@@ -564,7 +548,6 @@ void SDRender::ShadowedScene()
         shadowSettings->setBaseShadowTextureUnit(3);
         shadowSettings->setLightNum(1);
         shadowSettings->setShaderHint(osgShadow::ShadowSettings::NO_SHADERS);
-        //shadowSettings->setDebugDraw(useDebugDraw);
 
         shadowRoot = new osgShadow::ShadowedScene;
 
@@ -588,9 +571,7 @@ void SDRender::ShadowedScene()
 
 void SDRender::addCars(osg::Node* cars)
 {
-    //m_CarRoot = new osg::Group;
     m_CarRoot->addChild(cars);
-    //m_CarRoot->setNodeMask(castShadowMask);
 
     osgUtil::Optimizer optimizer;
     optimizer.optimize(m_CarRoot.get());
@@ -605,8 +586,6 @@ void SDRender::UpdateLight( void )
     sol_angle = (float)thesky->getSA();
     moon_angle = (float)thesky->getMA();
     sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
-
-    //GfOut("Sun Angle in Render = %f - sky brightness = %f\n", sol_angle, sky_brightness);
 
     if (SDTrack->local.rain > 0)
     {
@@ -667,7 +646,7 @@ void SDRender::UpdateLight( void )
                 ((FogColor._v[1] * 0.75f) + (sun_color._v[0] * 0.25f)) * sky_brightness,
                 ((FogColor._v[2] * 0.75f) + (sun_color._v[0] * 0.25f)) * sky_brightness, 1.0f);
         SceneSpecular = osg::Vec4f(sun_color._v[0] * sky_brightness, sun_color._v[0] * sky_brightness,
-                                   sun_color._v[0] * sky_brightness, 1.0f);
+                sun_color._v[0] * sky_brightness, 1.0f);
     }
 }//grUpdateLight
 
@@ -726,13 +705,13 @@ void SDRender::UpdateFogColor(double sol_angle)
     // the current visibility.
     float av = thesky->get_visibility();
     if (av > 45000)
-       av = 45000;
+        av = 45000;
 
     float avf = 0.87 - (45000 - av) / 83333.33;
     float sif = 0.5 - cos( sol_angle * 2)/2;
 
     if (sif < 1e-4)
-       sif = 1e-4;
+        sif = 1e-4;
 
     float rf1 = fabs((rotation - SD_PI) / SD_PI);             // 0.0 .. 1.0
     float rf2 = avf * pow(rf1 * rf1, 1 /sif);
@@ -796,7 +775,7 @@ void SDRender::UpdateSky(double currentTime, double accelTime)
     scenery = (SDScenery *)getScenery();
     double r_WrldX = scenery->getWorldX();
     double r_WrldY = scenery->getWorldY();
-    //double r_WrldZ = SDScenery::getWorldZ();
+
     osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0 );
     thesky->reposition(viewPos, 0, currentTime - lastTimeHighSpeed);
 
@@ -809,7 +788,6 @@ void SDRender::UpdateSky(double currentTime, double accelTime)
     const float deltaTimeLowSpeed = (float)(nextTimeLowSpeed - lastTimeLowSpeed);
 
     // Update sun and moon, and thus global lighting / coloring parameters of the scene.
-    //GfLogDebug("%f : Updating slow objects of the dynamic sky dome (sun and moon)\n", currentTime);
     if (nextTimeLowSpeed != lastTimeLowSpeed)
     {
         // 1) Update sun position
@@ -842,7 +820,7 @@ void SDRender::UpdateSky(double currentTime, double accelTime)
 
     Scene_ambiant = osg::Vec4f(ambian, ambian, ambian, 1.0f);
     osg::ref_ptr<osg::Material> material = new osg::Material;
-    //material->setColorMode(osg::Material::OFF); // switch glColor usage off
+
     material->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(emis, emis, emis, 1.0f));
     material->setAmbient(osg::Material::FRONT_AND_BACK, Scene_ambiant);
     stateSet->setAttributeAndModes(material, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
@@ -863,7 +841,7 @@ void SDRender::weather(void)
 
     // Cloud layers.
     SDNbCloudLayers =
-        (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
+            (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
 
     GfLogInfo("Graphic options : Number of cloud layers : %u\n", SDNbCloudLayers);
 
@@ -872,27 +850,27 @@ void SDRender::weather(void)
 
     switch (SDTrack->local.rain)
     {
-        case TR_RAIN_NONE:
-            SDVisibility = SDMax_Visibility;
-            SDRain = 0;
-            break;
-        case TR_RAIN_LITTLE:
-            SDVisibility = 800.0;
-            SDRain = 1;
-            break;
-        case TR_RAIN_MEDIUM:
-            SDVisibility = 400.0;
-            SDRain = 2;
-            break;
-        case TR_RAIN_HEAVY:
-            SDVisibility = 200.0;
-            SDRain = 3;
-            break;
-        default:
-            GfLogWarning("Unsupported rain strength value %d (assuming none)",
-                          SDTrack->local.rain);
-            SDVisibility = 12000.0;
-            break;
+    case TR_RAIN_NONE:
+        SDVisibility = SDMax_Visibility;
+        SDRain = 0;
+        break;
+    case TR_RAIN_LITTLE:
+        SDVisibility = 800.0;
+        SDRain = 1;
+        break;
+    case TR_RAIN_MEDIUM:
+        SDVisibility = 400.0;
+        SDRain = 2;
+        break;
+    case TR_RAIN_HEAVY:
+        SDVisibility = 200.0;
+        SDRain = 3;
+        break;
+    default:
+        GfLogWarning("Unsupported rain strength value %d (assuming none)",
+                     SDTrack->local.rain);
+        SDVisibility = 12000.0;
+        break;
     }//switch Rain
 
     if (SDRain > 0)

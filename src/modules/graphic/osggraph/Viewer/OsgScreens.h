@@ -19,7 +19,6 @@
 #ifndef _OSGSCREENS_H_
 #define _OSGSCREENS_H_
 
-
 #include <raceman.h>        //tSituation
 #include <vector>
 
@@ -29,15 +28,6 @@
 
 class SDDebugHUD;
 class SDReflectionMapping;
-
-/*#define SD_SPLIT_ADD	0
-#define SD_SPLIT_REM	1
-#define SD_SPLIT_ARR	2
-
-#define SD_NEXT_SCREEN	0
-#define SD_PREV_SCREEN	1
-
-#define SD_NB_MAX_SCREEN 6*/
 
 class SDScreens
 {
@@ -59,10 +49,6 @@ protected:
     bool m_SpanSplit;
     int m_CurrentScreenIndex;
 
-    //void AdaptScreenSize();
-    //		int mirrorFlag;
-    //		void loadParams(tSituation *s);			// Load from parameters files.
-
 public:
     SDScreens();
     ~SDScreens();
@@ -70,17 +56,11 @@ public:
     void Init(int x, int y, int width, int height, osg::ref_ptr<osg::Node> m_sceneroot, osg::Vec3f fogcolor);
     void InitCars(tSituation *s);
     void update(tSituation *s,SDFrameInfo* fi);
-    //void splitScreen(long p);
-    //void changeScreen(long p);
     void changeCamera(long p);
     void registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node);
     void toggleDebugHUD();
 
     inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}
-
-    // void activate(int x, int y, int w, int h, float v);
-    // inline void deactivate(void) { active = false; }
-    // inline void setCurrentCar(tCarElt *newCurCar) { curCar = newCurCar; }
 };
 
 #endif //_OSGSCREENS_H_

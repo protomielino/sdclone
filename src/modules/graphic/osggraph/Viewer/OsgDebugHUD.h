@@ -31,11 +31,7 @@ class SDDebugHUD
         SDDebugHUD();
         ~SDDebugHUD();
 
-        inline osg::ref_ptr<osg::Camera> getRootCamera(){
-            return HUD_camera;
-        }
-
-
+        inline osg::ref_ptr<osg::Camera> getRootCamera() { return HUD_camera; }
 };
 
 #endif //_OSGDEBUGHUD_H_

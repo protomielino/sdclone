@@ -21,9 +21,9 @@
 
 class SDCar;
 
-class SDCarShader{
+class SDCarShader
+{
 private :
-
     SDCar * pSdCar;
 
     osg::ref_ptr<osg::Program> program ;

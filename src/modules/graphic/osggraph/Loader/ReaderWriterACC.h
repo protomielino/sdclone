@@ -50,19 +50,19 @@
 
 namespace acc3d
 {
-	enum 
-	{
-		ObjectTypeNormal = 0,
-		ObjectTypeGroup = 1,
-		ObjectTypeLight = 2,
+enum
+{
+    ObjectTypeNormal = 0,
+    ObjectTypeGroup = 1,
+    ObjectTypeLight = 2,
 
-		SurfaceTypePolygon = 0,
-		SurfaceTypeLineLoop = 1,
-		SurfaceTypeLineStrip = 2,
+    SurfaceTypePolygon = 0,
+    SurfaceTypeLineLoop = 1,
+    SurfaceTypeLineStrip = 2,
 
-		SurfaceShaded = 1<<4,
-		SurfaceTwoSided = 1<<5
-	};
+    SurfaceShaded = 1<<4,
+    SurfaceTwoSided = 1<<5
+};
 }
 
 void setTranslucent(osg::StateSet* stateSet);
@@ -73,10 +73,10 @@ unsigned int GetUVCount(unsigned flags);
 // Just a container to store an ac3d material
 class MaterialData
 {
-  public:
+public:
     MaterialData() :
-    mMaterial(new osg::Material),
-    mColorArray(new osg::Vec4Array(1))
+        mMaterial(new osg::Material),
+        mColorArray(new osg::Vec4Array(1))
     {
         mMaterial->setDataVariance(osg::Object::STATIC);
         mColorArray->setDataVariance(osg::Object::STATIC);
@@ -164,11 +164,11 @@ public:
     TextureData() :
         mTranslucent(false),
         mRepeat(true),
-		mAlphaClamp(0.0f)
-    {		
+        mAlphaClamp(0.0f)
+    {
     }
 
-	void SetBlockTransparent(bool bStatus) { mTranslucent = bStatus;}	
+    void SetBlockTransparent(bool bStatus) { mTranslucent = bStatus;}
 
     bool setTexture(const std::string& name, const std::string& name1, const std::string& name2, const std::string& name3, const osgDB::ReaderWriter::Options* options, osg::TexEnv* modulateTexEnv,const bool bBlockTransparent)
     {
@@ -187,13 +187,13 @@ public:
         std::string absFileName = osgDB::findDataFile(name, options);
         if (absFileName.empty())
         {
-            osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: could not find texture \"" << name << "\"" << std::endl;
+            osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not find texture \"" << name << "\"" << std::endl;
             return false;
         }
         mImage = osgDB::readRefImageFile(absFileName, options);
         if (!mImage.valid())
         {
-            osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: could not read texture \"" << name << "\"" << std::endl;
+            osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name << "\"" << std::endl;
             return false;
         }
 
@@ -201,21 +201,21 @@ public:
         mTexture2DClamp->setImage(mImage.get());
         mTranslucent = mImage->isImageTranslucent();
 
-		if (bBlockTransparent)
-			mTranslucent = false;
+        if (bBlockTransparent)
+            mTranslucent = false;
 
         // Use a shared modulate TexEnv
         mModulateTexEnv = modulateTexEnv;
 
-		if (name1!="")
-		{
+        if (name1!="")
+        {
             std::string absFileName1 = osgDB::findDataFile(name1, options);
             mImage1 = osgDB::readRefImageFile(absFileName1, options);
             if (!mImage1.valid())
-			{
-                //osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: could not read texture \"" << name1 << "\"" << std::endl;
-				return false;
-			}
+            {
+                //osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name1 << "\"" << std::endl;
+                return false;
+            }
 
             mTexture2DRepeat1 = new osg::Texture2D;
             mTexture2DRepeat1->setDataVariance(osg::Object::STATIC);
@@ -223,14 +223,14 @@ public:
             mTexture2DRepeat1->setWrap(osg::Texture2D::WRAP_T, osg::Texture2D::REPEAT);
             mTexture2DRepeat1->setMaxAnisotropy(16);
             mTexture2DRepeat1->setImage(mImage1.get());
-	        
+
             mTexture2DClamp1 = new osg::Texture2D;
             mTexture2DClamp1->setDataVariance(osg::Object::STATIC);
             mTexture2DClamp1->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::CLAMP_TO_EDGE);
             mTexture2DClamp1->setWrap(osg::Texture2D::WRAP_T, osg::Texture2D::CLAMP_TO_EDGE);
             mTexture2DClamp1->setMaxAnisotropy(16);
             mTexture2DClamp1->setImage(mImage1.get());
-		}
+        }
 
         if (name2!="")
         {
@@ -238,7 +238,7 @@ public:
             mImage2 = osgDB::readRefImageFile(absFileName2, options);
             if (!mImage2.valid())
             {
-                //osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: could not read texture \"" << name2 << "\"" << std::endl;
+                //osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name2 << "\"" << std::endl;
                 return false;
             }
             mTexture2DRepeat2 = new osg::Texture2D;
@@ -262,7 +262,7 @@ public:
             mImage3 = osgDB::readRefImageFile(absFileName3, options);
             if (!mImage3.valid())
             {
-                //osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: could not read texture \"" << name3 << "\"" << std::endl;
+                //osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name3 << "\"" << std::endl;
                 return false;
             }
             mTexture2DRepeat3 = new osg::Texture2D;
@@ -280,30 +280,30 @@ public:
             mTexture2DClamp3->setImage(mImage3.get());
         }
 
-		if (strstr(name.c_str(),"tree")!=NULL || strstr(name.c_str(),"trans-")!=NULL || strstr(name.c_str(),"arbor")!=NULL)
-		{
-			mAlphaClamp=0.65f;
-		}
+        if (strstr(name.c_str(),"tree")!=NULL || strstr(name.c_str(),"trans-")!=NULL || strstr(name.c_str(),"arbor")!=NULL)
+        {
+            mAlphaClamp=0.65f;
+        }
         return true;
     }
-	
+
     void setRepeat(bool repeat)
     {
         mRepeat = repeat;
     }
-	
+
     bool valid() const
     {
         return mImage.valid();
     }
-	
+
     std::string getFileName() const
     {
         if (!mImage.valid())
             return std::string();
         return mImage->getFileName();
     }
-	
+
     void toTextureStateSet(osg::StateSet* stateSet) const
     {
         if (!valid())
@@ -312,9 +312,9 @@ public:
         stateSet->setTextureAttribute(0, mModulateTexEnv.get());
 
         if (mRepeat)
-           stateSet->setTextureAttribute(0, mTexture2DRepeat.get());
+            stateSet->setTextureAttribute(0, mTexture2DRepeat.get());
         else
-           stateSet->setTextureAttribute(0, mTexture2DClamp.get());
+            stateSet->setTextureAttribute(0, mTexture2DClamp.get());
 
         stateSet->setTextureMode(0, GL_TEXTURE_2D, osg::StateAttribute::ON);
 
@@ -352,14 +352,14 @@ public:
         if (mTranslucent)
             setTranslucent(stateSet);
 
-		if (mAlphaClamp>0.0f)
-			setAlphaClamp(stateSet,mAlphaClamp);
+        if (mAlphaClamp>0.0f)
+            setAlphaClamp(stateSet,mAlphaClamp);
     }
 };
 
 class FileData
 {
-  public:
+public:
     FileData(const osgDB::ReaderWriter::Options* options) : mOptions(options), mLightIndex(1)
     {
         mModulateTexEnv = new osg::TexEnv;
@@ -369,11 +369,11 @@ class FileData
 
     TextureData toTextureData(const std::string& texName0, const std::string& texName1, const std::string& texName2, const std::string& texName3, const bool bBlockTransparent)
     {
-		std::string strTrans = "_NO";
-		if (bBlockTransparent)
-			strTrans = "_YES";
+        std::string strTrans = "_NO";
+        if (bBlockTransparent)
+            strTrans = "_YES";
 
-		std::string texName = texName0+texName1+texName2+texName3+strTrans;
+        std::string texName = texName0+texName1+texName2+texName3+strTrans;
         TextureDataMap::iterator i = mTextureStates.find(texName);
         if (i == mTextureStates.end())
             mTextureStates[texName].setTexture(texName0, texName1, texName2, texName3, mOptions.get(), mModulateTexEnv.get(), bBlockTransparent);
@@ -423,18 +423,18 @@ private:
 struct RefData 
 {
     RefData(const osg::Vec2& _texCoord, const osg::Vec2& _texCoord1, const osg::Vec2& _texCoord2, const osg::Vec2& _texCoord3)
-    { 
+    {
         texCoord  = _texCoord;
-		texCoord1 = _texCoord1;
-		texCoord2 = _texCoord2;
+        texCoord1 = _texCoord1;
+        texCoord2 = _texCoord2;
         texCoord3 = _texCoord3;
     }
 
     osg::Vec2 texCoord;
-	osg::Vec2 texCoord1;
-	osg::Vec2 texCoord2;
+    osg::Vec2 texCoord1;
+    osg::Vec2 texCoord2;
     osg::Vec2 texCoord3;
-	osg::Vec3 normal;
+    osg::Vec3 normal;
 };
 
 struct VertexData 
@@ -465,12 +465,12 @@ class VertexSet : public osg::Referenced
 public:
     VertexSet() : _dirty(true)
     {}
-	
+
     void reserve(unsigned n)
     {
         _vertices.reserve(n);
     }
-	
+
     unsigned size() const
     {
         return _vertices.size();
@@ -481,22 +481,22 @@ public:
         _dirty = true;
         _vertices.push_back(vertex);
     }
-	
+
     const osg::Vec3& getVertex(unsigned index)
     {
         return _vertices[index]._vertex;
     }
-	
+
     const osg::Vec3& getVertex(const VertexIndex& vertexIndex)
     {
         return _vertices[vertexIndex.vertexIndex]._vertex;
     }
-	
+
     const osg::Vec3& getNormal(const VertexIndex& vertexIndex)
     {
         return _vertices[vertexIndex.vertexIndex]._refs[vertexIndex.refIndex].normal;
     }
-	
+
     const osg::Vec2& getTexCoord(const VertexIndex& vertexIndex)
     {
         return _vertices[vertexIndex.vertexIndex]._refs[vertexIndex.refIndex].texCoord;
@@ -520,11 +520,11 @@ public:
 
     VertexIndex addRefData(unsigned i, const RefData& refData)
     {
-         if (_vertices.size() <= i)
-         {
-             osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: internal error, got invalid vertex index!" << std::endl;
-             return VertexIndex(0, 0);
-         }
+        if (_vertices.size() <= i)
+        {
+            osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: internal error, got invalid vertex index!" << std::endl;
+            return VertexIndex(0, 0);
+        }
         return VertexIndex(i, _vertices[i].addRefData(refData));
     }
 
@@ -535,7 +535,7 @@ private:
 
 class PrimitiveBin : public osg::Referenced
 {
-  public:
+public:
     PrimitiveBin(unsigned flags, VertexSet* vertexSet) :
         _geode(new osg::Geode),
         _vertexSet(vertexSet),
@@ -549,63 +549,63 @@ class PrimitiveBin : public osg::Referenced
     virtual bool endPrimitive() = 0;
     virtual osg::Geode* finalize(const MaterialData& material, const TextureData& textureData) = 0;
 
-  protected:
+protected:
     bool isLineLoop() const
     {
         return (_flags & acc3d::SurfaceTypeLineLoop)!=0;
     }
-	
+
     bool isLineStrip() const
     {
         return (_flags & acc3d::SurfaceTypeLineStrip)!=0;
     }
-	
+
     bool isTwoSided() const
     {
         return (_flags & acc3d::SurfaceTwoSided)!=0;
         //return true;
     }
-	
+
     bool isSmooth() const
     {
         return (_flags & acc3d::SurfaceShaded)!=0;
     }
-	
-	bool isTriangleStrip() const
-	{
-		if (_flags == 0x14)
-			return true;
-		
-		if(_flags == 0x24)
-			return true;
 
-		if (_flags == 0x34)
-			return true;
-		
-		if (_flags == 0x44)
-			return true;
-		
-		return false;
-	}
+    bool isTriangleStrip() const
+    {
+        if (_flags == 0x14)
+            return true;
 
-	bool isTriangleFan() const
-	{
-		if (_flags == 0x30)
-			return true;
+        if(_flags == 0x24)
+            return true;
 
-		return false;
-	}
+        if (_flags == 0x34)
+            return true;
+
+        if (_flags == 0x44)
+            return true;
+
+        return false;
+    }
+
+    bool isTriangleFan() const
+    {
+        if (_flags == 0x30)
+            return true;
+
+        return false;
+    }
 
     osg::ref_ptr<osg::Geode> _geode;
     osg::ref_ptr<VertexSet> _vertexSet;
 
-  private:
+private:
     unsigned _flags;
 };
 
 class LineBin : public PrimitiveBin
 {
-  private:
+private:
     osg::ref_ptr<osg::Geometry> _geometry;
     osg::ref_ptr<osg::Vec3Array> _vertices;
     osg::ref_ptr<osg::Vec2Array> _texCoords;
@@ -613,18 +613,18 @@ class LineBin : public PrimitiveBin
     osg::ref_ptr<osg::Vec2Array> _texCoords2;
     osg::ref_ptr<osg::Vec2Array> _texCoords3;
 
-    struct Ref 
-	{
-      osg::Vec2 texCoord;
-      osg::Vec2 texCoord1;
-      osg::Vec2 texCoord2;
-      osg::Vec2 texCoord3;
+    struct Ref
+    {
+        osg::Vec2 texCoord;
+        osg::Vec2 texCoord1;
+        osg::Vec2 texCoord2;
+        osg::Vec2 texCoord3;
 
-      unsigned index;
+        unsigned index;
     };
     std::vector<Ref> _refs;
 
-  public:
+public:
     LineBin(unsigned flags, VertexSet* vertexSet) :
         PrimitiveBin(flags, vertexSet),
         _geometry(new osg::Geometry),
@@ -653,9 +653,9 @@ class LineBin : public PrimitiveBin
     virtual bool beginPrimitive(unsigned nRefs)
     {
         // Check if we have enough for a line or someting broken ...
-        if (nRefs < 2) 
-		{
-            osg::notify(osg::WARN) << "osgDB DREAM OF MOTORSPORT reader: detected line with less than 2 vertices!" << std::endl;
+        if (nRefs < 2)
+        {
+            osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: detected line with less than 2 vertices!" << std::endl;
             return false;
         }
 
@@ -663,7 +663,7 @@ class LineBin : public PrimitiveBin
         _refs.resize(0);
         return true;
     }
-	
+
     virtual bool vertex(unsigned vertexIndex, const osg::Vec2& texCoord, const osg::Vec2& texCoord1, const osg::Vec2& texCoord2, const osg::Vec2& texCoord3)
     {
         Ref ref;
@@ -675,7 +675,7 @@ class LineBin : public PrimitiveBin
         _refs.push_back(ref);
         return true;
     }
-	
+
     virtual bool endPrimitive()
     {
         GLint type;
@@ -683,16 +683,16 @@ class LineBin : public PrimitiveBin
             type = osg::PrimitiveSet::LINE_LOOP;
         else if (isLineStrip())
             type = osg::PrimitiveSet::LINE_STRIP;
-        else 
-		{
-            osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: non surface flags in surface bin!" << std::endl;
+        else
+        {
+            osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: non surface flags in surface bin!" << std::endl;
             return false;
         }
         unsigned nRefs = _refs.size();
         unsigned start = _vertices->size();
-		
-        for (unsigned i = 0; i < nRefs; ++i) 
-		{
+
+        for (unsigned i = 0; i < nRefs; ++i)
+        {
             osg::Vec3 vertex = _vertexSet->getVertex(_refs[i].index);
             _vertices->push_back(vertex);
             _texCoords->push_back(_refs[i].texCoord);
@@ -718,42 +718,42 @@ class LineBin : public PrimitiveBin
 
 class SurfaceBin : public PrimitiveBin 
 {
-  private:
-    struct Ref 
-	{
+private:
+    struct Ref
+    {
         osg::Vec2 texCoord;
-		osg::Vec2 texCoord1;
-		osg::Vec2 texCoord2;
+        osg::Vec2 texCoord1;
+        osg::Vec2 texCoord2;
         osg::Vec2 texCoord3;
         unsigned index;
     };
     std::vector<Ref> _refs;
-  
-    struct TriangleData 
-	{
+
+    struct TriangleData
+    {
         VertexIndex index[3];
     };
-    std::vector<TriangleData> _triangles;	
+    std::vector<TriangleData> _triangles;
 
-	std::vector<std::vector<VertexIndex> > _trianglestrips;
-	//std::vector<VertexIndex> _trianglestrip;
-  
-    struct QuadData 
-	{
+    std::vector<std::vector<VertexIndex> > _trianglestrips;
+    //std::vector<VertexIndex> _trianglestrip;
+
+    struct QuadData
+    {
         VertexIndex index[4];
     };
-	
+
     std::vector<QuadData> _quads;
 
-    struct PolygonData 
-	{
+    struct PolygonData
+    {
         std::vector<VertexIndex> index;
     };
-	
+
     std::vector<PolygonData> _polygons;
     std::vector<PolygonData> _toTessellatePolygons;
 
-  public:
+public:
     SurfaceBin(unsigned flags, VertexSet *vertexSet) :
         PrimitiveBin(flags, vertexSet)
     {}
@@ -764,40 +764,40 @@ class SurfaceBin : public PrimitiveBin
         _refs.clear();
 
         // Check if we have enough for a line or someting broken ...
-        if (nRefs < 3) 
-		{
-            osg::notify(osg::WARN) << "osgDB DREAM OF MOTORSPORT reader: detected surface with less than 3 vertices!" << std::endl;
+        if (nRefs < 3)
+        {
+            osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: detected surface with less than 3 vertices!" << std::endl;
             return false;
         }
         return true;
     }
-	
+
     virtual bool vertex(unsigned vertexIndex, const osg::Vec2& texCoord, const osg::Vec2& texCoord1, const osg::Vec2& texCoord2, const osg::Vec2& texCoord3)
     {
         Ref ref;
         ref.index = vertexIndex;
         ref.texCoord = texCoord;
-		ref.texCoord1 = texCoord1;
-		ref.texCoord2 = texCoord2;
+        ref.texCoord1 = texCoord1;
+        ref.texCoord2 = texCoord2;
         ref.texCoord3 = texCoord3;
         _refs.push_back(ref);
 
         return true;
     }
-	
+
     virtual bool endPrimitive()
     {
-        unsigned nRefs = _refs.size();		
-		
+        unsigned nRefs = _refs.size();
+
         // Compute the normal times the enclosed area.
         // During that check if the surface is convex. If so, put in the surface as such.
         bool needTessellation = true;
         osg::Vec3 prevEdgeNormal;
         osg::Vec3 weightedNormal(0, 0, 0);
         osg::Vec3 v0 = _vertexSet->getVertex(_refs[0].index);
-		
-        for (unsigned i = 2; i < nRefs; ++i) 
-		{
+
+        for (unsigned i = 2; i < nRefs; ++i)
+        {
             osg::Vec3 side1 = _vertexSet->getVertex(_refs[i-1].index) - v0;
             osg::Vec3 side2 = _vertexSet->getVertex(_refs[i].index) - v0;
             osg::Vec3 newNormal = side1^side2;
@@ -829,65 +829,65 @@ class SurfaceBin : public PrimitiveBin
         
         if (needTessellation)
         {
-			if (isTriangleStrip())
-			{
-				int index = _trianglestrips.size();
-				_trianglestrips.resize(index+1);
-				for (unsigned i = 0; i < nRefs; ++i) 
-				{
+            if (isTriangleStrip())
+            {
+                int index = _trianglestrips.size();
+                _trianglestrips.resize(index+1);
+                for (unsigned i = 0; i < nRefs; ++i)
+                {
                     RefData refData(_refs[i].texCoord, _refs[i].texCoord1, _refs[i].texCoord2,  _refs[i].texCoord3);
-					VertexIndex vertexIndex = _vertexSet->addRefData(_refs[i].index, refData);
-					_trianglestrips[index].push_back( vertexIndex );
-				}
-			}
-			else if (isTriangleFan())
-			{
-				//Convert fan to triangles
-				int i = 0;
-				int tricount=nRefs-2;
-				
+                    VertexIndex vertexIndex = _vertexSet->addRefData(_refs[i].index, refData);
+                    _trianglestrips[index].push_back( vertexIndex );
+                }
+            }
+            else if (isTriangleFan())
+            {
+                //Convert fan to triangles
+                int i = 0;
+                int tricount=nRefs-2;
+
                 RefData refData(_refs[i].texCoord, _refs[i].texCoord1, _refs[i].texCoord2,  _refs[i].texCoord3);
-				VertexIndex vertexIndex = _vertexSet->addRefData(_refs[i].index, refData);
-				i++;
+                VertexIndex vertexIndex = _vertexSet->addRefData(_refs[i].index, refData);
+                i++;
 
-				while (i<tricount)
-				{
-					TriangleData tri;
-			
+                while (i<tricount)
+                {
+                    TriangleData tri;
+
                     RefData refData1(_refs[i].texCoord, _refs[i].texCoord1, _refs[i].texCoord2,  _refs[i].texCoord3);
-					VertexIndex vertexIndex1 = _vertexSet->addRefData(_refs[i].index, refData1);
-						
+                    VertexIndex vertexIndex1 = _vertexSet->addRefData(_refs[i].index, refData1);
+
                     RefData refData2(_refs[i].texCoord, _refs[i].texCoord1, _refs[i].texCoord2,  _refs[i].texCoord3);
-					VertexIndex vertexIndex2 = _vertexSet->addRefData(_refs[i+1].index, refData2);
+                    VertexIndex vertexIndex2 = _vertexSet->addRefData(_refs[i+1].index, refData2);
 
-					tri.index[0] = vertexIndex;
-					tri.index[1] = vertexIndex1;
-					tri.index[2] = vertexIndex2;
+                    tri.index[0] = vertexIndex;
+                    tri.index[1] = vertexIndex1;
+                    tri.index[2] = vertexIndex2;
 
-					if ((tri.index[0].vertexIndex!=tri.index[1].vertexIndex)&&(tri.index[1].vertexIndex!=tri.index[2].vertexIndex)&&(tri.index[0].vertexIndex!=tri.index[2].vertexIndex))
-						_triangles.push_back(tri);
+                    if ((tri.index[0].vertexIndex!=tri.index[1].vertexIndex)&&(tri.index[1].vertexIndex!=tri.index[2].vertexIndex)&&(tri.index[0].vertexIndex!=tri.index[2].vertexIndex))
+                        _triangles.push_back(tri);
 
-					i++;
-				}
-			}
-			else
-			{
-				unsigned polygonIndex = _toTessellatePolygons.size();
-				_toTessellatePolygons.resize(polygonIndex + 1);
-				for (unsigned i = 0; i < nRefs; ++i) 
-				{
+                    i++;
+                }
+            }
+            else
+            {
+                unsigned polygonIndex = _toTessellatePolygons.size();
+                _toTessellatePolygons.resize(polygonIndex + 1);
+                for (unsigned i = 0; i < nRefs; ++i)
+                {
                     RefData refData(_refs[i].texCoord, _refs[i].texCoord1, _refs[i].texCoord2,  _refs[i].texCoord3);
-					VertexIndex vertexIndex = _vertexSet->addRefData(_refs[i].index, refData);
-					_toTessellatePolygons[polygonIndex].index.push_back(vertexIndex);
-				}
-			}
+                    VertexIndex vertexIndex = _vertexSet->addRefData(_refs[i].index, refData);
+                    _toTessellatePolygons[polygonIndex].index.push_back(vertexIndex);
+                }
+            }
         }
         else if (nRefs == 3)
         {
             unsigned triangleIndex = _triangles.size();
             _triangles.resize(triangleIndex + 1);
-            for (unsigned i = 0; i < 3; ++i) 
-			{
+            for (unsigned i = 0; i < 3; ++i)
+            {
                 RefData refData(_refs[i].texCoord, _refs[i].texCoord1, _refs[i].texCoord2,  _refs[i].texCoord3);
                 VertexIndex vertexIndex = _vertexSet->addRefData(_refs[i].index, refData);
                 _triangles[triangleIndex].index[i] = vertexIndex;
@@ -897,8 +897,8 @@ class SurfaceBin : public PrimitiveBin
         {
             unsigned quadIndex = _quads.size();
             _quads.resize(quadIndex + 1);
-            for (unsigned i = 0; i < 4; ++i) 
-			{
+            for (unsigned i = 0; i < 4; ++i)
+            {
                 RefData refData(_refs[i].texCoord, _refs[i].texCoord1, _refs[i].texCoord2,  _refs[i].texCoord3);
                 VertexIndex vertexIndex = _vertexSet->addRefData(_refs[i].index, refData);
                 _quads[quadIndex].index[i] = vertexIndex;
@@ -918,14 +918,14 @@ class SurfaceBin : public PrimitiveBin
     }
 
     void pushVertex(const VertexIndex& vertexIndex, osg::Vec3Array* vertexArray,
-        osg::Vec3Array* normalArray, osg::Vec2Array* texcoordArray, osg::Vec2Array* texcoordArray1, osg::Vec2Array* texcoordArray2, osg::Vec2Array* texcoordArray3)
+                    osg::Vec3Array* normalArray, osg::Vec2Array* texcoordArray, osg::Vec2Array* texcoordArray1, osg::Vec2Array* texcoordArray2, osg::Vec2Array* texcoordArray3)
     {
         vertexArray->push_back(_vertexSet->getVertex(vertexIndex));
         normalArray->push_back(_vertexSet->getNormal(vertexIndex));
         if (texcoordArray)
             texcoordArray->push_back(_vertexSet->getTexCoord(vertexIndex));
         if (texcoordArray1)
-			texcoordArray1->push_back(_vertexSet->getTexCoord1(vertexIndex));
+            texcoordArray1->push_back(_vertexSet->getTexCoord1(vertexIndex));
         if (texcoordArray2)
             texcoordArray2->push_back(_vertexSet->getTexCoord2(vertexIndex));
         if (texcoordArray3)
@@ -941,11 +941,11 @@ class SurfaceBin : public PrimitiveBin
         stateSet->setMode(GL_LIGHTING, osg::StateAttribute::ON);
 
         // Single- or doublesided culling
-        if (isTwoSided()) 
-		{
+        if (isTwoSided())
+        {
             stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
-        } else 
-		{
+        } else
+        {
             osg::CullFace* cullFace = new osg::CullFace;
             cullFace->setDataVariance(osg::Object::STATIC);
             cullFace->setMode(osg::CullFace::BACK);
@@ -973,8 +973,8 @@ class SurfaceBin : public PrimitiveBin
         vertexArray->setDataVariance(osg::Object::STATIC);
         geometry->setVertexArray(vertexArray);
         osg::Vec2Array* texcoordArray = 0;
-		osg::Vec2Array* texcoordArray1 = 0;
-		osg::Vec2Array* texcoordArray2 = 0;
+        osg::Vec2Array* texcoordArray1 = 0;
+        osg::Vec2Array* texcoordArray2 = 0;
         osg::Vec2Array* texcoordArray3 = 0;
 
         if (textureData.valid())
@@ -983,7 +983,7 @@ class SurfaceBin : public PrimitiveBin
             texcoordArray->setDataVariance(osg::Object::STATIC);
             geometry->setTexCoordArray(0, texcoordArray);
 
-			texcoordArray1 = new osg::Vec2Array;
+            texcoordArray1 = new osg::Vec2Array;
             texcoordArray1->setDataVariance(osg::Object::STATIC);
             geometry->setTexCoordArray(1, texcoordArray1);
 
@@ -1026,7 +1026,7 @@ class SurfaceBin : public PrimitiveBin
                     pushVertex(_triangles[i].index[j], vertexArray, normalArray, texcoordArray, texcoordArray1, texcoordArray2, texcoordArray3);
                 }
             }
-			osg::DrawArrays* drawArray = new osg::DrawArrays(osg::PrimitiveSet::TRIANGLES, start, 3*_triangles.size());
+            osg::DrawArrays* drawArray = new osg::DrawArrays(osg::PrimitiveSet::TRIANGLES, start, 3*_triangles.size());
             geometry->addPrimitiveSet(drawArray);
         }
 
@@ -1051,7 +1051,7 @@ class SurfaceBin : public PrimitiveBin
             unsigned start = vertexArray->size();
             osg::DrawArrayLengths* drawArrayLengths = new osg::DrawArrayLengths(osg::PrimitiveSet::POLYGON, start);
             drawArrayLengths->reserve(_polygons.size());
-			
+
             for (unsigned i = 0; i < _polygons.size(); ++i)
             {
                 for (unsigned j = 0; j < _polygons[i].index.size(); ++j)
@@ -1063,24 +1063,24 @@ class SurfaceBin : public PrimitiveBin
             geometry->addPrimitiveSet(drawArrayLengths);
         }
 
-		//handle triangle strips
+        //handle triangle strips
         if (!_trianglestrips.empty())
         {
-			for (unsigned j=0;j<_trianglestrips.size();j++)
-			{
-				unsigned start = vertexArray->size();
-				for (unsigned i = 0; i < _trianglestrips[j].size(); ++i)
-				{
+            for (unsigned j=0;j<_trianglestrips.size();j++)
+            {
+                unsigned start = vertexArray->size();
+                for (unsigned i = 0; i < _trianglestrips[j].size(); ++i)
+                {
                     pushVertex(_trianglestrips[j][i], vertexArray, normalArray, texcoordArray, texcoordArray1, texcoordArray2, texcoordArray3);
-				}
+                }
 
-				osg::DrawArrays* drawArray = new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP, start, _trianglestrips[j].size());
-				geometry->addPrimitiveSet(drawArray);
-			}
+                osg::DrawArrays* drawArray = new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP, start, _trianglestrips[j].size());
+                geometry->addPrimitiveSet(drawArray);
+            }
         }
 
-		osgUtil::SmoothingVisitor v;
-		v.smooth(*geometry);
+        osgUtil::SmoothingVisitor v;
+        v.smooth(*geometry);
         return _geode.get();
     }
 };
@@ -1136,20 +1136,20 @@ struct Bins
             }
         }
     }
-	
+
     void finalize(osg::Group* group, const MaterialData& material, const TextureData& textureData)
     {
         if (lineBin.valid())
         {
-			group->addChild(lineBin->finalize(material, textureData));
+            group->addChild(lineBin->finalize(material, textureData));
         }
         if (smoothDoubleSurfaceBin.valid())
         {
-			group->addChild(smoothDoubleSurfaceBin->finalize(material, textureData));
+            group->addChild(smoothDoubleSurfaceBin->finalize(material, textureData));
         }
         if (smoothSingleSurfaceBin.valid())
         {
-			osg::Geode *pGeode = smoothSingleSurfaceBin->finalize(material, textureData);
+            osg::Geode *pGeode = smoothSingleSurfaceBin->finalize(material, textureData);
             group->addChild(pGeode);
         }
         if (flatDoubleSurfaceBin.valid())
@@ -1172,21 +1172,21 @@ private:
 
 class ReaderWriterACC : public osgDB::ReaderWriter
 {
-    public:    
-        ReaderWriterACC();
-        virtual const char* className();
-        virtual osgDB::ReaderWriter::ReadResult readNode(const std::string& file,const Options* options);
-        virtual osgDB::ReaderWriter::ReadResult readNode(std::istream& fin, const Options* options);
-        virtual osgDB::ReaderWriter::WriteResult writeNode(const osg::Node& node,const std::string& fileName, const Options* /*options*/);    
-        virtual osgDB::ReaderWriter::WriteResult writeNode(const osg::Node& node,std::ostream& fout, const Options* opts);
-		void SetCar(bool b);
-		osg::Node* readFile(std::istream& stream, const osgDB::ReaderWriter::Options* options);
-		osg::Node* readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTransform, TextureData textureData);
-	
-	protected:
-		//Used for cars
-		osg::Group *m_transparentGroup;
-		osg::Group *m_opaqueGroup;
-		bool m_bCar;
-		bool m_bBlockTransparent;
+public:
+    ReaderWriterACC();
+    virtual const char* className();
+    virtual osgDB::ReaderWriter::ReadResult readNode(const std::string& file,const Options* options);
+    virtual osgDB::ReaderWriter::ReadResult readNode(std::istream& fin, const Options* options);
+    virtual osgDB::ReaderWriter::WriteResult writeNode(const osg::Node& node,const std::string& fileName, const Options* /*options*/);
+    virtual osgDB::ReaderWriter::WriteResult writeNode(const osg::Node& node,std::ostream& fout, const Options* opts);
+    void SetCar(bool b);
+    osg::Node* readFile(std::istream& stream, const osgDB::ReaderWriter::Options* options);
+    osg::Node* readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTransform, TextureData textureData);
+
+protected:
+    //Used for cars
+    osg::Group *m_transparentGroup;
+    osg::Group *m_opaqueGroup;
+    bool m_bCar;
+    bool m_bBlockTransparent;
 };

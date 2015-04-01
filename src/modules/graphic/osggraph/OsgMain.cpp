@@ -24,12 +24,12 @@
 #include <osgViewer/CompositeViewer>
 #include <osgViewer/Viewer>
 
-
 #include <glfeatures.h> // GfglFeatures
 #include <robot.h>	//ROB_SECT_ARBITRARY
 #include <graphic.h>
 
 #include "OsgMain.h"
+#include "OsgOptions.h"
 #include "OsgCar.h"
 #include "OsgScenery.h"
 #include "OsgRender.h"
@@ -39,10 +39,16 @@
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;
 
+SDOptions *Options = 0;
 SDCars *cars = 0;
 SDScenery *scenery = 0;
 SDRender *render = 0;
 SDScreens * screens = 0;
+
+void *getOptions()
+{
+    return Options;
+}
 
 void *getScreens()
 {
@@ -64,10 +70,7 @@ void * getScenery()
     return scenery;
 }
 
-//static osg::ref_ptr<osg::Group> m_sceneroot = NULL;
-//static osg::ref_ptr<osg::Group> m_carroot = NULL;
 static osg::Timer m_timer;
-//static osg::Timer_t m_start_tick;
 
 int grMaxTextureUnits = 0;
 
@@ -79,9 +82,6 @@ void *grTrackHandle = 0;
 
 int m_Winx, m_Winy, m_Winw, m_Winh;
 
-//tgrCarInfo *grCarInfo;
-//ssgContext grContext;
-//cGrScreen *Screens[SD_NB_MAX_SCREEN];
 tdble grLodFactorValue = 1.0;
 
 // Frame/FPS info.
@@ -99,48 +99,6 @@ int m_NbArrangeScreens = 0;
 
 // Current screen index.
 static int m_CurrentScreenIndex = 0;
-
-//static grssgLoaderOptions options(/*bDoMipMap*/true);
-
-// TODO: Move this to glfeatures.
-/*#ifdef WIN32
-PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2fARB = NULL;
-PFNGLMULTITEXCOORD2FVARBPROC glMultiTexCoord2fvARB = NULL;
-PFNGLACTIVETEXTUREARBPROC glActiveTextureARB = NULL;
-PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
-#endif*/
-
-
-// Set up OpenGL features from user settings.
-/*static void setupOpenGLFeatures(void)
-{
-    static bool bInitialized = false;
-
-    // Don't do it twice.
-    if (bInitialized)
-        return;
-
-	// Multi-texturing.
-	grMaxTextureUnits = 1;
-	if (GfglFeatures::self().isSelected(GfglFeatures::MultiTexturing))
-	{
-		// Use the selected number of texture units.
-		grMaxTextureUnits = GfglFeatures::self().getSelected(GfglFeatures::MultiTexturingUnits);
-
-#ifdef WIN32
-		// Retrieve the addresses of multi-texturing functions under Windows
-		// They are not declared in gl.h or any other header ;
-		// you can only get them through a call to wglGetProcAddress at run-time.
-		glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)wglGetProcAddress("glMultiTexCoord2fARB");
-		glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
-		glClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC)wglGetProcAddress("glClientActiveTextureARB");
-		glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC)wglGetProcAddress("glMultiTexCoord2fvARB");
-#endif
-	}
-
-	// Done once and for all.
-	bInitialized = true;
-}*/
 
 static void SDPrevCar(void * /* dummy */)
 {
@@ -169,18 +127,6 @@ void SDSwitchMirror(void * vp)
     screens->getActiveView()->switchMirror();
 }
 
-/*void SDSplitScreen(void * vp)
-{
-    long t = (long)vp;
-    screens->splitScreen(t);
-}*/
-
-/*void SDChangeScreen(void * vp)
-{
-    long t = (long)vp;
-    screens->changeScreen(t);
-}*/
-
 void SDToggleHUD(void * vp)
 {
     screens->toggleDebugHUD();
@@ -188,7 +134,6 @@ void SDToggleHUD(void * vp)
 
 int initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
-    //render = new SDRender();
     screens = new SDScreens();
 
     m_Winx = x;
@@ -205,12 +150,6 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     frameInfo.nTotalFrames = 0;
     fFPSPrevInstTime = GfTimeClock();
     nFPSTotalSeconds = 0;
-
-    //tdble grLodFactorValue = 1.0;
-    //m_start_tick = m_timer.tick();
-
-    //m_sceneViewer->getUsage();
-    //m_sceneViewer->realize();
 
     screens->Init(x,y,width,height, render->getRoot(), render->getFogColor());
 
@@ -254,8 +193,6 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
 
     GfLogInfo("Current screen is #%d (out of %d)\n", m_CurrentScreenIndex, m_NbActiveScreens);
 
-    //grLodFactorValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, 1.0);
-
     return 0; // true;
 }
 
@@ -276,7 +213,7 @@ int refresh(tSituation *s)
         // Trace F/S every 5 seconds.
         if (nFPSTotalSeconds % 5 == 2)
             GfLogInfo("Frame rate (F/s) : Instant = %.1f (Average %.1f)\n",
-                       frameInfo.fInstFps, frameInfo.fAvgFps);
+                      frameInfo.fInstFps, frameInfo.fAvgFps);
     }
 
     cars->updateCars();
@@ -285,37 +222,6 @@ int refresh(tSituation *s)
 
     return 0;
 }
-
-    /*GfProfStartProfile("refresh");
-
-
-    TRACE_GL("refresh: start");
-
-	// Moved car collision damage propagation from grcar::grDrawCar.
-	// Because it has to be done only once per graphics update, whereas grDrawCar
-	// is called once for each car and for each screen.
-	grPropagateDamage(s);
-
-	// Update sky if dynamic time enabled.
-	grUpdateSky(s->currentTime, s->accelTime);
-
-    GfProfStartProfile("grDrawBackground/glClear");
-    glDepthFunc(GL_LEQUAL);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    GfProfStopProfile("grDrawBackground/glClear");
-
-    for (i = 0; i < m_NbActiveScreens; i++) {
-                Screens[i]->update(s, &frameInfo);
-    }
-
-    grUpdateSmoke(s->currentTime);
-    grTrackLightUpdate(s);
-
-    GfProfStopProfile("refresh");
-
-    return 0;
-}*/
-
 
 void shutdownCars(void)
 {
@@ -327,60 +233,21 @@ void shutdownCars(void)
         GfLogInfo("Delete cars in OsgMain\n");
     }
 
-    //delete m_carroot;
 
-/*	int i;
-
-	GfOut("-- shutdownCars\n");
-	if (grNbCars) {
-		grShutdownBoardCar();
-		grShutdownSkidmarks();
-		grShutdownSmoke();
-		grShutdownCarlight();
-		grTrackLightShutdown();*/
-		/* Delete ssg objects */
-		/*CarsAnchor->removeAllKids();
-		ShadowAnchor->removeAllKids();
-		for (i = 0; i < grNbCars; i++) {
-			ssgDeRefDelete(grCarInfo[i].envSelector);
-			ssgDeRefDelete(grCarInfo[i].shadowBase);
-			if (grCarInfo[i].driverSelectorinsg == false) {
-				delete grCarInfo[i].driverSelector;
-			}
-		}
-
-		PitsAnchor->removeAllKids();
-		ThePits = 0;
-		free(grCarInfo);
-	}
-
-	GfParmReleaseHandle(grHandle);
-	grHandle = NULL;
-
-	for (i = 0; i < SD_NB_MAX_SCREEN; i++) {
-		Screens[i]->setCurrentCar(NULL);
-	}
-    */
 
     // Trace final mean F/s.
-        if (nFPSTotalSeconds > 0)
-                GfLogTrace("Average frame rate: %.2f F/s\n",
-                                   (double)frameInfo.nTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - fFPSPrevInstTime));
+    if (nFPSTotalSeconds > 0)
+        GfLogTrace("Average frame rate: %.2f F/s\n",
+                   (double)frameInfo.nTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - fFPSPrevInstTime));
 }
 
 int initTrack(tTrack *track)
 {
-	// The inittrack does as well init the context, that is highly inconsistent, IMHO.
-	// TODO: Find a solution to init the graphics first independent of objects.
+    // The inittrack does as well init the context, that is highly inconsistent, IMHO.
+    // TODO: Find a solution to init the graphics first independent of objects.
 
-    //setupOpenGLFeatures();
-
-	// Now, do the real track loading job.
+    // Now, do the real track loading job.
     grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    //osg::ref_ptr<osg::Group> sceneroot = NULL;
-    //m_sceneroot = NULL;
-	/*if (m_NbActiveScreens > 0)
-		return grLoadScene(track);*/
 
     scenery = new SDScenery;
     render = new SDRender;
@@ -394,15 +261,13 @@ int initTrack(tTrack *track)
 int  initCars(tSituation *s)
 {
     GfLogInfo("InitCars\n");
-	char buf[256];
+    char buf[256];
     cars = new SDCars;
     cars->loadCars(s, scenery->getSpeedWay());
     render->addCars(cars->getCarsNode());
-    //osgUtil::Optimizer optimizer;
-    //optimizer.optimize(m_sceneroot);
     GfLogInfo("All cars loaded\n");
 
-	screens->InitCars(s);
+    screens->InitCars(s);
 
     if (!grHandle)
     {
@@ -415,29 +280,17 @@ int  initCars(tSituation *s)
 
 void shutdownTrack(void)
 {
-    //scenery->ShutdownScene();
-
-    /*if (scenery)
-    {
-        delete scenery;
-        scenery = NULL;
-        GfLogInfo("Delete scenery in OsgMain\n");
-    }*/
-
     // Do the real track termination job.
     osgDB::Registry::instance()->clearObjectCache();
-    //m_sceneroot = NULL;
-        //grShutdownScene();
 
-	if (grTrackHandle)
-	{
-		GfParmReleaseHandle(grTrackHandle);
-		grTrackHandle = 0;
-	}
+    if (grTrackHandle)
+    {
+        GfParmReleaseHandle(grTrackHandle);
+        grTrackHandle = 0;
+    }
 }
 
-void
-shutdownView(void)
+void shutdownView(void)
 {
     if (screens)
     {
@@ -453,13 +306,6 @@ shutdownView(void)
         GfLogInfo("Delete render in OsgMain\n");
     }
 }
-
-//void SsgGraph::bendCar(int index, sgVec3 poc, sgVec3 force, int count)
-//{
-//	if (grCarInfo)
-//		grPropagateDamage (grCarInfo[index].carEntity, poc, force, count);
-//}*/
-
 
 Camera * getCamera(void)
 {

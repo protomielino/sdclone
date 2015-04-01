@@ -26,14 +26,6 @@
 #include "OsgWheel.h"
 #include <osgDB/WriteFile>
 
-/*SDWheels::SDWheels(void)
-{
-}
-
-SDWheels::~SDWheels(void)
-{
-}*/
-
 osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)
 {
     rcvShadowMask = 0x1;
@@ -80,7 +72,6 @@ osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)
     }
 
     return group;
-
 }
 
 osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const char * wheel_mod_name)
@@ -205,8 +196,8 @@ void SDWheels::updateWheels()
         osg::Matrix posMatrix = osg::Matrix::translate(car->priv.wheel[i].relPos.x, car->priv.wheel[i].relPos.y, car->priv.wheel[i].relPos.z);
 
         osg::Matrix camberDirMatrix = osg::Matrix::rotate(car->priv.wheel[i].relPos.ax, osg::X_AXIS,//camber
-                                         0.0, osg::Y_AXIS,
-                                         car->priv.wheel[i].relPos.az, osg::Z_AXIS );//direction
+                                                          0.0, osg::Y_AXIS,
+                                                          car->priv.wheel[i].relPos.az, osg::Z_AXIS );//direction
 
         posMatrix = camberDirMatrix * posMatrix;
         osg::MatrixTransform * trans = dynamic_cast<osg::MatrixTransform *>(wheels[i]->getChild(0));
@@ -215,8 +206,8 @@ void SDWheels::updateWheels()
 
         for (j = 0; j < 3; j++)
         {
-          if (fabs(car->_wheelSpinVel(i)) < maxVel[j])
-            break;
+            if (fabs(car->_wheelSpinVel(i)) < maxVel[j])
+                break;
         }
 
         this->wheels_switches[i]->setSingleChildOn(j);

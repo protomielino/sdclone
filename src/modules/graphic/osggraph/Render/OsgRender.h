@@ -28,7 +28,6 @@
 struct Situation;
 typedef Situation tSituation;
 
-
 class SDSky;
 class SDScenery;
 
@@ -70,7 +69,7 @@ private:
     unsigned int rcvShadowMask;
     unsigned int castShadowMask;
     unsigned carsShader;
-    int SDDynamicWeather;    
+    int SDDynamicWeather;
     bool SDDynamicSkyDome;
 
     int cloudsTextureIndex;
@@ -92,12 +91,12 @@ private:
     float sky_brightness;
 
     SDSky *thesky;
-	SDScenery *scenery;
+    SDScenery *scenery;
     tTrack *SDTrack;
 
 public:
-	SDRender(void);
-	~SDRender(void);
+    SDRender(void);
+    ~SDRender(void);
 
     void Init(tTrack *track);
     osg::ref_ptr< osg::StateSet> setFogState();

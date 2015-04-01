@@ -32,8 +32,6 @@ SDWing3::SDWing3(void)
 
 SDWing3::~SDWing3(void)
 {
-    //delete loader;
-
     _wing3Switch->removeChildren(0, _wing3Switch->getNumChildren());
     _wing3Switch = NULL;
 }
@@ -94,9 +92,9 @@ osg::ref_ptr<osg::Switch> SDWing3::initWing3(tCarElt *car,void *handle)
         _wing3Switch->setSingleChildOn(0);
 
 #if 1
-    std::string pWing3_path = GetLocalDir();
-    pWing3_path = pWing3_path+"wing3.osg";
-    osgDB::writeNodeFile( *_wing3Switch, pWing3_path );
+        std::string pWing3_path = GetLocalDir();
+        pWing3_path = pWing3_path+"wing3.osg";
+        osgDB::writeNodeFile( *_wing3Switch, pWing3_path );
 #endif
     }
 
@@ -104,35 +102,3 @@ osg::ref_ptr<osg::Switch> SDWing3::initWing3(tCarElt *car,void *handle)
 
     return _wing3Switch.get();
 }
-
-/*void SDWheels::updateWheels()
-{
-    int j;
-    static float maxVel[3] = { 20.0, 40.0, 70.0 };
-
-    brakes.updateBrakes();
-
-    for(int i=0; i<4; i++)
-    {
-        osg::Matrix spinMatrix = osg::Matrix::rotate(car->priv.wheel[i].relPos.ay, osg::Y_AXIS);
-
-        osg::Matrix posMatrix = osg::Matrix::translate(car->priv.wheel[i].relPos.x, car->priv.wheel[i].relPos.y, car->priv.wheel[i].relPos.z);
-
-        osg::Matrix camberDirMatrix = osg::Matrix::rotate(car->priv.wheel[i].relPos.ax, osg::X_AXIS,//camber
-                                         0.0, osg::Y_AXIS,
-                                         car->priv.wheel[i].relPos.az, osg::Z_AXIS );//direction
-
-        posMatrix = camberDirMatrix * posMatrix;
-        osg::MatrixTransform * trans = dynamic_cast<osg::MatrixTransform *>(wheels[i]->getChild(0));
-        trans->setMatrix(spinMatrix);
-        wheels[i]->setMatrix(posMatrix);
-
-        for (j = 0; j < 3; j++)
-        {
-          if (fabs(car->_wheelSpinVel(i)) < maxVel[j])
-            break;
-        }
-
-        this->wheels_switches[i]->setSingleChildOn(j);
-    }
-}*/

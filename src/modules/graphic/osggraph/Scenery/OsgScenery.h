@@ -30,8 +30,6 @@
 class	SDBackground;
 class   SDPit;
 class   SDTrackLights;
-//class	SDSpectators;
-//class	SDTrees;
 class	SDScenery;
 class   osgLoader;
 
@@ -42,18 +40,17 @@ class SDBackground
 {
     osg::ref_ptr<osg::Group>	 _background;
 
-	bool	_type;
+    bool	_type;
 
 public:
+    // Constructor
+    SDBackground(void);
 
-	// Constructor
-	SDBackground(void);
-
-	// Destructor
-	~SDBackground(void);
+    // Destructor
+    ~SDBackground(void);
 
     void build(bool type, int X, int Y, int Z, const std::string strTrack);
-	void reposition(int X, int Y);
+    void reposition(int X, int Y);
 
     osg::ref_ptr<osg::Group> getBackground() { return _background.get(); }
 };
@@ -64,7 +61,6 @@ class SDPit
     bool	_number;
 
 public:
-
     // Constructor
     SDPit(void);
 
@@ -93,34 +89,6 @@ public:
     osg::ref_ptr<osg::Group> getTrackLight() { return _osgtracklight.get(); }
 };
 
-/*class SDSpectators
-{
-private:
-
-	osg::ref_prt<osg::Node>	_spectators;
-
-	int	_number;
-
-public:
-
-	void SDSpectators(void);
-	void ~SDSpectators(void);
-	void build(int number, tTrack *track);
-};
-
-class SDTrees
-{
-private:
-
-	osg::ref_ptr<osg::Node> _trees;
-
-public:
-
-	void SDTrees(void);
-	void ~SDTrees(void);
-	void build(tTrack *track);
-};*/
-
 static int grWrldX=0;
 static int grWrldY=0;
 static int grWrldZ = 0;
@@ -130,51 +98,39 @@ static bool speedWay=false;
 class SDScenery
 {
 private:
-	SDBackground	*m_background;
+    SDBackground	*m_background;
     SDPit           *m_pit;
     SDTrackLights   *m_tracklights;
-	//SDSpectators	*m_spectators;
-	//SDTrees	*m_trees;
-	osg::ref_ptr<osg::Group> _scenery;
+
+    osg::ref_ptr<osg::Group> _scenery;
 
     tTrack *SDTrack;
 
-    /*int _grWrldX;
-    int _grWrldY;
-    int _grWrldZ;
-    int _grWrldMaxSize;*/
     int _max_visibility;
     int _nb_cloudlayer;
     int _DynamicSkyDome;
     int _SkyDomeDistance;
     int _SkyDomeDistThresh;
 
-	bool _bgtype;
-	bool _bgsky;
+    bool _bgtype;
+    bool _bgsky;
 
-	//_spectators = 0;
-	//_trees = 0;
-	//_pits = 0;
-	std::string _strTexturePath;
+    std::string _strTexturePath;
 
-	void LoadGraphicsOptions();
-	void LoadSkyOptions();
-	void CustomizePits(void);
-	bool LoadTrack(std::string strTrack);
+    void LoadGraphicsOptions();
+    void LoadSkyOptions();
+    void CustomizePits(void);
+    bool LoadTrack(std::string strTrack);
 
 public:
-	/* Constructor */
-	SDScenery(void);
+    /* Constructor */
+    SDScenery(void);
 
-	/* Destructor */
-	~SDScenery(void);
+    /* Destructor */
+    ~SDScenery(void);
 
     void LoadScene(tTrack *track);
-    //void CreatePit(tTrack *track);
-	//void	addSpectators(SDSpectators->build(number, tTrack *track));
-	//void	addTrees(SDTrees->build(tTrack *track));
     void ShutdownScene(void);
-	//void
 
     inline static int getWorldX(){return grWrldX;}
     inline static int getWorldY(){return grWrldY;}

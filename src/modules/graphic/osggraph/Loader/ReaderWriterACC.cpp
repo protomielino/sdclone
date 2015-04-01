@@ -67,33 +67,33 @@ REGISTER_OSGPLUGIN(acc, ReaderWriterACC)
 
 class geodeVisitor : public osg::NodeVisitor
 { // collects geodes from scene sub-graph attached to 'this'
-        public:
-            geodeVisitor():
-                osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
+  public:
+  geodeVisitor():
+  osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
 
-            ~geodeVisitor() { _geodelist.clear();}
+  ~geodeVisitor() { _geodelist.clear();}
 
-            // one apply for each type of Node that might be a user transform
-            virtual void apply(osg::Geode& geode)
-                        {
-                _geodelist.push_back(&geode);
-            }
+  // one apply for each type of Node that might be a user transform
+  virtual void apply(osg::Geode& geode)
+{
+  _geodelist.push_back(&geode);
+  }
 
-	    virtual void apply(osg::Group& gp)
-			{
-		traverse(gp);    // must continue subgraph traversal.
-	    }
+  virtual void apply(osg::Group& gp)
+{
+  traverse(gp);    // must continue subgraph traversal.
+  }
 
-	    std::vector<const osg::Geode *> getGeodes() {return _geodelist;}
+  std::vector<const osg::Geode *> getGeodes() {return _geodelist;}
 
-        protected:
-            typedef std::vector<const osg::Geode *>    Geodelist;
-            Geodelist  _geodelist;
+  protected:
+  typedef std::vector<const osg::Geode *>    Geodelist;
+Geodelist  _geodelist;
 };
 
 ReaderWriterACC::ReaderWriterACC()
 {
-    osgDB::ReaderWriter::supportsExtension("acc","DREAM OF MOTORSPORT Database format");
+    osgDB::ReaderWriter::supportsExtension("acc","SPEED DREAMS Database format");
     m_bCar = false;
     m_transparentGroup = NULL;
     m_opaqueGroup = NULL;
@@ -101,7 +101,7 @@ ReaderWriterACC::ReaderWriterACC()
 
 const char* ReaderWriterACC::className()
 {
-    return "ACC DREAM OF MOTORSPORT Database Reader";
+    return "ACC SPEED DREAMS Database Reader";
 }
 
 void ReaderWriterACC::SetCar(bool b)
@@ -115,12 +115,12 @@ osg::Node* ReaderWriterACC::readFile(std::istream& stream, const osgDB::ReaderWr
     osg::Group *pWorld = new osg::Group;
     osg::Matrix identityTransform;
 
-	while ((stream.good())&&(!stream.eof()))
-	{
-		osg::Node* node = readObject(stream, fileData, identityTransform, TextureData());
-		if (node)
-			pWorld->addChild(node);
-	}
+    while ((stream.good())&&(!stream.eof()))
+    {
+        osg::Node* node = readObject(stream, fileData, identityTransform, TextureData());
+        if (node)
+            pWorld->addChild(node);
+    }
     return pWorld;
 }
 
@@ -156,7 +156,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
         {
             std::string type;
             stream >> type;
-            /* osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: object name \""
+            /* osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: object name \""
                                     << type  << "\"5" << std::endl;*/
 
             if (!m_bCar)
@@ -210,7 +210,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
         else if (token == "name")
         {
             strName = readString(stream);
-            /*osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: group name \""
+            /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: group name \""
                                     << strName  << "\"5" << std::endl;*/
             m_bBlockTransparent = false;
 
@@ -258,25 +258,25 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                 {
                 case 0:
                     texname0 = texname;
-                    /*osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: texture0 name \""
+                    /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: texture0 name \""
                                             << texname0  << "\"5" << std::endl;*/
                     break;
 
                 case 1:
                     texname1 = texname;
-                    /*osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: texture1 name \""
+                    /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: texture1 name \""
                                             << texname1  << "\"5" << std::endl;*/
                     break;
 
                 case 2:
                     texname2 = texname;
-                    /*osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: texture2 name \""
+                    /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: texture2 name \""
                                             << texname2  << "\"5" << std::endl;*/
                     break;
 
                 case 3:
                     texname3 = texname;
-                    /*osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: texture3 name \""
+                    /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: texture3 name \""
                                             << texname3  << "\"5" << std::endl;*/
                     break;
                 }
@@ -378,19 +378,19 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 
                     if (token != "SURF")
                     {
-                        osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: expected SURF line while reading object \""
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: expected SURF line while reading object \""
                                                 << group->getName() << "\"!" << std::endl;
                         return group.release();
                     }
 
                     stream >> token;
                     unsigned flags = strtol(token.c_str(), NULL, 0);
-                   // unsigned v = flags &0xF;
+                    // unsigned v = flags &0xF;
 
                     stream >> token;
                     if (token != "mat")
                     {
-                        osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: expected mat line while reading object \""
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: expected mat line while reading object \""
                                                 << group->getName() << "\"!" << std::endl;
                         return group.release();
                     }
@@ -400,7 +400,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     stream >> matIdx;
                     if (primitiveBins.size() <= matIdx)
                     {
-                        osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: invalid material number while reading object \""
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: invalid material number while reading object \""
                                                 << group->getName() << "\"1" << std::endl;
                         return group.release();
                     }
@@ -410,7 +410,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     primitiveBin = primitiveBins[matIdx].getOrCreatePrimitiveBin(flags, vertexSet.get());
                     if (!primitiveBin)
                     {
-                        osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: unexpected primitive flags while reading object \""
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: unexpected primitive flags while reading object \""
                                                 << group->getName() << "\"2" << std::endl;
                         return group.release();
                     }
@@ -419,7 +419,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     stream >> token;
                     if (token != "refs")
                     {
-                        osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: expected refs line while reading object \""
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: expected refs line while reading object \""
                                                 << group->getName() << "\"3" << std::endl;
                         return group.release();
                     }
@@ -428,7 +428,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     stream >> nRefs;
                     if (!stream)
                     {
-                        osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: could not read number of refs while reading object \""
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read number of refs while reading object \""
                                                 << group->getName() << "\"4" << std::endl;
                         return group.release();
                     }
@@ -445,7 +445,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                         stream >> index;
                         if (vertexSet->size() <= index)
                         {
-                            osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: invalid ref vertex index while reading object \""
+                            osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: invalid ref vertex index while reading object \""
                                                     << group->getName() << "\"5" << std::endl;
                             return group.release();
                         }
@@ -454,7 +454,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                         osg::Vec2 texCoord, texCoord1, texCoord2, texCoord3;
                         std::string strUVs;
                         std::getline(stream,strUVs);
-                        /*osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: string nRefs texture vertex \""
+                        /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: string nRefs texture vertex \""
                                                 << strUVs << "\"5" << std::endl;*/
 
                         char * pch;
@@ -465,7 +465,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                         pch = strtok (NULL, " ");
                         texCoord[1] = atof(pch);
                         pch = strtok (NULL, " ");
-                        /*osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: string nRefs texture0 vertex \""
+                        /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: string nRefs texture0 vertex \""
                                                 << texCoord[0]  << "\"5" << std::endl;*/
 
                         //UVCount = 1;
@@ -475,7 +475,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                             pch = strtok (NULL, " ");
                             texCoord1[1] = atof(pch);
                             pch = strtok (NULL, " ");
-                            /*osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: string nRefs texture1 vertex \""
+                            /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: string nRefs texture1 vertex \""
                                                     << texCoord1[0]  << "\"5" << std::endl;*/
                             //UVCount = 2;
                         }
@@ -486,7 +486,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                             pch = strtok (NULL, " ");
                             texCoord2[1] = atof(pch);
                             pch = strtok (NULL, " ");
-                            /*osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: string nRefs texture2 vertex \""
+                            /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: string nRefs texture2 vertex \""
                                                     << texCoord2[0]  << "\"5" << std::endl;*/
                             //UVCount = 3;
                         }
@@ -497,14 +497,14 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                             pch = strtok (NULL, " ");
                             texCoord3[1] = atof(pch);
                             pch = strtok (NULL, " ");
-                            /*osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: string nRefs texture3 vertex \""
+                            /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: string nRefs texture3 vertex \""
                                                     << texCoord3[0]  << "\"5" << std::endl;*/
                             //UVCount = 3;
                         }
 
                         if (!stream)
                         {
-                            osg::notify(osg::WARN) << "osgDB DREAM OF MOTORSPORT reader: could not parse texture coords while reading object \""
+                            osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: could not parse texture coords while reading object \""
                                                    << group->getName() << "\" setting to (0,0)" << std::endl;
                             stream.clear();
                             std::string dummy;
@@ -551,7 +551,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 
             unsigned num;
             stream >> num;
-            /*osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: kids number \""
+            /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: kids number \""
                                     << num  << "\"5" << std::endl;*/
             if (num != 0)
             {
@@ -560,7 +560,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     k = readObject(stream, fileData, transform*parentTransform, textureData);
                     if (k == 0)
                     {
-                        osg::notify(osg::FATAL) << "osgDB DREAM OF MOTORSPORT reader: error reading KIDS object" << std::endl;
+                        osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: error reading KIDS object" << std::endl;
                         return group.release();
                     }
                     else
@@ -603,7 +603,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
         else
         {
             std::string strUnknown = token;
-            osg::notify(osg::WARN) << "osgDB DREAM OF MOTORSPORT reader: unknown token refs line while reading object \"6"
+            osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: unknown token refs line while reading object \"6"
                                    <<" token:"<< strUnknown << "\"" << std::endl;
         }
 
@@ -612,7 +612,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
             //bool bBad = stream.bad();
             //bool bFail = stream.fail();
             //bool bEof = stream.eof();
-            osg::notify(osg::WARN) << "osgDB DREAM OF MOTORSPORT reader: token read error \"7"
+            osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: token read error \"7"
                                    <<" token:"<< token << "\"" << std::endl;
         }
     }
@@ -634,7 +634,7 @@ osgDB::ReaderWriter::ReadResult ReaderWriterACC::readNode(const std::string& fil
 
     // GWM added Dec 2003 - get full path name (change in osgDB handling of files).
     std::string fileName = osgDB::findDataFile( file, options );
-    osg::notify(osg::INFO) << "osgDB DREAM OF MOTORSPORT reader: starting reading \"" << fileName << "\"" << std::endl;
+    osg::notify(osg::INFO) << "osgDB SPEED DREAMS reader: starting reading \"" << fileName << "\"" << std::endl;
 
     // Anders Backmann - correct return if path not found
     if (fileName.empty()) return ReadResult::FILE_NOT_FOUND;
@@ -778,9 +778,9 @@ std::string readString(std::istream& stream)
 
 void setAlphaClamp(osg::StateSet* stateSet,float clamp)
 {
-	osg::AlphaFunc* alphaFunc = new osg::AlphaFunc;
-	alphaFunc->setFunction(osg::AlphaFunc::GREATER,clamp);
-	stateSet->setAttributeAndModes( alphaFunc, osg::StateAttribute::ON );
+    osg::AlphaFunc* alphaFunc = new osg::AlphaFunc;
+    alphaFunc->setFunction(osg::AlphaFunc::GREATER,clamp);
+    stateSet->setAttributeAndModes( alphaFunc, osg::StateAttribute::ON );
 }
 
 void setTranslucent(osg::StateSet* stateSet)
@@ -796,17 +796,17 @@ void setTranslucent(osg::StateSet* stateSet)
 
 unsigned int GetUVCount(unsigned flags)
 {
-	switch(flags)
-	{
-	case 0x14:
-		return 1;
-	case 0x24:
-		return 2;
-	case 0x34:
-		return 2;
-	case 0x44:
-		return 2;
-	}
+    switch(flags)
+    {
+    case 0x14:
+        return 1;
+    case 0x24:
+        return 2;
+    case 0x34:
+        return 2;
+    case 0x44:
+        return 2;
+    }
 
-	return 0;
+    return 0;
 }

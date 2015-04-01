@@ -32,7 +32,7 @@
 #include "OsgCar.h"
 
 SDScreens::SDScreens()
-   :m_CurrentScreenIndex(0)
+    :m_CurrentScreenIndex(0)
 {
     debugHUD = new SDDebugHUD();
     //viewer = static_cast<osgViewer::Viewer *> (GfScrGetViewer());
@@ -43,12 +43,12 @@ SDScreens::SDScreens()
 class CameraDrawnCallback : public osg::Camera::DrawCallback
 {
 public:
-   virtual void operator()(const osg::Camera& cam) const
-   {
+    virtual void operator()(const osg::Camera& cam) const
+    {
         SDCars * cars = (SDCars*)getCars();
         osg::Matrixf mat = cam.getViewMatrix();
         cars->updateShadingParameters(mat);
-   }
+    }
 };
 
 
@@ -96,37 +96,6 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     mirrorStateSet->setAttribute(frontFace);
     mirrorStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
 
-    //adding all otherer cams
-    /*osg::ref_ptr<osg::Camera> screenCam;
-    for(int i=1;i<SD_NB_MAX_SCREEN;i++)
-    {
-        screenCam = new osg::Camera;
-        screenCam->setGraphicsContext(gw);
-        screenCam->setClearMask( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        screenCam->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
-        screenCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-        screenCam->addChild(m_sceneroot.get());
-        screenCam->setClearColor( osg::Vec4(fogcolor._v[0],fogcolor._v[1], fogcolor._v[2], 0.0f) );
-        screenCam->setPreDrawCallback(new CameraDrawnCallback);
-        screenCam->setNodeMask(0);
-
-        mirrorCam = new osg::Camera;
-        mirrorCam->setGraphicsContext(gw);
-        mirrorCam->setClearMask( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        mirrorCam->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
-        mirrorCam->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-        mirrorCam->addChild(m_sceneroot.get());
-        mirrorCam->setClearColor( osg::Vec4(fogcolor._v[0],fogcolor._v[1], fogcolor._v[2], 0.0f));
-        mirrorCam->setNodeMask(0);
-
-        view = new SDView(screenCam.get(),0,0,m_Winw,m_Winh,mirrorCam.get());
-
-        Screens.insert(Screens.end(),view);
-
-        root->addChild(screenCam.get());
-        root->addChild(mirrorCam.get());
-    }*/
-
     //debugHUD->setTexture(reflectionMapping->getMap());
     // debugHUD->setTexture(reflectionMapping->getReflectionMap());
     root->addChild(debugHUD->getRootCamera());
@@ -137,43 +106,24 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
 
 void SDScreens::InitCars(tSituation *s)
 {
-    //char buf[256];
-    //char	idx[16];
-    //int		index;
     int		i;
     tCarElt 	*elt;
-    //void	*hdle;
+
     const char *pszSpanSplit;
     int grNbSuggestedScreens = 0;
 
-    for (i = 0; i < s->_ncars; i++) 
+    for (i = 0; i < s->_ncars; i++)
     {
-    	elt = s->cars[i];
-        //index = elt->index;
-        //hdle = elt->_paramsHandle;
+        elt = s->cars[i];
 
-    	// WARNING: This index hack on the human robot for the Career mode
-    	//          does no more work with the new "welcome" module system
-    	//          (the "normal" index has no more the 10 limit) ... TO BE FIXED !!!!!!!
-    	/*if (elt->_driverType == RM_DRV_HUMAN && elt->_driverIndex > 10)
-        sprintf(idx, "Robots/index/%d", elt->_driverIndex - 11);
-    else
-        sprintf(idx, "Robots/index/%d", elt->_driverIndex);
-
-    grCarInfo[index].iconColor[0] = GfParmGetNum(hdle, idx, "red",   (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "red",   NULL, 0));
-    grCarInfo[index].iconColor[1] = GfParmGetNum(hdle, idx, "green", (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "green", NULL, 0));
-    grCarInfo[index].iconColor[2] = GfParmGetNum(hdle, idx, "blue",  (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "blue",  NULL, 0));
-    grCarInfo[index].iconColor[3] = 1.0;
-    grInitCar(elt);*/
-
-    	// Pre-assign each human driver (if any) to a different screen
-    	// (set him as the "current driver" for this screen).
+        //  Pre-assign each human driver (if any) to a different screen
+        // (set him as the "current driver" for this screen).
         if (grNbSuggestedScreens < SD_NB_MAX_SCREEN
-        	&& elt->_driverType == RM_DRV_HUMAN && !elt->_networkPlayer)
+                && elt->_driverType == RM_DRV_HUMAN && !elt->_networkPlayer)
         {
             Screens[0]->setCurrentCar(elt);
             GfLogTrace("Screen #%d : Assigned to %s\n", 0, elt->_name);
-        	grNbSuggestedScreens++;
+            grNbSuggestedScreens++;
         }
     }
 
@@ -181,14 +131,14 @@ void SDScreens::InitCars(tSituation *s)
     pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
     m_SpanSplit = strcmp(pszSpanSplit, GR_VAL_YES) ? 0 : 1;
 
-    if (m_SpanSplit == 0 && grNbSuggestedScreens > 1) 
+    if (m_SpanSplit == 0 && grNbSuggestedScreens > 1)
     {
         // Mulitplayer, so ignore the stored number of screens
         m_NbActiveScreens = grNbSuggestedScreens;
         m_NbArrangeScreens = 0;
-    } else 
+    } else
     {
-            // Load the real number of active screens and the arrangment.
+        // Load the real number of active screens and the arrangment.
         m_NbActiveScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, 1.0);
         m_NbArrangeScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_ARR_SCREENS, NULL, 0.0);
     }
@@ -198,9 +148,6 @@ void SDScreens::InitCars(tSituation *s)
     {
         Screens[i]->Init(s);
     }
-
-    // Setup the screens (= OpenGL viewports) inside the physical game window.
-    //this->AdaptScreenSize();
 }
 
 void SDScreens::update(tSituation * s,SDFrameInfo* fi)
@@ -224,7 +171,7 @@ void SDScreens::changeCamera(long p)
     this->getActiveView()->getCameras()->nextCamera(p);
 
     // For SpanSplit ensure screens change together
-    if (m_SpanSplit && getActiveView()->getViewOffset() ) 
+    if (m_SpanSplit && getActiveView()->getViewOffset() )
     {
         int i, camList,camNum;
 
@@ -257,9 +204,9 @@ SDScreens::~SDScreens()
     {
         delete Screens[i];
     }
-    //root.release();
+
     viewer->setSceneData(new osg::Group());
-    //delete viewer->getSceneData();
+
 
     delete viewer;
     delete debugHUD;

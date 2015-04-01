@@ -122,13 +122,8 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):car(c)
         camera->attach( osg::Camera::COLOR_BUFFER, reflectionMap, 0, i );
         camera->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
         camera->addChild( m_sceneroot );
-
-        //camera->setPreDrawCallback(pre_cam);
-        //camera->setPostDrawCallback(post_cam);
-        //camera->setProjectionMatrixAsOrtho(,1,-1,1,0,20000);
-
         camera->setProjectionMatrixAsPerspective(90.0,1.0,1.0,100000.0);
-        //camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+
         camerasRoot->addChild(camera);
         cameras.push_back(camera);
 
@@ -190,10 +185,6 @@ void SDReflectionMapping::update()
 
     cameras[osg::TextureCubeMap::NEGATIVE_Y]->setViewMatrix(mat*negY);
     cameras[osg::TextureCubeMap::POSITIVE_Y]->setViewMatrix(mat*posY);
-
-    /*for(unsigned int i=0;i<cameras.size();i++){
-        cameras[i]->setViewMatrixAsLookAt(eye,center,up);
-    }*/
 }
 
 SDReflectionMapping::~SDReflectionMapping()

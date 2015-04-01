@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include <osg/MatrixTransform>
-//#include <osg/Node>
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
 #include <osgDB/Registry>
@@ -37,11 +36,11 @@ SDBackground::~SDBackground(void)
 
 void SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const std::string TrackPath)
 {
-	bool land = type;	
+    bool land = type;
     osgDB::Registry::instance()->clearObjectCache();
 
-	std::string LocalPath = GetDataDir();
-	
+    std::string LocalPath = GetDataDir();
+
     osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
     pathList.push_back(TrackPath);
     pathList.push_back(LocalPath+"data/objects");
@@ -49,24 +48,24 @@ void SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const
     osgDB::Registry::instance()->setDataFilePathList(pathList);
 
     osg::ref_ptr<osg::MatrixTransform> _background_transform = new osg::MatrixTransform;
-	osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-                         0.0f, -1.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f);
-                         	
-	if (!land)
-	{
+    osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
+                     0.0f, -1.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f);
+
+    if (!land)
+    {
         osg::ref_ptr<osg::Node> m_background = osgDB::readNodeFile("background-sky.ac");
-		//_background_transform->setMatrix(mat);
-		osg::Matrix t = osg::Matrix::translate(grWrldX /2, grWrldY /2, grWrldZ /2);
-		mat = mat * t;
-		_background_transform->setMatrix(mat);
+        //_background_transform->setMatrix(mat);
+        osg::Matrix t = osg::Matrix::translate(grWrldX /2, grWrldY /2, grWrldZ /2);
+        mat = mat * t;
+        _background_transform->setMatrix(mat);
         _background_transform->addChild( m_background.get() );
-	}
-	else
-	{
+    }
+    else
+    {
         osg::ref_ptr<osg::Node> m_background = osgDB::readNodeFile("land.ac");
-		_background_transform->setMatrix(mat);
+        _background_transform->setMatrix(mat);
         _background_transform->addChild( m_background.get() );
-	}
+    }
 
     osg::ref_ptr<osg::StateSet> bgstate = _background_transform->getOrCreateStateSet();
     bgstate->setRenderBinDetails(-1, "RenderBin");

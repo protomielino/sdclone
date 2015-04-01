@@ -32,21 +32,18 @@
 
 class SDWheels
 {
-    private :
-        tCarElt *car;
-        osg::ref_ptr<osg::Switch> wheels_switches[4];
-        osg::ref_ptr<osg::MatrixTransform> wheels[4];       
-        SDBrakes brakes;
-        osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
-        unsigned int rcvShadowMask;
-        unsigned int castShadowMask;
+private :
+    tCarElt *car;
+    osg::ref_ptr<osg::Switch> wheels_switches[4];
+    osg::ref_ptr<osg::MatrixTransform> wheels[4];
+    SDBrakes brakes;
+    osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
+    unsigned int rcvShadowMask;
+    unsigned int castShadowMask;
 
-    public :
-        //SDWheels(void);
-        //~SDWheels(void);
-
-        osg::ref_ptr<osg::Node> initWheels(tCarElt *car,void * handle);
-        void updateWheels();
+public :
+    osg::ref_ptr<osg::Node> initWheels(tCarElt *car,void * handle);
+    void updateWheels();
 };
 
 #endif /* _OSGCAR_H_ */

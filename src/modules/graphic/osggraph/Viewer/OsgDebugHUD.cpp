@@ -7,9 +7,8 @@
 
 #include "OsgDebugHUD.h"
 
-
-
-SDDebugHUD::SDDebugHUD(){
+SDDebugHUD::SDDebugHUD()
+{
     osg::Geometry* geom;
     osg::ref_ptr<osg::Vec3Array> texcoords;
 
@@ -39,7 +38,6 @@ SDDebugHUD::SDDebugHUD(){
     geom->setTexCoordArray(0,texcoords);
     quad->addDrawable( geom );
 
-
     HUD_camera = new osg::Camera;
     HUD_camera->setClearMask( GL_DEPTH_BUFFER_BIT );
     HUD_camera->setRenderOrder( osg::Camera::POST_RENDER );
@@ -49,14 +47,17 @@ SDDebugHUD::SDDebugHUD(){
     HUD_camera->setNodeMask(0);
 }
 
-void SDDebugHUD::setTexture(osg::ref_ptr<osg::Texture> map){
+void SDDebugHUD::setTexture(osg::ref_ptr<osg::Texture> map)
+{
     osg::StateSet* stateset = HUD_camera->getOrCreateStateSet();
     stateset->setTextureAttributeAndModes( 0,map);
 }
 
-void SDDebugHUD::toggleHUD(){
+void SDDebugHUD::toggleHUD()
+{
     HUD_camera->setNodeMask(1-HUD_camera->getNodeMask());
 }
 
-SDDebugHUD::~SDDebugHUD(){
+SDDebugHUD::~SDDebugHUD()
+{
 }

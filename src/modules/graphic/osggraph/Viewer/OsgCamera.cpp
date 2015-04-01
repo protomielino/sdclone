@@ -48,7 +48,8 @@ static double lastTime;
 
 
 
-SDCamera::SDCamera(SDView  * c, int myid, int mydrawCurrent, int mydrawdrv, int mydrawBackground, int mymirrorAllowed){
+SDCamera::SDCamera(SDView  * c, int myid, int mydrawCurrent, int mydrawdrv, int mydrawBackground, int mymirrorAllowed)
+{
     screen = c;
     id = myid;
     drawCurrent = mydrawCurrent;
@@ -61,7 +62,8 @@ SDCamera::SDCamera(SDView  * c, int myid, int mydrawCurrent, int mydrawdrv, int 
     up[0] = up[1] = 0.0; up[2] = 1.0;
 }
 
-Camera * SDCamera::getGenericCamera(){
+Camera * SDCamera::getGenericCamera()
+{
     Camera * c = new Camera;
     c->Centerv = &center._v;
     c->Posv = &eye._v;
@@ -70,7 +72,8 @@ Camera * SDCamera::getGenericCamera(){
     return c;
 }
 
-void SDCamera::setViewOffset(float v){
+void SDCamera::setViewOffset(float v)
+{
 
 }
 
@@ -81,8 +84,8 @@ void SDCamera::update(tCarElt * car, tSituation * s)
 // SdPerspCamera ================================================================
 
 SDPerspCamera::SDPerspCamera(SDView *myscreen, int id, int drawCurr, int drawDrv, int drawBG, int mirrorAllowed,
-                   float myfovy, float myfovymin, float myfovymax,
-                   float myfnear, float myffar, float myfogstart, float myfogend)
+                             float myfovy, float myfovymin, float myfovymax,
+                             float myfnear, float myffar, float myfogstart, float myfogend)
     : SDCamera(myscreen, id, drawCurr, drawDrv, drawBG, mirrorAllowed)
 {
     fovy     = myfovy;
@@ -99,54 +102,25 @@ SDPerspCamera::SDPerspCamera(SDView *myscreen, int id, int drawCurr, int drawDrv
 }
 
 void SDPerspCamera::setProjection(void)
-{
-
-
-
-    //screen->getOsgCam()->setProjectionMatrixAsPerspective(fovy,screen->getViewRatio(),fnear,ffar);
-
-
-    // PLib takes the field of view as angles in degrees. However, the
-    // aspect ratio really aplies to lengths in the projection
-    // plane. So we have to transform the fovy angle to a length in
-    // the projection plane, apply the aspect ratio and transform the
-    // result back to an angle. Care needs to be taken to because the
-    // tan and atan functions operate on angles in radians. Also,
-    // we're only interested in half the viewing angle.
-
-   // float fovx = atan(getAspectRatio() / spanaspect * tan(fovy * M_PI / 360.0)) * 360.0 / M_PI;
-   screen->getOsgCam()->setProjectionMatrixAsPerspective(fovy,screen->getViewRatio() / spanaspect,fnear,ffar);
-
-    // grContext.setFOV(fovx, fovy);
-    //grContext.setNearFar(fnear, ffar);
+{    
+    screen->getOsgCam()->setProjectionMatrixAsPerspective(fovy,screen->getViewRatio() / spanaspect,fnear,ffar);
 
     // correct view for split screen spanning
-    if (viewOffset != 0 && spanOffset != 0) {
-    float dist, left, right;
-    double frnear,frfar,frtop,frbottom,frleft,frright;
-    //frfar = 41000.0;
+    if (viewOffset != 0 && spanOffset != 0)
+    {
+        float dist, left, right;
+        double frnear,frfar,frtop,frbottom,frleft,frright;
 
-        //sgFrustum * frus = grContext.getFrustum();
-   screen->getOsgCam()->getProjectionMatrixAsFrustum(frleft,frright,
-                                                     frbottom,frtop,
-                                                     frnear, frfar);
+        screen->getOsgCam()->getProjectionMatrixAsFrustum(frleft,frright, frbottom, frtop, frnear, frfar);
+        if (spanAngle)
+            dist = (screenDist / arcRatio) - (((screenDist / arcRatio) - screenDist) * cos(spanAngle));
+        else
+            dist = screenDist;
 
-
-    //=($A$2/$B$2)-((($A$2/$B$2)-$A$2)*cos(B10))
-    if (spanAngle)
-        dist = (screenDist / arcRatio) - (((screenDist / arcRatio) - screenDist) * cos(spanAngle));
-    else
-        dist = screenDist;
-
-    if (dist !=0) {
-        left = frleft + (spanOffset * frnear/dist);
-        right = frright + (spanOffset * frnear/dist);
-
-        /*GfLogInfo("Adjusting ViewOffset %f : Frustum %f : dist %f : left %f -> %1.12f, Right %f -> %1.12f, near %f\n",
-            viewOffset, spanOffset, dist,
-            frus->getLeft(), left, //frus->getLeft() + spanOffset,
-            frus->getRight(), right, //frus->getRight() + spanOffset,
-            frus->getNear());*/
+        if (dist !=0)
+        {
+            left = frleft + (spanOffset * frnear/dist);
+            right = frright + (spanOffset * frnear/dist);
 
             screen->getOsgCam()->setProjectionMatrixAsFrustum(left,right,frbottom,frtop,frnear,frfar);
         }
@@ -155,23 +129,21 @@ void SDPerspCamera::setProjection(void)
 
 void SDPerspCamera::setModelView(void)
 {
-  screen->getOsgCam()->setViewMatrixAsLookAt(eye,center,up);
+    screen->getOsgCam()->setViewMatrixAsLookAt(eye,center,up);
 }
 
 void SDPerspCamera::loadDefaults(char *attr)
 {
     sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
-    fovy = (float)GfParmGetNum(grHandle, path,
-                   attr, (char*)NULL, fovydflt);
+    fovy = (float)GfParmGetNum(grHandle, path, attr, (char*)NULL, fovydflt);
     limitFov();
 }
 
-
 /* Give the height in pixels of 1 m high object on the screen at this point */
-float SDPerspCamera::getLODFactor(float x, float y, float z) {
+float SDPerspCamera::getLODFactor(float x, float y, float z)
+{
     tdble	dx, dy, dz, dd;
     float	ang;
-   // int		scrh;//, dummy;
     float	res;
 
     dx = x - eye[0];
@@ -181,11 +153,10 @@ float SDPerspCamera::getLODFactor(float x, float y, float z) {
     dd = sqrt(dx*dx+dy*dy+dz*dz);
 
     ang = DEG2RAD(fovy / 2.0);
-    //GfScrGetSize(&dummy, &scrh, &dummy, &dummy);
-
     res = (float)screen->getScreenHeight() / 2.0 / dd / tan(ang);
-    if (res < 0) {
-    res = 0;
+    if (res < 0)
+    {
+        res = 0;
     }
     return res;
 }
@@ -196,44 +167,43 @@ float SDPerspCamera::getSpanAngle(void)
 
     // check if already computed
     if (fovy == spanfovy)
-    return spanAngle;
+        return spanAngle;
 
     fovy = spanfovy;
 
     //PreCalculate the spanOffset
-    if (viewOffset) {
-    //=2*$A$2*$D$2*tan(radians($C$2)/2)
-    float width = 2 * (bezelComp / 100) * screenDist * tan(spanfovy * M_PI / 360.0) * screen->getViewRatio() / spanaspect;
+    if (viewOffset)
+    {
+        float width = 2 * (bezelComp / 100) * screenDist * tan(spanfovy * M_PI / 360.0) * screen->getViewRatio() / spanaspect;
 
 #if 1
-    // New method
-    if (arcRatio > 0) {
-        //=if($B$2=0,0,2*atan($A$5*$B$2/(2*$A$2)))
+        // New method
+        if (arcRatio > 0)
+        {
             float fovxR = 2 * atan(width * arcRatio / (2 * screenDist));
 
-        //=A10*$B$5
             angle = (viewOffset - 10) * fovxR;
 
-        //=if($B$2=0,A10*$A$5,abs($A$2/$B$2)-$A$2)/sqrt(tan(radians(90)-B10)^2+1)*if(A10>0,-1,1)
-        spanOffset = fabs((screenDist / arcRatio) - screenDist) / sqrt((tan((M_PI/2) - angle) * tan((M_PI/2) - angle)) + 1);
+            spanOffset = fabs((screenDist / arcRatio) - screenDist) / sqrt((tan((M_PI/2) - angle) * tan((M_PI/2) - angle)) + 1);
 
-        if (viewOffset < 10) spanOffset *= -1;
-        if (arcRatio > 1) spanOffset *= -1;
-    } else {
-        // monitors mounted flat on wall
-        angle = 0;
-        spanOffset = (viewOffset - 10) * width;
-    }
+            if (viewOffset < 10) spanOffset *= -1;
+            if (arcRatio > 1) spanOffset *= -1;
+        } else
+        {
+            // monitors mounted flat on wall
+            angle = 0;
+            spanOffset = (viewOffset - 10) * width;
+        }
 #else
-    // Old method
-    angle = (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelComp - 100)/200)) *
-        atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
+        // Old method
+        angle = (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelComp - 100)/200)) *
+                atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
 
-    spanOffset = 0;
+        spanOffset = 0;
 #endif
-    spanAngle = angle;
+        spanAngle = angle;
 
-    GfLogInfo("ViewOffset %f : fovy %f, arcRatio %f => width %f, angle %f, SpanOffset %f\n", viewOffset, fovy, arcRatio, width, angle, spanOffset);
+        GfLogInfo("ViewOffset %f : fovy %f, arcRatio %f => width %f, angle %f, SpanOffset %f\n", viewOffset, fovy, arcRatio, width, angle, spanOffset);
     }
 
     return angle;
@@ -244,120 +214,129 @@ void SDPerspCamera::setViewOffset(float newOffset)
     viewOffset = newOffset;
 
     //PreCalculate the spanAngle and spanOffset
-    if (newOffset) {
-    spanfovy = fovy;
-    fovy = 0;
+    if (newOffset)
+    {
+        spanfovy = fovy;
+        fovy = 0;
         spanAngle = getSpanAngle();
-    } else {
-    //spanAngle = 0;
-    spanOffset = 0;
+    } else
+    {
+        spanOffset = 0;
     }
 }
 
 void SDPerspCamera::setZoom(int cmd)
 {
-    //char	buf[256];
-
-
-    switch(cmd) {
+    switch(cmd)
+    {
     case GR_ZOOM_IN:
-    if (fovy > 2) {
-        fovy--;
-    } else {
-        fovy /= 2.0;
-    }
-    if (fovy < fovymin) {
-        fovy = fovymin;
-    }
-    break;
+        if (fovy > 2)
+        {
+            fovy--;
+        } else
+        {
+            fovy /= 2.0;
+        }
+
+        if (fovy < fovymin)
+        {
+            fovy = fovymin;
+        }
+
+        break;
 
     case GR_ZOOM_OUT:
-    fovy++;
-    if (fovy > fovymax) {
-        fovy = fovymax;
-    }
-    break;
+        fovy++;
+        if (fovy > fovymax)
+        {
+            fovy = fovymax;
+        }
+        break;
 
     case GR_ZOOM_MIN:
-    fovy = fovymax;
-    break;
+        fovy = fovymax;
+        break;
 
     case GR_ZOOM_MAX:
-    fovy = fovymin;
-    break;
+        fovy = fovymin;
+        break;
 
     case GR_ZOOM_DFLT:
-    fovy = fovydflt;
-    break;
+        fovy = fovydflt;
+        break;
     }
 
     limitFov();
 
-    if (viewOffset) {
-    spanfovy = fovy;
-    fovy = 0;
+    if (viewOffset)
+    {
+        spanfovy = fovy;
+        fovy = 0;
         spanAngle = getSpanAngle();
-    } else {
-    //spanAngle = 0;
-    spanOffset = 0;
+    } else
+    {
+        spanOffset = 0;
     }
 
-   this->setProjection();
-   sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, screen->getCameras()->getIntSelectedCamera(), getId());
-   sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
-   GfParmSetNum(grHandle, path, buf, (char*)NULL, (tdble)fovy);
-   GfParmWriteFile(NULL, grHandle, "Graph");
+    this->setProjection();
+    sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, screen->getCameras()->getIntSelectedCamera(), getId());
+    sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
+    GfParmSetNum(grHandle, path, buf, (char*)NULL, (tdble)fovy);
+    GfParmWriteFile(NULL, grHandle, "Graph");
 }
 
 
 class SDCarCamInsideDriverEye : public SDPerspCamera
 {
- public:
+public:
     SDCarCamInsideDriverEye(SDView *myscreen, int id, int drawCurr, int drawBG,
-            float myfovy, float myfovymin, float myfovymax,
-            float myfnear, float myffar = 1500.0,
-            float myfogstart = 1400.0, float myfogend = 1500.0)
-    : SDPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
-             myfovy, myfovymin, myfovymax,
-             myfnear, myffar, myfogstart, myfogend) {
+                            float myfovy, float myfovymin, float myfovymax,
+                            float myfnear, float myffar = 1500.0,
+                            float myfogstart = 1400.0, float myfogend = 1500.0)
+        : SDPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
+                        myfovy, myfovymin, myfovymax,
+                        myfnear, myffar, myfogstart, myfogend)
+    {
     }
 
-    void update(tCarElt *car, tSituation *s) {
-    sgVec3 P, p;
-    float offset = 0;
+    void update(tCarElt *car, tSituation *s)
+    {
+        sgVec3 P, p;
+        float offset = 0;
 
-    p[0] = car->_drvPos_x;
-    p[1] = car->_bonnetPos_y;
-    p[2] = car->_drvPos_z;
-    sgXformPnt3(p, car->_posMat);
+        p[0] = car->_drvPos_x;
+        p[1] = car->_bonnetPos_y;
+        p[2] = car->_drvPos_z;
+        sgXformPnt3(p, car->_posMat);
 
-    eye[0] = p[0];
-    eye[1] = p[1];
-    eye[2] = p[2];
+        eye[0] = p[0];
+        eye[1] = p[1];
+        eye[2] = p[2];
 
-    // Compute offset angle and bezel compensation)
-    if (viewOffset) {
-        offset += getSpanAngle();
-    }
+        // Compute offset angle and bezel compensation)
+        if (viewOffset)
+        {
+            offset += getSpanAngle();
+        }
 
-    P[0] = car->_drvPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset);
-    P[1] = car->_bonnetPos_y - 30.0 * sin(2*PI/3 * car->_glance + offset);
-    P[2] = car->_drvPos_z;
-    sgXformPnt3(P, car->_posMat);
+        P[0] = car->_drvPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset);
+        P[1] = car->_bonnetPos_y - 30.0 * sin(2*PI/3 * car->_glance + offset);
+        P[2] = car->_drvPos_z;
+        sgXformPnt3(P, car->_posMat);
 
-    center[0] = P[0];
-    center[1] = P[1];
-    center[2] = P[2];
+        center[0] = P[0];
+        center[1] = P[1];
+        center[2] = P[2];
 
-    up[0] = car->_posMat[2][0];
-    up[1] = car->_posMat[2][1];
-    up[2] = car->_posMat[2][2];
+        up[0] = car->_posMat[2][0];
+        up[1] = car->_posMat[2][1];
+        up[2] = car->_posMat[2][2];
 
-    speed[0] = car->pub.DynGCg.vel.x;
-    speed[1] = car->pub.DynGCg.vel.y;
-    speed[2] = car->pub.DynGCg.vel.z;
+        speed[0] = car->pub.DynGCg.vel.x;
+        speed[1] = car->pub.DynGCg.vel.y;
+        speed[2] = car->pub.DynGCg.vel.z;
 
-    Speed = car->_speed_x * 3.6;
+        Speed = car->_speed_x * 3.6;
     }
 };
 
@@ -371,131 +350,139 @@ class SDCarCamInsideDriverEye : public SDPerspCamera
 class SDCarCamInsideDynDriverEye : public SDCarCamInsideDriverEye
 {
 #if (CamDriverEyeDynamicBehaviour != 1)
- private:
+private:
     tdble PreA;
 #endif
 
- public:
+public:
     SDCarCamInsideDynDriverEye(SDView *myscreen, int id, int drawCurr, int drawBG,
-            float myfovy, float myfovymin, float myfovymax,
-            float myfnear, float myffar = 1500.0,
-            float myfogstart = 1400.0, float myfogend = 1500.0)
-    : SDCarCamInsideDriverEye(myscreen, id, drawCurr, drawBG,
-             myfovy, myfovymin, myfovymax,
-             myfnear, myffar, myfogstart, myfogend) {
+                               float myfovy, float myfovymin, float myfovymax,
+                               float myfnear, float myffar = 1500.0,
+                               float myfogstart = 1400.0, float myfogend = 1500.0)
+        : SDCarCamInsideDriverEye(myscreen, id, drawCurr, drawBG,
+                                  myfovy, myfovymin, myfovymax,
+                                  myfnear, myffar, myfogstart, myfogend)
+    {
 #if (CamDriverEyeDynamicBehaviour == 1)
-    up[0] = 0;
-    up[1] = 0;
-    up[2] = 1;
+        up[0] = 0;
+        up[1] = 0;
+        up[2] = 1;
 #else
-    PreA = 0.0f;
+        PreA = 0.0f;
 #endif
     }
 
-    void update(tCarElt *car, tSituation *s) {
-    sgVec3 P, p;
-    float offset = 0;
+    void update(tCarElt *car, tSituation *s)
+    {
+        sgVec3 P, p;
+        float offset = 0;
 
-    p[0] = car->_drvPos_x;
-    p[1] = car->_drvPos_y;
-    p[2] = car->_drvPos_z;
-    sgXformPnt3(p, car->_posMat);
+        p[0] = car->_drvPos_x;
+        p[1] = car->_drvPos_y;
+        p[2] = car->_drvPos_z;
+        sgXformPnt3(p, car->_posMat);
 
-    eye[0] = p[0];
-    eye[1] = p[1];
-    eye[2] = p[2];
+        eye[0] = p[0];
+        eye[1] = p[1];
+        eye[2] = p[2];
 
-    // Compute offset angle and bezel compensation)
-    if (viewOffset) {
-        offset += getSpanAngle();
-    }
+        // Compute offset angle and bezel compensation)
+        if (viewOffset)
+        {
+            offset += getSpanAngle();
+        }
 
-    P[0] = car->_drvPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset);
-    P[1] = car->_drvPos_y - 30.0 * sin(2*PI/3 * car->_glance + offset);
-    P[2] = car->_drvPos_z;
+        P[0] = car->_drvPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset);
+        P[1] = car->_drvPos_y - 30.0 * sin(2*PI/3 * car->_glance + offset);
+        P[2] = car->_drvPos_z;
 
 #if (CamDriverEyeDynamicBehaviour == 3)
-    tdble A = 0;
+        tdble A = 0;
 
-    // We want uniform movement across split screens when 'spanning'
-    if (viewOffset && lastTime == s->currentTime) {
-        A = spanA;
-    } else {
-        A = car->_yaw;
-        if (fabs(PreA - A) > fabs(PreA - A + 2*PI)) {
-            PreA += 2*PI;
-        } else if (fabs(PreA - A) > fabs(PreA - A - 2*PI)) {
-            PreA -= 2*PI;
+        // We want uniform movement across split screens when 'spanning'
+        if (viewOffset && lastTime == s->currentTime)
+        {
+            A = spanA;
+        } else
+        {
+            A = car->_yaw;
+            if (fabs(PreA - A) > fabs(PreA - A + 2*PI))
+            {
+                PreA += 2*PI;
+            } else if (fabs(PreA - A) > fabs(PreA - A - 2*PI))
+            {
+                PreA -= 2*PI;
+            }
+            RELAXATION(A, PreA, 8.0f);
+            spanA = A;
         }
-        RELAXATION(A, PreA, 8.0f);
-        spanA = A;
-    }
-    lastTime = s->currentTime;
+        lastTime = s->currentTime;
 
-    // ignore head movement if glancing left/right
-    if (car->_glance == 0) {
-        tdble headTurn = (A - car->_yaw)/2;
+        // ignore head movement if glancing left/right
+        if (car->_glance == 0)
+        {
+            tdble headTurn = (A - car->_yaw)/2;
 
-        if (headTurn > PI/3) headTurn = PI/3;
-        if (headTurn < -PI/3) headTurn = -PI/3;
+            if (headTurn > PI/3) headTurn = PI/3;
+            if (headTurn < -PI/3) headTurn = -PI/3;
 
-        P[0] = car->_drvPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset + headTurn);
-        P[1] = car->_drvPos_y - 30.0 * sin(2*PI/3 * car->_glance + offset + headTurn);
-    }
+            P[0] = car->_drvPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset + headTurn);
+            P[1] = car->_drvPos_y - 30.0 * sin(2*PI/3 * car->_glance + offset + headTurn);
+        }
 #endif
 
-    sgXformPnt3(P, car->_posMat);
+        sgXformPnt3(P, car->_posMat);
 
 #if (CamDriverEyeDynamicBehaviour == 2)
-    tdble A = 0;
+        tdble A = 0;
 
-    // We want uniform movement across split screens when 'spanning'
-    if (viewOffset && lastTime == s->currentTime) {
-        A = spanA;
-    } else {
-        A = car->_yaw;
-        if (fabs(PreA - A) > fabs(PreA - A + 2*PI)) {
-            PreA += 2*PI;
-        } else if (fabs(PreA - A) > fabs(PreA - A - 2*PI)) {
-            PreA -= 2*PI;
+        // We want uniform movement across split screens when 'spanning'
+        if (viewOffset && lastTime == s->currentTime) {
+            A = spanA;
+        } else {
+            A = car->_yaw;
+            if (fabs(PreA - A) > fabs(PreA - A + 2*PI)) {
+                PreA += 2*PI;
+            } else if (fabs(PreA - A) > fabs(PreA - A - 2*PI)) {
+                PreA -= 2*PI;
+            }
+            RELAXATION(A, PreA, 4.0f);
+            spanA = A;
         }
-        RELAXATION(A, PreA, 4.0f);
-        spanA = A;
-    }
-    lastTime = s->currentTime;
+        lastTime = s->currentTime;
 
-    // ignore if glancing left/right
-    if (car->_glance != 0)
-        A = 0;
+        // ignore if glancing left/right
+        if (car->_glance != 0)
+            A = 0;
 
-    const tdble CosA = cos(A);
-    const tdble SinA = sin(A);
+        const tdble CosA = cos(A);
+        const tdble SinA = sin(A);
 
-    tdble brake = 0.0f;
-    if (car->_accel_x < 0.0)
-    brake = MIN(2.0, fabs(car->_accel_x) / 20.0);
+        tdble brake = 0.0f;
+        if (car->_accel_x < 0.0)
+            brake = MIN(2.0, fabs(car->_accel_x) / 20.0);
 
-    center[0] = P[0] - (10 - 1) * CosA;
-    center[1] = P[1] - (10 - 1) * SinA;
-    center[2] = P[2]  - brake;
+        center[0] = P[0] - (10 - 1) * CosA;
+        center[1] = P[1] - (10 - 1) * SinA;
+        center[2] = P[2]  - brake;
 
 #else
-    center[0] = P[0];
-    center[1] = P[1];
-    center[2] = P[2];
+        center[0] = P[0];
+        center[1] = P[1];
+        center[2] = P[2];
 #endif
 
 #if (CamDriverEyeDynamicBehaviour != 1)
-    up[0] = car->_posMat[2][0];
-    up[1] = car->_posMat[2][1];
-    up[2] = car->_posMat[2][2];
+        up[0] = car->_posMat[2][0];
+        up[1] = car->_posMat[2][1];
+        up[2] = car->_posMat[2][2];
 #endif
 
-    speed[0] = car->pub.DynGCg.vel.x;
-    speed[1] = car->pub.DynGCg.vel.y;
-    speed[2] = car->pub.DynGCg.vel.z;
+        speed[0] = car->pub.DynGCg.vel.x;
+        speed[1] = car->pub.DynGCg.vel.y;
+        speed[2] = car->pub.DynGCg.vel.z;
 
-    Speed = car->_speed_x * 3.6;
+        Speed = car->_speed_x * 3.6;
     }
 };
 

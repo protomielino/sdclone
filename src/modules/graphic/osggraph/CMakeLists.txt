@@ -5,6 +5,7 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Utils/OsgAtomic.h
                      Utils/OsgReferenced.h 
                      Utils/OsgMath.h
+					 Utils/OsgOptions.h
 
                      Sky/OsgSphere.h
                      Sky/OsgSun.h
@@ -45,6 +46,7 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      )
 			
 SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
+					 Utils/OsgOptions.cpp
 
                      Sky/OsgSphere.cpp
                      Sky/OsgSun.cpp

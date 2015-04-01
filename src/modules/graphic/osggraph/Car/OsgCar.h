@@ -42,67 +42,67 @@ class SDWing3;
 
 class SDCar
 {
-    private :
-        osg::ref_ptr<osg::MatrixTransform> car_branch;
-        osg::ref_ptr<osg::Group> car_root;
-        osg::ref_ptr<osg::Vec3Array> shadowVertices;
-        osg::ref_ptr<osg::Geometry> quad;
-        osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
+private :
+    osg::ref_ptr<osg::MatrixTransform> car_branch;
+    osg::ref_ptr<osg::Group> car_root;
+    osg::ref_ptr<osg::Vec3Array> shadowVertices;
+    osg::ref_ptr<osg::Geometry> quad;
+    osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
 
-        tCarElt     *car;
+    tCarElt     *car;
 
-        SDWheels    wheels;
-        //SDCockpit   *cockpit;
-        //SDWing      *wing;
-        //SDWing3     * wing3;
-        //SDDriver    *driver;
+    SDWheels    wheels;
+    //SDCockpit   *cockpit;
+    //SDWing      *wing;
+    //SDWing3     * wing3;
+    //SDDriver    *driver;
 
-        SDCarShader *shader;
-        SDReflectionMapping *reflectionMapping;
-        int reflectionMappingMethod;
-        unsigned int rcvShadowMask;
-        unsigned int castShadowMask;
+    SDCarShader *shader;
+    SDReflectionMapping *reflectionMapping;
+    int reflectionMappingMethod;
+    unsigned int rcvShadowMask;
+    unsigned int castShadowMask;
 
-        void setReflectionMap(osg::ref_ptr<osg::Texture> map);
+    void setReflectionMap(osg::ref_ptr<osg::Texture> map);
 
-    public :
-        SDCar(void);
-        ~SDCar(void);
-        osg::ref_ptr<osg::Node> loadCar(tCarElt *car, bool tracktype, unsigned carshader);
-        void deactivateCar(tCarElt *car);
-        bool isCar(tCarElt*c);
-        SDReflectionMapping * getReflectionMap();
+public :
+    SDCar(void);
+    ~SDCar(void);
+    osg::ref_ptr<osg::Node> loadCar(tCarElt *car, bool tracktype, unsigned carshader);
+    void deactivateCar(tCarElt *car);
+    bool isCar(tCarElt*c);
+    SDReflectionMapping * getReflectionMap();
 
-        int getReflectionMappingMethod();
+    int getReflectionMappingMethod();
 
-        tCarElt * getCar();
+    tCarElt * getCar();
 
-        void activateCar(tCarElt *car);
-        void updateCar();
-        void updateShadingParameters(osg::Matrixf modelview);
+    void activateCar(tCarElt *car);
+    void updateCar();
+    void updateShadingParameters(osg::Matrixf modelview);
 };
 
 class SDCars
 {
-    private :
-        std::vector<SDCar *> the_cars;
-        osg::ref_ptr<osg::Group> cars_branch;
-        tSituation * situation;
+private :
+    std::vector<SDCar *> the_cars;
+    osg::ref_ptr<osg::Group> cars_branch;
+    tSituation * situation;
 
-        void addSDCar(SDCar * car);
+    void addSDCar(SDCar * car);
 
-    public :
-		SDCars(void);
-		~SDCars(void);
+public :
+    SDCars(void);
+    ~SDCars(void);
 
-        void loadCars(tSituation * pSituation, bool trackType);
-        void updateCars();
-        void deactivateCar(tCarElt*car);
-        void activateCar(tCarElt*car);
-        SDCar *getCar(tCarElt*car);
-        void unLoad();
-        void updateShadingParameters(osg::Matrixf modelview);
-        osg::ref_ptr<osg::Node> getCarsNode() { return cars_branch.get(); }
+    void loadCars(tSituation * pSituation, bool trackType);
+    void updateCars();
+    void deactivateCar(tCarElt*car);
+    void activateCar(tCarElt*car);
+    SDCar *getCar(tCarElt*car);
+    void unLoad();
+    void updateShadingParameters(osg::Matrixf modelview);
+    osg::ref_ptr<osg::Node> getCarsNode() { return cars_branch.get(); }
 };
 
 #endif /* _OSGCAR_H_ */

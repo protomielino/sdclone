@@ -22,8 +22,6 @@
 #include <osg/TextureCubeMap>
 #include <osg/Texture2D>
 
-//#include <car.h>
-
 #define REFLECTIONMAPPING_OFF 0
 #define REFLECTIONMAPPING_STATIC 1
 #define REFLECTIONMAPPING_HYBRID 2

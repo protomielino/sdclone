@@ -31,10 +31,8 @@
 SDCarShader::SDCarShader(osg::Node *car, SDCar *c)
 {
     std::string TmpPath = GetDataDir();
-    osg::ref_ptr<osg::Shader> vertShader =
-             new osg::Shader( osg::Shader::VERTEX);
-    osg::ref_ptr<osg::Shader> fragShader =
-                new osg::Shader( osg::Shader::FRAGMENT);
+    osg::ref_ptr<osg::Shader> vertShader = new osg::Shader( osg::Shader::VERTEX);
+    osg::ref_ptr<osg::Shader> fragShader = new osg::Shader( osg::Shader::FRAGMENT);
     vertShader->loadShaderSourceFromFile(TmpPath+"/data/shaders/car.vert");
     fragShader->loadShaderSourceFromFile(TmpPath+"/data/shaders/car.frag");
     program = new osg::Program;
@@ -48,11 +46,9 @@ SDCarShader::SDCarShader(osg::Node *car, SDCar *c)
 
     diffuseMap = new osg::Uniform("diffusemap", 0 );
     stateset->addUniform(diffuseMap);
-    //shadowMap = new osg::Uniform("shadowmap", 1);
-    //stateset->addUniform(shadowMap);
+
     specularColor = new osg::Uniform("specularColor", osg::Vec4(0.8f,0.8f,0.8f,1.0f));
     stateset->addUniform(specularColor);
-
 
     lightVector = stateset->getOrCreateUniform("lightvector",osg::Uniform::FLOAT_VEC3);
     lightPower = stateset->getOrCreateUniform("lightpower",osg::Uniform::FLOAT_VEC4);

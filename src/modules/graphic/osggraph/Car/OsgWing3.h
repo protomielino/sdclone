@@ -30,19 +30,19 @@
 
 class SDWing3
 {
-    private :
-        tCarElt *car;
-        osg::ref_ptr<osg::Switch> _wing3Switch;
+private :
+    tCarElt *car;
+    osg::ref_ptr<osg::Switch> _wing3Switch;
 
-        unsigned int rcvShadowMask;
-        unsigned int castShadowMask;
+    unsigned int rcvShadowMask;
+    unsigned int castShadowMask;
 
-    public :
-        SDWing3();
-        ~SDWing3();
+public :
+    SDWing3();
+    ~SDWing3();
 
-        osg::ref_ptr<osg::Switch> initWing3(tCarElt *car,void * handle);
-        void updateWing3();
+    osg::ref_ptr<osg::Switch> initWing3(tCarElt *car,void * handle);
+    void updateWing3();
 };
 
 #endif /* _OSGWING3_H_ */

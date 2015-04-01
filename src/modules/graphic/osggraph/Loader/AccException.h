@@ -24,15 +24,15 @@
 
 namespace acc3d
 {
-	class Exception
-	{
-		public:
-			Exception(std::string error);
-			~Exception();
-			std::string getError(){return _error;};
-		private:
-			std::string _error;
-	};
+class Exception
+{
+public:
+    Exception(std::string error);
+    ~Exception();
+    std::string getError(){return _error;};
+private:
+    std::string _error;
+};
 }
 
 #endif

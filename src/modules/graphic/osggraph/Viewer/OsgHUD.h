@@ -24,7 +24,6 @@
 
 #include <osg/Camera>
 
-//class cGrTrackMap;
 class SDFrameInfo;
 
 class SDHUD

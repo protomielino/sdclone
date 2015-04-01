@@ -28,16 +28,16 @@
 
 class SDWing
 {
-    private :
-        tCarElt *car;
+private :
+    tCarElt *car;
 
-        unsigned int rcvShadowMask;
-        unsigned int castShadowMask;
+    unsigned int rcvShadowMask;
+    unsigned int castShadowMask;
 
-    public :
-        SDWing();
-        ~SDWing();
-        osg::ref_ptr<osg::Switch> initWing(tCarElt *car,void * handle, bool tracktype);
+public :
+    SDWing();
+    ~SDWing();
+    osg::ref_ptr<osg::Switch> initWing(tCarElt *car,void * handle, bool tracktype);
 };
 
 #endif /* _OSGWING_H_ */

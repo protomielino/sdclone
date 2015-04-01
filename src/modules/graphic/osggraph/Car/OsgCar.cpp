@@ -70,8 +70,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
     int index;
     void *handle;
     const char *param;
-    //const char *param;,car_branch->getMatrix()
-    //int lg =0;
+
     int nranges = 0;
     rcvShadowMask = 0x1;
     castShadowMask = 0x2;
@@ -82,16 +81,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
 
     std::string TmpPath = GetDataDir();
     std::string strTPath;
-    
-    /*strncpy(car->_masterModel, GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_TEMPLATE, ""), MAX_NAME_LEN - 1);
-    car->_masterModel[MAX_NAME_LEN - 1] = 0;*/
 
     index = car->index;	/* current car's index */
     handle = car->_carHandle;
-
-    /* Initialize board */
-    /* Schedule texture mapping if we are using a custom skin and/or a master 3D model */
-    //const bool bMasterModel = strlen(car->_masterModel) != 0;
 
     GfLogInfo("[gr] Init(%d) car %s for driver %s index %d\n", index, car->_carName, car->_modName, car->_driverIndex);
     GfLogInfo("[gr] Init(%d) car %s MasterModel name\n", index, car->_masterModel);
@@ -105,14 +97,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
              GfDataDir(), car->_modName, car->_carName);
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
-    
-    /*if (bMasterModel)
-    {
-        snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/%s/",
-                 GfLocalDir(), car->_modName, car->_masterModel);
-        strTPath = TmpPath+buf;
-        loader.AddSearchPath(strTPath);
-    }*/
 
     snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/",
              GfDataDir(), car->_modName);
@@ -124,14 +108,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
     
-    /*if (bMasterModel)
-    {
-        lg += snprintf(buf, nMaxTexPathSize, "drivers/%s/%d/%s/",
-                       car->_modName, car->_driverIndex, car->_masterModel);
-        strTPath = TmpPath+buf;
-        loader.AddSearchPath(strTPath);
-    }*/
-    
     snprintf(buf, nMaxTexPathSize, "drivers/%s/%d/",
              car->_modName, car->_driverIndex);
     strTPath = TmpPath+buf;
@@ -141,14 +117,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
              car->_modName, car->_carName);
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
-    
-    /*if (bMasterModel)
-    {
-        snprintf(buf, nMaxTexPathSize, "drivers/%s/%s/",
-                 car->_modName, car->_masterModel);
-        strTPath = TmpPath+buf;
-        loader.AddSearchPath(strTPath);
-    }*/
 
     snprintf(buf, nMaxTexPathSize, "drivers/%s/", car->_modName);
     strTPath = TmpPath+buf;
@@ -157,13 +125,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
     snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
-    
-    /*if (bMasterModel)
-    {
-        snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_masterModel);
-        strTPath = TmpPath+buf;
-        loader.AddSearchPath(strTPath);
-    }*/
 
     snprintf(buf, nMaxTexPathSize, "data/objects/");
     strTPath = TmpPath+buf;
@@ -178,15 +139,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
     snprintf(buf, nMaxTexPathSize, "%s.ac",
              car->_carName); /* default car 3D model file */
     snprintf(path, 256, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
-    // param = GfParmGetStr(handle, path, PRM_CAR, buf);
 
     std::string strPath = GetDataDir();
-
-    /*if (bMasterModel)
-        sprintf(buf, "cars/models/%s/%s.acc", car->_masterModel, car->_masterModel);
-    else*/
-        sprintf(buf, "cars/models/%s/%s.acc", car->_carName, car->_carName);
-
+    sprintf(buf, "cars/models/%s/%s.acc", car->_carName, car->_carName);
     strPath+=buf;
 
     std::string name = car->_carName;
@@ -212,16 +167,12 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
 
     pCar = loader.Load3dFile(strPath, true);
 #if 0
-            std::string pCar_path = GetLocalDir();
-            pCar_path = pCar_path+name+".osg";
-            osgDB::writeNodeFile( *pCar, pCar_path );
+    std::string pCar_path = GetLocalDir();
+    pCar_path = pCar_path+name+".osg";
+    osgDB::writeNodeFile( *pCar, pCar_path );
 #endif
 
     GfLogInfo("Load Car ACC !\n");
-
-    /*strPath+=buf;
-    GfOut("Chemin Textures : %s\n", strTPath.c_str());
-    osg::ref_ptr<osg::Node> pCar = loader.Load3dFile(strPath, true);*/
 
     snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_WING_MODEL);
     param = GfParmGetStr(handle, path, PRM_WING_1, NULL);
@@ -255,9 +206,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
         else
             pWing->setSingleChildOn(1);
 #if 0
-    std::string pWing_path = GetLocalDir();
-    pWing_path = pWing_path+"wing.osg";
-    osgDB::writeNodeFile( *pWing, pWing_path );
+        std::string pWing_path = GetLocalDir();
+        pWing_path = pWing_path+"wing.osg";
+        osgDB::writeNodeFile( *pWing, pWing_path );
 #endif
     }
 
@@ -292,9 +243,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
         pWin3->setSingleChildOn(0);
 
 #if 0
-    std::string pWing3_path = GetLocalDir();
-    pWing3_path = pWing3_path+"wing3.osg";
-    osgDB::writeNodeFile( *pWin3, pWing3_path );
+        std::string pWing3_path = GetLocalDir();
+        pWing3_path = pWing3_path+"wing3.osg";
+        osgDB::writeNodeFile( *pWin3, pWing3_path );
 #endif
     }
 
@@ -309,19 +260,13 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
 
     if (param)
     {
-
-        /*if (bMasterModel)
-            sprintf(buf, "cars/models/%s/cockpit.ac", car->_masterModel);
-        else*/
         sprintf(buf, "cars/models/%s/cockpit.ac", car->_carName);
-
         strPath +=buf;
-
         cock= loader.Load3dFile(strPath, true);
 #if 0
-            std::string pCockpit_path = GetLocalDir();
-            pCockpit_path = pCockpit_path+"cockpit.osg";
-            osgDB::writeNodeFile( *cock, pCockpit_path );
+        std::string pCockpit_path = GetLocalDir();
+        pCockpit_path = pCockpit_path+"cockpit.osg";
+        osgDB::writeNodeFile( *cock, pCockpit_path );
 #endif
 
         GfLogTrace("Cockpit High Loading \n");
@@ -336,12 +281,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
             osg::ref_ptr<osg::MatrixTransform> steer = new osg::MatrixTransform;
 
             strPath = GetDataDir();
-
-            /*if (bMasterModel)
-                sprintf(buf, "cars/models/%s/histeer.acc", car->_masterModel);
-            else*/
-                sprintf(buf, "cars/models/%s/histeer.ac", car->_carName);
-
+            sprintf(buf, "cars/models/%s/histeer.ac", car->_carName);
             strPath+=buf;
             steer_branch = loader.Load3dFile(strPath, true);
 #if 0
@@ -362,93 +302,66 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
             pos = rot * pos;
             steer->addChild(steer_branch.get());
             steer->setMatrix(pos);
-
-            //cockpit->addChild(steer.get());
             GfLogTrace("Cockpit High Steer Loading \n");
         }
 
-        /*if (!cock)
-            pBody->setSingleChildOn(0);
-        else*/
-            //cockpit->setSingleChildOn(1);
-
     }
-        cockpit->addChild(cock.get());
-        pBody->addChild(cockpit.get(), false);
+    cockpit->addChild(cock.get());
+    pBody->addChild(cockpit.get(), false);
 #if 0
-        std::string pBody_path = GetLocalDir();
-        pBody_path = pBody_path+"body-"+name+".osg";
-        osgDB::writeNodeFile( *pBody, pBody_path );
+    std::string pBody_path = GetLocalDir();
+    pBody_path = pBody_path+"body-"+name+".osg";
+    osgDB::writeNodeFile( *pBody, pBody_path );
 #endif
 
-        // separate driver models for animation according to steering wheel angle ...
-        snprintf(path, 256, "%s/%s", SECT_GROBJECTS, LST_DRIVER);
-        nranges = GfParmGetEltNb(handle, path) + 1;
-        osg::ref_ptr<osg::Switch> driver = new osg::Switch;
+    // separate driver models for animation according to steering wheel angle ...
+    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, LST_DRIVER);
+    nranges = GfParmGetEltNb(handle, path) + 1;
+    osg::ref_ptr<osg::Switch> driver = new osg::Switch;
 
-        if (nranges > 1)
+    if (nranges > 1)
+    {
+        int selIndex = 0;
+        std::string tmp = GetLocalDir();
+        std::string driver_path;
+
+        // add the drivers
+        for (int i = 1; i < nranges; i++)
         {
-            // We have at least one separate driver model to add...
-            //osg::ref_ptr<osg::Node> driver_branch = new osg::Node;
+            osg::ref_ptr<osg::Node> driver_branch = new osg::Node;
+            osg::ref_ptr<osg::MatrixTransform> position = new osg::MatrixTransform;
 
-            //grCarInfo[index].DRMSelector = DRMSel = new ssgSelector;
-            //grCarInfo[index].carTransform->addKid(DRMSel);
+            snprintf(buf, nMaxTexPathSize, "%s/%s/%d", SECT_GROBJECTS, LST_DRIVER, i);
+            param = GfParmGetStr(handle, buf, PRM_DRIVERMODEL, "");
 
-            int selIndex = 0;
-            std::string tmp = GetLocalDir();
-            std::string driver_path;
+            tdble xpos = GfParmGetNum(handle, buf, PRM_XPOS, NULL, 0.0);
+            tdble ypos = GfParmGetNum(handle, buf, PRM_YPOS, NULL, 0.0);
+            tdble zpos = GfParmGetNum(handle, buf, PRM_ZPOS, NULL, 0.0);
+            osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
 
-            // add the drivers
-            for (int i = 1; i < nranges; i++)
-            {
-                osg::ref_ptr<osg::Node> driver_branch = new osg::Node;
-                osg::ref_ptr<osg::MatrixTransform> position = new osg::MatrixTransform;
+            driver_path = tmp+param;
+            driver_branch = loader.Load3dFile(driver_path, true);
 
-                snprintf(buf, nMaxTexPathSize, "%s/%s/%d", SECT_GROBJECTS, LST_DRIVER, i);
-                param = GfParmGetStr(handle, buf, PRM_DRIVERMODEL, "");
-                //grCarInfo[index].DRMThreshold[selIndex] = GfParmGetNum(handle, buf, PRM_DRIVERSTEER, NULL, 0.0);
+            position->addChild(driver_branch);
+            driver->addChild(position);
+            driver_path ="";
 
-                tdble xpos = GfParmGetNum(handle, buf, PRM_XPOS, NULL, 0.0);
-                tdble ypos = GfParmGetNum(handle, buf, PRM_YPOS, NULL, 0.0);
-                tdble zpos = GfParmGetNum(handle, buf, PRM_ZPOS, NULL, 0.0);
-                osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
-
-                driver_path = tmp+param;
-
-                driver_branch = loader.Load3dFile(driver_path, true);
-
-                position->addChild(driver_branch);
-                driver->addChild(position);
-                driver_path ="";
-
-                selIndex++;
-            }
-
-            driver->setSingleChildOn(0);
-
-            // select a default driver - steer value of 0.0 is desired...
-            /*for (i = 1; i < nranges; i++)
-            {
-                if (grCarInfo[index].DRMThreshold[i-1] == 0.0f)
-                {
-                    DRMSel->select( grCarInfo[index].DRMSelectMask[i-1] );
-                    break;
-                }
-            }
-            if (i == nranges)
-                DRMSel->select( grCarInfo[index].DRMSelectMask[0] );*/
-
-        #if 0
-            std::string pDriver_path = GetLocalDir();
-            pDriver_path = pDriver_path+"driver.osg";
-            osgDB::writeNodeFile( *driver, pDriver_path );
-        #endif
+            selIndex++;
         }
 
-        gCar->addChild(pCar.get());
-        gCar->addChild(pWing.get());
-        gCar->addChild(pWin3.get());
-        gCar->addChild(driver.get());
+        driver->setSingleChildOn(0);
+
+#if 0
+        std::string pDriver_path = GetLocalDir();
+        pDriver_path = pDriver_path+"driver.osg";
+        osgDB::writeNodeFile( *driver, pDriver_path );
+#endif
+    }
+
+    gCar->addChild(pCar.get());
+    gCar->addChild(pWing.get());
+    gCar->addChild(pWin3.get());
+    gCar->addChild(driver.get());
 #else
 
     osg::ref_ptr<osg::Group> gCar = new osg::Group;
@@ -486,40 +399,33 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, unsigned ca
     options->getDatabasePathList().clear();
 #endif
 
-        pBody->addChild(gCar.get(), true);
-        pBody->setSingleChildOn(1);
+    pBody->addChild(gCar.get(), true);
+    pBody->setSingleChildOn(1);
 
-        osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
-        transform1->addChild(pBody.get());
-        transform1->setNodeMask(rcvShadowMask | castShadowMask);
+    osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
+    transform1->addChild(pBody.get());
+    transform1->setNodeMask(rcvShadowMask | castShadowMask);
 
-        // GfOut("loaded car %d",pCar.get());
-        this->car_branch = transform1.get();
+    // GfOut("loaded car %d",pCar.get());
+    this->car_branch = transform1.get();
 
-        //wheels = new SDWheels;
-        this->car_branch->addChild(wheels.initWheels(car,handle));
-        /*this->car_branch->getOrCreateStateSet()->setMode
-            ( GL_DEPTH_TEST, osg::StateAttribute::PROTECTED|osg::StateAttribute::ON );*/
+    //wheels = new SDWheels;
+    this->car_branch->addChild(wheels.initWheels(car,handle));
 
-        this->car_root = new osg::Group;
-        car_root->addChild(car_branch);
+    this->car_root = new osg::Group;
+    car_root->addChild(car_branch);
 
-        /*if (SHADOW_TECHNIQUE == 0)
-        this->car_root->addChild(this->initOcclusionQuad(car));*/
+    this->shader = new SDCarShader(pCar.get(), this);
 
-        //car_root->setNodeMask(1);
+    if (carshader)
+        this->reflectionMappingMethod = REFLECTIONMAPPING_DYNAMIC;
+    else
+        this->reflectionMappingMethod = REFLECTIONMAPPING_OFF;
 
-        this->shader = new SDCarShader(pCar.get(), this);
+    this->reflectionMapping = new SDReflectionMapping(this);
+    this->setReflectionMap(reflectionMapping->getReflectionMap());
 
-        if (carshader)
-            this->reflectionMappingMethod = REFLECTIONMAPPING_DYNAMIC;
-        else
-            this->reflectionMappingMethod = REFLECTIONMAPPING_OFF;
-
-        this->reflectionMapping = new SDReflectionMapping(this);
-        this->setReflectionMap(reflectionMapping->getReflectionMap());
-
-        return this->car_root;
+    return this->car_root;
 }
 
 bool SDCar::isCar(tCarElt*c)
@@ -554,7 +460,6 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car)
     std::string TmpPath = GetDataDir();
 
     //  GfOut("\n################## LOADING SHADOW ###############################\n");
-
     std::string shadowTextureName = GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_SHADOW_TEXTURE, "");
 
     snprintf(buf, sizeof(buf), "cars/models/%s/", car->_carName);
@@ -565,10 +470,10 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car)
     shadowTextureName = TmpPath +dir+shadowTextureName;
 
     // GfOut("\n lepath = %s\n",shadowTextureName.c_str());
-
     osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array;
     osg::ref_ptr<osg::Vec2Array> texcoords = new osg::Vec2Array;
     vtx._v[2] = 0.0;
+
     for (i = 0, x = car->_dimension_x * MULT / 2.0; i < GR_SHADOW_POINTS / 2;
          i++, x -= car->_dimension_x * MULT / (float)(GR_SHADOW_POINTS - 2) * 2.0)
     {
@@ -614,7 +519,6 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car)
     root->addDrawable( quad.get() );
 
     osg::StateSet* stateset = root->getOrCreateStateSet();
-    //stateset->setMode( GL_DEPTH_TEST, osg::StateAttribute::OFF );
     stateset->setRenderBinDetails( 2, "DepthSortedBin");
     stateset->setTextureAttributeAndModes(0, texture.get() );
     stateset->setAttributeAndModes( blendFunc );
@@ -623,7 +527,6 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car)
     shadowVertices = vertices;
 
     //  GfOut("\n################## LOADED SHADOW ###############################\n");
-
     return root.get();
 }
 
@@ -685,7 +588,7 @@ void SDCar::updateShadingParameters(osg::Matrixf modelview)
 
 void SDCar::setReflectionMap(osg::ref_ptr<osg::Texture> map)
 {
-   car_branch->getOrCreateStateSet()->setTextureAttributeAndModes(2, map, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
+    car_branch->getOrCreateStateSet()->setTextureAttributeAndModes(2, map, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 }
 
 SDCars::SDCars(void)
