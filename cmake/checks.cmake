@@ -245,6 +245,20 @@ MACRO(CHECK_LIBRARIES)
 		MESSAGE(STATUS "Looking for library SDL - NOT found")
 	ENDIF(SDL_FOUND)
 	
+	# SDL2
+	IF(OPTION_SDL2)
+		IF(NOT SDL2_FOUND)
+			Find_Package(SDL2)
+		ENDIF()
+
+		IF(SDL2_FOUND)
+			SET(HAVE_LIBSDL2 1)
+			MESSAGE(STATUS "Looking for library SDL2 - found")
+		ELSE(SDL2_FOUND)
+			MESSAGE(STATUS "Looking for library SDL2 - NOT found")
+		ENDIF(SDL2_FOUND)
+	ENDIF(OPTION_SDL2)
+	
 	# OSG
 	IF(OPTION_OSGGRAPH)
 	

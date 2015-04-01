@@ -9,7 +9,12 @@ SET(_HEADERS previewmenu.h)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(robottools tgf tgfclient math portability)
-ADD_SDL_INCLUDEDIR()
+
+IF(OPTION_SDL2)
+     ADD_SDL2_INCLUDEDIR()
+ELSE(OPTION_SDL2)
+     ADD_SDL_INCLUDEDIR()
+ENDIF(OPTION_SDL2)
 ADD_PLIB_INCLUDEDIR()
 
 #disable developer warning
