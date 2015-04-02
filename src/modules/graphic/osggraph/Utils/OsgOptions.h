@@ -4,7 +4,7 @@
     created                  : Thu Mar 31 00:00:41 CEST 2015
     copyright                : (C) 2015 by Xavier Bertaux
     email                    : bertauxx@yahoo.fr
-    version                  : $Id: OsgOptions.h 4693 2012-04-13 03:12:09Z torcs-ng $
+    version                  : $Id: OsgOptions.h 5940 2015-04-01 03:12:09Z torcs-ng $
 
  ***************************************************************************/
 
@@ -29,7 +29,37 @@ public:
     ~SDOptions( void );
 
 private:
+    unsigned int _SmokeValue;
+    unsigned int _SmokeDuration;
+    unsigned int _SmokeInterval;
 
+    unsigned int _SkidValue;
+    unsigned int _SkidLength;
+    unsigned int _SkidInterval;
+
+    unsigned int _LOD;
+
+    bool         _bgsky;
+    unsigned int _DynamicSkyDome;
+    unsigned int _SkyDomeDistance;
+    unsigned int _Max_Visibility;
+    unsigned int _PrecipitationDensity;
+    unsigned int _Rain;
+
+    unsigned int _CloudLayer;
+
+    unsigned int _SceneLOD;
+    bool         _Cockpit3D;
+
+    unsigned int _ShadowType;
+    int          _ShadowSize;
+    unsigned int _ShadowQuality;
+
+    unsigned int _Shaders;
+    int          _ShadersQuality;
+    int          _ShadersSize;
+
+    bool         _NormalMap;
 };
 
 #endif /* _OSGOPTIONS_H_ */
