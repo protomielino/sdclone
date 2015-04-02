@@ -570,7 +570,7 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 	SDL_SetWindowPosition(GfuiWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
 	// attempt to make window operational
-	SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, 1, 9);
+	SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, -1, 0);
 	SDL_RenderPresent(renderer);
 
 	/* Create OpenGL context */
