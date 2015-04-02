@@ -1154,19 +1154,21 @@ xmlExternalEntityRefHandler (XML_Parser mainparser,
 static int
 parseXml (struct parmHandle *parmHandle, char *buf, int len, int done)
 {
-	if (!XML_Parse(parmHandle->parser, buf, len, done)) {
+    if (!XML_Parse(parmHandle->parser, buf, len, done))
+    {
 		if (TraceLoggersAvailable)
 			GfLogError ("parseXml: %s at line %d\n",
 				(char*)XML_ErrorString (XML_GetErrorCode (parmHandle->parser)),
 				XML_GetCurrentLineNumber (parmHandle->parser));
 		else
-			fprintf (stderr,"parseXml: %s at line %d\n",
+            fprintf (stderr,"parseXml: %s at line %lu\n",
 				(char*)XML_ErrorString (XML_GetErrorCode (parmHandle->parser)),
 				XML_GetCurrentLineNumber (parmHandle->parser));
 		return 1;
 	}
 
-	if (done) {
+    if (done)
+    {
 		XML_ParserFree(parmHandle->parser);
 		parmHandle->parser = 0;
 	}
