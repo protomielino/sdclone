@@ -119,47 +119,47 @@ RmOptimizationScreenStart(const char *title, const char *bgimg)
     int titleId = GfuiMenuCreateLabelControl(HScreen, hmenu, "titlelabel");
     GfuiLabelSetText(HScreen, titleId, title);
 
-	char* StatusLabel = "Status";
+	const char* StatusLabel = "Status";
     StatusLabelId = GfuiMenuCreateLabelControl(HScreen, hmenu, "StatusLabel");
     GfuiLabelSetText(HScreen, StatusLabelId, StatusLabel);
 
-	char* InitialLapTimeLabel = "Initial lap time:";
+	const char* InitialLapTimeLabel = "Initial lap time:";
     int InitialLapTimeId = GfuiMenuCreateLabelControl(HScreen, hmenu, "InitialLapTimeLabel");
     GfuiLabelSetText(HScreen, InitialLapTimeId, InitialLapTimeLabel);
     InitialLapTimeValueId = GfuiMenuCreateLabelControl(HScreen, hmenu, "InitialLapTimeValue");
     GfuiLabelSetText(HScreen, InitialLapTimeValueId, "");
 
-	char* TotalLapTimeLabel = "Total lap time:";
+	const char* TotalLapTimeLabel = "Total lap time:";
     TotalLapTimeId = GfuiMenuCreateLabelControl(HScreen, hmenu, "TotalLapTimeLabel");
     GfuiLabelSetText(HScreen, TotalLapTimeId, TotalLapTimeLabel);
     TotalLapTimeValueId = GfuiMenuCreateLabelControl(HScreen, hmenu, "TotalLapTimeValue");
     GfuiLabelSetText(HScreen, TotalLapTimeValueId, "");
 
-	char* BestLapTimeLabel = "Best lap time:";
+	const char* BestLapTimeLabel = "Best lap time:";
     int BestLapTimeId = GfuiMenuCreateLabelControl(HScreen, hmenu, "BestLapTimeLabel");
     GfuiLabelSetText(HScreen, BestLapTimeId, BestLapTimeLabel);
     BestLapTimeValueId = GfuiMenuCreateLabelControl(HScreen, hmenu, "BestLapTimeValue");
     GfuiLabelSetText(HScreen, BestLapTimeValueId, "");
 
-	char* LoopsDoneLabel = "Loops done:";
+	const char* LoopsDoneLabel = "Loops done:";
     int LoopsDoneId = GfuiMenuCreateLabelControl(HScreen, hmenu, "LoopsDoneLabel");
     GfuiLabelSetText(HScreen, LoopsDoneId, LoopsDoneLabel);
     LoopsDoneValueId = GfuiMenuCreateLabelControl(HScreen, hmenu, "LoopsDoneValue");
     GfuiLabelSetText(HScreen, LoopsDoneValueId, "");
 
-	char* LoopsRemainingLabel = "Loops remaining:";
+	const char* LoopsRemainingLabel = "Loops remaining:";
     int LoopsRemainingId = GfuiMenuCreateLabelControl(HScreen, hmenu, "LoopsRemainingLabel");
     GfuiLabelSetText(HScreen, LoopsRemainingId, LoopsRemainingLabel);
     LoopsRemainingValueId = GfuiMenuCreateLabelControl(HScreen, hmenu, "LoopsRemainingValue");
     GfuiLabelSetText(HScreen, LoopsRemainingValueId, "");
 
-	char* VariationScaleLabel = "Variation scale:";
+	const char* VariationScaleLabel = "Variation scale:";
     int VariationScaleId = GfuiMenuCreateLabelControl(HScreen, hmenu, "VariationScaleLabel");
     GfuiLabelSetText(HScreen, VariationScaleId, VariationScaleLabel);
     VariationScaleValueId = GfuiMenuCreateLabelControl(HScreen, hmenu, "VariationScaleValue");
     GfuiLabelSetText(HScreen, VariationScaleValueId, "");
 
-	char* ParameterListLabel = "Parameters varied";
+	const char* ParameterListLabel = "Parameters varied";
     ParameterListLabelId = GfuiMenuCreateLabelControl(HScreen, hmenu, "ParametersVariedLabel");
     GfuiLabelSetText(HScreen, ParameterListLabelId, ParameterListLabel);
 
@@ -409,10 +409,10 @@ RmOptimizationScreenSetParameterText(int N, char** Labels, char** Values, char**
 	{
 	    void *hmenu = GfuiMenuLoad("optimizationscreen.xml");
 
-		char* StatusLabel = "Final Status";
+		const char* StatusLabel = "Final Status";
 		GfuiLabelSetText(HScreen, StatusLabelId, StatusLabel);
 
-		char* TotalLapTimeLabel = "Faster by:";
+		const char* TotalLapTimeLabel = "Faster by:";
 		GfuiLabelSetText(HScreen, TotalLapTimeId, TotalLapTimeLabel);
 
 		freez(TotalLapTimeValue);
