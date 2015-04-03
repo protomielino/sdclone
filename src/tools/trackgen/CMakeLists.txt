@@ -28,7 +28,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_EXE_LINKER_FLAGS_DEBUG 
-        "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcmt.lib")
+        "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libcmtd.lib")
     SET(CMAKE_EXE_LINKER_FLAGS_RELEASE 
         "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmt.lib")
 ENDIF(MSVC)
