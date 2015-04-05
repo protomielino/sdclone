@@ -585,9 +585,6 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 #endif
 				0x00000000);
 
-	// don't try to initialise (for now)
-	bTryBestVInitMode = 0;
-
 	SDL_ShowWindow(GfuiWindow);
 
 	if (bFullScreen) {

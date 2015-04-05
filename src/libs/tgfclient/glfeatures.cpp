@@ -248,7 +248,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 #if SDL_MAJOR_VERSION >= 2
 						SDL_SetWindowSize(GfuiWindow, nWidth, nHeight);
 
-						SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, 1, 9);
+						SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, -1, 0);
 						SDL_RenderPresent(renderer);
 
 						SDL_GLContext context;
@@ -295,7 +295,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 #if SDL_MAJOR_VERSION >= 2
 						SDL_SetWindowSize(GfuiWindow, nWidth, nHeight);
 
-						SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, 1, 9);
+						SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, -1, 0);
 						SDL_RenderPresent(renderer);
 
 						SDL_GLContext context;
