@@ -879,7 +879,7 @@ void GfScrShutdown(void)
 	GfLogTrace("Shutting down screen.\n");
 
 	// Shutdown SDL video sub-system.
-	SDL_QuitSubSystem(SDL_INIT_VIDEO);
+	SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
 	// If there's an 'in-test' screen properties section in the config file,
 	// * if the test state is 'to do', do nothing (will be taken care of in next GfScrInit),
