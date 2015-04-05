@@ -426,7 +426,15 @@ DisplayMenu::DisplayMenu()
 
 DisplayMenu::~DisplayMenu()
 {
-	free(_aColorDepths);
+	int nDefColorDepths;
+	int* aDefColorDepths = GfScrGetDefaultColorDepths(&nDefColorDepths);
+	if (_aColorDepths && _aColorDepths != aDefColorDepths)
+		free(_aColorDepths);
+
+	int nDefScreenSizes;
+	tScreenSize* aDefScreenSizes = GfScrGetDefaultSizes(&nDefScreenSizes);
+	if (_aScreenSizes && _aScreenSizes != aDefScreenSizes)
+		free(_aScreenSizes);
 }
 
 bool DisplayMenu::initialize(void *pPreviousMenu)
@@ -528,4 +536,5 @@ void* DisplayMenuInit(void *pPreviousMenu)
 void DisplayMenuRelease(void)
 {
 	delete PDisplayMenu;
+   PDisplayMenu = NULL;
 }
