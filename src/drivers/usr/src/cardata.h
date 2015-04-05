@@ -64,12 +64,12 @@ class SingleCardata
 	protected:
 		static float getSpeed(tCarElt *car, float trackangle);
 
-		float speed;		// speed in direction of the track.
+        float speed;            // speed in direction of the track.
 		float truespeed;		// speed accounting for bends
-		float width;		// the cars needed width on the track.
-		float length;		// the cars needed length on the track.
-		float trackangle;	// Track angle at the opponents position.
-		float angle;		// The angle of the car relative to the track tangent.
+        float width;            // the cars needed width on the track.
+        float length;           // the cars needed length on the track.
+        float trackangle;       // Track angle at the opponents position.
+        float angle;            // The angle of the car relative to the track tangent.
 		float tolftwall;        // how far to the nearest left barrier
 		float torgtwall;        // how far to the nearest Right barrier
 
@@ -77,7 +77,7 @@ class SingleCardata
         tPosd corner2[4];
         tPosd lastspeed[3];
 
-		tCarElt *car;		// For identification.
+        tCarElt *car;           // For identification.
 };
 
 

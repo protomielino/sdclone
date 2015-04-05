@@ -128,11 +128,6 @@ static const double	s_sgMax[] = { 0.03, 100 };
 static const int	s_sgSteps[] = { 10,  18 };
 
 TDriver::TDriver(int Index, const int robot_type):
-    m_pitControl(m_track, m_pitPath[PATH_NORMAL]),
-    m_CarType(0),
-    m_driveType(DT_RWD),
-	m_gearUpRpm(8000),
-
     m_XXX(0),
 
     m_SideScaleMu(0.97),
@@ -147,6 +142,31 @@ TDriver::TDriver(int Index, const int robot_type):
     m_WeatherCode(0),
     m_DryCode(0),
 
+    m_pitControl(m_track, m_pitPath[PATH_NORMAL]),
+    m_CarType(0),
+    m_driveType(DT_RWD),
+    m_gearUpRpm(8000.0),
+
+    m_prevYawError(0.0),
+    m_prevLineError(0.0),
+    m_Flying(0.0),
+    m_avgAY(0.0),
+	m_raceStart(false),
+    m_avoidS(1.0),
+    m_avoidT(0.0),
+	m_followPath(PATH_NORMAL),
+
+    m_FuelNeeded(0.0),
+
+    m_steerGraph(2, s_sgMin, s_sgMax, s_sgSteps, 0),
+    m_steerAvg(19, 0.001, 0.02, 15, 20, 95),
+
+    m_lastB(0.0),
+    m_lastBrk(0.0),
+    m_lastTargV(0.0),
+
+    m_Strategy(NULL),
+
     HasABS(false),
     HasESP(false),
     HasTCL(false),
@@ -154,26 +174,7 @@ TDriver::TDriver(int Index, const int robot_type):
 
     m_TclRange(10.0),
     m_TclSlip(1.6),
-    m_TclFactor(1.0),
-
-	m_prevYawError(0),
-	m_prevLineError(0),
-    m_Flying(0),
-	m_avgAY(0),
-	m_raceStart(false),
-	m_avoidS(1),
-	m_avoidT(0),
-	m_followPath(PATH_NORMAL),
-	m_lastB(0),
-	m_lastBrk(0),
-	m_lastTargV(0),
-	m_maxAccel(0, 150, 30, 1),
-	m_steerGraph(2, s_sgMin, s_sgMax, s_sgSteps, 0),
-    m_steerAvg(19, 0.001, 0.02, 15, 20, 95),
-
-    m_FuelNeeded(0),
-
-    m_Strategy(NULL)
+    m_TclFactor(1.0)
 {
     INDEX = Index;
 
@@ -755,7 +756,7 @@ double TDriver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 
 		int	k = int(floor((pi.k - K_MIN) / K_STEP));
 		int	s = int(floor((spd0 - SPD_MIN) / SPD_STEP));
-		double	ae = 0;
+        double	ae = 0;
 		if( k >= 0 && k < K_N && s >= 0 && s < SPD_N )
 		{
 			ae = m_angle[s][k] - ang;
@@ -827,12 +828,12 @@ double TDriver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 	double	x = car->pub.DynGCg.pos.x + midPt * cos(car->_yaw);
 	double	y = car->pub.DynGCg.pos.y + midPt * sin(car->_yaw);
 
-	static double	oldX = x;
-	static double	oldY = y;
-	double	velX = (x - oldX) / 0.02;
-	double	velY = (y - oldY) / 0.02;
-	oldX = x;
-	oldY = y;
+    // static double	oldX = x;                   // Removed 5th April 2015 - Not Used
+    // static double	oldY = y;                   // Removed 5th April 2015 - Not Used
+    //double	velX = (x - oldX) / 0.02;           // Removed 5th April 2015 - Not Used
+    //double	velY = (y - oldY) / 0.02;           // Removed 5th April 2015 - Not Used
+    // oldX = x;                                    // Removed 5th April 2015 - Not Used
+    // oldY = y;                                    // Removed 5th April 2015 - Not Used
 
 	tTrkLocPos	trkPos;
 	RtTrackGlobal2Local(car->_trkPos.seg, x, y, &trkPos, 0);
@@ -906,7 +907,7 @@ double TDriver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 	double	yawU = car->_yaw_rate;
 
 	// future yaw rate required ahead.
-	double	yawV = aheadPi.k * spd0;
+    //double	yawV = aheadPi.k * spd0;        // Removed 5th April 2015 - Not Used
 
 	// future yaw required ahead (assuming current yaw to be 0).
 	double	yawS = aheadPi.oang - car->_yaw;
@@ -1282,7 +1283,7 @@ void TDriver::Drive( tSituation* s )
 		m_lastAng = m_lastAng * 0.75 + angle * 0.25;
 	}
 
-	const double G = 9.81;
+    //const double G = 9.81;            // Removed 5th April 2015 - Not Used
 
 	double	acc = 1.0;
 	double	brk = 0;
@@ -1480,15 +1481,15 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 {
 	m_pShared->m_teamInfo.GetAt(car->index)->damage = car->_dammage;
 
-	double	trackLen = m_track.GetLength();
-	double	myPos = RtGetDistFromStart(car);
+    // double	trackLen = m_track.GetLength();     // Removed 5th April 2015 - Not Used
+    // double	myPos = RtGetDistFromStart(car);    // Removed 5th April 2015 - Not USed
 	double	mySpd = hypot(car->_speed_X, car->_speed_Y);
 	if( fabs(mySpd) < 0.01 )
 		mySpd = 0.01;
 
 	double	myDirX = car->_speed_X / mySpd;
 	double	myDirY = car->_speed_Y / mySpd;
-	int		myIdx = 0;
+    // int		myIdx = 0;                          // Removed 5th April 2015 - Not Used
 
     for( int i = 0; i < m_nCars; i++ )
 	{
@@ -1833,9 +1834,9 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 			double	colTime = fabs(k) > maxSpdK ? 0.5 : 0.7;
 			double	catTime = fabs(k) > maxSpdK ? 0.5 :	2.5;
 			double	cacTime = fabs(k) > maxSpdK ? 0.5 : 2.5;
-            bool	catching = oi.catchTime < colTime && oi.GotFlags(Opponent::F_COLLIDE)  ||
-                                oi.catchTime    < catTime && oi.GotFlags(Opponent::F_CATCHING) ||
-                                oi.catchAccTime < cacTime && oi.GotFlags(Opponent::F_CATCHING_ACC);
+            bool	catching = ( oi.catchTime < colTime && oi.GotFlags(Opponent::F_COLLIDE))  ||
+                               ( oi.catchTime    < catTime && oi.GotFlags(Opponent::F_CATCHING)) ||
+                               ( oi.catchAccTime < cacTime && oi.GotFlags(Opponent::F_CATCHING_ACC));
 
             if( !ignoreTeamMate && (oi.avoidLatchTime > 0 || catching || oi.GotFlags(Opponent::F_DANGEROUS)))
 			{
@@ -1934,7 +1935,7 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 
     LogSHADOW.debug("ss %5.1f %5.1f  as %5.1f %5.1f  bpo %5.1f\r", ai.sideSpan.a, ai.sideSpan.b, ai.aheadSpan.a, ai.aheadSpan.b, ai.bestPathOffs );
 
-	double	pos = car->_distFromStartLine;
+    // double	pos = car->_distFromStartLine;          // Removed 5 April 2015 - Not Used
 	int		carIdx = m_track.IndexFromPos(m_track.CalcPos(car));
 	ai.k = 	m_path[PATH_NORMAL].GetAt(carIdx).k;
 	int		NSEG = m_track.GetSize();
@@ -1953,7 +1954,7 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 
 	GenericAvoidance		ga;
 
-	int		priority = ga.priority(ai, car);
+    // int		priority = ga.priority(ai, car);        // Removed 5th April 2015 - Not Used
 	Vec2d	target = ga.calcTarget(ai, car, *this);
 
 #if defined(USE_NEW_AVOIDANCE)
@@ -1978,7 +1979,7 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 		m_attractor = target.x;
 
 	double	targetS = 1 - target.y;
-    if( m_avoidS != 1 && m_attractor == 0 || m_avoidS != targetS && m_attractor != 0 )
+    if(( m_avoidS != 1 && m_attractor == 0) || (m_avoidS != targetS && m_attractor != 0))
 	{
 		targetS = (m_attractor == 0) ? 1 : 0;//0.35;
 		double	avoidA = targetS > m_avoidS ? avoidSMaxA : -avoidSMaxA;
@@ -2020,9 +2021,9 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 		m_avoidS = 1;
 		m_avoidSVel = 0;
 	}
-	else if( oldAvoidS < targetS && m_avoidS >= targetS ||
-			 oldAvoidS > targetS && m_avoidS <= targetS ||
-			 fabs(targetS - m_avoidS) < 0.0005 )
+    else if(( oldAvoidS < targetS && m_avoidS >= targetS ) ||
+            ( oldAvoidS > targetS && m_avoidS <= targetS ) ||
+            ( fabs(targetS - m_avoidS) < 0.0005 ))
 	{
 		m_avoidS = targetS;
 		m_avoidSVel = 0;
@@ -2073,8 +2074,8 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 		m_avoidT = 1;
 		m_avoidTVel = 0;
 	}
-	else if( oldAvoidT < attractT && m_avoidT >= attractT ||
-			 oldAvoidT > attractT && m_avoidT <= attractT )
+    else if(( oldAvoidT < attractT && m_avoidT >= attractT ) ||
+            ( oldAvoidT > attractT && m_avoidT <= attractT ))
 	{
 		m_avoidT = attractT;
 		m_avoidTVel = 0;
@@ -2299,8 +2300,8 @@ double TDriver::ApplyTractionControl( tCarElt* car, double acc )
 		tract = 0.1;
 
 		wr /= count;
-		double	gr = car->_gearRatio[car->_gear + car->_gearOffset];
-		double	rpmForSpd = gr * car->_speed_x / wr;
+        // double	gr = car->_gearRatio[car->_gear + car->_gearOffset];    // Removed 5th April 2015 - Not Used
+        // double	rpmForSpd = gr * car->_speed_x / wr;                    // Removed 5th April 2015 - Not Used
 
 		acc = 0;
 	}

@@ -22,42 +22,42 @@
 
 void AddMod( LRLMod *mod, int divstart, int divend, double dval, int ival )
 {
- if (!mod) return;
+    if (!mod) return;
 
- mod->data[mod->used].divstart = divstart;
- mod->data[mod->used].divend = divend;
- mod->data[mod->used].dval = dval;
- mod->data[mod->used].ival = ival;
- mod->used++;
+    mod->data[mod->used].divstart = divstart;
+    mod->data[mod->used].divend = divend;
+    mod->data[mod->used].dval = dval;
+    mod->data[mod->used].ival = ival;
+    mod->used++;
 }
 
 
 double GetModD( LRLMod *mod, int div )
 {
- int i;
+    int i;
 
- if (!mod)
-  return 0.0;
+    if (!mod)
+        return 0.0;
 
- for (i=0; i<mod->used; i++)
- {
-  if (div >= mod->data[i].divstart && div <= mod->data[i].divend)
-   return mod->data[i].dval;
- }
- return 0.0;
+    for (i=0; i<mod->used; i++)
+    {
+        if (div >= mod->data[i].divstart && div <= mod->data[i].divend)
+            return mod->data[i].dval;
+    }
+    return 0.0;
 }
 
 int GetModI( LRLMod *mod, int div )
 {
- int i;
+    int i;
 
- if (!mod)
-  return 0;
+    if (!mod)
+        return 0;
 
- for (i=0; i<mod->used; i++)
- {
-  if (div >= mod->data[i].divstart && div <= mod->data[i].divend)
-   return mod->data[i].ival;
- }
- return 0;
+    for (i=0; i<mod->used; i++)
+    {
+        if (div >= mod->data[i].divstart && div <= mod->data[i].divend)
+            return mod->data[i].ival;
+    }
+    return 0;
 }

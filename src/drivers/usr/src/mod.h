@@ -22,16 +22,17 @@
 
 #define LMOD_DATA 200
 
-typedef struct {
-  double dval;
-  int ival;
-  int divstart;
-  int divend;
+typedef struct
+{
+    double dval;
+    int ival;
+    int divstart;
+    int divend;
 } LRLModData;
 
 typedef struct {
-  LRLModData data[LMOD_DATA];
-  int used;
+    LRLModData data[LMOD_DATA];
+    int used;
 } LRLMod;
 
 extern void AddMod( LRLMod *mod, int divstart, int divend, double dval, int ival );
