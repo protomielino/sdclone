@@ -86,7 +86,7 @@ void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituat
     }
 
     m_expectedfuelperlap = fuelPerLap;
-    double raceDist = 0.0;
+    //double raceDist = 0.0;                // Removed 6th April 2015 - Not Used
     float fuelForRace = 0.0;
     int numPitstop = 0;
     int raceLaps = s->_totLaps + 1;
@@ -364,7 +364,7 @@ float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
     int lapsToEnd;
 
     lapsToEnd = car->_remainingLaps - car->_lapsBehindLeader;
-    int inLap = s->_totLaps - car->_remainingLaps;
+    // int inLap = s->_totLaps - car->_remainingLaps;               // Removed 6th April 2015 - Not Used
     fuelToEnd = MIN(getRefuel1(lapsToEnd), getRefuel2(lapsToEnd));
 
     //m_remainingstops = int(floor(fuelToEnd / car->_tank));

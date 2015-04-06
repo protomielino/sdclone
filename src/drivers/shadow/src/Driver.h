@@ -230,7 +230,8 @@ public:
     double  CalcFriction_shadow_LP1(double Crv);
     double  CalcFriction_shadow_REF(double Crv);
 
-    //double CalcCrv_shadow(double Crv);
+    double  CalcCrv_shadow(double Crv);
+    double  CalcCrv_shadow_SC(double Crv);
     double  CalcCrv_shadow_Identity(double Crv);
     double  CalcCrv_shadow_36GP(double Crv);
     double  CalcCrv_shadow_LP1(double Crv);
@@ -253,18 +254,6 @@ public:
     bool        m_UseAccelOut;
     float       m_DeltaAccel;                           //
     float       m_DeltaAccelRain;                       //
-
-    double      m_XXX;
-    float       m_SideScaleMu;
-    float       m_SideScaleBrake;
-    float       m_SideBorderOuter;
-    float       m_SideBorderInner;
-    bool        m_Rain;
-    double      m_RainIntensity;
-    double      m_ScaleMuRain;
-    double      m_ScaleBrakeRain;
-    int         m_WeatherCode;                              // Track specific weather
-    int         m_DryCode;                                  // Track specific dry weather
 
     double      m_BrakeCoeff[NBR_BRAKECOEFF+1];             // Brake coefficients
     int         m_LastBrakeCoefIndex;                       // Index of last brake coef.
@@ -333,7 +322,30 @@ private:
 
     tSituation      *m_Situation;           // situation
 	int				m_driveType;
-	double			m_gearUpRpm;			// for gear changing.
+    double			m_gearUpRpm;			// for gear changing.
+
+    double          m_XXX;
+
+    float           m_SideScaleMu;
+    float           m_SideScaleBrake;
+    float           m_SideBorderOuter;
+    float           m_SideBorderInner;
+    bool            m_Rain;
+    double          m_RainIntensity;
+    double          m_ScaleMuRain;
+    double          m_ScaleBrakeRain;
+    int             m_WeatherCode;          // Track specific weather
+    int             m_DryCode;              // Track specific dry weather
+
+    bool            HasABS;
+    bool            HasESP;
+    bool            HasTCL;
+    bool            HasTYC;
+
+    double          m_TclRange;                            // TCL range
+    double          m_TclSlip;                             // Max TCL slip
+    double          m_TclFactor;                           // TCL scale
+
 	PidController	m_lineControl;			// controller for line error.
 	PidController	m_velAngControl;		// controller for direction of car.
 	PidController	m_angControl;			// controller for attack angle error.
@@ -358,27 +370,29 @@ private:
 	double			m_attractor;			// where we want to be.
 	int				m_followPath;			// path we want to follow;
 
+    LinearRegression	m_accBrkCoeff;                      //
+    double			m_brkCoeff[50];
+    double			m_steerCoeff[STEER_SPD_MAX][STEER_K_MAX];
+
+    int				m_lastB;
+    double			m_lastBrk;
+    double			m_lastTargV;
+
+    LearnedGraph	m_maxAccel;
+    double			m_angle[SPD_N][K_N];
+
+    LearnedGraph	m_steerGraph;
+    AveragedData	m_steerAvg;
+
     double          m_FuelNeeded;
     double          m_RepairNeeded;
 
 	LinearAttractor	m_avoidX;
 	LinearAttractor	m_avoidY;
 
-	LearnedGraph	m_maxAccel;
-	double			m_angle[SPD_N][K_N];
-
 	Vec2d			m_lastPts[HIST];
 	double			m_lastSpd;
 	double			m_lastAng;
-
-    LinearRegression	m_accBrkCoeff;                      //
-	double			m_brkCoeff[50];
-	double			m_steerCoeff[STEER_SPD_MAX][STEER_K_MAX];
-	LearnedGraph	m_steerGraph;
-	AveragedData	m_steerAvg;
-	int				m_lastB;
-	double			m_lastBrk;
-	double			m_lastTargV;
 
     AbstractStrategy  *m_Strategy;                         // Pit strategy
 
@@ -401,15 +415,6 @@ private:
     double          DecelAdjustPerc;                       //
 
     unsigned int    RandomSeed;                            // seed of generator
-
-    bool            HasABS;
-    bool            HasESP;
-    bool            HasTCL;
-    bool            HasTYC;
-
-    double          m_TclRange;                            // TCL range
-    double          m_TclSlip;                             // Max TCL slip
-    double          m_TclFactor;                           // TCL scale
 
     double          CA;
     double          CW;

@@ -62,6 +62,8 @@ protected:
     bool  releasePit;
 
 public:
+    AbstractStrategy()
+      :oState(PIT_NONE), oGoToPit(false), Car(NULL), Track(NULL), pitPath(NULL), Driver(NULL), DistToSwitch(100), StartFuel(-1){};
     // Need this empty constructor... do not remove.
     virtual ~AbstractStrategy() {}
     // Set Initial fuel at race start.
@@ -77,8 +79,9 @@ public:
     // Pit Free?
     virtual bool isPitFree(tCarElt* car) = 0;
 
-    tCarElt   *Car;                                    // TORCS-Daten
-    tTrack    *Track;                                  // Track-Daten
+    tCarElt   *Car;
+    tTrack    *Track;
+    PitPath   *pitPath;
     TDriver   *Driver;
     //Pit     Pit;
     //TDriver   Driver;

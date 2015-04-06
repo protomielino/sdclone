@@ -128,6 +128,11 @@ static const double	s_sgMax[] = { 0.03, 100 };
 static const int	s_sgSteps[] = { 10,  18 };
 
 TDriver::TDriver(int Index, const int robot_type):
+    m_pitControl(m_track, m_pitPath[PATH_NORMAL]),
+    m_CarType(0),
+    m_driveType(DT_RWD),
+	m_gearUpRpm(8000),
+
     m_XXX(0),
 
     m_SideScaleMu(0.97),
@@ -142,31 +147,6 @@ TDriver::TDriver(int Index, const int robot_type):
     m_WeatherCode(0),
     m_DryCode(0),
 
-    m_pitControl(m_track, m_pitPath[PATH_NORMAL]),
-    m_CarType(0),
-    m_driveType(DT_RWD),
-    m_gearUpRpm(8000.0),
-
-    m_prevYawError(0.0),
-    m_prevLineError(0.0),
-    m_Flying(0.0),
-    m_avgAY(0.0),
-	m_raceStart(false),
-    m_avoidS(1.0),
-    m_avoidT(0.0),
-	m_followPath(PATH_NORMAL),
-
-    m_FuelNeeded(0.0),
-
-    m_steerGraph(2, s_sgMin, s_sgMax, s_sgSteps, 0),
-    m_steerAvg(19, 0.001, 0.02, 15, 20, 95),
-
-    m_lastB(0.0),
-    m_lastBrk(0.0),
-    m_lastTargV(0.0),
-
-    m_Strategy(NULL),
-
     HasABS(false),
     HasESP(false),
     HasTCL(false),
@@ -174,7 +154,26 @@ TDriver::TDriver(int Index, const int robot_type):
 
     m_TclRange(10.0),
     m_TclSlip(1.6),
-    m_TclFactor(1.0)
+    m_TclFactor(1.0),
+
+	m_prevYawError(0),
+	m_prevLineError(0),
+    m_Flying(0),
+	m_avgAY(0),
+	m_raceStart(false),
+	m_avoidS(1),
+	m_avoidT(0),
+	m_followPath(PATH_NORMAL),
+	m_lastB(0),
+	m_lastBrk(0),
+	m_lastTargV(0),
+	m_maxAccel(0, 150, 30, 1),
+	m_steerGraph(2, s_sgMin, s_sgMax, s_sgSteps, 0),
+    m_steerAvg(19, 0.001, 0.02, 15, 20, 95),
+
+    m_FuelNeeded(0),
+
+    m_Strategy(NULL)
 {
     INDEX = Index;
 
@@ -520,7 +519,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
 	pItem->pOther = 0;
     pItem->pCar = car;
     m_pShared->m_teamInfo.Add( car->index, pItem );
-    LogSHADOW.debug("End Shadow2 NewRace\n");
+    LogSHADOW.debug("End Shadow NewRace\n");
 }
 
 void TDriver::GetPtInfo( int path, double pos, PtInfo& pi ) const
@@ -756,9 +755,10 @@ double TDriver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 
 		int	k = int(floor((pi.k - K_MIN) / K_STEP));
 		int	s = int(floor((spd0 - SPD_MIN) / SPD_STEP));
-        double	ae = 0;
+        // double	ae = 0;                                 // Moved in if(...) 6th April 2015
 		if( k >= 0 && k < K_N && s >= 0 && s < SPD_N )
 		{
+            double	ae = 0;
 			ae = m_angle[s][k] - ang;
 		}
 
@@ -830,8 +830,8 @@ double TDriver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 
     // static double	oldX = x;                   // Removed 5th April 2015 - Not Used
     // static double	oldY = y;                   // Removed 5th April 2015 - Not Used
-    //double	velX = (x - oldX) / 0.02;           // Removed 5th April 2015 - Not Used
-    //double	velY = (y - oldY) / 0.02;           // Removed 5th April 2015 - Not Used
+    // double	velX = (x - oldX) / 0.02;           // Removed 5th April 2015 - Not Used
+    // double	velY = (y - oldY) / 0.02;           // Removed 5th April 2015 - Not Used
     // oldX = x;                                    // Removed 5th April 2015 - Not Used
     // oldY = y;                                    // Removed 5th April 2015 - Not Used
 
@@ -907,7 +907,7 @@ double TDriver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 	double	yawU = car->_yaw_rate;
 
 	// future yaw rate required ahead.
-    //double	yawV = aheadPi.k * spd0;        // Removed 5th April 2015 - Not Used
+    // double	yawV = aheadPi.k * spd0;        // Removed 5th April 2015 - Not Used
 
 	// future yaw required ahead (assuming current yaw to be 0).
 	double	yawS = aheadPi.oang - car->_yaw;
@@ -1283,7 +1283,7 @@ void TDriver::Drive( tSituation* s )
 		m_lastAng = m_lastAng * 0.75 + angle * 0.25;
 	}
 
-    //const double G = 9.81;            // Removed 5th April 2015 - Not Used
+    // const double G = 9.81;            // Removed 5th April 2015 - Not Used
 
 	double	acc = 1.0;
 	double	brk = 0;
@@ -1293,6 +1293,7 @@ void TDriver::Drive( tSituation* s )
 	bool	close = false;
 	bool	lapper = false;
     AvoidOtherCars( INDEX, car, pi.k, targetSpd, s, close, lapper );
+    LogSHADOW.debug("SHADOW AvoidOtherCars\n");
 	if( close )
 	{
 		SpeedControl( SPDC_TRAFFIC, targetSpd, spd0, car, acc, brk );
@@ -2300,8 +2301,8 @@ double TDriver::ApplyTractionControl( tCarElt* car, double acc )
 		tract = 0.1;
 
 		wr /= count;
-        // double	gr = car->_gearRatio[car->_gear + car->_gearOffset];    // Removed 5th April 2015 - Not Used
-        // double	rpmForSpd = gr * car->_speed_x / wr;                    // Removed 5th April 2015 - Not Used
+        double	gr = car->_gearRatio[car->_gear + car->_gearOffset];    // Removed 5th April 2015 - Not Used
+        double	rpmForSpd = gr * car->_speed_x / wr;                    // Removed 5th April 2015 - Not Used
 
 		acc = 0;
 	}
@@ -2897,7 +2898,7 @@ double TDriver::CalcHairpin(double Speed, double AbsCrv)
 //==========================================================================*
 /*
 //==========================================================================*
-// simplix
+// shadow
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_shadow(double Crv)
 {
@@ -2917,7 +2918,7 @@ double TDriver::CalcCrv_shadow(double Crv)
 //==========================================================================*
 */
 //==========================================================================*
-// simplix
+// shadow
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_shadow_LP1(double Crv)
 {
@@ -2944,7 +2945,6 @@ double TDriver::CalcCrv_shadow_Identity(double Crv)
   return 1.0;
 }
 //==========================================================================*
-/*
 //==========================================================================*
 // simplix_sc
 //--------------------------------------------------------------------------*
@@ -2952,7 +2952,7 @@ double TDriver::CalcCrv_shadow_SC(double Crv)
 {
   double Offset = 1300;
 
-  if (oCrvComp)
+  if (m_CrvComp)
   {
     if (Crv < 0.0085)
       return 1.0;
@@ -2962,29 +2962,10 @@ double TDriver::CalcCrv_shadow_SC(double Crv)
   else
     return 1.0;
 }
-//==========================================================================*
 
 //==========================================================================*
-// simplix_36GP
-//--------------------------------------------------------------------------*
-double TDriver::CalcCrv_shadow_36GP(double Crv)
-{
-  double Offset = 1300;
-
-  if (oCrvComp)
-  {
-    if (Crv < 0.0085)
-      return 1.0;
-    else
-      return ((1+Crv) * (400 + Offset)/(1/Crv + Offset));
-  }
-  else
-    return 1.0;
-}
 //==========================================================================*
-*/
-//==========================================================================*
-// simplix_36GP
+// shadow_36GP
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_shadow_36GP(double Crv)
 {
@@ -3000,6 +2981,7 @@ double TDriver::CalcCrv_shadow_36GP(double Crv)
   else
     return 1.0;
 }
+
 //==========================================================================*
 
 //==========================================================================*
@@ -3009,6 +2991,7 @@ double TDriver::CalcHairpin_shadow_Identity(double Speed, double AbsCrv)
 {
   return Speed;
 }
+
 //==========================================================================*
 
 //==========================================================================*
@@ -3069,8 +3052,8 @@ double TDriver::CalcHairpin_shadow(double Speed, double AbsCrv)
 
   return Speed;
 }
-//==========================================================================*
 
+//==========================================================================*
 //==========================================================================*
 // If not used for a carset
 //--------------------------------------------------------------------------*
@@ -3078,10 +3061,10 @@ double TDriver::CalcFriction_shadow_Identity(const double Crv)
 {
   return 1.0;
 }
-//==========================================================================*
 
 //==========================================================================*
-// simplix_ls2
+//==========================================================================*
+// shadow_ls2
 //--------------------------------------------------------------------------*
 double TDriver::CalcFriction_shadow_LS2(const double Crv)
 {
@@ -3121,9 +3104,8 @@ double TDriver::CalcFriction_shadow_LS2(const double Crv)
 }
 
 //==========================================================================*
-
 //==========================================================================*
-// simplix
+// shadow_LP1
 //--------------------------------------------------------------------------*
 double TDriver::CalcFriction_shadow_LP1(const double Crv)
 {
@@ -3163,9 +3145,8 @@ double TDriver::CalcFriction_shadow_LP1(const double Crv)
 }
 
 //==========================================================================*
-
 //==========================================================================*
-// simplix
+// shadow_REF
 //--------------------------------------------------------------------------*
 double TDriver::CalcFriction_shadow_REF(const double Crv)
 {
@@ -3204,10 +3185,9 @@ double TDriver::CalcFriction_shadow_REF(const double Crv)
   return FrictionFactor * m_XXX;
 }
 //==========================================================================*
-
 //==========================================================================*
-// simplix_TRB1
-// simplix_GP36
+// shadow_TRB1
+// shadow_GP36
 //--------------------------------------------------------------------------*
 void TDriver::CalcSkilling_shadow()
 {
@@ -3223,9 +3203,8 @@ void TDriver::CalcSkilling_shadow()
 */
 }
 //==========================================================================*
-
 //==========================================================================*
-// simplix_ls1
+// shadow_ls1
 //--------------------------------------------------------------------------*
 void TDriver::CalcSkilling_shadow_LS1()
 {
@@ -3234,9 +3213,8 @@ void TDriver::CalcSkilling_shadow_LS1()
     Skill = SkillScale * (SkillGlobal + SkillDriver) + SkillOffset;
 }
 //==========================================================================*
-
 //==========================================================================*
-// simplix_ls2
+// shadow_ls2
 //--------------------------------------------------------------------------*
 void TDriver::CalcSkilling_shadow_LS2()
 {
@@ -3245,9 +3223,8 @@ void TDriver::CalcSkilling_shadow_LS2()
     Skill = SkillScale * (SkillGlobal + SkillDriver) + SkillOffset;
 }
 //==========================================================================*
-
 //==========================================================================*
-// simplix_MPA1
+// shadow_MPA1
 //--------------------------------------------------------------------------*
 void TDriver::CalcSkilling_shadow_MPA1()
 {
@@ -3256,9 +3233,8 @@ void TDriver::CalcSkilling_shadow_MPA1()
     Skill = SkillScale * (SkillGlobal + SkillDriver) + SkillOffset;
 }
 //==========================================================================*
-
 //==========================================================================*
-// simplix_SC
+// shadow_SC
 //--------------------------------------------------------------------------*
 void TDriver::CalcSkilling_shadow_SC()
 {
@@ -3269,9 +3245,8 @@ void TDriver::CalcSkilling_shadow_SC()
 }
 
 //==========================================================================*
-
 //==========================================================================*
-// simplix_lp1
+// shadow_lp1
 //--------------------------------------------------------------------------*
 void TDriver::CalcSkilling_shadow_LP1()
 {
@@ -3280,7 +3255,6 @@ void TDriver::CalcSkilling_shadow_LP1()
     Skill = SkillScale * (SkillGlobal + SkillDriver) + SkillOffset;
 }
 //==========================================================================*
-
 //==========================================================================*
 // Set name of robot (and other appendant features)
 //--------------------------------------------------------------------------*
@@ -3290,7 +3264,6 @@ void TDriver::SetBotName(const char* Value)
     LogSHADOW.debug("#Car Name    : %s\n" , m_CarType);
 };
 //==========================================================================*
-
 //==========================================================================*
 // Set scaling factor for avoiding racinglines
 //--------------------------------------------------------------------------*
@@ -3300,7 +3273,6 @@ void TDriver::ScaleSide(float FactorMu, float FactorBrake)
   m_SideScaleBrake = FactorBrake;
 }
 //==========================================================================*
-
 //==========================================================================*
 // Set additional border to outer side
 //--------------------------------------------------------------------------*
@@ -3309,7 +3281,6 @@ void TDriver::SideBorderOuter(float Factor)
   m_SideBorderOuter = Factor;
 }
 //==========================================================================*
-
 //==========================================================================*
 // Set additional border to inner side
 //--------------------------------------------------------------------------*
@@ -3318,7 +3289,6 @@ void TDriver::SideBorderInner(float Factor)
   m_SideBorderInner = Factor;
 }
 //==========================================================================*
-
 //==========================================================================*
 // Meteorology
 //--------------------------------------------------------------------------*
@@ -3334,8 +3304,7 @@ void TDriver::Meteorology()
   {
     Surf = Seg->surface;
     m_RainIntensity = MAX(m_RainIntensity, Surf->kFrictionDry / Surf->kFriction);
-    //GfLogDebug("# %.4f, %.4f %s\n",
-    //  Surf->kFriction, Surf->kRollRes, Surf->material);
+    GfLogDebug("# %.4f, %.4f %s\n",Surf->kFriction, Surf->kRollRes, Surf->material);
     Seg = Seg->next;
   }
 

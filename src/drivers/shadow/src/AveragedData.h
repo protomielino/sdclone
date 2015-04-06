@@ -4,7 +4,8 @@
 class AveragedData  
 {
 public:
-    AveragedData( int nBinsX, double minX, double maxX, int nBinsY, double minY, double maxY );
+	AveragedData( int nBinsX, double minX, double maxX,
+				  int nBinsY, double minY, double maxY );
 	~AveragedData();
 
 	int		GetXSize() const;
