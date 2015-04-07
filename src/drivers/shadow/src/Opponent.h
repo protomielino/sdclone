@@ -150,10 +150,8 @@ public:
 
 	void		UpdatePath();
 
-	void		UpdateSit( const CarElt* myCar, const TeamInfo* pTeamInfo,
-						   double myDirX, double myDirY );
-	void		ProcessMyCar( const Situation* s, const TeamInfo* pTeamInfo,
-							  const CarElt* myCar, const Sit& mySit,
+    void		UpdateSit( const CarElt* myCar, const TeamInfo* pTeamInfo, double myDirX, double myDirY );
+    void		ProcessMyCar( const Situation* s, const TeamInfo* pTeamInfo, const CarElt* myCar, const Sit& mySit,
                               const TDriver& me, double myMaxAccX, int idx );
 
 private:

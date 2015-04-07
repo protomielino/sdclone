@@ -225,6 +225,11 @@ TDriver::TDriver(int Index, const int robot_type):
         robot_name = "shadow_mpa1";
         Frc = 0.88;
         break;
+
+    case SHADOW_MPA11:
+        robot_name = "shadow_mpa11";
+        Frc = 0.88;
+        break;
     }
 
     for( int i = 0; i < 50; i++ )
@@ -2719,29 +2724,29 @@ void TDriver::initTireMu()
     m_cm.TYRE_MU_R = TIREMUR;
 }
 
-double TDriver::filterTCL(double Accel)                                // Tracktion control
+double TDriver::filterTCL(double Accel)                                     // Tracktion control
 {
-    if(fabs(car->_speed_x) < 0.001)                                       // Only if driving faster
+    if(fabs(car->_speed_x) < 0.001)                                         // Only if driving faster
         return Accel;
 
-    double Spin = 0;                                                      // Initialize spin
-    double Wr = 0;                                                        // wheel radius
-    int Count = 0;                                                        // count impellers
+    double Spin = 0;                                                        // Initialize spin
+    double Wr = 0;                                                          // wheel radius
+    int Count = 0;                                                          // count impellers
 
-    if(HasTrainFWD)                                                       // If front wheels
-    {                                                                     //   are impellers
+    if(HasTrainFWD)                                                         // If front wheels
+    {                                                                       //   are impellers
         double WSL = car->_wheelSpinVel(FRNT_LFT);                          // Get spin velocity
         double WSR = car->_wheelSpinVel(FRNT_RGT);
         if (WSL > WSR)                                                      // Depending on max
-            Spin += 2 * WSL + WSR;                                            // calc weighted spin
+            Spin += 2 * WSL + WSR;                                          // calc weighted spin
         else
             Spin += WSL + 2 * WSR;
         Wr += car->_wheelRadius(FRNT_LFT)+ car->_wheelRadius(FRNT_RGT);     // measure radius
         Count += 3;                                                         // and count weights
     }
 
-    if(HasTrainRWD)                                                       // If rear wheels
-    {                                                                     //   are impellers
+    if(HasTrainRWD)                                                         // If rear wheels
+    {                                                                       //   are impellers
         double WSL = car->_wheelSpinVel(REAR_LFT);
         double WSR = car->_wheelSpinVel(REAR_RGT);
         if (WSL > WSR)
