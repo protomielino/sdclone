@@ -6,13 +6,6 @@ SET(ROBOT_NAME "shadow")
 # Official-only shadow interface.
 SET(ROBOT_INTERFACE LEGACY WELCOME)
 
-# Work-in-progress / unofficial shadow interface.
-#IF(NOT OPTION_OFFICIAL_ONLY)
-#
-#    SET(ROBOT_INTERFACE ${ROBOT_INTERFACE} shadow_mpa11)
-#
-#ENDIF()
-
 SET(ROBOT_SOURCES src/Array.h
 				src/AveragedData.cpp
 				src/AveragedData.h
@@ -78,8 +71,7 @@ SET(ROBOT_SOURCES src/Array.h
 				src/Utils.cpp 
 				src/Utils.h
 				src/Vec2d.h
-				src/Vec3d.h
-)
+				src/Vec3d.h)
 
 # Official-only shadow instances.
 SET(ROBOT_CLONES shadow_36GP shadow_sc shadow_srw shadow_trb1 shadow_ls1 shadow_ls2 shadow_mp5 
@@ -90,7 +82,6 @@ ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.3.0 SOVERSION 1.0.0
              INTERFACE ${ROBOT_INTERFACE}
              SOURCES ${ROBOT_SOURCES}
              CLONENAMES ${ROBOT_CLONES})
-
 
 # For data associated to the ubiquitous robot module and its clones,
 # see data/drivers/shadow*/CMakeLists.txt
