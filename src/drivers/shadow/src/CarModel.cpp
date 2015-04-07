@@ -114,7 +114,7 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
 
     double Den;
 
-    double ScaleBump;
+    double ScaleBump  = 1.0;
     /*if (k > 0)
       ScaleBump = CarParam.oScaleBumpLeft;
     else
