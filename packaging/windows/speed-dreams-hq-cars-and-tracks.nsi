@@ -83,6 +83,9 @@ Section -Drivers
   SetOutPath "$INSTDIR\lib\drivers\usr"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr\*.*"
 
+  SetOutPath "$INSTDIR\lib\drivers\dandroid"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid\*.*"
+
   ; Customizable robot data files (car and track setups) (needed for the Career mode)
   SetOutPath "$INSTDIR\data\drivers\simplix"
   File /r "${BUILD_INST_DIR}\data\drivers\simplix\*.*"
@@ -97,11 +100,14 @@ Section -Drivers
   SetOutPath "$INSTDIR\lib\drivers\usr_ls1"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_ls1\*.*"
 
+  SetOutPath "$INSTDIR\lib\drivers\dandroid_36GP"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid_36GP\*.*"
+
   SetOutPath "$INSTDIR\lib\drivers\usr_36GP"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_36GP\*.*"
 
-  SetOutPath "$INSTDIR\lib\drivers\kilo2008"
-  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\kilo2008\*.*"
+  ; SetOutPath "$INSTDIR\lib\drivers\kilo2008"
+  ; File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\kilo2008\*.*"
 
   ; Robots data files (car and track setups)
   SetOutPath "$INSTDIR\data\drivers\simplix_ls1"
@@ -113,11 +119,14 @@ Section -Drivers
   SetOutPath "$INSTDIR\data\drivers\usr_ls1"
   File /r "${BUILD_INST_DIR}\data\drivers\usr_ls1\*.*"
 
+  SetOutPath "$INSTDIR\data\drivers\dandroid_36GP"
+  File /r "${BUILD_INST_DIR}\data\drivers\dandroid_36GP\*.*"
+
   SetOutPath "$INSTDIR\data\drivers\usr_36GP"
   File /r "${BUILD_INST_DIR}\data\drivers\usr_36GP\*.*"
 
-  SetOutPath "$INSTDIR\data\drivers\kilo2008"
-  File /r "${BUILD_INST_DIR}\data\drivers\kilo2008\*.*"
+  ; SetOutPath "$INSTDIR\data\drivers\kilo2008"
+  ; File /r "${BUILD_INST_DIR}\data\drivers\kilo2008\*.*"
 
 SectionEnd
 

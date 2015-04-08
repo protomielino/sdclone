@@ -204,6 +204,9 @@ Section /o "Basic mod Tools" SEC02
   SetOutPath "$INSTDIR\lib\drivers\usr"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr\*.*"
 
+  SetOutPath "$INSTDIR\lib\drivers\dandroid"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid\*.*"
+
   ; Customizable robot data files (car and track setups)
   SetOutPath "$INSTDIR\data\drivers\simplix"
   File /r "${BUILD_INST_DIR}\data\drivers\simplix\*.*"
