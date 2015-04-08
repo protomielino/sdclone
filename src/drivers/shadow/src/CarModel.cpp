@@ -56,6 +56,7 @@ CarModel::CarModel()
     CD_CX(0),
 
 	KZ_SCALE(0),
+    BUMP_FACTOR(0),
 	WIDTH(2)
 {
 }
@@ -114,7 +115,7 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
 
     double Den;
 
-    double ScaleBump  = 1.0;
+    double ScaleBump  = BUMP_FACTOR;
     /*if (k > 0)
       ScaleBump = CarParam.oScaleBumpLeft;
     else

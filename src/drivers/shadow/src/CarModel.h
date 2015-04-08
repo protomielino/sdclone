@@ -65,6 +65,7 @@ public:
     double	CD_WING;        // aerodynamic drag constant -- wings
     double  CD_CX;
     double	KZ_SCALE;       // bump sensitivity.
+    double  BUMP_FACTOR;    // bump sensitivity factor.
     double	WIDTH;          // width of car (m).
 };
 

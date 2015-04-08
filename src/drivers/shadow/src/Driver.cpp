@@ -64,7 +64,7 @@ const float TDriver::SHIFT = 0.98f;                                  // [-] (% o
 const float TDriver::SHIFT_UP = 0.99f;                               // [-] (% of rpmredline)
 const float TDriver::SHIFT_DOWN = 120;
 const float TDriver::SHIFT_MARGIN = 4.0f;                            // [m/s] Avoid oscillating gear changes.
-const float TDriver::CLUTCH_SPEED = 5.0f;
+const float TDriver::CLUTCH_SPEED = 0.5f;
 
 //double TDriver::LengthMargin;                      // safety margin long.
 //bool TDriver::Qualification;                       // Global flag
@@ -155,6 +155,11 @@ TDriver::TDriver(int Index, const int robot_type):
     m_TclRange(10.0),
     m_TclSlip(1.6),
     m_TclFactor(1.0),
+
+    m_ClutchMax(0.5),
+    m_ClutchDelta(0.009),
+    m_ClutchRange(0.82),
+    m_ClutchRelease(0.5),
 
 	m_prevYawError(0),
 	m_prevLineError(0),
@@ -349,6 +354,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 	m_cm.AERO = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_AERO_MOD, 0, 0);
 	m_cm.MU_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_MU_SCALE, NULL, 0.9f);
 	m_cm.KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_KZ_SCALE, NULL, 0.43f);
+    m_cm.BUMP_FACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR, NULL, 1.0);
     m_cm.NEEDSINLONG = GfParmGetNum(hCarParm, SECT_PRIV, PRV_NEED_SIN, NULL, 0);
     m_cm.USEDACCEXIT = GfParmGetNum(hCarParm, SECT_PRIV, PRV_USED_ACC, NULL, 0);
 
@@ -381,6 +387,18 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 	STEER_K_DEC = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_K_DEC, 0, 0);
 	PIT_ENTRY_OFFSET = GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_ENTRY_OFFS, 0, 0);
 	PIT_EXIT_OFFSET = GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_EXIT_OFFS, 0, 0);
+
+    m_ClutchDelta = GfParmGetNum(hCarParm, SECT_PRIV, PRV_CLUTCH_DELTA,0,(float)m_ClutchDelta);
+    LogSHADOW.debug("#m_ClutchDelta %g\n", m_ClutchDelta);
+
+    m_ClutchMax = GfParmGetNum(hCarParm, SECT_PRIV, PRV_CLUTCH_MAX,0,(float)m_ClutchMax);
+    LogSHADOW.debug("#m_ClutchMax %g\n",m_ClutchMax);
+
+    m_ClutchRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_CLUTCH_RANGE,0,(float)m_ClutchRange);
+    LogSHADOW.debug("#m_ClutchRange %g\n",m_ClutchRange);
+
+    m_ClutchRelease = GfParmGetNum(hCarParm, SECT_PRIV, PRV_CLUTCH_RELEASE,0, (float)m_ClutchRelease);
+    LogSHADOW.debug("#m_ClutchRelease %g\n",m_ClutchRelease);
 
     LogSHADOW.debug("FLY_HEIGHT %g\n", FLY_HEIGHT );
     LogSHADOW.debug( "BUMP_MOD %d\n", BUMP_MOD );
@@ -2124,7 +2142,7 @@ int TDriver::CalcGear( tCarElt* car, double& acc )
 	double	rpm = gr_this * car->_speed_x / wr;
 
 	double	rpmUp = m_gearUpRpm;
-	double	rpmDn = rpmUp * gr_this * 0.9 / gr_dn;
+    double	rpmDn = rpmUp * gr_this / gr_dn;
 
     if( car->_gear < MAX_GEAR && rpm > rpmUp )
 	{
@@ -2170,26 +2188,26 @@ float TDriver::getClutch()
     omega = car->_enginerpmRedLine/car->_gearRatio[car->_gear + car->_gearOffset];
     speedr = (CLUTCH_SPEED + MAX(0.0f, car->_speed_x))/fabs(wr*omega);
 #else
-      if(oClutch > 0)
+      if(m_Clutch > 0)
       {
-        if (oGear < 2)
-          StartAutomatic();
+        /*if (oGear < 2)
+          StartAutomatic();*/
 
-        oClutch = MIN(ClutchMax, Clutch);
-        if(Clutch == ClutchMax)
+        m_Clutch = MIN(m_ClutchMax, m_Clutch);
+        if(m_Clutch == m_ClutchMax)
         {
           if(GearRatio() * CarSpeedLong
-              / (wheelRadius * CarRpm) > ClutchRange)
+              / (wheelRadius * CarRpm) > m_ClutchRange)
           {
-            Clutch = ClutchMax - 0.01;
+            m_Clutch = m_ClutchMax - 0.01;
           }
           else
-            Clutch -= ClutchDelta/10;
+            m_Clutch -= m_ClutchDelta/10;
         }
         else
         {
-          oClutch -= ClutchDelta;
-          oClutch = MAX(0.0, Clutch);
+          m_Clutch -= m_ClutchDelta;
+          m_Clutch = MAX(0.0, m_Clutch);
         }
       }
     }

@@ -53,6 +53,11 @@
 #define PRV_BUMP_MOD		"bump mod"
 #define PRV_SIDE_MOD		"side mod"
 #define PRV_KZ_SCALE		"kz scale"
+#define PRV_BUMP_FACTOR     "bump factor"
+#define PRV_CLUTCH_DELTA    "clutch delta"
+#define PRV_CLUTCH_RANGE    "clutch range"
+#define PRV_CLUTCH_MAX      "clutch max"
+#define PRV_CLUTCH_RELEASE  "clutch release"
 #define PRV_STEER_K_ACC		"steer k acc"
 #define PRV_STEER_K_DEC		"steer k dec"
 #define PRV_AVOID_WIDTH		"avoid width"
@@ -345,6 +350,11 @@ private:
     double          m_TclRange;                            // TCL range
     double          m_TclSlip;                             // Max TCL slip
     double          m_TclFactor;                           // TCL scale
+
+    double          m_ClutchMax;
+    double          m_ClutchDelta;
+    double          m_ClutchRange;
+    double          m_ClutchRelease;
 
 	PidController	m_lineControl;			// controller for line error.
 	PidController	m_velAngControl;		// controller for direction of car.
