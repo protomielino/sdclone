@@ -350,7 +350,7 @@ double	CarModel::CalcAcceleration(double k0, double kz0, double k1, double kz1, 
 			acc = maxAcc;
 
 		double	inner = MX(0, u * u + 2 * acc * dist );
-		double	oldV = v;
+        double	oldV = v;
 		v = sqrt(inner);
 
 		if( fabs(v - oldV) < 0.001 )
@@ -397,7 +397,7 @@ void	CarModel::CalcSimuSpeeds( double spd0, double dy, double dist, double kFric
 	// max_a = M * G * MU;
 	// max_spd = sqrt(max_a r) = sqrt(M * G * MU / k)
 
-	double	M  = MASS + FUEL;
+    //double	M  = MASS + FUEL;
 	double	MU = kFriction * TYRE_MU;
 
     double	max_acc = GRAVITY * MU;
@@ -443,7 +443,7 @@ void	CarModel::CalcSimuSpeedRanges( double spd0,	double dist, double	kFriction, 
 	// max_a = M * G * MU;
 	// max_spd = sqrt(max_a r) = sqrt(M * G * MU / k)
 
-	double	M  = MASS + FUEL;
+    //double	M  = MASS + FUEL;
 	double	MU = kFriction * TYRE_MU;
     double	max_acc = GRAVITY * MU;
 

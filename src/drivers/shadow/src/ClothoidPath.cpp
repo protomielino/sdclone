@@ -129,14 +129,14 @@ void ClothoidPath::AnalyseBumps( const CarModel& cm, bool dumpInfo )
 	double	sz = m_pPath[0].pt.z;
 	double	vz = 0;
 	double	pz = sz;
-	double	dt = 0.1;
+    //double	dt = 0.1;
     for( int count = 0; count < 2; count++ )
 	{
 		int		pi = NSEG - 1;
 
 		for( int i = 0; i < NSEG; i++ )
 		{
-			double	oldSz = sz;
+            //double	oldSz = sz;
 			double	oldPz = pz;
 
 			double	v = (m_pPath[i].accSpd + m_pPath[pi].accSpd) * 0.5;
@@ -419,7 +419,7 @@ void	ClothoidPath::Optimise(	const CarModel&	cm,	double factor, int idx, PathPt*
 	}
 
 	double	t = l3->offs;
-	double	oldT = t;
+    //double	oldT = t;
 	Utils::LineCrossesLineXY( l3->Pt(), l3->Norm(), p2, p4 - p2, t );
 //	if( l3->h < 0.1 )
 	{

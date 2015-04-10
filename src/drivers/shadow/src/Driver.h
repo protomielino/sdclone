@@ -37,7 +37,6 @@
 #include "LearnedGraph.h"
 #include "AveragedData.h"
 #include "LinearRegression.h"
-#include "LinearAttractor.h"
 #include "PtInfo.h"
 #include "Strategy.h"
 
@@ -397,8 +396,8 @@ private:
     double          m_FuelNeeded;
     double          m_RepairNeeded;
 
-	LinearAttractor	m_avoidX;
-	LinearAttractor	m_avoidY;
+    //LinearAttractor	m_avoidX;
+    //LinearAttractor	m_avoidY;
 
 	Vec2d			m_lastPts[HIST];
 	double			m_lastSpd;

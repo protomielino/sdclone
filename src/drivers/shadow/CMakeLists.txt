@@ -21,12 +21,8 @@ SET(ROBOT_SOURCES src/Array.h
 				src/CubicSpline.h
 				src/GenericAvoidance.cpp
 				src/GenericAvoidance.h
-				src/Hysteresis.cpp
-				src/Hysteresis.h
 				src/LearnedGraph.cpp
 				src/LearnedGraph.h
-				src/LinearAttractor.cpp 
-				src/LinearAttractor.h
 				src/LinearRegression.cpp 
 				src/LinearRegression.h
 				src/LinePath.cpp
@@ -45,8 +41,6 @@ SET(ROBOT_SOURCES src/Array.h
 				src/Path.h
 				src/PathRecord.cpp 
 				src/PathRecord.h
-				src/Pattern.cpp 
-				src/Pattern.h
 				src/PidController.cpp 
 				src/PidController.h
 				src/PitControl.cpp

@@ -98,7 +98,7 @@ void PitControl::Process( CarElt* pCar )
 	double	repairLimit = delayRepair ? 7000 : 5000;
 
 	double	fuelPerLap = fuelPerM * trackLen;
-	double	damagePerLap = damagePerM * trackLen;
+    //double	damagePerLap = damagePerM * trackLen;
 
 //	bool	likeToPit = pCar->_dammage >=  500 || pCar->_fuel < 90;
 //	bool	likeToPit = pCar->_dammage + damagePerLap >= repairLimit ||

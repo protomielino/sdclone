@@ -47,7 +47,7 @@ void OptimisedPath::Initialise()
 void OptimisedPath::SetupStartSlice()
 {
 	// need to add nodes to this slice, that are around the start pt info.
-	if( m_curSlice == 0  );
+    if( m_curSlice == 0  )
 		m_curSlice = new Slice();
 
 	SetupSlice( 0, m_curSlice );
@@ -149,8 +149,8 @@ void OptimisedPath::NextSlice()
 			double	ang = node2.m_ang - node1.m_ang;
 			NORM_PI_PI(ang);
 			double	k1 = ang / dist;
-			double	k2 = Utils::CalcCurvatureTan(p1, node1.m_vel, p2);
-			double	K = GetAt(m_curSlice->m_seg).k;
+            //double	k2 = Utils::CalcCurvatureTan(p1, node1.m_vel, p2);
+            //double	K = GetAt(m_curSlice->m_seg).k;
 
 			double	minSpd, maxSpd;
 			m_cm.CalcSimuSpeeds(spd1, k1, dist, 1.0, minSpd, maxSpd);
