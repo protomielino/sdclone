@@ -43,7 +43,7 @@
 #include "teammanager.h"
 
 #define SECT_PRIV			"private"
-#define PRV_GEAR_UP_RPM		"gear up rpm"
+#define PRV_SHIFT           "shift"
 #define PRV_MU_SCALE		"mu scale"
 #define PRV_RAIN_MU         "mu scale rain"
 #define PRV_FLY_HEIGHT		"fly height"
@@ -222,12 +222,16 @@ public:
     double  (TDriver::*CalcCrvFoo)(double Crv);
     double  (TDriver::*CalcHairpinFoo)(double Speed, double AbsCrv);
 
+    double  CalcSkill(tSituation *s, double TargetSpeed);
     void    CalcSkilling_shadow();
     void    CalcSkilling_shadow_LS1();
     void    CalcSkilling_shadow_LS2();
     void    CalcSkilling_shadow_MPA1();
     void    CalcSkilling_shadow_SC();
     void    CalcSkilling_shadow_LP1();
+
+    void    AdjustSkilling(void* pCarHandle);
+    void    GetSkillingParameters(const char* BaseParamPath, const char* PathFilename);
 
     double  CalcFriction_shadow_Identity(double Crv);
     double  CalcFriction_shadow_LS2(double Crv);
@@ -275,6 +279,7 @@ private:
 	double	ApplyTractionControl( tCarElt* car, double acc );
     void    Meteorology();
     int     GetWeather();
+    bool    CheckPitSharing();
 
     void            SetRandomSeed(unsigned int Seed);
     unsigned int    getRandom();
@@ -354,6 +359,8 @@ private:
     double          m_ClutchDelta;
     double          m_ClutchRange;
     double          m_ClutchRelease;
+
+    float           m_Shift;
 
 	PidController	m_lineControl;			// controller for line error.
 	PidController	m_velAngControl;		// controller for direction of car.
@@ -459,7 +466,6 @@ private:
     double          AirBrakeLatchTime;
     float           OversteerASR;
 
-    static const float SHIFT;
     static const float SHIFT_UP;
     static const float SHIFT_DOWN;
     static const float SHIFT_MARGIN;

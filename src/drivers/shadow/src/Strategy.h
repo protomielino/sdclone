@@ -55,15 +55,15 @@ protected:
         PIT_EXIT,
         PIT_GONE
     };
-    int	oState;		                           // Current pitting state
-    bool  oGoToPit;                               // Pit stop needed
+    int     m_State;		                           // Current pitting state
+    bool    m_GoToPit;                               // Pit stop needed
 
     int   teamIndex;
     bool  releasePit;
 
 public:
     AbstractStrategy()
-      :oState(PIT_NONE), oGoToPit(false), Car(NULL), Track(NULL), pitPath(NULL), Driver(NULL), DistToSwitch(100), StartFuel(-1){};
+      :m_State(PIT_NONE), m_GoToPit(false), Car(NULL), Track(NULL), pitPath(NULL), Driver(NULL), DistToSwitch(100), StartFuel(-1){};
     // Need this empty constructor... do not remove.
     virtual ~AbstractStrategy() {}
     // Set Initial fuel at race start.
@@ -96,6 +96,8 @@ public:
     double    TireLimitRear;
     double    DegradationPerLap;
     int       Laps;
+
+    bool      OutOfPitlane(){return m_State < PIT_ENTER;}
 };
 
 class SimpleStrategy : public AbstractStrategy
@@ -151,6 +153,7 @@ protected:
     float m_pittime;                    // Expected additional time for pit stop.
     int AlwaysPit;
     int strategy_verbose;
+
     int laps_to_go(tCarElt *car) {return car->_remainingLaps - car->_lapsBehindLeader;}
     virtual void updateFuelStrategy(tCarElt* car, tSituation *s);
 };

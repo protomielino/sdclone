@@ -60,10 +60,9 @@ float TDriver::SpeedLimitScale = 25;               // Speed limit scale
 bool  TDriver::FirstPropagation = true;            // Initialize
 bool  TDriver::Learning = false;                   // Initialize
 
-const float TDriver::SHIFT = 0.98f;                                  // [-] (% of rpmredline) When do we like to shift gears. <0.96>
-const float TDriver::SHIFT_UP = 0.99f;                               // [-] (% of rpmredline)
+const float TDriver::SHIFT_UP = 0.99f;             // [-] (% of rpmredline)
 const float TDriver::SHIFT_DOWN = 120;
-const float TDriver::SHIFT_MARGIN = 4.0f;                            // [m/s] Avoid oscillating gear changes.
+const float TDriver::SHIFT_MARGIN = 4.0f;          // [m/s] Avoid oscillating gear changes.
 const float TDriver::CLUTCH_SPEED = 0.5f;
 
 //double TDriver::LengthMargin;                      // safety margin long.
@@ -160,6 +159,8 @@ TDriver::TDriver(int Index, const int robot_type):
     m_ClutchDelta(0.009),
     m_ClutchRange(0.82),
     m_ClutchRelease(0.5),
+
+    m_Shift(0.98),
 
 	m_prevYawError(0),
 	m_prevLineError(0),
@@ -259,29 +260,151 @@ TDriver::~TDriver()
     //delete [] m_opp;
 
     if (m_Strategy != NULL)
-      delete m_Strategy;
+        delete m_Strategy;
 
     LogSHADOW.debug("\n#<<< TDriver::~TDriver()\n\n");
 }
 
 static void* MergeParamFile( void* hParams, const char* fileName )
 {
-	void*	hNewParams = GfParmReadFile(fileName, GFPARM_RMODE_STD);
-	if( hNewParams == NULL )
-		return hParams;
+    void*	hNewParams = GfParmReadFile(fileName, GFPARM_RMODE_STD);
+    if( hNewParams == NULL )
+        return hParams;
 
-	if( hParams == NULL )
-		return hNewParams;
+    if( hParams == NULL )
+        return hNewParams;
 
-	return GfParmMergeHandles(hParams, hNewParams,
-				GFPARM_MMODE_SRC    | GFPARM_MMODE_DST |
-				GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
+    return GfParmMergeHandles(hParams, hNewParams,
+                              GFPARM_MMODE_SRC    | GFPARM_MMODE_DST |
+                              GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
 }
 
 void TDriver::SetShared( Shared* pShared )
 {
-	m_pShared = pShared;
+    m_pShared = pShared;
 }
+
+//==========================================================================*
+
+//==========================================================================*
+// Adjust skilling depending on the car types to drive
+//--------------------------------------------------------------------------*
+void TDriver::AdjustSkilling(void* pCarHandle)
+{
+    // Adjust skilling ...
+    if ((Skill < 0) || (!Skilling))
+    {
+        Skilling = false;
+        Skill = 1.0;
+        LogSHADOW.debug("#No skilling: Skill %g\n", Skill);
+        //Param.Tmp.oSkill = oSkill;
+    }
+    else
+    {
+        SkillOffset = MAX(0.0,MIN(10.0, GfParmGetNum(pCarHandle, SECT_PRIV,
+                                                    "offset skill", (char *) NULL, (float) SkillOffset)));
+        LogSHADOW.debug("#SkillOffset: %g\n", SkillOffset);
+        SkillScale = MAX(0.0,MIN(10.0, GfParmGetNum(pCarHandle, SECT_PRIV,
+                                                    "scale skill", (char *) NULL, (float)SkillScale)));
+        LogSHADOW.debug("#SkillScale: %g\n", SkillScale);
+
+        //LookAhead = LookAhead / (1+SkillGlobal/24);
+        //LookAheadFactor = LookAheadFactor / (1+SkillGlobal/24);
+
+        CalcSkilling();
+
+        //Param.Tmp.oSkill = 1.0 + oSkill;
+        LogSHADOW.debug("\n#>>>Skilling: Skill %g SkillGlobal %g SkillDriver %g LookAhead %g "
+                        "LookAheadFactor %g effSkill:%g\n\n", Skill, SkillGlobal, SkillDriver/*,
+                        LookAhead, LookAheadFactor, Param.Tmp.oSkill*/);
+    }
+};
+
+//==========================================================================*
+//==========================================================================*
+// Get skilling parameters
+//--------------------------------------------------------------------------*
+void TDriver::GetSkillingParameters(const char* BaseParamPath, const char* PathFilename)
+{
+    // Global skilling from Andrew Sumner ...
+    // Check if skilling is enabled
+    int SkillEnabled = 0;
+    char	PathFilenameBuffer[1024];
+
+    // Do not skill if optimisation is working
+    //if (!GeneticOpti)
+    {
+        snprintf(PathFilenameBuffer, 256, "%s/default.xml", BaseParamPath);
+        LogSHADOW.debug("#PathFilename: %s\n", PathFilenameBuffer); // itself
+        void* SkillHandle = GfParmReadFile(PathFilename, GFPARM_RMODE_REREAD);
+        if (SkillHandle)
+        {
+            SkillEnabled = (int) MAX(0,MIN(1,(int) GfParmGetNum(SkillHandle,
+                                                                "skilling", "enable", (char *) NULL, 0.0)));
+            LogSHADOW.debug("#SkillEnabled %d\n", SkillEnabled);
+            //TeamEnabled = GfParmGetNum(SkillHandle, "team", "enable", 0, (float)TeamEnabled) != 0;
+            //LogSHADOW.debug("#TeamEnabled %d\n", TeamEnabled);
+        }
+
+        GfParmReleaseHandle(SkillHandle);
+    }
+
+    if (SkillEnabled > 0)                          // If skilling is enabled
+    {                                              // Get Skill level
+        Skilling = true;                            // of TORCS-Installation
+        LogSHADOW.debug("#Skilling: On\n");
+
+        void* SkillHandle = NULL;
+
+        snprintf(PathFilenameBuffer, 256,
+                 "%sconfig/raceman/extra/skill.xml",GetLocalDir());
+        LogSHADOW.debug("#skill.xml: %s\n", PathFilename);
+        SkillHandle = GfParmReadFile(PathFilename, GFPARM_RMODE_REREAD);
+        if (SkillHandle)
+        {
+            SkillGlobal = MAX(0.0,MIN(10.0,GfParmGetNum(SkillHandle, "skill", "level",
+                                                        (char *) NULL, 10.0)));
+            LogSHADOW.debug("#LocalDir: SkillGlobal: %g\n", SkillGlobal);
+        }
+        else
+        {
+            snprintf(PathFilenameBuffer, 256, "%sconfig/raceman/extra/skill.xml",GetDataDir());
+            LogSHADOW.debug("#skill.xml: %s\n", PathFilename);
+
+            SkillHandle = GfParmReadFile(PathFilename, GFPARM_RMODE_REREAD);
+            if (SkillHandle)
+            {
+                SkillGlobal = MAX(0.0,MIN(10.0, GfParmGetNum(SkillHandle,
+                                                             "skill", "level", (char *) NULL, 10.0)));
+                LogSHADOW.debug("#DataDir: SkillGlobal: %g\n", SkillGlobal);
+            }
+        }
+
+        // Get individual skilling
+        snprintf(PathFilenameBuffer, 256, "%s/%d/skill.xml", BaseParamPath, INDEX);
+        LogSHADOW.debug("#PathFilename: %s\n", PathFilenameBuffer); // itself
+        SkillHandle = GfParmReadFile(PathFilename, GFPARM_RMODE_REREAD);
+
+        if (SkillHandle)
+        {
+            SkillDriver = GfParmGetNum(SkillHandle, "skill", "level", 0, 0.0);
+            SkillDriver = MIN(1.0, MAX(0.0, SkillDriver));
+            LogSHADOW.debug("#SkillDriver: %g\n", SkillDriver);
+
+            DriverAggression =
+                    GfParmGetNum(SkillHandle, "skill", "aggression", (char *)NULL, 0.0);
+            LogSHADOW.debug("#DriverAggression: %g\n", DriverAggression);
+        }
+
+        GfParmReleaseHandle(SkillHandle);
+    }
+    else
+    {
+        Skilling = false;
+        LogSHADOW.debug("#Skilling: Off\n");
+    }
+    // ... Global skilling from Andrew Sumner
+};
 
 // Called for every track change or new race.
 void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandle, tSituation* pS )
@@ -345,9 +468,6 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     LogSHADOW.debug("Load track settings ....\n");
 
 	// get the private parameters now.
-
-    double rpm = GfParmGetNum(hCarParm, SECT_PRIV, PRV_GEAR_UP_RPM, NULL, 7000);
-	m_gearUpRpm = rpm / 10.0;
     m_ScaleMuRain = GfParmGetNum(hCarParm, SECT_PRIV, PRV_RAIN_MU, NULL, m_ScaleMuRain);
     LogSHADOW.info("#Scale Mu Rain: %g\n", m_ScaleMuRain);
 
@@ -399,6 +519,9 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 
     m_ClutchRelease = GfParmGetNum(hCarParm, SECT_PRIV, PRV_CLUTCH_RELEASE,0, (float)m_ClutchRelease);
     LogSHADOW.debug("#m_ClutchRelease %g\n",m_ClutchRelease);
+
+    m_Shift = GfParmGetNum(hCarParm, SECT_PRIV, PRV_SHIFT, 0, (float)m_Shift);
+    LogSHADOW.debug("#m_Shift %g\n",m_Shift);
 
     LogSHADOW.debug("FLY_HEIGHT %g\n", FLY_HEIGHT );
     LogSHADOW.debug( "BUMP_MOD %d\n", BUMP_MOD );
@@ -1529,279 +1652,6 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 								m_maxAccel.CalcY(car->_speed_x), i );
     }
 
-#if defined(USE_NEW_AVOIDANCE)
-	double	newAvoidS = 1;
-	double	newAvoidT = 0;
-
-	{
-		int	sort[cMAX_OPP];
-		int	cnt = 0;
-
-		for( int i = 0; i < m_nCars; i++ )
-		{
-			Opponent::Info&	oi = m_opp[i].GetInfo();
-			CarElt*			oCar = m_opp[i].GetCar();
-			if( oCar == car || oi.flags == 0 )
-				continue;
-
-			bool	ignoreTeamMate =
-						oi.GotFlags(Opponent::F_TEAMMATE | Opponent::F_AHEAD) &&
-						(car->_laps < oCar->_laps ||
-						 car->_dammage + 200 >= oi.tmDamage);
-			if( ignoreTeamMate )
-				continue;
-
-			if( oi.newCatching )
-			{
-				int	j;
-				for( j = cnt; j > 0; j-- )
-				{
-					if( m_opp[sort[j - 1]].GetInfo().newCatchTime < oi.newCatchTime )
-						break;
-					sort[j] = sort[j - 1];
-				}
-				sort[j] = i;
-				cnt++;
-			}
-		}
-
-//		double	toL, toR;
-//		GetPathToLeftAndRight( car, toL, toR );
-//		Span	rootSpan(-car->_trkPos.toMiddle - toL, -car->_trkPos.toMiddle + toR);
-
-		PtInfo	pi;
-		GetPtInfo( PATH_NORMAL, car->_distFromStartLine, pi );
-		double	targ = pi.offs;
-
-		double	width = m_track.GetWidth() * 0.5 - 1;
-		Span	rootSpan(-width, width);
-		rootSpan.Extend( pi.offs );
-
-		double	myOffs = -car->_trkPos.toMiddle;
-		bool	toSideL = false;
-		bool	toSideR = false;
-		double	repulsion = 0;
-
-		//
-		//	deal with cars to side.
-		//
-
-		int		which = 0;
-		for( ;	which < cnt &&
-				m_opp[sort[which]].GetInfo().newCatchTime == 0; which++ )
-		{
-			Opponent::Info&	oi = m_opp[sort[which]].GetInfo();
-
-			// to side.
-			if( oi.sit.rdPY > 0 )
-			{
-				toSideL = true;
-
-				double	offs;
-				if( oi.newPiL.isSpace )
-					offs = oi.newPiL.myOffset;
-				else
-					offs = oi.sit.offs - oi.sit.minDY;
-				rootSpan.b = MN(rootSpan.b, offs);
-
-				double	dist = fabs(myOffs - offs);
-				if( dist < 3 )
-					repulsion -= 0.2;//0.5 / MX(1, dist);
-			}
-			else
-			{
-				toSideR = true;
-
-				double	offs;
-				if( oi.newPiR.isSpace )
-					offs = oi.newPiR.myOffset;
-				else
-					offs = oi.sit.offs + oi.sit.minDY;
-				rootSpan.a = MX(rootSpan.a, offs);
-
-				double	dist = fabs(myOffs - offs);
-				if( dist < 3 )
-					repulsion += 0.2;//0.5 / MX(1, dist);
-			}
-
-			targ = myOffs * 0.95 + pi.offs * 0.05 + repulsion;
-		}
-
-		//
-		//	setup path coords for cars to side.
-		//
-
-		PathRange	pr;
-		if( toSideL || toSideR )
-		{
-			if( toSideL )
-				pr.AddGreater( myPos, rootSpan.a, false, *this );
-
-			if( toSideR )
-				pr.AddLesser( myPos, rootSpan.b, false, *this );
-		}
-
-		//
-		//	deal with cars ahead.
-		//
-
-		{for( ; which < cnt; which++ )
-		{
-			Opponent::Info&	oi = m_opp[sort[which]].GetInfo();
-
-			if( rootSpan.IsNull() )
-			{
-				rootSpan.a = rootSpan.b = (rootSpan.a + rootSpan.b) * 0.5;
-				targ = rootSpan.a;
-				break;
-			}
-
-			Span	temp(rootSpan);
-
-			// ahead.
-			if( oi.newPiL.isSpace && oi.newPiL.goodPath )
-			{
-				if( oi.newPiR.isSpace && oi.newPiR.goodPath )
-				{
-					// space on both sides... damn, need to make a
-					//	decision!  :)
-					double	mid = (oi.newPiL.myOffset + oi.newPiR.myOffset) * 0.5;
-					if( pi.offs < mid )
-					{
-						// overtake to left.
-						double	offs = oi.newPiL.myOffset;
-						rootSpan.b = MN(rootSpan.b, offs);
-					}
-					else //if( pi.offs > oi.newPiR.myOffset )
-					{
-						// overtake to right.
-						double	offs = oi.newPiR.myOffset;
-						rootSpan.a = MX(rootSpan.a, offs);
-					}
-				}
-				else
-				{
-					// space only to left.
-					double	offs = oi.newPiL.myOffset;
-					rootSpan.b = MN(rootSpan.b, offs);
-				}
-			}
-			else if( oi.newPiR.isSpace && oi.newPiR.goodPath )
-			{
-				// space only to right.
-				double	offs = oi.newPiR.myOffset;
-				rootSpan.a = MX(rootSpan.a, offs);
-			}
-			else
-			{
-				// no space to overtake at all! (thin track?)
-			}
-
-			if( rootSpan.IsNull() )
-			{
-				rootSpan = temp;
-				break;
-			}
-		}}
-
-#ifdef USE_NEW_AVOIDANCE_GFOUT
-		if( cnt > 0 )
-		{
-			double	offs = CalcPathOffset(car->_distFromStartLine, m_avoidS, m_avoidT);
-			GfOut( "---- %.1f %.1f -------- targ %.1f -------------------\n",
-					0.0, 0.0, offs );//span.a, span.b );
-		}
-#endif
-
-		int	nonZ = -1;
-		double	minSide = -99;
-		double	maxSide = 99;
-		double	curOffs = -car->_trkPos.toMiddle;
-		{for( int i = cnt - 1; i >= 0; i-- )
-		{
-			int	j = sort[i];
-			Opponent::Info&	oi = m_opp[j].GetInfo();
-
-			NAOUT( "%2d (%6.2f, %5.1f)  t %5.1f %5.1f  mp %6.1f  spd %5.1f rtv(%6.2f)  bo %5.1f\n",
-				j, oi.sit.rdPX, oi.sit.rdPY,
-				oi.newCatchTime, oi.newAheadTime, oi.newMidPos,
-				oi.sit.spd, oi.newCatchSpd, oi.newBestOffset );
-
-#ifdef USE_NEW_AVOIDANCE_GFOUT
-			if( oi.newPiL.isSpace )
-			{
-				GfOut( "    L %5.2f  mySpd %5.1f  goodPath %d  myOffset %5.1f (%6.3f %6.3f)\n",
-						oi.newPiL.offset, oi.newPiL.mySpeed, oi.newPiL.goodPath,
-						oi.newPiL.myOffset, oi.newPiL.bestU, oi.newPiL.bestV );
-			}
-			if( oi.newPiR.isSpace )
-			{
-				GfOut( "    R %5.2f  mySpd %5.1f  goodPath %d  myOffset %5.1f (%6.3f %6.3f)\n",
-						oi.newPiR.offset, oi.newPiR.mySpeed, oi.newPiR.goodPath,
-						oi.newPiR.myOffset, oi.newPiR.bestU, oi.newPiR.bestV );
-			}
-#endif
-
-			if( oi.newCatchTime > 0 )
-				nonZ = j;
-			if( oi.newCatchTime == 0 )
-			{
-//				if( curOffs < oi.newSpan.b )
-//					maxSide = MN(maxSide, oi.newSpan.a);
-//				if( curOffs > oi.newSpan.a )
-//					minSide = MX(minSide, oi.newSpan.b);
-			}
-		}}
-
-/*
-		if( nonZ >= 0 )
-		{
-			double	oppTarg;
-			Opponent::Info&	oi = m_opp[nonZ].GetInfo();
-			if( oi.newBestOffset < oi.newSpan.a ||
-				oi.newBestOffset > oi.newSpan.b )
-				oppTarg = oi.newBestOffset;
-			else if( oi.newBestOffset - oi.newSpan.a <
-					 oi.newSpan.b - oi.newBestOffset )
-				oppTarg = oi.newSpan.a;
-			else
-				oppTarg = oi.newSpan.b;
-
-			CarElt*			oCar = m_opp[nonZ].GetCar();
-			double	u, v;
-			CalcBestPathUV( oCar->_distFromStartLine, oppTarg, u, v );
-			targ = CalcPathOffset(car->_distFromStartLine, newAvoidS, newAvoidT );
-		}
-*/
-		if( targ < rootSpan.a )
-			targ = rootSpan.a;
-		else if( targ > rootSpan.b )
-			targ = rootSpan.b;
-
-		NAOUT( "[%.1f %.1f]  nonZ %d\n", rootSpan.a, rootSpan.b, nonZ );
-
-		CalcBestPathUV( car->_distFromStartLine, targ, newAvoidS, newAvoidT );
-//		newAvoidT = CalcPathTarget( car->_distFromStartLine, targ );
-//		if( newAvoidT != 0 )
-//			newAvoidS = 0;
-//		else
-//			newAvoidS = 1;
-
-		if( toSideL || toSideR )
-		{
-//			if( newAvoidS != 1 )
-			{
-				newAvoidS = 0;
-				newAvoidT = CalcPathTarget(car->_distFromStartLine, targ);
-			}
-		}
-
-		NAOUT( "pos %.1f  targ %.1f  newA %5.2f %5.2f (av %5.2f %5.2f)\n",
-				car->_distFromStartLine, targ, newAvoidS, newAvoidT,
-				m_avoidS, m_avoidT );
-	}
-#endif
-
 	// accumulate all the collision the flags...
 	Avoidance::Info	ai;
 	double	minCatchTime = 99;
@@ -1981,11 +1831,6 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
     // int		priority = ga.priority(ai, car);        // Removed 5th April 2015 - Not Used
 	Vec2d	target = ga.calcTarget(ai, car, *this);
 
-#if defined(USE_NEW_AVOIDANCE)
-	target.x = newAvoidT;
-	target.y = 1 - newAvoidS;
-#endif
-
 	carTargetSpd = MN(carTargetSpd, ai.spdF);
 	close = (ai.flags & Opponent::F_CLOSE) != 0;
 
@@ -2104,28 +1949,6 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 		m_avoidT = attractT;
 		m_avoidTVel = 0;
 	}
-
-#if defined(USE_NEW_AVOIDANCE)
-	double	newScale = 0.5;
-	m_avoidY.SetMaxAccel(    0.001 * newScale );
-	m_avoidY.SetMaxVelocity( 0.010 * newScale );
-	m_avoidX.SetMaxAccel(    0.002 * newScale );
-	m_avoidX.SetMaxVelocity( 0.040 * newScale );
-/*
-	if( newAvoidS != 1 && m_avoidY.GetValue() == 1 )
-	{
-		m_avoidX.SetValue( newAvoidT );
-	}
-*/
-	m_avoidY.Update( newAvoidS );
-	m_avoidX.Update( newAvoidT );
-
-	NAOUT( "linAtt %6.3f %6.3f -- targ %6.3f %6.3f\n",
-			m_avoidY.GetValue(), m_avoidX.GetValue(), targetS, attractT );
-
-	m_avoidS = m_avoidY.GetValue();
-	m_avoidT = m_avoidX.GetValue();
-#endif
 }
 
 int TDriver::CalcGear( tCarElt* car, double& acc )
@@ -2159,7 +1982,7 @@ int TDriver::CalcGear( tCarElt* car, double& acc )
         float omega = car->_enginerpmRedLine/gr_up;
         float wr = wheelRadius;
 
-        if (omega*wr*SHIFT < car->_speed_x)
+        if (omega * wr * m_Shift < car->_speed_x)
         {
             return car->_gear + 1;
         } else
@@ -2167,7 +1990,7 @@ int TDriver::CalcGear( tCarElt* car, double& acc )
             float gr_down = car->_gearRatio[car->_gear + car->_gearOffset - 1];
             omega = car->_enginerpmRedLine/gr_down;
 
-            if (car->_gear > 1 && omega*wr*SHIFT > car->_speed_x + SHIFT_MARGIN)
+            if (car->_gear > 1 && omega * wr * m_Shift > car->_speed_x + SHIFT_MARGIN)
             {
                 return car->_gear - 1;
             }
@@ -2196,13 +2019,12 @@ float TDriver::getClutch()
         m_Clutch = MIN(m_ClutchMax, m_Clutch);
         if(m_Clutch == m_ClutchMax)
         {
-          if(GearRatio() * CarSpeedLong
-              / (wheelRadius * CarRpm) > m_ClutchRange)
+          if(GearRatio() * CarSpeedLong / (wheelRadius * CarRpm) > m_ClutchRange)
           {
             m_Clutch = m_ClutchMax - 0.01;
           }
           else
-            m_Clutch -= m_ClutchDelta/10;
+            m_Clutch -= m_ClutchDelta / 10;
         }
         else
         {
@@ -3207,6 +3029,52 @@ double TDriver::CalcFriction_shadow_REF(const double Crv)
 
   return FrictionFactor * m_XXX;
 }
+
+//==========================================================================*
+//==========================================================================*
+// Skilling
+//--------------------------------------------------------------------------*
+double TDriver::CalcSkill(tSituation *s, double TargetSpeed)
+{
+    if (Skilling && (RM_TYPE_PRACTICE != s->_raceType)
+            && m_Strategy->OutOfPitlane())
+    {
+        if ((SkillAdjustTimer == -1.0) || (TDriver::CurrSimTime - SkillAdjustTimer > SkillAdjustLimit))
+        {
+            double Rand1 = (double) getRandom() / 65536.0;
+            double Rand2 = (double) getRandom() / 65536.0;
+            double Rand3 = (double) getRandom() / 65536.0;
+
+            // acceleration to use in current time limit
+            DecelAdjustTarget = (Skill / 4 * Rand1);
+
+            // brake to use
+            BrakeAdjustTarget = MAX(0.7, 1.0 - MAX(0.0, Skill/10 * (Rand2 - 0.7)));
+
+            // how long this skill mode to last for
+            SkillAdjustLimit = 5.0 + Rand3 * 50.0;
+            SkillAdjustTimer = TDriver::CurrSimTime;
+
+            if (DecelAdjustPerc < DecelAdjustTarget)
+                DecelAdjustPerc += MIN(s->deltaTime*4, DecelAdjustTarget - DecelAdjustPerc);
+            else
+                DecelAdjustPerc -= MIN(s->deltaTime*4, DecelAdjustPerc - DecelAdjustTarget);
+
+            if (BrakeAdjustPerc < BrakeAdjustTarget)
+                BrakeAdjustPerc += MIN(s->deltaTime*2, BrakeAdjustTarget - BrakeAdjustPerc);
+            else
+                BrakeAdjustPerc -= MIN(s->deltaTime*2, BrakeAdjustPerc - BrakeAdjustTarget);
+        }
+        LogSHADOW.debug("#TS: %g DAP: %g (%g)", TargetSpeed, DecelAdjustPerc,(1 - DecelAdjustPerc/10));
+        TargetSpeed *= (1 - Skill/SkillMax * DecelAdjustPerc/20);
+        LogSHADOW.debug("#TS: %g\n", TargetSpeed);
+
+        LogSHADOW.debug("#%g %g\n", DecelAdjustPerc,(1 - DecelAdjustPerc/10));
+    }
+
+    return TargetSpeed;
+}
+
 //==========================================================================*
 //==========================================================================*
 // shadow_TRB1
@@ -3217,14 +3085,8 @@ void TDriver::CalcSkilling_shadow()
     SkillGlobal = SkillGlobal/10.0;
     SkillDriver = SkillDriver/3.0;
     Skill = SkillScale * (SkillGlobal + SkillDriver) + SkillOffset;
-/*
-    oSkillScale = oSkillScale/50.0;
-    oSkillDriver = oSkillDriver / (5.0 * ((50.0 - oSkillGlobal)/40.0));
-    oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2)
-        * (1.0 + oSkillDriver) + oSkillOffset;
-    oSkillMax = oSkillScale * 24 + oSkillOffset;
-*/
 }
+
 //==========================================================================*
 //==========================================================================*
 // shadow_ls1
@@ -3353,3 +3215,29 @@ int TDriver::GetWeather()
 {
     return (track->local.rain << 4) + track->local.water;
 };
+
+//==========================================================================*
+//==========================================================================*
+// Check if pit sharing is activated
+//--------------------------------------------------------------------------*
+bool TDriver::CheckPitSharing()
+{
+    const tTrackOwnPit* OwnPit = car->_pit;           // Get my pit
+
+    if (OwnPit == NULL)                               // If pit is NULL
+    {                                                 // nothing to do
+        LogSHADOW.debug("\n\n#Pit = NULL\n\n");       // here
+        return false;
+    }
+
+    if (OwnPit->freeCarIndex > 1)
+    {
+        LogSHADOW.debug("\n\n#PitSharing = true\n\n");
+        return true;
+    }
+    else
+    {
+        LogSHADOW.debug("\n\n#PitSharing = false\n\n");
+        return false;
+    }
+}
