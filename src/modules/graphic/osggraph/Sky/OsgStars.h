@@ -22,7 +22,7 @@
 
 #include <osg/Array>
 
-class SDStars
+class SDStars : public osg::Referenced
 {
     osg::ref_ptr<osg::Vec4Array> stars_cl;
     int old_phase;

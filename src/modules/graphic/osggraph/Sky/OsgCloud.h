@@ -33,7 +33,7 @@ using std::string;
 
 //class SDCloudField;
 
-class SDCloudLayer
+class SDCloudLayer : public osg::Referenced
 {
 public:
 

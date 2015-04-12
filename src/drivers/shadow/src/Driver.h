@@ -81,7 +81,7 @@
 #define NBR_BRAKECOEFF 50                                   // Number of brake coeffs
 
 const double	SPD_MIN = 0;
-const double	SPD_MAX = 112;
+const double	SPD_MAX = 120;
 const int		SPD_N = 20;
 const double	SPD_STEP = (SPD_MAX - SPD_MIN) / SPD_N;
 const double	K_MIN = -0.1;
@@ -129,8 +129,7 @@ public:
     ~TDriver();                                     // Destructor
 
 	void	SetShared( Shared* pShared );
-    void	InitTrack(tTrack* track, void* carHandle,
-                        void** carParmHandle, tSituation* s);
+    void	InitTrack(tTrack* track, void* carHandle, void** carParmHandle, tSituation* s);
     void	NewRace(tCarElt* car, tSituation* s );
 
 	void	GetPtInfo( int path, double pos, PtInfo& pi ) const;
@@ -148,7 +147,8 @@ public:
     double filterTrk(double accel);
 
     void initCa();
-    void initCa_MPA1();
+    //void initCa_MPA1();
+    //void initCa_MPA11();
     void initCw();
     void initCR();
 

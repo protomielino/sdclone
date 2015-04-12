@@ -583,7 +583,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
 	char*	pTrackName = strrchr(m_track.GetTrack()->filename, '/') + 1;
 	char	buf[1024];
 
-    sprintf( buf, "drivers/%s/%s.spr", robot_name, pTrackName );
+    snprintf( buf, 256, "drivers/%s/%s.spr", robot_name, pTrackName );
 
     initCw();
     LogSHADOW.debug(" CW = %.3f\n", m_cm.CD_BODY);

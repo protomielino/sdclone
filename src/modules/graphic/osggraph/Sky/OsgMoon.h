@@ -24,7 +24,7 @@
 #include <osg/MatrixTransform>
 #include <osg/Material>
 
-class SDMoon
+class SDMoon : public osg::Referenced
 {
     osg::ref_ptr<osg::MatrixTransform> moon_transform;
     osg::ref_ptr<osg::Material> orb_material;

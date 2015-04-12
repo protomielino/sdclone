@@ -70,11 +70,11 @@ private:
     typedef layer_list_type::const_iterator layer_list_const_iterator;
 
     // components of the sky
-    SDSkyDome* dome;
-    SDSun* sun;
-    SDMoon* moon;
-    SDStars* planets;
-    SDStars* stars;
+    osg::ref_ptr<SDSkyDome> dome;
+    osg::ref_ptr<SDSun> sun;
+    osg::ref_ptr<SDMoon> moon;
+    osg::ref_ptr<SDStars> planets;
+    osg::ref_ptr<SDStars> stars;
     layer_list_type cloud_layers;
 
     osg::ref_ptr<osg::Group> pre_root, cloud_root;

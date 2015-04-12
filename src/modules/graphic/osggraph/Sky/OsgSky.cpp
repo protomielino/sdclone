@@ -74,16 +74,18 @@ SDSky::SDSky( void )
 // Destructor
 SDSky::~SDSky( void )
 {
-    delete dome;
-    delete sun;
-    delete moon;
-    delete planets;
-    delete stars;
-    pre_root->removeChild(0, pre_root->getNumChildren());
+    //delete dome;
+    //delete sun;
+    //delete moon;
+    //delete planets;
+    //delete stars;
+
     for(unsigned i=0;i<cloud_layers.size();i++)
     {
         delete cloud_layers[i];
     }
+
+    pre_root->removeChild(0, pre_root->getNumChildren());
     //delete pre_transform;
     //delete post_root;
 }

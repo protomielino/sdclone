@@ -31,7 +31,7 @@ namespace osg
 class DrawElementsUShort;
 }
 
-class SDSkyDome
+class SDSkyDome : public osg::Referenced
 {
     osg::ref_ptr<osg::MatrixTransform> dome_transform;
     double asl;

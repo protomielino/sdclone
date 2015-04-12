@@ -231,7 +231,7 @@ bool SDSkyDome::repaint( const Vec3f& sky_color,
    const float middleVisFactor = 1.0 - vis_factor * (0.1 + 0.85 * cvf/45000);
 
    (*dome_cl)[0] = sky_color;
-   SDVectorArrayAdapter<Vec3Array> colors(*dome_cl, numBands, 1);
+   osggraph::SDVectorArrayAdapter<Vec3Array> colors(*dome_cl, numBands, 1);
    const double saif = sun_angle / SD_PI;
    static const osg::Vec3f blueShift(0.8, 1.0, 1.2);
    const osg::Vec3f skyFogDelta = sky_color - fog_color;

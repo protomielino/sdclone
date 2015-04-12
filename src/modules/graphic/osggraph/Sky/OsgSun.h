@@ -24,7 +24,7 @@
 #include <osg/Node>
 #include <osg/MatrixTransform>
 
-class SDSun
+class SDSun : public osg::Referenced
 {
     osg::ref_ptr<osg::MatrixTransform> sun_transform;
 
