@@ -276,7 +276,6 @@ private:
 	int		CalcGear( tCarElt* car, double& acc );
     float   getClutch();
 	double	ApplyAbs( tCarElt* car, double brake );
-	double	ApplyTractionControl( tCarElt* car, double acc );
     void    Meteorology();
     int     GetWeather();
     bool    CheckPitSharing();

@@ -2003,37 +2003,12 @@ int TDriver::CalcGear( tCarElt* car, double& acc )
 // Compute the clutch value.
 float TDriver::getClutch()
 {
-#if 1
     float speedr;
     float omega;
     float wr = wheelRadius;
     //int PrevGear = car->_gear - 1;
     omega = car->_enginerpmRedLine/car->_gearRatio[car->_gear + car->_gearOffset];
     speedr = (CLUTCH_SPEED + MAX(0.0f, car->_speed_x))/fabs(wr*omega);
-#else
-      if(m_Clutch > 0)
-      {
-        /*if (oGear < 2)
-          StartAutomatic();*/
-
-        m_Clutch = MIN(m_ClutchMax, m_Clutch);
-        if(m_Clutch == m_ClutchMax)
-        {
-          if(GearRatio() * CarSpeedLong / (wheelRadius * CarRpm) > m_ClutchRange)
-          {
-            m_Clutch = m_ClutchMax - 0.01;
-          }
-          else
-            m_Clutch -= m_ClutchDelta / 10;
-        }
-        else
-        {
-          m_Clutch -= m_ClutchDelta;
-          m_Clutch = MAX(0.0, m_Clutch);
-        }
-      }
-    }
-#endif
 
     if (1 || car->_gearCmd > 1)
     {
@@ -2102,63 +2077,12 @@ double TDriver::ApplyAbs( tCarElt* car, double brake )
 
     slip = 4.0 * car->_speed_x / slip;
 
-	if( slip < 0.9 )//ABS_SLIP )
+    if( slip > 1.0 )
 	{
 		brake *= 0.5;
 	}
 
 	return brake;
-}
-
-double TDriver::ApplyTractionControl( tCarElt* car, double acc )
-{
-	double	spin = 0;
-	double	wr = 0;
-	int		count = 0;
-
-    if( m_driveType == DT_FWD || m_driveType == DT_4WD )
-	{
-		spin += car->_wheelSpinVel(FRNT_LFT) * car->_wheelRadius(FRNT_LFT);
-		spin += car->_wheelSpinVel(FRNT_RGT) * car->_wheelRadius(FRNT_RGT);
-		wr += car->_wheelRadius(FRNT_LFT) + car->_wheelRadius(FRNT_RGT);
-		count += 2;
-	}
-
-    if( m_driveType == DT_RWD || m_driveType == DT_4WD )
-	{
-		spin += car->_wheelSpinVel(REAR_LFT) * car->_wheelRadius(REAR_LFT);
-		spin += car->_wheelSpinVel(REAR_RGT) * car->_wheelRadius(REAR_RGT);
-		wr += car->_wheelRadius(REAR_LFT) + car->_wheelRadius(REAR_RGT);
-		count += 2;
-	}
-
-	static double	tract = 1.0;
-
-	spin /= count;
-
-	if( car->_speed_x < 0.01 )
-		return acc;
-
-	double	slip = car->_speed_x / spin;
-
-    if( slip > 1.1 )
-	{
-		tract = 0.1;
-
-		wr /= count;
-        double	gr = car->_gearRatio[car->_gear + car->_gearOffset];    // Removed 5th April 2015 - Not Used
-        double	rpmForSpd = gr * car->_speed_x / wr;                    // Removed 5th April 2015 - Not Used
-
-		acc = 0;
-	}
-	else
-	{
-		tract = MN(1.0, tract + 0.1);
-	}
-
-	acc = MN(acc, tract);
-
-	return acc;
 }
 
 tdble F(tWing* wing)
@@ -2255,38 +2179,7 @@ void TDriver::initBrake()
 void TDriver::initCa()
 {
     LogSHADOW.debug("\n#Shadow Init InitCA >>>\n\n");
-#if 0
-    //bool WingTypeProfile = false;
 
-    char const *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
-
-    float FrontWingArea = GfParmGetNum(car->_carHandle, SECT_FRNTWING, PRM_WINGAREA, (char*) NULL, 0.0f);
-    float FrontWingAngle = GfParmGetNum(car->_carHandle, SECT_FRNTWING, PRM_WINGANGLE, (char*) NULL, 0.0f);
-
-    float rearwingarea = GfParmGetNum(car->_carHandle, SECT_REARWING, PRM_WINGAREA, (char*) NULL, 0.0f);
-    float rearwingangle = GfParmGetNum(car->_carHandle, SECT_REARWING, PRM_WINGANGLE, (char*) NULL, 0.0f);
-
-    float FrontWingcd = 1.23f * FrontWingArea *sin (FrontWingAngle);
-    float RearWingcd = 1.23f * rearwingarea * sin(rearwingangle);
-
-
-#if 0
-    float wingca = 1.23f * rearwingarea *sin (rearwingangle);
-#else
-    float wingca = 1.23f * (FrontWingcd + RearWingcd);
-#endif
-
-    float cl = GfParmGetNum(car->_carHandle, SECT_AERODYNAMICS, PRM_FCL, (char*) NULL, 0.0f) +
-            GfParmGetNum(car->_carHandle, SECT_AERODYNAMICS, PRM_RCL, (char*) NULL, 0.0f);
-    float h = 0.0f;
-    int i;
-
-    for (i = 0; i < 4; i++)
-        h += GfParmGetNum(car->_carHandle, WheelSect[i], PRM_RIDEHEIGHT, (char*) NULL, 0.20f);
-
-    h*= 1.5f; h = h*h; h = h*h; h = 2.0f * exp(-3.0f*h);
-    CA = h * cl + 4.0f * wingca;
-#else
     const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
     const char *WingSect[2] = {SECT_FRNTWING, SECT_REARWING};
 
@@ -2460,10 +2353,9 @@ void TDriver::initCa()
     m_cm.CA_GE = CARGROUNDEFFECT;
     m_cm.CD_WING = WingCD;
     //<<< simuv4
-#endif
+
     LogSHADOW.debug("\n#<<< Shadow Init InitCa\n\n");
 }
-
 
 // Compute aerodynamic drag coefficient CW.
 void TDriver::initCw()
