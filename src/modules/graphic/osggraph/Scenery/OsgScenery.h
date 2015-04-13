@@ -93,7 +93,6 @@ static int grWrldX=0;
 static int grWrldY=0;
 static int grWrldZ = 0;
 static int grWrldMaxSize=0;
-static bool speedWay=false;
 
 class SDScenery
 {
@@ -114,6 +113,8 @@ private:
 
     bool _bgtype;
     bool _bgsky;
+    bool _speedWay;
+    bool _speedWayLong;
 
     std::string _strTexturePath;
 
@@ -136,7 +137,8 @@ public:
     inline static int getWorldY(){return grWrldY;}
     inline static int getWorldZ(){return grWrldZ;}
     inline static int getWorldMaxSize(){return grWrldMaxSize;}
-    inline static bool getSpeedWay() { return speedWay; }
+    bool getSpeedWay() { return _speedWay; }
+	bool getSpeedWayLong() { return _speedWayLong; }
 
     osg::ref_ptr<osg::Group> getScene() { return _scenery.get(); }
     osg::ref_ptr<osg::Group> getBackground() { return m_background->getBackground(); }

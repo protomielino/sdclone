@@ -68,7 +68,7 @@ private :
 public :
     SDCar(void);
     ~SDCar(void);
-    osg::ref_ptr<osg::Node> loadCar(tCarElt *car, bool tracktype, unsigned carshader);
+    osg::ref_ptr<osg::Node> loadCar(tCarElt *car, bool tracktype, bool subcat, unsigned carshader);
     void deactivateCar(tCarElt *car);
     bool isCar(tCarElt*c);
     SDReflectionMapping * getReflectionMap();
@@ -95,7 +95,7 @@ public :
     SDCars(void);
     ~SDCars(void);
 
-    void loadCars(tSituation * pSituation, bool trackType);
+    void loadCars(tSituation * pSituation, bool trackType, bool subCat);
     void updateCars();
     void deactivateCar(tCarElt*car);
     void activateCar(tCarElt*car);

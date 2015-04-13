@@ -263,7 +263,7 @@ int  initCars(tSituation *s)
     GfLogInfo("InitCars\n");
     char buf[256];
     cars = new SDCars;
-    cars->loadCars(s, scenery->getSpeedWay());
+    cars->loadCars(s, scenery->getSpeedWay(), scenery->getSpeedWayLong());
     render->addCars(cars->getCarsNode());
     GfLogInfo("All cars loaded\n");
 

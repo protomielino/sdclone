@@ -47,7 +47,8 @@ SDScenery::SDScenery(void)
 
     _bgtype = false;
     _bgsky =  false;
-    speedWay = false;
+    _speedWay = false;
+    _speedWayLong = false;
 
     _scenery = NULL;
 
@@ -93,10 +94,18 @@ void SDScenery::LoadScene(tTrack *track)
     grWrldZ = (int)(SDTrack->max.z - SDTrack->min.z + 1);
     grWrldMaxSize = (int)(MAX(MAX(grWrldX, grWrldY), grWrldZ));
 
-    if (!strcmp(SDTrack->category, "speedway"))
-        speedWay = false;
+    if (strcmp(SDTrack->category, "speedway") == 0)
+    {
+        _speedWay = true;
+        if (strcmp(SDTrack->subcategory, "long") == 0)
+            _speedWayLong = true;
+        else
+            _speedWayLong = false;
+    }
     else
-        speedWay = true;
+        _speedWay = false;
+
+    GfOut("SpeedWay = %d - SubCategorie = %d\n", _speedWay, _speedWayLong);
 
     acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
     osgname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC2, "track.osg");
