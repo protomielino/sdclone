@@ -287,7 +287,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
     GfLogInfo("Rear Wing angle Loaded\n");
 
-/*    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_COCKPIT);
+    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_COCKPIT);
     param = GfParmGetStr(handle, path, PRM_MODELCOCKPIT, NULL);
 
     strPath = GetDataDir();
@@ -348,11 +348,11 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     std::string pBody_path = GetLocalDir();
     pBody_path = pBody_path+"body-"+name+".osg";
     osgDB::writeNodeFile( *pBody, pBody_path );
-#endif*/
+#endif
 
 
     /* add Steering Wheel 0 (if one exists) */
-    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
+    /*snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
     param = GfParmGetStr(handle, path, PRM_SW_MODEL, NULL);
     if (param)
     {
@@ -398,7 +398,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
         }
 
         pSteer->setSingleChildOn(0);
-    }
+    }*/
 
 
     // separate driver models for animation according to steering wheel angle ...
