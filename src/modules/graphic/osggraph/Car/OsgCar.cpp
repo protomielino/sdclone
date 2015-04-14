@@ -240,12 +240,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     snprintf(path, 256, "%s/%s", SECT_GROBJECTS, LST_REARWING);
     nranges = GfParmGetEltNb(handle, path) + 1;
 
-
-    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, LST_REARWING);
-    nranges = GfParmGetEltNb(handle, path) + 1;
     if (nranges > 1)
     {        
-        osg::ref_ptr<osg::Switch> pWing3 = new osg::Switch;
+        //osg::ref_ptr<osg::Switch> pWing3 = new osg::Switch;
         int selIndex = 0;
         std::string tmp = GetDataDir();
         sprintf(buf, "cars/models/%s/", car->_carName);
