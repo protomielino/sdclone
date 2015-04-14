@@ -65,7 +65,7 @@ SDCar::~SDCar(void)
 osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat, unsigned carshader)
 {
     this->car = car;
-    static const int nMaxTexPathSize = 4096;
+    static const int nMaxTexPathSize = 1024;
     char buf[nMaxTexPathSize];
     int index;
     void *handle;
@@ -74,7 +74,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     int nranges = 0;
     rcvShadowMask = 0x1;
     castShadowMask = 0x2;
-    char path[256];
+    char path[nMaxTexPathSize];
 
 #if 1
     osgLoader loader;
@@ -241,9 +241,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     nranges = GfParmGetEltNb(handle, path) + 1;
 
     if (nranges > 1)
-    {        
-        //osg::ref_ptr<osg::Switch> pWing3 = new osg::Switch;
-        int selIndex = 0;
+    {
         std::string tmp = GetDataDir();
         sprintf(buf, "cars/models/%s/", car->_carName);
         tmp = tmp+buf;
@@ -251,26 +249,25 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
         // Add the rearwings
         for (int i = 1; i < nranges; i++)
         {
-            osg::ref_ptr<osg::Node> rearwingBody1 = new osg::Node;
+            osg::ref_ptr<osg::Node> pWing1 = new osg::Node;
             osg::ref_ptr<osg::MatrixTransform> position = new osg::MatrixTransform;
+            snprintf(path, nMaxTexPathSize, "%s/%s/%d", SECT_GROBJECTS, LST_REARWING, i);
+            param = GfParmGetStr(handle, path, PRM_REARWINGMODEL, "");
 
-            snprintf(buf, nMaxTexPathSize, "%s/%s/%d", SECT_GROBJECTS, LST_REARWING, i);
-            param = GfParmGetStr(handle, buf, PRM_REARWINGMODEL, "");
             strPath = tmp+param;
 
-            rearwingBody1 = loader.Load3dFile(strPath, true);
+
             GfLogInfo("Loading Wing animate %i - %s !\n", i, strPath.c_str());
 
-            tdble xpos = GfParmGetNum(handle, buf, PRM_XPOS, NULL, 0.0);
-            tdble ypos = GfParmGetNum(handle, buf, PRM_YPOS, NULL, 0.0);
-            tdble zpos = GfParmGetNum(handle, buf, PRM_ZPOS, NULL, 0.0);
+            tdble xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
+            tdble ypos = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0.0);
+            tdble zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
             osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
 
-            position->addChild(rearwingBody1);
+            pWing1 = loader.Load3dFile(strPath, true);
+            position->addChild(pWing1);
             pWing3->addChild(position);
             strPath ="";
-
-            selIndex++;
         }
 
         pWing3->setSingleChildOn(0);
@@ -284,6 +281,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
     GfLogInfo("Rear Wing angle Loaded\n");
 
+
+    // Cockpit separate object loaded  ...
     snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_COCKPIT);
     param = GfParmGetStr(handle, path, PRM_MODELCOCKPIT, NULL);
 
@@ -349,8 +348,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
 
     /* add Steering Wheel 0 (if one exists) */
-    /*snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
+    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
     param = GfParmGetStr(handle, path, PRM_SW_MODEL, NULL);
+
     if (param)
     {
         std::string tmpPath = GetDataDir();
@@ -360,42 +360,53 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
         strPath = tmpPath + param;
 
         osg::ref_ptr<osg::Node> steerEntityLo = loader.Load3dFile(strPath, true);
-        osg::ref_ptr<osg::Node> steerEntityHi = NULL;
+        osg::ref_ptr<osg::MatrixTransform> steer_transform = new osg::MatrixTransform;
 
-        if (steerEntityLo)
-        {
-            osg::ref_ptr<osg::Node> steer_branch = new osg::Node;
-            osg::ref_ptr<osg::MatrixTransform> steerb = new osg::MatrixTransform;
+        tdble xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
+        tdble ypos = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0.0);
+        tdble zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
+        tdble angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
+        osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
+        osg::Matrix rot = osg::Matrix::rotate(angl, osg::Y_AXIS);
 
-            osg::ref_ptr<osg::Node> steerBranch = new osg::Node;
+        pos = rot * pos;
+        steer_transform->setMatrix(pos);
 
-            tdble xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
-            tdble ypos = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0.0);
-            tdble zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
-            tdble angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
-            osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
-            osg::Matrix rot = osg::Matrix::rotate(angl, osg::Y_AXIS);
+        steer_transform->addChild(steerEntityLo.get());
+        pSteer->addChild(steer_transform.get(), true);
+        GfLogTrace("Low Steer Loading \n");
+    }
 
+    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
+    param = GfParmGetStr(handle, path, PRM_SW_MODELHR, NULL);
 
-            param = GfParmGetStr(handle, path, PRM_SW_MODELHR, NULL);
-            if (param)
-            {
-                strPath = tmpPath+param;
-                osg::ref_ptr<osg::Node> steerEntityHi = loader.Load3dFile(strPath, true);
+    if (param)
+    {
+        std::string tmpPath = GetDataDir();
+        snprintf(buf, 256, "cars/models/%s/", car->_carName);
+        tmpPath = tmpPath+buf;
 
-                if (steerEntityHi)
-                {
-                    osg::ref_ptr<osg::MatrixTransform> steerrb = new osg::MatrixTransform;
-                    osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
-                    osg::Matrix rot = osg::Matrix::rotate(angl, osg::Y_AXIS);
+        strPath = tmpPath + param;
 
-                }
-            }
+        osg::ref_ptr<osg::Node> steerEntityHi = loader.Load3dFile(strPath, true);
+        osg::ref_ptr<osg::MatrixTransform> steer_transform = new osg::MatrixTransform;
 
-        }
+        tdble xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
+        tdble ypos = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0.0);
+        tdble zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
+        tdble angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
+        osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
+        osg::Matrix rot = osg::Matrix::rotate(angl, osg::Y_AXIS);
 
-        pSteer->setSingleChildOn(0);
-    }*/
+        pos = rot * pos;
+        steer_transform->setMatrix(pos);
+
+        steer_transform->addChild(steerEntityHi.get());
+        pSteer->addChild(steer_transform.get(), false);
+        GfLogTrace("High Steer Loading \n");
+    }
+
+    pSteer->setSingleChildOn(0);
 
 
     // separate driver models for animation according to steering wheel angle ...
@@ -446,7 +457,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     gCar->addChild(pWing.get());
     gCar->addChild(pWing3.get());
     gCar->addChild(pDriver.get());
-    //gCar->accept(pSteer.get());
+    gCar->addChild(pSteer.get());
 #else
 
     osg::ref_ptr<osg::Group> gCar = new osg::Group;
