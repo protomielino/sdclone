@@ -63,7 +63,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     osg::ref_ptr<osg::Camera> mirrorCam = new osg::Camera;
 
     viewer = new osgViewer::Viewer;
-
+    viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
     SDView * view = new SDView(viewer->getCamera(),0,0, m_Winw, m_Winh, mirrorCam.get());
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, m_Winw, m_Winh);
     viewer->getCamera()->setViewport(new osg::Viewport(0, 0, m_Winw, m_Winh));
