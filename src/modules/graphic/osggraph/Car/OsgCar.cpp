@@ -51,6 +51,12 @@ SDCar::SDCar(void) :
     reflectionMapping(NULL)
 {
     car_root = new osg::Group;
+
+    _cockpit = false;
+    _driver = false;
+    _wing1 = false;
+    _wing3 = false;
+    _steer = false;
 }
 
 SDCar::~SDCar(void)
@@ -150,7 +156,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     gCar->setName("CAR");
     osg::ref_ptr<osg::Switch> pBody =new osg::Switch;
     pBody->setName("COCK");
-    osg::ref_ptr<osg::Node> pCar = new osg::Node;
+    osg::ref_ptr<osg::Group> pCar = new osg::Group;
     osg::ref_ptr<osg::Switch> pWing = new osg::Switch;
     pWing->setName("WING");
     osg::ref_ptr<osg::Switch> pWing3 = new osg::Switch;
@@ -165,8 +171,11 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     strPath+=buf;
     GfLogInfo("Chemin Textures : %s\n", strTPath.c_str());
 
-    pCar = loader.Load3dFile(strPath, true);
-#if 1
+    osg::ref_ptr<osg::Node> Car = new osg::Node;
+    Car = loader.Load3dFile(strPath, true);
+
+    pCar->addChild(Car.get());
+#if 0
     std::string pCar_path = GetLocalDir();
     pCar_path = pCar_path+name+".osg";
     osgDB::writeNodeFile( *pCar, pCar_path );
@@ -182,6 +191,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
         osg::ref_ptr<osg::Node> pWin1 = new osg::Node;
         osg::ref_ptr<osg::Node> pWin2 = new osg::Node;
         osg::ref_ptr<osg::Node> pWin3 = new osg::Node;
+
+        _wing1 = true;
 
         std::string tmp = GetDataDir();
         sprintf(buf, "cars/models/%s/", car->_carName);
@@ -229,7 +240,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
                 GfLogInfo("Activate Wing Long !\n");
             }
         }
-#if 1
+#if 0
         std::string pWing_path = GetLocalDir();
         pWing_path = pWing_path+"wing.osg";
         osgDB::writeNodeFile( *pWing, pWing_path );
@@ -242,6 +253,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
     if (nranges > 1)
     {
+        _wing3 = true;
         std::string tmp = GetDataDir();
         sprintf(buf, "cars/models/%s/", car->_carName);
         tmp = tmp+buf;
@@ -271,81 +283,40 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
         }
 
         pWing3->setSingleChildOn(0);
+        GfLogInfo("Rear Wing angle Loaded\n");
 
-#if 1
+#if 0
         std::string pWing3_path = GetLocalDir();
         pWing3_path = pWing3_path+"wing3.osg";
         osgDB::writeNodeFile( *pWing3, pWing3_path );
 #endif
     }
 
-    GfLogInfo("Rear Wing angle Loaded\n");
-
 
     // Cockpit separate object loaded  ...
     snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_COCKPIT);
     param = GfParmGetStr(handle, path, PRM_MODELCOCKPIT, NULL);
 
-    strPath = GetDataDir();
-    osg::ref_ptr<osg::Group> cockpit = new osg::Group;
-    osg::ref_ptr<osg::Node> cock = new osg::Node;
-
     if (param)
     {
-        sprintf(buf, "cars/models/%s/cockpit.ac", car->_carName);
-        strPath +=buf;
-        cock= loader.Load3dFile(strPath, true);
+        _cockpit = true;
+        std::string tmp = GetDataDir();
+        sprintf(buf, "cars/models/%s/", car->_carName);
+        tmp = tmp+buf;
+
+        osg::ref_ptr<osg::Node> cockpit = new osg::Node;
+
+        strPath= tmp+param;
+
+        cockpit = loader.Load3dFile(strPath, true);
+        GfLogInfo("Cockpit loaded = %s !\n", strPath.c_str());
 #if 0
         std::string pCockpit_path = GetLocalDir();
         pCockpit_path = pCockpit_path+"cockpit.osg";
         osgDB::writeNodeFile( *cock, pCockpit_path );
 #endif
 
-        GfLogTrace("Cockpit High Loading \n");
-
-        // Load steer cockpit model if available
-        snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
-        param = GfParmGetStr(handle, path, PRM_SW_MODELHR, NULL);
-
-        if (param)
-        {
-            osg::ref_ptr<osg::Node> steer_branch = new osg::Node;
-            osg::ref_ptr<osg::MatrixTransform> steer = new osg::MatrixTransform;
-
-            strPath = GetDataDir();
-            sprintf(buf, "cars/models/%s/histeer.ac", car->_carName);
-            strPath+=buf;
-            steer_branch = loader.Load3dFile(strPath, true);
-#if 0
-            std::string pSteer_path = GetLocalDir();
-            pSteer_path = pSteer_path+"histeer.osg";
-            osgDB::writeNodeFile( *steer_branch, pSteer_path );
-#endif
-
-            double xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
-            double ypos = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0.0);
-            double zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
-            double angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
-            //double steerMovt = GfParmGetNum(handle, path, PRM_SW_MOVT, NULL, 1.0);
-
-            osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
-            osg::Matrix rot = osg::Matrix::rotate(0.0, osg::X_AXIS, angl, osg::Y_AXIS, 0.0, osg::Z_AXIS );
-
-            pos = rot * pos;
-            steer->addChild(steer_branch.get());
-            steer->setMatrix(pos);
-            GfLogTrace("Cockpit High Steer Loading \n");
-        }
-
     }
-    cockpit->addChild(cock.get());
-    pBody->addChild(cockpit.get(), false);
-#if 0
-    std::string pBody_path = GetLocalDir();
-    pBody_path = pBody_path+"body-"+name+".osg";
-    osgDB::writeNodeFile( *pBody, pBody_path );
-#endif
-
 
     /* add Steering Wheel 0 (if one exists) */
     snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
@@ -353,6 +324,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
     if (param)
     {
+        _steer = true;
         std::string tmpPath = GetDataDir();
         snprintf(buf, 256, "cars/models/%s/", car->_carName);
         tmpPath = tmpPath+buf;
@@ -382,6 +354,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
     if (param)
     {
+        _steer = true;
         std::string tmpPath = GetDataDir();
         snprintf(buf, 256, "cars/models/%s/", car->_carName);
         tmpPath = tmpPath+buf;
@@ -415,6 +388,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
     if (nranges > 1)
     {
+        _driver = true;
         int selIndex = 0;
         std::string tmp = GetLocalDir();
         std::string driver_path;
@@ -446,16 +420,17 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
         pDriver->setSingleChildOn(0);
 
-#if 1
+#if 0
         std::string pDriver_path = GetLocalDir();
         pDriver_path = pDriver_path+"driver.osg";
         osgDB::writeNodeFile( *pDriver, pDriver_path );
 #endif
     }
 
+    pCar->addChild(pWing.get());
+    pCar->addChild(pWing3.get());
+
     gCar->addChild(pCar.get());
-    gCar->addChild(pWing.get());
-    gCar->addChild(pWing3.get());
     gCar->addChild(pDriver.get());
     gCar->addChild(pSteer.get());
 #else
@@ -496,7 +471,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 #endif
 
     pBody->addChild(gCar.get(), true);
-    pBody->setSingleChildOn(1);
+    pBody->setSingleChildOn(0);
 
     osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
     transform1->addChild(pBody.get());

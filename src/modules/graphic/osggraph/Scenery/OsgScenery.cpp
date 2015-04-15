@@ -261,7 +261,7 @@ bool SDScenery::LoadTrack(std::string strTrack)
     {
         pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
         _scenery->addChild(pTrack);
-#if 1
+#if 0
         std::string Tpath = GetLocalDir();
         Tpath = Tpath+"/track.osg";
         osgDB::writeNodeFile( *pTrack, Tpath);

@@ -71,6 +71,13 @@ public :
     osg::ref_ptr<osg::Node> loadCar(tCarElt *car, bool tracktype, bool subcat, unsigned carshader);
     void deactivateCar(tCarElt *car);
     bool isCar(tCarElt*c);
+
+    bool    _cockpit;
+    bool    _driver;
+    bool    _wing1;
+    bool    _wing3;
+    bool    _steer;
+
     SDReflectionMapping * getReflectionMap();
 
     int getReflectionMappingMethod();
