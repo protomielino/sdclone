@@ -113,10 +113,15 @@ static tCmdDispInfo CmdDispInfo[] = {
     { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID | GEAR_MODE_HBOX }, // RIGHTGLANCE
 };
 
+#if SDL_JOYSTICK
+static tCtrlJoyInfo *joyInfo = NULL;
+static tCtrlJoyInfo joyCenter;
+#else
 static jsJoystick	*Joystick[GFCTRL_JOY_NUMBER];
 static float		JoyAxis[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
 static float 		JoyAxisCenter[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
 static int		JoyButtons[GFCTRL_JOY_NUMBER];
+#endif
 
 static float SteerSensVal;
 static float DeadZoneVal;
@@ -204,11 +209,15 @@ static void
 onQuit(void *prevMenu)
 {
     /* Release joysticks */
+#if SDL_JOYSTICK
+   GfctrlJoyRelease(joyInfo);
+#else
     for (int jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++)
 	if (Joystick[jsInd]) {
 	    delete Joystick[jsInd];
 	    Joystick[jsInd] = 0;
 	}
+#endif
 
     /* Back to previous screen */
     GfuiScreenActivate(prevMenu);
@@ -336,8 +345,13 @@ getMovedAxis(int joy_number)
     float	maxDiff = 0.3;
 
     for (i = GFCTRL_JOY_MAX_AXES * joy_number; i < GFCTRL_JOY_MAX_AXES * (joy_number+1); i++) {
+#if SDL_JOYSTICK
+	if (maxDiff < fabs(joyInfo->ax[i] - joyCenter.ax[i])) {
+	    maxDiff = fabs(joyInfo->ax[i] - joyCenter.ax[i]);
+#else
 	if (maxDiff < fabs(JoyAxis[i] - JoyAxisCenter[i])) {
 	    maxDiff = fabs(JoyAxis[i] - JoyAxisCenter[i]);
+#endif
 	    Index = i;
 	}
     }
@@ -397,9 +411,14 @@ IdleWaitForInput(void)
     }
 
     /* Check for a Joystick button pressed */
+#if SDL_JOYSTICK
+    GfctrlJoyGetCurrentStates(joyInfo);
+#endif
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
+#ifndef SDL_JOYSTICK
 	if (Joystick[index]) {
 	    Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
+#endif
 
             /* check for joystick movement as well */
             axis = getMovedAxis(index);
@@ -407,16 +426,29 @@ IdleWaitForInput(void)
 	    /* Allow a little extra time to detect button */
 	    if (axis != -1 && Cmd[CurrentCmd].pref != HM_ATT_JOY_REQ_AXIS) {
 		GfSleep(0.3);
+#if SDL_JOYSTICK
+         GfctrlJoyGetCurrentStates(joyInfo);
+#else
    		Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
+#endif
 	    }
 
 	    /* Joystick buttons */
+#if SDL_JOYSTICK
+	    for (i = 0; i < GFCTRL_JOY_MAX_BUTTONS; i++) {
+		if (joyInfo->levelup[i + GFCTRL_JOY_MAX_BUTTONS * index]) {
+#else
 	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
 		if (((b & mask) != 0) && ((JoyButtons[index] & mask) == 0)) {
+#endif
 		    /* Allow a little extra time to detect axis movement */
 		    if (axis == -1 && Cmd[CurrentCmd].pref != HM_ATT_JOY_REQ_BUT) {
     			GfSleep(0.3);
+#if SDL_JOYSTICK
+            GfctrlJoyGetCurrentStates(joyInfo);
+#else
 	    		Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
+#endif
             		axis = getMovedAxis(index);
 		    }
 
@@ -430,7 +462,11 @@ IdleWaitForInput(void)
 			if (Cmd[CurrentCmd].pref >= HM_ATT_JOY_PREF_ANY)
 			    Cmd[CurrentCmd].pref ++;
 
+#if SDL_JOYSTICK
+         Cmd[CurrentCmd].butIgnore = i + GFCTRL_JOY_MAX_BUTTONS * index;
+#else
 			Cmd[CurrentCmd].butIgnore = i + 32 * index;
+#endif
 
 			goto configure_for_joy_axis;
 		    }
@@ -446,17 +482,26 @@ IdleWaitForInput(void)
 		    /* Button i fired */
 		    GfuiApp().eventLoop().setRecomputeCB(0);
 		    InputWaited = 0;
+#if SDL_JOYSTICK
+		    str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_BUT, i + GFCTRL_JOY_MAX_BUTTONS * index);
+		    Cmd[CurrentCmd].ref.index = i + GFCTRL_JOY_MAX_BUTTONS * index;
+#else
 		    str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_BUT, i + 32 * index);
 		    Cmd[CurrentCmd].ref.index = i + 32 * index;
+#endif
 		    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_BUT;
 		    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
 		    GfuiApp().eventLoop().postRedisplay();
+#ifndef SDL_JOYSTICK
 		    JoyButtons[index] = b;
+#endif
 		    updateButtonText();
 		    return;
 		}
 	    }
+#ifndef SDL_JOYSTICK
 	    JoyButtons[index] = b;
+#endif
 
 	    /* Axis movement detected without button */
 	    if (axis != -1) {
@@ -487,7 +532,9 @@ configure_for_joy_axis:
 		updateButtonText();
 		return;
 	    }
+#ifndef SDL_JOYSTICK
 	}
+#endif
     }
 
     /* Let CPU take breath (and fans stay at low and quiet speed) */
@@ -527,10 +574,15 @@ onPush(void *vi)
     GfctrlMouseGetCurrentState(&MouseInfo);
 
     /* Read initial joysticks status */
+#if SDL_JOYSTICK
+    GfctrlJoyGetCurrentStates(joyInfo);
+    memcpy(&joyCenter, joyInfo, sizeof(joyCenter));
+#else
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++)
 	if (Joystick[index])
 	    Joystick[index]->read(&JoyButtons[index], &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
     memcpy(JoyAxisCenter, JoyAxis, sizeof(JoyAxisCenter));
+#endif
 
     /* Now, wait for input device actions */
     GfuiApp().eventLoop().setRecomputeCB(IdleWaitForInput);
@@ -539,6 +591,10 @@ onPush(void *vi)
 static void
 onActivate(void * /* dummy */)
 {
+#if SDL_JOYSTICK
+    joyInfo = GfctrlJoyCreate();
+    GfctrlJoyGetCurrentStates(joyInfo);
+#else
     // Create and test joysticks ; only keep the up and running ones.
     for (int jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++) {
 	if (!Joystick[jsInd])
@@ -552,6 +608,7 @@ onActivate(void * /* dummy */)
 		jsInd, Joystick[jsInd]->getName(), Joystick[jsInd]->getNumAxes());
 	}
     }
+#endif
 
     if (ReloadValues) {
 
@@ -631,9 +688,11 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
 
     PrevScrHandle = prevMenu;
 
+#ifndef SDL_JOYSTICK
     /* Initialize joysticks array */
     for (int jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++)
 	Joystick[jsInd] = 0;
+#endif
 
     /* Create screen */
     ScrHandle = GfuiScreenCreate((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);

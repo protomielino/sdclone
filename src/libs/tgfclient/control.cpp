@@ -28,15 +28,20 @@
 #include <stdio.h>
 #include <cstring>
 
-#ifdef __APPLE__
-#include <js.h>
-#else
-#include <plib/js.h>
-#endif
+//#ifndef SDL_JOYSTICK
+//#ifdef __APPLE__
+//#include <js.h>
+//#else
+//#include <plib/js.h>
+//#endif
+//#endif
 
 
 
 #include "tgfclient.h"
+#if SDL_MAJOR_VERSION >= 2
+#include "SDL_haptic.h"
+#endif
 
 
 static const char *GfJoyBtn[] = {
@@ -129,7 +134,20 @@ static int gfmaxKey		= sizeof(GfKey)		/ sizeof(GfKey[0]);
 
 static int gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
 
+
+#if SDL_JOYSTICK
+static SDL_Joystick *Joysticks[GFCTRL_JOY_NUMBER] = {NULL};
+static tCtrlJoyInfo *joyInfoCopy = NULL;
+#if SDL_MAJOR_VERSION >= 2
+static SDL_Haptic *Haptics[GFCTRL_JOY_NUMBER] = {NULL};
+static SDL_HapticEffect cfx[GFCTRL_JOY_NUMBER];
+static unsigned int	cfx_timeout[GFCTRL_JOY_NUMBER];
+static unsigned int 	rfx_timeout[GFCTRL_JOY_NUMBER];
+static int id[GFCTRL_JOY_NUMBER];
+#endif
+#else
 static jsJoystick *Joysticks[GFCTRL_JOY_NUMBER] = {NULL};
+#endif
 
 
 /** Get a control reference by its name
@@ -274,6 +292,7 @@ GfctrlGetNameByRef(int type, int index)
 void
 gfctrlJoyInit(void)
 {
+#ifndef SDL_JOYSTICK
     gfctrlJoyPresent = GFCTRL_JOY_NONE;
 
     for (int index = 0; index < GFCTRL_JOY_NUMBER; index++) {
@@ -289,17 +308,144 @@ gfctrlJoyInit(void)
 			gfctrlJoyPresent = GFCTRL_JOY_PRESENT;
 		}
     }
+#else
+#if SDL_MAJOR_VERSION >= 2
+    memset(&cfx, 0, sizeof(cfx));
+
+    SDL_SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
+    if (SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_TIMER) < 0) {
+#else
+    if (SDL_Init(SDL_INIT_JOYSTICK) < 0) {
+#endif
+        GfLogError("Couldn't initialize SDL: %s\n", SDL_GetError());
+        gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
+	return;
+    }
+
+    gfctrlJoyPresent = SDL_NumJoysticks();
+    if (gfctrlJoyPresent > GFCTRL_JOY_NUMBER) gfctrlJoyPresent = GFCTRL_JOY_NUMBER;
+
+    for (int index = 0; index < gfctrlJoyPresent; index++) {
+		if (!Joysticks[index]) {
+			Joysticks[index] = SDL_JoystickOpen(index);
+		}
+    
+		// Don't configure the joystick if it doesn't work
+		if (Joysticks[index] ==  NULL) {
+			GfLogError("Couldn't open joystick %d: %s\n", index, SDL_GetError());
+#if SDL_MAJOR_VERSION >= 2
+		} else {
+			cfx_timeout[index] = 0;
+			rfx_timeout[index] = 0;
+			
+			// Find which Haptic device relates to this joystick
+			Haptics[index] = SDL_HapticOpenFromJoystick(Joysticks[index]);
+
+			if (!Haptics[index]) {
+				GfLogInfo("Joystick %d does not support haptic\n", index);
+				break;
+#if 1
+			} else {
+				// add an CF effect on startup
+				gfctrlJoyConstantForce(index, 50000, 9000);
+#endif
+			}
+
+			// Check for Rumble capability
+			if (SDL_HapticRumbleSupported(Haptics[index]) == SDL_TRUE) {
+				if (SDL_HapticRumbleInit(Haptics[index]) != 0) 
+					GfLogError("Couldn't init rumble on joystick %d: %s\n", index, SDL_GetError());
+#if 1
+				else
+					gfctrlJoyRumble(index, 0.5);
+#endif
+			}
+#endif
+                }
+     }
+#endif
 }
+
+#if SDL_JOYSTICK
+void
+gfctrlJoyConstantForce(int index, unsigned int level, int dir)
+{
+#if SDL_MAJOR_VERSION >= 2
+	if (!Haptics[index]) return;
+
+	if ((SDL_HapticQuery(Haptics[index]) & SDL_HAPTIC_CONSTANT) == 0) return;
+
+	cfx[index].type = SDL_HAPTIC_CONSTANT;
+	cfx[index].constant.direction.type = SDL_HAPTIC_POLAR;
+	cfx[index].constant.direction.dir[0] = dir;
+	cfx[index].constant.length = 1000;
+	cfx[index].constant.level = level;
+	cfx[index].constant.attack_length = 0;
+	cfx[index].constant.fade_length = 1000;
+
+#if __WIN32__
+	if (SDL_HapticGetEffectStatus(Haptics[index], id[index]) == SDL_TRUE)
+#else
+	// Linux SDL doesn't support checking status at the moment :-(
+	if (cfx_timeout[index] > SDL_GetTicks())
+#endif
+		SDL_HapticUpdateEffect(Haptics[index], id[index], &cfx[index]);
+	else {
+		SDL_HapticDestroyEffect(Haptics[index], id[index]);
+		id[index] = SDL_HapticNewEffect(Haptics[index], &cfx[index]);
+		SDL_HapticRunEffect(Haptics[index], id[index], 1);
+	}
+
+	cfx_timeout[index] = SDL_GetTicks() + cfx[index].constant.length;
+#endif
+}
+
+void
+gfctrlJoyRumble(int index, float level)
+{
+#if SDL_MAJOR_VERSION >= 2
+	if (!Haptics[index]) return;
+
+	if (SDL_HapticRumbleSupported(Haptics[index]) != SDL_TRUE) return;
+
+	// we have to stop the rumble before updating
+	if (rfx_timeout[index] > SDL_GetTicks()) {
+		if (SDL_HapticRumbleStop(Haptics[index]) != 0)
+			GfLogError("Failed to stop rumble: %s\n", SDL_GetError() );
+	}
+
+	if (SDL_HapticRumblePlay(Haptics[index], level, 100) != 0)
+		GfLogError("Failed to play rumble: %s\n", SDL_GetError() );
+
+	rfx_timeout[index] = SDL_GetTicks() + 100;
+#endif
+}
+#endif
 
 // Shutdown time.
 void
 gfctrlJoyShutdown(void)
 {
-	if (gfctrlJoyPresent != GFCTRL_JOY_UNTESTED)
+   if (gfctrlJoyPresent != GFCTRL_JOY_UNTESTED)
+#ifndef SDL_JOYSTICK
+	
 		for (int index = 0; index < GFCTRL_JOY_NUMBER; index++)
 			delete Joysticks[index];
 
-	gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
+	
+#else
+      for (int index = 0; index < gfctrlJoyPresent; index++) {
+			SDL_JoystickClose(Joysticks[index]);
+			Joysticks[index] = NULL;
+#if SDL_MAJOR_VERSION >= 2
+			if (Haptics[index]) {
+				SDL_HapticClose(Haptics[index]);
+				Haptics[index] = NULL;
+			}			
+#endif
+		}
+#endif
+      gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
 }
 
 /** Create the joystick control
@@ -316,8 +462,16 @@ GfctrlJoyCreate(void)
     if (gfctrlJoyPresent == GFCTRL_JOY_UNTESTED)
 		gfctrlJoyInit();
 
+#if SDL_JOYSTICK
+    if (joyInfoCopy != NULL) return joyInfoCopy;
+#endif
+
     tCtrlJoyInfo* joyInfo = (tCtrlJoyInfo *)calloc(1, sizeof(tCtrlJoyInfo));
-    
+
+#if SDL_JOYSTICK
+    joyInfoCopy = joyInfo;
+#endif
+
     return joyInfo;
 }
 
@@ -330,6 +484,9 @@ void
 GfctrlJoyRelease(tCtrlJoyInfo *joyInfo)
 {
     free(joyInfo);
+#if SDL_JOYSTICK
+    joyInfoCopy = NULL;
+#endif
 }
 
 
@@ -341,7 +498,11 @@ GfctrlJoyRelease(tCtrlJoyInfo *joyInfo)
 int
 GfctrlJoyIsAnyPresent(void)
 {
+#if SDL_JOYSTICK
+   if (gfctrlJoyPresent == 0)
+#else
     if (gfctrlJoyPresent == GFCTRL_JOY_UNTESTED)
+#endif
 		gfctrlJoyInit();
 
     return gfctrlJoyPresent;
@@ -359,6 +520,7 @@ int
 GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 {
     int			ind;
+#ifndef SDL_JOYSTICK
     int			i;
     int			b;
     unsigned int	mask;
@@ -392,9 +554,86 @@ GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
     } else {
 	return -1;
     }
+#else
+    int			i,j;
 
+    if (gfctrlJoyPresent != GFCTRL_JOY_UNTESTED) {
+    	for (ind = 0; ind < gfctrlJoyPresent; ind++) {
+
+            // This polling is missing sometimes, skiping buttons or leaving axes stuck on
+     if (Joysticks[ind]) {
+#if SDL_MAJOR_VERSION < 2
+		// poll each axis 
+		// note: for SDL2 use events, set in GfctrlJoySetAxis()
+		j = SDL_JoystickNumAxes(Joysticks[ind]);
+		if (j > GFCTRL_JOY_MAX_AXES) j = GFCTRL_JOY_MAX_AXES;
+
+		for (i=0; i < j;i++)
+                    joyInfo->ax[GFCTRL_JOY_MAX_AXES * ind + i] = ((float) SDL_JoystickGetAxis(Joysticks[ind],i)) / 32768;
+#endif
+
+		// read each button
+		j = SDL_JoystickNumButtons(Joysticks[ind]);
+		if (j > GFCTRL_JOY_MAX_BUTTONS) j = GFCTRL_JOY_MAX_BUTTONS;
+ 
+		for (i=0; i < j;i++) {
+#if SDL_MAJOR_VERSION < 2
+		    GfctrlJoySetButton(ind, i, (int) SDL_JoystickGetButton(Joysticks[ind], i));
+#else
+		    // buttons are read set by events, we just pass them up when requested
+
+                    if (joyInfo->oldb[GFCTRL_JOY_MAX_BUTTONS * ind + i] == joyInfo->levelup[GFCTRL_JOY_MAX_BUTTONS * ind + i]) {
+			// already informed system of event up/down already, so clear it
+ 			joyInfo->edgeup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
+		   }
+
+                    // store button for next round
+                    joyInfo->oldb[GFCTRL_JOY_MAX_BUTTONS * ind + i] = joyInfo->levelup[GFCTRL_JOY_MAX_BUTTONS * ind + i];
+#endif
+ 		}
+ 	    }
+ 	}
+     } else {
+ 	return -1;
+     }
+#endif
     return 0;
 }
+
+#if SDL_JOYSTICK
+void
+GfctrlJoySetAxis(int joy, int axis, float value)
+{
+	if (joyInfoCopy == NULL) return;
+
+	joyInfoCopy->ax[GFCTRL_JOY_MAX_AXES * joy + axis] = value;
+	//GfLogInfo("SDL Joy %d Axis %d = Value %f\n", joy, axis, value);
+}
+
+void
+GfctrlJoySetButton(int joy, int button, int value)
+{
+	if (joyInfoCopy == NULL) return;
+
+	if ((value == SDL_PRESSED) && !joyInfoCopy->levelup[GFCTRL_JOY_MAX_BUTTONS * joy + button] ) {
+	    joyInfoCopy->edgeup[GFCTRL_JOY_MAX_BUTTONS * joy + button] = 1;
+	} else {
+	    joyInfoCopy->edgeup[GFCTRL_JOY_MAX_BUTTONS * joy + button] = 0;
+	}
+
+	if ((value != SDL_PRESSED) && joyInfoCopy->levelup[GFCTRL_JOY_MAX_BUTTONS * joy + button] ) {
+	    joyInfoCopy->edgedn[GFCTRL_JOY_MAX_BUTTONS * joy + button] = 1;
+	} else {
+	    joyInfoCopy->edgedn[GFCTRL_JOY_MAX_BUTTONS * joy + button] = 0;
+	}
+
+	if (value == SDL_PRESSED) {
+	    joyInfoCopy->levelup[GFCTRL_JOY_MAX_BUTTONS * joy + button] = 1;
+	} else {
+	    joyInfoCopy->levelup[GFCTRL_JOY_MAX_BUTTONS * joy + button] = 0;
+	}
+}
+#endif
 
 /** Initialize the mouse control
     @ingroup	ctrl

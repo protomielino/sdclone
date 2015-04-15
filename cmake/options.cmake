@@ -97,7 +97,9 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_OSGGRAPH false CACHE BOOL "Build OpenScenGraph-based WIP osggraph graphics module")
     
-    SET(OPTION_SDL2 false CACHE BOOL "Build with SDL2 instead lib SDL 1.2")
+    SET(OPTION_SDL2 false CACHE BOOL "Build with SDL2 instead of SDL 1.2")
+
+    SET(OPTION_SDL_JOYSTICK false CACHE BOOL "Use SDL for Joystick instead of PLIB")
 	
     SET(OPTION_AUTOVERSION true CACHE BOOL "Enable automatic computation of the version from SVN source tree")
     
@@ -181,6 +183,10 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     IF(OPTION_UNLOAD_SSGGRAPH)
       ADD_DEFINITIONS(-DUNLOAD_SSGGRAPH)
     ENDIF(OPTION_UNLOAD_SSGGRAPH)
+
+    IF(OPTION_SDL_JOYSTICK)
+          ADD_DEFINITIONS(-DSDL_JOYSTICK)
+    ENDIF(OPTION_SDL_JOYSTICK)
 
     # Define for code that needs Torcs backward compatibility
     ADD_DEFINITIONS(-DSPEED_DREAMS)
