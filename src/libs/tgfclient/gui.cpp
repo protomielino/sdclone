@@ -638,10 +638,11 @@ GfuiScreenActivate(void *screen)
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	else
 		SDL_EnableKeyRepeat(0, 0);
-#endif
+#else
 #if SDL_JOYSTICK
 	GfuiApp().eventLoop().setJoystickAxisCB(GfctrlJoySetAxis);
 	GfuiApp().eventLoop().setJoystickButtonCB(GfctrlJoySetButton);
+#endif
 #endif
 
 	if (GfuiScreen->onlyCallback == 0) 

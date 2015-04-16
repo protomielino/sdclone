@@ -585,6 +585,7 @@ GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
                     if (joyInfo->oldb[GFCTRL_JOY_MAX_BUTTONS * ind + i] == joyInfo->levelup[GFCTRL_JOY_MAX_BUTTONS * ind + i]) {
 			// already informed system of event up/down already, so clear it
  			joyInfo->edgeup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
+         joyInfo->edgedn[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
 		   }
 
                     // store button for next round
