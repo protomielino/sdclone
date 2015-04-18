@@ -4,6 +4,8 @@
 
 #include <math.h>
 
+#include <tgf.hpp>
+
 #include "LearnedGraph.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -12,8 +14,8 @@
 
 LearnedGraph::LearnedGraph()
 :	m_nAxes(0),
-	m_beta(0.5),
 	m_pAxis(0),
+    m_beta(0.5),
 	m_pData(0)
 {
 }
@@ -21,8 +23,8 @@ LearnedGraph::LearnedGraph()
 LearnedGraph::LearnedGraph(	int	nAxes, const double* min, const double*	max, const int*	steps, double initialValue )
 :
 	m_nAxes(nAxes),
-	m_beta(0.5),
-	m_pAxis(0),
+    m_pAxis(0),
+    m_beta(0.5),
 	m_pData(0)
 {
 	m_pAxis = new Axis[nAxes];
@@ -46,8 +48,8 @@ LearnedGraph::LearnedGraph(	int	nAxes, const double* min, const double*	max, con
 
 LearnedGraph::LearnedGraph( double minX, double maxX, int xSteps, double initialY )
 :	m_nAxes(1),
-	m_beta(0.5),
 	m_pAxis(0),
+    m_beta(0.5),
 	m_pData(0)
 {
 	m_pAxis = new Axis[1];
@@ -152,6 +154,7 @@ void LearnedGraph::SetBeta( double beta )
 
 double LearnedGraph::CalcValue( int dim, int offs, const Idx* idx ) const
 {
+    GfOut("CalcValue offs - dim - m_nAxes = %i - %i - %i\n", offs, dim, m_nAxes);
 	if( dim < m_nAxes )
 	{
 		int		offs_i = offs + m_pAxis[dim].m_itemSize * idx[dim].i;
@@ -168,6 +171,7 @@ double LearnedGraph::CalcValue( int dim, int offs, const Idx* idx ) const
 
 void LearnedGraph::LearnValue( int dim, int offs, const Idx* idx, double delta )
 {
+    GfOut("LearnValue offs - Dim - m_nAxes = %i - %i - %i\n", offs, dim, m_nAxes);
 	if( dim < m_nAxes )
 	{
 		int		offs_i = offs + m_pAxis[dim].m_itemSize * idx[dim].i;
@@ -187,8 +191,7 @@ LearnedGraph::Idx*	LearnedGraph::MakeIdx( const double* coord ) const
 	for( int i = 0; i < m_nAxes; i++ )
 	{
 		// 0 <= t <= m_steps
-		idx[i].t = m_pAxis[i].m_steps * (coord[i] - m_pAxis[i].m_min) /
-							m_pAxis[i].m_span;
+        idx[i].t = m_pAxis[i].m_steps * (coord[i] - m_pAxis[i].m_min) /	m_pAxis[i].m_span;
 		if( idx[i].t < 0 )
 			idx[i].t = 0;
 		else if( idx[i].t > m_pAxis[i].m_steps )
