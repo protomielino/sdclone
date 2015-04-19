@@ -2,8 +2,6 @@ INCLUDE(../../../../cmake/macros.cmake)
 
 SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Utils/OsgColor.h
-                     #Utils/OsgAtomic.h
-                     #Utils/OsgReferenced.h 
                      Utils/OsgMath.h
 					 Utils/OsgOptions.h
 
@@ -35,11 +33,6 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Car/OsgCar.h
                      Car/OsgWheel.h
                      Car/OsgBrake.h
-					 Car/OsgWing.h
-					 Car/OsgWing3.h
-					 Car/OsgCockpit.h
-					 Car/OsgDriver.h
-					 Car/OsgSteer.h
 
                      OsgGraph.h
                      OsgMain.h
@@ -79,11 +72,6 @@ SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
                      Car/OsgCar.cpp
                      Car/OsgWheel.cpp
                      Car/OsgBrake.cpp
-					 Car/OsgWing.cpp
-					 Car/OsgWing3.cpp
-					 Car/OsgCockpit.cpp
-					 Car/OsgDriver.cpp
-					 Car/OsgSteer.cpp
 
                      OsgGraph.cpp
                      OsgMain.cpp

@@ -26,19 +26,12 @@
 
 #include <osg/TextureCubeMap>
 
-#include "OsgCockpit.h"
 #include "OsgDriver.h"
 #include "OsgWheel.h"
-#include "OsgWing.h"
-#include "OsgWing3.h"
 
 class SDCarShader;
 class SDReflectionMapping;
 class SDWheels;
-class SDCockpit;
-class SDDriver;
-class SDWing;
-class SDWing3;
 
 class SDCar
 {
@@ -52,13 +45,9 @@ private :
     tCarElt     *car;
 
     SDWheels    wheels;
-    //SDCockpit   *cockpit;
-    //SDWing      *wing;
-    //SDWing3     * wing3;
-    //SDDriver    *driver;
-
     SDCarShader *shader;
     SDReflectionMapping *reflectionMapping;
+
     int reflectionMappingMethod;
     unsigned int rcvShadowMask;
     unsigned int castShadowMask;
@@ -78,11 +67,11 @@ public :
     bool    _wing3;
     bool    _steer;
 
-    SDReflectionMapping * getReflectionMap();
+    SDReflectionMapping *getReflectionMap();
 
     int getReflectionMappingMethod();
 
-    tCarElt * getCar();
+    tCarElt *getCar();
 
     void activateCar(tCarElt *car);
     void updateCar();
@@ -94,7 +83,7 @@ class SDCars
 private :
     std::vector<SDCar *> the_cars;
     osg::ref_ptr<osg::Group> cars_branch;
-    tSituation * situation;
+    tSituation *situation;
 
     void addSDCar(SDCar * car);
 

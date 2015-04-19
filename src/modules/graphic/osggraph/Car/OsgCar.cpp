@@ -61,8 +61,8 @@ SDCar::SDCar(void) :
 
 SDCar::~SDCar(void)
 {
-    car_root->removeChildren(0, car_root->getNumChildren());
-    car_root = NULL;
+    //car_root->removeChildren(0, car_root->getNumChildren());
+    //car_root = NULL;
 
     delete shader;
     delete reflectionMapping;
@@ -513,7 +513,7 @@ int SDCar::getReflectionMappingMethod()
     return reflectionMappingMethod;
 }
 
-tCarElt * SDCar::getCar()
+tCarElt *SDCar::getCar()
 {
     return car;
 }
@@ -675,12 +675,12 @@ SDCars::~SDCars(void)
     }
 }
 
-void SDCars::addSDCar(SDCar * car)
+void SDCars::addSDCar(SDCar *car)
 {
-    the_cars.insert(the_cars.end(),car);
+    the_cars.insert(the_cars.end(), car);
 }
 
-void SDCars::loadCars(tSituation * pSituation, bool trackType, bool subCat)
+void SDCars::loadCars(tSituation *pSituation, bool trackType, bool subCat)
 {
     SDRender *rend = (SDRender *)getRender();
     unsigned carShader = rend->getShader();
@@ -717,7 +717,7 @@ void SDCars::activateCar(tCarElt *car)
     }
 }
 
-SDCar *SDCars::getCar(tCarElt*car)
+SDCar *SDCars::getCar(tCarElt *car)
 {
     std::vector<SDCar *>::iterator it;
     SDCar *res = new SDCar;

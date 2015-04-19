@@ -358,8 +358,11 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 		# TODO: Find a way to install them in the osgPlugins-xxx subdir (works as is, but ...)
 		SET(_OSG_PLUGIN_NAME_HINTS "osgdb_ac;osgdb_dds;osgdb_glsl") # ';'-separated list
       LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_ive;osgdb_jpeg;osgdb_osg;osgdb_curl")
-      LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_osga;osgdb_osgtgz;osgdb_png;osgdb_rgb")
-      LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_serializers_osg;osgdb_serializers_osgga;osgdb_serializers_osgparticle;osgdb_serializers_osgshadow;osgdb_serializers_osgviewer")
+      LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_osga;osgdb_osgshadow;osgdb_osgtgz;osgdb_png;osgdb_rgb")
+      LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_serializers_osg;osgdb_serializers_osganimation;osgdb_serializers_osgfx;osgdb_serializers_osgga;osgdb_serializers_osgmanipulator;osgdb_serializers_osgparticle")
+	  LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_serializers_osgshadow;osgdb_serializers_osgsim;osgdb_serializers_osgtext;osgdb_serializers_osggui;osgdb_serializers_osgutil;osgdb_serializers_osgviewer")
+	  LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_deprecated_osg;osgdb_deprecated_osganimation;osgdb_deprecated_osgfx;osgdb_deprecated_osgparticle;osgdb_deprecated_osgshadow")
+	  LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_deprecated_osgsim;osgdb_deprecated_osgtext;osgdb_deprecated_osgwidget;osgdb_deprecated_osgviewer")
 
 		GET_FILENAME_COMPONENT(_OSG_PLUGINS_DIR "${_DLL_PATHNAME_}" PATH)
 		FILE(GLOB_RECURSE _OSG_PLUGIN_NAMES "${_OSG_PLUGINS_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
