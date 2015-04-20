@@ -79,7 +79,7 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
 #if 1
     osgLoader loader;
     char wheel_file_name[32];
-	int MaxPathSize = 512;
+	static const int MaxPathSize = 512;
     char buf[MaxPathSize];
 
     std::string TmpPath = GetDataDir();
