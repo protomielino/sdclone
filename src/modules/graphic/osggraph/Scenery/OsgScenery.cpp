@@ -134,7 +134,7 @@ void SDScenery::LoadScene(tTrack *track)
     }
 
     std::string strPath = GetDataDir();
-    sprintf(buf, "tracks/%s/%s", SDTrack->category, SDTrack->internalname);
+    sprintf(buf, "tracks/%s/%/", SDTrack->category, SDTrack->internalname);
 
     std::string ext = osgDB::getFileExtension(acname);
 
@@ -145,7 +145,6 @@ void SDScenery::LoadScene(tTrack *track)
             GfOut("Load 3D Model Scene ACC\n");
             strPath+=buf;
             _strTexturePath = strPath;
-            strPath+="/";
             strPath+=acname;
 
             LoadTrack(strPath);
@@ -159,8 +158,8 @@ void SDScenery::LoadScene(tTrack *track)
             strTPath += buf;
             osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
             pathList.push_back(strPath);
-            pathList.push_back(strTPath+"data/objects");
-            pathList.push_back(strTPath+"data/textures");
+            pathList.push_back(strTPath+"data/objects/");
+            pathList.push_back(strTPath+"data/textures/");
             osgDB::Registry::instance()->setDataFilePathList(pathList);
             osg::ref_ptr<osg::Node> pTrack = osgDB::readNodeFile(acname);
 
@@ -191,8 +190,8 @@ void SDScenery::LoadScene(tTrack *track)
 
         osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
         pathList.push_back(strPath);
-        pathList.push_back(strTPath+"data/objects");
-        pathList.push_back(strTPath+"data/textures");
+        pathList.push_back(strTPath+"data/objects/");
+        pathList.push_back(strTPath+"data/textures/");
         osgDB::Registry::instance()->setDataFilePathList(pathList);
         osg::ref_ptr<osg::Node> pTrack = osgDB::readNodeFile( osgname );
         _scenery->addChild(pTrack.get());
