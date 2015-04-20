@@ -271,7 +271,7 @@ int  initCars(tSituation *s)
 
     if (!grHandle)
     {
-        sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
+        snprintf(buf, 256, "%s%s", GfLocalDir(), GR_PARAM_FILE);
         grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     }
 

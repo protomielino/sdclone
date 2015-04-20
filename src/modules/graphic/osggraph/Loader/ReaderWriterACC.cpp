@@ -93,7 +93,7 @@ Geodelist  _geodelist;
 
 ReaderWriterACC::ReaderWriterACC()
 {
-    osgDB::ReaderWriter::supportsExtension("acc","SPEED DREAMS Database format");
+    osgDB::ReaderWriter::supportsExtension("acc", "SPEED DREAMS Database format");
     m_bCar = false;
     m_transparentGroup = NULL;
     m_opaqueGroup = NULL;

@@ -79,20 +79,21 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
 #if 1
     osgLoader loader;
     char wheel_file_name[32];
-    char buf[4096];
+	int MaxPathSize = 512;
+    char buf[MaxPathSize];
 
     std::string TmpPath = GetDataDir();
     std::string strTPath;
-    snprintf(buf, 4096, "drivers/%s/%d/", car->_modName, car->_driverIndex);
+    snprintf(buf, MaxPathSize, "drivers/%s/%d/", car->_modName, car->_driverIndex);
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
 
-    snprintf(buf, 4096, "cars/models/%s/", car->_carName);
+    snprintf(buf, MaxPathSize, "cars/models/%s/", car->_carName);
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
     GfOut("Chemin Textures : %s\n", strTPath.c_str());
 
-    snprintf(buf, 4096, "data/textures/");
+    snprintf(buf, MaxPathSize, "data/textures/");
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
 
@@ -116,7 +117,7 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
     }
 #else
     char wheel_file_name[32];
-    char buf[4096];
+    char buf[MaxPathSize];
 
     std::string LocalPath = GetDataDir();
 
@@ -124,10 +125,10 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
     options->CACHE_NONE;
     //options = new osgDB::ReaderWriter::Options;
 
-    snprintf(buf, 4096, "drivers/%s/%d/", car->_modName, car->_driverIndex);
+    snprintf(buf, MaxPathSize, "drivers/%s/%d/", car->_modName, car->_driverIndex);
     options->getDatabasePathList().push_back(LocalPath+buf);
 
-    snprintf(buf, 4096, "cars/models/%s/", car->_carName);
+    snprintf(buf, MaxPathSize, "cars/models/%s/", car->_carName);
     options->getDatabasePathList().push_back(LocalPath+buf);
 
     options->getDatabasePathList().push_back(LocalPath+"data/textures/");

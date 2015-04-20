@@ -71,7 +71,7 @@ SDCar::~SDCar(void)
 osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat, unsigned carshader)
 {
     this->car = car;
-    static const int nMaxTexPathSize = 1024;
+    static const int nMaxTexPathSize = 512;
     char buf[nMaxTexPathSize];
     int index;
     void *handle;
