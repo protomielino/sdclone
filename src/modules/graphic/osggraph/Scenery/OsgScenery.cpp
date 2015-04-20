@@ -84,7 +84,7 @@ void SDScenery::LoadScene(tTrack *track)
 
     if(grHandle == NULL)
     {
-        sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
+        snprintf(buf, 256, "%s%s", GetLocalDir(), GR_PARAM_FILE);
         grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
     }//if grHandle
 
@@ -126,7 +126,7 @@ void SDScenery::LoadScene(tTrack *track)
         {
             _bgtype = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), GR_ATT_BGSKY_LAND) == 0;
             std::string strPath = PathTmp;
-            sprintf(buf, "tracks/%s/%s", SDTrack->category, SDTrack->internalname);
+            snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
             strPath += buf;
             m_background->build(_bgtype, grWrldX, grWrldY, grWrldZ, strPath);
             GfOut("Background loaded\n");
@@ -134,7 +134,7 @@ void SDScenery::LoadScene(tTrack *track)
     }
 
     std::string strPath = GetDataDir();
-    sprintf(buf, "tracks/%s/%/", SDTrack->category, SDTrack->internalname);
+    snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
 
     std::string ext = osgDB::getFileExtension(acname);
 
@@ -154,7 +154,7 @@ void SDScenery::LoadScene(tTrack *track)
             strPath+=buf;
 
             std::string strTPath = GetDataDir();
-            snprintf(buf, 255, "data/textures/");
+            snprintf(buf, 256, "data/textures/");
             strTPath += buf;
             osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
             pathList.push_back(strPath);
@@ -185,7 +185,7 @@ void SDScenery::LoadScene(tTrack *track)
         GfOut("OSG MODEL 3D = %s\n", osgname);
         strPath+=buf;
         std::string strTPath = GetDataDir();
-        snprintf(buf, 4096, "data/textures/");
+        snprintf(buf, 256, "data/textures/");
         strTPath += buf;
 
         osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
@@ -225,7 +225,7 @@ void SDScenery::LoadGraphicsOptions()
 
     if (!grHandle)
     {
-        sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
+        snprintf(buf, 256, "%s%s", GfLocalDir(), GR_PARAM_FILE);
         grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
     }//if grHandle
 
@@ -243,14 +243,14 @@ void SDScenery::ShutdownScene(void)
 
 bool SDScenery::LoadTrack(std::string strTrack)
 {
-    char buf[4096];
+    char buf[256];
     GfOut("Chemin Track : %s\n", strTrack.c_str());
     osgLoader loader;
     GfOut("Chemin Textures : %s\n", _strTexturePath.c_str());
     loader.AddSearchPath(_strTexturePath);
 
     std::string strTPath = GetDataDir();
-    snprintf(buf, 4096, "data/textures/");
+    snprintf(buf, 256, "data/textures/");
     strTPath += buf;
     loader.AddSearchPath(strTPath);
 

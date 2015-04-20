@@ -144,10 +144,10 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     //  selIndex = 0; 	/* current selector index */
     snprintf(buf, nMaxTexPathSize, "%s.ac",
              car->_carName); /* default car 3D model file */
-    snprintf(path, 256, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
+    snprintf(path, nMaxTexPathSize, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
 
     std::string strPath = GetDataDir();
-    sprintf(buf, "cars/models/%s/%s.acc", car->_carName, car->_carName);
+    snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s.acc", car->_carName, car->_carName);
     strPath+=buf;
 
     std::string name = car->_carName;
@@ -184,7 +184,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     GfLogInfo("Load Car ACC !\n");
 
     /* Set a selector on the wing type MPA*/
-    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_WING_MODEL);
+    snprintf(path, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, SECT_WING_MODEL);
     param = GfParmGetStr(handle, path, PRM_WING_1, NULL);
     if (param)
     {
@@ -195,7 +195,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
         _wing1 = true;
 
         std::string tmp = GetDataDir();
-        sprintf(buf, "cars/models/%s/", car->_carName);
+        snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
         tmp = tmp+buf;
 
         param = GfParmGetStr(handle, path, PRM_WING_1, NULL);
@@ -248,14 +248,14 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     }
 
     // Separate rear wing models for animation according to rear wing angle ...
-    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, LST_REARWING);
+    snprintf(path, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, LST_REARWING);
     nranges = GfParmGetEltNb(handle, path) + 1;
 
     if (nranges > 1)
     {
         _wing3 = true;
         std::string tmp = GetDataDir();
-        sprintf(buf, "cars/models/%s/", car->_carName);
+        snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
         tmp = tmp+buf;
 
         // Add the rearwings
@@ -267,7 +267,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
             param = GfParmGetStr(handle, path, PRM_REARWINGMODEL, "");
 
             strPath = tmp+param;
-
 
             GfLogInfo("Loading Wing animate %i - %s !\n", i, strPath.c_str());
 
@@ -294,14 +293,14 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
 
     // Cockpit separate object loaded  ...
-    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_COCKPIT);
+    snprintf(path, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, SECT_COCKPIT);
     param = GfParmGetStr(handle, path, PRM_MODELCOCKPIT, NULL);
 
     if (param)
     {
         _cockpit = true;
         std::string tmp = GetDataDir();
-        sprintf(buf, "cars/models/%s/", car->_carName);
+        snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
         tmp = tmp+buf;
 
         osg::ref_ptr<osg::Node> cockpit = new osg::Node;
@@ -319,14 +318,14 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     }
 
     /* add Steering Wheel 0 (if one exists) */
-    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
+    snprintf(path, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
     param = GfParmGetStr(handle, path, PRM_SW_MODEL, NULL);
 
     if (param)
     {
         _steer = true;
         std::string tmpPath = GetDataDir();
-        snprintf(buf, 256, "cars/models/%s/", car->_carName);
+        snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
         tmpPath = tmpPath+buf;
 
         strPath = tmpPath + param;
@@ -349,14 +348,14 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
         GfLogTrace("Low Steer Loading \n");
     }
 
-    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
+    snprintf(path, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
     param = GfParmGetStr(handle, path, PRM_SW_MODELHR, NULL);
 
     if (param)
     {
         _steer = true;
         std::string tmpPath = GetDataDir();
-        snprintf(buf, 256, "cars/models/%s/", car->_carName);
+        snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
         tmpPath = tmpPath+buf;
 
         strPath = tmpPath + param;
@@ -383,7 +382,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
 
     // separate driver models for animation according to steering wheel angle ...
-    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, LST_DRIVER);
+    snprintf(path, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, LST_DRIVER);
     nranges = GfParmGetEltNb(handle, path) + 1;
 
     if (nranges > 1)
