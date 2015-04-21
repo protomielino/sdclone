@@ -45,7 +45,7 @@ private :
     osg::ref_ptr<osg::Uniform> reflectionMapStaticOffsetCoords;
 
 public :
-    SDCarShader(osg::Node *car, SDCar *c);
+    SDCarShader(osg::Group *car, SDCar *c);
     void update(osg::Matrixf view);
 };
 

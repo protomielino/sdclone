@@ -487,7 +487,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
     this->shader = new SDCarShader(pCar.get(), this);
 
-    if (carshader)
+    if (carshader > 1)
         this->reflectionMappingMethod = REFLECTIONMAPPING_DYNAMIC;
     else
         this->reflectionMappingMethod = REFLECTIONMAPPING_OFF;

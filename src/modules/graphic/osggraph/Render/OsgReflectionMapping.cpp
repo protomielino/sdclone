@@ -122,17 +122,17 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):car(c)
         camera->attach( osg::Camera::COLOR_BUFFER, reflectionMap, 0, i );
         camera->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
         camera->addChild( m_sceneroot );
-        camera->setProjectionMatrixAsPerspective(90.0,1.0,1.0,100000.0);
-
+        camera->setProjectionMatrixAsPerspective(90.0, 1.0, 1.0, 100000.0);
+		 
         camerasRoot->addChild(camera);
         cameras.push_back(camera);
 
-        if (reflectionShader == 1)
+        if (reflectionShader > 1)
             camera->setNodeMask(0);
     }
 
     //ACTIVATE to enable Environment MApping <= temporary hack.
-    if (reflectionShader == 1)
+    if (reflectionShader > 1)
     {
         SDScreens * screens = (SDScreens*)getScreens();
         screens->registerViewDependantPreRenderNode(this->getCamerasRoot());

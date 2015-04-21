@@ -28,7 +28,7 @@
 #include "OsgCar.h"
 #include "OsgSky.h"
 
-SDCarShader::SDCarShader(osg::Node *car, SDCar *c)
+SDCarShader::SDCarShader(osg::Group *car, SDCar *c)
 {
     std::string TmpPath = GetDataDir();
     osg::ref_ptr<osg::Shader> vertShader = new osg::Shader( osg::Shader::VERTEX);
@@ -39,7 +39,7 @@ SDCarShader::SDCarShader(osg::Node *car, SDCar *c)
     program->addShader( vertShader.get() );
     program->addShader( fragShader.get() );
 
-    pCar= car;
+    pCar= dynamic_cast<osg::Group *> (car);
     this->pSdCar = c;
     stateset = pCar->getOrCreateStateSet();
     stateset->setAttributeAndModes(program);
