@@ -24,7 +24,7 @@ class SDCar;
 class SDCarShader
 {
 private :
-    SDCar * pSdCar;
+    SDCar *pSdCar;
 
     osg::ref_ptr<osg::Program> program ;
     osg::ref_ptr<osg::Node> pCar;
@@ -45,7 +45,7 @@ private :
     osg::ref_ptr<osg::Uniform> reflectionMapStaticOffsetCoords;
 
 public :
-    SDCarShader(osg::Group *car, SDCar *c);
+    SDCarShader(osg::Node *car, SDCar *c);
     void update(osg::Matrixf view);
 };
 

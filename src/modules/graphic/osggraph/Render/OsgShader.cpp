@@ -28,7 +28,7 @@
 #include "OsgCar.h"
 #include "OsgSky.h"
 
-SDCarShader::SDCarShader(osg::Group *car, SDCar *c)
+SDCarShader::SDCarShader(osg::Node *car, SDCar *c)
 {
     std::string TmpPath = GetDataDir();
     osg::ref_ptr<osg::Shader> vertShader = new osg::Shader( osg::Shader::VERTEX);
@@ -39,7 +39,8 @@ SDCarShader::SDCarShader(osg::Group *car, SDCar *c)
     program->addShader( vertShader.get() );
     program->addShader( fragShader.get() );
 
-    pCar= dynamic_cast<osg::Group *> (car);
+    //pCar= dynamic_cast<osg::Group *> (car);
+    pCar = car;
     this->pSdCar = c;
     stateset = pCar->getOrCreateStateSet();
     stateset->setAttributeAndModes(program);
@@ -47,7 +48,7 @@ SDCarShader::SDCarShader(osg::Group *car, SDCar *c)
     diffuseMap = new osg::Uniform("diffusemap", 0 );
     stateset->addUniform(diffuseMap);
 
-    specularColor = new osg::Uniform("specularColor", osg::Vec4(0.8f,0.8f,0.8f,1.0f));
+    specularColor = new osg::Uniform("specularColor", osg::Vec4(0.8f, 0.8f, 0.8f, 1.0f));
     stateset->addUniform(specularColor);
 
     lightVector = stateset->getOrCreateUniform("lightvector",osg::Uniform::FLOAT_VEC3);
@@ -56,7 +57,7 @@ SDCarShader::SDCarShader(osg::Group *car, SDCar *c)
     shininess = new osg::Uniform("smoothness", 300.0f);
     stateset->addUniform(shininess);
 
-    reflectionMappingMethod = new osg::Uniform("reflectionMappingMethod",pSdCar->getReflectionMappingMethod());
+    reflectionMappingMethod = new osg::Uniform("reflectionMappingMethod", this->pSdCar->getReflectionMappingMethod());
     reflectionMapCube = new osg::Uniform("reflectionMapCube", 2 );
     reflectionMap2DSampler = new osg::Uniform("reflectionMap2DSampler", 2 );
     reflectionMapStaticOffsetCoords = stateset->getOrCreateUniform("reflectionMapStaticOffsetCoords", osg::Uniform::FLOAT_VEC3);

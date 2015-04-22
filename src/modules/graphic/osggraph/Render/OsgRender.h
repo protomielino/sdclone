@@ -68,7 +68,7 @@ private:
     unsigned SDSkyDomeDistThresh;
     unsigned int rcvShadowMask;
     unsigned int castShadowMask;
-    unsigned carsShader;
+    int carsShader;
     int SDDynamicWeather;
     bool SDDynamicSkyDome;
 
@@ -110,7 +110,7 @@ public:
     void weather(void);
 
     inline SDSky * getSky() { return thesky; }
-    inline unsigned getShader() { return carsShader; }
+    inline int getShader() { return carsShader; }
     osg::ref_ptr<osg::Group> getRoot() { return m_RealRoot.get(); }
     osg::ref_ptr<osg::Group> getSceneRoot() { return m_scene.get(); }
     osg::ref_ptr<osg::Group> getCarRoot() { return m_CarRoot.get(); }

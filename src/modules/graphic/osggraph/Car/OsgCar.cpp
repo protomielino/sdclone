@@ -57,18 +57,20 @@ SDCar::SDCar(void) :
     _wing1 = false;
     _wing3 = false;
     _steer = false;
+
+    _carShader = 0;
 }
 
 SDCar::~SDCar(void)
 {
-    //car_root->removeChildren(0, car_root->getNumChildren());
-    //car_root = NULL;
+    car_root->removeChildren(0, car_root->getNumChildren());
+    car_root = NULL;
 
     delete shader;
     delete reflectionMapping;
 }
 
-osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat, unsigned carshader)
+osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat, int carshader)
 {
     this->car = car;
     static const int nMaxTexPathSize = 512;
@@ -81,6 +83,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     rcvShadowMask = 0x1;
     castShadowMask = 0x2;
     char path[nMaxTexPathSize];
+
+    _carShader = carshader;
 
 #if 1
     osgLoader loader;
@@ -156,7 +160,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     gCar->setName("CAR");
     osg::ref_ptr<osg::Switch> pBody =new osg::Switch;
     pBody->setName("COCK");
-    osg::ref_ptr<osg::Group> pCar = new osg::Group;
+    osg::ref_ptr<osg::Node> pCar = new osg::Node;
+    osg::ref_ptr<osg::Node> pCockpit = new osg::Node;
     osg::ref_ptr<osg::Switch> pWing = new osg::Switch;
     pWing->setName("WING");
     osg::ref_ptr<osg::Switch> pWing3 = new osg::Switch;
@@ -171,10 +176,10 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     strPath+=buf;
     GfLogInfo("Chemin Textures : %s\n", strTPath.c_str());
 
-    osg::ref_ptr<osg::Node> Car = new osg::Node;
-    Car = loader.Load3dFile(strPath, true);
+    //osg::ref_ptr<osg::Node> Car = new osg::Node;
+    pCar = loader.Load3dFile(strPath, true);
 
-    pCar->addChild(Car.get());
+    //pCar->addChild(Car.get());
 #if 0
     std::string pCar_path = GetLocalDir();
     pCar_path = pCar_path+name+".osg";
@@ -303,19 +308,18 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
         snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
         tmp = tmp+buf;
 
-        osg::ref_ptr<osg::Node> cockpit = new osg::Node;
-
         strPath= tmp+param;
 
-        cockpit = loader.Load3dFile(strPath, true);
+        pCockpit = loader.Load3dFile(strPath, true);
         GfLogInfo("Cockpit loaded = %s !\n", strPath.c_str());
 #if 0
         std::string pCockpit_path = GetLocalDir();
         pCockpit_path = pCockpit_path+"cockpit.osg";
         osgDB::writeNodeFile( *cock, pCockpit_path );
 #endif
-
     }
+
+    pBody->addChild(pCockpit.get(), false);
 
     /* add Steering Wheel 0 (if one exists) */
     snprintf(path, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
@@ -426,8 +430,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 #endif
     }
 
-    pCar->addChild(pWing.get());
-    pCar->addChild(pWing3.get());
+    gCar->addChild(pWing.get());
+    gCar->addChild(pWing3.get());
 
     gCar->addChild(pCar.get());
     gCar->addChild(pDriver.get());
@@ -470,7 +474,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 #endif
 
     pBody->addChild(gCar.get(), true);
-    pBody->setSingleChildOn(0);
+    pBody->setSingleChildOn(1);
 
     osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
     transform1->addChild(pBody.get());
@@ -487,13 +491,13 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
     this->shader = new SDCarShader(pCar.get(), this);
 
-    if (carshader > 1)
+    if (_carShader > 1)
         this->reflectionMappingMethod = REFLECTIONMAPPING_DYNAMIC;
     else
         this->reflectionMappingMethod = REFLECTIONMAPPING_OFF;
 
     this->reflectionMapping = new SDReflectionMapping(this);
-    this->setReflectionMap(reflectionMapping->getReflectionMap());
+    this->setReflectionMap(this->reflectionMapping->getReflectionMap());
 
     return this->car_root;
 }
@@ -502,14 +506,14 @@ bool SDCar::isCar(tCarElt*c)
 {
     return c==car;
 }
-SDReflectionMapping * SDCar::getReflectionMap()
+SDReflectionMapping *SDCar::getReflectionMap()
 {
-    return reflectionMapping;
+    return this->reflectionMapping;
 }
 
 int SDCar::getReflectionMappingMethod()
 {
-    return reflectionMappingMethod;
+    return this->reflectionMappingMethod;
 }
 
 tCarElt *SDCar::getCar()
