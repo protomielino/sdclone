@@ -38,9 +38,9 @@ class SDCar
 private :
     osg::ref_ptr<osg::MatrixTransform> car_branch;
     osg::ref_ptr<osg::Group> car_root;
-    osg::ref_ptr<osg::Vec3Array> shadowVertices;
-    osg::ref_ptr<osg::Geometry> quad;
-    osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
+    //osg::ref_ptr<osg::Vec3Array> shadowVertices;
+    //osg::ref_ptr<osg::Geometry> quad;
+    //osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
 
     tCarElt     *car;
 
@@ -49,9 +49,8 @@ private :
     SDReflectionMapping *reflectionMapping;
 
     int reflectionMappingMethod;
-    unsigned int rcvShadowMask;
+	unsigned int rcvShadowMask;
     unsigned int castShadowMask;
-
     void setReflectionMap(osg::ref_ptr<osg::Texture> map);
 
 public :

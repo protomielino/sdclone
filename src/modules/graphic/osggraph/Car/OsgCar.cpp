@@ -47,11 +47,11 @@
 class SDRender;
 
 SDCar::SDCar(void) :
+	car_branch(NULL),
+	car_root(NULL),
     shader(NULL),
     reflectionMapping(NULL)
 {
-    car_root = new osg::Group;
-
     _cockpit = false;
     _driver = false;
     _wing1 = false;
@@ -72,7 +72,10 @@ SDCar::~SDCar(void)
 
 osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat, int carshader)
 {
+	this->car_branch = new osg::MatrixTransform;
+	this->car_root = new osg::Group;
     this->car = car;
+
     static const int nMaxTexPathSize = 512;
     char buf[nMaxTexPathSize];
     int index;
@@ -521,7 +524,7 @@ tCarElt *SDCar::getCar()
     return car;
 }
 
-#define GR_SHADOW_POINTS 6
+/*#define GR_SHADOW_POINTS 6
 #define MULT 1.1
 osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car)
 {
@@ -602,7 +605,7 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car)
 
     //  GfOut("\n################## LOADED SHADOW ###############################\n");
     return root.get();
-}
+}*/
 
 void SDCar::deactivateCar(tCarElt *car)
 {

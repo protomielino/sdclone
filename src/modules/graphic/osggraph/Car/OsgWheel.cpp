@@ -71,7 +71,7 @@ osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)
         group->addChild(wheels[i]);
     }
 
-    return group;
+	return group.get();
 }
 
 osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const char * wheel_mod_name)
@@ -107,7 +107,7 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
         {
             snprintf(wheel_file_name, 32, "%s%d.acc", wheel_mod_name, j);
             wheel = loader.Load3dFile(wheel_file_name, true);
-            wheels_switches[wheelIndex]->addChild(wheel,false);
+			wheels_switches[wheelIndex]->addChild(wheel.get(), false);
 #if 0
             std::string wheel_path = GetLocalDir();
             wheel_path = wheel_path+wheel_file_name+".osg";
@@ -166,21 +166,21 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
     if(wheelIndex == FRNT_RGT || wheelIndex == REAR_RGT )
     {
         osg::ref_ptr<osg::MatrixTransform> flipright = new osg::MatrixTransform;
-        flipright->setMatrix(osg::Matrix::rotate(osg::PI,osg::Z_AXIS));
-        flipright->addChild(whlsize);
-        whlsize = flipright;
+        flipright->setMatrix(osg::Matrix::rotate(osg::PI, osg::Z_AXIS));
+		flipright->addChild(whlsize.get());
+		whlsize = flipright.get();
     }
 
     osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
-    transform1->addChild(whlsize);
+    transform1->addChild(whlsize.get());
 
     osg::ref_ptr<osg::MatrixTransform> transform2 = new osg::MatrixTransform;
-    transform2->addChild(transform1);
+    transform2->addChild(transform1.get());
 
     //initiating brakes
     transform2->addChild(this->brakes.initBrake(wheelIndex));
 
-    return transform2;
+    return transform2.get();
 }
 
 void SDWheels::updateWheels()
@@ -196,9 +196,9 @@ void SDWheels::updateWheels()
 
         osg::Matrix posMatrix = osg::Matrix::translate(car->priv.wheel[i].relPos.x, car->priv.wheel[i].relPos.y, car->priv.wheel[i].relPos.z);
 
-        osg::Matrix camberDirMatrix = osg::Matrix::rotate(car->priv.wheel[i].relPos.ax, osg::X_AXIS,//camber
+        osg::Matrix camberDirMatrix = osg::Matrix::rotate(car->priv.wheel[i].relPos.ax, osg::X_AXIS, //camber
                                                           0.0, osg::Y_AXIS,
-                                                          car->priv.wheel[i].relPos.az, osg::Z_AXIS );//direction
+                                                          car->priv.wheel[i].relPos.az, osg::Z_AXIS ); //direction
 
         posMatrix = camberDirMatrix * posMatrix;
         osg::MatrixTransform * trans = dynamic_cast<osg::MatrixTransform *>(wheels[i]->getChild(0));
