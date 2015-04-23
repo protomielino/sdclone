@@ -25,7 +25,7 @@
 
 #include "OsgScenery.h"
 
-SDTrackLights::SDTrackLights(void)
+/*SDTrackLights::SDTrackLights(void)
 {
 }
 
@@ -38,4 +38,4 @@ SDTrackLights::~SDTrackLights(void)
 void SDTrackLights::build(const std::string TrackPath)
 {
         osg::ref_ptr<osg::StateSet> state;
-}
+}*/

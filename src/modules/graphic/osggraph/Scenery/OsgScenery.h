@@ -28,8 +28,8 @@
 #include <osg/Group>
 
 class	SDBackground;
-class   SDPit;
-class   SDTrackLights;
+//class   SDPit;
+//class   SDTrackLights;
 class	SDScenery;
 class   osgLoader;
 
@@ -55,7 +55,7 @@ public:
     osg::ref_ptr<osg::Group> getBackground() { return _background.get(); }
 };
 
-class SDPit
+/*class SDPit
 {
     osg::ref_ptr<osg::Group>	 _osgpit;
     bool	_number;
@@ -87,7 +87,7 @@ public:
 
     void build(const std::string strTrack);
     osg::ref_ptr<osg::Group> getTrackLight() { return _osgtracklight.get(); }
-};
+};*/
 
 static int grWrldX=0;
 static int grWrldY=0;
@@ -98,8 +98,8 @@ class SDScenery
 {
 private:
     SDBackground	*m_background;
-    SDPit           *m_pit;
-    SDTrackLights   *m_tracklights;
+    //SDPit           *m_pit;
+    //SDTrackLights   *m_tracklights;
 
     osg::ref_ptr<osg::Group> _scenery;
 
@@ -142,8 +142,8 @@ public:
 
     osg::ref_ptr<osg::Group> getScene() { return _scenery.get(); }
     osg::ref_ptr<osg::Group> getBackground() { return m_background->getBackground(); }
-    osg::ref_ptr<osg::Group> getPit() { return m_pit->getPit(); }
-    osg::ref_ptr<osg::Group> getTracklight() { return m_tracklights->getTrackLight(); }
+    //osg::ref_ptr<osg::Group> getPit() { return m_pit->getPit(); }
+    //osg::ref_ptr<osg::Group> getTracklight() { return m_tracklights->getTrackLight(); }
 };
 
 #endif //_OSGSCENERY_H_

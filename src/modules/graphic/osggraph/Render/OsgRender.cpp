@@ -72,9 +72,21 @@ static const int NbShadersValues = sizeof(ShadersValues) / sizeof(ShadersValues[
 static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = {1, 3, 5, 7, 8};
 static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
 
-SDRender::SDRender(void)
-    :AStarsData(NULL),
-      APlanetsData(NULL)
+SDRender::SDRender(void) :
+    m_RealRoot(NULL),
+    m_scene(NULL),
+    m_CarRoot(NULL),
+    skyGroup(NULL),
+    stateSet(NULL),
+    skySS(NULL),
+    lightSource(NULL),
+    sunLight(NULL),
+    shadowRoot(NULL),
+    AStarsData(NULL),
+    APlanetsData(NULL),
+    thesky(NULL),
+    scenery(NULL),
+    SDTrack(NULL)
 {
     BaseSkyColor = osg::Vec3f( 0.31f, 0.43f, 0.69f );
     BaseFogColor = osg::Vec3f( 0.84f, 0.84f, 1.0f );
@@ -105,9 +117,6 @@ SDRender::SDRender(void)
     sol_angle = 0.0;
     moon_angle = 0.0;
     sky_brightness = 0.0;
-    m_scene = NULL;
-    thesky = NULL;
-    SDTrack = NULL;
 }
 
 SDRender::~SDRender(void)

@@ -68,7 +68,10 @@ public:
 CameraPreCallback *pre_cam = new CameraPreCallback;
 CameraPostCallback *post_cam = new CameraPostCallback;
 
-SDReflectionMapping::SDReflectionMapping(SDCar *c):car(c)
+SDReflectionMapping::SDReflectionMapping(SDCar *c):
+    camerasRoot(NULL),
+    reflectionMap(NULL),
+    car(c)
 {
     SDRender *render = (SDRender *)getRender();
     unsigned reflectionShader = render->getShader();
@@ -88,25 +91,24 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):car(c)
     imagePosZ->setInternalTextureFormat(GL_RGB);
     imageNegZ->setInternalTextureFormat(GL_RGB);
 
-    osg::ref_ptr<osg::TextureCubeMap> reflectionMap;
+    osg::ref_ptr<osg::TextureCubeMap> reflectionmap = new osg::TextureCubeMap;
 
-    reflectionMap = new osg::TextureCubeMap;
-    this->reflectionMap = reflectionMap;
+    this->reflectionMap = reflectionmap;
 
-    reflectionMap->setImage(osg::TextureCubeMap::POSITIVE_X, imagePosX);
-    reflectionMap->setImage(osg::TextureCubeMap::NEGATIVE_X, imageNegX);
-    reflectionMap->setImage(osg::TextureCubeMap::POSITIVE_Y, imagePosY);
-    reflectionMap->setImage(osg::TextureCubeMap::NEGATIVE_Y, imageNegY);
-    reflectionMap->setImage(osg::TextureCubeMap::POSITIVE_Z, imagePosZ);
-    reflectionMap->setImage(osg::TextureCubeMap::NEGATIVE_Z, imageNegZ);
+    reflectionmap->setImage(osg::TextureCubeMap::POSITIVE_X, imagePosX);
+    reflectionmap->setImage(osg::TextureCubeMap::NEGATIVE_X, imageNegX);
+    reflectionmap->setImage(osg::TextureCubeMap::POSITIVE_Y, imagePosY);
+    reflectionmap->setImage(osg::TextureCubeMap::NEGATIVE_Y, imageNegY);
+    reflectionmap->setImage(osg::TextureCubeMap::POSITIVE_Z, imagePosZ);
+    reflectionmap->setImage(osg::TextureCubeMap::NEGATIVE_Z, imageNegZ);
 
-    reflectionMap->setTextureSize( 256, 256 );
-    reflectionMap->setInternalFormat( GL_RGB);
-    reflectionMap->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
-    reflectionMap->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
-    reflectionMap->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_EDGE);
-    reflectionMap->setFilter(osg::TextureCubeMap::MIN_FILTER,osg::TextureCubeMap::LINEAR);
-    reflectionMap->setFilter(osg::TextureCubeMap::MAG_FILTER,osg::TextureCubeMap::LINEAR);
+    reflectionmap->setTextureSize( 256, 256 );
+    reflectionmap->setInternalFormat( GL_RGB);
+    reflectionmap->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
+    reflectionmap->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
+    reflectionmap->setWrap(osg::Texture::WRAP_R, osg::Texture::CLAMP_TO_EDGE);
+    reflectionmap->setFilter(osg::TextureCubeMap::MIN_FILTER,osg::TextureCubeMap::LINEAR);
+    reflectionmap->setFilter(osg::TextureCubeMap::MAG_FILTER,osg::TextureCubeMap::LINEAR);
 
     camerasRoot = new osg::Group;
 

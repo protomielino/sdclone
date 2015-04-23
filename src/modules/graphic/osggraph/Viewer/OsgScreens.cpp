@@ -31,8 +31,12 @@
 #include "OsgMain.h"
 #include "OsgCar.h"
 
-SDScreens::SDScreens()
-    :m_CurrentScreenIndex(0)
+SDScreens::SDScreens() :
+    root(NULL),
+    mirrorScene(NULL),
+    prerenderRoot(NULL),
+
+    m_CurrentScreenIndex(0)
 {
     debugHUD = new SDDebugHUD();
     //viewer = static_cast<osgViewer::Viewer *> (GfScrGetViewer());

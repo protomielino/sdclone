@@ -33,7 +33,10 @@
 #include <robottools.h>	//RtXXX()
 #include <portability.h>
 
-SDScenery::SDScenery(void)
+SDScenery::SDScenery(void) :
+    m_background(NULL),
+    _scenery(NULL),
+    SDTrack(NULL)
 {
     grWrldX = 0;
     grWrldY = 0;
@@ -49,16 +52,12 @@ SDScenery::SDScenery(void)
     _bgsky =  false;
     _speedWay = false;
     _speedWayLong = false;
-
-    _scenery = NULL;
-
-    SDTrack = NULL;
 }
 
 SDScenery::~SDScenery(void)
 {
     delete	m_background;
-    delete  m_pit;
+    //delete  m_pit;
     delete SDTrack;
 
     _scenery = NULL;
@@ -75,7 +74,7 @@ void SDScenery::LoadScene(tTrack *track)
     GfOut("Initialisation class SDScenery\n");
 
     m_background = new SDBackground;
-    m_pit = new SDPit;
+    //m_pit = new SDPit;
     _scenery = new osg::Group;
     SDTrack = track;
 
@@ -196,8 +195,8 @@ void SDScenery::LoadScene(tTrack *track)
         osg::ref_ptr<osg::Node> pTrack = osgDB::readNodeFile( osgname );
         _scenery->addChild(pTrack.get());
 
-        m_pit->build(strPath);
-        _scenery->addChild(m_pit->getPit());
+        //m_pit->build(strPath);
+        //_scenery->addChild(m_pit->getPit());
     }
 
     osgDB::Registry::instance()->clearObjectCache();

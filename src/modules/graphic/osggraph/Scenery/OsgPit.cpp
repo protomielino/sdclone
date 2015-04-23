@@ -24,7 +24,7 @@
 
 #include "OsgScenery.h"
 
-SDPit::SDPit(void)
+/*SDPit::SDPit(void)
 {
 }
 
@@ -53,4 +53,4 @@ void SDPit::build(const std::string TrackPath)
 
     _osgpit = new osg::Group;
     _osgpit->addChild(_pit_transform.get());
-}
+}*/
