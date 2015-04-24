@@ -39,11 +39,11 @@
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;
 
-SDOptions *Options = 0;
-SDCars *cars = 0;
-SDScenery *scenery = 0;
-SDRender *render = 0;
-SDScreens * screens = 0;
+static SDOptions *Options = 0;
+static SDCars *cars = 0;
+static SDScenery *scenery = 0;
+static SDRender *render = 0;
+static SDScreens *screens = 0;
 
 void *getOptions()
 {
@@ -287,6 +287,14 @@ void shutdownTrack(void)
     {
         GfParmReleaseHandle(grTrackHandle);
         grTrackHandle = 0;
+    }
+
+    if (scenery)
+    {
+        scenery->ShutdownScene();
+        delete scenery;
+        scenery = NULL;
+        GfLogInfo("Delete scenery in OsgMain\n");
     }
 }
 
