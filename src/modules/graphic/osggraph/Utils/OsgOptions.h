@@ -29,37 +29,37 @@ public:
     ~SDOptions( void );
 
 private:
-    unsigned int _SmokeValue;
-    unsigned int _SmokeDuration;
-    unsigned int _SmokeInterval;
+    int     _SmokeValue;
+    int     _SmokeDuration;
+    int     _SmokeInterval;
 
-    unsigned int _SkidValue;
-    unsigned int _SkidLength;
-    unsigned int _SkidInterval;
+    int     _SkidValue;
+    int     _SkidLength;
+    int     _SkidInterval;
 
-    unsigned int _LOD;
+    int     _LOD;
 
-    bool         _bgsky;
-    unsigned int _DynamicSkyDome;
-    unsigned int _SkyDomeDistance;
-    unsigned int _Max_Visibility;
-    unsigned int _PrecipitationDensity;
-    unsigned int _Rain;
+    bool    _bgsky;
+    int     _DynamicSkyDome;
+    int     _SkyDomeDistance;
+    int     _Max_Visibility;
+    int     _PrecipitationDensity;
+    int     _Rain;
 
-    unsigned int _CloudLayer;
+    int     _CloudLayer;
 
-    unsigned int _SceneLOD;
-    bool         _Cockpit3D;
+    int     _SceneLOD;
+    bool    _Cockpit3D;
 
-    unsigned int _ShadowType;
-    int          _ShadowSize;
-    unsigned int _ShadowQuality;
+    int     _ShadowType;
+    int     _ShadowSize;
+    int     _ShadowQuality;
 
-    unsigned int _Shaders;
-    int          _ShadersQuality;
-    int          _ShadersSize;
+    int     _Shaders;
+    int     _ShadersQuality;
+    int     _ShadersSize;
 
-    bool         _NormalMap;
+    bool    _NormalMap;
 };
 
 #endif /* _OSGOPTIONS_H_ */

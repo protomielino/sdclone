@@ -39,11 +39,11 @@
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;
 
-static SDOptions *Options = 0;
-static SDCars *cars = 0;
-static SDScenery *scenery = 0;
-static SDRender *render = 0;
-static SDScreens *screens = 0;
+SDOptions *Options = 0;
+SDCars *cars = 0;
+SDScenery *scenery = 0;
+SDRender *render = 0;
+SDScreens *screens = 0;
 
 void *getOptions()
 {
@@ -248,6 +248,8 @@ int initTrack(tTrack *track)
 
     // Now, do the real track loading job.
     grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+    Options = new SDOptions;
 
     scenery = new SDScenery;
     render = new SDRender;

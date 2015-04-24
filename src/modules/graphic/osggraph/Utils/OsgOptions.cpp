@@ -45,7 +45,38 @@ static const int NbShadersValues = sizeof(ShadersValues) / sizeof(ShadersValues[
 static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = {1, 3, 5, 7, 8};
 static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
 
-SDOptions::SDOptions(void)
+SDOptions::SDOptions(void) :
+    _SmokeValue(0),
+    _SmokeDuration(0),
+    _SmokeInterval(0),
+
+    _SkidValue(0),
+    _SkidLength(0),
+    _SkidInterval(0),
+
+    _LOD(0),
+
+    _bgsky(true),
+    _DynamicSkyDome(0),
+    _SkyDomeDistance(20000),
+    _Max_Visibility(10000),
+    _PrecipitationDensity(100),
+    _Rain(0),
+
+    _CloudLayer(1),
+
+    _SceneLOD(0),
+    _Cockpit3D(false),
+
+    _ShadowType(0),
+    _ShadowSize(1024),
+    _ShadowQuality(0),
+
+    _Shaders(0),
+    _ShadersQuality(0),
+    _ShadersSize(256),
+
+    _NormalMap(false)
 {
 }
 
