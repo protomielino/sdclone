@@ -284,8 +284,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
             osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
 
             pWing1 = loader.Load3dFile(strPath, true);
-            position->addChild(pWing1);
-            pWing3->addChild(position);
+			position->addChild(pWing1.get());
+			pWing3->addChild(position.get());
             strPath ="";
         }
 
@@ -417,8 +417,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
             driver_branch = loader.Load3dFile(driver_path, true);
             GfLogInfo("Loading Animated Driver %i - %s \n", i, driver_path.c_str());
 
-            position->addChild(driver_branch);
-            pDriver->addChild(position);
+			position->addChild(driver_branch.get());
+			pDriver->addChild(position.get());
             driver_path ="";
 
             selIndex++;
@@ -640,7 +640,9 @@ void SDCar::updateCar()
 
     this->car_branch->setMatrix(mat);
 
-    reflectionMapping->update();
+	if(_carShader == 2)
+		reflectionMapping->update();
+
     this->setReflectionMap(reflectionMapping->getReflectionMap());
 
     //ugly computation,
@@ -665,12 +667,14 @@ void SDCar::updateShadingParameters(osg::Matrixf modelview)
 
 void SDCar::setReflectionMap(osg::ref_ptr<osg::Texture> map)
 {
-    car_branch->getOrCreateStateSet()->setTextureAttributeAndModes(2, map, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
+    car_branch->getOrCreateStateSet()->setTextureAttributeAndModes(2, map, 
+		osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 }
 
-SDCars::SDCars(void)
+SDCars::SDCars(void) :
+	cars_branch(NULL)
 {
-    cars_branch = new osg::Group;
+
 }
 
 SDCars::~SDCars(void)
@@ -688,6 +692,7 @@ void SDCars::addSDCar(SDCar *car)
 
 void SDCars::loadCars(tSituation *pSituation, bool trackType, bool subCat)
 {
+	cars_branch = new osg::Group;
     SDRender *rend = (SDRender *)getRender();
     unsigned carShader = rend->getShader();
     tSituation *s = pSituation;
