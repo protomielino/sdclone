@@ -65,39 +65,40 @@ using namespace osgDB;
 // reader/writer.
 REGISTER_OSGPLUGIN(acc, ReaderWriterACC)
 
+// collects geodes from scene sub-graph attached to 'this'
 class geodeVisitor : public osg::NodeVisitor
-{ // collects geodes from scene sub-graph attached to 'this'
-  public:
-  geodeVisitor():
-  osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
-
-  ~geodeVisitor() { _geodelist.clear();}
-
-  // one apply for each type of Node that might be a user transform
-  virtual void apply(osg::Geode& geode)
 {
-  _geodelist.push_back(&geode);
-  }
+public:
+    geodeVisitor():
+    osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
 
-  virtual void apply(osg::Group& gp)
-{
-  traverse(gp);    // must continue subgraph traversal.
-  }
+    ~geodeVisitor() { _geodelist.clear();}
 
-  std::vector<const osg::Geode *> getGeodes() {return _geodelist;}
+    // one apply for each type of Node that might be a user transform
+    virtual void apply(osg::Geode& geode)
+    {
+        _geodelist.push_back(&geode);
+    }
 
-  protected:
-  typedef std::vector<const osg::Geode *>    Geodelist;
-Geodelist  _geodelist;
+    virtual void apply(osg::Group& gp)
+    {
+        traverse(gp);    // must continue subgraph traversal.
+    }
+
+    std::vector<const osg::Geode *> getGeodes() {return _geodelist;}
+
+protected:
+    typedef std::vector<const osg::Geode *> Geodelist;
+    Geodelist  _geodelist;
 };
 
-ReaderWriterACC::ReaderWriterACC()
-{
-    osgDB::ReaderWriter::supportsExtension("acc", "SPEED DREAMS Database format");
-    m_bCar = false;
-    m_transparentGroup = NULL;
-    m_opaqueGroup = NULL;
-}
+    ReaderWriterACC::ReaderWriterACC()
+    {
+        osgDB::ReaderWriter::supportsExtension("acc", "SPEED DREAMS Database format");
+        m_bCar = false;
+        m_transparentGroup = NULL;
+        m_opaqueGroup = NULL;
+    }
 
 const char* ReaderWriterACC::className()
 {
@@ -128,12 +129,15 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 {
     int textureId = 0;
     std::string texname0, texname1, texname2, texname3;
+
     // most of this logic came from Andy Colebourne (developer of the AC3D editor) so it had better be right!
     // The transform configured in this current object level
     osg::Matrix transform;
+
     // The vertex pool in this object
     osg::ref_ptr<VertexSet> vertexSet = new VertexSet;
     osg::ref_ptr<osg::Group> group = NULL;
+
     //osg::ref_ptr<osg::Group> group = new osg::Group;
     osg::Vec2 textureOffset(0, 0);
     osg::Vec2 textureRepeat(1, 1);

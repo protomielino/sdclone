@@ -24,9 +24,9 @@
 #include <osg/MatrixTransform>
 #include <osg/Node>
 
-osgLoader::osgLoader(void)
+osgLoader::osgLoader(void) :
+    m_pOpt(new osgDB::ReaderWriter::Options())
 {
-    m_pOpt = new osgDB::ReaderWriter::Options();
 }
 
 osgLoader::~osgLoader(void)

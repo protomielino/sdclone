@@ -21,7 +21,8 @@
 
 using namespace acc3d;
 
-Exception::Exception(std::string error)
+Exception::Exception(std::string error) :
+    _error(NULL)
 {
     _error = error;
 }
