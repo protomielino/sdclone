@@ -22,7 +22,6 @@
     @version	$Id$
     @ingroup	gui
 */
-
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -41,6 +40,11 @@
 #include "gui.h"
 #include "guimenu.h"
 #include "musicplayer.h"
+
+#ifdef WIN32
+PFNGLUSEPROGRAMOBJECTARBPROC glUseProgram = NULL;
+PFNGLACTIVETEXTUREARBPROC   glActiveTextureARB ;
+#endif
 
 
 #if SDL_MAJOR_VERSION >= 2
@@ -122,6 +126,10 @@ gfuiInit(void)
 	gfuiInitMenu();
 	initMusic();
 
+#ifdef WIN32
+	glUseProgram = (PFNGLUSEPROGRAMOBJECTARBPROC)wglGetProcAddress("glUseProgram");
+    glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
+#endif
 	//gfctrlJoyInit(); // Not here ; done later on the fly, when really needed.
 }
 
@@ -256,6 +264,8 @@ GfuiRedraw(void)
 {
 	tGfuiObject	*curObj;
 	
+	glUseProgram(0);
+	glActiveTextureARB(GL_TEXTURE0);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
@@ -272,6 +282,10 @@ GfuiRedraw(void)
 	gluOrtho2D(0, GfuiScreen->width, 0, GfuiScreen->height);
 	glMatrixMode(GL_MODELVIEW);  
 	glLoadIdentity();
+	glMatrixMode(GL_TEXTURE);  
+	glLoadIdentity();
+	glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
+	
 	
 	if (GfuiScreen->bgColor.alpha != 0.0) {
 		glClearColor(GfuiScreen->bgColor.red,
@@ -280,7 +294,7 @@ GfuiRedraw(void)
 			     GfuiScreen->bgColor.alpha);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
-	
+
 	// Display backround image if any.
 	if (GfuiScreen->bgImage) {
 
@@ -288,9 +302,12 @@ GfuiRedraw(void)
 		glDisable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_REPLACE);
+
 		glColor3f(gfuiColors[GFUI_BASECOLORBGIMAGE][0], 
 				  gfuiColors[GFUI_BASECOLORBGIMAGE][1],
 				  gfuiColors[GFUI_BASECOLORBGIMAGE][2]);
+
 		glBindTexture(GL_TEXTURE_2D, GfuiScreen->bgImage);
 
 		// Get real 2^N x 2^P texture size (may have been 0 padded at load time
@@ -330,6 +347,7 @@ GfuiRedraw(void)
 		}
 
 		// Display texture.
+
 		glBegin(GL_QUADS);
 
 		glTexCoord2f(tx1, ty1); glVertex3f(0.0, 0.0, 0.0);
@@ -339,6 +357,8 @@ GfuiRedraw(void)
 
 		glEnd();
 		glDisable(GL_TEXTURE_2D);
+		
+
 		glEnable(GL_BLEND);
 	}
 	
