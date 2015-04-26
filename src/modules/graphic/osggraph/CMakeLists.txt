@@ -18,7 +18,8 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Loader/ReaderWriterACC.h
                      Loader/OsgLoader.h
 
-                     Scenery/OsgScenery.h
+                     #Scenery/OsgTrackLight.h
+					 Scenery/OsgScenery.h
 
                      Render/OsgRender.h
                      Render/OsgReflectionMapping.h
@@ -56,7 +57,7 @@ SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
 
                      Scenery/OsgBackground.cpp
                      Scenery/OsgPit.cpp
-					 Scenery/OsgTrackLight.cpp
+					 #Scenery/OsgTrackLight.cpp
                      Scenery/OsgScenery.cpp 
 
                      Render/OsgRender.cpp
