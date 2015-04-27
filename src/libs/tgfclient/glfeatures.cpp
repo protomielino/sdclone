@@ -20,6 +20,7 @@
 #include <limits>
 
 #include <SDL.h>
+#include <SDL_opengl.h>
 
 #include "glfeatures.h"
 
@@ -36,7 +37,7 @@ static const char* pszNoUnit = 0;
 
     Note: Copied from freeGLUT 2.4.0
 */
-
+#if SDL_MAJOR_VERSION < 2
 static bool gfglIsOpenGLExtensionSupported(const char* extension)
 {
   const char *extensions, *start;
@@ -68,6 +69,7 @@ static bool gfglIsOpenGLExtensionSupported(const char* extension)
 
   return false;
 }
+#endif
 
 // GfglFeatures singleton --------------------------------------------------------
 
@@ -138,7 +140,11 @@ void GfglFeatures::detectStandardSupport()
 	//    driver problems and not a bugfix. According to the specification OpenGL should
 	//    choose an uncompressed alternate format if it can't provide the requested
 	//    compressed one... but it does not on all cards/drivers.
+#if SDL_MAJOR_VERSION >= 2
+    bool bValue = SDL_GL_ExtensionSupported("GL_ARB_texture_compression");
+#else
 	bool bValue = gfglIsOpenGLExtensionSupported("GL_ARB_texture_compression");
+#endif
 	if (bValue) 
 	{
 		int nFormats;
@@ -149,38 +155,67 @@ void GfglFeatures::detectStandardSupport()
 	_mapSupportedBool[TextureCompression] = bValue;
 
 	// 6) Multi-texturing (automatically select all the texturing units).
+#if SDL_MAJOR_VERSION >= 2
+    bValue = SDL_GL_ExtensionSupported("GL_ARB_multitexture");
+#else
 	bValue = gfglIsOpenGLExtensionSupported("GL_ARB_multitexture");
+#endif
 	glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &nValue);
 	if (nValue < 2)
 		bValue = false;
+
 	_mapSupportedBool[MultiTexturing] = bValue;
+
 	if (bValue)
 		_mapSupportedInt[MultiTexturingUnits] = nValue;
 
 	// 7) Rectangle textures.
+#if SDL_MAJOR_VERSION >= 2
+    _mapSupportedBool[TextureRectangle] =
+            SDL_GL_ExtensionSupported("GL_ARB_texture_rectangle");
+#else
 	_mapSupportedBool[TextureRectangle] =
 		gfglIsOpenGLExtensionSupported("GL_ARB_texture_rectangle");
+#endif
 
 	// 8) Non-power-of-2 textures.
+#if SDL_MAJOR_VERSION >= 2
+    _mapSupportedBool[TextureNonPowerOf2] =
+            SDL_GL_ExtensionSupported("GL_ARB_texture_non_power_of_two");
+#else
 	_mapSupportedBool[TextureNonPowerOf2] =
 		gfglIsOpenGLExtensionSupported("GL_ARB_texture_non_power_of_two");
+#endif
 
 	// 9) Stereo Vision (need a proper check)
 	_mapSupportedBool[StereoVision] = false;
 
 	// 10) Bump Mapping 
+#if SDL_MAJOR_VERSION >= 2
+    bValue = SDL_GL_ExtensionSupported("GL_ARB_multitexture")
+            && SDL_GL_ExtensionSupported("GL_ARB_texture_cube_map")
+            && SDL_GL_ExtensionSupported("GL_ARB_texture_env_combine")
+            && SDL_GL_ExtensionSupported("GL_ARB_texture_env_dot3")
+            && SDL_GL_ExtensionSupported("GL_ARB_imaging");
+#else
 	bValue = 
 		gfglIsOpenGLExtensionSupported("GL_ARB_multitexture")
 		&& gfglIsOpenGLExtensionSupported("GL_ARB_texture_cube_map")
 		&& gfglIsOpenGLExtensionSupported("GL_ARB_texture_env_combine")
 		&& gfglIsOpenGLExtensionSupported("GL_ARB_texture_env_dot3")
 		&& gfglIsOpenGLExtensionSupported("GL_ARB_imaging");
+#endif
 	
 	_mapSupportedBool[BumpMapping] = bValue;
 
 
     // 10) Anisotropic filtrering
+#if SDL_MAJOR_VERSION >= 2
+    bValue = SDL_GL_ExtensionSupported("GL_EXT_texture_filter_anisotropic");
+#else
     bValue = gfglIsOpenGLExtensionSupported("GL_EXT_texture_filter_anisotropic");
+#endif
+
     _mapSupportedInt[AnisotropicFiltering] = bValue?2:InvalidInt;
 
 }
@@ -196,6 +231,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 	//    (to do that, we need to try setting up the video modes for real).
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
+
 	SDL_Surface* pWinSurface = 0;
 
 	int nAlphaChannel = bAlpha ? 1 : 0;
@@ -210,6 +246,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 
 #if SDL_MAJOR_VERSION >= 2
 		const int bfVideoMode = SDL_WINDOW_OPENGL | (nFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+        SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 #else
 		const int bfVideoMode = SDL_OPENGL | (nFullScreen ? SDL_FULLSCREEN : 0);
 #endif

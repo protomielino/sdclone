@@ -404,6 +404,12 @@ static void gfScrReshapeViewport(int width, int height)
 
 bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 {
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) 
+	{
+       GfLogError("\nUnable to initialize SDL:  (%s)\n", SDL_GetError());
+        return false;
+    }
+
 	// Initialize SDL video subsystem (and exit if not supported).
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	{
