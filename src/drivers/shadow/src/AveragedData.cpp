@@ -1,6 +1,20 @@
-// AveragedData.cpp: implementation of the AveragedData class.
-//
-//////////////////////////////////////////////////////////////////////
+/***************************************************************************
+
+    created              : Sat Mar 18 23:16:38 CET 2006
+    copyright            : (C) 2006 by Tim Foden, 2015 by Xavier Bertaux
+    email                : bertauxx@yahoo.fr
+    version              : $Id: AverageData.cpp 6004 2015-05-09 21:03:25Z torcs-ng $
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #include <math.h>
 #include <robottools.h>
