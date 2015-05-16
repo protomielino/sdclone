@@ -676,6 +676,8 @@ void Driver::newRace(tCarElt* car, tSituation *s)
     }
   }
 
+  strategy->Init(this);                         // Init strategy
+
 #ifdef SPEED_DREAMS
   teamIndex = RtTeamManagerIndex( car, track, s );
   strategy->setTeamIndex( teamIndex );
@@ -3772,4 +3774,28 @@ void Driver::Meteorology()
          mRain = 0;
 
      GfOut("#Rain BIPBIP: %d\n", mRain);
+}
+
+double Driver::TyreConditionFront()
+{
+  return MIN(car->_tyreCondition(0), car->_tyreCondition(1));
+}
+
+double Driver::TyreConditionRear()
+{
+  return MIN(car->_tyreCondition(2), car->_tyreCondition(3));
+}
+
+double Driver::TyreTreadDepthFront()
+{
+  double Right = (car->_tyreTreadDepth(0) - car->_tyreCritTreadDepth(0));
+  double Left = (car->_tyreTreadDepth(1) - car->_tyreCritTreadDepth(1));
+  return 100 * MIN(Right, Left);
+}
+
+double Driver::TyreTreadDepthRear()
+{
+  double Right = (car->_tyreTreadDepth(2) - car->_tyreCritTreadDepth(2));
+  double Left = (car->_tyreTreadDepth(3) - car->_tyreCritTreadDepth(3));
+  return 100 * MIN(Right, Left);
 }

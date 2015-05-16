@@ -48,6 +48,7 @@ class Opponents;
 class Opponent;
 class Pit;
 class AbstractStrategy;
+class SimpleStrategy;
 
 enum { TEAM_FRIEND=1, TEAM_FOE };
 enum { avoidleft=1, avoidright=2, avoidside=4, avoidsideclosing=8, avoidback=16 };
@@ -91,6 +92,11 @@ class Driver {
 		int GetMode() { return mode; }
 		float getWidth() { return mycardata->getWidthOnTrack(); }
 		double getBrakeMargin() { return brakemargin; }
+
+        double TyreConditionFront();
+        double TyreConditionRear();
+        double TyreTreadDepthFront();
+        double TyreTreadDepthRear();
 
 	private:
 		// Utility functions.
@@ -149,6 +155,7 @@ class Driver {
 		unsigned int getRandom();
         int getWeather();
         void Meteorology();
+
 		float stuckSteering( float steercmd );
 
 		// Per robot global data.
@@ -201,7 +208,7 @@ class Driver {
 		Opponent *opponent;		// The array of opponents.
 
 		Pit *pit;						// Pointer to the pit instance.
-		AbstractStrategy *strategy;		// Pit stop strategy.
+        SimpleStrategy *strategy;		// Pit stop strategy.
 
 		SingleCardata *mycardata;		// Pointer to "global" data about my car.
 		LRLMod *tLftMargin;

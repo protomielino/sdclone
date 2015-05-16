@@ -41,7 +41,8 @@ SimpleStrategy::SimpleStrategy() :
     is_pitting(0),
     remainlaps(0),
     pit_reason(0),
-    track(NULL)
+    track(NULL),
+    m_Driver(NULL)
 {
 #ifdef SPEED_DREAMS
     teamIndex = 0;
@@ -56,6 +57,15 @@ SimpleStrategy::~SimpleStrategy()
     // Nothing so far.
 }
 
+void SimpleStrategy::Init(Driver *driver)
+{
+  m_Driver = driver;
+
+  m_TireLimitFront = m_Driver->TyreTreadDepthFront();
+  m_TireLimitRear = m_Driver->TyreTreadDepthRear();
+  m_DegradationPerLap = 0.0;
+  //m_Laps = 0;
+}
 
 // Trivial strategy: fill in as much fuel as required for the whole race, or if the tank is
 // too small fill the tank completely.
