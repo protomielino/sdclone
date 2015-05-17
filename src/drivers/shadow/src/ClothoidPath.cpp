@@ -160,9 +160,9 @@ void ClothoidPath::AnalyseBumps( const CarModel& cm, bool dumpInfo )
 
 			if( count == 1 && dumpInfo )
 			{
-				GfOut( "###  %4d  spd %3.0f k %7.4f dt %.3f pz %5.2f sz %5.2f vz %5.2f -> h %5.2f\n",
+                /*GfOut( "###  %4d  spd %3.0f k %7.4f dt %.3f pz %5.2f sz %5.2f vz %5.2f -> h %5.2f\n",
 						i, m_pPath[i].accSpd * 3.6, m_pPath[i].k, dt,
-						pz, sz, vz, m_pPath[i].h );
+                        pz, sz, vz, m_pPath[i].h );*/
 			}
 
 			pi = i;

@@ -79,6 +79,7 @@ public:
     double  m_TireLimitFront;
     double  m_TireLimitRear;
     double  m_DegradationPerLap;
+    int     m_Laps;
 
 protected:
     int strategy;

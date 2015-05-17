@@ -64,7 +64,7 @@ void SimpleStrategy::Init(Driver *driver)
   m_TireLimitFront = m_Driver->TyreTreadDepthFront();
   m_TireLimitRear = m_Driver->TyreTreadDepthRear();
   m_DegradationPerLap = 0.0;
-  //m_Laps = 0;
+  m_Laps = 0;
 }
 
 // Trivial strategy: fill in as much fuel as required for the whole race, or if the tank is
@@ -219,6 +219,31 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
 
     float fuelPerM = cmpfuel / track->length;
     bool GotoPit = RtTeamNeedPitStop(teamIndex,fuelPerM,repairWanted);
+
+    if (m_Driver->HasTYC)
+    {
+      double TdF = m_Driver->TyreTreadDepthFront(); // Check tyre condition
+      double TdR = m_Driver->TyreTreadDepthRear();  // Pit stop needed if
+      m_DegradationPerLap = (m_Laps * m_DegradationPerLap
+        + MAX(m_TireLimitFront - TdF, m_TireLimitRear - TdR));
+      m_DegradationPerLap /= ++m_Laps;
+
+      if (MIN(TdF,TdR) < 1.5 * m_DegradationPerLap) // tyres become critical
+      {
+          /*LogUSR.warning("Tyre condition D: %.1f%% F: %.1f%% R: %.1f%%\n",
+          m_DegradationPerLap, TdF, TdR);*/
+
+        if ((TdF < 1.1 * m_DegradationPerLap)
+          || (TdR < 1.1 * m_DegradationPerLap))
+        {
+          GotoPit = true;                           //   to stop in pit
+        }
+      }
+
+      m_TireLimitFront = TdF;
+      m_TireLimitRear = TdR;
+    }
+
     if (GotoPit)
         is_pitting = 1;
     else

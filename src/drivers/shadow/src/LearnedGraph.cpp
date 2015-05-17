@@ -154,7 +154,7 @@ void LearnedGraph::SetBeta( double beta )
 
 double LearnedGraph::CalcValue( int dim, int offs, const Idx* idx ) const
 {
-    GfOut("CalcValue offs - dim - m_nAxes = %i - %i - %i\n", offs, dim, m_nAxes);
+    //GfOut("CalcValue offs - dim - m_nAxes = %i - %i - %i\n", offs, dim, m_nAxes);
 	if( dim < m_nAxes )
 	{
 		int		offs_i = offs + m_pAxis[dim].m_itemSize * idx[dim].i;
@@ -171,7 +171,7 @@ double LearnedGraph::CalcValue( int dim, int offs, const Idx* idx ) const
 
 void LearnedGraph::LearnValue( int dim, int offs, const Idx* idx, double delta )
 {
-    GfOut("LearnValue offs - Dim - m_nAxes = %i - %i - %i\n", offs, dim, m_nAxes);
+    //GfOut("LearnValue offs - Dim - m_nAxes = %i - %i - %i\n", offs, dim, m_nAxes);
 	if( dim < m_nAxes )
 	{
 		int		offs_i = offs + m_pAxis[dim].m_itemSize * idx[dim].i;

@@ -724,18 +724,18 @@ bool LinePath::LoadPath( const char* pDataFile )
 
             float	x, y;
             RtTrackLocal2Global( &pos, &x, &y, 0 );
-            GfOut( "global start coords (%g, %g)\n", x, y );
+            //GfOut( "global start coords (%g, %g)\n", x, y );
 
             origin.x = x;
             origin.y = y;
         }
 
         // work out which slice the last point is in.
-        GfOut( "nPoints %d\n", nPoints );
+        //GfOut( "nPoints %d\n", nPoints );
         Vec2d	lastPt = pPoints[nPoints - 1] + origin;
-        GfOut( "lastPt (%g, %g)\n", lastPt.x, lastPt.y );
+        //GfOut( "lastPt (%g, %g)\n", lastPt.x, lastPt.y );
         double	dist = m_pTrack->CalcPos(lastPt.x, lastPt.y);
-        GfOut( "dist %g\n", dist );
+        //GfOut( "dist %g\n", dist );
         int		last_s = m_pTrack->IndexFromPos(dist);
 
         for( int i = 0; i < nPoints; i++ )
@@ -748,10 +748,10 @@ bool LinePath::LoadPath( const char* pDataFile )
             int	cur_s = m_pTrack->IndexFromPos(dist);
 
             tTrackSeg*	pSeg = m_pTrack->GetAt(cur_s).pSeg;
-            GfOut( "%4d  (%8g,%8g)  seg %4d/%3d%c %d\n",
+            /*GfOut( "%4d  (%8g,%8g)  seg %4d/%3d%c %d\n",
                    i, pt.x, pt.y, cur_s, pSeg->id,
                    pSeg->type == TR_RGT ? 'R' : pSeg->type == TR_LFT ? 'L' : '-',
-                   pSeg->raceInfo );
+                   pSeg->raceInfo );*/
 
             if( //!m_pCar->On_pit_lane &&
                     last_s >= 0 && last_s != cur_s )
@@ -771,7 +771,7 @@ bool LinePath::LoadPath( const char* pDataFile )
                         //						Rec&	rec = m_pData[next_s];
                         //						const double	gamma = 0.8;
                         //						rec.avgW	= rec.avgW * (1 - gamma) + w * gamma;
-                        GfOut( "%%%%  w[%d] = %g (was %g)\n", next_s, w, m_pPath[next_s].offs );
+                        //GfOut( "%%%%  w[%d] = %g (was %g)\n", next_s, w, m_pPath[next_s].offs );
                         m_pPath[next_s].offs = w;
                         m_pPath[next_s].pt   = m_pPath[next_s].CalcPt();
                     }
@@ -788,7 +788,7 @@ bool LinePath::LoadPath( const char* pDataFile )
 
     CalcCurvaturesZ();
 
-    GfOut( "\"springs\" data file loaded OK\n" );
+    //GfOut( "\"springs\" data file loaded OK\n" );
 
     // take some of the "kinks" out of the data.
     //	OptimisePath( 1, 100 );

@@ -98,6 +98,11 @@ public:
     double TyreTreadDepthFront();
     double TyreTreadDepthRear();
 
+    bool    HasABS;
+    bool    HasESP;
+    bool    HasTCL;
+    bool    HasTYC;
+
 private:
     // Utility functions.
     bool isStuck();
@@ -189,11 +194,6 @@ private:
     int prefer_side;
     int allowcorrecting;
     int pitpos;
-
-    bool    HasABS;
-    bool    HasESP;
-    bool    HasTCL;
-    bool    HasTYC;
 
     float prevspeedangle;		// the angle of the speed vector relative to trackangle, > 0.0 points to right.
     float speedangle;		// the angle of the speed vector relative to trackangle, > 0.0 points to right.
