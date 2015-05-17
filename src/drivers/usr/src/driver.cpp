@@ -90,6 +90,12 @@ Driver::Driver(int index, const int robot_type) :
     prefer_side(0),
     allowcorrecting(0),
     pitpos(0),
+
+    HasABS(false),
+    HasESP(false),
+    HasTCL(false),
+    HasTYC(false),
+
     prevspeedangle(0.0f),
     speedangle(0.0f),
     angle(0.0f),
@@ -205,12 +211,12 @@ Driver::Driver(int index, const int robot_type) :
     mRain(0)
 {
   INDEX = index;
-  
+
   switch(robot_type) {
     case USR_TRB1:
       robot_name = "usr_trb1";
       break;
-    
+
     case USR_SC:
       robot_name = "usr_sc";
       break;
@@ -231,7 +237,7 @@ Driver::Driver(int index, const int robot_type) :
       robot_name = "usr_rs";
       break;
 
-	case USR_LP1:
+    case USR_LP1:
       robot_name = "usr_lp1";
       break;
 
@@ -307,7 +313,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetDataDir());
     skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
   }//if !skillHandle
-  
+
   if (skillHandle)
   {
     global_skill = GfParmGetNum(skillHandle, (char *)SECT_SKILL, (char *)PRV_SKILL_LEVEL, (char *) NULL, 10.0f);
@@ -333,7 +339,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
   // Get a pointer to the first char of the track filename.
   char *ptrackname = strrchr(track->filename, '/') + 1;
   char *p = strrchr(ptrackname, '.');
-  char trackname[256] = {0};  
+  char trackname[256] = {0};
 
   if (p)
     strncpy(trackname, ptrackname, p - ptrackname);
@@ -386,6 +392,55 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
   // Init fuel.
   strategy->setFuelAtRaceStart(t, carParmHandle, s, INDEX);
+
+  const char *enabling;
+
+  HasTYC = false;
+  enabling = GfParmGetStr(carParmHandle, SECT_FEATURES, PRM_TIRETEMPDEG, VAL_NO);
+  if (strcmp(enabling, VAL_YES) == 0)
+  {
+    HasTYC = true;
+    LogUSR.info("#Car has TYC yes\n");
+  }
+  else
+    LogUSR.info("#Car has TYC no\n");
+
+  HasABS = false;
+  enabling = GfParmGetStr(carParmHandle, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
+  if (strcmp(enabling, VAL_YES) == 0)
+  {
+    HasABS = true;
+    LogUSR.info("#Car has ABS yes\n");
+  }
+  else
+    LogUSR.info("#Car has ABS no\n");
+
+  HasESP = false;
+  enabling = GfParmGetStr(carParmHandle, SECT_FEATURES, PRM_ESPINSIMU, VAL_NO);
+  if (strcmp(enabling, VAL_YES) == 0)
+  {
+    HasESP = true;
+    LogUSR.info("#Car has ESP yes\n");
+  }
+  else
+    LogUSR.info("#Car has ESP no\n");
+
+  HasTCL = false;
+  enabling = GfParmGetStr(carParmHandle, SECT_FEATURES, PRM_TCLINSIMU, VAL_NO);
+  if (strcmp(enabling, VAL_YES) == 0)
+  {
+    HasTCL = true;
+    LogUSR.info("#Car has TCL yes\n");
+  }
+  else
+    LogUSR.info("#Car has TCL no\n");
+
+ // For test of simu options override switches here
+  /*
+  oCarHasABS = true;
+  oCarHasTCL = true;
+  oCarHasESP = true;
+  */
 
   // Load and set parameters.
   MU_FACTOR = GfParmGetNum(*carParmHandle, SECT_PRIVATE, BT_ATT_MUFACTOR, (char*)NULL, 0.69f);
@@ -614,8 +669,8 @@ void Driver::newRace(tCarElt* car, tSituation *s)
   {
     char *ptrackname = strrchr(track->filename, '/') + 1;
     char *p = strrchr(ptrackname, '.');
-    char trackname[256] = {0};  
-  
+    char trackname[256] = {0};
+
     if (p)
       strncpy(trackname, ptrackname, p - ptrackname);
     else
@@ -696,7 +751,7 @@ void Driver::calcSpeed()
 
   if (mode != mode_normal)
   {
-    if (fabs(speedangle) > 0.05 && 
+    if (fabs(speedangle) > 0.05 &&
         (fabs(speedangle) > fabs(rldata->rlangle) || fabs(speedangle - rldata->rlangle) > 0.05))
       speed_redux -= MIN(0.6, MIN(fabs(speedangle), fabs(speedangle-rldata->rlangle))/2);
     avspeed *= speed_redux;
@@ -782,7 +837,7 @@ void Driver::calcSpeed()
         diff *= MIN(1.0, collision / 3.0f)*0.8;
       x += diff * OversteerASR;
     }
-    else if (mode != mode_normal && 
+    else if (mode != mode_normal &&
              (car->_accel_x < 1.0 || sidedanger) &&
              ((angle > 0.0 && laststeer > 0.0 && rldata->rInverse < -0.001) ||
               (angle < 0.0 && laststeer < 0.0 && rldata->rInverse > 0.001)))
@@ -881,7 +936,7 @@ int Driver::rearOffTrack()
         car->_wheelSeg(REAR_LFT)->surface->kRollRes > MAX(0.005, car->_trkPos.seg->surface->kRollRes*1.2)));
 
   if (left_bad && right_bad) return 1;
-  
+
   if (car->_speed_x < 10.0 && (left_bad || right_bad)) return 1;
 
   return 0;
@@ -942,13 +997,22 @@ void Driver::drive(tSituation *s)
 
   car->_steerCmd = getSteer(s);
 
-  if (!isStuck()) 
+  if (!isStuck())
   {
     car->_gearCmd = getGear();
     calcSpeed();
-    car->_brakeCmd = filterABS(filterBrakeSpeed(filterBColl(filterBPit(getBrake()))));
-    if (car->_brakeCmd <= 0.001f) {
-      car->_accelCmd = filterTCL(filterTrk(filterTeam(filterOverlap(getAccel()))));
+
+    if (!HasABS && !HasESP)
+        car->_brakeCmd = filterABS(filterBrakeSpeed(filterBColl(filterBPit(getBrake()))));
+    else
+        car->_brakeCmd = filterBrakeSpeed(filterBColl(filterBPit(getBrake())));
+
+    if (car->_brakeCmd <= 0.001f)
+    {
+        if(!HasTCL)
+                car->_accelCmd = filterTCL(filterTrk(filterTeam(filterOverlap(getAccel()))));
+        else
+            car->_accelCmd = filterTrk(filterTeam(filterOverlap(getAccel())));
     } else {
       car->_accelCmd = 0.0f;
     }
@@ -1011,7 +1075,7 @@ int Driver::pitCommand(tSituation *s)
 void Driver::endRace(tSituation *s)
 {
 #ifdef SPEED_DREAMS
-  RtTeamReleasePit(teamIndex); 
+  RtTeamReleasePit(teamIndex);
 #endif
   car->ctrl.raceCmd = 0;
 }
@@ -1090,17 +1154,17 @@ float Driver::getAccel()
     if (pit->getInPit() && car->_brakeCmd == 0.0f)
     {
       //float s = pit->toSplineCoord( car->_distFromStartLine );
-  
+
 #if 0
       if (pit->needPitstop())
       {
-        if (currentspeedsqr > pit->getSpeedlimitSqr()*0.9) 
+        if (currentspeedsqr > pit->getSpeedlimitSqr()*0.9)
         {
           accelcmd = MIN(accelcmd, 0.4f);
         }
       }
 #endif
-      
+
       accelcmd = MIN(accelcmd, 0.6f);
     }
     else if (fabs(angle) > 0.8 && currentspeed > 10.0f)
@@ -1125,7 +1189,7 @@ float Driver::filterOverlap(float accel)
 
   for (i = 0; i < opponents->getNOpponents(); i++)
   {
-    if (opponent[i].getState() & OPP_LETPASS) 
+    if (opponent[i].getState() & OPP_LETPASS)
     {
       return accel*0.4f;
     }
@@ -1147,7 +1211,7 @@ float Driver::filterTeam(float accel)
  for (i = 0; i < opponents->getNOpponents(); i++)
  {
   if (opponent[i].getCarPtr() == car) continue;
-  if ((opponent[i].getTeam() != TEAM_FRIEND) || (opponent[i].getCarPtr()->_msgColorCmd[0] == 1.0)) 
+  if ((opponent[i].getTeam() != TEAM_FRIEND) || (opponent[i].getCarPtr()->_msgColorCmd[0] == 1.0))
    continue;
 
   if (opponent[i].getDistance() > 3.0 || opponent[i].getDistance() < 0.0)
@@ -1157,7 +1221,7 @@ float Driver::filterTeam(float accel)
   car->_brakeCmd = MAX(car->_brakeCmd, opponent[i].getCarPtr()->_brakeCmd*0.7);
  }
 #endif
- 
+
  if (NoTeamWaiting) return accel;
 
  // now filter to wait for catching up
@@ -1177,7 +1241,7 @@ float Driver::filterTeam(float accel)
    }
   }
 
-  if (opponent[i].getCarPtr()->_pos >= car->_pos + 2 && 
+  if (opponent[i].getCarPtr()->_pos >= car->_pos + 2 &&
       opponent[i].getCarPtr()->_laps == car->_laps &&
       opponent[i].getDistance() > -(car->_speed_x*2) &&
       opponent[i].getDistance() < 0.0)
@@ -1186,12 +1250,12 @@ float Driver::filterTeam(float accel)
   }
  }
 
- for (i = 0; i < opponents->getNOpponents(); i++) 
+ for (i = 0; i < opponents->getNOpponents(); i++)
  {
-  if (opponent[i].getCarPtr()->_state == RM_CAR_STATE_PIT 
+  if (opponent[i].getCarPtr()->_state == RM_CAR_STATE_PIT
       || opponent[i].getCarPtr()->_state == RM_CAR_STATE_PULLUP
       || opponent[i].getCarPtr()->_state == RM_CAR_STATE_PULLDN
-      || opponent[i].getCarPtr()->_state == RM_CAR_STATE_OUT) 
+      || opponent[i].getCarPtr()->_state == RM_CAR_STATE_OUT)
    continue;
 
   if (opponent[i].getCarPtr() == car) continue;
@@ -1202,7 +1266,7 @@ float Driver::filterTeam(float accel)
 
   double time_behind = fabs(opponent[i].getDistance()) / opponent[i].getCarPtr()->_speed_x;
 
-  if ((opponent[i].getTeam() & TEAM_FRIEND) && 
+  if ((opponent[i].getTeam() & TEAM_FRIEND) &&
       opponent[i].getCarPtr()->_laps >= car->_laps &&
       opponent[i].getCarPtr()->_dammage < car->_dammage + 2000 &&
       ((time_behind <= TeamWaitTime && time_behind > 0.4) ||
@@ -1280,7 +1344,7 @@ int Driver::getGear()
       }
     }
   }
-  
+
   return car->_gearCmd;
 }
 
@@ -1435,7 +1499,7 @@ float Driver::getSteer(tSituation *s)
     //targetAngle = atan2(rldata->target.y - car->_pos_Y, rldata->target.x - car->_pos_X);
 
     allowcorrecting = 0;
-    if (mode == mode_avoiding && 
+    if (mode == mode_avoiding &&
         (!avoidmode ||
          (avoidmode == avoidright && racesteer > avoidsteer) ||
          (avoidmode == avoidleft && racesteer < avoidsteer)))
@@ -1502,7 +1566,7 @@ float Driver::getSteer(tSituation *s)
         steer = (float)(correctSteering( (float)avoidsteer, (float)racesteer ));
         correctlimit = (steer - racesteer);
       }
-  
+
       if (fabs(angle) >= 1.6)
       {
         if (steer > 0.0)
@@ -1522,8 +1586,8 @@ float Driver::getSteer(tSituation *s)
   }
 
 
-  if (mode == mode_avoiding && 
-      (lastmode == mode_normal || lastmode == mode_correcting) && 
+  if (mode == mode_avoiding &&
+      (lastmode == mode_normal || lastmode == mode_correcting) &&
       !((avoidmode & avoidright) && (avoidmode & avoidleft)))
   {
     // if we're only avoiding on one side, and racesteer avoids more than avoidsteer, and just prior we
@@ -1590,7 +1654,7 @@ double Driver::calcSteer( double targetAngle, int rl )
     steer_direction = MAX(laststeer_direction - rgtlimit, MIN(laststeer_direction + lftlimit, steer_direction));
 
 #if 1
-    double speedsteer = (80.0 - MIN(70.0, MAX(40.0, currentspeed))) / 
+    double speedsteer = (80.0 - MIN(70.0, MAX(40.0, currentspeed))) /
                          ((185.0 * MIN(1.0, car->_steerLock / 0.785)) +
                          (185.0 * (MIN(1.3, MAX(1.0, 1.0 + rearskid))) - 185.0));
     if (fabs(steer_direction) > speedsteer)
@@ -1796,7 +1860,7 @@ if (DebugMsg & debug_steer) LogUSR.debug(" MB%.3f", steer);
         lastNSasteer = (float) MAX(rldata->NSsteer, lastNSasteer - changelimit);
 if (DebugMsg & debug_steer) LogUSR.debug(" I%.3f", steer);
     }
-  
+
   }
 
 if (DebugMsg & debug_steer) LogUSR.debug(" %.3f NS=%.3f\n", steer, lastNSasteer);
@@ -1842,7 +1906,7 @@ float Driver::smoothSteering( float steercmd )
 
   return steercmd;
 #if 0
-  // try to limit sudden changes in steering to avoid loss of control through oversteer. 
+  // try to limit sudden changes in steering to avoid loss of control through oversteer.
   double lftspeedfactor = ((((60.0 - (MAX(40.0, MIN(70.0, currentspeed + MAX(0.0, car->_accel_x*5))) - 25)) / 300) * 2.5) / 0.585) * SmoothSteer;
   double rgtspeedfactor = lftspeedfactor;
 
@@ -1863,7 +1927,7 @@ float Driver::smoothSteering( float steercmd )
 // Compute the clutch value.
 float Driver::getClutch()
 {
-  if (1 || car->_gearCmd > 1) 
+  if (1 || car->_gearCmd > 1)
   {
     float maxtime = MAX(0.06f, 0.32f - ((float) car->_gearCmd / 65.0f));
     if (car->_gear != car->_gearCmd && car->_gearCmd < MaxGear)
@@ -1916,7 +1980,7 @@ float Driver::adjustOffset(float offset)
   {
     // we want to adjust outwards a bit if in close to the corner (more if avoiding
     // a car on the inside, way less otherwise).  If the car is on the outside third
-    // of the track we don't want to adjust at all.  Inbetween the inside third and 
+    // of the track we don't want to adjust at all.  Inbetween the inside third and
     // the outside third we want a gradual decline in the adjust amount...
     if (adjustment < 0.0)
     {
@@ -1963,7 +2027,7 @@ vec2f Driver::getTargetPoint(bool use_lookahead, double targetoffset)
 {
   tTrackSeg *seg = car->_trkPos.seg;
   float length = getDistToSegEnd();
-  float offset = (targetoffset > -99 ? (float)targetoffset 
+  float offset = (targetoffset > -99 ? (float)targetoffset
       : (skipcount < 2 ? getOffset() : myoffset));
   double time_mod = 1.0;
   pitoffset = -100.0f;
@@ -2120,7 +2184,7 @@ vec2f Driver::getTargetPoint(bool use_lookahead, double targetoffset)
     float arcsign = (seg->type == TR_RGT) ? -1.0f : 1.0f;
     arc = arc*arcsign;
     s = s.rotate(c, arc);
-  
+
     n = c - s;
     n.normalize();
     t = s + arcsign*offset*n;
@@ -2210,7 +2274,7 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
 
     return true;
   }
-  
+
 
   // not worth the risk, ignore opponent
 
@@ -2246,7 +2310,7 @@ float Driver::getOffset()
   double ri = rldata->aInverse;
   double rgtinc = incfactor * MIN(3.0, MAX(0.6, 1.0 + (ri < 0.0 ? ri*4 : ri*MAX(5.0, car->_speed_x-25)*OutSteerFactor)));
   double lftinc = incfactor * MIN(3.0, MAX(0.6, 1.0 - (ri > 0.0 ? ri*4 : ri*MAX(5.0,car->_speed_x-25)*OutSteerFactor)));
-  
+
   //double reduce_movt = MAX(0.01, 1.0 - (MIN(1.0, fabs(laststeer))*2 * fabs(angle-speedangle)*3));
 #if 1
   double reduce_movt = MAX(0.1, MIN(1.0, 1.0 - fabs(angle*2 - laststeer)) * MAX(fabs(angle-speedangle), fabs(speedangle-angle))*1);
@@ -2282,7 +2346,7 @@ float Driver::getOffset()
   }
 #endif
 
-  
+
   //myoffset = car->_trkPos.toMiddle;
   if (mode == mode_normal)
   {
@@ -2296,7 +2360,7 @@ float Driver::getOffset()
     //double dspeed = MAX(0.0, rldata->speed - currentspeed) * 4;
     //double pspeed = MAX(1.0, 60.0 - (currentspeed - (30.0 + MAX(0.0, car->_accel_x) + dspeed))) / 10;
 
-    // instead of toMiddle just aiming at where the car currently is, we move it in the direction 
+    // instead of toMiddle just aiming at where the car currently is, we move it in the direction
     // the car's travelling ... but less so if the speedangle is different from the car's angle.
     double sa = speedangle;
     //double anglechange = ((sa*0.8) * MAX(0.0, 1.0 - fabs(sa-angle)*(0.6+fabs(sa-angle)))) * 0.7;
@@ -2336,14 +2400,14 @@ float Driver::getOffset()
   //myoffset = car->_trkPos.toMiddle;
 
   // Side Collision.
-  for (i = 0; i < opponents->getNOpponents(); i++) 
+  for (i = 0; i < opponents->getNOpponents(); i++)
   {
     tCarElt *ocar = opponent[i].getCarPtr();
 
     if (ocar->_state & (RM_CAR_STATE_NO_SIMU & ~RM_CAR_STATE_PIT))
       continue;
 
-    if (fabs(ocar->_trkPos.toMiddle) > Width/2 + 3.0 && 
+    if (fabs(ocar->_trkPos.toMiddle) > Width/2 + 3.0 &&
         fabs(car->_trkPos.toMiddle-ocar->_trkPos.toMiddle) >= 5.0)
       continue;
 
@@ -2352,7 +2416,7 @@ float Driver::getOffset()
       o = &opponent[i];
 if (DebugMsg & debug_overtake)
     LogUSR.debug("%s SIDE %s\n", car->_name, ocar->_name);
-      
+
       double sidedist = fabs(ocar->_trkPos.toLeft - car->_trkPos.toLeft);
       double sidemargin = opponent[i].getWidth()/2 + getWidth()/2 + 5.0f + MAX(fabs(rldata->rInverse), fabs(rldata->mInverse))*100;
       double side = (car->_trkPos.toMiddle-angle) - (ocar->_trkPos.toMiddle-opponent[i].getAngle());
@@ -2496,17 +2560,17 @@ else if (DebugMsg & debug_overtake)
     for (int otry=0; otry<=1; otry++)
     {
       // Overtake.
-      for (i = 0; i < opponents->getNOpponents(); i++) 
+      for (i = 0; i < opponents->getNOpponents(); i++)
       {
         tCarElt *ocar = opponent[i].getCarPtr();
-  
+
         // strategy telling us to follow this car?
         if ((opponent[i].getState() & OPP_FRONT_FOLLOW))
           continue;
 
         // off track or a long way wide of us?
         if (!(opponent[i].getState() & OPP_COLL) &&
-            fabs(ocar->_trkPos.toMiddle) > Width/2 + 3.0 && 
+            fabs(ocar->_trkPos.toMiddle) > Width/2 + 3.0 &&
             fabs(car->_trkPos.toMiddle-ocar->_trkPos.toMiddle) >= 8.0)
           continue;
 
@@ -2568,7 +2632,7 @@ if (DebugMsg & debug_overtake)
         if (avoidingside == TR_LFT)
         {
           sidedist -= (speedangle - o->getSpeedAngle()) * 20;
-          if (mustmove || 
+          if (mustmove ||
               sidedist < car->_dimension_y + ocar->_dimension_y + 2.0 ||
               (o->getState() & OPP_COLL) ||
               (prefer_side == TR_RGT && car->_trkPos.toRight > MIN(lane2right, 3.0 - nextCRinverse*1000)))
@@ -2596,7 +2660,7 @@ else if (DebugMsg & debug_overtake)
         else // if (avoidingside == TR_RGT)
         {
           sidedist -= (o->getSpeedAngle() - speedangle) * 20;
-          if (mustmove || 
+          if (mustmove ||
               sidedist < car->_dimension_y + ocar->_dimension_y + 2.0 ||
               (o->getState() & OPP_COLL) ||
                     (prefer_side == TR_LFT && car->_trkPos.toLeft > MIN(lane2left, 3.0 + nextCRinverse*1000)))
@@ -2634,7 +2698,7 @@ else if (DebugMsg & debug_overtake)
             avoidlftoffset = (float) MIN(avoidlftoffset, ocar->_trkPos.toMiddle - (o->getWidth()+1.0f));
             avoidmode |= avoidleft;
           }
-  
+
           if ((avoidingside == TR_LFT && rInverse > 0.0) ||
               (avoidingside == TR_RGT && rInverse < 0.0))
             avoidtime = MIN(simtime, avoidtime + MIN(deltaTime*0.9, fabs(rInverse*1.2)));
@@ -2652,7 +2716,7 @@ else if (DebugMsg & debug_overtake)
       o = NULL;
 
       // Let overlap or let less damaged team mate pass.
-      for (i = 0; i < opponents->getNOpponents(); i++) 
+      for (i = 0; i < opponents->getNOpponents(); i++)
       {
         // Let the teammate with less damage overtake to use slipstreaming.
         // The position change happens when the damage difference is greater than
@@ -2667,7 +2731,7 @@ else if (DebugMsg & debug_overtake)
         }
       }
 
-      if (o != NULL) 
+      if (o != NULL)
       {
         tCarElt *ocar = o->getCarPtr();
         float side = car->_trkPos.toMiddle - ocar->_trkPos.toMiddle;
@@ -2698,12 +2762,12 @@ if (DebugMsg & debug_overtake)
           avoidlftoffset = (float) MIN(avoidlftoffset, ocar->_trkPos.toMiddle - (o->getWidth()+1.0f));
           avoidmode |= avoidleft;
         }
-  
+
         myoffset = (float) (MAX(minoffset, MIN(maxoffset, myoffset)));
 if (DebugMsg & debug_overtake)
 LogUSR.debug("%s BEHIND %s (%g)\n", car->_name, ocar->_name, myoffset);
 
-      } 
+      }
     }
   }
 
@@ -2786,7 +2850,7 @@ if (DebugMsg & debug_overtake)
     LogUSR.debug("CHECKSWITCH: Rgt - ti=%.2f dm=%.1f o=%.2f->%.2f m=%.2f->%.2f\n",t_impact,deltamult,ocar->_trkPos.toLeft,ocatchleft,car->_trkPos.toLeft,mcatchleft);
         if (nextCRinverse > 0.0)
           radius = 0.0;
-        if ((side == prefer_side || 
+        if ((side == prefer_side ||
              ocatchleft < (car->_dimension_y + 3.0 + radius + speedchange) * switchrad ||
              ocatchleft < (mcatchleft - 1.5) * switchrad) &&
             xdist > sdiff + ydist + MAX(0.0, angle*10) &&
@@ -2804,7 +2868,7 @@ if (DebugMsg & debug_overtake)
 LogUSR.debug("CHECKSWITCH: Lft - ti=%.2f dm=%.1f o=%.2f->%.2f m=%.2f->%.2f\n",t_impact,deltamult,ocar->_trkPos.toLeft,ocatchleft,car->_trkPos.toLeft,mcatchleft);
         if (nextCRinverse < 0.0)
           radius = 0.0;
-        if ((side == prefer_side || 
+        if ((side == prefer_side ||
              track->width-ocatchleft < (car->_dimension_y + 3.0 + radius + speedchange) * switchrad ||
              ocatchleft > (mcatchleft + 1.5) * switchrad) &&
             xdist > sdiff + (-ydist) + MAX(0.0, -angle*10) &&
@@ -2836,7 +2900,7 @@ void Driver::update(tSituation *s)
 
     int nCars = cardata->getNCars();
 
-    for (int i = 0; i < nCars; i++) 
+    for (int i = 0; i < nCars; i++)
     {
         // update cars that are close to ours
         SingleCardata *cdata = cardata->getCarData(i);
@@ -2878,12 +2942,12 @@ void Driver::update(tSituation *s)
     if (DLong > 500)
       pitStopChecked = false;
 
-    if (!pit->getPitstop() 
+    if (!pit->getPitstop()
       && (!pitStopChecked)
       && (DLong < 500)
-      && (car->_distFromStartLine < pit->getNPitEntry() || car->_distFromStartLine > pit->getNPitEnd())) 
+      && (car->_distFromStartLine < pit->getNPitEntry() || car->_distFromStartLine > pit->getNPitEnd()))
 #else
-    if (!pit->getPitstop() && (car->_distFromStartLine < pit->getNPitEntry() || car->_distFromStartLine > pit->getNPitEnd())) 
+    if (!pit->getPitstop() && (car->_distFromStartLine < pit->getNPitEntry() || car->_distFromStartLine > pit->getNPitEnd()))
 #endif
     {
       bool pitstop = strategy->needPitstop(car, s, opponents);
@@ -2907,7 +2971,7 @@ void Driver::update(tSituation *s)
           continue;
 
         int opitpos = (int) opponent[i].getCarPtr()->_lightCmd;
- 
+
         if (opitpos != PIT_NONE && car->_fuel > fuelperlap*1.5 && car->_trkPos.toLeft >= 0.0 && car->_trkPos.toLeft <= track->width)
         {
           // pit occupied & we've got enough fuel to go around again
@@ -2929,7 +2993,7 @@ void Driver::update(tSituation *s)
             double opfrompit = pitloc - opponent[i].getCarPtr()->_distFromStartLine;
             if (myfrompit < 0.0) myfrompit += track->length;
             if (opfrompit < 0.0) opfrompit += track->length;
-            
+
             // work out who's closest to the pit & therefore should go in front
             if (opfrompit > myfrompit)
             {
@@ -2959,7 +3023,7 @@ void Driver::update(tSituation *s)
 
 #ifdef SPEED_DREAMS
   if (pitpos == PIT_NONE)
-    RtTeamReleasePit(teamIndex); 
+    RtTeamReleasePit(teamIndex);
 #else
   car->_lightCmd = (char) pitpos;
 #endif
@@ -3130,7 +3194,7 @@ bool Driver::isStuck()
   if (stuck)
   {
     // stuck - ok to be "unstuck"?
-    if (fangle < 0.7 && 
+    if (fangle < 0.7 &&
         toSide > 2.0 &&
         simtime - stuck_timer > 2.0)
     {
@@ -3157,7 +3221,7 @@ bool Driver::isStuck()
     else if (stuck == STUCK_FORWARD)
     {
       // should we try reverse?
-      if ((simtime - stuck_timer > MAX(4.0, car->_speed_x/2) && 
+      if ((simtime - stuck_timer > MAX(4.0, car->_speed_x/2) &&
            (fabs(car->_speed_x) < 4.0 || (!returning && fabs(car->_yaw_rate) < 0.4))) ||
           (car->_trkPos.toRight < 0.0 + fangle && angle < -0.6 && angle > -2.4) ||
           (car->_trkPos.toLeft < 0.0 + fangle && angle > 0.6 && angle < 2.4))
@@ -3166,7 +3230,7 @@ bool Driver::isStuck()
         stuck_timer = (float)simtime;
       }
     }
-    
+
     last_stuck_time = (float)simtime;
   }
   else if (getSpeed() < 10.0 || toSide < 2.0)
@@ -3366,7 +3430,8 @@ float Driver::filterBPit(float brake)
   if (pit->getPitstop() && !pit->getInPit()) {
     float dl, dw;
     RtDistToPit(car, track, &dl, &dw);
-    if (dl < PIT_BRAKE_AHEAD) {
+    if (dl < PIT_BRAKE_AHEAD)
+    {
       float mu = car->_trkPos.seg->surface->kFriction*TIREMU*PIT_MU;
       if (brakedist(0.0f, mu) > dl) {
         return 1.0f;
@@ -3431,7 +3496,7 @@ float Driver::filterBColl(float brake)
   float mu = car->_trkPos.seg->surface->kFriction * BrakeMu;
   int i;
   float thisbrake = 0.0f;
-  for (i = 0; i < opponents->getNOpponents(); i++) 
+  for (i = 0; i < opponents->getNOpponents(); i++)
   {
     if ((opponent[i].getState() & OPP_COLL))
     {
@@ -3439,7 +3504,7 @@ float Driver::filterBColl(float brake)
       float ospeed = opponent[i].getSpeed() + accel;
       float margin = MIN(0.3f, MAX(0.0f, 0.3f - opponent[i].getDistance()));
       if ((opponent[i].getState() & OPP_SIDE_COLL) ||
-          brakedist(ospeed, mu) + MIN(1.0, margin + MAX(0.0, (getSpeed()-ospeed)/9)) > opponent[i].getDistance() + accel) 
+          brakedist(ospeed, mu) + MIN(1.0, margin + MAX(0.0, (getSpeed()-ospeed)/9)) > opponent[i].getDistance() + accel)
       {
         accelcmd = 0.0f;
         float thiscollision = MAX(0.01f, MIN(5.0f, opponent[i].getTimeImpact()));
@@ -3521,7 +3586,7 @@ float Driver::filterTCL(float accel)
   accel = MIN(1.0f, accel);
 
   float slip = (this->*GET_DRIVEN_WHEEL_SPEED)() - fabs(car->_speed_x);
-  if (slip > TclSlip) 
+  if (slip > TclSlip)
     accel = accel - (float) MIN(accel*0.9f, (slip - TclSlip)/TclRange);
 #if 0
   float accel1 = accel, accel2 = accel, accel3 = accel, accel4 = accel, accel5 = accel;
@@ -3562,7 +3627,7 @@ float Driver::filterTCL(float accel)
     if (wseg1->surface->kFriction < seg->surface->kFriction)
       accel1 = (float) MAX(0.0f, accel1 - (seg->surface->kFriction - wseg1->surface->kFriction));
 #endif
-  
+
     if (wseg0->surface->kRollRes > MAX(0.01, seg->surface->kRollRes*1.2))
       accel1 = (float) MAX(0.0f, accel1 - (wseg0->surface->kRollRes - seg->surface->kRollRes*1.2)*4);
     if (wseg1->surface->kRollRes > MAX(0.01, seg->surface->kRollRes*1.2))

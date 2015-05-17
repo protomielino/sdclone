@@ -46,6 +46,8 @@
 #define PRV_SHIFT           "shift"
 #define PRV_MU_SCALE		"mu scale"
 #define PRV_RAIN_MU         "mu scale rain"
+#define PRV_ACCEL_DELTA     "accel delta"
+#define PRV_ACCEL_DELTA_RAIN "accel delta rain"
 #define PRV_FLY_HEIGHT		"fly height"
 #define PRV_FACTOR			"factor"
 #define PRV_AERO_MOD		"aero mod"
@@ -145,6 +147,7 @@ public:
 
     double filterTCL(double accel);
     double filterTrk(double accel);
+    double filterAccel(double Accel);
 
     void initCa();
     //void initCa_MPA1();
@@ -260,14 +263,13 @@ public:
 
     bool        m_UseFilterAccel;
     bool        m_UseAccelOut;
-    float       m_DeltaAccel;                           //
-    float       m_DeltaAccelRain;                       //
 
     double      m_BrakeCoeff[NBR_BRAKECOEFF+1];             // Brake coefficients
     int         m_LastBrakeCoefIndex;                       // Index of last brake coef.
     double      m_LastTargetSpeed;                          // Last target speed
 
     double      m_LastBrake;                                // Last brake command
+    double      m_LastAccel;
     int         m_LastPosIdx;                               // Last brake position
 
 private:
@@ -276,6 +278,7 @@ private:
 	int		CalcGear( tCarElt* car, double& acc );
     float   getClutch();
 	double	ApplyAbs( tCarElt* car, double brake );
+    double  filterBrake(double Brake);
     void    Meteorology();
     int     GetWeather();
     bool    CheckPitSharing();
@@ -342,6 +345,8 @@ private:
     double          m_RainIntensity;
     double          m_ScaleMuRain;
     double          m_ScaleBrakeRain;
+    float           m_DeltaAccel;                           //
+    float           m_DeltaAccelRain;                       //
     int             m_WeatherCode;          // Track specific weather
     int             m_DryCode;              // Track specific dry weather
 

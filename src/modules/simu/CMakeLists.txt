@@ -6,7 +6,7 @@ ADD_SUBDIRECTORY(simuv4)
 # Unofficial / obsolete simulation engines.
 IF(NOT OPTION_OFFICIAL_ONLY)
 
-	SD_ADD_SUBDIRECTORY(simuv2)
+	#SD_ADD_SUBDIRECTORY(simuv2)
 	SD_ADD_SUBDIRECTORY(simuv3)
 
 ENDIF()

@@ -130,7 +130,7 @@ TDriver::TDriver(int Index, const int robot_type):
     m_pitControl(m_track, m_pitPath[PATH_NORMAL]),
     m_CarType(0),
     m_driveType(DT_RWD),
-	m_gearUpRpm(8000),
+    m_gearUpRpm(9000),
 
     m_XXX(0),
 
@@ -143,6 +143,8 @@ TDriver::TDriver(int Index, const int robot_type):
     m_RainIntensity(0),
     m_ScaleMuRain(0.85),
     m_ScaleBrakeRain(0.75),
+    m_DeltaAccel(0.05f),
+    m_DeltaAccelRain(0.025f),
     m_WeatherCode(0),
     m_DryCode(0),
 
@@ -523,8 +525,59 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     m_Shift = GfParmGetNum(hCarParm, SECT_PRIV, PRV_SHIFT, 0, (float)m_Shift);
     LogSHADOW.debug("#m_Shift %g\n",m_Shift);
 
+    m_DeltaAccel = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ACCEL_DELTA , 0, (float)m_DeltaAccel);
+    m_DeltaAccelRain = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ACCEL_DELTA_RAIN, 0, (float)m_DeltaAccelRain);
     LogSHADOW.debug("FLY_HEIGHT %g\n", FLY_HEIGHT );
     LogSHADOW.debug( "BUMP_MOD %d\n", BUMP_MOD );
+
+    const char *enabling;
+
+    HasTYC = false;
+    enabling = GfParmGetStr(hCarParm, SECT_FEATURES, PRM_TIRETEMPDEG, VAL_NO);
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HasTYC = true;
+      LogSHADOW.info("#Car has TYC yes\n");
+    }
+    else
+      LogSHADOW.info("#Car has TYC no\n");
+
+    HasABS = false;
+    enabling = GfParmGetStr(hCarParm, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HasABS = true;
+      LogSHADOW.info("#Car has ABS yes\n");
+    }
+    else
+      LogSHADOW.info("#Car has ABS no\n");
+
+    HasESP = false;
+    enabling = GfParmGetStr(hCarParm, SECT_FEATURES, PRM_ESPINSIMU, VAL_NO);
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HasESP = true;
+      LogSHADOW.info("#Car has ESP yes\n");
+    }
+    else
+      LogSHADOW.info("#Car has ESP no\n");
+
+    HasTCL = false;
+    enabling = GfParmGetStr(hCarParm, SECT_FEATURES, PRM_TCLINSIMU, VAL_NO);
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HasTCL = true;
+      LogSHADOW.info("#Car has TCL yes\n");
+    }
+    else
+      LogSHADOW.info("#Car has TCL no\n");
+
+   // For test of simu options override switches here
+    /*
+    oCarHasABS = true;
+    oCarHasTCL = true;
+    oCarHasESP = true;
+    */
 
 	MyTrack::SideMod	sideMod;
 	sideMod.side = -1;
@@ -1593,15 +1646,26 @@ void TDriver::Drive( tSituation* s )
 		}
 	}
 
-	brk = ApplyAbs(car, brk);
+    if (!HasESP)
+      //brk = filterBrake(car, brk);
+    //oBrake = FilterBrakeSpeed(oBrake);
+    if (!HasABS)
+      brk = ApplyAbs(car, brk);
+    //brk = ApplyAbs(car, brk);
     steer = FlightControl(steer);
-    acc = filterTCL(acc);
+
+    if (!HasTCL)
+        acc = filterTCL(acc);
+    //acc = filterTCL(acc);
+    acc = filterAccel(acc);
 
     // set up the values to return
     car->ctrl.steer = steer;
     car->ctrl.gear = gear;
     car->ctrl.accelCmd = acc;
     car->ctrl.brakeCmd = brk;
+    m_LastBrake = brk;
+    m_LastAccel = acc;
 
 	m_pitControl.Process( car );
 }
@@ -1979,7 +2043,7 @@ int TDriver::CalcGear( tCarElt* car, double& acc )
     {
         /*BT gear changing */
         float gr_up = car->_gearRatio[car->_gear + car->_gearOffset];
-        float omega = car->_enginerpmRedLine/gr_up;
+        float omega = (car->_enginerpmRedLine * m_Shift) /gr_up;
         float wr = wheelRadius;
 
         if (omega * wr * m_Shift < car->_speed_x)
@@ -1988,7 +2052,7 @@ int TDriver::CalcGear( tCarElt* car, double& acc )
         } else
         {
             float gr_down = car->_gearRatio[car->_gear + car->_gearOffset - 1];
-            omega = car->_enginerpmRedLine/gr_down;
+            omega = (car->_enginerpmRedLine * m_Shift) /gr_down;
 
             if (car->_gear > 1 && omega * wr * m_Shift > car->_speed_x + SHIFT_MARGIN)
             {
@@ -2064,6 +2128,82 @@ float TDriver::getClutch()
             return clutcht;
         }
     }
+}
+
+double TDriver::filterBrake(double Brake)
+{
+  /*BrakeRight = 1.0f;
+  BrakeLeft = 1.0f;
+  BrakeFront = 1.0f;
+  BrakeRear = 1.0f;
+
+  // EPS system for use with SimuV4 ...
+  if((CarSpeedLong > SLOWSPEED) && (Brake > 0.0))
+  {
+    Brake *= (float) MAX(0.1, oCosDriftAngle2);
+    if (oDriftAngle > 4.0/180.0*PI)
+    {
+      BrakeLeft = 1.0f + oBrakeCorrLR;
+      BrakeRight = 1.0f - oBrakeCorrLR;
+      BrakeFront = 1.0f + oBrakeCorrFR;
+      BrakeRear = 1.0f - oBrakeCorrFR;
+      LogSHADOW.debug("#BL+ BR- %.3f deg\n",oDriftAngle*180/PI);
+    }
+    else if (oDriftAngle > 2.0/180.0*PI)
+    {
+      oBrakeLeft = 1.0f + oBrakeCorrLR;
+      oBrakeRight = 1.0f - oBrakeCorrLR;
+      oBrakeFront = 1.0f;
+      oBrakeRear = 1.0f;
+      LogSHADOW.debug("#BL+ BR- %.3f deg\n",oDriftAngle*180/PI);
+    }
+    else if (oDriftAngle < -4.0/180.0*PI)
+    {
+      oBrakeRight = 1.0f + oBrakeCorrLR;
+      oBrakeLeft = 1.0f - oBrakeCorrLR;
+      oBrakeFront = 1.0f + oBrakeCorrFR;
+      oBrakeRear = 1.0f - oBrakeCorrFR;
+      LogSHADOW.debug("#BL- BR+ %.3f deg\n",oDriftAngle*180/PI);
+    }
+    else if (oDriftAngle < -2.0/180.0*PI)
+    {
+      oBrakeRight = 1.0f + oBrakeCorrLR;
+      oBrakeLeft = 1.0f - oBrakeCorrLR;
+      oBrakeFront = 1.0f;
+      oBrakeRear = 1.0f;
+      LogSHADOW.debug("#BL- BR+ %.3f deg\n",oDriftAngle*180/PI);
+    }
+    else
+    {
+      oBrakeRight = 1.0f;
+      oBrakeLeft = 1.0f;
+      oBrakeFront = 1.0f;
+      oBrakeRear = 1.0f;
+      //LogSHADOW.debug("#BR = BL %.3f�\n",oDriftAngle*180/PI);
+    }
+  }
+  // ... EPS system for use with SimuV4
+
+  // Limit the brake press at start of braking
+  if (oLastAccel > 0)
+    return MIN(0.10,Brake);*/
+
+  return Brake;
+}
+
+double TDriver::filterAccel(double Accel)
+{
+  if (m_Rain)
+  {
+    if (Accel > m_LastAccel + m_DeltaAccelRain)
+      Accel = MIN(1.0, m_LastAccel + m_DeltaAccelRain);
+  }
+  else
+  {
+    if (Accel > m_LastAccel + m_DeltaAccel)
+      Accel = MIN(1.0, m_LastAccel + m_DeltaAccel);
+  }
+  return Accel;
 }
 
 double TDriver::ApplyAbs( tCarElt* car, double brake )
