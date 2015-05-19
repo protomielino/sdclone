@@ -467,7 +467,9 @@ GfctrlJoyCreate(void)
 
     tCtrlJoyInfo* joyInfo = (tCtrlJoyInfo *)calloc(1, sizeof(tCtrlJoyInfo));
 
+#if SDL_JOYSTICK
     joyInfoCopy = joyInfo;
+#endif
 
     return joyInfo;
 }
@@ -501,7 +503,8 @@ GfctrlJoyIsAnyPresent(void)
 
     return gfctrlJoyPresent;
 }
-
+#if SDL_MAJOR_VERSION >= 2
+#if SDL_JOYSTICK
 int
 GfctrlSDL2JoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 {
@@ -559,7 +562,8 @@ GfctrlSDL2JoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
    }
    return 0;
 }
-
+#endif
+#endif
 /** Get the current state of the joysticks
     @ingroup	ctrl
     @param	joyInfo	Target joystick structure
@@ -571,7 +575,9 @@ int
 GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 {
 #if SDL_MAJOR_VERSION >= 2
+#ifdef SDL_JOYSTICK
    return GfctrlSDL2JoyGetCurrentStates(joyInfo);
+#endif
 #endif
     int			ind;
 #ifndef SDL_JOYSTICK
