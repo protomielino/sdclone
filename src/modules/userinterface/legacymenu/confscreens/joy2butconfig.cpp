@@ -60,7 +60,7 @@ static int MaxCmd;
 
 // Joystick info.
 #if SDL_JOYSTICK
-static tCtrlJoyInfo *joyInfo = NULL;
+static tCtrlJoyInfo joyInfo;// = NULL;
 static tCtrlJoyInfo joyCenter;
 #else
 static jsJoystick* Joystick[GFCTRL_JOY_NUMBER];
@@ -102,7 +102,7 @@ onNext(void * /* dummy */)
 
     /* Release up and running joysticks */
 #if SDL_JOYSTICK
-    GfctrlJoyRelease(joyInfo);
+    //GfctrlJoyRelease(joyInfo);
 #else
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++)
 	if (Joystick[index]) {
@@ -186,7 +186,7 @@ JoyCalAutomaton(void)
     case 0:
 	/* Grab snapshot of 'NULL' position */
 #if SDL_JOYSTICK
-   memcpy(&joyCenter, joyInfo, sizeof(joyCenter));
+   memcpy(&joyCenter, &joyInfo, sizeof(joyCenter));
 #else
 	memcpy(JoyAxisCenter, JoyAxis, sizeof(JoyAxisCenter));
 #endif
@@ -215,7 +215,7 @@ JoyCalAutomaton(void)
 	new_in_list = (linked_item_t*)malloc(sizeof(linked_item_t));
 	new_in_list->command = AtobCount;
 #if SDL_JOYSTICK
-   new_in_list->value = joyInfo->ax[AtobAxis];
+   new_in_list->value = joyInfo.ax[AtobAxis];
 #else
 	new_in_list->value = JoyAxis[AtobAxis];
 #endif
@@ -293,9 +293,9 @@ Idle2(void)
    int		index;
 #if SDL_JOYSTICK
    /* Check for activity on Joystick buttons */
-   GfctrlJoyGetCurrentStates(joyInfo);
+   GfctrlJoyGetCurrentStates(&joyInfo);
    for (index = 0; index < GFCTRL_JOY_NUMBER * GFCTRL_JOY_MAX_BUTTONS; index++) {
-      if (joyInfo->edgedn[index]) {
+      if (joyInfo.edgedn[index]) {
          /* Check whether to ignore */
          if(Cmd[CalState + CmdOffset].butIgnore == index)
             break;
@@ -351,8 +351,8 @@ onActivate(void * /* dummy */)
     int index;
     
 #if SDL_JOYSTICK
-    joyInfo = GfctrlJoyCreate();
-    GfctrlJoyGetCurrentStates(joyInfo);
+    //joyInfo = GfctrlJoyCreate();
+    GfctrlJoyGetCurrentStates(&joyInfo);
 #else
     // Create and test joysticks ; only keep the up and running ones.
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {

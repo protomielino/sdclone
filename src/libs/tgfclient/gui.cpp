@@ -130,7 +130,7 @@ gfuiInit(void)
 	glUseProgram = (PFNGLUSEPROGRAMOBJECTARBPROC)wglGetProcAddress("glUseProgram");
     glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
 #endif
-	//gfctrlJoyInit(); // Not here ; done later on the fly, when really needed.
+	gfctrlJoyInit(); // Not here ; done later on the fly, when really needed.
 }
 
 void
@@ -658,7 +658,7 @@ GfuiScreenActivate(void *screen)
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	else
 		SDL_EnableKeyRepeat(0, 0);
-#else
+//#else
 #if SDL_JOYSTICK
 	GfuiApp().eventLoop().setJoystickAxisCB(GfctrlJoySetAxis);
 	GfuiApp().eventLoop().setJoystickButtonCB(GfctrlJoySetButton);

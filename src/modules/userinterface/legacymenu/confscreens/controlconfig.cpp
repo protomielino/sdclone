@@ -114,7 +114,7 @@ static tCmdDispInfo CmdDispInfo[] = {
 };
 
 #if SDL_JOYSTICK
-static tCtrlJoyInfo *joyInfo = NULL;
+static tCtrlJoyInfo joyInfo;// = NULL;
 static tCtrlJoyInfo joyCenter;
 #else
 static jsJoystick	*Joystick[GFCTRL_JOY_NUMBER];
@@ -210,7 +210,7 @@ onQuit(void *prevMenu)
 {
     /* Release joysticks */
 #if SDL_JOYSTICK
-   GfctrlJoyRelease(joyInfo);
+   //   GfctrlJoyRelease(joyInfo);
 #else
     for (int jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++)
 	if (Joystick[jsInd]) {
@@ -346,8 +346,8 @@ getMovedAxis(int joy_number)
 
     for (i = GFCTRL_JOY_MAX_AXES * joy_number; i < GFCTRL_JOY_MAX_AXES * (joy_number+1); i++) {
 #if SDL_JOYSTICK
-	if (maxDiff < fabs(joyInfo->ax[i] - joyCenter.ax[i])) {
-	    maxDiff = fabs(joyInfo->ax[i] - joyCenter.ax[i]);
+	if (maxDiff < fabs(joyInfo.ax[i] - joyCenter.ax[i])) {
+	    maxDiff = fabs(joyInfo.ax[i] - joyCenter.ax[i]);
 #else
 	if (maxDiff < fabs(JoyAxis[i] - JoyAxisCenter[i])) {
 	    maxDiff = fabs(JoyAxis[i] - JoyAxisCenter[i]);
@@ -412,7 +412,7 @@ IdleWaitForInput(void)
 
     /* Check for a Joystick button pressed */
 #if SDL_JOYSTICK
-    GfctrlJoyGetCurrentStates(joyInfo);
+    GfctrlJoyGetCurrentStates(&joyInfo);
 #endif
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 #ifndef SDL_JOYSTICK
@@ -427,7 +427,7 @@ IdleWaitForInput(void)
 	    if (axis != -1 && Cmd[CurrentCmd].pref != HM_ATT_JOY_REQ_AXIS) {
 		GfSleep(0.3);
 #if SDL_JOYSTICK
-         GfctrlJoyGetCurrentStates(joyInfo);
+         GfctrlJoyGetCurrentStates(&joyInfo);
 #else
    		Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
 #endif
@@ -436,7 +436,7 @@ IdleWaitForInput(void)
 	    /* Joystick buttons */
 #if SDL_JOYSTICK
 	    for (i = 0; i < GFCTRL_JOY_MAX_BUTTONS; i++) {
-		if (joyInfo->levelup[i + GFCTRL_JOY_MAX_BUTTONS * index]) {
+		if (joyInfo.levelup[i + GFCTRL_JOY_MAX_BUTTONS * index]) {
 #else
 	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
 		if (((b & mask) != 0) && ((JoyButtons[index] & mask) == 0)) {
@@ -445,7 +445,7 @@ IdleWaitForInput(void)
 		    if (axis == -1 && Cmd[CurrentCmd].pref != HM_ATT_JOY_REQ_BUT) {
     			GfSleep(0.3);
 #if SDL_JOYSTICK
-            GfctrlJoyGetCurrentStates(joyInfo);
+            GfctrlJoyGetCurrentStates(&joyInfo);
 #else
 	    		Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
 #endif
@@ -575,8 +575,8 @@ onPush(void *vi)
 
     /* Read initial joysticks status */
 #if SDL_JOYSTICK
-    GfctrlJoyGetCurrentStates(joyInfo);
-    memcpy(&joyCenter, joyInfo, sizeof(joyCenter));
+    GfctrlJoyGetCurrentStates(&joyInfo);
+    memcpy(&joyCenter, &joyInfo, sizeof(joyCenter));
 #else
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++)
 	if (Joystick[index])
@@ -592,8 +592,8 @@ static void
 onActivate(void * /* dummy */)
 {
 #if SDL_JOYSTICK
-    joyInfo = GfctrlJoyCreate();
-    GfctrlJoyGetCurrentStates(joyInfo);
+    //joyInfo = GfctrlJoyCreate();
+    GfctrlJoyGetCurrentStates(&joyInfo);
 #else
     // Create and test joysticks ; only keep the up and running ones.
     for (int jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++) {

@@ -65,7 +65,7 @@ static int MaxCmd;
 
 // Joystick info.
 #if SDL_JOYSTICK
-static tCtrlJoyInfo *joyInfo = NULL;
+static tCtrlJoyInfo joyInfo;// = NULL;
 static tCtrlJoyInfo joyCenter;
 #else
 static jsJoystick* Joystick[GFCTRL_JOY_NUMBER];
@@ -96,7 +96,7 @@ static void
 onNext(void * /* dummy */)
 {
 #if SDL_JOYSTICK
-   GfctrlJoyRelease(joyInfo);
+//   GfctrlJoyRelease(joyInfo);
 #else
     int index;
 
@@ -133,7 +133,7 @@ JoyCalAutomaton(void)
     switch (CalState) {
     case 0:
 #if SDL_JOYSTICK
-   memcpy(&joyCenter, joyInfo, sizeof(joyCenter));
+   memcpy(&joyCenter, &joyInfo, sizeof(joyCenter));
 #else
 	memcpy(JoyAxisCenter, JoyAxis, sizeof(JoyAxisCenter));
 #endif
@@ -143,7 +143,7 @@ JoyCalAutomaton(void)
 	axis = Cmd[CalState + CmdOffset].ref.index;
 #if SDL_JOYSTICK
    Cmd[CalState + CmdOffset].min = joyCenter.ax[axis];
-   Cmd[CalState + CmdOffset].max = joyInfo->ax[axis];
+   Cmd[CalState + CmdOffset].max = joyInfo.ax[axis];
 #else
    Cmd[CalState + CmdOffset].min = JoyAxisCenter[axis];
    Cmd[CalState + CmdOffset].max = JoyAxis[axis];
@@ -156,7 +156,7 @@ JoyCalAutomaton(void)
 		Cmd[CalState + CmdOffset].pow = -1.0;
 
 #if SDL_JOYSTICK
-   sprintf(buf, "%.2f", joyInfo->ax[axis]);
+   sprintf(buf, "%.2f", joyInfo.ax[axis]);
 #else
 	sprintf(buf, "%.2f", JoyAxis[axis]);
 #endif
@@ -167,7 +167,7 @@ JoyCalAutomaton(void)
 	axis = Cmd[CalState + CmdOffset].ref.index;
 #if SDL_JOYSTICK
    Cmd[CalState + CmdOffset].min = joyCenter.ax[axis];
-   Cmd[CalState + CmdOffset].max = joyInfo->ax[axis];
+   Cmd[CalState + CmdOffset].max = joyInfo.ax[axis];
 #else
 	Cmd[CalState + CmdOffset].min = JoyAxisCenter[axis];
 	Cmd[CalState + CmdOffset].max = JoyAxis[axis];
@@ -179,7 +179,7 @@ JoyCalAutomaton(void)
 	else
 		Cmd[CalState + CmdOffset].pow = -1.0;
 #if SDL_JOYSTICK
-   sprintf(buf, "%.2f", joyInfo->ax[axis]);
+   sprintf(buf, "%.2f", joyInfo.ax[axis]);
 #else
 	sprintf(buf, "%.2f", JoyAxis[axis]);
 #endif
@@ -192,7 +192,7 @@ JoyCalAutomaton(void)
 	axis = Cmd[CalState + CmdOffset].ref.index;
 #if SDL_JOYSTICK
    Cmd[CalState + CmdOffset].min = joyCenter.ax[axis];
-   Cmd[CalState + CmdOffset].max = joyInfo->ax[axis];
+   Cmd[CalState + CmdOffset].max = joyInfo.ax[axis];
 #else
 	Cmd[CalState + CmdOffset].min = JoyAxisCenter[axis];
 	Cmd[CalState + CmdOffset].max = JoyAxis[axis];
@@ -205,7 +205,7 @@ JoyCalAutomaton(void)
 #endif
 	GfuiLabelSetText(ScrHandle, LabMinId[CalState - 2], buf);
 #if SDL_JOYSTICK
-   sprintf(buf, "%.2f", joyInfo->ax[axis]);
+   sprintf(buf, "%.2f", joyInfo.ax[axis]);
 #else
 	sprintf(buf, "%.2f", JoyAxis[axis]);
 #endif
@@ -233,9 +233,9 @@ Idle2(void)
    int		index;
 #if SDL_JOYSTICK
    /* Check for activity on Joystick buttons */
-   GfctrlJoyGetCurrentStates(joyInfo);
+   GfctrlJoyGetCurrentStates(&joyInfo);
    for (index = 0; index < GFCTRL_JOY_NUMBER * GFCTRL_JOY_MAX_BUTTONS; index++) {
-      if (joyInfo->edgedn[index]) {
+      if (joyInfo.edgedn[index]) {
          /* Check whether to ignore */
          if(Cmd[CalState + CmdOffset].butIgnore == index)
             break;
@@ -290,8 +290,8 @@ onActivate(void * /* dummy */)
     int i;
     int step;
 #if SDL_JOYSTICK
-    joyInfo = GfctrlJoyCreate();
-    GfctrlJoyGetCurrentStates(joyInfo);
+    //joyInfo = GfctrlJoyCreate();
+    GfctrlJoyGetCurrentStates(&joyInfo);
 #else
     int index;
 
