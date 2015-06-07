@@ -58,31 +58,32 @@ public:
 
 void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node> m_sceneroot, osg::Vec3f fogcolor)
 {
-    m_Winx = x;
-    m_Winy = y;
-    m_Winw = width;
-    m_Winh = height;
-
     //intialising main screen
-    osg::ref_ptr<osg::Camera> mirrorCam = new osg::Camera;
 
     viewer = new osgViewer::Viewer;
-    viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
-    SDView * view = new SDView(viewer->getCamera(),0,0, m_Winw, m_Winh, mirrorCam.get());
-    osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, m_Winw, m_Winh);
-    viewer->getCamera()->setViewport(new osg::Viewport(0, 0, m_Winw, m_Winh));
-    viewer->getCamera()->setGraphicsContext(gw);
+    //viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
+    //SDView * view = new SDView(viewer->getCamera(),0,0, m_Winw, m_Winh, mirrorCam.get());
+    //osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, m_Winw, m_Winh);
+    //viewer->getCamera()->setViewport(new osg::Viewport(0, 0, m_Winw, m_Winh));
+    //viewer->getCamera()->setGraphicsContext(gw);
+    osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, width, height);
     viewer->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
     viewer->getCamera()->setPreDrawCallback(new CameraDrawnCallback);
-    viewer->realize();
+    //viewer->realize();
 
+    osg::ref_ptr<osg::Camera> mirrorCam = new osg::Camera;
     mirrorCam->setGraphicsContext(gw);
     mirrorCam->setClearMask( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     mirrorCam->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
 
-    Screens.insert(Screens.end(), view);
+    //Screens.insert(Screens.end(), view);
 
+    SDView * view = new SDView(viewer->getCamera(),0,0, width, height, mirrorCam.get());
+    Screens.push_back(view);
+
+    /* Set the scene graph root node for traversal by the viewer */
     root = new osg::Group;
+    viewer->setSceneData(root.get());
     mirrorScene = new osg::Group;
 #if 1
     prerenderRoot = new osg::Group;
@@ -104,7 +105,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     // debugHUD->setTexture(reflectionMapping->getReflectionMap());
     root->addChild(debugHUD->getRootCamera());
 
-    viewer->setSceneData(root.get());
+    //viewer->setSceneData(root.get());
     viewer->realize();
 }
 
