@@ -2067,6 +2067,8 @@ int TDriver::CalcGear( tCarElt* car, double& acc )
 // Compute the clutch value.
 float TDriver::getClutch()
 {
+    float m_Clutch;
+#if 0
     float speedr;
     float omega;
     float wr = wheelRadius;
@@ -2128,6 +2130,46 @@ float TDriver::getClutch()
             return clutcht;
         }
     }
+#else
+    if(m_Clutch > 0)
+    {
+      if (car->_gear < 2)
+        m_Clutch = startAutomatic();
+
+      m_Clutch = MIN(m_ClutchMax, m_Clutch);
+      if(m_Clutch == m_ClutchMax)
+      {
+        if((car->_gear + car->_gearOffset)* car->_speed_x
+            / (wheelRadius * car->_enginerpm) > m_ClutchRange)
+        {
+          m_Clutch = m_ClutchMax - 0.01;
+        }
+        else
+          m_Clutch -= m_ClutchDelta / 10;
+      }
+      else
+      {
+        m_Clutch -= m_ClutchDelta;
+        m_Clutch = MAX(0.0, m_Clutch);
+      }
+    }
+
+    return m_Clutch;
+#endif
+}
+
+float TDriver::startAutomatic()
+{
+    float m_Clutch;
+  if ((car->_gearCmd == 1) && (TDriver::CurrSimTime < 20))
+  {
+    if (car->_enginerpm < 0.94)
+      m_Clutch += m_ClutchDelta;
+    else if (car->_enginerpm > 1.1 * 0.94)
+      m_Clutch -= m_ClutchDelta * m_ClutchRelease;
+  }
+
+  return m_Clutch;
 }
 
 double TDriver::filterBrake(double Brake)

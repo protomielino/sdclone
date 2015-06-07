@@ -277,6 +277,7 @@ private:
     void	AvoidOtherCars( int index, tCarElt* car, double k, double& carTargetSpd, tSituation* s, bool& inTraffic, bool& lapper );
 	int		CalcGear( tCarElt* car, double& acc );
     float   getClutch();
+    float   startAutomatic();
 	double	ApplyAbs( tCarElt* car, double brake );
     double  filterBrake(double Brake);
     void    Meteorology();
