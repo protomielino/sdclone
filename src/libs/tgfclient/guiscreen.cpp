@@ -169,9 +169,9 @@ tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSi
 			if (bFullScreen == 0) {
 				/* list any size <= desktop size */
 				if (ADefScreenSizes[avail-1].width <= bounds.w 
-						&&  ADefScreenSizes[avail].height <= bounds.h) {
+						&&  ADefScreenSizes[avail-1].height <= bounds.h) {
 					aSuppSizes[*pnSizes].width  = ADefScreenSizes[avail-1].width;
-					aSuppSizes[*pnSizes].height = ADefScreenSizes[avail].height;
+					aSuppSizes[*pnSizes].height = ADefScreenSizes[avail-1].height;
 
 					GfLogInfo(" %dx%d,", aSuppSizes[*pnSizes].width, aSuppSizes[*pnSizes].height);
 					(*pnSizes)++;
