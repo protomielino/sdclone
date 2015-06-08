@@ -332,7 +332,7 @@ SimCarUpdateForces(tCar *car)
 			else {F.F.x -= w;}
 		}
 	}
-printf("F.F.z=%g F.M.x=%g\n",F.F.z,F.M.x);	
+
 	/* compute accelerations */
 	car->DynGC.acc.x = F.F.x * minv;
 	car->DynGC.acc.y = F.F.y * minv;
