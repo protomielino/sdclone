@@ -142,10 +142,14 @@ SimCarConfig(tCar *car)
 	/*for (i = 0; i < 2; i++) {
 		SimAxleConfig(car, i, 0.0);
 	}*/
-	wf0 = (wf0 - car->wheel[FRNT_RGT].weight0 - car->wheel[FRNT_LFT].weight0);
-	wr0 = (wr0 - car->wheel[REAR_RGT].weight0 - car->wheel[REAR_LFT].weight0);
-	SimAxleConfig(car, FRNT, wf0);
-	SimAxleConfig(car, REAR, wr0);
+	if (Kfheave > 0.0f) {
+		wf0 = (wf0 - car->wheel[FRNT_RGT].weight0 - car->wheel[FRNT_LFT].weight0);
+		SimAxleConfig(car, FRNT, wf0);
+	} else { SimAxleConfig(car, FRNT, 0.0f); }
+	if (Krheave > 0.0f) {
+		wr0 = (wr0 - car->wheel[REAR_RGT].weight0 - car->wheel[REAR_LFT].weight0);
+		SimAxleConfig(car, REAR, wr0);
+	} else { SimAxleConfig(car, REAR, 0.0f); }
 	
 	for (i = 0; i < 4; i++) {
 		SimWheelConfig(car, i); 
@@ -328,7 +332,7 @@ SimCarUpdateForces(tCar *car)
 			else {F.F.x -= w;}
 		}
 	}
-	
+printf("F.F.z=%g F.M.x=%g\n",F.F.z,F.M.x);	
 	/* compute accelerations */
 	car->DynGC.acc.x = F.F.x * minv;
 	car->DynGC.acc.y = F.F.y * minv;
