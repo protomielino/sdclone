@@ -141,6 +141,7 @@ tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSi
 	Uint32 format;
 	SDL_Rect bounds;
 	tScreenSize* aSuppSizes;
+   tScreenSize* tmpSuppSizes;
 	tScreenSize last;
 
 	last.width = 0;
@@ -163,17 +164,17 @@ tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSi
 
 	if (avail) {
 		/* Overzealous malloc */
-		aSuppSizes = (tScreenSize*)malloc((avail+1) * sizeof(tScreenSize));
+		tmpSuppSizes = (tScreenSize*)malloc((avail+1) * sizeof(tScreenSize));
 
 		while (avail) {
 			if (bFullScreen == 0) {
 				/* list any size <= desktop size */
 				if (ADefScreenSizes[avail-1].width <= bounds.w 
 						&&  ADefScreenSizes[avail-1].height <= bounds.h) {
-					aSuppSizes[*pnSizes].width  = ADefScreenSizes[avail-1].width;
-					aSuppSizes[*pnSizes].height = ADefScreenSizes[avail-1].height;
+					tmpSuppSizes[*pnSizes].width  = ADefScreenSizes[avail-1].width;
+					tmpSuppSizes[*pnSizes].height = ADefScreenSizes[avail-1].height;
 
-					GfLogInfo(" %dx%d,", aSuppSizes[*pnSizes].width, aSuppSizes[*pnSizes].height);
+					GfLogInfo(" %dx%d,", tmpSuppSizes[*pnSizes].width, tmpSuppSizes[*pnSizes].height);
 					(*pnSizes)++;
 				}
 			}
@@ -183,10 +184,10 @@ tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSi
 						&& (last.width != mode.w || last.height != mode.h)
 #endif
 						) {
-					aSuppSizes[*pnSizes].width  = mode.w;
-					aSuppSizes[*pnSizes].height = mode.h;
+					tmpSuppSizes[*pnSizes].width  = mode.w;
+					tmpSuppSizes[*pnSizes].height = mode.h;
 
-					GfLogInfo(" %dx%d,", aSuppSizes[*pnSizes].width, aSuppSizes[*pnSizes].height);
+					GfLogInfo(" %dx%d,", tmpSuppSizes[*pnSizes].width, tmpSuppSizes[*pnSizes].height);
 					(*pnSizes)++;
 
 					last.width = mode.w;
@@ -198,18 +199,32 @@ tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSi
 
 		/* work around SDL2 bug, add desktop bounds as option */
 		if (bFullScreen && (bounds.w != last.width || bounds.h != last.height)) {
-			aSuppSizes[*pnSizes].width  = bounds.w;
-			aSuppSizes[*pnSizes].height = bounds.h;
+			tmpSuppSizes[*pnSizes].width  = bounds.w;
+			tmpSuppSizes[*pnSizes].height = bounds.h;
 
-			GfLogInfo(" %dx%d,", aSuppSizes[*pnSizes].width, aSuppSizes[*pnSizes].height);
+			GfLogInfo(" %dx%d,", tmpSuppSizes[*pnSizes].width, tmpSuppSizes[*pnSizes].height);
 			(*pnSizes)++;
 		}
 
 	} else {
 		GfLogInfo(" None.");
-		aSuppSizes = (tScreenSize*) NULL;
+		tmpSuppSizes = (tScreenSize*) NULL;
 	}
 	GfLogInfo("\nModes selected %d\n", *pnSizes);
+
+   // reverse the array so they appear in correct order in GUI...
+   if(*pnSizes > 0) {
+      aSuppSizes = (tScreenSize*)malloc((*pnSizes) * sizeof(tScreenSize));
+      int maxindex = *pnSizes - 1;
+      for(int i = maxindex; i >= 0; i--) {
+         aSuppSizes[i] = tmpSuppSizes[maxindex - i];
+      }
+      // ...and free the temporary array
+      free(tmpSuppSizes);
+   }
+   else {
+      aSuppSizes = NULL;
+   }
 #else
 	// Query system video capabilities.
 	const SDL_VideoInfo* sdlVideoInfo = SDL_GetVideoInfo();
