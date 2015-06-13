@@ -235,15 +235,7 @@ MACRO(CHECK_LIBRARIES)
 		MESSAGE(STATUS "Looking for library JPEG - NOT found")
 	ENDIF(JPEG_FOUND)
 
-	# SDL
-	Find_Package(SDL)
 
-	IF(SDL_FOUND)
-		SET(HAVE_LIBSDL 1)
-		MESSAGE(STATUS "Looking for library SDL - found")
-	ELSE(SDL_FOUND)
-		MESSAGE(STATUS "Looking for library SDL - NOT found")
-	ENDIF(SDL_FOUND)
 	
 	# SDL2
 	IF(OPTION_SDL2)
@@ -257,7 +249,18 @@ MACRO(CHECK_LIBRARIES)
 		ELSE(SDL2_FOUND)
 			MESSAGE(STATUS "Looking for library SDL2 - NOT found")
 		ENDIF(SDL2_FOUND)
-	ENDIF(OPTION_SDL2)
+
+	ELSE(OPTION_SDL2)
+			# SDL 1.x
+		Find_Package(SDL)
+
+		IF(SDL_FOUND)
+			SET(HAVE_LIBSDL 1)
+			MESSAGE(STATUS "Looking for library SDL - found")
+		ELSE(SDL_FOUND)
+			MESSAGE(STATUS "Looking for library SDL - NOT found")
+		ENDIF(SDL_FOUND)
+		ENDIF(OPTION_SDL2)
 	
 	# OSG
 	IF(OPTION_OSGGRAPH)

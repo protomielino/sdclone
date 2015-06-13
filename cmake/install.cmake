@@ -95,8 +95,14 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
 	      LIST(APPEND _DLLS_TO_INSTALL ${_DLL_PATHNAME})
         ENDIF()
 
-        FIND_PACKAGE(SDL)
-        SET(_LIB_PATHNAME "${SDL_LIBRARY}")
+        IF(OPTION_SDL2)
+           FIND_PACKAGE(SDL2)
+           SET(_LIB_PATHNAME "${SDL2_LIBRARY}")
+        ELSE(OPTION_SDL2)
+           FIND_PACKAGE(SDL)
+           SET(_LIB_PATHNAME "${SDL_LIBRARY}")
+        ENDIF(OPTION_SDL2)
+
         IF(MINGW)
           # Multiple lib specs fuss ... find the one
           STRING(REGEX REPLACE ".*;([^;]+dll[^;]*);.*" "\\1" _LIB_PATHNAME "${_LIB_PATHNAME}")
