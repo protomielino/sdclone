@@ -76,9 +76,9 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_3RDPARTY_SQLITE3 false CACHE BOOL "Use SQLite3 as database for record/replay")
 
-    SET(OPTION_START_PAUSED false CACHE BOOL "Enable Starting races in a Paused state")
+    SET(OPTION_START_PAUSED true CACHE BOOL "Enable Starting races in a Paused state")
 
-    SET(OPTION_COOLDOWN false CACHE BOOL "Enable post-session cooldown driving")
+    SET(OPTION_COOLDOWN true CACHE BOOL "Enable post-session cooldown driving")
 
     # Enable building with 3rd party SOLID library under Windows, as we ship the binary package,
     # but not under Linux, where FreeSolid seems not to be available by default on most distros.

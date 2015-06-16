@@ -163,7 +163,7 @@ static void loadSimuCfg(void)
 
 #ifdef STARTPAUSED
 	// startpaused
-	startPausedSchemeName = GfParmGetStr(paramHandle,RM_SECT_RACE_ENGINE, RM_ATTR_STARTPAUSED, StartPausedSchemeList[0]);
+	startPausedSchemeName = GfParmGetStr(paramHandle,RM_SECT_RACE_ENGINE, RM_ATTR_STARTPAUSED, StartPausedSchemeList[1]);
 	for (i = 0; i < NbStartPausedSchemes; i++) {
 		if (strcmp(startPausedSchemeName, StartPausedSchemeList[i]) == 0) {
 			CurStartPausedScheme = i;
@@ -174,7 +174,7 @@ static void loadSimuCfg(void)
 
 #ifdef COOLDOWN
 	// cooldown
-	cooldownSchemeName = GfParmGetStr(paramHandle,RM_SECT_RACE_ENGINE, RM_ATTR_COOLDOWN, CooldownSchemeList[0]);
+	cooldownSchemeName = GfParmGetStr(paramHandle,RM_SECT_RACE_ENGINE, RM_ATTR_COOLDOWN, CooldownSchemeList[1]);
 	for (i = 0; i < NbCooldownSchemes; i++) {
 		if (strcmp(cooldownSchemeName, CooldownSchemeList[i]) == 0) {
 			CurCooldownScheme = i;
