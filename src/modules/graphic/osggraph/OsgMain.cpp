@@ -29,7 +29,7 @@
 #include <graphic.h>
 
 #include "OsgMain.h"
-#include "OsgOptions.h"
+//#include "OsgOptions.h"
 #include "OsgCar.h"
 #include "OsgScenery.h"
 #include "OsgRender.h"
@@ -39,16 +39,16 @@
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;
 
-SDOptions *Options = 0;
+//SDOptions *Options = 0;
 SDCars *cars = 0;
 SDScenery *scenery = 0;
 SDRender *render = 0;
 SDScreens *screens = 0;
 
-void *getOptions()
+/*oid *getOptions()
 {
     return Options;
-}
+}*/
 
 void *getScreens()
 {
@@ -249,7 +249,7 @@ int initTrack(tTrack *track)
     // Now, do the real track loading job.
     grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-    Options = new SDOptions;
+    //Options = new SDOptions;
 
     scenery = new SDScenery;
     render = new SDRender;
