@@ -24,7 +24,8 @@
 
 #include "OsgScenery.h"
 
-SDBackground::SDBackground(void)
+SDBackground::SDBackground(void) :
+    _background(NULL)
 {
 }
 
@@ -42,9 +43,10 @@ void SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const
     std::string LocalPath = GetDataDir();
 
     osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
-    pathList.push_back(TrackPath);
-    pathList.push_back(LocalPath+"data/objects/");
-    pathList.push_back(LocalPath+"data/textures/");
+
+    pathList.push_front(LocalPath+"data/objects/");
+    pathList.push_front(LocalPath+"data/textures/");
+    pathList.push_front(TrackPath);
     osgDB::Registry::instance()->setDataFilePathList(pathList);
 
     osg::ref_ptr<osg::MatrixTransform> _background_transform = new osg::MatrixTransform;
