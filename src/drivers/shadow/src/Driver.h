@@ -79,6 +79,11 @@
 #define PRV_NEED_SIN        "use sin long"
 #define PRV_USED_ACC        "acc exit"
 #define PRV_SKILL_OFFSET    "offset skill"
+#define PRV_BRAKE_LIMIT		"brake limit"
+#define PRV_BRAKE_LIMIT_BASE "brake limit base"
+#define PRV_BRAKE_LIMIT_SCALE "brake limit scale"
+#define PRV_SPEED_LIMIT_BASE "speed limit base"
+#define PRV_SPEED_LIMIT_SCALE "speed limit scale"
 
 #define NBR_BRAKECOEFF 50                                   // Number of brake coeffs
 
@@ -235,6 +240,8 @@ public:
     void    CalcSkilling_shadow_LP1();
 
     void    AdjustSkilling(void* pCarHandle);
+	void	AdjustBrakes(void *pCarHandle);
+
     void    GetSkillingParameters(const char* BaseParamPath, const char* PathFilename);
 
     double  CalcFriction_shadow_Identity(double Crv);

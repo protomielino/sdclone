@@ -189,12 +189,13 @@ TDriver::TDriver(int Index, const int robot_type):
     {
     case SHADOW_TRB1:
         robot_name = "shadow_trb1";
+		TDriver::UseBrakeLimit = false;
         Frc = 0.95;
         break;
 
     case SHADOW_SC:
         robot_name = "shadow_sc";
-        Frc = 0.90;
+        Frc = 0.85;
         break;
 
     case SHADOW_SRW:
@@ -529,6 +530,8 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     m_DeltaAccelRain = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ACCEL_DELTA_RAIN, 0, (float)m_DeltaAccelRain);
     LogSHADOW.debug("FLY_HEIGHT %g\n", FLY_HEIGHT );
     LogSHADOW.debug( "BUMP_MOD %d\n", BUMP_MOD );
+
+	AdjustBrakes(hCarParm);
 
     const char *enabling;
 
@@ -2357,6 +2360,32 @@ void TDriver::initBrake()
     LogSHADOW.debug("#Shadow2 Brake force       : %0.2f\n", BrakeForce);
     LogSHADOW.debug("\n#<<< Shadow2 Init Brake\n\n");
 }
+
+//==========================================================================*
+
+//==========================================================================*
+// Adjust brakes
+//--------------------------------------------------------------------------*
+void TDriver::AdjustBrakes(void *pCarHandle)
+{
+	if ((TDriver::UseBrakeLimit) || (TDriver::UseGPBrakeLimit))
+	{
+		TDriver::BrakeLimit = GfParmGetNum(pCarHandle, SECT_PRIV, PRV_BRAKE_LIMIT, 0, (float) TDriver::BrakeLimit);
+		LogSHADOW.debug("#BrakeLimit %g\n", TDriver::BrakeLimit);
+
+		TDriver::BrakeLimitBase = GfParmGetNum(pCarHandle, SECT_PRIV,PRV_BRAKE_LIMIT_BASE,0, (float) TDriver::BrakeLimitBase);
+		LogSHADOW.debug("#BrakeLimitBase %g\n", TDriver::BrakeLimitBase);
+
+		TDriver::BrakeLimitScale = GfParmGetNum(pCarHandle, SECT_PRIV, PRV_BRAKE_LIMIT_SCALE, 0, (float) TDriver::BrakeLimitScale);
+		LogSHADOW.debug("#BrakeLimitScale %g\n", TDriver::BrakeLimitScale);
+
+		TDriver::SpeedLimitBase = GfParmGetNum(pCarHandle, SECT_PRIV, PRV_SPEED_LIMIT_BASE, 0, (float) TDriver::SpeedLimitBase);
+		LogSHADOW.debug("#SpeedLimitBase %g\n", TDriver::SpeedLimitBase);
+
+		TDriver::SpeedLimitScale = GfParmGetNum(pCarHandle, SECT_PRIV, PRV_SPEED_LIMIT_SCALE, 0, (float) TDriver::SpeedLimitScale);
+		LogSHADOW.debug("#SpeedLimitScale %g\n", TDriver::SpeedLimitScale);
+	}
+};
 
 void TDriver::initCa()
 {

@@ -20,6 +20,7 @@
 #include "CarModel.h"
 #include "Quadratic.h"
 #include "Utils.h"
+#include "Driver.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -283,6 +284,14 @@ double	CarModel::CalcBreaking(double k0, double kz0, double k1, double kz1, doub
 		double	Ftanroad = -sqrt(Froad * Froad - Flatroad * Flatroad) + Ftan;
 
         double	acc = Ftanroad / M;
+
+		if (TDriver::UseBrakeLimit)
+		{
+			double Radius = 1.0 / fabs(Kz);
+			double factor = MIN(1.0,MAX(0.39, (Radius - 190.0) / 100.0));
+			acc = MAX(acc, TDriver::BrakeLimit * factor);
+		}
+
 		double	inner = MX(0, v * v - 2 * acc * dist );
 		double	oldU = u;
 		u = sqrt(inner);
