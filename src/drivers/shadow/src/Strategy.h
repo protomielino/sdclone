@@ -40,6 +40,8 @@
 
 #include "Driver.h"
 
+class Opponents;
+
 class AbstractStrategy
 {
 protected:

@@ -96,6 +96,7 @@ extern GfLogger* PLogSHADOW;
 #define LogSHADOW (*PLogSHADOW)
 
 class   AbstractStrategy;
+class   SimpleStrategy;
 
 //==========================================================================*
 // Speed Dreams-Interface
@@ -415,7 +416,7 @@ private:
 	double			m_lastSpd;
 	double			m_lastAng;
 
-    AbstractStrategy  *m_Strategy;                         // Pit strategy
+    SimpleStrategy  *m_Strategy;                           // Pit strategy
 
     bool            m_CrvComp;   			               // Crv compensation
     float           clutchtime;                            // Clutch timer.
