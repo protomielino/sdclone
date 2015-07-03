@@ -42,48 +42,50 @@
 
 #include "teammanager.h"
 
-#define SECT_PRIV			"private"
-#define PRV_SHIFT           "shift"
-#define PRV_MU_SCALE		"mu scale"
-#define PRV_RAIN_MU         "mu scale rain"
-#define PRV_ACCEL_DELTA     "accel delta"
-#define PRV_ACCEL_DELTA_RAIN "accel delta rain"
-#define PRV_FLY_HEIGHT		"fly height"
-#define PRV_FACTOR			"factor"
-#define PRV_AERO_MOD		"aero mod"
-#define PRV_BUMP_MOD		"bump mod"
-#define PRV_SIDE_MOD		"side mod"
-#define PRV_KZ_SCALE		"kz scale"
-#define PRV_BUMP_FACTOR     "bump factor"
-#define PRV_CLUTCH_DELTA    "clutch delta"
-#define PRV_CLUTCH_RANGE    "clutch range"
-#define PRV_CLUTCH_MAX      "clutch max"
-#define PRV_CLUTCH_RELEASE  "clutch release"
-#define PRV_STEER_K_ACC		"steer k acc"
-#define PRV_STEER_K_DEC		"steer k dec"
-#define PRV_AVOID_WIDTH		"avoid width"
-#define PRV_SPDC_NORMAL		"spd ctrl normal"
-#define PRV_SPDC_TRAFFIC	"spd ctrl traffic"
-#define PRV_STAY_TOGETHER	"stay together"
-#define PRV_PITSTRAT        "pitstrat"
-#define PRV_PITSTOP         "chkpitstop"
-#define PRV_CHKQUALIF       "chkqualiftime"
-#define PRV_PIT_ENTRY_OFFS	"pit entry offset"
-#define PRV_PIT_EXIT_OFFS	"pit exit offset"
-#define PRV_MAX_BRAKING     "max braking"
-#define PRV_FUELPERMETERS   "fuel per meters"
-#define PRV_FUELPERLAPS     "fuel per lap"
-#define PRV_RESERVE         "reserve"
-#define PRV_FULL_FUEL       "full fuel"
-#define PRV_VERBOSE         "strategyverbose"
-#define PRV_NEED_SIN        "use sin long"
-#define PRV_USED_ACC        "acc exit"
-#define PRV_SKILL_OFFSET    "offset skill"
-#define PRV_BRAKE_LIMIT		"brake limit"
-#define PRV_BRAKE_LIMIT_BASE "brake limit base"
-#define PRV_BRAKE_LIMIT_SCALE "brake limit scale"
-#define PRV_SPEED_LIMIT_BASE "speed limit base"
-#define PRV_SPEED_LIMIT_SCALE "speed limit scale"
+#define SECT_PRIV               "private"
+#define PRV_SHIFT               "shift"
+#define PRV_MU_SCALE            "mu scale"
+#define PRV_RAIN_MU             "mu scale rain"
+#define PRV_ACCEL_DELTA         "accel delta"
+#define PRV_ACCEL_DELTA_RAIN    "accel delta rain"
+#define PRV_FLY_HEIGHT          "fly height"
+#define PRV_FACTOR              "factor"
+#define PRV_AERO_MOD            "aero mod"
+#define PRV_BUMP_MOD            "bump mod"
+#define PRV_SIDE_MOD            "side mod"
+#define PRV_KZ_SCALE            "kz scale"
+#define PRV_BUMP_FACTOR         "bump factor"
+#define PRV_CLUTCH_DELTA        "clutch delta"
+#define PRV_CLUTCH_RANGE        "clutch range"
+#define PRV_CLUTCH_MAX          "clutch max"
+#define PRV_CLUTCH_RELEASE      "clutch release"
+#define PRV_STEER_K_ACC         "steer k acc"
+#define PRV_STEER_K_DEC         "steer k dec"
+#define PRV_AVOID_WIDTH         "avoid width"
+#define PRV_SPDC_NORMAL         "spd ctrl normal"
+#define PRV_SPDC_TRAFFIC        "spd ctrl traffic"
+#define PRV_SPDC_EXTRA          "spd ctrl extra"
+#define PRV_STEER_CTRL          "steer ctrl"
+#define PRV_STAY_TOGETHER       "stay together"
+#define PRV_PITSTRAT            "pitstrat"
+#define PRV_PITSTOP             "chkpitstop"
+#define PRV_CHKQUALIF           "chkqualiftime"
+#define PRV_PIT_ENTRY_OFFS      "pit entry offset"
+#define PRV_PIT_EXIT_OFFS       "pit exit offset"
+#define PRV_MAX_BRAKING         "max braking"
+#define PRV_FUELPERMETERS       "fuel per meters"
+#define PRV_FUELPERLAPS         "fuel per lap"
+#define PRV_RESERVE             "reserve"
+#define PRV_FULL_FUEL           "full fuel"
+#define PRV_VERBOSE             "strategyverbose"
+#define PRV_NEED_SIN            "use sin long"
+#define PRV_USED_ACC            "acc exit"
+#define PRV_SKILL_OFFSET        "offset skill"
+#define PRV_BRAKE_LIMIT         "brake limit"
+#define PRV_BRAKE_LIMIT_BASE    "brake limit base"
+#define PRV_BRAKE_LIMIT_SCALE   "brake limit scale"
+#define PRV_SPEED_LIMIT_BASE    "speed limit base"
+#define PRV_SPEED_LIMIT_SCALE   "speed limit scale"
 
 #define NBR_BRAKECOEFF 50                                   // Number of brake coeffs
 
@@ -193,6 +195,7 @@ public:
     double              CurrSimTime;                    // Current simulation time
     const char          *robot_name;
     double              Frc;                            // Friction coefficient
+    //bool                UseBrakeLimit;                // Enable/disable brakelimit
 
     double              wheelRadius;
 
@@ -333,6 +336,8 @@ private:
     double			BUMP_MOD;
 	int				SPDC_NORMAL;
 	int				SPDC_TRAFFIC;
+    int             SPDC_EXTRA;
+    int             STEER_CTRL;
 	double			STEER_K_ACC;
 	double			STEER_K_DEC;
 	double			STAY_TOGETHER;			// dist in m.
@@ -387,7 +392,7 @@ private:
     int             m_Flying;               // Flag prepare landing
 	int				m_nCars;
 	int				m_myOppIdx;
-    Opponent		m_opp[MAX_OPP];         // info about other cars.
+    Opponent		*m_opp;                  // info about other cars.
 	double			m_avgAY;
 	bool			m_raceStart;
 	double			m_avoidS;				// where we are LR->T (0..1).

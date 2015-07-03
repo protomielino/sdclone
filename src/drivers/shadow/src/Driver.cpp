@@ -39,9 +39,9 @@
 //==========================================================================*
 // Statics
 //--------------------------------------------------------------------------*
-int TDriver::NBBOTS = MAX_NBBOTS;                   // Nbr of drivers/robots
-const char* TDriver::ROBOT_DIR = "drivers/shadow";  // Sub path to dll
-const char* TDriver::DEFAULTCARTYPE  = "car1-trb1"; // Default car type
+//int TDriver::NBBOTS = MAX_NBBOTS;                   // Nbr of drivers/robots
+//const char* TDriver::ROBOT_DIR = "drivers/shadow";  // Sub path to dll
+//const char* TDriver::DEFAULTCARTYPE  = "car1-trb1"; // Default car type
 int   TDriver::RobotType = 0;
 bool  TDriver::AdvancedParameters = false;         // Advanced parameters
 bool  TDriver::UseOldSkilling = false;             // Use old skilling
@@ -189,13 +189,12 @@ TDriver::TDriver(int Index, const int robot_type):
     {
     case SHADOW_TRB1:
         robot_name = "shadow_trb1";
-		TDriver::UseBrakeLimit = false;
         Frc = 0.95;
         break;
 
     case SHADOW_SC:
         robot_name = "shadow_sc";
-        Frc = 0.85;
+        Frc = 0.90;
         break;
 
     case SHADOW_SRW:
@@ -260,7 +259,7 @@ TDriver::TDriver(int Index, const int robot_type):
 TDriver::~TDriver()
 {
     LogSHADOW.debug("\n#TDriver::~TDriver() >>>\n\n");
-    //delete [] m_opp;
+    delete [] m_opp;
 
     if (m_Strategy != NULL)
         delete m_Strategy;
@@ -504,6 +503,8 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     BUMP_MOD = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_MOD, 0, 0);
 	SPDC_NORMAL = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_SPDC_NORMAL, 0, 2));
 	SPDC_TRAFFIC = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_SPDC_TRAFFIC, 0, 2));
+    SPDC_EXTRA = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_SPDC_EXTRA, 0, 3));
+    STEER_CTRL = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_CTRL, 0, 0));
 	AVOID_WIDTH = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AVOID_WIDTH, 0, 0.5);
 	STAY_TOGETHER = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STAY_TOGETHER, 0, 0);
 	STEER_K_ACC = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_K_ACC, 0, 0);
@@ -612,6 +613,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
     this->car = pCar;
 	m_myOppIdx = -1;
     clutchtime = 0.0f;
+    m_opp = new Opponent[m_nCars];
     for( int i = 0; i < m_nCars; i++ )
 	{
 		m_opp[i].Initialise( &m_track, pS->cars[i] );
@@ -918,6 +920,7 @@ double TDriver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 	// get info about pts on track.
 	GetPosInfo( pos, pi );
 	GetPosInfo( aheadPos, aheadPi );
+    LogSHADOW.debug("SHADOW SteerAngle0\n");
 
 	PtInfo	piOmega;
 	double	aheadOmega = car->_dimension_x * 0.5 + spd0 * 0.02;// * 10;
@@ -975,6 +978,7 @@ double TDriver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 
 double TDriver::SteerAngle1( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 {
+    LogSHADOW.debug("SHADOW SteerAngle1\n");
 	// work out current car speed.
 	double	spd0 = hypot(car->_speed_x, car->_speed_y);
 
@@ -1022,6 +1026,7 @@ double TDriver::SteerAngle1( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 
 double TDriver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 {
+    LogSHADOW.debug("SHADOW SteerAngle2\n");
 	// work out current car speed.
 	double	spd0 = hypot(car->_speed_x, car->_speed_y);
 
@@ -1079,6 +1084,7 @@ double TDriver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 
 double TDriver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 {
+    LogSHADOW.debug("SHADOW SteerAngle3\n");
 	// work out current car speed.
 	double	spd0 = hypot(car->_speed_x, car->_speed_y);
 
@@ -1142,6 +1148,7 @@ double TDriver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 
 double TDriver::SteerAngle4( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 {
+    LogSHADOW.debug("SHADOW SteerAngle4\n");
 	// work out current car speed.
 	double	spd0 = hypot(car->_speed_x, car->_speed_y);
 
@@ -1457,7 +1464,18 @@ void TDriver::Drive( tSituation* s )
 	// get curret pos on track.
 
 	PtInfo	pi, aheadPi;
-	double	angle = SteerAngle0(car, pi, aheadPi);
+    double angle = 0.0;
+
+    switch (STEER_CTRL)
+    {
+    case 0:		angle = SteerAngle0(car, pi, aheadPi);		break;
+    case 1:		angle = SteerAngle1(car, pi, aheadPi);		break;
+    case 2:		angle = SteerAngle2(car, pi, aheadPi);		break;
+    case 3:		angle = SteerAngle3(car, pi, aheadPi);		break;
+    case 4:		angle = SteerAngle4(car, pi, aheadPi);      break;
+    default:	angle = SteerAngle0(car, pi, aheadPi);		break;
+    }
+
 	double	steer = angle / car->_steerLock;
 
     // work out current car speed.
@@ -1499,18 +1517,31 @@ void TDriver::Drive( tSituation* s )
 	if( close )
 	{
 		SpeedControl( SPDC_TRAFFIC, targetSpd, spd0, car, acc, brk );
+        LogSHADOW.debug("#Drive SpeedControl = close\n");
 	}
 	else if( m_pitControl.WantToPit() )
 	{
 		SpeedControl( SPDC_TRAFFIC, targetSpd, spd0, car, acc, brk );
+        LogSHADOW.debug("#Drive SpeedControl = m_pitControl\n");
 	}
 	else
 	{
 		if( m_avoidS == 1 )
+        {
 			SpeedControl( SPDC_NORMAL, targetSpd, spd0, car, acc, brk );
-		else
-			SpeedControl1( targetSpd, spd0, acc, brk );
-	}
+            LogSHADOW.debug("#Drive SpeedControl = m_avoidS\n");
+        }
+        else if (car->_trkPos.seg->type == TR_STR)
+        {
+            SpeedControl( SPDC_EXTRA, targetSpd, spd0, car, acc, brk );
+            LogSHADOW.debug("#Drive SpeedControl = SpeedControl1\n");
+        }
+        else
+        {
+            SpeedControl( SPDC_NORMAL, targetSpd, spd0, car, acc, brk );
+            LogSHADOW.debug("#Drive SpeedControl = SPDC_NORMAL - track seg type = %d\n", track->seg->type);
+        }
+    }
 
 	if( lapper )
 		acc = MN(acc, 0.9);
@@ -1743,8 +1774,7 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 
 		if( oi.GotFlags(Opponent::F_FRONT) )
 		{
-			if( oi.flags & (Opponent::F_COLLIDE | Opponent::F_CATCHING |
-							Opponent::F_CATCHING_ACC) )
+            if( oi.flags & (Opponent::F_COLLIDE || Opponent::F_CATCHING || Opponent::F_CATCHING_ACC) )
 			{
 			}
 
@@ -1753,7 +1783,7 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 				ai.spdF = MN(ai.spdF, oi.catchSpd);
 			}
 
-			if( oi.flags & (Opponent::F_COLLIDE | Opponent::F_CATCHING) )
+            if( oi.flags & (Opponent::F_COLLIDE || Opponent::F_CATCHING) )
 				minCatchTime = MN(minCatchTime, oi.catchTime);
 
 			if( oi.flags & Opponent::F_CATCHING_ACC )
