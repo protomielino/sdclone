@@ -35,6 +35,11 @@
 
 #define	STEER_SPD_IDX(x)	(int(floor((x) / 5)))
 #define	STEER_K_IDX(k)		(MX(0, MN(int(20 + floor((k) * 500 + 0.5)), 40)))
+#define DOUBLE_NORM_PI_PI(x) 				\
+{ \
+	while ((x) > PI) { (x) -= 2*PI; } \
+	while ((x) < -PI) { (x) += 2*PI; } \
+}
 
 //==========================================================================*
 // Statics
@@ -156,6 +161,12 @@ TDriver::TDriver(int Index, const int robot_type):
     m_TclRange(10.0),
     m_TclSlip(1.6),
     m_TclFactor(1.0),
+
+	m_DriftAngle(0.0),
+	m_AbsDriftAngle(0.0),
+	m_LastAbsDriftAngle(0.0),
+	m_CosDriftAngle2(1.0),
+	m_DriftFactor(1.0),
 
     m_ClutchMax(0.5),
     m_ClutchDelta(0.009),
@@ -475,6 +486,9 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 
 	m_cm.AERO = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_AERO_MOD, 0, 0);
 	m_cm.MU_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_MU_SCALE, NULL, 0.9f);
+	if (raceType[pS->_raceType] == "qualify")
+		m_cm.MU_SCALE = m_cm.MU_SCALE + 0.02;
+
 	m_cm.KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_KZ_SCALE, NULL, 0.43f);
     m_cm.BUMP_FACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR, NULL, 1.0);
     m_cm.NEEDSINLONG = GfParmGetNum(hCarParm, SECT_PRIV, PRV_NEED_SIN, NULL, 0);
@@ -657,7 +671,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
     m_cm.WIDTH = car->_dimension_y;
 
 	m_cm2 = m_cm;
-	m_cm2.MU_SCALE = MN(1.0, m_cm.MU_SCALE);
+	m_cm2.MU_SCALE = MN(1.5, m_cm.MU_SCALE);
 
     LogSHADOW.debug( "SPDC N %d    SPDC T %d\n", SPDC_NORMAL, SPDC_TRAFFIC );
 
@@ -1478,6 +1492,11 @@ void TDriver::Drive( tSituation* s )
 
 	double	steer = angle / car->_steerLock;
 
+	m_DriftAngle = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
+	DOUBLE_NORM_PI_PI(m_DriftAngle);                
+	m_AbsDriftAngle = fabs(m_DriftAngle);            
+	m_CosDriftAngle2 = (float) cos(MAX(MIN(m_AbsDriftAngle * 2, PI),-PI));
+
     // work out current car speed.
 	double	spd0 = hypot(car->_speed_x, car->_speed_y);
 
@@ -1688,6 +1707,8 @@ void TDriver::Drive( tSituation* s )
     //brk = ApplyAbs(car, brk);
     steer = FlightControl(steer);
 
+	acc = filterDrifting(acc);
+
     if (!HasTCL)
         acc = filterTCL(acc);
     //acc = filterTCL(acc);
@@ -1700,6 +1721,7 @@ void TDriver::Drive( tSituation* s )
     car->ctrl.brakeCmd = brk;
     m_LastBrake = brk;
     m_LastAccel = acc;
+	m_LastAbsDriftAngle = m_AbsDriftAngle;
 
 	m_pitControl.Process( car );
 }
@@ -2748,6 +2770,33 @@ double TDriver::filterTCL(double Accel)                                     // T
     }
 
     return MIN(1.0, Accel);
+}
+
+//==========================================================================*
+// Filter Drifting
+//--------------------------------------------------------------------------*
+double TDriver::filterDrifting(double Acc)
+{
+	if(car->_speed_x < 5.0)
+		return Acc;
+
+	double Drifting = m_AbsDriftAngle;
+	double DriftFactor = m_DriftFactor;
+
+	if (m_Rain)
+	{
+		Drifting *= 1.5;
+		DriftFactor *= 2;
+	}
+
+	// Decrease accelleration while drifting
+	double DriftAngle = MAX(MIN(Drifting * 1.75, PI - 0.01),-PI + 0.01);
+	if (m_AbsDriftAngle > m_LastAbsDriftAngle)
+		Acc /= MAX(1.0,(DriftFactor * 150 * ( 1 - cos(DriftAngle))));
+	else
+		Acc /= MAX(1.0,(DriftFactor * 50 * ( 1 - cos(DriftAngle))));
+
+	return MIN(1.0, Acc);
 }
 
 //==========================================================================*

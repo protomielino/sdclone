@@ -291,6 +291,7 @@ private:
     float   startAutomatic();
 	double	ApplyAbs( tCarElt* car, double brake );
     double  filterBrake(double Brake);
+	double  filterDrifting(double Acc);
     void    Meteorology();
     int     GetWeather();
     bool    CheckPitSharing();
@@ -372,6 +373,12 @@ private:
     double          m_TclRange;                            // TCL range
     double          m_TclSlip;                             // Max TCL slip
     double          m_TclFactor;                           // TCL scale
+
+	double			m_DriftAngle;                          // Drifting angle
+    double			m_AbsDriftAngle;                       // fabs(Drifting angle)
+    double			m_LastAbsDriftAngle;                   // Historie
+	double			m_CosDriftAngle2;
+	double			m_DriftFactor;                         // Drifting acceleration factor
 
     double          m_ClutchMax;
     double          m_ClutchDelta;
