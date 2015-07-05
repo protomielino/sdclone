@@ -186,6 +186,7 @@ TDriver::TDriver(int Index, const int robot_type):
 	m_lastB(0),
 	m_lastBrk(0),
 	m_lastTargV(0),
+    m_maxbrkPressRatio(0.85),
 	m_maxAccel(0, 150, 30, 1),
 	m_steerGraph(2, s_sgMin, s_sgMax, s_sgSteps, 0),
     m_steerAvg(19, 0.001, 0.02, 15, 20, 95),
@@ -1413,6 +1414,34 @@ void TDriver::SpeedControl5( double targetSpd, double spd0, tCarElt* car, double
     }
 }
 
+void TDriver::SpeedControl6( double targetSpd, double spd0, tCarElt* car, double& acc, double& brk )
+{
+    int	B = (int) MIN(NBR_BRAKECOEFF,(floor(spd0/2)));
+    double Diff = 2 * m_brkCoeff[B] * (spd0 - targetSpd);
+
+    brk = m_speedController.Sample(Diff*Diff*Diff);
+    brk = MIN(m_maxbrkPressRatio,MAX(0.0, brk));
+
+    if (Diff < 0)
+    {
+        brk = 0;
+    }
+    else if ((brk > 0) && (Diff < 0.1))
+    {
+        brk = 0;
+        acc = 0.06;
+    }
+
+    if (brk > 0)
+    {
+        acc = 0;
+        LogSHADOW.debug("#Diff: %.3f m/s B: %.3f %% T: %.1f R: %.3f %%\n",
+                         Diff, brk*100, m_speedController.m_total, m_maxbrkPressRatio);
+    }
+
+    m_lastTargV = targetSpd;
+}
+
 void TDriver::SpeedControl(int which, double targetSpd, double spd0, CarElt* car, double& acc, double& brk )
 {
 	switch( which )
@@ -1423,6 +1452,7 @@ void TDriver::SpeedControl(int which, double targetSpd, double spd0, CarElt* car
 		case 3:		SpeedControl3(targetSpd, spd0, acc, brk);		break;
 		case 4:		SpeedControl4(targetSpd, spd0, car, acc, brk);	break;
         case 5:     SpeedControl5(targetSpd, spd0, car, acc, brk);  break;
+        case 6:     SpeedControl6(targetSpd, spd0, car, acc, brk);  break;
 		default:	SpeedControl3(targetSpd, spd0, acc, brk);		break;
 	}
 }
@@ -2394,7 +2424,7 @@ void TDriver::initBrake()
     LogSHADOW.info("#################################\n");
 
     float MaxPressRatio = GfParmGetNum(car->_carHandle, SECT_PRIV,
-                                       PRV_MAX_BRAKING, (char*)NULL, (float) BrakeMaxPressRatio);
+                                       PRV_MAX_BRAKING, (char*)NULL, (float) m_maxbrkPressRatio);
     LogSHADOW.debug("#Shadow2 Max press ratio   : %0.7f\n", MaxPressRatio);
 
     float BrakeCoeffFront = (float) (DiameterFront * 0.5 * AreaFront * MuFront);

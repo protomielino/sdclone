@@ -183,6 +183,8 @@ public:
 						   double& acc, double& brk );
     void    SpeedControl5(double targetSpd, double spd0, CarElt* car,
                           double& acc, double& brk );
+    void    SpeedControl6(double targetSpd, double spd0, CarElt* car,
+                          double& acc, double& brk );
 	void	SpeedControl( int which, double targetSpd, double spd0,
 						  CarElt* car, double& acc, double& brk );
 
@@ -418,6 +420,7 @@ private:
     int				m_lastB;
     double			m_lastBrk;
     double			m_lastTargV;
+    double          m_maxbrkPressRatio;
 
     LearnedGraph	m_maxAccel;
     double			m_angle[SPD_N][K_N];
