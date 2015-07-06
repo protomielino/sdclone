@@ -458,6 +458,8 @@ private:
     double          DecelAdjustTarget;                     //
     double          DecelAdjustPerc;                       //
 
+	int				m_raceType;
+
     unsigned int    RandomSeed;                            // seed of generator
 
     double          CA;

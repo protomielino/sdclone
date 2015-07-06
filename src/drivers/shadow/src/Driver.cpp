@@ -193,7 +193,9 @@ TDriver::TDriver(int Index, const int robot_type):
 
     m_FuelNeeded(0),
 
-    m_Strategy(NULL)
+    m_Strategy(NULL),
+
+	m_raceType(0)
 {
     INDEX = Index;
 
@@ -445,6 +447,8 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 	//
 
     const char*	raceType[] = { "practice", "qualify", "race" };
+	m_raceType = pS->_raceType;
+	LogSHADOW.info("#RaceType = %d\n", m_raceType);
 
     m_WeatherCode = GetWeather();
 
@@ -461,15 +465,20 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 	//	ok, lets read/merge the car parms.
 	//
 
+	    Meteorology();
+
 	// default params for car type (e.g. clkdtm)
     snprintf( buf, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, m_CarType, trackName );
     LogSHADOW.info("#Override params for car type with params of track: %s\n", buf);
 	hCarParm = MergeParamFile(hCarParm, buf);
 
-    // Override params for car type with params of track and weather
-    snprintf(buf, BUFSIZE, "drivers/%s/%s/%s-%d.xml", robot_name, m_CarType, trackName, m_WeatherCode);
-    LogSHADOW.info("#Override params for car type with params of track and weather: %s\n", buf);
-    hCarParm = MergeParamFile(hCarParm, buf);
+	if (m_Rain)
+	{
+		// Override params for car type with params of track and weather
+		snprintf(buf, BUFSIZE, "drivers/%s/%s/%s-%d.xml", robot_name, m_CarType, trackName, m_WeatherCode);
+		LogSHADOW.info("#Override params for car type with params of track and weather: %s\n", buf);
+		hCarParm = MergeParamFile(hCarParm, buf);
+	}
 
 	// override params for car type on track of specific race type.
     snprintf( buf, sizeof(buf), "drivers/%s/%s/track-%s-%s.xml", robot_name, m_CarType, trackName, raceType[pS->_raceType] );
@@ -487,15 +496,16 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 
 	m_cm.AERO = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_AERO_MOD, 0, 0);
 	m_cm.MU_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_MU_SCALE, NULL, 0.9f);
-	if (raceType[pS->_raceType] == "qualify")
+	if (m_raceType == 1)
+	{
 		m_cm.MU_SCALE = m_cm.MU_SCALE + 0.02;
+		LogSHADOW.info("#Scale Mu Qualification\n");
+	}
 
 	m_cm.KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_KZ_SCALE, NULL, 0.43f);
     m_cm.BUMP_FACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR, NULL, 1.0);
     m_cm.NEEDSINLONG = GfParmGetNum(hCarParm, SECT_PRIV, PRV_NEED_SIN, NULL, 0);
     m_cm.USEDACCEXIT = GfParmGetNum(hCarParm, SECT_PRIV, PRV_USED_ACC, NULL, 0);
-
-    Meteorology();
 
 	FACTORS.RemoveAll();
 
