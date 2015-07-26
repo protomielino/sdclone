@@ -113,7 +113,7 @@ static const int MAXNBBOTS = MAX_NBBOTS;         // Number of drivers/robots
 static const int BUFSIZE = 256;
 
 enum { SHADOW_TRB1=1, SHADOW_SC, SHADOW_SRW, SHADOW_LS1, SHADOW_LS2, SHADOW_36GP,
-       SHADOW_RS, SHADOW_LP1, SHADOW_MPA1, SHADOW_MPA11 };
+       SHADOW_RS, SHADOW_LP1, SHADOW_MPA1, SHADOW_MPA11, SHADOW_MPA12 };
 
 class TDriver  
 {

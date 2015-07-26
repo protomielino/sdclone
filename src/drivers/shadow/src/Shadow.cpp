@@ -205,11 +205,18 @@ void SetupSHADOW_mpa1()
     robot_type = SHADOW_MPA1;
 };
 
-// Schismatic init for shadow_mpa1
+// Schismatic init for shadow_mpa11
 void SetupSHADOW_mpa11()
 {
     // Add shadow_mpa1 specific initialization here
     robot_type = SHADOW_MPA11;
+};
+
+// Schismatic init for shadow_mpa12
+void SetupSHADOW_mpa12()
+{
+    // Add shadow_mpa1 specific initialization here
+    robot_type = SHADOW_MPA12;
 };
 
 
@@ -314,6 +321,21 @@ extern "C" int shadow_mpa11(tModInfo *ModInfo)
     int ret = -1;
     setRobotName("shadow_mpa11");
     robot_type = SHADOW_MPA11;
+    void *robot_settings = getFileHandle();
+    if (robot_settings)
+    {
+        ret = shadow(ModInfo);
+    }
+
+    return ret;
+}
+
+// Schismatic entry point for shadow_mpa12
+extern "C" int shadow_mpa12(tModInfo *ModInfo)
+{
+    int ret = -1;
+    setRobotName("shadow_mpa12");
+    robot_type = SHADOW_MPA12;
     void *robot_settings = getFileHandle();
     if (robot_settings)
     {
@@ -469,6 +491,8 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
         SetupSHADOW_mpa1();
     else if (strncmp(robot_name,"shadow_mpa11", strlen("shadow_mpa11")) == 0)
         SetupSHADOW_mpa11();
+	else if (strncmp(robot_name,"shadow_mpa12", strlen("shadow_mpa12")) == 0)
+        SetupSHADOW_mpa12();
 
 
     // Set max nb of interfaces to return.

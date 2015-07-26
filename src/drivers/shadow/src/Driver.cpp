@@ -252,6 +252,11 @@ TDriver::TDriver(int Index, const int robot_type):
         robot_name = "shadow_mpa11";
         Frc = 0.88;
         break;
+
+	case SHADOW_MPA12:
+		robot_name = "shadow_mpa12";
+		Frc = 0.88;
+		break;
     }
 
     for( int i = 0; i < 50; i++ )
