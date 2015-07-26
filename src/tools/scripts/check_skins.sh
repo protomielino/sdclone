@@ -14,7 +14,7 @@ cars="`pwd`/../../../data/cars/models/"
 
 # Enable the screen shots
 config="-C $HOME/.speed-dreams-2"
-run="-r /storage/speed-dreams-git-svn/games/speed-dreams-2"
+run="-r $HOME/Sources/speed-dreams/trunk/build/games/speed-dreams-2"
 
 # Use alternative script to process images
 #proc="-p my_script.sh"
