@@ -48,15 +48,17 @@ typedef struct Suspension
 {
     tSpring spring;
     tDamper damper;
+    tdble inertance;
 
     tdble x; /* suspension travel */
     tdble v; /* suspension travel speed */
+    tdble a; /* suspension travel acceleration */
 
     tdble force;        /* generated force */
     int    state;        /* indicate the state of the suspension */
 #define SIM_SUSP_COMP   1  	/* the suspension is fully compressed */
 #define SIM_SUSP_EXT    2  	/* the suspension is fully extended */
-
+#define SIM_SUSP_INAIR  4   /* the suspension is in the air, can be combined with the other states */
 } tSuspension;
 
 

@@ -160,19 +160,29 @@ void SimWheelUpdateRide(tCar *car, int index)
     tdble max_extend =  wheel->pos.z - Zroad;
 	wheel->rideHeight = max_extend;
 
+	if (car->features & FEAT_FIXEDWHEELFORCE) {
+		if (max_extend > new_susp_x + 0.01) {
+			wheel->susp.state = SIM_SUSP_INAIR;
+		} else {wheel->susp.state = 0;}
+	} else {
+		wheel->susp.state = 0;
+	}
+	
 	if (max_extend < new_susp_x) {
 		new_susp_x = max_extend;
 		wheel->rel_vel = 0.0f;
 	} else if (new_susp_x < wheel->susp.spring.packers) {
 		wheel->rel_vel = 0.0f;
 	}
- 
-	tdble prex = wheel->susp.x;
-	wheel->susp.x = new_susp_x;
 
+	tdble prex = wheel->susp.x;
+	tdble prev = wheel->susp.v;
+	wheel->susp.x = new_susp_x;
+	
 	// verify the suspension travel, beware, wheel->susp.x will be scaled by SimSuspCheckIn
 	SimSuspCheckIn(&(wheel->susp));
 	wheel->susp.v = (prex - wheel->susp.x) / SimDeltaTime;
+	wheel->susp.a = (prev - wheel->susp.v) / SimDeltaTime;
 	
 	// update wheel brake
 	SimBrakeUpdate(car, wheel, &(wheel->brake));
@@ -210,13 +220,10 @@ void SimWheelUpdateForce(tCar *car, int index)
 	// VERTICAL STUFF CONSIDERING SMALL PITCH AND ROLL ANGLES
 	// update suspension force
 	SimSuspUpdate(&(wheel->susp));
-
 	// check suspension state
 	wheel->state |= wheel->susp.state;
-	if ((wheel->state & SIM_SUSP_EXT) == 0) {
-		wheel->forces.z = axleFz + wheel->susp.force;
-		if(wheel->susp.force > 0)
-			{wheel->forces.z += wheel->axleFz3rd;}
+	if ( ((wheel->state & SIM_SUSP_EXT) == 0) && ((wheel->state & SIM_SUSP_INAIR) == 0) ) {
+		wheel->forces.z = axleFz + wheel->susp.force + wheel->axleFz3rd;
 		reaction_force = wheel->forces.z;
 		if (car->features & FEAT_FIXEDWHEELFORCE) {
 			wheel->rel_vel -= SimDeltaTime * wheel->forces.z / wheel->mass;

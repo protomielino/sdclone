@@ -96,15 +96,16 @@ static tdble springForce(tSuspension *susp)
 
 void SimSuspCheckIn(tSuspension *susp)
 {
-	susp->state = 0;
+	/*susp->state = 0;*/
+	/* note: susp->state is reset in SimWheelUpdateRide in wheel.cpp */
 	if (susp->x < susp->spring.packers) {
 		susp->x = susp->spring.packers;
-		susp->state = SIM_SUSP_COMP;
+		susp->state |= SIM_SUSP_COMP;
 	}
 	susp->x *= susp->spring.bellcrank;
 	if (susp->x >= susp->spring.xMax) {
 		susp->x = susp->spring.xMax;
-		susp->state = SIM_SUSP_EXT;
+		susp->state |= SIM_SUSP_EXT;
 	}
 }
 
@@ -113,7 +114,7 @@ void SimSuspCheckIn(tSuspension *susp)
 
 void SimSuspUpdate(tSuspension *susp)
 {
-	susp->force = (springForce(susp) + damperForce(susp)) * susp->spring.bellcrank;
+	susp->force = (springForce(susp) + damperForce(susp) + susp->inertance * susp->a) * susp->spring.bellcrank;
 }
 
 
@@ -136,6 +137,7 @@ void SimSuspConfig(void *hdle, const char *section, tSuspension *susp, tdble F0,
 	susp->damper.rebound.C2 = GfParmGetNum(hdle, section, PRM_FASTREBOUND, (char*)NULL, 0.0f);
 	susp->damper.bump.v1    = GfParmGetNum(hdle, section, PRM_BUMPLVEL, (char*)NULL, 0.5f);
 	susp->damper.rebound.v1 = GfParmGetNum(hdle, section, PRM_REBOUNDLVEL, (char*)NULL, 0.5f);
+	susp->inertance = 0.0;
 	
 	susp->spring.x0 = susp->spring.bellcrank * X0;
 	susp->spring.F0 = F0 / susp->spring.bellcrank;
