@@ -46,4 +46,10 @@ python check_robot_skins.py -d $drivers/simplix_ref  -c $cars $versioning $confi
 # Kilo2008
 python check_robot_skins.py -d $drivers/kilo2008/ -c $cars $versioning $config $run $proc kilo2008.xml
 
+# dandroid
+python check_robot_skins.py -d $drivers/dandroid_36GP -c $cars $versioning $config $run $proc dandroid_36GP.xml
 
+# shadow
+python check_robot_skins.py -d $drivers/shadow_sc   -c $cars $versioning $config $run $proc shadow_sc.xml
+python check_robot_skins.py -d $drivers/shadow_mpa11 -c $cars $versioning $config $run $proc shadow_mpa11.xml
+python check_robot_skins.py -d $drivers/shadow_mpa12 -c $cars $versioning $config $run $proc shadow_mpa12.xml
