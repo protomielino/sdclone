@@ -36,7 +36,7 @@ SET(ROBOT_SOURCES
 )
 
 # Official-only dandroid instances.
-SET(ROBOT_CLONES dandroid_36GP)
+SET(ROBOT_CLONES dandroid_36GP dandroid_mpa12)
 
 # The ubiquitous robot module and its clones.
 ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 2.0.0 SOVERSION 1.0.0

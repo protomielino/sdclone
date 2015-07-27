@@ -139,49 +139,11 @@ void* getFileHandle()
 // Carset specific init functions
 ////////////////////////////////////////////////////////////
 
-// Schismatic init for usr_trb1
-void SetupUSR_trb1()
-{
-    // Add usr_trb1 specific initialization here
-    robot_type = USR_TRB1;
-};
-
-// Schismatic init for usr_ls2
-void SetupUSR_ls2()
-{
-    // Add usr_ls2 specific initialization here
-    robot_type = USR_LS2;
-};
-
-
-// Schismatic init for usr_sc
-void SetupUSR_sc()
-{
-    // Add usr_sc specific initialization here
-    robot_type = USR_SC;
-};
-
-
-// Schismatic init for usr_ls1
-void SetupUSR_ls1()
-{
-    // Add usr_ls1 specific initialization here
-    robot_type = USR_LS1;
-};
-
-
 // Schismatic init for usr_36GP
 void SetupUSR_36GP()
 {
     // Add usr_36GP specific initialization here
     robot_type = USR_36GP;
-};
-
-// Schismatic init for usr_rs
-void SetupUSR_rs()
-{
-    // Add usr_RS specific initialization here
-    robot_type = USR_RS;
 };
 
 // Schismatic init for usr_lp1
@@ -191,11 +153,60 @@ void SetupUSR_lp1()
     robot_type = USR_LP1;
 };
 
+// Schismatic init for usr_ls1
+void SetupUSR_ls1()
+{
+    // Add usr_ls1 specific initialization here
+    robot_type = USR_LS1;
+};
+
+// Schismatic init for usr_ls2
+void SetupUSR_ls2()
+{
+    // Add usr_ls2 specific initialization here
+    robot_type = USR_LS2;
+};
+
 // Schismatic init for usr_mpa1
 void SetupUSR_mpa1()
 {
     // Add usr_mpa1 specific initialization here
     robot_type = USR_MPA1;
+};
+
+// Schismatic init for usr_mpa11
+void SetupUSR_mpa11()
+{
+    // Add usr_mpa1 specific initialization here
+    robot_type = USR_MPA11;
+};
+
+// Schismatic init for usr_mpa12
+void SetupUSR_mpa12()
+{
+    // Add usr_mpa1 specific initialization here
+    robot_type = USR_MPA12;
+};
+
+// Schismatic init for usr_rs
+void SetupUSR_rs()
+{
+    // Add usr_RS specific initialization here
+    robot_type = USR_RS;
+};
+
+// Schismatic init for usr_sc
+void SetupUSR_sc()
+{
+    // Add usr_sc specific initialization here
+    robot_type = USR_SC;
+};
+
+// Schismatic init for usr_trb1
+void SetupUSR_trb1()
+{
+    // Add usr_trb1 specific initialization here
+    robot_type = USR_TRB1;
 };
 
 
@@ -267,6 +278,36 @@ extern "C" int usr_mpa1(tModInfo *ModInfo)
     int ret = -1;
     setRobotName("usr_mpa1");
     robot_type = USR_MPA1;
+    void *robot_settings = getFileHandle();
+    if (robot_settings)
+    {
+        ret = usr(ModInfo);
+    }
+
+    return ret;
+}
+
+// Schismatic entry point for usr_mpa1
+extern "C" int usr_mpa11(tModInfo *ModInfo)
+{
+    int ret = -1;
+    setRobotName("usr_mpa11");
+    robot_type = USR_MPA11;
+    void *robot_settings = getFileHandle();
+    if (robot_settings)
+    {
+        ret = usr(ModInfo);
+    }
+
+    return ret;
+}
+
+// Schismatic entry point for usr_mpa1
+extern "C" int usr_mpa12(tModInfo *ModInfo)
+{
+    int ret = -1;
+    setRobotName("usr_mpa12");
+    robot_type = USR_MPA12;
     void *robot_settings = getFileHandle();
     if (robot_settings)
     {
@@ -418,6 +459,10 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
         SetupUSR_lp1();
     else if (strncmp(robot_name,"usr_mpa1", strlen("usr_mpa1")) == 0)
         SetupUSR_mpa1();
+    else if (strncmp(robot_name,"usr_mpa11", strlen("usr_mpa11")) == 0)
+        SetupUSR_mpa11();
+    else if (strncmp(robot_name,"usr_mpa12", strlen("usr_mpa12")) == 0)
+        SetupUSR_mpa12();
 
 
     // Set max nb of interfaces to return.
