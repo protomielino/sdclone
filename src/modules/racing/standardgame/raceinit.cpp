@@ -652,7 +652,8 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 	}
 
     category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
-    if (category) {
+    if (category)
+    {
 	  GfLogTrace("Checking/Merging %s specs into %s base setup for %s ...\n",
 				 category, elt->_carName, curModInfo->name);
       strncpy(elt->_category, category, MAX_NAME_LEN - 1);
@@ -661,6 +662,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       snprintf(buf2, sizeof(buf2), "cars/categories/%s.xml", elt->_category);
       cathdle = GfParmReadFile(buf2, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	  int errorcode = 0;
+
       if ((errorcode = GfParmCheckHandle(cathdle, carhdle))) 
 	  {
         switch (errorcode)
@@ -683,6 +685,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 	    } 
         return NULL;
       }
+
       carhdle = GfParmMergeHandles(cathdle, carhdle,
                                    GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
 	  
