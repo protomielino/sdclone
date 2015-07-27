@@ -463,7 +463,9 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
   char buf2[256];
   char const *str;
   char const *category;
+  char const *subcategory;
   char const *teamname;
+  std::string carname;
   tModInfoNC *curModInfo;
   tRobotItf *curRobot;
   void *robhdle;
@@ -477,6 +479,8 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 
   /* good robot found */
   curModInfo = &((*(ReInfo->robModList))->modInfo[modindex]);
+
+  subcategory = ReInfo->track->subcategory;
 
 #if 0 //SDW
   if (replayReplay)
@@ -614,15 +618,39 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
     elt->_endRaceMemPool = NULL;
     elt->_shutdownMemPool = NULL;
 
+	carname = elt->_carName;
+
     GfLogTrace("Driver #%d(%d) : module='%s', name='%s', car='%s', cat='%s', skin='%s' on %x\n",
 			   carindex, listindex, elt->_modName, elt->_name, elt->_carName,
 			   elt->_category, elt->_skinName, elt->_skinTargets);
-  
-    /* Retrieve and load car specs : merge car default specs,
-       category specs and driver modifications (=> handle) */
-    /* Read Car model specifications */
-    snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", elt->_carName, elt->_carName);
-    carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+	if ((strncmp(carname.c_str(), "mpa11", 5) == 0) || (strncmp(carname.c_str(), "mpa12", 5) == 0))
+	{
+		if (strcmp(subcategory, "long") == 0)
+			carname = carname+"-long";
+		else if (strcmp(subcategory, "short") == 0)
+			carname = carname+"-short";
+		else 
+			carname = carname+"-road";
+
+		GfLogTrace("MPA... Category car = %s \n", carname.c_str());
+
+		/* Retrieve and load car specs : merge car default specs,
+		category specs and driver modifications (=> handle) */
+		/* Read Car model specifications */
+		snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", elt->_carName, carname.c_str());
+		carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+	}
+	else
+	{  
+		/* Retrieve and load car specs : merge car default specs,
+		category specs and driver modifications (=> handle) */
+		/* Read Car model specifications */
+		snprintf(buf, sizeof(buf), "cars/models/%s/%s.xml", elt->_carName, elt->_carName);
+		carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	}
+
     category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
     if (category) {
 	  GfLogTrace("Checking/Merging %s specs into %s base setup for %s ...\n",
