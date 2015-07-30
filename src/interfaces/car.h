@@ -739,6 +739,7 @@ typedef struct CarElt
 #define PRM_MIN_TQ_BIAS		"min torque bias"
 #define PRM_MAX_TQ_BIAS		"max torque bias"
 #define PRM_MAX_SLIP_BIAS	"max slip bias"
+#define PRM_COAST_MAX_SLIP_BIAS "coast max slip bias"
 #define PRM_LOCKING_TQ		"locking input torque"
 #define PRM_VISCOSITY_FACTOR	"viscosity factor"
 
@@ -749,6 +750,8 @@ typedef struct CarElt
 #define VAL_DIFF_LIMITED_SLIP	"LIMITED SLIP"
 #define VAL_DIFF_LOCKING     	"LOCKING"
 #define VAL_DIFF_VISCOUS_COUPLER "VISCOUS COUPLER"
+#define VAL_DIFF_15WAY_LSD	"1.5 WAY LSD"
+#define VAL_DIFF_ELECTRONIC_LSD	"ELECTRONIC LSD"
 
 #define VAL_TRANS_RWD		"RWD"
 #define VAL_TRANS_FWD		"FWD"

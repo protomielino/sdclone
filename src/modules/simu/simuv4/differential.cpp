@@ -45,10 +45,18 @@ SimDifferentialConfig(void *hdle, const char *section, tDifferential *differenti
         differential->type = DIFF_SPOOL;
     }  else if (strcmp(type, VAL_DIFF_FREE) == 0) {
         differential->type = DIFF_FREE;
+    }  else if (strcmp(type, VAL_DIFF_15WAY_LSD) == 0) {
+        differential->type = DIFF_15WAY_LSD;
+    }  else if (strcmp(type, VAL_DIFF_ELECTRONIC_LSD) == 0) {
+        differential->type = DIFF_ELECTRONIC_LSD;
     } else {
         differential->type = DIFF_NONE; 
     }
-    
+
+    if ( (differential->type == DIFF_15WAY_LSD) || (differential->type == DIFF_ELECTRONIC_LSD) ) {
+        differential->dCoastSlipMax  = GfParmGetNum(hdle, section, PRM_COAST_MAX_SLIP_BIAS, (char*)NULL, differential->dSlipMax);
+    } else {differential->dCoastSlipMax = differential->dSlipMax;}
+
     if (differential->efficiency > 1.0f) {differential->efficiency = 1.0f;}
     if (differential->efficiency < 0.0f) {differential->efficiency = 0.0f;}
 
@@ -210,6 +218,28 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
             }
             break;
 
+        case DIFF_ELECTRONIC_LSD: ;
+        case DIFF_15WAY_LSD:
+            //Similar to DIFF_LIMITED_SLIP, 
+            //but has different dSlipMax for power (acceleration) 
+            //and coast (deceleration), instead working as a free
+            //differential in coast direction.
+            //Electronic LSD has the same working, but its parameters
+            //can be changed during driving.
+            {
+                float spiderTq = inTq1 - inTq0; 
+                float propTq = DrTq/differential->lockInputTq;
+                float rate = 0.0f;
+                rate = 1.0f - exp(-propTq*propTq);
+
+                float pressure = tanh(rate*(spinVel1-spinVel0));
+                float bias = (DrTq >= 0 ? differential->dSlipMax : differential->dCoastSlipMax) * 0.5f* pressure;
+                float open = 1.0f;// - rate;
+                DrTq0 = DrTq*(0.5f+bias) + spiderTq*open;
+                DrTq1 = DrTq*(0.5f-bias) - spiderTq*open;
+            }
+            break;
+        
         case DIFF_VISCOUS_COUPLER:
             if (spinVel0 >= spinVel1) {
                 DrTq0 = DrTq * differential->dTqMin;
