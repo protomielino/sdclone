@@ -109,6 +109,8 @@ extern GfLogger* PLogSimplix;
 #define RTYPE_SIMPLIX_LP1  8					 // Robot type simplix_lp1
 #define RTYPE_SIMPLIX_REF  9					 // Robot type simplix_ref
 #define RTYPE_SIMPLIX_SRW  10                    // Robot type simplix_srw
+#define RTYPE_SIMPLIX_MPA11 11                   // Robot type simplix_mpa11
+#define RTYPE_SIMPLIX_MPA12 12                   // Robot type simplix_mpa12
 //==========================================================================*
 
 //==========================================================================*
