@@ -43,8 +43,9 @@ public:
     double  LENGTH;         // Length of car (m)
     double	FUEL;           // mass of fuel in car.
     double	DAMAGE;         // damage of this car.
-    double  NEEDSINLONG;
-    double  USEDACCEXIT;
+    bool    NEEDSINLONG;
+    bool    USEDACCEXIT;
+    double  SKILL;          // skill car driver.
 
     double	TYRE_MU;        // mu value of tyres (min of those avail).
     double	TYRE_MU_F;      // mu value of front tyres.

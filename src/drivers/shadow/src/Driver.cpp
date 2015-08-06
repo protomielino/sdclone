@@ -511,6 +511,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     m_cm.BUMP_FACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR, NULL, 1.0);
     m_cm.NEEDSINLONG = GfParmGetNum(hCarParm, SECT_PRIV, PRV_NEED_SIN, NULL, 0);
     m_cm.USEDACCEXIT = GfParmGetNum(hCarParm, SECT_PRIV, PRV_USED_ACC, NULL, 0);
+    m_cm.BRAKESCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BRAKESCALE, NULL, 1.0);
 
 	FACTORS.RemoveAll();
 
@@ -681,6 +682,8 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
     initWheelRadius();
     initWheelPos();
     initBrake();
+
+    m_cm.BRAKEFORCE = BrakeForce;
 
 	m_cm.FUEL = 0;//pCar->_fuel;
 

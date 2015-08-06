@@ -35,6 +35,7 @@ CarModel::CarModel()
 	DAMAGE(0),
     NEEDSINLONG(false),
     USEDACCEXIT(false),
+    SKILL(0),
 
 	TYRE_MU(0),
 	TYRE_MU_F(0),
@@ -285,6 +286,8 @@ double	CarModel::CalcBreaking(double k0, double kz0, double k1, double kz1, doub
 
         double	acc = Ftanroad / M;
 
+        acc = BRAKESCALE * Ftanroad / (MASS * ( 3 + SKILL) / 4);
+
 		if (TDriver::UseBrakeLimit)
 		{
 			double Radius = 1.0 / fabs(Kz);
@@ -300,7 +303,14 @@ double	CarModel::CalcBreaking(double k0, double kz0, double k1, double kz1, doub
 			break;
 	}
 
-	return u;
+    double midspd = (u + spd1)/2;
+
+    // Check brake
+    double brakedecel = BRAKESCALE * BRAKEFORCE / MASS;
+    double braketargetspd = sqrt(midspd * midspd + 2 * brakedecel * dist);
+    double resulttargetspd = MIN(u, braketargetspd);
+
+    return MAX(resulttargetspd, spd1);
 }
 
 double	CarModel::CalcAcceleration(double k0, double kz0, double k1, double kz1, double spd0, double dist, double kFriction, double RollAngle , double TiltAngle) const

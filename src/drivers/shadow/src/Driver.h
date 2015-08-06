@@ -48,6 +48,8 @@
 #define PRV_RAIN_MU             "mu scale rain"
 #define PRV_ACCEL_DELTA         "accel delta"
 #define PRV_ACCEL_DELTA_RAIN    "accel delta rain"
+#define PRV_BRAKESCALE          "brake scale"
+#define PRV_BRAKEFORCE          "brake force"
 #define PRV_FLY_HEIGHT          "fly height"
 #define PRV_FACTOR              "factor"
 #define PRV_AERO_MOD            "aero mod"
