@@ -22,7 +22,7 @@
 
 #include "linalg.h"
 #include "mod.h"
-#include "xmldefs.h"
+#include "globaldefs.h"
 
 enum { LINE_MID=0, LINE_RL };
 enum { mode_normal=1, mode_correcting, mode_avoiding, mode_pitting };

@@ -19,7 +19,7 @@
 
 
 #include "pit.h"
-#include "xmldefs.h"
+#include "globaldefs.h"
 
 const float Pit::SPEED_LIMIT_MARGIN = 0.5;		// [m/s] savety margin to avoid pit speeding.
 
