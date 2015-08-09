@@ -25,66 +25,68 @@
 //==========================================================================*
 // Statics
 //--------------------------------------------------------------------------*
-int Driver::NBBOTS = MAX_NBBOTS;                  // Nbr of drivers/robots
-const char* Driver::MyBotName = "usr";        // Name of this bot
-const char* Driver::ROBOT_DIR = "drivers/usr";// Sub path to dll
-const char* Driver::SECT_PRIV = "private";// Private section
-const char* Driver::DEFAULTCARTYPE  = "car1-trb1";// Default car type
+int Driver::NBBOTS = MAX_NBBOTS;					// Nbr of drivers/robots
+const char* Driver::MyBotName = "usr";				// Name of this bot
+const char* Driver::ROBOT_DIR = "drivers/usr";		// Sub path to dll
+const char* Driver::SECT_PRIV = "private";			// Private section
+const char* Driver::DEFAULTCARTYPE  = "car1-trb1";	// Default car type
 int   Driver::RobotType = 0;
-bool  Driver::AdvancedParameters = false;         // Advanced parameters
-bool  Driver::UseOldSkilling = false;             // Use old skilling
-bool  Driver::UseSCSkilling = false;              // Use supercar skilling
-bool  Driver::UseMPA1Skilling = false;            // Use mpa1 car skilling
-float Driver::SkillingFactor = 0.1f;              // Skilling factor for career-mode
-bool  Driver::UseBrakeLimit = false;              // Use brake limit
-bool  Driver::UseGPBrakeLimit = false;            // Use brake limit GP36
-bool  Driver::UseRacinglineParameters = false;    // Use racingline parameters
-bool  Driver::UseWingControl = false;             // Use wing control parameters
-float Driver::BrakeLimit = -6;                    // Brake limit
-float Driver::BrakeLimitBase = 0.025f;            // Brake limit base
-float Driver::BrakeLimitScale = 25;               // Brake limit scale
-float Driver::SpeedLimitBase = 0.025f;            // Speed limit base
-float Driver::SpeedLimitScale = 25;               // Speed limit scale
-bool  Driver::FirstPropagation = true;            // Initialize
-bool  Driver::Learning = false;                   // Initialize
 
-double Driver::LengthMargin;                      // safety margin long.
-bool Driver::Qualification;                       // Global flag
-static const char *WheelSect[4] =                  // TORCS defined sections
+/*bool  Driver::AdvancedParameters = false;			// Advanced parameters
+bool  Driver::UseOldSkilling = false;				// Use old skilling
+bool  Driver::UseSCSkilling = false;				// Use supercar skilling
+bool  Driver::UseMPA1Skilling = false;				// Use mpa1 car skilling
+float Driver::SkillingFactor = 0.1f;				// Skilling factor for career-mode
+bool  Driver::UseBrakeLimit = false;				// Use brake limit
+bool  Driver::UseGPBrakeLimit = false;				// Use brake limit GP36
+bool  Driver::UseRacinglineParameters = false;		// Use racingline parameters
+bool  Driver::UseWingControl = false;				// Use wing control parameters
+float Driver::BrakeLimit = -6;						// Brake limit
+float Driver::BrakeLimitBase = 0.025f;				// Brake limit base
+float Driver::BrakeLimitScale = 25;					// Brake limit scale
+float Driver::SpeedLimitBase = 0.025f;				// Speed limit base
+float Driver::SpeedLimitScale = 25;					// Speed limit scale
+bool  Driver::FirstPropagation = true;				// Initialize
+bool  Driver::Learning = false;						// Initialize*/
+bool  Driver::UseWingControl = false;				// Use wing control parameters
+
+double Driver::LengthMargin;						// safety margin long.
+bool Driver::Qualification;							// Global flag
+static const char *WheelSect[4] =					// TORCS defined sections
 {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 static const char *WingSect[2] =
 {SECT_FRNTWING, SECT_REARWING};
 //const float Driver::MAX_UNSTUCK_ANGLE = (float)(15.0f/180.0f*PI); // [radians] If the angle of the car on the track is smaller, we assume we are not stuck.
 const float Driver::MAX_UNSTUCK_ANGLE = 1.3f;
-const float Driver::UNSTUCK_TIME_LIMIT = 2.5f;        // [s] We try to get unstuck after this time.
-const float Driver::MAX_UNSTUCK_SPEED = 5.0f;       // [m/s] Below this speed we consider being stuck.
-const float Driver::MIN_UNSTUCK_DIST = -1.0f;       // [m] If we are closer to the middle we assume to be not stuck.
-const float Driver::G = 9.81f;                // [m/(s*s)] Welcome on Earth.
-const float Driver::FULL_ACCEL_MARGIN = 1.0f;       // [m/s] Margin reduce oscillation of brake/acceleration.
-const float Driver::SHIFT = 0.9f;             // [-] (% of rpmredline) When do we like to shift gears.
-const float Driver::SHIFT_MARGIN = 4.0f;          // [m/s] Avoid oscillating gear changes.
-const float Driver::ABS_MINSPEED = 3.0f;          // [m/s] Below this speed the ABS is disabled (numeric, division by small numbers).
-const float Driver::LOOKAHEAD_CONST = 18.0f;        // [m]
-const float Driver::LOOKAHEAD_FACTOR = 0.33f;       // [-]
-const float Driver::WIDTHDIV = 3.0f;            // [-] Defines the percentage of the track to use (2/WIDTHDIV).
-const float Driver::SIDECOLL_MARGIN = 3.0f;         // [m] Distance between car centers to avoid side collisions.
+const float Driver::UNSTUCK_TIME_LIMIT = 2.5f;			// [s] We try to get unstuck after this time.
+const float Driver::MAX_UNSTUCK_SPEED = 5.0f;			// [m/s] Below this speed we consider being stuck.
+const float Driver::MIN_UNSTUCK_DIST = -1.0f;			// [m] If we are closer to the middle we assume to be not stuck.
+const float Driver::G = 9.81f;							// [m/(s*s)] Welcome on Earth.
+const float Driver::FULL_ACCEL_MARGIN = 1.0f;			// [m/s] Margin reduce oscillation of brake/acceleration.
+const float Driver::SHIFT = 0.9f;						// [-] (% of rpmredline) When do we like to shift gears.
+const float Driver::SHIFT_MARGIN = 4.0f;				// [m/s] Avoid oscillating gear changes.
+const float Driver::ABS_MINSPEED = 3.0f;				// [m/s] Below this speed the ABS is disabled (numeric, division by small numbers).
+const float Driver::LOOKAHEAD_CONST = 18.0f;			// [m]
+const float Driver::LOOKAHEAD_FACTOR = 0.33f;			// [-]
+const float Driver::WIDTHDIV = 3.0f;					// [-] Defines the percentage of the track to use (2/WIDTHDIV).
+const float Driver::SIDECOLL_MARGIN = 3.0f;				// [m] Distance between car centers to avoid side collisions.
 const float Driver::BORDER_OVERTAKE_MARGIN = 1.0f;      // [m]
-const float Driver::OVERTAKE_OFFSET_SPEED = 5.0f;     // [m/s] Offset change speed.
-const float Driver::PIT_LOOKAHEAD = 6.0f;         // [m] Lookahead to stop in the pit.
-const float Driver::PIT_BRAKE_AHEAD = 200.0f;       // [m] Workaround for "broken" pitentries.
-const float Driver::PIT_MU = 0.4f;              // [-] Friction of pit concrete.
-const float Driver::MAX_SPEED = 84.0f;            // [m/s] Speed to compute the percentage of brake to apply.
-const float Driver::MAX_FUEL_PER_METER = 0.0008f;     // [liter/m] fuel consumtion.
-const float Driver::CLUTCH_SPEED = 5.0f;          // [m/s]
-const float Driver::CENTERDIV = 0.1f;           // [-] (factor) [0.01..0.6].
-const float Driver::DISTCUTOFF = 200.0f;          // [m] How far to look, terminate while loops.
-const float Driver::MAX_INC_FACTOR = 8.0f;          // [m] Increment faster if speed is slow [1.0..10.0].
-const float Driver::CATCH_FACTOR = 8.0f;          // [-] select MIN(catchdist, dist*CATCH_FACTOR) to overtake.
-const float Driver::CLUTCH_FULL_MAX_TIME = 2.0f;      // [s] Time to apply full clutch.
+const float Driver::OVERTAKE_OFFSET_SPEED = 5.0f;		// [m/s] Offset change speed.
+const float Driver::PIT_LOOKAHEAD = 6.0f;				// [m] Lookahead to stop in the pit.
+const float Driver::PIT_BRAKE_AHEAD = 200.0f;			// [m] Workaround for "broken" pitentries.
+const float Driver::PIT_MU = 0.4f;						// [-] Friction of pit concrete.
+const float Driver::MAX_SPEED = 84.0f;					// [m/s] Speed to compute the percentage of brake to apply.
+const float Driver::MAX_FUEL_PER_METER = 0.0008f;		// [liter/m] fuel consumtion.
+const float Driver::CLUTCH_SPEED = 5.0f;				// [m/s]
+const float Driver::CENTERDIV = 0.1f;					// [-] (factor) [0.01..0.6].
+const float Driver::DISTCUTOFF = 200.0f;				// [m] How far to look, terminate while loops.
+const float Driver::MAX_INC_FACTOR = 8.0f;				// [m] Increment faster if speed is slow [1.0..10.0].
+const float Driver::CATCH_FACTOR = 8.0f;				// [-] select MIN(catchdist, dist*CATCH_FACTOR) to overtake.
+const float Driver::CLUTCH_FULL_MAX_TIME = 2.0f;		// [s] Time to apply full clutch.
 const float Driver::USE_LEARNED_OFFSET_RANGE = 0.2f;    // [m] if offset < this use the learned stuff
 
-const float Driver::TEAM_REAR_DIST = 50.0f;         //
-const int Driver::TEAM_DAMAGE_CHANGE_LEAD = 700;      // When to change position in the team?
+const float Driver::TEAM_REAR_DIST = 50.0f;				//
+const int Driver::TEAM_DAMAGE_CHANGE_LEAD = 700;		// When to change position in the team?
 
 #define SKIPLIMIT 4
 
@@ -96,7 +98,7 @@ Cardata *Driver::cardata = NULL;
 static int current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 
 #define BUFLEN 256
-static char PathFilenameBuffer[BUFLEN];          // for path and filename
+static char PathFilenameBuffer[BUFLEN];					// for path and filename
 
 #define RANDOM_SEED 0xfded
 #define RANDOM_A    1664525
@@ -307,39 +309,11 @@ Driver::Driver(int index) :
     mRain(0)
 {
     LogUSR.debug("\n#TDriver::TDriver() >>>\n\n");
-    int I;
-    m_Index = index;                                // Save own index
+    //int I;
+    m_Index = index;										// Save own index
     m_Extended = ( index < 0 || index >= NBBOTS ) ? 1 : 0;  //   is extended or not
 
-    // Motion survey
-    /*oSysFooStuckX = new TSysFoo(1,128);            // Ringbuffer for X
-    oSysFooStuckY = new TSysFoo(1,128);            // and Y coordinates
-
-    // Steering: Control offset from path
-    oPIDCLine.oP = 1.0;
-    oPIDCLine.oD = 10;
-
-    // Braking: Control speed difference
-    oPIDCBrake.oP = 20.0;
-    oPIDCBrake.oI = 0.0;
-    oPIDCBrake.oD = 30.0;
-    oPIDCBrake.oMaxTotal = 0.0;
-    oPIDCBrake.oMinTotal = 0.0;
-
-    // StartRPM: Control engine revs while prestart
-    oPIDCStart.oP = 12.00;                         // Proportional factor
-    oPIDCStart.oI = 1.0;                           // Integrative factor
-    oPIDCStart.oD = 2.0;                           // Differential factor
-
-    for (I = 0; I <= NBR_BRAKECOEFF; I++)          // Initialize braking
-      oBrakeCoeff[I] = 0.5;
-
-    NBRRL = gNBR_RL;                               // Setup number
-    oRL_FREE = RL_FREE;                            // and index for
-    oRL_LEFT = RL_LEFT;                            // normal races
-    oRL_RIGHT = RL_RIGHT;*/
-
-    //Driver::LengthMargin = LENGTH_MARGIN;         // Initialize safty margin
+    //Driver::LengthMargin = LENGTH_MARGIN;					// Initialize safty margin
     //enableCarNeedsSinLong = false;
 
     LogUSR.debug("\n#<<< Driver::Driver()\n\n");
@@ -400,7 +374,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
     // Initialize the base param path
     const char* BaseParamPath = Driver::ROBOT_DIR;
-    const char* PathFilename = PathFilenameBuffer;
+    //const char* PathFilename = PathFilenameBuffer;
 
     //load the driver skill level, range 0 - 1
     float driver_skill = 0.0f;

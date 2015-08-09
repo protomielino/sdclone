@@ -96,33 +96,33 @@ public:
     double TyreTreadDepthRear();
 
     // Per robot global data.
-    static int NBBOTS;                           // Nbr of cars
-    double CurrSimTime;                          // Current simulation time
-    static const char* MyBotName;                      // Name of this bot
-    static const char* ROBOT_DIR;                      // Sub path to dll
-    static const char* SECT_PRIV;                      // Private section
-    static const char* DEFAULTCARTYPE;                 // Default car type
+    static int NBBOTS;									// Nbr of cars
+    double CurrSimTime;									// Current simulation time
+    static const char* MyBotName;						// Name of this bot
+    static const char* ROBOT_DIR;						// Sub path to dll
+    static const char* SECT_PRIV;						// Private section
+    static const char* DEFAULTCARTYPE;					// Default car type
 
-    static int RobotType;
-    static bool AdvancedParameters;
-    static bool UseOldSkilling;
-    static bool UseSCSkilling;
-    static bool UseMPA1Skilling;
-    static float SkillingFactor;
-    static bool UseBrakeLimit;
-    static bool UseGPBrakeLimit;
-    static bool UseRacinglineParameters;
-    static bool UseWingControl;
-    static float BrakeLimit;
-    static float BrakeLimitScale;
-    static float BrakeLimitBase;
-    static float SpeedLimitScale;
-    static float SpeedLimitBase;
-    static bool FirstPropagation;
-    static bool Learning;
+    static int		RobotType;
+    static bool		AdvancedParameters;
+    static bool		UseOldSkilling;
+    static bool		UseSCSkilling;
+    static bool		UseMPA1Skilling;
+    static float	SkillingFactor;
+    static bool		UseBrakeLimit;
+    static bool		UseGPBrakeLimit;
+    static bool		UseRacinglineParameters;
+    static bool		UseWingControl;
+    static float	BrakeLimit;
+    static float	BrakeLimitScale;
+    static float	BrakeLimitBase;
+    static float	SpeedLimitScale;
+    static float	SpeedLimitBase;
+    static bool		FirstPropagation;
+    static bool		Learning;
 
-    static double LengthMargin;                  // Length margin
-    static bool Qualification;                   // Flag qualifying
+    static double	LengthMargin;						// Length margin
+    static bool		Qualification;						// Flag qualifying
 
     int         m_Index;
     int         m_Extended;
@@ -223,10 +223,10 @@ private:
     int allowcorrecting;
     int pitpos;
 
-    float prevspeedangle;		// the angle of the speed vector relative to trackangle, > 0.0 points to right.
-    float speedangle;		// the angle of the speed vector relative to trackangle, > 0.0 points to right.
+    float prevspeedangle;				// the angle of the speed vector relative to trackangle, > 0.0 points to right.
+    float speedangle;					// the angle of the speed vector relative to trackangle, > 0.0 points to right.
     float angle;
-    float mass;				// Mass of car + fuel.
+    float mass;							// Mass of car + fuel.
     float maxfuel;
     float myoffset, pitoffset;			// Offset to the track middle.
     float laststeer, lastbrake, lastaccel;
@@ -234,29 +234,29 @@ private:
     float avgaccel_x;
     double wheelz[4];
 
-    char        *m_BotName;                                 // Name of driver
-    const char  *m_TeamName;                                // Name of team
-    int         m_RaceNumber;                               // Race number
+    char        *m_BotName;				// Name of driver
+    const char  *m_TeamName;            // Name of team
+    int         m_RaceNumber;           // Race number
 
-    tCarElt *car;			// Pointer to tCarElt struct.
-    LRaceLine *raceline; // pointer to the raceline instance
+    tCarElt *car;						// Pointer to tCarElt struct.
+    LRaceLine *raceline;				// pointer to the raceline instance
 
-    Opponents *opponents;	// The container for opponents.
-    Opponent *opponent;		// The array of opponents.
+    Opponents *opponents;				// The container for opponents.
+    Opponent *opponent;					// The array of opponents.
 
-    Pit *pit;						// Pointer to the pit instance.
-    SimpleStrategy *strategy;		// Pit stop strategy.
+    Pit *pit;							// Pointer to the pit instance.
+    SimpleStrategy *strategy;			// Pit stop strategy.
 
-    SingleCardata *mycardata;		// Pointer to "global" data about my car.
+    SingleCardata *mycardata;			// Pointer to "global" data about my car.
     LRLMod *tLftMargin;
     LRLMod *tRgtMargin;
     LRLMod *tYawRateAccel;
 
-    double simtime;       // how long since the race started
-    double avoidtime;    // how long since we began avoiding
+    double simtime;						// how long since the race started
+    double avoidtime;					// how long since we began avoiding
     double frontavoidtime;
-    double correcttimer; // how long we've been correcting
-    double correctlimit; // level of divergence with raceline steering
+    double correcttimer;				// how long we've been correcting
+    double correctlimit;				// level of divergence with raceline steering
     double aligned_timer;
     double stopped_timer;
     double brakedelay;
@@ -266,19 +266,19 @@ private:
     double sideratio;
     double laststeer_direction;
     double steerLock;
-    float currentspeedsqr;	// Square of the current speed_x.
+    float currentspeedsqr;				// Square of the current speed_x.
     float currentspeed;
-    float clutchtime;		// Clutch timer.
-    float oldlookahead;		// Lookahead for steering in the previous step.
-    float oldtime_mod;		// Lookahead for steering in the previous step.
-    float racesteer;     // steer command to get to raceline
+    float clutchtime;					// Clutch timer.
+    float oldlookahead;					// Lookahead for steering in the previous step.
+    float oldtime_mod;					// Lookahead for steering in the previous step.
+    float racesteer;					// steer command to get to raceline
     float stucksteer;
     float prevleft;
 
-    LRaceLineData *rldata; // info queried from raceline.cpp
+    LRaceLineData *rldata;				// info queried from raceline.cpp
 
-    float avoidlftoffset; // closest opponent on the left
-    float avoidrgtoffset; // closest opponent on the right
+    float avoidlftoffset;				// closest opponent on the left
+    float avoidrgtoffset;				// closest opponent on the right
     float accelcmd, brakecmd;
     float faccelcmd, fbrakecmd;
     float TurnDecel;
@@ -333,12 +333,12 @@ private:
     // Data that should stay constant after first initialization.
     int MAX_UNSTUCK_COUNT;
     int INDEX;
-    float CARMASS;		// Mass of the car only [kg].
-    float CA;			// Aerodynamic downforce coefficient.
-    float CW;			// Aerodynamic drag coefficient.
-    float TIREMU;		// Friction coefficient of tires.
-    float OVERTAKE_OFFSET_INC;		// [m/timestep]
-    float MU_FACTOR;				// [-]
+    float CARMASS;						// Mass of the car only [kg].
+    float CA;							// Aerodynamic downforce coefficient.
+    float CW;							// Aerodynamic drag coefficient.
+    float TIREMU;						// Friction coefficient of tires.
+    float OVERTAKE_OFFSET_INC;			// [m/timestep]
+    float MU_FACTOR;					// [-]
 
     float GearRevsChangeDown[6];
     float GearRevsChangeUp[6];

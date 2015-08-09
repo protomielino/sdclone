@@ -55,7 +55,8 @@ static const int MAXNBBOTS = MAX_NBBOTS;         // Number of drivers/robots
 static const int BUFSIZE = 256;
 
 // Default driver names
-static char const* defaultBotName[MAXNBBOTS] = {
+static char const* defaultBotName[MAXNBBOTS] =
+{
     "driver 1",  "driver 2",  "driver 3",  "driver 4",  "driver 5",
     "driver 6",  "driver 7",  "driver 8",  "driver 9",  "driver 10",
     "driver 11", "driver 12", "driver 13", "driver 14", "driver 15",
@@ -63,7 +64,8 @@ static char const* defaultBotName[MAXNBBOTS] = {
 };
 
 // Default driver descriptions
-static char const* defaultBotDesc[MAXNBBOTS] = {
+static char const* defaultBotDesc[MAXNBBOTS] =
+{
     "driver 1",  "driver 2",  "driver 3",  "driver 4",  "driver 5",
     "driver 6",  "driver 7",  "driver 8",  "driver 9",  "driver 10",
     "driver 11", "driver 12", "driver 13", "driver 14", "driver 15",
@@ -142,11 +144,9 @@ void* GetFileHandle(const char *RobotName)
 {
     void* RobotSettings = NULL;
 
-    strncpy(BufName, RobotName, BUFSIZE);           // Save robot's name
-    snprintf(BufPathDirRel, BUFSIZE,                // Robot's directory
-             "drivers/%s",RobotName);                    // relative to installation
-    snprintf(BufPathXMLRel, BUFSIZE,                // Robot's xml-filename
-             "drivers/%s/%s.xml",RobotName,RobotName);   // relative to installation
+    strncpy(BufName, RobotName, BUFSIZE);											// Save robot's name
+    snprintf(BufPathDirRel, BUFSIZE, "drivers/%s",RobotName);						// relative to installation
+    snprintf(BufPathXMLRel, BUFSIZE, "drivers/%s/%s.xml", RobotName, RobotName);		// relative to installation
 
     // Test local installation path
     snprintf(BufPathXML, BUFSIZE, "%s%s", GetLocalDir(), RobPathXMLRel);
@@ -184,10 +184,7 @@ void SetupUSR()
 {
     m_RobotType = RTYPE_USR;
     SetParameters(NBBOTS, "car1-trb1");
-    Driver::AdvancedParameters = true;
-    Driver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
     Driver::UseWingControl = true;
-    Driver::UseRacinglineParameters = true;
 };
 
 ////////////////////////////////////////////////////////////
@@ -197,11 +194,6 @@ void SetupUSR_mpa1()
 {
     m_RobotType = RTYPE_USR_MPA1;
     SetParameters(NBBOTS, "mpa1-murasama");
-    Driver::AdvancedParameters = true;
-    Driver::UseBrakeLimit = false;
-    Driver::UseMPA1Skilling = true;
-    Driver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
-    Driver::UseRacinglineParameters = true;
 };
 
 ////////////////////////////////////////////////////////////
@@ -211,11 +203,6 @@ void SetupUSR_mpa11()
 {
     m_RobotType = RTYPE_USR_MPA11;
     SetParameters(NBBOTS, "mpa11-murasama");
-    Driver::AdvancedParameters = true;
-    Driver::UseBrakeLimit = false;
-    Driver::UseMPA1Skilling = true;
-    Driver::SkillingFactor = 0.1f;                 // Skilling factor for career-mode
-    Driver::UseRacinglineParameters = true;
 };
 
 ////////////////////////////////////////////////////////////
@@ -225,11 +212,6 @@ void SetupUSR_mpa12()
 {
     m_RobotType = RTYPE_USR_MPA12;
     SetParameters(NBBOTS, "mpa12-murasama");
-    Driver::AdvancedParameters = true;
-    Driver::UseBrakeLimit = false;
-    Driver::UseMPA1Skilling = true;
-    Driver::SkillingFactor = 0.1f;                 // Skilling factor for career-mode
-    Driver::UseRacinglineParameters = true;
 };
 
 ////////////////////////////////////////////////////////////
@@ -239,8 +221,6 @@ void SetupUSR_trb1()
 {
     m_RobotType = RTYPE_USR_TRB1;
     SetParameters(NBBOTS, "car1-trb1");
-    Driver::SkillingFactor = 0.1f;                 // Skilling factor for career-mode
-    Driver::UseRacinglineParameters = true;
 };
 
 ////////////////////////////////////////////////////////////
@@ -250,9 +230,6 @@ void SetupUSR_sc()
 {
     m_RobotType = RTYPE_USR_SC;
     SetParameters(NBBOTS, "sc-cavallo-360");
-    Driver::UseSCSkilling = true;                  // Use supercar skilling
-    Driver::SkillingFactor = 0.1f;                 // Skilling factor for career-mode
-    Driver::UseRacinglineParameters = true;
 };
 
 ////////////////////////////////////////////////////////////
@@ -263,11 +240,7 @@ void SetupUSR_srw()
     m_RobotType = RTYPE_USR_SRW;
     Driver::RobotType = m_RobotType;
     SetParameters(NBBOTS, "srw-sector-p4");
-    Driver::AdvancedParameters = true;
-    Driver::UseSCSkilling = true;                  // Use supercar skilling
-    Driver::SkillingFactor = 0.1f;                 // Skilling factor for career-mode
     Driver::UseWingControl = true;
-    Driver::UseRacinglineParameters = true;
 };
 
 ////////////////////////////////////////////////////////////
@@ -277,10 +250,6 @@ void SetupUSR_36GP()
 {
     m_RobotType = RTYPE_USR_36GP;
     SetParameters(NBBOTS, "36GP-alfa12c");
-    Driver::AdvancedParameters = true;
-    //TDriver::UseBrakeLimit = true;
-    //TDriver::UseGPBrakeLimit = true;
-    Driver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
 };
 
 ////////////////////////////////////////////////////////////
@@ -290,11 +259,6 @@ void SetupUSR_ls1()
 {
     m_RobotType = RTYPE_USR_LS1;
     SetParameters(NBBOTS, "ls1-archer-r9");
-    Driver::AdvancedParameters = true;
-    //TDriver::UseBrakeLimit = true;
-    Driver::UseBrakeLimit = false;
-    Driver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
-    Driver::UseRacinglineParameters = true;
 };
 
 ////////////////////////////////////////////////////////////
@@ -304,10 +268,6 @@ void SetupUSR_ls2()
 {
     m_RobotType = RTYPE_USR_LS2;
     SetParameters(NBBOTS, "ls2-bavaria-g3gtr");
-    Driver::AdvancedParameters = true;
-    Driver::UseBrakeLimit = true;
-    Driver::UseRacinglineParameters = true;
-    Driver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
 };
 
 ////////////////////////////////////////////////////////////
@@ -317,10 +277,6 @@ void SetupUSR_mp5()
 {
     m_RobotType = RTYPE_USR_MP5;
     SetParameters(NBBOTS, "mp5");
-    Driver::AdvancedParameters = true;
-    Driver::UseBrakeLimit = true;
-    //TDriver::UseSCSkilling = true;
-    Driver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
 };
 
 ////////////////////////////////////////////////////////////
@@ -330,7 +286,6 @@ void SetupUSR_lp1()
 {
     m_RobotType = RTYPE_USR_LP1;
     SetParameters(NBBOTS, "lp1-vieringe-vr8");
-    Driver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
 };
 
 ////////////////////////////////////////////////////////////
@@ -340,7 +295,6 @@ void SetupUSR_ref()
 {
     m_RobotType = RTYPE_USR_REF;
     SetParameters(NBBOTS, "ref-sector-p4");
-    Driver::UseRacinglineParameters = true;
     Driver::UseWingControl = true;
 };
 
@@ -351,7 +305,7 @@ int moduleWelcomeV1_00
 (const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
 {
     PLogUSR = GfLogger::instance("USR");
-    LogUSR.debug("\n#Interface Version: %d.%d\n", welcomeIn->itfVerMajor,welcomeIn->itfVerMinor);
+    LogUSR.debug("\n#Interface Version: %d.%d\n", welcomeIn->itfVerMajor, welcomeIn->itfVerMinor);
 
     // Get filehandle for robot's xml-file
     void* RobotSettings = GetFileHandle(welcomeIn->name);
@@ -369,8 +323,8 @@ int moduleWelcomeV1_00
         // robot team definition file we have to count
         // the number of sections within Robots/index!
         snprintf(Buffer, BUFSIZE, "%s/%s", ROB_SECT_ROBOTS, ROB_LIST_INDEX);
-        NBBOTS = GfParmGetEltNb(RobotSettings,Buffer);
-        LogUSR.debug("#Nbr of drivers  : %d\n",NBBOTS);
+        NBBOTS = GfParmGetEltNb(RobotSettings, Buffer);
+        LogUSR.debug("#Nbr of drivers  : %d\n", NBBOTS);
 
         DriverNames = (char *) calloc(NBBOTS,DRIVERLEN);
         DriverDescs = (char *) calloc(NBBOTS,DESCRPLEN);
@@ -662,140 +616,55 @@ static int initFuncPt(int Index, void *Pt)
 
     if (m_RobotType == RTYPE_USR)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR\n");
-        /*m_Instances[Index-IndexOffset].m_Robot->CalcSkillingFoo = &Driver::CalcSkilling_usr;
-        m_Instances[Index-IndexOffset].m_Robot->CalcFrictionFoo = &Driver::CalcFriction_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcCrvFoo = &Driver::CalcCrv_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcHairpinFoo = &Driver::CalcHairpin_simplix_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->ScaleSide(0.95f,0.95f);
-        m_Instances[Index-IndexOffset].m_Robot->SideBorderOuter(0.20f);*/
+        LogUSR.debug("#RobotType == RTYPE_USR\n");
     }
     else if (m_RobotType == RTYPE_USR_TRB1)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR_TRB1\n");
-        /*m_Instances[Index-IndexOffset].m_Robot->CalcSkillingFoo = &Driver::CalcSkilling_usr;
-        m_Instances[Index-IndexOffset].m_Robot->CalcFrictionFoo = &Driver::CalcFriction_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcCrvFoo = &Driver::CalcCrv_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcHairpinFoo = &Driver::CalcHairpin_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->ScaleSide(0.95f,0.95f);
-        m_Instances[Index-IndexOffset].m_Robot->SideBorderOuter(0.20f);*/
+        LogUSR.debug("#RobotType == RTYPE_USR_TRB1\n");
     }
     else if (m_RobotType == RTYPE_USR_SC)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR_SC\n");
-        /*m_Instances[Index-IndexOffset].m_Robot->CalcSkillingFoo = &Driver::CalcSkilling_usr_SC;
-        m_Instances[Index-IndexOffset].m_Robot->CalcFrictionFoo = &Driver::CalcFriction_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcCrvFoo = &Driver::CalcCrv_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcHairpinFoo = &Driver::CalcHairpin_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->ScaleSide(0.95f,0.95f);
-        m_Instances[Index-IndexOffset].m_Robot->SideBorderOuter(0.10f);*/
+        LogUSR.debug("#RobotType == RTYPE_USR_SC\n");
     }
     else if (m_RobotType == RTYPE_USR_SRW)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR_SRW\n");
-        /*m_Instances[Index-IndexOffset].m_Robot->CalcSkillingFoo = &Driver::CalcSkilling_usr_SC;
-        m_Instances[Index-IndexOffset].m_Robot->CalcFrictionFoo = &Driver::CalcFriction_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcCrvFoo = &Driver::CalcCrv_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcHairpinFoo = &Driver::CalcHairpin_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->ScaleSide(0.95f,0.95f);
-        m_Instances[Index-IndexOffset].m_Robot->SideBorderOuter(0.30f);
-        m_Instances[Index-IndexOffset].m_Robot->SideBorderInner(0.00f);*/
+        LogUSR.debug("#RobotType == RTYPE_USR_SRW\n");
     }
     else if (m_RobotType == RTYPE_USR_36GP)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR_36GP\n");
-        /*m_Instances[Index-IndexOffset].m_Robot->CalcSkillingFoo = &Driver::CalcSkilling_usr;
-        m_Instances[Index-IndexOffset].m_Robot->CalcFrictionFoo = &Driver::CalcFriction_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcCrvFoo = &Driver::CalcCrv_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcHairpinFoo = &Driver::CalcHairpin_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->ScaleSide(0.95f,0.95f);
-        m_Instances[Index-IndexOffset].m_Robot->SideBorderOuter(0.5f);*/
+        LogUSR.debug("#RobotType == RTYPE_USR_36GP\n");
     }
     else if (m_RobotType == RTYPE_USR_MPA1)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR_MPA1\n");
-        /*m_Instances[Index-IndexOffset].m_Robot->CalcSkillingFoo = &Driver::CalcSkilling_usr_MPA1;
-        m_Instances[Index-IndexOffset].m_Robot->CalcFrictionFoo = &Driver::CalcFriction_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcCrvFoo = &Driver::CalcCrv_usr_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcHairpinFoo = &Driver::CalcHairpin_usr;
-        m_Instances[Index-IndexOffset].m_Robot->ScaleSide(0.95f,0.95f);
-        m_Instances[Index-IndexOffset].m_Robot->SideBorderOuter(0.00f);
-        m_Instances[Index-IndexOffset].m_Robot->UseFilterAccel();*/
+        LogUSR.debug("#RobotType == RTYPE_USR_MPA1\n");
     }
     else if (m_RobotType == RTYPE_USR_MPA11)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR_MPA11\n");
-        /*cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_MPA1;
-        cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-        cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
-        cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
-        cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-        cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.00f);
-        cInstances[Index-IndexOffset].cRobot->UseFilterAccel();*/
+        LogUSR.debug("#RobotType == RTYPE_USR_MPA11\n");
     }
     else if (m_RobotType == RTYPE_USR_MPA12)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR_MPA12\n");
-        /*cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_MPA1;
-        cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-        cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
-        cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
-        cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-        cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.00f);
-        cInstances[Index-IndexOffset].cRobot->UseFilterAccel();*/
+        LogUSR.debug("#RobotType == RTYPE_USR_MPA12\n");
     }
     else if (m_RobotType == RTYPE_USR_LS1)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR_LS1\n");
-        /*cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_LS1;
-        cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-        cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
-        cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
-        cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-        cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
-        cInstances[Index-IndexOffset].cRobot->UseFilterAccel();*/
+        LogUSR.debug("#RobotType == RTYPE_USR_LS1\n");
     }
     else if (m_RobotType == RTYPE_USR_LS2)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR_LS2\n");
-        /*cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_LS2;
-        cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_LS2;
-        cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
-        cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
-        cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-        cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);*/
+        LogUSR.debug("#RobotType == RTYPE_USR_LS2\n");
     }
     else if (m_RobotType == RTYPE_USR_MP5)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR_MP5\n");
-        /*cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
-        cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-        cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
-        cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
-        cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-        cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);*/
+        LogUSR.debug("#RobotType == RTYPE_USR_MP5\n");
     }
     else if (m_RobotType == RTYPE_USR_LP1)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR_LP1\n");
-        /*cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
-        cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_LP1;
-        cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
-        cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
-        cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-        cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);*/
+        LogUSR.debug("#RobotType == RTYPE_USR_LP1\n");
     }
     else if (m_RobotType == RTYPE_USR_REF)
     {
-        LogUSR.debug("#cRobotType == RTYPE_USR_REF\n");
-        /*m_Instances[Index-IndexOffset].m_Robot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
-        //    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_REF;
-        m_Instances[Index-IndexOffset].m_Robot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
-        //    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix;
-        m_Instances[Index-IndexOffset].m_Robot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
-        m_Instances[Index-IndexOffset].m_Robot->ScaleSide(0.95f,0.95f);
-        m_Instances[Index-IndexOffset].m_Robot->SideBorderOuter(0.20f);*/
+        LogUSR.debug("#RobotType == RTYPE_USR_REF\n");
     }
 
     GfParmReleaseHandle(RobotSettings);
