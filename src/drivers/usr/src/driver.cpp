@@ -21,6 +21,39 @@
 
 #define CONTROL_SKILL
 
+
+//==========================================================================*
+// Statics
+//--------------------------------------------------------------------------*
+int Driver::NBBOTS = MAX_NBBOTS;                  // Nbr of drivers/robots
+const char* Driver::MyBotName = "usr";        // Name of this bot
+const char* Driver::ROBOT_DIR = "drivers/usr";// Sub path to dll
+const char* Driver::SECT_PRIV = "private";// Private section
+const char* Driver::DEFAULTCARTYPE  = "car1-trb1";// Default car type
+int   Driver::RobotType = 0;
+bool  Driver::AdvancedParameters = false;         // Advanced parameters
+bool  Driver::UseOldSkilling = false;             // Use old skilling
+bool  Driver::UseSCSkilling = false;              // Use supercar skilling
+bool  Driver::UseMPA1Skilling = false;            // Use mpa1 car skilling
+float Driver::SkillingFactor = 0.1f;              // Skilling factor for career-mode
+bool  Driver::UseBrakeLimit = false;              // Use brake limit
+bool  Driver::UseGPBrakeLimit = false;            // Use brake limit GP36
+bool  Driver::UseRacinglineParameters = false;    // Use racingline parameters
+bool  Driver::UseWingControl = false;             // Use wing control parameters
+float Driver::BrakeLimit = -6;                    // Brake limit
+float Driver::BrakeLimitBase = 0.025f;            // Brake limit base
+float Driver::BrakeLimitScale = 25;               // Brake limit scale
+float Driver::SpeedLimitBase = 0.025f;            // Speed limit base
+float Driver::SpeedLimitScale = 25;               // Speed limit scale
+bool  Driver::FirstPropagation = true;            // Initialize
+bool  Driver::Learning = false;                   // Initialize
+
+double Driver::LengthMargin;                      // safety margin long.
+bool Driver::Qualification;                       // Global flag
+static const char *WheelSect[4] =                  // TORCS defined sections
+{SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+static const char *WingSect[2] =
+{SECT_FRNTWING, SECT_REARWING};
 //const float Driver::MAX_UNSTUCK_ANGLE = (float)(15.0f/180.0f*PI); // [radians] If the angle of the car on the track is smaller, we assume we are not stuck.
 const float Driver::MAX_UNSTUCK_ANGLE = 1.3f;
 const float Driver::UNSTUCK_TIME_LIMIT = 2.5f;        // [s] We try to get unstuck after this time.
@@ -62,7 +95,70 @@ enum { STUCK_REVERSE = 1, STUCK_FORWARD = 2 };
 Cardata *Driver::cardata = NULL;
 static int current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 
-Driver::Driver(int index, const int robot_type) :
+#define BUFLEN 256
+static char PathFilenameBuffer[BUFLEN];          // for path and filename
+
+#define RANDOM_SEED 0xfded
+#define RANDOM_A    1664525
+#define RANDOM_C    1013904223
+
+//==========================================================================*
+// Set name of robot (and other appendant features)
+//--------------------------------------------------------------------------*
+void Driver::SetBotName(void* RobotSettings, char* Value)
+{
+    // At this point TORCS gives us no information
+    // about the name of the driver, the team and
+    // our own car type!
+    // Because we want it to set the name as defined
+    // in the teams xml file and to load depending
+    // setup files we have to find it out:
+
+    // Needed for Career mode?
+    /*if (CarType)
+        free (CarType);*/
+    CarType = NULL;
+
+    char SectionBuffer[256];                     // Buffer
+    char indexstr[32];
+
+    snprintf(SectionBuffer, BUFLEN, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, m_Index);
+    char* Section = SectionBuffer;
+
+    // Modified to avoid memory leaks
+    // Speed dreams has a trick to find out the oCarType
+    RtGetCarindexString(m_Index, "usr", (char) m_Extended, indexstr, 32);
+    if( m_Extended )
+      CarType = strdup( indexstr );
+    else // avoid empty car type
+      CarType = strdup(GfParmGetStr(RobotSettings, Section, ROB_ATTR_CAR, DEFAULTCARTYPE));                             // section, default car type
+
+    m_BotName = Value;                            // Get pointer to drv. name
+
+    m_TeamName = GfParmGetStr(RobotSettings, Section, ROB_ATTR_TEAM, (char *) CarType);                                 // section, default car type
+
+    m_RaceNumber = (int) GfParmGetNum(RobotSettings, Section, ROB_ATTR_RACENUM, (char *) NULL, (tdble) m_Index + 1);      // section, index as default
+
+    LogUSR.debug("#Bot name    : %s\n", m_BotName);
+    LogUSR.debug("#Team name   : %s\n", m_TeamName);
+    LogUSR.debug("#Car type    : %s\n", CarType);
+    LogUSR.debug("#Race number : %d\n", m_RaceNumber);
+};
+
+void Driver::SetRandomSeed(unsigned int seed)
+{
+   random_seed = seed ? seed : RANDOM_SEED;
+
+   return;
+}
+
+unsigned int Driver::getRandom()
+{
+    random_seed = RANDOM_A * random_seed + RANDOM_C;
+    return (random_seed >> 16);
+}
+
+Driver::Driver(int index) :
     HasABS(false),
     HasESP(false),
     HasTCL(false),
@@ -210,49 +306,43 @@ Driver::Driver(int index, const int robot_type) :
     cmd_light(0.0f),
     mRain(0)
 {
-    INDEX = index;
+    LogUSR.debug("\n#TDriver::TDriver() >>>\n\n");
+    int I;
+    m_Index = index;                                // Save own index
+    m_Extended = ( index < 0 || index >= NBBOTS ) ? 1 : 0;  //   is extended or not
 
-    switch(robot_type) {
-    case USR_TRB1:
-        robot_name = "usr_trb1";
-        break;
+    // Motion survey
+    /*oSysFooStuckX = new TSysFoo(1,128);            // Ringbuffer for X
+    oSysFooStuckY = new TSysFoo(1,128);            // and Y coordinates
 
-    case USR_SC:
-        robot_name = "usr_sc";
-        break;
+    // Steering: Control offset from path
+    oPIDCLine.oP = 1.0;
+    oPIDCLine.oD = 10;
 
-    case USR_LS1:
-        robot_name = "usr_ls1";
-        break;
+    // Braking: Control speed difference
+    oPIDCBrake.oP = 20.0;
+    oPIDCBrake.oI = 0.0;
+    oPIDCBrake.oD = 30.0;
+    oPIDCBrake.oMaxTotal = 0.0;
+    oPIDCBrake.oMinTotal = 0.0;
 
-    case USR_LS2:
-        robot_name = "usr_ls2";
-        break;
+    // StartRPM: Control engine revs while prestart
+    oPIDCStart.oP = 12.00;                         // Proportional factor
+    oPIDCStart.oI = 1.0;                           // Integrative factor
+    oPIDCStart.oD = 2.0;                           // Differential factor
 
-    case USR_36GP:
-        robot_name = "usr_36GP";
-        break;
+    for (I = 0; I <= NBR_BRAKECOEFF; I++)          // Initialize braking
+      oBrakeCoeff[I] = 0.5;
 
-    case USR_RS:
-        robot_name = "usr_rs";
-        break;
+    NBRRL = gNBR_RL;                               // Setup number
+    oRL_FREE = RL_FREE;                            // and index for
+    oRL_LEFT = RL_LEFT;                            // normal races
+    oRL_RIGHT = RL_RIGHT;*/
 
-    case USR_LP1:
-        robot_name = "usr_lp1";
-        break;
+    //Driver::LengthMargin = LENGTH_MARGIN;         // Initialize safty margin
+    //enableCarNeedsSinLong = false;
 
-    case USR_MPA1:
-        robot_name = "usr_mpa1";
-        break;
-
-    case USR_MPA11:
-        robot_name = "usr_mpa11";
-        break;
-
-    case USR_MPA12:
-        robot_name = "usr_mpa12";
-        break;
-    }
+    LogUSR.debug("\n#<<< Driver::Driver()\n\n");
 }
 
 
@@ -276,31 +366,10 @@ Driver::~Driver()
     free(tLftMargin);
     free(tRgtMargin);
     free(tYawRateAccel);
+
+    if (CarType != NULL)
+      free(CarType);
 }
-
-#define RANDOM_SEED 0xfded
-#define RANDOM_A    1664525
-#define RANDOM_C    1013904223
-#define BUFLEN 256
-
-void Driver::SetBotName(const char* Value)
-{
-    CarType = Value;
-    LogUSR.debug("#Car Name    : %s\n",CarType);
-};
-
-void Driver::SetRandomSeed(unsigned int seed)
-{
-    random_seed = seed ? seed : RANDOM_SEED;
-    return;
-}
-
-unsigned int Driver::getRandom()
-{
-    random_seed = RANDOM_A * random_seed + RANDOM_C;
-    return (random_seed >> 16);
-}
-
 
 // Called for every track change or new race.
 void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituation *s)
@@ -329,9 +398,13 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
     global_skill = MAX(0.0f, MIN(10.0f, global_skill));
 
+    // Initialize the base param path
+    const char* BaseParamPath = Driver::ROBOT_DIR;
+    const char* PathFilename = PathFilenameBuffer;
+
     //load the driver skill level, range 0 - 1
     float driver_skill = 0.0f;
-    snprintf(buffer, BUFSIZE, "drivers/%s/%d/skill.xml",robot_name,INDEX);
+    snprintf(buffer, BUFSIZE, "%s/%d/skill.xml", BaseParamPath, m_Index);
     skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
     if (skillHandle)
     {
@@ -357,7 +430,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     mRain = getWeather();
 
     //if (mRain == 0)
-    snprintf(buffer, BUFSIZE, "drivers/%s/%s/default.xml", robot_name, CarType);
+    snprintf(buffer, BUFSIZE, "%s/%s/default.xml", BaseParamPath, CarType);
     /*else
       snprintf(buffer, BUFSIZE, "drivers/%s/%s/default-%d.xml",robot_name, carName, mRain);*/
 
@@ -365,9 +438,9 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     void *newhandle;
 
     if (mRain == 0)
-        snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, CarType, trackname);
+        snprintf(buffer, BUFSIZE, "%s/%s/%s.xml", BaseParamPath, CarType, trackname);
     else
-        snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-%d.xml",robot_name, CarType, trackname, mRain);
+        snprintf(buffer, BUFSIZE, "%s/%s/%s-%d.xml", BaseParamPath, CarType, trackname, mRain);
 
     newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
     if (newhandle)
@@ -380,9 +453,9 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     else
     {
         if (mRain == 0)
-            snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, CarType, trackname);
+            snprintf(buffer, BUFSIZE, "%s/%s/%s.xml", BaseParamPath, CarType, trackname);
         else
-            snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s-%d.xml",robot_name, CarType, trackname, mRain);
+            snprintf(buffer, BUFSIZE, "%s/%s/%s-%d.xml", BaseParamPath, CarType, trackname, mRain);
 
         newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
         if (newhandle)

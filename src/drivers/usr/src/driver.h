@@ -39,10 +39,7 @@
 #include "cardata.h"
 #include "raceline.h"
 #include "mod.h"
-#include "xmldefs.h"
-
-extern GfLogger* PLogUSR;
-#define LogUSR (*PLogUSR)
+#include "globaldefs.h"
 
 class Opponents;
 class Opponent;
@@ -53,14 +50,14 @@ class SimpleStrategy;
 enum { TEAM_FRIEND=1, TEAM_FOE };
 enum { avoidleft=1, avoidright=2, avoidside=4, avoidsideclosing=8, avoidback=16 };
 enum { debug_steer=1, debug_overtake=2, debug_brake=4 };
-enum { USR_TRB1=1, USR_SC, USR_LS1, USR_LS2, USR_36GP, USR_RS, USR_LP1, USR_MPA1, USR_MPA11, USR_MPA12 };
 
-class Driver {
+class Driver
+{
 public:
-    Driver(int index, const int robot_type);
+    Driver(int index);
     ~Driver();
 
-    void SetBotName(const char *Value);
+    void SetBotName(void* RobotSettings, char* Value);
 
     // Callback functions called from Speed Dreams / TORCS.
     void initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituation *s);
@@ -97,6 +94,38 @@ public:
     double TyreConditionRear();
     double TyreTreadDepthFront();
     double TyreTreadDepthRear();
+
+    // Per robot global data.
+    static int NBBOTS;                           // Nbr of cars
+    double CurrSimTime;                          // Current simulation time
+    static const char* MyBotName;                      // Name of this bot
+    static const char* ROBOT_DIR;                      // Sub path to dll
+    static const char* SECT_PRIV;                      // Private section
+    static const char* DEFAULTCARTYPE;                 // Default car type
+
+    static int RobotType;
+    static bool AdvancedParameters;
+    static bool UseOldSkilling;
+    static bool UseSCSkilling;
+    static bool UseMPA1Skilling;
+    static float SkillingFactor;
+    static bool UseBrakeLimit;
+    static bool UseGPBrakeLimit;
+    static bool UseRacinglineParameters;
+    static bool UseWingControl;
+    static float BrakeLimit;
+    static float BrakeLimitScale;
+    static float BrakeLimitBase;
+    static float SpeedLimitScale;
+    static float SpeedLimitBase;
+    static bool FirstPropagation;
+    static bool Learning;
+
+    static double LengthMargin;                  // Length margin
+    static bool Qualification;                   // Flag qualifying
+
+    int         m_Index;
+    int         m_Extended;
 
     bool    HasABS;
     bool    HasESP;
@@ -163,9 +192,8 @@ private:
 
     float stuckSteering( float steercmd );
 
-    // Per robot global data.
-    const char *robot_name;
-    const char *CarType;
+    char* CarType;                              // Type name of own car
+
     int NoTeamWaiting;
     float TeamWaitTime;
     float truespeed;
@@ -205,6 +233,10 @@ private:
     float lastNSasteer, lastNSksteer;
     float avgaccel_x;
     double wheelz[4];
+
+    char        *m_BotName;                                 // Name of driver
+    const char  *m_TeamName;                                // Name of team
+    int         m_RaceNumber;                               // Race number
 
     tCarElt *car;			// Pointer to tCarElt struct.
     LRaceLine *raceline; // pointer to the raceline instance

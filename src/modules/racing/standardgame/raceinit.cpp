@@ -624,7 +624,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 			   carindex, listindex, elt->_modName, elt->_name, elt->_carName,
 			   elt->_category, elt->_skinName, elt->_skinTargets);
 
-	if ((strncmp(carname.c_str(), "mpa11", 5) == 0) || (strncmp(carname.c_str(), "mpa12", 5) == 0))
+    if ((strncmp(carname.c_str(), "mpa1", 4) == 0))
 	{
 		if (strcmp(subcategory, "long") == 0)
 			carname = carname+"-long";
