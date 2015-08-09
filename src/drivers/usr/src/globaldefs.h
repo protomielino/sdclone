@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file                 : driver.h
-    created              : Thu Dec 20 01:20:19 CET 2002
-    copyright            : (C) 2002-2004 Bernhard Wymann
-    email                : berniw@bluewin.ch
-    version              : $Id$
+    file                 : globaldefs.h
+    created              : Sat Aug 08 21:20:19 CET 2015
+    copyright            : (C) 2015 Xavier Bertaux
+    email                : bertauxx@yahoo.fr
+    version              : $Id: globaldefs.h 5902 2015-03-17 22:44:51Z torcs-ng $
 
  ***************************************************************************/
 
@@ -17,8 +17,40 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef _XMLDEFS_H_
-#define _XMLDEFS_H_
+#ifndef _GLOBALDEFS_H_
+#define _GLOBALDEFS_H_
+
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <string.h>
+#include <math.h>
+#include <time.h>
+
+#include <tgf.h>     // TORCS
+#include <track.h>   // TORCS
+#include <car.h>     // TORCS
+#include <raceman.h> // TORCS
+
+// The "USR" logger instance.
+extern GfLogger* PLogUSR;
+#define LogUSR (*PLogUSR)
+
+#define RTYPE_USR      0                     // Robot type usr
+#define RTYPE_USR_TRB1 1                     // Robot type usr_trb1
+#define RTYPE_USR_SC   2                     // Robot type usr_sc
+#define RTYPE_USR_36GP 3                     // Robot type usr_36GP
+#define RTYPE_USR_MPA1 4					 // Robot type usr_mpa1
+#define RTYPE_USR_MPA11 5                   // Robot type usr_mpa11
+#define RTYPE_USR_MPA12 6                   // Robot type usr_mpa12
+#define RTYPE_USR_LS1  7					 // Robot type usr_ls1
+#define RTYPE_USR_LS2  8					 // Robot type usr_ls2
+#define RTYPE_USR_MP5  9					 // Robot type usr_mp5
+#define RTYPE_USR_LP1  10					 // Robot type usr_lp1
+#define RTYPE_USR_REF  11					 // Robot type usr_ref
+#define RTYPE_USR_SRW  12                    // Robot type usr_srw
+
+static const int MAX_NBBOTS = 100;               // Number of drivers/robots
 
 #define SECT_PRIVATE          "private"
 
