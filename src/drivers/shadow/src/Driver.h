@@ -39,7 +39,6 @@
 #include "LinearRegression.h"
 #include "PtInfo.h"
 #include "Strategy.h"
-
 #include "teammanager.h"
 
 #define SECT_PRIV               "private"
@@ -197,7 +196,7 @@ public:
 
     static int          NBBOTS;                         // Nbr of cars
     double              CurrSimTime;                    // Current simulation time
-    const char          *robot_name;
+    static const char   *robot_name;
     double              Frc;                            // Friction coefficient
     //bool                UseBrakeLimit;                // Enable/disable brakelimit
 

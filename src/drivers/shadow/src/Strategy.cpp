@@ -66,13 +66,13 @@ void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituat
     /* Trivial strategy: fill in as much fuel as required for the whole race, or if the tank is
        too small fill the tank completely. */
     // Load and set parameters.
-    maxFuel = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, (char*)NULL, MAX_FUEL_TANK);
+    maxFuel = (tdble)(GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, (char*)NULL, MAX_FUEL_TANK));
     fuelPerMeter = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_FUELPERMETERS, (char*)NULL, MAX_FUEL_PER_METER);
     fuelPerLap = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_FUELPERLAPS, (char*)NULL, t->length * fuelPerMeter);
     fullfuel = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_FULL_FUEL, (char*)NULL, 0.0);
     fuel_Strat = (int)GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_PITSTRAT, (char*)NULL, 0.0);
-    test_Pitstop = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_PITSTOP, (char*)NULL, 0.0);
-    test_qualifTime = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_CHKQUALIF, (char*)NULL, 0.0);
+    test_Pitstop = (bool)(GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_PITSTOP, (char*)NULL, 0.0));
+    test_qualifTime = (bool)(GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_CHKQUALIF, (char*)NULL, 0.0));
     strategy_verbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_VERBOSE, (char*)NULL, 0.0);
 
     if ( fuel_Strat < 1 )
@@ -368,7 +368,7 @@ float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
     fuelToEnd = MIN(getRefuel1(lapsToEnd), getRefuel2(lapsToEnd));
 
     //m_remainingstops = int(floor(fuelToEnd / car->_tank));
-    m_remainingstops = fabs(fuelToEnd / car->_tank);
+    m_remainingstops = (int)(fabs(fuelToEnd / car->_tank));
     int num_remStops = m_remainingstops + 1;
     m_fuelperstint = car->_tank - car->_fuel;
     fuel = m_fuelperstint * 0.90;
@@ -483,7 +483,7 @@ float SimpleStrategy::calcFuel(double totalFuel)
 
     nb_pitstop = 1 + fabs(totalFuel / maxFuel);
     m_lastfuel = totalFuel / nb_pitstop;  //Max refuel per pit stop
-    nb_laps = 1 + floor( m_lastfuel / fuelPerLap);
+    nb_laps = (int)(1 + floor( m_lastfuel / fuelPerLap));
     fuelAtStart = nb_laps * fuelPerLap;
 
     return fuelAtStart;

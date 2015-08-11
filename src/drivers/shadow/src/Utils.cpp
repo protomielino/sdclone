@@ -33,13 +33,7 @@ Utils::~Utils()
 {
 }
 
-double Utils::ClosestPtOnLine(
-	double ptx,
-	double pty,
-	double px,
-	double py,
-	double vx,
-	double vy )
+double Utils::ClosestPtOnLine( double ptx, double pty, double px, double py, double vx, double vy )
 {
 	// P from AB
 	// Q is closest pt on AB
@@ -58,6 +52,7 @@ double Utils::ClosestPtOnLine(
 
 	double	num = pax * vx + pay * vy;
 	double	t = num / den;
+
 	return t;
 }
 
@@ -70,7 +65,7 @@ double Utils::DistPtFromLine( double ptx, double pty, double px, double py, doub
 	return dist;
 }
 
-bool	Utils::LineCrossesLine(	double p0x, double p0y, double v0x, double v0y, double p1x, double p1y, double v1x, double v1y, double&	t )
+bool Utils::LineCrossesLine( double p0x, double p0y, double v0x, double v0y, double p1x, double p1y, double v1x, double v1y, double& t )
 {
 //	double	denom = lv0 % lv1;
 	double	denom = v0x * v1y - v0y * v1x;
@@ -85,36 +80,17 @@ bool	Utils::LineCrossesLine(	double p0x, double p0y, double v0x, double v0y, dou
 	return true;
 }
 
-bool Utils::LineCrossesLine(
-	const Vec2d&	p0,
-	const Vec2d&	v0,
-	const Vec2d&	p1,
-	const Vec2d&	v1,
-
-	double&			t )
+bool Utils::LineCrossesLine( const Vec2d& p0, const Vec2d& v0, const Vec2d& p1, const Vec2d& v1, double& t )
 {
 	return LineCrossesLine(p0.x, p0.y, v0.x, v0.y, p1.x, p1.y, v1.x, v1.y, t);
 }
 
-bool Utils::LineCrossesLineXY(
-	const Vec3d&	p0,
-	const Vec3d&	v0,
-	const Vec3d&	p1,
-	const Vec3d&	v1,
-
-	double&			t )
+bool Utils::LineCrossesLineXY(const Vec3d& p0, const Vec3d& v0, const Vec3d& p1, const Vec3d& v1, double& t )
 {
 	return LineCrossesLine(p0.x, p0.y, v0.x, v0.y, p1.x, p1.y, v1.x, v1.y, t);
 }
 
-bool Utils::LineCrossesLine(
-	const Vec2d&	p0,
-	const Vec2d&	v0,
-	const Vec2d&	p1,
-	const Vec2d&	v1,
-
-	double&			t0,
-	double&			t1 )
+bool Utils::LineCrossesLine(const Vec2d& p0, const Vec2d& v0, const Vec2d& p1, const Vec2d& v1, double& t0,	double& t1 )
 {
 	double	denom = v0.x * v1.y - v0.y * v1.x;
 	if( denom == 0 )
@@ -129,10 +105,7 @@ bool Utils::LineCrossesLine(
 	return true;
 }
 
-double Utils::CalcCurvature(
-	double p1x, double p1y,
-	double p2x, double p2y,
-	double p3x, double p3y )
+double Utils::CalcCurvature( double p1x, double p1y, double p2x, double p2y, double p3x, double p3y )
 {
 	double	px = p1x - p2x;
 	double	py = p1y - p2y;
@@ -141,10 +114,8 @@ double Utils::CalcCurvature(
 	double	sx = p3x - p1x;
 	double	sy = p3y - p1y;
 
-	double	K = (2 * (px * qy - py * qx)) /
-						 sqrt((px * px + py * py) *
-							  (qx * qx + qy * qy) *
-							  (sx * sx + sy * sy));
+	double	K = (2 * (px * qy - py * qx)) / sqrt((px * px + py * py) * (qx * qx + qy * qy) * (sx * sx + sy * sy));
+
 	return K;
 }
 
@@ -159,6 +130,7 @@ double	Utils::CalcCurvatureTan( const Vec2d& p1, const Vec2d& tangent, const Vec
 	Vec2d	u = VecNorm(p2 - p1);
 	Vec2d	q = (p1 + p2) * 0.5;
 	double	radius;
+
 	if( !LineCrossesLine(p1, v, q, u, radius) )
 		return 0;
 	else
@@ -175,10 +147,11 @@ double	Utils::CalcCurvatureZ( const Vec3d& p1, const Vec3d& p2, const Vec3d& p3 
 	double	x1 = 0;
 	double	x2 = (p1 - p2).len();
 	double	x3 = x2 + (p2 - p3).len();
+
 	return CalcCurvature(x1, p1.z, x2, p2.z, x3, p3.z);
 }
 
-bool	Utils::CalcTangent( const Vec2d& p1, const Vec2d& p2, const Vec2d& p3, Vec2d& tangent )
+bool Utils::CalcTangent( const Vec2d& p1, const Vec2d& p2, const Vec2d& p3, Vec2d& tangent )
 {
 	Vec2d	mid1  = (p1 + p2) * 0.5;
 	Vec2d	norm1 = VecNorm(p2 - p1);
@@ -191,6 +164,7 @@ bool	Utils::CalcTangent( const Vec2d& p1, const Vec2d& p2, const Vec2d& p3, Vec2
 		if( p1 != p3 )
 		{
 			tangent = VecUnit(p3 - p1);
+
 			return true;
 		}
 
@@ -201,8 +175,10 @@ bool	Utils::CalcTangent( const Vec2d& p1, const Vec2d& p2, const Vec2d& p3, Vec2
 //	tangent = p2 - centre;
 //	tangent = VecNorm(p2 - centre);
 	tangent = VecUnit(VecNorm(p2 - centre));
+
 	if( norm1 * (p3 - p1) < 0 )
 		tangent = -tangent;
+
 	return true;
 }
 
@@ -220,14 +196,15 @@ double Utils::InterpCurvatureRad( double k0, double k1, double t )
 	// k = (k0 * k1) / (k1 + (k0 - k1) * t)
 	//
 	double	den = k1 + (k0 - k1) * t;
+
 	if( fabs(den) < 0.000001 )
 		den = 0.000001;
+
 	return k0 * k1 / den;
 }
 
 double Utils::InterpCurvature( double k0, double k1, double t )
 {
-//	return InterpCurvatureRad(k0, k1, t);
 	return InterpCurvatureLin(k0, k1, t);
 }
 

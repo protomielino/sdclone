@@ -55,6 +55,7 @@ public:
 
     double  BRAKESCALE;     // Scaling of Brake
     double  BRAKEFORCE;     // Brake force max
+	float	BRAKELIMIT;		// BrakeLimit
 
     double	CA;             // aerodynamic downforce constant -- total.
     double	CA_FW;          // aerodynamic downforce constant -- front wing.

@@ -47,6 +47,7 @@
 //int TDriver::NBBOTS = MAX_NBBOTS;                   // Nbr of drivers/robots
 //const char* TDriver::ROBOT_DIR = "drivers/shadow";  // Sub path to dll
 //const char* TDriver::DEFAULTCARTYPE  = "car1-trb1"; // Default car type
+const char* TDriver::robot_name="shadow_trb1";
 int   TDriver::RobotType = 0;
 bool  TDriver::AdvancedParameters = false;         // Advanced parameters
 bool  TDriver::UseOldSkilling = false;             // Use old skilling

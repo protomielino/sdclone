@@ -38,7 +38,7 @@ private:
 		PIT_BEFORE,
 		PIT_ENTER,
 		PIT_ASKED,
-		PIT_EXIT,
+		PIT_EXIT
 	};
 
 private:
@@ -46,7 +46,6 @@ private:
 	const PitPath&	m_pitPath;
 
 	int				m_state;
-
 	double			m_lastFuel;
 	double			m_totalFuel;
 	double			m_lastDamage;

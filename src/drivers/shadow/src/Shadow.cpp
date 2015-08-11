@@ -117,8 +117,7 @@ static void setRobotName(const char *name)
 void* getFileHandle()
 {
     // First we try to use the directories relative to the installation path
-    snprintf(pathBuffer, BUFSIZE, "%sdrivers/%s/%s.xml",
-             GetLocalDir(), robot_name, robot_name);
+    snprintf(pathBuffer, BUFSIZE, "%sdrivers/%s/%s.xml", GetLocalDir(), robot_name, robot_name);
 
     // Test local installation path
     void *robot_settings = GfParmReadFile(xml_path, GFPARM_RMODE_STD);
@@ -126,14 +125,12 @@ void* getFileHandle()
     if (!robot_settings)
     {
         // If not found, use global installation path
-        snprintf(pathBuffer, BUFSIZE, "%sdrivers/%s/%s.xml",
-                 GetDataDir(), robot_name, robot_name);
+        snprintf(pathBuffer, BUFSIZE, "%sdrivers/%s/%s.xml", GetDataDir(), robot_name, robot_name);
         robot_settings = GfParmReadFile(xml_path, GFPARM_RMODE_STD);
     }
 
     return robot_settings;
 }
-
 
 ////////////////////////////////////////////////////////////
 // Carset specific init functions
@@ -208,7 +205,7 @@ void SetupSHADOW_mpa1()
 // Schismatic init for shadow_mpa11
 void SetupSHADOW_mpa11()
 {
-    // Add shadow_mpa1 specific initialization here
+    // Add shadow_mpa11 specific initialization here
     robot_type = SHADOW_MPA11;
 };
 
@@ -413,12 +410,10 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
     {
         char section_buf[BUFSIZE];
         const char *section = section_buf;
-        snprintf(section_buf, BUFSIZE, "%s/%s/%d",
-                 ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
+        snprintf(section_buf, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
 
         // Try to get first driver from index 0
-        const char *driver_name = GfParmGetStrNC(robot_settings, section,
-                                                 ROB_ATTR_NAME, undefined);
+        const char *driver_name = GfParmGetStrNC(robot_settings, section, ROB_ATTR_NAME, undefined);
 
         // Check whether index 0 is used as start index
         if (strncmp(driver_name, undefined, strlen(undefined)) != 0)
@@ -441,21 +436,17 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
             memset(&DriverDescs[i * DRIVERLEN], 0, DRIVERLEN);
             memset(&CarNames[i * DRIVERLEN], 0, DRIVERLEN);
 
-            snprintf(section_buf, BUFSIZE, "%s/%s/%d",
-                     ROB_SECT_ROBOTS, ROB_LIST_INDEX, i + indexOffset);
-            const char *driver_name = GfParmGetStr(robot_settings, section,
-                                                   ROB_ATTR_NAME, undefined);
+            snprintf(section_buf, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i + indexOffset);
+            const char *driver_name = GfParmGetStr(robot_settings, section, ROB_ATTR_NAME, undefined);
 
             if (strncmp(driver_name, undefined, strlen(undefined)) != 0)
             {
                 // This driver is defined in robot's xml-file
                 strncpy(&DriverNames[i * DRIVERLEN], driver_name, DRIVERLEN - 1);
-                const char *driver_desc = GfParmGetStr(robot_settings, section,
-                                                       ROB_ATTR_DESC, defaultBotDesc[i]);
+                const char *driver_desc = GfParmGetStr(robot_settings, section, ROB_ATTR_DESC, defaultBotDesc[i]);
                 strncpy(&DriverDescs[i * DRIVERLEN], driver_desc, DRIVERLEN - 1);
 
-                const char *car_name =
-                        GfParmGetStr(robot_settings, section, ROB_ATTR_CAR, "nocar");
+                const char *car_name = GfParmGetStr(robot_settings, section, ROB_ATTR_CAR, "nocar");
                 strncpy(&CarNames[i * DRIVERLEN], car_name, DRIVERLEN - 1);
 
                 NBBOTS = i + 1;
@@ -471,9 +462,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
     }
     LogSHADOW.debug("NBBOTS: %d (of %d)\n", NBBOTS, MAXNBBOTS);
 
-    if (strncmp(robot_name, "shadow_trb1", strlen("shadow_trb1")) == 0)
-        SetupSHADOW_trb1();
-    else if (strncmp(robot_name,"shadow_sc", strlen("shadow_sc")) == 0)
+	if (strncmp(robot_name,"shadow_sc", strlen("shadow_sc")) == 0)
         SetupSHADOW_sc();
     else if (strncmp(robot_name,"shadow_srw", strlen("shadow_srw")) == 0)
         SetupSHADOW_srw();
@@ -487,12 +476,14 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
         SetupSHADOW_rs();
     else if (strncmp(robot_name,"shadow_lp1", strlen("shadow_lp1")) == 0)
         SetupSHADOW_lp1();
-    else if (strncmp(robot_name,"shadow_mpa1", strlen("shadow_mpa1")) == 0)
-        SetupSHADOW_mpa1();
     else if (strncmp(robot_name,"shadow_mpa11", strlen("shadow_mpa11")) == 0)
         SetupSHADOW_mpa11();
 	else if (strncmp(robot_name,"shadow_mpa12", strlen("shadow_mpa12")) == 0)
         SetupSHADOW_mpa12();
+	else if (strncmp(robot_name, "shadow_mpa1", strlen("shadow_mpa1")) == 0)
+        SetupSHADOW_mpa1();
+	else 
+        SetupSHADOW_trb1();
 
 
     // Set max nb of interfaces to return.
@@ -621,19 +612,18 @@ extern "C" int shadow(tModInfo *modInfo)
         char SectionBuf[BUFSIZE];
         char *Section = SectionBuf;
 
-        snprintf(SectionBuf, BUFSIZE, "%s/%s/%d",
-                 ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
+        snprintf(SectionBuf, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
 
         for (int i = 0; i < NBBOTS; ++i)
         {
-            const char *DriverName = GfParmGetStr(robot_settings, Section,
-                                                  ROB_ATTR_NAME, defaultBotName[i]);
+            const char *DriverName = GfParmGetStr(robot_settings, Section, ROB_ATTR_NAME, defaultBotName[i]);
             strncpy(&DriverNames[i * DRIVERLEN], DriverName, DRIVERLEN - 1);
-            const char *DriverDesc = GfParmGetStr(robot_settings, Section,
-                                                  ROB_ATTR_DESC, defaultBotDesc[i]);
+
+            const char *DriverDesc = GfParmGetStr(robot_settings, Section, ROB_ATTR_DESC, defaultBotDesc[i]);
             strncpy(&DriverDescs[i * DRIVERLEN], DriverDesc, DRIVERLEN - 1);
         }
     }
+
     return moduleInitialize(modInfo);
 }
 

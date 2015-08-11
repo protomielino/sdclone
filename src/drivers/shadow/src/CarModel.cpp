@@ -20,7 +20,7 @@
 #include "CarModel.h"
 #include "Quadratic.h"
 #include "Utils.h"
-#include "Driver.h"
+//#include "Driver.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -45,6 +45,7 @@ CarModel::CarModel()
 
     BRAKESCALE(0),
     BRAKEFORCE(0),
+	BRAKELIMIT(0.0),
 
 	CA(0),
 	CA_FW(0),
@@ -288,11 +289,11 @@ double	CarModel::CalcBreaking(double k0, double kz0, double k1, double kz1, doub
 
         acc = BRAKESCALE * Ftanroad / (MASS * ( 3 + SKILL) / 4);
 
-		if (TDriver::UseBrakeLimit)
+		if (BRAKELIMIT)
 		{
 			double Radius = 1.0 / fabs(Kz);
 			double factor = MIN(1.0,MAX(0.39, (Radius - 190.0) / 100.0));
-			acc = MAX(acc, TDriver::BrakeLimit * factor);
+			acc = MAX(acc, BRAKELIMIT * factor);
 		}
 
 		double	inner = MX(0, v * v - 2 * acc * dist );
