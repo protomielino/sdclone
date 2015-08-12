@@ -431,7 +431,6 @@ private:
 
     double          m_FuelNeeded;
     double          m_RepairNeeded;
-
     //LinearAttractor	m_avoidX;
     //LinearAttractor	m_avoidY;
 

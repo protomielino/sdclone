@@ -497,7 +497,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     LogSHADOW.debug("Load track settings ....\n");
 
 	// get the private parameters now.
-    m_ScaleMuRain = GfParmGetNum(hCarParm, SECT_PRIV, PRV_RAIN_MU, NULL, m_ScaleMuRain);
+    m_ScaleMuRain = (double)(GfParmGetNum(hCarParm, SECT_PRIV, PRV_RAIN_MU, NULL, m_ScaleMuRain));
     LogSHADOW.info("#Scale Mu Rain: %g\n", m_ScaleMuRain);
 
 	m_cm.AERO = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_AERO_MOD, 0, 0);
@@ -510,8 +510,8 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 
 	m_cm.KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_KZ_SCALE, NULL, 0.43f);
     m_cm.BUMP_FACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR, NULL, 1.0);
-    m_cm.NEEDSINLONG = GfParmGetNum(hCarParm, SECT_PRIV, PRV_NEED_SIN, NULL, 0);
-    m_cm.USEDACCEXIT = GfParmGetNum(hCarParm, SECT_PRIV, PRV_USED_ACC, NULL, 0);
+    m_cm.NEEDSINLONG = (bool)(GfParmGetNum(hCarParm, SECT_PRIV, PRV_NEED_SIN, NULL, 0));
+    m_cm.USEDACCEXIT = (bool)(GfParmGetNum(hCarParm, SECT_PRIV, PRV_USED_ACC, NULL, 0));
     m_cm.BRAKESCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BRAKESCALE, NULL, 1.0);
 
 	FACTORS.RemoveAll();

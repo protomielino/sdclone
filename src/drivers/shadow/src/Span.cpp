@@ -54,7 +54,7 @@ bool Span::Overlaps( const Span& span ) const
 
 	double	newA = MX(a, span.a);
 	double	newB = MN(b, span.b);
-	return a < b;
+	return newA < newB;
 }
 
 bool Span::Contains( const Span& span ) const
