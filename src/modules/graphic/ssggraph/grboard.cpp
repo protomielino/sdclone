@@ -116,6 +116,7 @@ cGrBoard::loadDefaults(const tCarElt *curCar)
   leaderNb  = (int)GfParmGetNum(grHandle, path, GR_ATT_NBLEADER, NULL, 10);
   counterFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_COUNTER, NULL, 1);
   GFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_GGRAPH, NULL, 1);
+  dashboardFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_DASHBOARD, NULL, 0);
   arcadeFlag  = (int)GfParmGetNum(grHandle, path, GR_ATT_ARCADE, NULL, 0);
   boardWidth  = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARDWIDTH, NULL, 100);
   speedoRise  = (int)GfParmGetNum(grHandle, path, GR_ATT_SPEEDORISE, NULL, 0);
@@ -133,6 +134,7 @@ cGrBoard::loadDefaults(const tCarElt *curCar)
     leaderNb  = (int)GfParmGetNum(grHandle, path, GR_ATT_NBLEADER, NULL, leaderNb);
     counterFlag   = (int)GfParmGetNum(grHandle, path, GR_ATT_COUNTER, NULL, counterFlag);
     GFlag   = (int)GfParmGetNum(grHandle, path, GR_ATT_GGRAPH, NULL, GFlag);
+    dashboardFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_DASHBOARD, NULL, dashboardFlag);
     arcadeFlag  = (int)GfParmGetNum(grHandle, path, GR_ATT_ARCADE, NULL, arcadeFlag);
     boardWidth  = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARDWIDTH, NULL, boardWidth);
     speedoRise  = (int)GfParmGetNum(grHandle, path, GR_ATT_SPEEDORISE, NULL, speedoRise);
@@ -188,6 +190,11 @@ cGrBoard::selectBoard(int val)
     case 5:
       arcadeFlag = 1 - arcadeFlag;
       GfParmSetNum(grHandle, path, GR_ATT_ARCADE, (char*)NULL, (tdble)arcadeFlag);
+      break;
+    case 6:
+      //dashboardFlag = 1 - dashboardFlag;
+      dashboardFlag = (dashboardFlag + 1) % 5;
+      GfParmSetNum(grHandle, path, GR_ATT_DASHBOARD, (char*)NULL, (tdble)dashboardFlag);
       break;
   }
   GfParmWriteFile(NULL, grHandle, "graph");
@@ -1280,6 +1287,8 @@ void cGrBoard::refreshBoard(tSituation *s, const cGrFrameInfo* frameInfo,
       grDispLeaderBoard(s);
     if (counterFlag)
       grDispCounterBoard2();
+    if (dashboardFlag)
+      grDispDashboard();
   }
 
   trackMap->display(currCar, s, 0, 0, rightAnchor, TOP_ANCHOR);
@@ -1759,6 +1768,61 @@ cGrBoard::grGenerateLeaderBoardEntry(const tCarElt *car, const tSituation* s,
   return buf;
 }
 
+
+/**
+ * Display the dashboard,
+ * either the immediateely changeable parameters,
+ * or the desired changes during the next pit stop.
+ */
+void
+cGrBoard::grDispDashboard()
+{
+  char buf1[17], buf2[9], buf3[9];
+
+  //TEST: for a quick test of the look, replace this later
+  switch (dashboardFlag) {
+    case 1:
+    case 3:
+      snprintf(buf1, sizeof(buf1), "%s", "F/R Brake Rep.");
+      snprintf(buf2, sizeof(buf2), "%.1f%%", 53.02);
+      break;
+    case 2:
+    case 4:
+      snprintf(buf1, sizeof(buf1), "%s", "Fuel");
+      snprintf(buf2, sizeof(buf2), "%.1fl", car_->_fuel);
+      snprintf(buf3, sizeof(buf3), "%.1fl", car_->_tank);
+  }
+  //end of TEST
+
+  int dym = GfuiFontHeight(GFUI_FONT_MEDIUM_C);
+  int y1;
+  int dx = GfuiFontWidth(GFUI_FONT_LARGE_C, "0");
+  int x1 = (leftAnchor + rightAnchor) / 2 - 16 * dx;
+  int dy = GfuiFontHeight(GFUI_FONT_LARGE_C);
+
+  if (dashboardFlag > 2) {
+    y1  = TOP_ANCHOR - dym; //bottom of scrolling line leaderboard
+  } else {
+    y1 = 128 + dy; //in top of speedo
+  }
+  grSetupDrawingArea(x1, y1, x1 + 32 * dx, y1 - dy);
+  
+  // Write information
+  if (dashboardFlag % 2) {//TEST condition
+    GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
+    GfuiDrawString(buf2, danger_color_, GFUI_FONT_LARGE_C, x1 + 16 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
+  } else {
+    GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
+    GfuiDrawString(buf2, emphasized_color_, GFUI_FONT_LARGE_C, x1 + 16 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
+    GfuiDrawString(buf3, ahead_color_, GFUI_FONT_LARGE_C, x1 + 24 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
+  }
+  /*
+   * normal_color_: white - text
+   * danger_color_: red - immediately changing value
+   * emphasized_color: yellow - value required at pit stop
+   * ahead_color: cyan ? ok_color: green - actual value
+   */
+}
 
 /**
  * Set up a drawing area to put textual info there.

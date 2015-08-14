@@ -41,6 +41,7 @@ class cGrBoard
     int leaderNb;
     int counterFlag;
     int GFlag;
+    int dashboardFlag;
     int arcadeFlag;
     int boardWidth;
     int leftAnchor;
@@ -71,6 +72,8 @@ class cGrBoard
     void grDispCounterBoard2();
     void grDispLeaderBoardScroll(const tSituation *s);
     void grDispLeaderBoardScrollLine(const tSituation *s);
+    
+    void grDispDashboard();
 
     void grDispArcade(const tSituation *s);
     std::string grGenerateLeaderBoardEntry(const tCarElt *car, const tSituation *s,
