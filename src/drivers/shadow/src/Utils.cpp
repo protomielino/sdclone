@@ -114,7 +114,11 @@ double Utils::CalcCurvature( double p1x, double p1y, double p2x, double p2y, dou
 	double	sx = p3x - p1x;
 	double	sy = p3y - p1y;
 
-	double	K = (2 * (px * qy - py * qx)) / sqrt((px * px + py * py) * (qx * qx + qy * qy) * (sx * sx + sy * sy));
+	double divider = sqrt((px * px + py * py) * (qx * qx + qy * qy) * (sx * sx + sy * sy));
+	if (divider == 0.0)
+		return 0.0;
+
+	double	K = (2 * (px * qy - py * qx)) / divider;
 
 	return K;
 }
