@@ -1,0 +1,3 @@
+Get rid of opengl headers zip and download them directly
+
+Factor out links and hashes
