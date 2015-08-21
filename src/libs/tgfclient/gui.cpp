@@ -1073,7 +1073,6 @@ GfuiAddKey(void *scr, int key, int modifier, const char *descr, void *userData,
 	}
 }
 
-#ifdef STARTPAUSED
 /** Remove a Keyboard shortcut from the screen 
 	 @ingroup	gui
 	 @param	scr		Target screen
@@ -1147,7 +1146,7 @@ GfuiRemoveKey(void *scr, int key, int modifier, const char *descr)
 	}
 	return bFound;
 }
-#endif
+
 /** Enable/disable the key auto-repeat for the given screen.
     @ingroup	screen
     @param	scr		Screen

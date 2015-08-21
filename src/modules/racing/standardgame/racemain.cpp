@@ -620,7 +620,6 @@ RePreRace(void)
 	return RM_SYNC | RM_NEXT_STEP;
 }
 
-#ifdef STARTPAUSED
 /* return state mode */
 int
 RePreRacePause(void)
@@ -655,7 +654,6 @@ ReStopPreracePause()
 	ReSituation::self().setRaceMessage("", -1/*always*/, /*big=*/true);
 	::ReStart();
 }
-#endif
 
 /* return state mode */
 int
@@ -1177,7 +1175,6 @@ ReCleanupStandardgame()
 	}
 }
 
-#if defined(STARTPAUSED) || defined(COOLDOWN)
 bool 
 ReSessionHasHuman()
 {
@@ -1193,8 +1190,7 @@ ReSessionHasHuman()
 	}
 	return hasHuman;
 }
-#endif
-#ifdef COOLDOWN
+
 int
 ReRaceCooldown()
 {
@@ -1226,5 +1222,3 @@ ReStopCooldown()
 {
 	ReStateApply((void*)RE_STATE_RACE_END);
 }
-
-#endif

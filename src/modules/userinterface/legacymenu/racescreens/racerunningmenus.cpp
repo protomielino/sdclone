@@ -180,9 +180,7 @@ static bool rmRacePaused = false;
 // Flag to know if the menu state has been changed (and thus needs a redraw+redisplay).
 static bool rmbMenuChanged = false;
 
-#ifdef STARTPAUSED
 bool rmPreRacePause = false;
-#endif
 
 struct RmMovieCapture
 {
@@ -324,14 +322,10 @@ rmRedisplay()
 #endif
 	
 	// Exec the "slow resume race" manager, if needed.
-#ifdef STARTPAUSED
 	if (!rmPreRacePause)
 	{
 		rmProgressiveTimeModifier.execute();
 	}
-#else
-	rmProgressiveTimeModifier.execute();
-#endif
 
 	// Redraw the graphics part of the GUI if requested.
 	const bool bUpdateGraphics =
@@ -399,11 +393,7 @@ rmScreenActivate(void * /* dummy */)
     GfuiApp().eventLoop().setRedisplayCB(rmRedisplay);
 
 	// If not paused ...
-#ifdef STARTPAUSED
-	 if ((!rmRacePaused)&&(!rmPreRacePause))
-#else
-	 if (!rmRacePaused)
-#endif
+	if ((!rmRacePaused)&&(!rmPreRacePause))
 	{
 		// Reset normal sound volume.
 		if (LegacyMenu::self().soundEngine())
@@ -423,7 +413,6 @@ rmScreenActivate(void * /* dummy */)
 static void
 rmRacePause(void * /* vboard */)
 {
-#ifdef STARTPAUSED
    // Pause is disabled during Pre Race Pause
    // as the simulation is already Paused
    if (!rmPreRacePause)
@@ -432,12 +421,6 @@ rmRacePause(void * /* vboard */)
       {
          if (LegacyMenu::self().soundEngine())
             LegacyMenu::self().soundEngine()->mute(false);
-#else
-    if (rmRacePaused)
-	{
-		if (LegacyMenu::self().soundEngine())
-			LegacyMenu::self().soundEngine()->mute(false);
-#endif
 
 		LmRaceEngine().start();
 
@@ -472,9 +455,7 @@ rmRacePause(void * /* vboard */)
 	
 	// The menu changed.
 	rmbMenuChanged = true;
-#ifdef STARTPAUSED
-}
-#endif
+	}
 }
 
 static void
@@ -616,9 +597,7 @@ RmScreenInit()
     // We are starting "unpaused".
     GfuiVisibilitySet(rmScreenHandle, rmPauseId, GFUI_INVISIBLE);
 	rmRacePaused = false;
-#ifdef STARTPAUSED
 	rmPreRacePause = false;
-#endif
 
 	// Re-initialize the progressive time modifier,
 	// in case the race was exited while it was running.
@@ -664,7 +643,6 @@ RmShutdownReUpdateStateHook()
 	pvUpdateStateHookHandle = 0;
 }
 
-#ifdef STARTPAUSED
 static void 
 RmReadyToRace(void * /* dummy */)
 {
@@ -709,9 +687,7 @@ RmAddPreRacePauseItems()
       }
    }
 }
-#endif
 
-#if COOLDOWN
 static void 
 RmResultShow(void * /* dummy */)
 {
@@ -730,7 +706,6 @@ RmAddCooldownItems()
       rmbMenuChanged = true;
    }
 }
-#endif
 
 /**************************************************************************
  * Result only screen (blind mode)

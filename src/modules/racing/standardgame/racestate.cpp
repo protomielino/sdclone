@@ -94,16 +94,11 @@ ReStateManage(void)
 				mode = ReNetworkWaitReady();
 				if (mode & RM_NEXT_STEP) {
 					// Not an online race, or else all online players ready
-#ifdef STARTPAUSED
 					ReInfo->_reState = RE_STATE_PRE_RACE_PAUSE;
 					GfLogInfo("%s now in PRE RACE PAUSE state\n", ReInfo->_reName);
-#else
-					ReInfo->_reState = RE_STATE_RACE;
-					GfLogInfo("%s now in RACE state\n", ReInfo->_reName);
-#endif
 				}
 				break;
-#ifdef STARTPAUSED
+
 			case RE_STATE_PRE_RACE_PAUSE:
 				mode = RePreRacePause();
 				if (mode & RM_NEXT_STEP) {
@@ -113,13 +108,11 @@ ReStateManage(void)
 					GfLogInfo("%s now in RACE state\n", ReInfo->_reName);
 				}
 				break;
-#endif
 
 			case RE_STATE_RACE:
 				mode = ReUpdate();
 				if (ReInfo->s->_raceState == RM_RACE_ENDED) {
 					// Race is finished
-#if COOLDOWN
 					mode = ReRaceCooldown();
 					if (mode & RM_NEXT_STEP) {
 						ReInfo->_reState = RE_STATE_RACE_END;
@@ -128,16 +121,12 @@ ReStateManage(void)
 						ReInfo->_reState = RE_STATE_RACE_COOLDOWN;
 						GfLogInfo("%s now in COOLDOWN state\n", ReInfo->_reName);
 					}
-#else
-					ReInfo->_reState = RE_STATE_RACE_END;
-#endif
 				} else if (mode & RM_END_RACE) {
 					// Race was interrupted (paused) by the player
 					ReInfo->_reState = RE_STATE_RACE_STOP;
 				}
 				break;
 
-#if COOLDOWN
 			case RE_STATE_RACE_COOLDOWN:
 				{
 					// Player is on victory lap or joy riding
@@ -146,7 +135,6 @@ ReStateManage(void)
 					mode = ReUpdate();
 				}
 				break;
-#endif
 
 			case RE_STATE_RACE_STOP:
 				GfLogInfo("%s now in RACE_STOP state\n", ReInfo->_reName);

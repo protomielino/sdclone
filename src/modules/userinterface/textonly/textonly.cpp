@@ -195,7 +195,6 @@ void TextOnlyUI::updateRaceEngine()
     ToRaceEngine().updateState();
 }
 
-#ifdef STARTPAUSED
 bool TextOnlyUI::onRaceStartingPaused()
 {
 	GfLogDebug("TextOnlyUI::onRaceStartingPaused()\n");
@@ -203,7 +202,6 @@ bool TextOnlyUI::onRaceStartingPaused()
 	// Tell the race engine that Pre-race Pause is not supported
 	return false;
 }
-#endif
 
 void TextOnlyUI::onRaceStarted()
 {
@@ -247,7 +245,6 @@ void TextOnlyUI::onRaceFinishing()
 	GfApp().eventLoop().setRecomputeCB(0);
 }
 
-#if COOLDOWN
 bool TextOnlyUI::onRaceCooldownStarting()
 {
 	GfLogDebug("TextOnlyUI::onRaceCooldownStarting()\n");
@@ -255,8 +252,6 @@ bool TextOnlyUI::onRaceCooldownStarting()
 	// Tell the race engine that Cooldown not supported
 	return false;
 }
-#endif
-
 
 bool TextOnlyUI::onRaceFinished(bool bEndOfSession)
 {

@@ -303,10 +303,8 @@ TGFCLIENT_API void GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction);
 TGFCLIENT_API void GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction);
 TGFCLIENT_API void GfuiInitWindowPositionAndSize(int x, int y, int w, int h);
 
-#ifdef STARTPAUSED
 TGFCLIENT_API bool GfuiRemoveKey(void *scr, int key, const char *descr);
 TGFCLIENT_API bool GfuiRemoveKey(void *scr, int key, int modifier, const char *descr);
-#endif
 
 TGFCLIENT_API void GfuiRedraw(void);
 TGFCLIENT_API void GfuiSwapBuffers(void);

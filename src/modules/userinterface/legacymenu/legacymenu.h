@@ -85,12 +85,8 @@ public:
 	virtual bool onRaceEventFinished(bool bMultiEvent, bool careerNonHumanGroup);
 	virtual void onOptimizationInitializing();
 
-#ifdef STARTPAUSED
 	virtual bool onRaceStartingPaused();
-#endif
-#if COOLDOWN
 	virtual bool onRaceCooldownStarting();
-#endif
 	
 	// Loading messages management.
 	virtual void addLoadingMessage(const char* pszText);

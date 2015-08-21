@@ -396,7 +396,6 @@ void LegacyMenu::onRaceSimulationReady()
     }
 }
 
-#ifdef STARTPAUSED
 bool LegacyMenu::onRaceStartingPaused(){
    GfLogDebug("LegacyMenu::onRaceStartingPaused()\n");
 
@@ -417,7 +416,6 @@ bool LegacyMenu::onRaceStartingPaused(){
    // Tell the race engine if Prerace Pause is enabled
    return preracePauseEnabled;
 }
-#endif
 
 void LegacyMenu::onRaceStarted()
 {
@@ -447,7 +445,6 @@ void LegacyMenu::onRaceInterrupted() {
     ::RmStopRaceMenu();
 }
 
-#if COOLDOWN
 bool LegacyMenu::onRaceCooldownStarting(){
 
    bool cooldownEnabled = false;
@@ -467,7 +464,6 @@ bool LegacyMenu::onRaceCooldownStarting(){
    // Tell the race engine if Cooldown is enabled
    return cooldownEnabled;
 }
-#endif
 
 void LegacyMenu::onRaceFinishing()
 {
