@@ -210,6 +210,7 @@ SimCarConfig(tCar *car)
 		for (i = 0; i < 2; i++) {
 			car->wing[i].staticPos.x -= car->statGC.x;
 			car->wing[i].staticPos.y -= car->statGC.y;
+			car->wing[i].staticPos.z -= car->statGC.z;
 		}
 	}
 }
