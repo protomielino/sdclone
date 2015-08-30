@@ -214,22 +214,6 @@ void PlibSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgVec
 	sched->update();
 }
 
-
-
-
-
-int sortSndPriority(const void* a, const void* b) 
-{
-	SoundPri* A = (SoundPri*) a;
-	SoundPri* B = (SoundPri*) b;
-	if (A->a > B->a) {
-		return -1;
-	} else {
-		return 1;
-	}
-}
-
-
 void PlibSoundInterface::setMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap)
 {
 	int id = smap->id;

@@ -28,7 +28,16 @@
 
 const int OpenalSoundInterface::OSI_MIN_DYNAMIC_SOURCES = 4;
 
-
+int sortSndPriority(const void* a, const void* b) 
+{
+	SoundPri* A = (SoundPri*) a;
+	SoundPri* B = (SoundPri*) b;
+	if (A->a > B->a) {
+		return -1;
+	} else {
+		return 1;
+	}
+}
 
 OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels)
 : SoundInterface(sampling_rate, n_channels)
