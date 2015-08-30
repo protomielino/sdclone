@@ -40,7 +40,7 @@ version              : $Id$
 #include <set>
 #include <map>
 
-#ifdef __APPLE__
+#if defined(__APPLE__) && !defined(USE_MACPORTS)
 #include <enet.h>
 #else
 #include <enet/enet.h>

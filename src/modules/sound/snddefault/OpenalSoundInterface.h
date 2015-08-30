@@ -19,7 +19,7 @@
 #ifndef OPENAL_SOUND_INTERFACE_H
 #define OPENAL_SOUND_INTERFACE_H
 
-#ifdef __APPLE__
+#if defined(__APPLE__) && !defined(USE_MACPORTS)
 #include"al.h"
 #include"alc.h"
 #else

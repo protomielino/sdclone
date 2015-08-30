@@ -37,7 +37,7 @@
 #  pragma warning (disable:4251) // class XXX needs a DLL interface ...
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__) && !defined(USE_MACPORTS)
 #  include <js.h>
 #else
 #  include <plib/js.h>
