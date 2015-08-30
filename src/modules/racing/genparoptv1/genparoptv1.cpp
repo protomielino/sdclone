@@ -65,7 +65,7 @@ int closeGfModule()
 {
 	// Unregister it from the GfModule module manager.
 	if (GenParOptV1::_pSelf)
-		GfModule::unregister(GenParOptV1::_pSelf);
+		GenParOptV1::unregister(GenParOptV1::_pSelf);
 
 	// Delete the (only) module instance.
 	delete GenParOptV1::_pSelf;

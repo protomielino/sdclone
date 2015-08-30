@@ -61,7 +61,7 @@ int closeGfModule()
 {
     // Unregister it from the GfModule module manager.
     if (LegacyMenu::_pSelf)
-        GfModule::unregister(LegacyMenu::_pSelf);
+        LegacyMenu::unregister(LegacyMenu::_pSelf);
 
 	DisplayMenuRelease();
 

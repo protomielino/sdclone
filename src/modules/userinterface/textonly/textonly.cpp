@@ -62,7 +62,7 @@ int closeGfModule()
 {
 	// Unregister it from the GfModule module manager.
 	if (TextOnlyUI::_pSelf)
-		GfModule::unregister(TextOnlyUI::_pSelf);
+		TextOnlyUI::unregister(TextOnlyUI::_pSelf);
 
 	// Delete the (only) module instance.
 	delete TextOnlyUI::_pSelf;

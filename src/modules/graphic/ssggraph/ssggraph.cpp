@@ -45,7 +45,7 @@ int closeGfModule()
 {
     // Unregister it from the GfModule module manager.
     if (SsgGraph::_pSelf)
-        GfModule::unregister(SsgGraph::_pSelf);
+        SsgGraph::unregister(SsgGraph::_pSelf);
 
     // Delete the (only) module instance.
     delete SsgGraph::_pSelf;

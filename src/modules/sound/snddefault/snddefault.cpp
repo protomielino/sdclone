@@ -40,7 +40,7 @@ int closeGfModule()
 {
 	// Unregister it from the GfModule module manager.
 	if (SndDefault::_pSelf)
-		GfModule::unregister(SndDefault::_pSelf);
+		SndDefault::unregister(SndDefault::_pSelf);
 	
 	// Delete the (only) module instance.
 	delete SndDefault::_pSelf;

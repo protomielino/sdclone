@@ -63,7 +63,7 @@ int closeGfModule()
 {
 	// Unregister it from the GfModule module manager.
 	if (StandardGame::_pSelf)
-		GfModule::unregister(StandardGame::_pSelf);
+		StandardGame::unregister(StandardGame::_pSelf);
 
 	// Delete the (only) module instance.
 	delete StandardGame::_pSelf;

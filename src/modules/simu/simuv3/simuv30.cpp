@@ -42,7 +42,7 @@ int closeGfModule()
 {
 	// Unregister it from the GfModule module manager.
 	if (Simuv30::_pSelf)
-		GfModule::unregister(Simuv30::_pSelf);
+		Simuv30::unregister(Simuv30::_pSelf);
 	
 	// Delete the (only) module instance.
 	delete Simuv30::_pSelf;
