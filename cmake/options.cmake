@@ -76,6 +76,12 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_3RDPARTY_SQLITE3 false CACHE BOOL "Use SQLite3 as database for record/replay")
 
+    IF(APPLE)
+      # Automatically set OPTION_USE_MACPORTS (at least until someone fixes the regular APPLE build)
+      MESSAGE(STATUS "Automatically set OPTION_USE_MACPORTS (at least until someone fixes the regular APPLE build)")
+      SET(OPTION_USE_MACPORTS true CACHE BOOL "Use the MacPorts dependencies")
+    ENDIF(APPLE)
+
     # Enable building with 3rd party SOLID library under Windows, as we ship the binary package,
     # but not under Linux, where FreeSolid seems not to be available by default on most distros.
     IF(WIN32)
@@ -91,11 +97,22 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
       SET(OPTION_UNLOAD_SSGGRAPH true CACHE BOOL "If false, never unload ssggraph module (useful on some Linuxes to avoid XOrg crashes)")  
     ENDIF(UNIX)
 
-    SET(OPTION_OSGGRAPH true CACHE BOOL "Build OpenScenGraph-based WIP osggraph graphics module")
     
-    SET(OPTION_SDL2 false CACHE BOOL "Build with SDL2 instead of SDL 1.2")
-
-    SET(OPTION_SDL_JOYSTICK false CACHE BOOL "Use SDL for Joystick instead of PLIB")
+    IF(OPTION_USE_MACPORTS)
+       SET(CMAKE_MACOSX_RPATH TRUE)
+       #SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+       SET(CMAKE_PREFIX_PATH "/opt/local" CACHE PATH "Prepended to search path")
+       #SET(CMAKE_FIND_ROOT_PATH "/opt/local" CACHE PATH "Prepended to search path")
+       SET(CMAKE_FIND_FRAMEWORK LAST)
+       SET(OPTION_SDL2 true CACHE BOOL "Build with SDL2 instead of SDL 1.2")
+       SET(OPTION_SDL_JOYSTICK true CACHE BOOL "Use SDL for Joystick instead of PLIB")
+       MESSAGE(STATUS "Change the line below to true when OSG works on MacPorts")
+       SET(OPTION_OSGGRAPH false CACHE BOOL "Build OpenScenGraph-based WIP osggraph graphics module")
+    ELSE(OPTION_USE_MACPORTS)
+       SET(OPTION_SDL2 false CACHE BOOL "Build with SDL2 instead of SDL 1.2")
+       SET(OPTION_SDL_JOYSTICK false CACHE BOOL "Use SDL for Joystick instead of PLIB")
+       SET(OPTION_OSGGRAPH true CACHE BOOL "Build OpenScenGraph-based WIP osggraph graphics module")
+    ENDIF(OPTION_USE_MACPORTS)
 	
     SET(OPTION_AUTOVERSION true CACHE BOOL "Enable automatic computation of the version from SVN source tree")
     
@@ -175,6 +192,10 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     IF(OPTION_SDL_JOYSTICK)
           ADD_DEFINITIONS(-DSDL_JOYSTICK)
     ENDIF(OPTION_SDL_JOYSTICK)
+
+    IF(OPTION_USE_MACPORTS)
+          ADD_DEFINITIONS(-DUSE_MACPORTS)
+    ENDIF(OPTION_USE_MACPORTS)
 
     # Define for code that needs Torcs backward compatibility
     ADD_DEFINITIONS(-DSPEED_DREAMS)

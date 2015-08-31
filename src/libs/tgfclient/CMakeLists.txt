@@ -54,7 +54,11 @@ SD_ADD_LIBRARY(tgfclient SHARED ${_SOURCES} ${_OTHER_SOURCES})
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(tgfclient PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
-ADD_PLIB_LIBRARY(tgfclient ul sg sl)
+IF(OPTION_USE_MACPORTS)
+   ADD_PLIB_LIBRARY(tgfclient ul sg)
+ELSE(OPTION_USE_MACPORTS)
+   ADD_PLIB_LIBRARY(tgfclient ul sg sl)
+ENDIF(OPTION_USE_MACPORTS)
 
 ADD_SDLIB_LIBRARY(tgfclient portability tgf networking)
 
