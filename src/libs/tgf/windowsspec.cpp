@@ -31,6 +31,8 @@
 #include "tgf.h"
 #include "os.h"
 
+static const size_t SOFileExtLen = strlen("."DLLEXT);
+
 /*
 * Function
 *    windowsModLoad
@@ -74,7 +76,7 @@ windowsModLoad(unsigned int /* gfid */, const char *soPath, tModList **modlist)
 		strcpy(fname, lastSlash+1);
 	else
 		strcpy(fname, soPath);
-	fname[strlen(fname) - 4] = 0; /* cut .dll */
+	fname[strlen(fname) - SOFileExtLen] = 0; /* cut .dll */
 	
 	/* Load the DLL */
 	handle = LoadLibrary( soPath ); 
@@ -212,7 +214,7 @@ windowsModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 	// Scan directory
 	_finddata_t FData;
 	char Dir_name[ 1024 ];
-	sprintf( Dir_name, "%s\\*.dll", dir );
+	sprintf( Dir_name, "%s\\*."DLLEXT, dir );
 	long Dirent = _findfirst( Dir_name, &FData );
 	if ( Dirent != -1 )
 	{
@@ -302,12 +304,12 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 	{
 		do 
 		{
-			if (((strlen(FData.name) > 5) && 
-				 (strcmp(".dll", FData.name+strlen(FData.name)-4) == 0)) /* xxxx.dll */
+			if (((strlen(FData.name) > SOFileExtLen + 1) && 
+				 (strcmp("."DLLEXT, FData.name+strlen(FData.name)-SOFileExtLen) == 0)) /* xxxx.dll */
 				|| (level == 1 && FData.name[0] != '.'))
 			{
 				if (level == 1) 
-					sprintf(soPath, "%s/%s/%s.dll", dir, FData.name, FData.name);
+					sprintf(soPath, "%s/%s/%s.%s", dir, FData.name, FData.name,DLLEXT);
 				else
 					sprintf(soPath, "%s/%s", dir, FData.name);
 				
