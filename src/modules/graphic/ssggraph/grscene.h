@@ -22,7 +22,7 @@
 
 //TODO: What is this??? kilo
 #ifdef GUIONS
-#include <glib.h> 
+#include <glib.h>
 #endif //GUIONS
 
 #include <track.h>	//tTrack
@@ -43,6 +43,7 @@ extern ssgBranch *LandAnchor;
 extern ssgBranch *CarsAnchor;
 extern ssgBranch *ShadowAnchor;
 extern ssgBranch *PitsAnchor;
+extern ssgBranch *PitsIndicatorAnchor;
 extern ssgBranch *SmokeAnchor;
 extern ssgBranch *SkidAnchor;
 extern ssgBranch *CarlightAnchor;
@@ -65,12 +66,13 @@ extern int grLoadScene(tTrack *track);
 extern void grDrawScene();
 extern void grShutdownScene(void);
 extern void grCustomizePits(void);
+extern void grLoadPitsIndicator(void);
 extern void grDrawBackground(class cGrCamera *, class cGrBackgroundCam *bgCam);
 
 //TODO: Question: What is this??? kilo
 //      Possible answer: Some try to lower GPU load by filtering the scene ? JP
 #ifdef GUIONS
-class cDoV 
+class cDoV
 {
 public:
   tdble FrontLevelGroupGlobal; /* the distance for the end of the front scene */
@@ -82,7 +84,7 @@ public:
   tdble RearLevelGroup1;
   tdble RearLevelGroup2;
   tdble RearLevelGroup3;
-  
+
   tdble FrontLevelMap1;      /* the distance for the end of the front scene with only one mapping*/
   tdble FrontLevelMap2;      /* the distance for the end of the front scene with two mapping*/
   tdble FrontLevelMap3;      /* the distance for the end of the front scene with three mapping*/
@@ -91,7 +93,7 @@ public:
   tdble RearLevelMap3;
 };
 
-class cHashMapElement 
+class cHashMapElement
 {
   char	*name;
   int		numberOfMapToApply;

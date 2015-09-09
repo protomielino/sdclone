@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 /** @file
-    		This is the track structure.
+            This is the track structure.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
     @ingroup	trackstruct
@@ -204,6 +204,7 @@
 #define TRK_ATT_DOVFACTOR           "DoV factor"
 
 #define TRK_SECT_PITS               "Pits"
+#define TRK_ATT_PIT_INDICATOR       "pit indicator"
 #define TRK_ATT_MAX_PITS            "max pits"
 #define TRK_ATT_BUILDINGS_START     "start buildings"
 #define TRK_ATT_PIT_STYLE           "pit style"
@@ -451,20 +452,20 @@ typedef struct trackSeg
     tSegExt		*ext;
 
     tTrackSurface	*surface;   /**< Segment surface */
-	tTrackBarrier	*barrier[2]; /**< Segment barriers */
+    tTrackBarrier	*barrier[2]; /**< Segment barriers */
     tRoadCam        *cam;       /* current camera */
     struct trackSeg *next;      /**< Next segment */
     struct trackSeg *prev;      /**< Previous segment */
 
-	// Union to avoid code duplication for left/right side cases and to
-	// keep compatibility of code. The side definition is so ugly to
-	// match the one of the barrier[].
+    // Union to avoid code duplication for left/right side cases and to
+    // keep compatibility of code. The side definition is so ugly to
+    // match the one of the barrier[].
 #define TR_SIDE_LFT 1
 #define TR_SIDE_RGT 0
-	union {
-		struct { struct trackSeg *rside, *lside; };
-		struct trackSeg* side[2];
-	};
+    union {
+        struct { struct trackSeg *rside, *lside; };
+        struct trackSeg* side[2];
+    };
 
 } tTrackSeg;
 
@@ -505,18 +506,18 @@ typedef struct TrackOwnPit
     tdble lmin;             /**< Pitting area length min */
     tdble lmax;             /**< Pitting area length max */
     int freeCarIndex;       // Index of next free car entry (look at the next line).
-	struct CarElt	*car[TR_PIT_MAXCARPERPIT];	/**< Car links for pit */
+    struct CarElt	*car[TR_PIT_MAXCARPERPIT];	/**< Car links for pit */
 } tTrackOwnPit;
 
 /** Pits Info Structure */
 typedef struct tTrackPitInfo
 {
-	int type;		/**< Type of Pit:
-				   - TR_PIT_NONE
-				   - TR_PIT_ON_TRACK_SIDE
-				   - TR_PIT_ON_SEPARATE_PATH
-				   - TR_PIT_NO_BUILDING
-				 */
+    int type;		/**< Type of Pit:
+                   - TR_PIT_NONE
+                   - TR_PIT_ON_TRACK_SIDE
+                   - TR_PIT_ON_SEPARATE_PATH
+                   - TR_PIT_NO_BUILDING
+                 */
 #define TR_PIT_NONE		0           /**< No pits for that tracks */
 #define TR_PIT_ON_TRACK_SIDE	1   /**< The pits are on the track side */
 #define TR_PIT_ON_SEPARATE_PATH 2   /**< The pit is on a separate pitlane */
@@ -536,8 +537,9 @@ typedef struct tTrackPitInfo
     tTrackSeg *pitEnd;              /**< Pit lane segment */
     tTrackSeg *pitExit;             /**< Pit lane segment */
     tTrackOwnPit *driversPits;      /**< List of pits by driver */
-	int carsPerPit;
+    int carsPerPit;
     int driversPitsNb;              /**< Number of drivers */
+    int pitindicator;              /**< Pit Indicator 0/1 */
 } tTrackPitInfo;
 
 typedef struct TurnMarksInfo
@@ -594,14 +596,14 @@ typedef struct TrackGraphicInfo
 */
 typedef struct TrackLocalInfo
 {
-	/* Constant spec. data, read from <track>.xml */
-	const char *station;	/**<Station Weather */
+    /* Constant spec. data, read from <track>.xml */
+    const char *station;	/**<Station Weather */
     int	timezone;                   /**< timezone for real timeday with not connection http */
     tdble anyrainlkhood;            /**< Overall likelyhood of having rain (when random) [0, 1] */
     tdble littlerainlkhood;         /**< Likelyhood of having little rain when it rains [0, 1] */
     tdble mediumrainlkhood;         /**< Likelyhood of having medium rain when it rains [0, 1-little] */
 
-	/* Actual data for a race (computed at race start) */
+    /* Actual data for a race (computed at race start) */
     tdble timeofday;                /**< Local time of day, in seconds from 0:00 (0 = 0:00, 86400 = 24:00 */
     int timeofdayindex;
     tdble sunascension;             /**< Local sun "height" (related to the latitude, not to the time of day) */
