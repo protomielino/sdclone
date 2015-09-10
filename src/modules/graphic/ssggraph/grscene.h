@@ -43,7 +43,6 @@ extern ssgBranch *LandAnchor;
 extern ssgBranch *CarsAnchor;
 extern ssgBranch *ShadowAnchor;
 extern ssgBranch *PitsAnchor;
-extern ssgBranch *PitsIndicatorAnchor;
 extern ssgBranch *SmokeAnchor;
 extern ssgBranch *SkidAnchor;
 extern ssgBranch *CarlightAnchor;
@@ -66,7 +65,7 @@ extern int grLoadScene(tTrack *track);
 extern void grDrawScene();
 extern void grShutdownScene(void);
 extern void grCustomizePits(void);
-extern void grLoadPitsIndicator(void);
+extern void grLoadPitsIndicator(tdble x,tdble y, tdble z, char *buf, int Pitind);
 extern void grDrawBackground(class cGrCamera *, class cGrBackgroundCam *bgCam);
 
 //TODO: Question: What is this??? kilo

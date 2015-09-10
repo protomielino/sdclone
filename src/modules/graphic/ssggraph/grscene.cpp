@@ -60,7 +60,6 @@ ssgBranch *LandAnchor = NULL;
 ssgBranch *CarsAnchor = NULL;
 ssgBranch *ShadowAnchor = NULL;
 ssgBranch *PitsAnchor = NULL;
-ssgBranch *PitsIndicatorAnchor = NULL;
 ssgBranch *SmokeAnchor = NULL;
 ssgBranch *SkidAnchor = NULL;
 ssgBranch *CarlightAnchor = NULL;
@@ -163,10 +162,6 @@ grLoadScene(tTrack *track)
     /* Pit stops walls */
     PitsAnchor = new ssgBranch;
     TheScene->addKid(PitsAnchor);
-
-    /* Pit Indicator */
-    PitsIndicatorAnchor = new ssgBranch;
-    TheScene->addKid(PitsIndicatorAnchor);
 
     /* Skid Marks */
     SkidAnchor = new ssgBranch;
@@ -549,9 +544,6 @@ void grCustomizePits(void)
                     + pits->len / 2.0 * normalvector.x;
             tdble z4 = RtTrackHeightG(act_pit->pos.seg, x4, y4);
 
-            if (bHasPitIndicator = true)
-                grLoadPitsIndicator();
-
             ssgVertexArray *pit_vtx1 = new ssgVertexArray(4);
             ssgTexCoordArray *pit_tex1 = new ssgTexCoordArray(4);
             ssgColourArray *pit_clr1 = new ssgColourArray(1);
@@ -710,6 +702,23 @@ void grCustomizePits(void)
             pit3->setState(stWall);
             pit3->setCullFace(0);
             ThePits->addKid(pit3);
+
+			if (bHasPitIndicator)
+			{
+				int PitInt = pits->pitindicator;
+				snprintf(buf, sizeof(buf), "%sdrivers/%s/%d;%sdrivers/%s;drivers/%s/%d;drivers/%s;tracks/%s/%s;data/textures;data/img",
+				     GfLocalDir(),
+                     act_pit->car[0]->_modName,
+                     act_pit->car[0]->_driverIndex,
+                     GfLocalDir(),
+                     act_pit->car[0]->_modName,
+                     act_pit->car[0]->_modName,
+                     act_pit->car[0]->_driverIndex,
+                     act_pit->car[0]->_modName,
+					 grTrack->category, grTrack->internalname);
+
+                grLoadPitsIndicator(x3, y3, z3, buf, PitInt);
+			}
         }  // for i
     }
         break;
@@ -728,17 +737,25 @@ void grCustomizePits(void)
 }  // grCustomizePits
 
 // Load New Pit Indicator in Scene
-void grLoadPitsIndicator(void)
+void grLoadPitsIndicator(tdble x, tdble y, tdble z, char *buf, int Pitind)
 {
-    char buf[256];
+	char buf2[256];
     ssgEntity		*desc;
+	sgCoord			PitIndicatorPos;
+	ssgTransform *PitIndicatorLoc = new ssgTransform;
 
-    snprintf(buf, sizeof(buf), "tracks/%s/%s;data/textures;data/img;.", grTrack->category, grTrack->internalname);
     ssgTexturePath(buf);
-    snprintf(buf, sizeof(buf), "tracks/%s/%s;data/objects", grTrack->category, grTrack->internalname);
-    ssgModelPath(buf);
+    snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/objects", grTrack->category, grTrack->internalname);
+    ssgModelPath(buf2);
 
-    desc = grssgLoadAC3D("pit_indicator.ac", NULL);
-    PitsIndicatorAnchor->addKid(desc);
+	sgSetCoord(&PitIndicatorPos, x, y, z, 0, 0, 0.0);
+	PitIndicatorLoc->setTransform( &PitIndicatorPos);
 
+	if (Pitind == 1)
+		desc = grssgLoadAC3D("pit_indicator.ac", NULL);
+	else
+		desc = grssgLoadAC3D("normal_pit_indicator.ac", NULL);
+
+	PitIndicatorLoc->addKid(desc);
+    PitsAnchor->addKid(PitIndicatorLoc);
 }
