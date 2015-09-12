@@ -279,10 +279,12 @@ void grCustomizePits(void)
 
 
     // Draw the pit identification on the wall if any.
-    switch (pits->type) {
+    switch (pits->type)
+    {
     case TR_PIT_ON_TRACK_SIDE:
         GfLogTrace("Creating track side pit buildings (%d slots) ...\n", pits->nMaxPits);
-        for (int i = 0; i < pits->nMaxPits; i++) {
+        for (int i = 0; i < pits->nMaxPits; i++)
+        {
             //GfLogDebug("Pit Nbr: %d\n", i);
             ssgVertexArray *pit_vtx = new ssgVertexArray(4);
             ssgTexCoordArray *pit_tex = new ssgTexCoordArray(4);
@@ -297,7 +299,8 @@ void grCustomizePits(void)
 
             // If we have at least one car in the pit, use the team pit logo of driver 0.
             ssgState *st = 0;
-            if (pits->driversPits[i].car[0]) {
+            if (pits->driversPits[i].car[0])
+            {
                 snprintf(buf, sizeof(buf),
                          "%sdrivers/%s/%d;%sdrivers/%s;drivers/%s/%d;drivers/%s",
                          GfLocalDir(),
@@ -313,7 +316,8 @@ void grCustomizePits(void)
                 // update the logo file name accordingly.
                 int skinnedLogo = FALSE;
                 if (strlen(pits->driversPits[i].car[0]->_skinName) != 0
-                        && pits->driversPits[i].car[0]->_skinTargets & RM_CAR_SKIN_TARGET_PIT_DOOR) {
+                        && pits->driversPits[i].car[0]->_skinTargets & RM_CAR_SKIN_TARGET_PIT_DOOR)
+                {
                     skinnedLogo = TRUE;
                     strLogoFileName += '-';
                     strLogoFileName += pits->driversPits[i].car[0]->_skinName;
@@ -325,18 +329,21 @@ void grCustomizePits(void)
                 const std::string strPNGLogoFileName = strLogoFileName + ".png";
                 st = grSsgLoadTexStateEx(strPNGLogoFileName.c_str(), buf, FALSE, FALSE, FALSE);
 #endif
-                if (!st) {
+                if (!st)
+                {
                     const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
                     st = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf, FALSE, FALSE, skinnedLogo);
                 }
             }  // if pits->driverPits[i].car[0]
 
             // If no car in the pit, or logo file not found, hope for the .rgb in data/textures.
-            if (!st) {
+            if (!st)
+            {
                 snprintf(buf, sizeof(buf), "data/textures");
                 const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
                 st = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf, FALSE, FALSE, TRUE);
             }
+
             st->setOpaque();
             reinterpret_cast<ssgSimpleState*>(st)->setShininess(50);
             reinterpret_cast<ssgSimpleState*>(st)->disable(GL_BLEND);
@@ -436,6 +443,14 @@ void grCustomizePits(void)
             // Done.
             ThePits->addKid(pit);
         }  // for i
+
+#if 0
+        char buf3[256];
+        snprintf(buf3, sizeof(buf3), "%strack-pit.ac", GfLocalDir());
+
+        ssgSaveAC ( buf3, PitsAnchor );
+#endif
+
         break;
 
     case TR_PIT_NO_BUILDING:
@@ -505,7 +520,8 @@ void grCustomizePits(void)
                 else
                     bHasPitIndicator = false;
 
-            } else
+            }
+            else
             {
                 snprintf(buf, sizeof(buf), "data/textures");
                 strLogoFileName = "tr-wall-gr";
@@ -703,24 +719,32 @@ void grCustomizePits(void)
             pit3->setCullFace(0);
             ThePits->addKid(pit3);
 
-			if (bHasPitIndicator)
-			{
-				int PitInt = pits->pitindicator;
-				snprintf(buf, sizeof(buf), "%sdrivers/%s/%d;%sdrivers/%s;drivers/%s/%d;drivers/%s;tracks/%s/%s;data/textures;data/img",
-				     GfLocalDir(),
-                     act_pit->car[0]->_modName,
-                     act_pit->car[0]->_driverIndex,
-                     GfLocalDir(),
-                     act_pit->car[0]->_modName,
-                     act_pit->car[0]->_modName,
-                     act_pit->car[0]->_driverIndex,
-                     act_pit->car[0]->_modName,
-					 grTrack->category, grTrack->internalname);
+            if (bHasPitIndicator)
+            {
+                int PitInt = pits->pitindicator;
+                snprintf(buf, sizeof(buf), "%sdrivers/%s/%d;%sdrivers/%s;drivers/%s/%d;drivers/%s;tracks/%s/%s;data/textures;data/img",
+                         GfLocalDir(),
+                         act_pit->car[0]->_modName,
+                        act_pit->car[0]->_driverIndex,
+                        GfLocalDir(),
+                        act_pit->car[0]->_modName,
+                        act_pit->car[0]->_modName,
+                        act_pit->car[0]->_driverIndex,
+                        act_pit->car[0]->_modName,
+                        grTrack->category, grTrack->internalname);
 
                 grLoadPitsIndicator(x3, y3, z3, buf, PitInt);
-			}
+            }
         }  // for i
     }
+
+#if 0
+        char buf2[256];
+        snprintf(buf2, sizeof(buf2), "%strack-pit.ac", GfLocalDir());
+
+        ssgSaveAC ( buf2, PitsAnchor );
+#endif
+
         break;
 
     case TR_PIT_ON_SEPARATE_PATH:
@@ -739,23 +763,23 @@ void grCustomizePits(void)
 // Load New Pit Indicator in Scene
 void grLoadPitsIndicator(tdble x, tdble y, tdble z, char *buf, int Pitind)
 {
-	char buf2[256];
+    char buf2[256];
     ssgEntity		*desc;
-	sgCoord			PitIndicatorPos;
-	ssgTransform *PitIndicatorLoc = new ssgTransform;
+    sgCoord			PitIndicatorPos;
+    ssgTransform *PitIndicatorLoc = new ssgTransform;
 
     ssgTexturePath(buf);
     snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/objects", grTrack->category, grTrack->internalname);
     ssgModelPath(buf2);
 
-	sgSetCoord(&PitIndicatorPos, x, y, z, 0, 0, 0.0);
-	PitIndicatorLoc->setTransform( &PitIndicatorPos);
+    sgSetCoord(&PitIndicatorPos, x, y, z, 0, 0, 0.0);
+    PitIndicatorLoc->setTransform( &PitIndicatorPos);
 
-	if (Pitind == 1)
-		desc = grssgLoadAC3D("pit_indicator.ac", NULL);
-	else
-		desc = grssgLoadAC3D("normal_pit_indicator.ac", NULL);
+    if (Pitind == 1)
+        desc = grssgLoadAC3D("pit_indicator.ac", NULL);
+    else
+        desc = grssgLoadAC3D("normal_pit_indicator.ac", NULL);
 
-	PitIndicatorLoc->addKid(desc);
-    PitsAnchor->addKid(PitIndicatorLoc);
+    PitIndicatorLoc->addKid(desc);
+    ThePits->addKid(PitIndicatorLoc);
 }
