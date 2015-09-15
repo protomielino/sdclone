@@ -612,7 +612,7 @@ GenPlayerList(void)
 	/* Update scroll-list from PlayersInfo */
     UpdtScrollList();
 
-    /* Load players settings from human.xml file*/
+    /* Load players settings from human/preferences.xml file*/
     snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), HM_PREF_FILE);
     PrefHdle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
     if (!PrefHdle) {
