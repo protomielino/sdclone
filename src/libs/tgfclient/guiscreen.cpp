@@ -1065,3 +1065,10 @@ int GfScrCaptureAsPNG(const char *filename)
 
 	return nStatus;
 }
+
+#if SDL_MAJOR_VERSION >= 2
+SDL_Window* GfScrGetMainWindow()
+{
+    return GfuiWindow;
+}
+#endif

@@ -32,9 +32,9 @@
 #include "OsgMain.h"
 #include "OsgCar.h"
 
-#if SDL_MAJOR_VERSION >= 2
-extern SDL_Window* 	GfuiWindow;
-#endif
+//#if SDL_MAJOR_VERSION >= 2
+//extern SDL_Window* 	GfuiWindow;
+//#endif
 
 SDScreens::SDScreens() :
     root(NULL),
@@ -66,7 +66,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     //intialising main screen
 
     viewer = new osgViewer::Viewer;
-#if 1 //SDL_MAJOR_VERSION < 2
+#if SDL_MAJOR_VERSION < 2
     //viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
     //SDView * view = new SDView(viewer->getCamera(),0,0, m_Winw, m_Winh, mirrorCam.get());
     //osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, m_Winw, m_Winh);
@@ -76,6 +76,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     viewer->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
     viewer->getCamera()->setPreDrawCallback(new CameraDrawnCallback);
 #else
+    SDL_Window* GfuiWindow = GfScrGetMainWindow();
 	viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
 	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
     SDL_GetWindowPosition(GfuiWindow, &traits->x, &traits->y);

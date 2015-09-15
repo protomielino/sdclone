@@ -56,6 +56,10 @@
 
 #include "guiscreen.h"
 
+#if SDL_MAJOR_VERSION >= 2
+extern SDL_Window* 	GfuiWindow;
+#endif
+
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
@@ -87,6 +91,9 @@ typedef struct ScreenSize
     int height; // Height in pixels.
 } tScreenSize;
 
+#if SDL_MAJOR_VERSION >= 2
+TGFCLIENT_API SDL_Window* GfScrGetMainWindow();//{return GfuiWindow;};
+#endif
 TGFCLIENT_API bool GfScrInit(int nWinWidth = -1, int nWinHeight = -1, int nFullScreen = -1);
 TGFCLIENT_API void GfScrShutdown(void);
 TGFCLIENT_API void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH);

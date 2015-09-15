@@ -19,9 +19,6 @@
 #ifndef _GLFEATURES_H_
 #define _GLFEATURES_H_
 
-#if SDL_MAJOR_VERSION >= 2
-extern SDL_Window* GfuiWindow;
-#endif
 // Multi-plateform Open GL includes : use this header files when calling OpenGL
 
 #ifdef WIN32

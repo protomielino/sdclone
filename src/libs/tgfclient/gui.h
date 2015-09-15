@@ -23,10 +23,6 @@
 #include "glfeatures.h"
 #include "guifont.h"
 
-#if SDL_MAJOR_VERSION >= 2
-extern SDL_Window* GfuiWindow;
-#endif
-
 // Predefined colors (array and indexes).
 #define GFUI_COLORNB	24
 extern float	gfuiColors[GFUI_COLORNB][4];
