@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include <osg/Camera>
+
 #include <tgfclient.h>
 #include <graphic.h>
 

@@ -67,6 +67,7 @@ bool OsgGraphicsWindowSDL2::setWindowDecorationImplementation(bool flag)
     if(!m_Window) return false;
 
     SDL_SetWindowBordered(m_Window, flag ? SDL_TRUE : SDL_FALSE);
+
     return true;
 }
 
@@ -96,7 +97,8 @@ void OsgGraphicsWindowSDL2::setCursor(MouseCursor mouseCursor)
 
 void OsgGraphicsWindowSDL2::init()
 {
-    if(m_Valid) return;
+    if(m_Valid)
+        return;
 
     if(!_traits.valid())
         return;

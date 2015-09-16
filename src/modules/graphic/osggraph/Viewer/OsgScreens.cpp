@@ -19,6 +19,8 @@
 
 #include <tgfclient.h>
 
+#include <stdexcept>
+
 #include <osgViewer/Viewer>
 #include <osgViewer/GraphicsWindow>
 #include <osg/GraphicsContext>
@@ -29,14 +31,11 @@
 #if SDL_MAJOR_VERSION >= 2
 #include "OsgGraphicsWindow.h"
 #endif
+
 #include "OsgDebugHUD.h"
 #include "OsgReflectionMapping.h"
 #include "OsgMain.h"
 #include "OsgCar.h"
-
-//#if SDL_MAJOR_VERSION >= 2
-//extern SDL_Window* 	GfuiWindow;
-//#endif
 
 SDScreens::SDScreens() :
     root(NULL),
@@ -62,21 +61,18 @@ public:
     }
 };
 
-
 void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node> m_sceneroot, osg::Vec3f fogcolor)
 {
     //intialising main screen
 
     viewer = new osgViewer::Viewer;
 #if SDL_MAJOR_VERSION < 2
-    //viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
-    //SDView * view = new SDView(viewer->getCamera(),0,0, m_Winw, m_Winh, mirrorCam.get());
-    //osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, m_Winw, m_Winh);
-    //viewer->getCamera()->setViewport(new osg::Viewport(0, 0, m_Winw, m_Winh));
-    //viewer->getCamera()->setGraphicsContext(gw);
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, width, height);
-    viewer->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
-    viewer->getCamera()->setPreDrawCallback(new CameraDrawnCallback);
+    osg::ref_ptr<osg::Camera> Camera = viewer->getCamera();
+    //Camera->setGraphicsContext(gw);
+    //Camera->setViewport(new osg::Viewport(0, 0, width, height));
+    Camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+    Camera->setPreDrawCallback(new CameraDrawnCallback);
 #else
     SDL_Window* GfuiWindow = GfScrGetMainWindow();
 	viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
@@ -86,16 +82,24 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
 	traits->windowName = SDL_GetWindowTitle(GfuiWindow);
     traits->windowDecoration = !(SDL_GetWindowFlags(GfuiWindow)&SDL_WINDOW_BORDERLESS);
     traits->screenNum = SDL_GetWindowDisplayIndex(GfuiWindow);
+    traits->red = 8;
+    traits->green = 8;
+    traits->blue = 8;
+    traits->alpha = 0; // set to 0 to stop ScreenCaptureHandler reading the alpha channel
+    traits->depth = 24;
+    traits->stencil = 8;
     traits->vsync = true;
     traits->doubleBuffer = true;
     traits->inheritedWindowData = new OSGUtil::OsgGraphicsWindowSDL2::WindowData(GfuiWindow);
 
-	osg::ref_ptr<OSGUtil::OsgGraphicsWindowSDL2> gw = new OSGUtil::OsgGraphicsWindowSDL2(traits);
+    osg::ref_ptr<OSGUtil::OsgGraphicsWindowSDL2> gw = new OSGUtil::OsgGraphicsWindowSDL2(traits.get());
+    viewer->getCamera()->setGraphicsContext(gw);
+    viewer->getCamera()->setViewport(new osg::Viewport(0, 0, width, height));
 	viewer->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
     viewer->getCamera()->setPreDrawCallback(new CameraDrawnCallback);
 
-    if(!gw->valid()) throw 
-		std::runtime_error("Failed to create GraphicsContext");
+    if(!gw->valid())
+        throw std::runtime_error("Failed to create GraphicsContext");
 #endif
 
     osg::ref_ptr<osg::Camera> mirrorCam = new osg::Camera;
