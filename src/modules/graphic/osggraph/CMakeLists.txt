@@ -24,8 +24,6 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Render/OsgRender.h
                      Render/OsgReflectionMapping.h
                      Render/OsgShader.h
-                       
-					 Viewer/OsgGraphicsWindow.h
 					 Viewer/OsgView.h  	
                      Viewer/OsgScreens.h 
                      Viewer/OsgCamera.h
@@ -40,6 +38,10 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      OsgMain.h
                      )
 			
+IF(OPTION_SDL2)                       
+   SET(OSGGRAPH_HEADERS ${OSGGRAPH_HEADERS} Viewer/OsgGraphicsWindow.h)
+ENDIF(OPTION_SDL2)
+
 SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
 					 #Utils/OsgOptions.cpp
 
@@ -64,8 +66,6 @@ SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
                      Render/OsgRender.cpp
                      Render/OsgReflectionMapping.cpp
                      Render/OsgShader.cpp
-
-					 Viewer/OsgGraphicsWindow.cpp
 					 Viewer/OsgView.cpp 
                      Viewer/OsgScreens.cpp
                      Viewer/OsgCamera.cpp
@@ -79,6 +79,10 @@ SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
                      OsgGraph.cpp
                      OsgMain.cpp
 		     )
+
+IF(OPTION_SDL2)                       
+   SET(OSGGRAPH_SOURCES ${OSGGRAPH_SOURCES} Viewer/OsgGraphicsWindow.cpp)
+ENDIF(OPTION_SDL2)
 
 INCLUDE_DIRECTORIES(Utils Sky Loader Scenery Render Viewer Car .)
 

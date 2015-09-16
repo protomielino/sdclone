@@ -26,7 +26,9 @@
 #include <osg/FrontFace>
 
 #include "OsgScreens.h"
+#if SDL_MAJOR_VERSION >= 2
 #include "OsgGraphicsWindow.h"
+#endif
 #include "OsgDebugHUD.h"
 #include "OsgReflectionMapping.h"
 #include "OsgMain.h"
