@@ -75,7 +75,10 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     Camera->setPreDrawCallback(new CameraDrawnCallback);
 #else
     SDL_Window* GfuiWindow = GfScrGetMainWindow();
-	viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
+	//viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
+	//viewer->setThreadingModel(osgViewer::Viewer::CullDrawThreadPerContext);
+	//viewer->setThreadingModel(osgViewer::Viewer::DrawThreadPerContext);
+	viewer->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
     SDL_GetWindowPosition(GfuiWindow, &traits->x, &traits->y);
     SDL_GetWindowSize(GfuiWindow, &traits->width, &traits->height);
