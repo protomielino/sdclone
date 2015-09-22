@@ -376,26 +376,31 @@ void SDRender::Init(tTrack *track)
     cargroup->addChild(m_CarRoot.get());
     background->addChild(scenery->getBackground());
 
-    switch (QualityIndex+1)
-    {
-    case 1:
-        scene->setNodeMask( rcvShadowMask );
-        background->setNodeMask(~(rcvShadowMask | castShadowMask));
-        cargroup->setNodeMask(castShadowMask);
-        break;
-    case 2:
-        scene->setNodeMask( rcvShadowMask );
-        background->setNodeMask(~(rcvShadowMask | castShadowMask));
-        cargroup->setNodeMask(rcvShadowMask | castShadowMask);
-        break;
-    case 3:
-        scene->setNodeMask( rcvShadowMask | castShadowMask);
-        background->setNodeMask(~(rcvShadowMask | castShadowMask));
-        cargroup->setNodeMask(rcvShadowMask | castShadowMask);
-        break;
-    default:
-        break;
-    }
+	if(ShadowIndex > 0)
+	{
+		switch (QualityIndex+1)
+		{
+		case 0:
+			break;
+		case 1:
+			scene->setNodeMask( rcvShadowMask );
+			background->setNodeMask(~(rcvShadowMask | castShadowMask));
+			cargroup->setNodeMask(castShadowMask);
+			break;
+		case 2:
+			scene->setNodeMask( rcvShadowMask );
+			background->setNodeMask(~(rcvShadowMask | castShadowMask));
+			cargroup->setNodeMask(rcvShadowMask | castShadowMask);
+			break;
+		case 3:
+			scene->setNodeMask( rcvShadowMask | castShadowMask);
+			background->setNodeMask(~(rcvShadowMask | castShadowMask));
+			cargroup->setNodeMask(rcvShadowMask | castShadowMask);
+			break;
+		default:
+			break;
+		}
+	}
 
     m_scene->addChild(scene.get());
     m_scene->addChild(cargroup.get());

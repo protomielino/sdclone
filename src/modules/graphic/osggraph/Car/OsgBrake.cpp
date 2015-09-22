@@ -19,6 +19,8 @@
 
 #include <osg/Geometry>
 #include <osg/CullFace>
+#include <osg/Material>
+#include <osg/ShadeModel>
 
 #include <portability.h>
 
@@ -32,8 +34,6 @@ void SDBrakes::setCar(tCarElt * car)
 
 osg::ref_ptr<osg::Geode> SDBrakes::initBrake(int wheelIndex)
 {
-    rcvShadowMask = 0x1;
-    castShadowMask = 0x2;
     float	alpha;
     osg::Vec3 vtx;
     osg::Vec4 clr;
@@ -46,6 +46,22 @@ osg::ref_ptr<osg::Geode> SDBrakes::initBrake(int wheelIndex)
     osg::ref_ptr<osg::Geode> pBrake = new osg::Geode;
 
     pBrake->setName("Brake Assembly");
+	pBrake->setCullingActive(false);
+
+	osg::StateSet* stateSet = pBrake->getOrCreateStateSet();
+
+    osg::ShadeModel* shadeModel = new osg::ShadeModel;
+    shadeModel->setMode(osg::ShadeModel::SMOOTH);
+    stateSet->setAttributeAndModes(shadeModel);
+    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+    stateSet->setMode(GL_FOG, osg::StateAttribute::ON);
+    stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
+    stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
+    stateSet->setMode(GL_BLEND, osg::StateAttribute::OFF);
+    stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
+
+    osg::Material* material = new osg::Material;
+    stateSet->setAttribute(material);
 
     int brakeBranch = 32;
     float brakeAngle = 2.0 * SD_PI / (tdble)brakeBranch;
@@ -118,9 +134,9 @@ osg::ref_ptr<osg::Geode> SDBrakes::initBrake(int wheelIndex)
     pHub->addPrimitiveSet( new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_FAN, 0, brakeBranch+1 ));
     pHub->setVertexArray(hub_vtx.get());
     pHub->setNormalArray(hub_nrm.get());
-    pHub->setNormalBinding(osg::Geometry::BIND_OVERALL);
+    pHub->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
     pHub->setColorArray(hub_clr.get());
-    pHub->setColorBinding(osg::Geometry::BIND_OVERALL);
+    pHub->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
 
     pBrake->addDrawable(pHub.get());
 
@@ -153,9 +169,9 @@ osg::ref_ptr<osg::Geode> SDBrakes::initBrake(int wheelIndex)
     pBDisc->addPrimitiveSet( new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP, 0, brakeBranch+4 ));
     pBDisc->setVertexArray(brk_vtx.get());
     pBDisc->setNormalArray(brk_nrm.get());
-    pBDisc->setNormalBinding(osg::Geometry::BIND_OVERALL);
+    pBDisc->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
     pBDisc->setColorArray(brk_clr.get());
-    pBDisc->setColorBinding(osg::Geometry::BIND_OVERALL);
+    pBDisc->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
 
     pBrake->addDrawable(pBDisc.get());
 
@@ -191,14 +207,11 @@ osg::ref_ptr<osg::Geode> SDBrakes::initBrake(int wheelIndex)
     pCaliper->addPrimitiveSet( new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP, 0, brakeBranch-4 ));
     pCaliper->setVertexArray(cal_vtx.get());
     pCaliper->setNormalArray(cal_nrm.get());
-    pCaliper->setNormalBinding(osg::Geometry::BIND_OVERALL);
+    pCaliper->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
     pCaliper->setColorArray(cal_clr.get());
-    pCaliper->setColorBinding(osg::Geometry::BIND_OVERALL);
+    pCaliper->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
 
     pBrake->addDrawable(pCaliper.get());
-    pBrake->setCullingActive(false);
-
-    pBrake->setNodeMask(castShadowMask);
 
     return pBrake.get();
 }
@@ -215,6 +228,7 @@ void SDBrakes::updateBrakes()
         clr[3] = 1.0;
         cal_clr->push_back(clr);
 
-        this->brake_disks[i]->setColorArray(cal_clr.get());
+        this->brake_disks[i]->setColorArray(cal_clr.get(), osg::Array::BIND_PER_VERTEX);
+		//GfLogInfo("brake temp %i = %f\n", i, car->_brakeTemp(i) );
     }
 }

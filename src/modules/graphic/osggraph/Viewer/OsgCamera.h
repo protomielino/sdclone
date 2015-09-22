@@ -66,9 +66,10 @@ public:
 class SDCamera
 {
 private :
-    int			id;		/* Camera Id */
+    int			id;				/* Camera Id */
     int			drawCurrent;	/* flag to draw the current car */
-    int			drawDriver;	/* flag to draw the driver */
+	int			drawCockpit;	/* flag to draw the current cockpit */
+    int			drawDriver;		/* flag to draw the driver */
     int			drawBackground;	/* flag to draw the background */
     int			mirrorAllowed;	/* flag to allow the display of mirror */
 
@@ -79,7 +80,7 @@ protected:
 
 public:
     // Constructor
-    SDCamera(SDView * screen, int myid = 0, int mydrawCurrent = 0, int mydrawdrv = 0, int mydrawBackground = 0, int mymirrorAllowed = 0);
+    SDCamera(SDView * screen, int myid = 0, int mydrawCurrent = 0, int mydrawCkt= 0, int mydrawdrv = 0, int mydrawBackground = 0, int mymirrorAllowed = 0);
 
     inline int getId(){return 0;}
 
@@ -93,8 +94,10 @@ public:
     virtual float getLODFactor(float x, float y, float z) = 0;	/* Get the LOD factor for an object located at x,y,z */
 
     virtual void setViewOffset(float newOffset)=0;
-    inline float getAspectRatio(){ return 0.0; }
-    inline float getMirrorAllowed(){ return mirrorAllowed; }
+    inline float getAspectRatio()		{ return 0.0; }
+	inline int   getdrawCockpit()		{ return drawCockpit; }
+	inline int   getdrawDriver()		{ return drawDriver; }
+    inline int   getMirrorAllowed()		{ return mirrorAllowed; }
     inline osg::Vec3 getCameraPosition(){ return eye; }
 
     //camera for sound
@@ -128,7 +131,7 @@ protected:
     float spanOffset;
 
 public:
-    SDPerspCamera(SDView *myscreen, int id, int drawCurr, int drawDrv, int drawBG, int mirrorAllowed,
+    SDPerspCamera(SDView *myscreen, int id, int drawCurr, int drawCkt, int drawDrv, int drawBG, int mirrorAllowed,
                   float myfovy, float myfovymin, float myfovymax,
                   float myfnear, float myffar = 1500.0, float myfogstart = 1400.0, float myfogend = 1500.0);
 

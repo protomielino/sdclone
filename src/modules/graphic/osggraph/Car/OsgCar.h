@@ -49,8 +49,6 @@ private :
     SDReflectionMapping *reflectionMapping;
 
     int reflectionMappingMethod;
-	unsigned int rcvShadowMask;
-    unsigned int castShadowMask;
     void setReflectionMap(osg::ref_ptr<osg::Texture> map);
 
 public :

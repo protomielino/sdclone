@@ -147,14 +147,17 @@ private:
     osg::ref_ptr<osg::Texture2D> mTexture2DRepeat;
     osg::ref_ptr<osg::Texture2D> mTexture2DRepeat1;
     osg::ref_ptr<osg::Texture2D> mTexture2DClamp1;
+
     osg::ref_ptr<osg::Texture2D> mTexture2DRepeat2;
     osg::ref_ptr<osg::Texture2D> mTexture2DClamp2;
     osg::ref_ptr<osg::Texture2D> mTexture2DRepeat3;
     osg::ref_ptr<osg::Texture2D> mTexture2DClamp3;
+
     osg::ref_ptr<osg::Image> mImage;
     osg::ref_ptr<osg::Image> mImage1;
     osg::ref_ptr<osg::Image> mImage2;
     osg::ref_ptr<osg::Image> mImage3;
+
     bool mTranslucent;
     bool mRepeat;
     float mAlphaClamp;
@@ -241,6 +244,7 @@ public:
                 //osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name2 << "\"" << std::endl;
                 return false;
             }
+
             mTexture2DRepeat2 = new osg::Texture2D;
             mTexture2DRepeat2->setDataVariance(osg::Object::STATIC);
             mTexture2DRepeat2->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::REPEAT);

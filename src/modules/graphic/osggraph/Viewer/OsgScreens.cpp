@@ -29,7 +29,7 @@
 
 #include "OsgScreens.h"
 #if SDL_MAJOR_VERSION >= 2
-#include "OsgGraphicsWindow.h"
+//#include "OsgGraphicsWindow.h"
 #endif
 
 #include "OsgDebugHUD.h"
@@ -66,7 +66,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     //intialising main screen
 
     viewer = new osgViewer::Viewer;
-#if SDL_MAJOR_VERSION < 2
+#if 1 //SDL_MAJOR_VERSION < 2
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, width, height);
     osg::ref_ptr<osg::Camera> Camera = viewer->getCamera();
     //Camera->setGraphicsContext(gw);
@@ -110,8 +110,6 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     mirrorCam->setClearMask( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     mirrorCam->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
 
-    //Screens.insert(Screens.end(), view);
-
     SDView * view = new SDView(viewer->getCamera(),0,0, width, height, mirrorCam.get());
     Screens.push_back(view);
 
@@ -119,7 +117,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     root = new osg::Group;
     viewer->setSceneData(root.get());
     mirrorScene = new osg::Group;
-#if 1
+#if 0
     prerenderRoot = new osg::Group;
     root->addChild(prerenderRoot);
     //root->addChild(reflectionMapping->getCamerasRoot());
@@ -137,7 +135,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
 
     //debugHUD->setTexture(reflectionMapping->getMap());
     // debugHUD->setTexture(reflectionMapping->getReflectionMap());
-    root->addChild(debugHUD->getRootCamera());
+    //root->addChild(debugHUD->getRootCamera());
 
     //viewer->setSceneData(root.get());
     viewer->realize();

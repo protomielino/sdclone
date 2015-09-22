@@ -223,7 +223,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                 //bool b;
                 /*if (strName == "GRILL1_s_0")
                     b = true;*/
-                if (!strncmp(strName.c_str(), ":WI", 3) || !strncmp(strName.c_str(), "WI", 2) || !strncmp(strName.c_str(), "GLASS", 5))
+                if (!strncmp(strName.c_str(), ":WI", 3) || !strncmp(strName.c_str(), "RIM", 3) || !strncmp(strName.c_str(), "WI", 2) || !strncmp(strName.c_str(), "GLASS", 5))
                 {
                     group = m_transparentGroup;
                     m_bBlockTransparent = false;

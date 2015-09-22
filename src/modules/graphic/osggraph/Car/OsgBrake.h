@@ -29,8 +29,6 @@ private :
     tCarElt *car;
     osg::ref_ptr<osg::Geometry> brake_disks[4];
     osg::ref_ptr<osg::Vec4Array> cal_clr;
-    unsigned int rcvShadowMask;
-    unsigned int castShadowMask;
 
 public :
     void setCar(tCarElt * car);

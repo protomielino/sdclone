@@ -28,8 +28,6 @@
 
 osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)
 {
-    rcvShadowMask = 0x1;
-    castShadowMask = 0x2;
     this->car = car;
 
     this->brakes.setCar(car);
@@ -64,7 +62,6 @@ osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)
     }
 
     osg::ref_ptr<osg::Group> group = new osg::Group;
-    group->setNodeMask(castShadowMask);
 
     for(int i=0;i<4;i++)
     {

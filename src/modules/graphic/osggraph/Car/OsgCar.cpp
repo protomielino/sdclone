@@ -21,17 +21,19 @@
 #include <osg/MatrixTransform>
 #include <osg/Switch>
 #include <osg/Group>
+#include <osg/LOD>
+#include <osgUtil/Simplifier>
 #include <osgViewer/Viewer>
 #include <osg/Program>
 #include <osg/Geode>
 #include <osg/Geometry>
-#include <portability.h>
 #include <osg/Texture2D>
 #include <osg/BlendFunc>
 #include <osg/Depth>
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
 
+#include <portability.h>
 #include <robottools.h>
 
 #include "OsgLoader.h"
@@ -78,14 +80,13 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
     static const int nMaxTexPathSize = 512;
     char buf[nMaxTexPathSize];
+    char path[nMaxTexPathSize];
+
     int index;
     void *handle;
     const char *param;
 
     int nranges = 0;
-    rcvShadowMask = 0x1;
-    castShadowMask = 0x2;
-    char path[nMaxTexPathSize];
 
     _carShader = carshader;
 
@@ -478,10 +479,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
     pBody->addChild(gCar.get(), true);
     pBody->setSingleChildOn(1);
-
+#if 1
     osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
     transform1->addChild(pBody.get());
-    transform1->setNodeMask(rcvShadowMask | castShadowMask);
 
     // GfOut("loaded car %d",pCar.get());
     this->car_branch = transform1.get();
@@ -489,8 +489,42 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     //wheels = new SDWheels;
     this->car_branch->addChild(wheels.initWheels(car,handle));
 
-    this->car_root = new osg::Group;
+	this->car_root = new osg::Group;
     car_root->addChild(car_branch);
+#else
+	osg::ref_ptr<osg::Node> car_branch1 = dynamic_cast<osg::Node*>(pBody->clone( osg::CopyOp::DEEP_COPY_ALL ) );
+
+	osg::ref_ptr<osg::Node> lod1 = dynamic_cast<osg::Node*>( car_branch1->clone( osg::CopyOp::DEEP_COPY_ALL ) );
+	osg::ref_ptr<osg::Node> lod2 = dynamic_cast<osg::Node*>( car_branch1->clone( osg::CopyOp::DEEP_COPY_ALL ) );
+	osg::ref_ptr<osg::Node> lod3 = dynamic_cast<osg::Node*>( car_branch1->clone( osg::CopyOp::DEEP_COPY_ALL ) );
+
+	osgUtil::Simplifier simplifier;
+	// reduce the number of vertices and faces
+	simplifier.setSampleRatio( 0.5 );
+	lod2->accept( simplifier );
+
+	simplifier.setSampleRatio( 0.1 );
+	// this node should accept the simplifier node visitor
+	lod3->accept( simplifier );
+
+	osg::ref_ptr<osg::LOD> car_lod = new osg::LOD;
+    // add the meshes
+	car_lod->addChild( lod1.get(), 0.0f, 50.0f );
+	car_lod->addChild( lod2.get(), 50.0f, 100.0f );
+	car_lod->addChild( lod3.get(), 100.0f, FLT_MAX );
+
+    osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
+    transform1->addChild(car_lod.get());
+
+    // GfOut("loaded car %d",pCar.get());
+    this->car_branch = transform1.get();
+
+    //wheels = new SDWheels;
+    this->car_branch->addChild(wheels.initWheels(car,handle));
+
+	this->car_root = new osg::Group;
+    car_root->addChild(car_branch);
+#endif
 
     this->shader = new SDCarShader(pCar.get(), this);
 

@@ -48,11 +48,12 @@ static double lastTime;
 
 
 
-SDCamera::SDCamera(SDView  * c, int myid, int mydrawCurrent, int mydrawdrv, int mydrawBackground, int mymirrorAllowed)
+SDCamera::SDCamera(SDView  * c, int myid, int mydrawCurrent, int mydrawCkt, int mydrawdrv, int mydrawBackground, int mymirrorAllowed)
 {
     screen = c;
     id = myid;
     drawCurrent = mydrawCurrent;
+	drawCockpit = mydrawCkt;
     drawDriver = mydrawdrv;
     drawBackground = mydrawBackground;
     mirrorAllowed = mymirrorAllowed;
@@ -83,10 +84,10 @@ void SDCamera::update(tCarElt * car, tSituation * s)
 
 // SdPerspCamera ================================================================
 
-SDPerspCamera::SDPerspCamera(SDView *myscreen, int id, int drawCurr, int drawDrv, int drawBG, int mirrorAllowed,
+SDPerspCamera::SDPerspCamera(SDView *myscreen, int id, int drawCurr, int drawCkt, int drawDrv, int drawBG, int mirrorAllowed,
                              float myfovy, float myfovymin, float myfovymax,
                              float myfnear, float myffar, float myfogstart, float myfogend)
-    : SDCamera(myscreen, id, drawCurr, drawDrv, drawBG, mirrorAllowed)
+    : SDCamera(myscreen, id, drawCurr, drawCkt, drawDrv, drawBG, mirrorAllowed)
 {
     fovy     = myfovy;
     fovymin  = myfovymin;
@@ -293,7 +294,7 @@ public:
                             float myfovy, float myfovymin, float myfovymax,
                             float myfnear, float myffar = 1500.0,
                             float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
+        : SDPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 1,
                         myfovy, myfovymin, myfovymax,
                         myfnear, myffar, myfogstart, myfogend)
     {
@@ -502,7 +503,7 @@ public:
                    float fovy, float fovymin, float fovymax,
                    float mydist, float myHeight, float fnear, float ffar = 1500.0,
                    float myfogstart = 1400.0, float myfogend = 1500.0, float relaxation = 10.0f)
-        : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 0, fovy, fovymin,
                         fovymax, fnear, ffar, myfogstart, myfogend)
     {
         dist = mydist;
@@ -571,7 +572,7 @@ public:
                            float myfovy, float myfovymin, float myfovymax,
                            float myfnear, float myffar = 1500.0,
                            float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
+        : SDPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 1,
                         myfovy, myfovymin, myfovymax,
                         myfnear, myffar, myfogstart, myfogend) {}
 
@@ -625,7 +626,7 @@ public:
                             float myfovy, float myfovymin, float myfovymax,
                             float myfnear, float myffar = 1500.0,
                             float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
+        : SDPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 1,
                         myfovy, myfovymin, myfovymax,
                         myfnear, myffar, myfogstart, myfogend) {}
 
@@ -687,7 +688,7 @@ public:
                            float myfovy, float myfovymin, float myfovymax,
                            float myfnear, float myffar = 1500.0,
                            float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 0, drawBG, 0,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 0, drawBG, 0,
                         myfovy, myfovymin, myfovymax,
                         myfnear, myffar, myfogstart, myfogend) {}
 
@@ -758,7 +759,7 @@ public:
                   float fovy, float fovymin, float fovymax,
                   float mydist, float fnear, float ffar = 1500.0,
                   float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 0, fovy, fovymin,
                         fovymax, fnear, ffar, myfogstart, myfogend)
     {
         dist = mydist;
@@ -807,7 +808,7 @@ public:
                  float mydistx, float mydisty, float mydistz,
                  float fnear, float ffar = 1500.0,
                  float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 0, fovy, fovymin,
                         fovymax, fnear, ffar, myfogstart, myfogend)
     {
         distx = mydistx;
@@ -853,7 +854,7 @@ public:
                float mydistz, int axis,
                float fnear, float ffar = 1500.0,
                float myfogstart = 1600.0, float myfogend = 1700.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 0, fovy, fovymin,
                         fovymax, fnear, ffar, myfogstart, myfogend)
     {
         distz = mydistz;
@@ -920,7 +921,7 @@ public:
                    float mydistz,
                    float fnear, float ffar = 1500.0,
                    float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 0, fovy, fovymin,
                         fovymax, fnear, ffar, myfogstart, myfogend)
     {
         distz = mydistz;
@@ -995,7 +996,7 @@ public:
                    float centerx, float centery, float centerz,
                    float fnear, float ffar = 1500.0,
                    float myfogstart = 1600.0, float myfogend = 1700.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 0, fovy, fovymin,
                         fovymax, fnear, ffar, myfogstart, myfogend)
     {
 
@@ -1063,7 +1064,7 @@ public:
                    float fovy, float fovymin, float fovymax,
                    float fnear, float ffar = 1500.0,
                    float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 0, fovy, fovymin,
                         fovymax, fnear, ffar, myfogstart, myfogend) {}
 
     void update(tCarElt *car, tSituation *s)
@@ -1119,7 +1120,7 @@ public:
                    float fovy, float fovymin, float fovymax,
                    float fnear, float ffar = 1500.0,
                    float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 0, fovy, fovymin,
                         fovymax, fnear, ffar, myfogstart, myfogend) {}
 
     void update(tCarElt *car, tSituation *s)
@@ -1176,7 +1177,7 @@ public:
                      float fovy, float fovymin, float fovymax,
                      float fnear, float ffar = 1500.0,
                      float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 0, fovy, fovymin,
                         fovymax, fnear, ffar, myfogstart, myfogend)
     {
         locfar = ffar;
@@ -1256,7 +1257,7 @@ public:
                        float fovy, float fovymin, float fovymax,
                        float fnear, float ffar = 1500.0,
                        float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 0, fovy, fovymin,
                         fovymax, fnear, ffar, myfogstart, myfogend)
     {
         up[0] = 0;
@@ -1312,7 +1313,7 @@ public:
                     float fovy, float fovymin, float fovymax,
                     float fnear, float ffar = 1500.0,
                     float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 0, fovy, fovymin,
                         fovymax, fnear, ffar, myfogstart, myfogend)
     {
         up[0] = 0;
@@ -1435,7 +1436,7 @@ public:
                     float fovy, float fovymin, float fovymax,
                     float mydist, float fnear, float ffar = 1500.0,
                     float myfogstart = 1400.0, float myfogend = 1500.0)
-        : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
+        : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 0, fovy, fovymin,
                         fovymax, fnear, ffar, myfogstart, myfogend)
     {
         dist = mydist;
@@ -1491,7 +1492,7 @@ SDCarCamMirror::SDCarCamMirror(SDView *myscreen, int id, int drawCurr, int drawB
                                float myfovy, float myfovymin, float myfovymax,
                                float myfnear, float myffar,
                                float myfogstart, float myfogend)
-    : SDPerspCamera(myscreen, id, drawCurr, 1, drawBG, 1,
+    : SDPerspCamera(myscreen, id, drawCurr, 0, 1, drawBG, 1,
                     myfovy, myfovymin, myfovymax,
                     myfnear, myffar, myfogstart, myfogend)
     , origFovY(myfovy)
