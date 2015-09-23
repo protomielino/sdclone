@@ -147,7 +147,7 @@ osg::ref_ptr<osg::Geode> SDBrakes::initBrake(int wheelIndex)
 
     for (i = 0; i < (brakeBranch / 2 + 2); i++)
     {
-        alpha = curAngle + (float)i * 2.0 * SD_PI / (float)(brakeBranch - 1);
+        alpha = curAngle + (float)i * 2.0 * M_PI / (float)(brakeBranch - 1);
         vtx[0] = car->_brakeDiskRadius(wheelIndex) * cos(alpha);
         vtx[1] = b_offset;
         vtx[2] = car->_brakeDiskRadius(wheelIndex) * sin(alpha);

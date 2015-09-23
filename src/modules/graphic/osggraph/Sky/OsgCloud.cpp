@@ -387,11 +387,6 @@ void SDCloudLayer::rebuild()
     // the cloud layer. This is the difference in altitude between
     // the top of the inverted bowl and the edge of the bowl.
     const float alt_diff = layer_asl * 1.5f;
-    //const float layer_to_core = (SD_EARTH_RAD * 1000 + layer_asl);
-    //const float layer_angle = 0.5*layer_span / layer_to_core; // The angle is half the span
-    //const float border_to_core = layer_to_core * cos(layer_angle);
-    //const float alt_diff = layer_asl * 0.8f;
-    //const float alt_diff = layer_to_core - border_to_core;
 
     for (int i = 0; i < 4; i++)
     {
@@ -404,9 +399,7 @@ void SDCloudLayer::rebuild()
           cl[i] = new osg::Vec4Array;
           tl[i] = new osg::Vec2Array;
 
-
-          osg::Vec3 vertex(layer_span*(i-2)/2, -layer_span,
-                           alt_diff * (sin(i*mpi) - 2));
+          osg::Vec3 vertex(layer_span*(i-2)/2, -layer_span, alt_diff * (sin(i*mpi) - 2));
           osg::Vec2 tc(layer_scale * i/4, 0.0f);
           osg::Vec4 color(cloudColors[0], (i == 0) ? 0.0f : 0.15f);
 
@@ -416,12 +409,9 @@ void SDCloudLayer::rebuild()
 
           for (int j = 0; j < 4; j++)
           {
-            vertex = osg::Vec3(layer_span*(i-1)/2, layer_span*(j-2)/2,
-                               alt_diff * (sin((i+1)*mpi) + sin(j*mpi) - 2));
+            vertex = osg::Vec3(layer_span*(i-1)/2, layer_span*(j-2)/2, alt_diff * (sin((i+1)*mpi) + sin(j*mpi) - 2));
             tc = osg::Vec2(layer_scale * (i+1)/4, layer_scale * j/4);
-            color = osg::Vec4(cloudColors[0],
-                              ( (j == 0) || (i == 3)) ?
-                              ( (j == 0) && (i == 3)) ? 0.0f : 0.15f : 1.0f );
+            color = osg::Vec4(cloudColors[0], ( (j == 0) || (i == 3)) ? ( (j == 0) && (i == 3)) ? 0.0f : 0.15f : 1.0f );
 
             cl[i]->push_back(color);
             vl[i]->push_back(vertex);
@@ -464,11 +454,10 @@ void SDCloudLayer::rebuild()
         layer_transform->addChild(layer[i].get());
     }
 
-    //OSGFIXME: true
     if ( layer_states[layer_coverage].valid() )
     {
         osg::CopyOp copyOp;    // shallow copy
-        // render bin will be set in reposition
+
         osg::ref_ptr<osg::StateSet> stateSet = static_cast<osg::StateSet*>(layer_states2[layer_coverage]->clone(copyOp));
         stateSet->setDataVariance(osg::Object::DYNAMIC);
         group_top->setStateSet(stateSet.get());
@@ -476,9 +465,6 @@ void SDCloudLayer::rebuild()
         stateSet->setDataVariance(osg::Object::DYNAMIC);
         group_bottom->setStateSet(stateSet.get());
     }
-#if 0
-    osgDB::writeNodeFile(*layer_transform,"/home/xavier/cloud.ac");
-#endif
 }
 
 bool SDCloudLayer::repaint( const osg::Vec3f &fog_color )
@@ -574,14 +560,10 @@ bool SDCloudLayer::reposition(const osg::Vec3f &p, double dt )
             last_pos = p;
             last_x = p._v[0];
             last_y = p._v[1];
-            //scale = layer_scale;
         }
     }
 
     GfLogDebug("CloudLayer Alt = %.f\n", layer_asl);
-    //osgDB::writeNodeFile(*layer_transform,"/home/xavier/cloud.ac");
-
-    //layer3D->reposition( p, up, lon, lat, dt, layer_asl, speed, direction);
 
     return true;
 }

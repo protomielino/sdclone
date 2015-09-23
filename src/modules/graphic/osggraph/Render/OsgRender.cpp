@@ -486,7 +486,7 @@ void SDRender::ShadowedScene()
 {
     if (ShadowIndex == 1)
     {
-        unsigned int shadowTexUnit = 1;
+        unsigned int shadowTexUnit = 3;
 
         osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
         vdsm->setLight(sunLight.get());
@@ -529,8 +529,8 @@ void SDRender::ShadowedScene()
         unsigned int baseTexUnit = 0;
         unsigned int shadowTexUnit = 3;
 
-        lspsm->setMinLightMargin(5.0f);
-        lspsm->setMaxFarPlane(4096.0f);
+        lspsm->setMinLightMargin(0.5f);
+        lspsm->setMaxFarPlane(2048.0f);
         lspsm->setTextureSize(osg::Vec2s(ShadowTexSize, ShadowTexSize));
         lspsm->setShadowTextureCoordIndex(shadowTexUnit);
         lspsm->setShadowTextureUnit(shadowTexUnit);

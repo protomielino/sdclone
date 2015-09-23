@@ -54,14 +54,11 @@ osg::Node *osgLoader::Load3dFile(std::string strFile, bool car)
 {
     osg::Node *pNode = NULL;
     std::string ext = osgDB::getFileExtension(strFile);
-    /*if (car)
-        m_ACCReader2.SetCar(true);*/
+
+	m_ACCReader.SetCar(car);
 
     if (ext == "acc")
     {
-		/*if(car)
-			 osgDB::ReaderWriter::ReadResult rr = m_ACCReader2.readNode(strFile, m_pOpt);
-		else*/
         //Use custom ACC file loader
         osgDB::ReaderWriter::ReadResult rr = m_ACCReader.readNode(strFile, m_pOpt);
         GfOut("Object ACC load = %s -  %d \n", strFile.c_str(), rr.validNode());
@@ -86,6 +83,7 @@ osg::Node *osgLoader::Load3dFile(std::string strFile, bool car)
     else
     {
         pNode = osgDB::readNodeFile(strFile, m_pOpt);
+		GfOut("Object AC load = %s\n", strFile.c_str());
     }
 
     osg::MatrixTransform *rot = new osg::MatrixTransform;

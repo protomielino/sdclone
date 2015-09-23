@@ -75,6 +75,7 @@ SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
                      Car/OsgCar.cpp
                      Car/OsgWheel.cpp
                      Car/OsgBrake.cpp
+					 Car/OsgCarLight.cpp
 
                      OsgGraph.cpp
                      OsgMain.cpp

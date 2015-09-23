@@ -21,14 +21,15 @@
 #include <osg/MatrixTransform>
 #include <osg/Switch>
 #include <osg/Group>
-#include <osg/LOD>
 #include <osgUtil/Simplifier>
 #include <osgViewer/Viewer>
 #include <osg/Program>
 #include <osg/Geode>
 #include <osg/Geometry>
 #include <osg/Texture2D>
+#include <osg/AlphaFunc>
 #include <osg/BlendFunc>
+#include <osg/Material>
 #include <osg/Depth>
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
@@ -51,6 +52,11 @@ class SDRender;
 SDCar::SDCar(void) :
 	car_branch(NULL),
 	car_root(NULL),
+	pLight(NULL),
+	pLightBrake(NULL),
+	pWing3(NULL),
+	pDriver(NULL),
+	pSteer(NULL),
     shader(NULL),
     reflectionMapping(NULL)
 {
@@ -59,6 +65,8 @@ SDCar::SDCar(void) :
     _wing1 = false;
     _wing3 = false;
     _steer = false;
+	_light = false;
+	_lightbrake = false;
 
     _carShader = 0;
 }
@@ -167,15 +175,15 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     osg::ref_ptr<osg::Node> pCar = new osg::Node;
     osg::ref_ptr<osg::Node> pCockpit = new osg::Node;
     osg::ref_ptr<osg::Switch> pWing = new osg::Switch;
+	pLight = new osg::Switch;
+	pLightBrake = new osg::Switch;
     pWing->setName("WING");
-    osg::ref_ptr<osg::Switch> pWing3 = new osg::Switch;
-    pWing->setName("WINGREAR");
-    osg::ref_ptr<osg::Switch> pDriver = new osg::Switch;
+    pWing3 = new osg::Switch;
+    pWing3->setName("WINGREAR");
+    pDriver = new osg::Switch;
     pDriver->setName("DRIVER");
-    osg::ref_ptr<osg::Switch> pSteer = new osg::Switch;
-    pSteer->setName("STEER");
-    osg::ref_ptr<osg::Group> pHiSteer = new osg::Switch;
-    pHiSteer->setName("HISTEER");
+	pSteer = new osg::LOD;
+	pSteer->setName("STEER");
 
     strPath+=buf;
     GfLogInfo("Chemin Textures : %s\n", strTPath.c_str());
@@ -344,8 +352,10 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
         steer_transform->setMatrix(pos);
 
         steer_transform->addChild(steerEntityLo.get());
-        pSteer->addChild(steer_transform.get(), true);
+
+		pSteer->addChild(steer_transform.get(), 1.0f, FLT_MAX);
         GfLogTrace("Low Steer Loading \n");
+
     }
 
     snprintf(path, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
@@ -374,12 +384,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
         steer_transform->setMatrix(pos);
 
         steer_transform->addChild(steerEntityHi.get());
-        pSteer->addChild(steer_transform.get(), false);
+        pSteer->addChild(steer_transform.get(), 0.0f, 1.0f);
         GfLogTrace("High Steer Loading \n");
     }
-
-    pSteer->setSingleChildOn(0);
-
 
     // separate driver models for animation according to steering wheel angle ...
     snprintf(path, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, LST_DRIVER);
@@ -426,7 +433,98 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
         pDriver_path = pDriver_path+"driver.osg";
         osgDB::writeNodeFile( *pDriver, pDriver_path );
 #endif
-    }
+	}
+	
+	_light = false;
+	_lightbrake = false;
+
+	snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_LIGHT);
+	int lightNum = GfParmGetEltNb(handle, path);
+	const char *lightType;
+
+	for (int i = 0; i < lightNum; i++)
+	{
+		snprintf(path, 256, "%s/%s/%d", SECT_GROBJECTS, SECT_LIGHT, i + 1);
+		lightType = GfParmGetStr(handle, path, PRM_TYPE, "");
+
+		if (!strcmp(lightType, VAL_LIGHT_HEAD1))
+		{
+			_light = true;
+		} else if (!strcmp(lightType, VAL_LIGHT_HEAD2))
+		{
+			_light = true;
+		} else if (!strcmp(lightType, VAL_LIGHT_BRAKE)) 
+		{
+			_lightbrake = true;
+		} else if (!strcmp(lightType, VAL_LIGHT_BRAKE2)) 
+		{
+			_lightbrake = true;
+		} else if (!strcmp(lightType, VAL_LIGHT_REAR))
+		{
+			_light = true;
+		}
+	}
+
+	if (_light)
+	{
+		osg::ref_ptr<osg::Node> light1 = new osg::Node;
+		
+        std::string tmp = GetDataDir();
+        snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
+        tmp = tmp+buf;
+		strPath=tmp+"light.ac";
+
+		light1 = loader.Load3dFile(strPath, false);
+        light1->setName("LIGHT");
+
+		osg::ref_ptr<osg::StateSet> light1state = light1->getOrCreateStateSet();
+		osg::ref_ptr<osg::Material> light1_material = new osg::Material;
+		light1_material->setColorMode(osg::Material::AMBIENT_AND_DIFFUSE);
+		light1_material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(1, 1, 1, 1));
+		light1_material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(0, 0, 0, 1));
+		light1state->setAttribute(light1_material.get());
+
+		osg::ref_ptr<osg::AlphaFunc> lightalphaFunc = new osg::AlphaFunc;
+		lightalphaFunc->setFunction(osg::AlphaFunc::ALWAYS);
+		light1state->setAttributeAndModes(lightalphaFunc);
+
+		osg::ref_ptr<osg::BlendFunc> lightblendFunc = new osg::BlendFunc;
+		lightblendFunc->setSource(osg::BlendFunc::SRC_ALPHA);
+		lightblendFunc->setDestination(osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
+		light1state->setAttributeAndModes(lightblendFunc);
+
+		light1state->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+		light1state->setMode(GL_FOG, osg::StateAttribute::ON);
+		light1state->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
+
+		pLight->addChild(light1.get(), false);
+		pLight->setSingleChildOn(1);
+        GfLogInfo("Loaded LIGHT CAR OSG !\n");
+	}
+
+	if (_lightbrake)
+	{
+		osg::ref_ptr<osg::Node> light2 = new osg::Node;
+		osg::ref_ptr<osg::StateSet> light2state = light2->getOrCreateStateSet();
+
+		light2state->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
+		light2state->setMode(GL_FOG, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
+		light2state->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
+
+		light2->setNodeMask(~(0x1 | 0x2));
+		
+        std::string tmp = GetDataDir();
+        snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
+        tmp = tmp+buf;
+		strPath=tmp+"brakelight.ac";
+
+		light2 = loader.Load3dFile(strPath, false);
+        light2->setName("BRAKELIGHT");
+
+		pLightBrake->addChild(light2.get(), false);
+		pLightBrake->setSingleChildOn(1);
+        GfLogInfo("Loaded BRAKE LIGHT CAR OSG !\n");
+	}
 
     gCar->addChild(pCar.get());
     gCar->addChild(pDriver.get());
@@ -434,6 +532,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 
 	if(_wing1)
 		gCar->addChild(pWing.get());
+
 	if(_wing3)
 		gCar->addChild(pWing3.get());
 #else
@@ -477,6 +576,12 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
     pBody->setSingleChildOn(1);
 #if 1
     osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
+	if(_light)
+		transform1->addChild(pLight.get());
+
+	if(_lightbrake)
+		transform1->addChild(pLightBrake.get());
+
     transform1->addChild(pBody.get());
 
     // GfOut("loaded car %d",pCar.get());
@@ -656,6 +761,8 @@ void SDCar::activateCar(tCarElt *car)
 void SDCar::updateCar()
 {
     osg::Vec3 p;
+	float wingangle = car->_wingRCmd * 180 / PI;
+	float steerangle = car->_steerCmd;
 
     p[0] = car->_pos_X;//+ car->_drvPos_x;
     p[1] = car->_pos_Y;//+car->_drvPos_y;
@@ -666,6 +773,77 @@ void SDCar::updateCar()
             car->_posMat[2][0],car->_posMat[2][1],car->_posMat[2][2],car->_posMat[2][3],
             car->_posMat[3][0],car->_posMat[3][1],car->_posMat[3][2],car->_posMat[3][3]);
 
+	if (_wing3)
+	{
+		if ((wingangle > 0.0) && (wingangle < 10.0))
+			pWing3->setSingleChildOn(0);
+		else if ((wingangle > 10.0) && (wingangle < 35.0))
+			pWing3->setSingleChildOn(1);
+		else
+			pWing3->setSingleChildOn(2);
+	}
+
+	if (_driver)
+	{
+		if((steerangle > 0.0f) && (steerangle < 0.03f))
+			pDriver->setSingleChildOn(1);
+		else if((steerangle > 0.03f) && (steerangle < 0.07f))
+			pDriver->setSingleChildOn(2);
+		else if((steerangle > 0.07f) && (steerangle < 0.13f))
+			pDriver->setSingleChildOn(3);
+		else if((steerangle > 0.13f) && (steerangle < 0.21f))
+			pDriver->setSingleChildOn(4);
+		else if((steerangle > 0.21f) && (steerangle < 0.30f))
+			pDriver->setSingleChildOn(5);
+		else if((steerangle > 0.13f) && (steerangle < 0.21f))
+			pDriver->setSingleChildOn(6);
+		else if((steerangle > 0.30f) && (steerangle < 0.45f))
+			pDriver->setSingleChildOn(7);
+		else if(steerangle > 0.45f)
+			pDriver->setSingleChildOn(8);
+		else if((steerangle < 0.0f) && (steerangle > -0.03f))
+			pDriver->setSingleChildOn(9);
+		else if((steerangle < 0.03f) && (steerangle > -0.07f))
+			pDriver->setSingleChildOn(10);
+		else if((steerangle < 0.07f) && (steerangle > -0.13f))
+			pDriver->setSingleChildOn(11);
+		else if((steerangle < 0.13f) && (steerangle > -0.21f))
+			pDriver->setSingleChildOn(12);
+		else if((steerangle < 0.21f) && (steerangle > -0.30f))
+			pDriver->setSingleChildOn(13);
+		else if((steerangle < 0.30f) && (steerangle > -0.45f))
+			pDriver->setSingleChildOn(14);
+		else if(steerangle < 0.45f)
+			pDriver->setSingleChildOn(15);
+		else
+			pDriver->setSingleChildOn(0);
+	}
+
+	if(_steer)
+	{
+		steerangle = (-steerangle * 1.2);
+		osg::ref_ptr<osg::MatrixTransform> movt = new osg::MatrixTransform;
+		osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::Y_AXIS);
+
+		movt->setMatrix(rotation);
+		movt->addChild(pSteer);
+	}
+
+	if(_light)
+	{
+		if(car->_lightCmd)
+			pLight->setSingleChildOn(0);
+		else
+			pLight->setSingleChildOn(1);
+	}
+
+	if(_lightbrake)
+	{
+		if(car->_brakeCmd>0 || car->_ebrakeCmd>0) 
+			pLightBrake->setSingleChildOn(0);
+		else
+			pLightBrake->setSingleChildOn(1);
+	}
     wheels.updateWheels();
 
     this->car_branch->setMatrix(mat);
@@ -690,7 +868,7 @@ void SDCar::updateCar()
     }*/
 }
 
-void SDCar::updateShadingParameters(osg::Matrixf modelview)
+void SDCar::updateShadingParameters2(osg::Matrixf modelview)
 {
     shader->update(modelview);
 }
@@ -790,7 +968,7 @@ void SDCars::updateShadingParameters(osg::Matrixf modelview)
 
     for(it = the_cars.begin(); it!= the_cars.end(); it++)
     {
-        (*it)->updateShadingParameters(modelview);
+        (*it)->updateShadingParameters2(modelview);
     }
 }
 

@@ -291,14 +291,12 @@ bool SDSkyDome::repaint( const Vec3f& sky_color,
 
 bool SDSkyDome::reposition( const osg::Vec3f &p, double spin )
 {
-   // asl = _asl;
-
     osg::Matrix T, SPIN;
 
     T.makeTranslate( p );
     SPIN.makeRotate(spin, osg::Vec3(0, 0, 1));
 
-    dome_transform->setMatrix( T*SPIN/*T*/ );
+    dome_transform->setMatrix( T * SPIN );
 
     return true;
 }

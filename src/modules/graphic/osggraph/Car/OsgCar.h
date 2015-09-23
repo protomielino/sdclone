@@ -25,6 +25,7 @@
 #include <vector>
 
 #include <osg/TextureCubeMap>
+#include <osg/LOD>
 
 #include "OsgDriver.h"
 #include "OsgWheel.h"
@@ -38,6 +39,11 @@ class SDCar
 private :
     osg::ref_ptr<osg::MatrixTransform> car_branch;
     osg::ref_ptr<osg::Group> car_root;
+	osg::ref_ptr<osg::Switch> pLight;
+	osg::ref_ptr<osg::Switch> pLightBrake;
+	osg::ref_ptr<osg::Switch> pWing3;
+	osg::ref_ptr<osg::Switch> pDriver;
+	osg::ref_ptr<osg::LOD> pSteer;
     //osg::ref_ptr<osg::Vec3Array> shadowVertices;
     //osg::ref_ptr<osg::Geometry> quad;
     //osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
@@ -63,6 +69,8 @@ public :
     bool    _wing1;
     bool    _wing3;
     bool    _steer;
+	bool	_light;
+	bool	_lightbrake;
     int     _carShader;
 
     SDReflectionMapping *getReflectionMap();
@@ -73,7 +81,7 @@ public :
 
     void activateCar(tCarElt *car);
     void updateCar();
-    void updateShadingParameters(osg::Matrixf modelview);
+    void updateShadingParameters2(osg::Matrixf modelview);
 };
 
 class SDCars
