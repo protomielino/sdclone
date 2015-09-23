@@ -266,27 +266,19 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
         std::string tmp = GetDataDir();
         snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
         tmp = tmp+buf;
-
+		
         // Add the rearwings
         for (int i = 1; i < nranges; i++)
         {
-            osg::ref_ptr<osg::Node> pWing1 = new osg::Node;
-            osg::ref_ptr<osg::MatrixTransform> position = new osg::MatrixTransform;
+            osg::ref_ptr<osg::Node> pWing1_branch = new osg::Node;
             snprintf(path, nMaxTexPathSize, "%s/%s/%d", SECT_GROBJECTS, LST_REARWING, i);
             param = GfParmGetStr(handle, path, PRM_REARWINGMODEL, "");
 
-            strPath = tmp+param;
+			strPath = tmp+param;
+            pWing1_branch = loader.Load3dFile(strPath, true);
+			GfLogInfo("Loading Wing animate %i - %s !\n", i, strPath.c_str());
 
-            GfLogInfo("Loading Wing animate %i - %s !\n", i, strPath.c_str());
-
-            tdble xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
-            tdble ypos = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0.0);
-            tdble zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
-            osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
-
-            pWing1 = loader.Load3dFile(strPath, true);
-			position->addChild(pWing1.get());
-			pWing3->addChild(position.get());
+			pWing3->addChild(pWing1_branch.get());
             strPath ="";
         }
 
@@ -414,6 +406,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
             tdble zpos = GfParmGetNum(handle, buf, PRM_ZPOS, NULL, 0.0);
             osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
 
+			position->setMatrix(pos);
+
             driver_path = tmp+param;
             driver_branch = loader.Load3dFile(driver_path, true);
             GfLogInfo("Loading Animated Driver %i - %s \n", i, driver_path.c_str());
@@ -434,12 +428,14 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 #endif
     }
 
-    gCar->addChild(pWing.get());
-    gCar->addChild(pWing3.get());
-
     gCar->addChild(pCar.get());
     gCar->addChild(pDriver.get());
     gCar->addChild(pSteer.get());
+
+	if(_wing1)
+		gCar->addChild(pWing.get());
+	if(_wing3)
+		gCar->addChild(pWing3.get());
 #else
 
     osg::ref_ptr<osg::Group> gCar = new osg::Group;

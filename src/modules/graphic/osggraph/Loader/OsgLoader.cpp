@@ -54,14 +54,17 @@ osg::Node *osgLoader::Load3dFile(std::string strFile, bool car)
 {
     osg::Node *pNode = NULL;
     std::string ext = osgDB::getFileExtension(strFile);
-    if (car)
-        m_ACCReader.SetCar(true);
+    /*if (car)
+        m_ACCReader2.SetCar(true);*/
 
     if (ext == "acc")
     {
+		/*if(car)
+			 osgDB::ReaderWriter::ReadResult rr = m_ACCReader2.readNode(strFile, m_pOpt);
+		else*/
         //Use custom ACC file loader
         osgDB::ReaderWriter::ReadResult rr = m_ACCReader.readNode(strFile, m_pOpt);
-        GfOut("le test %d \n", rr.validNode());
+        GfOut("Object ACC load = %s -  %d \n", strFile.c_str(), rr.validNode());
         if (rr.validNode())
         {
             osg::Node *nod = rr.takeNode();
