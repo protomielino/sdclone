@@ -99,12 +99,16 @@ int RmGetFeaturesList( void* param )
 		sprintf( buf, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, caridx );
 		if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_TYPE, ROB_VAL_ROBOT ), ROB_VAL_HUMAN ) == 0 )
 		{
-			if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_LEVEL, ROB_VAL_ROOKIE ), ROB_VAL_ROOKIE ) == 0 )
-				driverFeatureMask |= RM_FEATURE_TIMEDSESSION | RM_FEATURE_WETTRACK;
-			else if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_LEVEL, ROB_VAL_ROOKIE ), ROB_VAL_AMATEUR ) == 0 )
+			if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_LEVEL, ROB_VAL_ARCADE ), ROB_VAL_ARCADE ) == 0 )
+				driverFeatureMask |= RM_FEATURE_TIMEDSESSION;
+			else if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_LEVEL, ROB_VAL_ARCADE ), ROB_VAL_SEMI_ROOKIE ) == 0 )
+				driverFeatureMask |= RM_FEATURE_TIMEDSESSION;
+			else if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_LEVEL, ROB_VAL_ARCADE ), ROB_VAL_ROOKIE ) == 0 )
+				driverFeatureMask |= RM_FEATURE_TIMEDSESSION;
+			else if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_LEVEL, ROB_VAL_ARCADE ), ROB_VAL_AMATEUR ) == 0 )
 				driverFeatureMask |= RM_FEATURE_TIMEDSESSION | RM_FEATURE_WETTRACK;
 			      /* | RM_FEATURE_BLUE */
-			else if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_LEVEL, ROB_VAL_ROOKIE ), ROB_VAL_SEMI_PRO ) == 0 )
+			else if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_LEVEL, ROB_VAL_ARCADE ), ROB_VAL_SEMI_PRO ) == 0 )
 				driverFeatureMask |= RM_FEATURE_TIMEDSESSION | RM_FEATURE_WETTRACK;
 			      /* | RM_FEATURE_PENALTIES | RM_FEATURE_SC | RM_FEATURE_YELLOW | RM_FEATURE_RED | */
 			else if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_LEVEL, ROB_VAL_ROOKIE ), ROB_VAL_PRO ) == 0 )

@@ -57,7 +57,7 @@
 
 
 static const char *aPszSkillLevelNames[] =
-	{ ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
+	{ ROB_VAL_ARCADE, ROB_VAL_SEMI_ROOKIE, ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
 static const int NSkillLevels = (int)(sizeof(aPszSkillLevelNames)/sizeof(char*));
 
 // The list of robot modules loaded for the race.
