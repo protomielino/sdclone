@@ -34,6 +34,10 @@
 
 #include "gui.h"
 
+/*#ifndef OFFICIAL_ONLY
+#define OFFICIAL_ONLY 1
+#endif*/
+
 
 /* list of available simulation engine */
 static const int DefaultSimuVersion = 1;
@@ -70,6 +74,13 @@ static const char *CooldownSchemeList[] = {RM_VAL_ON, RM_VAL_OFF};
 static const int NbCooldownSchemes = sizeof(CooldownSchemeList) / sizeof(CooldownSchemeList[0]);
 static int CurCooldownScheme = 0; // On
 
+/* list of available graphic engine */
+static const int DefaultGraphicVersion = 1;
+static const char *GraphicSchemeList[] = {RM_VAL_MOD_SSGRAPH, RM_VAL_MOD_OSGGRAPH};
+static const char *GraphicDispNameList[] = 	{"ssggraph", "OsgGraph"};
+static const int NbGraphicScheme = sizeof(GraphicSchemeList) / sizeof(GraphicSchemeList[0]);
+static int CurGraphicScheme = DefaultGraphicVersion;
+
 /* gui label ids */
 static int SimuVersionId;
 static int MultiThreadSchemeId;
@@ -79,6 +90,8 @@ static int ReplayRateSchemeId;
 static int StartPausedSchemeId;
 
 static int CooldownSchemeId;
+
+static int GraphicSchemeId;
 
 /* gui screen handles */
 static void *ScrHandle = NULL;
@@ -93,6 +106,7 @@ static void loadSimuCfg(void)
 	const char *replayRateSchemeName;
 	const char *startPausedSchemeName;
 	const char *cooldownSchemeName;
+	const char *graphicSchemeName;
 
 	int i;
 
@@ -103,8 +117,10 @@ static void loadSimuCfg(void)
 
 	// Simulation engine name.
 	simuVersionName = GfParmGetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, SimuVersionList[DefaultSimuVersion]);
-	for (i = 0; i < NbSimuVersions; i++) {
-		if (strcmp(simuVersionName, SimuVersionList[i]) == 0) {
+	for (i = 0; i < NbSimuVersions; i++)
+	{
+		if (strcmp(simuVersionName, SimuVersionList[i]) == 0)
+		{
 			CurSimuVersion = i;
 			break;
 		}
@@ -121,8 +137,10 @@ static void loadSimuCfg(void)
 
 	// Multi-threading.
 	multiThreadSchemeName = GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_MULTI_THREADING, MultiThreadSchemeList[0]);
-	for (i = 0; i < NbMultiThreadSchemes; i++) {
-		if (strcmp(multiThreadSchemeName, MultiThreadSchemeList[i]) == 0) {
+	for (i = 0; i < NbMultiThreadSchemes; i++)
+	{
+		if (strcmp(multiThreadSchemeName, MultiThreadSchemeList[i]) == 0)
+		{
 			CurMultiThreadScheme = i;
 			break;
 		}
@@ -130,8 +148,10 @@ static void loadSimuCfg(void)
 
 	// Thread affinity.
 	threadAffinitySchemeName = GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_THREAD_AFFINITY, ThreadAffinitySchemeList[0]);
-	for (i = 0; i < NbThreadAffinitySchemes; i++) {
-		if (strcmp(threadAffinitySchemeName, ThreadAffinitySchemeList[i]) == 0) {
+	for (i = 0; i < NbThreadAffinitySchemes; i++) 
+	{
+		if (strcmp(threadAffinitySchemeName, ThreadAffinitySchemeList[i]) == 0)
+		{
 			CurThreadAffinityScheme = i;
 			break;
 		}
@@ -140,8 +160,10 @@ static void loadSimuCfg(void)
 	// Replay Rate
 #ifdef THIRD_PARTY_SQLITE3
 	replayRateSchemeName = GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_REPLAY_RATE, ReplaySchemeList[0]);
-	for (i = 0; i < NbReplaySchemes; i++) {
-		if (strcmp(replayRateSchemeName, ReplaySchemeList[i]) == 0) {
+	for (i = 0; i < NbReplaySchemes; i++) 
+	{
+		if (strcmp(replayRateSchemeName, ReplaySchemeList[i]) == 0)
+		{
 			CurReplayScheme = i;
 			break;
 		}
@@ -152,8 +174,10 @@ static void loadSimuCfg(void)
 
 	// startpaused
 	startPausedSchemeName = GfParmGetStr(paramHandle,RM_SECT_RACE_ENGINE, RM_ATTR_STARTPAUSED, StartPausedSchemeList[1]);
-	for (i = 0; i < NbStartPausedSchemes; i++) {
-		if (strcmp(startPausedSchemeName, StartPausedSchemeList[i]) == 0) {
+	for (i = 0; i < NbStartPausedSchemes; i++) 
+	{
+		if (strcmp(startPausedSchemeName, StartPausedSchemeList[i]) == 0) 
+		{
 			CurStartPausedScheme = i;
 			break;
 		}
@@ -161,9 +185,22 @@ static void loadSimuCfg(void)
 
 	// cooldown
 	cooldownSchemeName = GfParmGetStr(paramHandle,RM_SECT_RACE_ENGINE, RM_ATTR_COOLDOWN, CooldownSchemeList[1]);
-	for (i = 0; i < NbCooldownSchemes; i++) {
-		if (strcmp(cooldownSchemeName, CooldownSchemeList[i]) == 0) {
+	for (i = 0; i < NbCooldownSchemes; i++)
+	{
+		if (strcmp(cooldownSchemeName, CooldownSchemeList[i]) == 0) 
+		{
 			CurCooldownScheme = i;
+			break;
+		}
+	}
+
+	// graphic engine
+	graphicSchemeName = GfParmGetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_GRAPHIC, GraphicSchemeList[1]);
+	for (i = 0; i < NbGraphicScheme; i++) 
+	{
+		if (strcmp(graphicSchemeName, GraphicSchemeList[i]) == 0)
+		{
+			CurGraphicScheme = i;
 			break;
 		}
 	}
@@ -174,11 +211,17 @@ static void loadSimuCfg(void)
 	GfuiLabelSetText(ScrHandle, MultiThreadSchemeId, MultiThreadSchemeList[CurMultiThreadScheme]);
 	GfuiLabelSetText(ScrHandle, ThreadAffinitySchemeId, ThreadAffinitySchemeList[CurThreadAffinityScheme]);
 	GfuiLabelSetText(ScrHandle, ReplayRateSchemeId, ReplaySchemeDispNameList[CurReplayScheme]);
+
 #ifndef THIRD_PARTY_SQLITE3
 	GfuiEnable(ScrHandle, ReplayRateSchemeId, GFUI_DISABLE);
 #endif
 	GfuiLabelSetText(ScrHandle, StartPausedSchemeId, StartPausedSchemeList[CurStartPausedScheme]);
 	GfuiLabelSetText(ScrHandle, CooldownSchemeId, CooldownSchemeList[CurCooldownScheme]);
+	GfuiLabelSetText(ScrHandle, GraphicSchemeId, GraphicSchemeList[CurGraphicScheme]);
+
+#ifdef OFFICIAL_ONLY
+	GfuiEnable(ScrHandle, GraphicSchemeId, GFUI_DISABLE);
+#endif
 }
 
 
@@ -195,6 +238,7 @@ static void storeSimuCfg(void * /* dummy */)
 	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_REPLAY_RATE, ReplaySchemeList[CurReplayScheme]);
 	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_STARTPAUSED, StartPausedSchemeList[CurStartPausedScheme]);
 	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_COOLDOWN, CooldownSchemeList[CurCooldownScheme]);
+	GfParmSetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_GRAPHIC, GraphicSchemeList[CurGraphicScheme]);
 	GfParmWriteFile(NULL, paramHandle, "raceengine");
 	GfParmReleaseHandle(paramHandle);
 	
@@ -224,6 +268,26 @@ onChangeSimuVersion(void *vp)
 	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionDispNameList[CurSimuVersion]);
 }
 
+/* Change the graphc engine version (but only show really available modules) */
+static void
+onChangeGraphicVersion(void *vp)
+{
+	char buf[1024];
+
+	if (!vp)
+		return;
+
+	const int oldGraphicVersion = CurGraphicScheme;
+	do
+	{
+		CurGraphicScheme = (CurGraphicScheme + NbGraphicScheme + (int)(long)vp) % NbGraphicScheme;
+	
+		snprintf(buf, sizeof(buf), "%smodules/graphic/%s.%s", GfLibDir(), GraphicSchemeList[CurGraphicScheme], DLLEXT);
+	}
+	while (!GfFileExists(buf) && CurGraphicScheme != oldGraphicVersion);
+
+	GfuiLabelSetText(ScrHandle, GraphicSchemeId, GraphicDispNameList[CurGraphicScheme]);
+}
 
 /* Change the multi-threading scheme */
 static void
@@ -328,6 +392,12 @@ SimuMenuInit(void *prevMenu)
 
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "cooldownleftarrow", (void*)-1, onChangeCooldownScheme);
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "cooldownrightarrow", (void*)1, onChangeCooldownScheme);
+
+	GraphicSchemeId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "graphiclabel");
+#ifndef OFFICIAL_ONLY
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "graphicleftarrow", (void*)-1, onChangeGraphicVersion);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "graphicrightarrow", (void*)1, onChangeGraphicVersion);
+#endif
 
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "ApplyButton", PrevScrHandle, storeSimuCfg);
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "CancelButton", PrevScrHandle, GfuiScreenActivate);

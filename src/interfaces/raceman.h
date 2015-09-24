@@ -425,6 +425,7 @@ typedef struct RmInfo
 #define RM_VAL_MOD_SIMU_REPLAY		"simureplay"
 #define RM_VAL_MOD_TRACK		"track"
 #define RM_VAL_MOD_SSGRAPH		"ssggraph"
+#define RM_VAL_MOD_OSGGRAPH		"osggraph"
 
 /* Replay Settings */
 
