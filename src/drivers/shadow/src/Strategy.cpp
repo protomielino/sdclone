@@ -51,7 +51,8 @@ SimpleStrategy::SimpleStrategy()
     m_maxDamage = 0;                    // [-] max damage before we request a pit stop.
     m_Fuel = 0;                         // [Kg] Security fuel at the strat race.
     m_expectedfuelperlap = 0;           // [Kg] Expected fuel per lap
-
+	TrackLength = 0;
+	RaceDistance = 0;
 }
 
 
@@ -63,6 +64,9 @@ SimpleStrategy::~SimpleStrategy()
 
 void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituation *s, int index)
 {
+	Track = t;
+	TrackLength = Track->length;
+	RaceDistance = TrackLength * s->_totLaps; 
     /* Trivial strategy: fill in as much fuel as required for the whole race, or if the tank is
        too small fill the tank completely. */
     // Load and set parameters.

@@ -156,6 +156,9 @@ protected:
     int AlwaysPit;
     int strategy_verbose;
 
+	float	  TrackLength;
+	float	  RaceDistance;
+
     int laps_to_go(tCarElt *car) {return car->_remainingLaps - car->_lapsBehindLeader;}
     virtual void updateFuelStrategy(tCarElt* car, tSituation *s);
 };

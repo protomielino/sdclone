@@ -34,11 +34,15 @@ public:
 private:
 	enum
 	{
-		PIT_NONE,
-		PIT_BEFORE,
-		PIT_ENTER,
-		PIT_ASKED,
-		PIT_EXIT
+        PIT_NONE,
+        PIT_BEFORE,
+        PIT_PREPARE,
+        PIT_ENTER,
+        PIT_ASKED,
+        PIT_SERVICE,
+        PIT_EXIT_WAIT,
+        PIT_EXIT,
+        PIT_GONE
 	};
 
 private:

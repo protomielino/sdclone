@@ -218,7 +218,6 @@ TDriver::TDriver(int Index, const int robot_type):
         Frc = 0.95;
         break;
 
-
     case SHADOW_LS1:
         robot_name = "shadow_ls1";
         Frc = 0.85;
@@ -373,19 +372,17 @@ void TDriver::GetSkillingParameters(const char* BaseParamPath, const char* PathF
 
     if (SkillEnabled > 0)                          // If skilling is enabled
     {                                              // Get Skill level
-        Skilling = true;                            // of TORCS-Installation
+        Skilling = true;                           // of TORCS-Installation
         LogSHADOW.debug("#Skilling: On\n");
 
         void* SkillHandle = NULL;
 
-        snprintf(PathFilenameBuffer, 256,
-                 "%sconfig/raceman/extra/skill.xml",GetLocalDir());
+        snprintf(PathFilenameBuffer, 256, "%sconfig/raceman/extra/skill.xml",GetLocalDir());
         LogSHADOW.debug("#skill.xml: %s\n", PathFilename);
         SkillHandle = GfParmReadFile(PathFilename, GFPARM_RMODE_REREAD);
         if (SkillHandle)
         {
-            SkillGlobal = MAX(0.0,MIN(10.0,GfParmGetNum(SkillHandle, "skill", "level",
-                                                        (char *) NULL, 10.0)));
+            SkillGlobal = MAX(0.0,MIN(10.0,GfParmGetNum(SkillHandle, "skill", "level", (char *) NULL, 10.0)));
             LogSHADOW.debug("#LocalDir: SkillGlobal: %g\n", SkillGlobal);
         }
         else
@@ -396,8 +393,7 @@ void TDriver::GetSkillingParameters(const char* BaseParamPath, const char* PathF
             SkillHandle = GfParmReadFile(PathFilename, GFPARM_RMODE_REREAD);
             if (SkillHandle)
             {
-                SkillGlobal = MAX(0.0,MIN(10.0, GfParmGetNum(SkillHandle,
-                                                             "skill", "level", (char *) NULL, 10.0)));
+                SkillGlobal = MAX(0.0,MIN(10.0, GfParmGetNum(SkillHandle, "skill", "level", (char *) NULL, 10.0)));
                 LogSHADOW.debug("#DataDir: SkillGlobal: %g\n", SkillGlobal);
             }
         }
@@ -433,14 +429,12 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 {
     void*	hCarParm = 0;
     char	buf[1024];
+	char	trackName[256];
     track = pTrack;
 
-	char	trackName[256];
     strncpy( trackName, strrchr(track->filename, '/') + 1, sizeof(trackName) );
 	*strrchr(trackName, '.') = '\0';
-
-
-
+	
     if (track->length < 2000)
       RtTeamManagerLaps(3);
     else if (track->length < 3000)
@@ -471,7 +465,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 	//	ok, lets read/merge the car parms.
 	//
 
-	    Meteorology();
+	Meteorology();
 
 	// default params for car type (e.g. clkdtm)
     snprintf( buf, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, m_CarType, trackName );
@@ -618,9 +612,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 	MyTrack::SideMod	sideMod;
 	sideMod.side = -1;
 	const char*	pStr = GfParmGetStr(hCarParm, SECT_PRIV, PRV_SIDE_MOD, "");
-	if( pStr == 0 ||
-		sscanf(pStr, "%d , %d , %d",
-				&sideMod.side, &sideMod.start, &sideMod.end) != 3 )
+	if( pStr == 0 || sscanf(pStr, "%d , %d , %d", &sideMod.side, &sideMod.start, &sideMod.end) != 3 )
 	{
 		sideMod.side = -1;
 	}
@@ -667,6 +659,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
 
     LogSHADOW.debug( "CARMASS %g   TYRE_MU %g   TYRE_MU_F %g   TYRE_MU_R %g \n",
 			m_cm.MASS, m_cm.TYRE_MU, m_cm.TYRE_MU_F, m_cm.TYRE_MU_R );
+
     LogSHADOW.debug( "MU_SC %g   KZ_SCALE %g   FLY_HEIGHT %g\n",
 			m_cm.MU_SCALE, m_cm.KZ_SCALE, FLY_HEIGHT );
 
@@ -730,12 +723,9 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
 
     LogSHADOW.debug("m_path passed\n");
 
-    m_pitPath[PATH_NORMAL].MakePath( car, &m_path[PATH_NORMAL], m_cm,
-										PIT_ENTRY_OFFSET, PIT_EXIT_OFFSET );
-    m_pitPath[PATH_LEFT].  MakePath( car, &m_path[PATH_LEFT],   m_cm2,
-										PIT_ENTRY_OFFSET, PIT_EXIT_OFFSET );
-    m_pitPath[PATH_RIGHT]. MakePath( car, &m_path[PATH_RIGHT],  m_cm2,
-										PIT_ENTRY_OFFSET, PIT_EXIT_OFFSET );
+    m_pitPath[PATH_NORMAL].MakePath( car, &m_path[PATH_NORMAL], m_cm,  PIT_ENTRY_OFFSET, PIT_EXIT_OFFSET );
+    m_pitPath[PATH_LEFT].  MakePath( car, &m_path[PATH_LEFT],   m_cm2, PIT_ENTRY_OFFSET, PIT_EXIT_OFFSET );
+    m_pitPath[PATH_RIGHT]. MakePath( car, &m_path[PATH_RIGHT],  m_cm2, PIT_ENTRY_OFFSET, PIT_EXIT_OFFSET );
 
     LogSHADOW.debug("m_pit Path passed\n");
 

@@ -102,8 +102,7 @@ void PitControl::Process( CarElt* pCar )
 
 //	bool	likeToPit = pCar->_dammage >=  500 || pCar->_fuel < 90;
 //	bool	likeToPit = pCar->_dammage + damagePerLap >= repairLimit ||
-	bool	likeToPit = pCar->_dammage >= repairLimit ||
-						pCar->_fuel < fuelPerLap * 1.5;
+	bool	likeToPit = pCar->_dammage >= repairLimit || pCar->_fuel < fuelPerLap * 1.5;
 //	likeToPit = true;
 
 	// pitting on the last lap is a silly thing to do (think about it!).
