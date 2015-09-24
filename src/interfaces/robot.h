@@ -106,6 +106,8 @@ typedef struct RobotItf {
 #define ROB_ATTR_LEVEL                  "skill level"
 #define ROB_ATTR_FEATURES               "features"
 
+#define ROB_VAL_ARCADE					"arcade"
+#define ROB_VAL_SEMI_ROOKIE				"semi-rookie"
 #define ROB_VAL_ROOKIE                  "rookie"
 #define ROB_VAL_AMATEUR                 "amateur"
 #define ROB_VAL_SEMI_PRO                "semi-pro"
