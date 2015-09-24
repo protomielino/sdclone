@@ -18,7 +18,6 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Loader/ReaderWriterACC.h
                      Loader/OsgLoader.h
 
-                     #Scenery/OsgTrackLight.h
 					 Scenery/OsgScenery.h
 
                      Render/OsgRender.h
@@ -75,7 +74,6 @@ SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
                      Car/OsgCar.cpp
                      Car/OsgWheel.cpp
                      Car/OsgBrake.cpp
-					 Car/OsgCarLight.cpp
 
                      OsgGraph.cpp
                      OsgMain.cpp
