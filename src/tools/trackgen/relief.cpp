@@ -62,7 +62,7 @@ static ssgEntity	*Root = NULL;
  * separate between interior and exterior lines
  */
 static ssgBranch *
-hookNode(const char *s)
+hookNode(char *s)
 {
     tLine	*line;
     
