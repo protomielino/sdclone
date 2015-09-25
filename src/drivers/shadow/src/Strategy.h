@@ -81,10 +81,10 @@ public:
     // Pit Free?
     virtual bool isPitFree(tCarElt* car) = 0;
 
-    tCarElt   *Car;
-    tTrack    *Track;
-    PitPath   *pitPath;
-    TDriver   *Driver;
+    tCarElt    *Car;
+    tTrack     *Track;
+    PitPath    *pitPath;
+    TDriver    *Driver;
     //Pit     Pit;
     //TDriver   Driver;
 

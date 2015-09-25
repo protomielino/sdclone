@@ -43,8 +43,6 @@ SET(ROBOT_SOURCES src/Array.h
 				src/PathRecord.h
 				src/PidController.cpp 
 				src/PidController.h
-				src/PitControl.cpp
-				src/PitControl.h
 				src/PitPath.cpp 
 				src/PitPath.h
 				src/PtInfo.cpp 

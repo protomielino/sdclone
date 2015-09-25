@@ -31,7 +31,6 @@
 #include "ClothoidPath.h"
 #include "OptimisedPath.h"
 #include "PitPath.h"
-#include "PitControl.h"
 #include "Opponent.h"
 #include "PidController.h"
 #include "LearnedGraph.h"
@@ -318,12 +317,12 @@ private:
     MyTrack 		m_track;
 	OptimisedPath	m_path[N_PATHS];
 	PitPath			m_pitPath[N_PATHS];
-	PitControl		m_pitControl;
 
 	CarModel		m_cm;
 	CarModel		m_cm2;
 
     tCarElt         *car;                                         // Pointer to tCarElt struct.
+
     // Track variables.
     tTrack          *track;
     tWing           carWing[2];

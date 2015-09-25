@@ -133,7 +133,6 @@ static const double	s_sgMax[] = { 0.03, 100 };
 static const int	s_sgSteps[] = { 10,  18 };
 
 TDriver::TDriver(int Index, const int robot_type):
-    m_pitControl(m_track, m_pitPath[PATH_NORMAL]),
     m_CarType(0),
     m_driveType(DT_RWD),
     m_gearUpRpm(9000),
@@ -622,6 +621,8 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 
     m_track.NewTrack( track, false, &sideMod );
 
+	m_Situation = pS;
+
     // Create pitting strategy
     m_Strategy = new SimpleStrategy();
     m_Strategy->Driver = this;
@@ -753,7 +754,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
 void TDriver::GetPtInfo( int path, double pos, PtInfo& pi ) const
 {
 
-	if( m_pitControl.WantToPit() && m_pitPath[path].ContainsPos(pos) )
+	if( m_Strategy->needPitstop(car, m_Situation) && m_pitPath[path].ContainsPos(pos) )
 		m_pitPath[path].GetPtInfo( pos, pi );
 	else
 		m_path[path].GetPtInfo( pos, pi );
@@ -1577,7 +1578,7 @@ void TDriver::Drive( tSituation* s )
 		SpeedControl( SPDC_TRAFFIC, targetSpd, spd0, car, acc, brk );
         LogSHADOW.debug("#Drive SpeedControl = close\n");
 	}
-	else if( m_pitControl.WantToPit() )
+	else if( m_Strategy->needPitstop(car, s) )
 	{
 		SpeedControl( SPDC_TRAFFIC, targetSpd, spd0, car, acc, brk );
         LogSHADOW.debug("#Drive SpeedControl = m_pitControl\n");
@@ -1762,7 +1763,7 @@ void TDriver::Drive( tSituation* s )
     m_LastAccel = acc;
 	m_LastAbsDriftAngle = m_AbsDriftAngle;
 
-	m_pitControl.Process( car );
+	m_Strategy->update(car, s);
 }
 
 // Pitstop callback.
