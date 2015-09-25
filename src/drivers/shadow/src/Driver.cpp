@@ -88,9 +88,9 @@ static const char *WingSect[2] =
 // R: Avoid to right
 //--------------------------------------------------------------------------*
 /*#define BUFLEN 256
-static char PathToWriteToBuffer[BUFLEN];         // for path we write to
-static char PathFilenameBuffer[BUFLEN];          // for path and filename
-static char TrackNameBuffer[BUFLEN];             // for track name
+static char PathToWriteToBuffer[BUFLEN];         // for path we write to*/
+static char PathFilenameBuffer[256];          // for path and filename
+/*static char TrackNameBuffer[BUFLEN];             // for track name
 static char TrackLoadQualifyBuffer[BUFLEN];      // for track filename Q
 static char TrackLoadBuffer[BUFLEN];             // for track filename F
 static char TrackLoadLeftBuffer[BUFLEN];         // for track filename L
@@ -344,23 +344,22 @@ void TDriver::AdjustSkilling(void* pCarHandle)
 //==========================================================================*
 // Get skilling parameters
 //--------------------------------------------------------------------------*
-void TDriver::GetSkillingParameters(const char* BaseParamPath, const char* PathFilename)
+void TDriver::GetSkillingParameters()
 {
     // Global skilling from Andrew Sumner ...
     // Check if skilling is enabled
     int SkillEnabled = 0;
-    char	PathFilenameBuffer[1024];
+    char	PathFilenameBuffer[512];
 
     // Do not skill if optimisation is working
     //if (!GeneticOpti)
     {
-        snprintf(PathFilenameBuffer, 256, "%s/default.xml", BaseParamPath);
+        snprintf(PathFilenameBuffer, 512, "%sdrivers/%s/default.xml", GetDataDir(), robot_name);
         LogSHADOW.debug("#PathFilename: %s\n", PathFilenameBuffer); // itself
-        void* SkillHandle = GfParmReadFile(PathFilename, GFPARM_RMODE_REREAD);
+        void* SkillHandle = GfParmReadFile(PathFilenameBuffer, GFPARM_RMODE_REREAD);
         if (SkillHandle)
         {
-            SkillEnabled = (int) MAX(0,MIN(1,(int) GfParmGetNum(SkillHandle,
-                                                                "skilling", "enable", (char *) NULL, 0.0)));
+            SkillEnabled = (int) MAX(0,MIN(1,(int) GfParmGetNum(SkillHandle, "skilling", "enable", (char *) NULL, 0.0)));
             LogSHADOW.debug("#SkillEnabled %d\n", SkillEnabled);
             //TeamEnabled = GfParmGetNum(SkillHandle, "team", "enable", 0, (float)TeamEnabled) != 0;
             //LogSHADOW.debug("#TeamEnabled %d\n", TeamEnabled);
@@ -376,31 +375,31 @@ void TDriver::GetSkillingParameters(const char* BaseParamPath, const char* PathF
 
         void* SkillHandle = NULL;
 
-        snprintf(PathFilenameBuffer, 256, "%sconfig/raceman/extra/skill.xml",GetLocalDir());
-        LogSHADOW.debug("#skill.xml: %s\n", PathFilename);
-        SkillHandle = GfParmReadFile(PathFilename, GFPARM_RMODE_REREAD);
+        snprintf(PathFilenameBuffer, 256, "%sconfig/raceman/extra/skill.xml", GetLocalDir());
+        LogSHADOW.debug("#skill.xml: %s\n", PathFilenameBuffer);
+        SkillHandle = GfParmReadFile(PathFilenameBuffer, GFPARM_RMODE_REREAD);
         if (SkillHandle)
         {
-            SkillGlobal = MAX(0.0,MIN(10.0,GfParmGetNum(SkillHandle, "skill", "level", (char *) NULL, 10.0)));
+            SkillGlobal = MAX(0.0,MIN(30.0,GfParmGetNum(SkillHandle, "skill", "level", (char *) NULL, 30.0)));
             LogSHADOW.debug("#LocalDir: SkillGlobal: %g\n", SkillGlobal);
         }
         else
         {
-            snprintf(PathFilenameBuffer, 256, "%sconfig/raceman/extra/skill.xml",GetDataDir());
-            LogSHADOW.debug("#skill.xml: %s\n", PathFilename);
+            snprintf(PathFilenameBuffer, 256, "%sconfig/raceman/extra/skill.xml", GetDataDir());
+            LogSHADOW.debug("#skill.xml: %s\n", PathFilenameBuffer);
 
-            SkillHandle = GfParmReadFile(PathFilename, GFPARM_RMODE_REREAD);
+            SkillHandle = GfParmReadFile(PathFilenameBuffer, GFPARM_RMODE_REREAD);
             if (SkillHandle)
             {
-                SkillGlobal = MAX(0.0,MIN(10.0, GfParmGetNum(SkillHandle, "skill", "level", (char *) NULL, 10.0)));
+                SkillGlobal = MAX(0.0,MIN(30.0, GfParmGetNum(SkillHandle, "skill", "level", (char *) NULL, 30.0)));
                 LogSHADOW.debug("#DataDir: SkillGlobal: %g\n", SkillGlobal);
             }
         }
 
         // Get individual skilling
-        snprintf(PathFilenameBuffer, 256, "%s/%d/skill.xml", BaseParamPath, INDEX);
+        snprintf(PathFilenameBuffer, 256, "%sdrivers/%s/%d/skill.xml", GetDataDir(), robot_name, INDEX);
         LogSHADOW.debug("#PathFilename: %s\n", PathFilenameBuffer); // itself
-        SkillHandle = GfParmReadFile(PathFilename, GFPARM_RMODE_REREAD);
+        SkillHandle = GfParmReadFile(PathFilenameBuffer, GFPARM_RMODE_REREAD);
 
         if (SkillHandle)
         {
@@ -408,9 +407,10 @@ void TDriver::GetSkillingParameters(const char* BaseParamPath, const char* PathF
             SkillDriver = MIN(1.0, MAX(0.0, SkillDriver));
             LogSHADOW.debug("#SkillDriver: %g\n", SkillDriver);
 
-            DriverAggression =
-                    GfParmGetNum(SkillHandle, "skill", "aggression", (char *)NULL, 0.0);
+            DriverAggression = GfParmGetNum(SkillHandle, "skill", "aggression", (char *)NULL, 0.0);
             LogSHADOW.debug("#DriverAggression: %g\n", DriverAggression);
+
+			SkillDriver = (float)((SkillGlobal + SkillDriver * 2) * (1.0 + SkillDriver));
         }
 
         GfParmReleaseHandle(SkillHandle);
@@ -431,16 +431,21 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 	char	trackName[256];
     track = pTrack;
 
-    strncpy( trackName, strrchr(track->filename, '/') + 1, sizeof(trackName) );
+	// Initialize the base param path
+	const char* BaseParamPath = TDriver::robot_name;
+	const char* PathFilename = PathFilenameBuffer;
+
+    SkillGlobal = Skill = DecelAdjustPerc = DriverAggression = 0.0;
+    GetSkillingParameters();
+	LogSHADOW.debug("#Skill Driver = %f\n", SkillDriver);
+
+	strncpy( trackName, strrchr(track->filename, '/') + 1, sizeof(trackName) );
 	*strrchr(trackName, '.') = '\0';
 	
     if (track->length < 2000)
       RtTeamManagerLaps(3);
     else if (track->length < 3000)
       RtTeamManagerLaps(2);
-
-    SkillGlobal = Skill = DecelAdjustPerc = DriverAggression = 0.0;
-
 	//
 	//	set up race type array.
 	//
@@ -495,6 +500,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 
 	m_cm.AERO = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_AERO_MOD, 0, 0);
 	m_cm.MU_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_MU_SCALE, NULL, 0.9f);
+	m_cm.SKILL = SkillDriver / 10;
 	if (m_raceType == 1)
 	{
 		m_cm.MU_SCALE = m_cm.MU_SCALE + 0.02;
@@ -1572,6 +1578,7 @@ void TDriver::Drive( tSituation* s )
 	bool	close = false;
 	bool	lapper = false;
     AvoidOtherCars( INDEX, car, pi.k, targetSpd, s, close, lapper );
+
     LogSHADOW.debug("SHADOW AvoidOtherCars\n");
 	if( close )
 	{
@@ -2004,7 +2011,7 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 	double	avoidTMaxA = 0.0003 * scale;
 	double	avoidTMaxV = 0.2 * scale;
 
-		m_attractor = target.x;
+	m_attractor = target.x;
 
 	double	targetS = 1 - target.y;
     if(( m_avoidS != 1 && m_attractor == 0) || (m_avoidS != targetS && m_attractor != 0))
@@ -2067,6 +2074,7 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 
 		double	dist = attractT - m_avoidT;
 		double	slowS = (m_avoidTVel * m_avoidTVel) / (2 * avoidTMaxA);
+
 		if( dist * m_avoidTVel > 0 && fabs(dist) <= slowS )
 		{
 			avoidA = -(m_avoidTVel * m_avoidTVel) / (2 * dist);
@@ -2102,8 +2110,7 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 		m_avoidT = 1;
 		m_avoidTVel = 0;
 	}
-    else if(( oldAvoidT < attractT && m_avoidT >= attractT ) ||
-            ( oldAvoidT > attractT && m_avoidT <= attractT ))
+    else if(( oldAvoidT < attractT && m_avoidT >= attractT ) || ( oldAvoidT > attractT && m_avoidT <= attractT ))
 	{
 		m_avoidT = attractT;
 		m_avoidTVel = 0;

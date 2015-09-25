@@ -367,10 +367,10 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
     if (skillHandle)
     {
-        global_skill = GfParmGetNum(skillHandle, (char *)SECT_SKILL, (char *)PRV_SKILL_LEVEL, (char *) NULL, 10.0f);
+        global_skill = GfParmGetNum(skillHandle, (char *)SECT_SKILL, (char *)PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
     }
 
-    global_skill = MAX(0.0f, MIN(10.0f, global_skill));
+    global_skill = MAX(0.0f, MIN(30.0f, global_skill));
 
     // Initialize the base param path
     const char* BaseParamPath = Driver::ROBOT_DIR;
@@ -1453,7 +1453,6 @@ void Driver::calcSkill()
             // how long this skill mode to last for
             skill_adjust_limit = 5.0 + rand3 * 50.0;
             skill_adjust_timer = simtime;
-            //fprintf(stderr,"SKILL: New Targets: Decel=%.3f Brake=%.3f Time=%.3f\n",decel_adjust_targ,brake_adjust_targ,skill_adjust_limit);
         }
 
         if (decel_adjust_perc < decel_adjust_targ)

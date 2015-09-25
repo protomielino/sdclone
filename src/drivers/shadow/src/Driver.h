@@ -247,7 +247,7 @@ public:
     void    AdjustSkilling(void* pCarHandle);
 	void	AdjustBrakes(void *pCarHandle);
 
-    void    GetSkillingParameters(const char* BaseParamPath, const char* PathFilename);
+    void    GetSkillingParameters();
 
     double  CalcFriction_shadow_Identity(double Crv);
     double  CalcFriction_shadow_LS2(double Crv);
