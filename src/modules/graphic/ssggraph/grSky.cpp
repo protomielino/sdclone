@@ -271,6 +271,10 @@ void cGrSky::postDraw( float alt )
 
 		float slop = 5.0; // if we are closer than this to a cloud layer, don't draw cloud
 
+		glDepthMask( GL_FALSE );
+        glStencilFunc( GL_EQUAL, 1, 1 );
+        glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
+
 		for ( int i = 0; i < num; i++ )
 		{
 			cGrCloudLayer *cloud = clouds.get(index[i]);
@@ -282,6 +286,9 @@ void cGrSky::postDraw( float alt )
 			if ( alt < asl - slop || alt > asl + thickness + slop )
 				cloud->draw();
 		}
+
+		glDepthMask( GL_TRUE );
+        glDisable( GL_STENCIL_TEST );
 
 		delete [] index;
 	}

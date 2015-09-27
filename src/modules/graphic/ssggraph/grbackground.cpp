@@ -858,6 +858,7 @@ grPreDrawSky(tSituation* s, float fogStart, float fogEnd)
 {
     static const double m_log01 = -log( 0.01 );
     static const double sqrt_m_log01 = sqrt( m_log01 );
+	GLbitfield clear_mask;
 
     if (grSkyDomeDistance && grTrack->skyversion > 0)
     {
@@ -872,6 +873,8 @@ grPreDrawSky(tSituation* s, float fogStart, float fogEnd)
         glHint(GL_FOG_HINT, GL_DONT_CARE);
 
         ssgGetLight(0)->setColour(GL_DIFFUSE, White);
+		clear_mask |= GL_COLOR_BUFFER_BIT;
+		glClear( clear_mask );
 
         TheSky->preDraw();
 

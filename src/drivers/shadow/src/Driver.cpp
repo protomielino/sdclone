@@ -1771,6 +1771,9 @@ void TDriver::Drive( tSituation* s )
 	m_LastAbsDriftAngle = m_AbsDriftAngle;
 
 	m_Strategy->update(car, s);
+
+	/*if (!Qualification)								// Don't use pit while
+		m_Strategy->CheckPitState(0.6f);				//  qualification*/
 }
 
 // Pitstop callback.
