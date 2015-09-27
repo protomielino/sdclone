@@ -104,7 +104,7 @@ ReStateManage(void)
 				if (mode & RM_NEXT_STEP) {
 					// player is ready
 					ReInfo->_reState = RE_STATE_RACE;
-					ReInfo->s->currentTime = -2.0;
+					ReInfo->s->currentTime = -10.0;
 					GfLogInfo("%s now in RACE state\n", ReInfo->_reName);
 				}
 				break;

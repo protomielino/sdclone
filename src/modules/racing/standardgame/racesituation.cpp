@@ -254,13 +254,13 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 		{
 			s->currentTime = GfTimeClock() - NetGetNetwork()->GetRaceStartTime();
 		}
+	}
 
-		if (s->currentTime < -2.0)
-		{
-			std::ostringstream ossMsg;
-			ossMsg << "Race will start in " << -(int)s->currentTime << " seconds";
-			ReRaceMsgSetBig(pCurrReInfo, ossMsg.str().c_str());
-		}
+	if (s->currentTime < -2.0)
+	{
+		std::ostringstream ossMsg;
+		ossMsg << "Race will start in " << -(int)s->currentTime << " seconds";
+		ReRaceMsgSetBig(pCurrReInfo, ossMsg.str().c_str());
 	}
 
 	//GfLogDebug("ReSituationUpdater::runOneStep: currTime=%.3f\n", s->currentTime);
@@ -319,7 +319,7 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 
 	GfProfStartProfile("rbDrive*");
 	GfSchedBeginEvent("raceupdate", "robots");
-	if ((s->currentTime - pCurrReInfo->_reLastRobTime) >= RCM_MAX_DT_ROBOTS) {
+	if (fabs((s->currentTime - pCurrReInfo->_reLastRobTime)) >= RCM_MAX_DT_ROBOTS) {
 		s->deltaTime = s->currentTime - pCurrReInfo->_reLastRobTime;
 		tRobotItf *robot;
 		for (int i = 0; i < s->_ncars; i++) {
