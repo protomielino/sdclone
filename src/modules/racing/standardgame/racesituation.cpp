@@ -319,7 +319,7 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 
 	GfProfStartProfile("rbDrive*");
 	GfSchedBeginEvent("raceupdate", "robots");
-	if (fabs((s->currentTime - pCurrReInfo->_reLastRobTime)) >= RCM_MAX_DT_ROBOTS) {
+	if ((s->currentTime - pCurrReInfo->_reLastRobTime) >= RCM_MAX_DT_ROBOTS) {
 		s->deltaTime = s->currentTime - pCurrReInfo->_reLastRobTime;
 		tRobotItf *robot;
 		for (int i = 0; i < s->_ncars; i++) {
