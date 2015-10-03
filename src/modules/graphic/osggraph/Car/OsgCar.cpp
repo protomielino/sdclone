@@ -868,7 +868,7 @@ void SDCar::updateCar()
     }*/
 }
 
-void SDCar::updateShadingParameters2(osg::Matrixf modelview)
+void SDCar::updateShadingParameters(osg::Matrixf modelview)
 {
     shader->update(modelview);
 }
@@ -968,7 +968,7 @@ void SDCars::updateShadingParameters(osg::Matrixf modelview)
 
     for(it = the_cars.begin(); it!= the_cars.end(); it++)
     {
-        (*it)->updateShadingParameters2(modelview);
+        (*it)->updateShadingParameters(modelview);
     }
 }
 

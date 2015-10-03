@@ -117,7 +117,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     root = new osg::Group;
     viewer->setSceneData(root.get());
     mirrorScene = new osg::Group;
-#if 0
+#if 1
     prerenderRoot = new osg::Group;
     root->addChild(prerenderRoot);
     //root->addChild(reflectionMapping->getCamerasRoot());

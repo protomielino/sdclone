@@ -81,7 +81,7 @@ public :
 
     void activateCar(tCarElt *car);
     void updateCar();
-    void updateShadingParameters2(osg::Matrixf modelview);
+    void updateShadingParameters(osg::Matrixf modelview);
 };
 
 class SDCars
