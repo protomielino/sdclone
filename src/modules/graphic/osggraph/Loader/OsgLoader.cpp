@@ -46,6 +46,7 @@ osg::ref_ptr<osg::Image> osgLoader::LoadImageFile(std::string strFile)
         return Image;
 
     Image = osgDB::readRefImageFile(absFileName, m_pOpt);
+    GfLogDebug("Loaded %s \n", absFileName.c_str());
 
     return Image;
 }

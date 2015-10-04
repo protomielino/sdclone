@@ -61,6 +61,8 @@
 
 using namespace osgDB;
 
+TextureData::TextureImageMap TextureData::mTextureImageMap;
+
 // now register with osg::Registry to instantiate the above
 // reader/writer.
 REGISTER_OSGPLUGIN(acc, ReaderWriterACC)

@@ -17,7 +17,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include<string.h>
+
+#include <string.h>
+#include <map>
 
 #include <osgDB/FileNameUtils>
 #include <osgDB/Registry>
@@ -44,6 +46,8 @@
 
 #include <osgUtil/Tessellator>
 #include <osgUtil/SmoothingVisitor>
+
+#include <tgf.h>
 
 #include "AccException.h"
 #include "AccGeode.h"
@@ -164,6 +168,8 @@ private:
     bool mCar;
 
 public:
+    typedef std::map<std::string, osg::ref_ptr<osg::Image> > TextureImageMap;
+    static TextureImageMap mTextureImageMap;
     TextureData() :
         mTranslucent(false),
         mRepeat(true),
@@ -188,16 +194,32 @@ public:
         mTexture2DClamp->setMaxAnisotropy(16);
 
         std::string absFileName = osgDB::findDataFile(name, options);
+
         if (absFileName.empty())
         {
             osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not find texture \"" << name << "\"" << std::endl;
             return false;
         }
-        mImage = osgDB::readRefImageFile(absFileName, options);
-        if (!mImage.valid())
+
+        TextureData::TextureImageMap::iterator i = TextureData::mTextureImageMap.find(absFileName);
+
+        if (i == TextureData::mTextureImageMap.end())
         {
-            osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name << "\"" << std::endl;
-            return false;
+            mImage = osgDB::readRefImageFile(absFileName, options);
+            GfLogDebug("Loaded image %s \n", absFileName.c_str());
+
+            if (!mImage.valid())
+            {
+                osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name << "\"" << std::endl;
+                return false;
+            }
+
+            TextureData::mTextureImageMap[absFileName] = mImage;
+        }
+        else
+        {
+            mImage = TextureData::mTextureImageMap[absFileName];
+            GfLogDebug("Take in Cache image %s \n", absFileName.c_str());
         }
 
         mTexture2DRepeat->setImage(mImage.get());
@@ -213,11 +235,25 @@ public:
         if (name1!="")
         {
             std::string absFileName1 = osgDB::findDataFile(name1, options);
-            mImage1 = osgDB::readRefImageFile(absFileName1, options);
-            if (!mImage1.valid())
+            TextureData::TextureImageMap::iterator i = TextureData::mTextureImageMap.find(absFileName1);
+
+            if (i == TextureData::mTextureImageMap.end())
             {
-                //osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name1 << "\"" << std::endl;
-                return false;
+                mImage1 = osgDB::readRefImageFile(absFileName1, options);
+                GfLogDebug("Loaded image 1 %s \n", absFileName1.c_str());
+
+                if (!mImage1.valid())
+                {
+                    //osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name1 << "\"" << std::endl;
+                    return false;
+                }
+
+                TextureData::mTextureImageMap[absFileName1] = mImage1;
+            }
+            else
+            {
+                mImage1 = TextureData::mTextureImageMap[absFileName];
+                GfLogDebug("Take in Cache image1 %s \n", absFileName.c_str());
             }
 
             mTexture2DRepeat1 = new osg::Texture2D;
@@ -238,11 +274,25 @@ public:
         if (name2!="")
         {
             std::string absFileName2 = osgDB::findDataFile(name2, options);
-            mImage2 = osgDB::readRefImageFile(absFileName2, options);
-            if (!mImage2.valid())
+            TextureData::TextureImageMap::iterator i = TextureData::mTextureImageMap.find(absFileName2);
+
+            if (i == TextureData::mTextureImageMap.end())
             {
-                //osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name2 << "\"" << std::endl;
-                return false;
+                mImage2 = osgDB::readRefImageFile(absFileName2, options);
+                GfLogDebug("Loaded image 2 %s \n", absFileName2.c_str());
+
+                if (!mImage2.valid())
+                {
+                    //osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name2 << "\"" << std::endl;
+                    return false;
+                }
+
+                TextureData::mTextureImageMap[absFileName2] = mImage2;
+            }
+            else
+            {
+                mImage2 = TextureData::mTextureImageMap[absFileName2];
+                GfLogDebug("Take in Cache image2 %s \n", absFileName.c_str());
             }
 
             mTexture2DRepeat2 = new osg::Texture2D;
@@ -263,12 +313,26 @@ public:
         if (name3!="")
         {
             std::string absFileName3 = osgDB::findDataFile(name3, options);
-            mImage3 = osgDB::readRefImageFile(absFileName3, options);
-            if (!mImage3.valid())
+            TextureData::TextureImageMap::iterator i = TextureData::mTextureImageMap.find(absFileName3);
+
+            if (i == TextureData::mTextureImageMap.end())
             {
-                //osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name3 << "\"" << std::endl;
-                return false;
+                mImage3 = osgDB::readRefImageFile(absFileName3, options);
+                GfLogDebug("Loaded  image3 %s \n", absFileName3.c_str());
+                if (!mImage3.valid())
+                {
+                    //osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: could not read texture \"" << name3 << "\"" << std::endl;
+                    return false;
+                }
+
+                TextureData::mTextureImageMap[absFileName3] = mImage3;
             }
+            else
+            {
+                mImage3 = TextureData::mTextureImageMap[absFileName3];
+                GfLogDebug("Take in Cache image3 %s \n", absFileName.c_str());
+            }
+
             mTexture2DRepeat3 = new osg::Texture2D;
             mTexture2DRepeat3->setDataVariance(osg::Object::STATIC);
             mTexture2DRepeat3->setWrap(osg::Texture2D::WRAP_S, osg::Texture2D::REPEAT);
