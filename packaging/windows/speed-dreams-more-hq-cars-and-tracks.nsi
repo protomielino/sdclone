@@ -102,8 +102,11 @@ Section -Drivers
   SetOutPath "$INSTDIR\data\drivers\usr_trb1"
   File /r "${BUILD_INST_DIR}\data\drivers\usr_trb1\*.*"
   
-  SetOutPath "$INSTDIR\data\drivers\usr_mpa1"
-  File /r "${BUILD_INST_DIR}\data\drivers\usr_mpa1\*.*"
+  ;SetOutPath "$INSTDIR\data\drivers\usr_mpa1"
+  ;File /r "${BUILD_INST_DIR}\data\drivers\usr_mpa1\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\shadow_mpa1"
+  File /r "${BUILD_INST_DIR}\data\drivers\shadow_mpa1\*.*"
 
   ; Warning: Must be here because kilo2008 also drivers the TRB1 cars.
   ; SetOutPath "$INSTDIR\data\drivers\kilo2008"
