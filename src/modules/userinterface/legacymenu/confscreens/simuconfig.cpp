@@ -74,13 +74,6 @@ static const char *CooldownSchemeList[] = {RM_VAL_ON, RM_VAL_OFF};
 static const int NbCooldownSchemes = sizeof(CooldownSchemeList) / sizeof(CooldownSchemeList[0]);
 static int CurCooldownScheme = 0; // On
 
-/* list of available graphic engine */
-static const int DefaultGraphicVersion = 1;
-static const char *GraphicSchemeList[] = {RM_VAL_MOD_SSGRAPH, RM_VAL_MOD_OSGGRAPH};
-static const char *GraphicDispNameList[] = 	{"ssggraph", "OsgGraph"};
-static const int NbGraphicScheme = sizeof(GraphicSchemeList) / sizeof(GraphicSchemeList[0]);
-static int CurGraphicScheme = DefaultGraphicVersion;
-
 /* gui label ids */
 static int SimuVersionId;
 static int MultiThreadSchemeId;
@@ -90,8 +83,6 @@ static int ReplayRateSchemeId;
 static int StartPausedSchemeId;
 
 static int CooldownSchemeId;
-
-static int GraphicSchemeId;
 
 /* gui screen handles */
 static void *ScrHandle = NULL;
@@ -106,7 +97,6 @@ static void loadSimuCfg(void)
 	const char *replayRateSchemeName;
 	const char *startPausedSchemeName;
 	const char *cooldownSchemeName;
-	const char *graphicSchemeName;
 
 	int i;
 
@@ -194,17 +184,6 @@ static void loadSimuCfg(void)
 		}
 	}
 
-	// graphic engine
-	graphicSchemeName = GfParmGetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_GRAPHIC, GraphicSchemeList[1]);
-	for (i = 0; i < NbGraphicScheme; i++) 
-	{
-		if (strcmp(graphicSchemeName, GraphicSchemeList[i]) == 0)
-		{
-			CurGraphicScheme = i;
-			break;
-		}
-	}
-
 	GfParmReleaseHandle(paramHandle);
 
 	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionDispNameList[CurSimuVersion]);
@@ -217,11 +196,6 @@ static void loadSimuCfg(void)
 #endif
 	GfuiLabelSetText(ScrHandle, StartPausedSchemeId, StartPausedSchemeList[CurStartPausedScheme]);
 	GfuiLabelSetText(ScrHandle, CooldownSchemeId, CooldownSchemeList[CurCooldownScheme]);
-	GfuiLabelSetText(ScrHandle, GraphicSchemeId, GraphicSchemeList[CurGraphicScheme]);
-
-#ifdef OFFICIAL_ONLY
-	GfuiEnable(ScrHandle, GraphicSchemeId, GFUI_DISABLE);
-#endif
 }
 
 
@@ -238,7 +212,6 @@ static void storeSimuCfg(void * /* dummy */)
 	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_REPLAY_RATE, ReplaySchemeList[CurReplayScheme]);
 	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_STARTPAUSED, StartPausedSchemeList[CurStartPausedScheme]);
 	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_COOLDOWN, CooldownSchemeList[CurCooldownScheme]);
-	GfParmSetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_GRAPHIC, GraphicSchemeList[CurGraphicScheme]);
 	GfParmWriteFile(NULL, paramHandle, "raceengine");
 	GfParmReleaseHandle(paramHandle);
 	
@@ -266,27 +239,6 @@ onChangeSimuVersion(void *vp)
 	while (!GfFileExists(buf) && CurSimuVersion != oldSimuVersion);
 
 	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionDispNameList[CurSimuVersion]);
-}
-
-/* Change the graphc engine version (but only show really available modules) */
-static void
-onChangeGraphicVersion(void *vp)
-{
-	char buf[1024];
-
-	if (!vp)
-		return;
-
-	const int oldGraphicVersion = CurGraphicScheme;
-	do
-	{
-		CurGraphicScheme = (CurGraphicScheme + NbGraphicScheme + (int)(long)vp) % NbGraphicScheme;
-	
-		snprintf(buf, sizeof(buf), "%smodules/graphic/%s.%s", GfLibDir(), GraphicSchemeList[CurGraphicScheme], DLLEXT);
-	}
-	while (!GfFileExists(buf) && CurGraphicScheme != oldGraphicVersion);
-
-	GfuiLabelSetText(ScrHandle, GraphicSchemeId, GraphicDispNameList[CurGraphicScheme]);
 }
 
 /* Change the multi-threading scheme */
@@ -392,12 +344,6 @@ SimuMenuInit(void *prevMenu)
 
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "cooldownleftarrow", (void*)-1, onChangeCooldownScheme);
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "cooldownrightarrow", (void*)1, onChangeCooldownScheme);
-
-	GraphicSchemeId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "graphiclabel");
-#ifndef OFFICIAL_ONLY
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "graphicleftarrow", (void*)-1, onChangeGraphicVersion);
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "graphicrightarrow", (void*)1, onChangeGraphicVersion);
-#endif
 
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "ApplyButton", PrevScrHandle, storeSimuCfg);
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "CancelButton", PrevScrHandle, GfuiScreenActivate);

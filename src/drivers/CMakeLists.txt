@@ -14,7 +14,9 @@ IF(NOT OPTION_OFFICIAL_ONLY)
   # Work-in-progress.
   SD_ADD_SUBDIRECTORY(shadow)
 
-  SD_ADD_SUBDIRECTORY(replay)
+  IF(OPTION_3RDPARTY_SQLITE3)
+  	SD_ADD_SUBDIRECTORY(replay)
+  ENDIF()
 
   # Obsolete (as robot samples).
   #SD_ADD_SUBDIRECTORY(bt)
