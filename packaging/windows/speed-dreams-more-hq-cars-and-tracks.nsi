@@ -85,8 +85,11 @@ Section -Drivers
   SetOutPath "$INSTDIR\lib\drivers\usr_trb1"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_trb1\*.*"
   
-  SetOutPath "$INSTDIR\lib\drivers\usr_mpa1"
-  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_mpa1\*.*"
+  ;SetOutPath "$INSTDIR\lib\drivers\usr_mpa1"
+  ;File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_mpa1\*.*"
+
+  SetOutPath "$INSTDIR\lib\drivers\shadow_mpa1"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_mpa1\*.*"
 
   ; Robots data files (car and track setups)
   SetOutPath "$INSTDIR\data\drivers\simplix_trb1"
