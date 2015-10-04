@@ -88,8 +88,8 @@ Section -Drivers
   ;SetOutPath "$INSTDIR\lib\drivers\usr_mpa1"
   ;File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_mpa1\*.*"
 
-  SetOutPath "$INSTDIR\lib\drivers\shadow_mpa1"
-  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_mpa1\*.*"
+  ;SetOutPath "$INSTDIR\lib\drivers\shadow_mpa1"
+  ;File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_mpa1\*.*"
 
   ; Robots data files (car and track setups)
   SetOutPath "$INSTDIR\data\drivers\simplix_trb1"
@@ -105,8 +105,8 @@ Section -Drivers
   ;SetOutPath "$INSTDIR\data\drivers\usr_mpa1"
   ;File /r "${BUILD_INST_DIR}\data\drivers\usr_mpa1\*.*"
 
-  SetOutPath "$INSTDIR\data\drivers\shadow_mpa1"
-  File /r "${BUILD_INST_DIR}\data\drivers\shadow_mpa1\*.*"
+  ;SetOutPath "$INSTDIR\data\drivers\shadow_mpa1"
+  ;File /r "${BUILD_INST_DIR}\data\drivers\shadow_mpa1\*.*"
 
   ; Warning: Must be here because kilo2008 also drivers the TRB1 cars.
   ; SetOutPath "$INSTDIR\data\drivers\kilo2008"
