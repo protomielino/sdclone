@@ -219,7 +219,7 @@ grLoadScene(tTrack *track)
         return -1;
     }
 
-    if (grSkyDomeDistance > 0 && grTrack->skyversion > 0)
+    if ( grSkyDomeDistance > 0 )
     {
         grBGSky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
         if (grBGSky)

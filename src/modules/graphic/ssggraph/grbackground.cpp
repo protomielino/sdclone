@@ -119,7 +119,7 @@ grInitBackground()
 
     // If no realistic sky dome requested, or if the track skyversion doesn't support it,
     // we set up a static - texture-based - background
-    if (!grSkyDomeDistance || grTrack->skyversion < 1)
+    if (!grSkyDomeDistance )
     {
         GfLogInfo("Setting up static background (mono-texture sky and landscape)\n");
 
@@ -448,7 +448,7 @@ grLoadBackground()
     // Load static background if no sky dome.
     const tTrackGraphicInfo *graphic = &grTrack->graphic;
     TheBackground = 0;
-    if (!grSkyDomeDistance || grTrack->skyversion < 1)
+    if (!grSkyDomeDistance )
     {
         GfLogInfo("Loading static background (type %d)\n", graphic->bgtype);
 
@@ -769,7 +769,7 @@ grLoadBackground()
     GfLogTrace("Loading sky shadow mapping image :\n");
     grEnvShadowState = 0;
     int nEnvShadowIndex = -1; // Default = not depending on weather conds.
-    if (!grSkyDomeDistance || grTrack->skyversion < 1)
+    if (!grSkyDomeDistance )
     {
         // Static / texture-based sky case.
         if (grTrack->local.rain > 0) // Rain => full cloud cover.
@@ -860,7 +860,7 @@ grPreDrawSky(tSituation* s, float fogStart, float fogEnd)
     static const double sqrt_m_log01 = sqrt( m_log01 );
 	GLbitfield clear_mask;
 
-    if (grSkyDomeDistance && grTrack->skyversion > 0)
+    if (grSkyDomeDistance )
     {
     const GLfloat fog_exp2_density = sqrt_m_log01 / TheSky->getVisibility();
         glEnable(GL_FOG);
@@ -904,7 +904,7 @@ grDrawStaticBackground(cGrCamera *cam, cGrBackgroundCam *bgCam)
 void
 grPostDrawSky(void)
 {
-    if (grSkyDomeDistance && grTrack->skyversion > 0)
+    if (grSkyDomeDistance )
         TheSky->postDraw(grSkyDomeDistance);
 }//grPostDrawSky
 
@@ -919,7 +919,7 @@ grUpdateSky(double currentTime, double accelTime)
 
     // Nothing to do if static sky dome, or race not started.
     //if (!grDynamicSkyDome)	//TODO(kilo): find some meaning for this variable
-    if (!grSkyDomeDistance || grTrack->skyversion < 1)
+    if (!grSkyDomeDistance )
         return;
 
     if (currentTime < 0) {
@@ -929,7 +929,8 @@ grUpdateSky(double currentTime, double accelTime)
 
     if (!bInitialized)
     {
-        if (grSkyDomeDistance && grTrack->skyversion > 0) {
+        if (grSkyDomeDistance ) 
+		{
             // Ensure the sun and moon positions are reset
             const int timeOfDay = (int)grTrack->local.timeofday;
             GLfloat sunAscension = grTrack->local.sunascension;

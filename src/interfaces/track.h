@@ -42,7 +42,6 @@
 #define TRK_ATT_SURF                "surface"
 #define TRK_ATT_NAME                "name"
 #define TRK_ATT_VERSION             "version"
-#define TRK_ATT_SKY_VERSION         "sky version"
 #define TRK_ATT_AUTHOR              "author"
 #define TRK_ATT_DESCR               "description"
 #define TRK_ATT_CAT                 "category"
@@ -65,7 +64,6 @@
 #define TRK_SECT_GRAPH              "Graphic"
 
 #define TRK_ATT_3DDESC              "3d description"
-#define TRK_ATT_3DDESC2             "3d osg"
 
 #define TRK_ATT_BKGRND              "background image"
 #define TRK_ATT_BGTYPE              "background type"
@@ -646,7 +644,6 @@ typedef struct Track
     const char    *subcategory; /**< used for the moment for long/short speedway */
     int           nseg;         /**< Number of segments */
     int           version;      /**< Version of the track type */
-    int           skyversion;   /**< Version of the "Sky dome" feature */
     tdble         length;       /**< main track length */
     tdble         width;        /**< main track width */
     tTrackPitInfo pits;         /**< Pits information */

@@ -761,7 +761,7 @@ void SDRender::UpdateSky(double currentTime, double accelTime)
 
     if (!bInitialized)
     {
-        if (SDSkyDomeDistance && SDTrack->skyversion > 0)
+        if ( SDSkyDomeDistance )
         {
             // Ensure the sun and moon positions are reset
             const int timeOfDay = (int)SDTrack->local.timeofday;
