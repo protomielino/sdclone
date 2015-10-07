@@ -68,7 +68,6 @@ void SDScenery::LoadScene(tTrack *track)
 {
 	void		*hndl = grTrackHandle;
 	const char	*acname;
-	const char  *osgname;
 	char 		buf[256];
 
 	GfOut("Initialisation class SDScenery\n");

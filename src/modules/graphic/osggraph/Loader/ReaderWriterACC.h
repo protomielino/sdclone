@@ -252,8 +252,8 @@ public:
             }
             else
             {
-                mImage1 = TextureData::mTextureImageMap[absFileName];
-                GfLogDebug("Take in Cache image1 %s \n", absFileName.c_str());
+                mImage1 = TextureData::mTextureImageMap[absFileName1];
+                GfLogDebug("Take in Cache image1 %s \n", absFileName1.c_str());
             }
 
             mTexture2DRepeat1 = new osg::Texture2D;
@@ -292,7 +292,7 @@ public:
             else
             {
                 mImage2 = TextureData::mTextureImageMap[absFileName2];
-                GfLogDebug("Take in Cache image2 %s \n", absFileName.c_str());
+                GfLogDebug("Take in Cache image2 %s \n", absFileName2.c_str());
             }
 
             mTexture2DRepeat2 = new osg::Texture2D;
@@ -330,7 +330,7 @@ public:
             else
             {
                 mImage3 = TextureData::mTextureImageMap[absFileName3];
-                GfLogDebug("Take in Cache image3 %s \n", absFileName.c_str());
+                GfLogDebug("Take in Cache image3 %s \n", absFileName3.c_str());
             }
 
             mTexture2DRepeat3 = new osg::Texture2D;
