@@ -28,11 +28,11 @@ class SDBrakes
 private :
     tCarElt *car;
     osg::ref_ptr<osg::Geometry> brake_disks[4];
-    osg::ref_ptr<osg::Vec4Array> cal_clr;
+    osg::ref_ptr<osg::Vec4Array> brk_clr;
 
 public :
     void setCar(tCarElt * car);
-    osg::ref_ptr<osg::Geode> initBrake(int wheelIndex);
+    osg::Node *initBrake(int wheelIndex);
     void updateBrakes();
 };
 
