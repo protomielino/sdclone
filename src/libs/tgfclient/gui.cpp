@@ -1246,7 +1246,7 @@ GfuiInitWindowPositionAndSize(int x, int y, int w, int h)
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
 #if SDL_MAJOR_VERSION >= 2
-	if (SDL_GetWindowWMInfo(NULL, &wmInfo)) {
+	if (SDL_GetWindowWMInfo(GfuiWindow, &wmInfo)) {
 #else
 	if (SDL_GetWMInfo(&wmInfo)) {
 #endif
@@ -1260,6 +1260,9 @@ GfuiInitWindowPositionAndSize(int x, int y, int w, int h)
 		// TODO.
 		GfLogWarning("GfuiInitWindowPositionAndSize not yet implemented under non-Windows OSes\n");
 #endif // WIN32
+	}
+	else{
+		GfLogWarning("SDL_GetWindowWMInfo() failed: SDL_GetError() returns: %s\n", SDL_GetError());
 	}
 }
 
