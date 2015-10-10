@@ -402,8 +402,8 @@ void SDRender::Init(tTrack *track)
 		}
 	}
 
+	m_scene->addChild(cargroup.get());
     m_scene->addChild(scene.get());
-    m_scene->addChild(cargroup.get());
     m_scene->addChild(background.get());
 
     sceneGroup->addChild(m_scene.get());

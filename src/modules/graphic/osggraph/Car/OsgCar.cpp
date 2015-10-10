@@ -510,8 +510,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat
 		light2state->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
 		light2state->setMode(GL_FOG, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
 		light2state->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
-
-		light2->setNodeMask(~(0x1 | 0x2));
 		
         std::string tmp = GetDataDir();
         snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);

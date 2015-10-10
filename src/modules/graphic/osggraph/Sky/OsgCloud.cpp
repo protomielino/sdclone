@@ -51,7 +51,7 @@ static bool state_initialized = false;
 
 // make an StateSet for a cloud layer given the named texture
 static osg::StateSet*
-SDMakeState(const std::string &path, const char* colorTexture)
+SDMakeState(const std::string &path, const char* colorTexture, const char* normalTexture )
 {
     osg::StateSet *stateSet = new osg::StateSet;
 
@@ -64,6 +64,15 @@ SDMakeState(const std::string &path, const char* colorTexture)
     texture->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
     stateSet->setTextureAttributeAndModes(0, texture.get());
     stateSet->setTextureMode(0, GL_TEXTURE_2D, osg::StateAttribute::ON);
+
+	TmpPath = path+"data/sky/"+normalTexture; 
+	GfLogInfo("Path Sky cloud normal texture = %s\n", TmpPath.c_str());
+    osg::ref_ptr<osg::Image> image2 = osgDB::readImageFile(TmpPath);
+    osg::ref_ptr<osg::Texture2D> texture2 = new osg::Texture2D(image2.get());
+    texture2->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
+    texture2->setWrap(osg::Texture::WRAP_T, osg::Texture::REPEAT);
+    stateSet->setTextureAttributeAndModes(1, texture2.get());
+    stateSet->setTextureMode(1, GL_TEXTURE_2D, osg::StateAttribute::ON);
 
     osg::ref_ptr<osg::ShadeModel> Smooth = new osg::ShadeModel;
     Smooth->setMode(ShadeModel::SMOOTH);
@@ -81,21 +90,9 @@ SDMakeState(const std::string &path, const char* colorTexture)
     StandardBlendFunc->setSource(BlendFunc::SRC_ALPHA);
     StandardBlendFunc->setDestination(BlendFunc::ONE_MINUS_SRC_ALPHA);
     StandardBlendFunc->setDataVariance(Object::STATIC);
-    stateSet->setAttributeAndModes(StandardBlendFunc.get());
-
-    /*osg::ref_ptr<osg::Material> material = new osg::Material;
-    material->setColorMode(osg::Material::AMBIENT_AND_DIFFUSE);
-    material->setEmission(osg::Material::FRONT_AND_BACK,
-                          osg::Vec4(0.05, 0.05, 0.05, 0));
-    material->setSpecular(osg::Material::FRONT_AND_BACK,
-                          osg::Vec4(0, 0, 0, 1));
-    material->setDiffuse(osg::Material::FRONT_AND_BACK,
-                          osg::Vec4(0.5, 0.5, 0.5, 1));
-    material->setAmbient(osg::Material::FRONT_AND_BACK,
-                          osg::Vec4(0.2, 0.2, 0.2, 1));
-
-    stateSet->setAttribute(material.get());*/
-    stateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
+    
+	stateSet->setAttributeAndModes(StandardBlendFunc.get());
+	stateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHT0, osg::StateAttribute::OFF);    
@@ -281,6 +278,7 @@ void SDCloudLayer::setTextureOffset(const osg::Vec2& offset)
     osg::TexMat *texMat = dynamic_cast<osg::TexMat*>(attr);
     if (!texMat)
         return;
+
     texMat->setMatrix(osg::Matrix::translate(offset[0],offset[1], 0.0));
 }
 
@@ -298,53 +296,53 @@ void SDCloudLayer::rebuild()
         GfOut("initializing cloud layers\n");
 
         osg::ref_ptr<osg::StateSet> state;
-        state = SDMakeState(texture_path, "overcast.png");
+        state = SDMakeState(texture_path, "overcast.png", "overcast_n.png");
         layer_states[SD_CLOUD_OVERCAST] = state;
-        state = SDMakeState(texture_path, "overcast_top.png");
+        state = SDMakeState(texture_path, "overcast_top.png", "overcast_top_n.png");
         layer_states2[SD_CLOUD_OVERCAST] = state;
 
-        state = SDMakeState(texture_path, "overcast2.png");
+        state = SDMakeState(texture_path, "overcast2.png", "overcast2_n.png");
         layer_states[SD_CLOUD_OVERCAST2] = state;
-        state = SDMakeState(texture_path, "overcast_top.png");
+        state = SDMakeState(texture_path, "overcast2_top.png", "overcast2_top_n.png");
         layer_states2[SD_CLOUD_OVERCAST2] = state;
 
-        state = SDMakeState(texture_path, "broken.png");
+        state = SDMakeState(texture_path, "broken.png", "broken_n.png");
         layer_states[SD_CLOUD_BROKEN] = state;
         layer_states2[SD_CLOUD_BROKEN] = state;
 
-        state = SDMakeState(texture_path, "broken2.png");
+        state = SDMakeState(texture_path, "broken2.png", "broken2_n.png");
         layer_states[SD_CLOUD_BROKEN2] = state;
         layer_states2[SD_CLOUD_BROKEN2] = state;
 
-        state = SDMakeState(texture_path, "scattered.png");
+        state = SDMakeState(texture_path, "scattered.png", "scattered_n.png" );
         layer_states[SD_CLOUD_SCATTERED] = state;
         layer_states2[SD_CLOUD_SCATTERED] = state;
 
-        state = SDMakeState(texture_path, "scattered2.png");
+        state = SDMakeState(texture_path, "scattered2.png", "scattered2_n.png" );
         layer_states[SD_CLOUD_SCATTERED2] = state;
         layer_states2[SD_CLOUD_SCATTERED2] = state;
 
-        state = SDMakeState(texture_path, "many.png");
+        state = SDMakeState(texture_path, "many.png", "many_n.png");
         layer_states[SD_CLOUD_MANY] = state;
         layer_states2[SD_CLOUD_MANY] = state;
 
-        state = SDMakeState(texture_path, "many2.png");
+        state = SDMakeState(texture_path, "many2.png", "many2_n.png" );
         layer_states[SD_CLOUD_MANY2] = state;
         layer_states2[SD_CLOUD_MANY2] = state;
 
-        state = SDMakeState(texture_path, "few.png");
+        state = SDMakeState(texture_path, "few.png", "few_n.png");
         layer_states[SD_CLOUD_FEW] = state;
         layer_states2[SD_CLOUD_FEW] = state;
 
-        state = SDMakeState(texture_path, "few2.png");
+        state = SDMakeState(texture_path, "few2.png", "few2_n.png");
         layer_states[SD_CLOUD_FEW2] = state;
         layer_states2[SD_CLOUD_FEW2] = state;
 
-        state = SDMakeState(texture_path, "cirrus.png");
+        state = SDMakeState(texture_path, "cirrus.png", "cirrus_n.png");
         layer_states[SD_CLOUD_CIRRUS] = state;
         layer_states2[SD_CLOUD_CIRRUS] = state;
 
-        state = SDMakeState(texture_path, "cirrus2.png");
+        state = SDMakeState(texture_path, "cirrus2.png", "cirrus2_n.png");
         layer_states[SD_CLOUD_CIRRUS2] = state;
         layer_states2[SD_CLOUD_CIRRUS2] = state;
 
@@ -474,7 +472,7 @@ bool SDCloudLayer::repaint( const osg::Vec3f &fog_color )
         = dynamic_cast<osg::TexEnvCombine*>(layer_root->getStateSet()
                                             ->getTextureAttribute(1, osg::StateAttribute::TEXENV));
     combiner->setConstantColor(combineColor);
-
+	
     return true;
 }
 

@@ -89,6 +89,7 @@ class SDCars
 private :
     std::vector<SDCar *> the_cars;
     osg::ref_ptr<osg::Group> cars_branch;
+	osg::ref_ptr<osg::Group> shadow_branch;
     tSituation *situation;
 
     void addSDCar(SDCar * car);
@@ -104,7 +105,9 @@ public :
     SDCar *getCar(tCarElt*car);
     void unLoad();
     void updateShadingParameters(osg::Matrixf modelview);
-    osg::ref_ptr<osg::Node> getCarsNode() { return cars_branch.get(); }
+	osg::ref_ptr<osg::Node> getShadowNode() { return shadow_branch.get(); }
+	osg::ref_ptr<osg::Node> getCarsNode() { return cars_branch.get(); }
+
 };
 
 #endif /* _OSGCAR_H_ */
