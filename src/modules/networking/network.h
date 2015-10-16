@@ -59,7 +59,7 @@ version              : $Id$
 //Network update rates
 #define CAR_CONTROL_UPDATE 0.1
 #define CAR_DATA_UPDATE 5.0
-#define RACESTARTDELEAY 10.0
+#define RACESTARTDELEAY 3.0
 #define FINISHDELAY 10.0
 
 //Packet definitions
