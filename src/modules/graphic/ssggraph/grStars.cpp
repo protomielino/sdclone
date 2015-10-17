@@ -223,10 +223,10 @@ bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
       mag = star_data[i][2];
       if ( mag < cutoff ) 
       {
-        nmag = ( 4.5 - mag ) / 5.5; // translate to 0 ... 1.0 scale
-        // alpha = nmag * 0.7 + 0.3; // translate to a 0.3 ... 1.0 scale
-        alpha = nmag * 0.85 + 0.15; // translate to a 0.15 ... 1.0 scale
-        alpha *= factor;          // dim when the sun is brighter
+        nmag = ( 4.5 - mag ) / 5.5;		// translate to 0 ... 1.0 scale
+        // alpha = nmag * 0.7 + 0.3;	// translate to a 0.3 ... 1.0 scale
+        alpha = nmag * 0.85 + 0.15;		// translate to a 0.15 ... 1.0 scale
+        alpha *= factor;				// dim when the sun is brighter
       }
       else 
       {

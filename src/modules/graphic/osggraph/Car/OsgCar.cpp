@@ -912,7 +912,7 @@ void SDCars::loadCars(tSituation *pSituation, bool trackType, bool subCat)
         this->cars_branch->addChild(car->loadCar(elt, trackType, subCat, carShader));
     }
     
-    return;;
+    return;
 }
 
 void SDCars::deactivateCar(tCarElt *car)
