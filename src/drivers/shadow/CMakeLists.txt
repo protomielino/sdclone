@@ -66,7 +66,7 @@ SET(ROBOT_SOURCES src/Array.h
 				src/Vec3d.h)
 
 # Official-only shadow instances.
-SET(ROBOT_CLONES shadow_36GP shadow_sc shadow_srw shadow_trb1 shadow_ls1 shadow_ls2 shadow_mp5 
+SET(ROBOT_CLONES shadow_36GP shadow_67GP shadow_sc shadow_srw shadow_trb1 shadow_ls1 shadow_ls2 shadow_mp5
 			shadow_mpa1 shadow_mpa11 shadow_mpa12 shadow_lp1 shadow_ref)
 
 # The ubiquitous robot module and its clones.

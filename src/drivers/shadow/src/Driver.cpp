@@ -232,6 +232,11 @@ TDriver::TDriver(int Index, const int robot_type):
         Frc = 0.75;
         break;
 
+    case SHADOW_67GP:
+        robot_name = "shadow_67GP";
+        Frc = 0.75;
+        break;
+
     case SHADOW_RS:
         robot_name = "shadow_rs";
         Frc = 0.98;

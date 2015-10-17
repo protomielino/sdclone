@@ -181,6 +181,13 @@ void SetupSHADOW_36GP()
     robot_type = SHADOW_36GP;
 };
 
+// Schismatic init for shadow_36GP
+void SetupSHADOW_67GP()
+{
+    // Add shadow_36GP specific initialization here
+    robot_type = SHADOW_67GP;
+};
+
 // Schismatic init for shadow_rs
 void SetupSHADOW_rs()
 {
@@ -357,6 +364,21 @@ extern "C" int shadow_36GP(tModInfo *ModInfo)
     return ret;
 }
 
+// Schismatic entry point for shadow_36GP
+extern "C" int shadow_67GP(tModInfo *ModInfo)
+{
+    int ret = -1;
+    setRobotName("shadow_67GP");
+    robot_type = SHADOW_67GP;
+    void *robot_settings = getFileHandle();
+    if (robot_settings)
+    {
+        ret = shadow(ModInfo);
+    }
+
+    return ret;
+}
+
 // Schismatic entry point for shadow_rs
 extern "C" int shadow_rs(tModInfo *ModInfo)
 {
@@ -472,6 +494,8 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
         SetupSHADOW_ls2();
     else if (strncmp(robot_name,"shadow_36GP", strlen("shadow_36GP")) == 0)
         SetupSHADOW_36GP();
+    else if (strncmp(robot_name,"shadow_67GP", strlen("shadow_67GP")) == 0)
+        SetupSHADOW_67GP();
     else if (strncmp(robot_name,"shadow_rs", strlen("shadow_rs")) == 0)
         SetupSHADOW_rs();
     else if (strncmp(robot_name,"shadow_lp1", strlen("shadow_lp1")) == 0)
