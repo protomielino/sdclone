@@ -76,6 +76,11 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_3RDPARTY_SQLITE3 false CACHE BOOL "Use SQLite3 as database for record/replay")
 
+    SET(OPTION_OSGGRAPH true CACHE BOOL "Build OpenScenGraph-based WIP osggraph graphics module")
+
+    SET(OPTION_SDL2 true CACHE BOOL "Build with SDL2 instead of SDL 1.2")
+    SET(OPTION_SDL_JOYSTICK true CACHE BOOL "Use SDL for Joystick instead of PLIB")
+
     IF(APPLE)
       # Automatically set OPTION_USE_MACPORTS (at least until someone fixes the regular APPLE build)
       MESSAGE(STATUS "Automatically set OPTION_USE_MACPORTS (at least until someone fixes the regular APPLE build)")
@@ -104,14 +109,8 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
        SET(CMAKE_PREFIX_PATH "/opt/local" CACHE PATH "Prepended to search path")
        #SET(CMAKE_FIND_ROOT_PATH "/opt/local" CACHE PATH "Prepended to search path")
        SET(CMAKE_FIND_FRAMEWORK LAST)
-       SET(OPTION_SDL2 true CACHE BOOL "Build with SDL2 instead of SDL 1.2")
-       SET(OPTION_SDL_JOYSTICK true CACHE BOOL "Use SDL for Joystick instead of PLIB")
-       MESSAGE(STATUS "Change the line below to true when OSG works on MacPorts")
+       MESSAGE(STATUS "Remove the line below to true when OSG works on MacPorts")
        SET(OPTION_OSGGRAPH false CACHE BOOL "Build OpenScenGraph-based WIP osggraph graphics module")
-    ELSE(OPTION_USE_MACPORTS)
-       SET(OPTION_SDL2 false CACHE BOOL "Build with SDL2 instead of SDL 1.2")
-       SET(OPTION_SDL_JOYSTICK false CACHE BOOL "Use SDL for Joystick instead of PLIB")
-       SET(OPTION_OSGGRAPH true CACHE BOOL "Build OpenScenGraph-based WIP osggraph graphics module")
     ENDIF(OPTION_USE_MACPORTS)
 	
     SET(OPTION_AUTOVERSION true CACHE BOOL "Enable automatic computation of the version from SVN source tree")
