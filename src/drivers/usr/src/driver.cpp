@@ -52,10 +52,8 @@ bool  Driver::UseWingControl = false;				// Use wing control parameters
 
 double Driver::LengthMargin;						// safety margin long.
 bool Driver::Qualification;							// Global flag
-static const char *WheelSect[4] =					// TORCS defined sections
-{SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
-static const char *WingSect[2] =
-{SECT_FRNTWING, SECT_REARWING};
+static const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+static const char *WingSect[2]  = {SECT_FRNTWING, SECT_REARWING};
 //const float Driver::MAX_UNSTUCK_ANGLE = (float)(15.0f/180.0f*PI); // [radians] If the angle of the car on the track is smaller, we assume we are not stuck.
 const float Driver::MAX_UNSTUCK_ANGLE = 1.3f;
 const float Driver::UNSTUCK_TIME_LIMIT = 2.5f;			// [s] We try to get unstuck after this time.
@@ -98,7 +96,7 @@ Cardata *Driver::cardata = NULL;
 static int current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 
 #define BUFLEN 256
-static char PathFilenameBuffer[BUFLEN];					// for path and filename
+//static char PathFilenameBuffer[BUFLEN];					// for path and filename
 
 #define RANDOM_SEED 0xfded
 #define RANDOM_A    1664525

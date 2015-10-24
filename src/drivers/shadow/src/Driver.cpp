@@ -89,7 +89,7 @@ static const char *WingSect[2] =
 //--------------------------------------------------------------------------*
 /*#define BUFLEN 256
 static char PathToWriteToBuffer[BUFLEN];         // for path we write to*/
-static char PathFilenameBuffer[256];          // for path and filename
+//static char PathFilenameBuffer[256];          // for path and filename
 /*static char TrackNameBuffer[BUFLEN];             // for track name
 static char TrackLoadQualifyBuffer[BUFLEN];      // for track filename Q
 static char TrackLoadBuffer[BUFLEN];             // for track filename F
@@ -437,8 +437,8 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     track = pTrack;
 
 	// Initialize the base param path
-	const char* BaseParamPath = TDriver::robot_name;
-	const char* PathFilename = PathFilenameBuffer;
+    //const char* BaseParamPath = TDriver::robot_name;
+    //const char* PathFilename = PathFilenameBuffer;
 
     SkillGlobal = Skill = DecelAdjustPerc = DriverAggression = 0.0;
     GetSkillingParameters();
@@ -495,7 +495,6 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 	hCarParm = MergeParamFile(hCarParm, buf);
 
 	// setup the car param handle to be returned.
-
 	*ppCarParmHandle = hCarParm;
     LogSHADOW.debug("Load track settings ....\n");
 
@@ -535,18 +534,18 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 		FACTORS.Add( 1.005 );
 
 
-	FLY_HEIGHT = GfParmGetNum(hCarParm, SECT_PRIV, PRV_FLY_HEIGHT, "m", 0.15f);
-    BUMP_MOD = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_MOD, 0, 0);
-	SPDC_NORMAL = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_SPDC_NORMAL, 0, 2));
-	SPDC_TRAFFIC = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_SPDC_TRAFFIC, 0, 2));
-    SPDC_EXTRA = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_SPDC_EXTRA, 0, 3));
-    STEER_CTRL = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_CTRL, 0, 0));
-	AVOID_WIDTH = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AVOID_WIDTH, 0, 0.5);
-	STAY_TOGETHER = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STAY_TOGETHER, 0, 0);
-	STEER_K_ACC = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_K_ACC, 0, 0);
-	STEER_K_DEC = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_K_DEC, 0, 0);
+    FLY_HEIGHT       = GfParmGetNum(hCarParm, SECT_PRIV, PRV_FLY_HEIGHT, "m", 0.15f);
+    BUMP_MOD         = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_MOD, 0, 0);
+    SPDC_NORMAL      = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_SPDC_NORMAL, 0, 2));
+    SPDC_TRAFFIC     = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_SPDC_TRAFFIC, 0, 2));
+    SPDC_EXTRA       = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_SPDC_EXTRA, 0, 3));
+    STEER_CTRL       = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_CTRL, 0, 0));
+    AVOID_WIDTH      = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AVOID_WIDTH, 0, 0.5);
+    STAY_TOGETHER    = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STAY_TOGETHER, 0, 0);
+    STEER_K_ACC      = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_K_ACC, 0, 0);
+    STEER_K_DEC      = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_K_DEC, 0, 0);
 	PIT_ENTRY_OFFSET = GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_ENTRY_OFFS, 0, 0);
-	PIT_EXIT_OFFSET = GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_EXIT_OFFS, 0, 0);
+    PIT_EXIT_OFFSET  = GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_EXIT_OFFS, 0, 0);
 
     m_ClutchDelta = GfParmGetNum(hCarParm, SECT_PRIV, PRV_CLUTCH_DELTA,0,(float)m_ClutchDelta);
     LogSHADOW.debug("#m_ClutchDelta %g\n", m_ClutchDelta);
@@ -653,6 +652,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
     for( int i = 0; i < m_nCars; i++ )
 	{
 		m_opp[i].Initialise( &m_track, pS->cars[i] );
+
 		if( pS->cars[i] == pCar )
 			m_myOppIdx = i;
     }
@@ -996,7 +996,7 @@ double TDriver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 
 		int	k = int(floor((pi.k - K_MIN) / K_STEP));
 		int	s = int(floor((spd0 - SPD_MIN) / SPD_STEP));
-        // double	ae = 0;                                 // Moved in if(...) 6th April 2015
+
 		if( k >= 0 && k < K_N && s >= 0 && s < SPD_N )
 		{
             double	ae = 0;
@@ -1666,16 +1666,16 @@ void TDriver::Drive( tSituation* s )
 
 		if( car->ctrl.clutchCmd > 0.5 )
 		{
-            car->ctrl.clutchCmd = getClutch();
+            car->ctrl.clutchCmd = getClutch(car->ctrl.clutchCmd);
 		}
 		else if( car->ctrl.clutchCmd == 0.5 )
 		{
 			if( rpmForSpd / rpm > 0.82 )
-                car->ctrl.clutchCmd = getClutch();
+                car->ctrl.clutchCmd = getClutch(car->ctrl.clutchCmd);
 		}
 		else
 		{
-            car->ctrl.clutchCmd = getClutch();
+            car->ctrl.clutchCmd = getClutch(car->ctrl.clutchCmd);
 			if( car->ctrl.clutchCmd < 0 )
 				car->ctrl.clutchCmd = 0;
 		}
@@ -1710,7 +1710,7 @@ void TDriver::Drive( tSituation* s )
 		double	rpm = car->_enginerpm;
 		double	clutch = (850 - rpm) / 400;
 		if( car->_speed_x < 0.05 )
-            clutch = getClutch();
+            clutch = getClutch(clutch);
 
         car->ctrl.clutchCmd = MX(0, MN(clutch, 0.9));
 	}
@@ -2175,9 +2175,9 @@ int TDriver::CalcGear( tCarElt* car, double& acc )
 }
 
 // Compute the clutch value.
-float TDriver::getClutch()
+float TDriver::getClutch(float flutch)
 {
-    float m_Clutch;
+    float m_Clutch = flutch;
 #if 0
     float speedr;
     float omega;
@@ -2244,7 +2244,7 @@ float TDriver::getClutch()
     if(m_Clutch > 0)
     {
       if (car->_gear < 2)
-        m_Clutch = startAutomatic();
+        m_Clutch = startAutomatic(m_Clutch);
 
       m_Clutch = MIN(m_ClutchMax, m_Clutch);
       if(m_Clutch == m_ClutchMax)
@@ -2268,9 +2268,9 @@ float TDriver::getClutch()
 #endif
 }
 
-float TDriver::startAutomatic()
+float TDriver::startAutomatic(float clutch)
 {
-    float m_Clutch;
+    float m_Clutch = clutch;
   if ((car->_gearCmd == 1) && (TDriver::CurrSimTime < 20))
   {
     if (car->_enginerpm < 0.94)

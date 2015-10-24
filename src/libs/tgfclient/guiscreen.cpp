@@ -141,7 +141,7 @@ tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSi
 	Uint32 format;
 	SDL_Rect bounds;
 	tScreenSize* aSuppSizes;
-   tScreenSize* tmpSuppSizes;
+    tScreenSize* tmpSuppSizes;
 	tScreenSize last;
 
 	last.width = 0;

@@ -289,8 +289,8 @@ private:
 	void	ProcessOtherCars( int index, tCarElt* car, double spd, tSituation* s );
     void	AvoidOtherCars( int index, tCarElt* car, double k, double& carTargetSpd, tSituation* s, bool& inTraffic, bool& lapper );
 	int		CalcGear( tCarElt* car, double& acc );
-    float   getClutch();
-    float   startAutomatic();
+    float   getClutch(float flutch);
+    float   startAutomatic(float clutch);
 	double	ApplyAbs( tCarElt* car, double brake );
     double  filterBrake(double Brake);
 	double  filterDrifting(double Acc);
