@@ -353,6 +353,38 @@ typedef struct MemPoolCar
 	tMemoryPool shutdown;
 } tMemPoolCar;
 
+/* data for a dashboard item */
+typedef struct
+{
+    int		type;		/* type of the item, for possible values see below */
+    tdble	value;		/* actual value */
+    tdble	min, max;	/* limits for value*/
+    tdble	stepsize;	/* value of increment/decrement in one step */
+    tdble	desired_value;	/* desired new value */
+} tDashboardItem;
+/* constants for type: */
+#define	DI_NONE					-1
+/* types for dashboardInstant */
+#define DI_BRAKE_REPARTITION			0
+#define DI_FRONT_ANTIROLLBAR			1
+#define DI_REAR_ANTIROLLBAR			2
+#define DI_FRONT_DIFF_MAX_SLIP_BIAS 		3
+#define DI_FRONT_DIFF_COAST_MAX_SLIP_BIAS	4
+#define DI_CENTRAL_DIFF_MAX_SLIP_BIAS		5
+#define DI_CENTRAL_DIFF_COAST_MAX_SLIP_BIAS	6
+#define DI_REAR_DIFF_MAX_SLIP_BIAS		7
+#define DI_REAR_DIFF_COAST_MAX_SLIP_BIAS	8
+/* number of instant types */
+#define NR_DI_INSTANT				9
+/* types for dashboardRequest */
+#define DI_FUEL					32
+#define DI_REPAIR				33
+#define DI_TYRE_SET				34
+#define DI_FRONT_WING_ANGLE			35
+#define DI_REAR_WING_ANGLE			36
+/* number of request types */
+#define NR_DI_REQUEST				5
+
 /** Data known only by the driver */
 typedef struct
 {
@@ -390,7 +422,12 @@ typedef struct
 	tCollisionState collision_state; /**< collision state ; Simu V3 only  */
     tMemPoolCar	memoryPool;
     tdble       driveSkill;          /**< Skill level for robots: 0.0 means as fast as possible; 10.0 means at a slower speed so players can easier win */
-    tdble       steerTq;            /**< torqu on steering wheel for force feedback */
+    tdble       steerTq;            /**< torque on steering wheel for force feedback */
+    tDashboardItem dashboardInstant[NR_DI_INSTANT];
+    int		dashboardInstantNb;	/* number and list of immediately changing items in dashboard */
+    tDashboardItem dashboardRequest[NR_DI_REQUEST];
+    int		dashboardRequestNb;	/* number and list of items requested to change during next pit stop */
+    int		dashboardActiveItem;	/* active item in dashboard, 0 .. dashboardInstantNb+dashboardRequestNb-1 */
 } tPrivCar;
 /* structure access */
 #define _fuelTotal      priv.fuel_consumption_total
@@ -429,6 +466,11 @@ typedef struct
 #define _newRaceMemPool		priv.memoryPool.newRace
 #define _endRaceMemPool		priv.memoryPool.endRace
 #define _shutdownMemPool	priv.memoryPool.shutdown
+
+#define	_dashboardInstant	priv.dashboardInstant
+#define _dashboardInstantNb	priv.dashboardInstantNb
+#define _dashboardRequest	priv.dashboardRequest
+#define _dashboardRequestNb	priv.dashboardRequestNb
 
 /** Info returned by driver during the race */
 /** New order to get better alignment, additional parameters for new features */
@@ -472,6 +514,7 @@ typedef struct
 #define RM_MSG_LEN	31
 
 	float	msgColor[4]; /**< RGBA of text */
+	tDashboardItem *setupChangeCmd;	/* setup item changed in dashboard */
 } tCarCtrl;
 #define _steerCmd	ctrl.steer
 #define _accelCmd	ctrl.accelCmd
@@ -499,6 +542,42 @@ typedef struct
 
 struct RobotItf;
 
+/* structrure to store one parameter of car setup */
+typedef struct
+{
+    tdble	value;		/* actual value */
+    tdble	min, max;	/* limits for value*/
+    tdble	desired_value;	/* desired new value */
+    tdble	stepsize;	/* value of increment/decrement in one step */
+    bool	changed;	/* TRUE if the item has been changed */
+} tCarSetupItem;
+
+/* car setup parameters */
+typedef struct
+{
+    tCarSetupItem FRWeightRep, FRLWeightRep, RRLWeightRep;
+    tCarSetupItem fuel;
+    tCarSetupItem wingAngle[2];
+    tCarSetupItem revsLimiter;
+    tCarSetupItem gearRatio[MAX_GEARS];
+    int differentialType[3];
+    tCarSetupItem differentialRatio[3];
+    tCarSetupItem differentialMinTqBias[3], differentialMaxTqBias[3], differentialViscosity[3];
+    tCarSetupItem differentialLockingTq[3], differentialMaxSlipBias[3], differentialCoastMaxSlipBias[3];
+    tCarSetupItem steerLock;
+    tCarSetupItem brakeRepartition, brakePressure;
+    tCarSetupItem rideHeight[4], toe[4], camber[4];
+    tCarSetupItem tirePressure[4], tireOpLoad[4]; //note: pressure is unused now
+    tCarSetupItem arbSpring[2], arbBellcrank[2];
+    tCarSetupItem heaveSpring[2], heaveBellcrank[2], heaveInertance[2];
+    tCarSetupItem heaveFastBump[2], heaveSlowBump[2], heaveBumpLvel[2];
+    tCarSetupItem heaveFastRebound[2], heaveSlowRebound[2], heaveReboundLvel[2];
+    tCarSetupItem suspSpring[4], suspBellcrank[4], suspInertance[4];
+    tCarSetupItem suspCourse[4], suspPacker[4];
+    tCarSetupItem suspFastBump[4], suspSlowBump[4], suspBumpLvel[4];
+    tCarSetupItem suspFastRebound[4], suspSlowRebound[4], suspReboundLvel[4];
+} tCarSetup;
+
 /** Command issued by the car during pit stop */
 typedef struct CarPitCmd
 {
@@ -507,6 +586,7 @@ typedef struct CarPitCmd
 #define RM_PIT_REPAIR		0
 #define RM_PIT_STOPANDGO	1
     int			stopType;
+    bool		setupChanged; /* TRUE if setup has changed during the pit stop */
 } tCarPitCmd;
 /* structure access */
 #define _pitFuel	pitcmd.fuel
@@ -525,6 +605,7 @@ typedef struct CarElt
     tCarRaceInfo	race;	/**< public */
     tPrivCar		priv;	/**< private */
     tCarCtrl		ctrl;	/**< private */
+    tCarSetup		setup;	/**< private */
     tCarPitCmd		pitcmd;	/**< private */
     struct RobotItf	*robot;	/**< private */
     struct CarElt	*next;
