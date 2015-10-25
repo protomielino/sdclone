@@ -60,7 +60,12 @@ CarModel::CarModel()
 
 	KZ_SCALE(0),
     BUMP_FACTOR(0),
-	WIDTH(2)
+	WIDTH(2),
+	HASTYC(false),
+	TYRECONDITIONFRONT(0),
+	TYRECONDITIONREAR(0),
+	TYRETREADDEPTHFRONT(0),
+	TYRETREADDEPTHREAR(0)
 {
 }
 
@@ -126,13 +131,16 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
 
     double MuF = kFriction * TYRE_MU_F * MU_SCALE;
     double MuR = kFriction * TYRE_MU_R * MU_SCALE;
-    /*if (oDriver->oCarHasTYC)
+
+    if (HASTYC)
     {
-      double TcF = oDriver->TyreConditionFront();
-      double TcR = oDriver->TyreConditionRear();
-      Mu = MIN(TcF*MuF,TcR*MuR) / oTmpCarParam->oSkill;
+      double TcF = TYRECONDITIONFRONT;
+      double TcR = TYRECONDITIONREAR;
+	  MuF = TcF * MuF;
+	  MuR = TcR * MuR;
+      Mu = MIN(MuF, MuR) / SKILL;
     }
-    else*/
+    else
       Mu = MIN(MuF, MuR); // oTmpCarParam->oSkill;
 
     Den = (AbsCrv - ScaleBump * kz) - (CA_FW * MuF + CA_RW * MuR
@@ -246,6 +254,17 @@ double	CarModel::CalcBreaking(double k0, double kz0, double k1, double kz1, doub
         MU_R = kFriction * TYRE_MU_R;
         MU   = (MU_F + MU_R) * 0.5;
     }
+
+	if (HASTYC)
+    {
+      double TcF = TYRECONDITIONFRONT;
+      double TcR = TYRECONDITIONREAR;
+	  MU_F = TcF * MU_F;
+	  MU_R = TcR * MU_R;
+      MU = MIN(MU_F, MU_R) / SKILL;
+    }
+    else
+      MU = MIN(MU_F, MU_R); // oTmpCarParam->oSkill;
 
     double	CD = CD_BODY * (1.0 + DAMAGE / 10000.0) + CD_WING;
 

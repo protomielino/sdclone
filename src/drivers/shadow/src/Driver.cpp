@@ -689,6 +689,17 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
     initWheelPos();
     initBrake();
 
+	if(HasTYC)
+	{
+		m_cm.HASTYC = true;
+		m_cm.TYRECONDITIONFRONT  = TyreConditionFront();
+		m_cm.TYRECONDITIONREAR   = TyreConditionRear();
+		m_cm.TYRETREADDEPTHFRONT = TyreTreadDepthFront();
+		m_cm.TYRETREADDEPTHREAR  = TyreTreadDepthRear();
+	}
+	else
+		m_cm.HASTYC = false;
+
     m_cm.BRAKEFORCE = BrakeForce;
 
 	m_cm.FUEL = 0;//pCar->_fuel;
@@ -1511,6 +1522,20 @@ void TDriver::Drive( tSituation* s )
 	{
 		m_cm.FUEL	= 5 * floor(carFuel / 5);
 		m_cm.DAMAGE	= car->_dammage;
+
+		if(HasTYC)
+		{
+			m_cm.TYRECONDITIONFRONT  = TyreConditionFront();
+			m_cm.TYRECONDITIONREAR   = TyreConditionRear();
+			m_cm.TYRETREADDEPTHFRONT = TyreTreadDepthFront();
+			m_cm.TYRETREADDEPTHREAR  = TyreTreadDepthRear();
+
+			m_cm2.TYRECONDITIONFRONT  = TyreConditionFront();
+			m_cm2.TYRECONDITIONREAR   = TyreConditionRear();
+			m_cm2.TYRETREADDEPTHFRONT = TyreTreadDepthFront();
+			m_cm2.TYRETREADDEPTHREAR  = TyreTreadDepthRear();
+		}
+
 		m_cm2.FUEL = m_cm.FUEL;
 		m_cm2.DAMAGE = m_cm.DAMAGE;
 
@@ -3478,3 +3503,28 @@ bool TDriver::CheckPitSharing()
         return false;
     }
 }
+
+double TDriver::TyreConditionFront()
+{
+    return MIN(car->_tyreCondition(0), car->_tyreCondition(1));
+}
+
+double TDriver::TyreConditionRear()
+{
+    return MIN(car->_tyreCondition(2), car->_tyreCondition(3));
+}
+
+double TDriver::TyreTreadDepthFront()
+{
+    double Right = (car->_tyreTreadDepth(0) - car->_tyreCritTreadDepth(0));
+    double Left = (car->_tyreTreadDepth(1) - car->_tyreCritTreadDepth(1));
+    return 100 * MIN(Right, Left);
+}
+
+double TDriver::TyreTreadDepthRear()
+{
+    double Right = (car->_tyreTreadDepth(2) - car->_tyreCritTreadDepth(2));
+    double Left = (car->_tyreTreadDepth(3) - car->_tyreCritTreadDepth(3));
+    return 100 * MIN(Right, Left);
+}
+

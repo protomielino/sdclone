@@ -273,6 +273,10 @@ public:
     void    LearnBraking(double Pos);                   // Learn braking parameters
     void    DetectFlight();
     double  FlightControl(double Steer);                // Prepare landing
+	double	TyreConditionFront();
+	double	TyreConditionRear();
+	double	TyreTreadDepthFront();
+	double	TyreTreadDepthRear();
 
     bool        m_UseFilterAccel;
     bool        m_UseAccelOut;
