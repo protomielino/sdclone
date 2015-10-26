@@ -72,8 +72,6 @@ public:
 	bool	HASTYC;
 	double  TYRECONDITIONFRONT;
 	double	TYRECONDITIONREAR;
-	double	TYRETREADDEPTHFRONT;
-	double	TYRETREADDEPTHREAR;
 };
 
 #endif

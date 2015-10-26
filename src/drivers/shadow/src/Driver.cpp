@@ -694,8 +694,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
 		m_cm.HASTYC = true;
 		m_cm.TYRECONDITIONFRONT  = TyreConditionFront();
 		m_cm.TYRECONDITIONREAR   = TyreConditionRear();
-		m_cm.TYRETREADDEPTHFRONT = TyreTreadDepthFront();
-		m_cm.TYRETREADDEPTHREAR  = TyreTreadDepthRear();
+		LogSHADOW.debug("Tyre Front = %d - Tyre Rear = %d\n", m_cm.TYRECONDITIONFRONT, m_cm.TYRECONDITIONREAR);
 	}
 	else
 		m_cm.HASTYC = false;
@@ -1518,23 +1517,20 @@ void TDriver::Drive( tSituation* s )
 
 	double	carFuel = car->_fuel;
 
-    if( fabs(m_cm.FUEL   - carFuel)    > 5	|| fabs(m_cm.DAMAGE - car->_dammage) > 250 )
+	if(HasTYC)
+	{
+		m_cm.TYRECONDITIONFRONT  = TyreConditionFront();
+		m_cm.TYRECONDITIONREAR   = TyreConditionRear();
+		LogSHADOW.debug("Tyre Front = %3f - Tyre Rear = %3f\n", m_cm.TYRECONDITIONFRONT, m_cm.TYRECONDITIONREAR);
+
+		m_cm2.TYRECONDITIONFRONT  = TyreConditionFront();
+		m_cm2.TYRECONDITIONREAR   = TyreConditionRear();
+	}
+
+    if((fabs(m_cm.FUEL - carFuel) > 5) || (fabs(m_cm.DAMAGE - car->_dammage) > 250))
 	{
 		m_cm.FUEL	= 5 * floor(carFuel / 5);
 		m_cm.DAMAGE	= car->_dammage;
-
-		if(HasTYC)
-		{
-			m_cm.TYRECONDITIONFRONT  = TyreConditionFront();
-			m_cm.TYRECONDITIONREAR   = TyreConditionRear();
-			m_cm.TYRETREADDEPTHFRONT = TyreTreadDepthFront();
-			m_cm.TYRETREADDEPTHREAR  = TyreTreadDepthRear();
-
-			m_cm2.TYRECONDITIONFRONT  = TyreConditionFront();
-			m_cm2.TYRECONDITIONREAR   = TyreConditionRear();
-			m_cm2.TYRETREADDEPTHFRONT = TyreTreadDepthFront();
-			m_cm2.TYRETREADDEPTHREAR  = TyreTreadDepthRear();
-		}
 
 		m_cm2.FUEL = m_cm.FUEL;
 		m_cm2.DAMAGE = m_cm.DAMAGE;

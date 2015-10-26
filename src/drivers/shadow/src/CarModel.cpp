@@ -63,9 +63,7 @@ CarModel::CarModel()
 	WIDTH(2),
 	HASTYC(false),
 	TYRECONDITIONFRONT(0),
-	TYRECONDITIONREAR(0),
-	TYRETREADDEPTHFRONT(0),
-	TYRETREADDEPTHREAR(0)
+	TYRECONDITIONREAR(0)
 {
 }
 
@@ -138,7 +136,7 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
       double TcR = TYRECONDITIONREAR;
 	  MuF = TcF * MuF;
 	  MuR = TcR * MuR;
-      Mu = MIN(MuF, MuR) / SKILL;
+      Mu = MIN(MuF, MuR); // SKILL;
     }
     else
       Mu = MIN(MuF, MuR); // oTmpCarParam->oSkill;
@@ -261,7 +259,7 @@ double	CarModel::CalcBreaking(double k0, double kz0, double k1, double kz1, doub
       double TcR = TYRECONDITIONREAR;
 	  MU_F = TcF * MU_F;
 	  MU_R = TcR * MU_R;
-      MU = MIN(MU_F, MU_R) / SKILL;
+      MU = MIN(MU_F, MU_R); // SKILL;
     }
     else
       MU = MIN(MU_F, MU_R); // oTmpCarParam->oSkill;
