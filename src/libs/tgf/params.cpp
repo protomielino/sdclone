@@ -3023,6 +3023,68 @@ GfParmGetNumMax (void *handle, char const *path, const char *key, const char *un
 
 
 
+/** Get a numerical parameter in a config file with limits.
+    @ingroup	paramsdata
+    @param	handle	handle of parameters	
+    @param	path	path of param
+    @param	key	key name	
+    @param	unit	unit to convert the result to (NULL if SI wanted)	
+    @param	value	pointer to value
+    @param	min	pointer to minimum
+    @param	max	pointer to maximum
+    @return	0 in success, -1 otherwise
+    in success value, min and max is changed
+ */
+int
+GfParmGetNumWithLimits (void *handle, char const *path, const char *key, const char *unit, tdble* value, tdble* min, tdble* max)
+{
+	struct parmHandle *parmHandle = (struct parmHandle *)handle;
+	struct parmHeader *conf;
+	struct param *param;
+
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetNum: bad handle (%p)\n", parmHandle);
+		return -1;
+	}
+
+	conf = parmHandle->conf;
+
+	if (parmHandle->magic != PARM_MAGIC) 
+	{
+		GfLogFatal ("GfParmGetNum: bad handle (%p)\n", parmHandle);
+		return -1;
+	}
+
+	param = getParamByName (conf, path, key, 0);
+    if (!param ||  (param->type != P_NUM && param->type != P_FORM)) 
+    {
+		return -1;
+    }
+    if (param->type == P_FORM) 
+    {
+	 GfFormCalcFuncNew( param->formula, parmHandle, path, NULL, NULL, value, NULL );
+	 (*min) = (*value);
+	 (*max) = (*value);
+    }
+	else 
+    {
+	 (*value) = param->valnum;
+	 (*min) = param->min;
+	 (*max) = param->max;
+    }
+
+	if (unit) 
+	{
+		(*value) = GfParmSI2Unit(unit, *value);
+		(*min) = GfParmSI2Unit(unit, *min);
+		(*max) = GfParmSI2Unit(unit, *max);
+	}
+	
+    return 0;
+}
+
+
+
 /** Get a numerical parameter in a config file.
     @ingroup	paramslist
     @param	handle	handle of parameters	

@@ -440,6 +440,8 @@ TGF_API tdble GfParmGetNum(void *handle, const char *path, const char *key, cons
 TGF_API tdble GfParmGetNumMin(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
 /* get max of num parameter value */
 TGF_API tdble GfParmGetNumMax(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
+/* get num parameter value with limits */
+TGF_API int GfParmGetNumWithLimits (void *handle, char const *path, const char *key, const char *unit, tdble* value, tdble* min, tdble* max);
 /* get num parameter value */
 TGF_API tdble GfParmGetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
 /* get min of num parameter value */
