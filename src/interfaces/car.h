@@ -471,6 +471,7 @@ typedef struct
 #define _dashboardInstantNb	priv.dashboardInstantNb
 #define _dashboardRequest	priv.dashboardRequest
 #define _dashboardRequestNb	priv.dashboardRequestNb
+#define _dashboardActiveItem	priv.dashboardActiveItem
 
 /** Info returned by driver during the race */
 /** New order to get better alignment, additional parameters for new features */
