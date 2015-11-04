@@ -736,6 +736,8 @@ typedef struct CarElt
 #define PRM_BRKCOR_FR		"brake corr fr"
 
 #define PRM_CX				"Cx"
+#define PRM_CL				"Clift"
+#define PRM_CLBIAS			"Clift bias"
 #define PRM_FCL				"front Clift"
 #define PRM_RCL				"rear Clift"
 #define PRM_FRNTAREA		"front area"
