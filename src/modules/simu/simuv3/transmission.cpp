@@ -41,6 +41,7 @@ SimTransmissionConfig(tCar *car)
     transType		= GfParmGetStr(hdle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
     clutch->releaseTime	= GfParmGetNum(hdle, SECT_GEARBOX, PRM_SHIFTTIME, (char*)NULL, 0.2f);
 
+	gRatio = 0;
     fRatio = 0;
     gEff   = 0;
 

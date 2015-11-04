@@ -946,7 +946,7 @@ const char* SetupGlobalFileName(char* buf, int size, tgenData* Data, const char*
 		}
 		else
 		{
-			snprintf(buf,size,"%sdrivers/%s/%s/%default-%d%s",
+			snprintf(buf,size,"%sdrivers/%s/%s/default-%d%s",
 				GetLocalDir(),Data->RobotName,Data->CarType,Data->WeatherCode,Ext);
 		}
 	}
@@ -1095,7 +1095,7 @@ ReImportGeneticParameters()
 		{
 			// Build path to meta data file
 			snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-template.xml",
-			GetLocalDir(),Data->RobotName,Data->CarType);
+				GetLocalDir(),Data->RobotName,Data->CarType);
 		}
 	}
 	else
@@ -1597,6 +1597,9 @@ SelectParameterAndMutation(tgenData *Data)
 
 				// Get parameter from index
 				Param = Data->GP[P];
+
+				if (!Param->Active)
+					continue;
 
 				// Statistics
 				Param->Tries += 1;

@@ -139,15 +139,15 @@ TDriver::TDriver(int Index, const int robot_type):
 
     m_XXX(0),
 
-    m_SideScaleMu(0.97),
-    m_SideScaleBrake(0.97),
-    m_SideBorderOuter(0.2),
-    m_SideBorderInner(0.2),
+    m_SideScaleMu(0.97f),
+    m_SideScaleBrake(0.97f),
+    m_SideBorderOuter(0.2f),
+    m_SideBorderInner(0.2f),
 
     m_Rain(false),
     m_RainIntensity(0),
-    m_ScaleMuRain(0.85),
-    m_ScaleBrakeRain(0.75),
+    m_ScaleMuRain(0.85f),
+    m_ScaleBrakeRain(0.75f),
     m_DeltaAccel(0.05f),
     m_DeltaAccelRain(0.025f),
     m_WeatherCode(0),
@@ -159,7 +159,7 @@ TDriver::TDriver(int Index, const int robot_type):
     HasTYC(false),
 
     m_TclRange(10.0),
-    m_TclSlip(1.6),
+    m_TclSlip(1.6f),
     m_TclFactor(1.0),
 
 	m_DriftAngle(0.0),
@@ -168,12 +168,12 @@ TDriver::TDriver(int Index, const int robot_type):
 	m_CosDriftAngle2(1.0),
 	m_DriftFactor(1.0),
 
-    m_ClutchMax(0.5),
-    m_ClutchDelta(0.009),
-    m_ClutchRange(0.82),
-    m_ClutchRelease(0.5),
+    m_ClutchMax(0.5f),
+    m_ClutchDelta(0.009f),
+    m_ClutchRange(0.82f),
+    m_ClutchRelease(0.5f),
 
-    m_Shift(0.98),
+    m_Shift(0.98f),
 
 	m_prevYawError(0),
 	m_prevLineError(0),
@@ -186,10 +186,10 @@ TDriver::TDriver(int Index, const int robot_type):
 	m_lastB(0),
 	m_lastBrk(0),
 	m_lastTargV(0),
-    m_maxbrkPressRatio(0.85),
+    m_maxbrkPressRatio(0.85f),
 	m_maxAccel(0, 150, 30, 1),
 	m_steerGraph(2, s_sgMin, s_sgMax, s_sgSteps, 0),
-    m_steerAvg(19, 0.001, 0.02, 15, 20, 95),
+    m_steerAvg(19, 0.001f, 0.02f, 15, 20, 95),
 
     m_FuelNeeded(0),
 
@@ -499,7 +499,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     LogSHADOW.debug("Load track settings ....\n");
 
 	// get the private parameters now.
-    m_ScaleMuRain = (double)(GfParmGetNum(hCarParm, SECT_PRIV, PRV_RAIN_MU, NULL, m_ScaleMuRain));
+    m_ScaleMuRain = (double)(GfParmGetNum(hCarParm, SECT_PRIV, PRV_RAIN_MU, NULL, (tdble) m_ScaleMuRain));
     LogSHADOW.info("#Scale Mu Rain: %g\n", m_ScaleMuRain);
 
 	m_cm.AERO = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_AERO_MOD, 0, 0);
@@ -513,8 +513,8 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 
 	m_cm.KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_KZ_SCALE, NULL, 0.43f);
     m_cm.BUMP_FACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR, NULL, 1.0);
-    m_cm.NEEDSINLONG = (bool)(GfParmGetNum(hCarParm, SECT_PRIV, PRV_NEED_SIN, NULL, 0));
-    m_cm.USEDACCEXIT = (bool)(GfParmGetNum(hCarParm, SECT_PRIV, PRV_USED_ACC, NULL, 0));
+    m_cm.NEEDSINLONG = (GfParmGetNum(hCarParm, SECT_PRIV, PRV_NEED_SIN, NULL, 0) != 0);
+    m_cm.USEDACCEXIT = (GfParmGetNum(hCarParm, SECT_PRIV, PRV_USED_ACC, NULL, 0) != 0);
     m_cm.BRAKESCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BRAKESCALE, NULL, 1.0);
 
 	FACTORS.RemoveAll();
@@ -722,11 +722,11 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
 		double	w = AVOID_WIDTH;
 
 		m_pShared->m_path[PATH_NORMAL].SetFactors( FACTORS );
-        m_pShared->m_path[PATH_NORMAL].MakeSmoothPath( &m_track, m_cm, ClothoidPath::Options(BUMP_MOD));
+        m_pShared->m_path[PATH_NORMAL].MakeSmoothPath( &m_track, m_cm, ClothoidPath::Options((int)BUMP_MOD));
 		m_pShared->m_path[PATH_LEFT].SetFactors( FACTORS );
-        m_pShared->m_path[PATH_LEFT].MakeSmoothPath( &m_track, m_cm2, ClothoidPath::Options(BUMP_MOD, 999, -w));
+        m_pShared->m_path[PATH_LEFT].MakeSmoothPath( &m_track, m_cm2, ClothoidPath::Options((int)BUMP_MOD, 999, -w));
 		m_pShared->m_path[PATH_RIGHT].SetFactors( FACTORS );
-        m_pShared->m_path[PATH_RIGHT].MakeSmoothPath( &m_track, m_cm2, ClothoidPath::Options(BUMP_MOD, -w, 999));
+        m_pShared->m_path[PATH_RIGHT].MakeSmoothPath( &m_track, m_cm2, ClothoidPath::Options((int)BUMP_MOD, -w, 999));
     }
 
     LogSHADOW.debug("m_Pshared passed\n");
@@ -1035,7 +1035,7 @@ double TDriver::SteerAngle1( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 	double	y = car->pub.DynGCg.pos.y + midPt * sin(car->_yaw);
 
 	tTrkLocPos	trkPos;
-	RtTrackGlobal2Local(car->_trkPos.seg, x, y, &trkPos, 0);
+	RtTrackGlobal2Local(car->_trkPos.seg, (tdble)x, (tdble)y, &trkPos, 0);
 	double	toMiddle = trkPos.toMiddle;
 
 	// get curret pos on track.
@@ -1089,7 +1089,7 @@ double TDriver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     // oldY = y;                                    // Removed 5th April 2015 - Not Used
 
 	tTrkLocPos	trkPos;
-	RtTrackGlobal2Local(car->_trkPos.seg, x, y, &trkPos, 0);
+	RtTrackGlobal2Local(car->_trkPos.seg, (tdble) x, (tdble) y, &trkPos, 0);
 	double	toMiddle = trkPos.toMiddle;
 
 
@@ -1731,9 +1731,9 @@ void TDriver::Drive( tSituation* s )
 		double	rpm = car->_enginerpm;
 		double	clutch = (850 - rpm) / 400;
 		if( car->_speed_x < 0.05 )
-            clutch = getClutch(clutch);
+            clutch = getClutch((tdble) clutch);
 
-        car->ctrl.clutchCmd = MX(0, MN(clutch, 0.9));
+        car->ctrl.clutchCmd = (tdble) MX(0, MN(clutch, 0.9));
 	}
 
 	if( fabs(pi.offs) > 5 )
@@ -1788,10 +1788,10 @@ void TDriver::Drive( tSituation* s )
     acc = filterAccel(acc);
 
     // set up the values to return
-    car->ctrl.steer = steer;
+    car->ctrl.steer = (tdble) steer;
     car->ctrl.gear = gear;
-    car->ctrl.accelCmd = acc;
-    car->ctrl.brakeCmd = brk;
+    car->ctrl.accelCmd = (tdble) acc;
+    car->ctrl.brakeCmd = (tdble) brk;
     m_LastBrake = brk;
     m_LastAccel = acc;
 	m_LastAbsDriftAngle = m_AbsDriftAngle;
@@ -2175,7 +2175,7 @@ int TDriver::CalcGear( tCarElt* car, double& acc )
         /*BT gear changing */
         float gr_up = car->_gearRatio[car->_gear + car->_gearOffset];
         float omega = (car->_enginerpmRedLine * m_Shift) /gr_up;
-        float wr = wheelRadius;
+        float wr = (tdble) wheelRadius;
 
         if (omega * wr * m_Shift < car->_speed_x)
         {
@@ -2267,21 +2267,21 @@ float TDriver::getClutch(float flutch)
       if (car->_gear < 2)
         m_Clutch = startAutomatic(m_Clutch);
 
-      m_Clutch = MIN(m_ClutchMax, m_Clutch);
+      m_Clutch = (tdble)(MIN(m_ClutchMax, m_Clutch));
       if(m_Clutch == m_ClutchMax)
       {
         if((car->_gear + car->_gearOffset)* car->_speed_x
             / (wheelRadius * car->_enginerpm) > m_ClutchRange)
         {
-          m_Clutch = m_ClutchMax - 0.01;
+          m_Clutch = (tdble)(m_ClutchMax - 0.01);
         }
         else
-          m_Clutch -= m_ClutchDelta / 10;
+          m_Clutch -= (tdble)(m_ClutchDelta / 10);
       }
       else
       {
-        m_Clutch -= m_ClutchDelta;
-        m_Clutch = MAX(0.0, m_Clutch);
+        m_Clutch -= (tdble) m_ClutchDelta;
+        m_Clutch = (tdble)(MAX(0.0, m_Clutch));
       }
     }
 
@@ -2295,9 +2295,9 @@ float TDriver::startAutomatic(float clutch)
   if ((car->_gearCmd == 1) && (TDriver::CurrSimTime < 20))
   {
     if (car->_enginerpm < 0.94)
-      m_Clutch += m_ClutchDelta;
+      m_Clutch += (tdble)(m_ClutchDelta);
     else if (car->_enginerpm > 1.1 * 0.94)
-      m_Clutch -= m_ClutchDelta * m_ClutchRelease;
+      m_Clutch -= (tdble)(m_ClutchDelta * m_ClutchRelease);
   }
 
   return m_Clutch;

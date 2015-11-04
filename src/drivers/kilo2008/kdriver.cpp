@@ -1635,13 +1635,13 @@ vec2f KDriver::TargetPoint() {
     n.normalize();
     vec2f d((seg->vertex[TR_EL].x - seg->vertex[TR_SL].x) / seg->length,
       (seg->vertex[TR_EL].y - seg->vertex[TR_SL].y) / seg->length);
-    return s + d * length + static_cast<float>(offset) * n;
+    return (s + d * (float) length + static_cast<float>((float) offset) * n);
   } else {
     vec2f c(seg->center.x, seg->center.y);
     double arc = length / seg->radius;
     double arcsign = (seg->type == TR_RGT) ? -1.0 : 1.0;
     arc = arc * arcsign;
-    s = s.rotate(c, arc);
+    s = s.rotate(c, (float) arc);
 
     vec2f n, t, rt;
     n = c - s;

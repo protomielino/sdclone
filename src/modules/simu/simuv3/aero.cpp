@@ -33,7 +33,7 @@ SimAeroConfig(tCar *car)
     car->aero.Clift[1] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_RCL, (char*)NULL, 0.0f);
     float aero_factor = car->options->aero_factor;
 
-    car->aero.SCx2 = 0.5f * AIR_DENSITY * Cx * FrntArea;
+    car->aero.SCx2 = (tdble) (0.5f * AIR_DENSITY * Cx * FrntArea);
     car->aero.Clift[0] *= aero_factor / 4.0f;
     car->aero.Clift[1] *= aero_factor / 4.0f;
     float max_lift = MaximumLiftGivenDrag (car->aero.SCx2, FrntArea);
@@ -93,22 +93,22 @@ SimAeroUpdate(tCar *car, tSituation *s)
 	    tCar* otherCar = &(SimCarTable[i]);
 	    tdble otherYaw = otherCar->DynGC.pos.az;
 	    tdble tmpsdpang = spdang - atan2(y - otherCar->DynGC.pos.y, x - otherCar->DynGC.pos.x);
-	    NORM_PI_PI(tmpsdpang);
+	    FLOAT_NORM_PI_PI(tmpsdpang);
 	    tdble dyaw = yaw - otherYaw;
-	    NORM_PI_PI(dyaw);
+	    FLOAT_NORM_PI_PI(dyaw);
 
 	    if ((otherCar->DynGC.vel.x > 10.0) &&
 		(fabs(dyaw) < 0.1396)) {
 		if (fabs(tmpsdpang) > 2.9671) {	    /* 10 degrees */
 		    /* behind another car - reduce overall airflow */
-                    tdble factor = (fabs(tmpsdpang)-2.9671)/(M_PI-2.9671);
+            tdble factor = (tdble)((fabs(tmpsdpang)-2.9671)/(M_PI-2.9671));
 
-		    tmpas = 1.0 - factor * exp(- 2.0 * DIST(x, y, otherCar->DynGC.pos.x, otherCar->DynGC.pos.y)/(otherCar->aero.Cd * otherCar->DynGC.vel.x));
+		    tmpas = (tdble) (1.0 - factor * exp(- 2.0 * DIST(x, y, otherCar->DynGC.pos.x, otherCar->DynGC.pos.y)/(otherCar->aero.Cd * otherCar->DynGC.vel.x)));
 		    airSpeed = airSpeed * tmpas;
 		} else if (fabs(tmpsdpang) < 0.1396f) {	    /* 8 degrees */
                     tdble factor = 0.5f * (0.1396f-fabs(tmpsdpang))/(0.1396f);
 		    /* before another car - breaks down rear eddies, reduces only drag*/
-		    tmpas = 1.0f - factor * exp(- 8.0 * DIST(x, y, otherCar->DynGC.pos.x, otherCar->DynGC.pos.y) / (car->aero.Cd * car->DynGC.vel.x));
+		    tmpas = (tdble) (1.0f - factor * exp(- 8.0 * DIST(x, y, otherCar->DynGC.pos.x, otherCar->DynGC.pos.y) / (car->aero.Cd * car->DynGC.vel.x)));
 		    dragK = dragK * tmpas;
 		}
 	    }
@@ -118,9 +118,9 @@ SimAeroUpdate(tCar *car, tSituation *s)
     car->airSpeed2 = airSpeed * airSpeed;
     
     tdble v2 = car->airSpeed2;
-    tdble dmg_coef = ((tdble)car->dammage / 10000.0);
+    tdble dmg_coef = (tdble)((tdble)car->dammage / 10000.0);
 
-    car->aero.drag = -SIGN(car->DynGC.vel.x) * car->aero.SCx2 * v2 * (1.0 + dmg_coef) * dragK * dragK;
+    car->aero.drag = (tdble)(-SIGN(car->DynGC.vel.x) * car->aero.SCx2 * v2 * (1.0 + dmg_coef) * dragK * dragK);
 
 
     // Since we have the forces ready, we just multiply. 
@@ -135,13 +135,13 @@ SimAeroUpdate(tCar *car, tSituation *s)
 
 
     v2 = car->DynGC.vel.y;
-    car->aero.lateral_drag = -SIGN(v2)*v2*v2*0.7;
+    car->aero.lateral_drag = (tdble)(-SIGN(v2)*v2*v2*0.7);
     car->aero.Mx += car->aero.lateral_drag * dmg_coef2 * car->aero.rot_lateral[0];
     car->aero.My += car->aero.lateral_drag * dmg_coef2 * car->aero.rot_lateral[1];
     car->aero.Mz += car->aero.lateral_drag * dmg_coef2 * car->aero.rot_lateral[2];
 
     v2 = car->DynGC.vel.z;
-    car->aero.vertical_drag = -SIGN(v2)*v2*v2*1.5;
+    car->aero.vertical_drag = (tdble)(-SIGN(v2)*v2*v2*1.5);
     car->aero.Mx += car->aero.vertical_drag * dmg_coef2 * car->aero.rot_vertical[0];
     car->aero.My += car->aero.vertical_drag * dmg_coef2 * car->aero.rot_vertical[1];
     car->aero.Mz += car->aero.vertical_drag * dmg_coef2 * car->aero.rot_vertical[2];
@@ -155,23 +155,23 @@ SimAeroUpdate(tCar *car, tSituation *s)
 void SimAeroDamage(tCar *car, sgVec3 poc, tdble F)
 {
     tAero* aero = &car->aero;
-    tdble dmg = F*0.0001;
+    tdble dmg = (tdble) (F*0.0001);
 
-    aero->rot_front[0] += dmg*(urandom()-.5);
-    aero->rot_front[1] += dmg*(urandom()-.5);
-    aero->rot_front[2] += dmg*(urandom()-.5);
+    aero->rot_front[0] += (tdble)(dmg*(urandom()-.5));
+    aero->rot_front[1] += (tdble)(dmg*(urandom()-.5));
+    aero->rot_front[2] += (tdble)(dmg*(urandom()-.5));
     if (sgLengthVec3(car->aero.rot_front) > 1.0) {
         sgNormaliseVec3 (car->aero.rot_front);
     }
-    aero->rot_lateral[0] += dmg*(urandom()-.5);
-    aero->rot_lateral[1] += dmg*(urandom()-.5);
-    aero->rot_lateral[2] += dmg*(urandom()-.5);
+    aero->rot_lateral[0] += (tdble)(dmg*(urandom()-.5));
+    aero->rot_lateral[1] += (tdble)(dmg*(urandom()-.5));
+    aero->rot_lateral[2] += (tdble)(dmg*(urandom()-.5));
     if (sgLengthVec3(car->aero.rot_lateral) > 1.0) {
         sgNormaliseVec3 (car->aero.rot_lateral);
     }
-    aero->rot_vertical[0] += dmg*(urandom()-.5);
-    aero->rot_vertical[1] += dmg*(urandom()-.5);
-    aero->rot_vertical[2] += dmg*(urandom()-.5);
+    aero->rot_vertical[0] += (tdble)(dmg*(urandom()-.5));
+    aero->rot_vertical[1] += (tdble)(dmg*(urandom()-.5));
+    aero->rot_vertical[2] += (tdble)(dmg*(urandom()-.5));
     if (sgLengthVec3(car->aero.rot_vertical) > 1.0) {
         sgNormaliseVec3 (car->aero.rot_vertical);
     }
@@ -200,17 +200,17 @@ SimWingConfig(tCar *car, int index)
     
     switch (car->options->aeroflow_model) {
     case SIMPLE:
-        wing->Kx = -AIR_DENSITY * area; ///< \bug: there should be a 1/2 here.
+        wing->Kx = (tdble)(-AIR_DENSITY * area); ///< \bug: there should be a 1/2 here.
         //wing->Kz = 4.0 * wing->Kx;
         wing->Kz = car->options->aero_factor * wing->Kx;
         break;
     case PLANAR:
-        wing->Kx = -AIR_DENSITY * area * 16.0f;
+        wing->Kx = (tdble)(-AIR_DENSITY * area * 16.0f);
         wing->Kz = wing->Kx;
         break;
     case OPTIMAL:
 		fprintf (stderr, "Using optimal wings\n");
-        wing->Kx = -AIR_DENSITY * area; ///< \bug: there should be a 1/2 here.
+        wing->Kx = (tdble)(-AIR_DENSITY * area); ///< \bug: there should be a 1/2 here.
         wing->Kz = car->options->aero_factor * wing->Kx;
         break;
     default:
@@ -261,16 +261,16 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
 	    tCar* otherCar = &(SimCarTable[i]);
 	    tdble otherYaw = otherCar->DynGC.pos.az;
 	    tdble tmpsdpang = spdang - atan2(y - otherCar->DynGC.pos.y, x - otherCar->DynGC.pos.x);
-	    NORM_PI_PI(tmpsdpang);
+	    FLOAT_NORM_PI_PI(tmpsdpang);
 	    tdble dyaw = yaw - otherYaw;
-	    NORM_PI_PI(dyaw);
+	    FLOAT_NORM_PI_PI(dyaw);
 	    if ((otherCar->DynGC.vel.x > 10.0) &&
 		(fabs(dyaw) < 0.1396)) {
 		if (fabs(tmpsdpang) > 2.9671) {	    /* 10 degrees */
 		    /* behind another car - reduce overall airflow */
-                    tdble factor = (fabs(tmpsdpang)-2.9671)/(M_PI-2.9671);
-		    tmpas = 1.0 - factor*exp(- 2.0 * DIST(x, y, otherCar->DynGC.pos.x, otherCar->DynGC.pos.y) /
-                                             (otherCar->aero.Cd * otherCar->DynGC.vel.x));
+            tdble factor = (tdble)((fabs(tmpsdpang)-2.9671)/(M_PI-2.9671));
+		    tmpas = (tdble)(1.0 - factor*exp(- 2.0 * DIST(x, y, otherCar->DynGC.pos.x, otherCar->DynGC.pos.y) /
+                                             (otherCar->aero.Cd * otherCar->DynGC.vel.x)));
 		    i_flow = i_flow * tmpas;
 		} 
 	    }
@@ -283,10 +283,10 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
         tdble alpha = 0.0f;
         tdble vt2b = vt2 * (alpha+(1-alpha)*i_flow);
         vt2b = vt2b * vt2b;
-        tdble hm = 1.5 * (car->wheel[0].rideHeight + car->wheel[1].rideHeight + car->wheel[2].rideHeight + car->wheel[3].rideHeight);
+        tdble hm = (tdble)(1.5 * (car->wheel[0].rideHeight + car->wheel[1].rideHeight + car->wheel[2].rideHeight + car->wheel[3].rideHeight));
         hm = hm*hm;
         hm = hm*hm;
-        hm = 1.0 + exp(-3.0*hm);
+        hm = (tdble)(1.0 + exp(-3.0*hm));
         car->aero.lift[index] = - car->aero.Clift[index] * vt2b * hm;
         //car->aero.lift[1] = - car->aero.Clift[1] * vt2b *  hm;
         //printf ("%f\n", car->aero.lift[0]+car->aero.lift[1]);
@@ -331,7 +331,7 @@ tdble PartialFlowRectangle(tdble theta, tdble psi)
         return 1.0;
     if (fabs(psi)>fabs(2.0*theta))
         return 0.0;
-    return (1.0-(1.0-sin(psi)/sin(2.0*theta)));
+    return (tdble)((1.0-(1.0-sin(psi)/sin(2.0*theta))));
 }
  
 tdble PartialFlowSmooth(tdble theta, tdble psi)
@@ -340,7 +340,7 @@ tdble PartialFlowSmooth(tdble theta, tdble psi)
         return 1.0;
     if (fabs(psi)>fabs(2.0*theta))
         return 0.0;
-    return (0.5*(1.0+tanh((theta-psi)/(fabs(1.0-(psi/theta))-1.0))));
+    return (tdble)((0.5*(1.0+tanh((theta-psi)/(fabs(1.0-(psi/theta))-1.0)))));
 }
  
 tdble PartialFlowSphere(tdble theta, tdble psi)
@@ -349,7 +349,7 @@ tdble PartialFlowSphere(tdble theta, tdble psi)
         return 1.0;
     if (fabs(psi)>fabs(2.0*theta))
         return 0.0;
-    return (0.5*(1.0+sin((theta-psi)*M_PI/(2.0*theta))));
+    return (tdble)((0.5*(1.0+sin((theta-psi)*M_PI/(2.0*theta)))));
 }
            
 tdble Max_Cl_given_Cd (tdble Cd)
@@ -369,13 +369,13 @@ tdble Max_Cl_given_Cd (tdble Cd)
 tdble Max_SCl_given_Cd (tdble Cd, tdble A)
 {
     tdble Cl = Max_Cl_given_Cd (Cd);
-    return A * Cl * AIR_DENSITY / 2.0f;
+    return (tdble)(A * Cl * AIR_DENSITY / 2.0f);
 }
 
 tdble MaximumLiftGivenDrag (tdble drag, tdble A)
 {
     // We know the drag, C/2 \rho A.
     // We must calculate the drag coefficient
-    tdble Cd = (drag / A) * 2.0f / AIR_DENSITY;
+    tdble Cd = (tdble)((drag / A) * 2.0f / AIR_DENSITY);
     return Max_SCl_given_Cd (Cd, A);
 }
