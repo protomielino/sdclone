@@ -58,12 +58,38 @@ SimAeroConfig(tCar *car)
 {
     void *hdle = car->params;
     tdble Cx, FrntArea;
+	// New style parameters:
+	// To be able to check the total of clift to be in the defined range
+	// min <= car->aero.Clift[0] + car->aero.Clift[1] <= max
+	// with the default procedures of SD we define Clift with
+	// the two new style parameters CliftTotal and CliftBias.
+	// If CliftTotal and/or CliftBias are not defined, the corresponding
+	// value is calculated from the old style parameters
+	tdble CliftTotal;
+	tdble CliftBias;
     
     Cx       = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_CX, (char*)NULL, 0.4f);
     FrntArea = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FRNTAREA, (char*)NULL, 2.5f);
+
+	// Try to get the old style parameters
     car->aero.Clift[0] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FCL, (char*)NULL, 0.0f);
     car->aero.Clift[1] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_RCL, (char*)NULL, 0.0f);
-    car->aero.CdBody = 0.645f * Cx * FrntArea;
+
+	// Calculate CliftTotal from old style parameters
+	CliftTotal = car->aero.Clift[0] + car->aero.Clift[1];
+	// Use calculated value if no new style definition found
+	CliftTotal = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_CL, (char*)NULL, CliftTotal);
+
+	// Calculate CliftBias from old style parameters
+	CliftBias = car->aero.Clift[0] / CliftTotal;
+	// Use calculated value if no new style definition found
+	CliftBias = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_CLBIAS, (char*)NULL, CliftBias);
+
+	// Calculate front/rear Clift based on new style parameters
+	car->aero.Clift[0] = CliftBias * CliftTotal;
+	car->aero.Clift[1] = CliftTotal - car->aero.Clift[0];
+
+	car->aero.CdBody = 0.645f * Cx * FrntArea;
     car->aero.Cd = car->aero.CdBody;
 
     float max_lift = MaximumLiftGivenDrag (0.5f * rho * Cx * FrntArea, FrntArea);
