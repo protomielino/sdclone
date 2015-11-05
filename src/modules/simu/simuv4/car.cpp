@@ -166,7 +166,10 @@ SimCarConfig(tCar *car)
 	
 	/* Set the origin to GC */
 	car->wheelbase = car->wheeltrack = 0;
-	car->statGC.x = car->wheel[FRNT_RGT].staticPos.x * gcfr + car->wheel[REAR_RGT].staticPos.x * (1 - gcfr);
+	// Old code is misleading, because at this time staticPos.x still is relPos.x 
+	// car->statGC.x = car->wheel[FRNT_RGT].staticPos.x * gcfr + car->wheel[REAR_RGT].staticPos.x * (1 - gcfr);
+	// Use the correct variable name instead
+	car->statGC.x = car->wheel[FRNT_RGT].relPos.x * gcfr + car->wheel[REAR_RGT].relPos.x * (1 - gcfr);
 	
 	carElt->_dimension = car->dimension;
 	carElt->_statGC = car->statGC;
