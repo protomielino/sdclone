@@ -229,14 +229,6 @@ void* SoundMenuInit(void *prevMenu)
 
 	VolumeValueId = GfuiMenuCreateEditControl(scrHandle,param,"volumeedit",NULL,NULL,changeVolume);
 
-
-	//// TODO remove this and uncomment the static controls in 'soundconfigmenu.xml'
-	//// if/when Music is officially included
-	//// HACK to allow CMake option 'OPTION_MENU_MUSIC' to show/hide these menu music labels
-	//GfuiMenuCreateLabelControl(scrHandle,param,"musicstaticlabel");
-	//GfuiMenuCreateLabelControl(scrHandle,param,"musicstaticvolume");
-	//// end of code to remove
-
 	GfuiMenuCreateButtonControl(scrHandle,param,"musicleftarrow",(void*)-1,changeMusicState);
 	GfuiMenuCreateButtonControl(scrHandle,param,"musicrightarrow",(void*)1,changeMusicState);
 
