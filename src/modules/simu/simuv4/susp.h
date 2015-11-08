@@ -56,9 +56,10 @@ typedef struct Suspension
 
     tdble force;        /* generated force */
     int    state;        /* indicate the state of the suspension */
+    /* Note: susp.state is merged with wheel.state in the code,
+     * so SIM_SUSP and SIM_WH states cannot use the same bit */
 #define SIM_SUSP_COMP   1  	/* the suspension is fully compressed */
 #define SIM_SUSP_EXT    2  	/* the suspension is fully extended */
-#define SIM_SUSP_INAIR  4   /* the suspension is in the air, can be combined with the other states */
 } tSuspension;
 
 

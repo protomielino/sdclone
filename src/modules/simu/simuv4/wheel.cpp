@@ -43,6 +43,7 @@ SimWheelConfig(tCar *car, int index)
 	tireratio             = GfParmGetNum(hdle, WheelSect[index], PRM_TIRERATIO, (char*)NULL, 0.75f);
 	wheel->mu             = GfParmGetNum(hdle, WheelSect[index], PRM_MU, (char*)NULL, 1.0f);
 	wheel->I              = GfParmGetNum(hdle, WheelSect[index], PRM_INERTIA, (char*)NULL, 1.5f);
+	//BUG: the next line should go after SimBrakeConfig to have an effect
 	wheel->I += wheel->brake.I; // add brake inertia
 	wheel->staticPos.y    = GfParmGetNum(hdle, WheelSect[index], PRM_YPOS, (char*)NULL, 0.0f);
 	x0                    = GfParmGetNum(hdle, WheelSect[index], PRM_RIDEHEIGHT, (char*)NULL, 0.20f);
@@ -162,7 +163,7 @@ void SimWheelUpdateRide(tCar *car, int index)
 
 	if (car->features & FEAT_FIXEDWHEELFORCE) {
 		if (max_extend > new_susp_x + 0.01) {
-			wheel->susp.state = SIM_SUSP_INAIR;
+			wheel->susp.state = SIM_WH_INAIR;
 		} else {wheel->susp.state = 0;}
 	} else {
 		wheel->susp.state = 0;
@@ -222,7 +223,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 	SimSuspUpdate(&(wheel->susp));
 	// check suspension state
 	wheel->state |= wheel->susp.state;
-	if ( ((wheel->state & SIM_SUSP_EXT) == 0) && ((wheel->state & SIM_SUSP_INAIR) == 0) ) {
+	if ( ((wheel->state & SIM_SUSP_EXT) == 0) && ((wheel->state & SIM_WH_INAIR) == 0) ) {
 		wheel->forces.z = axleFz + wheel->susp.force + wheel->axleFz3rd;
 		reaction_force = wheel->forces.z;
 		if (car->features & FEAT_FIXEDWHEELFORCE) {
