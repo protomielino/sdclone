@@ -306,7 +306,7 @@ public:
         float offset = 0;
 
         p[0] = car->_drvPos_x;
-        p[1] = car->_bonnetPos_y;
+        p[1] = car->_drvPos_y;
         p[2] = car->_drvPos_z;
         sgXformPnt3(p, car->_posMat);
 
