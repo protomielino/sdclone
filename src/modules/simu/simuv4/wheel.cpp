@@ -139,7 +139,6 @@ SimWheelConfig(tCar *car, int index)
 	wheel->feedBack.spinVel = 0.0f;
 	wheel->feedBack.Tq = 0.0f;
 	wheel->feedBack.brkTq = 0.0f;
-	wheel->rel_vel = 0.0f;
 	wheel->torques.x = wheel->torques.y = wheel->torques.z = 0.0f;
 }
 
@@ -155,25 +154,17 @@ void SimWheelUpdateRide(tCar *car, int index)
 
 	// Wheel susp.x is not the wheel movement, look at SimSuspCheckIn, it becomes there scaled with
 	// susp->spring.bellcrank, so we invert this here.
-	tdble prexwheel = wheel->susp.x / wheel->susp.spring.bellcrank;
 
-	tdble new_susp_x= prexwheel - wheel->rel_vel * SimDeltaTime;
+	tdble new_susp_x = (wheel->susp.x - wheel->susp.v * SimDeltaTime) / wheel->susp.spring.bellcrank;
     tdble max_extend =  wheel->pos.z - Zroad;
 	wheel->rideHeight = max_extend;
 
-	if (car->features & FEAT_FIXEDWHEELFORCE) {
-		if (max_extend > new_susp_x + 0.01) {
-			wheel->susp.state = SIM_WH_INAIR;
-		} else {wheel->susp.state = 0;}
-	} else {
-		wheel->susp.state = 0;
-	}
+	if (max_extend > new_susp_x + 0.01) {
+		wheel->susp.state = SIM_WH_INAIR;
+	} else {wheel->susp.state = 0;}
 	
 	if (max_extend < new_susp_x) {
 		new_susp_x = max_extend;
-		wheel->rel_vel = 0.0f;
-	} else if (new_susp_x < wheel->susp.spring.packers) {
-		wheel->rel_vel = 0.0f;
 	}
 
 	tdble prex = wheel->susp.x;
@@ -225,26 +216,30 @@ void SimWheelUpdateForce(tCar *car, int index)
 	wheel->state |= wheel->susp.state;
 	if ( ((wheel->state & SIM_SUSP_EXT) == 0) && ((wheel->state & SIM_WH_INAIR) == 0) ) {
 		wheel->forces.z = axleFz + wheel->susp.force + wheel->axleFz3rd;
-		reaction_force = wheel->forces.z;
 		if (car->features & FEAT_FIXEDWHEELFORCE) {
-			wheel->rel_vel -= SimDeltaTime * wheel->forces.z / wheel->mass;
+			wheel->susp.v -= wheel->susp.spring.bellcrank * SimDeltaTime * wheel->forces.z / wheel->mass;
 		} else {
-			wheel->rel_vel -= SimDeltaTime * wheel->susp.force / wheel->mass;
+			wheel->susp.v -= wheel->susp.spring.bellcrank * SimDeltaTime * wheel->susp.force / wheel->mass;
 		}
 		if (wheel->forces.z < 0.0f) {
 			wheel->forces.z = 0.0f;
 		}
 	} else {
-		if (wheel->rel_vel < 0.0) {
-            wheel->rel_vel = 0.0;
-        }
-        if (car->features & FEAT_FIXEDWHEELFORCE) {
-			wheel->rel_vel -= SimDeltaTime * wheel->forces.z / wheel->mass;
-		} else {
-			wheel->rel_vel -= SimDeltaTime * wheel->susp.force / wheel->mass;
+        if (wheel->state & SIM_SUSP_EXT) {
+			/* calculate the force needed to reach susp->spring.xMax */
+			wheel->forces.z = -wheel->susp.a * wheel->mass / wheel->susp.spring.bellcrank;
+			wheel->susp.v = 0.0f;
+		} else { //SIM_WH_INAIR
+			wheel->forces.z = axleFz + wheel->susp.force + wheel->axleFz3rd;
+			if (car->features & FEAT_FIXEDWHEELFORCE) {
+			    wheel->susp.v -= wheel->susp.spring.bellcrank * SimDeltaTime * wheel->forces.z / wheel->mass;
+		    } else {
+			    wheel->susp.v -= wheel->susp.spring.bellcrank * SimDeltaTime * wheel->susp.force / wheel->mass;
+		    }
+		    wheel->forces.z = 0.0f; /* zero for zero grip and prevent getting into the air */
 		}
-		wheel->forces.z = 0.0f;
 	}
+	reaction_force = wheel->forces.z;
 
 	// update wheel coord, center relative to GC
 	wheel->relPos.z = - wheel->susp.x / wheel->susp.spring.bellcrank + wheel->radius;

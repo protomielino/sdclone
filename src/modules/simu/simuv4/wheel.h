@@ -78,7 +78,6 @@ typedef struct
     tdble	mass;		/* total wheel mass (incl. brake) (unsprung mass) */
     tdble	camber;		/* camber, negative toward exterior on both sides */
     tdble	pressure;	/* tire pressure */
-	tdble   rel_vel;    /* relative velocity - used for realstic suspension movement*/
     
     tdble   Ttire;      /* tire temperature in K */
     tdble   Topt;       /* optimal temperature in K, where mu maximal */
