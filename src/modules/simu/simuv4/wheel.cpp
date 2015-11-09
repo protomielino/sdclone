@@ -226,10 +226,12 @@ void SimWheelUpdateForce(tCar *car, int index)
 		}
 	} else {
         if (wheel->state & SIM_SUSP_EXT) {
-			/* calculate the force needed to reach susp->spring.xMax */
+			/* calculate the force needed to reach susp->spring.xMax 
+			 * it becomes 0 from the 2. time step being extended 
+			 * works even if both SIM_SUSP_EXT and SIM_WH_INAIR is set */
 			wheel->forces.z = -wheel->susp.a * wheel->mass / wheel->susp.spring.bellcrank;
 			wheel->susp.v = 0.0f;
-		} else { //SIM_WH_INAIR
+		} else { //SIM_WH_INAIR is set, but SIM_SUSP_EXT is not
 			wheel->forces.z = axleFz + wheel->susp.force + wheel->axleFz3rd;
 			if (car->features & FEAT_FIXEDWHEELFORCE) {
 			    wheel->susp.v -= wheel->susp.spring.bellcrank * SimDeltaTime * wheel->forces.z / wheel->mass;
