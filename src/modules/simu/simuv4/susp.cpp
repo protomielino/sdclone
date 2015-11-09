@@ -114,7 +114,9 @@ void SimSuspCheckIn(tSuspension *susp)
 
 void SimSuspUpdate(tSuspension *susp)
 {
+	tdble prevforce = susp->force;
 	susp->force = (springForce(susp) + damperForce(susp) + susp->inertance * susp->a) * susp->spring.bellcrank;
+	if (susp->force * prevforce < 0.0) {susp->force = 0.0;}
 }
 
 
