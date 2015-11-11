@@ -273,12 +273,14 @@ ExternalProject_Add(libvorbis-1.3.5
    )
 endif(OPTION_VORBIS)
 
+#disable building unneeded sub projects (they failed with VS2008)
+set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_tests=off -DBUILD_examples=off -DBUILD_tools=off)
 if(OPTION_EXPAT)
 ExternalProject_Add(expat-2.1.0
    DOWNLOAD_NAME expat-2.1.0.tar.gz
    URL http://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download
    URL_HASH SHA256=823705472F816DF21C8F6AA026DD162B280806838BB55B3432B0FB1FCCA7EB86
-   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+   CMAKE_ARGS ${EXPAT_ARGS}
    #UPDATE_COMMAND ""
    #PATCH_COMMAND ""
    #CONFIGURE_COMMAND ""
@@ -393,6 +395,13 @@ if(OPTION_OSG)
    CMAKE_ARGS ${OSG_ARGS}
    DEPENDS zlib-1.2.8 curl-7.43.0 freetype-2.5.3 OpenGL-headers jpeg-9a libpng-1.6.18 SDL-1.2.15 SDL2-2.0.3
    )
+   ExternalProject_Add_Step(osg-OpenSceneGraph-3.4.0 sdl1x_add_cmake
+   COMMAND ${CMAKE_COMMAND} -E copy_if_different
+           "${CMAKE_SOURCE_DIR}/patches/osg-3.4.0.types.txt"
+           "<SOURCE_DIR>/include/osg/Types"
+   DEPENDEES update # do after update
+   DEPENDERS patch  # do before patch
+)
 endif(OPTION_OSG)
 
 #add_subdirectory(src)
