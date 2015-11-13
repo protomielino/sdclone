@@ -60,7 +60,6 @@ typedef struct
     tPosd	staticPos;	/* pos relative to the GC (z is suspension travel at rest) */
 				/* and angles are camber (ax), caster (ay) and toe (az) */
     tdble   cosax, sinax;/*cosinus and sinus of relPos.ax*/
-    tdble	rollCenter;
 
     tdble  	weight0;	/* initial weight on this wheel */
     tdble	tireSpringRate;

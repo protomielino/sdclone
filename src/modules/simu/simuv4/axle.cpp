@@ -25,7 +25,7 @@ static const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_RE
 void SimAxleConfig(tCar *car, int index, tdble weight0)
 {
 	void	*hdle = car->params;
-	tdble	rollCenter, x0r, x0l;
+	tdble	x0r, x0l;
 	
 	tAxle *axle = &(car->axle[index]);
 	
@@ -33,8 +33,6 @@ void SimAxleConfig(tCar *car, int index, tdble weight0)
 	axle->I    = GfParmGetNum(hdle, AxleSect[index], PRM_INERTIA, (char*)NULL, 0.15f);
 	x0r        = GfParmGetNum(hdle, WheelSect[index*2], PRM_RIDEHEIGHT, (char*)NULL, 0.20f);
 	x0l        = GfParmGetNum(hdle, WheelSect[index*2+1], PRM_RIDEHEIGHT, (char*)NULL, 0.20f);
-	rollCenter = GfParmGetNum(hdle, AxleSect[index], PRM_ROLLCENTER, (char*)NULL, 0.15f);
-	car->wheel[index*2].rollCenter = car->wheel[index*2+1].rollCenter = rollCenter;
 	
 	if (index == 0) {
 		SimSuspConfig(hdle, SECT_FRNTARB, &(axle->arbSusp), 0, 0);
