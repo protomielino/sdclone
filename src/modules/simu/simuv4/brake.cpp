@@ -88,11 +88,41 @@ void
 SimBrakeSystemConfig(tCar *car)
 {
     void *hdle = car->params;
+    tCarSetupItem *setupBrkRep = &(car->carElt->setup.brakeRepartition);
+    tCarSetupItem *setupBrkPress = &(car->carElt->setup.brakePressure);
     
-    car->brkSyst.rep   = GfParmGetNum(hdle, SECT_BRKSYST, PRM_BRKREP, (char*)NULL, 0.5);
-    car->brkSyst.coeff = GfParmGetNum(hdle, SECT_BRKSYST, PRM_BRKPRESS, (char*)NULL, 1000000);
+    setupBrkRep->desired_value = setupBrkRep->min = setupBrkRep->max = 0.5;
+    GfParmGetNumWithLimits(hdle, SECT_BRKSYST, PRM_BRKREP, (char*)NULL, &(setupBrkRep->desired_value), &(setupBrkRep->min), &(setupBrkRep->max));
+    setupBrkRep->changed = TRUE;
+    setupBrkRep->stepsize = 0.5;
+    
+    setupBrkPress->desired_value = setupBrkPress->min = setupBrkPress->max = 1000000;
+    GfParmGetNumWithLimits(hdle, SECT_BRKSYST, PRM_BRKPRESS, (char*)NULL, &(setupBrkPress->desired_value), &(setupBrkPress->min), &(setupBrkPress->max));
+    setupBrkPress->changed = TRUE;
+    setupBrkPress->stepsize = 1000;
+    
     car->brkSyst.ebrake_pressure = GfParmGetNum(hdle, SECT_BRKSYST, PRM_EBRKPRESS, (char*)NULL, 0.0);
     
+    SimBrakeSystemReConfig(car);
+}
+
+void 
+SimBrakeSystemReConfig(tCar *car)
+{
+    tCarSetupItem *setupBrkRep = &(car->carElt->setup.brakeRepartition);
+    tCarSetupItem *setupBrkPress = &(car->carElt->setup.brakePressure);
+    
+    if (setupBrkRep->changed) {
+        car->brkSyst.rep = MIN(setupBrkRep->max, MAX(setupBrkRep->min, setupBrkRep->desired_value));
+	setupBrkRep->value = car->brkSyst.rep;
+	setupBrkRep->changed = FALSE;
+    }
+    
+    if (setupBrkPress->changed) {
+        car->brkSyst.coeff = MIN(setupBrkPress->max, MAX(setupBrkPress->min, setupBrkPress->desired_value));
+	setupBrkPress->value = car->brkSyst.coeff;
+	setupBrkPress->changed = FALSE;
+    }
 }
 
 void 

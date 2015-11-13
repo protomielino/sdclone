@@ -237,9 +237,13 @@ SimWingConfig(tCar *car, int index)
     void   *hdle = car->params;
     tWing  *wing = &(car->wing[index]);
     tdble area;
+    tCarSetupItem *setupAngle = &(car->carElt->setup.wingAngle[index]);
 
     area              = GfParmGetNum(hdle, WingSect[index], PRM_WINGAREA, (char*)NULL, 0);
-    wing->angle       = GfParmGetNum(hdle, WingSect[index], PRM_WINGANGLE, (char*)NULL, 0);
+    setupAngle->desired_value = setupAngle->min = setupAngle->max = 0.0;
+    GfParmGetNumWithLimits(hdle, WingSect[index], PRM_WINGANGLE, (char*)NULL, &(setupAngle->desired_value), &(setupAngle->min), &(setupAngle->max));
+    setupAngle->changed = TRUE;
+    setupAngle->stepsize = DEG2RAD(0.1);
     wing->staticPos.x = GfParmGetNum(hdle, WingSect[index], PRM_XPOS, (char*)NULL, 0);
     wing->staticPos.z = GfParmGetNum(hdle, WingSect[index], PRM_ZPOS, (char*)NULL, 0);
     wing->staticPos.y = 0.0;
@@ -328,28 +332,10 @@ SimWingConfig(tCar *car, int index)
     if (wing->WingType == 0)
 	{
 		wing->Kz = 4.0f * wing->Kx;
-	    if (index == 1)
-		{
-			car->aero.Cd = car->aero.CdBody - wing->Kx*sin(wing->angle);
-			//fprintf(stderr,"Kz: %g Kx: %g\n",wing->Kz,wing->Kx);
-			//fprintf(stderr,"car->aero.Cd: %g angle: %g\n",car->aero.Cd,wing->angle*180/PI);
-		}
 	}
 	else if (wing->WingType == 1) 
 	{
-        wing->Kz = CliftFromAoA(wing) * wing->Kx;
-		//fprintf(stderr,"Kz: %g Kx: %g\n",wing->Kz,wing->Kx);
-
-		if (index == 0)
-		{
-			car->aero.Cd = (tdble)(car->aero.CdBody - wing->Kx*sin(wing->angle - wing->AoAatZRad));
-			//fprintf(stderr,"car->aero.Cd: %g wing->Kx: %g angle: %g wing->AoAatZero: %g\n",car->aero.Cd,wing->Kx,wing->angle*180/PI,wing->AoAatZero);
-		}
-		else
-		{
-			car->aero.Cd -= (tdble)(wing->Kx*sin(wing->angle - wing->AoAatZRad));
-			//fprintf(stderr,"car->aero.Cd: %g wing->Kx: %g wing->angle: %g wing->AoAatZero: %g\n",car->aero.Cd,wing->Kx,wing->angle*180/PI,wing->AoAatZero);
-		}
+	    wing->Kz = CliftFromAoA(wing) * wing->Kx;
 	}
 	else if (wing->WingType == 2)
 	{
@@ -363,8 +349,30 @@ SimWingConfig(tCar *car, int index)
 		wing->Kx3 = 1.0f;
 		wing->Kx4 = 0.9f;
 	}
+    SimWingReConfig(car, index);
 }
 
+void
+SimWingReConfig(tCar *car, int index)
+{
+    tWing  *wing = &(car->wing[index]);
+    tCarSetupItem *angle = &(car->carElt->setup.wingAngle[index]);
+       
+    if (angle->changed) {    
+	wing->angle = MIN(angle->max,MAX(angle->min,angle->desired_value));
+	angle->value = wing->angle;
+    
+	if (wing->WingType == 0) {
+	    if (index==1) {
+		car->aero.Cd = car->aero.CdBody - wing->Kx*sin(wing->angle);
+	    }
+	} else if (wing->WingType == 1) {
+	    tWing  *otherwing = &(car->wing[1-index]);
+	    car->aero.Cd = (tdble)(car->aero.CdBody - wing->Kx*sin(wing->angle - wing->AoAatZRad) - otherwing->Kx*sin(otherwing->angle - otherwing->AoAatZRad));
+	}
+     angle->changed = FALSE;
+    }
+}
 
 void
 SimWingUpdate(tCar *car, int index, tSituation* s)

@@ -70,11 +70,13 @@ extern void SimSteerUpdate(tCar *car);
 extern void SimBrakeConfig(void *hdle, const char *section, tBrake *brake);
 extern void SimBrakeUpdate(tCar *car, tWheel *wheel, tBrake *brake);
 extern void SimBrakeSystemConfig(tCar *car);
+extern void SimBrakeSystemReConfig(tCar *car);
 extern void SimBrakeSystemUpdate(tCar *car);
 
 extern void SimAeroConfig(tCar *car);
 extern void SimAeroUpdate(tCar *car, tSituation *s);
 extern void SimWingConfig(tCar *car, int index);
+extern void SimWingReConfig(tCar *car, int index);
 extern void SimWingUpdate(tCar *car, int index, tSituation *s);
 
 extern void SimCarUpdateWheelPos(tCar *car);
