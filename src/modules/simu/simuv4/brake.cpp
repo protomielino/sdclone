@@ -102,13 +102,11 @@ SimBrakeSystemConfig(tCar *car)
     setupBrkPress->stepsize = 1000;
     
     car->brkSyst.ebrake_pressure = GfParmGetNum(hdle, SECT_BRKSYST, PRM_EBRKPRESS, (char*)NULL, 0.0);
-    
-    SimBrakeSystemReConfig(car);
 }
 
 void 
 SimBrakeSystemReConfig(tCar *car)
-{
+{/* called by SimCarReConfig() in car.cpp */
     tCarSetupItem *setupBrkRep = &(car->carElt->setup.brakeRepartition);
     tCarSetupItem *setupBrkPress = &(car->carElt->setup.brakePressure);
     

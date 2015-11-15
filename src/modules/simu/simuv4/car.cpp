@@ -42,6 +42,10 @@ SimCarConfig(tCar *car)
 	int		i;
 	tCarElt	*carElt = car->carElt;
 	const char *enabling;
+	tCarSetupItem *setupGcfr = &(car->carElt->setup.FRWeightRep);
+	tCarSetupItem *setupGcfrl = &(car->carElt->setup.FRLWeightRep);
+	tCarSetupItem *setupGcrrl = &(car->carElt->setup.RRLWeightRep);
+	tCarSetupItem *setupFuel = &(car->carElt->setup.fuel);
 	
 	/* get features first */
 	car->features = 0;
@@ -88,20 +92,38 @@ SimCarConfig(tCar *car)
 
 	
 	/* continue with car parameters */
+	setupGcfr->desired_value = setupGcfr->min = setupGcfr->max = 0.5;
+	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_FRWEIGHTREP, (char*)NULL, &(setupGcfr->desired_value), &(setupGcfr->min), &(setupGcfr->max));
+	setupGcfr->changed = TRUE;
+	setupGcfr->stepsize = 0.005;
+	gcfr = setupGcfr->desired_value;
+	
+	setupGcfrl->desired_value = setupGcfrl->min = setupGcfrl->max = 0.5;
+	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_FRLWEIGHTREP, (char*)NULL, &(setupGcfrl->desired_value), &(setupGcfrl->min), &(setupGcfrl->max));
+	setupGcfrl->changed = TRUE;
+	setupGcfrl->stepsize = 0.005;
+	gcfrl = setupGcfrl->desired_value;
+	
+	setupGcrrl->desired_value = setupGcrrl->min = setupGcrrl->max = 0.5;
+	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_RRLWEIGHTREP, (char*)NULL, &(setupGcrrl->desired_value), &(setupGcrrl->min), &(setupGcrrl->max));
+	setupGcrrl->changed = TRUE;
+	setupGcrrl->stepsize = 0.005;
+	gcrrl = setupGcrrl->desired_value;
+
+	setupFuel->desired_value = setupFuel->min = setupFuel->max = 80.0;
+	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_FUEL, (char*)NULL, &(setupFuel->desired_value), &(setupFuel->min), &(setupFuel->max));
+	setupFuel->changed = TRUE;
+	setupFuel->stepsize = 1.0;
+	
 	car->dimension.x = GfParmGetNum(hdle, SECT_CAR, PRM_LEN, (char*)NULL, 4.7f);
 	car->dimension.y = GfParmGetNum(hdle, SECT_CAR, PRM_WIDTH, (char*)NULL, 1.9f);
 	overallwidth     = GfParmGetNum(hdle, SECT_CAR, PRM_OVERALLWIDTH, (char*)NULL, car->dimension.y);
 	car->dimension.z = GfParmGetNum(hdle, SECT_CAR, PRM_HEIGHT, (char*)NULL, 1.2f);
 	car->mass        = GfParmGetNum(hdle, SECT_CAR, PRM_MASS, (char*)NULL, 1500);
 	car->Minv        = (tdble) (1.0 / car->mass);
-	gcfr             = GfParmGetNum(hdle, SECT_CAR, PRM_FRWEIGHTREP, (char*)NULL, .5);
-	gcfrl            = GfParmGetNum(hdle, SECT_CAR, PRM_FRLWEIGHTREP, (char*)NULL, .5);
-	gcrrl            = GfParmGetNum(hdle, SECT_CAR, PRM_RRLWEIGHTREP, (char*)NULL, .5);
 	car->statGC.y    = (tdble) (- (gcfr * gcfrl + (1 - gcfr) * gcrrl) * car->dimension.y + car->dimension.y / 2.0);
 	car->statGC.z    = GfParmGetNum(hdle, SECT_CAR, PRM_GCHEIGHT, (char*)NULL, .5);
-	
 	car->tank        = GfParmGetNum(hdle, SECT_CAR, PRM_TANK, (char*)NULL, 80);
-	car->fuel        = GfParmGetNum(hdle, SECT_CAR, PRM_FUEL, (char*)NULL, 80);
 	k                = GfParmGetNum(hdle, SECT_CAR, PRM_CENTR, (char*)NULL, 1.0);
 	carElt->_drvPos_x = GfParmGetNum(hdle, SECT_DRIVER, PRM_XPOS, (char*)NULL, 0.0);
 	carElt->_drvPos_y = GfParmGetNum(hdle, SECT_DRIVER, PRM_YPOS, (char*)NULL, 0.0);
@@ -110,21 +132,35 @@ SimCarConfig(tCar *car)
 	carElt->_bonnetPos_y = GfParmGetNum(hdle, SECT_BONNET, PRM_YPOS, (char*)NULL, carElt->_drvPos_y);
 	carElt->_bonnetPos_z = GfParmGetNum(hdle, SECT_BONNET, PRM_ZPOS, (char*)NULL, carElt->_drvPos_z);
 	
-	if (car->fuel > car->tank) {
-		car->fuel = car->tank;
-	}
 	k = k * k;
 	car->Iinv.x = (tdble) (12.0 / (car->mass * k * (car->dimension.y * car->dimension.y + car->dimension.z * car->dimension.z)));
 	car->Iinv.y = (tdble) (12.0 / (car->mass * k * (car->dimension.x * car->dimension.x + car->dimension.z * car->dimension.z)));
 	car->Iinv.z = (tdble) (12.0 / (car->mass * k * (car->dimension.y * car->dimension.y + car->dimension.x * car->dimension.x)));
 	
 	/* configure components */
+	tCarSetupItem *setupSpring;
 	tdble K[4], Kfheave, Krheave;
 	for (i = 0; i < 4; i++) {
-		K[i] = GfParmGetNum(hdle, SuspSect[i], PRM_SPR, (char*)NULL, 175000.0f);
+		setupSpring = &(car->carElt->setup.suspSpring[i]);
+		setupSpring->desired_value = setupSpring->min = setupSpring-> max = 175000.0f;
+		GfParmGetNumWithLimits(hdle, SuspSect[i], PRM_SPR, (char*)NULL, &(setupSpring->desired_value), &(setupSpring->min), &(setupSpring->max));
+		setupSpring->changed = TRUE;
+		setupSpring->stepsize = 1000;
+		K[i] = setupSpring->desired_value;
 	}
-	Kfheave = GfParmGetNum(hdle, SECT_FRNTHEAVE, PRM_SPR, (char*)NULL, 0.0f);
-	Krheave = GfParmGetNum(hdle, SECT_REARHEAVE, PRM_SPR, (char*)NULL, 0.0f);
+	setupSpring = &(car->carElt->setup.heaveSpring[0]);
+	setupSpring->desired_value = setupSpring->min = setupSpring-> max = 0.0f;
+	GfParmGetNumWithLimits(hdle, SECT_FRNTHEAVE, PRM_SPR, (char*)NULL, &(setupSpring->desired_value), &(setupSpring->min), &(setupSpring->max));
+	setupSpring->changed = TRUE;
+	setupSpring->stepsize = 1000;
+	Kfheave = setupSpring->desired_value;
+	setupSpring = &(car->carElt->setup.heaveSpring[1]);
+	setupSpring->desired_value = setupSpring->min = setupSpring-> max = 0.0f;
+	GfParmGetNumWithLimits(hdle, SECT_REARHEAVE, PRM_SPR, (char*)NULL, &(setupSpring->desired_value), &(setupSpring->min), &(setupSpring->max));
+	setupSpring->changed = TRUE;
+	setupSpring->stepsize = 1000;
+	Krheave = setupSpring->desired_value;
+
 	/* wheel force bugfix is needed for heave springs */
 	if ( (Kfheave > 0.0f) || (Krheave > 0.0f) ) 
 		{car->features = car->features | FEAT_FIXEDWHEELFORCE;}
@@ -139,17 +175,9 @@ SimCarConfig(tCar *car)
 	car->wheel[REAR_RGT].weight0 = wr0 * gcrrl * K[REAR_RGT] / (K[REAR_RGT] + 0.5f*Krheave);
 	car->wheel[REAR_LFT].weight0 = wr0 * (1 - gcrrl) * K[REAR_LFT] / (K[REAR_LFT] + 0.5f*Krheave);
 	
-	/*for (i = 0; i < 2; i++) {
-		SimAxleConfig(car, i, 0.0);
-	}*/
-	if (Kfheave > 0.0f) {
-		wf0 = (wf0 - car->wheel[FRNT_RGT].weight0 - car->wheel[FRNT_LFT].weight0);
-		SimAxleConfig(car, FRNT, wf0);
-	} else { SimAxleConfig(car, FRNT, 0.0f); }
-	if (Krheave > 0.0f) {
-		wr0 = (wr0 - car->wheel[REAR_RGT].weight0 - car->wheel[REAR_LFT].weight0);
-		SimAxleConfig(car, REAR, wr0);
-	} else { SimAxleConfig(car, REAR, 0.0f); }
+	for (i = 0; i < 2; i++) {
+		SimAxleConfig(car, i);
+	}
 	
 	for (i = 0; i < 4; i++) {
 		SimWheelConfig(car, i); 
@@ -216,6 +244,113 @@ SimCarConfig(tCar *car)
 			car->wing[i].staticPos.z -= car->statGC.z;
 		}
 	}
+	
+	SimCarReConfig(car);
+
+/*
+for(i=0;i<4;i++) {
+	printf("Wheel%d: opl=%g toe=%g° cam=%g°\n",i,car->wheel[i].opLoad,RAD2DEG(car->wheel[i].staticPos.az),RAD2DEG(car->wheel[i].staticPos.ax));
+}
+for(i=0;i<4;i++) {
+	printf("WS%d K=%g bc=%g ine=%g\n",i,car->wheel[i].susp.spring.K,car->wheel[i].susp.spring.bellcrank,car->wheel[i].susp.inertance);
+	printf("    c=%g p=%g x0=%g F0=%g\n",car->wheel[i].susp.spring.xMax,car->wheel[i].susp.spring.packers,car->wheel[i].susp.spring.x0,car->wheel[i].susp.spring.F0);
+	printf("    SB=%g SR=%g FB=%g FR=%g BV=%g RV=%g\n",car->wheel[i].susp.damper.bump.C1,car->wheel[i].susp.damper.rebound.C1,car->wheel[i].susp.damper.bump.C2,car->wheel[i].susp.damper.rebound.C2,car->wheel[i].susp.damper.bump.v1,car->wheel[i].susp.damper.rebound.v1);
+}
+for(i=0;i<2;i++) {
+	printf("ARB%d K=%g\n",i,car->axle[i].arbSusp.spring.K);
+}
+for(i=0;i<2;i++) {
+	printf("H%d K=%g bc=%g ine=%g\n",i,car->axle[i].heaveSusp.spring.K,car->axle[i].heaveSusp.spring.bellcrank,car->axle[i].heaveSusp.inertance);
+	printf("    c=%g p=%g x0=%g F0=%g\n",car->axle[i].heaveSusp.spring.xMax,car->axle[i].heaveSusp.spring.packers,car->axle[i].heaveSusp.spring.x0,car->axle[i].heaveSusp.spring.F0);
+	printf("    SB=%g SR=%g FB=%g FR=%g BV=%g RV=%g\n",car->axle[i].heaveSusp.damper.bump.C1,car->axle[i].heaveSusp.damper.rebound.C1,car->axle[i].heaveSusp.damper.bump.C2,car->axle[i].heaveSusp.damper.rebound.C2,car->axle[i].heaveSusp.damper.bump.v1,car->axle[i].heaveSusp.damper.rebound.v1);
+}
+printf("BrakeBal=%g p=%g\n",car->brkSyst.rep,car->brkSyst.coeff);
+printf("FWing=%g° Rwing=%g°\n",RAD2DEG(car->wing[0].angle),RAD2DEG(car->wing[1].angle));
+*/
+}
+
+
+void
+SimCarReConfig(tCar *car)
+{
+	int i;
+	tdble	w;
+	tdble	gcfrl, gcrrl, gcfr;
+	tdble	wf0, wr0;
+	tdble K[4], Kfheave, Krheave;
+	tCarSetupItem *setupSpring;
+	tCarSetupItem *setupGcfr = &(car->carElt->setup.FRWeightRep);
+	tCarSetupItem *setupGcfrl = &(car->carElt->setup.FRLWeightRep);
+	tCarSetupItem *setupGcrrl = &(car->carElt->setup.RRLWeightRep);
+	tCarSetupItem *setupFuel = &(car->carElt->setup.fuel);
+	
+	if (setupFuel->changed) {
+		car->fuel = MIN(setupFuel->max, MAX(setupFuel->min, setupFuel->desired_value));
+		if (car->fuel > car->tank) {car->fuel = car->tank;}
+		setupFuel->value = car->fuel;
+		setupFuel->changed = FALSE;
+	}
+	
+	if (setupGcfr->changed) {
+		gcfr = MIN(setupGcfr->max, MAX(setupGcfr->min, setupGcfr->desired_value));
+		setupGcfr->value = gcfr;
+		setupGcfr->changed = FALSE;
+	} else {
+		gcfr = setupGcfr->value;
+	}
+	
+	if (setupGcfrl->changed) {
+		gcfrl = MIN(setupGcfrl->max, MAX(setupGcfrl->min, setupGcfrl->desired_value));
+		setupGcfrl->value = gcfrl;
+		setupGcfrl->changed = FALSE;
+	} else {
+		gcfrl = setupGcfrl->value;
+	}
+	
+	if (setupGcrrl->changed) {
+		gcrrl = MIN(setupGcrrl->max, MAX(setupGcrrl->min, setupGcrrl->desired_value));
+		setupGcrrl->value = gcrrl;
+		setupGcrrl->changed = FALSE;
+	} else {
+		gcrrl = setupGcrrl->value;
+	}
+	
+	for (i = 0; i < 4; i++) {
+		setupSpring = &(car->carElt->setup.suspSpring[i]);
+		K[i] = MIN(setupSpring->max, MAX(setupSpring->min, setupSpring->desired_value));
+	}
+	setupSpring = &(car->carElt->setup.heaveSpring[0]);
+	Kfheave = MIN(setupSpring->max, MAX(setupSpring->min, setupSpring->desired_value));
+	setupSpring = &(car->carElt->setup.heaveSpring[1]);
+	Krheave = MIN(setupSpring->max, MAX(setupSpring->min, setupSpring->desired_value));
+	
+	/* calculate wheel loads */
+	w = car->mass * G;
+	wf0 = w * gcfr;
+	wr0 = w * (1 - gcfr);
+	
+	car->wheel[FRNT_RGT].weight0 = wf0 * gcfrl * K[FRNT_RGT] / (K[FRNT_RGT] + 0.5f*Kfheave);
+	car->wheel[FRNT_LFT].weight0 = wf0 * (1 - gcfrl) * K[FRNT_LFT] / (K[FRNT_LFT] + 0.5f*Kfheave);
+	car->wheel[REAR_RGT].weight0 = wr0 * gcrrl * K[REAR_RGT] / (K[REAR_RGT] + 0.5f*Krheave);
+	car->wheel[REAR_LFT].weight0 = wr0 * (1 - gcrrl) * K[REAR_LFT] / (K[REAR_LFT] + 0.5f*Krheave);
+	
+	/* reconfigure components */
+	if (Kfheave > 0.0f) {
+		wf0 = (wf0 - car->wheel[FRNT_RGT].weight0 - car->wheel[FRNT_LFT].weight0);
+		SimAxleReConfig(car, FRNT, wf0);
+	} else { SimAxleReConfig(car, FRNT, 0.0f); }
+	if (Krheave > 0.0f) {
+		wr0 = (wr0 - car->wheel[REAR_RGT].weight0 - car->wheel[REAR_LFT].weight0);
+		SimAxleReConfig(car, REAR, wr0);
+	} else { SimAxleReConfig(car, REAR, 0.0f); }
+	
+	for (i = 0; i < 4; i++) {
+		SimWheelReConfig(car, i); 
+	}
+	SimBrakeSystemReConfig(car);
+	for (i = 0; i < 2; i++) {
+		SimWingReConfig(car, i);
+	}
 }
 
 
@@ -267,7 +402,7 @@ SimCarUpdateForces(tCar *car)
 			car->wheel[i].forces.y * car->wheel[i].staticPos.x;
 		F.M.z += car->wheel[i].torques.z;
 	}
-	
+
 	/* Aero Drag */
 	F.F.x += car->aero.drag;
 	

@@ -349,12 +349,11 @@ SimWingConfig(tCar *car, int index)
 		wing->Kx3 = 1.0f;
 		wing->Kx4 = 0.9f;
 	}
-    SimWingReConfig(car, index);
 }
 
 void
 SimWingReConfig(tCar *car, int index)
-{
+{/* called by SimCarReConfig() in car.cpp */
     tWing  *wing = &(car->wing[index]);
     tCarSetupItem *angle = &(car->carElt->setup.wingAngle[index]);
        

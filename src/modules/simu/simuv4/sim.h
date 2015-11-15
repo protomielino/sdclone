@@ -46,18 +46,22 @@ extern void SimUpdateSingleCar(int index, double deltaTime,tSituation *s);
 extern tDynPt* GetSimCarTable(int index);
 
 
-extern void SimAxleConfig(tCar *car, int index, tdble weight0);
+extern void SimAxleConfig(tCar *car, int index);
+extern void SimAxleReConfig(tCar *car, int index, tdble weight0);
 extern void SimAxleUpdate(tCar *car, int index);
 
 extern void SimCarConfig(tCar *car);
+extern void SimCarReConfig(tCar *car);
 extern void SimCarUpdate(tCar *car, tSituation*);
 extern void SimCarUpdate2(tCar *car, tSituation*);
 
 extern void SimSuspCheckIn(tSuspension *susp);
 extern void SimSuspUpdate(tSuspension *susp);
-extern void SimSuspConfig(void *hdle, const char *section, tSuspension *susp, tdble F0, tdble X0);
+extern void SimSuspConfig(tCar *car, void *hdle, const char *section, tSuspension *susp, int index);
+extern void SimSuspReConfig(tCar *car, tSuspension *susp, int index, tdble F0, tdble X0);
 
 extern void SimWheelConfig(tCar *car, int index);
+extern void SimWheelReConfig(tCar *car, int index);
 extern void SimWheelUpdateRide(tCar *car, int index);
 extern void SimWheelUpdateForce(tCar *car, int index);
 extern void SimWheelUpdateRotation(tCar *car);
