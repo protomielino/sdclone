@@ -20,7 +20,6 @@
 #include "sim.h"
 
 void 
-//SimDifferentialConfig(void *hdle, const char *section, tDifferential *differential)
 SimDifferentialConfig(tCar *car, int index)
 {
     void *hdle = car->params;
