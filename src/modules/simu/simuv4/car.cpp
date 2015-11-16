@@ -266,6 +266,15 @@ for(i=0;i<2;i++) {
 }
 printf("BrakeBal=%g p=%g\n",car->brkSyst.rep,car->brkSyst.coeff);
 printf("FWing=%g° Rwing=%g°\n",RAD2DEG(car->wing[0].angle),RAD2DEG(car->wing[1].angle));
+for(i=0;i<3;i++) {
+	printf("DIFF%d typ=%d r=%g\n",i,car->transmission.differential[i].type,car->transmission.differential[i].ratio);
+	printf("    Tmin=%g Tmax=%g Visc=%g\n",car->transmission.differential[i].dTqMin,car->transmission.differential[i].dTqMax,car->transmission.differential[i].viscosity);
+	printf("    LockT=%g MaxS=%g CMaxS=%g\n",car->transmission.differential[i].lockInputTq,car->transmission.differential[i].dSlipMax,car->transmission.differential[i].dCoastSlipMax);
+}
+printf("STEER lock=%g\n",RAD2DEG(car->steer.steerLock));
+printf("GEARS: ");
+for(i=0; i<MAX_GEARS;i++){printf("%g ",car->transmission.overallRatio[i]);}
+printf("\n");
 */
 }
 
@@ -347,6 +356,9 @@ SimCarReConfig(tCar *car)
 	for (i = 0; i < 4; i++) {
 		SimWheelReConfig(car, i); 
 	}
+	SimEngineReConfig(car);
+	SimTransmissionReConfig(car);
+	SimSteerReConfig(car);
 	SimBrakeSystemReConfig(car);
 	for (i = 0; i < 2; i++) {
 		SimWingReConfig(car, i);

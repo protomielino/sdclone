@@ -69,6 +69,7 @@ extern void SimUpdateFreeWheels(tCar *car, int axlenb);
 
 
 extern void SimSteerConfig(tCar *car);
+extern void SimSteerReConfig(tCar *car);
 extern void SimSteerUpdate(tCar *car);
 
 extern void SimBrakeConfig(void *hdle, const char *section, tBrake *brake);
@@ -86,13 +87,16 @@ extern void SimWingUpdate(tCar *car, int index, tSituation *s);
 extern void SimCarUpdateWheelPos(tCar *car);
 
 extern void SimTransmissionConfig(tCar *car);
+extern void SimTransmissionReConfig(tCar *car);
 extern void SimTransmissionUpdate(tCar *car);
 extern void SimGearboxUpdate(tCar *car);
 
-extern void SimDifferentialConfig(void *hdle, const char *section, tDifferential *differential);
+extern void SimDifferentialConfig(tCar *car, int index);
+extern void SimDifferentialReConfig(tCar *car, int index);
 extern void SimDifferentialUpdate(tCar *car, tDifferential *differential, int first);
 
 extern void SimEngineConfig(tCar *car);
+extern void SimEngineReConfig(tCar *car);
 extern void SimEngineUpdateTq(tCar *car);
 extern tdble SimEngineUpdateRpm(tCar *car, tdble axleRpm);
 extern void SimEngineShutdown(tCar *car);

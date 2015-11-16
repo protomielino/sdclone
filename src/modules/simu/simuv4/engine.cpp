@@ -28,13 +28,18 @@ SimEngineConfig(tCar *car)
 	tdble	rpmMaxTq = 0;
 	char	idx[64];
 	tEngineCurveElem *data;
+	tCarSetupItem *setupRevLimit = &(car->carElt->setup.revsLimiter);
 	struct tEdesc {
 		tdble rpm;
 		tdble tq;
 	} *edesc;
 
 
-	car->engine.revsLimiter = GfParmGetNum(hdle, SECT_ENGINE, PRM_REVSLIM, (char*)NULL, 800);
+	setupRevLimit->desired_value = setupRevLimit->min = setupRevLimit->max = 800;
+	GfParmGetNumWithLimits(hdle, SECT_ENGINE, PRM_REVSLIM, (char*)NULL, &(setupRevLimit->desired_value), &(setupRevLimit->min), &(setupRevLimit->max));
+	setupRevLimit->changed = TRUE;
+	setupRevLimit->stepsize = RPM2RADS(100.0);
+	car->engine.revsLimiter = setupRevLimit->desired_value;
 	car->carElt->_enginerpmRedLine = car->engine.revsLimiter;
 	car->engine.revsMax     = GfParmGetNum(hdle, SECT_ENGINE, PRM_REVSMAX, (char*)NULL, 1000);
 	car->carElt->_enginerpmMax = car->engine.revsMax;
@@ -122,6 +127,24 @@ SimEngineConfig(tCar *car)
 	if (car->engine.revsLimiter > car->engine.revsMax) {
 	    car->engine.revsLimiter = car->engine.revsMax;
 	    GfLogWarning("Revs limiter is bigger than revs maxi.\nIt is set to %g.\n",car->engine.revsLimiter);
+	}
+	if (setupRevLimit->max > car->engine.revsMax) {
+		setupRevLimit->max = car->engine.revsMax;
+		if (setupRevLimit->min > setupRevLimit->max)
+			{setupRevLimit->min = setupRevLimit->max;}
+	}
+}
+
+void
+SimEngineReConfig(tCar *car)
+{/* called by SimCarReConfig in car.cpp */
+	tCarSetupItem *setupRevLimit = &(car->carElt->setup.revsLimiter);
+	
+	if (setupRevLimit->changed) {
+		car->engine.revsLimiter = MIN(setupRevLimit->max, MAX(setupRevLimit->min, setupRevLimit->desired_value));
+		car->carElt->_enginerpmRedLine = car->engine.revsLimiter;
+		setupRevLimit->value = car->engine.revsLimiter;
+		setupRevLimit->changed = FALSE;
 	}
 }
 
