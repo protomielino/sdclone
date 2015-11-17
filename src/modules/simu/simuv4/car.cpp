@@ -132,6 +132,9 @@ SimCarConfig(tCar *car)
 	carElt->_bonnetPos_y = GfParmGetNum(hdle, SECT_BONNET, PRM_YPOS, (char*)NULL, carElt->_drvPos_y);
 	carElt->_bonnetPos_z = GfParmGetNum(hdle, SECT_BONNET, PRM_ZPOS, (char*)NULL, carElt->_drvPos_z);
 	
+	if (setupFuel->max > car->tank) {setupFuel->max = car->tank;}
+	if (setupFuel->min > car->tank) {setupFuel->min = car->tank;}
+	
 	k = k * k;
 	car->Iinv.x = (tdble) (12.0 / (car->mass * k * (car->dimension.y * car->dimension.y + car->dimension.z * car->dimension.z)));
 	car->Iinv.y = (tdble) (12.0 / (car->mass * k * (car->dimension.x * car->dimension.x + car->dimension.z * car->dimension.z)));
@@ -246,6 +249,95 @@ SimCarConfig(tCar *car)
 	}
 	
 	SimCarReConfig(car);
+	
+	/* initialize dashboardInstant */
+	tPrivCar *priv = &(car->carElt->priv);
+	tCarSetup *setup = &(car->carElt->setup);
+	
+	for (i = 0; i < NR_DI_INSTANT; i++) {
+		priv->dashboardInstant[i].type = DI_NONE;
+		priv->dashboardInstant[i].setup = NULL;
+	}
+	i = 0;
+	if (setup->brakeRepartition.min != setup->brakeRepartition.max) {
+		priv->dashboardInstant[i].type = DI_BRAKE_REPARTITION;
+		priv->dashboardInstant[i].setup = &(setup->brakeRepartition);
+		i++;
+	}
+	if (setup->arbSpring[0].min != setup->arbSpring[0].max) {
+		priv->dashboardInstant[i].type = DI_FRONT_ANTIROLLBAR;
+		priv->dashboardInstant[i].setup = &(setup->arbSpring[0]);
+		i++;
+	}
+	if (setup->arbSpring[1].min != setup->arbSpring[1].max) {
+		priv->dashboardInstant[i].type = DI_REAR_ANTIROLLBAR;
+		priv->dashboardInstant[i].setup = &(setup->arbSpring[1]);
+		i++;
+	}
+	if (setup->differentialType[0] == DIFF_ELECTRONIC_LSD) {
+		if (setup->differentialMaxSlipBias[0].min != setup->differentialMaxSlipBias[0].max) {
+			priv->dashboardInstant[i].type = DI_FRONT_DIFF_MAX_SLIP_BIAS;
+			priv->dashboardInstant[i].setup = &(setup->differentialMaxSlipBias[0]);
+			i++;
+		}
+		if (setup->differentialCoastMaxSlipBias[0].min != setup->differentialCoastMaxSlipBias[0].min) {
+			priv->dashboardInstant[i].type = DI_FRONT_DIFF_COAST_MAX_SLIP_BIAS;
+			priv->dashboardInstant[i].setup = &(setup->differentialCoastMaxSlipBias[0]);
+			i++;
+		}
+	}
+	if (setup->differentialType[1] == DIFF_ELECTRONIC_LSD) {
+		if (setup->differentialMaxSlipBias[1].min != setup->differentialMaxSlipBias[1].max) {
+			priv->dashboardInstant[i].type = DI_REAR_DIFF_MAX_SLIP_BIAS;
+			priv->dashboardInstant[i].setup = &(setup->differentialMaxSlipBias[1]);
+			i++;
+		}
+		if (setup->differentialCoastMaxSlipBias[1].min != setup->differentialCoastMaxSlipBias[1].min) {
+			priv->dashboardInstant[i].type = DI_REAR_DIFF_COAST_MAX_SLIP_BIAS;
+			priv->dashboardInstant[i].setup = &(setup->differentialCoastMaxSlipBias[1]);
+			i++;
+		}
+	}
+	if (setup->differentialType[2] == DIFF_ELECTRONIC_LSD) {
+		if (setup->differentialMaxSlipBias[2].min != setup->differentialMaxSlipBias[2].max) {
+			priv->dashboardInstant[i].type = DI_CENTRAL_DIFF_MAX_SLIP_BIAS;
+			priv->dashboardInstant[i].setup = &(setup->differentialMaxSlipBias[2]);
+			i++;
+		}
+		if (setup->differentialCoastMaxSlipBias[2].min != setup->differentialCoastMaxSlipBias[2].min) {
+			priv->dashboardInstant[i].type = DI_CENTRAL_DIFF_COAST_MAX_SLIP_BIAS;
+			priv->dashboardInstant[i].setup = &(setup->differentialCoastMaxSlipBias[2]);
+			i++;
+		}
+	}
+	priv->dashboardInstantNb = i;
+	
+	/* initialize dashboardRequest */
+	priv->dashboardRequest[0].type = DI_FUEL;
+	priv->dashboardRequest[0].setup = &(setup->fuel);
+	priv->dashboardRequest[1].type = DI_REPAIR;
+	priv->dashboardRequest[1].setup = &(setup->reqRepair);
+	for (i = 2; i < NR_DI_REQUEST; i++) {
+		priv->dashboardRequest[i].type = DI_NONE;
+		priv->dashboardRequest[i].setup = NULL;
+	}
+	i=2;
+	if (car->features & FEAT_TIRETEMPDEG) {
+		priv->dashboardRequest[2].type = DI_TYRE_SET;
+		priv->dashboardRequest[2].setup = &(setup->reqTireset);
+		i = 3;
+	}
+	if ( (car->wing[0].WingType != -1) && (setup->wingAngle[0].min != setup->wingAngle[0].max) ) {
+		priv->dashboardRequest[i].type = DI_FRONT_WING_ANGLE;
+		priv->dashboardRequest[i].setup = &(setup->wingAngle[0]);
+		i++;
+	}
+	if ( (car->wing[1].WingType != -1) && (setup->wingAngle[1].min != setup->wingAngle[1].max) ) {
+		priv->dashboardRequest[i].type = DI_REAR_WING_ANGLE;
+		priv->dashboardRequest[i].setup = &(setup->wingAngle[1]);
+		i++;
+	}
+	priv->dashboardRequestNb = i;
 
 /*
 for(i=0;i<4;i++) {
@@ -274,6 +366,16 @@ for(i=0;i<3;i++) {
 printf("STEER lock=%g\n",RAD2DEG(car->steer.steerLock));
 printf("GEARS: ");
 for(i=0; i<MAX_GEARS;i++){printf("%g ",car->transmission.overallRatio[i]);}
+printf("\n");
+printf("Dashboard Instant Nr = %d\n    ",priv->dashboardInstantNb);
+for (i = 0; i < NR_DI_INSTANT; i++) {
+	printf("%d  ",priv->dashboardInstant[i].type);
+}
+printf("\n");
+printf("Dashboard Request Nr = %d\n    ",priv->dashboardRequestNb);
+for (i = 0; i < NR_DI_REQUEST; i++) {
+	printf("%d  ",priv->dashboardRequest[i].type);
+}
 printf("\n");
 */
 }
