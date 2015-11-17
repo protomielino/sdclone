@@ -353,14 +353,21 @@ typedef struct MemPoolCar
 	tMemoryPool shutdown;
 } tMemPoolCar;
 
+/* structrure to store one parameter of car setup */
+typedef struct
+{
+    tdble	value;		/* actual value */
+    tdble	min, max;	/* limits for value*/
+    tdble	desired_value;	/* desired new value */
+    tdble	stepsize;	/* value of increment/decrement in one step */
+    bool	changed;	/* TRUE if the item has been changed */
+} tCarSetupItem;
+
 /* data for a dashboard item */
 typedef struct
 {
     int		type;		/* type of the item, for possible values see below */
-    tdble	value;		/* actual value */
-    tdble	min, max;	/* limits for value*/
-    tdble	stepsize;	/* value of increment/decrement in one step */
-    tdble	desired_value;	/* desired new value */
+    tCarSetupItem *setup;	/* store the items setup values */
 } tDashboardItem;
 /* constants for type: */
 #define	DI_NONE					-1
@@ -370,10 +377,10 @@ typedef struct
 #define DI_REAR_ANTIROLLBAR			2
 #define DI_FRONT_DIFF_MAX_SLIP_BIAS 		3
 #define DI_FRONT_DIFF_COAST_MAX_SLIP_BIAS	4
-#define DI_CENTRAL_DIFF_MAX_SLIP_BIAS		5
-#define DI_CENTRAL_DIFF_COAST_MAX_SLIP_BIAS	6
-#define DI_REAR_DIFF_MAX_SLIP_BIAS		7
-#define DI_REAR_DIFF_COAST_MAX_SLIP_BIAS	8
+#define DI_REAR_DIFF_MAX_SLIP_BIAS		5
+#define DI_REAR_DIFF_COAST_MAX_SLIP_BIAS	6
+#define DI_CENTRAL_DIFF_MAX_SLIP_BIAS		7
+#define DI_CENTRAL_DIFF_COAST_MAX_SLIP_BIAS	8
 /* number of instant types */
 #define NR_DI_INSTANT				9
 /* types for dashboardRequest */
@@ -543,16 +550,6 @@ typedef struct
 
 struct RobotItf;
 
-/* structrure to store one parameter of car setup */
-typedef struct
-{
-    tdble	value;		/* actual value */
-    tdble	min, max;	/* limits for value*/
-    tdble	desired_value;	/* desired new value */
-    tdble	stepsize;	/* value of increment/decrement in one step */
-    bool	changed;	/* TRUE if the item has been changed */
-} tCarSetupItem;
-
 /* car setup parameters */
 typedef struct
 {
@@ -577,6 +574,7 @@ typedef struct
     tCarSetupItem suspCourse[4], suspPacker[4];
     tCarSetupItem suspFastBump[4], suspSlowBump[4], suspBumpLvel[4];
     tCarSetupItem suspFastRebound[4], suspSlowRebound[4], suspReboundLvel[4];
+    tCarSetupItem reqRepair, reqTireset; //used for pit stop repair and tire set request
 } tCarSetup;
 
 /** Command issued by the car during pit stop */
