@@ -389,8 +389,9 @@ typedef struct
 #define DI_TYRE_SET				34
 #define DI_FRONT_WING_ANGLE			35
 #define DI_REAR_WING_ANGLE			36
+#define DI_PENALTY				40
 /* number of request types */
-#define NR_DI_REQUEST				5
+#define NR_DI_REQUEST				6
 
 /** Data known only by the driver */
 typedef struct
@@ -574,7 +575,7 @@ typedef struct
     tCarSetupItem suspCourse[4], suspPacker[4];
     tCarSetupItem suspFastBump[4], suspSlowBump[4], suspBumpLvel[4];
     tCarSetupItem suspFastRebound[4], suspSlowRebound[4], suspReboundLvel[4];
-    tCarSetupItem reqRepair, reqTireset; //used for pit stop repair and tire set request
+    tCarSetupItem reqRepair, reqTireset, reqPenalty; //used for pit stop repair, tire set and stop & go request
 } tCarSetup;
 
 /** Command issued by the car during pit stop */
