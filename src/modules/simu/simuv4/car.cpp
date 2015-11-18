@@ -313,6 +313,25 @@ SimCarConfig(tCar *car)
 	priv->dashboardInstantNb = i;
 	
 	/* initialize dashboardRequest */
+	setup->reqRepair.min = setup->reqRepair.value = setup->reqRepair.max = 0.0;
+	setup->reqRepair.desired_value = 0.0;
+	setup->reqRepair.stepsize = 500;
+	setup->reqRepair.changed = FALSE;
+	
+	setup->reqTireset.min = 0.0;
+	setup->reqTireset.max = 1.0;
+	setup->reqTireset.value = 1.0;
+	setup->reqTireset.desired_value = 1.0; //1.0 means change tires, 0.0 keep old tires
+	setup->reqTireset.stepsize = 1.0;
+	setup->reqTireset.changed = FALSE;
+	
+	setup->reqPenalty.min = 0.0;
+	setup->reqPenalty.max = 1.0;
+	setup->reqPenalty.value = 0.0;
+	setup->reqPenalty.desired_value = 0.0; //0.0 means refuel/repair first, 1.0 means serve penalty first
+	setup->reqPenalty.stepsize = 1.0;
+	setup->reqPenalty.changed = FALSE;
+	
 	priv->dashboardRequest[0].type = DI_FUEL;
 	priv->dashboardRequest[0].setup = &(setup->fuel);
 	priv->dashboardRequest[1].type = DI_REPAIR;
@@ -337,7 +356,11 @@ SimCarConfig(tCar *car)
 		priv->dashboardRequest[i].setup = &(setup->wingAngle[1]);
 		i++;
 	}
+	priv->dashboardRequest[i].type = DI_PENALTY;
+	priv->dashboardRequest[i].setup = &(setup->reqPenalty);
+	i++;
 	priv->dashboardRequestNb = i;
+	priv->dashboardActiveItem = 0;
 
 /*
 for(i=0;i<4;i++) {
