@@ -1878,7 +1878,6 @@ cGrBoard::grDispDashboard()
   grSetupDrawingArea(x1, y1, x1 + 32 * dx, y1 - dy);
   
   // Write information
-  //if (dashboardFlag % 2) {//TEST condition
   if (car_->_dashboardActiveItem < car_->_dashboardInstantNb) {
     GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
     GfuiDrawString(buf2, danger_color_, GFUI_FONT_LARGE_C, x1 + 16 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
