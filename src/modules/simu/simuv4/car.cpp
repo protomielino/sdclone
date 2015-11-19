@@ -328,7 +328,7 @@ SimCarConfig(tCar *car)
 	setup->reqPenalty.min = 0.0;
 	setup->reqPenalty.max = 1.0;
 	setup->reqPenalty.value = 0.0;
-	setup->reqPenalty.desired_value = 0.0; //0.0 means refuel/repair first, 1.0 means serve penalty first
+	setup->reqPenalty.desired_value = 0.0; //0.0 means refuel/repair next, 1.0 means serve penalty next
 	setup->reqPenalty.stepsize = 1.0;
 	setup->reqPenalty.changed = FALSE;
 	
@@ -392,14 +392,16 @@ for(i=0; i<MAX_GEARS;i++){printf("%g ",car->transmission.overallRatio[i]);}
 printf("\n");
 printf("Dashboard Instant Nr = %d\n    ",priv->dashboardInstantNb);
 for (i = 0; i < NR_DI_INSTANT; i++) {
-	printf("%d  ",priv->dashboardInstant[i].type);
+	if (priv->dashboardInstant[i].type!=DI_NONE)
+	printf("    %d  %g\n",priv->dashboardInstant[i].type,priv->dashboardInstant[i].setup->value);
+	else printf("    %d\n",priv->dashboardInstant[i].type);
 }
-printf("\n");
 printf("Dashboard Request Nr = %d\n    ",priv->dashboardRequestNb);
 for (i = 0; i < NR_DI_REQUEST; i++) {
-	printf("%d  ",priv->dashboardRequest[i].type);
+	if (priv->dashboardRequest[i].type!=DI_NONE)
+	printf("    %d  %g\n",priv->dashboardRequest[i].type,priv->dashboardRequest[i].setup->value);
+	else printf("    %d\n",priv->dashboardRequest[i].type);
 }
-printf("\n");
 */
 }
 

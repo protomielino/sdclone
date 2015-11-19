@@ -192,8 +192,7 @@ cGrBoard::selectBoard(int val)
       GfParmSetNum(grHandle, path, GR_ATT_ARCADE, (char*)NULL, (tdble)arcadeFlag);
       break;
     case 6:
-      //dashboardFlag = 1 - dashboardFlag;
-      dashboardFlag = (dashboardFlag + 1) % 5;
+      dashboardFlag = (dashboardFlag + 1) % 3;
       GfParmSetNum(grHandle, path, GR_ATT_DASHBOARD, (char*)NULL, (tdble)dashboardFlag);
       break;
   }
@@ -1778,29 +1777,100 @@ void
 cGrBoard::grDispDashboard()
 {
   char buf1[17], buf2[9], buf3[9];
-
-  //TEST: for a quick test of the look, replace this later
-  switch (dashboardFlag) {
-    case 1:
-    case 3:
-      snprintf(buf1, sizeof(buf1), "%s", "F/R Brake Rep.");
-      snprintf(buf2, sizeof(buf2), "%.1f%%", 53.02);
-      break;
-    case 2:
-    case 4:
-      snprintf(buf1, sizeof(buf1), "%s", "Fuel");
-      snprintf(buf2, sizeof(buf2), "%.1fl", car_->_fuel);
-      snprintf(buf3, sizeof(buf3), "%.1fl", car_->_tank);
-  }
-  //end of TEST
-
   int dym = GfuiFontHeight(GFUI_FONT_MEDIUM_C);
   int y1;
   int dx = GfuiFontWidth(GFUI_FONT_LARGE_C, "0");
   int x1 = (leftAnchor + rightAnchor) / 2 - 16 * dx;
   int dy = GfuiFontHeight(GFUI_FONT_LARGE_C);
+  const tDashboardItem *item;
 
-  if (dashboardFlag > 2) {
+  // Setup information string
+  if (car_->_dashboardActiveItem < car_->_dashboardInstantNb) {
+    item = &(car_->_dashboardInstant[car_->_dashboardActiveItem]);
+    switch (item->type) {
+      case DI_BRAKE_REPARTITION:
+        snprintf(buf1, sizeof(buf1), "%s", "F/R Brake Rep.");
+        snprintf(buf2, sizeof(buf2), "%.1f %%", 100.0*item->setup->value);
+        break;
+      case DI_FRONT_ANTIROLLBAR:
+        snprintf(buf1, sizeof(buf1), "%s", "Front ARB");
+        snprintf(buf2, sizeof(buf2), "%.0f kN/m", item->setup->value/1000.0);
+        break;
+      case DI_REAR_ANTIROLLBAR:
+        snprintf(buf1, sizeof(buf1), "%s", "Rear ARB");
+        snprintf(buf2, sizeof(buf2), "%.0f kN/m", item->setup->value/1000.0);
+        break;
+      case DI_FRONT_DIFF_MAX_SLIP_BIAS:
+        snprintf(buf1, sizeof(buf1), "%s", "F Pow Max Slip");
+        snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
+        break;
+      case DI_FRONT_DIFF_COAST_MAX_SLIP_BIAS:
+        snprintf(buf1, sizeof(buf1), "%s", "F Coa Max Slip");
+        snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
+        break;
+      case DI_REAR_DIFF_MAX_SLIP_BIAS:
+        snprintf(buf1, sizeof(buf1), "%s", "R Pow Max Slip");
+        snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
+        break;
+      case DI_REAR_DIFF_COAST_MAX_SLIP_BIAS:
+        snprintf(buf1, sizeof(buf1), "%s", "R Coa Max Slip");
+        snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
+        break;
+      case DI_CENTRAL_DIFF_MAX_SLIP_BIAS:
+        snprintf(buf1, sizeof(buf1), "%s", "C Pow Max Slip");
+        snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
+        break;
+      case DI_CENTRAL_DIFF_COAST_MAX_SLIP_BIAS:
+        snprintf(buf1, sizeof(buf1), "%s", "C Coa Max Slip");
+        snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
+        break;
+    }
+  } else {
+    item = &(car_->_dashboardRequest[car_->_dashboardActiveItem - car_->_dashboardInstantNb]);
+    switch (item->type) {
+      case DI_FUEL:
+        snprintf(buf1, sizeof(buf1), "%s", "Fuel");
+        snprintf(buf2, sizeof(buf2), "%.1f l", item->setup->desired_value);
+        snprintf(buf3, sizeof(buf3), "%.1f l", car_->_fuel);
+        break;
+      case DI_REPAIR:
+        snprintf(buf1, sizeof(buf1), "%s", "Repair");
+        snprintf(buf2, sizeof(buf2), "%.0f", item->setup->desired_value);
+        snprintf(buf3, sizeof(buf3), "%d", car_->_dammage);
+        break;
+      case DI_TYRE_SET:
+        snprintf(buf1, sizeof(buf1), "%s", "New tires");
+        if (item->setup->desired_value > 0.9) {
+          snprintf(buf2, sizeof(buf2), "%s", "YES");
+        } else {
+          snprintf(buf2, sizeof(buf2), "%s", "NO");
+        }
+        snprintf(buf3, sizeof(buf3), "%s", "");
+        break;
+      case DI_FRONT_WING_ANGLE:
+        snprintf(buf1, sizeof(buf1), "%s", "Front wing");
+        snprintf(buf2, sizeof(buf2), "%.1f", RAD2DEG(item->setup->desired_value));
+        snprintf(buf3, sizeof(buf3), "%.1f", RAD2DEG(item->setup->value));
+        break;
+      case DI_REAR_WING_ANGLE:
+        snprintf(buf1, sizeof(buf1), "%s", "Rear wing");
+        snprintf(buf2, sizeof(buf2), "%.1f", RAD2DEG(item->setup->desired_value));
+        snprintf(buf3, sizeof(buf3), "%.1f", RAD2DEG(item->setup->value));
+        break;
+      case DI_PENALTY:
+        snprintf(buf1, sizeof(buf1), "%s", "Next pit type");
+        if (item->setup->desired_value > 0.9) {
+          snprintf(buf2, sizeof(buf2), "%s", "PENALTY");
+        } else {
+          snprintf(buf2, sizeof(buf2), "%s", "REPAIR");
+        }
+        snprintf(buf3, sizeof(buf3), "%s", "");
+        break;
+    }
+  }
+  
+  // Background
+  if (dashboardFlag == 2) {
     y1  = TOP_ANCHOR - dym; //bottom of scrolling line leaderboard
   } else {
     y1 = 128 + dy; //in top of speedo
@@ -1808,7 +1878,8 @@ cGrBoard::grDispDashboard()
   grSetupDrawingArea(x1, y1, x1 + 32 * dx, y1 - dy);
   
   // Write information
-  if (dashboardFlag % 2) {//TEST condition
+  //if (dashboardFlag % 2) {//TEST condition
+  if (car_->_dashboardActiveItem < car_->_dashboardInstantNb) {
     GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
     GfuiDrawString(buf2, danger_color_, GFUI_FONT_LARGE_C, x1 + 16 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
   } else {
