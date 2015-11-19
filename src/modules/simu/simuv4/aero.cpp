@@ -243,7 +243,7 @@ SimWingConfig(tCar *car, int index)
     setupAngle->desired_value = setupAngle->min = setupAngle->max = 0.0;
     GfParmGetNumWithLimits(hdle, WingSect[index], PRM_WINGANGLE, (char*)NULL, &(setupAngle->desired_value), &(setupAngle->min), &(setupAngle->max));
     setupAngle->changed = TRUE;
-    setupAngle->stepsize = RAD2DEG(0.1);
+    setupAngle->stepsize = DEG2RAD(0.1);
     wing->staticPos.x = GfParmGetNum(hdle, WingSect[index], PRM_XPOS, (char*)NULL, 0);
     wing->staticPos.z = GfParmGetNum(hdle, WingSect[index], PRM_ZPOS, (char*)NULL, 0);
     wing->staticPos.y = 0.0;
