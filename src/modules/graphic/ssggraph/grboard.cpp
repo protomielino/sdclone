@@ -1779,7 +1779,7 @@ cGrBoard::grDispDashboard()
   char buf1[17], buf2[9], buf3[9];
   int dym = GfuiFontHeight(GFUI_FONT_MEDIUM_C);
   int y1;
-  int dx = GfuiFontWidth(GFUI_FONT_LARGE_C, "0");
+  int dx = GfuiFontWidth(GFUI_FONT_LARGE_C, "E");
   int x1 = (leftAnchor + rightAnchor) / 2 - 16 * dx;
   int dy = GfuiFontHeight(GFUI_FONT_LARGE_C);
   const tDashboardItem *item;
