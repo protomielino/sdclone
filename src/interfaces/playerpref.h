@@ -136,6 +136,19 @@
 #define HM_ATT_R_GLANCE_MIN     "right glance min"
 #define HM_ATT_R_GLANCE_MAX     "right glance max"
 
+#define HM_ATT_DASHB_NEXT       "dashboard next item"
+#define HM_ATT_DASHB_NEXT_MIN   "dashboard next item min"
+#define HM_ATT_DASHB_NEXT_MAX   "dashboard next item max"
+#define HM_ATT_DASHB_PREV       "dashboard previous item"
+#define HM_ATT_DASHB_PREV_MIN   "dashboard previous item min"
+#define HM_ATT_DASHB_PREV_MAX   "dashboard previous item max"
+#define HM_ATT_DASHB_INC        "dashboard increase"
+#define HM_ATT_DASHB_INC_MIN    "dashboard increase min"
+#define HM_ATT_DASHB_INC_MAX    "dashboard increase max"
+#define HM_ATT_DASHB_DEC        "dashboard decrease"
+#define HM_ATT_DASHB_DEC_MIN    "dashboard decrease min"
+#define HM_ATT_DASHB_DEC_MAX    "dashboard decrease max"
+
 #define	HM_SECT_PREF	"Preferences"
 
 #define HM_LIST_DRV	"Drivers"
@@ -189,8 +202,12 @@
 #define	CMD_HBOX_Y	21
 #define CMD_LEFTGLANCE	22
 #define CMD_RIGHTGLANCE	23
+#define CMD_DASHB_NEXT 24
+#define CMD_DASHB_PREV 25
+#define CMD_DASHB_INC 26
+#define CMD_DASHB_DEC 27
 
-#define CMD_END_OF_LIST 23	/* Change this to same value as last item */
+#define CMD_END_OF_LIST 27	/* Change this to same value as last item */
 
 #endif /* _PLAYERPREF_H_ */ 
 
