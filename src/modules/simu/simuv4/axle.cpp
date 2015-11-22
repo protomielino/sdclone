@@ -61,20 +61,25 @@ void SimAxleConfig(tCar *car, int index)
 	car->wheel[index*2+1].feedBack.I += (tdble) (axle->I / 2.0);
 }
 
+void SimArbReConfig(tCar *car, int index)
+{
+	tCarSetupItem *setupArbK = &(car->carElt->setup.arbSpring[index]);
+	tSuspension *arb = &(car->axle[index].arbSusp);
+	if (setupArbK->changed) {
+		arb->spring.K = MIN(setupArbK->max, MAX(setupArbK->min, setupArbK->desired_value));
+		setupArbK->value = arb->spring.K;
+		setupArbK->changed = FALSE;
+	}
+}
 
 void SimAxleReConfig(tCar *car, int index, tdble weight0)
 {/* called by SimCarReConfig() in car.cpp */
-	tCarSetupItem *setupArbK = &(car->carElt->setup.arbSpring[index]);
 	tCarSetupItem *setupRideHeightR = &(car->carElt->setup.rideHeight[index*2]);
 	tCarSetupItem *setupRideHeightL = &(car->carElt->setup.rideHeight[index*2+1]);
 	tAxle *axle = &(car->axle[index]);
 	tdble x0r, x0l;
 	
-	if (setupArbK->changed) {
-		axle->arbSusp.spring.K = MIN(setupArbK->max, MAX(setupArbK->min, setupArbK->desired_value));
-		setupArbK->value = axle->arbSusp.spring.K;
-		setupArbK->changed = FALSE;
-	}
+	SimArbReConfig(car, index);
 	
 	if (setupRideHeightR->changed) {
 		x0r = MIN(setupRideHeightR->max, MAX(setupRideHeightR->min, setupRideHeightR->desired_value));

@@ -110,8 +110,12 @@ SimCarConfig(tCar *car)
 	setupGcrrl->stepsize = 0.005;
 	gcrrl = setupGcrrl->desired_value;
 
+	car->tank        = GfParmGetNum(hdle, SECT_CAR, PRM_TANK, (char*)NULL, 80);
+	
 	setupFuel->desired_value = setupFuel->min = setupFuel->max = 80.0;
 	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_FUEL, (char*)NULL, &(setupFuel->desired_value), &(setupFuel->min), &(setupFuel->max));
+	setupFuel->min = 0.0;
+	setupFuel->max = car->tank;
 	setupFuel->changed = TRUE;
 	setupFuel->stepsize = 1.0;
 	
@@ -123,7 +127,6 @@ SimCarConfig(tCar *car)
 	car->Minv        = (tdble) (1.0 / car->mass);
 	car->statGC.y    = (tdble) (- (gcfr * gcfrl + (1 - gcfr) * gcrrl) * car->dimension.y + car->dimension.y / 2.0);
 	car->statGC.z    = GfParmGetNum(hdle, SECT_CAR, PRM_GCHEIGHT, (char*)NULL, .5);
-	car->tank        = GfParmGetNum(hdle, SECT_CAR, PRM_TANK, (char*)NULL, 80);
 	k                = GfParmGetNum(hdle, SECT_CAR, PRM_CENTR, (char*)NULL, 1.0);
 	carElt->_drvPos_x = GfParmGetNum(hdle, SECT_DRIVER, PRM_XPOS, (char*)NULL, 0.0);
 	carElt->_drvPos_y = GfParmGetNum(hdle, SECT_DRIVER, PRM_YPOS, (char*)NULL, 0.0);
@@ -131,9 +134,6 @@ SimCarConfig(tCar *car)
 	carElt->_bonnetPos_x = GfParmGetNum(hdle, SECT_BONNET, PRM_XPOS, (char*)NULL, carElt->_drvPos_x);
 	carElt->_bonnetPos_y = GfParmGetNum(hdle, SECT_BONNET, PRM_YPOS, (char*)NULL, carElt->_drvPos_y);
 	carElt->_bonnetPos_z = GfParmGetNum(hdle, SECT_BONNET, PRM_ZPOS, (char*)NULL, carElt->_drvPos_z);
-	
-	if (setupFuel->max > car->tank) {setupFuel->max = car->tank;}
-	if (setupFuel->min > car->tank) {setupFuel->min = car->tank;}
 	
 	k = k * k;
 	car->Iinv.x = (tdble) (12.0 / (car->mass * k * (car->dimension.y * car->dimension.y + car->dimension.z * car->dimension.z)));
@@ -927,6 +927,15 @@ SimCarUpdate(tCar *car, tSituation * /* s */)
 	CHECK(car);
 	SimCarCollideXYScene(car);
 	CHECK(car);
+	
+	/* update car->carElt->setup.reqRepair with damage */
+	tCarSetupItem *repair = &(car->carElt->setup.reqRepair);
+	if ((repair->desired_value > 0.0) && (repair->max == repair->desired_value)) {
+		repair->max = repair->desired_value = car->dammage;
+	} else {
+		repair->max = car->dammage;
+	}
+		
 }
 
 void
