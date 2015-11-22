@@ -303,6 +303,7 @@ typedef struct {
     tdble   treadDepth;     	/**< tread depth, between 0 and 1 */
     tdble   critTreadDepth; 	/**< critical tread depth, when grip falls off suddenly, between 0 and treadDepth */
 	tdble slipNorm; 			/* normalized slip, the variable of Magic Formula */
+	tdble slipOpt;				/* the value of slipNorm giving maximal grip */
 	tdble slipSide;
 	tdble slipAccel;
 	tdble Fx;
@@ -316,6 +317,7 @@ typedef struct {
 #define _wheelSpinVel(i)        priv.wheel[i].spinVel
 #define _wheelSeg(i)            priv.wheel[i].seg
 #define _wheelSlipNorm(i)       priv.wheel[i].slipNorm
+#define _wheelSlipOpt(i)        priv.wheel[i].slipOpt
 #define _wheelSlipSide(i)       priv.wheel[i].slipSide
 #define _wheelSlipAccel(i)      priv.wheel[i].slipAccel
 #define _wheelFx(i)             priv.wheel[i].Fx

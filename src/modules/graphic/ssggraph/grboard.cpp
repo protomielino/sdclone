@@ -40,6 +40,7 @@ static const string rgba[4] =
 
 static const int NB_BOARDS = 3;
 static const int NB_LBOARDS = 5;    // # of leaderboard states
+static const int NB_GFLAG = 3;
 static const int NB_DEBUG = 4;
 
 // Boards work on a OrthoCam with fixed height of 600, width flows
@@ -184,7 +185,7 @@ cGrBoard::selectBoard(int val)
       GfParmSetNum(grHandle, path, GR_ATT_DEBUG, (char*)NULL, (tdble)debugFlag);
       break;
     case 4:
-      GFlag = 1 - GFlag;
+      GFlag = (GFlag + 1) % NB_GFLAG;
       GfParmSetNum(grHandle, path, GR_ATT_GGRAPH, (char*)NULL, (tdble)GFlag);
       break;
     case 5:
@@ -362,6 +363,55 @@ cGrBoard::grDispGGraph()
   glVertex2f(XC + THNSS, YC);
   glVertex2f(XC + THNSS, YC + car_->ctrl.clutchCmd * 100.0f);
   glVertex2f(XC - THNSS, YC + car_->ctrl.clutchCmd * 100.0f);
+  
+  // Draw the tire slip color gauges
+  if (GFlag == 2) {
+    tdble s;
+    // FR wheel
+    s = car_->_wheelSlipNorm(0)/car_->_wheelSlipOpt(0);
+    if (s > 1.0) {
+      glColor4f(1.0f, 0.0f, MIN(1.0f, s - 1.0), 0.9f);
+    } else {
+      glColor4f(s, s, 1.0f - s, 0.9f);
+    }
+    glVertex2f(X1 + 40.0f, Y1 + 30.0f);
+    glVertex2f(X1 + 50.0f, Y1 + 30.0f);
+    glVertex2f(X1 + 50.0f, Y1 + 50.0f);
+    glVertex2f(X1 + 40.0f, Y1 + 50.0f);
+    // FL wheel
+    s = car_->_wheelSlipNorm(1)/car_->_wheelSlipOpt(1);
+    if (s > 1.0) {
+      glColor4f(1.0f, 0.0f, MIN(1.0f, s - 1.0), 0.9f);
+    } else {
+      glColor4f(s, s, 1.0f - s, 0.9f);
+    }
+    glVertex2f(X1 - 50.0f, Y1 + 30.0f);
+    glVertex2f(X1 - 40.0f, Y1 + 30.0f);
+    glVertex2f(X1 - 40.0f, Y1 + 50.0f);
+    glVertex2f(X1 - 50.0f, Y1 + 50.0f);
+    // RR wheel
+    s = car_->_wheelSlipNorm(2)/car_->_wheelSlipOpt(2);
+    if (s > 1.0) {
+      glColor4f(1.0f, 0.0f, MIN(1.0f, s - 1.0), 0.9f);
+    } else {
+      glColor4f(s, s, 1.0f - s, 0.9f);
+    }
+    glVertex2f(X1 + 40.0f, Y1 - 50.0f);
+    glVertex2f(X1 + 50.0f, Y1 - 50.0f);
+    glVertex2f(X1 + 50.0f, Y1 - 30.0f);
+    glVertex2f(X1 + 40.0f, Y1 - 30.0f);
+    // RL wheel
+    s = car_->_wheelSlipNorm(3)/car_->_wheelSlipOpt(3);
+    if (s > 1.0) {
+      glColor4f(1.0f, 0.0f, MIN(1.0f, s - 1.0), 0.9f);
+    } else {
+      glColor4f(s, s, 1.0f - s, 0.9f);
+    }
+    glVertex2f(X1 - 50.0f, Y1 - 50.0f);
+    glVertex2f(X1 - 40.0f, Y1 - 50.0f);
+    glVertex2f(X1 - 40.0f, Y1 - 30.0f);
+    glVertex2f(X1 - 50.0f, Y1 - 30.0f);
+  }
 
   glEnd();
 
@@ -374,6 +424,7 @@ cGrBoard::grDispGGraph()
   glColor4fv(emphasized_color_);
   glVertex2f(X1, Y1);
   glVertex2f(X2, Y2);
+
   glEnd();
 }
 
