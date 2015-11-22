@@ -280,7 +280,7 @@ SimCarConfig(tCar *car)
 			priv->dashboardInstant[i].setup = &(setup->differentialMaxSlipBias[0]);
 			i++;
 		}
-		if (setup->differentialCoastMaxSlipBias[0].min != setup->differentialCoastMaxSlipBias[0].min) {
+		if (setup->differentialCoastMaxSlipBias[0].min != setup->differentialCoastMaxSlipBias[0].max) {
 			priv->dashboardInstant[i].type = DI_FRONT_DIFF_COAST_MAX_SLIP_BIAS;
 			priv->dashboardInstant[i].setup = &(setup->differentialCoastMaxSlipBias[0]);
 			i++;
@@ -292,7 +292,7 @@ SimCarConfig(tCar *car)
 			priv->dashboardInstant[i].setup = &(setup->differentialMaxSlipBias[1]);
 			i++;
 		}
-		if (setup->differentialCoastMaxSlipBias[1].min != setup->differentialCoastMaxSlipBias[1].min) {
+		if (setup->differentialCoastMaxSlipBias[1].min != setup->differentialCoastMaxSlipBias[1].max) {
 			priv->dashboardInstant[i].type = DI_REAR_DIFF_COAST_MAX_SLIP_BIAS;
 			priv->dashboardInstant[i].setup = &(setup->differentialCoastMaxSlipBias[1]);
 			i++;
@@ -304,7 +304,7 @@ SimCarConfig(tCar *car)
 			priv->dashboardInstant[i].setup = &(setup->differentialMaxSlipBias[2]);
 			i++;
 		}
-		if (setup->differentialCoastMaxSlipBias[2].min != setup->differentialCoastMaxSlipBias[2].min) {
+		if (setup->differentialCoastMaxSlipBias[2].min != setup->differentialCoastMaxSlipBias[2].max) {
 			priv->dashboardInstant[i].type = DI_CENTRAL_DIFF_COAST_MAX_SLIP_BIAS;
 			priv->dashboardInstant[i].setup = &(setup->differentialCoastMaxSlipBias[2]);
 			i++;
