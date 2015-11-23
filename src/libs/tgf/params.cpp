@@ -1633,8 +1633,9 @@ xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */, bo
 			<br>-1 if data was truncated
     		<br>1 if other error
 */
+
 int
-GfParmWriteBuf (void *handle, char *buf, int size)
+GfParmWriteBuf (void *handle, char *buf, int size) /* Never used in current codebase: to be removed? */
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
     char		line[LINE_SZ];
@@ -1677,6 +1678,36 @@ GfParmWriteBuf (void *handle, char *buf, int size)
     }
     // buf [size - 1] = 0; redundant: memset(buf,0,size); and if(len >= curSize){...
     
+    return 0; // Success
+}
+
+/** Write a configuration string.
+    @ingroup	conf
+    @param	handle	Configuration handle
+    @param	str		a std:string to vrite the configuration to
+    @return	0 if OK
+    		<br>1 bad handle
+*/
+
+int
+GfParmWriteString (void *handle, std::string& str)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    char		line[LINE_SZ];
+
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogFatal ("GfParmWriteString: bad handle (%p)\n", parmHandle);
+		return 1; // Error
+    }
+    
+    parmHandle->outCtrl.state = 0;
+    parmHandle->outCtrl.curSection = NULL;
+    parmHandle->outCtrl.curParam = NULL;
+
+    while (xmlGetOuputLine (parmHandle, line, sizeof (line))) {
+		str.append(line);
+    }
+   
     return 0; // Success
 }
 

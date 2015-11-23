@@ -412,7 +412,8 @@ TGF_API int GfParmWriteFile(const char *file, void* handle, const char *name);
 /* last optional parameter allows usage without logger be available */
 TGF_API int GfParmWriteFileSDHeader(const char *file, void* handle, const char *name, const char *author, bool trace = true);
 /* write a parameter file to a supplied buffer */
-TGF_API int GfParmWriteBuf(void *handle, char *buf, int size);
+TGF_API int GfParmWriteBuf(void *handle, char *buf, int size);/* Never used in current codebase: to be removed? */
+TGF_API int GfParmWriteString(void *handle, std::string& str);
 
 
 TGF_API char *GfParmGetName(void *handle);
