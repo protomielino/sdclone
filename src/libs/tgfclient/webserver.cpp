@@ -904,7 +904,7 @@ int WebServer::sendRaceEnd (int race_id, int endposition){
 }
 
 //initialize the web server
-WebServer webServer;
+TGFCLIENT_API WebServer webServer;
 #endif //WEBSERVER
 
 
