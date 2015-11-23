@@ -30,7 +30,9 @@
 
 #include <portability.h>
 #include <robot.h>
+#ifdef WEBSERVER
 #include <webserver.h>
+#endif //WEBSERVER
 
 #include "standardgame.h"
 

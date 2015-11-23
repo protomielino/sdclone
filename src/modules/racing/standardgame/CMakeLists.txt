@@ -18,7 +18,11 @@ SET(_OTHER_SOURCES )
 
 ADD_INTERFACE_INCLUDEDIR()
 
-ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfdata networking tgfclient)
+IF(OPTION_WEBSERVER)
+	ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfdata networking tgfclient)
+ELSE(OPTION_WEBSERVER)
+	ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfdata networking)
+ENDIF(OPTION_WEBSERVER)
 
 ADD_PLIB_INCLUDEDIR()
 

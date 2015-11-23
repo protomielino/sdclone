@@ -21,6 +21,7 @@
     @author     <a href=mailto:madbad82@gmail.com>MadBad</a>
     @version    $Id$
 */
+#ifdef WEBSERVER
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -904,5 +905,6 @@ int WebServer::sendRaceEnd (int race_id, int endposition){
 
 //initialize the web server
 WebServer webServer;
+#endif //WEBSERVER
 
 

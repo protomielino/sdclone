@@ -38,7 +38,9 @@
 #include <robot.h>
 #include <raceman.h>
 #include <replay.h>
+#ifdef WEBSERVER
 #include <webserver.h>
+#endif //WEBSERVER
 
 #include "standardgame.h"
 
@@ -372,7 +374,8 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 	if (replayRecord && pCurrReInfo->s->currentTime >= replayTimestamp) {
 		replaySituation(pCurrReInfo);
 	}
-	
+
+	#ifdef WEBSERVER
 	// webServer lap logger.
 	extern TGFCLIENT_API WebServer webServer;
 	//Find human cars
@@ -421,6 +424,8 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 		}
 	}
 	webServer.updateAsyncStatus();
+	#endif //WEBSERVER	
+
 }
 
 int ReSituationUpdater::threadLoop(void* pUpdater)

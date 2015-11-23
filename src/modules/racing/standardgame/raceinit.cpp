@@ -27,8 +27,10 @@
 #include <string>
 #include <sstream>
 #include <map>
+#ifdef WEBSERVER
 #include <ctime>
 #include <iostream>
+#endif //WEBSERVER
 
 #ifdef THIRD_PARTY_SQLITE3
 #include <sqlite3.h>
@@ -42,7 +44,9 @@
 
 #include <portability.h>
 #include <tgf.hpp>
+#ifdef WEBSERVER
 #include <webserver.h>
+#endif //WEBSERVER
 
 #include <racemanagers.h>
 #include <race.h>
@@ -58,7 +62,10 @@
 
 #include "raceinit.h"
 
+#ifdef WEBSERVER
 extern TGFCLIENT_API WebServer webServer;
+#endif //WEBSERVER
+
 
 static const char *aPszSkillLevelNames[] =
 	{ ROB_VAL_ARCADE, ROB_VAL_SEMI_ROOKIE, ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
@@ -958,7 +965,7 @@ ReInitCars(void)
     }
 #endif
   }
-
+	#ifdef WEBSERVER
 	// webServer lap logger.
 	//Find human cars
 	for (int i = 0; i < ReInfo->s->_ncars; i++) {
@@ -980,7 +987,7 @@ ReInitCars(void)
 
 		}
 	}
-
+	#endif //WEBSERVER
 
 
   ReInfo->_rePitRequester = 0;

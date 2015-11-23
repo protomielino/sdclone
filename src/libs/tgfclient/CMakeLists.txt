@@ -13,17 +13,31 @@ ADD_JPEG_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
 ADD_OPENAL_INCLUDEDIR()
 ADD_VORBIS_INCLUDEDIR()
-ADD_CURL_INCLUDEDIR()
+IF(OPTION_WEBSERVER)
+	ADD_CURL_INCLUDEDIR()
+ENDIF(OPTION_WEBSERVER)
 
-SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
-             guiimage.cpp guimenu.cpp guiscrollbar.cpp guitexture.cpp
-             tgfclient.cpp gui.cpp guiedit.cpp guihelp.cpp
-             guilabel.cpp guiobject.cpp guiscrollist.cpp 
-             guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
-             guiscreen.cpp guieventloop.cpp guiapplication.cpp 
-             musicplayer.cpp musicplayer.h 
-             glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h 
-             webserver.h webserver.cpp)
+IF(OPTION_WEBSERVER)
+	SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
+				 guiimage.cpp guimenu.cpp guiscrollbar.cpp guitexture.cpp
+				 tgfclient.cpp gui.cpp guiedit.cpp guihelp.cpp
+				 guilabel.cpp guiobject.cpp guiscrollist.cpp 
+				 guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
+				 guiscreen.cpp guieventloop.cpp guiapplication.cpp 
+				 musicplayer.cpp musicplayer.h 
+				 glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h 
+				 webserver.h webserver.cpp)
+ELSE(OPTION_WEBSERVER)
+	SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
+				 guiimage.cpp guimenu.cpp guiscrollbar.cpp guitexture.cpp
+				 tgfclient.cpp gui.cpp guiedit.cpp guihelp.cpp
+				 guilabel.cpp guiobject.cpp guiscrollist.cpp 
+				 guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
+				 guiscreen.cpp guieventloop.cpp guiapplication.cpp 
+				 musicplayer.cpp musicplayer.h 
+				 glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h)
+ENDIF(OPTION_WEBSERVER)
+
 SET(_OTHER_SOURCES guimenutest.xml)
 
 SET(_SOURCES ${_SOURCES} 
@@ -65,7 +79,9 @@ ADD_SDLIB_LIBRARY(tgfclient portability tgf networking)
 
 ADD_PNG_LIBRARY(tgfclient)
 ADD_JPEG_LIBRARY(tgfclient)
-ADD_CURL_LIBRARY(tgfclient)
+IF(OPTION_WEBSERVER)
+	ADD_CURL_LIBRARY(tgfclient)
+ENDIF(OPTION_WEBSERVER)
 
 IF(OPENGL_FOUND)
     TARGET_LINK_LIBRARIES(tgfclient ${OPENGL_LIBRARY})

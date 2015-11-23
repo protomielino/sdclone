@@ -81,6 +81,8 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     SET(OPTION_SDL2 true CACHE BOOL "Build with SDL2 instead of SDL 1.2")
     SET(OPTION_SDL_JOYSTICK true CACHE BOOL "Use SDL for Joystick instead of PLIB")
 
+    SET(OPTION_WEBSERVER false CACHE BOOL "Build with WebServer functionality")
+
     IF(APPLE)
       # Automatically set OPTION_USE_MACPORTS (at least until someone fixes the regular APPLE build)
       MESSAGE(STATUS "Automatically set OPTION_USE_MACPORTS (at least until someone fixes the regular APPLE build)")
@@ -191,6 +193,10 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     IF(OPTION_SDL_JOYSTICK)
           ADD_DEFINITIONS(-DSDL_JOYSTICK)
     ENDIF(OPTION_SDL_JOYSTICK)
+
+    IF(OPTION_WEBSERVER)
+          ADD_DEFINITIONS(-DWEBSERVER)
+    ENDIF(OPTION_WEBSERVER)
 
     IF(OPTION_USE_MACPORTS)
           ADD_DEFINITIONS(-DUSE_MACPORTS)

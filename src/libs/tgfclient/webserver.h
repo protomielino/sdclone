@@ -21,6 +21,7 @@
     @author     <a href=mailto:madbad82@gmail.com>MadBad</a>
     @version    $Id$
 */
+#ifdef WEBSERVER
 #include "tgfclient.h"
 #include <vector>
 #include <string>
@@ -124,5 +125,6 @@ class TGFCLIENT_API WebServer {
 		//destructor
 		~WebServer();	
 };
+#endif //WEBSERVER
 
 

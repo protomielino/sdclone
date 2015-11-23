@@ -58,7 +58,6 @@ extern tModList *ReRacingRobotsModList;
 struct RmInfo;
 extern struct RmInfo *ReInfo;
 
-
 #endif /* _RACEINIT_H_ */ 
 
 

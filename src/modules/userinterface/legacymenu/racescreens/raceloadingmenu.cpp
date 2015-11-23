@@ -115,8 +115,12 @@ RmLoadingScreenStart(const char *title, const char *bgimg)
     // Display screen.
     GfuiScreenActivate(HScreen);
     GfuiDisplay();
+
+	#ifdef WEBSERVER
     //force one redisplay
     GfuiApp().eventLoop().forceRedisplay(); 
+	#endif //WEBSERVER
+
 }
 
 void
@@ -176,7 +180,9 @@ RmLoadingScreenSetText(const char *text)
 	while (i != CurTextLineIdx);
 	
 	GfuiDisplay();
+	#ifdef WEBSERVER
     //force one redisplay
     GfuiApp().eventLoop().forceRedisplay(); 
+	#endif //WEBSERVER
 }
  
