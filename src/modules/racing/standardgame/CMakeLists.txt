@@ -18,9 +18,7 @@ SET(_OTHER_SOURCES )
 
 ADD_INTERFACE_INCLUDEDIR()
 
-ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfdata networking)
-
-ADD_CURL_INCLUDEDIR()
+ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfdata networking tgfclient)
 
 ADD_PLIB_INCLUDEDIR()
 
@@ -60,7 +58,5 @@ ADD_SDLIB_LIBRARY(standardgame portability tgf tgfdata robottools networking)
 IF(OPTION_3RDPARTY_SQLITE3)
     ADD_SQLITE3_LIBRARY(standardgame)
 ENDIF(OPTION_3RDPARTY_SQLITE3)
-
-ADD_CURL_LIBRARY(standardgame)
 
 SD_INSTALL_FILES(LIB modules/racing TARGETS standardgame)

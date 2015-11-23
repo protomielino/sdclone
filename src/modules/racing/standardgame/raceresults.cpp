@@ -30,6 +30,7 @@
 
 #include <portability.h>
 #include <robot.h>
+#include <webserver.h>
 
 #include "standardgame.h"
 
@@ -37,12 +38,6 @@
 #include "racestate.h"
 #include "raceresults.h"
 
-//webserver requirements
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <curl/curl.h>
-#include "raceinit.h"
 
 //TODO: is it still necessary?
 //static const char *aSessionTypeNames[3] = {"Practice", "Qualifications", "Race"};

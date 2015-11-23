@@ -38,6 +38,7 @@
 #include <robot.h>
 #include <raceman.h>
 #include <replay.h>
+#include <webserver.h>
 
 #include "standardgame.h"
 
@@ -48,19 +49,6 @@
 #include "racemessage.h"
 #include "racenetwork.h"
 
-//webserver requirements
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <curl/curl.h>
-#include "raceinit.h"
-
-//==/CURL
-//==ALTRO
-//double bestNetworkLapTime = 180;
-//int previousLaps[100]; /*harcoded max number of cars on track*/
-//==/ALTRO
-//madbad-end
 
 
 // The singleton.

@@ -13,7 +13,7 @@ ADD_JPEG_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
 ADD_OPENAL_INCLUDEDIR()
 ADD_VORBIS_INCLUDEDIR()
-
+ADD_CURL_INCLUDEDIR()
 
 SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
              guiimage.cpp guimenu.cpp guiscrollbar.cpp guitexture.cpp
@@ -22,7 +22,8 @@ SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
              guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
              guiscreen.cpp guieventloop.cpp guiapplication.cpp 
              musicplayer.cpp musicplayer.h 
-             glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h )
+             glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h 
+             webserver.h webserver.cpp)
 SET(_OTHER_SOURCES guimenutest.xml)
 
 SET(_SOURCES ${_SOURCES} 
@@ -64,6 +65,8 @@ ADD_SDLIB_LIBRARY(tgfclient portability tgf networking)
 
 ADD_PNG_LIBRARY(tgfclient)
 ADD_JPEG_LIBRARY(tgfclient)
+ADD_CURL_LIBRARY(tgfclient)
+
 IF(OPENGL_FOUND)
     TARGET_LINK_LIBRARIES(tgfclient ${OPENGL_LIBRARY})
 ENDIF(OPENGL_FOUND)
