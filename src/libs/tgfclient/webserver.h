@@ -24,7 +24,7 @@
 #include <vector>
 #include <string>
 #include <ctime>
-
+#include <curl/multi.h>
 class NotificationManager {
 
 	public:
@@ -72,6 +72,7 @@ class NotificationManager {
 class WebServer {
 
 	public:
+		void readConfiguration();	
 		int readUserConfig(int userId);
 
 		int sendGenericRequest (std::string data, std::string& serverReply);
@@ -97,7 +98,7 @@ class WebServer {
 		int addAsyncRequest(std::string const data);
 		
 		//curl
-		//CURLM multi_handle; 
+		CURLM* multi_handle;
 		int handle_count;
 		std::string curlServerReply;
 	

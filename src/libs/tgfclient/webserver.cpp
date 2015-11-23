@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sstream>
-#include <curl/multi.h>
 #include <playerpref.h>
 #include <tgf.h>
 #include "tgfclient.h"
@@ -360,39 +359,23 @@ void NotificationManager::updateWebserverStatusUi(){
 //initialize the notification manager
 NotificationManager notifications;
 
-CURLM* multi_handle; 
-
-/* START webserver*/
 WebServer::WebServer(){
 
-	void *configHandle;
-	char configFileUrl[256];
-	
 	//initialize some curl var
-	multi_handle = curl_multi_init();
+	this->multi_handle = curl_multi_init();
 	this->handle_count = 0;
 
-	//get the preferencies file location
-	sprintf(configFileUrl, "%s%s", GfLocalDir(), "config/webserver.xml");
-/*
-	//read the preferencies file
-	configHandle = GfParmReadFile(configFileUrl, GFPARM_RMODE_REREAD);
+	this->readConfiguration();
 
-	//get webServer url from the config
-	this->url = GfParmGetStr(configHandle, "WebServer Settings", "url","val");
-
-	GfLogInfo("WebServer - webserver url is: %s\n", this->url);
-*/
-	this->url ="http://www.madbad.altervista.org/speed-dreams/webserver.php";
 }
 WebServer::~WebServer(){
 	//cleanup curl
-	curl_multi_cleanup(multi_handle);
+	curl_multi_cleanup(this->multi_handle);
 }
 int WebServer::updateAsyncStatus(){
 
 	//perform the pending requests
-	curl_multi_perform(multi_handle, &this->handle_count);
+	curl_multi_perform(this->multi_handle, &this->handle_count);
 
 	if( this->handle_count>0){
 		GfLogInfo("############################# ASYNC WAITING UPDATES: %i\n", this->handle_count);
@@ -408,7 +391,7 @@ int WebServer::updateAsyncStatus(){
 	int http_status_code;
 	const char *szUrl;
 	
-	while ((msg = curl_multi_info_read(multi_handle, &this->handle_count))) {
+	while ((msg = curl_multi_info_read(this->multi_handle, &this->handle_count))) {
 		if (msg->msg == CURLMSG_DONE) {
 			eh = msg->easy_handle;
 
@@ -475,7 +458,7 @@ int WebServer::updateAsyncStatus(){
 			} else {
 				fprintf(stderr, "GET of %s returned http status code %d\n", szUrl, http_status_code);
 			}
-			curl_multi_remove_handle(multi_handle, eh);
+			curl_multi_remove_handle(this->multi_handle, eh);
 			curl_easy_cleanup(eh);
 			/* then cleanup the formpost chain */ 
 			//curl_formfree(formpost);
@@ -524,7 +507,7 @@ int WebServer::addAsyncRequest(std::string const data){
 	}
 	
 	//add the request to the queque
-	curl_multi_add_handle(multi_handle, curl);
+	curl_multi_add_handle(this->multi_handle, curl);
 
 	//pending request
 	webserverState=WEBSERVER_SENDING;
@@ -602,6 +585,25 @@ int WebServer::sendGenericRequest (std::string data, std::string& serverReply){
 	return 0;
 }
 
+void WebServer::readConfiguration (){
+
+	void *configHandle;
+	char configFileUrl[256];
+/*	
+	//get the preferencies file location
+	sprintf(configFileUrl, "%s%s", GfLocalDir(), "config/webserver.xml");
+
+	//read the preferencies file
+	configHandle = GfParmReadFile(configFileUrl, GFPARM_RMODE_REREAD);
+	
+	//get webServer url from the config
+	this->url = GfParmGetStr(configHandle, "WebServer Settings", "url","val");
+*/
+	this->url ="http://www.madbad.altervista.org/speed-dreams/webserver.php";
+
+	//GfLogInfo("WebServer - webserver url is: %s\n", this->url);
+}
+
 int WebServer::readUserConfig (int userId){
 	void *prHandle;
 	char prefFileUrl[256];
@@ -624,6 +626,7 @@ int WebServer::readUserConfig (int userId){
 
 	return 0;
 }
+
 int WebServer::sendLogin (int userId){
 	std::string serverReply;
 
