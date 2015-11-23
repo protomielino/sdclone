@@ -56,8 +56,11 @@ SD_ADD_LIBRARY(standardgame MODULE ${_SOURCES} ${_HEADERS} ${_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(standardgame PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
-
-ADD_SDLIB_LIBRARY(standardgame portability tgf tgfdata robottools networking)
+IF(OPTION_WEBSERVER)
+	ADD_SDLIB_LIBRARY(standardgame portability tgf tgfdata robottools networking tgfclient)
+ELSE(OPTION_WEBSERVER)
+	ADD_SDLIB_LIBRARY(standardgame portability tgf tgfdata robottools networking)
+ENDIF(OPTION_WEBSERVER)
 
 IF(OPTION_3RDPARTY_SQLITE3)
     ADD_SQLITE3_LIBRARY(standardgame)
