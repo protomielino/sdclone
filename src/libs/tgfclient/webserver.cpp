@@ -674,8 +674,8 @@ void WebServer::readConfiguration (){
 	this->url = GfParmGetStr(configHandle, "WebServer Settings", "url","val");
 */
 
-//	this->url ="http://www.madbad.altervista.org/speed-dreams/webserver.php";
-	this->url ="http://localhost/speed-dreams/webserver.php";
+	this->url ="http://www.madbad.altervista.org/speed-dreams/webserver.php";
+//	this->url ="http://localhost/speed-dreams/webserver.php";
 
 	//GfLogInfo("WebServer - webserver url is: %s\n", this->url);
 }
