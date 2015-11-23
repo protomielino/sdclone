@@ -21,8 +21,15 @@
     @author     <a href=mailto:madbad82@gmail.com>MadBad</a>
     @version    $Id$
 */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sstream>
+#include <curl/multi.h>
+#include <playerpref.h>
+#include <tgf.h>
+#include "tgfclient.h"
 #include "webserver.h"
-
 
 //string splitting utils
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
@@ -39,6 +46,7 @@ std::vector<std::string> split(const std::string &s, char delim) {
     split(s, delim, elems);
     return elems;
 }
+
 //to string (from c++11)
 template <typename T>
 std::string to_string(T value)
@@ -48,52 +56,12 @@ std::string to_string(T value)
 	return os.str() ;
 }
 
-
-// WEBSERVER class and utilus
-struct MemoryStruct {
-	char *memory;
-	size_t size;
-};
- /*
-static size_t
-WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
-{
-	size_t realsize = size * nmemb;
-	struct MemoryStruct *mem = (struct MemoryStruct *)userp;
-	
-	mem->memory =(char*)realloc(mem->memory, mem->size + realsize + 1);
-	if(mem->memory == NULL) {
-		// out of memory!  
-		printf("not enough memory (realloc returned NULL)\n");
-		return 0;
-	}
-	
-	memcpy(&(mem->memory[mem->size]), contents, realsize);
-	mem->size += realsize;
-	mem->memory[mem->size] = 0;
-	
-	return realsize;
-}
-*/
 static size_t WriteStringCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
     ((std::string*)userp)->append((char*)contents, size * nmemb);
     return size * nmemb;
 }
 
-
- 
-//webserver requirements
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sstream>
-//#include <curl/curl.h>
-#include <curl/multi.h>
-#include <playerpref.h>
-
-//webserver utility
-//replace
 void replaceAll(std::string& str, const std::string& from, const std::string& to) {
     if(from.empty())
         return;
@@ -103,8 +71,6 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
         start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
     }
 }
-
-
 
 const int WEBSERVER_IDLE = 0;
 const int WEBSERVER_SENDING = 1;
@@ -391,15 +357,10 @@ void NotificationManager::updateWebserverStatusUi(){
 	}
 
 }
-
+//initialize the notification manager
 NotificationManager notifications;
 
-
-
-
 CURLM* multi_handle; 
-//extern std::vector<std::string> msglist;
-extern int webserverState;
 
 /* START webserver*/
 WebServer::WebServer(){
@@ -436,9 +397,9 @@ int WebServer::updateAsyncStatus(){
 	if( this->handle_count>0){
 		GfLogInfo("############################# ASYNC WAITING UPDATES: %i\n", this->handle_count);
 		//display some UI to the user to inform him we are waiting a reply from the server
-webserverState=2;
+		webserverState=WEBSERVER_RECEIVING;
 	}else{
-webserverState=0;
+		webserverState=WEBSERVER_IDLE;
 	}
 	
 	CURLMsg *msg;
@@ -456,7 +417,7 @@ webserverState=0;
 				fprintf(stderr, "CURL error code: %d\n", msg->data.result);
 				
 				//something went wrong. anyway we are no more busy
-				webserverState=0;
+				webserverState=WEBSERVER_IDLE;
 
 				continue;
 			}
@@ -533,8 +494,7 @@ int WebServer::addAsyncRequest(std::string const data){
 	CURL* curl = NULL;
 	struct curl_httppost *formpost=NULL;
 	struct curl_httppost *lastptr=NULL;
-	//struct MemoryStruct chunk;
-	//
+
 	curl = curl_easy_init();
 	if(curl) {
 		
@@ -567,8 +527,8 @@ int WebServer::addAsyncRequest(std::string const data){
 	curl_multi_add_handle(multi_handle, curl);
 
 	//pending request
-	//webserverBusy=true;
-webserverState=1;
+	webserverState=WEBSERVER_SENDING;
+	
 	return 0;	
 }
 
@@ -577,7 +537,9 @@ int WebServer::sendGenericRequest (std::string data, std::string& serverReply){
 	CURLcode res;
 
 	GfLogInfo("WebServer - SENDING data to server:\n %s \n", data.c_str()); 
-webserverState=1;
+
+	webserverState=WEBSERVER_SENDING;
+
 	//insert "data=" before the actual data
 	data.insert(0,"data=");
 	const char *postthis=data.c_str();
@@ -622,8 +584,11 @@ webserverState=1;
 			// 
 
 			GfLogInfo("WebServer - RECEIVING data from server:\n %s\n", this->curlServerReply.c_str());
-webserverState=2;
+			
+			webserverState=WEBSERVER_RECEIVING;
+
 			serverReply = this->curlServerReply;
+
 			//empty the string
 			this->curlServerReply.clear();			
 		}
@@ -839,10 +804,8 @@ int WebServer::sendRaceEnd (int race_id, int endposition){
 
 	return 0;
 }
+
 //initialize the web server
 WebServer webServer;
-
-/* END webserver*/ 
-
 
 

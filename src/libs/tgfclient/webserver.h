@@ -23,10 +23,7 @@
 */
 #include <vector>
 #include <string>
-#include <sstream>
 #include <ctime>
-#include <tgf.h>
-#include "tgfclient.h"
 
 class NotificationManager {
 
@@ -69,8 +66,6 @@ class NotificationManager {
 		int propertyChangeNeeded;
 		
 };
-
-
 
 
 
