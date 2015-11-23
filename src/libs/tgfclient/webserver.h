@@ -38,7 +38,9 @@ class NotificationManager {
 
 	public:
 		//a list of notification messages
-		std::vector<std::string> msglist;	
+		std::vector<std::string> msglist;
+
+		std::clock_t animationLastExecTime; //the current time
 	
 		//constructor
 		NotificationManager();
@@ -66,7 +68,7 @@ class NotificationManager {
 		int textPadding;
 		std::clock_t animationStartTime; //when the animation started
 		std::clock_t animationRestStartTime; //when the animation started
-		std::clock_t animationLastExecTime; //the current time
+
 		float totalAnimationDuration;//how much the animation should take to fully run in one direction
 		float animationRestTime; //how much wes should wait when we a re fully displayed
 		int animationDirection;
