@@ -83,7 +83,7 @@ WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 	
 	return realsize;
 }
-* */
+*/
 static size_t WriteStringCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
     ((std::string*)userp)->append((char*)contents, size * nmemb);
@@ -136,6 +136,7 @@ class WebServer {
  * elt->_carHandle
  * line 671
  * */
+
 
 #endif /* _RACEINIT_H_ */ 
 
