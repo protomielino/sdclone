@@ -708,7 +708,8 @@ int WebServer::sendLogin (int userId){
 
 	//read username and password and save it in as webserver properties 
 	this->readUserConfig(userId);
-	
+	this->sendLogin(this->username, this->password);
+/*	
 	std::string username="username";
 	std::string password="password";
 	
@@ -734,6 +735,30 @@ int WebServer::sendLogin (int userId){
 	//replace the {{tags}} with the respecting values
 	replaceAll(dataToSend, "{{username}}", this->username);
 	replaceAll(dataToSend, "{{password}}", this->password);
+
+	this->addOrderedAsyncRequest(dataToSend);
+*/
+	return 0;
+}
+int WebServer::sendLogin (const char* username, const char* password){
+	std::string serverReply;
+
+	//prepare the string to send
+	std::string dataToSend ("");
+	dataToSend.append(	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+						"<content>"
+						"<request_id>{{request_id}}</request_id>"
+						"<request>"			
+						"<login>"
+						"<username>{{username}}</username>"
+						"<password>{{password}}</password>"
+						"</login>"
+						"</request>"
+						"</content>");
+						
+	//replace the {{tags}} with the respecting values
+	replaceAll(dataToSend, "{{username}}", username);
+	replaceAll(dataToSend, "{{password}}", password);
 
 	this->addOrderedAsyncRequest(dataToSend);
 

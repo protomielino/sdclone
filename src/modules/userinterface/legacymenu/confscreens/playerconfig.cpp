@@ -29,6 +29,7 @@
 #include <playerpref.h>
 #include <graphic.h>
 #include <gui.h>
+#include <webserver.h>
 
 #include <drivers.h>
 
@@ -431,9 +432,7 @@ PutPlayerSettings(unsigned index)
     GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_TRANS, player->gearChangeModeString());
     GfParmSetNum(PrefHdle, drvSectionPath, HM_ATT_NBPITS, (char*)NULL, (tdble)player->nbPitStops());
     GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_AUTOREVERSE, Yn[player->autoReverse()]);
-GfLogInfo("##########Saving Username: %s\n", player->webserverusername());
     GfParmSetStr(PrefHdle, drvSectionPath, "WebServerUsername", player->webserverusername());
-GfLogInfo("##########Saving Username: %s\n", player->webserverpassword());
     GfParmSetStr(PrefHdle, drvSectionPath, "WebServerPassword", player->webserverpassword());
     
     
@@ -627,8 +626,6 @@ GenPlayerList(void)
     const char *str;
     int racenumber;
     float color[4];
-    const char *webserverusername;
-    const char *webserverpassword;
     
     /* Reset players list */
     tPlayerInfoList::iterator playerIter;
@@ -707,10 +704,9 @@ GenPlayerList(void)
 
 		str = GfParmGetStr(PrefHdle, sstring, "WebServerUsername", 0);
 		PlayersInfo[i]->setWebserverusername(str);
-GfLogInfo("##########Loaded Username: %s\n", str);
+
 		str = GfParmGetStr(PrefHdle, sstring, "WebServerPassword", 0);
 		PlayersInfo[i]->setWebserverpassword(str);
-GfLogInfo("##########Loaded Pasword: %s\n", str);
 
     }
 
@@ -803,7 +799,7 @@ onChangeWebserverusername(void * /* dummy */)
 
     if (CurrPlayer != PlayersInfo.end()) {
         val = GfuiEditboxGetString(ScrHandle, WebUsernameEditId);
-GfLogInfo("##########Changed Username: %s\n", val);
+
         // Remove leading spaces (#587)
         std::string strIn(val);
         size_t startpos = strIn.find_first_not_of(" \t"); // Find the first character position after excluding leading blank spaces
@@ -842,6 +838,22 @@ onChangeWebserverpassword(void * /* dummy */)
 
     UpdtScrollList();
 }
+
+static void onWebserverLoginTest(void * /* dummy */)
+{
+	if (CurrPlayer != PlayersInfo.end()) {
+
+		std::string username = (*CurrPlayer)->webserverusername();
+		std::string password = (*CurrPlayer)->webserverpassword();
+		
+		extern TGFCLIENT_API WebServer webServer;
+		webServer.sendLogin(username.c_str(),password.c_str());
+
+		//request a redisplay
+	    GfuiApp().eventLoop().postRedisplay();
+	}
+}
+
 //#641 New player name should get empty when clicking on it
 // In the Player Configuration menu, when you create
 // a new player, his name is set to "-- Enter name --",
@@ -1047,6 +1059,10 @@ PlayerConfigMenuInit(void *prevMenu)
     /* Web username and password editbox */
     WebUsernameEditId = GfuiMenuCreateEditControl(ScrHandle, param, "webusernameedit", NULL, NULL, onChangeWebserverusername);
     WebPasswordEditId = GfuiMenuCreateEditControl(ScrHandle, param, "webpasswordedit", NULL, NULL, onChangeWebserverpassword);
+
+    /* Web test button */
+    GfuiMenuCreateButtonControl(ScrHandle, param, "weblogintest", NULL, onWebserverLoginTest);
+
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(param);

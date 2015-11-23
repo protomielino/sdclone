@@ -23,6 +23,9 @@
 #include "webserver.h"
 
 extern NotificationManager notifications;
+extern TGFCLIENT_API WebServer webServer;
+
+
 
 // Private data (pimp pattern) =============================================
 class GfuiEventLoop::Private
@@ -298,6 +301,7 @@ void GfuiEventLoop::postRedisplay(void)
 
 void GfuiEventLoop::forceRedisplay()
 {
+	webServer.updateAsyncStatus();
 	notifications.updateStatus();
 	
 	if (_pPrivate->cbDisplay)
