@@ -189,8 +189,8 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	_FIND_3RDPARTY_DEPENDENCY(JPEG jpeglib.h "" "jpeg_s;jpeg;jpeg-8;jpeg-9" ${ROOT_DIR} "")
 	
 	# CURL.
-	_FIND_3RDPARTY_DEPENDENCY(CURL curl/curl.h "" libcurl ${ROOT_DIR} "")
-	
+	_FIND_3RDPARTY_DEPENDENCY(CURL curl/curl.h "" "libcurl;libcurl_imp" ${ROOT_DIR} "")	
+
 	# ZLib.
 	_FIND_3RDPARTY_DEPENDENCY(ZLIB zlib.h "" "z;zlib;zlib1" ${ROOT_DIR} "D")
 	
