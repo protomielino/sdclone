@@ -114,7 +114,7 @@ void NotificationManager::updateStatus(){
 	}
 	
 	//update webserver status icon
-//	this->updateWebserverStatusUi();
+	this->updateWebserverStatusUi();
 	
 	//remember the current screen for the next run
 	this->prevScreenHandle = this->screenHandle;
@@ -337,14 +337,14 @@ void NotificationManager::createUi(){
 	GfParmSetNum(this->menuXMLDescHdle, "dynamic controls/slide", "y", "null", ypos);
 }
 void NotificationManager::updateWebserverStatusUi(){
-	
+/*	//todo: this was causing some random crash
 	//if there is some prev ui around hide it
 	if(this->notifyUiIdBusyIcon > 0){
 		
 		GfuiVisibilitySet(this->prevScreenHandle, this->notifyUiIdBusyIcon, GFUI_INVISIBLE);
 
 	}	
-	
+*/	
 	if(this->screenHandle > 0){
 		//if webserver is busy display busy icon
 		std::string webServerIcon = "busyicon";
