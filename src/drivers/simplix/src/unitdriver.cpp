@@ -79,7 +79,7 @@
 #include "unitstrategy.h"
 #include "unittrack.h"
 
-#define EXPORT_RACINGLINE
+//#define EXPORT_RACINGLINE
 
 //==========================================================================*
 // Statics
@@ -1559,6 +1559,7 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
   oCarHandle = CarCarHandle;                     // data of car, car param
   oSituation = Situation;                        // file and situation
   oLastGear = CarGearNbr - 1;                    // Save index of last gear
+  LogSimplix.info("\n\n#>>> CarGearNbr: %d\n\n\n",CarGearNbr);
   // 
   OwnCarOppIndex();                              // Find own opponent index
 
@@ -1652,7 +1653,7 @@ void TDriver::Drive()
 
   GetPosInfo(Pos,oLanePoint);                    // Info about pts on track
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
-  double InitialTS = oTargetSpeed;
+//  double InitialTS = oTargetSpeed;
   if (!oCarHasTCL)
     oTargetSpeed = FilterStart(oTargetSpeed);    // Filter Start
   //fprintf(stderr,"oTargetSpeed %.2f km/h\n",oTargetSpeed*3.6),
