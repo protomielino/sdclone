@@ -374,12 +374,16 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 	}
 	
 	// webServer lap logger.
-	extern WebServer webServer;
+	extern TGFCLIENT_API WebServer webServer;
 	//Find human cars
 	for (int i = 0; i < pCurrReInfo->s->_ncars; i++) {
 		if(pCurrReInfo->s->cars[i]->_driverType == RM_DRV_HUMAN){
-			//if at least a lap has been done and a lap is passed then log it to the webServer
-			if(pCurrReInfo->s->cars[i]->_laps > 1 && pCurrReInfo->s->cars[i]->_laps > webServer.previousLaps){
+			//if: 
+			//- at least a lap has been done 
+			//- a lap is passed 
+			//- we have not done the final lap
+			// then log it to the webServer
+			if(pCurrReInfo->s->cars[i]->_laps > 1 && pCurrReInfo->s->cars[i]->_laps > webServer.previousLaps && webServer.raceEndSent==false){
 				
 				//remember the current number of laps for next cicle
 				webServer.previousLaps = pCurrReInfo->s->cars[i]->_laps;
@@ -403,6 +407,15 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 					//pCurrReInfo->s->_raceType,			//type of race: 0 practice/ 1 qualify/ 2 race
 					//pCurrReInfo->s->cars[i]->_carName,	//car name
 					//pCurrReInfo->s->cars[i]->_category,	//car category
+				);
+			}
+			
+			//if we have already done the last lap but we have not yet sent the raceEnd comunication to the webserver: do it!
+			if(pCurrReInfo->s->cars[i]->_remainingLaps < 0 && webServer.raceEndSent == false){
+				//send race data
+				webServer.sendRaceEnd (
+					webServer.raceId,
+					ReInfo->s->cars[i]->_pos				//car end position,
 				);
 			}
 		}

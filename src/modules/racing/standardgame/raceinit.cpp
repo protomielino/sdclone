@@ -58,7 +58,7 @@
 
 #include "raceinit.h"
 
-extern WebServer webServer;
+extern TGFCLIENT_API WebServer webServer;
 
 static const char *aPszSkillLevelNames[] =
 	{ ROB_VAL_ARCADE, ROB_VAL_SEMI_ROOKIE, ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
@@ -966,7 +966,7 @@ ReInitCars(void)
 			
 			//login
 			webServer.sendLogin(ReInfo->s->cars[i]->_driverIndex);
-			
+
 			//send race data
 			webServer.sendRaceStart (
 				ReInfo->s->cars[i]->_skillLevel,	//user_skill,
@@ -977,6 +977,7 @@ ReInitCars(void)
 				ReInfo->s->cars[i]->_pos,			//car starting position,
 				VERSION_LONG 						//speed dreams version
 			);
+
 		}
 	}
 

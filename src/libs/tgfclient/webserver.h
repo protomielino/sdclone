@@ -21,10 +21,18 @@
     @author     <a href=mailto:madbad82@gmail.com>MadBad</a>
     @version    $Id$
 */
+#include "tgfclient.h"
 #include <vector>
 #include <string>
 #include <ctime>
 #include <curl/multi.h>
+
+struct webRequest_t {
+  int id;
+  std::string data;
+};
+
+
 class NotificationManager {
 
 	public:
@@ -69,33 +77,40 @@ class NotificationManager {
 
 
 
-class WebServer {
+class TGFCLIENT_API WebServer {
 
 	public:
-		void readConfiguration();	
-		int readUserConfig(int userId);
-
-		int sendGenericRequest (std::string data, std::string& serverReply);
-		int sendLogin (int userId);
-		int sendLap (int race_id, double laptime, double fuel, int position, int wettness);
-		int sendRaceStart (int user_skill, const char *track_id, char *car_id, int type, void *setup, int startposition, const char *sdversion);
-		int sendRaceEnd (int race_id, int endposition);
-
-		int raceId;
-		
-		//user info
-		int userId;
+		//local data
+		bool raceEndSent;
 		int previousLaps;
 		const char* username;
 		const char* password;
+		const char* url;
+
+		//dynamic data retrieved with some request to the webserver
+		int raceId;
+		int userId;
 		const char* sessionId;
 		
-		//config
-		const char* url;
+		//configuration readers
+		void readConfiguration();	
+		int readUserConfig(int userId);
 		
+		//sync request
+		int sendGenericRequest (std::string data, std::string& serverReply);
+
 		//async requests
 		int updateAsyncStatus();
 		int addAsyncRequest(std::string const data);
+		int addOrderedAsyncRequest(std::string const data);
+		int pendingAsyncRequestId;
+		std::vector<webRequest_t> orderedAsyncRequestQueque;	
+
+		//specific requests
+		int sendLogin (int userId);
+		int sendRaceStart (int user_skill, const char *track_id, char *car_id, int type, void *setup, int startposition, const char *sdversion);
+		int sendRaceEnd (int race_id, int endposition);
+		int sendLap (int race_id, double laptime, double fuel, int position, int wettness);
 		
 		//curl
 		CURLM* multi_handle;

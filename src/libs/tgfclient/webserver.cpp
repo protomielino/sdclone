@@ -70,11 +70,20 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
         start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
     }
 }
+//unique id generator
+int uniqueId=1;
+int getUniqueId(){
+	return uniqueId++;
+}
+
+//
 
 const int WEBSERVER_IDLE = 0;
 const int WEBSERVER_SENDING = 1;
 const int WEBSERVER_RECEIVING = 2;
 int webserverState = WEBSERVER_IDLE;
+
+
 
 
 NotificationManager::NotificationManager(){
@@ -294,7 +303,7 @@ void NotificationManager::removeOldUi(){
 		}
 		
 		//iterate trougth ui and set them invisible
-		for (int i; i < notifyUiId.size(); i++) {
+		for (int i = 0; i < notifyUiId.size(); i++) {
 
 			GfuiVisibilitySet(this->prevScreenHandle, this->notifyUiId[i], GFUI_INVISIBLE);
 
@@ -318,7 +327,7 @@ void NotificationManager::createUi(){
 	int yposmod= ypos;
 
 	//iterate trougth lines
-	for (int i; i < this->messageLines.size(); i++) {
+	for (int i = 0; i < this->messageLines.size(); i++) {
 
 		int uiId;
 		uiId= GfuiMenuCreateLabelControl(this->screenHandle, this->menuXMLDescHdle, "slide");
@@ -359,26 +368,55 @@ void NotificationManager::updateWebserverStatusUi(){
 //initialize the notification manager
 NotificationManager notifications;
 
+
+
+
+
+
 WebServer::WebServer(){
+	
+	//set some default
+	this->raceId = -1;
+	this->userId = -1;
+	this->previousLaps = -1;
+	this->raceEndSent = false;
 
 	//initialize some curl var
 	this->multi_handle = curl_multi_init();
 	this->handle_count = 0;
 
+	//initialize the configuration
 	this->readConfiguration();
 
 }
 WebServer::~WebServer(){
+	
 	//cleanup curl
 	curl_multi_cleanup(this->multi_handle);
+	
 }
 int WebServer::updateAsyncStatus(){
+	
+	//if we have some ordered async request pending
+	if( this->pendingAsyncRequestId == 0 && !this->orderedAsyncRequestQueque.empty() ){
+		webRequest_t nextRequest;
+		nextRequest = this->orderedAsyncRequestQueque.front();
+
+		//replace the {{tags}} with actual data received from previous requests replies
+		replaceAll(nextRequest.data, "{{race_id}}", to_string(this->raceId));
+		replaceAll(nextRequest.data, "{{user_id}}", to_string(this->userId));	
+		
+		GfLogInfo("WebServer: Adding AsyncRequest from orderedAsyncRequestQueque with id: %i\n", nextRequest.id);
+		this->pendingAsyncRequestId = nextRequest.id;
+		this->addAsyncRequest(nextRequest.data);
+	}
+	
 
 	//perform the pending requests
 	curl_multi_perform(this->multi_handle, &this->handle_count);
 
-	if( this->handle_count>0){
-		GfLogInfo("############################# ASYNC WAITING UPDATES: %i\n", this->handle_count);
+	if( this->handle_count > 0){
+		GfLogInfo("WebServer: Number of async request waiting for a reply from the server: %i\n", this->handle_count);
 		//display some UI to the user to inform him we are waiting a reply from the server
 		webserverState=WEBSERVER_RECEIVING;
 	}else{
@@ -410,24 +448,33 @@ int WebServer::updateAsyncStatus(){
 			szUrl = NULL;
 
 			curl_easy_getinfo(eh, CURLINFO_RESPONSE_CODE, &http_status_code);
-			//curl_easy_getinfo(eh, CURLINFO_PRIVATE, &szUrl);
+
 			curl_easy_getinfo(eh, CURLINFO_EFFECTIVE_URL, &szUrl);
 
 			//the server replyed
 			if(http_status_code==200) {
-				printf("200 OK for %s\n", szUrl);
+				GfLogInfo("WebServer: successfull reply from the server from url: %s\n", szUrl);
 
-				GfLogInfo("############################# ASYNC SERVER REPLY:\n%s\n", this->curlServerReply.c_str());
+				GfLogInfo("WebServer: The reply from the server is:\n%s\n", this->curlServerReply.c_str());
 				//manage server replyes...
 				
 				//read the xml reply of the server
 				void *xmlReply;
 				xmlReply = GfParmReadBuf(const_cast<char*>(this->curlServerReply.c_str()));
 
+				if(GfParmExistsSection(xmlReply, "content")){
+					int requestId = GfParmGetNum(xmlReply, "content", "request_id", "null",0);
+					if( requestId == this->pendingAsyncRequestId ){
+						//reset the pending request id
+						this->pendingAsyncRequestId=0;
+						// remove this request from the queque... so we can continue with the next
+						GfLogInfo("WebServer: Removing successfull AsyncRequest from the orderedAsyncRequestQueque with id: %i\n", this->orderedAsyncRequestQueque.front().id);		
+						this->orderedAsyncRequestQueque.erase (this->orderedAsyncRequestQueque.begin());
+					}
+				}
+
+
 				//the server want we display something?
-				//todo: if more than one messagge only the last one is show to the user...
-//GfParmListSeekFirst
-//GfParmListSeekNext
 				if(GfParmExistsSection(xmlReply, "content/reply/messages")){
 					int msgsCount = GfParmGetNum(xmlReply, "content/reply/messages", "number", "null",0);
 					if( msgsCount > 0 ){
@@ -435,9 +482,8 @@ int WebServer::updateAsyncStatus(){
 						   {
 							std::string msgTag = "message";
 							msgTag.append(to_string(dispatchedMsgs));
-							GfLogInfo("n\%s\n", msgTag.c_str());
+							GfLogInfo("WebServer: Adding messagge to be displayed to the NotificationQueque:\n%s\n", msgTag.c_str());
 							
-							//ReSituation::self().setRaceMessage(GfParmGetStr(xmlReply, "content/reply/messages", msgTag.c_str(), "null"),5, false);
 							notifications.msglist.push_back(GfParmGetStr(xmlReply, "content/reply/messages", msgTag.c_str(), "null"));
 						   }
 					}
@@ -448,10 +494,25 @@ int WebServer::updateAsyncStatus(){
 				if(GfParmExistsSection(xmlReply, "content/reply/races")){
 					if(GfParmGetNum(xmlReply, "content/reply/races", "id", "null", 0) != 0){
 						this->raceId = (int)GfParmGetNum(xmlReply, "content/reply/races", "id", "null", 0);
-						GfLogInfo("WebServer - assigned race id is: %i\n", this->raceId);
-						notifications.msglist.push_back("Webserver assigned a raceid");
+						GfLogInfo("WebServer: Assigned raceId by the server is: %i\n", this->raceId);
 					}
 				}
+						
+				//login reply
+				//store the webServer assigned race id				
+				if(GfParmExistsSection(xmlReply, "content/reply/login")){
+					if(GfParmGetNum(xmlReply, "content/reply/login", "id", "null",0) != 0){
+						//store the webServer session and id assigned
+						this->sessionId = GfParmGetStr(xmlReply, "content/reply/login", "sessionid", "null");
+						this->userId = GfParmGetNum(xmlReply, "content/reply/login", "id", "null",0);
+						GfLogInfo("WebServer: Successfull Login as userId: %i\n", this->userId);
+					}else{
+						GfLogInfo("WebServer: Login Failed: Wrong username or password.\n");
+						notifications.msglist.push_back("WebServer: Login Failed: Wrong username or password.");
+						return 1;				
+					}
+					GfLogInfo("WebServer: Assigned session id is: %s\n", this->sessionId);
+				}				
 
 				//empty the string
 				this->curlServerReply.clear();
@@ -472,7 +533,7 @@ int WebServer::updateAsyncStatus(){
 }
 
 int WebServer::addAsyncRequest(std::string const data){
-	GfLogInfo("############################# ADD ASYNC REQUEST:\n %s \n", data.c_str());
+	GfLogInfo("WebServer: Performing ASYNC request:\n%s\n", data.c_str());
 
 	CURL* curl = NULL;
 	struct curl_httppost *formpost=NULL;
@@ -481,8 +542,8 @@ int WebServer::addAsyncRequest(std::string const data){
 	curl = curl_easy_init();
 	if(curl) {
 		
+		//set url to be called
 		curl_easy_setopt(curl, CURLOPT_URL, this->url);
-		//curl_easy_setopt(curl, CURLOPT_URL, testurl);
 		
 		// send all data to this function
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteStringCallback);
@@ -514,12 +575,24 @@ int WebServer::addAsyncRequest(std::string const data){
 	
 	return 0;	
 }
+int WebServer::addOrderedAsyncRequest(std::string data){
+	//prepare the request object
+	webRequest_t request;
+	
+	request.id = getUniqueId();
+	request.data = data;
+	
+	replaceAll(request.data, "{{request_id}}", to_string(request.id));
+
+	this->orderedAsyncRequestQueque.push_back(request);
+	return 0;	
+}
 
 int WebServer::sendGenericRequest (std::string data, std::string& serverReply){
 	CURL *curl;
 	CURLcode res;
 
-	GfLogInfo("WebServer - SENDING data to server:\n %s \n", data.c_str()); 
+	GfLogInfo("WebServer: Performing SYNC request:\n%s\n", data.c_str()); 
 
 	webserverState=WEBSERVER_SENDING;
 
@@ -554,7 +627,8 @@ int WebServer::sendGenericRequest (std::string data, std::string& serverReply){
 
 		// Check for errors 
 		if(res != CURLE_OK) {
-			notifications.msglist.push_back("WebServer: failed to connect!");
+			notifications.msglist.push_back("Failed to connect to the WebServer!");
+			GfLogInfo("WebServer: Unable to perform SYNC request some error occured:\n", data.c_str()); 
 			fprintf(stderr, "curl_easy_perform() failed: %s\n",
 					curl_easy_strerror(res));
 		}
@@ -566,7 +640,7 @@ int WebServer::sendGenericRequest (std::string data, std::string& serverReply){
 			// Do something nice with it!
 			// 
 
-			GfLogInfo("WebServer - RECEIVING data from server:\n %s\n", this->curlServerReply.c_str());
+			GfLogInfo("WebServer: Receiving data from the WebServer:\n%s\n", this->curlServerReply.c_str());
 			
 			webserverState=WEBSERVER_RECEIVING;
 
@@ -599,7 +673,9 @@ void WebServer::readConfiguration (){
 	//get webServer url from the config
 	this->url = GfParmGetStr(configHandle, "WebServer Settings", "url","val");
 */
-	this->url ="http://www.madbad.altervista.org/speed-dreams/webserver.php";
+
+//	this->url ="http://www.madbad.altervista.org/speed-dreams/webserver.php";
+	this->url ="http://localhost/speed-dreams/webserver.php";
 
 	//GfLogInfo("WebServer - webserver url is: %s\n", this->url);
 }
@@ -638,7 +714,7 @@ int WebServer::sendLogin (int userId){
 	
 	//if the user has not setup the webserver login info abort the login
 	if(username==this->username && password==this->password){
-		GfLogInfo("WebServer - send of login info aborted (the user is not correctly setup).\n");
+		GfLogInfo("WebServer: Send of login info aborted (the user is not correctly setup in this client).\n");
 		return 1;	
 	}
 
@@ -646,7 +722,8 @@ int WebServer::sendLogin (int userId){
 	std::string dataToSend ("");
 	dataToSend.append(	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 						"<content>"
-						"<request>"
+						"<request_id>{{request_id}}</request_id>"
+						"<request>"			
 						"<login>"
 						"<username>{{username}}</username>"
 						"<password>{{password}}</password>"
@@ -657,54 +734,31 @@ int WebServer::sendLogin (int userId){
 	//replace the {{tags}} with the respecting values
 	replaceAll(dataToSend, "{{username}}", this->username);
 	replaceAll(dataToSend, "{{password}}", this->password);
-	
-	GfLogInfo("WebServer - sending LOGIN info\n");
 
-	this->sendGenericRequest(dataToSend, serverReply);
-
-	GfLogInfo("WebServer - PROCESSING SERVER REPLY:\n%s\n", serverReply.c_str());
-
-	//read the xml reply of the server
-	void *xmlReply;
-	xmlReply = GfParmReadBuf(const_cast<char*>(serverReply.c_str()));
-
-	//login reply
-	//store the webServer session and id assigned if available
-	if(GfParmExistsSection(xmlReply, "content/reply/login")){
-		if(GfParmGetNum(xmlReply, "content/reply/login", "id", "null",0) != 0){
-			GfLogInfo("WebServer - loggin succeded.\n");
-			notifications.msglist.push_back("WebServer: LOGGED IN!");
-			//store the webServer session and id assigned
-			this->sessionId = GfParmGetStr(xmlReply, "content/reply/login", "sessionid", "null");
-			this->userId = GfParmGetNum(xmlReply, "content/reply/login", "id", "null",0);
-		}else{
-			GfLogInfo("WebServer - Login Failed: probably wrong username or password.\n");
-			notifications.msglist.push_back("WebServer: Login Failed:\nwrong username or password.");
-			return 1;				
-		}
-	}else{
-		GfLogInfo("WebServer - Login Failed: bad reply from the server.\n");
-		notifications.msglist.push_back("WebServer: Login Failed:\nbad reply from the server.");
-		return 1;		
-	}
-
-
-	GfLogInfo("WebServer - assigned session id is: %s\n", this->sessionId);
+	this->addOrderedAsyncRequest(dataToSend);
 
 	return 0;
 }
 int WebServer::sendLap (int race_id, double laptime, double fuel, int position, int wettness){
-
+/*
+	//Do some sanity-checks befor proceding... If something is wrong do nothing
 	//are we logged in?
 	if(this->sessionId=='\0'){
-		GfLogInfo("WebServer - send of lap info aborted. No session ID assigned (we are not logged-in).\n");			
+		GfLogInfo("Comunication of lap info aborted. No session ID assigned (we are not logged in)");			
 		return 1;
 	}
-
+	
+	//Was the raceStart comunication successfull?
+	if(this->raceId > -1){
+		GfLogInfo("Comunication of lap info aborted. This race was not being tracked.");			
+		return 1;
+	}
+*/
 	//prepare the string to send
 	std::string dataToSend ("");
 	dataToSend.append(	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 						"<content>"
+						"<request_id>{{request_id}}</request_id>"
 						"<request>"
 						"<laps>"
 						"<race_id>{{race_id}}</race_id>"
@@ -717,15 +771,13 @@ int WebServer::sendLap (int race_id, double laptime, double fuel, int position, 
 						"</content>");
 						
 	//replace the {{tags}} with the respecting values						
-	replaceAll(dataToSend, "{{race_id}}", to_string(race_id));
+	//The following tags will be replaced later because some other request must be done before: {{race_id}}
 	replaceAll(dataToSend, "{{laptime}}", to_string(laptime));
 	replaceAll(dataToSend, "{{fuel}}", to_string(fuel));
 	replaceAll(dataToSend, "{{position}}", to_string(position));
 	replaceAll(dataToSend, "{{wettness}}", to_string(wettness));	
 	
-	GfLogInfo("WebServer - sending LAP info\n");
-
-	this->addAsyncRequest(dataToSend);
+	this->addOrderedAsyncRequest(dataToSend);
 
 	return 0;
 }
@@ -733,19 +785,26 @@ int WebServer::sendRaceStart (int user_skill, const char *track_id, char *car_id
 	std::string serverReply;
 	std::string mysetup;
 	std::string dataToSend;
+	this->raceEndSent = false;
+	this->previousLaps = -1;
 
+	//Do some sanity-checks befor proceding... If something is wrong do nothing
 	//are we logged in?
+/*
 	if(this->sessionId=='\0'){
-		GfLogInfo("WebServer - send of racestart info aborted. No session ID assigned (we are not logged in)");			
+		GfLogInfo("Comunication of race start to the webserver aborted. No session ID assigned (we are not logged in)");			
 		return 1;
 	}
-
+*/
+	
+	//Sanity-checks passed we continue
 	//read the setup
 	GfParmWriteString(setup, mysetup);
 
 	//prepare the string to send
 	dataToSend.append(	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 						"<content>"
+						"<request_id>{{request_id}}</request_id>"
 						"<request>"
 						"<races>"
 						"<user_id>{{user_id}}</user_id>"
@@ -761,7 +820,7 @@ int WebServer::sendRaceStart (int user_skill, const char *track_id, char *car_id
 						"</content>");
 						
 	//replace the {{tags}} with the respecting values						
-	replaceAll(dataToSend, "{{user_id}}", to_string(this->userId));						
+	//The following tags will be replaced later because some other request must be done before: {{user_id}}			
 	replaceAll(dataToSend, "{{user_skill}}", to_string(user_skill));						
 	replaceAll(dataToSend, "{{track_id}}", to_string(track_id));						
 	replaceAll(dataToSend, "{{car_id}}", to_string(car_id));						
@@ -770,25 +829,33 @@ int WebServer::sendRaceStart (int user_skill, const char *track_id, char *car_id
 	replaceAll(dataToSend, "{{startposition}}", to_string(startposition));						
 	replaceAll(dataToSend, "{{sdversion}}", to_string(sdversion));						
 						
-	GfLogInfo("WebServer - sending RACE START info\n");	
-
-	this->addAsyncRequest(dataToSend);
+	this->addOrderedAsyncRequest(dataToSend);
 
 	return 0;
 }
 int WebServer::sendRaceEnd (int race_id, int endposition){
 	std::string serverReply;
 
+	//Do some sanity-checks befor proceding... If something is wrong do nothing
 	//are we logged in?
+/*
 	if(this->sessionId=='\0'){
-		GfLogInfo("WebServer - send of raceend info aborted. No session ID assigned (we are not logged in)");			
+		GfLogInfo("Comunication of race end to the webserver aborted. No session ID assigned (we are not logged in)");			
 		return 1;
 	}
-
+	
+	//Was the raceStart comunication successfull?
+	if(this->raceId > -1){
+		GfLogInfo("Comunication of race end to the webserver aborted. This race was not being tracked.");			
+		return 1;
+	}
+*/
+	//Sanity-checks passed we continue
 	//prepare the string to send
 	std::string dataToSend ("");
 	dataToSend.append(	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 						"<content>"
+						"<request_id>{{request_id}}</request_id>"
 						"<request>"
 						"<races>"
 						"<id>{{race_id}}</id>"
@@ -797,13 +864,15 @@ int WebServer::sendRaceEnd (int race_id, int endposition){
 						"</request>"
 						"</content>");
 						
-	//replace the {{tags}} with the respecting values						
-	replaceAll(dataToSend, "{{race_id}}", to_string(race_id));
+	//replace the {{tags}} with the respecting values
+	//The following tags will be replaced later because some other request must be done before: {{race_id}}
 	replaceAll(dataToSend, "{{endposition}}", to_string(endposition));
 
-	GfLogInfo("WebServer - sending RACE END information \n");	
+	this->addOrderedAsyncRequest(dataToSend);
 
-	this->sendGenericRequest(dataToSend, serverReply);
+	this->raceEndSent = true;
+	//restore default race id
+	//this->raceId = -1;
 
 	return 0;
 }
