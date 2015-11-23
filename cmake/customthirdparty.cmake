@@ -188,6 +188,9 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	# JPEG.
 	_FIND_3RDPARTY_DEPENDENCY(JPEG jpeglib.h "" "jpeg_s;jpeg;jpeg-8;jpeg-9" ${ROOT_DIR} "")
 	
+	# CURL.
+	_FIND_3RDPARTY_DEPENDENCY(CURL curl/curl.h "" libcurl ${ROOT_DIR} "")
+	
 	# ZLib.
 	_FIND_3RDPARTY_DEPENDENCY(ZLIB zlib.h "" "z;zlib;zlib1" ${ROOT_DIR} "D")
 	
@@ -396,6 +399,9 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	_FIND_3RDPARTY_DLL("${JPEG_LIBRARY}" "jpeg;jpeg-8;jpeg-9" "lib" _DLL_PATHNAME)
+	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
+
+	_FIND_3RDPARTY_DLL("${CURL_LIBRARY}" "curl" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	# 2) Copy found 3rd party DLL files to the bin folder (for running without installing).

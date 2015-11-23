@@ -263,6 +263,18 @@ MACRO(CHECK_LIBRARIES)
 			MESSAGE(STATUS "Looking for library SDL - NOT found")
 		ENDIF(SDL_FOUND)
 		ENDIF(OPTION_SDL2)
+
+
+	# CURL
+	Find_Package(CURL)
+
+	IF(CURL_FOUND)
+		SET(HAVE_CURL 1)
+		MESSAGE(STATUS "Looking for library CURL - found")
+	ELSE(CURL_FOUND)
+		MESSAGE(STATUS "Looking for library CURL - NOT found")
+	ENDIF(CURL_FOUND)
+
 	
 	# OSG
 	IF(OPTION_OSGGRAPH)
