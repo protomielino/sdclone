@@ -37,6 +37,12 @@
 #include "racestate.h"
 #include "raceresults.h"
 
+//webserver requirements
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <curl/curl.h>
+#include "raceinit.h"
 
 //TODO: is it still necessary?
 //static const char *aSessionTypeNames[3] = {"Practice", "Qualifications", "Race"};
@@ -448,6 +454,26 @@ ReStoreRaceResults(const char *race)
 				}
 				break;
 			}
+	}
+	// webServer lap logger.
+	extern WebServer webServer;
+	// webServer lap logger.
+	//Find human cars
+	for (int i = 0; i < ReInfo->s->_ncars; i++) {
+		if(ReInfo->s->cars[i]->_driverType == RM_DRV_HUMAN){
+			
+			//read webServer config from user preferencies file
+			//webServer.readUserConfig(ReInfo->s->cars[i]->_driverIndex);
+
+			//login
+			webServer.sendLogin(ReInfo->s->cars[i]->_driverIndex);
+			
+			//send race data
+			webServer.sendRaceEnd (
+				webServer.raceId,
+				ReInfo->s->cars[i]->_pos			//car end position,
+			);
+		}
 	}
 }
 
