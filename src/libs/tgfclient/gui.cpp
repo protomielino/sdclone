@@ -48,7 +48,7 @@ PFNGLACTIVETEXTUREARBPROC   glActiveTextureARB ;
 
 
 #if SDL_MAJOR_VERSION >= 2
-SDL_Window* 	GfuiWindow;
+SDL_Window* 	GfuiWindow = NULL;
 #endif
 
 tGfuiScreen	*GfuiScreen;	/* current screen */

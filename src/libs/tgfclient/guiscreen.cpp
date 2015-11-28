@@ -416,8 +416,371 @@ static void gfScrReshapeViewport(int width, int height)
     GfScrCenX = width / 2;
     GfScrCenY = height / 2;
 }
+#if SDL_MAJOR_VERSION >= 2
 
-bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
+SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,int bfVideoMode)
+{
+    if(GfuiWindow)
+    {
+        SDL_DestroyWindow(GfuiWindow);
+        GfuiWindow = NULL;
+    }
+    if(PScreenSurface)
+    {
+        SDL_FreeSurface(PScreenSurface);
+        PScreenSurface = NULL;
+    }
+    // Set window/icon captions
+    std::ostringstream ossCaption;
+    ossCaption << GfuiApp().name() << ' ' << GfuiApp().version();
+
+    GfuiWindow = SDL_CreateWindow(ossCaption.str().c_str(),
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        nWinWidth, nWinHeight, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
+
+
+    // Set window icon (MUST be a 32x32 icon for Windows, and with black pixels as alpha ones, 
+    // as BMP doesn't support transparency).
+    std::ostringstream ossIconFilename;
+    ossIconFilename << GfDataDir() << "data/icons/icon.bmp";
+    SDL_Surface* surfIcon = SDL_LoadBMP(ossIconFilename.str().c_str());
+    if (surfIcon)
+    {
+        SDL_SetColorKey(surfIcon, TRUE, SDL_MapRGB(surfIcon->format, 0, 0, 0));
+        SDL_SetWindowIcon(GfuiWindow, surfIcon);
+        SDL_FreeSurface(surfIcon);
+    }
+
+    // attempt to make window operational
+    SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, -1, 0);
+    SDL_RenderPresent(renderer);
+
+    /* Create OpenGL context */
+    SDL_GLContext context;
+    context = SDL_GL_CreateContext(GfuiWindow);
+
+    // If specified, try best possible settings.
+    PScreenSurface = SDL_CreateRGBSurface(0, nWinWidth, nWinHeight, nTotalDepth,
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
+        0x00FF0000, 0x0000FF00, 0x000000FF,
+#else
+        0x000000FF, 0x0000FF00, 0x00FF0000,
+#endif
+        0x00000000);
+
+    if (bfVideoMode & SDL_WINDOW_FULLSCREEN)
+    {
+        SDL_Rect bounds;
+
+        /* Work around SDL2 bug */
+        if (SDL_GetDisplayBounds(0, &bounds) == 0) {
+            if (bounds.w == nWinWidth && bounds.h == nWinHeight)
+                SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+            else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
+        } else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
+    }
+    return PScreenSurface;
+}
+
+bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
+{
+	// Prepare video mode.
+	int bfVideoMode = SDL_WINDOW_OPENGL;
+
+	// Initialize SDL video subsystem (and exit if not supported).
+	if (SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
+	{
+		GfLogError("Couldn't initialize SDL audio/video sub-system (%s)\n", SDL_GetError());
+		return false;
+	}
+
+	// Get selected frame buffer specs from config file
+	// 1) Load the config file
+	std::ostringstream ossConfigFilename;
+	ossConfigFilename << GfLocalDir() << GFSCR_CONF_FILE;
+	void* hparmScreen =
+		GfParmReadFile(ossConfigFilename.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+	// 2) Check / update test state of any 'in-test' specs.
+	if (GfParmExistsSection(hparmScreen, GFSCR_SECT_INTESTPROPS))
+	{
+		// Remove the 'in-test' specs if the test failed (we are still in the 'in progress'
+		// test state because the game crashed during the test).
+		if (std::string(GfParmGetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE,
+									 GFSCR_VAL_INPROGRESS)) == GFSCR_VAL_INPROGRESS)
+		{
+			GfLogInfo("Reverting to last validated screen specs, as last test failed.\n");
+			GfParmRemoveSection(hparmScreen, GFSCR_SECT_INTESTPROPS);
+		}
+
+		// If the test has not yet been done, mark it as 'in progress'
+		else
+		{
+			GfLogInfo("Testing new screen specs : let's see what's happening ...\n");
+			GfParmSetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE,
+						 GFSCR_VAL_INPROGRESS);
+		}
+		
+		// Write the config file to disk (in case the forthcoming test makes the game crash,
+		// or in order the Options / Display menu shows the actual current settings).
+		GfParmWriteFile(NULL, hparmScreen, "Screen");
+	}
+
+	// 3) Select the 'in-test' specs if present, otherwise the 'validated' ones.
+	const char* pszScrPropSec =
+		GfParmExistsSection(hparmScreen, GFSCR_SECT_INTESTPROPS)
+		? GFSCR_SECT_INTESTPROPS : GFSCR_SECT_VALIDPROPS;
+
+	// 4) Get/Read the specs.
+	if (nWinWidth < 0)
+		nWinWidth =
+			(int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_X, (char*)NULL, 800);
+	if (nWinHeight < 0)
+		nWinHeight =
+			(int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_Y, (char*)NULL, 600);
+    int nTotalDepth =
+		(int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_BPP, (char*)NULL, 32);
+	bool bAlphaChannel =
+		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_ALPHACHANNEL,
+								 GFSCR_VAL_YES))
+		== GFSCR_VAL_YES;
+	bool bFullScreen;
+	if (nFullScreen < 0)
+		bFullScreen =
+			std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_FSCR, GFSCR_VAL_NO))
+			== GFSCR_VAL_YES;
+	else
+		bFullScreen = nFullScreen ? true : false;
+
+    bool bBumpMap =
+		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_BUMPMAPPING, 
+								 GFSCR_VAL_NO))
+		== GFSCR_VAL_YES;
+
+	int nAniFilt =
+		(int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_ANISOTROPICFILTERING, (char*)NULL, 0);
+
+	bool bStereo =
+		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_STEREOVISION,
+								 GFSCR_VAL_NO))
+		== GFSCR_VAL_YES;
+    bool bTryBestVInitMode =
+		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_VINIT,
+								 GFSCR_VAL_VINIT_BEST))
+		== GFSCR_VAL_VINIT_BEST;
+	
+	if(bFullScreen)
+		bfVideoMode |= SDL_WINDOW_FULLSCREEN;
+
+	if (bTryBestVInitMode) 
+	{
+		GfLogInfo("Trying 'best possible mode' for video initialization.\n");
+
+		// Detect best supported features for the specified frame buffer specs.
+		// Warning: Restarts the game if the frame buffer specs changed since last call.
+		// If specified and possible, setup the best possible settings.
+		if (GfglFeatures::self().checkBestSupport(nWinWidth, nWinHeight, nTotalDepth,
+                                                  bAlphaChannel, bFullScreen, bBumpMap, bStereo,nAniFilt,hparmScreen))
+		{
+			// Load Open GL user settings from the config file.
+			GfglFeatures::self().loadSelection();
+	
+			// Setup the video mode parameters.
+			const int nColorDepth =
+				GfglFeatures::self().getSelected(GfglFeatures::ColorDepth);
+			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, nColorDepth/3);
+			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, nColorDepth/3);
+			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, nColorDepth/3);
+			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, nColorDepth);
+
+			const int nAlphaDepth =
+				GfglFeatures::self().getSelected(GfglFeatures::AlphaDepth);
+			SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, nAlphaDepth);
+			
+			const int nDoubleBuffer =
+				GfglFeatures::self().isSelected(GfglFeatures::DoubleBuffer) ? 1 : 0;
+			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, nDoubleBuffer);
+			
+			const int nMultiSampling =
+				GfglFeatures::self().isSelected(GfglFeatures::MultiSampling) ? 1 : 0;
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, nMultiSampling);
+			if (nMultiSampling)
+			{
+				const int nMaxMultiSamples =
+					GfglFeatures::self().getSelected(GfglFeatures::MultiSamplingSamples);
+				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, nMaxMultiSamples);
+			}
+
+			const int nStereoVision =
+				GfglFeatures::self().isSelected(GfglFeatures::StereoVision) ? 1 : 0;
+			SDL_GL_SetAttribute(SDL_GL_STEREO, nStereoVision);
+
+			// Try the video mode with these parameters : should always work
+			// (unless you downgraded you hardware / OS and didn't clear your config file).
+			PScreenSurface = gfScrCreateWindow(nWinWidth, nWinHeight, nTotalDepth,bfVideoMode);
+		}
+
+		// If best mode not supported, or test actually failed,
+		// revert to a supported mode (restart the game).
+		if (!PScreenSurface)
+		{
+			GfLogWarning("Failed to setup best supported video mode "
+						 "whereas previously detected !\n");
+			GfLogWarning("Tip: You should remove your %s%s file and restart,\n",
+						 GfLocalDir(), GFSCR_CONF_FILE);
+			GfLogWarning("     if something changed in your OS"
+						 " or video hardware/driver configuration.\n");
+
+			// If testing new screen specs, remember that the test failed
+			// in order to revert to the previous validated specs on restart.
+			if (std::string(pszScrPropSec) == GFSCR_SECT_INTESTPROPS)
+			{
+				GfParmSetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_TESTSTATE,
+							 GFSCR_VAL_FAILED);
+			}
+				
+			// Force compatible video init. mode if not testing a new video mode.
+			else
+			{
+				GfLogWarning("Falling back to a more compatible default mode ...\n");
+				GfParmSetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_VINIT,
+							 GFSCR_VAL_VINIT_COMPATIBLE);
+			}
+			GfParmWriteFile(NULL, hparmScreen, "Screen");
+			GfParmReleaseHandle(hparmScreen);
+
+			// And restart the game.
+			GfuiApp().restart(); // Never returns.
+		}
+	}
+	
+	// Video initialization with generic compatible settings.
+	if (!PScreenSurface)
+	{
+		GfLogInfo("Trying 'default compatible' mode for video initialization.\n");
+
+		// cancel StereoVision
+		SDL_GL_SetAttribute(SDL_GL_STEREO, 0);
+
+		PScreenSurface = gfScrCreateWindow(nWinWidth, nWinHeight, nTotalDepth,bfVideoMode);
+		if (!PScreenSurface)
+			GfLogTrace("Can't get a %s%dx%dx%d compatible video mode\n",
+					   bFullScreen ? "full-screen " : "", nWinWidth, nWinHeight, nTotalDepth);
+	}
+
+	// Failed : Try and remove the full-screen requirement if present ...
+	if (!PScreenSurface && bFullScreen)
+	{
+		bfVideoMode &= ~SDL_WINDOW_FULLSCREEN;
+		PScreenSurface = gfScrCreateWindow(nWinWidth, nWinHeight, nTotalDepth,bfVideoMode);
+		if (!PScreenSurface)
+			GfLogTrace("Can't get a non-full-screen %dx%dx%d compatible video mode\n",
+					   nWinWidth, nWinHeight, nTotalDepth);
+		
+		// Update screen specs.
+		GfParmSetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_FSCR, GFSCR_VAL_NO);
+		GfParmWriteFile(NULL, hparmScreen, "Screen");
+	}
+
+	// Failed : Try with a lower fallback size  : should be supported everywhere ...
+	if (!PScreenSurface)
+	{
+		nWinWidth = ADefScreenSizes[0].width;
+		nWinHeight = ADefScreenSizes[0].height;
+		PScreenSurface = gfScrCreateWindow(nWinWidth, nWinHeight, nTotalDepth,bfVideoMode);
+		if (!PScreenSurface)
+			GfLogTrace("Can't get a %dx%dx%d compatible video mode\n",
+					   nWinWidth, nWinHeight, nTotalDepth);
+		
+		// Update screen specs.
+		GfParmSetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_X, 0, (tdble)nWinWidth);
+		GfParmSetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_Y, 0, (tdble)nWinHeight);
+		GfParmWriteFile(NULL, hparmScreen, "Screen");
+	}
+
+	// Failed : Try with a lower fallback color depth : should be supported everywhere ...
+	if (!PScreenSurface)
+	{
+		nTotalDepth = ADefScreenColorDepths[0];
+		PScreenSurface = gfScrCreateWindow(nWinWidth, nWinHeight, nTotalDepth,bfVideoMode);
+		if (!PScreenSurface)
+			GfLogTrace("Can't get a %dx%dx%d compatible video mode\n",
+					   nWinWidth, nWinHeight, nTotalDepth);
+		
+		// Update screen specs.
+		GfParmSetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_BPP, 0, (tdble)nTotalDepth);
+		GfParmWriteFile(NULL, hparmScreen, "Screen");
+	}
+
+	// Close the config file.
+	GfParmReleaseHandle(hparmScreen);
+
+	// Failed : No way ... no more ideas !
+	if (!PScreenSurface)
+	{
+		GfLogError("Unable to get any compatible video mode"
+				   " (fallback resolution / color depth not supported) : giving up !\n\n");
+		return false;
+	}
+
+	// If we get here, that's because we succeeded in getting a valid video mode :-)
+	
+	// If 'compatible mode' selected, detect only standard Open GL features
+	// and load OpenGL settings from the config file.
+	if (!bTryBestVInitMode) 
+	{
+		GfglFeatures::self().detectStandardSupport();
+		GfglFeatures::self().dumpSupport();
+		GfglFeatures::self().loadSelection();
+	}
+
+	// Save view geometry and screen center.
+	GfViewWidth = nWinWidth;
+	GfViewHeight = nWinHeight;
+	GfScrCenX = nWinWidth / 2;
+	GfScrCenY = nWinHeight / 2;
+
+	// Report about selected SDL video mode.
+	GfLogInfo("Selected SDL video mode :\n");
+	GfLogInfo("  Full screen : %s\n", (bfVideoMode & SDL_WINDOW_FULLSCREEN) ? "Yes" : "No");
+	GfLogInfo("  Size        : %dx%d\n", nWinWidth, nWinHeight);
+	GfLogInfo("  Color depth : %d bits\n", nTotalDepth);
+	
+	// Report about underlying hardware (needs a running frame buffer).
+	GfglFeatures::self().dumpHardwareInfo();
+
+	if(GfuiWindow)
+		SDL_ShowWindow(GfuiWindow);
+	
+#ifdef WIN32
+	// Under Windows, give an initial position to the window if not full-screen mode
+	// (under Linux/Mac OS X, no need, the window manager smartly takes care of this).
+	if (!(bfVideoMode & SDL_WINDOW_FULLSCREEN))
+	{
+		// Try to center the game Window on the desktop, but keep the title bar visible if any.
+		const HWND hDesktop = GetDesktopWindow();
+		RECT rectDesktop;
+		GetWindowRect(hDesktop, &rectDesktop);
+		const int nWMWinXPos =
+			nWinWidth >= rectDesktop.right ? 0 : (rectDesktop.right - nWinWidth) / 2;
+		const int nWMWinYPos =
+			nWinHeight >= rectDesktop.bottom ? 0 : (rectDesktop.bottom - nWinHeight) / 2;
+		GfuiInitWindowPositionAndSize(nWMWinXPos, nWMWinYPos, nWinWidth, nWinHeight);
+	}
+#endif
+
+
+
+	// Initialize the Open GL viewport.
+	gfScrReshapeViewport(nWinWidth, nWinHeight);
+
+	// Setup the event loop about the new display.
+	GfuiApp().eventLoop().setReshapeCB(gfScrReshapeViewport);
+	GfuiApp().eventLoop().postRedisplay();
+	return true;
+}
+#else
+bool GfScrInitSDL1(int nWinWidth, int nWinHeight, int nFullScreen)
 {
     /*if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
@@ -432,23 +795,15 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 		return false;
 	}
 	
-#if SDL_MAJOR_VERSION < 2
 	// Enable unicode translation for SDL key press events, even if already done before
 	// (SDL_InitSubSystem(SDL_INIT_VIDEO) seems to break it).
 	SDL_EnableUNICODE(/*enable=*/1);
-#endif
 	
 	// Set window/icon captions
 	std::ostringstream ossCaption;
 	ossCaption << GfuiApp().name() << ' ' << GfuiApp().version();
-#if SDL_MAJOR_VERSION >= 2
-	//SDL_Window* window
-	GfuiWindow = SDL_CreateWindow(ossCaption.str().c_str(),
-			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-			nWinWidth, nWinHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-#else
+
 	SDL_WM_SetCaption(ossCaption.str().c_str(), ossCaption.str().c_str());
-#endif
 
 	// Set window icon (MUST be a 32x32 icon for Windows, and with black pixels as alpha ones, 
 	// as BMP doesn't support transparency).
@@ -457,13 +812,8 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 	SDL_Surface* surfIcon = SDL_LoadBMP(ossIconFilename.str().c_str());
 	if (surfIcon)
 	{
-#if SDL_MAJOR_VERSION >= 2
-		SDL_SetColorKey(surfIcon, TRUE, SDL_MapRGB(surfIcon->format, 0, 0, 0));
-		SDL_SetWindowIcon(GfuiWindow, surfIcon);
-#else
 	    SDL_SetColorKey(surfIcon, SDL_SRCCOLORKEY, SDL_MapRGB(surfIcon->format, 0, 0, 0));
 	    SDL_WM_SetIcon(surfIcon, 0);
-#endif
 	    SDL_FreeSurface(surfIcon);
 	}
 
@@ -483,12 +833,7 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 //  Uint32 video_mem;
 //  SDL_PixelFormat *vfmt;
 //} SDL_VideoInfo;
-#if SDL_MAJOR_VERSION >= 2
-	// FIXME - Need to rewrite function
 
-	// At the moment the whole setting up of the screen is handled in the 
-	// short section of code above.
-#else
 	const SDL_VideoInfo* sdlVideoInfo = SDL_GetVideoInfo();
 	
 	if (!sdlVideoInfo)
@@ -504,7 +849,6 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 	// These ones don't report actually real values on some configurations.
 	// GfLogInfo("  Hardware acceleration : %s\n", sdlVideoInfo->hw_available ? "Yes" : "No");
 	// GfLogInfo("  Total video memory    : %u Kb\n", sdlVideoInfo->video_mem);
-#endif
 
 	// Get selected frame buffer specs from config file
 	// 1) Load the config file
@@ -584,48 +928,11 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 		== GFSCR_VAL_VINIT_BEST;
 
 	// Prepare video mode.
-#if SDL_MAJOR_VERSION >= 2
-	int bfVideoMode = SDL_WINDOW_OPENGL;
-
-	SDL_SetWindowSize(GfuiWindow, nWinWidth, nWinHeight);
-	SDL_SetWindowPosition(GfuiWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-
-	// attempt to make window operational
-	SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, -1, 0);
-	SDL_RenderPresent(renderer);
-
-	/* Create OpenGL context */
-	SDL_GLContext context;
-	context = SDL_GL_CreateContext(GfuiWindow);
-	// If specified, try best possible settings.
-	PScreenSurface = SDL_CreateRGBSurface(0, nWinWidth, nWinHeight, nTotalDepth,
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
-				0x00FF0000, 0x0000FF00, 0x000000FF,
-#else
-				0x000000FF, 0x0000FF00, 0x00FF0000,
-#endif
-				0x00000000);
-
-	SDL_ShowWindow(GfuiWindow);
-
-	if (bFullScreen) {
-		SDL_Rect bounds;
-		bfVideoMode |= SDL_WINDOW_FULLSCREEN;
-
-		/* Work around SDL2 bug */
-		if (SDL_GetDisplayBounds(0, &bounds) == 0) {
-			if (bounds.w == nWinWidth && bounds.h == nWinHeight)
-				SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-			else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
-		} else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
-	}
-#else
 	int bfVideoMode = SDL_OPENGL;
 	if (bFullScreen)
 		bfVideoMode |= SDL_FULLSCREEN;
 
 	PScreenSurface = NULL;
-#endif
 	if (bTryBestVInitMode) 
 	{
 		GfLogInfo("Trying 'best possible mode' for video initialization.\n");
@@ -671,17 +978,7 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 			
 			// Try the video mode with these parameters : should always work
 			// (unless you downgraded you hardware / OS and didn't clear your config file).
-#if SDL_MAJOR_VERSION >= 2
-			PScreenSurface = SDL_CreateRGBSurface(0, nWinWidth, nWinHeight, nTotalDepth,
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
-						0x00FF0000, 0x0000FF00, 0x000000FF,
-#else 
-						0x000000FF, 0x0000FF00, 0x00FF0000,
-#endif 
-						0x00000000); 
-#else
 			PScreenSurface = SDL_SetVideoMode(nWinWidth, nWinHeight, nTotalDepth, bfVideoMode);
-#endif
 		}
 
 		// If best mode not supported, or test actually failed,
@@ -726,17 +1023,7 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 		// cancel StereoVision
 		SDL_GL_SetAttribute(SDL_GL_STEREO, 0);
 
-#if SDL_MAJOR_VERSION >= 2
-		PScreenSurface = SDL_CreateRGBSurface(0, nWinWidth, nWinHeight, nTotalDepth,
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
-						0x00FF0000, 0x0000FF00, 0x000000FF,
-#else 
-						0x000000FF, 0x0000FF00, 0x00FF0000,
-#endif 
-						0x00000000); 
-#else
 		PScreenSurface = SDL_SetVideoMode(nWinWidth, nWinHeight, nTotalDepth, bfVideoMode);
-#endif
 		if (!PScreenSurface)
 			GfLogTrace("Can't get a %s%dx%dx%d compatible video mode\n",
 					   bFullScreen ? "full-screen " : "", nWinWidth, nWinHeight, nTotalDepth);
@@ -745,19 +1032,8 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 	// Failed : Try and remove the full-screen requirement if present ...
 	if (!PScreenSurface && bFullScreen)
 	{
-#if SDL_MAJOR_VERSION >= 2
-		bfVideoMode &= ~SDL_WINDOW_FULLSCREEN;
-		PScreenSurface = SDL_CreateRGBSurface(0, nWinWidth, nWinHeight, nTotalDepth,
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
-						0x00FF0000, 0x0000FF00, 0x000000FF,
-#else 
-						0x000000FF, 0x0000FF00, 0x00FF0000,
-#endif 
-						0x00000000); 
-#else
 		bfVideoMode &= ~SDL_FULLSCREEN;
 		PScreenSurface = SDL_SetVideoMode(nWinWidth, nWinHeight, nTotalDepth, bfVideoMode);
-#endif
 		if (!PScreenSurface)
 			GfLogTrace("Can't get a non-full-screen %dx%dx%d compatible video mode\n",
 					   nWinWidth, nWinHeight, nTotalDepth);
@@ -772,17 +1048,7 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 	{
 		nWinWidth = ADefScreenSizes[0].width;
 		nWinHeight = ADefScreenSizes[0].height;
-#if SDL_MAJOR_VERSION >= 2
-		PScreenSurface = SDL_CreateRGBSurface(0, nWinWidth, nWinHeight, nTotalDepth,
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
-						0x00FF0000, 0x0000FF00, 0x000000FF,
-#else 
-						0x000000FF, 0x0000FF00, 0x00FF0000,
-#endif 
-						0x00000000); 
-#else
 		PScreenSurface = SDL_SetVideoMode(nWinWidth, nWinHeight, nTotalDepth, bfVideoMode);
-#endif
 		if (!PScreenSurface)
 			GfLogTrace("Can't get a %dx%dx%d compatible video mode\n",
 					   nWinWidth, nWinHeight, nTotalDepth);
@@ -797,17 +1063,7 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 	if (!PScreenSurface)
 	{
 		nTotalDepth = ADefScreenColorDepths[0];
-#if SDL_MAJOR_VERSION >= 2
-		PScreenSurface = SDL_CreateRGBSurface(0, nWinWidth, nWinHeight, nTotalDepth,
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
-						0x00FF0000, 0x0000FF00, 0x000000FF,
-#else 
-						0x000000FF, 0x0000FF00, 0x00FF0000,
-#endif 
-						0x00000000); 
-#else
 		PScreenSurface = SDL_SetVideoMode(nWinWidth, nWinHeight, nTotalDepth, bfVideoMode);
-#endif
 		if (!PScreenSurface)
 			GfLogTrace("Can't get a %dx%dx%d compatible video mode\n",
 					   nWinWidth, nWinHeight, nTotalDepth);
@@ -847,11 +1103,7 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 
 	// Report about selected SDL video mode.
 	GfLogInfo("Selected SDL video mode :\n");
-#if SDL_MAJOR_VERSION >= 2
- 	GfLogInfo("  Full screen : %s\n", (bfVideoMode & SDL_WINDOW_FULLSCREEN) ? "Yes" : "No");
-#else
  	GfLogInfo("  Full screen : %s\n", (bfVideoMode & SDL_FULLSCREEN) ? "Yes" : "No");
-#endif
  	GfLogInfo("  Size        : %dx%d\n", nWinWidth, nWinHeight);
  	GfLogInfo("  Color depth : %d bits\n", nTotalDepth);
 	
@@ -861,11 +1113,7 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 #ifdef WIN32
 	// Under Windows, give an initial position to the window if not full-screen mode
 	// (under Linux/Mac OS X, no need, the window manager smartly takes care of this).
-#if SDL_MAJOR_VERSION >= 2
-	if (!(bfVideoMode & SDL_WINDOW_FULLSCREEN))
-#else
 	if (!(bfVideoMode & SDL_FULLSCREEN))
-#endif
 	{
 		// Try to center the game Window on the desktop, but keep the title bar visible if any.
 		const HWND hDesktop = GetDesktopWindow();
@@ -886,6 +1134,15 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 	GfuiApp().eventLoop().setReshapeCB(gfScrReshapeViewport);
 	GfuiApp().eventLoop().postRedisplay();
 	return true;
+}
+#endif
+bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
+{
+#if SDL_MAJOR_VERSION >= 2
+    return GfScrInitSDL2(nWinWidth,nWinHeight,nFullScreen);
+#else
+    return GfScrInitSDL1(nWinWidth,nWinHeight,nFullScreen);
+#endif
 }
 
 /** Shutdown the screen

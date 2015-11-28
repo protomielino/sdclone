@@ -219,7 +219,259 @@ void GfglFeatures::detectStandardSupport()
     _mapSupportedInt[AnisotropicFiltering] = bValue?2:InvalidInt;
 
 }
+#if SDL_MAJOR_VERSION >= 2
+// Best supported features detection for the given specs of the frame buffer.
+bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
+                                     bool& bAlpha, bool& bFullScreen, bool& bBumpMapping, bool& bStereoVision, int &nAniFilt)
+{
+	GfLogInfo("Detecting best SDL2 supported features for a %dx%dx%d%s frame buffer.\n",
+			  nWidth, nHeight, nDepth, bFullScreen ? " full-screen" : "");
 
+	// I) Detection of the max possible values for requested features.
+	//    (to do that, we need to try setting up the video modes for real).
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	SDL_Window* testWindow = NULL;
+	SDL_Renderer* renderer = NULL;
+	SDL_Surface* pWinSurface = 0;
+
+	int nAlphaChannel = bAlpha ? 1 : 0;
+	int nCurrDepth = nDepth;
+	int nFullScreen = bFullScreen ? 1 : 0;
+	int nStereoVision = bStereoVision ? 1 : 0;
+
+
+	while (!pWinSurface && nFullScreen >= 0)
+	{
+		GfLogTrace("Trying %s mode\n", nFullScreen ? "full-screen" : "windowed");
+
+		const int bfVideoMode = SDL_WINDOW_OPENGL | (nFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+		SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+
+		nAlphaChannel = bAlpha ? 1 : 0;
+		while (!pWinSurface && nAlphaChannel >= 0)
+		{
+			GfLogTrace("Trying with%s alpha channel\n", nAlphaChannel ? "" : "out");
+			nCurrDepth = nDepth;
+			while (!pWinSurface && nCurrDepth >= 16)
+			{
+				GfLogTrace("Trying %d bits RVB+A color depth\n", nCurrDepth);
+				SDL_GL_SetAttribute(SDL_GL_RED_SIZE, nCurrDepth/4);
+				SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, nCurrDepth/4);
+				SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, nCurrDepth/4);
+				SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, (3*nCurrDepth)/4);
+				SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, nAlphaChannel ? nCurrDepth/4 : 0);
+
+				while (!pWinSurface && nStereoVision >= 0)
+				{
+					GfLogTrace("Trying with%s stereo vision\n", nStereoVision ? "" : "out");
+					if (nStereoVision)
+						SDL_GL_SetAttribute(SDL_GL_STEREO, GL_TRUE);
+					else
+						SDL_GL_SetAttribute(SDL_GL_STEREO, GL_FALSE);
+		
+					// Anti-aliasing : detect the max supported number of samples
+					// (assumed to be <= 32).
+					int nMaxMultiSamples = 32; // Hard coded max value for the moment.
+					while (!pWinSurface && nMaxMultiSamples > 1)
+					{
+						// Set the anti-aliasing attributes and setup the video mode.
+						GfLogTrace("Trying %dx anti-aliasing\n", nMaxMultiSamples);
+						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, nMaxMultiSamples);
+						
+						testWindow = SDL_CreateWindow("SDL2 test",
+							SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+							nWidth, nHeight, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
+						//SDL_SetWindowSize(GfuiWindow, nWidth, nHeight);
+						if(testWindow)
+						{
+							renderer = SDL_CreateRenderer(testWindow, -1, 0);
+							SDL_RenderPresent(renderer);
+							if(renderer)
+							{
+
+								SDL_GLContext context = 0;
+								context = SDL_GL_CreateContext(testWindow);
+								if(context)
+								{
+
+									pWinSurface = SDL_CreateRGBSurface(0, nWidth, nHeight, nCurrDepth,
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
+										0x00FF0000, 0x0000FF00, 0x000000FF,
+#else 
+										0x000000FF, 0x0000FF00, 0x00FF0000,
+#endif 
+										0x00000000);
+
+									// Now check if we have a video mode, and if it actually features
+									// what we specified.
+									int nActualSampleBuffers = 0;
+									int nActualMultiSamples = 0;
+									if (pWinSurface)
+									{
+										SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &nActualSampleBuffers);
+										SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &nActualMultiSamples);
+									}
+									GfLogDebug("nMaxMultiSamples=%d : nActualSampleBuffers=%d, nActualMultiSamples=%d\n",
+										nMaxMultiSamples, nActualSampleBuffers, nActualMultiSamples);
+
+									// If not, try a lower number of samples.
+									if (nActualSampleBuffers == 0 || nActualMultiSamples != nMaxMultiSamples)
+									{
+										SDL_FreeSurface(pWinSurface);
+										pWinSurface = 0;
+									}
+									SDL_GL_DeleteContext(context);
+									context = NULL;
+								}
+								SDL_DestroyRenderer(renderer);
+								renderer = NULL;
+							}
+							SDL_DestroyWindow(testWindow);
+							testWindow = NULL;
+						}
+						if (!pWinSurface)
+						{
+							GfLogTrace("%d+%d bit %dx anti-aliased double-buffer not supported\n",
+									   3*nCurrDepth/4, nCurrDepth/4, nMaxMultiSamples);
+							nMaxMultiSamples /= 2;
+						}
+					}
+	
+					// Failed : try without anti-aliasing.
+					if (!pWinSurface)
+					{
+						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+						testWindow = SDL_CreateWindow("SDL2 test",
+							SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+							nWidth, nHeight, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
+						if(testWindow)
+						{
+							//SDL_SetWindowSize(GfuiWindow, nWidth, nHeight);
+
+							renderer = SDL_CreateRenderer(testWindow, -1, 0);
+							if(renderer)
+							{
+								SDL_RenderPresent(renderer);
+
+								SDL_GLContext context;
+								context = SDL_GL_CreateContext(testWindow);
+								if(context)
+								{
+
+									pWinSurface = SDL_CreateRGBSurface(0, nWidth, nHeight, nCurrDepth,
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN 
+										0x00FF0000, 0x0000FF00, 0x000000FF,
+#else 
+										0x000000FF, 0x0000FF00, 0x00FF0000,
+#endif
+										0x00000000);
+
+									SDL_GL_DeleteContext(context);
+									context = NULL;
+								}
+								SDL_DestroyRenderer(renderer);
+								renderer = NULL;
+							}
+							SDL_DestroyWindow(testWindow);
+							testWindow = NULL;
+						}
+						if (!pWinSurface)
+							GfLogTrace("%d+%d bit double-buffer not supported\n",
+							3*nCurrDepth/4, nCurrDepth/4);
+					}
+	
+					// Failed : try without StereoVision
+					if (!pWinSurface)
+						nStereoVision--;
+				}
+
+				// Failed : try with lower color depth.
+				if (!pWinSurface)
+					nCurrDepth -= 8;
+			}
+
+			// Failed : try without alpha channel if not already done
+			// (Note: it this really relevant ?).
+			if (!pWinSurface)
+				nAlphaChannel--;
+		}
+
+		// Failed : try a windowed mode if not already done.
+		if (!pWinSurface)
+			nFullScreen--;
+	}
+
+	// Failed : no more idea :-(
+	if (!pWinSurface)
+	{
+		// Reset support data (will result in emptying the section when storing,
+		// thus forcing new detection when checkSupport will be called again).
+		_mapSupportedBool.clear();
+		_mapSupportedInt.clear();
+		
+		GfLogError("No supported 'best' video mode found for a %dx%dx%d%s frame buffer.\n",
+				   nWidth, nHeight, nDepth, bFullScreen ? " full-screen" : "");
+		
+		return false;
+	}
+	
+	testWindow = SDL_CreateWindow("SDL2 test",
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		nWidth, nHeight, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
+	if(testWindow)
+	{
+		renderer = SDL_CreateRenderer(testWindow, -1, 0);
+		if(renderer)
+		{
+			SDL_RenderPresent(renderer);
+
+			SDL_GLContext context;
+			context = SDL_GL_CreateContext(testWindow);
+			if(context)
+			{
+				// II) Read-out what we have from the up-and-running frame buffer
+				//     and set "supported" values accordingly.
+
+				// 1) Standard features.
+				detectStandardSupport();
+
+				// 2) Multi-sampling = anti-aliasing
+				int nValue;
+				SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &nValue);
+				_mapSupportedBool[MultiSampling] = nValue != 0;
+				//GfLogDebug("SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS) = %d\n", nValue);
+				if (nValue)
+				{
+					SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &nValue);
+					//GfLogDebug("SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES) = %d\n", nValue);
+					if (nValue > 1)
+						_mapSupportedInt[MultiSamplingSamples] = nValue;
+					else
+						_mapSupportedBool[MultiSampling] = false;
+				}
+
+				// III) Return the updated frame buffer specs.
+				//nWidth = nWidth; // Unchanged.
+				//nHeight = nHeight; // Unchanged.
+				nDepth = nCurrDepth;
+				bFullScreen = nFullScreen ? true : false;
+				bAlpha = nAlphaChannel ? true : false;
+
+				SDL_GL_DeleteContext(context);
+				context = NULL;
+			}
+			SDL_DestroyRenderer(renderer);
+			renderer = NULL;
+		}
+		SDL_DestroyWindow(testWindow);
+		testWindow = NULL;
+	}
+	return true;
+}
+#endif
 // Best supported features detection for the given specs of the frame buffer.
 bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
                                      bool& bAlpha, bool& bFullScreen, bool& bBumpMapping, bool& bStereoVision, int &nAniFilt)
@@ -733,7 +985,11 @@ bool GfglFeatures::checkBestSupport(int nWidth, int nHeight, int nDepth,
 		bDetBump = bBump;
         nDetAni = nAniFilt;
 		bSupportFound =
+#if SDL_MAJOR_VERSION < 2
             detectBestSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetBump, bDetStereo, nDetAni);
+#else
+            detectBestSupportSDL2(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetBump, bDetStereo, nDetAni);
+#endif
 
 		// Store support data in any case.
         storeSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetBump, bDetStereo,nDetAni, hparm);
