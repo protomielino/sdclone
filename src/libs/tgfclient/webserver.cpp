@@ -356,12 +356,16 @@ void NotificationManager::updateWebserverStatusUi(){
 	}	
 	
 	if(this->screenHandle > 0){
-		//if webserver is busy display busy icon
-		std::string webServerIcon = "busyicon";
-		webServerIcon.append(to_string(webserverState));
+		//if webserver is not IDLE display busy icon (sending or receiving)
+		if(webserverState != WEBSERVER_IDLE){
+			
+			std::string webServerIcon = "busyicon";
+			webServerIcon.append(to_string(webserverState));
 
-		this->notifyUiIdBusyIcon = GfuiMenuCreateStaticImageControl(this->screenHandle, this->menuXMLDescHdle, webServerIcon.c_str());			
-		GfuiVisibilitySet(this->screenHandle, this->notifyUiIdBusyIcon, GFUI_VISIBLE);		
+			this->notifyUiIdBusyIcon = GfuiMenuCreateStaticImageControl(this->screenHandle, this->menuXMLDescHdle, webServerIcon.c_str());			
+			GfuiVisibilitySet(this->screenHandle, this->notifyUiIdBusyIcon, GFUI_VISIBLE);
+			
+		}
 		
 	}
 
