@@ -49,8 +49,9 @@ public:
     SDCamera * getSelectedCamera();
     void nextCamera(int list);
     void update(tCarElt * car, tSituation * s);
-    inline int getIntSelectedCamera(){return selectedCamera;}
-    void selectCamera(int list,int cam);
+    inline int getIntSelectedCamera() { return selectedCamera; }
+    inline int getIntSelectedList() { return selectedList; }
+    void selectCamera(int list, int cam);
 
     inline void getIntSelectedListAndCamera(int *list,int *cam)
     {
@@ -82,7 +83,7 @@ public:
     // Constructor
     SDCamera(SDView * screen, int myid = 0, int mydrawCurrent = 0, int mydrawCkt= 0, int mydrawdrv = 0, int mydrawBackground = 0, int mymirrorAllowed = 0);
 
-    inline int getId(){return 0;}
+    inline int getId() { return id; }
 
     virtual void update(tCarElt *car, tSituation *s) = 0;	/* Change the camera if necessary */
     virtual void setProjection(void) = 0;

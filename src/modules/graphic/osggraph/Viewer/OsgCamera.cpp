@@ -138,6 +138,7 @@ void SDPerspCamera::loadDefaults(char *attr)
     sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
     fovy = (float)GfParmGetNum(grHandle, path, attr, (char*)NULL, fovydflt);
     limitFov();
+    setProjection();
 }
 
 /* Give the height in pixels of 1 m high object on the screen at this point */
@@ -280,7 +281,7 @@ void SDPerspCamera::setZoom(int cmd)
     }
 
     this->setProjection();
-    sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, screen->getCameras()->getIntSelectedCamera(), getId());
+    sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, screen->getCameras()->getIntSelectedList(), getId());
     sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
     GfParmSetNum(grHandle, path, buf, (char*)NULL, (tdble)fovy);
     GfParmWriteFile(NULL, grHandle, "Graph");
