@@ -347,14 +347,14 @@ void NotificationManager::createUi(){
 	GfParmSetNum(this->menuXMLDescHdle, "dynamic controls/slide", "y", "null", ypos);
 }
 void NotificationManager::updateWebserverStatusUi(){
-/*	//todo: this was causing some random crash
+	//todo: this was causing some random crash
 	//if there is some prev ui around hide it
-	if(this->notifyUiIdBusyIcon > 0){
+	if(this->notifyUiIdBusyIcon > 0 && this->screenHandle == this->prevScreenHandle){
 		
 		GfuiVisibilitySet(this->prevScreenHandle, this->notifyUiIdBusyIcon, GFUI_INVISIBLE);
 
 	}	
-*/	
+	
 	if(this->screenHandle > 0){
 		//if webserver is busy display busy icon
 		std::string webServerIcon = "busyicon";
