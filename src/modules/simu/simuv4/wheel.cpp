@@ -155,24 +155,25 @@ SimWheelConfig(tCar *car, int index)
 	/* calculate optimal slip value */
 	tdble s, Bx, low, high;
 	int i;
-	//wheel->mfC * atan(Bx * (1.0f - wheel->mfE) + wheel->mfE * atan(Bx))
-	Bx = PI_2 / wheel->mfC;
-	low = high = Bx;
-	while (wheel->mfC * atan(low * (1.0f - wheel->mfE) + wheel->mfE * atan(low)) > PI_2) {
-		low *= 0.9;
-	}
-	while (wheel->mfC * atan(high * (1.0f - wheel->mfE) + wheel->mfE * atan(high)) < PI_2) {
-		high *=1.1;
-	}
-	for (i = 0; i < 32; i++) {
-		Bx = 0.5 * (low + high);
-		if (wheel->mfC * atan(Bx * (1.0f - wheel->mfE) + wheel->mfE * atan(Bx)) < PI_2) {
-			low = Bx;
-		} else {
-			high = Bx;
+	//wheel->mfC * atan(Bx * (1.0f - wheel->mfE) + wheel->mfE * atan(Bx)) == PI/2
+	low = 0.0;
+	high = wheel->mfB;
+	
+	if (wheel->mfC * atan(high * (1.0f - wheel->mfE) + wheel->mfE * atan(high)) < PI_2) {
+		/* tire parameters are unphysical*/
+		s = 1.0;
+		GfLogWarning("Tire magic curve parameters are unphysical!");
+	} else {
+		for (i = 0; i < 32; i++) {
+			Bx = 0.5 * (low + high);
+			if (wheel->mfC * atan(Bx * (1.0f - wheel->mfE) + wheel->mfE * atan(Bx)) < PI_2) {
+				low = Bx;
+			} else {
+				high = Bx;
+			}
 		}
+		s = 0.5 * (low + high) / wheel->mfB;
 	}
-	s = 0.5 * (low + high) / wheel->mfB;
 	car->carElt->_wheelSlipOpt(index) = s;
 }
 
