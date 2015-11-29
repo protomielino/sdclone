@@ -370,9 +370,10 @@ cGrBoard::grDispGGraph()
     // FR wheel
     s = car_->_wheelSlipNorm(0)/car_->_wheelSlipOpt(0);
     if (s > 1.0) {
-      glColor4f(1.0f, 0.0f, MIN(1.0f, s - 1.0), 0.9f);
+      s = MIN(1.0f, s - 1.0f);
+      glColor4f(1.0f - 0.5f * s, 0.0f, 0.5f * s, 0.9f);
     } else {
-      glColor4f(s, s, 1.0f - s, 0.9f);
+      glColor4f(s, 0.5f + 0.5f * s, 0.0f, 0.9f);
     }
     glVertex2f(X1 + 40.0f, Y1 + 30.0f);
     glVertex2f(X1 + 50.0f, Y1 + 30.0f);
@@ -381,9 +382,10 @@ cGrBoard::grDispGGraph()
     // FL wheel
     s = car_->_wheelSlipNorm(1)/car_->_wheelSlipOpt(1);
     if (s > 1.0) {
-      glColor4f(1.0f, 0.0f, MIN(1.0f, s - 1.0), 0.9f);
+      s = MIN(1.0f, s - 1.0f);
+      glColor4f(1.0f - 0.5f * s, 0.0f, 0.5f * s, 0.9f);
     } else {
-      glColor4f(s, s, 1.0f - s, 0.9f);
+      glColor4f(s, 0.5f + 0.5f * s, 0.0f, 0.9f);
     }
     glVertex2f(X1 - 50.0f, Y1 + 30.0f);
     glVertex2f(X1 - 40.0f, Y1 + 30.0f);
@@ -392,9 +394,10 @@ cGrBoard::grDispGGraph()
     // RR wheel
     s = car_->_wheelSlipNorm(2)/car_->_wheelSlipOpt(2);
     if (s > 1.0) {
-      glColor4f(1.0f, 0.0f, MIN(1.0f, s - 1.0), 0.9f);
+      s = MIN(1.0f, s - 1.0f);
+      glColor4f(1.0f - 0.5f * s, 0.0f, 0.5f * s, 0.9f);
     } else {
-      glColor4f(s, s, 1.0f - s, 0.9f);
+      glColor4f(s, 0.5f + 0.5f * s, 0.0f, 0.9f);
     }
     glVertex2f(X1 + 40.0f, Y1 - 50.0f);
     glVertex2f(X1 + 50.0f, Y1 - 50.0f);
@@ -403,9 +406,10 @@ cGrBoard::grDispGGraph()
     // RL wheel
     s = car_->_wheelSlipNorm(3)/car_->_wheelSlipOpt(3);
     if (s > 1.0) {
-      glColor4f(1.0f, 0.0f, MIN(1.0f, s - 1.0), 0.9f);
+      s = MIN(1.0f, s - 1.0f);
+      glColor4f(1.0f - 0.5f * s, 0.0f, 0.5f * s, 0.9f);
     } else {
-      glColor4f(s, s, 1.0f - s, 0.9f);
+      glColor4f(s, 0.5f + 0.5f * s, 0.0f, 0.9f);
     }
     glVertex2f(X1 - 50.0f, Y1 - 50.0f);
     glVertex2f(X1 - 40.0f, Y1 - 50.0f);
@@ -1836,6 +1840,7 @@ cGrBoard::grDispDashboard()
   const tDashboardItem *item;
 
   // Setup information string
+  ///printf("DB: active=%d, inst=%d, req=%d\n",car_->_dashboardActiveItem,car_->_dashboardInstantNb,car_->_dashboardRequestNb);
   if (car_->_dashboardActiveItem < car_->_dashboardInstantNb) {
     item = &(car_->_dashboardInstant[car_->_dashboardActiveItem]);
     switch (item->type) {
@@ -1876,6 +1881,7 @@ cGrBoard::grDispDashboard()
         snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
         break;
     }
+    ///printf("DB item %d, val=%g\n",item->type,item->setup->value);
   } else {
     item = &(car_->_dashboardRequest[car_->_dashboardActiveItem - car_->_dashboardInstantNb]);
     switch (item->type) {
@@ -1918,6 +1924,7 @@ cGrBoard::grDispDashboard()
         snprintf(buf3, sizeof(buf3), "%s", "");
         break;
     }
+    ///printf("DB item %d, des=%g\n",item->type,item->setup->desired_value);
   }
   
   // Background
@@ -1929,6 +1936,7 @@ cGrBoard::grDispDashboard()
   grSetupDrawingArea(x1, y1, x1 + 32 * dx, y1 - dy);
   
   // Write information
+  ///printf("%s|%s|%s\n",buf1,buf2,buf3);
   if (car_->_dashboardActiveItem < car_->_dashboardInstantNb) {
     GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
     GfuiDrawString(buf2, danger_color_, GFUI_FONT_LARGE_C, x1 + 16 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
