@@ -821,6 +821,13 @@ tRmInfo* ReSituationUpdater::copySituation(tRmInfo*& pTarget, const tRmInfo* pSo
 		//pTgtCar->_debug = pSrcCar->_debug; // Ever used anywhere ?
 		pTgtCar->priv.collision_state = pSrcCar->priv.collision_state;
 		//pTgtCar->_memoryPool ...; // ???? Memory pool copy ??????
+		pTgtCar->_dashboardActiveItem = pSrcCar->_dashboardActiveItem;
+		/* NOTE: dashboardInstant, dashboardInstantNb, dashboardRequest, dashboardRequestNb
+		 * are not copied, because they are initialized once and never changed again.
+		 * An dashboardInstant and dashboardRequest's tCarSetupItem pointers
+		 * are not updated, so they always point to the targets setup field.
+		 * This is safe until the graphics engine does not start to change car setups.
+		 */ 
 
 		// 5) ctrl (raw mem copy)
 		memcpy(&pTgtCar->ctrl, &pSrcCar->ctrl, sizeof(tCarCtrl));
