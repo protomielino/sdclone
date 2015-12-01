@@ -218,6 +218,15 @@ void GfglFeatures::detectStandardSupport()
 
     _mapSupportedInt[AnisotropicFiltering] = bValue?2:InvalidInt;
 
+    // 11) MultiSampling
+#if SDL_MAJOR_VERSION >= 2
+    bValue = SDL_GL_ExtensionSupported("GL_ARB_multisample");
+#else
+    bValue = gfglIsOpenGLExtensionSupported("GL_ARB_multisample");
+#endif
+    _mapSupportedBool[MultiSampling] = bValue;
+    _mapSupportedInt[MultiSamplingSamples] = bValue?8:InvalidInt; // Good but reasonable value. (8)
+
 }
 #if SDL_MAJOR_VERSION >= 2
 // Best supported features detection for the given specs of the frame buffer.
