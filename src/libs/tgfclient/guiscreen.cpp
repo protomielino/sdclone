@@ -439,7 +439,8 @@ SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,in
         nWinWidth, nWinHeight, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
 
 
-    // Set window icon (MUST be a 32x32 icon for Windows, and with black pixels as alpha ones, 
+#if !defined(__APPLE__)
+    // Set window icon (MUST be a 32x32 icon for Windows, and with black pixels as alpha ones,
     // as BMP doesn't support transparency).
     std::ostringstream ossIconFilename;
     ossIconFilename << GfDataDir() << "data/icons/icon.bmp";
@@ -450,7 +451,7 @@ SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,in
         SDL_SetWindowIcon(GfuiWindow, surfIcon);
         SDL_FreeSurface(surfIcon);
     }
-
+#endif
     // attempt to make window operational
     SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, -1, 0);
     SDL_RenderPresent(renderer);
@@ -571,6 +572,11 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
 	
 	if(bFullScreen)
 		bfVideoMode |= SDL_WINDOW_FULLSCREEN;
+
+	// TODO ?
+	// Add new values to the config OpenGL Major and Minor 
+	// and setup GL Major/Minor before window creation
+	// SDL_GL_SetSwapInterval(1) for for vsync (may have to go AFTER window creation)
 
 	if (bTryBestVInitMode) 
 	{
