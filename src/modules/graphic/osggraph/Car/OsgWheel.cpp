@@ -90,6 +90,10 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
     loader.AddSearchPath(strTPath);
     GfOut("Chemin Textures : %s\n", strTPath.c_str());
 
+    snprintf(buf, MaxPathSize, "data/objects/");
+    strTPath = TmpPath+buf;
+    loader.AddSearchPath(strTPath);
+
     snprintf(buf, MaxPathSize, "data/textures/");
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
