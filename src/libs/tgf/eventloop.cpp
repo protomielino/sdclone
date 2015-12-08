@@ -58,8 +58,10 @@ private: // Private data members.
 	//! Initialization flag for the underlying software layers.
 	static bool _bInitialized;
 
+#if SDL_MAJOR_VERSION < 2
 	//! Unicode for each typed SDL key sym + modifier
 	std::map<Uint32, Uint16> _mapUnicodes;
+#endif
 };
 
 GfEventLoop::Private::Private()
@@ -82,6 +84,10 @@ GfEventLoop::Private::Private()
 // is typed ; we never clears this map, but assume not that many such combinations
 // will be typed in a game session (could theorically go up to 2^23 combinations, though ;-)
 // Known issues (TODO): No support for Caps and NumLock keys ... don't use them !
+
+// As of SDL2, this translation to unicode is no longer needed. SDL2 has unicode support
+// It can now be used to translate keycodes to other keycodes. See SDLK_KP_ENTER
+// below, we do not want to treat the two <Enter> keys as distinct.
 int GfEventLoop::Private::translateKeySym(int code, int modifier, int unicode)
 {
 #if SDL_MAJOR_VERSION < 2
@@ -112,6 +118,10 @@ int GfEventLoop::Private::translateKeySym(int code, int modifier, int unicode)
 	// Done.
 	return keyUnicode;
 #else
+	// Make the Numpad <Enter> key behave like the regular <Enter> key
+	if(SDLK_KP_ENTER == code)
+		code = SDLK_RETURN;
+
 	return code;
 #endif
 }
