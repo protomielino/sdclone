@@ -23,7 +23,7 @@ SET(CONFSCREENS_SOURCES ${CS}/playerconfig.cpp ${CS}/controlconfig.cpp
 SET(CONFSCREENS_HEADERS ${CS}/confscreens.h ${CS}/advancedgraphconfig.h
                         ${CS}/playerconfig.h ${CS}/controlconfig.h
                         ${CS}/joystickconfig.h ${CS}/mouseconfig.h
-                        ${CS}/joy2butconfig.h ${CS}/
+                        ${CS}/joy2butconfig.h ${CS}/monitorconfig.h
                         ${CS}/displayconfig.h ${CS}/graphconfig.h ${CS}/openglconfig.h 
                         ${CS}/simuconfig.h ${CS}/soundconfig.h ${CS}/aiconfig.h
                         ${CS}/carsettingsmenu.h ${CS}/hostsettingsmenu.h)
