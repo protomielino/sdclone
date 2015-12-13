@@ -108,6 +108,7 @@ static tScreenSize ADefScreenSizes[] =
 	{ 1800, 1440 },
 	{ 1920, 1080 },
 	{ 1920, 1200 },
+	{ 3840, 2160 }
 };
 static const int NDefScreenSizes =
 	sizeof(ADefScreenSizes) / sizeof(ADefScreenSizes[0]);
