@@ -45,9 +45,6 @@ SDScreens::SDScreens() :
     m_CurrentScreenIndex(0)
 {
     debugHUD = new SDDebugHUD();
-    //viewer = static_cast<osgViewer::Viewer *> (GfScrGetViewer());
-    viewer = new osgViewer::Viewer;
-    viewer->setSceneData(new osg::Group());
 }
 
 class CameraDrawnCallback : public osg::Camera::DrawCallback
@@ -242,10 +239,10 @@ SDScreens::~SDScreens()
         delete Screens[i];
     }
 
-    viewer->setSceneData(new osg::Group());
+    //viewer->setSceneData(new osg::Group());
 
 
-    delete viewer;
+    //delete viewer;
     delete debugHUD;
-    viewer = NULL;
+    //viewer = NULL;
 }

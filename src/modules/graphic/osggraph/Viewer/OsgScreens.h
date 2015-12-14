@@ -32,7 +32,7 @@ class SDReflectionMapping;
 class SDScreens
 {
 protected:
-    osgViewer::Viewer* viewer;
+    osg::ref_ptr<osgViewer::Viewer> viewer;
     std::vector<SDView *> Screens;
     osg::ref_ptr<osg::Group> root;
     osg::ref_ptr<osg::Group> mirrorScene;
