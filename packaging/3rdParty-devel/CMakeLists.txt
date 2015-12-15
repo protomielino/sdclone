@@ -27,7 +27,7 @@
 # (hashtag) starts a comment
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-project(3rdParty-devel)
+project(3rdParty-2.2)
 
 include(ExternalProject)
 include(CMakeDependentOption)
@@ -81,7 +81,7 @@ option(OPTION_VORBIS "Download and Build libvorbis" true)
 option(OPTION_EXPAT "Download and Build Expat" true)
 option(OPTION_ZLIB "Download and Build zlib" true)
 option(OPTION_PNG "Download and Build libpng" true)
-option(OPTION_SQLITE3 "Download and Build sqlite3" true)
+option(OPTION_SQLITE3 "Download and Build sqlite3" false)
 option(OPTION_FREETYPE "Download and Build FreeType" true)
 option(OPTION_CURL "Download and Build curl" true)
 option(OPTION_OSG "Download and Build OpenSceneGraph" true)
@@ -407,7 +407,7 @@ endif(OPTION_OSG)
 #add_subdirectory(src)
 
 # no-output target, for having some files available in IDEs.
-set(DOCSOURCES COPYING LICENSE)
+set(DOCSOURCES COPYING LICENSE readme.txt)
 
 add_custom_target(rootdoc SOURCES ${DOCSOURCES})
 
