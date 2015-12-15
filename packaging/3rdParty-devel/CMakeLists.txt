@@ -122,7 +122,7 @@ ExternalProject_Add_Step(SDL-1.2.15 sdl1x_add_cmake
 endif(OPTION_SDL_1x)
 
 # TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)
-message(WARNING "TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)")
+# message(WARNING "TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)")
 
 if(OPTION_SDL_2x)
 set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off)
@@ -198,7 +198,7 @@ ExternalProject_Add(jpeg-9a
 endif(OPTION_JPEG)
 
 if(OPTION_FREESOLID)
-message(WARNING "TODO - need to decide between the patches for FreeSOLID-2.1.1 OR FreeSOLID-2.1.2")
+#message(WARNING "TODO - need to decide between the patches for FreeSOLID-2.1.1 OR FreeSOLID-2.1.2")
 #ExternalProject_Add(FreeSOLID-2.1.1 
 #   DOWNLOAD_NAME FreeSOLID-2.1.1.zip
 #   URL http://sourceforge.net/projects/freesolid/files/FreeSOLID/FreeSOLID-2.1.1.zip/FreeSOLID-2.1.1.zip/download 
@@ -321,18 +321,21 @@ ExternalProject_Add_Step(zlib-1.2.8 sd_zlib_rename_lib
 endif(OPTION_ZLIB)
 
 if(OPTION_PNG)
-set(PNG_ARGS ${EXTERNALS_CMAKE_ARGS} -DPNG_SHARED=off -DPNG_TESTS=off -DCMAKE_DEBUG_POSTFIX='')
-ExternalProject_Add(libpng-1.6.18 
-   DOWNLOAD_NAME libpng-1.6.18.tar.gz 
-   URL http://sourceforge.net/projects/libpng/files/libpng16/1.6.18/libpng-1.6.18.tar.gz/download 
-   URL_HASH SHA256=593D9216270DCA1AB1FC2F0E4383A9AC99394C349392FB0F65043F0E6FBFDAC6
-   CMAKE_ARGS ${PNG_ARGS}
-   DEPENDS zlib-1.2.8
-   )
-   ExternalProject_Add_Step(libpng-1.6.18 sd_libpng_rename
-   COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/libpng16_static${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/libpng.lib
-   DEPENDEES install
-   )
+   set(PNG_PROJECT libpng-1.6.19)
+   set(PNG_ARGS ${EXTERNALS_CMAKE_ARGS} -DPNG_SHARED=off -DPNG_TESTS=off -DCMAKE_DEBUG_POSTFIX='')
+   ExternalProject_Add(${PNG_PROJECT} 
+      DOWNLOAD_NAME ${PNG_PROJECT}.tar.gz 
+      URL http://sourceforge.net/projects/libpng/files/libpng16/1.6.19/libpng-1.6.19.tar.gz/download 
+      URL_HASH MD5=3121BDC77C365A87E054B9F859F421FE
+      CMAKE_ARGS ${PNG_ARGS}
+      DEPENDS zlib-1.2.8
+      )
+      ExternalProject_Add_Step(${PNG_PROJECT} sd_libpng_rename
+      COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/libpng16_static${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/libpng.lib
+      DEPENDEES install
+      )
+else(OPTION_PNG)
+   set(PNG_PROJECT libpng-1.6.19)
 endif(OPTION_PNG)
 
 if(OPTION_SQLITE3)
@@ -393,7 +396,7 @@ if(OPTION_OSG)
    URL http://trac.openscenegraph.org/downloads/developer_releases/OpenSceneGraph-3.4.0.zip
    URL_HASH MD5=A5E762C64373A46932E444F6F7332496
    CMAKE_ARGS ${OSG_ARGS}
-   DEPENDS zlib-1.2.8 curl-7.43.0 freetype-2.5.3 OpenGL-headers jpeg-9a libpng-1.6.18 SDL-1.2.15 SDL2-2.0.3
+   DEPENDS zlib-1.2.8 curl-7.43.0 freetype-2.5.3 OpenGL-headers jpeg-9a ${PNG_PROJECT} SDL-1.2.15 SDL2-2.0.3
    )
    ExternalProject_Add_Step(osg-OpenSceneGraph-3.4.0 sdl1x_add_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
