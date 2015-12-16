@@ -15,8 +15,9 @@ II - Linux Installation from sources
 
 III - Windows Installation from sources
 
-  1 - CMake and MinGW under Windows
-  2 - CMake and MS VC++ 2005 (8) / 2008 (9) / 2010 (10) under Windows
+  1 - CMake and MinGW under Windows (NOTE: may be outdated!)
+  2 - CMake and MS VC++ 2008 (9) / 2010 (10) 2012 (11) under Windows
+                (MS VC++ 2005 (8) should work, but was not tested for Speed-Dreams 2.2)
   3 - MS VC++ 6 : no more supported
 
 IV - FreeBSD Installation from sources (Work in progress)
@@ -45,7 +46,14 @@ I - Pre-requisites
 
 And also Open Scene Graph 3.x if you plan to build the work-in-progress next generation "osggraph" 3D graphics engine module.
 
-WARNING: Under Windows, be carefull to compile anything for multi-threaded DLL integration (/MD[d])
+As of version 2.2, you will also need:
+- SDL 2.0.x (http://www.libsdl.org/)
+- FreeSOLID 2.1.2 (http://sourceforge.net/projects/freesolid)
+- cURL 7.43.0 (http://curl.haxx.se/download/curl-7.43.0.tar.bz2)
+- FreeType 2.5.3 (http://sourceforge.net/projects/freetype)
+
+
+WARNING: Under Windows, be careful to compile everything for multi-threaded DLL integration (/MD[d])
 
 
 II - Linux installation from sources
@@ -313,15 +321,15 @@ The Speed Dreams Team.
 III - Windows installation from sources
 ---------------------------------------
 
-Note that these instructions work under Windows XP 32 SP2/SP3 ; 
-some tweaks might be needed for newer / wider versions.
+Note that these instructions work under Windows Vista,Windows 7 SP1, Windows 8, Windows 8.1; 
+some tweaks might be needed for newer versions.
 
 0) Initial steps, common to all build methods
 
-  a.  Install CMake v2.6+ http://www.cmake.org/cmake/resources/software.html
+  a.  Install CMake v2.8 or higher (recommend 3.4) http://www.cmake.org/cmake/resources/software.html
 
   b.  Download the official Speed Dreams tarballs from SF.net
-        http://sourceforge.net/projects/speed-dreams/files/2.1.0
+        http://sourceforge.net/projects/speed-dreams/files/2.2.0
       (speed-dreams-src-<package>-<version>.tar.xz)
       
         Note: See II.2.a above about which packages you really need.
@@ -338,7 +346,7 @@ some tweaks might be needed for newer / wider versions.
       
         Note: See II.2.b above about the order in which you need to extract the packages.
 
-1) CMake and MinGW :
+1) CMake and MinGW : (NOTE: may be outdated!)
 
   Notes: 
    * Tested with success with CMake 2.8.2 and 2.8.8 + MinGW 2012 April (gcc 4.7.0),
@@ -637,36 +645,36 @@ some tweaks might be needed for newer / wider versions.
 
        * You can now "Compile / Run" or "Debug / Start debugging / Start debugging" from the menu !
 
-2) Cmake and MS VC++ 2005 (8) / 2008 (9) / 2010 (10) on Windows XP 32
-
-Note: If you use an "Express" version, don't forget to install also the Windows SDK.
+2) CMake and MS VC++ 2008 (9) / 2010 (10) / 2012 (11) on Windows Vista 32, Windows 7, Windows 8, Windows 8.1
+   (MS VC++ 2005 (8) should work, but was not tested for Speed-Dreams 2.2)
 
   a.b.c. See above 0) Initial steps, common to all build methods
 
-  d.  Download the "MSVC 2005 / 2.0.0-or-earlier" release of the "3rdParty" binary package from SF.net
+  d.  Download the apprpriate "3rdParty" binary package from SF.net for your compiler
         http://sourceforge.net/projects/speed-dreams/files/3rd%20party
-      (it contains necessary 3rd party libs compiled with/for MSVC 2005)
+      (they contain necessary 3rd party libs compiled with/for a specific MSVC compiler)
+         (if your compiler is not listed See the Note below to compile your own)
   e.  Extract from the zip file the "3rdParty" directory to where speed-dreams sources
       are installed.  
-      Example: If sources are in c:\gamesources\speed-dreams\src-2.0.0
+      Example: If sources are in c:\gamesources\speed-dreams\src-2.2.0
                (inside which you should find at least the "src" and "data" folders), 
                then extract 3rd party zip in c:\gamesources\speed-dreams\3rdParty
                (inside which you should find at least the "include" and "lib" folders), 
   f.  Startup CMake GUI and set :
-      * "Where is the source code" to c:\gamesources\speed-dreams\src-2.0.0
-      * "Where to build the binaries" to c:\gamesources\speed-dreams\src-2.0.0\build
+      * "Where is the source code" to c:\gamesources\speed-dreams\src-2.2.0
+      * "Where to build the binaries" to c:\gamesources\speed-dreams\src-2.2.0\build
         (if you follow the folder specs above).
   g.  Press "Configure" button, answer "Yes, create the ...\build folder",
       select the right MSVC compiler version and don't change the "Use native compilers" option.
       Press the "Configure" button again, until the "Generate" button is no more greyed.
   h.  Press the "Generate" button.  CMake will generate the solution file "speed-dreams-2.sln"
-      and associated project files (*.vcproj) in the ...\build folder
-      (Note : .sln/.vcproj are OK for MSVC 2005, but you might get other files extensions
-              the later MSVC versions).
+      and associated project files (*.vcxproj) in the ...\build folder
+      (Note : .sln/.vcxproj are OK for MSVC 2010, but you might get other files extensions
+           for different MSVC versions).
   i.  Load speed-dreams-2.sln in MSVC IDE.
   j.  Select the build configuration (Debug, Release, ...).
   k.  Build the whole Solution (Build / Build Solution)
-  l.  Build the 'INSTALL' project (right click on it and select Build).
+  l.  (optional)Build the 'INSTALL' project (right click on it and select Build).
   m.  Double-click on speed-dreams-2.exe in c:\speed-dreams-2-build\bin
 
  Note: First-ever startups sometimes fail to correctly write the necessary stuff
@@ -674,34 +682,14 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
        If this happens, simply remove the <My documents>\speed-dreams-2.settings folder
        with Windows explorer, and restart the game : it should now work.
 
- Note: This should also work with MSVC 2008/2010.
-       For MSVC 2003, you'll probably need to rebuild
-       a dedicated 3rdParty package for this compiler
+ Note : If you need to compile the 3rdParty package from sources:
+        As of r6211 there is a work in progress CMake script at:
+        https://svn.code.sf.net/p/speed-dreams/code/trunk/packaging/3rdParty-devel/CMakeLists.txt
 
- Note : If you need to recompile the 3rdParty package from sources,
-        (the "Sources/2.0.0-or-earlier" release of the "3rdParty" package on SF.net Download page)
-        be carefull then to rebuild :
-         - everything possible
-         - for the same configuration (don't mix Release and Debug) 
-         - everything for multithreaded DLL integration (/MD & /MDd),
-        ... or be ready for headaches, and no support at all ;-)
+        Please note: this CMake script uses CMake's ExternalProject module. It downloads the needed
+        sources and builds them. This can use considerable bandwith! (and take a long time).
+        Please see the readme.txt in that directory.
 
- Note: Building from SVN repo at SF.net :
-       From trunk@r4790, there's CMake support for a new MSVC 2005 3rd party binary package,
-       with updated releases of the dependencies, + 2 new ones : Expat 2 and FreeSOLID 2,
-       coming there in order to replace the bundled versions (txml and simuv2.1/SOLID-2.0),
-       in order SD becomes compatible with FOSS Linux distros (like Fedora, Debian, ...).
-       See http://sourceforge.net/projects/speed-dreams/files/3rd%20party/MSVC%202005/post-2.0.0
-       (and http://sourceforge.net/projects/speed-dreams/files/3rd%20party/Sources/post-2.0.0),
-       along with "II - Linux installation from sources" for some more tips about CMake options.
-      
- Note: If you plan to build "osggraph", extract the Open Scene Graph 3.x binaries
-       from Alpha Pixel in your 3rdParty folder ; get the ones for your own version of MSVC :
-         http://www.alphapixel.com/osg/downloads/free-openscenegraph-binary-downloads
-       And after building and installing SD, don't forget to manually copy libpng13.dll
-       from the Open Scene Graph package to SD "bin" install folder
-       (because Alpha Pixel's OSG libs are dynamically linked to libpng, which is neither the case
-        for the remainder of our 3rd party MSVC 2005 package, nor for SD itself).
 
 3) MS VC++ 6 : No more supported.
 
