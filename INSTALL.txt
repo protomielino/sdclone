@@ -22,7 +22,9 @@ III - Windows Installation from sources
 
 IV - FreeBSD Installation from sources (Work in progress)
 
-V - MacOS X installation from sources (TODO)
+V - MacOS X installation from sources 
+  1 - CMake and McPorts
+  2 - CMake and XCode (TODO)
 
 
 
@@ -180,7 +182,8 @@ The Speed Dreams Team.
 
         - CMAKE_PREFIX_PATH:STRING :
             Path prefixes for additional 3rdParty libraries (def:empty)
-            (use /usr/local if you compiled some 3rdParty libs yourself).
+            (use /usr/local if you compiled some 3rdParty libs yourself)
+            or (use /opt/local for MacPorts on OS X).
 
         - CMAKE_INSTALL_PREFIX:PATH :
             Install path for Speed Dreams (def: /usr/local)
@@ -196,10 +199,9 @@ The Speed Dreams Team.
                   Ask the dev team for any hint about building it ...
 
         - OPTION_OSGGRAPH:BOOL :
-            Enable building of the WIP new OpenSceneGraph-based graphics module 'osggraph' (def: OFF)
+            Enable building of the WIP new OpenSceneGraph-based graphics module 'osggraph' (def: ON)
             Note: This requires new 3rd party libs : OpenSceneGraph
-            Hint: Once built, to load it at race-time, substitute 'ssggraph' by 'osggraph'
-                  in <user settings>/config/raceengine.xml
+            Hint: Once built, to load it at race-time, goto Options->OpenGL
 
         - OPTION_TRACE:BOOL :
             Full run-time traces if ON (def: ON)
@@ -220,12 +222,17 @@ The Speed Dreams Team.
             Enable debug symbols even in Release builds (def: OFF)
             (see http://sourceforge.net/p/speed-dreams/tickets/356).
 
-        - OPTION_START_PAUSED:BOOL :
-            Begin the race in a 'Paused' state (def: OFF)
-            (see http://sourceforge.net/p/speed-dreams/tickets/356).
+        - OPTION_SDL2:BOOL :
+            Use SDL2 for Window/Input management (def: ON)
+            Set to OFF to use SDL1.
 
-        - OPTION_COOLDOWN:BOOL :
-            Allow driving after the race is complete (def: OFF)
+        - OPTION_SDL_JOYSTICK:BOOL :
+            Use SDLx to read the joystick. (def: ON)
+            Set to OFF to use PLIB for joystick input.
+
+        - OPTION_WEBSERVER:BOOL :
+            Enable the WIP Webserver/Laplogger (def: OFF)
+            (see http://sourceforge.net/p/speed-dreams/tickets/912).
 
         Tips reported about some issues :
         - sometimes, ENET_INCLUDE_DIR is not detected correctly, resulting in something like
@@ -722,5 +729,61 @@ Some specific details though :
 V - MacOS X installation from sources
 --------------------------------------
 
-To do ...
+1 - CMake and McPorts via Terminal
+
+  a. install xcode (from app store)
+
+    1. If you haven't used it before, run xcode at least once. It might prompt you to agree to an Apple user agreement.
+
+  b. xcode command-line tools (xcode-select --install)
+
+  c. install Macports (https://www.macports.org/install.php)
+
+  d. install CMake (http://www.cmake.org/download/) OR from Macports
+
+  e. install the dependencies (via Macports)
+     sudo port -t install python27
+     sudo port -t install libsdl
+     sudo port -t install libsdl2
+     sudo port -t install openal-soft
+     sudo port -t install plib
+     sudo port -t install libenet
+     sudo port -t install libogg
+     sudo port -t install libvorbis
+     sudo port -t install expat
+     sudo port -t install zlib
+     sudo port -t install libpng
+     sudo port -t install jpeg
+     sudo port -t install jasper
+     sudo port -t install freetype
+     sudo port -t install curl
+     sudo port -t install subversion
+     sudo port -t install cmake
+
+  f. As of Dec 2015, the OpenSceneGraph port is broken, so it needs to be
+     built from sources:
+     1. Download the source (http://trac.openscenegraph.org/downloads/developer_releases/OpenSceneGraph-3.4.0.zip)
+     2. Unpack the source somewhere (eg /home/source/OpenSceneGraph-3.4.0)
+     3. From a Terminal: 
+        a) cd /home/source/OpenSceneGraph-3.4.0
+        b) mkdir build
+        c) cd build
+        d) cmake -G"Unix Makefiles" -D CMAKE_INSTALL_PREFIX=/opt/local -D CMAKE_PREFIX_PATH=/opt/local ..
+           Note: if you installed Macports to a non-standard location, adjust the CMAKE options accordingly.
+        e) sudo make install (this can take a long time). 
+
+  g. Download or checkout the Speed-Dreams sources from 
+      (https://sourceforge.net/p/speed-dreams/code/HEAD/tree/)
+
+  h. Unpack the source somewhere (eg /home/source/speed-dreams)
+  i. From a Terminal: 
+        1) cd /home/source/speed-dreams
+        2) mkdir build
+        3) cd build
+        4) cmake -G"Unix Makefiles" -D CMAKE_INSTALL_PREFIX=speed-dreams-2.app -D OPTION_OFFICIAL=true ..
+        5) make install
+        6) Double-click on speed-dreams-2.app in Finder or drag speed-dreams-2.app into your Apllications folder.
+
+
+2 - CMake and XCode (TODO)
 
