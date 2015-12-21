@@ -51,6 +51,23 @@ static const int DEFAULT_WIDTH = 800;
 
 static const int BUFSIZE = 256;
 
+//string constants for dashboard
+const char strBrakeRep[] = "F/R Brake Rep.";
+const char strFrontARB[] = "Front ARB";
+const char strRearARB[] = "Rear ARB";
+const char strFDiffMSB[] = "F Pow Max Slip";
+const char strFDiffCMSB[] = "F Coa Max Slip";
+const char strRDiffMSB[] = "R Pow Max Slip";
+const char strRDiffCMSB[] = "R Coa Max Slip";
+const char strCDiffMSB[] = "C Pow Max Slip";
+const char strCDiffCMSB[] = "C Coa Max Slip";
+const char strFuel[] = "Fuel";
+const char strRepair[] = "Repair";
+const char strTireSet[] = "New tires";
+const char strFrontWing[] = "Front wing";
+const char strRearWing[] = "Rear wing";
+const char strPenalty[] = "Next pit type";
+
 
 cGrBoard::cGrBoard(int myid) :
     normal_color_(NULL), danger_color_(NULL), ok_color_(NULL),
@@ -116,8 +133,8 @@ cGrBoard::loadDefaults(const tCarElt *curCar)
   leaderFlag  = (int)GfParmGetNum(grHandle, path, GR_ATT_LEADER, NULL, 1);
   leaderNb  = (int)GfParmGetNum(grHandle, path, GR_ATT_NBLEADER, NULL, 10);
   counterFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_COUNTER, NULL, 1);
-  GFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_GGRAPH, NULL, 1);
-  dashboardFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_DASHBOARD, NULL, 0);
+  GFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_GGRAPH, NULL, 2);
+  dashboardFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_DASHBOARD, NULL, 1);
   arcadeFlag  = (int)GfParmGetNum(grHandle, path, GR_ATT_ARCADE, NULL, 0);
   boardWidth  = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARDWIDTH, NULL, 100);
   speedoRise  = (int)GfParmGetNum(grHandle, path, GR_ATT_SPEEDORISE, NULL, 0);
@@ -1831,7 +1848,8 @@ cGrBoard::grGenerateLeaderBoardEntry(const tCarElt *car, const tSituation* s,
 void
 cGrBoard::grDispDashboard()
 {
-  char buf1[17], buf2[9], buf3[9];
+  const char *buf1;
+  char buf2[9], buf3[9];
   int dym = GfuiFontHeight(GFUI_FONT_MEDIUM_C);
   int y1;
   int dx = GfuiFontWidth(GFUI_FONT_LARGE_C, "E");
@@ -1840,63 +1858,61 @@ cGrBoard::grDispDashboard()
   const tDashboardItem *item;
 
   // Setup information string
-  ///printf("DB: active=%d, inst=%d, req=%d\n",car_->_dashboardActiveItem,car_->_dashboardInstantNb,car_->_dashboardRequestNb);
   if (car_->_dashboardActiveItem < car_->_dashboardInstantNb) {
     item = &(car_->_dashboardInstant[car_->_dashboardActiveItem]);
     switch (item->type) {
       case DI_BRAKE_REPARTITION:
-        snprintf(buf1, sizeof(buf1), "%s", "F/R Brake Rep.");
+        buf1 = strBrakeRep;
         snprintf(buf2, sizeof(buf2), "%.1f %%", 100.0*item->setup->value);
         break;
       case DI_FRONT_ANTIROLLBAR:
-        snprintf(buf1, sizeof(buf1), "%s", "Front ARB");
+        buf1 = strFrontARB;
         snprintf(buf2, sizeof(buf2), "%.0f kN/m", item->setup->value/1000.0);
         break;
       case DI_REAR_ANTIROLLBAR:
-        snprintf(buf1, sizeof(buf1), "%s", "Rear ARB");
+        buf1 = strRearARB;
         snprintf(buf2, sizeof(buf2), "%.0f kN/m", item->setup->value/1000.0);
         break;
       case DI_FRONT_DIFF_MAX_SLIP_BIAS:
-        snprintf(buf1, sizeof(buf1), "%s", "F Pow Max Slip");
+        buf1 = strFDiffMSB;
         snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
         break;
       case DI_FRONT_DIFF_COAST_MAX_SLIP_BIAS:
-        snprintf(buf1, sizeof(buf1), "%s", "F Coa Max Slip");
+        buf1 = strFDiffCMSB;
         snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
         break;
       case DI_REAR_DIFF_MAX_SLIP_BIAS:
-        snprintf(buf1, sizeof(buf1), "%s", "R Pow Max Slip");
+        buf1 = strRDiffMSB;
         snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
         break;
       case DI_REAR_DIFF_COAST_MAX_SLIP_BIAS:
-        snprintf(buf1, sizeof(buf1), "%s", "R Coa Max Slip");
+        buf1 = strRDiffCMSB;
         snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
         break;
       case DI_CENTRAL_DIFF_MAX_SLIP_BIAS:
-        snprintf(buf1, sizeof(buf1), "%s", "C Pow Max Slip");
+        buf1 = strCDiffMSB;
         snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
         break;
       case DI_CENTRAL_DIFF_COAST_MAX_SLIP_BIAS:
-        snprintf(buf1, sizeof(buf1), "%s", "C Coa Max Slip");
+        buf1 = strCDiffCMSB;
         snprintf(buf2, sizeof(buf2), "%.0f %%", 100.0*item->setup->value);
         break;
     }
-    ///printf("DB item %d, val=%g\n",item->type,item->setup->value);
   } else {
     item = &(car_->_dashboardRequest[car_->_dashboardActiveItem - car_->_dashboardInstantNb]);
     switch (item->type) {
       case DI_FUEL:
-        snprintf(buf1, sizeof(buf1), "%s", "Fuel");
+        buf1 = strFuel;
         snprintf(buf2, sizeof(buf2), "%.1f l", item->setup->desired_value);
         snprintf(buf3, sizeof(buf3), "%.1f l", car_->_fuel);
         break;
       case DI_REPAIR:
-        snprintf(buf1, sizeof(buf1), "%s", "Repair");
+        buf1 =strRepair;
         snprintf(buf2, sizeof(buf2), "%.0f", item->setup->desired_value);
         snprintf(buf3, sizeof(buf3), "%d", car_->_dammage);
         break;
       case DI_TYRE_SET:
-        snprintf(buf1, sizeof(buf1), "%s", "New tires");
+        buf1 = strTireSet;
         if (item->setup->desired_value > 0.9) {
           snprintf(buf2, sizeof(buf2), "%s", "YES");
         } else {
@@ -1905,17 +1921,17 @@ cGrBoard::grDispDashboard()
         snprintf(buf3, sizeof(buf3), "%s", "");
         break;
       case DI_FRONT_WING_ANGLE:
-        snprintf(buf1, sizeof(buf1), "%s", "Front wing");
+        buf1 = strFrontWing;
         snprintf(buf2, sizeof(buf2), "%.1f", RAD2DEG(item->setup->desired_value));
         snprintf(buf3, sizeof(buf3), "%.1f", RAD2DEG(item->setup->value));
         break;
       case DI_REAR_WING_ANGLE:
-        snprintf(buf1, sizeof(buf1), "%s", "Rear wing");
+        buf1 = strRearWing;
         snprintf(buf2, sizeof(buf2), "%.1f", RAD2DEG(item->setup->desired_value));
         snprintf(buf3, sizeof(buf3), "%.1f", RAD2DEG(item->setup->value));
         break;
       case DI_PENALTY:
-        snprintf(buf1, sizeof(buf1), "%s", "Next pit type");
+        buf1 = strPenalty;
         if (item->setup->desired_value > 0.9) {
           snprintf(buf2, sizeof(buf2), "%s", "PENALTY");
         } else {
@@ -1924,7 +1940,6 @@ cGrBoard::grDispDashboard()
         snprintf(buf3, sizeof(buf3), "%s", "");
         break;
     }
-    ///printf("DB item %d, des=%g\n",item->type,item->setup->desired_value);
   }
   
   // Background
@@ -1936,7 +1951,6 @@ cGrBoard::grDispDashboard()
   grSetupDrawingArea(x1, y1, x1 + 32 * dx, y1 - dy);
   
   // Write information
-  ///printf("%s|%s|%s\n",buf1,buf2,buf3);
   if (car_->_dashboardActiveItem < car_->_dashboardInstantNb) {
     GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
     GfuiDrawString(buf2, danger_color_, GFUI_FONT_LARGE_C, x1 + 16 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
