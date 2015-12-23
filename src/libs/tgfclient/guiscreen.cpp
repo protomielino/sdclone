@@ -757,7 +757,10 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
 	GfglFeatures::self().dumpHardwareInfo();
 
 	if(GfuiWindow)
+	{
 		SDL_ShowWindow(GfuiWindow);
+		SDL_RestoreWindow(GfuiWindow);
+	}
 	
 #ifdef WIN32
 	// Under Windows, give an initial position to the window if not full-screen mode

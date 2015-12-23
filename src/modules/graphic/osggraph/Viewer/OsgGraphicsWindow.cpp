@@ -151,6 +151,7 @@ bool OsgGraphicsWindowSDL2::realizeImplementation()
     if(!m_Valid) return false;
 
     SDL_ShowWindow(m_Window);
+    SDL_RestoreWindow(m_Window);
 
 #if OSG_MIN_VERSION_REQUIRED(3,3,4)
     getEventQueue()->syncWindowRectangleWithGraphicsContext();
