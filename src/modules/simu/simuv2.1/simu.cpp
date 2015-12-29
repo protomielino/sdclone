@@ -156,6 +156,7 @@ SimReConfig(tCarElt *carElt)
 	car->dammage -= carElt->pitcmd.repair;
 	if (car->dammage < 0) car->dammage = 0;
     }
+    carElt->setup.reqRepair.desired_value = 0.0;
 }
 
 
