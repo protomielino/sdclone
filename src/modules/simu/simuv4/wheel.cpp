@@ -374,7 +374,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 
 	Ft = 0.0f;
 	Fn = 0.0f;
-	s = sqrt(sx*sx+sy*sy);//printf("%d sx=%g sy=%g vt=%g wrl=%g sV=%g ", index,sx,sy,vt,wrl,wheel->spinVel);
+	s = sqrt(sx*sx+sy*sy);
 
 	{
 		// calculate _skid and _reaction for sound.
@@ -431,7 +431,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 	wheel->forces.y = Ft * SinA + Fn * CosA;
 	wheel->spinTq = Ft * wheel->radius;
 	wheel->sa = sa;
-	wheel->sx = sx;//printf("Tq=%g\n",wheel->spinTq);
+	wheel->sx = sx;
 
 	wheel->feedBack.spinVel = wheel->spinVel;
 	wheel->feedBack.Tq = wheel->spinTq;
