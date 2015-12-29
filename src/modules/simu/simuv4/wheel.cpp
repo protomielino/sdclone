@@ -374,7 +374,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 
 	Ft = 0.0f;
 	Fn = 0.0f;
-	s = sqrt(sx*sx+sy*sy);
+	s = sqrt(sx*sx+sy*sy);//printf("%d sx=%g sy=%g vt=%g wrl=%g sV=%g ", index,sx,sy,vt,wrl,wheel->spinVel);
 
 	{
 		// calculate _skid and _reaction for sound.
@@ -421,10 +421,9 @@ void SimWheelUpdateForce(tCar *car, int index)
 		// wheel axis based
 		Ft -= F * sx / s;
 		Fn -= F * sy / s;
+	} else {
+		Ft -=F;
 	}
-
-	FLOAT_RELAXATION2(Fn, wheel->preFn, 50.0f);
-	FLOAT_RELAXATION2(Ft, wheel->preFt, 50.0f);
 
 	wheel->relPos.az = waz;
 
@@ -432,7 +431,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 	wheel->forces.y = Ft * SinA + Fn * CosA;
 	wheel->spinTq = Ft * wheel->radius;
 	wheel->sa = sa;
-	wheel->sx = sx;
+	wheel->sx = sx;//printf("Tq=%g\n",wheel->spinTq);
 
 	wheel->feedBack.spinVel = wheel->spinVel;
 	wheel->feedBack.Tq = wheel->spinTq;
@@ -526,7 +525,7 @@ SimWheelUpdateRotation(tCar *car)
 		/*update rotation*/
 		wheel->spinVel = wheel->in.spinVel;
 		
-		if ( (car->features & FEAT_SLOWGRIP) && (wheel->brake.Tq == 0.0) && (car->ctrl->accelCmd * car->transmission.clutch.transferValue < 0.05) ) {
+		if ( (car->features & FEAT_SLOWGRIP) && (wheel->brake.Tq <= 1.0) && (car->ctrl->accelCmd * car->transmission.clutch.transferValue < 0.05) ) {
 			/* prevent wheelspin value oscillating around wheel tangential velocity */
 			tdble waz = wheel->steer + wheel->staticPos.az;
 			tdble vt = wheel->bodyVel.x * cos(waz) + wheel->bodyVel.y * sin(waz);
