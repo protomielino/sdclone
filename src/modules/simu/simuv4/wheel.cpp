@@ -424,6 +424,11 @@ void SimWheelUpdateForce(tCar *car, int index)
 	} else {
 		Ft -=F;
 	}
+	
+	if ( !(car->features & FEAT_SLOWGRIP) ) {
+		FLOAT_RELAXATION2(Fn, wheel->preFn, 50.0f);
+		FLOAT_RELAXATION2(Ft, wheel->preFt, 50.0f);
+	}
 
 	wheel->relPos.az = waz;
 
