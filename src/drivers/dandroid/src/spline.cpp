@@ -20,7 +20,12 @@
 #include "spline.h"
 
 
-Spline::Spline(int dim, SplinePoint *spl)
+Spline::Spline()
+{
+}
+
+
+void Spline::newSpline(int dim, SplinePoint* spl)
 {
   mSpl = spl;
   mDim = dim;

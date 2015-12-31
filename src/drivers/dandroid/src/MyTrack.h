@@ -28,23 +28,10 @@
 class MyTrack
 {
 public:
-  struct SideMod
-  {
-    SideMod() : side(-1), start(0), end(0) {}
-
-    int  side;
-    int  start;
-    int  end;
-  };
-
-public:
   MyTrack();
   ~MyTrack();
 
-  void NewTrack( tTrack* pNewTrack, bool pit = false, SideMod* pSideMod = 0 );
-
-  tTrack* GetTrack();
-  const tTrack* GetTrack() const;
+  void NewTrack( tTrack* pNewTrack, double seg_len );
 
   double GetLength() const;
   int  GetSize() const;
@@ -64,8 +51,6 @@ public:
   double CalcForwardAngle( double trackPos ) const;
   Vec2d CalcNormal( double trackPos ) const;
 
-  double GetFriction( int index, double offset ) const;
-
 private:
   void CalcPtAndNormal( const tTrackSeg* pSeg, double toStart, double& t, Vec3d& pt, Vec3d& norm ) const;
 
@@ -74,7 +59,6 @@ private:
   double m_delta;
   Seg* m_pSegs;
   tTrack* m_pCurTrack;
-  SideMod m_sideMod;
 };
 
 #endif // _MYTRACK_H_

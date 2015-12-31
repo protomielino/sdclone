@@ -31,34 +31,7 @@ LinePath::~LinePath()
  delete [] m_pPath;
 }
 
-LinePath& LinePath::operator=( const LinePath& path )
-{
-  m_pTrack = path.m_pTrack;
-
-  const int NSEG = m_pTrack->GetSize();
-
-  delete [] m_pPath;
-  m_pPath = new PathPt[NSEG];
-  memcpy( m_pPath, path.m_pPath, NSEG * sizeof(PathPt) );
-
-  return *this;
-}
-
-void LinePath::Set( const LinePath& path )
-{
-  m_pTrack = path.m_pTrack;
-  const int NSEG = m_pTrack->GetSize();
-
-  delete [] m_pPath;
-  m_pPath = new PathPt[NSEG];
-
-  m_maxL = path.m_maxL;
-  m_maxR = path.m_maxR;
-
-  memcpy( m_pPath, path.m_pPath, NSEG * sizeof(*m_pPath) );
-}
-
-void LinePath::Initialise( MyTrack* pTrack, double maxL, double maxR )
+void LinePath::Initialise( MyTrack* pTrack, double maxL, double maxR, double margin )
 {
   const int NSEG = pTrack->GetSize();
 
@@ -68,6 +41,7 @@ void LinePath::Initialise( MyTrack* pTrack, double maxL, double maxR )
 
   m_maxL = maxL;
   m_maxR = maxR;
+  m_margin = margin;
 
   for( int i = 0; i < NSEG; i++ )
   {
@@ -76,9 +50,6 @@ void LinePath::Initialise( MyTrack* pTrack, double maxL, double maxR )
     m_pPath[i].kz = 0;
     m_pPath[i].offs = m_pPath[i].pSeg->midOffs;
     m_pPath[i].pt = m_pPath[i].CalcPt();
-    m_pPath[i].maxSpd = 10;
-    m_pPath[i].spd = 10;
-    m_pPath[i].accSpd = 10;
     m_pPath[i].h = 0;
     m_pPath[i].lBuf = 0;
     m_pPath[i].rBuf = 0;
@@ -160,8 +131,6 @@ void LinePath::CalcFwdAbsK( int range)
   while( i > 0 )
   {
     m_pPath[i].fwdK = totalK / count;
-// GfOut( "***** i %d, k %7.4f fdwK %g  %6.1f\n",
-// i, m_pPath[i].k, m_pPath[i].fwdK, 1 / m_pPath[i].fwdK );
     totalK += fabs(m_pPath[i].k);
     totalK -= fabs(m_pPath[j].k);
 
@@ -170,39 +139,4 @@ void LinePath::CalcFwdAbsK( int range)
     if( j < 0 )
       j = NSEG - 1;
   }
-}
-
-double LinePath::CalcEstimatedTime( int start, int len ) const
-{
-  double totalTime = 0;
-
-  const int NSEG = m_pTrack->GetSize();
-  for( int s = 0; s < len; s++ )
-  {
-    int  i = (s + start) % NSEG;
-    int  j = (i + 1) % NSEG;
-    double dist = Utils::VecLenXY(m_pPath[i].CalcPt() - m_pPath[j].CalcPt());
-    double spd = (m_pPath[i].accSpd + m_pPath[j].accSpd) * 0.5;
-    double time = dist / spd;
-    totalTime += time;
-  }
-
-  return totalTime;
-}
-
-double LinePath::CalcEstimatedLapTime() const
-{
-  double lapTime = 0;
-
-  const int NSEG = m_pTrack->GetSize();
-  for( int i = 0; i < NSEG; i++ )
-  {
-    int  j = (i + 1) % NSEG;
-    double dist = Utils::VecLenXY(m_pPath[i].CalcPt() - m_pPath[j].CalcPt());
-    double spd = (m_pPath[i].accSpd + m_pPath[j].accSpd) * 0.5;
-    double time = dist / spd;
-    lapTime += time;
-  }
-
-  return lapTime;
 }

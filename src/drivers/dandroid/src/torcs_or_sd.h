@@ -18,8 +18,8 @@
 #ifndef _TORCS_OR_SD_H_
 #define _TORCS_OR_SD_H_
 
-//#define TARGET_TORCS
-#define TARGET_SPEEDDREAMS
+//#define DANDROID_TORCS
+#define DANDROID_SPEEDDREAMS
 
 #endif // _TORCS_OR_SD_H_
 

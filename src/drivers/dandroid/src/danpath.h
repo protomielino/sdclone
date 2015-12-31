@@ -58,24 +58,22 @@ class DanSector {
 
 class DanLine {
   public:
-  DanLine(PTrack t);
+  DanLine();
+  void init(PTrack t);
   void addDanPoint(DanPoint danpoint);
   bool calcParam();
-  void createSectors();
+  void createSectors(std::vector <DanSector>& sect);
   bool getDanPos(double fromstart, DanPoint& danpoint);
-  bool getLocalPos(PTrackSeg segment, DanPoint danpoint, tTrkLocPos* locpos);
   DanPoint nextPos(DanPoint danpoint);
   DanPoint prevPos(DanPoint danpoint);
-  std::vector <DanSector> mDansect;
   private:
   // Data
   double MAX_RADIUS;
   PTrack mTrack;
   PTrackSeg myseg; // Needed in fromStart() because of problem with crossing tracks
-  std::vector <DanPoint> mDanpath;
+  std::vector <DanPoint> mLine;
   // Functions
   DanPoint getPos(int index);
-  double calcRadius(int index);
   double calcYaw(DanPoint danpoint);
   double calcTrackYaw(DanPoint danpoint, double& trackyaw);
   bool fromStart(Vec2d pos, double& fromstart);
@@ -92,17 +90,19 @@ class DanPath {
   public:
   enum PathLine{IDEAL_LINE, LEFT_LINE, RIGHT_LINE, NUM_LINES};
 
-  DanPath(PTrack t, double max_left, double max_right, double factor);
-  ~DanPath();
+  DanPath();
+  void init(PTrack t, double max_left, double max_right, double margin, double factor, double seglen);
   bool getDanPos(int line, double fromstart, DanPoint& danpoint);
-  bool getLocalPos(PTrackSeg segment, DanPoint danpoint, tTrkLocPos* locpos);
   DanPoint nextPos(DanPoint danpoint);
-  DanLine* mDanLine[NUM_LINES];
+  DanLine mDanLine[NUM_LINES];
+  std::vector <DanSector> mSector;
   private:
   PTrack mTrack;
   double mMaxL;
   double mMaxR;
+  double mMargin;
   double mClothFactor;
+  double mSegLen;
   void getClothPath();
 };
 

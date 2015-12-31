@@ -75,11 +75,10 @@ const char *sUndefined = "undefined";
 ////////////////////////////////
 // Utility
 ////////////////////////////////
-#ifdef TARGET_SPEEDDREAMS
+#ifdef DANDROID_SPEEDDREAMS
 
 // Set robots's name and xml file pathname
-static void setRobotName(const string name)
-{
+static void setRobotName(const string name) {
   char buffer[BUFSIZE];
   snprintf(buffer, BUFSIZE, "drivers/%s/%s.xml", name.c_str(), name.c_str());      
   nameBuffer = name;
@@ -160,8 +159,13 @@ extern "C" int moduleInitialize(tModInfo *modInfo) {
   // Clear all structures.
   memset(modInfo, 0, NBBOTS * sizeof(tModInfo));
   for (int i = 0; i < NBBOTS; i++) {
+#ifdef DANDROID_TORCS
+    modInfo[i].name = strdup(Drivers[i].first.c_str());
+    modInfo[i].desc = strdup(Drivers[i].second.c_str());
+#else
     modInfo[i].name = Drivers[i].first.c_str();
     modInfo[i].desc = Drivers[i].second.c_str();
+#endif
     modInfo[i].fctInit = InitFuncPt;       // Init function.
     modInfo[i].gfId    = ROB_IDENT;        // Supported framework version.
     modInfo[i].index   = i + indexOffset;  // Indices from robot's xml-file.

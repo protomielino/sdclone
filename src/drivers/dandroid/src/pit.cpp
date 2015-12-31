@@ -19,7 +19,17 @@
 #include "pit.h"
 
 
-Pit::Pit(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentrymargin)
+Pit::Pit()
+{
+}
+
+
+Pit::~Pit()
+{
+}
+
+
+void Pit::init(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentrymargin)
 {
   if (pitdamage) {
     PIT_DAMAGE = pitdamage;
@@ -82,15 +92,7 @@ Pit::Pit(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentrymargi
       p[i].y *= sign;
     }
     p[3].y = fabs(pitinfo->driversPits->pos.toMiddle) * sign;
-    spline = new Spline(NPOINTS, p);
-  }
-}
-
-
-Pit::~Pit()
-{
-  if (mypit != NULL) {
-    delete spline;
+    spline.newSpline(NPOINTS, p);
   }
 }
 
@@ -112,7 +114,7 @@ double Pit::getPitOffset(double fromstart)
   if (mypit != NULL) {
     if (getInPit() || (getPitstop() && isBetween(fromstart))) {
       fromstart = toSplineCoord(fromstart);
-      return spline->evaluate(fromstart);
+      return spline.evaluate(fromstart);
     } else if (getPitstop() && isBetween(fromstart + ENTRY_MARGIN)) {
       return p[0].y;
     }
@@ -126,12 +128,17 @@ void Pit::setPitstop(bool pitst)
 {
   if (mypit == NULL) return;
   if (!isBetween(car->_distFromStartLine) && !isBetween(car->_distFromStartLine + ENTRY_MARGIN)) {
+    if (teamcar != NULL && !(teamcar->_state & RM_CAR_STATE_OUT)) {
+      if (teamcar->_raceCmd == RM_CMD_PIT_ASKED || teamcar->_state & RM_CAR_STATE_PIT) {
+        return;
+      }
+    }
+    car->_raceCmd = RM_CMD_PIT_ASKED;
     pitstop = pitst;
-  } else if (!pitst) {
+  } else if (pitst == false) {
     pitstop = pitst;
   }
 }
-
 
 // Check if the argument fromstart is in the range of the pit
 bool Pit::isBetween(double fromstart)
@@ -197,6 +204,7 @@ void Pit::update()
         totalfuel += lastfuel + lastpitfuel - car->priv.fuel;
         fuellapscounted++;
         avgfuelperlap = totalfuel / fuellapscounted;
+        //GfOut("Car:%s fuelpermeter:%g\n", car->_name, avgfuelperlap / track->length);
       }
       lastfuel = car->priv.fuel;
       lastpitfuel = 0.0;
@@ -231,18 +239,6 @@ void Pit::update()
       && teamcarfuel < (1.1 + pitlapdiff) * maxfuelperlap
       && car->_fuel < remainingLaps * maxfuelperlap) {
           setPitstop(true);
-      }
-    }
-    if (getPitstop()) {
-      if (teamcar == NULL || teamcar->_state & RM_CAR_STATE_OUT) {
-        car->_raceCmd = RM_CMD_PIT_ASKED;
-      } else {
-        if ((teamcar->_raceCmd == RM_CMD_PIT_ASKED || teamcar->_state & RM_CAR_STATE_PIT)
-        && car->_fuel > maxfuelperlap) {
-          setPitstop(false);
-        } else {
-          car->_raceCmd = RM_CMD_PIT_ASKED;
-        }
       }
     }
   }

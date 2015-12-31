@@ -28,23 +28,19 @@
 class ClothoidPath : public LinePath
 {
 public:
-  enum
-  {
-    FLAG_FLYING = 0x01,
-  };
-
   struct Options
   {
-    int  bumpMod;
     double maxL;
     double maxR;
-
-    Options() : bumpMod(0), maxL(999), maxR(999) {}
-    Options( int bm, double ml = 999, double mr = 999 ) : bumpMod(bm), maxL(ml), maxR(mr) {}
+    double margin;
+    double factor;
+    
+    Options() : maxL(999), maxR(999), margin(1.0), factor(1.005) {}
+    Options( double ml = 999, double mr = 999, double ma = 1.0, double fa = 1.005 ) : maxL(ml), maxR(mr), margin(ma), factor(fa) {}
   };
 
 public:
-  ClothoidPath( double factor = 1.005 );
+  ClothoidPath();
   virtual ~ClothoidPath();
 
   void MakeSmoothPath( MyTrack* pTrack, const Options& opts );

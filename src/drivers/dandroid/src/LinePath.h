@@ -33,15 +33,11 @@ public:
     double kz;	 // curvature in z direction... e.g. bumps.
     double offs; // offs from centre point.
     Vec3d pt; // actual pt (same as CalcPt())
-    double maxSpd; // max speed through this pt.
-    double spd; // speed through this pt (braking only).
-    double accSpd; // speed through this pt, with modelled accel.
     double h; // predicted height of car above track (flying).
     double lBuf; // buffer from left for safety.
     double rBuf; // buffer from right for safety.
     double fwdK;
 
-    double Dist() const { return pSeg->segDist; }
     double Wl() const { return pSeg->wl; }
     double Wr() const { return pSeg->wr; }
     const Vec3d&Pt() const { return pSeg->pt; }
@@ -53,10 +49,7 @@ public:
   LinePath();
   virtual ~LinePath();
 
-  virtual LinePath& operator=( const LinePath& path );
-
-  void	Set( const LinePath& path );
-  void	Initialise( MyTrack* pTrack, double maxL = 999, double maxR = 999 );
+  void	Initialise( MyTrack* pTrack, double maxL = 999, double maxR = 999, double margin = 1.0 );
 
   const PathPt&	GetAt( int idx ) const;
 
@@ -67,15 +60,13 @@ public:
   void CalcCurvaturesZ( int step = 1 );
   void CalcFwdAbsK( int range );
 
-  double CalcEstimatedTime( int start, int len ) const;
-  double CalcEstimatedLapTime() const;
-
 protected:
   MyTrack* m_pTrack;
   PathPt* m_pPath;
 
   double m_maxL;
   double m_maxR;
+  double m_margin;
 };
 
 #endif // _LINEPATH_H_

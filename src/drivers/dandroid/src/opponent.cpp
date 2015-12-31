@@ -55,14 +55,12 @@ void Opponent::update(PSituation s)
     calcSpeed();
     // Detect backmarkers
     if ((car->_distRaced + track->length / 2.0 < mycar->_distRaced)
-    || (teammate && car->_dammage > mycar->_dammage + 500)
-    || (teammate && car->_fuel > mycar->_fuel + 20.0)) {
+    || (teammate && car->_dammage > mycar->_dammage + 1000)) {
       backmarker = true;
     }
     // Let opponent pass
     if ((car->_distRaced - track->length / 2.0 > mycar->_distRaced)
-    || (teammate && car->_dammage < mycar->_dammage - 500 && !backmarker)
-    || (teammate && car->_fuel < mycar->_fuel - 20.0 && !backmarker)) {
+    || (teammate && car->_dammage < mycar->_dammage - 1000 && !backmarker)) {
       letpass = true;
     }
     // Update special data
@@ -326,8 +324,15 @@ bool Opponent::fastBehind()
 
 
 
+
+
+Opponents::Opponents()
+{
+}
+
+
 // Initialize the list of opponents
-Opponents::Opponents(PTrack t, PSituation s, PCarElt car)
+void Opponents::init(PTrack t, PSituation s, PCarElt car)
 {
   opponent = new Opponent[s->_ncars - 1];
   int i, j = 0;
@@ -352,14 +357,14 @@ void Opponents::update(PSituation s, PCarElt mycar)
 {
   oppnear = NULL;
   oppnear2 = NULL;
-  double mindist = DBL_MAX;
-  double mindist2 = DBL_MAX;
+  double mindist = Opponent::FRONTRANGE;
+  double mindist2 = Opponent::FRONTRANGE;
   double minside = DBL_MAX;
   double minside2 = DBL_MAX;
   oppletpass = NULL;
-  double minletpass = -DBL_MAX;
+  double minletpass = -Opponent::BACKRANGE;
   oppback = NULL;
-  double minback = -DBL_MAX;
+  double minback = -Opponent::BACKRANGE;
   oppComingFastBehind = false;
   int i;
   for (i = 0; i < nopponents; i++) {
@@ -382,19 +387,19 @@ void Opponents::update(PSituation s, PCarElt mycar)
         mindist = 0.0;
         oppnear = &opponent[i];
       }
-    } else if (dist > -5.0 && fabs(dist) <= fabs(mindist) && fabs(sidedist) < 15.0) {
+    } else if (dist > -2.0 && fabs(dist) < fabs(mindist) && fabs(sidedist) < 15.0) {
       mindist = dist;
       oppnear = &opponent[i];
     }
     // Get opponent to let passing
     if (opponent[i].letpass) {
-      if (dist <= 0.0 && dist >= minletpass) {
+      if (dist <= 0.0 && dist > minletpass) {
         minletpass = dist;
         oppletpass = &opponent[i];
       }
     }
     // Get nearest back opponent
-    if (dist < 0.0 && dist >= minback) {
+    if (dist < 0.0 && dist > minback) {
       minback = dist;
       oppback = &opponent[i];
     }

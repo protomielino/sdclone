@@ -30,9 +30,8 @@
 
 class PathInfo {
   public:
-  DanPoint danpoint;
-  tTrkLocPos local;
-  tTrkLocPos target;
+  DanPoint carpos;
+  DanPoint tarpos;
   double maxspeed;
   double offset;
 };
@@ -54,7 +53,6 @@ class TDriver {
 
   private:
   // Utility functions
-  void clearControls();
   void updateTime();
   void updateTimer();
   void updateBasics();
@@ -69,10 +67,8 @@ class TDriver {
   double getMaxSpeed(DanPoint danpoint);
   double curveSpeed(double radius);
   double bumpSpeed(double curv_z);
-  double brakeSpeed(double radius, double speed, double nextdist, double nextspeed);
-  double brakeSpeed1(double nextdist, double nextspeed);
-  double brakeDist(double radius, double speed, double allowedspeed);
-  double brakeDist1(double speed, double allowedspeed);
+  double brakeSpeed(double nextdist, double nextspeed);
+  double brakeDist(double speed, double allowedspeed);
   double getBrake(double maxspeed);
   double getAccel(double maxspeed);
   double getSteer();
@@ -97,8 +93,13 @@ class TDriver {
   double diffSpeedMargin(Opponent* opp);
   bool oppNoDanger(Opponent* opp);
   double fromStart(double fromstart);
-  void updateDanSectorId();
+  void updateSector();
   void learnSpeedFactors();
+  bool offtrack();
+  bool equalSpeedFactors();
+  bool allSectorsFaster();
+  int nextLearnSector(int sect);
+  void increaseSpeedFactor(int sect, double inc);
   void getSpeedFactors();
   void updatePathCar(int line);
   void updatePathTarget(int line);
@@ -116,16 +117,16 @@ class TDriver {
   void calcTargetAngle();
   double filterABS(double brake);
   double filterTCL(double accel);
+  double filterTCL_FWD();
   double filterTCL_RWD();
   double filterTCLSideSlip(double accel);
   void initCa();
-  void initCw();
   void readSpecs();
   void readPrivateSection();
   void printSetup();
   void controlSpeed(double& accelerator, double speed);
   void updateAttackAngle();
-  void controlAttackAngle(double& targetangle);
+  bool controlAttackAngle(double& targetangle);
   void controlOffset(double& targetangle);
   void controlYawRate(double& targetangle);
   bool hysteresis(bool lastout, double in, double hyst);
@@ -139,7 +140,7 @@ class TDriver {
   // Per robot global data
   int mDrvPath;
   int prev_mDrvPath;
-  enum {PATH_O, PATH_L, PATH_R, PATH_LR}; // States for mDrvPath
+  enum {PATH_O, PATH_L, PATH_R}; // States for mDrvPath
   int mDrvState;
   int prev_mDrvState;
   enum {STATE_RACE, STATE_STUCK, STATE_OFFTRACK, STATE_PITLANE, STATE_PITSTOP}; // States for mDrvState
@@ -151,8 +152,8 @@ class TDriver {
   PTrack mTrack;
   int mCarIndex;
   std::string mCarType;
-  DanPath* mDanPath;
-  Opponents* mOpponents;  // the container for opponents
+  DanPath mDanPath;
+  Opponents mOpponents;  // the container for opponents
   Opponent* mOpp;         // relevant opponent for calculations
   Opponent* mOppNear;
   Opponent* mOppNear2;
@@ -175,7 +176,7 @@ class TDriver {
   int mTestLine;
   int mDriverMsgLevel;
   int mDriverMsgCarIndex;
-  Pit* mPit;
+  Pit mPit;
   double mTankvol;
   double mFuelPerMeter;
   double mMu;    // friction coefficient
@@ -193,35 +194,43 @@ class TDriver {
   double mSectorTime;
   double mOldTimer;
   bool mTenthTimer;
+  int mShiftTimer;
   bool mStuck;
   int mStuckcount;
   bool mStateChange;
   bool mPathChange;
   bool mOvertake;
   bool prev_mOvertake;
+  int mOvertakeTimer;
   bool mLetPass;
   bool prev_mLetPass;
   bool mLeavePit;
   double mFriction;
-  double mCentifugal;
+  double mCentrifugal;
   double mBrakeFriction;
   double mBrakeforce;
   double mBorderdist;
   bool mOnLeftSide;
+  int mTrackType;
+  double mTrackRadius;
+  bool mOnCurveInside;
   double mAngleToTrack;
   bool mAngleToLeft;
   bool mPointingToWall;
+  double mWallToMiddleAbs;
   double mWalldist;
   int mLastDamage;
   int mDamageDiff;
   int mPrevRacePos;
   int mRacePosChange;
   double mAccel;
+  double mAccelAvg;
+  double mAccelAvgSum;
+  int mAccelAvgCount;
   double mMaxspeed;
   std::vector <DanSector> mSect;
-  int mDanSectorId;
-  int prev_mDanSectorId;
-  std::vector <int> mOfftracksector;
+  int mSector;
+  int prev_mSector;
   double mSectSpeedfactor;
   PathInfo mPath[3];
   bool mCurveAhead;
@@ -232,12 +241,21 @@ class TDriver {
   int mDrivingFastCount;
   bool mCatchingOpp;
   bool mLearnSectTime;
+  bool mGetLapTime;
+  double mLastLapTime;
+  double mBestLapTime;
   bool mLearnLap;
+  bool mAllSectorsFaster;
+  bool mLearnSingleSector;
+  int mLearnSector;
+  bool mLearnedAll;
+  bool mOfftrackInSector;
+  bool mFinalLearnLap;
   double mFromStart;
   double mToMiddle;
   double mTargetFromstart;
   double mTargetToMiddle;
-  double mOldTargetToMiddle;
+  double mNormalTargetToMiddle;
   double mPrevTargetdiff;
   double mTargetAngle;
   bool mMaxSteerAngle;
@@ -254,18 +272,23 @@ class TDriver {
   bool mWait;
   double mFuelStart;
   double mPathOffs;
+  double mAccelX;
+  double mAccelXSum;
+  int mAccelXCount;
+  double mSkillGlobal;
+  double mSkillDriver;
   PidController mSpeedController;
   PidController mAttackAngleController;
   PidController mOffsetController;
+  int mWatchdogCount;
   // Data that should stay constant after first initialization
   double mFRONTWINGANGLE;
   double mREARWINGANGLE;
   double mWHEELBASE;  // wheelbase of the car
   double mCARMASS;    // mass of the car only
   double mCA;         // aerodynamic downforce coefficient
-  double mCW;         // aerodynamic drag coefficient
   double mBRAKEPRESS;
-  double mBRAKEDISTFACTOR;
+  double mBRAKEDECEL;
   double mBRAKEFORCEFACTOR;
   double mBUMPSPEEDFACTOR;
   double mFUELWEIGHTFACTOR;
@@ -279,7 +302,9 @@ class TDriver {
   bool mTRACTIONCONTROL;
   double mMAXLEFT;
   double mMAXRIGHT;
+  double mMARGIN;
   double mCLOTHFACTOR;
+  double mSEGLEN;
   // Class constants
   double mLOOKAHEAD_CONST;
   double mFRONTCOLL_MARGIN;

@@ -21,7 +21,7 @@
 #include "torcs_or_sd.h"
 #include "globaldefinitions.h"
 
-#ifdef TARGET_TORCS
+#ifdef DANDROID_TORCS
 #include <track.h>
 #include <car.h>
 #include <raceman.h>
@@ -35,8 +35,9 @@
 
 class Pit {
   public:
-    Pit(PTrack t, PSituation s, PtCarElt car, int pitdamage, double pitentrymargin);
+    Pit();
     ~Pit();
+    void init(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentrymargin);
     void setPitstop(bool pitstop);
     bool getPitstop() { return pitstop; }
     void setInPit(bool inpitl) { inpitlane = inpitl; }
@@ -66,7 +67,7 @@ class Pit {
     tTrackOwnPit* mypit;    /* pointer to my pit */
     tTrackPitInfo* pitinfo; /* general pit info */
     SplinePoint p[NPOINTS]; /* spline points */
-    Spline* spline;         /* spline */
+    Spline spline;          /* spline */
     bool pitstop;           /* pitstop planned */
     bool inpitlane;         /* we are still in the pit lane */
     double pitentry;         /* distance to start line of the pit entry */

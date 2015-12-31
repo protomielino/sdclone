@@ -29,8 +29,9 @@ class SplinePoint {
 
 class Spline {
   public:
-    Spline(int dim, SplinePoint* spl);
-
+    Spline();
+    
+    void newSpline(int dim, SplinePoint* spl);
     double evaluate(double z);
 
   private:

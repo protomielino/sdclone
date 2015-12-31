@@ -26,9 +26,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-ClothoidPath::ClothoidPath( double factor )
+ClothoidPath::ClothoidPath()
 {
-  m_factor = factor;
 }
 
 ClothoidPath::~ClothoidPath()
@@ -37,7 +36,9 @@ ClothoidPath::~ClothoidPath()
 
 void ClothoidPath::MakeSmoothPath(MyTrack* pTrack, const Options& opts)
 {
-  LinePath::Initialise( pTrack, opts.maxL, opts.maxR );
+  m_factor = opts.factor;
+
+  LinePath::Initialise( pTrack, opts.maxL, opts.maxR, opts.margin );
 
   const int NSEG = pTrack->GetSize();
 
@@ -141,9 +142,8 @@ void ClothoidPath::SetOffset(
   const PathPt* l2, 
   const PathPt* l4 )
 {
-  double marg = 1.0;
-  double wl  = -MN(m_maxL, l3->Wl()) + marg;
-  double wr  =  MN(m_maxR, l3->Wr()) - marg;
+  double wl  = -MN(m_maxL, l3->Wl()) + m_margin;
+  double wr  =  MN(m_maxR, l3->Wr()) - m_margin;
   double buf = MN(1.5, 100 * fabs(k)); // a = v*v/r;
 
   if( k >= 0 )// 0.00001 )
@@ -173,13 +173,7 @@ void ClothoidPath::SetOffset(
     }
   }
 
-  // if( t < -m_maxL + lMargin )
-  //  t = -m_maxL + lMargin;
-  // else if( t > m_maxR - rMargin )
-  //  t = m_maxR - rMargin;
-
   l3->offs = t;
-  // l3->k = k;
   l3->pt = l3->CalcPt();
   l3->k = Utils::CalcCurvatureXY(l2->pt, l3->pt, l4->pt);
 }

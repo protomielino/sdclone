@@ -77,7 +77,6 @@ class Opponent {
     bool mInDrivingDirection;
     double mCatchtime;
     bool mFastBehind;
-  private:
     // constants
     static const double FRONTRANGE;
     static const double BACKRANGE;
@@ -88,8 +87,9 @@ class Opponent {
 /* The Opponents class holds an array of all Opponents */
 class Opponents {
   public:
-    Opponents(PTrack t, PSituation s, PCarElt car);
+    Opponents();
     ~Opponents();
+    void init(PTrack t, PSituation s, PCarElt car);
     void update(PSituation s, PCarElt mycar);
     Opponent* oppNear() { return oppnear; }
     Opponent* oppNear2() { return oppnear2; }
