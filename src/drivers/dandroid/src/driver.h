@@ -195,6 +195,7 @@ class TDriver {
   double mOldTimer;
   bool mTenthTimer;
   int mShiftTimer;
+  int mGear;
   bool mStuck;
   int mStuckcount;
   bool mStateChange;

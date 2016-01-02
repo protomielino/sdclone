@@ -83,6 +83,7 @@ TDriver::TDriver(int index)
   mOfftrackInSector = false;
   mLearnedAll = false;
   mShiftTimer = 0;
+  mGear = 0;
   mAccelX = 0.0;
   mAccelXSum = 0.0;
   mAccelXCount = 0;
@@ -695,6 +696,11 @@ double TDriver::getAccel(double maxspeed)
     }
     accel = mSkillDriver * mAccel;
   }
+  if (oCurrSimTime < 0.0) {
+    if (oCar->_enginerpm / oCar->_enginerpmRedLine > 0.7) {
+      accel = 0.0;
+    }
+  }
   return accel;
 }
 
@@ -733,26 +739,29 @@ int TDriver::getGear()
     }
   }  
   if (mShiftTimer < shifttime) {
-    return oCar->_gear;
+    return mGear;
   }
   
+  if (oCurrSimTime < 0.0) {
+    return mGear = 0;
+  }
   if (mDrvState == STATE_STUCK) {
-    return -1;
+    return mGear = -1;
   }
   if (oCar->_gear <= 0) {
-    return 1;
+    return mGear = 1;
   }
   if (oCar->_enginerpm / oCar->_enginerpmRedLine > SHIFT_UP) {
     mShiftTimer = 0;
-    return oCar->_gear + 1;
+    return mGear++;
   } else {
     double ratiodown = oCar->_gearRatio[oCar->_gear + oCar->_gearOffset - 1] / oCar->_gearRatio[oCar->_gear + oCar->_gearOffset];
     if (oCar->_gear > 1 && (oCar->_enginerpmRedLine - SHIFT_DOWN_MARGIN) / oCar->_enginerpm > ratiodown) {
       mShiftTimer = 0;
-      return oCar->_gear - 1;
+      return mGear--;
     }
   }
-  return oCar->_gear;
+  return mGear;
 }
 
 
