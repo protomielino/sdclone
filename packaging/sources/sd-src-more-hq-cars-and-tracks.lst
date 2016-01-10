@@ -15,6 +15,10 @@ data/cars/models/mpa1-hartbill-2002
 data/cars/models/mpa1-murasama
 data/cars/models/mpa1-team-lynx
 
+data/cars/models/mpa11-murasama
+
+data/cars/models/mpa12-murasama
+
 data/cars/models/trb1-boxer-trbrs
 data/cars/models/trb1-cavallo-360rb
 data/cars/models/trb1-sector-rb1
@@ -47,7 +51,7 @@ data/tracks/road/salty
 
 data/tracks/speedway/CMakeLists.txt
 
+data/tracks/speedway/alamo
 data/tracks/speedway/longpond
-data/tracks/speedway/mile
 data/tracks/speedway/milky-five
 data/tracks/speedway/newton
