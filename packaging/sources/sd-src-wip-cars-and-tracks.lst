@@ -43,6 +43,11 @@ data/cars/models/ls2-vortex-gt
 data/cars/models/sc-kanagawa-z35gts
 data/cars/models/sc-kongei-kk8s
 
+data/cars/models/srw-boxer-ts
+data/cars/models/srw-kanagawa-gtr
+data/cars/models/srw-kongei-kk8s
+data/cars/models/srw-sector-p4
+
 data/tracks/circuit/CMakeLists.txt
 
 data/tracks/circuit/goldstone-sand
@@ -78,3 +83,5 @@ data/tracks/speedway/e-track-5
 data/tracks/speedway/f-speedway
 data/tracks/speedway/sunshine
 data/tracks/speedway/tennessee
+
+src/drivers/dandroid
