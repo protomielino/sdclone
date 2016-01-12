@@ -167,6 +167,18 @@ Section -Cars
   SetOutPath "$INSTDIR\data\cars\models\ls1-cavallo-570s1"
   File /r "${BUILD_INST_DIR}\data\cars\models\ls1-cavallo-570s1\*.*"
 
+  SetOutPath "$INSTDIR\data\cars\models\srw-boxer-ts"
+  File /r "${BUILD_INST_DIR}\data\cars\models\srw-boxer-ts\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\srw-kanagawa-gtr"
+  File /r "${BUILD_INST_DIR}\data\cars\models\srw-kanagawa-gtr\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\srw-kongei-kk8s"
+  File /r "${BUILD_INST_DIR}\data\cars\models\srw-kongei-kk8s\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\srw-sector-p4"
+  File /r "${BUILD_INST_DIR}\data\cars\models\srw-sector-p4\*.*"
+
 SectionEnd
 
 Section -Tracks
