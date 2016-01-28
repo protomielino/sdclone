@@ -159,9 +159,9 @@ void GfuiEventLoop::operator()()
 					{
 						injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 0,0);
 					}
-					else if((event.key.keysym.mod != KMOD_NONE)
-							&&(event.key.keysym.mod != KMOD_LSHIFT)
-							&&(event.key.keysym.mod != KMOD_RSHIFT))
+					else if((event.key.keysym.mod & KMOD_CTRL)
+							||(event.key.keysym.mod & KMOD_ALT)
+							||(event.key.keysym.mod & KMOD_GUI))
 					{
 						injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 0,0);
 					}
@@ -195,9 +195,9 @@ void GfuiEventLoop::operator()()
 					{
 						injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 1,0);
 					}
-					else if((event.key.keysym.mod != KMOD_NONE)
-							&&(event.key.keysym.mod != KMOD_LSHIFT)
-							&&(event.key.keysym.mod != KMOD_RSHIFT))
+					else if((event.key.keysym.mod & KMOD_CTRL)
+							||(event.key.keysym.mod & KMOD_ALT)
+							||(event.key.keysym.mod & KMOD_GUI))
 					{
 						injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 1,0);
 					}
