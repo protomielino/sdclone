@@ -185,6 +185,9 @@ Section -Tracks
 
   SetOutPath "$INSTDIR\data\tracks\road\lombaro"
   File /r "${BUILD_INST_DIR}\data\tracks\road\lombaro\*.*"
+
+  SetOutPath "$INSTDIR\data\tracks\road\longday"
+  File /r "${BUILD_INST_DIR}\data\tracks\road\longday\*.*"
     
   SetOutPath "$INSTDIR\data\tracks\road\ole-road-1"
   File /r "${BUILD_INST_DIR}\data\tracks\road\ole-road-1\*.*"

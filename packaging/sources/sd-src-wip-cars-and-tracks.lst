@@ -5,14 +5,25 @@ data/config/raceman/championship-mp5.xml
 data/config/raceman/career-36GP.xml
 data/config/raceman/career_36GP.xmls
 data/config/raceman/career_MPA1.xmls
+data/config/raceman/career-supercars.xml
 data/config/raceman/career_supercars.xmls
 data/config/raceman/career_ls1.xmls
+data/config/raceman/networkrace.xml
 
 data/drivers/usr_ls2
 data/drivers/usr_rs
 
 data/drivers/simplix_ls2
 data/drivers/simplix_mp5
+data/drivers/simplix_srw
+
+data/drivers/dandroid_ls1
+data/drivers/dandroid_ls2
+data/drivers/dandroid_mpa1
+data/drivers/dandroid_rs
+data/drivers/dandroid_sc
+data/drivers/dandroid_srw
+data/drivers/dandroid_trb1
 
 data/cars/models/67gp-upping-ut19
 
@@ -84,4 +95,4 @@ data/tracks/speedway/f-speedway
 data/tracks/speedway/sunshine
 data/tracks/speedway/tennessee
 
-src/drivers/dandroid
+
