@@ -239,6 +239,7 @@ rmOnRaceDataChanged()
 	// Re-load competitors scroll list from the race.
 	GfuiScrollListClear(ScrHandle, CompetitorsScrollListId);
 	VecCompetitorsInfo.clear();
+    VecCompetitorsInfo.reserve(vecCompetitors.size());
     for (int nCompIndex = 0; nCompIndex < (int)vecCompetitors.size(); nCompIndex++)
 	{
 		const GfDriver* pComp = vecCompetitors[nCompIndex];
@@ -247,8 +248,12 @@ rmOnRaceDataChanged()
 		if (!pRaceMan->hasSubFiles()) // Don't show car name if Career mode (N/A here).
 			ossText << " (" << pComp->getCar()->getName() << ')';
 		VecCompetitorsInfo.push_back(ossText.str());
+	}
+	for (int nCompIndex = 0; nCompIndex < (int)vecCompetitors.size(); nCompIndex++)
+	{
+		const GfDriver* pComp = vecCompetitors[nCompIndex];
 		GfuiScrollListInsertElement(ScrHandle, CompetitorsScrollListId,
-									VecCompetitorsInfo.back().c_str(), nCompIndex+1, (void*)pComp);
+									VecCompetitorsInfo[nCompIndex].c_str(), nCompIndex+1, (void*)pComp);
 		//GfLogDebug("Added competitor %s (%s#%d)\n", ossText.str().c_str(),
 		//		   pComp->getModuleName().c_str(),  pComp->getInterfaceIndex());
 	}
