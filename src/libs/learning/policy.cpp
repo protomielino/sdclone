@@ -12,6 +12,7 @@
  ***************************************************************************/
 
 #include <cstring>
+#include <math.h>
 #include "learn_debug.h"
 #include "policy.h"
 #include "MathFunctions.h"
