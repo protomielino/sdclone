@@ -41,7 +41,7 @@ Speed Dreams 2.2.0
   *New individaul tire slip indicators
   *New ability to adjust car setup while driving (Brake bias,etc) and pre-select Pit actions
   *Race can start in Paused state. (see Simulation menu)
-  *Cool down driving now allowed port race.(see Simulation menu)
+  *Cool down driving now allowed post race.(see Simulation menu)
   *Window management changed from SDL1.2 to SDL2
   *Joystick handling changed from PLIB to SDL2
   *New graphics engine option (OpenSceneGraph) WIP (see OpenGL menu)
