@@ -276,9 +276,9 @@ Function DownloadFromSFNet
   StrCpy $R3 "success" ; R3 : Status
 
   DetailPrint "1) Downloading default mirror URL (auto-selected by SF.net) ..." 
-  NSISdl::download "$R1" "$R2.html"
+  inetc::get "$R1" "$R2.html" /end
   Pop $R0
-  ${If} $R0 != "success"
+  ${If} $R0 != "OK"
     
     ${If} $R0 == "cancel"
       StrCpy $R3 "Mirror selection page download was cancelled"
@@ -304,9 +304,9 @@ Function DownloadFromSFNet
     ${Else}
 
       DetailPrint "2) Downloading file from $R4 ..." 
-      NSISdl::download "$R4" "$R2"
+      inetc::get "$R4" "$R2" /end
       Pop $R0
-      ${If} $R0 != "success"
+      ${If} $R0 != "OK"
     
         ${If} $R0 == "cancel"
           StrCpy $R3 "File download was cancelled"

@@ -230,7 +230,7 @@ Section /o "HQ cars and tracks (1)" SEC03
 
   StrCpy $1 "speed-dreams-${HQCARSTRACKS_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
   StrCpy $2 "HQ cars and tracks (1)"
-  !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 340
+  !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 380
 
 SectionEnd
 
@@ -238,7 +238,7 @@ Section /o "HQ cars and tracks (2)" SEC04
 
   StrCpy $1 "speed-dreams-${MOREHQCARSTRACKS_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
   StrCpy $2 "HQ cars and tracks (2)"
-  !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 275
+  !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 430
 
 SectionEnd
 
@@ -246,7 +246,7 @@ Section /o "WIP cars and tracks" SEC05
 
   StrCpy $1 "speed-dreams-${WIPCARSTRACKS_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
   StrCpy $2 "WIP cars and tracks"
-  !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 150
+  !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 250
 
 SectionEnd
 
