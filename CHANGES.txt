@@ -18,7 +18,7 @@ Speed Dreams 2.2.0
  *Simplix:
   Can drive with supercars at wet tracks
   Uses the ABS, TCL, EPS of simuV4 if enabled for the car (own functions otherwise)
-  *New robot: Dandorid
+  *New robot: Dandroid
 
  Cars
   *New Supercars with Rear wings carset (WIP)
