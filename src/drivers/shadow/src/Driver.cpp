@@ -1899,10 +1899,15 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 
 			oi.avoidLatchTime = MX(0, oi.avoidLatchTime - s->deltaTime);
 
-			double	maxSpdK = 15.0 / (110 * 110);
-			double	colTime = fabs(k) > maxSpdK ? 0.5 : 0.7;
-			double	catTime = fabs(k) > maxSpdK ? 0.5 :	2.5;
-			double	cacTime = fabs(k) > maxSpdK ? 0.5 : 2.5;
+			//double	maxSpdK = 15.0 / (110 * 110);
+			double maxSpdK = m_cm.CalcMaxSpeedCrv();
+			//double	colTime = fabs(k) > maxSpdK ? 0.5 : 0.7;
+			double colTime = fabs(k) > maxSpdK ? 1.0 : 1.2;
+			//double	catTime = fabs(k) > maxSpdK ? 0.5 :	2.5;
+			double catTime = fabs(k) > maxSpdK ? 1.0 : 3.0;
+			//double	cacTime = fabs(k) > maxSpdK ? 0.5 : 2.5;
+			double cacTime = fabs(k) > maxSpdK ? 1.0 : 3.0;
+
             bool	catching = ( oi.catchTime < colTime && oi.GotFlags(Opponent::F_COLLIDE))  ||
                                ( oi.catchTime    < catTime && oi.GotFlags(Opponent::F_CATCHING)) ||
                                ( oi.catchAccTime < cacTime && oi.GotFlags(Opponent::F_CATCHING_ACC));

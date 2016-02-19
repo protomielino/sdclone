@@ -425,6 +425,12 @@ double	CarModel::CalcMaxLateralF( double spd, double kFriction, double kz ) cons
 #endif
 }
 
+double CarModel::CalcMaxSpeedCrv() const
+{
+  const double MAX_SPD = 112; // 400 km/h
+  return G * TYRE_MU / (MAX_SPD * MAX_SPD);
+}
+
 void	CarModel::CalcSimuSpeeds( double spd0, double dy, double dist, double kFriction, double& minSpd, double& maxSpd ) const
 {
 	// simple speed calc for use in simulation for path optimisation... the

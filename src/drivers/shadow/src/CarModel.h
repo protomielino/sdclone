@@ -33,6 +33,8 @@ public:
     double	CalcMaxSpdK() const;
     double	CalcMaxLateralF(double spd, double kFriction , double kz = 0.0) const;
 
+	double CalcMaxSpeedCrv() const;
+
     void	CalcSimuSpeeds( double spd0, double dy, double dist, double kFriction, double& minSpd, double& maxSpd ) const;
     void	CalcSimuSpeedRanges( double spd0, double dist, double kFriction, double& minSpd, double& maxSpd, double& maxDY ) const;
 
