@@ -272,10 +272,15 @@ reCarsApplyRaceRules(tCarElt *car)
             if (minradius > 1.0f)
             {
                 car->_commitBestLapTime = false;
-                snprintf(msg, sizeof(msg), "%s 10s Penalty Time", car->_name);
+                /* Temporarily replace the message to work around #944
+		snprintf(msg, sizeof(msg), "%s 10s Penalty Time", car->_name);
+		*/
+		snprintf(msg, sizeof(msg), "%s Cut corner, laptime invalidated", car->_name);
                 msg[sizeof(msg)-1] = 0; // Some snprintf implementations fail to do so.
                 ReSituation::self().setRaceMessage(msg, 5);
-                reCarsAddPenalty(car, RM_PENALTY_10SEC_STOPANDGO);
+                /* Temporarily remove to work around #944
+		reCarsAddPenalty(car, RM_PENALTY_10SEC_STOPANDGO);
+		*/
             }
         }
     }
