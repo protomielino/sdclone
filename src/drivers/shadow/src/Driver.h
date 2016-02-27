@@ -76,6 +76,7 @@
 #define PRV_FUELPERMETERS       "fuel per meters"
 #define PRV_FUELPERLAPS         "fuel per lap"
 #define PRV_RESERVE             "reserve"
+#define PRV_DAMAGE              "damage"
 #define PRV_FULL_FUEL           "full fuel"
 #define PRV_VERBOSE             "strategyverbose"
 #define PRV_NEED_SIN            "use sin long"

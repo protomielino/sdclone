@@ -25,12 +25,13 @@
 
 #include "Strategy.h"
 
+
 SimpleStrategy::SimpleStrategy()
 {
     MAX_FUEL_PER_METER = 0.00068f;		// [liter/m] max fuel consumtion.
     MAX_FUEL_TANK = 83.0f;              // [Kg] Fuel: Car Tank capacity.(for car3-trb1)
     PIT_DAMMAGE = 5000;                 // [-] max damage before test_Pitstop
-    MAX_DAMAGE = 8000;              	// [-] max damage limit in the last five laps before the pit stop.
+    MAX_DAMAGE = 4000;              	// [-] max damage limit in the last five laps before the pit stop.
     fuel_Strat = 1;                     // [-] Pit refuel strategy for Short(1) or Long(2) track.
 
     needRepair = false;                 // [-] Need to repair (amount of damage)
@@ -42,6 +43,7 @@ SimpleStrategy::SimpleStrategy()
     m_checkFuel = false;                // [-] Needed fuel checked.
     strategy_verbose = 0;               // [-] Display information about refuel and repair.
 
+    FuelperMeters = 0.0f;
     fuelPerLap = 0.0f;                  // [Kg] The maximum amount of fuel we needed for a lap.
     lastPitFuel = 0.0f;                 // [Kg] Amount refueled, special case when we refuel.
     fuelSum = 0.0f;                     // [Kg] All the fuel used.
@@ -66,13 +68,18 @@ void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituat
 {
 	Track = t;
 	TrackLength = Track->length;
+    LogSHADOW.info("Strategy Track Lengh =  %.2f\n", TrackLength);
 	RaceDistance = TrackLength * s->_totLaps; 
+    LogSHADOW.info("Strategy Race Distance =  %.2f\n", RaceDistance);
     /* Trivial strategy: fill in as much fuel as required for the whole race, or if the tank is
        too small fill the tank completely. */
     // Load and set parameters.
     maxFuel = (tdble)(GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, (char*)NULL, (tdble) MAX_FUEL_TANK));
-    fuelPerMeter = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_FUELPERMETERS, (char*)NULL, MAX_FUEL_PER_METER);
-    fuelPerLap = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_FUELPERLAPS, (char*)NULL, t->length * fuelPerMeter);
+    LogSHADOW.info("Strategy max fuel =  %.2f\n", maxFuel);
+    FuelperMeters = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_FUELPERMETERS, (char*)NULL, (tdble) MAX_FUEL_PER_METER);
+    LogSHADOW.info("Strategy fuel per meters =  %.5f\n", FuelperMeters);
+    fuelPerLap = TrackLength * FuelperMeters;
+    LogSHADOW.info("Strategy fuel per lap =  %.2f\n", fuelPerLap);
     fullfuel = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_FULL_FUEL, (char*)NULL, 0.0);
     fuel_Strat = (int)GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_PITSTRAT, (char*)NULL, 0.0);
     test_Pitstop = (GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_PITSTOP, (char*)NULL, 0.0) != 0);
@@ -96,7 +103,7 @@ void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituat
     int raceLaps = s->_totLaps + 1;
     //raceDist = raceLaps * t->length;
     //fuelForRace = raceDist * fuelPerMeter;
-    fuelForRace = s->_totLaps * fuelPerLap;
+    fuelForRace = raceLaps * fuelPerLap;
     numPitstop = (tdble) fabs(fuelForRace / maxFuel);
     if ( numPitstop < fuelForRace / maxFuel )
     {
@@ -107,10 +114,10 @@ void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituat
 
     if (shortTrack)
     {
-        m_fuel = fuelPerLap * 2.0;
+        m_fuel = fuelPerLap * 1.2;
     } else
     {
-        m_fuel = fuelPerLap * 1.4;
+        m_fuel = fuelPerLap * 1.3;
     }
 
     if ( index == 1 )
@@ -228,7 +235,7 @@ void SimpleStrategy::updateFuelStrategy(tCarElt* car, tSituation *s)
     if (!m_checkFuel && requiredfuel <= 0.0f && car->_remainingLaps <= 5)
     {
         // We have enough fuel to end the race, no further stop required.
-        GfOut("%s No Pitstop required > carFuel:%.2f, remLap:%d\n", car->_name,car->_fuel, car->_remainingLaps);
+        LogSHADOW.debug("%s No Pitstop required > carFuel:%.2f, remLap:%d\n", car->_name,car->_fuel, car->_remainingLaps);
         m_checkFuel = true;
         return;
     }
@@ -236,7 +243,7 @@ void SimpleStrategy::updateFuelStrategy(tCarElt* car, tSituation *s)
     // We don't have enough fuel to end the race need at least one stop.
     if (!m_checkFuel && requiredfuel > 0.0f && car->_fuel < fuelPerLap * 3.0)
     {
-        GfOut("%s Pitstop needed to refuel >> reqFuel: %.2f, carFuel: %.2f, remLap: %d\n",
+        LogSHADOW.debug("%s Pitstop needed to refuel >> reqFuel: %.2f, carFuel: %.2f, remLap: %d\n",
               car->_name, requiredfuel, car->_fuel, car->_remainingLaps);
         m_checkFuel = true;
     }
@@ -249,7 +256,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
     int m_maxDamage = PIT_DAMMAGE;
     float attvalue = 0.0f;
     // load defined value in xml file of Max Dammage before pitstops for this track
-    //attvalue = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, BT_ATT_MAXDAMMAGE, (char*) NULL, PIT_DAMMAGE);
+    attvalue = GfParmGetNum(car->_carHandle, SECT_PRIV, PRV_DAMAGE, (char*) NULL, PIT_DAMMAGE);
     m_maxDamage = (int)attvalue;
     // Estimated average fuel per lap
     //m_Fuel = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, BT_ATT_FUELPERLAP, (char*) NULL, m_expectedfuelperlap);
@@ -281,7 +288,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
             {
                 if (!m_checkFuel)
                 {
-                    GfOut("%s Go to Pit the next lap to refuel: reqFuel=%.2f, carFuel=%.2f, remLap=%d\n",
+                    LogSHADOW.debug("%s Go to Pit the next lap to refuel: reqFuel=%.2f, carFuel=%.2f, remLap=%d\n",
                           car->_name, reqfuel, car->_fuel, car->_remainingLaps);
                     m_checkFuel = true;
                 }
@@ -297,7 +304,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
                 {
                     if (!m_checkDamage)
                     {
-                        GfOut("%s >> Max_damage: %d Car_damage: %d Laps_toGo: %d\n",
+                        LogSHADOW.debug("%s >> Max_damage: %d Car_damage: %d Laps_toGo: %d\n",
                               car->_name, m_maxDamage, car->_dammage, laps_to_go(car));
                         m_checkDamage = true;
                     }
@@ -312,7 +319,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
                     {
                         if (!m_checkDamage)
                         {
-                            GfOut("%s Dont Stop At Pit!> Laps_toGo:%d  Car_damage: %d Max_damage: %d\n",
+                            LogSHADOW.debug("%s Dont Stop At Pit!> Laps_toGo:%d  Car_damage: %d Max_damage: %d\n",
                                   car->_name, laps_to_go(car), car->_dammage, m_maxDamage);
                             m_checkDamage = true;
                             needRepair = false;
@@ -356,7 +363,7 @@ int SimpleStrategy::pitRepair(tCarElt* car, tSituation *s)
         needRepair = false;
     }
 
-    fprintf(stderr,"# %s repairing %d dammage\n", car->_name, damRepair);
+    LogSHADOW.debug("# %s repairing %d dammage\n", car->_name, damRepair);
     return damRepair;
 }
 
@@ -392,9 +399,9 @@ float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
         /* Long track strategy eg Spring*/
         if (strategy_verbose)
         {
-            fprintf(stderr,">> [PitStrat 2] ");
+            LogSHADOW.debug(">> [PitStrat 2] ");
         }
-        fprintf(stderr," %s in Pit to refuel < PitStop %d >\n", car->_name, countPitStop);
+        LogSHADOW.debug(" %s in Pit to refuel < PitStop %d >\n", car->_name, countPitStop);
 
         m_fuelperstint = (tdble)((fuelToEnd / num_remStops) + addFuel);
 
@@ -415,7 +422,7 @@ float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
         /* Strategy for short track and track length less than 5000m*/
         if (strategy_verbose)
         {
-            fprintf(stderr,">> [PitStrat 1] ");
+            LogSHADOW.debug(">> [PitStrat 1] ");
         }
 
         if (m_remainingstops >= 1)
@@ -427,7 +434,7 @@ float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
         }
 
         fuel = MIN(m_fuelperstint - car->_fuel, car->_tank - car->_fuel);
-        fprintf(stderr," %s in Pit to refuel %.2fl < PitStop %d >\n", car->_name, fuel, countPitStop);
+        LogSHADOW.debug(" %s in Pit to refuel %.2fl < PitStop %d >\n", car->_name, fuel, countPitStop);
     }
 
 
@@ -441,21 +448,21 @@ float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
 #ifdef STRAT_DEBUG
     double totalFuel = s->_totLaps * fuelPerLap;
     double fuelPerPitStop = totalFuel / 4;
-    fprintf(stderr,"[%s()] totalFuel=%.2f fuelPerPitStop=%.2f inLap=%d lapsToEnd=%d m_fuelperstint=%.2f car_fuel=%.2f fuel=%.2f\n",
+    LogSHADOW.debug("[%s()] totalFuel=%.2f fuelPerPitStop=%.2f inLap=%d lapsToEnd=%d m_fuelperstint=%.2f car_fuel=%.2f fuel=%.2f\n",
             __FUNCTION__, totalFuel, fuelPerPitStop, inLap, lapsToEnd, m_fuelperstint, car->_fuel, fuel);
 #endif
 
     if (strategy_verbose) {
         if (!m_remainingstops) {
-            fprintf(stderr,"# Last Pitstop for %s: LapsToEnd: %d, LapsBehindLeader: %d, fuelToEnd: %.2f, FuelperLap: %.2f\n",
+            LogSHADOW.debug("# Last Pitstop for %s: LapsToEnd: %d, LapsBehindLeader: %d, fuelToEnd: %.2f, FuelperLap: %.2f\n",
                     car->_name, lapsToEnd, car->_lapsBehindLeader, fuelToEnd, fuelPerLap);
         } else {
-            fprintf(stderr,"# [%s()] LapsToEnd: %d, LapsBehindLeader: %d, FuelToEnd: %.2f, FuelperLap: %.2f,\n", __FUNCTION__,
+            LogSHADOW.debug("# [%s()] LapsToEnd: %d, LapsBehindLeader: %d, FuelToEnd: %.2f, FuelperLap: %.2f,\n", __FUNCTION__,
                     lapsToEnd, car->_lapsBehindLeader, fuelToEnd, fuelPerLap);
         }
-        fprintf(stderr,">> %s ReFueling %.2f,  Fuel needed = %.2f, carFuel= %.2f, remPitStop= %d\n",
+        LogSHADOW.debug(">> %s ReFueling %.2f,  Fuel needed = %.2f, carFuel= %.2f, remPitStop= %d\n",
                 car->_name, fuel, m_fuelperstint, car->_fuel,  m_remainingstops);
-        fprintf(stderr," \n");
+        LogSHADOW.debug(" \n");
     }
 
     lastPitFuel = fuel;
