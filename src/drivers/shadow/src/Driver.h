@@ -237,7 +237,7 @@ public:
     double  (TDriver::*CalcCrvFoo)(double Crv);
     double  (TDriver::*CalcHairpinFoo)(double Speed, double AbsCrv);
 
-    double  CalcSkill(tSituation *s, double TargetSpeed);
+    void    CalcSkill();
     void    CalcSkilling_shadow();
     void    CalcSkilling_shadow_LS1();
     void    CalcSkilling_shadow_LS2();

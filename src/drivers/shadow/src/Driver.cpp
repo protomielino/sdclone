@@ -416,6 +416,7 @@ void TDriver::GetSkillingParameters()
             LogSHADOW.debug("#DriverAggression: %g\n", DriverAggression);
 
 			SkillDriver = (float)((SkillGlobal + SkillDriver * 2) * (1.0 + SkillDriver));
+            Skill = (float)((SkillGlobal + SkillDriver * 2) * (1.0 + SkillDriver));
         }
 
         GfParmReleaseHandle(SkillHandle);
@@ -1522,6 +1523,8 @@ void TDriver::Drive( tSituation* s )
 		m_avoidTVel = 0;
 	}
 
+    CurrSimTime = s->currentTime;
+
 	double	carFuel = car->_fuel;
 
 	if(HasTYC)
@@ -1781,13 +1784,20 @@ void TDriver::Drive( tSituation* s )
 		}
 	}
 
+    CalcSkill();
+
+
     if (!HasESP)
       //brk = filterBrake(car, brk);
     //oBrake = FilterBrakeSpeed(oBrake);
     if (!HasABS)
       brk = ApplyAbs(car, brk);
-    //brk = ApplyAbs(car, brk);
+
     steer = FlightControl(steer);
+
+    brk *= BrakeAdjustPerc;
+
+    //acc *= BrakeAdjustPerc;
 
 	acc = filterDrifting(acc);
 
@@ -3306,12 +3316,12 @@ double TDriver::CalcFriction_shadow_REF(const double Crv)
 //==========================================================================*
 // Skilling
 //--------------------------------------------------------------------------*
-double TDriver::CalcSkill(tSituation *s, double TargetSpeed)
+void TDriver::CalcSkill()
 {
-    if (Skilling && (RM_TYPE_PRACTICE != s->_raceType)
+    if (Skilling && (RM_TYPE_PRACTICE != m_Situation->_raceType)
             && m_Strategy->OutOfPitlane())
     {
-        if ((SkillAdjustTimer == -1.0) || (TDriver::CurrSimTime - SkillAdjustTimer > SkillAdjustLimit))
+        if ((SkillAdjustTimer == -1.0) || (CurrSimTime - SkillAdjustTimer > SkillAdjustLimit))
         {
             double Rand1 = (double) getRandom() / 65536.0;
             double Rand2 = (double) getRandom() / 65536.0;
@@ -3321,31 +3331,26 @@ double TDriver::CalcSkill(tSituation *s, double TargetSpeed)
             DecelAdjustTarget = (Skill / 4 * Rand1);
 
             // brake to use
-            BrakeAdjustTarget = MAX(0.7, 1.0 - MAX(0.0, Skill/10 * (Rand2 - 0.7)));
+            BrakeAdjustTarget = MAX(0.85, 1.0 - MAX(0.0, Skill/15 * (Rand2 - 0.85)));
             LogSHADOW.debug("Brake Adjust Target = %.2f\n", BrakeAdjustTarget);
 
             // how long this skill mode to last for
             SkillAdjustLimit = 5.0 + Rand3 * 50.0;
-            SkillAdjustTimer = TDriver::CurrSimTime;
+            SkillAdjustTimer = CurrSimTime;
 
             if (DecelAdjustPerc < DecelAdjustTarget)
-                DecelAdjustPerc += MIN(s->deltaTime*4, DecelAdjustTarget - DecelAdjustPerc);
+                DecelAdjustPerc += MIN(m_Situation->deltaTime*4, DecelAdjustTarget - DecelAdjustPerc);
             else
-                DecelAdjustPerc -= MIN(s->deltaTime*4, DecelAdjustPerc - DecelAdjustTarget);
+                DecelAdjustPerc -= MIN(m_Situation->deltaTime*4, DecelAdjustPerc - DecelAdjustTarget);
 
             if (BrakeAdjustPerc < BrakeAdjustTarget)
-                BrakeAdjustPerc += MIN(s->deltaTime*2, BrakeAdjustTarget - BrakeAdjustPerc);
+                BrakeAdjustPerc += MIN(m_Situation->deltaTime*2, BrakeAdjustTarget - BrakeAdjustPerc);
             else
-                BrakeAdjustPerc -= MIN(s->deltaTime*2, BrakeAdjustPerc - BrakeAdjustTarget);
+                BrakeAdjustPerc -= MIN(m_Situation->deltaTime*2, BrakeAdjustPerc - BrakeAdjustTarget);
         }
-        LogSHADOW.debug("#TS: %g DAP: %g (%g)", TargetSpeed, DecelAdjustPerc,(1 - DecelAdjustPerc/10));
-        TargetSpeed *= (1 - Skill/SkillMax * DecelAdjustPerc/20);
-        LogSHADOW.debug("#TS: %g\n", TargetSpeed);
+        LogSHADOW.debug("CalcSkill DAP: %g (%g)\n ", DecelAdjustPerc,(1 - DecelAdjustPerc/10));
 
-        LogSHADOW.debug("#%g %g\n", DecelAdjustPerc,(1 - DecelAdjustPerc/10));
     }
-
-    return TargetSpeed;
 }
 
 //==========================================================================*
