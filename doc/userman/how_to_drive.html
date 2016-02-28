@@ -15,16 +15,12 @@
 	<h1>I want to drive !</h1>
 	
 	<p>
-		Here is the manual for the players who want to drive in Speed Dreams <b>1.4.0</b>.
+		Here is the manual for the players who want to drive in Speed Dreams <b>2.2.0</b>.
 	</p>
 	
 	<p>
-		Note: The following screenshots may appear slightly different from what you'll really get ; they were actually shot for the 1.4.0-beta1, and some details have changed since then in the buttons shape, colors and highlight effects ; definitely nothing bad ;-)
-	</p>
-	
-	<p>
-		First of all you should install and run Speed Dreams ; for that, please read see the
-		INSTALL file <a href="http://speed-dreams.svn.sourceforge.net/viewvc/speed-dreams/tags/1.4.0">here</a>.
+		First of all you should install and run Speed Dreams ; for that, please read the
+		INSTALL file <a href="http://sourceforge.net/p/speed-dreams/code/HEAD/tree/tags/2.2.0/INSTALL.txt">here</a>.
 	</p>
 	
 	<p>
@@ -55,8 +51,8 @@
 	</p>
 	
 	<p>
-		Wait ! A last but important tip : never forget to hit the F1 key if you need help
-		about the available keyboard shortcuts in the current menu ...
+		Wait ! A last but important tip : you can always hit the F1 key if you need help
+		about the available keyboard shortcuts for the current menu ...
 	</p>
 	
 	<p>
@@ -72,9 +68,9 @@
 		To select a player to configure, click in the "Players" list box on one player's name. 
 		You can also :
 		<ul>
-			<li>create a new player through the New button under the list box (all default settings),</li>
-			<li>copy the selected one with the Copy button (all his settings will be copied, you'll then need to give him a new name),</li>
-			<li>delete the selected one with the Delete button.</li>
+			<li>create a new player through the New button (+ icon) under the list box (all default settings),</li>
+			<li>copy the selected one with the Copy button (two pages icon) (all his settings will be copied, you'll then need to give him a new name),</li>
+			<li>delete the selected one with the Delete button (trash can icon).</li>
 		</ul>
 	</p> 
 	
@@ -98,28 +94,18 @@
 	<p>
 		This configuration screen is also used to:
 		<ul>
-			<li>Select the player's car:
-				<ol>
-					<li>First select the car's category you want:
-						<ul>
-							<li><b>36 GP</b>: These terrible Grand-Prix cars of the thirties</li>
-							<li><b>Supercars</b>: The ones you dream of, in their unmodified version</li>
-							<li><b>TRB1</b>: The Speed Dreams setups of the well known GTs from Torcs</li>
-							<li><b>LS-GT1</b>: The future awesome Speed Dreams GT1 series</li>
-						</ul>
-					</li>
-					<li>Then select your car within the category.</li>
-				</ol>
-			</li>
 			<li>Select the transmission mode (automatic, sequential or grid)</li>
 				<ul>
 					<li><b>automatic</b>: Just throttle down or brake, the computer takes car of the gears</li>
 					<li><b>sequential</b>: Shift up and down like in a F1 car</li>
-					<li><b>grid</b>: Enjoy the good old grid shifter, like grand father's</li>
+					<li><b>grid</b>: Enjoy the good old grid shifter, like grandfather's</li>
+					<li><b>hbox</b>: standard shifter</li>
 				</ul>
 			<li>Program the number of pit stops you want for the race, so the initial fuel amount is adjusted accordingly.</li>
 			<li>Change the player's skill level:
 				<ul>
+					<li><b>Arcade</b>: No damages (0%),  high traction (+60%)</li>
+					<li><b>Semi-Rookie</b>: No damages (0%),  high traction (+50%)</li>
 					<li><b>Rookie</b>: No damages (0%),  high traction (+40%)</li>
 					<li><b>Amateur</b>: Small damages (50%),  high traction (+35%)</li>
 					<li><b>Semi-Pro</b>: Medium damages (80%), medium traction (+30%)</li>
@@ -194,7 +180,7 @@
 	</p>
 	
 	<p>
-		Then you probably want to calibrate the relevant axes, if any specified.
+		Then you probably want to calibrate the relevant axes, if any were specified.
 	</p>
 	
 	<p>
@@ -215,7 +201,7 @@
 	</p>
 	
 	<p>
-		The calibration screen is a bit different when you choosed the mouse.
+		The calibration screen is a bit different when you choose the mouse.
 	</p>
 	
 	<p>
@@ -226,8 +212,7 @@
 		Note: If you selected at least one mouse axis and one joystick axis in the Control Configuration menu, don't be surprised if the mouse and then the joystick calibration menus appear one after the other : you actually need to calibrate the two devices.
 	</p>
 	<p>
-		When the calibration is done, press the "Next" button 
-		(yes, the screenshot showes a "Back" one, but it is not totally up-to-date ;-).
+		When the calibration is done, press the "Done" button 
 		If something went wrong during the calibration process for a device, don't panic, 
 		use the "reset" button to start over the calibration for this device.
 	</p>
@@ -283,7 +268,7 @@
 	<p>
 		<b>Note:</b> If the program does not restart with the parameters you have chosen, 
 		don't panic, just edit the "screen.xml" file and reset the values 
-		to a more conservative choice (this file is normally located in ~/.speed-dreams/config under Unixes, or <My documents>/speed-dreams.settings/config under Windows).
+		to a more conservative choice (this file is normally located in ~/.speed-dreams-2/config under Unixes, or <My Documents>/speed-dreams-2.settings/config under Windows).
 	</p>
 	
 	<p>
@@ -314,12 +299,24 @@
 	        <li><b>LOD Factor</b>: The cars LOD (Level Of Detail) threshold (>= 0.0)</li>
 	    </ul>
 	<p>
-        As a general rule for all these parameters, greater values will need a more powerfull system :
-        play a little to find the ones that fit best your hardware</p>
+        As a general rule for all these parameters, greater values will need a more powerful system :
+        play a little to find the ones that best fit your hardware</p>
 	<p>
 		<img src="images/graphic-accept.jpg">
 	</p>
-	
+		<p>
+        Even more Graphic parameters are located in the "Advanced Graphics" menu
+    </p>
+	<p>
+		<img src="images/options-advanced-graphics.jpg">
+	</p>
+
+   	<p>
+        Again, you may want to experiment a little to find the ones that best fit your hardware</p>
+	<p>
+		<img src="images/advanced-graphic-accept.jpg">
+	</p>
+
 	<p>
 		The Open GL settings can be changed in the "Open GL" menu
 	</p>
@@ -365,8 +362,8 @@
 	<p>
 		You can select here the physics engine you prefer :
 	    <ul>
-	        <li><b>Simu V2</b>: The current official engine (2.5D) ; the cars and robots are optimized for this engine</li>
-	        <li><b>Simu V3</b>: The future Speed Dream engine (3D) ; experimental for the moment</li>
+	        <li><b>Simu V4</b>: The current official engine ; the cars and robots are optimized for this engine</li>
+	        <li><b>Simu V2.1</b>: A previous physics engine</li>
 	    </ul>
 	</p>
 	<p>
