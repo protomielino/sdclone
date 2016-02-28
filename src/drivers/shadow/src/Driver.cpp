@@ -336,7 +336,7 @@ void TDriver::AdjustSkilling(void* pCarHandle)
         //LookAhead = LookAhead / (1+SkillGlobal/24);
         //LookAheadFactor = LookAheadFactor / (1+SkillGlobal/24);
 
-        CalcSkilling();
+        //CalcSkilling();
 
         //Param.Tmp.oSkill = 1.0 + oSkill;
         LogSHADOW.debug("\n#>>>Skilling: Skill %g SkillGlobal %g SkillDriver %g LookAhead %g "
@@ -440,7 +440,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     //const char* BaseParamPath = TDriver::robot_name;
     //const char* PathFilename = PathFilenameBuffer;
 
-    SkillGlobal = Skill = DecelAdjustPerc = DriverAggression = 0.0;
+    SkillGlobal = Skill = DecelAdjustPerc = DriverAggression = SkillAdjustLimit = 0.0;
     GetSkillingParameters();
 	LogSHADOW.debug("#Skill Driver = %f\n", SkillDriver);
 
@@ -648,6 +648,13 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
     this->car = pCar;
 	m_myOppIdx = -1;
     clutchtime = 0.0f;
+
+    // Skilling from Andrew Sumner ...
+    SkillAdjustTimer = -1;
+    SkillAdjustLimit = 0.0;
+    BrakeAdjustTarget = DecelAdjustTarget = 1.0f;
+    BrakeAdjustPerc = DecelAdjustPerc = 1.0f;
+
     m_opp = new Opponent[m_nCars];
     for( int i = 0; i < m_nCars; i++ )
 	{
@@ -1604,6 +1611,8 @@ void TDriver::Drive( tSituation* s )
 	bool	close = false;
 	bool	lapper = false;
     AvoidOtherCars( INDEX, car, pi.k, targetSpd, s, close, lapper );
+    //targetSpd = CalcSkill(m_Situation, targetSpd);
+
 
     LogSHADOW.debug("SHADOW AvoidOtherCars\n");
 	if( close )
@@ -3313,6 +3322,7 @@ double TDriver::CalcSkill(tSituation *s, double TargetSpeed)
 
             // brake to use
             BrakeAdjustTarget = MAX(0.7, 1.0 - MAX(0.0, Skill/10 * (Rand2 - 0.7)));
+            LogSHADOW.debug("Brake Adjust Target = %.2f\n", BrakeAdjustTarget);
 
             // how long this skill mode to last for
             SkillAdjustLimit = 5.0 + Rand3 * 50.0;
