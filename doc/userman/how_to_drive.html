@@ -56,7 +56,7 @@
 	</p>
 	
 	<p>
-		You first need to configure a "human player" in order to choose you car and control device(s) : 
+		You first need to configure a "human player" in order to choose your car and control device(s) : 
 		go to the Player Configuration menu.
 	</p>
 	
@@ -87,14 +87,14 @@
 	</p>
 		<img src="images/playerconfig-editname.jpg">
 	<p>
-		Tip: If you do not want to come back later to change the car / control settings,
-		create here multiple players with different cars / control settings ...
+		Tip: If you do not want to come back later to change the control settings,
+		create here multiple players with different control settings ...
 	</p>
 	
 	<p>
 		This configuration screen is also used to:
 		<ul>
-			<li>Select the transmission mode (automatic, sequential or grid)</li>
+			<li>Select the transmission mode (automatic, sequential, grid or hbox)</li>
 				<ul>
 					<li><b>automatic</b>: Just throttle down or brake, the computer takes car of the gears</li>
 					<li><b>sequential</b>: Shift up and down like in a F1 car</li>
@@ -104,12 +104,12 @@
 			<li>Program the number of pit stops you want for the race, so the initial fuel amount is adjusted accordingly.</li>
 			<li>Change the player's skill level:
 				<ul>
-					<li><b>Arcade</b>: No damages (0%),  high traction (+60%)</li>
-					<li><b>Semi-Rookie</b>: No damages (0%),  high traction (+50%)</li>
-					<li><b>Rookie</b>: No damages (0%),  high traction (+40%)</li>
-					<li><b>Amateur</b>: Small damages (50%),  high traction (+35%)</li>
-					<li><b>Semi-Pro</b>: Medium damages (80%), medium traction (+30%)</li>
-					<li><b>Pro</b>: High damages (100%), low traction (+0%)</li>
+					<li><b>Arcade</b>: No damages (0%),  high traction (+40%)</li>
+					<li><b>Semi-Rookie</b>: Tiny damages (10%),  high traction (+30%)</li>
+					<li><b>Rookie</b>: Small damages (30%),  high traction (+20%)</li>
+					<li><b>Amateur</b>: Medium damages (50%),  high traction (+10%)</li>
+					<li><b>Semi-Pro</b>: High damages (80%), medium traction (+0%)</li>
+					<li><b>Pro</b>: Full damages (100%), low traction (+0%)</li>
 				</ul>
 			</li>
 			<li>Select the auto reverse function (engage automatically the reverse gear when the car is stopped and you continue to brake).</li>
@@ -122,7 +122,7 @@
 	<h1>Player's Control Configuration</h1>
 	
 	<p>
-		To configure the controls click on the "Controls" button
+		To configure the controls click on the "Controls" button.
 	</p>
 	
 	<p>
@@ -184,7 +184,7 @@
 	</p>
 	
 	<p>
-		Note: Of course, the "Calibrate" will only appear if you selected a mouse
+		Note: Of course, the "Calibrate" button will only appear if you have selected a mouse
 		or joystick axis.
 	</p>
 	
@@ -212,7 +212,7 @@
 		Note: If you selected at least one mouse axis and one joystick axis in the Control Configuration menu, don't be surprised if the mouse and then the joystick calibration menus appear one after the other : you actually need to calibrate the two devices.
 	</p>
 	<p>
-		When the calibration is done, press the "Done" button 
+		When the calibration is done, press the "Done" button. 
 		If something went wrong during the calibration process for a device, don't panic, 
 		use the "reset" button to start over the calibration for this device.
 	</p>
@@ -254,7 +254,7 @@
 	
 	<p>
 		You can adjust the screen / window resolution, the colour depth,
-		the display mode (windowed or fullscreen), the video initialization mode
+		the display mode (windowed or fullscreen), the video modes detection (auto or manual), the video initialization mode
 		("compatible" normally works, while best may produce odd graphic effects ...).
 	</p>
 	<p>
@@ -285,7 +285,7 @@
 	</p>
 	
 	<p>
-        The Graphic parameters are located in the "Graphic" menu
+        The Graphic parameters are located in the "Graphics" menu
     </p>
 	<p>
 		<img src="images/options-graphic.jpg">
@@ -293,32 +293,33 @@
 	
 	<p>The following parameters are customisable:</p>
 	    <ul>
-	        <li><b>Visibility</b>: The depth of view factor (> 0), you can go beyond 100%</li>
+	        <li><b>Visibility</b>: The depth of view factor (> 0) when Sky dome is disabled, you can go beyond 100%</li>
 	        <li><b>Smoke</b>: The number of smokes per car (>= 0)</li>
 	        <li><b>Skid Marks</b>: The number of skid marks per car (>= 0)</li>
 	        <li><b>LOD Factor</b>: The cars LOD (Level Of Detail) threshold (>= 0.0)</li>
+	        <li><b>Sky dome distance</b>: The distance where our dynamic sky is drawn, set it 0 to disable it and use a simple background image for sky</li>
 	    </ul>
 	<p>
         As a general rule for all these parameters, greater values will need a more powerful system :
-        play a little to find the ones that best fit your hardware</p>
+        play a little to find the ones that best fit your hardware.</p>
 	<p>
 		<img src="images/graphic-accept.jpg">
 	</p>
 		<p>
-        Even more Graphic parameters are located in the "Advanced Graphics" menu
+        Even more Graphic parameters are located in the "Advanced Graphics" menu.
     </p>
 	<p>
 		<img src="images/options-advanced-graphics.jpg">
 	</p>
 
    	<p>
-        Again, you may want to experiment a little to find the ones that best fit your hardware</p>
+        Again, you may want to experiment a little to find the ones that best fit your hardware.</p>
 	<p>
 		<img src="images/advanced-graphic-accept.jpg">
 	</p>
 
 	<p>
-		The Open GL settings can be changed in the "Open GL" menu
+		The Open GL settings can be changed in the "Open GL" menu.
 	</p>
 	
 	<p>
@@ -326,15 +327,22 @@
 	</p>
 	
 	<p>
-		You can enable or disable the texture compresssion if your hardware supports it
-		and adjust the maximum texture size (as the number of pixels for each side of a square).
+		You can enable or disable the texture compresssion, 
+		adjust the maximum texture size (as the number of pixels for each side of a square), 
+		enable or disable multi-texturing, set your anti-aliasing number, bump mapping, and anisotropic filtering level.
+		Only the options supported by your hardware can be changed.
+		In the last row you can switch between graphic engines:
+		<ul>
+	        <li><b>ssggraph</b>: Our old and tested graphic engine, this is the default</li>
+	        <li><b>OsgGraph</b>: Our experimental new graphic engine for the adventurous, it is not yet feature-full</li>
+	    </ul>
 	</p>
 	<p>
 		<img src="images/opengl-accept.jpg">
 	</p>
 	
 	<p>
-		The Sound parameters can be changed in the "Sound" menu
+		The Sound parameters can be changed in the "Sound" menu.
 	</p>
 	
 	<p>
@@ -343,16 +351,17 @@
 	
 	<p>
 		You can disable in-game sound, or select the OpenAL or PLib backend
-		(OpenAL generaly gives a better 16 bits sound ; choose PLib if OpenAL doesn't work
+		(OpenAL generally gives better 16 bits sound ; choose PLib if OpenAL doesn't work
         or according to your taste).
 		You can also adjust the master volume (from 0 to 100% of the current OS level).
+		You can also enable or disable menu music and set its volume.
 	</p>
 	<p>
 		<img src="images/sound-accept.jpg">
 	</p>
 	
 	<p>
-		The Simulation Engine settings can be changed in the "Simulation" menu
+		The Simulation Engine settings can be changed in the "Simulation" menu.
 	</p>
 	
 	<p>
@@ -362,16 +371,25 @@
 	<p>
 		You can select here the physics engine you prefer :
 	    <ul>
-	        <li><b>Simu V4</b>: The current official engine ; the cars and robots are optimized for this engine</li>
-	        <li><b>Simu V2.1</b>: A previous physics engine</li>
+	        <li><b>Simu V4</b>: The current official engine with all new features; the cars and robots are optimized for this engine</li>
+	        <li><b>Simu V2.1</b>: A previous physics engine to give a stable reference point</li>
 	    </ul>
+	</p>
+	<p>
+	    You can then set multi-threading on, off or auto. Setting it on will use 2 of your CPU cores if it has more than one.
+	    If CPU affinity is set on, the game will try to detect the number of cores in your CPU, and use multi threading only when it thinks there are more cores.
+	    Note: in certain CPU / OS combo only one core is detected even if there are multiple ones - switch off CPU affinity if you think you are in this situation.
+	</p>
+	<p>
+		You can also decide here whether you want your race start as paused (then you need to hit Enter to start the race),
+		or whether you want to drive a cool-down lap or rather go to the results screen as soon as the last car crossed the finish line.
 	</p>
 	<p>
 		<img src="images/simulation-accept.jpg">
 	</p>
 	
 	<p>
-		The AI opponents settings can be changed in the "AI Opponents" menu
+		The AI opponents settings can be changed in the "AI Opponents" menu.
 	</p>
 	
 	<p>
