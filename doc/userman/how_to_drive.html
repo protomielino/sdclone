@@ -253,9 +253,15 @@
 	</p>
 	
 	<p>
-		You can adjust the screen / window resolution, the colour depth,
-		the display mode (windowed or fullscreen), the video modes detection (auto or manual), the video initialization mode
-		("compatible" normally works, while best may produce odd graphic effects ...).
+		Here you can adjust:
+		<ul>
+			<li>window resolution </li>
+			<li>the colour depth</li>
+			<li>the display mode (windowed or fullscreen)</li>
+			<li>the video modes detection (auto or manual) ("auto" populates the window size choices as reported by SDL, "manual" populates the window size choices from an internal list)</li>
+			<li>the video initialization mode
+		("compatible" normally works, while "best possible" will try to configure OpenGL options for the best graphics (this may produce odd graphic effects or poor performance)</li>
+		</ul>
 	</p>
 	<p>
 		<img src="images/display-accept.jpg">
@@ -576,7 +582,7 @@
 	<h1>Pitting and using the dashboard</h1>
 	
 	<p>
-		In version 2.2.0 when you stop in your pit box you do not longer are asked about fuel and repair amount, 
+		In version 2.2.0 when you stop in your pit box you are no longer asked about fuel and repair amount, 
 		instead you have to set it through the new dashboard before pitting. Just as in real life. 
 		Press the key <b>6</b> to cycle through the dashboards positions: bottom, up and none.
 	</p>
