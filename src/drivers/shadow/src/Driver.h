@@ -55,6 +55,8 @@
 #define PRV_SIDE_MOD            "side mod"
 #define PRV_KZ_SCALE            "kz scale"
 #define PRV_BUMP_FACTOR         "bump factor"
+#define PRV_BUMP_FACTOR_LEFT    "bump factor left"
+#define PRV_BUMP_FACTOR_RIGHT   "bump factor right"
 #define PRV_CLUTCH_DELTA        "clutch delta"
 #define PRV_CLUTCH_RANGE        "clutch range"
 #define PRV_CLUTCH_MAX          "clutch max"

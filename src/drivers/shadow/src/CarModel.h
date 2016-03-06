@@ -70,6 +70,8 @@ public:
     double  CD_CX;
     double	KZ_SCALE;       // bump sensitivity.
     double  BUMP_FACTOR;    // bump sensitivity factor.
+	double	BUMP_FACTORLEFT;
+	double	BUMP_FACTORRIGHT;
     double	WIDTH;          // width of car (m).
 	bool	HASTYC;
 	double  TYRECONDITIONFRONT;

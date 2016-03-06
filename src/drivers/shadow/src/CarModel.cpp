@@ -60,6 +60,9 @@ CarModel::CarModel()
 
 	KZ_SCALE(0),
     BUMP_FACTOR(0),
+	BUMP_FACTORLEFT(0),
+	BUMP_FACTORRIGHT(0),
+
 	WIDTH(2),
 	HASTYC(false),
 	TYRECONDITIONFRONT(0),
@@ -122,10 +125,10 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
     double Den;
 
     double ScaleBump  = BUMP_FACTOR;
-    /*if (k > 0)
-      ScaleBump = CarParam.oScaleBumpLeft;
+    if (k > 0)
+      ScaleBump = BUMP_FACTORLEFT;
     else
-      ScaleBump = CarParam.oScaleBumpRight;*/
+      ScaleBump = BUMP_FACTORRIGHT;
 
     double MuF = kFriction * TYRE_MU_F * MU_SCALE;
     double MuR = kFriction * TYRE_MU_R * MU_SCALE;

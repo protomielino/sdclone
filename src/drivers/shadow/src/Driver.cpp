@@ -514,6 +514,8 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 
 	m_cm.KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_KZ_SCALE, NULL, 0.43f);
     m_cm.BUMP_FACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR, NULL, 1.0);
+	m_cm.BUMP_FACTORLEFT = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR_LEFT, NULL, 1.0);
+	m_cm.BUMP_FACTORRIGHT = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR_RIGHT, NULL, 1.0);
     m_cm.NEEDSINLONG = (GfParmGetNum(hCarParm, SECT_PRIV, PRV_NEED_SIN, NULL, 0) != 0);
     m_cm.USEDACCEXIT = (GfParmGetNum(hCarParm, SECT_PRIV, PRV_USED_ACC, NULL, 0) != 0);
     m_cm.BRAKESCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BRAKESCALE, NULL, 1.0);
