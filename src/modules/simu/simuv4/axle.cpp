@@ -36,12 +36,12 @@ void SimAxleConfig(tCar *car, int index)
 	setupRideHeightR->desired_value = setupRideHeightR->min = setupRideHeightR->max = 0.20f;
 	GfParmGetNumWithLimits(hdle, WheelSect[index*2], PRM_RIDEHEIGHT, (char*)NULL, &(setupRideHeightR->desired_value), &(setupRideHeightR->min), &(setupRideHeightR->max));
 	setupRideHeightR->changed = TRUE;
-	setupRideHeightR->stepsize = 0.001;
+	setupRideHeightR->stepsize = 0.001f;
 	
 	setupRideHeightL->desired_value = setupRideHeightL->min = setupRideHeightL->max = 0.20f;
 	GfParmGetNumWithLimits(hdle, WheelSect[index*2+1], PRM_RIDEHEIGHT, (char*)NULL, &(setupRideHeightL->desired_value), &(setupRideHeightL->min), &(setupRideHeightL->max));
 	setupRideHeightL->changed = TRUE;
-	setupRideHeightL->stepsize = 0.001;
+	setupRideHeightL->stepsize = 0.001f;
 	
 	if (index == 0) {
 		setupArbK->desired_value = setupArbK->min = setupArbK->max = 175000.0f;

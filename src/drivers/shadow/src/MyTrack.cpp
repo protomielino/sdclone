@@ -88,15 +88,15 @@ void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
 				tsend = pseg->lgfromstart + pseg->length;
 			}
 
-			const double	MIN_MU = pseg->surface->kFriction * 0.8;
-			const double	MAX_ROUGH = MX(0.005, pseg->surface->kRoughness * 1.2);
-			const double	MAX_RESIST = MX(0.02, pseg->surface->kRollRes * 1.2);
+//			const double	MIN_MU = pseg->surface->kFriction * 0.8;
+//			const double	MAX_ROUGH = MX(0.005, pseg->surface->kRoughness * 1.2);
+//			const double	MAX_RESIST = MX(0.02, pseg->surface->kRollRes * 1.2);
 
 //			GfOut( "   ### segDist %g   tsend %g\n",
 //					segDist, tsend );
 
-			double	t = (segDist - pseg->lgfromstart) / pseg->length;
-			double	width = pseg->startWidth + (pseg->endWidth - pseg->startWidth) * t;
+//			double	t = (segDist - pseg->lgfromstart) / pseg->length;
+//			double	width = pseg->startWidth + (pseg->endWidth - pseg->startWidth) * t;
 
 			m_pSegs[i].segDist = segDist;
 			m_pSegs[i].pSeg = pseg;
@@ -223,9 +223,9 @@ void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
 							pSide->surface->kRollRes   > MAX_RESIST	||
 							fabs(pSide->Kzw - SLOPE) > 0.005 )
 						{
-							bool	inner = 
-										s == TR_SIDE_LFT && pseg->type == TR_LFT ||
-										s == TR_SIDE_RGT && pseg->type == TR_RGT;
+//							bool	inner = 
+//										s == TR_SIDE_LFT && pseg->type == TR_LFT ||
+//										s == TR_SIDE_RGT && pseg->type == TR_RGT;
 							w = 0;//inner ? MN(w, 0.5) : 0;
 							done = true;
 						}
@@ -391,7 +391,7 @@ double MyTrack::CalcPos( double x, double y, const Seg* hint, bool sides ) const
 		pTrackSeg = hint->pSeg;
 
 	tTrkLocPos	pos;
-	RtTrackGlobal2Local( pTrackSeg, x, y, &pos, sides );
+	RtTrackGlobal2Local( pTrackSeg, (tdble) x, (tdble)y, &pos, sides );
 	double	dist = RtGetDistFromStart2(&pos);
 	return dist;
 }

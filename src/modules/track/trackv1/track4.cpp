@@ -977,7 +977,9 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
             case TR_PIT_NO_BUILDING:
             case TR_PIT_ON_TRACK_SIDE:
                 {//dummy for eliminating warnings of locally declared variables cross-jumping with cases
-                    pits->nPitSeg  = 0;
+                    pits->nPitSeg = 0;
+
+					// If undefined used defaults
                     if (pitBuildingsStart == NULL)
                         pitBuildingsStart = pitStart;
                     if (pitBuildingsEnd == NULL)
@@ -1084,6 +1086,7 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
                     }//while i
                     GfLogDebug("\n");
 
+					/* THIS CODE DOES NOTHING >>> */
                     for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
                         curSeg = curSeg2 = NULL;
 
@@ -1110,6 +1113,7 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
                             }
                         }
                     }//for mSeg
+					/* <<< THIS CODE DOES NOTHING */
                 }//dummy
                 break;
 
@@ -1124,26 +1128,28 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
     }//if found
 
 	for (mSeg = pitBuildingsStart; mSeg != pitBuildingsEnd; mSeg = mSeg->next) {
-        curSeg2 = NULL;
-
         switch(pits->side) {
             case TR_RGT:
-                curSeg = mSeg->rside;
-                curSeg2 = curSeg->rside;
                 mSeg->barrier[0]->style = TR_PITBUILDING;
-				if (curSeg2 != NULL)
-					curSeg2->raceInfo |= TR_PITBUILD;
+                curSeg = mSeg->rside;
+				if (curSeg){
+					curSeg2 = curSeg->rside;
+					if (curSeg2 != NULL)
+						curSeg2->raceInfo |= TR_PITBUILD;
+				}
 				GfLogDebug("%s: mSeg->barrier[0]->style = TR_PITBUILDING\n",mSeg->name);
                 break;
 
             case TR_LFT:
-                curSeg = mSeg->lside;
-                curSeg2 = curSeg->lside;
                 mSeg->barrier[1]->style = TR_PITBUILDING;
-				if (curSeg2 != NULL)
-				    curSeg2->raceInfo |= TR_PITBUILD;
+                curSeg = mSeg->lside;
+				if (curSeg) {
+					curSeg2 = curSeg->lside;
+					if (curSeg2 != NULL)
+						curSeg2->raceInfo |= TR_PITBUILD;
+				}
 				GfLogDebug("%s: mSeg->barrier[1]->style = TR_PITBUILDING\n",mSeg->name);
-            break;
+				break;
         }//switch pits->side
     }//for mSeg
 }

@@ -128,9 +128,9 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
     mDriverMsgCarIndex = 0;
     mFRONTCOLL_MARGIN = 4.0;
   } else {
-    mLearning = GfParmGetNum(handle, "private", "learning", (char*)NULL, 0.0);
+    mLearning = GfParmGetNum(handle, "private", "learning", (char*)NULL, 0.0) != 0;
     //mLearning = 1;
-    mTestpitstop = GfParmGetNum(handle, "private", "test pitstop", (char*)NULL, 0.0);
+    mTestpitstop = GfParmGetNum(handle, "private", "test pitstop", (char*)NULL, 0.0) != 0;
     //mTestpitstop = 1;
     mTestLine = (int)GfParmGetNum(handle, "private", "test line", (char*)NULL, 0.0);
     mDriverMsgLevel = (int)GfParmGetNum(handle, "private", "driver message", (char*)NULL, 0.0);
@@ -156,7 +156,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
     std::sprintf(buffer, "drivers/%s/%s/default.xml", MyBotName, mCarType.c_str());
     *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
   }
-  mFuelPerMeter = GfParmGetNum(*CarParmHandle, "private", "fuelpermeter", (char*)NULL, 0.001);
+  mFuelPerMeter = GfParmGetNum(*CarParmHandle, "private", "fuelpermeter", (char*)NULL, 0.001f);
   
   // Set initial fuel
   double distance = Situation->_totLaps * mTrack->length;
@@ -168,7 +168,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
   if (mLearning) {
     mFuelStart = mTankvol;
   }
-  GfParmSetNum(*CarParmHandle, SECT_CAR, PRM_FUEL, (char*)NULL, mFuelStart);
+  GfParmSetNum(*CarParmHandle, SECT_CAR, PRM_FUEL, (char*)NULL, (tdble) mFuelStart);
   
   // Get skill level
   handle = NULL;
@@ -443,11 +443,12 @@ void TDriver::calcTarget()
 
 void TDriver::setControls()
 {
-  oCar->_steerCmd = getSteer();
+  oCar->_steerCmd = (tdble) getSteer();
   oCar->_gearCmd = getGear();
-  oCar->_clutchCmd = getClutch();  // must be after gear
-  oCar->_brakeCmd = filterABS(getBrake(mMaxspeed));
-  oCar->_accelCmd = mAccel = filterTCLSideSlip(filterTCL(getAccel(mMaxspeed)));  // must be after brake
+  oCar->_clutchCmd = (tdble) getClutch();  // must be after gear
+  oCar->_brakeCmd = (tdble) filterABS(getBrake(mMaxspeed));
+  mAccel = filterTCLSideSlip(filterTCL(getAccel(mMaxspeed)));  // must be after brake
+  oCar->_accelCmd = (tdble) mAccel; 
   oCar->_lightCmd = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 }
 
@@ -731,7 +732,7 @@ int TDriver::getGear()
   
   if (oCurrSimTime < 0.5) {
     // For the start
-    shifttime = 0.0;
+    shifttime = 0;
   }
   if (mTenthTimer) {
     if (mShiftTimer < shifttime) {
@@ -1307,14 +1308,14 @@ void TDriver::readPrivateSection()
   mPITENTRYMARGIN = GfParmGetNum(oCar->_carHandle, "private", "pitentrymargin", (char*)NULL, 200.0);
   mPITENTRYSPEED = GfParmGetNum(oCar->_carHandle, "private", "pitentryspeed", (char*)NULL, 25.0);
   mPITEXITSPEED = GfParmGetNum(oCar->_carHandle, "private", "pitexitspeed", (char*)NULL, 25.0);
-  mSPEEDFACTOR = GfParmGetNum(oCar->_carHandle, "private", "speedfactor", (char*)NULL, 0.6);
-  mTARGETFACTOR = GfParmGetNum(oCar->_carHandle, "private", "targetfactor", (char*)NULL, 0.3);
+  mSPEEDFACTOR = GfParmGetNum(oCar->_carHandle, "private", "speedfactor", (char*)NULL, 0.6f);
+  mTARGETFACTOR = GfParmGetNum(oCar->_carHandle, "private", "targetfactor", (char*)NULL, 0.3f);
   mTARGETWALLDIST = GfParmGetNum(oCar->_carHandle, "private", "targetwalldist", (char*)NULL, 0.0);
-  mTRACTIONCONTROL = GfParmGetNum(oCar->_carHandle, "private", "tractioncontrol", (char*)NULL, 1.0);
+  mTRACTIONCONTROL = GfParmGetNum(oCar->_carHandle, "private", "tractioncontrol", (char*)NULL, 1.0) != 0;
   mMAXLEFT = GfParmGetNum(oCar->_carHandle, "private", "maxleft", (char*)NULL, 10.0);
   mMAXRIGHT = GfParmGetNum(oCar->_carHandle, "private", "maxright", (char*)NULL, 10.0);
   mMARGIN = GfParmGetNum(oCar->_carHandle, "private", "margin", (char*)NULL, 1.5);
-  mCLOTHFACTOR = GfParmGetNum(oCar->_carHandle, "private", "clothoidfactor", (char*)NULL, 1.005);
+  mCLOTHFACTOR = GfParmGetNum(oCar->_carHandle, "private", "clothoidfactor", (char*)NULL, 1.005f);
   mSEGLEN = GfParmGetNum(oCar->_carHandle, "private", "seglen", (char*)NULL, 3.0);
 }
 
@@ -1870,8 +1871,8 @@ void TDriver::calcGlobalTarget()
     mGlobalTarget = mPath[mDrvPath].tarpos.pos;
   } else {
     tTrkLocPos target_local;
-    RtTrackGlobal2Local(oCar->_trkPos.seg, mPath[mDrvPath].tarpos.pos.x, mPath[mDrvPath].tarpos.pos.y, &target_local, TR_LPOS_MAIN);
-    target_local.toMiddle = mTargetToMiddle;
+    RtTrackGlobal2Local(oCar->_trkPos.seg, (tdble) mPath[mDrvPath].tarpos.pos.x, (tdble) mPath[mDrvPath].tarpos.pos.y, &target_local, TR_LPOS_MAIN);
+    target_local.toMiddle = (tdble) mTargetToMiddle;
     tdble x, y;
     RtTrackLocal2Global(&target_local, &x, &y, TR_TOMIDDLE);
     mGlobalTarget.x = x;

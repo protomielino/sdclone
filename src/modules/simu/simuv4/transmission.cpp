@@ -83,7 +83,7 @@ SimTransmissionConfig(tCar *car)
 		setupGear->desired_value = setupGear->min = setupGear->max = 0.0f;
 		GfParmGetNumWithLimits(hdle, path, PRM_RATIO, (char*)NULL, &(setupGear->desired_value), &(setupGear->min), &(setupGear->max));
 		setupGear->changed = TRUE;
-		setupGear->stepsize = 0.01;
+		setupGear->stepsize = 0.01f;
 		gRatio = setupGear->desired_value;
 		if ((trans->gearbox.gearMax == 0) && (gRatio != 0.0f)) {
 			trans->gearbox.gearMax = i - 1;

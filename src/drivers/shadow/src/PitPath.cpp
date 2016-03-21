@@ -92,7 +92,7 @@ void PitPath::MakePath( CarElt*	pCar, LinePath*	pBasePath, const CarModel& cm, d
 		y[6] = pi.offs;
 		s[6] = -tan(pi.oang - m_pTrack->CalcForwardAngle(m_pitExitPos));
 
-		float sign = (pPitInfo->side == TR_LFT) ? -1.0 : 1.0;
+		float sign = (pPitInfo->side == TR_LFT) ? -1.0f : 1.0f;
 		{for( int i = 1; i < NPOINTS - 1; i++ )
 		{
 			y[i] = fabs(pPitInfo->driversPits->pos.toMiddle) - pPitInfo->width;

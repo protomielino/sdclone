@@ -309,6 +309,7 @@ double Pit::getSideDist()
 void Pit::pitCommand()
 {
   car->_pitRepair = getRepair();
-  car->_pitFuel = lastpitfuel = getFuel();
+  lastpitfuel = getFuel();
+  car->_pitFuel = (tdble) lastpitfuel;
   setPitstop(false);
 }

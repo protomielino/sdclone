@@ -57,22 +57,22 @@ SimDifferentialConfig(tCar *car, int index)
     setupDRatio->desired_value = setupDRatio->min = setupDRatio->max = 1.0f;
     GfParmGetNumWithLimits(hdle, section, PRM_RATIO, (char*)NULL, &(setupDRatio->desired_value), &(setupDRatio->min), &(setupDRatio->max));
     setupDRatio->changed = TRUE;
-    setupDRatio->stepsize = 0.1;
+    setupDRatio->stepsize = 0.1f;
     
     setupDMinTB->desired_value = setupDMinTB->min = setupDMinTB->max = 0.05f;
     GfParmGetNumWithLimits(hdle, section, PRM_MIN_TQ_BIAS, (char*)NULL, &(setupDMinTB->desired_value), &(setupDMinTB->min), &(setupDMinTB->max));
     setupDMinTB->changed = TRUE;
-    setupDMinTB->stepsize = 0.01;
+    setupDMinTB->stepsize = 0.01f;
     
     setupDMaxTB->desired_value = setupDMaxTB->min = setupDMaxTB->max = 0.80f;
     GfParmGetNumWithLimits(hdle, section, PRM_MAX_TQ_BIAS, (char*)NULL, &(setupDMaxTB->desired_value), &(setupDMaxTB->min), &(setupDMaxTB->max));
     setupDMaxTB->changed = TRUE;
-    setupDMaxTB->stepsize = 0.01;
+    setupDMaxTB->stepsize = 0.01f;
     
     setupDVisc->desired_value = setupDVisc->min = setupDVisc->max = 2.0f;
     GfParmGetNumWithLimits(hdle, section, PRM_VISCOSITY_FACTOR, (char*)NULL, &(setupDVisc->desired_value), &(setupDVisc->min), &(setupDVisc->max));
     setupDVisc->changed = TRUE;
-    setupDVisc->stepsize = 0.1;
+    setupDVisc->stepsize = 0.1f;
     
     setupDLT->desired_value = setupDLT->min = setupDLT->max = 300.0f;
     GfParmGetNumWithLimits(hdle, section, PRM_LOCKING_TQ, (char*)NULL, &(setupDLT->desired_value), &(setupDLT->min), &(setupDLT->max));

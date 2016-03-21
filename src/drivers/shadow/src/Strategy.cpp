@@ -78,7 +78,7 @@ void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituat
     LogSHADOW.info("Strategy max fuel =  %.2f\n", maxFuel);
     FuelperMeters = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_FUELPERMETERS, (char*)NULL, (tdble) MAX_FUEL_PER_METER);
     LogSHADOW.info("Strategy fuel per meters =  %.5f\n", FuelperMeters);
-    fuelPerLap = TrackLength * FuelperMeters;
+    fuelPerLap = (tdble) (TrackLength * FuelperMeters);
     LogSHADOW.info("Strategy fuel per lap =  %.2f\n", fuelPerLap);
     fullfuel = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_FULL_FUEL, (char*)NULL, 0.0);
     fuel_Strat = (int)GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_PITSTRAT, (char*)NULL, 0.0);
@@ -104,7 +104,7 @@ void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituat
     //raceDist = raceLaps * t->length;
     //fuelForRace = raceDist * fuelPerMeter;
     fuelForRace = raceLaps * fuelPerLap;
-    numPitstop = (tdble) fabs(fuelForRace / maxFuel);
+    numPitstop = (int) fabs(fuelForRace / maxFuel);
     if ( numPitstop < fuelForRace / maxFuel )
     {
         numPitstop = numPitstop + 1;
@@ -256,7 +256,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
     int m_maxDamage = PIT_DAMMAGE;
     float attvalue = 0.0f;
     // load defined value in xml file of Max Dammage before pitstops for this track
-    attvalue = GfParmGetNum(car->_carHandle, SECT_PRIV, PRV_DAMAGE, (char*) NULL, PIT_DAMMAGE);
+    attvalue = GfParmGetNum(car->_carHandle, SECT_PRIV, PRV_DAMAGE, (char*) NULL, (tdble) PIT_DAMMAGE);
     m_maxDamage = (int)attvalue;
     // Estimated average fuel per lap
     //m_Fuel = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, BT_ATT_FUELPERLAP, (char*) NULL, m_expectedfuelperlap);

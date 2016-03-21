@@ -45,12 +45,12 @@ SimWheelConfig(tCar *car, int index)
 	setupToe->desired_value = setupToe->min = setupToe->max = 0.0f;
 	GfParmGetNumWithLimits(hdle, WheelSect[index], PRM_TOE, (char*)NULL, &(setupToe->desired_value), &(setupToe->min), &(setupToe->max));
 	setupToe->changed = TRUE;
-	setupToe->stepsize = DEG2RAD(0.1);
+	setupToe->stepsize = (tdble) DEG2RAD(0.1);
 	
 	setupCamber->desired_value = setupCamber->min = setupCamber->max = 0.0f;
 	GfParmGetNumWithLimits(hdle, WheelSect[index], PRM_CAMBER, (char*)NULL, &(setupCamber->desired_value), &(setupCamber->min), &(setupCamber->max));
 	setupCamber->changed = TRUE;
-	setupCamber->stepsize = DEG2RAD(0.1);
+	setupCamber->stepsize = (tdble) DEG2RAD(0.1);
 
 	setupPressure->desired_value = setupPressure->min = setupPressure->max = 275600;
 	GfParmGetNumWithLimits(hdle, WheelSect[index], PRM_PRESSURE, (char*)NULL, &(setupPressure->desired_value), &(setupPressure->min), &(setupPressure->max));
@@ -165,14 +165,14 @@ SimWheelConfig(tCar *car, int index)
 		GfLogWarning("Tire magic curve parameters are unphysical!");
 	} else {
 		for (i = 0; i < 32; i++) {
-			Bx = 0.5 * (low + high);
+			Bx = (tdble)(0.5 * (low + high));
 			if (wheel->mfC * atan(Bx * (1.0f - wheel->mfE) + wheel->mfE * atan(Bx)) < PI_2) {
 				low = Bx;
 			} else {
 				high = Bx;
 			}
 		}
-		s = 0.5 * (low + high) / wheel->mfB;
+		s = (tdble)(0.5 * (low + high) / wheel->mfB);
 	}
 	car->carElt->_wheelSlipOpt(index) = s;
 }

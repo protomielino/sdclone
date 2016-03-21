@@ -1469,6 +1469,7 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	pits->type     = TR_PIT_ON_TRACK_SIDE;
 	pits->nPitSeg  = 0;
 
+	// If undefined used defaults
 	if (pitBuildingsStart == NULL)
 		pitBuildingsStart = pits->pitStart;
 	if (pitBuildingsEnd == NULL)
@@ -1538,53 +1539,57 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    i++;
 	}
 
+	/* THIS CODE DOES NOTHING >>> */
 	for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
 		curSeg = curSeg2 = NULL;
 
 	    if ((mSeg != pitStart->prev) && (mSeg != pitEnd->next)) {
-		if (curSeg) {
-		curSeg->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
-		}
-		if (curSeg2) {
-		    curSeg2->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
-		}
+			if (curSeg) {
+				curSeg->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
+			}
+			if (curSeg2) {
+				curSeg2->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
+			}
 	    } else if (mSeg == pitStart->prev) {
-		if (curSeg) {
-		curSeg->raceInfo |= TR_PITSTART;
-		}
-		if (curSeg2) {
-		    curSeg2->raceInfo |= TR_PITSTART;
-		}
+			if (curSeg) {
+				curSeg->raceInfo |= TR_PITSTART;
+			}
+			if (curSeg2) {
+				curSeg2->raceInfo |= TR_PITSTART;
+			}
 	    } else if (mSeg == pitEnd->next) {
-		if (curSeg) {
-		curSeg->raceInfo |= TR_PITEND;
-		}
-		if (curSeg2) {
-		    curSeg2->raceInfo |= TR_PITEND;
-		} 
+			if (curSeg) {
+				curSeg->raceInfo |= TR_PITEND;
+			}
+			if (curSeg2) {
+				curSeg2->raceInfo |= TR_PITEND;
+			} 
 	    }
 	}
-	    
+	/* <<< THIS CODE DOES NOTHING */	    
     }
 
 	for (mSeg = pitBuildingsStart; mSeg != pitBuildingsEnd; mSeg = mSeg->next) {
-	    curSeg2 = NULL;
 	    switch(pits->side) {
-	    case TR_RGT:
-		curSeg = mSeg->rside;
-		curSeg2 = curSeg->rside;
-	    mSeg->barrier[0]->style = TR_PITBUILDING;
-		if (curSeg2 != NULL)
-		    curSeg2->raceInfo |= TR_PITBUILD;
-		break;
-	    case TR_LFT:
-		curSeg = mSeg->lside;
-		curSeg2 = curSeg->lside;
-	    mSeg->barrier[1]->style = TR_PITBUILDING;
-		if (curSeg2 != NULL)
-		    curSeg2->raceInfo |= TR_PITBUILD;
-		break;
-    }
+		    case TR_RGT:
+				mSeg->barrier[0]->style = TR_PITBUILDING;
+				curSeg = mSeg->rside;
+				if (curSeg){
+					curSeg2 = curSeg->rside;
+					if (curSeg2 != NULL)
+						curSeg2->raceInfo |= TR_PITBUILD;
+				}
+				break;
+			case TR_LFT:
+				mSeg->barrier[1]->style = TR_PITBUILDING;
+				curSeg = mSeg->lside;
+				if (curSeg){
+					curSeg2 = curSeg->lside;
+					if (curSeg2 != NULL)
+						curSeg2->raceInfo |= TR_PITBUILD;
+				}
+				break;
+		}
     }
 
 	/* 

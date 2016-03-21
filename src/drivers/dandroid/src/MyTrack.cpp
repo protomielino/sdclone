@@ -150,7 +150,7 @@ double MyTrack::CalcPos( double x, double y, const Seg* hint, bool sides ) const
     pTrackSeg = hint->pSeg;
 
   tTrkLocPos pos;
-  RtTrackGlobal2Local( pTrackSeg, x, y, &pos, sides );
+  RtTrackGlobal2Local( pTrackSeg, (tdble) x, (tdble) y, &pos, sides );
   double dist = RtGetDistFromStart2(&pos);
   return dist;
 }

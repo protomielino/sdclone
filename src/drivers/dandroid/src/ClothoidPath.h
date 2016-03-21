@@ -36,7 +36,7 @@ public:
     double factor;
     
     Options() : maxL(999), maxR(999), margin(1.0), factor(1.005) {}
-    Options( double ml = 999, double mr = 999, double ma = 1.0, double fa = 1.005 ) : maxL(ml), maxR(mr), margin(ma), factor(fa) {}
+    Options( double ml /* = 999 */, double mr = 999, double ma = 1.0, double fa = 1.005 ) : maxL(ml), maxR(mr), margin(ma), factor(fa) {}
   };
 
 public:

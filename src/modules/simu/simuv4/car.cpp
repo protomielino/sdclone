@@ -95,19 +95,19 @@ SimCarConfig(tCar *car)
 	setupGcfr->desired_value = setupGcfr->min = setupGcfr->max = 0.5;
 	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_FRWEIGHTREP, (char*)NULL, &(setupGcfr->desired_value), &(setupGcfr->min), &(setupGcfr->max));
 	setupGcfr->changed = TRUE;
-	setupGcfr->stepsize = 0.005;
+	setupGcfr->stepsize = 0.005f;
 	gcfr = setupGcfr->desired_value;
 	
 	setupGcfrl->desired_value = setupGcfrl->min = setupGcfrl->max = 0.5;
 	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_FRLWEIGHTREP, (char*)NULL, &(setupGcfrl->desired_value), &(setupGcfrl->min), &(setupGcfrl->max));
 	setupGcfrl->changed = TRUE;
-	setupGcfrl->stepsize = 0.005;
+	setupGcfrl->stepsize = 0.005f;
 	gcfrl = setupGcfrl->desired_value;
 	
 	setupGcrrl->desired_value = setupGcrrl->min = setupGcrrl->max = 0.5;
 	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_RRLWEIGHTREP, (char*)NULL, &(setupGcrrl->desired_value), &(setupGcrrl->min), &(setupGcrrl->max));
 	setupGcrrl->changed = TRUE;
-	setupGcrrl->stepsize = 0.005;
+	setupGcrrl->stepsize = 0.005f;
 	gcrrl = setupGcrrl->desired_value;
 
 	car->tank        = GfParmGetNum(hdle, SECT_CAR, PRM_TANK, (char*)NULL, 80);
@@ -931,9 +931,9 @@ SimCarUpdate(tCar *car, tSituation * /* s */)
 	/* update car->carElt->setup.reqRepair with damage */
 	tCarSetupItem *repair = &(car->carElt->setup.reqRepair);
 	if ((repair->desired_value > 0.0) && (repair->max == repair->desired_value)) {
-		repair->max = repair->desired_value = car->dammage;
+		repair->max = repair->desired_value = (tdble) car->dammage;
 	} else {
-		repair->max = car->dammage;
+		repair->max = (tdble) car->dammage;
 	}
 		
 }

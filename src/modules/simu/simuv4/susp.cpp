@@ -167,7 +167,7 @@ void SimSuspConfig(tCar *car, void *hdle, const char *section, tSuspension *susp
 	setupBellcrank->desired_value = setupBellcrank->min = setupBellcrank-> max = 1.0f;
 	GfParmGetNumWithLimits(hdle, section, PRM_BELLCRANK, (char*)NULL, &(setupBellcrank->desired_value), &(setupBellcrank->min), &(setupBellcrank->max));
 	setupBellcrank->changed = TRUE;
-	setupBellcrank->stepsize = 0.1;
+	setupBellcrank->stepsize = 0.1f;
 	
 	setupInertance->desired_value = setupInertance->min = setupInertance-> max = 0.0f;
 	//Inertance is not yet used in car setup files.
@@ -197,23 +197,23 @@ void SimSuspConfig(tCar *car, void *hdle, const char *section, tSuspension *susp
 	setupBumpLvel->desired_value = setupBumpLvel->min = setupBumpLvel->max = 0.5f;
 	GfParmGetNumWithLimits(hdle, section, PRM_BUMPLVEL, (char*)NULL, &(setupBumpLvel->desired_value), &(setupBumpLvel->min), &(setupBumpLvel->max));
 	setupBumpLvel->changed = TRUE;
-	setupBumpLvel->stepsize = 0.01;
+	setupBumpLvel->stepsize = 0.01f;
 	
 	setupRebLvel->desired_value = setupRebLvel->min = setupRebLvel->max = 0.5f;
 	GfParmGetNumWithLimits(hdle, section, PRM_REBOUNDLVEL, (char*)NULL, &(setupRebLvel->desired_value), &(setupRebLvel->min), &(setupRebLvel->max));
 	setupRebLvel->changed = TRUE;
-	setupRebLvel->stepsize = 0.01;
+	setupRebLvel->stepsize = 0.01f;
 	
 	if (index<4) {
 		setupCourse->desired_value = setupCourse->min = setupCourse->max = 0.5f;
 		GfParmGetNumWithLimits(hdle, section, PRM_SUSPCOURSE, (char*)NULL, &(setupCourse->desired_value), &(setupCourse->min), &(setupCourse->max));
 		setupCourse->changed = TRUE;
-		setupCourse->stepsize = 0.001;
+		setupCourse->stepsize = 0.001f;
 		
 		setupPacker->desired_value = setupPacker->min = setupPacker->max = 0.0f;
 		GfParmGetNumWithLimits(hdle, section, PRM_PACKERS, (char*)NULL, &(setupPacker->desired_value), &(setupPacker->min), &(setupPacker->max));
 		setupPacker->changed = TRUE;
-		setupPacker->stepsize = 0.001;
+		setupPacker->stepsize = 0.001f;
 	}
 }
 

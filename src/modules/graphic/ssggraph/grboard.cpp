@@ -1848,7 +1848,7 @@ cGrBoard::grGenerateLeaderBoardEntry(const tCarElt *car, const tSituation* s,
 void
 cGrBoard::grDispDashboard()
 {
-  const char *buf1;
+  const char *buf1 = NULL;
   char buf2[9], buf3[9];
   int dym = GfuiFontHeight(GFUI_FONT_MEDIUM_C);
   int y1;
@@ -1952,10 +1952,12 @@ cGrBoard::grDispDashboard()
   
   // Write information
   if (car_->_dashboardActiveItem < car_->_dashboardInstantNb) {
-    GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
+	if (buf1)
+		GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
     GfuiDrawString(buf2, danger_color_, GFUI_FONT_LARGE_C, x1 + 16 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
   } else {
-    GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
+	if (buf1)
+	    GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
     GfuiDrawString(buf2, emphasized_color_, GFUI_FONT_LARGE_C, x1 + 16 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
     GfuiDrawString(buf3, ahead_color_, GFUI_FONT_LARGE_C, x1 + 24 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
   }

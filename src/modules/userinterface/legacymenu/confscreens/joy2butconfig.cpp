@@ -98,12 +98,11 @@ static int DoneBut = 0;;
 static void
 onNext(void * /* dummy */)
 {
-    int index;
-
     /* Release up and running joysticks */
 #if SDL_JOYSTICK
     //GfctrlJoyRelease(joyInfo);
 #else
+    int index;
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++)
 	if (Joystick[index]) {
 	    delete Joystick[index];
@@ -348,12 +347,12 @@ static void
 onActivate(void * /* dummy */)
 {
     int i;
-    int index;
     
 #if SDL_JOYSTICK
     //joyInfo = GfctrlJoyCreate();
     GfctrlJoyGetCurrentStates(&joyInfo);
 #else
+    int index;
     // Create and test joysticks ; only keep the up and running ones.
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 	Joystick[index] = new jsJoystick(index);

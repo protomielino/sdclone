@@ -684,9 +684,9 @@ SimCarUpdate(tCar *car, tSituation * /* s */)
     /* update car->carElt->setup.reqRepair with damage */
 	tCarSetupItem *repair = &(car->carElt->setup.reqRepair);
 	if ((repair->desired_value > 0.0) && (repair->max == repair->desired_value)) {
-		repair->max = repair->desired_value = car->dammage;
+		repair->max = repair->desired_value = (tdble) car->dammage;
 	} else {
-		repair->max = car->dammage;
+		repair->max = (tdble) car->dammage;
 	}
 }
 
