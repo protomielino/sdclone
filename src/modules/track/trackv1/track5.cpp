@@ -904,25 +904,6 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
         }
         GfOut("PitBuildingStart: %s\n", pitBuildingsStart->name);
 
-		//Search for pit buildings end
-        segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_BUILDINGS_STOPP, NULL);
-        if (segName != 0) {
-            /* Search backward the last segment with that name */
-            pitBuildingsEnd = theTrack->seg; /* last track segment */
-            found = false;
-            for(i = 0; i < theTrack->nseg; i++) {
-                if (!strcmp(segName, pitBuildingsEnd->name)) {
-                    found = true;
-                    break;
-                }
-                pitBuildingsEnd = pitBuildingsEnd->prev;
-            }
-            if (!found) {
-                pitBuildingsEnd = NULL;
-            } 
-        }
-        GfOut("PitBuildungsEnd: %s\n", pitBuildingsEnd->name);
-
         //Search for pits end
         segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_END, NULL);
         if (segName != 0)
@@ -946,8 +927,28 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
                 pitEnd = NULL;
             }
         }
-
         GfOut("PitEnd: %s\n", pitEnd->name);
+
+		//Search for pit buildings end
+        segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_BUILDINGS_STOP, NULL);
+        if (segName != 0) {
+            /* Search backward the last segment with that name */
+            pitBuildingsEnd = theTrack->seg; /* last track segment */
+            found = false;
+            for(i = 0; i < theTrack->nseg; i++) {
+                if (!strcmp(segName, pitBuildingsEnd->name)) {
+                    found = true;
+                    break;
+                }
+                pitBuildingsEnd = pitBuildingsEnd->prev;
+            }
+            if (!found) {
+                pitBuildingsEnd = pitEnd;
+            } 
+        } else {
+            pitBuildingsEnd = pitEnd;
+        }
+        GfOut("PitBuildungsEnd: %s\n", pitBuildingsEnd->name);
 
         //Decide which side the pit is located
         const char *paramVal = GfParmGetStr(TrackHandle, path2, TRK_ATT_SIDE, "right");

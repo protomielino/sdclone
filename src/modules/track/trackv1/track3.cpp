@@ -1396,25 +1396,10 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 				pitBuildingsStart = pitBuildingsStart->prev;
 			}
 			if (!found) {
-				pitBuildingsStart = NULL;
+				pitBuildingsStart = pitStart;
 			}
-
-		}
-
-        segName = GfParmGetStr(TrackHandle, TRK_SECT_MAIN, TRK_ATT_BUILDINGS_STOPP, NULL);
-        if (segName != 0) {
-            pitBuildingsEnd = theTrack->seg;
-            found = 0;
-            for(i = 0; i < theTrack->nseg; i++) {
-                if (!strcmp(segName, pitBuildingsEnd->name)) {
-                    found = 1;
-                    break;
-                }
-                pitBuildingsEnd = pitBuildingsEnd->prev;
-            }
-            if (!found) {
-                pitBuildingsEnd = NULL;
-            } 
+        } else {
+			pitBuildingsStart = pitStart;
         }
 
 		segName = GfParmGetStr(TrackHandle, TRK_SECT_MAIN, TRK_ATT_PIT_END, NULL);
@@ -1433,6 +1418,24 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 			if (!found) {
 			pitEnd = NULL;
 	    }
+
+        segName = GfParmGetStr(TrackHandle, TRK_SECT_MAIN, TRK_ATT_BUILDINGS_STOP, NULL);
+        if (segName != 0) {
+            pitBuildingsEnd = theTrack->seg;
+            found = 0;
+            for(i = 0; i < theTrack->nseg; i++) {
+                if (!strcmp(segName, pitBuildingsEnd->name)) {
+                    found = 1;
+                    break;
+                }
+                pitBuildingsEnd = pitBuildingsEnd->prev;
+            }
+            if (!found) {
+                pitBuildingsEnd = pitEnd;
+            } 
+        } else {
+            pitBuildingsEnd = pitEnd;
+        }
 	}
 	paramVal = GfParmGetStr(TrackHandle, TRK_SECT_MAIN, TRK_ATT_PIT_SIDE, "right");
 	if (strcmp(paramVal, "right") == 0) {

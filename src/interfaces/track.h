@@ -205,7 +205,7 @@
 #define TRK_ATT_PIT_INDICATOR       "pit indicator"
 #define TRK_ATT_MAX_PITS            "max pits"
 #define TRK_ATT_BUILDINGS_START     "start buildings"
-#define TRK_ATT_BUILDINGS_STOPP     "stop buildings"
+#define TRK_ATT_BUILDINGS_STOP      "stop buildings"
 #define TRK_ATT_PIT_STYLE           "pit style"
 #define TRK_ATT_ENTRY               "entry"
 #define TRK_ATT_EXIT                "exit"
