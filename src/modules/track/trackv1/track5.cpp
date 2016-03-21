@@ -837,10 +837,11 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
             }
             pitEntrySeg = pitEntrySeg->prev;
         }// for i
-        if (!found) {
+        if (found) 
+	        GfOut("PitEntry: %s\n", pitEntrySeg->name);
+		else
             pitEntrySeg = NULL;
-        }
-        GfOut("PitEntry: %s\n", pitEntrySeg->name);
+
 
         //Search for pit exit
         segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_EXIT, NULL);
@@ -856,11 +857,11 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
                 }
                 pitExitSeg = pitExitSeg->prev;
             }
-            if (!found) {
+            if (found) 
+		        GfOut("PitExit: %s\n", pitExitSeg->name);
+			else
                 pitExitSeg = NULL;
-            }
         }
-        GfOut("PitExit: %s\n", pitExitSeg->name);
 
         //Search for pits start
         segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_START, NULL);
@@ -880,29 +881,31 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
                 pitStart = NULL;
             }
         }
-        GfOut("PitStart: %s\n", pitStart->name);
+		if (pitStart != NULL) {
+	        GfOut("PitStart: %s\n", pitStart->name);
 
-        //Search for pit buildings start
-        segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_BUILDINGS_START, NULL);
-        if (segName != 0) {
-            pitBuildingsStart = theTrack->seg;
-            found = false;
-            for(i = 0; i < theTrack->nseg; i++) {
-                if (!strcmp(segName, pitBuildingsStart->name)) {
-                    found = true;
-                } else if (found) {
-                    pitBuildingsStart = pitBuildingsStart->next;
-                    break;
-                }
-            pitBuildingsStart = pitBuildingsStart->prev;
-            }
-            if (!found) {
-                pitBuildingsStart = pitStart;
-            }
-        } else {
-            pitBuildingsStart = pitStart;
-        }
-        GfOut("PitBuildingStart: %s\n", pitBuildingsStart->name);
+	        //Search for pit buildings start
+		    segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_BUILDINGS_START, NULL);
+			if (segName != 0) {
+				pitBuildingsStart = theTrack->seg;
+	            found = false;
+		        for(i = 0; i < theTrack->nseg; i++) {
+			        if (!strcmp(segName, pitBuildingsStart->name)) {
+				        found = true;
+					} else if (found) {
+	                    pitBuildingsStart = pitBuildingsStart->next;
+		                break;
+			        }
+				pitBuildingsStart = pitBuildingsStart->prev;
+				}
+	            if (!found) {
+		            pitBuildingsStart = pitStart;
+			    }
+	        } else {
+		        pitBuildingsStart = pitStart;
+			}
+	        GfOut("PitBuildingStart: %s\n", pitBuildingsStart->name);
+		}
 
         //Search for pits end
         segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_END, NULL);
@@ -927,28 +930,30 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
                 pitEnd = NULL;
             }
         }
-        GfOut("PitEnd: %s\n", pitEnd->name);
+		if (pitEnd != NULL) {
+	        GfOut("PitEnd: %s\n", pitEnd->name);
 
-		//Search for pit buildings end
-        segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_BUILDINGS_STOP, NULL);
-        if (segName != 0) {
-            /* Search backward the last segment with that name */
-            pitBuildingsEnd = theTrack->seg; /* last track segment */
-            found = false;
-            for(i = 0; i < theTrack->nseg; i++) {
-                if (!strcmp(segName, pitBuildingsEnd->name)) {
-                    found = true;
-                    break;
-                }
-                pitBuildingsEnd = pitBuildingsEnd->prev;
-            }
-            if (!found) {
-                pitBuildingsEnd = pitEnd;
-            } 
-        } else {
-            pitBuildingsEnd = pitEnd;
+			//Search for pit buildings end
+		    segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_BUILDINGS_STOP, NULL);
+			if (segName != 0) {
+				/* Search backward the last segment with that name */
+	            pitBuildingsEnd = theTrack->seg; /* last track segment */
+		        found = false;
+			    for(i = 0; i < theTrack->nseg; i++) {
+				    if (!strcmp(segName, pitBuildingsEnd->name)) {
+					    found = true;
+						break;
+	                }
+		            pitBuildingsEnd = pitBuildingsEnd->prev;
+			    }
+				if (!found) {
+					pitBuildingsEnd = pitEnd;
+	            } 
+		    } else {
+			    pitBuildingsEnd = pitEnd;
+	        }
+		    GfOut("PitBuildungsEnd: %s\n", pitBuildingsEnd->name);
         }
-        GfOut("PitBuildungsEnd: %s\n", pitBuildingsEnd->name);
 
         //Decide which side the pit is located
         const char *paramVal = GfParmGetStr(TrackHandle, path2, TRK_ATT_SIDE, "right");
