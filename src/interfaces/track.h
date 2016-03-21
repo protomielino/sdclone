@@ -205,6 +205,7 @@
 #define TRK_ATT_PIT_INDICATOR       "pit indicator"
 #define TRK_ATT_MAX_PITS            "max pits"
 #define TRK_ATT_BUILDINGS_START     "start buildings"
+#define TRK_ATT_BUILDINGS_STOPP     "stop buildings"
 #define TRK_ATT_PIT_STYLE           "pit style"
 #define TRK_ATT_ENTRY               "entry"
 #define TRK_ATT_EXIT                "exit"
@@ -441,6 +442,7 @@ typedef struct trackSeg
 #define TR_PIT		0x00000040  /**< Car pit */
 #define TR_PITSTART	0x00000080  /**< Car pit Star */
 #define TR_PITEND	0x00000100  /**< Car pit End */
+#define TR_PITBUILD 0x00000200  /**< Car pit while buildings */
 
     tdble DoVfactor;            /* the factor to use in calculating DoV for this Seg */
 

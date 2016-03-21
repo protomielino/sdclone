@@ -69,6 +69,7 @@ static tTrackSeg	*pitEntrySeg = NULL;
 static tTrackSeg	*pitExitSeg = NULL;
 static tTrackSeg	*pitStart = NULL;
 static tTrackSeg	*pitBuildingsStart = NULL;
+static tTrackSeg	*pitBuildingsEnd = NULL;
 static tTrackSeg	*pitEnd = NULL;
 
 static tTrackPitInfo	*pits = NULL;
@@ -787,6 +788,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
     pitExitSeg = NULL;
     pitStart = NULL;
     pitBuildingsStart = NULL;
+    pitBuildingsEnd = NULL;
     pitEnd = NULL;
 
     //Search for the pit section in the track XML file
@@ -878,6 +880,25 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
         }
         GfOut("PitBuildingStart: %s\n", pitBuildingsStart->name);
 
+		//Search for pit buildings end
+        segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_BUILDINGS_STOPP, NULL);
+        if (segName != 0) {
+            /* Search backward the last segment with that name */
+            pitBuildingsEnd = theTrack->seg; /* last track segment */
+            found = false;
+            for(i = 0; i < theTrack->nseg; i++) {
+                if (!strcmp(segName, pitBuildingsEnd->name)) {
+                    found = true;
+                    break;
+                }
+                pitBuildingsEnd = pitBuildingsEnd->prev;
+            }
+            if (!found) {
+                pitBuildingsEnd = NULL;
+            } 
+        }
+        GfOut("PitBuildungsEnd: %s\n", pitBuildingsEnd->name);
+
         //Search for pits end
         segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_END, NULL);
         if (segName != 0) {
@@ -918,7 +939,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
             pitExitSeg->raceInfo |= TR_PITEXIT;
             pits->len   = GfParmGetNum(TrackHandle, path2, TRK_ATT_LEN, (char*)NULL, 15.0);
             pits->width = GfParmGetNum(TrackHandle, path2, TRK_ATT_WIDTH, (char*)NULL, 5.0);
-            pits->pitindicator = GfParmGetNum(TrackHandle, path2, TRK_ATT_PIT_INDICATOR, (char*)NULL, 0.0);
+            pits->pitindicator = (int) GfParmGetNum(TrackHandle, path2, TRK_ATT_PIT_INDICATOR, (char*)NULL, 0.0);
             found = true;
         } else {
             found = false;
@@ -950,18 +971,21 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
             case TR_PIT_ON_TRACK_SIDE:
                 {//dummy for eliminating warnings of locally declared variables cross-jumping with cases
                     pits->nPitSeg  = 0;
-                    if (pitStart->lgfromstart > pitEnd->lgfromstart) {
-                        pits->nPitSeg = (int)((theTrack->length - pitStart->lgfromstart
-                            + pitEnd->lgfromstart + pitEnd->length + pits->len / 2.0) / pits->len);
+                    if (pitBuildingsStart == NULL)
+                        pitBuildingsStart = pitStart;
+                    if (pitBuildingsEnd == NULL)
+                        pitBuildingsEnd = pitEnd;
+
+					if (pitBuildingsStart->lgfromstart > pitBuildingsEnd->lgfromstart) {
+                        pits->nPitSeg = (int)((theTrack->length - pitBuildingsStart->lgfromstart
+                            + pitBuildingsEnd->lgfromstart + pitBuildingsEnd->length + pits->len / 2.0) / pits->len);
                     } else {
-                        pits->nPitSeg = (int)((pitEnd->lgfromstart + pitEnd->length
-                            - pitStart->lgfromstart + pits->len / 2.0) / pits->len);
+                        pits->nPitSeg = (int)((pitEnd->lgfromstart + pitBuildingsEnd->length
+                            - pitBuildingsStart->lgfromstart + pits->len / 2.0) / pits->len);
                     }
                     pits->nMaxPits = MIN(pits->nPitSeg,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nPitSeg));
                     pits->driversPits = (tTrackOwnPit*)calloc(pits->nPitSeg, sizeof(tTrackOwnPit));
 
-                    if (pitBuildingsStart == NULL)
-                        pitBuildingsStart = pitStart;
                     mSeg = pitBuildingsStart->prev;
                     //mSeg = mSeg->next;
 
@@ -1056,24 +1080,6 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
                     for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
                         curSeg = curSeg2 = NULL;
 
-                        switch(pits->side) {
-                            case TR_RGT:
-                                curSeg = mSeg->rside;
-                                curSeg2 = curSeg->rside;
-                                if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) {
-                                    mSeg->barrier[0]->style = TR_PITBUILDING;
-                                }
-                                break;
-
-                            case TR_LFT:
-                                curSeg = mSeg->lside;
-                                curSeg2 = curSeg->lside;
-                                if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) {
-                                    mSeg->barrier[1]->style = TR_PITBUILDING;
-                                }
-                                break;
-                        }//switch pits->side
-
                         if ((mSeg != pitStart->prev) && (mSeg != pitEnd->next)) {
                             if (curSeg) {
                                 curSeg->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
@@ -1110,7 +1116,7 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
         }//switch pits->type
     }//if found
 
-    for (mSeg = pitBuildingsStart; mSeg != pitEnd; mSeg = mSeg->next) {
+	for (mSeg = pitBuildingsStart; mSeg != pitBuildingsEnd; mSeg = mSeg->next) {
         curSeg2 = NULL;
 
         switch(pits->side) {
@@ -1118,12 +1124,16 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
                 curSeg = mSeg->rside;
                 curSeg2 = curSeg->rside;
                 mSeg->barrier[0]->style = TR_PITBUILDING;
+			    curSeg2->raceInfo |= TR_PITBUILD;
+				GfLogDebug("%s: mSeg->barrier[0]->style = TR_PITBUILDING\n",mSeg->name);
                 break;
 
             case TR_LFT:
                 curSeg = mSeg->lside;
                 curSeg2 = curSeg->lside;
                 mSeg->barrier[1]->style = TR_PITBUILDING;
+			    curSeg2->raceInfo |= TR_PITBUILD;
+				GfLogDebug("%s: mSeg->barrier[1]->style = TR_PITBUILDING\n",mSeg->name);
             break;
         }//switch pits->side
     }//for mSeg
