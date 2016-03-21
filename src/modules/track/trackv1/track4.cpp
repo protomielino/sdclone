@@ -1131,7 +1131,8 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
                 curSeg = mSeg->rside;
                 curSeg2 = curSeg->rside;
                 mSeg->barrier[0]->style = TR_PITBUILDING;
-			    curSeg2->raceInfo |= TR_PITBUILD;
+				if (curSeg2 != NULL)
+					curSeg2->raceInfo |= TR_PITBUILD;
 				GfLogDebug("%s: mSeg->barrier[0]->style = TR_PITBUILDING\n",mSeg->name);
                 break;
 
@@ -1139,7 +1140,8 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
                 curSeg = mSeg->lside;
                 curSeg2 = curSeg->lside;
                 mSeg->barrier[1]->style = TR_PITBUILDING;
-			    curSeg2->raceInfo |= TR_PITBUILD;
+				if (curSeg2 != NULL)
+				    curSeg2->raceInfo |= TR_PITBUILD;
 				GfLogDebug("%s: mSeg->barrier[1]->style = TR_PITBUILDING\n",mSeg->name);
             break;
         }//switch pits->side
