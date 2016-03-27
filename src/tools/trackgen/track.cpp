@@ -110,8 +110,9 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
     {
 		case TR_PIT_ON_TRACK_SIDE:
 		case TR_PIT_NO_BUILDING:
-			pits->driversPits = (tTrackOwnPit*)calloc(pits->nPitSeg, sizeof(tTrackOwnPit));
-			pits->driversPitsNb = pits->nPitSeg; 
+            pits->driversPitsNb = MIN(pits->nPitSeg,pits->nMaxPits);
+			pits->driversPits = (tTrackOwnPit*)calloc(pits->driversPitsNb, sizeof(tTrackOwnPit));
+			 
 			curPos.type = TR_TOMIDDLE;
 			//TR_LPOS_MAIN; //NB: TR_LPOS_MAIN not handled by RtTrackLocal2Global!
 
@@ -147,7 +148,7 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 			offset = 0;
 			toStart = 0;
 			i = 0;
-            while (i < pits->nPitSeg)
+            while (i < pits->driversPitsNb)
             {
                 if (changeSeg)
                 {

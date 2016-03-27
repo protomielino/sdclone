@@ -993,7 +993,7 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
                             - pitBuildingsStart->lgfromstart + pits->len / 2.0) / pits->len);
                     }
                     pits->nMaxPits = MIN(pits->nPitSeg,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nPitSeg));
-                    pits->driversPits = (tTrackOwnPit*)calloc(pits->nPitSeg, sizeof(tTrackOwnPit));
+                    pits->driversPits = (tTrackOwnPit*)calloc(pits->nMaxPits, sizeof(tTrackOwnPit));
 
                     mSeg = pitBuildingsStart->prev;
                     //mSeg = mSeg->next;
@@ -1002,7 +1002,7 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
                     tdble		offset = 0;
                     tdble		toStart = 0;
                     int i = 0;
-                    while (i < pits->nPitSeg) {
+                    while (i < pits->nMaxPits) {
                         if (changeSeg) {
                             changeSeg = false;
                             offset = 0;
