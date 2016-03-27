@@ -132,7 +132,7 @@ GfTexScaleImagePowerof2(unsigned char *pSrcImg, int srcW, int srcH, GLenum forma
  */
 unsigned char *
 GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int *pHeight,
-					  int *pPow2Width, int *pPow2Height)
+					  int *pPow2Width, int *pPow2Height, bool useGammaCorrection)
 {
 	static const int nPNGBytesToCheck = 4;
 
@@ -235,10 +235,12 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 		png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
 	}
 	
-	if (png_get_gAMA(png_ptr, info_ptr, &gamma)) {
-		png_set_gamma(png_ptr, screen_gamma, gamma);
-	} else {
-		png_set_gamma(png_ptr, screen_gamma, 0.50);
+	if(useGammaCorrection){
+		if (png_get_gAMA(png_ptr, info_ptr, &gamma)) {
+			png_set_gamma(png_ptr, screen_gamma, gamma);
+		} else {
+			png_set_gamma(png_ptr, screen_gamma, 0.50);
+		}
 	}
 
 	// Store read image width and height.
