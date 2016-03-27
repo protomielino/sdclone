@@ -922,7 +922,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 			} else {
 	            pitBuildingsEnd = pitEnd;
 		    }
-			GfOut("PitBuildungsEnd: %s\n", pitBuildingsEnd->name);
+			GfOut("PitBuildingsEnd: %s\n", pitBuildingsEnd->name);
 		}
 
         //Decide which side the pit is located

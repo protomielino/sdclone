@@ -952,7 +952,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 		    } else {
 			    pitBuildingsEnd = pitEnd;
 	        }
-		    GfOut("PitBuildungsEnd: %s\n", pitBuildingsEnd->name);
+		    GfOut("PitBuildingsEnd: %s\n", pitBuildingsEnd->name);
         }
 
         //Decide which side the pit is located
@@ -964,7 +964,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 
         //Decide pit style
         pits->type = (int)GfParmGetNum(TrackHandle, path2, TRK_ATT_PIT_STYLE, NULL, TR_PIT_ON_TRACK_SIDE);
-        GfOut("track4:: Pit style: %d\n", pits->type);
+        GfOut("track5:: Pit style: %d\n", pits->type);
 
         if ((pitEntrySeg != NULL) && (pitExitSeg != NULL)
             && (pitStart != NULL) && (pitEnd != NULL))
