@@ -804,7 +804,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
         sprintf(path, "%s/%s/%.*s", TRK_SECT_MAIN, TRK_LST_SEGMENTS, (int)(sizeof(path) - strlen(TRK_SECT_MAIN) - strlen(TRK_LST_SEGMENTS)), segName);
         segId = (int)GfParmGetNum(TrackHandle, path, TRK_ATT_ID, (char*)NULL, -1);
         pitEntrySeg = theTrack->seg;
-        for(i = 0; i < theTrack->nseg; i++) {
+        for(i = 0; i <= theTrack->nseg; i++) {
             if (pitEntrySeg->id == segId) {
                 found = true;
             } else if (found) {
@@ -824,7 +824,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
             /* Search backward the last segment with that name */
             pitExitSeg = theTrack->seg; /* last track segment */
             found = false;
-            for(i = 0; i < theTrack->nseg; i++) {
+            for(i = 0; i <= theTrack->nseg; i++) {
                 /* set the flag on the last segment of pit_exit */
                 if (!strcmp(segName, pitExitSeg->name)) {
                     found = true;
@@ -843,7 +843,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
         if (segName != 0) {
             pitStart = theTrack->seg;
             found = false;
-            for(i = 0; i < theTrack->nseg; i++) {
+            for(i = 0; i <= theTrack->nseg; i++) {
                 if (!strcmp(segName, pitStart->name)) {
                     found = true;
                 } else if (found) {
@@ -864,7 +864,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 			if (segName != 0) {
 				pitBuildingsStart = theTrack->seg;
 	            found = false;
-		        for(i = 0; i < theTrack->nseg; i++) {
+		        for(i = 0; i <= theTrack->nseg; i++) {
 			        if (!strcmp(segName, pitBuildingsStart->name)) {
 				        found = true;
 					} else if (found) {
@@ -888,7 +888,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
             /* Search backward the last segment with that name */
             pitEnd = theTrack->seg; /* last track segment */
             found = false;
-            for(i = 0; i < theTrack->nseg; i++) {
+            for(i = 0; i <= theTrack->nseg; i++) {
                 if (!strcmp(segName, pitEnd->name)) {
                     found = true;
                     break;
@@ -909,7 +909,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 			    /* Search backward the last segment with that name */
 				pitBuildingsEnd = theTrack->seg; /* last track segment */
 	            found = false;
-		        for(i = 0; i < theTrack->nseg; i++) {
+		        for(i = 0; i <= theTrack->nseg; i++) {
 			        if (!strcmp(segName, pitBuildingsEnd->name)) {
 				        found = true;
 					    break;

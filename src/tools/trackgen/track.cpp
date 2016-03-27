@@ -119,7 +119,7 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 			if (segName != 0) {
 				pitBuildingsStart = theTrack->seg;
 				found = false;
-                for(i = 0; i < theTrack->nseg; i++)
+                for(i = 0; i <= theTrack->nseg; i++)
                 {
                     if (!strcmp(segName, pitBuildingsStart->name))
                     {
