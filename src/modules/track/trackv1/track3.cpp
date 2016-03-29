@@ -1539,34 +1539,49 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    i++;
 	}
 
-	/* THIS CODE DOES NOTHING >>> */
+	// Setup pit speed limit
 	for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
 		curSeg = curSeg2 = NULL;
+
+		switch(pits->side) {
+
+		case TR_RGT:
+		curSeg = mSeg->rside;
+		if (curSeg)
+			curSeg2 = curSeg->rside;
+		break;
+
+		case TR_LFT:
+		curSeg = mSeg->lside;
+		if (curSeg)
+			curSeg2 = curSeg->lside;
+		break;
+
+		}
 
 	    if ((mSeg != pitStart->prev) && (mSeg != pitEnd->next)) {
 			if (curSeg) {
 				curSeg->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
-			}
-			if (curSeg2) {
-				curSeg2->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
+				if (curSeg2) {
+					curSeg2->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
+				}
 			}
 	    } else if (mSeg == pitStart->prev) {
 			if (curSeg) {
 				curSeg->raceInfo |= TR_PITSTART;
-			}
-			if (curSeg2) {
-				curSeg2->raceInfo |= TR_PITSTART;
+				if (curSeg2) {
+					curSeg2->raceInfo |= TR_PITSTART;
+				}
 			}
 	    } else if (mSeg == pitEnd->next) {
 			if (curSeg) {
 				curSeg->raceInfo |= TR_PITEND;
+				if (curSeg2) {
+					curSeg2->raceInfo |= TR_PITEND;
+				} 
 			}
-			if (curSeg2) {
-				curSeg2->raceInfo |= TR_PITEND;
-			} 
 	    }
 	}
-	/* <<< THIS CODE DOES NOTHING */	    
     }
 
 	for (mSeg = pitBuildingsStart; mSeg != pitBuildingsEnd; mSeg = mSeg->next) {

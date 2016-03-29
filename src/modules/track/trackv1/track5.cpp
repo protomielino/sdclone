@@ -1117,34 +1117,49 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
                     }//while i
                     GfLogDebug("\n");
 
-					/* THIS CODE DOES NOTHING >>> */
-                    for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
-                        curSeg = curSeg2 = NULL;
+					// Setup pit speed limit
+					for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
+						curSeg = curSeg2 = NULL;
 
-						if ((mSeg != pitStart->prev) && (mSeg != pitEnd->next)) {
-                            if (curSeg) {
-                                curSeg->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
-                            }
-                            if (curSeg2) {
-                                curSeg2->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
-                            }
-                        } else if (mSeg == pitStart->prev) {
-                            if (curSeg) {
-                                curSeg->raceInfo |= TR_PITSTART;
-                            }
-                            if (curSeg2) {
-                                curSeg2->raceInfo |= TR_PITSTART;
-                            }
-                        } else if (mSeg == pitEnd->next) {
-                            if (curSeg) {
-                                curSeg->raceInfo |= TR_PITEND;
-                            }
-                            if (curSeg2) {
-                                curSeg2->raceInfo |= TR_PITEND;
-                            }
-                        }
-                    }//for mSeg
-					/* <<< THIS CODE DOES NOTHING */
+						switch(pits->side) {
+
+						case TR_RGT:
+						curSeg = mSeg->rside;
+						if (curSeg)
+							curSeg2 = curSeg->rside;
+						break;
+
+						case TR_LFT:
+						curSeg = mSeg->lside;
+						if (curSeg)
+							curSeg2 = curSeg->lside;
+						break;
+
+						}
+
+					    if ((mSeg != pitStart->prev) && (mSeg != pitEnd->next)) {
+							if (curSeg) {
+								curSeg->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
+								if (curSeg2) {
+									curSeg2->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
+								}
+							}
+						} else if (mSeg == pitStart->prev) {
+							if (curSeg) {
+								curSeg->raceInfo |= TR_PITSTART;
+								if (curSeg2) {
+									curSeg2->raceInfo |= TR_PITSTART;
+								}
+							}
+						} else if (mSeg == pitEnd->next) {
+							if (curSeg) {
+								curSeg->raceInfo |= TR_PITEND;
+								if (curSeg2) {
+									curSeg2->raceInfo |= TR_PITEND;
+								} 
+							}
+						}
+					}
                 }//dummy
                 break;
 
