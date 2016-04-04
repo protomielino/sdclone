@@ -58,10 +58,8 @@ private: // Private data members.
 	//! Initialization flag for the underlying software layers.
 	static bool _bInitialized;
 
-#if SDL_MAJOR_VERSION < 2
 	//! Unicode for each typed SDL key sym + modifier
 	std::map<Uint32, Uint16> _mapUnicodes;
-#endif
 };
 
 GfEventLoop::Private::Private()
@@ -118,11 +116,40 @@ int GfEventLoop::Private::translateKeySym(int code, int modifier, int unicode)
 	// Done.
 	return keyUnicode;
 #else
+	int keyUnicode = code; //default to returning code
+
 	// Make the Numpad <Enter> key behave like the regular <Enter> key
 	if(SDLK_KP_ENTER == code)
-		code = SDLK_RETURN;
+		keyUnicode = SDLK_RETURN;
 
-	return code;
+	else
+	{
+		const Uint32 keyId = ((Uint32)code & GF_MAX_KEYCODE) | (((Uint32)modifier) << 9);
+
+		// If unicode - add to the map...
+		if(unicode)
+		{
+			// Truncate unicodes above GF_MAX_KEYCODE (no need for more).
+			keyUnicode = (unsigned short)(unicode & GF_MAX_KEYCODE);
+			_mapUnicodes[keyId] = (unsigned short)keyUnicode;
+			GfLogDebug("translateKeySym(c=%X, m=%X, u=%X) : '%c', id=%X, ucode=%X (nk=%d)\n",
+				   code, modifier, unicode, // Truncate high bits for MSVC 2010 bugs.
+				   (keyUnicode > 0 && keyUnicode < 128 && isprint(keyUnicode & 0x7F))
+				   ? (char)(keyUnicode & 0x7F) : ' ',
+				   keyId, keyUnicode, _mapUnicodes.size());
+		}
+		else
+		{
+			// Search it in our unicode map.
+			const std::map<Uint32, Uint16>::const_iterator itUnicode = _mapUnicodes.find(keyId);
+			if (itUnicode != _mapUnicodes.end())
+			{
+				keyUnicode = (*itUnicode).second;
+			}
+		}
+	}
+
+	return keyUnicode;
 #endif
 }
 

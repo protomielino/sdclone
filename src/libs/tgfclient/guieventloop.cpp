@@ -136,6 +136,7 @@ void GfuiEventLoop::operator()()
 #if SDL_MAJOR_VERSION >= 2
 	static int unicode = 0;
    static SDL_Keymod modifier = KMOD_NONE;
+   static SDL_Keycode keysym = SDLK_UNKNOWN;
 #endif
 
 	// Check for events.
@@ -165,12 +166,11 @@ void GfuiEventLoop::operator()()
 					{
 						injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 0,0);
 					}
-#if 0
 					else
 					{
-						printf("SDL_KEYDOWN: %c\r\n",(char)event.key.keysym.sym);
+						//GfLogDebug("SDL_KEYDOWN: %c\r\n",(char)event.key.keysym.sym);
+						keysym = event.key.keysym.sym;
 					}
-#endif
 #endif
 					break;
 
@@ -178,8 +178,8 @@ void GfuiEventLoop::operator()()
 				case SDL_TEXTINPUT:
 					unicode = (int)(event.text.text[0]);
 					modifier = SDL_GetModState();
-					injectKeyboardEvent(unicode,modifier, 0,0);
-					//printf("SDL_TEXTINPUT: %c %X\r\n",(char)unicode,modifier);
+					injectKeyboardEvent(keysym, modifier, 0, unicode);
+					//GfLogDebug("SDL_TEXTINPUT: %c %X\r\n",(char)unicode,modifier);
 					break;
 #endif
 
@@ -187,25 +187,8 @@ void GfuiEventLoop::operator()()
 #if SDL_MAJOR_VERSION < 2
 					injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 1,event.key.keysym.unicode);
 #else
-					if((event.key.keysym.sym & SDLK_SCANCODE_MASK) == SDLK_SCANCODE_MASK)
-					{
-						injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 1,0);
-					}
-					else if(false == isprint(event.key.keysym.sym))
-					{
-						injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 1,0);
-					}
-					else if((event.key.keysym.mod & KMOD_CTRL)
-							||(event.key.keysym.mod & KMOD_ALT)
-							||(event.key.keysym.mod & KMOD_GUI))
-					{
-						injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 1,0);
-					}
-					else
-					{
-						injectKeyboardEvent(unicode, event.key.keysym.mod, 1,0);
-						//printf("SDL_KEYUP: %c unicode = %c\r\n",(char)event.key.keysym.sym,unicode);
-					}
+					injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 1,0);
+					//GfLogDebug("SDL_KEYUP: %c\r\n",(char)event.key.keysym.sym);
 #endif
 					break;
 
