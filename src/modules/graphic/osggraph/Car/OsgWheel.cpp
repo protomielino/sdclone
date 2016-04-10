@@ -79,6 +79,8 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
 	static const int MaxPathSize = 512;
     char buf[MaxPathSize];
 
+	std::string bSkinName = "";
+
     std::string TmpPath = GetDataDir();
     std::string strTPath;
     snprintf(buf, MaxPathSize, "drivers/%s/%d/", car->_modName, car->_driverIndex);
@@ -107,7 +109,7 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
         if (wheel_mod_name && strlen(wheel_mod_name))
         {
             snprintf(wheel_file_name, 32, "%s%d.acc", wheel_mod_name, j);
-            wheel = loader.Load3dFile(wheel_file_name, true);
+            wheel = loader.Load3dFile(wheel_file_name, true, bSkinName);
 			wheels_switches[wheelIndex]->addChild(wheel.get(), false);
 #if 0
             std::string wheel_path = GetLocalDir();

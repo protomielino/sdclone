@@ -213,9 +213,10 @@ void SDScenery::ShutdownScene(void)
     SDTrack = NULL;
 }
 
-bool SDScenery::LoadTrack(std::string strTrack)
+bool SDScenery::LoadTrack(std::string& strTrack)
 {
     char buf[256];
+	std::string name = "";
     GfOut("Chemin Track : %s\n", strTrack.c_str());
     osgLoader loader;
     GfOut("Chemin Textures : %s\n", _strTexturePath.c_str());
@@ -226,7 +227,7 @@ bool SDScenery::LoadTrack(std::string strTrack)
     strTPath += buf;
     loader.AddSearchPath(strTPath);
 
-    osg::Node *pTrack = loader.Load3dFile(strTrack, false);
+    osg::Node *pTrack = loader.Load3dFile(strTrack, false, name);
 
     if (pTrack)
     {

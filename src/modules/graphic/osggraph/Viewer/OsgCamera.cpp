@@ -2409,9 +2409,9 @@ void SDCameras::loadSpanValues()
             GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_MONITOR, GR_VAL_MONITOR_16BY9);
 
     if (strcmp(pszMonitorType, GR_VAL_MONITOR_16BY9) == 0)
-        spanaspect = 1.7777;
+        spanaspect = 1.7777f;
     if (strcmp(pszMonitorType, GR_VAL_MONITOR_4BY3) == 0)
-        spanaspect = 1.3333 ;
+        spanaspect = 1.3333f ;
     if (strcmp(pszMonitorType, GR_VAL_MONITOR_NONE) == 0)
-        spanaspect = 1;
+        spanaspect = 1.0f;
 }

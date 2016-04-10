@@ -35,7 +35,7 @@ SDBackground::~SDBackground(void)
     _background = NULL;
 }
 
-void SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const std::string TrackPath)
+void SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const std::string& TrackPath)
 {
     bool land = type;
     osgDB::Registry::instance()->clearObjectCache();

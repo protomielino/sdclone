@@ -49,7 +49,7 @@ public:
     // Destructor
     ~SDBackground(void);
 
-    void build(bool type, int X, int Y, int Z, const std::string strTrack);
+    void build(bool type, int X, int Y, int Z, const std::string& strTrack);
     void reposition(int X, int Y);
 
     osg::ref_ptr<osg::Group> getBackground() { return _background.get(); }
@@ -121,7 +121,7 @@ private:
     void LoadGraphicsOptions();
     void LoadSkyOptions();
     void CustomizePits(void);
-    bool LoadTrack(std::string strTrack);
+    bool LoadTrack(std::string& strTrack);
 
 public:
     /* Constructor */
