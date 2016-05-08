@@ -61,7 +61,6 @@ ctrlCheck(tCar *car)
     if (isnan(car->ctrl->brakeCmd) || isinf(car->ctrl->brakeCmd)) car->ctrl->brakeCmd = 0;
     if (isnan(car->ctrl->clutchCmd) || isinf(car->ctrl->clutchCmd)) car->ctrl->clutchCmd = 0;
     if (isnan(car->ctrl->steer) || isinf(car->ctrl->steer)) car->ctrl->steer = 0;
-    if (isnan(car->ctrl->gear) || isinf(car->ctrl->gear)) car->ctrl->gear = 0;
 	if (isnan(car->ctrl->wingFrontCmd) || isinf(car->ctrl->wingFrontCmd)) car->ctrl->wingFrontCmd = 0;
 	if (isnan(car->ctrl->wingRearCmd) || isinf(car->ctrl->wingRearCmd)) car->ctrl->wingRearCmd = 0;
 	if (isnan(car->ctrl->brakeFrontLeftCmd) || isinf(car->ctrl->brakeFrontLeftCmd)) car->ctrl->brakeFrontLeftCmd = 0;
@@ -73,7 +72,6 @@ ctrlCheck(tCar *car)
     if (isnan(car->ctrl->brakeCmd)) car->ctrl->brakeCmd = 0;
     if (isnan(car->ctrl->clutchCmd)) car->ctrl->clutchCmd = 0;
     if (isnan(car->ctrl->steer)) car->ctrl->steer = 0;
-    if (isnan(car->ctrl->gear)) car->ctrl->gear = 0;
 	if (isnan(car->ctrl->wingFrontCmd)) car->ctrl->wingFrontCmd = 0;
 	if (isnan(car->ctrl->wingRearCmd)) car->ctrl->wingRearCmd = 0;
 	if (isnan(car->ctrl->brakeFrontLeftCmd)) car->ctrl->brakeFrontLeftCmd = 0;
