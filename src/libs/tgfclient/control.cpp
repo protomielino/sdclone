@@ -276,9 +276,9 @@ GfctrlGetNameByRef(int type, int index)
 		return GfKey[i].descr;
 	    }
 	}
-	if (isprint(index)) {
-	    sprintf(buf, "%c", index);
-	    return buf;
+	if(index > 0 && index < 128 && isprint(index & 0x7F)) {
+		sprintf(buf, "%c", index & 0x7F);
+		return buf;
 	}
 	return NULL;
 	break;
