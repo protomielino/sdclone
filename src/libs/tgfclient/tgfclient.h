@@ -230,13 +230,18 @@ TGFCLIENT_API tScreenSize* GfScrGetDefaultSizes(int* pnSizes);
 #define GFUIK_F14	SDLK_F14
 #define GFUIK_F15	SDLK_F15
 
+#define GFUIK_RSHIFT	SDLK_RSHIFT
+#define GFUIK_LSHIFT	SDLK_LSHIFT
+
 // Add needed other GFUIK_* here or above.
 
 // Maximun value of a key code (Has to be the least greater  2^N - 1 >= SDLK_LAST)
 #define GFUIK_MAX	GF_MAX_KEYCODE
 
+#if SDL_MAJOR_VERSION < 2 // SDLK_LAST no longer defined as of SDL2
 #if (GFUIK_MAX < SDLK_LAST)
 # error SDLK_MAX has grown too much, please increase GF_MAX_KEYCODE to the least greater power of 2 minus 1.
+#endif
 #endif
 
 

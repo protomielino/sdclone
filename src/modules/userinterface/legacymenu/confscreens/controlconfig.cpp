@@ -327,6 +327,9 @@ onKeyAction(int key, int /* modifier */, int state)
     if (!InputWaited || state == GFUI_KEY_UP) {
 	return 0;
     }
+    if (key == GFUIK_RSHIFT || key == GFUIK_LSHIFT) {
+        return 0;
+    }
     if (key == GFUIK_ESCAPE) {
 	/* escape */
 	Cmd[CurrentCmd].ref.index = -1;
