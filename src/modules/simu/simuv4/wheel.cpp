@@ -408,6 +408,14 @@ void SimWheelUpdateForce(tCar *car, int index)
 	}
 
 	F *= wheel->forces.z * mu * wheel->trkPos.seg->surface->kFriction;	/* coeff */
+	
+	/* force feedback torque */
+	if (s > 0.000001f) {
+		//version A: same magic formula as or force
+		//wheel->torqueAlign = 0.025 * F * sy / (s * (1.0f + stmp * simSkidFactor[car->carElt->_skillLevel]));
+		//version B: quicker torque decrease by setting mfE = 0 for torque
+		wheel->torqueAlign = 0.025 * wheel->forces.z * mu * wheel->trkPos.seg->surface->kFriction * sin(wheel->mfC * atan(Bx )) * sy / s;
+	} else wheel->torqueAlign = 0.0f;
 
 	// For debugging weather simultation on some tracks
 	#ifdef SD_DEBUG

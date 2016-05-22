@@ -32,6 +32,7 @@ typedef struct
     /* dynamic */
     t3Dd	forces;		/* forces acting on car */
     t3Dd	torques;	/* torques acting on car (gyroscopic forces) */
+    tdble   torqueAlign;  /* torque for force feedback from magic formula */
     tdble	rollRes;	/* Rolling Resistance (summed over the car) */
     tdble	rideHeight;	/* height of the bottom of the car */
     tdble	zRoad;		/* z of the road */

@@ -432,7 +432,8 @@ typedef struct
 	tCollisionState collision_state; /**< collision state ; Simu V3 only  */
     tMemPoolCar	memoryPool;
     tdble       driveSkill;          /**< Skill level for robots: 0.0 means as fast as possible; 10.0 means at a slower speed so players can easier win */
-    tdble       steerTq;            /**< torque on steering wheel for force feedback */
+    tdble       steerTqCenter;            /**< torques on steering wheel for force feedback, this is the centering torque, linear with steering angle */
+    tdble	steerTqAlign;		/**< force feedback torque: tire aligning torque from magic formula */
     tDashboardItem dashboardInstant[NR_DI_INSTANT];
     int		dashboardInstantNb;	/* number and list of immediately changing items in dashboard */
     tDashboardItem dashboardRequest[NR_DI_REQUEST];
@@ -470,7 +471,9 @@ typedef struct
 #define _smoke          priv.smoke
 #define _normal         priv.normal
 #define _coll2Pos       priv.collpos
-#define _steerTq        priv.steerTq
+
+#define _steerTqCenter		priv.steerTqCenter
+#define _steerTqAlign		priv.steerTqAlign
 
 #define _newTrackMemPool	priv.memoryPool.newTrack
 #define _newRaceMemPool		priv.memoryPool.newRace
