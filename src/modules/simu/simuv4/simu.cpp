@@ -548,7 +548,6 @@ SimUpdate(tSituation *s, double deltaTime)
 		carElt->_dammage = car->dammage;
 		carElt->_steerTqCenter = -car->ctrl->steer;
 		carElt->_steerTqAlign = car->wheel[FRNT_RGT].torqueAlign + car->wheel[FRNT_LFT].torqueAlign;
-		printf("Center=%g Align=%g\n",carElt->_steerTqCenter,carElt->_steerTqAlign);
 	}
 }
 
@@ -675,6 +674,5 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	carElt->_dammage = car->dammage;
 	carElt->_steerTqCenter = -car->ctrl->steer;
 	carElt->_steerTqAlign = car->wheel[FRNT_RGT].torqueAlign + car->wheel[FRNT_LFT].torqueAlign;
-	printf("Center=%g Align=%g\n",carElt->_steerTqCenter,carElt->_steerTqAlign);
 }
 
