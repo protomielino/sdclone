@@ -133,9 +133,6 @@ void DanLine::printData()
     for (int i = 0; i < (int)mLine.size(); i++) {
       GfOut("ind:%d fs:%g r:%g curv_z:%g\n", i, mLine[i].fromstart, mLine[i].radius, mLine[i].curv_z);
     }
-    for (int i = 0; i < (int)mSector.size(); i++) {
-      GfOut("sector:%d fs:%g speedfactor:%g\n", mSector[i].sector, mSector[i].fromstart, mSector[i].speedfactor);
-    }
   }
 #endif
 }
@@ -313,6 +310,9 @@ void DanPath::init(PTrack t, double max_left, double max_right, double margin, d
   }
   
   mDanLine[IDEAL_LINE].createSectors(mSector);
+  for (int i = 0; i < (int)mSector.size(); i++) {
+    GfOut("sector:%d fs:%g speedfactor:%g\n", mSector[i].sector, mSector[i].fromstart, mSector[i].speedfactor);
+  }
 }
 
 
@@ -346,14 +346,13 @@ void DanPath::getClothPath()
       clpath.MakeSmoothPath(&track, ClothoidPath::Options(-1.0, mMaxR, mMargin, mClothFactor));
     }
     LinePath::PathPt pathpoint;
-    int index = 0;
     for (int j = 0; j < track.GetSize(); j++) {
       pathpoint = clpath.GetAt(j);
       point.x = pathpoint.pt.x;
       point.y = pathpoint.pt.y;
       DanPoint p;
       p.line = l;
-      p.index = index++;
+      p.index = j;
       p.pos = point;
       p.type = 0;
       p.fromstart = 0;
