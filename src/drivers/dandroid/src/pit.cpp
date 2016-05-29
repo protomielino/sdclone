@@ -127,7 +127,7 @@ double Pit::getPitOffset(double fromstart)
 void Pit::setPitstop(bool pitst)
 {
   if (mypit == NULL) return;
-  if (!isBetween(car->_distFromStartLine) && !isBetween(car->_distFromStartLine + ENTRY_MARGIN)) {
+  if (!isBetween(mFromStart) && !isBetween(mFromStart + ENTRY_MARGIN)) {
     if (teamcar != NULL && !(teamcar->_state & RM_CAR_STATE_OUT)) {
       if (teamcar->_raceCmd == RM_CMD_PIT_ASKED || teamcar->_state & RM_CAR_STATE_PIT) {
         return;
@@ -185,11 +185,12 @@ bool Pit::isPitlimit(double fromstart)
 
 
 // update pit data and strategy
-void Pit::update()
+void Pit::update(double fromstart)
 {
+  mFromStart = fromstart;
   if (mypit != NULL) {
     int remainingLaps = car->_remainingLaps - car->_lapsBehindLeader;
-    if (isBetween(car->_distFromStartLine)) {
+    if (isBetween(mFromStart)) {
       if (getPitstop()) {
         setInPit(true);
       }
@@ -248,7 +249,7 @@ void Pit::update()
 // Computes the amount of fuel
 double Pit::getFuel()
 {
-  double laps = car->_remainingLaps + (track->length - car->_distFromStartLine) / track->length;
+  double laps = car->_remainingLaps + (track->length - mFromStart) / track->length;
   double fueltoend = (laps - car->_lapsBehindLeader) * avgfuelperlap;
   int pitstops = int(floor(fueltoend / car->_tank));
   double stintfuel = fueltoend / (pitstops + 1) + 2.0;
@@ -256,7 +257,7 @@ double Pit::getFuel()
     stintfuel = car->_tank;
   }
   double fuel = MAX(MIN(stintfuel - car->_fuel, car->_tank - car->_fuel), 0.0);
-  //GfOut("fromStart:%g laps:%g lapsBehindLeader:%d fueltoend:%g pitstops:%d stintfuel:%g fuel:%g\n", car->_distFromStartLine, laps, car->_lapsBehindLeader, fueltoend, pitstops, stintfuel, fuel);
+  //GfOut("fromStart:%g laps:%g lapsBehindLeader:%d fueltoend:%g pitstops:%d stintfuel:%g fuel:%g\n", mFromStart, laps, car->_lapsBehindLeader, fueltoend, pitstops, stintfuel, fuel);
   return fuel;
 }
 

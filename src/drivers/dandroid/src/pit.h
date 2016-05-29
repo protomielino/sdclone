@@ -52,7 +52,7 @@ class Pit {
     double getNPitLoc() { return p[3].x; }
     double getNPitEnd() { return p[5].x; }
     double toSplineCoord(double x);
-    void update();
+    void update(double fromstart);
     int getRepair();
     double getFuel();
     double getSpeedlimit();
@@ -70,6 +70,7 @@ class Pit {
     Spline spline;          /* spline */
     bool pitstop;           /* pitstop planned */
     bool inpitlane;         /* we are still in the pit lane */
+    double mFromStart;
     double pitentry;         /* distance to start line of the pit entry */
     double pitexit;          /* distance to the start line of the pit exit */
     double limitentry;       /* distance to start line of the pit entry */

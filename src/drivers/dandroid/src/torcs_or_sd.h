@@ -18,8 +18,18 @@
 #ifndef _TORCS_OR_SD_H_
 #define _TORCS_OR_SD_H_
 
+// Set here TORCS or SPEEDDREAMS manually
 //#define DANDROID_TORCS
 #define DANDROID_SPEEDDREAMS
+
+// The following globals will be set automatically
+#ifdef DANDROID_TORCS
+const bool IS_DANDROID_TORCS = true;
+const bool IS_DANDROID_SPEEDDREAMS = false;
+#else
+const bool IS_DANDROID_TORCS = false;
+const bool IS_DANDROID_SPEEDDREAMS = true;
+#endif
 
 #endif // _TORCS_OR_SD_H_
 

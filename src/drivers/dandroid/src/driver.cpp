@@ -281,7 +281,6 @@ void TDriver::updateTimer()
 
 void TDriver::updateBasics()
 {
-  mPit.update();
   mMass = mCARMASS + mFUELWEIGHTFACTOR * oCar->_fuel;
   mSpeed = oCar->_speed_x;
   
@@ -304,6 +303,9 @@ void TDriver::updateBasics()
   }
   
   mFromStart = oCar->_distFromStartLine;
+  if (mFromStart < 0.0) {
+    mFromStart += mTrack->length;
+  }
   mToMiddle = oCar->_trkPos.toMiddle;
   mOnLeftSide = mToMiddle > 0.0 ? true : false;
   mBorderdist = oCar->_trkPos.seg->width / 2.0 - fabs(mToMiddle) - oCar->_dimension_y / 2.0;
@@ -365,6 +367,7 @@ void TDriver::updateBasics()
   updateStuck();
   updateAttackAngle();
   updateCurveAhead();
+  mPit.update(mFromStart);
 }
 
 
@@ -562,8 +565,12 @@ double TDriver::getPitSpeed()
   double brakespeed;
   if (pitdist < 20.0) {
     brakespeed = 0.6 * brakeSpeed(pitdist, 0.0);
+    if (IS_DANDROID_TORCS)
+      brakespeed = 1.0 * brakeSpeed(pitdist, 0.0);
   } else {
     brakespeed = 1.0 * brakeSpeed(pitdist, 0.0);
+    if (IS_DANDROID_TORCS)
+      brakespeed = 2.0 * brakeSpeed(pitdist, 0.0);
   }
   maxspeed = MIN(maxspeed, brakespeed);
   return maxspeed;
@@ -590,7 +597,7 @@ double TDriver::getMaxSpeed(DanPoint danpoint)
     if (bumpspeed < nextspeed) {
       nextspeed = bumpspeed;
     }
-    maxspeed = brakeSpeed(nextdist, nextspeed);;
+    maxspeed = brakeSpeed(nextdist, nextspeed);
     if (lowest > maxspeed) {
       lowest = maxspeed;
     }
