@@ -843,7 +843,7 @@ bool TDriver::statePitstop()
   } else if (mDrvState == STATE_PITSTOP) {
     // Traffic in the way when leaving?
     if (mOppBack != NULL) {
-      if (mOppComingFastBehind && mOppBack->speed < 40.0) {
+      if (mOppBack->mDist > -20.0 && mOppBack->speed > 5.0 && mOppBack->speed < 25.0) {
         return true;
       }
     }
