@@ -379,12 +379,12 @@ gfctrlJoyConstantForce(int index, unsigned int level, int dir)
 	if ((SDL_HapticQuery(Haptics[index]) & SDL_HAPTIC_CONSTANT) == 0) return;
 
 	cfx[index].type = SDL_HAPTIC_CONSTANT;
-	cfx[index].constant.direction.type = SDL_HAPTIC_POLAR;
-	cfx[index].constant.direction.dir[0] = dir;
-	cfx[index].constant.length = 1000;
-	cfx[index].constant.level = level;
-	cfx[index].constant.attack_length = 0;
-	cfx[index].constant.fade_length = 1000;
+	cfx[index].constant.direction.type = SDL_HAPTIC_POLAR; // Polar coordinates
+	cfx[index].constant.direction.dir[0] = dir; // direction of the force
+	cfx[index].constant.length = 1000; //how log is the effect
+	cfx[index].constant.level = level; // strength: minimum 0 maximum 32767 
+	cfx[index].constant.attack_length = 0; // Takes 0 second (instantly) to get max strength
+	cfx[index].constant.fade_length = 1000; // Takes 1 second to fade away
 
 #if __WIN32__
 	if (SDL_HapticGetEffectStatus(Haptics[index], id[index]) == SDL_TRUE)

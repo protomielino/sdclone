@@ -546,8 +546,12 @@ SimUpdate(tSituation *s, double deltaTime)
 		carElt->_fuel = car->fuel;
 		carElt->priv.collision |= car->collision;
 		carElt->_dammage = car->dammage;
+
 		carElt->_steerTqCenter = -car->ctrl->steer;
 		carElt->_steerTqAlign = car->wheel[FRNT_RGT].torqueAlign + car->wheel[FRNT_LFT].torqueAlign;
+//		carElt->_steerTq = -car->ctrl->steer; /*TODO: torque from Pacejka*/
+//		carElt->_steerTq = car->carElt->_tyreEffMu(0)+car->carElt->_tyreEffMu(1)/2;
+//		carElt->_steerTq = (car->wheel[FRNT_RGT].torques.x + car->wheel[FRNT_LFT].torques.x) / 2;
 	}
 }
 

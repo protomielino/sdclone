@@ -1162,13 +1162,24 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
     car->_steerCmd = leftSteer + rightSteer;
     
 	/* Force feedback hack */
-	float force = car->_steerTq * 32760 * 5;
+	//float force = car->_steerTq * 32760 * 5;
+	float force = car->_steerTq * 32760 / 400 * -1;
+
+
+
 
 	if (force > 32760) force = 32760;
 	if (force < -32760) force = -32760;
 
-	//GfOut("force = %d\n", car->_steerTq);
-
+	GfOut("##FF## force = %f\n", car->_steerTq);
+	GfOut("##FF## applied force = %f\n", force);
+	GfOut("##FF## direction = %d\n", force < 0 ? 9000 : 27000);
+	GfOut("##FF## value = %d\n", abs((int)force));
+/*
+	GfOut("FRNT_RGT = %f\n", car->_wheel[FRNT_RGT]);
+	GfOut("FRNT_LFT = %f\n"	,	car->_wheel[FRNT_LFT]);																								//based on 36000 degree of rotation 
+*/																										// if force is below 0 we turn anticlock-wise
+																										// if force is over 0 we turn clock-wise
 	gfctrlJoyConstantForce(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), abs((int)force), force < 0 ? 9000 : 27000 );
 	//gfctrlJoyRumble(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), 0.9);
 

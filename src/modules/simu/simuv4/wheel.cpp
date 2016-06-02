@@ -344,7 +344,8 @@ void SimWheelUpdateForce(tCar *car, int index)
 	v2 = wheel->bodyVel.x * wheel->bodyVel.x + wheel->bodyVel.y * wheel->bodyVel.y;
 	v = sqrt(v2);
 
-	// slip angle
+	// slip angle ? from [0 =  means the tire is going straight ahead (no slip)]
+	//              to   [3-6 = there is slip]
 	if (v < 0.000001f) {
 		sa = 0.0f;
 	} else {
@@ -352,6 +353,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 	}
 	FLOAT_NORM_PI_PI(sa);
 
+	// slip ratio = the spin velocity divided by its actual world velocity. A slip ratio of -1 means full braking lock; a ratio of 0 means the tire is spinning at the exact same rate as the road is disappearing below it. A slip ratio of 1 means it's spinning.
 	wrl = wheel->spinVel * wheel->radius;
 	if ((wheel->state & SIM_SUSP_EXT) != 0) {
 		sx = sy = 0.0f;
@@ -394,7 +396,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 
 	// load sensitivity
 	mu = wheel->mu * (wheel->lfMin + (wheel->lfMax - wheel->lfMin) * exp(wheel->lfK * wheel->forces.z / wheel->opLoad));
-	
+
 	//temperature and degradation
 	if (car->features & FEAT_TIRETEMPDEG) {
 		tireCond = 1 - wheel->muTmult * (wheel->Ttire - wheel->Topt)*(wheel->Ttire - wheel->Topt);
@@ -455,6 +457,15 @@ void SimWheelUpdateForce(tCar *car, int index)
 	car->carElt->_wheelSlipAccel(index) = sx*v;
 	car->carElt->_reaction[index] = reaction_force;
 	car->carElt->_tyreEffMu(index) = mu;
+if(index == 1){
+GfOut("##FF## Index -  = %i\n", index);
+GfOut("##FF## SA - Slip Angle = %f\n", wheel->sa);
+GfOut("##FF## MU -  = %f\n", mu);	
+GfOut("##FF## Norm -  = %f\n", car->carElt->_wheelSlipNorm(index));
+GfOut("##FF## Opt -  = %f\n", car->carElt->_wheelSlipOpt(index));
+GfOut("##FF## Norm/opt -  = %f\n", car->carElt->_wheelSlipNorm(index)/car->carElt->_wheelSlipOpt(index));
+}
+
 	
 	tdble Work = 0.0;
 	/* update tire temperature and degradation */
