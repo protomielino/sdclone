@@ -217,6 +217,7 @@ int ForceFeedbackManager::autocenterEffect(tCarElt* car, tSituation *s){
 	
 	
 	int effectForce;
+	int sign;
 	
 	//force acting on the front wheels
 	effectForce = car->_steerTq * this->effectsConfig["autocenterEffect"]["frontwheelsmultiplier"] / 1000; 
@@ -225,6 +226,7 @@ int ForceFeedbackManager::autocenterEffect(tCarElt* car, tSituation *s){
 	effectForce += -1 * car->_wheelFy(REAR_RGT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 1000 ;
 	effectForce += -1 * car->_wheelFy(REAR_LFT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 1000;
 	
+
 	//smooth
 	effectForce = (effectForce + (this->effectsConfig["autocenterEffect"]["previousValue"] * this->effectsConfig["autocenterEffect"]["smoothing"] / 1000)) / ((this->effectsConfig["autocenterEffect"]["smoothing"]/1000)+1);
 //	GfLogInfo("Autocenter smooth: (%i)\n", effectForce);
@@ -233,6 +235,11 @@ int ForceFeedbackManager::autocenterEffect(tCarElt* car, tSituation *s){
 	this->effectsConfig["autocenterEffect"]["previousValue"] = effectForce;
 	
 //	GfLogInfo("Autocenter: (%i)\n", effectForce);
+	sign = (effectForce > 0) - (effectForce < 0);
+	//be sure this is a positive number
+	effectForce = effectForce * sign;
+
+	effectForce = (int)((pow((double) effectForce, (double) 1/2) * 120) * sign);
 	
 	return effectForce;
 
