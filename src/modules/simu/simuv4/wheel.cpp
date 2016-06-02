@@ -475,19 +475,19 @@ GfOut("#%f", car->carElt->_wheelSlipNorm(index)/car->carElt->_wheelSlipOpt(index
 	std::ostringstream paramname;
 	paramname.str("");
 	paramname << "WHEEL SA-" << index;
-	telemetry.log(paramname.str(),wheel->sa);
+	//telemetry.log(paramname.str(),wheel->sa);
 	paramname.str("");
 	paramname << "WHEEL MU-" << index;
-	telemetry.log(paramname.str(),mu);
+	telemetry.log(paramname.str(),wheel->mu);
 	paramname.str("");
 	paramname << "WHEEL NORM-" << index;
-	telemetry.log(paramname.str(),car->carElt->_wheelSlipNorm(index));
+	//telemetry.log(paramname.str(),car->carElt->_wheelSlipNorm(index));
 	paramname.str("");
 	paramname << "WHEEL OPT-" << index;
 	telemetry.log(paramname.str(),car->carElt->_wheelSlipOpt(index));
 	paramname.str("");
 	paramname << "WHEEL NORM/OPT-" << index;
-	telemetry.log(paramname.str(),car->carElt->_wheelSlipNorm(index)/car->carElt->_wheelSlipOpt(index));
+	//telemetry.log(paramname.str(),car->carElt->_wheelSlipNorm(index)/car->carElt->_wheelSlipOpt(index));
 //}
 
 	

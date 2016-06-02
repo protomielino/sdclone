@@ -61,6 +61,8 @@
 
 #include "humandriver.h"
 
+float force = 0;
+
 typedef enum { eTransAuto, eTransSeq, eTransGrid, eTransHbox } eTransmission;
 
 typedef enum { eRWD, eFWD, e4WD } eDriveTrain;
@@ -1164,10 +1166,23 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 	/* Force feedback hack */
 	//float force = car->_steerTq * 32760 * 5;
 	//float force = car->_steerTq * 32760 / 400 * -1;
-   // tdble skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
-    //   NORM_PI_PI(skidAng);
+    tdble skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
+    NORM_PI_PI(skidAng);
 	//tdble skidAng=0;
-	float force = (car->_steerTq /*- skidAng*/ * 32760);//adjusted by skid
+	//float force = (car->_steerTq/10 /*- skidAng*/ * 32760);//adjusted by skid
+	//copysign(1.0f,car->_steerCmd) *
+	//float force = copysign(1.0f,car->_steerCmd) * -1 * (sqrt(fabs(car->_steerCmd)));//basic autocenter
+	//float force = car->_speed_Y - (car->priv.wheel[0].forces.y + car->priv.wheel[0].forces.x)/2;
+	//car->_wheelSlipAccel(REAR_RGT)
+	//force = force * skidAng ;
+	
+	//car->_pitch
+	float multiplier = 3 + (car->_dimension_x - 4);  //the longer the car the stronger the effect
+	//telemetry.log("Dimension-y", car->_dimension_y);
+	//telemetry.log("Dimension-z", car->_dimension_z);
+	force = (force + (car->_steerTq*multiplier)) / 2; //try to smooth it
+	//force = force * 32760;
+	//float force = (skidAng * car->_steerCmd * 32760);//adjusted by skid
 
 																							// if force is below 0 we turn anticlock-wise
 																										// if force is over 0 we turn clock-wise
@@ -1638,39 +1653,61 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 	telemetry.log("Time-RaceTime",(float)s->currentTime);
 	telemetry.log("Time-LapTime", (float)car->_curLapTime);
 	
-	telemetry.log("FF-steerTq",car->_steerTq);
+	telemetry.log("SteerTq-steerTq",car->_steerTq);
 	telemetry.log("FF-appliedForce",force);
-	telemetry.log("FF-direction",force);
-	telemetry.log("FF-value",abs((int)force));
 	
 	telemetry.log("Slip-Slip",slip);
 	
-	telemetry.log("Carx-x", car->_speed_x);
-	telemetry.log("Cary-y", car->_speed_y);
-	//telemetry.log("Skid-skidAng", skidAng);
+	telemetry.log("SpeedX-sX", car->_speed_x);
+	telemetry.log("SpeedY-sY", car->_speed_y);
+	telemetry.log("SpeedZ-sZ", car->_speed_z);
+
+	telemetry.log("AccelX-aX", (float)car->_accel_x);
+	telemetry.log("AccelY-aY", (float)car->_accel_y);
+	telemetry.log("AccelZ-aZ", (float)car->_accel_z);
 
 	telemetry.log("Lap-Lap", (float)car->_laps);	
-	telemetry.log("Dist-Dist", (float)HCtx[idx]->distToStart);
-	telemetry.log("Accelx-Ax", (float)car->_accel_x);
-	telemetry.log("Accely-Ay", (float)car->_accel_y);
+	telemetry.log("DistFromStartLine-Dist", (float)HCtx[idx]->distToStart);
+
+	telemetry.log("Pitch-Pitch", car->_pitch);
+	telemetry.log("Roll-Roll", car->_roll);
+	telemetry.log("Yaw-Yaw", car->_yaw);
+	telemetry.log("Yawrate-Yawrate", car->_yaw_rate);
+	
+	telemetry.log("PitchD-Pitch", (float)RAD2DEG(car->_pitch));
+	telemetry.log("RollD-Roll", (float)RAD2DEG(car->_roll));
+	telemetry.log("YawD-Yaw", (float)RAD2DEG(car->_yaw));
+	
 	telemetry.log("Command-Steer", (float)car->_steerCmd);
 	telemetry.log("TrottleBrake-Throttle", (float)car->_accelCmd);
 	telemetry.log("TrottleBrake-Brake", (float)car->_brakeCmd);
-	telemetry.log("EngineRPM-EngineRPM", (float)car->_enginerpm);
+	
 	telemetry.log("Gear-Gear", (float)HCtx[idx]->gear);
 	telemetry.log("Speed-Speed", (float)car->_speed_x);
+	telemetry.log("EngineRPM-EngineRPM", (float)car->_enginerpm);
 	
 	telemetry.log("Position-x", car->_pos_X);
 	telemetry.log("Position-y", car->_pos_Y);
 	telemetry.log("Position-z", car->_pos_Z);
+
 	telemetry.log("Damage-Damage", car->_dammage);
 	telemetry.log("Collision-Collision", car->priv.collision);
 	telemetry.log("Fuel-Fuel", car->_fuel);
 	
-	telemetry.log("BrakeTemp-1",car->_brakeTemp(0));
-	telemetry.log("BrakeTemp-2",car->_brakeTemp(1));
-	telemetry.log("BrakeTemp-3",car->_brakeTemp(2));
-	telemetry.log("BrakeTemp-4",car->_brakeTemp(3));
+	telemetry.log("BrakeTemp-FR",car->_brakeTemp(0));
+	telemetry.log("BrakeTemp-FL",car->_brakeTemp(1));
+	telemetry.log("BrakeTemp-RR",car->_brakeTemp(2));
+	telemetry.log("BrakeTemp-RL",car->_brakeTemp(3));
+	
+	telemetry.log("MU-FR",car->priv.wheel[0].effectiveMu);
+	telemetry.log("MU-FL",car->priv.wheel[1].effectiveMu);
+	telemetry.log("MU-RR",car->priv.wheel[2].effectiveMu);
+	telemetry.log("MU-RL",car->priv.wheel[3].effectiveMu);
+	
+	//telemetry.log("Dimension-x", car->_dimension_x);
+
+
+	
 	
 	//track segment that the car is on
 	//carElt->_wheelSeg(i)

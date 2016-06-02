@@ -547,11 +547,18 @@ SimUpdate(tSituation *s, double deltaTime)
 		carElt->priv.collision |= car->collision;
 		carElt->_dammage = car->dammage;
 
+
 		carElt->_steerTqCenter = -car->ctrl->steer;
 		carElt->_steerTqAlign = car->wheel[FRNT_RGT].torqueAlign + car->wheel[FRNT_LFT].torqueAlign;
 //		carElt->_steerTq = -car->ctrl->steer; /*TODO: torque from Pacejka*/
 //		carElt->_steerTq = car->carElt->_tyreEffMu(0)+car->carElt->_tyreEffMu(1)/2;
 //		carElt->_steerTq = (car->wheel[FRNT_RGT].torques.x + car->wheel[FRNT_LFT].torques.x) / 2;
+		//carElt->_steerTq = -car->ctrl->steer; /*TODO: torque from Pacejka*/
+//		if (false){
+//			carElt->_steerTq = ((-1 * car->wheel[0].forces.y) + (-1 * car->wheel[1].forces.y))/2 + ((car->wheel[2].forces.y + car->wheel[3].forces.y))/2;
+//		}else{
+//			carElt->_steerTq = ((-1 * car->wheel[0].forces.y) + (-1 * car->wheel[1].forces.y))/2;	
+//		}
 	}
 }
 
@@ -676,7 +683,13 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	carElt->_fuel = car->fuel;
 	carElt->priv.collision |= car->collision;
 	carElt->_dammage = car->dammage;
+<<<<<<< d3ca4e7529f695a9912e1cea883501857876f678
 	carElt->_steerTqCenter = -car->ctrl->steer;
 	carElt->_steerTqAlign = car->wheel[FRNT_RGT].torqueAlign + car->wheel[FRNT_LFT].torqueAlign;
+=======
+	//carElt->_steerTq = -car->ctrl->steer; /*TODO: torque from Pacejka*/
+	carElt->_steerTq = ((-1 * car->wheel[0].forces.y) + (-1 * car->wheel[1].forces.y))/2;
+	
+>>>>>>> update FF torque calculation
 }
 
