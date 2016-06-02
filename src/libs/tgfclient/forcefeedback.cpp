@@ -45,11 +45,12 @@ ForceFeedbackManager::ForceFeedbackManager(){
 ForceFeedbackManager::~ForceFeedbackManager(){
 
 }
-void ForceFeedbackManager::readConfiguration(tCarElt* car){
+void ForceFeedbackManager::readConfiguration(std::string carName){
 	//use the user specified configuration for the specified car
 	//or use the user specified global configuration
 	//or use the default configuration for the car
 	//or use the default global configuration
+	this->carName = carName;
 
 	std::string configFileUrl = GfLocalDir();
 	configFileUrl.append("/drivers/human/preferences.xml");
@@ -57,10 +58,11 @@ void ForceFeedbackManager::readConfiguration(tCarElt* car){
 	std::string effectsSectionPathDefault = "forceFeedback/default/effectsConfig";
 	
 	std::string effectsSectionPathSpecific = "forceFeedback/";
-	effectsSectionPathSpecific.append(car->_carName);
+	//effectsSectionPathSpecific.append(car->_carName);
+	effectsSectionPathSpecific.append(carName);
 	effectsSectionPathSpecific.append("/effectsConfig");
 	
-	//remove the previous stored configuration
+	//remove the previous stored configuration (if any)
 	this->effectsConfig.clear();
 	
 	//add some needed default configuration
@@ -113,6 +115,71 @@ void ForceFeedbackManager::readConfigurationFromFileSection(std::string configFi
 	}
 
 }
+void ForceFeedbackManager::saveConfiguration(){
+
+	std::string configFileUrl = GfLocalDir();
+	configFileUrl.append("/drivers/human/preferences.xml");
+	
+	std::string effectsSectionPathSpecific = "/forceFeedback/";
+	effectsSectionPathSpecific.append(carName);
+	
+	//open the file
+	void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
+	
+	
+	//delette the current car specific section if it exist
+	if(GfParmExistsSection(paramHandle, effectsSectionPathSpecific.c_str())){
+		//delette the section
+		//GfParmListRemoveElt (void *handle, const char *path, const char *key)
+		GfParmListClean(paramHandle, effectsSectionPathSpecific.c_str());
+	}
+	
+
+	effectsSectionPathSpecific.append("/effectsConfig");
+	//now recreate the whole car section
+	//GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, tdble val)
+
+
+
+	/*
+	addSection
+	
+	addParam
+	
+	insertParam 
+	
+	GfParmSetStr
+	*/
+	
+	
+	// iterate on the first map
+	typedef std::map<std::string, std::map<std::string, int> >::iterator it_type;
+	for(it_type iterator = this->effectsConfig.begin(); iterator != this->effectsConfig.end(); iterator++) {
+		// iterator->first = key (effect type name)
+		// iterator->second = value (second map)
+
+		// now iterate on the second map
+		typedef std::map<std::string, int>::iterator it_type2;
+		for(it_type2 iterator2 = iterator->second.begin(); iterator2 != iterator->second.end(); iterator2++) {
+			// iterator2->first = key (effect parameter name)
+			// iterator2->second = value (effect value)
+
+			std::string effectPath = effectsSectionPathSpecific;
+			effectPath.append("/");
+			effectPath.append(iterator->first.c_str());
+
+			//remove the first slash
+			effectPath.erase(0,1);
+			
+			GfParmSetNum(paramHandle, effectPath.c_str(), iterator2->first.c_str(), "", iterator2->second);
+
+		}
+	}
+	
+	//write changes
+	GfParmWriteFile(NULL,paramHandle,"preferences");
+	
+}
 int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
 
 	//calculate autocenter
@@ -152,21 +219,14 @@ int ForceFeedbackManager::autocenterEffect(tCarElt* car, tSituation *s){
 	int effectForce;
 	
 	//force acting on the front wheels
-	effectForce = car->_steerTq; 
+	effectForce = car->_steerTq * this->effectsConfig["autocenterEffect"]["frontwheelsmultiplier"] / 1000; 
 
 	//force action on the back wheels
-	//effectForce += car->_wheelFy(REAR_RGT);
-	//effectForce += car->_wheelFy(REAR_LFT);
-
-	
-//	GfLogInfo("Autocenter tq: (%i)\n", effectForce);
-
-	//multiply
-	effectForce = effectForce * this->effectsConfig["autocenterEffect"]["multiplier"] / 1000;
-//	GfLogInfo("Autocenter multipli: (%i)\n", effectForce);
+	effectForce += -1 * car->_wheelFy(REAR_RGT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 1000 ;
+	effectForce += -1 * car->_wheelFy(REAR_LFT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 1000;
 	
 	//smooth
-	effectForce = (effectForce + (this->effectsConfig["autocenterEffect"]["previousValue"] * this->effectsConfig["autocenterEffect"]["multiplier"] / 1000)) / ((this->effectsConfig["autocenterEffect"]["multiplier"]/1000)+1);
+	effectForce = (effectForce + (this->effectsConfig["autocenterEffect"]["previousValue"] * this->effectsConfig["autocenterEffect"]["smoothing"] / 1000)) / ((this->effectsConfig["autocenterEffect"]["smoothing"]/1000)+1);
 //	GfLogInfo("Autocenter smooth: (%i)\n", effectForce);
 
 	//remember the current value for the next run

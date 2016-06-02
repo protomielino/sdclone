@@ -53,12 +53,15 @@ struct forceFeedBackEffect_t {
 class ForceFeedbackManager {
 
 	public:
-		void readConfiguration(tCarElt* car);
+		void readConfiguration(std::string carName);
+		void saveConfiguration();
 		int updateForce(tCarElt* car, tSituation *s);
 		bool initialized;
 		int force;
 		int reversed;
 		std::vector<std::string> effects;
+		std::map< std::string, std::map<std::string, int> > effectsConfig;
+		std::string carName;
 
 		//constructor
 		ForceFeedbackManager();
@@ -73,8 +76,6 @@ class ForceFeedbackManager {
 
 		std::clock_t lastExecTime; //the current time
 		
-		std::map< std::string, std::map<std::string, int> > effectsConfig;
-
 		void* menuXMLDescHdle;
 
 		std::clock_t animationStartTime; //when the animation started

@@ -745,6 +745,10 @@ void HumanDriver::new_race(int index, tCarElt* car, tSituation *s)
         }//KEYBOARD
 
     }//for i
+    
+   
+   	//initialize the force feedback
+	forceFeedback.readConfiguration(car->_carName);
 }
 
 /*
@@ -1167,10 +1171,12 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 
     car->_steerCmd = leftSteer + rightSteer;
     
-    
+/*    
+	//this is done on driver initilization
     if(!forceFeedback.initialized){
-		forceFeedback.readConfiguration(car);
+		forceFeedback.readConfiguration(car->_carName);
 	}
+*/
 	force = forceFeedback.updateForce(car, s);
     
 	/* Force feedback hack 
