@@ -76,6 +76,7 @@ void ForceFeedbackManager::readConfiguration(std::string carName){
 	if(GfParmExistsSection(paramHandle, effectsSectionPathSpecific.c_str())){
 		this->readConfigurationFromFileSection(configFileUrl, effectsSectionPathSpecific);
 	}
+	GfParmReleaseHandle(paramHandle);
 
 	//now we are correctly initialized
 	this->initialized = true;
@@ -111,6 +112,8 @@ void ForceFeedbackManager::readConfigurationFromFileSection(std::string configFi
 			
 		} while (GfParmListSeekNext(paramHandle, effectsSectionPath.c_str()) == 0);
 	}
+	GfParmReleaseHandle(paramHandle);
+
 
 }
 void ForceFeedbackManager::saveConfiguration(){
@@ -160,7 +163,8 @@ void ForceFeedbackManager::saveConfiguration(){
 	
 	//write changes
 	GfParmWriteFile(NULL,paramHandle,"preferences");
-	
+	GfParmReleaseHandle(paramHandle);
+
 }
 int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
 
