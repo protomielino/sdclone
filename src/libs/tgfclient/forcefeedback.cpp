@@ -327,4 +327,4 @@ int ForceFeedbackManager::bumpsEffect(tCarElt* car, tSituation *s){
 
 }
 //initialize the force feedback
-ForceFeedbackManager forceFeedback;
+TGFCLIENT_API ForceFeedbackManager forceFeedback;

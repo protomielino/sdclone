@@ -63,7 +63,7 @@
 #include "forcefeedback.h"
 
 
-extern ForceFeedbackManager forceFeedback;
+extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
 
 float force = 0;
 

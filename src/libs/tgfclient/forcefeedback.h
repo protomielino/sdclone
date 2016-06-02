@@ -1,3 +1,5 @@
+#ifndef __forcefeedback_h__
+#define __forcefeedback_h__
 /***************************************************************************
                     forcefeedback.h -- Interface file for The Gaming Framework
                              -------------------
@@ -29,6 +31,17 @@
 #include <car.h> //tCarElt
 #include <raceman.h> //tSituation
 
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef TGFCLIENT_DLL
+#  define TGFCLIENT_API __declspec(dllexport)
+# else
+#  define TGFCLIENT_API __declspec(dllimport)
+# endif
+#else
+# define TGFCLIENT_API
+#endif
+
 
 struct forceFeedBackEffect_t {
 	std::string name; //a name for the effect
@@ -38,7 +51,7 @@ struct forceFeedBackEffect_t {
 };
 
 
-class ForceFeedbackManager {
+class TGFCLIENT_API ForceFeedbackManager {
 
 	public:
 		void readConfiguration(std::string carName);
@@ -74,3 +87,4 @@ class ForceFeedbackManager {
 		int globalMultiplier;
 
 };
+#endif // __forcefeedback_h__
