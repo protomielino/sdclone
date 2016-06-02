@@ -31,6 +31,8 @@
 #endif
 
 #include "osspec.h"
+#include <ctime>
+#include <map>
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
@@ -996,6 +998,30 @@ TGF_API void GfFormFreeCommandNew(void *cmd);
 
 // Maximun value of a key code (Has to be the least greater  2^N - 1 >= SDLK_LAST)
 #define GF_MAX_KEYCODE	0x1FF
+
+TGF_API class GfTelemetry{
+		public:
+		void start();
+		void log (std::string name, std::string value);
+		void log (std::string name, int value);
+		void log (std::string name, float value);
+		void plot();
+		std::clock_t lastDataLogTime;
+		int count;
+		bool doLog;
+		bool headerWritten;
+		std::map<std::string,std::string> data;
+		
+		void end();
+		std::string params_names;
+		std::string params_values;
+		//constructor
+		GfTelemetry();
+	
+		//destructor
+		~GfTelemetry();	
+};
+
 
 
 #endif /* __TGF__H__ */

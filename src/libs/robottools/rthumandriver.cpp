@@ -1163,22 +1163,13 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
     
 	/* Force feedback hack */
 	//float force = car->_steerTq * 32760 * 5;
-	float force = car->_steerTq * 32760 / 400 * -1;
+	//float force = car->_steerTq * 32760 / 400 * -1;
+   // tdble skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
+    //   NORM_PI_PI(skidAng);
+	//tdble skidAng=0;
+	float force = (car->_steerTq /*- skidAng*/ * 32760);//adjusted by skid
 
-
-
-
-	if (force > 32760) force = 32760;
-	if (force < -32760) force = -32760;
-
-	GfOut("##FF## force = %f\n", car->_steerTq);
-	GfOut("##FF## applied force = %f\n", force);
-	GfOut("##FF## direction = %d\n", force < 0 ? 9000 : 27000);
-	GfOut("##FF## value = %d\n", abs((int)force));
-/*
-	GfOut("FRNT_RGT = %f\n", car->_wheel[FRNT_RGT]);
-	GfOut("FRNT_LFT = %f\n"	,	car->_wheel[FRNT_LFT]);																								//based on 36000 degree of rotation 
-*/																										// if force is below 0 we turn anticlock-wise
+																							// if force is below 0 we turn anticlock-wise
 																										// if force is over 0 we turn clock-wise
 	gfctrlJoyConstantForce(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), abs((int)force), force < 0 ? 9000 : 27000 );
 	//gfctrlJoyRumble(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), 0.9);
@@ -1632,6 +1623,71 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
     }
 #endif
 #endif
+
+	if (force > 32760) force = 32760;
+	if (force < -32760) force = -32760;
+
+	extern GfTelemetry telemetry;
+	telemetry.start();//start a new "data row"
+	//telemetry.log("paramName","ParamValue");
+
+
+    //tdble skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
+    //NORM_PI_PI(skidAng);
+	
+	telemetry.log("Time-RaceTime",(float)s->currentTime);
+	telemetry.log("Time-LapTime", (float)car->_curLapTime);
+	
+	telemetry.log("FF-steerTq",car->_steerTq);
+	telemetry.log("FF-appliedForce",force);
+	telemetry.log("FF-direction",force);
+	telemetry.log("FF-value",abs((int)force));
+	
+	telemetry.log("Slip-Slip",slip);
+	
+	telemetry.log("Carx-x", car->_speed_x);
+	telemetry.log("Cary-y", car->_speed_y);
+	//telemetry.log("Skid-skidAng", skidAng);
+
+	telemetry.log("Lap-Lap", (float)car->_laps);	
+	telemetry.log("Dist-Dist", (float)HCtx[idx]->distToStart);
+	telemetry.log("Accelx-Ax", (float)car->_accel_x);
+	telemetry.log("Accely-Ay", (float)car->_accel_y);
+	telemetry.log("Command-Steer", (float)car->_steerCmd);
+	telemetry.log("TrottleBrake-Throttle", (float)car->_accelCmd);
+	telemetry.log("TrottleBrake-Brake", (float)car->_brakeCmd);
+	telemetry.log("EngineRPM-EngineRPM", (float)car->_enginerpm);
+	telemetry.log("Gear-Gear", (float)HCtx[idx]->gear);
+	telemetry.log("Speed-Speed", (float)car->_speed_x);
+	
+	telemetry.log("Position-x", car->_pos_X);
+	telemetry.log("Position-y", car->_pos_Y);
+	telemetry.log("Position-z", car->_pos_Z);
+	telemetry.log("Damage-Damage", car->_dammage);
+	telemetry.log("Collision-Collision", car->priv.collision);
+	telemetry.log("Fuel-Fuel", car->_fuel);
+	
+	telemetry.log("BrakeTemp-1",car->_brakeTemp(0));
+	telemetry.log("BrakeTemp-2",car->_brakeTemp(1));
+	telemetry.log("BrakeTemp-3",car->_brakeTemp(2));
+	telemetry.log("BrakeTemp-4",car->_brakeTemp(3));
+	
+	//track segment that the car is on
+	//carElt->_wheelSeg(i)
+	
+	//center of gravity of the car
+	//telemetry.log("GC-GC",car->pub.DynGC); //.acc.x  vel.x
+	//telemetry.log("GC-GCg",car->pub.DynGCg); //.acc.x  vel.x pos.x //see car.h
+	
+	//telemetry.log("",);
+	
+	
+
+/*
+	GfOut("FRNT_RGT = %f\n", car->_wheel[FRNT_RGT]);
+	GfOut("FRNT_LFT = %f\n"	,	car->_wheel[FRNT_LFT]);																								//based on 36000 degree of rotation 
+*/		
+
 
     HCtx[idx]->lap = car->_laps;
 }//common_drive

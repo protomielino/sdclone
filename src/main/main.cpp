@@ -258,6 +258,9 @@ main(int argc, char *argv[])
 	const std::string strAppName(pApp->name());
 	delete pApp;
 
+extern GfTelemetry telemetry;
+telemetry.plot();
+
  	// That's all (but trace what we are doing).
 	if (piUserItf && piRaceEngine)
 		GfLogInfo("Exiting normally from %s.\n", strAppName.c_str());

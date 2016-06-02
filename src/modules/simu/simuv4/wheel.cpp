@@ -19,6 +19,7 @@
 
 #include <tgf.h>
 #include "sim.h"
+#include <sstream> 
 
 static const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 static const char *SuspSect[4] = {SECT_FRNTRGTSUSP, SECT_FRNTLFTSUSP, SECT_REARRGTSUSP, SECT_REARLFTSUSP};
@@ -457,14 +458,37 @@ void SimWheelUpdateForce(tCar *car, int index)
 	car->carElt->_wheelSlipAccel(index) = sx*v;
 	car->carElt->_reaction[index] = reaction_force;
 	car->carElt->_tyreEffMu(index) = mu;
-if(index == 1){
-GfOut("##FF## Index -  = %i\n", index);
-GfOut("##FF## SA - Slip Angle = %f\n", wheel->sa);
-GfOut("##FF## MU -  = %f\n", mu);	
-GfOut("##FF## Norm -  = %f\n", car->carElt->_wheelSlipNorm(index));
-GfOut("##FF## Opt -  = %f\n", car->carElt->_wheelSlipOpt(index));
-GfOut("##FF## Norm/opt -  = %f\n", car->carElt->_wheelSlipNorm(index)/car->carElt->_wheelSlipOpt(index));
-}
+//if(index == 1){
+//GfOut(" (%i) Index -  = %i\n", index);
+//GfOut("#%i", index); //index
+/*
+GfOut("#%f", wheel->sa); //SA
+GfOut("#%f", mu);	 //MU
+GfOut("#%f", car->carElt->_wheelSlipNorm(index)); //NORM
+GfOut("#%f", car->carElt->_wheelSlipOpt(index)); //OPT
+GfOut("#%f", car->carElt->_wheelSlipNorm(index)/car->carElt->_wheelSlipOpt(index)); //NORM/OPT
+*/
+
+	extern GfTelemetry telemetry;
+	//telemetry.start();//start a new "data row"
+	//telemetry.log("paramName","ParamValue");
+	std::ostringstream paramname;
+	paramname.str("");
+	paramname << "WHEEL SA-" << index;
+	telemetry.log(paramname.str(),wheel->sa);
+	paramname.str("");
+	paramname << "WHEEL MU-" << index;
+	telemetry.log(paramname.str(),mu);
+	paramname.str("");
+	paramname << "WHEEL NORM-" << index;
+	telemetry.log(paramname.str(),car->carElt->_wheelSlipNorm(index));
+	paramname.str("");
+	paramname << "WHEEL OPT-" << index;
+	telemetry.log(paramname.str(),car->carElt->_wheelSlipOpt(index));
+	paramname.str("");
+	paramname << "WHEEL NORM/OPT-" << index;
+	telemetry.log(paramname.str(),car->carElt->_wheelSlipNorm(index)/car->carElt->_wheelSlipOpt(index));
+//}
 
 	
 	tdble Work = 0.0;
