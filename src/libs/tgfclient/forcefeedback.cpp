@@ -39,7 +39,6 @@ int filterPositiveNumbers (int number){
 ForceFeedbackManager::ForceFeedbackManager(){
 	this->initialized = false;
 
-
 	// ??log the initialization time ??
 }
 ForceFeedbackManager::~ForceFeedbackManager(){
@@ -58,7 +57,6 @@ void ForceFeedbackManager::readConfiguration(std::string carName){
 	std::string effectsSectionPathDefault = "forceFeedback/default/effectsConfig";
 	
 	std::string effectsSectionPathSpecific = "forceFeedback/";
-	//effectsSectionPathSpecific.append(car->_carName);
 	effectsSectionPathSpecific.append(carName);
 	effectsSectionPathSpecific.append("/effectsConfig");
 	
@@ -72,7 +70,7 @@ void ForceFeedbackManager::readConfiguration(std::string carName){
 	//read the default configuration (this should always exist)
 	this->readConfigurationFromFileSection(configFileUrl, effectsSectionPathDefault);
 
-	//merge the current configuration with the read the car specific configuration
+	//merge the current configuration with the read car specific configuration
 	//if there is one
 	void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
 	if(GfParmExistsSection(paramHandle, effectsSectionPathSpecific.c_str())){
@@ -126,7 +124,6 @@ void ForceFeedbackManager::saveConfiguration(){
 	//open the file
 	void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
 	
-	
 	//delette the current car specific section if it exist
 	if(GfParmExistsSection(paramHandle, effectsSectionPathSpecific.c_str())){
 		//delette the section
@@ -134,23 +131,8 @@ void ForceFeedbackManager::saveConfiguration(){
 		GfParmListClean(paramHandle, effectsSectionPathSpecific.c_str());
 	}
 	
-
 	effectsSectionPathSpecific.append("/effectsConfig");
 	//now recreate the whole car section
-	//GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, tdble val)
-
-
-
-	/*
-	addSection
-	
-	addParam
-	
-	insertParam 
-	
-	GfParmSetStr
-	*/
-	
 	
 	// iterate on the first map
 	typedef std::map<std::string, std::map<std::string, int> >::iterator it_type;
@@ -190,20 +172,14 @@ int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
 	//this->force += this->bumpsEffect(car, s);
 	//GfLogInfo("After bump: (%i)\n", this->force);
 
-
 	//apply global effect
 	//multiply
 	this->force = this->force * this->effectsConfig["globalEffect"]["multiplier"] / 1000;
-//	GfLogInfo("Final multiply: (%i)\n", this->force);
 	
 	//reverse if needed
 	if(this->effectsConfig["globalEffect"]["reverse"] == 1){
 		this->force = -1 * this->force;
 	}
-//	GfLogInfo("Final reverse: (%i)\n", this->force);
-
-
-//	GfLogInfo("Final force: (%i)\n", this->force);
 
 	return this->force;
 
@@ -215,7 +191,6 @@ int ForceFeedbackManager::autocenterEffect(tCarElt* car, tSituation *s){
 	 * car->steerLock
 	 * */
 	
-	
 	int effectForce;
 	int sign;
 	
@@ -226,19 +201,19 @@ int ForceFeedbackManager::autocenterEffect(tCarElt* car, tSituation *s){
 	effectForce += car->_wheelFy(REAR_RGT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 1000 ;
 	effectForce += car->_wheelFy(REAR_LFT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 1000;
 	
-
 	//smooth
 	effectForce = (effectForce + (this->effectsConfig["autocenterEffect"]["previousValue"] * this->effectsConfig["autocenterEffect"]["smoothing"] / 1000)) / ((this->effectsConfig["autocenterEffect"]["smoothing"]/1000)+1);
-//	GfLogInfo("Autocenter smooth: (%i)\n", effectForce);
 
 	//remember the current value for the next run
 	this->effectsConfig["autocenterEffect"]["previousValue"] = effectForce;
 	
-//	GfLogInfo("Autocenter: (%i)\n", effectForce);
+	//we need to store the sign of the force
 	sign = (effectForce > 0) - (effectForce < 0);
+	
 	//be sure this is a positive number
 	effectForce = effectForce * sign;
 
+	//we use an inverse exponential function to have a stronger force at low values and a lighetr one a bigger values
 	effectForce = (int)((pow((double) effectForce, (double) 1/2) * 120) * sign);
 	
 	return effectForce;

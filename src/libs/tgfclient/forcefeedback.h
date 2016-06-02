@@ -30,18 +30,6 @@
 #include <raceman.h> //tSituation
 
 
-//#include <tgfclient.h>
-//#include <portability.h>
-/*
-//#include "robottools.h"	//Rt*
-#include <robot.h>
-#include <playerpref.h>
-#include <car.h>
-
-#include "humandriver.h"
-*/
-/*to be checked:end*/
-
 struct forceFeedBackEffect_t {
 	std::string name; //a name for the effect
 	std::clock_t startTime; //when we have started this effect
