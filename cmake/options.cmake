@@ -20,6 +20,8 @@
 # @author   Mart Kelder, J.-P. Meuret
 # @version  $Id$
 
+INCLUDE(CMakeDependentOption)
+
 MACRO(ADD_SD_COMPILE_OPTIONS)
 
   # This has to be done more than once, because HAVE_CONFIG_H may change.
@@ -80,6 +82,7 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_SDL2 true CACHE BOOL "Build with SDL2 instead of SDL 1.2")
     SET(OPTION_SDL_JOYSTICK true CACHE BOOL "Use SDL for Joystick instead of PLIB")
+    CMAKE_DEPENDENT_OPTION(OPTION_SDL_FORCEFEEDBACK "Use SDL2 Haptics" true "OPTION_SDL_JOYSTICK;OPTION_SDL2" false)
 
     SET(OPTION_WEBSERVER false CACHE BOOL "Build with WebServer functionality")
 
@@ -193,6 +196,10 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     IF(OPTION_SDL_JOYSTICK)
           ADD_DEFINITIONS(-DSDL_JOYSTICK)
     ENDIF(OPTION_SDL_JOYSTICK)
+
+    IF(OPTION_SDL_FORCEFEEDBACK)
+          ADD_DEFINITIONS(-DSDL_FORCEFEEDBACK)
+    ENDIF(OPTION_SDL_FORCEFEEDBACK)
 
     IF(OPTION_WEBSERVER)
           ADD_DEFINITIONS(-DWEBSERVER)

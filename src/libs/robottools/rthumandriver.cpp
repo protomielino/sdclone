@@ -1171,6 +1171,7 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 
     car->_steerCmd = leftSteer + rightSteer;
     
+#if SDL_FORCEFEEDBACK
 	//get force from the forceFeedback manager
 	force = forceFeedback.updateForce(car, s);
 
@@ -1180,6 +1181,7 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 
 	//send effect to the wheel
 	gfctrlJoyConstantForce(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), ((int)force), 0 );
+#endif
 
 #define GLANCERATE 3 	// speed at which the driver turns his head, ~1/3s to full glance
     newGlance = car->_glance;
