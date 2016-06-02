@@ -576,6 +576,7 @@ SimUpdate(tSituation *s, double deltaTime)
 	GfOut("RR = %f\n", car->wheel[REAR_RGT].forces.y);
 	GfOut("RL = %f\n", car->wheel[REAR_LFT].forces.y);
 	*/
+		carElt->_steerTq = -1 * (car->wheel[FRNT_RGT].forces.y + car->wheel[FRNT_LFT].forces.y)/2;	
 	}
 }
 
@@ -705,6 +706,7 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	carElt->_steerTqAlign = car->wheel[FRNT_RGT].torqueAlign + car->wheel[FRNT_LFT].torqueAlign;
 =======
 	//carElt->_steerTq = -car->ctrl->steer; /*TODO: torque from Pacejka*/
+<<<<<<< 564d628f4f76b8521b9e7477c85d532272a6f432
 	carElt->_steerTq = ((-1 * car->wheel[0].forces.y) + (-1 * car->wheel[1].forces.y))/2;
 	
 <<<<<<< 96fdc2d05cab490fcd782ecbda4de7d0b3ef0007
@@ -715,6 +717,10 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	telemetry.log("ZFORCEFL",car->wheel[1].forces.y);
 	telemetry.log("ZFORCERR",car->wheel[2].forces.y);
 	telemetry.log("ZFORCERL",car->wheel[3].forces.y);
+=======
+	carElt->_steerTq = -1 * (car->wheel[FRNT_RGT].forces.y + car->wheel[FRNT_LFT].forces.y)/2;	
+
+>>>>>>> remove old and unrelated code relative to this specific branch
 	
 >>>>>>> update
 }
