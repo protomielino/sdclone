@@ -42,6 +42,18 @@ ForceFeedbackManager::ForceFeedbackManager(){
 
 }
 ForceFeedbackManager::~ForceFeedbackManager(){
+	// iterate on the first map
+	typedef std::map<std::string, std::map<std::string, int> >::iterator it_type;
+	for(it_type iterator = this->effectsConfig.begin(); iterator != this->effectsConfig.end(); iterator++) {
+		// iterator->first = key (effect type name)
+		// iterator->second = value (second map)
+
+		//clear the sub-map
+		iterator->second.clear();
+	}
+	
+	//clear the map
+	effectsConfig.clear();
 
 }
 void ForceFeedbackManager::readConfiguration(std::string carName){
