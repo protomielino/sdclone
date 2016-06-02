@@ -2702,9 +2702,12 @@ GfParmListGetCurEltName (void *handle, const char *path)
 
 	return section->curSubSection->fullName;
 }
-/*
- * madbad
- * */
+/** Get the names of the params in a given section
+    @ingroup	paramslist
+    @param	handle	handle of parameters
+    @param	path	path of list
+    @return	a vector of strings containing the names of the params in the list
+ */
 std::vector<std::string> 
 GfParmListGetParamsNamesList (void *handle, const char *path)
 {

@@ -385,34 +385,20 @@ gfctrlJoyConstantForce(int index, int level, int dir)
     printf("level = %d \r\n",level);
     if(-1 == id[index])
     {
-	cfx[index].type = SDL_HAPTIC_CONSTANT;
-	//cfx[index].constant.direction.type = SDL_HAPTIC_POLAR; // Polar coordinates
-	//cfx[index].constant.direction.dir[0] = dir; // direction of the force
-	cfx[index].constant.direction.type = SDL_HAPTIC_CARTESIAN;
-	cfx[index].constant.direction.dir[0] = 1;	
-	cfx[index].constant.length = 1000; 
-	cfx[index].constant.level = level; // strength: minimum 0 maximum 32767 
-	cfx[index].constant.attack_length = 0; // Takes 0 second (instantly) to get max strength
-	cfx[index].constant.fade_length = 0; // Takes 0 second to fade away
-    //cfx_timeout[index] = SDL_GetTicks() + cfx[index].constant.length;
-    id[index] = SDL_HapticNewEffect(Haptics[index], &cfx[index]);
-    SDL_HapticRunEffect(Haptics[index], id[index], SDL_HAPTIC_INFINITY);
+		cfx[index].type = SDL_HAPTIC_CONSTANT;
+		cfx[index].constant.direction.type = SDL_HAPTIC_CARTESIAN;
+		cfx[index].constant.direction.dir[0] = 1;	
+		cfx[index].constant.length = 1000; //how log is the effect
+		cfx[index].constant.level = level; // strength: minimum 0 maximum 32767 
+		cfx[index].constant.attack_length = 0; // Takes 0 second (instantly) to get max strength
+		cfx[index].constant.fade_length = 0; // Takes 0 second to fade away
+		id[index] = SDL_HapticNewEffect(Haptics[index], &cfx[index]);
+		SDL_HapticRunEffect(Haptics[index], id[index], SDL_HAPTIC_INFINITY);
     }
-    cfx[index].constant.length = 1000; //how log is the effect
+    cfx[index].constant.length = 1000;
     cfx[index].constant.level = level;
 
-//#if __WIN32__
-//	if (SDL_HapticGetEffectStatus(Haptics[index], id[index]) == SDL_TRUE)
-//#else
-//	// Linux SDL doesn't support checking status at the moment :-(
-//	if (cfx_timeout[index] > SDL_GetTicks())
-//#endif
-		SDL_HapticUpdateEffect(Haptics[index], id[index], &cfx[index]);
-//	else {
-//		SDL_HapticDestroyEffect(Haptics[index], id[index]);
-//		id[index] = SDL_HapticNewEffect(Haptics[index], &cfx[index]);
-//		SDL_HapticRunEffect(Haptics[index], id[index], 1);
-//	}
+	SDL_HapticUpdateEffect(Haptics[index], id[index], &cfx[index]);
 
 	cfx_timeout[index] = SDL_GetTicks() + cfx[index].constant.length;
 #endif
