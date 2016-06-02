@@ -1177,7 +1177,8 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 	//force = force * skidAng ;
 	
 	//car->_pitch
-	float multiplier = 3 + (car->_dimension_x - 4);  //the longer the car the stronger the effect
+	//float multiplier = 3 + (car->_dimension_x - 4);  //the longer the car the stronger the effect
+	float multiplier = 4;  //the longer the car the stronger the effect
 	//telemetry.log("Dimension-y", car->_dimension_y);
 	//telemetry.log("Dimension-z", car->_dimension_z);
 	force = (force + (car->_steerTq*multiplier)) / 2; //try to smooth it
@@ -1699,11 +1700,22 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 	telemetry.log("BrakeTemp-RR",car->_brakeTemp(2));
 	telemetry.log("BrakeTemp-RL",car->_brakeTemp(3));
 	
+	/*
 	telemetry.log("MU-FR",car->priv.wheel[0].effectiveMu);
 	telemetry.log("MU-FL",car->priv.wheel[1].effectiveMu);
 	telemetry.log("MU-RR",car->priv.wheel[2].effectiveMu);
 	telemetry.log("MU-RL",car->priv.wheel[3].effectiveMu);
-	
+	*/
+
+	//car->wheel[0].forces.y
+	/*
+	telemetry.log("ZFORCE-FR",car->priv.wheel[0].forces.y);
+	telemetry.log("ZFORCE-FL",car->priv.wheel[1].forces.y);
+	telemetry.log("ZFORCE-RR",car->priv.wheel[2].forces.y);
+	telemetry.log("ZFORCE-RL",car->priv.wheel[3].forces.y);
+	* /
+
+
 	//telemetry.log("Dimension-x", car->_dimension_x);
 
 

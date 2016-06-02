@@ -554,11 +554,28 @@ SimUpdate(tSituation *s, double deltaTime)
 //		carElt->_steerTq = car->carElt->_tyreEffMu(0)+car->carElt->_tyreEffMu(1)/2;
 //		carElt->_steerTq = (car->wheel[FRNT_RGT].torques.x + car->wheel[FRNT_LFT].torques.x) / 2;
 		//carElt->_steerTq = -car->ctrl->steer; /*TODO: torque from Pacejka*/
+
 //		if (false){
 //			carElt->_steerTq = ((-1 * car->wheel[0].forces.y) + (-1 * car->wheel[1].forces.y))/2 + ((car->wheel[2].forces.y + car->wheel[3].forces.y))/2;
 //		}else{
 //			carElt->_steerTq = ((-1 * car->wheel[0].forces.y) + (-1 * car->wheel[1].forces.y))/2;	
 //		}
+		if (false){
+			carElt->_steerTq = -1 * (car->wheel[FRNT_RGT].forces.y + car->wheel[FRNT_LFT].forces.y + car->wheel[REAR_RGT].forces.y + car->wheel[REAR_LFT].forces.y)/4;
+		}else{
+			carElt->_steerTq = -1 * (car->wheel[FRNT_RGT].forces.y + car->wheel[FRNT_LFT].forces.y)/2;	
+		}
+	extern GfTelemetry telemetry;
+	telemetry.log("YFORCEFR",car->wheel[FRNT_RGT].forces.y);
+	telemetry.log("YFORCEFL",car->wheel[FRNT_LFT].forces.y);
+	telemetry.log("YFORCERR",car->wheel[REAR_RGT].forces.y);
+	telemetry.log("YFORCERL",car->wheel[REAR_LFT].forces.y);
+	/*
+	GfOut("FR = %f\n", car->wheel[FRNT_RGT].forces.y);
+	GfOut("FL = %f\n", car->wheel[FRNT_LFT].forces.y);
+	GfOut("RR = %f\n", car->wheel[REAR_RGT].forces.y);
+	GfOut("RL = %f\n", car->wheel[REAR_LFT].forces.y);
+	*/
 	}
 }
 
@@ -690,6 +707,15 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	//carElt->_steerTq = -car->ctrl->steer; /*TODO: torque from Pacejka*/
 	carElt->_steerTq = ((-1 * car->wheel[0].forces.y) + (-1 * car->wheel[1].forces.y))/2;
 	
+<<<<<<< 96fdc2d05cab490fcd782ecbda4de7d0b3ef0007
 >>>>>>> update FF torque calculation
+=======
+	extern GfTelemetry telemetry;
+	telemetry.log("ZFORCEFR",car->wheel[0].forces.y);
+	telemetry.log("ZFORCEFL",car->wheel[1].forces.y);
+	telemetry.log("ZFORCERR",car->wheel[2].forces.y);
+	telemetry.log("ZFORCERL",car->wheel[3].forces.y);
+	
+>>>>>>> update
 }
 

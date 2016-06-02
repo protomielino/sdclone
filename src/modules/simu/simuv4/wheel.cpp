@@ -469,6 +469,8 @@ GfOut("#%f", car->carElt->_wheelSlipOpt(index)); //OPT
 GfOut("#%f", car->carElt->_wheelSlipNorm(index)/car->carElt->_wheelSlipOpt(index)); //NORM/OPT
 */
 
+/*
+
 	extern GfTelemetry telemetry;
 	//telemetry.start();//start a new "data row"
 	//telemetry.log("paramName","ParamValue");
@@ -489,7 +491,7 @@ GfOut("#%f", car->carElt->_wheelSlipNorm(index)/car->carElt->_wheelSlipOpt(index
 	paramname << "WHEEL NORM/OPT-" << index;
 	//telemetry.log(paramname.str(),car->carElt->_wheelSlipNorm(index)/car->carElt->_wheelSlipOpt(index));
 //}
-
+*/
 	
 	tdble Work = 0.0;
 	/* update tire temperature and degradation */
