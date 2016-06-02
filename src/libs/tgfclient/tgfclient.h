@@ -699,7 +699,7 @@ TGFCLIENT_API tCtrlJoyInfo* GfctrlJoyCreate(void);
 TGFCLIENT_API void GfctrlJoyRelease(tCtrlJoyInfo* joyInfo);
 TGFCLIENT_API int GfctrlJoyGetCurrentStates(tCtrlJoyInfo* joyInfo);
  #if SDL_JOYSTICK
-TGFCLIENT_API void gfctrlJoyConstantForce(int index, unsigned int level, int dir);
+TGFCLIENT_API void gfctrlJoyConstantForce(int index, int level, int dir);
 TGFCLIENT_API void gfctrlJoyRumble(int index, float level);
 TGFCLIENT_API void GfctrlJoySetAxis(int joy, int axis, float value);
 TGFCLIENT_API void GfctrlJoySetButton(int joy, int button, int value);

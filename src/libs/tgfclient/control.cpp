@@ -312,6 +312,11 @@ gfctrlJoyInit(void)
 #else
 #if SDL_MAJOR_VERSION >= 2
     memset(&cfx, 0, sizeof(cfx));
+    
+    for(int i = 0;i<GFCTRL_JOY_NUMBER;i++)
+    {
+      id[i] = -1;
+    }    
 
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC) < 0) {
 #else
@@ -350,7 +355,7 @@ gfctrlJoyInit(void)
 #if 1
 			} else {
 				// add an CF effect on startup
-				gfctrlJoyConstantForce(index, 50000, 9000);
+				gfctrlJoyConstantForce(index, 0, 0);
 #endif
 			}
 
@@ -371,33 +376,43 @@ gfctrlJoyInit(void)
 
 #if SDL_JOYSTICK
 void
-gfctrlJoyConstantForce(int index, unsigned int level, int dir)
+gfctrlJoyConstantForce(int index, int level, int dir)
 {
 #if SDL_MAJOR_VERSION >= 2
 	if (!Haptics[index]) return;
 
 	if ((SDL_HapticQuery(Haptics[index]) & SDL_HAPTIC_CONSTANT) == 0) return;
-
+    printf("level = %d \r\n",level);
+    if(-1 == id[index])
+    {
 	cfx[index].type = SDL_HAPTIC_CONSTANT;
-	cfx[index].constant.direction.type = SDL_HAPTIC_POLAR; // Polar coordinates
-	cfx[index].constant.direction.dir[0] = dir; // direction of the force
-	cfx[index].constant.length = 1000; //how log is the effect
+	//cfx[index].constant.direction.type = SDL_HAPTIC_POLAR; // Polar coordinates
+	//cfx[index].constant.direction.dir[0] = dir; // direction of the force
+	cfx[index].constant.direction.type = SDL_HAPTIC_CARTESIAN;
+	cfx[index].constant.direction.dir[0] = 1;	
+	cfx[index].constant.length = 1000; 
 	cfx[index].constant.level = level; // strength: minimum 0 maximum 32767 
 	cfx[index].constant.attack_length = 0; // Takes 0 second (instantly) to get max strength
-	cfx[index].constant.fade_length = 1000; // Takes 1 second to fade away
+	cfx[index].constant.fade_length = 0; // Takes 0 second to fade away
+    //cfx_timeout[index] = SDL_GetTicks() + cfx[index].constant.length;
+    id[index] = SDL_HapticNewEffect(Haptics[index], &cfx[index]);
+    SDL_HapticRunEffect(Haptics[index], id[index], SDL_HAPTIC_INFINITY);
+    }
+    cfx[index].constant.length = 1000; //how log is the effect
+    cfx[index].constant.level = level;
 
-#if __WIN32__
-	if (SDL_HapticGetEffectStatus(Haptics[index], id[index]) == SDL_TRUE)
-#else
-	// Linux SDL doesn't support checking status at the moment :-(
-	if (cfx_timeout[index] > SDL_GetTicks())
-#endif
+//#if __WIN32__
+//	if (SDL_HapticGetEffectStatus(Haptics[index], id[index]) == SDL_TRUE)
+//#else
+//	// Linux SDL doesn't support checking status at the moment :-(
+//	if (cfx_timeout[index] > SDL_GetTicks())
+//#endif
 		SDL_HapticUpdateEffect(Haptics[index], id[index], &cfx[index]);
-	else {
-		SDL_HapticDestroyEffect(Haptics[index], id[index]);
-		id[index] = SDL_HapticNewEffect(Haptics[index], &cfx[index]);
-		SDL_HapticRunEffect(Haptics[index], id[index], 1);
-	}
+//	else {
+//		SDL_HapticDestroyEffect(Haptics[index], id[index]);
+//		id[index] = SDL_HapticNewEffect(Haptics[index], &cfx[index]);
+//		SDL_HapticRunEffect(Haptics[index], id[index], 1);
+//	}
 
 	cfx_timeout[index] = SDL_GetTicks() + cfx[index].constant.length;
 #endif
