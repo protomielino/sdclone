@@ -577,6 +577,11 @@ SimUpdate(tSituation *s, double deltaTime)
 	GfOut("RL = %f\n", car->wheel[REAR_LFT].forces.y);
 	*/
 		carElt->_steerTq = -1 * (car->wheel[FRNT_RGT].forces.y + car->wheel[FRNT_LFT].forces.y)/2;	
+		carElt->_steerTqCenter = -car->ctrl->steer;
+		carElt->_steerTqAlign = car->wheel[FRNT_RGT].torqueAlign + car->wheel[FRNT_LFT].torqueAlign;
+		
+		//carElt->_steerTq = -car->ctrl->steer; /*TODO: torque from Pacejka*/
+		//carElt->_steerTq = -1 * (car->wheel[FRNT_RGT].forces.y + car->wheel[FRNT_LFT].forces.y)/2;	
 	}
 }
 
