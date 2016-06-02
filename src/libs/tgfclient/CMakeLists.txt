@@ -26,7 +26,8 @@ IF(OPTION_WEBSERVER)
 				 guiscreen.cpp guieventloop.cpp guiapplication.cpp 
 				 musicplayer.cpp musicplayer.h 
 				 glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h 
-				 webserver.h webserver.cpp)
+				 webserver.h webserver.cpp
+				 forcefeedback.h forcefeedback.cpp)
 ELSE(OPTION_WEBSERVER)
 	SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
 				 guiimage.cpp guimenu.cpp guiscrollbar.cpp guitexture.cpp
@@ -35,7 +36,8 @@ ELSE(OPTION_WEBSERVER)
 				 guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
 				 guiscreen.cpp guieventloop.cpp guiapplication.cpp 
 				 musicplayer.cpp musicplayer.h 
-				 glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h)
+				 glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h
+				 forcefeedback.h forcefeedback.cpp)
 ENDIF(OPTION_WEBSERVER)
 
 SET(_OTHER_SOURCES guimenutest.xml)

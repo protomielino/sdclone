@@ -60,6 +60,10 @@
 #include <car.h>
 
 #include "humandriver.h"
+#include "forcefeedback.h"
+
+
+extern ForceFeedbackManager forceFeedback;
 
 float force = 0;
 
@@ -1163,10 +1167,16 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 
     car->_steerCmd = leftSteer + rightSteer;
     
-	/* Force feedback hack */
+    
+    if(!forceFeedback.initialized){
+		forceFeedback.readConfiguration(car);
+	}
+	force = forceFeedback.updateForce(car, s);
+    
+	/* Force feedback hack 
 	float multiplier = 4;
 	force = (force + (car->_steerTq*multiplier)) / 2; //make the force smoother
-
+	*/
 	// if force is below 0 we turn anticlock-wise
 	// if force is over 0 we turn clock-wise
 	gfctrlJoyConstantForce(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), abs((int)force), force < 0 ? 9000 : 27000 );

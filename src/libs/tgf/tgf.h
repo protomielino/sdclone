@@ -46,6 +46,7 @@
 #include "modinfo.h" // Don't move this include line : needs TGF_API definition.
 
 #include <string>
+#include <vector>
 
 /** Floating point type used everywhere.
     @ingroup definitions
@@ -496,6 +497,8 @@ TGF_API char *GfParmListGetCurEltName(void *handle, const char *path);
 TGF_API int GfParmListRemoveElt(void *handle, const char *path, const char *key);
 TGF_API int GfParmListRenameElt(void *handle, const char *path, const char *oldKey, const char *newKey);
 TGF_API int GfParmListClean(void *handle, const char *path);
+TGF_API  std::vector<std::string> GfParmListGetParamsNamesList(void *handle, const char *path);
+
 
 TGF_API void GfParmSetVariable(void *handle, char const *path, char const *key, tdble val);
 TGF_API void GfParmRemoveVariable(void *handle, char const *path, char const *key);

@@ -701,27 +701,32 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	carElt->_fuel = car->fuel;
 	carElt->priv.collision |= car->collision;
 	carElt->_dammage = car->dammage;
-<<<<<<< d3ca4e7529f695a9912e1cea883501857876f678
+
 	carElt->_steerTqCenter = -car->ctrl->steer;
 	carElt->_steerTqAlign = car->wheel[FRNT_RGT].torqueAlign + car->wheel[FRNT_LFT].torqueAlign;
-=======
 	//carElt->_steerTq = -car->ctrl->steer; /*TODO: torque from Pacejka*/
-<<<<<<< 564d628f4f76b8521b9e7477c85d532272a6f432
+
 	carElt->_steerTq = ((-1 * car->wheel[0].forces.y) + (-1 * car->wheel[1].forces.y))/2;
 	
-<<<<<<< 96fdc2d05cab490fcd782ecbda4de7d0b3ef0007
->>>>>>> update FF torque calculation
-=======
 	extern GfTelemetry telemetry;
 	telemetry.log("ZFORCEFR",car->wheel[0].forces.y);
 	telemetry.log("ZFORCEFL",car->wheel[1].forces.y);
 	telemetry.log("ZFORCERR",car->wheel[2].forces.y);
 	telemetry.log("ZFORCERL",car->wheel[3].forces.y);
-=======
 	carElt->_steerTq = -1 * (car->wheel[FRNT_RGT].forces.y + car->wheel[FRNT_LFT].forces.y)/2;	
-
->>>>>>> remove old and unrelated code relative to this specific branch
 	
->>>>>>> update
+	//front wheels: use only a force that is the delta between where the car is pointing and wheel is pointing
+	carElt->_steerTq += car->wheel[FRNT_RGT].forces.y * car->wheel[FRNT_RGT].sa;
+	carElt->_steerTq += car->wheel[FRNT_LFT].forces.y * car->wheel[FRNT_LFT].sa;
+	
+	//rear wheels: use all the lateral force
+	//carElt->_steerTq += car->wheel[REAR_RGT].forces.y;
+	//carElt->_steerTq += car->wheel[REAR_LFT].forces.y;
+	
+	carElt->_steerTq *=-1;
+	
+	//carElt->_steerTq = -1 * (car->wheel[FRNT_RGT].forces.y + car->wheel[FRNT_LFT].forces.y)/2;	
+
+	
 }
 

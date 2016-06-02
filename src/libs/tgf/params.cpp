@@ -2702,7 +2702,36 @@ GfParmListGetCurEltName (void *handle, const char *path)
 
 	return section->curSubSection->fullName;
 }
+/*
+ * madbad
+ * */
+std::vector<std::string> 
+GfParmListGetParamsNamesList (void *handle, const char *path)
+{
+	struct parmHandle *parmHandle = (struct parmHandle *)handle;
+	struct parmHeader *conf;
+	struct section *section;
+    struct param	*param;
+	 std::vector<std::string> paramsNamesList;
 
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmListGetParamsNamesList: bad handle (%p)\n", parmHandle);
+		return paramsNamesList;
+    }
+
+	conf = parmHandle->conf;
+	section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+	param = GF_TAILQ_FIRST (&(section->paramList));
+	
+	while (param) {
+
+		paramsNamesList.push_back(param->name);
+	    param = GF_TAILQ_NEXT (param, linkParam);
+
+	}	
+	
+	return paramsNamesList;
+}
 
 /** Get string parameter value.
     @ingroup	paramsdata

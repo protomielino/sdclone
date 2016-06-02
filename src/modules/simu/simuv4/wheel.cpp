@@ -452,6 +452,9 @@ void SimWheelUpdateForce(tCar *car, int index)
 	wheel->feedBack.Tq = wheel->spinTq;
 	wheel->feedBack.brkTq = wheel->brake.Tq;
 
+	car->carElt->_wheelFx(index) = wheel->forces.x;
+	car->carElt->_wheelFy(index) = wheel->forces.y;
+	car->carElt->_wheelFz(index) = wheel->forces.z;
 	car->carElt->_wheelSlipNorm(index) = stmp;
 	car->carElt->_wheelSlipSide(index) = sy*v;
 	car->carElt->_wheelSlipAccel(index) = sx*v;
