@@ -37,9 +37,9 @@ int filterPositiveNumbers (int number){
 
 
 ForceFeedbackManager::ForceFeedbackManager(){
+
 	this->initialized = false;
 
-	// ??log the initialization time ??
 }
 ForceFeedbackManager::~ForceFeedbackManager(){
 

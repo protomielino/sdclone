@@ -69,7 +69,6 @@ class ForceFeedbackManager {
 		std::clock_t animationStartTime; //when the animation started
 		std::clock_t animationRestStartTime; //when the animation started
 
-
 		int autocenterEffect(tCarElt* car, tSituation *s);
 		int bumpsEffect(tCarElt* car, tSituation *s);
 		int globalMultiplier;
