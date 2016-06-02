@@ -1160,6 +1160,17 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
     }
 
     car->_steerCmd = leftSteer + rightSteer;
+    
+	/* Force feedback hack */
+	float force = car->_steerTq * 32760 * 5;
+
+	if (force > 32760) force = 32760;
+	if (force < -32760) force = -32760;
+
+	//GfOut("force = %d\n", car->_steerTq);
+
+	gfctrlJoyConstantForce(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), abs((int)force), force < 0 ? 9000 : 27000 );
+	//gfctrlJoyRumble(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), 0.9);
 
 #define GLANCERATE 3 	// speed at which the driver turns his head, ~1/3s to full glance
     newGlance = car->_glance;

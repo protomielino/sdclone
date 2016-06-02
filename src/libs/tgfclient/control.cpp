@@ -347,7 +347,7 @@ gfctrlJoyInit(void)
 			if (!Haptics[index]) {
 				GfLogInfo("Joystick %d does not support haptic\n", index);
 				break;
-#if 0
+#if 1
 			} else {
 				// add an CF effect on startup
 				gfctrlJoyConstantForce(index, 50000, 9000);
@@ -358,7 +358,7 @@ gfctrlJoyInit(void)
 			if (SDL_HapticRumbleSupported(Haptics[index]) == SDL_TRUE) {
 				if (SDL_HapticRumbleInit(Haptics[index]) != 0) 
 					GfLogError("Couldn't init rumble on joystick %d: %s\n", index, SDL_GetError());
-#if 0
+#if 1
 				else
 					gfctrlJoyRumble(index, 0.5);
 #endif
