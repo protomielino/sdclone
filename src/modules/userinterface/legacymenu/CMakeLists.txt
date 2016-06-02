@@ -14,6 +14,7 @@ ENDIF(MSVC)
 
 SET(CS confscreens)
 SET(CONFSCREENS_SOURCES ${CS}/playerconfig.cpp ${CS}/controlconfig.cpp
+						${CS}/forcefeedbackconfig.cpp
                         ${CS}/joystickconfig.cpp ${CS}/mouseconfig.cpp
                         ${CS}/joy2butconfig.cpp
                         ${CS}/displayconfig.cpp ${CS}/graphconfig.cpp ${CS}/openglconfig.cpp
@@ -21,6 +22,7 @@ SET(CONFSCREENS_SOURCES ${CS}/playerconfig.cpp ${CS}/controlconfig.cpp
                         ${CS}/simuconfig.cpp ${CS}/soundconfig.cpp ${CS}/aiconfig.cpp
                         ${CS}/carsettingsmenu.cpp ${CS}/hostsettingsmenu.cpp)
 SET(CONFSCREENS_HEADERS ${CS}/confscreens.h ${CS}/advancedgraphconfig.h
+						${CS}/forcefeedbackconfig.h
                         ${CS}/playerconfig.h ${CS}/controlconfig.h
                         ${CS}/joystickconfig.h ${CS}/mouseconfig.h
                         ${CS}/joy2butconfig.h ${CS}/monitorconfig.h
@@ -29,7 +31,7 @@ SET(CONFSCREENS_HEADERS ${CS}/confscreens.h ${CS}/advancedgraphconfig.h
                         ${CS}/carsettingsmenu.h ${CS}/hostsettingsmenu.h)
 
 SET(RS racescreens)
-SET(RACESCREENS_SOURCES ${RS}/raceselectmenu.cpp
+SET(RACESCREENS_SOURCES ${RS}/raceselectmenu.cpp 
                         #${RS}/raceweekendmenu.cpp
                         ${RS}/racemanmenu.cpp ${RS}/fileselect.cpp ${RS}/networkingmenu.cpp
                         ${RS}/raceconfigstate.cpp

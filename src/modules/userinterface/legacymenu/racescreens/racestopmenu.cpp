@@ -31,6 +31,9 @@
 #include <playerpref.h>
 #include <robot.h>
 
+#include <forcefeedbackconfig.h>
+
+
 extern RmProgressiveTimeModifier rmProgressiveTimeModifier;
 
 extern bool rmPreRacePause;
@@ -121,7 +124,7 @@ rmRestartRaceHookInit()
 
 	return pvRestartRaceHookHandle;
 }
-
+// Controls hook *******************************************************
 static void
 rmControlsHookActivate(void * /* dummy */)
 {
@@ -164,7 +167,47 @@ rmControlsHookInit()
 	return pvControlsHookHandle;
 }
 
-// Quit race hook ********
+// ForceFeedbackConfig hook ********************************************
+static void
+rmForceFeedbackConfigHookActivate(void * /* dummy */)
+{
+	void *prHandle;
+	char buf[100];
+	const char *str;
+	tGearChangeMode gearChangeMode;
+
+	sprintf(buf, "%s%s", GfLocalDir(), HM_PREF_FILE);
+	prHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+
+	snprintf(buf, sizeof(buf), "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, curPlayerIdx);
+
+
+	std::string carName = "";
+	
+	//Find human cars
+	tRmInfo* pCurrReInfo = LmRaceEngine().inData();
+	for (int i = 0; i < pCurrReInfo->s->_ncars; i++) {
+		if(pCurrReInfo->s->cars[i]->_driverType == RM_DRV_HUMAN){
+			carName.append(pCurrReInfo->s->cars[i]->_carName);
+		}
+	}
+
+
+	GfuiScreenActivate(ForceFeedbackMenuInit(hscreen, prHandle, curPlayerIdx, carName));
+}
+
+static void	*pvForceFeedbackConfigHookHandle = 0;
+
+static void *
+rmForceFeedbackConfigHookInit()
+{
+	if (!pvForceFeedbackConfigHookHandle)
+		pvForceFeedbackConfigHookHandle = GfuiHookCreate(0, rmForceFeedbackConfigHookActivate);
+
+	return pvForceFeedbackConfigHookHandle;
+}
+
+// Quit race hook ******************************************************
 static void	*rmStopScrHandle = 0;
 
 static void
@@ -185,7 +228,7 @@ rmQuitHookInit()
 	return pvQuitHookHandle;
 }
 
-// 2, 3, 4 or 5 buttons "Stop race" menu *****************************************
+// 2, 3, 4 or 5 buttons "Stop race" menu *******************************
 
 static void *QuitHdle[6] = { 0, 0, 0, 0, 0, 0 };
 
@@ -255,16 +298,18 @@ rmStopRaceMenu(const char *buttonRole1, void *screen1,
 			   const char *buttonRole3 = 0, void *screen3 = 0,
 			   const char *buttonRole4 = 0, void *screen4 = 0,
 			   const char *buttonRole5 = 0, void *screen5 = 0,
-			   const char *buttonRole6 = 0, void *screen6 = 0)
+			   const char *buttonRole6 = 0, void *screen6 = 0,
+			   const char *buttonRole7 = 0, void *screen7 = 0)
 {
-    const tButtonDesc aButtons[6] =
+    const tButtonDesc aButtons[7] =
     {
         { buttonRole1, screen1 },
         { buttonRole2, screen2 },
         { buttonRole3, screen3 },
         { buttonRole4, screen4 },
         { buttonRole5, screen5 },
-        { buttonRole6, screen6 }
+        { buttonRole6, screen6 },
+        { buttonRole7, screen7 }
     };
 	
     int nButtons = 2;
@@ -279,6 +324,8 @@ rmStopRaceMenu(const char *buttonRole1, void *screen1,
 				nButtons++;
 				if (buttonRole6 && screen6)
 					nButtons++;
+					if (buttonRole7 && screen7)
+						nButtons++;
 			}
 		}
 	}
@@ -297,8 +344,8 @@ RmStopRaceMenu()
 	void* params = LmRaceEngine().outData()->params;
 	const char* pszRaceName = LmRaceEngine().outData()->_reRaceName;
 
-	const char *buttonRole[6];
-	void *screen[6];
+	const char *buttonRole[7];
+	void *screen[7];
 	int i;
 
 #if 1
@@ -320,7 +367,7 @@ RmStopRaceMenu()
 	if (LegacyMenu::self().soundEngine())
 		LegacyMenu::self().soundEngine()->mute();
 
-	for(i=0; i < 6; i++) {
+	for(i=0; i < 7; i++) {
 		buttonRole[i] = "";
 		screen[i] = NULL;
 	}
@@ -365,6 +412,9 @@ RmStopRaceMenu()
 		
 			buttonRole[i] = "controls";
 			screen[i++] = rmControlsHookInit();
+
+			buttonRole[i] = "forcefeedback";
+			screen[i++] = rmForceFeedbackConfigHookInit();
 			break;
 		}
 	}
@@ -378,7 +428,8 @@ RmStopRaceMenu()
 			   buttonRole[2], screen[2],
 			   buttonRole[3], screen[3],
 			   buttonRole[4], screen[4],
-			   buttonRole[5], screen[5]);
+			   buttonRole[5], screen[5],
+			   buttonRole[6], screen[6]);
 }
 
 void
