@@ -53,6 +53,7 @@ cGrScreen::cGrScreen(int myid)
 	selectPrevFlag = false;
 	mirrorFlag = 1;
 	memset(cams, 0, sizeof(cams));
+	memset(subcamIndex, 0, sizeof(subcamIndex));
 	viewRatio = 1.33;
 	cars = 0;
 	viewOffset = 0;
@@ -205,9 +206,9 @@ void cGrScreen::selectCamera(long cam)
 			curCam = (cGrPerspCamera*)GF_TAILQ_FIRST(&cams[cam]);
 		}
 	} else {
-		/* Change of camera list, take the first one */
-		curCamHead = cam;
-		curCam = (cGrPerspCamera*)GF_TAILQ_FIRST(&cams[cam]);
+		
+		/* Change of camera list, take the last one used*/
+		selectNthCamera(cam,subcamIndex[cam]);
 	}
 
 	if (curCam == NULL) {
@@ -273,6 +274,8 @@ void cGrScreen::saveCamera(void)
 	drawCurrent = curCam->getDrawCurrent();
 	curCam->limitFov ();
 	GfParmWriteFile(NULL, grHandle, "Graph");
+
+	subcamIndex[curCamHead] = curCam->getId();
 }
 
 static class cGrPerspCamera *TheDispCam;	/* the display camera */
@@ -595,6 +598,7 @@ void cGrScreen::initCams(tSituation *s)
 	}
 	
 	loadParams(s);
+	saveCamera();
 }
 
 void cGrScreen::initBoard(void)

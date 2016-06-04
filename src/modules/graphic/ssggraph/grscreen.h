@@ -34,6 +34,7 @@ class cGrScreen {
 	
 		int	curCamHead;							// The current camera list.
 		tGrCamHead		cams[10];				// From F2 to F11.
+		int				subcamIndex[10];		// current subcam index (for each list)
 	
 		class cGrPerspCamera *curCam;			// The current camera.
 		class cGrCarCamMirror *mirrorCam;		// The mirror camera.
