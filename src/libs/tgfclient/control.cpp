@@ -140,11 +140,13 @@ static SDL_Joystick *Joysticks[GFCTRL_JOY_NUMBER] = {NULL};
 static tCtrlJoyInfo *joyInfoCopy = NULL;
 //static tCtrlJoyInfo joyInfo;
 #if SDL_MAJOR_VERSION >= 2
+#if SDL_FORCEFEEDBACK
 static SDL_Haptic *Haptics[GFCTRL_JOY_NUMBER] = {NULL};
 static SDL_HapticEffect cfx[GFCTRL_JOY_NUMBER];
 static unsigned int	cfx_timeout[GFCTRL_JOY_NUMBER];
 static unsigned int 	rfx_timeout[GFCTRL_JOY_NUMBER];
 static int id[GFCTRL_JOY_NUMBER];
+#endif
 #endif
 #else
 static jsJoystick *Joysticks[GFCTRL_JOY_NUMBER] = {NULL};
@@ -311,6 +313,7 @@ gfctrlJoyInit(void)
     }
 #else
 #if SDL_MAJOR_VERSION >= 2
+#if SDL_FORCEFEEDBACK
     memset(&cfx, 0, sizeof(cfx));
     
     for(int i = 0;i<GFCTRL_JOY_NUMBER;i++)
@@ -319,6 +322,9 @@ gfctrlJoyInit(void)
     }    
 
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC) < 0) {
+#else
+	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0) {
+#endif
 #else
     if (SDL_Init(SDL_INIT_JOYSTICK) < 0) {
 #endif
@@ -341,7 +347,7 @@ gfctrlJoyInit(void)
 		// Don't configure the joystick if it doesn't work
 		if (Joysticks[index] ==  NULL) {
 			GfLogError("Couldn't open joystick %d: %s\n", index, SDL_GetError());
-#if SDL_MAJOR_VERSION >= 2
+#if ((SDL_MAJOR_VERSION >= 2) && (SDL_FORCEFEEDBACK))
 		} else {
 			cfx_timeout[index] = 0;
 			rfx_timeout[index] = 0;
@@ -374,15 +380,14 @@ gfctrlJoyInit(void)
 #endif
 }
 
-#if SDL_JOYSTICK
+#if SDL_FORCEFEEDBACK
 void
 gfctrlJoyConstantForce(int index, int level, int dir)
 {
-#if SDL_MAJOR_VERSION >= 2
 	if (!Haptics[index]) return;
 
 	if ((SDL_HapticQuery(Haptics[index]) & SDL_HAPTIC_CONSTANT) == 0) return;
-    printf("level = %d \r\n",level);
+    //printf("level = %d \r\n",level);
     if(-1 == id[index])
     {
 		cfx[index].type = SDL_HAPTIC_CONSTANT;
@@ -401,13 +406,11 @@ gfctrlJoyConstantForce(int index, int level, int dir)
 	SDL_HapticUpdateEffect(Haptics[index], id[index], &cfx[index]);
 
 	cfx_timeout[index] = SDL_GetTicks() + cfx[index].constant.length;
-#endif
 }
 
 void
 gfctrlJoyRumble(int index, float level)
 {
-#if SDL_MAJOR_VERSION >= 2
 	if (!Haptics[index]) return;
 
 	if (SDL_HapticRumbleSupported(Haptics[index]) != SDL_TRUE) return;
@@ -422,7 +425,6 @@ gfctrlJoyRumble(int index, float level)
 		GfLogError("Failed to play rumble: %s\n", SDL_GetError() );
 
 	rfx_timeout[index] = SDL_GetTicks() + 100;
-#endif
 }
 #endif
 
@@ -441,7 +443,7 @@ gfctrlJoyShutdown(void)
       for (int index = 0; index < gfctrlJoyPresent; index++) {
 			SDL_JoystickClose(Joysticks[index]);
 			Joysticks[index] = NULL;
-#if SDL_MAJOR_VERSION >= 2
+#if ((SDL_MAJOR_VERSION >= 2) && (SDL_FORCEFEEDBACK))
 			if (Haptics[index]) {
 				SDL_HapticClose(Haptics[index]);
 				Haptics[index] = NULL;

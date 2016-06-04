@@ -17,28 +17,22 @@ IF(OPTION_WEBSERVER)
 	ADD_CURL_INCLUDEDIR()
 ENDIF(OPTION_WEBSERVER)
 
+SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
+            guiimage.cpp guimenu.cpp guiscrollbar.cpp guitexture.cpp
+            tgfclient.cpp gui.cpp guiedit.cpp guihelp.cpp
+            guilabel.cpp guiobject.cpp guiscrollist.cpp 
+            guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
+            guiscreen.cpp guieventloop.cpp guiapplication.cpp 
+            musicplayer.cpp musicplayer.h 
+            glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h)
+
 IF(OPTION_WEBSERVER)
-	SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
-				 guiimage.cpp guimenu.cpp guiscrollbar.cpp guitexture.cpp
-				 tgfclient.cpp gui.cpp guiedit.cpp guihelp.cpp
-				 guilabel.cpp guiobject.cpp guiscrollist.cpp 
-				 guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
-				 guiscreen.cpp guieventloop.cpp guiapplication.cpp 
-				 musicplayer.cpp musicplayer.h 
-				 glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h 
-				 webserver.h webserver.cpp
-				 forcefeedback.h forcefeedback.cpp)
-ELSE(OPTION_WEBSERVER)
-	SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
-				 guiimage.cpp guimenu.cpp guiscrollbar.cpp guitexture.cpp
-				 tgfclient.cpp gui.cpp guiedit.cpp guihelp.cpp
-				 guilabel.cpp guiobject.cpp guiscrollist.cpp 
-				 guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
-				 guiscreen.cpp guieventloop.cpp guiapplication.cpp 
-				 musicplayer.cpp musicplayer.h 
-				 glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h
-				 forcefeedback.h forcefeedback.cpp)
+   SET(_SOURCES ${_SOURCES} webserver.cpp webserver.h)
 ENDIF(OPTION_WEBSERVER)
+
+IF(OPTION_SDL_FORCEFEEDBACK)
+   SET(_SOURCES ${_SOURCES} forcefeedback.cpp forcefeedback.h)
+ENDIF(OPTION_SDL_FORCEFEEDBACK)
 
 SET(_OTHER_SOURCES guimenutest.xml)
 

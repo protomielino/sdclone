@@ -60,12 +60,14 @@
 #include <car.h>
 
 #include "humandriver.h"
+#if SDL_FORCEFEEDBACK
 #include "forcefeedback.h"
 
 
 extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
 
 float force = 0;
+#endif
 
 typedef enum { eTransAuto, eTransSeq, eTransGrid, eTransHbox } eTransmission;
 
@@ -746,9 +748,10 @@ void HumanDriver::new_race(int index, tCarElt* car, tSituation *s)
 
     }//for i
     
-   
+#if SDL_FORCEFEEDBACK
    	//initialize the force feedback
 	forceFeedback.readConfiguration(car->_carName);
+#endif
 }
 
 /*
@@ -1633,8 +1636,8 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 #endif
 #endif
 
-	if (force > 32760) force = 32760;
-	if (force < -32760) force = -32760;
+	//if (force > 32760) force = 32760;
+	//if (force < -32760) force = -32760;
 
     HCtx[idx]->lap = car->_laps;
 }//common_drive
