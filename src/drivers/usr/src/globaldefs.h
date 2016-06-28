@@ -49,6 +49,7 @@ extern GfLogger* PLogUSR;
 #define RTYPE_USR_LP1  10					 // Robot type usr_lp1
 #define RTYPE_USR_REF  11					 // Robot type usr_ref
 #define RTYPE_USR_SRW  12                    // Robot type usr_srw
+#define RTYPE_USR_MP10 13                    // Robot type usr_mpa10
 
 static const int MAX_NBBOTS = 100;               // Number of drivers/robots
 

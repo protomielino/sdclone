@@ -31,6 +31,7 @@ python check_robot_skins.py -d $drivers/usr_mpa1 -c $cars $versioning $config $r
 python check_robot_skins.py -d $drivers/usr_sc   -c $cars $versioning $config $run $proc usr_sc.xml
 python check_robot_skins.py -d $drivers/usr_trb1 -c $cars $versioning $config $run $proc usr_trb1.xml
 python check_robot_skins.py -d $drivers/usr_rs   -c $cars $versioning $config $run $proc usr_rs.xml
+python check_robot_skins.py -d $drivers/usr_mp10 -c $cars $versioning $config $run $proc usr_mp10.xml
 
 # Simplix
 python check_robot_skins.py -d $drivers/simplix_36GP -c $cars $versioning $config $run $proc simplix_36GP.xml

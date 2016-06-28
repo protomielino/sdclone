@@ -299,6 +299,15 @@ void SetupUSR_ref()
 };
 
 ////////////////////////////////////////////////////////////
+// Schismatic entry point for usr_mp10
+////////////////////////////////////////////////////////////
+void SetupUSR_mp10()
+{
+    m_RobotType = RTYPE_USR_MP10;
+    SetParameters(NBBOTS, "mpa1-murasama");
+};
+
+////////////////////////////////////////////////////////////
 // Handle module entry for Speed Dreams Interface V1.00 (new fixed name scheme)
 ////////////////////////////////////////////////////////////
 int moduleWelcomeV1_00
@@ -423,6 +432,8 @@ int moduleWelcomeV1_00
         SetupUSR_lp1();
     else if (strncmp(RobName,"usr_ref", strlen("usr_ref")) == 0)
         SetupUSR_ref();
+    else if (strncmp(RobName,"usr_mp10", strlen("usr_mp10")) == 0)
+        SetupUSR_mp10();
     else
         SetupUSR();
 
@@ -665,6 +676,10 @@ static int initFuncPt(int Index, void *Pt)
     else if (m_RobotType == RTYPE_USR_REF)
     {
         LogUSR.debug("#RobotType == RTYPE_USR_REF\n");
+    }
+    else if (m_RobotType == RTYPE_USR_MP10)
+    {
+        LogUSR.debug("#RobotType == RTYPE_USR_MP10\n");
     }
 
     GfParmReleaseHandle(RobotSettings);
