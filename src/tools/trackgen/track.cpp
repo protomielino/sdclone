@@ -1977,7 +1977,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 	runninglentgh = 0;
 	sprintf(sname, "B%dLt", j);
 	for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next) {
-	    if ((mseg->lside != NULL) && (mseg->lside->raceInfo & TR_PIT)) {
+	    if ((mseg->lside != NULL) && (mseg->lside->raceInfo & TR_PITBUILD)) {
 		runninglentgh = 0;
 		startNeeded = 1;
 		NEWDISPLIST(0, sname, i);
