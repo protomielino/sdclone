@@ -270,6 +270,9 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
     tdble		x3, y3, z3;
     int			startNeeded;
 
+    tdble xprev = 0;
+    tdble yprev = 0;
+
     tDispElt		*aDispElt = NULL;
     unsigned int	prevTexId;
     unsigned int	curTexId = 0;
@@ -1730,11 +1733,11 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		curBarrier = mseg->barrier[0];
 		CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
 		if (!curTexLink) {
-		    curTexSeg = 0;
-		} else {
-		    curTexSeg = mseg->lgfromstart;
-		}
-		texLen = curTexSeg / curTexSize;
+		    texLen = 0; //edited
+		} /*else {
+		    ;
+		}                          auch edited        */
+		//texLen = curTexSeg / curTexSize;
 		if (mseg->rside) {
 		    seg = mseg->rside;
 		    if (seg->rside) {
@@ -1748,6 +1751,8 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		    NEWDISPLIST(0, sname, i);
 		    if (curTexType == 0) texLen = 0;
 		    runninglentgh = 0;
+		    xprev = seg->vertex[TR_SR].x;  // edited
+		    yprev = seg->vertex[TR_SR].y;  // edited
 
 		    switch (curBarrier->style) {
 		    case TR_FENCE:
@@ -1787,15 +1792,17 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		switch (seg->type) {
 		case TR_STR:
 		    ts = LMAX;
-		    texStep = LMAX / curTexSize;
-		    texLen += texStep;
+		    
 		    trkpos.seg = seg;
 		    while (ts < seg->length) {
 			trkpos.toStart = ts;
 			trkpos.toRight = 0;
 			RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
 			curHeight = RtTrackHeightL(&trkpos);
-			
+			texStep = sqrt( pow( ( y - yprev ), 2.0f) + pow(( x - xprev ), 2.0f) ) / curTexSize;	//new
+			texLen += texStep; 									//new
+			xprev=x; 									        //new
+			yprev=y; 										//new
 			switch (curBarrier->style) {
 			case TR_FENCE:
 			    if (j == 0) {
@@ -1826,24 +1833,29 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 			}
 
 			ts += LMAX;
-			texLen += texStep;
+			
 		    }
 		    ts = seg->length;
 		    break;
 		case TR_LFT:
 		    step = LMAX / (mseg->radiusr);
-		    texStep = step * mseg->radius / curTexSize;
+		    // texStep = step * mseg->radius / curTexSize; //edited
 		    anz = seg->angle[TR_ZS] + step;
 		    ts = step;
-		    texLen += texStep;
+		    //texLen += texStep;
 		    radiusr = seg->radiusr;
 		    trkpos.seg = seg;
 		    while (anz < seg->angle[TR_ZE]) {
 			trkpos.toStart = ts;
 			trkpos.toRight = 0;
 			RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+			
+			
 			curHeight = RtTrackHeightL(&trkpos);
-
+			texStep = sqrt( pow( ( y - yprev ), 2.0f) + pow(( x - xprev ), 2.0f) ) / curTexSize;	//new
+			texLen += texStep; 									//new
+			xprev=x; 									        //new
+			yprev=y; 										//new
 			switch (curBarrier->style) {
 			case TR_FENCE:
 			    if (j == 0) {
@@ -1874,25 +1886,29 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 			}
 
 			ts += step;
-			texLen += texStep;
+			//removed
 			anz += step;
 		    }
 		    ts = seg->arc;
 		    break;
 		case TR_RGT:
 		    step = LMAX / (mseg->radiusl);
-		    texStep = step * mseg->radius / curTexSize;
+		   //removed
 		    anz = seg->angle[TR_ZS] - step;
 		    ts = step;
-		    texLen += texStep;
+		   //removed
 		    radiusr = seg->radiusr;
 		    trkpos.seg = seg;
 		    while (anz > seg->angle[TR_ZE]) {
 			trkpos.toStart = ts;
 			trkpos.toRight = 0;
 			RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
+			
 			curHeight = RtTrackHeightL(&trkpos);
-
+			texStep = sqrt( pow( ( y - yprev ), 2.0f) + pow(( x - xprev ), 2.0f) ) / curTexSize;	//new
+			texLen += texStep; 									//new
+			xprev=x; 									        //new
+			yprev=y; 										//new
 			switch (curBarrier->style) {
 			case TR_FENCE:
 			    if (j == 0) {
@@ -1922,13 +1938,15 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 			    break;
 			}
 			ts += step;
-			texLen += texStep;
 			anz -= step;
 		    }
 		    ts = seg->arc;
 		    break;
 		}
-		texLen = (curTexSeg + mseg->length) / curTexSize;
+		texStep = sqrt( pow( ( seg->vertex[TR_ER].y - yprev ), 2.0f) + pow(( seg->vertex[TR_ER].x - xprev ), 2.0f) ) / curTexSize; //new
+		texLen += texStep;													//edited
+		xprev = seg->vertex[TR_ER].x;												//new
+		yprev = seg->vertex[TR_ER].y;												//new
 		switch (curBarrier->style) {
 		case TR_FENCE:
 		    if (j == 0) {
@@ -1985,11 +2003,11 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		curBarrier = mseg->barrier[1];
 		CHECKDISPLIST(curBarrier->surface->material, sname, i, 0);
 		if (!curTexLink) {
-		    curTexSeg = 0;
-		} else {
+		    texLen = 0; //*
+		} /*else {
 		    curTexSeg = mseg->lgfromstart;
 		}
-		texLen = curTexSeg / curTexSize;
+		texLen = curTexSeg / curTexSize; */
 		if (mseg->lside) {
 		    seg = mseg->lside;
 		    if (seg->lside) {
@@ -2002,7 +2020,8 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		    NEWDISPLIST(0, sname, i);
 		    runninglentgh = 0;
 		    if (curTexType == 0) texLen = 0;
-
+		    xprev = seg->vertex[TR_SR].x;  // edited
+		    yprev = seg->vertex[TR_SR].y;  // edited
 
 		    switch (curBarrier->style) {
 		    case TR_FENCE:
@@ -2045,15 +2064,17 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		switch (seg->type) {
 		case TR_STR:
 		    ts = LMAX;
-		    texStep = LMAX / curTexSize;
-		    texLen += texStep;
+
 		    trkpos.seg = seg;
 		    while (ts < seg->length) {
 			trkpos.toStart = ts;
 			trkpos.toRight = RtTrackGetWidth(seg, ts);
 			RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
 			curHeight = RtTrackHeightL(&trkpos);
-
+						texStep = sqrt( pow( ( y - yprev ), 2.0f) + pow(( x - xprev ), 2.0f) ) / curTexSize;	//new
+			texLen += texStep; 									//new
+			xprev=x; 									        //new
+			yprev=y; 										//new
 			switch (curBarrier->style) {
 			case TR_FENCE:
 			    if (j == 0) {
@@ -2086,16 +2107,16 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 			}
 
 			ts += LMAX;
-			texLen += texStep;
+			
 		    }
 		    ts = seg->length;
 		    break;
 		case TR_LFT:
 		    step = LMAX / (mseg->radiusr);
-		    texStep = step * mseg->radius / curTexSize;
+		    
 		    anz = seg->angle[TR_ZS] + step;
 		    ts = step;
-		    texLen += texStep;
+		   
 		    radiusl = seg->radiusl;
 		    trkpos.seg = seg;
 		    while (anz < seg->angle[TR_ZE]) {
@@ -2103,6 +2124,10 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 			trkpos.toRight = RtTrackGetWidth(seg, ts);
 			RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
 			curHeight = RtTrackHeightL(&trkpos);
+		    texStep = sqrt( pow( ( y - yprev ), 2.0f) + pow(( x - xprev ), 2.0f) ) / curTexSize;	//new
+			texLen += texStep; 									//new
+			xprev=x; 									        //new
+			yprev=y; 										//new		
 
 			switch (curBarrier->style) {
 			case TR_FENCE:
@@ -2136,17 +2161,18 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 			}
 
 			ts += step;
-			texLen += texStep;
+			
+			
 			anz += step;
 		    }
 		    ts = seg->arc;
 		    break;
 		case TR_RGT:
 		    step = LMAX / (mseg->radiusl);
-		    texStep = step * mseg->radius / curTexSize;
+		  
 		    anz = seg->angle[TR_ZS] - step;
 		    ts = step;
-		    texLen += texStep;
+		  
 		    radiusl = seg->radiusl;
 		    trkpos.seg = seg;
 		    while (anz > seg->angle[TR_ZE]) {
@@ -2154,7 +2180,10 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 			trkpos.toRight = RtTrackGetWidth(seg, ts);
 			RtTrackLocal2Global(&trkpos, &x, &y, TR_TORIGHT);
 			curHeight = RtTrackHeightL(&trkpos);
-
+			texStep = sqrt( pow( ( y - yprev ), 2.0f) + pow(( x - xprev ), 2.0f) ) / curTexSize;	//new
+			texLen += texStep; 									//new
+			xprev=x; 									        //new
+			yprev=y; 										//new
 			switch (curBarrier->style) {
 			case TR_FENCE:
 			    if (j == 0) {
@@ -2187,13 +2216,16 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 			}
 
 			ts += step;
-			texLen += texStep;
+			
 			anz -= step;
 		    }
 		    ts = seg->arc;
 		    break;
 		}
-		texLen = (curTexSeg + mseg->length) / curTexSize;
+		texStep = sqrt( pow( ( seg->vertex[TR_ER].y - yprev ), 2.0f) + pow(( seg->vertex[TR_ER].x - xprev ), 2.0f) ) / curTexSize; //new
+		texLen += texStep;													//edited
+		xprev = seg->vertex[TR_ER].x;												//new
+		yprev = seg->vertex[TR_ER].y;				
 
 		switch (curBarrier->style) {
 		case TR_FENCE:
@@ -2235,6 +2267,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 	    }
 	}
     }
+
 
     if (!bump) {
 
