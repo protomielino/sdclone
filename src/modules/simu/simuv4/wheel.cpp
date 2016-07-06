@@ -412,13 +412,19 @@ void SimWheelUpdateForce(tCar *car, int index)
 	F *= wheel->forces.z * mu * wheel->trkPos.seg->surface->kFriction;	/* coeff */
 	
 	/* force feedback torque */
-	if ( (s > 0.000001f) && (v>1.0f) ) {
+	tdble TorqueRatio = 0.6;
+	tdble MaxTorqueAngle;
+	if ( (s > 0.000001f) && (v>1.5f) ) {
 		//version A: same magic formula as or force
 		//wheel->torqueAlign = 0.025 * F * sy / (s * (1.0f + stmp * simSkidFactor[car->carElt->_skillLevel]));
 		//version B: quicker torque decrease by setting mfE = 0 for torque
 		//wheel->torqueAlign = 0.025 * wheel->forces.z * mu * wheel->trkPos.seg->surface->kFriction * sin(wheel->mfC * atan(Bx)) * sy / s;
 		//version C: "textbook" torque, depends only on slip angle (sa)
-		wheel->torqueAlign = 0.025 * wheel->forces.z * mu * wheel->trkPos.seg->surface->kFriction * sin(2.0f * atan(wheel->mfB * sa));
+		//wheel->torqueAlign = 0.025 * wheel->forces.z * mu * wheel->trkPos.seg->surface->kFriction * sin(2.0f * atan(wheel->mfB * sa));
+		//version D: maximal torque at TorqueRatio*optimal wheel slip angle
+		MaxTorqueAngle = TorqueRatio * asin(car->carElt->_wheelSlipOpt(index));
+		//MaxTorqueAngle = 1/wheel->mfB;
+		wheel->torqueAlign = 0.025 * wheel->forces.z * mu * wheel->trkPos.seg->surface->kFriction * sin(2.0f * atan(sa / MaxTorqueAngle));
 	} else wheel->torqueAlign = 0.0f;
 
 	// For debugging weather simultation on some tracks
