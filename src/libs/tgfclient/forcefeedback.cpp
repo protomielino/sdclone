@@ -209,9 +209,13 @@ int ForceFeedbackManager::autocenterEffect(tCarElt* car, tSituation *s){
 	
 	int effectForce;
 	int sign;
+	tdble TqAlign;
 	
 	//force acting on the front wheels
-	effectForce = car->_steerTqAlign * this->effectsConfig["autocenterEffect"]["frontwheelsmultiplier"] / 1000; 
+	tdble H = 450.0;
+	TqAlign = car->_steerTqAlign;
+	TqAlign = H * TqAlign / (fabs(TqAlign) + H);
+	effectForce = TqAlign * this->effectsConfig["autocenterEffect"]["frontwheelsmultiplier"] / 1000; 
 
 	//force action on the back wheels
 	effectForce += car->_wheelFy(REAR_RGT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 1000 ;
@@ -227,11 +231,11 @@ int ForceFeedbackManager::autocenterEffect(tCarElt* car, tSituation *s){
 	sign = (effectForce > 0) - (effectForce < 0);
 	
 	//be sure this is a positive number
-	effectForce = effectForce * sign;
+	//effectForce = effectForce * sign;
 
 	//we use an inverse exponential function to have a stronger force at low values and a lighetr one a bigger values
-	effectForce = (int)((pow((double) effectForce, (double) 1/2) * 120) * sign);
-	
+	//effectForce = (int)((pow((double) effectForce, (double) 1/2) * 120) * sign);
+
 	return effectForce;
 
 }
