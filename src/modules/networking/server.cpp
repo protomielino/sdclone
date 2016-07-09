@@ -647,7 +647,7 @@ void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
     NetDriver driver;
 
     char hostName[256];
-    enet_address_get_host_ip (&driver.address,hostName,256);
+    enet_address_get_host_ip (&pPeer->address,hostName,256);
 
     GfLogTrace ("Client Player Info connected from %s\n",hostName); 
 
