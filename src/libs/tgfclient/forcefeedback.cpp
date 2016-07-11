@@ -162,16 +162,26 @@ void ForceFeedbackManager::saveConfiguration(){
 	for(it_type iterator = this->effectsConfig.begin(); iterator != this->effectsConfig.end(); iterator++) {
 		// iterator->first = key (effect type name)
 		// iterator->second = value (second map)
-
+		
 		// now iterate on the second map
 		typedef std::map<std::string, int>::iterator it_type2;
 		for(it_type2 iterator2 = iterator->second.begin(); iterator2 != iterator->second.end(); iterator2++) {
 			// iterator2->first = key (effect parameter name)
 			// iterator2->second = value (effect value)
+			
+			std::string effectPath = "";
+			
+			if ( iterator->first.compare("globalEffect") == 0){
+				//save global setting in the default section
+				effectPath.append("/forceFeedback/default/effectsConfig/");
+				effectPath.append(iterator->first.c_str());
+			}else{
+				//save other settings in car specific section
+				effectPath.append(effectsSectionPathSpecific);
+				effectPath.append("/");
+				effectPath.append(iterator->first.c_str());
+			}
 
-			std::string effectPath = effectsSectionPathSpecific;
-			effectPath.append("/");
-			effectPath.append(iterator->first.c_str());
 
 			//remove the first slash
 			effectPath.erase(0,1);
@@ -248,7 +258,7 @@ int ForceFeedbackManager::autocenterEffect(tCarElt* car, tSituation *s){
 	effectForce = TqAlign * this->effectsConfig["autocenterEffect"]["frontwheelsmultiplier"] / 1000; 
 
 	//force action on the back wheels
-	effectForce += car->_wheelFy(REAR_RGT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 1000 ;
+	effectForce += car->_wheelFy(REAR_RGT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 1000;
 	effectForce += car->_wheelFy(REAR_LFT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 1000;
 	
 	//smooth
@@ -395,7 +405,7 @@ int ForceFeedbackManager::engineRevvingEffect(tCarElt* car, tSituation *s){
 	GfLogInfo("Sign: (%i)\n", this->effectsConfig["engineRevvingEffect"]["previousSign"]);
 
 	//force acting on the front wheels
-	effectForce = 50000 / (int)car->_enginerpm * 2 * this->effectsConfig["engineRevvingEffect"]["previousSign"]; 
+	effectForce = 50000 / (int)car->_enginerpm * 2 * this->effectsConfig["engineRevvingEffect"]["previousSign"] * this->effectsConfig["engineRevvingEffect"]["multiplier"] / 1000; 
 	
 	GfLogInfo("RPM: (%i)\n", (int)car->_enginerpm);
 	GfLogInfo("Efect: (%i)\n", effectForce);
