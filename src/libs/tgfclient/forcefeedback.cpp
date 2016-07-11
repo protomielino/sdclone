@@ -250,6 +250,10 @@ int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
 		this->force = -1 * this->force;
 	}
 	
+	//check that force is in correct range
+    if (this->force > 32760) this->force = 32760;
+    if (this->force < -32760) this->force = -32760;	
+	
 	GfLogInfo("Final force: (%i)\n", this->force);
 
 	return this->force;

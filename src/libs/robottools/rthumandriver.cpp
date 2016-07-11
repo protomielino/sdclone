@@ -66,7 +66,6 @@
 
 extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
 
-float force = 0;
 #endif
 
 typedef enum { eTransAuto, eTransSeq, eTransGrid, eTransHbox } eTransmission;
@@ -1175,15 +1174,10 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
     car->_steerCmd = leftSteer + rightSteer;
     
 #if SDL_FORCEFEEDBACK
-	//get force from the forceFeedback manager
-	force = forceFeedback.updateForce(car, s);
 
-	//check that force is in correct range
-    if (force > 32760) force = 32760;
-    if (force < -32760) force = -32760;	
+	//send force feedback effect to the wheel
+	gfctrlJoyConstantForce(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), forceFeedback.updateForce(car, s), 0 );
 
-	//send effect to the wheel
-	gfctrlJoyConstantForce(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), ((int)force), 0 );
 #endif
 
 #define GLANCERATE 3 	// speed at which the driver turns his head, ~1/3s to full glance
@@ -1635,9 +1629,6 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
     }
 #endif
 #endif
-
-	//if (force > 32760) force = 32760;
-	//if (force < -32760) force = -32760;
 
     HCtx[idx]->lap = car->_laps;
 }//common_drive
