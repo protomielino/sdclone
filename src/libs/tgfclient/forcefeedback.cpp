@@ -27,6 +27,11 @@
 #include "tgfclient.h"
 #include "forcefeedback.h"
 
+bool timeLogged = false;
+clock_t effectStart = std::clock();
+clock_t effectCurTime = std::clock();
+
+
 int filterPositiveNumbers (int number){
 	if (number > 0){
 		return number;
@@ -180,10 +185,18 @@ void ForceFeedbackManager::saveConfiguration(){
 }
 int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
 
-	//calculate autocenter
-	this->force = this->autocenterEffect(car, s);
-	GfLogInfo("After autocenter: (%i)\n", this->force);
-
+	//calculate autocenter if enabled
+	if (this->effectsConfig["autocenterEffect"]["enabled"]){
+		this->force = this->autocenterEffect(car, s);
+		GfLogInfo("After autocenter: (%i)\n", this->force);
+	}
+	
+	//calculate engine revving if enabled
+	if (this->effectsConfig["engineRevvingEffect"]["enabled"]){
+		this->force += this->engineRevvingEffect(car, s);
+		GfLogInfo("After engineRevving: (%i)\n", this->force);
+	}
+	
 	//calculate bump
 	//this->force += this->bumpsEffect(car, s);
 	//GfLogInfo("After bump: (%i)\n", this->force);
@@ -327,6 +340,49 @@ int ForceFeedbackManager::bumpsEffect(tCarElt* car, tSituation *s){
 	GfLogInfo("(%i)\n",left);
 	GfLogInfo("(%i)\n",right);
 */
+	return effectForce;
+
+}
+
+int ForceFeedbackManager::engineRevvingEffect(tCarElt* car, tSituation *s){
+
+	int effectForce;
+	double changeTimeInterval = 20;
+
+	if(timeLogged != true){
+		effectStart = std::clock();
+		timeLogged = true;
+	GfLogInfo("StartTime: (%f)\n",(double)effectStart);
+		GfLogInfo("###############new time\n");
+	GfLogInfo("StartTime: (%f)\n",(double)effectStart);
+
+	}
+	effectCurTime = std::clock();
+	
+	double timeDiff = (((double)effectCurTime - (double)effectStart )) / CLOCKS_PER_SEC * 1000;
+	
+	GfLogInfo("CurTime: (%f)\n", (double)effectCurTime);
+	GfLogInfo("StartTime: (%f)\n",(double)effectStart);
+	GfLogInfo("TimeDiff: (%f)\n", timeDiff);
+	
+	if (timeDiff > 40){
+		if( this->effectsConfig["engineRevvingEffect"]["previousSign"] > 0 ){
+			this->effectsConfig["engineRevvingEffect"]["previousSign"] = -1;
+		}else{
+			this->effectsConfig["engineRevvingEffect"]["previousSign"] = 1;		
+		}
+		
+		effectStart = std::clock();
+	}
+
+	GfLogInfo("Sign: (%i)\n", this->effectsConfig["engineRevvingEffect"]["previousSign"]);
+
+	//force acting on the front wheels
+	effectForce = 50000 / (int)car->_enginerpm * 2 * this->effectsConfig["engineRevvingEffect"]["previousSign"]; 
+	
+	GfLogInfo("RPM: (%i)\n", (int)car->_enginerpm);
+	GfLogInfo("Efect: (%i)\n", effectForce);
+	
 	return effectForce;
 
 }

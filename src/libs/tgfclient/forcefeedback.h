@@ -83,6 +83,7 @@ class TGFCLIENT_API ForceFeedbackManager {
 		std::clock_t animationRestStartTime; //when the animation started
 
 		int autocenterEffect(tCarElt* car, tSituation *s);
+		int engineRevvingEffect(tCarElt* car, tSituation *s);
 		int bumpsEffect(tCarElt* car, tSituation *s);
 		int globalMultiplier;
 
