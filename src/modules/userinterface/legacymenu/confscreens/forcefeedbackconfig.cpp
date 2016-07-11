@@ -41,7 +41,8 @@ static void *ScrHandle = NULL;
 static void* PrevScrHandle = NULL;
 
 //force feedback manager
-ForceFeedbackManager forceFeedback;
+extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
+ 
 
 
 //editBoxStruct
@@ -92,8 +93,18 @@ onSaveForceFeedbackConfig(void * /* dummy */)
 
 		GfLogInfo("%s%s.\n", editbox->effectTypeName.c_str(), editbox->effectParameterName.c_str());
 
-		forceFeedback.effectsConfig[editbox->effectTypeName.c_str()][editbox->effectParameterName.c_str()] = 
-			atoi(GfuiEditboxGetString(ScrHandle, editbox->id));
+		if (editbox->effectParameterName.compare("enabled") == 0){
+			
+			forceFeedback.effectsConfig[editbox->effectTypeName.c_str()][editbox->effectParameterName.c_str()] = 
+				(int)GfuiCheckboxIsChecked(ScrHandle, (int)editbox->id);
+
+	
+		}else{
+			
+			forceFeedback.effectsConfig[editbox->effectTypeName.c_str()][editbox->effectParameterName.c_str()] = 
+				atoi(GfuiEditboxGetString(ScrHandle, editbox->id));
+
+		}
 		
 	}	
 	
@@ -150,18 +161,18 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, std::str
 	int editBoxId = 0;
 	
 
-	// iterate on the first map
+	// iterate on the first map: the various effect config sections
 	typedef std::map<std::string, std::map<std::string, int> >::iterator it_type;
 	for(it_type iterator = forceFeedback.effectsConfig.begin(); iterator != forceFeedback.effectsConfig.end(); iterator++) {
 		// iterator->first = key (effect type name)
 		// iterator->second = value (second map)
 
-		// now iterate on the second map
+		// now iterate on the second map: the actuals config params of each section
 		typedef std::map<std::string, int>::iterator it_type2;
 		for(it_type2 iterator2 = iterator->second.begin(); iterator2 != iterator->second.end(); iterator2++) {
 			// iterator2->first = key (effect parameter name)
 			// iterator2->second = value (effect value)
-
+	
 			editBoxName.clear();
 			editBoxName.append(iterator->first.c_str());
 			editBoxName.append(iterator2->first.c_str());
@@ -172,28 +183,52 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, std::str
 			//GfLogInfo("%s%s\n", iterator->first.c_str(), iterator2->first.c_str());
 			
 			if(GfParmExistsSection(menuXMLDescHdle, sectionName.c_str())){
-				//GfLogInfo("Exist: %s\n", editBoxName.c_str());
-				
-				//crete the editBox GUI
-				editBoxId = GfuiMenuCreateEditControl(ScrHandle, menuXMLDescHdle, editBoxName.c_str(),
-				NULL, NULL, onValueChange);
-				
-				//convert the integer to a string
-				std::ostringstream editBoxValue;
-				editBoxValue << iterator2->second;
+				GfLogInfo("Exist: %s\n", editBoxName.c_str());
+		
+				//if (iterator2->first.c_str() == "enabled"){
+				if (iterator2->first.compare("enabled") == 0){
+					
+					int checkboxId =
+						GfuiMenuCreateCheckboxControl(ScrHandle, menuXMLDescHdle, editBoxName.c_str(),
+							  NULL, NULL/*onClientPlayerReady*/);
+							  
+					//
+					GfuiCheckboxSetChecked(ScrHandle, checkboxId, (bool)iterator2->second);
+					//
+					//GfuiCheckboxSetText(ScrHandle, checkboxId, iterator->first.c_str());
+					
+					//save this data for later use
+					EditBox editbox;
+					editbox.id = checkboxId;
+					editbox.effectTypeName = iterator->first.c_str();
+					editbox.effectParameterName = iterator2->first.c_str();
 
-				//set the value of the editBox
-				GfuiEditboxSetString(ScrHandle, editBoxId, editBoxValue.str().c_str());
-				
-				//save this data for later use
-				EditBox editbox;
-				editbox.id = editBoxId;
-				editbox.effectTypeName = iterator->first.c_str();
-				editbox.effectParameterName = iterator2->first.c_str();
-				
-				//add it to our list
-				EditBoxes.push_back(editbox);
+					//add it to our list
+					EditBoxes.push_back(editbox);	
+												
+					GfLogInfo("Generated checkbox for (%s)\n", editBoxName.c_str());
+					
+				}else{
+					//crete the editBox GUI
+					editBoxId = GfuiMenuCreateEditControl(ScrHandle, menuXMLDescHdle, editBoxName.c_str(),
+					NULL, NULL, onValueChange);
+					
+					//convert the integer to a string
+					std::ostringstream editBoxValue;
+					editBoxValue << iterator2->second;
 
+					//set the value of the editBox
+					GfuiEditboxSetString(ScrHandle, editBoxId, editBoxValue.str().c_str());
+					
+					//save this data for later use
+					EditBox editbox;
+					editbox.id = editBoxId;
+					editbox.effectTypeName = iterator->first.c_str();
+					editbox.effectParameterName = iterator2->first.c_str();
+					
+					//add it to our list
+					EditBoxes.push_back(editbox);					
+				}
 				
 			}else{
 				//GfLogInfo("NON Exist: %s\n", editBoxName.c_str());
