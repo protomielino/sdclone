@@ -522,6 +522,7 @@ TGFCLIENT_API int GfuiCheckboxCreate(void* scr, int font, int x, int y,
 TGFCLIENT_API void GfuiCheckboxSetChecked(void* scr, int id, bool bChecked);
 TGFCLIENT_API void GfuiCheckboxSetText(void* scr, int id, const char *text);
 TGFCLIENT_API void GfuiCheckboxSetTextColor(void* scr, int id, const GfuiColor& color);
+TGFCLIENT_API bool GfuiCheckboxIsChecked(void* scr, int id);
 
 
 TGFCLIENT_API void GfuiButtonSetText(void* scr, int id, const char* text);

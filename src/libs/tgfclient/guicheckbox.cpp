@@ -193,6 +193,19 @@ GfuiCheckboxSetTextColor(void *scr, int id, const GfuiColor& color)
 	GfuiLabelSetColor(scr, checkbox->labelId, color.toFloatRGBA());
 }
 
+
+bool
+GfuiCheckboxIsChecked(void* scr, int id)
+{
+    tGfuiObject* object = gfuiGetObject(scr, id);
+	
+	//should we check here if the given id is actually a checkbox??
+	
+	tGfuiCheckbox* checkbox = &(object->u.checkbox);
+
+	return checkbox->pInfo->bChecked;
+}
+
 void
 gfuiReleaseCheckbox(tGfuiObject *obj)
 {
