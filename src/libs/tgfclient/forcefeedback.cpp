@@ -84,11 +84,14 @@ void ForceFeedbackManager::readConfiguration(std::string carName){
 	this->effectsConfig.clear();
 	
 	//add some needed default configuration
-	this->effectsConfig["autocenterEffect"]["previousValue"] = 1;
-	this->effectsConfig["bumpsEffect"]["initialized"] = 0;
+	this->effectsConfig["autocenterEffect"]["_previousValue"] = 1;
+	this->effectsConfig["bumpsEffect"]["_initialized"] = 0;
 
 	//read the default configuration (this should always exist)
 	this->readConfigurationFromFileSection(configFileUrl, effectsSectionPathDefault);
+	
+	//keep a copy of the default config
+	this->effectsConfigDefault = this->effectsConfig;
 
 	//merge the current configuration with the read car specific configuration
 	//if there is one
@@ -127,7 +130,7 @@ void ForceFeedbackManager::readConfigurationFromFileSection(std::string configFi
 
 				paramValue = (int)GfParmGetNum(paramHandle, subSectionPath.c_str(), paramsInSection[i].c_str(), "null", 0);
 				GfLogInfo ("(%s): (%i)\n", paramsInSection[i].c_str(), paramValue);
-				this->effectsConfig[subSectionName.c_str()][paramsInSection[i]] = paramValue;
+				this->effectsConfig[subSectionName.c_str()][paramsInSection[i]] = paramValue;				
 			 }
 			
 		} while (GfParmListSeekNext(paramHandle, effectsSectionPath.c_str()) == 0);
@@ -171,11 +174,27 @@ void ForceFeedbackManager::saveConfiguration(){
 			
 			std::string effectPath = "";
 			
-			if ( iterator->first.compare("globalEffect") == 0){
+			//if the param name start with a "_" it is an internal one and so should not be saved on the pref file
+			if ( iterator2->first.compare(0,1,"_") == 0){
+				continue;
+			}
+			
+			//are we saving car specific settings o global ones?
+			if ( iterator->first.compare("globalEffect") == 0 ){
+				//global settings
 				//save global setting in the default section
 				effectPath.append("/forceFeedback/default/effectsConfig/");
 				effectPath.append(iterator->first.c_str());
 			}else{
+				//car specific settings
+				
+				//is the value the same as the global default config?
+				//if yes do not save in the car specific (it is already stored in the gloabl config)
+				//so if in the future we change the global value the change will be used by all cars that has no (different) specific value			
+				if(	this->effectsConfigDefault[iterator->first.c_str()][iterator2->first.c_str()] == iterator2->second){
+					continue;
+				}
+				
 				//save other settings in car specific section
 				effectPath.append(effectsSectionPathSpecific);
 				effectPath.append("/");
@@ -222,9 +241,9 @@ int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
 	//this->force += this->bumpsEffect(car, s);
 	//GfLogInfo("After bump: (%i)\n", this->force);
 
-	//apply global effect
+	//apply global effect multiplier
 	//multiply
-	this->force = this->force * this->effectsConfig["globalEffect"]["multiplier"] / 1000;
+	this->force = this->force * this->effectsConfig["globalEffect"]["multiplier"] / 100;
 	
 	//reverse if needed
 	if(this->effectsConfig["globalEffect"]["reverse"] == 1){
@@ -255,17 +274,17 @@ int ForceFeedbackManager::autocenterEffect(tCarElt* car, tSituation *s){
 	tdble H = 450.0;
 	TqAlign = car->_steerTqAlign;
 	TqAlign = H * TqAlign / (fabs(TqAlign) + H);
-	effectForce = TqAlign * this->effectsConfig["autocenterEffect"]["frontwheelsmultiplier"] / 1000; 
+	effectForce = TqAlign * this->effectsConfig["autocenterEffect"]["frontwheelsmultiplier"] / 100; 
 
 	//force action on the back wheels
-	effectForce += car->_wheelFy(REAR_RGT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 1000;
-	effectForce += car->_wheelFy(REAR_LFT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 1000;
+	effectForce += car->_wheelFy(REAR_RGT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 100;
+	effectForce += car->_wheelFy(REAR_LFT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 100;
 	
 	//smooth
-	effectForce = (effectForce + (this->effectsConfig["autocenterEffect"]["previousValue"] * this->effectsConfig["autocenterEffect"]["smoothing"] / 1000)) / ((this->effectsConfig["autocenterEffect"]["smoothing"]/1000)+1);
+	effectForce = (effectForce + (this->effectsConfig["autocenterEffect"]["_previousValue"] * this->effectsConfig["autocenterEffect"]["smoothing"] / 100)) / ((this->effectsConfig["autocenterEffect"]["smoothing"]/100)+1);
 
 	//remember the current value for the next run
-	this->effectsConfig["autocenterEffect"]["previousValue"] = effectForce;
+	this->effectsConfig["autocenterEffect"]["_previousValue"] = effectForce;
 	
 	//we need to store the sign of the force
 	sign = (effectForce > 0) - (effectForce < 0);
@@ -294,10 +313,10 @@ int ForceFeedbackManager::bumpsEffect(tCarElt* car, tSituation *s){
 	GfLogInfo("(%f)\n",car->_wheelFz(3));
 */
 	if(this->effectsConfig["bumpsEffect"]["initialized"] == 0){
-		this->effectsConfig["bumpsEffect"]["previousWheelZForce0"] = car->_wheelFz(0);
-		this->effectsConfig["bumpsEffect"]["previousWheelZForce1"] = car->_wheelFz(1);
-		this->effectsConfig["bumpsEffect"]["previousWheelZForce2"] = car->_wheelFz(2);
-		this->effectsConfig["bumpsEffect"]["previousWheelZForce3"] = car->_wheelFz(3);
+		this->effectsConfig["bumpsEffect"]["_previousWheelZForce0"] = car->_wheelFz(0);
+		this->effectsConfig["bumpsEffect"]["_previousWheelZForce1"] = car->_wheelFz(1);
+		this->effectsConfig["bumpsEffect"]["_previousWheelZForce2"] = car->_wheelFz(2);
+		this->effectsConfig["bumpsEffect"]["_previousWheelZForce3"] = car->_wheelFz(3);
 		this->effectsConfig["bumpsEffect"]["initialized"] = 1;
 	}
 
@@ -315,10 +334,10 @@ int ForceFeedbackManager::bumpsEffect(tCarElt* car, tSituation *s){
 
 
 
-	this->effectsConfig["bumpsEffect"]["previousWheelZForce0"] = car->_wheelFz(0);
-	this->effectsConfig["bumpsEffect"]["previousWheelZForce1"] = car->_wheelFz(1);
-	this->effectsConfig["bumpsEffect"]["previousWheelZForce2"] = car->_wheelFz(2);
-	this->effectsConfig["bumpsEffect"]["previousWheelZForce3"] = car->_wheelFz(3);
+	this->effectsConfig["bumpsEffect"]["_previousWheelZForce0"] = car->_wheelFz(0);
+	this->effectsConfig["bumpsEffect"]["_previousWheelZForce1"] = car->_wheelFz(1);
+	this->effectsConfig["bumpsEffect"]["_previousWheelZForce2"] = car->_wheelFz(2);
+	this->effectsConfig["bumpsEffect"]["_previousWheelZForce3"] = car->_wheelFz(3);
 
 
 	GfLogInfo("\n\n");
@@ -393,19 +412,19 @@ int ForceFeedbackManager::engineRevvingEffect(tCarElt* car, tSituation *s){
 	GfLogInfo("TimeDiff: (%f)\n", timeDiff);
 	
 	if (timeDiff > 40){
-		if( this->effectsConfig["engineRevvingEffect"]["previousSign"] > 0 ){
-			this->effectsConfig["engineRevvingEffect"]["previousSign"] = -1;
+		if( this->effectsConfig["engineRevvingEffect"]["_previousSign"] > 0 ){
+			this->effectsConfig["engineRevvingEffect"]["_previousSign"] = -1;
 		}else{
-			this->effectsConfig["engineRevvingEffect"]["previousSign"] = 1;		
+			this->effectsConfig["engineRevvingEffect"]["_previousSign"] = 1;		
 		}
 		
 		effectStart = std::clock();
 	}
 
-	GfLogInfo("Sign: (%i)\n", this->effectsConfig["engineRevvingEffect"]["previousSign"]);
+	GfLogInfo("Sign: (%i)\n", this->effectsConfig["engineRevvingEffect"]["_previousSign"]);
 
 	//force acting on the front wheels
-	effectForce = 50000 / (int)car->_enginerpm * 2 * this->effectsConfig["engineRevvingEffect"]["previousSign"] * this->effectsConfig["engineRevvingEffect"]["multiplier"] / 1000; 
+	effectForce = 50000 / (int)car->_enginerpm * 2 * this->effectsConfig["engineRevvingEffect"]["_previousSign"] * this->effectsConfig["engineRevvingEffect"]["multiplier"] / 100; 
 	
 	GfLogInfo("RPM: (%i)\n", (int)car->_enginerpm);
 	GfLogInfo("Efect: (%i)\n", effectForce);

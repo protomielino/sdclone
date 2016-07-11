@@ -62,6 +62,7 @@ class TGFCLIENT_API ForceFeedbackManager {
 		int reversed;
 		std::vector<std::string> effects;
 		std::map< std::string, std::map<std::string, int> > effectsConfig;
+		std::map< std::string, std::map<std::string, int> > effectsConfigDefault;
 		std::string carName;
 
 		//constructor
