@@ -93,7 +93,10 @@ onSaveForceFeedbackConfig(void * /* dummy */)
 
 		GfLogInfo("%s%s.\n", editbox->effectTypeName.c_str(), editbox->effectParameterName.c_str());
 
-		if (editbox->effectParameterName.compare("enabled") == 0){
+		if (
+			editbox->effectParameterName.compare("enabled") == 0
+			|| editbox->effectParameterName.compare("reverse") == 0
+		){
 			
 			forceFeedback.effectsConfig[editbox->effectTypeName.c_str()][editbox->effectParameterName.c_str()] = 
 				(int)GfuiCheckboxIsChecked(ScrHandle, (int)editbox->id);
@@ -186,7 +189,10 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, std::str
 				GfLogInfo("Exist: %s\n", editBoxName.c_str());
 		
 				//if (iterator2->first.c_str() == "enabled"){
-				if (iterator2->first.compare("enabled") == 0){
+				if (
+					iterator2->first.compare("enabled") == 0
+					|| iterator2->first.compare("reverse") == 0
+				){
 					
 					int checkboxId =
 						GfuiMenuCreateCheckboxControl(ScrHandle, menuXMLDescHdle, editBoxName.c_str(),

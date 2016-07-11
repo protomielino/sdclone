@@ -31,6 +31,9 @@ bool timeLogged = false;
 clock_t effectStart = std::clock();
 clock_t effectCurTime = std::clock();
 
+float prevSteerCmd;
+float prevSteerCmdDiff;
+int prevDirection = 1;
 
 int filterPositiveNumbers (int number){
 	if (number > 0){
@@ -185,6 +188,8 @@ void ForceFeedbackManager::saveConfiguration(){
 }
 int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
 
+	this->force = 0;
+
 	//calculate autocenter if enabled
 	if (this->effectsConfig["autocenterEffect"]["enabled"]){
 		this->force = this->autocenterEffect(car, s);
@@ -196,6 +201,12 @@ int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
 		this->force += this->engineRevvingEffect(car, s);
 		GfLogInfo("After engineRevving: (%i)\n", this->force);
 	}
+
+	//calculate engine revving if enabled
+	//if (this->effectsConfig["engineRevvingEffect"]["enabled"]){
+		this->force += this->lowSpeedCostantForceEffect(car, s);
+	//	GfLogInfo("After engineRevving: (%i)\n", this->force);
+	//}
 	
 	//calculate bump
 	//this->force += this->bumpsEffect(car, s);
@@ -209,6 +220,8 @@ int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
 	if(this->effectsConfig["globalEffect"]["reverse"] == 1){
 		this->force = -1 * this->force;
 	}
+	
+	GfLogInfo("Final force: (%i)\n", this->force);
 
 	return this->force;
 
@@ -216,6 +229,10 @@ int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
 
 int ForceFeedbackManager::autocenterEffect(tCarElt* car, tSituation *s){
 	
+	
+	if(car->_speed_xy < 4){
+		return 0;
+	}
 	/*
 	 * car->steerLock
 	 * */
@@ -383,6 +400,73 @@ int ForceFeedbackManager::engineRevvingEffect(tCarElt* car, tSituation *s){
 	GfLogInfo("RPM: (%i)\n", (int)car->_enginerpm);
 	GfLogInfo("Efect: (%i)\n", effectForce);
 	
+	return effectForce;
+
+}
+
+int ForceFeedbackManager::lowSpeedCostantForceEffect(tCarElt* car, tSituation *s){
+
+	int effectForce;
+	int sign;
+
+	//we need to store the sign of the force
+	sign = ((car->_steerTqCenter - prevSteerCmd) > 0) - ((car->_steerTqCenter - prevSteerCmd) < 0);
+
+	GfLogInfo("test: (%f)\n", car->_steerTqCenter);
+	GfLogInfo("test: (%f)\n", prevSteerCmd );
+
+	int prevDirectionSign = (prevDirection > 0) - (prevDirection < 0);
+
+	GfLogInfo("Sign: (%d)\n", sign);
+	GfLogInfo("Direction sign: (%d)\n", prevDirectionSign);	
+
+
+/*	
+	if(prevDirectionSign == sign || sign == 0){
+		
+		prevDirection = prevDirection + sign;
+
+	}else{
+
+		prevDirection = sign;
+
+	}
+*/
+
+	prevDirection = prevDirection + sign;
+	if (prevDirection > 7) prevDirection =7;
+	if (prevDirection < -7) prevDirection =-7;
+	
+
+
+
+	GfLogInfo("Direction score: (%d)\n", prevDirection);
+
+
+	//force calculation
+	if (car->_speed_xy < this->effectsConfig["lowSpeedCostantForceEffect"]["maxSpeedAtWithcForceIsApplied"]
+//		&& abs(prevDirection) > 8
+	){
+
+		effectForce =
+				this->effectsConfig["lowSpeedCostantForceEffect"]["maxForce"] / 8 * abs(prevDirection) /
+				//(car->_speed_xy  + 1) * 
+				(pow(car->_speed_xy, (float) 1/2) + 1) *
+				//sign;
+				prevDirectionSign;
+		
+	}else{
+
+		effectForce = 1;
+
+	}
+
+	prevSteerCmdDiff = car->_steerTqCenter - prevSteerCmd;
+	prevSteerCmd = car->_steerTqCenter;
+
+	GfLogInfo("SPEED: (%i)\n", (int)car->_speed_xy);
+	GfLogInfo("Efect: (%i)\n", effectForce);
+
 	return effectForce;
 
 }
