@@ -75,6 +75,7 @@ typedef struct
     tdble	lfMin;		/* Load factor */
     tdble	lfK;		/* Load factor */
     tdble	opLoad;		/* Operating load */
+    tdble   AlignTqFactor; /* aligning torque factor */
     tdble	mass;		/* total wheel mass (incl. brake) (unsprung mass) */
     tdble	camber;		/* camber, negative toward exterior on both sides */
     tdble	pressure;	/* tire pressure */

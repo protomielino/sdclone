@@ -705,6 +705,7 @@ typedef struct CarElt
 #define PRM_LOADFMAX			"load factor max"
 #define PRM_LOADFMIN			"load factor min"
 #define PRM_OPLOAD				"operating load"
+#define PRM_ALIGNTQFACTOR		"aligning torque factor"
 #define PRM_OPTTEMP				"optimal temperature"
 #define PRM_INITTEMP			"initial temperature"
 #define PRM_COLDMUFACTOR		"cold mu factor"
