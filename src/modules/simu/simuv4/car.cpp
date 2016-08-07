@@ -35,6 +35,7 @@ SimCarConfig(tCar *car)
 {
 	void	*hdle = car->params;
 	tdble	k;
+	t3Dd	Irot;
 	tdble	w;
 	tdble	gcfrl, gcrrl, gcfr, gcrl;
 	tdble	wf0, wr0;
@@ -137,10 +138,17 @@ SimCarConfig(tCar *car)
 	carElt->_bonnetPos_y = GfParmGetNum(hdle, SECT_BONNET, PRM_YPOS, (char*)NULL, carElt->_drvPos_y);
 	carElt->_bonnetPos_z = GfParmGetNum(hdle, SECT_BONNET, PRM_ZPOS, (char*)NULL, carElt->_drvPos_z);
 	
+	/* rotational inertias */
 	k = k * k;
-	car->Iinv.x = (tdble) (12.0 / (car->mass * k * (car->dimension.y * car->dimension.y + car->dimension.z * car->dimension.z)));
-	car->Iinv.y = (tdble) (12.0 / (car->mass * k * (car->dimension.x * car->dimension.x + car->dimension.z * car->dimension.z)));
-	car->Iinv.z = (tdble) (12.0 / (car->mass * k * (car->dimension.y * car->dimension.y + car->dimension.x * car->dimension.x)));
+	Irot.x = (car->mass * k * (car->dimension.y * car->dimension.y + car->dimension.z * car->dimension.z)) / 12.0;
+	Irot.y = (car->mass * k * (car->dimension.x * car->dimension.x + car->dimension.z * car->dimension.z)) / 12.0;
+	Irot.z = (car->mass * k * (car->dimension.y * car->dimension.y + car->dimension.x * car->dimension.x)) / 12.0;
+	Irot.x = GfParmGetNum(hdle, SECT_CAR, PRM_ROLLROTINERTIA, (char*)NULL, Irot.x);
+	Irot.y = GfParmGetNum(hdle, SECT_CAR, PRM_PITCHROTINERTIA, (char*)NULL, Irot.y);
+	Irot.z = GfParmGetNum(hdle, SECT_CAR, PRM_YAWROTINERTIA, (char*)NULL, Irot.z);
+	car->Iinv.x = (tdble) (1.0 / Irot.x);
+	car->Iinv.y = (tdble) (1.0 / Irot.y);
+	car->Iinv.z = (tdble) (1.0 / Irot.z);
 	
 	/* configure components */
 	tCarSetupItem *setupSpring;
