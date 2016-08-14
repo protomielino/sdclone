@@ -27,7 +27,7 @@
 # (hashtag) starts a comment
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-project(3rdParty-2.2)
+project(3rdParty-2.3)
 
 include(ExternalProject)
 include(CMakeDependentOption)
