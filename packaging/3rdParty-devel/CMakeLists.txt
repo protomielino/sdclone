@@ -388,21 +388,24 @@ endif(OPTION_SQLITE3)
    # ========== For OpenSceneGraph =============
 
 if(OPTION_FREETYPE)
-   set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false)
+   set(FREETYPE_PROJECT freetype-2.6.5)
+   set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false -DWITH_PNG=OFF)
 
-   ExternalProject_Add(freetype-2.5.3
-   DOWNLOAD_NAME ft253.zip
-   URL https://sourceforge.net/projects/freetype/files/freetype2/2.5.3/ft253.zip/download
-   URL_HASH SHA256=CB7475E88852893B83D9C99A5FFEDEFD46398EDC8EF8410396D4D73F1A1281B9 
+   ExternalProject_Add(${FREETYPE_PROJECT}
+   DOWNLOAD_NAME ft265.zip
+   URL https://sourceforge.net/projects/freetype/files/freetype2/2.6.5/ft265.zip/download
+   URL_HASH SHA256=635309058FF8B8056BB94488FFC26CC984ED632E01DDFE80E4C0768930483182 
    CMAKE_ARGS ${FREETYPE_ARGS}
    )
-#   ExternalProject_Add_Step(freetype-2.5.3 freetype_add_cmake
-#   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#           "${CMAKE_SOURCE_DIR}/patches/freetype-2.5.3.CMakeLists.txt"
-#           "<SOURCE_DIR>/CMakeLists.txt"
-#   DEPENDEES update # do after update
-#   DEPENDERS patch  # do before patch
-#   )
+
+   # Rename the lib to remove 'd' post-fix for debug builds
+   ExternalProject_Add_Step(${FREETYPE_PROJECT} freetypelib_rename
+   COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/freetype${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/freetype.lib
+   DEPENDEES install
+   )
+
+else(OPTION_FREETYPE)
+   set(FREETYPE_PROJECT )
 endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
@@ -441,7 +444,7 @@ if(OPTION_OSG)
    URL http://trac.openscenegraph.org/downloads/developer_releases/OpenSceneGraph-3.4.0.zip
    URL_HASH MD5=A5E762C64373A46932E444F6F7332496
    CMAKE_ARGS ${OSG_ARGS}
-   DEPENDS zlib-1.2.8 ${CURL_PROJECT} freetype-2.5.3 OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
+   DEPENDS zlib-1.2.8 ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
    )
 
    message(STATUS "Todo - remove after OSG > 3.4.0 as this fix is already merged upstream.")
