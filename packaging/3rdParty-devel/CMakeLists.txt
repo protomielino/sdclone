@@ -406,14 +406,26 @@ if(OPTION_FREETYPE)
 endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
-   set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_CURL_TESTS=Off)
+#   set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_CURL_TESTS=Off)
+#   # may only be needed for Madbad's web stuff
+#   ExternalProject_Add(curl-7.43.0
+#   URL https://curl.haxx.se/download/curl-7.43.0.tar.bz2
+#   URL_HASH SHA256=BAA654A1122530483CCC1C58CC112FEC3724A82C11C6A389F1E6A37DC8858DF9
+#   CMAKE_ARGS ${CURL_ARGS}
+#   DEPENDS zlib-1.2.8
+#   )
+#   
+   set(CURL_PROJECT curl-7.50.1)
+   set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off)
    # may only be needed for Madbad's web stuff
-   ExternalProject_Add(curl-7.43.0
-   URL https://curl.haxx.se/download/curl-7.43.0.tar.bz2
-   URL_HASH SHA256=BAA654A1122530483CCC1C58CC112FEC3724A82C11C6A389F1E6A37DC8858DF9
+   ExternalProject_Add(${CURL_PROJECT}
+   URL https://curl.haxx.se/download/curl-7.50.1.tar.bz2
+   URL_HASH SHA256=3C12C5F54CCAA1D40ABC65D672107DCC75D3E1FCB38C267484334280096E5156
    CMAKE_ARGS ${CURL_ARGS}
    DEPENDS zlib-1.2.8
    )
+else(OPTION_CURL)
+   set(CURL_PROJECT )
 endif(OPTION_CURL)
 
 if(OPTION_OSG)
@@ -429,9 +441,11 @@ if(OPTION_OSG)
    URL http://trac.openscenegraph.org/downloads/developer_releases/OpenSceneGraph-3.4.0.zip
    URL_HASH MD5=A5E762C64373A46932E444F6F7332496
    CMAKE_ARGS ${OSG_ARGS}
-   DEPENDS zlib-1.2.8 curl-7.43.0 freetype-2.5.3 OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
+   DEPENDS zlib-1.2.8 ${CURL_PROJECT} freetype-2.5.3 OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
    )
-   ExternalProject_Add_Step(osg-OpenSceneGraph-3.4.0 sdl1x_add_cmake
+
+   message(STATUS "Todo - remove after OSG > 3.4.0 as this fix is already merged upstream.")
+   ExternalProject_Add_Step(osg-OpenSceneGraph-3.4.0 osg_fix_types
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
            "${CMAKE_SOURCE_DIR}/patches/osg-3.4.0.types.txt"
            "<SOURCE_DIR>/include/osg/Types"
