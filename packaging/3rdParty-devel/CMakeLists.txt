@@ -5,7 +5,7 @@
 #    created              : Aug 5 2015
 #    copyright            : (C) 2015 Joe Thompson
 #    email                : beaglejoe@users.sourceforge.net
-#    version              : $Id:$
+#    version              : $Id: $
 #
 #==============================================================================
 #
@@ -125,14 +125,26 @@ endif(OPTION_SDL_1x)
 # message(WARNING "TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)")
 
 if(OPTION_SDL_2x)
-set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off)
-message(STATUS "CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
-ExternalProject_Add(SDL2-2.0.3 
-   URL https://www.libsdl.org/release/SDL2-2.0.3.tar.gz 
-   URL_HASH SHA256=A5A69A6ABF80BCCE713FA873607735FE712F44276A7F048D60A61BB2F6B3C90C 
+   set(SDL2_PROJECT SDL2-2.0.4)
+   set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off)
+   #message(STATUS "CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
+   ExternalProject_Add(${SDL2_PROJECT} 
+   URL https://www.libsdl.org/release/SDL2-2.0.4.tar.gz 
+   URL_HASH SHA256=DA55E540BF6331824153805D58B590A29C39D2D506C6D02FA409AEDEAB21174B 
    CMAKE_ARGS ${SDL2_ARGS}
    DEPENDS OpenGL-headers
    )
+   message(STATUS "Patching SDL 2.0.4 for DirectInput Haptics...")
+   message(STATUS "TODO - check if this patch is still needed with SDL2 > 2.0.4")
+   ExternalProject_Add_Step(${SDL2_PROJECT} sdl_2-dinput-patch
+   COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/patches/SDL_dinputhaptic.c.patched"
+            "<SOURCE_DIR>/src/haptic/windows/SDL_dinputhaptic.c"
+   DEPENDEES update # do after update
+   DEPENDERS patch  # do before patch
+   )
+else(OPTION_SDL_2x)
+   set(SDL2_PROJECT )
 endif(OPTION_SDL_2x)
 
 if(OPTION_OPENAL)
@@ -160,7 +172,7 @@ if(OPTION_PLIB)
    else(OPTION_PLIB_USE_HEAD)
 
    ExternalProject_Add(plib-1.8.5 
-      URL http://plib.sourceforge.net/dist/plib-1.8.5.tar.gz 
+      URL https://plib.sourceforge.net/dist/plib-1.8.5.tar.gz 
       URL_HASH SHA256=485B22BF6FDC0DA067E34EAD5E26F002B76326F6371E2AE006415DEA6A380A32 
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
       DEPENDS OpenGL-headers
@@ -204,7 +216,7 @@ if(OPTION_FREESOLID)
 #message(WARNING "TODO - need to decide between the patches for FreeSOLID-2.1.1 OR FreeSOLID-2.1.2")
 #ExternalProject_Add(FreeSOLID-2.1.1 
 #   DOWNLOAD_NAME FreeSOLID-2.1.1.zip
-#   URL http://sourceforge.net/projects/freesolid/files/FreeSOLID/FreeSOLID-2.1.1.zip/FreeSOLID-2.1.1.zip/download 
+#   URL https://sourceforge.net/projects/freesolid/files/FreeSOLID/FreeSOLID-2.1.1.zip/FreeSOLID-2.1.1.zip/download 
 #   URL_HASH SHA256=5A4F8576E27223F03AD0ADD76A79B06DB6CD8F15C8D2767EA35E0C540BA1BEE8 
 #   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
 #   UPDATE_COMMAND ""
@@ -217,7 +229,7 @@ if(OPTION_FREESOLID)
 set(FreeSOLID_ARGS ${EXTERNALS_CMAKE_ARGS} -D'CMAKE_DEBUG_POSTFIX=""')
 ExternalProject_Add(FreeSOLID-2.1.2
    DOWNLOAD_NAME FreeSOLID-2.1.2.zip
-   URL http://sourceforge.net/projects/freesolid/files/FreeSOLID-2.1.2.zip/download 
+   URL https://sourceforge.net/projects/freesolid/files/FreeSOLID-2.1.2.zip/download 
    URL_HASH SHA256=89EDC6AFDD9D60C8020B2B865B61558C86A8928DC6F1773B9F4708B5C28EB873 
    CMAKE_ARGS ${FreeSOLID_ARGS}
    )
@@ -281,7 +293,7 @@ set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_tests=off -DBUILD_examples=off -D
 if(OPTION_EXPAT)
 ExternalProject_Add(expat-2.1.0
    DOWNLOAD_NAME expat-2.1.0.tar.gz
-   URL http://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download
+   URL https://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download
    URL_HASH SHA256=823705472F816DF21C8F6AA026DD162B280806838BB55B3432B0FB1FCCA7EB86
    CMAKE_ARGS ${EXPAT_ARGS}
    #UPDATE_COMMAND ""
@@ -362,7 +374,7 @@ if(OPTION_FREETYPE)
 
    ExternalProject_Add(freetype-2.5.3
    DOWNLOAD_NAME ft253.zip
-   URL http://sourceforge.net/projects/freetype/files/freetype2/2.5.3/ft253.zip/download
+   URL https://sourceforge.net/projects/freetype/files/freetype2/2.5.3/ft253.zip/download
    URL_HASH SHA256=CB7475E88852893B83D9C99A5FFEDEFD46398EDC8EF8410396D4D73F1A1281B9 
    CMAKE_ARGS ${FREETYPE_ARGS}
    )
@@ -379,7 +391,7 @@ if(OPTION_CURL)
    set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_CURL_TESTS=Off)
    # may only be needed for Madbad's web stuff
    ExternalProject_Add(curl-7.43.0
-   URL http://curl.haxx.se/download/curl-7.43.0.tar.bz2
+   URL https://curl.haxx.se/download/curl-7.43.0.tar.bz2
    URL_HASH SHA256=BAA654A1122530483CCC1C58CC112FEC3724A82C11C6A389F1E6A37DC8858DF9
    CMAKE_ARGS ${CURL_ARGS}
    DEPENDS zlib-1.2.8
@@ -399,7 +411,7 @@ if(OPTION_OSG)
    URL http://trac.openscenegraph.org/downloads/developer_releases/OpenSceneGraph-3.4.0.zip
    URL_HASH MD5=A5E762C64373A46932E444F6F7332496
    CMAKE_ARGS ${OSG_ARGS}
-   DEPENDS zlib-1.2.8 curl-7.43.0 freetype-2.5.3 OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 SDL2-2.0.3
+   DEPENDS zlib-1.2.8 curl-7.43.0 freetype-2.5.3 OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
    )
    ExternalProject_Add_Step(osg-OpenSceneGraph-3.4.0 sdl1x_add_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
