@@ -291,16 +291,34 @@ endif(OPTION_VORBIS)
 #disable building unneeded sub projects (they failed with VS2008)
 set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_tests=off -DBUILD_examples=off -DBUILD_tools=off)
 if(OPTION_EXPAT)
-ExternalProject_Add(expat-2.1.0
-   DOWNLOAD_NAME expat-2.1.0.tar.gz
-   URL https://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download
-   URL_HASH SHA256=823705472F816DF21C8F6AA026DD162B280806838BB55B3432B0FB1FCCA7EB86
+   ExternalProject_Add(expat-2.2.0
+   DOWNLOAD_NAME expat-2.2.0.tar.bz2
+   URL https://sourceforge.net/projects/expat/files/expat/2.2.0/expat-2.2.0.tar.bz2/download
+   URL_HASH SHA256=D9E50FF2D19B3538BD2127902A89987474E1A4DB8E43A66A4D1A712AB9A504FF
    CMAKE_ARGS ${EXPAT_ARGS}
    #UPDATE_COMMAND ""
    #PATCH_COMMAND ""
    #CONFIGURE_COMMAND ""
    #BUILD_COMMAND ""
    #INSTALL_COMMAND ""  
+   )
+   # Hopefully temporary - report to Expat
+   # https://sourceforge.net/p/expat/bugs/534/
+   message(STATUS "Todo - remove after Expat's bug 534 gets fixed...")
+   ExternalProject_Add_Step(expat-2.2.0 expat-2.2.0_fix_cmake
+   COMMAND ${CMAKE_COMMAND} -E copy_if_different
+           "${CMAKE_SOURCE_DIR}/patches/expat-2.2.0-CMakeLists.txt"
+           "<SOURCE_DIR>/CMakeLists.txt"
+   DEPENDEES update # do after update
+   DEPENDERS patch  # do before patch
+   )
+   ExternalProject_Add_Step(expat-2.2.0 sd_expat_lib_rename
+   COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/expat${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/expat.lib
+   DEPENDEES install
+   )
+   ExternalProject_Add_Step(expat-2.2.0 sd_expat_dll_rename
+   COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/bin/expat${SUPER_BUILD_POSTFIX}.dll ${EXTERNALS_INSTALL_DIR}/bin/expat.dll
+   DEPENDEES install
    )
 endif(OPTION_EXPAT)
 
