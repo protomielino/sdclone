@@ -176,25 +176,28 @@ if(OPTION_PLIB)
 endif(OPTION_PLIB)
 
 if(OPTION_JPEG)
-ExternalProject_Add(jpeg-9a
-   URL http://ijg.org/files/jpegsrc.v9a.tar.gz
-   URL_HASH SHA256=3A753EA48D917945DD54A2D97DE388AA06CA2EB1066CBFDC6652036349FE05A7
+   set(JPG_PROJECT jpeg-9b)
+   ExternalProject_Add(${JPG_PROJECT}
+   URL http://ijg.org/files/jpegsrc.v9b.tar.gz
+   URL_HASH SHA256=240FD398DA741669BF3C90366F58452EA59041CACC741A489B99F2F6A0BAD052
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    )
-   ExternalProject_Add_Step(jpeg-9a jpeg_add_cmake
+   ExternalProject_Add_Step(${JPG_PROJECT} jpeg_add_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/jpeg-9a.CMakeLists.txt"
+           "${CMAKE_SOURCE_DIR}/patches/jpeg-9b.CMakeLists.txt"
            "<SOURCE_DIR>/CMakeLists.txt"
    DEPENDEES update # do after update
    DEPENDERS patch  # do before patch
    )
-   ExternalProject_Add_Step(jpeg-9a jpeg_config
+   ExternalProject_Add_Step(${JPG_PROJECT} jpeg_config
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
            "<SOURCE_DIR>/jconfig.vc"
            "<SOURCE_DIR>/jconfig.h"
    DEPENDEES update # do after update
    DEPENDERS patch  # do before patch
    )
+else(OPTION_JPEG)
+   set(JPG_PROJECT )
 endif(OPTION_JPEG)
 
 if(OPTION_FREESOLID)
@@ -296,7 +299,7 @@ message(STATUS "CMAKE_COMMAND = ${CMAKE_COMMAND}")
 if(OPTION_ZLIB)
 ExternalProject_Add(zlib-1.2.8
    DOWNLOAD_NAME zlib-1.2.8.tar.gz
-   URL http://sourceforge.net/projects/libpng/files/zlib/1.2.8/zlib-1.2.8.tar.gz/download
+   URL https://sourceforge.net/projects/libpng/files/zlib/1.2.8/zlib-1.2.8.tar.gz/download
    URL_HASH SHA256=36658CB768A54C1D4DEC43C3116C27ED893E88B02ECFCB44F2166F9C0B7F2A0D
    #CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=on
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
@@ -325,7 +328,7 @@ if(OPTION_PNG)
    set(PNG_ARGS ${EXTERNALS_CMAKE_ARGS} -DPNG_SHARED=off -DPNG_TESTS=off -DCMAKE_DEBUG_POSTFIX='')
    ExternalProject_Add(${PNG_PROJECT} 
       DOWNLOAD_NAME ${PNG_PROJECT}.tar.gz 
-      URL http://sourceforge.net/projects/libpng/files/libpng16/older-releases/1.6.19/libpng-1.6.19.tar.gz/download 
+      URL https://sourceforge.net/projects/libpng/files/libpng16/older-releases/1.6.19/libpng-1.6.19.tar.gz/download 
       URL_HASH MD5=3121BDC77C365A87E054B9F859F421FE
       CMAKE_ARGS ${PNG_ARGS}
       DEPENDS zlib-1.2.8
@@ -396,7 +399,7 @@ if(OPTION_OSG)
    URL http://trac.openscenegraph.org/downloads/developer_releases/OpenSceneGraph-3.4.0.zip
    URL_HASH MD5=A5E762C64373A46932E444F6F7332496
    CMAKE_ARGS ${OSG_ARGS}
-   DEPENDS zlib-1.2.8 curl-7.43.0 freetype-2.5.3 OpenGL-headers jpeg-9a ${PNG_PROJECT} SDL-1.2.15 SDL2-2.0.3
+   DEPENDS zlib-1.2.8 curl-7.43.0 freetype-2.5.3 OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 SDL2-2.0.3
    )
    ExternalProject_Add_Step(osg-OpenSceneGraph-3.4.0 sdl1x_add_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
