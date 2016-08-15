@@ -289,7 +289,7 @@ ExternalProject_Add(libvorbis-1.3.5
 endif(OPTION_VORBIS)
 
 #disable building unneeded sub projects (they failed with VS2008)
-set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_tests=off -DBUILD_examples=off -DBUILD_tools=off)
+set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_tests=off -DBUILD_examples=off -DBUILD_tools=off -DCMAKE_DEBUG_POSTFIX='')
 if(OPTION_EXPAT)
    ExternalProject_Add(expat-2.2.0
    DOWNLOAD_NAME expat-2.2.0.tar.bz2
@@ -311,14 +311,6 @@ if(OPTION_EXPAT)
            "<SOURCE_DIR>/CMakeLists.txt"
    DEPENDEES update # do after update
    DEPENDERS patch  # do before patch
-   )
-   ExternalProject_Add_Step(expat-2.2.0 sd_expat_lib_rename
-   COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/expat${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/expat.lib
-   DEPENDEES install
-   )
-   ExternalProject_Add_Step(expat-2.2.0 sd_expat_dll_rename
-   COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/bin/expat${SUPER_BUILD_POSTFIX}.dll ${EXTERNALS_INSTALL_DIR}/bin/expat.dll
-   DEPENDEES install
    )
 endif(OPTION_EXPAT)
 
