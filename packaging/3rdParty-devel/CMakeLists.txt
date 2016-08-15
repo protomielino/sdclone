@@ -324,12 +324,12 @@ ExternalProject_Add_Step(zlib-1.2.8 sd_zlib_rename_lib
 endif(OPTION_ZLIB)
 
 if(OPTION_PNG)
-   set(PNG_PROJECT libpng-1.6.19)
+   set(PNG_PROJECT libpng-1.6.24)
    set(PNG_ARGS ${EXTERNALS_CMAKE_ARGS} -DPNG_SHARED=off -DPNG_TESTS=off -DCMAKE_DEBUG_POSTFIX='')
    ExternalProject_Add(${PNG_PROJECT} 
       DOWNLOAD_NAME ${PNG_PROJECT}.tar.gz 
-      URL https://sourceforge.net/projects/libpng/files/libpng16/older-releases/1.6.19/libpng-1.6.19.tar.gz/download 
-      URL_HASH MD5=3121BDC77C365A87E054B9F859F421FE
+      URL https://sourceforge.net/projects/libpng/files/libpng16/1.6.24/libpng-1.6.24.tar.gz/download 
+      URL_HASH MD5=65213080DD30A9B16193D9B83ADC1EE9
       CMAKE_ARGS ${PNG_ARGS}
       DEPENDS zlib-1.2.8
       )
@@ -338,7 +338,7 @@ if(OPTION_PNG)
       DEPENDEES install
       )
 else(OPTION_PNG)
-   set(PNG_PROJECT libpng-1.6.19)
+   set(PNG_PROJECT )
 endif(OPTION_PNG)
 
 if(OPTION_SQLITE3)
