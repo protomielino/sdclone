@@ -174,6 +174,7 @@ int NetNetwork::GetDriverStartRank(int idx)
 
 NetDriver::NetDriver()
 {
+    //TODO more to initialize...
     //Initialize values
     idx = -1;
     memset(name,0,sizeof(name));
@@ -185,10 +186,10 @@ NetDriver::NetDriver()
     red = 1.0;
     green = 1.0;
     blue = 1.0;
-    hostPort = 0;
     client = false;
     memset(module,0,sizeof(module));
     memset(type,0,sizeof(type));
+    connectionID = 0;
 }
 
 bool NetworkInit();

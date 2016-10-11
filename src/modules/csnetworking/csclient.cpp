@@ -98,7 +98,7 @@ void NetClient::ResetNetwork()
 
     ENetPeer * pCurrentPeer1;
 
-    if (m_pHost ==NULL)
+    if (NULL == m_pHost)
         return;
 
     for (pCurrentPeer1 = m_pHost-> peers;
@@ -133,13 +133,13 @@ bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDrive
 
 #if (ENET_VERSION >= 0x010300)
     m_pClient = enet_host_create (NULL /* create a client host */,
-            MAXNETWORKPLAYERS, 
+            1, // peer count only the server shold connect
             2, /*channel limit*/
             0/* downstream bandwidth */,
             0/* upstream bandwidth */);
 #else
     m_pClient = enet_host_create (NULL /* create a client host */,
-            MAXNETWORKPLAYERS, 
+            1, // peer count only the server shold connect
             0/* downstream bandwidth */,
             0/* upstream bandwidth */);
 #endif
@@ -149,47 +149,6 @@ bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDrive
         GfLogError ("An error occurred while trying to create an ENet client host.\n");
         ResetNetwork();
         return false;
-    }
-
-    ENetAddress caddress;
-    caddress.host = ENET_HOST_ANY;
-
-    /* Bind the server to port*/
-    caddress.port = SPEEDDREAMSPEERPORT;
-
-#if (ENET_VERSION >= 0x010300)
-    m_pHost = enet_host_create (&caddress /* create a peer host */,
-            MAXNETWORKPLAYERS, 
-            2, /*channel limit*/
-            0/* downstream bandwidth */,
-            0/* upstream bandwidth */);
-#else
-    m_pHost = enet_host_create (&caddress /* create a peer host */,
-            MAXNETWORKPLAYERS, 
-            0/* downstream bandwidth */,
-            0/* upstream bandwidth */);
-#endif
-    if(m_pHost==NULL)
-    {
-        //try the other ports
-        for (int i=1;i<5;i++)
-        {
-            caddress.port++;
-#if (ENET_VERSION >= 0x010300)
-            m_pHost = enet_host_create (&caddress,MAXNETWORKPLAYERS,2,0,0);
-#else
-            m_pHost = enet_host_create (&caddress,MAXNETWORKPLAYERS,0,0);
-#endif
-            if(m_pHost)
-                break;
-
-        }
-
-        if (m_pHost == NULL)
-        {
-            GfLogError("Unable to setup client listener\n");
-            return false;
-        }
     }
 
     ENetAddress address;
@@ -290,11 +249,8 @@ void NetClient::SetDriverReady(bool bReady)
 bool NetClient::SendDriverInfoPacket(NetDriver *pDriver)
 {
     SetDriverName(pDriver->name);
-    pDriver->address.port = m_pHost->address.port;
 
     GfLogTrace("SendDriverInfoPacket: pDriver\n");
-    GfLogTrace("->host=%d\n", pDriver->address.host);
-    GfLogTrace("->port=%d\n", pDriver->address.port);
     GfLogTrace("->idx=%d\n", pDriver->idx);
     GfLogTrace("->name=%s\n", pDriver->name);
     GfLogTrace("->sname=%s\n", pDriver->sname);
@@ -605,66 +561,6 @@ void NetClient::ReadRaceSetupPacket(ENetPacket *pPacket)
     SetRaceInfoChanged(true);
 }
 
-void NetClient::ConnectToDriver(NetDriver driver)
-{
-    char hostName[256];
-    enet_address_get_host_ip (&driver.address,hostName,256);
-
-    if (!driver.client)
-    {
-        GfLogTrace("Skipping server: %s Address: %s\n",driver.name,hostName);
-        return;
-    }
-
-    if (strcmp(driver.name,GetDriverName())==0)
-    {
-        GfLogTrace("Skipping ourself: %s Address:  %s\n",driver.name,hostName);
-        return;
-    }
-
-    ENetPeer * pCurrentPeer;
-
-    for (pCurrentPeer = m_pClient-> peers;
-            pCurrentPeer < & m_pClient->peers [m_pClient->peerCount];
-            ++ pCurrentPeer)
-    {
-        if (pCurrentPeer->state == ENET_PEER_STATE_CONNECTED)
-        {
-            if ((pCurrentPeer->address.host == driver.address.host)&&
-                    (pCurrentPeer->address.port == driver.address.port))
-            {
-                GfLogTrace("Already connected to driver: %s Address: %s\n",driver.name,hostName);
-                return;
-            }
-        }
-
-    }
-
-    GfLogTrace("connecting to driver: %s Address: %s\n",driver.name,hostName);
-
-    //Connect to peer player
-    //ENetPeer *pPeer = enet_host_connect (m_pClient, &driver.address, 2);
-
-
-
-    ENetEvent event;
-
-    if (enet_host_service (m_pClient, & event, 5000) > 0 &&
-            event.type == ENET_EVENT_TYPE_CONNECT)
-    {
-        GfLogTrace("Successfully connected to peer\n");
-        return;
-    }
-    else
-    {
-        //char hostName[256];
-        //enet_address_get_host_ip (&event.peer->address,hostName,256);
-        GfLogWarning("Failed to connect to peer! (%X)\n", &event.peer->address);
-        return;
-    }
-
-}
-
 void NetClient::ReadWeatherPacket(ENetPacket *pPacket)
 {
     //TODO Xavier read in weather data
@@ -805,7 +701,7 @@ void NetClient::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
             pPacket->flags);
 
     //Send to connected clients
-    enet_host_broadcast (m_pHost, channel, pPacket);
+    //enet_host_broadcast (m_pHost, channel, pPacket);
 
     //Send to server
     enet_peer_send (m_pServer, channel, pHostPacket);
@@ -830,17 +726,18 @@ void NetClient::SetCarInfo(const char *pszName)
     }
 }
 
+// FIXME - remove this function
 void NetClient::ConnectToClients()
 {
-    std::vector<NetDriver> vecDrivers;
+    //std::vector<NetDriver> vecDrivers;
 
-    RobotXml robotxml;
-    robotxml.ReadRobotDrivers(NETWORKROBOT,vecDrivers);
+    //RobotXml robotxml;
+    //robotxml.ReadRobotDrivers(NETWORKROBOT,vecDrivers);
 
-    for(unsigned int i=0;i<vecDrivers.size();i++)
-    {
-        ConnectToDriver(vecDrivers[i]);
-    }
+    //for(unsigned int i=0;i<vecDrivers.size();i++)
+    //{
+    //    ConnectToDriver(vecDrivers[i]);
+    //}
 
 }
 

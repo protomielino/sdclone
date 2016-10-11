@@ -56,11 +56,11 @@ bool RobotXml::CreateRobotFile(const char*pRobotName,std::vector<NetDriver> &vec
         else
             GfParmSetStr(params, path2, "client","no");
 
-
-        char hostName[256];
-        enet_address_get_host_ip (&vecDrivers[i].address,hostName,256);
-        GfParmSetStr(params, path2, "host",hostName);
-        GfParmSetNum(params, path2, "port",(char*)NULL, vecDrivers[i].address.port);
+        // FIXME - remove the params in the XML ??
+        //char hostName[256];
+        //enet_address_get_host_ip (&vecDrivers[i].address,hostName,256);
+        //GfParmSetStr(params, path2, "host",hostName);
+        //GfParmSetNum(params, path2, "port",(char*)NULL, vecDrivers[i].address.port);
     }
 
     //Save our changes
@@ -104,12 +104,8 @@ bool RobotXml::ReadRobotDrivers(const char*pRobotName,std::vector<NetDriver> &ve
         driver.red = GfParmGetNum(params, path2, "red",NULL,1.0);
         driver.green = GfParmGetNum(params, path2, "green",NULL,1.0);
         driver.blue = GfParmGetNum(params, path2, "blue",NULL,1.0);
-        std::string strHost = GfParmGetStr(params, path2, "host",NULL);
+        std::string strHost = GfParmGetStr(params, path2, "host","");
 
-        ENetAddress address;
-        enet_address_set_host (& address, strHost.c_str());
-        driver.address.host = address.host;
-        driver.address.port = (enet_uint16)GfParmGetNum(params, path2, "port",NULL,0);
         strncpy(driver.module,NETWORKROBOT,64);
         vecDrivers.push_back(driver);
     }

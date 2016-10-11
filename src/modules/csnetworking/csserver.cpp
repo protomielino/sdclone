@@ -375,7 +375,7 @@ void NetServer::UpdateDriver(NetDriver & driver)
 
         if (!driver.client)
         {
-            driver.address = m_pServer->address;
+            driver.connectionID = 0;
         }
 
         pSData->m_vecNetworkPlayers.push_back(driver);
@@ -427,6 +427,7 @@ void NetServer::RemoveDriver(ENetEvent event)
 {
     int playerStartIndex;
     ENetAddress address = event.peer->address;
+    enet_uint32 peerConnectID = *((enet_uint32*)(event.peer->data));
 
     char hostName[256];
     enet_address_get_host_ip (&address,hostName,256);
@@ -442,7 +443,7 @@ void NetServer::RemoveDriver(ENetEvent event)
         while(p!=m_vecWaitForPlayers.end())
         {
 
-            if ((p->address.host == address.host)&&(p->hostPort == address.port))
+            if (p->connectionID == peerConnectID)
             {
                 m_vecWaitForPlayers.erase(p);
                 break;
@@ -461,7 +462,7 @@ void NetServer::RemoveDriver(ENetEvent event)
     {
         if (p->client)
         {
-            if ((p->address.host == address.host)&&(p->hostPort == address.port))
+            if (p->connectionID == peerConnectID)
             {
                 if(m_bRaceActive)
                 {
@@ -648,6 +649,7 @@ void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
 
     char hostName[256];
     enet_address_get_host_ip (&pPeer->address,hostName,256);
+    driver.connectionID = pPeer->connectID;
 
     GfLogTrace ("Client Player Info connected from %s\n",hostName); 
 
@@ -697,6 +699,7 @@ void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
     GfLogTrace(".module=%s\n", driver.module);
     GfLogTrace(".type=%s\n", driver.type);
     GfLogTrace(".client=%d\n", driver.client);
+    GfLogTrace(" ConnectID: %X\n",driver.connectionID);
 
     //Make sure player name is unique otherwise disconnect player
     NetServerMutexData *pSData = LockServerData();
@@ -705,7 +708,7 @@ void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
         if (strcmp(driver.name,pSData->m_vecNetworkPlayers[i].name)==0)
         {
             // check to see if existing client is just updating details
-            if (pPeer->address.host == pSData->m_vecNetworkPlayers[i].address.host) {
+            if (pPeer->connectID == pSData->m_vecNetworkPlayers[i].connectionID) {
                 GfLogInfo("Client driver updated details\n");
                 break;
             }
@@ -716,9 +719,6 @@ void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
         }
     }
     UnlockServerData();
-
-    driver.address.host = pPeer->address.host;
-    driver.hostPort = pPeer->address.port;
 
     SendPlayerAcceptedPacket(pPeer);
     UpdateDriver(driver);
@@ -886,8 +886,15 @@ bool NetServer::listen()
 
             GfLogTrace ("A new client connected from %s\n",hostName); 
 
+            // TODO FIXME
             /* Store any relevant client information here. */
-            event.peer -> data = (void*)"Client information";
+            event.peer->data = (void*)malloc(sizeof(event.peer->connectID));
+            if(event.peer->data)
+            {
+                memcpy(event.peer->data,&event.peer->connectID,sizeof(event.peer->connectID));
+                printf("event.peer->connectID = %ld \n",event.peer->connectID);
+                printf("ConnectID = %ld \n",*((enet_uint32*)(event.peer->data)));
+            }
 
             break;
 
@@ -908,7 +915,7 @@ bool NetServer::listen()
 
             /* Reset the peer's client information. */
 
-            event.peer -> data = NULL;
+            freez(event.peer->data);
             break;
 
         case ENET_EVENT_TYPE_NONE:
@@ -1039,12 +1046,15 @@ void NetServer::ReadPacket(ENetEvent event)
         break;
     case CARCONTROLS_PACKET:
         ReadCarControlsPacket(event.packet);
+        RelayPacket(event.packet, event.peer);
         break;
     case CARSTATUS_PACKET:
         ReadCarStatusPacket(event.packet);
+		RelayPacket(event.packet, event.peer, RELIABLECHANNEL);
         break;
     case LAPSTATUS_PACKET:
         ReadLapStatusPacket(event.packet);
+		RelayPacket(event.packet, event.peer, RELIABLECHANNEL);
         break;
     case DRIVERREADY_PACKET:
         ReadDriverReadyPacket(event.packet);
@@ -1130,6 +1140,24 @@ void NetServer::SendPrepareToRacePacket()
             ENET_PACKET_FLAG_RELIABLE);
 
     BroadcastPacket(pPacket,RELIABLECHANNEL);
+}
+
+void NetServer::RelayPacket(ENetPacket *pPacket, ENetPeer *pPeer, enet_uint8 channel /*= UNRELIABLECHANNEL */)
+{
+    int clients = m_pHost->peerCount;
+    for(int i = 0; i < clients; i++)
+    {
+        if(&m_pHost->peers[i] != pPeer)
+        {
+            ENetPacket * pRelayPacket = enet_packet_create (pPacket->data, 
+                pPacket->dataLength, 
+                pPacket->flags);
+
+            enet_peer_send (&m_pHost->peers[i], channel, pRelayPacket);
+            enet_host_flush(m_pHost);
+        }
+    }
+    m_activeNetworkTime = GfTimeClock();
 }
 
 void NetServer::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)

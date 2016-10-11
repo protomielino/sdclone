@@ -20,9 +20,9 @@ version              : $Id$
 #ifndef CSNETWORK_H
 #define CSNETWORK_H
 
-#ifdef _MSC_VER
-#pragma warning (disable: 4251)
-#endif
+//#ifdef _MSC_VER
+//#pragma warning (disable: 4251)
+//#endif
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
@@ -149,8 +149,6 @@ class NETWORKING_API NetDriver
 public:
     NetDriver();
     ~NetDriver() {}
-    ENetAddress address;
-    unsigned short hostPort;
 
     int idx;
     char name[64];
@@ -166,6 +164,7 @@ public:
     char type[64];
     bool client;
     bool active;
+	enet_uint32 connectionID;
 };
 
 //Holds car setup values
@@ -354,8 +353,6 @@ protected:
     void ReadPlayerRejectedPacket(ENetPacket *pPacket);
     void ReadPlayerAcceptedPacket(ENetPacket *pPacket);
 
-    void ConnectToDriver(NetDriver driver);
-
     virtual void BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel);
 
     bool m_bConnected;
@@ -433,6 +430,7 @@ protected:
 
     NetServerMutexData m_ServerData;
     virtual void BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel);
+    virtual void RelayPacket(ENetPacket *pPacket, ENetPeer *pPeer, enet_uint8 channel = UNRELIABLECHANNEL);
     void Dump(const char* pszCaller);
 
 
