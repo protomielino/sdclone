@@ -22,7 +22,11 @@
     @version	$Id$
 */
 
+#ifdef CLIENT_SERVER
+#include <csnetwork.h>
+#else
 #include <network.h>
+#endif
 
 #include "standardgame.h"
 

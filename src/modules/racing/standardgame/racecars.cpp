@@ -27,7 +27,11 @@
 
 #include <portability.h>
 #include <raceman.h>
+#ifdef CLIENT_SERVER
+#include <csnetwork.h>
+#else
 #include <network.h>
+#endif
 #include <robot.h>
 #include <robottools.h>
 #include <teammanager.h>

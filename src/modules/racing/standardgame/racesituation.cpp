@@ -34,7 +34,11 @@
 #endif
 
 #include <portability.h>
+#ifdef CLIENT_SERVER
+#include <csnetwork.h>
+#else
 #include <network.h>
+#endif
 #include <robot.h>
 #include <raceman.h>
 #include <replay.h>

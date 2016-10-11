@@ -71,7 +71,8 @@ ELSE(OPTION_USE_MACPORTS)
    ADD_PLIB_LIBRARY(tgfclient ul sg sl)
 ENDIF(OPTION_USE_MACPORTS)
 
-ADD_SDLIB_LIBRARY(tgfclient portability tgf networking)
+#ADD_SDLIB_LIBRARY(tgfclient portability tgf networking)
+ADD_SDLIB_LIBRARY(tgfclient portability tgf)
 
 ADD_PNG_LIBRARY(tgfclient)
 ADD_JPEG_LIBRARY(tgfclient)

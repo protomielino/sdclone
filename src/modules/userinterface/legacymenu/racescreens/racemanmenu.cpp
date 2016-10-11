@@ -39,7 +39,11 @@
 #include <cars.h>
 
 #include <playerconfig.h>
+#ifdef CLIENT_SERVER
+#include <csnetwork.h>
+#else
 #include <network.h>
+#endif
 
 #include "legacymenu.h"
 #include "racescreens.h"

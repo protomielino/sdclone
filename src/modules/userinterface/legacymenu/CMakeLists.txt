@@ -57,7 +57,17 @@ SET(LEGACYMENU_HEADERS ${MAINSCREENS_HEADERS}
 
 INCLUDE_DIRECTORIES(. ${MS} ${CS} ${RS})
 ADD_INTERFACE_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(math portability tgf tgfclient tgfdata networking)
+
+IF(OPTION_CLIENT_SERVER)
+   SET(NETWORKING_INC csnetworking)
+   SET(NETWORKING_LIB csnetworking)
+ELSE(OPTION_CLIENT_SERVER)
+   SET(NETWORKING_INC networking)
+   SET(NETWORKING_LIB networking)
+ENDIF(OPTION_CLIENT_SERVER)
+
+ADD_SDLIB_INCLUDEDIR(math portability tgf tgfclient tgfdata ${NETWORKING_INC})
+
 ADD_PLIB_INCLUDEDIR()
 
 IF(OPTION_SDL2)
@@ -89,6 +99,6 @@ SD_ADD_LIBRARY(legacymenu MODULE ${LEGACYMENU_SOURCES} ${LEGACYMENU_HEADERS})
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(legacymenu PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
-ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata networking)
+ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata ${NETWORKING_LIB})
 
 SD_INSTALL_FILES(LIB modules/userinterface TARGETS legacymenu)

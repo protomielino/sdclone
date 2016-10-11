@@ -22,7 +22,11 @@ This file deals with car settings
 */
 
 #include <cars.h>
+#ifdef CLIENT_SERVER
+#include <csnetwork.h>
+#else
 #include <network.h>
+#endif
 
 #include "carsettingsmenu.h"
 

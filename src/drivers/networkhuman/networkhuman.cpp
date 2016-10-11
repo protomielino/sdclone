@@ -28,7 +28,11 @@
  * Deleted original contents, except for robot interface entry points.
  */
 #include <portability.h>
+#ifdef CLIENT_SERVER
+#include <csnetwork.h>
+#else
 #include <network.h>
+#endif
 #include <humandriver.h>
 
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);

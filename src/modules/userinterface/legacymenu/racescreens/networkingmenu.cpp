@@ -38,7 +38,11 @@
 #include <tracks.h>
 #include <cars.h>
 #include <drivers.h>
+#ifdef CLIENT_SERVER
+#include <csnetwork.h>
+#else
 #include <network.h>
+#endif
 
 #include <playerconfig.h>
 #include <playerpref.h>

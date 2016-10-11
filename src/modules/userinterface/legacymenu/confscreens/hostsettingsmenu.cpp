@@ -22,7 +22,11 @@ This file deals with network host settings
 */
 
 #include <cars.h>
+#ifdef CLIENT_SERVER
+#include <csnetwork.h>
+#else
 #include <network.h>
+#endif
 
 #include "hostsettingsmenu.h"
 
