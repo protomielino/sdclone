@@ -86,6 +86,8 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_WEBSERVER false CACHE BOOL "Build with WebServer functionality")
 
+    SET(OPTION_CLIENT_SERVER false CACHE BOOL "Build with Client/Server network architecture")
+
     IF(APPLE)
       # Automatically set OPTION_USE_MACPORTS (at least until someone fixes the regular APPLE build)
       MESSAGE(STATUS "Automatically set OPTION_USE_MACPORTS (at least until someone fixes the regular APPLE build)")
@@ -204,6 +206,10 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     IF(OPTION_WEBSERVER)
           ADD_DEFINITIONS(-DWEBSERVER)
     ENDIF(OPTION_WEBSERVER)
+
+    IF(OPTION_CLIENT_SERVER)
+          ADD_DEFINITIONS(-DCLIENT_SERVER)
+    ENDIF(OPTION_CLIENT_SERVER)
 
     IF(OPTION_USE_MACPORTS)
           ADD_DEFINITIONS(-DUSE_MACPORTS)
