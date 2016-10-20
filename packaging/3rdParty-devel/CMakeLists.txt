@@ -125,24 +125,18 @@ endif(OPTION_SDL_1x)
 # message(WARNING "TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)")
 
 if(OPTION_SDL_2x)
-   set(SDL2_PROJECT SDL2-2.0.4)
+   set(SDL2_PROJECT SDL2-2.0.5)
    set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off)
+#   set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off -DSDL_MAIN_HANDLED=True)
    #message(STATUS "CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
    ExternalProject_Add(${SDL2_PROJECT} 
-   URL https://www.libsdl.org/release/SDL2-2.0.4.tar.gz 
-   URL_HASH SHA256=DA55E540BF6331824153805D58B590A29C39D2D506C6D02FA409AEDEAB21174B 
+   URL https://www.libsdl.org/release/SDL2-2.0.5.tar.gz 
+   URL_HASH SHA256=442038CF55965969F2FF06D976031813DE643AF9C9EDC9E331BD761C242E8785
+
    CMAKE_ARGS ${SDL2_ARGS}
    DEPENDS OpenGL-headers
    )
-   message(STATUS "Patching SDL 2.0.4 for DirectInput Haptics...")
-   message(STATUS "TODO - check if this patch is still needed with SDL2 > 2.0.4")
-   ExternalProject_Add_Step(${SDL2_PROJECT} sdl_2-dinput-patch
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${CMAKE_SOURCE_DIR}/patches/SDL_dinputhaptic.c.patched"
-            "<SOURCE_DIR>/src/haptic/windows/SDL_dinputhaptic.c"
-   DEPENDEES update # do after update
-   DEPENDERS patch  # do before patch
-   )
+
 else(OPTION_SDL_2x)
    set(SDL2_PROJECT )
 endif(OPTION_SDL_2x)
