@@ -495,6 +495,9 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
 		GfLogError("Couldn't initialize SDL audio/video sub-system (%s)\n", SDL_GetError());
 		return false;
 	}
+#if ((SDL_MAJOR_VERSION >= 2) && (SDL_PATCHLEVEL >= 5))
+	SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
+#endif
 
 	// Get selected frame buffer specs from config file
 	// 1) Load the config file
