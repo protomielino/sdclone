@@ -515,7 +515,7 @@ GfctrlSDL2JoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
    int			i,j;
    unsigned int	b;
    unsigned int	mask;
-   if (gfctrlJoyPresent == GFCTRL_JOY_PRESENT)
+   if (gfctrlJoyPresent != GFCTRL_JOY_UNTESTED)
    {
       // Update all the joysticks
       SDL_JoystickUpdate();
