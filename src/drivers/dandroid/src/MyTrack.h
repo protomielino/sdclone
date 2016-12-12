@@ -32,24 +32,8 @@ public:
   ~MyTrack();
 
   void NewTrack( tTrack* pNewTrack, double seg_len );
-
-  double GetLength() const;
   int  GetSize() const;
-  double GetWidth() const;
-
-  double NormalisePos( double trackPos ) const;
-  int  IndexFromPos( double trackPos ) const;
-
   const Seg& operator[]( int index ) const;
-  const Seg& GetAt( int index ) const;
-
-  double GetDelta() const;
-  double CalcPos( tTrkLocPos& trkPos, double offset = 0 ) const;
-  double CalcPos( tCarElt* car, double offset = 0 ) const;
-  double CalcPos( double x, double y, const Seg* hint = 0, bool sides = false ) const;
-
-  double CalcForwardAngle( double trackPos ) const;
-  Vec2d CalcNormal( double trackPos ) const;
 
 private:
   void CalcPtAndNormal( const tTrackSeg* pSeg, double toStart, double& t, Vec3d& pt, Vec3d& norm ) const;

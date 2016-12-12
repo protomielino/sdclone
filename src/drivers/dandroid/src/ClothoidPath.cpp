@@ -38,7 +38,7 @@ void ClothoidPath::MakeSmoothPath(MyTrack* pTrack, const Options& opts)
 {
   m_factor = opts.factor;
 
-  LinePath::Initialise( pTrack, opts.maxL, opts.maxR, opts.margin );
+  LinePath::Initialise( pTrack, opts.maxL, opts.maxR, opts.marginIns, opts.marginOuts );
 
   const int NSEG = pTrack->GetSize();
 
@@ -118,16 +118,25 @@ void ClothoidPath::SmoothBetween( int step )
         t += delta * kappa / deltaK;
       }
 
-      const double buf = 1.0;//1.25;
-      if( t < -l.Wl() + l.lBuf + buf )
-        t = -l.Wl() + l.lBuf + buf;
-      else if( t > l.Wr() - l.rBuf - buf )
-        t = l.Wr() - l.rBuf - buf;
-
-      if( t < -m_maxL + l.lBuf + buf )
-        t = -m_maxL + l.lBuf + buf;
-      else if( t > m_maxR - l.rBuf - buf )
-        t = m_maxR - l.rBuf - buf;
+      if( k1 >= 0 )// 0.00001 )
+      {
+        if( t < -l.Wl() + m_margin_inside )
+        t = -l.Wl() + m_margin_inside;
+      else if( t > l.Wr() - m_margin_outside )
+        t = l.Wr() - m_margin_outside;
+      }
+      else //if( k < -0.00001 )
+      {
+        if( t < -l.Wl() + m_margin_outside )
+          t = -l.Wl() + m_margin_outside;
+        else if( t > l.Wr() - m_margin_inside )
+          t = l.Wr() - m_margin_inside;
+      }
+  
+      if( t < -m_maxL )
+        t = -m_maxL;
+      else if( t > m_maxR )
+        t = m_maxR;
 
       l.offs = t;
       l.pt = l.CalcPt();
@@ -142,35 +151,22 @@ void ClothoidPath::SetOffset(
   const PathPt* l2, 
   const PathPt* l4 )
 {
-  double wl  = -MN(m_maxL, l3->Wl()) + m_margin;
-  double wr  =  MN(m_maxR, l3->Wr()) - m_margin;
-  double buf = MN(1.5, 100 * fabs(k)); // a = v*v/r;
+  double wl  = -MN(m_maxL, l3->Wl());
+  double wr  =  MN(m_maxR, l3->Wr());
 
   if( k >= 0 )// 0.00001 )
   {
-    if( t < wl )
-      t = wl;
-    else if( t > wr - l3->rBuf - buf )
-    {
-      if( l3->offs > wr - l3->rBuf - buf )
-        t = MN(t, l3->offs);
-      else
-        t = wr - l3->rBuf - buf;
-      t = MN(t, wr);
-    }
+    if( t < wl + m_margin_inside )
+      t = wl + m_margin_inside;
+    else if( t > wr - m_margin_outside )
+      t = wr - m_margin_outside;
   }
   else //if( k < -0.00001 )
   {
-    if( t > wr )
-      t = wr;
-    else if( t < wl + l3->lBuf + buf )
-    {
-      if( l3->offs < wl + l3->lBuf + buf )
-        t = MX(t, l3->offs);
-      else
-        t = wl + l3->lBuf + buf;
-      t = MX(t, wl);
-    }
+    if( t > wr - m_margin_inside )
+      t = wr - m_margin_inside;
+    else if( t < wl + m_margin_outside )
+      t = wl + m_margin_outside;
   }
 
   l3->offs = t;

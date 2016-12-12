@@ -47,12 +47,13 @@ class DanPoint {
 class DanSector {
   public:
   int sector;
+  int learned;
   double fromstart;
+  double brakedistfactor;
   double speedfactor;
   double time;
   double bestspeedfactor;
   double besttime;
-  int learned;
 };
 
 
@@ -91,7 +92,7 @@ class DanPath {
   enum PathLine{IDEAL_LINE, LEFT_LINE, RIGHT_LINE, NUM_LINES};
 
   DanPath();
-  void init(PTrack t, double max_left, double max_right, double margin, double factor, double seglen);
+  void init(PTrack t, double max_left, double max_right, double marginIn, double marginOut, double factor, double seglen);
   bool getDanPos(int line, double fromstart, DanPoint& danpoint);
   DanPoint nextPos(DanPoint danpoint);
   DanLine mDanLine[NUM_LINES];
@@ -100,7 +101,8 @@ class DanPath {
   PTrack mTrack;
   double mMaxL;
   double mMaxR;
-  double mMargin;
+  double mMarginIns;
+  double mMarginOuts;
   double mClothFactor;
   double mSegLen;
   void getClothPath();

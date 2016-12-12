@@ -45,7 +45,8 @@ void Opponent::update(PSituation s)
 {
   initState();
   // Check for cars out
-  if (car->_state & RM_CAR_STATE_NO_SIMU) {
+  if (car->_state & RM_CAR_STATE_NO_SIMU || car->_state & RM_CAR_STATE_PIT) {
+    mRacing = false;
     return;
   }
   calcDist();
@@ -67,7 +68,6 @@ void Opponent::update(PSituation s)
     mDistFromCenter = distFromCenter();
     mDistToStraight = distToStraight();
     mBehind = behind();
-    mAngle = angle();
     mInDrivingDirection = inDrivingDirection();
     mCatchtime = catchTime();
     mFastBehind = fastBehind();
@@ -80,16 +80,20 @@ void Opponent::initState()
   backmarker = false;
   letpass = false;
   mDist = DBL_MAX;
+  mRacing = true;
 }
 
 
 void Opponent::calcBasics()
 {
   fromStart = car->_distFromStartLine;
+  mAngle = angle();
   mAngleToTrack = RtTrackSideTgAngleL(&(car->_trkPos)) - car->_yaw;
   NORM_PI_PI(mAngleToTrack);
   mAngleToLeft = mAngleToTrack < 0.0 ? true : false;
+  prev_toMiddle = toMiddle;
   toMiddle = car->_trkPos.toMiddle;
+  toMiddleChangeRate = (toMiddle - prev_toMiddle) / RCM_MAX_DT_ROBOTS;
   sidedist = toMiddle - mycar->_trkPos.toMiddle;
   borderdist = car->_trkPos.seg->width / 2.0 - fabs(toMiddle);
 }
@@ -133,29 +137,32 @@ void Opponent::calcDist()
     mDist += track->length;
   }
   // more precise at slow speed
-  if (mycar->_speed_X < 20.0 && fabs(mDist) < 30.0) {
+  if (mycar->_speed_x < 20.0 && fabs(mDist) < 30.0) {
     double fraction = MAX(0.0, (fabs(mDist) - 15.0) / 15.0);
     double dX = car->_pos_X - mycar->_pos_X;
     double dY = car->_pos_Y - mycar->_pos_Y;
     mDist = fraction * mDist + (1.0 - fraction) * sqrt(dX * dX + dY * dY - sidedist * sidedist) * SIGN(mDist);
   }
-  double COLLDIST = 0.97 * car->_dimension_x;
+  double cardim = car->_dimension_x / 2.0 - (1 - fabs(cos(mAngle))) * (car->_dimension_x - car->_dimension_y) / 2.0 + mycar->_dimension_x / 2.0;
   mAside = false;
-  if (mDist >= COLLDIST) {
+  if (mDist >= cardim) {
     // opponent in front
-    mDist -= COLLDIST;
-  } else if (mDist <= -COLLDIST) {
+    mDist -= cardim;
+  } else if (mDist <= -cardim) {
     // opponent behind
-    mDist += COLLDIST;
+    mDist += cardim;
   } else {
     // opponent aside
-    if (mycar->_speed_X < 20.0) {
+    if (mycar->_speed_x < 8.0) {
       // more precise at slow speed
       mDist = cornerDist();
+      if (fabs(mDist) > 1.0) {
+        mAside = true;
+      }
     } else {
       mDist = 0.0;
+      mAside = true;
     }
-    mAside = true;
   }
 }
 
@@ -279,11 +286,6 @@ double Opponent::angle()
 {
   double oppangle = car->_yaw - mycar->_yaw;
   NORM_PI_PI(oppangle);
-  if (fabs(oppangle) > PI / 2.0) {
-    oppangle -= PI;
-    NORM_PI_PI(oppangle);
-    oppangle = -oppangle;
-  }
   return oppangle;
 }
 

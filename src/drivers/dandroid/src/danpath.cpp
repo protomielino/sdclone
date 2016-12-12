@@ -80,12 +80,13 @@ void DanLine::createSectors(std::vector <DanSector>& sect)
   int sector = 0;
   DanSector dansect;
   dansect.sector = sector;
+  dansect.learned = 0;
   dansect.fromstart = 0.0;
+  dansect.brakedistfactor = 1.0;
   dansect.speedfactor = 0.6;
   dansect.time = 0.0;
   dansect.bestspeedfactor = 0.6;
   dansect.besttime = 10000.0;
-  dansect.learned = 0;
   sect.push_back(dansect);
   double lastfromstart = dansect.fromstart;
   bool newsector = false;
@@ -234,24 +235,29 @@ bool DanLine::toMiddle(Vec2d pos, double& tomiddle)
 // Find nearest section on mLine
 int DanLine::getIndex(double fromstart)
 {
-  double estpos = fromstart / mTrack->length;
-  int i = (int)floor(estpos * mLine.size());
-  while (true) {
-    if (i < 0) {
-      i = mLine.size() - 1;
-    } else if (i >= (int)mLine.size()) {
-      i = 0;
+  if (fromstart >= 0.0 && fromstart <= mTrack->length) {
+    double estpos = fromstart / mTrack->length;
+    int i = (int)floor(estpos * mLine.size());
+    while (true) {
+      if (i < 0) {
+        i = mLine.size() - 1;
+      } else if (i >= (int)mLine.size()) {
+        i = 0;
+      }
+      double sectlen = getDistDiff(getPos(i).fromstart, getPos(i + 1).fromstart);
+//      double poslen = getDistDiff(getPos(i).fromstart, fromstart);
+      double poslen = getDistDiff(getPos(i).fromstart, fromstart+0.001);
+      if (poslen >= 0.0 && poslen <= sectlen) {
+        //GfOut("poslen:%g sectlen:%g", poslen, sectlen);
+        break;
+      }
+      i += (int)SIGN(poslen);
     }
-    double sectlen = getDistDiff(getPos(i).fromstart, getPos(i + 1).fromstart);
-//    double poslen = getDistDiff(getPos(i).fromstart, fromstart);
-    double poslen = getDistDiff(getPos(i).fromstart, fromstart+0.001);
-    if (poslen >= 0.0 && poslen <= sectlen) {
-      //GfOut("poslen:%g sectlen:%g", poslen, sectlen);
-      break;
-    }
-    i += (int)SIGN(poslen);
+    return i;
+  } else {
+    GfOut("!!!!!!!!!!!!!There is  a bug in DanLine::getIndex, 'fromstart'=%g is out of range !!!!!!!!!!!!!!!", fromstart);
+    return 0;
   }
-  return i;
 }
 
 
@@ -288,12 +294,13 @@ DanPath::DanPath()
 }
 
 
-void DanPath::init(PTrack t, double max_left, double max_right, double margin, double factor, double seglen)
+void DanPath::init(PTrack t, double max_left, double max_right, double marginIn, double marginOut, double factor, double seglen)
 {
   mTrack = t;
   mMaxL = max_left;
   mMaxR = max_right;
-  mMargin = margin;
+  mMarginIns = marginIn;
+  mMarginOuts = marginOut;
   mClothFactor = factor;
   mSegLen = seglen;
 
@@ -337,13 +344,13 @@ void DanPath::getClothPath()
   for (int l = 0; l < NUM_LINES; l++) {
     ClothoidPath clpath;
     if (l == IDEAL_LINE ) {
-      clpath.MakeSmoothPath(&track, ClothoidPath::Options(mMaxL, mMaxR, mMargin, mClothFactor));
+      clpath.MakeSmoothPath(&track, ClothoidPath::Options(mMaxL, mMaxR, mMarginIns, mMarginOuts, mClothFactor));
     }
     if (l == LEFT_LINE ) {
-      clpath.MakeSmoothPath(&track, ClothoidPath::Options(mMaxL, -1.0, mMargin, mClothFactor));
+      clpath.MakeSmoothPath(&track, ClothoidPath::Options(mMaxL, -0.5, 1.0, 1.5, mClothFactor));
     }
     if (l == RIGHT_LINE) {
-      clpath.MakeSmoothPath(&track, ClothoidPath::Options(-1.0, mMaxR, mMargin, mClothFactor));
+      clpath.MakeSmoothPath(&track, ClothoidPath::Options(-0.5, mMaxR, 1.0, 1.5, mClothFactor));
     }
     LinePath::PathPt pathpoint;
     for (int j = 0; j < track.GetSize(); j++) {

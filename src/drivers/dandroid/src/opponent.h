@@ -46,8 +46,8 @@ class Opponent {
     double getSpeed(double ltrackangle);
     void calcDist();
     double cornerDist();
-    double distFromCenter();
-    double distToStraight();
+    double distFromCenter();  // dist from door to door (y) line through center
+    double distToStraight();  // dist from front to back (x) line
     bool behind();
     double angle();
     bool inDrivingDirection();
@@ -59,13 +59,16 @@ class Opponent {
     PTrack track;
   public:
     double speed;    // speed in track direction
-    double fromStart; 
+    double fromStart;
+    bool mRacing;
     double mDist;      // approximation of the real distance
     double mAngleToTrack;
     bool mAngleToLeft;
     bool mAside;
     double sidedist;    // side distance of center of gravity of the cars
     double toMiddle;
+    double prev_toMiddle;
+    double toMiddleChangeRate; // m/s (positive to left)
     double borderdist;
     bool teammate;
     bool backmarker;

@@ -34,8 +34,6 @@ public:
     double offs; // offs from centre point.
     Vec3d pt; // actual pt (same as CalcPt())
     double h; // predicted height of car above track (flying).
-    double lBuf; // buffer from left for safety.
-    double rBuf; // buffer from right for safety.
     double fwdK;
 
     double Wl() const { return pSeg->wl; }
@@ -49,7 +47,7 @@ public:
   LinePath();
   virtual ~LinePath();
 
-  void	Initialise( MyTrack* pTrack, double maxL = 999, double maxR = 999, double margin = 1.0 );
+  void	Initialise( MyTrack* pTrack, double maxL = 999, double maxR = 999, double marginInside = 1.0, double marginOutside = 1.5 );
 
   const PathPt&	GetAt( int idx ) const;
 
@@ -66,7 +64,8 @@ protected:
 
   double m_maxL;
   double m_maxR;
-  double m_margin;
+  double m_margin_inside;
+  double m_margin_outside;
 };
 
 #endif // _LINEPATH_H_

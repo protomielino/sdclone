@@ -31,7 +31,7 @@ LinePath::~LinePath()
  delete [] m_pPath;
 }
 
-void LinePath::Initialise( MyTrack* pTrack, double maxL, double maxR, double margin )
+void LinePath::Initialise( MyTrack* pTrack, double maxL, double maxR, double marginInside, double marginOutside )
 {
   const int NSEG = pTrack->GetSize();
 
@@ -41,7 +41,8 @@ void LinePath::Initialise( MyTrack* pTrack, double maxL, double maxR, double mar
 
   m_maxL = maxL;
   m_maxR = maxR;
-  m_margin = margin;
+  m_margin_inside = marginInside;
+  m_margin_outside = marginOutside;
 
   for( int i = 0; i < NSEG; i++ )
   {
@@ -51,8 +52,6 @@ void LinePath::Initialise( MyTrack* pTrack, double maxL, double maxR, double mar
     m_pPath[i].offs = m_pPath[i].pSeg->midOffs;
     m_pPath[i].pt = m_pPath[i].CalcPt();
     m_pPath[i].h = 0;
-    m_pPath[i].lBuf = 0;
-    m_pPath[i].rBuf = 0;
   }
 
   CalcCurvaturesXY();

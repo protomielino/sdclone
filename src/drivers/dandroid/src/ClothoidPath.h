@@ -32,11 +32,12 @@ public:
   {
     double maxL;
     double maxR;
-    double margin;
+    double marginIns;
+    double marginOuts;
     double factor;
     
-    Options() : maxL(999), maxR(999), margin(1.0), factor(1.005) {}
-    Options( double ml /* = 999 */, double mr = 999, double ma = 1.0, double fa = 1.005 ) : maxL(ml), maxR(mr), margin(ma), factor(fa) {}
+    Options() : maxL(999), maxR(999), marginIns(1.0), marginOuts(1.5), factor(1.005) {}
+    Options( double ml /* = 999 */, double mr = 999, double maIn = 1.0, double maOut = 1.5, double fa = 1.005 ) : maxL(ml), maxR(mr), marginIns(maIn), marginOuts(maOut), factor(fa) {}
   };
 
 public:

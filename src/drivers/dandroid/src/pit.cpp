@@ -36,8 +36,8 @@ void Pit::init(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentr
   } else {
     PIT_DAMAGE = 5000;
   }
-  MAX_DAMAGE = 8000;              // [-]
-  MAX_DAMAGE_DIST = 50000;        // [m]
+  MAX_DAMAGE = 7000;              // [-]
+  MAX_DAMAGE_DIST = 30000;        // [m]
   ENTRY_MARGIN = pitentrymargin;  // [m]
   SPEED_LIMIT_MARGIN = 0.1;      // [m/s] savety margin
   track = t;
@@ -266,7 +266,7 @@ double Pit::getFuel()
 int Pit::getRepair()
 {
   if ((car->_remainingLaps - car->_lapsBehindLeader) * track->length < MAX_DAMAGE_DIST) {
-    return (int)(0.2 * car->_dammage);
+    return (int)(0.5 * car->_dammage);
   }
   return car->_dammage;
 }

@@ -82,103 +82,14 @@ void MyTrack::NewTrack( tTrack* pNewTrack, double seg_len )
   }
 }
 
-double MyTrack::GetLength() const
-{
-  return m_pCurTrack->length;
-}
-
 int  MyTrack::GetSize() const
 {
   return NSEG;
 }
 
-double MyTrack::GetWidth() const
-{
-  return m_pCurTrack->width;
-}
-
-double MyTrack::NormalisePos( double trackPos ) const
-{
-  while( trackPos < 0 )
-    trackPos += m_pCurTrack->length;
-  while( trackPos >= m_pCurTrack->length )
-    trackPos -= m_pCurTrack->length;
-  return trackPos;
-}
-
-int MyTrack::IndexFromPos( double trackPos ) const
-{
-  int idx = int(floor(trackPos / m_delta)) % NSEG;
-  if( idx < 0 )
-    idx += NSEG;
-  else if( idx >= NSEG )
-    idx -= NSEG;
-  return idx;
-}
-
 const Seg& MyTrack::operator[]( int index ) const
 {
  return m_pSegs[index];
-}
-
-const Seg& MyTrack::GetAt( int index ) const
-{
-  return m_pSegs[index];
-}
-
-double MyTrack::GetDelta() const
-{
-  return m_delta;
-}
-
-double MyTrack::CalcPos( tTrkLocPos& trkPos, double offset ) const
-{
-  double pos = RtGetDistFromStart2(&trkPos) + offset;
-  return NormalisePos(pos);
-}
-
-double MyTrack::CalcPos( tCarElt* car, double offset ) const
-{
-  double pos = RtGetDistFromStart(car) + offset;
-  return NormalisePos(pos);
-}
-
-double MyTrack::CalcPos( double x, double y, const Seg* hint, bool sides ) const
-{
-  tTrackSeg* pTrackSeg = m_pSegs[0].pSeg;
-  if( hint != 0 )
-    pTrackSeg = hint->pSeg;
-
-  tTrkLocPos pos;
-  RtTrackGlobal2Local( pTrackSeg, (tdble) x, (tdble) y, &pos, sides );
-  double dist = RtGetDistFromStart2(&pos);
-  return dist;
-}
-
-double MyTrack::CalcForwardAngle( double trackPos ) const
-{
-  int     idx = IndexFromPos(trackPos);
-  const tTrackSeg* pSeg = m_pSegs[idx].pSeg;
-
-  double t;
-  Vec3d pt;
-  Vec3d norm;
-  CalcPtAndNormal( pSeg, trackPos - pSeg->lgfromstart, t, pt, norm );
-
-  return Utils::VecAngXY(norm) + PI / 2;
-}
-
-Vec2d MyTrack::CalcNormal( double trackPos ) const
-{
-  int idx = IndexFromPos(trackPos);
-  const tTrackSeg* pSeg = m_pSegs[idx].pSeg;
-
-  double t;
-  Vec3d pt;
-  Vec3d norm;
-  CalcPtAndNormal( pSeg, trackPos - pSeg->lgfromstart, t, pt, norm );
-
-  return norm.GetXY();
 }
 
 void MyTrack::CalcPtAndNormal(const tTrackSeg* pSeg, double toStart, double& t, Vec3d& pt, Vec3d& norm ) const
