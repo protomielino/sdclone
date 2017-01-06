@@ -96,24 +96,6 @@ void NetClient::ResetNetwork()
 
     NetSetClient(false);
 
-    ENetPeer * pCurrentPeer1;
-
-    if (NULL == m_pHost)
-        return;
-
-    for (pCurrentPeer1 = m_pHost-> peers;
-            pCurrentPeer1 < & m_pHost->peers [m_pHost->peerCount];
-            ++ pCurrentPeer1)
-    {
-        if (pCurrentPeer1->state != ENET_PEER_STATE_CONNECTED)
-            continue;
-
-        enet_peer_reset (pCurrentPeer1);
-    }
-
-    enet_host_destroy(m_pHost);
-    m_pHost = NULL;
-
 }
 
 bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDriver)
@@ -158,11 +140,11 @@ bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDrive
     address.port = (enet_uint16)port;
 
     /* Initiate the connection, allocating the two channels 0 and 1. */
-    GfLogError ("Initiating network connection to host '%s:%d' ...\n", pAddress, port);
+    GfLogInfo ("Initiating network connection to host '%s:%d' ...\n", pAddress, port);
 #if (ENET_VERSION >= 0x010300)
-    m_pServer = enet_host_connect (m_pClient, & address, 2, 0);
+    m_pServer = enet_host_connect (m_pClient, &address, 2, 0);
 #else
-    m_pServer = enet_host_connect (m_pClient, & address, 2);
+    m_pServer = enet_host_connect (m_pClient, &address, 2);
 #endif
 
     if (m_pServer == NULL)
@@ -193,6 +175,7 @@ bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDrive
     SendDriverInfoPacket(pDriver);
 
     //Wait for server to accept or reject 
+    // TODO don't wait forever
     GfLogInfo ("Sent local driver info to the network server : waiting ...\n");
     while(m_eClientAccepted == PROCESSINGCLIENT)
         SDL_Delay(50);
@@ -474,7 +457,6 @@ bool NetClient::listen()
         return false;
 
     listenHost(m_pClient);
-    listenHost(m_pHost);
 
     return true;
 }
@@ -699,9 +681,6 @@ void NetClient::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
     ENetPacket * pHostPacket = enet_packet_create (pPacket->data, 
             pPacket->dataLength, 
             pPacket->flags);
-
-    //Send to connected clients
-    //enet_host_broadcast (m_pHost, channel, pPacket);
 
     //Send to server
     enet_peer_send (m_pServer, channel, pHostPacket);

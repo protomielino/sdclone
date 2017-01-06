@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : networkingmenu.cpp
+    file                 : csnetworkingmenu.cpp
     created              : July 2009
     copyright            : (C) 2009 Brian Gavin
     web                  : speed-dreams.sourceforge.net
@@ -22,8 +22,7 @@
    The server sees a list of players and the client sees a list of other players.
    Should also allow choosing IP address, track, etc ...
 */
-
-#ifndef CLIENT_SERVER
+#ifdef CLIENT_SERVER
 #include <cstdlib>
 #include <cstdio>
 #include <string>
@@ -76,6 +75,7 @@ static int g_NameId;
 
 static char	buf[1024];
 static void	*racemanMenuHdle = NULL;
+static void	*previousMenuHandle = RmRaceSelectMenuHandle;
 static bool	bRobotsReady = false;
 static bool	bGarage = false;
 
@@ -98,6 +98,7 @@ CarSettingsMenu g_CarMenu;
 static RmGarageMenu GarageMenu;
 
 static int GetHumanDriver(NetDriver &driver,int index);
+static int GetHumanDriverIdx(void);
 static void ServerPrepareStartNetworkRace(void *pVoid);
 static void NetworkClientConnectMenu(void * /* dummy */);
 
@@ -248,12 +249,12 @@ UpdateNetworkPlayers()
 	pNetwork->SetCurrentDriver();
 
 	//reload xml file
-	NetGetNetwork()->SetRaceXMLFile("config/raceman/networkrace.xml");
-	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
+	//NetGetNetwork()->SetRaceXMLFile("config/raceman/networkrace.xml");
+	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.tmp",GFPARM_RMODE_REREAD);
 	assert(reInfo->params);
 
-	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
-	assert(reInfo->_reName);
+	//reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+	//assert(reInfo->_reName);
 
 	// Scan each of the human drivers to see if they're active in this race
 	if (NetIsServer()) {
@@ -279,7 +280,7 @@ UpdateNetworkPlayers()
 			pSData->m_vecNetworkPlayers[i].active = false;
 			newDriver = GfDrivers::self()->getDriver(NETWORKROBOT, pSData->m_vecNetworkPlayers[i].idx);
 
-			// Scan through drivers listed in 'networkrace.xml'
+			// Scan through drivers listed in 'networkrace.tmp'
 			while (pSData->m_vecNetworkPlayers[i].active == false) {
 				sprintf(path2, "%s/%d", RM_SECT_DRIVERS, k++);
 				if (GfParmExistsSection(reInfo->params, path2) == 0) {
@@ -327,7 +328,7 @@ UpdateNetworkPlayers()
 	GfTrack* PCurTrack = GfTracks::self()->getTrackWithName(buf);
 	LmRaceEngine().race()->getManager()->setEventTrack(0, PCurTrack);
 	
-	int laps = (int)GfParmGetNum(reInfo->params, reInfo->_reName,"laps", "", 1);
+	int laps = (int)GfParmGetNum(reInfo->params, "Online Race","laps", "", 1);
 	sprintf(buf, "%i", laps);
 	GfuiLabelSetText(racemanMenuHdle,g_lapsHd,buf);
 
@@ -476,13 +477,14 @@ rmNetworkClientDisconnect(void * /* dummy */)
 	if (NetGetClient())
 		NetGetClient()->Disconnect();
 
-	GfuiScreenActivate(RmRaceSelectMenuHandle);
+	GfuiScreenActivate(previousMenuHandle);
 }
 
 
 static void
 CheckDriversCategory()
 {
+	return;
 	bool bDriversChange = false;
 	std::string strCarCat;
 	bool bCollisions;
@@ -531,7 +533,7 @@ HostServerIdle(void)
 			CheckDriversCategory();
 			//Send to clients all of the xml files we modified and client needs to reload
 			NetGetServer()->SendFilePacket("drivers/networkhuman/networkhuman.xml");
-			NetGetServer()->SendFilePacket("config/raceman/networkrace.xml");
+			NetGetServer()->SendFilePacket("config/raceman/networkrace.tmp");
 			NetGetServer()->SendRaceSetupPacket();
 			NetGetServer()->SendDriversReadyPacket();
 			NetGetServer()->SetRaceInfoChanged(false);
@@ -541,6 +543,7 @@ HostServerIdle(void)
 			if (NetGetServer()->GetRefreshDisplay())
 			{
 				UpdateNetworkPlayers();
+				NetGetServer()->SetRaceInfoChanged(false);
 			}
 
 		}
@@ -592,64 +595,101 @@ ClientIdle(void)
 static void
 NetworkRaceInfo()
 {
-	NetDriver driver;
-	int i = 1;
+	//NetDriver driver;
+	//int i = 1;
 
-	NetGetServer()->SetRaceXMLFile("config/raceman/networkrace.xml");
+	// May not be needed
+	//NetGetServer()->ClearDrivers();
+	//NetGetServer()->SetRaceXMLFile("config/raceman/networkrace.tmp");
 
 	//Look up race info
 	tRmInfo* reInfo = LmRaceEngine().inData();
-	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_STD);
+	GfRace* pRace = LmRaceEngine().race();
+	const GfRaceManager* pRaceMan = pRace->getManager();
 
-	int nCars = GfParmGetEltNb(reInfo->params, RM_SECT_DRIVERS);
+	// Get the currently selected track for the race (should never fail, unless no track at all).
+	const GfTrack* pTrack = pRace->getTrack();
 
-	if (nCars == 0)
-	{
-		// Add all local humans if there are no drivers already specified
-		while (GetHumanDriver(driver,i++)) {
-			driver.client = false;
-			driver.active = true;
-			NetGetServer()->UpdateDriver(driver);
-			NetGetServer()->SetDriverName(driver.name);
-			GfLogInfo("NetworkRaceInfo: Adding default driver %s\n",driver.name);
+		//Update track info
+	//std::string strTrackPath = GfParmGetStr(reInfo->params, "Tracks/1", RM_ATTR_NAME, "");
+	//std::string strCategory = GfParmGetStr(reInfo->params, "Tracks/1", RM_ATTR_CATEGORY, "");
 
-		}
+	std::string strTrackName = pTrack->getName();//GetTrackName(strCategory.c_str(),strTrackPath.c_str());
 
-		// ensure changes writen to 'networkrace.xml'
-		NetGetServer()->GenerateDriversForXML();
+	//sprintf(buf, "%s", strTrackName.c_str());
+	GfuiLabelSetText(racemanMenuHdle,g_trackHd,strTrackName.c_str());
 
-		// add drivers so they show up in race config dialogue
-		GfDrivers::self()->reload();
-		LmRaceEngine().race()->load(LmRaceEngine().race()->getManager(), true);
-	} else {
-		// Add the humans which are already in the race
-		char	dname[256];
 
-		for (i = 1; i < nCars+1; i++) {
-			sprintf(dname, "%s/%d", RM_SECT_DRIVERS, i);
+	int laps = (int)GfParmGetNum(reInfo->params,"Online Race","laps", "", 1);
+	sprintf(buf, "%i", laps);
+	GfuiLabelSetText(racemanMenuHdle,g_lapsHd,buf);
 
-			if(strcmp(NETWORKROBOT, GfParmGetStr(reInfo->params, dname, RM_ATTR_MODULE, "")) == 0) {
-				if (GetHumanDriver(driver,i) > -1) {
-					driver.client = false;
-					driver.active = true;
-					NetGetServer()->UpdateDriver(driver);
-					NetGetServer()->SetDriverName(driver.name);
-					GfLogInfo("NetworkRaceInfo: Adding default driver %s\n",driver.name);
-				}
-			}
-		}
-	}
+	GfuiScreenAddBgImg(racemanMenuHdle, pTrack->getPreviewFile().c_str());
+	GfuiStaticImageSet(racemanMenuHdle, g_OutlineId,pTrack->getOutlineFile().c_str());
+
+
+
+	return;
+
+//	NetGetServer()->SetRaceXMLFile("config/raceman/networkrace.tmp");
+
+	NetGetServer()->ClearDrivers();
+
+	//Look up race info
+	//tRmInfo* reInfo = LmRaceEngine().inData();
+	//reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.tmp",GFPARM_RMODE_STD);
+
+	//NetGetServer()->ClearDrivers();
+	//int nCars = GfParmGetEltNb(reInfo->params, RM_SECT_DRIVERS);
+
+	//if (nCars == 0)
+	//{
+	//	// Add all local humans if there are no drivers already specified
+	//	while (GetHumanDriver(driver,i++)) {
+	//		driver.client = false;
+	//		driver.active = true;
+	//		NetGetServer()->UpdateDriver(driver);
+	//		NetGetServer()->SetDriverName(driver.name);
+	//		GfLogInfo("NetworkRaceInfo: Adding default driver %s\n",driver.name);
+
+	//	}
+
+	//	// ensure changes writen to 'networkrace.tmp'
+	//	NetGetServer()->GenerateDriversForXML();
+
+	//	// add drivers so they show up in race config dialogue
+	//	GfDrivers::self()->reload();
+	//	LmRaceEngine().race()->load(LmRaceEngine().race()->getManager(), true);
+	//} else {
+	//	// Add the humans which are already in the race
+	//	char	dname[256];
+
+	//	for (i = 1; i < nCars+1; i++) {
+	//		sprintf(dname, "%s/%d", RM_SECT_DRIVERS, i);
+
+	//		if(strcmp(NETWORKROBOT, GfParmGetStr(reInfo->params, dname, RM_ATTR_MODULE, "")) == 0) {
+	//			if (GetHumanDriver(driver,i) > -1) {
+	//				driver.client = false;
+	//				driver.active = true;
+	//				NetGetServer()->UpdateDriver(driver);
+	//				NetGetServer()->SetDriverName(driver.name);
+	//				GfLogInfo("NetworkRaceInfo: Adding default driver %s\n",driver.name);
+	//			}
+	//		}
+	//	}
+	//}
 
 	// make sure nobody is 'ready to race'
-	NetMutexData *pNData = NetGetNetwork()->LockNetworkData();
-	for (unsigned int i=0; i < pNData->m_vecReadyStatus.size(); i++)
-		pNData->m_vecReadyStatus[i] = false;
-	NetGetNetwork()->UnlockNetworkData();
-	bRobotsReady = false;
+	//NetMutexData *pNData = NetGetNetwork()->LockNetworkData();
+	//for (unsigned int i=0; i < pNData->m_vecReadyStatus.size(); i++)
+	//	pNData->m_vecReadyStatus[i] = false;
+	//NetGetNetwork()->UnlockNetworkData();
+	//bRobotsReady = false;
 
 	// ensure the system knows about 'new' network drivers
-	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
+	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.tmp",GFPARM_RMODE_REREAD);
 	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+	GfDrivers::self()->reload();
 }
 
 // Not used for the moment.
@@ -660,73 +700,280 @@ NetworkRaceInfo()
 
 static void OnActivateNetworkClient(void *)
 {
-	int nDriverIdx = NetGetNetwork()->GetDriverIdx();
+	//tRmInfo* reInfo = LmRaceEngine().inData();
+	//	// Create a local file - and switch to it
+	//GfParmWriteFileLocal("config/raceman/networkrace.xml",reInfo->params,"Online Race");
+	//GfParmWriteFileLocal("config/raceman/networkrace.bak",reInfo->params,"Online Race");
+	//reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.tmp",GFPARM_RMODE_REREAD);
 
-	if(NetGetNetwork()->IsConnected() && nDriverIdx > -1) {
-		// Menu reactivated after garage menu is done
+	if (!NetGetClient())
+	{
+		NetSetServer(false);
+		NetSetClient(true);
+
+		NetGetNetwork()->SetRaceXMLFile("config/raceman/networkrace.tmp");
+
 		NetDriver driver;
-		char newName[64];
-		char dname[256];
+		int idx = GetHumanDriverIdx();
+		GetHumanDriver(driver,idx);
+		driver.client = true;
+		driver.active = true;
 
-		// check for car change
-		if (bGarage == true ) {
-			bGarage = false;
-
-			tRmInfo* reInfo = LmRaceEngine().inData();
-			reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
-			reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
-
-			sprintf(dname, "%s/%d", RM_SECT_DRIVERS, nDriverIdx);
-			int idx = GfParmGetNum(reInfo->params, dname, RM_ATTR_IDX, "",0);
-
-			GfDriver* PCurrentDriver = GfDrivers::self()->getDriver(NETWORKROBOT, idx);
-			strncpy(newName, PCurrentDriver->getCar()->getId().c_str(), sizeof(newName));
-
-			GfLogInfo("Client: Index %d changed to %s\n", idx, newName);
-			NetGetNetwork()->SetCarInfo(newName);
-		} else {
-			// Ensure menu system knows about all cars
-			GfDrivers::self()->reload();
-			// tRmInfo* reInfo = LmRaceEngine().inData(); // Never used
-			LmRaceEngine().race()->load(LmRaceEngine().race()->getManager(), true);
+		//strcpy(driver.name,g_strDriver.c_str());
+///////////////////// TODO TEMPORARY 	COMMENTED OUT
+		if (!NetGetClient()->ConnectToServer((char*)g_strHostIP.c_str(),SPEEDDREAMSPORT,&driver))
+		{
+			//TODO check that this return is OK
+			//failed so back to connect menu
+			//NetworkClientConnectMenu(NULL);
+			NetSetClient(false);
+			return;
 		}
+
+		NetGetClient()->SendDriverInfoPacket(&driver);
+///////////////////// TODO END TEMPORARY 	COMMENTED OUT
 	}
+
+	//int nDriverIdx = NetGetNetwork()->GetDriverIdx();
+
+	//if(NetGetNetwork()->IsConnected() && nDriverIdx > -1) {
+	//	// Menu reactivated after garage menu is done
+	//	NetDriver driver;
+	//	char newName[64];
+	//	char dname[256];
+
+	//	// check for car change
+	//	if (bGarage == true ) {
+	//		bGarage = false;
+
+	//		tRmInfo* reInfo = LmRaceEngine().inData();
+	//		reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.tmp",GFPARM_RMODE_REREAD);
+	//		reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+
+	//		sprintf(dname, "%s/%d", RM_SECT_DRIVERS, nDriverIdx);
+	//		int idx = GfParmGetNum(reInfo->params, dname, RM_ATTR_IDX, "",0);
+
+	//		GfDriver* PCurrentDriver = GfDrivers::self()->getDriver(NETWORKROBOT, idx);
+	//		strncpy(newName, PCurrentDriver->getCar()->getId().c_str(), sizeof(newName));
+
+	//		GfLogInfo("Client: Index %d changed to %s\n", idx, newName);
+	//		NetGetNetwork()->SetCarInfo(newName);
+	//	} else {
+	//		// Ensure menu system knows about all cars
+	//		GfDrivers::self()->reload();
+	//		// tRmInfo* reInfo = LmRaceEngine().inData(); // Never used
+	//		LmRaceEngine().race()->load(LmRaceEngine().race()->getManager(), true);
+	//	}
+	//}
+	UpdateNetworkPlayers();
 
 	GfuiApp().eventLoop().setRecomputeCB(ClientIdle);
 	bGarage = false;
 }
 
+void rmUseRealConfigFile()
+{
+	///////////////////////////
+	char buf[256];
+
+	tRmInfo* reInfo = LmRaceEngine().inData();
+	//LmRaceEngine().race()->removeAllCompetitors();
+	snprintf(buf, sizeof(buf), "%sconfig/raceman/%s.xml", GfLocalDir(), reInfo->_reFilename);
+
+	reInfo->params = GfParmReadFile(buf,GFPARM_RMODE_REREAD);
+	printf("%s\n",reInfo->_reName);
+	////reInfo->_reFilename = "netserver";
+	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+
+	LmRaceEngine().race()->getManager()->reset(reInfo->params, /* bClosePrevHdle= */ true);
+
+	LmRaceEngine().race()->load(LmRaceEngine().race()->getManager(), true);
+
+	// Notify the race engine of the changes (this is a non-interactive config., actually).
+	LmRaceEngine().configureRace(/* bInteractive */ false);
+
+///////////////////////////
+	//tRmInfo* reInfo = LmRaceEngine().inData();
+
+	//reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+	//assert(reInfo->_reName);
+	//GfParmWriteFileLocal("config/raceman/networkrace.tmp", reInfo->params, reInfo->_reName);
+
+	//reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.tmp",GFPARM_RMODE_REREAD);
+	//assert(reInfo->params);
+
+	//reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+	//assert(reInfo->_reName);
+	//NetGetNetwork()->SetRaceXMLFile("config/raceman/networkrace.tmp");
+}
+
+static void rmUseTempConfigFile()
+{
+	tRmInfo* reInfo = LmRaceEngine().inData();
+
+	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+	assert(reInfo->_reName);
+	GfParmWriteFileLocal("config/raceman/networkrace.tmp", reInfo->params, reInfo->_reName);
+
+	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.tmp",GFPARM_RMODE_REREAD);
+	assert(reInfo->params);
+
+	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+	assert(reInfo->_reName);
+}
+
+static void rmConvertDriversForNetwork()
+{
+	NetDriver driver;
+	const std::vector<GfDriver*>& vecCompetitors = LmRaceEngine().race()->getCompetitors();
+
+	NetGetServer()->ClearDrivers();
+	//LmRaceEngine().race()->removeAllCompetitors();
+	//LmRaceEngine().race()->store();
+	rmUseTempConfigFile();
+	GfParmListClean(LmRaceEngine().inData()->params, RE_SECT_DRIVERS);
+	//GfParmListClean(LmRaceEngine().inData()->params, RM_SECT_DRIVERINFO);
+
+	std::vector<GfDriver*>::const_iterator itCompetitors;
+	for (itCompetitors = vecCompetitors.begin(); itCompetitors != vecCompetitors.end(); itCompetitors++)
+	{
+		GfDriver* pDriver = (*itCompetitors);
+		if(pDriver->isHuman())
+		{
+			int index = pDriver->getInterfaceIndex();
+			if(GetHumanDriver(driver,index) > -1)
+			{
+				driver.client = false;
+				driver.active = true;
+				NetGetServer()->UpdateDriver(driver);
+				NetGetServer()->SetDriverName(driver.name);
+				GfLogInfo("rmConvertDriversForNetwork: Adding driver %s\n",driver.name);
+			}
+		}
+	}
+	// ensure changes writen to 'networkrace.tmp'
+	NetGetServer()->GenerateDriversForXML();
+
+	// add drivers so they show up in race config dialogue
+	GfDrivers::self()->reload();
+	LmRaceEngine().race()->load(LmRaceEngine().race()->getManager(), true);
+
+		// make sure nobody is 'ready to race'
+	NetMutexData *pNData = NetGetNetwork()->LockNetworkData();
+	for (unsigned int i=0; i < pNData->m_vecReadyStatus.size(); i++)
+		pNData->m_vecReadyStatus[i] = false;
+	NetGetNetwork()->UnlockNetworkData();
+	bRobotsReady = false;
+
+	tRmInfo* reInfo = LmRaceEngine().inData();
+	// ensure the system knows about 'new' network drivers
+	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.tmp",GFPARM_RMODE_REREAD);
+	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+	
+}
+
+// FIXME - move this function to networking
+//		   it is designed to be called from text mode
+static void rmInitHostLobbyMode()
+{
+	//tRmInfo* reInfo = LmRaceEngine().inData();
+	//assert(reInfo->params);
+
+	//// Create a local file - and switch to it
+	//GfParmWriteFileLocal("config/raceman/networkrace.tmp",reInfo->params,"Online Race");
+	//
+	//reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.tmp",GFPARM_RMODE_REREAD);
+	//reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+	rmUseTempConfigFile();
+
+	if (!NetGetNetwork())
+	{
+		NetSetServer(true);
+		NetSetClient(false);
+		NetGetNetwork()->SetRaceXMLFile("config/raceman/networkrace.tmp");
+		rmConvertDriversForNetwork();
+		if (!NetGetServer()->Start(SPEEDDREAMSPORT))
+		{
+			//TODO check that this return is OK
+			NetSetServer(false);
+			return;
+		}
+	}
+	// Set everyone to the 'not-ready' state
+	bRobotsReady = 0;
+	if (NetGetNetwork())
+	{
+		//NetGetServer()->SetRaceXMLFile("config/raceman/networkrace.tmp");
+
+		NetMutexData *pNData = NetGetNetwork()->LockNetworkData();
+		for (unsigned int i=0;i<pNData->m_vecReadyStatus.size();i++)
+			pNData->m_vecReadyStatus[i] = false;
+		NetGetNetwork()->UnlockNetworkData();
+	}
+	//if(NetGetServer())
+	//{
+	//	NetGetServer()->ClearDrivers();
+	//}
+}
 
 static void
 OnActivateNetworkHost(void *)
 {
-	tRmInfo* reInfo = LmRaceEngine().inData();
+	rmInitHostLobbyMode();
 
-	// Set everyone to the 'not-ready' state
-	bRobotsReady = 0;
-	NetMutexData *pNData = NetGetNetwork()->LockNetworkData();
-	for (unsigned int i=0;i<pNData->m_vecReadyStatus.size();i++)
-		pNData->m_vecReadyStatus[i] = false;
-	NetGetNetwork()->UnlockNetworkData();
+	if (NetGetNetwork())
+	{
+		NetGetServer()->SetRaceInfoChanged(true);
 
-	NetGetServer()->SetRaceInfoChanged(true);
+		NetGetServer()->SetRefreshDisplay(true);
 
-	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
-	assert(reInfo->params);
-	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
-	GfuiApp().eventLoop().setRecomputeCB(HostServerIdle);	
+		UpdateNetworkPlayers();
 
-	NetGetServer()->SetRefreshDisplay(true);
+		GfuiApp().eventLoop().setRecomputeCB(HostServerIdle);
+	}
+	else
+	{
+		// FIXME - what to do if no network ???
+		GfuiApp().eventLoop().setRecomputeCB(GfuiIdle);
+	}
 }
+
+static void
+OnDeactivateNetworkClient(void *)
+{
+	GfuiApp().eventLoop().setRecomputeCB(GfuiIdle);
+
+	tRmInfo* reInfo = LmRaceEngine().inData();
+	//reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.bak",GFPARM_RMODE_REREAD);
+	reInfo->params = GfParmReadFileLocal("config/raceman/netclient.xml",GFPARM_RMODE_REREAD);
+}
+
 
 static void
 rmNetworkServerDisconnect(void * /* dummy */)
 {
 	GfLogInfo("Disconnecting all clients\n");
-	if (NetGetServer())
-		NetGetServer()->Disconnect();
+	GfuiApp().eventLoop().setRecomputeCB(GfuiIdle);
 
-	GfuiScreenActivate(RmRaceSelectMenuHandle);
+	if (NetGetServer())
+	{
+		NetGetServer()->ClearDrivers();
+		NetGetServer()->Disconnect();
+	}
+	rmUseRealConfigFile();
+
+	//tRmInfo* reInfo = LmRaceEngine().inData();
+	//LmRaceEngine().race()->removeAllCompetitors();
+	//reInfo->params = GfParmReadFileLocal("config/raceman/netserver.xml",GFPARM_RMODE_REREAD);
+	//printf("%s\n",reInfo->_reName);
+	//////reInfo->_reFilename = "netserver";
+	//reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+	//GfDrivers::self()->reload();
+	//LmRaceEngine().race()->load(LmRaceEngine().race()->getManager(), true);
+	//////LmRaceEngine().race()->removeAllCompetitors();
+	//////reInfo->params = GfParmReadFileLocal("config/raceman/netserver.xml",GFPARM_RMODE_REREAD);
+	GfuiScreenActivate(previousMenuHandle);
+	//RmConfigRunState(/*bStart=*/true);
 }
 
 static void
@@ -743,7 +990,7 @@ rmCarSettingsMenu(void *pMenu)
 		GfLogInfo("Car %d changed \n", nDriverIdx);
 
 		tRmInfo* reInfo = LmRaceEngine().inData();
-		reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
+		reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.tmp",GFPARM_RMODE_REREAD);
 		reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 
 		sprintf(dname, "%s/%d", RM_SECT_DRIVERS, nDriverIdx);
@@ -763,28 +1010,38 @@ rmNetworkHostSettingsMenu(void *pMenu)
 {
 	g_HostMenu.initialize(pMenu);
 	
-	RmSetRacemanMenuHandle(g_HostMenu.getMenuHandle());
+	//RmSetRacemanMenuHandle(g_HostMenu.getMenuHandle());
 
 	g_HostMenu.runMenu();
 }
 
-
 // Host on-line race menu.
 void
-RmNetworkHostMenu(void * /* dummy */)
+RmNetworkHostMenu(void* pPreviousScreen)
 {
 	GfLogTrace("Entering Network Host menu.\n");
-	
-	if (!NetGetNetwork())
+
+	if(pPreviousScreen)
 	{
-		NetSetServer(true);
-		NetSetClient(false);
-		if (!NetGetServer()->Start(SPEEDDREAMSPORT))
-		{
-			NetSetServer(false);
-			return;
-		}
+		previousMenuHandle = pPreviousScreen;
 	}
+	else
+	{
+		previousMenuHandle = RmRaceSelectMenuHandle;
+	}
+
+///////////////////// TODO TEMPORARY 	COMMENTED OUT
+	//if (!NetGetNetwork())
+	//{
+	//	NetSetServer(true);
+	//	NetSetClient(false);
+	//	if (!NetGetServer()->Start(SPEEDDREAMSPORT))
+	//	{
+	//		NetSetServer(false);
+	//		return;
+	//	}
+	//}
+///////////////////// TODO END TEMPORARY 	COMMENTED OUT
 
 	if (racemanMenuHdle)
 		GfuiScreenRelease(racemanMenuHdle);
@@ -796,9 +1053,7 @@ RmNetworkHostMenu(void * /* dummy */)
 
 	GfuiMenuCreateStaticControls(racemanMenuHdle, mparam);
 
-	RmSetRacemanMenuHandle(racemanMenuHdle);
-
-	NetworkRaceInfo();
+	//RmSetRacemanMenuHandle(racemanMenuHdle);
 
 	g_trackHd = GfuiMenuCreateLabelControl(racemanMenuHdle,mparam,"trackname");
 
@@ -807,7 +1062,8 @@ RmNetworkHostMenu(void * /* dummy */)
     
 	g_OutlineId = GfuiMenuCreateStaticImageControl(racemanMenuHdle,mparam,"outlineimage");
 	
-	//Show players
+	//Show players 
+	// TODO change to scroll list for more players?
 	for (int i = 0; i < MAXNETWORKPLAYERS; i++) {
 		char buf[1024];
 		sprintf(buf,"ready%i",i);
@@ -823,18 +1079,19 @@ RmNetworkHostMenu(void * /* dummy */)
 		GfuiLabelSetText(racemanMenuHdle,g_carNames[i],"");
 	}
 
-	g_ReadyCheckboxId =
-		GfuiMenuCreateCheckboxControl(racemanMenuHdle, mparam, "playerreadycheckbox",
-								NULL, onHostPlayerReady);
+	//g_ReadyCheckboxId =
+	//	GfuiMenuCreateCheckboxControl(racemanMenuHdle, mparam, "playerreadycheckbox",
+	//							NULL, onHostPlayerReady);
 
+	// TODO -- move this to config...
 	g_HostSettingsButtonId =
 		GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "networkhostsettings",
 								racemanMenuHdle, rmNetworkHostSettingsMenu);
-	GfuiEnable(racemanMenuHdle, g_HostSettingsButtonId, GFUI_DISABLE);
+	GfuiEnable(racemanMenuHdle, g_HostSettingsButtonId, GFUI_ENABLE);
 
-	g_RaceSetupId =
-		GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "racesetup",
-								racemanMenuHdle, RmConfigureRace);
+	//g_RaceSetupId =
+	//	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "racesetup",
+	//							racemanMenuHdle, RmConfigureRace);
 
 	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "start race",
 								NULL, ServerPrepareStartNetworkRace);
@@ -847,7 +1104,8 @@ RmNetworkHostMenu(void * /* dummy */)
 	GfuiAddKey(racemanMenuHdle, GFUIK_ESCAPE, "Back to previous menu",
 								0, 0, rmNetworkServerDisconnect);
 
-	UpdateNetworkPlayers();
+	// Add race info to menu items
+	NetworkRaceInfo();
 
 	GfuiScreenActivate(racemanMenuHdle);
 }
@@ -860,8 +1118,8 @@ ShowWaitingToConnectScreen()
 	if (racemanMenuHdle) 
 		GfuiScreenRelease(racemanMenuHdle);
 
-	racemanMenuHdle = GfuiScreenCreate(NULL,  NULL, (tfuiCallback) NULL, 
-									   NULL, (tfuiCallback)NULL,  1);
+	racemanMenuHdle = GfuiScreenCreate(NULL,  previousMenuHandle, (tfuiCallback) NULL, 
+									   NULL, OnDeactivateNetworkClient,  1);
 
 	void *mparam = GfuiMenuLoad("networkwaitconnectmenu.xml");
 	GfuiMenuCreateStaticControls(racemanMenuHdle, mparam);
@@ -874,36 +1132,49 @@ ShowWaitingToConnectScreen()
 }
 
 void
-RmNetworkClientMenu(void * /* dummy */)
+RmNetworkClientMenu(void* pPreviousScreen)
 {
 	GfLogTrace("Entering Network Client menu.\n");
-	
-	ShowWaitingToConnectScreen();
-	
-	if (!NetGetClient())
+	rmUseTempConfigFile();
+
+	if(pPreviousScreen)
 	{
-		NetSetServer(false);
-		NetSetClient(true);
-
-		NetDriver driver;
-		GetHumanDriver(driver,1);
-		driver.client = true;
-		driver.active = true;
-		strcpy(driver.name,g_strDriver.c_str());
-		if (!NetGetClient()->ConnectToServer((char*)g_strHostIP.c_str(),SPEEDDREAMSPORT,&driver))
-		{
-			//failed so back to connect menu
-			NetworkClientConnectMenu(NULL);
-			return;
-		}
-
-		//NetGetClient()->SendDriverInfoPacket(&driver);
+		previousMenuHandle = pPreviousScreen;
 	}
+	else
+	{
+		previousMenuHandle = RmRaceSelectMenuHandle;
+	}
+	
+	// TODO -need this, but somewhere else...
+	//ShowWaitingToConnectScreen();
+	
+//	if (!NetGetClient())
+//	{
+//		NetSetServer(false);
+//		NetSetClient(true);
+//
+//		NetDriver driver;
+//		GetHumanDriver(driver,1);
+//		driver.client = true;
+//		driver.active = true;
+//		strcpy(driver.name,g_strDriver.c_str());
+/////////////////////// TODO TEMPORARY 	COMMENTED OUT
+//		if (!NetGetClient()->ConnectToServer((char*)g_strHostIP.c_str(),SPEEDDREAMSPORT,&driver))
+//		{
+//			//failed so back to connect menu
+//			NetworkClientConnectMenu(NULL);
+//			return;
+//		}
+//
+//		NetGetClient()->SendDriverInfoPacket(&driver);
+/////////////////////// TODO END TEMPORARY 	COMMENTED OUT
+//	}
 
 	if (racemanMenuHdle)
 		GfuiScreenRelease(racemanMenuHdle);
 
-	racemanMenuHdle = GfuiScreenCreate(NULL,  NULL, (tfuiCallback)OnActivateNetworkClient, 
+	racemanMenuHdle = GfuiScreenCreate(NULL,  previousMenuHandle, (tfuiCallback)OnActivateNetworkClient, 
 									   NULL, (tfuiCallback)NULL, 1);
 
 	void *mparam = GfuiMenuLoad("networkclientmenu.xml");
@@ -911,7 +1182,7 @@ RmNetworkClientMenu(void * /* dummy */)
 
 	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
 
-	RmSetRacemanMenuHandle(racemanMenuHdle);
+	//RmSetRacemanMenuHandle(racemanMenuHdle);
 
 	g_trackHd = GfuiMenuCreateLabelControl(racemanMenuHdle,mparam,"trackname");
 
@@ -950,11 +1221,11 @@ RmNetworkClientMenu(void * /* dummy */)
 
 	GfParmReleaseHandle(mparam);
 
-	UpdateNetworkPlayers();
+	//UpdateNetworkPlayers();
 	
 	GfuiScreenActivate(racemanMenuHdle);
 	
-	GfuiApp().eventLoop().setRecomputeCB(ClientIdle);
+	//GfuiApp().eventLoop().setRecomputeCB(ClientIdle);
 }
 
 static void 
@@ -1026,11 +1297,11 @@ NetworkClientConnectMenu(void * /* dummy */)
 	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "ConnectButton",
 								0, RmNetworkClientMenu);
 	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "BackButton",
-								RmRaceSelectMenuHandle, GfuiScreenActivate);
+								previousMenuHandle, GfuiScreenActivate);
 	
 	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
 	GfuiAddKey(racemanMenuHdle, GFUIK_ESCAPE, "Back to previous menu",
-								RmRaceSelectMenuHandle, 0, GfuiScreenActivate);
+								previousMenuHandle, 0, GfuiScreenActivate);
 
 	GfParmReleaseHandle(mparam);
 	
@@ -1069,11 +1340,11 @@ RmNetworkMenu(void *)
 								0, NetworkClientConnectMenu);
 
 	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "BackButton",
-								RmRaceSelectMenuHandle, GfuiScreenActivate);
+								previousMenuHandle, GfuiScreenActivate);
 
 	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
 	GfuiAddKey(racemanMenuHdle, GFUIK_ESCAPE, "Back to previous menu",
-								RmRaceSelectMenuHandle, 0, GfuiScreenActivate);
+								previousMenuHandle, 0, GfuiScreenActivate);
 
 	GfParmReleaseHandle(mparam);
 	
@@ -1090,9 +1361,26 @@ ServerPrepareStartNetworkRace(void * /* dummy */)
 
 	//restore the idle function
 	GfuiApp().eventLoop().setRecomputeCB(GfuiIdle);
+
+	tRmInfo* reInfo = LmRaceEngine().inData();
+	LmRaceEngine().race()->getManager()->reset(reInfo->params, /* bClosePrevHdle= */ true);
+
+	LmRaceEngine().race()->load(LmRaceEngine().race()->getManager(), true);
+
+	// Notify the race engine of the changes (this is a non-interactive config., actually).
+	LmRaceEngine().configureRace(/* bInteractive */ false);
+	LmRaceEngine().race()->setDirty(false);
 	LmRaceEngine().startNewRace();
 }
 
+// Retrieve the idx value for the local human driver (only one is permitted)
+static int GetHumanDriverIdx(void)
+{
+	int idx = 0;
+	tRmInfo* reInfo = LmRaceEngine().inData();
+	idx = GfParmGetNum(reInfo->params, "Drivers/1", RM_ATTR_IDX, "",0);
+	return idx;
+}
 // Retrieve the NetDriver instance with given index in the human module interface list
 static int
 GetHumanDriver(NetDriver &driver,int index)

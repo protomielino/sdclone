@@ -257,7 +257,7 @@ bool NetNetwork::IsClientMode()
 // Get the index of the local network-human driver in the networkhuman interface list
 int NetNetwork::GetNetworkHumanIdx()
 {
-    assert(m_strDriverName!="");
+    //assert(m_strDriverName!="");
     int idx = 1;
 
     char buf[255];

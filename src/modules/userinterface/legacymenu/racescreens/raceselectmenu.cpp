@@ -132,7 +132,11 @@ RmRaceSelectInit(void *prevMenu)
 											NULL, rmOnActivate, 
 											NULL, (tfuiCallback)NULL, 
 											1);
-    void *hMenuXMLDesc = GfuiMenuLoad("raceselectmenu.xml");
+#if defined(CLIENT_SERVER)
+    void *hMenuXMLDesc = GfuiMenuLoad("csraceselectmenu.xml");
+#else
+	void *hMenuXMLDesc = GfuiMenuLoad("raceselectmenu.xml");
+#endif
     GfuiMenuCreateStaticControls(RmRaceSelectMenuHandle, hMenuXMLDesc);
 
     // Create the raceman type buttons and sub-type combo-boxes (if any).

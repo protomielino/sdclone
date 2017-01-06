@@ -222,7 +222,7 @@ double NetServer::WaitForRaceStart()
 void NetServer::ClearDrivers()
 {
     LockServerData()->m_vecNetworkPlayers.clear();
-    LockServerData()->Unlock();
+    UnlockServerData();
     GenerateDriversForXML();
     Dump("NetServer::ClearDrivers");
 }
@@ -250,6 +250,8 @@ void NetServer::GenerateDriversForXML()
     assert(params);
 
     const char *pName =GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+
+	GfParmListClean(params, RE_SECT_DRIVERS);
 
     // We only want to add human drivers which don't already exist
     NetServerMutexData *pSData = LockServerData();
@@ -312,7 +314,7 @@ void NetServer::SetLocalDrivers()
 
     int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);	
     //Gather vector of all non human drivers
-    std::vector<NetDriver> vecRDrivers;
+////    std::vector<NetDriver> vecRDrivers;
     for (int i=1;i<=nCars;i++)
     {
         NetDriver driver;
@@ -892,8 +894,8 @@ bool NetServer::listen()
             if(event.peer->data)
             {
                 memcpy(event.peer->data,&event.peer->connectID,sizeof(event.peer->connectID));
-                printf("event.peer->connectID = %ld \n",event.peer->connectID);
-                printf("ConnectID = %ld \n",*((enet_uint32*)(event.peer->data)));
+                printf("event.peer->connectID = %X \n",event.peer->connectID);
+                printf("ConnectID = %X \n",*((enet_uint32*)(event.peer->data)));
             }
 
             break;

@@ -454,8 +454,12 @@ rmdsClickOnDriver(void * /* dummy */)
 	GfuiEnable(ScrHandle, MoveDownButtonId,
 			   nSelCompInd >= 0 && nSelCompInd < (int)nCompetitors - 1 ? GFUI_ENABLE : GFUI_DISABLE);
 
+// TODO - need to determine if this IS a network game and if it is Server OR Spectator
+//      - allow 0 Competitors
+#ifndef CLIENT_SERVER
     // Don't allow user to Accept 0 drivers, this would cause a crash.
     GfuiEnable(ScrHandle, NextButtonId, nCompetitors > 0 ? GFUI_ENABLE : GFUI_DISABLE);
+#endif
 }
 
 static void
