@@ -89,7 +89,8 @@ static std::string g_strCar;
 static float green[] = {0.0, 1.0, 0.0, 1.0};
 static float white[] = {1.0, 1.0, 1.0, 1.0};
 
-static std::string g_strHostIP = "127.0.0.1";
+std::string g_strHostIP = "127.0.0.1";
+std::string g_strHostPort = "28500";
 
 HostSettingsMenu g_HostMenu;
 CarSettingsMenu g_CarMenu;

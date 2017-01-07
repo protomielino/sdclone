@@ -42,6 +42,10 @@
 static tRmTrackSelect  ts;
 static tRmDriverSelect ds;
 static tRmRaceParam    rp;
+#ifdef CLIENT_SERVER
+static tRmNetworkSetting cs;
+static tRmNetworkSetting ss;
+#endif
 
 
 static void
@@ -172,7 +176,32 @@ RmConfigRunState(bool bStart)
 		rp.session = GfParmGetStr(params, path, RM_ATTR_RACE, RM_VAL_ANYRACE);
 		RmRaceParamsMenu(&rp);
 	}
-	
+#ifdef CLIENT_SERVER
+	else if (!strcmp(conf, RM_VAL_CLIENTCONF)) {
+		
+		// network client settings menu
+		cs.nextScreen = rmConfigHookInit();
+		if (curConf == 1) {
+			cs.prevScreen = RmGetRacemanMenuHandle();
+		} else {
+			cs.prevScreen = rmConfigBackHookInit();
+		}
+		cs.pRace = LmRaceEngine().race();
+		RmClientSettings(&cs);
+
+	}else if (!strcmp(conf, RM_VAL_SERVERCONF)) {
+		
+		// network server settings menu
+		ss.nextScreen = rmConfigHookInit();
+		if (curConf == 1) {
+			ss.prevScreen = RmGetRacemanMenuHandle();
+		} else {
+			ss.prevScreen = rmConfigBackHookInit();
+		}
+		ss.pRace = LmRaceEngine().race();
+		RmServerSettings(&ss);
+	}
+#endif	
 	// Prepare next configuration if any.
 	curConf++;
 	GfParmSetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, curConf);

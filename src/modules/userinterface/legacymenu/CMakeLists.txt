@@ -45,7 +45,9 @@ SET(RACESCREENS_SOURCES ${RS}/raceselectmenu.cpp
                         ${RS}/racestopmenu.cpp ${RS}/racestartmenu.cpp ${RS}/racepitmenu.cpp 
                         ${RS}/raceresultsmenus.cpp ${RS}/racenexteventmenu.cpp)
 IF(OPTION_CLIENT_SERVER)
-   SET(RACESCREENS_SOURCES ${RACESCREENS_SOURCES} ${RS}/csnetworkingmenu.cpp)
+   SET(RACESCREENS_SOURCES ${RACESCREENS_SOURCES} ${RS}/csnetworkingmenu.cpp 
+                                                  ${RS}/csnetclientsettings.cpp
+                                                  ${RS}/csnetserversettings.cpp)
 ENDIF(OPTION_CLIENT_SERVER)
 SET(RACESCREENS_HEADERS ${RS}/racescreens.h ${RS}/garagemenu.h) #${RS}/raceweekendscreens.h)
 

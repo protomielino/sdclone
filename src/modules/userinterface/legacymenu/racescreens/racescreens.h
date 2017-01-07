@@ -55,6 +55,14 @@ typedef struct RmRaceParam
     void        	*prevScreen;	/* Race manager screen to go back */
     void        	*nextScreen;	/* Race manager screen to go after select */
 } tRmRaceParam;
+#ifdef CLIENT_SERVER
+typedef struct RmNetworkSetting
+{
+	GfRace      *pRace; /* The race to update */
+    void        *prevScreen;	/* Race manager screen to go back */
+    void        *nextScreen;	/* Race manager screen to go after select */
+} tRmNetworkSetting;
+#endif
 
 typedef void (*tfSelectFile) (const char *);
 
@@ -74,6 +82,11 @@ typedef struct RmFileSelect
 extern void RmTrackSelect(void * /* vs */);
 
 extern void RmDriversSelect(void * /* vs */);
+
+#ifdef CLIENT_SERVER
+extern void RmClientSettings(void * /* cs */);
+extern void RmServerSettings(void * /* ss */);
+#endif
 
 extern void RmPitMenuStart(tCarElt * /* car */, tSituation * /* situation */, tfuiCallback /* callback */);
 

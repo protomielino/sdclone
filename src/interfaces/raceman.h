@@ -307,6 +307,10 @@ typedef struct RmInfo
 #define RM_VAL_DRVSEL		"drivers select"
 #define RM_VAL_RACECONF		"race config"
 #define RM_VAL_ANYRACE		"All Sessions"
+#ifdef CLIENT_SERVER
+#define RM_VAL_CLIENTCONF	"client config"
+#define RM_VAL_SERVERCONF	"server config"
+#endif
 
 #define RM_VAL_CONFRACELEN	"race length"
 #define RM_VAL_CONFDISPMODE	"display mode"
