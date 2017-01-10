@@ -33,6 +33,9 @@
 
 #include "racescreens.h"
 
+#include "csnetworking.h"
+#include <csnetwork.h>
+
 
 // Menu variables.
 static void* menuScreen;
@@ -42,27 +45,93 @@ static tRmNetworkSetting *MenuData;
 static int rmcsIpEditId;
 static int rmcsPortEditId;
 
+
+// value variables
+static int portNumber = SPEEDDREAMSPORT;
+static std::string hostIP = "127.0.0.1";
+
 extern std::string g_strHostIP;
 extern std::string g_strHostPort;
 
-static void
-rmcsChangeIP(void * /* dummy */)
-{
-    char	*val;
+static char	buf[512];
 
-    val = GfuiEditboxGetString(menuScreen, rmcsIpEditId);
-    if (val!=NULL)
-        g_strHostIP = val;
+static void
+loadOptions()
+{
+    snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), CS_PARAM_FILE);
+    void* grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+    portNumber = GfParmGetNum(grHandle, CS_SECT_CLIENT, CS_ATT_PORT, NULL, SPEEDDREAMSPORT);
+    hostIP =  GfParmGetStr(grHandle, CS_SECT_CLIENT, CS_ATT_IP4, "127.0.0.1");
+    // TODO
+
+    GfParmReleaseHandle(grHandle);
 }
 
 static void
-rmcsChangePort(void * /* dummy */)
+saveOptions()
 {
-    char	*val;
+    // Force current edit to loose focus (if one has it) and update associated variable.
+    GfuiUnSelectCurrent();
 
-    val = GfuiEditboxGetString(menuScreen, rmcsPortEditId);
-    if (val!=NULL)
-        g_strHostPort = val;
+    snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), CS_PARAM_FILE);
+    void* grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+    GfParmSetNum(grHandle, CS_SECT_CLIENT, CS_ATT_PORT, NULL, portNumber);
+    GfParmSetStr(grHandle, CS_SECT_CLIENT, CS_ATT_IP4, hostIP.c_str());
+    // TODO
+
+    GfParmWriteFile(NULL, grHandle, "networking");
+
+    GfParmReleaseHandle(grHandle);
+
+    g_strHostIP = hostIP;
+    snprintf(buf,sizeof(buf),"%ud",portNumber);
+    g_strHostPort = buf;
+
+}
+
+static void
+rmcsChangeIP(void* vp)
+{
+    if (vp)
+    {
+        char* val = GfuiEditboxGetString(menuScreen, rmcsIpEditId);
+        if (val != NULL)
+        {
+            hostIP = val;
+        }
+    }
+
+    // Display current value
+    GfuiEditboxSetString(menuScreen, rmcsIpEditId, hostIP.c_str());
+}
+
+static void
+rmcsChangePort(void* vp)
+{
+    if (vp)
+    {
+        char* val = GfuiEditboxGetString(menuScreen, rmcsPortEditId);
+        if (val != NULL)
+        {
+            portNumber = strtol(val, (char **)NULL, 0);
+        }
+    }
+
+    // Display current value
+    snprintf(buf, sizeof(buf), "%d", portNumber);
+    GfuiEditboxSetString(menuScreen, rmcsPortEditId, buf);
+}
+
+static void
+rmcsActivate(void* /* dummy */)
+{
+    loadOptions();
+
+    rmcsChangeIP(0);
+    rmcsChangePort(0);
+
 }
 
 static void
@@ -76,10 +145,18 @@ rmcsDeactivate(void *screen)
 }
 
 static void
+rmcsNext(void* nextScreenHandle)
+{
+    saveOptions();
+    
+    rmcsDeactivate(nextScreenHandle);
+}
+
+static void
 rmcsAddKeys(void)
 {
     GfuiMenuDefaultKeysAdd(menuScreen);
-    GfuiAddKey(menuScreen, GFUIK_RETURN, "Accept", MenuData->nextScreen, rmcsDeactivate, NULL);
+    GfuiAddKey(menuScreen, GFUIK_RETURN, "Accept", MenuData->nextScreen, rmcsNext, NULL);
     GfuiAddKey(menuScreen, GFUIK_ESCAPE, "Cancel", MenuData->prevScreen, rmcsDeactivate, NULL);
 }
 
@@ -91,14 +168,14 @@ RmClientSettings(void *cs)
     GfLogTrace("Entering Network Client Sttings menu.\n");
 
     // Create the screen, load menu XML descriptor and create static controls.
-    menuScreen = GfuiScreenCreate(NULL, NULL, (tfuiCallback)NULL, NULL, (tfuiCallback)NULL, 1);   
+    menuScreen = GfuiScreenCreate(NULL, NULL, rmcsActivate, NULL, (tfuiCallback)NULL, 1);   
     void *menuXML = GfuiMenuLoad("csnetworkclientmenu.xml");
     GfuiMenuCreateStaticControls(menuScreen, menuXML);
 
-    rmcsIpEditId = GfuiMenuCreateEditControl(menuScreen, menuXML, "IPAddrEdit", 0, 0, rmcsChangeIP);
+    rmcsIpEditId = GfuiMenuCreateEditControl(menuScreen, menuXML, "IPAddrEdit", (void*)1, 0, rmcsChangeIP);
     GfuiEditboxSetString(menuScreen, rmcsIpEditId, g_strHostIP.c_str());
 
-    rmcsPortEditId = GfuiMenuCreateEditControl(menuScreen, menuXML, "PortEdit", 0, 0, rmcsChangePort);
+    rmcsPortEditId = GfuiMenuCreateEditControl(menuScreen, menuXML, "PortEdit", (void*)1, 0, rmcsChangePort);
     GfuiEditboxSetString(menuScreen, rmcsPortEditId, g_strHostPort.c_str());
 
     // Create the variable title label.
@@ -107,9 +184,9 @@ RmClientSettings(void *cs)
     strTitle += MenuData->pRace->getManager()->getName().c_str();
     GfuiLabelSetText(menuScreen, titleId, strTitle.c_str());
 
-    // Create Accept and Cancel buttons
+    // Create Next and Back buttons
     GfuiMenuCreateButtonControl(menuScreen, menuXML, "nextbutton",
-                                MenuData->nextScreen, rmcsDeactivate);
+                                MenuData->nextScreen, rmcsNext);
     GfuiMenuCreateButtonControl(menuScreen, menuXML, "backbutton",
                                 MenuData->prevScreen, rmcsDeactivate);
     

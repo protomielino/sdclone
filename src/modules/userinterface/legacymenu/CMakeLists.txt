@@ -49,7 +49,11 @@ IF(OPTION_CLIENT_SERVER)
                                                   ${RS}/csnetclientsettings.cpp
                                                   ${RS}/csnetserversettings.cpp)
 ENDIF(OPTION_CLIENT_SERVER)
+
 SET(RACESCREENS_HEADERS ${RS}/racescreens.h ${RS}/garagemenu.h) #${RS}/raceweekendscreens.h)
+IF(OPTION_CLIENT_SERVER)
+   SET(RACESCREENS_HEADERS ${RACESCREENS_HEADERS} ${RS}/csnetworking.h) 
+ENDIF(OPTION_CLIENT_SERVER)
 
 SET(LEGACYMENU_SOURCES ${MAINSCREENS_SOURCES} 
                        ${CONFSCREENS_SOURCES} 
