@@ -132,7 +132,7 @@ MACRO(SPLIT_ARGN)
 
 				#Check if it is what we expect
 				IF(NOT SA_EXPECT_KEYWORD)
-					MESSAGE(ERROR "Unexpected keyword in SPLIT_ARGN, got \"${SA_ITEM}\".")
+					MESSAGE(ERROR ": Unexpected keyword in SPLIT_ARGN, got \"${SA_ITEM}\".")
 				ELSE(NOT SA_EXPECT_KEYWORD)
 					#Save information about the keyword
 					SPLIT_ARGN_GET_KEYWORD(${SA_ITEM} SA_KEYWORD_FOUND SA_CUR_KEYWORD SA_CUR_MINCOUNT SA_CUR_MAXCOUNT SA_CUR_ISVARNAME SA_CUR_VARNAME ${ARGN})
@@ -141,7 +141,7 @@ MACRO(SPLIT_ARGN)
 						SET(${SA_CUR_VARNAME})
 						SET(${SA_CUR_ISVARNAME} FALSE)
 					ELSE(SA_KEYWORD_FOUND)
-						MESSAGE(ERROR "Got keyword, but didn't found information about \"${SA_ITEM}\"")
+						MESSAGE(ERROR ": Got keyword, but didn't found information about \"${SA_ITEM}\"")
 					ENDIF(SA_KEYWORD_FOUND)
 				ENDIF(NOT SA_EXPECT_KEYWORD)
 
@@ -149,7 +149,7 @@ MACRO(SPLIT_ARGN)
 
 				#Check if it is what we expect
 				IF(NOT SA_EXPECT_VALUE)
-					MESSAGE(ERROR "Unexpected value in SPLIT_ARGN, got \"${SA_ITEM}\".")
+					MESSAGE(ERROR ": Unexpected value in SPLIT_ARGN, got \"${SA_ITEM}\".")
 				ELSE(NOT SA_EXPECT_VALUE)
 					#Save this item to the list
 					SET(${SA_CUR_VARNAME} ${${SA_CUR_VARNAME}} ${SA_ITEM})
@@ -179,7 +179,7 @@ MACRO(SPLIT_ARGN)
 	
 	IF(SA_START AND NOT SA_EXPECT_KEYWORD)
 		#Didn't get all the expected values of the last keyword
-		MESSAGE(ERROR "Missing values at the end in SPLIT_ARGN.")
+		MESSAGE(ERROR ": Missing values at the end in SPLIT_ARGN.")
 	ENDIF(SA_START AND NOT SA_EXPECT_KEYWORD)
 
 ENDMACRO(SPLIT_ARGN)

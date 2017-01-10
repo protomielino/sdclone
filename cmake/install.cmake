@@ -406,7 +406,7 @@ MACRO(SD_INSTALL_DIRECTORIES)
       SET(POSTFIX "")
     ENDIF()
   ELSE()
-    MESSAGE(ERROR "SD_INSTALL_DIRECTORIES: Expected mandatory DATA and DIRECTORIES keywords")
+    MESSAGE(ERROR ": SD_INSTALL_DIRECTORIES: Expected mandatory DATA and DIRECTORIES keywords")
   ENDIF()
 
   # Compute destination sub-dir
