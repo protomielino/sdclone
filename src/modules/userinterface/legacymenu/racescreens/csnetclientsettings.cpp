@@ -4,7 +4,7 @@
     created              : Fri January 6 2017
     copyright            : (C) 2017 by Joe Thompson
     email                : beaglejoe@users.sourceforge.net
-    version              : $Id: $
+    version              : $Id$
 
  ***************************************************************************/
 
