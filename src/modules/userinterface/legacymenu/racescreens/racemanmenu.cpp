@@ -593,49 +593,6 @@ RmRacemanMenu()
 void
 RmRacemanMenu()
 {
-	// Special case of the online race, not yet migrated to using tgfdata.
-	// TODO: Integrate better the networking menu system in the race config. menu system
-	//       (merge the RmNetworkClientMenu and RmNetworkHostMenu into this race man menu,
-	//        after adding some more features / controls ? because they look similar).
-	//tRmInfo* reInfo = LmRaceEngine().inData();
-	//if (!strcmp(reInfo->_reName, "Online Race"))
-	//{
-	//	// Temporary, as long as the networking menu are not ported to tgfdata.
-	//	
-	//	// Force any needed fix on the specified track for the race (may not exist)
-	//	const GfTrack* pTrack = LmRaceEngine().race()->getTrack();
-	//	GfLogTrace("Using track %s for Online Race", pTrack->getName().c_str());
-
-	//	// Synchronize reInfo->params with LmRaceEngine().race() state,
-	//	// in case the track was fixed.
-	//	if (LmRaceEngine().race()->isDirty())
-	//		LmRaceEngine().race()->store(); // Save data to params.
-	//	
-	//	// End of temporary.
-
-	//	if (NetGetNetwork())
-	//	{
-	//		if (NetGetNetwork()->IsConnected())
-	//		{
-	//			if (NetIsClient())
-	//			{
-	//				RmNetworkClientMenu(NULL);
-	//				return;
-	//			}
-	//			else if (NetIsServer())
-	//			{
-	//				RmNetworkHostMenu(NULL);
-	//				return;
-	//			}
-	//		}
-	//	}
-	//	else
-	//	{
-	//		RmNetworkMenu(NULL);
-	//		return;
-	//	}
-	//}
-
 	// Don't do this twice.
 	if (ScrHandle)
 		GfuiScreenRelease(ScrHandle);
@@ -648,7 +605,6 @@ RmRacemanMenu()
 	bool NetClient = false;
 	
 	std::string racID = pRaceMan->getId();
-	//int xxx = racID.compare("netserver");
 	if (0 == strcmp(racID.c_str(), "netserver"))
 	{
 		NetServer = true;
@@ -748,4 +704,4 @@ RmRacemanMenu()
 	// Activate screen.
 	GfuiScreenActivate(ScrHandle);
 }
-#endif // ndef CLIENT_SERVER
+#endif // ifndef CLIENT_SERVER
