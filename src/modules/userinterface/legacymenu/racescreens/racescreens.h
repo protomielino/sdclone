@@ -159,7 +159,6 @@ extern void RmNetworkHostMenu(void* /* dummy */);
 #else
 // From networkingmenu.
 extern void RmNetworkClientMenu(void* pPreviousScreen = NULL);
-//extern void RmNetworkMenu(void* /* dummy */);
 extern void RmNetworkHostMenu(void* pPreviousScreen = NULL);
 extern void rmUseRealConfigFile();
 #endif
