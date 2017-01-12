@@ -121,6 +121,7 @@ NetNetwork::NetNetwork()
     m_sendCarDataTime = 0.0;
     m_pHost = NULL;
     m_currentTime = 0.0;
+    m_strRaceXMLFile = "";
 }
 
 NetNetwork::~NetNetwork()

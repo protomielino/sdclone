@@ -288,6 +288,7 @@ void NetServer::GenerateDriversForXML()
 
     //Save our changes
     GfParmWriteFileLocal(m_strRaceXMLFile.c_str(), params, pName);
+    GfParmWriteFileLocal("config/raceman/netclient.tmp", params, pName);
 }
 
 void NetServer::SetLocalDrivers()
