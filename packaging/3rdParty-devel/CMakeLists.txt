@@ -101,14 +101,14 @@ message(STATUS "OpenGL extensions (Windows only??)")
 if(WIN32 AND OPTION_OPENGL_HEADERS)
 ExternalProject_Add(OpenGL-headers
    URL ${CMAKE_CURRENT_SOURCE_DIR}/patches/openglheaders.zip
-   URL_HASH SHA256=4BA471B7306D47776C916BD507B89415BAF6D5662E17A27C2C575D8E331C985B
+   URL_HASH SHA256=4ba471b7306d47776c916bd507b89415baf6d5662e17a27c2c575d8e331c985b
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
 endif(WIN32 AND OPTION_OPENGL_HEADERS)
 
 if(OPTION_SDL_1x)
 ExternalProject_Add(SDL-1.2.15 
    URL https://www.libsdl.org/release/SDL-1.2.15.tar.gz 
-   URL_HASH SHA256=D6D316A793E5E348155F0DD93B979798933FB98AA1EDEBCC108829D6474AAD00 
+   URL_HASH SHA256=d6d316a793e5e348155f0dd93b979798933fb98aa1edebcc108829d6474aad00 
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    DEPENDS OpenGL-headers
    )
@@ -131,7 +131,7 @@ if(OPTION_SDL_2x)
    #message(STATUS "CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
    ExternalProject_Add(${SDL2_PROJECT} 
    URL https://www.libsdl.org/release/SDL2-2.0.5.tar.gz 
-   URL_HASH SHA256=442038CF55965969F2FF06D976031813DE643AF9C9EDC9E331BD761C242E8785
+   URL_HASH SHA256=442038cf55965969f2ff06d976031813de643af9c9edc9e331bd761c242e8785
 
    CMAKE_ARGS ${SDL2_ARGS}
    DEPENDS OpenGL-headers
@@ -144,7 +144,7 @@ endif(OPTION_SDL_2x)
 if(OPTION_OPENAL)
 ExternalProject_Add(openal-soft-1.17.2 
    URL http://kcat.strangesoft.net/openal-releases/openal-soft-1.17.2.tar.bz2 
-   URL_HASH SHA256=A341F8542F1F0B8C65241A17DA13D073F18EC06658E1A1606A8ECC8BBC2B3314
+   URL_HASH SHA256=a341f8542f1f0b8c65241a17da13d073f18ec06658e1a1606a8ecc8bbc2b3314
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
 endif(OPTION_OPENAL)
 
@@ -167,7 +167,7 @@ if(OPTION_PLIB)
 
    ExternalProject_Add(plib-1.8.5 
       URL https://plib.sourceforge.net/dist/plib-1.8.5.tar.gz 
-      URL_HASH SHA256=485B22BF6FDC0DA067E34EAD5E26F002B76326F6371E2AE006415DEA6A380A32 
+      URL_HASH SHA256=485b22bf6fdc0da067e34ead5e26f002b76326f6371e2ae006415dea6a380a32 
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
       DEPENDS OpenGL-headers
       )
@@ -185,7 +185,7 @@ if(OPTION_JPEG)
    set(JPG_PROJECT jpeg-9b)
    ExternalProject_Add(${JPG_PROJECT}
    URL http://ijg.org/files/jpegsrc.v9b.tar.gz
-   URL_HASH SHA256=240FD398DA741669BF3C90366F58452EA59041CACC741A489B99F2F6A0BAD052
+   URL_HASH SHA256=240fd398da741669bf3c90366f58452ea59041cacc741a489b99f2f6a0bad052
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    )
    ExternalProject_Add_Step(${JPG_PROJECT} jpeg_add_cmake
@@ -211,7 +211,7 @@ if(OPTION_FREESOLID)
 #ExternalProject_Add(FreeSOLID-2.1.1 
 #   DOWNLOAD_NAME FreeSOLID-2.1.1.zip
 #   URL https://sourceforge.net/projects/freesolid/files/FreeSOLID/FreeSOLID-2.1.1.zip/FreeSOLID-2.1.1.zip/download 
-#   URL_HASH SHA256=5A4F8576E27223F03AD0ADD76A79B06DB6CD8F15C8D2767EA35E0C540BA1BEE8 
+#   URL_HASH SHA256=5a4f8576e27223f03ad0add76a79b06db6cd8f15c8d2767ea35e0c540ba1bee8 
 #   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
 #   UPDATE_COMMAND ""
 #   PATCH_COMMAND ""
@@ -224,7 +224,7 @@ set(FreeSOLID_ARGS ${EXTERNALS_CMAKE_ARGS} -D'CMAKE_DEBUG_POSTFIX=""')
 ExternalProject_Add(FreeSOLID-2.1.2
    DOWNLOAD_NAME FreeSOLID-2.1.2.zip
    URL https://sourceforge.net/projects/freesolid/files/FreeSOLID-2.1.2.zip/download 
-   URL_HASH SHA256=89EDC6AFDD9D60C8020B2B865B61558C86A8928DC6F1773B9F4708B5C28EB873 
+   URL_HASH SHA256=89edc6afdd9d60c8020b2b865b61558c86a8928dc6f1773b9f4708b5c28eb873 
    CMAKE_ARGS ${FreeSOLID_ARGS}
    )
 ExternalProject_Add_Step(FreeSOLID-2.1.2 freesolid_add_cmake
@@ -239,7 +239,7 @@ endif(OPTION_FREESOLID)
 if(OPTION_ENET)
 ExternalProject_Add(enet-1.3.13
    URL http://enet.bespin.org/download/enet-1.3.13.tar.gz
-   URL_HASH SHA256=E36072021FAA28731B08C15B1C3B5B91B911BAF5F6ABCC7FE4A6D425ABADA35C
+   URL_HASH SHA256=e36072021faa28731b08c15b1c3b5b91b911baf5f6abcc7fe4a6d425abada35c
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    )
    ExternalProject_Add_Step(enet-1.3.13 enet_add_cmake
@@ -254,7 +254,7 @@ endif(OPTION_ENET)
 if(OPTION_OGG)
 ExternalProject_Add(libogg-1.3.2
    URL http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz
-   URL_HASH SHA256=E19EE34711D7AF328CB26287F4137E70630E7261B17CBE3CD41011D73A654692
+   URL_HASH SHA256=e19ee34711d7af328cb26287f4137e70630e7261b17cbe3cd41011d73a654692
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    )
    ExternalProject_Add_Step(libogg-1.3.2 libogg_add_cmake
@@ -269,7 +269,7 @@ endif(OPTION_OGG)
 if(OPTION_VORBIS)
 ExternalProject_Add(libvorbis-1.3.5
    URL http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz
-   URL_HASH SHA256=6EFBCECDD3E5DFBF090341B485DA9D176EB250D893E3EB378C428A2DB38301CE
+   URL_HASH SHA256=6efbcecdd3e5dfbf090341b485da9d176eb250d893e3eb378c428a2db38301ce
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    DEPENDS "libogg-1.3.2"
    )
@@ -288,7 +288,7 @@ if(OPTION_EXPAT)
    ExternalProject_Add(expat-2.2.0
    DOWNLOAD_NAME expat-2.2.0.tar.bz2
    URL https://sourceforge.net/projects/expat/files/expat/2.2.0/expat-2.2.0.tar.bz2/download
-   URL_HASH SHA256=D9E50FF2D19B3538BD2127902A89987474E1A4DB8E43A66A4D1A712AB9A504FF
+   URL_HASH SHA256=d9e50ff2d19b3538bd2127902a89987474e1a4db8e43a66a4d1a712ab9a504ff
    CMAKE_ARGS ${EXPAT_ARGS}
    #UPDATE_COMMAND ""
    #PATCH_COMMAND ""
@@ -316,7 +316,7 @@ if(OPTION_ZLIB)
 ExternalProject_Add(zlib-1.2.8
    DOWNLOAD_NAME zlib-1.2.8.tar.gz
    URL https://sourceforge.net/projects/libpng/files/zlib/1.2.8/zlib-1.2.8.tar.gz/download
-   URL_HASH SHA256=36658CB768A54C1D4DEC43C3116C27ED893E88B02ECFCB44F2166F9C0B7F2A0D
+   URL_HASH SHA256=36658cb768a54c1d4dec43c3116c27ed893e88b02ecfcb44f2166f9c0b7f2a0d
    #CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=on
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    #UPDATE_COMMAND ""
@@ -344,8 +344,8 @@ if(OPTION_PNG)
    set(PNG_ARGS ${EXTERNALS_CMAKE_ARGS} -DPNG_SHARED=off -DPNG_TESTS=off -DCMAKE_DEBUG_POSTFIX='')
    ExternalProject_Add(${PNG_PROJECT} 
       DOWNLOAD_NAME ${PNG_PROJECT}.tar.gz 
-      URL https://sourceforge.net/projects/libpng/files/libpng16/1.6.24/libpng-1.6.24.tar.gz/download 
-      URL_HASH MD5=65213080DD30A9B16193D9B83ADC1EE9
+      URL https://sourceforge.net/projects/libpng/files/libpng16/older-releases/1.6.24/libpng-1.6.24.tar.gz/download 
+      URL_HASH MD5=65213080dd30a9b16193d9b83adc1ee9
       CMAKE_ARGS ${PNG_ARGS}
       DEPENDS zlib-1.2.8
       )
@@ -361,7 +361,7 @@ if(OPTION_SQLITE3)
    # may only be needed for Simon's replay stuff
    ExternalProject_Add(sqlite3
    URL https://www.sqlite.org/2015/sqlite-autoconf-3081101.tar.gz
-   URL_HASH SHA1=D0E22D7E361B6F50830A3CDEAFE35311443F8F9A 
+   URL_HASH SHA1=d0e22d7e361b6f50830a3cdeafe35311443f8f9a 
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    UPDATE_COMMAND ""
    PATCH_COMMAND ""
@@ -380,7 +380,7 @@ if(OPTION_FREETYPE)
    ExternalProject_Add(${FREETYPE_PROJECT}
    DOWNLOAD_NAME ft265.zip
    URL https://sourceforge.net/projects/freetype/files/freetype2/2.6.5/ft265.zip/download
-   URL_HASH SHA256=635309058FF8B8056BB94488FFC26CC984ED632E01DDFE80E4C0768930483182 
+   URL_HASH SHA256=635309058ff8b8056bb94488ffc26cc984ed632e01ddfe80e4c0768930483182 
    CMAKE_ARGS ${FREETYPE_ARGS}
    )
 
@@ -399,7 +399,7 @@ if(OPTION_CURL)
 #   # may only be needed for Madbad's web stuff
 #   ExternalProject_Add(curl-7.43.0
 #   URL https://curl.haxx.se/download/curl-7.43.0.tar.bz2
-#   URL_HASH SHA256=BAA654A1122530483CCC1C58CC112FEC3724A82C11C6A389F1E6A37DC8858DF9
+#   URL_HASH SHA256=baa654a1122530483ccc1c58cc112fec3724a82c11c6a389f1e6a37dc8858df9
 #   CMAKE_ARGS ${CURL_ARGS}
 #   DEPENDS zlib-1.2.8
 #   )
@@ -409,7 +409,7 @@ if(OPTION_CURL)
    # may only be needed for Madbad's web stuff
    ExternalProject_Add(${CURL_PROJECT}
    URL https://curl.haxx.se/download/curl-7.50.1.tar.bz2
-   URL_HASH SHA256=3C12C5F54CCAA1D40ABC65D672107DCC75D3E1FCB38C267484334280096E5156
+   URL_HASH SHA256=3c12c5f54ccaa1d40abc65d672107dcc75d3e1fcb38c267484334280096e5156
    CMAKE_ARGS ${CURL_ARGS}
    DEPENDS zlib-1.2.8
    )
@@ -421,14 +421,14 @@ if(OPTION_OSG)
    set(OSG_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX='')
 
    # http://trac.openscenegraph.org/downloads/developer_releases/OpenSceneGraph-3.4.0.zip
-   # A5E762C64373A46932E444F6F7332496
+   # a5e762c64373a46932e444f6f7332496
    #ExternalProject_Add(osg-OpenSceneGraph-3.4.0-rc10
    #URL https://github.com/openscenegraph/osg/archive/OpenSceneGraph-3.4.0-rc10.tar.gz
-   #URL_HASH SHA256=47D4281E86B3B3EE14E40A46FF60884ED2213E9D41204BE76A1F57A6E01CBB0D
+   #URL_HASH SHA256=47d4281e86b3b3ee14e40a46ff60884ed2213e9d41204be76a1f57a6e01cbb0d
 
    ExternalProject_Add(osg-OpenSceneGraph-3.4.0
    URL http://trac.openscenegraph.org/downloads/developer_releases/OpenSceneGraph-3.4.0.zip
-   URL_HASH MD5=A5E762C64373A46932E444F6F7332496
+   URL_HASH MD5=a5e762c64373a46932e444f6f7332496
    CMAKE_ARGS ${OSG_ARGS}
    DEPENDS zlib-1.2.8 ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
    )
