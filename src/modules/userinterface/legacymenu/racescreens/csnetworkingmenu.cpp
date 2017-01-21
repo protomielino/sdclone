@@ -747,7 +747,7 @@ static void rmConvertDriversForNetwork()
 
 	tRmInfo* reInfo = LmRaceEngine().inData();
 	// ensure the system knows about 'new' network drivers
-	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.tmp",GFPARM_RMODE_REREAD);
+	reInfo->params = GfParmReadFileLocal(g_strTempConfig.c_str(),GFPARM_RMODE_REREAD);
 	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 	
 }
