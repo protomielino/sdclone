@@ -349,12 +349,15 @@ void cGrScreen::camDraw(tSituation *s)
 	// Draw the sky dome if enabled (first part)
 	if (dispCam->getDrawBackground() &&  grSkyDomeDistance > 0 ) 
 	{
-  		grPreDrawSky(s, dispCam->getFogStart(), dispCam->getFogEnd());
+  		grPreDrawSky(s, dispCam->getFogStart(), dispCam->getFogEnd(), dispCam);
+
+		grPreDrawBackgroundSky(dispCam);
   	}
 
 	// Draw the rest of the scene (track, buildings, landscape, cars, ...)
 	grDrawScene();
 
+	grDrawBackgroundSky();
 	// Draw the sky dome if enabled (last part)
 	if (dispCam->getDrawBackground() &&  grSkyDomeDistance > 0 )
 	{

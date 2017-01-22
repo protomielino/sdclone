@@ -48,7 +48,7 @@ extern ssgBranch *SkidAnchor;
 extern ssgBranch *CarlightAnchor;
 extern ssgBranch *TrackLightAnchor;
 extern ssgBranch *ThePits;
-extern ssgBranch *BackSkyAnchor;
+extern ssgRoot *BackSkyAnchor;
 extern ssgTransform *BackSkyLoc;
 
 extern ssgStateSelector	*grEnvSelector;

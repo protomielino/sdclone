@@ -65,7 +65,7 @@ ssgBranch *SkidAnchor = NULL;
 ssgBranch *CarlightAnchor = NULL;
 ssgBranch *TrackLightAnchor = NULL;
 ssgBranch *ThePits = NULL;
-ssgBranch *BackSkyAnchor = NULL;
+ssgRoot *BackSkyAnchor = NULL;
 ssgTransform *BackSkyLoc = NULL;
 
 // Must have (Question: What for ?)
@@ -150,10 +150,10 @@ grLoadScene(tTrack *track)
     TheScene = new ssgRoot;
 
     /* Background Sky */
-    BackSkyAnchor = new ssgBranch;
+    BackSkyAnchor = new ssgRoot;
     BackSkyLoc = new ssgTransform;
-    BackSkyLoc->addKid(BackSkyAnchor);
-    TheScene->addKid(BackSkyLoc);
+    BackSkyAnchor->addKid(BackSkyLoc);
+    //TheScene->addKid(BackSkyLoc);
 
     /* Landscape */
     LandAnchor = new ssgBranch;

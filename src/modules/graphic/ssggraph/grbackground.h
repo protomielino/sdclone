@@ -36,8 +36,10 @@ extern void grLoadBackgroundSky(void);
 extern void grLoadBackgroundLand(void);
 extern void grInitBackground();
 extern void grUpdateSky(double currentTime, double accelTime);
-extern void grPreDrawSky(struct Situation* s, float fogStart, float fogEnd);
+extern void grPreDrawSky(struct Situation* s, float fogStart, float fogEnd, class cGrCamera *cam);
 extern void grPostDrawSky();
+extern void grPreDrawBackgroundSky(class cGrCamera *cam);
+extern void grDrawBackgroundSky(void);
 extern void grDrawStaticBackground(class cGrCamera *cam, class cGrBackgroundCam *bgCam);
 extern void grShutdownBackground(void);
 
