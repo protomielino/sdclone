@@ -23,8 +23,58 @@
 #include <raceman.h>    // tSituation
 
 #include <osg/Camera>
+//#include <osgText/Text>
 
 class SDFrameInfo;
+
+class OSGPLOT
+{
+	private:
+
+	public:
+	OSGPLOT(
+		float positionX,
+		float positionY,
+		float width,
+		float height,
+		float maxValue,
+		float minValue,
+		float timeFrame,
+		float referenceLineAtValue,
+		std::string Xdata,
+		std::string Ydata
+	);
+	~OSGPLOT();
+	float positionX;
+	float positionY;
+	float width;
+	float height;
+	float maxValue;
+	float minValue;
+	float timeFrame;
+	float referenceLineAtValue;
+	std::string Xdata;
+	std::string Ydata;
+
+	osg::Vec3Array* dataPoints;
+
+	osg::Geometry* osgMainPlotLineGeometry;
+	osg::Vec3Array* osgMainPlotLineVertices;
+
+	osg::Geometry* osgReferencePlotLineGeometry;
+	osg::Vec3Array* osgReferencePlotLineVertices;
+
+	osg::ref_ptr<osg::Group> osgGroup;
+
+	osg::ref_ptr <osg::Group> getGroup();
+
+	void appendDataPoint(float x, float y, float z);
+	void removeOldDataPoint();
+	void recalculateDrawnPoint();
+	void drawBackground();
+	void update(tSituation *s, const SDFrameInfo* frameInfo,const tCarElt *currCar);
+
+};
 
 class SDHUD
 {
@@ -51,6 +101,34 @@ class SDHUD
         float *_arcade_color;
         float *_background_color;
 
+		//car data that need to be remembered between frames for the hud
+		int carLaps;
+		tdble lapLenght;
+		float startingFuel = 0.0;
+		float remainingFuelForLaps = 0.0f;
+
+		//
+		float laptimeFreezeCountdown = 3.0f;//keep display for x seconds
+		float laptimeFreezeTime = 0.0f;
+		float timeDiffFreezeCountdown = 8.0f;//keep display for x seconds
+		float timeDiffFreezeTime = 0.0f;
+		int oldSector = 0;
+		float oldBestLapTime;
+		float oldBestSplitTime;
+		float oldLapTime;
+		int numberOfSectors = 0;
+		int oldLapNumber = 0;
+
+		float hudScale = 1.0f;
+
+		//
+		//std::map<std::string,osgText::Text* > hudTextElements;
+		std::map<std::string,osg::Geometry* > hudImgElements;
+		std::map<std::string,osg::ref_ptr <osg::Group> > hudGraphElements;
+
+		std::map<std::string,OSGPLOT* > plotElements;
+     
+
     public:
         SDHUD();
         ~SDHUD();
@@ -62,14 +140,23 @@ class SDHUD
         void ToogleFPS();
         void ToogleHudBoard();
 
+        osg::Geode* HUDGeode;
+        osg::Projection* HUDProjectionMatrix;
+        osg::ref_ptr<osg::Camera> camera;
+
         void CreateHUD( int scrH, int scrW);
         void DispDebug(const tSituation *s, const SDFrameInfo* frame);
-        void RefreshBoard(tSituation *s, const SDFrameInfo* frameInfo, const tCarElt *currCar);
+        void Refresh(tSituation *s, const SDFrameInfo* frameInfo, const tCarElt *currCar);
+        //osg::ref_ptr <osg::Geode> generateHudFromXmlFile( int scrH, int scrW);
+        osg::ref_ptr <osg::Group> generateHudFromXmlFile( int scrH, int scrW);
+
 
         inline osg::ref_ptr<osg::Camera> getRootCamera()
         {
             return _cameraHUD;
         }
 };
+
+
 
 #endif //_OSGHUD_H_

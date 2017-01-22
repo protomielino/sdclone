@@ -36,6 +36,7 @@
 #include "OsgReflectionMapping.h"
 #include "OsgMain.h"
 #include "OsgCar.h"
+#include "OsgHUD.h"
 
 SDScreens::SDScreens() :
     root(NULL),
@@ -46,6 +47,7 @@ SDScreens::SDScreens() :
 {
     debugHUD = new SDDebugHUD();
 }
+    extern SDHUD hud;
 
 class CameraDrawnCallback : public osg::Camera::DrawCallback
 {
@@ -133,6 +135,19 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     //debugHUD->setTexture(reflectionMapping->getMap());
     // debugHUD->setTexture(reflectionMapping->getReflectionMap());
     //root->addChild(debugHUD->getRootCamera());
+
+	//create the hud and its own camera and add it to the viewer
+	hud.CreateHUD(height, width);
+	/*
+	osg::Camera* hudCamera = hud.camera;
+	hudCamera->setGraphicsContext(gw);
+	hudCamera->setViewport(0,0, width, height);
+	viewer->addSlave(hudCamera, false);
+	*/
+	hud.camera->setGraphicsContext(gw);
+	hud.camera->setViewport(0,0, width, height);
+	viewer->addSlave(hud.camera, false);
+
 
     //viewer->setSceneData(root.get());
     viewer->realize();

@@ -35,6 +35,7 @@
 #include "OsgRender.h"
 #include "OsgMath.h"
 #include "OsgScreens.h"
+#include "OsgHUD.h"
 
 //extern	osg::Timer m_timer;
 //extern	osg::Timer_t m_start_tick;
@@ -44,6 +45,8 @@ SDCars *cars = 0;
 SDScenery *scenery = 0;
 SDRender *render = 0;
 SDScreens *screens = 0;
+
+SDHUD hud;
 
 /*oid *getOptions()
 {
@@ -219,6 +222,10 @@ int refresh(tSituation *s)
     cars->updateCars();
     render->UpdateSky(s->currentTime, s->accelTime);
     screens->update(s, &frameInfo);
+
+    //refresh the hud
+    tCarElt* curCar = screens->getActiveView()->getCurrentCar();
+    hud.Refresh(s, &frameInfo, curCar);
 
     return 0;
 }
