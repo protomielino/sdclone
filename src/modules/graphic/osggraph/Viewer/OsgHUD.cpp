@@ -568,6 +568,24 @@ void changeImageSize(osg::Geometry *geom,
 SDHUD::SDHUD()
 {
 	_cameraHUD = new osg::Camera;
+	
+	//initialize some vars
+	this->startingFuel = 0.0;
+	this->remainingFuelForLaps = 0.0f;
+
+	//
+	this->laptimeFreezeCountdown = 3.0f;//keep display for x seconds
+	this->laptimeFreezeTime = 0.0f;
+	this->timeDiffFreezeCountdown = 8.0f;//keep display for x seconds
+	this->timeDiffFreezeTime = 0.0f;
+	this->oldSector = 0;
+	this->oldBestLapTime;
+	this->oldBestSplitTime;
+	this->oldLapTime;
+	this->numberOfSectors = 0;
+	this->oldLapNumber = 0;
+
+	this->hudScale = 1.0f;
 }
 
 void SDHUD::CreateHUD(int scrH, int scrW)
@@ -687,7 +705,8 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 	} 
 
 	int id = 0;
-	for(tCarElt * car : boardCars) {
+	for(std::vector<tCarElt *>::iterator car = boardCars.begin(); car != boardCars.end(); ++car) {
+
 		std::ostringstream mapKey;
 		id++;
 
@@ -696,11 +715,11 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 		this->hudImgElements[mapKey.str()]->setNodeMask(1);
 
 		//select special background for current and/or first player
-		if (car == currCar){
+		if ((*car) == currCar){
 			this->hudImgElements[mapKey.str()]->setNodeMask(0);
 			mapKey << "-current";
 			this->hudImgElements[mapKey.str()]->setNodeMask(1);
-		}else if (car->_pos == 1){
+		}else if ((*car)->_pos == 1){
 			this->hudImgElements[mapKey.str()]->setNodeMask(0);
 			mapKey << "-first";
 			this->hudImgElements[mapKey.str()]->setNodeMask(1);
@@ -709,7 +728,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 		std::ostringstream position;
 		position.str("");
-		position << car->_pos;
+		position << (*car)->_pos;
 		mapKey.str("");
 		mapKey << "board-player" << id << "-number";
 		hudTextElements[mapKey.str()]->setText(position.str());
@@ -718,7 +737,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 		//update board names texts
 		mapKey.str("");
 		mapKey << "board-player" << id << "-name";
-		hudTextElements[mapKey.str()]->setText(car->_name);
+		hudTextElements[mapKey.str()]->setText((*car)->_name);
 		hudTextElements[mapKey.str()]->setNodeMask(1);
 
 		//update time diff texts
@@ -734,17 +753,17 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 			std::ostringstream tempStr;
 			tempStr.str("");
-			if(car->_laps == currCar->_laps){
-				tempStr << formatLaptime((car->_curTime - currCar->_curTime),1);
-			}else if (car->_laps > currCar->_laps){
-				tempStr << (car->_laps - currCar->_laps);
+			if((*car)->_laps == currCar->_laps){
+				tempStr << formatLaptime(((*car)->_curTime - currCar->_curTime),1);
+			}else if ((*car)->_laps > currCar->_laps){
+				tempStr << ((*car)->_laps - currCar->_laps);
 				tempStr << " laps";
 			}
 
 			hudTextElements[mapKey.str()]->setText(tempStr.str());
 			hudTextElements[mapKey.str()]->setNodeMask(1);
 			//hide time diff for our car
-			if (car == currCar){
+			if ((*car) == currCar){
 				hudTextElements[mapKey.str()]->setNodeMask(0);
 			}
 		}else{
@@ -884,7 +903,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 	if( currCar->_laps > this->carLaps && currCar->_laps > 1){
 		if (currCar->_laps == 2){
-			this->lapLenght = this->lapLenght - currCar->_distRaced;
+			this->lapLength = this->lapLength - currCar->_distRaced;
 		}
 		float fuelConsumpionPerLap = (this->startingFuel - currCar->_fuel)  / (float)(currCar->_laps-1);
 		this->remainingFuelForLaps = currCar->_fuel / fuelConsumpionPerLap;
@@ -1046,10 +1065,10 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
 						std::vector<std::string> colorStringVector = split(colorString.c_str(), '#');
 
 						osg::Vec4 color = osg::Vec4(
-							std::stof(colorStringVector[0]),
-							std::stof(colorStringVector[1]),
-							std::stof(colorStringVector[2]),
-							std::stof(colorStringVector[3])
+							std::atof(colorStringVector[0].c_str()),
+							std::atof(colorStringVector[1].c_str()),
+							std::atof(colorStringVector[2].c_str()),
+							std::atof(colorStringVector[3].c_str())
 						);
 
 						text->setColor(color);
@@ -1325,7 +1344,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
 				/* ============================
 					 NO MORE HUD TYPE OPTIONS...??
 				   ============================*/
-					GfLogInfo("OSG-HUD object type not recognized: %s", type);
+					GfLogInfo("OSG-HUD object type not recognized: %s", type.c_str());
 				}
 
 		} while (GfParmListSeekNext(paramHandle, sectionPath.c_str()) == 0);

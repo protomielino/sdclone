@@ -103,23 +103,23 @@ class SDHUD
 
 		//car data that need to be remembered between frames for the hud
 		int carLaps;
-		tdble lapLenght;
-		float startingFuel = 0.0;
-		float remainingFuelForLaps = 0.0f;
+		tdble lapLength;
+		float startingFuel;
+		float remainingFuelForLaps;
 
 		//
-		float laptimeFreezeCountdown = 3.0f;//keep display for x seconds
-		float laptimeFreezeTime = 0.0f;
-		float timeDiffFreezeCountdown = 8.0f;//keep display for x seconds
-		float timeDiffFreezeTime = 0.0f;
-		int oldSector = 0;
+		float laptimeFreezeCountdown;//keep display for x seconds
+		float laptimeFreezeTime;
+		float timeDiffFreezeCountdown;//keep display for x seconds
+		float timeDiffFreezeTime;
+		int oldSector;
 		float oldBestLapTime;
 		float oldBestSplitTime;
 		float oldLapTime;
-		int numberOfSectors = 0;
-		int oldLapNumber = 0;
+		int numberOfSectors;
+		int oldLapNumber;
 
-		float hudScale = 1.0f;
+		float hudScale;
 
 		//
 		//std::map<std::string,osgText::Text* > hudTextElements;
