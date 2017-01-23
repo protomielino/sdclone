@@ -101,7 +101,7 @@ MACRO(ADD_OSG_INCLUDEDIR)
 
 	IF(NOT OPENSCENEGRAPH_FOUND)
 		FIND_PACKAGE(OpenSceneGraph REQUIRED osgDB osgViewer osgGA osgUtil osgFX 
-					 osgParticle OsgShadow)
+					 osgParticle OsgShadow osgText)
 	ENDIF(NOT OPENSCENEGRAPH_FOUND)
 
 	IF(OPENSCENEGRAPH_FOUND)
@@ -116,7 +116,7 @@ MACRO(ADD_OSG_LIBRARY TARGET)
 
 	IF(NOT OPENSCENEGRAPH_FOUND)
         FIND_PACKAGE(OpenSceneGraph REQUIRED osgDB osgViewer osgGA osgUtil osgFX 
-					 osgParticle osgShadow)
+					 osgParticle osgShadow osgText)
 	ENDIF(NOT OPENSCENEGRAPH_FOUND)
 
     IF(OPENSCENEGRAPH_FOUND)

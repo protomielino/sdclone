@@ -281,7 +281,7 @@ MACRO(CHECK_LIBRARIES)
 	IF(OPTION_OSGGRAPH)
 	
 		IF(NOT OPENSCENEGRAPH_FOUND)
-			Find_Package(OpenSceneGraph REQUIRED osgDB osgViewer osgGA osgUtil osgFX osgParticle osgShadow)
+			Find_Package(OpenSceneGraph REQUIRED osgDB osgViewer osgGA osgUtil osgFX osgParticle osgShadow osgText)
 		ENDIF()
 
 		IF(OPENSCENEGRAPH_FOUND)
