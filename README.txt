@@ -43,7 +43,7 @@ For more in depth information visit http://www.speed-dreams.org,
 you'll hopefully find there some information (documentation, HOWTO, FAQ ... work-in-progress).
 
 If you are stuck please report problems through speed-dreams-users mailing list
-or our Tracker (visit http://sourceforge.net/apps/trac and login to SF.net for that).
+or our Tracker (visit https://sourceforge.net/p/speed-dreams/tickets/ and login to SF.net for that).
 
 
 Car Setups
