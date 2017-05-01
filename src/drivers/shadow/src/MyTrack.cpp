@@ -150,8 +150,8 @@ void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
 			double	segDist = m_pSegs[i].segDist;
 			double	t = (segDist - pseg->lgfromstart) / pseg->length;
 
-			bool	inPit = (pitEntry < pitExit && pitEntry <= i && i <= pitExit ||
-							 pitEntry > pitExit && (i <= pitExit || i >= pitEntry));
+			bool	inPit = (pitEntry < (pitExit && pitEntry <= i && i <= pitExit) ||
+							(pitEntry > pitExit && i <= pitExit) || (i >= pitEntry));
 
 			const double	MIN_MU = pseg->surface->kFriction * 0.8;
 			const double	MAX_ROUGH = MX(0.005, pseg->surface->kRoughness * 1.2);
@@ -186,9 +186,9 @@ void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
 						w = MN(w, 1.5);
 						done = true;
 
-						if( (s == TR_SIDE_LFT && pseg->type == TR_RGT ||
-							 s == TR_SIDE_RGT && pseg->type == TR_LFT) &&
-							pSide->surface->kFriction  < pseg->surface->kFriction )
+						if( (s == TR_SIDE_LFT && pseg->type == TR_RGT) ||
+							 ((s == TR_SIDE_RGT && pseg->type == TR_LFT) &&
+							pSide->surface->kFriction  < pseg->surface->kFriction ))
 							// keep a wheel on the good stuff.
 							w = 0;//MN(w, 1.5);
 
@@ -230,9 +230,9 @@ void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
 							done = true;
 						}
 
-						if( (s == TR_SIDE_LFT && pseg->type == TR_RGT ||
-							 s == TR_SIDE_RGT && pseg->type == TR_LFT) &&
-							pSide->surface->kFriction  < pseg->surface->kFriction )
+						if( (s == TR_SIDE_LFT && pseg->type == TR_RGT) ||
+							(( s == TR_SIDE_RGT && pseg->type == TR_LFT) &&
+							pSide->surface->kFriction  < pseg->surface->kFriction ))
 						{
 							// keep a wheel on the good stuff.
 							w = 0;//MN(w, 1.5);

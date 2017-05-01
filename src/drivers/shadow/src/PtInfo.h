@@ -26,16 +26,16 @@ public:
 	~PtInfo();
 
 public:
-	int			idx;	// index of seg.
-	double		t;		// parametric distance to next seg [0..1]
+	int		idx;	// index of seg.
+	double		t;	// parametric distance to next seg [0..1]
 	double		offs;	// offset from middle for the path.
 	double		oang;	// global angle.
 	double		toL;	// distance to edge of track on left.
 	double		toR;	// distance to edge of track on right.
-	double		k;		// curvature at point.
-    double      kz;     // curvature in z at point
+	double		k;	// curvature at point.
+	double		kz;     // curvature in z at point
 	double		spd;	// speed.
-    double      accSpd; // Accelleration speed
+	double		accSpd; // Accelleration speed
 };
 
 #endif

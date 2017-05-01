@@ -161,6 +161,8 @@ TDriver::TDriver(int Index, const int robot_type):
   m_TclRange(10.0),
   m_TclSlip(1.6f),
   m_TclFactor(1.0),
+  m_AbsRange(4.0),
+  m_AbsSlip(2.0),
 
   m_DriftAngle(0.0),
   m_AbsDriftAngle(0.0),
@@ -341,7 +343,7 @@ void TDriver::AdjustSkilling(void* pCarHandle)
       //Param.Tmp.oSkill = 1.0 + oSkill;
       LogSHADOW.debug("\n#>>>Skilling: Skill %g SkillGlobal %g SkillDriver %g LookAhead %g "
                       "LookAheadFactor %g effSkill:%g\n\n", Skill, SkillGlobal, SkillDriver/*,
-                                        LookAhead, LookAheadFactor, Param.Tmp.oSkill*/);
+                                                        LookAhead, LookAheadFactor, Param.Tmp.oSkill*/);
     }
 };
 
@@ -477,12 +479,12 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 
   Meteorology();
 
- if (!m_Rain)
-  {
-  // default params for car type (e.g. clkdtm)
-  snprintf( buf, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, m_CarType, trackName );
-  LogSHADOW.info("#Override params for car type with params of track: %s\n", buf);
-  hCarParm = MergeParamFile(hCarParm, buf);
+  if (!m_Rain)
+    {
+      // default params for car type (e.g. clkdtm)
+      snprintf( buf, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, m_CarType, trackName );
+      LogSHADOW.info("#Override params for car type with params of track: %s\n", buf);
+      hCarParm = MergeParamFile(hCarParm, buf);
     }
 
   if (m_Rain)
@@ -526,7 +528,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
   FACTORS.RemoveAll();
 
   for( int i = 0; ; i++ )
-    {
+  {
       snprintf( buf, sizeof(buf), "%s %d", PRV_FACTOR, i );
       double	factor = GfParmGetNum(hCarParm, SECT_PRIV, buf, 0, -1);
       LogSHADOW.debug("FACTOR %g\n", factor );
@@ -534,7 +536,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
         break;
 
       FACTORS.Add( factor );
-    }
+  }
 
   if( FACTORS.GetSize() == 0 )
     FACTORS.Add( 1.005 );
@@ -572,6 +574,9 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
   m_DeltaAccelRain = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ACCEL_DELTA_RAIN, 0, (float)m_DeltaAccelRain);
   LogSHADOW.debug("FLY_HEIGHT %g\n", FLY_HEIGHT );
   LogSHADOW.debug( "BUMP_MOD %d\n", BUMP_MOD );
+
+  m_TclSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_SLIP , 0, (float)m_TclSlip);
+  m_TclRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_RANGE , 0, (float)m_TclRange);
 
   AdjustBrakes(hCarParm);
 
@@ -1573,8 +1578,8 @@ void TDriver::Drive( tSituation* s )
     case 1:		angle = SteerAngle1(car, pi, aheadPi);		break;
     case 2:		angle = SteerAngle2(car, pi, aheadPi);		break;
     case 3:		angle = SteerAngle3(car, pi, aheadPi);		break;
-    case 4:		angle = SteerAngle4(car, pi, aheadPi);      break;
-    default:	angle = SteerAngle0(car, pi, aheadPi);		break;
+    case 4:		angle = SteerAngle4(car, pi, aheadPi);          break;
+    default:            angle = SteerAngle0(car, pi, aheadPi);		break;
     }
 
   double	steer = angle / car->_steerLock;
@@ -1626,29 +1631,29 @@ void TDriver::Drive( tSituation* s )
   if( close )
     {
       SpeedControl( SPDC_TRAFFIC, targetSpd, spd0, car, acc, brk );
-      LogSHADOW.debug("#Drive SpeedControl = close\n");
+      LogSHADOW.debug("#Drive Close SpeedControl = close\n");
     }
   else if( m_Strategy->needPitstop(car, s) )
     {
       SpeedControl( SPDC_TRAFFIC, targetSpd, spd0, car, acc, brk );
-      LogSHADOW.debug("#Drive SpeedControl = m_pitControl\n");
+      LogSHADOW.debug("#Drive needPitStop SpeedControl = m_pitControl\n");
     }
   else
     {
       if( m_avoidS == 1 )
         {
           SpeedControl( SPDC_NORMAL, targetSpd, spd0, car, acc, brk );
-          LogSHADOW.debug("#Drive SpeedControl = m_avoidS\n");
+          LogSHADOW.debug("#Drive Avoid SpeedControl = m_avoidS\n");
         }
       else if (car->_trkPos.seg->type == TR_STR)
         {
           SpeedControl( SPDC_EXTRA, targetSpd, spd0, car, acc, brk );
-          LogSHADOW.debug("#Drive SpeedControl = SpeedControl1\n");
+          LogSHADOW.debug("#Drive Extra SpeedControl = SpeedControl1\n");
         }
       else
         {
           SpeedControl( SPDC_NORMAL, targetSpd, spd0, car, acc, brk );
-          LogSHADOW.debug("#Drive SpeedControl = SPDC_NORMAL - track seg type = %d\n", track->seg->type);
+          LogSHADOW.debug("#Drive Normal SpeedControl = SPDC_NORMAL - track seg type = %d\n", track->seg->type);
         }
     }
 
@@ -1792,11 +1797,8 @@ void TDriver::Drive( tSituation* s )
   CalcSkill();
 
 
-  if (!HasESP)
-    //brk = filterBrake(car, brk);
-    //oBrake = FilterBrakeSpeed(oBrake);
-    if (!HasABS)
-      brk = ApplyAbs(car, brk);
+  if (!HasESP && !HasABS)
+    brk = ApplyAbs(car, brk);
 
   steer = FlightControl(steer);
 
@@ -1808,7 +1810,7 @@ void TDriver::Drive( tSituation* s )
 
   if (!HasTCL)
     acc = filterTCL(acc);
-  //acc = filterTCL(acc);
+
   acc = filterAccel(acc);
 
   // set up the values to return
@@ -2412,7 +2414,38 @@ double TDriver::ApplyAbs( tCarElt* car, double brake )
 {
   if( car->_speed_x < 10 )
     return brake;
+#if 1
+  float origbrake = brake;
+  float rearskid = MAX(0.0f, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
+  int i;
+  float slip = 0.0f;
 
+  for (i = 0; i < 4; i++)
+  {
+      slip += car->_wheelSpinVel(i) * car->_wheelRadius(i);
+  }
+
+  float trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
+  double angle = trackangle - car->_yaw;
+
+  slip *= 1.0f + MAX(rearskid, MAX(fabs(car->_yaw_rate) / 5, fabs(angle) / 6));
+  slip = car->_speed_x - slip / 4.0f;
+  if (slip > m_AbsSlip)
+  {
+      brake = brake - MIN(brake, (slip - m_AbsSlip) / m_AbsRange);
+  }
+
+  if (car->_speed_x > 5.0)
+  {
+      double skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
+      NORM_PI_PI(skidAng);
+      skidAng = MIN(skidAng * 2, PI);
+      brake *= MAX(0, fabs(cos(skidAng)));
+  }
+
+  brake = MAX(brake, MIN(origbrake, 0.1f));
+
+#else
   double	slip = 0.0;
   for( int i = 0; i < 4; i++ )
     slip += car->_wheelSpinVel(i) * car->_wheelRadius(i);
@@ -2423,6 +2456,7 @@ double TDriver::ApplyAbs( tCarElt* car, double brake )
     {
       brake *= 0.5;
     }
+#endif
 
   return brake;
 }

@@ -198,7 +198,7 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
 
 	double	distAhead = MX(20, mySit.spd * mySit.spd / 30);
 	if( (m_info.flags & F_DANGEROUS) == 0 )
-		distAhead = MN(MX(40, distAhead), 80);
+        distAhead = MN(MX(45, distAhead), 80);
 
 	if( pTeamInfo->IsTeamMate(myCar, oCar) )
 	{
