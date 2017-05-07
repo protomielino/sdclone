@@ -3580,50 +3580,33 @@ float Driver::filterABS(float brake)
 {
     if (car->_speed_x < ABS_MINSPEED) return brake;
 
-    float absrange = (collision > 0.0 ? AbsRange * 0.7f : AbsRange);
-    float brake1 = brake, brake2 = brake;
-
-    double skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
-    NORM_PI_PI(skidAng);
-
-    if (fabs(skidAng) > 0.2)
-        brake1 = (float) MIN(brake1, 0.1f + 0.7f * cos(skidAng));
-
-    float slip = 0.0f;
-    for (int i=0; i<4; i++)
-        slip = MAX(slip, car->_speed_x - (car->_wheelSpinVel(i) * car->_wheelRadius(i)));
-
-    if (slip > AbsSlip)
-        brake2 = (float) MAX(MIN(0.35f, brake), brake - MIN(brake*0.8f, (slip - AbsSlip) / absrange));
-
-    brake = MIN(brake, MIN(brake1, brake2));
-#if 0
     float origbrake = brake;
-    //float rearskid = MAX(0.0f, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
+    float rearskid = MAX(0.0f, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
     int i;
     float slip = 0.0f;
-    for (i = 0; i < 4; i++) {
+
+    for (i = 0; i < 4; i++)
+    {
         slip += car->_wheelSpinVel(i) * car->_wheelRadius(i);
     }
-    //slip *= 1.0f + MAX(rearskid, MAX(fabs(car->_yaw_rate)/10, fabs(angle)/8));
-    slip = car->_speed_x - slip/4.0f;
-    //if (collision)
-    //  slip *= 0.25f;
-    if (origbrake == 2.0f)
-        slip *= 0.1f;
 
-    float absslip = (car->_speed_x < 20.0f ? MIN(AbsSlip, AbsRange/2) : AbsSlip);
-    if (slip > absslip) {
-        brake = brake - MIN(brake, (slip - absslip)/AbsRange);
+    slip *= 1.0f + MAX(rearskid, MAX(fabs(car->_yaw_rate) / 5, fabs(angle) / 6));
+    slip = car->_speed_x - slip / 4.0f;
+
+    if (slip > AbsSlip)
+    {
+        brake = brake - MIN(brake, (slip - AbsSlip) / AbsRange);
     }
+
+    if (car->_speed_x > 5.0)
+    {
+        double skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
+        NORM_PI_PI(skidAng);
+        skidAng = MIN(skidAng * 2, PI);
+        brake *= MAX(0, fabs(cos(skidAng)));
+    }
+
     brake = MAX(brake, MIN(origbrake, 0.1f));
-
-    //brake = MAX(MIN(origbrake, collision ? 0.15f :0.05f), brake - MAX(fabs(angle), fabs(car->_yaw_rate) / 2));
-    brake = (float) (MAX(MIN(origbrake, (collision ? MAX(0.05f, (5.0-collision)/30) : 0.05f)), brake - fabs(angle-speedangle)*0.3));
-
-    if (fbrakecmd)
-        brake = MAX(brake, fbrakecmd);
-#endif
 
     return brake;
 }

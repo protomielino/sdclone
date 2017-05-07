@@ -29,7 +29,7 @@ SET(ROBOT_SOURCES
   src/globaldefs.h)
 
 # Official-only USR instances.
-SET(ROBOT_CLONES usr_trb1 usr_sc usr_ls1 usr_ls2 usr_mpa1 usr_mpa11 usr_mpa12 usr_36GP usr_rs usr_lp1 usr_mp10)
+SET(ROBOT_CLONES usr_trb1 usr_sc usr_srw usr_ls1 usr_ls2 usr_mpa1 usr_mpa11 usr_mpa12 usr_36GP usr_rs usr_lp1 usr_mp10)
 
 ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.0.0 SOVERSION 1.0.0
               INTERFACE ${ROBOT_INTERFACE} 
