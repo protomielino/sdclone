@@ -25,11 +25,11 @@
 //==========================================================================*
 // Statics
 //--------------------------------------------------------------------------*
-int Driver::NBBOTS = MAX_NBBOTS;					// Nbr of drivers/robots
+int Driver::NBBOTS = MAX_NBBOTS;                                // Nbr of drivers/robots
 const char* Driver::MyBotName = "usr";				// Name of this bot
-const char* Driver::ROBOT_DIR = "drivers/usr";		// Sub path to dll
+const char* Driver::ROBOT_DIR = "drivers/usr";                  // Sub path to dll
 const char* Driver::SECT_PRIV = "private";			// Private section
-const char* Driver::DEFAULTCARTYPE  = "car1-trb1";	// Default car type
+const char* Driver::DEFAULTCARTYPE  = "trb1-cavallo-360rb";     // Default car type
 int   Driver::RobotType = 0;
 
 /*bool  Driver::AdvancedParameters = false;			// Advanced parameters
@@ -39,19 +39,19 @@ bool  Driver::UseMPA1Skilling = false;				// Use mpa1 car skilling
 float Driver::SkillingFactor = 0.1f;				// Skilling factor for career-mode
 bool  Driver::UseBrakeLimit = false;				// Use brake limit
 bool  Driver::UseGPBrakeLimit = false;				// Use brake limit GP36
-bool  Driver::UseRacinglineParameters = false;		// Use racingline parameters
+bool  Driver::UseRacinglineParameters = false;                  // Use racingline parameters
 bool  Driver::UseWingControl = false;				// Use wing control parameters
-float Driver::BrakeLimit = -6;						// Brake limit
+float Driver::BrakeLimit = -6;					// Brake limit
 float Driver::BrakeLimitBase = 0.025f;				// Brake limit base
-float Driver::BrakeLimitScale = 25;					// Brake limit scale
+float Driver::BrakeLimitScale = 25;				// Brake limit scale
 float Driver::SpeedLimitBase = 0.025f;				// Speed limit base
-float Driver::SpeedLimitScale = 25;					// Speed limit scale
+float Driver::SpeedLimitScale = 25;				// Speed limit scale
 bool  Driver::FirstPropagation = true;				// Initialize
-bool  Driver::Learning = false;						// Initialize*/
+bool  Driver::Learning = false;					// Initialize*/
 bool  Driver::UseWingControl = false;				// Use wing control parameters
 
-double Driver::LengthMargin;						// safety margin long.
-bool Driver::Qualification;							// Global flag
+double Driver::LengthMargin;					// safety margin long.
+bool Driver::Qualification;					// Global flag
 static const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 static const char *WingSect[2]  = {SECT_FRNTWING, SECT_REARWING};
 //const float Driver::MAX_UNSTUCK_ANGLE = (float)(15.0f/180.0f*PI); // [radians] If the angle of the car on the track is smaller, we assume we are not stuck.

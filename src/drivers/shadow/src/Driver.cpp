@@ -577,6 +577,9 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
 
   m_TclSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_SLIP , 0, (float)m_TclSlip);
   m_TclRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_RANGE , 0, (float)m_TclRange);
+  m_AbsSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_SLIP , 0, (float)m_AbsSlip);
+  m_AbsRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_RANGE , 0, (float)m_AbsRange);
+  LogSHADOW.debug( "#Car TCL SLIP = %g - TCL RANGE = %g - ABS SLIP = %g - ABS RANGE = %g\n", m_TclSlip, m_TclRange, m_AbsSlip, m_AbsRange );
 
   AdjustBrakes(hCarParm);
 

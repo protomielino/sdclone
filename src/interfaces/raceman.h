@@ -16,14 +16,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 /** @file
-    		This is the race information structures.
+                This is the race information structures.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
     @ingroup	raceinfo
 */
- 
+
 #ifndef _RACEMANV1_H_
 #define _RACEMANV1_H_
 
@@ -50,7 +50,7 @@ typedef int (*tfRmRunState) (struct RmInfo *);
 #define RM_NEXT_EVENT		0x00000400
 
 #define RM_QUIT			0x10000000
-#define RM_ERROR			0x2000000
+#define RM_ERROR	        0x2000000
 
 
 #define RCM_MAX_DT_SIMU		0.002
@@ -97,7 +97,7 @@ typedef struct Situation {
     double		currentTime;	/**< current time in sec since the beginning of the simulation */
     double		accelTime;	/**< accelerared time used for 24hr race simulation */
     int			nbPlayers;	/**< number of human player in local (splitted screen) */
-    tCarElt		**cars;		/**< list of cars */ 
+    tCarElt		**cars;		/**< list of cars */
 } tSituation;
 
 /** Race Engine states */
@@ -123,7 +123,7 @@ typedef struct Situation {
 #define RE_STATE_RACE_COOLDOWN	19
 
 /** Race Engine Car Information about the race */
-typedef struct 
+typedef struct
 {
     tTrkLocPos	prevTrkPos;
     tdble	sTime;
@@ -159,9 +159,9 @@ typedef struct
     int			running;
     unsigned	displayMode; // Bit field (see RM_DISP_MODE_*)
     tCarElt		*pitRequester; // The car asking for pit (stopped in the slot).
-	char		*message;
+        char		*message;
     double		messageEnd;
-	char		*bigMessage;
+        char		*bigMessage;
     double		bigMessageEnd;
 } tRaceEngineInfo;
 
@@ -187,6 +187,28 @@ typedef struct
 #define RM_PNST_STOPANDGO	0x00000002
 #define RM_PNST_STOPANDGO_OK	0x00000004
 #define RM_PNST_OVERSPEED	0x00000008
+#define RM_PNST_SPD		0x00010000
+#define RM_PNST_STNGO		0x00020000
+
+typedef struct RmRaceRules
+{
+  enum RmRuleFlags
+  {
+    CORNER_CUTTING_TIME_INVALIDATE = 1,
+    WALL_HIT_TIME_INVALIDATE = 2,
+    CORNER_CUTTING_TIME_PENALTY = 4
+  };
+
+  int enabled;
+  tdble fuelFactor;
+  tdble damageFactor;
+  tdble refuelFuelFlow;
+  tdble damageRepairFactor;
+  tdble pitstopBaseTime;
+  tdble tireFactor;
+  tdble allTiresChangeTime;
+} tRmRaceRules;
+
 
 typedef struct RmCarRules
 {
@@ -209,6 +231,7 @@ typedef struct RmInfo
     tModList		**robModList;	/**< robot modules loaded */
     tRmCarRules		*rules;		/**< by car rules */
     tRaceEngineInfo	raceEngineInfo;
+    tRmRaceRules        raceRules;
 } tRmInfo;
 
 /*
@@ -255,13 +278,13 @@ typedef struct RmInfo
 #define RM_ATTR_NUMBER		"number"
 #define RM_ATTR_CAR		"car"
 #define RM_ATTR_NBGROUPS	"number of groups"
-#define RM_ATTR_CAR_CATEGORY "Car Category"
+#define RM_ATTR_CAR_CATEGORY    "Car Category"
 
 #define RM_ATTR_PRIO		"priority"
 #define RM_ATTR_NAME		"name"
 #define RM_ATTR_TYPE		"type"
 #define RM_ATTR_SUBTYPE		"subtype"
-#define RM_ATTR_FULLNAME		"full name"
+#define RM_ATTR_FULLNAME	"full name"
 #define RM_ATTR_DRVNAME		"driver name"
 #define RM_ATTR_CATEGORY	"category"
 #define RM_ATTR_DESCR		"description"
@@ -271,7 +294,7 @@ typedef struct RmInfo
 
 #define RM_ATTR_MODULE		"module"
 #define RM_ATTR_IDX		"idx"
-#define RM_ATTR_CARNAME	"car name"
+#define RM_ATTR_CARNAME	        "car name"
 #define RM_ATTR_TEAMNAME	"team"
 #define RM_ATTR_SKINNAME	"skin name"
 #define RM_ATTR_SKINTARGETS	"skin targets"
@@ -294,12 +317,24 @@ typedef struct RmInfo
 #define RM_ATTR_DISTANCE	"distance"
 #define RM_ATTR_LAPS		"laps"
 #define RM_ATTR_SESSIONTIME	"sessiontime"
-#define RM_ATTR_CLOUDS	    "clouds"
-#define RM_ATTR_RAIN        "rain"
-#define RM_ATTR_TIME_OF_DAY		"time of day"
+#define RM_ATTR_CLOUDS	        "clouds"
+#define RM_ATTR_RAIN            "rain"
+#define RM_ATTR_TIME_OF_DAY	"time of day"
 #define RM_ATTR_QUAL_LAPS	"Qualification laps"
 #define RM_ATTR_POLE		"pole position side"
 #define RM_ATTR_CARSPERPIT	"cars per pit"
+
+#define RM_ATTR_INVALIDATE_BEST_LAP_WALL_TOUCH  "invalidate best lap on wall touch"
+#define RM_ATTR_INVALIDATE_BEST_LAP_CORNER_CUT  "invalidate best lap on corner cutting"
+#define RM_ATTR_CORNER_CUT_TIME_PENALTY         "corner cutting time penalty"
+#define RM_ATTR_DAMAGE_FACTOR                   "damage factor"
+#define RM_ATTR_FUEL_FACTOR                     "fuel consumption factor"
+#define RM_ATTR_TIRE_FACTOR                     "tire factor"
+#define RM_ATTR_PIT_SPEED_LIMIT                 "pit speed limit"
+#define RM_ATTR_REFUEL_FUEL_FLOW                "refuel fuel flow"
+#define RM_ATTR_DAMAGE_REPAIR_FACTOR            "damage repair factor"
+#define RM_ATTR_PITSTOP_BASE_TIME               "pitstop base time"
+#define RM_ATTR_ALL_TIRES_CHANGE_TIME           "all tires change time"
 
 #define RM_ATTR_POINTS		"points"
 
@@ -307,6 +342,7 @@ typedef struct RmInfo
 #define RM_VAL_DRVSEL		"drivers select"
 #define RM_VAL_RACECONF		"race config"
 #define RM_VAL_ANYRACE		"All Sessions"
+
 #ifdef CLIENT_SERVER
 #define RM_VAL_CLIENTCONF	"client config"
 #define RM_VAL_SERVERCONF	"server config"
@@ -483,7 +519,7 @@ typedef struct RmInfo
 
 #define RE_SECT_RANK		"Rank"
 
-#define RE_SECT_TEAMINFO	"Team Info"		
+#define RE_SECT_TEAMINFO	"Team Info"
 
 #define RE_ATTR_NAME		"name"
 #define RE_ATTR_SNAME		"short name"
@@ -499,6 +535,8 @@ typedef struct RmInfo
 #define RE_ATTR_DAMMAGES	"damages"
 #define RE_ATTR_NB_PIT_STOPS	"pit stops"
 #define RE_ATTR_POINTS		"points"
+#define RE_ATTR_PENALTYTIME	"penaltytime"
+
 #define RE_SECT_CLASSPOINTS	"Class Points"
 
 #endif /* _RACEMANV1_H_ */
