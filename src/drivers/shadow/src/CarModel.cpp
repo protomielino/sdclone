@@ -22,6 +22,10 @@
 #include "Utils.h"
 //#include "Driver.h"
 
+// The "SHADOW" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -140,9 +144,13 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
       MuF = TcF * MuF;
       MuR = TcR * MuR;
       Mu = MIN(MuF, MuR); // SKILL;
+      LogSHADOW.debug("TYRE MUF = %.f - TYRE MUR = %.f - MU = %.f\n", MuF, MuR, Mu);
     }
     else
-      Mu = MIN(MuF, MuR); // oTmpCarParam->oSkill;
+    {
+        Mu = MIN(MuF, MuR); // oTmpCarParam->oSkill;
+        LogSHADOW.debug("MU = %.f\n", Mu);
+    }
 
     Den = (AbsCrv - ScaleBump * kz) - (CA_FW * MuF + CA_RW * MuR
       + CA_GE_F * MuF + CA_GE_R * MuR) / MASS;
@@ -164,7 +172,7 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
       Speed *= oDriver->CarCharacteristic.CalcOffset(Speed);*/
 
     //Speed = oDriver->CalcHairpin(Speed,AbsCrv);
-
+    LogSHADOW.debug("CarModel CalcMaxSpeed = %.f\n", Speed);
     return Speed;
 /*
     double	M  = MASS + FUEL;
@@ -254,6 +262,7 @@ double	CarModel::CalcBreaking(double k0, double kz0, double k1, double kz1, doub
         MU_F = kFriction * TYRE_MU_F;
         MU_R = kFriction * TYRE_MU_R;
         MU   = (MU_F + MU_R) * 0.5;
+        LogSHADOW.debug("CalcBreaking TYRE MUF = %.f - TYRE MUR = %.f - MU = %.f\n", MU_F, MU_R, MU);
     }
 
     if (HASTYC)
@@ -263,6 +272,7 @@ double	CarModel::CalcBreaking(double k0, double kz0, double k1, double kz1, doub
       MU_F = TcF * MU_F;
       MU_R = TcR * MU_R;
       MU = MIN(MU_F, MU_R); // SKILL;
+      LogSHADOW.debug("CalcBreaking HASTYC TYRE MUF = %.f - TYRE MUR = %.f - MU = %.f\n", MU_F, MU_R, MU);
     }
     else
       MU = MIN(MU_F, MU_R); // oTmpCarParam->oSkill;
@@ -331,6 +341,8 @@ double	CarModel::CalcBreaking(double k0, double kz0, double k1, double kz1, doub
     double braketargetspd = sqrt(midspd * midspd + 2 * brakedecel * dist);
     double resulttargetspd = MIN(u, braketargetspd);
 
+    LogSHADOW.debug("CalcBreaking resulttargetspd = %.f\n", MAX(resulttargetspd, spd1));
+
     return MAX(resulttargetspd, spd1);
 }
 
@@ -350,6 +362,7 @@ double	CarModel::CalcAcceleration(double k0, double kz0, double k1, double kz1, 
         double MU_F = TcF * TYRE_MU_F;
         double MU_R = TcR * TYRE_MU_R;
         MU = MIN(MU_F, MU_R); // SKILL;
+        LogSHADOW.debug("CalcAcceleration TYRE MUF = %.f - TYRE MUR = %.f - MU = %.f\n", MU_F, MU_R, MU);
     }
 
     double	cs = cos(RollAngle);

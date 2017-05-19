@@ -1646,12 +1646,12 @@ void TDriver::Drive( tSituation* s )
       if( m_avoidS == 1 )
         {
           SpeedControl( SPDC_NORMAL, targetSpd, spd0, car, acc, brk );
-          LogSHADOW.debug("#Drive Avoid SpeedControl = m_avoidS\n");
+          LogSHADOW.debug("#Drive Avoid SpeedControl = m_avoidS - %d\n", SPDC_NORMAL);
         }
       else if (car->_trkPos.seg->type == TR_STR)
         {
           SpeedControl( SPDC_EXTRA, targetSpd, spd0, car, acc, brk );
-          LogSHADOW.debug("#Drive Extra SpeedControl = SpeedControl1\n");
+          LogSHADOW.debug("#Drive Extra SpeedControl = %d\n", SPDC_EXTRA);
         }
       else
         {
@@ -3564,12 +3564,14 @@ bool TDriver::CheckPitSharing()
 
 double TDriver::TyreConditionFront()
 {
-  return MIN(car->_tyreCondition(0), car->_tyreCondition(1));
+    LogSHADOW.debug("Tyre Condition 0 = %.f - Tyre Condition 1 = %.f\n", car->_tyreCondition(0), car->_tyreCondition(1));
+    return MIN(car->_tyreCondition(0), car->_tyreCondition(1));
 }
 
 double TDriver::TyreConditionRear()
 {
-  return MIN(car->_tyreCondition(2), car->_tyreCondition(3));
+    LogSHADOW.debug("Tyre Condition 2 = %.f - Tyre Condition 3 = %.f\n", car->_tyreCondition(2), car->_tyreCondition(3));
+    return MIN(car->_tyreCondition(2), car->_tyreCondition(3));
 }
 
 double TDriver::TyreTreadDepthFront()
