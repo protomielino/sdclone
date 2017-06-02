@@ -91,6 +91,7 @@
 #define PRV_SPEED_LIMIT_SCALE   "speed limit scale"
 #define PRV_TCL_SLIP            "tcl slip"
 #define PRV_TCL_RANGE           "tcl range"
+#define PRV_TCL_FACTOR          "tcl factor"
 #define PRV_ABS_SLIP            "abs slip"
 #define PRV_ABS_RANGE           "abs range"
 
@@ -386,9 +387,8 @@ private:
   double        m_TclRange;                            // TCL range
   double        m_TclSlip;                             // Max TCL slip
   double        m_TclFactor;                           // TCL scale
-
-  double        m_AbsRange;                            // TCL range
-  double        m_AbsSlip;                             // Max TCL slip
+  float         m_AbsSlip;
+  float         m_AbsRange;
 
   double	m_DriftAngle;                          // Drifting angle
   double	m_AbsDriftAngle;                       // fabs(Drifting angle)
@@ -400,6 +400,8 @@ private:
   double        m_ClutchDelta;
   double        m_ClutchRange;
   double        m_ClutchRelease;
+
+  double        suspHeight;
 
   float         m_Shift;
 
@@ -488,6 +490,8 @@ private:
   float           TIREMUF;
   float           TIREMUR;
 
+  float           (TDriver::*GET_DRIVEN_WHEEL_SPEED)();
+
   double          BrakeMaxPressRatio;
   double          BrakeMaxTqFront;
   double          BrakeMaxTqRear;
@@ -513,6 +517,9 @@ private:
   static const float SHIFT_DOWN;
   static const float SHIFT_MARGIN;
   static const float CLUTCH_SPEED;
+  static const float ABS_MINSPEED;
+  static const float ABS_SLIP;
+  static const float ABS_RANGE;
 };
 
 #endif

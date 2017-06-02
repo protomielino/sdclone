@@ -70,6 +70,9 @@ const float TDriver::SHIFT_UP = 0.99f;             // [-] (% of rpmredline)
 const float TDriver::SHIFT_DOWN = 120;
 const float TDriver::SHIFT_MARGIN = 4.0f;          // [m/s] Avoid oscillating gear changes.
 const float TDriver::CLUTCH_SPEED = 0.5f;
+const float TDriver::ABS_MINSPEED = 3.0f;            // [m/s] Below this speed the ABS is disabled (numeric, division by small numbers).
+const float TDriver::ABS_SLIP = 2.5f;
+const float TDriver::ABS_RANGE = 5.0f;
 
 //double TDriver::LengthMargin;                      // safety margin long.
 //bool TDriver::Qualification;                       // Global flag
@@ -158,11 +161,11 @@ TDriver::TDriver(int Index, const int robot_type):
   HasTCL(false),
   HasTYC(false),
 
-  m_TclRange(10.0),
+  m_TclRange(5.0),
   m_TclSlip(1.6f),
   m_TclFactor(1.0),
-  m_AbsRange(4.0),
-  m_AbsSlip(2.0),
+  m_AbsSlip(2.5f),
+  m_AbsRange(5.0f),
 
   m_DriftAngle(0.0),
   m_AbsDriftAngle(0.0),
@@ -174,6 +177,7 @@ TDriver::TDriver(int Index, const int robot_type):
   m_ClutchDelta(0.009f),
   m_ClutchRange(0.82f),
   m_ClutchRelease(0.5f),
+  suspHeight(0),
 
   m_Shift(0.98f),
 
@@ -570,15 +574,30 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
   m_Shift = GfParmGetNum(hCarParm, SECT_PRIV, PRV_SHIFT, 0, (float)m_Shift);
   LogSHADOW.debug("#m_Shift %g\n",m_Shift);
 
+  m_TclSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_SLIP, 0, m_TclSlip);
+  LogSHADOW.debug("#m_TclSlip %g\n",m_TclSlip);
+
+  m_TclRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_RANGE, 0, m_TclRange);
+  LogSHADOW.debug("#m_TclRange %g\n",m_TclRange);
+
+  m_TclFactor = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_FACTOR, 0, m_TclFactor);
+  LogSHADOW.debug("#m_TclFactor %g\n",m_TclFactor);
+
+  m_AbsSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_SLIP, 0, m_AbsSlip);
+  LogSHADOW.debug("#m_AbsSlip %g\n",m_AbsSlip);
+
+  m_AbsRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_RANGE, 0, m_AbsRange);
+  LogSHADOW.debug("#m_AbsRange %g\n",m_AbsRange);
+
   m_DeltaAccel = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ACCEL_DELTA , 0, (float)m_DeltaAccel);
   m_DeltaAccelRain = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ACCEL_DELTA_RAIN, 0, (float)m_DeltaAccelRain);
   LogSHADOW.debug("FLY_HEIGHT %g\n", FLY_HEIGHT );
   LogSHADOW.debug( "BUMP_MOD %d\n", BUMP_MOD );
 
-  m_TclSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_SLIP , 0, (float)m_TclSlip);
+  /*m_TclSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_SLIP , 0, (float)m_TclSlip);
   m_TclRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_RANGE , 0, (float)m_TclRange);
   m_AbsSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_SLIP , 0, (float)m_AbsSlip);
-  m_AbsRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_RANGE , 0, (float)m_AbsRange);
+  m_AbsRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_RANGE , 0, (float)m_AbsRange);*/
   LogSHADOW.debug( "#Car TCL SLIP = %g - TCL RANGE = %g - ABS SLIP = %g - ABS RANGE = %g\n", m_TclSlip, m_TclRange, m_AbsSlip, m_AbsRange );
 
   AdjustBrakes(hCarParm);
@@ -652,6 +671,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
   m_Strategy->Driver = this;
 
   m_Strategy->setFuelAtRaceStart(track, ppCarParmHandle, pS, INDEX);                               //   strategy
+  m_AbsSlip = ABS_SLIP;
 }
 
 // Start a new race.
@@ -679,6 +699,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
     }
 
   m_cm.MASS = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_MASS, NULL, 1000.0);
+  suspHeight = GfParmGetNum(car->_carHandle, SECT_REARLFTSUSP, PRM_SUSPCOURSE, NULL, 0.0f);
 
   initCa();
 
@@ -2417,7 +2438,13 @@ double TDriver::ApplyAbs( tCarElt* car, double brake )
 {
   if( car->_speed_x < 10 )
     return brake;
-#if 1
+
+  if (car->_speed_x < ABS_MINSPEED)
+      return brake;
+
+  float trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
+  double angle = trackangle - car->_yaw;
+  NORM_PI_PI(angle);
   float origbrake = brake;
   float rearskid = MAX(0.0f, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
   int i;
@@ -2428,11 +2455,9 @@ double TDriver::ApplyAbs( tCarElt* car, double brake )
       slip += car->_wheelSpinVel(i) * car->_wheelRadius(i);
   }
 
-  float trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
-  double angle = trackangle - car->_yaw;
-
   slip *= 1.0f + MAX(rearskid, MAX(fabs(car->_yaw_rate) / 5, fabs(angle) / 6));
   slip = car->_speed_x - slip / 4.0f;
+
   if (slip > m_AbsSlip)
   {
       brake = brake - MIN(brake, (slip - m_AbsSlip) / m_AbsRange);
@@ -2447,19 +2472,6 @@ double TDriver::ApplyAbs( tCarElt* car, double brake )
   }
 
   brake = MAX(brake, MIN(origbrake, 0.1f));
-
-#else
-  double	slip = 0.0;
-  for( int i = 0; i < 4; i++ )
-    slip += car->_wheelSpinVel(i) * car->_wheelRadius(i);
-
-  slip = 4.0 * car->_speed_x / slip;
-
-  if( slip > 1.0 )
-    {
-      brake *= 0.5;
-    }
-#endif
 
   return brake;
 }
@@ -2897,6 +2909,7 @@ double TDriver::filterTCL(double Accel)                                     // T
   Wr /= Count;                                   // and radius
 
   double Slip = Spin * Wr - car->_speed_x;        // Calculate slip
+
   if (m_Rain)
     Slip *= m_TclFactor * (m_RainIntensity * 0.25 + 1);
 
@@ -2904,6 +2917,7 @@ double TDriver::filterTCL(double Accel)                                     // T
   if (m_Rain)
     AccelScale = 0.01f;
 
+#if 0
   if (Slip > m_TclSlip)                           // Decrease accel if needed
     {
       float MinAccel = (float) (AccelScale * Accel);
@@ -2912,6 +2926,54 @@ double TDriver::filterTCL(double Accel)                                     // T
     }
 
   return MIN(1.0, Accel);
+#else
+    //if (simtime < 0.7)
+        //return accel;
+
+    Accel = MIN(1.0f, Accel);
+    float accel1 = Accel, accel2 = Accel, accel3 = Accel, accel4 = Accel;
+
+    if (car->_speed_x > 10.0f)
+    {
+    }
+        float this_tcl_slip = (car->_speed_x > 10.0f ? m_TclSlip : m_TclRange/10);
+        if (Slip > this_tcl_slip)
+        {
+            float friction = MIN(car->_wheelSeg(REAR_RGT)->surface->kFriction, car->_wheelSeg(REAR_LFT)->surface->kFriction);
+
+            if (friction >= 0.95f)
+                friction = pow(friction+0.06f, 3.0f);
+            else
+                friction = pow(friction, 3.0f);
+
+            float this_slip = MIN(m_TclRange, (m_TclRange/2) * friction);
+            //accel3 = accel3 - MIN(accel3, (slip - tcl_slip) / tcl_range);
+            accel3 = accel3 - MIN(accel3, (Slip - this_slip) / m_TclRange);
+        }
+
+#if 1
+        //if (raceType != RM_TYPE_QUALIF)
+        {
+            double height = 0.0;
+            tTrkLocPos wp;
+            double wx = car->pub.DynGCg.pos.x;
+            double wy = car->pub.DynGCg.pos.y;
+            RtTrackGlobal2Local(car->_trkPos.seg, wx, wy, &wp, TR_LPOS_SEGMENT);
+            height = car->_pos_Z - RtTrackHeightL(&wp) - car->_wheelRadius(REAR_LFT) - suspHeight*2;
+
+            if (height > 0.0)
+            {
+                accel1 = MAX(accel3, 1.0);
+                accel2 = MAX(accel3, 1.0);
+                accel3 = MAX(accel3, 1.0);
+                accel4 = MAX(accel3, 1.0);
+                accel1 = MIN(accel1, 0.2);
+            }
+        }
+#endif
+#endif
+
+    return MIN(accel1, MIN(accel2, MIN(accel3, accel4)));
 }
 
 //==========================================================================*

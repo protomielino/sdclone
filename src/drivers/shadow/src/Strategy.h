@@ -80,6 +80,7 @@ public:
     virtual int pitRepair(tCarElt* car, tSituation *s) = 0;
     // Pit Free?
     virtual bool isPitFree(tCarElt* car) = 0;
+    virtual int pitStopPenalty() = 0;
 
     tCarElt    *Car;
     tTrack     *Track;
@@ -114,6 +115,7 @@ public:
     float   pitRefuel(tCarElt* car, tSituation *s);
     int     pitRepair(tCarElt* car, tSituation *s);
     bool    isPitFree(tCarElt* car);
+    int     pitStopPenalty() { return m_stopPenalty; }
 
 protected:
     bool test_Pitstop;
@@ -149,6 +151,8 @@ protected:
     int PIT_DAMMAGE;                    // max damage before we request a pit stop. (M*2? Do not disturb!)
     int MAX_DAMAGE;
     int MAX_DAMAGE_DIST;
+
+    int m_stopPenalty;
 
     int fuel_Strat;                     // Pit refuel strategy
     float m_fuelperstint;
