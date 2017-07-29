@@ -3841,7 +3841,7 @@ static char const* GfParmMakePathKey( char const* path, va_list arg, char const 
     if( lastSlash != NULL && key )
     {
         *key = lastSlash + 1;
-        lastSlash = '\0';
+        lastSlash = (char*)'\0';
     }
     else if( key )
     {
