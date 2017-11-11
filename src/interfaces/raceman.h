@@ -159,9 +159,9 @@ typedef struct
     int			running;
     unsigned	displayMode; // Bit field (see RM_DISP_MODE_*)
     tCarElt		*pitRequester; // The car asking for pit (stopped in the slot).
-        char		*message;
+    char		*message;
     double		messageEnd;
-        char		*bigMessage;
+    char		*bigMessage;
     double		bigMessageEnd;
 } tRaceEngineInfo;
 
@@ -184,11 +184,11 @@ typedef struct
 #define _reBigMessageEnd	raceEngineInfo.bigMessageEnd
 
 #define RM_PNST_DRIVETHROUGH	0x00000001
-#define RM_PNST_STOPANDGO	0x00000002
+#define RM_PNST_STOPANDGO	    0x00000002
 #define RM_PNST_STOPANDGO_OK	0x00000004
-#define RM_PNST_OVERSPEED	0x00000008
-#define RM_PNST_SPD		0x00010000
-#define RM_PNST_STNGO		0x00020000
+#define RM_PNST_OVERSPEED	    0x00000008
+#define RM_PNST_SPD		        0x00010000
+#define RM_PNST_STNGO		    0x00020000
 
 typedef struct RmRaceRules
 {

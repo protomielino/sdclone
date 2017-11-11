@@ -359,10 +359,10 @@ typedef tMemoryPoolItem* tMemoryPool;
 
 typedef struct MemPoolCar
 {
-	tMemoryPool newTrack;
-	tMemoryPool newRace;
-	tMemoryPool endRace;
-	tMemoryPool shutdown;
+    tMemoryPool newTrack;
+    tMemoryPool newRace;
+    tMemoryPool endRace;
+    tMemoryPool shutdown;
 } tMemPoolCar;
 
 /* structrure to store one parameter of car setup */
@@ -411,15 +411,15 @@ typedef struct
     void	*paramsHandle;          /**< accessible parameters for modules */
     void	*carHandle;             /**< parameters for car caracteristics */
     int		driverIndex;            /**< index when multiple drivers are in the same dll */
-    int         moduleIndex;            /**< index which is the same as the one in the files */
+    int     moduleIndex;            /**< index which is the same as the one in the files */
     char	modName[MAX_NAME_LEN];	/**< dll name */
     tWheelState	wheel[4];
     tPosd	corner[4];              /**< car's corners position */
     int		gear;                   /**< current gear */
     int		gearNext;               /**< next gear while shiting */
     tdble	fuel;                   /**< remaining fuel (liters) */
-    tdble       fuel_consumption_total; // l
-    tdble       fuel_consumption_instant; // l/100km (>100 means infinity)
+    tdble   fuel_consumption_total; // l
+    tdble   fuel_consumption_instant; // l/100km (>100 means infinity)
     tdble	enginerpm;
     tdble	enginerpmRedLine;
     tdble	enginerpmMax;
@@ -434,7 +434,7 @@ typedef struct
     tdble	reaction[4];            /**< reaction on wheels */
     int		collision;
     int		simcollision;           /**< For rules etc. reflects the collision state from simu */
-    float       smoke;
+    float   smoke;
     t3Dd	normal;
     t3Dd	collpos;                /**< Collision position, useful for sound ; Simu V2 only */
     int		dammage;
@@ -524,22 +524,22 @@ typedef struct
 #define RM_CMD_PIT_ASKED	1	/**< Race command: Pit asked */
 #define RM_CMD_MAX_MSG_SIZE 32
 
-	int	lightCmd;           /**< Lights command */
+    int	lightCmd;           /**< Lights command */
 #define RM_LIGHT_HEAD1		0x00000001	/**< head light 1 */
 #define RM_LIGHT_HEAD2		0x00000002	/**< head light 2 */
 
-	int	ebrakeCmd;          /**< Parking/Emergency Brake command */
+    int	ebrakeCmd;          /**< Parking/Emergency Brake command */
 
-	int	wingControlMode;        /**< 0: No wing control; 1 fixed wing angles; 2 variable wing angles */
-	int	singleWheelBrakeMode;   /**< 0: No single wheel brake; 1 single wheel brake mode */
-	int	switch3;                /**< reserved for future use */
-	int	telemetryMode;          /**< Define mode for telemetry output: 0: no output; 1: full output; ... see car.cpp SimCarUpdate2 */
+    int	wingControlMode;        /**< 0: No wing control; 1 fixed wing angles; 2 variable wing angles */
+    int	singleWheelBrakeMode;   /**< 0: No single wheel brake; 1 single wheel brake mode */
+    int	switch3;                /**< reserved for future use */
+    int	telemetryMode;          /**< Define mode for telemetry output: 0: no output; 1: full output; ... see car.cpp SimCarUpdate2 */
 
-	char	msg[4][RM_CMD_MAX_MSG_SIZE];     /**< 4 lines of 31 characters : 0-1 from car, 2-3 from race engine */
+    char	msg[4][RM_CMD_MAX_MSG_SIZE];     /**< 4 lines of 31 characters : 0-1 from car, 2-3 from race engine */
 #define RM_MSG_LEN	31
 
-	float	msgColor[4]; /**< RGBA of text */
-	tDashboardItem *setupChangeCmd;	/* setup item changed in dashboard */
+    float	msgColor[4]; /**< RGBA of text */
+    tDashboardItem *setupChangeCmd;	/* setup item changed in dashboard */
 } tCarCtrl;
 #define _steerCmd	ctrl.steer
 #define _accelCmd	ctrl.accelCmd
@@ -603,6 +603,9 @@ typedef struct CarPitCmd
 #define RM_PIT_STOPANDGO	1
     int			stopType;
     bool		setupChanged; /* TRUE if setup has changed during the pit stop */
+
+    enum TireChange { NONE = 0, ALL = 1};
+    TireChange tireChange;
 } tCarPitCmd;
 /* structure access */
 #define _pitFuel	pitcmd.fuel
