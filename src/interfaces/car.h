@@ -440,7 +440,7 @@ typedef struct
     int		dammage;
     int		debug;
     tCollisionState collision_state;    /**< collision state ; Simu V3 only  */
-    tdble       localPressure;	        /**< Environment pressure at cars location */
+    tdble   localPressure;	// Environment pressure at cars location
     tMemPoolCar	memoryPool;
     tdble       driveSkill;             /**< Skill level for robots: 0.0 means as fast as possible; 10.0 means at a slower speed so players can easier win */
     tdble       steerTqCenter;          /**< torques on steering wheel for force feedback, this is the centering torque, linear with steering angle */
