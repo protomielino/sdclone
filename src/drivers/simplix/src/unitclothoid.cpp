@@ -121,45 +121,45 @@ void TClothoidLane::MakeSmoothPath(
   LogSimplix.debug("OptimisePath:\n");
   while (Step > 0)
   {
-	LogSimplix.debug("Step: %d\n",Step);
- 	for (int I = 0; I < L; I++)
-	{
-		OptimisePath(Step, Delta, 0, Param.oCarParam.oUglyCrvZ);
-	}
+    LogSimplix.debug("Step: %d\n",Step);
+    for (int I = 0; I < L; I++)
+    {
+        OptimisePath(Step, Delta, 0, Param.oCarParam.oUglyCrvZ);
+    }
     Step >>= 1;
   }
 
   if (Opts.BumpMod)
   {
     LogSimplix.debug("AnalyseBumps:\n");
-	AnalyseBumps(false);
-	//AnalyseBumps(true);
+    AnalyseBumps(false);
+    //AnalyseBumps(true);
 
-	Step = 1;
-	Step <<= ANALYSE_STEPS;
+    Step = 1;
+    Step <<= ANALYSE_STEPS;
 
-	while (Step > 0)
-	{
-	  LogSimplix.debug("Step: %d\n",Step);
-  	  for (int I = 0; I < L; I++)
-	  {
-		OptimisePath(Step, Delta, Opts.BumpMod, Param.oCarParam.oUglyCrvZ);
-		CalcCurvaturesZ();
-		CalcFwdAbsCrv(FwdRange);
-		CalcMaxSpeeds(Step);
-		PropagateBreaking(Step);
-		PropagateAcceleration(Step);
-	  }
+    while (Step > 0)
+    {
+      LogSimplix.debug("Step: %d\n",Step);
+      for (int I = 0; I < L; I++)
+      {
+        OptimisePath(Step, Delta, Opts.BumpMod, Param.oCarParam.oUglyCrvZ);
+        CalcCurvaturesZ();
+        CalcFwdAbsCrv(FwdRange);
+        CalcMaxSpeeds(Step);
+        PropagateBreaking(Step);
+        PropagateAcceleration(Step);
+      }
       Step >>= 1;
-	}
+    }
   }
   else
   {
-	Step = 1;
+    Step = 1;
     CalcCurvaturesZ();
-	CalcMaxSpeeds(Step);
-	PropagateBreaking(Step);
-	PropagateAcceleration(Step);
+    CalcMaxSpeeds(Step);
+    PropagateBreaking(Step);
+    PropagateAcceleration(Step);
   }
 
 }
@@ -190,7 +190,7 @@ bool TClothoidLane::LoadSmoothPath(
 //--------------------------------------------------------------------------*
 void TClothoidLane::SmoothPath(
 /*  TTrackDescription* Track,*/
-  const TParam& Param, 
+  const TParam& Param,
   const TOptions& Opts)
 {
   oBase = Opts.Base;
@@ -208,14 +208,14 @@ void TClothoidLane::SmoothPath(
   {
     LogSimplix.debug("Step: %d\n",Step);
     for (int I = 0; I < L; I++)
-	{
-	  OptimisePath(Step, Delta, Opts.BumpMod, Param.oCarParam.oUglyCrvZ);
-	  CalcCurvaturesZ();
-	  CalcFwdAbsCrv(FwdRange);
-	  CalcMaxSpeeds(Step);
-	  PropagateBreaking(Step);
-	  PropagateAcceleration(Step);
-	}
+    {
+      OptimisePath(Step, Delta, Opts.BumpMod, Param.oCarParam.oUglyCrvZ);
+      CalcCurvaturesZ();
+      CalcFwdAbsCrv(FwdRange);
+      CalcMaxSpeeds(Step);
+      PropagateBreaking(Step);
+      PropagateAcceleration(Step);
+    }
     Step >>= 1;
   }
 }
@@ -247,53 +247,53 @@ void TClothoidLane::AnalyseBumps(bool DumpInfo)
   int K;
   for (I = 0; I < 2; I++)
   {
-	K = Count - 1;
+    K = Count - 1;
 
-	for (J = 0; J < Count; J++)
-	{
-	  double OldPz = Pz;
+    for (J = 0; J < Count; J++)
+    {
+      double OldPz = Pz;
 
-	  double V = (oPathPoints[J].AccSpd + oPathPoints[K].AccSpd) * 0.5;
-	  if (V < 1.00)
-		V = 1.0;
-	  double S = TUtils::VecLenXY(oPathPoints[J].Point - oPathPoints[K].Point);
-	  double Dt = S / V;
+      double V = (oPathPoints[J].AccSpd + oPathPoints[K].AccSpd) * 0.5;
+      if (V < 1.00)
+        V = 1.0;
+      double S = TUtils::VecLenXY(oPathPoints[J].Point - oPathPoints[K].Point);
+      double Dt = S / V;
 
-	  if (Dt > 1.00)
-		Dt = 1.00;
+      if (Dt > 1.00)
+        Dt = 1.00;
 
-	  Pz = oPathPoints[J].Point.z;
-	  Sz += Vz * Dt - 0.5 * G * Dt * Dt;
-	  Vz -= G * Dt;
+      Pz = oPathPoints[J].Point.z;
+      Sz += Vz * Dt - 0.5 * G * Dt * Dt;
+      Vz -= G * Dt;
 
-	  if (Sz <= Pz)
-	  {
-		double NewVz = (Pz - OldPz) / Dt;
-		if (Vz < NewVz)
-		  Vz = NewVz;
-		Sz = Pz;
-	  }
+      if (Sz <= Pz)
+      {
+        double NewVz = (Pz - OldPz) / Dt;
+        if (Vz < NewVz)
+          Vz = NewVz;
+        Sz = Pz;
+      }
 
-	  oPathPoints[J].FlyHeight = Sz - Pz;
+      oPathPoints[J].FlyHeight = Sz - Pz;
 
-	  if ((I == 1) && DumpInfo)
-	  {
-		LogSimplix.debug( "%4d v %3.0f crv %7.4f dt %.3f pz %5.2f sz %5.2f vz %5.2f -> h %5.2f\n",
-		  J, oPathPoints[J].AccSpd * 3.6, oPathPoints[J].Crv, Dt,
-		  Pz, Sz, Vz, oPathPoints[J].FlyHeight);
-	  }
-	  K = J;
-	}
+      if ((I == 1) && DumpInfo)
+      {
+        LogSimplix.debug( "%4d v %3.0f crv %7.4f dt %.3f pz %5.2f sz %5.2f vz %5.2f -> h %5.2f\n",
+          J, oPathPoints[J].AccSpd * 3.6, oPathPoints[J].Crv, Dt,
+          Pz, Sz, Vz, oPathPoints[J].FlyHeight);
+      }
+      K = J;
+    }
   }
 
   for (I = 0; I < 3; I++)
   {
     for (J = 0; J < Count; J++)
-	{
-	  K = (J + 1) % Count;
-	  if (oPathPoints[J].FlyHeight < oPathPoints[K].FlyHeight)
-	    oPathPoints[J].FlyHeight = oPathPoints[K].FlyHeight;
-	}
+    {
+      K = (J + 1) % Count;
+      if (oPathPoints[J].FlyHeight < oPathPoints[K].FlyHeight)
+        oPathPoints[J].FlyHeight = oPathPoints[K].FlyHeight;
+    }
   }
 }
 //==========================================================================*
@@ -316,33 +316,33 @@ void TClothoidLane::SmoothBetween(int Step, double BumpMod)
   int J = 2 * Step;
   for (int I = 0; I < Count; I += Step)
   {
-	L0 = L1;
-	L1 = L2;
-	L2 = L3;
-	L3 = &oPathPoints[J];
+    L0 = L1;
+    L1 = L2;
+    L2 = L3;
+    L3 = &oPathPoints[J];
 
-	J += Step;
-	if (J >= Count)
-	  J = 0;
+    J += Step;
+    if (J >= Count)
+      J = 0;
 
-	TVec3d P0 = L0->Point;
-	TVec3d P1 = L1->Point;
-	TVec3d P2 = L2->Point;
-	TVec3d P3 = L3->Point;
+    TVec3d P0 = L0->Point;
+    TVec3d P1 = L1->Point;
+    TVec3d P2 = L2->Point;
+    TVec3d P3 = L3->Point;
 
-	double Crv1 = TUtils::CalcCurvatureXY(P0, P1, P2);
-	double Crv2 = TUtils::CalcCurvatureXY(P1, P2, P3);
+    double Crv1 = TUtils::CalcCurvatureXY(P0, P1, P2);
+    double Crv2 = TUtils::CalcCurvatureXY(P1, P2, P3);
 
-	if (I + Step > Count)
-	  Step = Count - I;
+    if (I + Step > Count)
+      Step = Count - I;
 
-	for (int K = 1; K < Step; K++)
-	{
-	  TPathPt* P = &(oPathPoints[(I + K) % Count]);
-	  double Len1 = (P->CalcPt() - P1).len();
-	  double Len2 = (P->CalcPt() - P2).len();
+    for (int K = 1; K < Step; K++)
+    {
+      TPathPt* P = &(oPathPoints[(I + K) % Count]);
+      double Len1 = (P->CalcPt() - P1).len();
+      double Len2 = (P->CalcPt() - P2).len();
       Adjust(Crv1, Len1, Crv2, Len2, L1, P, L2, P1, P2, BumpMod);
-	}
+    }
   }
   }
   else
@@ -358,22 +358,22 @@ void TClothoidLane::SmoothBetween(int Step, double BumpMod)
     int J = 2;
     for (int I = 0; I < 3*Count; I++)
     {
-	  L0 = L1;
-	  L1 = L2;
-	  L2 = L3;
-	  L3 = &oPathPoints[J];
+      L0 = L1;
+      L1 = L2;
+      L2 = L3;
+      L3 = &oPathPoints[J];
 
-	  J++;
-	  if (J >= Count)
-	    J = 0;
+      J++;
+      if (J >= Count)
+        J = 0;
 
-	  //TVec3d P0 = L0->Point;
-	  //TVec3d P1 = L1->Point;
-	  //TVec3d P2 = L2->Point;
-	  //TVec3d P3 = L3->Point;
+      //TVec3d P0 = L0->Point;
+      //TVec3d P1 = L1->Point;
+      //TVec3d P2 = L2->Point;
+      //TVec3d P3 = L3->Point;
 
-	  double T = L0->Offset + L1->Offset + L2->Offset;
-	  L1->Offset = (float) (T/3);
+      double T = L0->Offset + L1->Offset + L2->Offset;
+      L1->Offset = (float) (T/3);
     }
   }
 }
@@ -388,48 +388,48 @@ void TClothoidLane::SetOffset
   double Margin = oFixCarParam.oWidth / 2;
   double WL = -P->WtoL() + Margin;
   double WR = P->WtoR() - Margin;
-  double BorderInner = oFixCarParam.oBorderInner 
-	  + MAX(0.0,MIN(oFixCarParam.oMaxBorderInner, 
-	  oFixCarParam.oBorderScale * fabs(Crv) - 1));
+  double BorderInner = oFixCarParam.oBorderInner
+      + MAX(0.0,MIN(oFixCarParam.oMaxBorderInner,
+      oFixCarParam.oBorderScale * fabs(Crv) - 1));
   double BorderOuter = oFixCarParam.oBorderOuter;
- 
+
   if (Crv >= 0) // turn to left
   {
     if (LaneType == ltLeft)
-	{
-	  T = MAX(T,WL);
- 	  T = MIN(T,WR);
-	}
-	else if (LaneType == ltRight)
-	{
-	  T = MAX(T,WL);
- 	  T = MIN(T,WR - BorderOuter);
-	}
-	else
-	{
-	  WL += BorderInner;
-	  T = MAX(T,WL);
- 	  T = MIN(T,WR - BorderOuter);
-	}
+    {
+      T = MAX(T,WL);
+      T = MIN(T,WR);
+    }
+    else if (LaneType == ltRight)
+    {
+      T = MAX(T,WL);
+      T = MIN(T,WR - BorderOuter);
+    }
+    else
+    {
+      WL += BorderInner;
+      T = MAX(T,WL);
+      T = MIN(T,WR - BorderOuter);
+    }
   }
   else // turn to right
   {
     if (LaneType == ltLeft)
-	{
-	  T = MIN(T,WR);
-	  T = MAX(T,WL + BorderOuter);
-	}
-	else if (LaneType == ltRight)
-	{
-	  T = MIN(T,WR);
-	  T = MAX(T,WL);
-	}
-	else
-	{
-  	  WR -= BorderInner;
-	  T = MIN(T,WR);
-	  T = MAX(T,WL + BorderOuter);
-	}
+    {
+      T = MIN(T,WR);
+      T = MAX(T,WL + BorderOuter);
+    }
+    else if (LaneType == ltRight)
+    {
+      T = MIN(T,WR);
+      T = MAX(T,WL);
+    }
+    else
+    {
+      WR -= BorderInner;
+      T = MIN(T,WR);
+      T = MAX(T,WL + BorderOuter);
+    }
   }
 
   if (!(P->Fix))
@@ -455,8 +455,8 @@ void TClothoidLane::OptimiseLine
   int I = (Index + Count - Step) % Count;
   while (oPathPoints[I].FlyHeight > HLimit)
   {
-	LR.Add(oPathPoints[I].Point.GetXY());
-	I = (I + Count - Step) % Count;
+    LR.Add(oPathPoints[I].Point.GetXY());
+    I = (I + Count - Step) % Count;
   }
 
   LR.Add(oPathPoints[I].Point.GetXY());
@@ -464,8 +464,8 @@ void TClothoidLane::OptimiseLine
   I = Index;
   while (oPathPoints[I].FlyHeight > HLimit)
   {
- 	LR.Add(oPathPoints[I].Point.GetXY());
-	I = (I + Step) % Count;
+    LR.Add(oPathPoints[I].Point.GetXY());
+    I = (I + Step) % Count;
   }
 
   LR.Add(oPathPoints[I].Point.GetXY());
@@ -499,17 +499,17 @@ void TClothoidLane::Adjust
   if (Crv != 0.0)
   {
     if (Crv1 * Crv2 >= 0
-	  && fabs(Crv1) < MAX_SPEED_CRV
-	  && fabs(Crv2) < MAX_SPEED_CRV)
+      && fabs(Crv1) < MAX_SPEED_CRV
+      && fabs(Crv2) < MAX_SPEED_CRV)
     {
-	  Crv *= 0.9;
+      Crv *= 0.9;
     }
 
     TUtils::LineCrossesLineXY(P->Pt(), P->Norm(), VPP, VPN - VPP, T);
 
     double Delta = DELTA_T;
     double DeltaCrv = TUtils::CalcCurvatureXY
-	  (VPP, P->Pt() + P->Norm() * (T + Delta), VPN);
+      (VPP, P->Pt() + P->Norm() * (T + Delta), VPN);
 
     if (BumpMod > 0 && BumpMod < 2)
       Delta *= 1 - MAX(0.0,MIN(0.5,P->FlyHeight - 0.1)) * BumpMod;
@@ -548,37 +548,37 @@ void TClothoidLane::Optimise
   {
     double Crv0 = TUtils::CalcCurvatureXY(P0, P1, P2);
     double Crv3 = TUtils::CalcCurvatureXY(P4, P5, P6);
-	if (Crv0 * Crv1 > 0 && Crv2 * Crv3 > 0)
-	{
-	  if (fabs(Crv0) < fabs(Crv1) && fabs(Crv1) * 1.02 < fabs(Crv2))
-	  {
-		Crv1 *= Factor/oBase;
-		Crv0 *= Factor/oBase;
-	  }
-	  else if(fabs(Crv0) > fabs(Crv1) * 1.02 && fabs(Crv1) > fabs(Crv2))
-	  {
-		Crv1 *= Factor*oBase;
-		Crv0 *= Factor*oBase;
-	  }
-	}
+    if (Crv0 * Crv1 > 0 && Crv2 * Crv3 > 0)
+    {
+      if (fabs(Crv0) < fabs(Crv1) && fabs(Crv1) * 1.02 < fabs(Crv2))
+      {
+        Crv1 *= Factor/oBase;
+        Crv0 *= Factor/oBase;
+      }
+      else if(fabs(Crv0) > fabs(Crv1) * 1.02 && fabs(Crv1) > fabs(Crv2))
+      {
+        Crv1 *= Factor*oBase;
+        Crv0 *= Factor*oBase;
+      }
+    }
   }
   else if(Crv1 * Crv2 < 0)
   {
-	double Crv0 = TUtils::CalcCurvatureXY(P0, P1, P2);
-	double Crv3 = TUtils::CalcCurvatureXY(P4, P5, P6);
-	if (Crv0 * Crv1 > 0 && Crv2 * Crv3 > 0)
-	{
-	  if(fabs(Crv1) < fabs(Crv2) && fabs(Crv1) < fabs(Crv3))
-	  {
-		Crv1 = (Crv1 * 0.25 + Crv2 * 0.75);
-		Crv0 = (Crv0 * 0.25 + Crv3 * 0.75);
-	  }
-	  else if(fabs(Crv2) < fabs(Crv1) && fabs(Crv2) < fabs(Crv0))
-	  {
-		Crv2 = (Crv2 * 0.25 + Crv1 * 0.75);
-		Crv3 = (Crv3 * 0.25 + Crv0 * 0.75);
-	  }
-	}
+    double Crv0 = TUtils::CalcCurvatureXY(P0, P1, P2);
+    double Crv3 = TUtils::CalcCurvatureXY(P4, P5, P6);
+    if (Crv0 * Crv1 > 0 && Crv2 * Crv3 > 0)
+    {
+      if(fabs(Crv1) < fabs(Crv2) && fabs(Crv1) < fabs(Crv3))
+      {
+        Crv1 = (Crv1 * 0.25 + Crv2 * 0.75);
+        Crv0 = (Crv0 * 0.25 + Crv3 * 0.75);
+      }
+      else if(fabs(Crv2) < fabs(Crv1) && fabs(Crv2) < fabs(Crv0))
+      {
+        Crv2 = (Crv2 * 0.25 + Crv1 * 0.75);
+        Crv3 = (Crv3 * 0.25 + Crv0 * 0.75);
+      }
+    }
   }
   Adjust(Crv1, Len1, Crv2, Len2, L2, L3, L4, P2, P4, BumpMod);
 }
@@ -595,53 +595,53 @@ void TClothoidLane::OptimisePath
   for (int I = 0; I < NIterations; I++)
   {
     TPathPt* L0 = NULL;
-	TPathPt* L1 = &oPathPoints[Count - 3 * Step];
-	TPathPt* L2 = &oPathPoints[Count - 2 * Step];
-	TPathPt* L3 = &oPathPoints[Count - Step];
-	TPathPt* L4 = &oPathPoints[0];
-	TPathPt* L5 = &oPathPoints[Step];
-	TPathPt* L6 = &oPathPoints[2 * Step];
-	TPathPt* LFly;
+    TPathPt* L1 = &oPathPoints[Count - 3 * Step];
+    TPathPt* L2 = &oPathPoints[Count - 2 * Step];
+    TPathPt* L3 = &oPathPoints[Count - Step];
+    TPathPt* L4 = &oPathPoints[0];
+    TPathPt* L5 = &oPathPoints[Step];
+    TPathPt* L6 = &oPathPoints[2 * Step];
+    TPathPt* LFly;
 
-	// Go forwards
-	int	K = 3 * Step;
-	int	N = (Count + Step - 1) / Step;
-	for (int J = 0; J < N; J++)
-	{
-	  L0 = L1;
-	  L1 = L2;
-	  L2 = L3;
-	  L3 = L4;
-	  L4 = L5;
-	  L5 = L6;
-	  L6 = &oPathPoints[K];
-	  LFly = L3;  
+    // Go forwards
+    int	K = 3 * Step;
+    int	N = (Count + Step - 1) / Step;
+    for (int J = 0; J < N; J++)
+    {
+      L0 = L1;
+      L1 = L2;
+      L2 = L3;
+      L3 = L4;
+      L4 = L5;
+      L5 = L6;
+      L6 = &oPathPoints[K];
+      LFly = L3;
 
-	  int Index = (K + Count - 3 * Step) % Count;
+      int Index = (K + Count - 3 * Step) % Count;
       double Factor = oBaseFactor;
 
-	  if (LFly->CrvZ < UglyCrvZ)
-	  {
-		Optimise(Factor/10, L3, L0, L1, L2, L4, L5, L6, BumpMod);
-	  }
-	  else if (LFly->FlyHeight > 0.035)
-	  {
-		Optimise(Factor/100, L3, L0, L1, L2, L4, L5, L6, BumpMod);
-	  }
-	  else if (BumpMod == 2 && L3->FlyHeight > 0.1)
-	  {
-		LogSimplix.debug("OptimiseLine Index: %d\n",Index);
-		OptimiseLine(Index, Step, 0.1, L3, L2, L4);
-	  }
-	  else
-	  {
-		Optimise(Factor, L3, L0, L1, L2, L4, L5, L6, BumpMod);
-	  }
-      //K = (K + Step) % Count; 
+      if (LFly->CrvZ < UglyCrvZ)
+      {
+        Optimise(Factor/10, L3, L0, L1, L2, L4, L5, L6, BumpMod);
+      }
+      else if (LFly->FlyHeight > 0.035)
+      {
+        Optimise(Factor/100, L3, L0, L1, L2, L4, L5, L6, BumpMod);
+      }
+      else if (BumpMod == 2 && L3->FlyHeight > 0.1)
+      {
+        LogSimplix.debug("OptimiseLine Index: %d\n",Index);
+        OptimiseLine(Index, Step, 0.1, L3, L2, L4);
+      }
+      else
+      {
+        Optimise(Factor, L3, L0, L1, L2, L4, L5, L6, BumpMod);
+      }
+      //K = (K + Step) % Count;
       K += Step;
-	  if (K >= Count)
-		K = 0;
-	}
+      if (K >= Count)
+        K = 0;
+    }
   }
 
   // Smooth values between Steps
@@ -671,12 +671,12 @@ bool TClothoidLane::SaveToFile(const char* Filename)
 
   for (int I = 0; I < oTrack->Count(); I++)
   {
-	TPathPt& P = oPathPoints[I];                 // Points in this lane
-	const TVec3d& C = P.Pt();
-	const TVec3d& N = P.Norm();
-	fprintf(F, "%d\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n",
-	  I,C.x, C.y, C.z, N.x, N.y, N.z, P.WToL, P.Offset, P.WToR,
-	  P.Point.x, P.Point.y, P.AccSpd);
+    TPathPt& P = oPathPoints[I];                 // Points in this lane
+    const TVec3d& C = P.Pt();
+    const TVec3d& N = P.Norm();
+    fprintf(F, "%d\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\n",
+      I,C.x, C.y, C.z, N.x, N.y, N.z, P.WToL, P.Offset, P.WToR,
+      P.Point.x, P.Point.y, P.AccSpd);
   }
 
   fclose(F);
@@ -691,7 +691,7 @@ bool TClothoidLane::SaveToFile(const char* Filename)
 int TClothoidLane::GetWeather()
 {
   const TSection& Sec = (*oTrack)[0];
-  tTrackSeg* Seg = Sec.Seg; 
+  tTrackSeg* Seg = Sec.Seg;
   return (int) (100000 * Seg->surface->kFriction);
 };
 //==========================================================================*
@@ -710,8 +710,8 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
   readSize = fread(&K,sizeof(int),1,F);
   if( readSize < 1 )
   {
-  	fclose(F);
-	return false;
+    fclose(F);
+    return false;
   }
   if (K > 0)
   {
@@ -723,8 +723,8 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
   readSize = fread(&Version,sizeof(int),1,F);
   if(readSize < 1)
   {
-  	fclose(F);
-	return false;
+    fclose(F);
+    return false;
   }
   if (Version < RL_VERSION)
   {
@@ -736,8 +736,8 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
   readSize = fread(&Weather,sizeof(int),1,F);
   if(readSize < 1)
   {
-  	fclose(F);
-	return false;
+    fclose(F);
+    return false;
   }
   if (Weather != GetWeather())
   {
@@ -753,8 +753,8 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
   readSize = fread(&N,sizeof(int),1,F);
   if(readSize < 1)
   {
-  	fclose(F);
-	return false;
+    fclose(F);
+    return false;
   }
   for (int I = 0; I < N; I++)
   {
@@ -816,7 +816,7 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   }
   if (error)
   {
-	  LogSimplix.debug("TClothoidLane::SavePointsToFile(%s) : Some error occured\n", TrackLoad);
+      LogSimplix.debug("TClothoidLane::SavePointsToFile(%s) : Some error occured\n", TrackLoad);
   }
   fclose(F);
 }

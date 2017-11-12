@@ -84,7 +84,7 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     SET(OPTION_SDL_JOYSTICK true CACHE BOOL "Use SDL for Joystick instead of PLIB")
     CMAKE_DEPENDENT_OPTION(OPTION_SDL_FORCEFEEDBACK "Use SDL2 Haptics" true "OPTION_SDL_JOYSTICK;OPTION_SDL2" false)
 
-    SET(OPTION_WEBSERVER false CACHE BOOL "Build with WebServer functionality")
+    SET(OPTION_WEBSERVER true CACHE BOOL "Build with WebServer functionality")
 
     SET(OPTION_CLIENT_SERVER false CACHE BOOL "Build with Client/Server network architecture")
 
