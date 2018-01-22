@@ -20,7 +20,7 @@ IF(MSVC)
     SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
 ENDIF(MSVC)
 
-SET(SIMU_SOURCES aero.cpp axle.cpp brake.cpp car.cpp categories.cpp
+SET(SIMU_SOURCES aero.cpp atmosphere.cpp axle.cpp brake.cpp car.cpp categories.cpp
                  collide.cpp differential.cpp engine.cpp simu.cpp
                  steer.cpp susp.cpp transmission.cpp wheel.cpp
                  simuv4.cpp)

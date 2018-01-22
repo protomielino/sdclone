@@ -110,6 +110,9 @@ extern void SimCarCollideShutdown(int nbcars);
 extern void SimCarCollideInit(tTrack *track);
 extern void SimCollideRemoveCar(tCar *car, int nbcars);
 
+extern void SimAtmosphereConfig(tTrack *track);
+extern void SimAtmosphereUpdate(tCar *car, tSituation *s);
+
 extern tdble SimDeltaTime;
 extern int SimTelemetry;
 extern tCar *SimCarTable;
@@ -119,9 +122,16 @@ extern t3Dd vectEnd[];
 extern tdble simDammageFactor[];
 extern tdble simSkidFactor[];
 
+extern tdble SimRain;
+extern tdble SimTimeOfDay;
+
+extern tdble Tair;
+extern tdble Ttrack; //track temperature in K
+extern float SimAirPressure;
+
 /// return a number drawn uniformly from [0,1]
 inline float urandom() {
-	return ((((float)rand()-1)/((float)RAND_MAX)));
+    return ((((float)rand()-1)/((float)RAND_MAX)));
 }
 
 #define SIM_VECT_COLL	12
@@ -132,7 +142,4 @@ inline float urandom() {
 
 #define SIM_Z_OFFSET	2.0
 
-#endif /* _SIMFCT_H_ */ 
-
-
-
+#endif /* _SIMFCT_H_ */

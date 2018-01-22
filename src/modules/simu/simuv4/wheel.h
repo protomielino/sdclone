@@ -24,7 +24,6 @@
 
 typedef struct
 {
-
     /* internal data */
     tSuspension  susp;		/* associated suspension */
     tBrake       brake;		/* associated brake disk */
@@ -56,10 +55,10 @@ typedef struct
     tdble	sa;		/* slip angle */
     tdble	sx;		/* longitudinal slip value */
     tdble	steer;
-    
+
     /* static */
     tPosd	staticPos;	/* pos relative to the GC (z is suspension travel at rest) */
-				/* and angles are camber (ax), caster (ay) and toe (az) */
+                /* and angles are camber (ax), caster (ay) and toe (az) */
     tdble   cosax, sinax;/*cosinus and sinus of relPos.ax*/
 
     tdble  	weight0;	/* initial weight on this wheel */
@@ -79,7 +78,7 @@ typedef struct
     tdble	mass;		/* total wheel mass (incl. brake) (unsprung mass) */
     tdble	camber;		/* camber, negative toward exterior on both sides */
     tdble	pressure;	/* tire pressure */
-    
+
     tdble   Ttire;      /* tire temperature in K */
     tdble   Topt;       /* optimal temperature in K, where mu maximal */
     tdble   Tinit;      /* initial tire temperature, right after pit or at start */
@@ -99,9 +98,4 @@ typedef struct
     tdble	preFn, preFt;
 } tWheel;
 
-    
-
-#endif /* _WHEEL_H__ */ 
-
-
-
+#endif /* _WHEEL_H__ */
