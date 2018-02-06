@@ -1176,7 +1176,12 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 #if SDL_FORCEFEEDBACK
 
 	//send force feedback effect to the wheel
-	gfctrlJoyConstantForce(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), forceFeedback.updateForce(car, s), 0 );
+	//dont' even try to do it if steer command is on a keyboard because it somehow manage to crash (unable to identify the joystic to send FF to?)
+	if(cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_KEYBOARD){
+		//                     v<-  this controller detenction does not make ->v 
+		//                     v<-  sense to me                              ->v
+		gfctrlJoyConstantForce(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), forceFeedback.updateForce(car, s), 0 );
+	}
 
 #endif
 
