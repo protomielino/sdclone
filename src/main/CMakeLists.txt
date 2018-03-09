@@ -146,6 +146,8 @@ ENDIF(NOT OPTION_OFFICIAL_ONLY)
    LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/drivers/usr_rs/usr_rs.so")
    LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/drivers/usr_sc/usr_sc.so")
    LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/drivers/usr_trb1/usr_trb1.so")
+   LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/drivers/usr_mp10/usr_mp10.so")
+   LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/drivers/usr_srw/usr_srw.so")
 
    IF(OPTION_OSGGRAPH)
 #SET(OSG_PLUGIN_DIR /opt/local/lib/osgPlugins-3.4.0)

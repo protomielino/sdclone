@@ -64,6 +64,8 @@ data/config/raceengine.xml
 data/config/raceresults.xsl
 data/config/screen.xml
 data/config/sound.xml
+data/config/osghudconfig.xml
+data/config/webserver.xml
 
 data/config/raceman/CMakeLists.txt
 data/config/raceman/extra

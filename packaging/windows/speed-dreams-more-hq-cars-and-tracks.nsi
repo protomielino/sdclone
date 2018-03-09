@@ -66,7 +66,8 @@ Section -CoreData
   File "${BUILD_INST_DIR}\data\config\raceman\championship.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-supercars.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-trb1.xml"
-    File "${BUILD_INST_DIR}\data\config\raceman\championship-mpa1.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\championship-mpa1.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\championship-mpa11.xml"
 
 SectionEnd
 
