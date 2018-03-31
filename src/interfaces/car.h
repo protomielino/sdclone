@@ -55,7 +55,6 @@ typedef struct
     tdble	tireWidth;	        /**< Tire width */
     tdble	brakeDiskRadius;        /**< Brake disk radius */
     tdble	wheelRadius;	        /**< Overall wheel radius */
-    tdble	idealTemperature;       /**< Tire ideal temperature */
 } tWheelSpec;
 /* structure access short cuts */
 #define _rimRadius(i)		info.wheel[i].rimRadius 	/**< short cut to tWheelSpec#rimRadius */
@@ -316,10 +315,6 @@ typedef struct {
   tdble         Fy;
   tdble         Fz;
   tdble         effectiveMu;
-  tdble         currentPressure;	/**< current tire pressure considering temperature */
-  tdble         currentTemperature;	/**< current temperature */
-  tdble         currentWear;		/**< [0..1], 1 means totally worn (tread thickness 0) */
-  tdble         currentGraining;	/**< [0..1], 1 means totally grained */
 } tWheelState;
 /* structure access */
 #define _ride(i)                priv.wheel[i].relPos.z
