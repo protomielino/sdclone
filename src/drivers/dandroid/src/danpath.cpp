@@ -83,9 +83,9 @@ void DanLine::createSectors(std::vector <DanSector>& sect)
   dansect.learned = 0;
   dansect.fromstart = 0.0;
   dansect.brakedistfactor = 1.0;
-  dansect.speedfactor = 0.6;
+  dansect.speedfactor = 0.9;
   dansect.time = 0.0;
-  dansect.bestspeedfactor = 0.6;
+  dansect.bestspeedfactor = 1.0;
   dansect.besttime = 10000.0;
   sect.push_back(dansect);
   double lastfromstart = dansect.fromstart;
@@ -146,7 +146,7 @@ bool DanLine::getDanPos(double fromstart, DanPoint& danpoint)
   }
   int index = getIndex(fromstart);
   danpoint = mLine[index];
-  
+
   // Calculate radius
   double radius = mLine[index].radius;
   double nextradius = nextPos(mLine[index]).radius;
@@ -315,7 +315,7 @@ void DanPath::init(PTrack t, double max_left, double max_right, double marginIn,
       GfOut("Error danpath: calcParam() failed\n");
     }
   }
-  
+
   mDanLine[IDEAL_LINE].createSectors(mSector);
   for (int i = 0; i < (int)mSector.size(); i++) {
     GfOut("sector:%d fs:%g speedfactor:%g\n", mSector[i].sector, mSector[i].fromstart, mSector[i].speedfactor);

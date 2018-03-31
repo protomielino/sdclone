@@ -25,7 +25,7 @@
 #include "strategy.h"
 #include "globaldefs.h"
 
-const float SimpleStrategy::MAX_FUEL_PER_METER = 0.0008f;	// [kg/m] fuel consumtion.
+const float SimpleStrategy::MAX_FUEL_PER_METER = 0.0006f;	// [kg/m] fuel consumtion.
 
 
 SimpleStrategy::SimpleStrategy() :

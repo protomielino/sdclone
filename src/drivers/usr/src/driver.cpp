@@ -122,12 +122,13 @@ void Driver::SetBotName(void* RobotSettings, char* Value)
     char SectionBuffer[256];                     // Buffer
     char indexstr[32];
 
-    snprintf(SectionBuffer, BUFLEN, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, m_Index);
+    snprintf(SectionBuffer, BUFLEN, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, m_Index+1);
     char* Section = SectionBuffer;
 
     // Modified to avoid memory leaks
     // Speed dreams has a trick to find out the oCarType
     RtGetCarindexString(m_Index, "usr", (char) m_Extended, indexstr, 32);
+
     if( m_Extended )
       CarType = strdup( indexstr );
     else // avoid empty car type
@@ -357,6 +358,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     // load the global skill level, range 0 - 10
     snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetLocalDir());
     void *skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
+
     if(!skillHandle)
     {
         snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetDataDir());
@@ -369,6 +371,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     }
 
     global_skill = MAX(0.0f, MIN(30.0f, global_skill));
+    LogUSR.info("Skill Driver = %.3f\n", global_skill);
 
     // Initialize the base param path
     const char* BaseParamPath = Driver::ROBOT_DIR;
@@ -403,6 +406,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
     //if (mRain == 0)
     snprintf(buffer, BUFSIZE, "%s/%s/default.xml", BaseParamPath, CarType);
+    LogUSR.info("Loaded default.xml : %s\n", buffer);
     /*else
       snprintf(buffer, BUFSIZE, "drivers/%s/%s/default-%d.xml",robot_name, carName, mRain);*/
 
@@ -415,12 +419,15 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
         snprintf(buffer, BUFSIZE, "%s/%s/%s-%d.xml", BaseParamPath, CarType, trackname, mRain);
 
     newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+
     if (newhandle)
     {
         if (*carParmHandle)
             *carParmHandle = GfParmMergeHandles(*carParmHandle, newhandle, (GFPARM_MMODE_SRC|GFPARM_MMODE_DST|GFPARM_MMODE_RELSRC|GFPARM_MMODE_RELDST));
         else
             *carParmHandle = newhandle;
+
+        LogUSR.info("Loaded track XML: %s\n", buffer);
     }
     else
     {

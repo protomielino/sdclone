@@ -120,7 +120,9 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
   handle = NULL;
   sprintf(buffer, "drivers/%s/%s/_all_tracks.xml", MyBotName, mCarType.c_str());
   handle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-  if (handle == NULL) {
+
+  if (handle == NULL)
+  {
     mLearning = 0;
     mTestpitstop = 0;
     mTestLine = 0;
@@ -128,7 +130,9 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
     mDriverMsgCarIndex = 0;
     mFRONTCOLL_MARGIN = 4.0;
     mSTARTCLUTCHRATE = 0.01;
-  } else {
+  }
+  else
+  {
     mLearning = GfParmGetNum(handle, "private", "learning", (char*)NULL, 0.0) != 0;
     //mLearning = 1;
     mTestpitstop = GfParmGetNum(handle, "private", "test pitstop", (char*)NULL, 0.0) != 0;
@@ -142,7 +146,8 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
 
   // Parameters that are track specific
   *CarParmHandle = NULL;
-  switch (Situation->_raceType) {
+  switch (Situation->_raceType)
+  {
     case RM_TYPE_QUALIF:
       sprintf(buffer, "drivers/%s/%s/qualifying/%s", MyBotName, mCarType.c_str(), trackname);
       *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
@@ -150,17 +155,22 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
     default:
       break;
   }
-  if (*CarParmHandle == NULL) {
+
+  if (*CarParmHandle == NULL)
+  {
     sprintf(buffer, "drivers/%s/%s/%s", MyBotName, mCarType.c_str(), trackname);
     *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
   }
-  if (*CarParmHandle == NULL) {
+
+  if (*CarParmHandle == NULL)
+  {
     sprintf(buffer, "drivers/%s/%s/default.xml", MyBotName, mCarType.c_str());
     *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
   }
+
   readPrivateSection(CarParmHandle);
   readConstSpecs(CarHandle);
-  
+
   // Set initial fuel
   double distance = Situation->_totLaps * mTrack->length;
   mFuelStart = getFuel(distance);
@@ -169,7 +179,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
     GfParmSetNum(*CarParmHandle, SECT_ENGINE, PRM_FUELCONS, (char*)NULL, 0.0);
   }
   GfParmSetNum(*CarParmHandle, SECT_CAR, PRM_FUEL, (char*)NULL, (tdble) mFuelStart);
-  
+
   // Get skill level
   handle = NULL;
   sprintf(buffer, "%sconfig/raceman/extra/skill.xml", GetLocalDir());
@@ -204,7 +214,7 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
   mDanPath.init(mTrack, mMAXLEFT, mMAXRIGHT, mMARGININSIDE, mMARGINOUTSIDE, mCLOTHFACTOR, mSEGLEN);
   mOpponents.init(mTrack, Situation, Car);
   mPit.init(mTrack, Situation, Car, mPITDAMAGE, mPITENTRYMARGIN);
-  
+
   // File with speed factors
   mNewFile = false;
   if (!readSectorSpeeds()) {
@@ -220,7 +230,7 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
       mNewFile = true;
     }
   }
-  
+
   mPrevRacePos= Car->_pos;
 }
 
@@ -229,7 +239,7 @@ void TDriver::Drive()
 {
 #ifdef TIME_ANALYSIS
   struct timeval tv;
-  gettimeofday(&tv, NULL); 
+  gettimeofday(&tv, NULL);
   double usec1 = tv.tv_usec;
 #endif
   updateTime();
@@ -245,7 +255,7 @@ void TDriver::Drive()
   printChangedVars();
   setPrevVars();
 #ifdef TIME_ANALYSIS
-  gettimeofday(&tv, NULL); 
+  gettimeofday(&tv, NULL);
   double usec2 = tv.tv_usec;
   driverMsgValue(0, "useconds", usec2 - usec1);
 #endif
@@ -292,7 +302,7 @@ void TDriver::updateBasics()
 {
   mMass = mCARMASS + mFUELWEIGHTFACTOR * oCar->_fuel;
   mSpeed = oCar->_speed_x;
-  
+
   mAccelAvgSum += mAccel;
   mAccelAvgCount ++;
   if (mTenthTimer) {
@@ -301,7 +311,7 @@ void TDriver::updateBasics()
     mAccelAvgCount = 0;
     //GfOut("mAccelAvg=%g\n", mAccelAvg);
   }
-  
+
   mAccelXSum += oCar->_accel_x;
   mAccelXCount ++;
   if (mTenthTimer) {
@@ -310,7 +320,7 @@ void TDriver::updateBasics()
     mAccelXCount = 0;
     //GfOut("mAccelX=%g\n", mAccelX);
   }
-  
+
   mFromStart = fromStart(oCar->_distFromStartLine);
   mToMiddle = oCar->_trkPos.toMiddle;
   mOnLeftSide = mToMiddle > 0.0 ? true : false;
@@ -355,16 +365,16 @@ void TDriver::updateBasics()
   mBrakeFriction = sqrt(MAX(0.1, mFriction * mFriction - mCentrifugal * mCentrifugal));
   mBrakeforce = MAX(mBRAKEFORCEMIN, mBRAKEFORCEFACTOR * mBrakeFriction / mBRAKEFORCE_MAX);
   mBrakeforce = MIN(1.0, mBrakeforce);
-  
+
   if (!mCatchedRaceLine) {
     mPathChangeTime += RCM_MAX_DT_ROBOTS;
   }
-  
+
   mDamageDiff = oCar->_dammage - mLastDamage;
   mLastDamage = oCar->_dammage;
   mRacePosChange = mPrevRacePos - oCar->_pos;
   mPrevRacePos= oCar->_pos;
-  
+
 #ifdef DRIVER_PRINT_RACE_EVENTS
   if (mDamageDiff > 20 || (mDrvState == STATE_OFFTRACK && mStateChange == true) || mRacePosChange != 0) {
     char *str = GfTime2Str(oCurrSimTime, 0);
@@ -463,7 +473,7 @@ void TDriver::setControls()
   oCar->_clutchCmd = (tdble) getClutch();  // must be after gear
   oCar->_brakeCmd = (tdble) filterABS(getBrake(mMaxspeed));
   mAccel = filterTCLSideSlip(filterTCL(getAccel(mMaxspeed)));  // must be after brake
-  oCar->_accelCmd = (tdble) mAccel; 
+  oCar->_accelCmd = (tdble) mAccel;
   oCar->_lightCmd = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 }
 
@@ -513,7 +523,7 @@ void TDriver::printChangedVars()
     if (prev_mControlYawRate != mControlYawRate) {
       driverMsgValue(3, "mControlYawRate:", mControlYawRate);
     }
-    
+
     driverMsgValue(4, "mPathOffs:", mPathOffs);
     driverMsgValue(4, "vmax:", 3.6 * mMaxspeed);
   }
@@ -662,7 +672,7 @@ double TDriver::brakeDist(double speed, double allowedspeed)
   if (speed <= allowedspeed) {
     return -1000.0;
   }
-  
+
   double v1sqr;
   double v2sqr;
   double brakedist = 0.0;
@@ -680,7 +690,7 @@ double TDriver::brakeDist(double speed, double allowedspeed)
 
   brakedist *= 0.65 + 20.0 * fabs(getCurvature(brakedist));
   //GfOut("bdist=%g \n", brakedist);
-  
+
   return brakedist;
 }
 
@@ -688,15 +698,15 @@ double TDriver::brakeDist(double speed, double allowedspeed)
 double TDriver::getBrake(double maxspeed)
 {
   double brakeforce = 0.0;
-  
+
   if (mSpeed > maxspeed) {
     brakeforce = mBrakeforce;
   }
-  
+
   if (mDrvState == STATE_OFFTRACK) {
     brakeforce *= 0.2;
   }
-  
+
   if (mDrvState == STATE_PITLANE) {
     // Pit speed limiter
     if (mSpeed > maxspeed) {
@@ -709,7 +719,7 @@ double TDriver::getBrake(double maxspeed)
   if (mDrvState == STATE_PITSTOP) {
     brakeforce = mBrakeforce;
   }
-  
+
   double collbrakeforce = 0.0;
   if (onCollision()) {
     collbrakeforce = mBrakeforce + 0.05 + mCollOvershooting / 10.0;
@@ -772,7 +782,7 @@ int TDriver::getGear()
   const double SHIFT_DOWN_MARGIN = 130.0;    // [rad/s] down from rpmredline
   int shifttime = 5;
   const int MAX_GEAR = oCar->_gearNb - 1;
-  
+
   if (oCurrSimTime < 0.0) {
     return mGear = 0;
   }
@@ -784,11 +794,11 @@ int TDriver::getGear()
     if (mShiftTimer < shifttime) {
       mShiftTimer++;
     }
-  }  
+  }
   if (mShiftTimer < shifttime) {
     return mGear;
   }
-  
+
   if (mDrvState == STATE_STUCK) {
     return mGear = -1;
   }
@@ -897,7 +907,7 @@ bool TDriver::statePitlane()
 
 void TDriver::updateLetPass()
 {
-  
+
   if (mOppLetPass == NULL || mDrvState != STATE_RACE || oCurrSimTime < 60.0) {
     mLetPass = false;
     return;
@@ -938,7 +948,7 @@ void TDriver::updateLetPass()
 void TDriver::setDrvState(int state)
 {
   mDrvState = state;
-  
+
   // Update state changes
   mStateChange = false;
   if (prev_mDrvState != mDrvState) {
@@ -1053,7 +1063,7 @@ void TDriver::calcTargetToMiddle()
   double prevtargettomiddle = mTargetToMiddle;
   mNormalTargetToMiddle = mPath[mDrvPath].tarpos.tomiddle;
   mTargetToMiddle = mNormalTargetToMiddle;
-  
+
   switch (mDrvState) {
     case STATE_RACE: {
       // Path changes
@@ -1146,11 +1156,11 @@ bool TDriver::overtakeOpponent()
   } else {
     mOvertakeTimer = 0;
   }
-  
+
   // Overtake conditions
   double maxdist = MIN(50, mFRONTCOLL_MARGIN + 5.0 + mSpeed);
-  if (mOppDist < maxdist && mOppDist > 1.0 
-  // Watch for cars coming out of the pitlane    
+  if (mOppDist < maxdist && mOppDist > 1.0
+  // Watch for cars coming out of the pitlane
   && (mOpp->borderdist > -3.0 || (mOpp->borderdist <= -3.0 && mOpp->speed > 25 && fabs(mOpp->sidedist) < 5.0))) {
     if (mOpp->mCatchtime < 2.0 || (mOppDist < mFRONTCOLL_MARGIN + 2.0 && !mDrivingFast)) mCatchingOpp = true;
     if (mOpp->mCatchtime > 10.0) mCatchingOpp = false;
@@ -1187,7 +1197,7 @@ int TDriver::overtakeStrategy()
   if (mOpp == NULL) {
     return mDrvPath;
   }
-  
+
   // Predict side of opponent
   int predict_catchtime_opp_path = PATH_O;
   if (mOpp->mCatchtime < 10.0) {
@@ -1196,7 +1206,7 @@ int TDriver::overtakeStrategy()
       predict_catchtime_opp_path = opptomiddle_prediction > 0.0 ? PATH_L : PATH_R;
     }
   }
-  
+
   int path = mDrvPath;
   // Normal overtaking
   if (mOpp->mDist > 1.0) {
@@ -1291,7 +1301,7 @@ bool TDriver::onCollision()
       }
     }
   }
-/*  
+/*
   // collision braking test
   if (mFromStart < 4410.0) {
     //mCollDist = 1019.0 - mFromStart;
@@ -1302,12 +1312,12 @@ bool TDriver::onCollision()
         mColl = true;
     }
   }
-*/  
+*/
 
   if (mColl && mCarIndex == mDriverMsgCarIndex) {
     //GfOut("fs=%g colldist=%g brakedist=%g\n", mFromStart, mCollDist, mCollBrakeDist);
   }
-  
+
   // is track free to enter
   if (mOppComingFastBehind
   && mBorderdist < -2.0 && mBorderdist > -5.0
@@ -1409,8 +1419,8 @@ void TDriver::initCw(PCarSettings CarParmHandle)
 
 void TDriver::initBrakes()
 {
-  double maxf = 2.0 * mBRAKEREPARTITION * mBRAKEPRESS * oCar->_brakeDiskRadius(0) * mBRAKEPISTONAREA_FRONT * mBRAKEDISKMU_FRONT / oCar->_wheelRadius(0);  
-  double maxr = 2.0 * (1 - mBRAKEREPARTITION) * mBRAKEPRESS * oCar->_brakeDiskRadius(2) * mBRAKEPISTONAREA_REAR * mBRAKEDISKMU_REAR / oCar->_wheelRadius(2);  
+  double maxf = 2.0 * mBRAKEREPARTITION * mBRAKEPRESS * oCar->_brakeDiskRadius(0) * mBRAKEPISTONAREA_FRONT * mBRAKEDISKMU_FRONT / oCar->_wheelRadius(0);
+  double maxr = 2.0 * (1 - mBRAKEREPARTITION) * mBRAKEPRESS * oCar->_brakeDiskRadius(2) * mBRAKEPISTONAREA_REAR * mBRAKEDISKMU_REAR / oCar->_wheelRadius(2);
   mBRAKEFORCE_MAX = maxf + maxr;
 }
 
@@ -1423,7 +1433,7 @@ void TDriver::readConstSpecs(PCarHandle CarHandle)
 
   mBRAKEPISTONAREA_FRONT = GfParmGetNum(CarHandle, SECT_FRNTRGTBRAKE, PRM_BRKAREA, (char*)NULL, 0.002f);
   mBRAKEPISTONAREA_REAR = GfParmGetNum(CarHandle, SECT_REARRGTBRAKE, PRM_BRKAREA, (char*)NULL, 0.002f);
-  
+
   mBRAKEDISKMU_FRONT = GfParmGetNum(CarHandle, SECT_FRNTRGTBRAKE, PRM_MU, (char*)NULL, 0.30f);
   mBRAKEDISKMU_REAR = GfParmGetNum(CarHandle, SECT_REARRGTBRAKE, PRM_MU, (char*)NULL, 0.30f);
 }
@@ -1463,14 +1473,15 @@ void TDriver::readPrivateSection(PCarSettings *CarParmHandle)
 
 void TDriver::printSetup()
 {
-  if (mDriverMsgLevel && mCarIndex == mDriverMsgCarIndex) {
+  //if (mDriverMsgLevel && mCarIndex == mDriverMsgCarIndex)
+  {
     GfOut("%s: Learning=%d\n", oCar->_name, mLearning);
     GfOut("%s: Testpitstop=%d\n", oCar->_name, mTestpitstop);
     GfOut("%s: TestLine=%d\n", oCar->_name, mTestLine);
     GfOut("%s: DriverMsgLevel=%d\n", oCar->_name, mDriverMsgLevel);
     GfOut("%s: DriverMsgCarIndex=%d\n", oCar->_name, mDriverMsgCarIndex);
     GfOut("%s: FRONTCOLL_MARGIN=%g\n", oCar->_name, mFRONTCOLL_MARGIN);
-  
+
     GfOut("%s: BRAKEPRESS=%g\n", oCar->_name, mBRAKEPRESS);
     GfOut("%s: BRAKE_REPARTITION=%g\n", oCar->_name, mBRAKEREPARTITION);
     GfOut("%s: FRONTWINGANGLE=%g\n", oCar->_name, mFRONTWINGANGLE * 360 / (2 * PI));
@@ -1503,7 +1514,7 @@ void TDriver::printSetup()
     GfOut("%s: marginoutside=%g\n", oCar->_name, mMARGINOUTSIDE);
     GfOut("%s: clothoidfactor=%g\n", oCar->_name, mCLOTHFACTOR);
     GfOut("%s: seglen=%g\n", oCar->_name, mSEGLEN);
-    
+
     GfOut("%s: skill level global=%g\n", oCar->_name, mSkillGlobal);
     GfOut("%s: skill level driver=%g\n", oCar->_name, mSkillDriver);
   }
@@ -1716,7 +1727,7 @@ void TDriver::learnSpeedFactors()
         mLearnSingleSector = true;
       }
     } else {
-      // Changing only one sector speed factor per lap 
+      // Changing only one sector speed factor per lap
       if (mLastLapTime < mBestLapTime) {
         GfOut("lap: %d sec: %d sf: %g gained: %g\n", oCar->_laps-1, mLearnSector, mSect[mLearnSector].speedfactor, mBestLapTime - mLastLapTime);
         mSect[mLearnSector].bestspeedfactor = mSect[mLearnSector].speedfactor;
@@ -1734,7 +1745,7 @@ void TDriver::learnSpeedFactors()
     }
     GfOut("lap: %d time total: %g best: %g\n", oCar->_laps-1, mLastLapTime, mBestLapTime);
   }
-    
+
   // Setup for the next lap
   if (mFromStart > 6.0 && mFromStart < 9.0 && oCar->_laps < oSituation->_totLaps && !mLearnLap) {
     // Increase speed factors
@@ -1893,8 +1904,8 @@ void TDriver::updateCurveAhead()
 {
   if (mFromStart > mCurveAheadFromStart) {
       mCurveAhead = false;
-  }  
-  
+  }
+
   if (!mCurveAhead) {
     if (mTrackType != TR_STR && mTrackRadius < 200.0) {
       mCurveAheadFromStart = fromStart(mFromStart + 5);
@@ -1908,22 +1919,22 @@ void TDriver::updateCurveAhead()
         mCurveAhead = true;
       }
     }
-  } 
+  }
 }
 
 
 void TDriver::updateDrivingFast()
 {
   double maxspeed = mPath[mDrvPath].maxspeed;
-  mDrivingFast = ( mSpeed > 0.85 * maxspeed 
-                   || (mTrackRadius < 200 && maxspeed > 100.0 && mSpeed > 40.0) 
+  mDrivingFast = ( mSpeed > 0.85 * maxspeed
+                   || (mTrackRadius < 200 && maxspeed > 100.0 && mSpeed > 40.0)
                    || (mCurveAhead && mSpeed > 40.0)
                    || mControlAttackAngle
-                   || mBumpSpeed) 
+                   || mBumpSpeed)
                  && mSpeed > 5.0;
   // Delay state change for 0.5 second (25 x 20ms)
   if (prev_mDrivingFast && !mDrivingFast) {
-    if (mDrivingFastCount < 25) { 
+    if (mDrivingFastCount < 25) {
       mDrivingFastCount++;
       mDrivingFast = true;
     } else {
@@ -1931,7 +1942,7 @@ void TDriver::updateDrivingFast()
       mDrivingFast = false;
     }
   } else {
-    mDrivingFastCount = 0;    
+    mDrivingFastCount = 0;
   }
 }
 
@@ -1964,11 +1975,11 @@ void TDriver::updateFrontCollFactor()
   if (mBackmarkerInFrontOfTeammate || mDrivingFast) {
     mFrontCollFactor = 1.5;
   }
-  
+
   if (fabs(mSpeed) < 5.0) {
     mFrontCollFactor = 0.2;
   }
-  
+
   if (mOpp != NULL) {
     if (fabs(mOpp->mAngle) > 1.5) {
       mFrontCollFactor = 2.0;
@@ -2200,9 +2211,9 @@ bool TDriver::readSectorSpeeds()
   DanSector sect;
   std::ifstream myfile(filename);
   if (myfile.is_open()) {
-    while (myfile >> sect.sector 
-                  >> sect.fromstart 
-                  >> sect.brakedistfactor 
+    while (myfile >> sect.sector
+                  >> sect.fromstart
+                  >> sect.brakedistfactor
                   >> sect.speedfactor) {
       if (mLearning) {
         GfOut("S:%d l:%d fs:%g bdf:%g t:%g bt:%g sf:%g bsf:%g\n", sect.sector, sect.learned, sect.fromstart, sect.brakedistfactor, sect.time, sect.besttime, sect.speedfactor, sect.bestspeedfactor);
