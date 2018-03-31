@@ -121,17 +121,20 @@ SDRender::SDRender(void) :
 
 SDRender::~SDRender(void)
 {
-    m_scene->removeChildren(0, m_scene->getNumChildren());
-    m_CarRoot->removeChildren(0, m_CarRoot->getNumChildren());
-    skyGroup->removeChildren(0, skyGroup->getNumChildren());
-    m_RealRoot->removeChildren(0, m_RealRoot->getNumChildren());
-    stateSet->getTextureAttributeList().clear();
-    stateSet->getTextureModeList().clear();
+    if(m_scene != NULL)
+    {
+        m_scene->removeChildren(0, m_scene->getNumChildren());
+        m_CarRoot->removeChildren(0, m_CarRoot->getNumChildren());
+        skyGroup->removeChildren(0, skyGroup->getNumChildren());
+        m_RealRoot->removeChildren(0, m_RealRoot->getNumChildren());
+        stateSet->getTextureAttributeList().clear();
+        stateSet->getTextureModeList().clear();
 
-    m_scene = NULL;
-    m_CarRoot = NULL;
-    skyGroup = NULL;
-    m_RealRoot = NULL;
+        m_scene = NULL;
+        m_CarRoot = NULL;
+        skyGroup = NULL;
+        m_RealRoot = NULL;
+    }
 
     delete thesky;
 
@@ -376,33 +379,33 @@ void SDRender::Init(tTrack *track)
     cargroup->addChild(m_CarRoot.get());
     background->addChild(scenery->getBackground());
 
-	if(ShadowIndex > 0)
-	{
-		switch (QualityIndex+1)
-		{
-		case 0:
-			break;
-		case 1:
-			scene->setNodeMask( rcvShadowMask );
-			background->setNodeMask(~(rcvShadowMask | castShadowMask));
-			cargroup->setNodeMask(castShadowMask);
-			break;
-		case 2:
-			scene->setNodeMask( rcvShadowMask );
-			background->setNodeMask(~(rcvShadowMask | castShadowMask));
-			cargroup->setNodeMask(rcvShadowMask | castShadowMask);
-			break;
-		case 3:
-			scene->setNodeMask( rcvShadowMask | castShadowMask);
-			background->setNodeMask(~(rcvShadowMask | castShadowMask));
-			cargroup->setNodeMask(rcvShadowMask | castShadowMask);
-			break;
-		default:
-			break;
-		}
-	}
+    if(ShadowIndex > 0)
+    {
+        switch (QualityIndex+1)
+        {
+        case 0:
+            break;
+        case 1:
+            scene->setNodeMask( rcvShadowMask );
+            background->setNodeMask(~(rcvShadowMask | castShadowMask));
+            cargroup->setNodeMask(castShadowMask);
+            break;
+        case 2:
+            scene->setNodeMask( rcvShadowMask );
+            background->setNodeMask(~(rcvShadowMask | castShadowMask));
+            cargroup->setNodeMask(rcvShadowMask | castShadowMask);
+            break;
+        case 3:
+            scene->setNodeMask( rcvShadowMask | castShadowMask);
+            background->setNodeMask(~(rcvShadowMask | castShadowMask));
+            cargroup->setNodeMask(rcvShadowMask | castShadowMask);
+            break;
+        default:
+            break;
+        }
+    }
 
-	m_scene->addChild(cargroup.get());
+    m_scene->addChild(cargroup.get());
     m_scene->addChild(scene.get());
     m_scene->addChild(background.get());
 

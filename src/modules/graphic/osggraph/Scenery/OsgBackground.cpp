@@ -31,8 +31,11 @@ SDBackground::SDBackground(void) :
 
 SDBackground::~SDBackground(void)
 {
-    _background->removeChildren(0, _background->getNumChildren());
-    _background = NULL;
+    if(_background != NULL)
+    {
+        _background->removeChildren(0, _background->getNumChildren());
+        _background = NULL;
+    }
 }
 
 void SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const std::string& TrackPath)

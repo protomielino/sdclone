@@ -60,119 +60,124 @@ SDScenery::~SDScenery(void)
     //delete  m_pit;
     delete SDTrack;
 
-    _scenery = NULL;
+    if(_scenery != NULL)
+    {
+        _scenery->removeChildren(0, _scenery->getNumChildren());
+        _scenery = NULL;
+    }
+
     SDTrack = NULL;
 }
 
 void SDScenery::LoadScene(tTrack *track)
 {
-	void		*hndl = grTrackHandle;
-	const char	*acname;
-	char 		buf[256];
+    void		*hndl = grTrackHandle;
+    const char	*acname;
+    char 		buf[256];
 
-	GfOut("Initialisation class SDScenery\n");
+    GfOut("Initialisation class SDScenery\n");
 
-	m_background = new SDBackground;
-	//m_pit = new SDPit;
-	_scenery = new osg::Group;
-	SDTrack = track;
+    m_background = new SDBackground;
+    //m_pit = new SDPit;
+    _scenery = new osg::Group;
+    SDTrack = track;
 
-	// Load graphics options.
-	LoadGraphicsOptions();
+    // Load graphics options.
+    LoadGraphicsOptions();
 
-	if(grHandle == NULL)
-	{
-		snprintf(buf, 256, "%s%s", GetLocalDir(), GR_PARAM_FILE);
-		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
-	}//if grHandle
+    if(grHandle == NULL)
+    {
+        snprintf(buf, 256, "%s%s", GetLocalDir(), GR_PARAM_FILE);
+        grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+    }//if grHandle
 
-	/* Determine the world limits */
-	grWrldX = (int)(SDTrack->max.x - SDTrack->min.x + 1);
-	grWrldY = (int)(SDTrack->max.y - SDTrack->min.y + 1);
-	grWrldZ = (int)(SDTrack->max.z - SDTrack->min.z + 1);
-	grWrldMaxSize = (int)(MAX(MAX(grWrldX, grWrldY), grWrldZ));
+    /* Determine the world limits */
+    grWrldX = (int)(SDTrack->max.x - SDTrack->min.x + 1);
+    grWrldY = (int)(SDTrack->max.y - SDTrack->min.y + 1);
+    grWrldZ = (int)(SDTrack->max.z - SDTrack->min.z + 1);
+    grWrldMaxSize = (int)(MAX(MAX(grWrldX, grWrldY), grWrldZ));
 
-	if (strcmp(SDTrack->category, "speedway") == 0)
-	{
-		_speedWay = true;
-		if (strcmp(SDTrack->subcategory, "long") == 0)
-			_speedWayLong = true;
-		else
-			_speedWayLong = false;
-	}
-	else
-		_speedWay = false;
+    if (strcmp(SDTrack->category, "speedway") == 0)
+    {
+        _speedWay = true;
+        if (strcmp(SDTrack->subcategory, "long") == 0)
+            _speedWayLong = true;
+        else
+            _speedWayLong = false;
+    }
+    else
+        _speedWay = false;
 
-	GfOut("SpeedWay = %d - SubCategorie = %d\n", _speedWay, _speedWayLong);
+    GfOut("SpeedWay = %d - SubCategorie = %d\n", _speedWay, _speedWayLong);
 
-	acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
+    acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
 
-	GfOut("ACname = %s\n", acname);
+    GfOut("ACname = %s\n", acname);
 
-	if (strlen(acname) == 0)
-	{
-		GfLogError("No specified track 3D model file\n");
-	}
+    if (strlen(acname) == 0)
+    {
+        GfLogError("No specified track 3D model file\n");
+    }
 
-	std::string PathTmp = GetDataDir();
+    std::string PathTmp = GetDataDir();
 
-		_bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
-		if (_bgsky)
-		{
-			_bgtype = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), GR_ATT_BGSKY_LAND) == 0;
-			std::string strPath = PathTmp;
-			snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
-			strPath += buf;
-			m_background->build(_bgtype, grWrldX, grWrldY, grWrldZ, strPath);
-			GfOut("Background loaded\n");
-		}
+        _bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
+        if (_bgsky)
+        {
+            _bgtype = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), GR_ATT_BGSKY_LAND) == 0;
+            std::string strPath = PathTmp;
+            snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
+            strPath += buf;
+            m_background->build(_bgtype, grWrldX, grWrldY, grWrldZ, strPath);
+            GfOut("Background loaded\n");
+        }
 
-	std::string strPath = GetDataDir();
-	snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
+    std::string strPath = GetDataDir();
+    snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
 
-	std::string ext = osgDB::getFileExtension(acname);
+    std::string ext = osgDB::getFileExtension(acname);
 
-	if (ext == "acc")
-	{
-		GfOut("Load 3D Model Scene ACC\n");
-		strPath+=buf;
-		_strTexturePath = strPath;
-		strPath+=acname;
+    if (ext == "acc")
+    {
+        GfOut("Load 3D Model Scene ACC\n");
+        strPath+=buf;
+        _strTexturePath = strPath;
+        strPath+=acname;
 
-		LoadTrack(strPath);
-	}
-	else
-	{
-		strPath+=buf;
+        LoadTrack(strPath);
+    }
+    else
+    {
+        strPath+=buf;
 
-		std::string strTPath = GetDataDir();
-		snprintf(buf, 256, "data/textures/");
-		strTPath += buf;
-		osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
-		pathList.push_back(strPath);
-		pathList.push_back(strTPath+"data/objects/");
-		pathList.push_back(strTPath+"data/textures/");
-		osgDB::Registry::instance()->setDataFilePathList(pathList);
-		osg::ref_ptr<osg::Node> pTrack = osgDB::readNodeFile(acname);
+        std::string strTPath = GetDataDir();
+        snprintf(buf, 256, "data/textures/");
+        strTPath += buf;
+        osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
+        pathList.push_back(strPath);
+        pathList.push_back(strTPath+"data/objects/");
+        pathList.push_back(strTPath+"data/textures/");
+        osgDB::Registry::instance()->setDataFilePathList(pathList);
+        osg::ref_ptr<osg::Node> pTrack = osgDB::readNodeFile(acname);
 
-		if (ext =="ac")
-		{
-			osg::ref_ptr<osg::MatrixTransform> rot = new osg::MatrixTransform;
-			osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f,
-				0.0f,  0.0f, 1.0f, 0.0f,
-				0.0f, -1.0f, 0.0f, 0.0f,
-				0.0f,  0.0f, 0.0f, 1.0f);
-			rot->setMatrix(mat);
-			rot->addChild(pTrack);
-			_scenery->addChild(rot.get());
-		}
-		else
-		{
-			_scenery->addChild(pTrack.get());
-		}
-	}
+        if (ext =="ac")
+        {
+            osg::ref_ptr<osg::MatrixTransform> rot = new osg::MatrixTransform;
+            osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f,
+                0.0f,  0.0f, 1.0f, 0.0f,
+                0.0f, -1.0f, 0.0f, 0.0f,
+                0.0f,  0.0f, 0.0f, 1.0f);
+            rot->setMatrix(mat);
+            rot->addChild(pTrack);
+            _scenery->addChild(rot.get());
+        }
+        else
+        {
+            _scenery->addChild(pTrack.get());
+        }
+    }
 
-	osgDB::Registry::instance()->clearObjectCache();
+    osgDB::Registry::instance()->clearObjectCache();
 }
 
 void SDScenery::LoadSkyOptions()
@@ -216,7 +221,7 @@ void SDScenery::ShutdownScene(void)
 bool SDScenery::LoadTrack(std::string& strTrack)
 {
     char buf[256];
-	std::string name = "";
+    std::string name = "";
     GfOut("Chemin Track : %s\n", strTrack.c_str());
     osgLoader loader;
     GfOut("Chemin Textures : %s\n", _strTexturePath.c_str());
