@@ -61,7 +61,7 @@
 #define SCARCE_CLOUD 5
 #define COVERAGE_CLOUD 8
 
-static const char* ShadowValues[] = { GR_ATT_SHADOW_NONE, GR_ATT_SHADOW_SM, GR_ATT_SHADOW_SSM, GR_ATT_SHADOW_PSSM, GR_ATT_SHADOW_LSPM, GR_ATT_SHADOW_VOLUME, GR_ATT_SHADOW_VDSM};
+static const char* ShadowValues[] = { GR_ATT_SHADOW_NONE, GR_ATT_SHADOW_SM, GR_ATT_SHADOW_SSM, GR_ATT_SHADOW_PSSM, GR_ATT_SHADOW_LSPM, GR_ATT_SHADOW_VDSM};
 static const int NbShadowValues = sizeof(ShadowValues) / sizeof(ShadowValues[0]);
 static const char* TexSizeValues[] = { GR_ATT_SHADOW_512, GR_ATT_SHADOW_1024, GR_ATT_SHADOW_2048, GR_ATT_SHADOW_4096, GR_ATT_SHADOW_8192 };
 static const int NbTexSizeValues = sizeof(TexSizeValues) / sizeof(TexSizeValues[0]);
@@ -546,19 +546,6 @@ void SDRender::ShadowedScene()
         shadowRoot->setShadowTechnique((lspsm.get()));
     }
     else if (ShadowIndex == 5)
-    {
-        osg::DisplaySettings::instance()->setMinimumNumStencilBits(8);
-
-        osg::ref_ptr<osgShadow::ShadowVolume> sv = new osgShadow::ShadowVolume;
-        sv->setDynamicShadowVolumes(1);
-        sv->setDrawMode(osgShadow::ShadowVolumeGeometry::GEOMETRY);
-
-        shadowRoot = new osgShadow::ShadowedScene;
-        shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
-        shadowRoot->setCastsShadowTraversalMask(castShadowMask);
-        shadowRoot->setShadowTechnique((sv.get()));
-    }
-    else if (ShadowIndex == 6)
     {
         osg::ref_ptr<osgShadow::ShadowSettings> shadowSettings = new osgShadow::ShadowSettings;
         shadowSettings->setTextureSize(osg::Vec2s(ShadowTexSize, ShadowTexSize));

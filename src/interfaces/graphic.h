@@ -16,8 +16,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
- 
+
+
 #ifndef _GRAPHV1_H_
 #define _GRAPHV1_H_
 
@@ -81,7 +81,6 @@
 #define GR_ATT_SHADOW_SSM   "soft shadowmap"
 #define GR_ATT_SHADOW_PSSM  "paralele shadowmap"
 #define GR_ATT_SHADOW_LSPM  "light shadowmap"
-#define GR_ATT_SHADOW_VOLUME "shadow volume"
 #define GR_ATT_SHADOW_VDSM  "view dependent shadowmap"
 
 #define GR_ATT_SHADOW_SIZE  "texture shadow size"
@@ -116,7 +115,7 @@
 #define GR_ATT_REAR_LEVEL2      "Rear Level Group 2"
 #define GR_ATT_REAR_LEVEL1      "Rear Level Group 1"
 
-#define GR_ATT_FRONT_MAP1       "Front Level Map 1" 
+#define GR_ATT_FRONT_MAP1       "Front Level Map 1"
 #define GR_ATT_FRONT_MAP2       "Front Level Map 2"
 #define GR_ATT_FRONT_MAP3       "Front Level Map 3"
 #define GR_ATT_REAR_MAP1        "Rear Level Map 1"
