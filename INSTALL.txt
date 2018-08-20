@@ -32,30 +32,46 @@ I - Pre-requisites
 ------------------
 
 - Working OpenGL Driver and header files / associated libraries
-- SDL 1.2.12/13/15 (http://www.libsdl.org/)
+- SDL 2.0.x or SDL 1.2.12/13/15 (http://www.libsdl.org/)
 - PLIB 1.8.3 / 4 / 5 (http://plib.sourceforge.net/). 
   Linux: Be carefull to compile plib with -fPIC on AMD64 if you run a 64 bit version.
 - OpenAL soft 1.5 / 1.6 / 1.11 / 1.14 (http://connect.creativelabs.com/openal)
    (Torcs modified 0.0.8 from www.torcs.org also used to work in the past).
-- libOGG 1.3 or newer and libVorbis 1.3 or newer (optional for the moment, will soon get mandatory)
+- libOGG 1.3 or newer and libVorbis 1.3 or newer
 - ENet 1.3.2/4 (http://enet.bespin.org)
   Linux: Be careful to compile ENet with -fPIC on AMD64 if you run a 64 bit build.
-- Expat 2 (can be skipped for the moment, but won't anymore soon)
-- Free Solid 2 (optional for the moment, will soon get mandatory)
+- Expat 2
 - libpng
 - zlib
-- jpeg
+- libjpeg
+- cURL 7.43.0 or newer (http://curl.haxx.se/download/curl-7.43.0.tar.bz2)
 
-And also Open Scene Graph 3.x if you plan to build the work-in-progress next generation "osggraph" 3D graphics engine module.
+And also Open Scene Graph 3.4 or newer if you plan to build the work-in-progress next generation "osggraph" 3D graphics engine module.
 
 As of version 2.2, you will also need:
-- SDL 2.0.x (http://www.libsdl.org/)
 - FreeSOLID 2.1.2 (http://sourceforge.net/projects/freesolid)
-- cURL 7.43.0 (http://curl.haxx.se/download/curl-7.43.0.tar.bz2)
 - FreeType 2.5.3 (http://sourceforge.net/projects/freetype)
 
 
 WARNING: Under Windows, be careful to compile everything for multi-threaded DLL integration (/MD[d])
+
+On a fresh install of Linux Mint 19 the following packages were needed to be installed
+(a good starting point on any Ubuntu 18.04 variant):
+- build-essential
+- cmake-curses-gui or cmake
+- libopenscenegraph-3.4-dev
+- freeglut3-dev
+- libvorbis-dev
+- libsdl2-dev
+- libopenal-dev
+- libenet-dev
+- libexpat1-dev
+- libjpeg-dev
+- libplib-dev
+- libpng-dev
+- libcurl4-openssl-dev
+- subversion (only when you want to build the development version from the repository)
+These will install all other required packages as their dependencies.
 
 
 II - Linux installation from sources
@@ -80,30 +96,30 @@ The Speed Dreams Team.
 
   a - get these tarballs : please go to our SF.net download page at
 
-        http://sourceforge.net/projects/speed-dreams/files/2.0.0,
+        https://sourceforge.net/projects/speed-dreams/files/2.2.2/,
 
       and you should find :
 
-        speed-dreams-src-base-2.0.0-r4687.tar.xz
-        speed-dreams-src-hq-cars-and-tracks-2.0.0-r4687.tar.xz
-        speed-dreams-src-more-hq-cars-and-tracks-2.0.0-r4687.tar.xz
-        speed-dreams-src-wip-cars-and-tracks-2.0.0-r4687.tar.xz
-        speed-dreams-src-unmaintained-2.0.0-r4687.tar.xz
+        speed-dreams-src-base-2.2.0-r4687.tar.xz
+        speed-dreams-src-hq-cars-and-tracks-2.2.0-r4687.tar.xz
+        speed-dreams-src-more-hq-cars-and-tracks-2.2.0-r4687.tar.xz
+        speed-dreams-src-wip-cars-and-tracks-2.2.0-r4687.tar.xz
+        speed-dreams-src-unmaintained-2.2.0-r4687.tar.xz
         
         and 
         
-        speed-dreams-src-partial-build-patch-2.0.0-r4687.tar.xz
+        speed-dreams-src-partial-build-patch-2.2.0-r4687.tar.xz
 
       At this point, you have 2 options :
       1. you want full game contents : you need to download the 4 first source packages
          ("base", "hq-cars-and-tracks", "more-hq-cars-and-tracks", "wip-cars-and-tracks"),
          and even the 5th "unmaintained" one (if you really need it, you know it :-)
       2. you don't need full game contents : you need at least the "base" package,
-         along with the "partial-build-patch" one ; you can optionnaly add 1 or more of any
-         of the other source packages to you basket, as you like.
+         along with the "partial-build-patch" one ; you can optionally add 1 or more of any
+         of the other source packages to your basket, as you like.
       
       Let's say that you downloaded your packages in $HOME/sd
-      and that we'll extract them in the "2.0.0-r4687" folder
+      and that we'll extract them in the "2.2.0" folder
       (you can do as you like, but we'll use this folder in the explanations below).
 
   b - extract the tarballs :
@@ -111,19 +127,19 @@ The Speed Dreams Team.
       Whatever the chosen option (1 or 2) :
       
       $ cd $HOME/sd
-      $ mkdir 2.0.0-r4687
-      $ cd 2.0.0-r4687
+      $ mkdir 2.2.0
+      $ cd 2.2.0
       $ for file in ../*.xz; do tar xvfa $file; done
       
       If you chose option 2 (selected content), then you also have to :
-      $ tar xvfa speed-dreams-src-partial-build-patch-2.0.0-r4687.tar.xz
+      $ tar xvfa speed-dreams-src-partial-build-patch-2.2.0-r4687.tar.xz
 
       You should now see "cmake", "data" and "src" folders (among others).
 
       Advanced: If you chose option 2, and want to add another source package
                 after following the above extraction instructions, always
                 extract again at the end the "partial-build-patch" package
-                before configuring and building ; you can even add contents
+                before configuring and building; you can even add contents
                 like this after configuring and building ... of course you'll
                 then need to configure and build again.
 
@@ -168,6 +184,11 @@ The Speed Dreams Team.
              * press (g) for generate
              * press (e) to exit
 
+        Note, that usually you need to configure cmake / ccmake twice, before build files 
+        can be generated. So, if you do not see the (g) option appearing after configuration,
+        try to configure it again without leaving ccmake. After changing variables in ccmake,
+        another configuration is required before it can generate build files.
+
 
         Usefull CMake variables for Speed Dreams (note that some might be "advanced" ones) :
 
@@ -190,12 +211,12 @@ The Speed Dreams Team.
 
         - OPTION_3RDPARTY_EXPAT:BOOL :
             Enable building against 3rd party Expat 2 library, rather than bundled txml (def: ON)
-            Disable if "Expat 2 dev" is not available for your distro (which is very unlikely).
+            Disable if "Expat 2 dev" is not available for your distro.
 
         - OPTION_3RDPARTY_SOLID:BOOL :
             Enable building against 3rd party Free Solid 2 library, rather than bundled one (def: OFF)
             Note: This is not set by default, because Free Solid 2 dev is not yet available
-                  on most Linux distros (only Fedora is working on this right now, AFAIK, 2012, July)
+                  on most Linux distros (amongst the big ones only Fedora has it right now, in 2018, August)
                   Ask the dev team for any hint about building it ...
 
         - OPTION_OSGGRAPH:BOOL :
@@ -207,7 +228,7 @@ The Speed Dreams Team.
             Full run-time traces if ON (def: ON)
 
         - OPTION_TRACE_LEVEL:STRING :
-            Run-time traces level integer threshold, only if OPTION_TRACE
+            Run-time traces level integer threshold, only if OPTION_TRACE is ON
             (traces with higher level are not logged ;
              0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ...) (def: 5)
 
@@ -259,8 +280,7 @@ The Speed Dreams Team.
 3 - Installation from SVN
 
   Before you start, be aware that the SVN trunk / branches might crash or even not compile
-  sometimes. If you want to get it anyway, follow the instructions at
-    http://sourceforge.net/svn/?group_id=239111
+  sometimes.
 
   For the moment, 
   - the developments for the next release are located in the trunk ; 
@@ -304,16 +324,18 @@ The Speed Dreams Team.
   Note: Running the next-generation graphics module "osggraph" :
         There's currently no GUI for selecting the graphics engine ;
         you have to manually change the "graphic" attribute of the "Modules" section
-        in <user settings>/config/raceengine.xml, and give it the "osggraph" value.
+        in <user settings>/config/raceengine.xml, and give it the "osggraph" value,
+        where <user settings> is what you set in SD_LOCALDIR,
+        by default it is ~/.speed-dreams-2.
 
 5 - Known run-time issues :
 
   * Under some Linux configurations, the game crashes after restarting a race,
-    of when exiting ; we have a build-time workaround for this :
+    or when exiting; we have a build-time workaround for this :
     see above, in II-2-c-2, the OPTION_UNLOAD_SSGGRAPH CMake option.
 
   * If you get all white rectangles or ugly fonts in the menus,
-    it's likely that some game data was not properly installed ;
+    it's likely that some game data was not properly installed;
     check again carefully the build and install instructions.
 
 6 - Getting Help
@@ -328,7 +350,7 @@ The Speed Dreams Team.
 III - Windows installation from sources
 ---------------------------------------
 
-Note that these instructions work under Windows Vista,Windows 7 SP1, Windows 8, Windows 8.1; 
+Note that these instructions work under Windows Vista, Windows 7 SP1, Windows 8, Windows 8.1; 
 some tweaks might be needed for newer versions.
 
 0) Initial steps, common to all build methods
