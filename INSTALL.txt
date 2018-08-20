@@ -100,15 +100,15 @@ The Speed Dreams Team.
 
       and you should find :
 
-        speed-dreams-src-base-2.2.0-r4687.tar.xz
-        speed-dreams-src-hq-cars-and-tracks-2.2.0-r4687.tar.xz
-        speed-dreams-src-more-hq-cars-and-tracks-2.2.0-r4687.tar.xz
-        speed-dreams-src-wip-cars-and-tracks-2.2.0-r4687.tar.xz
-        speed-dreams-src-unmaintained-2.2.0-r4687.tar.xz
+        speed-dreams-src-base-2.2.2-r4687.tar.xz
+        speed-dreams-src-hq-cars-and-tracks-2.2.2-r4687.tar.xz
+        speed-dreams-src-more-hq-cars-and-tracks-2.2.2-r4687.tar.xz
+        speed-dreams-src-wip-cars-and-tracks-2.2.2-r4687.tar.xz
+        speed-dreams-src-unmaintained-2.2.2-r4687.tar.xz
         
         and 
         
-        speed-dreams-src-partial-build-patch-2.2.0-r4687.tar.xz
+        speed-dreams-src-partial-build-patch-2.2.2-r4687.tar.xz
 
       At this point, you have 2 options :
       1. you want full game contents : you need to download the 4 first source packages
@@ -119,7 +119,7 @@ The Speed Dreams Team.
          of the other source packages to your basket, as you like.
       
       Let's say that you downloaded your packages in $HOME/sd
-      and that we'll extract them in the "2.2.0" folder
+      and that we'll extract them in the "2.2.2" folder
       (you can do as you like, but we'll use this folder in the explanations below).
 
   b - extract the tarballs :
@@ -127,12 +127,12 @@ The Speed Dreams Team.
       Whatever the chosen option (1 or 2) :
       
       $ cd $HOME/sd
-      $ mkdir 2.2.0
-      $ cd 2.2.0
+      $ mkdir 2.2.2
+      $ cd 2.2.2
       $ for file in ../*.xz; do tar xvfa $file; done
       
       If you chose option 2 (selected content), then you also have to :
-      $ tar xvfa speed-dreams-src-partial-build-patch-2.2.0-r4687.tar.xz
+      $ tar xvfa speed-dreams-src-partial-build-patch-2.2.2-r4687.tar.xz
 
       You should now see "cmake", "data" and "src" folders (among others).
 
@@ -358,7 +358,7 @@ some tweaks might be needed for newer versions.
   a.  Install CMake v2.8 or higher (recommend 3.4) http://www.cmake.org/cmake/resources/software.html
 
   b.  Download the official Speed Dreams tarballs from SF.net
-        http://sourceforge.net/projects/speed-dreams/files/2.2.0
+        http://sourceforge.net/projects/speed-dreams/files/2.2.2
       (speed-dreams-src-<package>-<version>.tar.xz)
       
         Note: See II.2.a above about which packages you really need.
