@@ -100,15 +100,15 @@ The Speed Dreams Team.
 
       and you should find :
 
-        speed-dreams-src-base-2.2.2-r4687.tar.xz
-        speed-dreams-src-hq-cars-and-tracks-2.2.2-r4687.tar.xz
-        speed-dreams-src-more-hq-cars-and-tracks-2.2.2-r4687.tar.xz
-        speed-dreams-src-wip-cars-and-tracks-2.2.2-r4687.tar.xz
-        speed-dreams-src-unmaintained-2.2.2-r4687.tar.xz
+        speed-dreams-src-base-2.2.2-r6545.tar.xz
+        speed-dreams-src-hq-cars-and-tracks-2.2.2-r6545.tar.xz
+        speed-dreams-src-more-hq-cars-and-tracks-2.2.2-r6545.tar.xz
+        speed-dreams-src-wip-cars-and-tracks-2.2.2-r6545.tar.xz
+        speed-dreams-src-unmaintained-2.2.2-r6545.tar.xz
         
         and 
         
-        speed-dreams-src-partial-build-patch-2.2.2-r4687.tar.xz
+        speed-dreams-src-partial-build-patch-2.2.2-r6545.tar.xz
 
       At this point, you have 2 options :
       1. you want full game contents : you need to download the 4 first source packages
@@ -132,7 +132,7 @@ The Speed Dreams Team.
       $ for file in ../*.xz; do tar xvfa $file; done
       
       If you chose option 2 (selected content), then you also have to :
-      $ tar xvfa speed-dreams-src-partial-build-patch-2.2.2-r4687.tar.xz
+      $ tar xvfa speed-dreams-src-partial-build-patch-2.2.2-r6545.tar.xz
 
       You should now see "cmake", "data" and "src" folders (among others).
 
@@ -252,7 +252,7 @@ The Speed Dreams Team.
             Set to OFF to use PLIB for joystick input.
 
         - OPTION_WEBSERVER:BOOL :
-            Enable the WIP Webserver/Laplogger (def: OFF)
+            Enable the WIP Webserver/Laplogger (def: ON)
             (see http://sourceforge.net/p/speed-dreams/tickets/912).
 
         Tips reported about some issues :
