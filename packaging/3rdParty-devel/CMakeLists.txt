@@ -125,13 +125,13 @@ endif(OPTION_SDL_1x)
 # message(WARNING "TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)")
 
 if(OPTION_SDL_2x)
-   set(SDL2_PROJECT SDL2-2.0.5)
+   set(SDL2_PROJECT SDL2-2.0.8)
    set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off)
 #   set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off -DSDL_MAIN_HANDLED=True)
    #message(STATUS "CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
    ExternalProject_Add(${SDL2_PROJECT} 
-   URL https://www.libsdl.org/release/SDL2-2.0.5.tar.gz 
-   URL_HASH SHA256=442038cf55965969f2ff06d976031813de643af9c9edc9e331bd761c242e8785
+   URL https://www.libsdl.org/release/SDL2-2.0.8.tar.gz 
+   URL_HASH SHA256=edc77c57308661d576e843344d8638e025a7818bff73f8fbfab09c3c5fd092ec
 
    CMAKE_ARGS ${SDL2_ARGS}
    DEPENDS OpenGL-headers
@@ -142,9 +142,9 @@ else(OPTION_SDL_2x)
 endif(OPTION_SDL_2x)
 
 if(OPTION_OPENAL)
-ExternalProject_Add(openal-soft-1.17.2 
-   URL http://kcat.strangesoft.net/openal-releases/openal-soft-1.17.2.tar.bz2 
-   URL_HASH SHA256=a341f8542f1f0b8c65241a17da13d073f18ec06658e1a1606a8ecc8bbc2b3314
+ExternalProject_Add(openal-soft-1.19.0 
+   URL http://kcat.strangesoft.net/openal-releases/openal-soft-1.19.0.tar.bz2 
+   URL_HASH SHA256=f1adf3a6e73e2f9270a0fd00887ea23793968fa787f60dcdec41a3b2f42a0ed6
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
 endif(OPTION_OPENAL)
 
@@ -182,15 +182,15 @@ if(OPTION_PLIB)
 endif(OPTION_PLIB)
 
 if(OPTION_JPEG)
-   set(JPG_PROJECT jpeg-9b)
+   set(JPG_PROJECT jpeg-9c)
    ExternalProject_Add(${JPG_PROJECT}
-   URL http://ijg.org/files/jpegsrc.v9b.tar.gz
-   URL_HASH SHA256=240fd398da741669bf3c90366f58452ea59041cacc741a489b99f2f6a0bad052
+   URL http://ijg.org/files/jpegsrc.v9c.tar.gz
+   URL_HASH SHA256=650250979303a649e21f87b5ccd02672af1ea6954b911342ea491f351ceb7122
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    )
    ExternalProject_Add_Step(${JPG_PROJECT} jpeg_add_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/jpeg-9b.CMakeLists.txt"
+           "${CMAKE_SOURCE_DIR}/patches/jpeg-9c.CMakeLists.txt"
            "<SOURCE_DIR>/CMakeLists.txt"
    DEPENDEES update # do after update
    DEPENDERS patch  # do before patch
@@ -252,14 +252,14 @@ ExternalProject_Add(enet-1.3.13
 endif(OPTION_ENET)
 
 if(OPTION_OGG)
-ExternalProject_Add(libogg-1.3.2
-   URL http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz
-   URL_HASH SHA256=e19ee34711d7af328cb26287f4137e70630e7261b17cbe3cd41011d73a654692
+ExternalProject_Add(libogg-1.3.3
+   URL http://downloads.xiph.org/releases/ogg/libogg-1.3.3.tar.gz
+   URL_HASH SHA256=c2e8a485110b97550f453226ec644ebac6cb29d1caef2902c007edab4308d985
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    )
-   ExternalProject_Add_Step(libogg-1.3.2 libogg_add_cmake
+   ExternalProject_Add_Step(libogg-1.3.3 libogg_add_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/libogg-1.3.2.CMakeLists.txt"
+           "${CMAKE_SOURCE_DIR}/patches/libogg-1.3.3.CMakeLists.txt"
            "<SOURCE_DIR>/CMakeLists.txt"
    DEPENDEES update # do after update
    DEPENDERS patch  # do before patch
@@ -267,15 +267,15 @@ ExternalProject_Add(libogg-1.3.2
 endif(OPTION_OGG)
 
 if(OPTION_VORBIS)
-ExternalProject_Add(libvorbis-1.3.5
-   URL http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz
-   URL_HASH SHA256=6efbcecdd3e5dfbf090341b485da9d176eb250d893e3eb378c428a2db38301ce
+ExternalProject_Add(libvorbis-1.3.6
+   URL http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.6.tar.gz
+   URL_HASH SHA256=6ed40e0241089a42c48604dc00e362beee00036af2d8b3f46338031c9e0351cb
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-   DEPENDS "libogg-1.3.2"
+   DEPENDS "libogg-1.3.3"
    )
-   ExternalProject_Add_Step(libvorbis-1.3.5 libvorbis_add_cmake
+   ExternalProject_Add_Step(libvorbis-1.3.6 libvorbis_add_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/libvorbis-1.3.5.CMakeLists.txt"
+           "${CMAKE_SOURCE_DIR}/patches/libvorbis-1.3.6.CMakeLists.txt"
            "<SOURCE_DIR>/CMakeLists.txt"
    DEPENDEES update # do after update
    DEPENDERS patch  # do before patch
@@ -340,12 +340,12 @@ ExternalProject_Add_Step(zlib-1.2.8 sd_zlib_rename_lib
 endif(OPTION_ZLIB)
 
 if(OPTION_PNG)
-   set(PNG_PROJECT libpng-1.6.24)
+   set(PNG_PROJECT libpng-1.6.35)
    set(PNG_ARGS ${EXTERNALS_CMAKE_ARGS} -DPNG_SHARED=off -DPNG_TESTS=off -DCMAKE_DEBUG_POSTFIX='')
    ExternalProject_Add(${PNG_PROJECT} 
       DOWNLOAD_NAME ${PNG_PROJECT}.tar.gz 
-      URL https://sourceforge.net/projects/libpng/files/libpng16/older-releases/1.6.24/libpng-1.6.24.tar.gz/download 
-      URL_HASH MD5=65213080dd30a9b16193d9b83adc1ee9
+      URL https://sourceforge.net/projects/libpng/files/libpng16/1.6.35/libpng-1.6.35.tar.gz/download 
+      URL_HASH MD5=d94d9587c421ac42316b6ab8f64f1b85
       CMAKE_ARGS ${PNG_ARGS}
       DEPENDS zlib-1.2.8
       )
@@ -374,13 +374,13 @@ endif(OPTION_SQLITE3)
    # ========== For OpenSceneGraph =============
 
 if(OPTION_FREETYPE)
-   set(FREETYPE_PROJECT freetype-2.6.5)
+   set(FREETYPE_PROJECT freetype-2.9.1)
    set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false -DWITH_PNG=OFF)
 
    ExternalProject_Add(${FREETYPE_PROJECT}
-   DOWNLOAD_NAME ft265.zip
-   URL https://sourceforge.net/projects/freetype/files/freetype2/2.6.5/ft265.zip/download
-   URL_HASH SHA256=635309058ff8b8056bb94488ffc26cc984ed632e01ddfe80e4c0768930483182 
+   DOWNLOAD_NAME ft291.zip
+   URL https://sourceforge.net/projects/freetype/files/freetype2/2.9.1/ft291.zip/download
+   URL_HASH SHA256=60bbfa0b9772bdc3489006c937a977dcbd03bb9c0f4912c777c174cbe4cb552f 
    CMAKE_ARGS ${FREETYPE_ARGS}
    )
 
@@ -426,17 +426,17 @@ if(OPTION_OSG)
    #URL https://github.com/openscenegraph/osg/archive/OpenSceneGraph-3.4.0-rc10.tar.gz
    #URL_HASH SHA256=47d4281e86b3b3ee14e40a46ff60884ed2213e9d41204be76a1f57a6e01cbb0d
 
-   ExternalProject_Add(osg-OpenSceneGraph-3.4.0
-   URL http://trac.openscenegraph.org/downloads/developer_releases/OpenSceneGraph-3.4.0.zip
-   URL_HASH MD5=a5e762c64373a46932e444f6f7332496
+   ExternalProject_Add(osg-OpenSceneGraph-3.6.3
+   URL https://github.com/openscenegraph/OpenSceneGraph/archive/OpenSceneGraph-3.6.3.zip
+   URL_HASH SHA256=d8f237e76393e4c749b25321d3735d2c4e5b8c7076f9826213eb0cf8eeca0031
    CMAKE_ARGS ${OSG_ARGS}
    DEPENDS zlib-1.2.8 ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
    )
 
    message(STATUS "Todo - remove after OSG > 3.4.0 as this fix is already merged upstream.")
-   ExternalProject_Add_Step(osg-OpenSceneGraph-3.4.0 osg_fix_types
+   ExternalProject_Add_Step(osg-OpenSceneGraph-3.6.3 osg_fix_types
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/osg-3.4.0.types.txt"
+           "${CMAKE_SOURCE_DIR}/patches/osg-3.6.3.types.txt"
            "<SOURCE_DIR>/include/osg/Types"
    DEPENDEES update # do after update
    DEPENDERS patch  # do before patch

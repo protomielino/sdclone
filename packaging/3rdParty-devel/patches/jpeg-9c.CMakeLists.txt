@@ -28,7 +28,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(jpeg C)
 
-set(VERSION "9b")
+set(VERSION "9c")
 
 
 include_directories(include)
@@ -78,6 +78,7 @@ set(jpeg_SOURCES jaricom.c
                  jmemnobs.c
                  jquant1.c
                  jquant2.c
+                 jaricom
                  jutils.c
                     )
 
