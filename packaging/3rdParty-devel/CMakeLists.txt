@@ -142,9 +142,9 @@ else(OPTION_SDL_2x)
 endif(OPTION_SDL_2x)
 
 if(OPTION_OPENAL)
-ExternalProject_Add(openal-soft-1.19.0 
-   URL http://kcat.strangesoft.net/openal-releases/openal-soft-1.19.0.tar.bz2 
-   URL_HASH SHA256=f1adf3a6e73e2f9270a0fd00887ea23793968fa787f60dcdec41a3b2f42a0ed6
+ExternalProject_Add(openal-soft-1.19.1 
+   URL http://www.openal-soft.org/openal-releases/openal-soft-1.19.1.tar.bz2
+   URL_HASH SHA256=5c2f87ff5188b95e0dc4769719a9d89ce435b8322b4478b95dd4b427fe84b2e9
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
 endif(OPTION_OPENAL)
 
