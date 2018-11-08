@@ -355,9 +355,9 @@ endif(OPTION_PNG)
 
 if(OPTION_SQLITE3)
    # may only be needed for Simon's replay stuff
-   ExternalProject_Add(sqlite3
-   URL https://www.sqlite.org/2015/sqlite-autoconf-3081101.tar.gz
-   URL_HASH SHA1=d0e22d7e361b6f50830a3cdeafe35311443f8f9a 
+   ExternalProject_Add(sqlite3-3.25.3
+   URL https://www.sqlite.org/2018/sqlite-autoconf-3250300.tar.gz
+   URL_HASH SHA256=00ebf97be13928941940cc71de3d67e9f852698233cd98ce2d178fd08092f3dd
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    UPDATE_COMMAND ""
    PATCH_COMMAND ""
