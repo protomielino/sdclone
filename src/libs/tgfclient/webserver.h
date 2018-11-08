@@ -22,11 +22,14 @@
     @version    $Id$
 */
 #ifdef WEBSERVER
+
+#ifndef _SD_WEBSERVER_H_
+#define _SD_WEBSERVER_H_
 #include "tgfclient.h"
 #include <vector>
 #include <string>
 #include <ctime>
-#include <curl/multi.h>
+#include <curl/curl.h>
 
 struct webRequest_t {
   int id;
@@ -127,6 +130,8 @@ class TGFCLIENT_API WebServer {
 		//destructor
 		~WebServer();	
 };
+
+#endif //_SD_WEBSERVER_H_
 #endif //WEBSERVER
 
 

@@ -23,15 +23,17 @@
 #include <deque>
 #include <string>
 
+#ifdef WEBSERVER
+#include <webserver.h>
+#endif //WEBSERVER
+
 #include <portability.h>
 #include <tgfclient.h>
 #include <robot.h>
 #include <playerpref.h>
 #include <graphic.h>
 #include <gui.h>
-#ifdef WEBSERVER
-#include <webserver.h>
-#endif //WEBSERVER
+
 
 #include <drivers.h>
 

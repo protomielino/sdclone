@@ -42,11 +42,12 @@
 #include <robottools.h>
 #include <replay.h>
 
-#include <portability.h>
+
 #include <tgf.hpp>
 #ifdef WEBSERVER
 #include <webserver.h>
 #endif //WEBSERVER
+#include <portability.h>
 
 #include <racemanagers.h>
 #include <race.h>

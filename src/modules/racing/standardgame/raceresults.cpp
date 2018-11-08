@@ -28,11 +28,13 @@
 #include <algorithm>
 #include <string>
 
-#include <portability.h>
-#include <robot.h>
 #ifdef WEBSERVER
 #include <webserver.h>
 #endif //WEBSERVER
+
+#include <portability.h>
+#include <robot.h>
+
 
 #include "standardgame.h"
 
