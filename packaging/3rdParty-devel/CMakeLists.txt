@@ -125,13 +125,11 @@ endif(OPTION_SDL_1x)
 # message(WARNING "TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)")
 
 if(OPTION_SDL_2x)
-   set(SDL2_PROJECT SDL2-2.0.8)
+   set(SDL2_PROJECT SDL2-2.0.9)
    set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off)
-#   set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off -DSDL_MAIN_HANDLED=True)
-   #message(STATUS "CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
    ExternalProject_Add(${SDL2_PROJECT} 
-   URL https://www.libsdl.org/release/SDL2-2.0.8.tar.gz 
-   URL_HASH SHA256=edc77c57308661d576e843344d8638e025a7818bff73f8fbfab09c3c5fd092ec
+      URL https://www.libsdl.org/release/SDL2-2.0.9.tar.gz 
+   URL_HASH SHA256=255186dc676ecd0c1dbf10ec8a2cc5d6869b5079d8a38194c2aecdff54b324b1
 
    CMAKE_ARGS ${SDL2_ARGS}
    DEPENDS OpenGL-headers
@@ -142,10 +140,17 @@ else(OPTION_SDL_2x)
 endif(OPTION_SDL_2x)
 
 if(OPTION_OPENAL)
-ExternalProject_Add(openal-soft-1.19.1 
-   URL http://www.openal-soft.org/openal-releases/openal-soft-1.19.1.tar.bz2
-   URL_HASH SHA256=5c2f87ff5188b95e0dc4769719a9d89ce435b8322b4478b95dd4b427fe84b2e9
-   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
+   if(MSVC_VERSION LESS 1900)
+      ExternalProject_Add(openal-soft-1.18.2 
+         URL http://www.openal-soft.org/openal-releases/openal-soft-1.18.2.tar.bz2 
+         URL_HASH SHA256=9f8ac1e27fba15a59758a13f0c7f6540a0605b6c3a691def9d420570506d7e82
+         CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
+   else(MSVC_VERSION LESS 1900)
+      ExternalProject_Add(openal-soft-1.19.1 
+         URL http://www.openal-soft.org/openal-releases/openal-soft-1.19.1.tar.bz2
+         URL_HASH SHA256=5c2f87ff5188b95e0dc4769719a9d89ce435b8322b4478b95dd4b427fe84b2e9
+         CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
+   endif(MSVC_VERSION LESS 1900)
 endif(OPTION_OPENAL)
 
 if(OPTION_PLIB)
@@ -282,13 +287,13 @@ ExternalProject_Add(libvorbis-1.3.6
    )
 endif(OPTION_VORBIS)
 
+if(OPTION_EXPAT)
 #disable building unneeded sub projects (they failed with VS2008)
 set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_tests=off -DBUILD_examples=off -DBUILD_tools=off -DCMAKE_DEBUG_POSTFIX='')
-if(OPTION_EXPAT)
-   ExternalProject_Add(expat-2.2.0
-   DOWNLOAD_NAME expat-2.2.0.tar.bz2
-   URL https://sourceforge.net/projects/expat/files/expat/2.2.0/expat-2.2.0.tar.bz2/download
-   URL_HASH SHA256=d9e50ff2d19b3538bd2127902a89987474e1a4db8e43a66a4d1a712ab9a504ff
+ExternalProject_Add(expat-2.2.6
+   DOWNLOAD_NAME expat-2.2.6.tar.bz2
+   URL https://sourceforge.net/projects/expat/files/expat/2.2.6/expat-2.2.6.tar.bz2/download
+   URL_HASH SHA256=17b43c2716d521369f82fc2dc70f359860e90fa440bea65b3b85f0b246ea81f2
    CMAKE_ARGS ${EXPAT_ARGS}
    #UPDATE_COMMAND ""
    #PATCH_COMMAND ""
@@ -296,27 +301,16 @@ if(OPTION_EXPAT)
    #BUILD_COMMAND ""
    #INSTALL_COMMAND ""  
    )
-   # Hopefully temporary - report to Expat
-   # https://sourceforge.net/p/expat/bugs/534/
-   message(STATUS "Todo - remove after Expat's bug 534 gets fixed...")
-   ExternalProject_Add_Step(expat-2.2.0 expat-2.2.0_fix_cmake
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/expat-2.2.0-CMakeLists.txt"
-           "<SOURCE_DIR>/CMakeLists.txt"
-   DEPENDEES update # do after update
-   DEPENDERS patch  # do before patch
-   )
 endif(OPTION_EXPAT)
 
-message(STATUS "CMAKE_COMMAND = ${CMAKE_COMMAND}")
-#set(ZLIB_ARGS ${EXTERNALS_CMAKE_ARGS} -DSKIP_INSTALL_LIBRARIES=On -DSKIP_INSTALL_LIBRARIES=On -D'CMAKE_DEBUG_POSTFIX=""')
-#set(ZLIB_ARGS ${EXTERNALS_CMAKE_ARGS} -D'CMAKE_BUILD_POSTFIX=hello')
-
 if(OPTION_ZLIB)
-ExternalProject_Add(zlib-1.2.8
-   DOWNLOAD_NAME zlib-1.2.8.tar.gz
-   URL https://sourceforge.net/projects/libpng/files/zlib/1.2.8/zlib-1.2.8.tar.gz/download
-   URL_HASH SHA256=36658cb768a54c1d4dec43c3116c27ed893e88b02ecfcb44f2166f9c0b7f2a0d
+   set(ZLIB_PROJECT zlib-1.2.11)
+   #set(ZLIB_ARGS ${EXTERNALS_CMAKE_ARGS} -DSKIP_INSTALL_LIBRARIES=On -DSKIP_INSTALL_LIBRARIES=On -D'CMAKE_DEBUG_POSTFIX=""')
+   #set(ZLIB_ARGS ${EXTERNALS_CMAKE_ARGS} -D'CMAKE_BUILD_POSTFIX=hello')
+   ExternalProject_Add(${ZLIB_PROJECT} 
+   DOWNLOAD_NAME ${ZLIB_PROJECT}.tar.gz
+   URL https://sourceforge.net/projects/libpng/files/zlib/1.2.11/zlib-1.2.11.tar.gz/download
+   URL_HASH SHA256=c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
    #CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=on
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    #UPDATE_COMMAND ""
@@ -325,18 +319,20 @@ ExternalProject_Add(zlib-1.2.8
    #BUILD_COMMAND ""
    #INSTALL_COMMAND ${CMAKE_COMMAND} install(TARGETS zlibstatic)
    )
-ExternalProject_Add_Step(zlib-1.2.8 sd_zlib_remove_dll
+ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_remove_dll
    COMMAND "${CMAKE_COMMAND}" -E remove -f ${EXTERNALS_INSTALL_DIR}/bin/zlib${SUPER_BUILD_POSTFIX}.dll 
    DEPENDEES install
    )
-ExternalProject_Add_Step(zlib-1.2.8 sd_zlib_remove_lib
+ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_remove_lib
    COMMAND "${CMAKE_COMMAND}" -E remove -f ${EXTERNALS_INSTALL_DIR}/lib/zlib${SUPER_BUILD_POSTFIX}.lib
    DEPENDEES sd_zlib_remove_dll
    )
-ExternalProject_Add_Step(zlib-1.2.8 sd_zlib_rename_lib
+ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_rename_lib
    COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/zlibstatic${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/zlib.lib 
    DEPENDEES sd_zlib_remove_lib
    )
+else(OPTION_ZLIB)
+   set(ZLIB_PROJECT )
 endif(OPTION_ZLIB)
 
 if(OPTION_PNG)
@@ -347,7 +343,7 @@ if(OPTION_PNG)
       URL https://sourceforge.net/projects/libpng/files/libpng16/1.6.35/libpng-1.6.35.tar.gz/download 
       URL_HASH MD5=d94d9587c421ac42316b6ab8f64f1b85
       CMAKE_ARGS ${PNG_ARGS}
-      DEPENDS zlib-1.2.8
+      DEPENDS ${ZLIB_PROJECT}
       )
       ExternalProject_Add_Step(${PNG_PROJECT} sd_libpng_rename
       COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/libpng16_static${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/libpng.lib
@@ -375,7 +371,10 @@ endif(OPTION_SQLITE3)
 
 if(OPTION_FREETYPE)
    set(FREETYPE_PROJECT freetype-2.9.1)
-   set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false -DWITH_PNG=OFF)
+   set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false 
+                                             -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true 
+                                             -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE 
+                                             -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=TRUE)
 
    ExternalProject_Add(${FREETYPE_PROJECT}
    DOWNLOAD_NAME ft291.zip
@@ -383,64 +382,47 @@ if(OPTION_FREETYPE)
    URL_HASH SHA256=60bbfa0b9772bdc3489006c937a977dcbd03bb9c0f4912c777c174cbe4cb552f 
    CMAKE_ARGS ${FREETYPE_ARGS}
    )
-
-   # Rename the lib to remove 'd' post-fix for debug builds
-   ExternalProject_Add_Step(${FREETYPE_PROJECT} freetypelib_rename
-   COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/freetype${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/freetype.lib
-   DEPENDEES install
+   
+   ExternalProject_Add_Step(${FREETYPE_PROJECT} freetype_cmake
+   COMMAND ${CMAKE_COMMAND} -E copy_if_different
+           "${CMAKE_SOURCE_DIR}/patches/freetype-2.9.1.CMakeLists.txt"
+           "<SOURCE_DIR>/CMakeLists.txt"
+   DEPENDEES update # do after update
+   DEPENDERS patch  # do before patch
    )
+   # Rename the lib to remove 'd' post-fix for debug builds
+#   ExternalProject_Add_Step(${FREETYPE_PROJECT} freetypelib_rename
+#   COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/freetype${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/freetype.lib
+#   DEPENDEES install
+#   )
 
 else(OPTION_FREETYPE)
    set(FREETYPE_PROJECT )
 endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
-#   set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_CURL_TESTS=Off)
-#   # may only be needed for Madbad's web stuff
-#   ExternalProject_Add(curl-7.43.0
-#   URL https://curl.haxx.se/download/curl-7.43.0.tar.bz2
-#   URL_HASH SHA256=baa654a1122530483ccc1c58cc112fec3724a82c11c6a389f1e6a37dc8858df9
-#   CMAKE_ARGS ${CURL_ARGS}
-#   DEPENDS zlib-1.2.8
-#   )
-#   
-   set(CURL_PROJECT curl-7.50.1)
+   set(CURL_PROJECT curl-7.62.0)
    set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off)
    # may only be needed for Madbad's web stuff
    ExternalProject_Add(${CURL_PROJECT}
-   URL https://curl.haxx.se/download/curl-7.50.1.tar.bz2
-   URL_HASH SHA256=3c12c5f54ccaa1d40abc65d672107dcc75d3e1fcb38c267484334280096e5156
+   URL https://curl.haxx.se/download/curl-7.62.0.tar.bz2
+   URL_HASH SHA256=7802c54076500be500b171fde786258579d60547a3a35b8c5a23d8c88e8f9620
    CMAKE_ARGS ${CURL_ARGS}
-   DEPENDS zlib-1.2.8
+   DEPENDS ${ZLIB_PROJECT}
    )
 else(OPTION_CURL)
    set(CURL_PROJECT )
 endif(OPTION_CURL)
 
 if(OPTION_OSG)
-   set(OSG_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX='')
-
-   # http://trac.openscenegraph.org/downloads/developer_releases/OpenSceneGraph-3.4.0.zip
-   # a5e762c64373a46932e444f6f7332496
-   #ExternalProject_Add(osg-OpenSceneGraph-3.4.0-rc10
-   #URL https://github.com/openscenegraph/osg/archive/OpenSceneGraph-3.4.0-rc10.tar.gz
-   #URL_HASH SHA256=47d4281e86b3b3ee14e40a46ff60884ed2213e9d41204be76a1f57a6e01cbb0d
+   set(OSG_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX='' -DUSE_3RDPARTY_BIN=Off)
 
    ExternalProject_Add(osg-OpenSceneGraph-3.6.3
    URL https://github.com/openscenegraph/OpenSceneGraph/archive/OpenSceneGraph-3.6.3.zip
    URL_HASH SHA256=d8f237e76393e4c749b25321d3735d2c4e5b8c7076f9826213eb0cf8eeca0031
    CMAKE_ARGS ${OSG_ARGS}
-   DEPENDS zlib-1.2.8 ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
+   DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
    )
-
-   message(STATUS "Todo - remove after OSG > 3.4.0 as this fix is already merged upstream.")
-   ExternalProject_Add_Step(osg-OpenSceneGraph-3.6.3 osg_fix_types
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/osg-3.6.3.types.txt"
-           "<SOURCE_DIR>/include/osg/Types"
-   DEPENDEES update # do after update
-   DEPENDERS patch  # do before patch
-)
 endif(OPTION_OSG)
 
 #add_subdirectory(src)

@@ -78,7 +78,6 @@ set(jpeg_SOURCES jaricom.c
                  jmemnobs.c
                  jquant1.c
                  jquant2.c
-                 jaricom
                  jutils.c
                     )
 
