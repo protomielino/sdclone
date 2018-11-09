@@ -25,7 +25,7 @@
 #==============================================================================
 #
 # (hashtag) starts a comment
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.4.0 FATAL_ERROR)
 
 project(3rdParty-2.3)
 
@@ -141,6 +141,7 @@ endif(OPTION_SDL_2x)
 
 if(OPTION_OPENAL)
    if(MSVC_VERSION LESS 1900)
+      message("openal-soft versions newer than 1.18.2 need Visual Studio 2015")
       ExternalProject_Add(openal-soft-1.18.2 
          URL http://www.openal-soft.org/openal-releases/openal-soft-1.18.2.tar.bz2 
          URL_HASH SHA256=9f8ac1e27fba15a59758a13f0c7f6540a0605b6c3a691def9d420570506d7e82
@@ -373,6 +374,8 @@ if(OPTION_FREETYPE)
    set(FREETYPE_PROJECT freetype-2.9.1)
    set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false 
                                              -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true 
+                                             -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE 
+                                             -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE 
                                              -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE 
                                              -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=TRUE)
 
