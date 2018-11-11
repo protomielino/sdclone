@@ -123,11 +123,16 @@ extern tdble simDammageFactor[];
 extern tdble simSkidFactor[];
 
 extern tdble SimRain;
+extern tdble SimWater;
 extern tdble SimTimeOfDay;
+extern int   SimDay;
+extern tdble SimHumidity;
+extern int   SimClouds;
 
-extern tdble Tair;
+extern tdble Tair;   //air temperature in K (K = degree * 12,38125)
 extern tdble Ttrack; //track temperature in K
 extern float SimAirPressure;
+extern float SimAirDensity;
 
 /// return a number drawn uniformly from [0,1]
 inline float urandom() {

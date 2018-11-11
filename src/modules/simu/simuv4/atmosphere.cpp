@@ -19,13 +19,76 @@
 
 #include "sim.h"
 
-static int SimClouds = 0;
+//static int SimClouds = 0;
 
 void SimAtmosphereConfig(tTrack *track)
 {
     SimRain = track->local.rain;
     SimTimeOfDay = track->local.timeofday;
     SimClouds = track->local.clouds;
+
+    // Adapt air pressure with track elevation
+    if (track->local.altitude < 500)
+    {
+        SimAirPressure = 101300;
+
+        if (track->local.altitude < 100)
+            SimAirDensity = 1.290f;
+        else if (track->local.altitude < 200)
+            SimAirDensity = 1.273f;
+        else if (track->local.altitude < 300)
+            SimAirDensity = 1.261f;
+        else if (track->local.altitude < 400)
+            SimAirDensity = 1.249f;
+        else SimAirDensity = 1.237f;
+    }
+    else if (track->local.altitude < 1000)
+    {
+        SimAirPressure = 95400;
+
+        if (track->local.altitude < 600)
+            SimAirDensity = 1.225f;
+        else if (track->local.altitude < 700)
+            SimAirDensity = 1.213f;
+        else if (track->local.altitude < 800)
+            SimAirDensity = 1.202f;
+        else if (track->local.altitude < 900)
+            SimAirDensity = 1.190f;
+        else SimAirDensity = 1.179f;
+    }
+    else if (track->local.altitude < 1500)
+{
+            SimAirPressure = 89800;
+
+            if (track->local.altitude < 1100)
+                SimAirDensity = 1.167f;
+            else if (track->local.altitude < 1200)
+                SimAirDensity = 1.156f;
+            else if (track->local.altitude < 1300)
+                SimAirDensity = 1.145f;
+            else if (track->local.altitude < 1400)
+                SimAirDensity = 1.134f;
+            else SimAirDensity = 1.123f;
+    }
+    else if (track->local.altitude < 2000)
+    {
+            SimAirPressure = 84600;
+
+            if (track->local.altitude < 1600)
+                SimAirDensity = 1.112f;
+            else if (track->local.altitude < 1700)
+                SimAirDensity = 1.101f;
+            else if (track->local.altitude < 1800)
+                SimAirDensity = 1.090f;
+            else if (track->local.altitude < 1900)
+                SimAirDensity = 1.079f;
+            else SimAirDensity = 1.069f;
+    }
+    else
+    {
+        SimAirPressure = 79400;
+        SimAirDensity = 1.058f;
+    }
 
     if (SimTimeOfDay < 6.00 * 60 *60 && SimTimeOfDay > 19 * 60 * 60)
         Tair -= 6.75;

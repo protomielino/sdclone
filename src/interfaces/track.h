@@ -60,6 +60,7 @@
 #define TRK_ATT_MEDIUMRAINLKHD      "medium rain likelyhood"
 #define TRK_ATT_TIMEOFDAY           "time of day"
 #define TRK_ATT_SUN_ASCENSION       "sun ascension"
+#define TRK_ATT_ALTITUDE            "altitude"
 
 #define TRK_SECT_GRAPH              "Graphic"
 
@@ -607,6 +608,7 @@ typedef struct TrackLocalInfo
     tdble timeofday;                /**< Local time of day, in seconds from 0:00 (0 = 0:00, 86400 = 24:00 */
     int timeofdayindex;
     tdble sunascension;             /**< Local sun "height" (related to the latitude, not to the time of day) */
+    tdble altitude;                 /**< Local altitude track */
 
     int clouds;	/**< Clouds coverage in the sky  (warning : consistency with RM_VAL_CLOUDS_*) */
 #define TR_CLOUDS_NONE   0
