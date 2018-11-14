@@ -126,7 +126,8 @@ endif(OPTION_SDL_1x)
 
 if(OPTION_SDL_2x)
    set(SDL2_PROJECT SDL2-2.0.9)
-   set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off)
+   set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off -DSDL_CMAKE_DEBUG_POSTFIX=)
+#   set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off)
    ExternalProject_Add(${SDL2_PROJECT} 
       URL https://www.libsdl.org/release/SDL2-2.0.9.tar.gz 
    URL_HASH SHA256=255186dc676ecd0c1dbf10ec8a2cc5d6869b5079d8a38194c2aecdff54b324b1
@@ -134,6 +135,15 @@ if(OPTION_SDL_2x)
    CMAKE_ARGS ${SDL2_ARGS}
    DEPENDS OpenGL-headers
    )
+   message(WARNING "Remove the step below when SDL2 CMake is fixed")
+   ExternalProject_Add_Step(${SDL2_PROJECT} sdl2_fix_cmake
+   COMMAND ${CMAKE_COMMAND} -E copy_if_different
+           "${CMAKE_SOURCE_DIR}/patches/sdl-2.0.9.CMakeLists.txt"
+           "<SOURCE_DIR>/CMakeLists.txt"
+   DEPENDEES update # do after update
+   DEPENDERS patch  # do before patch
+   )
+# end  message(WARNING "Remove the step below when SDL2 CMake is fixed")
 
 else(OPTION_SDL_2x)
    set(SDL2_PROJECT )
@@ -405,7 +415,7 @@ endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
    set(CURL_PROJECT curl-7.62.0)
-   set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off)
+   set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off -DCMAKE_DEBUG_POSTFIX=)
    # may only be needed for Madbad's web stuff
    ExternalProject_Add(${CURL_PROJECT}
    URL https://curl.haxx.se/download/curl-7.62.0.tar.bz2
