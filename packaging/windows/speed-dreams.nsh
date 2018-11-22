@@ -14,11 +14,11 @@
 !endif
 
 !ifndef VER_MINOR
-   !define VER_MINOR 2
+   !define VER_MINOR 3
 !endif
 
 !ifndef VER_PATCH
-   !define VER_PATCH 2
+   !define VER_PATCH 0
 !endif
 
 !ifndef VER_EXTRA

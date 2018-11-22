@@ -12,7 +12,7 @@ CHECK_LIBRARIES()
 
 # Determine version
 SET(NEXT_LESSER_VERSION 0) # The next lesser version
-SET(NEXT_MAJOR_MINOR_VERSION "2.2") # Next major.minor version
+SET(NEXT_MAJOR_MINOR_VERSION "2.3") # Next major.minor version
 
 # Uncomment if you don't want automatic SVN version detection
 # (poor performances under Windows, don't work with git-svn, ...)
