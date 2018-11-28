@@ -446,7 +446,9 @@ set(DOCSOURCES COPYING LICENSE readme.txt)
 add_custom_target(rootdoc SOURCES ${DOCSOURCES})
 
 install(DIRECTORY ${EXTERNALS_INSTALL_DIR} DESTINATION .)
-install(FILES ${DOCSOURCES} DESTINATION 3rdParty)
+install(FILES ${DOCSOURCES} DESTINATION ${EXTERNALS_INSTALL_DIR})
+
+install(DIRECTORY Licenses/ DESTINATION ${EXTERNALS_INSTALL_DIR}/Licenses)
 
 
 # ========== Packaging =============

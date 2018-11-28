@@ -5,7 +5,7 @@ Building the dependencies for Speed-Dreams makes use of CMake's ExternalProject
 
  =============================================================================
  Windows
- As of version 2.2, this will download approximately 30MB of source files.
+ As of version 2.3, this will download approximately 30MB of source files.
  You will need more than 1GB of free disk space for the build.
 
  Prerequisites:
