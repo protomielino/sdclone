@@ -290,7 +290,7 @@ void GfuiEventLoop::forceRedisplay()
 	std::clock_t currentTime =  std::clock();
 	
 	//run the webserver update process and ui at 30 FPS
-	if( ( currentTime - notifications.animationLastExecTime ) > 0,033333333 ){
+	if( ( currentTime - notifications.animationLastExecTime ) > 0.033333333 ){
 
 		webServer.updateAsyncStatus();
 		notifications.updateStatus();		

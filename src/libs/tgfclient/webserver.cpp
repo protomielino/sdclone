@@ -87,7 +87,11 @@ int webserverState = WEBSERVER_IDLE;
 
 
 
-NotificationManager::NotificationManager(){
+NotificationManager::NotificationManager()
+: screenHandle(NULL),
+  prevScreenHandle(NULL),
+  menuXMLDescHdle(NULL)
+{
 
     this->busy = false;
     this->notifyUiIdBg = -1;//the bg image ui id
@@ -188,7 +192,7 @@ void NotificationManager::runAnimation(){
         //int propertyStepChange = remainingChangeNeeded / animationTimeRemaining * animationTimeFromLastStep;
         //int propertyStepChange = remainingChangeNeeded / animationTimeRemaining;
         //if we have not arhieving 30fps slow down the animation
-        if(animationTimeFromLastStep > 0,033333333){
+        if(animationTimeFromLastStep > 0.033333333){
 
             animationTimeFromLastStep = animationTimeFromLastStep;
 
@@ -354,7 +358,7 @@ void NotificationManager::updateWebserverStatusUi()
         GfuiVisibilitySet(this->prevScreenHandle, this->notifyUiIdBusyIcon, GFUI_INVISIBLE);
     }
 
-    if(this->screenHandle > 0)
+    if(this->screenHandle != NULL)
     {
         //if webserver is not IDLE display busy icon (sending or receiving)
         if(webserverState != WEBSERVER_IDLE)
