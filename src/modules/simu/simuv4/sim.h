@@ -129,7 +129,7 @@ extern int   SimDay;
 extern tdble SimHumidity;
 extern int   SimClouds;
 
-extern tdble Tair;   //air temperature in K (K = degree * 12,38125)
+extern tdble Tair;   //air temperature in K (K = 273.15 + degree Celsius)
 extern tdble Ttrack; //track temperature in K
 extern float SimAirPressure;
 extern float SimAirDensity;

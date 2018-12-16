@@ -90,6 +90,8 @@ void SimAtmosphereConfig(tTrack *track)
         SimAirDensity = 1.058f;
     }
 
+    GfLogDebug("SimAirPressure = %3f - SimAirDensity = %3f\n", SimAirPressure, SimAirDensity);
+
     if (SimTimeOfDay < 6.00 * 60 *60 && SimTimeOfDay > 19 * 60 * 60)
         Tair -= 6.75;
     else if (SimTimeOfDay > 6.00 * 60 * 60 && SimTimeOfDay < 10 * 60 * 60)

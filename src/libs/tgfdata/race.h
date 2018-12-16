@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file   
-		Singleton holding information on a race (mainly the starting grid)
+
+/** @file
+        Singleton holding information on a race (mainly the starting grid)
     @defgroup	tgfdata	Data manager for the client gaming framework.
 */
 
@@ -41,91 +41,93 @@ class TGFDATA_API GfRace
 {
 public:
 
-	//! Constructor.
-	GfRace();
+    //! Constructor.
+    GfRace();
 
-	//! Destructor.
-	~GfRace();
+    //! Destructor.
+    ~GfRace();
 
-	//! Load from the given race manager params and results file if specified.
-	void load(GfRaceManager* pRaceMan, bool bKeepHumans = true, void* hparmResults = 0);
+    //! Load from the given race manager params and results file if specified.
+    void load(GfRaceManager* pRaceMan, bool bKeepHumans = true, void* hparmResults = 0);
 
-	//! Clear the race.
-	void clear();
-	
-	//! Store to the race manager params file.
-	void store();
+    //! Clear the race.
+    void clear();
 
-	//! Is the race data consistent with the params from which it was loaded ?
-	bool isDirty() const;
+    //! Store to the race manager params file.
+    void store();
 
-	//! Force dirtyness.
-	void setDirty(bool bIsDirty = true);
-	
-	GfRaceManager* getManager() const;
+    //! Is the race data consistent with the params from which it was loaded ?
+    bool isDirty() const;
 
-	enum ETimeOfDaySpec { eTimeDawn, eTimeMorning, eTimeNoon, eTimeAfternoon,
-						  eTimeDusk, eTimeNight, eTimeNow, eTimeReal, eTimeFromTrack, eTimeRandom,
-						  eTime24hr,
-						  nTimeSpecNumber }; // Last = invalid value = nb of valid ones.
-	enum ECloudsSpec { eCloudsNone, eCloudsFew, eCloudsScarce, eCloudsMany, eCloudsFull,
-					   eCloudsRandom, nCloudsSpecNumber}; // Last = invalid value = nb of valid ones.
-	enum ERainSpec { eRainNone, eRainLittle, eRainMedium, eRainHeavy, eRainRandom,
-					 nRainSpecNumber }; // Last = invalid value = nb of valid ones.
-	class Parameters
-	{
-	  public:
-		unsigned bfOptions; // Bit field of configurable parameters (RM_CONF_* values).
-		int nLaps;
-		int nDistance; // km
-		int nDuration; // s
-		unsigned bfDisplayMode;
-		ETimeOfDaySpec eTimeOfDaySpec;
-		ECloudsSpec eCloudsSpec;
-		ERainSpec eRainSpec;
-	};
-	
-	Parameters* getParameters(const std::string& strSessionName) const;
+    //! Force dirtyness.
+    void setDirty(bool bIsDirty = true);
 
-	int getSupportedFeatures() const;
+    GfRaceManager* getManager() const;
 
-	bool acceptsDriverType(const std::string& strType) const;
-	const std::vector<std::string>& getAcceptedDriverTypes() const;
-	bool acceptsCarCategory(const std::string& strCatId) const;
-	const std::vector<std::string>& getAcceptedCarCategoryIds() const;
+    enum ETimeOfDaySpec { eTimeDawn, eTimeMorning, eTimeNoon, eTimeAfternoon,
+                          eTimeDusk, eTimeNight, eTimeNow, eTimeReal, eTimeFromTrack, eTimeRandom,
+                          eTime24hr,
+                          nTimeSpecNumber }; // Last = invalid value = nb of valid ones.
+    enum ECloudsSpec { eCloudsNone, eCloudsFew, eCloudsScarce, eCloudsMany, eCloudsFull,
+                       eCloudsRandom, nCloudsSpecNumber}; // Last = invalid value = nb of valid ones.
+    enum ERainSpec { eRainNone, eRainLittle, eRainMedium, eRainHeavy, eRainRandom,
+                     nRainSpecNumber }; // Last = invalid value = nb of valid ones.
+    enum EMonthSpec { eMonthJanuary, eMonthFebruary, eMonthMarch, eMonthApril, eMonthMay, eMonthJune, eMonthJuly, eMonthAugust, eMonthSeptember, eMonthOctober, eMonthNovember, eMonthDecember, eMonthReal, nMonthSpecNumber };
+    class Parameters
+    {
+      public:
+        unsigned bfOptions; // Bit field of configurable parameters (RM_CONF_* values).
+        int nLaps;
+        int nDistance; // km
+        int nDuration; // s
+        unsigned bfDisplayMode;
+        ETimeOfDaySpec eTimeOfDaySpec;
+        ECloudsSpec eCloudsSpec;
+        ERainSpec eRainSpec;
+        EMonthSpec  eMonthSpec;
+    };
 
-	//! For all sessions to "results-only" mode (SimuSimu mode unchanged).
-	void forceResultsOnly();
+    Parameters* getParameters(const std::string& strSessionName) const;
 
-	unsigned getCompetitorsCount() const;
-	const std::vector<GfDriver*>& getCompetitors() const;
-	bool hasHumanCompetitors() const;
-	bool acceptsMoreCompetitors() const;
-	bool appendCompetitor(GfDriver* pComp);
-	bool removeCompetitor(GfDriver* pComp);
-	bool moveCompetitor(GfDriver* pComp, int nDeltaPlace);
-	bool removeAllCompetitors();
-	bool shuffleCompetitors();
+    int getSupportedFeatures() const;
 
- 	GfDriver* getCompetitor(const std::string& strModName, int nItfIndex) const;
+    bool acceptsDriverType(const std::string& strType) const;
+    const std::vector<std::string>& getAcceptedDriverTypes() const;
+    bool acceptsCarCategory(const std::string& strCatId) const;
+    const std::vector<std::string>& getAcceptedCarCategoryIds() const;
 
-	bool isCompetitorFocused(const GfDriver* pComp) const;
-	GfDriver* getFocusedCompetitor() const;
-	void setFocusedCompetitor(const GfDriver* pComp);
+    //! For all sessions to "results-only" mode (SimuSimu mode unchanged).
+    void forceResultsOnly();
 
-	GfTrack* getTrack() const;
+    unsigned getCompetitorsCount() const;
+    const std::vector<GfDriver*>& getCompetitors() const;
+    bool hasHumanCompetitors() const;
+    bool acceptsMoreCompetitors() const;
+    bool appendCompetitor(GfDriver* pComp);
+    bool removeCompetitor(GfDriver* pComp);
+    bool moveCompetitor(GfDriver* pComp, int nDeltaPlace);
+    bool removeAllCompetitors();
+    bool shuffleCompetitors();
 
-	const std::string& getSessionName() const;
+    GfDriver* getCompetitor(const std::string& strModName, int nItfIndex) const;
 
-	void* getResultsDescriptorHandle() const;
-	
- 	void print() const;
+    bool isCompetitorFocused(const GfDriver* pComp) const;
+    GfDriver* getFocusedCompetitor() const;
+    void setFocusedCompetitor(const GfDriver* pComp);
+
+    GfTrack* getTrack() const;
+
+    const std::string& getSessionName() const;
+
+    void* getResultsDescriptorHandle() const;
+
+    void print() const;
 
 protected:
-	
-	// Its private data.
-	class Private;
-	Private* _pPrivate;
+
+    // Its private data.
+    class Private;
+    Private* _pPrivate;
 };
 
 #endif /* __TGFRACE_H__ */

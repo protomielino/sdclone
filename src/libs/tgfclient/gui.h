@@ -1,10 +1,10 @@
 /***************************************************************************
-                         gui.h -- Interface file for GUI                          
-                             -------------------                                         
+                         gui.h -- Interface file for GUI
+                             -------------------
     created              : Fri Aug 13 22:15:46 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -15,7 +15,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
+
 #ifndef _GUI_H__
 #define _GUI_H__
 
@@ -71,7 +71,9 @@ typedef struct
     int	align;
     int	maxlen;
 
-	void		*userDataOnFocus;
+    bool masked;    // show asterisks instead of text
+
+    void		*userDataOnFocus;
     tfuiCallback	onFocus;
     tfuiCallback	onFocusLost;
 } tGfuiLabel;
@@ -101,7 +103,7 @@ typedef struct
     void		*userDataOnFocus;
     tfuiCallback	onFocus;
     tfuiCallback	onFocusLost;
-    
+
     int imgX, imgY;
     int imgWidth, imgHeight;
 
@@ -110,7 +112,7 @@ typedef struct
     GLuint enabled;
     GLuint focused;
     GLuint pushed;
-    
+
     bool bShowBox;
 } tGfuiButton;
 
@@ -123,7 +125,7 @@ typedef struct
     GLuint enabled;
     GLuint focused;
     GLuint pushed;
-    
+
     int			x, y;		// Image position
     int			width, height; // Image size
     int			mirror; // Horizontal / Vertical symetry to apply to image
@@ -196,16 +198,16 @@ typedef struct
     int			cursorIdx;
     void		*userDataOnFocus;
     tfuiCallback	onFocus;
-    tfuiCallback	onFocusLost;    
+    tfuiCallback	onFocusLost;
 } tGfuiEditbox;
 
 typedef struct
 {
     tGfuiLabel	label;
     tGfuiGrButton	leftButton;
-	tGfuiGrButton	rightButton;
-	void *scr;
-	tComboBoxInfo *pInfo;
+    tGfuiGrButton	rightButton;
+    void *scr;
+    tComboBoxInfo *pInfo;
 
     GfuiColor fgColor[3];
     int	comboType;
@@ -218,26 +220,26 @@ typedef struct
 typedef struct
 {
     int labelId;
-	void *scr;
-	tCheckBoxInfo *pInfo;
+    void *scr;
+    tCheckBoxInfo *pInfo;
 
     GfuiColor fgColor[3];
-	int checkId;
-	int uncheckId;
+    int checkId;
+    int uncheckId;
 
     tfuiCheckboxCallback onChange;
 } tGfuiCheckbox;
 
 typedef struct
 {
-	void *scr;
-	GLuint fgImage;
-	GLuint bgImage;
+    void *scr;
+    GLuint fgImage;
+    GLuint bgImage;
     GfuiColor outlineColor;
 
-	float min;
-	float max;
-	float value;
+    float min;
+    float max;
+    float value;
 
     void		*userDataOnFocus;
     tfuiCallback	onFocus;
@@ -249,9 +251,9 @@ typedef struct
 typedef struct
 {
     int srcWidth, srcHeight; // Dimensions of the source image file (pixels).
-	bool canDeform;
-	unsigned int activeimage;
-	GLuint	texture[GFUI_MAXSTATICIMAGES];
+    bool canDeform;
+    unsigned int activeimage;
+    GLuint	texture[GFUI_MAXSTATICIMAGES];
 } tGfuiImage;
 
 typedef struct GfuiObject
@@ -266,16 +268,16 @@ typedef struct GfuiObject
     int		xmax, ymax;
     union
     {
-		tGfuiLabel	label;
-		tGfuiButton	button;
-		tGfuiGrButton	grbutton;
-		tGfuiScrollList scrollist;
-		tGfuiScrollBar	scrollbar;
-		tGfuiEditbox	editbox;
-		tGfuiImage	image;
-		tGfuiCombobox combobox;
-		tGfuiCheckbox checkbox;
-		tGfuiProgressbar progressbar;
+        tGfuiLabel	label;
+        tGfuiButton	button;
+        tGfuiGrButton	grbutton;
+        tGfuiScrollList scrollist;
+        tGfuiScrollBar	scrollbar;
+        tGfuiEditbox	editbox;
+        tGfuiImage	image;
+        tGfuiCombobox combobox;
+        tGfuiCheckbox checkbox;
+        tGfuiProgressbar progressbar;
     } u;
     struct GfuiObject	*next;
     struct GfuiObject	*prev;
@@ -295,9 +297,9 @@ typedef struct GfuiKey
 } tGfuiKey;
 
 /* screen definition */
-typedef struct 
+typedef struct
 {
-	int			ScreenID; /* Identify screen in registration */
+    int			ScreenID; /* Identify screen in registration */
     float		width, height; /* in menu/screen objects coordinate system */
     GfuiColor		bgColor; /* RGBA */
     GLuint		bgImage; /* Should always be 2^N x 2^P  (for low-end graphic hardwares) */
@@ -393,15 +395,15 @@ extern void gfuiLabelDraw(tGfuiLabel *label, const GfuiColor& color);
 extern void gfuiGrButtonDraw(tGfuiGrButton *button, int state, int focus);
 
 extern void gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
-						  int x, int y, int width, int align, int font,
-						  const float *bgColor, const float *fgColor,
-						  const float *bgFocusColor, const float *fgFocusColor,
-						  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+                          int x, int y, int width, int align, int font,
+                          const float *bgColor, const float *fgColor,
+                          const float *bgFocusColor, const float *fgFocusColor,
+                          void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 extern void gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enabled,
-							 const char *focused, const char *pushed,
-							 int x, int y, int width, int height, int mirror, int mouse,
-							 void *userDataOnPush, tfuiCallback onPush, 
-							 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+                             const char *focused, const char *pushed,
+                             int x, int y, int width, int height, int mirror, int mouse,
+                             void *userDataOnPush, tfuiCallback onPush,
+                             void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 
 extern void gfuiReleaseLabel(tGfuiObject *obj);
 extern void gfuiReleaseButton(tGfuiObject *obj);
@@ -424,7 +426,7 @@ extern void gfuiScrollListPrevElt (tGfuiObject *object);
 extern void gfuiReleaseImage(tGfuiObject *obj);
 extern void gfuiDrawImage(tGfuiObject *obj);
 
-#endif /* _GUI_H__ */ 
+#endif /* _GUI_H__ */
 
 
 

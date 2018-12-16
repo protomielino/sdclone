@@ -149,8 +149,8 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
         this->de_activateMirror();
     }
 
-    cameras->update(curCar,s);
-    mirror->update(curCar,s);
+    cameras->update(curCar, s);
+    mirror->update(curCar, s);
     mirror->setModelView();
 }
 

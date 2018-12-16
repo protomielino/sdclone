@@ -1,10 +1,10 @@
 /***************************************************************************
-               menu.h -- Interface file for Dynamic Menu Management                                   
-                             -------------------                                         
+               menu.h -- Interface file for Dynamic Menu Management
+                             -------------------
     created              : Fri Aug 13 22:24:24 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -15,8 +15,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
- 
+
+
 #ifndef __MENU__H__
 #define __MENU__H__
 
@@ -68,7 +68,7 @@ extern bool gfuiMenuGetBoolean(const char* pszValue, bool bDefault = false);
 //#define GFMNU_ATTR_V_ALIGN "v align"
 
 #define GFMNU_ATTR_FONT "font"
-				  
+
 #define GFMNU_ATTR_COLOR "color"
 #define GFMNU_ATTR_COLOR_DISABLED "disabled color"
 #define GFMNU_ATTR_COLOR_FOCUSED "focused color"
@@ -105,6 +105,8 @@ extern bool gfuiMenuGetBoolean(const char* pszValue, bool bDefault = false);
 
 #define GFMNU_ATTR_CHECKED "checked"
 
+#define GFMNU_ATTR_MASKED_TEXT "mask text"
+
 #define GFMNU_ATTR_MIN "min"
 #define GFMNU_ATTR_MAX "max"
 #define GFMNU_ATTR_VALUE "value"
@@ -120,7 +122,7 @@ extern bool gfuiMenuGetBoolean(const char* pszValue, bool bDefault = false);
 
 #define GFMNU_ATTR_MUSIC_FILE "music file"
 
-#endif /* __MENU__H__ */ 
+#endif /* __MENU__H__ */
 
 
 

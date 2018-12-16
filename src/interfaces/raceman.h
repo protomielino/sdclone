@@ -192,21 +192,21 @@ typedef struct
 
 typedef struct RmRaceRules
 {
-  enum RmRuleFlags
-  {
-    CORNER_CUTTING_TIME_INVALIDATE = 1,
-    WALL_HIT_TIME_INVALIDATE = 2,
-    CORNER_CUTTING_TIME_PENALTY = 4
-  };
+    enum RmRuleFlags
+    {
+        CORNER_CUTTING_TIME_INVALIDATE = 1,
+        WALL_HIT_TIME_INVALIDATE = 2,
+        CORNER_CUTTING_TIME_PENALTY = 4
+    };
 
-  int enabled;
-  tdble fuelFactor;
-  tdble damageFactor;
-  tdble refuelFuelFlow;
-  tdble damageRepairFactor;
-  tdble pitstopBaseTime;
-  tdble tireFactor;
-  tdble allTiresChangeTime;
+    int enabled;
+    tdble fuelFactor;
+    tdble damageFactor;
+    tdble refuelFuelFlow;
+    tdble damageRepairFactor;
+    tdble pitstopBaseTime;
+    tdble tireFactor;
+    tdble allTiresChangeTime;
 } tRmRaceRules;
 
 
@@ -276,7 +276,7 @@ typedef struct RmInfo
 #define RM_ATTR_TOTALNUM	"total number"
 #define RM_ATTR_MAX_DRV		"maximum drivers"
 #define RM_ATTR_NUMBER		"number"
-#define RM_ATTR_CAR		"car"
+#define RM_ATTR_CAR		    "car"
 #define RM_ATTR_NBGROUPS	"number of groups"
 #define RM_ATTR_CAR_CATEGORY    "Car Category"
 
@@ -293,8 +293,8 @@ typedef struct RmInfo
 #define RM_ATTR_STARTIMG	"start image"
 
 #define RM_ATTR_MODULE		"module"
-#define RM_ATTR_IDX		"idx"
-#define RM_ATTR_CARNAME	        "car name"
+#define RM_ATTR_IDX		    "idx"
+#define RM_ATTR_CARNAME	    "car name"
 #define RM_ATTR_TEAMNAME	"team"
 #define RM_ATTR_SKINNAME	"skin name"
 #define RM_ATTR_SKINTARGETS	"skin targets"
@@ -317,9 +317,10 @@ typedef struct RmInfo
 #define RM_ATTR_DISTANCE	"distance"
 #define RM_ATTR_LAPS		"laps"
 #define RM_ATTR_SESSIONTIME	"sessiontime"
-#define RM_ATTR_CLOUDS	        "clouds"
-#define RM_ATTR_RAIN            "rain"
+#define RM_ATTR_CLOUDS	    "clouds"
+#define RM_ATTR_RAIN        "rain"
 #define RM_ATTR_TIME_OF_DAY	"time of day"
+#define RM_ATTR_MONTH       "month"
 #define RM_ATTR_QUAL_LAPS	"Qualification laps"
 #define RM_ATTR_POLE		"pole position side"
 #define RM_ATTR_CARSPERPIT	"cars per pit"
@@ -353,12 +354,14 @@ typedef struct RmInfo
 #define RM_VAL_CONFTIMEOFDAY	"time of day"
 #define RM_VAL_CONFCLOUDCOVER	"cloud cover"
 #define RM_VAL_CONFRAINFALL	"rain fall"
+#define RM_VAL_CONFMONTH        "month"
 
 #define RM_CONF_RACE_LEN	0x0001
 #define RM_CONF_DISP_MODE	0x0002
 #define RM_CONF_TIME_OF_DAY	0x0004
 #define RM_CONF_CLOUD_COVER	0x0008
 #define RM_CONF_RAIN_FALL	0x0010
+#define RM_CONF_MONTH       0x0016
 
 #define RM_VAL_DRV_LIST_ORDER	"drivers list"
 #define RM_VAL_LAST_RACE_ORDER	"last race"
@@ -387,9 +390,9 @@ typedef struct RmInfo
 #define RM_VAL_TIME_24HR	"24 hour"
 #define RM_VAL_TIME_REAL	"real"
 #define RM_VALS_TIME { RM_VAL_TIME_DAWN, RM_VAL_TIME_MORNING, RM_VAL_TIME_NOON, \
-                       RM_VAL_TIME_AFTERNOON, RM_VAL_TIME_DUSK, RM_VAL_TIME_NIGHT, \
-                       RM_VAL_TIME_NOW, RM_VAL_TIME_TRACK, RM_VAL_TIME_RANDOM, \
-                       RM_VAL_TIME_24HR, RM_VAL_TIME_REAL}
+    RM_VAL_TIME_AFTERNOON, RM_VAL_TIME_DUSK, RM_VAL_TIME_NIGHT, \
+    RM_VAL_TIME_NOW, RM_VAL_TIME_TRACK, RM_VAL_TIME_RANDOM, \
+    RM_VAL_TIME_24HR, RM_VAL_TIME_REAL}
 
 // Indices for RM_VALS_TIME.
 #define RM_IND_TIME_DAWN	0
@@ -412,7 +415,7 @@ typedef struct RmInfo
 #define RM_VAL_CLOUDS_RANDOM	"random"
 #define RM_VAL_CLOUDS_REAL	"real"
 #define RM_VALS_CLOUDS { RM_VAL_CLOUDS_NONE, RM_VAL_CLOUDS_FEW, RM_VAL_CLOUDS_SCARCE, \
-                         RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_FULL, RM_VAL_CLOUDS_RANDOM }
+    RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_FULL, RM_VAL_CLOUDS_RANDOM }
 
 #define RM_VAL_RAIN_NONE	"none"
 #define RM_VAL_RAIN_LITTLE	"little"
@@ -420,8 +423,22 @@ typedef struct RmInfo
 #define RM_VAL_RAIN_HEAVY	"heavy"
 #define RM_VAL_RAIN_RANDOM	"random"
 #define RM_VAL_RAIN_REAL	"real"
-#define RM_VALS_RAIN { RM_VAL_RAIN_NONE, RM_VAL_RAIN_LITTLE, RM_VAL_RAIN_MEDIUM, \
-                       RM_VAL_RAIN_HEAVY, RM_VAL_RAIN_RANDOM }
+#define RM_VALS_RAIN { RM_VAL_RAIN_NONE, RM_VAL_RAIN_LITTLE, RM_VAL_RAIN_MEDIUM, RM_VAL_RAIN_HEAVY, RM_VAL_RAIN_RANDOM }
+
+#define RM_VAL_MONTH_JANUARY  "january"
+#define RM_VAL_MONTH_FEBRUARY "february"
+#define RM_VAL_MONTH_MARCH    "march"
+#define RM_VAL_MONTH_APRIL    "april"
+#define RM_VAL_MONTH_MAY      "may"
+#define RM_VAL_MONTH_JUNE     "june"
+#define RM_VAL_MONTH_JULY     "july"
+#define RM_VAL_MONTH_AUGUST   "august"
+#define RM_VAL_MONTH_SEPTEMBER "spetember"
+#define RM_VAL_MONTH_OCTOBER  "october"
+#define RM_VAL_MONTH_NOVEMBER "november"
+#define RM_VAL_MONTH_DECEMBER "december"
+#define RM_VAL_MONTH_REAL     "real"
+#define RM_VALS_MONTH { RM_VAL_MONTH_JANUARY, RM_VAL_MONTH_FEBRUARY, RM_VAL_MONTH_MARCH, RM_VAL_MONTH_APRIL, RM_VAL_MONTH_MAY, RM_VAL_MONTH_JUNE, RM_VAL_MONTH_JULY, RM_VAL_MONTH_AUGUST, RM_VAL_MONTH_SEPTEMBER, RM_VAL_MONTH_OCTOBER, RM_VAL_MONTH_NOVEMBER, RM_VAL_MONTH_DECEMBER, RM_VAL_MONTH_REAL }
 
 /* Movie capture */
 
@@ -540,6 +557,7 @@ typedef struct RmInfo
 #define RE_SECT_CLASSPOINTS	"Class Points"
 
 #endif /* _RACEMANV1_H_ */
+
 
 
 

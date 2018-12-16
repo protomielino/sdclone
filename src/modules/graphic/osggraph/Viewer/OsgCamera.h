@@ -69,7 +69,7 @@ class SDCamera
 private :
     int			id;				/* Camera Id */
     int			drawCurrent;	/* flag to draw the current car */
-	int			drawCockpit;	/* flag to draw the current cockpit */
+    int			drawCockpit;	/* flag to draw the current cockpit */
     int			drawDriver;		/* flag to draw the driver */
     int			drawBackground;	/* flag to draw the background */
     int			mirrorAllowed;	/* flag to allow the display of mirror */
@@ -96,8 +96,8 @@ public:
 
     virtual void setViewOffset(float newOffset)=0;
     inline float getAspectRatio()		{ return 0.0; }
-	inline int   getdrawCockpit()		{ return drawCockpit; }
-	inline int   getdrawDriver()		{ return drawDriver; }
+    inline int   getdrawCockpit()		{ return drawCockpit; }
+    inline int   getdrawDriver()		{ return drawDriver; }
     inline int   getMirrorAllowed()		{ return mirrorAllowed; }
     inline osg::Vec3 getCameraPosition(){ return eye; }
 
@@ -110,6 +110,55 @@ public:
     {
         setProjection();
         setModelView();
+    }
+
+    t3Dd *getPos(void)
+    {
+        static t3Dd pos;
+        pos.x = eye[0];
+        pos.y = eye[1];
+        pos.z = eye[2];
+        return &pos;
+    }
+
+    osg::Vec3 *getPosv(void)
+    {
+        return &eye;
+    }
+
+    osg::Vec3 *getSpeedv(void)
+    {
+        return &speed;
+    }
+
+    t3Dd *getCenter(void)
+    {
+        static t3Dd pos;
+        pos.x = center[0];
+        pos.y = center[1];
+        pos.z = center[2];
+        return &pos;
+    }
+
+    osg::Vec3 *getCenterv(void)
+    {
+        return &center;
+    }
+
+    t3Dd *getUp(void)
+    {
+        static t3Dd pos;
+
+        pos.x = up[0];
+        pos.y = up[1];
+        pos.z = up[2];
+
+        return &pos;
+    }
+
+    osg::Vec3 *getUpv(void)
+    {
+        return &up;
     }
 
     // Destructor
