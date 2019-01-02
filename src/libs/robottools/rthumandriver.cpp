@@ -2280,6 +2280,26 @@ void HumanDriver::human_prefs(const int robot_index, int player_index)
 
     prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_AUTOREVERSE, Yn[HCtx[idx]->autoReverse].c_str());
     HCtx[idx]->autoReverse = (prm == Yn[0]);
+
+    if (HCtx[idx]->transmission != eTransGrid) {
+       for (int k = CMD_GEAR_2; k <= CMD_GEAR_6; k++) {
+          cmdCtrl[k].type = GFCTRL_TYPE_NOT_AFFECTED;
+       }
+    }
+    if (HCtx[idx]->transmission != eTransHbox) {
+       cmdCtrl[CMD_HBOX_X].type = GFCTRL_TYPE_NOT_AFFECTED;
+       cmdCtrl[CMD_HBOX_Y].type = GFCTRL_TYPE_NOT_AFFECTED;
+    }
+    if (HCtx[idx]->transmission == eTransHbox)
+       cmdCtrl[CMD_GEAR_1].type = GFCTRL_TYPE_NOT_AFFECTED;
+
+    if (HCtx[idx]->transmission == eTransAuto &&  HCtx[idx]->autoReverse) {
+       cmdCtrl[CMD_GEAR_R].type = GFCTRL_TYPE_NOT_AFFECTED;
+       cmdCtrl[CMD_GEAR_N].type = GFCTRL_TYPE_NOT_AFFECTED;
+       cmdCtrl[CMD_GEAR_1].type = GFCTRL_TYPE_NOT_AFFECTED;
+    }
+
+    
 }
 
 HumanDriver::HumanDriver(const char *robotname)
