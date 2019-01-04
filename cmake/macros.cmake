@@ -30,10 +30,12 @@ ENDIF(NOT DEFINED IN_SOURCETREE)
 # Setup the install prefix.
 IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   IF(WIN32)
-    SET(CMAKE_INSTALL_PREFIX "/speed-dreams-2-build" CACHE PATH "Prefix prepended to install directories" FORCE)
-  ELSE(WIN32)
+    SET(CMAKE_INSTALL_PREFIX "installed-build" CACHE PATH "Prefix prepended to install directories" FORCE)
+  ELSEIF(APPLE)
+    SET(CMAKE_INSTALL_PREFIX "speed-dreams-2.app" CACHE PATH "Prefix prepended to install directories" FORCE)
+  ELSE()
     SET(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Prefix prepended to install directories" FORCE)
-  ENDIF(WIN32)
+  ENDIF()
 ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 # Determine the source folder if ???
