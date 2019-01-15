@@ -468,7 +468,7 @@ FunctionEnd
 ; This one is called at uninstaller startup.
 Function un.onInit
 
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Do you really want to unistall $(^Name) and all its components ?" IDYES +2
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Do you really want to uninstall $(^Name) and all its components ?" IDYES +2
   Abort
 
 FunctionEnd
