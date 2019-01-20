@@ -65,8 +65,8 @@ SDMakeState(const std::string &path, const char* colorTexture, const char* norma
     stateSet->setTextureAttributeAndModes(0, texture.get());
     stateSet->setTextureMode(0, GL_TEXTURE_2D, osg::StateAttribute::ON);
 
-	TmpPath = path+"data/sky/"+normalTexture; 
-	GfLogInfo("Path Sky cloud normal texture = %s\n", TmpPath.c_str());
+    TmpPath = path+"data/sky/"+normalTexture;
+    GfLogInfo("Path Sky cloud normal texture = %s\n", TmpPath.c_str());
     osg::ref_ptr<osg::Image> image2 = osgDB::readImageFile(TmpPath);
     osg::ref_ptr<osg::Texture2D> texture2 = new osg::Texture2D(image2.get());
     texture2->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
@@ -90,12 +90,12 @@ SDMakeState(const std::string &path, const char* colorTexture, const char* norma
     StandardBlendFunc->setSource(BlendFunc::SRC_ALPHA);
     StandardBlendFunc->setDestination(BlendFunc::ONE_MINUS_SRC_ALPHA);
     StandardBlendFunc->setDataVariance(Object::STATIC);
-    
-	stateSet->setAttributeAndModes(StandardBlendFunc.get());
-	stateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
+
+    stateSet->setAttributeAndModes(StandardBlendFunc.get());
+    stateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::ON);
-    stateSet->setMode(GL_LIGHT0, osg::StateAttribute::OFF);    
+    stateSet->setMode(GL_LIGHT0, osg::StateAttribute::OFF);
 
     return stateSet;
 }
@@ -301,50 +301,25 @@ void SDCloudLayer::rebuild()
         state = SDMakeState(texture_path, "overcast_top.png", "overcast_top_n.png");
         layer_states2[SD_CLOUD_OVERCAST] = state;
 
-        state = SDMakeState(texture_path, "overcast2.png", "overcast2_n.png");
-        layer_states[SD_CLOUD_OVERCAST2] = state;
-        state = SDMakeState(texture_path, "overcast2_top.png", "overcast2_top_n.png");
-        layer_states2[SD_CLOUD_OVERCAST2] = state;
-
         state = SDMakeState(texture_path, "broken.png", "broken_n.png");
         layer_states[SD_CLOUD_BROKEN] = state;
         layer_states2[SD_CLOUD_BROKEN] = state;
-
-        state = SDMakeState(texture_path, "broken2.png", "broken2_n.png");
-        layer_states[SD_CLOUD_BROKEN2] = state;
-        layer_states2[SD_CLOUD_BROKEN2] = state;
 
         state = SDMakeState(texture_path, "scattered.png", "scattered_n.png" );
         layer_states[SD_CLOUD_SCATTERED] = state;
         layer_states2[SD_CLOUD_SCATTERED] = state;
 
-        state = SDMakeState(texture_path, "scattered2.png", "scattered2_n.png" );
-        layer_states[SD_CLOUD_SCATTERED2] = state;
-        layer_states2[SD_CLOUD_SCATTERED2] = state;
-
         state = SDMakeState(texture_path, "many.png", "many_n.png");
         layer_states[SD_CLOUD_MANY] = state;
         layer_states2[SD_CLOUD_MANY] = state;
-
-        state = SDMakeState(texture_path, "many2.png", "many2_n.png" );
-        layer_states[SD_CLOUD_MANY2] = state;
-        layer_states2[SD_CLOUD_MANY2] = state;
 
         state = SDMakeState(texture_path, "few.png", "few_n.png");
         layer_states[SD_CLOUD_FEW] = state;
         layer_states2[SD_CLOUD_FEW] = state;
 
-        state = SDMakeState(texture_path, "few2.png", "few2_n.png");
-        layer_states[SD_CLOUD_FEW2] = state;
-        layer_states2[SD_CLOUD_FEW2] = state;
-
         state = SDMakeState(texture_path, "cirrus.png", "cirrus_n.png");
         layer_states[SD_CLOUD_CIRRUS] = state;
         layer_states2[SD_CLOUD_CIRRUS] = state;
-
-        state = SDMakeState(texture_path, "cirrus2.png", "cirrus2_n.png");
-        layer_states[SD_CLOUD_CIRRUS2] = state;
-        layer_states2[SD_CLOUD_CIRRUS2] = state;
 
         layer_states[SD_CLOUD_CLEAR] = 0;
         layer_states2[SD_CLOUD_CLEAR] = 0;
@@ -472,7 +447,7 @@ bool SDCloudLayer::repaint( const osg::Vec3f &fog_color )
         = dynamic_cast<osg::TexEnvCombine*>(layer_root->getStateSet()
                                             ->getTextureAttribute(1, osg::StateAttribute::TEXENV));
     combiner->setConstantColor(combineColor);
-	
+
     return true;
 }
 
@@ -515,7 +490,7 @@ bool SDCloudLayer::reposition(const osg::Vec3f &p, double dt )
         }
 
         double sp_dist = speed * dt;
-        
+
         if ( p._v[0] != last_x || p._v[1] != last_y || sp_dist != 0 )
         {
             double ax = 0.0, ay = 0.0, bx = 0.0, by = 0.0;

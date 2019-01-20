@@ -101,6 +101,8 @@ static const int MAX_NBBOTS = 100;               // Number of drivers/robots
 #define PRV_OFFTRACK_ALLOWED  "offtrack allowed"
 #define PRV_OFFTRACK_RLIMIT   "rough limit"
 #define PRV_AVOID_OFFSET      "avoid offset"
+#define PRV_CTFACTOR          "ct factor"
+#define PRV_FUEL_MASS_FACTOR  "fuel mass factor"
 
 // driver values
 #define PRV_PIT_DAMAGE        "pit damage"

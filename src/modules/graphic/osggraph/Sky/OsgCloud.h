@@ -39,19 +39,13 @@ public:
 
     enum Coverage
     {
-        SD_CLOUD_OVERCAST = 0,
-        SD_CLOUD_OVERCAST2,
-        SD_CLOUD_BROKEN,
-        SD_CLOUD_BROKEN2,
-        SD_CLOUD_MANY,
-        SD_CLOUD_MANY2,
-        SD_CLOUD_SCATTERED,
-        SD_CLOUD_SCATTERED2,
-        SD_CLOUD_FEW,
-        SD_CLOUD_FEW2,
+        SD_CLOUD_CLEAR = 0,
         SD_CLOUD_CIRRUS,
-        SD_CLOUD_CIRRUS2,
-        SD_CLOUD_CLEAR,
+        SD_CLOUD_FEW,
+        SD_CLOUD_SCATTERED,
+        SD_CLOUD_MANY,
+        SD_CLOUD_BROKEN,
+        SD_CLOUD_OVERCAST,
         SD_MAX_CLOUD_COVERAGES
     };
 
