@@ -63,11 +63,11 @@ data/tracks/circuit/goldstone-sand
 data/tracks/road/CMakeLists.txt
 
 data/tracks/road/e-track-2
-data/tracks/road/e-track-3
+data/tracks/road/auriac
 data/tracks/road/e-track-4
 data/tracks/road/spring
 data/tracks/road/street-1
-data/tracks/road/wheel-1
+data/tracks/road/alicante
 
 data/tracks/dirt/CMakeLists.txt
 
