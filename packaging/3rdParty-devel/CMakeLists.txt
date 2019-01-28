@@ -347,12 +347,12 @@ else(OPTION_ZLIB)
 endif(OPTION_ZLIB)
 
 if(OPTION_PNG)
-   set(PNG_PROJECT libpng-1.6.35)
+   set(PNG_PROJECT libpng-1.6.36)
    set(PNG_ARGS ${EXTERNALS_CMAKE_ARGS} -DPNG_SHARED=off -DPNG_TESTS=off -DCMAKE_DEBUG_POSTFIX='')
    ExternalProject_Add(${PNG_PROJECT} 
       DOWNLOAD_NAME ${PNG_PROJECT}.tar.gz 
-      URL https://sourceforge.net/projects/libpng/files/libpng16/1.6.35/libpng-1.6.35.tar.gz/download 
-      URL_HASH MD5=d94d9587c421ac42316b6ab8f64f1b85
+      URL https://sourceforge.net/projects/libpng/files/libpng16/1.6.36/libpng-1.6.36.tar.gz/download 
+      URL_HASH SHA256=ca13c548bde5fb6ff7117cc0bdab38808acb699c0eccb613f0e4697826e1fd7d
       CMAKE_ARGS ${PNG_ARGS}
       DEPENDS ${ZLIB_PROJECT}
       )
