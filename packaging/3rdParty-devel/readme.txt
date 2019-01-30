@@ -2,6 +2,9 @@ Building the dependencies for Speed-Dreams makes use of CMake's ExternalProject
  module. The source for each is downloaded from each project's site, patched if
  necessary, and built. This can take considerable time and accesses several
  different sites. See the CMakeLists.txt for the exact sites.(search for URL).
+ The installation also contains a folder 3rdParty/source_info in which you
+ will find the download source for each project.
+
 
  =============================================================================
  Windows

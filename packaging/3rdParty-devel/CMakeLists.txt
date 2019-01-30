@@ -445,10 +445,17 @@ set(DOCSOURCES COPYING LICENSE readme.txt)
 
 add_custom_target(rootdoc SOURCES ${DOCSOURCES})
 
-install(DIRECTORY ${EXTERNALS_INSTALL_DIR} DESTINATION .)
+file(GLOB_RECURSE _INFO_FILES "${EXTERNALS_PREFIX}/Stamp/*info.txt")
+
+# ========== Installation =============
+
+install(FILES ${_INFO_FILES} DESTINATION ${EXTERNALS_INSTALL_DIR}/source_info)
+
 install(FILES ${DOCSOURCES} DESTINATION ${EXTERNALS_INSTALL_DIR})
 
 install(DIRECTORY Licenses/ DESTINATION ${EXTERNALS_INSTALL_DIR}/Licenses)
+
+install(DIRECTORY ${EXTERNALS_INSTALL_DIR} DESTINATION .)
 
 
 # ========== Packaging =============
