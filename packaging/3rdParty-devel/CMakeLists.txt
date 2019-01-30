@@ -101,7 +101,7 @@ message(STATUS "OpenGL extensions (Windows only??)")
 if(WIN32 AND OPTION_OPENGL_HEADERS)
 ExternalProject_Add(OpenGL-headers
    URL ${CMAKE_CURRENT_SOURCE_DIR}/patches/openglheaders.zip
-   URL_HASH SHA256=4ba471b7306d47776c916bd507b89415baf6d5662e17a27c2c575d8e331c985b
+   URL_HASH SHA256=e66ae96912231de021e17c80a978765c126b26cfde1103f63e9f33e4780f7fad
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
 endif(WIN32 AND OPTION_OPENGL_HEADERS)
 
@@ -182,7 +182,7 @@ if(OPTION_PLIB)
    else(OPTION_PLIB_USE_HEAD)
 
    ExternalProject_Add(plib-1.8.5 
-      URL https://plib.sourceforge.net/dist/plib-1.8.5.tar.gz 
+      URL http://plib.sourceforge.net/dist/plib-1.8.5.tar.gz 
       URL_HASH SHA256=485b22bf6fdc0da067e34ead5e26f002b76326f6371e2ae006415dea6a380a32 
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
       DEPENDS OpenGL-headers
