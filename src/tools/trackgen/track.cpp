@@ -83,11 +83,6 @@ static tdble		TrackStep;
 #define sqr(x) ((x)*(x))
 #endif
 
-tdble Distance(tdble x0, tdble y0, tdble z0, tdble x1, tdble y1, tdble z1)
-{
-	return sqrt((x0-x1)*(x0-x1)+(y0-y1)*(y0-y1)+(z0-z1)*(z0-z1));
-}
-
 static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 	tTrackSeg	*curMainSeg;
 	tTrackSeg	*curPitSeg = NULL;

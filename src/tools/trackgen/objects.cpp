@@ -81,7 +81,7 @@ public:
 typedef struct objdef
 {
     GF_TAILQ_ENTRY(objdef)	link;
-    int			random;
+    int			random, trackOriented, terrainOriented;
     unsigned int	color;
     ssgEntity		*obj;
     tdble		deltaHeight;
@@ -167,6 +167,12 @@ InitObjects(tTrack *track, void *TrackHandle)
 	    sgMakeRotMat4(m, GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION, "deg", 0), 0.0, 0.0);
 	    ApplyTransform(m, curObj->obj);
 	}
+	if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION_TYPE, ""), "track") == 0) {
+	    curObj->trackOriented = 1;
+	} else {curObj->trackOriented =0;}
+	if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION_TYPE, ""), "terrain") == 0) {
+	    curObj->terrainOriented = 1;
+	} else {curObj->terrainOriented =0;}
 	GF_TAILQ_INSERT_HEAD(&objhead, curObj, link);
 
 	GfParmListSeekNext(TrackHandle, TRK_SECT_OBJECTS);
@@ -192,12 +198,12 @@ AddToRoot(ssgEntity *node)
 }
 
 static void
-AddObject(unsigned int clr, tdble x, tdble y)
+AddObject(tTrack *track, void *TrackHandle, unsigned int clr, tdble x, tdble y)
 {
     struct objdef	*curObj;
     ssgEntity		*obj;
     sgMat4		m;
-    tdble		dv;
+    tdble		dv=0, angle=0;
     
     for (curObj = GF_TAILQ_FIRST(&objhead); curObj; curObj = GF_TAILQ_NEXT(curObj, link)) {
 	if (clr == curObj->color) {
@@ -207,9 +213,19 @@ AddObject(unsigned int clr, tdble x, tdble y)
 /* 		sgMakeCoordMat4 (m, 0.0, 0.0, curObj->deltaHeight * rand() / (RAND_MAX + 1.0), 0.0, 0.0, 0.0); */
 /* 		ApplyTransform (m, obj); */
 		dv = curObj->deltaVert;
-		sgMakeRotMat4 (m, 360.0 * rand() / (RAND_MAX + 1.0), dv / 2.0 - dv * rand() / (RAND_MAX + 1.0), dv / 2.0  - dv * rand() / (RAND_MAX + 1.0));
-		ApplyTransform (m, obj);
+		angle = 360.0 * rand() / (RAND_MAX + 1.0);
+		
 	    }
+	    if (curObj->terrainOriented) {
+			/* NEW: calculate angle for terrain-aligned orientation */
+			angle= getTerrainAngle(TrackRoot, x, y);
+		}
+		if (curObj->trackOriented) {
+			/* NEW: calculate angle for track-aligned orientation */
+			angle= getTrackAngle(track, TrackHandle, x, y);
+		}
+	    sgMakeRotMat4(m, angle, dv / 2.0 - dv * rand() / (RAND_MAX + 1.0), dv / 2.0  - dv * rand() / (RAND_MAX + 1.0));
+		ApplyTransform(m, obj);
 	    sgMakeTransMat4(m, x, y, getHOT(TrackRoot, x, y));
 	    ApplyTransform(m, obj);
 	    AddToRoot(obj);
@@ -461,7 +477,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 	sprintf(buf, "tracks/%s/%s/%s", track->category, track->internalname, map);
 
 	printf("Processing object map %s\n", buf);
-	MapImage = GfTexReadImageFromPNG(buf, 2.2, &width, &height, 0, 0, false);
+	MapImage = GfTexReadImageFromPNG(buf, 2.2, &width, &height, 0, 0);
 	if (!MapImage) {
 	    return;
 	}
@@ -475,7 +491,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 	    for (i = 0; i < width; i++) {
 		clr = (MapImage[4 * (i + width * j)] << 16) + (MapImage[4 * (i + width * j) + 1] << 8) + MapImage[4 * (i + width * j) + 2];
 		if (clr) {
-		    AddObject(clr, i * kX + dX, j * kY + dY);
+		    AddObject(track, TrackHandle, clr, i * kX + dX, j * kY + dY);
 		}
 	    }
 	}

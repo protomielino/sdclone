@@ -30,6 +30,9 @@
 
 extern int GetFilename(const char *filename, const char *filepath, char *buf);
 extern float getHOT(ssgRoot *root, float x, float y);
+extern float getTerrainAngle(ssgRoot *root, float x, float y);
+extern float getTrackAngle(tTrack *Track, void *TrackHandle, float x, float y);
+extern tdble Distance(tdble x0, tdble y0, tdble z0, tdble x1, tdble y1, tdble z1);
 
 /* Use the texture name to select options like mipmap */
 class ssgLoaderOptionsEx : public ssgLoaderOptions
