@@ -3,9 +3,9 @@
 #
 #    file                 : CMakeLists.txt
 #    created              : Aug 5 2015
-#    copyright            : (C) 2015 Joe Thompson
+#    copyright            : (C) 2015-2019 Joe Thompson
 #    email                : beaglejoe@users.sourceforge.net
-#    version              : $Id: $
+#    version              : $Id$
 #
 #==============================================================================
 #
@@ -168,6 +168,7 @@ if(OPTION_PLIB)
    if(OPTION_PLIB_USE_HEAD)
    ExternalProject_Add(plib-1.8.5-head 
       SVN_REPOSITORY  svn://svn.code.sf.net/p/plib/code/trunk
+      SVN_REVISION -r2173  #-r2173 as of 2012-08-24 can also use -rHEAD, but specific revision is supposed to prevent calling svn update
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
       DEPENDS OpenGL-headers
       )
