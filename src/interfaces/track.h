@@ -720,6 +720,8 @@ typedef struct Track
 
 #define TRK_ATT_FINISH          "finish segment"
 
+#define TRK_ATT_BORDER_DISTANCE     "border distance"
+
 #endif /* _TRACKV1_H_ */
 
 

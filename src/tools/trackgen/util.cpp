@@ -198,6 +198,106 @@ float getTrackAngle(tTrack *Track, void *TrackHandle, float x, float y)
 }
 
 /*
+ * same thing for border alignment, just one difference: a new position 
+ * x/y/z is returned to keep it aligned with the track in distance & height
+ * need additional input in xml object definition:
+ *   <attnum...
+ *  
+ */ 
+float getBorderAngle(tTrack *Track, void *TrackHandle, float x, float y, float distance, float *xRet, float *yRet, float *zRet )
+{
+	float angle=0, dst=100000, shDst=100000;
+	int 		i;
+    tTrackSeg 		*seg = Track->seg;
+	tTrkLocPos		curPos, closePos, objPos;
+    float x2, y2, x3, y3;
+	for(i = 0; i < Track->nseg; i++)
+    {
+		seg=seg->next;
+		curPos.seg=seg;
+		curPos.toMiddle=0;
+		
+		switch (seg->type) {
+		case TR_STR:
+			for (float toStart=0; toStart<seg->length; toStart+=(seg->length/5.0))
+			{
+				curPos.toStart=toStart;
+				RtTrackLocal2Global(&curPos, &x2, &y2, TR_TOMIDDLE);
+				dst=Distance(x,y,0,x2,y2,0);
+				//printf("distance: %g\n",dst);
+				if ( dst < shDst ){
+					shDst=dst;
+					closePos=curPos;				
+				}
+			}
+			break;
+		case TR_RGT:
+			for (float toStart=0; toStart<seg->arc; toStart+=(seg->arc/5.0))
+			{
+				curPos.toStart=toStart;
+				RtTrackLocal2Global(&curPos, &x2, &y2, TR_TOMIDDLE);
+				dst=Distance(x,y,0,x2,y2,0);
+				//printf("distance: %g\n",dst);
+				if ( dst < shDst ){
+					shDst=dst;
+					closePos=curPos;				
+				}
+			}
+			break;
+        case TR_LFT:
+			for (float toStart=0; toStart<seg->arc; toStart+=(seg->arc/10.0))
+			{
+				curPos.toStart=toStart;
+				RtTrackLocal2Global(&curPos, &x2, &y2, TR_TOMIDDLE);
+				dst=Distance(x,y,0,x2,y2,0);
+				//printf("distance: %g\n",dst);
+				if ( dst < shDst ){
+					shDst=dst;
+					closePos=curPos;				
+				}
+			}
+			break;
+		}
+	
+		
+	}
+	//check if left or right
+    
+   
+    curPos=closePos;
+	seg=curPos.seg;
+	//check if left or right
+	RtTrackGlobal2Local(seg, x, y, &objPos, 1);
+	if ( objPos.toMiddle < 0 ) 
+	// object on right side
+	{
+		curPos.toRight = 0;
+		objPos.toRight = -distance;
+		RtTrackLocal2Global(&curPos, &x3, &y3, TR_TORIGHT);
+		curPos.toStart+=0.001;
+		RtTrackLocal2Global(&curPos, &x2, &y2, TR_TORIGHT);
+		angle=-90.0-atan2f(x2-x3,y2-y3)*180/PI;
+		RtTrackLocal2Global(&objPos, &*xRet, &*yRet, TR_TORIGHT);
+	}
+	else 
+	// left side
+	{	curPos.toLeft = 0;
+		objPos.toLeft = -distance;
+		RtTrackLocal2Global(&curPos, &x3, &y3, TR_TOLEFT);
+		curPos.toStart+=0.001;
+		RtTrackLocal2Global(&curPos, &x2, &y2, TR_TOLEFT);
+		angle=90.0-atan2f(x2-x3,y2-y3)*180/PI;
+		RtTrackLocal2Global(&objPos, &*xRet, &*yRet, TR_TOLEFT);
+	}
+	
+	*zRet=RtTrackHeightG(seg, *xRet, *yRet);
+	printf("tried to align to border: x: %g y: %g z: %g angle: %g \n", *xRet, *yRet, *zRet, angle);
+	//return values
+    
+    return angle;
+}
+
+/*
  * calculates an angle based on plane equation (face normal) of the 
 * terrain in this spot. * Angle is determined so that the x axis is 
 * aligned to a horizontal intersection (i.e. height line) of the 
