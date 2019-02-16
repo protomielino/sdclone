@@ -40,6 +40,8 @@ extern tTrack *grTrack;
 
 extern ssgRoot *TheScene;
 extern ssgBranch *LandAnchor;
+extern ssgBranch *BackSkyAnchor;
+extern ssgTransform *BackSkyLoc;
 extern ssgBranch *CarsAnchor;
 extern ssgBranch *ShadowAnchor;
 extern ssgBranch *PitsAnchor;
@@ -48,8 +50,8 @@ extern ssgBranch *SkidAnchor;
 extern ssgBranch *CarlightAnchor;
 extern ssgBranch *TrackLightAnchor;
 extern ssgBranch *ThePits;
-extern ssgRoot *BackSkyAnchor;
-extern ssgTransform *BackSkyLoc;
+
+
 
 extern ssgStateSelector	*grEnvSelector;
 extern cgrMultiTexState	*grEnvState;

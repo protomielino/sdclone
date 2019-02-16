@@ -835,7 +835,7 @@ void grLoadBackgroundSky(void)
     sgCoord BackSkypos;
     sgSetCoord(&BackSkypos, grWrldX/2, grWrldY/2, 0, 0, 0, 0);
     BackSkyLoc->setTransform(&BackSkypos);
-	BackSkyAnchor->addKid(BackSkyLoc);
+    BackSkyAnchor->addKid(BackSkyLoc);
 }
 
 void grLoadBackgroundLand(void)
@@ -857,25 +857,25 @@ void grLoadBackgroundLand(void)
 void
 grPreDrawBackgroundSky(class cGrCamera *cam)
 {
-	sgMat4 T;
+    sgMat4 T;
 
-	sgVec3 posview;
-	memcpy(&posview, cam->getCenterv(), sizeof(posview));
+    sgVec3 posview;
+    memcpy(&posview, cam->getCenterv(), sizeof(posview));
 
-	sgMakeTransMat4( T, posview );
-	sgMat4 TRANSFORM;
+    sgMakeTransMat4( T, posview );
+    sgMat4 TRANSFORM;
 
-	sgCopyMat4( TRANSFORM, T );
+    sgCopyMat4( TRANSFORM, T );
 
-	sgCoord backgroundpos;
-	sgSetCoord( &backgroundpos, TRANSFORM );
-	BackSkyLoc->setTransform(&backgroundpos);
+    sgCoord backgroundpos;
+    sgSetCoord( &backgroundpos, TRANSFORM );
+    BackSkyLoc->setTransform(&backgroundpos);
 }
 
 void
 grDrawBackgroundSky(void)
 {
-	ssgCullAndDraw(BackSkyAnchor);
+    ssgCullAndDraw(BackSkyAnchor);
 }
 
 void
@@ -883,7 +883,7 @@ grPreDrawSky(tSituation* s, float fogStart, float fogEnd, class cGrCamera *cam)
 {
     static const double m_log01 = -log( 0.01 );
     static const double sqrt_m_log01 = sqrt( m_log01 );
-	GLbitfield clear_mask;
+    GLbitfield clear_mask;
 
     if (grSkyDomeDistance )
     {
@@ -898,12 +898,12 @@ grPreDrawSky(tSituation* s, float fogStart, float fogEnd, class cGrCamera *cam)
         glHint(GL_FOG_HINT, GL_DONT_CARE);
 
         ssgGetLight(0)->setColour(GL_DIFFUSE, White);
-		clear_mask |= GL_COLOR_BUFFER_BIT;
-		glClear( clear_mask );
+        clear_mask |= GL_COLOR_BUFFER_BIT;
+        glClear( clear_mask );
 
-		sgVec3 posview;
-		memcpy(&posview, cam->getCenterv(), sizeof(posview));
-		TheSky->repositionFlat(posview, 0, 0);
+        sgVec3 posview;
+        memcpy(&posview, cam->getCenterv(), sizeof(posview));
+        TheSky->repositionFlat(posview, 0, 0);
 
         TheSky->preDraw();
 
@@ -958,7 +958,7 @@ grUpdateSky(double currentTime, double accelTime)
     if (!bInitialized)
     {
         if (grSkyDomeDistance )
-		{
+        {
             // Ensure the sun and moon positions are reset
             const int timeOfDay = (int)grTrack->local.timeofday;
             GLfloat sunAscension = grTrack->local.sunascension;

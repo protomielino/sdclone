@@ -57,6 +57,8 @@ ssgRoot *TheScene = NULL;
 
 // TheScene kids order (but some others in background.cpp)
 ssgBranch *LandAnchor = NULL;
+ssgBranch *BackSkyAnchor = NULL;
+ssgTransform *BackSkyLoc = NULL;
 ssgBranch *CarsAnchor = NULL;
 ssgBranch *ShadowAnchor = NULL;
 ssgBranch *PitsAnchor = NULL;
@@ -65,8 +67,7 @@ ssgBranch *SkidAnchor = NULL;
 ssgBranch *CarlightAnchor = NULL;
 ssgBranch *TrackLightAnchor = NULL;
 ssgBranch *ThePits = NULL;
-ssgRoot *BackSkyAnchor = NULL;
-ssgTransform *BackSkyLoc = NULL;
+
 
 // Must have (Question: What for ?)
 int preScene(ssgEntity *e)
@@ -150,10 +151,10 @@ grLoadScene(tTrack *track)
     TheScene = new ssgRoot;
 
     /* Background Sky */
-    BackSkyAnchor = new ssgRoot;
+    BackSkyAnchor = new ssgBranch;
     BackSkyLoc = new ssgTransform;
     BackSkyAnchor->addKid(BackSkyLoc);
-    //TheScene->addKid(BackSkyLoc);
+    TheScene->addKid(BackSkyAnchor);
 
     /* Landscape */
     LandAnchor = new ssgBranch;
