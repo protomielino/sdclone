@@ -363,7 +363,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 		# Plugins : Complete the list right below according to the actual needs.
 		# TODO: Find a way to install them in the osgPlugins-xxx subdir (works as is, but ...)
 		SET(_OSG_PLUGIN_NAME_HINTS "osgdb_ac;osgdb_dds;osgdb_glsl") # ';'-separated list
-      LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_ive;osgdb_jpeg;osgdb_osg;osgdb_curl")
+      LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_ive;osgdb_jpeg;osgdb_osg;osgdb_curl;osgdb_freetype")
       LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_osga;osgdb_osgshadow;osgdb_osgtgz;osgdb_png;osgdb_rgb")
       LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_serializers_osg;osgdb_serializers_osganimation;osgdb_serializers_osgfx;osgdb_serializers_osgga;osgdb_serializers_osgmanipulator;osgdb_serializers_osgparticle")
 	  LIST(APPEND _OSG_PLUGIN_NAME_HINTS "osgdb_serializers_osgshadow;osgdb_serializers_osgsim;osgdb_serializers_osgtext;osgdb_serializers_osggui;osgdb_serializers_osgutil;osgdb_serializers_osgviewer")
