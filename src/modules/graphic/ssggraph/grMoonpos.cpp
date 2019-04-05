@@ -20,40 +20,36 @@
 #include "grMoonpos.h"
 
 // Position of the Moon first month 2012
-static const double MoonPositionDay[31] = { 40020, 41400, 42960, 44760, 46980, 49680, 52860, 56520, 60600, 64860, 69300, 73740,
-										78240, 82800, 0, 960, 5580, 10080, 14400, 18180, 21360, 23940, 26040, 27780, 29220,
-										30540, 31800, 33060, 34380, 35880, 37560 };
+static const double MoonPositionDay[31] = { 232.25, 243.86, 255.47, 267.08, 278.69, 290.3, 301.91, 313.53, 325.13, 336.75, 348.36, 0,
+                                        11.61, 23.22, 34.83, 46.44, 58.05, 69.66, 81.27, 92.88, 104.49, 116.10, 127.71, 139.32, 150.93,
+                                        162.54, 174.15, 185.76, 197.37, 208.98, 220.59 };
 
 double grUpdateMoonPos(double timeOfDay)
 {
-	double moonpos, actual = 0;
-	time_t Time;
-	struct tm *Date;
-	
-	time(&Time);
-	Date = localtime(&Time);
+    double moonpos, actual = 0;
+    time_t Time;
+    struct tm *Date;
 
-	int hour = Date->tm_hour;
-	int minute = Date->tm_min;
-	
-	int day = Date->tm_mday;
-	int month = Date->tm_mon +1;
-	int year = Date->tm_year + 1900;
+    time(&Time);
+    Date = localtime(&Time);
 
-	year = (2012 - year) +1;
-	double diff = 420 * month * year;
-	if (diff > 86340)
-		diff = diff - 86340;
+    int day = Date->tm_mday;
 
-	actual = (hour*3600)+(minute*60);
-	moonpos = (MoonPositionDay[day+1] - diff);
-	if (actual > moonpos)
-		moonpos = actual - moonpos;
-	else
-		moonpos = moonpos - actual;
+    actual = timeOfDay;
+    moonpos = (MoonPositionDay[day+1] - day);
+    moonpos = moonpos + (15 * ((double)timeOfDay / 3600 - 90.0));
+    if (moonpos > 360.0)
+        moonpos = 0.0;
+    if (moonpos > 0.0)
+        moonpos = 0.0;
+    /*if (actual > moonpos)
+        moonpos = actual - moonpos;
+    else
+        moonpos = moonpos - actual;*/
 
-	return moonpos;
-	
+
+    return moonpos;
+
 }
 
 

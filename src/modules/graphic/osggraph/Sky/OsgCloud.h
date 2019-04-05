@@ -42,8 +42,9 @@ public:
         SD_CLOUD_CLEAR = 0,
         SD_CLOUD_CIRRUS,
         SD_CLOUD_FEW,
-        SD_CLOUD_SCATTERED,
         SD_CLOUD_MANY,
+        SD_CLOUD_CUMULUS,
+        SD_CLOUD_SCATTERED,
         SD_CLOUD_BROKEN,
         SD_CLOUD_OVERCAST,
         SD_MAX_CLOUD_COVERAGES

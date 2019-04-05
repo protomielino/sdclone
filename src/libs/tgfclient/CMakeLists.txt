@@ -27,7 +27,7 @@ SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
             glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h)
 
 IF(OPTION_WEBSERVER)
-   SET(_SOURCES ${_SOURCES} webserver.cpp webserver.h)
+   SET(_SOURCES ${_SOURCES} webserver.cpp webserver.h webmetar.cpp webmetar.h)
 ENDIF(OPTION_WEBSERVER)
 
 IF(OPTION_SDL_FORCEFEEDBACK)

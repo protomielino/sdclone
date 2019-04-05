@@ -613,11 +613,21 @@ typedef struct TrackLocalInfo
 
     int clouds;	/**< Clouds coverage in the sky  (warning : consistency with RM_VAL_CLOUDS_*) */
 #define TR_CLOUDS_NONE   0
-#define TR_CLOUDS_FEW    1
-#define TR_CLOUDS_SCARCE 2
+#define TR_CLOUDS_CIRRUS 1
+#define TR_CLOUDS_FEW    2
 #define TR_CLOUDS_MANY   3
-#define TR_CLOUDS_FULL   4
-#define TR_CLOUDS_RANDOM 5 // Must not be used in the clouds field. Race engine only.
+#define TR_CLOUDS_CUMULUS 4
+#define TR_CLOUDS_SCARCE 5
+#define TR_CLOUDS_BROKEN 6
+#define TR_CLOUDS_FULL   7
+#define TR_CLOUDS_RANDOM 8 // Must not be used in the clouds field. Race engine only.
+    double cloud_altitude;
+
+    int clouds2;
+    double cloud_altitude2;
+
+    int clouds3;
+    double cloud_altitude3;
 
     int rain;                       /**< Rain strength / strength spec (warning : consistency with RM_VAL_RAIN_*) */
 #define TR_RAIN_NONE 0
@@ -631,7 +641,15 @@ typedef struct TrackLocalInfo
 #define TR_WATER_LITTLE	1
 #define TR_WATER_SOME	2
 #define TR_WATER_MUCH	3
-
+    int snow;
+    int hail;
+    tdble relativehumidity;
+    tdble visibility;
+    tdble airtemperature;
+    tdble airpressure;
+    tdble windspeed;
+    tdble dewp;
+    tdble winddir;
 } tTrackLocalInfo;
 
 /** Track structure

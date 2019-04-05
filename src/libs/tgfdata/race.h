@@ -68,11 +68,11 @@ public:
                           eTimeDusk, eTimeNight, eTimeNow, eTimeReal, eTimeFromTrack, eTimeRandom,
                           eTime24hr,
                           nTimeSpecNumber }; // Last = invalid value = nb of valid ones.
-    enum ECloudsSpec { eCloudsNone, eCloudsFew, eCloudsScarce, eCloudsMany, eCloudsFull,
+    enum ECloudsSpec { eCloudsNone, eCloudsCirrus, eCloudsFew, eCloudsMany, eCloudsCumulus, eCloudsScarce, eCloudsBroken, eCloudsFull,
                        eCloudsRandom, nCloudsSpecNumber}; // Last = invalid value = nb of valid ones.
     enum ERainSpec { eRainNone, eRainLittle, eRainMedium, eRainHeavy, eRainRandom,
                      nRainSpecNumber }; // Last = invalid value = nb of valid ones.
-    enum EMonthSpec { eMonthJanuary, eMonthFebruary, eMonthMarch, eMonthApril, eMonthMay, eMonthJune, eMonthJuly, eMonthAugust, eMonthSeptember, eMonthOctober, eMonthNovember, eMonthDecember, eMonthReal, nMonthSpecNumber };
+    enum EWeatherSpec { eWeatherConfig, eWeatherRecorded, eWeatherReal, nWeatherSpecNumber };
     class Parameters
     {
       public:
@@ -82,9 +82,9 @@ public:
         int nDuration; // s
         unsigned bfDisplayMode;
         ETimeOfDaySpec eTimeOfDaySpec;
-        ECloudsSpec eCloudsSpec;
-        ERainSpec eRainSpec;
-        EMonthSpec  eMonthSpec;
+        ECloudsSpec    eCloudsSpec;
+        ERainSpec      eRainSpec;
+        EWeatherSpec   eWeatherSpec;
     };
 
     Parameters* getParameters(const std::string& strSessionName) const;

@@ -199,7 +199,7 @@ typedef struct RmRaceRules
         CORNER_CUTTING_TIME_PENALTY = 4
     };
 
-    int enabled;
+    int   enabled;
     tdble fuelFactor;
     tdble damageFactor;
     tdble refuelFuelFlow;
@@ -221,17 +221,17 @@ typedef struct RmCarRules
  */
 typedef struct RmInfo
 {
-    tCarElt		*carList;	/**< List of all the cars racing */
+    tCarElt		    *carList;	/**< List of all the cars racing */
     tSituation		*s;		/**< Situation during race */
-    tTrack		*track;		/**< Current track */
-    void		*params;	/**< Raceman parameters */
-    void		*mainParams;    /**< Stays the same even if params change because of more xml-files per raceman */
-    void		*results;	/**< Race results */
-    void		*mainResults;   /**< Stays the same even if params change because of more xml-files per raceman */
+    tTrack		    *track;		/**< Current track */
+    void		    *params;	/**< Raceman parameters */
+    void		    *mainParams;    /**< Stays the same even if params change because of more xml-files per raceman */
+    void		    *results;	/**< Race results */
+    void		    *mainResults;   /**< Stays the same even if params change because of more xml-files per raceman */
     tModList		**robModList;	/**< robot modules loaded */
     tRmCarRules		*rules;		/**< by car rules */
     tRaceEngineInfo	raceEngineInfo;
-    tRmRaceRules        raceRules;
+    tRmRaceRules    raceRules;
 } tRmInfo;
 
 /*
@@ -320,7 +320,7 @@ typedef struct RmInfo
 #define RM_ATTR_CLOUDS	    "clouds"
 #define RM_ATTR_RAIN        "rain"
 #define RM_ATTR_TIME_OF_DAY	"time of day"
-#define RM_ATTR_MONTH       "month"
+#define RM_ATTR_WEATHER     "weather"
 #define RM_ATTR_QUAL_LAPS	"Qualification laps"
 #define RM_ATTR_POLE		"pole position side"
 #define RM_ATTR_CARSPERPIT	"cars per pit"
@@ -349,19 +349,19 @@ typedef struct RmInfo
 #define RM_VAL_SERVERCONF	"server config"
 #endif
 
-#define RM_VAL_CONFRACELEN	"race length"
-#define RM_VAL_CONFDISPMODE	"display mode"
-#define RM_VAL_CONFTIMEOFDAY	"time of day"
-#define RM_VAL_CONFCLOUDCOVER	"cloud cover"
-#define RM_VAL_CONFRAINFALL	"rain fall"
-#define RM_VAL_CONFMONTH        "month"
+#define RM_VAL_CONFRACELEN	   "race length"
+#define RM_VAL_CONFDISPMODE	   "display mode"
+#define RM_VAL_CONFTIMEOFDAY   "time of day"
+#define RM_VAL_CONFCLOUDCOVER  "cloud cover"
+#define RM_VAL_CONFRAINFALL	   "rain fall"
+#define RM_VAL_CONFWEATHER     "weather"
 
 #define RM_CONF_RACE_LEN	0x0001
 #define RM_CONF_DISP_MODE	0x0002
 #define RM_CONF_TIME_OF_DAY	0x0004
 #define RM_CONF_CLOUD_COVER	0x0008
 #define RM_CONF_RAIN_FALL	0x0010
-#define RM_CONF_MONTH       0x0016
+#define RM_CONF_WEATHER     0x0016
 
 #define RM_VAL_DRV_LIST_ORDER	"drivers list"
 #define RM_VAL_LAST_RACE_ORDER	"last race"
@@ -407,15 +407,17 @@ typedef struct RmInfo
 #define RM_IND_TIME_24HR	9
 #define RM_IND_TIME_REAL	10
 
-#define RM_VAL_CLOUDS_NONE	"no cloud"
-#define RM_VAL_CLOUDS_FEW	"few clouds"
+#define RM_VAL_CLOUDS_NONE	    "no cloud"
+#define RM_VAL_CLOUDS_CIRRUS    "cirrus"
+#define RM_VAL_CLOUDS_FEW	    "few clouds"
+#define RM_VAL_CLOUDS_MANY	    "many clouds"
+#define RM_VAL_CLOUDS_CUMULUS   "cumulus"
 #define RM_VAL_CLOUDS_SCARCE	"scarce clouds"
-#define RM_VAL_CLOUDS_MANY	"many clouds"
-#define RM_VAL_CLOUDS_FULL	"full cover"
+#define RM_VAL_CLOUDS_BROKEN    "broken"
+#define RM_VAL_CLOUDS_FULL	    "full cover"
 #define RM_VAL_CLOUDS_RANDOM	"random"
-#define RM_VAL_CLOUDS_REAL	"real"
-#define RM_VALS_CLOUDS { RM_VAL_CLOUDS_NONE, RM_VAL_CLOUDS_FEW, RM_VAL_CLOUDS_SCARCE, \
-    RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_FULL, RM_VAL_CLOUDS_RANDOM }
+#define RM_VAL_CLOUDS_REAL	    "real"
+#define RM_VALS_CLOUDS { RM_VAL_CLOUDS_NONE, RM_VAL_CLOUDS_CIRRUS, RM_VAL_CLOUDS_FEW, RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_CUMULUS, RM_VAL_CLOUDS_SCARCE, RM_VAL_CLOUDS_BROKEN, RM_VAL_CLOUDS_FULL, RM_VAL_CLOUDS_RANDOM }
 
 #define RM_VAL_RAIN_NONE	"none"
 #define RM_VAL_RAIN_LITTLE	"little"
@@ -425,20 +427,10 @@ typedef struct RmInfo
 #define RM_VAL_RAIN_REAL	"real"
 #define RM_VALS_RAIN { RM_VAL_RAIN_NONE, RM_VAL_RAIN_LITTLE, RM_VAL_RAIN_MEDIUM, RM_VAL_RAIN_HEAVY, RM_VAL_RAIN_RANDOM }
 
-#define RM_VAL_MONTH_JANUARY  "january"
-#define RM_VAL_MONTH_FEBRUARY "february"
-#define RM_VAL_MONTH_MARCH    "march"
-#define RM_VAL_MONTH_APRIL    "april"
-#define RM_VAL_MONTH_MAY      "may"
-#define RM_VAL_MONTH_JUNE     "june"
-#define RM_VAL_MONTH_JULY     "july"
-#define RM_VAL_MONTH_AUGUST   "august"
-#define RM_VAL_MONTH_SEPTEMBER "spetember"
-#define RM_VAL_MONTH_OCTOBER  "october"
-#define RM_VAL_MONTH_NOVEMBER "november"
-#define RM_VAL_MONTH_DECEMBER "december"
-#define RM_VAL_MONTH_REAL     "real"
-#define RM_VALS_MONTH { RM_VAL_MONTH_JANUARY, RM_VAL_MONTH_FEBRUARY, RM_VAL_MONTH_MARCH, RM_VAL_MONTH_APRIL, RM_VAL_MONTH_MAY, RM_VAL_MONTH_JUNE, RM_VAL_MONTH_JULY, RM_VAL_MONTH_AUGUST, RM_VAL_MONTH_SEPTEMBER, RM_VAL_MONTH_OCTOBER, RM_VAL_MONTH_NOVEMBER, RM_VAL_MONTH_DECEMBER, RM_VAL_MONTH_REAL }
+#define RM_VAL_WEATHER_CONFIG   "config"
+#define RM_VAL_WEATHER_RECORDED "recorded"
+#define RM_VAL_WEATHER_REAL     "real"
+#define RM_VALS_WEATHER { RM_VAL_WEATHER_CONFIG, RM_VAL_WEATHER_RECORDED, RM_VAL_WEATHER_REAL }
 
 /* Movie capture */
 

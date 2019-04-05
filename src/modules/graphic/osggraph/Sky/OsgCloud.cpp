@@ -309,6 +309,10 @@ void SDCloudLayer::rebuild()
         layer_states[SD_CLOUD_SCATTERED] = state;
         layer_states2[SD_CLOUD_SCATTERED] = state;
 
+        state = SDMakeState(texture_path, "cumulus.png", "cumulus_n.png");
+        layer_states[SD_CLOUD_CUMULUS] = state;
+        layer_states2[SD_CLOUD_CUMULUS] = state;
+
         state = SDMakeState(texture_path, "many.png", "many_n.png");
         layer_states[SD_CLOUD_MANY] = state;
         layer_states2[SD_CLOUD_MANY] = state;

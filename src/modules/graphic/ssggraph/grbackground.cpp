@@ -59,8 +59,11 @@ static const sgVec4 BaseSkyColor    = { 0.31f, 0.43f, 0.69f, 1.0f };
 static int NStars = 0;
 static int NPlanets = 0;
 static int cloudsTextureIndex = 0;
+static int cloudsTextureIndex2 = 0;
+static int cloudsTextureIndex3 = 0;
 
-static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = { 1, 3, 5, 7, 8 };
+
+static const int CloudsTextureIndices[TR_CLOUDS_FULL+2] = { 0, 1, 3, 5, 7, 8 };
 static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
 
 static const char* AEnvShadowKeys[] =
@@ -113,6 +116,7 @@ static sgVec4 SceneSpecular;
 void
 grInitBackground()
 {
+    GfLogDebug("Start Init Background ...\n");
     char buf[256];
     void *hndl = grTrackHandle;
     ssgLight *light = ssgGetLight(0);
@@ -216,26 +220,22 @@ grInitBackground()
         //Build the sky
         TheSky	= new cGrSky;
         TheSky->build(grSkyDomeDistance, grSkyDomeDistance, 2000 * domeSizeRatio, grSkyDomeDistance, 2000 * domeSizeRatio, grSkyDomeDistance,
-            NPlanets, APlanetsData, NStars, AStarsData );
+                      NPlanets, APlanetsData, NStars, AStarsData );
 
         //Add the Sun itself
         GLfloat sunAscension = grTrack->local.sunascension;
         grSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
         TheSky->setSD( DEG2RAD(grSunDeclination));
-        TheSky->setSRA( sunAscension );
+        TheSky->setSRA(DEG2RAD(sunAscension ));
 
         GfLogInfo("  Sun : time of day = %02d:%02d:%02d (declination = %.1f deg), "
-              "ascension = %.1f deg\n",
+                  "ascension = %.1f deg\n",
                   timeOfDay / 3600, (timeOfDay % 3600) / 60, timeOfDay % 60,
                   grSunDeclination, RAD2DEG(sunAscension));
 
-        /*if ( grSunDeclination > 180 )
-            grMoonDeclination = 3.0 + (rand() % 40);
-        else
-            grMoonDeclination = (rand() % 270);*/
-
-        grMoonDeclination = grUpdateMoonPos(timeOfDay);
+        grMoonDeclination = (float)grUpdateMoonPos(timeOfDay);
+        GfLogDebug("Moon déclination = %.1f\n", grMoonDeclination);
 
         const float moonAscension = grTrack->local.sunascension;
 
@@ -249,82 +249,128 @@ grInitBackground()
         // TODO :
         //  * Why does thickness and transition get greater as the sky dome distance decreases ?
         //  * More/different cloud layers for each rain strength value (only 2 as for now) ?
-        cloudsTextureIndex = CloudsTextureIndices[grTrack->local.clouds];
+        cloudsTextureIndex = grTrack->local.clouds;
+        cloudsTextureIndex2 = grTrack->local.clouds2;
+        cloudsTextureIndex3 =grTrack->local.clouds3;
+
+        GfLogDebug("CTI = %i - CTI2 = %i - CTI3 = %i - cloud1 = %i - cloud2 = %i - cloud3 = %i\n", cloudsTextureIndex, cloudsTextureIndex2, cloudsTextureIndex3, grTrack->local.clouds,
+                   grTrack->local.clouds2, grTrack->local.clouds3 );
 
         cGrCloudLayer *cloudLayers[NMaxCloudLayers];
-        snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-        if (grTrack->local.rain > 0)
+        if (grTrack->local.rain > 1)
         {
             GfLogInfo("  Cloud cover : Rainy, 1 layer\n");
+            snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", 8);
 
-            cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 650,
-                                              400 / domeSizeRatio, 400 / domeSizeRatio);
-            cloudLayers[0]->setSpeed(300);
-            cloudLayers[0]->setDirection(60);
-        }
-        else if (grNbCloudLayers == 1)
-        {
-            GfLogInfo("  Cloud cover : 3 layers\n");
-
-            int wind = (rand() % 200) + 100;
-
-            cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 2550,
+            cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude,
                                               100 / domeSizeRatio, 100 / domeSizeRatio);
-            cloudLayers[0]->setSpeed(wind);
-            cloudLayers[0]->setDirection(45);
+            cloudLayers[0]->setSpeed(grTrack->local.windspeed);
+            cloudLayers[0]->setDirection(grTrack->local.winddir);
+        }
+        else if (grNbCloudLayers == 1 && cloudsTextureIndex > 0)
+        {
+            GfLogInfo("  Cloud cover : 1 layers\n");
+            snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+            cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude,
+                                              100 / domeSizeRatio, 100 / domeSizeRatio);
+            cloudLayers[0]->setSpeed(grTrack->local.windspeed);
+            cloudLayers[0]->setDirection(grTrack->local.winddir);
 
-            GfLogInfo("   * layer 1 : speed=60, direction=45, texture=%s\n", buf);
+            GfLogInfo("   * layer 1 : speed = %.3f, direction = .3f, texture= %s\n", grTrack->local.windspeed, grTrack->local.winddir, buf);
 
         }
-        else if (grNbCloudLayers == 2)
+        else if (grNbCloudLayers == 2 && cloudsTextureIndex > 0)
         {
             GfLogInfo("  Cloud cover : 2 layers\n");
 
-            snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", 1);
-            cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 3000,
-                                              100 / domeSizeRatio, 100 / domeSizeRatio);
-            cloudLayers[0]->setSpeed(30);
-            cloudLayers[0]->setDirection(40);
+            if (cloudsTextureIndex2 > 0)
+            {
+                snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex2);
+                cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude2,
+                                                  100 / domeSizeRatio, 100 / domeSizeRatio);
+                cloudLayers[0]->setSpeed(0);
+                cloudLayers[0]->setDirection(0);
 
-            GfLogInfo("   * layer 1 : speed=30, direction=40, texture=%s\n", buf);
+                GfLogInfo("   * layer 1 : speed= 0, direction = 0, texture = %s\n", buf);
 
-            snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-            cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, 2000,
-                                              100 / domeSizeRatio, 100 / domeSizeRatio);
-            cloudLayers[1]->setSpeed(60);
-            cloudLayers[1]->setDirection(45);
+                snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+                cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude,
+                                                  100 / domeSizeRatio, 100 / domeSizeRatio);
+                cloudLayers[1]->setSpeed(grTrack->local.windspeed);
+                cloudLayers[1]->setDirection(grTrack->local.winddir);
 
-            GfLogInfo("   * layer 2 : speed=60, direction=45, texture=%s\n", buf);
+                GfLogInfo("   * layer 2 : speed = %.3f, direction = %.3f, texture=%s\n", grTrack->local.windspeed, grTrack->local.winddir, buf);
+            }
+            else
+            {
+                snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+                cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude,
+                                                  100 / domeSizeRatio, 100 / domeSizeRatio);
+                cloudLayers[0]->setSpeed(0);
+                cloudLayers[0]->setDirection(0);
+
+                GfLogInfo("   * layer 1 : speed=30, direction=40, texture=%s\n", buf);
+            }
 
         }
-        else if (grNbCloudLayers == 3)
+        else if (grNbCloudLayers == 3 && cloudsTextureIndex > 0)
         {
             GfLogInfo("  Cloud cover : 3 layers\n");
 
-            snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", 1);
-            cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 3000,
-                                              100 / domeSizeRatio, 100 / domeSizeRatio);
-            int wind = (rand() % 40) + 60;
-            cloudLayers[0]->setSpeed(wind);
-            cloudLayers[0]->setDirection(40);
+            if (cloudsTextureIndex3 > 0)
+            {
+                snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex3);
+                cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude3,
+                                                  100 / domeSizeRatio, 100 / domeSizeRatio);
+                cloudLayers[0]->setSpeed(0);
+                cloudLayers[0]->setDirection(grTrack->local.winddir);
 
-            GfLogInfo("   * layer 1 : speed=30, direction=40, texture=%s\n", buf);
+                GfLogInfo("   * layer 1 : speed=30, direction=40, texture=%s\n", buf);
 
-            snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-            cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, 2000,
-                                              100 / domeSizeRatio, 100 / domeSizeRatio);
-            cloudLayers[1]->setSpeed(60);
-            cloudLayers[1]->setDirection(45);
+                snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex2);
+                cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude2,
+                                                  100 / domeSizeRatio, 100 / domeSizeRatio);
+                cloudLayers[1]->setSpeed(grTrack->local.windspeed);
+                cloudLayers[1]->setDirection(grTrack->local.winddir);
 
-            GfLogInfo("   * layer 2 : speed=60, direction=45, texture=%s\n", buf);
+                GfLogInfo("   * layer 2 : speed=60, direction=45, texture=%s\n", buf);
 
-            snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-            cloudLayers[2] = TheSky->addCloud(buf, grSkyDomeDistance, 1000,
-                                              100 / domeSizeRatio, 100 / domeSizeRatio);
-            cloudLayers[2]->setSpeed(80);
-            cloudLayers[2]->setDirection(45);
+                snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+                cloudLayers[2] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude,
+                                                  100 / domeSizeRatio, 100 / domeSizeRatio);
+                cloudLayers[2]->setSpeed(grTrack->local.winddir);
+                cloudLayers[2]->setDirection(grTrack->local.winddir);
 
-            GfLogInfo("   * layer 3 : speed=80, direction=45, texture=%s\n", buf);
+                GfLogInfo("   * layer 3 : speed=80, direction=45, texture=%s\n", buf);
+            }
+            else if (cloudsTextureIndex2 > 0)
+            {
+                snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex2);
+                cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude2,
+                                                  100 / domeSizeRatio, 100 / domeSizeRatio);
+                cloudLayers[0]->setSpeed(0);
+                cloudLayers[0]->setDirection(0);
+
+                GfLogInfo("   * layer 1 : speed= 0, direction = 0, texture = %s\n", buf);
+
+                snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+                cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude,
+                                                  100 / domeSizeRatio, 100 / domeSizeRatio);
+                cloudLayers[1]->setSpeed(grTrack->local.windspeed);
+                cloudLayers[1]->setDirection(grTrack->local.winddir);
+
+                GfLogInfo("   * layer 2 : speed = %.3f, direction = %.3f, texture=%s\n", grTrack->local.windspeed, grTrack->local.winddir, buf);
+            }
+            else
+            {
+                snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+                cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude,
+                                                  100 / domeSizeRatio, 100 / domeSizeRatio);
+                cloudLayers[0]->setSpeed(0);
+                cloudLayers[0]->setDirection(0);
+
+                GfLogInfo("   * layer 1 : speed=30, direction=40, texture=%s\n", buf);
+            }
         }
 
         // Set up the light source to the Sun position.
@@ -342,27 +388,24 @@ grInitBackground()
         //float visibility = 0.0f;
         switch (grTrack->local.rain)
         {
-            case TR_RAIN_NONE:
-                //visibility = 0.0f;
-                grVisibility = grMax_Visibility;
-                break;
-            case TR_RAIN_LITTLE:
-                //visibility = 400.0f;
-                grVisibility = 800.0;
-                break;
-            case TR_RAIN_MEDIUM:
-                //visibility = 500.0f;
-                grVisibility = 600.0;
-                break;
-            case TR_RAIN_HEAVY:
-                //visibility = 550.0f;
-                grVisibility = 400.0;
-                break;
-            default:
-                GfLogWarning("Unsupported rain strength value %d (assuming none)",
-                             grTrack->local.rain);
-                grVisibility = 12000.0;
-                break;
+        case TR_RAIN_NONE:
+            //visibility = 0.0f;
+            grVisibility = grTrack->local.visibility;
+            break;
+        case TR_RAIN_LITTLE:
+            grVisibility = 800.0;
+            break;
+        case TR_RAIN_MEDIUM:
+            grVisibility = 600.0;
+            break;
+        case TR_RAIN_HEAVY:
+            grVisibility = 400.0;
+            break;
+        default:
+            GfLogWarning("Unsupported rain strength value %d (assuming none)",
+                         grTrack->local.rain);
+            grVisibility = grTrack->local.visibility;
+            break;
         }//switch Rain
 
         //TheSky->modifyVisibility( visibility, 0);
@@ -383,9 +426,9 @@ grInitBackground()
 #ifdef GL_SEPARATE_SPECULAR_COLOR
     glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,GL_SEPARATE_SPECULAR_COLOR);
 #else
-    #ifdef GL_SEPARATE_SPECULAR_COLOR_EXT
+#ifdef GL_SEPARATE_SPECULAR_COLOR_EXT
     glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL_EXT,GL_SEPARATE_SPECULAR_COLOR_EXT);
-    #	endif
+#	endif
 #endif
 }//grInitBackground
 
@@ -393,9 +436,10 @@ grInitBackground()
 void
 grLoadBackgroundGraphicsOptions()
 {
+    GfLogDebug("Start loading background ...\n");
     // Sky dome / background.
     grSkyDomeDistance =
-        (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, 0, 0) + 0.5);
+            (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, 0, 0) + 0.5);
     if (grSkyDomeDistance > 0 && grSkyDomeDistance < SkyDomeDistThresh)
         grSkyDomeDistance = SkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
 
@@ -409,12 +453,12 @@ grLoadBackgroundGraphicsOptions()
 
     // Cloud layers.
     grNbCloudLayers =
-        (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
+            (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
 
     GfLogInfo("Graphic options : Number of cloud layers : %u\n", grNbCloudLayers);
 
     grMax_Visibility =
-        (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, 0, 0));
+            (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, 0, 0));
 
 
 }
@@ -440,7 +484,7 @@ grLoadBackground()
     ssgSimpleState	*bg_st;
 
     snprintf(buf, sizeof(buf), "tracks/%s/%s;data/img;data/textures;.",
-            grTrack->category, grTrack->internalname);
+             grTrack->category, grTrack->internalname);
     grFilePath = buf;
     grGammaValue = 1.8;
     grMipMap = 0;
@@ -465,255 +509,256 @@ grLoadBackground()
 
         grBackgroundType = graphic->bgtype;
         switch (grBackgroundType) {
-            case TR_BACKGROUND_TYPE_0: //-----------------------------------------------------------
-                bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
-                bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
-                bg_clr = new ssgColourArray(1);
-                bg_nrm = new ssgNormalArray(1);
-                bg_clr->add(clr);
-                bg_nrm->add(nrm);
+        case TR_BACKGROUND_TYPE_0: //-----------------------------------------------------------
+            bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
+            bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
+            bg_clr = new ssgColourArray(1);
+            bg_nrm = new ssgNormalArray(1);
+            bg_clr->add(clr);
+            bg_nrm->add(nrm);
 
-                for (i = 0; i < NbBackgroundFaces + 1; i++) {
-                    alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
-                    texLen = (float)i / (float)NbBackgroundFaces;
+            for (i = 0; i < NbBackgroundFaces + 1; i++) {
+                alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
+                texLen = (float)i / (float)NbBackgroundFaces;
 
-                    x = BackgroundDistance * cos(alpha);
-                    y = BackgroundDistance * sin(alpha);
+                x = BackgroundDistance * cos(alpha);
+                y = BackgroundDistance * sin(alpha);
 
-                    vtx[0] = x;
-                    vtx[1] = y;
-                    vtx[2] = z1;
-                    bg_vtx->add(vtx);
-                    tex[0] = texLen*4.0;
-                    tex[1] = 0;
-                    bg_tex->add(tex);
+                vtx[0] = x;
+                vtx[1] = y;
+                vtx[2] = z1;
+                bg_vtx->add(vtx);
+                tex[0] = texLen*4.0;
+                tex[1] = 0;
+                bg_tex->add(tex);
 
-                    vtx[0] = x;
-                    vtx[1] = y;
-                    vtx[2] = z2;
-                    bg_vtx->add(vtx);
-                    tex[0] = texLen*4.0;
-                    tex[1] = 1.0;
-                    bg_tex->add(tex);
-                }//for i
+                vtx[0] = x;
+                vtx[1] = y;
+                vtx[2] = z2;
+                bg_vtx->add(vtx);
+                tex[0] = texLen*4.0;
+                tex[1] = 1.0;
+                bg_tex->add(tex);
+            }//for i
 
-                bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
-                bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
-                bg_st->disable(GL_LIGHTING);
-                bg->setState(bg_st);
-                bg->setCullFace(0);
-                TheBackground->addKid(bg);
-                break;	//case 1
+            bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
+            bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
+            bg_st->disable(GL_LIGHTING);
+            bg->setState(bg_st);
+            bg->setCullFace(0);
+            TheBackground->addKid(bg);
+            break;	//case 1
 
-            case TR_BACKGROUND_TYPE_2: //-----------------------------------------------------------
-                bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
-                bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
-                bg_clr = new ssgColourArray(1);
-                bg_nrm = new ssgNormalArray(1);
-                bg_clr->add(clr);
-                bg_nrm->add(nrm);
+        case TR_BACKGROUND_TYPE_2: //-----------------------------------------------------------
+            bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
+            bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
+            bg_clr = new ssgColourArray(1);
+            bg_nrm = new ssgNormalArray(1);
+            bg_clr->add(clr);
+            bg_nrm->add(nrm);
 
-                for (i = 0; i < NbBackgroundFaces / 4 + 1; i++) {
-                    alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
-                    texLen = (float)i / (float)NbBackgroundFaces;
+            for (i = 0; i < NbBackgroundFaces / 4 + 1; i++) {
+                alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
+                texLen = (float)i / (float)NbBackgroundFaces;
 
-                    x = BackgroundDistance * cos(alpha);
-                    y = BackgroundDistance * sin(alpha);
+                x = BackgroundDistance * cos(alpha);
+                y = BackgroundDistance * sin(alpha);
 
-                    vtx[0] = x;
-                    vtx[1] = y;
-                    vtx[2] = z1;
-                    bg_vtx->add(vtx);
-                    tex[0] = texLen*4.0;
-                    tex[1] = 0;
-                    bg_tex->add(tex);
+                vtx[0] = x;
+                vtx[1] = y;
+                vtx[2] = z1;
+                bg_vtx->add(vtx);
+                tex[0] = texLen*4.0;
+                tex[1] = 0;
+                bg_tex->add(tex);
 
-                    vtx[0] = x;
-                    vtx[1] = y;
-                    vtx[2] = z2;
-                    bg_vtx->add(vtx);
-                    tex[0] = texLen*4.0;
-                    tex[1] = 0.5;
-                    bg_tex->add(tex);
-                }//for i
+                vtx[0] = x;
+                vtx[1] = y;
+                vtx[2] = z2;
+                bg_vtx->add(vtx);
+                tex[0] = texLen*4.0;
+                tex[1] = 0.5;
+                bg_tex->add(tex);
+            }//for i
 
-                bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
-                bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
-                bg_st->disable(GL_LIGHTING);
-                bg->setState(bg_st);
-                bg->setCullFace(0);
-                TheBackground->addKid(bg);
-
-
-                bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
-                bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
-                bg_clr = new ssgColourArray(1);
-                bg_nrm = new ssgNormalArray(1);
-                bg_clr->add(clr);
-                bg_nrm->add(nrm);
-
-                for (i = NbBackgroundFaces/4; i < NbBackgroundFaces / 2 + 1; i++) {
-                    alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
-                    texLen = (float)i / (float)NbBackgroundFaces;
-
-                    x = BackgroundDistance * cos(alpha);
-                    y = BackgroundDistance * sin(alpha);
-
-                    vtx[0] = x;
-                    vtx[1] = y;
-                    vtx[2] = z1;
-                    bg_vtx->add(vtx);
-                    tex[0] = texLen*4.0;
-                    tex[1] = 0.5;
-                    bg_tex->add(tex);
-
-                    vtx[0] = x;
-                    vtx[1] = y;
-                    vtx[2] = z2;
-                    bg_vtx->add(vtx);
-                    tex[0] = texLen*4.0;
-                    tex[1] = 1.0;
-                    bg_tex->add(tex);
-                }//for i
-
-                bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
-                bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
-                bg_st->disable(GL_LIGHTING);
-                bg->setState(bg_st);
-                bg->setCullFace(0);
-                TheBackground->addKid(bg);
+            bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
+            bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
+            bg_st->disable(GL_LIGHTING);
+            bg->setState(bg_st);
+            bg->setCullFace(0);
+            TheBackground->addKid(bg);
 
 
-                bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
-                bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
-                bg_clr = new ssgColourArray(1);
-                bg_nrm = new ssgNormalArray(1);
+            bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
+            bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
+            bg_clr = new ssgColourArray(1);
+            bg_nrm = new ssgNormalArray(1);
+            bg_clr->add(clr);
+            bg_nrm->add(nrm);
 
-                bg_clr->add(clr);
-                bg_nrm->add(nrm);
+            for (i = NbBackgroundFaces/4; i < NbBackgroundFaces / 2 + 1; i++) {
+                alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
+                texLen = (float)i / (float)NbBackgroundFaces;
 
-                for (i = NbBackgroundFaces / 2; i < 3 * NbBackgroundFaces / 4 + 1; i++) {
-                    alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
-                    texLen = (float)i / (float)NbBackgroundFaces;
+                x = BackgroundDistance * cos(alpha);
+                y = BackgroundDistance * sin(alpha);
 
-                    x = BackgroundDistance * cos(alpha);
-                    y = BackgroundDistance * sin(alpha);
+                vtx[0] = x;
+                vtx[1] = y;
+                vtx[2] = z1;
+                bg_vtx->add(vtx);
+                tex[0] = texLen*4.0;
+                tex[1] = 0.5;
+                bg_tex->add(tex);
 
-                    vtx[0] = x;
-                    vtx[1] = y;
-                    vtx[2] = z1;
-                    bg_vtx->add(vtx);
-                    tex[0] = texLen*4.0;
-                    tex[1] = 0.0;
-                    bg_tex->add(tex);
+                vtx[0] = x;
+                vtx[1] = y;
+                vtx[2] = z2;
+                bg_vtx->add(vtx);
+                tex[0] = texLen*4.0;
+                tex[1] = 1.0;
+                bg_tex->add(tex);
+            }//for i
 
-                    vtx[0] = x;
-                    vtx[1] = y;
-                    vtx[2] = z2;
-                    bg_vtx->add(vtx);
-                    tex[0] = texLen*4.0;
-                    tex[1] = 0.5;
-                    bg_tex->add(tex);
-                }//for i
-
-                bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
-                bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
-                bg_st->disable(GL_LIGHTING);
-                bg->setState(bg_st);
-                bg->setCullFace(0);
-                TheBackground->addKid(bg);
+            bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
+            bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
+            bg_st->disable(GL_LIGHTING);
+            bg->setState(bg_st);
+            bg->setCullFace(0);
+            TheBackground->addKid(bg);
 
 
-                bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
-                bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
-                bg_clr = new ssgColourArray(1);
-                bg_nrm = new ssgNormalArray(1);
+            bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
+            bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
+            bg_clr = new ssgColourArray(1);
+            bg_nrm = new ssgNormalArray(1);
 
-                bg_clr->add(clr);
-                bg_nrm->add(nrm);
+            bg_clr->add(clr);
+            bg_nrm->add(nrm);
 
-                for(i = 3 * NbBackgroundFaces / 4; i < NbBackgroundFaces + 1; i++) {
-                    alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
-                    texLen = (float)i / (float)NbBackgroundFaces;
+            for (i = NbBackgroundFaces / 2; i < 3 * NbBackgroundFaces / 4 + 1; i++) {
+                alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
+                texLen = (float)i / (float)NbBackgroundFaces;
 
-                    x = BackgroundDistance * cos(alpha);
-                    y = BackgroundDistance * sin(alpha);
+                x = BackgroundDistance * cos(alpha);
+                y = BackgroundDistance * sin(alpha);
 
-                    vtx[0] = x;
-                    vtx[1] = y;
-                    vtx[2] = z1;
-                    bg_vtx->add(vtx);
-                    tex[0] = texLen*4.0;
-                    tex[1] = 0.5;
-                    bg_tex->add(tex);
+                vtx[0] = x;
+                vtx[1] = y;
+                vtx[2] = z1;
+                bg_vtx->add(vtx);
+                tex[0] = texLen*4.0;
+                tex[1] = 0.0;
+                bg_tex->add(tex);
 
-                    vtx[0] = x;
-                    vtx[1] = y;
-                    vtx[2] = z2;
-                    bg_vtx->add(vtx);
-                    tex[0] = texLen*4.0;
-                    tex[1] = 1.0;
-                    bg_tex->add(tex);
-                }//for i
+                vtx[0] = x;
+                vtx[1] = y;
+                vtx[2] = z2;
+                bg_vtx->add(vtx);
+                tex[0] = texLen*4.0;
+                tex[1] = 0.5;
+                bg_tex->add(tex);
+            }//for i
 
-                bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
-                bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
-                bg_st->disable(GL_LIGHTING);
-                bg->setState(bg_st);
-                bg->setCullFace(0);
-                TheBackground->addKid(bg);
+            bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
+            bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
+            bg_st->disable(GL_LIGHTING);
+            bg->setState(bg_st);
+            bg->setCullFace(0);
+            TheBackground->addKid(bg);
 
-                break;	//case 2
 
-            case TR_BACKGROUND_TYPE_4: //-----------------------------------------------------------
-                z1 = -1.0;
-                z2 = 1.0;
+            bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
+            bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
+            bg_clr = new ssgColourArray(1);
+            bg_nrm = new ssgNormalArray(1);
 
-                bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
-                bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
-                bg_clr = new ssgColourArray(1);
-                bg_nrm = new ssgNormalArray(1);
-                bg_clr->add(clr);
-                bg_nrm->add(nrm);
+            bg_clr->add(clr);
+            bg_nrm->add(nrm);
 
-                for (i = 0; i < NbBackgroundFaces + 1; i++) {
-                    alpha = (double)i * 2 * PI / (double)NbBackgroundFaces;
-                    texLen = 1.0 - (float)i / (float)NbBackgroundFaces;
+            for(i = 3 * NbBackgroundFaces / 4; i < NbBackgroundFaces + 1; i++) {
+                alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
+                texLen = (float)i / (float)NbBackgroundFaces;
 
-                    x = BackgroundDistance * cos(alpha);
-                    y = BackgroundDistance * sin(alpha);
+                x = BackgroundDistance * cos(alpha);
+                y = BackgroundDistance * sin(alpha);
 
-                    vtx[0] = x;
-                    vtx[1] = y;
-                    vtx[2] = z1;
-                    bg_vtx->add(vtx);
-                    tex[0] = texLen;
-                    tex[1] = 0;
-                    bg_tex->add(tex);
+                vtx[0] = x;
+                vtx[1] = y;
+                vtx[2] = z1;
+                bg_vtx->add(vtx);
+                tex[0] = texLen*4.0;
+                tex[1] = 0.5;
+                bg_tex->add(tex);
 
-                    vtx[0] = x;
-                    vtx[1] = y;
-                    vtx[2] = z2;
-                    bg_vtx->add(vtx);
-                    tex[0] = texLen;
-                    tex[1] = 1.0;
-                    bg_tex->add(tex);
-                }//for i
+                vtx[0] = x;
+                vtx[1] = y;
+                vtx[2] = z2;
+                bg_vtx->add(vtx);
+                tex[0] = texLen*4.0;
+                tex[1] = 1.0;
+                bg_tex->add(tex);
+            }//for i
 
-                bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
-                bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
-                bg_st->disable(GL_LIGHTING);
-                bg->setState(bg_st);
-                bg->setCullFace(0);
-                TheBackground->addKid(bg);
-                break;//case 4
+            bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
+            bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
+            bg_st->disable(GL_LIGHTING);
+            bg->setState(bg_st);
+            bg->setCullFace(0);
+            TheBackground->addKid(bg);
 
-            default:
-                GfLogError("Unsupported background type %d\n", graphic->bgtype);
-                break;
+            break;	//case 2
+
+        case TR_BACKGROUND_TYPE_4: //-----------------------------------------------------------
+            z1 = -1.0;
+            z2 = 1.0;
+
+            bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
+            bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
+            bg_clr = new ssgColourArray(1);
+            bg_nrm = new ssgNormalArray(1);
+            bg_clr->add(clr);
+            bg_nrm->add(nrm);
+
+            for (i = 0; i < NbBackgroundFaces + 1; i++) {
+                alpha = (double)i * 2 * PI / (double)NbBackgroundFaces;
+                texLen = 1.0 - (float)i / (float)NbBackgroundFaces;
+
+                x = BackgroundDistance * cos(alpha);
+                y = BackgroundDistance * sin(alpha);
+
+                vtx[0] = x;
+                vtx[1] = y;
+                vtx[2] = z1;
+                bg_vtx->add(vtx);
+                tex[0] = texLen;
+                tex[1] = 0;
+                bg_tex->add(tex);
+
+                vtx[0] = x;
+                vtx[1] = y;
+                vtx[2] = z2;
+                bg_vtx->add(vtx);
+                tex[0] = texLen;
+                tex[1] = 1.0;
+                bg_tex->add(tex);
+            }//for i
+
+            bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
+            bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
+            bg_st->disable(GL_LIGHTING);
+            bg->setState(bg_st);
+            bg->setCullFace(0);
+            TheBackground->addKid(bg);
+            break;//case 4
+
+        default:
+            GfLogError("Unsupported background type %d\n", graphic->bgtype);
+            break;
         }//switch grBackgroundType
 
-        if (!SunAnchor && grTrack->local.rain == 0) {
+        if (!SunAnchor && grTrack->local.rain == 0)
+        {
             // Lens Flares when no sky dome (realistic sky dome will use another system when ready).
             SunAnchor = new ssgBranch;
             TheScene->addKid(SunAnchor);
@@ -725,8 +770,8 @@ grLoadBackground()
         // Check / fix the cloud cover index, in any case.
         if (grTrack->local.clouds < 0)
             grTrack->local.clouds = 0;
-        else if(grTrack->local.clouds >= NCloudsTextureIndices)
-            grTrack->local.clouds = NCloudsTextureIndices - 1;
+        /*else if(grTrack->local.clouds >= NCloudsTextureIndices)
+            grTrack->local.clouds = NCloudsTextureIndices - 1;*/
     }
 
     // Environment Mapping Settings
@@ -737,7 +782,7 @@ grLoadBackground()
     for (i = 0; i < graphic->envnb; i++) {
         GfLogTrace("Loading #%d track-specific env. mapping image :\n", i+1);
         envst = (ssgSimpleState*)grSsgLoadTexState(graphic->env[i]);
-    // Avoid crash with missing env.rgb files (i.e. Wheel-1)
+        // Avoid crash with missing env.rgb files (i.e. Wheel-1)
         if (!envst) {
             GfLogWarning("Failed : trying fallback env.png\n");
             envst = (ssgSimpleState*)grSsgLoadTexState("env.png");
@@ -754,7 +799,7 @@ grLoadBackground()
         envst->deRef();
     }//for i
 
-        grEnvSelector->selectStep(0); //mandatory !!!
+    grEnvSelector->selectStep(0); //mandatory !!!
 
     // Avoid crash with missing env.rgb files (i.e. Wheel-1)
     GfLogTrace("Loading global env. mapping image :\n");
@@ -887,7 +932,7 @@ grPreDrawSky(tSituation* s, float fogStart, float fogEnd, class cGrCamera *cam)
 
     if (grSkyDomeDistance )
     {
-    const GLfloat fog_exp2_density = sqrt_m_log01 / TheSky->getVisibility();
+        const GLfloat fog_exp2_density = sqrt_m_log01 / TheSky->getVisibility();
         glEnable(GL_FOG);
         //glFogf(GL_FOG_START, fogStart);
         //glFogf(GL_FOG_END, fogEnd);
@@ -940,6 +985,7 @@ grPostDrawSky(void)
 void
 grUpdateSky(double currentTime, double accelTime)
 {
+    GfLogDebug("Start Update Sky ...\n");
     // Detect first call (in order to initialize "last times").
     static bool bInitialized = false;
     static double lastTimeHighSpeed = 0;
@@ -981,10 +1027,10 @@ grUpdateSky(double currentTime, double accelTime)
         return;
     }
 
-        // At each call, update possibly high speed objects of the sky dome : the clouds.
-        sgVec3 viewPos;
-        sgSetVec3(viewPos, grWrldX/2, grWrldY/2, 0);
-        TheSky->repositionFlat(viewPos, 0, currentTime - lastTimeHighSpeed);
+    // At each call, update possibly high speed objects of the sky dome : the clouds.
+    sgVec3 viewPos;
+    sgSetVec3(viewPos, grWrldX/2, grWrldY/2, 0);
+    TheSky->repositionFlat(viewPos, 0, currentTime - lastTimeHighSpeed);
 
     // Now, we are done for high speed objects.
     lastTimeHighSpeed = currentTime;
@@ -1032,7 +1078,7 @@ grShutdownBackground(void)
         TheSky = 0;
     }
 
-//TODO(kilo): why not delete?
+    //TODO(kilo): why not delete?
     if (TheSun)
         TheSun = 0;
 
@@ -1070,9 +1116,11 @@ grShutdownBackground(void)
 
 void grUpdateLight( void )
 {
+    GfLogDebug("Start Update light ...\n");
     const float sol_angle = (float)TheSky->getSA();
     const float moon_angle = (float)TheSky->getMA();
     float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
+    GfLogDebug("Sol Angle = %.3f - Moon angle = %.3f\n", sol_angle, moon_angle);
 
     if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
     {
@@ -1127,17 +1175,13 @@ void grUpdateLight( void )
 
     grGammaCorrectRGB( CloudsColor );
 
-    // 3b) repaint the sky (simply update geometrical, color, ... state, no actual redraw)
-    TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle, moon_angle,
-                    NPlanets, APlanetsData, NStars, AStarsData);
-
     // 3c) update the main light position (it's at the sun position !)
     sgCoord solpos;
     TheSky->getSunPos(&solpos);
     ssgGetLight(0)-> setPosition(solpos.xyz);
 
     // 3c) update scene colors.
-    if (grVisibility > 1000 && cloudsTextureIndex < 8)
+    if (grVisibility > 1000 && (cloudsTextureIndex < 8 && cloudsTextureIndex2 < 8 && cloudsTextureIndex3 < 8))
     {
         SceneAmbiant[0] = (sun_color[0]*0.25f + CloudsColor[0]*0.75f) * sky_brightness;
         SceneAmbiant[1] = (sun_color[1]*0.25f + CloudsColor[1]*0.75f) * sky_brightness;
@@ -1171,6 +1215,10 @@ void grUpdateLight( void )
         SceneSpecular[2] = sun_color[0] * sky_brightness;
         SceneSpecular[3] = 1.0;
     }
+
+    // 3b) repaint the sky (simply update geometrical, color, ... state, no actual redraw)
+     TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle, moon_angle,
+                     NPlanets, APlanetsData, NStars, AStarsData);
 }//grUpdateLight
 
 void grUpdateFogColor(double sol_angle)
@@ -1208,13 +1256,13 @@ void grUpdateFogColor(double sol_angle)
     //
     float av = TheSky->getVisibility();
     if (av > 45000)
-       av = 45000;
+        av = 45000;
 
     float avf = 0.87 - (45000 - av) / 83333.33;
     float sif = 0.5 - cos( sol_angle * 2)/2;
 
     if (sif < 1e-4)
-       sif = 1e-4;
+        sif = 1e-4;
 
     float rf1 = fabs((rotation - SGD_PI) / SGD_PI);             // 0.0 .. 1.0
     float rf2 = avf * pow(rf1 * rf1, 1 /sif);

@@ -39,7 +39,7 @@ static const char* DisplayModeNames[RM_DISP_MODE_NUMBER] =
 static const char* TimeOfDaySpecNames[GfRace::nTimeSpecNumber] = RM_VALS_TIME;
 static const char* CloudsSpecNames[GfRace::nCloudsSpecNumber] = RM_VALS_CLOUDS;
 static const char* RainSpecNames[GfRace::nRainSpecNumber] = RM_VALS_RAIN;
-static const char* MonthSpecNames[GfRace::nMonthSpecNumber] = RM_VALS_MONTH;
+static const char* WeatherSpecNames[GfRace::nWeatherSpecNumber] = RM_VALS_WEATHER;
 
 
 // Private data for GfRace
@@ -225,8 +225,8 @@ void GfRace::load(GfRaceManager* pRaceMan, bool bKeepHumans, void* hparmResults)
                 pSessionParams->bfOptions |= RM_CONF_CLOUD_COVER;
             else if (strOption == RM_VAL_CONFRAINFALL)
                 pSessionParams->bfOptions |= RM_CONF_RAIN_FALL;
-            else if (strOption == RM_VAL_CONFMONTH)
-                pSessionParams->bfOptions |= RM_CONF_MONTH;
+            else if (strOption == RM_VAL_CONFWEATHER)
+                pSessionParams->bfOptions |= RM_CONF_WEATHER;
         }
     }
 
@@ -309,13 +309,13 @@ void GfRace::load(GfRaceManager* pRaceMan, bool bKeepHumans, void* hparmResults)
                 break;
             }
 
-        const std::string strMonthSpec =
-            GfParmGetStr(hparmRaceMan, pszSessionName, RM_ATTR_MONTH, "");
-        pSessionParams->eMonthSpec = nMonthSpecNumber;
-        for (int i = 0; i < nMonthSpecNumber; i++)
-            if (strMonthSpec == MonthSpecNames[i])
+        const std::string strWeatherSpec =
+            GfParmGetStr(hparmRaceMan, pszSessionName, RM_ATTR_WEATHER, "");
+        pSessionParams->eWeatherSpec = nWeatherSpecNumber;
+        for (int i = 0; i < nWeatherSpecNumber; i++)
+            if (strWeatherSpec == WeatherSpecNames[i])
             {
-                pSessionParams->eMonthSpec = (EMonthSpec)i;
+                pSessionParams->eWeatherSpec = (EWeatherSpec)i;
                 break;
             }
         // GfLogDebug("GfRace::load(...) : %s : opts=%02x, "
@@ -602,11 +602,11 @@ void GfRace::store()
         else
             GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_RAIN);
 
-        if (pSessionParams->eMonthSpec != nMonthSpecNumber)
-            GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_MONTH,
-                         MonthSpecNames[pSessionParams->eMonthSpec]);
+        if (pSessionParams->eWeatherSpec != nWeatherSpecNumber)
+            GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_WEATHER,
+                         WeatherSpecNames[pSessionParams->eWeatherSpec]);
         else
-            GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_MONTH);
+            GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_WEATHER);
 
         // GfLogDebug("GfRace::store(...) : %s params : "
         // 		   "laps=%d, dist=%d, dur=%d, disp=0x%x, tod=%d, clds=%d, rain=%d\n",

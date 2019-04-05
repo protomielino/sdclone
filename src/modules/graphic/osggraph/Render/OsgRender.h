@@ -73,6 +73,8 @@ private:
     bool SDDynamicSkyDome;
 
     int cloudsTextureIndex;
+    int cloudsTextureIndex2;
+    int cloudsTextureIndex3;
     float SDSunDeclination;
     float SDMoonDeclination;
     float SDMax_Visibility;
@@ -111,7 +113,7 @@ public:
 
     inline SDSky * getSky() { return thesky; }
     inline int getShader() { return carsShader; }
-	inline int getShaowIndex() { return ShadowIndex; }
+    inline int getShaowIndex() { return ShadowIndex; }
     osg::ref_ptr<osg::Group> getRoot() { return m_RealRoot.get(); }
     osg::ref_ptr<osg::Group> getSceneRoot() { return m_scene.get(); }
     osg::ref_ptr<osg::Group> getCarRoot() { return m_CarRoot.get(); }

@@ -850,17 +850,20 @@ void SDRender::weather(void)
 
     GfLogInfo("Graphic options : Number of cloud layers : %u\n", SDNbCloudLayers);
 
-    cloudsTextureIndex = CloudsTextureIndices[SDTrack->local.clouds];
+    cloudsTextureIndex = SDTrack->local.clouds;
+    cloudsTextureIndex2 = SDTrack->local.clouds2;
+    cloudsTextureIndex3 = SDTrack->local.clouds3;
+
     unsigned int SDRain = 0;
 
     switch (SDTrack->local.rain)
     {
     case TR_RAIN_NONE:
-        SDVisibility = SDMax_Visibility;
+        SDVisibility = SDTrack->local.visibility;
         SDRain = 0;
         break;
     case TR_RAIN_LITTLE:
-        SDVisibility = 800.0;
+        SDVisibility = SDTrack->local.visibility;
         SDRain = 1;
         break;
     case TR_RAIN_MEDIUM:
@@ -874,23 +877,23 @@ void SDRender::weather(void)
     default:
         GfLogWarning("Unsupported rain strength value %d (assuming none)",
                      SDTrack->local.rain);
-        SDVisibility = 12000.0;
+        SDVisibility = SDTrack->local.visibility;
         break;
     }//switch Rain
 
-    if (SDRain > 0)
+    if (SDRain > 1)
     {
         SDCloudLayer *layer = new SDCloudLayer(datapath);
         layer->setCoverage(layer->SD_CLOUD_OVERCAST);
-        layer->setSpeed(60);
-        layer->setDirection(20);
-        layer->setElevation_m(1000);
-        layer->setThickness_m(400  / domeSizeRatio);
-        layer->setTransition_m(400  / domeSizeRatio);
+        layer->setSpeed(SDTrack->local.windspeed);
+        layer->setDirection(SDTrack->local.winddir);
+        layer->setElevation_m(SDTrack->local.cloud_altitude);
+        layer->setThickness_m(100  / domeSizeRatio);
+        layer->setTransition_m(100 / domeSizeRatio);
         layer->setSpan_m(SDSkyDomeDistance);
         thesky->add_cloud_layer(layer);
     }
-    else if (SDNbCloudLayers == 1)
+    else if (SDNbCloudLayers == 1 && cloudsTextureIndex > 0)
     {
         SDCloudLayer *layer = new SDCloudLayer(datapath);
         switch (cloudsTextureIndex)
@@ -902,128 +905,418 @@ void SDRender::weather(void)
             layer->setCoverage(layer->SD_CLOUD_CIRRUS);
             break;
         case 2:
-        case 3:
             layer->setCoverage(layer->SD_CLOUD_FEW);
             break;
-        case 4:
-        case 5:
+        case 3:
             layer->setCoverage(layer->SD_CLOUD_MANY);
             break;
+        case 4:
+            layer->setCoverage(layer->SD_CLOUD_CUMULUS);
+            break;
+        case 5:
+            layer->setCoverage(layer->SD_CLOUD_SCATTERED);
+            break;
         case 6:
-        case 7:
             layer->setCoverage(layer->SD_CLOUD_BROKEN);
             break;
-        default:
+        case 7:
             layer->setCoverage(layer->SD_CLOUD_OVERCAST);
+            break;
+        default:
+            layer->setCoverage(layer->SD_CLOUD_CLEAR);
             break;
         }
 
-        layer->setSpeed(30);
-        layer->setDirection(20);
-        layer->setElevation_m(2550);
-        layer->setThickness_m(400  / domeSizeRatio);
-        layer->setTransition_m(400  / domeSizeRatio);
+        layer->setSpeed(SDTrack->local.windspeed);
+        layer->setDirection(SDTrack->local.winddir);
+        layer->setElevation_m(SDTrack->local.cloud_altitude);
+        layer->setThickness_m(100  / domeSizeRatio);
+        layer->setTransition_m(100  / domeSizeRatio);
         layer->setSpan_m(SDSkyDomeDistance);
         thesky->add_cloud_layer(layer);
     }
-    else if (SDNbCloudLayers == 2)
+    else if (SDNbCloudLayers == 2 && cloudsTextureIndex > 0)
     {
-        SDCloudLayer *layer = new SDCloudLayer(datapath);
-        layer->setCoverage(layer->SD_CLOUD_CIRRUS);
-        layer->setSpeed(30);
-        layer->setDirection(50);
-        layer->setElevation_m(6000);
-        layer->setThickness_m(400  / domeSizeRatio);
-        layer->setTransition_m(400  / domeSizeRatio);
-        layer->setSpan_m(SDSkyDomeDistance);
-        thesky->add_cloud_layer(layer);
-
-        SDCloudLayer *layer2 = new SDCloudLayer(datapath);
-        switch (cloudsTextureIndex)
+        if (cloudsTextureIndex2 > 0)
         {
-        case 0:
-        case 1:
-            layer->setCoverage(layer->SD_CLOUD_CIRRUS);
-            break;
-        case 2:
-        case 3:
-            layer->setCoverage(layer->SD_CLOUD_FEW);
-            break;
-        case 4:
-        case 5:
-            layer->setCoverage(layer->SD_CLOUD_MANY);
-            break;
-        case 6:
-        case 7:
-            layer->setCoverage(layer->SD_CLOUD_BROKEN);
-            break;
-        default:
-            layer->setCoverage(layer->SD_CLOUD_OVERCAST);
-            break;
-        }
+            SDCloudLayer *layer = new SDCloudLayer(datapath);
+            switch (cloudsTextureIndex2)
+            {
+            case 0:
+                layer->setCoverage(layer->SD_CLOUD_CLEAR);
+                break;
+            case 1:
+                layer->setCoverage(layer->SD_CLOUD_CIRRUS);
+                break;
+            case 2:
+                layer->setCoverage(layer->SD_CLOUD_FEW);
+                break;
+            case 3:
+                layer->setCoverage(layer->SD_CLOUD_MANY);
+                break;
+            case 4:
+                layer->setCoverage(layer->SD_CLOUD_CUMULUS);
+                break;
+            case 5:
+                layer->setCoverage(layer->SD_CLOUD_SCATTERED);
+                break;
+            case 6:
+                layer->setCoverage(layer->SD_CLOUD_BROKEN);
+                break;
+            case 7:
+                layer->setCoverage(layer->SD_CLOUD_OVERCAST);
+                break;
+            default:
+                layer->setCoverage(layer->SD_CLOUD_CLEAR);
+                break;
+            }
 
-        layer2->setSpeed(80);
-        layer2->setDirection(50);
-        layer2->setElevation_m(3500);
-        layer2->setThickness_m(400  / domeSizeRatio);
-        layer2->setTransition_m(400  / domeSizeRatio);
-        layer2->setSpan_m(SDSkyDomeDistance);
-        thesky->add_cloud_layer(layer2);
+            layer->setSpeed(SDTrack->local.windspeed);
+            layer->setDirection(SDTrack->local.winddir);
+            layer->setElevation_m(SDTrack->local.cloud_altitude2);
+            layer->setThickness_m(100  / domeSizeRatio);
+            layer->setTransition_m(100  / domeSizeRatio);
+            layer->setSpan_m(SDSkyDomeDistance);
+            thesky->add_cloud_layer(layer);
+
+            SDCloudLayer *layer2 = new SDCloudLayer(datapath);
+            switch (cloudsTextureIndex)
+            {
+            case 0:
+                layer2->setCoverage(layer2->SD_CLOUD_CLEAR);
+                break;
+            case 1:
+                layer2->setCoverage(layer2->SD_CLOUD_CIRRUS);
+                break;
+            case 2:
+                layer2->setCoverage(layer2->SD_CLOUD_FEW);
+                break;
+            case 3:
+                layer2->setCoverage(layer2->SD_CLOUD_MANY);
+                break;
+            case 4:
+                layer2->setCoverage(layer2->SD_CLOUD_CUMULUS);
+                break;
+            case 5:
+                layer2->setCoverage(layer2->SD_CLOUD_SCATTERED);
+                break;
+            case 6:
+                layer2->setCoverage(layer2->SD_CLOUD_BROKEN);
+                break;
+            case 7:
+                layer2->setCoverage(layer2->SD_CLOUD_OVERCAST);
+                break;
+            default:
+                layer2->setCoverage(layer2->SD_CLOUD_CLEAR);
+                break;
+            }
+
+            layer2->setSpeed(SDTrack->local.windspeed);
+            layer2->setDirection(SDTrack->local.winddir);
+            layer2->setElevation_m(SDTrack->local.cloud_altitude);
+            layer2->setThickness_m(100  / domeSizeRatio);
+            layer2->setTransition_m(100  / domeSizeRatio);
+            layer2->setSpan_m(SDSkyDomeDistance);
+            thesky->add_cloud_layer(layer2);
+        }
+        else
+        {
+            SDCloudLayer *layer = new SDCloudLayer(datapath);
+
+            switch (cloudsTextureIndex)
+            {
+            case 0:
+                layer->setCoverage(layer->SD_CLOUD_CLEAR);
+                break;
+            case 1:
+                layer->setCoverage(layer->SD_CLOUD_CIRRUS);
+                break;
+            case 2:
+                layer->setCoverage(layer->SD_CLOUD_FEW);
+                break;
+            case 3:
+                layer->setCoverage(layer->SD_CLOUD_MANY);
+                break;
+            case 4:
+                layer->setCoverage(layer->SD_CLOUD_CUMULUS);
+                break;
+            case 5:
+                layer->setCoverage(layer->SD_CLOUD_SCATTERED);
+                break;
+            case 6:
+                layer->setCoverage(layer->SD_CLOUD_BROKEN);
+                break;
+            case 7:
+                layer->setCoverage(layer->SD_CLOUD_OVERCAST);
+                break;
+            default:
+                layer->setCoverage(layer->SD_CLOUD_CLEAR);
+                break;
+            }
+
+            layer->setSpeed(SDTrack->local.windspeed);
+            layer->setDirection(SDTrack->local.winddir);
+            layer->setElevation_m(SDTrack->local.cloud_altitude);
+            layer->setThickness_m(100  / domeSizeRatio);
+            layer->setTransition_m(100  / domeSizeRatio);
+            layer->setSpan_m(SDSkyDomeDistance);
+            thesky->add_cloud_layer(layer);
+
+        }
     }
-    else if (SDNbCloudLayers == 3)
+    else if (SDNbCloudLayers == 3 && cloudsTextureIndex > 0)
     {
-        SDCloudLayer *layer = new SDCloudLayer(datapath);
-        layer->setCoverage(layer->SD_CLOUD_CIRRUS);
-        layer->setSpeed(30);
-        layer->setDirection(20);
-        layer->setElevation_m(6000);
-        layer->setThickness_m(400  / domeSizeRatio);
-        layer->setTransition_m(400  / domeSizeRatio);
-        layer->setSpan_m(SDSkyDomeDistance);
-        thesky->add_cloud_layer(layer);
-
-        SDCloudLayer *layer2 = new SDCloudLayer(datapath);
-        layer2->setCoverage(layer2->SD_CLOUD_FEW);
-        layer2->setSpeed(60);
-        layer2->setDirection(20);
-        layer2->setElevation_m(4500);
-        layer2->setThickness_m(400  / domeSizeRatio);
-        layer2->setTransition_m(400  / domeSizeRatio);
-        layer2->setSpan_m(SDSkyDomeDistance);
-        thesky->add_cloud_layer(layer2);
-
-        SDCloudLayer *layer3 = new SDCloudLayer(datapath);
-        switch (cloudsTextureIndex)
+        if (cloudsTextureIndex3 > 0)
         {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-            layer->setCoverage(layer->SD_CLOUD_FEW);
-            break;
-        case 4:
-        case 5:
-            layer->setCoverage(layer->SD_CLOUD_MANY);
-            break;
-        case 6:
-        case 7:
-            layer->setCoverage(layer->SD_CLOUD_BROKEN);
-            break;
-        default:
-            layer->setCoverage(layer->SD_CLOUD_OVERCAST);
-            break;
-        }
+            SDCloudLayer *layer3 = new SDCloudLayer(datapath);
+            if (cloudsTextureIndex3 > 0)
+            {
+                switch (cloudsTextureIndex3)
+                {
+                case 0:
+                    layer3->setCoverage(layer3->SD_CLOUD_CLEAR);
+                    break;
+                case 1:
+                    layer3->setCoverage(layer3->SD_CLOUD_CIRRUS);
+                    break;
+                case 2:
+                    layer3->setCoverage(layer3->SD_CLOUD_FEW);
+                    break;
+                case 3:
+                    layer3->setCoverage(layer3->SD_CLOUD_MANY);
+                    break;
+                case 4:
+                    layer3->setCoverage(layer3->SD_CLOUD_CUMULUS);
+                    break;
+                case 5:
+                    layer3->setCoverage(layer3->SD_CLOUD_SCATTERED);
+                    break;
+                case 6:
+                    layer3->setCoverage(layer3->SD_CLOUD_BROKEN);
+                    break;
+                case 7:
+                    layer3->setCoverage(layer3->SD_CLOUD_OVERCAST);
+                    break;
+                default:
+                    layer3->setCoverage(layer3->SD_CLOUD_CLEAR);
+                    break;
+                }
 
-        layer3->setSpeed(90);
-        layer3->setDirection(20);
-        layer3->setElevation_m(2500);
-        layer3->setThickness_m(400  / domeSizeRatio);
-        layer3->setTransition_m(400  / domeSizeRatio);
-        layer3->setSpan_m(SDSkyDomeDistance);
-        thesky->add_cloud_layer(layer3);
+                layer3->setSpeed(0);
+                layer3->setDirection(SDTrack->local.winddir);
+                layer3->setElevation_m(SDTrack->local.cloud_altitude3);
+                layer3->setThickness_m(100  / domeSizeRatio);
+                layer3->setTransition_m(100  / domeSizeRatio);
+                layer3->setSpan_m(SDSkyDomeDistance);
+                thesky->add_cloud_layer(layer3);
+
+                SDCloudLayer *layer2 = new SDCloudLayer(datapath);
+                switch (cloudsTextureIndex2)
+                {
+                case 0:
+                    layer2->setCoverage(layer2->SD_CLOUD_CLEAR);
+                    break;
+                case 1:
+                    layer2->setCoverage(layer2->SD_CLOUD_CIRRUS);
+                    break;
+                case 2:
+                    layer2->setCoverage(layer2->SD_CLOUD_FEW);
+                    break;
+                case 3:
+                    layer2->setCoverage(layer2->SD_CLOUD_MANY);
+                    break;
+                case 4:
+                    layer2->setCoverage(layer2->SD_CLOUD_CUMULUS);
+                    break;
+                case 5:
+                    layer2->setCoverage(layer2->SD_CLOUD_SCATTERED);
+                    break;
+                case 6:
+                    layer2->setCoverage(layer2->SD_CLOUD_BROKEN);
+                    break;
+                case 7:
+                    layer2->setCoverage(layer2->SD_CLOUD_OVERCAST);
+                    break;
+                default:
+                    layer2->setCoverage(layer2->SD_CLOUD_CLEAR);
+                    break;
+                }
+
+                layer2->setSpeed(SDTrack->local.windspeed /2);
+                layer2->setDirection(SDTrack->local.winddir);
+                layer2->setElevation_m(SDTrack->local.cloud_altitude2);
+                layer2->setThickness_m(100  / domeSizeRatio);
+                layer2->setTransition_m(100  / domeSizeRatio);
+                layer2->setSpan_m(SDSkyDomeDistance);
+                thesky->add_cloud_layer(layer2);
+
+                SDCloudLayer *layer = new SDCloudLayer(datapath);
+                switch (cloudsTextureIndex)
+                {
+                case 0:
+                    layer->setCoverage(layer->SD_CLOUD_CLEAR);
+                    break;
+                case 1:
+                    layer->setCoverage(layer->SD_CLOUD_CIRRUS);
+                    break;
+                case 2:
+                    layer->setCoverage(layer->SD_CLOUD_FEW);
+                    break;
+                case 3:
+                    layer->setCoverage(layer->SD_CLOUD_MANY);
+                    break;
+                case 4:
+                    layer->setCoverage(layer->SD_CLOUD_CUMULUS);
+                    break;
+                case 5:
+                    layer->setCoverage(layer->SD_CLOUD_SCATTERED);
+                    break;
+                case 6:
+                    layer->setCoverage(layer->SD_CLOUD_BROKEN);
+                    break;
+                case 7:
+                    layer->setCoverage(layer->SD_CLOUD_OVERCAST);
+                    break;
+                default:
+                    layer->setCoverage(layer->SD_CLOUD_CLEAR);
+                    break;
+                }
+
+                layer->setSpeed(SDTrack->local.windspeed);
+                layer->setDirection(SDTrack->local.winddir);
+                layer->setElevation_m(SDTrack->local.cloud_altitude);
+                layer->setThickness_m(100  / domeSizeRatio);
+                layer->setTransition_m(100  / domeSizeRatio);
+                layer->setSpan_m(SDSkyDomeDistance);
+                thesky->add_cloud_layer(layer);
+            }
+        }
+        else if (cloudsTextureIndex2 > 0)
+        {
+            SDCloudLayer *layer2 = new SDCloudLayer(datapath);
+            switch (cloudsTextureIndex2)
+            {
+            case 0:
+                layer2->setCoverage(layer2->SD_CLOUD_CLEAR);
+                break;
+            case 1:
+                layer2->setCoverage(layer2->SD_CLOUD_CIRRUS);
+                break;
+            case 2:
+                layer2->setCoverage(layer2->SD_CLOUD_FEW);
+                break;
+            case 3:
+                layer2->setCoverage(layer2->SD_CLOUD_MANY);
+                break;
+            case 4:
+                layer2->setCoverage(layer2->SD_CLOUD_CUMULUS);
+                break;
+            case 5:
+                layer2->setCoverage(layer2->SD_CLOUD_SCATTERED);
+                break;
+            case 6:
+                layer2->setCoverage(layer2->SD_CLOUD_BROKEN);
+                break;
+            case 7:
+                layer2->setCoverage(layer2->SD_CLOUD_OVERCAST);
+                break;
+            default:
+                layer2->setCoverage(layer2->SD_CLOUD_CLEAR);
+                break;
+            }
+
+            layer2->setSpeed(SDTrack->local.windspeed /2);
+            layer2->setDirection(SDTrack->local.winddir);
+            layer2->setElevation_m(SDTrack->local.cloud_altitude2);
+            layer2->setThickness_m(100  / domeSizeRatio);
+            layer2->setTransition_m(100  / domeSizeRatio);
+            layer2->setSpan_m(SDSkyDomeDistance);
+            thesky->add_cloud_layer(layer2);
+
+            SDCloudLayer *layer = new SDCloudLayer(datapath);
+            switch (cloudsTextureIndex)
+            {
+            case 0:
+                layer->setCoverage(layer->SD_CLOUD_CLEAR);
+                break;
+            case 1:
+                layer->setCoverage(layer->SD_CLOUD_CIRRUS);
+                break;
+            case 2:
+                layer->setCoverage(layer->SD_CLOUD_FEW);
+                break;
+            case 3:
+                layer->setCoverage(layer->SD_CLOUD_MANY);
+                break;
+            case 4:
+                layer->setCoverage(layer->SD_CLOUD_CUMULUS);
+                break;
+            case 5:
+                layer->setCoverage(layer->SD_CLOUD_SCATTERED);
+                break;
+            case 6:
+                layer->setCoverage(layer->SD_CLOUD_BROKEN);
+                break;
+            case 7:
+                layer->setCoverage(layer->SD_CLOUD_OVERCAST);
+                break;
+            default:
+                layer->setCoverage(layer->SD_CLOUD_CLEAR);
+                break;
+            }
+
+            layer->setSpeed(SDTrack->local.windspeed);
+            layer->setDirection(SDTrack->local.winddir);
+            layer->setElevation_m(SDTrack->local.cloud_altitude);
+            layer->setThickness_m(100  / domeSizeRatio);
+            layer->setTransition_m(100  / domeSizeRatio);
+            layer->setSpan_m(SDSkyDomeDistance);
+            thesky->add_cloud_layer(layer);
+        }
+        else if (cloudsTextureIndex > 0)
+        {
+            SDCloudLayer *layer = new SDCloudLayer(datapath);
+            switch (cloudsTextureIndex)
+            {
+            case 0:
+                layer->setCoverage(layer->SD_CLOUD_CLEAR);
+                break;
+            case 1:
+                layer->setCoverage(layer->SD_CLOUD_CIRRUS);
+                break;
+            case 2:
+                layer->setCoverage(layer->SD_CLOUD_FEW);
+                break;
+            case 3:
+                layer->setCoverage(layer->SD_CLOUD_MANY);
+                break;
+            case 4:
+                layer->setCoverage(layer->SD_CLOUD_CUMULUS);
+                break;
+            case 5:
+                layer->setCoverage(layer->SD_CLOUD_SCATTERED);
+                break;
+            case 6:
+                layer->setCoverage(layer->SD_CLOUD_BROKEN);
+                break;
+            case 7:
+                layer->setCoverage(layer->SD_CLOUD_OVERCAST);
+                break;
+            default:
+                layer->setCoverage(layer->SD_CLOUD_CLEAR);
+                break;
+            }
+
+            layer->setSpeed(SDTrack->local.windspeed);
+            layer->setDirection(SDTrack->local.winddir);
+            layer->setElevation_m(SDTrack->local.cloud_altitude);
+            layer->setThickness_m(100  / domeSizeRatio);
+            layer->setTransition_m(100  / domeSizeRatio);
+            layer->setSpan_m(SDSkyDomeDistance);
+            thesky->add_cloud_layer(layer);
+        }
     }
 }
-
 osg::Vec4f SDRender::getSceneColor(void)
 {
     return Scene_ambiant;

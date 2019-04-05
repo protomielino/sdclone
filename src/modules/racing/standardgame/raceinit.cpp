@@ -46,6 +46,7 @@
 #include <tgf.hpp>
 #ifdef WEBSERVER
 #include <webserver.h>
+#include <webmetar.h>
 #endif //WEBSERVER
 #include <portability.h>
 
@@ -65,6 +66,7 @@
 
 #ifdef WEBSERVER
 extern TGFCLIENT_API WebServer webServer;
+extern TGFCLIENT_API WebMetar webMetar;
 #endif //WEBSERVER
 
 

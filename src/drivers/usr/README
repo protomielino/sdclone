@@ -1,1 +1,17 @@
-USR Base
+Bot name: usr_2017
+Version: I've lost count
+copyleft 2019
+   Xavier Bertaux <bertauxx@gmail.com>
+copyleft 2006 - 2017: 
+   Andrew Sumner <novocas7rian@gmail.com>
+   Remi Coulom
+   Bernhard Wymann <berniw@bluewin.ch>
+
+The origins of this robot began with Andrew melding the raceline logic from 
+Remi's K1999 and the framework code from Berniw's BT into a new bot, "locus",
+which was designed to provide a competitive entry-level codebase for the 
+annual TRB championship.
+
+After a break of several years, in 2015 Andrew began with a copy of the locus 
+code and started a series of hacks & tweaks to improve its laptimes and its
+ability to overtake, resulting in the USR and Axiom robots you see today.

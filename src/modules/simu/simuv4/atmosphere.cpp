@@ -26,6 +26,7 @@ void SimAtmosphereConfig(tTrack *track)
     SimRain = track->local.rain;
     SimTimeOfDay = track->local.timeofday;
     SimClouds = track->local.clouds;
+    Tair = track->local.airtemperature + 273.15;
 
     // Adapt air pressure with track elevation
     if (track->local.altitude < 500)
