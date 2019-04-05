@@ -49,7 +49,7 @@
 extern TGFCLIENT_API WebMetarCloud webMetarCloud;
 extern TGFCLIENT_API WebMetarRunway webMetarRunway;
 extern TGFCLIENT_API WebMetarVisibility webMetarVisibility;
-static TGFCLIENT_API WebMetar *webMetar = NULL;
+static WebMetar *webMetar = NULL;
 #endif //WEBSERVER
 
 
