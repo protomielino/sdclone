@@ -816,7 +816,10 @@ bool WebMetar::scanWeather()
             _rain = w.intensity;
         }
         else if (!strcmp(a->id, "SN"))
+        {
             _snow = w.intensity;
+            _rain = w.intensity;
+        }
     }
 
     if (!weather.length())
@@ -887,10 +890,7 @@ bool WebMetar::scanSkyCondition()
         return true;
     }
 
-    if (!strncmp(m, "CLR", i = 3)				// clear
-            || !strncmp(m, "SKC", i = 3)		// sky clear
-            || !strncmp(m, "NCD", i = 3)		// nil cloud detected
-            || !strncmp(m, "NSC", i = 3)		// no significant clouds
+    if  (!strncmp(m, "SKC", i = 3)		         // sky clear
             || !strncmp(m, "CAVOK", i = 5))      // ceiling and visibility OK (implies 9999)
     {
         m += i;
@@ -915,11 +915,29 @@ bool WebMetar::scanSkyCondition()
 
     if (!strncmp(m, "VV", i = 2))				// vertical visibility
         ;
+    else if (!strncmp(m, "CLR", i = 3))
+    {
+        cl._coverage = WebMetarCloud::COVERAGE_CIRRUS;
+        _cloudnumber =  _cloudnumber + 1;
+        GfLogDebug("CLR / CIRRUS  - cloudnumber = %i\n", _cloudnumber);
+    }
     else if (!strncmp(m, "FEW", i = 3))
     {
         cl._coverage = WebMetarCloud::COVERAGE_FEW;
         _cloudnumber =  _cloudnumber + 1;
         GfLogDebug("FEW  - cloudnumber = %i\n", _cloudnumber);
+    }
+    else if (!strncmp(m, "NCD", i = 3))
+    {
+        cl._coverage = WebMetarCloud::COVERAGE_MANY;
+        _cloudnumber =  _cloudnumber + 1;
+        GfLogDebug("NCD / MANY CLOUDS - cloudnumber = %i\n", _cloudnumber);
+    }
+    else if (!strncmp(m, "NSC", i = 3))
+    {
+        cl._coverage = WebMetarCloud::COVERAGE_CUMULUS;
+        _cloudnumber =  _cloudnumber + 1;
+        GfLogDebug("NCD / MANY CLOUDS - cloudnumber = %i\n", _cloudnumber);
     }
     else if (!strncmp(m, "SCT", i = 3))
     {
@@ -950,7 +968,14 @@ bool WebMetar::scanSkyCondition()
     {
         _m = m;
 
-        return true;				// ignore single OVC/BKN/...
+        if (_cloudnumber > 0)
+        {
+            cl._altitude = 120 * 100 * 0.3048;
+            i = -1;
+            GfLogDebug("Cl.altitude = %.3f\n", cl._altitude);
+        }
+        else
+            return true;				// ignore single OVC/BKN/...
     }
     else if (!scanNumber(&m, &i, 3))
         i = -1;
@@ -971,7 +996,7 @@ bool WebMetar::scanSkyCondition()
     if (i != -1)
         cl._altitude = i * 100 * 0.3048;
     else
-        cl._altitude = 3000;
+        cl._altitude = 1500;
 
     GfLogDebug("Alitude = %.3f i = %i\n", cl._altitude, i);
 
@@ -988,7 +1013,8 @@ bool WebMetar::scanSkyCondition()
         m += 3;
 
     if (!scanBoundary(&m))
-        return false;
+        if (_cloudnumber < 1)
+            return false;
 
     _clouds.push_back(cl);
 
