@@ -28,6 +28,8 @@
 #include "tgfclient.h"
 #include "webmetar.h"
 
+#include <portability.h> // snprintf
+
 const double CAVOK_VISIBILITY = 9999.0;
 
 const int WEBMETAR_IDLE = 0;
