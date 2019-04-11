@@ -260,7 +260,7 @@ grInitBackground()
         if (grTrack->local.rain > 1)
         {
             GfLogInfo("  Cloud cover : Rainy, 1 layer\n");
-            snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", 8);
+            snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", 7);
 
             cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude,
                                               100 / domeSizeRatio, 100 / domeSizeRatio);

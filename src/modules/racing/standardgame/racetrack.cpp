@@ -161,7 +161,7 @@ reTrackDump(const tTrack *track, int verbose)
     const int seconds = (int)track->local.timeofday;
     GfLogInfo("TimeOfDay= %02d:%02d:%02d\n", seconds / 3600, (seconds % 3600) / 60, seconds % 60);
     GfLogInfo("Sun asc. = %.1f d\n", RAD2DEG(track->local.sunascension));
-    GfLogInfo("Clouds   = %d (0=none, 1=few, 2=scarce, 3=many, 4=full)\n", track->local.clouds);
+    GfLogInfo("Clouds   = %d (0=none, 1=cirrus, 2=few, 3=many, 7=full)\n", track->local.clouds);
     GfLogInfo("Rain     = %d (0=none, 1=little, 2=medium, 3=heavy)\n", track->local.rain);
     GfLogInfo("Water    = %d (0=none, 1=some, 2=more, 3=swampy)\n", track->local.water);
 
@@ -691,8 +691,9 @@ reTrackInitSimuWeather(void)
     char month[2] = "";
     char day[2] = "";
 
-    snprintf(day, 2, "%i", now.tm_mday);
-    snprintf(month, 2, "%i", now.tm_mon + 1);
+    snprintf(day, 3, "%i", now.tm_mday);
+    snprintf(month, 3, "%i", now.tm_mon + 1);
+    GfLogDebug("Day = %s - Month = %s\n", day, month);
 
     char buffer[256];
     snprintf(buffer, 255, "%sdata/weather/", GetDataDir());
@@ -701,11 +702,15 @@ reTrackInitSimuWeather(void)
 
     if (now.tm_mday < 10)
         weatherfile = weatherfile + "0" + day + "-";
+    else if (now.tm_mday == 10 || now.tm_mday == 20 || now.tm_mday == 30)
+        weatherfile = weatherfile + day + "0-";
     else
         weatherfile = weatherfile + day + "-";
 
     if ((now.tm_mon + 1) < 10)
         weatherfile = weatherfile + "0" + month + ".txt";
+    else if (now.tm_mon == 10)
+        weatherfile = weatherfile + month + "0-";
     else
         weatherfile = weatherfile + month + ".txt";
 
