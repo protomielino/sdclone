@@ -36,6 +36,7 @@
 #include "LearnedGraph.h"
 #include "AveragedData.h"
 #include "LinearRegression.h"
+#include "LinePath.h"
 #include "PtInfo.h"
 #include "Strategy.h"
 #include "teammanager.h"
