@@ -28,13 +28,11 @@
 #include <stdio.h>
 #include <math.h>
 #include <car.h>
-#include <track.h>
 #include <robottools.h>
 #include <raceman.h>
 
 #include "linalg.h"
 #include "globaldefs.h"
-
 
 class SingleCardata
 {
@@ -46,55 +44,35 @@ public:
     inline float getLengthOnTrack() { return length; }
     inline float getTrackangle() { return trackangle; }
     inline float getCarAngle() { return angle; }
-    inline float getTrueSpeed() { return truespeed; }
-    inline double getTyreMu() { return TyreMu; }
 
     inline bool thisCar(tCarElt *car) { return (car == this->car); }
     inline tPosd *getCorner1() { return corner1; }
     inline tPosd *getCorner2() { return corner2; }
     inline tPosd *getLastSpeed() { return lastspeed; }
-    inline double getSpeedDeltaX() { return (car->_speed_X - lastspeed[1].ax)*0.7 + (lastspeed[1].ax-lastspeed[2].ax)/4; }
-    inline double getSpeedDeltaY() { return (car->_speed_Y - lastspeed[1].ay)*0.7 + (lastspeed[1].ay-lastspeed[2].ay)/4; }
-    inline float toLftWall() { return tolftwall; }
-    inline float toRgtWall() { return torgtwall; }
-    inline float getDistFromStart() { return car->_distFromStartLine; }
 
     void update();
     void updateModel();
-    void updateWalls();
-    void evalTrueSpeed();
 
 protected:
     static float getSpeed(tCarElt *car, float trackangle);
 
-    float speed;            // speed in direction of the track.
-    float truespeed;		// speed accounting for bends
-    float width;            // the cars needed width on the track.
-    float length;           // the cars needed length on the track.
-    float trackangle;       // Track angle at the opponents position.
-    float angle;            // The angle of the car relative to the track tangent.
+    float speed;		// speed in direction of the track.
+    float width;		// the cars needed width on the track.
+    float length;		// the cars needed length on the track.
+    float trackangle;	// Track angle at the opponents position.
+    float angle;		// The angle of the car relative to the track tangent.
     float fuelMassFactor;
-    float tolftwall;        // how far to the nearest left barrier
-    float torgtwall;        // how far to the nearest Right barrier
 
     tPosd corner1[4];
     tPosd corner2[4];
     tPosd lastspeed[3];
-    tdble TyreMu;
+
     tdble t_m;
     tdble t_m_f;
     tdble t_m_r;
     tdble currentMass;
-    double hTT;
 
     double CTFactor;
-
-    tdble carMu;
-    tdble fuelCarMu;
-    tdble offlineFuelCarMu;
-    tdble baseCarMu;
-    tdble fuel;
-    tdble damage;
 
     tdble RH;
     tdble CA;
@@ -102,12 +80,26 @@ protected:
     tdble CA_FW;
     tdble CA_GE;
 
-    double lmTT;
-    double rmTT;
-
     tdble baseMass;
 
-    tCarElt *car;           // For identification.
+    tCarElt *car;		// For identification.
+
+public:
+    double lTT;
+    tdble mFTT;
+    tdble aFTT;
+    tdble aTT;
+    double hTT;
+    tdble lftOH;
+    tdble rgtOH;
+    double lmTT;
+    double rmTT;
+    tdble carMu;
+    tdble fullCarMu;
+    tdble offlineFuelCarMu;
+    tdble baseCarMu;
+    tdble fuel;
+    tdble damage;
 };
 
 
@@ -120,13 +112,10 @@ public:
 
     void update();
     SingleCardata *findCar(tCarElt *car);
-    int getNCars() { return ncars; }
-    SingleCardata *getCarData(int i) { return data + i; }
 
 protected:
     SingleCardata *data;	// Array with car data.
     int ncars;				// # of elements in data.
 };
 
-
-#endif // _BT_CARDATA_H_
+#endif

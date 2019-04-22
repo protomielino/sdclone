@@ -35,18 +35,14 @@ float Spline::evaluate(float z)
 
     // Binary search for interval.
     a = 0; b = dim - 1;
-
-    do
-    {
+    do {
         i = (a + b) / 2;
-        if (s[i].x <= z)
-        {
+        if (s[i].x <= z) {
             a = i;
-        } else
-        {
+        } else {
             b = i;
         }
-    } while ((a + 1) != b);
+    } while ((a + 1) < b);
 
     // Evaluate.
     i = a;
@@ -59,3 +55,4 @@ float Spline::evaluate(float z)
     a3 -= a2;
     return a0 + (a1 + (a2 + a3*t) * (t-1))*t;
 }
+

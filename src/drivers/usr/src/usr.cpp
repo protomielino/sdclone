@@ -23,7 +23,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
+#include <vector>
+#include <utility>
 #include <math.h>
 
 #include <tgf.h>
@@ -37,826 +39,254 @@
 #include "globaldefs.h"
 #include "driver.h"
 
-// Traditional TORCS Interface
+using ::std::string;
+using ::std::vector;
+using ::std::pair;
+
+// The "SHADOW" logger instance
+GfLogger* PLogUSR = 0;
+
+// TORCS interface
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
 static void newRace(int index, tCarElt* car, tSituation *s);
 static void drive(int index, tCarElt* car, tSituation *s);
-static int pitCmd(int index, tCarElt* car, tSituation *s);
+static int pitcmd(int index, tCarElt* car, tSituation *s);
 static void shutdown(int index);
-static int initFuncPt(int index, void *pt);
+static int InitFuncPt(int index, void *pt);
 static void endRace(int index, tCarElt *car, tSituation *s);
 
-extern "C" int usr(tModInfo *modInfo);
-
-//==========================================================================*
-// Speed Dreams-Interface
-//--------------------------------------------------------------------------*
-static const int MAXNBBOTS = MAX_NBBOTS;         // Number of drivers/robots
+// SD interface
 static const int BUFSIZE = 256;
-
-// Default driver names
-static char const* defaultBotName[MAXNBBOTS] =
-{
-    "driver 1",  "driver 2",  "driver 3",  "driver 4",  "driver 5",
-    "driver 6",  "driver 7",  "driver 8",  "driver 9",  "driver 10",
-    "driver 11", "driver 12", "driver 13", "driver 14", "driver 15",
-    "driver 16", "driver 17", "driver 18", "driver 19", "driver 20"
+static const int MAXNBBOTS = 20;
+static const string defaultBotName[MAXNBBOTS] = {  // NOLINT(runtime/string)
+  "driver 1",  "driver 2",  "driver 3",  "driver 4",  "driver 5",
+  "driver 6",  "driver 7",  "driver 8",  "driver 9",  "driver 10",
+  "driver 11", "driver 12", "driver 13", "driver 14", "driver 15",
+  "driver 16", "driver 17", "driver 18", "driver 19", "driver 20"
 };
 
-// Default driver descriptions
-static char const* defaultBotDesc[MAXNBBOTS] =
-{
-    "driver 1",  "driver 2",  "driver 3",  "driver 4",  "driver 5",
-    "driver 6",  "driver 7",  "driver 8",  "driver 9",  "driver 10",
-    "driver 11", "driver 12", "driver 13", "driver 14", "driver 15",
-    "driver 16", "driver 17", "driver 18", "driver 19", "driver 20"
+static const string defaultBotDesc[MAXNBBOTS] = {  // NOLINT(runtime/string)
+  "driver 1",  "driver 2",  "driver 3",  "driver 4",  "driver 5",
+  "driver 6",  "driver 7",  "driver 8",  "driver 9",  "driver 10",
+  "driver 11", "driver 12", "driver 13", "driver 14", "driver 15",
+  "driver 16", "driver 17", "driver 18", "driver 19", "driver 20"
 };
 
-// Max length of a drivers name
-static const int DRIVERLEN = 32;
-// Max length of a drivers description
-static const int DESCRPLEN = 256;
-// Pointer to buffer for driver's names defined in robot's xml-file
-static char *DriverNames;
-// Pointer to buffer for driver's descriptions defined in robot's xml-file
-static char *DriverDescs;
+// Drivers info: pair(first:Name, second:Desc)
+static vector< pair<string, string> > Drivers;
+static Driver *driver[MAXNBBOTS];  // Array of drivers
 
 // Number of drivers defined in robot's xml-file
-static int NBBOTS = 0;                           // Still unknown
-// Robot's name
-static char BufName[BUFSIZE];                    // Buffer for robot's name
-static const char* RobName = BufName;            // Pointer to robot's name
-// Robot's relative dir
-static char BufPathDirRel[BUFSIZE];              // Robot's dir relative
-static const char* RobPathDirRel = BufPathDirRel;// to installation dir
-// Robot's relative xml-filename
-static char BufPathXMLRel[BUFSIZE];              // Robot's xml-filename
-static const char* RobPathXMLRel = BufPathXMLRel;// relative to install. dir
-// Robot's absolute dir
-static char BufPathDir[BUFSIZE];                 // Robot's dir
-// Robot's absolute xml-filename
-static char BufPathXML[BUFSIZE];                 // Robot's xml-filename
-static const char* RobPathXML = BufPathXML;      // Pointer to xml-filename
+static int NBBOTS = 0;      // Still unknown
+static string nameBuffer;   // Robot's name // NOLINT(runtime/string)
+static string pathBuffer;   // Robot's xml-filename // NOLINT(runtime/string)
 
 // Save start index offset from robot's xml file
-static int IndexOffset = 0;
-
+static int indexOffset = 0;
 // Marker for undefined drivers to be able to comment out drivers
 // in the robot's xml-file between others, not only at the end of the list
-char undefined[] = "undefined";
+const char *sUndefined = "undefined";
 
-static int m_RobotType;  //Decide if TRB, SC, GP36, LS or some other driver
 
-// The "USR" logger instance
-GfLogger* PLogUSR = 0;
 
-typedef struct m_InstanceInfo
+////////////////////////////////
+// Utility
+////////////////////////////////
+// Set robots's name and xml file pathname
+static void setRobotName(const string name)
 {
-    Driver  *m_Robot;
-    double  m_Ticks;
-    double  m_MinTicks;
-    double  m_MaxTicks;
-    int     m_TickCount;
-    int     m_LongSteps;
-    int     m_CriticalSteps;
-    int     m_UnusedCount;
-} tInstanceInfo;
-
-//#undef ROB_SECT_ARBITRARY
-#ifdef ROB_SECT_ARBITRARY
-static tInstanceInfo *m_Instances;
-static int m_InstancesCount;
-#else //ROB_SECT_ARBITRARY
-static tInstanceInfo m_Instances[MAXNBBOTS];
-#endif //ROB_SECT_ARBITRARY
-
-////////////////////////////////////////////////////////////
-// Utility functions
-////////////////////////////////////////////////////////////
-
-// name: getFileHandle
-// Obtains the file handle for the robot XML file,
-//  trying the installation path first, then
-//  the global one, if the previous attempt failed.
-// @param
-// @return file handler for the robot XML file
-void* GetFileHandle(const char *RobotName)
-{
-    void* RobotSettings = NULL;
-
-    strncpy(BufName, RobotName, BUFSIZE);											// Save robot's name
-    snprintf(BufPathDirRel, BUFSIZE, "drivers/%s",RobotName);						// relative to installation
-    snprintf(BufPathXMLRel, BUFSIZE, "drivers/%s/%s.xml", RobotName, RobotName);		// relative to installation
-
-    // Test local installation path
-    snprintf(BufPathXML, BUFSIZE, "%s%s", GetLocalDir(), RobPathXMLRel);
-    snprintf(BufPathDir, BUFSIZE, "%s%s", GetLocalDir(), RobPathDirRel);
-    RobotSettings = GfParmReadFile(RobPathXML, GFPARM_RMODE_STD );
-
-    if (!RobotSettings)
-    {
-        // If not found, use global installation path
-        snprintf(BufPathXML, BUFSIZE, "%s%s", GetDataDir(), RobPathXMLRel);
-        snprintf(BufPathDir, BUFSIZE, "%s%s", GetDataDir(), RobPathDirRel);
-        RobotSettings = GfParmReadFile(RobPathXML, GFPARM_RMODE_STD );
-    }
-
-    return RobotSettings;
+  char buffer[BUFSIZE];
+  snprintf(buffer, BUFSIZE, "drivers/%s/%s.xml", name.c_str(), name.c_str());
+  nameBuffer = name;
+  pathBuffer = buffer;
 }
 
-////////////////////////////////////////////////////////////
-// Set parameters
-////////////////////////////////////////////////////////////
-void SetParameters(int N, char const* DefaultCarType)
-{
-    NBBOTS = N;
-    Driver::NBBOTS = N;                                    // Used nbr of cars
-    Driver::MyBotName = BufName;                           // Name of this bot
-    Driver::ROBOT_DIR = BufPathDir;                        // Path to dll
-    Driver::SECT_PRIV = "private";                         // Private section
-    Driver::DEFAULTCARTYPE  = DefaultCarType;              // Default car type
-};
+////////////////////////////////////////////////////////////////
+// SD Interface (new, fixed name scheme, from Andrew's USR code)
+////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////
-// Schismatic entry point for simplix
-////////////////////////////////////////////////////////////
-void SetupUSR()
-{
-    m_RobotType = RTYPE_USR;
-    SetParameters(NBBOTS, "car1-trb1");
-    Driver::UseWingControl = true;
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_mpa1
-////////////////////////////////////////////////////////////
-void SetupUSR_mpa1()
-{
-    m_RobotType = RTYPE_USR_MPA1;
-    SetParameters(NBBOTS, "mpa1-murasama");
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_mpa11
-////////////////////////////////////////////////////////////
-void SetupUSR_mpa11()
-{
-    m_RobotType = RTYPE_USR_MPA11;
-    SetParameters(NBBOTS, "mpa11-murasama");
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_mpa12
-////////////////////////////////////////////////////////////
-void SetupUSR_mpa12()
-{
-    m_RobotType = RTYPE_USR_MPA12;
-    SetParameters(NBBOTS, "mpa12-murasama");
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_trb1
-////////////////////////////////////////////////////////////
-void SetupUSR_trb1()
-{
-    m_RobotType = RTYPE_USR_TRB1;
-    SetParameters(NBBOTS, "car1-trb1");
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_sc
-////////////////////////////////////////////////////////////
-void SetupUSR_sc()
-{
-    m_RobotType = RTYPE_USR_SC;
-    SetParameters(NBBOTS, "sc-cavallo-360");
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_srw
-////////////////////////////////////////////////////////////
-void SetupUSR_srw()
-{
-    m_RobotType = RTYPE_USR_SRW;
-    Driver::RobotType = m_RobotType;
-    SetParameters(NBBOTS, "srw-sector-p4");
-    Driver::UseWingControl = true;
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_36GP
-////////////////////////////////////////////////////////////
-void SetupUSR_36GP()
-{
-    m_RobotType = RTYPE_USR_36GP;
-    SetParameters(NBBOTS, "36GP-alfa12c");
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_ls1
-////////////////////////////////////////////////////////////
-void SetupUSR_ls1()
-{
-    m_RobotType = RTYPE_USR_LS1;
-    SetParameters(NBBOTS, "ls1-archer-r9");
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_ls2
-////////////////////////////////////////////////////////////
-void SetupUSR_ls2()
-{
-    m_RobotType = RTYPE_USR_LS2;
-    SetParameters(NBBOTS, "ls2-bavaria-g3gtr");
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_MP5
-////////////////////////////////////////////////////////////
-void SetupUSR_mp5()
-{
-    m_RobotType = RTYPE_USR_MP5;
-    SetParameters(NBBOTS, "mp5");
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_lp1
-////////////////////////////////////////////////////////////
-void SetupUSR_lp1()
-{
-    m_RobotType = RTYPE_USR_LP1;
-    SetParameters(NBBOTS, "lp1-vieringe-vr8");
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_ref
-////////////////////////////////////////////////////////////
-void SetupUSR_ref()
-{
-    m_RobotType = RTYPE_USR_REF;
-    SetParameters(NBBOTS, "ref-sector-p4");
-    Driver::UseWingControl = true;
-};
-
-////////////////////////////////////////////////////////////
-// Schismatic entry point for usr_mp10
-////////////////////////////////////////////////////////////
-void SetupUSR_mp10()
-{
-    m_RobotType = RTYPE_USR_MP10;
-    SetParameters(NBBOTS, "mpa1-murasama");
-};
-
-////////////////////////////////////////////////////////////
-// Handle module entry for Speed Dreams Interface V1.00 (new fixed name scheme)
-////////////////////////////////////////////////////////////
-int moduleWelcomeV1_00
-(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
-{
-    PLogUSR = GfLogger::instance("USR");
-    LogUSR.debug("\n#Interface Version: %d.%d\n", welcomeIn->itfVerMajor, welcomeIn->itfVerMinor);
-
-    // Get filehandle for robot's xml-file
-    void* RobotSettings = GetFileHandle(welcomeIn->name);
-    // Let's look what we have to provide here
-    if (RobotSettings)
-    {
-        LogUSR.debug("#Robot name      : %s\n",RobName);
-        LogUSR.debug("#Robot directory : %s\n",RobPathDirRel);
-        LogUSR.debug("#Robot XML-file  : %s\n",RobPathXMLRel);
-
-        char Buffer[BUFSIZE];
-        char *Section = Buffer;
-
-        // To get the number of drivers defined in the
-        // robot team definition file we have to count
-        // the number of sections within Robots/index!
-        snprintf(Buffer, BUFSIZE, "%s/%s", ROB_SECT_ROBOTS, ROB_LIST_INDEX);
-        NBBOTS = GfParmGetEltNb(RobotSettings, Buffer);
-        LogUSR.debug("#Nbr of drivers  : %d\n", NBBOTS);
-
-        DriverNames = (char *) calloc(NBBOTS,DRIVERLEN);
-        DriverDescs = (char *) calloc(NBBOTS,DESCRPLEN);
-
-        // Setup a path to the first driver section
-        // assuming that it starts with the index 0
-        snprintf(Buffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
-
-        // Try to get first driver from index 0
-        const char *DriverName = GfParmGetStr( RobotSettings, Section, (char *) ROB_ATTR_NAME, undefined);
-
-        // Check wether index 0 is used as start index
-        if (strncmp(DriverName,undefined,strlen(undefined)) != 0)
-        {
-            // Teams xml file uses index 0, 1, ..., N - 1
-            IndexOffset = 0;
-        }
-        else
-        {
-            // Teams xml file uses index 1, 2, ..., N
-            IndexOffset = 1;
-        }
-
-        // Loop over all possible drivers, clear all buffers,
-        // save defined driver names and desc.
-        int I = 0;
-        int N = 0;
-        int M = 0;
-
-        while (N < NBBOTS)
-        {
-            snprintf(Section, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, I + IndexOffset );
-            const char *DriverName = GfParmGetStr( RobotSettings, Section, (char *) ROB_ATTR_NAME,undefined);
-
-            if (strncmp(DriverName,undefined,strlen(undefined)) != 0)
-            {   // This driver is defined in robot's xml-file
-                strncpy(&DriverNames[I*DRIVERLEN], DriverName, DRIVERLEN-1);
-                const char *DriverDesc = GfParmGetStr(RobotSettings, Section, (char *) ROB_ATTR_DESC, defaultBotDesc[I]);
-                strncpy(&DriverDescs[I*DESCRPLEN], DriverDesc, DESCRPLEN-1);
-
-                LogUSR.debug("#Driver %d: %s (%s)\n",I,DriverName, DriverDesc);
-
-                N++;
-            }
-            else
-            {
-                // There is an index skipped in the robots team definition file
-                // Therefore we have to get additional memory to store the data
-                M++;
-
-                DriverNames = (char *) realloc(DriverNames, (NBBOTS+M)*DRIVERLEN);
-                memset(&DriverNames[I*DRIVERLEN], 0, DRIVERLEN);
-
-                DriverDescs = (char *) realloc(DriverDescs,(NBBOTS+M)*DESCRPLEN);
-                memset(&DriverDescs[I*DESCRPLEN], 0, DESCRPLEN);
-
-                LogUSR.debug("#Driver %d: %s (%s)\n", I, &DriverNames[I*DRIVERLEN], &DriverDescs[I*DESCRPLEN]);
-            }
-
-            I++;
-        }
-
-        GfParmReleaseHandle(RobotSettings);
-    }
-    else
-    {
-        // Handle error here
-        LogUSR.debug("#Robot XML-Path not found: (%s) or (%s) %s\n\n", GetLocalDir(), GetDataDir(), RobPathXMLRel);
-
-        NBBOTS = 0;
-        // But this is not considered a real failure of moduleWelcome !
-    }
-
-    // Handle additional settings for wellknown identities
-    if (strncmp(RobName,"usr_trb1", strlen("usr_trb1")) == 0)
-        SetupUSR_trb1();
-    else if (strncmp(RobName,"usr_sc", strlen("usr_sc")) == 0)
-        SetupUSR_sc();
-    else if (strncmp(RobName,"usr_srw", strlen("usr_srw")) == 0)
-        SetupUSR_srw();
-    else if (strncmp(RobName,"usr_36GP", strlen("usr_36GP")) == 0)
-        SetupUSR_36GP();
-    else if (strncmp(RobName,"usr_mpa1", strlen("usr_mpa1")) == 0)
-        SetupUSR_mpa1();
-    else if (strncmp(RobName,"usr_mpa11", strlen("usr_mpa11")) == 0)
-        SetupUSR_mpa11();
-    else if (strncmp(RobName,"usr_mpa12", strlen("usr_mpa12")) == 0)
-        SetupUSR_mpa12();
-    else if (strncmp(RobName,"usr_ls1", strlen("usr_ls1")) == 0)
-        SetupUSR_ls1();
-    else if (strncmp(RobName,"usr_ls2", strlen("usr_ls2")) == 0)
-        SetupUSR_ls2();
-    else if (strncmp(RobName,"usr_mp5", strlen("usr_mp5")) == 0)
-        SetupUSR_mp5();
-    else if (strncmp(RobName,"usr_lp1", strlen("usr_lp1")) == 0)
-        SetupUSR_lp1();
-    else if (strncmp(RobName,"usr_ref", strlen("usr_ref")) == 0)
-        SetupUSR_ref();
-    else if (strncmp(RobName,"usr_mp10", strlen("usr_mp10")) == 0)
-        SetupUSR_mp10();
-    else
-        SetupUSR();
-
-    // Set max nb of interfaces to return.
-    welcomeOut->maxNbItf = NBBOTS;
-
-    return 0;
-}
-
-////////////////////////////////////////////////////////////
 // Module entry point (new fixed name scheme).
-// Extended for use with schismatic robots and checked interface versions
-////////////////////////////////////////////////////////////
-extern "C" int moduleWelcome
-(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
+// Extended for use with schismatic robots
+
+extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
+                              tModWelcomeOut* welcomeOut)
 {
-    if (welcomeIn->itfVerMajor >= 1)
-    {
-        if (welcomeIn->itfVerMinor > 0)
-            // For future use add updated versions here
-            return moduleWelcomeV1_00(welcomeIn, welcomeOut);
-        else
-            // Initial version
-            return moduleWelcomeV1_00(welcomeIn, welcomeOut);
+  // Save module name and loadDir, and determine module XML file pathname.
+  setRobotName(welcomeIn->name);
+
+  // Filehandle for robot's xml-file
+  void *pRobotSettings = GfParmReadFile(pathBuffer.c_str(), GFPARM_RMODE_STD);
+
+  PLogUSR = GfLogger::instance("USR");
+
+  if (pRobotSettings) {  // robot settings XML could be read
+    NBBOTS = 0;
+
+    char SectionBuffer[BUFSIZE];
+    snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
+
+    // Try to get first driver from index 0
+    const string sDriverName = GfParmGetStrNC(pRobotSettings,
+                                    SectionBuffer,
+                                    ROB_ATTR_NAME,
+                                    const_cast<char*>(sUndefined));
+
+    // Check whether index 0 is used as start index
+    if (sDriverName != sUndefined) {
+      // Teams xml file uses index 0, 1, ..., N - 1
+      indexOffset = 0;
+    } else {
+      // Teams xml file uses index 1, 2, ..., N
+      indexOffset = 1;
     }
 
-    LogUSR.debug("\n#Unhandled Interface Version: %d.%d\n",	welcomeIn->itfVerMajor, welcomeIn->itfVerMinor);
+    // Loop over all possible drivers, clear all buffers,
+    // save defined driver names and descriptions.
+    Drivers.clear();
+    for (int i = indexOffset; i < MAXNBBOTS + indexOffset; ++i) {
+      snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i);
 
-    welcomeOut->maxNbItf = 0;
+      string sDriverName = GfParmGetStr(pRobotSettings, SectionBuffer,
+                                          ROB_ATTR_NAME, sUndefined);
 
-    return -1;
+      if (sDriverName != sUndefined) {
+        // This driver is defined in robot's xml-file
+        string sDriverDesc = GfParmGetStr(pRobotSettings, SectionBuffer,
+                                    ROB_ATTR_DESC, defaultBotDesc[i].c_str());
+        Drivers.push_back(make_pair(sDriverName, sDriverDesc));
+        ++NBBOTS;
+      }
+    }  // for i
+
+    GfParmReleaseHandle(pRobotSettings);
+  }
+  else        // if robot settings XML could not be read
+  {
+    // For schismatic robots NBBOTS is unknown! Handle error here
+    NBBOTS = 0;
+    // But this is not considered a real failure of moduleWelcome !
+  }
+
+  // Set max nb of interfaces to return.
+  welcomeOut->maxNbItf = NBBOTS;
+
+  return 0;
 }
 
-////////////////////////////////////////////////////////////
 // Module entry point (new fixed name scheme).
-// Tells TORCS, who we are, how we want to be called and
-// what we are able to do.
-////////////////////////////////////////////////////////////
-extern "C" int moduleInitialize(tModInfo *ModInfo)
+extern "C" int moduleInitialize(tModInfo *modInfo)
 {
-    LogUSR.debug("\n#Initialize from %s ...\n", RobPathXML);
-    LogUSR.debug("#NBBOTS: %d (of %d)\n", NBBOTS, MAXNBBOTS);
+  // Clear all structures.
+  memset(modInfo, 0, NBBOTS * sizeof(tModInfo));
+  for (int i = 0; i < NBBOTS; i++)
+  {
+    modInfo[i].name = Drivers[i].first.c_str();
+    modInfo[i].desc = Drivers[i].second.c_str();
+    modInfo[i].fctInit = InitFuncPt;       // Init function.
+    modInfo[i].gfId    = ROB_IDENT;        // Supported framework version.
+    modInfo[i].index   = i + indexOffset;  // Indices from robot's xml-file.
+  }  // for i
 
-#ifdef ROB_SECT_ARBITRARY
-    // Clear all structures.
-    memset(ModInfo, 0, (NBBOTS+1)*sizeof(tModInfo));
-
-    int I;
-    for (I = 0; I < Driver::NBBOTS; I++)
-    {
-        ModInfo[I].name = &DriverNames[I*DRIVERLEN]; // Tell customisable name
-        ModInfo[I].desc = &DriverDescs[I*DESCRPLEN]; // Tell customisable desc.
-        ModInfo[I].fctInit = initFuncPt;             // Common used functions
-        ModInfo[I].gfId = ROB_IDENT;                 // Robot identity
-        ModInfo[I].index = I+IndexOffset;            // Drivers index
-    }
-
-    ModInfo[NBBOTS].name = RobName;
-    ModInfo[NBBOTS].desc = RobName;
-    ModInfo[NBBOTS].fctInit = initFuncPt;
-    ModInfo[NBBOTS].gfId = ROB_IDENT;
-    ModInfo[NBBOTS].index = NBBOTS+IndexOffset;
-#else //ROB_SECT_ARBITRARY
-    // Clear all structures.
-    memset(ModInfo, 0, NBBOTS*sizeof(tModInfo));
-
-    int I;
-    for (I = 0; I < TDriver::NBBOTS; I++)
-    {
-        ModInfo[I].name = &DriverNames[I*DRIVERLEN]; // Tell customisable name
-        ModInfo[I].desc = &DriverDescs[I*DESCRPLEN]; // Tell customisable desc.
-        ModInfo[I].fctInit = InitFuncPt;             // Common used functions
-        ModInfo[I].gfId = ROB_IDENT;                 // Robot identity
-        ModInfo[I].index = I+IndexOffset;            // Drivers index
-    }
-#endif //ROB_SECT_ARBITRARY
-
-    LogUSR.debug("# ... Initialized\n\n");
-
-    return 0;
+  return 0;
 }
 
-////////////////////////////////////////////////////////////
 // Module exit point (new fixed name scheme).
-////////////////////////////////////////////////////////////
 extern "C" int moduleTerminate()
 {
-    LogUSR.debug("#Terminated %s\n\n", RobName);
-
-    if (DriverNames)
-        free(DriverNames);
-
-    DriverNames = NULL;
-
-    if (DriverDescs)
-        free(DriverDescs);
-
-    DriverDescs = NULL;
-
-    return 0;
+  return 0;
 }
 
-////////////////////////////////////////////////////////////
-// Module entry point (Torcs backward compatibility scheme).
-////////////////////////////////////////////////////////////
-int usrEntryPoint(tModInfo *ModInfo, void *RobotSettings)
+////////////////////////////////////////////////////////////////
+// TORCS backward compatibility scheme, from Andrew's USR code
+////////////////////////////////////////////////////////////////
+
+// Module entry point
+extern "C" int usr(tModInfo *modInfo)
 {
-    LogUSR.debug("\n#Torcs backward compatibility scheme used\n");
-    NBBOTS = MIN(10,NBBOTS);
+  NBBOTS = 10;
+  Drivers.clear();
+  pathBuffer = "drivers/usr/usr.xml";
+  nameBuffer = "usr";
 
-    memset(ModInfo, 0, NBBOTS*sizeof(tModInfo));
-    DriverNames = (char *) calloc(10,DRIVERLEN);
-    DriverDescs = (char *) calloc(10,DESCRPLEN);
-    memset(DriverNames, 0, 10*DRIVERLEN);
-    memset(DriverDescs, 0, 10*DESCRPLEN);
+  // Filehandle for robot's xml-file
+  void *pRobotSettings = GfParmReadFile(pathBuffer.c_str(), GFPARM_RMODE_STD);
 
-    char SectionBuf[BUFSIZE];
-    char *Section = SectionBuf;
-
-    snprintf( SectionBuf, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
-
-    int I;
-    for (I = 0; I < NBBOTS; I++)
+  if (pRobotSettings) {  // Let's look what we have to provide here
+    char SectionBuffer[BUFSIZE];
+    for (int i = 0; i < NBBOTS; i++)
     {
-        snprintf( SectionBuf, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, I + IndexOffset );
-        const char *DriverName = GfParmGetStr( RobotSettings, Section, (char *) ROB_ATTR_NAME, defaultBotName[I]);
-
-        strncpy(&DriverNames[I*DRIVERLEN], DriverName, DRIVERLEN-1);
-        const char *DriverDesc = GfParmGetStr( RobotSettings, Section, (char *) ROB_ATTR_DESC, defaultBotDesc[I]);
-
-        strncpy(&DriverDescs[I*DESCRPLEN], DriverDesc, DESCRPLEN-1);
+      snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i);
+      string sDriverName = GfParmGetStr(pRobotSettings, SectionBuffer, ROB_ATTR_NAME, defaultBotName[i].c_str());
+      string sDriverDesc = GfParmGetStr(pRobotSettings, SectionBuffer, ROB_ATTR_DESC, defaultBotDesc[i].c_str());
+      Drivers.push_back(make_pair(sDriverName, sDriverDesc));
     }
 
-    GfParmReleaseHandle(RobotSettings);
+    GfParmReleaseHandle(pRobotSettings);
+  }
 
-    return moduleInitialize(ModInfo);
+  return moduleInitialize(modInfo);
 }
 
-////////////////////////////////////////////////////////////
-// Module exit point (Torcs backward compatibility scheme).
-////////////////////////////////////////////////////////////
+// Module exit point (TORCS backward compatibility scheme).
 extern "C" int usrShut()
 {
-    return moduleTerminate();
+  return moduleTerminate();
 }
 
-////////////////////////////////////////////////////////////
-// TORCS: Initialization
-//
-// After clarification of the general calling (calling this func.),
-// we tell TORCS our functions to provide the requested services:
-////////////////////////////////////////////////////////////
-static int initFuncPt(int Index, void *Pt)
+// Module interface initialization.
+static int InitFuncPt(int index, void *pt)
 {
-    tRobotItf *Itf = (tRobotItf *)Pt;              // Get typed pointer
+  tRobotItf *itf = static_cast<tRobotItf *>(pt);
 
-    Itf->rbNewTrack = initTrack;                   // Store function pointers
-    Itf->rbNewRace  = newRace;
-    Itf->rbDrive    = drive;
-    Itf->rbPitCmd   = pitCmd;
-    Itf->rbEndRace  = endRace;
-    Itf->rbShutdown = shutdown;
-    Itf->index      = Index;                       // Store index
+  // Create robot instance for index.
+  driver[index] = new Driver(index);
+  driver[index]->MyBotName = nameBuffer.c_str();
 
-#ifdef ROB_SECT_ARBITRARY
-    int xx;
-    tInstanceInfo *copy;
-
-    //Make sure enough data is allocated
-    if (m_InstancesCount <= Index-IndexOffset)
-    {
-        copy = new tInstanceInfo[Index-IndexOffset+1];
-        for (xx = 0; xx < m_InstancesCount; ++xx)
-            copy[xx] = m_Instances[xx];
-
-        for (xx = m_InstancesCount; xx < Index-IndexOffset+1; ++xx)
-            copy[xx].m_Robot = NULL;
-
-        if (m_InstancesCount > 0)
-            delete []m_Instances;
-
-        m_Instances = copy;
-        m_InstancesCount = Index-IndexOffset+1;
-    }
-#endif
-
-    void* RobotSettings =	GetFileHandle(Driver::MyBotName);
-
-    m_Instances[Index-IndexOffset].m_Robot = new Driver(Index-IndexOffset);
-    m_Instances[Index-IndexOffset].m_Robot->SetBotName( RobotSettings, &DriverNames[(Index-IndexOffset)*DRIVERLEN]);
-
-    if (m_RobotType == RTYPE_USR)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR\n");
-    }
-    else if (m_RobotType == RTYPE_USR_TRB1)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_TRB1\n");
-    }
-    else if (m_RobotType == RTYPE_USR_SC)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_SC\n");
-    }
-    else if (m_RobotType == RTYPE_USR_SRW)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_SRW\n");
-    }
-    else if (m_RobotType == RTYPE_USR_36GP)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_36GP\n");
-    }
-    else if (m_RobotType == RTYPE_USR_MPA1)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_MPA1\n");
-    }
-    else if (m_RobotType == RTYPE_USR_MPA11)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_MPA11\n");
-    }
-    else if (m_RobotType == RTYPE_USR_MPA12)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_MPA12\n");
-    }
-    else if (m_RobotType == RTYPE_USR_LS1)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_LS1\n");
-    }
-    else if (m_RobotType == RTYPE_USR_LS2)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_LS2\n");
-    }
-    else if (m_RobotType == RTYPE_USR_MP5)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_MP5\n");
-    }
-    else if (m_RobotType == RTYPE_USR_LP1)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_LP1\n");
-    }
-    else if (m_RobotType == RTYPE_USR_REF)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_REF\n");
-    }
-    else if (m_RobotType == RTYPE_USR_MP10)
-    {
-        LogUSR.debug("#RobotType == RTYPE_USR_MP10\n");
-    }
-
-    GfParmReleaseHandle(RobotSettings);
-
-    return 0;
+  itf->rbNewTrack = initTrack;    // Give the robot the track view called.
+  itf->rbNewRace  = newRace;      // Start a new race.
+  itf->rbDrive    = drive;        // Drive during race.
+  itf->rbPitCmd   = pitcmd;       // Pit commands.
+  itf->rbEndRace  = endRace;      // End of the current race.
+  itf->rbShutdown = shutdown;     // Called before the module is unloaded.
+  itf->index      = index;        // Index used if multiple interfaces.
+  return 0;
 }
 
-////////////////////////////////////////////////////////////
-// TORCS: New track
-////////////////////////////////////////////////////////////
-static void initTrack(int Index, tTrack* Track, void *CarHandle, void **CarParmHandle, tSituation *S)
+// Called for every track change or new race.
+static void initTrack(int index, tTrack* track, void *carHandle,
+                      void **carParmHandle, tSituation *s)
 {
-    // Init common used data
-    //m_Instances[Index-IndexOffset].m_Robot->SetCommonData( &gCommonData, cRobotType );
-    m_Instances[Index-IndexOffset].m_Robot->initTrack( Track, CarHandle, CarParmHandle, S);
+  driver[index]->initTrack(track, carHandle, carParmHandle, s);
 }
 
 
-////////////////////////////////////////////////////////////
-// TORCS: New Race starts
-////////////////////////////////////////////////////////////
-static void newRace(int Index, tCarElt* Car, tSituation *S)
+// Start a new race.
+static void newRace(int index, tCarElt* car, tSituation *s)
 {
-    RtInitTimer(); // Check existance of Performance Counter Hardware
-
-    m_Instances[Index-IndexOffset].m_Ticks = 0.0;               // Initialize counters
-    m_Instances[Index-IndexOffset].m_MinTicks = FLT_MAX;        // and time data
-    m_Instances[Index-IndexOffset].m_MaxTicks = 0.0;
-    m_Instances[Index-IndexOffset].m_TickCount = 0;
-    m_Instances[Index-IndexOffset].m_LongSteps = 0;
-    m_Instances[Index-IndexOffset].m_CriticalSteps = 0;
-    m_Instances[Index-IndexOffset].m_UnusedCount = 0;
-
-    m_Instances[Index-IndexOffset].m_Robot->newRace(Car, S);
-    m_Instances[Index-IndexOffset].m_Robot->CurrSimTime = -10.0;
+  driver[index]->newRace(car, s);
 }
 
-////////////////////////////////////////////////////////////
-// TORCS-Callback: Drive
-//
-// Attention: This procedure is called very frequent and fast in succession!
-// Therefore we don't throw debug messages here!
-// To find basic bugs, it may be usefull to do it anyhow!
-////////////////////////////////////////////////////////////
-static void drive(int Index, tCarElt* Car, tSituation *S)
+// Drive during race.
+static void drive(int index, tCarElt* car, tSituation *s)
 {
-    //LogUSR.debug("#>>> TDriver::Drive\n");
-    if (m_Instances[Index-IndexOffset].m_Robot->CurrSimTime < S->currentTime)
-        //  if (cInstances[Index-IndexOffset].cRobot->CurrSimTime + 0.03 < S->currentTime)
-    {
-        //LogUSR.debug("#Drive\n");
-        double StartTimeStamp = RtTimeStamp();
-
-        m_Instances[Index-IndexOffset].m_Robot->CurrSimTime = S->currentTime;
-        //m_Instances[Index-IndexOffset].m_Robot->update(S);    // Update info about opp.
-        /*if (m_Instances[Index-IndexOffset].m_Robot->IsStuck())    // Check if we are stuck
-            m_Instances[Index-IndexOffset].m_Robot->Unstuck();      //   Unstuck
-        else  */                                       // or
-            m_Instances[Index-IndexOffset].m_Robot->drive(S);        //   Drive
-
-        double Duration = RtDuration(StartTimeStamp);
-
-        if (m_Instances[Index-IndexOffset].m_TickCount > 0)       // Collect used time
-        {
-            if (Duration > 1.0)
-                m_Instances[Index-IndexOffset].m_LongSteps++;
-            if (Duration > 2.0)
-                m_Instances[Index-IndexOffset].m_CriticalSteps++;
-            if (m_Instances[Index-IndexOffset].m_MinTicks > Duration)
-                m_Instances[Index-IndexOffset].m_MinTicks = Duration;
-            if (m_Instances[Index-IndexOffset].m_MaxTicks < Duration)
-                m_Instances[Index-IndexOffset].m_MaxTicks = Duration;
-        }
-        m_Instances[Index-IndexOffset].m_TickCount++;
-        m_Instances[Index-IndexOffset].m_Ticks += Duration;
-    }
-    else
-    {
-        //LogUSR.debug("#DriveLast\n");
-        m_Instances[Index-IndexOffset].m_UnusedCount++;
-        //m_Instances[Index-IndexOffset].m_Robot->DriveLast();      // Use last drive commands
-    }
-    //LogUSR.debug("#<<< TDriver::Drive\n");
+  driver[index]->drive(s);
 }
 
-////////////////////////////////////////////////////////////
-// TORCS: Pitstop (Car is in pit!)
-////////////////////////////////////////////////////////////
-static int pitCmd(int Index, tCarElt* Car, tSituation *S)
+// Pitstop callback.
+static int pitcmd(int index, tCarElt* car, tSituation *s)
 {
-    // Dummy: use parameters
-    if ((Index < 0) || (Car == NULL) || (S == NULL))
-        LogUSR.debug("PitCmd\n");
-
-    return m_Instances[Index-IndexOffset].m_Robot->pitCommand(S);
+  return driver[index]->pitCommand(s);
 }
 
-////////////////////////////////////////////////////////////
-// TORCS: Race ended
-////////////////////////////////////////////////////////////
-static void endRace(int Index, tCarElt *Car, tSituation *S)
+// End of the current race.
+static void endRace(int index, tCarElt *car, tSituation *s)
 {
-    // Dummy: use parameters
-    if ((Index < 0) || (Car == NULL) || (S == NULL))
-        Index = 0;
-
-    LogUSR.debug("EndRace\n");
-    m_Instances[Index-IndexOffset].m_Robot->endRace(S);
+  driver[index]->endRace(s);
 }
 
-////////////////////////////////////////////////////////////
-// TORCS: Cleanup
-////////////////////////////////////////////////////////////
-static void shutdown(int Index)
+// Called before the module is unloaded.
+static void shutdown(int index)
 {
-#ifdef ROB_SECT_ARBITRARY
-    int count;
-    int xx;
-    tInstanceInfo *copy;
-#endif //ROB_SECT_ARBITRARY
-
-    LogUSR.debug("\n\n#Clock\n");
-    LogUSR.debug("#Total Time used: %g sec\n", m_Instances[Index-IndexOffset].m_Ticks/1000.0);
-    LogUSR.debug("#Min   Time used: %g msec\n", m_Instances[Index-IndexOffset].m_MinTicks);
-    LogUSR.debug("#Max   Time used: %g msec\n", m_Instances[Index-IndexOffset].m_MaxTicks);
-    LogUSR.debug("#Mean  Time used: %g msec\n", m_Instances[Index-IndexOffset].m_Ticks/m_Instances[Index-IndexOffset].m_TickCount);
-    LogUSR.debug("#Long Time Steps: %d\n", m_Instances[Index-IndexOffset].m_LongSteps);
-    LogUSR.debug("#Critical Steps : %d\n", m_Instances[Index-IndexOffset].m_CriticalSteps);
-    LogUSR.debug("#Unused Steps   : %d\n", m_Instances[Index-IndexOffset].m_UnusedCount);
-    LogUSR.debug("\n");
-    LogUSR.debug("\n");
-
-    m_Instances[Index-IndexOffset].m_Robot->shutdown();
-    delete m_Instances[Index-IndexOffset].m_Robot;
-    m_Instances[Index-IndexOffset].m_Robot = NULL;
-
-#ifdef ROB_SECT_ARBITRARY
-    //Check if this was the highest index
-    if (m_InstancesCount == Index-IndexOffset+1)
-    {
-        //Now make the cInstances array smaller
-        //Count the number of robots which are still in the array
-        count = 0;
-        for (xx = 0; xx < Index-IndexOffset+1; ++xx)
-        {
-            if (m_Instances[xx].m_Robot)
-                count = xx+1;
-        }
-
-        if (count>0)
-        {
-            //We have robots left: make a new array
-            copy = new tInstanceInfo[count];
-            for (xx = 0; xx < count; ++xx)
-                copy[xx] = m_Instances[xx];
-        }
-        else
-        {
-            copy = NULL;
-        }
-        delete []m_Instances;
-        m_Instances = copy;
-        m_InstancesCount = count;
-    }
-#endif //ROB_SECT_ARBITRARY
-}
-
-////////////////////////////////////////////////////////////
-// Module entry point (Torcs backward compatibility scheme).
-////////////////////////////////////////////////////////////
-extern "C" int usr(tModInfo *ModInfo)
-{
-    void *RobotSettings = GetFileHandle("usr");
-    if (!RobotSettings)
-        return -1;
-
-    SetParameters(1, "car1-trb1");
-
-    return usrEntryPoint(ModInfo, RobotSettings);
+  driver[index]->shutdown();
+  delete driver[index];
 }

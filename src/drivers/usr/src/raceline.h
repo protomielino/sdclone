@@ -1,10 +1,10 @@
-/****************************************************************************
+/***************************************************************************
 
     file                 : raceline.h
-    created              : Wed Mai 14 19:53:00 CET 2003
-    copyright            : (C) 2003-2004 by Bernhard Wymann
-    email                : berniw@bluewin.ch
-    version              : $Id: raceline.h 3636 2011-05-31 04:36:35Z andrewsumner $
+    created              : Sat Feb 07 19:53:00 CET 2015
+    copyright            : (C) 2015 by Andrew Sumner
+    email                : novocas7rian@gmail.com
+    version              : $Id: raceline.h,v 1.3 2015/02/07 20:11:49 andrew Exp $
 
  ***************************************************************************/
 
@@ -20,279 +20,336 @@
 #ifndef _RACELINE_H_
 #define _RACELINE_H_
 
+#include <iostream>
+#include <fstream>
+#include <string>
+
 #include "linalg.h"
-#include "mod.h"
-#include "globaldefs.h"
+#include "linemode.h"
+#include "cardata.h"
+#include "manual_override.h"
 
-enum { LINE_MID=0, LINE_RL };
-enum { mode_normal=1, mode_correcting, mode_avoiding, mode_pitting };
+#define NUM_RACELINES 4
+#define NUM_RACELINE_SPEEDS 4 //12
+#define MAXSEGMENTS 4000
+#define MAXDIVS 9000
 
-#define MAXSEGMENTS 3000
-#define MAXDIVS 10000
-
-typedef struct
-{
-    double *tRInverse;
-    double *tx;
-    double *ty;
-    double *tz;
-    double *tzd;
-    double *tLane;
-    double *txLeft;
-    double *tyLeft;
-    double *txRight;
-    double *tyRight;
-    double *tLaneLMargin;
-    double *tLaneRMargin;
-    double *tFriction;
-    double *tBrakeFriction;
-    //double *tSegDist;
-    double *tElemLength;
-    double *tDistance;
-    double *ExtLimit;
-    tTrackSeg **tSegment;
-    int *tDivSeg;
-    int *tSegIndex;
-    char trackname[64];
-    double Width;
-    double Length;
-    int Segs;
-    int init;
-    int offset;
-} SRaceLine;
-
-typedef struct
+typedef struct 
 {
     tSituation *s;
-    double rInverse;
-    double mInverse;
-    double aInverse;
-    double amInverse;
-    double decel;
-    double adecel;
-    double lane;
-    double ksteer;
-    double tsteer;
-    double collision;
-    double speedangle;
-    double angle;
-    double speed;
-    double tspeed;
-    double avspeed;
-    double slowavspeed;
-    double accel_redux;
-    double overtakecaution;
-    double offset;
-    double lookahead;
-    double steer;
-    double NSsteer;
-    double NSasteer;
-    double laststeer;
-    double braking;
-    double rlangle;
-    double followdist;
-    double speedchange;
-    double aligned_time;
-    int thisdiv;
-    int nextdiv;
-    int mode;
+    v2d *target;
+    int next_apex;
     int avoidmode;
-    int closing;
-    int exiting;
-    int alone;
-    int outsideline;
-    int insideline;
-    v2d target;
-} LRaceLineData;
+    float speed;
+    float left_speed;
+    float right_speed;
+    float left_speed_outsteer;
+    float right_speed_outsteer;
+    float leftlane_2left;
+    float rightlane_2right;
+    float raceoffset;
+    float lookahead;
+    float racesteer;
+    float laststeer;
+    float angle;
+    float target_lane;
+    float speedangle;
+    double error;
+    double vnerror;
+    float skid;
+    bool coll;
+    LLineMode *linemode;
+} RaceLineDriveData;
 
-typedef struct
+class Driver;
+class LLearn;
+  
+class LRaceLine 
 {
-    int i0;
-    int i1;
-    int i2;
-    int i3;
-    double d0;
-    double d1;
-    double d2;
-    double d3;
-    double t;
-    double a0;
-    double a1;
-    double a2;
-    double a3;
-} InterpData;
+  public:
+    LRaceLine(Driver *pdriver);
+    ~LRaceLine();
 
-class LRaceLine
-{
-public:
-    LRaceLine();
+    void setCornerSpeeds( double nml, double mid, double slow ) { CornerSpeed = nml; CornerSpeedMid = mid; CornerSpeedSlow = slow; }
+    void setBrakeDist( double wi ) { BrakeDist = wi; }
+    void setCar( tCarElt *mycar, SingleCardata *mycardata ) { car = mycar; cardata = mycardata; }
+    void setRwData( tTrack* t, void **carParmHandle, tSituation *s);
+    void setOverrides( LManualOverrideCollection *overrides ) { overrideCollection = overrides; }
 
-    void setMinCornerInverse( double wi ) { MinCornerInverse = wi; }
-    void setCornerSpeed( double wi ) { CornerSpeed = wi; }
-    void setCornerAccel( double wi ) { CornerAccel = wi; }
-    void setBrakeDelay( double wi ) { BrakeDelay = wi; }
-    void setIntMargin( double wi ) { IntMargin = wi; }
-    void setExtMargin( double wi ) { ExtMargin = wi; }
-    void setAvoidSpeedAdjust( double wi ) { AvoidSpeedAdjust = wi; }
-    void setCarHandle( void *pCarHandle ) { carhandle = pCarHandle; }
-    void setSkill( double tskill) { skill = tskill; }
-    void setCW( double cw ) { CW = cw; }
-    int getCarefulBrake() { return GetModI( tCarefulBrake, Next ); }
-    double getRLAngle(int div);
+    LManualOverrideCollection *overrideCollection;
 
-    double MinCornerInverse;
-    double IncCornerInverse;
-    double IncCornerFactor;
-    double BaseCornerSpeed;
-    double BaseCornerSpeedX;
-    double DefaultCornerSpeedX;
+    double minTurnInverse;
     double CornerSpeed;
-    double CornerSpeedX;
-    double CornerAccel;
-    double BrakeDelay;
-    double BrakeDelayX;
-    double BrakeMod;
-    double BrakePower;
+    double turnSpeed;
+    double CornerSpeedMid;
+    double CornerSpeedSlow;
+    double CornerSpeedFactor;
+    double outsideCornerSpeed;
+    double insideCornerSpeed;
+    double offlineTurnSpeed;
+    double offlineBrakeDist;
+    double brakeDist;
+    double brakeDistMid;
+    double brakeDistSlow;
+    double BrakeDist;
     double IntMargin;
     double ExtMargin;
-    double AvoidSpeedAdjust;
-    double AvoidSpeedAdjustX;
-    double AvoidBrakeAdjust;
-    double AvoidBrakeAdjustX;
-    double CurveFactor;
-    double SecurityZ;
-    double MaxSteerTime;
-    double MinSteerTime;
-    double TargetSpeed;
-    double ATargetSpeed;
-    double SteerGain;
-    double SteerSkid;
-    double SkidAccel;
-    double DivLength;
-    double AccelCurveDampen;   //
-    double BrakeCurveDampen;
-    double AccelCurveLimit;
-    double BrakeCurveLimit;
-    double AccelExit;          //
-    double AvoidAccelExit;     //
-    double OvertakeCaution;    // default 0.0 - higher increases caution in overtaking
-    double SkidCorrection;     // default 1.0.  Higher corrects steer errors faster & reduces wobble
-    double SteerRIAcc;
-    double SteerRIAccC;
-    double BumpCaution;
-    double SlopeFactor;
-    double ExitBoost;
-    double ExitBoostX;
-    double AvoidExitBoost;
-    double AvoidExitBoostX;
-    double AvoidOffset;
-    bool RaceLineDebug;
-
-    double CW;
+    double AvoidIntMargin;
+    double AvoidExtMargin;
+    double speedAdjust;
     double wheelbase;
     double wheeltrack;
-    double k1999steer;
-    double laststeer;
-    double lastNksteer;
-    double lastNasteer;
-    double skill;
-    double lastyaw;
+    double coldTyreFactor;
+    double curveFactor;
+    double curveAccel;
+    double curveBrake;
+    double bumpCaution;
+    double offlineBumpCaution;
+    double slopeFactor;
+    double offlineSlopeFactor;
+    double fulltankPercent;
+    double midtankPercent;
     double maxfuel;
-    double deltaTime;
-    double avgerror;
+    double edgeLineMargin;
+    double lookAhead;
+    double lookAheadOut;
+    double lookAheadEmpty;
+	double lookAheadColdFactor;
+    double outsteerSpeedReducer;
+    double steerSkidFactor;
+    double steerSkidOfflineFactor;
+    double errorCorrectionFactor;
+    double outsideSteeringDampener;
+    double outsideSteeringDampenerOverlap;
+    double outsideSteeringDampenerAccel;
+    double steerTimeFactor;
+
+    int iterations;
+    int side_iterations;
+    int rl_speed_mode;
+    int saveTrack;
+    int loadTrack;
 
     int Divs;
-    int AccelCurveOffset;
-    int Iterations;
-    int SteerMod;
-    int SRLidx;
-    int OfftrackAllowed;
+    int DivLength;
+    int Segs;
 
-    double roughlimit;
+    int racelineOverride;
 
+    Driver *driver;
+
+    double Width;
+    double Length;
+    double TargetSpeed;
+    double *tSegDist;
+    int *tSegIndex;
+    tTrackSeg **tSegment;
+    double *tElemLength;
+    double **tx;
+    double **ty;
+    double **tz;
+    double **tzd;
+    double **tLane;
+    double **tRInverse;
     double **tSpeed;
-    double *tLaneShift;
-    int *tDivSeg;
+    int **tDivSeg;
+    double *tDistance;
+    double *tMaxSpeed;
+    double *tMaxSpeedCold;
+    double **txLeft;
+    double **tyLeft;
+    double **txRight;
+    double **tyRight;
+    double *tFriction;
+    double *tzLeft;
+    double *tzRight;
 
-    LRLMod *tRLMarginRgt;
-    LRLMod *tRLMarginLft;
-    LRLMod *tOTCaution;
-    LRLMod *tRLSpeed;
-    LRLMod *tRLBrake;
-    LRLMod *tIntMargin;
-    LRLMod *tExtMargin;
-    LRLMod *tSecurity;
-    LRLMod *tDecel;
-    LRLMod *tADecel;
-    LRLMod *tSpeedLimit;
-    LRLMod *tCornerAccel;
-    LRLMod *tAccelCurveDampen;
-    LRLMod *tCurveFactor;
-    LRLMod *tAvoidSpeed;
-    LRLMod *tAvoidSpeedX;
-    LRLMod *tAvoidBrake;
-    LRLMod *tAvoidBrakeX;
-    LRLMod *tAccelCurveOffset;
-    LRLMod *tCarefulBrake;
-    LRLMod *tSkidAccel;
-    LRLMod *tAccelExit;
-    LRLMod *tSkidCorrection;
-    LRLMod *tBumpCaution;
-    LRLMod *tBrakeCurve;
-    LRaceLineData *data;
+    double Time;
 
     int fDirt;
+    int Prev;
     int Next;
+    int NextNextNext;
     int This;
-    int CarDiv;
-    tTrack *track;
 
-    void *carhandle;
+	int m_raceType;
+
     tCarElt *car;
 
     void UpdateTxTy(int i, int rl);
-    void SetSegmentInfo(const tTrackSeg *pseg, double d, int i, double l, int rl);
-    void AllocTrack(tTrack *ptrack);
-    void AllocRaceline(int rl, const char *trackname);
-    void FreeRaceline(int rl);
-    void FreeTrack(bool freeall);
-    void SplitTrack(tTrack *ptrack, int rl);
-    double SegCamber(int rl, int div);
-    double GetRInverse(int prev, double x, double y, int next, int rl);
-    void AdjustRadius(int prev, int i, int next, double TargetRInverse, int rl, double Security = -1);
+    void SetSegmentInfo(const tTrackSeg *pseg, double d, int i, double l);
+    void SplitTrack(tTrack *ptrack, int rl, bool preLoaded);
+    double GetRInverse(int prev, double x, double y, int next, double *tX, double *tY);
+	double GetRInverse(double prevx, double prevy, double x, double y, double nextx, double nexty);
+    double getRInverseWithDiv(int raceline, int div)
+    { 
+        if (div >= 0) return tRInverse[raceline][div];
+        
+        return tRInverse[raceline][Next]; 
+    }
+    
+    double getRInverse(int raceline = LINE_RL) 
+    { 
+        return tRInverse[raceline][Next]; 
+    }
+    
+    double getRInverse(double distance) { int d = ((Next + int(distance/DivLength)) % Divs); return tRInverse[LINE_RL][d]; }
+    
+    void AdjustRadius(int prev, int i, int next, double TargetRInverse, int rl, double Security = 0);
     void Smooth(int Step, int rl);
-    void ComputeSpeed(int rl);
     void StepInterpolate(int iMin, int iMax, int Step, int rl);
     void Interpolate(int Step, int rl);
-    void CalcZCurvature(int rl);
-    void TrackInit(tSituation *p);
-    void InitTrack(tTrack* ptrack, tSituation *p);
-    void CalcAvoidSpeed( int next, LRaceLineData *data, double angle );
-    int findNextCorner( double *nextCRinverse );
+    void InitTrack(tTrack* track, tSituation *p);
+	void CreateSideRaceline(int rl);
     void NewRace(tCarElt* newcar, tSituation *s);
-    void GetRaceLineData(tSituation *s, LRaceLineData *data);
-    void GetPoint( double offset, vec2f *rt, double *mInverse );
-    void GetSteerPoint( double lookahead, vec2f *rt, double offset = -100.0, double time = -1.0 );
-    void GetRLSteerPoint( vec2f *rt, double *offset, double time );
-    int isOnLine();
-    double correctLimit(double avoidsteer, double racesteer, int insideline);
-    double getAvoidSpeedDiff( float distance );
-    double getK1999Steer() { return k1999steer; }
-    double getRInverse(int div);
-    double getRInverse() { return getRInverse(Next); }
-    void getOpponentInfo(double distance, int rl, double *aspeed, double *rInv, double offset = -1000.0);
-    double getRLMarginRgt(int divadvance) { int div=(Next+divadvance)%Divs; return GetModD( tRLMarginRgt, div ); }
-    double getRLMarginLft(int divadvance) { int div=(Next+divadvance)%Divs; return GetModD( tRLMarginLft, div ); }
-    double getAvoidSteer(double offset, LRaceLineData *data);
-    void NoAvoidSteer() { lastNasteer = lastNksteer; }
-    double calcAvoidSpeed( double offset, double rInv, double speed, double rlspeed );
+    void GetRaceLineData(RaceLineDriveData *data, bool transitioning);
+    void GetPoint( float offset, float lookahead, vec2f *rt );
+    
+    int isOnLine( int line);
+    double correctLimit(int line);
+    double getAvoidSpeed( float distance1, float distance2 );
+    double getLookAhead(int rl, double leftMargin, double rightMargin, bool coll);
+    double getLineSpeed(int Div, int rl) 
+    { 
+        switch (rl)
+        {
+            case LINE_RL:
+                return tSpeed[LINE_RL][Div];
+            case LINE_RL_MID:
+                return tSpeed[LINE_RL_MID][Div];
+            case LINE_RL_SLOW:
+                return tSpeed[LINE_RL_SLOW][Div];
+            case LINE_LEFT:
+                return tSpeed[LINE_LEFT][Div];
+            case LINE_RIGHT:
+                return tSpeed[LINE_RIGHT][Div];
+            case LINE_MID:
+                return tSpeed[LINE_MID][Div];
+            default:
+                return 0.0;
+        }
+        return 0.0;
+    }
+    
+    double getMaxSpeed(int Div, int rl);
+    double getBumpCaution(int Div, int rl);
+    double getFriction(int Div);
+    double getCurveFactor(int Div, bool isBraking);
+    double getCornerSpeed( int Div, int rl);
+    double getBrakeDist( int Div, int rl);
+    double getIntMargin( int raceline, int Div, double rInverse );
+    double getExtMargin( int raceline, int Div, double rInverse );
+    double getMinTurnInverse(int raceline);
+    double getSlowestSpeedForDistance(double distance, int raceline, double midMargin, int *div = NULL);
+    int findNextCorner(tCarElt *ocar, int index = -1, int *apex_div = NULL, double *distance = NULL);
+    int findNextBrakingZone();
+    double SegCamberForNext();
+    int DivIndexForCar(tCarElt *theCar, double catchtime = -1.0);
+    int DivIndexForCarDistance(tCarElt *theCar, double distance);
+    void slowestSpeedBetweenDivs(int startdiv, int enddiv, double *rlspeed, double *leftspeed, double *rightspeed);
+    void ComputeRacelineSpeed(int i, int rl, double **tSpeed, int speedrl);
+    void ComputeRacelineBraking(int i, int rl, double **tSpeed, int speedrl);
+    void UpdateRacelineSpeeds(int raceType);
+    
+	bool InBrakingZone(int rl) 
+	{
+		if (tSpeed[rl][Next] < tSpeed[rl][This])
+			return true;
+		return false;
+	}
+	
+	void SmoothSideRacingLines();
 
+#define MAX_TDATA 50
+    int turnSpeedSegStart[MAX_TDATA];
+    int turnSpeedSegEnd[MAX_TDATA];
+    float segTurnSpeed[MAX_TDATA];
 
-    // interpolation...
-    void CI_Update(double dist);
-    double CubicInterpolation(const double *pd) const;
-    double LinearInterpolation(const double *pd) const;
-    InterpData interpdata;
+    int brakeDistSegStart[MAX_TDATA];
+    int brakeDistSegEnd[MAX_TDATA];
+    float segBrakeDist[MAX_TDATA];
+
+    int MspeedSegStart[MAX_TDATA];
+    int MspeedSegEnd[MAX_TDATA];
+    float segMaxSpeed[MAX_TDATA];
+
+    int extMargSegStart[MAX_TDATA];
+    int extMargSegEnd[MAX_TDATA];
+    float segExtMargin[MAX_TDATA];
+
+    int intMargSegStart[MAX_TDATA];
+    int intMargSegEnd[MAX_TDATA];
+    float segIntMargin[MAX_TDATA];
+
+    int line_verbose;
+    int steer_verbose;
+    int LineIndex;
+    int LineSave;
+    int rlLine;
+    int racelineDebug;
+
+    double last_left_steer;
+    double last_rl_steer;
+    double last_right_steer;
+    double last_steer;
+    double last_last_steer;
+    double last_steer_diff;
+    int last_target_raceline;
+    double last_lane;
+    double cornersteer;
+
+    bool hasSlow;
+    bool hasMid;
+    int useMergedSpeed;
+
+	tTrack *m_pTrack;
+
+	double lastUpdateDist;
+	double stopUpdateDist;
+	double resumeUpdateDist;
+	bool hasLastUpdate;
+
+    SingleCardata *cardata;
+	LLearn *learn;
+
+	double CalculateSpeedAtDiv(LLineMode *lineMode, int div);
+	double OfflineLane(int div, double leftMargin, double rightMargin);
+	bool IsSlowerThanSpeedToDiv(LLineMode *lineMode, double speed, int div, double *slowSpeed);
+	double CalculateOfflineSpeed(int index, int next, double leftMargin, double rightMargin);
+	bool ApproachingBrakeZone(tCarElt *pCar = NULL);
+
+  private:
+    // Utility functions
+    void saveFile();
+    void StoreData(tTrack* track);
+    void WriteLine(tTrack* track);
+    void WriteTrack(tTrack* track);
+    int DivIndex(RaceLineDriveData *data, int raceline, double *X, double *Y);
+    int DivIndex(RaceLineDriveData *data, double leftMargin, double rightMargin, double *X, double *Y);
+    double SegCamber(int rl, int div);
+    void CalcZCurvature(int rl);
+    float AdjustLookahead(int raceline, float lookahead);
+    double CaTT();
+	double AdjustTxForMargin(int div, double lane);
+	double AdjustTyForMargin(int div, double lane);
+	double RInverseForMargin(int div, double leftMargin, double rightMargin);
+
+	double CalculateSpeed(RaceLineDriveData *data, double X, double Y, int index, int next, double leftMargin, double rightMargin, double tLeftMargin, double tRightMargin);
+    double CalculateSpeed(RaceLineDriveData *data, double X, double Y, int index, int next, double *tSpd, double *tX, double *tY);
+    double CalculateOffset(double *tX, double *tY, int next, int rl);
+	double CalculateOffset(int div, double leftMargin, double rightMargin);
+    double CalculateCurvature(double c0, double tRINext, double tRIIndex);
+    double CalculateMixedCurvature(double c0, int Index, double transition_percentage);
+    void SteerTheCar(RaceLineDriveData *data, int raceline);
+	void SteerTheCarOffline(RaceLineDriveData *data);
+	void CalculateOfflineSpeed(RaceLineDriveData *data);
+    void updateRLSpeedMode();
+    float smoothSteering(float steercmd, float laststeer);
+    bool LoadTrack(tTrack *track, tSituation *s);
+    double Point2Lane(int rl, double x, double y);
+    void SaveTrack(tTrack *track, tSituation *s);
+    int readInt(FILE *fp);
+    double readDouble(FILE *fp);
+    void removeNewLineCharacters(char *text);
 };
-
-#endif 
+#endif // _RACELINE_H_

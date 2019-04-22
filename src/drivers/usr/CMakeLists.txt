@@ -13,19 +13,27 @@ SET(ROBOT_SOURCES
   src/cardata.cpp
   src/driver.h
   src/driver.cpp
+  src/learning.h
   src/linalg.h
-  src/mod.h
-  src/mod.cpp
+  src/line.cpp
+  src/line.h
+  src/linemode.h
+  src/linemode.cpp
+  src/manual_override.cpp
+  src/manual_override.h
   src/opponent.h
   src/opponent.cpp
   src/pit.h
   src/pit.cpp
+  src/quadratic.cpp
+  src/quadratic.h
   src/raceline.h
   src/raceline.cpp
   src/spline.h
   src/spline.cpp
   src/strategy.h
   src/strategy.cpp
+  src/Vec2d.h
   src/globaldefs.h)
 
 # Official-only USR instances.

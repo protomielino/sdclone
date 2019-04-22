@@ -1,10 +1,8 @@
 /***************************************************************************
 
-    file                 : spline.h
-    created              : Wed Mai 14 19:53:00 CET 2003
-    copyright            : (C) 2003-2004 by Bernhard Wymann
-    email                : berniw@bluewin.ch
-    version              : $Id$
+    file        : Vec2d.h
+    created     : 9 Apr 2006
+    copyright   : (C) 2006 Tim Foden
 
  ***************************************************************************/
 
@@ -17,27 +15,28 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef _SPLINE_H_
-#define _SPLINE_H_
+// Vec2d.h: interface for the Vec2d class.
+//
+//////////////////////////////////////////////////////////////////////
 
-class SplinePoint {
-    public:
-        float x;    // x coordinate.
-        float y;    // y coordinate.
-        float s;    // slope.
+#ifndef _VEC2D_H_
+#define _VEC2D_H_
+
+#include <v2_t.h>
+#include <tgf.h>
+
+class Vec2d : public v2t<double>
+{
+public:
+    Vec2d() {}
+    Vec2d( const v2t<double>& v ) : v2t<double>(v) {}
+    Vec2d( double x, double y ) : v2t<double>(x, y) {};
+
+    Vec2d&	operator=( const v2t<double>& v )
+    {
+        v2t<double>::operator=(v);
+        return *this;
+    }
 };
 
-
-class Spline {
-    public:
-        Spline(int dim, SplinePoint *s);
-
-        float evaluate(float z);
-
-    private:
-        SplinePoint *s;
-        int dim;
-};
-
-#endif // _SPLINE_H_
-
+#endif // _VEC2D_H_

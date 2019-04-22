@@ -31,20 +31,10 @@
 #include <raceman.h>
 #include <robottools.h>
 #include <robot.h>
+//#include <portability.h>
 
 #include "driver.h"
 #include "cardata.h"
-
-#define OPP_IGNORE		0
-#define OPP_FRONT		(1<<0)
-#define OPP_BACK		(1<<1)
-#define OPP_SIDE		(1<<2)
-#define OPP_COLL		(1<<3)
-#define OPP_LETPASS		(1<<4)
-#define OPP_FRONT_FAST	(1<<5)
-#define OPP_FRONT_FOLLOW	(1<<6)
-#define OPP_SIDE_COLL		(1<<7)
-
 
 class Driver;
 
@@ -59,90 +49,166 @@ public:
     static void setTrackPtr(tTrack *track) { Opponent::track = track; }
 
     tCarElt *getCarPtr() { return car; }
+
     int getState() { return state; }
     float getCatchDist() { return catchdist; }
-    float getDistance() { return distance; }
+    double getDistance() { return distance; }
     float getBrakeDistance() { return brakedistance; }
     float getSideDist() { return sidedist; }
     float getWidth() { return cardata->getWidthOnTrack(); }
     float getSpeed() { return cardata->getSpeedInTrackDirection(); }
-    float getOverlapTimer() { return overlaptimer; }
-    float getTrueSpeed() { return getSpeed(); /*cardata->getTrueSpeed();*/ }
+    float getOverlapTimer() { return (float)overlaptimer; }
+    float getBrakeOvertake () { return brake_overtake_filter; }
+    float getCollSpeed () { return collspeed; }
+    double getTimeImpact() { return t_impact; }
+    double getTimeToSide() { return t_toside; }
+    double getCurrentLft() { return currentLft; }
+    double getCurrentRgt() { return currentRgt; }
+    double getImpactLft() { return impactLft; }
+    double getImpactRgt() { return impactRgt; }
+    double getSideSpeed() { return prevToLeft - toLeft; }
+    double getTrueSpeedDiff() { return trueSpeedDiff; }
+    double getProjectedSpeedAngle(double time) { return speedAngle[0] + (speedAngle[0] - speedAngle[3]) * (time/(4*deltaTime))*0.5; }
 
+    bool getWithinBrakeDist() { return withinBrakeDist; }
+    bool getHasSlowerSpeed() { return hasSlowerSpeed; }
     bool isTeamMate() { return teammate; }
+
     int getDamage() { return car->_dammage; }
     int getTeam() { return team; }
-    double getNextLeft() { return nextleft; }
+
     void markAsTeamMate() { teammate = true; }
     void setIndex(int i) { index = i; }
-    int getIndex() { return index; }
-    float getTimeImpact() { return t_impact; }
 
-    void update(tSituation *s, Driver *driver, int DebugMsg);
+    int getIndex() { return index; }
     float getSpeedAngle() { return speedangle; }
-    float getAngle() { return angle; }
+    float getAvgLateralMovt() { return (float)avgLateralMovt; }
+
+    //void init (tCarElt *ocar, tCarElt *mcar);
+    void update(tSituation *s, Driver *driver);
+    void initState();
+    void calcState(float Speed, Driver *driver);
+    void calcDist();
+    void calcSpeed();
+
+    double getSpeedAngle(double angle);
+    float getCornerDist();
+    float getCornerDist(tCarElt *car1, tCarElt *car2);
+
+    double speed;
+    float oppSpeed;
+    float mySpeed;
+    int state;        // The relation to the opponent (E.G opponent is in front me or behind...):
+    bool oppFront;
+    bool oppBehind;
+    bool oppFaraway;
+    bool oppSlower;
+    bool oppFaster;
+    bool oppLetPass;
+    double brake_multiplier;
+    double brake_warn_multiplier;
+    double deltamult;
+    double deltaTime;
+    double simTime;
+    double left_toMid;
+    double right_toMid;
 
 private:
-    float getDistToSegStart();
+    float getDistToSegStart(tCarElt *theCar);
+    void updateOverlapTimer(tSituation *s, tCarElt *mycar);
     int polyOverlap(tPosd *op, tPosd *dp);
-    int testCollision(Driver *driver, double impact, double speedincr, vec2f *targ = NULL);
-    void updateOverlapTimer(tSituation *s, tCarElt *mycar, int alone);
-    float GetCloseDistance( float distn, tCarElt *mycar );
+    int testLinearCollision2(Driver *driver);
+    int testLinearCollision(Driver *driver, double t_impact, double speed_difference, double catch_distance, double multiplier);
+    int testRacelineCollision(Driver *driver, double distance, double t_impact, double future_left = -999, double future_right = -999);
+    int testQuadraticCollision(Driver *driver);
+    int testCalculatedCollision(Driver *driver);
+    double CalcCollSpeed(Driver *driver);
 
-    float distance;		// approximation of the real distance, negative if the opponent is behind.
-    float brakedistance;		// distance minus opponent car length
-    float catchdist;	// distance needed to catch the opponent (linear estimate).
-    float sidedist;		// approx distance of center of gravity of the cars.
-    float deltamult;
-    float speedangle;
-    float prevspeedangle;
-    float angle;
-    float lastyr;
-    float nextleft;
-    float prevleft;
-    float t_impact;
-    float brakemargin;
-    int state;			// State variable to characterize the relation to the opponent, e. g. opponent is behind.
+    double distance;        // approximation of the real distance, negative if the opponent is behind.
+    double distance2;
+    double distance3;
+    float brakedistance;        // distance minus opponent car length
+    float catchdist;    // distance needed to catch the opponent (linear estimate).
+    float sidedist;        // approx distance of center of gravity of the cars.
+    double t_impact;
+    double t_toside;
+    float collspeed;
+    double prev_speed_X;
+    double prev_speed_Y;
+    double d_prev_speed_X;
+    double d_prev_speed_Y;
+    double average_AX;
+    double average_AY;
+    double avgLateralMovt;
+    double prevToLeft;
+    double speedAngle[4];
+    double speedDelta;
+    double prevSpeed;
+
+    double currentLft;
+    double currentRgt;
+    double impactLft;
+    double impactRgt;
+
+    double left_speed_y;
+    double right_speed_y;
+    double last_left_toMid;
+    double last_right_toMid;
+
+    float brake_overtake_filter;
+
     int team;
-    int teamindex;
     int index;
-    float overlaptimer;
+    double overlaptimer;
+    float speedangle;
+    float relativeangle;
+    double toLeft;
 
-    tCarElt *car;
-    SingleCardata *cardata;		// Pointer to global data about this opponent.
-    bool teammate;				// Is this opponent a team mate of me (configure it in setup XML)?
+    bool hasSlowerSpeed;
+
+    double trueSpeedDiff;
+
+    tCarElt *car;            // pointer to the opponents car
+    tCarElt *mycar;          // pointer to the my car
+    SingleCardata *cardata;        // Pointer to global data about this opponent.
+
+    bool teammate;            // Is this opponent a team mate of me (configure it in setup XML)?
+    bool firstTime;
+    bool withinBrakeDist;
 
     // class variables.
     static tTrack *track;
 
     // constants.
+    double FRONTCOLL_MARGIN;
+    double SIDECOLL_MARGIN;
     static const float FRONTCOLLDIST;
     static const float BACKCOLLDIST;
-    static const float LENGTH_MARGIN;
-    static const float SIDE_MARGIN;
+
     static const float EXACT_DIST;
     static const float LAP_BACK_TIME_PENALTY;
     static const float OVERLAP_WAIT_TIME;
     static const float SPEED_PASS_MARGIN;
+    static const int MAX_DAMAGE_DIFF;
 };
-
 
 // The Opponents class holds an array of all Opponents.
 class Opponents
 {
 public:
-    Opponents(tSituation *s, Driver *driver, Cardata *cardata);
+    Opponents(tSituation *s, Driver *driver, Cardata *cardata, double brake_multiplier, double brake_warn_multiplier);
     ~Opponents();
 
-    void update(tSituation *s, Driver *driver, int DebugMsg);
+    void update(tSituation *s, Driver *driver);
     Opponent *getOpponentPtr() { return opponent; }
     int getNOpponents() { return nopponents; }
     void setTeamMate(const char *teammate);
+    tCarElt *getTeamMateCar();
+    bool isBehindFriend(int pos);
 
 private:
     Opponent *opponent;
     int nopponents;
 };
-
 
 #endif // _OPPONENT_H_
