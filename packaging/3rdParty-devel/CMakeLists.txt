@@ -405,12 +405,11 @@ else(OPTION_FREETYPE)
 endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
-   set(CURL_PROJECT curl-7.64.0)
+   set(CURL_PROJECT curl-7.64.1)
    set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off -DCMAKE_DEBUG_POSTFIX=)
-   # may only be needed for Madbad's web stuff
    ExternalProject_Add(${CURL_PROJECT}
-   URL https://curl.haxx.se/download/curl-7.64.0.tar.bz2
-   URL_HASH SHA256=d573ba1c2d1cf9d8533fadcce480d778417964e8d04ccddcc76e591d544cf2eb
+   URL https://curl.haxx.se/download/curl-7.64.1.tar.bz2
+   URL_HASH SHA256=4cc7c738b35250d0680f29e93e0820c4cb40035f43514ea3ec8d60322d41a45d
    CMAKE_ARGS ${CURL_ARGS}
    DEPENDS ${ZLIB_PROJECT}
    )
