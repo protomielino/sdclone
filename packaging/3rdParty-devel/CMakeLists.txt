@@ -385,7 +385,7 @@ endif(OPTION_SQLITE3)
    # ========== For OpenSceneGraph =============
 
 if(OPTION_FREETYPE)
-   set(FREETYPE_PROJECT freetype-2.9.1)
+   set(FREETYPE_PROJECT freetype-2.10.0)
    set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false 
                                              -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true 
                                              -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE 
@@ -394,25 +394,12 @@ if(OPTION_FREETYPE)
                                              -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=TRUE)
 
    ExternalProject_Add(${FREETYPE_PROJECT}
-   DOWNLOAD_NAME ft291.zip
-   URL https://sourceforge.net/projects/freetype/files/freetype2/2.9.1/ft291.zip/download
-   URL_HASH SHA256=60bbfa0b9772bdc3489006c937a977dcbd03bb9c0f4912c777c174cbe4cb552f 
+   DOWNLOAD_NAME ft2100.zip
+   URL https://sourceforge.net/projects/freetype/files/freetype2/2.10.0/ft2100.zip/download
+   URL_HASH SHA256=804ca0eb2eb65ac8fbd4e9cc00e60217a3b1d6aa57cf9af8fc8f60a7dbaead06 
    CMAKE_ARGS ${FREETYPE_ARGS}
+   DEPENDS ${ZLIB_PROJECT} ${PNG_PROJECT}
    )
-   
-   ExternalProject_Add_Step(${FREETYPE_PROJECT} freetype_cmake
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/freetype-2.9.1.CMakeLists.txt"
-           "<SOURCE_DIR>/CMakeLists.txt"
-   DEPENDEES update # do after update
-   DEPENDERS patch  # do before patch
-   )
-   # Rename the lib to remove 'd' post-fix for debug builds
-#   ExternalProject_Add_Step(${FREETYPE_PROJECT} freetypelib_rename
-#   COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/freetype${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/freetype.lib
-#   DEPENDEES install
-#   )
-
 else(OPTION_FREETYPE)
    set(FREETYPE_PROJECT )
 endif(OPTION_FREETYPE)
