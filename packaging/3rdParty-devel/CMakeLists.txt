@@ -156,6 +156,13 @@ if(OPTION_OPENAL)
          URL http://www.openal-soft.org/openal-releases/openal-soft-1.18.2.tar.bz2 
          URL_HASH SHA256=9f8ac1e27fba15a59758a13f0c7f6540a0605b6c3a691def9d420570506d7e82
          CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
+      ExternalProject_Add_Step(openal-soft-1.18.2 openal_patch_cmake
+         COMMAND ${CMAKE_COMMAND} -E copy_if_different
+         "${CMAKE_SOURCE_DIR}/patches/openal-soft-1.18.2.CMakeLists.txt"
+         "<SOURCE_DIR>/CMakeLists.txt"
+         DEPENDEES update # do after update
+         DEPENDERS patch  # do before patch
+         )
    else(MSVC_VERSION LESS 1900)
       ExternalProject_Add(openal-soft-1.19.1 
          URL http://www.openal-soft.org/openal-releases/openal-soft-1.19.1.tar.bz2
