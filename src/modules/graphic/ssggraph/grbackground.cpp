@@ -306,8 +306,8 @@ grInitBackground()
                 snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
                 cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude,
                                                   100 / domeSizeRatio, 100 / domeSizeRatio);
-                cloudLayers[0]->setSpeed(0);
-                cloudLayers[0]->setDirection(0);
+                cloudLayers[0]->setSpeed(grTrack->local.windspeed);
+                cloudLayers[0]->setDirection(grTrack->local.winddir);
 
                 GfLogInfo("   * layer 1 : speed=30, direction=40, texture=%s\n", buf);
             }
@@ -330,7 +330,7 @@ grInitBackground()
                 snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex2);
                 cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude2,
                                                   100 / domeSizeRatio, 100 / domeSizeRatio);
-                cloudLayers[1]->setSpeed(grTrack->local.windspeed);
+                cloudLayers[1]->setSpeed(grTrack->local.windspeed / 2);
                 cloudLayers[1]->setDirection(grTrack->local.winddir);
 
                 GfLogInfo("   * layer 2 : speed=60, direction=45, texture=%s\n", buf);
@@ -366,8 +366,8 @@ grInitBackground()
                 snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
                 cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, grTrack->local.cloud_altitude,
                                                   100 / domeSizeRatio, 100 / domeSizeRatio);
-                cloudLayers[0]->setSpeed(0);
-                cloudLayers[0]->setDirection(0);
+                cloudLayers[0]->setSpeed(grTrack->local.windspeed);
+                cloudLayers[0]->setDirection(grTrack->local.winddir);
 
                 GfLogInfo("   * layer 1 : speed=30, direction=40, texture=%s\n", buf);
             }

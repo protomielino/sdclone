@@ -39,9 +39,9 @@ void SingleCardata::update()
         corner1[i].ay = car->_corner_y(i);
 
         if (i == FRNT_LFT || i == REAR_LFT)
-            lmTT = MAX(lmTT, 0.5);
+            lmTT = MAX(lmTT, 1.0);
         else
-            rmTT = MAX(rmTT, 0.5);
+            rmTT = MAX(rmTT, 1.0);
     }
 
     lastspeed[2].ax = lastspeed[1].ax;
@@ -73,6 +73,8 @@ void SingleCardata::init( CarElt *pcar )
 {
     int i;
     car = pcar;
+
+    HasABS = HasESP = HasTCL = HasTYC = false;
 
     for (i=0; i<4; i++)
     {
@@ -109,6 +111,7 @@ void SingleCardata::init( CarElt *pcar )
     RH *= 1.5f; RH = RH*RH; RH = 2.0f * exp(-3.0f * RH);
     tdble CL = GfParmGetNum(car->_carHandle, SECT_AERODYNAMICS, PRM_FCL, (char *)NULL, 0.0f) +
                GfParmGetNum(car->_carHandle, SECT_AERODYNAMICS, PRM_RCL, (char *)NULL, 0.0f);
+
     float fwingarea = GfParmGetNum(car->_carHandle, SECT_FRNTWING, PRM_WINGAREA, (char*) NULL, 0.0f);
     float fwingangle = GfParmGetNum(car->_carHandle, SECT_FRNTWING, PRM_WINGANGLE, (char*) NULL, 0.0f);
     float rwingarea = GfParmGetNum(car->_carHandle, SECT_REARWING, PRM_WINGAREA, (char*) NULL, 0.0f);
@@ -116,6 +119,7 @@ void SingleCardata::init( CarElt *pcar )
     float rwingArea = rwingarea * sin(rwingangle);
     float fwingArea = fwingarea * sin(fwingangle);
     float wingCA = 1.23f * (fwingArea + rwingArea);
+
     CA = RH * CL + 4.0f * wingCA;
     CA_FW = 4 * 1.23f * fwingArea;
     CA_RW = 4 * 1.23f * rwingArea;
@@ -134,8 +138,8 @@ void SingleCardata::init( CarElt *pcar )
 
 void SingleCardata::updateModel()
 {
-    aTT = 0.0f; aFTT = 0.0f; mFTT = 0.0f;
-    float mLTT = 0.0f, mRTT = 0.0f;
+    aTT = 1.0f; aFTT = 1.0f; mFTT = 1.0f;
+    float mLTT = 0.9f, mRTT = 0.9f;
     tdble mG = 0.0f;
     int i;
 

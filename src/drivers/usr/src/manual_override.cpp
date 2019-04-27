@@ -279,16 +279,18 @@ LManualOverrideCollection::~LManualOverrideCollection()
     free(overrides);
 }
 
-void LManualOverrideCollection::loadFromFile(char *trackName, const char *carName, int raceType)
+void LManualOverrideCollection::loadFromFile(char *trackName, const char *botname, const char *carName, int raceType)
 {
     char buffer[1025];
     char truncatedTrackName[512];
     int len = strlen(trackName);
     strcpy(truncatedTrackName, trackName);
 
+    BOT_NAME = botname;
+
     if (len > 4)
         truncatedTrackName[len-4] = 0;
-    snprintf(buffer, 1024, "%sdrivers/%s/%s/%s/%s.dat", GetDataDir(), "usr_sc", carName, (raceType == RM_TYPE_RACE ? "race" : (raceType == RM_TYPE_QUALIF ? "qualifying" : "practice")), truncatedTrackName);
+    snprintf(buffer, 1024, "%sdrivers/%s/%s/%s/%s.dat", GetDataDir(), botname, carName, (raceType == RM_TYPE_RACE ? "race" : (raceType == RM_TYPE_QUALIF ? "qualifying" : "practice")), truncatedTrackName);
     FILE *filepointer = fopen(buffer, "r");
 
     if (!filepointer)
@@ -340,7 +342,7 @@ void LManualOverrideCollection::saveToFile()
 {
 #if 0
     char buffer[1025];
-    snprintf(buffer, 1024, "%sdrivers/%s/%s/%s.dat_save", GetDataDir(), BOT_NAME, carName, trackName);
+    snprintf(buffer, 1024, "%sdrivers/%s/%s/%s.dat_save", GetLocalDir(), BOT_NAME, carName, trackName);
     FILE *filepointer = fopen(buffer, "w");
 
     if (filepointer)

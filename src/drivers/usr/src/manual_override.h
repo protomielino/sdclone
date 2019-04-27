@@ -62,13 +62,14 @@ public:
     LManualOverrideCollection();
     ~LManualOverrideCollection();
 
-    void loadFromFile(char *trackname, const char *carname, int racetype);
+    void loadFromFile(char *trackname, const char *botname, const char *carname, int racetype);
     void saveToFile();
     LManualOverride *getOverrideForLabel(char *label);
 
 private:
     int divCount;
     int override_count;
+    const char* BOT_NAME;
     LManualOverride **overrides;
 
     void removeNewLineCharacters(char *text);

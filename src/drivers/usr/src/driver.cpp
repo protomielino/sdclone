@@ -265,10 +265,10 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
                 LogUSR.info("Loading in defaut : %s\n", buffer);
         *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
         if (*carParmHandle)
-            std::cout << "Default XML loaded" << std::endl;
+            LogUSR.info("Default XML loaded in : %s\n", buffer);
     }
     else
-        std::cout << "XML loaded - " << buffer << std::endl;
+        LogUSR.info("XML loaded - %s\n" , buffer);
 
     if (*carParmHandle != NULL && newParmHandle != NULL)
     {
@@ -363,7 +363,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
     {
         overrideCollection = new LManualOverrideCollection();
-        overrideCollection->loadFromFile(trackname, (const char *)carName, s->_raceType);
+        overrideCollection->loadFromFile(trackname, MyBotName, (const char *)carName, s->_raceType);
         //overrideCollection->saveToFile();
         raceline->setOverrides(overrideCollection);
     }
@@ -413,7 +413,8 @@ void Driver::newRace(tCarElt* car, tSituation *s)
     initCR();
     initTireMu();
     initTCLfilter();
-    if (displaySetting) {
+    if (displaySetting)
+    {
         showSetup();
     }
 
@@ -421,9 +422,11 @@ void Driver::newRace(tCarElt* car, tSituation *s)
     memset(racelineDrivedata, 0, sizeof(RaceLineDriveData));
 
     // Create just one instance of cardata shared by all drivers.
-    if (cardata == NULL) {
+    if (cardata == NULL)
+    {
         cardata = new Cardata(s);
     }
+
     mycardata = cardata->findCar(car);
     currentsimtime = s->currentTime;
     overtake_timer = 0.0;

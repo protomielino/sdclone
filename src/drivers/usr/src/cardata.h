@@ -74,6 +74,11 @@ protected:
 
     double CTFactor;
 
+    bool   HasTYC;
+    bool   HasABS;
+    bool   HasESP;
+    bool   HasTCL;
+
     tdble RH;
     tdble CA;
     tdble CA_RW;
