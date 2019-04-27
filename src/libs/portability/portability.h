@@ -94,10 +94,18 @@ PORTABILITY_API char *strtok_r(char *str, const char *delim, char **nextp);
 // * MSVC 2003 : 1300 <= _MSC_VER < 1400
 // * MSVC 2005 : 1400 <= _MSC_VER < 1500
 // * MSVC 2008 : 1500 <= _MSC_VER < 1600
-// * MSVC 2010 : 1600 <= _MSC_VER
+// * MSVC 2010 : 1600 <= _MSC_VER < 1700
+// * MSVC 2012 : 1700 <= _MSC_VER < 1800
+// * MSVC 2013 : 1800 <= _MSC_VER < 1900
+// * MSVC 2015 : 1900 <= _MSC_VER < 1910
+// * MSVC 2017 : 1910 <= _MSC_VER < 1920
+// * MSVC 2019 : 1920 <= _MSC_VER
 #ifdef _MSC_VER
 
+#if _MSC_VER < 1900
 #define isnan _isnan
+#define isfinite _finite
+#endif
 
 // Ticket #663 - MSVC implementation of snprintf is not safe
 // We provide our own version of the function,

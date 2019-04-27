@@ -30,7 +30,7 @@
 #include "globaldefs.h"
 
 #ifdef _MSC_VER
-#if _MSC_VER <= 1500
+#if _MSC_VER <= 1900
 #define IsNan _isnan
 #define IsFinite _finite
 #endif
@@ -38,7 +38,7 @@
 
 #ifndef IsNan
 #define IsNan isnan
-#define IsFinite isfinite
+#define IsFinite std::isfinite
 #endif
 
 const float Driver::MAX_UNSTUCK_ANGLE = (float)(15.0f / 180.0f*PI);    // [radians] If the angle of the car on the track is smaller, we assume we are not stuck.
@@ -2305,9 +2305,9 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
             rightSlowSpeedRatio = raceline->tSpeed[LINE_RL][rgtDiv] / minRspeed;
         }
 
-        if (IsNan(leftSlowSpeedRatio) || !std::IsFinite(leftSlowSpeedRatio))
+        if (IsNan(leftSlowSpeedRatio) || !IsFinite(leftSlowSpeedRatio))
             leftSlowSpeedRatio = 1.0;
-        if (IsNan(rightSlowSpeedRatio) || !std::IsFinite(rightSlowSpeedRatio))
+        if (IsNan(rightSlowSpeedRatio) || !IsFinite(rightSlowSpeedRatio))
             rightSlowSpeedRatio = 1.0;
 
         bool avoid2Rgt = (space2Right && curRspeed >= ocar->_speed_x && (rightSlowSpeedRatio <= (curRspeed * rgt_caution) / MAX(1.0, ocar->_speed_x)));

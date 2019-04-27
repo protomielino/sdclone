@@ -27,9 +27,9 @@
 #include "manual_override.h"
 #include "globaldefs.h"
 
-#if defined(WIN32)
-#define snprintf _snprintf
-#endif
+//#if defined(WIN32)
+//#define snprintf _snprintf
+//#endif
 
 #define SECT_OVERRIDE "overrides"
 
