@@ -75,6 +75,43 @@ void SingleCardata::init( CarElt *pcar )
     car = pcar;
 
     HasABS = HasESP = HasTCL = HasTYC = false;
+    const char *enabling;
+
+    enabling = GfParmGetStr(car->_carHandle, SECT_FEATURES, PRM_TIRETEMPDEG, VAL_NO);
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HasTYC = true;
+      LogUSR.info("#USR Car has TYC yes\n");
+    }
+    else
+      LogUSR.info("#USR Car has TYC no\n");
+
+    enabling = GfParmGetStr(car->_carHandle, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HasABS = true;
+      LogUSR.info("#USR #Car has ABS yes\n");
+    }
+    else
+      LogUSR.info("#Car has ABS no\n");
+
+    enabling = GfParmGetStr(car->_carHandle, SECT_FEATURES, PRM_ESPINSIMU, VAL_NO);
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HasESP = true;
+      LogUSR.info("#USR Car has ESP yes\n");
+    }
+    else
+      LogUSR.info("#USR Car has ESP no\n");
+
+    enabling = GfParmGetStr(car->_carHandle, SECT_FEATURES, PRM_TCLINSIMU, VAL_NO);
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HasABS = true;
+      LogUSR.info("#USR Car has TCL yes\n");
+    }
+    else
+      LogUSR.info("#USR Car has TCL no\n");
 
     for (i=0; i<4; i++)
     {
@@ -92,7 +129,7 @@ void SingleCardata::init( CarElt *pcar )
 
     RH = 0.0f;
 
-    static char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+    static const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 
     for (i=0; i<4; i++)
     {
@@ -191,6 +228,42 @@ void SingleCardata::updateModel()
     fullCarMu = ((CA_FW * t_m_f + CA_RW * t_m_r + CA_GE * t_m) / (baseMass+car->_tank * fuelMassFactor)) / baseCarMu;
     offlineFuelCarMu = ((CA_FW * t_m_f + CA_RW * t_m_r + CA_GE * t_m) / (baseMass+fuel)) / baseCarMu;
     carMu = ((CA_FW * cTMF + CA_RW * cTMR + CA_GE * cTM) / (baseMass+fuel * fuelMassFactor)) / baseCarMu;
+}
+
+double SingleCardata::TyreConditionFront()
+{
+  return MIN(car->_tyreCondition(0), car->_tyreCondition(1));
+}
+
+double SingleCardata::TyreConditionRear()
+{
+  return MIN(car->_tyreCondition(2), car->_tyreCondition(3));
+}
+
+double SingleCardata::TyreConditionLeft()
+{
+  return MIN(car->_tyreCondition(1), car->_tyreCondition(3));
+}
+
+double SingleCardata::TyreConditionRight()
+{
+  return MIN(car->_tyreCondition(0), car->_tyreCondition(2));
+}
+
+double SingleCardata::TyreTreadDepthFront()
+{
+  double Right = (car->_tyreTreadDepth(0) - car->_tyreCritTreadDepth(0));
+  double Left = (car->_tyreTreadDepth(1) - car->_tyreCritTreadDepth(1));
+
+  return 100 * MIN(Right, Left);
+}
+
+double SingleCardata::TyreTreadDepthRear()
+{
+  double Right = (car->_tyreTreadDepth(2) - car->_tyreCritTreadDepth(2));
+  double Left = (car->_tyreTreadDepth(3) - car->_tyreCritTreadDepth(3));
+
+  return 100 * MIN(Right, Left);
 }
 
 Cardata::Cardata(tSituation *s)

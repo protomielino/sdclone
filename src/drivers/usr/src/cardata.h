@@ -89,6 +89,13 @@ protected:
 
     tCarElt *car;		// For identification.
 
+    double TyreConditionFront();
+    double TyreConditionRear();
+    double TyreConditionLeft();
+    double TyreConditionRight();
+    double TyreTreadDepthFront();
+    double TyreTreadDepthRear();
+
 public:
     double lTT;
     tdble mFTT;
