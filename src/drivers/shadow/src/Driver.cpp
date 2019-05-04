@@ -30,6 +30,7 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
+static const int BUFSIZE = 256;
 
 #define FLY_COUNT		20
 
@@ -44,10 +45,6 @@
 //==========================================================================*
 // Statics
 //--------------------------------------------------------------------------*
-//int TDriver::NBBOTS = MAX_NBBOTS;                   // Nbr of drivers/robots
-//const char* TDriver::ROBOT_DIR = "drivers/shadow";  // Sub path to dll
-//const char* TDriver::DEFAULTCARTYPE  = "car1-trb1"; // Default car type
-const char* TDriver::robot_name="shadow_trb1";
 int   TDriver::RobotType = 0;
 bool  TDriver::AdvancedParameters = false;         // Advanced parameters
 bool  TDriver::UseOldSkilling = false;             // Use old skilling
@@ -73,35 +70,6 @@ const float TDriver::CLUTCH_SPEED = 0.5f;
 const float TDriver::ABS_MINSPEED = 3.0f;            // [m/s] Below this speed the ABS is disabled (numeric, division by small numbers).
 const float TDriver::ABS_SLIP = 2.5f;
 const float TDriver::ABS_RANGE = 5.0f;
-
-//double TDriver::LengthMargin;                      // safety margin long.
-//bool TDriver::Qualification;                       // Global flag
-/*static const char *WheelSect[4] =                  // TORCS defined sections
-{SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
-static const char *WingSect[2] =
-{SECT_FRNTWING, SECT_REARWING};*/
-//==========================================================================*
-
-//==========================================================================*
-// Buffers
-//
-// Q: qualifying
-// F: Free
-// L: Avoid to left
-// R: Avoid to right
-//--------------------------------------------------------------------------*
-/*#define BUFLEN 256
-static char PathToWriteToBuffer[BUFLEN];         // for path we write to*/
-//static char PathFilenameBuffer[256];          // for path and filename
-/*static char TrackNameBuffer[BUFLEN];             // for track name
-static char TrackLoadQualifyBuffer[BUFLEN];      // for track filename Q
-static char TrackLoadBuffer[BUFLEN];             // for track filename F
-static char TrackLoadLeftBuffer[BUFLEN];         // for track filename L
-static char TrackLoadRightBuffer[BUFLEN];        // for track filename R
-static char PitLoadBuffer[BUFLEN];               // for pit track filename F
-static char PitLoadLeftBuffer[BUFLEN];           // for pit track filename L
-static char PitLoadRightBuffer[BUFLEN];          // for pit track filename R*/
-//==========================================================================*
 
 //==========================================================================*
 // Skilling: Randomness
@@ -135,7 +103,7 @@ static const double	s_sgMin[] = { 0.00,  10 };
 static const double	s_sgMax[] = { 0.03, 100 };
 static const int	s_sgSteps[] = { 10,  18 };
 
-TDriver::TDriver(int Index, const int robot_type):
+TDriver::TDriver(int Index):
   m_CarType(0),
   m_driveType(DT_RWD),
   m_gearUpRpm(9000),
@@ -200,74 +168,11 @@ TDriver::TDriver(int Index, const int robot_type):
   m_FuelNeeded(0),
 
   m_Strategy(NULL),
+  m_pShared(NULL),
 
   m_raceType(0)
 {
   INDEX = Index;
-
-  switch(robot_type)
-    {
-    case SHADOW_TRB1:
-      robot_name = "shadow_trb1";
-      Frc = 0.95;
-      break;
-
-    case SHADOW_SC:
-      robot_name = "shadow_sc";
-      Frc = 0.90;
-      break;
-
-    case SHADOW_SRW:
-      robot_name = "shadow_srw";
-      WingControl = true;
-      Frc = 0.95;
-      break;
-
-    case SHADOW_LS1:
-      robot_name = "shadow_ls1";
-      Frc = 0.85;
-      break;
-
-    case SHADOW_LS2:
-      robot_name = "shadow_ls2";
-      Frc = 0.85;
-      break;
-
-    case SHADOW_36GP:
-      robot_name = "shadow_36GP";
-      Frc = 0.75;
-      break;
-
-    case SHADOW_67GP:
-      robot_name = "shadow_67GP";
-      Frc = 0.75;
-      break;
-
-    case SHADOW_RS:
-      robot_name = "shadow_rs";
-      Frc = 0.98;
-      break;
-
-    case SHADOW_LP1:
-      robot_name = "shadow_lp1";
-      Frc = 0.90;
-      break;
-
-    case SHADOW_MPA1:
-      robot_name = "shadow_mpa1";
-      Frc = 0.88;
-      break;
-
-    case SHADOW_MPA11:
-      robot_name = "shadow_mpa11";
-      Frc = 0.88;
-      break;
-
-    case SHADOW_MPA12:
-      robot_name = "shadow_mpa12";
-      Frc = 0.88;
-      break;
-    }
 
   for( int i = 0; i < 50; i++ )
     {
@@ -293,6 +198,9 @@ TDriver::~TDriver()
   if (m_Strategy != NULL)
     delete m_Strategy;
 
+  if(m_pShared !=NULL)
+      delete m_pShared;
+
   LogSHADOW.debug("\n#<<< TDriver::~TDriver()\n\n");
 }
 
@@ -308,11 +216,6 @@ static void* MergeParamFile( void* hParams, const char* fileName )
   return GfParmMergeHandles(hParams, hNewParams,
                             GFPARM_MMODE_SRC    | GFPARM_MMODE_DST |
                             GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
-}
-
-void TDriver::SetShared( Shared* pShared )
-{
-  m_pShared = pShared;
 }
 
 //==========================================================================*
@@ -360,14 +263,12 @@ void TDriver::GetSkillingParameters()
   // Global skilling from Andrew Sumner ...
   // Check if skilling is enabled
   int SkillEnabled = 0;
-  char	PathFilenameBuffer[512];
+  char	PathFilenameBuffer[1024];
 
-  // Do not skill if optimisation is working
-  //if (!GeneticOpti)
-  {
-    snprintf(PathFilenameBuffer, 512, "%sdrivers/%s/default.xml", GetDataDir(), robot_name);
+    snprintf(PathFilenameBuffer, 1024, "%sdrivers/%s/default.xml", GetDataDir(), MyBotName);
     LogSHADOW.debug("#PathFilename: %s\n", PathFilenameBuffer); // itself
     void* SkillHandle = GfParmReadFile(PathFilenameBuffer, GFPARM_RMODE_REREAD);
+
     if (SkillHandle)
       {
         SkillEnabled = (int) MAX(0,MIN(1,(int) GfParmGetNum(SkillHandle, "skilling", "enable", (char *) NULL, 0.0)));
@@ -377,7 +278,6 @@ void TDriver::GetSkillingParameters()
       }
 
     GfParmReleaseHandle(SkillHandle);
-  }
 
   if (SkillEnabled > 0)                          // If skilling is enabled
     {                                              // Get Skill level
@@ -408,7 +308,7 @@ void TDriver::GetSkillingParameters()
         }
 
       // Get individual skilling
-      snprintf(PathFilenameBuffer, 256, "%sdrivers/%s/%d/skill.xml", GetDataDir(), robot_name, INDEX);
+      snprintf(PathFilenameBuffer, 256, "%sdrivers/%s/%d/skill.xml", GetDataDir(), MyBotName, INDEX);
       LogSHADOW.debug("#PathFilename: %s\n", PathFilenameBuffer); // itself
       SkillHandle = GfParmReadFile(PathFilenameBuffer, GFPARM_RMODE_REREAD);
 
@@ -441,11 +341,15 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
   void*	hCarParm = 0;
   char	buf[1024];
   char	trackName[256];
+  char  carName[256];
   track = pTrack;
 
-  // Initialize the base param path
-  //const char* BaseParamPath = TDriver::robot_name;
-  //const char* PathFilename = PathFilenameBuffer;
+  const char *car_sect = SECT_GROBJECTS "/" LST_RANGES "/" "1";
+  strncpy(carName, GfParmGetStr(pCarHandle, car_sect, PRM_CAR, ""), sizeof(carName));
+  char *p = strrchr(carName, '.');
+
+  if (p)
+      *p = '\0';
 
   SkillGlobal = Skill = DecelAdjustPerc = DriverAggression = SkillAdjustLimit = 0.0;
   GetSkillingParameters();
@@ -472,8 +376,8 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
   //	set up the base param path.
   //
 
-  snprintf(buf, BUFSIZE, "drivers/%s/%s/default.xml", robot_name, m_CarType);
-  LogSHADOW.info("#Path for default.xml = drivers/%s/%s/default.xml\n", robot_name, m_CarType);
+  snprintf(buf, BUFSIZE, "drivers/%s/%s/default.xml", MyBotName, carName);
+  LogSHADOW.info("#Path for default.xml = drivers/%s/%s/default.xml\n", MyBotName, carName);
 
   *ppCarParmHandle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 
@@ -486,7 +390,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
   if (!m_Rain)
     {
       // default params for car type (e.g. clkdtm)
-      snprintf( buf, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, m_CarType, trackName );
+      snprintf( buf, BUFSIZE, "drivers/%s/%s/%s.xml", MyBotName, carName, trackName );
       LogSHADOW.info("#Override params for car type with params of track: %s\n", buf);
       hCarParm = MergeParamFile(hCarParm, buf);
     }
@@ -494,13 +398,13 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
   if (m_Rain)
     {
       // Override params for car type with params of track and weather
-      snprintf(buf, BUFSIZE, "drivers/%s/%s/%s-%d.xml", robot_name, m_CarType, trackName, m_WeatherCode);
+      snprintf(buf, BUFSIZE, "drivers/%s/%s/%s-%d.xml", MyBotName, carName, trackName, m_WeatherCode);
       LogSHADOW.info("#Override params for car type with params of track and weather: %s\n", buf);
       hCarParm = MergeParamFile(hCarParm, buf);
     }
 
   // override params for car type on track of specific race type.
-  snprintf( buf, sizeof(buf), "drivers/%s/%s/track-%s-%s.xml", robot_name, m_CarType, trackName, raceType[pS->_raceType] );
+  snprintf( buf, sizeof(buf), "drivers/%s/%s/track-%s-%s.xml", MyBotName, carName, trackName, raceType[pS->_raceType] );
   LogSHADOW.info("#Override params for car type with params of track and race type: %s\n", buf);
   hCarParm = MergeParamFile(hCarParm, buf);
 
@@ -651,6 +555,8 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     oCarHasESP = true;
     */
 
+  m_pShared = new Shared();
+
   MyTrack::SideMod	sideMod;
   sideMod.side = -1;
   const char*	pStr = GfParmGetStr(hCarParm, SECT_PRIV, PRV_SIDE_MOD, "");
@@ -720,7 +626,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
   char*	pTrackName = strrchr(m_track.GetTrack()->filename, '/') + 1;
   char	buf[1024];
 
-  snprintf( buf, 256, "drivers/%s/%s.spr", robot_name, pTrackName );
+  snprintf( buf, 256, "drivers/%s/%s.spr", MyBotName, pTrackName );
 
   initCw();
   LogSHADOW.debug(" CW = %.3f\n", m_cm.CD_BODY);

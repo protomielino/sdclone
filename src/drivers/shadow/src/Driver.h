@@ -118,8 +118,6 @@ class   SimpleStrategy;
 // Speed Dreams-Interface
 //--------------------------------------------------------------------------*
 static const int MAX_NBBOTS = 100;
-static const int MAXNBBOTS = MAX_NBBOTS;         // Number of drivers/robots
-static const int BUFSIZE = 256;
 
 enum { SHADOW_TRB1=1, SHADOW_SC, SHADOW_SRW, SHADOW_LS1, SHADOW_LS2, SHADOW_36GP,
        SHADOW_67GP, SHADOW_RS, SHADOW_LP1, SHADOW_MPA1, SHADOW_MPA11, SHADOW_MPA12 };
@@ -144,10 +142,9 @@ public:
   };
 
 public:
-  TDriver(int index, const int robot_type);       //  Constructor
+  TDriver(int index);                             //  Constructor
   ~TDriver();                                     // Destructor
 
-  void	SetShared( Shared* pShared );
   void	InitTrack(tTrack* track, void* carHandle, void** carParmHandle, tSituation* s);
   void	NewRace(tCarElt* car, tSituation* s );
 
@@ -204,14 +201,10 @@ public:
 
   static int          NBBOTS;                         // Nbr of cars
   double              CurrSimTime;                    // Current simulation time
-  static const char   *robot_name;
   double              Frc;                            // Friction coefficient
   //bool                UseBrakeLimit;                // Enable/disable brakelimit
 
   double              wheelRadius;
-
-  static const char*  ROBOT_DIR;                      // Sub path to dll
-  static const char*  DEFAULTCARTYPE;                 // Default car type
 
   static int          RobotType;
   static bool         AdvancedParameters;
@@ -298,6 +291,8 @@ public:
   double      m_LastAccel;
   int         m_LastPosIdx;                               // Last brake position
 
+  const char* MyBotName;                                  // Name of this bot
+
 private:
   void    ProcessOtherCars( int index, tCarElt* car, double spd, tSituation* s );
   void    AvoidOtherCars( int index, tCarElt* car, double k, double& carTargetSpd, tSituation* s, bool& inTraffic, bool& lapper );
@@ -352,8 +347,8 @@ private:
   double	BUMP_MOD;
   int		SPDC_NORMAL;
   int		SPDC_TRAFFIC;
-  int           SPDC_EXTRA;
-  int           STEER_CTRL;
+  int       SPDC_EXTRA;
+  int       STEER_CTRL;
   double	STEER_K_ACC;
   double	STEER_K_DEC;
   double	STAY_TOGETHER;			// dist in m.
