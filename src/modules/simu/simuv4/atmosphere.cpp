@@ -27,12 +27,11 @@ void SimAtmosphereConfig(tTrack *track)
     SimTimeOfDay = track->local.timeofday;
     SimClouds = track->local.clouds;
     Tair = track->local.airtemperature + 273.15;
+    SimAirPressure = track->local.airpressure;
 
     // Adapt air pressure with track elevation
     if (track->local.altitude < 500)
     {
-        SimAirPressure = 101300;
-
         if (track->local.altitude < 100)
             SimAirDensity = 1.290f;
         else if (track->local.altitude < 200)
@@ -45,8 +44,6 @@ void SimAtmosphereConfig(tTrack *track)
     }
     else if (track->local.altitude < 1000)
     {
-        SimAirPressure = 95400;
-
         if (track->local.altitude < 600)
             SimAirDensity = 1.225f;
         else if (track->local.altitude < 700)
@@ -59,8 +56,6 @@ void SimAtmosphereConfig(tTrack *track)
     }
     else if (track->local.altitude < 1500)
 {
-            SimAirPressure = 89800;
-
             if (track->local.altitude < 1100)
                 SimAirDensity = 1.167f;
             else if (track->local.altitude < 1200)
@@ -73,8 +68,6 @@ void SimAtmosphereConfig(tTrack *track)
     }
     else if (track->local.altitude < 2000)
     {
-            SimAirPressure = 84600;
-
             if (track->local.altitude < 1600)
                 SimAirDensity = 1.112f;
             else if (track->local.altitude < 1700)
@@ -87,7 +80,6 @@ void SimAtmosphereConfig(tTrack *track)
     }
     else
     {
-        SimAirPressure = 79400;
         SimAirDensity = 1.058f;
     }
 
@@ -113,16 +105,6 @@ void SimAtmosphereConfig(tTrack *track)
         Tair -= 3.05;
     else
         Tair -= 5.75;
-
-    if(SimRain == 0)
-        Tair = Tair;
-    else if (SimRain == 1)
-        Tair -= 1.55;
-    else if (SimRain == 2)
-        Tair -= 2.75;
-    else
-        Tair -= 3.50;
-    //Tair = 297.15;  // 24 degree celsius
 }
 
 

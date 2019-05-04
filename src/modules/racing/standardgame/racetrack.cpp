@@ -408,7 +408,7 @@ reTrackInitWeather(void)
     trackLocal->water = water;
     trackLocal->airtemperature = 15.0f;
     trackLocal->dewp = 5.0f;
-    trackLocal->airpressure = 1125.0f;
+    trackLocal->airpressure = 101300;
     trackLocal->windspeed = rand() % 100;
     trackLocal->winddir = rand() % 359;
     trackLocal->relativehumidity = 65.0f;
@@ -653,6 +653,8 @@ reTrackInitRealWeather(void)
             trackLocal->airpressure = 30.0 * 3386.388640341;
         else
             trackLocal->airpressure = webMetar->getPressure_hPa();
+
+        trackLocal->airpressure = trackLocal->airpressure * 100;
 
         trackLocal->rain = webMetar->getRain();
         trackLocal->snow = webMetar->getSnow();
