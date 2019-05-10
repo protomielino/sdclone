@@ -117,10 +117,6 @@ class   SimpleStrategy;
 //==========================================================================*
 // Speed Dreams-Interface
 //--------------------------------------------------------------------------*
-static const int MAX_NBBOTS = 100;
-
-enum { SHADOW_TRB1=1, SHADOW_SC, SHADOW_SRW, SHADOW_LS1, SHADOW_LS2, SHADOW_36GP,
-       SHADOW_67GP, SHADOW_RS, SHADOW_LP1, SHADOW_MPA1, SHADOW_MPA11, SHADOW_MPA12 };
 
 class TDriver
 {
@@ -199,7 +195,6 @@ public:
   void	EndRace(tSituation* s );
   void	Shutdown();
 
-  static int          NBBOTS;                         // Nbr of cars
   double              CurrSimTime;                    // Current simulation time
   double              Frc;                            // Friction coefficient
   //bool                UseBrakeLimit;                // Enable/disable brakelimit
@@ -321,7 +316,6 @@ private:
   };
 
 private:
-  Shared*	m_pShared;
   MyTrack 	m_track;
   OptimisedPath	m_path[N_PATHS];
   PitPath	m_pitPath[N_PATHS];
@@ -450,6 +444,7 @@ private:
   double	m_lastAng;
 
   SimpleStrategy  *m_Strategy;                           // Pit strategy
+  Shared*	      m_pShared;
 
   bool            m_CrvComp;   			               // Crv compensation
   float           clutchtime;                            // Clutch timer.
