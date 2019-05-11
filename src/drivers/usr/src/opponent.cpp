@@ -17,11 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
-//#define OPP_DEBUG
-//#define BRAKE_DEBUG
-//#include "quadratic.h"
 #include "opponent.h"
-#include "Vec2d.h"
+#include "vec2d.h"
 #include "globaldefs.h"
 
 // class variables and constants.

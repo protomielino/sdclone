@@ -647,6 +647,7 @@ typedef struct TrackLocalInfo
     tdble visibility;
     tdble airtemperature;
     tdble airpressure;
+    tdble airdensity;
     tdble windspeed;
     tdble dewp;
     tdble winddir;

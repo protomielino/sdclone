@@ -250,6 +250,7 @@ public:
     inline double		getDewpoint_F()		const { return _dewp == WebMetarNaN ? WebMetarNaN : 1.8 * _dewp + 32; }
     inline double		getPressure_hPa()	const { return _pressure == WebMetarNaN ? WebMetarNaN : _pressure / 100; }
     inline double		getPressure_inHg()	const { return _pressure == WebMetarNaN ? WebMetarNaN : _pressure * 0.0002952998330101010; }
+    inline double       getDensity_C()      const { return _density; }
 
     inline int			getRain()			const { return _rain; }
     inline int			getHail()			const { return _hail; }
@@ -285,6 +286,7 @@ protected:
     double		_dewp;
     double      _distance;
     double		_pressure;
+    double      _density;
     int			_rain;
     int			_hail;
     int			_snow;
@@ -333,6 +335,7 @@ protected:
     bool	scanBoundary(char **str);
     const struct Token *scanToken(char **str, const struct Token *list);
     void	normalizeData();
+    void    density();
 };
 
 #endif //_SD_WEBMETAR_H_

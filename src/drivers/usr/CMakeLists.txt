@@ -33,7 +33,7 @@ SET(ROBOT_SOURCES
   src/spline.cpp
   src/strategy.h
   src/strategy.cpp
-  src/Vec2d.h
+  src/vec2d.h
   src/globaldefs.h)
 
 # Official-only USR instances.

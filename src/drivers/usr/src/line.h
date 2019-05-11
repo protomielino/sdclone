@@ -121,7 +121,7 @@ private:
 //
 // need MAX_LINE_SEGS  180  <-- SO bad doesnt works!
 //  */
-#define MAX_LINE_SEGS  60 //
+#define MAX_LINE_SEGS 200 //
 #define MAX_LINE_PASS   4
 
     lineseg_t lseg[MAX_LINE_PASS][MAX_LINE_SEGS];
@@ -141,7 +141,7 @@ private:
     vec2f findOutside(tTrackSeg *start, tTrackSeg *end, float arc );
     void circle3point( vec2f point1, vec2f point2, vec2f point3, vec2f *center, float *radius);
 
-    /* ack, talk about creep.  This started off simple
+        /* ack, talk about creep.  This started off simple
          * and has become a beast.  This should really
          * become a struct of params that is passed around,
          * whenever I get time to clean it up.

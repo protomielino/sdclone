@@ -551,8 +551,8 @@ bool Driver::calcSpeed()
         else
         {
             double factor = 30.0;
-            if (mycardata->aTT < mycardata->lTT)
-                factor *= 1.0 + (1.0 - mycardata->aTT / mycardata->lTT) / 2;
+            if (mycardata->lTT < mycardata->CTTT + 0.02)
+                factor *= 1.0 + (1.0 * mycardata->aTT);
             brakecmd = MIN(1.0f, factor * fabs(x));
         }
     }
@@ -2386,7 +2386,6 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
     return false;
 }
 
-
 int Driver::GetAvoidSide(Opponent *oppnt, int allowed_sides, double t_impact, double *leftMargin, double *rightMargin)
 {
     if (!allowed_sides) return 0;
@@ -2572,7 +2571,6 @@ if (s->currentTime - thetimer >= 1.0)
 }
 
 /******************************************************************************/
-
 void Driver::isAlone()
 {
     int i;
@@ -2607,7 +2605,6 @@ double	Driver::AverageTmpForCar(CarElt *car)
 
 
 /******************************************************************************/
-
 // Check if I'm stuck.
 bool Driver::isStuck()
 {
@@ -2665,7 +2662,6 @@ bool Driver::isStuck()
 }
 
 /******************************************************************************/
-
 // Compute aerodynamic downforce coefficient CA.
 void Driver::initCa()
 {
@@ -2698,7 +2694,6 @@ void Driver::initCa()
 }
 
 /******************************************************************************/
-
 // Compute aerodynamic drag coefficient CW.
 void Driver::initCw()
 {
@@ -2709,7 +2704,6 @@ void Driver::initCw()
 }
 
 /******************************************************************************/
-
 void Driver::initCR()
 {
     CR = GfParmGetNum(car->_carHandle, (char *)SECT_CAR, (char *)PRM_FRWEIGHTREP, (char *)NULL, 0.50);
@@ -2717,7 +2711,6 @@ void Driver::initCR()
 }
 
 /******************************************************************************/
-
 // Init the friction coefficient of the the tires.
 void Driver::initTireMu()
 {
@@ -2735,7 +2728,6 @@ void Driver::initTireMu()
 }
 
 /******************************************************************************/
-
 // Reduces the brake value such that it fits the speed (more downforce -> more braking).
 float Driver::filterBrakeSpeed(float brake)
 {
@@ -2748,7 +2740,6 @@ float Driver::filterBrakeSpeed(float brake)
 }
 
 /******************************************************************************/
-
 // Brake filter for pit stop.
 float Driver::filterBPit(float brake)
 {
@@ -2834,7 +2825,6 @@ float Driver::filterBPit(float brake)
 }
 
 /******************************************************************************/
-
 // Brake filter for collision avoidance.
 float Driver::filterBColl(float brake)
 {
@@ -2856,7 +2846,6 @@ float Driver::filterBColl(float brake)
 }
 
 /******************************************************************************/
-
 // Antilocking filter for brakes.
 float Driver::filterABS(float brake)
 {
@@ -2890,7 +2879,6 @@ float Driver::filterABS(float brake)
 }
 
 /******************************************************************************/
-
 // TCL filter for accelerator pedal.
 float Driver::filterTCL(float accel, int raceType)
 {
@@ -2966,7 +2954,6 @@ float Driver::filterTCL(float accel, int raceType)
 }
 
 /******************************************************************************/
-
 // Traction Control (TCL) setup.
 void Driver::initTCLfilter()
 {
@@ -2983,16 +2970,33 @@ void Driver::initTCLfilter()
 }
 
 /******************************************************************************/
-
 // TCL filter plugin for rear wheel driven cars.
 float Driver::filterTCL_RWD()
 {
-    return (car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) *
-        car->_wheelRadius(REAR_LFT) / 2.0f;
+#if 1
+    return (car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) * car->_wheelRadius(REAR_LFT) / 2.0f;
+#else
+    double WSR = car->_wheelSpinVel(REAR_RGT);
+    double WSL = car->_wheelSpinVel(REAR_LFT);
+    double spin = 0;
+    double wr = 0;
+    double slip = 0;
+
+    if (WSL > WSR)
+        spin += 2 * WSL + WSR;
+    else
+        spin +=  WSL + 2 * WSR;
+
+    wr += car->_wheelRadius(REAR_LFT)+ car->_wheelRadius(REAR_RGT);
+    spin /= 3;
+    wr /= 3;
+
+    slip = spin * wr - car->_speed_x;        // Calculate slip
+    return slip;
+#endif
 }
 
 /******************************************************************************/
-
 // TCL filter plugin for front wheel driven cars.
 float Driver::filterTCL_FWD()
 {
@@ -3001,7 +3005,6 @@ float Driver::filterTCL_FWD()
 }
 
 /******************************************************************************/
-
 // TCL filter plugin for all wheel driven cars.
 float Driver::filterTCL_4WD()
 {
@@ -3012,7 +3015,6 @@ float Driver::filterTCL_4WD()
 }
 
 /******************************************************************************/
-
 // Hold car on the track.
 float Driver::filterTrk(float targetAngle)
 {
@@ -3049,14 +3051,52 @@ float Driver::filterTrk(float targetAngle)
 }
 
 /******************************************************************************/
-
 // Compute the needed distance to brake.
 float Driver::brakedist(float allowedspeed, float mu)
 {
     float c = mu*G;
-    float d = (CA*mu + CW) / car_Mass;
+    float d = (CA * mu + CW) / car_Mass;
     float v1sqr = currentspeedsqr;
     float v2sqr = allowedspeed*allowedspeed;
-    return -log((c + v2sqr*d) / (c + v1sqr*d)) / (2.0f*d);
+
+    return -log((c + v2sqr*d) / (c + v1sqr*d)) / (2.0f * d);
 }
 
+// Meteorology
+//--------------------------------------------------------------------------*
+void Driver::Meteorology()
+{
+    tTrackSeg *Seg;
+    tTrackSurface *Surf;
+    rainintensity = 0;
+    weathercode = GetWeather();
+    Seg = track->seg;
+
+    for ( int I = 0; I < track->nseg; I++)
+    {
+        Surf = Seg->surface;
+        rainintensity = MAX(rainintensity, Surf->kFrictionDry / Surf->kFriction);
+        LogUSR.debug("# %.4f, %.4f %s\n",Surf->kFriction, Surf->kRollRes, Surf->material);
+        Seg = Seg->next;
+    }
+
+    rainintensity -= 1;
+
+    if (rainintensity > 0)
+    {
+        rain = true;
+        mycardata->muscale *= 0.85;
+        mycardata->basebrake *= 0.75;
+        tcl_slip = MIN(tcl_slip, 2.0);
+    }
+    else
+        rain = false;
+}
+
+//==========================================================================*
+// Estimate weather
+//--------------------------------------------------------------------------*
+int Driver::GetWeather()
+{
+    return (track->local.rain << 4) + track->local.water;
+};

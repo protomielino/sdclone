@@ -409,6 +409,7 @@ reTrackInitWeather(void)
     trackLocal->airtemperature = 15.0f;
     trackLocal->dewp = 5.0f;
     trackLocal->airpressure = 101300;
+    trackLocal->airdensity = 1.219f;
     trackLocal->windspeed = rand() % 100;
     trackLocal->winddir = rand() % 359;
     trackLocal->relativehumidity = 65.0f;
@@ -638,7 +639,7 @@ reTrackInitRealWeather(void)
             }
         }
 
-        // temperature/pressure
+        // temperature/pressure/density
         if (webMetar->getTemperature_C() == WebMetarNaN)
             trackLocal->airtemperature = 15.0;
         else
@@ -655,6 +656,7 @@ reTrackInitRealWeather(void)
             trackLocal->airpressure = webMetar->getPressure_hPa();
 
         trackLocal->airpressure = trackLocal->airpressure * 100;
+        trackLocal->airdensity = webMetar->getDensity_C();
 
         trackLocal->rain = webMetar->getRain();
         trackLocal->snow = webMetar->getSnow();
@@ -667,6 +669,7 @@ reTrackInitRealWeather(void)
         GfLogDebug("Air Temperature = %.3f\n", trackLocal->airtemperature);
         GfLogDebug("Dew point = %.3f\n", trackLocal->dewp);
         GfLogDebug("Air pressure = %.3f\n", trackLocal->airpressure);
+        GfLogDebug("Air Density = %.3f\n", trackLocal->airdensity);
         GfLogDebug("Rain = %i\n", trackLocal->rain);
         GfLogDebug("Snow = %i\n", trackLocal->snow);
         GfLogDebug("Hail = %i\n", trackLocal->hail);
@@ -704,15 +707,15 @@ reTrackInitSimuWeather(void)
 
     if (now.tm_mday < 10)
         weatherfile = weatherfile + "0" + day + "-";
-    else if (now.tm_mday == 10 || now.tm_mday == 20 || now.tm_mday == 30)
-        weatherfile = weatherfile + day + "0-";
+    /*else if (now.tm_mday == 10 || now.tm_mday == 20 || now.tm_mday == 30)
+        weatherfile = weatherfile + day + "0-";*/
     else
         weatherfile = weatherfile + day + "-";
 
     if ((now.tm_mon + 1) < 10)
         weatherfile = weatherfile + "0" + month + ".txt";
-    else if (now.tm_mon == 10)
-        weatherfile = weatherfile + month + "0-";
+    /*else if (now.tm_mon == 10)
+        weatherfile = weatherfile + month + "0-";*/
     else
         weatherfile = weatherfile + month + ".txt";
 

@@ -53,6 +53,11 @@ public:
     void update();
     void updateModel();
 
+    bool   HasTYC;
+    bool   HasABS;
+    bool   HasESP;
+    bool   HasTCL;
+
 protected:
     static float getSpeed(tCarElt *car, float trackangle);
 
@@ -74,11 +79,6 @@ protected:
 
     double CTFactor;
 
-    bool   HasTYC;
-    bool   HasABS;
-    bool   HasESP;
-    bool   HasTCL;
-
     tdble RH;
     tdble CA;
     tdble CA_RW;
@@ -98,7 +98,7 @@ protected:
 
 public:
     double lTT;
-    tdble mFTT;
+    tdble CTTT;
     tdble aFTT;
     tdble aTT;
     double hTT;
@@ -110,6 +110,8 @@ public:
     tdble fullCarMu;
     tdble offlineFuelCarMu;
     tdble baseCarMu;
+    tdble muscale;
+    tdble basebrake;
     tdble fuel;
     tdble damage;
 };

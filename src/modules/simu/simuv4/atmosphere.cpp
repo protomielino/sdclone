@@ -28,60 +28,7 @@ void SimAtmosphereConfig(tTrack *track)
     SimClouds = track->local.clouds;
     Tair = track->local.airtemperature + 273.15;
     SimAirPressure = track->local.airpressure;
-
-    // Adapt air pressure with track elevation
-    if (track->local.altitude < 500)
-    {
-        if (track->local.altitude < 100)
-            SimAirDensity = 1.290f;
-        else if (track->local.altitude < 200)
-            SimAirDensity = 1.273f;
-        else if (track->local.altitude < 300)
-            SimAirDensity = 1.261f;
-        else if (track->local.altitude < 400)
-            SimAirDensity = 1.249f;
-        else SimAirDensity = 1.237f;
-    }
-    else if (track->local.altitude < 1000)
-    {
-        if (track->local.altitude < 600)
-            SimAirDensity = 1.225f;
-        else if (track->local.altitude < 700)
-            SimAirDensity = 1.213f;
-        else if (track->local.altitude < 800)
-            SimAirDensity = 1.202f;
-        else if (track->local.altitude < 900)
-            SimAirDensity = 1.190f;
-        else SimAirDensity = 1.179f;
-    }
-    else if (track->local.altitude < 1500)
-{
-            if (track->local.altitude < 1100)
-                SimAirDensity = 1.167f;
-            else if (track->local.altitude < 1200)
-                SimAirDensity = 1.156f;
-            else if (track->local.altitude < 1300)
-                SimAirDensity = 1.145f;
-            else if (track->local.altitude < 1400)
-                SimAirDensity = 1.134f;
-            else SimAirDensity = 1.123f;
-    }
-    else if (track->local.altitude < 2000)
-    {
-            if (track->local.altitude < 1600)
-                SimAirDensity = 1.112f;
-            else if (track->local.altitude < 1700)
-                SimAirDensity = 1.101f;
-            else if (track->local.altitude < 1800)
-                SimAirDensity = 1.090f;
-            else if (track->local.altitude < 1900)
-                SimAirDensity = 1.079f;
-            else SimAirDensity = 1.069f;
-    }
-    else
-    {
-        SimAirDensity = 1.058f;
-    }
+    SimAirDensity = track->local.airdensity;
 
     GfLogDebug("SimAirPressure = %3f - SimAirDensity = %3f\n", SimAirPressure, SimAirDensity);
 

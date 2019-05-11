@@ -197,6 +197,7 @@ void WebMetar::WebMetarLoad(const string& m)
     while (scanRunwayReport()) ;
     scanRemainder();
     scanRemark();
+    density();
 
     if (_grpcount < 4)
     {
@@ -1483,6 +1484,132 @@ int WebMetar::scanNumber(char **src, int *num, int min, int max)
     *src = s;
 
     return i;
+}
+
+void WebMetar::density()
+{
+    double relhumidity = getRelHumidity();
+    double pressure = _pressure * 100;
+    double temp = _temp;
+    double tas;
+
+    if (temp < -50)
+        tas = 0.1;
+    else if (temp < -30)
+        tas = 13;
+    else if (temp < -19)
+        tas = 103;
+    else if (temp < -16)
+        tas = 150;
+    else if (temp < -13)
+        tas = 190;
+    else if (temp < -11)
+        tas = 240;
+    else if (temp < -9)
+        tas = 260;
+    else if (temp < -8)
+        tas = 300;
+    else if (temp < -5)
+        tas = 370;
+    else if (temp < -2)
+        tas = 460;
+    else if (temp == -1)
+        tas = 560;
+    else if (temp == 0)
+        tas = 611;
+    else if (temp < 3)
+        tas = 706;
+    else if (temp < 5)
+        tas = 813;
+    else if (temp < 7)
+        tas = 935;
+    else if (temp < 9)
+        tas = 1073;
+    else if (temp < 11)
+        tas = 1228;
+    else if (temp == 11)
+        tas = 1312;
+    else if (temp == 12)
+        tas = 1402;
+    else if (temp == 13)
+        tas = 1497;
+    else if (temp == 14)
+        tas = 1598;
+    else if (temp == 15)
+        tas = 1705;
+    else if (temp == 16)
+        tas = 1818;
+    else if (temp == 17)
+        tas = 1937;
+    else if (temp == 18)
+        tas = 2063;
+    else if (temp == 19)
+        tas = 2197;
+    else if (temp == 20)
+        tas = 2338;
+    else if (temp == 21)
+        tas = 2487;
+    else if (temp == 22)
+        tas = 2643;
+    else if (temp == 23)
+        tas = 2809;
+    else if (temp == 24)
+        tas = 2983;
+    else if (temp == 25)
+        tas = 3167;
+    else if (temp == 26)
+        tas = 3360;
+    else if (temp == 27)
+        tas = 3564;
+    else if (temp == 28)
+        tas = 3780;
+    else if (temp == 29)
+        tas = 4005;
+    else if (temp == 30)
+        tas = 4243;
+    else if (temp == 31)
+        tas = 4492;
+    else if (temp == 32)
+        tas = 4755;
+    else if (temp == 33)
+        tas = 5030;
+    else if (temp == 34)
+        tas = 5319;
+    else if (temp == 35)
+        tas = 5623;
+    else if (temp == 36)
+        tas = 5941;
+    else if (temp == 37)
+        tas = 6275;
+    else if (temp == 38)
+        tas = 6625;
+    else if (temp == 39)
+        tas = 6992;
+    else if (temp == 40)
+        tas = 7375;
+    else if (temp == 41)
+        tas = 7778;
+    else if (temp == 42)
+        tas = 8199;
+    else if (temp == 43)
+        tas = 8639;
+    else if (temp == 44)
+        tas = 9101;
+    else if (temp == 45)
+        tas = 9583;
+    else if (temp == 46)
+        tas = 10086;
+    else if (temp == 47)
+        tas = 10612;
+    else if (temp == 48)
+        tas = 11160;
+    else if (temp == 49)
+        tas = 11735;
+    else
+        tas = 12334;
+
+    _density = ((1 - ( 0.3783 * relhumidity * tas) / pressure) * pressure) / (287.058 * (temp + 273.15)) / 100;
+    GfLogDebug("Density = %.3f - relative humidity = %.3f\n", _density, relhumidity);
 }
 
 // find longest match of str in list

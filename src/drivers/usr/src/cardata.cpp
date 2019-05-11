@@ -44,6 +44,19 @@ void SingleCardata::update()
             rmTT = MAX(rmTT, 1.0);
     }
 
+    aTT = aFTT = lTT = CTTT = 1.0;
+
+    if(HasTYC)
+    {
+        lmTT = TyreConditionLeft();
+        rmTT = TyreConditionRight();
+        aTT = MIN(TyreConditionFront(), TyreConditionRear());
+        aFTT = TyreConditionFront();
+
+        lTT = MIN(TyreTreadDepthFront(), TyreTreadDepthRear());
+        CTTT = MIN(MIN(car->_tyreCritTreadDepth(0), car->_tyreCritTreadDepth(1)), MIN(car->_tyreCritTreadDepth(2), car->_tyreCritTreadDepth(3)));
+    }
+
     lastspeed[2].ax = lastspeed[1].ax;
     lastspeed[2].ay = lastspeed[1].ay;
     lastspeed[1].ax = lastspeed[0].ax;
@@ -164,9 +177,8 @@ void SingleCardata::init( CarElt *pcar )
 
     baseMass = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_MASS, NULL, 1000.0f);
     fuel = 0.0f;
-    mFTT = 0.0f;
-    aFTT = 0.0f;
-    aTT = 0.0f;
+    aFTT = aTT = lmTT = rmTT = 0.0f;
+    lTT = CTTT = 0.0f;
     carMu = fullCarMu = offlineFuelCarMu = 1.0f;
     lmTT = rmTT = 0.0;
     baseCarMu = (CA_FW * t_m_f + CA_RW * t_m_r + CA_GE * t_m) / baseMass;
@@ -175,8 +187,8 @@ void SingleCardata::init( CarElt *pcar )
 
 void SingleCardata::updateModel()
 {
-    aTT = 1.0f; aFTT = 1.0f; mFTT = 1.0f;
-    float mLTT = 0.9f, mRTT = 0.9f;
+    aTT = aFTT = lmTT = rmTT = lTT = CTTT = 1.0f;
+    float mLTT = 1.0f, mRTT = 1.0f;
     tdble mG = 0.0f;
     int i;
 
@@ -199,6 +211,18 @@ void SingleCardata::updateModel()
 
     aTT /= 4;
     aFTT /= 2;*/
+
+    if(HasTYC)
+    {
+        lmTT = TyreConditionLeft();
+        rmTT = TyreConditionRight();
+        aTT = MIN(TyreConditionFront(), TyreConditionRear());
+        aFTT = TyreConditionFront();
+
+        lTT = MIN(TyreTreadDepthFront(), TyreTreadDepthRear());
+        CTTT = MIN(MIN(car->_tyreCritTreadDepth(0), car->_tyreCritTreadDepth(1)), MIN(car->_tyreCritTreadDepth(2), car->_tyreCritTreadDepth(3)));
+    }
+
     fuel = car->_fuel;
     damage = (tdble)car->_dammage;
     tdble cTM = t_m, cTMF = t_m_f, cTMR = t_m_r;

@@ -226,7 +226,7 @@ int SimpleStrategy::calcRepair(tCarElt* car, tSituation *s)
     bool lastPit = ((car->_remainingLaps + 1) * fuelPerLap > maxFuel ? false : true);
     Opponent *sortedOpp[64];
     Opponent *O = NULL;
-    tCarElt *Ocar = NULL;
+    tCarElt *m_tmCar = NULL;
 
     if (!lastPit)
     {

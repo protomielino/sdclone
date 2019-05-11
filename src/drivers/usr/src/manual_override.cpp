@@ -342,7 +342,7 @@ void LManualOverrideCollection::saveToFile()
 {
 #if 0
     char buffer[1025];
-    snprintf(buffer, 1024, "%sdrivers/%s/%s/%s.dat_save", GetLocalDir(), BOT_NAME, carName, trackName);
+    snprintf(buffer, 1024, "%sdrivers/%s/%s/%s.dat_save", GetLocalDir(), BOT_NAME, "carName", "trackName");
     FILE *filepointer = fopen(buffer, "w");
 
     if (filepointer)
