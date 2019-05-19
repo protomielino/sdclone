@@ -761,7 +761,7 @@ ReRaceRealStart(void)
         ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
     }
 
-    //GfLogDebug("ReRaceRealStart: Loaded dispMode=0x%x\n", ReInfo->_displayMode);
+    GfLogDebug("ReRaceRealStart: Loaded dispMode=0x%x\n", ReInfo->_displayMode);
 
     // Check if there is a human in the driver list
     foundHuman = ReHumanInGroup() ? 2 : 0;
@@ -835,8 +835,9 @@ ReRaceRealStart(void)
     ReUI().onRaceDriversLoaded();
 
     // Initialize the physics engine
+    GfLogDebug("Initialize Physic Engine ...\n");
     RePhysicsEngine().updateSituation(s, RCM_MAX_DT_SIMU);
-
+    GfLogDebug("End Initialize Physic engine ...\n");
     carInfo = ReInfo->_reCarInfo;
     for (i = 0; i < s->_ncars; i++) {
         carInfo[i].prevTrkPos = s->cars[i]->_trkPos;

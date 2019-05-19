@@ -144,7 +144,7 @@ grLoadScene(tTrack *track)
     // Load graphics options.
     grLoadGraphicsOptions();
 
-    //GfLogDebug("grLoadScene(track=%p)\n", track);
+    GfLogDebug("grLoadScene(track=%p)\n", track);
     grTrack = track;
 
     // Build scene.
@@ -241,6 +241,8 @@ grLoadScene(tTrack *track)
     desc = grssgLoadAC3D(acname, NULL);
     LandAnchor->addKid(desc);
 
+    GfLogDebug("End Loading scene ...\n");
+
     return 0;
 }//grLoadScene
 
@@ -270,6 +272,8 @@ void grCustomizePits(void)
     char buf[512];
     ThePits = new ssgBranch();
     PitsAnchor->addKid(ThePits);
+
+    GfLogDebug("Customize pits ... \n");
 
     tTrackPitInfo *pits = &(grTrack->pits);
 
