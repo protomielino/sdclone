@@ -24,7 +24,7 @@
 // class variables and constants.
 tTrack* Opponent::track;
 const float Opponent::FRONTCOLLDIST = 200.0f;            // [m] distance to check other cars in front me.
-const float Opponent::BACKCOLLDIST = 15.0f;            // [m] distance to check other cars behind me.
+const float Opponent::BACKCOLLDIST = 25.0f;            // [m] distance to check other cars behind me.
 
 const float Opponent::EXACT_DIST = 12.0f;            // [m] if the estimated distance is smaller, compute it more accurate
 const float Opponent::LAP_BACK_TIME_PENALTY = -30.0f;        // [s]

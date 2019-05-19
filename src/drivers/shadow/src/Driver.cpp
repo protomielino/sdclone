@@ -103,6 +103,9 @@ static const double	s_sgMax[] = { 0.03, 100 };
 static const int	s_sgSteps[] = { 10,  18 };
 
 TDriver::TDriver(int Index):
+    track(NULL),
+    car(NULL),
+    m_Situation(NULL),
     m_CarType(0),
     m_driveType(DT_RWD),
     m_gearUpRpm(9000),
@@ -166,6 +169,7 @@ TDriver::TDriver(int Index):
 
     m_FuelNeeded(0),
 
+    m_opp(NULL),
     m_Strategy(NULL),
     m_pShared(NULL),
 
@@ -191,7 +195,16 @@ TDriver::TDriver(int Index):
 
 TDriver::~TDriver()
 {
-    LogSHADOW.debug("\n#TDriver::~TDriver() >>>\n\n");
+    LogSHADOW.debug("#TDriver::~TDriver() >>>\n\n");
+    /*if(track != NULL)
+        delete track;
+
+    if(car != NULL)
+        delete car;
+
+    if(m_Situation != NULL)
+        delete m_Situation;*/
+
     delete [] m_opp;
 
     if (m_Strategy != NULL)
@@ -200,7 +213,7 @@ TDriver::~TDriver()
     if(m_pShared !=NULL)
         delete m_pShared;
 
-    LogSHADOW.debug("\n#<<< TDriver::~TDriver()\n\n");
+    LogSHADOW.debug("#<<< TDriver::~TDriver()\n\n");
 }
 
 static void* MergeParamFile( void* hParams, const char* fileName )
