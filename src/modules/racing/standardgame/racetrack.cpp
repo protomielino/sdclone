@@ -28,7 +28,6 @@
 
 #include <tgf.h>
 
-#include <portability.h>
 
 #include <raceman.h>
 #include <track.h>
@@ -47,6 +46,9 @@ static ReWebMetarRunway     webMetarRunway;
 static ReWebMetarVisibility webMetarVisibility;
 static ReWebMetar           *webMetar = NULL;
 #endif //WEBSERVER
+
+// portability.h must be after curl.h (included by racewebmetar.h)
+#include <portability.h>
 
 // Local functions.
 static void reTrackDump(const tTrack *track, int verbose);
