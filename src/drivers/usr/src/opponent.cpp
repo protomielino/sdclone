@@ -22,15 +22,15 @@
 #include "globaldefs.h"
 
 // class variables and constants.
-tTrack* Opponent::track;
-const float Opponent::FRONTCOLLDIST = 200.0f;            // [m] distance to check other cars in front me.
-const float Opponent::BACKCOLLDIST = 25.0f;            // [m] distance to check other cars behind me.
+tTrack*     Opponent::track;
+const float Opponent::FRONTCOLLDIST = 220.0f;               // [m] distance to check other cars in front me.
+const float Opponent::BACKCOLLDIST = 25.0f;                 // [m] distance to check other cars behind me.
 
-const float Opponent::EXACT_DIST = 12.0f;            // [m] if the estimated distance is smaller, compute it more accurate
-const float Opponent::LAP_BACK_TIME_PENALTY = -30.0f;        // [s]
-const float Opponent::OVERLAP_WAIT_TIME = 3.0f;            // [s] overlaptimer must reach this time before we let the opponent pass.
-const float Opponent::SPEED_PASS_MARGIN = 2.0f;            // [m/s] avoid overlapping opponents to stuck behind me.
-const int Opponent::MAX_DAMAGE_DIFF = 1000;
+const float Opponent::EXACT_DIST = 12.0f;                   // [m] if the estimated distance is smaller, compute it more accurate
+const float Opponent::LAP_BACK_TIME_PENALTY = -30.0f;       // [s]
+const float Opponent::OVERLAP_WAIT_TIME = 3.0f;             // [s] overlaptimer must reach this time before we let the opponent pass.
+const float Opponent::SPEED_PASS_MARGIN = 2.0f;             // [m/s] avoid overlapping opponents to stuck behind me.
+const int   Opponent::MAX_DAMAGE_DIFF = 1000;
 
 Opponent::Opponent()
 {
@@ -41,8 +41,8 @@ Opponent::Opponent()
     currentLft = currentRgt = impactLft = impactRgt = -10.0;
     teammate = hasSlowerSpeed = false;
     team = -1;
-    FRONTCOLL_MARGIN = 0.0;            // [m] front safety margin.
-    SIDECOLL_MARGIN = 3.0;            // [m] side safety margin.
+    FRONTCOLL_MARGIN = 0.3;            // [m] front safety margin.
+    SIDECOLL_MARGIN = 3.0;             // [m] side safety margin.
     brake_multiplier = 0.3;
     brake_warn_multiplier = 0.3;
     relativeangle = 0.0f;
@@ -382,7 +382,7 @@ void Opponent::calcState(float Speed, Driver *driver)
 #ifdef BRAKE_DEBUG
             if (state & OPP_COLL)
             {
-                fprintf(stderr, "%s %s: FRONT COLLISION\n", mycar->_name, car->_name); fflush(stderr);
+                LogUSR.debug("%s %s: FRONT COLLISION\n", mycar->_name, car->_name);
             }
 #endif
             if ((state & OPP_COLL) && driver->raceline->InBrakingZone(LINE_RL))
@@ -800,7 +800,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     if (distance > MAX(5.0, 6 * ((90 - tadiff) / 18)))
     {
 #ifdef BRAKE_DEBUG
-        fprintf(stderr, "%s %d NO COLL due to track angle\n",car->_name,mycar->_dammage);fflush(stderr);
+        LogUSR.debug("%s %d NO COLL due to track angle\n",car->_name,mycar->_dammage);
 #endif
         return 0;
     }
@@ -831,7 +831,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     if (speedDiff >= 0.0 && distance <= 0.0 && fabs(car->_trkPos.toLeft - mycar->_trkPos.toLeft) < MAX(cardata->getWidthOnTrack(), driver->getWidthOnTrack()) + 0.5)
     {
 #ifdef BRAKE_DEBUG
-        fprintf(stderr, "%s %d COLL A: sdiff %.3f and distance %.1f > 1.0\n", car->_name, mycar->_dammage, speedDiff, distance); fflush(stderr);
+        LogUSR("%s %d COLL A: sdiff %.3f and distance %.1f > 1.0\n", car->_name, mycar->_dammage, speedDiff, distance);
 #endif
         collspeed = MIN(collspeed, car->_speed_x - 2.0f);
 
@@ -841,7 +841,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     if (timpact < 0.0 && distance > 2.0)
     {
 #ifdef BRAKE_DEBUG
-        fprintf(stderr, "%s %d NO COLL A: t_impact %.2f <= 0.0 and distance %.1f > 1.0\n", car->_name, mycar->_dammage, timpact, distance); fflush(stderr);
+        LogUSR.debug("%s %d NO COLL A: t_impact %.2f <= 0.0 and distance %.1f > 1.0\n", car->_name, mycar->_dammage, timpact, distance);
 #endif
         return -1;
     }
@@ -849,7 +849,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     if (mycar->_speed_x <= collspeed && distance > 0.5 && !(state & OPP_SIDE))
     {
 #ifdef BRAKE_DEBUG
-        fprintf(stderr, "%s %d NO COLL B: speed %.2f < collspeed %.2f\n", car->_name, mycar->_dammage, mycar->_speed_x, collspeed); fflush(stderr);
+        LogUSR.debug("%s %d NO COLL B: speed %.2f < collspeed %.2f\n", car->_name, mycar->_dammage, mycar->_speed_x, collspeed);
 #endif
         return -1;
     }

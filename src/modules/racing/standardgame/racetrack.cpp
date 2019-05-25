@@ -28,11 +28,6 @@
 
 #include <tgf.h>
 
-#ifdef WEBSERVER
-#include <fstream>
-#include <webmetar.h>
-#endif //WEBSERVER
-
 #include <portability.h>
 
 #include <raceman.h>
@@ -45,14 +40,13 @@
 #include "racetrack.h"
 
 #ifdef WEBSERVER
-//extern TGFCLIENT_API WebMetar webMetar;
-extern TGFCLIENT_API WebMetarCloud webMetarCloud;
-extern TGFCLIENT_API WebMetarRunway webMetarRunway;
-extern TGFCLIENT_API WebMetarVisibility webMetarVisibility;
-static WebMetar *webMetar = NULL;
+#include <fstream>
+#include "racewebmetar.h"
+static ReWebMetarCloud      webMetarCloud;
+static ReWebMetarRunway     webMetarRunway;
+static ReWebMetarVisibility webMetarVisibility;
+static ReWebMetar           *webMetar = NULL;
 #endif //WEBSERVER
-
-
 
 // Local functions.
 static void reTrackDump(const tTrack *track, int verbose);
@@ -511,14 +505,14 @@ void
 reTrackInitRealWeather(void)
 {
     std::string url = "ftp://tgftp.nws.noaa.gov/data/observations/metar/stations/";
-    webMetar = new WebMetar;
+    webMetar = new ReWebMetar;
     tTrackLocalInfo *trackLocal = &ReInfo->track->local;
 
     url += trackLocal->station;
     url += ".TXT";
 
     GfLogInfo("URL WEATHER : %s\n", url.c_str());
-    bool w = webMetar->WebMetarFtp(url);
+    bool w = webMetar->ReWebMetarFtp(url);
 
     if (w == false)
         reTrackInitSimuWeather();
@@ -554,7 +548,7 @@ reTrackInitRealWeather(void)
 
         GfLogDebug("Contenu weather.txt = %s\n", weather.c_str());
 
-        webMetar->WebMetarLoad(weather);
+        webMetar->ReWebMetarLoad(weather);
 
         if (webMetar->getCAVOK())
         {
@@ -577,7 +571,7 @@ reTrackInitRealWeather(void)
         if (d == WebMetarNaN )
             d = 10000.0;
 
-        if (webMetarVisibility.getModifier() == WebMetarVisibility::GREATER_THAN)
+        if (webMetarVisibility.getModifier() == ReWebMetarVisibility::GREATER_THAN)
             d += 2000.0;// * sg_random();
 
         if(d > 15000)
@@ -683,7 +677,7 @@ reTrackInitRealWeather(void)
 void
 reTrackInitSimuWeather(void)
 {
-    webMetar = new WebMetar;
+    webMetar = new ReWebMetar;
     tTrackLocalInfo *trackLocal = &ReInfo->track->local;
 
     struct tm now;
@@ -744,7 +738,7 @@ reTrackInitSimuWeather(void)
     file.close();
     GfLogDebug("Contenu weather.txt = %s\n", weather.c_str());
 
-    webMetar->WebMetarLoad(weather);
+    webMetar->ReWebMetarLoad(weather);
 
     if (webMetar->getCAVOK())
     {
@@ -767,7 +761,7 @@ reTrackInitSimuWeather(void)
     if (d == WebMetarNaN )
         d = 10000.0;
 
-    if (webMetarVisibility.getModifier() == WebMetarVisibility::GREATER_THAN)
+    if (webMetarVisibility.getModifier() == ReWebMetarVisibility::GREATER_THAN)
         d += 2000.0;// * sg_random();
 
     if(d > 15000)
@@ -928,4 +922,3 @@ ReTrackShutdown(void)
 
     return 0;
 }
-

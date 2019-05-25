@@ -26,7 +26,7 @@
 #include <tgf.h>
 
 #include "tgfclient.h"
-#include "webmetar.h"
+#include "racewebmetar.h"
 
 #include <portability.h> // snprintf
 
@@ -64,7 +64,7 @@ static size_t curl_fwrite(void *buffer, size_t size, size_t nmemb, void *stream)
     return fwrite(buffer, size, nmemb, out->stream);
 }
 
-WebMetar::WebMetar() :
+ReWebMetar::ReWebMetar() :
     _grpcount(0),
     _x_proxy(false),
     _year(-1),
@@ -96,7 +96,7 @@ WebMetar::WebMetar() :
 {
 }
 
-bool WebMetar::WebMetarFtp(const string& m)
+bool ReWebMetar::ReWebMetarFtp(const string& m)
 {
     CURL *curl;
     CURLcode res;
@@ -151,7 +151,7 @@ bool WebMetar::WebMetarFtp(const string& m)
     return true;
 }
 
-void WebMetar::WebMetarLoad(const string& m)
+void ReWebMetar::ReWebMetarLoad(const string& m)
 {
     _data = new char[m.length() + 2];	// make room for " \0"
     strcpy(_data, m.c_str());
@@ -212,7 +212,7 @@ void WebMetar::WebMetarLoad(const string& m)
 /**
   * Clears lists and maps to discourage access after destruction.
   */
-WebMetar::~WebMetar()
+ReWebMetar::~ReWebMetar()
 {
     _clouds.clear();
     _runways.clear();
@@ -221,7 +221,7 @@ WebMetar::~WebMetar()
 }
 
 
-void WebMetar::useCurrentDate()
+void ReWebMetar::useCurrentDate()
 {
     GfLogDebug("Start use current date ...\n");
     struct tm now;
@@ -239,7 +239,7 @@ void WebMetar::useCurrentDate()
   * Replace any number of subsequent spaces by just one space, and add
   * a trailing space. This makes scanning for things like "ALL RWY" easier.
   */
-void WebMetar::normalizeData()
+void ReWebMetar::normalizeData()
 {
     GfLogDebug("Start normalize data ...\n");
     char *src, *dest;
@@ -254,7 +254,7 @@ void WebMetar::normalizeData()
 }
 
 // \d\d\d\d/\d\d/\d\d
-bool WebMetar::scanPreambleDate()
+bool ReWebMetar::scanPreambleDate()
 {
     GfLogDebug("Start scan Pre amble Date ...\n");
     char *m = _m;
@@ -288,7 +288,7 @@ bool WebMetar::scanPreambleDate()
 }
 
 // \d\d:\d\d
-bool WebMetar::scanPreambleTime()
+bool ReWebMetar::scanPreambleTime()
 {
     GfLogDebug("Start scan Pre amble Time ...\n");
     char *m = _m;
@@ -315,7 +315,7 @@ bool WebMetar::scanPreambleTime()
 }
 
 // (METAR|SPECI)
-bool WebMetar::scanType()
+bool ReWebMetar::scanType()
 {
     GfLogDebug("Start scan Tyoe ...\n");
     if (strncmp(_m, "METAR ", 6) && strncmp(_m, "SPECI ", 6))
@@ -328,7 +328,7 @@ bool WebMetar::scanType()
 }
 
 // [A-Z]{4}
-bool WebMetar::scanId()
+bool ReWebMetar::scanId()
 {
     GfLogDebug("Start scan ICAO ...\n");
     char *m = _m;
@@ -349,7 +349,7 @@ bool WebMetar::scanId()
 }
 
 // \d{6}Z
-bool WebMetar::scanDate()
+bool ReWebMetar::scanDate()
 {
     GfLogDebug("Start scan Date ...\n");
     char *m = _m;
@@ -381,7 +381,7 @@ bool WebMetar::scanDate()
 
 
 // (NIL|AUTO|COR|RTD)
-bool WebMetar::scanModifier()
+bool ReWebMetar::scanModifier()
 {
     GfLogDebug("Start scan Modifier ...\n");
     char *m = _m;
@@ -415,7 +415,7 @@ bool WebMetar::scanModifier()
 
 
 // (\d{3}|VRB)\d{1,3}(G\d{2,3})?(KT|KMH|MPS)
-bool WebMetar::scanWind()
+bool ReWebMetar::scanWind()
 {
     GfLogDebug("Start scan wind ...\n");
     char *m = _m;
@@ -474,7 +474,7 @@ bool WebMetar::scanWind()
 }
 
 // \d{3}V\d{3}
-bool WebMetar::scanVariability()
+bool ReWebMetar::scanVariability()
 {
     GfLogDebug("Start scan Variability ...\n");
     char *m = _m;
@@ -499,7 +499,7 @@ bool WebMetar::scanVariability()
     return true;
 }
 
-bool WebMetar::scanVisibility()
+bool ReWebMetar::scanVisibility()
 // TODO: if only directed vis are given, do still set min/max
 {
     GfLogDebug("Start scan Visibility ...\n");
@@ -514,7 +514,7 @@ bool WebMetar::scanVisibility()
     char *m = _m;
     double distance;
     int i, dir = -1;
-    int modifier = WebMetarVisibility::EQUALS;
+    int modifier = ReWebMetarVisibility::EQUALS;
     // \d{4}(N|NE|E|SE|S|SW|W|NW)?
     if (scanNumber(&m, &i, 4))
     {
@@ -554,9 +554,9 @@ bool WebMetar::scanVisibility()
         }
 
         if (i == 0)
-            i = 50, modifier = WebMetarVisibility::LESS_THAN;
+            i = 50, modifier = ReWebMetarVisibility::LESS_THAN;
         else if (i == 9999)
-            i++, modifier = WebMetarVisibility::GREATER_THAN;
+            i++, modifier = ReWebMetarVisibility::GREATER_THAN;
 
         distance = i;
         _distance = i;
@@ -566,7 +566,7 @@ bool WebMetar::scanVisibility()
     {
         // M?(\d{1,2}|\d{1,2}/\d{1,2}|\d{1,2} \d{1,2}/\d{1,2})(SM|KM)
         if (*m == 'M')
-            m++, modifier = WebMetarVisibility::LESS_THAN;
+            m++, modifier = ReWebMetarVisibility::LESS_THAN;
 
         if (!scanNumber(&m, &i, 1, 2))
             return false;
@@ -609,7 +609,7 @@ bool WebMetar::scanVisibility()
     if (!scanBoundary(&m))
         return false;
 
-    WebMetarVisibility *v;
+    ReWebMetarVisibility *v;
     if (dir != -1)
         v = &_dir_visibility[dir / 45];
     else if (_min_visibility._distance == NaN)
@@ -630,12 +630,12 @@ bool WebMetar::scanVisibility()
 }
 
 // R\d\d[LCR]?/([PM]?\d{4}V)?[PM]?\d{4}(FT)?[DNU]?
-bool WebMetar::scanRwyVisRange()
+bool ReWebMetar::scanRwyVisRange()
 {
     GfLogDebug("Start scan RWY vis range ...\n");
     char *m = _m;
     int i;
-    WebMetarRunway r;
+    ReWebMetarRunway r;
 
     if (*m++ != 'R')
         return false;
@@ -654,9 +654,9 @@ bool WebMetar::scanRwyVisRange()
     int from, to;
 
     if (*m == 'P')
-        m++, r._min_visibility._modifier = WebMetarVisibility::GREATER_THAN;
+        m++, r._min_visibility._modifier = ReWebMetarVisibility::GREATER_THAN;
     else if (*m == 'M')
-        m++, r._min_visibility._modifier = WebMetarVisibility::LESS_THAN;
+        m++, r._min_visibility._modifier = ReWebMetarVisibility::LESS_THAN;
     if (!scanNumber(&m, &from, 4))
         return false;
 
@@ -664,9 +664,9 @@ bool WebMetar::scanRwyVisRange()
     {
         m++;
         if (*m == 'P')
-            m++, r._max_visibility._modifier = WebMetarVisibility::GREATER_THAN;
+            m++, r._max_visibility._modifier = ReWebMetarVisibility::GREATER_THAN;
         else if (*m == 'M')
-            m++, r._max_visibility._modifier = WebMetarVisibility::LESS_THAN;
+            m++, r._max_visibility._modifier = ReWebMetarVisibility::LESS_THAN;
         if (!scanNumber(&m, &to, 4))
             return false;
     } else
@@ -686,11 +686,11 @@ bool WebMetar::scanRwyVisRange()
         m++;
 
     if (*m == 'D')
-        m++, r._min_visibility._tendency = WebMetarVisibility::DECREASING;
+        m++, r._min_visibility._tendency = ReWebMetarVisibility::DECREASING;
     else if (*m == 'N')
-        m++, r._min_visibility._tendency = WebMetarVisibility::STABLE;
+        m++, r._min_visibility._tendency = ReWebMetarVisibility::STABLE;
     else if (*m == 'U')
-        m++, r._min_visibility._tendency = WebMetarVisibility::INCREASING;
+        m++, r._min_visibility._tendency = ReWebMetarVisibility::INCREASING;
 
     if (!scanBoundary(&m))
         return false;
@@ -753,7 +753,7 @@ static const struct Token phenomenon[] =
 };
 
 // (+|-|VC)?(NSW|MI|PR|BC|DR|BL|SH|TS|FZ)?((DZ|RA|SN|SG|IC|PE|GR|GS|UP){0,3})(BR|FG|FU|VA|DU|SA|HZ|PY|PO|SQ|FC|SS|DS){0,3}
-bool WebMetar::scanWeather()
+bool ReWebMetar::scanWeather()
 {
     GfLogDebug("Start Scan Weather ...\n");
     char *m = _m;
@@ -873,13 +873,13 @@ static const struct Token cloud_types[] =
 #include <iostream>
 
 // (FEW|SCT|BKN|OVC|SKC|CLR|CAVOK|VV)([0-9]{3}|///)?[:cloud_type:]?
-bool WebMetar::scanSkyCondition()
+bool ReWebMetar::scanSkyCondition()
 {
     GfLogDebug("Start Scan Sky Condition ...\n");
 
     char *m = _m;
     int i;
-    WebMetarCloud cl;
+    ReWebMetarCloud cl;
 
     if (!strncmp(m, "//////", 6))
     {
@@ -903,7 +903,7 @@ bool WebMetar::scanSkyCondition()
 
         if (i == 3)
         {
-            cl._coverage = WebMetarCloud::COVERAGE_CLEAR;
+            cl._coverage = ReWebMetarCloud::COVERAGE_CLEAR;
             _clouds.push_back(cl);
         }
         else
@@ -920,43 +920,43 @@ bool WebMetar::scanSkyCondition()
         ;
     else if (!strncmp(m, "CLR", i = 3))
     {
-        cl._coverage = WebMetarCloud::COVERAGE_CIRRUS;
+        cl._coverage = ReWebMetarCloud::COVERAGE_CIRRUS;
         _cloudnumber =  _cloudnumber + 1;
         GfLogDebug("CLR / CIRRUS  - cloudnumber = %i\n", _cloudnumber);
     }
     else if (!strncmp(m, "FEW", i = 3))
     {
-        cl._coverage = WebMetarCloud::COVERAGE_FEW;
+        cl._coverage = ReWebMetarCloud::COVERAGE_FEW;
         _cloudnumber =  _cloudnumber + 1;
         GfLogDebug("FEW  - cloudnumber = %i\n", _cloudnumber);
     }
     else if (!strncmp(m, "NCD", i = 3))
     {
-        cl._coverage = WebMetarCloud::COVERAGE_MANY;
+        cl._coverage = ReWebMetarCloud::COVERAGE_MANY;
         _cloudnumber =  _cloudnumber + 1;
         GfLogDebug("NCD / MANY CLOUDS - cloudnumber = %i\n", _cloudnumber);
     }
     else if (!strncmp(m, "NSC", i = 3))
     {
-        cl._coverage = WebMetarCloud::COVERAGE_CUMULUS;
+        cl._coverage = ReWebMetarCloud::COVERAGE_CUMULUS;
         _cloudnumber =  _cloudnumber + 1;
         GfLogDebug("NCD / MANY CLOUDS - cloudnumber = %i\n", _cloudnumber);
     }
     else if (!strncmp(m, "SCT", i = 3))
     {
-        cl._coverage = WebMetarCloud::COVERAGE_SCATTERED;
+        cl._coverage = ReWebMetarCloud::COVERAGE_SCATTERED;
         _cloudnumber =  _cloudnumber + 1;
         GfLogDebug("SCATTERED - cloudnumber = %i\n", _cloudnumber);
     }
     else if (!strncmp(m, "BKN", i = 3))
     {
-        cl._coverage = WebMetarCloud::COVERAGE_BROKEN;
+        cl._coverage = ReWebMetarCloud::COVERAGE_BROKEN;
         _cloudnumber =  _cloudnumber + 1;
         GfLogDebug("BROKEN - cloudnumber = %i\n", _cloudnumber);
     }
     else if (!strncmp(m, "OVC", i = 3))
     {
-        cl._coverage = WebMetarCloud::COVERAGE_OVERCAST;
+        cl._coverage = ReWebMetarCloud::COVERAGE_OVERCAST;
         _cloudnumber =  _cloudnumber + 1;
         GfLogDebug("OVERCAST - cloudnumber = %i\n", _cloudnumber);
     }
@@ -983,12 +983,12 @@ bool WebMetar::scanSkyCondition()
     else if (!scanNumber(&m, &i, 3))
         i = -1;
 
-    if (cl._coverage == WebMetarCloud::COVERAGE_NIL)
+    if (cl._coverage == ReWebMetarCloud::COVERAGE_NIL)
     {
         if (!scanBoundary(&m))
             return false;
         if (i == -1)			// 'VV///'
-            _vert_visibility._modifier = WebMetarVisibility::NOGO;
+            _vert_visibility._modifier = ReWebMetarVisibility::NOGO;
         else
             _vert_visibility._distance = i * 100 * 0.3048;
         _m = m;
@@ -1049,7 +1049,7 @@ bool WebMetar::scanSkyCondition()
 
 // M?[0-9]{2}/(M?[0-9]{2})?            (spec)
 // (M?[0-9]{2}|XX)/(M?[0-9]{2}|XX)?    (Namibia)
-bool WebMetar::scanTemperature()
+bool ReWebMetar::scanTemperature()
 {
     GfLogDebug("Start scan Temperature ...\n");
     char *m = _m;
@@ -1103,7 +1103,7 @@ bool WebMetar::scanTemperature()
     return true;
 }
 
-double WebMetar::getRelHumidity() const
+double ReWebMetar::getRelHumidity() const
 {
     GfLogDebug("Start get relative temperature ...\n");
     if (_temp == NaN || _dewp == NaN)
@@ -1117,7 +1117,7 @@ double WebMetar::getRelHumidity() const
 
 // [AQ]\d{4}             (spec)
 // [AQ]\d{2}(\d{2}|//)   (Namibia)
-bool WebMetar::scanPressure()
+bool ReWebMetar::scanPressure()
 {
     GfLogDebug("Start scan Pressure ...\n");
     char *m = _m;
@@ -1188,12 +1188,12 @@ static const char *runway_friction[] =
 };
 
 // \d\d(CLRD|[\d/]{4})(\d\d|//)
-bool WebMetar::scanRunwayReport()
+bool ReWebMetar::scanRunwayReport()
 {
     char *m = _m;
     int i;
     char id[4];
-    WebMetarRunway r;
+    ReWebMetarRunway r;
 
     if (!scanNumber(&m, &i, 2))
         return false;
@@ -1289,7 +1289,7 @@ bool WebMetar::scanRunwayReport()
 
 
 // WS (ALL RWYS?|RWY ?\d\d[LCR]?)?
-bool WebMetar::scanWindShear()
+bool ReWebMetar::scanWindShear()
 {
     GfLogDebug("Start scan Wind Shear ...\n");
     char *m = _m;
@@ -1358,7 +1358,7 @@ bool WebMetar::scanWindShear()
     return true;
 }
 
-bool WebMetar::scanTrendForecast()
+bool ReWebMetar::scanTrendForecast()
 {
     GfLogDebug("Start scan Trent Forecast ...\n");
     char *m = _m;
@@ -1388,7 +1388,7 @@ static const struct Token colors[] =
 { 0, 0 }
 };
 
-bool WebMetar::scanColorState()
+bool ReWebMetar::scanColorState()
 {
     GfLogDebug("Start scan Color State ...\n");
     char *m = _m;
@@ -1405,7 +1405,7 @@ bool WebMetar::scanColorState()
     return true;
 }
 
-bool WebMetar::scanRemark()
+bool ReWebMetar::scanRemark()
 {
     GfLogDebug("Start scan Remark ...\n");
     if (strncmp(_m, "RMK", 3))
@@ -1430,7 +1430,7 @@ bool WebMetar::scanRemark()
     return true;
 }
 
-bool WebMetar::scanRemainder()
+bool ReWebMetar::scanRemainder()
 {
     GfLogDebug("Start scan Remainder ...\n");
     char *m = _m;
@@ -1452,7 +1452,7 @@ bool WebMetar::scanRemainder()
 }
 
 
-bool WebMetar::scanBoundary(char **s)
+bool ReWebMetar::scanBoundary(char **s)
 {
     if (**s && !isspace(**s))
         return false;
@@ -1464,7 +1464,7 @@ bool WebMetar::scanBoundary(char **s)
 }
 
 
-int WebMetar::scanNumber(char **src, int *num, int min, int max)
+int ReWebMetar::scanNumber(char **src, int *num, int min, int max)
 {
     int i;
     char *s = *src;
@@ -1486,7 +1486,7 @@ int WebMetar::scanNumber(char **src, int *num, int min, int max)
     return i;
 }
 
-void WebMetar::density()
+void ReWebMetar::density()
 {
     double relhumidity = getRelHumidity();
     double pressure = _pressure * 100;
@@ -1613,7 +1613,7 @@ void WebMetar::density()
 }
 
 // find longest match of str in list
-const struct Token *WebMetar::scanToken(char **str, const struct Token *list)
+const struct Token *ReWebMetar::scanToken(char **str, const struct Token *list)
 {
     const struct Token *longest = 0;
     int maxlen = 0, len;
@@ -1635,7 +1635,7 @@ const struct Token *WebMetar::scanToken(char **str, const struct Token *list)
     return longest;
 }
 
-void WebMetarCloud::set(double alt, Coverage cov)
+void ReWebMetarCloud::set(double alt, Coverage cov)
 {
     _altitude = alt;
 
@@ -1643,7 +1643,7 @@ void WebMetarCloud::set(double alt, Coverage cov)
         _coverage = cov;
 }
 
-WebMetarCloud::Coverage WebMetarCloud::getCoverage( const std::string & coverage )
+ReWebMetarCloud::Coverage ReWebMetarCloud::getCoverage( const std::string & coverage )
 {
     if( coverage == "clear" ) return COVERAGE_CLEAR;
     if( coverage == "few" ) return COVERAGE_FEW;
@@ -1654,15 +1654,15 @@ WebMetarCloud::Coverage WebMetarCloud::getCoverage( const std::string & coverage
     return COVERAGE_NIL;
 }
 
-const char * WebMetarCloud::COVERAGE_NIL_STRING =		"nil";
-const char * WebMetarCloud::COVERAGE_CLEAR_STRING =		"clear";
-const char * WebMetarCloud::COVERAGE_CIRRUS_STRING =    "cirrus";
-const char * WebMetarCloud::COVERAGE_FEW_STRING =		"few";
-const char * WebMetarCloud::COVERAGE_SCATTERED_STRING = "scattered";
-const char * WebMetarCloud::COVERAGE_BROKEN_STRING =	"broken";
-const char * WebMetarCloud::COVERAGE_OVERCAST_STRING =	"overcast";
+const char * ReWebMetarCloud::COVERAGE_NIL_STRING =		"nil";
+const char * ReWebMetarCloud::COVERAGE_CLEAR_STRING =		"clear";
+const char * ReWebMetarCloud::COVERAGE_CIRRUS_STRING =    "cirrus";
+const char * ReWebMetarCloud::COVERAGE_FEW_STRING =		"few";
+const char * ReWebMetarCloud::COVERAGE_SCATTERED_STRING = "scattered";
+const char * ReWebMetarCloud::COVERAGE_BROKEN_STRING =	"broken";
+const char * ReWebMetarCloud::COVERAGE_OVERCAST_STRING =	"overcast";
 
-void WebMetarVisibility::set(double dist, int dir, int mod, int tend)
+void ReWebMetarVisibility::set(double dist, int dir, int mod, int tend)
 {
     _distance = dist;
     if (dir != -1)
@@ -1673,9 +1673,4 @@ void WebMetarVisibility::set(double dist, int dir, int mod, int tend)
         _tendency = tend;
 }
 
-//initialize the web server
-TGFCLIENT_API WebMetar webMetar;
-TGFCLIENT_API WebMetarCloud webMetarCloud;
-TGFCLIENT_API WebMetarRunway webMetarRunway;
-TGFCLIENT_API WebMetarVisibility webMetarVisibility;
 #endif //WEBMETAR

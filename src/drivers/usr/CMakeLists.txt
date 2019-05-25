@@ -25,8 +25,6 @@ SET(ROBOT_SOURCES
   src/opponent.cpp
   src/pit.h
   src/pit.cpp
-  src/quadratic.cpp
-  src/quadratic.h
   src/raceline.h
   src/raceline.cpp
   src/spline.h

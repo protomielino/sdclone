@@ -18,15 +18,14 @@
 
 #ifdef WEBSERVER
 
-#ifndef _SD_WEBMETAR_H_
-#define _SD_WEBMETAR_H_
+#ifndef _SD_REWEBMETAR_H_
+#define _SD_REWEBMETAR_H_
+
 #include <vector>
 #include <string>
 #include <map>
 #include <ctime>
 #include <curl/curl.h>
-
-#include "tgfclient.h"
 
 // url https://tgftp.nws.noaa.gov/data/observations/metar/stations/
 struct Token
@@ -39,11 +38,11 @@ const double WebMetarNaN = -1E20;
 
 //class WebMetar;
 
-class TGFCLIENT_API WebMetarVisibility
+class ReWebMetarVisibility
 {
-    friend class WebMetar;
+    friend class ReWebMetar;
 public:
-    WebMetarVisibility() :
+    ReWebMetarVisibility() :
         _distance(WebMetarNaN),
         _direction(-1),
         _modifier(EQUALS),
@@ -83,11 +82,11 @@ protected:
 
 
 // runway condition (surface and visibility)
-class TGFCLIENT_API WebMetarRunway
+class ReWebMetarRunway
 {
-    friend class WebMetar;
+    friend class ReWebMetar;
 public:
-    WebMetarRunway() :
+    ReWebMetarRunway() :
         _deposit(-1),
         _deposit_string(0),
         _extent(-1),
@@ -107,12 +106,12 @@ public:
     inline const char		*getFrictionString()  const { return _friction_string; }
     inline const char		*getComment()		const { return _comment; }
     inline       bool		getWindShear()		const { return _wind_shear; }
-    inline const            WebMetarVisibility&	getMinVisibility()	const { return _min_visibility; }
-    inline const            WebMetarVisibility&	getMaxVisibility()	const { return _max_visibility; }
+    inline const            ReWebMetarVisibility&	getMinVisibility()	const { return _min_visibility; }
+    inline const            ReWebMetarVisibility&	getMaxVisibility()	const { return _max_visibility; }
 
 protected:
-    WebMetarVisibility _min_visibility;
-    WebMetarVisibility _max_visibility;
+    ReWebMetarVisibility _min_visibility;
+    ReWebMetarVisibility _max_visibility;
     int		           _deposit;
     const char*        _deposit_string;
     int		           _extent;
@@ -125,9 +124,9 @@ protected:
 };
 
 // cloud layer
-class TGFCLIENT_API WebMetarCloud
+class ReWebMetarCloud
 {
-    friend class WebMetar;
+    friend class ReWebMetar;
 public:
     enum Coverage
     {
@@ -152,7 +151,7 @@ public:
     static const char * COVERAGE_BROKEN_STRING;
     static const char * COVERAGE_OVERCAST_STRING;
 
-    WebMetarCloud() : _coverage(COVERAGE_NIL), _altitude(WebMetarNaN), _type(0), _type_long(0) {}
+    ReWebMetarCloud() : _coverage(COVERAGE_NIL), _altitude(WebMetarNaN), _type(0), _type_long(0) {}
 
     void set(double alt, Coverage cov = COVERAGE_NIL );
 
@@ -170,14 +169,14 @@ protected:
     const char*			_type_long; // cumulus
 };
 
-class TGFCLIENT_API WebMetar
+class ReWebMetar
 {
 public:
-    WebMetar();
-    ~WebMetar();
+    ReWebMetar();
+    ~ReWebMetar();
 
-    bool WebMetarFtp(const std::string& m);
-    void WebMetarLoad(const std::string& m);
+    bool ReWebMetarFtp(const std::string& m);
+    void ReWebMetarLoad(const std::string& m);
 
     enum ReportType
     {
@@ -239,10 +238,10 @@ public:
     inline int			getWindRangeFrom()	const { return _wind_range_from; }
     inline int			getWindRangeTo()	const { return _wind_range_to; }
 
-    inline const WebMetarVisibility&    getMinVisibility()	const { return _min_visibility; }
-    inline const WebMetarVisibility&    getMaxVisibility()	const { return _max_visibility; }
-    inline const WebMetarVisibility&    getVertVisibility()	const { return _vert_visibility; }
-    inline const WebMetarVisibility*    getDirVisibility()	const { return _dir_visibility; }
+    inline const ReWebMetarVisibility&    getMinVisibility()	const { return _min_visibility; }
+    inline const ReWebMetarVisibility&    getMaxVisibility()	const { return _max_visibility; }
+    inline const ReWebMetarVisibility&    getVertVisibility()	const { return _vert_visibility; }
+    inline const ReWebMetarVisibility*    getDirVisibility()	const { return _dir_visibility; }
 
     inline double		getTemperature_C()	const { return _temp; }
     inline double		getTemperature_F()	const { return _temp == WebMetarNaN ? WebMetarNaN : 1.8 * _temp + 32; }
@@ -259,8 +258,8 @@ public:
 
     double				getRelHumidity()	const;
 
-    inline const std::vector<WebMetarCloud>& getClouds()				const	{ return _clouds; }
-    inline const std::map<std::string, WebMetarRunway>& getRunways()	const	{ return _runways; }
+    inline const std::vector<ReWebMetarCloud>& getClouds()				const	{ return _clouds; }
+    inline const std::map<std::string, ReWebMetarRunway>& getRunways()	const	{ return _runways; }
     inline const std::vector<std::string>& getWeather()					const	{ return _weather; }
     inline const std::vector<struct Weather> getWeather2()				const   { return _weather2; }
 
@@ -300,13 +299,13 @@ protected:
     bool		_cavok;
     std::vector<struct Weather> _weather2;
 
-    WebMetarVisibility				_min_visibility;
-    WebMetarVisibility				_max_visibility;
-    WebMetarVisibility				_vert_visibility;
-    WebMetarVisibility				_dir_visibility[8];
-    std::vector<WebMetarCloud>		_clouds;
-    std::map<std::string, WebMetarRunway>	_runways;
-    std::vector<std::string>		_weather;
+    ReWebMetarVisibility				_min_visibility;
+    ReWebMetarVisibility				_max_visibility;
+    ReWebMetarVisibility				_vert_visibility;
+    ReWebMetarVisibility				_dir_visibility[8];
+    std::vector<ReWebMetarCloud>		_clouds;
+    std::map<std::string, ReWebMetarRunway>	_runways;
+    std::vector<std::string>		    _weather;
 
     bool	scanPreambleDate();
     bool	scanPreambleTime();
@@ -331,12 +330,12 @@ protected:
     bool	scanRemark();
     bool	scanRemainder();
 
-    int	scanNumber(char **str, int *num, int min, int max = 0);
+    int	    scanNumber(char **str, int *num, int min, int max = 0);
     bool	scanBoundary(char **str);
     const struct Token *scanToken(char **str, const struct Token *list);
     void	normalizeData();
     void    density();
 };
 
-#endif //_SD_WEBMETAR_H_
+#endif //_SD_REWEBMETAR_H_
 #endif //WEBSERVER
