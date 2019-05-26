@@ -44,6 +44,7 @@ public:
     inline float getLengthOnTrack() { return length; }
     inline float getTrackangle() { return trackangle; }
     inline float getCarAngle() { return angle; }
+    inline double getAvgAccelX() { return avgAccelX; }
 
     inline bool thisCar(tCarElt *car) { return (car == this->car); }
     inline tPosd *getCorner1() { return corner1; }
@@ -68,12 +69,13 @@ public:
 protected:
     static float getSpeed(tCarElt *car, float trackangle);
 
-    float speed;		// speed in direction of the track.
-    float width;		// the cars needed width on the track.
-    float length;		// the cars needed length on the track.
-    float trackangle;	// Track angle at the opponents position.
-    float angle;		// The angle of the car relative to the track tangent.
-    float fuelMassFactor;
+    float  speed;		// speed in direction of the track.
+    float  width;		// the cars needed width on the track.
+    float  length;		// the cars needed length on the track.
+    float  trackangle;	// Track angle at the opponents position.
+    float  angle;		// The angle of the car relative to the track tangent.
+    float  fuelMassFactor;
+    double avgAccelX;
 
     tPosd corner1[4];
     tPosd corner2[4];

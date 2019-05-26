@@ -31,6 +31,8 @@ void SingleCardata::update()
     width = MAX(car->_dimension_y, fabs(car->_dimension_x*sin(angle) + car->_dimension_y*cos(angle))) + 0.1f;
     length = MAX(car->_dimension_x, fabs(car->_dimension_y*sin(angle) + car->_dimension_x*cos(angle))) + 0.1f;
 
+    avgAccelX = avgAccelX * 0.9 + car->_accel_x / 10;
+
     for (int i=0; i<4; i++)
     {
         corner2[i].ax = corner1[i].ax;
@@ -135,6 +137,8 @@ void SingleCardata::init( CarElt *pcar )
 
     lastspeed[0].ax = lastspeed[1].ax = lastspeed[2].ax = car->_speed_X;
     lastspeed[0].ay = lastspeed[1].ay = lastspeed[2].ay = car->_speed_Y;
+
+    avgAccelX = 0.0;
 
     t_m = t_m_f = t_m_r = 9999999.0f;
     //lTT = (double)GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_WTT, (char *)NULL, BT_ATT_WT);

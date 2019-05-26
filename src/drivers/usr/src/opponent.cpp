@@ -34,7 +34,7 @@ const int   Opponent::MAX_DAMAGE_DIFF = 1000;
 
 Opponent::Opponent()
 {
-    t_impact = t_toside = 0.0;
+    t_impact = t_toside = avgAccelX = 0.0;
     toLeft = 0.0f;
     prevToLeft = -200.0f;
     brake_overtake_filter = 1.0f;
@@ -69,6 +69,7 @@ void Opponent::update(tSituation *s, Driver *driver)
         firstTime = false;
     }
 
+    avgAccelX = avgAccelX * 0.9 + car->_accel_x / 10;
     toLeft = car->_trkPos.toLeft;
 
     if (prevToLeft < -100.0f)
@@ -860,7 +861,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     {
         int div = driver->raceline->DivIndexForCar(car, timpact);
 
-        if (driver->raceline->IsSlowerThanSpeedToDiv(driver->linemode, car->_speed_x + MIN(0.0, car->_accel_x / 4), div, &slowSpeed))
+        if (driver->raceline->IsSlowerThanSpeedToDiv(driver->linemode, car->_speed_x + MIN(0.0, avgAccelX / 4), div, &slowSpeed))
         {
 #ifdef BRAKE_DEBUG
             fprintf(stderr, "%s %d NO COLL C: Slower Speed %.2f between opponent and collision point\n", car->_name, mycar->_dammage, slowSpeed); fflush(stderr);

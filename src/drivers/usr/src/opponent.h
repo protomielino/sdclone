@@ -83,6 +83,7 @@ public:
     int getIndex() { return index; }
     float getSpeedAngle() { return speedangle; }
     float getAvgLateralMovt() { return (float)avgLateralMovt; }
+    double getAvgAccelX() { return avgAccelX; }
 
     //void init (tCarElt *ocar, tCarElt *mcar);
     void update(tSituation *s, Driver *driver);
@@ -139,6 +140,7 @@ private:
     double d_prev_speed_Y;
     double average_AX;
     double average_AY;
+    double avgAccelX;
     double avgLateralMovt;
     double prevToLeft;
     double speedAngle[4];

@@ -2094,6 +2094,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
     double myTmp = AverageTmpForCar(car);
     bool approachingBrakeZone = raceline->ApproachingBrakeZone(NULL);
     double rInverse = raceline->tRInverse[LINE_RL][raceline->Next];
+    double fabsRInverse = fabs(rInverse);
     potentialOvertake = false;
 
     // Create list of opponents sorted by their importance
@@ -2132,10 +2133,14 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
         if ((opponent[i].getState() & OPP_FRONT))
         {
             double distance = opponent[i].getDistance();
-            double mySpeed = getSpeed() + 0.5;
-            double ospeed = opponent[i].getSpeed();
+            double myCurrentSpeed = getSpeed() + (distance < 3 ? mycardata->getAvgAccelX()/10 * (3 - distance) : 0.0);
+            double myMaxSpeed = MIN(raceline->TargetSpeed, myCurrentSpeed + MAX(2, mycardata->getAvgAccelX() / 4));
+             double ospeed = ocar->_speed_x + (distance < 3 ? opponent[i].getAvgAccelX()/10 * (3 - distance) : 0.0);
 
-            if (mySpeed < ospeed - (fabs(rInverse) > 0.001 ? MAX(0.3, 1.0 - fabs(rInverse) * 50) : 1.0 + car->_speed_x/50.0))
+             if (distance < 3)
+                 myMaxSpeed += mycardata->getAvgAccelX()/10 * (3 - distance);
+
+            if (MAX(myCurrentSpeed, myMaxSpeed) <= ospeed - (fabsRInverse > 0.005 ? MAX(0.3, 1.0 - fabsRInverse * 50) : MAX(1.0, 5.0 - car->_speed_x/25.0)))
             {
 #ifdef OVERTAKE_DEBUG
                 fprintf(stderr, "%s >> %s: IGNORED, too fast for us\n", car->_name, ocar->_name); fflush(stderr);
@@ -2157,7 +2162,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
                 lftSpeed = MIN(lftSpeed, car->_speed_x + 3.0);
             if (rgtSpeed > car->_speed_x && accelcmd > 0.9)
                 rgtSpeed = MIN(rgtSpeed, car->_speed_x + 3.0);
-            double speedDiff = MAX(0.0, MAX(lftSpeed, MAX(rgtSpeed, mySpeed)) - ospeed);
+            double speedDiff = MAX(0.0, MAX(lftSpeed, MAX(rgtSpeed, myCurrentSpeed)) - ospeed);
 
             double catchtime = MAX(0.0, MIN(opponent[i].getTimeToSide(), MAX(lftSpeed, rgtSpeed)));
             double ranking = MIN(distance*5, catchtime);
