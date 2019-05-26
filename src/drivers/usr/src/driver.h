@@ -44,8 +44,6 @@
 #include "globaldefs.h"
 #include "manual_override.h"
 
-
-
 class Opponents;
 class Opponent;
 class Pit;
@@ -60,7 +58,8 @@ class SimpleStrategy;
 extern GfLogger* PLogUSR;
 #define LogUSR (*PLogUSR)
 
-class Driver {
+class Driver
+{
 public:
     Driver(int index);
     ~Driver();
@@ -172,27 +171,26 @@ private:
     bool CheckOvertaking(double leftMargin, double rightMargin);
     int GetAvoidSide(Opponent *oppnt, int allowed_sides, double t_impact, double *leftMargin, double *rightMargin);
 
-
     // Per robot global data.
     RaceLineDriveData *racelineDrivedata;
 
     LManualOverrideCollection *overrideCollection;
-    int mode;
-    int avoidmode;
-    int lastmode;
-    int stuck;
-    float speedangle;        // the angle of the speed vector relative to trackangle, > 0.0 points to right.
-    float angle;
+    int    mode;
+    int    avoidmode;
+    int    lastmode;
+    int    stuck;
+    float  speedangle;        // the angle of the speed vector relative to trackangle, > 0.0 points to right.
+    float  angle;
     double car_Mass;        // Mass of car + fuel.
     double ftank_Mass;        // Mass of full fuel tank.
-    float myoffset;            // Offset to the track middle.
-    float laststeer;
-    float lastNSasteer;
-    float coll_brake_timpact;
-    float coll_brake_boost;
-    float brakeratio;
+    float  myoffset;            // Offset to the track middle.
+    float  laststeer;
+    float  lastNSasteer;
+    float  coll_brake_timpact;
+    float  coll_brake_boost;
+    float  brakeratio;
     double brake_coefficient;
-    float outside_overtake_inhibitor;
+    float  outside_overtake_inhibitor;
     double prevYawRate;
     double deltaTime;
     double speedAdvance, speedDivisor;
@@ -207,7 +205,7 @@ private:
     double last_right_toMid;
 
     double spinDist;
-    int spinDir;
+    int    spinDir;
 
     double speedAngle[4];
     double wheelz[4];
@@ -216,30 +214,30 @@ private:
     double gear_shift_up;
     double gear_shift_down;
 
-    float stucksteer;
-    float stuck_stopped_timer;
-    float stuck_reverse_timer;
-    int stuck_damage;
-    int test_raceline;
-    int test_rnd_raceline;
+    float  stucksteer;
+    float  stuck_stopped_timer;
+    float  stuck_reverse_timer;
+    int    stuck_damage;
+    int    test_raceline;
+    int    test_rnd_raceline;
 
     tSituation *situation;
 
     tCarElt *car;            // Pointer to tCarElt struct.
-    Line *line;                             // Racing line finder
+    Line    *line;           // Racing line finder
 
     Opponents *opponents;    // The container for opponents.
-    Opponent *opponent;        // The array of opponents.
+    Opponent  *opponent;      // The array of opponents.
 
     Pit *pit;                        // Pointer to the pit instance.
     SimpleStrategy *strategy;        // Pit stop strategy.
 
     static Cardata *cardata;        // Data about all cars shared by all instances.
-    SingleCardata *mycardata;        // Pointer to "global" data about my car.
-    static double currentsimtime;    // Store time to avoid useless updates.
+    SingleCardata  *mycardata;        // Pointer to "global" data about my car.
+    static double  currentsimtime;    // Store time to avoid useless updates.
     double overtake_test_timer;
 
-    static int curseg_id;
+    static int  curseg_id;
     static char *curseg_name;
 
     double simtime;       // how long since the race started
@@ -255,17 +253,17 @@ private:
     double setAccel;
     double LetPass;
     double m_fuelPerMeter;
-    int displaySetting;
-    int modeVerbose;
-    int m_fuelStrat;
-    int m_maxDammage;
-    int m_testPitstop;
-    int m_testQualifTime;
-    int m_lineIndex;
-    int m_strategyverbose;
-    int m_steerverbose;
-    int LineK1999;
-    int bumpCaution;
+    int    displaySetting;
+    int    modeVerbose;
+    int    m_fuelStrat;
+    int    m_maxDammage;
+    int    m_testPitstop;
+    int    m_testQualifTime;
+    int    m_lineIndex;
+    int    m_strategyverbose;
+    int    m_steerverbose;
+    int    LineK1999;
+    int    bumpCaution;
     double left_overtake_caution;
     double right_overtake_caution;
     double overtake_caution;
@@ -275,25 +273,25 @@ private:
     double brakemargin;
     bool   rain;
     double rainintensity;
-    int    weathercode;          // Track specific weather
-    float currentspeedsqr;    // Square of the current speed_x.
-    float clutchtime;        // Clutch timer.
-    float oldlookahead;        // Lookahead for steering in the previous step.
-    float racesteer;     // steer command to get to raceline
-    float rlookahead;    // how far ahead on the track we look for steering
-    float raceoffset;    // offset from middle of track towards which raceline is steering
-    float avoidlftoffset; // closest opponent on the left
-    float avoidrgtoffset; // closest opponent on the right
-    float racespeed;     // how fast raceline code says we should be going
-    float avoidspeed;    // how fast we should go if avoiding
-    float accelcmd, brakecmd;
-    float PitOffset;
-    v2d racetarget;      // the 2d point the raceline is driving at.
+    int    weathercode;       // Track specific weather
+    float  currentspeedsqr;   // Square of the current speed_x.
+    float  clutchtime;        // Clutch timer.
+    float  oldlookahead;      // Lookahead for steering in the previous step.
+    float  racesteer;         // steer command to get to raceline
+    float  rlookahead;        // how far ahead on the track we look for steering
+    float  raceoffset;        // offset from middle of track towards which raceline is steering
+    float  avoidlftoffset;    // closest opponent on the left
+    float  avoidrgtoffset;    // closest opponent on the right
+    float  racespeed;         // how fast raceline code says we should be going
+    float  avoidspeed;        // how fast we should go if avoiding
+    float  accelcmd, brakecmd;
+    float  PitOffset;
+    v2d    racetarget;        // the 2d point the raceline is driving at.
 
-    float *radius;
-    int carindex;
+    float  *radius;
+    int    carindex;
 
-    bool potentialOvertake;
+    bool   potentialOvertake;
 
     const char* moduleName;
 
@@ -304,25 +302,25 @@ private:
     int INDEX;
     double CARMASS;        // Mass of the car only [kg].
     double FUEL_FACTOR;
-    float CA;    // Aerodynamic downforce coefficient.
+    float  CA;     // Aerodynamic downforce coefficient.
 
-    double FCA;  // front downforce
-    double RCA;  // rear downforce
-    double FWA;  // front wing angle
-    float CW;    // Aerodynamic drag coefficient.
-    double CR;   // Front/rear weight repartition
-    float TIREMU; // Friction coefficient of tires.
-    float (Driver::*GET_DRIVEN_WHEEL_SPEED)();
-    float OVERTAKE_OFFSET_INC;        // [m/timestep]
-    float MU_FACTOR;                // [-]
-    float COAST_ACCEL;
+    double FCA;    // front downforce
+    double RCA;    // rear downforce
+    double FWA;    // front wing angle
+    float  CW;     // Aerodynamic drag coefficient.
+    double CR;     // Front/rear weight repartition
+    float  TIREMU; // Friction coefficient of tires.
+    float  (Driver::*GET_DRIVEN_WHEEL_SPEED)();
+    float  OVERTAKE_OFFSET_INC;        // [m/timestep]
+    float  MU_FACTOR;                // [-]
+    float  COAST_ACCEL;
     double baseBrake;
 
-    float WB4DIST;
-    int WB4COUNT;
-    float HMDIST;
-    int m_lastWSide;
-    int m_lastWCount;
+    float  WB4DIST;
+    int    WB4COUNT;
+    float  HMDIST;
+    int    m_lastWSide;
+    int    m_lastWCount;
 
     // Class constants.
     static const float MAX_UNSTUCK_ANGLE;
@@ -363,11 +361,10 @@ private:
     static const float USE_LEARNED_OFFSET_RANGE;
 
     static const float TEAM_REAR_DIST;
-    static const int TEAM_DAMAGE_CHANGE_LEAD;
+    static const int   TEAM_DAMAGE_CHANGE_LEAD;
 
     // Track variables.
     tTrack* track;
 };
 
 #endif // _DRIVER_H_
-
