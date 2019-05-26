@@ -74,27 +74,27 @@ public:
     void shutdown(void);
 
     tCarElt *getCarPtr() { return car; }
-    tTrack *getTrackPtr() { return track; }
-    float getSpeed() { return mycardata->getSpeedInTrackDirection(); /*speed;*/ }
-    double getBrakeMargin();
-    float getSpeedAngle() { return speedangle; }
-    float getAngle() { return angle; }
-    int GetMode() { return mode; }
-    tPosd *getCorner1() { return mycardata->getCorner1(); }
-    float getBrakeTImpact() { return coll_brake_timpact; }
+    tTrack  *getTrackPtr() { return track; }
+    float   getSpeed() { return mycardata->getSpeedInTrackDirection(); /*speed;*/ }
+    double  getBrakeMargin();
+    float   getSpeedAngle() { return speedangle; }
+    float   getAngle() { return angle; }
+    int     GetMode() { return mode; }
+    tPosd   *getCorner1() { return mycardata->getCorner1(); }
+    float   getBrakeTImpact() { return coll_brake_timpact; }
     LManualOverrideCollection *getOverrides() { return overrideCollection; }
-    double getBrakeCoefficient();
+    double  getBrakeCoefficient();
     LRaceLine *getRaceLine() { return raceline; }
-    bool isOnRaceline() { return !(linemode->IsTransitioning()); }
-    double getSpeedAngle(double time) { return speedAngle[0] + (speedAngle[0] - speedAngle[3]) * (time / (4 * deltaTime))*0.5; }
-    int getAvoidMode() { return avoidmode; }
-    vec2f getTargetPoint(double lane);
-    double mass() { return CARMASS; }
-    float getWidthOnTrack() { return mycardata->getWidthOnTrack(); }
+    bool    isOnRaceline() { return !(linemode->IsTransitioning()); }
+    double  getSpeedAngle(double time) { return speedAngle[0] + (speedAngle[0] - speedAngle[3]) * (time / (4 * deltaTime))*0.5; }
+    int     getAvoidMode() { return avoidmode; }
+    vec2f   getTargetPoint(double lane);
+    double  mass() { return CARMASS; }
+    float   getWidthOnTrack() { return mycardata->getWidthOnTrack(); }
 
-    void isAlone();
-    double futureLeftToMid(double t_impact) { return (t_impact <= 0.0 ? left_toMid : left_toMid + left_speed_y * t_impact); }
-    double futureRightToMid(double t_impact) { return (t_impact <= 0.0 ? right_toMid : right_toMid + right_speed_y * t_impact); }
+    void    isAlone();
+    double  futureLeftToMid(double t_impact) { return (t_impact <= 0.0 ? left_toMid : left_toMid + left_speed_y * t_impact); }
+    double  futureRightToMid(double t_impact) { return (t_impact <= 0.0 ? right_toMid : right_toMid + right_speed_y * t_impact); }
 
     double pitTimer;
     double average_AX;
@@ -116,13 +116,13 @@ public:
 
 private:
     // Utility functions.
-    bool isStuck();
-    void update(tSituation *s);
+    bool  isStuck();
+    void  update(tSituation *s);
     float getAllowedSpeed(float lgfromstart);
     float getAccel();
     float getDistToSegEnd();
     float getBrake();
-    int getGear();
+    int   getGear();
     float getSteer(tSituation *s);
     float getClutch();
     float getOffset();
@@ -130,13 +130,13 @@ private:
     float smoothSteering( float steercmd );
     float correctSteering( float avoidsteer, float racesteer );
     float calcSteer( float targetAngle, int rl, float racesteer );
-    void SetMode( int newmode, double leftMargin, double rightMargin, bool force=false );
+    void  SetMode( int newmode, double leftMargin, double rightMargin, bool force=false );
     float getWidth() { return mycardata->getWidthOnTrack(); }
-    bool calcSpeed();
-    int checkSwitch( int side, Opponent *o, tCarElt *ocar, double catchdist );
+    bool  calcSpeed();
+    int   checkSwitch( int side, Opponent *o, tCarElt *ocar, double catchdist );
     double AverageTmpForCar(CarElt *car);
-    void    Meteorology();
-    int     GetWeather();
+    void  Meteorology();
+    int   GetWeather();
 
     float filterOverlap(float accel);
     float filterBColl(float brake);
@@ -162,6 +162,8 @@ private:
     void showSetup();
 
     void computeRadius(int line, float *radius);
+    void initWheelPos();
+    int  checkFlying();
 
     void loadSVG();
     void saveSVG();
@@ -208,6 +210,7 @@ private:
     int spinDir;
 
     double speedAngle[4];
+    double wheelz[4];
 
     double gear_shift;
     double gear_shift_up;

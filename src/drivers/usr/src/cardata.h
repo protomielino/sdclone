@@ -58,6 +58,13 @@ public:
     bool   HasESP;
     bool   HasTCL;
 
+    double TyreConditionF;
+    double TyreConditionR;
+    double TyreConditionG;
+    double TyreConditionD;
+    double TyreCondition;
+    double TyreTreadDepth;
+
 protected:
     static float getSpeed(tCarElt *car, float trackangle);
 

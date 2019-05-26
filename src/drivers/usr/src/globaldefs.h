@@ -35,21 +35,6 @@
 extern GfLogger* PLogUSR;
 #define LogUSR (*PLogUSR)
 
-#define RTYPE_USR      0                     // Robot type usr
-#define RTYPE_USR_TRB1 1                     // Robot type usr_trb1
-#define RTYPE_USR_SC   2                     // Robot type usr_sc
-#define RTYPE_USR_36GP 3                     // Robot type usr_36GP
-#define RTYPE_USR_MPA1 4					 // Robot type usr_mpa1
-#define RTYPE_USR_MPA11 5                   // Robot type usr_mpa11
-#define RTYPE_USR_MPA12 6                   // Robot type usr_mpa12
-#define RTYPE_USR_LS1  7					 // Robot type usr_ls1
-#define RTYPE_USR_LS2  8					 // Robot type usr_ls2
-#define RTYPE_USR_MP5  9					 // Robot type usr_mp5
-#define RTYPE_USR_LP1  10					 // Robot type usr_lp1
-#define RTYPE_USR_REF  11					 // Robot type usr_ref
-#define RTYPE_USR_SRW  12                    // Robot type usr_srw
-#define RTYPE_USR_MP10 13                    // Robot type usr_mpa10
-
 static const int MAX_NBBOTS = 100;               // Number of drivers/robots
 
 #define SECT_PRIVATE          "usr private"

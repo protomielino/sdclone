@@ -1419,7 +1419,7 @@ void LRaceLine::InitTrack(tTrack* track, tSituation *p)
 {
     learn = new LLearn(car->_carHandle);
 
-    iterations = (int)GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_ITERATIONS, (char *)NULL, 100.0);
+    iterations = (int)GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_ITERATIONS, (char *)NULL, 250.0);
     side_iterations = (int)GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_SIDE_ITERATIONS, (char *)NULL, (tdble)iterations/5.0f);
     offlineTurnSpeed = GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_OFFLINE_TURNSPEED, (char *)NULL, 10.0);
     outsideCornerSpeed = GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_OUTSIDECORNERSPEED, (char *)NULL, (tdble)offlineTurnSpeed);
@@ -1469,6 +1469,7 @@ void LRaceLine::InitTrack(tTrack* track, tSituation *p)
     stopUpdateDist = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_STOP_UPDATE_DIST, (char *)NULL, (tdble) 500.0f );
     resumeUpdateDist = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_RESUME_UPDATE_DIST, (char *)NULL, (tdble) -1.0f );
     hasLastUpdate = false;
+    LogUSR.debug("USR Raceline initTrack data XML loaded ...\n");
 
     m_raceType = p->_raceType;
 
@@ -1482,6 +1483,8 @@ void LRaceLine::InitTrack(tTrack* track, tSituation *p)
         }
     }
 
+    LogUSR.debug("USR Raceline initTrack split Track 1 passed ...\n");
+
     bool trackPreLoaded = false;
     //hasSlow = false, hasMid = false;
     hasSlow = true, hasMid = true;
@@ -1491,6 +1494,7 @@ void LRaceLine::InitTrack(tTrack* track, tSituation *p)
     {
         if (rl == LINE_RL)
         {
+            LogUSR.debug("USR Raceline initTrack split Track RL ...\n");
             /*Split the track into small elements*/
             SplitTrack(track, rl, trackPreLoaded);
 
@@ -1515,7 +1519,10 @@ void LRaceLine::InitTrack(tTrack* track, tSituation *p)
         }
     }
 
+    LogUSR.debug("USR Raceline initTrack split Track 2 passed ...\n");
+
     SmoothSideRacingLines();
+    LogUSR.debug("... USR Raceline initTrack split end\n");
 }
 
 void LRaceLine::SmoothSideRacingLines()

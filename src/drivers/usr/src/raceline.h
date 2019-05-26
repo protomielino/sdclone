@@ -31,10 +31,10 @@
 
 #define NUM_RACELINES 4
 #define NUM_RACELINE_SPEEDS 4 //12
-#define MAXSEGMENTS 4000
-#define MAXDIVS 9000
+#define MAXSEGMENTS 6000
+#define MAXDIVS 11000
 
-typedef struct 
+typedef struct
 {
     tSituation *s;
     v2d *target;
@@ -63,8 +63,8 @@ typedef struct
 
 class Driver;
 class LLearn;
-  
-class LRaceLine 
+
+class LRaceLine
 {
   public:
     LRaceLine(Driver *pdriver);
@@ -114,7 +114,7 @@ class LRaceLine
     double lookAhead;
     double lookAheadOut;
     double lookAheadEmpty;
-	double lookAheadColdFactor;
+    double lookAheadColdFactor;
     double outsteerSpeedReducer;
     double steerSkidFactor;
     double steerSkidOfflineFactor;
@@ -172,7 +172,7 @@ class LRaceLine
     int NextNextNext;
     int This;
 
-	int m_raceType;
+    int m_raceType;
 
     tCarElt *car;
 
@@ -180,37 +180,38 @@ class LRaceLine
     void SetSegmentInfo(const tTrackSeg *pseg, double d, int i, double l);
     void SplitTrack(tTrack *ptrack, int rl, bool preLoaded);
     double GetRInverse(int prev, double x, double y, int next, double *tX, double *tY);
-	double GetRInverse(double prevx, double prevy, double x, double y, double nextx, double nexty);
+    double GetRInverse(double prevx, double prevy, double x, double y, double nextx, double nexty);
+
     double getRInverseWithDiv(int raceline, int div)
-    { 
+    {
         if (div >= 0) return tRInverse[raceline][div];
-        
-        return tRInverse[raceline][Next]; 
+
+        return tRInverse[raceline][Next];
     }
-    
-    double getRInverse(int raceline = LINE_RL) 
-    { 
-        return tRInverse[raceline][Next]; 
+
+    double getRInverse(int raceline = LINE_RL)
+    {
+        return tRInverse[raceline][Next];
     }
-    
+
     double getRInverse(double distance) { int d = ((Next + int(distance/DivLength)) % Divs); return tRInverse[LINE_RL][d]; }
-    
+
     void AdjustRadius(int prev, int i, int next, double TargetRInverse, int rl, double Security = 0);
     void Smooth(int Step, int rl);
     void StepInterpolate(int iMin, int iMax, int Step, int rl);
     void Interpolate(int Step, int rl);
     void InitTrack(tTrack* track, tSituation *p);
-	void CreateSideRaceline(int rl);
+    void CreateSideRaceline(int rl);
     void NewRace(tCarElt* newcar, tSituation *s);
     void GetRaceLineData(RaceLineDriveData *data, bool transitioning);
     void GetPoint( float offset, float lookahead, vec2f *rt );
-    
+
     int isOnLine( int line);
     double correctLimit(int line);
     double getAvoidSpeed( float distance1, float distance2 );
     double getLookAhead(int rl, double leftMargin, double rightMargin, bool coll);
-    double getLineSpeed(int Div, int rl) 
-    { 
+    double getLineSpeed(int Div, int rl)
+    {
         switch (rl)
         {
             case LINE_RL:
@@ -230,7 +231,7 @@ class LRaceLine
         }
         return 0.0;
     }
-    
+
     double getMaxSpeed(int Div, int rl);
     double getBumpCaution(int Div, int rl);
     double getFriction(int Div);
@@ -250,15 +251,15 @@ class LRaceLine
     void ComputeRacelineSpeed(int i, int rl, double **tSpeed, int speedrl);
     void ComputeRacelineBraking(int i, int rl, double **tSpeed, int speedrl);
     void UpdateRacelineSpeeds(int raceType);
-    
-	bool InBrakingZone(int rl) 
-	{
-		if (tSpeed[rl][Next] < tSpeed[rl][This])
-			return true;
-		return false;
-	}
-	
-	void SmoothSideRacingLines();
+
+    bool InBrakingZone(int rl)
+    {
+        if (tSpeed[rl][Next] < tSpeed[rl][This])
+            return true;
+        return false;
+    }
+
+    void SmoothSideRacingLines();
 
 #define MAX_TDATA 50
     int turnSpeedSegStart[MAX_TDATA];
@@ -302,21 +303,21 @@ class LRaceLine
     bool hasMid;
     int useMergedSpeed;
 
-	tTrack *m_pTrack;
+    tTrack *m_pTrack;
 
-	double lastUpdateDist;
-	double stopUpdateDist;
-	double resumeUpdateDist;
-	bool hasLastUpdate;
+    double lastUpdateDist;
+    double stopUpdateDist;
+    double resumeUpdateDist;
+    bool hasLastUpdate;
 
     SingleCardata *cardata;
-	LLearn *learn;
+    LLearn *learn;
 
-	double CalculateSpeedAtDiv(LLineMode *lineMode, int div);
-	double OfflineLane(int div, double leftMargin, double rightMargin);
-	bool IsSlowerThanSpeedToDiv(LLineMode *lineMode, double speed, int div, double *slowSpeed);
-	double CalculateOfflineSpeed(int index, int next, double leftMargin, double rightMargin);
-	bool ApproachingBrakeZone(tCarElt *pCar = NULL);
+    double CalculateSpeedAtDiv(LLineMode *lineMode, int div);
+    double OfflineLane(int div, double leftMargin, double rightMargin);
+    bool IsSlowerThanSpeedToDiv(LLineMode *lineMode, double speed, int div, double *slowSpeed);
+    double CalculateOfflineSpeed(int index, int next, double leftMargin, double rightMargin);
+    bool ApproachingBrakeZone(tCarElt *pCar = NULL);
 
   private:
     // Utility functions
@@ -330,19 +331,19 @@ class LRaceLine
     void CalcZCurvature(int rl);
     float AdjustLookahead(int raceline, float lookahead);
     double CaTT();
-	double AdjustTxForMargin(int div, double lane);
-	double AdjustTyForMargin(int div, double lane);
-	double RInverseForMargin(int div, double leftMargin, double rightMargin);
+    double AdjustTxForMargin(int div, double lane);
+    double AdjustTyForMargin(int div, double lane);
+    double RInverseForMargin(int div, double leftMargin, double rightMargin);
 
-	double CalculateSpeed(RaceLineDriveData *data, double X, double Y, int index, int next, double leftMargin, double rightMargin, double tLeftMargin, double tRightMargin);
+    double CalculateSpeed(RaceLineDriveData *data, double X, double Y, int index, int next, double leftMargin, double rightMargin, double tLeftMargin, double tRightMargin);
     double CalculateSpeed(RaceLineDriveData *data, double X, double Y, int index, int next, double *tSpd, double *tX, double *tY);
     double CalculateOffset(double *tX, double *tY, int next, int rl);
-	double CalculateOffset(int div, double leftMargin, double rightMargin);
+    double CalculateOffset(int div, double leftMargin, double rightMargin);
     double CalculateCurvature(double c0, double tRINext, double tRIIndex);
     double CalculateMixedCurvature(double c0, int Index, double transition_percentage);
     void SteerTheCar(RaceLineDriveData *data, int raceline);
-	void SteerTheCarOffline(RaceLineDriveData *data);
-	void CalculateOfflineSpeed(RaceLineDriveData *data);
+    void SteerTheCarOffline(RaceLineDriveData *data);
+    void CalculateOfflineSpeed(RaceLineDriveData *data);
     void updateRLSpeedMode();
     float smoothSteering(float steercmd, float laststeer);
     bool LoadTrack(tTrack *track, tSituation *s);

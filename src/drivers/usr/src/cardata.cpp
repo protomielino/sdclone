@@ -84,6 +84,7 @@ float SingleCardata::getSpeed(tCarElt *car, float ltrackangle)
 
 void SingleCardata::init( CarElt *pcar )
 {
+    LogUSR.debug("USR driver cardata init ...\n");
     int i;
     car = pcar;
 
@@ -183,6 +184,8 @@ void SingleCardata::init( CarElt *pcar )
     lmTT = rmTT = 0.0;
     baseCarMu = (CA_FW * t_m_f + CA_RW * t_m_r + CA_GE * t_m) / baseMass;
     CTFactor = GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_CTFACTOR, NULL, 1.0f);
+
+    LogUSR.debug("... USR driver cardata init end\n");
 }
 
 void SingleCardata::updateModel()
