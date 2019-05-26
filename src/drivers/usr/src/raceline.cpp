@@ -1469,7 +1469,6 @@ void LRaceLine::InitTrack(tTrack* track, tSituation *p)
     stopUpdateDist = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_STOP_UPDATE_DIST, (char *)NULL, (tdble) 500.0f );
     resumeUpdateDist = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_RESUME_UPDATE_DIST, (char *)NULL, (tdble) -1.0f );
     hasLastUpdate = false;
-    LogUSR.debug("USR Raceline initTrack data XML loaded ...\n");
 
     m_raceType = p->_raceType;
 
@@ -1483,8 +1482,6 @@ void LRaceLine::InitTrack(tTrack* track, tSituation *p)
         }
     }
 
-    LogUSR.debug("USR Raceline initTrack split Track 1 passed ...\n");
-
     bool trackPreLoaded = false;
     //hasSlow = false, hasMid = false;
     hasSlow = true, hasMid = true;
@@ -1494,7 +1491,6 @@ void LRaceLine::InitTrack(tTrack* track, tSituation *p)
     {
         if (rl == LINE_RL)
         {
-            LogUSR.debug("USR Raceline initTrack split Track RL ...\n");
             /*Split the track into small elements*/
             SplitTrack(track, rl, trackPreLoaded);
 
@@ -1519,10 +1515,7 @@ void LRaceLine::InitTrack(tTrack* track, tSituation *p)
         }
     }
 
-    LogUSR.debug("USR Raceline initTrack split Track 2 passed ...\n");
-
     SmoothSideRacingLines();
-    LogUSR.debug("... USR Raceline initTrack split end\n");
 }
 
 void LRaceLine::SmoothSideRacingLines()
@@ -2968,8 +2961,7 @@ void LRaceLine::GetRaceLineData(RaceLineDriveData *data, bool transitioning)
         {
             static char *lineName[] = { "MID", "LFT", "RGT", "RL" };
             int rl = data->linemode->GetTargetRaceline();
-            fprintf(stderr, "%s TR %d:%d (%.1f) %s %s str=%.2f %.3f/%.3f %.3f/%.3f spd %.1f/%.1f/%.1f ang=%.3f vang=%.3f skidang=%.3f accx=%.3f\n", car->_name, This, Next, car->_distFromStartLine, lineName[rl], (isTransitioning ? "TRANS" : "OFFLINE"), data->racesteer, data->linemode->GetLeftCurrentMargin(), data->linemode->GetLeftTargetMargin(), data->linemode->GetRightCurrentMargin(), data->linemode->GetRightTargetMargin(), car->_speed_x, data->speed, CalculateOfflineSpeed((Next - 5 + Divs) % Divs, Next, data->linemode->GetLeftCurrentMargin(), data->linemode->GetRightCurrentMargin()), data->angle, data->speedangle, atan2(car->_speed_Y, car->_speed_X) - car->_yaw, car->_accel_x);
-            fflush(stderr);
+            LogUSR.debug("%s TR %d:%d (%.1f) %s %s str=%.2f %.3f/%.3f %.3f/%.3f spd %.1f/%.1f/%.1f ang=%.3f vang=%.3f skidang=%.3f accx=%.3f\n", car->_name, This, Next, car->_distFromStartLine, lineName[rl], (isTransitioning ? "TRANS" : "OFFLINE"), data->racesteer, data->linemode->GetLeftCurrentMargin(), data->linemode->GetLeftTargetMargin(), data->linemode->GetRightCurrentMargin(), data->linemode->GetRightTargetMargin(), car->_speed_x, data->speed, CalculateOfflineSpeed((Next - 5 + Divs) % Divs, Next, data->linemode->GetLeftCurrentMargin(), data->linemode->GetRightCurrentMargin()), data->angle, data->speedangle, atan2(car->_speed_Y, car->_speed_X) - car->_yaw, car->_accel_x);
         }
 #endif
     }
@@ -2988,8 +2980,7 @@ void LRaceLine::GetRaceLineData(RaceLineDriveData *data, bool transitioning)
 #ifndef LEARNING
         if (true || data->s->_raceType == RM_TYPE_PRACTICE)
         {
-            fprintf(stderr, "%s LN %d:%d (%.1f %.1f) %s spd %.1f/%.1f/%.1f err=%.3f vne=%.3f skidang=%.3f accx=%.3f\n", car->_name, This, Next, car->_distFromStartLine, car->_distRaced, (rl == LINE_RL ? "RL" : (rl == LINE_LEFT ? "LFT" : "RGT")), car->_speed_x, data->speed, CalculateOfflineSpeed((Next - 5 + Divs) % Divs, Next, leftTarget, rightTarget), data->error, data->vnerror, atan2(car->_speed_Y, car->_speed_X) - car->_yaw, car->_accel_x);
-            fflush(stderr);
+            LogUSR.debug("%s LN %d:%d (%.1f %.1f) %s spd %.1f/%.1f/%.1f err=%.3f vne=%.3f skidang=%.3f accx=%.3f\n", car->_name, This, Next, car->_distFromStartLine, car->_distRaced, (rl == LINE_RL ? "RL" : (rl == LINE_LEFT ? "LFT" : "RGT")), car->_speed_x, data->speed, CalculateOfflineSpeed((Next - 5 + Divs) % Divs, Next, leftTarget, rightTarget), data->error, data->vnerror, atan2(car->_speed_Y, car->_speed_X) - car->_yaw, car->_accel_x);
         }
 #endif
     }
@@ -3316,12 +3307,12 @@ int LRaceLine::isOnLine(int line)
     double pos2middle = fabs(car->_trkPos.toLeft - lane2left);
 
     if (steer_verbose)
-        fprintf(stderr, "Lane ToLeft:%.3f, Car ToLeft:%.3f, Car ToMiddle:%.3f\n", lane2left, car->_trkPos.toLeft, car->_trkPos.toMiddle);
+        LogUSR.debug("Lane ToLeft:%.3f, Car ToLeft:%.3f, Car ToMiddle:%.3f\n", lane2left, car->_trkPos.toLeft, car->_trkPos.toMiddle);
 
     if (pos2middle < MAX(0.1, 1.0 - (car->_speed_x * (car->_speed_x / 10)) / 600))
     {
         if (steer_verbose)
-            fprintf(stderr, "%s is OnLine: PosToMiddle: %.3f \n", car->_name, pos2middle);
+            LogUSR.debug("%s is OnLine: PosToMiddle: %.3f \n", car->_name, pos2middle);
 
         return 1;
     }

@@ -619,27 +619,27 @@ void Driver::drive(tSituation *s)
                 }
                 if (target_line != test_rnd_raceline)
                 {
-                    fprintf(stderr, "%d/%d ", rnd, target_line);
+                    LogUSR.debug("%d/%d ", rnd, target_line);
                     line_timer = s->currentTime;
                     if (target_line == LINE_RL)
                     {
                         //linemode->setRecoveryToRaceLine();
                         SetMode(correcting, 0.0, 1.0);
-                        fprintf(stderr, " Switching to %s from %s\n", lineName[target_line], lineName[test_rnd_raceline]);fflush(stderr);
+                        LogUSR.debug(" Switching to %s from %s\n", lineName[target_line], lineName[test_rnd_raceline]);
                     }
                     else if (target_line == LINE_LEFT)
                     {
                         //linemode->setAvoidanceToLeft();
                         double rightMargin = 0.9 - (double)(rand() % 75) / 100.0;
                         SetMode(avoidright, 0.0, rightMargin);
-                        fprintf(stderr, "Switching to %s from %s (rgt %.3f)\n", lineName[target_line], lineName[test_rnd_raceline], rightMargin);fflush(stderr);
+                        LogUSR.debug("Switching to %s from %s (rgt %.3f)\n", lineName[target_line], lineName[test_rnd_raceline], rightMargin);
                     }
                     else if (target_line == LINE_RIGHT)
                     {
                         //linemode->setAvoidanceToRight();
                         double leftMargin = 0.1 + (double)(rand() % 75) / 100.0;
                         SetMode(avoidleft, leftMargin, 1.0);
-                        fprintf(stderr, "Switching to %s from %s (lft %.3f)\n", lineName[target_line], lineName[test_rnd_raceline], leftMargin);fflush(stderr);
+                        LogUSR.debug("Switching to %s from %s (lft %.3f)\n", lineName[target_line], lineName[test_rnd_raceline], leftMargin);
                     }
                     else if (target_line == LINE_MID)
                     {
@@ -649,7 +649,7 @@ void Driver::drive(tSituation *s)
                         if (leftMargin > rightMargin)
                             leftMargin = rightMargin;
                         SetMode(avoidleft|avoidright, leftMargin, rightMargin);
-                        fprintf(stderr, "Switching to %s from %s (%.3f %.3f)\n", lineName[target_line], lineName[test_rnd_raceline], leftMargin, rightMargin);fflush(stderr);
+						LogUSR.debug("Switching to %s from %s (%.3f %.3f)\n", lineName[target_line], lineName[test_rnd_raceline], leftMargin, rightMargin);
                     }
                     test_rnd_raceline = target_line;
                 }
@@ -816,21 +816,21 @@ void Driver::shutdown(void)
 /*============== Print Parameters at Setup ===================*/
 void Driver::showSetup()
 {
-    fprintf(stderr, "######### %s #########\n", car->_name);
-    fprintf(stderr, "# %s: Mode verbose= %d\n", car->_name, modeVerbose);
-    fprintf(stderr, "# %s: Strategy verbose= %d\n", car->_name, m_strategyverbose);
-    fprintf(stderr, "# %s: Steering verbose= %d\n", car->_name, m_steerverbose);
-    fprintf(stderr, "# %s: Check QualifTime= %d\n", car->_name, m_testQualifTime);
-    fprintf(stderr, "# %s: Check Pitstop= %d\n", car->_name, m_testPitstop);
-    fprintf(stderr, "# \n");
-    fprintf(stderr, "# %s: fuelPerMeter= %.5f\n", car->_name, m_fuelPerMeter);
-    fprintf(stderr, "# %s: PitDamage= %d\n", car->_name, m_maxDammage);
-    fprintf(stderr, "# %s: Fuel strategy= %d\n", car->_name, m_fuelStrat);
-    fprintf(stderr, "# \n");
-    fprintf(stderr, "# %s: Brake delay= %.1f\n", car->_name, brakedelay);
-    fprintf(stderr, "# %s: Corner speed= %.1f\n", car->_name, CornerSpeed);
-    fprintf(stderr, "# %s: Pit Offset= %.1f\n", car->_name, PitOffset);
-    fprintf(stderr, "# %s: Let Pass= %.2f\n", car->_name, LetPass);
+    LogUSR.debug("######### %s #########\n", car->_name);
+    LogUSR.debug("# %s: Mode verbose= %d\n", car->_name, modeVerbose);
+    LogUSR.debug("# %s: Strategy verbose= %d\n", car->_name, m_strategyverbose);
+    LogUSR.debug("# %s: Steering verbose= %d\n", car->_name, m_steerverbose);
+    LogUSR.debug("# %s: Check QualifTime= %d\n", car->_name, m_testQualifTime);
+    LogUSR.debug("# %s: Check Pitstop= %d\n", car->_name, m_testPitstop);
+    LogUSR.debug("# \n");
+    LogUSR.debug("# %s: fuelPerMeter= %.5f\n", car->_name, m_fuelPerMeter);
+    LogUSR.debug("# %s: PitDamage= %d\n", car->_name, m_maxDammage);
+    LogUSR.debug("# %s: Fuel strategy= %d\n", car->_name, m_fuelStrat);
+    LogUSR.debug("# \n");
+    LogUSR.debug("# %s: Brake delay= %.1f\n", car->_name, brakedelay);
+    LogUSR.debug("# %s: Corner speed= %.1f\n", car->_name, CornerSpeed);
+    LogUSR.debug("# %s: Pit Offset= %.1f\n", car->_name, PitOffset);
+    LogUSR.debug("# %s: Let Pass= %.2f\n", car->_name, LetPass);
 }
 /*========================================================*/
 
@@ -983,12 +983,16 @@ float Driver::getBrake()
     }
     if (brakenow)
     {
-        if (car->_speed_x > 0.001) { fprintf(stderr, "%.1f %.1f\n", car->_speed_x, (car->_trkPos.seg->lgfromstart + car->_trkPos.toStart) - brakedist);fflush(stderr);}
+        if (car->_speed_x > 0.001) 
+		{ 
+			LogUSR.debug("%.1f %.1f\n", car->_speed_x, (car->_trkPos.seg->lgfromstart + car->_trkPos.toStart) - brakedist);
+		}
         return 1.0;
     }
 #endif
     // Car drives backward?
-    if (car->_speed_x < -MAX_UNSTUCK_SPEED) {
+    if (car->_speed_x < -MAX_UNSTUCK_SPEED) 
+	{
         // Yes, brake.
         return 1.0;
     }
@@ -1898,7 +1902,7 @@ float Driver::getOffset()
 #ifdef OVERTAKE_DEBUG
     if (overtake_test_timer == simtime)
     {
-        fprintf(stderr, "OVERTAKE - nothing to overtake\n");
+        LogUSR.debug("OVERTAKE - nothing to overtake\n");
     }
     fflush(stderr);
 #endif
@@ -1930,7 +1934,7 @@ float Driver::getOffset()
         }
         else if(opp->getState() & OPP_LETPASS)
         {
-            fprintf(stderr, "%s >> Opponent:%s LETPASS=%d\n", car->_name, opponent[i].getCarPtr()->_name,(opp->getState()&OPP_LETPASS));
+            LogUSR.debug("%s >> Opponent:%s LETPASS=%d\n", car->_name, opponent[i].getCarPtr()->_name,(opp->getState()&OPP_LETPASS));
             fflush(stderr);
         }
         */
@@ -1946,7 +1950,7 @@ float Driver::getOffset()
             // Behind, larger distances are smaller ("more negative").
             if (opponent[i].getDistance() > mindist && opponent[i].getDistance() < 0.0) {
 #ifdef OVERTAKE_DEBUG
-                fprintf(stderr, "OVERLAPPER: %s distance %.1f\n", opponent[i].getCarPtr()->_name,opponent[i].getDistance()); fflush(stderr);
+                LogUSR.debug("OVERLAPPER: %s distance %.1f\n", opponent[i].getCarPtr()->_name,opponent[i].getDistance());
 #endif
                 mindist = opponent[i].getDistance();
                 o = &opponent[i];
@@ -1979,7 +1983,7 @@ float Driver::getOffset()
             leftMargin = MIN(rightMargin, MAX(leftMargin, (oppCarTR + MAX(0.0, o->getAvgLateralMovt() * 2)) / track->width));
         }
 #ifdef OVERTAKE_DEBUG
-        fprintf(stderr, "back avoidmode = %s%s\n",(avoidmode & avoidleft) ? "right " : "",(avoidmode & avoidright) ? "left" : "");fflush(stderr);
+        LogUSR.debug("back avoidmode = %s%s\n",(avoidmode & avoidleft) ? "right " : "",(avoidmode & avoidright) ? "left" : "");
 #endif
         if (avoidmode)
         {
@@ -2049,7 +2053,7 @@ float Driver::getOffset()
         {
 #ifdef OVERTAKE_DEBUG
             if (linemode->GetLeftTargetMargin() != 0.0 || linemode->GetRightTargetMargin() != 1.0)
-                fprintf(stderr, "Set Correcting...\n");
+                LogUSR.debug("Set Correcting...\n");
 #endif
             SetMode(correcting, 0.0, 1.0, true);
         }
@@ -2057,7 +2061,7 @@ float Driver::getOffset()
     else
     {
 #ifdef OVERTAKE_DEBUG
-        fprintf(stderr, "Can't correct as %.3f - %.3f < %.2f\n",situation->currentTime,overtake_timer, MAX(0.2, (car->_speed_x / 50) - fabs(raceline->tRInverse[LINE_RL][raceline->Next])*10));
+        LogUSR.debug("Can't correct as %.3f - %.3f < %.2f\n",situation->currentTime,overtake_timer, MAX(0.2, (car->_speed_x / 50) - fabs(raceline->tRInverse[LINE_RL][raceline->Next])*10));
 #endif
     }
 
@@ -2121,7 +2125,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
         if ((opponent[i].getState() & OPP_FRONT_FOLLOW))
         {
 #ifdef OVERTAKE_DEBUG
-            fprintf(stderr, "%s >> %s: IGNORED, Following\n", car->_name, ocar->_name); fflush(stderr);
+            LogUSR.debug("%s >> %s: IGNORED, Following\n", car->_name, ocar->_name);
 #endif
             continue;
         }
@@ -2144,7 +2148,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
                 !(opponent[i].getState() & OPP_COLL))
         {
 #ifdef OVERTAKE_DEBUG
-            fprintf(stderr, "%s >> %s: IGNORED, Off Track\n", car->_name, ocar->_name); fflush(stderr);
+			LogUSR.debug("%s >> %s: IGNORED, Off Track\n", car->_name, ocar->_name);
 #endif
             continue;
         }
@@ -2165,7 +2169,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
             if (MAX(myCurrentSpeed, myMaxSpeed) <= ospeed - (fabsRInverse > 0.005 ? MAX(0.3, 1.0 - fabsRInverse * 50) : MAX(1.0, 5.0 - car->_speed_x/25.0)))
             {
 #ifdef OVERTAKE_DEBUG
-                fprintf(stderr, "%s >> %s: IGNORED, too fast for us\n", car->_name, ocar->_name); fflush(stderr);
+                LogUSR.debug("%s >> %s: IGNORED, too fast for us\n", car->_name, ocar->_name);
 #endif
                 continue;
             }
@@ -2173,7 +2177,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
             if (opponent[i].getHasSlowerSpeed())
             {
 #ifdef OVERTAKE_DEBUG
-                fprintf(stderr, "%s >> %s: IGNORED, slower speed between us and collision point\n", car->_name, ocar->_name); fflush(stderr);
+                LogUSR.debug("%s >> %s: IGNORED, slower speed between us and collision point\n", car->_name, ocar->_name);
 #endif
                 continue;
             }
@@ -2193,7 +2197,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
             if (speedDiff < minSpeedDiff && !nearBrakingZone && !opponent[i].getWithinBrakeDist())
             {
 #ifdef OVERTAKE_DEBUG
-                fprintf(stderr, "%s >> %s: IGNORED, speed diff %.2f < %.2f\n", car->_name, ocar->_name, speedDiff, minSpeedDiff); fflush(stderr);
+                LogUSR.debug("%s >> %s: IGNORED, speed diff %.2f < %.2f\n", car->_name, ocar->_name, speedDiff, minSpeedDiff);
 #endif
                 continue;
             }
@@ -2209,13 +2213,13 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
             if ((catchtime < 0.0 || (MIN(distance, catchtime) > importance)))
             {
 #ifdef OVERTAKE_DEBUG
-                fprintf(stderr, "%s >> %s: IGNORED, catchtime %.4f > importance %.4f dist=%.3f\n", car->_name, ocar->_name, catchtime, importance, distance); fflush(stderr);
+                LogUSR.debug("%s >> %s: IGNORED, catchtime %.4f > importance %.4f dist=%.3f\n", car->_name, ocar->_name, catchtime, importance, distance);
 #endif
                 continue;
             }
 
 #ifdef OVERTAKE_DEBUG
-            fprintf(stderr, "%s >> %s: CONSIDERING, catchtime/10 %.4f < importance %.4f, nbz %d wBD %d\n", car->_name, ocar->_name, catchtime/10, importance, nearBrakingZone, opponent[i].getWithinBrakeDist()); fflush(stderr);
+            LogUSR.debug("%s >> %s: CONSIDERING, catchtime/10 %.4f < importance %.4f, nbz %d wBD %d\n", car->_name, ocar->_name, catchtime/10, importance, nearBrakingZone, opponent[i].getWithinBrakeDist());
 #endif
 
             for (j = 0; j < oppCount; j++)
@@ -2304,7 +2308,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
             if (oppAvoidLft < minLft && oppAvoidRgt > maxRgt)
             {
 #ifdef OVERTAKE_DEBUG
-                fprintf(stderr, "%s >> %s: BLOCKED! %.2f < %.2f and %.2f > %.2f\n", car->_name, ocar->_name, oppAvoidLft, minLft, oppAvoidRgt, maxRgt); fflush(stderr);
+                LogUSR.debug("%s >> %s: BLOCKED! %.2f < %.2f and %.2f > %.2f\n", car->_name, ocar->_name, oppAvoidLft, minLft, oppAvoidRgt, maxRgt);
 #endif
                 continue;
             }
@@ -2392,7 +2396,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
         bool avoid2Rgt = (space2Right && curRspeed >= ocar->_speed_x && (rightSlowSpeedRatio <= (curRspeed * rgt_caution) / MAX(1.0, ocar->_speed_x)));
         bool avoid2Lft = (space2Left && curLspeed >= ocar->_speed_x && (leftSlowSpeedRatio <= (curLspeed * lft_caution) / MAX(1.0, ocar->_speed_x)));
 #ifdef OVERTAKE_DEBUG
-        fprintf(stderr, "%s -> %s spd=%.3f/%.3f a2L=%d %d spd=%.3f/%.3f [%d (%.3f %.3f) %d %d] (%.6f <= (%.3f/%.1f)=%.3f) a2R=%d %d spd=%.3f/%.3f [%d (%.3f %.3f) %d %d] (%.6f <= (%.3f/%.1f)=%.3f\n", car->_name, ocar->_name, car->_speed_x,ocar->_speed_x,avoid2Lft, space2Left, curLspeed, minLspeed, oppAvoidLft >= minLft, oppAvoidLft, minLft, curLspeed >= ocar->_speed_x, leftSlowSpeedRatio <= (curLspeed * lft_caution) / ocar->_speed_x, leftSlowSpeedRatio,curLspeed*lft_caution,ocar->_speed_x,(curLspeed*lft_caution)/ocar->_speed_x,avoid2Rgt, space2Right, curRspeed,minRspeed,oppAvoidRgt <= maxRgt, oppAvoidRgt, maxRgt, curRspeed >= ocar->_speed_x, rightSlowSpeedRatio <= (curRspeed * rgt_caution) / ocar->_speed_x,rightSlowSpeedRatio,curRspeed*rgt_caution,ocar->_speed_x,(curRspeed*rgt_caution)/ocar->_speed_x);
+        LogUSR.debug("%s -> %s spd=%.3f/%.3f a2L=%d %d spd=%.3f/%.3f [%d (%.3f %.3f) %d %d] (%.6f <= (%.3f/%.1f)=%.3f) a2R=%d %d spd=%.3f/%.3f [%d (%.3f %.3f) %d %d] (%.6f <= (%.3f/%.1f)=%.3f\n", car->_name, ocar->_name, car->_speed_x,ocar->_speed_x,avoid2Lft, space2Left, curLspeed, minLspeed, oppAvoidLft >= minLft, oppAvoidLft, minLft, curLspeed >= ocar->_speed_x, leftSlowSpeedRatio <= (curLspeed * lft_caution) / ocar->_speed_x, leftSlowSpeedRatio,curLspeed*lft_caution,ocar->_speed_x,(curLspeed*lft_caution)/ocar->_speed_x,avoid2Rgt, space2Right, curRspeed,minRspeed,oppAvoidRgt <= maxRgt, oppAvoidRgt, maxRgt, curRspeed >= ocar->_speed_x, rightSlowSpeedRatio <= (curRspeed * rgt_caution) / ocar->_speed_x,rightSlowSpeedRatio,curRspeed*rgt_caution,ocar->_speed_x,(curRspeed*rgt_caution)/ocar->_speed_x);
 #endif
 
         // choose side with highest minimum speed provided its still above minSpeedDiff
@@ -2414,14 +2418,14 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
             {
                 SetMode(avoidSide, MAX(minLeftMargin, (oppAvoidRgt+2.0)/track->width), maxRightMargin, true);
 #ifdef OVERTAKE_DEBUG
-                fprintf(stderr, "%s >> %s: OVERTAKE to RIGHT (1)\n", car->_name, ocar->_name, oppAvoidRgt); fflush(stderr);
+                LogUSRrr.debug("%s: OVERTAKE to RIGHT (1)\n", car->_name, ocar->_name, oppAvoidRgt);
 #endif
             }
             else
             {
                 SetMode(avoidSide, minLeftMargin, MIN(maxRightMargin, (oppAvoidLft-2.0)/track->width), true);
 #ifdef OVERTAKE_DEBUG
-                fprintf(stderr, "%s >> %s: OVERTAKE to LEFT (1)\n", car->_name, ocar->_name); fflush(stderr);
+                LogUSR.debug("%s >> %s: OVERTAKE to LEFT (1)\n", car->_name, ocar->_name);
 #endif
             }
         }
@@ -2430,7 +2434,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
             avoidSide = avoidright;
             SetMode(avoidSide, minLeftMargin, MIN(maxRightMargin, (oppAvoidLft-2.0)/track->width), true);
 #ifdef OVERTAKE_DEBUG
-            fprintf(stderr, "%s >> %s: OVERTAKE to LEFT (2)\n", car->_name, ocar->_name); fflush(stderr);
+            LogUSR.debug("%s >> %s: OVERTAKE to LEFT (2)\n", car->_name, ocar->_name);
 #endif
         }
         else if (avoid2Rgt)
@@ -2438,7 +2442,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
             avoidSide = avoidleft;
             SetMode(avoidSide, MAX(minLeftMargin, (oppAvoidRgt+2.0)/track->width), maxRightMargin, true);
 #ifdef OVERTAKE_DEBUG
-            fprintf(stderr, "%s >> %s: OVERTAKE to RIGHT (2)\n", car->_name, ocar->_name); fflush(stderr);
+            LogUSR.debug("%s >> %s: OVERTAKE to RIGHT (2)\n", car->_name, ocar->_name);
 #endif
         }
 
@@ -2453,7 +2457,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
         }
 
 #ifdef OVERTAKE_DEBUG
-        fprintf(stderr, "%s >> %s: DISCARDED aLft=%.2f aRgt=%.2f oSpd=%.2f lSpd=%.2f->%.2f rSpd=%.2f->%.2f ratio l%.2f r%.2f > l%.2f r%.2f\n", car->_name, ocar->_name,oppAvoidLft,oppAvoidRgt,ocar->_speed_x,curLspeed,minLspeed,curRspeed,minRspeed,leftSlowSpeedRatio,rightSlowSpeedRatio,curLspeed/ocar->_speed_x,curRspeed/ocar->_speed_x); fflush(stderr);
+        LogUSR.debug("%s >> %s: DISCARDED aLft=%.2f aRgt=%.2f oSpd=%.2f lSpd=%.2f->%.2f rSpd=%.2f->%.2f ratio l%.2f r%.2f > l%.2f r%.2f\n", car->_name, ocar->_name,oppAvoidLft,oppAvoidRgt,ocar->_speed_x,curLspeed,minLspeed,curRspeed,minRspeed,leftSlowSpeedRatio,rightSlowSpeedRatio,curLspeed/ocar->_speed_x,curRspeed/ocar->_speed_x);
 #endif
     }
 
@@ -2503,7 +2507,7 @@ int Driver::GetAvoidSide(Opponent *oppnt, int allowed_sides, double t_impact, do
     }
 #ifdef OVERTAKE_DEBUG
     else
-        fprintf(stderr, "Can't avoid to the left, oppTL=%.1f base=%.1f\n", oppCarTL, base2left);
+        LogUSR.debug("Can't avoid to the left, oppTL=%.1f base=%.1f\n", oppCarTL, base2left);
 #endif
     if ((allowed_sides & avoidleft) && oppCarTR < base2right)
     {
@@ -2515,7 +2519,7 @@ int Driver::GetAvoidSide(Opponent *oppnt, int allowed_sides, double t_impact, do
     }
 #ifdef OVERTAKE_DEBUG
     else
-        fprintf(stderr, "Can't avoid to the right, oppTR=%.1f base=%.1f\n", oppCarTR, base2right);
+        LogUSR.debug("Can't avoid to the right, oppTR=%.1f base=%.1f\n", oppCarTR, base2right);
 #endif
 
 #if 0
@@ -2577,11 +2581,12 @@ void Driver::update(tSituation *s)
         double dist = sqrt((dx*dx) + (dy*dy));
         double adjx = car->_corner_x(FRNT_LFT) + dist * sin(getSpeedAngle(1.0));
         double adjy = car->_corner_y(FRNT_LFT) + dist * cos(getSpeedAngle(1.0));
-        fprintf(stderr, "Current=%.2f/%.2f Projected=%.2f/%.2f -> %.2f/%.2f sA=%.2f/%.2f - %.2f %.2f %.2f\n",car->_corner_x(FRNT_LFT),car->_corner_y(FRNT_LFT),newx,newy,adjx,adjy,speedAngle[0],getSpeedAngle(1.0),speedAngle[1],speedAngle[2],speedAngle[3]);fflush(stderr);
+        LogUSR.debug("Current=%.2f/%.2f Projected=%.2f/%.2f -> %.2f/%.2f sA=%.2f/%.2f - %.2f %.2f %.2f\n",car->_corner_x(FRNT_LFT),car->_corner_y(FRNT_LFT),newx,newy,adjx,adjy,speedAngle[0],getSpeedAngle(1.0),speedAngle[1],speedAngle[2],speedAngle[3]);
     }
 #endif
     // Update global car data (shared by all instances) just once per timestep.
-    if (currentsimtime != s->currentTime) {
+    if (currentsimtime != s->currentTime) 
+	{
         simtime = currentsimtime = s->currentTime;
         cardata->update();
     }
