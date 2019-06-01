@@ -181,14 +181,10 @@ public:
   void	SpeedControl1( double targetSpd, double spd0, double& acc, double& brk );
   void	SpeedControl2( double targetSpd, double spd0, double& acc, double& brk );
   void	SpeedControl3( double targetSpd, double spd0, double& acc, double& brk );
-  void	SpeedControl4( double targetSpd, double spd0, CarElt* car,
-                       double& acc, double& brk );
-  void  SpeedControl5(double targetSpd, double spd0, CarElt* car,
-                        double& acc, double& brk );
-  void  SpeedControl6(double targetSpd, double spd0, CarElt* car,
-                        double& acc, double& brk );
-  void	SpeedControl( int which, double targetSpd, double spd0,
-                      CarElt* car, double& acc, double& brk );
+  void	SpeedControl4( double targetSpd, double spd0, CarElt* car, double& acc, double& brk );
+  void  SpeedControl5(double targetSpd, double spd0, CarElt* car,  double& acc, double& brk );
+  void  SpeedControl6(double targetSpd, double spd0, CarElt* car,  double& acc, double& brk );
+  void	SpeedControl( int which, double targetSpd, double spd0,    CarElt* car, double& acc, double& brk );
 
   void	Drive(tSituation* s );
   int	PitCmd(tSituation* s );
@@ -269,6 +265,7 @@ public:
   void    SideBorderInner(float Factor);
   void    LearnBraking(double Pos);                   // Learn braking parameters
   void    DetectFlight();
+  int     CheckFlying();
   double  FlightControl(double Steer);                // Prepare landing
   double  TyreConditionFront();
   double  TyreConditionRear();
@@ -316,11 +313,11 @@ private:
   };
 
 private:
-  MyTrack 	m_track;
+  MyTrack 	    m_track;
   OptimisedPath	m_path[N_PATHS];
-  PitPath	m_pitPath[N_PATHS];
+  PitPath	    m_pitPath[N_PATHS];
 
-  CarModel	m_cm;
+  CarModel	    m_cm;
   CarModel      m_cm2;
 
   tCarElt       *car;                           // Pointer to tCarElt struct.
@@ -351,8 +348,8 @@ private:
   double	PIT_EXIT_OFFSET;		// dist in m.
 
   tSituation    *m_Situation;                   // situation
-  int		m_driveType;
-  double	m_gearUpRpm;			// for gear changing.
+  int		    m_driveType;
+  double	    m_gearUpRpm;			// for gear changing.
 
   double        m_XXX;
 

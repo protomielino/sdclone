@@ -53,8 +53,8 @@ SimpleStrategy::SimpleStrategy()
     m_maxDamage = 0;                    // [-] max damage before we request a pit stop.
     m_Fuel = 0;                         // [Kg] Security fuel at the strat race.
     m_expectedfuelperlap = 0;           // [Kg] Expected fuel per lap
-	TrackLength = 0;
-	RaceDistance = 0;
+    TrackLength = 0;
+    RaceDistance = 0;
 }
 
 
@@ -66,10 +66,10 @@ SimpleStrategy::~SimpleStrategy()
 
 void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituation *s, int index)
 {
-	Track = t;
-	TrackLength = Track->length;
+    Track = t;
+    TrackLength = Track->length;
     LogSHADOW.info("Strategy Track Lengh =  %.2f\n", TrackLength);
-	RaceDistance = TrackLength * s->_totLaps; 
+    RaceDistance = TrackLength * s->_totLaps;
     LogSHADOW.info("Strategy Race Distance =  %.2f\n", RaceDistance);
     /* Trivial strategy: fill in as much fuel as required for the whole race, or if the tank is
        too small fill the tank completely. */
@@ -278,6 +278,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
         /* Ideally we shouldn't pit on the last lap...
           just get to the finish line somehow. */
         int lapsToEnd = car->_remainingLaps - car->_lapsBehindLeader;
+
         if(lapsToEnd > 0)
         {
             // Do we need to refuel?
@@ -292,6 +293,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
                           car->_name, reqfuel, car->_fuel, car->_remainingLaps);
                     m_checkFuel = true;
                 }
+
                 return true;
             }
 
@@ -300,6 +302,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
             if (car->_dammage > m_maxDamage && isPitFree(car))
             {
                 needRepair = true;
+
                 if(laps_to_go(car) > 5)
                 {
                     if (!m_checkDamage)
@@ -308,8 +311,10 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
                               car->_name, m_maxDamage, car->_dammage, laps_to_go(car));
                         m_checkDamage = true;
                     }
+
                     return true;
-                } else if(laps_to_go(car) <= 5)
+                }
+                else if(laps_to_go(car) <= 5)
                 {
                     if(car->_dammage > MAX_DAMAGE)
                     {
@@ -452,11 +457,15 @@ float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
             __FUNCTION__, totalFuel, fuelPerPitStop, inLap, lapsToEnd, m_fuelperstint, car->_fuel, fuel);
 #endif
 
-    if (strategy_verbose) {
-        if (!m_remainingstops) {
+    if (strategy_verbose)
+    {
+        if (!m_remainingstops)
+        {
             LogSHADOW.debug("# Last Pitstop for %s: LapsToEnd: %d, LapsBehindLeader: %d, fuelToEnd: %.2f, FuelperLap: %.2f\n",
                     car->_name, lapsToEnd, car->_lapsBehindLeader, fuelToEnd, fuelPerLap);
-        } else {
+        }
+        else
+        {
             LogSHADOW.debug("# [%s()] LapsToEnd: %d, LapsBehindLeader: %d, FuelToEnd: %.2f, FuelperLap: %.2f,\n", __FUNCTION__,
                     lapsToEnd, car->_lapsBehindLeader, fuelToEnd, fuelPerLap);
         }

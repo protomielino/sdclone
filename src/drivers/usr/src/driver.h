@@ -136,6 +136,7 @@ private:
     double AverageTmpForCar(CarElt *car);
     void  Meteorology();
     int   GetWeather();
+    void  calcSkill();
 
     float filterOverlap(float accel);
     float filterBColl(float brake);
@@ -170,6 +171,9 @@ private:
     double GetOvertakeSpeedDiff();
     bool CheckOvertaking(double leftMargin, double rightMargin);
     int GetAvoidSide(Opponent *oppnt, int allowed_sides, double t_impact, double *leftMargin, double *rightMargin);
+
+    void SetRandomSeed(unsigned int seed);
+    unsigned int getRandom();
 
     // Per robot global data.
     RaceLineDriveData *racelineDrivedata;
@@ -287,6 +291,19 @@ private:
     float  accelcmd, brakecmd;
     float  PitOffset;
     v2d    racetarget;        // the 2d point the raceline is driving at.
+
+    double driver_aggression;
+    double global_skill;
+    double skill;
+    double skill_adjust_limit;
+    double skill_adjust_timer;
+    double decel_adjust_targ;
+    double decel_adjust_perc;
+    double brake_adjust_targ;
+    double brake_adjust_perc;
+
+
+    unsigned int random_seed;
 
     float  *radius;
     int    carindex;

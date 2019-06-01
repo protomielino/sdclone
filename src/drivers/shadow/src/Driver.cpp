@@ -70,6 +70,8 @@ const float TDriver::ABS_MINSPEED = 3.0f;            // [m/s] Below this speed t
 const float TDriver::ABS_SLIP = 2.5f;
 const float TDriver::ABS_RANGE = 5.0f;
 
+enum { FLYING_FRONT = 1, FLYING_BACK = 2, FLYING_SIDE = 4 };
+
 //==========================================================================*
 // Skilling: Randomness
 //--------------------------------------------------------------------------*
@@ -206,9 +208,7 @@ TDriver::~TDriver()
         delete m_Situation;*/
 
     delete [] m_opp;
-
-    if (m_Strategy != NULL)
-        delete m_Strategy;
+    delete m_Strategy;
 
     if(m_pShared !=NULL)
         delete m_pShared;
@@ -2992,11 +2992,42 @@ void TDriver::DetectFlight()
         LogSHADOW.debug("#Jumping: %g %d\n", m_Jumping, m_Flying);
 }
 
+int TDriver::CheckFlying()
+{
+    int i = 0;
+    if (car->_speed_x < 20)
+        return 0;
+
+    if (car->priv.wheel[0].relPos.z < wheelz[0] &&
+            car->priv.wheel[1].relPos.z < wheelz[1])
+    {
+        i += FLYING_FRONT;
+    }
+    if (car->priv.wheel[2].relPos.z < wheelz[2] - 0.05 &&
+            car->priv.wheel[3].relPos.z < wheelz[3] - 0.05)
+    {
+        i += FLYING_BACK;
+    }
+    if (!i)
+    {
+        if ((car->priv.wheel[0].relPos.z < wheelz[0] &&
+             car->priv.wheel[2].relPos.z < wheelz[2] - 0.05) ||
+                (car->priv.wheel[1].relPos.z < wheelz[1] &&
+                 car->priv.wheel[3].relPos.z < wheelz[3] - 0.05))
+        {
+            i = FLYING_SIDE;
+        }
+    }
+
+    return i;
+}
+
 //==========================================================================*
 // Prepare landing
 //--------------------------------------------------------------------------*
 double TDriver::FlightControl(double Steer)
 {
+#if 1
     if ( m_Flying)
     {
         // Steer in direction of car movement
@@ -3005,9 +3036,16 @@ double TDriver::FlightControl(double Steer)
         int F = FLY_COUNT -  m_Flying;
         double T = MAX(0, MIN(1.0 * F / FLY_COUNT, 1));
         Steer = Steer * T + (1 - T) * Angle / car->_steerLock;
-    }
 
-    return Steer;
+        return Steer;
+    }
+#else
+    int flying = CheckFlying();
+    if (flying & (FLYING_FRONT | FLYING_BACK))
+        return 0.0;
+    else
+        return Steer;
+#endif
 }
 
 //==========================================================================*

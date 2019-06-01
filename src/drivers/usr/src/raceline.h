@@ -75,6 +75,7 @@ class LRaceLine
     void setCar( tCarElt *mycar, SingleCardata *mycardata ) { car = mycar; cardata = mycardata; }
     void setRwData( tTrack* t, void **carParmHandle, tSituation *s);
     void setOverrides( LManualOverrideCollection *overrides ) { overrideCollection = overrides; }
+    void setSkill( double tskill) { skill = tskill; }
 
     LManualOverrideCollection *overrideCollection;
 
@@ -123,6 +124,7 @@ class LRaceLine
     double outsideSteeringDampenerOverlap;
     double outsideSteeringDampenerAccel;
     double steerTimeFactor;
+    double skill;
 
     int iterations;
     int side_iterations;

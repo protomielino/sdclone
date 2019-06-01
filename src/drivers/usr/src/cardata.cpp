@@ -50,13 +50,13 @@ void SingleCardata::update()
 
     if(HasTYC)
     {
-        lmTT = TyreConditionLeft();
-        rmTT = TyreConditionRight();
-        aTT = MIN(TyreConditionFront(), TyreConditionRear());
-        aFTT = TyreConditionFront();
+        lmTT = TyreConditionG = TyreConditionLeft();
+        rmTT = TyreConditionD = TyreConditionRight();
+        aTT = TyreCondition = MIN(TyreConditionFront(), TyreConditionRear());
+        aFTT = TyreConditionF = TyreConditionFront();
 
-        lTT = MIN(TyreTreadDepthFront(), TyreTreadDepthRear());
-        CTTT = MIN(MIN(car->_tyreCritTreadDepth(0), car->_tyreCritTreadDepth(1)), MIN(car->_tyreCritTreadDepth(2), car->_tyreCritTreadDepth(3)));
+        lTT = TyreTreadDepth =  MIN(TyreTreadDepthFront(), TyreTreadDepthRear());
+        CTTT = TyreCriticalTreadDeph = MAX(MAX(car->_tyreCritTreadDepth(0), car->_tyreCritTreadDepth(1)), MAX(car->_tyreCritTreadDepth(2), car->_tyreCritTreadDepth(3)));
     }
 
     lastspeed[2].ax = lastspeed[1].ax;
@@ -221,13 +221,13 @@ void SingleCardata::updateModel()
 
     if(HasTYC)
     {
-        lmTT = TyreConditionLeft();
-        rmTT = TyreConditionRight();
-        aTT = MIN(TyreConditionFront(), TyreConditionRear());
-        aFTT = TyreConditionFront();
+        lmTT = TyreConditionG = TyreConditionLeft();
+        rmTT = TyreConditionD = TyreConditionRight();
+        aTT = TyreCondition = MIN(TyreConditionFront(), TyreConditionRear());
+        aFTT = TyreConditionF = TyreConditionFront();
 
-        lTT = MIN(TyreTreadDepthFront(), TyreTreadDepthRear());
-        CTTT = MIN(MIN(car->_tyreCritTreadDepth(0), car->_tyreCritTreadDepth(1)), MIN(car->_tyreCritTreadDepth(2), car->_tyreCritTreadDepth(3)));
+        lTT = TyreTreadDepth = MIN(TyreTreadDepthFront(), TyreTreadDepthRear());
+        CTTT = TyreCriticalTreadDeph = MAX(MAX(car->_tyreCritTreadDepth(0), car->_tyreCritTreadDepth(1)), MAX(car->_tyreCritTreadDepth(2), car->_tyreCritTreadDepth(3)));
     }
 
     fuel = car->_fuel;

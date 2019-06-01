@@ -65,6 +65,7 @@ public:
     double TyreConditionD;
     double TyreCondition;
     double TyreTreadDepth;
+    double TyreCriticalTreadDeph;
 
 protected:
     static float getSpeed(tCarElt *car, float trackangle);
