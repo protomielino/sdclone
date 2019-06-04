@@ -88,6 +88,8 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_CLIENT_SERVER false CACHE BOOL "Build with Client/Server network architecture")
 
+    SET(OPTION_PACKAGING true CACHE BOOL "Enable Packaging for distribution")
+
     IF(APPLE)
       # Automatically set OPTION_USE_MACPORTS (at least until someone fixes the regular APPLE build)
       MESSAGE(STATUS "Automatically set OPTION_USE_MACPORTS (at least until someone fixes the regular APPLE build)")

@@ -25,7 +25,9 @@ src/drivers/simplix/src
 src/drivers/dandroid/CMakeLists.txt
 src/drivers/dandroid/src
 
-src/drivers/kilo2008
+src/drivers/shadow/CMakeLists.txt
+src/drivers/shadow/README
+src/drivers/shadow/src
 
 src/drivers/human
 src/drivers/networkhuman
