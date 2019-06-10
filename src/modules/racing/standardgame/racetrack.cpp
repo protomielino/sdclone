@@ -654,10 +654,20 @@ reTrackInitRealWeather(void)
         trackLocal->airpressure = trackLocal->airpressure * 100;
         trackLocal->airdensity = webMetar->getDensity_C();
 
-        trackLocal->rain = webMetar->getRain();
-        trackLocal->snow = webMetar->getSnow();
-        trackLocal->hail = webMetar->getHail();
-        trackLocal->relativehumidity = webMetar->getRelHumidity();
+        if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
+        {
+            trackLocal->rain = webMetar->getRain();
+            trackLocal->snow = webMetar->getSnow();
+            trackLocal->hail = webMetar->getHail();
+            trackLocal->relativehumidity = webMetar->getRelHumidity();
+        }
+        else
+        {
+            trackLocal->rain = TR_RAIN_NONE;
+            trackLocal->snow = TR_RAIN_NONE;
+            trackLocal->hail = TR_RAIN_NONE;
+            trackLocal->relativehumidity = TR_RAIN_NONE;
+        }
 
         GfLogDebug("Visibility = %.3f\n", trackLocal->visibility);
         GfLogDebug("Wind Speed = %.3f\n", trackLocal->windspeed);
@@ -841,10 +851,20 @@ reTrackInitSimuWeather(void)
     else
         trackLocal->airpressure = webMetar->getPressure_hPa();
 
-    trackLocal->rain = webMetar->getRain();
-    trackLocal->snow = webMetar->getSnow();
-    trackLocal->hail = webMetar->getHail();
-    trackLocal->relativehumidity = webMetar->getRelHumidity();
+    if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
+    {
+        trackLocal->rain = webMetar->getRain();
+        trackLocal->snow = webMetar->getSnow();
+        trackLocal->hail = webMetar->getHail();
+        trackLocal->relativehumidity = webMetar->getRelHumidity();
+    }
+    else
+    {
+        trackLocal->rain = TR_RAIN_NONE;
+        trackLocal->snow = TR_RAIN_NONE;
+        trackLocal->hail = TR_RAIN_NONE;
+        trackLocal->relativehumidity = TR_RAIN_NONE;
+    }
 
     GfLogDebug("Visibility = %.3f\n", trackLocal->visibility);
     GfLogDebug("Wind Speed = %.3f\n", trackLocal->windspeed);
