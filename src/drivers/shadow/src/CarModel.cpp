@@ -167,7 +167,7 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
         }
     }
 
-    double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(k) + kz) / Den);
+    double Speed = factor * sqrt((Cos * GRAVITY * Mu + Sin * GRAVITY * SGN(k) + kz) / Den);
     /*if (oDriver->CarCharacteristic.IsValidX(Speed))
       Speed *= oDriver->CarCharacteristic.CalcOffset(Speed);*/
 
@@ -319,7 +319,7 @@ double	CarModel::CalcBreaking(double k0, double kz0, double k1, double kz1, doub
 
         acc = BRAKESCALE * Ftanroad / (MASS * ( 3 + SKILL) / 4);
 
-        if (BRAKELIMIT)
+        if (BRAKELIMIT > 0.0)
         {
             double Radius = 1.0 / fabs(Kz);
             double factor = MIN(1.0,MAX(0.39, (Radius - 190.0) / 100.0));
@@ -453,7 +453,7 @@ double	CarModel::CalcMaxLateralF( double spd, double kFriction, double kz ) cons
 double CarModel::CalcMaxSpeedCrv() const
 {
   const double MAX_SPD = 112; // 400 km/h
-  return G * TYRE_MU / (MAX_SPD * MAX_SPD);
+  return GRAVITY * TYRE_MU / (MAX_SPD * MAX_SPD);
 }
 
 void	CarModel::CalcSimuSpeeds( double spd0, double dy, double dist, double kFriction, double& minSpd, double& maxSpd ) const
