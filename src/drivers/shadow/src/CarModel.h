@@ -21,7 +21,7 @@
 // my own planet ...
 #define GRAVITY 9.81
 
-class CarModel  
+class CarModel
 {
 public:
     CarModel();
@@ -33,7 +33,7 @@ public:
     double	CalcMaxSpdK() const;
     double	CalcMaxLateralF(double spd, double kFriction , double kz = 0.0) const;
 
-	double CalcMaxSpeedCrv() const;
+    double CalcMaxSpeedCrv() const;
 
     void	CalcSimuSpeeds( double spd0, double dy, double dist, double kFriction, double& minSpd, double& maxSpd ) const;
     void	CalcSimuSpeedRanges( double spd0, double dist, double kFriction, double& minSpd, double& maxSpd, double& maxDY ) const;
@@ -70,12 +70,19 @@ public:
     double  CD_CX;
     double	KZ_SCALE;       // bump sensitivity.
     double  BUMP_FACTOR;    // bump sensitivity factor.
-	double	BUMP_FACTORLEFT;
-	double	BUMP_FACTORRIGHT;
-    double	WIDTH;          // width of car (m).
-	bool	HASTYC;
-	double  TYRECONDITIONFRONT;
-	double	TYRECONDITIONREAR;
+    double	BUMP_FACTORLEFT;
+    double	BUMP_FACTORRIGHT;
+    double	AVOID_MU_SCALE;	// scaling of MU to use for this car.
+    double	lftOH;
+    double	rgtOH;
+    double	AVOID_KZ_SCALE;	// bump sensitivity.
+    double	WIDTH;		// width of car (m).
+    double  BRAKE_FACTOR;   // higher number = slower braking
+    double	CT_FACTOR;
+
+    bool	HASTYC;
+    double  TYRECONDITIONFRONT;
+    double	TYRECONDITIONREAR;
 };
 
 #endif

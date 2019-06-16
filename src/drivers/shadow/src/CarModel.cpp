@@ -44,7 +44,7 @@ CarModel::CarModel()
     TYRE_MU(0),
     TYRE_MU_F(0),
     TYRE_MU_R(0),
-    MU_SCALE(0),
+    MU_SCALE(0.9),
     MIN_MU_SCALE(0),
 
     BRAKESCALE(0),
@@ -61,13 +61,17 @@ CarModel::CarModel()
     CD_BODY(0),
     CD_WING(0),
     CD_CX(0),
+    KZ_SCALE(0.43f),
 
-    KZ_SCALE(0),
-    BUMP_FACTOR(0),
-    BUMP_FACTORLEFT(0),
-    BUMP_FACTORRIGHT(0),
+    AVOID_MU_SCALE(0.9),
 
+    lftOH(0),
+    rgtOH(0),
+    AVOID_KZ_SCALE(0.43f),
     WIDTH(2),
+    BRAKE_FACTOR(1),
+    CT_FACTOR(1),
+
     HASTYC(false),
     TYRECONDITIONFRONT(0),
     TYRECONDITIONREAR(0)
@@ -148,7 +152,7 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
     }
     else
     {
-        Mu = MIN(MuF, MuR); // oTmpCarParam->oSkill;
+        Mu = MIN(MuF, MuR);
         LogSHADOW.debug("MU = %.f\n", Mu);
     }
 
@@ -168,69 +172,9 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
     }
 
     double Speed = factor * sqrt((Cos * GRAVITY * Mu + Sin * GRAVITY * SGN(k) + kz) / Den);
-    /*if (oDriver->CarCharacteristic.IsValidX(Speed))
-      Speed *= oDriver->CarCharacteristic.CalcOffset(Speed);*/
-
-    //Speed = oDriver->CalcHairpin(Speed,AbsCrv);
     LogSHADOW.debug("CarModel CalcMaxSpeed = %.f\n", Speed);
+
     return Speed;
-/*
-    double	M  = MASS + FUEL;
-
-    double	mua, muf, mur;
-
-    if( AERO == 1 )
-    {
-        double	MU_F = kFriction * TYRE_MU_F;
-        double	MU_R = kFriction * TYRE_MU_R;
-
-        muf = MU_F * MU_SCALE;
-        mur = MU_R * MU_SCALE;
-        mua = (MU_F + MU_R) * 0.5;
-    }
-    else
-    {
-        double	MU = kFriction * TYRE_MU;
-
-        mua   = MU * MU_SCALE;// * 0.975;
-    }
-
-    double	cs = cos(RollAngle);
-    double	sn = sin(RollAngle);
-
-    double	absK = MX(0.001, fabs(k));
-    double	sgnK = SGN(k);
-
-    double	num, den;
-
-    if( AERO == 1 )
-    {
-        num = M * (cs * GRAVITY * mua + sn * G * sgnK);
-        den = M * (absK - KZ_SCALE * kz) - (CA_FW * muf + CA_RW * mur + CA_GE * mua);
-    }
-    else
-    {
-//		num = M * (G * mu + sn * G * sgnK);
-        num = M * (cs * G * mua + sn * G * sgnK);
-//		den = M * (absK - 0.00 * kz) - CA * mu_df;
-//		den = M * (absK - 0.10 * kz) - CA * mu_df;
-//		den = M * (absK - 0.20 * kz) - CA * mu_df;
-//		den = M * (absK - 0.25 * kz) - CA * mu_df;
-//		den = M * (absK - 0.29 * kz) - CA * mu_df;
-//		den = M * (absK - 0.33 * kz) - CA * mu_df;
-//		den = M * (absK - 0.42 * kz) - CA * mu_df;
-        den = M * (absK - KZ_SCALE * kz) - CA * mua;
-    }
-
-    if( den < 0.00001 )
-        den = 0.00001;
-
-    double	spd = sqrt(num / den);
-
-    if( spd > 200 )
-        spd = 200;
-
-    return spd;*/
 }
 
 double	CarModel::CalcBreaking(double k0, double kz0, double k1, double kz1, double spd1, double dist, double kFriction, double RollAngle , double TiltAngle) const
@@ -385,7 +329,8 @@ double	CarModel::CalcAcceleration(double k0, double kz0, double k1, double kz1, 
     //  3m/ss @ 60m/s
     //	1m/ss @ 75m/s
     //	0m/ss @ 85m/s
-    Quadratic	accFromSpd(0.001852, -0.35, 17.7);	// approx. clkdtm
+    //Quadratic	accFromSpd(0.001852, -0.35, 17.7);	// approx. clkdtm
+    Quadratic	accFromSpd(21.0/5400, -43.0/60, 30);	// approx. clkdtm
     double OldV = 0.0;
     // Power (kW) = Torque (Nm) x Speed (RPM) / 9.5488
 

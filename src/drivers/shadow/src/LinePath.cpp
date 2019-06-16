@@ -420,6 +420,9 @@ void LinePath::PropagateBreaking( int start, int len, const CarModel& cm, int st
 
             double	trackRollAngle = atan2(m_pPath[i].Norm().z, 1);
             double  trackTiltAngle = 1.1 * atan2(delta.z, dist);
+            double brakeFactor = -1;
+            double kz = -1, mu = -1;
+
             double	u = cm.CalcBreaking( m_pPath[i].k, m_pPath[i].kz, m_pPath[j].k, m_pPath[j].kz, m_pPath[j].spd, dist, m_pTrack->GetFriction(i, m_pPath[i].offs),
                         trackRollAngle, trackTiltAngle);
 

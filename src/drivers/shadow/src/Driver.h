@@ -42,8 +42,10 @@
 #include "teammanager.h"
 
 #define SECT_PRIV               "private"
+#define PRV_GEAR_UP_RPM		    "gear up rpm"
 #define PRV_SHIFT               "shift"
 #define PRV_MU_SCALE            "mu scale"
+#define PRV_AVOID_MU_SCALE	    "avoid mu scale"
 #define PRV_RAIN_MU             "mu scale rain"
 #define PRV_ACCEL_DELTA         "accel delta"
 #define PRV_ACCEL_DELTA_RAIN    "accel delta rain"
@@ -51,10 +53,21 @@
 #define PRV_BRAKEFORCE          "brake force"
 #define PRV_FLY_HEIGHT          "fly height"
 #define PRV_FACTOR              "factor"
+#define PRV_FACTOR0			    "factor 0"
+#define PRV_FACTORVARIANT	    "factor variant"
+#define PRV_AERO_BOOST_FACTOR	"aero boost"
 #define PRV_AERO_MOD            "aero mod"
 #define PRV_BUMP_MOD            "bump mod"
 #define PRV_SIDE_MOD            "side mod"
+#define PRV_RL_RIGHT_MARGIN	    "rl right margin"
+#define PRV_RL_LEFT_MARGIN	    "rl left margin"
+#define PRV_RIGHT_MARGIN	    "right margin"
+#define PRV_LEFT_MARGIN		    "left margin"
+#define PRV_MAX_SPEED     	    "max speed"
+#define PRV_AVOID_KZ_SCALE	    "avoid kz scale"
 #define PRV_KZ_SCALE            "kz scale"
+#define PRV_AVOID_BRAKE_FACTOR	"avoid brake factor"
+#define PRV_AVOID_WIDTH		    "avoid width"
 #define PRV_BUMP_FACTOR         "bump factor"
 #define PRV_BUMP_FACTOR_LEFT    "bump factor left"
 #define PRV_BUMP_FACTOR_RIGHT   "bump factor right"
@@ -69,18 +82,39 @@
 #define PRV_SPDC_TRAFFIC        "spd ctrl traffic"
 #define PRV_SPDC_EXTRA          "spd ctrl extra"
 #define PRV_STEER_CTRL          "steer ctrl"
+#define PRV_STEER_CONTROL	    "steer control"
+#define PRV_STEER_CONTROL_AV	"steer control avoid"
+#define PRV_STEER_CONTROL_RE	"steer control recovery"
+#define PRV_STEER_YAW_FACTOR	"steer yaw factor"
+#define PRV_STEER_AVGK_MOD	    "steer avgk mod"
+#define PRV_STAY_TOGETHER	    "stay together"
+#define PRV_PIT_ENTRY_OFFS	    "pit entry offset"
+#define PRV_PIT_EXIT_OFFS	    "pit exit offset"
+#define PRV_PIT_START_OFFS	    "pit start offset"
+#define PRV_PIT_STOP_OFFS	    "pit stop offset"
+#define PRV_PIT_START_OVERRIDE  "pit start override"
+#define PRV_PIT_EXIT_OVERRIDE   "pit exit override"
+#define PRV_PIT_TEST		    "pit test"
+#define PRV_MAXCATCHTIME	    "max catch time"
+#define PRV_ACCSTEERLOOKAHEAD	"accel steer lookahead factor"
+#define PRV_DECSTEERLOOKAHEAD	"brake steer lookahead factor"
+#define PRV_SKIDFACTOR		    "steer skid factor"
+#define PRV_SKIDFACTOR_TRAFFIC	"steer skid factor traffic"
+#define PRV_STEERLOOKAHEAD	    "steer lookahead"
+#define PRV_STEERSMOOTHFACTOR	"steer smooth factor"
 #define PRV_STAY_TOGETHER       "stay together"
 #define PRV_PITSTRAT            "pitstrat"
 #define PRV_PITSTOP             "chkpitstop"
 #define PRV_CHKQUALIF           "chkqualiftime"
-#define PRV_PIT_ENTRY_OFFS      "pit entry offset"
-#define PRV_PIT_EXIT_OFFS       "pit exit offset"
 #define PRV_MAX_BRAKING         "max braking"
 #define PRV_FUELPERMETERS       "fuel per meters"
 #define PRV_FUELPERLAPS         "fuel per lap"
 #define PRV_RESERVE             "reserve"
 #define PRV_DAMAGE              "damage"
+#define PRV_MAX_DAMAGE		    "max damage"
 #define PRV_FULL_FUEL           "full fuel"
+#define PRV_INITIAL_FUEL	    "initial fuel"
+#define PRV_TWB4D		        "tw factor"
 #define PRV_VERBOSE             "strategyverbose"
 #define PRV_NEED_SIN            "use sin long"
 #define PRV_USED_ACC            "acc exit"
@@ -95,16 +129,24 @@
 #define PRV_TCL_FACTOR          "tcl factor"
 #define PRV_ABS_SLIP            "abs slip"
 #define PRV_ABS_RANGE           "abs range"
+#define PRV_COAST_ACCEL         "coast accel"
+#define PRV_AVOID_SCALE         "avoid scale"
+#define PRV_STOP_UPDATE_DIST    "stop update dist"
+#define PRV_RESUME_UPDATE_DIST  "resume update dist"
+#define PRV_LAST_UPDATE_DIST    "last update dist"
+#define PRV_OVERTAKE_SPD		"overtake speed"
+#define PRV_BRAKE_FACTOR	    "brake factor"
+#define PRV_CTFACTOR            "ctfactor"
 
 #define NBR_BRAKECOEFF 50                                   // Number of brake coeffs
 
 const double	SPD_MIN = 0;
 const double	SPD_MAX = 120;
-const int	SPD_N = 20;
+const int	    SPD_N = 20;
 const double	SPD_STEP = (SPD_MAX - SPD_MIN) / SPD_N;
 const double	K_MIN = -0.1;
 const double	K_MAX = 0.1;
-const int	K_N = 100;
+const int	    K_N = 100;
 const double	K_STEP = (K_MAX - K_MIN) / K_N;
 
 // The "SHADOW" logger instance.
@@ -342,10 +384,39 @@ private:
   int       STEER_CTRL;
   double	STEER_K_ACC;
   double	STEER_K_DEC;
+  double	OVERTAKE_SPEED;
   double	STAY_TOGETHER;			// dist in m.
   double	AVOID_WIDTH;			// in m.
+  double	PIT_STOP_OFFSET;		// dist in m.
+  double	PIT_START_OFFSET;		// dist in m.
   double	PIT_ENTRY_OFFSET;		// dist in m.
   double	PIT_EXIT_OFFSET;		// dist in m.
+  double	MAXCATCHTIME;
+  double	ACCSTEERLOOKAHEAD;
+  double	DECSTEERLOOKAHEAD;
+  double	STEERLOOKAHEAD;
+  double	STEERSMOOTHFACTOR;
+  double	SKIDFACTOR;
+  double	SKIDFACTOR_TRAFFIC;
+  double	INITIAL_FUEL;
+  int		MAX_DAMAGE;
+  int		PIT_TEST;
+  int		FACTORVARIANT;
+  double	STEERYAWFACTOR;
+  int		STEERAVGKMOD;
+  double	AEROBOOSTFACTOR;
+  double	STOPUPDATEDIST;
+  double	LASTUPDATEDIST;
+  double	RESUMEUPDATEDIST;
+  double	AEROCOLDFACTOR;
+  double	AEROFULLFACTOR;
+  double	AEROEMPTYFACTOR;
+  double	BRAKE_FACTOR;
+  double	AVOID_SCALE;
+  int		STEERCONTROL;
+  int		STEERCONTROL_AVOID;
+  int		STEERCONTROL_RECOVERY;
+  double	TWDIST;
 
   tSituation    *m_Situation;                   // situation
   int		    m_driveType;
@@ -374,8 +445,8 @@ private:
   double        m_TclRange;                            // TCL range
   double        m_TclSlip;                             // Max TCL slip
   double        m_TclFactor;                           // TCL scale
-  float         m_AbsSlip;
-  float         m_AbsRange;
+  double        m_AbsSlip;
+  double        m_AbsRange;
 
   double	m_DriftAngle;                          // Drifting angle
   double	m_AbsDriftAngle;                       // fabs(Drifting angle)
@@ -387,6 +458,7 @@ private:
   double        m_ClutchDelta;
   double        m_ClutchRange;
   double        m_ClutchRelease;
+  double        m_coastAccel;
 
   double        suspHeight;
 

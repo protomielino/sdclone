@@ -444,6 +444,10 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     m_cm.NEEDSINLONG = (GfParmGetNum(hCarParm, SECT_PRIV, PRV_NEED_SIN, NULL, 0) != 0);
     m_cm.USEDACCEXIT = (GfParmGetNum(hCarParm, SECT_PRIV, PRV_USED_ACC, NULL, 0) != 0);
     m_cm.BRAKESCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BRAKESCALE, NULL, 1.0);
+    m_cm.AVOID_MU_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AVOID_MU_SCALE, NULL, 0.9f);
+    m_cm.AVOID_KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AVOID_KZ_SCALE, NULL, 0.43f);
+    m_cm.BRAKE_FACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BRAKE_FACTOR, NULL, 1.00f);
+    m_cm.CT_FACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_CTFACTOR, NULL, 1.00f);
 
     FACTORS.RemoveAll();
 
@@ -468,12 +472,44 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     SPDC_TRAFFIC     = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_SPDC_TRAFFIC, 0, 2));
     SPDC_EXTRA       = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_SPDC_EXTRA, 0, 3));
     STEER_CTRL       = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_CTRL, 0, 0));
-    AVOID_WIDTH      = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AVOID_WIDTH, 0, 0.5);
+    AVOID_WIDTH      = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AVOID_WIDTH, 0, 0.5f);
     STAY_TOGETHER    = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STAY_TOGETHER, 0, 0);
     STEER_K_ACC      = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_K_ACC, 0, 0);
     STEER_K_DEC      = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_K_DEC, 0, 0);
+    PIT_START_OFFSET = GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_START_OFFS, 0, 0);
+    PIT_STOP_OFFSET = GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_STOP_OFFS, 0, 0);
     PIT_ENTRY_OFFSET = GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_ENTRY_OFFS, 0, 0);
     PIT_EXIT_OFFSET  = GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_EXIT_OFFS, 0, 0);
+
+    STEERCONTROL = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_CONTROL, 0, 2));
+    STEERCONTROL = MX(0, MN(4, STEERCONTROL));
+    STEERCONTROL_AVOID = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_CONTROL_AV, 0, STEERCONTROL));
+    STEERCONTROL_AVOID = MX(0, MN(4, STEERCONTROL_AVOID));
+    STEERCONTROL_RECOVERY = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_CONTROL_RE, 0, 0));
+    STEERCONTROL_RECOVERY = MX(0, MN(4, STEERCONTROL_RECOVERY));
+    MAXCATCHTIME = GfParmGetNum(hCarParm, SECT_PRIV, PRV_MAXCATCHTIME, 0, 99);
+    ACCSTEERLOOKAHEAD = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ACCSTEERLOOKAHEAD, 0, 0.00f);
+    DECSTEERLOOKAHEAD = GfParmGetNum(hCarParm, SECT_PRIV, PRV_DECSTEERLOOKAHEAD, 0, 0.10f);
+    STEERLOOKAHEAD = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEERLOOKAHEAD, 0, 0.02f);
+    STEERSMOOTHFACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEERSMOOTHFACTOR, 0, 1.0f);
+    SKIDFACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_SKIDFACTOR, 0, 0.4f);
+    SKIDFACTOR_TRAFFIC = GfParmGetNum(hCarParm, SECT_PRIV, PRV_SKIDFACTOR_TRAFFIC, 0, 0.6f);
+    MAX_DAMAGE = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_MAX_DAMAGE, 0, 5000);
+    PIT_TEST = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_TEST, 0, 0);
+    TWDIST = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TWB4D, 0, -1000.0f);
+    INITIAL_FUEL = GfParmGetNum(hCarParm, SECT_PRIV, PRV_INITIAL_FUEL, 0, -1);
+    m_coastAccel = GfParmGetNum(hCarParm, SECT_PRIV, PRV_COAST_ACCEL, NULL, 0.1f);
+    AVOID_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AVOID_SCALE, NULL, 1.0f);
+    STOPUPDATEDIST = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STOP_UPDATE_DIST, NULL, 500.0f);
+    LASTUPDATEDIST = GfParmGetNum(hCarParm, SECT_PRIV, PRV_LAST_UPDATE_DIST, NULL, -1.0f);
+    RESUMEUPDATEDIST = GfParmGetNum(hCarParm, SECT_PRIV, PRV_RESUME_UPDATE_DIST, NULL, -1.0f);
+    FACTORVARIANT = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_FACTORVARIANT, NULL, 0.0f);
+    STEERYAWFACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_YAW_FACTOR, NULL, 0.08f);
+    STEERAVGKMOD = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_AVGK_MOD, NULL, 0.0f);
+    AEROBOOSTFACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AERO_BOOST_FACTOR, NULL, 1.00f);
+    OVERTAKE_SPEED = GfParmGetNum(hCarParm, SECT_PRIV, PRV_OVERTAKE_SPD, NULL, 2.00f);
+
+    AVOID_SCALE = MX(0.0, MN(1.0, AVOID_SCALE));
 
     m_ClutchDelta = GfParmGetNum(hCarParm, SECT_PRIV, PRV_CLUTCH_DELTA,0,(float)m_ClutchDelta);
     LogSHADOW.debug("#m_ClutchDelta %g\n", m_ClutchDelta);
@@ -490,19 +526,19 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     m_Shift = GfParmGetNum(hCarParm, SECT_PRIV, PRV_SHIFT, 0, (float)m_Shift);
     LogSHADOW.debug("#m_Shift %g\n",m_Shift);
 
-    m_TclSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_SLIP, 0, m_TclSlip);
+    m_TclSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_SLIP, 0, 2.0);
     LogSHADOW.debug("#m_TclSlip %g\n",m_TclSlip);
 
-    m_TclRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_RANGE, 0, m_TclRange);
+    m_TclRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_RANGE, 0, 8.0);
     LogSHADOW.debug("#m_TclRange %g\n",m_TclRange);
 
     m_TclFactor = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_FACTOR, 0, m_TclFactor);
     LogSHADOW.debug("#m_TclFactor %g\n",m_TclFactor);
 
-    m_AbsSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_SLIP, 0, m_AbsSlip);
+    m_AbsSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_SLIP, 0, 3.0);
     LogSHADOW.debug("#m_AbsSlip %g\n",m_AbsSlip);
 
-    m_AbsRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_RANGE, 0, m_AbsRange);
+    m_AbsRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_RANGE, 0, 5.0);
     LogSHADOW.debug("#m_AbsRange %g\n",m_AbsRange);
 
     m_DeltaAccel = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ACCEL_DELTA , 0, (float)m_DeltaAccel);
@@ -510,10 +546,6 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     LogSHADOW.debug("FLY_HEIGHT %g\n", FLY_HEIGHT );
     LogSHADOW.debug( "BUMP_MOD %d\n", BUMP_MOD );
 
-    /*m_TclSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_SLIP , 0, (float)m_TclSlip);
-  m_TclRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TCL_RANGE , 0, (float)m_TclRange);
-  m_AbsSlip = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_SLIP , 0, (float)m_AbsSlip);
-  m_AbsRange = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ABS_RANGE , 0, (float)m_AbsRange);*/
     LogSHADOW.debug( "#Car TCL SLIP = %g - TCL RANGE = %g - ABS SLIP = %g - ABS RANGE = %g\n", m_TclSlip, m_TclRange, m_AbsSlip, m_AbsRange );
 
     AdjustBrakes(hCarParm);
