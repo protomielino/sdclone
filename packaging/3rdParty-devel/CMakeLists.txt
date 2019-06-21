@@ -310,12 +310,13 @@ ExternalProject_Add(libvorbis-1.3.6
 endif(OPTION_VORBIS)
 
 if(OPTION_EXPAT)
+   set(EXPAT_PROJECT expat-2.2.7)
 #disable building unneeded sub projects (they failed with VS2008)
 set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_tests=off -DBUILD_examples=off -DBUILD_tools=off -DCMAKE_DEBUG_POSTFIX='')
-ExternalProject_Add(expat-2.2.6
-   DOWNLOAD_NAME expat-2.2.6.tar.bz2
-   URL https://sourceforge.net/projects/expat/files/expat/2.2.6/expat-2.2.6.tar.bz2/download
-   URL_HASH SHA256=17b43c2716d521369f82fc2dc70f359860e90fa440bea65b3b85f0b246ea81f2
+ExternalProject_Add(${EXPAT_PROJECT}
+   DOWNLOAD_NAME ${EXPAT_PROJECT}.tar.bz2
+   URL https://sourceforge.net/projects/expat/files/expat/2.2.7/expat-2.2.7.tar.bz2/download
+   URL_HASH SHA256=cbc9102f4a31a8dafd42d642e9a3aa31e79a0aedaa1f6efd2795ebc83174ec18
    CMAKE_ARGS ${EXPAT_ARGS}
    #UPDATE_COMMAND ""
    #PATCH_COMMAND ""
@@ -323,6 +324,8 @@ ExternalProject_Add(expat-2.2.6
    #BUILD_COMMAND ""
    #INSTALL_COMMAND ""  
    )
+else(OPTION_EXPAT)
+   set(EXPAT_PROJECT )
 endif(OPTION_EXPAT)
 
 if(OPTION_ZLIB)
