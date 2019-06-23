@@ -55,6 +55,7 @@ SimpleStrategy::SimpleStrategy()
     m_expectedfuelperlap = 0;           // [Kg] Expected fuel per lap
     TrackLength = 0;
     RaceDistance = 0;
+	m_timeOfPitExit = -30;
 }
 
 
@@ -522,6 +523,3 @@ double SimpleStrategy::getRefuel2(int laps)
 
     return refuelforrace;
 }
-
-
-

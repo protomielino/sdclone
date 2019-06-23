@@ -183,35 +183,35 @@ public:
   TDriver(int index);                             //  Constructor
   ~TDriver();                                     // Destructor
 
-  void	InitTrack(tTrack* track, void* carHandle, void** carParmHandle, tSituation* s);
-  void	NewRace(tCarElt* car, tSituation* s );
+  void		InitTrack(tTrack* track, void* carHandle, void** carParmHandle, tSituation* s);
+  void		NewRace(tCarElt* car, tSituation* s );
 
-  void	GetPtInfo( int path, double pos, PtInfo& pi ) const;
-  void	GetPosInfo( double pos, PtInfo& pi, double u, double v ) const;
-  void	GetPosInfo( double pos, PtInfo& pi ) const;
+  void		GetPtInfo( int path, double pos, PtInfo& pi ) const;
+  void		GetPosInfo( double pos, PtInfo& pi, double u, double v ) const;
+  void		GetPosInfo( double pos, PtInfo& pi ) const;
   double	CalcPathTarget( double pos, double offs, double s ) const;
   double	CalcPathTarget( double pos, double offs ) const;
-  Vec2d	CalcPathTarget2( double pos, double offs ) const;
+  Vec2d		CalcPathTarget2( double pos, double offs ) const;
   double	CalcPathOffset( double pos, double s, double t ) const;
-  void	CalcBestPathUV( double pos, double offs, double& u, double& v ) const;
+  void		CalcBestPathUV( double pos, double offs, double& u, double& v ) const;
   double	CalcBestSpeed( double pos, double offs ) const;
-  void	GetPathToLeftAndRight( const CarElt* pCar, double& toL, double& toR ) const;
+  void		GetPathToLeftAndRight( const CarElt* pCar, double& toL, double& toR ) const;
 
-  double filterTCL(double accel);
-  double filterTrk(double accel);
-  double filterAccel(double Accel);
+  double	filterTCL(double accel);
+  double	filterTrk(double accel);
+  double	filterAccel(double Accel);
 
-  void initCa();
+  void		initCa();
   //void initCa_MPA1();
   //void initCa_MPA11();
-  void initCw();
-  void initCR();
+  void		initCw();
+  void		initCR();
 
-  void initDriveTrain();
-  void initWheelRadius();
-  void initTireMu();
-  void initWheelPos();
-  void initBrake();
+  void		initDriveTrain();
+  void		initWheelRadius();
+  void		initTireMu();
+  void		initWheelPos();
+  void		initBrake();
 
   double	SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi );
   double	SteerAngle1( tCarElt* car, PtInfo& pi, PtInfo& aheadPi );
@@ -219,21 +219,21 @@ public:
   double	SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi );
   double	SteerAngle4( tCarElt* car, PtInfo& pi, PtInfo& aheadPi );
 
-  void	SpeedControl0( double targetSpd, double spd0, double& acc, double& brk );
-  void	SpeedControl1( double targetSpd, double spd0, double& acc, double& brk );
-  void	SpeedControl2( double targetSpd, double spd0, double& acc, double& brk );
-  void	SpeedControl3( double targetSpd, double spd0, double& acc, double& brk );
-  void	SpeedControl4( double targetSpd, double spd0, CarElt* car, double& acc, double& brk );
-  void  SpeedControl5(double targetSpd, double spd0, CarElt* car,  double& acc, double& brk );
-  void  SpeedControl6(double targetSpd, double spd0, CarElt* car,  double& acc, double& brk );
-  void	SpeedControl( int which, double targetSpd, double spd0,    CarElt* car, double& acc, double& brk );
+  void		SpeedControl0( double targetSpd, double spd0, double& acc, double& brk );
+  void		SpeedControl1( double targetSpd, double spd0, double& acc, double& brk );
+  void		SpeedControl2( double targetSpd, double spd0, double& acc, double& brk );
+  void		SpeedControl3( double targetSpd, double spd0, double& acc, double& brk );
+  void		SpeedControl4( double targetSpd, double spd0, CarElt* car, double& acc, double& brk );
+  void		SpeedControl5(double targetSpd, double spd0, CarElt* car,  double& acc, double& brk );
+  void		SpeedControl6(double targetSpd, double spd0, CarElt* car,  double& acc, double& brk );
+  void		SpeedControl( int which, double targetSpd, double spd0,    CarElt* car, double& acc, double& brk );
 
-  void	Drive(tSituation* s );
-  int	PitCmd(tSituation* s );
-  void	EndRace(tSituation* s );
-  void	Shutdown();
+  void		Drive(tSituation* s );
+  int		PitCmd(tSituation* s );
+  void		EndRace(tSituation* s );
+  void		Shutdown();
 
-  double              CurrSimTime;                    // Current simulation time
+  double    CurrSimTime;                    // Current simulation time
   double              Frc;                            // Friction coefficient
   //bool                UseBrakeLimit;                // Enable/disable brakelimit
 
@@ -470,15 +470,15 @@ private:
   PidController m_speedController;      // controller for speed.
   double	m_prevYawError;
   double	m_prevLineError;
-  double        m_Jumping;              // Car is jumping
-  double        m_JumpOffset;           // Offset for calculation of jumps
-  bool          m_FirstJump;
-  int           m_Flying;               // Flag prepare landing
+  double    m_Jumping;              // Car is jumping
+  double    m_JumpOffset;           // Offset for calculation of jumps
+  bool      m_FirstJump;
+  int       m_Flying;               // Flag prepare landing
   int		m_nCars;
   int		m_myOppIdx;
   Opponent	*m_opp;                  // info about other cars.
   double	m_avgAY;
-  bool          m_raceStart;
+  bool      m_raceStart;
   double	m_avoidS;				// where we are LR->T (0..1).
   double	m_avoidSVel;
   double	m_avoidT;				// where we are L->R (-1..1).
@@ -495,7 +495,7 @@ private:
   int		m_lastB;
   double	m_lastBrk;
   double	m_lastTargV;
-  double        m_maxbrkPressRatio;
+  double    m_maxbrkPressRatio;
 
   LearnedGraph	m_maxAccel;
   double	m_angle[SPD_N][K_N];

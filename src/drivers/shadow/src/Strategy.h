@@ -57,6 +57,7 @@ protected:
         PIT_EXIT,
         PIT_GONE
     };
+
     int     m_State;		                           // Current pitting state
     bool    m_GoToPit;                               // Pit stop needed
 
@@ -65,7 +66,7 @@ protected:
 
 public:
     AbstractStrategy()
-      :m_State(PIT_NONE), m_GoToPit(false), Car(NULL), Track(NULL), pitPath(NULL), Driver(NULL), DistToSwitch(100), StartFuel(-1){};
+      :m_State(PIT_NONE), m_GoToPit(false), Car(NULL), Track(NULL), pitPath(NULL), Driver(NULL), DistToSwitch(100), StartFuel(-1) {};
     // Need this empty constructor... do not remove.
     virtual ~AbstractStrategy() {}
     // Set Initial fuel at race start.
@@ -116,6 +117,7 @@ public:
     int     pitRepair(tCarElt* car, tSituation *s);
     bool    isPitFree(tCarElt* car);
     int     pitStopPenalty() { return m_stopPenalty; }
+	double  TimeSincePit(double simtime) { return simtime - m_timeOfPitExit; }
 
 protected:
     bool test_Pitstop;
@@ -145,6 +147,7 @@ protected:
     float calcFuel(double totalFuel);
     double getRefuel1(int laps);		// How much fuel it takes to reach the finish line.
     double getRefuel2(int laps);
+	double m_timeOfPitExit;
 
     float MAX_FUEL_PER_METER;           // max fuel consumtion.
     double MAX_FUEL_TANK;               // max fuel for this car(fuel tank capacity).

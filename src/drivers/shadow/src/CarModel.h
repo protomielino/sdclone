@@ -76,7 +76,7 @@ public:
     double	lftOH;
     double	rgtOH;
     double	AVOID_KZ_SCALE;	// bump sensitivity.
-    double	WIDTH;		// width of car (m).
+    double	WIDTH;			// width of car (m).
     double  BRAKE_FACTOR;   // higher number = slower braking
     double	CT_FACTOR;
 

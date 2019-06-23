@@ -156,8 +156,7 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
         LogSHADOW.debug("MU = %.f\n", Mu);
     }
 
-    Den = (AbsCrv - ScaleBump * kz) - (CA_FW * MuF + CA_RW * MuR
-      + CA_GE_F * MuF + CA_GE_R * MuR) / MASS;
+    Den = (AbsCrv - ScaleBump * kz) - (CA_FW * MuF + CA_RW * MuR + CA_GE_F * MuF + CA_GE_R * MuR) / MASS;
 
     if (Den < 0.00001)
      Den = 0.00001;
@@ -329,7 +328,7 @@ double	CarModel::CalcAcceleration(double k0, double kz0, double k1, double kz1, 
     //  3m/ss @ 60m/s
     //	1m/ss @ 75m/s
     //	0m/ss @ 85m/s
-    //Quadratic	accFromSpd(0.001852, -0.35, 17.7);	// approx. clkdtm
+    //Quadratic	accFromSpd(0.001852, -0.35, 17.7);		// approx. clkdtm
     Quadratic	accFromSpd(21.0/5400, -43.0/60, 30);	// approx. clkdtm
     double OldV = 0.0;
     // Power (kW) = Torque (Nm) x Speed (RPM) / 9.5488
@@ -348,8 +347,8 @@ double	CarModel::CalcAcceleration(double k0, double kz0, double k1, double kz1, 
 
         if( Flatroad > Froad )
             Flatroad = Froad;
-        double	Ftanroad = sqrt(Froad * Froad - Flatroad * Flatroad) + Ftan;
 
+        double	Ftanroad = sqrt(Froad * Froad - Flatroad * Flatroad) + Ftan;
         double	acc = Ftanroad / M;
         double	maxAcc = MIN(11.5, accFromSpd.CalcY(avgV));
 
@@ -398,6 +397,7 @@ double	CarModel::CalcMaxLateralF( double spd, double kFriction, double kz ) cons
 double CarModel::CalcMaxSpeedCrv() const
 {
   const double MAX_SPD = 112; // 400 km/h
+
   return GRAVITY * TYRE_MU / (MAX_SPD * MAX_SPD);
 }
 
