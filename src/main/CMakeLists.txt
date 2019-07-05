@@ -68,12 +68,12 @@ IF(NOT OPTION_OFFICIAL_ONLY)
 ENDIF(NOT OPTION_OFFICIAL_ONLY)
 
 LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/liblearning.dylib")
-LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libnetworking.dylib")
-LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libportability.dylib")
-LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/librobottools.dylib")
-LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libtgf.dylib")
-LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libtgfclient.dylib")
-LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libtgfdata.dylib")
+#LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libnetworking.dylib")
+#LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libportability.dylib")
+#LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/librobottools.dylib")
+#LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libtgf.dylib")
+#LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libtgfclient.dylib")
+#LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libtgfdata.dylib")
 
    LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/modules/graphic/ssggraph.so")
 
