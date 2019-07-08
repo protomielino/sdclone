@@ -135,6 +135,7 @@
 #define PRV_RESUME_UPDATE_DIST  "resume update dist"
 #define PRV_LAST_UPDATE_DIST    "last update dist"
 #define PRV_OVERTAKE_SPD		"overtake speed"
+#define PRV_SPEED_FACTOR        "speed factor"
 #define PRV_BRAKE_FACTOR	    "brake factor"
 #define PRV_CTFACTOR            "ctfactor"
 
@@ -411,7 +412,9 @@ private:
   double	AEROCOLDFACTOR;
   double	AEROFULLFACTOR;
   double	AEROEMPTYFACTOR;
+  double    SPEED_FACTOR;
   double	BRAKE_FACTOR;
+
   double	AVOID_SCALE;
   int		STEERCONTROL;
   int		STEERCONTROL_AVOID;

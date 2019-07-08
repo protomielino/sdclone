@@ -487,27 +487,28 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     STEERCONTROL_AVOID = MX(0, MN(4, STEERCONTROL_AVOID));
     STEERCONTROL_RECOVERY = int(GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_CONTROL_RE, 0, 0));
     STEERCONTROL_RECOVERY = MX(0, MN(4, STEERCONTROL_RECOVERY));
-    MAXCATCHTIME = GfParmGetNum(hCarParm, SECT_PRIV, PRV_MAXCATCHTIME, 0, 99);
-    ACCSTEERLOOKAHEAD = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ACCSTEERLOOKAHEAD, 0, 0.00f);
-    DECSTEERLOOKAHEAD = GfParmGetNum(hCarParm, SECT_PRIV, PRV_DECSTEERLOOKAHEAD, 0, 0.10f);
-    STEERLOOKAHEAD = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEERLOOKAHEAD, 0, 0.02f);
-    STEERSMOOTHFACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEERSMOOTHFACTOR, 0, 1.0f);
-    SKIDFACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_SKIDFACTOR, 0, 0.4f);
+    MAXCATCHTIME       = GfParmGetNum(hCarParm, SECT_PRIV, PRV_MAXCATCHTIME, 0, 99);
+    ACCSTEERLOOKAHEAD  = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ACCSTEERLOOKAHEAD, 0, 0.00f);
+    DECSTEERLOOKAHEAD  = GfParmGetNum(hCarParm, SECT_PRIV, PRV_DECSTEERLOOKAHEAD, 0, 0.10f);
+    STEERLOOKAHEAD     = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEERLOOKAHEAD, 0, 0.02f);
+    STEERSMOOTHFACTOR  = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEERSMOOTHFACTOR, 0, 1.0f);
+    SKIDFACTOR         = GfParmGetNum(hCarParm, SECT_PRIV, PRV_SKIDFACTOR, 0, 0.4f);
     SKIDFACTOR_TRAFFIC = GfParmGetNum(hCarParm, SECT_PRIV, PRV_SKIDFACTOR_TRAFFIC, 0, 0.6f);
-    MAX_DAMAGE = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_MAX_DAMAGE, 0, 5000);
-    PIT_TEST = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_TEST, 0, 0);
-    TWDIST = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TWB4D, 0, -1000.0f);
-    INITIAL_FUEL = GfParmGetNum(hCarParm, SECT_PRIV, PRV_INITIAL_FUEL, 0, -1);
-    m_coastAccel = GfParmGetNum(hCarParm, SECT_PRIV, PRV_COAST_ACCEL, NULL, 0.1f);
-    AVOID_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AVOID_SCALE, NULL, 1.0f);
-    STOPUPDATEDIST = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STOP_UPDATE_DIST, NULL, 500.0f);
-    LASTUPDATEDIST = GfParmGetNum(hCarParm, SECT_PRIV, PRV_LAST_UPDATE_DIST, NULL, -1.0f);
-    RESUMEUPDATEDIST = GfParmGetNum(hCarParm, SECT_PRIV, PRV_RESUME_UPDATE_DIST, NULL, -1.0f);
-    FACTORVARIANT = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_FACTORVARIANT, NULL, 0.0f);
-    STEERYAWFACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_YAW_FACTOR, NULL, 0.08f);
-    STEERAVGKMOD = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_AVGK_MOD, NULL, 0.0f);
-    AEROBOOSTFACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AERO_BOOST_FACTOR, NULL, 1.00f);
-    OVERTAKE_SPEED = GfParmGetNum(hCarParm, SECT_PRIV, PRV_OVERTAKE_SPD, NULL, 2.00f);
+    MAX_DAMAGE         = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_MAX_DAMAGE, 0, 5000);
+    PIT_TEST           = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_TEST, 0, 0);
+    TWDIST             = GfParmGetNum(hCarParm, SECT_PRIV, PRV_TWB4D, 0, -1000.0f);
+    INITIAL_FUEL       = GfParmGetNum(hCarParm, SECT_PRIV, PRV_INITIAL_FUEL, 0, -1);
+    m_coastAccel       = GfParmGetNum(hCarParm, SECT_PRIV, PRV_COAST_ACCEL, NULL, 0.1f);
+    AVOID_SCALE        = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AVOID_SCALE, NULL, 1.0f);
+    STOPUPDATEDIST     = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STOP_UPDATE_DIST, NULL, 500.0f);
+    LASTUPDATEDIST     = GfParmGetNum(hCarParm, SECT_PRIV, PRV_LAST_UPDATE_DIST, NULL, -1.0f);
+    RESUMEUPDATEDIST   = GfParmGetNum(hCarParm, SECT_PRIV, PRV_RESUME_UPDATE_DIST, NULL, -1.0f);
+    FACTORVARIANT      = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_FACTORVARIANT, NULL, 0.0f);
+    STEERYAWFACTOR     = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_YAW_FACTOR, NULL, 0.08f);
+    STEERAVGKMOD       = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_STEER_AVGK_MOD, NULL, 0.0f);
+    AEROBOOSTFACTOR    = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AERO_BOOST_FACTOR, NULL, 1.00f);
+    OVERTAKE_SPEED     = GfParmGetNum(hCarParm, SECT_PRIV, PRV_OVERTAKE_SPD, NULL, 2.00f);
+    SPEED_FACTOR       = GfParmGetNum(hCarParm, SECT_PRIV, PRV_SPEED_FACTOR, 0, SPEED_FACTOR);
 
     AVOID_SCALE = MX(0.0, MN(1.0, AVOID_SCALE));
 
@@ -545,6 +546,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     m_DeltaAccelRain = GfParmGetNum(hCarParm, SECT_PRIV, PRV_ACCEL_DELTA_RAIN, 0, (float)m_DeltaAccelRain);
     LogSHADOW.debug("FLY_HEIGHT %g\n", FLY_HEIGHT );
     LogSHADOW.debug( "BUMP_MOD %d\n", BUMP_MOD );
+    LogSHADOW.debug("SPEED FACTOR = %g\n", SPEED_FACTOR);
 
     LogSHADOW.debug( "#Car TCL SLIP = %g - TCL RANGE = %g - ABS SLIP = %g - ABS RANGE = %g\n", m_TclSlip, m_TclRange, m_AbsSlip, m_AbsRange );
 
@@ -1318,53 +1320,53 @@ void TDriver::SpeedControl1( double	targetSpd, double spd0, double&	acc, double&
 
 void TDriver::SpeedControl2( double targetSpd, double spd0, double& acc, double& brk )
 {
-	if (m_lastBrk && m_lastTargV)
-	{
-		if (m_lastBrk > 0)//|| (car->ctrl.accelCmd == -m_lastBrk) )
-		{
-			double	err = m_lastTargV - spd0;
-			m_accBrkCoeff.Sample(err, m_lastBrk);
-			//			GfOut( "accbrk sample %g -> %g\n", err, m_lastBrk );
-		}
-		m_lastBrk = 0;
-		m_lastTargV = 0;
-	}
+    if (m_lastBrk && m_lastTargV)
+    {
+        if (m_lastBrk > 0)//|| (car->ctrl.accelCmd == -m_lastBrk) )
+        {
+            double	err = m_lastTargV - spd0;
+            m_accBrkCoeff.Sample(err, m_lastBrk);
+            //			GfOut( "accbrk sample %g -> %g\n", err, m_lastBrk );
+        }
+        m_lastBrk = 0;
+        m_lastTargV = 0;
+    }
 
-	if (spd0 > targetSpd)
-		//	if( targetSpd < 100 )
-	{
-		//		if( spd0 - 1 > targetSpd )
-		{
-			double	MAX_BRK = 0.9;
-			//			double	MAX_BRK = 0.75;
-			double	err = spd0 - targetSpd;
-			brk = MX(0, MN(m_accBrkCoeff.CalcY(err), MAX_BRK));
-			//			GfOut( "accbrk calcy  %g -> %g\n", err, t );
-			acc = 0;
+    if (spd0 > targetSpd)
+        //	if( targetSpd < 100 )
+    {
+        //		if( spd0 - 1 > targetSpd )
+        {
+            double	MAX_BRK = 0.9;
+            //			double	MAX_BRK = 0.75;
+            double	err = spd0 - targetSpd;
+            brk = MX(0, MN(m_accBrkCoeff.CalcY(err), MAX_BRK));
+            //			GfOut( "accbrk calcy  %g -> %g\n", err, t );
+            acc = 0;
 
-			m_lastBrk = brk;
-			m_lastTargV = 0;
+            m_lastBrk = brk;
+            m_lastTargV = 0;
 
-			if (brk > 0)
-			{
-				if (targetSpd > 0)
-					m_lastTargV = spd0;
-			}
+            if (brk > 0)
+            {
+                if (targetSpd > 0)
+                    m_lastTargV = spd0;
+            }
 
-			//			GfOut( "*** brake ***  spd0 %g   targ %g  brk %g   acc %g\n",
-			//					spd0, targetSpd, brk, acc );
-		}
-		//		else
-		//			acc = MN(acc, 0.1);
-	}
+            //			GfOut( "*** brake ***  spd0 %g   targ %g  brk %g   acc %g\n",
+            //					spd0, targetSpd, brk, acc );
+        }
+        //		else
+        //			acc = MN(acc, 0.1);
+    }
 #if 1
-	else
-	{
-		double x = (0 + spd0) * (targetSpd - spd0) / 200;
+    else
+    {
+        double x = (0 + spd0) * (targetSpd - spd0) / 200;
 
-		if (x > 0)
-			acc = x;
-	}
+        if (x > 0)
+            acc = x;
+    }
 #endif
 }
 
@@ -1378,7 +1380,7 @@ void TDriver::SpeedControl3( double	targetSpd, double spd0, double&	acc, double&
         m_lastTargV = 0;
     }
 
-    if( spd0 > targetSpd )
+    if( spd0 > targetSpd * 1.09)
     {
         {
             int		b = int(floor(spd0 / 2));
@@ -1415,7 +1417,7 @@ void TDriver::SpeedControl4( double targetSpd, double spd0, tCarElt* car, double
     {
         {
             double	MAX_BRK = 0.5;
-            double	err = spd0 - targetSpd;
+            double	err = spd0 - (targetSpd * SPEED_FACTOR);
             double	t = m_accBrkCoeff.CalcY(err);
 
             if( t > 0 )
@@ -1565,26 +1567,26 @@ void TDriver::Drive( tSituation* s )
     double angle = 0.0;
 
 #if 1
-	/*if (m_Strategy->WantToPit())
-		angle = SteerAngle2(car, pi, aheadPi);
-	else*/
-	{
-		int steerControl = ((MN(car->_trkPos.toLeft, car->_trkPos.toRight) < 0.0 && car->_speed_x < MN(20.0f, m_lastTargV - 10.0f)) ? STEERCONTROL_RECOVERY : STEERCONTROL);
+    /*if (m_Strategy->WantToPit())
+        angle = SteerAngle2(car, pi, aheadPi);
+    else*/
+    {
+        int steerControl = ((MN(car->_trkPos.toLeft, car->_trkPos.toRight) < 0.0 && car->_speed_x < MN(20.0f, m_lastTargV - 10.0f)) ? STEERCONTROL_RECOVERY : STEERCONTROL);
 
-		switch (steerControl) 
-		{
-		case 0:
-			angle = SteerAngle0(car, pi, aheadPi); break;
-		case 1:
-			angle = SteerAngle1(car, pi, aheadPi); break;
-		case 2:
-			angle = SteerAngle2(car, pi, aheadPi); break;
-		case 3:
-			angle = SteerAngle3(car, pi, aheadPi); break;
-		case 4:
-			angle = SteerAngle4(car, pi, aheadPi); break;
-		}
-	}
+        switch (steerControl)
+        {
+        case 0:
+            angle = SteerAngle0(car, pi, aheadPi); break;
+        case 1:
+            angle = SteerAngle1(car, pi, aheadPi); break;
+        case 2:
+            angle = SteerAngle2(car, pi, aheadPi); break;
+        case 3:
+            angle = SteerAngle3(car, pi, aheadPi); break;
+        case 4:
+            angle = SteerAngle4(car, pi, aheadPi); break;
+        }
+    }
 #else
     switch (STEER_CTRL)
     {
@@ -1667,7 +1669,7 @@ void TDriver::Drive( tSituation* s )
         }
         else
         {
-            SpeedControl( SPDC_NORMAL, targetSpd, spd0, car, acc, brk );
+            SpeedControl( SPDC_NORMAL, targetSpd * SPEED_FACTOR, spd0, car, acc, brk );
             LogSHADOW.debug("#Drive Normal SpeedControl = SPDC_NORMAL - track seg type = %d\n", track->seg->type);
         }
     }
