@@ -151,18 +151,18 @@ void SDReflectionMapping::update()
     SDScreens *screens = (SDScreens*)getScreens();
     osg::Camera * viewCam = screens->getActiveView()->getOsgCam();
 
-    tCarElt *car = this->car->getCar();
+    tCarElt *Car = this->car->getCar();
 
-    pre_cam->setCar(car);
-    post_cam->setCar(car);
+    pre_cam->setCar(Car);
+    post_cam->setCar(Car);
 
     sgVec3 p;
     osg::Vec3 eye, center, up;
 
-    p[0] = car->_drvPos_x;
-    p[1] = car->_bonnetPos_y;
-    p[2] = car->_drvPos_z;
-    sgXformPnt3(p, car->_posMat);
+    p[0] = Car->_drvPos_x;
+    p[1] = Car->_bonnetPos_y;
+    p[2] = Car->_drvPos_z;
+    sgXformPnt3(p, Car->_posMat);
 
     eye[0] = p[0];
     eye[1] = p[1];

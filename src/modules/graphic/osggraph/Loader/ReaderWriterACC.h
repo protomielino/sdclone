@@ -235,7 +235,7 @@ public:
         if (name1!="")
         {
             std::string absFileName1 = osgDB::findDataFile(name1, options);
-            TextureData::TextureImageMap::iterator i = TextureData::mTextureImageMap.find(absFileName1);
+            i = TextureData::mTextureImageMap.find(absFileName1);
 
             if (i == TextureData::mTextureImageMap.end())
             {
@@ -274,7 +274,7 @@ public:
         if (name2!="")
         {
             std::string absFileName2 = osgDB::findDataFile(name2, options);
-            TextureData::TextureImageMap::iterator i = TextureData::mTextureImageMap.find(absFileName2);
+            i = TextureData::mTextureImageMap.find(absFileName2);
 
             if (i == TextureData::mTextureImageMap.end())
             {
@@ -313,7 +313,7 @@ public:
         if (name3!="")
         {
             std::string absFileName3 = osgDB::findDataFile(name3, options);
-            TextureData::TextureImageMap::iterator i = TextureData::mTextureImageMap.find(absFileName3);
+            i = TextureData::mTextureImageMap.find(absFileName3);
 
             if (i == TextureData::mTextureImageMap.end())
             {

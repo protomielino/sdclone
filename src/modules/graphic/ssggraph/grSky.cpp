@@ -1,9 +1,9 @@
 /***************************************************************************
 
-    file        : grSky.cpp
-    copyright   : (C) 2009 by Xavier Bertaux (based on ssgasky plib code)
-    web         : http://www.speed-dreams.org
-    version     : $Id$
+	file        : grSky.cpp
+	copyright   : (C) 2009 by Xavier Bertaux (based on ssgasky plib code)
+	web         : http://www.speed-dreams.org
+	version     : $Id$
 
  ***************************************************************************/
 
@@ -64,8 +64,8 @@ cGrSky::~cGrSky( void )
 void cGrSky::build( double h_radius, double v_radius,
 					 double sun_size, double sun_dist,
 					 double moon_size, double moon_dist,
-				     int nplanets, sgdVec3 *planet_data,
-		     int nstars, sgdVec3 *star_data )
+					 int nplanets, sgdVec3 *planet_data,
+			 int nstars, sgdVec3 *star_data )
 {
   delete dome;
   delete sun;
@@ -154,15 +154,15 @@ bool cGrSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 	sun->reposition( view_pos, 0 );
 	moon->reposition( view_pos, 0 );
 
-    sun->getSunPosition ( & pos );
-    calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
-    sun->setSunAngle( angle );
-    sun->setSunRotation( rotation );
+	sun->getSunPosition ( & pos );
+	calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
+	sun->setSunAngle( angle );
+	sun->setSunRotation( rotation );
 
-    moon->getMoonPosition ( & pos );
-    calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
-    moon->setMoonAngle( angle );
-    moon->setMoonRotation( rotation );
+	moon->getMoonPosition ( & pos );
+	calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
+	moon->setMoonAngle( angle );
+	moon->setMoonRotation( rotation );
 
 	for ( i = 0; i < clouds.getNum (); i++ )
 	{
@@ -186,7 +186,7 @@ bool cGrSky::reposition( sgVec3 view_pos, sgVec3 zero_elev, sgVec3 view_up, doub
   dome->reposition( zero_elev, lon, lat, spin );
 
   for ( i = 0; i < clouds.getNum (); i++ )
-    clouds.get(i)->reposition( zero_elev, view_up, lon, lat, alt, dt );
+	clouds.get(i)->reposition( zero_elev, view_up, lon, lat, alt, dt );
 
   moon->reposition(view_pos, angle);
   sun->reposition( view_pos, angle);
@@ -198,33 +198,33 @@ bool cGrSky::reposition( sgVec3 view_pos, sgVec3 zero_elev, sgVec3 view_up, doub
 
 
 bool cGrSky::repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, double sol_angle,
-                       double moon_angle, int nplanets, sgdVec3 *planet_data,
-                       int nstars, sgdVec3 *star_data )
+					   double moon_angle, int nplanets, sgdVec3 *planet_data,
+					   int nstars, sgdVec3 *star_data )
 {
   int i;
 
   if ( effective_visibility > 300.0 )
   {
-    // turn on sky
-    enable();
+	// turn on sky
+	enable();
 
-    dome->repaint( sky_color, fog_color, sol_angle, effective_visibility );
+	dome->repaint( sky_color, fog_color, sol_angle, effective_visibility );
 
 	moon->repaint();
 	sun->repaint( sol_angle, effective_visibility );
 
-    for ( i = 0; i < clouds.getNum (); i++ )
-      clouds.get(i)->repaint( cloud_color );
+	for ( i = 0; i < clouds.getNum (); i++ )
+	  clouds.get(i)->repaint( cloud_color );
 
 
-    planets->repaint( sol_angle, nplanets, planet_data );
-    stars->repaint( sol_angle, nstars, star_data );
+	planets->repaint( sol_angle, nplanets, planet_data );
+	stars->repaint( sol_angle, nstars, star_data );
 
   }
   else
   {
-    // turn off sky
-    disable();
+	// turn off sky
+	disable();
   }
 
   return true;
@@ -272,10 +272,10 @@ void cGrSky::postDraw( float alt )
 		float slop = 5.0; // if we are closer than this to a cloud layer, don't draw cloud
 
 		glDepthMask( GL_FALSE );
-        glStencilFunc( GL_EQUAL, 1, 1 );
-        glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
+		glStencilFunc( GL_EQUAL, 1, 1 );
+		glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
 
-		for ( int i = 0; i < num; i++ )
+		for ( i = 0; i < num; i++ )
 		{
 			cGrCloudLayer *cloud = clouds.get(index[i]);
 
@@ -288,7 +288,7 @@ void cGrSky::postDraw( float alt )
 		}
 
 		glDepthMask( GL_TRUE );
-        glDisable( GL_STENCIL_TEST );
+		glDisable( GL_STENCIL_TEST );
 
 		delete [] index;
 	}
@@ -300,97 +300,95 @@ void cGrSky::modifyVisibility( float alt, float time_factor )
 
   for ( int i = 0; i < clouds.getNum (); ++i )
   {
-    cGrCloudLayer *cloud = clouds.get(i);
+	cGrCloudLayer *cloud = clouds.get(i);
 
-    if ( cloud->isEnabled() )
-    {
-      float asl = cloud->getElevation();
-      float thickness = cloud->getThickness();
-      float transition = cloud->getTransition();
+	if ( cloud->isEnabled() )
+	{
+	  float asl = cloud->getElevation();
+	  float thickness = cloud->getThickness();
+	  float transition = cloud->getTransition();
 
-      float ratio = 1.0;
+	  float ratio = 1.0;
 
-      if ( alt < asl - transition )
-      {
-        // below cloud layer
-        ratio = 1.0;
-      }
-      else if ( alt < asl )
-      {
-        // in lower transition
-        ratio = (asl - alt) / transition;
-      }
-      else if ( alt < asl + thickness )
-      {
-        // in cloud layer
-        ratio = 0.0;
-      }
-      else if ( alt < asl + thickness + transition )
-      {
-        // in upper transition
-        ratio = (alt - (asl + thickness)) / transition;
-      }
-      else
-      {
-        // above cloud layer
-        ratio = 1.0;
-      }
+	  if ( alt < asl - transition )
+	  {
+		// below cloud layer
+		ratio = 1.0;
+	  }
+	  else if ( alt < asl )
+	  {
+		// in lower transition
+		ratio = (asl - alt) / transition;
+	  }
+	  else if ( alt < asl + thickness )
+	  {
+		// in cloud layer
+		ratio = 0.0;
+	  }
+	  else if ( alt < asl + thickness + transition )
+	  {
+		// in upper transition
+		ratio = (alt - (asl + thickness)) / transition;
+	  }
+	  else
+	  {
+		// above cloud layer
+		ratio = 1.0;
+	  }
 
-      // accumulate effects from multiple cloud layers
-      effvis *= ratio;
+	  // accumulate effects from multiple cloud layers
+	  effvis *= ratio;
 
-      if ( ratio < 1.0 )
-      {
-        if ( ! in_puff )
-        {
-          // calc chance of entering cloud puff
-          double rnd = grRandom();
-          double chance = rnd * rnd * rnd;
-          if ( chance > 0.95 )
-          {
-            in_puff = true;
-            puff_length = grRandom() * 2.0; // up to 2 seconds
-            puff_progression = 0.0;
-          }
-        }
+	  if ( ratio < 1.0 )
+	  {
+		if ( ! in_puff )
+		{
+		  // calc chance of entering cloud puff
+		  double rnd = grRandom();
+		  double chance = rnd * rnd * rnd;
+		  if ( chance > 0.95 )
+		  {
+			in_puff = true;
+			puff_length = grRandom() * 2.0; // up to 2 seconds
+			puff_progression = 0.0;
+		  }
+		}
 
 	if ( in_puff )
 	{
 	  // modify actual_visibility based on puff envelope
 	  if ( puff_progression <= ramp_up )
 	  {
-	    double x = 0.5 * SGD_PI * puff_progression / ramp_up;
-	    double factor = 1.0 - sin( x );
-	    effvis = (float)(effvis * factor);
+		double x = 0.5 * SGD_PI * puff_progression / ramp_up;
+		double factor = 1.0 - sin( x );
+		effvis = (float)(effvis * factor);
 	  }
 	  else if ( puff_progression >= ramp_up + puff_length )
 	  {
-	    double x = 0.5 * SGD_PI *
-	      (puff_progression - (ramp_up + puff_length)) /
-	      ramp_down;
-	    double factor = sin( x );
-	    effvis = (float)(effvis * factor);
+		double x = 0.5 * SGD_PI * (puff_progression - (ramp_up + puff_length)) / ramp_down;
+		double factor = sin( x );
+		effvis = (float)(effvis * factor);
 	  }
 	  else
-  	  {
-            effvis = 0.0;
-          }
+	  {
+		effvis = 0.0;
+	  }
 
-          puff_progression += time_factor;
+	  puff_progression += time_factor;
 
 	  if ( puff_progression > puff_length + ramp_up + ramp_down)
 	  {
-	    in_puff = false;
+		in_puff = false;
 	  }
 	}
 
-        // never let visibility drop below 25 meters
-        if ( effvis <= 25.0 )
-        {
-          effvis = 25.0;
-        }
-       }
-     }
+		// never let visibility drop below 25 meters
+		if ( effvis <= 25.0 )
+		{
+		  effvis = 25.0;
+		}
+	   }
+	 }
   } // for
 
   effective_visibility = effvis;

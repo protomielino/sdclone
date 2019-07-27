@@ -928,8 +928,8 @@ grDrawBackgroundSky(void)
 void
 grPreDrawSky(tSituation* s, float fogStart, float fogEnd, class cGrCamera *cam)
 {
-    static const double m_log01 = -log( 0.01 );
-    static const double sqrt_m_log01 = sqrt( m_log01 );
+    //static const double m_log01 = -log( 0.01 );
+    //static const double sqrt_m_log01 = sqrt( m_log01 );
     GLbitfield clear_mask;
 
     if (grSkyDomeDistance )

@@ -382,22 +382,22 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 
 				for (unsigned n = 0; n < num; ++n)
 				{
-					std::string token;
-					stream >> token;
+					std::string token2;
+					stream >> token2;
 
-					if (token != "SURF")
+					if (token2 != "SURF")
 					{
 						osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: expected SURF line while reading object \""
 							<< group->getName() << "\"!" << std::endl;
 						return group.release();
 					}
 
-					stream >> token;
-					unsigned flags = strtol(token.c_str(), NULL, 0);
+					stream >> token2;
+					unsigned flags = strtol(token2.c_str(), NULL, 0);
 					// unsigned v = flags &0xF;
 
-					stream >> token;
-					if (token != "mat")
+					stream >> token2;
+					if (token2 != "mat")
 					{
 						osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: expected mat line while reading object \""
 							<< group->getName() << "\"!" << std::endl;
@@ -425,8 +425,8 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 					}
 
 					// read the refs
-					stream >> token;
-					if (token != "refs")
+					stream >> token2;
+					if (token2 != "refs")
 					{
 						osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: expected refs line while reading object \""
 							<< group->getName() << "\"3" << std::endl;

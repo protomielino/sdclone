@@ -60,8 +60,8 @@ private :
 public :
     SDCar(void);
     ~SDCar(void);
-    osg::ref_ptr<osg::Node> loadCar(tCarElt *car, bool tracktype, bool subcat, int carshader);
-    void deactivateCar(tCarElt *car);
+    osg::ref_ptr<osg::Node> loadCar(tCarElt *Car, bool tracktype, bool subcat, int carshader);
+    void deactivateCar(tCarElt *Car);
     bool isCar(tCarElt*c);
 
     bool    _cockpit;
@@ -79,7 +79,7 @@ public :
 
     tCarElt *getCar();
 
-    void activateCar(tCarElt *car);
+    void activateCar(tCarElt *Car);
     void updateCar();
     void updateShadingParameters(osg::Matrixf modelview);
 };

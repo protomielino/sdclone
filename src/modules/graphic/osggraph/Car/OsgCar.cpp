@@ -83,11 +83,11 @@ SDCar::~SDCar(void)
     delete reflectionMapping;
 }
 
-osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *car, bool tracktype, bool subcat, int carshader)
+osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat, int carshader)
 {
     this->car_branch = new osg::MatrixTransform;
     this->car_root = new osg::Group;
-    this->car = car;
+    this->car = Car;
 
     /* Schedule texture mapping if we are using a custom skin and/or a master 3D model */
     const bool bMasterModel = strlen(this->car->_masterModel) != 0;
@@ -749,17 +749,17 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car)
     return root.get();
 }*/
 
-void SDCar::deactivateCar(tCarElt *car)
+void SDCar::deactivateCar(tCarElt *Car)
 {
-    if(this->car == car)
+    if(this->car == Car)
     {
         this->car_root->setNodeMask(0);
     }
 }
 
-void SDCar::activateCar(tCarElt *car)
+void SDCar::activateCar(tCarElt *Car)
 {
-    if(this->car == car)
+    if(this->car == Car)
     {
         this->car_root->setNodeMask(1);
     }

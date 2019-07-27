@@ -173,9 +173,9 @@ public:
 	bool repaint() { return repaint ( moon_angle ); }
     bool repaint(double angle);
 
-    bool reposition(sgVec3 p, double moon_angle) 
+    bool reposition(sgVec3 p, double angle) 
     {
-       return reposition (p, moon_angle, moonAscension, moondeclination, moon_dist); 
+       return reposition (p, angle, moonAscension, moondeclination, moon_dist); 
     }
 
     bool reposition(sgVec3 p, double moon_angle, double moonAscension, double moondeclination, double moon_dist);
@@ -260,9 +260,9 @@ public:
 		     double rightAscension, double declination,
 		     double sun_dist, double lat, double alt_asl, double sun_angle );*/
 
-    bool reposition( sgVec3 p, double sun_angle ) 
+    bool reposition( sgVec3 p, double angle ) 
     {
-       return reposition ( p, sun_angle, sun_right_ascension, sun_declination, sun_dist ); 
+       return reposition ( p, angle, sun_right_ascension, sun_declination, sun_dist ); 
     }
 
     bool reposition( sgVec3 p, double sun_angle, double sun_right_ascension, double sun_declination, double sun_dist );

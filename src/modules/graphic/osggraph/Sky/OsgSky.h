@@ -43,7 +43,7 @@ class SDStars;
 class SDSkyDome;
 class SDSky;
 
-/*typedef struct
+typedef struct
 {
   osg::Vec3d pos;
   double spin;
@@ -60,7 +60,7 @@ typedef struct
   osg::Vec3f fog_color;
   osg::Vec3f cloud_color;
   double sun_angle, moon_angle;
-} SDSkyColor;*/
+} SDSkyColor;
 
 class SDSky
 {

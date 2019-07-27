@@ -674,7 +674,7 @@ osg::ref_ptr< osg::StateSet> SDRender::setFogState()
     return fogState.get();
 }
 
-void SDRender::UpdateFogColor(double sol_angle)
+void SDRender::UpdateFogColor(double angle)
 {
     double rotation;
 
