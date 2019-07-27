@@ -296,7 +296,7 @@ void TDriver::GetSkillingParameters()
         Skilling = true;                           // of TORCS-Installation
         LogSHADOW.debug("#Skilling: On\n");
 
-        void* SkillHandle = NULL;
+        SkillHandle = NULL;
 
         snprintf(PathFilenameBuffer, 256, "%sconfig/raceman/extra/skill.xml", GetLocalDir());
         LogSHADOW.debug("#skill.xml: %s\n", PathFilenameBuffer);
@@ -2438,17 +2438,17 @@ double TDriver::ApplyAbs( tCarElt* car, double brake )
     float trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
     double angle = trackangle - car->_yaw;
     NORM_PI_PI(angle);
-    float origbrake = brake;
-    float rearskid = MAX(0.0f, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
+    double origbrake = brake;
+    double rearskid = MAX(0.0, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
     int i;
-    float slip = 0.0f;
+    double slip = 0.0;
 
     for (i = 0; i < 4; i++)
     {
         slip += car->_wheelSpinVel(i) * car->_wheelRadius(i);
     }
 
-    slip *= 1.0f + MAX(rearskid, MAX(fabs(car->_yaw_rate) / 5, fabs(angle) / 6));
+    slip *= 1.0 + MAX(rearskid, MAX(fabs(car->_yaw_rate) / 5, fabs(angle) / 6));
     slip = car->_speed_x - slip / 4.0f;
 
     if (slip > m_AbsSlip)
@@ -2924,12 +2924,12 @@ double TDriver::filterTCL(double Accel)                                     // T
     //return accel;
 
     Accel = MIN(1.0f, Accel);
-    float accel1 = Accel, accel2 = Accel, accel3 = Accel, accel4 = Accel;
+    double accel1 = Accel, accel2 = Accel, accel3 = Accel, accel4 = Accel;
 
     if (car->_speed_x > 10.0f)
     {
     }
-    float this_tcl_slip = (car->_speed_x > 10.0f ? m_TclSlip : m_TclRange/10);
+    double this_tcl_slip = (car->_speed_x > 10.0f ? m_TclSlip : m_TclRange/10);
     if (Slip > this_tcl_slip)
     {
         float friction = MIN(car->_wheelSeg(REAR_RGT)->surface->kFriction, car->_wheelSeg(REAR_LFT)->surface->kFriction);
@@ -2939,7 +2939,7 @@ double TDriver::filterTCL(double Accel)                                     // T
         else
             friction = pow(friction, 3.0f);
 
-        float this_slip = MIN(m_TclRange, (m_TclRange/2) * friction);
+        double this_slip = MIN(m_TclRange, (m_TclRange/2) * friction);
         //accel3 = accel3 - MIN(accel3, (slip - tcl_slip) / tcl_range);
         accel3 = accel3 - MIN(accel3, (Slip - this_slip) / m_TclRange);
     }

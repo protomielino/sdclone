@@ -406,15 +406,15 @@ reTrackInitWeather(void)
     trackLocal->dewp = 5.0f;
     trackLocal->airpressure = 101300;
     trackLocal->airdensity = 1.219f;
-    trackLocal->windspeed = rand() % 100;
-    trackLocal->winddir = rand() % 359;
+    trackLocal->windspeed = (tdble)(rand() % 100);
+    trackLocal->winddir = (tdble)(rand() % 359);
     trackLocal->relativehumidity = 65.0f;
-    trackLocal->visibility = rand() % 12000;
+    trackLocal->visibility = (tdble)(rand() % 12000);
 
     reTrackInitWeatherValues();
 
-    if ((trackLocal->visibility < 8000) & (rain < 1))
-        trackLocal->visibility = 8000;
+    if ((trackLocal->visibility < 300) & (rain < 1))
+        trackLocal->visibility = 300;
 
     GfLogDebug("Visibility = %.3f\n", trackLocal->visibility);
     GfLogDebug("Wind Speed = %.3f\n", trackLocal->windspeed);
@@ -445,58 +445,58 @@ reTrackInitWeatherValues(void)
     gmtime_r(&now_sec, &now);
 #endif
     int month = now.tm_mon + 1;
-    int temp = 0.0;
+    tdble temp = 0.0;
 
     switch (month)
     {
     case 1:
-        temp = rand() % 10;
+        temp = (tdble)(rand() % 10);
         temp -= 10.0;
         break;
     case 2:
-        temp = rand() % 15;
+        temp = (tdble)(rand() % 15);
         temp -= 10.0;
         break;
     case 3:
-        temp = rand() % 18;
+        temp = (tdble)(rand() % 18);
         temp -= 8.0;
         break;
     case 4:
-        temp = rand() % 19;
+        temp = (tdble)(rand() % 19);
         temp -= 5.0;
         break;
     case 5:
-        temp = rand() % 22;
+        temp = (tdble)(rand() % 22);
         temp -= 4.0;
         break;
     case 6:
-        temp = rand() % 25;
+        temp = (tdble)(rand() % 25);
         temp -= 3.0;
         break;
     case 7:
-        temp = rand() % 30;
+        temp = (tdble)(rand() % 30);
         temp-= 3.0;
         break;
     case 8:
-        temp = rand() % 35;
+        temp = (tdble)(rand() % 35);
         temp -= 3.0;
         break;
     case 9:
-        temp = rand() % 30;
+        temp = (tdble)(rand() % 30);
         break;
     case 10:
-        temp = rand() % 25;
+        temp = (tdble)(rand() % 25);
         break;
     case 11:
-        temp = rand() % 20;
+        temp = (tdble)(rand() % 20);
         temp -= 5.0;
         break;
     case 12:
-        temp = rand() % 15;
+        temp = (tdble)(rand() % 15);
         temp -= 10.0;
         break;
     default:
-        temp = rand() % 25;
+        temp = (tdble)(rand() % 25);
     }
 
     trackLocal->airtemperature = temp;
@@ -560,14 +560,15 @@ reTrackInitRealWeather(void)
             if (webMetar->getCloudNumber() > 0)
             {
                 trackLocal->clouds = 0;
-                trackLocal->altitude = 5500 * 0.3048;
+                trackLocal->altitude = (tdble)(1676.40);
                 //_clouds.push_back(cl);
             }
         }
 
         // visibility
-        tdble _wind_range_from, _wind_range_to = 0;
-        double d = webMetar->getVisibility_m();
+		tdble _wind_range_from = 0.0;
+		tdble _wind_range_to = 0.0;
+        tdble d = (tdble)(webMetar->getVisibility_m());
         GfLogDebug("WebMetar Visibility in racetrack = %.3f\n", webMetar->getVisibility_m());
 
         if (d == WebMetarNaN )
@@ -606,7 +607,7 @@ reTrackInitRealWeather(void)
         if (webMetar->getWindSpeed_kmh() == WebMetarNaN)
             trackLocal->windspeed = 0.0;
         else
-            trackLocal->windspeed = webMetar->getWindSpeed_kmh();
+            trackLocal->windspeed = (tdble)(webMetar->getWindSpeed_kmh());
 
         // clouds
         int cn = webMetar->getCloudNumber();
@@ -639,27 +640,27 @@ reTrackInitRealWeather(void)
         if (webMetar->getTemperature_C() == WebMetarNaN)
             trackLocal->airtemperature = 15.0;
         else
-            trackLocal->airtemperature = webMetar->getTemperature_C();
+            trackLocal->airtemperature = (tdble)(webMetar->getTemperature_C());
 
         if (webMetar->getDewpoint_C() == WebMetarNaN)
             trackLocal->dewp = 0.0;
         else
-            trackLocal->dewp = webMetar->getDewpoint_C();
+            trackLocal->dewp = (tdble)(webMetar->getDewpoint_C());
 
         if (webMetar->getPressure_hPa() == WebMetarNaN)
-            trackLocal->airpressure = 30.0 * 3386.388640341;
+            trackLocal->airpressure = (tdble)(30.0 * 3386.388640341);
         else
-            trackLocal->airpressure = webMetar->getPressure_hPa();
+            trackLocal->airpressure = (tdble)(webMetar->getPressure_hPa());
 
-        trackLocal->airpressure = trackLocal->airpressure * 100;
-        trackLocal->airdensity = webMetar->getDensity_C();
+        trackLocal->airpressure = (tdble)(trackLocal->airpressure * 100);
+        trackLocal->airdensity = (tdble)(webMetar->getDensity_C());
 
         if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
         {
             trackLocal->rain = webMetar->getRain();
             trackLocal->snow = webMetar->getSnow();
             trackLocal->hail = webMetar->getHail();
-            trackLocal->relativehumidity = webMetar->getRelHumidity();
+            trackLocal->relativehumidity = (tdble)(webMetar->getRelHumidity());
         }
         else
         {
@@ -760,14 +761,15 @@ reTrackInitSimuWeather(void)
         if (webMetar->getCloudNumber() > 0)
         {
             trackLocal->clouds = 0;
-            trackLocal->altitude = 5500 * 0.3048;
+            trackLocal->altitude = (tdble)(5500 * 0.3048);
             //_clouds.push_back(cl);
         }
     }
 
     // visibility
-    tdble _wind_range_from, _wind_range_to = 0;
-    double d = webMetar->getVisibility_m();
+	tdble _wind_range_from = 0.0;
+	tdble _wind_range_to = 0.0;
+    tdble d = (tdble)(webMetar->getVisibility_m());
     GfLogDebug("WebMetar Visibility in racetrack = %.3f\n", webMetar->getVisibility_m());
 
     if (d == WebMetarNaN )
@@ -789,9 +791,9 @@ reTrackInitSimuWeather(void)
     {
         if (webMetar->getWindRangeTo() == -1)
         {
-            trackLocal->winddir = 0;
-            _wind_range_from = 0;
-            _wind_range_to = 359;
+            trackLocal->winddir = 0.0;
+            _wind_range_from = 0.0;
+            _wind_range_to = 359.0;
         }
         else
         {
@@ -806,7 +808,7 @@ reTrackInitSimuWeather(void)
     if (webMetar->getWindSpeed_kmh() == WebMetarNaN)
         trackLocal->windspeed = 0.0;
     else
-        trackLocal->windspeed = webMetar->getWindSpeed_kmh();
+        trackLocal->windspeed = (tdble)(webMetar->getWindSpeed_kmh());
 
     // clouds
     int cn = webMetar->getCloudNumber();
@@ -839,24 +841,24 @@ reTrackInitSimuWeather(void)
     if (webMetar->getTemperature_C() == WebMetarNaN)
         trackLocal->airtemperature = 15.0;
     else
-        trackLocal->airtemperature = webMetar->getTemperature_C();
+        trackLocal->airtemperature = (tdble)(webMetar->getTemperature_C());
 
     if (webMetar->getDewpoint_C() == WebMetarNaN)
         trackLocal->dewp = 0.0;
     else
-        trackLocal->dewp = webMetar->getDewpoint_C();
+        trackLocal->dewp = (tdble)(webMetar->getDewpoint_C());
 
     if (webMetar->getPressure_hPa() == WebMetarNaN)
-        trackLocal->airpressure = 30.0 * 3386.388640341;
+        trackLocal->airpressure = (tdble)(30.0 * 3386.388640341);
     else
-        trackLocal->airpressure = webMetar->getPressure_hPa();
+        trackLocal->airpressure = (tdble)(webMetar->getPressure_hPa());
 
     if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
     {
         trackLocal->rain = webMetar->getRain();
         trackLocal->snow = webMetar->getSnow();
         trackLocal->hail = webMetar->getHail();
-        trackLocal->relativehumidity = webMetar->getRelHumidity();
+        trackLocal->relativehumidity = (tdble)(webMetar->getRelHumidity());
     }
     else
     {
