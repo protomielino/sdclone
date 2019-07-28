@@ -66,6 +66,7 @@
 #define PRV_MAX_SPEED     	    "max speed"
 #define PRV_AVOID_KZ_SCALE	    "avoid kz scale"
 #define PRV_KZ_SCALE            "kz scale"
+#define PRV_OFFLINE_KZ_SCALE    "offline kz scale"
 #define PRV_AVOID_BRAKE_FACTOR	"avoid brake factor"
 #define PRV_AVOID_WIDTH		    "avoid width"
 #define PRV_BUMP_FACTOR         "bump factor"

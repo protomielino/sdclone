@@ -353,7 +353,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     void*	hCarParm = 0;
     char	buf[1024];
     char	trackName[256];
-    char  carName[256];
+    char	carName[256];
     track = pTrack;
 
     const char *car_sect = SECT_GROBJECTS "/" LST_RANGES "/" "1";
@@ -438,6 +438,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     }
 
     m_cm.KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_KZ_SCALE, NULL, 0.43f);
+	m_cm.OFFLINE_KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_OFFLINE_KZ_SCALE, NULL, 0.43f);
     m_cm.BUMP_FACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR, NULL, 1.0);
     m_cm.BUMP_FACTORLEFT = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR_LEFT, NULL, 1.0);
     m_cm.BUMP_FACTORRIGHT = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR_RIGHT, NULL, 1.0);
@@ -655,7 +656,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
 
     initCa();
 
-    LogSHADOW.debug( "CA %g   CA_FW %g   CA_RW %g   CA_GE %g\n", m_cm.CA, m_cm.CA_FW, m_cm.CA_RW, m_cm.CA_GE );
+    LogSHADOW.info( "CA %g   CA_FW %g   CA_RW %g   CA_GE %g\n", m_cm.CA, m_cm.CA_FW, m_cm.CA_RW, m_cm.CA_GE );
 
     m_cm.TYRE_MU   = 9999;
     m_cm.TYRE_MU_F = 9999;
@@ -663,10 +664,10 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
 
     initTireMu();
 
-    LogSHADOW.debug( "CARMASS %g   TYRE_MU %g   TYRE_MU_F %g   TYRE_MU_R %g \n",
+    LogSHADOW.info( "CARMASS %g   TYRE_MU %g   TYRE_MU_F %g   TYRE_MU_R %g \n",
                      m_cm.MASS, m_cm.TYRE_MU, m_cm.TYRE_MU_F, m_cm.TYRE_MU_R );
 
-    LogSHADOW.debug( "MU_SC %g   KZ_SCALE %g   FLY_HEIGHT %g\n",
+    LogSHADOW.info( "MU_SC %g   KZ_SCALE %g   FLY_HEIGHT %g\n",
                      m_cm.MU_SCALE, m_cm.KZ_SCALE, FLY_HEIGHT );
 
     char*	pTrackName = strrchr(m_track.GetTrack()->filename, '/') + 1;
@@ -675,7 +676,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
     snprintf( buf, 256, "drivers/%s/%s.spr", MyBotName, pTrackName );
 
     initCw();
-    LogSHADOW.debug(" CW = %.3f\n", m_cm.CD_BODY);
+    LogSHADOW.info(" CW = %.3f\n", m_cm.CD_BODY);
     initCR();
 
     initDriveTrain();
@@ -701,8 +702,9 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
 
     m_cm2 = m_cm;
     m_cm2.MU_SCALE = MN(1.5, m_cm.MU_SCALE);
+	m_cm2.KZ_SCALE = m_cm2.OFFLINE_KZ_SCALE;
 
-    LogSHADOW.debug( "SPDC N %d    SPDC T %d\n", SPDC_NORMAL, SPDC_TRAFFIC );
+    LogSHADOW.info( "SPDC N %d    SPDC T %d   KZ SCALE %g    OFFLINE KZ SCALE %g\n", SPDC_NORMAL, SPDC_TRAFFIC, m_cm.KZ_SCALE, m_cm2.KZ_SCALE);
 
     if( m_pShared->m_path[PATH_NORMAL].GetFactors() != FACTORS || m_pShared->m_pTrack != m_track.GetTrack())
     {

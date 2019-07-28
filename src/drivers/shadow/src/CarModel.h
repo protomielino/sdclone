@@ -69,6 +69,7 @@ public:
     double	CD_WING;        // aerodynamic drag constant -- wings
     double  CD_CX;
     double	KZ_SCALE;       // bump sensitivity.
+	double  OFFLINE_KZ_SCALE;
     double  BUMP_FACTOR;    // bump sensitivity factor.
     double	BUMP_FACTORLEFT;
     double	BUMP_FACTORRIGHT;

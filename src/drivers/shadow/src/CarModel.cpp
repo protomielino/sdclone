@@ -62,6 +62,7 @@ CarModel::CarModel()
     CD_WING(0),
     CD_CX(0),
     KZ_SCALE(0.43f),
+	OFFLINE_KZ_SCALE(0.43f),
 
     AVOID_MU_SCALE(0.9),
 
