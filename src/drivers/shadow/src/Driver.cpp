@@ -105,10 +105,10 @@ static const double	s_sgMax[] = { 0.03, 100 };
 static const int	s_sgSteps[] = { 10,  18 };
 
 TDriver::TDriver(int Index):
-    track(NULL),
     car(NULL),
-    m_Situation(NULL),
+    track(NULL),
     m_CarType(0),
+    m_Situation(NULL),
     m_driveType(DT_RWD),
     m_gearUpRpm(9000),
 
@@ -156,6 +156,7 @@ TDriver::TDriver(int Index):
     m_prevYawError(0),
     m_prevLineError(0),
     m_Flying(0),
+    m_opp(NULL),
     m_avgAY(0),
     m_raceStart(false),
     m_avoidS(1),
@@ -171,7 +172,7 @@ TDriver::TDriver(int Index):
 
     m_FuelNeeded(0),
 
-    m_opp(NULL),
+
     m_Strategy(NULL),
     m_pShared(NULL),
 
@@ -438,7 +439,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     }
 
     m_cm.KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_KZ_SCALE, NULL, 0.43f);
-	m_cm.OFFLINE_KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_OFFLINE_KZ_SCALE, NULL, 0.43f);
+    m_cm.OFFLINE_KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_OFFLINE_KZ_SCALE, NULL, 0.43f);
     m_cm.BUMP_FACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR, NULL, 1.0);
     m_cm.BUMP_FACTORLEFT = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR_LEFT, NULL, 1.0);
     m_cm.BUMP_FACTORRIGHT = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BUMP_FACTOR_RIGHT, NULL, 1.0);
@@ -702,7 +703,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
 
     m_cm2 = m_cm;
     m_cm2.MU_SCALE = MN(1.5, m_cm.MU_SCALE);
-	m_cm2.KZ_SCALE = m_cm2.OFFLINE_KZ_SCALE;
+    m_cm2.KZ_SCALE = m_cm2.OFFLINE_KZ_SCALE;
 
     LogSHADOW.info( "SPDC N %d    SPDC T %d   KZ SCALE %g    OFFLINE KZ SCALE %g\n", SPDC_NORMAL, SPDC_TRAFFIC, m_cm.KZ_SCALE, m_cm2.KZ_SCALE);
 
@@ -2355,7 +2356,7 @@ float TDriver::startAutomatic(float clutch)
 
 double TDriver::filterBrake(double Brake)
 {
-    /*BrakeRight = 1.0f;
+  /*BrakeRight = 1.0f;
   BrakeLeft = 1.0f;
   BrakeFront = 1.0f;
   BrakeRear = 1.0f;
@@ -2967,8 +2968,10 @@ double TDriver::filterTCL(double Accel)                                     // T
     }
 #endif
 #endif
+    Accel = MIN(accel1, MIN(accel2, MIN(accel3, accel4)));
+    float MinAccel = (float) (AccelScale * Accel);
 
-    return MIN(accel1, MIN(accel2, MIN(accel3, accel4)));
+    return  MAX(MinAccel, Accel);
 }
 
 //==========================================================================*
@@ -3113,8 +3116,6 @@ double TDriver::FlightControl(double Steer)
         int F = FLY_COUNT -  m_Flying;
         double T = MAX(0, MIN(1.0 * F / FLY_COUNT, 1));
         Steer = Steer * T + (1 - T) * Angle / car->_steerLock;
-
-        return Steer;
     }
 #else
     int flying = CheckFlying();
@@ -3123,6 +3124,7 @@ double TDriver::FlightControl(double Steer)
     else
         return Steer;
 #endif
+    return Steer;
 }
 
 //==========================================================================*
