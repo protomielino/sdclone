@@ -65,7 +65,7 @@ static int grSunHaloPostDraw( ssgEntity *e )
 // Constructor
 cGrSun::cGrSun( void )
 {
-	sun_transform = 0;
+    sun_transform = 0;
     prev_sun_angle = -9999.0;
     visibility = -9999.0;
 }
@@ -73,18 +73,21 @@ cGrSun::cGrSun( void )
 // Destructor
 cGrSun::~cGrSun( void )
 {
-	ssgDeRefDelete( sun_transform );
+    ssgDeRefDelete( sun_transform );
 }
 
-ssgBranch * cGrSun::build( double sun_size )
+ssgBranch * cGrSun::build(double sun_size , double humidity, double density)
 {
     ssgDeRefDelete( sun_transform );
 
-	sun_transform = new ssgTransform;
-	sun_transform->ref();
+    sun_transform = new ssgTransform;
+    sun_transform->ref();
 
-	sgVec4 color;
+    sgVec4 color;
     sgSetVec4( color, 1.0, 1.0, 1.0, 1.0 );
+
+    rel_humidity = humidity;
+    density_avg = density;
 
     sun_cl = new ssgColourArray( 1 );
     sun_cl->add( color );
@@ -99,36 +102,36 @@ ssgBranch * cGrSun::build( double sun_size )
 
     // set up the sun-state
     sun_state = new ssgSimpleState();
-	sun_state->setShadeModel( GL_SMOOTH );
-	sun_state->disable( GL_LIGHTING );
-	sun_state->enable( GL_CULL_FACE );
-	sun_state->disable( GL_TEXTURE_2D );
-	sun_state->enable( GL_COLOR_MATERIAL );
-	sun_state->setColourMaterial( GL_AMBIENT_AND_DIFFUSE );
-	sun_state->setMaterial( GL_EMISSION, 0, 0, 0, 1 );
-	sun_state->setMaterial( GL_SPECULAR, 0, 0, 0, 1 );
-	sun_state->disable( GL_BLEND );
+    sun_state->setShadeModel( GL_SMOOTH );
+    sun_state->disable( GL_LIGHTING );
+    sun_state->enable( GL_CULL_FACE );
+    sun_state->disable( GL_TEXTURE_2D );
+    sun_state->enable( GL_COLOR_MATERIAL );
+    sun_state->setColourMaterial( GL_AMBIENT_AND_DIFFUSE );
+    sun_state->setMaterial( GL_EMISSION, 0, 0, 0, 1 );
+    sun_state->setMaterial( GL_SPECULAR, 0, 0, 0, 1 );
+    sun_state->disable( GL_BLEND );
     sun_state->setAlphaClamp( 0.01f );
-	sun_state->disable( GL_ALPHA_TEST );
+    sun_state->disable( GL_ALPHA_TEST );
 
     ssgBranch *sun = grMakeSphere( sun_state, sun_cl, (float) sun_size, 15, 15,
-				    grSunPreDraw, grSunPostDraw );
+                    grSunPreDraw, grSunPostDraw );
 
-    repaint( 0.0, 10000.0 );
+    repaint( 0.0, 1.0 );
 
-	ihalo_state = new ssgSimpleState();
-	ihalo_state->setTexture( "data/textures/inner_halo.png" );
-	ihalo_state->enable( GL_TEXTURE_2D );
-	ihalo_state->disable( GL_LIGHTING );
-	ihalo_state->setShadeModel( GL_SMOOTH );
-	ihalo_state->disable( GL_CULL_FACE );
-	ihalo_state->enable( GL_COLOR_MATERIAL );
-	ihalo_state->setColourMaterial( GL_AMBIENT_AND_DIFFUSE );
-	ihalo_state->setMaterial( GL_EMISSION, 0, 0, 0, 1 );
-	ihalo_state->setMaterial( GL_SPECULAR, 0, 0, 0, 1 );
-	ihalo_state->enable( GL_ALPHA_TEST );
-	ihalo_state->setAlphaClamp(0.01f);
-	ihalo_state->enable ( GL_BLEND ) ;
+    ihalo_state = new ssgSimpleState();
+    ihalo_state->setTexture( "data/textures/inner_halo.png" );
+    ihalo_state->enable( GL_TEXTURE_2D );
+    ihalo_state->disable( GL_LIGHTING );
+    ihalo_state->setShadeModel( GL_SMOOTH );
+    ihalo_state->disable( GL_CULL_FACE );
+    ihalo_state->enable( GL_COLOR_MATERIAL );
+    ihalo_state->setColourMaterial( GL_AMBIENT_AND_DIFFUSE );
+    ihalo_state->setMaterial( GL_EMISSION, 0, 0, 0, 1 );
+    ihalo_state->setMaterial( GL_SPECULAR, 0, 0, 0, 1 );
+    ihalo_state->enable( GL_ALPHA_TEST );
+    ihalo_state->setAlphaClamp(0.01f);
+    ihalo_state->enable ( GL_BLEND ) ;
 
     float ihalo_size = (float) (sun_size * 2.0);
     sgVec3 vc;
@@ -210,125 +213,117 @@ ssgBranch * cGrSun::build( double sun_size )
 
 bool cGrSun::repaint( double sun_angle, double new_visibility )
 {
-	if ( visibility != new_visibility )
-	{
-		if (new_visibility < 100.0) new_visibility = 100.0;
+    if ( visibility != new_visibility )
+    {
+        if (new_visibility < 100.0) new_visibility = 100.0;
         else if (new_visibility > 45000.0) new_visibility = 45000.0;
         visibility = (float) new_visibility;
 
 
         static const float sqrt_m_log01 = (float) (sqrt( -log( 0.01 ) ));
         sun_exp2_punch_through = sqrt_m_log01 / ( visibility * 15 );
-		//sun_exp2_punch_through = 2.0 /log( visibility );
     }
 
     if ( prev_sun_angle != sun_angle )
-	{
+    {
         prev_sun_angle = sun_angle;
 
-		float aerosol_factor;
-		if ( visibility < 100 )
-		{
-			aerosol_factor = 8000;
-		}
-		else
-		{
-        	aerosol_factor = (float) (80.5 / log( visibility / 100 ));
-		}
+        float aerosol_factor;
+        if ( visibility < 100 )
+        {
+            aerosol_factor = 8000;
+        }
+        else
+        {
+            aerosol_factor = (float) (80.5 / log( visibility / 100 ));
+        }
 
-		float rel_humidity, density_avg;
+        if ( rel_humidity == 0.0 )
+        {
+            rel_humidity = 0.5;
+            density_avg = 0.7;
+        }
 
-		/*if ( !env_node )
-		{*/
-			rel_humidity = 0.5f;
-			density_avg = 0.7f;
-		/*}
-		else
-		{
-			//rel_humidity = env_node->getFloatValue( "relative-humidity" );
-			//density_avg =  env_node->getFloatValue( "atmosphere/density-tropo-avg" );
-		}*/
+        sgVec4 i_halo_color, o_halo_color, sun_color;
+        float green_scat_f;
 
-		sgVec4 i_halo_color, o_halo_color, sun_color;
-		float green_scat_f;
+        float red_scat_f = (float) (( aerosol_factor * path_distance * density_avg ) / 5E+07);
+        sun_color[0] = 1 - red_scat_f;
+        i_halo_color[0] = 1 - ( 1.1f * red_scat_f );
+        o_halo_color[0] = 1 - ( 1.4f * red_scat_f );
 
-		float red_scat_f = (float) (( aerosol_factor * path_distance * density_avg ) / 5E+07);
-		sun_color[0] = 1 - red_scat_f;
-		i_halo_color[0] = 1 - ( 1.1f * red_scat_f );
-		o_halo_color[0] = 1 - ( 1.4f * red_scat_f );
+        if (sun_declination > 5.0 || sun_declination < 2.0)
+        {
+            green_scat_f = (float) (( aerosol_factor * path_distance * density_avg ) / 5E+07);
+        }
+        else
+            green_scat_f = (float) (( aerosol_factor * path_distance * density_avg ) / 8.8938E+06);
 
-		if (sun_declination > 5.0 || sun_declination < 2.0)
-		{
-			green_scat_f = (float) (( aerosol_factor * path_distance * density_avg ) / 5E+07);
-		}
-		else
-			green_scat_f = (float) (( aerosol_factor * path_distance * density_avg ) / 8.8938E+06);
+        sun_color[1] = 1 - green_scat_f;
+        i_halo_color[1] = 1 - ( 1.1f * green_scat_f );
+        o_halo_color[1] = 1 - ( 1.4f * green_scat_f );
 
-		sun_color[1] = 1 - green_scat_f;
-		i_halo_color[1] = 1 - ( 1.1f * green_scat_f );
-		o_halo_color[1] = 1 - ( 1.4f * green_scat_f );
+        // Blue - 435.8 nm
+        float blue_scat_f = (float) (( aerosol_factor * path_distance * density_avg ) / 3.607E+06);
+        sun_color[2] = 1 - blue_scat_f;
+        i_halo_color[2] = 1 - ( 1.1f * blue_scat_f );
+        o_halo_color[2] = 1 - ( 1.4f * blue_scat_f );
 
-		// Blue - 435.8 nm
-		float blue_scat_f = (float) (( aerosol_factor * path_distance * density_avg ) / 3.607E+06);
-		sun_color[2] = 1 - blue_scat_f;
-		i_halo_color[2] = 1 - ( 1.1f * blue_scat_f );
-		o_halo_color[2] = 1 - ( 1.4f * blue_scat_f );
+        // Alpha
+        sun_color[3] = 1;
+        i_halo_color[3] = 1;
 
-		// Alpha
-		sun_color[3] = 1;
-		i_halo_color[3] = 1;
+        o_halo_color[3] = blue_scat_f;
+        if ( ( new_visibility < 10000 ) &&  ( blue_scat_f > 1 ))
+        {
+            o_halo_color[3] = 2 - blue_scat_f;
+        }
 
-		o_halo_color[3] = blue_scat_f;
-		if ( ( new_visibility < 10000 ) &&  ( blue_scat_f > 1 ))
-		{
-			o_halo_color[3] = 2 - blue_scat_f;
-		}
+        float saturation = 1 - ( rel_humidity / 200 );
+        sun_color[1] += (( 1 - saturation ) * ( 1 - sun_color[1] ));
+        sun_color[2] += (( 1 - saturation ) * ( 1 - sun_color[2] ));
 
-		float saturation = 1 - ( rel_humidity / 200 );
-		sun_color[1] += (( 1 - saturation ) * ( 1 - sun_color[1] ));
-		sun_color[2] += (( 1 - saturation ) * ( 1 - sun_color[2] ));
+        i_halo_color[1] += (( 1 - saturation ) * ( 1 - i_halo_color[1] ));
+        i_halo_color[2] += (( 1 - saturation ) * ( 1 - i_halo_color[2] ));
 
-		i_halo_color[1] += (( 1 - saturation ) * ( 1 - i_halo_color[1] ));
-		i_halo_color[2] += (( 1 - saturation ) * ( 1 - i_halo_color[2] ));
+        o_halo_color[1] += (( 1 - saturation ) * ( 1 - o_halo_color[1] ));
+        o_halo_color[2] += (( 1 - saturation ) * ( 1 - o_halo_color[2] ));
 
-		o_halo_color[1] += (( 1 - saturation ) * ( 1 - o_halo_color[1] ));
-		o_halo_color[2] += (( 1 - saturation ) * ( 1 - o_halo_color[2] ));
+        // just to make sure we're in the limits
+        if ( sun_color[0] < 0 ) sun_color[0] = 0;
+        else if ( sun_color[0] > 1) sun_color[0] = 1;
+        if ( i_halo_color[0] < 0 ) i_halo_color[0] = 0;
+        else if ( i_halo_color[0] > 1) i_halo_color[0] = 1;
+        if ( o_halo_color[0] < 0 ) o_halo_color[0] = 0;
+        else if ( o_halo_color[0] > 1) o_halo_color[0] = 1;
 
-		// just to make sure we're in the limits
-		if ( sun_color[0] < 0 ) sun_color[0] = 0;
-		else if ( sun_color[0] > 1) sun_color[0] = 1;
-		if ( i_halo_color[0] < 0 ) i_halo_color[0] = 0;
-		else if ( i_halo_color[0] > 1) i_halo_color[0] = 1;
-		if ( o_halo_color[0] < 0 ) o_halo_color[0] = 0;
-		else if ( o_halo_color[0] > 1) o_halo_color[0] = 1;
+        if ( sun_color[1] < 0 ) sun_color[1] = 0;
+        else if ( sun_color[1] > 1) sun_color[1] = 1;
+        if ( i_halo_color[1] < 0 ) i_halo_color[1] = 0;
+        else if ( i_halo_color[1] > 1) i_halo_color[1] = 1;
+        if ( o_halo_color[1] < 0 ) o_halo_color[1] = 0;
+        else if ( o_halo_color[0] > 1) o_halo_color[1] = 1;
 
-		if ( sun_color[1] < 0 ) sun_color[1] = 0;
-		else if ( sun_color[1] > 1) sun_color[1] = 1;
-		if ( i_halo_color[1] < 0 ) i_halo_color[1] = 0;
-		else if ( i_halo_color[1] > 1) i_halo_color[1] = 1;
-		if ( o_halo_color[1] < 0 ) o_halo_color[1] = 0;
-		else if ( o_halo_color[0] > 1) o_halo_color[1] = 1;
-
-		if ( sun_color[2] < 0 ) sun_color[2] = 0;
-		else if ( sun_color[2] > 1) sun_color[2] = 1;
-		if ( i_halo_color[2] < 0 ) i_halo_color[2] = 0;
-		else if ( i_halo_color[2] > 1) i_halo_color[2] = 1;
-		if ( o_halo_color[2] < 0 ) o_halo_color[2] = 0;
-		else if ( o_halo_color[2] > 1) o_halo_color[2] = 1;
-		if ( o_halo_color[3] < 0 ) o_halo_color[3] = 0;
-		else if ( o_halo_color[3] > 1) o_halo_color[3] = 1;
+        if ( sun_color[2] < 0 ) sun_color[2] = 0;
+        else if ( sun_color[2] > 1) sun_color[2] = 1;
+        if ( i_halo_color[2] < 0 ) i_halo_color[2] = 0;
+        else if ( i_halo_color[2] > 1) i_halo_color[2] = 1;
+        if ( o_halo_color[2] < 0 ) o_halo_color[2] = 0;
+        else if ( o_halo_color[2] > 1) o_halo_color[2] = 1;
+        if ( o_halo_color[3] < 0 ) o_halo_color[3] = 0;
+        else if ( o_halo_color[3] > 1) o_halo_color[3] = 1;
 
         grGammaCorrectRGB( sun_color );
-		grGammaCorrectRGB( i_halo_color );
-		grGammaCorrectRGB( o_halo_color );
+        grGammaCorrectRGB( i_halo_color );
+        grGammaCorrectRGB( o_halo_color );
 
         float *ptr;
         ptr = sun_cl->get( 0 );
         sgCopyVec4( ptr, sun_color );
-		ptr = ihalo_cl->get( 0 );
-		sgCopyVec4( ptr, i_halo_color );
-		ptr = ohalo_cl->get( 0 );
-		sgCopyVec4( ptr, o_halo_color );
+        ptr = ihalo_cl->get( 0 );
+        sgCopyVec4( ptr, i_halo_color );
+        ptr = ohalo_cl->get( 0 );
+        sgCopyVec4( ptr, o_halo_color );
     }
 
     return true;
@@ -364,8 +359,8 @@ bool cGrSun::reposition( sgVec3 p, double angle, double rightAscension, double d
     sun_transform->setTransform( &skypos );
 
     if ( prev_sun_angle != sun_angle )
-	{
-		if ( sun_angle == 0 ) sun_angle = 0.1;
+    {
+        if ( sun_angle == 0 ) sun_angle = 0.1;
         const double r_earth_pole = 6356752.314;
         const double r_tropo_pole = 6356752.314 + 8000;
         const double epsilon_earth2 = 6.694380066E-3;
@@ -380,7 +375,7 @@ bool cGrSun::reposition( sgVec3 p, double angle, double rightAscension, double d
         double sin_beta =  ( position_radius * sin ( gamma )  ) / r_tropo;
         double alpha =  SG_PI - gamma - asin( sin_beta );
 
-		path_distance = sqrt( pow( position_radius, 2 ) + pow( r_tropo, 2 )
+        path_distance = sqrt( pow( position_radius, 2 ) + pow( r_tropo, 2 )
                         - ( 2 * position_radius * r_tropo * cos( alpha ) ));
 
         double alt_half = sqrt( pow ( r_tropo, 2 ) + pow( path_distance / 2, 2 ) - r_tropo * path_distance * cos( asin( sin_beta )) ) - r_earth;
@@ -388,10 +383,10 @@ bool cGrSun::reposition( sgVec3 p, double angle, double rightAscension, double d
         if ( alt_half < 0.0 ) alt_half = 0.0;
 
         /*if ( env_node )
-		{
-			//env_node->setDoubleValue( "atmosphere/altitude-troposphere-top", r_tropo - r_earth );
-			//env_node->setDoubleValue( "atmosphere/altitude-half-to-sun", alt_half );
-		}*/
+        {
+            //env_node->setDoubleValue( "atmosphere/altitude-troposphere-top", r_tropo - r_earth );
+            //env_node->setDoubleValue( "atmosphere/altitude-half-to-sun", alt_half );
+        }*/
     }
 
     return true;

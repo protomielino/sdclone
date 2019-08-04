@@ -220,7 +220,7 @@ grInitBackground()
         //Build the sky
         TheSky	= new cGrSky;
         TheSky->build(grSkyDomeDistance, grSkyDomeDistance, 2000 * domeSizeRatio, grSkyDomeDistance, 2000 * domeSizeRatio, grSkyDomeDistance,
-                      NPlanets, APlanetsData, NStars, AStarsData );
+                      NPlanets, APlanetsData, NStars, AStarsData, grTrack->local.relativehumidity, grTrack->local.airdensity);
 
         //Add the Sun itself
         GLfloat sunAscension = grTrack->local.sunascension;

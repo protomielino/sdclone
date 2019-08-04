@@ -71,7 +71,7 @@ cGrSkyDome::~cGrSkyDome( void )
 
 
 // initialize the sky object and connect it into our scene graph
-ssgBranch * cGrSkyDome::build( double hscale, double vscale )
+ssgBranch * cGrSkyDome::build(double hscale, double vscale )
 {
   sgVec4 color;
   double theta;
@@ -122,7 +122,7 @@ ssgBranch * cGrSkyDome::build( double hscale, double vscale )
 
   sgSetVec3( center_vertex, 0.0, 0.0, (float)(center_elev * vscale));
 
-  for ( i = 0; i < 12; i++ ) 
+  for ( i = 0; i < 12; i++ )
   {
     theta = (i * 30.0) * SGD_DEGREES_TO_RADIANS;
 
@@ -150,7 +150,7 @@ ssgBranch * cGrSkyDome::build( double hscale, double vscale )
   // generate the center disk vertex/color arrays
   center_disk_vl->add( center_vertex );
   center_disk_cl->add( color );
-  for ( i = 11; i >= 0; i-- ) 
+  for ( i = 11; i >= 0; i-- )
   {
     center_disk_vl->add( upper_vertex[i] );
     center_disk_cl->add( color );
@@ -159,7 +159,7 @@ ssgBranch * cGrSkyDome::build( double hscale, double vscale )
   center_disk_cl->add( color );
 
   // generate the upper ring
-  for ( i = 0; i < 12; i++ ) 
+  for ( i = 0; i < 12; i++ )
   {
     upper_ring_vl->add( middle_vertex[i] );
     upper_ring_cl->add( color );
@@ -174,7 +174,7 @@ ssgBranch * cGrSkyDome::build( double hscale, double vscale )
   upper_ring_cl->add( color );
 
   // generate middle ring
-  for ( i = 0; i < 12; i++ ) 
+  for ( i = 0; i < 12; i++ )
   {
     middle_ring_vl->add( lower_vertex[i] );
     middle_ring_cl->add( color );
@@ -189,7 +189,7 @@ ssgBranch * cGrSkyDome::build( double hscale, double vscale )
   middle_ring_cl->add( color );
 
   // generate lower ring
-  for ( i = 0; i < 12; i++ ) 
+  for ( i = 0; i < 12; i++ )
   {
     lower_ring_vl->add( bottom_vertex[i] );
     lower_ring_cl->add( color );
@@ -212,16 +212,16 @@ ssgBranch * cGrSkyDome::build( double hscale, double vscale )
   // into the provide scene graph branch
   ssgVtxTable *center_disk, *upper_ring, *middle_ring, *lower_ring;
 
-  center_disk = new ssgVtxTable( GL_TRIANGLE_FAN, 
+  center_disk = new ssgVtxTable( GL_TRIANGLE_FAN,
   center_disk_vl, NULL, NULL, center_disk_cl );
 
-  upper_ring = new ssgVtxTable( GL_TRIANGLE_STRIP, 
+  upper_ring = new ssgVtxTable( GL_TRIANGLE_STRIP,
   upper_ring_vl, NULL, NULL, upper_ring_cl );
 
-  middle_ring = new ssgVtxTable( GL_TRIANGLE_STRIP, 
+  middle_ring = new ssgVtxTable( GL_TRIANGLE_STRIP,
   middle_ring_vl, NULL, NULL, middle_ring_cl );
 
-  lower_ring = new ssgVtxTable( GL_TRIANGLE_STRIP, 
+  lower_ring = new ssgVtxTable( GL_TRIANGLE_STRIP,
   lower_ring_vl, NULL, NULL, lower_ring_cl );
 
   center_disk->setState( dome_state );
@@ -276,7 +276,7 @@ bool cGrSkyDome::repositionFlat( sgVec3 p, double spin )
   return true;
 }
 
-static void fade_to_black( sgVec4 sky_color[], float asl, int count) 
+static void fade_to_black( sgVec4 sky_color[], float asl, int count)
 {
     const float ref_asl = 10000.0f;
     const sgVec3 space_color = {0.0f, 0.0f, 0.0f};
@@ -335,8 +335,8 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
   //sol_angle *= SGD_RADIANS_TO_DEGREES;
 
   // Check for sunrise/sunset condition
-  if ((sol_angle > 80.0)) 
-  { 
+  if ((sol_angle > 80.0))
+  {
     sgSetVec3( outer_param,
       (float)((10.0 - fabs(90.0 - sol_angle)) / 20.0),
       (float)((10.0 - fabs(90.0 - sol_angle)) / 40.0),
@@ -351,7 +351,7 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
 
     sgScaleVec3( middle_diff, middle_param, 1.0f / 6.0f );
   }
-  else 
+  else
   {
     sgSetVec3( outer_param, 0.0, 0.0, 0.0 );
     sgSetVec3( middle_param, 0.0, 0.0, 0.0 );
@@ -380,30 +380,30 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
         cvf = 45000;
 
   vis_factor = (vis - 1000.0) / 2000.0;
-  if ( vis_factor < 0.0 ) 
+  if ( vis_factor < 0.0 )
   {
         vis_factor = 0.0;
-  } else if ( vis_factor > 1.0) 
+  } else if ( vis_factor > 1.0)
   {
         vis_factor = 1.0;
   }
 
-  for ( j = 0; j < 3; j++ ) 
+  for ( j = 0; j < 3; j++ )
   {
     diff = sky_color[j] - fog_color[j];
     center_color[j] = sky_color[j]; // - (float)(diff * ( 1.0 - vis_factor ));
   }
 
-  for ( i = 0; i < 6; i++ ) 
+  for ( i = 0; i < 6; i++ )
   {
-    for ( j = 0; j < 3; j++ ) 
+    for ( j = 0; j < 3; j++ )
     {
       double saif = sol_angle/SG_PI;
       diff = sky_color[j] - fog_color[j] * (0.8 + j * 0.2) * (0.8 + saif - ((6-i)/10));
 
       upper_color[i][j] = sky_color[j] - (float)(diff * ( 1.0 - vis_factor * (0.7 + 0.3 * cvf/45000)));
       middle_color[i][j] = sky_color[j] - (float)(diff * ( 1.0 - vis_factor * (0.1 + 0.85 * cvf/45000)))
-			 + middle_amt[j];
+             + middle_amt[j];
       lower_color[i][j] = fog_color[j] + outer_amt[j];
 
       if ( upper_color[i][j] > 1.0 ) { upper_color[i][j] = 1.0; }
@@ -415,7 +415,7 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
     }
     upper_color[i][3] = middle_color[i][3] = lower_color[i][3] = 1.0;
 
-    for ( j = 0; j < 3; j++ ) 
+    for ( j = 0; j < 3; j++ )
     {
       outer_amt[j] -= outer_diff[j];
       middle_amt[j] -= middle_diff[j];
@@ -425,18 +425,18 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
   sgSetVec3( outer_amt, 0.0, 0.0, 0.0 );
   sgSetVec3( middle_amt, 0.0, 0.0, 0.0 );
 
-  for ( i = 6; i < 12; i++ ) 
+  for ( i = 6; i < 12; i++ )
   {
-    for ( j = 0; j < 3; j++ ) 
+    for ( j = 0; j < 3; j++ )
     {
-	  double saif = sol_angle/SG_PI;
+      double saif = sol_angle/SG_PI;
       diff = (sky_color[j] - fog_color[j]) * (0.8 + j * 0.2) * (0.8 + saif - ((-i+12)/10));
 
       upper_color[i][j] = sky_color[j] - (float)(diff *
                                  ( 1.0 - vis_factor * (0.7 + 0.3 * cvf/45000)));
       middle_color[i][j] = sky_color[j] - (float)(diff *
                                  ( 1.0 - vis_factor * (0.1 + 0.85 * cvf/45000)))
-								  + middle_amt[j];
+                                  + middle_amt[j];
       lower_color[i][j] = fog_color[j] + outer_amt[j];
 
       if ( upper_color[i][j] > 1.0 ) { upper_color[i][j] = 1.0; }
@@ -448,7 +448,7 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
     }
     upper_color[i][3] = middle_color[i][3] = lower_color[i][3] = 1.0;
 
-    for ( j = 0; j < 3; j++ ) 
+    for ( j = 0; j < 3; j++ )
     {
       outer_amt[j] += outer_diff[j];
       middle_amt[j] += middle_diff[j];
@@ -460,7 +460,7 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
   fade_to_black( middle_color, (asl+0.05f) * middle_elev, 12);
   fade_to_black( lower_color, (asl+0.05f) * lower_elev, 12);
 
-  for ( i = 0; i < 12; i++ ) 
+  for ( i = 0; i < 12; i++ )
   {
     sgCopyVec4( bottom_color[i], fog_color );
   }
@@ -478,7 +478,7 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
   // sgVec4 red;
   // sgSetVec4( red, 1.0, 0.0, 0.0, 1.0 );
   sgCopyVec4( slot, center_color );
-  for ( i = 11; i >= 0; i-- ) 
+  for ( i = 11; i >= 0; i-- )
   {
     slot = center_disk_cl->get( counter++ );
     sgCopyVec4( slot, upper_color[i] );
@@ -488,7 +488,7 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
 
   // generate the upper ring
   counter = 0;
-  for ( i = 0; i < 12; i++ ) 
+  for ( i = 0; i < 12; i++ )
   {
     slot = upper_ring_cl->get( counter++ );
     sgCopyVec4( slot, middle_color[i] );
@@ -504,7 +504,7 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
 
   // generate middle ring
   counter = 0;
-  for ( i = 0; i < 12; i++ ) 
+  for ( i = 0; i < 12; i++ )
   {
     slot = middle_ring_cl->get( counter++ );
     sgCopyVec4( slot, lower_color[i] );
@@ -520,7 +520,7 @@ bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, 
 
   // generate lower ring
   counter = 0;
-  for ( i = 0; i < 12; i++ ) 
+  for ( i = 0; i < 12; i++ )
   {
     slot = lower_ring_cl->get( counter++ );
     sgCopyVec4( slot, bottom_color[i] );
