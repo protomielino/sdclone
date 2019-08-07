@@ -229,7 +229,7 @@ bool cGrSun::repaint( double sun_angle, double new_visibility )
         prev_sun_angle = sun_angle;
 
         float aerosol_factor;
-        if ( visibility < 100 )
+        if ( visibility < 360 )
         {
             aerosol_factor = 8000;
         }

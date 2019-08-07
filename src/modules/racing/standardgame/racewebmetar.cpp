@@ -82,6 +82,7 @@ ReWebMetar::ReWebMetar() :
     _dewp(NaN),
     _distance(NaN),
     _pressure(NaN),
+    _density(NaN),
     _rain(false),
     _hail(false),
     _snow(false),
@@ -202,7 +203,6 @@ void ReWebMetar::ReWebMetarLoad(const string& m)
     if (_grpcount < 4)
     {
         delete[] _data;
-        //throw sg_io_exception("metar data incomplete ", sg_location(_url));
     }
 
     _url = "";

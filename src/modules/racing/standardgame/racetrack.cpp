@@ -524,7 +524,7 @@ reTrackInitRealWeather(void)
         snprintf(buffer, 255, "%sconfig/weather.txt", GetLocalDir());
 
         std::string data = buffer;
-        GfLogInfo("Path weather.txt : %s\n", data.c_str());
+        GfLogDebug("Path weather.txt : %s\n", data.c_str());
 
         std::ifstream file(data.c_str());
 
@@ -554,7 +554,7 @@ reTrackInitRealWeather(void)
 
         if (webMetar->getCAVOK())
         {
-            if (webMetar->getVisibility_m() == WebMetarNaN)
+            if (webMetar->getVisibility_m() == WebMetarNaN || webMetar->getVisibility_m() < 0)
                 webMetarVisibility.set(12000.0);
 
             if (webMetar->getCloudNumber() > 0)
@@ -566,9 +566,13 @@ reTrackInitRealWeather(void)
         }
 
         // visibility
-		tdble _wind_range_from = 0.0;
-		tdble _wind_range_to = 0.0;
+        tdble _wind_range_from = 0.0;
+        tdble _wind_range_to = 0.0;
         tdble d = (tdble)(webMetar->getVisibility_m());
+
+        if (d < 0.0)
+            d = 12000.0;
+
         GfLogDebug("WebMetar Visibility in racetrack = %.3f\n", webMetar->getVisibility_m());
 
         if (d == WebMetarNaN )
@@ -653,7 +657,11 @@ reTrackInitRealWeather(void)
             trackLocal->airpressure = (tdble)(webMetar->getPressure_hPa());
 
         trackLocal->airpressure = (tdble)(trackLocal->airpressure * 100);
-        trackLocal->airdensity = (tdble)(webMetar->getDensity_C());
+
+        if (webMetar->getDensity_C() == WebMetarNaN)
+            trackLocal->airdensity = 1.219f;
+        else
+            trackLocal->airdensity = (tdble)(webMetar->getDensity_C());
 
         if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
         {
@@ -767,10 +775,13 @@ reTrackInitSimuWeather(void)
     }
 
     // visibility
-	tdble _wind_range_from = 0.0;
-	tdble _wind_range_to = 0.0;
+    tdble _wind_range_from = 0.0;
+    tdble _wind_range_to = 0.0;
     tdble d = (tdble)(webMetar->getVisibility_m());
     GfLogDebug("WebMetar Visibility in racetrack = %.3f\n", webMetar->getVisibility_m());
+
+    if (d < 0.0)
+        d = 12000.0;
 
     if (d == WebMetarNaN )
         d = 10000.0;
@@ -853,6 +864,13 @@ reTrackInitSimuWeather(void)
     else
         trackLocal->airpressure = (tdble)(webMetar->getPressure_hPa());
 
+    trackLocal->airpressure = (tdble)(trackLocal->airpressure * 100);
+
+    if (webMetar->getDensity_C() == WebMetarNaN)
+        trackLocal->airdensity = 1.219f;
+    else
+        trackLocal->airdensity = (tdble)(webMetar->getDensity_C());
+
     if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
     {
         trackLocal->rain = webMetar->getRain();
@@ -874,6 +892,7 @@ reTrackInitSimuWeather(void)
     GfLogDebug("Air Temperature = %.3f\n", trackLocal->airtemperature);
     GfLogDebug("Dew point = %.3f\n", trackLocal->dewp);
     GfLogDebug("Air pressure = %.3f\n", trackLocal->airpressure);
+    GfLogDebug("Air Density = %.3f\n", trackLocal->airdensity);
     GfLogDebug("Rain = %i\n", trackLocal->rain);
     GfLogDebug("Snow = %i\n", trackLocal->snow);
     GfLogDebug("Hail = %i\n", trackLocal->hail);

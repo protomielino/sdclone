@@ -104,7 +104,7 @@ void cGrSky::build(double h_radius, double v_radius,
     moon->setMoonDist( moon_dist );
 
     sun = new cGrSun;
-    sun_transform -> addKid( sun->build( sun_size, humidity, airdensity));
+    sun_transform -> addKid( sun->build( sun_size, humidity, airdensity - 0.45));
     sun->setSunDistance( sun_dist );
 
     pre_transform -> addKid( stars_transform );
