@@ -27,136 +27,151 @@
 
 class TDriver;
 
-class Opponent  
+class Opponent
 {
 public:
-	enum	// flags
-	{
-		F_LEFT			= 0x000001,
-		F_RIGHT			= 0x000002,
-		F_FRONT			= 0x000004,
-		F_REAR			= 0x000008,
+    enum	// flags
+    {
+        F_LEFT			= 0x000001,
+        F_RIGHT			= 0x000002,
+        F_FRONT			= 0x000004,
+        F_REAR			= 0x000008,
 
-		F_AHEAD			= 0x000010,
-		F_TO_SIDE		= 0x000020,
-		F_BEHIND		= 0x000040,
+        F_AHEAD			= 0x000010,
+        F_TO_SIDE		= 0x000020,
+        F_BEHIND		= 0x000040,
 
-		F_TRK_LEFT		= 0x000100,
-		F_TRK_RIGHT		= 0x000200,
+        F_TRK_LEFT		= 0x000100,
+        F_TRK_RIGHT		= 0x000200,
 
-		F_CATCHING		= 0x001000,
-		F_CATCHING_ACC	= 0x002000,
-		F_COLLIDE		= 0x004000,
-		F_TRAFFIC		= 0x008000,
-		F_CLOSE			= 0x010000,
-		F_TEAMMATE		= 0x020000,
-		F_LAPPER		= 0x040000,	// it's lapping us.
-		F_BEING_LAPPED	= 0x080000,	// we're lapping it.
-		F_DANGEROUS		= 0x100000,
-	};
+        F_CATCHING		= 0x001000,
+        F_CATCHING_ACC	= 0x002000,
+        F_COLLIDE		= 0x004000,
+        F_TRAFFIC		= 0x008000,
+        F_CLOSE			= 0x010000,
+        F_TEAMMATE		= 0x020000,
+        F_LAPPER		= 0x040000,	// it's lapping us.
+        F_BEING_LAPPED	= 0x080000,	// we're lapping it.
+        F_DANGEROUS		= 0x100000,
+    };
 
-	struct Sit
-	{
-		// t = local track relative.
-		// r = relative to velocity frame of my car.
-		// g = global torcs coordinate frame.
-		// d = delta or difference.
-		// a = average.
+    struct Sit
+    {
+        // t = local track relative.
+        // r = relative to velocity frame of my car.
+        // g = global torcs coordinate frame.
+        // d = delta or difference.
+        // a = average.
 
-		double	spd;
+        double	spd;
+        double	stuckTime;
 
-		double	tVX;	// along track.
-		double	tVY;	// normal to track.
-		double	tYaw;
+        double	tVX;	// along track.
+        double	tVY;	// normal to track.
+        double	tYaw;
 
-		double	rdPX;
-		double	rdPY;
-		double	rdVX;
-		double	rdVY;
+        double	rdPX;
+        double	rdPY;
+        double	rdVX;
+        double	rdVY;
 
-		double	agVX;
-		double	agVY;
-		double	ragVX;
-		double	ragVY;
+        double	agVX;
+        double	agVY;
+        double	ragVX;
+        double	ragVY;
 
-		double	arAX;
-		double	arAY;
-		double	agAX;
-		double	agAY;
-		double	ragAX;
-		double	ragAY;
+        double	arAX;
+        double	arAY;
+        double	agAX;
+        double	agAY;
+        double	rAX;
+        double	rAY;
+        double	ragAX;
+        double	ragAY;
 
-		double	minDX;
-		double	minDY;
+        double	minDXa;
+        double	minDXb;
+        double	minDX;
+        double	minDY;
+        double	accDX;
 
-		double	relPos;
-		double	offs;
-	};
+        double	relPos;
+        double	offs;
 
-	struct PassInfo
-	{
-		bool	isSpace;
-		double	offset;
-		double	mySpeed;
-		bool	goodPath;
-		double	bestU;
-		double	bestV;
-		double	myOffset;
-	};
+        PtInfo	pi;	// from my path.
 
-	struct Info
-	{
-		Info() { memset( this, 0, sizeof(*this) ); }
+        static int compareRelPos( const Sit* a, const Sit* b ) { return SIGN(a->relPos - b->relPos); }
+    };
 
-		bool		GotFlags( int f ) const	{ return (flags & f) == f; }
+    struct PassInfo
+    {
+        bool	isSpace;
+        double	offset;
+        double	mySpeed;
+        bool	goodPath;
+        double	bestU;
+        double	bestV;
+        double	myOffset;
+    };
 
-		int			flags;		// flags from above (cOPP_XXX).
+    struct Info
+    {
+        Info() { memset( this, 0, sizeof(*this) ); }
 
-		Sit			sit;
+        bool		GotFlags( int f ) const	{ return (flags & f) == f; }
 
-		double		avoidLatchTime;
-		double		dangerousLatchTime;
+        int			flags;		// flags from above (cOPP_XXX).
 
-		double		catchTime;
-		double		catchY;
-		double		catchSpd;
-		double		catchDecel;
+        Sit			sit;
 
-		double		catchAccTime;
-		double		catchAccY;
-		double		catchAccSpd;
+        double		avoidLatchTime;
+        double		dangerousLatchTime;
 
-		bool		newCatching;
-		double		newCatchSpd;
-		double		newCatchTime;
-		double		newAheadTime;
-		double		newMidPos;
-		double		newBestOffset;
-		PassInfo	newPiL;
-		PassInfo	newPiR;
+        double		closeAheadTime;
+        double		closeBehindTime;
 
-		double	tmDamage;
-	};
+        double		catchTime;
+        double		catchY;
+        double		catchSpd;
+        double		catchDecel;
+
+        double		catchAccTime;
+        double		catchAccY;
+        double		catchAccSpd;
+
+        bool		newCatching;
+        double		newCatchSpd;
+        double		newCatchTime;
+        double		newAheadTime;
+        double		newMidPos;
+        double		newBestOffset;
+        PassInfo	newPiL;
+        PassInfo	newPiR;
+
+        double	tmDamage;
+    };
 
 public:
-	Opponent();
-	~Opponent();
+    Opponent();
+    ~Opponent();
 
-	void		Initialise( MyTrack* pTrack, CarElt* pCar );
+    void		Initialise( MyTrack* pTrack, CarElt* pCar );
 
-	CarElt*		GetCar();
-	const Info&	GetInfo() const;
-	Info&		GetInfo();
+    CarElt*		GetCar();
+    const CarElt*	GetCar() const;
+    const Info&		GetInfo() const;
+    Info&		GetInfo();
 
-	void		UpdatePath();
+    void		UpdatePath();
 
-    void		UpdateSit( const CarElt* myCar, const TeamInfo* pTeamInfo, double myDirX, double myDirY );
-    void		ProcessMyCar( const Situation* s, const TeamInfo* pTeamInfo, const CarElt* myCar, const Sit& mySit,
-                              const TDriver& me, double myMaxAccX, int idx );
+    void		UpdateSit( const CarElt* myCar, const Situation* s, const TeamInfo* pTeamInfo, double myDirX, double myDirY, const PtInfo& oppPi );
+    void		ProcessMyCar( const Situation* s, const TeamInfo* pTeamInfo, const CarElt* myCar, const Sit& mySit, const TDriver& me, double myMaxAccX, int idx );
+
+    static bool compareSitRelPos( const Opponent* a, const Opponent* b ) { return a->m_info.sit.relPos < b->m_info.sit.relPos; }
 
 private:
-	Info			m_info;
-	PathRecord		m_path;		// info about path of this opponent.
+    Info			m_info;
+    PathRecord		m_path;		// info about path of this opponent.
 };
 
 #endif

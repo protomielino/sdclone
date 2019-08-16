@@ -1873,17 +1873,30 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
     // double	trackLen = m_track.GetLength();     // Removed 5th April 2015 - Not Used
     // double	myPos = RtGetDistFromStart(car);    // Removed 5th April 2015 - Not USed
     double	mySpd = hypot(car->_speed_X, car->_speed_Y);
-    if( fabs(mySpd) < 0.01 )
-        mySpd = 0.01;
 
-    double	myDirX = car->_speed_X / mySpd;
-    double	myDirY = car->_speed_Y / mySpd;
-    // int		myIdx = 0;                          // Removed 5th April 2015 - Not Used
+    double	myDirX, myDirY;
+    if( fabs(mySpd) < 0.01 )
+    {
+        myDirX = cos(car->_yaw);
+        myDirY = sin(car->_yaw);
+        mySpd = 0.01;
+    }
+    else
+    {
+        myDirX = car->_speed_X / mySpd;
+        myDirY = car->_speed_Y / mySpd;
+    }
+
 
     for( int i = 0; i < m_nCars; i++ )
     {
         m_opp[i].UpdatePath();
-        m_opp[i].UpdateSit( car, &m_pShared->m_teamInfo, myDirX, myDirY );
+
+        PtInfo	oppPi;
+        const tCarElt* oCar = m_opp[i].GetCar();
+        GetPosInfo( oCar->race.distFromStartLine, oppPi );
+
+        m_opp[i].UpdateSit( car, s, &m_pShared->m_teamInfo, myDirX, myDirY, oppPi);
     }
 
     const Opponent::Sit&	mySit = m_opp[m_myOppIdx].GetInfo().sit;
@@ -3683,4 +3696,3 @@ double TDriver::TyreTreadDepthRear()
     double Left = (car->_tyreTreadDepth(3) - car->_tyreCritTreadDepth(3));
     return 100 * MIN(Right, Left);
 }
-
