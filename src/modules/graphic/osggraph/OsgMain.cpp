@@ -45,6 +45,7 @@ SDCars *cars = 0;
 SDScenery *scenery = 0;
 SDRender *render = 0;
 SDScreens *screens = 0;
+SDCamera *cam = 0;
 
 SDHUD hud;
 
@@ -220,6 +221,12 @@ int refresh(tSituation *s)
     }
 
     cars->updateCars();
+	cam = screens->getActiveView()->getCameras()->getSelectedCamera();
+	osg::Vec3d eye = cam->getCameraPosition();
+	double X = eye[0];
+	double Y = eye[1];
+	double Z = eye[2];
+	scenery->reposition(X, Y, Z );
     render->UpdateSky(s->currentTime, s->accelTime);
     screens->update(s, &frameInfo);
 
@@ -260,6 +267,7 @@ int initTrack(tTrack *track)
 
     scenery = new SDScenery;
     render = new SDRender;
+	//cam = new SDCamera;
 
     scenery->LoadScene(track);
     render->Init(track);

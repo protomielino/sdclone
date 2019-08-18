@@ -250,6 +250,11 @@ bool SDScenery::LoadTrack(std::string& strTrack)
     return true;
 }
 
+void SDScenery::reposition(double X, double Y, double Z)
+{
+	m_background->reposition(X, Y, getWorldZ() / 2);
+}
+
 void CreatePit(tTrack *track)
 {
     /*char buf[512];

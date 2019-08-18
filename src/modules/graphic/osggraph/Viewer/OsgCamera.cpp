@@ -70,6 +70,7 @@ Camera * SDCamera::getGenericCamera()
     c->Posv = &eye._v;
     c->Upv = &up._v;
     c->Speedv = &speed._v;
+
     return c;
 }
 

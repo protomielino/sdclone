@@ -38,7 +38,8 @@ class   osgLoader;
 
 class SDBackground
 {
-    osg::ref_ptr<osg::Group>	 _background;
+    osg::ref_ptr<osg::Group>				_background;
+	osg::ref_ptr < osg::MatrixTransform>	_backgroundTransform;
 
     bool	_type;
 
@@ -50,7 +51,7 @@ public:
     ~SDBackground(void);
 
     void build(bool type, int X, int Y, int Z, const std::string& strTrack);
-    void reposition(int X, int Y);
+    void reposition(double X, double Y, double Z);
 
     osg::ref_ptr<osg::Group> getBackground() { return _background.get(); }
 };
@@ -89,10 +90,10 @@ public:
     osg::ref_ptr<osg::Group> getTrackLight() { return _osgtracklight.get(); }
 };*/
 
-static int grWrldX=0;
-static int grWrldY=0;
-static int grWrldZ = 0;
-static int grWrldMaxSize=0;
+static double grWrldX =		  0.0;
+static double grWrldY =		  0.0;
+static double grWrldZ =       0.0;
+static double grWrldMaxSize = 0.0;
 
 class SDScenery
 {
@@ -132,11 +133,12 @@ public:
 
     void LoadScene(tTrack *track);
     void ShutdownScene(void);
+	void reposition(double X, double Y, double Z);
 
-    inline static int getWorldX(){return grWrldX;}
-    inline static int getWorldY(){return grWrldY;}
-    inline static int getWorldZ(){return grWrldZ;}
-    inline static int getWorldMaxSize(){return grWrldMaxSize;}
+    inline static double getWorldX(){return grWrldX;}
+    inline static double getWorldY(){return grWrldY;}
+    inline static double getWorldZ(){return grWrldZ;}
+    inline static double getWorldMaxSize(){return grWrldMaxSize;}
     bool getSpeedWay() { return _speedWay; }
 	bool getSpeedWayLong() { return _speedWayLong; }
 

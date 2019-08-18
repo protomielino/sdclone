@@ -25,7 +25,8 @@
 #include "OsgScenery.h"
 
 SDBackground::SDBackground(void) :
-    _background(NULL)
+    _background(NULL),
+	_backgroundTransform(NULL)
 {
 }
 
@@ -38,7 +39,7 @@ SDBackground::~SDBackground(void)
     }
 }
 
-void SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const std::string& TrackPath)
+void SDBackground::build(bool type, int X, int Y, int Z, const std::string& TrackPath)
 {
     bool land = type;
     osgDB::Registry::instance()->clearObjectCache();
@@ -52,9 +53,11 @@ void SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const
     pathList.push_front(TrackPath);
     osgDB::Registry::instance()->setDataFilePathList(pathList);
 
-    osg::ref_ptr<osg::MatrixTransform> _background_transform = new osg::MatrixTransform;
+    //osg::ref_ptr<osg::MatrixTransform> _background_transform = new osg::MatrixTransform;
     osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
                      0.0f, -1.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f);
+
+	_backgroundTransform = new osg::MatrixTransform;
 
     if (!land)
     {
@@ -62,21 +65,31 @@ void SDBackground::build(bool type, int grWrldX, int grWrldY, int grWrldZ, const
         //_background_transform->setMatrix(mat);
         osg::Matrix t = osg::Matrix::translate(grWrldX /2, grWrldY /2, grWrldZ /2);
         mat = mat * t;
-        _background_transform->setMatrix(mat);
-        _background_transform->addChild( m_background.get() );
+        _backgroundTransform->setMatrix(mat);
+        _backgroundTransform->addChild( m_background.get() );
     }
     else
     {
         osg::ref_ptr<osg::Node> m_background = osgDB::readNodeFile("land.ac");
-        _background_transform->setMatrix(mat);
-        _background_transform->addChild( m_background.get() );
+        _backgroundTransform->setMatrix(mat);
+        _backgroundTransform->addChild( m_background.get() );
     }
 
-    osg::ref_ptr<osg::StateSet> bgstate = _background_transform->getOrCreateStateSet();
+    osg::ref_ptr<osg::StateSet> bgstate = _backgroundTransform->getOrCreateStateSet();
     bgstate->setRenderBinDetails(-1, "RenderBin");
     bgstate->setMode(GL_LIGHTING, osg::StateAttribute::ON);
     bgstate->setMode(GL_FOG, osg::StateAttribute::ON);
 
     _background = new osg::Group;
-    _background->addChild(_background_transform.get());
+    _background->addChild(_backgroundTransform.get());
+}
+
+void SDBackground::reposition(double X, double Y, double Z)
+{
+	osg::Matrix T;
+	osg::Matrix mat(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+
+	T.makeTranslate(X, Y, Z);
+
+	_backgroundTransform->setMatrix(mat * T);
 }
