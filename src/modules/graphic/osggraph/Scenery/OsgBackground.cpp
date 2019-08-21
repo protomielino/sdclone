@@ -90,6 +90,6 @@ void SDBackground::reposition(double X, double Y, double Z)
 	osg::Matrix mat(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 
 	T.makeTranslate(X, Y, Z);
-
-	_backgroundTransform->setMatrix(mat * T);
+   if(_backgroundTransform)
+	   _backgroundTransform->setMatrix(mat * T);
 }
