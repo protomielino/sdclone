@@ -430,9 +430,9 @@ endif(OPTION_CURL)
 if(OPTION_OSG)
    set(OSG_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX='' -DUSE_3RDPARTY_BIN=Off)
 
-   ExternalProject_Add(osg-OpenSceneGraph-3.6.3
-   URL https://github.com/openscenegraph/OpenSceneGraph/archive/OpenSceneGraph-3.6.3.zip
-   URL_HASH SHA256=d8f237e76393e4c749b25321d3735d2c4e5b8c7076f9826213eb0cf8eeca0031
+   ExternalProject_Add(osg-OpenSceneGraph-3.6.4
+   URL https://github.com/openscenegraph/OpenSceneGraph/archive/OpenSceneGraph-3.6.4.zip
+   URL_HASH SHA256=4c1f82b0541f905da49ea70b4b4c9fee20c78fb5b9534b3f8990357ea05874ab
    CMAKE_ARGS ${OSG_ARGS}
    DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
    )
