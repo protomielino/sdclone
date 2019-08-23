@@ -404,7 +404,6 @@ if(OPTION_FREETYPE)
                                              -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=TRUE)
 
    ExternalProject_Add(${FREETYPE_PROJECT}
-   DOWNLOAD_NAME ft2100.zip
    URL https://sourceforge.net/projects/freetype/files/freetype2/2.10.1/ft2101.zip/download
    URL_HASH SHA256=6f22061c6972395526acf9e311c96ce3f900e4c713d8746c659af0a2bef685eb
    CMAKE_ARGS ${FREETYPE_ARGS}
