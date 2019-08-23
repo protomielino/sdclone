@@ -430,12 +430,27 @@ endif(OPTION_CURL)
 if(OPTION_OSG)
    set(OSG_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX='' -DUSE_3RDPARTY_BIN=Off)
 
+#   if(MSVC_VERSION LESS 1900)
+#      message("Disable Targa plugin, OSG newer than 3.6.3 need Visual Studio 2015")
+#      set(OSG_ARGS ${OSG_ARGS} -D BUILD_OSG_PLUGIN_TGA=0)
+#   endif()
+
    ExternalProject_Add(osg-OpenSceneGraph-3.6.4
    URL https://github.com/openscenegraph/OpenSceneGraph/archive/OpenSceneGraph-3.6.4.zip
    URL_HASH SHA256=4c1f82b0541f905da49ea70b4b4c9fee20c78fb5b9534b3f8990357ea05874ab
    CMAKE_ARGS ${OSG_ARGS}
    DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
    )
+   if(MSVC_VERSION LESS 1900)
+      message(WARNING "Remove this block when OSG TGA Plugin is fixed")
+      ExternalProject_Add_Step(osg-OpenSceneGraph-3.6.4 ReaderWriterTGA-fixed
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              "${CMAKE_SOURCE_DIR}/patches/ReaderWriterTGA-fixed.cpp"
+              "<SOURCE_DIR>/src/osgPlugins/tga/ReaderWriterTGA.cpp"
+      DEPENDEES update # do after update
+      DEPENDERS patch  # do before patch
+      )
+   endif()
 endif(OPTION_OSG)
 
 #add_subdirectory(src)
