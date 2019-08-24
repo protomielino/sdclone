@@ -113,7 +113,7 @@ SDCloudLayer::SDCloudLayer( const string &tex_path ) :
     layer_asl(0.0),
     layer_thickness(0.0),
     layer_transition(0.0),
-    layer_visibility(6000.0),
+    layer_visibility(25.0),
     layer_coverage(SD_CLOUD_CLEAR),
     scale(4000.0),
     speed(0.0),
@@ -161,8 +161,7 @@ SDCloudLayer::SDCloudLayer( const string &tex_path ) :
     rootSet->setTextureMode(1, GL_TEXTURE_2D, osg::StateAttribute::ON);
 
     osg::ref_ptr<osg::Image> dummyImage = new osg::Image;
-    dummyImage->allocateImage(1, 1, 1, GL_LUMINANCE_ALPHA,
-                              GL_UNSIGNED_BYTE);
+    dummyImage->allocateImage(1, 1, 1, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE);
     unsigned char* imageBytes = dummyImage->data(0, 0);
     imageBytes[0] = 255;
     imageBytes[1] = 255;
@@ -334,7 +333,7 @@ void SDCloudLayer::rebuild()
         osg::CopyOp copyOp;
         for (int i = 0; i < SD_MAX_CLOUD_COVERAGES; ++i)
         {
-            //SDStateAttributeFactory *saf = SDStateAttributeFactory::instance();
+            //osg::StateAttributeFactory *saf = SDStateAttributeFactory::instance();
             if (layer_states[i].valid())
             {
                 if (layer_states[i] == layer_states2[i])
@@ -352,7 +351,7 @@ void SDCloudLayer::rebuild()
 #endif
     }
 
-    //scale = 4000.0;
+    scale = 4000.0;
 
     setTextureOffset(base);
     // build the cloud layer
@@ -446,10 +445,14 @@ void SDCloudLayer::rebuild()
 
 bool SDCloudLayer::repaint( const osg::Vec3f &fog_color )
 {
-    osg::Vec4f combineColor(fog_color, cloud_alpha);
+    osg::Vec4f combineColor(toOsg(fog_color), cloud_alpha);
     osg::ref_ptr<osg::TexEnvCombine> combiner
         = dynamic_cast<osg::TexEnvCombine*>(layer_root->getStateSet()
                                             ->getTextureAttribute(1, osg::StateAttribute::TEXENV));
+
+    if (combiner == nullptr)
+        return false;
+
     combiner->setConstantColor(combineColor);
 
     return true;

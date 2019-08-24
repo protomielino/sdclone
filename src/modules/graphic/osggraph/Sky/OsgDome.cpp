@@ -43,20 +43,20 @@ using namespace osggraph;
 static const float center_elev = 1.0;
 
 
-    const int numRings = 64; //sizeof(domeParams) / sizeof(domeParams[0]);
-    const int numBands = 64; // 12
-    const int halfBands = numBands / 2;
+const int numRings = 64; //sizeof(domeParams) / sizeof(domeParams[0]);
+const int numBands = 64; // 12
+const int halfBands = numBands / 2;
 
-    // Make dome a bit over half sphere
-    const float domeAngle = 120.0;
+// Make dome a bit over half sphere
+const float domeAngle = 120.0;
 
-    const float bandDelta = 360.0 / numBands;
-    const float ringDelta = domeAngle / (numRings+1);
+const float bandDelta = 360.0 / numBands;
+const float ringDelta = domeAngle / (numRings + 1);
 
-    // Which band is at horizon
-    const int halfRings = numRings * (90.0 / domeAngle);
-    const int upperRings = numRings * (60.0 / domeAngle); // top half
-    const int middleRings = numRings * (15.0 / domeAngle);
+// Which band is at horizon
+const int halfRings = numRings * (90.0 / domeAngle);
+const int upperRings = numRings * (60.0 / domeAngle); // top half
+const int middleRings = numRings * (15.0 / domeAngle);
 
 static const float upper_radius = 0.9701; // (.6, 0.15)
 static const float upper_elev = 0.2425;
@@ -131,7 +131,7 @@ osg::Node* SDSkyDome::build( double hscale, double vscale )
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
     stateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
-    stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
+    stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
     stateSet->setMode(GL_BLEND, osg::StateAttribute::OFF);
     stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
     stateSet->setAttribute(new osg::CullFace(osg::CullFace::BACK));
@@ -172,7 +172,7 @@ osg::Node* SDSkyDome::build( double hscale, double vscale )
     geom->addPrimitiveSet(domeElements);
     geode->addDrawable(geom);
     // force a repaint of the sky colors with ugly defaults
-    repaint(osg::Vec3f(1.0, 1.0, 1.0), osg::Vec3f(1.0, 1.0, 1.0), 0.0, 10000.0 );
+    repaint(osg::Vec3f(1.0, 1.0, 1.0), osg::Vec3f(1.0, 1.0, 1.0), 0.0, 5000.0 );
     dome_transform = new osg::MatrixTransform;
     dome_transform->addChild(geode);
 
@@ -183,6 +183,7 @@ static void sd_fade_to_black(osg::Vec3f sky_color[], float asl, int count)
 {
     const float ref_asl = 10000.0f;
     const float d = exp( - asl / ref_asl );
+
     for(int i = 0; i < count ; i++)
         sky_color[i] *= d;
 }
@@ -246,17 +247,17 @@ bool SDSkyDome::repaint( const Vec3f& sky_color,
        // Color top half by linear interpolation (90...60 degrees)
        int j=0;
        for (; j < upperRings; j++)
-            colors(j, i) = (sky_color * (1 - j / (float)upperRings) + (colors(upperRings, i))* (j / (float)upperRings));
+            colors(j, i) = toOsg(sky_color * (1 - j / (float)upperRings) + (colors(upperRings, i)) * (j / (float)upperRings));
 
         j++; // Skip the 60 deg ring
 
         // From 60 to ~85 degrees
         for (int l = 0; j < upperRings + middleRings + 1; j++, l++)
-            colors(j, i) = ((colors(upperRings, i) * (1- l / (float)middleRings)) + ((sky_color - diff * middleVisFactor  + middle_amt) * (l / (float)middleRings)));
+            colors(j, i) = ((colors(upperRings, i) * (1- l / (float)middleRings)) + ((toOsg(sky_color) - diff * middleVisFactor  + middle_amt) * (l / (float)middleRings)));
 
         // 85 to 90 degrees
         for (int l = 0; j < halfRings; j++, l++)
-            colors(j, i) = (colors(upperRings + middleRings, i) * (1 - l / (float)(halfRings - upperRings - middleRings))) + ((fog_color + outer_amt) * l / (float)(halfRings - upperRings - middleRings));
+            colors(j, i) = (colors(upperRings + middleRings, i) * (1 - l / (float)(halfRings - upperRings - middleRings))) + (toOsg(fog_color + outer_amt) * l / (float)(halfRings - upperRings - middleRings));
 
         for (int j = 0; j < numRings - 1; ++j)
             sd_clampColor(colors(j, i));
@@ -286,6 +287,7 @@ bool SDSkyDome::repaint( const Vec3f& sky_color,
             colors(i, j) = fog_color;
 
     dome_cl->dirty();
+
     return true;
 }
 
@@ -293,7 +295,7 @@ bool SDSkyDome::reposition( const osg::Vec3f &p, double spin )
 {
     osg::Matrix T, SPIN;
 
-    T.makeTranslate( p );
+    T.makeTranslate( toOsg(p));
     SPIN.makeRotate(spin, osg::Vec3(0, 0, 1));
 
     dome_transform->setMatrix( T * SPIN );

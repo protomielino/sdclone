@@ -47,8 +47,7 @@ public:
     ~SDSkyDome( void );
 
     osg::Node *build( double hscale = 80000.0, double vscale = 80000.0 );
-    bool repaint( const osg::Vec3f &sky_color, const osg::Vec3f &fog_color,
-                  double sun_angle, double vis );
+    bool repaint( const osg::Vec3f &sky_color, const osg::Vec3f &fog_color, double sun_angle, double vis );
 
     bool reposition( const osg::Vec3f& p, double spin );
 private:

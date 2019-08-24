@@ -18,6 +18,16 @@
  ***************************************************************************/
 #include <portability.h>
 #include <stdlib.h>
+
+#include <osg/Vec2f>
+#include <osg/Vec2d>
+#include <osg/Vec3f>
+#include <osg/Vec3d>
+#include <osg/Vec4f>
+#include <osg/Vec4d>
+#include <osg/Quat>
+#include <osg/Matrix>
+
 #ifndef _OSGMATH_H_
 #define _OSGMATH_H_
 
@@ -66,6 +76,23 @@ struct osgCoord
 extern void osgXformPnt3( osg::Vec3 dst, const osg::Vec3 src, const osgMat4 mat );
 extern void osgMakeCoordMat4 ( osgMat4 m, const float x, const float y, const float z, const float h, const float p, const float r );
 inline void osgXformPnt3( osg::Vec3 dst, const osgMat4 mat ) { osgXformPnt3 ( dst, dst, mat ); }
+
+inline osg::Vec3d toOsg(const osg::Vec3d& v)
+{
+    return osg::Vec3d(v[0], v[1], v[2]);
+}
+
+inline osg::Vec3f toOsg(const osg::Vec3f& v)
+{
+    return osg::Vec3f(v[0], v[1], v[2]);
+}
+
+// Linear interpolation between two arbitrary typed values
+/*template<typename S>
+static S lerp(const S& val0, const S& val1, const T& t)
+{
+    return val0*(T(1) - t) + val1*t;
+}*/
 
 inline float sdASin ( float s )
                 { return (float) asin (s) * SD_RADIANS_TO_DEGREES ; }

@@ -56,19 +56,19 @@ public:
 
     /** get the cloud span (in meters) */
     float getSpan_m () const;
-    void setSpan_m (float span_m);
+    void  setSpan_m (float span_m);
 
     float getElevation_m () const;
-    void setElevation_m (float elevation_m, bool set_span = true);
+    void  setElevation_m (float elevation_m, bool set_span = true);
 
     float getThickness_m () const;
-    void setThickness_m (float thickness_m);
+    void  setThickness_m (float thickness_m);
 
     float getVisibility_m() const;
-    void setVisibility_m(float visibility_m);
+    void  setVisibility_m(float visibility_m);
 
     float getTransition_m () const;
-    void setTransition_m (float transition_m);
+    void  setTransition_m (float transition_m);
 
     Coverage getCoverage () const;
     void setCoverage (Coverage coverage);
@@ -86,14 +86,14 @@ public:
     }
 
     inline float getDirection() { return direction; }
-    inline void setSpeed(float sp)
+    inline void  setSpeed(float sp)
     {
         //Out("cloud speed = %f\n", sp);
         speed = sp;
     }
 
     inline float getSpeed() { return speed; }
-    inline void setAlpha( float alpha )
+    inline void  setAlpha( float alpha )
     {
         if ( alpha < 0.0 ) { alpha = 0.0; }
         if ( alpha > max_alpha ) { alpha = max_alpha; }
