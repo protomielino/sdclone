@@ -123,7 +123,7 @@ public:
                   double moon_angle, int nplanets, osg::Vec3d *planet_data,
                   int nstars, osg::Vec3d *star_data);
 
-    bool reposition(osg::Vec3 &view_pos,  double spin, /*double gst,*/ double dt);
+    bool reposition(osg::Vec3d &view_pos,  double spin, /*double gst,*/ double dt);
 
     void modify_vis( float alt, float time_factor );
 
@@ -142,33 +142,33 @@ public:
     SDCloudLayer * get_cloud_layer (int i);
     int get_cloud_layer_count () const;
 
-    void setMA(double angle) { moon->setMoonAngle(angle); }
+    void   setMA(double angle) { moon->setMoonAngle(angle); }
     double getMA() { return moon->getMoonAngle(); }
 
-    void setMR(double rotation) { moon->setMoonRotation( rotation); }
+    void   setMR(double rotation) { moon->setMoonRotation( rotation); }
     double getMR() { return moon->getMoonRotation(); }
-    void setMRA( double ra ) { moon->setMoonRightAscension( ra ); }
+    void   setMRA( double ra ) { moon->setMoonRightAscension( ra ); }
     double getMRA() { return moon->getMoonRightAscension(); }
 
-    void setMD( double decl ) { moon->setMoonDeclination( decl ); }
+    void   setMD( double decl ) { moon->setMoonDeclination( decl ); }
     double getMD() { return moon->getMoonDeclination(); }
 
-    void setMDist( double dist ) { moon->setMoonDist(dist); }
+    void   setMDist( double dist ) { moon->setMoonDist(dist); }
     double getMDist() { return moon->getMoonDist(); }
 
-    void setSA(double angle) { sun->setSunAngle(angle); }
+    void   setSA(double angle) { sun->setSunAngle(angle); }
     double getSA() { return sun->getSunAngle(); }
 
-    void setSR(double rotation) { sun->setSunRotation( rotation ); }
+    void   setSR(double rotation) { sun->setSunRotation( rotation ); }
     double getSR() { return sun->getSunRotation(); }
 
-    void setSRA(double ra) { sun->setSunRightAscension( ra ); }
+    void   setSRA(double ra) { sun->setSunRightAscension( ra ); }
     double getSRA() { return sun->getSunRightAscension(); }
 
-    void setSD( double decl ) { sun->setSunDeclination( decl ); }
+    void   setSD( double decl ) { sun->setSunDeclination( decl ); }
     double getSD() { return sun->getSunDeclination(); }
 
-    void setSDistance( double dist ) { sun->setSunDistance( dist ); }
+    void   setSDistance( double dist ) { sun->setSunDistance( dist ); }
     double getSDistance() { return sun->getSunDistance(); }
 
     inline float get_visibility() const { return effective_visibility; }

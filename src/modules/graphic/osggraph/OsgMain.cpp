@@ -227,7 +227,7 @@ int refresh(tSituation *s)
 	double Y = eye[1];
 	double Z = eye[2];
 	scenery->reposition(X, Y, Z );
-    render->UpdateSky(s->currentTime, s->accelTime);
+    render->UpdateSky(s->currentTime, s->accelTime, X, Y);
     screens->update(s, &frameInfo);
 
     //refresh the hud

@@ -107,7 +107,7 @@ public:
     void UpdateLight(void);
     void addCars(osg::Node* cars);
     void UpdateFogColor(double angle);
-    void UpdateSky(double currentTime, double accelTime);
+    void UpdateSky(double currentTime, double accelTime, double X, double Y);
     void ShadowedScene(void);
     void weather(void);
 

@@ -343,7 +343,7 @@ void SDRender::Init(tTrack *track)
     double r_WrldX = scenery->getWorldX();
     double r_WrldY = scenery->getWorldY();
     //double r_WrldZ = SDScenery::getWorldZ();
-    osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0 );
+    osg::Vec3d viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0 );
 
     weather();
     thesky->set_visibility( SDVisibility ); // Visibility in meters
@@ -730,7 +730,7 @@ void SDRender::UpdateFogColor(double angle)
     sd_gamma_correct_rgb( BaseFogColor._v );
 }
 
-void SDRender::UpdateSky(double currentTime, double accelTime)
+void SDRender::UpdateSky(double currentTime, double accelTime, double X, double Y)
 {
     // Detect first call (in order to initialize "last times").
     static bool bInitialized = false;
@@ -779,7 +779,8 @@ void SDRender::UpdateSky(double currentTime, double accelTime)
     double r_WrldX = scenery->getWorldX();
     double r_WrldY = scenery->getWorldY();
 
-    osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0 );
+    //osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0 );
+    osg::Vec3d viewPos(X, Y, 0.0 );
     thesky->reposition(viewPos, 0, currentTime - lastTimeHighSpeed);
 
     // Now, we are done for high speed objects.

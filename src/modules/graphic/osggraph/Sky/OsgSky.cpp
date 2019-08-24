@@ -165,7 +165,7 @@ bool SDSky::repaint( osg::Vec3f& sky_color, osg::Vec3f& fog_color, osg::Vec3f& c
     return true;
 }
 
-bool SDSky::reposition( osg::Vec3 &view_pos, double spin, /*double gst,*/
+bool SDSky::reposition( osg::Vec3d &view_pos, double spin, /*double gst,*/
                         double dt )
 {
   double angle;
