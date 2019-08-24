@@ -123,20 +123,21 @@ void cGrSky::build(double h_radius, double v_radius,
 
 
 cGrCloudLayer*
-cGrSky::addCloud( const char *cloud_tex_path, float span, float elevation, float thickness, float transition )
+cGrSky::addCloud(const char *cloud_tex_path, float span, float elevation, float thickness, float transition , float humidity)
 {
     cGrCloudLayer* cloud = new cGrCloudLayer;
-    cloud->build ( cloud_tex_path, span, elevation, thickness, transition );
+    cloud->build ( cloud_tex_path, span, elevation, thickness, transition , humidity);
     clouds.add( cloud );
+
     return cloud;
 }
 
 
 cGrCloudLayer*
-cGrSky::addCloud( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition )
+cGrSky::addCloud(ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition , float hum)
 {
     cGrCloudLayer* cloud = new cGrCloudLayer;
-    cloud->build ( cloud_state, span, elevation, thickness, transition );
+    cloud->build ( cloud_state, span, elevation, thickness, transition, hum );
     clouds.add( cloud );
     return cloud;
 }

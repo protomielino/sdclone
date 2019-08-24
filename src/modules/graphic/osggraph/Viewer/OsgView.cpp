@@ -252,7 +252,7 @@ void SDView::loadParams(tSituation *s)
     }
 
     // Retrieve the "current camera".
-    cameras->selectCamera(camList,camNum);
+    cameras->selectCamera(camList, camNum);
 
     // Back to the default camera if not found (and save it as the new current one).
     cameras->getIntSelectedListAndCamera(&camList,&camNum);
@@ -265,9 +265,9 @@ void SDView::loadParams(tSituation *s)
 
 void SDView::saveCamera()
 {
-    int camList,camNum;
+    int camList, camNum;
 
-    cameras->getIntSelectedListAndCamera(&camList,&camNum);
+    cameras->getIntSelectedListAndCamera(&camList, &camNum);
 
     sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
     GfParmSetStr(grHandle, path, GR_ATT_CUR_DRV, curCar->_name);

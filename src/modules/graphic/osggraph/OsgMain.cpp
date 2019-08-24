@@ -221,12 +221,12 @@ int refresh(tSituation *s)
     }
 
     cars->updateCars();
-	cam = screens->getActiveView()->getCameras()->getSelectedCamera();
-	osg::Vec3d eye = cam->getCameraPosition();
-	double X = eye[0];
-	double Y = eye[1];
-	double Z = eye[2];
-	scenery->reposition(X, Y, Z );
+    cam = screens->getActiveView()->getCameras()->getSelectedCamera();
+    osg::Vec3d eye = cam->getCameraPosition();
+    double X = eye[0];
+    double Y = eye[1];
+    double Z = eye[2];
+    scenery->reposition(X, Y, Z );
     render->UpdateSky(s->currentTime, s->accelTime, X, Y);
     screens->update(s, &frameInfo);
 
@@ -267,7 +267,7 @@ int initTrack(tTrack *track)
 
     scenery = new SDScenery;
     render = new SDRender;
-	//cam = new SDCamera;
+    //cam = new SDCamera;
 
     scenery->LoadScene(track);
     render->Init(track);
@@ -288,7 +288,7 @@ int  initCars(tSituation *s)
 
     if (!grHandle)
     {
-        snprintf(buf, 256, "%s%s", GfLocalDir(), GR_PARAM_FILE);
+        snprintf(buf, 1024, "%s%s", GfLocalDir(), GR_PARAM_FILE);
         grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     }
 

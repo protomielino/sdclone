@@ -47,6 +47,7 @@ cGrCloudLayer::cGrCloudLayer( void ) :
   scale(4000.0),
   speed(0.0),
   direction(0.0),
+  humidity(0.0),
   last_lon(0.0),
   last_lat(0.0),
   last_x(0.0),
@@ -59,28 +60,29 @@ cGrCloudLayer::cGrCloudLayer( void ) :
 
   layer_root->addKid(layer_transform);
 }
-  
+
 cGrCloudLayer::~cGrCloudLayer()
 {
   delete layer_root; // deletes layer_transform and layer as well
 }
 
-  
+
 void
-cGrCloudLayer::build( const char *cloud_tex_path, float span, float elevation, float thickness, float transition )
+cGrCloudLayer::build( const char *cloud_tex_path, float span, float elevation, float thickness, float transition, float hum )
 {
   ssgSimpleState *cloud_state = grCloudMakeState( cloud_tex_path );
-  build(cloud_state, span, elevation, thickness, transition);
+  build(cloud_state, span, elevation, thickness, transition, hum);
 }
 
 
 void
-cGrCloudLayer::build( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition )
+cGrCloudLayer::build( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition, float hum )
 {
   layer_span = span;
   layer_asl = elevation;
   layer_thickness = thickness;
   layer_transition = transition;
+  humidity = 100 - hum;
 
   scale = 4000.0;
   last_lon = last_lat = -999.0f;
@@ -98,9 +100,9 @@ cGrCloudLayer::build( ssgSimpleState *cloud_state, float span, float elevation, 
   const float mpi = SG_PI/4;
   const float alt_diff = layer_asl * 1.5f;
 
-  for (int i = 0; i < 4; i++) 
+  for (int i = 0; i < 4; i++)
   {
-    if ( layer[i] != NULL ) 
+    if ( layer[i] != NULL )
     {
       layer_transform->removeKid(layer[i]); // automatic delete
     }
@@ -120,7 +122,7 @@ cGrCloudLayer::build( ssgSimpleState *cloud_state, float span, float elevation, 
     vl[i]->add( vertex );
     tl[i]->add( tc );
 
-    for (int j = 0; j < 4; j++) 
+    for (int j = 0; j < 4; j++)
     {
       sgSetVec3( vertex, layer_span*(i-1)/2, layer_span*(j-2)/2,
         (float)(alt_diff * (sin((i+1)*mpi) + sin(j*mpi) - 2)) );
@@ -129,7 +131,7 @@ cGrCloudLayer::build( ssgSimpleState *cloud_state, float span, float elevation, 
         base[1] + layer_scale * j/4 );
 
       sgSetVec4( color, 1.0f, 1.0f, 1.0f,
-        ( (j == 0) || (i == 3)) ?  
+        ( (j == 0) || (i == 3)) ?
         ( (j == 0) && (i == 3)) ? 0.0f : 0.15f : 1.0f );
 
       cl[i]->add( color );
@@ -150,7 +152,7 @@ cGrCloudLayer::build( ssgSimpleState *cloud_state, float span, float elevation, 
       tl[i]->add( tc );
     }
 
-    sgSetVec3( vertex, layer_span*(i-1)/2, layer_span, 
+    sgSetVec3( vertex, layer_span*(i-1)/2, layer_span,
       (float)(alt_diff * (sin((i+1)*mpi) - 2)) );
 
     sgSetVec2( tc, base[0] + layer_scale * (i+1)/4,
@@ -179,11 +181,11 @@ bool cGrCloudLayer::repositionFlat( sgVec3 p, double dt )
 
   // combine p and asl (meters) to get translation offset
   sgVec3 asl_offset;
-  if ( p[SG_Z] <= layer_asl ) 
+  if ( p[SG_Z] <= layer_asl )
   {
     sgSetVec3( asl_offset, p[SG_X], p[SG_Y], layer_asl );
   }
-  else 
+  else
   {
     sgSetVec3( asl_offset, p[SG_X], p[SG_Y], layer_asl + layer_thickness );
   }
@@ -202,7 +204,7 @@ bool cGrCloudLayer::repositionFlat( sgVec3 p, double dt )
   // now calculate update texture coordinates
   double sp_dist = speed*dt;
 
-  if ( p[SG_X] != last_x || p[SG_Y] != last_y || sp_dist != 0 ) 
+  if ( p[SG_X] != last_x || p[SG_Y] != last_y || sp_dist != 0 )
   {
     // calculate cloud movement
     double ax = 0.0, ay = 0.0, bx = 0.0, by = 0.0;
@@ -210,7 +212,7 @@ bool cGrCloudLayer::repositionFlat( sgVec3 p, double dt )
     ax = p[SG_X] - last_x;
     ay = p[SG_Y] - last_y;
 
-    if (sp_dist > 0) 
+    if (sp_dist > 0)
     {
       bx = cos(-direction * SGD_DEGREES_TO_RADIANS) * sp_dist;
       by = sin(-direction * SGD_DEGREES_TO_RADIANS) * sp_dist;
@@ -230,14 +232,14 @@ bool cGrCloudLayer::repositionFlat( sgVec3 p, double dt )
     // with a bogus value.
     // while ( base[0] > 1.0 ) { base[0] -= 1.0; }
     // while ( base[0] < 0.0 ) { base[0] += 1.0; }
-    if ( base[0] > -10.0 && base[0] < 10.0 ) 
+    if ( base[0] > -10.0 && base[0] < 10.0 )
     {
       base[0] -= (int)base[0];
     }
-    else 
+    else
     {
       base[0] = 0.0;
-	  ulSetError(UL_WARNING, "Warning: base1\n");
+      ulSetError(UL_WARNING, "Warning: base1\n");
     }
 
     base[1] += yoff;
@@ -245,22 +247,22 @@ bool cGrCloudLayer::repositionFlat( sgVec3 p, double dt )
     // with a bogus value.
     // while ( base[1] > 1.0 ) { base[1] -= 1.0; }
     // while ( base[1] < 0.0 ) { base[1] += 1.0; }
-    if ( base[1] > -10.0 && base[1] < 10.0 ) 
+    if ( base[1] > -10.0 && base[1] < 10.0 )
     {
       base[1] -= (int)base[1];
     }
-    else 
+    else
     {
       base[1] = 0.0;
-	  ulSetError(UL_WARNING, "Warning: base2\n");
+      ulSetError(UL_WARNING, "Warning: base2\n");
     }
 
-    for (int i = 0; i < 4; i++) 
+    for (int i = 0; i < 4; i++)
     {
       tc = tl[i]->get( 0 );
       sgSetVec2( tc, base[0] + layer_scale * i/4, base[1] );
 
-      for (int j = 0; j < 4; j++) 
+      for (int j = 0; j < 4; j++)
       {
         tc = tl[i]->get( j*2+1 );
         sgSetVec2( tc, base[0] + layer_scale * (i+1)/4,
@@ -293,11 +295,11 @@ bool cGrCloudLayer::reposition( sgVec3 p, sgVec3 up, double lon, double lat, dou
   sgVec3 asl_offset;
   sgCopyVec3( asl_offset, up );
   sgNormalizeVec3( asl_offset );
-  if ( alt <= layer_asl ) 
+  if ( alt <= layer_asl )
   {
     sgScaleVec3( asl_offset, layer_asl );
   }
-  else 
+  else
   {
     sgScaleVec3( asl_offset, layer_asl + layer_thickness );
   }
@@ -325,7 +327,7 @@ bool cGrCloudLayer::reposition( sgVec3 p, sgVec3 up, double lon, double lat, dou
   layer_transform->setTransform( &layerpos );
 
   // now calculate update texture coordinates
-  if ( last_lon < -900 ) 
+  if ( last_lon < -900 )
   {
     last_lon = lon;
     last_lat = lat;
@@ -333,27 +335,27 @@ bool cGrCloudLayer::reposition( sgVec3 p, sgVec3 up, double lon, double lat, dou
 
   double sp_dist = speed*dt;
 
-  if ( lon != last_lon || lat != last_lat || sp_dist != 0 ) 
+  if ( lon != last_lon || lat != last_lat || sp_dist != 0 )
   {
     double course = 0.0, dist = 0.0;
-    if ( lon != last_lon || lat != last_lat ) 
+    if ( lon != last_lon || lat != last_lat )
     {
-	sgVec2 start, dest;
-	sgSetVec2(start, (float)last_lon, (float)last_lat);
-	sgSetVec2(dest, (float)lon, (float)lat);
-	calc_gc_course_dist( dest, start, &course, &dist );
+    sgVec2 start, dest;
+    sgSetVec2(start, (float)last_lon, (float)last_lat);
+    sgSetVec2(dest, (float)lon, (float)lat);
+    calc_gc_course_dist( dest, start, &course, &dist );
     }
 
     // calculate cloud movement
     double ax = 0.0, ay = 0.0, bx = 0.0, by = 0.0;
 
-    if (dist > 0.0) 
+    if (dist > 0.0)
     {
       ax = cos(course) * dist;
       ay = sin(course) * dist;
     }
 
-    if (sp_dist > 0) 
+    if (sp_dist > 0)
     {
       bx = cos(-direction * SGD_DEGREES_TO_RADIANS) * sp_dist;
       by = sin(-direction * SGD_DEGREES_TO_RADIANS) * sp_dist;
@@ -369,34 +371,34 @@ bool cGrCloudLayer::reposition( sgVec3 p, sgVec3 up, double lon, double lat, dou
     base = tl[0]->get( 0 );
     base[0] += xoff;
 
-    if ( base[0] > -10.0 && base[0] < 10.0 ) 
+    if ( base[0] > -10.0 && base[0] < 10.0 )
     {
       base[0] -= (int)base[0];
     }
-    else 
+    else
     {
       base[0] = 0.0;
-	  ulSetError(UL_WARNING, "Warning: base1\n");
+      ulSetError(UL_WARNING, "Warning: base1\n");
     }
 
     base[1] += yoff;
 
-    if ( base[1] > -10.0 && base[1] < 10.0 ) 
+    if ( base[1] > -10.0 && base[1] < 10.0 )
     {
       base[1] -= (int)base[1];
     }
-    else 
+    else
     {
       base[1] = 0.0;
-	  ulSetError(UL_WARNING, "Warning: base2\n");
+      ulSetError(UL_WARNING, "Warning: base2\n");
     }
 
-    for (int i = 0; i < 4; i++) 
+    for (int i = 0; i < 4; i++)
     {
       tc = tl[i]->get( 0 );
       sgSetVec2( tc, base[0] + layer_scale * i/4, base[1] );
 
-      for (int j = 0; j < 4; j++) 
+      for (int j = 0; j < 4; j++)
       {
         tc = tl[i]->get( j*2+1 );
         sgSetVec2( tc, base[0] + layer_scale * (i+1)/4,
@@ -424,10 +426,10 @@ bool cGrCloudLayer::repaint( sgVec3 fog_color )
   float *color;
 
   for ( int i = 0; i < 4; i++ )
-    for ( int j = 0; j < 10; ++j ) 
+    for ( int j = 0; j < 10; ++j )
     {
       color = cl[i]->get( j );
-      sgCopyVec3( color, fog_color );
+      sgCopyVec3( color, fog_color);
     }
 
   return true;
@@ -436,7 +438,7 @@ bool cGrCloudLayer::repaint( sgVec3 fog_color )
 void cGrCloudLayer::draw()
 {
   if (!enabled)
-	  return;
+      return;
 
   ssgCullAndDraw( layer_root );
 }
@@ -467,35 +469,35 @@ void calc_gc_course_dist( const sgVec2& start, const sgVec2& dest, double *cours
     double cos_start_y = cos( start[SG_Y] );
     volatile double tmp1 = sin( (start[SG_Y] - dest[SG_Y]) * 0.5 );
     volatile double tmp2 = sin( (start[SG_X] - dest[SG_X]) * 0.5 );
-    double d = 2.0 * asin( sqrt( tmp1 * tmp1 + 
+    double d = 2.0 * asin( sqrt( tmp1 * tmp1 +
                                  cos_start_y * cos(dest[SG_Y]) * tmp2 * tmp2));
 
     *dist = d * GR_RAD_TO_NM * GR_NM_TO_METER;
 
     double sin_start_y = sin( start[SG_Y] );
-    if ( fabs(1.0-sin_start_y) < GR_EPSILON ) 
+    if ( fabs(1.0-sin_start_y) < GR_EPSILON )
     {
         // EPS a small number ~ machine precision
-        if ( start[SG_Y] > 0 ) 
+        if ( start[SG_Y] > 0 )
         {
             *course = SGD_PI;   // starting from N pole
-        } 
-        else 
+        }
+        else
         {
             *course = 0;        // starting from S pole
         }
-    } 
-    else 
+    }
+    else
     {
-        
+
         double tmp5 = acos( (sin(dest[SG_Y]) - sin_start_y * cos(d)) /
                             (sin(d) * cos_start_y) );
 
-        if ( tmp2 >= 0 ) 
+        if ( tmp2 >= 0 )
         {
             *course = tmp5;
-        } 
-        else 
+        }
+        else
         {
             *course = 2 * SGD_PI - tmp5;
         }

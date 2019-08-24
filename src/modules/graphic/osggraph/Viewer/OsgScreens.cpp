@@ -65,6 +65,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     //intialising main screen
 
     viewer = new osgViewer::Viewer;
+    viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
 #if 1 //SDL_MAJOR_VERSION < 2
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, width, height);
     osg::ref_ptr<osg::Camera> Camera = viewer->getCamera();
@@ -74,14 +75,14 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     Camera->setPreDrawCallback(new CameraDrawnCallback);
 #else
     SDL_Window* GfuiWindow = GfScrGetMainWindow();
-	//viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
-	//viewer->setThreadingModel(osgViewer::Viewer::CullDrawThreadPerContext);
-	//viewer->setThreadingModel(osgViewer::Viewer::DrawThreadPerContext);
-	viewer->setThreadingModel(osgViewer::Viewer::SingleThreaded);
-	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
+    //viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
+    //viewer->setThreadingModel(osgViewer::Viewer::CullDrawThreadPerContext);
+    //viewer->setThreadingModel(osgViewer::Viewer::DrawThreadPerContext);
+    viewer->setThreadingModel(osgViewer::Viewer::SingleThreaded);
+    osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
     SDL_GetWindowPosition(GfuiWindow, &traits->x, &traits->y);
     SDL_GetWindowSize(GfuiWindow, &traits->width, &traits->height);
-	traits->windowName = SDL_GetWindowTitle(GfuiWindow);
+    traits->windowName = SDL_GetWindowTitle(GfuiWindow);
     traits->windowDecoration = !(SDL_GetWindowFlags(GfuiWindow)&SDL_WINDOW_BORDERLESS);
     traits->screenNum = SDL_GetWindowDisplayIndex(GfuiWindow);
     traits->red = 8;
@@ -97,7 +98,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     osg::ref_ptr<OSGUtil::OsgGraphicsWindowSDL2> gw = new OSGUtil::OsgGraphicsWindowSDL2(traits.get());
     viewer->getCamera()->setGraphicsContext(gw);
     viewer->getCamera()->setViewport(new osg::Viewport(0, 0, width, height));
-	viewer->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+    viewer->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
     viewer->getCamera()->setPreDrawCallback(new CameraDrawnCallback);
 
     if(!gw->valid())
@@ -136,17 +137,17 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     // debugHUD->setTexture(reflectionMapping->getReflectionMap());
     //root->addChild(debugHUD->getRootCamera());
 
-	//create the hud and its own camera and add it to the viewer
-	hud.CreateHUD(height, width);
-	/*
-	osg::Camera* hudCamera = hud.camera;
-	hudCamera->setGraphicsContext(gw);
-	hudCamera->setViewport(0,0, width, height);
-	viewer->addSlave(hudCamera, false);
-	*/
-	hud.camera->setGraphicsContext(gw);
-	hud.camera->setViewport(0,0, width, height);
-	viewer->addSlave(hud.camera, false);
+    //create the hud and its own camera and add it to the viewer
+    hud.CreateHUD(height, width);
+    /*
+    osg::Camera* hudCamera = hud.camera;
+    hudCamera->setGraphicsContext(gw);
+    hudCamera->setViewport(0,0, width, height);
+    viewer->addSlave(hudCamera, false);
+    */
+    hud.camera->setGraphicsContext(gw);
+    hud.camera->setViewport(0,0, width, height);
+    viewer->addSlave(hud.camera, false);
 
 
     //viewer->setSceneData(root.get());
@@ -199,13 +200,12 @@ void SDScreens::InitCars(tSituation *s)
     }
 }
 
-void SDScreens::update(tSituation * s,SDFrameInfo* fi)
+void SDScreens::update(tSituation * s, SDFrameInfo* fi)
 {
-    for (unsigned i=0;i< Screens.size();i++)
+    for (unsigned i=0; i< Screens.size(); i++)
     {
-        Screens[i]->update(s,fi);
+        Screens[i]->update(s, fi);
     }
-
 
     SDCars * cars = (SDCars *)getCars();
     tCarElt * c = this->getActiveView()->getCurrentCar();

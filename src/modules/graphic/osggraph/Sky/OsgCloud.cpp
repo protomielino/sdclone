@@ -450,7 +450,7 @@ bool SDCloudLayer::repaint( const osg::Vec3f &fog_color )
         = dynamic_cast<osg::TexEnvCombine*>(layer_root->getStateSet()
                                             ->getTextureAttribute(1, osg::StateAttribute::TEXENV));
 
-    if (combiner == nullptr)
+    if (combiner == NULL)
         return false;
 
     combiner->setConstantColor(combineColor);

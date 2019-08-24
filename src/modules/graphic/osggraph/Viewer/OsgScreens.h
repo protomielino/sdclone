@@ -39,15 +39,15 @@ protected:
     osg::ref_ptr<osg::Group> prerenderRoot;
     SDDebugHUD * debugHUD;
 
-    int m_Winx;
-    int m_Winy;
-    int m_Winw;
-    int m_Winh;
+    int  m_Winx;
+    int  m_Winy;
+    int  m_Winw;
+    int  m_Winh;
 
-    int m_NbActiveScreens;
-    int m_NbArrangeScreens;
+    int  m_NbActiveScreens;
+    int  m_NbArrangeScreens;
     bool m_SpanSplit;
-    int m_CurrentScreenIndex;
+    int  m_CurrentScreenIndex;
 
 public:
     SDScreens();

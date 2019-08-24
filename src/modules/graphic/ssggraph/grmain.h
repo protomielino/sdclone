@@ -36,9 +36,9 @@
 #ifdef WIN32
 // Multi-texturing functions : Under Windows, not present in gl.h or any other ;
 // you can only get them through a call to wglGetProcAddress at run-time.
-extern PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2fARB ;
-extern PFNGLMULTITEXCOORD2FVARBPROC glMultiTexCoord2fvARB;
-extern PFNGLACTIVETEXTUREARBPROC   glActiveTextureARB ;
+extern PFNGLMULTITEXCOORD2FARBPROC     glMultiTexCoord2fARB ;
+extern PFNGLMULTITEXCOORD2FVARBPROC    glMultiTexCoord2fvARB;
+extern PFNGLACTIVETEXTUREARBPROC       glActiveTextureARB ;
 extern PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB ;
 #endif
 
@@ -90,10 +90,10 @@ extern tdble grLodFactorValue;
 class cGrFrameInfo
 {
  public:
-	double fInstFps;        // "Instant" frame rate (average along a 1 second shifting window).
-	double fAvgFps;         // Average frame rate (since the beginning of the race).
-	unsigned nInstFrames;   // Nb of frames since the last "instant" FPS refresh time
-	unsigned nTotalFrames;  // Total nb of frames since initView
+    double fInstFps;        // "Instant" frame rate (average along a 1 second shifting window).
+    double fAvgFps;         // Average frame rate (since the beginning of the race).
+    unsigned nInstFrames;   // Nb of frames since the last "instant" FPS refresh time
+    unsigned nTotalFrames;  // Total nb of frames since initView
 };
 
-#endif /* _GRMAIN_H_ */ 
+#endif /* _GRMAIN_H_ */

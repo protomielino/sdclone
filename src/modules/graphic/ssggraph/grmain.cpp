@@ -88,32 +88,32 @@ PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
 // Set up OpenGL features from user settings.
 static void setupOpenGLFeatures(void)
 {
-	static bool bInitialized = false;
-	
-	// Don't do it twice.
+    static bool bInitialized = false;
+
+    // Don't do it twice.
     if (bInitialized)
-		return;
+        return;
 
     // Multi-texturing.
-	grMaxTextureUnits = 1;
-	if (GfglFeatures::self().isSelected(GfglFeatures::MultiTexturing))
-	{
-		// Use the selected number of texture units.
-		grMaxTextureUnits = GfglFeatures::self().getSelected(GfglFeatures::MultiTexturingUnits);
+    grMaxTextureUnits = 1;
+    if (GfglFeatures::self().isSelected(GfglFeatures::MultiTexturing))
+    {
+        // Use the selected number of texture units.
+        grMaxTextureUnits = GfglFeatures::self().getSelected(GfglFeatures::MultiTexturingUnits);
 
 #ifdef WIN32
-		// Retrieve the addresses of multi-texturing functions under Windows
-		// They are not declared in gl.h or any other header ;
-		// you can only get them through a call to wglGetProcAddress at run-time.
-		glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)wglGetProcAddress("glMultiTexCoord2fARB");
-		glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
-		glClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC)wglGetProcAddress("glClientActiveTextureARB");
-		glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC)wglGetProcAddress("glMultiTexCoord2fvARB");
+        // Retrieve the addresses of multi-texturing functions under Windows
+        // They are not declared in gl.h or any other header ;
+        // you can only get them through a call to wglGetProcAddress at run-time.
+        glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)wglGetProcAddress("glMultiTexCoord2fARB");
+        glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
+        glClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC)wglGetProcAddress("glClientActiveTextureARB");
+        glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC)wglGetProcAddress("glMultiTexCoord2fvARB");
 #endif
-	}
+    }
 
-	// Done once and for all.
-	bInitialized = true;
+    // Done once and for all.
+    bInitialized = true;
 }
 
 
@@ -123,267 +123,267 @@ grAdaptScreenSize(void)
     int i;
 
     switch (grNbActiveScreens)
-	{
-		default:
-		case 1:
-			// Hack to allow span-split to function OK
-			if (grNbArrangeScreens > 1) grNbArrangeScreens = 0;
+    {
+        default:
+        case 1:
+            // Hack to allow span-split to function OK
+            if (grNbArrangeScreens > 1) grNbArrangeScreens = 0;
 
-			// Always Full window.
-			grScreens[0]->activate(grWinx, grWiny, grWinw, grWinh, 0.0);
-			for (i=1; i < GR_NB_MAX_SCREEN; i++)
-				grScreens[i]->deactivate();
-			break;
-		case 2:
-			switch (grNbArrangeScreens) {
-			default:
-				grNbArrangeScreens = 0;
-			case 0:
-				// Top & Bottom half of the window
-				grScreens[0]->activate(grWinx, grWiny + grWinh / 2, grWinw, grWinh / 2, 0.0);
-				grScreens[1]->activate(grWinx, grWiny,              grWinw, grWinh / 2, 0.0);
-				break;
-			case 1:
-				// Left & Right half of the window
-				grScreens[0]->activate(grWinx,              grWiny, grWinw / 2, grWinh, grSpanSplit * (-0.5 + 10));
-				grScreens[1]->activate(grWinx + grWinw / 2, grWiny, grWinw / 2, grWinh, grSpanSplit * (0.5 + 10));
-				break;
-			case 2:
-				// 33/66% Left/Right 
-				grScreens[0]->activate(grWinx,              grWiny, grWinw / 3,   grWinh, 0.0);
-				grScreens[1]->activate(grWinx + grWinw / 3, grWiny, grWinw * 2/3, grWinh, 0.0);
-				break;
-			case 3:
-				// 66/33% Left/Right 
-				grScreens[0]->activate(grWinx,                grWiny, grWinw * 2/3, grWinh, 0.0);
-				grScreens[1]->activate(grWinx + grWinw * 2/3, grWiny, grWinw / 3,   grWinh, 0.0);
-				break;
-			}
+            // Always Full window.
+            grScreens[0]->activate(grWinx, grWiny, grWinw, grWinh, 0.0);
+            for (i=1; i < GR_NB_MAX_SCREEN; i++)
+                grScreens[i]->deactivate();
+            break;
+        case 2:
+            switch (grNbArrangeScreens) {
+            default:
+                grNbArrangeScreens = 0;
+            case 0:
+                // Top & Bottom half of the window
+                grScreens[0]->activate(grWinx, grWiny + grWinh / 2, grWinw, grWinh / 2, 0.0);
+                grScreens[1]->activate(grWinx, grWiny,              grWinw, grWinh / 2, 0.0);
+                break;
+            case 1:
+                // Left & Right half of the window
+                grScreens[0]->activate(grWinx,              grWiny, grWinw / 2, grWinh, grSpanSplit * (-0.5 + 10));
+                grScreens[1]->activate(grWinx + grWinw / 2, grWiny, grWinw / 2, grWinh, grSpanSplit * (0.5 + 10));
+                break;
+            case 2:
+                // 33/66% Left/Right
+                grScreens[0]->activate(grWinx,              grWiny, grWinw / 3,   grWinh, 0.0);
+                grScreens[1]->activate(grWinx + grWinw / 3, grWiny, grWinw * 2/3, grWinh, 0.0);
+                break;
+            case 3:
+                // 66/33% Left/Right
+                grScreens[0]->activate(grWinx,                grWiny, grWinw * 2/3, grWinh, 0.0);
+                grScreens[1]->activate(grWinx + grWinw * 2/3, grWiny, grWinw / 3,   grWinh, 0.0);
+                break;
+            }
 
-			for (i=2; i < GR_NB_MAX_SCREEN; i++)
-				grScreens[i]->deactivate();
-			break;
-		case 3:
-			switch (grNbArrangeScreens) {
-			default:
-				grNbArrangeScreens = 0;
-			case 0:
-				// Left/Right below wide
-				grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw,     grWinh / 2, 0.0);
-				grScreens[1]->activate(grWinx,              grWiny,              grWinw / 2, grWinh / 2, 0.0);
-				grScreens[2]->activate(grWinx + grWinw / 2, grWiny,              grWinw / 2, grWinh / 2, 0.0);
-				break;
-			case 1:
-				// All side by side
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 3,   grWinh, grSpanSplit * (-1 + 10));
-				grScreens[1]->activate(grWinx + grWinw / 3,   grWiny, grWinw / 3,   grWinh, grSpanSplit * (0.0 + 10));
-				grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny, grWinw / 3,   grWinh, grSpanSplit * (1 + 10));
-				break;
-			case 2:
-				// Left/Right above wide
-				grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
-				grScreens[1]->activate(grWinx + grWinw / 2, grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
-				grScreens[2]->activate(grWinx,              grWiny,              grWinw,     grWinh / 2, 0.0);
-				break;
-			case 3:
-				// 50/50% Left plus Top/Bottom on Right
-				grScreens[0]->activate(grWinx,              grWiny,              grWinw / 2, grWinh, 0.0);
-				grScreens[1]->activate(grWinx + grWinw / 2, grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
-				grScreens[2]->activate(grWinx + grWinw / 2, grWiny,              grWinw / 2, grWinh / 2, 0.0);
-				break;
-			case 5:
-				// 50/50% Top/Bottom on Left plus Right
-				grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
-				grScreens[1]->activate(grWinx + grWinw / 2, grWiny,              grWinw / 2, grWinh, 0.0);
-				grScreens[2]->activate(grWinx,              grWiny,              grWinw / 2, grWinh / 2, 0.0);
-				break;
-			case 6:
-				// 66/33% Left plus Top/Bottom on Right
-				grScreens[0]->activate(grWinx,                grWiny,              grWinw * 2/3, grWinh, 0.0);
-				grScreens[1]->activate(grWinx + grWinw * 2/3, grWiny + grWinh / 2, grWinw / 3,   grWinh / 2, 0.0);
-				grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny,              grWinw / 3,   grWinh / 2, 0.0);
-				break;
-			case 7:
-				// 33/66% Top/Bottom on Left plus Right
-				grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 3,   grWinh / 2, 0.0);
-				grScreens[1]->activate(grWinx + grWinw / 3, grWiny,              grWinw * 2/3, grWinh, 0.0);
-				grScreens[2]->activate(grWinx,              grWiny,              grWinw / 3,   grWinh / 2, 0.0);
-				break;
-			}
-			for (i=3; i < GR_NB_MAX_SCREEN; i++)
-				grScreens[i]->deactivate();
-			break;
-		case 4:
-			switch (grNbArrangeScreens) {
-			case 8:
-				// 3 side by side + 1 for rear view - only when spanning splits
-				if (grSpanSplit) {
-					grScreens[0]->activate(grWinx,                grWiny, grWinw / 4,   grWinh, grSpanSplit * (-1 + 10));
-					grScreens[1]->activate(grWinx + grWinw / 4,   grWiny, grWinw / 4,   grWinh, grSpanSplit * (0.0 + 10));
-					grScreens[2]->activate(grWinx + grWinw * 2/4, grWiny, grWinw / 4,   grWinh, grSpanSplit * (1 + 10));
-					grScreens[3]->activate(grWinx + grWinw * 3/4, grWiny, grWinw / 4,   grWinh, 0.0);
-					break;
-				} 
-			default:
-				grNbArrangeScreens = 0;
-			case 0:
-				// Top/Bottom Left/Rigth Quarters
-				grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
-				grScreens[1]->activate(grWinx + grWinw / 2, grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
-				grScreens[2]->activate(grWinx,              grWiny,              grWinw / 2, grWinh / 2, 0.0);
-				grScreens[3]->activate(grWinx + grWinw / 2, grWiny,              grWinw / 2, grWinh / 2, 0.0);
-				break;
-			case 1:
-				// All side by side
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 4,   grWinh, grSpanSplit * (-1.5 + 10));
-				grScreens[1]->activate(grWinx + grWinw / 4,   grWiny, grWinw / 4,   grWinh, grSpanSplit * (-0.5 + 10));
-				grScreens[2]->activate(grWinx + grWinw * 2/4, grWiny, grWinw / 4,   grWinh, grSpanSplit * (0.5 + 10));
-				grScreens[3]->activate(grWinx + grWinw * 3/4, grWiny, grWinw / 4,   grWinh, grSpanSplit * (1.5 + 10));
-				break;
-			case 2:
-				// Left/Middle/Right above wide
-				grScreens[0]->activate(grWinx,                grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);
-				grScreens[1]->activate(grWinx + grWinw / 3,   grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);
-				grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);
-				grScreens[3]->activate(grWinx,                grWiny,              grWinw,     grWinh / 2, 0.0);
-				break;
-			case 3:
-				// Left/Middle/Right below wide
-				grScreens[0]->activate(grWinx,                grWiny + grWinh / 2, grWinw,     grWinh / 2, 0.0);
-				grScreens[1]->activate(grWinx,                grWiny,              grWinw / 3, grWinh / 2, 0.0);
-				grScreens[2]->activate(grWinx + grWinw / 3,   grWiny,              grWinw / 3, grWinh / 2, 0.0);
-				grScreens[3]->activate(grWinx + grWinw * 2/3, grWiny,              grWinw / 3, grWinh / 2, 0.0);
-				break;
-			case 4:
-				// 50/50% Left plus Top/Middle/Bottom on Right
-				grScreens[0]->activate(grWinx,              grWiny,                grWinw / 2, grWinh, 0.0);
-				grScreens[1]->activate(grWinx + grWinw / 2, grWiny + grWinh * 2/3, grWinw / 2, grWinh / 3, 0.0);
-				grScreens[2]->activate(grWinx + grWinw / 2, grWiny + grWinh / 3,   grWinw / 2, grWinh / 3, 0.0);
-				grScreens[3]->activate(grWinx + grWinw / 2, grWiny,                grWinw / 2, grWinh / 3, 0.0);
-				break;
-			case 5:
-				// 50/50% Top/Middle/Bottom on Left plus Right
-				grScreens[0]->activate(grWinx,              grWiny + grWinh * 2/3, grWinw / 2, grWinh / 3, 0.0);
-				grScreens[1]->activate(grWinx + grWinw / 2, grWiny,                grWinw / 2, grWinh, 0.0);
-				grScreens[2]->activate(grWinx,              grWiny + grWinh / 3  , grWinw / 2, grWinh / 3, 0.0);
-				grScreens[3]->activate(grWinx,              grWiny,                grWinw / 2, grWinh / 3, 0.0);
-				break;
-			case 6:
-				// 66/33% Left plus Top/Middle/Bottom on Right
-				grScreens[0]->activate(grWinx,                grWiny,                grWinw * 2/3, grWinh, 0.0);
-				grScreens[1]->activate(grWinx + grWinw * 2/3, grWiny + grWinh * 2/3, grWinw / 3,   grWinh / 3, 0.0);
-				grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny + grWinh / 3,   grWinw / 3,   grWinh / 3, 0.0);
-				grScreens[3]->activate(grWinx + grWinw * 2/3, grWiny,                grWinw / 3,   grWinh / 3, 0.0);
-				break;
-			case 7:
-				// 33/66% Top/Middle/Bottom on Left plus Right
-				grScreens[0]->activate(grWinx,              grWiny + grWinh * 2/3, grWinw / 3,   grWinh / 3, 0.0);
-				grScreens[1]->activate(grWinx + grWinw / 3, grWiny,                grWinw * 2/3, grWinh, 0.0);
-				grScreens[2]->activate(grWinx,              grWiny + grWinh / 3  , grWinw / 3,   grWinh / 3, 0.0);
-				grScreens[3]->activate(grWinx,              grWiny,                grWinw / 3,   grWinh / 3, 0.0);
-				break;
-			}
-			for (i=4; i < GR_NB_MAX_SCREEN; i++)
-				grScreens[i]->deactivate();
-			break;
-		case 5:
-			switch (grNbArrangeScreens) {
-			default:
-				grNbArrangeScreens = 0;
-			case 0:
-				// Top/Bottom Left/Middle/Rigth Matrix
-				grScreens[0]->activate(grWinx,                grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
-				grScreens[1]->activate(grWinx + grWinw / 2  , grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
-				grScreens[2]->activate(grWinx,                grWiny,              grWinw / 3, grWinh / 2, 0.0);
-				grScreens[3]->activate(grWinx + grWinw / 3,   grWiny,              grWinw / 3, grWinh / 2, 0.0);
-				grScreens[4]->activate(grWinx + grWinw * 2/3, grWiny,              grWinw / 3, grWinh / 2, 0.0);
-				break;
-			case 1:
-				// All side by side
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 5,   grWinh, grSpanSplit * (-2.0 + 10));
-				grScreens[1]->activate(grWinx + grWinw / 5,   grWiny, grWinw / 5,   grWinh, grSpanSplit * (-1.0 + 10));
-				grScreens[2]->activate(grWinx + grWinw * 2/5, grWiny, grWinw / 5,   grWinh, grSpanSplit * (0.0 + 10));
-				grScreens[3]->activate(grWinx + grWinw * 3/5, grWiny, grWinw / 5,   grWinh, grSpanSplit * (1.0 + 10));
-				grScreens[4]->activate(grWinx + grWinw * 4/5, grWiny, grWinw / 5,   grWinh, grSpanSplit * (2.0 + 10));
-				break;
-			}
-			for (i=5; i < GR_NB_MAX_SCREEN; i++)
-				grScreens[i]->deactivate();
-			break;
-		case 6:
-			switch (grNbArrangeScreens) {
-			case 2:
-				if (grSpanSplit) {
-					// five side by side + 1 for rear view - only when spanning splits
-					grScreens[0]->activate(grWinx,                grWiny, grWinw / 6,   grWinh, grSpanSplit * (-2.0 + 10));
-					grScreens[1]->activate(grWinx + grWinw / 6,   grWiny, grWinw / 6,   grWinh, grSpanSplit * (-1.0 + 10));
-					grScreens[2]->activate(grWinx + grWinw * 2/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (0.0 + 10));
-					grScreens[3]->activate(grWinx + grWinw * 3/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (1.0 + 10));
-					grScreens[4]->activate(grWinx + grWinw * 4/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (2.0 + 10));
-					grScreens[5]->activate(grWinx + grWinw * 5/6, grWiny, grWinw / 6,   grWinh, 0.0);
-					break;
-				}
-			default:
-				grNbArrangeScreens = 0;
-			case 0:
-				// Top/Bottom Left/Middle/Rigth Matrix
-				grScreens[0]->activate(grWinx,                grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);
-				grScreens[1]->activate(grWinx + grWinw / 3,   grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);
-				grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);
-				grScreens[3]->activate(grWinx,                grWiny,              grWinw / 3, grWinh / 2, 0.0);
-				grScreens[4]->activate(grWinx + grWinw / 3,   grWiny,              grWinw / 3, grWinh / 2, 0.0);
-				grScreens[5]->activate(grWinx + grWinw * 2/3, grWiny,              grWinw / 3, grWinh / 2, 0.0);
-				break;
-			case 1:
-				// All side by side
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 6,   grWinh, grSpanSplit * (-2.5 + 10));
-				grScreens[1]->activate(grWinx + grWinw / 6,   grWiny, grWinw / 6,   grWinh, grSpanSplit * (-1.5 + 10));
-				grScreens[2]->activate(grWinx + grWinw * 2/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (-0.5 + 10));
-				grScreens[3]->activate(grWinx + grWinw * 3/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (0.5 + 10));
-				grScreens[4]->activate(grWinx + grWinw * 4/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (1.5 + 10));
-				grScreens[5]->activate(grWinx + grWinw * 5/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (2.5 + 10));
-				break;
-			}
-			for (i=6; i < GR_NB_MAX_SCREEN; i++)
-				grScreens[i]->deactivate();
-			break;
-		}
+            for (i=2; i < GR_NB_MAX_SCREEN; i++)
+                grScreens[i]->deactivate();
+            break;
+        case 3:
+            switch (grNbArrangeScreens) {
+            default:
+                grNbArrangeScreens = 0;
+            case 0:
+                // Left/Right below wide
+                grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw,     grWinh / 2, 0.0);
+                grScreens[1]->activate(grWinx,              grWiny,              grWinw / 2, grWinh / 2, 0.0);
+                grScreens[2]->activate(grWinx + grWinw / 2, grWiny,              grWinw / 2, grWinh / 2, 0.0);
+                break;
+            case 1:
+                // All side by side
+                grScreens[0]->activate(grWinx,                grWiny, grWinw / 3,   grWinh, grSpanSplit * (-1 + 10));
+                grScreens[1]->activate(grWinx + grWinw / 3,   grWiny, grWinw / 3,   grWinh, grSpanSplit * (0.0 + 10));
+                grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny, grWinw / 3,   grWinh, grSpanSplit * (1 + 10));
+                break;
+            case 2:
+                // Left/Right above wide
+                grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
+                grScreens[1]->activate(grWinx + grWinw / 2, grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
+                grScreens[2]->activate(grWinx,              grWiny,              grWinw,     grWinh / 2, 0.0);
+                break;
+            case 3:
+                // 50/50% Left plus Top/Bottom on Right
+                grScreens[0]->activate(grWinx,              grWiny,              grWinw / 2, grWinh, 0.0);
+                grScreens[1]->activate(grWinx + grWinw / 2, grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
+                grScreens[2]->activate(grWinx + grWinw / 2, grWiny,              grWinw / 2, grWinh / 2, 0.0);
+                break;
+            case 5:
+                // 50/50% Top/Bottom on Left plus Right
+                grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
+                grScreens[1]->activate(grWinx + grWinw / 2, grWiny,              grWinw / 2, grWinh, 0.0);
+                grScreens[2]->activate(grWinx,              grWiny,              grWinw / 2, grWinh / 2, 0.0);
+                break;
+            case 6:
+                // 66/33% Left plus Top/Bottom on Right
+                grScreens[0]->activate(grWinx,                grWiny,              grWinw * 2/3, grWinh, 0.0);
+                grScreens[1]->activate(grWinx + grWinw * 2/3, grWiny + grWinh / 2, grWinw / 3,   grWinh / 2, 0.0);
+                grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny,              grWinw / 3,   grWinh / 2, 0.0);
+                break;
+            case 7:
+                // 33/66% Top/Bottom on Left plus Right
+                grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 3,   grWinh / 2, 0.0);
+                grScreens[1]->activate(grWinx + grWinw / 3, grWiny,              grWinw * 2/3, grWinh, 0.0);
+                grScreens[2]->activate(grWinx,              grWiny,              grWinw / 3,   grWinh / 2, 0.0);
+                break;
+            }
+            for (i=3; i < GR_NB_MAX_SCREEN; i++)
+                grScreens[i]->deactivate();
+            break;
+        case 4:
+            switch (grNbArrangeScreens) {
+            case 8:
+                // 3 side by side + 1 for rear view - only when spanning splits
+                if (grSpanSplit) {
+                    grScreens[0]->activate(grWinx,                grWiny, grWinw / 4,   grWinh, grSpanSplit * (-1 + 10));
+                    grScreens[1]->activate(grWinx + grWinw / 4,   grWiny, grWinw / 4,   grWinh, grSpanSplit * (0.0 + 10));
+                    grScreens[2]->activate(grWinx + grWinw * 2/4, grWiny, grWinw / 4,   grWinh, grSpanSplit * (1 + 10));
+                    grScreens[3]->activate(grWinx + grWinw * 3/4, grWiny, grWinw / 4,   grWinh, 0.0);
+                    break;
+                }
+            default:
+                grNbArrangeScreens = 0;
+            case 0:
+                // Top/Bottom Left/Rigth Quarters
+                grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
+                grScreens[1]->activate(grWinx + grWinw / 2, grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
+                grScreens[2]->activate(grWinx,              grWiny,              grWinw / 2, grWinh / 2, 0.0);
+                grScreens[3]->activate(grWinx + grWinw / 2, grWiny,              grWinw / 2, grWinh / 2, 0.0);
+                break;
+            case 1:
+                // All side by side
+                grScreens[0]->activate(grWinx,                grWiny, grWinw / 4,   grWinh, grSpanSplit * (-1.5 + 10));
+                grScreens[1]->activate(grWinx + grWinw / 4,   grWiny, grWinw / 4,   grWinh, grSpanSplit * (-0.5 + 10));
+                grScreens[2]->activate(grWinx + grWinw * 2/4, grWiny, grWinw / 4,   grWinh, grSpanSplit * (0.5 + 10));
+                grScreens[3]->activate(grWinx + grWinw * 3/4, grWiny, grWinw / 4,   grWinh, grSpanSplit * (1.5 + 10));
+                break;
+            case 2:
+                // Left/Middle/Right above wide
+                grScreens[0]->activate(grWinx,                grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);
+                grScreens[1]->activate(grWinx + grWinw / 3,   grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);
+                grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);
+                grScreens[3]->activate(grWinx,                grWiny,              grWinw,     grWinh / 2, 0.0);
+                break;
+            case 3:
+                // Left/Middle/Right below wide
+                grScreens[0]->activate(grWinx,                grWiny + grWinh / 2, grWinw,     grWinh / 2, 0.0);
+                grScreens[1]->activate(grWinx,                grWiny,              grWinw / 3, grWinh / 2, 0.0);
+                grScreens[2]->activate(grWinx + grWinw / 3,   grWiny,              grWinw / 3, grWinh / 2, 0.0);
+                grScreens[3]->activate(grWinx + grWinw * 2/3, grWiny,              grWinw / 3, grWinh / 2, 0.0);
+                break;
+            case 4:
+                // 50/50% Left plus Top/Middle/Bottom on Right
+                grScreens[0]->activate(grWinx,              grWiny,                grWinw / 2, grWinh, 0.0);
+                grScreens[1]->activate(grWinx + grWinw / 2, grWiny + grWinh * 2/3, grWinw / 2, grWinh / 3, 0.0);
+                grScreens[2]->activate(grWinx + grWinw / 2, grWiny + grWinh / 3,   grWinw / 2, grWinh / 3, 0.0);
+                grScreens[3]->activate(grWinx + grWinw / 2, grWiny,                grWinw / 2, grWinh / 3, 0.0);
+                break;
+            case 5:
+                // 50/50% Top/Middle/Bottom on Left plus Right
+                grScreens[0]->activate(grWinx,              grWiny + grWinh * 2/3, grWinw / 2, grWinh / 3, 0.0);
+                grScreens[1]->activate(grWinx + grWinw / 2, grWiny,                grWinw / 2, grWinh, 0.0);
+                grScreens[2]->activate(grWinx,              grWiny + grWinh / 3  , grWinw / 2, grWinh / 3, 0.0);
+                grScreens[3]->activate(grWinx,              grWiny,                grWinw / 2, grWinh / 3, 0.0);
+                break;
+            case 6:
+                // 66/33% Left plus Top/Middle/Bottom on Right
+                grScreens[0]->activate(grWinx,                grWiny,                grWinw * 2/3, grWinh, 0.0);
+                grScreens[1]->activate(grWinx + grWinw * 2/3, grWiny + grWinh * 2/3, grWinw / 3,   grWinh / 3, 0.0);
+                grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny + grWinh / 3,   grWinw / 3,   grWinh / 3, 0.0);
+                grScreens[3]->activate(grWinx + grWinw * 2/3, grWiny,                grWinw / 3,   grWinh / 3, 0.0);
+                break;
+            case 7:
+                // 33/66% Top/Middle/Bottom on Left plus Right
+                grScreens[0]->activate(grWinx,              grWiny + grWinh * 2/3, grWinw / 3,   grWinh / 3, 0.0);
+                grScreens[1]->activate(grWinx + grWinw / 3, grWiny,                grWinw * 2/3, grWinh, 0.0);
+                grScreens[2]->activate(grWinx,              grWiny + grWinh / 3  , grWinw / 3,   grWinh / 3, 0.0);
+                grScreens[3]->activate(grWinx,              grWiny,                grWinw / 3,   grWinh / 3, 0.0);
+                break;
+            }
+            for (i=4; i < GR_NB_MAX_SCREEN; i++)
+                grScreens[i]->deactivate();
+            break;
+        case 5:
+            switch (grNbArrangeScreens) {
+            default:
+                grNbArrangeScreens = 0;
+            case 0:
+                // Top/Bottom Left/Middle/Rigth Matrix
+                grScreens[0]->activate(grWinx,                grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
+                grScreens[1]->activate(grWinx + grWinw / 2  , grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
+                grScreens[2]->activate(grWinx,                grWiny,              grWinw / 3, grWinh / 2, 0.0);
+                grScreens[3]->activate(grWinx + grWinw / 3,   grWiny,              grWinw / 3, grWinh / 2, 0.0);
+                grScreens[4]->activate(grWinx + grWinw * 2/3, grWiny,              grWinw / 3, grWinh / 2, 0.0);
+                break;
+            case 1:
+                // All side by side
+                grScreens[0]->activate(grWinx,                grWiny, grWinw / 5,   grWinh, grSpanSplit * (-2.0 + 10));
+                grScreens[1]->activate(grWinx + grWinw / 5,   grWiny, grWinw / 5,   grWinh, grSpanSplit * (-1.0 + 10));
+                grScreens[2]->activate(grWinx + grWinw * 2/5, grWiny, grWinw / 5,   grWinh, grSpanSplit * (0.0 + 10));
+                grScreens[3]->activate(grWinx + grWinw * 3/5, grWiny, grWinw / 5,   grWinh, grSpanSplit * (1.0 + 10));
+                grScreens[4]->activate(grWinx + grWinw * 4/5, grWiny, grWinw / 5,   grWinh, grSpanSplit * (2.0 + 10));
+                break;
+            }
+            for (i=5; i < GR_NB_MAX_SCREEN; i++)
+                grScreens[i]->deactivate();
+            break;
+        case 6:
+            switch (grNbArrangeScreens) {
+            case 2:
+                if (grSpanSplit) {
+                    // five side by side + 1 for rear view - only when spanning splits
+                    grScreens[0]->activate(grWinx,                grWiny, grWinw / 6,   grWinh, grSpanSplit * (-2.0 + 10));
+                    grScreens[1]->activate(grWinx + grWinw / 6,   grWiny, grWinw / 6,   grWinh, grSpanSplit * (-1.0 + 10));
+                    grScreens[2]->activate(grWinx + grWinw * 2/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (0.0 + 10));
+                    grScreens[3]->activate(grWinx + grWinw * 3/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (1.0 + 10));
+                    grScreens[4]->activate(grWinx + grWinw * 4/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (2.0 + 10));
+                    grScreens[5]->activate(grWinx + grWinw * 5/6, grWiny, grWinw / 6,   grWinh, 0.0);
+                    break;
+                }
+            default:
+                grNbArrangeScreens = 0;
+            case 0:
+                // Top/Bottom Left/Middle/Rigth Matrix
+                grScreens[0]->activate(grWinx,                grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);
+                grScreens[1]->activate(grWinx + grWinw / 3,   grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);
+                grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);
+                grScreens[3]->activate(grWinx,                grWiny,              grWinw / 3, grWinh / 2, 0.0);
+                grScreens[4]->activate(grWinx + grWinw / 3,   grWiny,              grWinw / 3, grWinh / 2, 0.0);
+                grScreens[5]->activate(grWinx + grWinw * 2/3, grWiny,              grWinw / 3, grWinh / 2, 0.0);
+                break;
+            case 1:
+                // All side by side
+                grScreens[0]->activate(grWinx,                grWiny, grWinw / 6,   grWinh, grSpanSplit * (-2.5 + 10));
+                grScreens[1]->activate(grWinx + grWinw / 6,   grWiny, grWinw / 6,   grWinh, grSpanSplit * (-1.5 + 10));
+                grScreens[2]->activate(grWinx + grWinw * 2/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (-0.5 + 10));
+                grScreens[3]->activate(grWinx + grWinw * 3/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (0.5 + 10));
+                grScreens[4]->activate(grWinx + grWinw * 4/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (1.5 + 10));
+                grScreens[5]->activate(grWinx + grWinw * 5/6, grWiny, grWinw / 6,   grWinh, grSpanSplit * (2.5 + 10));
+                break;
+            }
+            for (i=6; i < GR_NB_MAX_SCREEN; i++)
+                grScreens[i]->deactivate();
+            break;
+        }
 }
 
 static void
 grSplitScreen(void *vp)
 {
-	// Change the number of active screens as specified.
+    // Change the number of active screens as specified.
     long p = (long)vp;
 
     switch (p) {
-		case GR_SPLIT_ADD:
-			if (grNbActiveScreens < GR_NB_MAX_SCREEN)
-				grNbActiveScreens++;
-				if (grSpanSplit) 
-					grNbArrangeScreens=1;
-				else
-					grNbArrangeScreens=0;
-			break;
-		case GR_SPLIT_REM:
-			if (grNbActiveScreens > 1)
-				grNbActiveScreens--;
-				if (grSpanSplit) 
-					grNbArrangeScreens=1;
-				else
-					grNbArrangeScreens=0;
-			break;
-		case GR_SPLIT_ARR:
-			grNbArrangeScreens++;
+        case GR_SPLIT_ADD:
+            if (grNbActiveScreens < GR_NB_MAX_SCREEN)
+                grNbActiveScreens++;
+                if (grSpanSplit)
+                    grNbArrangeScreens=1;
+                else
+                    grNbArrangeScreens=0;
+            break;
+        case GR_SPLIT_REM:
+            if (grNbActiveScreens > 1)
+                grNbActiveScreens--;
+                if (grSpanSplit)
+                    grNbArrangeScreens=1;
+                else
+                    grNbArrangeScreens=0;
+            break;
+        case GR_SPLIT_ARR:
+            grNbArrangeScreens++;
     }
 
-	// Ensure current screen index stays in the righ range.
-	if (nCurrentScreenIndex >= grNbActiveScreens) {
-		nCurrentScreenIndex = grNbActiveScreens - 1;
-		GfParmSetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_CUR_SCREEN, NULL, nCurrentScreenIndex);
-	}
+    // Ensure current screen index stays in the righ range.
+    if (nCurrentScreenIndex >= grNbActiveScreens) {
+        nCurrentScreenIndex = grNbActiveScreens - 1;
+        GfParmSetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_CUR_SCREEN, NULL, nCurrentScreenIndex);
+    }
 
-	// Save nb of active screens to user settings.
+    // Save nb of active screens to user settings.
     GfParmSetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, grNbActiveScreens);
     GfParmSetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_ARR_SCREENS, NULL, grNbArrangeScreens);
     GfParmWriteFile(NULL, grHandle, "Graph");
@@ -396,12 +396,12 @@ grChangeScreen(void *vp)
     long p = (long)vp;
 
     switch (p) {
-		case GR_NEXT_SCREEN:
-			nCurrentScreenIndex = (nCurrentScreenIndex + 1) % grNbActiveScreens;
-			break;
-		case GR_PREV_SCREEN:
-			nCurrentScreenIndex = (nCurrentScreenIndex - 1 + grNbActiveScreens) % grNbActiveScreens;
-			break;
+        case GR_NEXT_SCREEN:
+            nCurrentScreenIndex = (nCurrentScreenIndex + 1) % grNbActiveScreens;
+            break;
+        case GR_PREV_SCREEN:
+            nCurrentScreenIndex = (nCurrentScreenIndex - 1 + grNbActiveScreens) % grNbActiveScreens;
+            break;
     }
 
     GfLogInfo("Changing current screen to #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
@@ -410,8 +410,7 @@ grChangeScreen(void *vp)
     GfParmWriteFile(NULL, grHandle, "Graph");
 }
 
-class cGrScreen *
-grGetCurrentScreen(void)
+cGrScreen *grGetCurrentScreen(void)
 {
     return grScreens[nCurrentScreenIndex];
 }
@@ -432,16 +431,16 @@ grSelectCamera(void *vp)
         long cam;
         int i, subcam;
 
-	cam = (long) vp;
-	subcam = grGetCurrentScreen()->getNthCamera();
+    cam = (long) vp;
+    subcam = grGetCurrentScreen()->getNthCamera();
 
         for (i=0; i < grNbActiveScreens; i++)
-    		if (grScreens[i]->getViewOffset() )
-		            grScreens[i]->selectNthCamera(cam, subcam);
+            if (grScreens[i]->getViewOffset() )
+                    grScreens[i]->selectNthCamera(cam, subcam);
     }
 }
 
-cGrCamera * grGetCurCamera() 
+cGrCamera * grGetCurCamera()
 {
     return grGetCurrentScreen()->getCurCamera();
 }
@@ -515,13 +514,13 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     frameInfo.fAvgFps = 0.0;
     frameInfo.nInstFrames = 0;
     frameInfo.nTotalFrames = 0;
-	fFPSPrevInstTime = GfTimeClock();
+    fFPSPrevInstTime = GfTimeClock();
     nFPSTotalSeconds = 0;
 
-	// Create the screens and initialize each board.
+    // Create the screens and initialize each board.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-	 	grScreens[i] = new cGrScreen(i);
-		grScreens[i]->initBoard();
+        grScreens[i] = new cGrScreen(i);
+        grScreens[i]->initBoard();
     }
 
     GfuiAddKey(screen, GFUIK_END,      "Zoom Minimum", (void*)GR_ZOOM_MIN,	grSetZoom, NULL);
@@ -561,7 +560,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)GR_NEXT_SCREEN, grChangeScreen, NULL);
     GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);
 
-	GfLogInfo("Current screen is #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
+    GfLogInfo("Current screen is #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
 
     grInitScene();
 
@@ -578,50 +577,50 @@ refresh(tSituation *s)
 
     GfProfStartProfile("refresh");
 
-	// Compute FPS indicators every second.
+    // Compute FPS indicators every second.
     frameInfo.nInstFrames++;
-	frameInfo.nTotalFrames++;
+    frameInfo.nTotalFrames++;
     const double dCurTime = GfTimeClock();
-	const double dDeltaTime = dCurTime - fFPSPrevInstTime;
+    const double dDeltaTime = dCurTime - fFPSPrevInstTime;
     if (dDeltaTime > 1.0) {
-		++nFPSTotalSeconds;
-		fFPSPrevInstTime = dCurTime;
-		frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
-		frameInfo.nInstFrames = 0;
-		frameInfo.fAvgFps = (double)frameInfo.nTotalFrames / nFPSTotalSeconds;
+        ++nFPSTotalSeconds;
+        fFPSPrevInstTime = dCurTime;
+        frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
+        frameInfo.nInstFrames = 0;
+        frameInfo.fAvgFps = (double)frameInfo.nTotalFrames / nFPSTotalSeconds;
     }
 
     TRACE_GL("refresh: start");
 
-	// Moved car collision damage propagation from grcar::grDrawCar.
-	// Because it has to be done only once per graphics update, whereas grDrawCar
-	// is called once for each car and for each screen.
-	grPropagateDamage(s);
+    // Moved car collision damage propagation from grcar::grDrawCar.
+    // Because it has to be done only once per graphics update, whereas grDrawCar
+    // is called once for each car and for each screen.
+    grPropagateDamage(s);
 
-	// Update sky if dynamic time enabled.
-	grUpdateSky(s->currentTime, s->accelTime);
-	
+    // Update sky if dynamic time enabled.
+    grUpdateSky(s->currentTime, s->accelTime);
+
     GfProfStartProfile("grDrawBackground/glClear");
     glDepthFunc(GL_LEQUAL);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GfProfStopProfile("grDrawBackground/glClear");
 
     for (i = 0; i < grNbActiveScreens; i++) {
-		grScreens[i]->update(s, &frameInfo);
+        grScreens[i]->update(s, &frameInfo);
     }
 
     grUpdateSmoke(s->currentTime);
     grTrackLightUpdate(s);
 
     GfProfStopProfile("refresh");
-	
+
     return 0;
 }
 
 int
 initCars(tSituation *s)
 {
-	char buf[256];
+    char buf[256];
     char	idx[16];
     int		index;
     int		i;
@@ -647,70 +646,70 @@ initCars(tSituation *s)
 
     grCarInfo = (tgrCarInfo*)calloc(s->_ncars, sizeof(tgrCarInfo));
 
-	for (i = 0; i < s->_ncars; i++) {
-		elt = s->cars[i];
-		/* Car pre-initialization */
-		grPreInitCar(elt);
-		/* Shadow init (Should be done before the cars for display order) */
-		grInitShadow(elt);
-		/* Skidmarks init */
-		grInitSkidmarks(elt);
-	}
-
     for (i = 0; i < s->_ncars; i++) {
-	elt = s->cars[i];
-	index = elt->index;
-	hdle = elt->_paramsHandle;
-
-	// WARNING: This index hack on the human robot for the Career mode
-	//          does no more work with the new "welcome" module system
-	//          (the "normal" index has no more the 10 limit) ... TO BE FIXED !!!!!!!
-	if (elt->_driverType == RM_DRV_HUMAN && elt->_driverIndex > 10)
-		sprintf(idx, "Robots/index/%d", elt->_driverIndex - 11);
-	else
-		sprintf(idx, "Robots/index/%d", elt->_driverIndex);
-
-	grCarInfo[index].iconColor[0] = GfParmGetNum(hdle, idx, "red",   (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "red",   NULL, 0));
-	grCarInfo[index].iconColor[1] = GfParmGetNum(hdle, idx, "green", (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "green", NULL, 0));
-	grCarInfo[index].iconColor[2] = GfParmGetNum(hdle, idx, "blue",  (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "blue",  NULL, 0));
-	grCarInfo[index].iconColor[3] = 1.0;
-	grInitCar(elt);
-
-	// Pre-assign each human driver (if any) to a different screen
-	// (set him as the "current driver" for this screen).
-	if (grNbSuggestedScreens < GR_NB_MAX_SCREEN
-		&& elt->_driverType == RM_DRV_HUMAN && !elt->_networkPlayer) 
-	{
-	    grScreens[grNbSuggestedScreens]->setCurrentCar(elt);
-		GfLogTrace("Screen #%d : Assigned to %s\n", grNbSuggestedScreens, elt->_name);
-	    grNbSuggestedScreens++;
-	}
+        elt = s->cars[i];
+        /* Car pre-initialization */
+        grPreInitCar(elt);
+        /* Shadow init (Should be done before the cars for display order) */
+        grInitShadow(elt);
+        /* Skidmarks init */
+        grInitSkidmarks(elt);
     }
 
-	/* Check whether view should be spanned across vertical splits */
-	pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
-	grSpanSplit = strcmp(pszSpanSplit, GR_VAL_YES) ? 0 : 1;
-	nCurrentScreenIndex = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_CUR_SCREEN, NULL, nCurrentScreenIndex);
+    for (i = 0; i < s->_ncars; i++) {
+    elt = s->cars[i];
+    index = elt->index;
+    hdle = elt->_paramsHandle;
 
-	if (grSpanSplit == 0 && grNbSuggestedScreens > 1) {
-		// Mulitplayer, so ignore the stored number of screens
-		grNbActiveScreens = grNbSuggestedScreens;
-		grNbArrangeScreens = 0;
-	} else {
-	     	// Load the real number of active screens and the arrangment.
-		grNbActiveScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, 1.0);
-		grNbArrangeScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_ARR_SCREENS, NULL, 0.0);
-	}
+    // WARNING: This index hack on the human robot for the Career mode
+    //          does no more work with the new "welcome" module system
+    //          (the "normal" index has no more the 10 limit) ... TO BE FIXED !!!!!!!
+    if (elt->_driverType == RM_DRV_HUMAN && elt->_driverIndex > 10)
+        sprintf(idx, "Robots/index/%d", elt->_driverIndex - 11);
+    else
+        sprintf(idx, "Robots/index/%d", elt->_driverIndex);
 
-	// Ensure current screen index stays in the righ range.
-	if (nCurrentScreenIndex >= grNbActiveScreens) {
-		nCurrentScreenIndex = grNbActiveScreens - 1;
-		GfParmSetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_CUR_SCREEN, NULL, nCurrentScreenIndex);
-	}
+    grCarInfo[index].iconColor[0] = GfParmGetNum(hdle, idx, "red",   (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "red",   NULL, 0));
+    grCarInfo[index].iconColor[1] = GfParmGetNum(hdle, idx, "green", (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "green", NULL, 0));
+    grCarInfo[index].iconColor[2] = GfParmGetNum(hdle, idx, "blue",  (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "blue",  NULL, 0));
+    grCarInfo[index].iconColor[3] = 1.0;
+    grInitCar(elt);
 
-	// Initialize the cameras for all the screens.
+    // Pre-assign each human driver (if any) to a different screen
+    // (set him as the "current driver" for this screen).
+    if (grNbSuggestedScreens < GR_NB_MAX_SCREEN
+        && elt->_driverType == RM_DRV_HUMAN && !elt->_networkPlayer)
+    {
+        grScreens[grNbSuggestedScreens]->setCurrentCar(elt);
+        GfLogTrace("Screen #%d : Assigned to %s\n", grNbSuggestedScreens, elt->_name);
+        grNbSuggestedScreens++;
+    }
+    }
+
+    /* Check whether view should be spanned across vertical splits */
+    pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
+    grSpanSplit = strcmp(pszSpanSplit, GR_VAL_YES) ? 0 : 1;
+    nCurrentScreenIndex = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_CUR_SCREEN, NULL, nCurrentScreenIndex);
+
+    if (grSpanSplit == 0 && grNbSuggestedScreens > 1) {
+        // Mulitplayer, so ignore the stored number of screens
+        grNbActiveScreens = grNbSuggestedScreens;
+        grNbArrangeScreens = 0;
+    } else {
+            // Load the real number of active screens and the arrangment.
+        grNbActiveScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, 1.0);
+        grNbArrangeScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_ARR_SCREENS, NULL, 0.0);
+    }
+
+    // Ensure current screen index stays in the righ range.
+    if (nCurrentScreenIndex >= grNbActiveScreens) {
+        nCurrentScreenIndex = grNbActiveScreens - 1;
+        GfParmSetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_CUR_SCREEN, NULL, nCurrentScreenIndex);
+    }
+
+    // Initialize the cameras for all the screens.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-	grScreens[i]->initCams(s);
+    grScreens[i]->initCams(s);
     }
 
     //Write back to file
@@ -718,11 +717,11 @@ initCars(tSituation *s)
 
     TRACE_GL("initCars: end");
 
-	// Initialize other stuff.
+    // Initialize other stuff.
     grInitSmoke(s->_ncars);
     grTrackLightInit();
 
-	// Setup the screens (= OpenGL viewports) inside the physical game window.
+    // Setup the screens (= OpenGL viewports) inside the physical game window.
     grAdaptScreenSize();
 
     return 0; // true;
@@ -731,93 +730,93 @@ initCars(tSituation *s)
 void
 shutdownCars(void)
 {
-	int i;
+    int i;
 
-	GfOut("-- shutdownCars\n");
-	if (grNbCars) {
-		grShutdownBoardCar();
-		grShutdownSkidmarks();
-		grShutdownSmoke();
-		grShutdownCarlight();
-		grTrackLightShutdown();
-		/* Delete ssg objects */
-		CarsAnchor->removeAllKids();
-		ShadowAnchor->removeAllKids();
-		for (i = 0; i < grNbCars; i++) {
-			ssgDeRefDelete(grCarInfo[i].envSelector);
-			ssgDeRefDelete(grCarInfo[i].shadowBase);
-			if (grCarInfo[i].driverSelectorinsg == false) {
-				delete grCarInfo[i].driverSelector;
-			}
-		}
+    GfOut("-- shutdownCars\n");
+    if (grNbCars) {
+        grShutdownBoardCar();
+        grShutdownSkidmarks();
+        grShutdownSmoke();
+        grShutdownCarlight();
+        grTrackLightShutdown();
+        /* Delete ssg objects */
+        CarsAnchor->removeAllKids();
+        ShadowAnchor->removeAllKids();
+        for (i = 0; i < grNbCars; i++) {
+            ssgDeRefDelete(grCarInfo[i].envSelector);
+            ssgDeRefDelete(grCarInfo[i].shadowBase);
+            if (grCarInfo[i].driverSelectorinsg == false) {
+                delete grCarInfo[i].driverSelector;
+            }
+        }
 
-		PitsAnchor->removeAllKids();
-		ThePits = 0;
-		free(grCarInfo);
-	}
+        PitsAnchor->removeAllKids();
+        ThePits = 0;
+        free(grCarInfo);
+    }
 
-	for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-		grScreens[i]->setCurrentCar(NULL);
-	}
+    for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
+        grScreens[i]->setCurrentCar(NULL);
+    }
 
-	GfParmReleaseHandle(grHandle);
-	grHandle = NULL;
+    GfParmReleaseHandle(grHandle);
+    grHandle = NULL;
 
-	if (nFPSTotalSeconds > 0)
-		GfLogTrace("Average frame rate: %.2f F/s\n",
-				   (double)frameInfo.nTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - fFPSPrevInstTime));
+    if (nFPSTotalSeconds > 0)
+        GfLogTrace("Average frame rate: %.2f F/s\n",
+                   (double)frameInfo.nTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - fFPSPrevInstTime));
 }
 
 int
 initTrack(tTrack *track)
 {
-	// The inittrack does as well init the context, that is highly inconsistent, IMHO.
-	// TODO: Find a solution to init the graphics first independent of objects.
-	grContext.makeCurrent();
+    // The inittrack does as well init the context, that is highly inconsistent, IMHO.
+    // TODO: Find a solution to init the graphics first independent of objects.
+    grContext.makeCurrent();
 
-	setupOpenGLFeatures();
-    
-	grssgSetCurrentOptions(&options);
+    setupOpenGLFeatures();
 
-	// Now, do the real track loading job.
-	grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	if (grNbActiveScreens > 0)
-		return grLoadScene(track);
+    grssgSetCurrentOptions(&options);
 
-	return -1;
+    // Now, do the real track loading job.
+    grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    if (grNbActiveScreens > 0)
+        return grLoadScene(track);
+
+    return -1;
 }
 
 
 void
 shutdownTrack(void)
 {
-	// Do the real track termination job.
-	grShutdownScene();
+    // Do the real track termination job.
+    grShutdownScene();
 
-	if (grTrackHandle)
-	{
-		GfParmReleaseHandle(grTrackHandle);
-		grTrackHandle = 0;
-	}
+    if (grTrackHandle)
+    {
+        GfParmReleaseHandle(grTrackHandle);
+        grTrackHandle = 0;
+    }
 
-	// And then the context termination job (should not be there, see initTrack).
-	options.endLoad();
-	
-	grShutdownState();
+    // And then the context termination job (should not be there, see initTrack).
+    options.endLoad();
+
+    grShutdownState();
 }
 
 void
 shutdownView(void)
 {
-	for (int i = 0; i < GR_NB_MAX_SCREEN; i++)
-	{
-		delete grScreens[i];
-		grScreens[i] = 0;
-	}
+    for (int i = 0; i < GR_NB_MAX_SCREEN; i++)
+    {
+        delete grScreens[i];
+        grScreens[i] = 0;
+    }
 }
 
 //void SsgGraph::bendCar(int index, sgVec3 poc, sgVec3 force, int count)
 //{
-//	if (grCarInfo) 
+//	if (grCarInfo)
 //		grPropagateDamage (grCarInfo[index].carEntity, poc, force, count);
 //}

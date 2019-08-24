@@ -70,6 +70,7 @@ private:
   float scale;
   float speed;
   float direction;
+  float humidity;
 
   double last_lon, last_lat;
   double last_x, last_y;
@@ -79,8 +80,8 @@ public:
   cGrCloudLayer( void );
   ~cGrCloudLayer( void );
 
-  void build( const char *cloud_tex_path, float span, float elevation, float thickness, float transition );
-  void build( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition );
+  void build(const char *cloud_tex_path, float span, float elevation, float thickness, float transition , float hum);
+  void build(ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition , float hum);
 
   bool repositionFlat( sgVec3 p, double dt );
   bool reposition( sgVec3 p, sgVec3 up, double lon, double lat, double alt, double dt );
@@ -395,8 +396,8 @@ public:
       int nplanets, sgdVec3 *planet_data,
       int nstars, sgdVec3 *star_data, double humidity, double airdensity );
 
-    cGrCloudLayer* addCloud( const char *cloud_tex_path, float span, float elevation, float thickness, float transition );
-    cGrCloudLayer* addCloud( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition );
+    cGrCloudLayer* addCloud( const char *cloud_tex_path, float span, float elevation, float thickness, float transition, float hum );
+    cGrCloudLayer* addCloud(ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition, float hum );
     cGrCloudLayer* getCloud(int i) { return clouds.get(i); }
     int getCloudCount() { return clouds.getNum(); }
 
