@@ -279,18 +279,15 @@ else(OPTION_ENET)
 endif(OPTION_ENET)
 
 if(OPTION_OGG)
-ExternalProject_Add(libogg-1.3.3
-   URL http://downloads.xiph.org/releases/ogg/libogg-1.3.3.tar.gz
-   URL_HASH SHA256=c2e8a485110b97550f453226ec644ebac6cb29d1caef2902c007edab4308d985
-   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-   )
-   ExternalProject_Add_Step(libogg-1.3.3 libogg_add_cmake
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/libogg-1.3.3.CMakeLists.txt"
-           "<SOURCE_DIR>/CMakeLists.txt"
-   DEPENDEES update # do after update
-   DEPENDERS patch  # do before patch
-   )
+   set(OGG_PROJECT ogg-1.3.4)
+   set(OGG_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS=on -DBUILD_TESTING=off -DINSTALL_DOCS=off )
+   ExternalProject_Add(${OGG_PROJECT}
+      URL http://downloads.xiph.org/releases/ogg/libogg-1.3.4.tar.gz
+      URL_HASH SHA256=fe5670640bd49e828d64d2879c31cb4dde9758681bb664f9bdbf159a01b0c76e
+      CMAKE_ARGS ${OGG_ARGS}
+      )
+else(OPTION_OGG)
+   set(OGG_PROJECT )
 endif(OPTION_OGG)
 
 if(OPTION_VORBIS)
@@ -298,7 +295,7 @@ ExternalProject_Add(libvorbis-1.3.6
    URL http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.6.tar.gz
    URL_HASH SHA256=6ed40e0241089a42c48604dc00e362beee00036af2d8b3f46338031c9e0351cb
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-   DEPENDS "libogg-1.3.3"
+   DEPENDS ${OGG_PROJECT}
    )
    ExternalProject_Add_Step(libvorbis-1.3.6 libvorbis_add_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different

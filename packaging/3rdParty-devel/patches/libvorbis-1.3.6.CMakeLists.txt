@@ -107,7 +107,7 @@ set(libvorbis_HEADERS lib/backends.h
 
 
 add_library(libvorbis SHARED ${libvorbis_SOURCES} ${libvorbis_HEADERS})
-target_link_libraries(libvorbis libogg)
+target_link_libraries(libvorbis ogg)
 
 ##############################################################################
 ## vorbisfile
@@ -122,21 +122,21 @@ set(libvorbisfile_HEADERS include/vorbis/vorbisfile.h
 
 
 add_library(libvorbisfile SHARED ${libvorbisfile_SOURCES} ${libvorbisfile_HEADERS})
-target_link_libraries(libvorbisfile libogg libvorbis)
+target_link_libraries(libvorbisfile ogg libvorbis)
 
 ##############################################################################
 ## vorbisdec
 set(vorbisdec_SOURCES examples/decoder_example.c)
 
 add_executable(vorbisdec ${vorbisdec_SOURCES})
-target_link_libraries(vorbisdec libogg libvorbis)
+target_link_libraries(vorbisdec ogg libvorbis)
 
 ##############################################################################
 ## vorbisenc
 set(vorbisenc_SOURCES examples/encoder_example.c)
 
 add_executable(vorbisenc ${vorbisenc_SOURCES})
-target_link_libraries(vorbisenc libogg libvorbis)
+target_link_libraries(vorbisenc ogg libvorbis)
 
 ##############################################################################
 ## installation
