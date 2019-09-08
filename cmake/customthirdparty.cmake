@@ -121,7 +121,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 
 	# Menu Music requires ogg, vorbis, and vorbisfile 
 	# OGG.
-	_FIND_3RDPARTY_DEPENDENCY(OGG ogg/ogg.h "" libogg ${ROOT_DIR} "")
+	_FIND_3RDPARTY_DEPENDENCY(OGG ogg/ogg.h "" "ogg;libogg" ${ROOT_DIR} "")
 
 	# Vorbis.
 	_FIND_3RDPARTY_DEPENDENCY(VORBIS vorbis/vorbisfile.h "" libvorbis ${ROOT_DIR} "")
@@ -309,7 +309,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	# Menu Music requires ogg, vorbis, and vorbisfile 
-	_FIND_3RDPARTY_DLL("${OGG_LIBRARY}" "libogg;libogg-0" "" _DLL_PATHNAME)
+	_FIND_3RDPARTY_DLL("${OGG_LIBRARY}" "ogg;libogg;libogg-0" "" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	_FIND_3RDPARTY_DLL("${VORBIS_LIBRARY}" "libvorbis;libvorbis-0" "" _DLL_PATHNAME)
