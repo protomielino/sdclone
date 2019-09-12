@@ -411,11 +411,11 @@ else(OPTION_FREETYPE)
 endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
-   set(CURL_PROJECT curl-7.65.3)
+   set(CURL_PROJECT curl-7.66.0)
    set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off -DCMAKE_DEBUG_POSTFIX=)
    ExternalProject_Add(${CURL_PROJECT}
-   URL https://curl.haxx.se/download/curl-7.65.3.tar.bz2
-   URL_HASH SHA256=0a855e83be482d7bc9ea00e05bdb1551a44966076762f9650959179c89fce509
+   URL https://curl.haxx.se/download/curl-7.66.0.tar.bz2
+   URL_HASH SHA256=6618234e0235c420a21f4cb4c2dd0badde76e6139668739085a70c4e2fe7a141
    CMAKE_ARGS ${CURL_ARGS}
    DEPENDS ${ZLIB_PROJECT}
    )
@@ -431,7 +431,7 @@ if(OPTION_OSG)
 #      set(OSG_ARGS ${OSG_ARGS} -D BUILD_OSG_PLUGIN_TGA=0)
 #   endif()
 
-   ExternalProject_Add(osg-OpenSceneGraph-3.6.4
+   ExternalProject_Add(OpenSceneGraph-3.6.4
    URL https://github.com/openscenegraph/OpenSceneGraph/archive/OpenSceneGraph-3.6.4.zip
    URL_HASH SHA256=4c1f82b0541f905da49ea70b4b4c9fee20c78fb5b9534b3f8990357ea05874ab
    CMAKE_ARGS ${OSG_ARGS}
@@ -439,7 +439,8 @@ if(OPTION_OSG)
    )
    if(MSVC_VERSION LESS 1900)
       message(WARNING "Remove this block when OSG TGA Plugin is fixed")
-      ExternalProject_Add_Step(osg-OpenSceneGraph-3.6.4 ReaderWriterTGA-fixed
+      message(WARNING "Already fixed upstream")
+      ExternalProject_Add_Step(OpenSceneGraph-3.6.4 ReaderWriterTGA-fixed
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
               "${CMAKE_SOURCE_DIR}/patches/ReaderWriterTGA-fixed.cpp"
               "<SOURCE_DIR>/src/osgPlugins/tga/ReaderWriterTGA.cpp"
