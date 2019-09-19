@@ -24,6 +24,15 @@
 class CarModel
 {
 public:
+    enum
+    {
+        F_NONE					= 0x00,
+        F_OLD_AERO_1			= 0x01,
+        F_SEPARATE_FRONT_REAR	= 0x02,
+        F_USE_PATH_PITCH		= 0x04,
+        F_USE_KV				= 0x08,
+    };
+
     CarModel();
     ~CarModel();
 
@@ -32,13 +41,16 @@ public:
     double	CalcAcceleration( double k0, double kz0, double k1, double kz1, double spd0, double dist, double kFriction, double RollAngle, double TiltAngle ) const;
     double	CalcMaxSpdK() const;
     double	CalcMaxLateralF(double spd, double kFriction , double kz = 0.0) const;
+    double	calcPredictedLoad( double speed, double weight_fraction, double downforce_constant, double k, double kz, double kv, double sin_roll, double cos_roll, double cos_pitch ) const;
 
     double CalcMaxSpeedCrv() const;
 
     void	CalcSimuSpeeds( double spd0, double dy, double dist, double kFriction, double& minSpd, double& maxSpd ) const;
     void	CalcSimuSpeedRanges( double spd0, double dist, double kFriction, double& minSpd, double& maxSpd, double& maxDY ) const;
 
+
 public:
+    int		FLAGS;			// options that modify calculations
     int		AERO;           // which aero calc to use.
     double  EMPTYMASS;
     double	MASS;           // fixed mass of car.
@@ -69,7 +81,8 @@ public:
     double	CD_WING;        // aerodynamic drag constant -- wings
     double  CD_CX;
     double	KZ_SCALE;       // bump sensitivity.
-	double  OFFLINE_KZ_SCALE;
+    double	KV_SCALE;		// bump sensitivity.
+    double  OFFLINE_KZ_SCALE;
     double  BUMP_FACTOR;    // bump sensitivity factor.
     double	BUMP_FACTORLEFT;
     double	BUMP_FACTORRIGHT;

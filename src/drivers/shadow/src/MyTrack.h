@@ -24,57 +24,59 @@
 #include "Seg.h"
 #include "PtInfo.h"
 
-class MyTrack  
+class MyTrack
 {
 public:
-	struct SideMod
-	{
-		SideMod() : side(-1), start(0), end(0) {}
+    struct SideMod
+    {
+        SideMod() : side(-1), start(0), end(0) {}
 
-		int		side;
-		int		start;
-		int		end;
-	};
+        int		side;
+        int		start;
+        int		end;
+    };
 
 public:
-	MyTrack();
-	~MyTrack();
+    MyTrack();
+    ~MyTrack();
 
-	void	NewTrack( tTrack* pNewTrack, bool pit = false, SideMod* pSideMod = 0 );
+    void	NewTrack( tTrack* pNewTrack, bool pit = false, SideMod* pSideMod = 0 );
 
-	tTrack*			GetTrack();
-	const tTrack*	GetTrack() const;
+    tTrack*			GetTrack();
+    const tTrack*	GetTrack() const;
 
-	double	GetLength() const;
-	int		GetSize() const;
-	double	GetWidth() const;
+    double	GetLength() const;
+    int		GetSize() const;
+    double	GetWidth() const;
 
-	double	NormalisePos( double trackPos ) const;
-	int		IndexFromPos( double trackPos ) const;
+    double	NormalisePos( double trackPos ) const;
+    int		IndexFromPos( double trackPos ) const;
 
-	const Seg&	operator[]( int index ) const;
-	const Seg&	GetAt( int index ) const;
+    const Seg&	operator[]( int index ) const;
+    const Seg&	GetAt( int index ) const;
 
-	double	GetDelta() const;
-	double	CalcPos( tTrkLocPos& trkPos, double offset = 0 ) const;
-	double	CalcPos( tCarElt* car, double offset = 0 ) const;
-	double	CalcPos( double x, double y, const Seg* hint = 0, bool sides = false ) const;
+    double	GetDelta() const;
+    double	CalcPos( tTrkLocPos& trkPos, double offset = 0 ) const;
+    double	CalcPos( tCarElt* car, double offset = 0 ) const;
+    double	CalcPos( double x, double y, const Seg* hint = 0, bool sides = false ) const;
 
-	double	CalcForwardAngle( double trackPos ) const;
-	Vec2d	CalcNormal( double trackPos ) const;
+    double	CalcHeightAbovePoint( const Vec3d& start_point, const Vec3d& direction, const Seg* hint = 0 ) const;
 
-	double	GetFriction( int index, double offset ) const;
+    double	CalcForwardAngle( double trackPos ) const;
+    Vec2d	CalcNormal( double trackPos ) const;
 
-private:
-	void	CalcPtAndNormal( const tTrackSeg* pSeg, double toStart,
-							 double& t, Vec3d& pt, Vec3d& norm ) const;
+    double	GetFriction( int index, double offset ) const;
 
 private:
-	int		NSEG;
-	double	m_delta;
-	Seg*	m_pSegs;
-	tTrack*	m_pCurTrack;
-	SideMod	m_sideMod;
+    void	CalcPtAndNormal( const tTrackSeg* pSeg, double toStart,
+                             double& t, Vec3d& pt, Vec3d& norm ) const;
+
+private:
+    int		NSEG;
+    double	m_delta;
+    Seg*	m_pSegs;
+    tTrack*	m_pCurTrack;
+    SideMod	m_sideMod;
 };
 
 #endif // !defined(AFX_MYTRACK_H__402D20B8_71B6_4F2C_B169_F4A3552012EB__INCLUDED_)

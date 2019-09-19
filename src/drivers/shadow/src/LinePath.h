@@ -22,75 +22,97 @@
 #include "MyTrack.h"
 #include "CarModel.h"
 
+#include <vector>
+
 class LinePath : public Path
 {
 public:
-	struct PathPt
-	{
-		const Seg*	pSeg;		// track seg that contains this Seg.
+    struct PathPt
+    {
+        const Seg*	pSeg;		// track seg that contains this Seg.
         double		k;			// curvature in xy.
-		double		kz;			// curvature in z direction... e.g. bumps.
-		double		offs;		// offs from centre point.
-		Vec3d		pt;			// actual pt (same as CalcPt())
-		double		maxSpd;		// max speed through this pt.
-		double		spd;		// speed through this pt (braking only).
-		double		accSpd;		// speed through this pt, with modelled accel.
-		double		h;			// predicted height of car above track (flying).
-		double		lBuf;		// buffer from left for safety.
-		double		rBuf;		// buffer from right for safety.
-		double		fwdK;
+        double		kz;			// curvature in z direction... e.g. bumps.
+        double      kh;
+        double      kv;
+        double		offs;		// offs from centre point.
+        Vec3d		pt;			// actual pt (same as CalcPt())
+        double      ap;
+        double      ar;
+        double      loadratio;
+        double		maxSpd;		// max speed through this pt.
+        double		spd;		// speed through this pt (braking only).
+        double		accSpd;		// speed through this pt, with modelled accel.
+        double		h;			// predicted height of car above track (flying).
+        double		lBuf;		// buffer from left for safety.
+        double		rBuf;		// buffer from right for safety.
+        double		fwdK;
+        bool        fixed;
 
-		double		Dist() const	{ return pSeg->segDist; }
-		double		Wl() const		{ return pSeg->wl; }
-		double		Wr() const		{ return pSeg->wr; }
-		const Vec3d&Pt() const		{ return pSeg->pt; }
-		const Vec3d&Norm() const	{ return pSeg->norm; }
-		Vec3d		CalcPt() const	{ return pSeg->pt + pSeg->norm * offs; }
-	};
+        double		Dist() const	{ return pSeg->segDist; }
+        double		Wl() const		{ return pSeg->wl; }
+        double		Wr() const		{ return pSeg->wr; }
+        double		Extl() const	{ return pSeg->el; }
+        double		Extr() const	{ return pSeg->er; }
+
+        const Vec3d&Pt() const		{ return pSeg->pt; }
+        const Vec3d&Norm() const	{ return pSeg->norm; }
+        Vec3d CalcPt() const	    { return pSeg->pt + pSeg->norm * offs; }
+        Vec3d CalcPt(double o) const { return pSeg->pt + pSeg->norm * o; }
+    };
 
 public:
-	LinePath();
-	virtual ~LinePath();
+    LinePath();
+    virtual ~LinePath();
 
-	virtual LinePath&	operator=( const LinePath& path );
+    virtual LinePath&	operator=( const LinePath& path );
 
-	//	CPath overrides.
-	virtual bool	ContainsPos( double trackPos ) const;
-	virtual bool	GetPtInfo( double trackPos, PtInfo& pi ) const;
+    //	CPath overrides.
+    virtual bool	ContainsPos( double trackPos ) const;
+    virtual bool	GetPtInfo( double trackPos, PtInfo& pi ) const;
 
-	void	Set( const LinePath& path );
-	void	Initialise( MyTrack* pTrack, double maxL = 999, double maxR = 999 );
+    void	Set( const LinePath& path );
+    void	Initialise( MyTrack* pTrack, double maxL = 999, double maxR = 999 );
 
-	const PathPt&	GetAt( int idx ) const;
+    const PathPt&	GetAt( int idx ) const;
 
-	void	CalcCurvaturesXY( int start, int len, int step = 1 );
-	void	CalcCurvaturesZ( int start, int len, int step = 1 );
-	void	CalcMaxSpeeds( int start, int len, const CarModel& cm, int step = 1 );
-	void	PropagateBreaking( int start, int len, const CarModel& cm, int step = 1 );
-	void	PropagateAcceleration( int start, int len, const CarModel& cm, int step = 1 );
+    void	CalcCurvaturesXY( int start, int len, int step = 1 );
+    void	CalcCurvaturesZ( int start, int len, int step = 1 );
+    void	CalcCurvaturesV( int start, int len, int step = 1 );
+    void	CalcCurvaturesH( int start, int len, int step = 1 );
+    void	CalcAngles( int start, int len, int step = 1 );
+    void	CalcLoadRatios( int start, int len, const CarModel& cm, int step = 1 );
+    void	CalcMaxSpeeds( int start, int len, const CarModel& cm, int step = 1 );
+    void	PropagateBreaking( int start, int len, const CarModel& cm, int step = 1 );
+    void	PropagateAcceleration( int start, int len, const CarModel& cm, int step = 1 );
 
-	void	CalcCurvaturesXY( int step = 1 );
-	void	CalcCurvaturesZ( int step = 1 );
-	void	CalcMaxSpeeds( const CarModel& cm, int step = 1 );
-	void	PropagateBreaking( const CarModel& cm, int step = 1 );
-	void	PropagateAcceleration( const CarModel& cm, int step = 1 );
-	void	CalcFwdAbsK( int range, int step = 1 );
+    void	CalcCurvaturesXY( int step = 1 );
+    void	CalcCurvaturesZ( int step = 1 );
+    void	CalcCurvaturesV( int step = 1 );
+    void	CalcCurvaturesH( int step = 1 );
+    void	CalcAngles( int step = 1 );
+    void	CalcLoadRatios( const CarModel& cm, int step = 1 );
+    void	CalcMaxSpeeds( const CarModel& cm, int step = 1 );
+    void	PropagateBreaking( const CarModel& cm, int step = 1 );
+    void	PropagateAcceleration( const CarModel& cm, int step = 1 );
+    void	CalcFwdAbsK( int range, int step = 1 );
 
-	double	CalcEstimatedTime( int start, int len ) const;
-	double	CalcEstimatedLapTime() const;
+    double	CalcEstimatedTime( int start, int len ) const;
+    double	CalcEstimatedLapTime() const;
     double  CalcTrackTurnangle(int i, int j);
 
-	// for interfacing with "springs" data.
-	bool	LoadPath( const char* pDataFile );
+    // for interfacing with "springs" data.
+    bool	LoadPath( const char* pDataFile );
 
 //	const PathPt&	GetAt( int index ) const;
 
 protected:
-	MyTrack*	m_pTrack;
-	PathPt*		m_pPath;
+    int         NSEG;
+    MyTrack*	m_pTrack;
+    std::vector<PathPt>	m_pPath;
 
-	double		m_maxL;
-	double		m_maxR;
+    double		m_estimatedTime;
+    double		m_maxL;
+    double		m_maxR;
 };
 
 #endif

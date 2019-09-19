@@ -30,8 +30,9 @@ extern GfLogger* PLogSHADOW;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CarModel::CarModel()
-:	AERO(0),
+CarModel::CarModel():
+    FLAGS(F_SEPARATE_FRONT_REAR | F_USE_KV),
+    AERO(0),
     EMPTYMASS(0),
     MASS(0),
     LENGTH(0),
@@ -62,7 +63,8 @@ CarModel::CarModel()
     CD_WING(0),
     CD_CX(0),
     KZ_SCALE(0.43f),
-	OFFLINE_KZ_SCALE(0.43f),
+    KV_SCALE(1),
+    OFFLINE_KZ_SCALE(0.43f),
 
     AVOID_MU_SCALE(0.9),
 
@@ -369,14 +371,14 @@ double	CarModel::CalcAcceleration(double k0, double kz0, double k1, double kz1, 
     return v;
 }
 
-double	CarModel::CalcMaxSpdK() const
+double CarModel::CalcMaxSpdK() const
 {
     const double	MAX_SPD = 112;	// ~400 kph
 
     return GRAVITY * TYRE_MU / (MAX_SPD * MAX_SPD);
 }
 
-double	CarModel::CalcMaxLateralF( double spd, double kFriction, double kz ) const
+double CarModel::CalcMaxLateralF( double spd, double kFriction, double kz ) const
 {
 #if 0
     double	M  = MASS + FUEL;
@@ -402,7 +404,30 @@ double CarModel::CalcMaxSpeedCrv() const
   return GRAVITY * TYRE_MU / (MAX_SPD * MAX_SPD);
 }
 
-void	CarModel::CalcSimuSpeeds( double spd0, double dy, double dist, double kFriction, double& minSpd, double& maxSpd ) const
+double CarModel::calcPredictedLoad(
+    double speed,
+    double weight_fraction,
+    double downforce_constant,
+    double k,
+    double kz,
+    double kv,
+    double sin_roll,
+    double cos_roll,
+    double cos_pitch ) const
+{
+    double	load_g = (MASS + FUEL) * weight_fraction * G * cos_roll * cos_pitch;
+    double	load_a = downforce_constant * speed * speed;
+    double	load_v;
+
+    if( FLAGS & F_USE_KV )
+        load_v = (MASS + FUEL) * weight_fraction * kv * KV_SCALE * speed * speed;
+    else
+        load_v = (MASS + FUEL) * weight_fraction * cos_roll * kz * KZ_SCALE * speed * speed;
+
+    return	load_g + load_a + /*load_h*/ + load_v;
+}
+
+void CarModel::CalcSimuSpeeds( double spd0, double dy, double dist, double kFriction, double& minSpd, double& maxSpd ) const
 {
     // simple speed calc for use in simulation for path optimisation... the
     //	overriding pre-requisite of which is speed of calculation.
@@ -448,7 +473,7 @@ void	CarModel::CalcSimuSpeeds( double spd0, double dy, double dist, double kFric
     minSpd = sqrt(spd0 * spd0 - 2 * lin_acc * dist);
 }
 
-void	CarModel::CalcSimuSpeedRanges( double spd0,	double dist, double	kFriction, double& minSpd, double& maxSpd, double& maxDY ) const
+void CarModel::CalcSimuSpeedRanges( double spd0,	double dist, double	kFriction, double& minSpd, double& maxSpd, double& maxDY ) const
 {
     // simple speed calc for use in simulation for path optimisation... the
     //	overriding pre-requisite of which is speed of calculation.

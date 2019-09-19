@@ -29,26 +29,30 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-LinePath::LinePath()
-    :	m_pTrack(0),
-      m_pPath(0)
+LinePath::LinePath() :
+    NSEG(0),
+    m_pTrack(0),
+    m_pPath(0),
+    m_estimatedTime(0)
 {
 }
 
 LinePath::~LinePath()
 {
-    delete [] m_pPath;
+    //m_pPath = NULL;
+    NSEG = 0;
 }
 
 LinePath& LinePath::operator=( const LinePath& path )
 {
     m_pTrack = path.m_pTrack;
 
-    const int	NSEG = m_pTrack->GetSize();
+    NSEG = path.NSEG;
 
-    delete [] m_pPath;
-    m_pPath = new PathPt[NSEG];
-    memcpy( m_pPath, path.m_pPath, NSEG * sizeof(PathPt) );
+    //delete [] m_pPath;
+    m_pPath = path.m_pPath;
+    m_estimatedTime = path.m_estimatedTime;
+    //memcpy( m_pPath, path.m_pPath, NSEG * sizeof(PathPt) );
 
     return *this;
 }
@@ -60,8 +64,6 @@ bool LinePath::ContainsPos( double trackPos ) const
 
 bool LinePath::GetPtInfo( double trackPos, PtInfo& pi ) const
 {
-    const int	NSEG = m_pTrack->GetSize();
-
     int		idx0 = m_pTrack->IndexFromPos(trackPos);
 
     int		idxp = (idx0 - 1 + NSEG) % NSEG;
@@ -279,24 +281,23 @@ bool	LinePath::GetPtInfo( double trackPos, PtInfo& pi ) const
 void LinePath::Set( const LinePath& path )
 {
     m_pTrack = path.m_pTrack;
-    const int	NSEG = m_pTrack->GetSize();
 
-    delete [] m_pPath;
-    m_pPath = new PathPt[NSEG];
+    //delete [] m_pPath;
+    m_pPath = path.m_pPath;
 
     m_maxL = path.m_maxL;
     m_maxR = path.m_maxR;
 
-    memcpy( m_pPath, path.m_pPath, NSEG * sizeof(*m_pPath) );
+    //memcpy( m_pPath, path.m_pPath, NSEG * sizeof(*m_pPath) );
 }
 
 void LinePath::Initialise( MyTrack* pTrack, double maxL, double maxR )
 {
-    const int	NSEG = pTrack->GetSize();
-
+    NSEG = pTrack->GetSize();
     m_pTrack = pTrack;
-    delete [] m_pPath;
-    m_pPath = new PathPt[NSEG];
+    //delete [] m_pPath;
+    m_pPath.resize( NSEG );
+    //m_pPath = new PathPt[NSEG];
 
     m_maxL = maxL;
     m_maxR = maxR;
@@ -306,18 +307,24 @@ void LinePath::Initialise( MyTrack* pTrack, double maxL, double maxR )
         m_pPath[i].pSeg		= &(*pTrack)[i];
         m_pPath[i].k		= 0;
         m_pPath[i].kz		= 0;
-        m_pPath[i].offs		= m_pPath[i].pSeg->midOffs;
+        m_pPath[i].kv		= 0;
         m_pPath[i].pt		= m_pPath[i].CalcPt();
+        m_pPath[i].ap		= 0;
+        m_pPath[i].ar		= 0;
         m_pPath[i].maxSpd	= 10;
-        m_pPath[i].spd		= 10;
+        m_pPath[i].spd	= 10;
         m_pPath[i].accSpd	= 10;
         m_pPath[i].h		= 0;
-        m_pPath[i].lBuf		= 0;
-        m_pPath[i].rBuf		= 0;
+        m_pPath[i].lBuf	= 0;
+        m_pPath[i].rBuf	= 0;
+        m_pPath[i].fixed	= false;
     }
 
+    CalcAngles();
     CalcCurvaturesXY();
     CalcCurvaturesZ();
+    CalcCurvaturesV();
+    CalcCurvaturesH();
 }
 
 const LinePath::PathPt&	LinePath::GetAt( int idx ) const
@@ -343,8 +350,6 @@ void LinePath::CalcCurvaturesXY( int start, int len, int step )
 
 void LinePath::CalcCurvaturesZ( int start, int len, int step )
 {
-    const int	NSEG = m_pTrack->GetSize();
-
     for( int count = 0; count < NSEG; count++ )
     {
         int		i  = (start + count) % NSEG;
@@ -356,19 +361,123 @@ void LinePath::CalcCurvaturesZ( int start, int len, int step )
                                                    m_pPath[in].CalcPt() );
 
     }
+}
 
-    // Overwrite values at start to avoid slowdown caused by track errors
-    /*for (int i = 0; i <= step; i++)
+void LinePath::CalcCurvaturesV( int start, int len, int step )
+{
+    for( int count = 0; count < NSEG; count++ )
     {
-      m_pPath[i].kz = 0.0;
-      m_pPath[NSEG-1-i].kz = 0.0;
-    }*/
+        int     i  = (start + count) % NSEG;
+        int     ip = (i - 1 * step + NSEG) % NSEG;
+        int		in = (i + 1 * step) % NSEG;
+
+        t3Dd	tn;
+        tTrkLocPos	pos;
+        RtTrackGlobal2Local(m_pPath[i].pSeg->pSeg, (float)m_pPath[i].pt.x, (float)m_pPath[i].pt.y, &pos, TR_LPOS_MAIN);
+        RtTrackSurfaceNormalL(&pos, &tn);
+        Vec3d	track_normal(tn);
+        Vec3d   curr_pt = m_pPath[i].pt;
+
+        // work out tangent in the horizontal plane
+        Vec2d   tangent2d;
+        Utils::CalcTangent( m_pPath[ip].pt.GetXY(), curr_pt.GetXY(), m_pPath[in].pt.GetXY(), tangent2d );
+
+        // project tangent onto the track segment plane, and re-normalise it.
+        Vec3d	tangent(tangent2d);
+        Vec3d	projection((tangent * track_normal) * track_normal);
+        tangent -= projection;
+        tangent.normalize();
+
+        // work out points ahead and behind of the current point, along the tangent.
+        const int delta_x = 10;
+        Vec3d   prev_pt(curr_pt - tangent * delta_x);
+        Vec3d   next_pt(curr_pt + tangent * delta_x);
+
+        // measure the relative track heights of the 3 points along the tangent line.
+        // (note the b_height should always be zero.)
+        double  a_height = m_pTrack->CalcHeightAbovePoint(prev_pt, track_normal, m_pPath[i].pSeg);
+        double  b_height = m_pTrack->CalcHeightAbovePoint(curr_pt, track_normal, m_pPath[i].pSeg);
+        double  c_height = m_pTrack->CalcHeightAbovePoint(next_pt, track_normal, m_pPath[i].pSeg);
+
+        // calculate the curvature normal to the track segment in the direction of the tangent
+        // to the racing line.
+        m_pPath[i].kv = Utils::CalcCurvature(-delta_x, a_height, 0, b_height, delta_x, c_height);
+    }
+}
+
+void LinePath::CalcCurvaturesH( int start, int len, int step )
+{
+    for( int count = 0; count < NSEG; count++ )
+    {
+        int     i  = (start + count) % NSEG;
+        int     ip = (i - 1 * step + NSEG) % NSEG;
+        int		in = (i + 1 * step) % NSEG;
+
+        if( i == 376 )
+            int f = 2;
+
+        t3Dd	tn;
+        tTrkLocPos	pos;
+        RtTrackGlobal2Local(m_pPath[i].pSeg->pSeg, (float)m_pPath[i].pt.x, (float)m_pPath[i].pt.y, &pos, TR_LPOS_MAIN);
+        RtTrackSurfaceNormalL(&pos, &tn);
+        Vec3d	track_normal(tn);
+
+        // project the points on to the horizontal plain.
+        Vec3d   prev_pt = m_pPath[ip].pt.SetZ(0);
+        Vec3d   curr_pt = m_pPath[i ].pt.SetZ(0);
+        Vec3d   next_pt = m_pPath[in].pt.SetZ(0);
+
+        // work out coordinate system in the track plane.
+        Vec3d	x = (track_normal % m_pPath[i].Norm()).to_unit_vector();
+        Vec3d	y = track_normal % x;
+
+        // calculate the curvature in the plane of the track segment.
+        m_pPath[i].kh = Utils::CalcCurvature(x * prev_pt, y * prev_pt,
+                                           x * curr_pt, y * curr_pt,
+                                           x * next_pt, y * next_pt);
+    }
+}
+
+void LinePath::CalcAngles( int start, int len, int step )
+{
+    for( int count = 0; count < NSEG; count++ )
+    {
+        int		i  = (start + count) % NSEG;
+        int		ip = (i - step + NSEG) % NSEG;
+        int		in = (i + step) % NSEG;
+
+        // estimate pitch using the points ahead and behind along the path.
+        Vec3d  pitchVec = m_pPath[in].pt - m_pPath[ip].pt;
+        double pathPitchAngle = atan2(pitchVec.z, pitchVec.GetXY().len());
+
+        // TODO: calculate the path roll angle instead of the track roll angle...
+        double pathRollAngle = atan2(m_pPath[i].Norm().z, 1);
+
+        m_pPath[i].ap = pathPitchAngle;
+        m_pPath[i].ar = pathRollAngle;
+    }
+}
+
+void LinePath::CalcLoadRatios( int start, int len, const CarModel& cm, int step )
+{
+    const double	recip_op_load = 1 / (cm.MASS * G);
+    const double	mass_load = (cm.MASS + cm.FUEL) * G;
+    const double	Ca = cm.CA;
+
+    for( int count = 0; count < NSEG; count++ )
+    {
+        int				i  = (start + count) % NSEG;
+        const PathPt&	pp = m_pPath[i];
+
+        double	load = cm.calcPredictedLoad(pp.accSpd, 1.0, Ca, pp.k, pp.kz, pp.kv, sin(pp.ar), cos(pp.ar), cos(pp.ap));
+        double	load_ratio = load * recip_op_load;
+
+        m_pPath[i].loadratio = load_ratio;
+    }
 }
 
 void LinePath::CalcMaxSpeeds( int start, int len, const CarModel& carModel, int step )
 {
-    const int	NSEG = m_pTrack->GetSize();
-
     for( int count = 0; count < len; count += step )
     {
         int	i = (start + count) % NSEG;
@@ -376,9 +485,11 @@ void LinePath::CalcMaxSpeeds( int start, int len, const CarModel& carModel, int 
 
         Vec3d Delta = m_pPath[i].CalcPt() - m_pPath[j].CalcPt();
         double Dist = Utils::VecLenXY(Delta);
+        // use friction from outer set of wheels.
+        double  frictionOffset = m_pPath[i].offs + SGN(m_pPath[i].k) * 0.75;
         double	trackRollAngle = atan2(m_pPath[i].Norm().z, 1);
         double  trackTiltAngle = 1.1 * atan2(Delta.z, Dist);
-        double	spd = carModel.CalcMaxSpeed( m_pPath[i].k, m_pPath[j].k, m_pPath[j].kz, m_pTrack->GetFriction(i, m_pPath[i].offs), trackRollAngle, trackTiltAngle);
+        double	spd = carModel.CalcMaxSpeed( m_pPath[i].k, m_pPath[j].k, m_pPath[j].kz, m_pTrack->GetFriction(i, frictionOffset), trackRollAngle, trackTiltAngle);
 
         double TrackTurnangle = CalcTrackTurnangle(i, (i + 50) % NSEG);
 
@@ -399,8 +510,6 @@ void LinePath::CalcMaxSpeeds( int start, int len, const CarModel& carModel, int 
 
 void LinePath::PropagateBreaking( int start, int len, const CarModel& cm, int step )
 {
-    const int	NSEG = m_pTrack->GetSize();
-
     for( int count = step * ((len - 1) / step); count >= 0; count -= step )
     {
         int		i = (start + count) % NSEG;
@@ -420,10 +529,11 @@ void LinePath::PropagateBreaking( int start, int len, const CarModel& cm, int st
 
             double	trackRollAngle = atan2(m_pPath[i].Norm().z, 1);
             double  trackTiltAngle = 1.1 * atan2(delta.z, dist);
+            double  frictionOffset = m_pPath[i].offs + SGN(m_pPath[i].k) * 0.75;
             double brakeFactor = -1;
             double kz = -1, mu = -1;
 
-            double	u = cm.CalcBreaking( m_pPath[i].k, m_pPath[i].kz, m_pPath[j].k, m_pPath[j].kz, m_pPath[j].spd, dist, m_pTrack->GetFriction(i, m_pPath[i].offs),
+            double	u = cm.CalcBreaking( m_pPath[i].k, m_pPath[i].kz, m_pPath[j].k, m_pPath[j].kz, m_pPath[j].spd, dist, m_pTrack->GetFriction(i, frictionOffset),
                         trackRollAngle, trackTiltAngle);
 
             if( m_pPath[i].spd > u )
@@ -439,8 +549,6 @@ void LinePath::PropagateBreaking( int start, int len, const CarModel& cm, int st
 
 void LinePath::PropagateAcceleration( int start, int len, const CarModel& cm, int step )
 {
-    const int	NSEG = m_pTrack->GetSize();
-
     for( int count = 0; count < len; count += step )
     {
         int		j = (start + count) % NSEG;
@@ -462,7 +570,8 @@ void LinePath::PropagateAcceleration( int start, int len, const CarModel& cm, in
             //			double	v = sqrt(2 * acc * dist + u * u);
             double	trackRollAngle = atan2(m_pPath[i].Norm().z, 1);
             double  trackTiltAngle = 1.1 * atan2(delta.z, dist);
-            double	v = cm.CalcAcceleration( m_pPath[i].k, m_pPath[i].kz, m_pPath[j].k, m_pPath[j].kz, m_pPath[i].accSpd, dist, m_pTrack->GetFriction(i, m_pPath[i].offs),
+            double  frictionOffset = m_pPath[i].offs + SGN(m_pPath[i].k) * 0.75;
+            double	v = cm.CalcAcceleration( m_pPath[i].k, m_pPath[i].kz, m_pPath[j].k, m_pPath[j].kz, m_pPath[i].accSpd, dist, m_pTrack->GetFriction(i, frictionOffset),
                         trackRollAngle, trackTiltAngle);
 
             //			if( v2 > v )
@@ -476,40 +585,54 @@ void LinePath::PropagateAcceleration( int start, int len, const CarModel& cm, in
 
 void LinePath::CalcCurvaturesXY( int step )
 {
-    const int	NSEG = m_pTrack->GetSize();
     CalcCurvaturesXY( 0, NSEG, step );
 }
 
 void LinePath::CalcCurvaturesZ( int step )
 {
-    const int	NSEG = m_pTrack->GetSize();
     CalcCurvaturesZ( 0, NSEG, step );
 }
 
+void LinePath::CalcCurvaturesV( int step )
+{
+    CalcCurvaturesV( 0, NSEG, step );
+}
+
+void LinePath::CalcCurvaturesH( int step )
+{
+    CalcCurvaturesH( 0, NSEG, step );
+}
+
+void LinePath::CalcAngles( int step )
+{
+    CalcAngles( 0, NSEG, step );
+}
+
+void LinePath::CalcLoadRatios( const CarModel& cm, int step )
+{
+    CalcLoadRatios( 0, NSEG, cm, step );
+}
+
+
 void LinePath::CalcMaxSpeeds( const CarModel& carModel, int step )
 {
-    const int	NSEG = m_pTrack->GetSize();
     CalcMaxSpeeds( 0, NSEG, carModel, step );
 }
 
 void LinePath::PropagateBreaking( const CarModel& cm, int step )
 {
-    const int	NSEG = m_pTrack->GetSize();
     PropagateBreaking( 0, NSEG, cm, step );
     PropagateBreaking( 0, NSEG, cm, step );
 }
 
 void LinePath::PropagateAcceleration( const CarModel& cm, int step )
 {
-    const int	NSEG = m_pTrack->GetSize();
     PropagateAcceleration( 0, NSEG, cm, step );
     PropagateAcceleration( 0, NSEG, cm, step );
 }
 
 void LinePath::CalcFwdAbsK( int range, int step )
 {
-    const int	NSEG = m_pTrack->GetSize();
-
     int		count = range / step;
     int		i = count * step;
     int		j = i;
@@ -549,7 +672,6 @@ double LinePath::CalcEstimatedTime( int start, int len ) const
 {
     double	totalTime = 0;
 
-    const int	NSEG = m_pTrack->GetSize();
     for( int s = 0; s < len; s++ )
     {
         int		i = (s + start) % NSEG;
@@ -568,7 +690,6 @@ double LinePath::CalcEstimatedLapTime() const
 {
     double	lapTime = 0;
 
-    const int	NSEG = m_pTrack->GetSize();
     for( int i = 0; i < NSEG; i++ )
     {
         int		j = (i + 1) % NSEG;
@@ -681,7 +802,6 @@ bool LinePath::LoadPath( const char* pDataFile )
         Vec2d	inP1 = pPoints[1];
         int		inP = 1;
 
-        const int	NSEG = m_pTrack->GetSize();
         for( int i = 0; i < NSEG; i++ )
             {
                 PathPt*	pp = &m_pPath[i];
@@ -712,7 +832,6 @@ bool LinePath::LoadPath( const char* pDataFile )
         //	points are global x, y coords that need to be interpolated.
         //
 
-        const int	NSEG = m_pTrack->GetSize();
         Vec2d	origin(0, 0);
 
         {

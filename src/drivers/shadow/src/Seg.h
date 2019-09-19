@@ -22,21 +22,24 @@
 
 #include "Vec3d.h"
 
-class Seg  
+class Seg
 {
 public:
-	Seg();
-	~Seg();
+    Seg();
+    ~Seg();
 
 public:
-	double		segDist;
-	tTrackSeg*	pSeg;		// main track segment.
-	double		wl;			// width to left.
-	double		wr;			// width to right.
-	double		midOffs;	// offset to "mid" (nominal centre -- e.g. pitlane)
-	double		t;			// relative position of pt within trackSeg [0..1]
-	Vec3d		pt;			// centre point.
-	Vec3d		norm;		// normal left to right (unit vector in xy, slope in z).
+    double		segDist;
+    tTrackSeg*	pSeg;		// main track segment.
+    double		wl;			// width to left.
+    double		wr;			// width to right.
+    double		el;			// extent to left.
+    double		er;			// extent to right.
+    double		midOffs;	// offset to "mid" (nominal centre -- e.g. pitlane)
+    double		t;			// relative position of pt within trackSeg [0..1]
+    Vec3d		pt;			// centre point.
+    Vec3d		norm;		// normal left to right (unit vector in xy, slope in z).
+    int			bendId;		// id of bend this seg is a part of.
 };
 
 #endif
