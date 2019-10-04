@@ -174,7 +174,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	
 	# Expat : Replaces bundled libs/txml (that will soon be removed).
 	IF(OPTION_3RDPARTY_EXPAT)
-		_FIND_3RDPARTY_DEPENDENCY(EXPAT expat.h "" "expat;expat-1" ${ROOT_DIR} "")
+		_FIND_3RDPARTY_DEPENDENCY(EXPAT expat.h "" "libexpat;expat;expat-1" ${ROOT_DIR} "")
 	ENDIF(OPTION_3RDPARTY_EXPAT)
 	
 	# FreeSOLID : Replaces bundled modules/simu/.../SOLID2.0 (that will soon be removed).
