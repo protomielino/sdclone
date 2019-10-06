@@ -20,7 +20,6 @@
 #include "CarModel.h"
 #include "Quadratic.h"
 #include "Utils.h"
-//#include "Driver.h"
 
 // The "SHADOW" logger instance.
 extern GfLogger* PLogSHADOW;
@@ -47,6 +46,11 @@ CarModel::CarModel():
     TYRE_MU_R(0),
     MU_SCALE(0.9),
     MIN_MU_SCALE(0),
+    AVOID_MU_SCALE(0.9),
+    KZ_SCALE(0.43f),
+    OFFLINE_KZ_SCALE(0.43f),
+    AVOID_KZ_SCALE(0.43f),
+    KV_SCALE(1),
 
     BRAKESCALE(0),
     BRAKEFORCE(0),
@@ -62,15 +66,10 @@ CarModel::CarModel():
     CD_BODY(0),
     CD_WING(0),
     CD_CX(0),
-    KZ_SCALE(0.43f),
-    KV_SCALE(1),
-    OFFLINE_KZ_SCALE(0.43f),
-
-    AVOID_MU_SCALE(0.9),
 
     lftOH(0),
     rgtOH(0),
-    AVOID_KZ_SCALE(0.43f),
+
     WIDTH(2),
     BRAKE_FACTOR(1),
     CT_FACTOR(1),
@@ -123,19 +122,16 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
       if (USEDACCEXIT)
         factor = 1.015;
 
-      //AbsCrv *= oDriver->CalcCrv(AbsCrv);
     }
     else
     {
       factor = 0.985;
-      //AbsCrv *= oDriver->CalcCrv(AbsCrv);
     }
-
-    //Friction *= oDriver->CalcFriction(AbsCrv);
 
     double Den;
 
     double ScaleBump  = BUMP_FACTOR;
+
     if (k > 0)
       ScaleBump = BUMP_FACTORLEFT;
     else
@@ -380,21 +376,9 @@ double CarModel::CalcMaxSpdK() const
 
 double CarModel::CalcMaxLateralF( double spd, double kFriction, double kz ) const
 {
-#if 0
-    double	M  = MASS + FUEL;
-    double	MU = kFriction * TYRE_MU;
-
-    double	vv = spd * spd;
-
-    double	Fdown = M * GRAVITY + /*M * Kz * vv*/ + CA * vv;
-    double	Flat  = Fdown * MU;
-
-    return Flat;
-#else
     double Fdown = (MASS + FUEL) * GRAVITY + (MASS * kz + CA) * spd * spd;
 
     return Fdown * kFriction * TYRE_MU;
-#endif
 }
 
 double CarModel::CalcMaxSpeedCrv() const
@@ -431,22 +415,13 @@ void CarModel::CalcSimuSpeeds( double spd0, double dy, double dist, double kFric
 {
     // simple speed calc for use in simulation for path optimisation... the
     //	overriding pre-requisite of which is speed of calculation.
-    //
-    // a = v*v/r
-    // max_a = M * G * MU;
-    // max_spd = sqrt(max_a r) = sqrt(M * G * MU / k)
 
-    //double	M  = MASS + FUEL;
     double	MU = kFriction * TYRE_MU;
 
     double	max_acc = GRAVITY * MU;
-//	double	max_spd = k == 0 ? 200 : MN(200, sqrt(max_acc / k));
-
-    //	s = ut + 0.5 att = dy
-    //	a = 2(dy - ut) / tt      ... but lateral u = 0
     double	estT = dist / spd0;
-
     double	lat_acc = 2 * dy / (estT * estT);
+
     if( lat_acc > max_acc )
         lat_acc = max_acc;
     double	lin_acc = sqrt(max_acc * max_acc - lat_acc * lat_acc);
@@ -463,13 +438,6 @@ void CarModel::CalcSimuSpeeds( double spd0, double dy, double dist, double kFric
         eng_acc = lin_acc;
 
     maxSpd = sqrt(spd0 * spd0 + 2 * eng_acc * dist);
-//	if( maxSpd > max_spd )
-//		maxSpd = max_spd;
-
-    //
-    // brake
-    //
-
     minSpd = sqrt(spd0 * spd0 - 2 * lin_acc * dist);
 }
 
@@ -477,12 +445,7 @@ void CarModel::CalcSimuSpeedRanges( double spd0,	double dist, double	kFriction, 
 {
     // simple speed calc for use in simulation for path optimisation... the
     //	overriding pre-requisite of which is speed of calculation.
-    //
-    // a = v*v/r
-    // max_a = M * G * MU;
-    // max_spd = sqrt(max_a r) = sqrt(M * G * MU / k)
 
-    //double	M  = MASS + FUEL;
     double	MU = kFriction * TYRE_MU;
     double	max_acc = GRAVITY * MU;
 
@@ -503,15 +466,12 @@ void CarModel::CalcSimuSpeedRanges( double spd0,	double dist, double	kFriction, 
     //
     // brake
     //
-
     minSpd = sqrt(spd0 * spd0 - 2 * max_acc * dist);
 
     //
     // turn (turning is symmetrical)
     //
 
-    // s = ut + 1/2 att    u = 0, as we're looking along vel vector.
-    // t = dist / spd0;
     double	turnT = dist / spd0;
     maxDY = 0.5 * max_acc * turnT * turnT;
 }

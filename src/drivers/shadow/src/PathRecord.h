@@ -23,38 +23,39 @@
 class PathRecord
 {
 public:
-	class Rec
-	{
-	public:
-		const Seg*	pSeg;	// MyTrack segment this info applies to.
-		double		avgW;	// average position
-		double		avgV;	// average speed
-	};
+    class Rec
+    {
+    public:
+        const Seg*	pSeg;	// MyTrack segment this info applies to.
+        double		avgW;	// average position
+        double		avgV;	// average speed
+    };
 
 public:
-	PathRecord();
-	~PathRecord();
+    PathRecord();
+    ~PathRecord();
 
-	void		Initialise( MyTrack* pTrack, CarElt* pCar );
-	void		Update();
+    void		Initialise( MyTrack* pTrack, CarElt* pCar );
+    void		Update();
 
-	tCarElt*	GetCar();
-	MyTrack*	GetTrack();
-	void		GetPredictionForPos( double pos, double& w, double& v ) const;
-	void		GetPrediction( double& w, double& v ) const;
-	double		CalcConfidence( double w, double v ) const;
-	double		CalcConfidence() const;
+    tCarElt*	GetCar();
+    const tCarElt*	GetCar() const;
+    MyTrack*	GetTrack();
+    void		GetPredictionForPos( double pos, double& w, double& v ) const;
+    void		GetPrediction( double& w, double& v ) const;
+    double		CalcConfidence( double w, double v ) const;
+    double		CalcConfidence() const;
 
-	const Rec&	GetAt( int index ) const;
+    const Rec&	GetAt( int index ) const;
 
 public:
-	MyTrack*	m_pTrack;
-	tCarElt*	m_pCar;
+    MyTrack*	m_pTrack;
+    tCarElt*	m_pCar;
 
-	Rec*		m_pData;
-	int			m_lastSeg;
-	Vec2d		m_lastPt;
-	double		m_lastSpd;
+    Rec*		m_pData;
+    int			m_lastSeg;
+    Vec2d		m_lastPt;
+    double		m_lastSpd;
 };
 
 #endif

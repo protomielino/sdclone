@@ -26,7 +26,9 @@
 #include "Utils.h"
 #include "Driver.h"
 
-
+// The "SHADOW" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
 
 //////////////////////////////////////////////////////////////////////
 
@@ -51,9 +53,19 @@ void Opponent::Initialise( MyTrack* pTrack, CarElt* pCar )
 
     m_info.flags = 0;
     m_info.avoidLatchTime = 0;
+    m_info.dangerousLatchTime = 0;
+    m_info.closeAheadTime = 0;
+    m_info.closeBehindTime = 0;
+
+    memset( &m_info.sit, 0, sizeof(m_info.sit) );
 }
 
 CarElt*	Opponent::GetCar()
+{
+    return m_path.GetCar();
+}
+
+const CarElt* Opponent::GetCar() const
 {
     return m_path.GetCar();
 }
@@ -79,6 +91,9 @@ void Opponent::UpdateSit( const CarElt* myCar, const Situation* s, const TeamInf
 
     if( (oCar->pub.state & RM_CAR_STATE_NO_SIMU & ~RM_CAR_STATE_PIT) )
         return;
+
+    // save point info
+    m_info.sit.pi = oppPi;
 
     // word out speed of car.
     m_info.sit.spd = hypot(oCar->_speed_X, oCar->_speed_Y);
@@ -141,27 +156,45 @@ void Opponent::UpdateSit( const CarElt* myCar, const Situation* s, const TeamInf
     m_info.sit.rdVX = rdVX;
     m_info.sit.rdVY = rdVY;
 
-    m_info.sit.minDX = (myCar->_dimension_x + oCar->_dimension_x) / 2;
+    m_info.sit.minDXa = (myCar->_dimension_x + oCar->_dimension_x) / 2;
+    m_info.sit.minDXb = m_info.sit.minDXa;
     m_info.sit.minDY = (myCar->_dimension_y + oCar->_dimension_y) / 2;
 
-    double	myVelAng = atan2(myCar->_speed_Y, myCar->_speed_X);
+    double	myVelAng = fabs(myCar->pub.speed) < 0.1 ? myCar->_yaw : atan2(myCar->_speed_Y, myCar->_speed_X);
     double	myYaw = myCar->_yaw - myVelAng;
     NORM_PI_PI(myYaw);
     double	oYaw = oCar->_yaw - myVelAng;
     NORM_PI_PI(oYaw);
-    double	extSide = (m_info.sit.minDX - m_info.sit.minDY) * (fabs(sin(myYaw)) + fabs(sin(oYaw)));
-//	m_info.sit.minDY += MX(0, MN((rdPX - m_info.sit.minDY) * 0.1, 4));
-    m_info.sit.minDY += extSide + 1;//0.5;
-    m_info.sit.minDX += 1.0;//pTeamInfo->IsTeamMate(myCar, oCar) ? 0.5 : 1.0;
+    double	extraSide = (m_info.sit.minDXa - m_info.sit.minDY) * (fabs(sin(myYaw)) + fabs(sin(oYaw)));
+    double	extraTan = 0;
 
-//	if( fabs(extSide) > 0.2 )
-//		GfOut( "****** angDiff %.3f extSide %.2f ******\n", angDiff, extSide );
+    if( (oCar->pub.state & RM_CAR_STATE_PIT) == 0 )
+    {
+        // opponent on track.
+        m_info.sit.minDY  += extraSide + 1;
+        m_info.sit.minDXa += extraTan + 2.0;
+        m_info.sit.minDXb += extraTan + 0.5;
+    }
+    else
+    {
+        // opponent stationary in pit box.
+        m_info.sit.minDY  += extraSide;
+        m_info.sit.minDXa += extraTan + 0.5;
+        m_info.sit.minDXb += extraTan + 0.5;
+    }
+
+    m_info.sit.decDX = m_info.sit.minDXb + 2;
+    m_info.sit.accDX = m_info.sit.minDXb;
+
+    //	if( fabs(extSide) > 0.2 )
+    //		GfOut( "****** angDiff %.3f extSide %.2f ******\n", angDiff, extSide );
 
     // work out positions of car from start of track.
     double	myPos = RtGetDistFromStart((tCarElt*)myCar);
     double	hisPos = RtGetDistFromStart((tCarElt*)oCar);
     double	relPos = hisPos - myPos;
     double	trackLen = m_path.GetTrack()->GetLength();
+
     if( relPos > trackLen / 2 )
         relPos -= trackLen;
     else if( relPos < -trackLen / 2 )
@@ -176,7 +209,7 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
 
     m_info.flags = 0;
 
-    if( oCar == myCar || (oCar->_state & RM_CAR_STATE_NO_SIMU))
+    if( oCar == myCar || (oCar->pub.state & RM_CAR_STATE_NO_SIMU & ~RM_CAR_STATE_PIT) )
     {
         return;
     }
@@ -190,10 +223,13 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
     {
         m_info.flags |= F_DANGEROUS;
         m_info.dangerousLatchTime = 2.0;
+        LogSHADOW.debug( "danger (%s) angle=%6.1f  relx=%6.1f  relvx=%6.1f  roppavga=%6.1f  roppa=%6.1f\n",
+                         oCar->_name, oSit.tYaw * 180 / PI, oSit.rdPX, oSit.rdVX, oSit.ragAX, oSit.rAX );
     }
     else
     {
         m_info.dangerousLatchTime -= s->deltaTime;
+
         if( m_info.dangerousLatchTime <= 0 )
         {
             m_info.flags &= ~F_DANGEROUS;
@@ -201,7 +237,8 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
         }
     }
 
-    double	distAhead = MX(20, mySit.spd * mySit.spd / 30);
+    double	distAhead = MX(20, mySit.spd * mySit.spd / 20);
+
     if( (m_info.flags & F_DANGEROUS) == 0 )
         distAhead = MN(MX(45, distAhead), 80);
 
@@ -211,13 +248,25 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
         m_info.tmDamage = oCar->_dammage;
     }
 
+    if( oSit.relPos > 0 && oSit.relPos < 10 )
+        m_info.closeAheadTime += s->deltaTime;
+    else
+        m_info.closeAheadTime = MX(0, m_info.closeAheadTime - s->deltaTime * 0.1);
+
+    if( oSit.relPos < 0 && oSit.relPos > -10 )
+        m_info.closeBehindTime += s->deltaTime;
+    else
+        m_info.closeBehindTime = MX(0, m_info.closeBehindTime - s->deltaTime * 0.1);
+
+    LogSHADOW.debug( "(%s) dist ahead %6.1f   relPos %6.1f\n", oCar->_name, distAhead, oSit.relPos );
+
     if( oSit.relPos < distAhead && oSit.relPos > -25 )
     {
         double		oVX = mySit.spd + oSit.rdVX;
 
         m_info.flags |= F_TRAFFIC;
 
-        if( oSit.rdPX > oSit.minDX )
+        if( oSit.rdPX > oSit.minDXa )
         {
             m_info.flags |= F_AHEAD | F_FRONT;
 
@@ -228,7 +277,7 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
             {
                 // time to catch up at present speeds...
                 double		acc = oSit.ragAX;// - (myCar->_accel_x + 3);
-                Quadratic	q(acc / 2, oSit.rdVX, oSit.rdPX - oSit.minDX);
+                Quadratic	q(acc / 2, oSit.rdVX, oSit.rdPX - oSit.minDXa);
                 double		t;
 
                 if( q.SmallestNonNegativeRoot(t) )
@@ -241,21 +290,25 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
                     m_info.catchSpd = oSit.rdPX < 15 ? oVX : oSit.tVX;
 
                     double	hisSpd = oSit.ragVX + oSit.ragAX * t;
-                    double	decel = (mySit.ragVX - hisSpd) / t;
+                    double	decel = (oSit.rdVX * oSit.rdVX) / (2 * (oSit.rdPX - 5)) - oSit.ragAX;
 
                     m_info.catchDecel = MX(0, decel);
 
-                    if( fabs(catchY) < oSit.minDY )
+                    double raceLineY = oSit.pi.offs + oCar->pub.trkPos.toMiddle;
+                    LogSHADOW.debug( "(%s) racelineoffs %0.3f  pioffs %0.3f  tomid %0.3f  catch-t %0.3f  catch-decel %0.3f\n",
+                                     oCar->info.name, raceLineY, oSit.pi.offs, oCar->pub.trkPos.toMiddle, t, m_info.catchDecel );
+
+                    if( fabs(catchY) < oSit.minDY || fabs(raceLineY) < oSit.minDY )
                     {
                         m_info.flags |= F_COLLIDE;
 
-                        if( oSit.rdPX < oSit.minDX + 0.15 )
+                        if( oSit.rdPX < oSit.minDXa + 0.15 )
                             m_info.catchDecel = 999;
                     }
                     else
                     {
                         // see if we hit on the side while passing.
-                        q.Setup( acc / 2, oSit.rdVX, oSit.rdPX + oSit.minDX );// + m_info.minDX );
+                        q.Setup( acc / 2, oSit.rdVX, oSit.rdPX + oSit.minDXa );// + m_info.minDX );
 
                         if( q.SmallestNonNegativeRoot(t) )
                         {
@@ -270,7 +323,8 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
                     }
                 }
 
-                q.Setup( oSit.ragAX - myMaxAccX, oSit.ragVX - mySit.ragVX, oSit.rdPX - oSit.minDX - 0.2 );
+                q.Setup( oSit.ragAX - myMaxAccX, oSit.ragVX - mySit.ragVX, oSit.rdPX - oSit.minDXa - 0.2 );
+
                 if( q.SmallestNonNegativeRoot(t))
                 {
                     double	catchY = relPar.CalcY(t);
@@ -282,21 +336,21 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
                 }
             }
 
-            if( myCar->_laps > oCar->_laps )
+            if( myCar->race.distRaced > oCar->race.distRaced + 50 )
             {
                 m_info.flags |= F_BEING_LAPPED;
             }
         }
         else
         {
-            if( oSit.rdPX < -oSit.minDX )	// behind
+            if( oSit.rdPX < -oSit.minDXb )	// behind
             {
                 m_info.flags |= F_BEHIND | F_REAR;
 
                 if( oSit.rdVX < 0 )
                 {
                     m_info.flags |= F_CATCHING;
-                    m_info.catchTime = (oSit.rdPX + oSit.minDX) / oSit.rdVX;
+                    m_info.catchTime = (oSit.rdPX + oSit.minDXb) / oSit.rdVX;
                     m_info.catchY = oSit.rdPY;
                     m_info.catchSpd = oVX;
                 }
@@ -306,7 +360,8 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
                 m_info.flags |= F_TO_SIDE;
                 m_info.flags |= oSit.rdPX > 0 ? F_FRONT : F_REAR;
 
-                double	aheadDist = oSit.minDX * 0.5;//0.33;
+                double	aheadDist = oSit.minDXa * 0.5;
+
                 if( fabs(oSit.rdPY) < oSit.minDY )
                 {
                     // colliding now.
@@ -322,9 +377,9 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
                     double	t = (fabs(oSit.rdPY) - oSit.minDY) / fabs(oSit.rdVY);
                     double	collX = oSit.rdPX + oSit.rdVX * t;
 
-                    if( collX > aheadDist && collX < oSit.minDX )
+                    if( collX > aheadDist && collX < oSit.minDXa )
                     {
-                        double	relSpd = (oSit.minDX - oSit.rdPX) / t;
+                        double	relSpd = (oSit.minDXa - oSit.rdPX) / t;
                         m_info.flags |= F_COLLIDE;
                         m_info.catchTime = t;
                         m_info.catchY = SGN(oSit.rdPY) * (oSit.minDY - 0.1);
@@ -334,13 +389,14 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
                 }
             }
 
-            if( (m_info.flags & (F_REAR | F_TO_SIDE)) && myCar->_laps < oCar->_laps )
+            if( (m_info.flags & (F_REAR | F_TO_SIDE)) && myCar->race.distRaced + 50 < oCar->race.distRaced &&
+                    m_info.closeAheadTime <= m_info.closeBehindTime )
             {
                 m_info.flags |= F_LAPPER;
             }
         }
 
-        if( 0 < oSit.rdPX && oSit.rdPX < oSit.minDX + 2 && fabs(oSit.rdPY) < oSit.minDY + 2 )
+        if( 0 < oSit.rdPX && oSit.rdPX < oSit.minDXa + 2 && fabs(oSit.rdPY) < oSit.minDY + 2 )
         {
             m_info.flags |= F_CLOSE;
         }
@@ -355,21 +411,21 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
     m_info.newCatchSpd = oSit.tVX - mySit.tVX;
     m_info.newCatching = false;
 
-    if( oSit.relPos > oSit.minDX )
+    if( oSit.relPos > oSit.minDXa )
     {
         bool	oDangerous = (m_info.flags & F_DANGEROUS) != 0;
 
         if( m_info.newCatchSpd < 0 )
         {
-            double	t1 = -(oSit.relPos - oSit.minDX) / m_info.newCatchSpd;
-            double	t2 = -(oSit.relPos + oSit.minDX) / m_info.newCatchSpd;
+            double	t1 = -(oSit.relPos - oSit.minDXa) / m_info.newCatchSpd;
+            double	t2 = -(oSit.relPos + oSit.minDXa) / m_info.newCatchSpd;
             m_info.newCatching = t1 <= timeLimit || oDangerous ||
-                                 oSit.relPos - oSit.minDX < closeDist;
+                    oSit.relPos - oSit.minDXa < closeDist;
             m_info.newCatchTime = t1;
             m_info.newAheadTime = t2;
         }
     }
-    else if( oSit.relPos >= -oSit.minDX )
+    else if( oSit.relPos >= -oSit.minDXb )
     {
         m_info.newCatching = true;
         m_info.newCatchTime = 0;
@@ -393,6 +449,12 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
         ahdOffs = MX(-w, MN(ahdOffs, w));
 
         double	midPos = (catPos + ahdPos) * 0.5;
+
+        double	trackLen = m_path.GetTrack()->GetLength();
+        ahdPos = fmod(ahdPos, trackLen);
+        catPos = fmod(catPos, trackLen);
+        midPos = fmod(midPos, trackLen);
+
         m_info.newMidPos = midPos;
 
         PtInfo	pi;
@@ -410,38 +472,36 @@ void Opponent::ProcessMyCar(const Situation* s, const TeamInfo*	pTeamInfo, const
         m_info.newPiL.isSpace = L > offs - toL;
         m_info.newPiL.goodPath = false;
         m_info.newPiL.myOffset = 0;
+
         if( m_info.newPiL.isSpace )
         {
             m_info.newPiL.offset = L;
             m_info.newPiL.mySpeed = me.CalcBestSpeed(midPos, MN(L, pi.offs));
             m_info.newPiL.goodPath = m_info.newPiL.mySpeed > oSit.spd;
 
-            {
-                double	u, v;
+            double	u, v;
 
-                me.CalcBestPathUV(midPos, L, u, v);
-                m_info.newPiL.bestU = u;
-                m_info.newPiL.bestV = v;
-                m_info.newPiL.myOffset = me.CalcPathOffset(myPos, u, v);
-            }
+            me.CalcBestPathUV(midPos, L, u, v);
+            m_info.newPiL.bestU = u;
+            m_info.newPiL.bestV = v;
         }
 
         m_info.newPiR.isSpace = R < offs + toR;
         m_info.newPiR.goodPath = false;
         m_info.newPiR.myOffset = 0;
+
         if( m_info.newPiR.isSpace )
         {
             m_info.newPiR.offset = R;
             m_info.newPiR.mySpeed = me.CalcBestSpeed(midPos, MX(R, pi.offs));
             m_info.newPiR.goodPath = m_info.newPiR.mySpeed > oSit.spd;
-            {
-                double	u, v;
 
-                me.CalcBestPathUV(midPos, R, u, v);
-                m_info.newPiR.bestU = u;
-                m_info.newPiR.bestV = v;
-                m_info.newPiR.myOffset = me.CalcPathOffset(myPos, u, v);
-            }
+            double	u, v;
+
+            me.CalcBestPathUV(midPos, R, u, v);
+            m_info.newPiR.bestU = u;
+            m_info.newPiR.bestV = v;
+            m_info.newPiR.myOffset = me.CalcPathOffset(myPos, u, v);
         }
     }
 }

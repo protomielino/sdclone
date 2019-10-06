@@ -91,8 +91,8 @@ public:
 
         double	minDXa;
         double	minDXb;
-        double	minDX;
         double	minDY;
+        double	decDX;
         double	accDX;
 
         double	relPos;

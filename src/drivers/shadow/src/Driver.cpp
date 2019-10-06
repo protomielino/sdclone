@@ -602,7 +602,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     oCarHasTCL = true;
     oCarHasESP = true;
     */
-
+    START_HOLD_LINE_TIME = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STARTLINE, 0, 5.0f);
     m_pShared = new Shared();
 
     MyTrack::SideMod	sideMod;
@@ -704,6 +704,7 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
     m_cm2 = m_cm;
     m_cm2.MU_SCALE = MN(1.5, m_cm.MU_SCALE);
     m_cm2.KZ_SCALE = m_cm2.OFFLINE_KZ_SCALE;
+    m_cm2.BRAKESCALE = MX(1.0, m_cm.BRAKESCALE);
 
     LogSHADOW.info( "SPDC N %d    SPDC T %d   KZ SCALE %g    OFFLINE KZ SCALE %g\n", SPDC_NORMAL, SPDC_TRAFFIC, m_cm.KZ_SCALE, m_cm2.KZ_SCALE);
 
@@ -783,9 +784,11 @@ void InterpPtInfo( PtInfo& pi0, const PtInfo& pi1, double t )
     pi0.k	= Utils::InterpCurvature(pi0.k, pi1.k, t);
     double	deltaOAng = pi1.oang - pi0.oang;
     NORM_PI_PI(deltaOAng);
+
     pi0.oang = pi0.oang + deltaOAng * t;
     pi0.offs = pi0.offs * (1 - t) + pi1.offs * t;
     pi0.spd	 = pi0.spd  * (1 - t) + pi1.spd  * t;
+    pi0.accSpd  = pi0.accSpd  * (1 - t) + pi1.accSpd  * t;
 }
 
 void TDriver::GetPosInfo( double pos, PtInfo& pi, double u, double v ) const
@@ -1074,24 +1077,25 @@ double TDriver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     double	spd0 = hypot(car->_speed_x, car->_speed_y);
 
     // calc x,y coords of mid point on frt axle.
-    double	midPt = 1.37;
+    double	midPt = 1.37;//1;//car->_dimension_x * 0.5;
     double	x = car->pub.DynGCg.pos.x + midPt * cos(car->_yaw);
     double	y = car->pub.DynGCg.pos.y + midPt * sin(car->_yaw);
 
-    // static double	oldX = x;                   // Removed 5th April 2015 - Not Used
-    // static double	oldY = y;                   // Removed 5th April 2015 - Not Used
-    // double	velX = (x - oldX) / 0.02;           // Removed 5th April 2015 - Not Used
-    // double	velY = (y - oldY) / 0.02;           // Removed 5th April 2015 - Not Used
-    // oldX = x;                                    // Removed 5th April 2015 - Not Used
-    // oldY = y;                                    // Removed 5th April 2015 - Not Used
+    static double	oldX = x;
+    static double	oldY = y;
+    double	velX = (x - oldX) / 0.02;
+    double	velY = (y - oldY) / 0.02;
+    oldX = x;
+    oldY = y;
 
     tTrkLocPos	trkPos;
-    RtTrackGlobal2Local(car->_trkPos.seg, (tdble) x, (tdble) y, &trkPos, 0);
+    RtTrackGlobal2Local(car->_trkPos.seg, x, y, &trkPos, 0);
     double	toMiddle = trkPos.toMiddle;
 
-
-    // get curret pos on track.
+    // get current pos on track.
     double	pos = m_track.CalcPos(trkPos);
+
+    // look this far ahead.
     double	aheadDist = spd0 * 0.02;
     double	aheadPos = m_track.CalcPos(trkPos, aheadDist);
 
@@ -1102,8 +1106,10 @@ double TDriver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     double	angle = aheadPi.oang - car->_yaw;
     NORM_PI_PI(angle);
 
+
     double	velAng = atan2(car->_speed_Y, car->_speed_X);
     double	velAngCtrl = aheadPi.oang - velAng;
+
     NORM_PI_PI(velAngCtrl);
     m_velAngControl.m_p = 1;//0.5;//1;
     m_velAngControl.m_d = 10;//25;
@@ -1111,15 +1117,15 @@ double TDriver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     angle += tanh(velAngCtrl);
 
     double	avgK = aheadPi.k;
+
     double omega = car->_speed_x * avgK;//aheadPi.k;
     angle += 0.02 * (omega - car->_yaw_rate);
 
     // control offset from path.
     m_lineControl.m_p = 1.0;
     m_lineControl.m_d = 10;
-    const double SC = 0.15;
+    const double SC = 0.15;//0.15;//0.15;//0.2;//0.15;
     double	delta = pi.offs + toMiddle;
-
     angle -= SC * tanh(m_lineControl.Sample(delta));
 
     return angle;
@@ -1612,6 +1618,12 @@ void TDriver::Drive( tSituation* s )
     // work out current car speed.
     double	spd0 = hypot(car->_speed_x, car->_speed_y);
 
+    if (m_lastSpd > spd0 / 3.6)
+    {
+      LogSHADOW.debug("0 - %.1f km/h : %.2f sec\n", m_lastSpd * 3.6, CurrSimTime);
+     // oAccelSpeed += 20;
+    }
+
     {
         Vec2d	thisPt(car->_pos_X, car->_pos_Y);
         if( (thisPt - m_lastPts[0]).len() > 0.1 && car->ctrl.accelCmd == 1.0 )
@@ -1640,10 +1652,11 @@ void TDriver::Drive( tSituation* s )
     double	brk = 0;
 
     double	targetSpd = pi.spd;
+    double	avoidTargetAcc = pi.accSpd;
 
     bool	close = false;
     bool	lapper = false;
-    AvoidOtherCars( INDEX, car, pi.k, targetSpd, s, close, lapper );
+    AvoidOtherCars( INDEX, car, s, pi.k, &targetSpd, &avoidTargetAcc, &close, &lapper );
     //targetSpd = CalcSkill(m_Situation, targetSpd);
 
 
@@ -1866,12 +1879,12 @@ void TDriver::Shutdown()
 {
 }
 
-void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTargetSpd, tSituation* s, bool& close, bool& lapper)
+void TDriver::AvoidOtherCars(int index, tCarElt* car, const tSituation*	s, double k, double* carTargetSpd, double* carTargetAcc, bool* close, bool* lapper)
 {
     m_pShared->m_teamInfo.GetAt(car->index)->damage = car->_dammage;
 
-    // double	trackLen = m_track.GetLength();     // Removed 5th April 2015 - Not Used
-    // double	myPos = RtGetDistFromStart(car);    // Removed 5th April 2015 - Not USed
+    double	trackLen = m_track.GetLength();
+    double	myPos = RtGetDistFromStart(const_cast<tCarElt*>(car));
     double	mySpd = hypot(car->_speed_X, car->_speed_Y);
 
     double	myDirX, myDirY;
@@ -1879,7 +1892,6 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
     {
         myDirX = cos(car->_yaw);
         myDirY = sin(car->_yaw);
-        mySpd = 0.01;
     }
     else
     {
@@ -1887,6 +1899,7 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
         myDirY = car->_speed_Y / mySpd;
     }
 
+    int		myIdx = 0;
 
     for( int i = 0; i < m_nCars; i++ )
     {
@@ -1895,16 +1908,14 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
         PtInfo	oppPi;
         const tCarElt* oCar = m_opp[i].GetCar();
         GetPosInfo( oCar->race.distFromStartLine, oppPi );
-
-        m_opp[i].UpdateSit( car, s, &m_pShared->m_teamInfo, myDirX, myDirY, oppPi);
+        m_opp[i].UpdateSit( car, s, &m_pShared->m_teamInfo, myDirX, myDirY,	oppPi );
     }
 
     const Opponent::Sit&	mySit = m_opp[m_myOppIdx].GetInfo().sit;
 
     for( int i = 0; i < m_nCars; i++ )
     {
-        m_opp[i].ProcessMyCar( s, &m_pShared->m_teamInfo, car, mySit, *this,
-                               m_maxAccel.CalcY(car->_speed_x), i );
+        m_opp[i].ProcessMyCar( s, &m_pShared->m_teamInfo, car, mySit, *this, m_maxAccel.CalcY(car->_speed_x), i );
     }
 
     // accumulate all the collision the flags...
@@ -1912,11 +1923,9 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
     double	minCatchTime = 99;
     double	minCatchAccTime = 99;
     double	minVCatTime = 99;
-    lapper = false;
+    *lapper = false;
 
     double	width = m_track.GetWidth();
-    ai.aheadSpan = Span(-width / 2, width / 2);
-    ai.sideSpan = ai.aheadSpan;
 
     PtInfo	pi;
     GetPtInfo( PATH_NORMAL, car->_distFromStartLine, pi );
@@ -1927,20 +1936,61 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
         Opponent::Info&	oi = m_opp[i].GetInfo();
         CarElt*			oCar = m_opp[i].GetCar();
 
+        if( oCar != car && fabs(oi.sit.rdPX) < 25 )
+            ai.nearbyCars++;
+    }
+
+    for( int i = 0; i < m_nCars; i++ )
+    {
+        Opponent::Info&	oi = m_opp[i].GetInfo();
+        CarElt*			oCar = m_opp[i].GetCar();
+
         ai.flags |= oi.flags;
 
         if( oi.GotFlags(Opponent::F_FRONT) )
         {
-            if( oi.flags & (Opponent::F_COLLIDE || Opponent::F_CATCHING || Opponent::F_CATCHING_ACC) )
+            if( oi.flags & (Opponent::F_COLLIDE | Opponent::F_CATCHING |
+                            Opponent::F_CATCHING_ACC) )
             {
             }
 
-            if( oi.GotFlags(Opponent::F_COLLIDE) &&	oi.catchDecel > 12.5 * car->_trkPos.seg->surface->kFriction )
+            bool dangerous = oi.GotFlags(Opponent::F_DANGEROUS);
+            if( oi.GotFlags(Opponent::F_COLLIDE) &&	true )
             {
-                ai.spdF = MN(ai.spdF, oi.catchSpd);
+                LogSHADOW.debug( "[%d] catching: (%s) cdec %g (dgr %d), cspd %g (in %g s)\n",
+                        car->index, oCar->info.name, oi.catchDecel, dangerous, oi.catchSpd, oi.catchTime );
+
+                // this is a really shitty estimate of the speed we need to be going
+                // to slow down for the being caught ahead... would really like to work out a better
+                // way.
+                bool followingClosely = oi.sit.rdPX > 0 &&
+                                        oi.sit.rdPX < oi.sit.minDXa + 3 &&
+                                        fabs(oi.sit.rdPY) < oi.sit.minDY;
+
+                bool dangerous = oi.GotFlags(Opponent::F_DANGEROUS);
+                const double MIN_DECEL = 15.0;
+                double decel =  (car->pub.speed - oi.catchSpd) / MX(oi.catchTime, 0.1);
+                LogSHADOW.debug( "[%d] catching: (%s) decel %g (dgr %d)\n", car->index, oCar->info.name, oi.catchDecel, dangerous );
+                LogSHADOW.debug( "[%d] catching: (%s) path spd: %g (%g) %g  path acc: %g (%g) %g\n",
+                        car->index, oCar->info.name, oi.sit.pi.spd, oi.sit.pi.spd - oCar->pub.DynGC.vel.x, oCar->pub.DynGC.vel.x,
+                        oi.sit.pi.accSpd, oi.sit.pi.accSpd - oCar->pub.DynGC.acc.x, oCar->pub.DynGC.acc.x );
+                if( decel > MIN_DECEL || dangerous || followingClosely )
+                {
+                    double decelSpeed = MX(oi.catchSpd, car->pub.speed - 2 * s->deltaTime * decel);
+                    if( dangerous )
+                        decelSpeed = oi.catchSpd;
+                    LogSHADOW.debug( "[%d] catching: (%s) myspd %g, decel spd %g, hisspd %g, catch (time %g  spd %g  dec %g)\n",
+                            car->index, oCar->info.name, car->pub.speed, decelSpeed, oCar->pub.speed, oi.catchTime, oi.catchSpd, oi.catchDecel );
+
+                    if( car->pub.speed > decelSpeed )
+                        LogSHADOW.debug( "[%d] slowing to avoid car: (%s) spd=%g\n", car->index, oCar->info.name, oCar->pub.speed );
+
+                    ai.spdF = MN(ai.spdF, oi.catchSpd);
+                    ai.accF = MN(ai.accF, -oi.catchDecel);
+                }
             }
 
-            if( oi.flags & (Opponent::F_COLLIDE || Opponent::F_CATCHING) )
+            if( oi.flags & (Opponent::F_COLLIDE | Opponent::F_CATCHING) )
                 minCatchTime = MN(minCatchTime, oi.catchTime);
 
             if( oi.flags & Opponent::F_CATCHING_ACC )
@@ -1948,31 +1998,34 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 
             if( oi.sit.rdVX < 0 )
             {
-                double	vCatTime = -(oi.sit.rdPX - oi.sit.minDX) / oi.sit.rdVX;
+                double	vCatTime = -(oi.sit.rdPX - oi.sit.minDXa) / oi.sit.rdVX;
 
                 if( vCatTime > 0 )
                     minVCatTime = MN(minVCatTime, vCatTime);
             }
 
-            bool ignoreTeamMate = oi.GotFlags(Opponent::F_TEAMMATE) && (car->_laps < oCar->_laps || car->_dammage + 200 >= oi.tmDamage);
+            bool	ignoreTeamMate = oi.GotFlags(Opponent::F_TEAMMATE) &&
+                                        (car->_laps < oCar->_laps ||
+                                         car->_dammage + 200 >= oi.tmDamage);
+            //ignoreTeamMate = true;
 
             oi.avoidLatchTime = MX(0, oi.avoidLatchTime - s->deltaTime);
 
-            //double	maxSpdK = 15.0 / (110 * 110);
-            double maxSpdK = m_cm.CalcMaxSpeedCrv();
-            //double	colTime = fabs(k) > maxSpdK ? 0.5 : 0.7;
-            double colTime = fabs(k) > maxSpdK ? 1.0 : 1.2;
-            //double	catTime = fabs(k) > maxSpdK ? 0.5 :	2.5;
-            double catTime = fabs(k) > maxSpdK ? 1.0 : 3.0;
-            //double	cacTime = fabs(k) > maxSpdK ? 0.5 : 2.5;
-            double cacTime = fabs(k) > maxSpdK ? 1.0 : 3.0;
+            double	maxSpdK = 15.0 / (110 * 110);
+            double	colTime = fabs(k) > maxSpdK ? 0.5 : 0.7;
+            double	catTime = fabs(k) > maxSpdK ? 0.5 :	2.5;
+            double	cacTime = fabs(k) > maxSpdK ? 0.5 : 2.5;
+            bool	catching =
+                 oi.catchTime    < colTime && fabs(oi.catchY)    < 5 && oi.GotFlags(Opponent::F_COLLIDE)  ||
+                 oi.catchTime    < catTime && fabs(oi.catchY)    < 5 && oi.GotFlags(Opponent::F_CATCHING) ||
+                 oi.catchAccTime < cacTime && fabs(oi.catchAccY) < 5 && oi.GotFlags(Opponent::F_CATCHING_ACC);
 
-            bool	catching = ( oi.catchTime < colTime && oi.GotFlags(Opponent::F_COLLIDE))  ||
-                    ( oi.catchTime    < catTime && oi.GotFlags(Opponent::F_CATCHING)) ||
-                    ( oi.catchAccTime < cacTime && oi.GotFlags(Opponent::F_CATCHING_ACC));
-
-            if( !ignoreTeamMate && (oi.avoidLatchTime > 0 || catching || oi.GotFlags(Opponent::F_DANGEROUS)))
+            if( !ignoreTeamMate && oi.avoidLatchTime > 0 || catching || oi.GotFlags(Opponent::F_DANGEROUS) )
             {
+                LogSHADOW.debug( "%.3f catch %d (dgr %d)  catch[%d%d t %.3f y %.4g]  acc[%d t %.3f y %.4g]\n",
+                        oi.avoidLatchTime, catching, oi.GotFlags(Opponent::F_DANGEROUS),
+                        oi.GotFlags(Opponent::F_CATCHING), oi.GotFlags(Opponent::F_COLLIDE), oi.catchTime, oi.catchY,
+                        oi.GotFlags(Opponent::F_CATCHING_ACC), oi.catchAccTime, oi.catchAccY );
                 double	toL, toR;
                 GetPathToLeftAndRight( oCar, toL, toR );
                 toL += oi.sit.tVY * oi.catchTime;
@@ -1997,12 +2050,11 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
                 if( avoidL )
                 {
                     ai.avoidAhead |= Opponent::F_LEFT;
-                    ai.aheadSpan.ExcludeLeftOf(-oCar->_trkPos.toMiddle + oi.sit.minDY);
                 }
+
                 if( avoidR )
                 {
                     ai.avoidAhead |= Opponent::F_RIGHT;
-                    ai.aheadSpan.ExcludeRightOf(-oCar->_trkPos.toMiddle - oi.sit.minDY);
                 }
 
                 if( avoidL )
@@ -2022,12 +2074,10 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
             if( oi.sit.rdPY < 0 )
             {
                 ai.minLSideDist = MN(ai.minLSideDist, -oi.sit.rdPY - oi.sit.minDY);
-                ai.sideSpan.ExcludeLeftOf(-oCar->_trkPos.toMiddle + oi.sit.minDY);
             }
             else
             {
                 ai.minRSideDist = MN(ai.minRSideDist,  oi.sit.rdPY - oi.sit.minDY);
-                ai.sideSpan.ExcludeRightOf(-oCar->_trkPos.toMiddle - oi.sit.minDY);
             }
 
         }
@@ -2035,49 +2085,39 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
         if( oi.GotFlags(Opponent::F_AHEAD) )
         {
             if( ai.pClosestAhead == 0 ||
-                    ai.pClosestAhead->sit.rdPX > oi.sit.rdPX )
+                ai.pClosestAhead->sit.rdPX > oi.sit.rdPX )
             {
                 ai.pClosestAhead = &oi;
             }
         }
 
-        bool	treatTeamMateAsLapper =
-                oi.GotFlags(Opponent::F_TEAMMATE | Opponent::F_REAR) &&
-                oi.sit.relPos > -25 &&
-                car->_laps == oCar->_laps &&
-                car->_dammage > oi.tmDamage + 300;
 
-        if( STAY_TOGETHER > 50 &&
-                oi.GotFlags(Opponent::F_TEAMMATE | Opponent::F_REAR) &&
-                oi.sit.relPos < -25 && oi.sit.relPos > -STAY_TOGETHER &&
-                car->_dammage + 2000 > oi.tmDamage )
-        {
-            lapper = true;
-        }
+        bool	treatTeamMateAsLapper =
+                    oi.GotFlags(Opponent::F_TEAMMATE | Opponent::F_REAR) &&
+                    oi.sit.relPos > -25 &&
+                    car->_laps == oCar->_laps &&
+                    car->_dammage > oi.tmDamage + 300 &&
+                    ai.nearbyCars <= 1;
 
         if( oi.GotFlags(Opponent::F_LAPPER) || treatTeamMateAsLapper )
         {
             int	av = oi.sit.rdPY < 0 ? Opponent::F_LEFT : Opponent::F_RIGHT;
             ai.avoidLapping |= av;
-            lapper = true;
+            *lapper = true;
         }
     }
 
     ai.k = k;
     ai.nextK = k;
 
-    LogSHADOW.debug("ss %5.1f %5.1f  as %5.1f %5.1f  bpo %5.1f\r", ai.sideSpan.a, ai.sideSpan.b, ai.aheadSpan.a, ai.aheadSpan.b, ai.bestPathOffs );
-
-    // double	pos = car->_distFromStartLine;          // Removed 5 April 2015 - Not Used
+    double	pos = car->_distFromStartLine;
     int		carIdx = m_track.IndexFromPos(m_track.CalcPos(car));
     ai.k = 	m_path[PATH_NORMAL].GetAt(carIdx).k;
     int		NSEG = m_track.GetSize();
-
     for( int i = 1; i < NSEG; i++ )
     {
         int	idx = (carIdx + i) % NSEG;
         double	thisK = m_path[PATH_NORMAL].GetAt(idx).k;
-
         if( fabs(thisK) > 0.01 )
         {
             ai.nextK = thisK;
@@ -2085,41 +2125,39 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
         }
     }
 
-    GenericAvoidance		ga;
+    Avoidance avoidance;
+    Vec2d	target = avoidance.calcTarget(ai, car, *this);
 
-    // int		priority = ga.priority(ai, car);        // Removed 5th April 2015 - Not Used
-    Vec2d	target = ga.calcTarget(ai, car, *this);
+    *carTargetSpd = MN(*carTargetSpd, ai.spdF);
+    *carTargetAcc = MN(*carTargetAcc, ai.accF);
+    *close = (ai.flags & Opponent::F_CLOSE) != 0;
 
-    carTargetSpd = MN(carTargetSpd, ai.spdF);
-    close = (ai.flags & Opponent::F_CLOSE) != 0;
-
-    if( m_Flying )
+    if( m_Flying || s->currentTime < START_HOLD_LINE_TIME )
         return;
 
-    double	w = AVOID_WIDTH * 2 + width;
+    double	w = 7.5;
     double	scale = 25.0 / w;
     double	avoidSMaxA = 0.00075 * scale;
     double	avoidSMaxV = 0.005 * scale;
-
     double	avoidTMaxA = 0.0003 * scale;
     double	avoidTMaxV = 0.2 * scale;
 
     m_attractor = target.x;
 
     double	targetS = 1 - target.y;
-    if(( m_avoidS != 1 && m_attractor == 0) || (m_avoidS != targetS && m_attractor != 0))
+
+    if( m_avoidS != 1 && m_attractor == 0 ||
+        m_avoidS != targetS && m_attractor != 0 )
     {
         targetS = (m_attractor == 0) ? 1 : 0;//0.35;
         double	avoidA = targetS > m_avoidS ? avoidSMaxA : -avoidSMaxA;
 
         double	dist = targetS - m_avoidS;
-
         if( fabs(dist) < 0.0005 )
             m_avoidSVel = 0;
         else
         {
             double	slowS = (m_avoidSVel * m_avoidSVel) / (2 * avoidSMaxA);
-
             if( fabs(dist) <= slowS )
             {
                 avoidA = -(m_avoidSVel * m_avoidSVel) / (2 * dist);
@@ -2138,7 +2176,6 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
 
     double	oldAvoidS = m_avoidS;
     m_avoidS += m_avoidSVel;
-
     if( m_avoidS < 0.0005 && m_avoidSVel < 0 )
     {
         m_avoidS = 0;
@@ -2149,9 +2186,9 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
         m_avoidS = 1;
         m_avoidSVel = 0;
     }
-    else if(( oldAvoidS < targetS && m_avoidS >= targetS ) ||
-            ( oldAvoidS > targetS && m_avoidS <= targetS ) ||
-            ( fabs(targetS - m_avoidS) < 0.0005 ))
+    else if( oldAvoidS < targetS && m_avoidS >= targetS ||
+             oldAvoidS > targetS && m_avoidS <= targetS ||
+             fabs(targetS - m_avoidS) < 0.0005 )
     {
         m_avoidS = targetS;
         m_avoidSVel = 0;
@@ -2164,7 +2201,6 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
     {
         double	tMaxA = avoidTMaxA / MX(0.2, 1 - m_avoidS);
         avoidA = attractT > m_avoidT ? tMaxA : -tMaxA;
-
         double	dist = attractT - m_avoidT;
         double	slowS = (m_avoidTVel * m_avoidTVel) / (2 * avoidTMaxA);
 
@@ -2184,11 +2220,29 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
         m_avoidTVel = 0;
 
     double	tMaxV = avoidTMaxV / MX(0.2, 1 - m_avoidS);
+    double	pos_tMaxV =  tMaxV;
+    double	neg_tMaxV = -tMaxV;
 
-    if( m_avoidTVel > tMaxV )
-        m_avoidTVel = tMaxV;
-    else if( m_avoidTVel < -tMaxV )
-        m_avoidTVel = -tMaxV;
+    if( target.y != 0 &&
+        (ai.flags & Opponent::F_DANGEROUS) == 0 &&
+        (ai.flags & Opponent::F_TO_SIDE)   == 0 )
+    {
+        if( k >  0.0025 && mySpd + 3 > pi.spd )
+        {
+            pos_tMaxV = 0;//*= 0.001;
+            LogSHADOW.debug( "-- right movement disallowed\n" );
+        }
+        if( k < -0.0025 && mySpd + 3 > pi.spd )
+        {
+            neg_tMaxV = 0;//*= 0.001;
+            LogSHADOW.debug( "-- left movement disallowed\n" );
+        }
+    }
+
+    if( m_avoidTVel > pos_tMaxV )
+        m_avoidTVel = pos_tMaxV;
+    else if( m_avoidTVel < neg_tMaxV )
+        m_avoidTVel = neg_tMaxV;
 
     double	oldAvoidT = m_avoidT;
     m_avoidT += m_avoidTVel;
@@ -2203,11 +2257,14 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, double k, double& carTarge
         m_avoidT = 1;
         m_avoidTVel = 0;
     }
-    else if(( oldAvoidT < attractT && m_avoidT >= attractT ) || ( oldAvoidT > attractT && m_avoidT <= attractT ))
+    else if( oldAvoidT < attractT && m_avoidT >= attractT ||
+             oldAvoidT > attractT && m_avoidT <= attractT )
     {
         m_avoidT = attractT;
         m_avoidTVel = 0;
     }
+
+    double	offs = CalcPathOffset(pos, m_avoidS, m_avoidT);
 }
 
 int TDriver::CalcGear( tCarElt* car, double& acc )

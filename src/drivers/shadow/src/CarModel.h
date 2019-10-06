@@ -18,6 +18,8 @@
 #ifndef _CARMODEL_H_
 #define _CARMODEL_H_
 
+#include "Vec3d.h"
+
 // my own planet ...
 #define GRAVITY 9.81
 
@@ -66,6 +68,17 @@ public:
     double	TYRE_MU_R;      // mu value of rear  tyres.
     double	MU_SCALE;       // scaling of MU to use for this car.
     double  MIN_MU_SCALE;   // Scaling of Min MU
+    double	AVOID_MU_SCALE;	// scaling of MU to use for this car.
+    double	BRAKE_MU_SCALE;	// extra scaling of MU to apply when braking.
+    double	KZ_SCALE;       // bump sensitivity.
+    double  OFFLINE_KZ_SCALE;
+    double	AVOID_KZ_SCALE;	// bump sensitivity.
+    double	KV_SCALE;		// bump sensitivity.
+
+    double	GRIP_SCALE_F;	// scaling of grip due to condition of front tyres.
+    double	GRIP_SCALE_R;	// scaling of grip due to condition of rear  tyres.
+    double	WING_ANGLE_F;	// front wing angle.
+    double	WING_ANGLE_R;	// rear wing angle.
 
     double  BRAKESCALE;     // Scaling of Brake
     double  BRAKEFORCE;     // Brake force max
@@ -80,16 +93,42 @@ public:
     double	CD_BODY;        // aerodynamic drag constant -- car body.
     double	CD_WING;        // aerodynamic drag constant -- wings
     double  CD_CX;
-    double	KZ_SCALE;       // bump sensitivity.
-    double	KV_SCALE;		// bump sensitivity.
-    double  OFFLINE_KZ_SCALE;
+
+    // load factor related.
+    double	OP_LOAD;
+    double	LF_MIN;
+    double	LF_MAX;
+    double	LF_K;
+
+    // real-time tracking.
+    Vec3d	POS_G;			// position in global coords.
+    Vec3d	VEL_G;			// velocity in global coords.
+    Vec3d	ACC_G;			// acceleration in global coords.
+    Vec3d	VEL_L;			// velocity in local  coords.
+    Vec3d	ACC_L;			// acceleration in local  coords.
+    double	POS_AZ;			// angle around z axis.
+    double	VEL_AZ;			// speed around z axis.
+
+    double	F_AXLE_X;		// front axle x position
+    double	R_AXLE_X;		// rear  axle x position
+    double	F_AXLE_WB;		// front axle weight balance (fraction of mass on axle)
+    double	R_AXLE_WB;		// rear  axle weight balance (fraction of mass on axle)
+    double	F_AXLE_CG;		// front axle ground effect constant
+    double	R_AXLE_CG;		// rear  axle ground effect constant
+
+    double	F_WING_X;		// front wing x position
+    double	R_WING_X;		// rear  wing x position
+
+    double	TARGET_SLIP;	// amount of slip to give maximum grip.
+    double	MAX_SLIP;		// amount of slip where grip level drops below 99% of maximum grip.
+
     double  BUMP_FACTOR;    // bump sensitivity factor.
     double	BUMP_FACTORLEFT;
     double	BUMP_FACTORRIGHT;
-    double	AVOID_MU_SCALE;	// scaling of MU to use for this car.
+
     double	lftOH;
     double	rgtOH;
-    double	AVOID_KZ_SCALE;	// bump sensitivity.
+
     double	WIDTH;			// width of car (m).
     double  BRAKE_FACTOR;   // higher number = slower braking
     double	CT_FACTOR;

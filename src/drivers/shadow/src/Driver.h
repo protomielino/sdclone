@@ -139,6 +139,7 @@
 #define PRV_SPEED_FACTOR        "speed factor"
 #define PRV_BRAKE_FACTOR	    "brake factor"
 #define PRV_CTFACTOR            "ctfactor"
+#define PRV_STARTLINE           "start hold line time"
 
 #define NBR_BRAKECOEFF 50                                   // Number of brake coeffs
 
@@ -331,7 +332,7 @@ public:
 
 private:
   void    ProcessOtherCars( int index, tCarElt* car, double spd, tSituation* s );
-  void    AvoidOtherCars( int index, tCarElt* car, double k, double& carTargetSpd, tSituation* s, bool& inTraffic, bool& lapper );
+  void    AvoidOtherCars(int index, tCarElt* car, const tSituation *s, double k, double *carTargetSpd, double *carTargetAcc, bool *inTraffic, bool *lapper );
   int     CalcGear( tCarElt* car, double& acc );
   float   getClutch(float flutch);
   float   startAutomatic(float clutch);
@@ -421,6 +422,7 @@ private:
   int		STEERCONTROL_AVOID;
   int		STEERCONTROL_RECOVERY;
   double	TWDIST;
+  double	START_HOLD_LINE_TIME;	// hold inital line on track, in s.
 
   tSituation    *m_Situation;                   // situation
   int		    m_driveType;
@@ -584,6 +586,7 @@ private:
   static const float ABS_MINSPEED;
   static const float ABS_SLIP;
   static const float ABS_RANGE;
+
 };
 
 #endif

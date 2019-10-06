@@ -20,6 +20,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "Cubic.h"
+#include "Utils.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -103,4 +104,9 @@ double Cubic::CalcGradient( double x ) const
 double Cubic::Calc2ndDerivative( double x ) const
 {
     return 6 * m_coeffs[0] * x + 2 * m_coeffs[1];
+}
+
+int	Cubic::Solve( double* r1, double* r2, double* r3 ) const
+{
+    return Utils::SolveCubic(m_coeffs[0], m_coeffs[1], m_coeffs[2], m_coeffs[3], r1, r2, r3);
 }
