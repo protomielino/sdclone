@@ -18,81 +18,84 @@
  *                                                                         *
  ***************************************************************************/
 
- 
+
 #ifndef _GRCAR_H_
 #define _GRCAR_H_
 
 #include <plib/ssg.h>
-#include <car.h>			//tCarElt
+#include <car.h>		//tCarElt
 #include <raceman.h>	//tSituation
 #include "grcam.h"		//cGrPerspCamera
+#include "grshader.h"   //cGrShader
 
 class cGrSkidmarks;
 class ssgVtxTableShadow;
+class cgrShader;
 
 class tgrCarInstrument
 {
 public:
-	ssgSimpleState	*texture;
-	GLuint	CounterList;
-	GLuint	needleList;
-	tdble		needleXCenter, needleYCenter;
-	tdble		digitXCenter, digitYCenter;
-	tdble		minValue, maxValue;
-	tdble		minAngle, maxAngle;
-	tdble		*monitored;
-	tdble		prevVal;
-	tdble		rawPrev;
-	int			digital;
-	float		needleColor[4];
+    ssgSimpleState	*texture;
+    GLuint	CounterList;
+    GLuint	needleList;
+    tdble		needleXCenter, needleYCenter;
+    tdble		digitXCenter, digitYCenter;
+    tdble		minValue, maxValue;
+    tdble		minAngle, maxAngle;
+    tdble		*monitored;
+    tdble		prevVal;
+    tdble		rawPrev;
+    int			digital;
+    float		needleColor[4];
 };
 
 
 class tgrCarInfo
 {
 public:
-	float				iconColor[4];
-	ssgTransform		*carTransform;
-	ssgSelector			*LODSelector;
-	ssgSelector			*DRMSelector;
-	ssgSelector			*DRMSelector2;
-	ssgEntity			*carEntity;
-	int                 nSteer;
-	int					LODSelectMask[32];
-	float				LODThreshold[32];
-	int					DRMSelectMask[32];
-	int					DRMSelectMask2[32];
-	int                 nDRM;
-	int					nDRM2;
-	float				DRMThreshold[32];
-	float				DRMThreshold2[32];
-	float				lastDRMswitch;
-	ssgSelector			*driverSelector;
-	ssgSelector			*steerSelector;
-	ssgSelector			*rearwingSelector;
-	bool				driverSelectorinsg;
-	bool				rearwingSelectorinsg;
-	ssgStateSelector	*envSelector;
-	ssgTransform		*wheelPos[4];
-	ssgTransform		*wheelRot[4];
-	ssgTransform		*steerRot[2];
-	ssgColourArray		*brkColor[4];
-	ssgSelector			*wheelselector[4];
-	ssgState			*wheelTexture;
-	ssgVtxTableShadow	*shadowBase;
-	ssgVtxTableShadow	*shadowCurr;
-	ssgBranch			*shadowAnchor;
-	cGrSkidmarks		*skidmarks;
-	sgMat4				carPos;
-	tgrCarInstrument	instrument[2];
-	tdble				distFromStart;
-	tdble				envAngle;
-	int					fireCount;
-	tdble				steerMovt;
-	tdble				px;
-	tdble				py;
-	tdble				sx;
-	tdble				sy;
+    float				iconColor[4];
+    ssgTransform		*carTransform;
+    ssgSelector			*LODSelector;
+    ssgSelector			*DRMSelector;
+    ssgSelector			*DRMSelector2;
+    ssgEntity			*carEntity;
+    int                 nSteer;
+    int					LODSelectMask[32];
+    float				LODThreshold[32];
+    int					DRMSelectMask[32];
+    int					DRMSelectMask2[32];
+    int                 nDRM;
+    int					nDRM2;
+    float				DRMThreshold[32];
+    float				DRMThreshold2[32];
+    float				lastDRMswitch;
+    ssgSelector			*driverSelector;
+    ssgSelector			*steerSelector;
+    ssgSelector			*rearwingSelector;
+    bool				driverSelectorinsg;
+    bool				rearwingSelectorinsg;
+    ssgStateSelector	*envSelector;
+    ssgTransform		*wheelPos[4];
+    ssgTransform		*wheelRot[4];
+    ssgTransform		*steerRot[2];
+    ssgColourArray		*brkColor[4];
+    ssgSelector			*wheelselector[4];
+    ssgState			*wheelTexture;
+    ssgVtxTableShadow	*shadowBase;
+    ssgVtxTableShadow	*shadowCurr;
+    ssgBranch			*shadowAnchor;
+    cGrSkidmarks		*skidmarks;
+    sgMat4				carPos;
+    tgrCarInstrument	instrument[2];
+    tdble				distFromStart;
+    tdble				envAngle;
+    int					fireCount;
+    tdble				steerMovt;
+    tdble				px;
+    tdble				py;
+    tdble				sx;
+    tdble				sy;
+    cgrShader           *shader;
 };
 
 extern tgrCarInfo	*grCarInfo;
@@ -106,4 +109,4 @@ extern void grDrawCar(tSituation *, tCarElt*, tCarElt *, int, int, double curTim
 extern void grInitCommonState(void);
 //extern void grPropagateDamage (ssgEntity* l, sgVec3 poc, sgVec3 force, int cnt);
 extern void grPropagateDamage (tSituation *);
-#endif /* _GRCAR_H_ */ 
+#endif /* _GRCAR_H_ */

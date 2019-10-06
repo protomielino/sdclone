@@ -21,7 +21,7 @@
 #define _GRCAM_H_
 
 #include <plib/ssg.h>	//GLuint
-#include <car.h>			//tCarElt
+#include <car.h>		//tCarElt
 #include <raceman.h>	//tSituation
 
 #ifdef WIN32
@@ -34,7 +34,7 @@ class cGrScreen;
 GF_TAILQ_HEAD(GrCamHead, cGrCamera);
 
 /* Camera interface */
-class cGrCamera 
+class cGrCamera
 {
  private:
     GF_TAILQ_ENTRY(cGrCamera) link;
@@ -51,23 +51,23 @@ class cGrCamera
     sgVec3 up;
     int Speed;
     class cGrScreen	*screen;	/* screen where the camera is attached */
-    
+
  public:
     cGrCamera(class cGrScreen *myscreen, int myid = 0, int mydrawCurrent = 0, int mydrawdrv = 0, int mydrawBackground = 0, int mymirrorAllowed = 0) {
-		screen = myscreen;
-		id = myid;
-		drawCurrent = mydrawCurrent;
-		drawDriver = mydrawdrv;
-		drawBackground = mydrawBackground;
-		mirrorAllowed = mymirrorAllowed;
-		speed[0] = speed[1] = speed[2] = 0.0;
-		eye[0] = eye[1] = eye[2] = 0.0;
-		center[0] = center[1] = center[2] = 0.0;
-		up[0] = up[1] = 0.0; up[2] = 1.0;
+        screen = myscreen;
+        id = myid;
+        drawCurrent = mydrawCurrent;
+        drawDriver = mydrawdrv;
+        drawBackground = mydrawBackground;
+        mirrorAllowed = mymirrorAllowed;
+        speed[0] = speed[1] = speed[2] = 0.0;
+        eye[0] = eye[1] = eye[2] = 0.0;
+        center[0] = center[1] = center[2] = 0.0;
+        up[0] = up[1] = 0.0; up[2] = 1.0;
     }
 
     virtual ~cGrCamera() {};
-    
+
     virtual void update(tCarElt *car, tSituation *s) = 0;	/* Change the camera if necessary */
     virtual void setProjection(void) = 0;
     virtual void setModelView(void) = 0;
@@ -86,11 +86,12 @@ class cGrCamera
     virtual float getAspectRatio();
 
     /* Set the camera view */
-    void action(void) {
-	setProjection();
-	setModelView();
+    void action(void)
+    {
+        setProjection();
+        setModelView();
     }
-    
+
     /* Get the camera info */
     int getId(void)		{ return id; }
     int getDrawCurrent(void)	{ return drawCurrent; }
@@ -99,59 +100,59 @@ class cGrCamera
     int isMirrorAllowed(void)	{ return mirrorAllowed; }
 
     t3Dd *getPos(void) {
-	static t3Dd pos;
-	pos.x = eye[0];
-	pos.y = eye[1];
-	pos.z = eye[2];
-	return &pos;
+    static t3Dd pos;
+    pos.x = eye[0];
+    pos.y = eye[1];
+    pos.z = eye[2];
+    return &pos;
     }
     sgVec3 *getPosv(void) {
-	return &eye;
+    return &eye;
     }
     sgVec3 *getSpeedv(void) {
         return &speed;
     }
     t3Dd *getCenter(void) {
-	static t3Dd pos;
-	pos.x = center[0];
-	pos.y = center[1];
-	pos.z = center[2];
-	return &pos;
+    static t3Dd pos;
+    pos.x = center[0];
+    pos.y = center[1];
+    pos.z = center[2];
+    return &pos;
     }
     sgVec3 *getCenterv(void) {
-	return &center;
+    return &center;
     }
     t3Dd *getUp(void) {
-	static t3Dd pos;
-	pos.x = up[0];
+    static t3Dd pos;
+    pos.x = up[0];
 
-	pos.y = up[1];
-	pos.z = up[2];
-	return &pos;
+    pos.y = up[1];
+    pos.z = up[2];
+    return &pos;
     }
     sgVec3 *getUpv(void) {
-	return &up;
+    return &up;
     }
 
     virtual float getFovY(void) {
-	return 67.5; // override in perspective camera
+    return 67.5; // override in perspective camera
     }
-    
+
     /* Add the camera in the corresponding list */
     void add(tGrCamHead *head) {
-	GF_TAILQ_INSERT_TAIL(head, this, link);
+    GF_TAILQ_INSERT_TAIL(head, this, link);
     }
-    
+
     /* Remove the camera from the corresponding list */
     void remove(tGrCamHead *head) {
-	GF_TAILQ_REMOVE(head, this, link);
+    GF_TAILQ_REMOVE(head, this, link);
     }
 
     /* Get the squared distance between the car and the camera */
     float getDist2(tCarElt *car);
 
     cGrCamera *next(void) {
-	return GF_TAILQ_NEXT(this, link);
+    return GF_TAILQ_NEXT(this, link);
     }
 };
 
@@ -170,12 +171,12 @@ class cGrPerspCamera : public cGrCamera
     float viewOffset;
     float spanAngle;
     float spanOffset;
-    
+
  public:
     cGrPerspCamera(class cGrScreen *myscreen, int id, int drawCurr, int drawDrv, int drawBG, int mirrorAllowed,
-		   float myfovy, float myfovymin, float myfovymax,
-		   float myfnear, float myffar = 1500.0, float myfogstart = 1400.0, float myfogend = 1500.0);
-    
+           float myfovy, float myfovymin, float myfovymax,
+           float myfnear, float myffar = 1500.0, float myfogstart = 1400.0, float myfogend = 1500.0);
+
     virtual void update(tCarElt *car, tSituation *s) = 0;	/* Change the camera if necessary */
     virtual void setProjection(void);
     virtual void setModelView(void);
@@ -195,7 +196,7 @@ class cGrPerspCamera : public cGrCamera
     virtual void afterDraw() {}
 
     cGrPerspCamera *next(void) {
-	return (cGrPerspCamera *)cGrCamera::next();
+    return (cGrPerspCamera *)cGrCamera::next();
     }
 
    virtual void limitFov(void)  {}
@@ -219,11 +220,11 @@ class cGrOrthoCamera : public cGrCamera
 
  public:
     cGrOrthoCamera(class cGrScreen *myscreen, float myleft, float myright, float mybottom, float mytop)
-	: cGrCamera(myscreen) {
-	left   = myleft;
-	right  = myright;
-	bottom = mybottom;
-	top    = mytop;
+    : cGrCamera(myscreen) {
+    left   = myleft;
+    right  = myright;
+    bottom = mybottom;
+    top    = mytop;
     }
 
     void setProjection(void);
@@ -242,11 +243,11 @@ class cGrBackgroundCam : public cGrPerspCamera
     int			mirrorBackground;
  public:
     cGrBackgroundCam(class cGrScreen *myscreen)
-	: cGrPerspCamera(myscreen, 0, 0, 0, 1, 0,
-			 67.5f, 67.5f, 67.5f,
-			 0.1f, 2000.0f, 100000.0f, 100000.0f) {
+    : cGrPerspCamera(myscreen, 0, 0, 0, 1, 0,
+             67.5f, 67.5f, 67.5f,
+             0.1f, 2000.0f, 100000.0f, 100000.0f) {
     }
-    
+
     void setModelView(void);
     void update(tCarElt *car, tSituation *s) {}
 
@@ -261,11 +262,11 @@ class cGrCarCamMirror : public cGrPerspCamera
     int		mx, my, mw, mh;		/* drawing area */
     float   aspectRatio;        /* the aspect ratio of the mirror: mw / mh */
     float   origFovY;           /* fovy set using constructor */
-    
+
  public:
     cGrCarCamMirror(cGrScreen *myscreen, int id, int drawCurr, int drawBG,
-		    float myfovy, float myfovymin, float myfovymax,
-		    float myfnear, float myffar = 1500.0,
+            float myfovy, float myfovymin, float myfovymax,
+            float myfnear, float myffar = 1500.0,
                    float myfogstart = 1400.0, float myfogend = 1500.0);
 
     void update (tCarElt *car, tSituation *s);
@@ -298,6 +299,6 @@ class cGrCarCamMirror : public cGrPerspCamera
 // If fixedFar is not nul, the fovFactor is used for the far clip plane ;
 // otherwise, fixedFar is used.
 extern void grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
-									   tdble fovFactor, tdble fixedFar = 0);
+                                       tdble fovFactor, tdble fixedFar = 0);
 
-#endif /* _GRCAM_H_ */ 
+#endif /* _GRCAM_H_ */

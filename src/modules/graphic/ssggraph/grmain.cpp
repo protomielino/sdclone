@@ -582,7 +582,9 @@ refresh(tSituation *s)
     frameInfo.nTotalFrames++;
     const double dCurTime = GfTimeClock();
     const double dDeltaTime = dCurTime - fFPSPrevInstTime;
-    if (dDeltaTime > 1.0) {
+
+    if (dDeltaTime > 1.0)
+    {
         ++nFPSTotalSeconds;
         fFPSPrevInstTime = dCurTime;
         frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
@@ -605,7 +607,8 @@ refresh(tSituation *s)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GfProfStopProfile("grDrawBackground/glClear");
 
-    for (i = 0; i < grNbActiveScreens; i++) {
+    for (i = 0; i < grNbActiveScreens; i++)
+    {
         grScreens[i]->update(s, &frameInfo);
     }
 

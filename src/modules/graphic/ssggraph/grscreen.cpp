@@ -315,6 +315,7 @@ void cGrScreen::camDraw(tSituation *s)
         grDrawStaticBackground(dispCam, bgCam);
         glClear(GL_DEPTH_BUFFER_BIT);
     }
+
     glEnable(GL_DEPTH_TEST);
 
     // Activate the current display camera.
@@ -332,10 +333,12 @@ void cGrScreen::camDraw(tSituation *s)
 
     // Sort the cars by distance for transparent windows
     TheDispCam = dispCam; // Needed by compareCars() ordering function
+
     if (dispCam != mirrorCam)
         qsort(cars, s->_ncars, sizeof(tCarElt*), compareCars);
 
-    for (int i = 0; i < s->_ncars; i++) {
+    for (int i = 0; i < s->_ncars; i++)
+    {
         grDrawCar(s, cars[i], curCar, dispCam->getDrawCurrent(), dispCam->getDrawDriver(), s->currentTime, dispCam);
     }
 
@@ -370,11 +373,13 @@ void cGrScreen::camDraw(tSituation *s)
     GfProfStopProfile("grDrawScene*");
 
     // Draw the precipitation if any.
-    if (dispCam->isMirrorAllowed() == 1) {
+    if (dispCam->isMirrorAllowed() == 1)
+    {
         // angle the rain for 1st person views
         grRain.drawPrecipitation(grTrack->local.rain, 1.0, 0.0,
             curCar->_roll * SG_RADIANS_TO_DEGREES, 0.0, curCar->_speed_x);
-    } else
+    }
+    else
         grRain.drawPrecipitation(grTrack->local.rain, 1.0, 0.0, 0.0, 0.0, 0.0);
 
     GfProfStartProfile("dispCam->afterDraw*");
@@ -386,33 +391,43 @@ void cGrScreen::camDraw(tSituation *s)
 /* Update screen display */
 void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
 {
-    if (!active) {
+    if (!active)
+    {
         return;
     }
 
     int carChanged = 0;
-    if (selectNextFlag) {
-        for (int i = 0; i < (s->_ncars - 1); i++) {
-            if (curCar == s->cars[i]) {
+    if (selectNextFlag)
+    {
+        for (int i = 0; i < (s->_ncars - 1); i++)
+        {
+            if (curCar == s->cars[i])
+            {
                 curCar = s->cars[i + 1];
                 carChanged = 1;
                 break;
             }
         }
+
         selectNextFlag = false;
     }
 
-    if (selectPrevFlag) {
-        for (int i = 1; i < s->_ncars; i++) {
+    if (selectPrevFlag)
+    {
+        for (int i = 1; i < s->_ncars; i++)
+        {
             if (curCar == s->cars[i]) {
                 curCar = s->cars[i - 1];
                 carChanged = 1;
                 break;
             }
         }
+
         selectPrevFlag = false;
     }
-    if (carChanged) {
+
+    if (carChanged)
+    {
         sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
         GfParmSetStr(grHandle, path, GR_ATT_CUR_DRV, curCar->_name);
         loadParams (s);
@@ -421,7 +436,8 @@ void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
         curCam->onSelect(curCar, s);
     }
 
-    if (grNbActiveScreens > 1) {
+    if (grNbActiveScreens > 1)
+    {
         // only need to scissor with split screens (to prevent a problem with Nouvuea driver)
         glEnable(GL_SCISSOR_TEST);
         glViewport(scrx, scry, scrw, scrh);
@@ -429,7 +445,9 @@ void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
         dispCam = curCam;
         camDraw(s);
         glDisable(GL_SCISSOR_TEST);
-    } else {
+    }
+    else
+    {
         glViewport(scrx, scry, scrw, scrh);
         dispCam = curCam;
         camDraw(s);

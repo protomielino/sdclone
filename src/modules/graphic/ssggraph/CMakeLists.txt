@@ -1,6 +1,7 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
 SET(SSGGRAPH_HEADERS grMoonpos.h grSky.h
+					 grshader.h grshader.cpp
                      grSphere.h grStars.cpp
                      grboard.h grcam.h grcar.h
                      grcarlight.h grmain.h 
