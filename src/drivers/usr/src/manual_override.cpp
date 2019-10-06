@@ -142,7 +142,7 @@ void LManualOverride::saveToFile(FILE *filepointer)
     {
         snprintf(str, 127, "%s<\n", label);
         fprintf(filepointer, str);
-        snprintf(str, 127, "%.4f %.4f %.4f\n\n", overrideValues[i].startdist, overrideValues[i].enddist, overrideValues[i].value);
+        snprintf(str, 127, "%i %i %.4f\n\n", overrideValues[i].startdist, overrideValues[i].enddist, overrideValues[i].value);
         fprintf(filepointer, str);
     }
 }
@@ -357,7 +357,7 @@ void LManualOverrideCollection::saveToFile()
 #endif
 }
 
-LManualOverride *LManualOverrideCollection::getOverrideForLabel(char *label)
+LManualOverride *LManualOverrideCollection::getOverrideForLabel(const char *label)
 {
     if (label)
     {

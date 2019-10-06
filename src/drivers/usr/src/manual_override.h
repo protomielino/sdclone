@@ -64,7 +64,7 @@ public:
 
     void loadFromFile(char *trackname, const char *botname, const char *carname, int racetype);
     void saveToFile();
-    LManualOverride *getOverrideForLabel(char *label);
+    LManualOverride *getOverrideForLabel(const char *label);
 
 private:
     int divCount;

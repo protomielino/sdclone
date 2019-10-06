@@ -498,8 +498,7 @@ void Opponent::calcState(float Speed, Driver *driver)
 #ifdef OPP_DEBUG
     if (state)// && state != OPP_IGNORE)
     {
-        fprintf(stderr, "%s - %s: %.1f %s %s %s\n", mycar->_name, car->_name, distance, (state & OPP_SIDE) ? "SIDE" : ((state & OPP_FRONT) ? "FRONT" : ((state & OPP_BACK) ? "BACK" : "")), (state & OPP_COLL) ? "COLL" : "",(state & OPP_IGNORE)?"IGNORE":"");
-        fflush(stderr);
+        LogUSR.debug("%s - %s: %.1f %s %s %s\n", mycar->_name, car->_name, distance, (state & OPP_SIDE) ? "SIDE" : ((state & OPP_FRONT) ? "FRONT" : ((state & OPP_BACK) ? "BACK" : "")), (state & OPP_COLL) ? "COLL" : "",(state & OPP_IGNORE)?"IGNORE":"");
     }
 #endif
 }
@@ -864,7 +863,7 @@ int Opponent::testLinearCollision2(Driver *driver)
         if (driver->raceline->IsSlowerThanSpeedToDiv(driver->linemode, car->_speed_x + MIN(0.0, avgAccelX / 4), div, &slowSpeed))
         {
 #ifdef BRAKE_DEBUG
-            fprintf(stderr, "%s %d NO COLL C: Slower Speed %.2f between opponent and collision point\n", car->_name, mycar->_dammage, slowSpeed); fflush(stderr);
+            LogUSR.debug("%s %d NO COLL C: Slower Speed %.2f between opponent and collision point\n", car->_name, mycar->_dammage, slowSpeed);
 #endif
             if (distance > MAX(2, 4.0 - fabs(driver->raceline->tRInverse[LINE_RL][driver->raceline->This]) * 1000))
                 hasSlowerSpeed = true;
@@ -879,7 +878,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     if (timpact < 0.0 && distance > 2.0 + MAX(0.0, MIN(2.0, -car->_accel_x)))
     {
 #ifdef BRAKE_DEBUG
-        fprintf(stderr, "%s %d NO COLL D: t_impact %.2f <= 0.0 and distance %.1f > 1.0\n", car->_name, mycar->_dammage, timpact, distance); fflush(stderr);
+        LogUSR.debug("%s %d NO COLL D: t_impact %.2f <= 0.0 and distance %.1f > 1.0\n", car->_name, mycar->_dammage, timpact, distance);
 #endif
         return -1;
     }
@@ -888,7 +887,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     if (timpact > MAX(1.0, MIN(distance*2, car->_speed_x / 20)) / (simTime < 2.0 ? 2 : 1) && distance > 0.5)
     {
 #ifdef BRAKE_DEBUG
-        fprintf(stderr, "%s %d NO COLL E: t_impact %.2f > speed factor %.2f, dist = %.2f\n",car->_name,mycar->_dammage,timpact,MAX(1.0, car->_speed_x/20), distance);fflush(stderr);
+        LogUSR.debug("%s %d NO COLL E: t_impact %.2f > speed factor %.2f, dist = %.2f\n",car->_name,mycar->_dammage,timpact,MAX(1.0, car->_speed_x/20), distance);
 #endif
         return -1;
     }
@@ -942,7 +941,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     {
         collspeed = (float) MIN(collspeed, car->_speed_x-2.0);
 #ifdef BRAKE_DEBUG
-        fprintf(stderr, "%s %d CLOSE OVERLAP COLLISION collspeed=%.2f\n",car->_name,mycar->_dammage,collspeed);fflush(stderr);
+        LogUSR.debug("%s %d CLOSE OVERLAP COLLISION collspeed=%.2f\n",car->_name,mycar->_dammage,collspeed);
 #endif
         return OPP_COLL | OPP_COLL_WARNING; // cars are overlapping now.
     }
@@ -950,7 +949,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     if (!(state & OPP_SIDE) && speedDiff <= 0 && car->_speed_x > 5.0f)
     {
 #ifdef BRAKE_DEBUG
-        fprintf(stderr, "%s %d NO COLL: speedDiff %.1f <= 0 and speed %.2f > 5.0\n",car->_name,mycar->_dammage,speedDiff,car->_speed_x);fflush(stderr);
+        LogUSR.debug("%s %d NO COLL: speedDiff %.1f <= 0 and speed %.2f > 5.0\n",car->_name,mycar->_dammage,speedDiff,car->_speed_x);
 #endif
         return -1;
     }
@@ -964,7 +963,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     if (driver->isOnRaceline() && rlspeed > collspeed && rlspeed <= car->_speed_x)
     {
 #ifdef BRAKE_DEBUG
-        fprintf(stderr, "%s %d NO COLL: speedDiff=%.1f collspeed=%.2f\n",car->_name,mycar->_dammage,speedDiff,collspeed);fflush(stderr);
+        LogUSR.debug("%s %d NO COLL: speedDiff=%.1f collspeed=%.2f\n",car->_name,mycar->_dammage,speedDiff,collspeed);
 #endif
         return 0;
     }
@@ -973,13 +972,14 @@ int Opponent::testLinearCollision2(Driver *driver)
     if (timpact > ((state & OPP_SIDE) ? 1.5 : 4.0))//MIN(3.0, MAX(0.7, speedDiff)))
     {
 #ifdef BRAKE_DEBUG
-        fprintf(stderr, "%s %d SIDE - NO COLL: t_impact %.2f > 5.0, dist=%.1f speedDiff=%.1f collspeed=%.2f\n",car->_name,mycar->_dammage,timpact,distance,speedDiff,collspeed);fflush(stderr);
+        LogUSR.debug("%s %d SIDE - NO COLL: t_impact %.2f > 5.0, dist=%.1f speedDiff=%.1f collspeed=%.2f\n",car->_name,mycar->_dammage,timpact,distance,speedDiff,collspeed);
 #endif
         return -1;
     }
 
     // move the opponent back a little towards our car, and project everything forward in time
     double deltax = 0.0, deltay = 0.0;
+
     for (i = 0; i < 4; i++)
     {
         // project opponent car by linear velocity, and make o_new2 moved back a little
@@ -1003,6 +1003,7 @@ int Opponent::testLinearCollision2(Driver *driver)
             thisdist = sqrt((deltax * deltax) + (deltay * deltay));
             double newax = d_cur[i].ax + thisdist * sin(driver->getSpeedAngle(timpact2));
             double neway = d_cur[i].ay + thisdist * cos(driver->getSpeedAngle(timpact2));
+
             if ((mycar->_yaw_rate < 0.0 && i == FRNT_RGT) || (mycar->_yaw_rate > 0.0 && i == FRNT_LFT))
             {
                 d_new2[i].ax = (tdble)newax;
@@ -1021,6 +1022,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     deltay = ((d_new2[FRNT_LFT].ay-o_new[REAR_LFT].ay)+(d_new2[FRNT_RGT].ay-o_new[REAR_RGT].ay))/2;
     double theta = atan2(deltax, deltay);
     double movedist = 0.5 + MIN(1.5, speedDiff/15);
+
     for (i = 0; i < 4; i++)
     {
         o_new2[i].ax = (tdble)(o_new[i].ax + movedist * sin(theta));
@@ -1029,14 +1031,14 @@ int Opponent::testLinearCollision2(Driver *driver)
 
     double trackdist = car->_distFromStartLine - mycar->_distFromStartLine;
     double sidedist = fabs(car->_trkPos.toLeft - mycar->_trkPos.toLeft);
-    if ((!(MIN(car->_trkPos.toLeft, car->_trkPos.toRight) < -3 && MIN(mycar->_trkPos.toLeft, mycar->_trkPos.toRight) >= 0)) &&
-            (sidedist / 2 < MAX(timpact, trackdist/2) || sidedist < 2.0 || speedDiff > 15))
+
+    if ((!(MIN(car->_trkPos.toLeft, car->_trkPos.toRight) < -3 && MIN(mycar->_trkPos.toLeft, mycar->_trkPos.toRight) >= 0)) && (sidedist / 2 < MAX(timpact, trackdist/2) || sidedist < 2.0 || speedDiff > 15))
         if (polyOverlap(o_new, d_new2) || polyOverlap(o_new2, d_new2))
         {
 #ifdef BRAKE_DEBUG
-            fprintf(stderr, "%s %d PROJECTED OVERLAP COLLISION dist=%.2f ospd=%.2f spd=%.2f collspeed=%.2f t_impact=%.2f sidedist=%.2f\n",car->_name,mycar->_dammage,distance,car->_speed_x,mycar->_speed_x,collspeed,timpact,fabs(car->_trkPos.toLeft - mycar->_trkPos.toLeft));fflush(stderr);
-#endif
+            LogUSR.debug("%s %d PROJECTED OVERLAP COLLISION dist=%.2f ospd=%.2f spd=%.2f collspeed=%.2f t_impact=%.2f sidedist=%.2f\n",car->_name,mycar->_dammage,distance,car->_speed_x,mycar->_speed_x,collspeed,timpact,fabs(car->_trkPos.toLeft - mycar->_trkPos.toLeft));
             return OPP_COLL | OPP_COLL_WARNING;
+#endif
         }
 
     //if (driver->isOnRaceline())// && car->_pos > mycar->_pos)
@@ -1091,7 +1093,8 @@ int Opponent::testLinearCollision2(Driver *driver)
 
     if (polyOverlap(o_new, d_new2))
     {
-        fprintf(stderr, "%s WARNING COLLISION\n",car->_name);fflush(stderr);
+        LogUSR.debug("%s WARNING COLLISION\n",car->_name);
+
         return OPP_COLL_WARNING;
     }
 #endif
@@ -1102,7 +1105,9 @@ int Opponent::testLinearCollision2(Driver *driver)
 double Opponent::CalcCollSpeed(Driver *driver)
 {
     double mySpd = hypot(mycar->_speed_X, mycar->_speed_Y);
+
     if (fabs(mySpd) < 0.01) mySpd = 0.01;
+
     double myDirX = car->_speed_X / mySpd;
     double myDirY = car->_speed_Y / mySpd;
 
@@ -1122,6 +1127,7 @@ double Opponent::CalcCollSpeed(Driver *driver)
     double ospeed = car->_speed_x + (distance < 2.0 ? MIN(0.0, car->_accel_x * t_impact * 2.0) : 0.0);
     double targetEk = driver->mass() * ospeed * ospeed / 2;
     double brake_coefficient = driver->getBrakeCoefficient();
+
     if (currentEk - targetEk > t_impact * 750000 / brake_coefficient)
     {
         if (state & OPP_SIDE)
@@ -1132,13 +1138,13 @@ double Opponent::CalcCollSpeed(Driver *driver)
             {
                 double t = (fabs(rdPY) - minDY) / fabs(rdVY);
                 double collX = rdPX + rdVX * t;
+
                 if (collX > minDX*0.5 && collX < minDX)
                     collspeed = (float)oVX - 3.0f;
             }
         }
         else
             collspeed = (float)oVX;
-        //collspeed = MAX(ospeed, mycar->_speed_x - (speedDiff * ((currentEk - (timpact * 100000 / brake_coefficient)) / (currentEk - targetEk))));
     }
     else
         collspeed = mycar->_speed_x + 2.0f;
@@ -1303,11 +1309,15 @@ int Opponent::testQuadraticCollision(Driver *driver)
     if (!(car->_state & RM_CAR_STATE_PIT) || fabs(car->_trkPos.toLeft - mycar->_trkPos.toLeft) < 3.0)
     {
         collision = testLinearCollision2(driver);
+
         if (collision <= 0) return 0;
+
         if ((collision & OPP_COLL))
             return collision;
+
         return testCalculatedCollision(driver);
     }
+
     return 0;
 #if 0
     // quadratics from mouse/sieger ... except I can't get them to work :/
@@ -1343,17 +1353,21 @@ int Opponent::testQuadraticCollision(Driver *driver)
     double acc = o_ragAX;
     Quadratic q(acc/2, o_rdVX, o_rdPX - minDX);
     double t = 0.0;
+
     if (q.SmallestNonNegativeRoot(t))
     {
         double catchY = relPar.CalcY(t);
+
         if (fabs(catchY) < minDY)
             collision = 1;
         else
         {
             q.Setup( acc/2, o_rdVX, o_rdPX + minDX );
+
             if (q.SmallestNonNegativeRoot(t))
             {
                 catchY = relPar.CalcY(t);
+
                 if (fabs(catchY) < minDY || catchY * o_rdPY < 0)
                     collision = 1;
             }
@@ -1409,12 +1423,12 @@ int Opponent::testCalculatedCollision(Driver *driver)
              (my_future_left > future_right && my_future_right <= future_left)))
     {
 #ifdef BRAKE_DEBUG
-        fprintf(stderr, "%s CCOLL %s: myrgt=%.1f mylft=%.1f oprgt=%.1f (%.1f) oplft=%.1f (%.1f) t_imp=%.3f ospd=%.2f/%.2f\n",car->_name,mycar->_name,my_future_right,my_future_left,future_right,right_toMid,future_left,left_toMid,t_impact,right_speed_y,left_speed_y); fflush(stderr);
+        LogUSR.debug("%s CCOLL %s: myrgt=%.1f mylft=%.1f oprgt=%.1f (%.1f) oplft=%.1f (%.1f) t_imp=%.3f ospd=%.2f/%.2f\n",car->_name,mycar->_name,my_future_right,my_future_left,future_right,right_toMid,future_left,left_toMid,t_impact,right_speed_y,left_speed_y);
 #endif
         return OPP_COLL;
     }
 #ifdef BRAKE_DEBUG
-    fprintf(stderr, "%s NO CCOLL %s: myrgt=%.1f mylft=%.1f oprgt=%.1f (%.1f) oplft=%.1f (%.1f) t_imp=%.3f ospd=%.2f/%.2f\n",car->_name,mycar->_name,my_future_right,my_future_left,future_right,right_toMid,future_left,left_toMid,t_impact,right_speed_y,left_speed_y); fflush(stderr);
+    LogUSR.debug("%s NO CCOLL %s: myrgt=%.1f mylft=%.1f oprgt=%.1f (%.1f) oplft=%.1f (%.1f) t_imp=%.3f ospd=%.2f/%.2f\n",car->_name,mycar->_name,my_future_right,my_future_left,future_right,right_toMid,future_left,left_toMid,t_impact,right_speed_y,left_speed_y);
 #endif
 
     return testRacelineCollision(driver, dist, t_impact, future_left, future_right);
@@ -1488,7 +1502,7 @@ int Opponent::testRacelineCollision(Driver *driver, double distance, double timp
         if (fabs(o_toLeft - rl_toLeft) < car->_dimension_y + 0.5)
         {
 #ifdef BRAKE_DEBUG
-            fprintf(stderr, "%s => %s RCOLL A\n", mycar->_name, car->_name); fflush(stderr);
+            LogUSR.debug("%s => %s RCOLL A\n", mycar->_name, car->_name);
 #endif
             return OPP_COLL;
         }
@@ -1503,7 +1517,7 @@ int Opponent::testRacelineCollision(Driver *driver, double distance, double timp
                 (my_future_left > future_right && my_future_right <= future_left))
         {
 #ifdef BRAKE_DEBUG
-            fprintf(stderr, "%s => %s RCOLL B\n", mycar->_name, car->_name); fflush(stderr);
+            LogUSR.debug("%s => %s RCOLL B\n", mycar->_name, car->_name);
 #endif
             return OPP_COLL;
         }
@@ -1557,8 +1571,11 @@ Opponents::Opponents(tSituation *s, Driver *driver, Cardata *c, double brake_mul
 {
     opponent = new Opponent[s->_ncars - 1];
     int i, j = 0;
-    for (i = 0; i < s->_ncars; i++) {
-        if (s->cars[i] != driver->getCarPtr()) {
+
+    for (i = 0; i < s->_ncars; i++)
+    {
+        if (s->cars[i] != driver->getCarPtr())
+        {
             opponent[j].setCarPtr(s->cars[i]);
             opponent[j].setCarDataPtr(c->findCar(s->cars[i]));
             opponent[j].setIndex(i);
@@ -1567,6 +1584,7 @@ Opponents::Opponents(tSituation *s, Driver *driver, Cardata *c, double brake_mul
             j++;
         }
     }
+
     Opponent::setTrackPtr(driver->getTrackPtr());
     nopponents = s->_ncars - 1;
 }
@@ -1590,8 +1608,10 @@ void Opponents::update(tSituation *s, Driver *driver)
 void Opponents::setTeamMate(const char *teamname)
 {
     int i;
-    for (i = 0; i < nopponents; i++) {
-        if (strcmp(opponent[i].getCarPtr()->_teamname, teamname) == 0) {
+    for (i = 0; i < nopponents; i++)
+    {
+        if (strcmp(opponent[i].getCarPtr()->_teamname, teamname) == 0)
+        {
             opponent[i].markAsTeamMate();
             break;    // Name should be unique, so we can stop.
         }
@@ -1605,6 +1625,7 @@ tCarElt *Opponents::getTeamMateCar()
         if (opponent[i].isTeamMate())
             return opponent[i].getCarPtr();
     }
+
     return NULL;
 }
 
@@ -1615,9 +1636,6 @@ bool Opponents::isBehindFriend(int pos)
         if (opponent[i].isTeamMate() && opponent[i].getCarPtr()->_pos < pos)
             return true;
     }
+
     return false;
 }
-
-
-
-

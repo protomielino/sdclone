@@ -674,7 +674,7 @@ void Driver::drive(tSituation *s)
             else
             {
 #if 1
-                static char *lineName[] = { "LINE_MID", "LINE_LEFT", "LINE_RIGHT", "LINE_RL", "LINE_RL", "LINE_RL" };
+                static const char *lineName[] = { "LINE_MID", "LINE_LEFT", "LINE_RIGHT", "LINE_RL", "LINE_RL", "LINE_RL" };
                 int rnd = rand();
                 int target_line = rnd % 4;
                 if (target_line == LINE_MID)

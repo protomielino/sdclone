@@ -67,7 +67,7 @@ public:
     bool IsOnHold(int div, bool stay_inside);
     bool IsOnRaceLine();
     bool IsTransitioning() { return m_IsTransitioning; }
-    bool SetTransitioning(bool value) { m_IsTransitioning = value; }
+    void SetTransitioning(bool value) { m_IsTransitioning = value; }
     bool HasFinishedTransition(double targetSteer, double steer);
     int GetTargetRaceline() { return m_TargetRaceline;  }
 

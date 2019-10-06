@@ -2959,7 +2959,7 @@ void LRaceLine::GetRaceLineData(RaceLineDriveData *data, bool transitioning)
 #ifndef LEARNING
         if (true || data->s->_raceType == RM_TYPE_PRACTICE)
         {
-            static char *lineName[] = { "MID", "LFT", "RGT", "RL" };
+            static const char *lineName[] = { "MID", "LFT", "RGT", "RL" };
             int rl = data->linemode->GetTargetRaceline();
             LogUSR.debug("%s TR %d:%d (%.1f) %s %s str=%.2f %.3f/%.3f %.3f/%.3f spd %.1f/%.1f/%.1f ang=%.3f vang=%.3f skidang=%.3f accx=%.3f\n", car->_name, This, Next, car->_distFromStartLine, lineName[rl], (isTransitioning ? "TRANS" : "OFFLINE"), data->racesteer, data->linemode->GetLeftCurrentMargin(), data->linemode->GetLeftTargetMargin(), data->linemode->GetRightCurrentMargin(), data->linemode->GetRightTargetMargin(), car->_speed_x, data->speed, CalculateOfflineSpeed((Next - 5 + Divs) % Divs, Next, data->linemode->GetLeftCurrentMargin(), data->linemode->GetRightCurrentMargin()), data->angle, data->speedangle, atan2(car->_speed_Y, car->_speed_X) - car->_yaw, car->_accel_x);
         }
