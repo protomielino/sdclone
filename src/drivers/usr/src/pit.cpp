@@ -53,6 +53,7 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
     pitmaxspeedoffset = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_PIT_MAX_SPEED_OFFSET, (char*)NULL, 0.0f);
     pitmaxspeed = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_PIT_MAX_SPEED, (char*)NULL, 0.0f);
     pittransoffset = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_PIT_TRANS_OFFSET, (char*)NULL, -1.0f);
+
     if (pittransoffset > 0.0)
         hastransoffset = true;
 
@@ -72,21 +73,28 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
         // HACK! pit entry on corkscrew
         pp[1].x = pp[0].x;
         pp[2].x = pp[1].x;
+
         if (pitstartoverride0 > 0.0)
             dtp[0].x = pp[0].x = pitstartoverride0;
+
         if (pitstartoverride1 > 0.0)
             pp[1].x = pitstartoverride1;
+
         if (pitstartoverride2 > 0.0)
             pp[2].x = pitstartoverride2;
+
         dtp[1].x = pp[3].x = pitinfo->pitStart->lgfromstart;
+
         if (pitstartoverride0 < 0.0)
             pp[1].x = pitinfo->pitEntry->lgfromstart + pitoffset + pitstartextralength;
+
         //pp[5].x = pitinfo->pitEnd->lgfromstart + pitinfo->len/2.0f;
         //pp[5].x = pp[3].x + (pitInfo->nMaxPits - car->index) * pitinfo->len;
         dtp[2].x = pp[7].x = pp[3].x + pitinfo->nMaxPits * pitinfo->len;
         dtp[3].x = pp[8].x = pitinfo->pitExit->lgfromstart;
+
         if (pitexitoverride > 0.0)
-            dtp[4].x = pp[8].x = pitexitoverride;
+            dtp[3].x = pp[8].x = pitexitoverride;
 
         pitentry = pp[0].x;
         pitend = pp[7].x;
@@ -96,6 +104,7 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
 
         // Normalizing spline segments to >= 0.0.
         int i;
+
         for (i = 0; i < PITPOINTS; i++)
         {
             pp[i].s = 0.0;
@@ -108,22 +117,27 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
         }
 
         // Fix broken pit exit.
-        if (pp[8].x < pp[7].x) {
+        if (pp[8].x < pp[7].x)
+        {
 
             dtp[3].x = pp[8].x = pp[7].x + 50.0f;
         }
 
         // Fix point for first pit if necessary.
-        if (pp[3].x > pp[4].x) {
+        if (pp[3].x > pp[4].x)
+        {
             pp[3].x = pp[4].x - 3.0f;
         }
-        if (pp[2].x > pp[3].x) {
+
+        if (pp[2].x > pp[3].x)
+        {
             pp[2].x = pp[3].x - 3.0f;
             pitentry = pp[2].x;
         }
 
         // Fix point for last pit if necessary.
-        if (pp[6].x > pp[7].x) {
+        if (pp[6].x > pp[7].x)
+        {
             pp[7].x = pp[6].x;
         }
 
@@ -131,11 +145,15 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
         float sign = (pitinfo->side == TR_LFT) ? 1.0f : -1.0f;
         dtp[0].y = pp[0].y = pitentryoffset;
         dtp[3].y = pp[8].y = pitexitoffset;
-        for (i = 1; i < PITPOINTS - 1; i++) {
+
+        for (i = 1; i < PITPOINTS - 1; i++)
+        {
             pp[i].y = fabs(pitinfo->driversPits->pos.toMiddle) - pitinfo->width;
             pp[i].y *= sign;
         }
-        for (i = 1; i < DTPOINTS - 1; i++) {
+
+        for (i = 1; i < DTPOINTS - 1; i++)
+        {
             dtp[i].y = fabs(pitinfo->driversPits->pos.toMiddle) - pitinfo->width;
             dtp[i].y *= sign;
         }
@@ -153,7 +171,8 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
 
 Pit::~Pit()
 {
-    if (mypit != NULL) {
+    if (mypit != NULL)
+    {
         delete pitspline;
         delete dtspline;
     }
@@ -164,9 +183,12 @@ Pit::~Pit()
 float Pit::toSplineCoord(float x)
 {
     x -= pitentry;
-    while (x < 0.0f) {
+
+    while (x < 0.0f)
+    {
         x += track->length;
     }
+
     return x;
 }
 
@@ -176,13 +198,17 @@ float Pit::getPitOffset(float offset, float fromstart)
 {
   float pitoffset;
 
-    if (mypit != NULL) {
-        if (getInPit() || (getPitstop() && isBetween(fromstart))) {
+    if (mypit != NULL)
+    {
+        if (getInPit() || (getPitstop() && isBetween(fromstart)))
+        {
             fromstart = toSplineCoord(fromstart);
             pitoffset = pitspline->evaluate(fromstart);
+
             return pitoffset;
         }
     }
+
     return offset;
 }
 
@@ -192,13 +218,17 @@ float Pit::getDriveThroughOffset(float offset, float fromstart)
 {
   float pitoffset;
 
-    if (mypit != NULL) {
-        if (getInPit() || (getPitstop() && isBetween(fromstart))) {
+    if (mypit != NULL)
+    {
+        if (getInPit() || (getPitstop() && isBetween(fromstart)))
+        {
             fromstart = toSplineCoord(fromstart);
             pitoffset = dtspline->evaluate(fromstart);
+
             return pitoffset;
         }
     }
+
     return offset;
 }
 
@@ -206,15 +236,19 @@ float Pit::getDriveThroughOffset(float offset, float fromstart)
 // Sets the pitstop flag if we are not in the pit range.
 void Pit::setPitstop(bool pitstop)
 {
-    if (mypit == NULL) {
+    if (mypit == NULL)
+    {
         return;
     }
 
     float fromstart = car->_distFromStartLine;
 
-    if (!isBetween(fromstart)) {
+    if (!isBetween(fromstart))
+    {
         this->pitstop = pitstop;
-    } else if (!pitstop) {
+    }
+    else if (!pitstop)
+    {
         this->pitstop = pitstop;
         pittimer = 0.0f;
     }
@@ -234,17 +268,26 @@ bool Pit::isInTrans(float fromstart)
 // Check if the argument fromstart is in the range of the pit.
 bool Pit::isBetween(float fromstart)
 {
-    if (pitentry <= pitexit) {
-        if (fromstart >= pitentry && fromstart <= pitexit) {
+    if (pitentry <= pitexit)
+    {
+        if (fromstart >= pitentry && fromstart <= pitexit)
+        {
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
-    } else {
+    }
+    else
+    {
         // Warning: TORCS reports sometimes negative values for "fromstart"!
-        if (fromstart <= pitexit || fromstart >= pitentry) {
+        if (fromstart <= pitexit || fromstart >= pitentry)
+        {
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
@@ -252,17 +295,26 @@ bool Pit::isBetween(float fromstart)
 
 bool Pit::isBetweenExit(float fromstart)
 {
-    if (pitend <= pitexit) {
-        if (fromstart >= pitend && fromstart <= pitexit) {
+    if (pitend <= pitexit)
+    {
+        if (fromstart >= pitend && fromstart <= pitexit)
+        {
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
-    } else {
+    }
+    else
+    {
         // Warning: TORCS reports sometimes negative values for "fromstart"!
-        if (fromstart <= pitexit || fromstart >= pitend) {
+        if (fromstart <= pitexit || fromstart >= pitend)
+        {
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
@@ -271,17 +323,26 @@ bool Pit::isBetweenExit(float fromstart)
 // check if fromstart is in the actual pit area
 bool Pit::isInPit(float fromstart)
 {
-    if (pitstopentry <= pitstopexit) {
-        if (fromstart >= pitstopentry && fromstart <= pitstopexit) {
+    if (pitstopentry <= pitstopexit)
+    {
+        if (fromstart >= pitstopentry && fromstart <= pitstopexit)
+        {
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
-    } else {
+    }
+    else
+    {
         // Warning: TORCS reports sometimes negative values for "fromstart"!
-        if (fromstart <= pitstopexit || fromstart >= pitstopentry) {
+        if (fromstart <= pitstopexit || fromstart >= pitstopentry)
+        {
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
@@ -294,6 +355,7 @@ float Pit::maxSpeed(float fromstart)
 
     if (fromstart > pitmaxspeedoffset)
         return pitmaxspeed;
+
     return 100000.0f;
 }
 
@@ -303,15 +365,24 @@ float Pit::maxSpeed(float fromstart)
 // ahead it is > 0, if we overshoot the pit it is < 0.
 bool Pit::isTimeout(float distance)
 {
-    if (car->_speed_x > 1.0f || distance > 3.0f || !getPitstop()) {
+    if (car->_speed_x > 1.0f || distance > 3.0f || !getPitstop())
+    {
         pittimer = 0.0f;
+
         return false;
-    } else {
+    }
+    else
+    {
         pittimer += (float) RCM_MAX_DT_ROBOTS;
-        if (pittimer > 3.0f) {
+
+        if (pittimer > 3.0f)
+        {
             pittimer = 0.0f;
+
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
@@ -321,19 +392,27 @@ bool Pit::isTimeout(float distance)
 // Update pit data and strategy.
 void Pit::update()
 {
-    if (mypit != NULL) {
+    if (mypit != NULL)
+    {
         inpitexit = false;
-        if (isBetween(car->_distFromStartLine)) {
-            if (getPitstop()) {
+
+        if (isBetween(car->_distFromStartLine))
+        {
+            if (getPitstop())
+            {
                 if (isBetweenExit(car->_distFromStartLine))
                     inpitexit = true;
+
                 setInPit(true);
             }
-        } else {
+        }
+        else
+        {
             setInPit(false);
         }
 
-        if (getPitstop()) {
+        if (getPitstop())
+        {
             car->_raceCmd = RM_CMD_PIT_ASKED;
         }
     }

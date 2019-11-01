@@ -25,93 +25,82 @@
 
 class Driver;
 
-class Pit {
-    public:
-        Pit(tSituation *s, Driver *driver, float PitOffset);
-        ~Pit();
+class Pit
+{
+public:
+    Pit(tSituation *s, Driver *driver, float PitOffset);
+    ~Pit();
 
-        void setPitstop(bool pitstop);
-        bool getPitstop() { return pitstop; }
+    void setPitstop(bool pitstop);
+    bool getPitstop() { return pitstop; }
 
-        void setInPit(bool inpitlane) { this->inpitlane = inpitlane; }
-        bool getInPit() { return inpitlane; }
-		bool getInPitExit() { return inpitexit; }
-		
-		float getPitEntryOffset() {
-			return pitspline->evaluate(pitentry);
-		}
+    void setInPit(bool inpitlane) { this->inpitlane = inpitlane; }
+    bool getInPit() { return inpitlane; }
+    bool getInPitExit() { return inpitexit; }
 
-        float getPitOffset(float offset, float fromstart);
-        float getDriveThroughOffset(float offset, float fromstart);
+    float getPitEntryOffset() {
+        return pitspline->evaluate(pitentry);
+    }
 
-        bool isBetween(float fromstart);
-        bool isBetweenExit(float fromstart);
-        float maxSpeed(float fromstart);
-        bool isInPit(float fromstart);
-        bool isTimeout(float distance);
-		bool isInTrans(float fromstart);
+    float getPitOffset(float offset, float fromstart);
+    float getDriveThroughOffset(float offset, float fromstart);
 
-#if 0
-        float getNPitStart() { return pp[1].x; }
-        float getNPitLoc() { return pp[3].x; }
-        float getNPitEnd() { return pp[5].x; }
-        float getNPitEntry() { return pp[0].x; }
-#endif
-        float getNPitStart() { return pp[1].x; }
-        float getNPitLoc() { return pp[5].x; }
-        float getNPitEnd() { return pp[7].x; }
-        float getNPitEntry() { return pp[0].x; }
+    bool isBetween(float fromstart);
+    bool isBetweenExit(float fromstart);
+    float maxSpeed(float fromstart);
+    bool isInPit(float fromstart);
+    bool isTimeout(float distance);
+    bool isInTrans(float fromstart);
 
-        float toSplineCoord(float x);
+    float getNPitStart() { return pp[1].x; }
+    float getNPitLoc() { return pp[5].x; }
+    float getNPitEnd() { return pp[7].x; }
+    float getNPitEntry() { return pp[0].x; }
 
-        float getSpeedlimitSqr() { return speedlimitsqr; }
-        float getSpeedlimit() { return speedlimit; }
-        float getSpeedLimitBrake(float speedsqr);
+    float toSplineCoord(float x);
 
-        void update();
+    float getSpeedlimitSqr() { return speedlimitsqr; }
+    float getSpeedlimit() { return speedlimit; }
+    float getSpeedLimitBrake(float speedsqr);
 
-    private:
-        tTrack *track;
-        tCarElt *car;
-        tTrackOwnPit *mypit;            // Pointer to my pit.
-        tTrackPitInfo *pitinfo;            // General pit info.
+    void update();
 
-#if 0
-        enum { NPOINTS = 7 };
-        SplinePoint p[NPOINTS];            // Spline points.
-#endif
-        enum { PITPOINTS = 9, DTPOINTS = 4 };
-        SplinePoint pp[PITPOINTS];            // Spline points.
-        SplinePoint dtp[DTPOINTS];            // Spline points.
+private:
+    tTrack *track;
+    tCarElt *car;
+    tTrackOwnPit *mypit;            // Pointer to my pit.
+    tTrackPitInfo *pitinfo;            // General pit info.
 
-        Spline *pitspline;                    // Spline.
-        Spline *dtspline;                    // Spline.
+    enum { PITPOINTS = 9, DTPOINTS = 4 };
+    SplinePoint pp[PITPOINTS];            // Spline points.
+    SplinePoint dtp[DTPOINTS];            // Spline points.
 
-        bool pitstop;                    // Pitstop planned.
-        bool usepitmaxspeed;
-		bool inpitexit;
-        bool inpitlane;                    // We are still in the pit lane.
-        float pitentry;                    // Distance to start line of the pit entry.
-        float pitend;                    // Distance to start line of the pit entry.
-        float pitexit;                    // Distance to the start line of the pit exit.
-        float pitstopentry;
-        float pitstopexit;
-        float pitmaxspeedoffset;
-        float pitmaxspeed;
+    Spline *pitspline;                    // Spline.
+    Spline *dtspline;                    // Spline.
 
-		float pittransoffset;
-		bool hastransoffset;
+    bool pitstop;                    // Pitstop planned.
+    bool usepitmaxspeed;
+    bool inpitexit;
+    bool inpitlane;                    // We are still in the pit lane.
+    float pitentry;                    // Distance to start line of the pit entry.
+    float pitend;                    // Distance to start line of the pit entry.
+    float pitexit;                    // Distance to the start line of the pit exit.
+    float pitstopentry;
+    float pitstopexit;
+    float pitmaxspeedoffset;
+    float pitmaxspeed;
 
-        float speedlimitsqr;            // Pit speed limit squared.
-        float speedlimit;                // Pit speed limit.
-        float pitspeedlimitsqr;            // The original speedlimit squared.
-        float pitstartextralength;
+    float pittransoffset;
+    bool hastransoffset;
 
-        float pittimer;                    // Timer for pit timeouts.
+    float speedlimitsqr;            // Pit speed limit squared.
+    float speedlimit;                // Pit speed limit.
+    float pitspeedlimitsqr;            // The original speedlimit squared.
+    float pitstartextralength;
 
-        static const float SPEED_LIMIT_MARGIN;
+    float pittimer;                    // Timer for pit timeouts.
+
+    static const float SPEED_LIMIT_MARGIN;
 };
 
 #endif // _PIT_H_
-
-
