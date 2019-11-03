@@ -39,8 +39,11 @@
 #include "racetrack.h"
 
 #ifdef WEBSERVER
+#include <iomanip>
 #include <fstream>
+#include <sstream>
 #include "racewebmetar.h"
+
 static ReWebMetarCloud      webMetarCloud;
 static ReWebMetarRunway     webMetarRunway;
 static ReWebMetarVisibility webMetarVisibility;
@@ -66,7 +69,7 @@ static void reTrackUpdatePhysics(void);
 int
 ReTrackInit(void)
 {
-    char buf[256];
+    char buf[1024];
 
     const char  *trackName;
     const char  *catName;
@@ -520,13 +523,18 @@ reTrackInitRealWeather(void)
         reTrackInitSimuWeather();
     else
     {
-        char buffer[256];
-        snprintf(buffer, 255, "%sconfig/weather.txt", GetLocalDir());
+        char buffer[1024];
+        snprintf(buffer, sizeof(buffer), "%sconfig/weather.txt", GetLocalDir());
 
         std::string data = buffer;
         GfLogDebug("Path weather.txt : %s\n", data.c_str());
 
         std::ifstream file(data.c_str());
+
+        if (!file.is_open()) {
+            GfLogError("Failed to open %s\n", data.c_str());
+            return;
+        }
 
         // compter le nombre de lignes
         int count = 0;
@@ -631,6 +639,7 @@ reTrackInitRealWeather(void)
                     trackLocal->clouds2 = webMetar->getCloud2();
                     trackLocal->cloud_altitude2 = webMetar->getAltitude2();
                     GfLogDebug("Clouds 2 = %i - Alitude cloud 2 = %.3f\n", trackLocal->clouds2, trackLocal->cloud_altitude2);
+                    break;
                 case 3:
                     trackLocal->clouds3 = webMetar->getCloud3();
                     trackLocal->cloud_altitude3 = webMetar->getAltitude3();
@@ -708,35 +717,22 @@ reTrackInitSimuWeather(void)
 #else
     gmtime_r(&now_sec, &now);
 #endif
-    char month[2] = "";
-    char day[2] = "";
 
-    snprintf(day, 3, "%i", now.tm_mday);
-    snprintf(month, 3, "%i", now.tm_mon + 1);
-    GfLogDebug("Day = %s - Month = %s\n", day, month);
+    std::ostringstream weatherfile;
+    weatherfile << GetDataDir() << "data/weather/" << trackLocal->station << "/"
+                << std::setw(2) << std::setfill('0') << std::right << now.tm_mday << "-"
+                << std::setw(2) << std::setfill('0') << std::right << (now.tm_mon + 1) << ".txt";
 
-    char buffer[256];
-    snprintf(buffer, 255, "%sdata/weather/", GetDataDir());
-    std::string weatherfile = buffer;
-    weatherfile = weatherfile + trackLocal->station+"/";
+    GfLogDebug("Path file weather : %s\n", weatherfile.str().c_str());
 
-    if (now.tm_mday < 10)
-        weatherfile = weatherfile + "0" + day + "-";
-    /*else if (now.tm_mday == 10 || now.tm_mday == 20 || now.tm_mday == 30)
-        weatherfile = weatherfile + day + "0-";*/
-    else
-        weatherfile = weatherfile + day + "-";
+    std::ifstream file(weatherfile.str().c_str());
 
-    if ((now.tm_mon + 1) < 10)
-        weatherfile = weatherfile + "0" + month + ".txt";
-    /*else if (now.tm_mon == 10)
-        weatherfile = weatherfile + month + "0-";*/
-    else
-        weatherfile = weatherfile + month + ".txt";
+    if (!file.is_open())
+    {
+        GfLogError("Failed to open %s\n", weatherfile.str().c_str());
 
-    GfLogDebug("Path file weather : %s\n", weatherfile.c_str());
-
-    std::ifstream file(weatherfile.c_str());
+        return;
+    }
 
     // compter le nombre de lignes
     int count = 0;
@@ -839,6 +835,7 @@ reTrackInitSimuWeather(void)
                 trackLocal->clouds2 = webMetar->getCloud2();
                 trackLocal->cloud_altitude2 = webMetar->getAltitude2();
                 GfLogDebug("Clouds 2 = %i - Alitude cloud 2 = %.3f\n", trackLocal->clouds2, trackLocal->cloud_altitude2);
+                break;
             case 3:
                 trackLocal->clouds3 = webMetar->getCloud3();
                 trackLocal->cloud_altitude3 = webMetar->getAltitude3();
