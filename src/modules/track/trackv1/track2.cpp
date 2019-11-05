@@ -56,6 +56,7 @@ static int sideBankType[2];
 static char *sideMaterial[2];
 static int envIndex;
 
+static const int BUFSIZE = 1024;
 
 static void
 InitSides(void *TrackHandle, char *section)
@@ -90,12 +91,12 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, char *section, int curStep, int s
     int		side;
     char	*material;
     tdble	Kew;
-    char	path[256];
-    char	path2[256];
+    char	path[BUFSIZE];
+    char	path2[BUFSIZE];
 
     x = y = z = 0;
 
-    sprintf(path, "%s/%s", section, TRK_LST_SEG);
+    snprintf(path, sizeof(path), "%s/%s", section, TRK_LST_SEG);
     for (side = 0; side < 2; side++) {
 	if (curStep == 0) {
 	    sw = GfParmGetCurNum(TrackHandle, path, KeySideStartWidth[side], (char*)NULL,sideEndWidth[side]);
@@ -136,7 +137,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, char *section, int curStep, int s
 	curSide->type = curSeg->type;
 	material = GfParmGetCurStr(TrackHandle, path, KeySideSurface[side], sideMaterial[side]);
 	sideMaterial[side] = curSide->material = material;
-	sprintf(path2, "%s/%s/%s", TRK_SECT_SURFACES, TRK_LST_SURF, material);
+	snprintf(path2, sizeof(path2), "%s/%s/%s", TRK_SECT_SURFACES, TRK_LST_SURF, material);
 	curSide->kFriction = GfParmGetNum(TrackHandle, path2, TRK_ATT_FRICTION, (char*)NULL, 0.8);
 	curSide->kRollRes = GfParmGetNum(TrackHandle, path2, TRK_ATT_ROLLRES, (char*)NULL, 0.001);
 	curSide->kRoughness = GfParmGetNum(TrackHandle, path2, TRK_ATT_ROUGHT, (char*)NULL, 0.0) /  2.0;
@@ -407,8 +408,8 @@ CreateSegRing(void *TrackHandle, char *section, tTrackSeg **pRoot, tdble *pLengt
     tdble	curzel, curzer, curArc, curLength, curzsl, curzsr;
     tdble	grade;
 
-    char	path[256];
-    char	path2[256];
+    char	path[BUFSIZE];
+    char	path2[BUFSIZE];
 #define MAX_TMP_INTS	256
     int		mi[MAX_TMP_INTS];
     int		ind = 0;
@@ -424,7 +425,7 @@ CreateSegRing(void *TrackHandle, char *section, tTrackSeg **pRoot, tdble *pLengt
     root = (tTrackSeg*)NULL;
     totLength = 0;
     
-    sprintf(path, "%s/%s", section, TRK_LST_SEG);
+    snprintf(path, sizeof(path), "%s/%s", section, TRK_LST_SEG);
     if (start == NULL) {
 	xr = xl = 0.0;
 	yr = 0.0;
@@ -455,7 +456,7 @@ CreateSegRing(void *TrackHandle, char *section, tTrackSeg **pRoot, tdble *pLengt
 
     /* Main Track */
     material = GfParmGetStr(TrackHandle, section, TRK_ATT_SURF, TRK_VAL_ASPHALT);
-    sprintf(path2, "%s/%s/%s", TRK_SECT_SURFACES, TRK_LST_SURF, material);
+    snprintf(path2, sizeof(path2), "%s/%s/%s", TRK_SECT_SURFACES, TRK_LST_SURF, material);
     kFriction = GfParmGetNum(TrackHandle, path2, TRK_ATT_FRICTION, (char*)NULL, 0.8);
     kRollRes = GfParmGetNum(TrackHandle, path2, TRK_ATT_ROLLRES, (char*)NULL, 0.001);
     kRoughness = GfParmGetNum(TrackHandle, path2, TRK_ATT_ROUGHT, (char*)NULL, 0.0) / 2.0;
@@ -498,7 +499,7 @@ CreateSegRing(void *TrackHandle, char *section, tTrackSeg **pRoot, tdble *pLengt
 	
 	/* surface change */
 	material = GfParmGetCurStr(TrackHandle, path, TRK_ATT_SURF, material);
-	sprintf(path2, "%s/%s/%s", TRK_SECT_SURFACES, TRK_LST_SURF, material);
+	snprintf(path2, sizeof(path2), "%s/%s/%s", TRK_SECT_SURFACES, TRK_LST_SURF, material);
 	kFriction = GfParmGetNum(TrackHandle, path2, TRK_ATT_FRICTION, (char*)NULL, kFriction);
 	kRollRes = GfParmGetNum(TrackHandle, path2, TRK_ATT_ROLLRES, (char*)NULL, kRollRes);
 	kRoughness = GfParmGetNum(TrackHandle, path2, TRK_ATT_ROUGHT, (char*)NULL, kRoughness * 2.0) / 2.0;
@@ -872,8 +873,8 @@ ReadTrack2(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
     int		found = 0;
     char	*paramVal;
     char	*pitType;
-    char	path[256];
-    char	path2[256];
+    char	path[BUFSIZE];
+    char	path2[BUFSIZE];
 
     xmin = xmax = ymin = ymax = zmin = zmax = 0.0;
     
@@ -1009,7 +1010,7 @@ ReadTrack2(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 
 	segName = GfParmGetStr(TrackHandle, TRK_SECT_PITS, TRK_ATT_FINISH, NULL);
 	if (segName != 0) {
-	    sprintf(path, "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEG, segName);
+	    snprintf(path, sizeof(path), "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEG, segName);
 	    segId = (int)GfParmGetNum(TrackHandle, path, TRK_ATT_ID, (char*)NULL, 0);
 	    curSeg = pitSeg->next;
 	    found = 0;
@@ -1078,7 +1079,7 @@ ReadTrack2(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
     /* 
      * camera definitions
      */
-    sprintf(path, "%s/%s", TRK_SECT_CAM, TRK_LST_CAM);
+    snprintf(path, sizeof(path), "%s/%s", TRK_SECT_CAM, TRK_LST_CAM);
     if (GfParmListSeekFirst(TrackHandle, path) == 0) {
 	do {
 	    curCam = (tRoadCam*)calloc(1, sizeof(tRoadCam));
@@ -1095,7 +1096,7 @@ ReadTrack2(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    if (segName == 0) {
 		GfFatal("Bad Track Definition: in Camera %s %s is missing\n", curCam->name, TRK_ATT_SEGMENT);
 	    }
-	    sprintf(path2, "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEG, segName);
+	    snprintf(path2, sizeof(path2), "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEG, segName);
 	    segId = (int)GfParmGetNum(TrackHandle, path2, TRK_ATT_ID, (char*)NULL, 0);
 	    curSeg = theTrack->seg;
 	    for(i=0; i<theTrack->nseg; i++)  {
@@ -1115,7 +1116,7 @@ ReadTrack2(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    if (segName == 0) {
 		GfFatal("Bad Track Definition: in Camera %s %s is missing\n", curCam->name, TRK_ATT_CAM_FOV);
 	    }
-	    sprintf(path2, "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEG, segName);
+	    snprintf(path2, sizeof(path2), "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEG, segName);
 	    segId = (int)GfParmGetNum(TrackHandle, path2, TRK_ATT_ID, (char*)NULL, 0);
 	    curSeg = theTrack->seg;
 	    for(i=0; i<theTrack->nseg; i++)  {
@@ -1128,7 +1129,7 @@ ReadTrack2(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    if (segName == 0) {
 		GfFatal("Bad Track Definition: in Camera %s %s is missing\n", curCam->name, TRK_ATT_CAM_FOVE);
 	    }
-	    sprintf(path2, "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEG, segName);
+	    snprintf(path2, sizeof(path2), "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEG, segName);
 	    segId = (int)GfParmGetNum(TrackHandle, path2, TRK_ATT_ID, (char*)NULL, 0);
 	
 	    do {

@@ -30,6 +30,7 @@
 
 
 static const tdble DEGPRAD = (tdble)(180.0 / PI);   /* degrees per radian */
+static const int BUFSIZE = 1024;
 
 static tTrack	*theTrack = NULL;
 static tRoadCam *theCamList;
@@ -162,8 +163,8 @@ GetTrackHeader(void *TrackHandle) {
     graphic->bgColor[2] = (float)GfParmGetNum(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BGCLR_B, (char*)NULL, 0.1f);
 
     // Environment map images
-    char buf[256];
-    sprintf(buf, "%s/%s", TRK_SECT_GRAPH, TRK_LST_ENV);
+    char buf[BUFSIZE];
+    snprintf(buf, sizeof(buf), "%s/%s", TRK_SECT_GRAPH, TRK_LST_ENV);
     graphic->envnb = GfParmGetEltNb(TrackHandle, buf);
     if (graphic->envnb < 1)
       graphic->envnb = 1;
@@ -171,7 +172,7 @@ GetTrackHeader(void *TrackHandle) {
     graphic->env = (const char**)calloc(graphic->envnb, sizeof(const char*));
     const char **env = graphic->env;
     for (int i = 1; i <= graphic->envnb; ++i) {
-      sprintf(buf, "%s/%s/%d", TRK_SECT_GRAPH, TRK_LST_ENV, i);
+      snprintf(buf, sizeof(buf), "%s/%s/%d", TRK_SECT_GRAPH, TRK_LST_ENV, i);
       *env = GfParmGetStr(TrackHandle, buf, TRK_ATT_ENVNAME, "env.png");
       ++env;
     }
@@ -182,15 +183,15 @@ GetTrackHeader(void *TrackHandle) {
     if (graphic->nb_lights > 0 ) {
       graphic->lights = (tGraphicLightInfo*)malloc( sizeof( tGraphicLightInfo ) * graphic->nb_lights );
       for (int i = 0; i < graphic->nb_lights; ++i) {
-        sprintf(buf, "%s/%d/%s", TRK_SECT_TRACKLIGHTS, i + 1, TRK_SECT_TOPLEFT);
+        snprintf(buf, sizeof(buf), "%s/%d/%s", TRK_SECT_TRACKLIGHTS, i + 1, TRK_SECT_TOPLEFT);
         graphic->lights[ i ].topleft.x = GfParmGetNum(TrackHandle, buf, TRK_ATT_X, (char*)NULL, 0.0f);
         graphic->lights[ i ].topleft.y = GfParmGetNum(TrackHandle, buf, TRK_ATT_Y, (char*)NULL, 0.0f);
         graphic->lights[ i ].topleft.z = GfParmGetNum(TrackHandle, buf, TRK_ATT_Z, (char*)NULL, 0.0f);
-        sprintf(buf, "%s/%d/%s", TRK_SECT_TRACKLIGHTS, i + 1, TRK_SECT_BOTTOMRIGHT);
+        snprintf(buf, sizeof(buf), "%s/%d/%s", TRK_SECT_TRACKLIGHTS, i + 1, TRK_SECT_BOTTOMRIGHT);
         graphic->lights[ i ].bottomright.x = GfParmGetNum(TrackHandle, buf, TRK_ATT_X, (char*)NULL, 0.0f);
         graphic->lights[ i ].bottomright.y = GfParmGetNum(TrackHandle, buf, TRK_ATT_Y, (char*)NULL, 0.0f);
         graphic->lights[ i ].bottomright.z = GfParmGetNum(TrackHandle, buf, TRK_ATT_Z, (char*)NULL, 0.0f);
-        sprintf(buf, "%s/%d", TRK_SECT_TRACKLIGHTS, i + 1);
+        snprintf(buf, sizeof(buf), "%s/%d", TRK_SECT_TRACKLIGHTS, i + 1);
         graphic->lights[ i ].onTexture = strdup(GfParmGetStr(TrackHandle, buf, TRK_ATT_TEXTURE_ON, ""));
         graphic->lights[ i ].offTexture = strdup(GfParmGetStr(TrackHandle, buf, TRK_ATT_TEXTURE_OFF, ""));
         graphic->lights[ i ].index = (int)GfParmGetNum(TrackHandle, buf, TRK_ATT_INDEX, (char*)NULL, 0.0f);

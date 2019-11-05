@@ -26,6 +26,8 @@
 #include <track.h>
 #include "trackinc.h"
 
+static const int BUFSIZE = 1024;
+
 /*
  * Read version 0 track segments
  */
@@ -56,7 +58,7 @@ ReadTrack0(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
     tdble	lsw, rsw;
     tdble	lssw, lsew;
     tdble	rssw, rsew;
-    char	path[256];
+    char	path[BUFSIZE];
     
     
 #define TSTX(x)			\
@@ -88,7 +90,7 @@ ReadTrack0(tTrack *theTrack, void *TrackHandle, tRoadCam **camList)
     segread = 0;
     curindex = 0;
 
-    sprintf(path , "%s/%s", TRK_SECT_MAIN, TRK_LST_SEG);
+    snprintf(path, sizeof(path), "%s/%s", TRK_SECT_MAIN, TRK_LST_SEG);
     GfParmListSeekFirst(TrackHandle, path);
     do {
 	segtype = GfParmGetCurStr(TrackHandle, path, TRK_ATT_TYPE, NULL);
