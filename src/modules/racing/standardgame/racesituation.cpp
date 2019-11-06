@@ -932,7 +932,7 @@ void ReSituationUpdater::replaySituation(tRmInfo*& pSource)
 		memcpy(&pTgtCar->pitcmd, &pSrcCar->pitcmd, sizeof(tCarPitCmd));
 
 		// and write to database
-		sprintf(command, "INSERT INTO car%d (timestamp, lap, datablob) VALUES (%f, %d, ?)", nCarInd, 
+		snprintf(command, sizeof(command), "INSERT INTO car%d (timestamp, lap, datablob) VALUES (%f, %d, ?)", nCarInd, 
 			pSource->s->currentTime, pSrcCar->_laps);
 
  		result = sqlite3_prepare_v2(replayDB, command, -1, &replayBlobs[nCarInd], 0);

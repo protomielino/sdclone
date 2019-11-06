@@ -70,7 +70,7 @@ int RmGetFeaturesList( void* param )
 	int raceFeatureMask = -1; // All bits set to 1.
 	void *robhdle;
 	
-	char path[ 256 ];
+	char path[ 1024 ];
 	char buf[ 1024 ];
 	int xx, yy;
 	int features_index;
@@ -80,15 +80,15 @@ int RmGetFeaturesList( void* param )
 	for( xx = 1; xx < nCars + 1; ++xx )
 	{
 		/* Open robot */
-		sprintf( path, "%s/%d", RM_SECT_DRIVERS, xx );
+		snprintf( path, sizeof(path), "%s/%d", RM_SECT_DRIVERS, xx );
 		cardllname = GfParmGetStr( param, path, RM_ATTR_MODULE, "" );
 		caridx = (int)GfParmGetNum( param, path, RM_ATTR_IDX, NULL, 0 );
-		sprintf( buf, "%s/drivers/%s/%s.xml", GfLocalDir(), cardllname, cardllname );
+		snprintf( buf, sizeof(buf), "%s/drivers/%s/%s.xml", GfLocalDir(), cardllname, cardllname );
 		robhdle = GfParmReadFile( buf, GFPARM_RMODE_STD );
 
 		if( !robhdle )
 		{
-			sprintf( buf, "drivers/%s/%s.xml", cardllname, cardllname );
+			snprintf( buf, sizeof(buf), "drivers/%s/%s.xml", cardllname, cardllname );
 			robhdle = GfParmReadFile( buf, GFPARM_RMODE_STD );
 		}
 
@@ -97,7 +97,7 @@ int RmGetFeaturesList( void* param )
 
 		driverFeatureMask = 0;
 
-		sprintf( buf, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, caridx );
+		snprintf( buf, sizeof(buf), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, caridx );
 		if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_TYPE, ROB_VAL_ROBOT ), ROB_VAL_HUMAN ) == 0 )
 		{
 			if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_LEVEL, ROB_VAL_ARCADE ), ROB_VAL_ARCADE ) == 0 )
@@ -117,7 +117,7 @@ int RmGetFeaturesList( void* param )
 			      /*RM_FEATURE_SC | RM_FEATURE_YELLOW | RM_FEATURE_BLUE | RM_FEATURE_RED | RM_FEATURE_PITEXIT |*/		      
 		} else if( strcmp( GfParmGetStr( robhdle, buf, ROB_ATTR_TYPE, ROB_VAL_ROBOT ), ROB_VAL_ROBOT ) == 0 )
 		{
-			sprintf( buf, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, caridx );
+			snprintf( buf, sizeof(buf), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, caridx );
 			features = GfParmGetStr( robhdle, buf, ROB_ATTR_FEATURES, "" );
 			features_index = 0;
 			buf_index = 0;

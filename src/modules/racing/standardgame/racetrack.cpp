@@ -730,6 +730,33 @@ reTrackInitSimuWeather(void)
     if (!file.is_open())
     {
         GfLogError("Failed to open %s\n", weatherfile.str().c_str());
+        int clouds = TR_CLOUDS_NONE;
+        int rain = TR_RAIN_NONE;
+        // Really random clouds.
+        clouds = rand() % (TR_CLOUDS_FULL);
+
+        // Update track local info.
+        trackLocal->rain = rain;
+        trackLocal->hail = 0;
+        trackLocal->snow = 0;
+        trackLocal->clouds = clouds;
+        trackLocal->cloud_altitude = 5500.0 * 0.3048;
+        trackLocal->water = rain;
+        trackLocal->airtemperature = 15.0f;
+        trackLocal->dewp = 5.0f;
+        trackLocal->airpressure = 101300;
+        trackLocal->airdensity = 1.219f;
+        trackLocal->windspeed = (tdble)(rand() % 100);
+        trackLocal->winddir = (tdble)(rand() % 359);
+        trackLocal->relativehumidity = 65.0f;
+        trackLocal->visibility = (tdble)(rand() % 12000);
+
+        reTrackInitWeatherValues();
+
+        if ((trackLocal->visibility < 300) & (rain < 1))
+            trackLocal->visibility = 300;
+
+        ReTrackUpdate();
 
         return;
     }

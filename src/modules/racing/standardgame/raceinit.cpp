@@ -73,6 +73,8 @@ static const char *aPszSkillLevelNames[] =
     { ROB_VAL_ARCADE, ROB_VAL_SEMI_ROOKIE, ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
 static const int NSkillLevels = (int)(sizeof(aPszSkillLevelNames)/sizeof(char*));
 
+static const size_t PathLenMax = 1024;
+
 // The list of robot modules loaded for the race.
 tModList *ReRacingRobotsModList = 0;
 
@@ -95,7 +97,7 @@ ReReset(void)
     ReInfo->robModList = &ReRacingRobotsModList;
 
     // Load Race engine params.
-    char buf[256];
+    char buf[PathLenMax];
     snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
     ReInfo->_reParam = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 }
@@ -470,10 +472,10 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 {
   tCarElt *elt;
   tMemoryPool oldPool;
-  char path[256];
-  char path2[256];
-  char buf[256];
-  char buf2[256];
+  char path[PathLenMax];
+  char path2[PathLenMax];
+  char buf[PathLenMax];
+  char buf2[PathLenMax];
   char const *str;
   char const *category;
   char const *subcategory;
@@ -946,12 +948,12 @@ ReInitCars(void)
       int result;
 
       if (replayRecord) {
-        sprintf(command, "DROP TABLE IF EXISTS car%d", i);
+        snprintf(command, sizeof(command), "DROP TABLE IF EXISTS car%d", i);
         result = sqlite3_exec(replayDB, command, 0, 0, 0);
         if (result) GfLogInfo("Replay: Unable to drop table car%d: %s\n", i, sqlite3_errmsg(replayDB));
       }
 
-      sprintf(command, "CREATE TABLE IF NOT EXISTS car%d (timestamp, lap, datablob BLOB)", i);
+      snprintf(command, sizeof(command), "CREATE TABLE IF NOT EXISTS car%d (timestamp, lap, datablob BLOB)", i);
       result = sqlite3_exec(replayDB, command, 0, 0, 0);
       if (result) {
          GfLogInfo("Replay: Unable to create table car%d: %s\n", i, sqlite3_errmsg(replayDB));
@@ -960,7 +962,7 @@ ReInitCars(void)
 
       if (replayReplay) {
         // Build index to allow faster read access
-        sprintf(command, "CREATE UNIQUE INDEX IF NOT EXISTS index%d ON car%d (timestamp)", i, i);
+        snprintf(command, sizeof(command), "CREATE UNIQUE INDEX IF NOT EXISTS index%d ON car%d (timestamp)", i, i);
         result = sqlite3_exec(replayDB, command, 0, 0, 0);
         if (result) GfLogInfo("Replay: Unable to create index car%d: %s\n", i, sqlite3_errmsg(replayDB));
       }

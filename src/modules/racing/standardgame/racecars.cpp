@@ -865,7 +865,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
                     int result;
 
                     GfLogInfo("Re-reading best lap\n");
-                    sprintf(command, "SELECT datablob FROM car0 where lap=%d", car->_bestLap);
+                    snprintf(command, sizeof(command), "SELECT datablob FROM car0 where lap=%d", car->_bestLap);
                     result = sqlite3_prepare_v2(replayDB, command, -1, &ghostcarBlob, 0);
 
                     if (result) {
