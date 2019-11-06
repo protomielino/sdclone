@@ -411,11 +411,11 @@ else(OPTION_FREETYPE)
 endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
-   set(CURL_PROJECT curl-7.66.0)
+   set(CURL_PROJECT curl-7.67.0)
    set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off -DCMAKE_DEBUG_POSTFIX=)
    ExternalProject_Add(${CURL_PROJECT}
-   URL https://curl.haxx.se/download/curl-7.66.0.tar.bz2
-   URL_HASH SHA256=6618234e0235c420a21f4cb4c2dd0badde76e6139668739085a70c4e2fe7a141
+   URL https://curl.haxx.se/download/curl-7.67.0.tar.bz2
+   URL_HASH SHA256=dd5f6956821a548bf4b44f067a530ce9445cc8094fd3e7e3fc7854815858586c
    CMAKE_ARGS ${CURL_ARGS}
    DEPENDS ${ZLIB_PROJECT}
    )
