@@ -509,6 +509,9 @@ reTrackInitWeatherValues(void)
 void
 reTrackInitRealWeather(void)
 {
+#ifndef WEBSERVER
+    reTrackInitSimuWeather();
+#else
     std::string url = "ftp://tgftp.nws.noaa.gov/data/observations/metar/stations/";
     webMetar = new ReWebMetar;
     tTrackLocalInfo *trackLocal = &ReInfo->track->local;
@@ -701,14 +704,16 @@ reTrackInitRealWeather(void)
 
         ReTrackUpdate();
     }
+#endif // WEBSERVER
 }
 
 // Initialize track weather info from race settings
 void
 reTrackInitSimuWeather(void)
 {
-    webMetar = new ReWebMetar;
     tTrackLocalInfo *trackLocal = &ReInfo->track->local;
+#ifdef WEBSERVER
+    webMetar = new ReWebMetar;
 
     struct tm now;
     time_t now_sec = time(0);
@@ -730,6 +735,7 @@ reTrackInitSimuWeather(void)
     if (!file.is_open())
     {
         GfLogError("Failed to open %s\n", weatherfile.str().c_str());
+#endif // WEBSERVER
         int clouds = TR_CLOUDS_NONE;
         int rain = TR_RAIN_NONE;
         // Really random clouds.
@@ -758,6 +764,7 @@ reTrackInitSimuWeather(void)
 
         ReTrackUpdate();
 
+#ifdef WEBSERVER
         return;
     }
 
@@ -923,6 +930,7 @@ reTrackInitSimuWeather(void)
     GfLogDebug("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
 
     ReTrackUpdate();
+#endif // WEBSERVER
 }
 
 // Update track info ...
@@ -981,11 +989,13 @@ reTrackUpdatePhysics(void)
 int
 ReTrackShutdown(void)
 {
+#ifdef WEBSERVER
     if(webMetar)
     {
         delete webMetar;
         webMetar = 0;
     }
+#endif // WEBSERVER
 
     return 0;
 }
