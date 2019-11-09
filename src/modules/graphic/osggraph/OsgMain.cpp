@@ -278,7 +278,7 @@ int initTrack(tTrack *track)
 int  initCars(tSituation *s)
 {
     GfLogInfo("InitCars\n");
-    char buf[256];
+    char buf[1024];
     cars = new SDCars;
     cars->loadCars(s, scenery->getSpeedWay(), scenery->getSpeedWayLong());
     render->addCars(cars->getCarsNode());

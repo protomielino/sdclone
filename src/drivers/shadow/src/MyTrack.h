@@ -24,6 +24,8 @@
 #include "Seg.h"
 #include "PtInfo.h"
 
+#include <vector>
+
 class MyTrack
 {
 public:
@@ -40,7 +42,8 @@ public:
     MyTrack();
     ~MyTrack();
 
-    void	NewTrack( tTrack* pNewTrack, bool pit = false, SideMod* pSideMod = 0 );
+    void	Clear();
+    void	NewTrack(tTrack* pNewTrack, const std::vector<double> *pInnerMod, bool pit = false, SideMod* pSideMod = 0 );
 
     tTrack*			GetTrack();
     const tTrack*	GetTrack() const;
@@ -77,6 +80,8 @@ private:
     Seg*	m_pSegs;
     tTrack*	m_pCurTrack;
     SideMod	m_sideMod;
+    std::vector<double>	m_innerMod;
+    int		m_nBends;
 };
 
 #endif // !defined(AFX_MYTRACK_H__402D20B8_71B6_4F2C_B169_F4A3552012EB__INCLUDED_)

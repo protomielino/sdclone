@@ -55,7 +55,7 @@ SimpleStrategy::SimpleStrategy()
     m_expectedfuelperlap = 0;           // [Kg] Expected fuel per lap
     TrackLength = 0;
     RaceDistance = 0;
-	m_timeOfPitExit = -30;
+    m_timeOfPitExit = -30;
 }
 
 
@@ -290,7 +290,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
             {
                 if (!m_checkFuel)
                 {
-                    LogSHADOW.debug("%s Go to Pit the next lap to refuel: reqFuel=%.2f, carFuel=%.2f, remLap=%d\n",
+                    LogSHADOW.debug("%s Go to Pit the next lap to refuel: reqFuel= %.2f, carFuel= %.2f, remLap= %d\n",
                           car->_name, reqfuel, car->_fuel, car->_remainingLaps);
                     m_checkFuel = true;
                 }

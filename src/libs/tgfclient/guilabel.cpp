@@ -307,14 +307,14 @@ gfuiLabelDraw(tGfuiLabel *label, const GfuiColor& color)
 {
     int of = 0;
     int fw = (int) label->font->getWidth("o");
-    int len = 0;
+    size_t len = 0;
 
     // Prevent strtok weirdness
     char *save;
     char text[128];
     char mask[128];
 
-    mask[0] = NULL;
+    mask[0] = '\0';
 
     strncpy(text, (char *) label->text, 128);
 
@@ -346,7 +346,7 @@ gfuiLabelDraw(tGfuiLabel *label, const GfuiColor& color)
     if (label->masked)
     {
         len = strlen(p);
-        mask[0] = NULL;
+        mask[0] = '\0';
         if (len > 0)
         {
             if (len > sizeof(mask))

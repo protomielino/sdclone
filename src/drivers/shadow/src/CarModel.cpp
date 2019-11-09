@@ -30,7 +30,7 @@ extern GfLogger* PLogSHADOW;
 //////////////////////////////////////////////////////////////////////
 
 CarModel::CarModel():
-    FLAGS(F_SEPARATE_FRONT_REAR | F_USE_KV),
+    FLAGS(F_SEPARATE_FRONT_REAR),
     AERO(0),
     EMPTYMASS(0),
     MASS(0),
@@ -39,6 +39,8 @@ CarModel::CarModel():
     DAMAGE(0),
     NEEDSINLONG(false),
     USEDACCEXIT(false),
+    USECONFIG(false),
+    USECONFIGWHEEL(false),
     SKILL(0),
 
     TYRE_MU(0),
@@ -47,6 +49,10 @@ CarModel::CarModel():
     MU_SCALE(0.9),
     MIN_MU_SCALE(0),
     AVOID_MU_SCALE(0.9),
+    GRIP_SCALE_F(1),
+    GRIP_SCALE_R(1),
+    WING_ANGLE_F(0),
+    WING_ANGLE_R(0),
     KZ_SCALE(0.43f),
     OFFLINE_KZ_SCALE(0.43f),
     AVOID_KZ_SCALE(0.43f),
@@ -84,7 +90,84 @@ CarModel::~CarModel()
 {
 }
 
-double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, double RollAngle, double TiltAngle ) const
+double	CarModel::CalcMaxSpeed(double k, double kz, double kv, double trackMu, double trackRollAngle , double trackPitchAngle) const
+{
+    //
+    //	Here we calculate the theoretical maximum speed at a point on the
+    //	path.  This takes into account the curvature of the path (k), the
+    //	grip on the road (mu), the downforce from the wings and the ground
+    //	effect (CA), the tilt of the road (left to right slope) (sn)
+    //	and the curvature of the road in z (kz).
+    //
+    //	There are still a few silly fudge factors to make the theory match
+    //	with the reality (the car goes too slowly otherwise, aarrgh!).
+    //
+
+    double	M  = MASS + FUEL;
+
+    double	mua, muf, mur;
+
+    if( FLAGS & F_OLD_AERO_1 )
+    {
+        double	MU_F = trackMu * TYRE_MU_F;
+        double	MU_R = trackMu * TYRE_MU_R;
+
+        muf = MU_F * MU_SCALE;
+        mur = MU_R * MU_SCALE;
+        mua = (MU_F + MU_R) * 0.5;
+    }
+    else
+    {
+        double	MU = trackMu * TYRE_MU;
+
+        mua   = MU * MU_SCALE;// * 0.975;
+    }
+
+    mua *= MN(GRIP_SCALE_F, GRIP_SCALE_R);
+
+    double	cs = cos(trackRollAngle) * cos(trackRollAngle);
+    double	sn = sin(trackRollAngle);
+
+    double	absK = MX(0.001, fabs(k));
+    double	sgnK = SGN(k);
+
+    double	num, den;
+
+    if( FLAGS & F_OLD_AERO_1 )
+    {
+        num = M * (cs * G * mua + sn * G * sgnK);
+//		den = M * (absK - 0.1 * kz) -
+        if( FLAGS & F_USE_KV )
+            den = M * (absK - KV_SCALE * kv) -
+                        (CA_FW * muf + CA_RW * mur + CA_GE * mua);
+        else
+            den = M * (absK - KZ_SCALE * kv) -
+                        (CA_FW * muf + CA_RW * mur + CA_GE * mua);
+    }
+    else
+    {
+        num = M * (cs * G * mua + sn * G * sgnK);
+
+        if( FLAGS & F_USE_KV )
+            den = M * (absK - KV_SCALE * kv) - CA * mua;
+        else
+            den = M * (absK - KZ_SCALE * kv) - CA * mua;
+    }
+
+    if( den < 0.00001 )
+        den = 0.00001;
+
+    double	spd = sqrt(num / den);
+
+    if( spd > 200 )
+        spd = 200;
+
+    LogSHADOW.debug( "Max Speed in CarModel = %.3f\n", spd);
+
+    return spd;
+}
+
+/*double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, double RollAngle, double TiltAngle ) const
 {
     //
     //	Here we calculate the theoretical maximum speed at a point on the
@@ -138,9 +221,9 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
       ScaleBump = BUMP_FACTORRIGHT;
 
     double MuF = kFriction * TYRE_MU_F; /* MU_SCALE;*/
-    double MuR = kFriction * TYRE_MU_R; /* MU_SCALE;*/
+/*    double MuR = kFriction * TYRE_MU_R; /* MU_SCALE;*/
 
-    if (HASTYC)
+/*    if (HASTYC)
     {
       double TcF = TYRECONDITIONFRONT;
       double TcR = TYRECONDITIONREAR;
@@ -173,7 +256,7 @@ double	CarModel::CalcMaxSpeed(double k, double k1, double kz, double kFriction, 
     LogSHADOW.debug("CarModel CalcMaxSpeed = %.f\n", Speed);
 
     return Speed;
-}
+}*/
 
 double	CarModel::CalcBreaking(double k0, double kz0, double k1, double kz1, double spd1, double dist, double kFriction, double RollAngle , double TiltAngle) const
 {
@@ -424,6 +507,7 @@ void CarModel::CalcSimuSpeeds( double spd0, double dy, double dist, double kFric
 
     if( lat_acc > max_acc )
         lat_acc = max_acc;
+
     double	lin_acc = sqrt(max_acc * max_acc - lat_acc * lat_acc);
 
     //
@@ -474,4 +558,66 @@ void CarModel::CalcSimuSpeedRanges( double spd0,	double dist, double	kFriction, 
 
     double	turnT = dist / spd0;
     maxDY = 0.5 * max_acc * turnT * turnT;
+}
+
+//===========================================================================
+void CarModel::config( const tCarElt* car )
+{
+    configWheels( car );
+    configCar( car->_carHandle );
+}
+
+void CarModel::config( void* hCar )
+{
+    configWheels( hCar );
+    configCar( hCar );
+}
+
+void CarModel::setupDefaultGearbox()
+{
+    GEAR_RATIOS.clear();
+    GEAR_EFFS.clear();
+
+    GEAR_RATIOS.push_back( 2.66 );
+    GEAR_EFFS.push_back( 0.955 );
+    GEAR_RATIOS.push_back( 1.78 );
+    GEAR_EFFS.push_back( 0.957 );
+    GEAR_RATIOS.push_back( 1.3 );
+    GEAR_EFFS.push_back( 0.95 );
+    GEAR_RATIOS.push_back( 1.0 );
+    GEAR_EFFS.push_back( 0.983 );
+    GEAR_RATIOS.push_back( 0.84 );
+    GEAR_EFFS.push_back( 0.948 );
+    GEAR_RATIOS.push_back( 0.74 );
+    GEAR_EFFS.push_back( 0.94 );
+}
+
+void CarModel::setupDefaultEngine()
+{
+    ENGINE_REVS.clear();
+    ENGINE_TORQUES.clear();
+
+    ENGINE_REVS.push_back(     0 );
+    ENGINE_REVS.push_back(  1000 * 2 * PI / 60 );
+    ENGINE_REVS.push_back(  2000 * 2 * PI / 60 );
+    ENGINE_REVS.push_back(  3000 * 2 * PI / 60 );
+    ENGINE_REVS.push_back(  4000 * 2 * PI / 60 );
+    ENGINE_REVS.push_back(  5000 * 2 * PI / 60 );
+    ENGINE_REVS.push_back(  6000 * 2 * PI / 60 );
+    ENGINE_REVS.push_back(  7000 * 2 * PI / 60 );
+    ENGINE_REVS.push_back(  8000 * 2 * PI / 60 );
+    ENGINE_REVS.push_back(  9000 * 2 * PI / 60 );
+    ENGINE_REVS.push_back( 10000 * 2 * PI / 60 );
+
+    ENGINE_TORQUES.push_back( 97 );
+    ENGINE_TORQUES.push_back( 222 );
+    ENGINE_TORQUES.push_back( 325 );
+    ENGINE_TORQUES.push_back( 470 );
+    ENGINE_TORQUES.push_back( 560 );
+    ENGINE_TORQUES.push_back( 555 );
+    ENGINE_TORQUES.push_back( 545 );
+    ENGINE_TORQUES.push_back( 511 );
+    ENGINE_TORQUES.push_back( 471 );
+    ENGINE_TORQUES.push_back( 410 );
+    ENGINE_TORQUES.push_back( 320 );
 }

@@ -27,52 +27,52 @@
 class ClothoidPath : public LinePath
 {
 public:
-	enum
-	{
-		FLAG_FLYING		= 0x01,
-	};
+    enum
+    {
+        FLAG_FLYING		= 0x01,
+    };
 
-	struct Options
-	{
-		int		bumpMod;
-		double	maxL;
-		double	maxR;
+    struct Options
+    {
+        int		bumpMod;
+        double	maxL;
+        double	maxR;
 
-		Options() : bumpMod(0), maxL(999), maxR(999) {}
+        Options() : bumpMod(0), maxL(999), maxR(999) {}
         Options( int bm, double ml = 999, double mr = 999 )	:	bumpMod(bm), maxL(ml), maxR(mr) {}
-	};
+    };
 
 public:
-	ClothoidPath();
-	virtual ~ClothoidPath();
+    ClothoidPath();
+    virtual ~ClothoidPath();
 
-	void	ClearFactors();
-	void	AddFactor( double factor );
-	void	SetFactors( const Array<double>& factors );
-	const Array<double>&	GetFactors() const;
+    void	ClearFactors();
+    void	AddFactor( double factor );
+    void	SetFactors( const Array<double>& factors );
+    const Array<double>&	GetFactors() const;
 
     void	MakeSmoothPath( MyTrack* pTrack, const CarModel& cm, const Options& opts );
 
 private:
-	void	AnalyseBumps( const CarModel& cm, bool dumpInfo = false );
-	void	SmoothBetween( int step );
-	void	SetOffset( const CarModel& cm, double k, double t,
-					   PathPt* l3, const PathPt* l2, const PathPt* l4 );
+    void	AnalyseBumps( const CarModel& cm, bool dumpInfo = false );
+    void	SmoothBetween( int step );
+    void	SetOffset(const CarModel& cm, double k, double t,
+                       PathPt *l3, const PathPt* l2, const PathPt* l4 );
 
-	void	OptimiseLine( const CarModel& cm, int idx, int step, double hLimit,
-						  PathPt* l3, const PathPt* l2, const PathPt* l4 );
+    void	OptimiseLine(const CarModel& cm, int idx, int step, double hLimit,
+                         PathPt *l3, const PathPt* l2, const PathPt* l4 );
 
-	void	Optimise(	const CarModel& cm, double factor,
-						int idx, PathPt* l3,
-						const PathPt* l0, const PathPt* l1,
-						const PathPt* l2, const PathPt* l4,
-						const PathPt* l5, const PathPt* l6,
-						int	bumpMod );
+    void	Optimise(	const CarModel& cm, double factor,
+                        int idx, PathPt* l3,
+                        const PathPt* l0, const PathPt* l1,
+                        const PathPt* l2, const PathPt* l4,
+                        const PathPt* l5, const PathPt* l6,
+                        int	bumpMod );
 
     void	OptimisePath(	const CarModel& cm,	int step, int nIterations, int bumpMod );
 
 private:
-	Array<double>	m_factors;
+    Array<double>	m_factors;
 };
 
 #endif

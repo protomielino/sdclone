@@ -41,7 +41,17 @@ MyTrack::~MyTrack()
     delete [] m_pSegs;
 }
 
-void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
+void MyTrack::Clear()
+{
+    delete [] m_pSegs;
+    NSEG = 0;
+    m_pSegs = 0;
+    m_pCurTrack = 0;
+    m_innerMod.clear();
+    m_nBends = 0;
+}
+
+void MyTrack::NewTrack( tTrack* pNewTrack, const std::vector<double>* pInnerMod, bool pit, SideMod* pSideMod )
 {
     if( m_pCurTrack != pNewTrack )
     {
@@ -51,6 +61,14 @@ void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
     }
 
     m_pCurTrack = pNewTrack;
+
+    if( pInnerMod )
+        m_innerMod = *pInnerMod;
+    else
+    {
+        m_innerMod.clear();
+    }
+
 
     if( pSideMod )
         m_sideMod = *pSideMod;
@@ -63,40 +81,26 @@ void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
         m_pSegs = new Seg[NSEG];
         m_delta = pNewTrack->length / NSEG;
 
-//		GfOut( "   ### NSEG %d\n", NSEG );
-
         tTrackSeg*	pseg = pNewTrack->seg;
+
         while( pseg->lgfromstart > pNewTrack->length / 2 )
             pseg = pseg->next;
+
         double		tsend = pseg->lgfromstart + pseg->length;
-//		GfOut( "   ### tsend %g len %g fromstart %g\n",
-//					tsend, pseg->length, pseg->lgfromstart );
 
         int	pitEntry = -1;
         int	pitExit  = -1;
         int pitSide  = pNewTrack->pits.side == TR_LFT ? TR_SIDE_LFT : TR_SIDE_RGT;
 
-        {for( int i = 0; i < NSEG; i++ )
+        for( int i = 0; i < NSEG; i++ )
         {
             double	segDist = i * m_delta;
+
             while( segDist >= tsend )
             {
                 pseg = pseg->next;
-//				GfOut( "   ### segDist %g tsend %g len %g fromstart %g\n",
-//						segDist, tsend, pseg->length, pseg->lgfromstart );
-//				tsend += pseg->length;
                 tsend = pseg->lgfromstart + pseg->length;
             }
-
-//			const double	MIN_MU = pseg->surface->kFriction * 0.8;
-//			const double	MAX_ROUGH = MX(0.005, pseg->surface->kRoughness * 1.2);
-//			const double	MAX_RESIST = MX(0.02, pseg->surface->kRollRes * 1.2);
-
-//			GfOut( "   ### segDist %g   tsend %g\n",
-//					segDist, tsend );
-
-//			double	t = (segDist - pseg->lgfromstart) / pseg->length;
-//			double	width = pseg->startWidth + (pseg->endWidth - pseg->startWidth) * t;
 
             m_pSegs[i].segDist = segDist;
             m_pSegs[i].pSeg = pseg;
@@ -106,46 +110,14 @@ void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
 
             if( pitEntry < 0 && (pseg->raceInfo & TR_PITENTRY) )
                 pitEntry = i;
+
             if( (pseg->raceInfo & TR_PITEXIT) )
                 pitExit  = i;
-        }}
-
-//		GfOut( "pit entry %d  pit exit %d \n", pitEntry, pitExit );
-/*
-        if( pNewTrack->pits.pitStart )
-        {
-            GfOut( "pit entry %d  pit exit %d \n",
-                pNewTrack->pits.pitEntry->id, pNewTrack->pits.pitExit->id );
-            GfOut( "pit start %d  pit end  %d \n",
-                pNewTrack->pits.pitStart->id, pNewTrack->pits.pitEnd->id );
-            GfOut( "pit side %d   pit len %g\n", pitSide, pNewTrack->pits.len );
-            pseg = pNewTrack->pits.pitEntry->prev;
-            do
-            {
-                pseg = pseg->next;
-                GfOut( " %7.2fm %4d %5.1fm %4.1fm..%4.1fm",
-                        pseg->lgfromstart, pseg->id, pseg->length,
-                        pseg->startWidth, pseg->endWidth );
-
-                tTrackSeg*	pSide = pseg->side[pitSide];
-                while( pSide )
-                {
-                    GfOut( "  %4.1f-%4.1fm %d %d %3x", pSide->startWidth, pSide->endWidth,
-                            pSide->type2, pSide->style, pSide->raceInfo );
-                    pSide = pSide->side[pitSide];
-                }
-
-                GfOut( "\n" );
-            }
-            while( pseg != pNewTrack->pits.pitExit );
         }
-*/
-        {for( int i = 0; i < NSEG; i++ )
+
+        for( int i = 0; i < NSEG; i++ )
         {
             pseg = m_pSegs[i].pSeg;
-
-//			GfOut( "   ### segDist %g   tsend %g\n",
-//					segDist, tsend );
 
             double	segDist = m_pSegs[i].segDist;
             double	t = (segDist - pseg->lgfromstart) / pseg->length;
@@ -158,28 +130,24 @@ void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
             const double	MAX_RESIST = MX(0.02, pseg->surface->kRollRes * 1.2);
             const double	SLOPE = pseg->Kzw;
 
-            {for( int s = 0; s < 2; s++ )
+            for( int s = 0; s < 2; s++ )
             {
                 tTrackSeg*	pSide = pseg->side[s];
+
                 if( pSide == 0 )
                     continue;
 
                 double	extraW = 0;
 
                 bool	done = false;
+
                 while( !done && pSide )
                 {
-                    double	w = pSide->startWidth +
-                                (pSide->endWidth - pSide->startWidth) * t;
-//					w = MX(0, w - 0.5);
+                    double	w = pSide->startWidth + (pSide->endWidth - pSide->startWidth) * t;
 
-//					w = MN(w, 1.0);
                     if( pSide->style == TR_CURB )
                     {
-                        if( s == m_sideMod.side &&
-                            i >= m_sideMod.start &&
-                            i <= m_sideMod.end )
-                            ;
+                        if( s == m_sideMod.side && i >= m_sideMod.start && i <= m_sideMod.end );
                         else
                         {
                         // always keep 1 wheel on main track.
@@ -190,21 +158,16 @@ void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
                              ((s == TR_SIDE_RGT && pseg->type == TR_LFT) &&
                             pSide->surface->kFriction  < pseg->surface->kFriction ))
                             // keep a wheel on the good stuff.
-                            w = 0;//MN(w, 1.5);
+                            w = 0;
 
                         // don't go too far up raised curbs (max 2cm).
                         if( pSide->height > 0 )
                             w = MN(w, 0.6);
-//							w = MN(0.05 * pSide->width / pSide->height, 1.5);
-
-//						if( pSide->surface->kFriction  < MIN_MU )
-//							w = 0;
                         }
                     }
                     else if( pSide->style == TR_PLAN )
                     {
-                        if( (inPit && pitSide == s)							 ||
-                            (pSide->raceInfo & (TR_SPEEDLIMIT | TR_PITLANE)) )
+                        if( (inPit && pitSide == s)	|| (pSide->raceInfo & (TR_SPEEDLIMIT | TR_PITLANE)) )
                         {
                             w = 0;
                             done = true;
@@ -223,10 +186,7 @@ void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
                             pSide->surface->kRollRes   > MAX_RESIST	||
                             fabs(pSide->Kzw - SLOPE) > 0.005 )
                         {
-//							bool	inner =
-//										s == TR_SIDE_LFT && pseg->type == TR_LFT ||
-//										s == TR_SIDE_RGT && pseg->type == TR_RGT;
-                            w = 0;//inner ? MN(w, 0.5) : 0;
+                            w = 0;
                             done = true;
                         }
 
@@ -235,81 +195,32 @@ void MyTrack::NewTrack( tTrack* pNewTrack, bool pit, SideMod* pSideMod )
                             pSide->surface->kFriction  < pseg->surface->kFriction ))
                         {
                             // keep a wheel on the good stuff.
-                            w = 0;//MN(w, 1.5);
+                            w = 0;
                             done = true;
                         }
                     }
                     else
                     {
                         // wall of some sort.
-//						w = 0;
-                        w = pSide->style == TR_WALL ? -0.5 :
-//							pSide->style == TR_FENCE ? -0.1 : 0;
-                            0;
+                        w = pSide->style == TR_WALL ? -0.5 : 0;
                         done = true;
                     }
 
                     extraW += w;
-
-//					if( pSide->style != TR_PLAN || w <= 0 )
-//						done = true;
-
                     pSide = pSide->side[s];
                 }
 
-//				extraW = MX(0, extraW - 0.1);
                 if( s == TR_SIDE_LFT )
                     m_pSegs[i].wl += extraW;
                 else
                     m_pSegs[i].wr += extraW;
-            }}
-
-//			GfOut( "\n" );
-
-//			m_pSegs[i].wl = 1;
-//			m_pSegs[i].wr = 1;
-//			m_pSegs[i].wl *= 0.6;
-//			m_pSegs[i].wr *= 0.6;
+            }
 
             CalcPtAndNormal( pseg, segDist - pseg->lgfromstart,
-//								m_pSegs[i].wl + m_pSegs[i].wr,
                                 m_pSegs[i].t,
                                 m_pSegs[i].pt, m_pSegs[i].norm );
 
-//			GfOut( "%4d  p(%7.2f, %7.2f, %7.2f)  n(%7.4f, %7.4f, %7.4f)\n",
-//					i, m_pSegs[i].pt.x, m_pSegs[i].pt.y, m_pSegs[i].pt.z,
-//					m_pSegs[i].norm.x, m_pSegs[i].norm.y, m_pSegs[i].norm.z );
-        }}
-/*
-        {for( int i = 0; i < NSEG; i++ )
-        {
-            int	in = (i + 1) % NSEG;
-
-            if( m_pSegs[i].wl > m_pSegs[in].wl )
-            {
-                if( m_pSegs[i].wl > m_pSegs[in].wl - 0.25 )
-                    m_pSegs[i].wl = m_pSegs[in].wl - 1;
-                else
-                    m_pSegs[i].wl = m_pSegs[in].wl;
-            }
-            if( m_pSegs[i].wr > m_pSegs[in].wr )
-            {
-                if( m_pSegs[i].wr > m_pSegs[in].wr - 0.25 )
-                    m_pSegs[i].wr = m_pSegs[in].wr - 1;
-                else
-                    m_pSegs[i].wr = m_pSegs[in].wr;
-            }
-        }}
-
-        {for( int i = NSEG - 1; i >= 0; i-- )
-        {
-            int	ip = (i - 1 + NSEG) % NSEG;
-
-            if( m_pSegs[i].wl > m_pSegs[ip].wl )
-                m_pSegs[i].wl = m_pSegs[ip].wl;
-            if( m_pSegs[i].wr > m_pSegs[ip].wr )
-                m_pSegs[i].wr = m_pSegs[ip].wr;
-        }}*/
+        }
     }
 }
 

@@ -54,8 +54,8 @@ public:
         double		Extl() const	{ return pSeg->el; }
         double		Extr() const	{ return pSeg->er; }
 
-        const Vec3d&Pt() const		{ return pSeg->pt; }
-        const Vec3d&Norm() const	{ return pSeg->norm; }
+        const Vec3d& Pt() const		{ return pSeg->pt; }
+        const Vec3d& Norm() const	{ return pSeg->norm; }
         Vec3d CalcPt() const	    { return pSeg->pt + pSeg->norm * offs; }
         Vec3d CalcPt(double o) const { return pSeg->pt + pSeg->norm * o; }
     };
@@ -74,6 +74,7 @@ public:
     void	Initialise( MyTrack* pTrack, double maxL = 999, double maxR = 999 );
 
     const PathPt&	GetAt( int idx ) const;
+    PathPt&			GetAt( int idx );
 
     void	CalcCurvaturesXY( int start, int len, int step = 1 );
     void	CalcCurvaturesZ( int start, int len, int step = 1 );
@@ -96,9 +97,30 @@ public:
     void	PropagateAcceleration( const CarModel& cm, int step = 1 );
     void	CalcFwdAbsK( int range, int step = 1 );
 
+    double  CalcTrackTurnangle(int i, int j);
+
+    void	SetOffset( const CarModel& cm, double offset, PathPt* l3 );
+
+    void	InterpolateBetweenLinear( const CarModel& cm, int step );
+    void	InterpolateBetweenLinearSection( const CarModel& cm, int start, int len, int step );
+    void	InterpolateBetweenLaneLinear( const CarModel& cm, int step );
+    void	GenShortest( const CarModel& cm );
+    void	GenMiddle();
+
+    void	Average( const CarModel& cm );
+    void	AverageSection( const CarModel& cm, int from, int len );
+    void	ModifySection( int from, int len, double delta, int important, double lBuf = 1, double rBuf = 1 );
+    void	QuadraticFilter( int idx );
+    void    FirFilter();
+
+    void	SetEstimatedTime( double time );
+    double	GetEstimatedTime() const;
+
     double	CalcEstimatedTime( int start, int len ) const;
     double	CalcEstimatedLapTime() const;
-    double  CalcTrackTurnangle(int i, int j);
+
+    double  GetRollAngle( int idx ) const;
+    double  GetPitchAngle( int idx ) const;
 
     // for interfacing with "springs" data.
     bool	LoadPath( const char* pDataFile );

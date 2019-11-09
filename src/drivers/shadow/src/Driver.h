@@ -140,6 +140,7 @@
 #define PRV_BRAKE_FACTOR	    "brake factor"
 #define PRV_CTFACTOR            "ctfactor"
 #define PRV_STARTLINE           "start hold line time"
+#define PRV_NEWACC              "use new code acc"
 
 #define NBR_BRAKECOEFF 50                                   // Number of brake coeffs
 

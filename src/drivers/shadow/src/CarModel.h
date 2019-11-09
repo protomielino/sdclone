@@ -18,7 +18,10 @@
 #ifndef _CARMODEL_H_
 #define _CARMODEL_H_
 
+#include "WheelModel.h"
 #include "Vec3d.h"
+
+#include <vector>
 
 // my own planet ...
 #define GRAVITY 9.81
@@ -38,7 +41,13 @@ public:
     CarModel();
     ~CarModel();
 
-    double	CalcMaxSpeed(double k0, double k1, double kz, double kFriction, double RollAngle , double TiltAngle) const;
+    void	setupDefaultGearbox();
+    void	setupDefaultEngine();
+
+    void    config( const tCarElt* car );
+    void    config( void* hCar );
+
+    double	CalcMaxSpeed(double k, double kz, double kv, double kFriction, double trackRollAngle, double trackPitchAngle) const;
     double	CalcBreaking( double k0, double kz0, double k1, double kz1, double spd1, double dist, double kFriction, double RollAngle, double TiltAngle ) const;
     double	CalcAcceleration( double k0, double kz0, double k1, double kz1, double spd0, double dist, double kFriction, double RollAngle, double TiltAngle ) const;
     double	CalcMaxSpdK() const;
@@ -49,6 +58,14 @@ public:
 
     void	CalcSimuSpeeds( double spd0, double dy, double dist, double kFriction, double& minSpd, double& maxSpd ) const;
     void	CalcSimuSpeedRanges( double spd0, double dist, double kFriction, double& minSpd, double& maxSpd, double& maxDY ) const;
+
+    const WheelModel&	wheel( int wheel ) const;
+    void				configWheels( const tCarElt* car );
+    void				configWheels( void* hCar );
+    void				updateWheels( const tCarElt* car, const tSituation* s );
+
+private:
+    void    configCar( void* hCar );
 
 
 public:
@@ -61,6 +78,8 @@ public:
     double	DAMAGE;         // damage of this car.
     bool    NEEDSINLONG;
     bool    USEDACCEXIT;
+    bool    USECONFIG;
+    bool    USECONFIGWHEEL;
     double  SKILL;          // skill car driver.
 
     double	TYRE_MU;        // mu value of tyres (min of those avail).
@@ -136,6 +155,17 @@ public:
     bool	HASTYC;
     double  TYRECONDITIONFRONT;
     double	TYRECONDITIONREAR;
+
+    double  GEAR_CHANGE_REVS;   // revs at which to change gear.
+
+    double  DIFF_RATIO;     // rear differential ratio.
+    double  DIFF_EFF;       // rear differential efficiency.
+    double	ENGINE_REV_LIMIT;	// revs where limit kicks in.
+    double  ENGINE_MAX_REVS;    // max revs for this engine.
+    std::vector<double> ENGINE_REVS;    // anglular rate (in radians per second.)
+    std::vector<double> ENGINE_TORQUES;
+    std::vector<double> GEAR_RATIOS;    // gear ratios
+    std::vector<double> GEAR_EFFS;      // gear efficiencies.
 };
 
 #endif

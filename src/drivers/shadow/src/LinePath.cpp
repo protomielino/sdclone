@@ -25,6 +25,10 @@
 #include "Utils.h"
 #include "ParametricCubic.h"
 
+// The "SHADOW" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -332,6 +336,11 @@ const LinePath::PathPt&	LinePath::GetAt( int idx ) const
     return m_pPath[idx];
 }
 
+LinePath::PathPt& LinePath::GetAt( int idx )
+{
+    return m_pPath[idx];
+}
+
 void LinePath::CalcCurvaturesXY( int start, int len, int step )
 {
     const int	NSEG = m_pTrack->GetSize();
@@ -452,6 +461,7 @@ void LinePath::CalcAngles( int start, int len, int step )
 
         // TODO: calculate the path roll angle instead of the track roll angle...
         double pathRollAngle = atan2(m_pPath[i].Norm().z, 1);
+        LogSHADOW.debug("Track Pitch = %.3f - Track Roll = %.3f\n", pathPitchAngle, pathRollAngle);
 
         m_pPath[i].ap = pathPitchAngle;
         m_pPath[i].ar = pathRollAngle;
@@ -489,9 +499,10 @@ void LinePath::CalcMaxSpeeds( int start, int len, const CarModel& carModel, int 
         double  frictionOffset = m_pPath[i].offs + SGN(m_pPath[i].k) * 0.75;
         double	trackRollAngle = atan2(m_pPath[i].Norm().z, 1);
         double  trackTiltAngle = 1.1 * atan2(Delta.z, Dist);
-        double	spd = carModel.CalcMaxSpeed( m_pPath[i].k, m_pPath[j].k, m_pPath[j].kz, m_pTrack->GetFriction(i, frictionOffset), trackRollAngle, trackTiltAngle);
-
+        //double	spd = carModel.CalcMaxSpeed( m_pPath[i].k, m_pPath[j].k, m_pPath[j].kz, m_pTrack->GetFriction(i, frictionOffset), trackRollAngle, trackTiltAngle);
+        double	spd = carModel.CalcMaxSpeed( m_pPath[j].k, m_pPath[j].kz, m_pPath[j].kv, m_pTrack->GetFriction(i, frictionOffset), trackRollAngle, trackTiltAngle);
         double TrackTurnangle = CalcTrackTurnangle(i, (i + 50) % NSEG);
+        LogSHADOW.debug("Track Turn Angle = %.3f\n", TrackTurnangle);
 
         if (TrackTurnangle > 0.7)
             spd *= 0.75;
@@ -666,6 +677,312 @@ void LinePath::CalcFwdAbsK( int range, int step )
         if( j < 0 )
             j = (NSEG / step) * step;
     }
+}
+
+void LinePath::SetOffset( const CarModel& cm, double offset, PathPt* l )
+{
+    double	marg = cm.WIDTH / 2 + 0.02;//1.0;//1.1
+    double	wl  = -MN(m_maxL, l->Wl()) + marg;
+    double	wr  =  MN(m_maxR, l->Wr()) - marg;
+
+    if( offset < wl )
+        offset = wl;
+    else if( offset > wr )
+        offset = wr;
+
+    l->offs = offset;
+    l->pt = l->CalcPt();
+}
+
+void LinePath::InterpolateBetweenLinear( const CarModel& cm, int step )
+{
+    // now smooth the values between steps
+    PathPt*	l0 = 0;
+    PathPt*	l1 = &m_pPath[0];
+
+    for( int i = 0; i < NSEG; i += step )
+    {
+        int		j = (i + step) % NSEG;
+        l0 = l1;
+        l1 = &m_pPath[j];
+
+        for( int k = 1; k < step; k++ )
+        {
+            double	t;
+            PathPt&	l = m_pPath[(i + k) % NSEG];
+            Utils::LineCrossesLine(l.Pt().GetXY(), l.Norm().GetXY(), l0->pt.GetXY(), l1->pt.GetXY() - l0->pt.GetXY(), t);
+
+            SetOffset( cm, t, &l );
+        }
+    }
+}
+
+void LinePath::InterpolateBetweenLinearSection( const CarModel& cm, int start, int len, int step )
+{
+    // now smooth the values between steps
+    PathPt*	l0 = 0;
+    PathPt*	l1 = &m_pPath[start];
+
+    for( int index = 0; index < len; index += step )
+    {
+        int		i = (start + index) % NSEG;
+        int		j = (start + MN(len, index + step)) % NSEG;
+
+        l0 = l1;
+        l1 = &m_pPath[j];
+
+        for( int k = (i + 1) % NSEG; k != j; k = (k + 1) % NSEG )
+        {
+            double	t;
+            PathPt&	l = m_pPath[k];
+            Utils::LineCrossesLine(l.Pt().GetXY(), l.Norm().GetXY(), l0->pt.GetXY(), l1->pt.GetXY() - l0->pt.GetXY(), t);
+            SetOffset( cm, t, &l );
+        }
+    }
+}
+
+void LinePath::InterpolateBetweenLaneLinear( const CarModel& cm, int step )
+{
+    // now smooth the values between steps
+    for( int i = 0; i < NSEG; i += step )
+    {
+        int		j = i + step;
+        if( j >= NSEG )
+        {
+            step = NSEG - i;
+            j = 0;
+        }
+
+        double	startT = m_pPath[i].offs;
+        double	endT   = m_pPath[j].offs;
+
+        for( int k = 1; k < step; k++ )
+        {
+            double	t = startT + (endT - startT) * k / step;
+            PathPt&	l = m_pPath[(i + k) % NSEG];
+            SetOffset( cm, t, &l );
+        }
+    }
+}
+
+void LinePath::GenShortest( const CarModel& cm )
+{
+    // just run an averaging alg over whole track repeatedly
+    for( int step = 128; step > 0; step /= 2 )
+    {
+        for( int j = 0; j < 5; j++ )
+        {
+            PathPt*	l0 = 0;
+            PathPt*	l1 = &m_pPath[((NSEG - step - 1) / step) * step];
+            PathPt*	l2 = &m_pPath[((NSEG - 1) / step) * step];
+
+            Vec2d	p0;
+            Vec2d	p1 = l1->pt.GetXY();
+            Vec2d	p2 = l2->pt.GetXY();
+
+            for( int i = 0; i < NSEG; i += step )
+            {
+                l0 = l1;
+                l1 = l2;
+                l2 = &m_pPath[i];
+
+                p0 = p1;
+                p1 = p2;
+                p2 = l2->pt.GetXY();
+
+                double	t;
+
+                if( Utils::LineCrossesLine(l1->Pt().GetXY(), l1->Norm().GetXY(), p0, p2 - p0, t) )
+                {
+                    SetOffset( cm, t, l1 );
+                    p1 = l1->pt.GetXY();
+                }
+            }
+        }
+
+        if( step > 1 )
+            InterpolateBetweenLinear( cm, step );
+    }
+
+    CalcAngles();
+    CalcCurvaturesXY();
+    CalcCurvaturesZ();
+    CalcCurvaturesV();
+    CalcCurvaturesH();
+}
+
+void LinePath::GenMiddle()
+{
+    for( int i = 0; i < NSEG; i++ )
+    {
+        m_pPath[i].offs = 0;
+        m_pPath[i].pt = m_pPath[i].Pt();
+    }
+
+    CalcAngles();
+    CalcCurvaturesXY();
+    CalcCurvaturesZ();
+    CalcCurvaturesV();
+    CalcCurvaturesH();
+}
+
+void LinePath::Average( const CarModel& cm )
+{
+    AverageSection( cm, 0, NSEG );
+}
+
+void LinePath::AverageSection( const CarModel& cm, int from, int len )
+{
+    // run an averaging alg
+    PathPt*	l0 = 0;
+    PathPt*	l1 = &m_pPath[(from - 1 + NSEG) % NSEG];
+    PathPt*	l2 = &m_pPath[from];
+
+    Vec2d	p0;
+    Vec2d	p1 = l1->pt.GetXY();
+    Vec2d	p2 = l2->pt.GetXY();
+
+    for( int i = 0; i < NSEG; i++ )
+    {
+        int		j = (from + 1 + i) % NSEG;
+
+        l0 = l1;
+        l1 = l2;
+        l2 = &m_pPath[j];
+
+        p0 = p1;
+        p1 = p2;
+        p2 = l2->pt.GetXY();
+
+        double	t;
+
+        if( Utils::LineCrossesLine(l1->Pt().GetXY(), l1->Norm().GetXY(), p0, p2 - p0, t) )
+        {
+            t = l1->offs * 0.9 + t * 0.1;
+            SetOffset( cm, t, l1 );
+            p1 = l1->pt.GetXY();
+        }
+    }
+}
+
+void LinePath::ModifySection( int from, int len, double delta, int important, double lBuf, double rBuf )
+{
+    // find distances...
+    double*	pDist = new double[len];
+    pDist[0] = 0;
+
+    for( int i = 1; i < len; i++ )
+    {
+        int		j = (from + i - 1) % NSEG;
+        int		k = (j + 1) % NSEG;
+        double	length = (GetAt(j).pt.GetXY() - GetAt(k).pt.GetXY()).len();
+        pDist[i] = pDist[i - 1] + length;
+    }
+
+    int		newFrom = from;
+    int		newTo = from + len;
+
+    // dry run to find limits, and a better estimate of distance
+    double	totalDist = pDist[len - 1];
+
+    Vec3d	p0 = GetAt(from).pt;
+
+    for( int i = 0; i < len; i++ )
+    {
+        int		j = (from + i) % NSEG;
+        const PathPt&	l0 = GetAt((j - 1 + NSEG) % NSEG);
+        const PathPt&	l1 = GetAt(j);
+        const PathPt&	l2 = GetAt((j + 1) % NSEG);
+
+        double	dist = pDist[i];
+        double	angle = PI * dist / totalDist;
+        double	offset = (1 - cos(angle)) * 0.5 * delta;
+
+        Vec2d	tan = Vec3d(l2.pt - l0.pt).GetXY().GetUnit().GetNormal();
+        double	dot = tan * l1.Norm().GetXY();
+        offset /= fabs(dot);
+
+        double	offs = l1.offs + offset;
+        if( offset < 0 && offs < -l1.Wl() + lBuf ||
+            offset > 0 && offs > l1.Wr() - rBuf )
+        {
+            if( i < (important - from + NSEG) % NSEG)
+                newFrom = j;
+            else
+            {
+                newTo = j;
+                break;
+            }
+        }
+
+        Vec3d	p1 = l1.CalcPt(offs);
+
+        if( i > 0 )
+        {
+
+            double	length = (p1.GetXY() - p0.GetXY()).len();
+            pDist[i] = pDist[i - 1] + length;
+        }
+
+        p0 = p1;
+    }
+
+    int		oldFrom = from;
+    from = newFrom;
+    len = (newTo - newFrom + NSEG) % NSEG;
+
+    if( len < 5 )
+    {
+        delete [] pDist;
+        return;
+    }
+
+    int		newI = (from - oldFrom + NSEG) % NSEG;
+    totalDist = pDist[newI + len - 1] - pDist[newI];
+
+    p0 = GetAt((from - 1 + NSEG) % NSEG).pt;
+
+    for( int i = 0; i < len; i++ )
+    {
+        int				j = (from + i) % NSEG;
+        PathPt&			l1 = GetAt(j);
+        const PathPt&	l2 = GetAt((j + 1) % NSEG);
+
+        double	dist = pDist[i + newI] - pDist[newI];
+        double	angle = PI * dist / totalDist;
+        double	offset = (1 - cos(angle)) * 0.5 * delta;
+
+        Vec2d	tan = Vec3d(l2.pt - p0).GetXY().GetUnit().GetNormal();
+        double	dot = tan * l1.Norm().GetXY();
+        offset /= fabs(dot);
+
+        p0 = l1.pt;
+
+        l1.offs += offset;
+        l1.pt = l1.CalcPt();
+    }
+
+    delete [] pDist;
+}
+
+void LinePath::SetEstimatedTime( double time )
+{
+    m_estimatedTime = time;
+}
+
+double LinePath::GetEstimatedTime() const
+{
+    return m_estimatedTime;
+}
+
+double LinePath::GetRollAngle( int idx ) const
+{
+    return m_pPath[idx].ar;
+}
+
+double LinePath::GetPitchAngle( int idx ) const
+{
+    return m_pPath[idx].ap;
 }
 
 double LinePath::CalcEstimatedTime( int start, int len ) const

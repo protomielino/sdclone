@@ -54,7 +54,8 @@
 
 #include "os.h"
 
-static const size_t SOFileExtLen = strlen("."DLLEXT);
+static const size_t SOFileExtLen = strlen("." DLLEXT);
+static const size_t SOPathLenMax = 1024;
 
 /*
  * Function
@@ -228,7 +229,7 @@ linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 static int
 linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 {
-	char		sopath[256];	/* path of the lib[x].so */
+	char		sopath[SOPathLenMax];	/* path of the lib[x].so */
 	tSOHandle 		handle;
 	DIR			*dp;
 	struct dirent	*ep;
@@ -245,9 +246,9 @@ linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 		while ((ep = readdir (dp)) != 0) 
 		{
 			if ((strlen(ep->d_name) > SOFileExtLen + 1) &&
-				(strcmp("."DLLEXT, ep->d_name+strlen(ep->d_name)-SOFileExtLen) == 0)) /* xxxx.so */
+				(strcmp("." DLLEXT, ep->d_name+strlen(ep->d_name)-SOFileExtLen) == 0)) /* xxxx.so */
 			{
-				sprintf(sopath, "%s/%s", dir, ep->d_name);
+				snprintf(sopath, sizeof(sopath), "%s/%s", dir, ep->d_name);
 				/* Try and avoid loading the same module twice (WARNING: Only checks sopath equality !) */
 				if (!GfModIsInList(sopath, *modlist))
 				{
@@ -320,7 +321,7 @@ linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 static int
 linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **modlist)
 {
-	char		 sopath[256];	/* path of the lib[x].so */
+	char		 sopath[SOPathLenMax];	/* path of the lib[x].so */
 	tSOHandle		 handle;
 	DIR			*dp;
 	struct dirent	*ep;
@@ -337,13 +338,13 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
 		while ((ep = readdir (dp)) != 0) 
 		{
 			if (((strlen(ep->d_name) >  SOFileExtLen + 1) && 
-				 (strcmp("."DLLEXT, ep->d_name+strlen(ep->d_name)-SOFileExtLen) == 0)) /* xxxx.so */
+				 (strcmp("." DLLEXT, ep->d_name+strlen(ep->d_name)-SOFileExtLen) == 0)) /* xxxx.so */
 				|| ((level == 1) && (ep->d_name[0] != '.')))
 			{
 				if (level == 1)
-					sprintf(sopath, "%s/%s/%s.%s", dir, ep->d_name, ep->d_name,DLLEXT);
+					snprintf(sopath, sizeof(sopath), "%s/%s/%s.%s", dir, ep->d_name, ep->d_name,DLLEXT);
 				else
-					sprintf(sopath, "%s/%s", dir, ep->d_name);
+					snprintf(sopath, sizeof(sopath), "%s/%s", dir, ep->d_name);
 				
 				/* Try and avoid loading the same module twice (WARNING: Only checks sopath equality !) */
 				if (!GfModIsInList(sopath, *modlist))

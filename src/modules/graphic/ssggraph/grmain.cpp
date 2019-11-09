@@ -623,7 +623,7 @@ refresh(tSituation *s)
 int
 initCars(tSituation *s)
 {
-    char buf[256];
+    char buf[1024];
     char	idx[16];
     int		index;
     int		i;
@@ -636,7 +636,7 @@ initCars(tSituation *s)
 
     if (!grHandle)
     {
-        sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
+        snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
         grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     }
 
@@ -668,9 +668,9 @@ initCars(tSituation *s)
     //          does no more work with the new "welcome" module system
     //          (the "normal" index has no more the 10 limit) ... TO BE FIXED !!!!!!!
     if (elt->_driverType == RM_DRV_HUMAN && elt->_driverIndex > 10)
-        sprintf(idx, "Robots/index/%d", elt->_driverIndex - 11);
+        snprintf(idx, sizeof(idx), "Robots/index/%d", elt->_driverIndex - 11);
     else
-        sprintf(idx, "Robots/index/%d", elt->_driverIndex);
+        snprintf(idx, sizeof(idx), "Robots/index/%d", elt->_driverIndex);
 
     grCarInfo[index].iconColor[0] = GfParmGetNum(hdle, idx, "red",   (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "red",   NULL, 0));
     grCarInfo[index].iconColor[1] = GfParmGetNum(hdle, idx, "green", (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "green", NULL, 0));

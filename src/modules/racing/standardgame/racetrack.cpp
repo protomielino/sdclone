@@ -58,8 +58,12 @@ static void reTrackDump(const tTrack *track, int verbose);
 static void reTrackInitTimeOfDay(void);
 static void reTrackInitWeather(void);
 static void reTrackInitWeatherValues(void);
+
+#ifdef WEBSERVER
 static void reTrackInitRealWeather(void);
 static void reTrackInitSimuWeather(void);
+#endif //WEBSERVER
+
 static void reTrackUpdatePhysics(void);
 
 /** Initialize the track for a race manager.
@@ -505,13 +509,11 @@ reTrackInitWeatherValues(void)
     trackLocal->airtemperature = temp;
 }
 
+#ifdef WEBSERVER
 // Initialize track weather info from race settings
 void
 reTrackInitRealWeather(void)
 {
-#ifndef WEBSERVER
-    reTrackInitSimuWeather();
-#else
     std::string url = "ftp://tgftp.nws.noaa.gov/data/observations/metar/stations/";
     webMetar = new ReWebMetar;
     tTrackLocalInfo *trackLocal = &ReInfo->track->local;
@@ -704,16 +706,14 @@ reTrackInitRealWeather(void)
 
         ReTrackUpdate();
     }
-#endif // WEBSERVER
 }
 
 // Initialize track weather info from race settings
 void
 reTrackInitSimuWeather(void)
 {
-    tTrackLocalInfo *trackLocal = &ReInfo->track->local;
-#ifdef WEBSERVER
     webMetar = new ReWebMetar;
+    tTrackLocalInfo *trackLocal = &ReInfo->track->local;
 
     struct tm now;
     time_t now_sec = time(0);
@@ -735,7 +735,6 @@ reTrackInitSimuWeather(void)
     if (!file.is_open())
     {
         GfLogError("Failed to open %s\n", weatherfile.str().c_str());
-#endif // WEBSERVER
         int clouds = TR_CLOUDS_NONE;
         int rain = TR_RAIN_NONE;
         // Really random clouds.
@@ -764,7 +763,6 @@ reTrackInitSimuWeather(void)
 
         ReTrackUpdate();
 
-#ifdef WEBSERVER
         return;
     }
 
@@ -930,8 +928,8 @@ reTrackInitSimuWeather(void)
     GfLogDebug("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
 
     ReTrackUpdate();
-#endif // WEBSERVER
 }
+#endif //WEBSERVER
 
 // Update track info ...
 void
@@ -995,7 +993,6 @@ ReTrackShutdown(void)
         delete webMetar;
         webMetar = 0;
     }
-#endif // WEBSERVER
-
+#endif //WEBSERVER
     return 0;
 }

@@ -297,7 +297,6 @@ TDriver::TDriver(int Index):
   oCarHasABS(false),
   oCarHasESP(false),
   oCarHasTCL(false),
-  oCarHasTYC(false),
   oTclRange(10.0),
   oTclSlip(1.6),
   oTclFactor(1.0),
@@ -396,7 +395,8 @@ TDriver::TDriver(int Index):
   oJumping(0),
   oJumpOffset(0.0),
   oFirstJump(true),
-  oStartSteerFactor(0.0)
+  oStartSteerFactor(0.0),
+  oCarHasTYC(false)
 {
   LogSimplix.debug("\n#TDriver::TDriver() >>>\n\n");
   int I;
@@ -4020,7 +4020,7 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
       buf[BLEN+1] = '-';
 
 //	sprintf(buf2,"%s AVR:%.2f AVO:%.2f TS:%.2f CS:%.2f",buf,oAvoidRange,oAvoidOffset,oTargetSpeed*3.6,oCurrSpeed*3.6);
-	sprintf(buf2,"%s %04.4d R:%.2f O:%.2f TS:%.2f CS:%.2f",buf,SecIndex,oAvoidRange,oAvoidOffset,oTargetSpeed*3.6,oCurrSpeed*3.6);
+	sprintf(buf2,"%s %04d R:%.2f O:%.2f TS:%.2f CS:%.2f",buf,SecIndex,oAvoidRange,oAvoidOffset,oTargetSpeed*3.6,oCurrSpeed*3.6);
 
     LogSimplix.info("%s\n",buf2);
     /* Plotter <<< */
