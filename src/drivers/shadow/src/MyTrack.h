@@ -43,7 +43,7 @@ public:
     ~MyTrack();
 
     void	Clear();
-    void	NewTrack(tTrack* pNewTrack, const std::vector<double> *pInnerMod, bool pit = false, SideMod* pSideMod = 0 );
+    void	NewTrack(tTrack* pNewTrack, const std::vector<double> *pInnerMod = NULL, bool pit = false, SideMod* pSideMod = 0 );
 
     tTrack*			GetTrack();
     const tTrack*	GetTrack() const;

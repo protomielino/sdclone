@@ -616,7 +616,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     LogSHADOW.debug( "SIDE MOD %d %d %d\n", sideMod.side, sideMod.start, sideMod.end );
     LogSHADOW.debug( "STAY_TOGETHER %g\n", STAY_TOGETHER );
 
-    m_track.NewTrack( track, false, &sideMod );
+    m_track.NewTrack( track, NULL, false, &sideMod );
 
     m_Situation = pS;
 
@@ -2136,10 +2136,12 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, const tSituation*	s, doubl
     int		carIdx = m_track.IndexFromPos(m_track.CalcPos(car));
     ai.k = 	m_path[PATH_NORMAL].GetAt(carIdx).k;
     int		NSEG = m_track.GetSize();
+
     for( int i = 1; i < NSEG; i++ )
     {
         int	idx = (carIdx + i) % NSEG;
         double	thisK = m_path[PATH_NORMAL].GetAt(idx).k;
+
         if( fabs(thisK) > 0.01 )
         {
             ai.nextK = thisK;
