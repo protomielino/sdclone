@@ -372,14 +372,17 @@ void SDCloudLayer::rebuild()
           }
 
           vl[i] = new osg::Vec3Array;
+          nl[i] = new osg::Vec3Array;
           cl[i] = new osg::Vec4Array;
           tl[i] = new osg::Vec2Array;
 
+          osg::Vec3 normal(0.0f, 0.0f, 1.f);
           osg::Vec3 vertex(layer_span*(i-2)/2, -layer_span, alt_diff * (sin(i*mpi) - 2));
           osg::Vec2 tc(layer_scale * i/4, 0.0f);
           osg::Vec4 color(cloudColors[0], (i == 0) ? 0.0f : 0.15f);
 
           cl[i]->push_back(color);
+          nl[i]->push_back(normal); // call only once, single normal is enough
           vl[i]->push_back(vertex);
           tl[i]->push_back(tc);
 
@@ -416,7 +419,7 @@ void SDCloudLayer::rebuild()
           osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry;
           geometry->setUseDisplayList(false);
           geometry->setVertexArray(vl[i].get());
-          geometry->setNormalBinding(osg::Geometry::BIND_OFF);
+          geometry->setNormalArray(nl[i].get(), osg::Array::BIND_OVERALL);
           geometry->setColorArray(cl[i].get(), osg::Array::BIND_PER_VERTEX);
           geometry->setTexCoordArray(0, tl[i].get(), osg::Array::BIND_PER_VERTEX);
           geometry->addPrimitiveSet(new osg::DrawArrays(GL_TRIANGLE_STRIP, 0, vl[i]->size()));

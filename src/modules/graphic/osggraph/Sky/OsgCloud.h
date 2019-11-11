@@ -136,6 +136,7 @@ private:
     float cloud_alpha;          // 1.0 = drawn fully, 0.0 faded out completely
 
     osg::ref_ptr<osg::Vec4Array> cl[4];
+    osg::ref_ptr<osg::Vec3Array> nl[4];
     osg::ref_ptr<osg::Vec3Array> vl[4];
     osg::ref_ptr<osg::Vec2Array> tl[4];
     osg::ref_ptr<osg::Vec3Array> tl2[4];
