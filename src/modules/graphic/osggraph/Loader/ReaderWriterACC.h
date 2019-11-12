@@ -777,8 +777,7 @@ public:
     {
         _geode->addDrawable(_geometry.get());
         material.toStateSet(_geode->getOrCreateStateSet());
-        _geometry->setColorArray(material.getColorArray());
-        _geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+        _geometry->setColorArray(material.getColorArray(), osg::Array::BIND_OVERALL);
         _geometry->setNormalBinding(osg::Geometry::BIND_OFF);
         return _geode.get();
     }
@@ -1031,12 +1030,10 @@ public:
         osg::Geometry* geometry = new osg::Geometry;
         _geode->addDrawable(geometry);
         geometry->setDataVariance(osg::Object::STATIC);
-        geometry->setColorArray(material.getColorArray());
-        geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
-        geometry->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
+        geometry->setColorArray(material.getColorArray(), osg::Array::BIND_OVERALL);
         osg::Vec3Array* normalArray = new osg::Vec3Array;
         normalArray->setDataVariance(osg::Object::STATIC);
-        geometry->setNormalArray(normalArray);
+        geometry->setNormalArray(normalArray, osg::Array::BIND_PER_VERTEX);
         osg::Vec3Array* vertexArray = new osg::Vec3Array;
         vertexArray->setDataVariance(osg::Object::STATIC);
         geometry->setVertexArray(vertexArray);
