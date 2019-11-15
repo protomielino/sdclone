@@ -86,6 +86,7 @@ SDCar::~SDCar(void)
 osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat, int carshader)
 {
     this->car_branch = new osg::MatrixTransform;
+    this->car_shaded_body = new osg::Group;
     this->car_root = new osg::Group;
     this->car = Car;
 
@@ -194,7 +195,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     pSteer = new osg::LOD;
     pSteer->setName("STEER");
 
-    strPath+=buf;
+    //strPath+=buf;
     GfLogInfo("Chemin Textures : %s\n", strTPath.c_str());
 
     //osg::ref_ptr<osg::Node> Car = new osg::Node;
@@ -533,15 +534,17 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         GfLogInfo("Loaded BRAKE LIGHT CAR OSG !\n");
     }
 
-    gCar->addChild(pCar.get());
-    gCar->addChild(pDriver.get());
-    gCar->addChild(pSteer.get());
+    car_shaded_body->addChild(pCar.get());
 
     if(_wing1)
-        gCar->addChild(pWing.get());
+        car_shaded_body->addChild(pWing.get());
 
     if(_wing3)
-        gCar->addChild(pWing3.get());
+       car_shaded_body->addChild(pWing3.get());
+
+    gCar->addChild(car_shaded_body.get());
+    gCar->addChild(pDriver.get());
+    gCar->addChild(pSteer.get());
 #else
 
     osg::ref_ptr<osg::Group> gCar = new osg::Group;
@@ -634,7 +637,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     car_root->addChild(car_branch);
 #endif
 
-    this->shader = new SDCarShader(pCar.get(), this);
+    this->shader = new SDCarShader(car_shaded_body.get(), this);
 
     if (_carShader > 1)
         this->reflectionMappingMethod = REFLECTIONMAPPING_DYNAMIC;
@@ -882,7 +885,7 @@ void SDCar::updateShadingParameters(osg::Matrixf modelview)
 
 void SDCar::setReflectionMap(osg::ref_ptr<osg::Texture> map)
 {
-    car_branch->getOrCreateStateSet()->setTextureAttributeAndModes(2, map,
+    car_shaded_body->getOrCreateStateSet()->setTextureAttributeAndModes(2, map,
         osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 }
 

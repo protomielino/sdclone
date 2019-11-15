@@ -75,6 +75,8 @@ void SDBackground::build(bool type, int X, int Y, int Z, const std::string& Trac
         _backgroundTransform->addChild( m_background.get() );
     }
 
+    osgDB::Registry::instance()->setDataFilePathList( osgDB::FilePathList() );
+
     osg::ref_ptr<osg::StateSet> bgstate = _backgroundTransform->getOrCreateStateSet();
     bgstate->setRenderBinDetails(-1, "RenderBin");
     bgstate->setMode(GL_LIGHTING, osg::StateAttribute::ON);

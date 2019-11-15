@@ -38,12 +38,13 @@ class SDCar
 {
 private :
     osg::ref_ptr<osg::MatrixTransform> car_branch;
+    osg::ref_ptr<osg::Group> car_shaded_body;
     osg::ref_ptr<osg::Group> car_root;
-	osg::ref_ptr<osg::Switch> pLight;
-	osg::ref_ptr<osg::Switch> pLightBrake;
-	osg::ref_ptr<osg::Switch> pWing3;
-	osg::ref_ptr<osg::Switch> pDriver;
-	osg::ref_ptr<osg::LOD> pSteer;
+    osg::ref_ptr<osg::Switch> pLight;
+    osg::ref_ptr<osg::Switch> pLightBrake;
+    osg::ref_ptr<osg::Switch> pWing3;
+    osg::ref_ptr<osg::Switch> pDriver;
+    osg::ref_ptr<osg::LOD> pSteer;
     //osg::ref_ptr<osg::Vec3Array> shadowVertices;
     //osg::ref_ptr<osg::Geometry> quad;
     //osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
@@ -69,8 +70,8 @@ public :
     bool    _wing1;
     bool    _wing3;
     bool    _steer;
-	bool	_light;
-	bool	_lightbrake;
+    bool	_light;
+    bool	_lightbrake;
     int     _carShader;
 
     SDReflectionMapping *getReflectionMap();
@@ -89,7 +90,7 @@ class SDCars
 private :
     std::vector<SDCar *> the_cars;
     osg::ref_ptr<osg::Group> cars_branch;
-	osg::ref_ptr<osg::Group> shadow_branch;
+    osg::ref_ptr<osg::Group> shadow_branch;
     tSituation *situation;
 
     void addSDCar(SDCar * car);
@@ -105,8 +106,8 @@ public :
     SDCar *getCar(tCarElt*car);
     void unLoad();
     void updateShadingParameters(osg::Matrixf modelview);
-	osg::ref_ptr<osg::Node> getShadowNode() { return shadow_branch.get(); }
-	osg::ref_ptr<osg::Node> getCarsNode() { return cars_branch.get(); }
+    osg::ref_ptr<osg::Node> getShadowNode() { return shadow_branch.get(); }
+    osg::ref_ptr<osg::Node> getCarsNode() { return cars_branch.get(); }
 
 };
 

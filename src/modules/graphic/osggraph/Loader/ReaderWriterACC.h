@@ -1245,7 +1245,7 @@ public:
     virtual osgDB::ReaderWriter::WriteResult writeNode(const osg::Node& node,const std::string& fileName, const Options* /*options*/);
     virtual osgDB::ReaderWriter::WriteResult writeNode(const osg::Node& node,std::ostream& fout, const Options* opts);
     void SetCar(bool b);
-	void SetSkin(std::string& name);
+	void SetSkin(const std::string& name);
     osg::Node* readFile(std::istream& stream, const osgDB::ReaderWriter::Options* options);
     osg::Node* readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTransform, TextureData textureData);
 

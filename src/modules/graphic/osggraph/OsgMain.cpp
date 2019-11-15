@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file                 : OsgMain.cpp
-    created              : Thu Aug 17 23:23:49 CEST 2000
-    copyright            : (C)2013 by Xavier Bertaux
-    email                : bertauxx@yahoo.fr
-    version              : $Id: OsgMain.cpp 4712 2012-05-10 06:02:49Z mungewell $
+	file                 : OsgMain.cpp
+	created              : Thu Aug 17 23:23:49 CEST 2000
+	copyright            : (C)2013 by Xavier Bertaux
+	email                : bertauxx@yahoo.fr
+	version              : $Id: OsgMain.cpp 4712 2012-05-10 06:02:49Z mungewell $
 
  ***************************************************************************/
 
@@ -51,27 +51,27 @@ SDHUD hud;
 
 /*oid *getOptions()
 {
-    return Options;
+	return Options;
 }*/
 
 void *getScreens()
 {
-    return screens;
+	return screens;
 }
 
 void *getRender()
 {
-    return render;
+	return render;
 }
 
 void * getCars()
 {
-    return cars;
+	return cars;
 }
 
 void * getScenery()
 {
-    return scenery;
+	return scenery;
 }
 
 static osg::Timer m_timer;
@@ -106,233 +106,233 @@ static int m_CurrentScreenIndex = 0;
 
 static void SDPrevCar(void * /* dummy */)
 {
-    screens->getActiveView()->selectPrevCar();
+	screens->getActiveView()->selectPrevCar();
 }
 
 static void SDNextCar(void * /* dummy */)
 {
-    screens->getActiveView()->selectNextCar();
+	screens->getActiveView()->selectNextCar();
 }
 
 void SDSelectCamera(void * vp)
 {
-    long t = (long)vp;
-    screens->changeCamera(t);
+	long t = (long)vp;
+	screens->changeCamera(t);
 }
 
 void SDSetZoom(void * vp)
 {
-    long t = (long)vp;
-    screens->getActiveView()->getCameras()->getSelectedCamera()->setZoom(t);
+	long t = (long)vp;
+	screens->getActiveView()->getCameras()->getSelectedCamera()->setZoom(t);
 }
 
 void SDSwitchMirror(void * vp)
 {
-    screens->getActiveView()->switchMirror();
+	screens->getActiveView()->switchMirror();
 }
 
 void SDToggleHUD(void * vp)
 {
-    screens->toggleDebugHUD();
+	screens->toggleDebugHUD();
 }
 
 int initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
-    screens = new SDScreens();
+	screens = new SDScreens();
 
-    m_Winx = x;
-    m_Winy = y;
-    m_Winw = width;
-    m_Winh = height;
+	m_Winx = x;
+	m_Winy = y;
+	m_Winw = width;
+	m_Winh = height;
 
-    fMouseRatioX = width / 640.0;
-    fMouseRatioY = height / 480.0;
+	fMouseRatioX = width / 640.0;
+	fMouseRatioY = height / 480.0;
 
-    frameInfo.fInstFps = 0.0;
-    frameInfo.fAvgFps = 0.0;
-    frameInfo.nInstFrames = 0;
-    frameInfo.nTotalFrames = 0;
-    fFPSPrevInstTime = GfTimeClock();
-    nFPSTotalSeconds = 0;
+	frameInfo.fInstFps = 0.0;
+	frameInfo.fAvgFps = 0.0;
+	frameInfo.nInstFrames = 0;
+	frameInfo.nTotalFrames = 0;
+	fFPSPrevInstTime = GfTimeClock();
+	nFPSTotalSeconds = 0;
 
-    screens->Init(x,y,width,height, render->getRoot(), render->getFogColor());
+	screens->Init(x,y,width,height, render->getRoot(), render->getFogColor());
 
-    GfuiAddKey(screen, GFUIK_END,      "Zoom Minimum", (void*)GR_ZOOM_MIN,	SDSetZoom, NULL);
-    GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	SDSetZoom, NULL);
-    GfuiAddKey(screen, '*',            "Zoom Default", (void*)GR_ZOOM_DFLT,	SDSetZoom, NULL);
+	GfuiAddKey(screen, GFUIK_END,      "Zoom Minimum", (void*)GR_ZOOM_MIN,	SDSetZoom, NULL);
+	GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	SDSetZoom, NULL);
+	GfuiAddKey(screen, '*',            "Zoom Default", (void*)GR_ZOOM_DFLT,	SDSetZoom, NULL);
 
-    GfuiAddKey( screen, GFUIK_PAGEUP,   "Select Previous Car", (void*)0, SDPrevCar, NULL);
-    GfuiAddKey( screen, GFUIK_PAGEDOWN, "Select Next Car",     (void*)0, SDNextCar, NULL);
+	GfuiAddKey( screen, GFUIK_PAGEUP,   "Select Previous Car", (void*)0, SDPrevCar, NULL);
+	GfuiAddKey( screen, GFUIK_PAGEDOWN, "Select Next Car",     (void*)0, SDNextCar, NULL);
 
-    GfuiAddKey(screen, GFUIK_F2,       "Driver Views",      (void*)0, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F3,       "Car Views",         (void*)1, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F4,       "Side Car Views",    (void*)2, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F5,       "Up Car View",       (void*)3, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F6,       "Persp Car View",    (void*)4, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F7,       "All Circuit Views", (void*)5, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F8,       "Track View",        (void*)6, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F9,       "Track View Zoomed", (void*)7, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F10,      "Follow Car Zoomed", (void*)8, SDSelectCamera, NULL);
-    GfuiAddKey(screen, GFUIK_F11,      "TV Director View",  (void*)9, SDSelectCamera, NULL);
+	GfuiAddKey(screen, GFUIK_F2,       "Driver Views",      (void*)0, SDSelectCamera, NULL);
+	GfuiAddKey(screen, GFUIK_F3,       "Car Views",         (void*)1, SDSelectCamera, NULL);
+	GfuiAddKey(screen, GFUIK_F4,       "Side Car Views",    (void*)2, SDSelectCamera, NULL);
+	GfuiAddKey(screen, GFUIK_F5,       "Up Car View",       (void*)3, SDSelectCamera, NULL);
+	GfuiAddKey(screen, GFUIK_F6,       "Persp Car View",    (void*)4, SDSelectCamera, NULL);
+	GfuiAddKey(screen, GFUIK_F7,       "All Circuit Views", (void*)5, SDSelectCamera, NULL);
+	GfuiAddKey(screen, GFUIK_F8,       "Track View",        (void*)6, SDSelectCamera, NULL);
+	GfuiAddKey(screen, GFUIK_F9,       "Track View Zoomed", (void*)7, SDSelectCamera, NULL);
+	GfuiAddKey(screen, GFUIK_F10,      "Follow Car Zoomed", (void*)8, SDSelectCamera, NULL);
+	GfuiAddKey(screen, GFUIK_F11,      "TV Director View",  (void*)9, SDSelectCamera, NULL);
 
-    GfuiAddKey(screen, 'h',            "Activate DEBUG HUD",  (void*)0, SDToggleHUD, NULL);
+	GfuiAddKey(screen, 'h',            "Activate DEBUG HUD",  (void*)0, SDToggleHUD, NULL);
 
-    /*GfuiAddKey(screen, '5',            "Debug Info",        (void*)3, grSelectBoard, NULL);
-    GfuiAddKey(screen, '4',            "G/Cmd Graph",       (void*)4, grSelectBoard, NULL);
-    GfuiAddKey(screen, '3',            "Leaders Board",     (void*)2, grSelectBoard, NULL);
-    GfuiAddKey(screen, '2',            "Driver Counters",   (void*)1, grSelectBoard, NULL);
-    GfuiAddKey(screen, '1',            "Driver Board",      (void*)0, grSelectBoard, NULL);*/
-    GfuiAddKey(screen, '9',            "Mirror",            (void*)0, SDSwitchMirror, NULL);
-    //GfuiAddKey(screen, '0',            "Arcade Board",      (void*)5, grSelectBoard, NULL);*/
-    GfuiAddKey(screen, '+', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
-    GfuiAddKey(screen, '=', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
-    GfuiAddKey(screen, '-', GFUIM_CTRL, "Zoom Out",          (void*)GR_ZOOM_OUT, SDSetZoom, NULL);
-    GfuiAddKey(screen, '>',             "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
-    GfuiAddKey(screen, '<',             "Zoom Out",          (void*)GR_ZOOM_OUT, SDSetZoom, NULL);
-    //GfuiAddKey(screen, '(',            "Split Screen",   (void*)SD_SPLIT_ADD, SDSplitScreen, NULL);
-    //GfuiAddKey(screen, ')',            "UnSplit Screen", (void*)SD_SPLIT_REM, SDSplitScreen, NULL);
-    //GfuiAddKey(screen, '_',            "Split Screen Arrangement", (void*)SD_SPLIT_ARR, SDSplitScreen, NULL);
-    //GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)SD_NEXT_SCREEN, SDChangeScreen, NULL);
-    /*GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);*/
+	/*GfuiAddKey(screen, '5',            "Debug Info",        (void*)3, grSelectBoard, NULL);
+	GfuiAddKey(screen, '4',            "G/Cmd Graph",       (void*)4, grSelectBoard, NULL);
+	GfuiAddKey(screen, '3',            "Leaders Board",     (void*)2, grSelectBoard, NULL);
+	GfuiAddKey(screen, '2',            "Driver Counters",   (void*)1, grSelectBoard, NULL);
+	GfuiAddKey(screen, '1',            "Driver Board",      (void*)0, grSelectBoard, NULL);*/
+	GfuiAddKey(screen, '9',            "Mirror",            (void*)0, SDSwitchMirror, NULL);
+	//GfuiAddKey(screen, '0',            "Arcade Board",      (void*)5, grSelectBoard, NULL);*/
+	GfuiAddKey(screen, '+', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
+	GfuiAddKey(screen, '=', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
+	GfuiAddKey(screen, '-', GFUIM_CTRL, "Zoom Out",          (void*)GR_ZOOM_OUT, SDSetZoom, NULL);
+	GfuiAddKey(screen, '>',             "Zoom In",           (void*)GR_ZOOM_IN,	 SDSetZoom, NULL);
+	GfuiAddKey(screen, '<',             "Zoom Out",          (void*)GR_ZOOM_OUT, SDSetZoom, NULL);
+	//GfuiAddKey(screen, '(',            "Split Screen",   (void*)SD_SPLIT_ADD, SDSplitScreen, NULL);
+	//GfuiAddKey(screen, ')',            "UnSplit Screen", (void*)SD_SPLIT_REM, SDSplitScreen, NULL);
+	//GfuiAddKey(screen, '_',            "Split Screen Arrangement", (void*)SD_SPLIT_ARR, SDSplitScreen, NULL);
+	//GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)SD_NEXT_SCREEN, SDChangeScreen, NULL);
+	/*GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);*/
 
-    GfLogInfo("Current screen is #%d (out of %d)\n", m_CurrentScreenIndex, m_NbActiveScreens);
+	GfLogInfo("Current screen is #%d (out of %d)\n", m_CurrentScreenIndex, m_NbActiveScreens);
 
-    return 0; // true;
+	return 0; // true;
 }
 
 int refresh(tSituation *s)
 {
-    // Compute F/S indicators every second.
-    frameInfo.nInstFrames++;
-    frameInfo.nTotalFrames++;
-    const double dCurTime = GfTimeClock();
-    const double dDeltaTime = dCurTime - fFPSPrevInstTime;
-    if (dDeltaTime > 1.0)
-    {
-        ++nFPSTotalSeconds;
-        fFPSPrevInstTime = dCurTime;
-        frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
-        frameInfo.nInstFrames = 0;
-        frameInfo.fAvgFps = (double)frameInfo.nTotalFrames / nFPSTotalSeconds;
-        // Trace F/S every 5 seconds.
-        if (nFPSTotalSeconds % 5 == 2)
-            GfLogInfo("Frame rate (F/s) : Instant = %.1f (Average %.1f)\n",
-                      frameInfo.fInstFps, frameInfo.fAvgFps);
-    }
+	// Compute F/S indicators every second.
+	frameInfo.nInstFrames++;
+	frameInfo.nTotalFrames++;
+	const double dCurTime = GfTimeClock();
+	const double dDeltaTime = dCurTime - fFPSPrevInstTime;
+	if (dDeltaTime > 1.0)
+	{
+		++nFPSTotalSeconds;
+		fFPSPrevInstTime = dCurTime;
+		frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
+		frameInfo.nInstFrames = 0;
+		frameInfo.fAvgFps = (double)frameInfo.nTotalFrames / nFPSTotalSeconds;
+		// Trace F/S every 5 seconds.
+		if (nFPSTotalSeconds % 5 == 2)
+			GfLogInfo("Frame rate (F/s) : Instant = %.1f (Average %.1f)\n",
+					  frameInfo.fInstFps, frameInfo.fAvgFps);
+	}
 
-    cars->updateCars();
-    cam = screens->getActiveView()->getCameras()->getSelectedCamera();
-    osg::Vec3d eye = cam->getCameraPosition();
-    double X = eye[0];
-    double Y = eye[1];
-    double Z = eye[2];
-    scenery->reposition(X, Y, Z );
-    render->UpdateSky(s->currentTime, s->accelTime, X, Y);
-    screens->update(s, &frameInfo);
+	cars->updateCars();
+	cam = screens->getActiveView()->getCameras()->getSelectedCamera();
+	osg::Vec3d eye = cam->getCameraPosition();
+	double X = eye[0];
+	double Y = eye[1];
+	double Z = eye[2];
+	scenery->reposition(X, Y, Z );
+	render->UpdateSky(s->currentTime, s->accelTime, X, Y);
+	screens->update(s, &frameInfo);
 
-    //refresh the hud
-    tCarElt* curCar = screens->getActiveView()->getCurrentCar();
-    hud.Refresh(s, &frameInfo, curCar);
+	//refresh the hud
+	tCarElt* curCar = screens->getActiveView()->getCurrentCar();
+	hud.Refresh(s, &frameInfo, curCar);
 
-    return 0;
+	return 0;
 }
 
 void shutdownCars(void)
 {
-    if (cars)
-    {
-        cars->unLoad();
-        delete cars;
-        cars = NULL;
-        GfLogInfo("Delete cars in OsgMain\n");
-    }
+	if (cars)
+	{
+		cars->unLoad();
+		delete cars;
+		cars = NULL;
+		GfLogInfo("Delete cars in OsgMain\n");
+	}
 
 
 
-    // Trace final mean F/s.
-    if (nFPSTotalSeconds > 0)
-        GfLogTrace("Average frame rate: %.2f F/s\n",
-                   (double)frameInfo.nTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - fFPSPrevInstTime));
+	// Trace final mean F/s.
+	if (nFPSTotalSeconds > 0)
+		GfLogTrace("Average frame rate: %.2f F/s\n",
+				   (double)frameInfo.nTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - fFPSPrevInstTime));
 }
 
 int initTrack(tTrack *track)
 {
-    // The inittrack does as well init the context, that is highly inconsistent, IMHO.
-    // TODO: Find a solution to init the graphics first independent of objects.
+	// The inittrack does as well init the context, that is highly inconsistent, IMHO.
+	// TODO: Find a solution to init the graphics first independent of objects.
 
-    // Now, do the real track loading job.
-    grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	// Now, do the real track loading job.
+	grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-    //Options = new SDOptions;
+	//Options = new SDOptions;
 
-    scenery = new SDScenery;
-    render = new SDRender;
-    //cam = new SDCamera;
+	scenery = new SDScenery;
+	render = new SDRender;
+	//cam = new SDCamera;
 
-    scenery->LoadScene(track);
-    render->Init(track);
+	scenery->LoadScene(track);
+	render->Init(track);
 
-    return 0;
+	return 0;
 }
 
 int  initCars(tSituation *s)
 {
-    GfLogInfo("InitCars\n");
-    char buf[1024];
-    cars = new SDCars;
-    cars->loadCars(s, scenery->getSpeedWay(), scenery->getSpeedWayLong());
-    render->addCars(cars->getCarsNode());
-    GfLogInfo("All cars loaded\n");
+	GfLogInfo("InitCars\n");
+	char buf[1024];
+	cars = new SDCars;
+	cars->loadCars(s, scenery->getSpeedWay(), scenery->getSpeedWayLong());
+	render->addCars(cars->getCarsNode());
+	GfLogInfo("All cars loaded\n");
 
-    screens->InitCars(s);
+	screens->InitCars(s);
 
-    if (!grHandle)
-    {
-        snprintf(buf, 1024, "%s%s", GfLocalDir(), GR_PARAM_FILE);
-        grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    }
+	if (!grHandle)
+	{
+		snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
+		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	}
 
-    return 0;
+	return 0;
 }
 
 void shutdownTrack(void)
 {
-    // Do the real track termination job.
-    osgDB::Registry::instance()->clearObjectCache();
+	// Do the real track termination job.
+	osgDB::Registry::instance()->clearObjectCache();
 
-    if (grTrackHandle)
-    {
-        GfParmReleaseHandle(grTrackHandle);
-        grTrackHandle = 0;
-    }
+	if (grTrackHandle)
+	{
+		GfParmReleaseHandle(grTrackHandle);
+		grTrackHandle = 0;
+	}
 
-    if (scenery)
-    {
-        scenery->ShutdownScene();
-        delete scenery;
-        scenery = NULL;
-        GfLogInfo("Delete scenery in OsgMain\n");
-    }
+	if (scenery)
+	{
+		scenery->ShutdownScene();
+		delete scenery;
+		scenery = NULL;
+		GfLogInfo("Delete scenery in OsgMain\n");
+	}
 }
 
 void shutdownView(void)
 {
-    if (screens)
-    {
-        delete screens;
-        screens = NULL;
-        GfLogInfo("Delete screens in OsgMain\n");
-    }
+	if (screens)
+	{
+		delete screens;
+		screens = NULL;
+		GfLogInfo("Delete screens in OsgMain\n");
+	}
 
-    if (render)
-    {
-        delete render;
-        render = NULL;
-        GfLogInfo("Delete render in OsgMain\n");
-    }
+	if (render)
+	{
+		delete render;
+		render = NULL;
+		GfLogInfo("Delete render in OsgMain\n");
+	}
 }
 
 Camera * getCamera(void)
 {
-    return screens->getActiveView()->getCamera();
+	return screens->getActiveView()->getCamera();
 }

@@ -809,47 +809,53 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         this->numberOfSectors = currCar->_currentSector+1;
     }
 
-    if( this->oldSector != currCar->_currentSector){
+    if( this->oldSector != currCar->_currentSector)
+    {
         this->laptimeFreezeTime = GfTimeClock();
         this->oldSector = currCar->_currentSector;
-        if (currCar->_currentSector == 0){
-            hudTextElements["laptime-last-time"]->setText(formatLaptime(currCar->_lastLapTime,0));
-            if(currCar->_lastLapTime == currCar->_bestLapTime){
 
+        if (currCar->_currentSector == 0)
+        {
+            hudTextElements["laptime-last-time"]->setText(formatLaptime(currCar->_lastLapTime,0));
+
+            if(currCar->_lastLapTime == currCar->_bestLapTime)
+            {
                 this->hudImgElements["laptime-last-background-green"]->setNodeMask(1);
                 this->hudImgElements["laptime-last-background-normal"]->setNodeMask(0);
                 this->hudImgElements["laptime-last-background-grey"]->setNodeMask(0);
                 this->hudImgElements["laptime-last-background-violet"]->setNodeMask(0);
                 this->hudImgElements["laptime-last-background-red"]->setNodeMask(0);
-
-            }else{
-
+            }
+            else
+            {
                 this->hudImgElements["laptime-last-background-normal"]->setNodeMask(0);
                 this->hudImgElements["laptime-last-background-grey"]->setNodeMask(1);
                 this->hudImgElements["laptime-last-background-violet"]->setNodeMask(0);
                 this->hudImgElements["laptime-last-background-green"]->setNodeMask(0);
                 this->hudImgElements["laptime-last-background-red"]->setNodeMask(0);
-
             }
 
-        }else{
+        }
+        else
+        {
+            float currentPrevSectorSplitTime = currCar->_curSplitTime[currCar->_currentSector - 1]; // our time in the sector we have "just" run over
+            float bestPrevSectorSplitTime = currCar->_bestSplitTime[currCar->_currentSector-1]; // the best split time of the sector we are in this moment
 
-            if(currentPrevSectorSplitTime < bestPrevSectorSplitTime){
-
+            if(currentPrevSectorSplitTime < bestPrevSectorSplitTime)
+            {
                 this->hudImgElements["laptime-last-background-normal"]->setNodeMask(0);
                 this->hudImgElements["laptime-last-background-grey"]->setNodeMask(0);
                 this->hudImgElements["laptime-last-background-violet"]->setNodeMask(0);
                 this->hudImgElements["laptime-last-background-green"]->setNodeMask(1);
                 this->hudImgElements["laptime-last-background-red"]->setNodeMask(0);
-
-            }else{
-
+            }
+            else
+            {
                 this->hudImgElements["laptime-last-background-normal"]->setNodeMask(0);
                 this->hudImgElements["laptime-last-background-grey"]->setNodeMask(1);
                 this->hudImgElements["laptime-last-background-violet"]->setNodeMask(0);
                 this->hudImgElements["laptime-last-background-green"]->setNodeMask(0);
                 this->hudImgElements["laptime-last-background-red"]->setNodeMask(0);
-
             }
         }
     }
@@ -1262,8 +1268,9 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
                     //add the image geometry to the hud
                     geode->addDrawable(geom);
 
-                }else if( type == "graph"){
-
+                }
+                else if( type == "graph")
+                {
                     /* ============================
                          CREATE OSG GRAPH
                        ============================*/
