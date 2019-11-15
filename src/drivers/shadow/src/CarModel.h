@@ -59,7 +59,7 @@ public:
     void	CalcSimuSpeeds( double spd0, double dy, double dist, double kFriction, double& minSpd, double& maxSpd ) const;
     void	CalcSimuSpeedRanges( double spd0, double dist, double kFriction, double& minSpd, double& maxSpd, double& maxDY ) const;
 
-    const WheelModel&	wheel( int wheel ) const;
+    const WheelModel&	wheel( int wl ) const;
     void				configWheels( const tCarElt* car );
     void				configWheels( void* hCar );
     void				updateWheels( const tCarElt* car, const tSituation* s );
@@ -166,6 +166,8 @@ public:
     std::vector<double> ENGINE_TORQUES;
     std::vector<double> GEAR_RATIOS;    // gear ratios
     std::vector<double> GEAR_EFFS;      // gear efficiencies.
+
+    WheelModel	_wheel[4];
 };
 
 #endif

@@ -1905,8 +1905,8 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, const tSituation*	s, doubl
 {
     m_pShared->m_teamInfo.GetAt(car->index)->damage = car->_dammage;
 
-    double	trackLen = m_track.GetLength();
-    double	myPos = RtGetDistFromStart(const_cast<tCarElt*>(car));
+    //double	trackLen = m_track.GetLength();
+    //double	myPos = RtGetDistFromStart(const_cast<tCarElt*>(car));
     double	mySpd = hypot(car->_speed_X, car->_speed_Y);
 
     double	myDirX, myDirY;
@@ -1921,7 +1921,7 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, const tSituation*	s, doubl
         myDirY = car->_speed_Y / mySpd;
     }
 
-    int		myIdx = 0;
+    //int		myIdx = 0;
 
     for( int i = 0; i < m_nCars; i++ )
     {
@@ -1947,7 +1947,7 @@ void TDriver::AvoidOtherCars(int index, tCarElt* car, const tSituation*	s, doubl
     double	minVCatTime = 99;
     *lapper = false;
 
-    double	width = m_track.GetWidth();
+    //double	width = m_track.GetWidth();
 
     PtInfo	pi;
     GetPtInfo( PATH_NORMAL, car->_distFromStartLine, pi );

@@ -186,8 +186,8 @@ void Opponent::UpdateSit( const CarElt* myCar, const Situation* s, const TeamInf
     m_info.sit.decDX = m_info.sit.minDXb + 2;
     m_info.sit.accDX = m_info.sit.minDXb;
 
-    //	if( fabs(extSide) > 0.2 )
-    //		GfOut( "****** angDiff %.3f extSide %.2f ******\n", angDiff, extSide );
+    if( fabs(extraSide) > 0.2 )
+        LogSHADOW.debug("****** extraTan %.3f extSide %.2f ******\n", extraTan, extraSide );
 
     // work out positions of car from start of track.
     double	myPos = RtGetDistFromStart((tCarElt*)myCar);
@@ -199,6 +199,8 @@ void Opponent::UpdateSit( const CarElt* myCar, const Situation* s, const TeamInf
         relPos -= trackLen;
     else if( relPos < -trackLen / 2 )
         relPos += trackLen;
+
+    LogSHADOW.debug("****** relpos %.3f ******\n", relPos );
 
     m_info.sit.relPos = relPos;
 }

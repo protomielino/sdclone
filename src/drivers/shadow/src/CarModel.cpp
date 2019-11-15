@@ -621,3 +621,31 @@ void CarModel::setupDefaultEngine()
     ENGINE_TORQUES.push_back( 410 );
     ENGINE_TORQUES.push_back( 320 );
 }
+
+//===========================================================================
+const WheelModel& CarModel::wheel( int wl ) const
+{
+    return _wheel[wl];
+}
+
+//===========================================================================
+void	CarModel::configWheels( const tCarElt* car )
+{
+    for( int w = 0; w < 4; w++ )
+        _wheel[w].config( car );
+}
+
+//===========================================================================
+void	CarModel::configWheels( void* hCar )
+{
+    for( int w = 0; w < 4; w++ )
+        _wheel[w].config( hCar );
+}
+
+//===========================================================================
+void	CarModel::updateWheels( const tCarElt* car, const tSituation* s )
+{
+    for( int w = 0; w < 4; w++ )
+        _wheel[w].update( car, s, *this );
+}
+
