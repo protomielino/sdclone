@@ -649,3 +649,286 @@ void	CarModel::updateWheels( const tCarElt* car, const tSituation* s )
         _wheel[w].update( car, s, *this );
 }
 
+//===========================================================================
+double  CarModel::rearWheelsAverageRadius() const
+{
+    return (_wheel[2].radius() + _wheel[3].radius()) * 0.5;
+}
+
+//===========================================================================
+double	CarModel::frontAxleSlipTangential() const
+{
+    double xfslip = (wheel(0).slipX() + wheel(1).slipX()) * 0.5;
+    return xfslip;
+}
+
+
+void    CarModel::configCar( void* hCar )
+{
+    MASS = GfParmGetNum(hCar, SECT_CAR, PRM_MASS, NULL, 1000.0);
+
+    float fwingarea	= GfParmGetNum(hCar, SECT_FRNTWING, PRM_WINGAREA,  NULL, 0.0);
+    WING_ANGLE_F	= GfParmGetNum(hCar, SECT_FRNTWING, PRM_WINGANGLE, NULL, 0.0);
+    float rwingarea	= GfParmGetNum(hCar, SECT_REARWING, PRM_WINGAREA,  NULL, 0.0);
+    WING_ANGLE_R	= GfParmGetNum(hCar, SECT_REARWING, PRM_WINGANGLE, NULL, 0.0);
+    float fwingArea = fwingarea * sinf((float)WING_ANGLE_F);
+    float rwingArea = rwingarea * sinf((float)WING_ANGLE_R);
+    float wingca	= 1.23f * (fwingArea + rwingArea);
+
+    float cl =  GfParmGetNum(hCar, SECT_AERODYNAMICS, PRM_FCL, NULL, 0.0) +
+                GfParmGetNum(hCar, SECT_AERODYNAMICS, PRM_RCL, NULL, 0.0);
+    float h  =  GfParmGetNum(hCar, SECT_FRNTRGTWHEEL, PRM_RIDEHEIGHT, NULL, 0.20f) +
+                GfParmGetNum(hCar, SECT_FRNTLFTWHEEL, PRM_RIDEHEIGHT, NULL, 0.20f) +
+                GfParmGetNum(hCar, SECT_REARRGTWHEEL, PRM_RIDEHEIGHT, NULL, 0.20f) +
+                GfParmGetNum(hCar, SECT_REARLFTWHEEL, PRM_RIDEHEIGHT, NULL, 0.20f);
+    h *= 1.5f; h = h*h; h = h*h; h = 2.0f * (float)exp(-3.0*h);
+    CA = h*cl + 4.0f*wingca;
+    CA_FW = 4 * 1.23f * fwingArea;
+    CA_RW = 4 * 1.23f * rwingArea;
+    CA_GE = h * cl;
+
+    LogSHADOW.info( "CA %g   CA_FW %g   CA_RW %g   CA_GE %g\n", CA, CA_FW, CA_RW, CA_GE );
+
+    double	cx = GfParmGetNum(hCar, SECT_AERODYNAMICS, PRM_CX, NULL, 0.0);
+    double	frontArea = GfParmGetNum(hCar, SECT_AERODYNAMICS, PRM_FRNTAREA, NULL, 0.0);
+
+    CD_BODY = 0.645 * cx * frontArea;
+    CD_WING = wingca;
+
+    // assumes load characteristics are the same for all tyres.
+    OP_LOAD = GfParmGetNum(hCar, SECT_REARRGTWHEEL, PRM_OPLOAD, (char*)NULL, MASS * G * 1.2f);
+    LF_MIN	= GfParmGetNum(hCar, SECT_REARRGTWHEEL, PRM_LOADFMIN, (char*)NULL, 0.8f);
+    LF_MAX	= GfParmGetNum(hCar, SECT_REARRGTWHEEL, PRM_LOADFMAX, (char*)NULL, 1.6f);
+    LF_K	= log((1.0f - LF_MIN) / (LF_MAX - LF_MIN));
+
+    WIDTH = GfParmGetNum(hCar, SECT_CAR, PRM_WIDTH, NULL, 1.9f);
+
+    TYRE_MU_F = MN(GfParmGetNum(hCar, SECT_FRNTRGTWHEEL, PRM_MU, NULL, 1.0),
+                   GfParmGetNum(hCar, SECT_FRNTLFTWHEEL, PRM_MU, NULL, 1.0));
+    TYRE_MU_R = MN(GfParmGetNum(hCar, SECT_REARRGTWHEEL, PRM_MU, NULL, 1.0),
+                   GfParmGetNum(hCar, SECT_REARLFTWHEEL, PRM_MU, NULL, 1.0));
+    TYRE_MU   = MN(TYRE_MU_R, TYRE_MU_R);
+
+    F_AXLE_X  = GfParmGetNum(hCar, SECT_FRNTAXLE, PRM_XPOS, NULL, 0);
+    R_AXLE_X  = GfParmGetNum(hCar, SECT_REARAXLE, PRM_XPOS, NULL, 0);
+    F_AXLE_WB = GfParmGetNum(hCar, SECT_FRNTAXLE, PRM_FRWEIGHTREP, NULL, 0.5f);
+    R_AXLE_WB = 1 - F_AXLE_WB;
+    F_AXLE_CG = h * GfParmGetNum(hCar, SECT_AERODYNAMICS, PRM_FCL, NULL, 0);
+    R_AXLE_CG = h * GfParmGetNum(hCar, SECT_AERODYNAMICS, PRM_RCL, NULL, 0);
+
+    F_WING_X  = GfParmGetNum(hCar, SECT_FRNTWING, PRM_XPOS, NULL, 0);
+    R_WING_X  = GfParmGetNum(hCar, SECT_REARWING, PRM_XPOS, NULL, 0);
+
+    // assume all 4 tyres have the same coefficients...
+    const double	Ca      = GfParmGetNum(hCar, SECT_FRNTLFTWHEEL, PRM_CA, (char*)NULL, 30.0f);
+    const double	RFactor = GfParmGetNum(hCar, SECT_FRNTLFTWHEEL, PRM_RFACTOR, (char*)NULL, 0.8f);
+    const double	EFactor	= GfParmGetNum(hCar, SECT_FRNTLFTWHEEL, PRM_EFACTOR, (char*)NULL, 0.7f);
+
+    const double	mfC = 2 - asin(RFactor) * 2 / PI;
+    const double	mfB = Ca / mfC;
+    const double	mfE = EFactor;
+
+    double	targetSlip = 0.175;
+    double	targetF = 0.0;
+    double	lastF = 0.0;
+    double	maxSlip = 0.27;
+
+    for( double slip = 0.0; slip < 0.5; slip += 0.001 )
+    {
+        double	Bx = mfB * slip;
+        double	F = sin(mfC * atan(Bx * (1.0f - mfE) + mfE * atan(Bx)));	// assumes PRO skill level.
+
+        if( F > targetF )
+        {
+            targetSlip = slip;
+            targetF = F;
+        }
+
+        if( lastF > 0.99 && F < 0.99 )
+            maxSlip = slip;
+
+        lastF = F;
+    }
+
+    TARGET_SLIP = targetSlip;
+    MAX_SLIP	= maxSlip;
+
+    LogSHADOW.info( "TARGET_SLIP=%g  MAX_SLIP=%g\n", TARGET_SLIP, MAX_SLIP );
+
+    char buf[64];
+    sprintf( buf, "%s/%s", SECT_ENGINE, ARR_DATAPTS );
+    int nPts = GfParmGetEltNb(hCar, buf);
+
+    if( nPts == 0 )
+    {
+        setupDefaultEngine();
+    }
+    else
+    {
+        ENGINE_REVS.clear();
+        ENGINE_TORQUES.clear();
+        for( int i = 0; i < nPts; i++ )
+        {
+            sprintf( buf, "%s/%s/%d", SECT_ENGINE, ARR_DATAPTS, i + 1 );
+            double revs    = GfParmGetNum(hCar, buf, PRM_RPM, (char*)NULL, 0);//car->engine.revsMax);
+            double torque  = GfParmGetNum(hCar, buf, PRM_TQ, (char*)NULL, 0);
+            ENGINE_REVS.push_back( revs );
+            ENGINE_TORQUES.push_back( torque );
+        }
+    }
+
+    ENGINE_REV_LIMIT = GfParmGetNum(hCar, SECT_ENGINE, PRM_REVSLIM, (char*)NULL, 800);
+    GEAR_CHANGE_REVS = ENGINE_REV_LIMIT - 200 * 2 * PI / 60;  // change gear a little below rev limit.
+    ENGINE_MAX_REVS  = ENGINE_REVS.back();
+
+    GEAR_RATIOS.clear();
+    GEAR_EFFS.clear();
+    for( int i = 1; ; i++ )
+    {
+        sprintf( buf, "%s/%s/%d", SECT_GEARBOX, ARR_GEARS, i );
+        double ratio = GfParmGetNum(hCar, buf, PRM_RATIO, (char*)NULL, 0.0f);
+        if( ratio == 0.0 )
+            break;
+        double eff   = GfParmGetNum(hCar, buf, PRM_EFFICIENCY, (char*)NULL, 1.0f);
+        GEAR_RATIOS.push_back( ratio );
+        GEAR_EFFS.push_back( eff );
+    }
+
+    DIFF_RATIO = GfParmGetNum(hCar, SECT_REARDIFFERENTIAL, PRM_RATIO, (char*)NULL, 1.0f);
+    DIFF_EFF   = GfParmGetNum(hCar, SECT_REARDIFFERENTIAL, PRM_EFFICIENCY, (char*)NULL, 1.0f);
+
+    // cache values of acceleration from speed.
+    ACCF_FROM_SPEED.clear();
+
+    double  w_radius = rearWheelsAverageRadius();
+    double  max_revs = GfParmGetNum(hCar, SECT_ENGINE, PRM_REVSMAX, (char*)NULL, 1000);
+    double  max_speed = max_revs * w_radius / (GEAR_RATIOS.back() * DIFF_RATIO);
+
+    for( int spd = 0; spd < max_speed; spd++ )
+    {
+        ACCF_FROM_SPEED.push_back( CalcAccForceFromSpeed(spd) );
+    }
+}
+
+double	CarModel::AxleCalcMaxSpeed(double k, double kz, double kv, double trackMu, double trackRollAngle, double trackPitchAngle,
+    double gripScale, double tyreMu, double ax, double wx,double wf, double Cw,double Cg ) const
+{
+    //	This function calculates the theoretical maximum speed for a single axle of
+    //	the car at a point on the path.	 This takes into account the curvature of
+    //	the path (k), the grip on the road (mu), the downforce from the nearest
+    //	wing and the axle's ground effect (CA), the tilt of the road (angle left to
+    //	right), the pitch of the road (angle rear to front), and the curvature of
+    //	the road in z (kz).
+    //
+    //	At this point the car is assumed to be travelling at a constant speed, and
+    //	thus any additional weight transfer (apart from the static weight balance)
+    //	due to accleration or braking is not taken into consideration.
+    //
+    //	Also makes a simplifying assumption that the downforce from the other wing
+    //	on this axle is small enough to be ignored.
+    //
+    //  ax      -- axle x position (relative to COG)
+    //  wx      -- wing x position (relative to COG)
+    //  wf      -- weight factor for this axle (0.47 for car6)
+    //  Cw      -- wing downforce constant
+    //  Cg      -- axle ground effect downforce constant -- but is dependent on the ride height.
+    //  ra      -- roll angle
+    //	pa		-- pitch angle
+
+    double	absK = MX(0.001, fabs(k));
+    double	sgnK = SGN(k);
+
+    double	af = wx / ax;
+    double	Ma = wf * (MASS + FUEL);
+    double	Ca = Cg + Cw * af;
+
+    double	opLoad = OP_LOAD * wf;
+    double	loadFactor = LF_MIN;
+
+//	trackRollAngle *= 1.1;
+    double	cs_roll	 = cos(trackRollAngle);
+    double	sn_roll	 = sin(trackRollAngle);
+    double	cs_pitch = cos(trackPitchAngle);
+
+    double	Gz  = cs_roll * cs_pitch * G;
+    double	Gy	= sn_roll * G * sgnK;
+
+    double	spd = 0;
+    int i = 0;
+    for( ; i < 100; i++ )
+    {
+        double	mu	= trackMu * tyreMu * MU_SCALE * gripScale * loadFactor;
+        double  num = Ma * (mu * Gz + Gy);
+//		double  den = MX(0.000001, Ma * absK - /*mu * */ Ma * kz * KZ_SCALE - mu * Ca);
+        double  den;
+        if( FLAGS & F_USE_KV )
+            den = MX(0.000001, Ma * absK -   mu *    Ma * kv * KV_SCALE
+                                               /*-   mu *    Ma * k             * sn_roll*/ - mu * Ca);
+        else
+            den = MX(0.000001, Ma * absK -   mu *    Ma * kz * KZ_SCALE * cs_roll
+                                               /*-   mu *    Ma * k             * sn_roll*/ - mu * Ca);
+
+        spd = MN(200, sqrt(num / den));
+
+        double	load = calcPredictedLoad(spd, wf, Ca, k, kz, kv, sn_roll, cs_roll, cs_pitch);
+        double	newLoadFactor = LF_MIN + (LF_MAX - LF_MIN) * exp(LF_K * load / opLoad);
+
+        if( fabs(newLoadFactor - loadFactor) < 0.001 )
+            break;
+
+        loadFactor = (loadFactor + newLoadFactor) * 0.5;
+    }
+
+    if( i == 100 )
+        LogSHADOW.info( "failed to find load factor!!!!! spd %g, lf %g\n",
+                spd, loadFactor );
+
+    return spd;
+}
+
+//===========================================================================
+// acceleration available from engine in m/s/s from speed in m/s
+double  CarModel::CalcAccForceFromSpeed( double speed ) const
+{
+    // NOTE: assumes drive is via rear wheels only.
+    const double wheel_radius = rearWheelsAverageRadius();
+
+    double  bestAccF = 0;
+    int lastGear = (int)GEAR_RATIOS.size() - 1;
+    for( int i = 0; i <= lastGear ; i++ )
+    {
+        double engine_revs  = speed * GEAR_RATIOS[i] * DIFF_RATIO / wheel_radius;
+        if( i <  lastGear && engine_revs > GEAR_CHANGE_REVS )
+            continue;
+        double tq_engine    = CalcEngineTorque(engine_revs);
+        double tq_axle      = tq_engine * GEAR_EFFS[i] * DIFF_EFF * GEAR_RATIOS[i] * DIFF_RATIO;
+        double f_road		= tq_axle / wheel_radius;
+        if( bestAccF < f_road )
+            bestAccF = f_road;
+    }
+
+    return bestAccF;
+}
+
+//===========================================================================
+double  CarModel::CalcEngineTorque( double revs ) const
+{
+    if( revs < ENGINE_REVS[0] )
+        revs = ENGINE_REVS[0];
+
+    if( revs > ENGINE_REVS.back() )
+        revs = ENGINE_REVS.back();
+
+    int index = 0;
+    while( index + 1 < (int)ENGINE_REVS.size() )
+    {
+        if( revs <= ENGINE_REVS[index + 1] )
+            break;
+
+        index += 1;
+    }
+
+    double t = (revs - ENGINE_REVS[index]) / (ENGINE_REVS[index + 1] - ENGINE_REVS[index]);
+    double torque = ENGINE_TORQUES[index] + (ENGINE_TORQUES[index + 1] - ENGINE_TORQUES[index]) * t;
+    return torque;
+}

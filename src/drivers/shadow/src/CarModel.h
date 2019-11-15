@@ -64,8 +64,17 @@ public:
     void				configWheels( void* hCar );
     void				updateWheels( const tCarElt* car, const tSituation* s );
 
+    double              rearWheelsAverageRadius() const;
+    double				frontAxleSlipTangential() const;
+    double				CalcEngineTorque( double rpm ) const;
+
 private:
     void    configCar( void* hCar );
+
+    double	AxleCalcMaxSpeed(double k, double kz, double kv, double kFriction, double trackRollAngle, double trackPitchAngle,
+                                double gripScale, double tyreMu, double axleX, double wingX, double weightBalanceFactor,double wingDownforceConst, double axleGroundEffectConst ) const;
+
+    double  CalcAccForceFromSpeed( double speed ) const;
 
 
 public:
@@ -166,6 +175,8 @@ public:
     std::vector<double> ENGINE_TORQUES;
     std::vector<double> GEAR_RATIOS;    // gear ratios
     std::vector<double> GEAR_EFFS;      // gear efficiencies.
+
+    std::vector<double> ACCF_FROM_SPEED; // cached table for fast acceleration force calculation from speed.
 
     WheelModel	_wheel[4];
 };
