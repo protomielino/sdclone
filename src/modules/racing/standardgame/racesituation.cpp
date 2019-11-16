@@ -640,15 +640,26 @@ void ReSituationUpdater::start()
 
 void ReSituationUpdater::stop()
 {
+	int i;
+	tRobotItf *robot;
+	tSituation *s = ReInfo->s;
+
 	GfLogInfo("Stopping race engine.\n");
 
 	// Lock the race engine data.
 	ReSituation::self().lock("ReSituationUpdater::stop");
 
+	// Allow robots to run their stop function
+	for (i = 0; i < s->_ncars; i++) {
+		robot = s->cars[i]->robot;
+		if (robot->rbPauseRace)
+			robot->rbPauseRace(robot->index, s->cars[i], s);
+	}
+
 	// Reset the running flags.
 	ReSituation::self().data()->_reRunning = 0;
 	ReSituation::self().data()->s->_raceState |= RM_RACE_PAUSED;
-		
+	
 	// Unlock the race engine data.
 	ReSituation::self().unlock("ReSituationUpdater::stop");
 }

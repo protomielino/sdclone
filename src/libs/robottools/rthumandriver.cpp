@@ -124,6 +124,11 @@ typedef struct HumanContext
     bool		mouseControlUsed;
     int			lightCmd;
     int         dashboardCounter;
+#if SDL_FORCEFEEDBACK
+    int			lastForceFeedbackIndex;
+    int			lastForceFeedbackLevel;
+    int			lastForceFeedbackDir;
+#endif
 
     // simuV4 ...
     bool		useESP;
@@ -753,6 +758,18 @@ void HumanDriver::new_race(int index, tCarElt* car, tSituation *s)
 #endif
 }
 
+void HumanDriver::pause_race(int index, tCarElt* /*car*/, tSituation* /*s*/)
+{
+#if SDL_FORCEFEEDBACK
+    const int idx = index - 1;
+
+    //reset force feedback to zero (if set)
+    if(HCtx[idx]->lastForceFeedbackLevel){
+        gfctrlJoyConstantForce(HCtx[idx]->lastForceFeedbackIndex, 0, 0);
+    }
+#endif
+}
+
 /*
  * Original function: resumerace
  *
@@ -789,7 +806,36 @@ void HumanDriver::resume_race(int index, tCarElt* car, tSituation *s)
         }//KEYBOARD
 
     }//for i
+
+#if SDL_FORCEFEEDBACK
+    //restore force feedback effect to the wheel (if was set)
+    if(HCtx[idx]->lastForceFeedbackLevel) {
+        if(cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_KEYBOARD){
+            HCtx[idx]->lastForceFeedbackIndex = int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER);
+            gfctrlJoyConstantForce(
+                HCtx[idx]->lastForceFeedbackIndex,
+                HCtx[idx]->lastForceFeedbackLevel,
+                HCtx[idx]->lastForceFeedbackDir );
+        } else {
+            HCtx[idx]->lastForceFeedbackLevel = 0; // forget force feedback level
+        }
+    }
+#endif
 }
+
+void HumanDriver::end_race(int index, tCarElt* /*car*/, tSituation* /*s*/)
+{
+#if SDL_FORCEFEEDBACK
+    const int idx = index - 1;
+
+    //reset force feedback to zero (if set)
+    if(HCtx[idx]->lastForceFeedbackLevel){
+        gfctrlJoyConstantForce(HCtx[idx]->lastForceFeedbackIndex, 0, 0);
+        HCtx[idx]->lastForceFeedbackLevel = 0; // forget force feedback level
+    }
+#endif
+}
+
 
 /*
  * Changes from original: none
@@ -1180,7 +1226,13 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 	if(cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_KEYBOARD){
 		//                     v<-  this controller detenction does not make ->v 
 		//                     v<-  sense to me                              ->v
-		gfctrlJoyConstantForce(int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER), forceFeedback.updateForce(car, s), 0 );
+        HCtx[idx]->lastForceFeedbackIndex = int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER);
+        HCtx[idx]->lastForceFeedbackLevel = forceFeedback.updateForce(car, s);
+        HCtx[idx]->lastForceFeedbackDir = 0;
+        gfctrlJoyConstantForce(
+            HCtx[idx]->lastForceFeedbackIndex,
+            HCtx[idx]->lastForceFeedbackLevel,
+            HCtx[idx]->lastForceFeedbackDir );
 	}
 
 #endif

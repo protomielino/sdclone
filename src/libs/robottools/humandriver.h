@@ -33,7 +33,9 @@ public:
     void init_track(int index, tTrack* track, void *carHandle,
                     void **carParmHandle, tSituation *s);
     void new_race(int index, tCarElt* car, tSituation *s);
+    void pause_race(int index, tCarElt* car, tSituation *s);
     void resume_race(int index, tCarElt* car, tSituation *s);
+    void end_race(int index, tCarElt* car, tSituation *s);
     void drive_mt(int index, tCarElt* car, tSituation *s);
     void drive_at(int index, tCarElt* car, tSituation *s);
     int pit_cmd(int index, tCarElt* car, tSituation *s);

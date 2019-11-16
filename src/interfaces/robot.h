@@ -45,6 +45,8 @@ typedef void (*tfRbNewTrack)(int index, tTrack *track, void *carHandle, void **m
 /** Callback prototype */
 typedef void (*tfRbNewRace) (int index, tCarElt *car, tSituation *s);
 /** Callback prototype */
+typedef void (*tfRbPauseRace) (int index, tCarElt *car, tSituation *s);
+/** Callback prototype */
 typedef void (*tfRbResumeRace) (int index, tCarElt *car, tSituation *s);
 /** Callback prototype */
 typedef void (*tfRbEndRace) (int index, tCarElt *car, tSituation *s);
@@ -65,6 +67,7 @@ typedef int  (*tfRbPitCmd)  (int index, tCarElt* car, tSituation *s);
 typedef struct RobotItf {
     tfRbNewTrack rbNewTrack;	/**< Give the robot the track view. Called for every track change or new race */
     tfRbNewRace  rbNewRace;	/**< Start a new race */
+    tfRbPauseRace  rbPauseRace;	/**< pause current race to ESC menu */
     tfRbResumeRace  rbResumeRace;	/**< resume current race from ESC menu */
     tfRbEndRace  rbEndRace;	/**< End of the current race */
     tfRbDrive	 rbDrive;	/**< Drive during race */

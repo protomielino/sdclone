@@ -526,6 +526,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
   } else {
     curRobot->rbNewTrack = NULL;
     curRobot->rbNewRace  = NULL;
+    curRobot->rbPauseRace = NULL;
     curRobot->rbResumeRace  = NULL;
     curRobot->rbDrive    = NULL;
     curRobot->rbPitCmd   = NULL;

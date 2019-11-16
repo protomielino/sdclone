@@ -46,7 +46,9 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 static void drive_mt(int index, tCarElt* car, tSituation *s);
 static void drive_at(int index, tCarElt* car, tSituation *s);
 static void newrace(int index, tCarElt* car, tSituation *s);
+static void pauserace(int index, tCarElt* car, tSituation *s);
 static void resumerace(int index, tCarElt* car, tSituation *s);
+static void endrace(int index, tCarElt* car, tSituation *s);
 static int  pitcmd(int index, tCarElt* car, tSituation *s);
 
 #ifdef _WIN32
@@ -84,7 +86,9 @@ InitFuncPt(int index, void *pt)
 	itf->rbNewTrack = initTrack;	/* give the robot the track view called */
 	/* for every track change or new race */
 	itf->rbNewRace  = newrace;
+	itf->rbPauseRace  = pauserace;
 	itf->rbResumeRace  = resumerace;
+	itf->rbEndRace  = endrace;
 
 	/* drive during race */
 	itf->rbDrive = robot.uses_at(index) ? drive_at : drive_mt;
@@ -186,9 +190,21 @@ newrace(int index, tCarElt* car, tSituation *s)
 
 
 void
+pauserace(int index, tCarElt* car, tSituation *s)
+{
+    robot.pause_race(index, car, s);
+}
+
+void
 resumerace(int index, tCarElt* car, tSituation *s)
 {
     robot.resume_race(index, car, s);
+}
+
+void
+endrace(int index, tCarElt* car, tSituation *s)
+{
+    robot.end_race(index, car, s);
 }
 
 /*
