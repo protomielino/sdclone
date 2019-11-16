@@ -24,6 +24,7 @@
 
 #include "OsgMain.h"
 #include "OsgView.h"
+#include "OsgNodeMask.h"
 
 static char buf[1024];
 static char path[1024];
@@ -98,6 +99,12 @@ void SDView::Init(tSituation *s)
     loadParams(s);
 }
 
+void SDView::setCurrentCar(tCarElt *newCurCar)
+{
+    curCar = newCurCar;
+    markCarCurrent(curCar);
+}
+
 /* Update screen display */
 void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
 {
@@ -141,6 +148,7 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
         loadParams (s);
         //board->setWidth(fakeWidth);
         GfParmWriteFile(NULL, grHandle, "Graph");
+        markCarCurrent(curCar);
     }
 
     if(hasChangedMirrorFlag)
@@ -152,6 +160,8 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
     cameras->update(curCar, s);
     mirror->update(curCar, s);
     mirror->setModelView();
+    cam->setCullMask( cameras->getSelectedCamera()->getCullMask() );
+    mirrorCam->setCullMask( mirror->getCullMask() );
 }
 
 void SDView::activate(int x, int y, int width, int height, float v)
@@ -164,14 +174,14 @@ void SDView::activate(int x, int y, int width, int height, float v)
     viewOffset =v;
     cam->setViewport(new osg::Viewport(x,y,width,height));
     cameras->getSelectedCamera()->setProjection();
-    cam->setNodeMask(1);
+    cam->setNodeMask(NODE_MASK_ALL);
     this->de_activateMirror();
 }
 
 void SDView::deactivate()
 {
-    cam->setNodeMask(0);
-    mirrorCam->setNodeMask(0);
+	cam->setNodeMask(NODE_MASK_NONE);
+    mirrorCam->setNodeMask(NODE_MASK_NONE);
 }
 
 void SDView::de_activateMirror()
@@ -181,14 +191,14 @@ void SDView::de_activateMirror()
     {
         if(cameras->getSelectedCamera()->getMirrorAllowed())
         {
-            this->mirrorCam->setNodeMask(1);
+            this->mirrorCam->setNodeMask(NODE_MASK_ALL);
         }else
         {
-            this->mirrorCam->setNodeMask(0);
+            this->mirrorCam->setNodeMask(NODE_MASK_NONE);
         }
     }else
     {
-        this->mirrorCam->setNodeMask(0);
+        this->mirrorCam->setNodeMask(NODE_MASK_NONE);
     }
 }
 

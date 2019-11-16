@@ -77,6 +77,6 @@ void * getScreens();
 void * getRender();
 void * getCars();
 void * getScenery();
-//void * getOptions();
+void   markCarCurrent(tCarElt *curCar);
 
 #endif /* _OSGMAIN_H_ */

@@ -1,4 +1,4 @@
-#include<osg/Camera>
+#include <osg/Camera>
 #include <osgDB/ReadFile>
 #include <osg/Geometry>
 #include <osg/Geode>
@@ -6,6 +6,7 @@
 #include <osg/TextureCubeMap>
 
 #include "OsgDebugHUD.h"
+#include "OsgNodeMask.h"
 
 SDDebugHUD::SDDebugHUD()
 {
@@ -44,7 +45,7 @@ SDDebugHUD::SDDebugHUD()
     HUD_camera->setProjectionMatrix(osg::Matrix::ortho2D(-1, 1, -1, 1));
     HUD_camera->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
     HUD_camera->addChild( quad );
-    HUD_camera->setNodeMask(0);
+    HUD_camera->setNodeMask( NODE_MASK_NONE );
 }
 
 void SDDebugHUD::setTexture(osg::ref_ptr<osg::Texture> map)
@@ -55,7 +56,7 @@ void SDDebugHUD::setTexture(osg::ref_ptr<osg::Texture> map)
 
 void SDDebugHUD::toggleHUD()
 {
-    HUD_camera->setNodeMask(1-HUD_camera->getNodeMask());
+    HUD_camera->setNodeMask( HUD_camera->getNodeMask() ? NODE_MASK_NONE : NODE_MASK_ALL );
 }
 
 SDDebugHUD::~SDDebugHUD()

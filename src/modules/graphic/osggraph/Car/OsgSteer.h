@@ -31,9 +31,6 @@ class SDSteer
 private :
     tCarElt *car;
 
-    unsigned int rcvShadowMask;
-    unsigned int castShadowMask;
-
 public :
     SDSteer();
     ~SDSteer();

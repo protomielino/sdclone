@@ -24,6 +24,8 @@
 
 #include "OsgLoader.h"
 #include "OsgCockpit.h"
+#include "OsgNodeMask.h"
+
 #include <osgDB/WriteFile>
 
 osg::ref_ptr<osg::Node> SDCockpit::initCockpit(tCarElt *car, void *handle)
@@ -98,7 +100,7 @@ osg::ref_ptr<osg::Node> SDCockpit::initCockpit(tCarElt *car, void *handle)
     options = NULL;
 #endif
 
-    _cockpit->setNodeMask(castShadowMask);
+    _cockpit->setNodeMask(NODE_MASK_SHADOW_CAST);
 
     return _cockpit.get();
 }

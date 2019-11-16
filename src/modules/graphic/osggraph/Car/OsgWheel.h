@@ -38,8 +38,6 @@ private :
     osg::ref_ptr<osg::MatrixTransform> wheels[4];
     SDBrakes brakes;
     osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
-    unsigned int rcvShadowMask;
-    unsigned int castShadowMask;
 
 public :
     osg::ref_ptr<osg::Node> initWheels(tCarElt *car,void * handle);

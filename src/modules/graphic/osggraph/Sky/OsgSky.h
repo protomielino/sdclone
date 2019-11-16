@@ -109,12 +109,6 @@ public:
     /** Destructor */
     ~SDSky( void );
 
-    enum NodeMask
-    {
-        BACKGROUND_BIT = (1 << 11),
-        MODEL_BIT = (1 << 12),
-    };
-
     void build( std::string tex_path, double h_radius, double v_radius, double sun_size, double sun_dist,
           double moon_size, double moon_dist, int nplanets, osg::Vec3d *planet_data,
           int nstars, osg::Vec3d *star_data );

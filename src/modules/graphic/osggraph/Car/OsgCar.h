@@ -81,6 +81,7 @@ public :
     tCarElt *getCar();
 
     void activateCar(tCarElt *Car);
+    void markCarCurrent(tCarElt *Car);
     void updateCar();
     void updateShadingParameters(osg::Matrixf modelview);
 };
@@ -103,6 +104,7 @@ public :
     void updateCars();
     void deactivateCar(tCarElt*car);
     void activateCar(tCarElt*car);
+    void markCarCurrent(tCarElt*car);
     SDCar *getCar(tCarElt*car);
     void unLoad();
     void updateShadingParameters(osg::Matrixf modelview);

@@ -34,9 +34,6 @@ class SDCockpit
         tCarElt *car;
         osg::ref_ptr<osg::Group> _cockpit;
 
-        unsigned int rcvShadowMask;
-        unsigned int castShadowMask;
-
     public :
         osg::ref_ptr<osg::Node> initCockpit(tCarElt *car,void * handle);
 };

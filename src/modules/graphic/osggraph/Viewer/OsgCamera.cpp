@@ -33,6 +33,7 @@
 #include "OsgView.h"
 #include "OsgScenery.h"
 #include "OsgMain.h"
+#include "OsgNodeMask.h"
 
 static char path[1024];
 char 		buf[256];
@@ -72,6 +73,19 @@ Camera * SDCamera::getGenericCamera()
     c->Speedv = &speed._v;
 
     return c;
+}
+
+unsigned int SDCamera::getCullMask() 
+{
+    unsigned int mask = NODE_MASK_ALL;
+    
+    if (!getDrawCurrent())
+        mask &= ~NODE_MASK_CAR_CURRENT;
+        
+    if (!getDrawDriver())
+       mask &= ~NODE_MASK_CAR_DRIVER;
+       
+    return mask;
 }
 
 void SDCamera::setViewOffset(float v)

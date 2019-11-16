@@ -66,8 +66,7 @@ private:
     unsigned SDSkyDomeDistance;
     unsigned SDNbCloudLayers;
     unsigned SDSkyDomeDistThresh;
-    unsigned int rcvShadowMask;
-    unsigned int castShadowMask;
+
     int carsShader;
     int SDDynamicWeather;
     bool SDDynamicSkyDome;

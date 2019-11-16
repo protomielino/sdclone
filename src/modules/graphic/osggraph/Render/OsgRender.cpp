@@ -44,6 +44,7 @@
 #include "OsgScenery.h"
 #include "OsgMath.h"
 #include "OsgColor.h"
+#include "OsgNodeMask.h"
 
 #include <glfeatures.h>         //gluXXX
 #include <robottools.h>         //RtXXX()
@@ -103,9 +104,6 @@ SDRender::SDRender(void) :
 
     cloudsTextureIndex = 0;
     carsShader = 0;
-
-    rcvShadowMask = 0x1;
-    castShadowMask = 0x2;
 
     SDSunDeclination = 0.0f;
     SDMoonDeclination = 0.0f;
@@ -385,19 +383,19 @@ void SDRender::Init(tTrack *track)
         case 0:
             break;
         case 1:
-            scene->setNodeMask( rcvShadowMask );
-            background->setNodeMask(~(rcvShadowMask | castShadowMask));
-            cargroup->setNodeMask(castShadowMask);
+            scene->setNodeMask(NODE_MASK_SHADOW_RECV);
+            background->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
+            cargroup->setNodeMask(NODE_MASK_SHADOW_CAST);
             break;
         case 2:
-            scene->setNodeMask( rcvShadowMask );
-            background->setNodeMask(~(rcvShadowMask | castShadowMask));
-            cargroup->setNodeMask(rcvShadowMask | castShadowMask);
+            scene->setNodeMask(NODE_MASK_SHADOW_RECV);
+            background->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
+            cargroup->setNodeMask(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST);
             break;
         case 3:
-            scene->setNodeMask( rcvShadowMask | castShadowMask);
-            background->setNodeMask(~(rcvShadowMask | castShadowMask));
-            cargroup->setNodeMask(rcvShadowMask | castShadowMask);
+            scene->setNodeMask(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST);
+            background->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
+            cargroup->setNodeMask(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST);
             break;
         default:
             break;
@@ -456,7 +454,7 @@ void SDRender::Init(tTrack *track)
 
     skyGroup = new osg::Group;
     skyGroup->setName("skyCloudsGroup");
-    skyGroup->setNodeMask(thesky->BACKGROUND_BIT);
+	skyGroup->setNodeMask(NODE_MASK_SKY_BACKGROUND);
     skyGroup->addChild(thesky->getPreRoot());
     skyGroup->addChild((thesky->getCloudRoot()));
 
@@ -465,7 +463,7 @@ void SDRender::Init(tTrack *track)
     skySS->setMode(GL_LIGHT0, osg::StateAttribute::OFF);
     skySS->setAttributeAndModes( new osg::ColorMask( true, true, true, false ), osg::StateAttribute::ON );
 
-    skyGroup->setNodeMask(~(rcvShadowMask | castShadowMask));
+    skyGroup->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
     sunLight->addChild(skyGroup.get());
 
     mRoot->addChild(sceneGroup.get());
@@ -495,8 +493,8 @@ void SDRender::ShadowedScene()
         vdsm->setTextureSize(osg::Vec2s(ShadowTexSize, ShadowTexSize));
         vdsm->setTextureUnit(shadowTexUnit);
         shadowRoot = new osgShadow::ShadowedScene;
-        shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
-        shadowRoot->setCastsShadowTraversalMask(castShadowMask);
+		shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
+        shadowRoot->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
         shadowRoot->setShadowTechnique((vdsm.get()));
     }
     else if (ShadowIndex  == 2)
@@ -506,8 +504,8 @@ void SDRender::ShadowedScene()
         ssm->setTextureSize(osg::Vec2s(ShadowTexSize, ShadowTexSize));
         ssm->setSoftnessWidth(1.0f);
         shadowRoot = new osgShadow::ShadowedScene;
-        shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
-        shadowRoot->setCastsShadowTraversalMask(castShadowMask);
+        shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
+        shadowRoot->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
         shadowRoot->setShadowTechnique((ssm.get()));
     }
     else if (ShadowIndex == 3)
@@ -519,8 +517,8 @@ void SDRender::ShadowedScene()
         pssm->setMaxFarDistance(512);
         pssm->setPolygonOffset(osg::Vec2(10.0f, 20.0f));
         shadowRoot = new osgShadow::ShadowedScene;
-        shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
-        shadowRoot->setCastsShadowTraversalMask(castShadowMask);
+        shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
+        shadowRoot->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
         shadowRoot->setShadowTechnique((pssm.get()));
     }
     else if (ShadowIndex == 4)
@@ -540,8 +538,8 @@ void SDRender::ShadowedScene()
 
         lspsm->setBaseTextureUnit(baseTexUnit);
         shadowRoot = new osgShadow::ShadowedScene;
-        shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
-        shadowRoot->setCastsShadowTraversalMask(castShadowMask);
+		shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
+        shadowRoot->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
         shadowRoot->setShadowTechnique((lspsm.get()));
     }
     else if (ShadowIndex == 5)
@@ -558,8 +556,8 @@ void SDRender::ShadowedScene()
 
         shadowRoot->setShadowSettings(shadowSettings);
         shadowRoot->setShadowTechnique(shadowTechnique);
-        shadowRoot->setReceivesShadowTraversalMask(rcvShadowMask);
-        shadowRoot->setCastsShadowTraversalMask(castShadowMask);
+        shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
+        shadowRoot->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
     }
 
     shadowRoot->addChild(m_scene.get());

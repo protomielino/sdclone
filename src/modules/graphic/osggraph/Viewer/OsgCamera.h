@@ -68,9 +68,9 @@ class SDCamera
 {
 private :
     int			id;				/* Camera Id */
-    int			drawCurrent;	/* flag to draw the current car */
-    int			drawCockpit;	/* flag to draw the current cockpit */
-    int			drawDriver;		/* flag to draw the driver */
+    int         drawCurrent;
+    int         drawCockpit;
+    int         drawDriver;
     int			drawBackground;	/* flag to draw the background */
     int			mirrorAllowed;	/* flag to allow the display of mirror */
 
@@ -96,10 +96,13 @@ public:
 
     virtual void setViewOffset(float newOffset)=0;
     inline float getAspectRatio()		{ return 0.0; }
-    inline int   getdrawCockpit()		{ return drawCockpit; }
-    inline int   getdrawDriver()		{ return drawDriver; }
+    inline int   getDrawCurrent()		{ return drawCurrent; }
+    inline int   getDrawCockpit()		{ return drawCockpit; }
+    inline int   getDrawDriver()		{ return drawDriver; }
     inline int   getMirrorAllowed()		{ return mirrorAllowed; }
     inline osg::Vec3 getCameraPosition(){ return eye; }
+
+    unsigned int getCullMask();
 
     //camera for sound
     Camera * getGenericCamera();

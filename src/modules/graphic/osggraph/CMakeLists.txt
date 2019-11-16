@@ -3,6 +3,7 @@ INCLUDE(../../../../cmake/macros.cmake)
 SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Utils/OsgColor.h
                      Utils/OsgMath.h
+                     Utils/OsgNodeMask.h
 					 #Utils/OsgOptions.h
 
                      Sky/OsgSphere.h

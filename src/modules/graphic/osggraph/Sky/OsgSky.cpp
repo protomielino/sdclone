@@ -20,6 +20,7 @@
 #include <tgf.h>
 
 #include "OsgSky.h"
+#include "OsgNodeMask.h"
 //#include "OsgCloudfield.h"
 //#include "OsgNewcloud.h"
 
@@ -57,13 +58,13 @@ SDSky::SDSky( void )
     //clouds_3d_density = 0.8;
 
     pre_root = new osg::Group;
-    pre_root->setNodeMask(BACKGROUND_BIT);
+    pre_root->setNodeMask(NODE_MASK_SKY_BACKGROUND);
     osg::StateSet* preStateSet = new osg::StateSet;
     preStateSet->setAttribute(new osg::Depth(osg::Depth::LESS, 0.0, 1.0, false));
     pre_root->setStateSet(preStateSet);
     cloud_root = new osg::Group;
     cloud_root->setName("SDSky-cloud-root");
-    cloud_root->setNodeMask(MODEL_BIT);
+    cloud_root->setNodeMask(NODE_MASK_SKY_MODEL);
 
     pre_selector = new osg::Switch;
     pre_transform = new osg::Group;

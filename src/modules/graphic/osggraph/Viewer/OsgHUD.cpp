@@ -37,6 +37,7 @@
 #include <osg/BlendFunc>
 
 #include "OsgHUD.h"
+#include "OsgNodeMask.h"
 #include "OsgMain.h"
 #include "tgfclient.h"
 
@@ -70,43 +71,55 @@ float verticalModifier, float horizontalModifier){
 
     //ref object
     //vertical
-    if(referenceObjPoint.find("t")==0){
+    if(referenceObjPoint.find("t")==0)
+    {
         vPoint += bb.yMax();
         vSign = 1;
-    }else if(referenceObjPoint.find("b")==0){
+    }else if(referenceObjPoint.find("b")==0)
+    {
         vPoint += bb.yMin();
         vSign = -1;
-    }else if(referenceObjPoint.find("m")==0){
+    }else if(referenceObjPoint.find("m")==0)
+    {
         vPoint += (bb.yMax() - bb.yMin())/2;
         vSign = 1;
     }
 
     //horizontal
-    if(referenceObjPoint.find("l")==1){
+    if(referenceObjPoint.find("l")==1)
+    {
         hPoint += bb.xMin();
-    }else if(referenceObjPoint.find("r")==1){
+    }else if(referenceObjPoint.find("r")==1)
+    {
         hPoint += bb.xMax();
-    }else if(referenceObjPoint.find("c")==1){
+    }else if(referenceObjPoint.find("c")==1)
+    {
         hPoint += (bb.xMax() - bb.xMin())/2;
     }
 
 
     //my obj /*todo check medium vertical alignment*/
     //vertical
-    if(objPoint.find("t")==0){
+    if(objPoint.find("t")==0)
+    {
         vPoint -= (mybb.yMax() - mybb.yMin()) * vSign;//height
-    }else if(objPoint.find("b")==0){
+    }else if(objPoint.find("b")==0)
+    {
         //do nothing
-    }else if(objPoint.find("m")==0){
+    }else if(objPoint.find("m")==0)
+    {
         vPoint -= (mybb.yMax() - mybb.yMin()) * vSign/2;
     }
 
     //horizontal
-    if(objPoint.find("l")==1){
+    if(objPoint.find("l")==1)
+    {
         //nothing to do
-    }else if(objPoint.find("r")==1){
+    }else if(objPoint.find("r")==1)
+    {
         hPoint -= (mybb.xMax() - mybb.xMin());//width
-    }else if(objPoint.find("c")==1){
+    }else if(objPoint.find("c")==1)
+    {
         hPoint -= (mybb.xMax() - mybb.xMin())/2;
     }
 
@@ -272,19 +285,27 @@ void OSGPLOT::recalculateDrawnPoint()
 
         //find max and min values for our plot
         //just draw point that are in our range of time
-        for(osg::Vec3Array::iterator it = this->dataPoints->begin(); it != this->dataPoints->end(); /*++it*/) {
-            if((*it).x() <= (GfTimeClock() - this->timeFrame) || (*it).x() <= 0){
+        for(osg::Vec3Array::iterator it = this->dataPoints->begin(); it != this->dataPoints->end(); /*++it*/) 
+        {
+            if((*it).x() <= (GfTimeClock() - this->timeFrame) || (*it).x() <= 0)
+            {
                 it = this->dataPoints->erase(it);
 
-            }else{
+            }
+            else
+            {
                 //find max
-                if ((*it).y() > this->maxValue){
+                if ((*it).y() > this->maxValue)
+                {
                     this->maxValue = (float)(*it).y();
                 }
+                
                 //find min
-                if ((*it).y() < this->minValue){
+                if ((*it).y() < this->minValue)
+                {
                     this->minValue = (float)(*it).y();
                 }
+                
                 ++it;
             }
         }
@@ -327,7 +348,6 @@ void OSGPLOT::recalculateDrawnPoint()
 
     }
 
-
     //recalculate reference plot line
     {
         // note, anticlockwise ordering.
@@ -353,7 +373,6 @@ void OSGPLOT::recalculateDrawnPoint()
         this->osgReferencePlotLineVertices->dirty();
         this->osgReferencePlotLineGeometry->setVertexArray(this->osgReferencePlotLineVertices);
     }
-
 }
 
 void OSGPLOT::drawBackground()
@@ -382,6 +401,7 @@ void OSGPLOT::drawBackground()
         osg::Vec3(this->positionX + this->width, this->positionY + this->height, 0.0f),
         osg::Vec3(this->positionX, this->positionY+this->height, 0.0f),
     };
+    
     int numCoords = sizeof(myCoords)/sizeof(osg::Vec3);
     osg::Vec3Array* vertices = new osg::Vec3Array(numCoords,myCoords);
 
@@ -415,29 +435,36 @@ void OSGPLOT::drawBackground()
 }
 
 // TODO[START]: move this to utils? /src/modules/graphic/osggraph/Utils
-void split(const std::string &s, char delim, std::vector<std::string> &elems) {
+void split(const std::string &s, char delim, std::vector<std::string> &elems) 
+{
     std::stringstream ss;
     ss.str(s);
     std::string item;
-    while (getline(ss, item, delim)) {
+    
+    while (getline(ss, item, delim)) 
+    {
         elems.push_back(item);
     }
 }
 
-std::vector<std::string> split(const std::string &s, char delim) {
+std::vector<std::string> split(const std::string &s, char delim) 
+{
     std::vector<std::string> elems;
     split(s, delim, elems);
     return elems;
 }
 
 
-std::string formatLaptime(tdble sec, int sgn) {
-
+std::string formatLaptime(tdble sec, int sgn) 
+{
     std::ostringstream lapTimeString;
 
-    if(sec < 0){
+    if(sec < 0)
+    {
         lapTimeString << "-";
-    }else{
+    }
+    else
+    {
         lapTimeString << "+";
     }
 
@@ -450,29 +477,36 @@ std::string formatLaptime(tdble sec, int sgn) {
     const int ms = (int)floor(sec * 1000.0);
 
     //minutes
-    if( m < 10){
+    if( m < 10)
+    {
         lapTimeString << "0";
     }
+    
     lapTimeString << m;
 
     lapTimeString << ":";
 
     //seconds
-    if( s < 10){
+    if( s < 10)
+    {
         lapTimeString << "0";
     }
+    
     lapTimeString << s;
 
     lapTimeString << ".";
 
     //decimals
-    if( ms < 100){
+    if( ms < 100)
+    {
         lapTimeString << "0";
     }
 
-    if( ms < 10){
+    if( ms < 10)
+    {
         lapTimeString << "0";
     }
+    
     lapTimeString << ms;
 
     return lapTimeString.str();
@@ -516,19 +550,26 @@ void changeImageSize(osg::Geometry *geom,
         * */
 
         //change the width
-        if(resizeFrom =="left"){
+        if(resizeFrom =="left")
+        {
             //change right vertices
             (*vertices)[1][0] = (*vertices)[0][0]+(imgWidth * newSize);
             (*vertices)[2][0] = (*vertices)[0][0]+(imgWidth * newSize);
-        }else if(resizeFrom =="right"){
+        }
+        else if(resizeFrom =="right")
+        {
             //change left vertices
             (*vertices)[0][0] = (*vertices)[1][0]-imgWidth+(imgWidth * (1.0f-newSize));
             (*vertices)[3][0] = (*vertices)[1][0]-imgWidth+(imgWidth * (1.0f-newSize));
-        }else if(resizeFrom =="top"){
+        }
+        else if(resizeFrom =="top")
+        {
             //change bottom vertices
             (*vertices)[0][1] = (*vertices)[2][1]-imgHeight+(imgHeight * (1.0f-newSize));
             (*vertices)[1][1] = (*vertices)[2][1]-imgHeight+(imgHeight * (1.0f-newSize));
-        }else if(resizeFrom =="bottom"){
+        }
+        else if(resizeFrom =="bottom")
+        {
             //change top vertices
             (*vertices)[2][1] = (*vertices)[0][1]+(imgHeight * newSize);
             (*vertices)[3][1] = (*vertices)[0][1]+(imgHeight * newSize);
@@ -545,16 +586,23 @@ void changeImageSize(osg::Geometry *geom,
 
         osg::Vec2Array* texcoords = dynamic_cast<osg::Vec2Array*>(geom->getTexCoordArray(0));
 
-        if(resizeFrom =="left"){
+        if(resizeFrom =="left")
+        {
             (*texcoords)[1][0]= newSize;
             (*texcoords)[2][0]= newSize;
-        }else if(resizeFrom =="right"){
+        }
+        else if(resizeFrom =="right")
+        {
             (*texcoords)[0][0] = 1.0f - newSize;
             (*texcoords)[3][0] = 1.0f - newSize;
-        }else if(resizeFrom =="top"){
+        }
+        else if(resizeFrom =="top")
+        {
             (*texcoords)[0][1] = 1.0f - newSize;
             (*texcoords)[1][1] = 1.0f - newSize;
-        }else if(resizeFrom =="bottom"){
+        }
+        else if(resizeFrom =="bottom")
+        {
             (*texcoords)[2][1] = newSize;
             (*texcoords)[3][1] = newSize;
         }
@@ -615,9 +663,12 @@ void SDHUD::CreateHUD(int scrH, int scrW)
 
     if(scaleH < scaleW){
         this->hudScale = scaleH;
-    }else{
+    }
+    else
+    {
         this->hudScale = scaleW;
     }
+    
     GfLogInfo("OSGHUD: Hud Scale is: %f\n", this->hudScale);
 
     //generate the hud from the relative xml file
@@ -639,11 +690,12 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
     //update all the graphs
     typedef std::map<std::string,OSGPLOT* >::iterator it_type;
-    for(it_type iterator = this->plotElements.begin(); iterator != this->plotElements.end(); iterator++) {
+    
+    for(it_type iterator = this->plotElements.begin(); iterator != this->plotElements.end(); iterator++)
+    {
         // iterator->first = key
         // iterator->second = value
         iterator->second->update(s,frameInfo,currCar);
-
     }
 
 //board
@@ -656,7 +708,8 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     std::vector<tCarElt *> boardCars;
 
     // get pointers for previous and behind cars from us
-    if (currCar->_pos > 2) {
+    if (currCar->_pos > 2) 
+    {
         secondAheadCar = s->cars[currCar->_pos - 3];
         boardCars.push_back(secondAheadCar);
     }
@@ -667,41 +720,44 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     //always add our car
     boardCars.push_back(s->cars[currCar->_pos-1]);
 
-    if (currCar->_pos < s->_ncars ) {
+    if (currCar->_pos < s->_ncars )
+    {
         firstBehindCar = s->cars[currCar->_pos + 0];
         boardCars.push_back(firstBehindCar);
     }
 
-    if (currCar->_pos < (s->_ncars-1) ) {
+    if (currCar->_pos < (s->_ncars-1) ) 
+    {
         secondBehindCar = s->cars[currCar->_pos + 1];
         boardCars.push_back(secondBehindCar);
     }
 
     //hide all board slots... we will enable later what we will use
-    for (int id = 1; id <= 5; id++){
+    for (int id = 1; id <= 5; id++)
+    {
         std::ostringstream mapKey;
         //hide board number
         mapKey.str("");
         mapKey << "board-player" << id << "-background";
-        this->hudImgElements[mapKey.str()]->setNodeMask(0);
+        this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
         mapKey.str("");
         mapKey << "board-player" << id << "-background-first";
-        this->hudImgElements[mapKey.str()]->setNodeMask(0);
+        this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
         mapKey.str("");
         mapKey << "board-player" << id << "-background-current";
-        this->hudImgElements[mapKey.str()]->setNodeMask(0);
+        this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
 
         mapKey.str("");
         mapKey << "board-player" << id << "-number";
-        hudTextElements[mapKey.str()]->setNodeMask(0);
+        hudTextElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
 
         mapKey.str("");
         mapKey << "board-player" << id << "-name";
-        hudTextElements[mapKey.str()]->setNodeMask(0);
+        hudTextElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
 
         mapKey.str("");
         mapKey << "board-player" << id << "-timediff";
-        hudTextElements[mapKey.str()]->setNodeMask(0);
+        hudTextElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
     }
 
     int id = 0;
@@ -712,17 +768,20 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
         mapKey.str("");
         mapKey << "board-player" << id << "-background";
-        this->hudImgElements[mapKey.str()]->setNodeMask(1);
+        this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
 
         //select special background for current and/or first player
-        if ((*car) == currCar){
-            this->hudImgElements[mapKey.str()]->setNodeMask(0);
+        if ((*car) == currCar)
+        {
+            this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
             mapKey << "-current";
-            this->hudImgElements[mapKey.str()]->setNodeMask(1);
-        }else if ((*car)->_pos == 1){
-            this->hudImgElements[mapKey.str()]->setNodeMask(0);
+            this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
+        }
+        else if ((*car)->_pos == 1)
+        {
+            this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
             mapKey << "-first";
-            this->hudImgElements[mapKey.str()]->setNodeMask(1);
+            this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
         }
 
 
@@ -732,42 +791,50 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         mapKey.str("");
         mapKey << "board-player" << id << "-number";
         hudTextElements[mapKey.str()]->setText(position.str());
-        hudTextElements[mapKey.str()]->setNodeMask(1);
+        hudTextElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
 
         //update board names texts
         mapKey.str("");
         mapKey << "board-player" << id << "-name";
         hudTextElements[mapKey.str()]->setText((*car)->_name);
-        hudTextElements[mapKey.str()]->setNodeMask(1);
+        hudTextElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
 
         //update time diff texts
         mapKey.str("");
         mapKey << "board-player" << id << "-timediff";
 
-        if(this->oldLapNumber != currCar->_laps){
+        if(this->oldLapNumber != currCar->_laps)
+        {
             this->timeDiffFreezeTime = GfTimeClock();
         }
 
-        if ( GfTimeClock() < (this->timeDiffFreezeTime + this->timeDiffFreezeCountdown)){
+        if ( GfTimeClock() < (this->timeDiffFreezeTime + this->timeDiffFreezeCountdown))
+        {
             this->oldLapNumber = currCar->_laps;
 
             std::ostringstream tempStr;
             tempStr.str("");
-            if((*car)->_laps == currCar->_laps){
+            if((*car)->_laps == currCar->_laps)
+            {
                 tempStr << formatLaptime(((*car)->_curTime - currCar->_curTime),1);
-            }else if ((*car)->_laps > currCar->_laps){
+            }
+            else if ((*car)->_laps > currCar->_laps)
+            {
                 tempStr << ((*car)->_laps - currCar->_laps);
                 tempStr << " laps";
             }
 
             hudTextElements[mapKey.str()]->setText(tempStr.str());
-            hudTextElements[mapKey.str()]->setNodeMask(1);
+           	hudTextElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
             //hide time diff for our car
-            if ((*car) == currCar){
-                hudTextElements[mapKey.str()]->setNodeMask(0);
+            if ((*car) == currCar)
+            {
+                hudTextElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
             }
-        }else{
-            hudTextElements[mapKey.str()]->setNodeMask(0);
+        }
+        else
+        {
+            hudTextElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
         }
 
 
@@ -820,19 +887,19 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
             if(currCar->_lastLapTime == currCar->_bestLapTime)
             {
-                this->hudImgElements["laptime-last-background-green"]->setNodeMask(1);
-                this->hudImgElements["laptime-last-background-normal"]->setNodeMask(0);
-                this->hudImgElements["laptime-last-background-grey"]->setNodeMask(0);
-                this->hudImgElements["laptime-last-background-violet"]->setNodeMask(0);
-                this->hudImgElements["laptime-last-background-red"]->setNodeMask(0);
+                this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_ALL);
+                this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
+                this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_NONE);
+                this->hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
+                this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
             }
             else
             {
-                this->hudImgElements["laptime-last-background-normal"]->setNodeMask(0);
-                this->hudImgElements["laptime-last-background-grey"]->setNodeMask(1);
-                this->hudImgElements["laptime-last-background-violet"]->setNodeMask(0);
-                this->hudImgElements["laptime-last-background-green"]->setNodeMask(0);
-                this->hudImgElements["laptime-last-background-red"]->setNodeMask(0);
+                this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
+                this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_ALL);
+                this->hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
+                this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_NONE);
+                this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
             }
 
         }
@@ -843,19 +910,19 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
             if(currentPrevSectorSplitTime < bestPrevSectorSplitTime)
             {
-                this->hudImgElements["laptime-last-background-normal"]->setNodeMask(0);
-                this->hudImgElements["laptime-last-background-grey"]->setNodeMask(0);
-                this->hudImgElements["laptime-last-background-violet"]->setNodeMask(0);
-                this->hudImgElements["laptime-last-background-green"]->setNodeMask(1);
-                this->hudImgElements["laptime-last-background-red"]->setNodeMask(0);
+                this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
+                this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_NONE);
+                this->hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
+                this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_ALL);
+                this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
             }
             else
             {
-                this->hudImgElements["laptime-last-background-normal"]->setNodeMask(0);
-                this->hudImgElements["laptime-last-background-grey"]->setNodeMask(1);
-                this->hudImgElements["laptime-last-background-violet"]->setNodeMask(0);
-                this->hudImgElements["laptime-last-background-green"]->setNodeMask(0);
-                this->hudImgElements["laptime-last-background-red"]->setNodeMask(0);
+                this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
+                this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_ALL);
+                this->hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
+                this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_NONE);
+                this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
             }
         }
     }
@@ -870,11 +937,11 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
         hudTextElements["laptime-last-time"]->setText(formatLaptime(currCar->_curLapTime,0));
 
-        this->hudImgElements["laptime-last-background-normal"]->setNodeMask(1);
-        this->hudImgElements["laptime-last-background-grey"]->setNodeMask(0);
-        this->hudImgElements["laptime-last-background-violet"]->setNodeMask(0);
-        this->hudImgElements["laptime-last-background-green"]->setNodeMask(0);
-        this->hudImgElements["laptime-last-background-red"]->setNodeMask(0);
+        this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_ALL);
+        this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_NONE);
+        this->hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
+       	this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_NONE);
+        this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
 
         //show laptime
         hudTextElements["laptime-best-time"]->setText(formatLaptime(bestSplitTime,0));
@@ -942,15 +1009,18 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     bool spd = false;   // Show speed limiter indicator?
 
     // Parse control messages if they include ABS / TCS / SPD
-    for (int i = 0; i < 4; i++) {
-        if (currCar->ctrl.msg[i]) {
+    for (int i = 0; i < 4; i++) 
+    {
+        if (currCar->ctrl.msg[i]) 
+        {
             abs = abs || strstr(currCar->ctrl.msg[i], "ABS");
             tcs = tcs || strstr(currCar->ctrl.msg[i], "TCS");
             spd = spd || strstr(currCar->ctrl.msg[i], "Speed Limiter On");
         }
     }
-    this->hudImgElements["abs-icon"]->setNodeMask(abs);
-    this->hudImgElements["tcs-icon"]->setNodeMask(tcs);
+    
+    this->hudImgElements["abs-icon"]->setNodeMask(abs ? NODE_MASK_ALL : NODE_MASK_NONE);
+    this->hudImgElements["tcs-icon"]->setNodeMask(tcs ? NODE_MASK_ALL : NODE_MASK_NONE);
 
 
 
@@ -998,7 +1068,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 void SDHUD::ToggleHUD1()
 {
-    _cameraHUD->setNodeMask(1-_cameraHUD->getNodeMask());
+    _cameraHUD->setNodeMask(_cameraHUD->getNodeMask() ? NODE_MASK_NONE : NODE_MASK_ALL);
 }
 
 osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
@@ -1359,9 +1429,6 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
 
     //release the xml file
     GfParmReleaseHandle(paramHandle);
-
-    //make the hud visible
-    geode->setNodeMask(1-geode->getNodeMask());
 
     //return the hud object
     return (*group).asGroup();

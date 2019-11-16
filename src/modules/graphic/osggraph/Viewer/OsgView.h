@@ -65,7 +65,8 @@ public:
     void Init(tSituation *s);
     void update(tSituation *s, const SDFrameInfo* frameInfo);
 
-    inline void setCurrentCar(tCarElt *newCurCar) { curCar = newCurCar; }
+    void setCurrentCar(tCarElt *newCurCar);
+    
     inline int getId(){return id;}
     inline void selectNextCar(void) { selectNextFlag = true; }
     inline void selectPrevCar(void) { selectPrevFlag = true; }

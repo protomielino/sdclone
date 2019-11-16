@@ -26,6 +26,7 @@
 #include "OsgRender.h"
 #include "OsgMain.h"
 #include "OsgReflectionMapping.h"
+#include "OsgNodeMask.h"
 
 #include <car.h>
 
@@ -127,7 +128,7 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):
         camera->setProjectionMatrixAsPerspective(90.0, 1.0, 1.0, 80000.0);
 
 		if (reflectionShader > 1)
-            camera->setNodeMask(0);
+            camera->setNodeMask(NODE_MASK_NONE);
 		 
         camerasRoot->addChild(camera);
         cameras.push_back(camera);
@@ -141,7 +142,7 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):
         SDScreens * screens = (SDScreens*)getScreens();
         screens->registerViewDependantPreRenderNode(this->getCamerasRoot());
 
-        cameras[4]->setNodeMask(1);
+        cameras[4]->setNodeMask(NODE_MASK_ALL);
     }
 }
 

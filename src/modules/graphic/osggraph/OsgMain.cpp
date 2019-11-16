@@ -336,3 +336,8 @@ Camera * getCamera(void)
 {
 	return screens->getActiveView()->getCamera();
 }
+
+void markCarCurrent(tCarElt *curCar)
+{
+    cars->markCarCurrent(curCar);
+}

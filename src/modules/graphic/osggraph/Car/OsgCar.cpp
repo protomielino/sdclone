@@ -46,6 +46,7 @@
 #include "OsgSky.h"
 #include "OsgShader.h"
 #include "OsgReflectionMapping.h"
+#include "OsgNodeMask.h"
 
 class SDRender;
 
@@ -756,7 +757,7 @@ void SDCar::deactivateCar(tCarElt *Car)
 {
     if(this->car == Car)
     {
-        this->car_root->setNodeMask(0);
+        this->car_root->setNodeMask(NODE_MASK_NONE);
     }
 }
 
@@ -764,7 +765,21 @@ void SDCar::activateCar(tCarElt *Car)
 {
     if(this->car == Car)
     {
-        this->car_root->setNodeMask(1);
+        this->car_root->setNodeMask(NODE_MASK_ALL);
+    }
+}
+
+void SDCar::markCarCurrent(tCarElt *Car)
+{
+    if(this->car == Car)
+    {
+        pDriver->setNodeMask(NODE_MASK_CAR_DRIVER);
+        car_branch->setNodeMask(NODE_MASK_CAR_CURRENT);
+    }
+    else 
+    {
+        pDriver->setNodeMask(NODE_MASK_ALL);
+        car_branch->setNodeMask(NODE_MASK_ALL);
     }
 }
 
@@ -969,6 +984,16 @@ void SDCars::updateCars()
     for(it = the_cars.begin(); it!= the_cars.end(); it++)
     {
         (*it)->updateCar();
+    }
+}
+
+void SDCars::markCarCurrent(tCarElt *car)
+{
+    std::vector<SDCar *>::iterator it;
+
+    for(it = the_cars.begin(); it!= the_cars.end(); it++)
+    {
+        (*it)->markCarCurrent(car);
     }
 }
 

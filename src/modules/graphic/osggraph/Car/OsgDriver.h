@@ -36,8 +36,7 @@ class SDDriver
         osg::ref_ptr<osg::Switch> _driverSwitch;
 
         //osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
-        unsigned int rcvShadowMask;
-        unsigned int castShadowMask;
+
 
     public :
         SDDriver(void);

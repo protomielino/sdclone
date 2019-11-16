@@ -37,8 +37,6 @@ SDDriver::~SDDriver(void)
 
 osg::ref_ptr<osg::Switch> SDDriver::initDriver(tCarElt *car,void *handle)
 {
-    rcvShadowMask = 0x1;
-    castShadowMask = 0x2;
     this->car = car;
 
     const char *param;
