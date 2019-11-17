@@ -54,7 +54,7 @@ SDCamera::SDCamera(SDView  * c, int myid, int mydrawCurrent, int mydrawCkt, int 
     screen = c;
     id = myid;
     drawCurrent = mydrawCurrent;
-	drawCockpit = mydrawCkt;
+    drawCockpit = mydrawCkt;
     drawDriver = mydrawdrv;
     drawBackground = mydrawBackground;
     mirrorAllowed = mymirrorAllowed;
@@ -75,16 +75,16 @@ Camera * SDCamera::getGenericCamera()
     return c;
 }
 
-unsigned int SDCamera::getCullMask() 
+unsigned int SDCamera::getCullMask()
 {
     unsigned int mask = NODE_MASK_ALL;
-    
+
     if (!getDrawCurrent())
-        mask &= ~NODE_MASK_CAR_CURRENT;
-        
+        mask &= ~NODE_MASK_CURCAR;
+
     if (!getDrawDriver())
-       mask &= ~NODE_MASK_CAR_DRIVER;
-       
+       mask &= ~NODE_MASK_CURDRV;
+
     return mask;
 }
 
@@ -118,7 +118,7 @@ SDPerspCamera::SDPerspCamera(SDView *myscreen, int id, int drawCurr, int drawCkt
 }
 
 void SDPerspCamera::setProjection(void)
-{    
+{
     screen->getOsgCam()->setProjectionMatrixAsPerspective(fovy,screen->getViewRatio() / spanaspect,fnear,ffar);
 
     // correct view for split screen spanning

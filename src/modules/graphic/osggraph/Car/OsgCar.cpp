@@ -753,33 +753,17 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car)
     return root.get();
 }*/
 
-void SDCar::deactivateCar(tCarElt *Car)
-{
-    if(this->car == Car)
-    {
-        this->car_root->setNodeMask(NODE_MASK_NONE);
-    }
-}
-
-void SDCar::activateCar(tCarElt *Car)
-{
-    if(this->car == Car)
-    {
-        this->car_root->setNodeMask(NODE_MASK_ALL);
-    }
-}
-
 void SDCar::markCarCurrent(tCarElt *Car)
 {
     if(this->car == Car)
     {
-        pDriver->setNodeMask(NODE_MASK_CAR_DRIVER);
-        car_branch->setNodeMask(NODE_MASK_CAR_CURRENT);
+        car_branch->setNodeMask(NODE_MASK_CURCAR);
+        pDriver->setNodeMask(NODE_MASK_CURDRV);
     }
     else 
     {
-        pDriver->setNodeMask(NODE_MASK_ALL);
         car_branch->setNodeMask(NODE_MASK_ALL);
+        pDriver->setNodeMask(NODE_MASK_ALL);
     }
 }
 
@@ -940,25 +924,6 @@ void SDCars::loadCars(tSituation *pSituation, bool trackType, bool subCat)
     }
 
     return;
-}
-
-void SDCars::deactivateCar(tCarElt *car)
-{
-    std::vector<SDCar *>::iterator it;
-    for(it = the_cars.begin(); it!= the_cars.end(); it++)
-    {
-        (*it)->deactivateCar(car);
-    }
-}
-
-void SDCars::activateCar(tCarElt *car)
-{
-    std::vector<SDCar *>::iterator it;
-
-    for(it = the_cars.begin(); it!= the_cars.end(); it++)
-    {
-        (*it)->activateCar(car);
-    }
 }
 
 SDCar *SDCars::getCar(tCarElt *car)

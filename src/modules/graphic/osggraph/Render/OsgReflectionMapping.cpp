@@ -30,45 +30,6 @@
 
 #include <car.h>
 
-class CameraPreCallback : public osg::Camera::DrawCallback
-{
-private:
-    tCarElt * car;
-public:
-
-    void setCar(tCarElt *c)
-    {
-        car = c;
-    }
-
-    virtual void operator()(const osg::Camera& cam) const
-    {
-        SDCars * cars = (SDCars *)getCars();
-        cars->deactivateCar(car);
-    }
-};
-
-class CameraPostCallback : public osg::Camera::DrawCallback
-{
-private:
-    tCarElt * car;
-
-public:    
-    void setCar(tCarElt *c)
-    {
-        car = c;
-    }
-
-    virtual void operator()(const osg::Camera& cam) const
-    {
-        SDCars * cars = (SDCars *)getCars();
-        cars->activateCar(car);
-    }
-};
-
-CameraPreCallback *pre_cam = new CameraPreCallback;
-CameraPostCallback *post_cam = new CameraPostCallback;
-
 SDReflectionMapping::SDReflectionMapping(SDCar *c):
     camerasRoot(NULL),
     reflectionMap(NULL),
@@ -127,9 +88,9 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):
         camera->addChild( m_sceneroot );
         camera->setProjectionMatrixAsPerspective(90.0, 1.0, 1.0, 80000.0);
 
-		if (reflectionShader > 1)
+        if (reflectionShader > 1)
             camera->setNodeMask(NODE_MASK_NONE);
-		 
+
         camerasRoot->addChild(camera);
         cameras.push_back(camera);
 
@@ -153,9 +114,6 @@ void SDReflectionMapping::update()
     osg::Camera * viewCam = screens->getActiveView()->getOsgCam();
 
     tCarElt *Car = this->car->getCar();
-
-    pre_cam->setCar(Car);
-    post_cam->setCar(Car);
 
     sgVec3 p;
     osg::Vec3 eye, center, up;

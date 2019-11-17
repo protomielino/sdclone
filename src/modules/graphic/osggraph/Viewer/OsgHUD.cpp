@@ -285,7 +285,7 @@ void OSGPLOT::recalculateDrawnPoint()
 
         //find max and min values for our plot
         //just draw point that are in our range of time
-        for(osg::Vec3Array::iterator it = this->dataPoints->begin(); it != this->dataPoints->end(); /*++it*/) 
+        for(osg::Vec3Array::iterator it = this->dataPoints->begin(); it != this->dataPoints->end(); /*++it*/)
         {
             if((*it).x() <= (GfTimeClock() - this->timeFrame) || (*it).x() <= 0)
             {
@@ -299,13 +299,13 @@ void OSGPLOT::recalculateDrawnPoint()
                 {
                     this->maxValue = (float)(*it).y();
                 }
-                
+
                 //find min
                 if ((*it).y() < this->minValue)
                 {
                     this->minValue = (float)(*it).y();
                 }
-                
+
                 ++it;
             }
         }
@@ -401,7 +401,7 @@ void OSGPLOT::drawBackground()
         osg::Vec3(this->positionX + this->width, this->positionY + this->height, 0.0f),
         osg::Vec3(this->positionX, this->positionY+this->height, 0.0f),
     };
-    
+
     int numCoords = sizeof(myCoords)/sizeof(osg::Vec3);
     osg::Vec3Array* vertices = new osg::Vec3Array(numCoords,myCoords);
 
@@ -435,19 +435,19 @@ void OSGPLOT::drawBackground()
 }
 
 // TODO[START]: move this to utils? /src/modules/graphic/osggraph/Utils
-void split(const std::string &s, char delim, std::vector<std::string> &elems) 
+void split(const std::string &s, char delim, std::vector<std::string> &elems)
 {
     std::stringstream ss;
     ss.str(s);
     std::string item;
-    
-    while (getline(ss, item, delim)) 
+
+    while (getline(ss, item, delim))
     {
         elems.push_back(item);
     }
 }
 
-std::vector<std::string> split(const std::string &s, char delim) 
+std::vector<std::string> split(const std::string &s, char delim)
 {
     std::vector<std::string> elems;
     split(s, delim, elems);
@@ -455,7 +455,7 @@ std::vector<std::string> split(const std::string &s, char delim)
 }
 
 
-std::string formatLaptime(tdble sec, int sgn) 
+std::string formatLaptime(tdble sec, int sgn)
 {
     std::ostringstream lapTimeString;
 
@@ -481,7 +481,7 @@ std::string formatLaptime(tdble sec, int sgn)
     {
         lapTimeString << "0";
     }
-    
+
     lapTimeString << m;
 
     lapTimeString << ":";
@@ -491,7 +491,7 @@ std::string formatLaptime(tdble sec, int sgn)
     {
         lapTimeString << "0";
     }
-    
+
     lapTimeString << s;
 
     lapTimeString << ".";
@@ -506,7 +506,7 @@ std::string formatLaptime(tdble sec, int sgn)
     {
         lapTimeString << "0";
     }
-    
+
     lapTimeString << ms;
 
     return lapTimeString.str();
@@ -668,7 +668,7 @@ void SDHUD::CreateHUD(int scrH, int scrW)
     {
         this->hudScale = scaleW;
     }
-    
+
     GfLogInfo("OSGHUD: Hud Scale is: %f\n", this->hudScale);
 
     //generate the hud from the relative xml file
@@ -690,7 +690,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
     //update all the graphs
     typedef std::map<std::string,OSGPLOT* >::iterator it_type;
-    
+
     for(it_type iterator = this->plotElements.begin(); iterator != this->plotElements.end(); iterator++)
     {
         // iterator->first = key
@@ -708,7 +708,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     std::vector<tCarElt *> boardCars;
 
     // get pointers for previous and behind cars from us
-    if (currCar->_pos > 2) 
+    if (currCar->_pos > 2)
     {
         secondAheadCar = s->cars[currCar->_pos - 3];
         boardCars.push_back(secondAheadCar);
@@ -726,7 +726,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         boardCars.push_back(firstBehindCar);
     }
 
-    if (currCar->_pos < (s->_ncars-1) ) 
+    if (currCar->_pos < (s->_ncars-1) )
     {
         secondBehindCar = s->cars[currCar->_pos + 1];
         boardCars.push_back(secondBehindCar);
@@ -825,7 +825,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
             }
 
             hudTextElements[mapKey.str()]->setText(tempStr.str());
-           	hudTextElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
+            hudTextElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
             //hide time diff for our car
             if ((*car) == currCar)
             {
@@ -940,7 +940,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_ALL);
         this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_NONE);
         this->hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
-       	this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_NONE);
+        this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_NONE);
         this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
 
         //show laptime
@@ -1009,16 +1009,16 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     bool spd = false;   // Show speed limiter indicator?
 
     // Parse control messages if they include ABS / TCS / SPD
-    for (int i = 0; i < 4; i++) 
+    for (int i = 0; i < 4; i++)
     {
-        if (currCar->ctrl.msg[i]) 
+        if (currCar->ctrl.msg[i])
         {
             abs = abs || strstr(currCar->ctrl.msg[i], "ABS");
             tcs = tcs || strstr(currCar->ctrl.msg[i], "TCS");
             spd = spd || strstr(currCar->ctrl.msg[i], "Speed Limiter On");
         }
     }
-    
+
     this->hudImgElements["abs-icon"]->setNodeMask(abs ? NODE_MASK_ALL : NODE_MASK_NONE);
     this->hudImgElements["tcs-icon"]->setNodeMask(tcs ? NODE_MASK_ALL : NODE_MASK_NONE);
 
@@ -1062,7 +1062,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 
     //make the camera visible
-    _cameraHUD->setNodeMask(1-_cameraHUD->getNodeMask());
+    _cameraHUD->setNodeMask(NODE_MASK_ALL);
 
 }
 

@@ -383,19 +383,19 @@ void SDRender::Init(tTrack *track)
         case 0:
             break;
         case 1:
-            scene->setNodeMask(NODE_MASK_SHADOW_RECV);
+            scene->setNodeMask(~NODE_MASK_SHADOW_CAST);
             background->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
-            cargroup->setNodeMask(NODE_MASK_SHADOW_CAST);
+            cargroup->setNodeMask(~NODE_MASK_SHADOW_RECV);
             break;
         case 2:
-            scene->setNodeMask(NODE_MASK_SHADOW_RECV);
+            scene->setNodeMask(~NODE_MASK_SHADOW_CAST);
             background->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
-            cargroup->setNodeMask(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST);
+            cargroup->setNodeMask(NODE_MASK_ALL);
             break;
         case 3:
-            scene->setNodeMask(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST);
+            scene->setNodeMask(NODE_MASK_ALL);
             background->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
-            cargroup->setNodeMask(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST);
+            cargroup->setNodeMask(NODE_MASK_ALL);
             break;
         default:
             break;
@@ -454,7 +454,7 @@ void SDRender::Init(tTrack *track)
 
     skyGroup = new osg::Group;
     skyGroup->setName("skyCloudsGroup");
-	skyGroup->setNodeMask(NODE_MASK_SKY_BACKGROUND);
+    skyGroup->setNodeMask(NODE_MASK_SKY_BACKGROUND);
     skyGroup->addChild(thesky->getPreRoot());
     skyGroup->addChild((thesky->getCloudRoot()));
 
@@ -493,7 +493,7 @@ void SDRender::ShadowedScene()
         vdsm->setTextureSize(osg::Vec2s(ShadowTexSize, ShadowTexSize));
         vdsm->setTextureUnit(shadowTexUnit);
         shadowRoot = new osgShadow::ShadowedScene;
-		shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
+        shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
         shadowRoot->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
         shadowRoot->setShadowTechnique((vdsm.get()));
     }
@@ -538,7 +538,7 @@ void SDRender::ShadowedScene()
 
         lspsm->setBaseTextureUnit(baseTexUnit);
         shadowRoot = new osgShadow::ShadowedScene;
-		shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
+        shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
         shadowRoot->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
         shadowRoot->setShadowTechnique((lspsm.get()));
     }

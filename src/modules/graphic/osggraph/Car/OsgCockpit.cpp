@@ -30,8 +30,6 @@
 
 osg::ref_ptr<osg::Node> SDCockpit::initCockpit(tCarElt *car, void *handle)
 {
-    rcvShadowMask = 0x1;
-    castShadowMask = 0x2;
     this->car = car;
 
     const char *param;

@@ -52,7 +52,7 @@ extern tdble grMaxDammage;
 // Number of active screens.
 extern int m_NbActiveScreens;
 
-//static 
+//static
 #define SD_SPLIT_ADD	0
 #define SD_SPLIT_REM	1
 #define SD_SPLIT_ARR	2
@@ -77,6 +77,5 @@ void * getScreens();
 void * getRender();
 void * getCars();
 void * getScenery();
-void   markCarCurrent(tCarElt *curCar);
 
 #endif /* _OSGMAIN_H_ */

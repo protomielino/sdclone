@@ -17,6 +17,10 @@
  *                                                                         *
  ***************************************************************************/
 
+// include RenderInfo first which contains a word "_style"
+// which can be replaced by the same preprocessor definition from <car.h>
+// and GCC will raise a strange untrackable compilation error
+#include <osg/RenderInfo>
 #include <osg/Camera>
 
 #include <tgfclient.h>
@@ -24,6 +28,7 @@
 
 #include "OsgMain.h"
 #include "OsgView.h"
+#include "OsgCar.h"
 #include "OsgNodeMask.h"
 
 static char buf[1024];
@@ -102,7 +107,7 @@ void SDView::Init(tSituation *s)
 void SDView::setCurrentCar(tCarElt *newCurCar)
 {
     curCar = newCurCar;
-    markCarCurrent(curCar);
+    ((SDCars*)getCars())->markCarCurrent(curCar);
 }
 
 /* Update screen display */
@@ -148,7 +153,7 @@ void SDView::update(tSituation *s, const SDFrameInfo* frameInfo)
         loadParams (s);
         //board->setWidth(fakeWidth);
         GfParmWriteFile(NULL, grHandle, "Graph");
-        markCarCurrent(curCar);
+        ((SDCars*)getCars())->markCarCurrent(curCar);
     }
 
     if(hasChangedMirrorFlag)
@@ -180,7 +185,7 @@ void SDView::activate(int x, int y, int width, int height, float v)
 
 void SDView::deactivate()
 {
-	cam->setNodeMask(NODE_MASK_NONE);
+    cam->setNodeMask(NODE_MASK_NONE);
     mirrorCam->setNodeMask(NODE_MASK_NONE);
 }
 

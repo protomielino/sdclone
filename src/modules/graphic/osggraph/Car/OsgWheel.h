@@ -44,4 +44,4 @@ public :
     void updateWheels();
 };
 
-#endif /* _OSGCAR_H_ */
+#endif /* _OSGWHEEL_H_ */
