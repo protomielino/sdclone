@@ -24,6 +24,7 @@
 #include "OsgScenery.h"
 #include "OsgLoader.h"
 #include <robottools.h> // RtXXX
+#include <portability.h> // snprintf
 
 
 SDPit::SDPit(void)
