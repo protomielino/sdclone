@@ -47,7 +47,12 @@ static tdble spanA;
 
 static double lastTime;
 
+static inline tdble calc_relaxation(tdble target, tdble prev, tdble rate, tdble dt)
+{
+    rate = std::max(tdble(0), std::min(tdble(1), rate));
 
+    return prev + (target - prev)*(1.0 - pow(1.0 - rate, dt));
+}
 
 SDCamera::SDCamera(SDView  * c, int myid, int mydrawCurrent, int mydrawCkt, int mydrawdrv, int mydrawBackground, int mymirrorAllowed)
 {
@@ -83,7 +88,7 @@ unsigned int SDCamera::getCullMask()
         mask &= ~NODE_MASK_CURCAR;
 
     if (!getDrawDriver())
-       mask &= ~NODE_MASK_CURDRV;
+        mask &= ~NODE_MASK_CURDRV;
 
     return mask;
 }
@@ -525,7 +530,7 @@ public:
         dist = mydist;
         height = myHeight;
         relax = relaxation;
-        PreA = 0.0;
+        PreA = NAN;
         up[0] = 0;
         up[1] = 0;
         up[2] = 1;
@@ -542,17 +547,38 @@ public:
             A = spanA;
         } else
         {
-            A = car->_yaw;
-            if (fabs(PreA - A) > fabs(PreA - A + 2*PI))
+            // init previous angle
+            if (isnan(PreA)) PreA = car->_yaw;
+
+            // take angle of current velocity vector
+            tdble vx = car->pub.DynGCg.vel.x;
+            tdble vy = car->pub.DynGCg.vel.y;
+            tdble vel = sqrt(vx*vx + vy*vy);
+
+            // don't change the angle when velocity is less than 1 m/s
+            if (vel < 1)
             {
-                PreA += 2*PI;
-            } else if (fabs(PreA - A) > fabs(PreA - A - 2*PI))
+                A = PreA;
+            }
+            else
             {
-                PreA -= 2*PI;
+                A = atan2(vy, vx);
+
+                //A = car->_yaw;
+                if (fabs(PreA - A) > fabs(PreA - A + 2*PI))
+                {
+                    PreA += 2*PI;
+                }
+                else if (fabs(PreA - A) > fabs(PreA - A - 2*PI))
+                {
+                    PreA -= 2*PI;
+                }
+
+                // relaxation to `relax` percents every 0.1 second
+                if (relax > 0.1)
+                    PreA = A = calc_relaxation(A, PreA, relax*0.01, (s->currentTime - lastTime)*10);
             }
 
-            if (relax > 0.1)
-                RELAXATION(A, PreA, relax);
             spanA = A;
         }
 
@@ -1903,10 +1929,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                           id,
                                                           1,	/* drawCurr */
                                                           1,	/* drawBG  */
-                                                          40.0,	/* fovy */
+                                                          67.5,	/* fovy */
                                                           5.0,	/* fovymin */
                                                           95.0,	/* fovymax */
-                                                          10.0,	/* dist */
+                                                          6.6,	/* dist */
                                                           2.0,	/* height */
                                                           1.0,	/* near */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
@@ -1920,10 +1946,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                           id,
                                                           1,	/* drawCurr */
                                                           1,	/* drawBG  */
-                                                          40.0,	/* fovy */
+                                                          67.5,	/* fovy */
                                                           5.0,	/* fovymin */
                                                           95.0,	/* fovymax */
-                                                          8.0,	/* dist */
+                                                          5.5,	/* dist */
                                                           .50,	/* height */
                                                           .50,	/* near */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
@@ -1937,10 +1963,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                          id,
                                                          1,	/* drawCurr */
                                                          1,	/* drawBG  */
-                                                         40.0,	/* fovy */
+                                                         67.5,	/* fovy */
                                                          5.0,	/* fovymin */
                                                          95.0,	/* fovymax */
-                                                         8.0,	/* dist */
+                                                         5.5,	/* dist */
                                                          0.5,	/* near */
                                                          fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                          fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
@@ -1953,10 +1979,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                           id,
                                                           1,	/* drawCurr */
                                                           1,	/* drawBG  */
-                                                          40.0,	/* fovy */
+                                                          67.5,	/* fovy */
                                                           5.0,	/* fovymin */
                                                           95.0,	/* fovymax */
-                                                          8.0,	/* dist */
+                                                          5.5,	/* dist */
                                                           2.5,	/* height */
                                                           1.0,	/* near */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
