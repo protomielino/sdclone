@@ -17,6 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
+
 #include <osg/Camera>
 #include <osg/Matrix>
 #include <osg/ValueObject>
@@ -51,7 +53,7 @@ static inline tdble calc_relaxation(tdble target, tdble prev, tdble rate, tdble 
 {
     rate = std::max(tdble(0), std::min(tdble(1), rate));
 
-    return prev + (target - prev)*(1.0 - pow(1.0 - rate, dt));
+    return prev + (target - prev)*(tdble(1.0) - pow(tdble(1.0) - rate, dt));
 }
 
 SDCamera::SDCamera(SDView  * c, int myid, int mydrawCurrent, int mydrawCkt, int mydrawdrv, int mydrawBackground, int mymirrorAllowed)
@@ -530,7 +532,7 @@ public:
         dist = mydist;
         height = myHeight;
         relax = relaxation;
-        PreA = NAN;
+        PreA = tdble(0.0)/tdble(0.0);
         up[0] = 0;
         up[1] = 0;
         up[2] = 1;

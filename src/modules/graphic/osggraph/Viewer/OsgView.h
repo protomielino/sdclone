@@ -59,14 +59,14 @@ protected:
     void loadParams(tSituation *s);			// Load from parameters files.
 
 public:
-    SDView(osg::Camera * c, int x , int y, int width , int height, osg::Camera * mc);
+    SDView(int id, osg::Camera * c, int x , int y, int width , int height, osg::Camera * mc);
     ~SDView();
 
     void Init(tSituation *s);
     void update(tSituation *s, const SDFrameInfo* frameInfo);
 
     void setCurrentCar(tCarElt *newCurCar);
-    
+
     inline int getId(){return id;}
     inline void selectNextCar(void) { selectNextFlag = true; }
     inline void selectPrevCar(void) { selectPrevFlag = true; }

@@ -110,7 +110,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     mirrorCam->setClearMask( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     mirrorCam->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
 
-    SDView * view = new SDView(viewer->getCamera(),0,0, width, height, mirrorCam.get());
+    SDView * view = new SDView((int)Screens.size(), viewer->getCamera(),0,0, width, height, mirrorCam.get());
     Screens.push_back(view);
 
     /* Set the scene graph root node for traversal by the viewer */

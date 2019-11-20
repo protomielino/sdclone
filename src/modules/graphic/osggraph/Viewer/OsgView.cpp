@@ -35,10 +35,8 @@ static char buf[1024];
 static char path[1024];
 static char path2[1024];
 
-static int cpt=0;
-
-SDView::SDView(osg::Camera * c, int x, int y, int width, int height,
-               osg::Camera * mc)
+SDView::SDView(int id, osg::Camera * c, int x, int y, int width, int height,
+                osg::Camera * mc)
 {
     this->x =x;
     this->y =y;
@@ -68,8 +66,7 @@ SDView::SDView(osg::Camera * c, int x, int y, int width, int height,
                            );
     // mirror->setProjection();
 
-    id = cpt;
-    cpt++;
+    this->id = id;
     curCar = NULL;
     cars = 0;
     selectNextFlag=false;
