@@ -53,7 +53,7 @@ static inline tdble calc_relaxation(tdble target, tdble prev, tdble rate, tdble 
 {
     rate = std::max(tdble(0), std::min(tdble(1), rate));
 
-    return prev + (target - prev)*(tdble(1.0) - pow(tdble(1.0) - rate, dt));
+    return prev + (target - prev)*(tdble(1) - pow(tdble(1) - rate, dt));
 }
 
 SDCamera::SDCamera(SDView  * c, int myid, int mydrawCurrent, int mydrawCkt, int mydrawdrv, int mydrawBackground, int mymirrorAllowed)
@@ -515,6 +515,7 @@ public:
 class SDCarCamBehind : public SDPerspCamera
 {
     tdble PreA;
+    bool PreAExists;
 
 protected:
     float dist;
@@ -532,7 +533,8 @@ public:
         dist = mydist;
         height = myHeight;
         relax = relaxation;
-        PreA = tdble(0.0)/tdble(0.0);
+        PreA = 0;
+        PreAExists = false;
         up[0] = 0;
         up[1] = 0;
         up[2] = 1;
@@ -550,7 +552,11 @@ public:
         } else
         {
             // init previous angle
-            if (isnan(PreA)) PreA = car->_yaw;
+            if (!PreAExists)
+            {
+            PreA = car->_yaw;
+            PreAExists = true;
+            }
 
             // take angle of current velocity vector
             tdble vx = car->pub.DynGCg.vel.x;
