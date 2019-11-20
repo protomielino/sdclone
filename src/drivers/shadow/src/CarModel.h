@@ -46,6 +46,7 @@ public:
 
     void    config( const tCarElt* car );
     void    config( void* hCar );
+    void	update( const tCarElt* car, const tSituation* sit );
 
     double	CalcMaxSpeed(double k, double kz, double kv, double kFriction, double trackRollAngle, double trackPitchAngle) const;
     double	CalcBreaking( double k0, double kz0, double k1, double kz1, double spd1, double dist, double kFriction, double RollAngle, double TiltAngle ) const;

@@ -1512,6 +1512,7 @@ void TDriver::SpeedControl(int which, double targetSpd, double spd0, CarElt* car
 
 void TDriver::Drive( tSituation* s )
 {
+    m_cm.update( car, s );
     DetectFlight();
 
     if( m_raceStart || s->currentTime <= 0.5 )

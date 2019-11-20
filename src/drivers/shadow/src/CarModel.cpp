@@ -810,6 +810,36 @@ void    CarModel::configCar( void* hCar )
     }
 }
 
+//===========================================================================
+void	CarModel::update( const tCarElt* car, const tSituation* sit )
+{
+    Vec3d	new_pos_g = Vec3d(car->pub.DynGCg.pos.x, car->pub.DynGCg.pos.y, car->pub.DynGCg.pos.z);
+    Vec3d	new_vel_g = (new_pos_g - POS_G) / sit->deltaTime;
+    Vec3d	new_acc_g = (new_vel_g - VEL_G) / sit->deltaTime;
+
+    POS_G = new_pos_g;
+    VEL_G = new_vel_g;
+    ACC_G = new_acc_g;
+
+    const sgMat4& m = car->pub.posMat;
+
+    VEL_L.x = VEL_G * Vec3d(m[0][0], m[0][1], m[0][2]);
+    VEL_L.y = VEL_G * Vec3d(m[1][0], m[1][1], m[1][2]);
+    VEL_L.z = VEL_G * Vec3d(m[2][0], m[2][1], m[2][2]);
+
+    ACC_L.x = ACC_G * Vec3d(m[0][0], m[0][1], m[0][2]);
+    ACC_L.y = ACC_G * Vec3d(m[1][0], m[1][1], m[1][2]);
+    ACC_L.z = ACC_G * Vec3d(m[2][0], m[2][1], m[2][2]);
+
+    double	new_pos_az = car->pub.DynGCg.pos.az;
+    double	new_vel_az = Utils::NormPiPi(new_pos_az - POS_AZ) / sit->deltaTime;
+
+    POS_AZ = new_pos_az;
+    VEL_AZ = new_vel_az;
+
+    updateWheels( car, sit );
+}
+
 double	CarModel::AxleCalcMaxSpeed(double k, double kz, double kv, double trackMu, double trackRollAngle, double trackPitchAngle,
     double gripScale, double tyreMu, double ax, double wx,double wf, double Cw,double Cg ) const
 {
