@@ -40,7 +40,6 @@
 
 SDScreens::SDScreens() :
     root(NULL),
-    mirrorScene(NULL),
     prerenderRoot(NULL),
 
     m_CurrentScreenIndex(0)
@@ -116,7 +115,6 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     /* Set the scene graph root node for traversal by the viewer */
     root = new osg::Group;
     viewer->setSceneData(root.get());
-    mirrorScene = new osg::Group;
 #if 1
     prerenderRoot = new osg::Group;
     root->addChild(prerenderRoot);
@@ -124,15 +122,10 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
 #endif
     root->addChild(m_sceneroot.get());
     root->addChild(mirrorCam);
-    mirrorScene->addChild(m_sceneroot.get());
-    mirrorCam->addChild(mirrorScene.get());
-
-    osg::FrontFace *frontFace = new osg::FrontFace();
-    frontFace->setMode( osg::FrontFace::CLOCKWISE );
-    osg::StateSet *mirrorStateSet = mirrorScene.get()->getOrCreateStateSet();
-    mirrorStateSet->setAttribute(frontFace);
-    mirrorStateSet->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
-
+    mirrorCam->addChild(m_sceneroot.get());
+    
+    root->getOrCreateStateSet()->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
+    
     //debugHUD->setTexture(reflectionMapping->getMap());
     // debugHUD->setTexture(reflectionMapping->getReflectionMap());
     //root->addChild(debugHUD->getRootCamera());

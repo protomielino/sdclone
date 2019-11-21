@@ -35,7 +35,6 @@ protected:
     osg::ref_ptr<osgViewer::Viewer> viewer;
     std::vector<SDView *> Screens;
     osg::ref_ptr<osg::Group> root;
-    osg::ref_ptr<osg::Group> mirrorScene;
     osg::ref_ptr<osg::Group> prerenderRoot;
     SDDebugHUD * debugHUD;
 

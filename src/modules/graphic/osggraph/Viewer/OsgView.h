@@ -25,13 +25,17 @@
 
 #include "OsgCamera.h"		//SDCameras
 
+#include <osg/FrontFace>
+
 class SDFrameInfo;
 
 class SDView
 {
 protected:
-    osg::Camera * cam;
-    osg::Camera * mirrorCam;
+    osg::Camera *cam;
+    osg::Camera *mirrorCam;
+    osg::FrontFace *camFrontFace;
+    osg::FrontFace *mirrorCamFrontFace;
 
     int id;
     int x, y, width, height;
@@ -84,6 +88,9 @@ public:
     inline osg::Camera *  getOsgCam(void) { return cam; }
     inline osg::Camera *  getOsgMirrorCam(void) { return mirrorCam; }
 
+    inline osg::FrontFace *  getOsgCamFrontFace(void) { return camFrontFace; }
+    inline osg::FrontFace *  getOsgMirrorCamFrontFace(void) { return mirrorCamFrontFace; }
+    
     inline int  getScreenXPos(void) { return x; }
     inline int  getScreenYPos(void) { return y; }
 

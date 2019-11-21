@@ -153,6 +153,7 @@ void SDPerspCamera::setProjection(void)
 void SDPerspCamera::setModelView(void)
 {
     screen->getOsgCam()->setViewMatrixAsLookAt(eye,center,up);
+    screen->getOsgCamFrontFace()->setMode(osg::FrontFace::COUNTER_CLOCKWISE);
 }
 
 void SDPerspCamera::loadDefaults(char *attr)
@@ -755,7 +756,7 @@ public:
         screen->getOsgCam()->setViewMatrix(res);
         screen->getOsgCam()->setUserValue("eye",eye);
 
-        //glFrontFace( GL_CW );
+        screen->getOsgCamFrontFace()->setMode(osg::FrontFace::CLOCKWISE);
     }
 
     void update(tCarElt *car, tSituation *s)
@@ -1563,6 +1564,7 @@ void SDCarCamMirror::setModelView(void)
     osg::Matrix res = m*mir;
 
     screen->getOsgMirrorCam()->setViewMatrix(res);
+    screen->getOsgMirrorCamFrontFace()->setMode(osg::FrontFace::CLOCKWISE);
     screen->getOsgCam()->setUserValue("eye",eye);
 }
 

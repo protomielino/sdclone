@@ -44,10 +44,15 @@ SDView::SDView(int id, osg::Camera * c, int x, int y, int width, int height,
     this->height = height;
     viewOffset =0;
     cam = c;
+    camFrontFace = new osg::FrontFace();
+    cam->getOrCreateStateSet()->setAttribute(camFrontFace);
 
     mirrorCam = mc;
     hasChangedMirrorFlag = false;
     mirrorFlag = true;
+    mirrorCamFrontFace = new osg::FrontFace();
+    mirrorCam->getOrCreateStateSet()->setAttribute(mirrorCamFrontFace);
+    
 
     tdble fovFactor = 1;
     tdble fixedFar = 80000.0;
