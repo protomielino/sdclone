@@ -123,9 +123,9 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     root->addChild(m_sceneroot.get());
     root->addChild(mirrorCam);
     mirrorCam->addChild(m_sceneroot.get());
-    
+
     root->getOrCreateStateSet()->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
-    
+
     //debugHUD->setTexture(reflectionMapping->getMap());
     // debugHUD->setTexture(reflectionMapping->getReflectionMap());
     //root->addChild(debugHUD->getRootCamera());
@@ -222,6 +222,7 @@ void SDScreens::changeCamera(long p)
         for (i=0; i < m_NbActiveScreens; i++)
             if (Screens[i]->getViewOffset() )
                 Screens[i]->getCameras()->selectCamera(camList,camNum);
+
     }
 }
 

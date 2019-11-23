@@ -42,6 +42,9 @@ static double lastTime;
 
 static inline tdble calc_relaxation(tdble target, tdble prev, tdble rate, tdble dt)
 {
+    if (dt < 0) return prev;
+    if (dt > 100) return target;
+
     rate = std::max(tdble(0), std::min(tdble(1), rate));
 
     return prev + (target - prev)*(tdble(1) - pow(tdble(1) - rate, dt));

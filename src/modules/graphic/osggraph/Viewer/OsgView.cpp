@@ -52,7 +52,7 @@ SDView::SDView(int id, osg::Camera * c, int x, int y, int width, int height,
     mirrorFlag = true;
     mirrorCamFrontFace = new osg::FrontFace();
     mirrorCam->getOrCreateStateSet()->setAttribute(mirrorCamFrontFace);
-    
+
 
     tdble fovFactor = 1;
     tdble fixedFar = 80000.0;
@@ -260,7 +260,8 @@ void SDView::loadParams(tSituation *s)
 
     // Only apply driver preferences when not spanning split screens
     pszSpanSplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
-    if (strcmp(pszSpanSplit, GR_VAL_YES))
+
+    if (strcmp(pszSpanSplit, GR_VAL_YES) && curCar->_driverType == RM_DRV_HUMAN)
     {
         sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
         camList	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM_HEAD, NULL, (tdble)camNum);
