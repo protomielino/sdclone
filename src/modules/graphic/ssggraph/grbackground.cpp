@@ -72,6 +72,20 @@ static const char* AEnvShadowKeys[] =
 static const int NEnvShadowFullCoverRainIndex = 5; // Index in AEnvShadowKeys
 static const int NEnvShadowNightIndex = 6; // Index in AEnvShadowKeys
 
+static const int EnvShadowIndices[] =
+{
+    0, // TR_CLOUDS_NONE
+    0, // TR_CLOUDS_CIRRUS
+    1, // TR_CLOUDS_FEW
+    3, // TR_CLOUDS_MANY
+    2, // TR_CLOUDS_CUMULUS
+    2, // TR_CLOUDS_SCARCE
+    2, // TR_CLOUDS_BROKEN
+    4  // TR_CLOUDS_FULL
+};
+
+static const int NEnvShadowIndices = sizeof(EnvShadowIndices) / sizeof(int);
+
 // Some exported global variables.
 ssgStateSelector* grEnvSelector = 0;
 cgrMultiTexState* grEnvState = 0;
@@ -830,8 +844,8 @@ grLoadBackground()
             nEnvShadowIndex = NEnvShadowNightIndex;
         else if (grTrack->local.rain > 0) // Rain => full cloud cover.
             nEnvShadowIndex = NEnvShadowFullCoverRainIndex;
-        else
-            nEnvShadowIndex = grTrack->local.clouds;
+        else if (grTrack->local.clouds < NEnvShadowIndices)
+            nEnvShadowIndex = EnvShadowIndices[ grTrack->local.clouds ];
     }
     if (nEnvShadowIndex >= 0)
     {
@@ -930,7 +944,7 @@ grPreDrawSky(tSituation* s, float fogStart, float fogEnd, class cGrCamera *cam)
 {
     //static const double m_log01 = -log( 0.01 );
     //static const double sqrt_m_log01 = sqrt( m_log01 );
-    GLbitfield clear_mask;
+    GLbitfield clear_mask = 0;
 
     if (grSkyDomeDistance )
     {
