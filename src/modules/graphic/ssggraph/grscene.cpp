@@ -41,6 +41,16 @@
 // (does not apply to the no-building pit, with the low wall, which already supports PNG).
 //#define PNG_LOGO_SUPPORT 1
 
+/* from grloadac.cpp (beuark!) */
+extern double shad_xmax;
+extern double shad_ymax;
+extern double shad_xmin;
+extern double shad_ymin;
+extern double t_xmax;
+extern double t_ymax;
+extern double t_xmin;
+extern double t_ymin;
+
 // Some public global variables.
 int grWrldX;
 int grWrldY;
@@ -239,6 +249,12 @@ grLoadScene(tTrack *track)
     ssgModelPath(buf);
 
     desc = grssgLoadAC3D(acname, NULL);
+
+    shad_xmax=t_xmax;
+    shad_ymax=t_ymax;
+    shad_xmin=t_xmin;
+    shad_ymin=t_ymin;
+
     LandAnchor->addKid(desc);
 
     GfLogDebug("End Loading scene ...\n");

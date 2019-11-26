@@ -622,14 +622,14 @@ SDHUD::SDHUD()
     this->remainingFuelForLaps = 0.0f;
 
     //
-    this->laptimeFreezeCountdown = 3.0f;//keep display for x seconds
+    this->laptimeFreezeCountdown = 3.0f;     //keep display for x seconds
     this->laptimeFreezeTime = 0.0f;
-    this->timeDiffFreezeCountdown = 8.0f;//keep display for x seconds
+    this->timeDiffFreezeCountdown = 8.0f;    //keep display for x seconds
     this->timeDiffFreezeTime = 0.0f;
     this->oldSector = 0;
-    this->oldBestLapTime;
-    this->oldBestSplitTime;
-    this->oldLapTime;
+    this->oldBestLapTime = 0.0f;
+    this->oldBestSplitTime = 0.0f;
+    this->oldLapTime = 0.0f;
     this->numberOfSectors = 0;
     this->oldLapNumber = 0;
 
