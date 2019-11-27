@@ -227,6 +227,7 @@ int refresh(tSituation *s)
     double Y = eye[1];
     double Z = eye[2];
     scenery->reposition(X, Y, Z );
+    scenery->update_tracklights(s->currentTime, s->_totTime, s->_raceType);
     render->UpdateSky(s->currentTime, s->accelTime, X, Y);
     screens->update(s, &frameInfo);
 

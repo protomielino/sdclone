@@ -60,7 +60,7 @@ SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
 
                      Scenery/OsgBackground.cpp
                      Scenery/OsgPit.cpp
-					 #Scenery/OsgTrackLight.cpp
+					 Scenery/OsgTrackLight.cpp
                      Scenery/OsgScenery.cpp 
 
                      Render/OsgRender.cpp

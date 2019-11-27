@@ -73,11 +73,13 @@ public:
     osg::ref_ptr<osg::Group> getPit() { return pit_root; }
 };
 
-/*class SDTrackLights
+class SDTrackLights
 {
 private:
-    osg::ref_ptr<osg::Group>    _osgtracklight;
-    bool    _number;
+    class Internal;
+    Internal *internal;
+    
+    osg::ref_ptr<osg::Group> _osgtracklight;
 
 public:
     // Constructor
@@ -86,9 +88,11 @@ public:
     // Destructor
     ~SDTrackLights(void);
 
-    void build(const std::string strTrack);
+    void build(tTrack *track);
+    void update(double currentTime, double totTime, int raceType);
+
     osg::ref_ptr<osg::Group> getTrackLight() { return _osgtracklight.get(); }
-};*/
+};
 
 static double grWrldX =		  0.0;
 static double grWrldY =		  0.0;
@@ -100,7 +104,7 @@ class SDScenery
 private:
     SDBackground	*m_background;
     SDPit           *m_pit;
-    //SDTrackLights   *m_tracklights;
+    SDTrackLights   *m_tracklights;
 
     osg::ref_ptr<osg::Group> _scenery;
 
@@ -134,6 +138,7 @@ public:
     void LoadScene(tTrack *track);
     void ShutdownScene(void);
 	void reposition(double X, double Y, double Z);
+	void update_tracklights(double currentTime, double totTime, int raceType);
 
     inline static double getWorldX(){return grWrldX;}
     inline static double getWorldY(){return grWrldY;}
@@ -145,7 +150,7 @@ public:
     osg::ref_ptr<osg::Group> getScene() { return _scenery.get(); }
     osg::ref_ptr<osg::Group> getBackground() { return m_background->getBackground(); }
     osg::ref_ptr<osg::Group> getPit() { return m_pit->getPit(); }
-    //osg::ref_ptr<osg::Group> getTracklight() { return m_tracklights->getTrackLight(); }
+    osg::ref_ptr<osg::Group> getTracklight() { return m_tracklights->getTrackLight(); }
 };
 
 #endif //_OSGSCENERY_H_

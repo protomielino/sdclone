@@ -35,6 +35,8 @@
 
 SDScenery::SDScenery(void) :
     m_background(NULL),
+    m_pit(NULL),
+    m_tracklights(NULL),
     _scenery(NULL),
     SDTrack(NULL)
 {
@@ -58,6 +60,7 @@ SDScenery::~SDScenery(void)
 {
     delete	m_background;
     delete  m_pit;
+    delete  m_tracklights;
     delete SDTrack;
 
     if(_scenery != NULL)
@@ -79,6 +82,7 @@ void SDScenery::LoadScene(tTrack *track)
 
     m_background = new SDBackground;
     m_pit = new SDPit;
+    m_tracklights = new SDTrackLights;
     _scenery = new osg::Group;
     SDTrack = track;
 
@@ -179,6 +183,9 @@ void SDScenery::LoadScene(tTrack *track)
     
     m_pit->build(track);
 	_scenery->addChild(m_pit->getPit());
+    
+    m_tracklights->build(track);
+	_scenery->addChild(m_tracklights->getTrackLight());
 
     osgDB::Registry::instance()->setDataFilePathList( osgDB::FilePathList() );
     osgDB::Registry::instance()->clearObjectCache();
@@ -257,4 +264,9 @@ bool SDScenery::LoadTrack(std::string& strTrack)
 void SDScenery::reposition(double X, double Y, double Z)
 {
 	m_background->reposition(X, Y, getWorldZ() / 2);
+}
+
+void SDScenery::update_tracklights(double currentTime, double totTime, int raceType)
+{
+    m_tracklights->update(currentTime, totTime, raceType);
 }
