@@ -1,7 +1,6 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
 SET(SSGGRAPH_HEADERS grMoonpos.h grSky.h
-					 grshader.h grshader.cpp
                      grSphere.h grStars.cpp
                      grboard.h grcam.h grcar.h
                      grcarlight.h grmain.h 
@@ -34,6 +33,9 @@ SET(SSGGRAPH_SOURCES grMoonpos.cpp
                      ssggraph.cpp)
 
 SET(SSGGRAPH_OTHER_SOURCES )
+IF(NOT APPLE)
+    SET(SSGGRAPH_HEADERS ${SSGGRAPH_HEADERS} grshader.h grshader.cpp)
+ENDIF(NOT APPLE)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)

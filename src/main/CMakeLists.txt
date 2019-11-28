@@ -49,7 +49,7 @@ ENDIF(UNIX)
 SD_INSTALL_FILES(BIN TARGETS ${_TARGET_NAME})
 
 IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
-   SET(OSG_PLUGIN_VERSION 3.6.3)
+   SET(OSG_PLUGIN_VERSION 3.6.4)
 SET(OSG_PLUGIN_DIR /opt/local/lib/osgPlugins-${OSG_PLUGIN_VERSION})
    message("OSG_PLUGIN_DIR = ${OSG_PLUGIN_DIR}")
    INSTALL(FILES ../../packaging/OSX/Info.plist DESTINATION ./Contents)
@@ -57,7 +57,14 @@ INSTALL(FILES ../../packaging/OSX/sd-icon-mac-256.icns DESTINATION ./Contents/Re
    SET(APPS "\${CMAKE_INSTALL_PREFIX}/games/${_TARGET_NAME}")
    SET(DIRS)
 #SET(DIRS ${DIRS} "${OSG_PLUGIN_DIR}")
+   
+   # need to switch on CMake version 3.8.0 ??
+   # use MacOS before 3.8.0
+   # use Frameworks from 3.8.0 onward
    SET(DIRS ${DIRS} "\${CMAKE_INSTALL_PREFIX}/MacOS")
+   SET(DIRS ${DIRS} "\${CMAKE_INSTALL_PREFIX}/Frameworks")
+
+
    SET(DIRS ${DIRS} "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib")
    SET(DIRS ${DIRS} /opt/local/lib)
 

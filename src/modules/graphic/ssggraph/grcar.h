@@ -26,7 +26,9 @@
 #include <car.h>		//tCarElt
 #include <raceman.h>	//tSituation
 #include "grcam.h"		//cGrPerspCamera
+#ifndef __APPLE__
 #include "grshader.h"   //cGrShader
+#endif
 
 class cGrSkidmarks;
 class ssgVtxTableShadow;
@@ -95,7 +97,9 @@ public:
     tdble				py;
     tdble				sx;
     tdble				sy;
+#ifndef __APPLE__
     cgrShader           *shader;
+#endif
 };
 
 extern tgrCarInfo	*grCarInfo;
