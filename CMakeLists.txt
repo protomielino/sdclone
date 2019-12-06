@@ -130,7 +130,12 @@ SD_INSTALL_FILES(DATA "/"  FILES ${_SOURCES})
 # Initialize user settings file management (before any of them is collected).
 SD_SETUP_SETTINGS_VERSION()
 
-# Sub-dirs to build ...					   
+# Setup empty GLOBAL lists for robots and modules
+SET_PROPERTY(GLOBAL PROPERTY SD_MODULE_LIST "")
+SET_PROPERTY(GLOBAL PROPERTY SD_ROBOT_LIST "")
+SET_PROPERTY(GLOBAL PROPERTY SD_OSG_PLUGIN_LIST "")
+
+# Sub-dirs to build ...
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(cmake)
