@@ -72,13 +72,13 @@ ENDIF(IN_SOURCETREE)
 
 # Determine the default value of the user settings folder.
 IF(WIN32)
-  SET(SD_LOCALDIR "~/speed-dreams-2.settings" CACHE DOC "Where the user settings files should go")
+  SET(SD_LOCALDIR "~/speed-dreams-2.settings" CACHE PATH "Where the user settings files should go")
 ELSE(WIN32) #UNIX
-  SET(SD_LOCALDIR "~/.speed-dreams-2" CACHE DOC "Where the user settings files should go")
+  SET(SD_LOCALDIR "~/.speed-dreams-2" CACHE PATH "Where the user settings files should go")
 ENDIF(WIN32)
 
 # Determine the default value of the tools executable file prefix.
-SET(SD_TOOLS_EXECPREFIX "sd2-" CACHE DOC "Prefix for the tools executable names")
+SET(SD_TOOLS_EXECPREFIX "sd2-" CACHE PATH "Prefix for the tools executable names")
 MARK_AS_ADVANCED(SD_TOOLS_EXECPREFIX)
 
 # Determine the default value of the data, bin and lib (and man) folders.
