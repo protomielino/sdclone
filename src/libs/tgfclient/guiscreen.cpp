@@ -108,6 +108,8 @@ static tScreenSize ADefScreenSizes[] =
 	{ 1800, 1440 },
 	{ 1920, 1080 },
 	{ 1920, 1200 },
+    { 2560, 1080 },
+    { 2560, 1440 },
 	{ 3840, 2160 }
 };
 static const int NDefScreenSizes =

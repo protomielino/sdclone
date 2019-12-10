@@ -31,7 +31,7 @@ public:
 	MonitorMenu();
 	bool initialize(void* pPreviousMenu);
 	
-	enum EMonitorType { e4by3 = 0, e16by9 = 1, nMonitorTypes };
+	enum EMonitorType { e4by3 = 0, e16by9 = 1, e21by9 = 2, nMonitorTypes };
 	enum ESpanSplit { eDisabled = 0, eEnabled = 1, nSpanSplits };
 
 	void setMonitorType(EMonitorType eMode);

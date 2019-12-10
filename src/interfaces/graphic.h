@@ -124,6 +124,7 @@
 
 #define GR_SCT_MONITOR          "Monitor"
 #define GR_ATT_MONITOR          "monitor type"
+#define GR_VAL_MONITOR_21BY9    "21:9"
 #define GR_VAL_MONITOR_16BY9	"16:9"
 #define GR_VAL_MONITOR_4BY3		"4:3"
 #define GR_VAL_MONITOR_NONE		"none"

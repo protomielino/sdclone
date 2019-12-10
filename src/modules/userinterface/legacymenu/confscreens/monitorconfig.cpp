@@ -29,7 +29,7 @@
 
 
 // Some consts.
-static const char* AMonitorTypes[MonitorMenu::nMonitorTypes] = { "4:3", "16:9" };
+static const char* AMonitorTypes[MonitorMenu::nMonitorTypes] = { "4:3", "16:9", "21:9" };
 static const char* ASpanSplits[MonitorMenu::nSpanSplits] = { "Disabled", "Enabled" };
 
 static float _nBezelComp;
@@ -132,10 +132,11 @@ void MonitorMenu::loadSettings()
 	void* grHandle = 
 		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-	// Monitor Type : 4:3 or 16:9
+	// Monitor Type : 4:3, 16:9 or 21:9
 	const char *pszMonitorType =
 		GfParmGetStr(grHandle, GR_SCT_MONITOR, GR_ATT_MONITOR, GR_VAL_MONITOR_16BY9);
-	_eMonitorType = strcmp(pszMonitorType, GR_VAL_MONITOR_16BY9) ? e4by3: e16by9;
+	_eMonitorType = strcmp(pszMonitorType, GR_VAL_MONITOR_4BY3) == 0 ? e4by3 :
+	                strcmp(pszMonitorType, GR_VAL_MONITOR_21BY9) == 0 ? e21by9 : e16by9;
 
 	// Span Split Screens
 	const char *pszSpanSplit =
@@ -167,7 +168,7 @@ void MonitorMenu::storeSettings() const
 		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	const char* pszMonitorType =
-		(_eMonitorType == e16by9) ? GR_VAL_MONITOR_16BY9 : GR_VAL_MONITOR_4BY3;
+		(_eMonitorType == e4by3) ? GR_VAL_MONITOR_4BY3 : (_eMonitorType == e21by9) ? GR_VAL_MONITOR_21BY9 : GR_VAL_MONITOR_16BY9;
 	GfParmSetStr(grHandle, GR_SCT_MONITOR, GR_ATT_MONITOR, pszMonitorType);
 
 	const char* pszSpanSplit =

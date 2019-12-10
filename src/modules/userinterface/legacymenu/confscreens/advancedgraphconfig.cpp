@@ -47,7 +47,7 @@ static const char* ShadersValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_AT
 static const int NbShadersValues = sizeof(ShadersValues) / sizeof(ShadersValues[0]);
 static const char* SpansplitValues[] = { GR_VAL_NO, GR_VAL_YES };
 static const int NbSpansplitValues = sizeof(SpansplitValues) / sizeof(SpansplitValues[0]);
-static const char* MonitorValues[] = { GR_VAL_MONITOR_16BY9, GR_VAL_MONITOR_4BY3, GR_VAL_MONITOR_NONE };
+static const char* MonitorValues[] = { GR_VAL_MONITOR_16BY9, GR_VAL_MONITOR_4BY3, GR_VAL_MONITOR_21BY9, GR_VAL_MONITOR_NONE };
 static const int NbMonitorValues = sizeof(MonitorValues) / sizeof(MonitorValues[0]);
 
 static void	*ScrHandle = NULL;
