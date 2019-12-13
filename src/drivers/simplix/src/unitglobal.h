@@ -47,7 +47,7 @@
 #else                    // but in a poor world without walls and fences, ...
 #define myhypot hypot      // Use hypot
 #define myfopen fopen      // Use fopen
-#endif                   // ... who needs windows and gates?   
+#endif                   // ... who needs windows and gates?
 // ... but the answer is just 42!
 
 #include <portability.h> // could be used now without vc++ 2005 warnings ...
@@ -55,15 +55,15 @@
 /*
 // VC++ 2005 or newer ...
 #if defined(_CRT_SECURE_NO_DEPRECATE) // used with vc++ 2005
-#undef snprintf 
+#undef snprintf
 #define snprintf _snprintf_s
 #endif
 // ... VC++ 2005 or newer
 
 // VC++ 6.0 ...
-#if defined(WIN32) && !defined(snprintf_s) 
-#undef snprintf 
-#define snprintf _snprintf 
+#if defined(WIN32) && !defined(snprintf_s)
+#undef snprintf
+#define snprintf _snprintf
 #endif
 */
 #if defined(WIN32) && !defined(fopen_s)
@@ -89,7 +89,7 @@ extern GfLogger* PLogSimplix;
 #define LogSimplix (*PLogSimplix)
 
 //==========================================================================*
-// Racing line version marker 
+// Racing line version marker
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
 #define RL_VERSION 137 // Force new calculation
@@ -111,6 +111,7 @@ extern GfLogger* PLogSimplix;
 #define RTYPE_SIMPLIX_SRW  10                    // Robot type simplix_srw
 #define RTYPE_SIMPLIX_MPA11 11                   // Robot type simplix_mpa11
 #define RTYPE_SIMPLIX_MPA12 12                   // Robot type simplix_mpa12
+#define RTYPE_SIMPLIX_STOCK 13                   // Robot type simplix_stock
 //==========================================================================*
 
 //==========================================================================*
@@ -183,13 +184,13 @@ typedef TPath* PPath;
 class TPit;
 typedef TPit* PPit;
 
-class TQuadratic;  
+class TQuadratic;
 typedef TQuadratic* PQuadratic;
 
 class TSimpleStrategy;
 typedef TSimpleStrategy* PSimpleStrategy;
 
-class TSection;  
+class TSection;
 typedef TSection* PSection;
 
 class TTeamManager;
@@ -202,7 +203,7 @@ typedef TTrackDescription* PTrackDescription;
 //==========================================================================*
 // Type definitions for TORCS pointers
 //--------------------------------------------------------------------------*
-typedef tTrack* PTrack;                            // TORCS track  
+typedef tTrack* PTrack;                            // TORCS track
 typedef tCarElt* PtCarElt;                         // TORCS car
 typedef CarElt* PCarElt;                           // TORCS car
 typedef void* PCarHandle;                          // TORCS file handle
@@ -215,25 +216,25 @@ typedef tTrackSeg* PTrackSeg;                      // TORCS segment of track
 //==========================================================================*
 // Indices for the different racinglines
 //--------------------------------------------------------------------------*
-enum	               
+enum
 {
   RL_FREE,                                       // Racing untroubled
   RL_LEFT,                                       // Racing on left side
   RL_RIGHT,                                      // Racing on right side
 
-  gNBR_RL                                        // Nbr of racinglines 
+  gNBR_RL                                        // Nbr of racinglines
 };
 //==========================================================================*
 
 //==========================================================================*
 // Collision flags
 //--------------------------------------------------------------------------*
-enum	
+enum
 {
   F_LEFT			= 0x000001, // You are at my left side
   F_RIGHT			= 0x000002, // or my right side
   F_FRONT			= 0x000004, // in front of me
-  F_REAR			= 0x000008, // behind me 
+  F_REAR			= 0x000008, // behind me
 
   F_AHEAD			= 0x000010, // I see you in front of me
   F_AT_SIDE			= 0x000020, // or looking to a side
@@ -243,7 +244,7 @@ enum
   F_TRK_RIGHT		= 0x000200, // European
 
   F_CATCHING		= 0x001000, // Tom and
-  F_CATCHING_ACC	= 0x002000, //   Jerry 
+  F_CATCHING_ACC	= 0x002000, //   Jerry
   F_COLLIDE			= 0x004000, // My assurance nbr is ...
   F_TRAFFIC			= 0x008000, // Business as usual
   F_CLOSE			= 0x010000, // You are too close to me!
@@ -260,7 +261,7 @@ enum
 // #defines
 //--------------------------------------------------------------------------*
 // Array sizes ...
-#define NBR_BRAKECOEFF 50                        // Number of brake coeffs 
+#define NBR_BRAKECOEFF 50                        // Number of brake coeffs
 // ... Array sizes
 
 // my own planet ...
@@ -362,26 +363,26 @@ enum
 #ifndef FLOAT_NORM_PI_PI
 #define FLOAT_NORM_PI_PI(x) 				\
 { \
-	while ((x) > PI) { (x) -= (float)(2*PI); } \
-	while ((x) < -PI) { (x) += (float)(2*PI); } \
+    while ((x) > PI) { (x) -= (float)(2*PI); } \
+    while ((x) < -PI) { (x) += (float)(2*PI); } \
 }
 #endif
 
 #define DOUBLE_NORM_PI_PI(x) 				\
 { \
-	while ((x) > PI) { (x) -= 2*PI; } \
-	while ((x) < -PI) { (x) += 2*PI; } \
+    while ((x) > PI) { (x) -= 2*PI; } \
+    while ((x) < -PI) { (x) += 2*PI; } \
 }
 // ... Shortcuts for this robot
 
 // Internal parameters ...
-#define ANALYSE_STEPS 2 
+#define ANALYSE_STEPS 2
 #define LENGTH_MARGIN (3.0f) // Initial value for PRV_LENGTH_MARGIN
 #define AVG_KEEP (0.75)
-#define AVG_CHANGE (1 - AVG_KEEP) 
+#define AVG_CHANGE (1 - AVG_KEEP)
 #define MAX_SPEED_CRV 0.00175 // R = 571,428 m
-#define SIDE_MARGIN (0.5)   
-#define DELTA_T 0.0001   
+#define SIDE_MARGIN (0.5)
+#define DELTA_T 0.0001
 #define UNSTUCK_COUNTER 90
 #define MAXBLOCKED 9
 #define MAXPRESSURE "max pressure"
@@ -426,31 +427,31 @@ enum
 #define PRV_LENGTH_MARGIN	 "length margin"
 #define PRV_QUALIFICATION    "qualification"      // Practice as qualifying
 
-#define PRV_BRAKE_LIMIT      "brake limit" 
-#define PRV_BRAKE_LIMIT_SCALE "brake limit scale" 
-#define PRV_BRAKE_LIMIT_BASE "brake limit base" 
+#define PRV_BRAKE_LIMIT      "brake limit"
+#define PRV_BRAKE_LIMIT_SCALE "brake limit scale"
+#define PRV_BRAKE_LIMIT_BASE "brake limit base"
 
-#define PRV_CAR_CHARACTER    "character" 
-#define PRV_PERFORMANCE		 "performance" 
+#define PRV_CAR_CHARACTER    "character"
+#define PRV_PERFORMANCE		 "performance"
 
-#define PRV_SPEED_LIMIT_SCALE "speed limit scale" 
-#define PRV_SPEED_LIMIT_BASE "speed limit base" 
+#define PRV_SPEED_LIMIT_SCALE "speed limit scale"
+#define PRV_SPEED_LIMIT_BASE "speed limit base"
 
-#define PRV_PIT_USE_FIRST    "pit use first" 
-#define PRV_PIT_USE_SMOOTH   "pit use smooth" 
-#define PRV_PITLANE_ENTRY    "pitlane entry offset" 
-#define PRV_PITLANE_EXIT     "pitlane exit offset" 
+#define PRV_PIT_USE_FIRST    "pit use first"
+#define PRV_PIT_USE_SMOOTH   "pit use smooth"
+#define PRV_PITLANE_ENTRY    "pitlane entry offset"
+#define PRV_PITLANE_EXIT     "pitlane exit offset"
 #define PRV_PIT_ENTRY_LONG	 "pit entry long"
 #define PRV_PIT_EXIT_LONG	 "pit exit long"
 #define PRV_PIT_EXIT_LEN	 "pit exit length"
 #define PRV_PIT_LAT_OFFS	 "pit lat offset"
 #define PRV_PIT_LONG_OFFS	 "pit long offset"
-#define PRV_PIT_SCALE_BRAKE  "pit scale brake" 
+#define PRV_PIT_SCALE_BRAKE  "pit scale brake"
 #define PRV_PIT_STOP_DIST    "pit stop dist"
 #define PRV_PIT_BRAKE_DIST   "pit brake dist"
 #define PRV_PIT_MINENTRYSPEED "pit min entry speed"
 #define PRV_PIT_MINEXITSPEED "pit min exit speed"
-#define PRV_PIT_TEST_STOP    "pit test stop" 
+#define PRV_PIT_TEST_STOP    "pit test stop"
 
 #define PRV_TELE_MODE        "telemetrie mode"    // enable telemetrie output
 
@@ -464,20 +465,20 @@ enum
 #define PRV_SCALE_BUMPOUTER  "scale bump outer"   // Scale bump detection outside
 #define PRV_LIMIT_SIDE_USE   "limit side use"     // Limit side use
 #define PRV_LIMIT_SIDE_WIDTH "limit side width"   // Limit side use width
-#define PRV_SCALE_MU         "scale mu"           // Scale friction calculation 
-#define PRV_SCALE__MU        "scale_mu"           // Scale friction calculation 
-#define PRV_SCALE_FRICTION	 "scale friction"     // Scale friction calculation 
-#define PRV_SCALE_BRAKING	 "scale braking"      // Scale brake calculation 
+#define PRV_SCALE_MU         "scale mu"           // Scale friction calculation
+#define PRV_SCALE__MU        "scale_mu"           // Scale friction calculation
+#define PRV_SCALE_FRICTION	 "scale friction"     // Scale friction calculation
+#define PRV_SCALE_BRAKING	 "scale braking"      // Scale brake calculation
 #define PRV_MAX_BRAKING	     "max braking"        // Max brake
 
 #define PRV_SCALE_BRAKE_Q    "qualy brake"        // Scale brake force for qualyfying
-#define PRV_SCALE_MU_Q       "qualy mu"           // Scale friction calculation for qualyfying 
+#define PRV_SCALE_MU_Q       "qualy mu"           // Scale friction calculation for qualyfying
 
 #define PRV_SCALE_MIN_MU     "scale min mu"
 #define PRV_SCALE_STEER	     "scale steer"
 
 #define PRV_UGLY_CRVZ        "ugly crvz"          // Use stiff crv
-#define PRV_SLOW_RADIUS      "slow radius"        // Radius to start slow down 
+#define PRV_SLOW_RADIUS      "slow radius"        // Radius to start slow down
 
 #define PRV_SIDE_MU          "side mu"            // Scale friction calculation for sides
 #define PRV_RAIN_MU          "scale mu rain"      // Scale friction calculation for sides
@@ -513,15 +514,15 @@ enum
 #define PRV_INIT_BRAKE       "initial brake"     // Scale brake coeff
 #define PRV_NEEDS_SIN        "sin long"          // default false
 
-#define PRV_TCL_RANGE        "tcl range"         // default 10.0    
-#define PRV_TCL_SLIP         "tcl slip"          // default 1.6    
-#define PRV_TCL_FACTOR       "tcl factor"        // default 1.0    
-#define PRV_DRIFT_FACTOR     "drift factor"      // default 1.0    
-//#define PRV_TCL_ACCEL        "tcl accel"         // default 0.1    
-//#define PRV_TCL_ACCELFACTOR  "tcl accelfactor"   // default 1.0    
+#define PRV_TCL_RANGE        "tcl range"         // default 10.0
+#define PRV_TCL_SLIP         "tcl slip"          // default 1.6
+#define PRV_TCL_FACTOR       "tcl factor"        // default 1.0
+#define PRV_DRIFT_FACTOR     "drift factor"      // default 1.0
+//#define PRV_TCL_ACCEL        "tcl accel"         // default 0.1
+//#define PRV_TCL_ACCELFACTOR  "tcl accelfactor"   // default 1.0
 
-#define PRV_ABS_DELTA        "abs delta"         // default 1.1    
-#define PRV_ABS_SCALE        "abs scale"         // default 0.5    
+#define PRV_ABS_DELTA        "abs delta"         // default 1.1
+#define PRV_ABS_SCALE        "abs scale"         // default 0.5
 
 #define PRV_CLUTCH_MAX       "clutch max"        // default 0.5
 #define PRV_CLUTCH_DELTA     "clutch delta"      // default 0.05
@@ -533,14 +534,14 @@ enum
 
 #define PRV_TEAM_ENABLE      "team enable"       // default 1
 
-#define PRV_WEATHER_DRY      "dry code"          // default 1.0    
-#define PRV_SHOW_PLOT        "show plot"          
+#define PRV_WEATHER_DRY      "dry code"          // default 1.0
+#define PRV_SHOW_PLOT        "show plot"
 // ... Parameters of this robot
 
 // Parameter candidates ...
 
 #define SLOWSPEED (5.0)
-// ... Parameter candidates 
+// ... Parameter candidates
 //==========================================================================*
 #endif // _UNITGOBAL_H_
 //--------------------------------------------------------------------------*

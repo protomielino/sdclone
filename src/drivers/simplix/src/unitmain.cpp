@@ -464,6 +464,22 @@ void SetUpSimplix_ref()
     TDriver::UseRacinglineParameters = true;
     TDriver::UseWingControl = true;
 };
+
+//==========================================================================*
+// Schismatic entry point for simplix_mpa12
+//--------------------------------------------------------------------------*
+void SetUpSimplix_stock()
+{
+    cRobotType = RTYPE_SIMPLIX_STOCK;
+    SetParameters(NBBOTS, "stock-deckard-72montecristo");
+    TDriver::AdvancedParameters = true;
+    TDriver::UseBrakeLimit = false;
+    TDriver::UseMPA1Skilling = true;
+    TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
+    TDriver::UseRacinglineParameters = true;
+};
+//==========================================================================*
+
 //==========================================================================*
 
 //==========================================================================*
@@ -937,6 +953,18 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_REF)
   {
     LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_REF\n");
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
+//    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_REF;
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
+//    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix;
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
+  }
+  else if (cRobotType == RTYPE_SIMPLIX_STOCK)
+  {
+    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_STOCK\n");
     cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
 //    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_REF;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
