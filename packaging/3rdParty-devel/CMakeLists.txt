@@ -377,15 +377,22 @@ endif(OPTION_PNG)
 
 if(OPTION_SQLITE3)
    # may only be needed for Simon's replay stuff
-   ExternalProject_Add(sqlite3-3.25.3
-   URL https://www.sqlite.org/2018/sqlite-autoconf-3250300.tar.gz
-   URL_HASH SHA256=00ebf97be13928941940cc71de3d67e9f852698233cd98ce2d178fd08092f3dd
+   ExternalProject_Add(sqlite3-3.30.1
+   URL https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip
+   URL_HASH SHA256=adf051d4c10781ea5cfabbbc4a2577b6ceca68590d23b58b8260a8e24cc5f081
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-   UPDATE_COMMAND ""
-   PATCH_COMMAND ""
-   CONFIGURE_COMMAND ""
-   BUILD_COMMAND ""
-   INSTALL_COMMAND ""  
+   #UPDATE_COMMAND ""
+   #PATCH_COMMAND ""
+   #CONFIGURE_COMMAND ""
+   #BUILD_COMMAND ""
+   #INSTALL_COMMAND ""  
+   )
+   ExternalProject_Add_Step(sqlite3-3.30.1 sqlite3_add_cmake
+   COMMAND ${CMAKE_COMMAND} -E copy_if_different
+           "${CMAKE_SOURCE_DIR}/patches/sqlite3-CMakeLists.txt"
+           "<SOURCE_DIR>/CMakeLists.txt"
+   DEPENDEES update # do after update
+   DEPENDERS patch  # do before patch
    )
 endif(OPTION_SQLITE3)
 
