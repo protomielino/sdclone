@@ -201,7 +201,7 @@ osg::Node* SDSun::build( std::string path, double dist, double sun_size )
     return sun_transform.get();
 }
 
-bool SDSun::repaint( double sun_angle, double new_visibility )
+bool SDSun::repaint( double angle, double new_visibility )
 {
     if ( visibility != new_visibility )
     {
@@ -213,9 +213,9 @@ bool SDSun::repaint( double sun_angle, double new_visibility )
         sun_exp2_punch_through = sqrt_m_log01 / ( visibility * 15 );
     }
 
-    if ( prev_sun_angle != sun_angle )
+    if ( prev_sun_angle != angle )
     {
-        prev_sun_angle = sun_angle;
+        prev_sun_angle = angle;
 
         double aerosol_factor;
         if ( visibility < 100 )
@@ -340,9 +340,9 @@ bool SDSun::reposition( osg::Vec3d p, double angle)
 bool SDSun::update_color_angle( double angle )
 {
     // Suncolor related things:
-    if ( prev_sun_angle != sun_angle )
+    if ( prev_sun_angle != angle )
     {
-        if ( sun_angle == 0 ) sun_angle = 0.1;
+        if ( angle == 0 ) angle = 0.1;
         const double r_earth_pole = 6356752.314;
         const double r_tropo_pole = 6356752.314 + 8000;
         const double epsilon_earth2 = 6.694380066E-3;

@@ -103,14 +103,14 @@ osg::Node* SDMoon::build( std::string path, double dist, double size )
     return moon_transform.get();
 }
 
-bool SDMoon::repaint( double moon_angle )
+bool SDMoon::repaint( double angle )
 {
-    if (prev_moon_angle == moon_angle)
+    if (prev_moon_angle == angle)
         return true;
 
-    prev_moon_angle = moon_angle;
+    prev_moon_angle = angle;
 
-    float moon_factor = 4*cos(moon_angle);
+    float moon_factor = 4*cos(angle);
 
     if (moon_factor > 1) moon_factor = 1.0;
     if (moon_factor < -1) moon_factor = -1.0;
