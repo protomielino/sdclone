@@ -11,6 +11,8 @@ SET(ROBOT_SOURCES src/Array.h
 				src/AveragedData.h
 				src/Avoidance.cpp
 				src/Avoidance.h
+				src/CarBounds2d.cpp
+				src/CarBounds2d.h
 				src/CarModel.cpp
 				src/CarModel.h
 				src/ClothoidPath.cpp
@@ -58,6 +60,8 @@ SET(ROBOT_SOURCES src/Array.h
 				src/Span.h
 				src/Strategy.cpp
 				src/Strategy.h
+				src/Stuck.cpp
+				src/Stuck.h
 				src/TeamInfo.cpp 
 				src/TeamInfo.h
 				src/Utils.cpp 

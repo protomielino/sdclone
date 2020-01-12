@@ -39,6 +39,7 @@
 #include "LinePath.h"
 #include "PtInfo.h"
 #include "Strategy.h"
+#include "Stuck.h"
 #include "teammanager.h"
 
 #define SECT_PRIV               "private"
@@ -189,6 +190,13 @@ public:
 
   void		InitTrack(tTrack* track, void* carHandle, void** carParmHandle, tSituation* s);
   void		NewRace(tCarElt* car, tSituation* s );
+  void		Drive(tSituation* s);
+  int		PitCmd(tSituation* s);
+  void		EndRace(tSituation* s);
+  void		Shutdown();
+
+  bool		Pitting(int path, double pos) const;
+  bool		Pitting(tCarElt* car) const;
 
   void		GetPtInfo( int path, double pos, PtInfo& pi ) const;
   void		GetPosInfo( double pos, PtInfo& pi, double u, double v ) const;
@@ -231,11 +239,6 @@ public:
   void		SpeedControl5(double targetSpd, double spd0, CarElt* car,  double& acc, double& brk );
   void		SpeedControl6(double targetSpd, double spd0, CarElt* car,  double& acc, double& brk );
   void		SpeedControl( int which, double targetSpd, double spd0,    CarElt* car, double& acc, double& brk );
-
-  void		Drive(tSituation* s );
-  int		PitCmd(tSituation* s );
-  void		EndRace(tSituation* s );
-  void		Shutdown();
 
   double    CurrSimTime;                    // Current simulation time
   double              Frc;                            // Friction coefficient
@@ -356,6 +359,11 @@ private:
   enum
   {
     MAX_OPP = 100
+  };
+
+  enum StuckAction
+  {
+	  NOT_STUCK, STUCK_GO_BACKWARDS, STUCK_GO_FORWARDS,
   };
 
 private:
@@ -481,19 +489,21 @@ private:
   double    m_JumpOffset;           // Offset for calculation of jumps
   bool      m_FirstJump;
   int       m_Flying;               // Flag prepare landing
-  int		m_nCars;
-  int		m_myOppIdx;
-  Opponent	*m_opp;                  // info about other cars.
-  double	m_avgAY;
-  bool      m_raceStart;
-  double	m_avoidS;				// where we are LR->T (0..1).
-  double	m_avoidSVel;
-  double	m_avoidT;				// where we are L->R (-1..1).
-  double	m_avoidTVel;
-  double	m_avoidU;
-  double	m_avoidV;
-  double	m_attractor;			// where we want to be.
-  int		m_followPath;			// path we want to follow;
+  int			m_nCars;
+  int			m_myOppIdx;
+  Opponent		*m_opp;                  // info about other cars.
+  double		m_avgAY;
+  bool			m_raceStart;
+  double		m_avoidS;				// where we are LR->T (0..1).
+  double		m_avoidSVel;
+  double		m_avoidT;				// where we are L->R (-1..1).
+  double		m_avoidTVel;
+  double		m_avoidU;
+  double		m_avoidV;
+  double		m_attractor;			// where we want to be.
+  int			m_followPath;			// path we want to follow;
+  Stuck			m_stuckThing;
+  StuckAction	m_stuck;
 
   LinearRegression	m_accBrkCoeff;                      //
   double	m_brkCoeff[50];

@@ -134,9 +134,11 @@ protected:
     float lastPitFuel;              // Amount refueled, special case when we refuel.
     float lastFuel;                 // The fuel available when we cross the start lane.
     float fuelSum;        			// All the fuel used needed for the race.
+	double fuelSumPerMeter;
     int counterFuelLaps;     		// Counter of the total laps.
     int countPitStop;               // Counter of the total pits stop.
     double avgFuelPerLap;    		// The average amount of fuel we needed for a lap.
+	double avgFuelPerMeter;
     int m_maxDamage;                // The Max damage set in the XML file.
     float m_Fuel;                   // The new average fuel per lap
     float m_expectedfuelperlap;		// Expected fuel per lap (may be very inaccurate).

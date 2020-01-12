@@ -32,6 +32,8 @@ public:
 	double		oang;	// global angle.
 	double		toL;	// distance to edge of track on left.
 	double		toR;	// distance to edge of track on right.
+	double      extL;
+	double      extR;
 	double		k;	// curvature at point.
 	double		kz;     // curvature in z at point
 	double		spd;	// speed.
