@@ -188,6 +188,8 @@ public:
   TDriver(int index);                             //  Constructor
   ~TDriver();                                     // Destructor
 
+  void	    SetShared( Shared* pShared );
+
   void		InitTrack(tTrack* track, void* carHandle, void** carParmHandle, tSituation* s);
   void		NewRace(tCarElt* car, tSituation* s );
   void		Drive(tSituation* s);
@@ -363,7 +365,7 @@ private:
 
   enum StuckAction
   {
-	  NOT_STUCK, STUCK_GO_BACKWARDS, STUCK_GO_FORWARDS,
+      NOT_STUCK, STUCK_GO_BACKWARDS, STUCK_GO_FORWARDS,
   };
 
 private:

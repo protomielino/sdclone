@@ -231,6 +231,11 @@ static void* MergeParamFile( void* hParams, const char* fileName )
                               GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
 }
 
+void TDriver::SetShared( Shared* pShared )
+{
+    m_pShared = pShared;
+}
+
 //==========================================================================*
 
 //==========================================================================*
@@ -603,7 +608,7 @@ void TDriver::InitTrack( tTrack* pTrack, void* pCarHandle, void** ppCarParmHandl
     oCarHasESP = true;
     */
     START_HOLD_LINE_TIME = GfParmGetNum(hCarParm, SECT_PRIV, PRV_STARTLINE, 0, 5.0f);
-    m_pShared = new Shared();
+    //m_pShared = new Shared();
 
     MyTrack::SideMod	sideMod;
     sideMod.side = -1;
@@ -772,15 +777,15 @@ void TDriver::NewRace( tCarElt* pCar, tSituation* pS )
 
 bool TDriver::Pitting(int path, double pos) const
 {
-	return	m_Strategy->needPitstop(car, m_Situation) &&
-		m_pitPath[path].ContainsPos(pos);
+    return	m_Strategy->needPitstop(car, m_Situation) &&
+        m_pitPath[path].ContainsPos(pos);
 }
 
 bool TDriver::Pitting(tCarElt* car) const
 {
-	double	pos = m_track.CalcPos(car);
+    double	pos = m_track.CalcPos(car);
 
-	return Pitting(PATH_NORMAL, pos);
+    return Pitting(PATH_NORMAL, pos);
 }
 
 void TDriver::GetPtInfo( int path, double pos, PtInfo& pi ) const
@@ -1871,18 +1876,18 @@ void TDriver::Drive( tSituation* s )
     m_LastAccel = acc;
     m_LastAbsDriftAngle = m_AbsDriftAngle;
 
-	const Opponent::Sit& mySit = m_opp[car->index].GetInfo().sit;
-	m_stuck = NOT_STUCK;
+    const Opponent::Sit& mySit = m_opp[car->index].GetInfo().sit;
+    m_stuck = NOT_STUCK;
 
-	bool doStuckThing = true;
+    bool doStuckThing = true;
 
-	if (Pitting(car))
-	{
-		doStuckThing = false;
-	}
+    if (Pitting(car))
+    {
+        doStuckThing = false;
+    }
 
-	if (doStuckThing)
-		m_stuckThing.execute(m_track, s, car, mySit);
+    if (doStuckThing)
+        m_stuckThing.execute(m_track, s, car, mySit);
 
     m_Strategy->update(car, s);
     //m_Strategy->needPitstop(car, m_Situation);
