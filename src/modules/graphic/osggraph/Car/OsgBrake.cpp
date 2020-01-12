@@ -18,9 +18,7 @@
  ***************************************************************************/
 
 #include <osg/Geometry>
-#include <osg/CullFace>
-#include <osg/Material>
-#include <osg/ShadeModel>
+#include <osg/Geode>
 
 #include <portability.h>
 
@@ -37,31 +35,22 @@ osg::Node *SDBrakes::initBrake(int wheelIndex)
     float	alpha;
     osg::Vec3 vtx;
     osg::Vec4 clr;
-    osg::Vec3 nrm;
     osg::Vec2 tex;
     float	b_offset = 0;
     tdble	curAngle = 0.0;
     int i;
 
+    tdble tireWidth = car->_tireWidth(wheelIndex);
+    tdble brakeDiskRadius = car->_brakeDiskRadius(wheelIndex);
+
     osg::Geode *pBrake = new osg::Geode;
-
     pBrake->setName("Brake Assembly");
-	pBrake->setCullingActive(false);
-
-	osg::StateSet* stateSet = pBrake->getOrCreateStateSet();
-
-    osg::ShadeModel* shadeModel = new osg::ShadeModel;
-    shadeModel->setMode(osg::ShadeModel::SMOOTH);
-    stateSet->setAttributeAndModes(shadeModel);
-    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-    stateSet->setMode(GL_FOG, osg::StateAttribute::ON);
-    stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
+    pBrake->setCullingActive(false);
+    osg::StateSet* stateSet = pBrake->getOrCreateStateSet();
+    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
     stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
     stateSet->setMode(GL_BLEND, osg::StateAttribute::OFF);
     stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
-
-    osg::Material* material = new osg::Material;
-    stateSet->setAttribute(material);
 
     int brakeBranch = 32;
     float brakeAngle = 2.0 * SD_PI / (tdble)brakeBranch;
@@ -71,26 +60,25 @@ osg::Node *SDBrakes::initBrake(int wheelIndex)
     {
     case FRNT_RGT:
         curAngle = -(SD_PI / 2.0 + brakeAngle);
-        b_offset = brakeOffset - car->_tireWidth(wheelIndex) / 2.0;
+        b_offset = brakeOffset - tireWidth / 2.0;
         break;
     case FRNT_LFT:
         curAngle = -(SD_PI / 2.0 + brakeAngle);
-        b_offset = car->_tireWidth(wheelIndex) / 2.0 - brakeOffset;
+        b_offset = tireWidth / 2.0 - brakeOffset;
         break;
     case REAR_RGT:
         curAngle = (SD_PI / 2.0 - brakeAngle);
-        b_offset = brakeOffset - car->_tireWidth(wheelIndex) / 2.0;
+        b_offset = brakeOffset - tireWidth / 2.0;
         break;
     case REAR_LFT:
         curAngle = (SD_PI / 2.0 - brakeAngle);
-        b_offset = car->_tireWidth(wheelIndex) / 2.0 - brakeOffset;
+        b_offset = tireWidth / 2.0 - brakeOffset;
         break;
     }
 
     /* hub */
     osg::Vec3Array *hub_vtx = new osg::Vec3Array();
     osg::Vec4Array *hub_clr = new osg::Vec4Array();
-    osg::Vec3Array *hub_nrm = new osg::Vec3Array();
 
     tdble hubRadius;
 
@@ -99,7 +87,7 @@ osg::Node *SDBrakes::initBrake(int wheelIndex)
     vtx[1] = b_offset;
     hub_vtx->push_back(vtx);
 
-    hubRadius = car->_brakeDiskRadius(wheelIndex) * 0.6;
+    hubRadius = brakeDiskRadius * 0.6;
     for (i = 0; i < brakeBranch; i++)
     {
         alpha = (float)i * 2.0 * SD_PI / (float)(brakeBranch - 1);
@@ -112,111 +100,72 @@ osg::Node *SDBrakes::initBrake(int wheelIndex)
     clr[0] = clr[1] = clr[2] = 0.0;
     clr[3] = 1.0;
     hub_clr->push_back(clr);
-    nrm[0] = nrm[2] = 0.0;
-
-    // Make normal point outside to have proper lighting.
-    switch(wheelIndex)
-    {
-    case FRNT_RGT:
-    case REAR_RGT:
-        nrm[1] = -1.0;
-        break;
-    case FRNT_LFT:
-    case REAR_LFT:
-        nrm[1] = 1.0;
-        break;
-    }
-
-    hub_nrm->push_back(nrm);
 
     osg::Geometry *pHub = new osg::Geometry;
     pHub->setName("Hub");
-    pHub->addPrimitiveSet( new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_FAN, 0, brakeBranch+1 ));
-
     pHub->setVertexArray(hub_vtx);
-    pHub->setColorArray(hub_clr);
-    pHub->setNormalArray(hub_nrm);
-
-    pHub->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
-    pHub->setNormalBinding(osg::Geometry::BIND_OFF);
+    pHub->setColorArray(hub_clr, osg::Array::BIND_OVERALL);
+    pHub->addPrimitiveSet( new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_FAN, 0, hub_vtx->size()) );
 
     pBrake->addDrawable(pHub);
 
     /* Brake disk */
     osg::Vec3Array *brk_vtx = new osg::Vec3Array();
-    brk_clr = new osg::Vec4Array();
-    osg::Vec3Array *brk_nrm = new osg::Vec3Array();
+    osg::Vec4Array *brk_clr = new osg::Vec4Array();
 
     for (i = 0; i < (brakeBranch / 2 + 2); i++)
     {
         alpha = curAngle + (float)i * 2.0 * M_PI / (float)(brakeBranch - 1);
-        vtx[0] = car->_brakeDiskRadius(wheelIndex) * cos(alpha);
+        vtx[0] = brakeDiskRadius * cos(alpha);
         vtx[1] = b_offset;
-        vtx[2] = car->_brakeDiskRadius(wheelIndex) * sin(alpha);
+        vtx[2] = brakeDiskRadius * sin(alpha);
         brk_vtx->push_back(vtx);
-        vtx[0] = car->_brakeDiskRadius(wheelIndex) * cos(alpha) * 0.6;
+        vtx[0] = brakeDiskRadius * cos(alpha) * 0.6;
         vtx[1] = b_offset;
-        vtx[2] = car->_brakeDiskRadius(wheelIndex) * sin(alpha) * 0.6;
+        vtx[2] = brakeDiskRadius * sin(alpha) * 0.6;
         brk_vtx->push_back(vtx);
     }
 
     clr[0] = clr[1] = clr[2] = 0.1;
     clr[3] = 1.0;
     brk_clr->push_back(clr);
-    brk_nrm->push_back(nrm);
 
     osg::Geometry *pBDisc = new osg::Geometry;
     pBDisc->setName("Disc Brake");
-
-    pBDisc->addPrimitiveSet( new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP, 0, brakeBranch+4 ));
-
+    pBDisc->setUseDisplayList(false);
     pBDisc->setVertexArray(brk_vtx);
-    pBDisc->setColorArray(brk_clr.get());
-    pBDisc->setNormalArray(brk_nrm);
-
-    pBDisc->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
-    pBDisc->setNormalBinding(osg::Geometry::BIND_OFF);
+    pBDisc->setColorArray(brk_clr, osg::Array::BIND_OVERALL);
+    pBDisc->addPrimitiveSet( new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP, 0, brk_vtx->size()) );
 
     pBrake->addDrawable(pBDisc);
-
-    this->brake_disks[wheelIndex] = pBDisc;
+    brake_colors[wheelIndex] = brk_clr;
 
     /* Brake caliper */
     osg::Vec3Array *cal_vtx = new osg::Vec3Array();
     osg::Vec4Array *cal_clr = new osg::Vec4Array();
-    osg::Vec3Array *cal_nrm = new osg::Vec3Array();
 
     for (i = 0; i < (brakeBranch / 2 - 2); i++)
     {
         alpha = - curAngle + (float)i * 2.0 * SD_PI / (float)(brakeBranch - 1);
-        vtx[0] = (car->_brakeDiskRadius(wheelIndex) + 0.02) * cos(alpha);
+        vtx[0] = (brakeDiskRadius + 0.02) * cos(alpha);
         vtx[1] = b_offset;
-        vtx[2] = (car->_brakeDiskRadius(wheelIndex) + 0.02) * sin(alpha);
+        vtx[2] = (brakeDiskRadius + 0.02) * sin(alpha);
         cal_vtx->push_back(vtx);
-        vtx[0] = car->_brakeDiskRadius(wheelIndex) * cos(alpha) * 0.6;
+        vtx[0] = brakeDiskRadius * cos(alpha) * 0.6;
         vtx[1] = b_offset;
-        vtx[2] = car->_brakeDiskRadius(wheelIndex) * sin(alpha) * 0.6;
+        vtx[2] = brakeDiskRadius * sin(alpha) * 0.6;
         cal_vtx->push_back(vtx);
     }
 
-    clr[0] = 0.2;
-    clr[1] = 0.2;
-    clr[2] = 0.2;
+    clr[0] = clr[1] = clr[2] = 0.2;
     clr[3] = 1.0;
     cal_clr->push_back(clr);
-    cal_nrm->push_back(nrm);
 
     osg::Geometry *pCaliper = new osg::Geometry;
     pCaliper->setName("Caliper");
-    pCaliper->addPrimitiveSet( new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP, 0, brakeBranch-4 ));
-
     pCaliper->setVertexArray(cal_vtx);
-    pCaliper->setColorArray(cal_clr);
-    pCaliper->setNormalArray(cal_nrm);
-
-    pCaliper->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
-    pCaliper->setNormalBinding(osg::Geometry::BIND_OFF);
-
+    pCaliper->setColorArray(cal_clr, osg::Array::BIND_OVERALL);
+    pCaliper->addPrimitiveSet( new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP, 0, cal_vtx->size()) );
 
     pBrake->addDrawable(pCaliper);
 
@@ -224,19 +173,19 @@ osg::Node *SDBrakes::initBrake(int wheelIndex)
 }
 
 void SDBrakes::updateBrakes()
-{ // TODO clean unused memory ... free pointers if needed
+{
     for(int i=0; i<4; i++)
     {
         osg::Vec4 clr;
+        tdble temp = car->_brakeTemp(i);
 
-        clr[0] = 0.1 + car->_brakeTemp(i) * 1.5;
-        clr[1] = 0.1 + car->_brakeTemp(i) * 0.3;
-        clr[2] = 0.1 - car->_brakeTemp(i) * 0.3;
+        clr[0] = 0.1 + temp * 1.5;
+        clr[1] = 0.1 + temp * 0.3;
+        clr[2] = 0.1 - temp * 0.3;
         clr[3] = 1.0;
-        (*brk_clr)[0] = clr;
-        brk_clr->dirty();
+        (*brake_colors[i])[0] = clr;
+        brake_colors[i]->dirty();
 
-        this->brake_disks[i]->setColorArray(brk_clr.get(), osg::Array::BIND_PER_VERTEX);
-		//GfLogInfo("brake temp %i = %f\n", i, car->_brakeTemp(i) );
+        //GfLogInfo("brake temp %i = %f\n", i, temp);
     }
 }

@@ -20,15 +20,14 @@
 #ifndef _OSGBRAKE_H_
 #define _OSGBRAKE_H_
 
-#include <osg/Geode>
+#include <osg/Geometry>
 #include <car.h>
 
 class SDBrakes
 {
 private :
     tCarElt *car;
-    osg::ref_ptr<osg::Geometry> brake_disks[4];
-    osg::ref_ptr<osg::Vec4Array> brk_clr;
+    osg::ref_ptr<osg::Vec4Array> brake_colors[4];
 
 public :
     void setCar(tCarElt * car);
