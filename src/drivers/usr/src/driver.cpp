@@ -140,9 +140,9 @@ Driver::Driver(int index)
     opponents = NULL;
     opponent = NULL;
     pit = NULL;
-    strategy = NULL;
-    cardata = NULL;
-    mycardata = NULL;
+    strategy = nullptr;
+    cardata = nullptr;
+    mycardata = nullptr;
     currentsimtime = 0.0;
     test_raceline = test_rnd_raceline = 0;
     outside_overtake_inhibitor = 1.0f;
@@ -156,7 +156,7 @@ Driver::Driver(int index)
     rlookahead = raceoffset = avoidlftoffset = avoidrgtoffset = racespeed = 0.0f;
     avoidspeed = accelcmd = brakecmd = PitOffset = brakeratio = 0.0f;
     racetarget.x = 0.0; racetarget.y = 0.0;
-    radius = NULL;
+    radius = nullptr;
     carindex = 0;
     alone = aloneTeam = underThreat = avoidCritical = false;
     suspHeight = 0.0;
@@ -214,7 +214,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     LogUSR.debug("USR Driver initrack ...\n");
     track = t;
 
-    const int BUFSIZE = 256;
+    const int BUFSIZE = 1024;
     char buffer[BUFSIZE];
     char carName[BUFSIZE];
     /*------------------------------------------------------*/
@@ -227,7 +227,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     void *newParmHandle;
     *carParmHandle = NULL;
     newParmHandle = NULL;
-    sprintf(buffer, "drivers/%s/%d/setup.xml", MyBotName, INDEX);
+    /*sprintf(buffer, "drivers/%s/%d/setup.xml", MyBotName, INDEX);
     //newParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
     *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
 
@@ -255,13 +255,45 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
         m_steerverbose = 0;
         modeVerbose = 0;
         displaySetting = 0;
-    }
+    }*/
 
     const char *car_sect = SECT_GROBJECTS "/" LST_RANGES "/" "1";
     strncpy(carName, GfParmGetStr(carHandle, car_sect, PRM_CAR, ""), sizeof(carName));
     char *p = strrchr(carName, '.');
+
     if (p)
         *p = '\0';
+
+	sprintf(buffer, "drivers/%s/%s/setup.xml", MyBotName, carName);
+	//newParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+	*carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+
+	if (*carParmHandle != NULL)
+	{
+		m_fuelPerMeter = GfParmGetNum(*carParmHandle, SECT_PRIVATE, BT_ATT_FUELPERMETER, (char*)NULL, 0.00068);
+		modeVerbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_VERBOSE, (char*)NULL, 0.0);
+		displaySetting = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_DISPLAYSETTING, (char*)NULL, 0.0);
+		m_testPitstop = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_PIT_TEST, (char*)NULL, 0.0);
+		m_testQualifTime = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_QUALIF_TEST, (char*)NULL, 0.0);
+		m_lineIndex = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_LINE_INDEX, (char*)NULL, 0.0);
+		m_strategyverbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_STRATEGY_VERBOSE, (char*)NULL, 0.0);
+		m_steerverbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_STEER_VERBOSE, (char*)NULL, 0.0);
+		newParmHandle = *carParmHandle;
+	}
+	else
+	{
+		m_fuelPerMeter = 0.00068;
+		m_fuelStrat = 1;
+		m_maxDammage = 5000;
+		m_testPitstop = 0;
+		m_testQualifTime = 0;
+		m_lineIndex = 0;
+		m_strategyverbose = 0;
+		m_steerverbose = 0;
+		modeVerbose = 0;
+		displaySetting = 0;
+	}
+
     *carParmHandle = NULL;
     switch (s->_raceType)
     {
@@ -294,7 +326,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     if (*carParmHandle == NULL)
     {
         std::cout << "Can't load the xml! " << buffer << std::endl;
-        sprintf(buffer, "drivers/%s/%s/default.xml", MyBotName, carName);
+        sprintf(buffer, "drivers/%s/%s/setup.xml", MyBotName, carName);
         LogUSR.info("Loading in defaut : %s\n", buffer);
         *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
         if (*carParmHandle)
@@ -401,10 +433,18 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
         raceline->setOverrides(overrideCollection);
     }
 
-    LogUSR.info("Brake Delay = %.3f\n", brakedelay);
-    LogUSR.info("Corner Speed = %.3f\n", CornerSpeed);
+	LogUSR.info("MU FACTOR        = %.3f\n", MU_FACTOR);
+	LogUSR.info("FUEL FACTOR      = %.3f\n", FUEL_FACTOR);
+	LogUSR.info("Max Damage       = %.3f\n", m_maxDammage);
+	LogUSR.info("Gear Shift       = %.3f\n", gear_shift);
+    LogUSR.info("Brake Delay      = %.3f\n", brakedelay);
+    LogUSR.info("Corner Speed     = %.3f\n", CornerSpeed);
     LogUSR.info("Corner Speed mid = %.3f\n", CornerSpeedMid);
     LogUSR.info("Corner Speed Low = %.3f\n", CornerSpeedSlow);
+	LogUSR.info("TCL SLIP         = %.3f\n", tcl_slip);
+	LogUSR.info("TCL RANGE        = %.3f\n", tcl_range);
+	LogUSR.info("ABS SLIP         = %.3f\n", abs_slip);
+	LogUSR.info("ABS RANGE        = %.3f\n", abs_range);
 
     // Get skill level
 

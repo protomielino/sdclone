@@ -68,7 +68,7 @@ public:
     void initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituation *s);
     void newRace(tCarElt* car, tSituation *s);
     void drive(tSituation *s);
-    int pitCommand(tSituation *s);
+    int  pitCommand(tSituation *s);
     void endRace(tSituation *s);
     void shutdown(void);
 
@@ -95,19 +95,19 @@ public:
     double  futureLeftToMid(double t_impact) { return (t_impact <= 0.0 ? left_toMid : left_toMid + left_speed_y * t_impact); }
     double  futureRightToMid(double t_impact) { return (t_impact <= 0.0 ? right_toMid : right_toMid + right_speed_y * t_impact); }
 
-    double pitTimer;
-    double average_AX;
-    double average_AY;
-    double avgLateralMovt;
-    double avgYawRateDelta;
-    double prevToLeft;
-    bool avoidCritical;
-    double avoidSqueezed;
-    bool alone;
-    bool underThreat;
-    bool aloneTeam;
-    bool currentCollision;
-    bool currentCollisionClose;
+    double	pitTimer;
+    double	average_AX;
+    double	average_AY;
+    double	avgLateralMovt;
+    double	avgYawRateDelta;
+    double	prevToLeft;
+    bool	avoidCritical;
+    double	avoidSqueezed;
+    bool	alone;
+    bool	underThreat;
+    bool	aloneTeam;
+    bool	currentCollision;
+    bool	currentCollisionClose;
     LRaceLine *raceline;
     LLineMode *linemode;
 
@@ -115,64 +115,64 @@ public:
 
 private:
     // Utility functions.
-    bool  isStuck();
-    void  update(tSituation *s);
-    float getAllowedSpeed(float lgfromstart);
-    float getAccel();
-    float getDistToSegEnd();
-    float getBrake();
-    int   getGear();
-    float getSteer(tSituation *s);
-    float getClutch();
-    float getOffset();
-    float brakedist(float allowedspeed, float mu);
-    float smoothSteering( float steercmd );
-    float correctSteering( float avoidsteer, float racesteer );
-    float calcSteer( float targetAngle, int rl, float racesteer );
-    void  SetMode( int newmode, double leftMargin, double rightMargin, bool force=false );
-    float getWidth() { return mycardata->getWidthOnTrack(); }
-    bool  calcSpeed();
-    int   checkSwitch( int side, Opponent *o, tCarElt *ocar, double catchdist );
-    double AverageTmpForCar(CarElt *car);
-    void  Meteorology();
-    int   GetWeather();
-    void  calcSkill();
+    bool	isStuck();
+    void	update(tSituation *s);
+    float	getAllowedSpeed(float lgfromstart);
+    float	getAccel();
+    float	getDistToSegEnd();
+    float	getBrake();
+    int		getGear();
+    float	getSteer(tSituation *s);
+    float	getClutch();
+    float	getOffset();
+    float	brakedist(float allowedspeed, float mu);
+    float	smoothSteering( float steercmd );
+    float	correctSteering( float avoidsteer, float racesteer );
+    float	calcSteer( float targetAngle, int rl, float racesteer );
+    void	SetMode( int newmode, double leftMargin, double rightMargin, bool force=false );
+    float	getWidth() { return mycardata->getWidthOnTrack(); }
+    bool	calcSpeed();
+    int		checkSwitch( int side, Opponent *o, tCarElt *ocar, double catchdist );
+    double	AverageTmpForCar(CarElt *car);
+    void	Meteorology();
+    int		GetWeather();
+    void	calcSkill();
 
-    float filterOverlap(float accel);
-    float filterBColl(float brake);
-    float filterABS(float brake);
-    float filterBPit(float brake);
-    float filterBrakeSpeed(float brake);
-    float filterTurnSpeed(float brake);
+    float	filterOverlap(float accel);
+    float	filterBColl(float brake);
+    float	filterABS(float brake);
+    float	filterBPit(float brake);
+    float	filterBrakeSpeed(float brake);
+    float	filterTurnSpeed(float brake);
 
-    float filterTCL(float accel, int raceType);
-    float filterTrk(float accel);
+    float	filterTCL(float accel, int raceType);
+    float	filterTrk(float accel);
 
-    float filterSColl(float steer);
+    float	filterSColl(float steer);
 
-    float filterTCL_RWD();
-    float filterTCL_FWD();
-    float filterTCL_4WD();
-    void initTCLfilter();
+    float	filterTCL_RWD();
+    float	filterTCL_FWD();
+    float	filterTCL_4WD();
+    void	initTCLfilter();
 
-    void initCa();
-    void initCw();
-    void initCR();
-    void initTireMu();
-    void showSetup();
+    void	initCa();
+    void	initCw();
+    void	initCR();
+    void	initTireMu();
+    void	showSetup();
 
-    void computeRadius(int line, float *radius);
-    void initWheelPos();
-    int  checkFlying();
+    void	computeRadius(int line, float *radius);
+    void	initWheelPos();
+    int		checkFlying();
 
-    void loadSVG();
-    void saveSVG();
+    void	loadSVG();
+    void	saveSVG();
 
-    double GetOvertakeSpeedDiff();
-    bool CheckOvertaking(double leftMargin, double rightMargin);
-    int GetAvoidSide(Opponent *oppnt, int allowed_sides, double t_impact, double *leftMargin, double *rightMargin);
+    double	GetOvertakeSpeedDiff();
+    bool	CheckOvertaking(double leftMargin, double rightMargin);
+    int		GetAvoidSide(Opponent *oppnt, int allowed_sides, double t_impact, double *leftMargin, double *rightMargin);
 
-    void SetRandomSeed(unsigned int seed);
+    void	SetRandomSeed(unsigned int seed);
     unsigned int getRandom();
 
     // Per robot global data.
