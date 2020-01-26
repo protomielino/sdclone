@@ -1,3 +1,7 @@
+// ParametricCubic.h: interface for the ParametricCubic class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #ifndef _PARAMETRICCUBIC_H_
 #define _PARAMETRICCUBIC_H_
 
@@ -10,7 +14,7 @@ public:
     ParametricCubic();
     ~ParametricCubic();
 
-    void	Set( Vec2d p0, Vec2d p1, Vec2d v0, Vec2d v1 );
+    void	SetPoints( Vec2d p0, Vec2d p1, Vec2d p2, Vec2d p3 );
     void	SetPointsAndTangents( Vec2d p0, Vec2d v0, Vec2d p1, Vec2d v1 );
     void	SetHalitePointsAndTangents( Vec2d p0, Vec2d v0, Vec2d p1, Vec2d v1 );
 
@@ -31,4 +35,4 @@ private:
     Cubic	m_y;
 };
 
-#endif
+#endif // _PARAMETRICCUBIC_H_

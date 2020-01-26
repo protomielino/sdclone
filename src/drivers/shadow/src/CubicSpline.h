@@ -15,29 +15,33 @@
  *                                                                         *
  ***************************************************************************/
 
+// CubicSpline.h: interface for the CubicSpline class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #ifndef _CUBICSPLINE_H_
 #define _CUBICSPLINE_H_
 
 #include "Cubic.h"
 
-class CubicSpline  
+class CubicSpline
 {
 public:
-	CubicSpline( int n, const double* x, const double* y, const double* s );
-	~CubicSpline();
+    CubicSpline( int n, const double* x, const double* y, const double* s );
+    ~CubicSpline();
 
-	double	CalcY( double x ) const;
-	double	CalcGradient( double x ) const;
+    double	CalcY( double x ) const;
+    double	CalcGradient( double x ) const;
 
-	bool	IsValidX( double x ) const;
-
-private:
-	int		FindSeg( double x ) const;
+    bool	IsValidX( double x ) const;
 
 private:
-	int		m_n;
-	double*	m_pSegs;
-	Cubic*	m_pCubics;
+    int		FindSeg( double x ) const;
+
+private:
+    int		m_n;
+    double*	m_pSegs;
+    Cubic*	m_pCubics;
 };
 
-#endif
+#endif // _CUBICSPLINE_H_

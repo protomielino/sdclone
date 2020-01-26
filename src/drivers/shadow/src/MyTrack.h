@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : MyTrack.h
-    created     : 9 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -15,16 +15,24 @@
  *                                                                         *
  ***************************************************************************/
 
+// MyTrack.h: interface for the MyTrack class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #ifndef _MYTRACK_H_
 #define _MYTRACK_H_
 
 #include <track.h>
 #include <car.h>
 
+#include <vector>
+
 #include "Seg.h"
 #include "PtInfo.h"
 
-#include <vector>
+// The "SHADOW" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
 
 class MyTrack
 {
@@ -43,7 +51,8 @@ public:
     ~MyTrack();
 
     void	Clear();
-    void	NewTrack(tTrack* pNewTrack, const std::vector<double> *pInnerMod = NULL, bool pit = false, SideMod* pSideMod = 0 );
+    void	NewTrack( tTrack* pNewTrack, const std::vector<double>* pInnerMod = NULL, bool pit = false, SideMod* pSideMod = NULL,
+                      int pitStartBufSegs = 0 );
 
     tTrack*			GetTrack();
     const tTrack*	GetTrack() const;
@@ -53,14 +62,15 @@ public:
     double	GetWidth() const;
 
     double	NormalisePos( double trackPos ) const;
+    bool	PosInRange( double pos, double rangeStart, double rangeLength ) const;
     int		IndexFromPos( double trackPos ) const;
 
     const Seg&	operator[]( int index ) const;
     const Seg&	GetAt( int index ) const;
 
     double	GetDelta() const;
-    double	CalcPos( tTrkLocPos& trkPos, double offset = 0 ) const;
-    double	CalcPos( tCarElt* car, double offset = 0 ) const;
+    double	CalcPos( const tTrkLocPos& trkPos, double offset = 0 ) const;
+    double	CalcPos( const tCarElt* car, double offset = 0 ) const;
     double	CalcPos( double x, double y, const Seg* hint = 0, bool sides = false ) const;
 
     double	CalcHeightAbovePoint( const Vec3d& start_point, const Vec3d& direction, const Seg* hint = 0 ) const;
@@ -70,18 +80,17 @@ public:
 
     double	GetFriction( int index, double offset ) const;
 
-private:
-    void	CalcPtAndNormal( const tTrackSeg* pSeg, double toStart,
+    void	CalcPtAndNormal( const tTrackSeg* pSeg, double toStartOfSeg,
                              double& t, Vec3d& pt, Vec3d& norm ) const;
 
 private:
-    int		NSEG;
-    double	m_delta;
-    Seg*	m_pSegs;
-    tTrack*	m_pCurTrack;
-    SideMod	m_sideMod;
+    int					NSEG;
+    double				m_delta;
+    Seg*				m_pSegs;
+    tTrack*				m_pCurTrack;
+    SideMod				m_sideMod;
     std::vector<double>	m_innerMod;
-    int		m_nBends;
+    int					m_nBends;
 };
 
-#endif // !defined(AFX_MYTRACK_H__402D20B8_71B6_4F2C_B169_F4A3552012EB__INCLUDED_)
+#endif

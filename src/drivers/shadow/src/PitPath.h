@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : PitPath.h
-    created     : 9 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -15,40 +15,48 @@
  *                                                                         *
  ***************************************************************************/
 
+// PitPath.h: interface for the PitPath class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #ifndef _PITPATH_H_
 #define _PITPATH_H_
 
-#include "LinePath.h"
+#include "Path.h"
 #include "MyTrack.h"
-#include "CubicSpline.h"
 
-class PitPath : public LinePath
+class PitPath : public Path
 {
 public:
-	PitPath();
-	virtual ~PitPath();
+    PitPath();
+    virtual ~PitPath();
 
-	void	MakePath( CarElt* pCar, LinePath* pBasePath, const CarModel& cm,
-						double entryOffset = 0, double exitOffset = 0 );
+    PitPath&			operator=( const PitPath& other );
+    virtual PitPath&	operator=( const Path& other );
 
-	//	CPath overrides.
+    void	MakePath( const tTrackOwnPit* pPit, Path* pBasePath, const CarModel& cm,
+                      int pitType, double entryOffset = 0, double exitOffset = 0 );
+
+    //	CPath overrides.
 //	virtual bool	ContainsPos( double trackPos ) const;
 //	virtual bool	GetPtInfo( double trackPos, PtInfo& pi ) const;
 
-	bool	InPitSection( double trackPos ) const;
-	bool	CanStop( double trackPos ) const;
+    bool	InPitSection( double trackPos ) const;
+    bool	CanStop( double trackPos ) const;
+    double	EntryToPitDistance() const;
 
 private:
-	double	ToSplinePos( double trackPos ) const;
+    double	ToSplinePos( double trackPos ) const;
+    void    LocalToGlobalXY( double dist, double offs, double slope, Vec2d* p, Vec2d* v );
 
 private:
 //	const MyTrack*	m_pTrack;
-	double			m_pitEntryPos;
-	double			m_pitExitPos;
-	double			m_pitStartPos;
-	double			m_pitEndPos;
-	int				m_stopIdx;
-//	CubicSpline*	m_pSpline;
+    double			m_pitEntryPos;
+    double			m_pitExitPos;
+    double			m_pitStartPos;
+    double			m_pitEndPos;
+    int				m_stopIdx;
+    double			m_stopPos;
 };
 
-#endif
+#endif // _PITPATH_H_

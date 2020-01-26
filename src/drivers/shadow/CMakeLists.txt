@@ -6,9 +6,7 @@ SET(ROBOT_NAME "shadow")
 # Official-only shadow interface.
 SET(ROBOT_INTERFACE LEGACY WELCOME)
 
-SET(ROBOT_SOURCES src/Array.h
-				src/AveragedData.cpp
-				src/AveragedData.h
+SET(ROBOT_SOURCES
 				src/Avoidance.cpp
 				src/Avoidance.h
 				src/CarBounds2d.cpp
@@ -21,30 +19,32 @@ SET(ROBOT_SOURCES src/Array.h
 				src/Cubic.h
 				src/CubicSpline.cpp
 				src/CubicSpline.h
-				src/GenericAvoidance.cpp
-				src/GenericAvoidance.h
 				src/LearnedGraph.cpp
 				src/LearnedGraph.h
 				src/LinearRegression.cpp 
 				src/LinearRegression.h
-				src/LinePath.cpp
-				src/LinePath.h
 				src/Driver.cpp
 				src/Driver.h
 				src/MyTrack.cpp
 				src/MyTrack.h
 				src/Opponent.cpp
 				src/Opponent.h
-				src/OptimisedPath.cpp 
-				src/OptimisedPath.h
 				src/ParametricCubic.cpp
 				src/ParametricCubic.h
+				src/ParametricCubicSpline.cpp
+				src/ParametricCubicSpline.h
 				src/Path.cpp 
 				src/Path.h
+				src/PathOffsets.cpp
+				src/PathOffsets.h
+				src/PathOptions.cpp
+				src/PathOptions.h
 				src/PathRecord.cpp 
 				src/PathRecord.h
 				src/PidController.cpp 
 				src/PidController.h
+				src/PitControl.cpp
+				src/PitControl.h
 				src/PitPath.cpp 
 				src/PitPath.h
 				src/PtInfo.cpp 
@@ -58,8 +58,8 @@ SET(ROBOT_SOURCES src/Array.h
 				src/Shared.h
 				src/Span.cpp 
 				src/Span.h
-				src/Strategy.cpp
-				src/Strategy.h
+				src/SpringsPath.cpp
+				src/SpringsPath.h
 				src/Stuck.cpp
 				src/Stuck.h
 				src/TeamInfo.cpp 

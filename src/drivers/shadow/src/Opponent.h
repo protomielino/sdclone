@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : Opponent.h
-    created     : 18 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -15,15 +15,19 @@
  *                                                                         *
  ***************************************************************************/
 
+// Opponent.h: interface for the Opponent class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #ifndef _OPPONENT_H_
 #define _OPPONENT_H_
 
-#include <car.h>
-#include <raceman.h>
-
 #include "PathRecord.h"
 #include "TeamInfo.h"
-#include "Span.h"
+#include "Utils.h"
+
+#include <car.h>
+#include <raceman.h>
 
 class TDriver;
 
@@ -100,13 +104,14 @@ public:
 
         PtInfo	pi;	// from my path.
 
-        static int compareRelPos( const Sit* a, const Sit* b ) { return SIGN(a->relPos - b->relPos); }
+        static int compareRelPos( const Sit* a, const Sit* b ) { return SGN(a->relPos - b->relPos); }
     };
 
     struct PassInfo
     {
         bool	isSpace;
         double	offset;
+//		double	myOffset
         double	mySpeed;
         bool	goodPath;
         double	bestU;
@@ -148,7 +153,7 @@ public:
         PassInfo	newPiL;
         PassInfo	newPiR;
 
-        double	tmDamage;
+        double		tmDamage;
     };
 
 public:
@@ -157,15 +162,20 @@ public:
 
     void		Initialise( MyTrack* pTrack, CarElt* pCar );
 
-    CarElt*		GetCar();
+    CarElt*			GetCar();
     const CarElt*	GetCar() const;
     const Info&		GetInfo() const;
-    Info&		GetInfo();
+    Info&			GetInfo();
 
-    void		UpdatePath();
-
-    void		UpdateSit( const CarElt* myCar, const Situation* s, const TeamInfo* pTeamInfo, double myDirX, double myDirY, const PtInfo& oppPi );
-    void		ProcessMyCar( const Situation* s, const TeamInfo* pTeamInfo, const CarElt* myCar, const Sit& mySit, const TDriver& me, double myMaxAccX, int idx );
+    void			UpdatePath();
+//	void			ProcessMyCar( const Situation* s, const TeamInfo* pTeamInfo,
+//								  const CarElt* myCar, double myDirX, double myDirY,
+//								  int idx );
+    void			UpdateSit( const CarElt* myCar, const Situation* s, const TeamInfo* pTeamInfo,
+                               double myDirX, double myDirY, const PtInfo& oppPi );
+    void			ProcessMyCar( const Situation* s, const TeamInfo* pTeamInfo,
+                                  const CarElt* myCar, const Sit& mySit,
+                                  const TDriver& me, double myMaxAccX, int idx );
 
     static bool compareSitRelPos( const Opponent* a, const Opponent* b ) { return a->m_info.sit.relPos < b->m_info.sit.relPos; }
 
@@ -174,4 +184,4 @@ private:
     PathRecord		m_path;		// info about path of this opponent.
 };
 
-#endif
+#endif // !defined(AFX_OPPONENT_H__36326AD0_5287_4D35_B380_AE45AD76DF12__INCLUDED_)

@@ -2,9 +2,9 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include <math.h>
-
 #include "Quadratic.h"
+
+#include <math.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -33,33 +33,33 @@ Quadratic::~Quadratic()
 {
 }
 
-void Quadratic::Setup( double a, double b, double c )
+void	Quadratic::Setup( double a, double b, double c )
 {
 	m_a = a;
 	m_b = b;
 	m_c = c;
 }
 
-void Quadratic::Setup( double x, double y, double velY, double accY )
+void	Quadratic::Setup( double x, double y, double velY, double accY )
 {
 	m_a = accY / 2;
 	m_b = velY - 2 * m_a * x;
 	m_c = y - (m_a * x + m_b) * x;
 }
 
-double Quadratic::CalcMin() const
+double	Quadratic::CalcMin() const
 {
 	// minimum is where slope == 0
 	double	x = -m_b / (2 * m_a);
 	return x;
 }
 
-double Quadratic::CalcY( double x ) const
+double	Quadratic::CalcY( double x ) const
 {
 	return (m_a * x + m_b) * x + m_c;
 }
 
-bool Quadratic::Solve( double y, double& x0, double& x1 ) const
+bool	Quadratic::Solve( double y, double& x0, double& x1 ) const
 {
 	if( m_a == 0 )
 	{
@@ -93,7 +93,7 @@ bool Quadratic::Solve( double y, double& x0, double& x1 ) const
 	return true;
 }
 
-bool Quadratic::SmallestNonNegativeRoot( double& t ) const
+bool	Quadratic::SmallestNonNegativeRoot( double& t ) const
 {
 	double	x0, x1;
 	if( !Solve(0, x0, x1) )
@@ -106,12 +106,12 @@ bool Quadratic::SmallestNonNegativeRoot( double& t ) const
 	return t >= 0;
 }
 
-Quadratic Quadratic::operator+( const Quadratic& q ) const
+Quadratic	Quadratic::operator+( const Quadratic& q ) const
 {
 	return Quadratic(m_a + q.m_a, m_b + q.m_b, m_c + q.m_c);
 }
 
-Quadratic Quadratic::operator-( const Quadratic& q ) const
+Quadratic	Quadratic::operator-( const Quadratic& q ) const
 {
 	return Quadratic(m_a - q.m_a, m_b - q.m_b, m_c - q.m_c);
 }

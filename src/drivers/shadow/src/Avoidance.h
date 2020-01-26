@@ -1,13 +1,14 @@
+// Avoidance.h: interface for the Avoidance class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #ifndef _AVOIDANCE_H_
 #define _AVOIDANCE_H_
 
 #include "Opponent.h"
 #include "Driver.h"
-#include "Span.h"
 
 #include <car.h>
-
-class TDriver;
 
 class Avoidance
 {
@@ -28,7 +29,6 @@ public:
         int				avoidToSide;
         int				avoidLapping;
         int				nearbyCars;
-
         double			k;
         double			nextK;
         double			spdL;
@@ -40,7 +40,6 @@ public:
         double			minLDist;
         double			minRDist;
         double			bestPathOffs;
-
         Opponent::Info*	pClosestAhead;
 
         Info()
@@ -74,7 +73,8 @@ public:
     Avoidance();
     virtual ~Avoidance();
 
-    virtual Vec2d	calcTarget(const Info& ai, const CarElt* pCar, const TDriver& me );
+    virtual Vec2d	calcTarget(const Info& ai, const CarElt* pCar,
+                                const TDriver &me );
 };
 
-#endif
+#endif // _AVOIDANCE_H_

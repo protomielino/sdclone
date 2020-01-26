@@ -45,19 +45,19 @@ CubicSpline::~CubicSpline()
 	delete [] m_pCubics;
 }
 
-double CubicSpline::CalcY( double x ) const
+double	CubicSpline::CalcY( double x ) const
 {
 	int	i = FindSeg(x);
 	return m_pCubics[i].CalcY(x);
 }
 
-double CubicSpline::CalcGradient( double x ) const
+double	CubicSpline::CalcGradient( double x ) const
 {
 	int	i = FindSeg(x);
 	return m_pCubics[i].CalcGradient(x);
 }
 
-bool CubicSpline::IsValidX( double x ) const
+bool	CubicSpline::IsValidX( double x ) const
 {
 	return x >= m_pSegs[0] && x <= m_pSegs[m_n - 1];
 }

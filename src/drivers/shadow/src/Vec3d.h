@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : Vec3d.h
-    created     : 9 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -14,6 +14,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
+// Vec3d.h: interface for the Vec3d class.
+//
+//////////////////////////////////////////////////////////////////////
 
 #ifndef _VEC3D_H_
 #define _VEC3D_H_
@@ -38,6 +42,7 @@ public:
     Vec3d&	operator=( const v3t<double>& v )
     {
         v3t<double>::operator=(v);
+
         return *this;
     }
 
@@ -45,6 +50,7 @@ public:
     {
         v3t<double>	temp;
         this->crossProduct(v, temp);
+
         return temp;
     }
 
@@ -52,11 +58,12 @@ public:
     {
         v3t<double>	temp(*this);
         temp.normalize();
+
         return temp;
     }
 
     Vec2d	GetXY() const { return Vec2d(x, y); }
-
     Vec3d	SetZ( int newZ ) const { return Vec3d(x, y, newZ); }
 };
+
 #endif

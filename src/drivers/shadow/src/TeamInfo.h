@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : TeamInfo.h
-    created     : 21 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 21 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -15,47 +15,50 @@
  *                                                                         *
  ***************************************************************************/
 
+// TeamInfo.h: interface for the TeamInfo class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #ifndef _TEAMINFO_H_
 #define _TEAMINFO_H_
 
+#include <vector>
+
 #include <car.h>
 
-class TeamInfo  
+// The "MOUSE" logger instance.
+extern GfLogger* PLogMOUSE;
+#define LogMOUSE (*PLogMOUSE)
+
+class TeamInfo
 {
 public:
-	enum
-	{
-		PIT_NOT_SHARED,
-		PIT_NOT_REQUIRED,
-		PIT_REQUEST,
-		PIT_REQUEST_URGENT,	// else will likely run out of fuel.
-		PIT_IN_USE,
-	};
-
-	struct	Item
-	{
-		int			index;		// index of car in race.
-		const char*	teamName;	// name of team.
-		int			damage;		// damage of this team member.
-		int			pitState;	// request for shared pit.
-		Item*		pOther;		// the other team member.
-		CarElt*		pCar;		// the car of this team member.
-	};
+    struct	Item
+    {
+        int			index;			// index of car in race.
+        const char*	teamName;		// name of team.
+        int			damage;			// damage of this team member.
+        bool		usingPit;		// true if entering pits or in pit.
+        double		lapsUntilPit;	// how many more laps until need to pit due to fuel.
+        Item*		pOther;			// the other team member.
+        CarElt*		pCar;			// the car of this team member.
+    };
 
 public:
-	TeamInfo();
-	~TeamInfo();
+    TeamInfo();
+    ~TeamInfo();
 
-	void		Empty();
-	void		Add( int index, Item* pItem );
-	const Item*	GetAt( int index ) const;
-	Item*		GetAt( int index );
+    void		Empty();
+    void		Add( int index, Item* pItem );
+    const Item*	GetAt( int index ) const;
+    Item*		GetAt( int index );
 
-	bool		IsTeamMate( const CarElt* pCar0, const CarElt* pCar1 ) const;
+    const Item*	GetTeamMate( const CarElt* pCar ) const;
+
+    bool		IsTeamMate( const CarElt* pCar0, const CarElt* pCar1 ) const;
 
 private:
-	int			m_size;
-	Item**		m_ppItems;
+    std::vector<Item*>	m_items;
 };
 
-#endif // !defined(AFX_TEAMINFO_H__7EA9649D_1527_4B70_BA9A_63E73AEFC9FF__INCLUDED_)
+#endif

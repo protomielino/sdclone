@@ -1,19 +1,3 @@
-/***************************************************************************
-
-    file        : WheelModel.cpp
-    created     : 02 november 2019
-    copyright   : (C) 2006 Tim Foden - (C) 2019 Xavier Bertaux
-
- ***************************************************************************/
-
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
 
 #include <robottools.h>
 
@@ -53,9 +37,9 @@ void    WheelModel::config( const tCarElt* car )
 {
     config( car->_carHandle );
 
-    _X -= car->info.statGC.x;
-    _Y -= car->info.statGC.y;
-    _Z -= car->info.statGC.z;
+	_X -= car->info.statGC.x;
+	_Y -= car->info.statGC.y;
+	_Z -= car->info.statGC.z;
 }
 
 void    WheelModel::config( void* hCar )
@@ -63,15 +47,15 @@ void    WheelModel::config( void* hCar )
     static const char* axleSect[2] = {SECT_FRNTAXLE, SECT_REARAXLE};
     static const char* wheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 
-    _X = GfParmGetNum(hCar, axleSect[_w/2], PRM_XPOS, (char*)NULL, 0.0f);
-    _Y = GfParmGetNum(hCar, wheelSect[_w], PRM_YPOS, (char*)NULL, 0.0f);
-    _Z = 0;
+	_X = GfParmGetNum(hCar, axleSect[_w/2], PRM_XPOS, (char*)NULL, 0.0f);
+	_Y = GfParmGetNum(hCar, wheelSect[_w], PRM_YPOS, (char*)NULL, 0.0f);
+	_Z = 0;
+	
+	_MU = GfParmGetNum(hCar, wheelSect[_w], PRM_MU, (char*)NULL, 1.0f);
 
-    _MU = GfParmGetNum(hCar, wheelSect[_w], PRM_MU, (char*)NULL, 1.0f);
-
-    double  Ca      = GfParmGetNum(hCar, wheelSect[_w], PRM_CA, (char*)NULL, 30.0f);
-    double  RFactor = GfParmGetNum(hCar, wheelSect[_w], PRM_RFACTOR, (char*)NULL, 0.8f);
-    double  EFactor = GfParmGetNum(hCar, wheelSect[_w], PRM_EFACTOR, (char*)NULL, 0.7f);
+	double  Ca      = GfParmGetNum(hCar, wheelSect[_w], PRM_CA, (char*)NULL, 30.0f);
+	double  RFactor = GfParmGetNum(hCar, wheelSect[_w], PRM_RFACTOR, (char*)NULL, 0.8f);
+	double  EFactor = GfParmGetNum(hCar, wheelSect[_w], PRM_EFACTOR, (char*)NULL, 0.7f);
 
 //	_lfMax          = GfParmGetNum(hCar, wheelSect[_w], PRM_LOADFMAX, (char*)NULL, 1.6f);
 //	_lfMin          = GfParmGetNum(hCar, wheelSect[_w], PRM_LOADFMIN, (char*)NULL, 0.8f);
@@ -80,12 +64,12 @@ void    WheelModel::config( void* hCar )
     _C = 2 - asin(RFactor) * 2 / PI;
     _B = Ca / _C;
     _E = EFactor;
-
+    
     double  rimDiam     = GfParmGetNum(hCar, wheelSect[_w], PRM_RIMDIAM,   (char*)NULL, 0.33f);
     double  tyreWidth   = GfParmGetNum(hCar, wheelSect[_w], PRM_TIREWIDTH, (char*)NULL, 0.145f);
     double  tyreRatio   = GfParmGetNum(hCar, wheelSect[_w], PRM_TIRERATIO, (char*)NULL, 0.75f);
-
-    _R = rimDiam * 0.5f + tyreWidth * tyreRatio;
+    
+	_R = rimDiam * 0.5f + tyreWidth * tyreRatio;
 }
 
 void    WheelModel::update( const tCarElt* car, const tSituation* sit, const CarModel& cm )
@@ -96,17 +80,17 @@ void    WheelModel::update( const tCarElt* car, const tSituation* sit, const Car
 
 void    WheelModel::updatePosition( const tCarElt* car, const tSituation* sit )
 {
-    const sgMat4& m = car->pub.posMat;
+	const sgMat4& m = car->pub.posMat;
 //	_x = car->pub.DynGCg.pos.x + m[0][0] * _X + m[1][0] * _Y + m[2][0] * _Z;
 //	_y = car->pub.DynGCg.pos.y + m[0][1] * _X + m[1][1] * _Y + m[2][1] * _Z;
 //	_z = car->pub.DynGCg.pos.z + m[0][2] * _X + m[1][2] * _Y + m[2][2] * _Z;
-    _x = car->pub.DynGCg.pos.x + m[0][0] * _X + m[0][1] * _Y + m[0][2] * _Z;
-    _y = car->pub.DynGCg.pos.y + m[1][0] * _X + m[1][1] * _Y + m[1][2] * _Z;
-    _z = car->pub.DynGCg.pos.z + m[2][0] * _X + m[2][1] * _Y + m[2][2] * _Z;
-
-    RtTrackGlobal2Local(car->pub.trkPos.seg, (tdble)_x, (tdble)_y, &_tp, TR_LPOS_SEGMENT);
+	_x = car->pub.DynGCg.pos.x + m[0][0] * _X + m[0][1] * _Y + m[0][2] * _Z;
+	_y = car->pub.DynGCg.pos.y + m[1][0] * _X + m[1][1] * _Y + m[1][2] * _Z;
+	_z = car->pub.DynGCg.pos.z + m[2][0] * _X + m[2][1] * _Y + m[2][2] * _Z;
+	
+	RtTrackGlobal2Local(car->pub.trkPos.seg, (tdble)_x, (tdble)_y, &_tp, TR_LPOS_SEGMENT);
 //  _friction = _p.seg->surface->kFriction;
-    _vay = (_vay + car->_wheelSpinVel(_w)) * 0.5;
+	_vay = (_vay + car->_wheelSpinVel(_w)) * 0.5;
 }
 
 void    WheelModel::updateSlip( const tCarElt* car, const tSituation* sit, const CarModel& cm )
@@ -119,34 +103,41 @@ void    WheelModel::updateSlip( const tCarElt* car, const tSituation* sit, const
         return;
     }
 
-    if( car->pub.speed < 0.5 )
-    {
+	if( car->pub.speed < 0.5 )
+	{
         _sx = _w < 2 ? 0 : car->ctrl.accelCmd * 0.5;
         _sy = _sa = 0;
         return;
-    }
+	}
 
-    double  bvx = cm.VEL_L.x - cm.VEL_AZ * _Y;
-    double  bvy = cm.VEL_L.y + cm.VEL_AZ * _X;
-    double  bv  = hypot(bvx, bvy);
+//	double  bvx = car->pub.DynGC.vel.x - car->pub.DynGC.vel.az * _Y;
+//	double  bvy = car->pub.DynGC.vel.y + car->pub.DynGC.vel.az * _X;
+	double  bvx = cm.VEL_L.x - cm.VEL_AZ * _Y;
+	double  bvy = cm.VEL_L.y + cm.VEL_AZ * _X;
+	double  bv  = hypot(bvx, bvy);
 
-    double  waz = _w < 2 ? car->ctrl.steer * car->info.steerLock : 0;
+	double  waz = _w < 2 ? car->ctrl.steer * car->info.steerLock : 0;
     double  wrl = _vay * car->_wheelRadius(_w);
 
-    if( bv < 0.000001f )
-    {
-        _sa = 0;
-        _sx = wrl;
-        _sy = 0;
-    }
-    else
-    {
-        _sa = atan2(bvy, bvx) - waz;
-        NORM_PI_PI(_sa);
+	if( bv < 0.000001f )
+	{
+		_sa = 0;
+		_sx = wrl;
+		_sy = 0;
+	}
+	else
+	{
+	    _sa = atan2(bvy, bvx) - waz;
+	    NORM_PI_PI(_sa);
 
-        double  vt = bvx * cos(waz) + bvy * sin(waz);
-        _sx = (vt - wrl) / fabs(vt);
-        _sy = sin(_sa); // should be tan(_sa)???
-    }
+	    double  vt = bvx * cos(waz) + bvy * sin(waz);
+		_sx = (vt - wrl) / fabs(vt);
+		_sy = sin(_sa); // should be tan(_sa)???
+	}
+	
+//	double  sv      = hypot(car->_wheelSlipSide(_w), car->_wheelSlipAccel(_w));
+//	double  s       = car->_skid[_w] / (zforce * 0.0002f);
+//	GfOut( "[%d] sv(%7.3f %6.3f) zf:%4.0f v(b%7.3f w%7.3f s%7.3f) s(%6.3f x%7.3f y%6.3f a%6.1f)\n",
+//			_w, car->_wheelSlipAccel(_w), car->_wheelSlipSide(_w), zforce, bv, wrl, sv, s, _sx, _sy, _sa * 180 / PI );
 }
 

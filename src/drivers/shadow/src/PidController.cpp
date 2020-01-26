@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : PidController.cpp
-    created     : 9 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -40,12 +40,12 @@ PidController::~PidController()
 {
 }
 
-double PidController::Sample( double propValue )
+double	PidController::Sample( double propValue )
 {
 	return Sample(propValue, propValue - m_lastPropValue);
 }
 
-double PidController::Sample( double propValue, double diffValue )
+double	PidController::Sample( double propValue, double diffValue )
 {
 	m_lastPropValue = propValue;
 

@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : Shared.h
-    created     : 19 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 118 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -15,24 +15,27 @@
  *                                                                         *
  ***************************************************************************/
 
+// Shared.h: interface for the Shared class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #ifndef _SHARED_H_
 #define _SHARED_H_
 
-#include <track.h>
-
 #include "TeamInfo.h"
 #include "ClothoidPath.h"
+#include <track.h>
 
-class Shared  
+class Shared
 {
 public:
-	Shared();
-	~Shared();
+    Shared();
+    ~Shared();
 
 public:
-	TeamInfo		m_teamInfo;
-	tTrack*			m_pTrack;
-	ClothoidPath	m_path[3];
+    TeamInfo		m_teamInfo;
+    tTrack*			m_pTrack;
+    ClothoidPath	m_path[3];
 };
 
 #endif

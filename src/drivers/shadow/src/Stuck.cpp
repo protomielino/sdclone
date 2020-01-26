@@ -168,7 +168,7 @@ void Stuck::executeRacing( const MyTrack& track, const tSituation* s, const tCar
 
 void Stuck::executeReorient( const MyTrack& track, const tSituation* s, tCarElt* me, const Opponent::Sit& mySit )
 {
-	LogSHADOW.debug( "[%d] reorient.  rev count %d\n", me->index, _stuckCount );
+	PRINTF( "[%d] reorient.  rev count %d\n", me->index, _stuckCount );
 
 	updateStuckTime( me, s );
 
@@ -178,14 +178,14 @@ void Stuck::executeReorient( const MyTrack& track, const tSituation* s, tCarElt*
 	if( fabs(dirAng) < 30 * PI / 180 )
 	{
 		_stuckState = RACING;
-		LogSHADOW.debug( "[%d] reorient.  finished.\n", me->index );
+		PRINTF( "[%d] reorient.  finished.\n", me->index );
 		return;
 	}
 
 	if( _stuckCount > 10 )
 	{
 		// give up... use the solver instead.
-		LogSHADOW.debug( "[%d] reorient.  start solvers.\n", me->index );
+		PRINTF( "[%d] reorient.  start solvers.\n", me->index );
 		_stuckState = REINIT;
     	_stuckCount = 0;
 		_stuckTime  = 0.0;
@@ -198,7 +198,6 @@ void Stuck::executeReorient( const MyTrack& track, const tSituation* s, tCarElt*
 	double	distAhead  = 25;
 	double	distBehind = 25;
 	CarBounds2d	bounds(me);
-
 	for( int i = 0; i < s->raceInfo.ncars; i++ )
 	{
 		const tCarElt* oCar = s->cars[i];
@@ -222,7 +221,7 @@ void Stuck::executeReorient( const MyTrack& track, const tSituation* s, tCarElt*
 			brk = me->pub.DynGC.vel.x > 0 ? 0.5 : 0;
 			if( distBehind < 0.2 || sideBehind < 2.5 )
 			{
-				LogSHADOW.debug( "[%d] reorient go forwards\n", me->index );
+				PRINTF( "[%d] reorient go forwards\n", me->index );
 				_stuckCount++;
 				_stuckState = REORIENT_FORWARDS;
 				_stuckTime = 0;
@@ -233,7 +232,7 @@ void Stuck::executeReorient( const MyTrack& track, const tSituation* s, tCarElt*
 			brk = me->pub.DynGC.vel.x < 0 ? 0.5 : 0;
 			if( distAhead < 0.2 || sideAhead < 2.5 )
 			{
-				LogSHADOW.debug( "[%d] reorient go backwards\n", me->index );
+				PRINTF( "[%d] reorient go backwards\n", me->index );
 				_stuckCount++;
 				_stuckState = REORIENT_BACKWARDS;
 				_stuckTime = 0;
@@ -300,7 +299,7 @@ void Stuck::executeSolving( const MyTrack& track, const tSituation* s, tCarElt* 
 	{
 		// no solution possible with initial state... try again in a short time.
     	_stuckCount++;
-		LogSHADOW.debug( "stuck: [%d] No solution: re-initting.\n", _stuckCount );
+		PRINTF( "stuck: [%d] No solution: re-initting.\n", _stuckCount );
 		_stuckState = _stuckCount < 10 ? REINIT : RACING;
 		_stuckTime  = 0.09;
 	}
@@ -385,7 +384,7 @@ bool	Stuck::clearAhead( const MyTrack& track, const tSituation* s, const tCarElt
 //	const MyTrack::Seg& seg(track.GetAt(track.IndexFromPos(me->race.distFromStartLine)));
 	double	width = track.GetWidth();
 	double	offs = -me->pub.trkPos.toMiddle;
-	LogSHADOW.debug( "offs=%.2f width=%.2f\n", offs, width );
+	PRINTF( "offs=%.2f width=%.2f\n", offs, width );
 	if( offs < -width / 2 || offs > width / 2 )
 		return false;	// still not back onto main raceway.
 
@@ -425,8 +424,8 @@ bool	Stuck::opponentsChanged( const tSituation* s, const tCarElt* me )
 
 void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
 {
-	LogSHADOW.debug( "[%d] stuck::init\n", me->index );
-	LogSHADOW.debug( "[%d] len %g  steer lock %g\n",
+	PRINTF( "[%d] stuck::init\n", me->index );
+	PRINTF( "[%d] len %g  steer lock %g\n",
 			me->index, me->priv.wheel[2].relPos.x - me->priv.wheel[0].relPos.x,
 			me->info.steerLock );
 
@@ -468,7 +467,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
 
 	double	width = track.GetWidth();
 	double	offs = -me->pub.trkPos.toMiddle;
-	LogSHADOW.debug( "offs=%.2f width=%.2f\n", offs, width );
+	PRINTF( "offs=%.2f width=%.2f\n", offs, width );
 //	if( offs < -width / 2 || offs > width / 2 )
 //		return false;	// still not back onto main raceway.
 	bool onMainRaceway = offs > -width / 2 && offs < width / 2;
@@ -499,19 +498,19 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
 		behindCar = me;
 
 	// figure out position ahead for destination (and cut-off).
-	LogSHADOW.debug( "my car: %g\n", me->race.distFromStartLine );
-	LogSHADOW.debug( "car ahead: %g\n", aheadCar->race.distFromStartLine );
+	PRINTF( "my car: %g\n", me->race.distFromStartLine );
+	PRINTF( "car ahead: %g\n", aheadCar->race.distFromStartLine );
 	double aheadPos = aheadCar->race.distFromStartLine + aheadCutOff;
 	if( aheadPos > me->race.distFromStartLine + GRID_RAD * 9 / 10 )
 		aheadPos = me->race.distFromStartLine + GRID_RAD * 9 / 10;
-	LogSHADOW.debug( "ahead pos: %g\n", aheadPos );
+	PRINTF( "ahead pos: %g\n", aheadPos );
 
 	// figure out position behind for cut-off.
-	LogSHADOW.debug( "car behind: %g\n", behindCar->race.distFromStartLine );
+	PRINTF( "car behind: %g\n", behindCar->race.distFromStartLine );
 	double behindPos = behindCar->race.distFromStartLine - 10;
 	if( behindPos < me->race.distFromStartLine - GRID_RAD * 9 / 10 )
 		behindPos = me->race.distFromStartLine - GRID_RAD * 9 / 10;
-	LogSHADOW.debug( "behind pos: %g\n", behindPos );
+	PRINTF( "behind pos: %g\n", behindPos );
 
 	// draw lines ahead and behind to help limit the search.
 	int aheadSegIndex = (track.IndexFromPos(aheadPos) + 1) % track.GetSize();
@@ -732,7 +731,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
 	if( at(car_pt1).est_time_to_dest < 0 && at(car_pt2).est_time_to_dest < 0 )
 	{
 //		dumpGrid();
-		LogSHADOW.info( "[%d] stuck::init -- no solution -- reinit.\n", me->index );
+		PRINTF( "[%d] stuck::init -- no solution -- reinit.\n", me->index );
 //		_stuckState = REINIT;
 //		_stuckTime  = 0.09;
 		_stuckState = RACING;
@@ -790,7 +789,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
 
 	dumpGrid();
 
-	LogSHADOW.info( "[%d] stuck::init -- done\n", me->index );
+	PRINTF( "[%d] stuck::init -- done\n", me->index );
 }
 
 void	Stuck::fillCarCells( int carI, double carX, double carY, double carAng, double len, double wid, double rad, bool addMask )
@@ -933,7 +932,7 @@ void	Stuck::fillTrackCells( const MyTrack& track )
 
 bool	Stuck::solve( const tCarElt* me )
 {
-	LogSHADOW.debug( "[%d] stuck::solve (exp=%d, qlen=%d, best time=%g)\n", me->index, _expansionsN, _pqN.size(), _bestTime );
+	PRINTF( "[%d] stuck::solve (exp=%d, qlen=%d, best time=%g)\n", me->index, _expansionsN, _pqN.size(), _bestTime );
 
 	vector<GridPoint> succs;
 	GridPoint car_pt1(*this, me, true, 0);
@@ -985,14 +984,14 @@ bool	Stuck::solve( const tCarElt* me )
 		return true;	
 	}
 
-	LogSHADOW.debug( "%d expansions\n", _expansionsN );
-	LogSHADOW.debug( "best time: %g\n", _bestTime );
-	LogSHADOW.debug( "best x: %d, y: %d, a: %d, fw %d\n", _bestPt.x(), _bestPt.y(), _bestPt.iang(), _bestPt.fw() );
+	PRINTF( "%d expansions\n", _expansionsN );
+	PRINTF( "best time: %g\n", _bestTime );
+	PRINTF( "best x: %d, y: %d, a: %d, fw %d\n", _bestPt.x(), _bestPt.y(), _bestPt.iang(), _bestPt.fw() );
 
 	if( fabs(_bestTime - 9e9f) < 1e8f )
 	{
 		// failed to find a solution.
-		LogSHADOW.debug( "no solution!\n" );
+		PRINTF( "no solution!\n" );
 		return false;
 	}
 
@@ -1006,7 +1005,7 @@ bool	Stuck::solve( const tCarElt* me )
 	while( from >= 0 && time < lastTime )
 	{
 		GridPoint	pt(from);
-		LogSHADOW.debug( "from x: %d, y: %d, a: %d, fw %d, time %f\n", pt.x(), pt.y(), pt.iang(), pt.fw(), time );
+		PRINTF( "from x: %d, y: %d, a: %d, fw %d, time %f\n", pt.x(), pt.y(), pt.iang(), pt.fw(), time );
 		_plan.push_back( pt );
 
 		lastTime = time;
@@ -1016,7 +1015,7 @@ bool	Stuck::solve( const tCarElt* me )
 
 //	dumpGrid();
 
-	LogSHADOW.debug( "stuck::solve -- done\n" );
+	PRINTF( "stuck::solve -- done\n" );
 	
 	_stuckState = EXEC_PLAN;
 	_stuckTime = 0;
@@ -1027,7 +1026,7 @@ bool	Stuck::solve( const tCarElt* me )
 // search from car to destination.
 bool	Stuck::solveR( const tCarElt* me )
 {
-	LogSHADOW.debug( "[%d] stuck::solveR (exp=%d, qlen=%d, best time=%g)\n", me->index, _expansionsR, _pqR.size(), _bestTime );
+	PRINTF( "[%d] stuck::solveR (exp=%d, qlen=%d, best time=%g)\n", me->index, _expansionsR, _pqR.size(), _bestTime );
 
 	vector<GridPoint> succs;
 
@@ -1078,14 +1077,14 @@ bool	Stuck::solveR( const tCarElt* me )
 		return true;	
 	}
 
-	LogSHADOW.debug( "%d expansions\n", _expansionsR );
-	LogSHADOW.debug( "best time: %g\n", _bestTime );
-	LogSHADOW.debug( "best x: %d, y: %d, a: %d, fw %d\n", _bestPt.x(), _bestPt.y(), _bestPt.iang(), _bestPt.fw() );
+	PRINTF( "%d expansions\n", _expansionsR );
+	PRINTF( "best time: %g\n", _bestTime );
+	PRINTF( "best x: %d, y: %d, a: %d, fw %d\n", _bestPt.x(), _bestPt.y(), _bestPt.iang(), _bestPt.fw() );
 
 	if( fabs(_bestTime - 9e9f) < 1e8f )
 	{
 		// failed to find a solution.
-		LogSHADOW.debug( "no solution!\n" );
+		PRINTF( "no solution!\n" );
 		return false;
 	}
 
@@ -1101,7 +1100,7 @@ bool	Stuck::solveR( const tCarElt* me )
 	while( from >= 0 && time < lastTime )
 	{
 		GridPoint	pt(from);
-		LogSHADOW.debug( "from x: %d, y: %d, a: %d, fw %d, time %f\n", pt.x(), pt.y(), pt.iang(), pt.fw(), time );
+		PRINTF( "from x: %d, y: %d, a: %d, fw %d, time %f\n", pt.x(), pt.y(), pt.iang(), pt.fw(), time );
 		_plan.push_back( pt );
 
 		lastTime = time;
@@ -1118,7 +1117,7 @@ bool	Stuck::solveR( const tCarElt* me )
 
 	dumpGrid();
 
-	LogSHADOW.debug( "stuck::solveR -- done\n" );
+	PRINTF( "stuck::solveR -- done\n" );
 	
 	_stuckState = EXEC_PLAN;
 	_stuckTime = 0;
@@ -1128,7 +1127,7 @@ bool	Stuck::solveR( const tCarElt* me )
 
 void Stuck::dumpGrid() const
 {
-	set<unsigned int> pts;
+	set<uint> pts;
 	for( int i = 0; i < _plan.size(); i++ )
 	{
 		const GridPoint& pt = _plan[i];
@@ -1172,8 +1171,7 @@ void Stuck::dumpGrid() const
 			else
 				line[x] = '#';
 		}
-
-		LogSHADOW.debug( "%s\n", line );
+		PRINTF( "%s\n", line );
 	}
 	
 	GridPoint	pt(*this, _me, true, 0);
@@ -1185,12 +1183,12 @@ void Stuck::dumpGrid() const
 	int dy = delta8_y[octang];
 	float ft = at(x, y).times[fwang(iang, true)];
 	float bt = at(x, y).times[fwang(iang, false)];
-	LogSHADOW.debug( "[%2d,%2d]  CAR  iang %d  ft %g  bt %g\n", x, y, iang, ft, bt );
+	PRINTF( "[%2d,%2d]  CAR  iang %d  ft %g  bt %g\n", x, y, iang, ft, bt );
 	
 	for( int i = 0; i < (int)_destinations.size(); i++ )
 	{
 		const GridPoint& dest = _destinations[i];
-		LogSHADOW.debug( "[%2d,%2d]  DEST  iang %d  t %g\n", dest.x(), dest.y(), dest.iang(), at(dest).times[dest.fwang()] );
+		PRINTF( "[%2d,%2d]  DEST  iang %d  t %g\n", dest.x(), dest.y(), dest.iang(), at(dest).times[dest.fwang()] );
 	}
 
 	int xx = x - dx;
@@ -1200,13 +1198,13 @@ void Stuck::dumpGrid() const
 		int fa = (iang + da) & 0x3F;
 		ft = at(xx, yy).times[fwang(fa, true)];
 		bt = at(xx, yy).times[fwang(fa, false)];
-		LogSHADOW.debug( "[%2d,%2d]  iang %d  ft %g  bt %g\n", xx, yy, fa, ft, bt );
+		PRINTF( "[%2d,%2d]  iang %d  ft %g  bt %g\n", xx, yy, fa, ft, bt );
 	}
 }
 
 void	Stuck::getUnstuck( const MyTrack& track, tCarElt* me, const tSituation* s )
 {
-	LogSHADOW.debug( "[%d] stuck::getUnstuck\n", me->index );
+	PRINTF( "[%d] stuck::getUnstuck\n", me->index );
 	
 	if( _planIndex >= _plan.size() - 1 )
 	{
@@ -1220,19 +1218,19 @@ void	Stuck::getUnstuck( const MyTrack& track, tCarElt* me, const tSituation* s )
 	GridPoint car_pt1(*this, me, true, 0);
 	int best = -1;
 	double bestDist = 9e9;
-	LogSHADOW.debug( "[%d] (%d,%d) nearest pt: ",  me->index, car_pt1.x(), car_pt1.y() );
+	DEBUGF( "[%d] (%d,%d) nearest pt: ",  me->index, car_pt1.x(), car_pt1.y() );
 	for( int i = _planIndex; i < _plan.size(); i++ )
 	{
 		const GridPoint& pt = _plan[i];
 		double dist = pt.dist(car_pt1);
-		LogSHADOW.debug( "[%d]=%g, ", i, dist );
+		DEBUGF( "[%d]=%g, ", i, dist );
 		if( bestDist > dist )
 		{
 			bestDist = dist;
 			best = i;
 		}
 	}
-	LogSHADOW.debug(" best=%d\n", best );
+	DEBUGF(" best=%d\n", best );
 	
 	if( best < 0 )
 	{
@@ -1260,16 +1258,14 @@ void	Stuck::getUnstuck( const MyTrack& track, tCarElt* me, const tSituation* s )
 	float spd = me->pub.DynGC.vel.x;
 	int   gear = fw ? 1 : -1;
 //	me->ctrl.accelCmd	= MN(0.25f, (8 - fabs(spd)) * 0.05);
-//	me->ctrl.accelCmd	= MN(0.25f, (10 - fabs(spd)) * 0.25);
-//	me->ctrl.accelCmd	= MN(0.50f, (10 - fabs(spd)) * 0.25);
-	me->ctrl.accelCmd	= MN(0.75f, (10 - fabs(spd)) * 0.25);
+	me->ctrl.accelCmd	= MN(0.25f, (10 - fabs(spd)) * 0.25);
 	me->ctrl.brakeCmd	= fw && spd < -0.1 || !fw && spd > 0.1 ? 0.5 : 0;
 	me->ctrl.clutchCmd	= 0;//gear == me->ctrl.gear ? 0.0f : 0.5f;
 	me->ctrl.gear		= gear;
 	me->ctrl.steer		= (spd > 0 ? deltaAng : -deltaAng) * 2 / me->info.steerLock;
 
 	double dist = calcCarDist(fw, 10, me, s);
-	LogSHADOW.debug( "[%d] dir=%d  dist=%g\n", me->index, fw, dist );
+	DEBUGF( "[%d] dir=%d  dist=%g\n", me->index, fw, dist );
 	if( dist < 0.2 )
 	{
 		me->ctrl.accelCmd = 0;
@@ -1285,7 +1281,7 @@ void	Stuck::getUnstuck( const MyTrack& track, tCarElt* me, const tSituation* s )
 		}
 	}
 
-	LogSHADOW.info( "[%d] plan index: %d/%d  acc=%.3f, gear=%d, da=%.3f, steer=%.3f, dist-ahead=%.3f\n",
+	PRINTF( "[%d] plan index: %d/%d  acc=%.3f, gear=%d, da=%.3f, steer=%.3f, dist-ahead=%.3f\n",
 			me->index, _planIndex, _plan.size(), me->ctrl.accelCmd, me->ctrl.gear, deltaAng * 180 / PI,
 			me->ctrl.steer * me->info.steerLock * 180 / PI, dist );
 }

@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : Cubic.h
-    created     : 9 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -14,6 +14,10 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
+// Cubic.h: interface for the Cubic class.
+//
+//////////////////////////////////////////////////////////////////////
 
 #ifndef _CUBIC_H_
 #define _CUBIC_H_
@@ -41,4 +45,4 @@ public:
     double	m_coeffs[4];	// coefficients
 };
 
-#endif
+#endif // _CUBIC_H_

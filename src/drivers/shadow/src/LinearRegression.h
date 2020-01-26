@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : LinearRegression.h
-    created     : 9 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -15,30 +15,35 @@
  *                                                                         *
  ***************************************************************************/
 
+// LinearRegression.h: interface for the LinearRegression class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #ifndef _LINEARREGRESSION_H_
 #define _LINEARREGRESSION_H_
 
 #include "Vec2d.h"
 
-class LinearRegression  
+class LinearRegression
 {
 public:
-	LinearRegression();
-	~LinearRegression();
+    LinearRegression();
+    ~LinearRegression();
 
-	void	Clear();
-	void	Sample( double X, double Y );
-	void	Sample( const Vec2d& p );
-	double	CalcY( double X ) const;
-	void	CalcLine( Vec2d& p, Vec2d& v ) const;
+    void	Clear();
+    void	Sample( double X, double Y );
+    void	Sample( const Vec2d& p );
+    double	CalcY( double X ) const;
+    void	CalcCoeffs( double* a, double* b ) const;
+    void	CalcLine( Vec2d& p, Vec2d& v ) const;
 
 public:
-	int		m_n;
-	double	m_sumX;
-	double	m_sumY;
-	double	m_sumXY;
-	double	m_sumXX;
-	double	m_sumYY;
+    int		m_n;
+    double	m_sumX;
+    double	m_sumY;
+    double	m_sumXY;
+    double	m_sumXX;
+    double	m_sumYY;
 };
 
-#endif
+#endif // _LINEARREGRESSION_H_

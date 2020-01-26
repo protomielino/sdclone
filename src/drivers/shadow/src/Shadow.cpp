@@ -44,7 +44,7 @@ using ::std::pair;
 // The "SHADOW" logger instance
 GfLogger* PLogSHADOW = 0;
 
-static Shared       s_shared;
+//static Shared       s_shared;
 
 // TORCS interface
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
@@ -262,38 +262,38 @@ static int InitFuncPt(int index, void *pt)
 static void initTrack(int index, tTrack* track, void *carHandle,
                       void **carParmHandle, tSituation *s)
 {
-    driver[index]->SetShared( &s_shared );
-    driver[index]->InitTrack(track, carHandle, carParmHandle, s);
+    //driver[index]->SetShared( &s_shared );
+    driver[index]->InitTrack(index, track, carHandle, carParmHandle, s);
 }
 
 
 // Start a new race.
 static void newRace(int index, tCarElt* car, tSituation *s)
 {
-    driver[index]->NewRace(car, s);
+    driver[index]->NewRace(index, car, s);
 }
 
 // Drive during race.
 static void drive(int index, tCarElt* car, tSituation *s)
 {
-    driver[index]->Drive(s);
+    driver[index]->Drive(index, car, s);
 }
 
 // Pitstop callback.
 static int pitcmd(int index, tCarElt* car, tSituation *s)
 {
-    return driver[index]->PitCmd(s);
+    return driver[index]->PitCmd(index, car, s);
 }
 
 // End of the current race.
 static void endRace(int index, tCarElt *car, tSituation *s)
 {
-    driver[index]->EndRace(s);
+    driver[index]->EndRace(index, car, s);
 }
 
 // Called before the module is unloaded.
 static void shutdown(int index)
 {
-    driver[index]->Shutdown();
+    driver[index]->Shutdown(index);
     delete driver[index];
 }

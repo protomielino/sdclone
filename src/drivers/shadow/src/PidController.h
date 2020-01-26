@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : PidController.h
-    created     : 9 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -15,27 +15,31 @@
  *                                                                         *
  ***************************************************************************/
 
+// PidController.h: interface for the PidController class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #ifndef _PIDCONTROLLER_H_
 #define _PIDCONTROLLER_H_
 
-class PidController  
+class PidController
 {
 public:
-	PidController();
-	virtual ~PidController();
+    PidController();
+    virtual ~PidController();
 
-	double	Sample( double propValue );
-	double	Sample( double propValue, double diffValue );
+    double	Sample( double propValue );
+    double	Sample( double propValue, double diffValue );
 
 public:
-	double	m_lastPropValue;	// for calculating differential (if not supplied)
-	double	m_total;			// for integral.
-	double	m_maxTotal;			// for integral.
-	double	m_totalRate;		// for integral.
+    double	m_lastPropValue;	// for calculating differential (if not supplied)
+    double	m_total;			// for integral.
+    double	m_maxTotal;			// for integral.
+    double	m_totalRate;		// for integral.
 
-	double	m_p;
-	double	m_i;
-	double	m_d;
+    double	m_p;
+    double	m_i;
+    double	m_d;
 };
 
-#endif
+#endif // _PIDCONTROLLER_H_

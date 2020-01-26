@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : CarModel.h
-    created     : 9 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -15,6 +15,10 @@
  *                                                                         *
  ***************************************************************************/
 
+// CarModel.h: interface for the CarModel class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #ifndef _CARMODEL_H_
 #define _CARMODEL_H_
 
@@ -23,8 +27,9 @@
 
 #include <vector>
 
-// my own planet ...
-#define GRAVITY 9.81
+// The "MOUSE" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
 
 class CarModel
 {
@@ -38,6 +43,7 @@ public:
         F_USE_KV				= 0x08,
     };
 
+public:
     CarModel();
     ~CarModel();
 
@@ -48,80 +54,80 @@ public:
     void    config( void* hCar );
     void	update( const tCarElt* car, const tSituation* sit );
 
-    double	CalcMaxSpeed(double k, double kz, double kv, double kFriction, double trackRollAngle, double trackPitchAngle) const;
-    double	CalcBreaking( double k0, double kz0, double k1, double kz1, double spd1, double dist, double kFriction, double RollAngle, double TiltAngle ) const;
-    double	CalcAcceleration( double k0, double kz0, double k1, double kz1, double spd0, double dist, double kFriction, double RollAngle, double TiltAngle ) const;
+    double	CalcMaxSpeed( double k, double kz, double kv, double kFriction,
+                          double rollAngle, double pitchAngle ) const;
+
+    double	CalcBraking( double k0, double kz0, double kv0, double k1, double kz1, double kv1,
+                          double spd1, double dist, double kFriction,
+                          double trackRollAngle, double pitchAngle ) const;
+
+    double	CalcAcceleration( double k0, double kz0, double kv0, double k1, double kz1, double kv1,
+                              double spd0, double dist, double kFriction,
+                              double trackRollAngle, double pitchAngle ) const;
     double	CalcMaxSpdK() const;
-    double	CalcMaxLateralF(double spd, double kFriction , double kz = 0.0) const;
-    double	calcPredictedLoad( double speed, double weight_fraction, double downforce_constant, double k, double kz, double kv, double sin_roll, double cos_roll, double cos_pitch ) const;
+    double	CalcMaxLateralF( double spd, double kFriction ) const;
 
-    double CalcMaxSpeedCrv() const;
+    void	CalcSimuSpeeds( double spd0, double dy, double dist, double kFriction,
+                            double& minSpd, double& maxSpd ) const;
+    void	CalcSimuSpeedRanges( double spd0, double dist, double kFriction,
+                                 double& minSpd, double& maxSpd, double& maxDY ) const;
 
-    void	CalcSimuSpeeds( double spd0, double dy, double dist, double kFriction, double& minSpd, double& maxSpd ) const;
-    void	CalcSimuSpeedRanges( double spd0, double dist, double kFriction, double& minSpd, double& maxSpd, double& maxDY ) const;
-
-    const WheelModel&	wheel( int wl ) const;
+    const WheelModel&	wheel( int wheel ) const;
     void				configWheels( const tCarElt* car );
     void				configWheels( void* hCar );
     void				updateWheels( const tCarElt* car, const tSituation* s );
 
     double              rearWheelsAverageRadius() const;
     double				frontAxleSlipTangential() const;
+    double				calcPredictedLoad( double speed, double weight_fraction, double downforce_constant,
+                                           double k, double kz, double kv, double sin_roll, double cos_roll, double cos_pitch ) const;
+    double				AccForceFromSpeed( double speed ) const;
     double				CalcEngineTorque( double rpm ) const;
 
 private:
     void    configCar( void* hCar );
+    double	CalcMaxSpeedAeroOld(double k, double kz, double kv, double kFriction,
+                                double rollAngle, double pitchAngle ) const;
 
-    double	AxleCalcMaxSpeed(double k, double kz, double kv, double kFriction, double trackRollAngle, double trackPitchAngle,
-                                double gripScale, double tyreMu, double axleX, double wingX, double weightBalanceFactor,double wingDownforceConst, double axleGroundEffectConst ) const;
+    double	CalcMaxSpeedAeroNew(double k, double kz, double kv, double kFriction,
+                                double rollAngle, double pitchAngle ) const;
+
+    double	AxleCalcMaxSpeed(   double k, double kz, double kv, double kFriction,
+                                double trackRollAngle, double trackPitchAngle,
+                                double gripScale, double tyreMu, double axleX, double wingX,
+                                double weightBalanceFactor,
+                                double wingDownforceConst, double axleGroundEffectConst ) const;
 
     double  CalcAccForceFromSpeed( double speed ) const;
 
-
 public:
     int		FLAGS;			// options that modify calculations
-    int		AERO;           // which aero calc to use.
-    double  EMPTYMASS;
-    double	MASS;           // fixed mass of car.
-    double  LENGTH;         // Length of car (m)
-    double	FUEL;           // mass of fuel in car.
-    double	DAMAGE;         // damage of this car.
-    bool    NEEDSINLONG;
-    bool    USEDACCEXIT;
-    bool    USECONFIG;
-    bool    USECONFIGWHEEL;
-    double  SKILL;          // skill car driver.
-
-    double	TYRE_MU;        // mu value of tyres (min of those avail).
-    double	TYRE_MU_F;      // mu value of front tyres.
-    double	TYRE_MU_R;      // mu value of rear  tyres.
-    double	MU_SCALE;       // scaling of MU to use for this car.
-    double  MIN_MU_SCALE;   // Scaling of Min MU
-    double	AVOID_MU_SCALE;	// scaling of MU to use for this car.
-    double	BRAKE_MU_SCALE;	// extra scaling of MU to apply when braking.
-    double	KZ_SCALE;       // bump sensitivity.
-    double  OFFLINE_KZ_SCALE;
-    double	AVOID_KZ_SCALE;	// bump sensitivity.
+    double	MASS;			// fixed mass of car.
+    double	FUEL;			// mass of fuel in car.
+    double	DAMAGE;			// damage of this car.
+    double	WIDTH;			// width of car (m).
+    double	TYRE_MU;		// mu value of tyres (min of those avail).
+    double	TYRE_MU_F;		// mu value of front tyres.
+    double	TYRE_MU_R;		// mu value of rear  tyres.
+    double	MU_SCALE;		// scaling of MU to use for this car.
+    double	KZ_SCALE;		// bump sensitivity.
     double	KV_SCALE;		// bump sensitivity.
-
+    double	BRAKE_MU_SCALE;	// extra scaling of MU to apply when braking.
     double	GRIP_SCALE_F;	// scaling of grip due to condition of front tyres.
     double	GRIP_SCALE_R;	// scaling of grip due to condition of rear  tyres.
     double	WING_ANGLE_F;	// front wing angle.
     double	WING_ANGLE_R;	// rear wing angle.
+    double  AERO;
+    double  SKILL;
 
-    double  BRAKESCALE;     // Scaling of Brake
-    double  BRAKEFORCE;     // Brake force max
-    double	BRAKELIMIT;		// BrakeLimit
+    // calculated aerodynamic constants.
+    double	CA;				// aerodynamic downforce constant -- total.
+    double	CA_FW;			// aerodynamic downforce constant -- front wing.
+    double	CA_RW;			// aerodynamic downforce constant -- rear wing.
+    double	CA_GE;			// aerodynamic downforce constant -- ground effect.
+    double	CD_BODY;		// aerodynamic drag constant -- car body.
+    double	CD_WING;		// aerodynamic drag constant -- wings.
 
-    double	CA;             // aerodynamic downforce constant -- total.
-    double	CA_FW;          // aerodynamic downforce constant -- front wing.
-    double	CA_RW;          // aerodynamic downforce constant -- rear wing.
-    double	CA_GE;          // aerodynamic downforce constant -- ground effect.
-    double  CA_GE_F;
-    double  CA_GE_R;
-    double	CD_BODY;        // aerodynamic drag constant -- car body.
-    double	CD_WING;        // aerodynamic drag constant -- wings
-    double  CD_CX;
 
     // load factor related.
     double	OP_LOAD;
@@ -150,21 +156,6 @@ public:
 
     double	TARGET_SLIP;	// amount of slip to give maximum grip.
     double	MAX_SLIP;		// amount of slip where grip level drops below 99% of maximum grip.
-
-    double  BUMP_FACTOR;    // bump sensitivity factor.
-    double	BUMP_FACTORLEFT;
-    double	BUMP_FACTORRIGHT;
-
-    double	lftOH;
-    double	rgtOH;
-
-    double	WIDTH;			// width of car (m).
-    double  BRAKE_FACTOR;   // higher number = slower braking
-    double	CT_FACTOR;
-
-    bool	HASTYC;
-    double  TYRECONDITIONFRONT;
-    double	TYRECONDITIONREAR;
 
     double  GEAR_CHANGE_REVS;   // revs at which to change gear.
 

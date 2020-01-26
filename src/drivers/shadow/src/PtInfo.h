@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : PtInfo.h
-    created     : 9 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -15,29 +15,31 @@
  *                                                                         *
  ***************************************************************************/
 
+// PtInfo.h: interface for the PtInfo class.
+//
+//////////////////////////////////////////////////////////////////////
 
 #ifndef _PTINFO_H_
 #define _PTINFO_H_
 
-class PtInfo  
+class PtInfo
 {
 public:
-	PtInfo();
-	~PtInfo();
+    PtInfo();
+    ~PtInfo();
 
 public:
-	int		idx;	// index of seg.
-	double		t;	// parametric distance to next seg [0..1]
-	double		offs;	// offset from middle for the path.
-	double		oang;	// global angle.
-	double		toL;	// distance to edge of track on left.
-	double		toR;	// distance to edge of track on right.
-	double      extL;
-	double      extR;
-	double		k;	// curvature at point.
-	double		kz;     // curvature in z at point
-	double		spd;	// speed.
-	double		accSpd; // Accelleration speed
+    int			idx;	// index of seg.
+    double		t;		// parametric distance to next seg [0..1]
+    double		offs;	// offset from middle for the path.
+    double		oang;	// global angle.
+    double		toL;	// distance to edge of track on left.
+    double		toR;	// distance to edge of track on right.
+    double		extL;	// extent to edge of track on left.
+    double		extR;	// extent to edge of track on right.
+    double		k;		// curvature at point.
+    double		spd;	// speed.
+    double		acc;	// acceleration.
 };
 
-#endif
+#endif // _PTINFO_H_

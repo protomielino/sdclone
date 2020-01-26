@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : TeamInfo.cpp
-    created     : 21 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    created     : 21 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -20,88 +20,93 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "TeamInfo.h"
+#include "Utils.h"
+
+using namespace std;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
 TeamInfo::TeamInfo()
-:	m_size(0),
-	m_ppItems(0)
 {
 }
 
 TeamInfo::~TeamInfo()
 {
-	Empty();
+    Empty();
 }
 
-void TeamInfo::Empty()
+void	TeamInfo::Empty()
 {
-	if( m_ppItems )
-	{
-		for( int i = 0; i < m_size; i++ )
-			delete m_ppItems[i];
-		delete [] m_ppItems;
-		m_size = 0;
-		m_ppItems = 0;
-	}
+    LogMOUSE.debug( "TeamInfo::Empty()\n" );
+
+    for( int i = 0; i < (int)m_items.size(); i++ )
+        delete m_items[i];
+    m_items.clear();
 }
 
-void TeamInfo::Add( int index, Item* pItem )
+void	TeamInfo::Add( int index, Item* pItem )
 {
-	if( index >= m_size )
-	{
-		// expand array.
-		Item**	ppNewItems = new Item*[index + 1];
-		int	i;
-		for( i = 0; i < m_size; i++ )
-			ppNewItems[i] = m_ppItems[i];
-		for( ; i <= index; i++ )
-			ppNewItems[i] = 0;
+    PRINTF( "TeamInfo::Add [%d] %s\n", index, pItem->pCar->info.carName );
 
-		delete [] m_ppItems;
-		m_ppItems = ppNewItems;
-		m_size = index + 1;
-	}
+    if( index >= m_items.size() )
+    {
+        // expand array.
+        m_items.resize( index + 1 );
+    }
 
-	if( m_ppItems[index] )
-		delete m_ppItems[index];
-	m_ppItems[index] = pItem;
+    if( m_items[index] )
+        delete m_items[index];
+    m_items[index] = pItem;
 
-	// see if we can find a team mate.
+    // see if we can find a team mate.
 //	if( pItem->team >= 0 )
-	{
-		for( int i = 0; i < m_size; i++ )
-		{
-			if( i != index && m_ppItems[i] &&
-				strcmp(m_ppItems[i]->teamName, pItem->teamName) == 0 &&
-				m_ppItems[i]->pOther == 0 )
-			{
-				// found a team-mate.
-				pItem->pOther = m_ppItems[i];
-				m_ppItems[i]->pOther = pItem;
-				break;
-			}
-		}
-	}
+    {
+        for( int i = 0; i < (int)m_items.size(); i++ )
+        {
+            if( i != index && m_items[i] &&
+                strcmp(m_items[i]->teamName, pItem->teamName) == 0 &&
+                m_items[i]->pOther == 0 )
+            {
+                // found a team-mate.
+                pItem->pOther = m_items[i];
+                m_items[i]->pOther = pItem;
+                break;
+            }
+        }
+    }
 }
 
-const TeamInfo::Item* TeamInfo::GetAt( int index ) const
+const TeamInfo::Item*	TeamInfo::GetAt( int index ) const
 {
-	return m_ppItems[index];
+    return m_items[index];
 }
 
 TeamInfo::Item*	TeamInfo::GetAt( int index )
 {
-	return m_ppItems[index];
+    return m_items[index];
 }
 
-bool TeamInfo::IsTeamMate( const CarElt* pCar0, const CarElt* pCar1 ) const
+const TeamInfo::Item*	TeamInfo::GetTeamMate( const CarElt* pCar ) const
 {
+    for( int i = 0; i < (int)m_items.size(); i++ )
+    {
+        if( m_items[i] && IsTeamMate(m_items[i]->pCar, pCar) )
+            return m_items[i];
+    }
+
+    return NULL;
+}
+
+bool	TeamInfo::IsTeamMate( const CarElt* pCar0, const CarElt* pCar1 ) const
+{
+//	return strcmp(pCar0->_teamname, pCar1->_teamname) == 0;
+    return pCar0->race.pit == pCar1->race.pit;
 //	const Item*	pItem0 = GetAt(pCar0->index);
 //	const Item*	pItem1 = pItem0 ? pItem0->pOther : 0;
 //	return pItem1 ? (pItem1->pCar == pCar1) : false;
 //	return false;
-	return strcmp(pCar0->_teamname, pCar1->_teamname) == 0;
+//	return true;
 }
+

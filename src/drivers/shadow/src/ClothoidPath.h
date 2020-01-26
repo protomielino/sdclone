@@ -1,10 +1,8 @@
 /***************************************************************************
 
-    file                 : ClothoidPath.h
-    created              : 9 Apr 2006
-    copyright            : (C)2006 Tim Foden - (C)2014 Xavier BERTAUX
-    email                : bertauxx@yahoo.fr
-    version              : $Id: ClothoidPath.h 5631 2014-12-27 21:32:55Z torcs-ng $
+    file        : ClothoidPath.h
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
 
  ***************************************************************************/
 
@@ -17,14 +15,44 @@
  *                                                                         *
  ***************************************************************************/
 
+// ClothoidPath.h: interface for the ClothoidPath class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #ifndef _CLOTHOIDPATH_H_
 #define _CLOTHOIDPATH_H_
 
-#include "LinePath.h"
+#include "Path.h"
+#include "PathOptions.h"
 #include "MyTrack.h"
-#include "Array.h"
 
-class ClothoidPath : public LinePath
+#include <vector>
+
+struct Blah
+{
+    static int ccount;
+    static int dcount;
+    int dummy;
+    int* pDummy;
+//	std::vector<int> vect;
+    Blah() : dummy(123456789), pDummy(new int[1024])//, vect(2, 5)
+    {
+        pDummy[0] = 1234;
+        ccount++;
+    }
+    ~Blah()
+    {
+        pDummy[0] = 4321;
+        delete [] pDummy;
+        dcount++;
+    }
+
+private:
+    Blah( const Blah& blah );
+    Blah& operator=( const Blah& blah );
+};
+
+class ClothoidPath : public Path
 {
 public:
     enum
@@ -32,47 +60,65 @@ public:
         FLAG_FLYING		= 0x01,
     };
 
-    struct Options
+    class ICalcTimeFunc
     {
-        int		bumpMod;
-        double	maxL;
-        double	maxR;
+    public:
+        virtual double operator()( const Path& path ) const = 0;
+    };
 
-        Options() : bumpMod(0), maxL(999), maxR(999) {}
-        Options( int bm, double ml = 999, double mr = 999 )	:	bumpMod(bm), maxL(ml), maxR(mr) {}
+    class EstimateTimeFunc : public ICalcTimeFunc
+    {
+    public:
+        virtual double operator()( const Path& path ) const
+        {
+            return path.CalcEstimatedLapTime();
+        }
     };
 
 public:
     ClothoidPath();
+private:
+    ClothoidPath( const ClothoidPath& other );
+public:
     virtual ~ClothoidPath();
 
-    void	ClearFactors();
-    void	AddFactor( double factor );
-    void	SetFactors( const Array<double>& factors );
-    const Array<double>&	GetFactors() const;
+    virtual ClothoidPath&	operator=( const Path& other ) override;
+    virtual ClothoidPath&	operator=( const ClothoidPath& other );
 
-    void	MakeSmoothPath( MyTrack* pTrack, const CarModel& cm, const Options& opts );
+    const PathOptions&	GetOptions() const;
 
-private:
+    void	MakeSmoothPath( const MyTrack* pTrack, const CarModel& cm,
+                            const PathOptions& opts );
+
+    void	Search( const CarModel& cm );
+    void	Search( const CarModel& cm, const ICalcTimeFunc& calcTimeFunc );
+
+//private:
     void	AnalyseBumps( const CarModel& cm, bool dumpInfo = false );
     void	SmoothBetween( int step );
-    void	SetOffset(const CarModel& cm, double k, double t,
-                       PathPt *l3, const PathPt* l2, const PathPt* l4 );
-
-    void	OptimiseLine(const CarModel& cm, int idx, int step, double hLimit,
-                         PathPt *l3, const PathPt* l2, const PathPt* l4 );
-
+    using Path::SetOffset;
+    double	LimitOffset( const CarModel& cm, double k, double t, const PathPt* l3 ) const;
+    void	SetOffset( const CarModel& cm, double k, double t,
+                       PathPt* l3, const PathPt* l1, const PathPt* l2, const PathPt* l4, const PathPt* l5 );
+    void	OptimiseLine( const CarModel& cm, int idx, int step, double hLimit,
+                       PathPt* l3, const PathPt* l2, const PathPt* l4 );
     void	Optimise(	const CarModel& cm, double factor,
                         int idx, PathPt* l3,
                         const PathPt* l0, const PathPt* l1,
                         const PathPt* l2, const PathPt* l4,
                         const PathPt* l5, const PathPt* l6,
                         int	bumpMod );
+    void	OptimisePath(	const CarModel& cm,
+                            int step, int nIterations, int bumpMod );
+    void	OptimisePathSection(	const CarModel& cm, int start, int len,
+                                    int step, const PathOptions& options );
 
-    void	OptimisePath(	const CarModel& cm,	int step, int nIterations, int bumpMod );
+    void    CalcCachedFactors();
 
 private:
-    Array<double>	m_factors;
+    PathOptions	m_options;
+    Blah				m_blah;
+//	std::vector<double> m_factors;  // cached factors
 };
 
-#endif
+#endif // !defined(AFX_CLOTHOIDPATH_H__E1689BA0_5D2E_4D10_954C_92DC51D23523__INCLUDED_)
