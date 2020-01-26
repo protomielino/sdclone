@@ -56,9 +56,12 @@ static const int MAX_NBBOTS = 100;               // Number of drivers/robots
 #define PRV_STEER_GAIN         "steer gain"
 #define PRV_STEER_SKID         "steer skid"
 #define PRV_STEER_SKID_OFFLINE "steer skid offline"
+#define PRV_STEER_SMOOTH       "steer smooth"
+#define PRV_ACCEL_SMOOTH       "accel smooth"
 #define PRV_OUTSTEER_REDUCER   "outsteer speed reducer"
 #define PRV_LOOKAHEAD          "lookahead"
 #define PRV_LOOKAHEAD_OUT      "lookahead outside"
+#define PRV_LOOKAHEAD_IN       "lookahead inside"
 #define PRV_LOOKAHEAD_EMPTY    "lookahead empty"
 #define PRV_LOOKAHEAD_LEFT     "lookahead left"
 #define PRV_LOOKAHEAD_RIGHT    "lookahead right"
@@ -86,6 +89,8 @@ static const int MAX_NBBOTS = 100;               // Number of drivers/robots
 #define PRV_RL_LEFT_MARGIN     "rl left margin"
 #define PRV_BASE_BRAKE         "base brake"
 #define PRV_BRAKE_MOD          "brake mod"
+#define PRV_APEX               "apex"
+#define PRV_CORRECT_FACTOR     "correct factor"
 #define PRV_BRAKE_POWER        "brake power"
 #define PRV_SPEED_LIMIT        "speed limit"
 #define PRV_RACELINE_DEBUG     "raceline debug"
@@ -193,6 +198,7 @@ static const int MAX_NBBOTS = 100;               // Number of drivers/robots
 #define PRV_PIT_MAX_SPEED      "pit max speed"
 #define PRV_PIT_MAX_SPEED_OFFSET "pit max speed offset"
 #define PRV_PIT_LAP_BUFFER     "pit lap buffer"
+#define PRV_PIT_EXIT_TI        "pit exit ti"
 #define PRV_NO_PIT             "no pit"
 #define PRV_FORCE_PIT          "force pit"
 #define PRV_PIT_STRATEGY       "pitstrat"
@@ -254,7 +260,7 @@ static const int MAX_NBBOTS = 100;               // Number of drivers/robots
 #define BT_ATT_BESTLAP        "bestlap"
 #define BT_ATT_WORSTLAP       "worstlap"
 #define BT_ATT_TEAMMATE       "teammate"
-#define BT_ATT_MAXDAMMAGE     "max damages"
+#define BT_ATT_MAXDAMAGE      "max damages"
 
 enum { no_mode=0, normal=1, correcting=2, pitting=4, avoiding=8, avoidright=16, avoidside=32, avoidleft=64 };
 
@@ -275,9 +281,9 @@ enum { no_mode=0, normal=1, correcting=2, pitting=4, avoiding=8, avoidright=16, 
                 const int OPP_FRONT_FAST		= 0x200; // Drives faster than we
                 const int OPP_FRONT_FOLLOW		= 0x400; // Drives slower than we
                 const int OPP_OFF_TRACK			= 0x800; // don't worry about this one
-                const int OPP_RACELINE_CONFLICT	= 0x1000; // don't worry about this one
-                const int OPP_COLL_LINEAR		= 0x2000;
-                const int OPP_BACK_CATCHING		= 0x4000;
-                const int OPP_BACK_THREAT  		= 0x8000;
+                const int OPP_COLL_LINEAR   	= 0x1000; // don't worry about this one
+                const int OPP_BACK_CATCHING		= 0x2000;
+                const int OPP_BACK_THREAT  		= 0x4000;
+                const int OPP_BACK_SLOW         = 0x8000;
 
 #endif
