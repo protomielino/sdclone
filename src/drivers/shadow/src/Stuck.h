@@ -49,9 +49,9 @@ private:
 
     struct GridPoint
     {
-        uint	pt;			// current position.
-        float	est_time;	// estimated time to finish.
-        float	time;		// current time.
+        unsigned int	pt;			// current position.
+        float			est_time;	// estimated time to finish.
+        float			time;		// current time.
 
         GridPoint()
         :	pt(0), est_time(0), time(0)
@@ -137,13 +137,13 @@ private:
     struct Cell
     {
         enum { EDGE_MASK = 0x80000000 };
-        uint	occupied_mask;
-        float	est_time_to_car;
-        float	est_time_to_dest;
-        int		dist_from_walls;
-        float	times[N_ANGLES * 2];	// indexed by fwang
-        int		from[N_ANGLES * 2];		// indexed by fwang
-        char	solution[N_ANGLES * 2];	// indexed by fwang
+        unsigned int	occupied_mask;
+        float			est_time_to_car;
+        float			est_time_to_dest;
+        int				dist_from_walls;
+        float			times[N_ANGLES * 2];	// indexed by fwang
+        int				from[N_ANGLES * 2];		// indexed by fwang
+        char			solution[N_ANGLES * 2];	// indexed by fwang
 
 
         Cell() { clear(); }

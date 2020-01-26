@@ -1127,7 +1127,7 @@ bool	Stuck::solveR( const tCarElt* me )
 
 void Stuck::dumpGrid() const
 {
-	set<uint> pts;
+	set<unsigned int> pts;
 	for( int i = 0; i < _plan.size(); i++ )
 	{
 		const GridPoint& pt = _plan[i];

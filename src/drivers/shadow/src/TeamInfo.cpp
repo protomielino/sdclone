@@ -39,7 +39,7 @@ TeamInfo::~TeamInfo()
 
 void	TeamInfo::Empty()
 {
-    LogMOUSE.debug( "TeamInfo::Empty()\n" );
+    LogSHADOW.debug( "TeamInfo::Empty()\n" );
 
     for( int i = 0; i < (int)m_items.size(); i++ )
         delete m_items[i];

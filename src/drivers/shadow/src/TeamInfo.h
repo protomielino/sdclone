@@ -26,9 +26,9 @@
 
 #include <car.h>
 
-// The "MOUSE" logger instance.
-extern GfLogger* PLogMOUSE;
-#define LogMOUSE (*PLogMOUSE)
+// The "SHADOW" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
 
 class TeamInfo
 {
