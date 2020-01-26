@@ -46,7 +46,7 @@ public:
     inline float getCarAngle() { return angle; }
     inline double getAvgAccelX() { return avgAccelX; }
 
-    inline bool thisCar(tCarElt *car) { return (car == this->car); }
+    inline bool thisCar(tCarElt *Car) { return (Car == this->car); }
     inline tPosd *getCorner1() { return corner1; }
     inline tPosd *getCorner2() { return corner2; }
     inline tPosd *getLastSpeed() { return lastspeed; }

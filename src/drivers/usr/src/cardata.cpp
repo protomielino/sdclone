@@ -65,6 +65,8 @@ void SingleCardata::update()
     lastspeed[1].ay = lastspeed[0].ay;
     lastspeed[0].ax = car->_speed_X;
     lastspeed[0].ay = car->_speed_Y;
+
+	LogUSR.debug("Tyre Condition = %.2f - Tire Thread Depth = %.2f - Tire Critical = %.2f - Mu = %.2f\n", aTT, lTT, CTTT, t_m);
 }
 
 static double cT(double v)
@@ -219,7 +221,7 @@ void SingleCardata::updateModel()
     aTT /= 4;
     aFTT /= 2;*/
 
-    if(HasTYC)
+    if(HasTYC == TRUE)
     {
         lmTT = TyreConditionG = TyreConditionLeft();
         rmTT = TyreConditionD = TyreConditionRight();

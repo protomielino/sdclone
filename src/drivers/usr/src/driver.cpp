@@ -374,9 +374,9 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
         MU_FACTOR = GfParmGetNum(*carParmHandle, SECT_PRIVATE, BT_ATT_MUFACTOR, (char*)NULL, 0.69f);
         FUEL_FACTOR = GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_FUEL_FACTOR, (char*)NULL, 1.5f);
         COAST_ACCEL = GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_COAST_ACCEL, (char*)NULL, 0.0f);
-        brakedelay = GfParmGetNum(*carParmHandle, SECT_PRIVATE, BT_ATT_BRAKEDIST, (char*)NULL, 10.0f);
-        m_maxDammage = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, BT_ATT_MAXDAMMAGE, (char*)NULL, 5000.0f);
-        PitOffset = GfParmGetNum(*carParmHandle, SECT_PRIVATE, BT_ATT_PITOFFSET, (char*)NULL, 10.0f);
+        brakedelay = GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_BRAKEDELAY, (char*)NULL, 10.0f);
+        m_maxDammage = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, BT_ATT_MAXDAMAGE, (char*)NULL, 5000.0f);
+        PitOffset = GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_PIT_OFFSET, (char*)NULL, 10.0f);
         m_fuelStrat = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_PIT_STRATEGY, (char*)NULL, 0.0f);
         LetPass = GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_LETPASS, (char*)NULL, 0.6f);
         tcl_slip = GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_TCL_SLIP, (char*)NULL, TCL_SLIP);
@@ -556,6 +556,7 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 
     strategy->setOpponents(opponents);
     strategy->setTrack(track);
+	strategy->setCarData(mycardata);
 
     // Set team mate.
     opponents->setTeamMate(car->_teamname);
@@ -2223,7 +2224,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
     bool oppIsBrakeZone[128];
     double myTmp;
 
-    if (mycardata->HasTYC)
+    if (mycardata->HasTYC == TRUE)
         myTmp = AverageTmpForCar(car);
     else
         myTmp = 1.0;
@@ -2250,7 +2251,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
         {
             double oTmp;
 
-            if (mycardata->HasTYC)
+            if (mycardata->HasTYC == TRUE)
                 oTmp = AverageTmpForCar(ocar);
             else
                 oTmp = 1.0;

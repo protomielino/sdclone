@@ -39,8 +39,10 @@
 
 #include "driver.h"
 #include "opponent.h"
+#include "cardata.h"
 
 class Opponents;
+class SingleCardata;
 
 class AbstractStrategy {
     public:
@@ -78,6 +80,7 @@ class SimpleStrategy : public AbstractStrategy {
         bool isPitFree(tCarElt* car);
         void setOpponents(Opponents *theOpp) { opp = theOpp; }
         void setTrack(tTrack *theTrack) { track = theTrack; }
+		void setCarData(SingleCardata *CarData) { cardata = CarData; }
         int pitStopPenalty() { return stopPenalty; }
         void setTeamMate(tCarElt *tcar) { m_tmCar = tcar; }
 
@@ -117,6 +120,7 @@ class SimpleStrategy : public AbstractStrategy {
         int stopPenalty;
         Opponents *opp;
         tTrack *track;
+		SingleCardata *cardata;
         float calcFuel(double totalFuel);    
         double getRefuel1(int laps);        // How much fuel it takes to reach the finish line.
         double getRefuel2(int laps);

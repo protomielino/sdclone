@@ -90,6 +90,7 @@ public:
     vec2f   getTargetPoint(double lane);
     double  mass() { return CARMASS; }
     float   getWidthOnTrack() { return mycardata->getWidthOnTrack(); }
+	double	AverageTmpForCar(CarElt *car);
 
     void    isAlone();
     double  futureLeftToMid(double t_impact) { return (t_impact <= 0.0 ? left_toMid : left_toMid + left_speed_y * t_impact); }
@@ -112,6 +113,7 @@ public:
     LLineMode *linemode;
 
     const char* MyBotName;                      // Name of this bot
+	Pit *pit;                        // Pointer to the pit instance.
 
 private:
     // Utility functions.
@@ -133,7 +135,7 @@ private:
     float	getWidth() { return mycardata->getWidthOnTrack(); }
     bool	calcSpeed();
     int		checkSwitch( int side, Opponent *o, tCarElt *ocar, double catchdist );
-    double	AverageTmpForCar(CarElt *car);
+
     void	Meteorology();
     int		GetWeather();
     void	calcSkill();
@@ -233,7 +235,6 @@ private:
     Opponents *opponents;    // The container for opponents.
     Opponent  *opponent;      // The array of opponents.
 
-    Pit *pit;                        // Pointer to the pit instance.
     SimpleStrategy *strategy;        // Pit stop strategy.
 
     static Cardata *cardata;        // Data about all cars shared by all instances.
