@@ -233,6 +233,7 @@ void	TDriver::SetShared( Shared* pShared )
 void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCarParmHandle, tSituation*	pS )
 {
     LogSHADOW.info( " # SHADOW's driver :initTrack()\n" );
+	*ppCarParmHandle = NULL;
 
     //
     //	get the name of the car (e.g. "clkdtm").
@@ -277,47 +278,59 @@ void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCa
 
     // Discover the car type used
     void* handle = NULL;
-    sprintf(buffer, "drivers/%s/%s.xml", MyBotName, MyBotName);
+    sprintf(buffer, "%sdrivers/%s/%s.xml", GfDataDir(),MyBotName, MyBotName);
     LogSHADOW.info(" #Path driver : %s\n", buffer);
     handle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-    sprintf(buffer, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, index);
-    //mCarType = GfParmGetStr(handle, buffer, (char*)ROB_ATTR_CAR, "no good");
-    //char	baseParamPath[] = buffer;
+
+	if (handle != NULL)
+	{
+		LogSHADOW.info("# Shadow driver : %s\n", buffer);
+		snprintf(buffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, index);
+		//mCarType = GfParmGetStr(handle, buffer, (char*)ROB_ATTR_CAR, "no good");
+	}
 
     //
     //	ok, lets read/merge the car parms.
     //
 
-    void*	hCarParm = pCarHandle;
+    void*	hCarParm = NULL;
     char	buf[1024];
 
-    // default params for car type (e.g. clkdtm)
-    snprintf( buffer, BUFSIZE, "drivers/%s/%s/default.xml", MyBotName, m_carName);
-    LogSHADOW.info(" #Path driver default params for car type: %s\n", buffer);
-    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+	// override params for car type on track.
+	snprintf(buffer, BUFSIZE, "%sdrivers/%s/%s/%s.xml", GfDataDir(), MyBotName, m_carName, m_trackName);
+	hCarParm = GfParmReadFile(buffer, GFPARM_RMODE_STD);
 
-    // override params for car type on track.
-    snprintf( buffer, BUFSIZE, "drivers/%s/%s/%s.xml", MyBotName, m_carName, m_trackName );
-    LogSHADOW.info(" #Path driver override params for car type on track : %s\n", buffer);
-    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+	LogSHADOW.info(" #Path driver override params for car type on track : %s\n", buffer);
+	hCarParm = MergeParamFile(hCarParm, buffer, hCarParm != pCarHandle);
+
+	if (hCarParm == NULL)
+	{
+		// default params for car type (e.g. clkdtm)
+		snprintf(buffer, BUFSIZE, "%sdrivers/%s/%s/default.xml", GfDataDir(), MyBotName, m_carName);
+		LogSHADOW.info(" #Path driver default params for car type: %s\n", buffer);
+		hCarParm = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+	}
+
+    
+
 
     // override params for car type on track of specific race type.
-    snprintf( buffer, BUFSIZE, "%s/%s/%s-%s.xml", MyBotName, m_carName, m_trackName, raceTypeStr[raceType] );
+    /*snprintf( buffer, BUFSIZE, "%s/%s/%s-%s.xml", MyBotName, m_carName, m_trackName, raceTypeStr[raceType] );
     LogSHADOW.info(" #Path driver override params for car type on track of specific race type : %s\n", buffer);
     hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
 
     // override params for car type on track with specific driver.
-    snprintf( buffer, BUFSIZE, "drivers/%s/%s/%s-drv-%d.xml", MyBotName, m_carName, m_trackName, index );
+    snprintf( buffer, BUFSIZE, "%sdrivers/%s/%s/%s-drv-%d.xml", GfDataDir(), MyBotName, m_carName, m_trackName, index );
     LogSHADOW.info(" #Path driver override params for car type on track with specific driver : %s\n", buffer);
-    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+    hCarParm = MergeParamFile(hCarParm, buffer, hCarParm != pCarHandle);
 
     // override params for car type on track of specific race type and driver.
-    snprintf( buffer, BUFSIZE, "drivers/%s/%s/%s-%s-drv-%d.xml", MyBotName, m_carName, m_trackName, raceTypeStr[raceType], index );
+    snprintf( buffer, BUFSIZE, "%sdrivers/%s/%s/%s-%s-drv-%d.xml", GfDataDir(),MyBotName, m_carName, m_trackName, raceTypeStr[raceType], index );
     LogSHADOW.info(" #Path driver override params for car type on track of specific race type and driver : %s\n", buffer);
-    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+    hCarParm = MergeParamFile(hCarParm, buffer, hCarParm != pCarHandle);
     hCarParm = GfParmReadFile(buf, GFPARM_RMODE_STD);
 
-    // setup the car param handle to be returned.
+    // setup the car param handle to be returned.*/
 
     *ppCarParmHandle = hCarParm;
 
@@ -325,7 +338,7 @@ void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCa
 
     const char* ac3d_car = GfParmGetStr(hCarParm, SECT_GROBJECTS "/" LST_RANGES "/1", PRM_CAR, "");
 
-    double rpm = GfParmGetNum(hCarParm, SECT_PRIV, PRV_GEAR_UP_RPM, (char*)NULL, 8190);
+    double rpm = GfParmGetNum(hCarParm, SECT_PRIV, PRV_GEAR_UP_RPM, "rpm", 8190.0);
     m_gearUpRpm = rpm * 2 * PI / 60;
     LogSHADOW.info( "*** gear up rpm: %g (%g)\n", rpm, m_gearUpRpm );
 
