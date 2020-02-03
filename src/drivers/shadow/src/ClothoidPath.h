@@ -22,6 +22,10 @@
 #ifndef _CLOTHOIDPATH_H_
 #define _CLOTHOIDPATH_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 #include "Path.h"
 #include "PathOptions.h"
 #include "MyTrack.h"
@@ -121,4 +125,4 @@ private:
 //	std::vector<double> m_factors;  // cached factors
 };
 
-#endif // !defined(AFX_CLOTHOIDPATH_H__E1689BA0_5D2E_4D10_954C_92DC51D23523__INCLUDED_)
+#endif // _CLOTHOIDPATH_H_

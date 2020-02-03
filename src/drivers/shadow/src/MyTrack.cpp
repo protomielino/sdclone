@@ -26,6 +26,10 @@
 
 using namespace std;
 
+// The "SHADOW" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -58,7 +62,6 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
 {
     if( m_pCurTrack != pNewTrack )
     {
-        LogSHADOW.debug(" # SHADOW MyTrack NewTrack initialise ...\n");
         delete [] m_pSegs;
         m_pSegs = 0;
         NSEG = 0;
@@ -84,14 +87,14 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
         m_pSegs = new Seg[NSEG];
         m_delta = pNewTrack->length / NSEG;
 
-        LogSHADOW.debug( "   ### NSEG %d\n", NSEG );
+//		DEBUGF( "   ### NSEG %d\n", NSEG );
 
         tTrackSeg*	pseg = pNewTrack->seg;
         while( pseg->lgfromstart > pNewTrack->length / 2 )
             pseg = pseg->next;
         double		tsend = pseg->lgfromstart + pseg->length;
-        LogSHADOW.debug( "   ### tsend %g len %g fromstart %g\n",
-                    tsend, pseg->length, pseg->lgfromstart );
+//		DEBUGF( "   ### tsend %g len %g fromstart %g\n",
+//					tsend, pseg->length, pseg->lgfromstart );
 
         int	pitEntry = -1;
         int pitStart = -1;
@@ -105,8 +108,8 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
             while( segDist >= tsend )
             {
                 pseg = pseg->next;
-                LogSHADOW.debug( "   ### segDist %g tsend %g len %g fromstart %g\n",
-                        segDist, tsend, pseg->length, pseg->lgfromstart );
+//				DEBUGF( "   ### segDist %g tsend %g len %g fromstart %g\n",
+//						segDist, tsend, pseg->length, pseg->lgfromstart );
 //				tsend += pseg->length;
                 tsend = pseg->lgfromstart + pseg->length;
             }
@@ -126,19 +129,44 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
 
             if( pitEntry < 0 && (pseg->raceInfo & TR_PITENTRY) )
                 pitEntry = i;
-
             if( pitStart < 0 && (pseg == pNewTrack->pits.pitStart || (pseg->raceInfo & TR_PITSTART) != 0 ))
                 pitStart = (i - 1 - pitStartBufSegs + NSEG) % NSEG;
-
             if( pseg == pNewTrack->pits.pitEnd || (pseg->raceInfo & TR_PITEND) != 0 )
                 pitEnd  = (i + 1) % NSEG;
-
             if( (pseg->raceInfo & TR_PITEXIT) )
                 pitExit  = i;
         }}
 
-        LogSHADOW.debug( "pit entry %d  pit exit %d \n", pitEntry, pitExit );
+//		DEBUGF( "pit entry %d  pit exit %d \n", pitEntry, pitExit );
+/*
+        if( pNewTrack->pits.pitStart )
+        {
+            DEBUGF( "pit entry %d  pit exit %d \n",
+                pNewTrack->pits.pitEntry->id, pNewTrack->pits.pitExit->id );
+            DEBUGF( "pit start %d  pit end  %d \n",
+                pNewTrack->pits.pitStart->id, pNewTrack->pits.pitEnd->id );
+            DEBUGF( "pit side %d   pit len %g\n", pitSide, pNewTrack->pits.len );
+            pseg = pNewTrack->pits.pitEntry->prev;
+            do
+            {
+                pseg = pseg->next;
+                DEBUGF( " %7.2fm %4d %5.1fm %4.1fm..%4.1fm",
+                        pseg->lgfromstart, pseg->id, pseg->length,
+                        pseg->startWidth, pseg->endWidth );
 
+                tTrackSeg*	pSide = pseg->side[pitSide];
+                while( pSide )
+                {
+                    DEBUGF( "  %4.1f-%4.1fm %d %d %3x", pSide->startWidth, pSide->endWidth,
+                            pSide->type2, pSide->style, pSide->raceInfo );
+                    pSide = pSide->side[pitSide];
+                }
+
+                DEBUGF( "\n" );
+            }
+            while( pseg != pNewTrack->pits.pitExit );
+        }
+*/
         int		lastStart	= 0;
         double	lastK		= 0;
         int		lastSign	= 1;
@@ -148,7 +176,7 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
 
         vector<int>	bends;
 
-        for( int i = 0; i < NSEG; i++ )
+        {for( int i = 0; i < NSEG; i++ )
         {
             const tTrackSeg* pseg = m_pSegs[i].pSeg;
             double k =  pseg->type == TR_LFT ?  1.0 / pseg->radius :
@@ -159,7 +187,7 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
 
             if( k != lastK )
             {
-                LogSHADOW.debug("[%d] t=%d, r=%g, k=%g, s=%d\n", i, pseg->type, pseg->radius, k, lastSign );
+                //PRINTF("[%d] t=%d, r=%g, k=%g, s=%d\n", i, pseg->type, pseg->radius, k, lastSign );
                 if( lastSign * lastK > 0 && lastSign * k < lastSign * lastK )
                 {
                     LogSHADOW.debug("bend[%d..%d] r=%g, k=%g, s=%d\n", lastStart, i, pseg->radius, lastK, lastSign );
@@ -170,7 +198,7 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                 lastSign	= k < lastK ? -1 : 1;
                 lastK		= k;
             }
-        }
+        }}
 
         int nBends = bends.size();
         LogSHADOW.debug( "number of bends identified: %d\n", nBends );
@@ -200,11 +228,13 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
             for( int j = 0; j < half; j++ )
             {
                 int index = (end - j + NSEG) % NSEG;
+
                 if( type != m_pSegs[index].pSeg->type )
                 {
                     LogSHADOW.debug( "[%da] begin=%d\n", nextId / 2, index );
                     break;
                 }
+
                 m_pSegs[index].bendId = nextId;
             }
         }
@@ -337,7 +367,6 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
 
                 double extent = pseg->width / 2;
                 pSide = pseg->side[s];
-
                 while( pSide )
                 {
                     if( pSide->style >= TR_WALL )
@@ -366,9 +395,9 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                                 m_pSegs[i].t,
                                 m_pSegs[i].pt, m_pSegs[i].norm );
 
-            LogSHADOW.debug( "%4d  p(%7.2f, %7.2f, %7.2f)  n(%7.4f, %7.4f, %7.4f)\n",
-                    i, m_pSegs[i].pt.x, m_pSegs[i].pt.y, m_pSegs[i].pt.z,
-                    m_pSegs[i].norm.x, m_pSegs[i].norm.y, m_pSegs[i].norm.z );
+//			DEBUGF( "%4d  p(%7.2f, %7.2f, %7.2f)  n(%7.4f, %7.4f, %7.4f)\n",
+//					i, m_pSegs[i].pt.x, m_pSegs[i].pt.y, m_pSegs[i].pt.z,
+//					m_pSegs[i].norm.x, m_pSegs[i].norm.y, m_pSegs[i].norm.z );
         }
 
         for( int i = 0; i < NSEG; i++ )
@@ -411,15 +440,11 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
 
 tTrack*	MyTrack::GetTrack()
 {
-    LogSHADOW.debug(" # MyTrack->GetTrack()");
-
     return m_pCurTrack;
 }
 
 const tTrack*	MyTrack::GetTrack() const
 {
-    LogSHADOW.debug(" # const MyTrack->GetTrack()");
-
     return m_pCurTrack;
 }
 
@@ -565,7 +590,6 @@ double	MyTrack::GetFriction( int index, double offset ) const
     if( offset < 0 )
     {
         double x = pSeg->width / 2 - offset;
-
         while( pSeg->lside != NULL && x > pSeg->width )
         {
             x -= pSeg->width;
@@ -575,7 +599,6 @@ double	MyTrack::GetFriction( int index, double offset ) const
     else
     {
         double x = pSeg->width / 2 + offset;
-
         while( pSeg->rside != NULL && x > pSeg->width )
         {
             x -= pSeg->width;
@@ -599,7 +622,7 @@ void	MyTrack::CalcPtAndNormal(
     {
         Vec3d	s = (Vec3d(pSeg->vertex[TR_SL]) + Vec3d(pSeg->vertex[TR_SR])) / 2;
         Vec3d	e = (Vec3d(pSeg->vertex[TR_EL]) + Vec3d(pSeg->vertex[TR_ER])) / 2;
-        t = toStart / (double)pSeg->length;
+        t = toStart / pSeg->length;
         pt = s + (e - s) * t;
 
         double hl = pSeg->vertex[TR_SL].z +

@@ -22,6 +22,10 @@
 #ifndef _OPPONENT_H_
 #define _OPPONENT_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 #include "PathRecord.h"
 #include "TeamInfo.h"
 #include "Utils.h"
@@ -29,7 +33,7 @@
 #include <car.h>
 #include <raceman.h>
 
-class TDriver;
+class Driver;
 
 class Opponent
 {
@@ -173,9 +177,9 @@ public:
 //								  int idx );
     void			UpdateSit( const CarElt* myCar, const Situation* s, const TeamInfo* pTeamInfo,
                                double myDirX, double myDirY, const PtInfo& oppPi );
-    void			ProcessMyCar( const Situation* s, const TeamInfo* pTeamInfo,
+    void			ProcessMyCar(const Situation* s, const TeamInfo* pTeamInfo,
                                   const CarElt* myCar, const Sit& mySit,
-                                  const TDriver& me, double myMaxAccX, int idx );
+                                  const Driver &me, double myMaxAccX, int idx );
 
     static bool compareSitRelPos( const Opponent* a, const Opponent* b ) { return a->m_info.sit.relPos < b->m_info.sit.relPos; }
 
@@ -184,4 +188,4 @@ private:
     PathRecord		m_path;		// info about path of this opponent.
 };
 
-#endif // !defined(AFX_OPPONENT_H__36326AD0_5287_4D35_B380_AE45AD76DF12__INCLUDED_)
+#endif // _OPPONENT_H_

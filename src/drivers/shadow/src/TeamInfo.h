@@ -22,13 +22,13 @@
 #ifndef _TEAMINFO_H_
 #define _TEAMINFO_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 #include <vector>
 
 #include <car.h>
-
-// The "SHADOW" logger instance.
-extern GfLogger* PLogSHADOW;
-#define LogSHADOW (*PLogSHADOW)
 
 class TeamInfo
 {
@@ -61,4 +61,4 @@ private:
     std::vector<Item*>	m_items;
 };
 
-#endif
+#endif // !defined(AFX_TEAMINFO_H__7EA9649D_1527_4B70_BA9A_63E73AEFC9FF__INCLUDED_)

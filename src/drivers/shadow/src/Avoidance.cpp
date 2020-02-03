@@ -1,6 +1,19 @@
-// Avoidance.cpp: implementation of the Avoidance class.
-//
-//////////////////////////////////////////////////////////////////////
+/***************************************************************************
+
+    file        : Avoidance.cpp
+    created     : (C) 2006
+    copyright   : (C) 2017 Tim Foden
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #include "Avoidance.h"
 
@@ -16,7 +29,7 @@ Avoidance::~Avoidance()
 {
 }
 
-Vec2d	Avoidance::calcTarget( const Info& ai, const CarElt* pCar, const TDriver& me )
+Vec2d	Avoidance::calcTarget( const Info& ai, const CarElt* pCar, const Driver& me )
 {
     Vec2d	target(0, 0);
 

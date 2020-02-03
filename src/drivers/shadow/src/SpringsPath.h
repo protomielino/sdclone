@@ -19,8 +19,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_SpringsPath_H__E1689BA0_5D2E_4D10_954C_92DC51D23523__INCLUDED_)
-#define AFX_SpringsPath_H__E1689BA0_5D2E_4D10_954C_92DC51D23523__INCLUDED_
+#ifndef _SPRINGSPATH_H_
+#define _SPRINGSPATH_H_
 
 #if _MSC_VER > 1000
 #pragma once
@@ -35,78 +35,78 @@
 class SpringsPath : public Path
 {
 public:
-	enum
-	{
-		FLAG_FLYING		= 0x01,
-	};
+    enum
+    {
+        FLAG_FLYING		= 0x01,
+    };
 
-	class ICalcTimeFunc
-	{
-	public:
-		virtual double operator()( const Path& path ) const = 0;
-	};
-	
-	class EstimateTimeFunc : public ICalcTimeFunc
-	{
-	public:
-		virtual double operator()( const Path& path ) const
-		{
-			return path.CalcEstimatedLapTime();
-		}
-	};
+    class ICalcTimeFunc
+    {
+    public:
+        virtual double operator()( const Path& path ) const = 0;
+    };
+
+    class EstimateTimeFunc : public ICalcTimeFunc
+    {
+    public:
+        virtual double operator()( const Path& path ) const
+        {
+            return path.CalcEstimatedLapTime();
+        }
+    };
 
 public:
-	SpringsPath();
-	virtual ~SpringsPath();
+    SpringsPath();
+    virtual ~SpringsPath();
 
-	virtual SpringsPath&	operator=( const Path& other );
-	SpringsPath&			operator=( const SpringsPath& other );
+    virtual SpringsPath&	operator=( const Path& other );
+    SpringsPath&			operator=( const SpringsPath& other );
 
-	const PathOptions&	GetOptions() const;
+    const PathOptions&	GetOptions() const;
 
-	void	MakeSmoothPath( const MyTrack* pTrack, const CarModel& cm,
-							const PathOptions& opts );
+    void	MakeSmoothPath( const MyTrack* pTrack, const CarModel& cm,
+                            const PathOptions& opts );
 
-	void	Search( const CarModel& cm );
-	void	Search( const CarModel& cm, const ICalcTimeFunc& calcTimeFunc );
+    void	Search( const CarModel& cm );
+    void	Search( const CarModel& cm, const ICalcTimeFunc& calcTimeFunc );
 
 private:
-	void	AnalyseBumps( const CarModel& cm, bool dumpInfo = false );
-	void	SmoothBetween( int step );
-	using Path::SetOffset;
-	void	SetOffset( const CarModel& cm, double k, double t,
-					   PathPt* l3, const PathPt* l2, const PathPt* l4 );
-	void	SetOffset( const CarModel&	cm, int index, double t );
-	void	OptimisePtLinear( const CarModel& cm, int idx, int step, double hLimit,
-							  PathPt* l3, const PathPt* l2, const PathPt* l4 );
-	void	OptimisePtClothoid(	const CarModel& cm, double factor,
-								int idx, PathPt* l3,
-								const PathPt* l0, const PathPt* l1,
-								const PathPt* l2, const PathPt* l4,
-								const PathPt* l5, const PathPt* l6,
-								int	bumpMod );
+    void	AnalyseBumps( const CarModel& cm, bool dumpInfo = false );
+    void	SmoothBetween( int step );
+    using Path::SetOffset;
+    void	SetOffset( const CarModel& cm, double k, double t,
+                       PathPt* l3, const PathPt* l2, const PathPt* l4 );
+    void	SetOffset( const CarModel&	cm, int index, double t );
+    void	OptimisePtLinear( const CarModel& cm, int idx, int step, double hLimit,
+                              PathPt* l3, const PathPt* l2, const PathPt* l4 );
+    void	OptimisePtClothoid(	const CarModel& cm, double factor,
+                                int idx, PathPt* l3,
+                                const PathPt* l0, const PathPt* l1,
+                                const PathPt* l2, const PathPt* l4,
+                                const PathPt* l5, const PathPt* l6,
+                                int	bumpMod );
 public:
-	void	ResetSpringVelocities();
-	void	OptimisePathSprings( const CarModel&	cm,
-								 int				step,
-								 int				nIterations,
-								 int				bumpMod );
+    void	ResetSpringVelocities();
+    void	OptimisePathSprings( const CarModel&	cm,
+                                 int				step,
+                                 int				nIterations,
+                                 int				bumpMod );
 
-	void	OptimisePathTopLevel(	const CarModel& cm,
-									int step, int nIterations, int bumpMod );
+    void	OptimisePathTopLevel(	const CarModel& cm,
+                                    int step, int nIterations, int bumpMod );
 
 private:
-	PathOptions	m_options;
+    PathOptions	m_options;
 
-	struct PathCalc
-	{
-		Vec2d	pnorm;
-		double	rlen;
-		double	old_offs;
-		Vec2d	force;
-	};
-	
-	std::vector<PathCalc>	m_temp;
+    struct PathCalc
+    {
+        Vec2d	pnorm;
+        double	rlen;
+        double	old_offs;
+        Vec2d	force;
+    };
+
+    std::vector<PathCalc>	m_temp;
 };
 
-#endif // !defined(AFX_SpringsPath_H__E1689BA0_5D2E_4D10_954C_92DC51D23523__INCLUDED_)
+#endif // _SRINGSPATH_H_

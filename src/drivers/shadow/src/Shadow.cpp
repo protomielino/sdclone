@@ -1,8 +1,8 @@
 /***************************************************************************
 
-    file        : mouse_2006.cpp
-    created     : 9 Apr 2006
-    copyright   : (C) 2006 Tim Foden
+    file        : shadow.cpp
+    created     : 30 Dec 2019
+    copyright   : (C) 2019 Xavier Bertaux
 
  ***************************************************************************/
 
@@ -41,22 +41,25 @@ using ::std::string;
 using ::std::vector;
 using ::std::pair;
 
+class Shared;
+class Driver;
+
 // The "SHADOW" logger instance
 GfLogger* PLogSHADOW = 0;
 
-//static Shared       s_shared;
+static Shared       s_shared;
 
 // TORCS interface
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
 static void newRace(int index, tCarElt* car, tSituation *s);
 static void drive(int index, tCarElt* car, tSituation *s);
-static int pitcmd(int index, tCarElt* car, tSituation *s);
+static int  pitcmd(int index, tCarElt* car, tSituation *s);
 static void shutdown(int index);
-static int InitFuncPt(int index, void *pt);
+static int  InitFuncPt(int index, void *pt);
 static void endRace(int index, tCarElt *car, tSituation *s);
 
 // SD interface
-static const int BUFSIZE = 256;
+static const int BUFSIZE = 512;
 static const int MAXNBBOTS = 100;
 static const string defaultBotName[MAXNBBOTS] =                  // NOLINT(runtime/string)
 {
@@ -76,7 +79,7 @@ static const string defaultBotDesc[MAXNBBOTS] =                  // NOLINT(runti
 
 // Drivers info: pair(first:Name, second:Desc)
 static vector< pair<string, string> > Drivers;
-static TDriver *driver[MAXNBBOTS];  // Array of drivers
+static Driver *driver[MAXNBBOTS];  // Array of drivers
 
 // Number of drivers defined in robot's xml-file
 static int NBBOTS = 0;      // Still unknown
@@ -245,7 +248,7 @@ static int InitFuncPt(int index, void *pt)
     tRobotItf *itf = static_cast<tRobotItf *>(pt);
 
     // Create robot instance for index.
-    driver[index] = new TDriver(index);
+    driver[index] = new Driver(index);
     driver[index]->MyBotName = nameBuffer.c_str();
 
     itf->rbNewTrack = initTrack;    // Give the robot the track view called.
@@ -255,6 +258,7 @@ static int InitFuncPt(int index, void *pt)
     itf->rbEndRace  = endRace;      // End of the current race.
     itf->rbShutdown = shutdown;     // Called before the module is unloaded.
     itf->index      = index;        // Index used if multiple interfaces.
+
     return 0;
 }
 
@@ -262,7 +266,7 @@ static int InitFuncPt(int index, void *pt)
 static void initTrack(int index, tTrack* track, void *carHandle,
                       void **carParmHandle, tSituation *s)
 {
-    //driver[index]->SetShared( &s_shared );
+    driver[index]->SetShared( &s_shared );
     driver[index]->InitTrack(index, track, carHandle, carParmHandle, s);
 }
 

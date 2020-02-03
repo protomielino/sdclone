@@ -24,6 +24,10 @@
 
 using namespace std;
 
+// The "SHADOW" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -39,8 +43,7 @@ TeamInfo::~TeamInfo()
 
 void	TeamInfo::Empty()
 {
-    LogSHADOW.debug( "TeamInfo::Empty()\n" );
-
+//	PRINTF( "TeamInfo::Empty()\n" );
     for( int i = 0; i < (int)m_items.size(); i++ )
         delete m_items[i];
     m_items.clear();
@@ -48,7 +51,7 @@ void	TeamInfo::Empty()
 
 void	TeamInfo::Add( int index, Item* pItem )
 {
-    PRINTF( "TeamInfo::Add [%d] %s\n", index, pItem->pCar->info.carName );
+    LogSHADOW.debug( "TeamInfo::Add [%d] %s\n", index, pItem->pCar->info.carName );
 
     if( index >= m_items.size() )
     {

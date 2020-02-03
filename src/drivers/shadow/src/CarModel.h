@@ -27,10 +27,6 @@
 
 #include <vector>
 
-// The "MOUSE" logger instance.
-extern GfLogger* PLogSHADOW;
-#define LogSHADOW (*PLogSHADOW)
-
 class CarModel
 {
 public:
@@ -78,12 +74,15 @@ public:
     void				updateWheels( const tCarElt* car, const tSituation* s );
 
     double              rearWheelsAverageRadius() const;
+
     double				frontAxleSlipTangential() const;
+
     double				calcPredictedLoad( double speed, double weight_fraction, double downforce_constant,
                                            double k, double kz, double kv, double sin_roll, double cos_roll, double cos_pitch ) const;
-    double				AccForceFromSpeed( double speed ) const;
-    double				CalcEngineTorque( double rpm ) const;
 
+    double				AccForceFromSpeed( double speed ) const;
+
+    double				CalcEngineTorque( double rpm ) const;
 private:
     void    configCar( void* hCar );
     double	CalcMaxSpeedAeroOld(double k, double kz, double kv, double kFriction,
@@ -117,8 +116,6 @@ public:
     double	GRIP_SCALE_R;	// scaling of grip due to condition of rear  tyres.
     double	WING_ANGLE_F;	// front wing angle.
     double	WING_ANGLE_R;	// rear wing angle.
-    double  AERO;
-    double  SKILL;
 
     // calculated aerodynamic constants.
     double	CA;				// aerodynamic downforce constant -- total.
@@ -127,7 +124,6 @@ public:
     double	CA_GE;			// aerodynamic downforce constant -- ground effect.
     double	CD_BODY;		// aerodynamic drag constant -- car body.
     double	CD_WING;		// aerodynamic drag constant -- wings.
-
 
     // load factor related.
     double	OP_LOAD;
@@ -170,7 +166,12 @@ public:
 
     std::vector<double> ACCF_FROM_SPEED; // cached table for fast acceleration force calculation from speed.
 
+    bool    HASTYC;
+    bool    HASABS;
+    bool    HASESP;
+    bool    HASTCL;
+
     WheelModel	_wheel[4];
 };
 
-#endif
+#endif // _CARMODEL_H_

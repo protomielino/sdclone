@@ -22,6 +22,10 @@
 #ifndef _PATH_H_
 #define _PATH_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 #include <vector>
 
 #include "MyTrack.h"
@@ -149,4 +153,4 @@ protected:
     double		m_maxR;
 };
 
-#endif
+#endif // _PATH_H_

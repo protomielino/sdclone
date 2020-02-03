@@ -25,12 +25,18 @@
 #include <math.h>
 #include "Utils.h"
 
+// The "SHADOW" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
 CarModel::CarModel()
-:   FLAGS(F_SEPARATE_FRONT_REAR | F_USE_KV),
+://	FLAGS(0),
+//	FLAGS(F_SEPARATE_FRONT_REAR),
+    FLAGS(F_SEPARATE_FRONT_REAR | F_USE_KV),
     MASS(0),
     FUEL(0),
     DAMAGE(0),
@@ -72,7 +78,11 @@ CarModel::CarModel()
     GEAR_CHANGE_REVS(8200 * 2 * PI / 60),
     ENGINE_MAX_REVS(10000 * 2 * PI / 60),
     DIFF_RATIO(1),
-    DIFF_EFF(1)
+    DIFF_EFF(1),
+    HASTYC(false),
+    HASABS(false),
+    HASESP(false),
+    HASTCL(false)
 {
     for( int w = 0; w < 4; w++ )
         _wheel[w].setWheel( w );
@@ -152,6 +162,47 @@ void	CarModel::setupDefaultEngine()
 
 void    CarModel::configCar( void* hCar )
 {
+    const char *enabling;
+    enabling = GfParmGetStr(hCar, SECT_FEATURES, PRM_TIRETEMPDEG, VAL_NO);
+
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HASTYC = true;
+      LogSHADOW.info("#Car has TYC yes\n");
+    }
+    else
+      LogSHADOW.info("#Car has TYC no\n");
+
+    enabling = GfParmGetStr(hCar, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
+
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HASABS = true;
+      LogSHADOW.info("#Car has ABS yes\n");
+    }
+    else
+      LogSHADOW.info("#Car has ABS no\n");
+
+    enabling = GfParmGetStr(hCar, SECT_FEATURES, PRM_ESPINSIMU, VAL_NO);
+
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HASESP = true;
+      LogSHADOW.info("#Car has ESP yes\n");
+    }
+    else
+      LogSHADOW.info("#Car has ESP no\n");
+
+    enabling = GfParmGetStr(hCar, SECT_FEATURES, PRM_TCLINSIMU, VAL_NO);
+
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      HASTCL = true;
+      LogSHADOW.info("#Car has TCL yes\n");
+    }
+    else
+      LogSHADOW.info("#Car has TCL no\n");
+
     MASS = GfParmGetNum(hCar, SECT_CAR, PRM_MASS, NULL, 1000.0);
 
     float fwingarea	= GfParmGetNum(hCar, SECT_FRNTWING, PRM_WINGAREA,  NULL, 0.0);
@@ -174,7 +225,7 @@ void    CarModel::configCar( void* hCar )
     CA_RW = 4 * 1.23f * rwingArea;
     CA_GE = h * cl;
 
-    LogSHADOW.debug( " # MOUSE CarModel CA %g   CA_FW %g   CA_RW %g   CA_GE %g\n", CA, CA_FW, CA_RW, CA_GE );
+    LogSHADOW.info( "CA %g   CA_FW %g   CA_RW %g   CA_GE %g\n", CA, CA_FW, CA_RW, CA_GE );
 
     double	cx = GfParmGetNum(hCar, SECT_AERODYNAMICS, PRM_CX, NULL, 0.0);
     double	frontArea = GfParmGetNum(hCar, SECT_AERODYNAMICS, PRM_FRNTAREA, NULL, 0.0);
@@ -219,13 +270,12 @@ void    CarModel::configCar( void* hCar )
     double	targetF = 0.0;
     double	lastF = 0.0;
     double	maxSlip = 0.27;
-
     for( double slip = 0.0; slip < 0.5; slip += 0.001 )
     {
         double	Bx = mfB * slip;
         double	F = sin(mfC * atan(Bx * (1.0f - mfE) + mfE * atan(Bx)));	// assumes PRO skill level.
 
-        LogSHADOW.debug( "# SHADOW CarModel slip=%g  F=%g\n", slip, F );
+//		PRINTF( "slip=%g  F=%g\n", slip, F );
 
         if( F > targetF )
         {
@@ -242,10 +292,10 @@ void    CarModel::configCar( void* hCar )
     TARGET_SLIP = targetSlip;
     MAX_SLIP	= maxSlip;
 
-    LogSHADOW.debug( "# SHADOW CarModel TARGET_SLIP=%g  MAX_SLIP=%g\n", TARGET_SLIP, MAX_SLIP );
+    LogSHADOW.info( "TARGET_SLIP=%g  MAX_SLIP=%g\n", TARGET_SLIP, MAX_SLIP );
 
     char buf[64];
-    sprintf( buf, "%s/%s", SECT_ENGINE, ARR_DATAPTS );
+    snprintf( buf, sizeof (buf), "%s/%s", SECT_ENGINE, ARR_DATAPTS );
     int nPts = GfParmGetEltNb(hCar, buf);
 
     if( nPts == 0 )
@@ -256,11 +306,10 @@ void    CarModel::configCar( void* hCar )
     {
         ENGINE_REVS.clear();
         ENGINE_TORQUES.clear();
-
         for( int i = 0; i < nPts; i++ )
         {
-            sprintf( buf, "%s/%s/%d", SECT_ENGINE, ARR_DATAPTS, i + 1 );
-            double revs    = GfParmGetNum(hCar, buf, PRM_RPM, (char*)NULL, 0);//car->engine.revsMax);
+            snprintf( buf, sizeof(buf), "%s/%s/%d", SECT_ENGINE, ARR_DATAPTS, i + 1 );
+            double revs    = GfParmGetNum(hCar, buf, PRM_RPM, (char*)NULL, 0);
             double torque  = GfParmGetNum(hCar, buf, PRM_TQ, (char*)NULL, 0);
             ENGINE_REVS.push_back( revs );
             ENGINE_TORQUES.push_back( torque );
@@ -273,10 +322,9 @@ void    CarModel::configCar( void* hCar )
 
     GEAR_RATIOS.clear();
     GEAR_EFFS.clear();
-
     for( int i = 1; ; i++ )
     {
-        sprintf( buf, "%s/%s/%d", SECT_GEARBOX, ARR_GEARS, i );
+        snprintf( buf, sizeof(buf), "%s/%s/%d", SECT_GEARBOX, ARR_GEARS, i );
         double ratio = GfParmGetNum(hCar, buf, PRM_RATIO, (char*)NULL, 0.0f);
 
         if( ratio == 0.0 )
@@ -330,11 +378,11 @@ void	CarModel::update( const tCarElt* car, const tSituation* sit )
     POS_AZ = new_pos_az;
     VEL_AZ = new_vel_az;
 
-    LogSHADOW.debug( "vx %7.4f %7.4f  vy %7.4f %7.4f  vz %7.4f %7.4f  vaz %7.4f %7.4f\n",
-            VEL_L.x, car->pub.DynGC.vel.x,
-            VEL_L.y, car->pub.DynGC.vel.y,
-            VEL_L.z, car->pub.DynGC.vel.z,
-            VEL_AZ, car->pub.DynGC.vel.az );
+//	DEBUGF( "vx %7.4f %7.4f  vy %7.4f %7.4f  vz %7.4f %7.4f  vaz %7.4f %7.4f\n",
+//			VEL_L.x, car->pub.DynGC.vel.x,
+//			VEL_L.y, car->pub.DynGC.vel.y,
+//			VEL_L.z, car->pub.DynGC.vel.z,
+//			VEL_AZ, car->pub.DynGC.vel.az );
 
     updateWheels( car, sit );
 }
@@ -442,6 +490,7 @@ double	CarModel::CalcMaxSpeedAeroOld(
         mua   = MU * MU_SCALE;// * 0.975;
     }
 
+//	mua *= (GRIP_SCALE_F + GRIP_SCALE_R) * 0.5;
     mua *= MN(GRIP_SCALE_F, GRIP_SCALE_R);
 
     double	cs = cos(trackRollAngle) * cos(trackPitchAngle);
@@ -455,20 +504,22 @@ double	CarModel::CalcMaxSpeedAeroOld(
     if( FLAGS & F_OLD_AERO_1 )
     {
         num = M * (cs * G * mua + sn * G * sgnK);
-
+//		den = M * (absK - 0.1 * kz) -
         if( FLAGS & F_USE_KV )
-            den = M * (absK - KV_SCALE * kv) - (CA_FW * muf + CA_RW * mur + CA_GE * mua);
+            den = M * (absK - KV_SCALE * kv) -
+                        (CA_FW * muf + CA_RW * mur + CA_GE * mua);
         else
-            den = M * (absK - KZ_SCALE * kz) - (CA_FW * muf + CA_RW * mur + CA_GE * mua);
+            den = M * (absK - KZ_SCALE * kz) -
+                        (CA_FW * muf + CA_RW * mur + CA_GE * mua);
     }
     else
     {
+//		num = M * (G * mu + sn * G * sgnK);
         num = M * (cs * G * mua + sn * G * sgnK);
-
         if( FLAGS & F_USE_KV )
-            den = M * (absK - KV_SCALE * kv) - CA * mua;
+            den = M * (absK - KV_SCALE * kv) - CA * mua; //mu_df;
         else
-            den = M * (absK - KZ_SCALE * kz) - CA * mua;
+            den = M * (absK - KZ_SCALE * kz) - CA * mua; //mu_df;
     }
 
     if( den < 0.00001 )
@@ -495,11 +546,13 @@ double	CarModel::CalcMaxSpeedAeroNew(
     double maxSpeedFrontAxle = AxleCalcMaxSpeed(k, kz, kv, trackMu,
                                                 rollAngle, pitchAngle,
                                                 GRIP_SCALE_F,
+//	                                            (GRIP_SCALE_F + GRIP_SCALE_R) * 0.5,
                                                 TYRE_MU_F, F_AXLE_X, F_WING_X,
                                                 F_AXLE_WB, CA_FW, F_AXLE_CG);
     double maxSpeedRearAxle  = AxleCalcMaxSpeed(k, kz, kv, trackMu,
                                                 rollAngle, pitchAngle,
                                                 GRIP_SCALE_R,
+//	                                            (GRIP_SCALE_F + GRIP_SCALE_R) * 0.5,
                                                 TYRE_MU_R, R_AXLE_X, R_WING_X,
                                                 R_AXLE_WB, CA_RW, R_AXLE_CG);
     return MN(maxSpeedFrontAxle, maxSpeedRearAxle);
@@ -528,7 +581,7 @@ double	CarModel::calcPredictedLoad(
     else
         load_v = (MASS + FUEL) * weight_fraction * cos_roll * kz * KZ_SCALE * speed * speed;
 //	return	load_g + load_a;// + load_h + load_v;
-    return	load_g + load_a + load_v;
+    return	load_g + load_a + /*load_h*/ + load_v;
 }
 
 // version with load sensitivity
@@ -639,8 +692,8 @@ double	CarModel::AxleCalcMaxSpeed(
     {
         double	mu	= trackMu * tyreMu * MU_SCALE * gripScale * loadFactor;
         double  num = Ma * (mu * Gz + Gy);
+//		double  den = MX(0.000001, Ma * absK - /*mu * */ Ma * kz * KZ_SCALE - mu * Ca);
         double  den;
-
         if( FLAGS & F_USE_KV )
             den = MX(0.000001, Ma * absK -   mu *    Ma * kv * KV_SCALE
                                                /*-   mu *    Ma * k             * sn_roll*/ - mu * Ca);
@@ -658,9 +711,9 @@ double	CarModel::AxleCalcMaxSpeed(
 
         loadFactor = (loadFactor + newLoadFactor) * 0.5;
     }
+
     if( i == 100 )
-        LogSHADOW.debug( "failed to find load factor!!!!! spd %g, lf %g\n",
-                spd, loadFactor );
+        LogSHADOW.debug( "failed to find load factor!!!!! spd %g, lf %g\n", spd, loadFactor );
 
     return spd;
 }
@@ -687,17 +740,20 @@ double	CarModel::CalcBraking(
     double	CD = CD_BODY * (1.0 + DAMAGE / 10000.0) + CD_WING;
 
     MU *= BRAKE_MU_SCALE;
+
+//	MU *= (GRIP_SCALE_F + GRIP_SCALE_R) * 0.5;
     MU *= MN(GRIP_SCALE_F, GRIP_SCALE_R);
 
     double	K  = (k0  + k1)  * 0.5;
-    double  kz = (kz0 + kz1) * 0.5;
-    double	kv = (kv0 + kv1) * 0.5;
+    double  kz = (kz0 + kz1) * 0.5;// * KZ_SCALE;
+    double	kv = (kv0 + kv1) * 0.5;// * KV_SCALE;
 
     double	Kz = FLAGS & F_USE_KV ? kv : kz;
-
+//	double	Kz = (kz0 + kz1) * 0.5 * KZ_SCALE;
     if( Kz > 0 )
         Kz = 0;
 
+//	trackRollAngle *= 1.1;
     double	sn_roll  = sin(trackRollAngle);
     double	cs_roll  = cos(trackRollAngle);
     double	sn_pitch = sin(trackPitchAngle);
@@ -709,14 +765,18 @@ double	CarModel::CalcBraking(
 
     double	v = spd1;
     double	u = v;
+
+//	double	dist = Utils::VecLenXY(m_pPath[i].CalcPt() -
+//								   m_pPath[j].CalcPt());
+
     double	axle_r = (fabs(F_AXLE_X) + fabs(R_AXLE_X)) * 0.5;
 
     for( int count = 0; count < 100; count++ )
     {
         double	avgV = (u + v) * 0.5;
         double	avgVV = avgV * avgV;
-        double	Froad;
 
+        double	Froad;
         if( FLAGS & F_OLD_AERO_1 )
         {
             double	Fdown = M * Gdown + M * Kz * avgVV + CA_GE * avgVV;
@@ -751,24 +811,22 @@ double	CarModel::CalcBraking(
         Froad -= Frot;	// change in rotation speed uses some grip.
 
         double	Flatroad = fabs(M * avgVV * K - Flat);
-
         if( Flatroad > Froad )
             Flatroad = Froad;
-
         double	Ftanroad = -sqrt(Froad * Froad - Flatroad * Flatroad) + Ftan;
 
         double	acc = Ftanroad / M;// * 0.95;
 
-        LogSHADOW.debug( "%K %7.4f  Glat %.3f\n", K, Glat );
-        LogSHADOW.debug( "K %7.4f  Fr %.3f  Fl %.3f  Ft %.3f  u %.1f  acc %.1f\n",
-                K, Froad, Flat, Ftan, u, acc );
-        LogSHADOW.debug( "K %7.4f  Flr %.3f  Ftr %.3f  u %.1f  acc %.1f\n",
-                K, Flatroad, Ftanroad, u, acc );
+//		DEBUGF( "%4d K %7.4f  Glat %.3f\n",
+//				i, K, Glat );
+//		DEBUGF( "%4d K %7.4f  Fr %.3f  Fl %.3f  Ft %.3f  u %.1f  acc %.1f\n",
+//				i, K, Froad, Flat, Ftan, u, acc );
+//		DEBUGF( "%4d K %7.4f  Flr %.3f  Ftr %.3f  u %.1f  acc %.1f\n",
+//				i, K, Flatroad, Ftanroad, u, acc );
 
         double	inner = MX(0, v * v - 2 * acc * dist );
         double	oldU = u;
         u = sqrt(inner);
-
         if( fabs(u - oldU) < 0.001 )
             break;
     }
@@ -797,7 +855,6 @@ double  CarModel::CalcEngineTorque( double revs ) const
 
     double t = (revs - ENGINE_REVS[index]) / (ENGINE_REVS[index + 1] - ENGINE_REVS[index]);
     double torque = ENGINE_TORQUES[index] + (ENGINE_TORQUES[index + 1] - ENGINE_TORQUES[index]) * t;
-
     return torque;
 }
 
@@ -819,7 +876,6 @@ double  CarModel::CalcAccForceFromSpeed( double speed ) const
         double tq_engine    = CalcEngineTorque(engine_revs);
         double tq_axle      = tq_engine * GEAR_EFFS[i] * DIFF_EFF * GEAR_RATIOS[i] * DIFF_RATIO;
         double f_road		= tq_axle / wheel_radius;
-
         if( bestAccF < f_road )
             bestAccF = f_road;
     }
@@ -835,14 +891,10 @@ double  CarModel::AccForceFromSpeed( double speed ) const
         speed = 0;
     else if( speed > ACCF_FROM_SPEED.size() - 2 )
         speed = ACCF_FROM_SPEED.size() - 2;
-
     int ispeed = (int)speed;
-
     if( ispeed < 0 || ispeed + 1 > (int)ACCF_FROM_SPEED.size() )
         return 0;
-
-    double fspeed = speed - ispeed;
-
+    double fspeed = speed - ispeed; // 0 <= fspeed < 1
     return ACCF_FROM_SPEED[ispeed] + (ACCF_FROM_SPEED[ispeed + 1] - ACCF_FROM_SPEED[ispeed]) * fspeed;
 }
 
@@ -858,18 +910,22 @@ double	CarModel::CalcAcceleration(
     double	CD = CD_BODY * (1.0 + DAMAGE / 10000.0) + CD_WING;
 
     // when under braking we keep some grip in reserve.
+    //MU *= BRAKE_MU_SCALE;
+
+//	MU *= (GRIP_SCALE_F + GRIP_SCALE_R) * 0.5;
     MU *= MN(GRIP_SCALE_F, GRIP_SCALE_R);
 
     double	K  = (k0  + k1)  * 0.5;
     double Kz;
     if( FLAGS & F_USE_KV )
-        Kz = (kv0 + kv1) * 0.5;
+        Kz = (kv0 + kv1) * 0.5;// * KV_SCALE;
     else
-        Kz = (kz0 + kz1) * 0.5;
-
+        Kz = (kz0 + kz1) * 0.5;// * KZ_SCALE;
+//	double	Kz = (kz0 + kz1) * 0.5 * KZ_SCALE;
     if( Kz > 0 )
         Kz = 0;
 
+//	trackRollAngle *= 1.1;
     double	Gdown = G * cos(trackRollAngle) * cos(trackPitchAngle);
     double	Glat  = G * sin(trackRollAngle);
     double	Gtan  = G * -sin(trackPitchAngle);
@@ -881,6 +937,10 @@ double	CarModel::CalcAcceleration(
     //  3m/ss @ 60m/s
     //	1m/ss @ 75m/s
     //	0m/ss @ 85m/s
+//	Quadratic	accFromSpd(21.0/5400, -43.0/60, 30);	// approx. clkdtm
+
+    // Power (kW) = Torque (Nm) x Speed (RPM) / 9.5488
+
     double	axle_r = (fabs(F_AXLE_X) + fabs(R_AXLE_X)) * 0.5;
 
     for( int count = 0; count < 100; count++ )
@@ -907,15 +967,12 @@ double	CarModel::CalcAcceleration(
         // work out tangential force available after accounting for the lateral force
         // needed for turning.
         double	Flatroad = fabs(M * vv * K - Flat);
-
         if( Flatroad > Froad )
             Flatroad = Froad;
-
         double	Ftanroad = sqrt(Froad * Froad - Flatroad * Flatroad);
 
         // account for acceleration available from engine.
         double	Facc = AccForceFromSpeed(avgV);
-
         if( Ftanroad > Facc )
             Ftanroad = Facc;
 
@@ -926,7 +983,6 @@ double	CarModel::CalcAcceleration(
         double	inner = MX(0, u * u + 2 * acc * dist );
         double	oldV = v;
         v = sqrt(inner);
-
         if( fabs(v - oldV) < 0.001 )
             break;
     }
@@ -943,7 +999,6 @@ double	CarModel::CalcMaxSpdK() const
 {
     const double	MAX_SPD = 110;	// ~400 kph
     double	maxSpdK = G * TYRE_MU / (MAX_SPD * MAX_SPD);
-
     return maxSpdK;
 }
 
@@ -1003,11 +1058,12 @@ void	CarModel::CalcSimuSpeeds(
     //	is an estimation (poor, but hopefully good enough for our purposes).
     static const Quadratic	accFromSpd(21.0/5400, -43.0/60, 30);
     double	eng_acc = accFromSpd.CalcY(spd0) * trackMu;
-
     if( eng_acc > lin_acc )
         eng_acc = lin_acc;
 
     maxSpd = sqrt(spd0 * spd0 + 2 * eng_acc * dist);
+//	if( maxSpd > max_spd )
+//		maxSpd = max_spd;
 
     //
     // brake
@@ -1034,7 +1090,9 @@ void	CarModel::CalcSimuSpeedRanges(
     // max_spd = sqrt(max_a r) = sqrt(M * G * MU / k)
 
     double	M  = MASS + FUEL;
+//	double	MU = trackMu * TYRE_MU * (GRIP_SCALE_F + GRIP_SCALE_R) * 0.5;
     double	MU = trackMu * TYRE_MU * MN(GRIP_SCALE_F, GRIP_SCALE_R);
+
     double	max_acc = G * MU;
 
     //
@@ -1045,7 +1103,6 @@ void	CarModel::CalcSimuSpeedRanges(
     //	is an estimation (poor, but hopefully good enough for our purposes).
     static const Quadratic	accFromSpd(21.0/5400, -43.0/60, 30);
     double	eng_acc = accFromSpd.CalcY(spd0) * trackMu;
-
     if( eng_acc > max_acc )
         eng_acc = max_acc;
 
@@ -1066,4 +1123,5 @@ void	CarModel::CalcSimuSpeedRanges(
     double	turnT = dist / spd0;
     maxDY = 0.5 * max_acc * turnT * turnT;
 }
+
 //===========================================================================

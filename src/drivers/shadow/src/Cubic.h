@@ -22,6 +22,10 @@
 #ifndef _CUBIC_H_
 #define _CUBIC_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 class Cubic
 {
 public:

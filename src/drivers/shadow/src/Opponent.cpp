@@ -27,6 +27,10 @@
 
 #include <robottools.h>
 
+// The "SHADOW" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
+
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
@@ -211,7 +215,7 @@ void	Opponent::ProcessMyCar(
     const TeamInfo*		pTeamInfo,
     const CarElt*		myCar,
     const Sit&			mySit,
-    const TDriver&		me,
+    const Driver&		me,
     double				myMaxAccX,
     int					idx )
 {
@@ -244,7 +248,7 @@ void	Opponent::ProcessMyCar(
     {
         m_info.flags |= F_DANGEROUS;
         m_info.dangerousLatchTime = 2.0;
-        PRINTF( "danger (%s) angle=%6.1f  relx=%6.1f  relvx=%6.1f  roppavga=%6.1f  roppa=%6.1f\n",
+        LogSHADOW.debug( "danger (%s) angle=%6.1f  relx=%6.1f  relvx=%6.1f  roppavga=%6.1f  roppa=%6.1f\n",
                 oCar->_name, oSit.tYaw * 180 / PI, oSit.rdPX, oSit.rdVX, oSit.ragAX, oSit.rAX );
     }
     else
@@ -260,13 +264,13 @@ void	Opponent::ProcessMyCar(
 //	double	distAhead = MX(20, mySit.spd * mySit.spd / 30);
 //	double	distAhead = MX(20, mySit.spd * mySit.spd / 25);
     double	distAhead = MX(20, mySit.spd * mySit.spd / 20);
+
     if( (m_info.flags & F_DANGEROUS) == 0 )
         distAhead = MN(MX(40, distAhead), 80);
 
     if( pTeamInfo->IsTeamMate(myCar, oCar) )
     {
         m_info.flags |= F_TEAMMATE;
-//		m_info.sit.minDX -= 1.5;
         m_info.tmDamage = oCar->_dammage;
     }
 
@@ -280,7 +284,7 @@ void	Opponent::ProcessMyCar(
     else
         m_info.closeBehindTime = MX(0, m_info.closeBehindTime - s->deltaTime * 0.1);
 
-    PRINTF( "(%s) dist ahead %6.1f   relPos %6.1f\n", oCar->_name, distAhead, oSit.relPos );
+    LogSHADOW.debug( "(%s) dist ahead %6.1f   relPos %6.1f\n", oCar->_name, distAhead, oSit.relPos );
 
     if( oSit.relPos < distAhead && oSit.relPos > -25 )
 //	if( oSit.relPos < 40 && oSit.relPos > -25 )
@@ -337,7 +341,7 @@ void	Opponent::ProcessMyCar(
 //						fabs(oSit.rdPY) < oSit.minDY ||
 //						catchY * oSit.rdPY < 0 )
                     double raceLineY = oSit.pi.offs + oCar->pub.trkPos.toMiddle;
-                    PRINTF( "(%s) racelineoffs %0.3f  pioffs %0.3f  tomid %0.3f  catch-t %0.3f  catch-decel %0.3f\n",
+                    LogSHADOW.debug( "(%s) racelineoffs %0.3f  pioffs %0.3f  tomid %0.3f  catch-t %0.3f  catch-decel %0.3f\n",
                             oCar->info.name, raceLineY, oSit.pi.offs, oCar->pub.trkPos.toMiddle, t, m_info.catchDecel );
                     if( fabs(catchY) < oSit.minDY || fabs(raceLineY) < oSit.minDY )
                     {
@@ -368,18 +372,11 @@ void	Opponent::ProcessMyCar(
                     }
                 }
 
-//				q.Setup( 0, oSit.rdVX - 5, oSit.rdPX - oSit.minDX - 0.2 );
-//				q.Setup( oSit.ragAX - mySit.ragAX, oSit.ragVX - mySit.ragVX,// - 3,
                 q.Setup( oSit.ragAX - myMaxAccX, oSit.ragVX - mySit.ragVX,// - 3,
                             oSit.rdPX - oSit.minDXa - 0.2 );
                 if( q.SmallestNonNegativeRoot(t) )
                 {
                     double	catchY = relPar.CalcY(t);
-
-//					if( t < 10 )
-//						DEBUGF( "%2d (%5.1f, %5.1f) t %.2f  oAg(%6.2f, %6.2f)  catchY %.2f\n",
-//								idx, relPX - m_info.minDX, relPY, t,
-//								oAXg, oAYg, catchY );
 
                     m_info.flags |= F_CATCHING_ACC;
                     m_info.catchAccTime = t;
@@ -388,7 +385,6 @@ void	Opponent::ProcessMyCar(
                 }
             }
 
-//			if( myCar->_laps > oCar->_laps )
             if( myCar->race.distRaced > oCar->race.distRaced + 50 )
             {
                 m_info.flags |= F_BEING_LAPPED;
@@ -422,20 +418,13 @@ void	Opponent::ProcessMyCar(
                     m_info.catchY = oSit.rdPY;
                     m_info.catchSpd = oSit.rdPX > aheadDist ? oVX - 3 : 200;
                     m_info.catchDecel = 999;
-
-//					if( oSit.rdPX > oSit.minDX / 2 &&
-//						oSit.rdPX < oSit.minDX - 0.2 )
-//						m_info.catchSpd = oVX - 5;
                 }
                 else if( oSit.rdPX > 0 && oSit.rdPY * oSit.rdVY < 0 )
                 {
                     // side collision in t seconds?
                     double	t = (fabs(oSit.rdPY) - oSit.minDY) / fabs(oSit.rdVY);
                     double	collX = oSit.rdPX + oSit.rdVX * t;
-//					if( t < 10 )
-//						DEBUGF( "%2d (%5.1f, %5.1f) t %.2f  oAg(%6.2f, %6.2f)  collX %.2f\n",
-//								idx, oSit.rdPX - oSit.minDX, oSit.rdPY, t,
-//								oSit.ragAX, oSit.ragAY, collX );
+
                     if( collX > aheadDist && collX < oSit.minDXa )
                     {
                         double	relSpd = (oSit.minDXa - oSit.rdPX) / t;
@@ -443,15 +432,12 @@ void	Opponent::ProcessMyCar(
                         m_info.catchTime = t;
                         m_info.catchY = SGN(oSit.rdPY) * (oSit.minDY - 0.1);
                         m_info.catchSpd = oVX - 3;
-//						m_info.catchSpd = oVX - relSpd - 3;
-//						m_info.catchDecel = 999;
                         m_info.catchDecel = (mySit.spd - (oVX - relSpd)) / t;
                     }
                 }
             }
 
             if( (m_info.flags & (F_REAR | F_TO_SIDE)) &&
-//				myCar->_laps < oCar->_laps )
                 myCar->race.distRaced + 50 < oCar->race.distRaced &&
                 m_info.closeAheadTime <= m_info.closeBehindTime )
             {
@@ -459,19 +445,12 @@ void	Opponent::ProcessMyCar(
             }
         }
 
-//		if( -3 < oSit.rdPX && oSit.rdPX < 7.5 && fabs(oSit.rdPY) < 7.5 )
         if( 0 < oSit.rdPX && oSit.rdPX < oSit.minDXa + 2 &&
             fabs(oSit.rdPY) < oSit.minDY + 2 )
         {
             m_info.flags |= F_CLOSE;
         }
     }
-/*	else if( pTeamInfo->IsTeamMate(myCar, oCar) &&
-                oSit.relPos < 0 && oSit.relPos > -25 )
-    {
-        m_info.flags |= F_TEAMMATE | F_BEHIND | F_REAR;
-        m_info.tmDamage = oCar->_dammage;
-    }*/
     else if( oSit.relPos < 0 )
     {
         m_info.flags |= F_BEHIND | F_REAR;
@@ -481,6 +460,7 @@ void	Opponent::ProcessMyCar(
     const double closeDist = 10;
     m_info.newCatchSpd = oSit.tVX - mySit.tVX;
     m_info.newCatching = false;
+
     if( oSit.relPos > oSit.minDXa )
     {
         bool	oDangerous = (m_info.flags & F_DANGEROUS) != 0;
@@ -494,17 +474,6 @@ void	Opponent::ProcessMyCar(
             m_info.newCatchTime = t1;
             m_info.newAheadTime = t2;
         }
-/*		else if( oSit.relPos - oSit.minDXa < closeDist )
-        {
-            m_info.newCatching = true;
-            m_info.newCatchTime = timeLimit + m_info.newCatchSpd;
-            m_info.newAheadTime = timeLimit + m_info.newCatchSpd;
-        }*/
-/*		else if( oDangerous )
-        {
-            m_info.newCatching = true;
-            m_info.newCatchTime = t;
-        }*/
     }
     else if( oSit.relPos >= -oSit.minDXb )
     {
@@ -537,15 +506,11 @@ void	Opponent::ProcessMyCar(
         midPos = fmod(midPos, trackLen);
 
         m_info.newMidPos = midPos;
-//		catPos = midPos;
 
         PtInfo	pi;
-//		me.GetPtInfo( MyRobot::PATH_NORMAL, catPos * 0.5, pi );
-        me.GetPtInfo( TDriver::PATH_NORMAL, midPos * 0.5, pi );
+        me.GetPtInfo( Driver::PATH_NORMAL, midPos * 0.5, pi );
         m_info.newBestOffset = pi.offs;
 
-//		double	L = offs - oSit.minDY - 1;
-//		double	R = offs + oSit.minDY + 1;
         double	L = catOffs - oSit.minDY - 1.0;
         double	R = catOffs + oSit.minDY + 1.0;
 
@@ -556,27 +521,19 @@ void	Opponent::ProcessMyCar(
         m_info.newPiL.isSpace = L > offs - toL;
         m_info.newPiL.goodPath = false;
         m_info.newPiL.myOffset = 0;
+
         if( m_info.newPiL.isSpace )
         {
             m_info.newPiL.offset = L;
-//			m_info.newPiL.mySpeed = me.CalcBestSpeed(pos, MN(L, pi.offs));
-//			m_info.newPiL.mySpeed = me.CalcBestSpeed(catPos, MN(L, pi.offs));
             m_info.newPiL.mySpeed = me.CalcBestSpeed(midPos, MN(L, pi.offs));
             m_info.newPiL.goodPath = m_info.newPiL.mySpeed > oSit.spd;
-//			if( m_info.newPiL.goodPath )
+
             {
                 double	u, v;
-//				me.CalcBestPathUV(pos, L, u, v);
-//				me.CalcBestPathUV(catPos, L, u, v);
                 me.CalcBestPathUV(midPos, L, u, v);
                 m_info.newPiL.bestU = u;
                 m_info.newPiL.bestV = v;
                 m_info.newPiL.myOffset = me.CalcPathOffset(myPos, u, v);
-/*				double	u = 0;
-                double	v = me.CalcPathTarget(pos, L);
-                m_info.newPiL.bestU = u;
-                m_info.newPiL.bestV = v;
-                m_info.newPiL.myOffset = me.CalcPathOffset(myPos, u, v);*/
             }
         }
 
@@ -586,33 +543,16 @@ void	Opponent::ProcessMyCar(
         if( m_info.newPiR.isSpace )
         {
             m_info.newPiR.offset = R;
-//			m_info.newPiR.mySpeed = me.CalcBestSpeed(pos, MX(R, pi.offs));
-//			m_info.newPiR.mySpeed = me.CalcBestSpeed(catPos, MX(R, pi.offs));
             m_info.newPiR.mySpeed = me.CalcBestSpeed(midPos, MX(R, pi.offs));
             m_info.newPiR.goodPath = m_info.newPiR.mySpeed > oSit.spd;
-//			if( m_info.newPiR.goodPath )
+
             {
                 double	u, v;
-//				me.CalcBestPathUV(pos, R, u, v);
-//				me.CalcBestPathUV(catPos, R, u, v);
                 me.CalcBestPathUV(midPos, R, u, v);
                 m_info.newPiR.bestU = u;
                 m_info.newPiR.bestV = v;
                 m_info.newPiR.myOffset = me.CalcPathOffset(myPos, u, v);
-/*				double	u = 0;
-                double	v = me.CalcPathTarget(pos, R);
-                m_info.newPiR.bestU = u;
-                m_info.newPiR.bestV = v;
-                m_info.newPiR.myOffset = me.CalcPathOffset(myPos, u, v);*/
             }
         }
     }
-/*
-    if( m_info.newCatching )
-    {
-        DEBUGF( "%2d (%6.2f, %5.2f)  t %5.2f  rtv(%6.2f)  spn(%5.2f %5.2f)\n",
-                idx, oSit.rdPX, oSit.rdPY,
-                m_info.newCatchTime, m_info.newCatchSpd,
-                m_info.newSpan.a, m_info.newSpan.b );
-    }*/
 }

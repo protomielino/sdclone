@@ -1,10 +1,8 @@
 /***************************************************************************
 
-    file                 : strategy.cpp
-    created              : Wed Sep 22 15:32:21 CET 2004
-    copyright            : (C) 2004 Bernhard Wymann
-    email                : berniw@bluewin.ch
-    version              : $Id: strategy.cpp,v 1.3 2006/03/06 22:43:50 berniw Exp $
+    file        : Strategy.cpp
+    created     : 3 Jan 2020
+    copyright   : (C) 2020 Xavier BERTAUX
 
  ***************************************************************************/
 
@@ -17,518 +15,323 @@
  *                                                                         *
  ***************************************************************************/
 
-/*
-    Very simple stategy sample implementation.
-*/
-
-//#define STRAT_DEBUG
+// Strategy.cpp: implementation of the Strategy class.
+//
+//////////////////////////////////////////////////////////////////////
 
 #include "Strategy.h"
+#include "Utils.h"
 
+#include <robottools.h>
 
-SimpleStrategy::SimpleStrategy()
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+Strategy::Strategy( const MyTrack& track, const PitPath& pitPath )
+:	m_track(track),
+    m_pitPath(pitPath),
+    m_warnDamageLimit(5000),
+    m_dangerDamageLimit(7000),
+    m_state(PIT_NONE),
+    m_lastFuel(0),
+    m_totalFuel(0),
+    m_totalLaps(0),
+    m_pitType(PT_NORMAL)
 {
-    MAX_FUEL_PER_METER = 0.00068f;		// [liter/m] max fuel consumtion.
-    MAX_FUEL_TANK = 83.0f;              // [Kg] Fuel: Car Tank capacity.(for car3-trb1)
-    PIT_DAMMAGE = 5000;                 // [-] max damage before test_Pitstop
-    MAX_DAMAGE = 4000;              	// [-] max damage limit in the last five laps before the pit stop.
-    fuel_Strat = 1;                     // [-] Pit refuel strategy for Short(1) or Long(2) track.
-
-    needRepair = false;                 // [-] Need to repair (amount of damage)
-    quickPitstop = false;               // [-] Fast repair (30% of damage)
-    fuelChecked = false;                // [-] Fuel statistics updated.
-    shortTrack = false;                 // [-] Strategy for short track enable/disable.
-    qualifRace = false;                 // [-] Qualifying race type enable.
-    m_checkDamage = false;              // [-] Dammage to repair checked.
-    m_checkFuel = false;                // [-] Needed fuel checked.
-    strategy_verbose = 0;               // [-] Display information about refuel and repair.
-
-    FuelperMeters = 0.0f;
-    fuelPerLap = 0.0f;                  // [Kg] The maximum amount of fuel we needed for a lap.
-    lastPitFuel = 0.0f;                 // [Kg] Amount refueled, special case when we refuel.
-    fuelSum = 0.0f;                     // [Kg] All the fuel used.
-	fuelSumPerMeter = 0.0;
-    counterFuelLaps = 0;                // [-] Counter of the total laps.
-    countPitStop = 0;                   // [-] Counter of the total pitStop.
-    avgFuelPerLap = 0.0;                // [Kg] Average fuel per lap.
-	avgFuelPerMeter = 0.0;
-    m_maxDamage = 0;                    // [-] max damage before we request a pit stop.
-    m_Fuel = 0;                         // [Kg] Security fuel at the strat race.
-    m_expectedfuelperlap = 0;           // [Kg] Expected fuel per lap
-    TrackLength = 0;
-    RaceDistance = 0;
-    m_timeOfPitExit = -30;
 }
 
-
-SimpleStrategy::~SimpleStrategy()
+Strategy::~Strategy()
 {
-    // Nothing so far.
 }
 
-
-void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituation *s, int index)
+void	Strategy::SetDamageLimits( int warnDamageLimit, int dangerDamageLimit )
 {
-    Track = t;
-    TrackLength = Track->length;
-    LogSHADOW.info("Strategy Track Lengh =  %.2f\n", TrackLength);
-    RaceDistance = TrackLength * s->_totLaps;
-    LogSHADOW.info("Strategy Race Distance =  %.2f\n", RaceDistance);
-    /* Trivial strategy: fill in as much fuel as required for the whole race, or if the tank is
-       too small fill the tank completely. */
-    // Load and set parameters.
-    maxFuel = (tdble)(GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, (char*)NULL, (tdble) MAX_FUEL_TANK));
-    LogSHADOW.info("Strategy max fuel =  %.2f\n", maxFuel);
-    FuelperMeters = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_FUELPERMETERS, (char*)NULL, (tdble) MAX_FUEL_PER_METER);
-    LogSHADOW.info("Strategy fuel per meters =  %.7f\n", FuelperMeters);
-    fuelPerLap = (tdble) (TrackLength * FuelperMeters);
-    LogSHADOW.info("Strategy fuel per lap =  %.2f\n", fuelPerLap);
-    fullfuel = GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_FULL_FUEL, (char*)NULL, 0.0);
-    fuel_Strat = (int)GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_PITSTRAT, (char*)NULL, 0.0);
-    test_Pitstop = (GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_PITSTOP, (char*)NULL, 0.0) != 0);
-    test_qualifTime = (GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_CHKQUALIF, (char*)NULL, 0.0) != 0);
-    strategy_verbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIV, PRV_VERBOSE, (char*)NULL, 0.0);
+    m_warnDamageLimit	= warnDamageLimit;
+    m_dangerDamageLimit	= dangerDamageLimit;
+}
 
-    if ( fuel_Strat < 1 )
-    {
-        fuel_Strat = 1 ;
-    }
+void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
+{
+    //
+    //	update statistics.
+    //
 
-    if ( fuel_Strat == 1 )
-    {
-        shortTrack = true;
-    }
+    double tyreWear = 0;
+    for( int w = 0; w < 4; w++ )
+        tyreWear = MX(tyreWear, pCar->priv.wheel[w].condition);
 
-    m_expectedfuelperlap = fuelPerLap;
-    //double raceDist = 0.0;                // Removed 6th April 2015 - Not Used
-    float fuelForRace = 0.0;
-    int numPitstop = 0;
-    int raceLaps = s->_totLaps + 1;
-    //raceDist = raceLaps * t->length;
-    //fuelForRace = raceDist * fuelPerMeter;
-    fuelForRace = raceLaps * fuelPerLap;
-    numPitstop = (int) fabs(fuelForRace / maxFuel);
-    if ( numPitstop < fuelForRace / maxFuel )
+    if( pCar->_fuel		> m_lastFuel	||
+        pCar->_dammage	< m_lastDamage	||
+        tyreWear		< m_lastTyreWear )
     {
-        numPitstop = numPitstop + 1;
-    }
-
-    double m_fuel; // + security fuel.
-
-    if (shortTrack)
-    {
-        m_fuel = fuelPerLap * 1.2;
-    } else
-    {
-        m_fuel = fuelPerLap * 1.3;
-    }
-
-    if ( index == 1 )
-    {
-        m_fuel = fuelPerLap;
-    }
-
-    // Initial fuel at Start race
-    if (fuelForRace > maxFuel * 3)
-    {
-        // welcome in Endurance race :-)
-        m_FuelStart = (tdble)(m_fuel + calcFuel(fuelForRace));
-
-    } else if (fuelForRace < maxFuel)
-    {
-        //maybe we are in Practice mode
-        m_FuelStart = (tdble)(m_fuel + raceLaps * fuelPerLap);
+        // been in pits... reset.
+//		DEBUGF( "***** Been in pits... resetting stats.\n" );
+        m_lastFuel		= pCar->_fuel;
+        m_lastDamage	= pCar->_dammage;
+        m_lastTyreWear	= tyreWear;
     }
     else
     {
-        m_FuelStart = (tdble)(m_fuel + fuelForRace);
-    }
-
-    if (s->_raceType == RM_TYPE_QUALIF)
-    {
-        qualifRace = true;
-        m_fuel = 0;
-        if (index == 1)
+        if( pCar->_fuel < m_lastFuel )
         {
-            m_FuelStart = (tdble)((s->_totLaps * fuelPerLap) + 0.0);
-        } else
-        {
-            m_FuelStart = s->_totLaps * fuelPerLap;
+            m_totalFuel += (m_lastFuel - pCar->_fuel);
+            m_lastFuel = pCar->_fuel;
         }
-    }
-    /* Tests in Practice mode */
-    //maybe we need to check PitStop (eg. corkscrew, e-track-3)
-    if (test_Pitstop && s->_raceType == RM_TYPE_PRACTICE)
-    {
-        m_fuel = 0;
-        //m_FuelStart = ((raceLaps / 2) * fuelPerLap) + 0.3;
-        m_FuelStart = (tdble)(1.92 * fuelPerLap);
-        LogSHADOW.info("...Check PitStop Enabled!\n");
-        //maybe we need to check Best Lap Time for qualifying
-    } else if (test_qualifTime && s->_raceType == RM_TYPE_PRACTICE)
-    {
-        qualifRace = true;
-        m_fuel = 0;
-        m_FuelStart = s->_totLaps * fuelPerLap;
-        LogSHADOW.info("...Check QualifTime Enabled!\n");
-    }
 
-    if (m_FuelStart > maxFuel)
-    {
-        m_FuelStart = (tdble) maxFuel;
-        if (index == 1)
+        if( pCar->_dammage > m_lastDamage )
         {
-            m_FuelStart = (tdble)(maxFuel - fuelPerLap);
+            m_totalDamage += (pCar->_dammage - m_lastDamage);
+            m_lastDamage = pCar->_dammage;
+        }
+
+        if( tyreWear > m_lastTyreWear )
+        {
+            m_totalTyreWear += (tyreWear - m_lastTyreWear);
+            m_lastTyreWear = tyreWear;
         }
     }
 
-    if (fullfuel > 0)
-        m_FuelStart = (tdble) fullfuel;
+    //
+    //	work out fuel economy, and damage rate.
+    //
 
-    m_FuelStart = (tdble)(MIN(m_FuelStart, maxFuel));
-
-    LogSHADOW.debug("# SHADOW Index %d : Laps = %d, Fuel per Lap = %.2f, securityFuel = + %.2f, Fuel at Start Race = %.2f\n",
-            index, s->_totLaps, fuelPerLap, m_fuel, m_FuelStart);
-
-    GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, (char*)NULL, m_FuelStart);
-}
-
-
-void SimpleStrategy::update(tCarElt* car, tSituation *s)
-{
-    // Fuel statistics update.
-    int id = car->_trkPos.seg->id;
-    /* Range must include enough segments to be executed once guaranteed. */
-    if (id >= 0 && id < 5 && !fuelChecked)
+    double	fuelPerM = 0.001;
+    double	damagePerM = 0;
+    double	tyreWearPerM = 0;
+    if( pCar->_distRaced > 0 )
     {
-        if (car->race.laps > 1)
-        {
-            //fuelPerLap = MAX(fuelPerLap, (lastFuel + lastPitFuel - car->priv.fuel));
-            fuelSum += (lastFuel + lastPitFuel - car->priv.fuel);
-			fuelSumPerMeter += (lastFuel - car->_fuel);
-            fuelPerLap = (fuelSum/(car->race.laps - 1));
-            counterFuelLaps++;
-            avgFuelPerLap = fuelSum / counterFuelLaps;
-			avgFuelPerMeter = fuelSumPerMeter / car->_distRaced;
-
-			LogSHADOW.info(" # Fuel per meter = %.7f\n", avgFuelPerMeter);
-
-
-            if (strategy_verbose)
-            {
-                // Just display pit refuel messages
-                updateFuelStrategy(car, s);
-            }
-        }
-
-        lastFuel = car->priv.fuel;
-        lastPitFuel = 0.0;
-        fuelChecked = true;
-    } else if (id > 5)
-    {
-        fuelChecked = false;
-    }
-}
-
-void SimpleStrategy::updateFuelStrategy(tCarElt* car, tSituation *s)
-{
-    double requiredfuel;
-
-    /* Required additional fuel for the rest of the race. +1 because
-       the computation happens right after crossing the start line. */
-
-    //requiredfuel = ((car->_remainingLaps + 1) - ceil(car->_fuel/fuelPerLap))*fuelPerLap;
-    requiredfuel = ((car->_remainingLaps + 1) *fuelPerLap) - ceil(car->_fuel);
-
-    if (!m_checkFuel && requiredfuel <= 0.0f && car->_remainingLaps <= 5)
-    {
-        // We have enough fuel to end the race, no further stop required.
-        LogSHADOW.debug("%s No Pitstop required > carFuel:%.2f, remLap:%d\n", car->_name,car->_fuel, car->_remainingLaps);
-        m_checkFuel = true;
-        return;
+        fuelPerM = m_totalFuel / pCar->_distRaced;
+        damagePerM = m_totalDamage / pCar->_distRaced;
+        tyreWearPerM = m_totalTyreWear / pCar->_distRaced;
     }
 
-    // We don't have enough fuel to end the race need at least one stop.
-    if (!m_checkFuel && requiredfuel > 0.0f && car->_fuel < fuelPerLap * 3.0)
+    //
+    //	decide if we want to pit.
+    //
+
+    int		raceLaps = pCar->_laps + pCar->_remainingLaps;
+    double	trackLen = m_track.GetLength();
+    double	distToRace = trackLen * raceLaps - pCar->_distRaced;
+    double	fuelForRace = 1.1 * fuelPerM * distToRace - pCar->_fuel;
+    int		nPitsForFuel = int(ceil(fuelForRace / pCar->_tank));
+    double	fuelIfPitNow = fuelForRace - (pCar->_tank - pCar->_fuel);
+    int		nPitsIfPitNow = 1 + int(ceil(fuelIfPitNow / pCar->_tank));
+
+    bool	delayRepair = nPitsForFuel < nPitsIfPitNow;
+    double	repairLimit = delayRepair ? m_dangerDamageLimit : m_warnDamageLimit;
+
+    double	fuelPerLap = fuelPerM * trackLen;
+    double	damagePerLap = damagePerM * trackLen;
+    double	tyreWearPerLap = tyreWearPerM * trackLen;
+
+    bool	pitAvailable = true;
+    double	minPitLaps = 1;
+
+//#ifndef DEV
+    if( pTeamInfo->pOther &&
+        (pTeamInfo->pOther->pCar->pub.state & RM_CAR_STATE_NO_SIMU) == 0 )
     {
-        LogSHADOW.debug("%s Pitstop needed to refuel >> reqFuel: %.2f, carFuel: %.2f, remLap: %d\n",
-              car->_name, requiredfuel, car->_fuel, car->_remainingLaps);
-        m_checkFuel = true;
+        int myIntLapsUntilPit = (int)floor(pTeamInfo->lapsUntilPit);
+        int oIntLapsUntilPit  = (int)floor(pTeamInfo->pOther->lapsUntilPit);
+        // if same number of laps left until pit required, raise min pit laps
+        // for the car with most urgent need.
+        if( myIntLapsUntilPit == oIntLapsUntilPit &&
+            pTeamInfo->lapsUntilPit < pTeamInfo->pOther->lapsUntilPit &&
+            nPitsForFuel > 0 )
+            minPitLaps = 2;
+        pitAvailable = !pTeamInfo->pOther->usingPit;
     }
+//#endif
 
-    return;
-}
+//	bool	likeToPit = pCar->_dammage >=  500 || pCar->_fuel < 90;
+//	bool	likeToPit = pCar->_dammage + damagePerLap >= repairLimit ||
+    m_pitType = PT_NORMAL;
+    bool	likeToPit = pitAvailable &&
+                        (pCar->_dammage >= repairLimit ||
+//						 pCar->_fuel < fuelPerLap * 1.5 ||
+                         pTeamInfo->lapsUntilPit < minPitLaps ||
+                         tyreWear > 0.95);
 
-bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
-{
-    int m_maxDamage = PIT_DAMMAGE;
-    float attvalue = 0.0f;
-    // load defined value in xml file of Max Dammage before pitstops for this track
-    attvalue = GfParmGetNum(car->_carHandle, SECT_PRIV, PRV_DAMAGE, (char*) NULL, (tdble) PIT_DAMMAGE);
-    m_maxDamage = (int)attvalue;
-    // Estimated average fuel per lap
-    //m_Fuel = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, BT_ATT_FUELPERLAP, (char*) NULL, m_expectedfuelperlap);
-
-    double minFuelFactor;
-    minFuelFactor = 1.8;
-    if (shortTrack)
-    {
-        minFuelFactor = 2.15;
-    }
-    if (qualifRace)
-    {
-        minFuelFactor = 0.99;
-    }
-
-    /* Question makes only sense if there is a pit. */
-    if(car->_pit != NULL)
-    {
-        /* Ideally we shouldn't pit on the last lap...
-          just get to the finish line somehow. */
-        int lapsToEnd = car->_remainingLaps - car->_lapsBehindLeader;
-
-        if(lapsToEnd > 0)
-        {
-            // Do we need to refuel?
-            double cmpfuel = (fuelPerLap == 0.0f) ? m_expectedfuelperlap : fuelPerLap;
-            double reqfuel = lapsToEnd * cmpfuel;
-
-            if(car->_fuel < fuelPerLap * minFuelFactor && car->_fuel < lapsToEnd * fuelPerLap)
-            {
-                if (!m_checkFuel)
-                {
-                    LogSHADOW.info("%s Go to Pit the next lap to refuel: reqFuel= %.2f, carFuel= %.2f, remLap= %d\n",
-                          car->_name, reqfuel, car->_fuel, car->_remainingLaps);
-                    m_checkFuel = true;
-                }
-
-                return true;
-            }
-
-            // Do we need to repair and is the pit free?
-            needRepair = false;
-            if (car->_dammage > m_maxDamage && isPitFree(car))
-            {
-                needRepair = true;
-
-                if(laps_to_go(car) > 5)
-                {
-                    if (!m_checkDamage)
-                    {
-                        LogSHADOW.debug("%s >> Max_damage: %d Car_damage: %d Laps_toGo: %d\n",
-                              car->_name, m_maxDamage, car->_dammage, laps_to_go(car));
-                        m_checkDamage = true;
-                    }
-
-                    return true;
-                }
-                else if(laps_to_go(car) <= 5)
-                {
-                    if(car->_dammage > MAX_DAMAGE)
-                    {
-                        quickPitstop = true;
-                        return true;
-                    } else
-                    {
-                        if (!m_checkDamage)
-                        {
-                            LogSHADOW.debug("%s Dont Stop At Pit!> Laps_toGo:%d  Car_damage: %d Max_damage: %d\n",
-                                  car->_name, laps_to_go(car), car->_dammage, m_maxDamage);
-                            m_checkDamage = true;
-                            needRepair = false;
-                        }
-                    }
-                }
-
-            }
-        }
-    }
-
-    return false;
-}
-
-
-bool SimpleStrategy::isPitFree(tCarElt* car)
-{
-    if (car->_pit != NULL)
-    {
-        if (car->_pit->pitCarIndex == TR_PIT_STATE_FREE)
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-int SimpleStrategy::pitRepair(tCarElt* car, tSituation *s)
-{
-    m_checkDamage = false;
-    int damRepair = 0;
-    if (needRepair)
-    {
-        damRepair = car->_dammage;
-        if(quickPitstop)
-        {
-            damRepair = (int)(0.3 * car->_dammage);
-        }
-
-        needRepair = false;
-    }
-
-    LogSHADOW.debug("# %s repairing %d dammage\n", car->_name, damRepair);
-    return damRepair;
-}
-
-
-float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
-{
-    float fuel;
-    float fuelToEnd;
-    int lapsToEnd;
-
-    lapsToEnd = car->_remainingLaps - car->_lapsBehindLeader;
-    // int inLap = s->_totLaps - car->_remainingLaps;               // Removed 6th April 2015 - Not Used
-    fuelToEnd = (tdble)(MIN(getRefuel1(lapsToEnd), getRefuel2(lapsToEnd)));
-
-    //m_remainingstops = int(floor(fuelToEnd / car->_tank));
-    m_remainingstops = (int)(fabs(fuelToEnd / car->_tank));
-    int num_remStops = m_remainingstops + 1;
-    m_fuelperstint = car->_tank - car->_fuel;
-    fuel = (tdble)(m_fuelperstint * 0.90);
-    double addFuel = fuelPerLap;
-    double addMinFuel = fuelPerLap * 0.80;
-
-    if (shortTrack && fuelPerLap < 3.50)
-    {
-        addFuel = fuelPerLap * 2.0;
-        addMinFuel = fuelPerLap;
-    }
-
-    countPitStop++;
-
-    if ( fuel_Strat == 2 )
-    {
-        /* Long track strategy eg Spring*/
-        if (strategy_verbose)
-        {
-            LogSHADOW.debug(">> [PitStrat 2] ");
-        }
-
-        LogSHADOW.info(" %s in Pit to refuel < PitStop %d >\n", car->_name, countPitStop);
-
-        m_fuelperstint = (tdble)((fuelToEnd / num_remStops) + addFuel);
-
-        if (m_remainingstops && (m_fuelperstint / car->_tank > 0.98))
-        {
-            m_fuelperstint = car->_tank;
-        }
-
-        fuel = (tdble)(MAX(MIN(m_fuelperstint - car->_fuel, car->_tank - car->_fuel), 0.0));
-
-        if (!m_remainingstops)
-        {
-            m_fuelperstint = (tdble)((lapsToEnd * fuelPerLap) + addMinFuel);
-        }
-
-    } else
-    {
-        /* Strategy for short track and track length less than 5000m*/
-        if (strategy_verbose)
-        {
-            LogSHADOW.debug(">> [PitStrat 1] ");
-        }
-
-        if (m_remainingstops >= 1)
-        {
-            m_fuelperstint = (tdble)((fuelToEnd / num_remStops) + addFuel);
-        } 
-		else if (m_remainingstops <= 0)
-        {
-            m_fuelperstint = (tdble)((lapsToEnd * fuelPerLap) + addMinFuel);
-        }
-
-        fuel = MIN(m_fuelperstint - car->_fuel, car->_tank - car->_fuel);
-        LogSHADOW.info(" %s in Pit to refuel %.2fl < PitStop %d >\n", car->_name, fuel, countPitStop);
-    }
-
-
-    if (fuelToEnd <= car->_fuel)
-    {
-        m_remainingstops = 0;
-        m_fuelperstint = 0.0;
-        fuel = 0.0;
-    }
-
-#ifdef STRAT_DEBUG
-    double totalFuel = s->_totLaps * fuelPerLap;
-    double fuelPerPitStop = totalFuel / 4;
-    LogSHADOW.debug("[%s()] totalFuel=%.2f fuelPerPitStop=%.2f inLap=%d lapsToEnd=%d m_fuelperstint=%.2f car_fuel=%.2f fuel=%.2f\n",
-            __FUNCTION__, totalFuel, fuelPerPitStop, inLap, lapsToEnd, m_fuelperstint, car->_fuel, fuel);
+#if defined(DEV) && 0  // don't want to leave this in the code by mistake for TRB races.
+    likeToPit = true;
+    tyreWear = 1.0;
 #endif
 
-    if (strategy_verbose)
+    // pitting on the last lap is a silly thing to do (think about it!).
+//	DEBUGF( "******* remaining laps %d\n", pCar->race.remainingLaps );
+    int	remainingLaps = pCar->race.remainingLaps + 1;
+    if( remainingLaps <= 1 )
+        likeToPit = false;
+
+    // need to pit due to a penalty -- normal pitting has priority here.
+    const CarPenalty* pPenalty = likeToPit ? 0 : GF_TAILQ_FIRST(&pCar->race.penaltyList);
+    if( pPenalty &&
+        pPenalty->lapToClear < raceLaps &&
+        (pPenalty->penalty == RM_PENALTY_DRIVETHROUGH ||
+         pPenalty->penalty == RM_PENALTY_STOPANDGO) )
     {
-        if (!m_remainingstops)
+        if( pitAvailable || pPenalty->penalty == RM_PENALTY_DRIVETHROUGH )
         {
-            LogSHADOW.debug("# Last Pitstop for %s: LapsToEnd: %d, LapsBehindLeader: %d, fuelToEnd: %.2f, FuelperLap: %.2f\n",
-                    car->_name, lapsToEnd, car->_lapsBehindLeader, fuelToEnd, fuelPerLap);
+            // got a pit related penalty to serve before the end of the race.
+            likeToPit = true;
+
+            // if got a drive through penalty then change type so the correct
+            // raceline can be used.
+            if( pPenalty->penalty == RM_PENALTY_DRIVETHROUGH )
+                m_pitType = PT_DRIVE_THROUGH;
         }
-        else
-        {
-            LogSHADOW.debug("# [%s()] LapsToEnd: %d, LapsBehindLeader: %d, FuelToEnd: %.2f, FuelperLap: %.2f,\n", __FUNCTION__,
-                    lapsToEnd, car->_lapsBehindLeader, fuelToEnd, fuelPerLap);
-        }
-        LogSHADOW.debug(">> %s ReFueling %.2f,  Fuel needed = %.2f, carFuel= %.2f, remPitStop= %d\n",
-                car->_name, fuel, m_fuelperstint, car->_fuel,  m_remainingstops);
-        LogSHADOW.debug(" \n");
     }
 
-    lastPitFuel = fuel;
-    m_checkFuel = false;
-    return fuel;
-}
+    //
+    //	manage the pit state.
+    //
 
-float SimpleStrategy::calcFuel(double totalFuel)
-{
-    float fuelAtStart;
-    float m_lastfuel;
-    int nb_pitstop = 0;
-    int nb_laps = 0;
+    double	trackPos = RtGetDistFromStart(pCar);
 
-#if 0
-    if (inRace) {
-        /* Now we are in race*/
-        if ( totalFuel / maxFuel > numPitstop ) {
-            numPitstop += numPitstop + 1;
-        }
-        double pit_ReFuel = (totalFuel / numPitstop) + fuelPerLap;
-        if ( pit_ReFuel > maxFuel ){
-            return maxFuel;
-        }
+    switch( m_state )
+    {
+        case PIT_NONE:
+            // only enable pitting while not in the pitting section of the track.
+            if( !m_pitPath.InPitSection(trackPos) && likeToPit )
+            {
+                // let's stop in the pits.
+                m_state = PIT_ENABLED;
+//				DEBUGF( "***** PIT_ENTER\n " );
+            }
+            break;
 
-        return pit_ReFuel;
+        case PIT_ENABLED:
+            // pitting enabled: change to pitting if now in the pitting section of the track.
+            if( !likeToPit )
+            {
+                // changed it's mind!
+                m_state = PIT_NONE;
+            }
+            else if( m_pitPath.InPitSection(trackPos) )
+            {
+                m_state = PIT_ENTER;
+            }
+            break;
+
+        case PIT_ENTER:
+//			if( pCar->ctrl.brakeCmd > 0.1 && pCar->ctrl.brakeCmd < 0.5 )
+//				pCar->ctrl.brakeCmd = 0.5;
+
+            if( !m_pitPath.CanStop(trackPos) )
+                break;
+
+            pCar->ctrl.raceCmd = RM_CMD_PIT_ASKED;
+            pCar->pitcmd.tireChange	= tyreWear > 0.5 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
+            m_state = PIT_ASKED;
+//			DEBUGF( "****** PIT_ASKED\n" );
+
+            // falls through...
+
+        case PIT_ASKED:
+            pCar->pitcmd.tireChange	= tyreWear > 0.5 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
+
+            if( m_pitPath.CanStop(trackPos) &&
+                (pCar->ctrl.raceCmd & RM_CMD_PIT_ASKED) )
+            {
+                // stop.
+                pCar->ctrl.accelCmd = 0;
+                pCar->ctrl.brakeCmd = 0.7f;
+
+                PtInfo	pi;
+                m_pitPath.GetPtInfo( trackPos, pi );
+                if( //(pi.offs - pCar->_trkPos.toMiddle) > 0.5 &&
+                    pCar->_speed_x < 0.5 )
+                {
+                    pCar->ctrl.accelCmd = 0.1f;
+                    pCar->ctrl.brakeCmd = 0;
+                }
+
+                if( pPenalty )
+                {
+                    pCar->pitcmd.stopType = pPenalty->penalty == RM_PENALTY_STOPANDGO ?
+                                                RM_PIT_STOPANDGO : RM_PIT_REPAIR;
+                    pCar->pitcmd.fuel		= 0;
+                    pCar->pitcmd.repair		= 0;
+                    pCar->pitcmd.tireChange	= tCarPitCmd::NONE;
+                }
+                else
+                {
+//					double	fuel = distToRace * fuelPerM * 1.02 + fuelPerLap - pCar->_fuel;
+//					double	fuel = distToRace * fuelPerM * 1.02 + fuelPerLap;
+                    double	fuel = distToRace * fuelPerM * 1.02;
+
+                    if( fuel > pCar->info.tank )
+                    {
+                        int nTanks = int(ceil(fuel / pCar->info.tank));
+                        fuel = MN(pCar->info.tank, fuel / nTanks + fuelPerLap * 2);
+                    }
+
+                    double	predDamage = pCar->_dammage + distToRace * damagePerM * 2;
+            //		int		repair = int(ceil(predDamage - 5000));
+                    int		repair = pCar->_dammage;
+
+                    double	distWithMaxFuel = pCar->_tank / fuelPerM;
+                    if( nPitsForFuel <= 1 && distToRace < distWithMaxFuel / 2 )
+                        repair = int(ceil(predDamage - 4000));
+
+                    pCar->pitcmd.stopType	= RM_PIT_REPAIR;
+                    pCar->pitcmd.fuel		= (tdble)MX(0, fuel - pCar->_fuel);
+                    pCar->pitcmd.repair		= MX(0, MN(repair, pCar->_dammage));
+                    pCar->pitcmd.tireChange	= tyreWear > 0.5 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
+                }
+
+//				printf( "****** PIT  fuel %g  repair %d  twear %0.4f  tchg 0x%x\n",
+//						pCar->pitcmd.fuel, pCar->pitcmd.repair, tyreWear, pCar->pitcmd.tireChange );
+            }
+            else
+            {
+                // pit stop finished -- need to exit pits now.
+                m_state = PIT_EXIT;
+//				DEBUGF( "***** PIT_EXIT\n " );
+            }
+            break;
+
+        case PIT_EXIT:
+            if( !m_pitPath.InPitSection(trackPos) )
+            {
+                m_state = PIT_NONE;
+//				DEBUGF( "***** PIT_NONE\n " );
+            }
+            else if( m_pitPath.CanStop(trackPos) )
+            {
+                // go.
+                pCar->ctrl.accelCmd = 0.5;
+                pCar->ctrl.brakeCmd = 0;
+            }
+
+            break;
     }
-#endif
 
-    nb_pitstop = (int)(1 + fabs(totalFuel / maxFuel));
-    m_lastfuel = (tdble)(totalFuel / nb_pitstop);  //Max refuel per pit stop
-    nb_laps = (int)(1 + floor( m_lastfuel / fuelPerLap));
-    fuelAtStart = nb_laps * fuelPerLap;
-
-    return fuelAtStart;
+//	if( m_pitPath.CanStop(trackPos) )
+//		pTeamInfo->lapsUntilPit = pCar->_fuel / fuelPerLap - 1;
+    double	fuelToPit = m_pitPath.EntryToPitDistance() * fuelPerM;
+    pTeamInfo->lapsUntilPit = (pCar->_fuel - fuelToPit) / fuelPerLap;// - 1;
+    pTeamInfo->usingPit = m_state == PIT_ENTER || m_state == PIT_ASKED;
 }
 
-double SimpleStrategy::getRefuel1(int laps)
+bool	Strategy::WantToPit() const
 {
-    double refuelforrace = laps * fuelPerLap;
-
-    return refuelforrace;
+    return m_state >= PIT_ENTER && m_state <= PIT_EXIT;
+//	return true;
 }
 
-double SimpleStrategy::getRefuel2(int laps)
+int		Strategy::PitType() const
 {
-    double refuelforrace = laps * avgFuelPerLap;
+    return m_pitType;
+//	return PT_DRIVE_THROUGH;
+//	return PT_NORMAL;
+}
 
-    return refuelforrace;
+double	Strategy::FuelPerM( const CarElt* pCar ) const
+{
+    double	fuelPerM = 0.001;
+    if( pCar->_distRaced > 0 )
+        fuelPerM = m_totalFuel / pCar->_distRaced;
+    return fuelPerM;
 }

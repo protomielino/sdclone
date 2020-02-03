@@ -22,6 +22,10 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 #include "Vec2d.h"
 #include "Vec3d.h"
 
@@ -29,14 +33,6 @@
 #define MN(x, y)	((x) < (y) ? (x) : (y))
 #define MX(x, y)	((x) > (y) ? (x) : (y))
 #define RG(v, l, h)	((v) < (l) ? (l) : (v) > (h) ? (h) : (v))
-
-#ifdef DEV
-#define PRINTF			printf
-#define DEBUGF			GfOut
-#else
-#define PRINTF(x, ...)	do {} while(0)
-#define DEBUGF(x, ...)	do {} while(0)
-#endif
 
 //typedef unsigned int uint;
 //typedef unsigned short ushort;
@@ -55,21 +51,21 @@ public:
     static double	DistPtFromLine( double ptx, double pty, double px, double py,
                                     double vx, double vy );
 
-    static bool	LineCrossesLine( double p0x, double p0y, double v0x, double v0y,
+    static bool	    LineCrossesLine( double p0x, double p0y, double v0x, double v0y,
                                  double p1x, double p1y, double v1x, double v1y,
                                  double& t );
-    static bool	LineCrossesLine( const Vec2d& p0, const Vec2d& v0,
+    static bool	    LineCrossesLine( const Vec2d& p0, const Vec2d& v0,
                                  const Vec2d& p1, const Vec2d& v1,
                                  double& t );
-    static bool	LineCrossesLineXY( const Vec3d& p0, const Vec3d& v0,
+    static bool	    LineCrossesLineXY( const Vec3d& p0, const Vec3d& v0,
                                    const Vec3d& p1, const Vec3d& v1,
                                    double& t );
 
-    static bool	LineCrossesLine( const Vec2d& p0, const Vec2d& v0,
+    static bool	    LineCrossesLine( const Vec2d& p0, const Vec2d& v0,
                                  const Vec2d& p1, const Vec2d& v1,
                                  double& t0, double& t1 );
 
-    static bool	LineCrossesCircle( const Vec2d&	lp, const Vec2d& lv,
+    static bool	    LineCrossesCircle( const Vec2d&	lp, const Vec2d& lv,
                                    const Vec2d& cp, double cr,
                                    double& t0, double& t1 );
 
@@ -106,4 +102,4 @@ public:
                                 double* r1, double* r2, double* r3 );
 };
 
-#endif
+#endif // _UTILS_H_

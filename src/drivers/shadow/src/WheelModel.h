@@ -1,3 +1,19 @@
+/***************************************************************************
+
+    file        : WheelModel.h
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #ifndef _WHEEL_MODEL_H_
 #define _WHEEL_MODEL_H_
@@ -14,15 +30,15 @@ class WheelModel
 public:
     WheelModel();
     ~WheelModel();
-    
+
     void    setWheel( int wheel );
     void    config( const tCarElt* car );
     void    config( void* hCar );
     void    update( const tCarElt* car, const tSituation* s, const CarModel& cm );
 
-	double	slipX() const { return _sx; }
-	double	slipY() const { return _sy; }
-	double	slip() const  { return hypot(_sx, _sy); }
+    double	slipX() const { return _sx; }
+    double	slipY() const { return _sy; }
+    double	slip() const  { return hypot(_sx, _sy); }
 
     double  radius() const { return _R; }
 
@@ -42,7 +58,7 @@ private:
     double      _E;     // magic formula constant
 
     double      _MU;    // tyre mu.
-    
+
     double      _R;     // nominal wheel & tyre radius.
 
     double      _x;     // global x position of wheel

@@ -22,9 +22,12 @@
 #ifndef _VEC3D_H_
 #define _VEC3D_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 #include <v3_t.h>
 #include <tgf.h>
-
 #include "Vec2d.h"
 
 class Vec3d : public v3t<double>
@@ -42,7 +45,6 @@ public:
     Vec3d&	operator=( const v3t<double>& v )
     {
         v3t<double>::operator=(v);
-
         return *this;
     }
 
@@ -50,7 +52,6 @@ public:
     {
         v3t<double>	temp;
         this->crossProduct(v, temp);
-
         return temp;
     }
 
@@ -58,12 +59,12 @@ public:
     {
         v3t<double>	temp(*this);
         temp.normalize();
-
         return temp;
     }
 
     Vec2d	GetXY() const { return Vec2d(x, y); }
+
     Vec3d	SetZ( int newZ ) const { return Vec3d(x, y, newZ); }
 };
 
-#endif
+#endif // _VEC3D_H_

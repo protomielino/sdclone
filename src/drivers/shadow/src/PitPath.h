@@ -22,6 +22,10 @@
 #ifndef _PITPATH_H_
 #define _PITPATH_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 #include "Path.h"
 #include "MyTrack.h"
 

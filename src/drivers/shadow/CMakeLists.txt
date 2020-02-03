@@ -21,7 +21,7 @@ SET(ROBOT_SOURCES
 				src/CubicSpline.h
 				src/LearnedGraph.cpp
 				src/LearnedGraph.h
-				src/LinearRegression.cpp 
+				src/LinearRegression.cpp
 				src/LinearRegression.h
 				src/Driver.cpp
 				src/Driver.h
@@ -33,38 +33,38 @@ SET(ROBOT_SOURCES
 				src/ParametricCubic.h
 				src/ParametricCubicSpline.cpp
 				src/ParametricCubicSpline.h
-				src/Path.cpp 
+				src/Path.cpp
 				src/Path.h
 				src/PathOffsets.cpp
 				src/PathOffsets.h
 				src/PathOptions.cpp
 				src/PathOptions.h
-				src/PathRecord.cpp 
+				src/PathRecord.cpp
 				src/PathRecord.h
-				src/PidController.cpp 
+				src/PidController.cpp
 				src/PidController.h
-				src/PitControl.cpp
-				src/PitControl.h
-				src/PitPath.cpp 
+				src/PitPath.cpp
 				src/PitPath.h
-				src/PtInfo.cpp 
+				src/PtInfo.cpp
 				src/PtInfo.h
-				src/Quadratic.cpp 
+				src/Quadratic.cpp
 				src/Quadratic.h
-				src/Seg.cpp 
+				src/Seg.cpp
 				src/Seg.h
 				src/Shadow.cpp
 				src/Shared.cpp
 				src/Shared.h
-				src/Span.cpp 
+				src/Span.cpp
 				src/Span.h
 				src/SpringsPath.cpp
 				src/SpringsPath.h
+				src/Strategy.cpp
+				src/Strategy.h
 				src/Stuck.cpp
 				src/Stuck.h
-				src/TeamInfo.cpp 
+				src/TeamInfo.cpp
 				src/TeamInfo.h
-				src/Utils.cpp 
+				src/Utils.cpp
 				src/Utils.h
 				src/Vec2d.h
 				src/Vec3d.h

@@ -27,6 +27,10 @@
 
 using namespace std;
 
+// The "SHADOW" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -98,8 +102,10 @@ bool	Path::GetPtInfo( double trackPos, PtInfo& pi ) const
 
     ParametricCubic	cubic;
 
+//	cubic.SetPoints( p1.GetXY(), v02.GetXY(), p2.GetXY(), v13.GetXY() );
     cubic.SetPoints( p0.GetXY(), p1.GetXY(), p2.GetXY(), p3.GetXY() );
 
+//	double	tx = (pt - p1) * v1 / (v1 * v1);
     double	tx = (trackPos - dist0) / (dist1 - dist0);
 
     Vec2d	pp = cubic.Calc(tx);
@@ -107,7 +113,7 @@ bool	Path::GetPtInfo( double trackPos, PtInfo& pi ) const
     double	ck = cubic.CalcCurvature(tx);
     double	k = Utils::InterpCurvatureLin(k1, k2, tx);
 
-//	DEBUGF( "*** tx=%.3f/%d (%.3f,%.3f) (%.3f,%.3f) k=%.5f %.5f\n", tx, idx0, pp.x, pp.y, pv.x, pv.y, k, k - ck );
+//	LogSHADOW.debug( "*** tx=%.3f/%d (%.3f,%.3f) (%.3f,%.3f) k=%.5f %.5f\n", tx, idx0, pp.x, pp.y, pv.x, pv.y, k, k - ck );
 
     tTrkLocPos	pos;
     const tTrackSeg*	pSeg = m_pTrack->GetAt(idx0).pSeg;
@@ -121,7 +127,7 @@ bool	Path::GetPtInfo( double trackPos, PtInfo& pi ) const
     pi.oang = Utils::VecAngle(pv);
 
     if( pi.t < 0 || pi.t >= 1 )
-        DEBUGF( "*** t out of range %g  tl %g  tp %g  d0 %g  d1 %g\n",
+        LogSHADOW.debug( "*** t out of range %g  tl %g  tp %g  d0 %g  d1 %g\n",
             pi.t, m_pTrack->GetLength(), trackPos, dist0, dist1 );
 
 
@@ -245,12 +251,21 @@ void	Path::CalcCurvaturesV( int start, int len, int step )
         int     i  = (start + count) % NSEG;
         int     ip = (i - 1 * step + NSEG) % NSEG;
         int		in = (i + 1 * step) % NSEG;
-
+#if 1
         t3Dd	tn;
         tTrkLocPos	pos;
         RtTrackGlobal2Local(m_pts[i].pSeg->pSeg, (float)m_pts[i].pt.x, (float)m_pts[i].pt.y, &pos, TR_LPOS_MAIN);
         RtTrackSurfaceNormalL(&pos, &tn);
         Vec3d	track_normal(tn);
+#else
+        double  sn_pitch = sin(m_pts[i].ap);
+        double  cs_pitch = cos(m_pts[i].ap);
+        double  sn_roll  = sin(m_pts[i].ar);
+        double  cs_roll  = cos(m_pts[i].ar);
+
+        Vec3d   track_normal(sn_pitch, cs_pitch * sn_roll, cs_pitch * cs_roll);
+        //track_normal.normalize();
+#endif
         Vec3d   curr_pt = m_pts[i].pt;
 
         // work out tangent in the horizontal plane
@@ -290,13 +305,32 @@ void	Path::CalcCurvaturesH( int start, int len, int step )
 
         if( i == 376 )
             int f = 2;
-
+#if 1
         t3Dd	tn;
         tTrkLocPos	pos;
         RtTrackGlobal2Local(m_pts[i].pSeg->pSeg, (float)m_pts[i].pt.x, (float)m_pts[i].pt.y, &pos, TR_LPOS_MAIN);
         RtTrackSurfaceNormalL(&pos, &tn);
         Vec3d	track_normal(tn);
+#else
+        double  sn_pitch = sin(m_pts[i].ap);
+        double  cs_pitch = cos(m_pts[i].ap);
+        double  sn_roll  = sin(m_pts[i].ar);
+        double  cs_roll  = cos(m_pts[i].ar);
 
+        Vec3d   track_normal(sn_pitch, cs_pitch * sn_roll, cs_pitch * cs_roll);
+        //track_normal.normalize();
+#endif
+
+#if 0
+        // project the points on to the plain of the track segment.
+        Vec3d   prev_pt = m_pts[ip].pt - (m_pts[ip].pt * track_normal) * track_normal;
+        Vec3d   curr_pt = m_pts[i ].pt - (m_pts[i ].pt * track_normal) * track_normal;
+        Vec3d   next_pt = m_pts[in].pt - (m_pts[in].pt * track_normal) * track_normal;
+
+        // work out coordinate system in the plane.
+        Vec3d	x = Vec3d(next_pt - prev_pt).to_unit_vector();
+        Vec3d	y = track_normal % x;
+#else
         // project the points on to the horizontal plain.
         Vec3d   prev_pt = m_pts[ip].pt.SetZ(0);
         Vec3d   curr_pt = m_pts[i ].pt.SetZ(0);
@@ -305,7 +339,7 @@ void	Path::CalcCurvaturesH( int start, int len, int step )
         // work out coordinate system in the track plane.
         Vec3d	x = (track_normal % m_pts[i].Norm()).to_unit_vector();
         Vec3d	y = track_normal % x;
-
+#endif
         // calculate the curvature in the plane of the track segment.
         m_pts[i].kh = Utils::CalcCurvature(x * prev_pt, y * prev_pt,
                                            x * curr_pt, y * curr_pt,
@@ -428,7 +462,7 @@ void	Path::PropagateBraking( int start, int len, const CarModel& cm, int step )
             if( m_pts[i].h > 0.1 )
                 m_pts[i].spd = m_pts[j].spd;
 
-//			DEBUGF( "%4d  K %7.4f      u %7.3f   v %7.3f\n", i, K, u, v );
+//			LogSHADOW.debug( "%4d  K %7.4f      u %7.3f   v %7.3f\n", i, K, u, v );
         }
     }
 }
@@ -558,7 +592,7 @@ void	Path::CalcFwdAbsK( int range, int step )
     while( i > 0 )
     {
         m_pts[i].fwdK = totalK / count;
-//		DEBUGF( "***** i %d, k %7.4f fdwK %g  %6.1f\n",
+//		LogSHADOW.debug( "***** i %d, k %7.4f fdwK %g  %6.1f\n",
 //				i, m_pts[i].k, m_pts[i].fwdK, 1 / m_pts[i].fwdK );
         totalK += fabs(m_pts[i].k);
         totalK -= fabs(m_pts[j].k);
@@ -850,9 +884,82 @@ void	Path::ModifySection( int from, int len, double delta, int important, double
         l1.offs += offset;
         l1.pt = l1.CalcPt();
     }}
-
+/*
+    {for( int i = 0; i < len; i++ )
+    {
+        int	j = (from + i) % NSEG;
+        QuadraticFilter( j );
+    }}
+*/
     delete [] pDist;
 }
+
+/*
+
+y = A x^2 + B x + C
+
+
+sum(x^2) A + sum(x)   B + N        C = sum(y)			...(1)
+sum(x^3) A + sum(x^2) B + sum(x)   C = sum(y x)			...(2)
+sum(x^4) A + sum(x^3) B + sum(x^2) C = sum(y x^2)		...(3)
+
+
+// from (1)
+
+A = [sum(y) - (sum(x) B + N C)] / sum(x^2)
+A = [sum(y) - sum(x) B - N C] / sum(x^2)				...(4)
+
+
+// substitute (4) into (2) and (3)...
+
+(2)...
+sum(x^3) A                                                      + sum(x^2) B + sum(x) C = sum(y x)
+sum(x^3) [sum(y) -          sum(x) B -          N C] / sum(x^2) + sum(x^2) B + sum(x) C = sum(y x)
+[sum(x^3) sum(y) - sum(x^3) sum(x) B - sum(x^3) N C] / sum(x^2) + sum(x^2) B +          sum(x) C =          sum(y x)
+ sum(x^3) sum(y) - sum(x^3) sum(x) B - sum(x^3) N C +  sum(x^2)   sum(x^2) B + sum(x^2) sum(x) C = sum(x^2) sum(y x)
+
+   sum(x^2) sum(x^2) B - sum(x^3) sum(x) B +    sum(x^2) sum(x) C - sum(x^3) N C + sum(x^3) sum(y) = sum(x^2) sum(y x)
+B [sum(x^2) sum(x^2)   - sum(x^3) sum(x)] +  C [sum(x^2) sum(x)   - sum(x^3) N]  + sum(x^3) sum(y) = sum(x^2) sum(y x)
+B [sum(x^2) sum(x^2)   - sum(x^3) sum(x)] = -C [sum(x^2) sum(x)   - sum(x^3) N]  - sum(x^3) sum(y) + sum(x^2) sum(y x)
+
+B   [sum(x^2) sum(x^2  ) - sum(x^3) sum(x)] = sum(x^2) sum(y x) - C [sum(x^2) sum(x)   - sum(x^3) N]  - sum(x^3) sum(y)
+
+B = [sum(x^2) sum(y x) - C [sum(x^2) sum(x) - sum(x^3) N] - sum(x^3) sum(y)] / [sum(x^2) sum(x^2) - sum(x^3) sum(x)]		...(5)
+
+(3)...
+sum(x^4) A                                                      + sum(x^3) B + sum(x^2) C = sum(y x^2)
+sum(x^4) [sum(y) -          sum(x) B -          N C] / sum(x^2) + sum(x^3) B + sum(x^2) C = sum(y x^2)
+[sum(x^4) sum(y) - sum(x^4) sum(x) B - sum(x^4) N C] / sum(x^2) + sum(x^3) B +          sum(x^2) C =          sum(y x^2)
+ sum(x^4) sum(y) - sum(x^4) sum(x) B - sum(x^4) N C +  sum(x^2)   sum(x^3) B + sum(x^2) sum(x^2) C = sum(x^2) sum(y x^2)
+
+   sum(x^2) sum(x^3) B - sum(x^4) sum(x) B +    sum(x^2) sum(x^2) C - sum(x^4) N C +  sum(x^4) sum(y) = sum(x^2) sum(y x^2)
+B [sum(x^2) sum(x^3)   - sum(x^4) sum(x)] +  C [sum(x^2) sum(x^2)   - sum(x^4) N]  +  sum(x^4) sum(y) = sum(x^2) sum(y x^2)
+B [sum(x^2) sum(x^3)   - sum(x^4) sum(x)] = -C [sum(x^2) sum(x^2)   - sum(x^4) N]  -  sum(x^4) sum(y) + sum(x^2) sum(y x^2)
+
+B [sum(x^2) sum(x^3)   - sum(x^4) sum(x)] = sum(x^2) sum(y x^2) - C [sum(x^2) sum(x^2)   - sum(x^4) N]  -  sum(x^4) sum(y)
+
+B = [sum(x^2) sum(y x^2) - C [sum(x^2) sum(x^2) - sum(x^4) N] - sum(x^4) sum(y)] / [sum(x^2) sum(x^3) - sum(x^4) sum(x)]	...(6)
+
+// now equate the Bs of (5) and (6)
+
+  [sum(x^2) sum(y x)   - C [sum(x^2) sum(x)   - sum(x^3) N] - sum(x^3) sum(y)] / [sum(x^2) sum(x^2) - sum(x^3) sum(x)]
+= [sum(x^2) sum(y x^2) - C [sum(x^2) sum(x^2) - sum(x^4) N] - sum(x^4) sum(y)] / [sum(x^2) sum(x^3) - sum(x^4) sum(x)]
+
+  [sum(x^2) sum(y x)   - C [sum(x^2) sum(x)   - sum(x^3) N] - sum(x^3) sum(y)] * [sum(x^2) sum(x^3) - sum(x^4) sum(x)]
+= [sum(x^2) sum(y x^2) - C [sum(x^2) sum(x^2) - sum(x^4) N] - sum(x^4) sum(y)] * [sum(x^2) sum(x^2) - sum(x^3) sum(x)]
+
+  [sum(x^2) sum(y x)   - sum(x^3) sum(y)] [sum(x^2) sum(x^3) - sum(x^4) sum(x)] - C [sum(x^2) sum(x)   - sum(x^3) N] [sum(x^2) sum(x^3) - sum(x^4) sum(x)]
+= [sum(x^2) sum(y x^2) - sum(x^4) sum(y)] [sum(x^2) sum(x^2) - sum(x^3) sum(x)] - C [sum(x^2) sum(x^2) - sum(x^4) N] [sum(x^2) sum(x^2) - sum(x^3) sum(x)]
+
+  C [sum(x^2) sum(x^2) - sum(x^4) N] [sum(x^2) sum(x^2) - sum(x^3) sum(x)]    - C [sum(x^2) sum(x)   - sum(x^3) N] [sum(x^2) sum(x^3) - sum(x^4) sum(x)]
+= [sum(x^2) sum(y x^2) - sum(x^4) sum(y)] [sum(x^2) sum(x^2) - sum(x^3) sum(x)] - [sum(x^2) sum(y x) - sum(x^3) sum(y)] [sum(x^2) sum(x^3) - sum(x^4) sum(x)]
+
+  C <[sum(x^2) sum(x^2) - sum(x^4) N] [sum(x^2) sum(x^2) - sum(x^3) sum(x)]  - [sum(x^2) sum(x)   - sum(x^3) N] [sum(x^2) sum(x^3) - sum(x^4) sum(x)]>
+= [sum(x^2) sum(y x^2) - sum(x^4) sum(y)] [sum(x^2) sum(x^2) - sum(x^3) sum(x)] - [sum(x^2) sum(y x) - sum(x^3) sum(y)] [sum(x^2) sum(x^3) - sum(x^4) sum(x)]
+
+C = [sum(x^2) sum(y x^2) - sum(x^4) sum(y)] [sum(x^2) sum(x^2) - sum(x^3) sum(x)] - [sum(x^2) sum(y x) - sum(x^3) sum(y)] [sum(x^2) sum(x^3) - sum(x^4) sum(x)]
+  / <[sum(x^2) sum(x^2) - sum(x^4) N] [sum(x^2) sum(x^2) - sum(x^3) sum(x)]  - [sum(x^2) sum(x)   - sum(x^3) N] [sum(x^2) sum(x^3) - sum(x^4) sum(x)]>
+*/
 
 void	Path::QuadraticFilter( int idx )
 {
@@ -906,11 +1013,15 @@ void	Path::QuadraticFilter( int idx )
         sy   += curr.y;
     }
 
+//	C = <[sum(x^2) sum(y x^2) - sum(x^4) sum(y)] [sum(x^2) sum(x^2) - sum(x^3) sum(x)] - [sum(x^2) sum(y x) - sum(x^3) sum(y)] [sum(x^2) sum(x^3) - sum(x^4) sum(x)]>
+//	  / <[sum(x^2) sum(x^2)   - sum(x^4) N]      [sum(x^2) sum(x^2) - sum(x^3) sum(x)] - [sum(x^2) sum(x)   - sum(x^3) N]      [sum(x^2) sum(x^3) - sum(x^4) sum(x)]>
+
     double xnum = (su2 * su2x - su4 * sx) * (su2 * su2 - su3 * su) - (su2 * sux - su3 * sx) * (su2 * su3 - su4 * su);
     double  den = (su2 * su2  - su4 * N)  * (su2 * su2 - su3 * su) - (su2 * su  - su3 * N)  * (su2 * su3 - su4 * su);
     double x = xnum / den;
 
     double ynum = (su2 * su2y - su4 * sy) * (su2 * su2 - su3 * su) - (su2 * suy - su3 * sy) * (su2 * su3 - su4 * su);
+//	double yden = (su2 * su2  - su4 * N)  * (su2 * su2 - su3 * su) - (su2 * su  - su3 * N)  * (su2 * su3 - su4 * su);
     double y = ynum / den;
 
     Path::PathPt& pathPt = GetAt(idx);
@@ -1043,12 +1154,12 @@ double  Path::GetPitchAngle( int idx ) const
 
 bool	Path::LoadPath( const char* pDataFile )
 {
-    DEBUGF( "Loading \"springs\" data file %s\n", pDataFile );
+    LogSHADOW.debug( "Loading \"springs\" data file %s\n", pDataFile );
 
     FILE*	pFile = fopen(pDataFile, "r");
     if( pFile == 0 )
     {
-//		DEBUGF( "Failed to open data file\n" );
+//		LogSHADOW.debug( "Failed to open data file\n" );
         return false;
     }
 
@@ -1056,7 +1167,7 @@ bool	Path::LoadPath( const char* pDataFile )
     if( fgets(buf, sizeof(buf), pFile) == NULL ||
         strncmp(buf, "SPRINGS-PATH", 12) != 0 )
     {
-//		DEBUGF( "Failed to open data file -- SPRINGS-PATH\n" );
+//		LogSHADOW.debug( "Failed to open data file -- SPRINGS-PATH\n" );
         fclose( pFile );
         return false;
     }
@@ -1066,7 +1177,7 @@ bool	Path::LoadPath( const char* pDataFile )
         sscanf(buf, "%d", &version) != 1 ||
         version != 0 && version != 1 && version != 2 )
     {
-//		DEBUGF( "Failed to open data file -- version\n" );
+//		LogSHADOW.debug( "Failed to open data file -- version\n" );
         fclose( pFile );
         return false;
     }
@@ -1079,7 +1190,7 @@ bool	Path::LoadPath( const char* pDataFile )
     if( fgets(buf, sizeof(buf), pFile) == NULL ||
         strncmp(buf, "TRACK-LEN", 9) != 0 )
     {
-//		DEBUGF( "Failed to open data file -- TRACK-LEN\n" );
+//		LogSHADOW.debug( "Failed to open data file -- TRACK-LEN\n" );
         fclose( pFile );
         return false;
     }
@@ -1089,16 +1200,16 @@ bool	Path::LoadPath( const char* pDataFile )
         sscanf(buf, "%lf", &trackLen) != 1 ||
         fabs(trackLen - m_pTrack->GetLength()) > 0.01 )
     {
-        DEBUGF( "Failed to open data file -- length %g %g\n",
+        LogSHADOW.debug( "Failed to open data file -- length %g %g\n",
                 trackLen, m_pTrack->GetLength() );
-//		fclose( pFile );
+        fclose( pFile );
         return false;
     }
 
     if( fgets(buf, sizeof(buf), pFile) == NULL ||
         strncmp(buf, "BEGIN-POINTS", 12) != 0 )
     {
-//		DEBUGF( "Failed to open data file -- BEGIN-POINTS\n" );
+        LogSHADOW.debug( "Failed to open data file -- BEGIN-POINTS\n" );
         fclose( pFile );
         return false;
     }
@@ -1107,7 +1218,7 @@ bool	Path::LoadPath( const char* pDataFile )
     if( fgets(buf, sizeof(buf), pFile) == NULL ||
         sscanf(buf, "%d", &nPoints) != 1 )
     {
-//		DEBUGF( "Failed to open data file -- nPoints\n" );
+        LogSHADOW.debug( "Failed to open data file -- nPoints\n" );
         fclose( pFile );
         return false;
     }
@@ -1121,7 +1232,7 @@ bool	Path::LoadPath( const char* pDataFile )
         if( fgets(buf, sizeof(buf), pFile) == NULL ||
             sscanf(buf, "%lf %lf", &points[i].x, &points[i].y) < required )
         {
-//			DEBUGF( "Failed to open data file -- point data\n" );
+//			LogSHADOW.debug( "Failed to open data file -- point data\n" );
             fclose( pFile );
             return false;
         }
@@ -1186,13 +1297,31 @@ bool	Path::LoadPath( const char* pDataFile )
         //
 
         Vec2d	origin(0, 0);
+/*
+        {
+            //
+            tTrkLocPos	pos;
+            pos.seg = m_pTrack->GetAt(0).pSeg;
+            pos.type = 0;
+            pos.toStart = 0;
+            pos.toRight = tdble(m_pTrack->GetWidth() / 2);
+            pos.toMiddle = 0;
+            pos.toLeft = tdble(m_pTrack->GetWidth() / 2);
 
+            float	x, y;
+            RtTrackLocal2Global( &pos, &x, &y, 0 );
+            LogSHADOW.debug( "global start coords (%g, %g)\n", x, y );
+
+            origin.x = x;
+            origin.y = y;
+        }
+*/
         // work out which slice the last point is in.
-        DEBUGF( "nPoints %d\n", nPoints );
+        LogSHADOW.debug( "nPoints %d\n", nPoints );
         Vec2d	lastPt = points[nPoints - 1] + origin;
-        DEBUGF( "lastPt (%g, %g)\n", lastPt.x, lastPt.y );
+        LogSHADOW.debug( "lastPt (%g, %g)\n", lastPt.x, lastPt.y );
         double	dist = m_pTrack->CalcPos(lastPt.x, lastPt.y);
-        DEBUGF( "dist %g\n", dist );
+        LogSHADOW.debug( "dist %g\n", dist );
         int		last_s = m_pTrack->IndexFromPos(dist);
 
         for( int i = 0; i < nPoints; i++ )
@@ -1208,7 +1337,7 @@ bool	Path::LoadPath( const char* pDataFile )
                 int f = 1;
 
             tTrackSeg*	pSeg = m_pTrack->GetAt(cur_s).pSeg;
-            DEBUGF( "%4d  (%8g,%8g)  seg %4d/%3d%c %d\n",
+            LogSHADOW.debug( "%4d  (%8g,%8g)  seg %4d/%3d%c %d\n",
                     i, pt.x, pt.y, cur_s, pSeg->id,
                     pSeg->type == TR_RGT ? 'R' : pSeg->type == TR_LFT ? 'L' : '-',
                     pSeg->raceInfo );
@@ -1228,7 +1357,10 @@ bool	Path::LoadPath( const char* pDataFile )
                                                 s0.pt.GetXY(), s0.norm.GetXY(), t, w) &&
                         t >= 0.0 && t <= 1.0001 )
                     {
-                        DEBUGF( "%%%%  w[%d] = %g (was %g)\n", next_s, w, m_pts[next_s].offs );
+//						Rec&	rec = m_pData[next_s];
+//						const double	gamma = 0.8;
+//						rec.avgW	= rec.avgW * (1 - gamma) + w * gamma;
+                        LogSHADOW.debug( "%%%%  w[%d] = %g (was %g)\n", next_s, w, m_pts[next_s].offs );
                         m_pts[next_s].offs = w;
                         m_pts[next_s].pt   = m_pts[next_s].CalcPt();
                     }
@@ -1249,7 +1381,11 @@ bool	Path::LoadPath( const char* pDataFile )
     CalcCurvaturesV();
     CalcCurvaturesH();
 
-    DEBUGF( "\"springs\" data file loaded OK\n" );
+    LogSHADOW.debug( "\"springs\" data file loaded OK\n" );
+
+    // take some of the "kinks" out of the data.
+//	OptimisePath( 1, 100 );
+//	OptimisePath( 1, 2 );
 
     // all done.
     return true;
@@ -1257,12 +1393,12 @@ bool	Path::LoadPath( const char* pDataFile )
 
 bool	Path::SavePath( const char* pDataFile ) const
 {
-    DEBUGF( "Saving \"springs\" data file %s\n", pDataFile );
+    LogSHADOW.debug( "Saving \"springs\" data file %s\n", pDataFile );
 
     FILE*	pFile = fopen(pDataFile, "w");
-
     if( pFile == 0 )
     {
+//		LogSHADOW.debug( "Failed to open data file\n" );
         return false;
     }
 

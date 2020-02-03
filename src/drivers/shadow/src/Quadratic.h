@@ -1,9 +1,26 @@
-// Quadratic.h: interface for the Quadratic class.
-//
-//////////////////////////////////////////////////////////////////////
+/***************************************************************************
+
+    file        : Quadratic.h
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #ifndef _QUADRATIC_H_
 #define _QUADRATIC_H_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
 
 class Quadratic
 {

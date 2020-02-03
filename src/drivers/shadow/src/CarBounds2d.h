@@ -1,8 +1,24 @@
+/***************************************************************************
+
+    file        : CarBounds2d.h
+    created     : (C) 2017
+    copyright   : (C) 2017 Tim Foden
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
 #ifndef _CAR_BOUNDARY_2D_
 #define _CAR_BOUNDARY_2D_
 
-#include <car.h>
-
+#include "car.h"
 #include "Vec2d.h"
 
 #include <vector>

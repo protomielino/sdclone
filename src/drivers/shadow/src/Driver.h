@@ -1,8 +1,8 @@
-﻿/***************************************************************************
+/***************************************************************************
 
     file        : Driver.h
-    created     : 18 Apr 2017
-    copyright   : (C) 2017 Tim Foden - 2019 Xavier Bertaux
+    created     : 03 Jan 2020
+    copyright   : (C) 2020 Xavier BERTAUX
 
  ***************************************************************************/
 
@@ -15,13 +15,16 @@
  *                                                                         *
  ***************************************************************************/
 
-// Driver.h: interface for the Driver class.
+// MyRobot.h: interface for the MyRobot class.
 //
 //////////////////////////////////////////////////////////////////////
 
 #ifndef _DRIVER_H_
 #define _DRIVER_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
 
 #include <track.h>
 #include <car.h>
@@ -30,14 +33,12 @@
 
 #include <vector>
 
-#include "../../../modules/simu/simuv4/aero.h"
-
 #include "MyTrack.h"
 #include "Shared.h"
 #include "ClothoidPath.h"
 #include "SpringsPath.h"
 #include "PitPath.h"
-#include "PitControl.h"
+#include "Strategy.h"
 #include "Opponent.h"
 #include "PidController.h"
 #include "LearnedGraph.h"
@@ -45,6 +46,10 @@
 #include "Utils.h"
 #include "Stuck.h"
 #include "PathOffsets.h"
+
+// The "SHADOW" logger instance.
+extern GfLogger* PLogSHADOW;
+#define LogSHADOW (*PLogSHADOW)
 
 const double	SPD_MIN = 0;
 const double	SPD_MAX = 100;
@@ -55,11 +60,7 @@ const double	K_MAX = 0.1;
 const int		K_N = 100;
 const double	K_STEP = (K_MAX - K_MIN) / K_N;
 
-// The "MOUSE" logger instance.
-extern GfLogger* PLogSHADOW;
-#define LogSHADOW (*PLogSHADOW)
-
-class TDriver
+class Driver
 {
 public:
     enum	// paths
@@ -79,10 +80,8 @@ public:
     };
 
 public:
-    TDriver(int index);
-    ~TDriver();
-
-    const char* MyBotName;                      // Name of this bot
+    Driver(int index);
+    ~Driver();
 
     void	SetShared( Shared* pShared );
 
@@ -110,10 +109,8 @@ public:
     double	CalcBestSpeed( double pos, double offs ) const;
     void	GetPathToLeftAndRight( const CarElt* pCar, double& toL, double& toR ) const;
     double	GripFactor( const CarElt* pCar, bool front ) const;
-    void    SetBotName(const char* Value);
 
-
-    int m_CarIndex;
+    const char* MyBotName;                      // Name of this bot
 
 private:
     struct Private;
@@ -161,13 +158,6 @@ private:
     double	ApplyAbs( tCarElt* car, double brake );
     double	ApplyTractionControl( tCarElt* car, double acc );
 
-    void            SetRandomSeed(unsigned int Seed);
-    unsigned int    getRandom();
-
-    void            Meteorology(tTrack* track);
-    int             GetWeather(tTrack* track);
-    void            calcSkill();
-
 private:
     enum	// drive types
     {
@@ -196,8 +186,8 @@ private:
         PathRange() : u(1), vL(-1), vR(1),
                       gotL(false), gotR(false), racingLine(true) {}
 
-        void	AddGreater( double pos, double offs, bool incRL, const TDriver& me );
-        void	AddLesser( double pos, double offs, bool incRL, const TDriver& me );
+        void	AddGreater( double pos, double offs, bool incRL, const Driver& me );
+        void	AddLesser( double pos, double offs, bool incRL, const Driver& me );
     };
 
     struct Braking
@@ -239,10 +229,8 @@ private:
                 clear();
                 return;
             }
-            else if( internalBrk == 0 )
+            else if( internalBrk = 0.0 )
             {
-                // make a 1st estimate of how hard to brake.
-                //targetSlip = 0.125;
                 internalBrk = MN(-targetAcc * 0.1, 0.5);
             }
 
@@ -354,12 +342,14 @@ private:
     };
 
 private:
+
+    int             INDEX;
     Shared*			m_pShared;
-    MyTrack			m_track;
     SpringsPath		m_path[N_PATHS];
     PitPath			m_pitPath[N_PATHS][2];
-    PitControl		m_pitControl;
+    Strategy		m_Strategy;
     PathOffsets     m_pathOffsets;
+    MyTrack         m_track;
 
     CarModel		m_cm[N_PATHS];
     Braking			m_brk;
@@ -439,6 +429,24 @@ private:
         }
     };
 
+/*
+    double			FLY_HEIGHT;
+    std::vector<double>	FACTORS;
+    int				BUMP_MOD;
+    int				SPDC_NORMAL;
+    int				SPDC_TRAFFIC;
+    double			ACC_MAX_SPIN_SPEED;
+    double			DEC_MAX_SPIN_SPEED;
+    double			STEER_K_ACC;
+    double			STEER_K_DEC;
+    double			STAY_TOGETHER;			// dist in m.
+    double			AVOID_WIDTH;			// in m.
+    double			PIT_ENTRY_OFFSET;		// dist in m.
+    double			PIT_EXIT_OFFSET;		// dist in m.
+    double			SKID_FACTOR;
+    double			SKID_FACTOR_TRAFFIC;
+    double			TCL_TARGET_SPEED;		// speed in m/s
+*/
     double			START_HOLD_LINE_TIME;	// hold inital line on track, in s.
 
     Private			m_priv[N_PATHS];
@@ -471,7 +479,7 @@ private:
     double			m_stuckTime;
 
     LearnedGraph	m_maxAccel;
-
+//	LearnedGraph	m_maxDecel;
     double			m_angle[SPD_N][K_N];
 
     int				m_lastLap;
@@ -493,29 +501,6 @@ private:
     int				_deltaCounter;
     double			_prevDelta;
     double			_lastSpd0;
-
-    double          simtime;       // how long since the race started
-    double          avoidtime;     // how long since we began avoiding
-    double          deltaTime;
-    double          correcttimer;  // how long we've been correcting
-    double          correctlimit;  // level of divergence with raceline steering
-    double          overtake_timer;
-
-    double          driver_aggression;
-    double          global_skill;
-    double          skill;
-    double          skill_adjust_limit;
-    double          skill_adjust_timer;
-    double          decel_adjust_targ;
-    double          decel_adjust_perc;
-    double          brake_adjust_targ;
-    double          brake_adjust_perc;
-
-    unsigned int    RandomSeed;                            // seed of generator
-
-    bool            rain;
-    double          rainintensity;
-    int             weathercode;       // Track specific weather
 };
 
-#endif // _DRIVER_H
+#endif // _DRIVER_H_

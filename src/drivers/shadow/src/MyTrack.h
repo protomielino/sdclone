@@ -22,6 +22,10 @@
 #ifndef _MYTRACK_H_
 #define _MYTRACK_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 #include <track.h>
 #include <car.h>
 
@@ -29,10 +33,6 @@
 
 #include "Seg.h"
 #include "PtInfo.h"
-
-// The "SHADOW" logger instance.
-extern GfLogger* PLogSHADOW;
-#define LogSHADOW (*PLogSHADOW)
 
 class MyTrack
 {
@@ -93,4 +93,4 @@ private:
     int					m_nBends;
 };
 
-#endif
+#endif // _MYTRACK_H_

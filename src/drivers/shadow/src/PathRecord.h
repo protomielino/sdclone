@@ -22,6 +22,10 @@
 #ifndef _PATHRECORD_H_
 #define _PATHRECORD_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 #include <math.h>
 
 #include "MyTrack.h"
@@ -80,4 +84,4 @@ public:
     double			m_lastSpd;
 };
 
-#endif // !defined(AFX_PATHRECORD_H__9FE494ED_9019_44AF_A058_FC83B3AA2405__INCLUDED_)
+#endif // _PATHRECORD_H_

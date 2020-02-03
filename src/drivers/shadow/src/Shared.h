@@ -22,8 +22,13 @@
 #ifndef _SHARED_H_
 #define _SHARED_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 #include "TeamInfo.h"
 #include "ClothoidPath.h"
+
 #include <track.h>
 
 class Shared
@@ -38,4 +43,4 @@ public:
     ClothoidPath	m_path[3];
 };
 
-#endif
+#endif // _SHARED_H_

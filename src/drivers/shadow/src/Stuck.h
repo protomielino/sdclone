@@ -1,3 +1,20 @@
+/***************************************************************************
+
+    file        : Stuck.h
+    created     : 18 Apr 2017
+    copyright   : (C) 2017 Tim Foden
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
 #ifndef _STUCK_H
 #define _STUCK_H
 
@@ -10,10 +27,6 @@
 #include "Utils.h"
 #include "MyTrack.h"
 #include "Opponent.h"
-
-// The "SHADOW" logger instance.
-extern GfLogger* PLogSHADOW;
-#define LogSHADOW (*PLogSHADOW)
 
 class Stuck
 {
@@ -49,9 +62,9 @@ private:
 
     struct GridPoint
     {
-        unsigned int	pt;			// current position.
-        float			est_time;	// estimated time to finish.
-        float			time;		// current time.
+        uint	pt;			// current position.
+        float	est_time;	// estimated time to finish.
+        float	time;		// current time.
 
         GridPoint()
         :	pt(0), est_time(0), time(0)
@@ -137,13 +150,13 @@ private:
     struct Cell
     {
         enum { EDGE_MASK = 0x80000000 };
-        unsigned int	occupied_mask;
-        float			est_time_to_car;
-        float			est_time_to_dest;
-        int				dist_from_walls;
-        float			times[N_ANGLES * 2];	// indexed by fwang
-        int				from[N_ANGLES * 2];		// indexed by fwang
-        char			solution[N_ANGLES * 2];	// indexed by fwang
+        uint	occupied_mask;
+        float	est_time_to_car;
+        float	est_time_to_dest;
+        int		dist_from_walls;
+        float	times[N_ANGLES * 2];	// indexed by fwang
+        int		from[N_ANGLES * 2];		// indexed by fwang
+        char	solution[N_ANGLES * 2];	// indexed by fwang
 
 
         Cell() { clear(); }

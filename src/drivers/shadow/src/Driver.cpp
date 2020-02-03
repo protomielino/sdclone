@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : Driver.cpp
-    created     : 25 Mar 2019
-    copyright   : (C) 2019 Tim Foden - Xavier BERTAUX
+    created     : 3 Jan 2020
+    copyright   : (C) 2020 Xavier Bertaux
 
  ***************************************************************************/
 
@@ -15,7 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 
-// TDriver.cpp: implementation of the TDriver class.
+// Driver.cpp: implementation of the Driver class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -61,16 +61,11 @@ using namespace std;
 #define PRV_AVOID_WIDTH				"avoid width"
 #define PRV_SPDC_NORMAL				"spd ctrl normal"
 #define PRV_SPDC_TRAFFIC			"spd ctrl traffic"
-#define PRV_SPDC_EXTRA              "spd ctrl extra"
 #define PRV_STAY_TOGETHER			"stay together"
 #define PRV_PIT_ENTRY_OFFS			"pit entry offset"
 #define PRV_PIT_EXIT_OFFS			"pit exit offset"
 #define PRV_PIT_DAMAGE_WARN			"pit damage warn limit"
 #define PRV_PIT_DAMAGE_DANGER		"pit damage danger limit"
-#define PRV_FUEL_PER_METER          "fuel per meter"
-#define PRV_FUEL_PER_LAP            "fuel per lap"
-#define PRV_FUEL_PER_SECOND         "fuel per second"
-#define PRV_PRACTICE_INIT_FUEL      "practive init fuel"
 #define PRV_SKID_FACTOR				"skid factor"
 #define PRV_SKID_FACTOR_TRAFFIC		"skid factor traffic"
 #define PRV_REAR_LAT_SLIP_FACTOR	"rear lat slip factor"
@@ -81,59 +76,35 @@ using namespace std;
 #define PRV_SAFETY_LIMIT			"safety limit"
 #define PRV_SAFETY_MULTIPLIER		"safety multiplier"
 #define PRV_BRAKE_LIMIT				"brake limit"
-#define PRV_PIT_STOP_TEST           "test pit"
 
 #define FLY_COUNT		20
 
 #define	STEER_SPD_IDX(x)	(int(floor((x) / 5)))
 #define	STEER_K_IDX(k)		(MX(0, MN(int(20 + floor((k) * 500 + 0.5)), 40)))
 
-static const int BUFSIZE = 1024;
-
-//==========================================================================*
-// Skilling: Randomness
-//--------------------------------------------------------------------------*
-#define RANDOM_SEED 0xfded
-#define RANDOM_A    1664525
-#define RANDOM_C    1013904223
-//==========================================================================*
-
-//==========================================================================*
-// Skilling: Initialize Randomness
-//--------------------------------------------------------------------------*
-void TDriver::SetRandomSeed(unsigned int Seed)
-{
-    RandomSeed = Seed ? Seed : RANDOM_SEED;
-    return;
-}
-//==========================================================================*
-
-//==========================================================================*
-// Skilling: Get Randomness
-//--------------------------------------------------------------------------*
-unsigned int TDriver::getRandom()
-{
-    RandomSeed = RANDOM_A * RandomSeed + RANDOM_C;
-    return (RandomSeed >> 16);
-}
-//==========================================================================*
-
 static const double	s_sgMin[] = { 0.00,  10 };
 static const double	s_sgMax[] = { 0.03, 100 };
 static const int	s_sgSteps[] = { 10,  18 };
 
-
-void	TDriver::PathRange::AddGreater(double pos, double offs, bool incRL, const TDriver& me )
+void	Driver::PathRange::AddGreater(
+        double pos,
+        double offs,
+        bool incRL,
+        const Driver& me )
 {
 }
 
-void	TDriver::PathRange::AddLesser(double pos, double offs, bool incRL, const TDriver& me )
+void	Driver::PathRange::AddLesser(
+        double pos,
+        double offs,
+        bool incRL,
+        const Driver& me )
 {
 }
 
-TDriver::TDriver(int index) :
-      m_CarIndex(index),
-      m_pitControl(m_track, m_pitPath[PATH_NORMAL][0]),
+Driver::Driver(int index)
+    :	INDEX(index),
+      m_Strategy(m_track, m_pitPath[PATH_NORMAL][0]),
       m_driveType(cDT_RWD),
       m_gearUpRpm(8000),
       m_prevYawError(0),
@@ -160,39 +131,39 @@ TDriver::TDriver(int index) :
       _lastSpd0(0)
 {
     for( int i = 0; i < 50; i++ )
-    {
-        m_brkCoeff[i] = 0.5;//0.12;
-    }
+        {
+            m_brkCoeff[i] = 0.5;//0.12;
+        }
 
     for( int i = 0; i < STEER_SPD_MAX; i++ )
-    {
-        for( int j = 0; j < STEER_K_MAX; j++ )
         {
-            m_steerCoeff[i][j] = 0;
+            for( int j = 0; j < STEER_K_MAX; j++ )
+            {
+                m_steerCoeff[i][j] = 0;
+            }
         }
-    }
 
     memset( m_angle, 0, sizeof(m_angle) );
-    m_pShared = new Shared();
 }
 
-TDriver::~TDriver()
+Driver::~Driver()
 {
-    delete m_pShared;
 }
 
 static void*	MergeParamFile( void* hParams, const char* fileName, bool relSrc = true )
 {
-    LogSHADOW.info( "loading: '%s'\n", fileName );
+    //	PRINTF( "loading: '%s'\n", fileName );
     void*	hNewParams = GfParmReadFile(fileName, GFPARM_RMODE_STD);
 
-    if( hNewParams == nullptr )
-        return hParams;
-
-    if( hParams == nullptr )
+    if( hNewParams == NULL )
     {
-        LogSHADOW.debug( "loaded: '%s'\n", fileName );
+        LogSHADOW.info("loaded: 'hParams' \n");
+        return hParams;
+    }
 
+    if( hParams == NULL )
+    {
+        LogSHADOW.info( "loaded: '%s'\n", fileName );
         return hNewParams;
     }
 
@@ -200,19 +171,15 @@ static void*	MergeParamFile( void* hParams, const char* fileName, bool relSrc = 
     const char* ac3d_car = GfParmGetStr(hNewParams, path, "car", "");
 
     float fw_ang = GfParmGetNum(hNewParams, "Front Wing", "angle", NULL, 0);
-    LogSHADOW.info("Wing = %.4f\n", fw_ang);
 
     GfParmCheckHandle( hParams, hNewParams );
 
-    LogSHADOW.debug( "merging: '%s'\n", fileName );
+    LogSHADOW.info( "merging: '%s'\n", fileName );
     hParams = GfParmMergeHandles(hParams, hNewParams,
-                                 GFPARM_MMODE_SRC
-                                 | GFPARM_MMODE_DST
-                                 | GFPARM_MMODE_RELSRC
-                                 | GFPARM_MMODE_RELDST);
+                                 GFPARM_MMODE_SRC | GFPARM_MMODE_DST |
+                                 (relSrc ? GFPARM_MMODE_RELSRC : 0) | GFPARM_MMODE_RELDST);
 
     const char* ac3d_car2 = GfParmGetStr(hParams, path, "car", "");
-
     return hParams;
 }
 
@@ -224,16 +191,20 @@ static double	SafeParmGetNum( void *handle, const char *path, const char *key, c
     return GfParmGetNum(handle, path, key, unit, deflt);
 }
 
-void	TDriver::SetShared( Shared* pShared )
+void	Driver::SetShared( Shared* pShared )
 {
     m_pShared = pShared;
 }
 
 // Called for every track change or new race.
-void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCarParmHandle, tSituation*	pS )
+void	Driver::InitTrack(
+        int			index,
+        tTrack*		pTrack,
+        void*		pCarHandle,
+        void**		ppCarParmHandle,
+        tSituation*	pS )
 {
-    LogSHADOW.info( " # SHADOW's driver :initTrack()\n" );
-	*ppCarParmHandle = NULL;
+    LogSHADOW.info( "Shadow : initTrack()\n" );
 
     //
     //	get the name of the car (e.g. "clkdtm").
@@ -242,16 +213,13 @@ void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCa
     //	to come up with so far.  it basically gets the name of the car .acc
     //	file, and strips off the ".acc" part, to get the name of the car.  yuk.
     //
-
     char*	path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
     char*	key  = PRM_CAR;
-    char buffer[BUFSIZE];
-
     strncpy( m_carName, GfParmGetStr(pCarHandle, path, key, ""), sizeof(m_carName) );
     char*	p = strrchr(m_carName, '.');
-
     if( p )
         *p = '\0';
+
     LogSHADOW.info( "   m_carName: '%s'\n", m_carName );
 
     //
@@ -260,11 +228,11 @@ void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCa
 
     strncpy( m_trackName, strrchr(pTrack->filename, '/') + 1, sizeof(m_trackName) );
     *strrchr(m_trackName, '.') = '\0';
+    LogSHADOW.info( "   m_trackName: '%s'\n", m_trackName );
 
     //
     //	set up race type array.
     //
-
 
     const char*	raceTypeStr[] = { "practice", "qualify", "race" };
     int			raceType = pS->raceInfo.type;
@@ -272,81 +240,78 @@ void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCa
     if( raceType == RM_TYPE_PRACTICE && (pS->raceInfo.totLaps == 3 || pS->raceInfo.totLaps == 10) )
         raceType =  RM_TYPE_QUALIF;
 
+    LogSHADOW.info("Race type = %s \n", raceTypeStr[raceType]);
+
     //
     //	set up the base param path.
     //
-
-    // Discover the car type used
-    void* handle = NULL;
-    sprintf(buffer, "%sdrivers/%s/%s.xml", GfDataDir(),MyBotName, MyBotName);
-    LogSHADOW.info(" #Path driver : %s\n", buffer);
-    handle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-
-	if (handle != NULL)
-	{
-		LogSHADOW.info("# Shadow driver : %s\n", buffer);
-		snprintf(buffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, index);
-		//mCarType = GfParmGetStr(handle, buffer, (char*)ROB_ATTR_CAR, "no good");
-	}
+    char	buf[1024];
+    snprintf(buf, sizeof(buf), "drivers/%s", MyBotName);
+    const char*	baseParamPath = buf;
 
     //
     //	ok, lets read/merge the car parms.
     //
+    void*	hCarParm = pCarHandle;
 
-    void*	hCarParm = NULL;
-    char	buf[1024];
+    // override params for default car type.
+    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/default.xml",
+              GfDataDir(), MyBotName, m_carName);
+    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+    LogSHADOW.debug("PATH = %s \n", buf);
 
-	// override params for car type on track.
-	snprintf(buffer, BUFSIZE, "%sdrivers/%s/%s/%s.xml", GfDataDir(), MyBotName, m_carName, m_trackName);
-	hCarParm = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+    // default params for car type (e.g. clkdtm)
+    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s.xml",
+              GfDataDir(), MyBotName, m_carName, m_carName );
+    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+    LogSHADOW.debug("PATH = %s \n", buf);
 
-	LogSHADOW.info(" #Path driver override params for car type on track : %s\n", buffer);
-	hCarParm = MergeParamFile(hCarParm, buffer, hCarParm != pCarHandle);
-
-	if (hCarParm == NULL)
-	{
-		// default params for car type (e.g. clkdtm)
-		snprintf(buffer, BUFSIZE, "%sdrivers/%s/%s/default.xml", GfDataDir(), MyBotName, m_carName);
-		LogSHADOW.info(" #Path driver default params for car type: %s\n", buffer);
-		hCarParm = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-	}
-
-    
-
+    // override params for car type on track.
+    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s.xml",
+              GfDataDir(), MyBotName, m_carName, m_trackName );
+    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+    LogSHADOW.debug("PATH = %s \n", buf);
 
     // override params for car type on track of specific race type.
-    /*snprintf( buffer, BUFSIZE, "%s/%s/%s-%s.xml", MyBotName, m_carName, m_trackName, raceTypeStr[raceType] );
-    LogSHADOW.info(" #Path driver override params for car type on track of specific race type : %s\n", buffer);
+    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s-%s.xml",
+              GfDataDir(), MyBotName, m_carName, m_trackName, raceTypeStr[raceType] );
     hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+    LogSHADOW.debug("PATH = %s \n", buf);
 
     // override params for car type on track with specific driver.
-    snprintf( buffer, BUFSIZE, "%sdrivers/%s/%s/%s-drv-%d.xml", GfDataDir(), MyBotName, m_carName, m_trackName, index );
-    LogSHADOW.info(" #Path driver override params for car type on track with specific driver : %s\n", buffer);
-    hCarParm = MergeParamFile(hCarParm, buffer, hCarParm != pCarHandle);
+    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s-drv=%d.xml",
+              GfDataDir(), MyBotName, m_carName, m_trackName, index );
+    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+    LogSHADOW.debug("PATH = %s \n", buf);
 
     // override params for car type on track of specific race type and driver.
-    snprintf( buffer, BUFSIZE, "%sdrivers/%s/%s/%s-%s-drv-%d.xml", GfDataDir(),MyBotName, m_carName, m_trackName, raceTypeStr[raceType], index );
-    LogSHADOW.info(" #Path driver override params for car type on track of specific race type and driver : %s\n", buffer);
-    hCarParm = MergeParamFile(hCarParm, buffer, hCarParm != pCarHandle);
-    hCarParm = GfParmReadFile(buf, GFPARM_RMODE_STD);
+    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s-%s-drv=%d.xml",
+              GfDataDir(), MyBotName, m_carName, m_trackName, raceTypeStr[raceType], index );
+    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+    LogSHADOW.debug("PATH = %s \n", buf);
 
-    // setup the car param handle to be returned.*/
+    // override params for car type on track of specific race type and driver.
+    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s.xml",
+              GfDataDir(), MyBotName, m_carName, m_trackName);
+    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+    LogSHADOW.debug("PATH = %s \n", buf);
+
+    // setup the car param handle to be returned.
 
     *ppCarParmHandle = hCarParm;
 
     // get the private parameters now.
-
     const char* ac3d_car = GfParmGetStr(hCarParm, SECT_GROBJECTS "/" LST_RANGES "/1", PRM_CAR, "");
 
-    double rpm = GfParmGetNum(hCarParm, SECT_PRIV, PRV_GEAR_UP_RPM, "rpm", 8190.0);
+    double rpm = GfParmGetNum(hCarParm, SECT_PRIV, PRV_GEAR_UP_RPM, "rpm", 8190);
     m_gearUpRpm = rpm * 2 * PI / 60;
     LogSHADOW.info( "*** gear up rpm: %g (%g)\n", rpm, m_gearUpRpm );
 
     START_HOLD_LINE_TIME = SafeParmGetNum(hCarParm, SECT_PRIV, "start hold line time", 0, 5.0f);
+    LogSHADOW.info( "*** Start hold line time: %g \n\n", START_HOLD_LINE_TIME );
 
     MyTrack::SideMod	sideMod[N_PATHS];
     string sect;
-
     for( int p = 0; p < N_PATHS; p++ )
     {
         switch( p )
@@ -359,7 +324,6 @@ void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCa
         if( p == PATH_NORMAL )
         {
             m_priv[p].FACTORS.clear();
-
             m_cm[p].config( hCarParm );
         }
         else
@@ -374,48 +338,51 @@ void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCa
         m_cm[p].KZ_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_KZ_SCALE, NULL, m_cm[PATH_NORMAL].KZ_SCALE);
         m_cm[p].KV_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_KV_SCALE, NULL, m_cm[PATH_NORMAL].KV_SCALE);
 
-        LogSHADOW.debug( "*** FLAGS: 0x%02X\n", m_cm[p].FLAGS );
-        LogSHADOW.debug( "*** MU_SCALE[%d]: %g\n", p, m_cm[p].MU_SCALE );
+        LogSHADOW.info( "*** FLAGS             : 0x%02X\n", m_cm[p].FLAGS );
+        LogSHADOW.info( "*** BRAKE_MU_SCALE[%d]: %.3f\n", p, m_cm[p].BRAKE_MU_SCALE );
+        LogSHADOW.info( "*** MU_SCALE[%d]      : %.3f\n", p, m_cm[p].MU_SCALE );
+        LogSHADOW.info( "*** KZ_SCALE[%d]      : %.3f\n", p, m_cm[p].KZ_SCALE );
+        LogSHADOW.info( "*** KV_SCALE[%d]      : %.3f\n\n", p, m_cm[p].KV_SCALE );
 
         for( int i = 0; ; i++ )
-        {
-            snprintf( buf, sizeof(buf), "%s %d", PRV_FACTOR, i );
-            double	factor = SafeParmGetNum(hCarParm, sect.c_str(), buf, 0, -1);
-            LogSHADOW.debug( "%s: %g\n", buf, factor );
+            {
+                snprintf( buf, sizeof(buf), "%s %d", PRV_FACTOR, i );
+                double	factor = SafeParmGetNum(hCarParm, sect.c_str(), buf, 0, -1);
+                LogSHADOW.debug( "%s: %g\n", buf, factor );
 
-            if( factor == -1 )
-                break;
+                if( factor == -1 )
+                    break;
 
-            if( i == 0 )
-                m_priv[p].FACTORS.clear();
+                if( i == 0 )
+                    m_priv[p].FACTORS.clear();
 
-            m_priv[p].FACTORS.push_back( factor );
-        }
+                m_priv[p].FACTORS.push_back( factor );
+            }
 
         if( m_priv[p].FACTORS.size() == 0 )
             m_priv[p].FACTORS.push_back( 1.005 );
 
         for( int bend = 0; bend < 100; bend++ )
-        {
-            snprintf( buf, sizeof(buf), "%s %d", PRV_INNER_MOD, bend );
-            double	innerModA = SafeParmGetNum(hCarParm, sect.c_str(), buf, 0, 999);
-            double	innerModB = innerModA;
-            innerModA = SafeParmGetNum(hCarParm, sect.c_str(), (string(buf) + "a").c_str(), 0, innerModA);
-            innerModB = SafeParmGetNum(hCarParm, sect.c_str(), (string(buf) + "b").c_str(), 0, innerModA);
+            {
+                snprintf( buf, sizeof(buf), "%s %d", PRV_INNER_MOD, bend );
+                double	innerModA = SafeParmGetNum(hCarParm, sect.c_str(), buf, 0, 999);
+                double	innerModB = innerModA;
+                innerModA = SafeParmGetNum(hCarParm, sect.c_str(), (string(buf) + "a").c_str(), 0, innerModA);
+                innerModB = SafeParmGetNum(hCarParm, sect.c_str(), (string(buf) + "b").c_str(), 0, innerModA);
 
-            if( innerModA == 999 && innerModB == 999 )
-                continue;
+                if( innerModA == 999 && innerModB == 999 )
+                    continue;
 
-            LogSHADOW.debug( "%s: %g, %g\n", buf, innerModA, innerModB );
+                LogSHADOW.debug( "%s: %g, %g\n", buf, innerModA, innerModB );
 
-            while( m_priv[p].INNER_MOD.size() < bend * 2 + 2 )
-                m_priv[p].INNER_MOD.push_back( 0 );
+                while( m_priv[p].INNER_MOD.size() < bend * 2 + 2 )
+                    m_priv[p].INNER_MOD.push_back( 0 );
 
-            if( innerModA != 999 )
-                m_priv[p].INNER_MOD[bend * 2] = innerModA;
-            if( innerModB != 999 )
-                m_priv[p].INNER_MOD[bend * 2 + 1] = innerModB;
-        }
+                if( innerModA != 999 )
+                    m_priv[p].INNER_MOD[bend * 2] = innerModA;
+                if( innerModB != 999 )
+                    m_priv[p].INNER_MOD[bend * 2 + 1] = innerModB;
+            }
 
         if( m_priv[p].INNER_MOD.size() == 0 )
             m_priv[p].INNER_MOD.push_back( 0.0 );
@@ -426,7 +393,6 @@ void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCa
         m_priv[p].SAVE_PATHS = SafeParmGetNum(hCarParm, sect.c_str(), PRV_SAVE_PATHS, 0, (float)m_priv[p].SAVE_PATHS) != 0;
         m_priv[p].QUAD_SMOOTH_ITERS = int(SafeParmGetNum(hCarParm, sect.c_str(), PRV_QUAD_SMOOTH_ITERS, 0, (float)m_priv[p].QUAD_SMOOTH_ITERS) + 0.5f);
         m_priv[p].SPDC_NORMAL = int(SafeParmGetNum(hCarParm, sect.c_str(), PRV_SPDC_NORMAL, 0, (float)m_priv[p].SPDC_NORMAL));
-        //		m_priv[p].SPDC_NORMAL = 4;
         m_priv[p].SPDC_TRAFFIC = int(SafeParmGetNum(hCarParm, sect.c_str(), PRV_SPDC_TRAFFIC, 0, (float)m_priv[p].SPDC_TRAFFIC));
         m_priv[p].ACC_MAX_SPIN_SPEED = SafeParmGetNum(hCarParm, sect.c_str(), PRV_ACC_MAX_SPIN_SPEED, 0, m_priv[p].ACC_MAX_SPIN_SPEED);
         m_priv[p].DEC_MAX_SPIN_SPEED = SafeParmGetNum(hCarParm, sect.c_str(), PRV_DEC_MAX_SPIN_SPEED, 0, m_priv[p].DEC_MAX_SPIN_SPEED);
@@ -449,12 +415,12 @@ void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCa
         m_priv[p].SAFETY_MULTIPLIER = SafeParmGetNum(hCarParm, sect.c_str(), PRV_SAFETY_MULTIPLIER, 0, m_priv[p].SAFETY_MULTIPLIER);
         m_priv[p].BRAKE_LIMIT = SafeParmGetNum(hCarParm, sect.c_str(), PRV_BRAKE_LIMIT, 0, m_priv[p].BRAKE_LIMIT);
 
-        LogSHADOW.debug( "FLY_HEIGHT %g\n", m_priv[p].FLY_HEIGHT );
-        LogSHADOW.debug( "BUMP_MOD %d\n", m_priv[p].BUMP_MOD );
+        LogSHADOW.info( "FLY_HEIGHT %g\n", m_priv[p].FLY_HEIGHT );
+        LogSHADOW.info( "BUMP_MOD %d\n\n", m_priv[p].BUMP_MOD );
 
         sideMod[p].side = -1;
 
-        if( ppCarParmHandle != NULL )
+        if( hCarParm != NULL )
         {
             const char*	pStr = GfParmGetStr(hCarParm, sect.c_str(), PRV_SIDE_MOD, "");
 
@@ -468,30 +434,21 @@ void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCa
         LogSHADOW.debug( "STAY_TOGETHER %g\n", m_priv[p].STAY_TOGETHER );
     }
 
-    LogSHADOW.debug( "*** FLAGS: 0x%02X\n", m_cm[PATH_NORMAL].FLAGS );
+    LogSHADOW.info( "*** FLAGS: 0x%02X\n\n", m_cm[PATH_NORMAL].FLAGS );
 
     m_track.NewTrack( pTrack, &m_priv[PATH_NORMAL].INNER_MOD, false, &sideMod[PATH_NORMAL],
                       m_priv[PATH_NORMAL].PIT_START_BUF_SEGS );
 
     // setup initial fuel for race.
-    double	fuelPerM        = GfParmGetNum(hCarParm, SECT_PRIV, PRV_FUEL_PER_METER, (char*) NULL, 0.00068);
-    double	maxFuel			= GfParmGetNum(hCarParm, SECT_CAR, PRM_TANK, (char*) NULL, 100.0);
+    double	fuelPerM        = SafeParmGetNum(hCarParm, SECT_PRIV, "fuel per m", 0, 0.001f);
+    double	maxFuel			= SafeParmGetNum(hCarParm, SECT_CAR, PRM_TANK, (char*) NULL, 100.0f);
     double	fullRaceFuel	= 1.02 * pS->_totLaps * pTrack->length * fuelPerM;
     double	fuel			= fullRaceFuel;
 
     if( raceType == RM_TYPE_PRACTICE )
     {
-        fuel = SafeParmGetNum(hCarParm, SECT_PRIV, PRV_PRACTICE_INIT_FUEL, (char*) NULL, fuel);
-
-        int testpit = GfParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_STOP_TEST, (char*) NULL, 0);
-
-        if (testpit = 1)
-        {
-            fuel = (fuelPerM * pTrack->length) * 1.02;
-            LogSHADOW.info(" practice test pit !\n");
-        }
-
-        LogSHADOW.debug( "practice initial fuel: %g\n", fuel );
+        fuel = SafeParmGetNum(hCarParm, SECT_PRIV, "practice init fuel", "Kg", fuel);
+        LogSHADOW.info( "practice initial fuel: %g\n", fuel );
     }
 
     if( fuel > maxFuel )
@@ -499,52 +456,49 @@ void	TDriver::InitTrack(int index, tTrack* pTrack, void*	pCarHandle, void** ppCa
         // pit required, so work out how much fuel per pit if divided equally.
         int nTanks = int(ceil(fullRaceFuel / maxFuel));
         fuel = fullRaceFuel / nTanks + fuelPerM * pTrack->length * (nTanks - 1);
-        LogSHADOW.debug( "number of pitstops: %d\n", nTanks - 1 );
+        LogSHADOW.info( "number of pitstops: %d\n", nTanks - 1 );
     }
-
-    LogSHADOW.info( "max fuel in tank : %g\n", maxFuel );
-    LogSHADOW.info( "initial fuel per meter : %g\n", fuelPerM );
-    LogSHADOW.info( "intiial fuel : %g\n", fuel );
-
+    LogSHADOW.info( "max fuel in tank: %g\n", maxFuel );
+    LogSHADOW.info( "initial fuel per m: %g\n", fuelPerM );
+    LogSHADOW.info( "intiial fuel: %g\n\n", fuel );
     GfParmSetNum( hCarParm, SECT_CAR, PRM_FUEL, (char*) NULL, fuel );
 
-    m_pitControl.SetDamageLimits( m_priv[PATH_NORMAL].PIT_DAMAGE_WARN, m_priv[PATH_NORMAL].PIT_DAMAGE_DANGER );
+    m_Strategy.SetDamageLimits( m_priv[PATH_NORMAL].PIT_DAMAGE_WARN,
+                                  m_priv[PATH_NORMAL].PIT_DAMAGE_DANGER );
 
     // override params for car type on track of specific race type.
-    snprintf( buf, sizeof(buf), "drivers/%s/cars/%s/track-%s",
-              MyBotName, m_carName, m_trackName );
+    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s",
+              GfDataDir(), MyBotName, m_carName, m_trackName );
     m_pathOffsets.setBaseFilename( buf );
-    LogSHADOW.info(" ... End SHADOW's driver InitTrack !\n");
 }
 
 // Start a new race.
-void	TDriver::NewRace( int index, tCarElt* pCar, tSituation* pS )
+void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
 {
-    LogSHADOW.info( "# mouse:newRace()\n" );
+    LogSHADOW.info( "Shadow : newRace()\n" );
 
-    //	if( pS == 0 )
-    //		DEBUGF( "!!!!! situation ptr is null !!!!!\n" );
     m_nCars = pS->_ncars;
     m_myOppIdx = -1;
 
     for( int i = 0; i < m_nCars; i++ )
-    {
-        m_opp[i].Initialise( &m_track, pS->cars[i] );
+        {
+            m_opp[i].Initialise( &m_track, pS->cars[i] );
 
-        if( pS->cars[i] == pCar )
-            m_myOppIdx = i;
-    }
+            if( pS->cars[i] == pCar )
+                m_myOppIdx = i;
+        }
 
     m_cm[PATH_NORMAL].config( pCar );
     m_cm[PATH_LEFT]  = m_cm[PATH_NORMAL];
     m_cm[PATH_RIGHT] = m_cm[PATH_NORMAL];
 
     LogSHADOW.info( "CA %g   CA_FW %g   CA_RW %g   CA_GE %g\n",
-                     m_cm[PATH_NORMAL].CA, m_cm[PATH_NORMAL].CA_FW,
-                     m_cm[PATH_NORMAL].CA_RW, m_cm[PATH_NORMAL].CA_GE );
+                    m_cm[PATH_NORMAL].CA, m_cm[PATH_NORMAL].CA_FW,
+                    m_cm[PATH_NORMAL].CA_RW, m_cm[PATH_NORMAL].CA_GE );
 
     double gripScaleF = GripFactor(pCar, true);
     double gripScaleR = GripFactor(pCar, false);
+
     m_cm[PATH_NORMAL].GRIP_SCALE_F	= gripScaleF;
     m_cm[PATH_NORMAL].GRIP_SCALE_R	= gripScaleR;
     m_cm[PATH_LEFT].GRIP_SCALE_F	= gripScaleF;
@@ -552,31 +506,21 @@ void	TDriver::NewRace( int index, tCarElt* pCar, tSituation* pS )
     m_cm[PATH_RIGHT].GRIP_SCALE_F	= gripScaleF;
     m_cm[PATH_RIGHT].GRIP_SCALE_R	= gripScaleR;
 
-    LogSHADOW.debug( "CARMASS %g   TYRE_MU %g   TYRE_MU_F %g   TYRE_MU_R %g \n",
-                     m_cm[PATH_NORMAL].MASS, m_cm[PATH_NORMAL].TYRE_MU,
-                     m_cm[PATH_NORMAL].TYRE_MU_F, m_cm[PATH_NORMAL].TYRE_MU_R );
-    LogSHADOW.debug( "NORMAL: MU_SC %g   KZ_SCALE %g   FLY_HEIGHT %g\n",
-                     m_cm[PATH_NORMAL].MU_SCALE, m_cm[PATH_NORMAL].KZ_SCALE, m_priv[PATH_NORMAL].FLY_HEIGHT );
-    LogSHADOW.debug( "LEFT:   MU_SC %g   KZ_SCALE %g   FLY_HEIGHT %g\n",
-                     m_cm[PATH_LEFT].MU_SCALE, m_cm[PATH_LEFT].KZ_SCALE, m_priv[PATH_LEFT].FLY_HEIGHT );
-    LogSHADOW.debug( "RIGHT:  MU_SC %g   KZ_SCALE %g   FLY_HEIGHT %g\n",
-                     m_cm[PATH_RIGHT].MU_SCALE, m_cm[PATH_RIGHT].KZ_SCALE, m_priv[PATH_RIGHT].FLY_HEIGHT );
-
-    //	m_track.CalcMaxSpeeds( CARMASS, CA, TYRE_MU, MU_SCALE, MU_DF_SCALE, pCar->_fuel );
-    //	m_track.PropagateBraking();
+    LogSHADOW.info( "CARMASS %g   TYRE_MU %g   TYRE_MU_F %g   TYRE_MU_R %g \n",
+                    m_cm[PATH_NORMAL].MASS, m_cm[PATH_NORMAL].TYRE_MU,
+                    m_cm[PATH_NORMAL].TYRE_MU_F, m_cm[PATH_NORMAL].TYRE_MU_R );
+    LogSHADOW.info( "NORMAL: MU_SC %g   KZ_SCALE %g   FLY_HEIGHT %g\n",
+                    m_cm[PATH_NORMAL].MU_SCALE, m_cm[PATH_NORMAL].KZ_SCALE, m_priv[PATH_NORMAL].FLY_HEIGHT );
+    LogSHADOW.info( "LEFT:   MU_SC %g   KZ_SCALE %g   FLY_HEIGHT %g\n",
+                    m_cm[PATH_LEFT].MU_SCALE, m_cm[PATH_LEFT].KZ_SCALE, m_priv[PATH_LEFT].FLY_HEIGHT );
+    LogSHADOW.info( "RIGHT:  MU_SC %g   KZ_SCALE %g   FLY_HEIGHT %g\n",
+                    m_cm[PATH_RIGHT].MU_SCALE, m_cm[PATH_RIGHT].KZ_SCALE, m_priv[PATH_RIGHT].FLY_HEIGHT );
 
     m_cm[PATH_NORMAL].FUEL = 0;//pCar->_fuel;
-    /*
-    m_cm[PATH_NORMAL].CD_BODY = 0.645 * cx * frontArea;
-    m_cm[PATH_NORMAL].CD_WING = wingca;
-    m_cm[PATH_NORMAL].WIDTH = pCar->_dimension_y;
-//	cm.CD = cx * (frontArea + wingArea);
-//	cm.CD = cx * frontArea + wingca;
-//	m_cm.CD = 0.645 * cx * frontArea;
-*/
+    LogSHADOW.info("FUEL : %.5f\n",m_cm[PATH_NORMAL].FUEL);
+
     for( int p = PATH_LEFT; p <= PATH_RIGHT; p++ )
     {
-        LogSHADOW.debug(" # Shadow's driver CarModel numero : %i\n", p);
         m_cm[p].FUEL	= m_cm[PATH_NORMAL].FUEL;
         m_cm[p].CD_BODY	= m_cm[PATH_NORMAL].CD_BODY;
         m_cm[p].CD_WING	= m_cm[PATH_NORMAL].CD_WING;
@@ -592,13 +536,7 @@ void	TDriver::NewRace( int index, tCarElt* pCar, tSituation* pS )
         m_cm[p].TYRE_MU		= m_cm[PATH_NORMAL].TYRE_MU;
         m_cm[p].TYRE_MU_F	= m_cm[PATH_NORMAL].TYRE_MU_F;
         m_cm[p].TYRE_MU_R	= m_cm[PATH_NORMAL].TYRE_MU_R;
-        LogSHADOW.info(" # end Shadow's driver CarModel numero : %i\n", p);
     }
-
-    //LogSHADOW.debug( "CD %g   wing CA %g\n", m_cm[PATH_NORMAL].CD_BODY, wingca );
-    //LogSHADOW.debug( "WING F %g    WING R %g   SPDC N %d    SPDC T %d\n",
-    //       fwingangle * 180 / PI, rwingangle * 180 / PI,
-    //      m_priv[PATH_NORMAL].SPDC_NORMAL, m_priv[PATH_NORMAL].SPDC_TRAFFIC );
 
     if( m_pShared->m_path[PATH_NORMAL].GetOptions().factors != m_priv[PATH_NORMAL].FACTORS ||
             m_pShared->m_path[PATH_LEFT].GetOptions().factors   != m_priv[PATH_LEFT].FACTORS ||
@@ -608,54 +546,57 @@ void	TDriver::NewRace( int index, tCarElt* pCar, tSituation* pS )
         if( m_pShared->m_pTrack != m_track.GetTrack() )
         {
             m_pShared->m_pTrack = m_track.GetTrack();
-            LogSHADOW.debug(" # MOUSE m_pShared->m_pTrack.GetTrack()\n");
             m_pShared->m_teamInfo.Empty();
-            LogSHADOW.debug(" # MOUSE m_pShared->m_teamInfo.Empty()\n");
         }
 
         LogSHADOW.debug( "Generating smooth paths...\n" );
-        //		double	w = 0.5;//m_track.GetWidth() / 6;
-        //		w = MX(0.5, m_track.GetWidth() / 2 - 3);
-        //		double	w = m_priv[PATH_NORMAL].AVOID_WIDTH;
 
         PathOptions options(m_priv[PATH_NORMAL].BUMP_MOD,
                             m_priv[PATH_NORMAL].SAFETY_LIMIT,
                             m_priv[PATH_NORMAL].SAFETY_MULTIPLIER);
+
         options.apexFactor = m_priv[PATH_NORMAL].APEX_FACTOR,
                 options.factors = m_priv[PATH_NORMAL].FACTORS;
+
         options.quadSmoothIters = m_priv[PATH_NORMAL].QUAD_SMOOTH_ITERS;
+
         m_pShared->m_path[PATH_NORMAL].MakeSmoothPath( &m_track, m_cm[PATH_NORMAL], options);
-        LogSHADOW.debug(" # Shadow newRace PathOptions passed !\n");
+        LogSHADOW.debug("m_pShared->m_path passed !\n");
 
         const double car_margin = m_track.GetWidth() / 2 - 4;
 
         options = PathOptions(m_priv[PATH_LEFT].BUMP_MOD,
                               m_priv[PATH_LEFT].SAFETY_LIMIT,
                               m_priv[PATH_LEFT].SAFETY_MULTIPLIER, 999, car_margin);
+
         options.apexFactor = m_priv[PATH_LEFT].APEX_FACTOR,
                 options.factors = m_priv[PATH_LEFT].FACTORS;
+
         options.quadSmoothIters = m_priv[PATH_LEFT].QUAD_SMOOTH_ITERS;
+
         m_pShared->m_path[PATH_LEFT].MakeSmoothPath( &m_track, m_cm[PATH_LEFT], options);
 
         options = PathOptions(m_priv[PATH_RIGHT].BUMP_MOD,
                               m_priv[PATH_RIGHT].SAFETY_LIMIT,
-                              //							  m_priv[PATH_RIGHT].SAFETY_MULTIPLIER, 0, 999);
                               m_priv[PATH_RIGHT].SAFETY_MULTIPLIER, car_margin, 999);
+
         options.apexFactor = m_priv[PATH_RIGHT].APEX_FACTOR,
                 options.factors = m_priv[PATH_RIGHT].FACTORS;
+
         options.quadSmoothIters = m_priv[PATH_RIGHT].QUAD_SMOOTH_ITERS;
+
         m_pShared->m_path[PATH_RIGHT].MakeSmoothPath( &m_track, m_cm[PATH_RIGHT], options);
-        LogSHADOW.debug(" ... SHADOW end newRace !\n");
     }
 
     m_path[PATH_NORMAL] = m_pShared->m_path[PATH_NORMAL];
-    LogSHADOW.debug(" # SHADOW m_path ...\n");
 
-    char	buf[1024];
-    sprintf( buf, "drivers/%s/cars/%s/track-%s.spr", MyBotName, m_carName, m_trackName );
-    bool loadedOk = m_path[PATH_NORMAL].LoadPath(buf);
-    LogSHADOW.debug( "loaded springs data: %s\n", loadedOk ? "true" : "false" );
+    {
+        char	buf[1024];
+        snprintf( buf, sizeof(buf),"%sdrivers/%s/%s/track-%s.spr", GfDataDir(), MyBotName, m_carName, m_trackName );
 
+        bool loadedOk = m_path[PATH_NORMAL].LoadPath(buf);
+        LogSHADOW.debug( "loaded springs data: %s\n", loadedOk ? "true" : "false" );
+    }
     m_path[PATH_NORMAL].CalcMaxSpeeds( m_cm[PATH_NORMAL] );
     m_path[PATH_NORMAL].PropagateBraking( m_cm[PATH_NORMAL] );
 
@@ -687,11 +628,6 @@ void	TDriver::NewRace( int index, tCarElt* pCar, tSituation* pS )
         }
     }
 
-    //	double	lapTime = m_path[PATH_NORMAL].CalcEstimatedLapTime();
-    //	DEBUGF( "Estimated lap time (%g): %02d:%02d.%03d\n",
-    //		lapTime, int(floor(lapTime / 60)), int(floor(lapTime)) % 60,
-    //		int((lapTime - floor(lapTime)) * 1000) );
-
     {
         // get name of car (e.g. 'car5-trb1')
         const char*	path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
@@ -702,8 +638,6 @@ void	TDriver::NewRace( int index, tCarElt* pCar, tSituation* pS )
         if( p )
             *p = '\0';
 
-        LogSHADOW.debug( "   carName: '%s'\n", carName );
-
         //	get the name of the track (e.g. "e-track-1")
         char	trackName[256];
         strncpy( trackName, strrchr(m_track.GetTrack()->filename, '/') + 1, sizeof(trackName) );
@@ -711,18 +645,20 @@ void	TDriver::NewRace( int index, tCarElt* pCar, tSituation* pS )
 
         //	set up the base param path.
         char	baseParamPath[] = "drivers/shadow";
+        //snprintf( buf, sizeof(buf), "%s/%s/track-%s-generated.spr", MyBotName, carName, trackName );
 
         //	save the generated racing line.
         if( m_priv[PATH_NORMAL].SAVE_PATHS )
         {
             char	buf[1024];
-            snprintf( buf, sizeof(buf), "%s/cars/%s/track-%s-generated.spr",
-                      baseParamPath, carName, trackName );
+            snprintf( buf, sizeof(buf), "%s/%s/track-%s-generated.spr",
+                      MyBotName, carName, trackName );
             m_path[PATH_NORMAL].SavePath( buf );
         }
     }
 
-    const char* traintype = GfParmGetStr(pCar->_carHandle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
+    const char* traintype = GfParmGetStr(pCar->_carHandle,
+                                         SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
     m_driveType = cDT_RWD;
 
     if( strcmp(traintype, VAL_TRANS_RWD) == 0 )
@@ -754,30 +690,29 @@ void	TDriver::NewRace( int index, tCarElt* pCar, tSituation* pS )
     m_pShared->m_teamInfo.Add( pCar->index, pItem );
 }
 
-bool	TDriver::Pitting( int path, double pos ) const
+bool	Driver::Pitting( int path, double pos ) const
 {
-    return	m_pitControl.WantToPit() &&
-            m_pitPath[path][m_pitControl.PitType()].ContainsPos(pos);
+    return	m_Strategy.WantToPit() &&
+            m_pitPath[path][m_Strategy.PitType()].ContainsPos(pos);
 }
 
-bool	TDriver::Pitting( tCarElt* car ) const
+bool	Driver::Pitting( tCarElt* car ) const
 {
     double	pos = m_track.CalcPos(car);
     return Pitting(PATH_NORMAL, pos);
 }
 
-void	TDriver::GetPtInfo( int path, double pos, PtInfo& pi ) const
+void	Driver::GetPtInfo( int path, double pos, PtInfo& pi ) const
 {
 
     if( Pitting(path, pos) )
-        m_pitPath[path][m_pitControl.PitType()].GetPtInfo( pos, pi );
+        m_pitPath[path][m_Strategy.PitType()].GetPtInfo( pos, pi );
     else
         m_path[path].GetPtInfo( pos, pi );
 }
 
 void	InterpPtInfo( PtInfo& pi0, const PtInfo& pi1, double t )
 {
-    //		pi.k	= piL.k    * (1 - t) + piR.k    * t;
     pi0.k	= Utils::InterpCurvature(pi0.k, pi1.k, t);
     double	deltaOAng = pi1.oang - pi0.oang;
     NORM_PI_PI(deltaOAng);
@@ -785,10 +720,13 @@ void	InterpPtInfo( PtInfo& pi0, const PtInfo& pi1, double t )
     pi0.offs = pi0.offs * (1 - t) + pi1.offs * t;
     pi0.spd	 = pi0.spd  * (1 - t) + pi1.spd  * t;
     pi0.acc  = pi0.acc  * (1 - t) + pi1.acc  * t;
-    //		pi.toL
 }
 
-void	TDriver::GetPosInfo( double pos, PtInfo& pi, double	u, double v ) const
+void	Driver::GetPosInfo(
+        double		pos,
+        PtInfo&		pi,
+        double		u,
+        double		v ) const
 {
     GetPtInfo( PATH_NORMAL, pos, pi );
 
@@ -811,12 +749,14 @@ void	TDriver::GetPosInfo( double pos, PtInfo& pi, double	u, double v ) const
     }
 }
 
-void	TDriver::GetPosInfo(double pos, PtInfo&	pi ) const
+void	Driver::GetPosInfo(
+        double		pos,
+        PtInfo&		pi ) const
 {
     GetPosInfo(pos, pi, m_avoidS, m_avoidT);
 }
 
-double	TDriver::CalcPathTarget( double pos, double offs, double s ) const
+double	Driver::CalcPathTarget( double pos, double offs, double s ) const
 {
     PtInfo	pi, piL, piR;
     GetPtInfo( PATH_NORMAL, pos, pi );
@@ -831,12 +771,12 @@ double	TDriver::CalcPathTarget( double pos, double offs, double s ) const
     return MX(-1, MN(t, 1)) * 2 - 1;
 }
 
-double	TDriver::CalcPathTarget( double pos, double offs ) const
+double	Driver::CalcPathTarget( double pos, double offs ) const
 {
     return CalcPathTarget(pos, offs, m_avoidS);
 }
 
-Vec2d	TDriver::CalcPathTarget2( double pos, double offs ) const
+Vec2d	Driver::CalcPathTarget2( double pos, double offs ) const
 {
     PtInfo	pi, piL, piR;
     GetPtInfo( PATH_NORMAL, pos, pi );
@@ -853,7 +793,7 @@ Vec2d	TDriver::CalcPathTarget2( double pos, double offs ) const
     return Vec2d(MX(-1, MN(t, 1)) * 2 - 1, 1);
 }
 
-double	TDriver::CalcPathOffset( double pos, double s, double t ) const
+double	Driver::CalcPathOffset( double pos, double s, double t ) const
 {
     PtInfo	pi, piL, piR;
     GetPtInfo( PATH_NORMAL, pos, pi );
@@ -868,7 +808,7 @@ double	TDriver::CalcPathOffset( double pos, double s, double t ) const
     return piL.offs;
 }
 
-void	TDriver::CalcBestPathUV( double pos, double offs, double& u, double& v ) const
+void	Driver::CalcBestPathUV( double pos, double offs, double& u, double& v ) const
 {
     PtInfo	pi, piL, piR;
     GetPtInfo( PATH_NORMAL, pos, pi );
@@ -902,12 +842,9 @@ void	TDriver::CalcBestPathUV( double pos, double offs, double& u, double& v ) co
             u = 0;
         v = 1;
     }
-    //	double	out = CalcPathOffset(pos, u, v);
-    //	DEBUGF( "CalcBestPathUV %5.1f:%4.1f  doffs %5.1f  %5.1f/%5.1f/%5.1f  %5.3f %6.3f : %6.3f\n",
-    //			pos, offs, doffs, piL.offs, pi.offs, piR.offs, u, v, out );
 }
 
-double	TDriver::CalcBestSpeed( double pos, double offs ) const
+double	Driver::CalcBestSpeed( double pos, double offs ) const
 {
     double	u, v;
     CalcBestPathUV( pos, offs, u, v );
@@ -918,7 +855,7 @@ double	TDriver::CalcBestSpeed( double pos, double offs ) const
     return pi.spd;
 }
 
-void	TDriver::GetPathToLeftAndRight( const CarElt* pCar, double& toL, double& toR ) const
+void	Driver::GetPathToLeftAndRight( const CarElt* pCar, double& toL, double& toR ) const
 {
     double	pos = pCar->_distFromStartLine;
     double	offs = -pCar->_trkPos.toMiddle;
@@ -930,14 +867,11 @@ void	TDriver::GetPathToLeftAndRight( const CarElt* pCar, double& toL, double& to
     toR = pi.offs - offs;
 }
 
-double	TDriver::GripFactor( const CarElt* pCar, bool front ) const
+double	Driver::GripFactor( const CarElt* pCar, bool front ) const
 {
     const double initialTemperature	= 273.15 + 20.0;
 
-    //	if( pCar->priv.wheel[2].currentTemperature != initialTemperature )
-    //		return 1.0;
-
-    double	gripFactor = 0;
+    double	gripFactor = 2.0;
     int		wheel_base = front ? 0 : 2;
     for( int i = 0; i < 2; i++ )
     {
@@ -950,39 +884,21 @@ double	TDriver::GripFactor( const CarElt* pCar, bool front ) const
         //gripFactor += ((1.0f-(MIN((di*di), 1.0f)))/4.0f + 3.0f/4.0f)*(1.0f - currentGraining/10.0f);
     }
 
-    return 1; //gripFactor * 0.5;
+    return gripFactor * 0.5;
 }
 
 double	CalcMaxSlip( double fRatio )
 {
-    //	double	stmp = MIN(slip, 1.5f);
-    //	Bx = wheel->mfB * stmp;
-    //	F = sin(wheel->mfC * atan(Bx * (1.0f - wheel->mfE) +
-    //								wheel->mfE * atan(Bx))) *
-    //			(1.0f + stmp * simSkidFactor[car->carElt->_skillLevel]);
-    //
-    //	f = sin(C + atan(Bx * (1 - E) + E * atan(Bx)))
-    //
-    //	s = 0, f = 0
-    //	s = 0.75, f = 0.75
-    //	s = 1.25, f = 1
-    //	s = 10, f = 1
-    //
-    //	sa = yaw - velAng;
-    //	slip = tan(sa) * vel;
-    //	sr = slip / vel == tan(sa) * vel / vel == tan(sa)
     return 0;
 }
 
-double	TDriver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi, const Private& priv )
+double	Driver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi, const Private& priv )
 {
     // work out current car speed.
     double	spd0 = hypot(car->_speed_x, car->_speed_y);
-    //	double	spd0 = car->_speed_x;
 
     // get current pos on track.
-    double	pos = m_track.CalcPos(car);//, car->_dimension_x * 0.025);
-    //	double	pos = m_track.CalcPos(car, car->_dimension_x * 0.2);
+    double	pos = m_track.CalcPos(car);
 
     GetPosInfo( pos, pi );
 
@@ -1001,13 +917,12 @@ double	TDriver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi, const Pr
     // work out basic steering angle (that aligns the front wheels parallel to the racing line).
     double	velAng = atan2(car->_speed_Y, car->_speed_X);
     double	angle = aheadPi.oang - car->_yaw;
-
     NORM_PI_PI(angle);
     double	basicAngle = angle;
 
     // control rotational velocity.
     double	avgK = (pi.k + piOmega.k) * 0.5;
-    double	targetOmega = car->_speed_x * avgK;
+    double	targetOmega = car->_speed_x * avgK;//aheadPi.k;
     double	o2 = (aheadPi.k - pi.k) * spd0 / aheadDist;
     static PidController	yawCtrl;
     yawCtrl.m_p = 0.12;
@@ -1020,41 +935,25 @@ double	TDriver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi, const Pr
     angle += omegaAngle2;
 
     double	accDecAngle = 0;
-
     if( car->_accel_x > 0 )
         accDecAngle = avgK * m_priv[PATH_NORMAL].STEER_K_ACC;
     else
         accDecAngle = avgK * m_priv[PATH_NORMAL].STEER_K_DEC;
-
     angle += accDecAngle;
 
-    //double	velAng = atan2(car->_speed_Y, car->_speed_X);
-    double	ang = car->_yaw - velAng;
-    NORM_PI_PI(ang);
-
-    int	k = int(floor((pi.k - K_MIN) / K_STEP));
-    int	s = int(floor((spd0 - SPD_MIN) / SPD_STEP));
-    double	ae = 0;
-    if( k >= 0 && k < K_N && s >= 0 && s < SPD_N )
     {
-        ae = m_angle[s][k] - ang;
+        double	velAng = atan2(car->_speed_Y, car->_speed_X);
+        double	ang = car->_yaw - velAng;
+        NORM_PI_PI(ang);
+
+        int	k = int(floor((pi.k - K_MIN) / K_STEP));
+        int	s = int(floor((spd0 - SPD_MIN) / SPD_STEP));
+        double	ae = 0;
+        if( k >= 0 && k < K_N && s >= 0 && s < SPD_N )
+        {
+            ae = m_angle[s][k] - ang;
+        }
     }
-
-    //		DEBUGF( "k %g  delta %g\n", pi.k, delta );
-    //		if( fabs(delta) > 0.2 && pi.k * delta < 0 )
-    //		{
-    //			double	ang = MX(0, MN((fabs(delta) - 0.2) * 0.2, 0.05));
-    //			angle += ang * SGN(pi.k);
-    //		}
-
-    //		m_angControl.m_p = 1;
-    //		m_angControl.m_d = 0;//10;
-    //		angle -= atan(m_angControl.Sample(ae));
-    //		angle += (ae + ang) * 0.5;
-
-
-    //	DEBUGF( "k change %7.4f  omega %7.4f  o2 %7.4f   yaw_rate %7.4f\n",
-    //			pi.k - aheadPi.k, targetOmega, o2, car->_yaw_rate );
 
     // control offset from path.
     m_lineControl.m_p = 1.0;
@@ -1068,7 +967,7 @@ double	TDriver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi, const Pr
     double	frontSlipSide = (car->priv.wheel[0].slipSide  + car->priv.wheel[1].slipSide)  / 2;
     if( fabs(frontSlipSide) > 8 )
         LogSHADOW.debug( "slip: front(tan=%7.3f side=%7.3f) rear(tan=%7.3f side=%7.3f) acc(tan=%7.3f side=%7.3f)  steer=%g\n",
-                         (car->priv.wheel[0].slipAccel + car->priv.wheel[1].slipAccel) / 2,
+                (car->priv.wheel[0].slipAccel + car->priv.wheel[1].slipAccel) / 2,
                 frontSlipSide,
                 (car->priv.wheel[2].slipAccel + car->priv.wheel[3].slipAccel) / 2,
                 (car->priv.wheel[2].slipSide  + car->priv.wheel[3].slipSide)  / 2,
@@ -1076,21 +975,22 @@ double	TDriver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi, const Pr
 
     const double steerHardFactor = 0.5;
     bool steeringHard = fabs(angle) > car->info.steerLock * steerHardFactor;
-    bool limitSteering =	fabs(frontSlipSide) > 6 && steeringHard && frontSlipSide * angle < 0;
-
+    bool limitSteering =	fabs(frontSlipSide) > 6 &&
+            steeringHard &&
+            frontSlipSide * angle < 0;
     if( limitSteering )
     {
         angle = (angle < 0 ? -car->info.steerLock : car->info.steerLock) * steerHardFactor;
     }
 
     LogSHADOW.debug( "%4d o=%6.2f a=%6.3f ba=%6.3f oa=%6.3f oa2=%6.3f ada=%6.3f la=%6.3f %g,%g\n",
-                     pi.idx, delta, angle, basicAngle, omegaAngle, omegaAngle2, accDecAngle, lineAngle,
-                     m_avoidS, m_avoidT );
+            pi.idx, delta, angle, basicAngle, omegaAngle, omegaAngle2, accDecAngle, lineAngle,
+            m_avoidS, m_avoidT );
 
     return angle;
 }
 
-double	TDriver::SteerAngle1( tCarElt* car, PtInfo& carPi, PtInfo& aheadPi )
+double	Driver::SteerAngle1( tCarElt* car, PtInfo& carPi, PtInfo& aheadPi )
 {
     tTrkLocPos	trkPos;
     PtInfo		axlePi, ahead2Pi;
@@ -1134,59 +1034,28 @@ double	TDriver::SteerAngle1( tCarElt* car, PtInfo& carPi, PtInfo& aheadPi )
     double	angle = axlePi.oang - car->_yaw;
     NORM_PI_PI(angle);
 
-    //	DEBUGF( "**** offs %6.3f  delta %6.3f   avoidT %5.2f\n",
-    //			pi.offs, delta, m_avoidT );
-
-    //	double	avgK = aheadPi.k;
-    //	double	avgK = (aheadPi.k + ahead2Pi.k * 2) / 3;
     double	avgK = (axlePi.k + aheadPi.k + ahead2Pi.k) / 3;
-    //	double	avgK = (pi.k + aheadPi.k) * 0.5;
-    //	double	avgK = pi.k;//(pi.k + aheadPi.k) * 0.5;
-    //	if( fabs(axlePi.k) > fabs(aheadPi.k) )
-    //		avgK = axlePi.k;
-    //	double	avgK = Utils::InterpCurvatureLin(pi.k, aheadPi.k, 0.5);
-    //	double	avgK = Utils::InterpCurvatureRad(pi.k, aheadPi.k, 0.5);
-
     double	accDecAngle = 0;
+
     if( car->_accel_x > 0 )
         accDecAngle = avgK * m_priv[PATH_NORMAL].STEER_K_ACC;
     else
         accDecAngle = avgK * m_priv[PATH_NORMAL].STEER_K_DEC;
+
     angle += accDecAngle;
 
-    //	double omega = car->_speed_x * avgK;//aheadPi.k;
     double omega = spd0 * avgK;//aheadPi.k;
-    //	angle += 0.1 * (omega - car->_yaw_rate);
-    angle += 0.15 * (omega - car->_yaw_rate);
-    //	angle += (omega - car->_yaw_rate);
 
+    angle += 0.15 * (omega - car->_yaw_rate);
     angle += omega * 0.15;
-    //	angle += omega * 0.15;
-    //	angle += car->_speed_x * aheadPi.k * 0.05;
-    /*
-    omega = spd0 * avgK - car->_yaw_rate;//aheadPi.k;
-    double	dist1s = spd0;
-//	omega = car->_speed_x * avgK - car->_yaw_rate;//aheadPi.k;
-//	double	dist1s = car->_speed_x;
-    double	len = 2.63;	// dist between front/back wheel centres.
-    double	radiusRear = dist1s / omega;
-    angle += atan(len / radiusRear);
-*/
-    //	double	velAng = atan2(velY, velX);
+
     double	velAng = atan2(car->_speed_Y, car->_speed_X);
-    //	double	velAngCtrl = ahead2Pi.oang - velAng;
     double	velAngCtrl = carPi.oang - velAng;
-    //	double	yawAng = car->_yaw - velAng;
     NORM_PI_PI(velAngCtrl);
-    m_velAngControl.m_p = 0.5;//0.5;//1;
-    m_velAngControl.m_d = 5;//10;//25;
+    m_velAngControl.m_p = 0.5;
+    m_velAngControl.m_d = 5;
     velAngCtrl = m_velAngControl.Sample(velAngCtrl);
-    //	angle += velAngCtrl;
     angle += tanh(velAngCtrl);
-    //	angle += 0.5 * velAngCtrl;
-    //	angle += 0.05 * tanh(20 * velAngCtrl);
-    //	angle += 0.1 * tanh(10 * velAngCtrl);
-    //	angle += tanh(2 * velAngCtrl);
 
     // control offset from path.
     m_lineControl.m_p = 0.6;
@@ -1195,33 +1064,25 @@ double	TDriver::SteerAngle1( tCarElt* car, PtInfo& carPi, PtInfo& aheadPi )
     m_lineControl.m_totalRate = 0;
     m_lineControl.m_maxTotal = 2;
     static double avgLineAngle = 0;
-    const double SC = 0.15;//0.15;//0.15;//0.2;//0.15;
-    //	const double SC = 0.14;//0.15;//0.15;//0.2;//0.15;
-    //	const double SC = MN(1, 8.5 / spd0);
+    const double SC = 0.15;
+
     double	delta = axlePi.offs + axleToMiddle;
-    //	double	delta = carPi.offs + carToMiddle;
-    //	double lineAngle = SC * atan(m_lineControl.Sample(delta));
     double lineAngle = SC * tanh(m_lineControl.Sample(delta));
     const double avgLineAngleFactor = 1;
     avgLineAngle = avgLineAngle * (1 - avgLineAngleFactor) + lineAngle * avgLineAngleFactor;
     angle -= avgLineAngle;
 
-    //	DEBUGF( "offset %6.2f tot %g\n", delta, m_lineControl.m_total );
-
-    //	angle *= 1.02;
-
     return angle;
 }
 
-double	TDriver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
+double	Driver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 {
     // work out current car speed.
     double	spd0 = hypot(car->_speed_x, car->_speed_y);
-    //	double	spd0 = car->_speed_x;
 
     // calc x,y coords of mid point on frt axle.
-    double	midPt = 1.37;//1;//car->_dimension_x * 0.5;
-    //	double	midPt = car->_dimension_x * 0.5;
+    double	midPt = 1.37;
+
     double	x = car->pub.DynGCg.pos.x + midPt * cos(car->_yaw);
     double	y = car->pub.DynGCg.pos.y + midPt * sin(car->_yaw);
 
@@ -1232,24 +1093,15 @@ double	TDriver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     oldX = x;
     oldY = y;
 
-    //	DEBUGF( "%g %g    %g %g    yaw %g\n",
-    //			car->pub.DynGCg.pos.x, car->pub.DynGCg.pos.y, x, y, car->_yaw );
-
     tTrkLocPos	trkPos;
     RtTrackGlobal2Local(car->_trkPos.seg, x, y, &trkPos, 0);
     double	toMiddle = trkPos.toMiddle;
-
 
     // get current pos on track.
     double	pos = m_track.CalcPos(trkPos);
 
     // look this far ahead.
-    //	double	aheadDist = car->_dimension_x * 0.5 + spd0 * 0.02;
-    //	double	aheadDist = (car->_dimension_x - 1.37) * 0.5 + spd0 * 0.02;
-    //	double	aheadDist = 1.37 + spd0 * 0.02;
-    //	double	aheadDist = 2 * spd0 * 0.02;
     double	aheadDist = spd0 * 0.02;
-    //	double	aheadDist = 2.0 + spd0 * 0.02;
     double	aheadPos = m_track.CalcPos(trkPos, aheadDist);
 
     // get info about pts on track.
@@ -1259,43 +1111,30 @@ double	TDriver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     double	angle = aheadPi.oang - car->_yaw;
     NORM_PI_PI(angle);
 
-    //	double	velAng = atan2(velY, velX);
     double	velAng = atan2(car->_speed_Y, car->_speed_X);
     double	velAngCtrl = aheadPi.oang - velAng;
-    //	double	yawAng = car->_yaw - velAng;
     NORM_PI_PI(velAngCtrl);
     m_velAngControl.m_p = 1;//0.5;//1;
     m_velAngControl.m_d = 10;//25;
     velAngCtrl = m_velAngControl.Sample(velAngCtrl);
-    //	angle += velAngCtrl;
+
     angle += tanh(velAngCtrl);
-    //	angle += 0.5 * velAngCtrl;
-    //	angle += 0.05 * tanh(20 * velAngCtrl);
 
-    //	DEBUGF( "**** offs %6.3f  delta %6.3f   avoidT %5.2f\n",
-    //			pi.offs, delta, m_avoidT );
-
-    //	double	avgK = (pi.k + aheadPi.k) * 0.5;
-    //	double	avgK = pi.k;//(pi.k + aheadPi.k) * 0.5;
     double	avgK = aheadPi.k;
-    //	double	avgK = Utils::InterpCurvatureLin(pi.k, aheadPi.k, 0.5);
-    //	double	avgK = Utils::InterpCurvatureRad(pi.k, aheadPi.k, 0.5);
-    double omega = car->_speed_x * avgK;//aheadPi.k;
-    //	double omega = spd0 * avgK;//aheadPi.k;
+    double omega = car->_speed_x * avgK;
     angle += 0.02 * (omega - car->_yaw_rate);
 
     // control offset from path.
     m_lineControl.m_p = 1.0;
     m_lineControl.m_d = 10;
-    const double SC = 0.15;//0.15;//0.15;//0.2;//0.15;
+    const double SC = 0.15;
     double	delta = pi.offs + toMiddle;
-    //	angle -= SC * atan(m_lineControl.Sample(delta));
     angle -= SC * tanh(m_lineControl.Sample(delta));
 
     return angle;
 }
 
-double	TDriver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
+double	Driver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 {
     // work out current car speed.
     double	spd0 = hypot(car->_speed_x, car->_speed_y);
@@ -1321,57 +1160,29 @@ double	TDriver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 
     // we want the angle of the car to be aheadPi.oang in aheadTime seconds.
     //	our current rotation speed is car->_yaw_rate.  our current rotation
-    //	angle is car->_yaw.
-
-    //	DEBUGF( "*****    yaw %g    g_yaw %g\n", car->_yaw, car->pub.DynGCg.pos.az );
-    //	DEBUGF( "*****    yaw %g    yaw_rate %g\n", car->_yaw, car->_yaw_rate );
-
-    //	static double	avgYawU = 0;
-    //	static double	avgAhdK = 0;
-    //	static double	avgYawS = 0;
-    //	avgYawU = avgYawU * 0.5 + car->_yaw_rate * 0.5;
-    //	avgAhdK = avgAhdK * 0.5 + aheadPi.k * 0.5;
-    //	double	ys = aheadPi.oang - car->_yaw;
-    //	NORM_PI_PI(ys);
-    //	avgYawS = avgYawS * 0.5 + ys * 0.5;
 
     // current yaw rate.
     double	yawU = car->_yaw_rate;
-    //	double	yawU = avgYawU;
 
     // future yaw rate required ahead.
     double	yawV = aheadPi.k * spd0;
-    //	double	yawV = avgAhdK * spd0;
 
     // future yaw required ahead (assuming current yaw to be 0).
     double	yawS = aheadPi.oang - car->_yaw;
-    //	double	yawS = avgYawS;
     NORM_PI_PI(yawS);
 
     // acceleration to apply.
     double	yawA = 2 * (yawS - yawU * aheadTime) / (aheadTime * aheadTime);
-    //	double	yawA = (yawS / aheadTime) - yawU;
-
     double	yaw1s = yawU + 0.5 * yawA;
-
-    //	DEBUGF( "**** yaw %.3f  yawU %.3f  yawV %.3f  yawS %.3f  yawA %.3f\n",
-    //			car->_yaw, yawU, yawV, yawS, yawA );
 
     // angle to steer to get desired yaw angle after timestep.
     double	dist1s = spd0;
     double	len = 2.63;	// dist between front/back wheel centres.
     double	radiusRear = dist1s / yaw1s;
-    //	double	angle = MX(-0.5, MN(atan(len / radiusRear), 0.5));
     double	angle = atan(len / radiusRear);
 
     if( spd0 < 1 )
         angle = 0;
-
-    //	DEBUGF( "**** yaw1s %g  distTs %.3f  radiusRear %.3f  angle %.3f\n",
-    //			yaw1s, dist1s, radiusRear, angle );
-
-    //	double omega = spd0 * avgK;//aheadPi.k;
-    //	angle += 0.02 * (omega - car->_yaw_rate);
 
     // control offset from path.
     const double SC1 = 1;
@@ -1380,12 +1191,10 @@ double	TDriver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     double	delta = pi.offs + car->_trkPos.toMiddle;
     const double SC2 = 1.0 / SC1;
     angle -= SC2 * atan(m_lineControl.Sample(delta));
-    //	angle -= 0.75 * atan(m_lineControl.Sample(delta));
-    //	angle -= 0.15 * atan(delta);
 
     double	frontSlipSide = (car->priv.wheel[0].slipSide  + car->priv.wheel[1].slipSide)  / 2;
     if( fabs(frontSlipSide) > 8 )
-        DEBUGF( "slip: front(tan=%7.3f side=%7.3f) rear(tan=%7.3f side=%7.3f) acc(tan=%7.3f side=%7.3f)  steer=%g\n",
+        LogSHADOW.debug( "slip: front(tan=%7.3f side=%7.3f) rear(tan=%7.3f side=%7.3f) acc(tan=%7.3f side=%7.3f)  steer=%g\n",
                 (car->priv.wheel[0].slipAccel + car->priv.wheel[1].slipAccel) / 2,
                 frontSlipSide,
                 (car->priv.wheel[2].slipAccel + car->priv.wheel[3].slipAccel) / 2,
@@ -1403,11 +1212,9 @@ double	TDriver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
         double  sa      = asin(sy);
 
         double  wrl     = car->_wheelSpinVel(0) * car->_wheelRadius(0);
-        //double  waz   = car->_steer;// + wheel->staticPos.az;
-        //double  CosA  = cos(waz);
-        //double  SinA  = sin(waz);
+
         if( s > m_cm[PATH_NORMAL].TARGET_SLIP + 0.0004 )
-            GfOut( "acc %6.2f  zf %6.1f  s %.6f  v %6.2f  sx %.6f  sy %.6f\n",
+            LogSHADOW.debug( "acc %6.2f  zf %6.1f  s %.6f  v %6.2f  sx %.6f  sy %.6f\n",
                    car->pub.DynGC.acc.x, zforce, s, v, sx, sy );
     }
 
@@ -1424,18 +1231,16 @@ double	TDriver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     return angle;
 }
 
-double	TDriver::SteerAngle4( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
+double	Driver::SteerAngle4( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 {
     // work out current car speed.
     double	spd0 = hypot(car->_speed_x, car->_speed_y);
-    //	double	spd0 = car->_speed_x;
 
     // get curret pos on track.
     double	pos = m_track.CalcPos(car);
 
     // look this far ahead.
     double	aheadDist = car->_dimension_x * 0.5 + spd0 * 0.02;
-    //	double	aheadDist = 1 + spd0 * 0.04;
     double	aheadPos = m_track.CalcPos(car, aheadDist);
 
     // get info about pts on track.
@@ -1445,49 +1250,44 @@ double	TDriver::SteerAngle4( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     //
     //	deal with yaw.
     //
-
     double	yawError = aheadPi.oang - car->_yaw;
     NORM_PI_PI(yawError);
-    //	double	yawERate = yawError - m_prevYawError;
     double	yawERate = car->pub.DynGC.vel.az;
 
     // PID with no integration term.
-    const double Y_PROP = 0.1;//1;//2;//1.0;
-    const double Y_DIFF = 2.5;//1;//10;
+    const double Y_PROP = 0.1;
+    const double Y_DIFF = 2.5;
     const double Y_SC = 1;
     double angle = Y_SC * atan((Y_PROP * yawError + Y_DIFF * yawERate) / Y_SC);
 
     //
     //	deal with line.
     //
-
     double	lineError = -(pi.offs + car->_trkPos.toMiddle);
     double	lineERate = lineError - m_prevLineError;
     m_prevLineError = lineError;
 
-    //	DEBUGF( "**** offs %6.3f  delta %6.3f   avoidT %5.2f\n",
-    //			pi.offs, delta, m_avoidT );
-
     // PID with no integration term.
-    //	const double L_PROP = 0.025;//005;
-    //	const double L_DIFF = 0.5;	// 2 -- osc;
-    const double L_PROP = 0;//0.15;//005;
-    const double L_DIFF = 0;//1.5;	// 2 -- osc;
-    const double L_SC = 0.15;//0.2;//0.15;
+    const double L_PROP = 0;
+    const double L_DIFF = 0;
+    const double L_SC = 0.15;
     angle += L_SC * atan((L_PROP * lineError + L_DIFF * lineERate) / L_SC);
 
     return angle;
 }
 
-void	TDriver::SpeedControl0(double targetSpd, double	spd0, double& acc, double& brk )
+void	Driver::SpeedControl0(
+        double	targetSpd,
+        double	spd0,
+        double&	acc,
+        double&	brk )
 {
     if( m_lastBrk && m_lastTargV )
     {
-        if( m_lastBrk > 0 )//|| (car->ctrl.accelCmd == -m_lastBrk) )
+        if( m_lastBrk > 0 )
         {
             double	err = m_lastTargV - spd0;
             m_accBrkCoeff.Sample( err, m_lastBrk );
-            //			DEBUGF( "accbrk sample %g -> %g\n", err, m_lastBrk );
         }
 
         m_lastBrk = 0;
@@ -1496,46 +1296,11 @@ void	TDriver::SpeedControl0(double targetSpd, double	spd0, double& acc, double& 
 
     if( spd0 - 0.25 > targetSpd )
     {
-        //		if( spd0 - 2 > targetSpd )
         if( spd0 > targetSpd )
-            //		if( spd0 * 0.9 > targetSpd )
-            //		if( spd0 - 1 > targetSpd )
         {
-#if 1
+
             acc = 0.0;
             brk = spd0 < 50 ? 0.5 : 0.6;
-#elif 1
-            double	MAX_BRK = 0.9;
-            //			double	MAX_BRK = 0.75;
-            double	err = spd0 - targetSpd;
-            brk = MX(0, MN(m_accBrkCoeff.CalcY(err), MAX_BRK));
-            //			DEBUGF( "accbrk calcy  %g -> %g\n", err, t );
-            acc = 0;
-
-            m_lastBrk = brk;
-            m_lastTargV = 0;
-
-            if( brk > 0 )
-            {
-                if( targetSpd > 0 )
-                    m_lastTargV = spd0;
-            }
-#else
-            if( spd0 - 2 < targetSpd )
-                brk = 0.07;
-            else if( spd0 - 3 < targetSpd )
-                brk = 0.14;
-            else if( spd0 - 4 < targetSpd )
-                brk = 0.20;
-            else if( spd0 - 5 < targetSpd )
-                brk = 0.35;
-            else if( spd0 - 6 < targetSpd )
-                brk = 0.5;
-            else
-                brk = 0.9;//targetSpd == 0 ? 0.5 : 0.75;
-            //			brk = spd0 - 3 < targetSpd ? 0.14 : spd0 - 5 < targetSpd ? 0.25 : 0.5;
-            acc = 0;
-#endif
         }
         else
         {
@@ -1551,31 +1316,18 @@ void	TDriver::SpeedControl0(double targetSpd, double	spd0, double& acc, double& 
             }
         }
     }
-#if 1
     else
     {
         double x = (10 + spd0) * (targetSpd - spd0) / 20;
         if (x > 0)
             acc = x;
     }
-#endif
-    /*
-    if( m_lastBrk > 0 && brk > 0 && spd0 - 6 < targetSpd )
-    {
-//			brk -= 0.3;
-//			if( brk < 0 )
-        {
-//				acc = MN(0.25, -brk);
-            brk = 0;
-            acc = 0.1;
-        }
-    }
-*/
+
     m_lastBrk = brk;
     m_lastTargV = 0;
 }
 
-void	TDriver::SpeedControl5(
+void	Driver::SpeedControl5(
         double	targetSpd,
         double	spd0,
         double	targetAcc,
@@ -1585,8 +1337,6 @@ void	TDriver::SpeedControl5(
         double&	brk,
         bool	traffic )
 {
-    //	targetSpd -= 0.5;
-    //	if( spd0 - 0.25 > targetSpd )
     double ta = MN(m_brk.adjAccForSpdError(targetAcc, spd0, targetSpd), 0);
     if( ta < 0 )
     {
@@ -1603,7 +1353,6 @@ void	TDriver::SpeedControl5(
             if( targetSpd > 1 )
             {
                 // slow naturally.
-                //				acc = MN(acc, 0.1);
                 acc = MN(acc, traffic ? 0.1 : 0.11 * (targetSpd - spd0));
             }
             else
@@ -1622,7 +1371,7 @@ void	TDriver::SpeedControl5(
     }
 }
 
-void	TDriver::SpeedControl6(
+void	Driver::SpeedControl6(
         double	targetSpd,
         double	spd0,
         double	targetAcc,
@@ -1654,7 +1403,7 @@ void	TDriver::SpeedControl6(
     m_lastTargV = 0;
 }
 
-void	TDriver::SpeedControl7(
+void	Driver::SpeedControl7(
         double	targetSpd,
         double	spd0,
         double	targetAcc,
@@ -1665,8 +1414,6 @@ void	TDriver::SpeedControl7(
         double&	brk,
         bool	traffic )
 {
-    //	targetSpd -= 0.5;
-    //	if( spd0 - 0.25 > targetSpd )
     double ta = MN(m_brk.adjAccForSpdError(targetAcc, spd0, targetSpd), 0);
     if( ta < 0 )
     {
@@ -1683,7 +1430,6 @@ void	TDriver::SpeedControl7(
             if( targetSpd > 1 )
             {
                 // slow naturally.
-                //				acc = MN(acc, 0.1);
                 acc = MN(acc, traffic ? 0.1 : 0.11 * (targetSpd - spd0));
             }
             else
@@ -1702,7 +1448,7 @@ void	TDriver::SpeedControl7(
     }
 }
 
-void	TDriver::SpeedControl8(
+void	Driver::SpeedControl8(
         double	targetSpd,
         double	spd0,
         double	targetAcc,
@@ -1713,9 +1459,8 @@ void	TDriver::SpeedControl8(
         double&	brk,
         bool	traffic )
 {
-    //	targetSpd -= 0.5;
-    //	if( spd0 - 0.25 > targetSpd )
     double ta = MN(m_brk.adjAccForSpdError(targetAcc, spd0, targetSpd), 0);
+
     if( ta < 0 )
     {
         if( spd0 > targetSpd )
@@ -1731,7 +1476,6 @@ void	TDriver::SpeedControl8(
             if( targetSpd > 1 )
             {
                 // slow naturally.
-                //				acc = MN(acc, 0.1);
                 acc = MN(acc, traffic ? 0.1 : 0.11 * (targetSpd - spd0));
             }
             else
@@ -1750,7 +1494,7 @@ void	TDriver::SpeedControl8(
     }
 }
 
-void	TDriver::SpeedControl9(
+void	Driver::SpeedControl9(
         double	targetSpd,
         double	spd0,
         double	targetAcc,
@@ -1784,7 +1528,7 @@ void	TDriver::SpeedControl9(
     brk = s_brk;
 }
 
-void	TDriver::SpeedControl1(
+void	Driver::SpeedControl1(
         double	targetSpd,
         double	spd0,
         double&	acc,
@@ -1805,8 +1549,8 @@ void	TDriver::SpeedControl1(
             else if( spd0 - 5 < targetSpd )
                 brk = 0.5;
             else
-                brk = 0.5;//targetSpd == 0 ? 0.5 : 0.75;
-            //			brk = spd0 - 3 < targetSpd ? 0.14 : spd0 - 5 < targetSpd ? 0.25 : 0.5;
+                brk = 0.5;
+
             acc = 0;
         }
         else
@@ -1825,7 +1569,7 @@ void	TDriver::SpeedControl1(
     m_lastTargV = 0;
 }
 
-void	TDriver::SpeedControl2(
+void	Driver::SpeedControl2(
         double	targetSpd,
         double	spd0,
         double&	acc,
@@ -1833,26 +1577,21 @@ void	TDriver::SpeedControl2(
 {
     if( m_lastBrk && m_lastTargV )
     {
-        if( m_lastBrk > 0 )//|| (car->ctrl.accelCmd == -m_lastBrk) )
+        if( m_lastBrk > 0 )
         {
             double	err = m_lastTargV - spd0;
             m_accBrkCoeff.Sample( err, m_lastBrk );
-            //			DEBUGF( "accbrk sample %g -> %g\n", err, m_lastBrk );
         }
         m_lastBrk = 0;
         m_lastTargV = 0;
     }
 
     if( spd0 > targetSpd )
-        //	if( targetSpd < 100 )
     {
-        //		if( spd0 - 1 > targetSpd )
         {
             double	MAX_BRK = 0.5;
-            //			double	MAX_BRK = 0.75;
             double	err = spd0 - targetSpd;
             brk = MX(0, MN(m_accBrkCoeff.CalcY(err), MAX_BRK));
-            //			DEBUGF( "accbrk calcy  %g -> %g\n", err, t );
             acc = 0;
 
             m_lastBrk = brk;
@@ -1863,16 +1602,11 @@ void	TDriver::SpeedControl2(
                 if( targetSpd > 0 )
                     m_lastTargV = spd0;
             }
-
-            //			DEBUGF( "*** brake ***  spd0 %g   targ %g  brk %g   acc %g\n",
-            //					spd0, targetSpd, brk, acc );
         }
-        //		else
-        //			acc = MN(acc, 0.1);
     }
 }
 
-void	TDriver::SpeedControl3(
+void	Driver::SpeedControl3(
         double	targetSpd,
         double	spd0,
         double&	acc,
@@ -1882,14 +1616,12 @@ void	TDriver::SpeedControl3(
     {
         double	err = spd0 - m_lastTargV;
         m_brkCoeff[m_lastB] += err * 0.001;
-        //		DEBUGF( "*** bfk err %g   coeff %g\n", err, m_brkCoeff[m_lastB] );
         m_lastBrk = 0;
         m_lastTargV = 0;
     }
 
     if( spd0 > targetSpd )
     {
-        //		if( spd0 - 1 > targetSpd )
         {
             int		b = int(floor(spd0 / 2));
             double	MAX_BRK = 0.5;
@@ -1904,16 +1636,11 @@ void	TDriver::SpeedControl3(
                 if( targetSpd > 0 )
                     m_lastTargV = targetSpd;
             }
-
-            //			DEBUGF( "*** brake ***  spd0 %g   targ %g  brk %g   acc %g\n",
-            //					spd0, targetSpd, brk, acc );
         }
-        //		else
-        //			acc = 0.1;
     }
 }
 
-void	TDriver::SpeedControl4(
+void	Driver::SpeedControl4(
         double	targetSpd,
         double	spd0,
         double	k,
@@ -1926,33 +1653,28 @@ void	TDriver::SpeedControl4(
         if( m_lastBrk > 0 || (car->ctrl.accelCmd == -m_lastBrk) )
         {
             double	err = m_lastTargV - spd0;
-            //			m_accBrkCoeff.Sample( err, m_lastBrk );
-            //			PRINTF( "%g,%g,%g\n", spd0, err, m_lastBrk );
         }
+
         m_lastBrk = 0;
         m_lastTargV = 0;
     }
 
-    //	if( spd0 > targetSpd )
-    //if( targetSpd < 100 )
     {
-        //		if( spd0 - 1 > targetSpd )
         {
-            //			double	MAX_BRK = 0.5;
-            //			double	MAX_BRK = 0.75;
             // this is a crude way to limit the slip... better to control the
             // slip more directly.
-            double	MAX_BRK = fabs(k) < 0.0015 ? 0.95 : fabs(k) < 0.0035 ? 0.75 : 0.6;
+            double	MAX_BRK = fabs(k) < 0.0015 ? 0.95 :
+                                                 fabs(k) < 0.0035 ? 0.75 : 0.6;
             double	err = spd0 - targetSpd;
             double	t = m_accBrkCoeff.CalcY(err);
-            //			DEBUGF( "accbrk calcy  %g -> %g\n", err, t );
-            //			DEBUGF( "brk k %9.6f  err %6.3f  t=%6.3f\n", k, err, t );
+
             if( t > 0 )
             {
-                //				brk = MN(t, MAX_BRK);
                 brk = MN(t, 0.9);
+
                 if( m_cm[PATH_NORMAL].frontAxleSlipTangential() > m_cm[PATH_NORMAL].TARGET_SLIP )
                     brk *= 0.7;
+
                 acc = 0;
             }
             else
@@ -1964,15 +1686,11 @@ void	TDriver::SpeedControl4(
             m_lastBrk = t;
             m_lastTargV = 0;
 
-            //			if( brk > 0 && brk < MAX_BRK )
             if( t > -1 && t < MAX_BRK )
             {
                 if( targetSpd > 0 )
                     m_lastTargV = spd0;
             }
-
-            LogSHADOW.debug( "*** brake ***  spd0 %g   targ %g  brk %g   acc %g\n",
-                             spd0, targetSpd, brk, acc );
         }
     }
 
@@ -2000,10 +1718,9 @@ void	TDriver::SpeedControl4(
     }
 
     _acc = MX(0, MN(_acc, 1));
-    //acc = _acc;
 }
 
-void	TDriver::SpeedControl(
+void	Driver::SpeedControl(
         int		which,
         double	targetSpd,
         double	spd0,
@@ -2018,8 +1735,6 @@ void	TDriver::SpeedControl(
         double&	brk,
         bool	traffic )
 {
-    //	SpeedControl2(targetSpd, spd0, acc, brk);
-    //	SpeedControl4(targetSpd, spd0, car, acc, brk);
     switch( which )
     {
     case 0:		SpeedControl0(targetSpd, spd0, acc, brk);			break;
@@ -2036,7 +1751,7 @@ void	TDriver::SpeedControl(
     }
 }
 
-void	TDriver::launchControlClutch( tCarElt* car, tSituation* s )
+void	Driver::launchControlClutch( tCarElt* car, tSituation* s )
 {
     static bool accel = true;
     static int gearChangeCounter = 0;
@@ -2052,7 +1767,7 @@ void	TDriver::launchControlClutch( tCarElt* car, tSituation* s )
         car->ctrl.accelCmd = 0.0;
         car->ctrl.brakeCmd = 1.0;
     }
-    //car->ctrl.steer = -tan(car->pub.trkPos.toMiddle * 0.01);
+
     car->ctrl.steer = -car->pub.DynGC.pos.az;
 
     if( s->currentTime < 0 )
@@ -2084,14 +1799,8 @@ void	TDriver::launchControlClutch( tCarElt* car, tSituation* s )
     wv /= count;
 
     double delta = wv - car->pub.speed;
-    //	static double avgVal = 1.0;
-    //	double value = MX(0, MN(-(m_cm[PATH_NORMAL].wheel(2).slipX() + m_cm[PATH_NORMAL].wheel(3).slipX()) * 0.5, 1.5));
-    //	avgVal = value * 0.25 + avgVal * 0.75;
-    //	double delta = avgVal;
     double ddiff = delta - _prevDelta;
     _prevDelta = delta;
-
-    //PRINTF( "wv %g, spd %g, diff %g, dc %d\n", wv, car->pub.speed, delta, _deltaCounter );
 
     if( car->ctrl.clutchCmd > 0 || gearChangeCounter > 0 || delta > 4 )
     {
@@ -2109,9 +1818,6 @@ void	TDriver::launchControlClutch( tCarElt* car, tSituation* s )
 
             //if( _deltaCounter > 0 )
             car->ctrl.clutchCmd = MX(0, MN(car->ctrl.clutchCmd + (delta - 4) * 0.02 + ddiff * 0.04, 1));
-            //else
-            //car->ctrl.clutchCmd = 0;
-            //			DEBUGF("adj clutch err %g  ddiff %g\n", err, ddiff );
         }
         else if( gearChangeCounter > 0 )
         {
@@ -2127,15 +1833,14 @@ void	TDriver::launchControlClutch( tCarElt* car, tSituation* s )
 
     double acc = 0;
     int newGear = CalcGear(car, acc);
+
     if( newGear > car->ctrl.gear )
         gearChangeCounter = 10;
+
     car->ctrl.gear = newGear;
 
-    //PRINTF( "time: %g  speed: %g  rpm: %g\n",
-    //		s->currentTime, car->pub.speed, car->priv.enginerpm );
-
     static double lastSpd = 0;
-    PRINTF( "%1.3f,%d,%6.3f,%4.0f,%5.3f,%5.3f,%6.3f,%6.3f,%6.3f,%6.3f,%6.3f\n",
+    LogSHADOW.debug( "%1.3f,%d,%6.3f,%4.0f,%5.3f,%5.3f,%6.3f,%6.3f,%6.3f,%6.3f,%6.3f\n",
             s->currentTime,
             car->priv.gear,
             car->pub.speed,
@@ -2150,7 +1855,7 @@ void	TDriver::launchControlClutch( tCarElt* car, tSituation* s )
     lastSpd = car->pub.DynGC.vel.x;
 }
 
-void	TDriver::launchControlSimple( tCarElt* car, tSituation* s )
+void	Driver::launchControlSimple( tCarElt* car, tSituation* s )
 {
     static int ctrlCount = 0;
 
@@ -2198,7 +1903,7 @@ void	TDriver::launchControlSimple( tCarElt* car, tSituation* s )
     double ddiff = delta - _prevDelta;
     _prevDelta = delta;
 
-    PRINTF( "%1.3f,%d,%5.2f,%3.0f,%5.3f,%5.3f,%6.3f,%6.3f\n",
+    LogSHADOW.debug( "%1.3f,%d,%5.2f,%3.0f,%5.3f,%5.3f,%6.3f,%6.3f\n",
             s->currentTime,
             car->priv.gear,
             car->pub.speed,
@@ -2209,7 +1914,7 @@ void	TDriver::launchControlSimple( tCarElt* car, tSituation* s )
             delta );
 }
 
-void	TDriver::launchControlAcclerator( tCarElt* car, tSituation* s )
+void	Driver::launchControlAcclerator( tCarElt* car, tSituation* s )
 {
     static bool accel = true;
     static int gearChangeCounter = 0;
@@ -2225,7 +1930,7 @@ void	TDriver::launchControlAcclerator( tCarElt* car, tSituation* s )
         car->ctrl.accelCmd = 0.0;
         car->ctrl.brakeCmd = 0.5;
     }
-    //car->ctrl.steer = -tan(car->pub.trkPos.toMiddle * 0.01);
+
     car->ctrl.steer = -car->pub.DynGC.pos.az;
 
     if( s->currentTime < 0 )
@@ -2269,40 +1974,15 @@ void	TDriver::launchControlAcclerator( tCarElt* car, tSituation* s )
     }
 
     double delta = wv - car->pub.speed;
-    //	double delta = -(car->priv.wheel[2].slipAccel + car->priv.wheel[3].slipAccel) / 2;
-    //	double delta = -(m_cm[PATH_NORMAL][PATH_NORMAL].wheel(2).slipX() + m_cm[PATH_NORMAL][PATH_NORMAL].wheel(3).slipX()) * 0.5;
     double ddiff = delta - _prevDelta;
     _prevDelta = delta;
 
-
-    //	PRINTF( "wv %g, spd %g, diff %g, dc %d\n", wv, car->pub.speed, delta, _deltaCounter );
-
     if( accel )
     {
-        /*if( s->currentTime < 0.1 )
-            car->ctrl.clutchCmd = 0.75;
-        else if( car->priv.enginerpm < car->priv.enginerpmRedLine * 0.8 && car->priv.gear == 1 )
-        {
-            double rpmErr = car->priv.enginerpmRedLine * 0.8 - car->priv.enginerpm;
-            car->ctrl.clutchCmd = 0.5 + rpmErr * 0.001;
-        }
-        else
-        {
-            //car->ctrl.clutchCmd = 0;
-        }*/
-
-        /*if( s->currentTime < 0.2 )
-        {
-            car->ctrl.clutchCmd = 0.75 - s->currentTime * 2;
-            car->ctrl.accelCmd = 1.0;
-        }
-        else*/ if( s->currentTime >= 0.2 && car->priv.gear < 3 )
+ if( s->currentTime >= 0.2 && car->priv.gear < 3 )
         {
             double slipErr = 4.0 - delta;
             car->ctrl.accelCmd = MX(0, MN(car->ctrl.accelCmd + 0.013 * slipErr - 0.05 * ddiff, 1.0));
-
-            //			double slipErr = m_cm[PATH_NORMAL].TARGET_SLIP - delta;
-            //			car->ctrl.accelCmd = MX(0, MN(car->ctrl.accelCmd + 0.1 * slipErr, 1.0));
         }
         else
         {
@@ -2318,11 +1998,8 @@ void	TDriver::launchControlAcclerator( tCarElt* car, tSituation* s )
         gearChangeCounter = 10;
     car->ctrl.gear = newGear;
 
-    //PRINTF( "time: %g  speed: %g  rpm: %g\n",
-    //		s->currentTime, car->pub.speed, car->priv.enginerpm );
-
     static double lastSpd = 0;
-    PRINTF( "%1.3f,%d,%6.3f,%4.0f,%5.3f,%5.3f,%6.3f,%6.3f,%6.3f,%6.3f,%6.3f\n",
+    LogSHADOW.debug( "%1.3f,%d,%6.3f,%4.0f,%5.3f,%5.3f,%6.3f,%6.3f,%6.3f,%6.3f,%6.3f\n",
             s->currentTime,
             car->priv.gear,
             car->pub.speed,
@@ -2337,7 +2014,7 @@ void	TDriver::launchControlAcclerator( tCarElt* car, tSituation* s )
     lastSpd = car->pub.DynGC.vel.x;
 }
 
-void	TDriver::launchControlAccSlip( tCarElt* car, tSituation* s )
+void	Driver::launchControlAccSlip( tCarElt* car, tSituation* s )
 {
     static bool accel = true;
     static int gearChangeCounter = 0;
@@ -2353,7 +2030,7 @@ void	TDriver::launchControlAccSlip( tCarElt* car, tSituation* s )
         car->ctrl.accelCmd = 0.0;
         car->ctrl.brakeCmd = 0.5;
     }
-    //car->ctrl.steer = -tan(car->pub.trkPos.toMiddle * 0.01);
+
     car->ctrl.steer = -car->pub.DynGC.pos.az;
 
     if( s->currentTime < 0 )
@@ -2382,6 +2059,7 @@ void	TDriver::launchControlAccSlip( tCarElt* car, tSituation* s )
                 car->_wheelRadius(REAR_RGT) * car->priv.wheel[REAR_RGT].spinVel;
         count += 2;
     }
+
     wv /= count;
 
     if( car->ctrl.clutchCmd > 0 || gearChangeCounter > 0 )
@@ -2397,42 +2075,16 @@ void	TDriver::launchControlAccSlip( tCarElt* car, tSituation* s )
     }
 
     double delta = wv - car->pub.speed;
-    //	double delta = -(car->priv.wheel[2].slipAccel + car->priv.wheel[3].slipAccel) / 2;
-    //	double delta = -(m_cm[PATH_NORMAL].wheel(2).slipX() + m_cm[PATH_NORMAL].wheel(3).slipX()) * 0.5;
     double ddiff = delta - _prevDelta;
     _prevDelta = delta;
 
-
-    //	PRINTF( "wv %g, spd %g, diff %g, dc %d\n", wv, car->pub.speed, delta, _deltaCounter );
-
     if( accel )
     {
-        /*if( s->currentTime < 0.1 )
-            car->ctrl.clutchCmd = 0.75;
-        else if( car->priv.enginerpm < car->priv.enginerpmRedLine * 0.8 && car->priv.gear == 1 )
+if( s->currentTime >= 0.0 && car->priv.gear < 3 )
         {
-            double rpmErr = car->priv.enginerpmRedLine * 0.8 - car->priv.enginerpm;
-            car->ctrl.clutchCmd = 0.5 + rpmErr * 0.001;
-        }
-        else
-        {
-            //car->ctrl.clutchCmd = 0;
-        }*/
-
-        /*if( s->currentTime < 0.2 )
-        {
-            car->ctrl.clutchCmd = 0.75 - s->currentTime * 2;
-            car->ctrl.accelCmd = 1.0;
-        }
-        else*/ if( s->currentTime >= 0.0 && car->priv.gear < 3 )
-        {
-            //			double slipErr = 4.0 - delta;
             double targSpd = 0.195 * MX(5, car->pub.DynGC.vel.x);
             double slipErr = targSpd - delta;
             car->ctrl.accelCmd = MX(0, MN(car->ctrl.accelCmd + 0.013 * slipErr - 0.05 * ddiff, 1.0));
-
-            //			double slipErr = m_cm[PATH_NORMAL].TARGET_SLIP - delta;
-            //			car->ctrl.accelCmd = MX(0, MN(car->ctrl.accelCmd + 0.1 * slipErr, 1.0));
         }
         else
         {
@@ -2444,30 +2096,29 @@ void	TDriver::launchControlAccSlip( tCarElt* car, tSituation* s )
 
     double acc = 0;
     int newGear = CalcGear(car, acc);
+
     if( newGear > car->ctrl.gear )
         gearChangeCounter = 10;
+
     car->ctrl.gear = newGear;
 
-    //PRINTF( "time: %g  speed: %g  rpm: %g\n",
-    //		s->currentTime, car->pub.speed, car->priv.enginerpm );
-
     static double lastSpd = 0;
-    PRINTF( "%1.3f,%d,%6.3f,%4.0f,%5.3f,%5.3f,%6.3f,%6.3f,%6.3f,%6.3f,%6.3f\n",
-            s->currentTime,
-            car->priv.gear,
-            car->pub.speed,
-            car->priv.enginerpm * 60 / (2 * PI),
-            car->ctrl.accelCmd,
-            car->ctrl.clutchCmd,
-            (car->pub.DynGC.vel.x - lastSpd) / s->deltaTime,//car->pub.DynGC.acc.x,
-            delta,
-            car->priv.wheel[2].slipAccel,
+    LogSHADOW.debug( "%1.3f,%d,%6.3f,%4.0f,%5.3f,%5.3f,%6.3f,%6.3f,%6.3f,%6.3f,%6.3f\n",
+                     s->currentTime,
+                     car->priv.gear,
+                     car->pub.speed,
+                     car->priv.enginerpm * 60 / (2 * PI),
+                     car->ctrl.accelCmd,
+                     car->ctrl.clutchCmd,
+                     (car->pub.DynGC.vel.x - lastSpd) / s->deltaTime,//car->pub.DynGC.acc.x,
+                     delta,
+                     car->priv.wheel[2].slipAccel,
             (m_cm[PATH_NORMAL].wheel(2).slipX() + m_cm[PATH_NORMAL].wheel(3).slipX()) * 0.5,
             (wv - car->pub.DynGC.vel.x) / car->pub.DynGC.vel.x );
     lastSpd = car->pub.DynGC.vel.x;
 }
 
-void	TDriver::launchControlAccSlip2( tCarElt* car, tSituation* s )
+void	Driver::launchControlAccSlip2( tCarElt* car, tSituation* s )
 {
     static bool accel = true;
     static int gearChangeCounter = 0;
@@ -2483,7 +2134,7 @@ void	TDriver::launchControlAccSlip2( tCarElt* car, tSituation* s )
         car->ctrl.accelCmd = 0.0;
         car->ctrl.brakeCmd = 0.5;
     }
-    //car->ctrl.steer = -tan(car->pub.trkPos.toMiddle * 0.01);
+
     car->ctrl.steer = -car->pub.DynGC.pos.az;
 
     if( s->currentTime < 0 )
@@ -2493,6 +2144,7 @@ void	TDriver::launchControlAccSlip2( tCarElt* car, tSituation* s )
         car->ctrl.brakeCmd = 0.0;
         car->ctrl.clutchCmd = 1.0;
         gearChangeCounter = 10;
+
         return;
     }
 
@@ -2518,9 +2170,6 @@ void	TDriver::launchControlAccSlip2( tCarElt* car, tSituation* s )
     {
         if( gearChangeCounter > 0 )
         {
-            //			if( car->ctrl.gear <= 1 )
-            //				car->ctrl.clutchCmd = 0.7f;
-            //			else
             car->ctrl.clutchCmd = MX(0, gearChangeCounter * 0.02 - 0.05);
         }
         else
@@ -2530,42 +2179,16 @@ void	TDriver::launchControlAccSlip2( tCarElt* car, tSituation* s )
     }
 
     double delta = wv - car->pub.speed;
-    //	double delta = -(car->priv.wheel[2].slipAccel + car->priv.wheel[3].slipAccel) / 2;
-    //	double delta = -(m_cm[PATH_NORMAL].wheel(2).slipX() + m_cm[PATH_NORMAL].wheel(3).slipX()) * 0.5;
     double ddiff = delta - _prevDelta;
     _prevDelta = delta;
 
-
-    //	PRINTF( "wv %g, spd %g, diff %g, dc %d\n", wv, car->pub.speed, delta, _deltaCounter );
-
     if( accel )
     {
-        /*if( s->currentTime < 0.1 )
-            car->ctrl.clutchCmd = 0.75;
-        else if( car->priv.enginerpm < car->priv.enginerpmRedLine * 0.8 && car->priv.gear == 1 )
+        if( s->currentTime >= 0.0 && car->priv.gear < 3 )
         {
-            double rpmErr = car->priv.enginerpmRedLine * 0.8 - car->priv.enginerpm;
-            car->ctrl.clutchCmd = 0.5 + rpmErr * 0.001;
-        }
-        else
-        {
-            //car->ctrl.clutchCmd = 0;
-        }*/
-
-        /*if( s->currentTime < 0.2 )
-        {
-            car->ctrl.clutchCmd = 0.75 - s->currentTime * 2;
-            car->ctrl.accelCmd = 1.0;
-        }
-        else*/ if( s->currentTime >= 0.0 && car->priv.gear < 3 )
-        {
-            //			double slipErr = 4.0 - delta;
             double targSpd = (car->priv.gear <= 1 ? 0.300 : 0.195) * MX(5, car->pub.DynGC.vel.x);
             double slipErr = targSpd - delta;
             car->ctrl.accelCmd = MX(0, MN(car->ctrl.accelCmd + 0.013 * slipErr - 0.05 * ddiff, 1.0));
-
-            //			double slipErr = m_cm[PATH_NORMAL].TARGET_SLIP - delta;
-            //			car->ctrl.accelCmd = MX(0, MN(car->ctrl.accelCmd + 0.1 * slipErr, 1.0));
         }
         else
         {
@@ -2588,29 +2211,27 @@ void	TDriver::launchControlAccSlip2( tCarElt* car, tSituation* s )
         static double cl = 0.9;
         car->ctrl.accelCmd = 1.0;
         car->ctrl.clutchCmd = cl;
-        //		if( car->priv.enginerpm * 60 / (2 * PI) > 8200 )
-        //			cl -= 0.05;
         car->ctrl.gear = 1;
     }
 
     static double lastSpd = 0;
-    PRINTF( "%1.3f,%d,%6.3f,%4.0f,%5.3f,%5.3f,%6.3f,%6.3f,%6.3f,%6.3f,%6.3f\n",
-            s->currentTime,
-            car->priv.gear,
-            car->pub.speed,
-            car->priv.enginerpm * 60 / (2 * PI),
-            car->ctrl.accelCmd,
-            car->ctrl.clutchCmd,
-            (car->pub.DynGC.vel.x - lastSpd) / s->deltaTime,//car->pub.DynGC.acc.x,
-            delta,
-            car->priv.wheel[2].slipAccel,
+    LogSHADOW.debug( "%1.3f,%d,%6.3f,%4.0f,%5.3f,%5.3f,%6.3f,%6.3f,%6.3f,%6.3f,%6.3f\n",
+                     s->currentTime,
+                     car->priv.gear,
+                     car->pub.speed,
+                     car->priv.enginerpm * 60 / (2 * PI),
+                     car->ctrl.accelCmd,
+                     car->ctrl.clutchCmd,
+                     (car->pub.DynGC.vel.x - lastSpd) / s->deltaTime,//car->pub.DynGC.acc.x,
+                     delta,
+                     car->priv.wheel[2].slipAccel,
             (m_cm[PATH_NORMAL].wheel(2).slipX() + m_cm[PATH_NORMAL].wheel(3).slipX()) * 0.5,
             (wv - car->pub.DynGC.vel.x) / car->pub.DynGC.vel.x );
     lastSpd = car->pub.DynGC.vel.x;
 
 }
 
-void	TDriver::launchControlFullThrottle( tCarElt* car, tSituation* s )
+void	Driver::launchControlFullThrottle( tCarElt* car, tSituation* s )
 {
     static bool accel = true;
     static int gearChangeCounter = 0;
@@ -2648,7 +2269,6 @@ void	TDriver::launchControlFullThrottle( tCarElt* car, tSituation* s )
         car->ctrl.brakeCmd = 0.0;
         car->ctrl.clutchCmd = 1.0;
         gearChangeCounter = 10;
-
         return;
     }
 
@@ -2691,10 +2311,8 @@ void	TDriver::launchControlFullThrottle( tCarElt* car, tSituation* s )
 
     double acc = 0;
     int newGear = CalcGear(car, acc);
-
     if( newGear != car->ctrl.gear )
         gearChangeCounter = 10;
-
     car->ctrl.gear = newGear;
 
     static double lastPos = 0;
@@ -2722,15 +2340,27 @@ void	TDriver::launchControlFullThrottle( tCarElt* car, tSituation* s )
     lastPos = car->pub.DynGC.pos.x;
 }
 
-void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
+void	Driver::Drive( int index, tCarElt* car, tSituation* s )
 {
     m_cm[PATH_NORMAL].update( car, s );
+
+#if EXPERIMENTAL
+    //#if 1
+    launchControlFullThrottle(car, s);
+    //	launchControlClutch(car, s);
+    //	launchControlAcclerator(car, s);
+    //	launchControlAccSlip(car, s);
+    //	launchControlAccSlip2(car, s);
+    //	launchControlSimple(car, s);
+    return;
+#endif
 
     double	h[4];
     for( int i = 0; i < 4; i++ )
     {
         tTrkLocPos	wp;
-
+        //		double		wx = car->_pos_X;
+        //		double		wy = car->_pos_Y;
         double		wx = car->pub.DynGCg.pos.x;
         double		wy = car->pub.DynGCg.pos.y;
         RtTrackGlobal2Local(car->_trkPos.seg, wx, wy, &wp, TR_LPOS_SEGMENT);
@@ -2751,7 +2381,7 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
         }
 
         m_raceStart = false;
-        LogSHADOW.debug( "m_avoidS = %g (race start 2)\n", 0.0 );
+        LogSHADOW.info( "m_avoidS = %g (race start 2)\n", 0.0 );
         m_avoidS = 0;
         m_avoidSVel = 0;
         m_avoidT = CalcPathTarget(m_track.CalcPos(car), -car->_trkPos.toMiddle);
@@ -2761,10 +2391,10 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
     if( car->race.laps != m_lastLap )
     {
         m_lastLap = car->race.laps;
-        LogSHADOW.info( "[%d] Average fuel/m: %g\n", car->index, m_pitControl.FuelPerM(car) );
+        LogSHADOW.debug( "[%d] Average fuel/m: %g\n", car->index, m_Strategy.FuelPerM(car) );
         double a, b;
         m_accBrkCoeff.CalcCoeffs(&a, &b);
-        LogSHADOW.info( "[%d] accbrk: a=%g, b=%g\n", car->index, a, b );
+        LogSHADOW.debug( "[%d] accbrk: a=%g, b=%g\n", car->index, a, b );
     }
 
     if( m_priv[PATH_NORMAL].SAVE_PATHS )
@@ -2806,7 +2436,6 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
 
     if( h[0] > m_priv[PATH_NORMAL].FLY_HEIGHT )
     {
-        //		m_flying = FLY_COUNT;
         m_flying = MN(FLY_COUNT, m_flying + (FLY_COUNT / 2));
     }
     else if( m_flying > 0 )
@@ -2818,11 +2447,6 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
 
     PtInfo	pi, aheadPi;
     double	angle = SteerAngle1(car, pi, aheadPi);
-
-    //	PRINTF( "%5.1f (%7.1f, %7.1f, %7.1f) %6.2f\n",
-    //			s->currentTime, car->pub.DynGC.pos.x, car->pub.DynGC.pos.y, car->pub.DynGC.pos.z,
-    //			pi.offs );
-
     double	steer = angle / car->_steerLock;
     const double steer_damping = 0.75;
     steer = m_prevSteer * steer_damping + steer * (1 - steer_damping);
@@ -2843,52 +2467,43 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
     double	rslip = hypot(xrslip, yrslip);
     NORM_PI_PI(oangle);
 
-    //	DEBUGF( "   *** pos %7.2f  angle %6.3f\n", pos, angle );
-
     // work out current car speed.
     double	spd0 = hypot(car->_speed_x, car->_speed_y);
     double	acc0 = (spd0 - _lastSpd0) / s->deltaTime;
     _lastSpd0 = spd0;
 
-    static Vec2d prevPos;
-    static Vec2d lastPos;
-    Vec2d currPos = Vec2d(car->pub.DynGCg.pos);
-    Vec2d lastVel = (lastPos - prevPos) / s->deltaTime;
-    Vec2d currVel = (currPos - lastPos) / s->deltaTime;
-    Vec2d currAcc = (currVel - lastVel) / s->deltaTime;
-    Vec2d carDir  = Vec2d(currVel).GetUnit();
-    double carTanAcc = currAcc * carDir;
-    double carLatAcc = currAcc * carDir.GetNormal();
-    double pathLatAcc = spd0 * spd0 * pi.k;
-    double pathFullAcc = sqrt(pathLatAcc * pathLatAcc + pi.acc * pi.acc);
-    LogSHADOW.debug( "[%d, %4d] p.ac %6.2f,%6.2f=%6.2f  c.ac %6.2f,%6.2f=%6.2f fsl %6.3f,%6.3f=%6.3f  rsl %6.3f,%6.3f=%6.3f\n",
-                     car->index, pi.idx,
-                     pi.acc, pathLatAcc, pathFullAcc,
-                     carTanAcc, carLatAcc, currAcc.len(),
-                     xfslip, yfslip, fslip, xrslip, yrslip, rslip );
-    prevPos = lastPos;
-    lastPos = currPos;
+    {
+        static Vec2d prevPos;
+        static Vec2d lastPos;
+        Vec2d currPos = Vec2d(car->pub.DynGCg.pos);
+        Vec2d lastVel = (lastPos - prevPos) / s->deltaTime;
+        Vec2d currVel = (currPos - lastPos) / s->deltaTime;
+        Vec2d currAcc = (currVel - lastVel) / s->deltaTime;
+        Vec2d carDir  = Vec2d(currVel).GetUnit();
+        double carTanAcc = currAcc * carDir;
+        double carLatAcc = currAcc * carDir.GetNormal();
+        double pathLatAcc = spd0 * spd0 * pi.k;
+        double pathFullAcc = sqrt(pathLatAcc * pathLatAcc + pi.acc * pi.acc);
+        LogSHADOW.debug( "[%d, %4d] p.ac %6.2f,%6.2f=%6.2f  c.ac %6.2f,%6.2f=%6.2f fsl %6.3f,%6.3f=%6.3f  rsl %6.3f,%6.3f=%6.3f\n",
+                         car->index, pi.idx,
+                         pi.acc, pathLatAcc, pathFullAcc,
+                         carTanAcc, carLatAcc, currAcc.len(),
+                         xfslip, yfslip, fslip, xrslip, yrslip, rslip );
+        prevPos = lastPos;
+        lastPos = currPos;
+    }
 
-    const CarModel& cm = m_cm[PATH_NORMAL];
-    double	opLoad = cm.MASS * G;
-    const Path::PathPt& pp = m_path[PATH_NORMAL].GetAt(pi.idx);
-    double	load = cm.calcPredictedLoad(spd0, 1.0, cm.CA, pi.k, pp.kz, pp.kv, sin(pp.ar), cos(pp.ar), cos(pp.ap));
-    double	sysLoad = car->priv.reaction[0] + car->priv.reaction[1] + car->priv.reaction[2] + car->priv.reaction[3];
-    LogSHADOW.debug( "[%d] load ratio %g %g path speed %g  overspeed %g  offset to path %g  engine acc %g\n",
-                     pi.idx, load / opLoad, sysLoad / opLoad, pi.spd, spd0 - pi.spd, pi.offs + car->pub.trkPos.toMiddle,
-                     cm.AccForceFromSpeed(pp.accSpd) / (cm.MASS + cm.FUEL) );
+    {
+        const CarModel& cm = m_cm[PATH_NORMAL];
+        double	opLoad = cm.MASS * G;
+        const Path::PathPt& pp = m_path[PATH_NORMAL].GetAt(pi.idx);
+        double	load = cm.calcPredictedLoad(spd0, 1.0, cm.CA, pi.k, pp.kz, pp.kv, sin(pp.ar), cos(pp.ar), cos(pp.ap));
+        double	sysLoad = car->priv.reaction[0] + car->priv.reaction[1] + car->priv.reaction[2] + car->priv.reaction[3];
+        LogSHADOW.debug( "[%d] load ratio %g %g path speed %g  overspeed %g  offset to path %g  engine acc %g\n",
+                pi.idx, load / opLoad, sysLoad / opLoad, pi.spd, spd0 - pi.spd, pi.offs + car->pub.trkPos.toMiddle,
+                cm.AccForceFromSpeed(pp.accSpd) / (cm.MASS + cm.FUEL) );
+    }
 
-
-    //	PRINTF( "[%d] eo%6.2f  ea%6.1f  es %6.2f  acc%6.2f  pa%6.2f fsl %6.3f,%6.3f=%6.3f  rsl %6.3f,%6.3f=%6.3f\n",
-    //			car->index, offset, oangle * 180 / PI, ospeed, acc0, pi.acc, xfslip, yfslip, fslip, xrslip, yrslip, rslip );
-
-    //	PRINTF( "[%d] a(x%6.2f c%6.2f p%6.2f t%6.2f) dspd%8.3f; yo%6.3f xfs; %6.3f; fs; %6.3f; rs; %6.3f; a-b; %5.3f %5.3f\n",
-    //			car->index, car->pub.DynGC.acc.x, acc0, m_cm[PATH_NORMAL].ACC_L.x, pi.acc,
-    //			car->pub.speed - pi.spd, pi.offs + car->pub.trkPos.toMiddle, xfslip, fslip, rslip,
-    //			car->ctrl.accelCmd, car->ctrl.brakeCmd );
-    /*	PRINTF( "[%d] react: %4.0f, %4.0f\n",
-            car->index, car->_reaction[0] + car->_reaction[1], car->_reaction[2] + car->_reaction[3] );
-*/
     double	targetSpd = pi.spd;
     double	targetAcc = pi.acc;
     double	avoidTargetSpd = pi.spd;
@@ -2902,17 +2517,17 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
     if( car->pub.speed > avoidTargetSpd && targetSpd > avoidTargetSpd )
     {
         LogSHADOW.debug( "[%d] slowing for avoidance.  curr %g  targ %g  avoid spd %g, avoid acc %g, curr acc %g\n",
-                         car->index, car->pub.speed, targetSpd, avoidTargetSpd, avoidTargetAcc, car->pub.DynGC.acc.x );
+                car->index, car->pub.speed, targetSpd, avoidTargetSpd, avoidTargetAcc, car->pub.DynGC.acc.x );
         slowing = true;
     }
+
 
     targetSpd = avoidTargetSpd;
     targetAcc = avoidTargetAcc;
 
-#if 1
     //
     // steer into the skid
-    if( !m_pitControl.WantToPit())
+    if( !m_Strategy.WantToPit())
     {
         double skidfactor = (m_avoidS != 1 ? m_priv[PATH_NORMAL].SKID_FACTOR_TRAFFIC :
                                              m_priv[PATH_NORMAL].SKID_FACTOR);
@@ -2930,7 +2545,6 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
         {
             static double last_srslip[MAX_MOD_ITF] = {0};
 
-            //			const double slip_limit = 0.15;
             const double slip_limit  = m_priv[PATH_NORMAL].REAR_LAT_SLIP_LIMIT;
             const double slip_factor = m_priv[PATH_NORMAL].REAR_LAT_SLIP_FACTOR;
             const double slip_dscale = m_priv[PATH_NORMAL].REAR_LAT_SLIP_DSCALE;
@@ -2943,35 +2557,32 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
             if( rslip > slip_limit && fabs(yrslip) > slip_limit * 0.5 )
             {
                 double slip_delta = yrslip > 0 ? rslip - slip_limit : slip_limit - rslip;
-                //PRINTF( "slip delta %g\n", slip_delta );
-                steer += atan(slip_delta) * slip_factor;// * 0.01;
+                steer += atan(slip_delta) * slip_factor;
             }
         }
     }
-#endif
 
-    //	DEBUGF( "   *** pos %7.2f  angle %6.3f\n", pos, angle );
-    Vec2d	thisPt(car->_pos_X, car->_pos_Y);
-    if( (thisPt - m_lastPts[0]).len() > 0.1 &&
-            car->ctrl.accelCmd == 1.0 )
     {
-        double	x[2];
-        x[0] = Utils::CalcCurvature(m_lastPts[0], m_lastPts[HIST / 2], thisPt);
-        x[0] = fabs(x[0]);
-        x[1] = m_lastSpd;
-        m_steerGraph.Learn( x, fabs(m_lastAng) );
-        //			DEBUGF( "*** Learn %8.6f, %5.2f -> %8.6f  \n",
-        //					x[0], m_lastSpd, fabs(m_lastAng) );
-    }
+        Vec2d	thisPt(car->_pos_X, car->_pos_Y);
+        if( (thisPt - m_lastPts[0]).len() > 0.1 &&
+                car->ctrl.accelCmd == 1.0 )
+        {
+            double	x[2];
+            x[0] = Utils::CalcCurvature(m_lastPts[0], m_lastPts[HIST / 2], thisPt);
+            x[0] = fabs(x[0]);
+            x[1] = m_lastSpd;
+            m_steerGraph.Learn( x, fabs(m_lastAng) );
+        }
 
-    for( int i = 0; i + 1 < HIST; i++ )
-    {
-        m_lastPts[i] = m_lastPts[i + 1];
-    }
+        for( int i = 0; i + 1 < HIST; i++ )
+        {
+            m_lastPts[i] = m_lastPts[i + 1];
+        }
 
-    m_lastPts[HIST - 1] = thisPt;
-    m_lastSpd = spd0;
-    m_lastAng = m_lastAng * 0.75 + angle * 0.25;
+        m_lastPts[HIST - 1] = thisPt;
+        m_lastSpd = spd0;
+        m_lastAng = m_lastAng * 0.75 + angle * 0.25;
+    }
 
     const double G = 9.81;
 
@@ -2979,61 +2590,21 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
     string	accWho = "none";
     double	brk = 0;
 
-    //	DEBUGF( "$$ tv=%5.1f - %5.1f == %5.1f  acc=%5.1f  slip=%5.2f,%5.2f  zf=%5.2f\n",
-    //			targetSpd, spd0, targetSpd - spd0, car->pub.DynGC.acc.x,
-    //			car->priv.wheel[2].slipAccel, car->priv.wheel[2].slipSide, car->priv.reaction[2] );
     int spdCtrl = m_priv[PATH_NORMAL].SPDC_NORMAL;
-    bool traffic = close;
-
+    bool traffic = close;// || m_Strategy.WantToPit();
     if( traffic )
         spdCtrl = m_priv[PATH_NORMAL].SPDC_TRAFFIC;
 
-    //	if( car->race.distRaced > 310 )
-    //		spdCtrl = 8;
-
-    //	double xslipf0 = (m_cm[PATH_NORMAL].wheel(0).slipX() + m_cm[PATH_NORMAL].wheel(1).slipX()) * 0.5;
-    //	double yslipf0 = (m_cm[PATH_NORMAL].wheel(0).slipY() + m_cm[PATH_NORMAL].wheel(1).slipY()) * 0.5;
-    //	double slipf0  = hypot(xslipf0, yslipf0);
-    //	SpeedControl( spdCtrl, targetSpd, spd0, targetAcc, acc0, xslipf0, slipf0, pi.k, car, acc, brk, traffic );
     SpeedControl( spdCtrl, targetSpd, spd0, targetAcc, acc0, fslip, xfslip, rslip, pi.k, car, acc, brk, traffic );
     accWho = "speed control";
-
-    LogSHADOW.debug( "speed control[%d]: acc %0.3f  brk %0.3f :: fslip %0.3f  rslip %0.3f :: fxslip %0.3f  rxslip %0.3f\n",
-                     spdCtrl, acc, brk, fslip, rslip, xfslip, xrslip );
 
     if( lapper )
     {
         acc = MN(acc, 0.6);
         accWho = "being lapped";
     }
-    /*
-    DEBUGF( "### (%8.3f, %8.3f)  (%8.3f, %8.3f)\n",
-            car->priv.wheel[2].slipSide,
-            car->priv.wheel[2].slipAccel,
-            car->priv.wheel[3].slipSide,
-            car->priv.wheel[3].slipAccel  );
-*/
-#if 0
-    const double TCL_SLIP  = 8;
-    const double TCL_RANGE = 8;
-    double drivenWheelSpeed = (car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) * car->_wheelRadius(REAR_LFT) / 2.0;
-    double slip = drivenWheelSpeed - car->_speed_x;
-    double min_slip = (car->_speed_x > 10.0f ? TCL_SLIP : TCL_RANGE/10);
-    if (slip > min_slip)
-    {
-        float friction = MIN(car->_wheelSeg(REAR_RGT)->surface->kFriction, car->_wheelSeg(REAR_LFT)->surface->kFriction);
-        if (friction >= 0.95f)
-            friction = pow(friction+0.06f, 3.0f);
-        else
-            friction = pow(friction, 3.0f);
-        float this_slip = MIN(TCL_RANGE, (TCL_RANGE/2) * friction);
-        acc = MIN(acc, 1.0f - MIN(0.95f, (slip - min_slip) / TCL_RANGE));
-    }
-#endif
-#if 1	// traction control.
-    {
-        //		double delta = -(car->priv.wheel[2].slipAccel + car->priv.wheel[3].slipAccel) / 2;
 
+    {
         double w1_speed = car->priv.wheel[0].spinVel * car->info.wheel[0].wheelRadius;
         double w2_speed = car->priv.wheel[1].spinVel * car->info.wheel[1].wheelRadius;
         double w3_speed = car->priv.wheel[2].spinVel * car->info.wheel[2].wheelRadius;
@@ -3066,7 +2637,6 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
                 accWho = "braking";
             }
         }
-
         if( s->currentTime < 0 )
         {
             acc = 1.0;
@@ -3074,36 +2644,22 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
             car->ctrl.clutchCmd = 1.0;
             accWho = "before start";
         }
-
-        //		PRINTF( "[%5.2f]%d brk %.2f%c  acc %.2f  tca %.2f  acc.x %6.3f  targ %6.3f  mx.sp %6.3f  av.sp %6.3f  "
-        //				"sxL %6.3f  sxR %6.3f\n",
-        //				s->currentTime, spdCtrl, brk, brk == 0 ? 'z' : 'n', acc, _tctrlAcc, car->pub.DynGC.acc.x, targetSpd, max_spin_speed,
-        //				avg_spin_speed, m_cm[PATH_NORMAL].wheel(2).slipX(), m_cm[PATH_NORMAL].wheel(3).slipX() );
     }
-#endif
 
     double	delta = pi.offs + car->_trkPos.toMiddle;
-    //	if( acc == 1.0 && car->_speed_y * delta > 0 &&
-    //		car->_speed_x > 0 && fabs(car->_speed_y / car->_speed_x) > 0.1 )
-    //		acc = 0.95;
 
-    //	acc = 1.0;
-    //	brk = 0;
     // out of control??
     double	skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
     NORM_PI_PI(skidAng);
-
     if( spdCtrl != 8 )
     {
-        if( /*brk == 0 &&*/ car->_speed_x > 5 && fabs(skidAng) > 0.2 )
+        if( car->_speed_x > 5 && fabs(skidAng) > 0.2 )
         {
-            //		DEBUGF( "******* skidAng %g    x_spd %g    ratio %g\n",
-            //				skidAng, car->_speed_x, car->_speed_y / car->_speed_x );
             acc = MN(acc, 0.25 + 0.75 * cos(skidAng));
             accWho = "skidding";
         }
 
-        if( /*brk != 0 &&*/ car->_speed_x > 5 )
+        if( car->_speed_x > 5 )
         {
             skidAng = MN(skidAng * 2, PI);
             brk *= MX(0, fabs(cos(skidAng)));
@@ -3119,13 +2675,6 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
         acc = MN(mx, acc);
         accWho = "too far off line";
     }
-
-    //	DEBUGF( "****** slip %6.3f m/s    sy %6.3f\n", spd0 * sin(skidAng),
-    //				sin(skidAng) );
-    //	if( fabs(sin(skidAng)) > 0.125 )
-    //		acc = MN(acc, 0.2);
-
-    //	DEBUGF( "acc %g  brk %g\n", acc, brk );
 
     if( car->ctrl.clutchCmd > 0 )
     {
@@ -3147,7 +2696,7 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
         double	gr = car->_gearRatio[car->_gear + car->_gearOffset];
         double	rpmForSpd = gr * car->_speed_x / wr;
         double	rpm = car->_enginerpm;
-        //		DEBUGF( "RPM %3.0f  RPM2 %3.0f  %g\n", rpm, rpmForSpd, rpmForSpd / rpm );
+
 
         const float dec = 0.02f;
         if( car->ctrl.clutchCmd > dec * 7.5f )
@@ -3208,25 +2757,18 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
 
     if( fabs(pi.offs) > 5 )
     {
-        //		acc = MN(acc, 0.25);
     }
 
     double	toL = pi.toL - car->_trkPos.toMiddle;
     double	toR = pi.toR + car->_trkPos.toMiddle;
-    //	DEBUGF( "toL %g   toR %g\n", toL, toR );
+
     if( toL < -1 || toR < -1 )
     {
-        // off track.
-        //		acc = MN(acc, 0.2);
     }
 
     if( car->ctrl.accelCmd == 1 && car->ctrl.brakeCmd == 0 )
     {
         m_maxAccel.Learn( car->_speed_x, car->_accel_x );
-        //		DEBUGF( "%4.1f %4.1f ", car->_speed_x, car->_accel_x );
-        //		for( int i = 0; i < 12; i++ )
-        //			DEBUGF( " %4.1f", m_maxAccel.GetY(i) );
-        //		DEBUGF( "\n" );
     }
 
     if( fabs(pi.k * spd0 - car->_yaw_rate) < 0.02 )
@@ -3244,76 +2786,59 @@ void	TDriver::Drive( int index, tCarElt* car, tSituation* s )
             m_angle[s][k] += ae * 0.1;
             ae = m_angle[s][k] - ang;
         }
-
-        //		DEBUGF( "Steady state  s %.1f, k %.6f, a %.4f  ae %.4f  o %g\n",
-        //				spd0, pi.k, ang, ae, pi.offs + car->_trkPos.toMiddle );
     }
 
     if( spdCtrl != 5 && spdCtrl != 6 && spdCtrl != 7 && spdCtrl != 8 )
         brk = ApplyAbs(car, brk);
-    //	acc = ApplyTractionControl(car, acc);
 
-    //	if( car->_speed_x > 10 )
-    //		acc = 0.0;
-
-    //	DEBUGF( "accel cmd: %.2f    steer ang: %.3f\n", acc, steer * car->_steerLock * 180 / PI );
-    /*
-    if( car->race.laps > 1 && pi.idx >= 330 )
-    {
-        acc = 0.0;
-        brk = 1.0;
-    }
-*/
-    //	PRINTF( "acc: %5.3f  reason: %s\n", acc, accWho.c_str() );
     // set up the values to return
     car->ctrl.steer = steer;
     car->ctrl.gear = gear;
     car->ctrl.accelCmd = acc;
-    //	car->ctrl.accelCmd = brk > 0 ? MN(acc, 0.2) : acc;
     car->ctrl.brakeCmd = brk;
 
     ////if( car->race.laps > 3 )
     bool doStuckThing = true;
     if( Pitting(car) )
     {
-        //		const TeamInfo::Item* pTeamMateInfo = m_pShared->m_teamInfo.GetTeamMate(car);
-        //		if( pTeamMateInfo != NULL && (pTeamMateInfo->pCar->pub.state & RM_CAR_STATE_PIT) )
         doStuckThing = false;
     }
     if( doStuckThing )
         m_stuckThing.execute( m_track, s, car, mySit );
 
-    m_pitControl.Process( car, m_pShared->m_teamInfo.GetAt(car->index) );
-
-    //	PRINTF( "[%d] final control : accel %0.3f  brake %0.3f  clutch %0.3f  gear %d  steer %0.3f  [%8.1fm]\n",
-    //			car->index, car->ctrl.accelCmd, car->ctrl.brakeCmd, car->ctrl.clutchCmd, car->ctrl.gear, car->ctrl.steer,
-    //			car->race.distRaced );
-
-    //	DEBUGF( "%g %g %g\n", car->priv.wheel[0].Fx, car->priv.wheel[0].Fy, car->priv.wheel[0].Fz );
-    //	DEBUGF( "%g %g %08x\n", car->priv.wheel[0].slipSide, car->priv.wheel[0].slipAccel, car->priv.wheel[0].seg );
-    //	DEBUGF( "%d %g %g --  \r", pi.idx, car->_pos_X, car->_pos_Y );
+    m_Strategy.Process( car, m_pShared->m_teamInfo.GetAt(car->index) );
 }
 
 // Pitstop callback.
-int		TDriver::PitCmd( int index, tCarElt* car, tSituation* s )
+int		Driver::PitCmd( int index, tCarElt* car, tSituation* s )
 {
-    m_pitControl.Process( car, m_pShared->m_teamInfo.GetAt(car->index) );
+    m_Strategy.Process( car, m_pShared->m_teamInfo.GetAt(car->index) );
+
     return false;
 }
 
 
 // End of the current race.
-void	TDriver::EndRace( int index, tCarElt* car, tSituation* s )
+void	Driver::EndRace( int index, tCarElt* car, tSituation* s )
 {
 }
 
 
 // Called before the module is unloaded.
-void	TDriver::Shutdown( int index )
+void	Driver::Shutdown( int index )
 {
+    // dump out some interesting info....
+    //	const int	NSEG = m_track.GetSize();
+    //	{for( int i = 0; i < NSEG; i++ )
+    //	{
+    //		DEBUGF( "dist %7.1f  spd %7.1f  rec %7.1f\n",
+    //				m_track[i].segDist,
+    //				m_path[PATH_NORMAL].GetAt(i).spd,
+    //				m_oppPath[m_myOppIdx].GetAt(i).avgV );
+    //	}}
 }
 
-void	TDriver::AvoidOtherCars(
+void	Driver::AvoidOtherCars(
         int					index,
         const tCarElt*		car,
         const tSituation*	s,
@@ -3395,33 +2920,17 @@ void	TDriver::AvoidOtherCars(
             if( oi.flags & (Opponent::F_COLLIDE | Opponent::F_CATCHING |
                             Opponent::F_CATCHING_ACC) )
             {
-                //				DEBUGF( "*** flags " );
-                //				if( oi.GotFlags(Opponent::F_COLLIDE) )		DEBUGF( "COLLIDE " );
-                //				if( oi.GotFlags(Opponent::F_CATCHING) )		DEBUGF( "CATCH " );
-                //				if( oi.GotFlags(Opponent::F_CATCHING_ACC) )	DEBUGF( "CATCH_A " );
-                //				if( oi.GotFlags(Opponent::F_CLOSE) )		DEBUGF( "CLOSE " );
-                //				DEBUGF( "\n" );
-                //				DEBUGF( "t %g   catchY %g  catchSpd %g  catchDec %g\n",
-                //						oi.catchTime, oi.catchY, oi.catchSpd, oi.catchDecel );
             }
 
             bool dangerous = oi.GotFlags(Opponent::F_DANGEROUS);
-            if( oi.GotFlags(Opponent::F_COLLIDE) &&
-                    //				oi.catchTime < 3 && fabs(oi.catchY) < oi.sit.minDY )
-                    //				oi.catchDecel > 5 & fabs(oi.catchY) < oi.sit.minDY )
-                    //				(dangerous ||
-                    //				 oi.catchDecel > 12.5 * car->_trkPos.seg->surface->kFriction) )
-                    true )
+            if( oi.GotFlags(Opponent::F_COLLIDE) && true )
             {
-                PRINTF( "[%d] catching: (%s) cdec %g (dgr %d), cspd %g (in %g s)\n",
-                        car->index, oCar->info.name, oi.catchDecel, dangerous, oi.catchSpd, oi.catchTime );
+                LogSHADOW.debug( "[%d] catching: (%s) cdec %g (dgr %d), cspd %g (in %g s)\n",
+                                 car->index, oCar->info.name, oi.catchDecel, dangerous, oi.catchSpd, oi.catchTime );
 
                 // this is a really shitty estimate of the speed we need to be going
                 // to slow down for the being caught ahead... would really like to work out a better
                 // way.
-                //				ai.spdF = MN(ai.spdF, oi.catchSpd);
-                //				ai.accF = MN(ai.accF, -oi.catchDecel);
-
                 bool followingClosely = oi.sit.rdPX > 0 &&
                         oi.sit.rdPX < oi.sit.minDXa + 3 &&
                         fabs(oi.sit.rdPY) < oi.sit.minDY;
@@ -3429,24 +2938,21 @@ void	TDriver::AvoidOtherCars(
                 bool dangerous = oi.GotFlags(Opponent::F_DANGEROUS);
                 const double MIN_DECEL = 15.0;
                 double decel =  (car->pub.speed - oi.catchSpd) / MX(oi.catchTime, 0.1);
-                PRINTF( "[%d] catching: (%s) decel %g (dgr %d)\n", car->index, oCar->info.name, oi.catchDecel, dangerous );
-                PRINTF( "[%d] catching: (%s) path spd: %g (%g) %g  path acc: %g (%g) %g\n",
-                        car->index, oCar->info.name, oi.sit.pi.spd, oi.sit.pi.spd - oCar->pub.DynGC.vel.x, oCar->pub.DynGC.vel.x,
-                        oi.sit.pi.acc, oi.sit.pi.acc - oCar->pub.DynGC.acc.x, oCar->pub.DynGC.acc.x );
+                LogSHADOW.debug( "[%d] catching: (%s) decel %g (dgr %d)\n", car->index, oCar->info.name, oi.catchDecel, dangerous );
+                LogSHADOW.debug( "[%d] catching: (%s) path spd: %g (%g) %g  path acc: %g (%g) %g\n",
+                                 car->index, oCar->info.name, oi.sit.pi.spd, oi.sit.pi.spd - oCar->pub.DynGC.vel.x, oCar->pub.DynGC.vel.x,
+                                 oi.sit.pi.acc, oi.sit.pi.acc - oCar->pub.DynGC.acc.x, oCar->pub.DynGC.acc.x );
                 if( decel > MIN_DECEL || dangerous || followingClosely )
-                    //				if( dangerous || oi.catchTime < 1.25 ||
-                    //					oCar->pub.DynGC.vel.x < oi.sit.pi.spd - 10 )
-                    //				if( oi.sit.rdPX < 10 || dangerous )
                 {
                     double decelSpeed = MX(oi.catchSpd, car->pub.speed - 2 * s->deltaTime * decel);
                     if( dangerous )
                         decelSpeed = oi.catchSpd;
-                    PRINTF( "[%d] catching: (%s) myspd %g, decel spd %g, hisspd %g, catch (time %g  spd %g  dec %g)\n",
-                            car->index, oCar->info.name, car->pub.speed, decelSpeed, oCar->pub.speed, oi.catchTime, oi.catchSpd, oi.catchDecel );
+                    LogSHADOW.debug( "[%d] catching: (%s) myspd %g, decel spd %g, hisspd %g, catch (time %g  spd %g  dec %g)\n",
+                                     car->index, oCar->info.name, car->pub.speed, decelSpeed, oCar->pub.speed, oi.catchTime, oi.catchSpd, oi.catchDecel );
                     if( car->pub.speed > decelSpeed )
-                        PRINTF( "[%d] slowing to avoid car: (%s) spd=%g\n",
-                                car->index, oCar->info.name, oCar->pub.speed );
-                    //					ai.spdF = MN(ai.spdF, decelSpeed);
+                        LogSHADOW.debug( "[%d] slowing to avoid car: (%s) spd=%g\n",
+                                         car->index, oCar->info.name, oCar->pub.speed );
+
                     ai.spdF = MN(ai.spdF, oi.catchSpd);
                     ai.accF = MN(ai.accF, -oi.catchDecel);
                 }
@@ -3454,11 +2960,14 @@ void	TDriver::AvoidOtherCars(
 
             if( oi.flags & (Opponent::F_COLLIDE | Opponent::F_CATCHING) )
                 minCatchTime = MN(minCatchTime, oi.catchTime);
+
             if( oi.flags & Opponent::F_CATCHING_ACC )
                 minCatchAccTime = MN(minCatchAccTime, oi.catchAccTime);
+
             if( oi.sit.rdVX < 0 )
             {
                 double	vCatTime = -(oi.sit.rdPX - oi.sit.minDXa) / oi.sit.rdVX;
+
                 if( vCatTime > 0 )
                     minVCatTime = MN(minVCatTime, vCatTime);
             }
@@ -3466,7 +2975,6 @@ void	TDriver::AvoidOtherCars(
             bool	ignoreTeamMate = oi.GotFlags(Opponent::F_TEAMMATE) &&
                     (car->_laps < oCar->_laps ||
                      car->_dammage + 200 >= oi.tmDamage);
-            //ignoreTeamMate = true;
 
             oi.avoidLatchTime = MX(0, oi.avoidLatchTime - s->deltaTime);
 
@@ -3478,32 +2986,23 @@ void	TDriver::AvoidOtherCars(
                     oi.catchTime    < colTime && fabs(oi.catchY)    < 5 && oi.GotFlags(Opponent::F_COLLIDE)  ||
                     oi.catchTime    < catTime && fabs(oi.catchY)    < 5 && oi.GotFlags(Opponent::F_CATCHING) ||
                     oi.catchAccTime < cacTime && fabs(oi.catchAccY) < 5 && oi.GotFlags(Opponent::F_CATCHING_ACC);
-            if( !ignoreTeamMate &&
-                    //				oi.catchTime < 10 &&
-                    //				(oi.GotFlags(Opponent::F_CATCHING) ||
-                    //				 oi.GotFlags(Opponent::F_CATCHING_ACC)) )
-                    (//oi.GotFlags(Opponent::F_CLOSE) ||
-                     oi.avoidLatchTime > 0 || catching ||
-                     oi.GotFlags(Opponent::F_DANGEROUS)) )
+            if(( !ignoreTeamMate && oi.avoidLatchTime > 0 )|| catching || oi.GotFlags(Opponent::F_DANGEROUS))
             {
-                DEBUGF( "%.3f catch %d (dgr %d)  catch[%d%d t %.3f y %.4g]  acc[%d t %.3f y %.4g]\n",
-                        oi.avoidLatchTime, catching, oi.GotFlags(Opponent::F_DANGEROUS),
-                        oi.GotFlags(Opponent::F_CATCHING), oi.GotFlags(Opponent::F_COLLIDE), oi.catchTime, oi.catchY,
-                        oi.GotFlags(Opponent::F_CATCHING_ACC), oi.catchAccTime, oi.catchAccY );
+                LogSHADOW.debug( "%.3f catch %d (dgr %d)  catch[%d%d t %.3f y %.4g]  acc[%d t %.3f y %.4g]\n",
+                                 oi.avoidLatchTime, catching, oi.GotFlags(Opponent::F_DANGEROUS),
+                                 oi.GotFlags(Opponent::F_CATCHING), oi.GotFlags(Opponent::F_COLLIDE), oi.catchTime, oi.catchY,
+                                 oi.GotFlags(Opponent::F_CATCHING_ACC), oi.catchAccTime, oi.catchAccY );
                 double	toL, toR;
                 GetPathToLeftAndRight( oCar, toL, toR );
                 toL += oi.sit.tVY * oi.catchTime;
                 toR -= oi.sit.tVY * oi.catchTime;
-                bool	spaceL = toL > oi.sit.minDY;// + 0.25;
-                bool	spaceR = toR > oi.sit.minDY;// + 0.25;
+                bool	spaceL = toL > oi.sit.minDY;
+                bool	spaceR = toR > oi.sit.minDY;
                 bool	avoidL = oi.sit.rdPY < 0 && spaceR;
                 bool	avoidR = oi.sit.rdPY > 0 && spaceL;
 
                 if( catching )
                     oi.avoidLatchTime = fabs(k) < maxSpdK ? 0.5 : 0.1;
-
-                //				bool	avoidL = oi.sit.rdPY < -oi.sit.minDY && spaceR;
-                //				bool	avoidR = oi.sit.rdPY >  oi.sit.minDY && spaceL;
 
                 if( fabs(k) < maxSpdK )
                 {
@@ -3512,40 +3011,22 @@ void	TDriver::AvoidOtherCars(
                         avoidL = !spaceL && spaceR;
                         avoidR = !spaceR && spaceL;
                     }
-                    /*					if( spaceL && spaceR )
-                    {
-                        if( oi.sit.rdPY < -oi.sit.minDY )
-                            avoidR = true;
-                        else if( oi.sit.rdPY >  oi.sit.minDY )
-                            avoidL = true;
-                        else if( spaceL && spaceR )
-                        {
-                            avoidL = toL < toR;
-                            avoidR = !avoidL;
-                        }
-                    }*/
                 }
-
-                //				bool	avoidL = oi.sit.rdPY < 0 && oCar->pub.trkPos.toRight > 4.0 ||
-                //								 oi.sit.rdPY > 0 && oCar->pub.trkPos.toLeft  < 4.0;
-                //				bool	avoidL = oi.sit.offs < 0;
 
                 if( avoidL )
                 {
                     ai.avoidAhead |= Opponent::F_LEFT;
-                    //					ai.aheadSpan.ExcludeLeftOf(-oCar->_trkPos.toMiddle + oi.sit.minDY);
                 }
+
                 if( avoidR )
                 {
                     ai.avoidAhead |= Opponent::F_RIGHT;
-                    //					ai.aheadSpan.ExcludeRightOf(-oCar->_trkPos.toMiddle - oi.sit.minDY);
                 }
 
                 if( avoidL )
-                    //					minLDist = MN(oi.sit.rdPX, minLDist);
                     ai.minLDist = MN(oi.sit.ragVX, ai.minLDist);
+
                 if( avoidR )
-                    //					minRDist = MN(oi.sit.rdPX, minRDist);
                     ai.minRDist = MN(oi.sit.ragVX, ai.minRDist);
             }
         }
@@ -3559,12 +3040,10 @@ void	TDriver::AvoidOtherCars(
             if( oi.sit.rdPY < 0 )
             {
                 ai.minLSideDist = MN(ai.minLSideDist, -oi.sit.rdPY - oi.sit.minDY);
-                //				ai.sideSpan.ExcludeLeftOf(-oCar->_trkPos.toMiddle + oi.sit.minDY);
             }
             else
             {
                 ai.minRSideDist = MN(ai.minRSideDist,  oi.sit.rdPY - oi.sit.minDY);
-                //				ai.sideSpan.ExcludeRightOf(-oCar->_trkPos.toMiddle - oi.sit.minDY);
             }
 
         }
@@ -3585,16 +3064,7 @@ void	TDriver::AvoidOtherCars(
                 car->_laps == oCar->_laps &&
                 car->_dammage > oi.tmDamage + 300 &&
                 ai.nearbyCars <= 1;
-        /*
-        if( STAY_TOGETHER > 50 &&
-            oi.GotFlags(Opponent::F_TEAMMATE | Opponent::F_REAR) &&
-            oi.sit.relPos < -25 && oi.sit.relPos > -STAY_TOGETHER &&
-            car->_dammage + 2000 > oi.tmDamage )
-        {
-//			treatTeamMateAsLapper = true;
-            lapper = true;
-        }
-*/
+
         if( oi.GotFlags(Opponent::F_LAPPER) || treatTeamMateAsLapper )
         {
             int	av = oi.sit.rdPY < 0 ? Opponent::F_LEFT : Opponent::F_RIGHT;
@@ -3615,9 +3085,11 @@ void	TDriver::AvoidOtherCars(
     {
         int	idx = (carIdx + i) % NSEG;
         double	thisK = m_path[PATH_NORMAL].GetAt(idx).k;
+
         if( fabs(thisK) > 0.01 )
         {
             ai.nextK = thisK;
+
             break;
         }
     }
@@ -3625,76 +3097,36 @@ void	TDriver::AvoidOtherCars(
     Avoidance avoidance;
     Vec2d	target = avoidance.calcTarget(ai, car, *this);
 
-    //	target.x = 1;
-    //	target.y = 1;
-
-    //	DEBUGF( "tx %g  ty %g\n", target.x, target.y );
-    //	DEBUGF( "****** avoid: %d%d%d  k %6.3f  nextK %6.3f  (%.2f,%.2f)  target: %6.3f\n",
-    //			ai.avoidToSide, ai.avoidLapping, ai.avoidAhead, ai.k, ai.nextK,
-    //			m_avoidS, m_avoidT, target );
-
     *carTargetSpd = MN(*carTargetSpd, ai.spdF);
     *carTargetAcc = MN(*carTargetAcc, ai.accF);
     *close = (ai.flags & Opponent::F_CLOSE) != 0;
-    //	lapper = ai.avoidLapping != 0;
 
     if( m_flying || s->currentTime < START_HOLD_LINE_TIME )
         return;
 
-    //	double	w = width;
-    //	double	w = m_priv[PATH_NORMAL].AVOID_WIDTH * 2 + width;
     double	w = 7.5;
     double	scale = 25.0 / w;
-    //	scale *= (w * 0.5 + 1) / (m_priv[PATH_NORMAL].AVOID_WIDTH * 2 + w * 0.5);
     double	avoidSMaxA = 0.00075 * scale;
     double	avoidSMaxV = 0.005 * scale;
-    //	double	avoidSMaxA = 0.00025 * scale;
-    //	double	avoidSMaxV = 0.0015 * scale;
-
-    //	double	avoidTMaxA = 0.0002;
     double	avoidTMaxA = 0.0003 * scale;
-    //	double	avoidTMaxA = 0.001 * scale;
     double	avoidTMaxV = 0.2 * scale;
 
-    //	avoidSMaxA *= 0.5;
-    //	avoidSMaxV *= 0.5;
-    //	avoidTMaxA *= 0.66;
-    //	avoidTMaxV *= 0.66;
-
-    //	if( avoidToSide && fabs(minSideDist) < 4 )
-    //	{
-    //		avoidMaxA    *= 2;
-    //		avoidMaxVNeg *= 2;
-    //		avoidMaxVPos *= 2;
-    //	}
-
-    /*
-    m_attractor = 0.0;
-    if( m_followPath == PATH_LEFT && m_avoidT <= 0 )
-        m_attractor = -1.0;
-    else if( m_followPath == PATH_RIGHT && m_avoidT >= 0 )
-        m_attractor = 1.0;
-*/
-    //	if( m_avoidT * target >= 0 )
     m_attractor = target.x;
-
-    //	if( m_avoidS == 1 && m_attractor != 0 )
-    //		m_avoidT = m_attractor;
 
     double	targetS = 1 - target.y;
 
-    if( m_avoidS != 1 && m_attractor == 0 || m_avoidS != targetS && m_attractor != 0 )
+    if( m_avoidS != 1 && m_attractor == 0 ||
+            m_avoidS != targetS && m_attractor != 0 )
     {
         targetS = (m_attractor == 0) ? 1 : 0;//0.35;
         double	avoidA = targetS > m_avoidS ? avoidSMaxA : -avoidSMaxA;
-        double	dist = targetS - m_avoidS;
 
+        double	dist = targetS - m_avoidS;
         if( fabs(dist) < 0.0005 )
             m_avoidSVel = 0;
         else
         {
             double	slowS = (m_avoidSVel * m_avoidSVel) / (2 * avoidSMaxA);
-
             if( fabs(dist) <= slowS )
             {
                 avoidA = -(m_avoidSVel * m_avoidSVel) / (2 * dist);
@@ -3716,36 +3148,21 @@ void	TDriver::AvoidOtherCars(
 
     if( m_avoidS < 0.0005 && m_avoidSVel < 0 )
     {
-        //		DEBUGF( "m_avoidS %g (v %g)\n", m_avoidS, m_avoidSVel );
-        //		DEBUGF( "m_avoidS = %g (min limit)\n", 0.0 );
         m_avoidS = 0;
         m_avoidSVel = 0;
     }
     else if( m_avoidS >= 0.9995 && m_avoidSVel > 0 )
     {
-        //		DEBUGF( "m_avoidS = %g (max limit)\n", 1.0 );
         m_avoidS = 1;
-        //		m_avoidT = 0;
         m_avoidSVel = 0;
     }
     else if( oldAvoidS < targetS && m_avoidS >= targetS ||
              oldAvoidS > targetS && m_avoidS <= targetS ||
              fabs(targetS - m_avoidS) < 0.0005 )
     {
-        //		DEBUGF( "m_avoidS = %g (hit target)\n", targetS );
         m_avoidS = targetS;
         m_avoidSVel = 0;
     }
-
-    //	avoidMaxVNeg *= 2;
-    //	avoidMaxVPos *= 2;
-
-    //	m_avoidS = 1;
-    //	DEBUGF( "**** avoidS %g\n", m_avoidS );
-
-    //	DEBUGF( "at %8.5f ts %3.1f as %8.5f asv %8.5f att %5.2f minCat %5.2f/%5.2f/%5.2f\r",
-    //			m_avoidT, targetS, m_avoidS, m_avoidSVel, m_attractor,
-    //			minCatchTime, minCatchAccTime, minVCatTime );
 
     double	attractT = m_attractor;
     double	avoidA = 0;
@@ -3753,20 +3170,15 @@ void	TDriver::AvoidOtherCars(
     if( attractT != m_avoidT )
     {
         double	tMaxA = avoidTMaxA / MX(0.2, 1 - m_avoidS);
-        //		avoidA = attractT > m_avoidT ? avoidTMaxA : -avoidTMaxA;
         avoidA = attractT > m_avoidT ? tMaxA : -tMaxA;
-        //		double	slowA  = -(m_avoidTVel * m_avoidTVel) / (2 * (attractor - m_avoidT));
-        //		if( fabs(slowA) >= avoidMaxA )
-        //			avoidA = SGN(slowA) * avoidMaxA;
-
         double	dist = attractT - m_avoidT;
         double	slowS = (m_avoidTVel * m_avoidTVel) / (2 * avoidTMaxA);
+
         if( dist * m_avoidTVel > 0 && fabs(dist) <= slowS )
         {
             avoidA = -(m_avoidTVel * m_avoidTVel) / (2 * dist);
         }
 
-        //		DEBUGF( "##### avoidA %7.4f   attractor %g\n", avoidA, attractor );
         if( avoidA > avoidTMaxA )
             avoidA = avoidTMaxA;
         else if( avoidA < -avoidTMaxA )
@@ -3780,7 +3192,6 @@ void	TDriver::AvoidOtherCars(
     double	tMaxV = avoidTMaxV / MX(0.2, 1 - m_avoidS);
     double	pos_tMaxV =  tMaxV;
     double	neg_tMaxV = -tMaxV;
-
     if( target.y != 0 &&
             (ai.flags & Opponent::F_DANGEROUS) == 0 &&
             (ai.flags & Opponent::F_TO_SIDE)   == 0 )
@@ -3790,7 +3201,6 @@ void	TDriver::AvoidOtherCars(
             pos_tMaxV = 0;//*= 0.001;
             LogSHADOW.debug( "-- right movement disallowed\n" );
         }
-
         if( k < -0.0025 && mySpd + 3 > pi.spd )
         {
             neg_tMaxV = 0;//*= 0.001;
@@ -3824,78 +3234,59 @@ void	TDriver::AvoidOtherCars(
     }
 
     double	offs = CalcPathOffset(pos, m_avoidS, m_avoidT);
-    //	CalcBestPathUV(pos, offs, m_avoidU, m_avoidV);
-
-    //	PRINTF( "***** targ (%5.2f, %5.2f)  k %9.6f  offs  %5.2f  avS %.3f  avT %.4f  avTV %.5f  avTA %.5f\n",
-    //			target.x, target.y, pi.k, offs - ai.bestPathOffs, m_avoidS, m_avoidT, m_avoidTVel, avoidA );
 }
 
-int		TDriver::CalcGear( tCarElt* car, double& acc )
+int		Driver::CalcGear( tCarElt* car, double& acc )
 {
     if( car->_gear <= 0 )
     {
         return 1;
     }
 
-    //	const int	MAX_GEAR = 7;
     const int	MAX_GEAR = car->_gearNb - 1;
 
-    double	gr_dn = car->_gear > 1 ?
-                car->_gearRatio[car->_gear + car->_gearOffset - 1] :
-            1e5;
+    double	gr_dn = car->_gear > 1 ? car->_gearRatio[car->_gear + car->_gearOffset - 1] : 1e5;
     double	gr_this = car->_gearRatio[car->_gear + car->_gearOffset];
-
     double	wr = (car->_wheelRadius(2) + car->_wheelRadius(3)) / 2;
     double	rpm = gr_this * car->_speed_x / wr;
-    //	double	rpm = car->_enginerpm;
-
     double	rpmUp = m_gearUpRpm;
     double	rpmDn = rpmUp * gr_this * 0.95 / gr_dn;
-
-    //	DEBUGF( "gear %d    rpm %6.1f %6.1f    dist %6.1f  up dist %6.1f   down dist %6.1f\n",
-    //		car->_gear, rpm, car->_enginerpm, grDist, upDist, dnDist );
 
     if( car->_gear < MAX_GEAR && rpm > rpmUp )
     {
         car->ctrl.clutchCmd = 0.5;//1.0;
-        //		acc = 0.5;
+
         return car->_gear + 1;
     }
     else if( car->_gear > 1 && rpm < rpmDn )
     {
         car->ctrl.clutchCmd = 1.0;
-        //		acc = 1.0;
+
         return car->_gear - 1;
     }
 
     return car->_gear;
 }
 
-double	TDriver::ApplyAbs( tCarElt* car, double brake )
+double	Driver::ApplyAbs( tCarElt* car, double brake )
 {
     if( car->_speed_x < 10 )
         return brake;
 
     double	slip = 0.0;
-
     for( int i = 0; i < 4; i++ )
         slip += car->_wheelSpinVel(i) * car->_wheelRadius(i) / car->_speed_x;
-
     slip /= 4.0;
 
-    //	if( slip < 0.9 )//ABS_SLIP )
-    //	if( (m_cm[PATH_NORMAL].wheel(0).slipX() + m_cm[PATH_NORMAL].wheel(1).slipX()) * 0.5 > 0.14 )
     if( (m_cm[PATH_NORMAL].wheel(0).slipX() + m_cm[PATH_NORMAL].wheel(1).slipX()) * 0.5 > m_cm[PATH_NORMAL].TARGET_SLIP )
     {
-        //		DEBUGF( "ABS ABS ABS ABS ABS ABS ABS  slip %g\n", slip );
-        //		brake *= slip;
         brake *= 0.5;
     }
 
     return brake;
 }
 
-double	TDriver::ApplyTractionControl( tCarElt* car, double acc )
+double	Driver::ApplyTractionControl( tCarElt* car, double acc )
 {
     double	spin = 0;
     double	wr = 0;
@@ -3933,9 +3324,6 @@ double	TDriver::ApplyTractionControl( tCarElt* car, double acc )
         wr /= count;
         double	gr = car->_gearRatio[car->_gear + car->_gearOffset];
         double	rpmForSpd = gr * car->_speed_x / wr;
-        //		DEBUGF( "TC:  slip %g   rpmForSpd %g\n",
-        //					slip, rpmForSpd );
-        //		acc = 0.5 * rpmForSpd / car->_enginerpmRedLine;
         acc = 0;
     }
     else
@@ -3947,77 +3335,3 @@ double	TDriver::ApplyTractionControl( tCarElt* car, double acc )
 
     return acc;
 }
-
-// Meteorology
-//--------------------------------------------------------------------------*
-void TDriver::Meteorology(tTrack *track)
-{
-    tTrackSeg *Seg;
-    tTrackSurface *Surf;
-    rainintensity = 0;
-    weathercode = GetWeather(track);
-    Seg = track->seg;
-
-    for ( int I = 0; I < track->nseg; I++)
-    {
-        Surf = Seg->surface;
-        rainintensity = MAX(rainintensity, Surf->kFrictionDry / Surf->kFriction);
-        LogSHADOW.debug("# %.4f, %.4f %s\n",Surf->kFriction, Surf->kRollRes, Surf->material);
-        Seg = Seg->next;
-    }
-
-    rainintensity -= 1;
-
-    if (rainintensity > 0)
-    {
-        rain = true;
-        //mycardata->muscale *= 0.85;
-        //mycardata->basebrake *= 0.75;
-        //tcl_slip = MIN(tcl_slip, 2.0);
-    }
-    else
-        rain = false;
-}
-
-//==========================================================================*
-// Estimate weather
-//--------------------------------------------------------------------------*
-int TDriver::GetWeather(tTrack *track)
-{
-    return (track->local.rain << 4) + track->local.water;
-};
-
-void TDriver::calcSkill()
-{
-    //if (RM_TYPE_PRACTICE != racetype)
-    if (skill_adjust_timer == -1.0 || simtime - skill_adjust_timer > skill_adjust_limit)
-    {
-        double rand1 = (double) getRandom() / 65536.0;  // how long we'll change speed for
-        double rand2 = (double) getRandom() / 65536.0;  // the actual speed change
-        double rand3 = (double) getRandom() / 65536.0;  // whether change is positive or negative
-
-        // acceleration to use in current time limit
-        decel_adjust_targ = (skill/4 * rand1);
-
-        // brake to use - usually 1.0, sometimes less (more rarely on higher skill)
-        brake_adjust_targ = MAX(0.85, 1.0 - MAX(0.0, skill/15 * (rand2-0.85)));
-
-        // how long this skill mode to last for
-        skill_adjust_limit = 5.0 + rand3 * 50.0;
-        skill_adjust_timer = simtime;
-    }
-
-    if (decel_adjust_perc < decel_adjust_targ)
-        decel_adjust_perc += MIN(deltaTime*4, decel_adjust_targ - decel_adjust_perc);
-    else
-        decel_adjust_perc -= MIN(deltaTime*4, decel_adjust_perc - decel_adjust_targ);
-
-    if (brake_adjust_perc < brake_adjust_targ)
-        brake_adjust_perc += MIN(deltaTime*2, brake_adjust_targ - brake_adjust_perc);
-    else
-        brake_adjust_perc -= MIN(deltaTime*2, brake_adjust_perc - brake_adjust_targ);
-
-    LogSHADOW.debug("skill: decel %.3f - %.3f, brake %.3f - %.3f\n", decel_adjust_perc, decel_adjust_targ, brake_adjust_perc, brake_adjust_targ);
-}
-
-

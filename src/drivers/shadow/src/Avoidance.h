@@ -1,9 +1,26 @@
-// Avoidance.h: interface for the Avoidance class.
-//
-//////////////////////////////////////////////////////////////////////
+/***************************************************************************
+
+    file        : Avoidance.h
+    created     : (C) 2006
+    copyright   : (C) 2017 Tim Foden
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #ifndef _AVOIDANCE_H_
 #define _AVOIDANCE_H_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
 
 #include "Opponent.h"
 #include "Driver.h"
@@ -26,6 +43,7 @@ public:
     {
         int				flags;
         int				avoidAhead;
+//		int				nAvoidAhead;
         int				avoidToSide;
         int				avoidLapping;
         int				nearbyCars;
@@ -73,8 +91,8 @@ public:
     Avoidance();
     virtual ~Avoidance();
 
-    virtual Vec2d	calcTarget(const Info& ai, const CarElt* pCar,
-                                const TDriver &me );
+    virtual Vec2d	calcTarget( const Info& ai, const CarElt* pCar,
+                                const Driver& me );
 };
 
 #endif // _AVOIDANCE_H_

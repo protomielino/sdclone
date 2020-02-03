@@ -22,6 +22,10 @@
 #ifndef _SEG_H_
 #define _SEG_H_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 #include <track.h>
 #include "Vec3d.h"
 
@@ -45,4 +49,4 @@ public:
     int			bendId;		// id of bend this seg is a part of.
 };
 
-#endif
+#endif // _SEG_H_
