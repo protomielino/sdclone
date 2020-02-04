@@ -58,18 +58,25 @@ public:
 	/// Return the last action value.
 	virtual real getLastActionValue () {return J_ps_pa;} 
 	/// \deprecated Get the probabilities of all actions - call after SelectAction().
-	virtual real* getActionProbabilities () {
+	virtual real* getActionProbabilities () 
+	{
 		real sum = 0.0;
 		int i;
-		for (i=0; i<n_actions; i++) {
+
+		for (i=0; i<n_actions; i++)
+		{
 			sum += eval[i];
 		}
-		for (i=0; i<n_actions; i++) {
+
+		for (i=0; i<n_actions; i++)
+		{
 			eval[i] = eval[i]/sum;
 		}
+
 		return eval;
 	}
-	virtual bool useConfidenceEstimates(bool confidence, real zeta=0.01);
+
+	virtual bool useConfidenceEstimates(bool confid, real zet=0.01);
 };
 
 

@@ -35,50 +35,9 @@ const float	Stuck::delta8_t[8] = {1.0f/Stuck::SPD, 1.0f/Stuck::SPD * 1.414f,
                                   1.0f/Stuck::SPD, 1.0f/Stuck::SPD * 1.414f,
                                   1.0f/Stuck::SPD, 1.0f/Stuck::SPD * 1.414f};
 
-const float	Stuck::delta64_t[64] = {
-/*
-    1.0f/Stuck::SPD * 1.000f, 1.0f/Stuck::SPD * 1.004f, 1.0f/Stuck::SPD * 1.020f, 1.0f/Stuck::SPD * 1.045f,
-    1.0f/Stuck::SPD * 1.082f, 1.0f/Stuck::SPD * 1.134f, 1.0f/Stuck::SPD * 1.203f, 1.0f/Stuck::SPD * 1.294f,
-    1.0f/Stuck::SPD * 1.414f, 1.0f/Stuck::SPD * 1.294f, 1.0f/Stuck::SPD * 1.203f, 1.0f/Stuck::SPD * 1.134f,
-    1.0f/Stuck::SPD * 1.082f, 1.0f/Stuck::SPD * 1.045f, 1.0f/Stuck::SPD * 1.020f, 1.0f/Stuck::SPD * 1.004f,
-
-    1.0f/Stuck::SPD * 1.000f, 1.0f/Stuck::SPD * 1.004f, 1.0f/Stuck::SPD * 1.020f, 1.0f/Stuck::SPD * 1.045f,
-    1.0f/Stuck::SPD * 1.082f, 1.0f/Stuck::SPD * 1.134f, 1.0f/Stuck::SPD * 1.203f, 1.0f/Stuck::SPD * 1.294f,
-    1.0f/Stuck::SPD * 1.414f, 1.0f/Stuck::SPD * 1.294f, 1.0f/Stuck::SPD * 1.203f, 1.0f/Stuck::SPD * 1.134f,
-    1.0f/Stuck::SPD * 1.082f, 1.0f/Stuck::SPD * 1.045f, 1.0f/Stuck::SPD * 1.020f, 1.0f/Stuck::SPD * 1.004f,
-
-    1.0f/Stuck::SPD * 1.000f, 1.0f/Stuck::SPD * 1.004f, 1.0f/Stuck::SPD * 1.020f, 1.0f/Stuck::SPD * 1.045f,
-    1.0f/Stuck::SPD * 1.082f, 1.0f/Stuck::SPD * 1.134f, 1.0f/Stuck::SPD * 1.203f, 1.0f/Stuck::SPD * 1.294f,
-    1.0f/Stuck::SPD * 1.414f, 1.0f/Stuck::SPD * 1.294f, 1.0f/Stuck::SPD * 1.203f, 1.0f/Stuck::SPD * 1.134f,
-    1.0f/Stuck::SPD * 1.082f, 1.0f/Stuck::SPD * 1.045f, 1.0f/Stuck::SPD * 1.020f, 1.0f/Stuck::SPD * 1.004f,
-
-    1.0f/Stuck::SPD * 1.000f, 1.0f/Stuck::SPD * 1.004f, 1.0f/Stuck::SPD * 1.020f, 1.0f/Stuck::SPD * 1.045f,
-    1.0f/Stuck::SPD * 1.082f, 1.0f/Stuck::SPD * 1.134f, 1.0f/Stuck::SPD * 1.203f, 1.0f/Stuck::SPD * 1.294f,
-    1.0f/Stuck::SPD * 1.414f, 1.0f/Stuck::SPD * 1.294f, 1.0f/Stuck::SPD * 1.203f, 1.0f/Stuck::SPD * 1.134f,
-    1.0f/Stuck::SPD * 1.082f, 1.0f/Stuck::SPD * 1.045f, 1.0f/Stuck::SPD * 1.020f, 1.0f/Stuck::SPD * 1.004f,
-*/
-/*
-    1.0f/Stuck::SPD * 1.000f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f,
-    1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f,
-    1.0f/Stuck::SPD * 1.414f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f,
-    1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f,
-
-    1.0f/Stuck::SPD * 1.000f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f,
-    1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f,
-    1.0f/Stuck::SPD * 1.414f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f,
-    1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f,
-
-    1.0f/Stuck::SPD * 1.000f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f,
-    1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f,
-    1.0f/Stuck::SPD * 1.414f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f,
-    1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f,
-
-    1.0f/Stuck::SPD * 1.000f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f,
-    1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f,
-    1.0f/Stuck::SPD * 1.414f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.500f,
-    1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.050f,
-*/
-    1.0f/Stuck::SPD * 1.000f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.100f, 1.0f/Stuck::SPD * 1.150f,
+const float	Stuck::delta64_t[64] = 
+{
+	1.0f/Stuck::SPD * 1.000f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.100f, 1.0f/Stuck::SPD * 1.150f,
     1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.480f, 1.0f/Stuck::SPD * 1.460f, 1.0f/Stuck::SPD * 1.440f,
     1.0f/Stuck::SPD * 1.414f, 1.0f/Stuck::SPD * 1.440f, 1.0f/Stuck::SPD * 1.460f, 1.0f/Stuck::SPD * 1.480f,
     1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.150f, 1.0f/Stuck::SPD * 1.100f, 1.0f/Stuck::SPD * 1.050f,
@@ -106,6 +65,7 @@ Stuck::Stuck()
     _stuckCount(0)
 {
     _grid.resize( GRID_SIZE );
+
     for( int x = 0; x < (int)_grid.size(); x++ )
         _grid[x].resize( GRID_SIZE );
 }
@@ -136,9 +96,6 @@ Stuck::~Stuck()
 
 bool Stuck::execute( const MyTrack& track, const tSituation* s, tCarElt* me, const Opponent::Sit& mySit )
 {
-//	LogSHADOW.debug( "stuck %d  stuck_time %1.2f  speed %1.2f\n",
-//			_stuckState, _stuckTime, me->_speed_x );
-
     double start = GfTimeClock();
 
     switch( _stuckState )
@@ -512,8 +469,10 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
     LogSHADOW.debug( "my car: %g\n", me->race.distFromStartLine );
     LogSHADOW.debug( "car ahead: %g\n", aheadCar->race.distFromStartLine );
     double aheadPos = aheadCar->race.distFromStartLine + aheadCutOff;
+
     if( aheadPos > me->race.distFromStartLine + GRID_RAD * 9 / 10 )
         aheadPos = me->race.distFromStartLine + GRID_RAD * 9 / 10;
+
     LogSHADOW.debug( "ahead pos: %g\n", aheadPos );
 
     // figure out position behind for cut-off.
@@ -527,6 +486,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
     int aheadSegIndex = (track.IndexFromPos(aheadPos) + 1) % track.GetSize();
     const Seg& aheadCutSeg = track.GetAt(aheadSegIndex);
     int lastX = -1;
+
     for( double offs = -aheadCutSeg.el - 1.5; offs < aheadCutSeg.er + 1.5; offs += 0.5 )
     {
         Vec3d pt = aheadCutSeg.pt + offs * aheadCutSeg.norm;
@@ -550,6 +510,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
 
     const Seg& behindCutSeg = track.GetAt(track.IndexFromPos(behindPos));
     lastX = -1;
+
     for( double offs = -behindCutSeg.el - 1.5; offs < behindCutSeg.er + 1.5; offs += 0.5 )
     {
         Vec3d pt = behindCutSeg.pt + offs * behindCutSeg.norm;
@@ -579,6 +540,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
     const int carx	  = car_pt1.x();
     const int cary	  = car_pt1.y();
     const int cariang = car_pt1.iang();
+
     for( int y = 0; y < GRID_SIZE; y++ )
     {
         for( int x = 0; x < GRID_SIZE; x++ )
@@ -627,6 +589,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
         int x = pt.x();
         int y = pt.y();
         Cell& from = at(x, y);
+
         for( int a = 0; a < 8; a += 2 )	// += 2 to only do orthogonal directions.
         {
             int		dx = delta8_x[a];
@@ -654,6 +617,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
     at(car_pt1).est_time_to_car = 0;
     at(car_pt2).est_time_to_car = 0;
     dq.push_back( car_pt1 );
+
     while( !dq.empty() )
     {
         GridPoint pt = dq.front();
@@ -661,6 +625,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
 
         int x = pt.x();
         int y = pt.y();
+
         for( int a = 0; a < 8; a++ )
         {
             int		dx = delta8_x[a];
@@ -687,6 +652,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
     const Seg& destSeg = track.GetAt(track.IndexFromPos(aheadPos));
     int mid_ang = to_iang(destSeg.norm.GetXY().GetAngle() + PI / 2);
     _destinations.clear();
+
     for( double offs = -destSeg.wl; offs < destSeg.wr; offs += 0.5 )
     {
         Vec3d pt = destSeg.pt + offs * destSeg.norm;
@@ -714,6 +680,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
 
         int x = pt.x();
         int y = pt.y();
+
         for( int a = 0; a < 8; a++ )
         {
             int		dx = delta8_x[a];
@@ -724,6 +691,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
             int y2 = y + dy;
 
             Cell& cell = at(x2, y2);
+
             if( !cell.isAvailable() )
                 continue;
 
@@ -741,18 +709,15 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
     // short time in the hope something has changed.
     if( at(car_pt1).est_time_to_dest < 0 && at(car_pt2).est_time_to_dest < 0 )
     {
-//		dumpGrid();
         LogSHADOW.debug( "[%d] stuck::init -- no solution -- reinit.\n", me->index );
-//		_stuckState = REINIT;
-//		_stuckTime  = 0.09;
         _stuckState = RACING;
         _stuckTime  = 0.0;
         return;
     }
 
     // initialise priority queue with destination positions.
-//	_pqN.clear();
     _pqN = priority_queue<GridPoint>();
+
     for( double offs = -destSeg.wl; offs < destSeg.wr; offs += 0.5 )
     {
         // mark all distinations as 0 time (which flags them as having been visited.)
@@ -769,13 +734,13 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
             continue;
 
         int mid_ang = to_iang(destSeg.norm.GetXY().GetAngle() + PI / 2);
+
         if( cell.times[fwang(mid_ang, true)] > 0 )
         {
 //			for( int a = -OCTANT; a <= OCTANT; a++ )
             for( int a = -1; a <= 1; a++ )
             {
                 int iang = (mid_ang + N_ANGLES + a) % N_ANGLES;
-                //cell.times[fwang(iang, true)] = 0;
                 _pqN.push( GridPoint(x, y, iang, true, 0, cell.est_time_to_car) );
             }
         }
@@ -783,8 +748,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
 
     // initialise priority queue with car start positions.
     _pqR = priority_queue<GridPoint>();
-//	for( int i = -2; i <= 2; i++ )
-//	for( int i = -1; i <= 1; i++ )
+
     for( int i =  0; i <= 0; i++ )
     {
         int iang = (car_pt1.iang() + i) & 63;
@@ -901,10 +865,12 @@ void	Stuck::fillTrackCells( const MyTrack& track )
     {
         vector<Edge>&    row = edges[scan_y];
         sort( row, scan_y );
+
         for( int i = 0; i + 1 < (int)row.size(); i += 2 )
         {
             int x1 = MX(0, row[i].x);
             int x2 = MN(GRID_SIZE - 1, row[i + 1].x );
+
             for( int x = x1; x <= x2; x++ )
                 _grid[x][scan_y].removeEdgeMask();
         }
@@ -912,11 +878,13 @@ void	Stuck::fillTrackCells( const MyTrack& track )
         if( scan_y + 1 < GRID_SIZE )
         {
             vector<Edge>&    nextRow = edges[scan_y + 1];
+
             for( int i = 0; i < (int)row.size(); i++ )
             {
                 if( scan_y + 1 <= row[i].ey )
                     nextRow.push_back(row[i]);
             }
+
             vector<Edge>().swap(row);
         }
     }
@@ -978,7 +946,6 @@ bool	Stuck::solve( const tCarElt* me )
 
     if( !_pqN.empty() )
     {
-//		dumpGrid();
         return true;
     }
 
@@ -990,6 +957,7 @@ bool	Stuck::solve( const tCarElt* me )
     {
         // failed to find a solution.
         LogSHADOW.debug( "no solution!\n" );
+
         return false;
     }
 
@@ -1000,6 +968,7 @@ bool	Stuck::solve( const tCarElt* me )
     int from = at(_bestPt).from[_bestPt.fwang()];
     float lastTime = 9e9f;
     float time = at(_bestPt).times[_bestPt.fwang()];
+
     while( from >= 0 && time < lastTime )
     {
         GridPoint	pt(from);
@@ -1045,6 +1014,7 @@ bool	Stuck::solveR( const tCarElt* me )
 
         // for each successor.
         Cell& fromCell = at(pt);
+
         for( vector<GridPoint>::iterator it = succs.begin(); it != succs.end(); it++ )
         {
             // if already visited with a better time --> continue.
@@ -1061,7 +1031,7 @@ bool	Stuck::solveR( const tCarElt* me )
             _pqR.push( *it );
 
             // if car cell filled in, done.
-            if( succCell.isSolution(it->fwang()) )//car_pt1.pt == it->pt || car_pt2.pt == it->pt )
+            if( succCell.isSolution(it->fwang()) )
             {
                 _bestTime = it->time;
                 _bestPt = *it;
@@ -1071,7 +1041,6 @@ bool	Stuck::solveR( const tCarElt* me )
 
     if( !_pqR.empty() )
     {
-//		dumpGrid();
         return true;
     }
 
@@ -1083,6 +1052,7 @@ bool	Stuck::solveR( const tCarElt* me )
     {
         // failed to find a solution.
         LogSHADOW.debug( "no solution!\n" );
+
         return false;
     }
 
@@ -1095,6 +1065,7 @@ bool	Stuck::solveR( const tCarElt* me )
     int from = at(_bestPt).from[_bestPt.fwang()];
     float lastTime = 9e9f;
     float time = at(_bestPt).times[_bestPt.fwang()];
+
     while( from >= 0 && time < lastTime )
     {
         GridPoint	pt(from);
@@ -1107,6 +1078,7 @@ bool	Stuck::solveR( const tCarElt* me )
     }
 
     std::reverse(_plan.begin(), _plan.end());
+
     for( int i = 0; i < (int)_plan.size() - 1; i++ )
     {
         if( _plan[i].fw() != _plan[i + 1].fw() )
@@ -1125,7 +1097,8 @@ bool	Stuck::solveR( const tCarElt* me )
 
 void Stuck::dumpGrid() const
 {
-    set<uint> pts;
+    set<unsigned int> pts;
+
     for( int i = 0; i < _plan.size(); i++ )
     {
         const GridPoint& pt = _plan[i];

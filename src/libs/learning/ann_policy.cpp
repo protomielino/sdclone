@@ -174,8 +174,10 @@ int ANN_Policy::SelectAction (real* s, real r, int forced_a)
 
 void ANN_Policy::Reset()
 {
-	if (separate_actions) {
-		for (int i=0; i<n_actions; i++) {
+	if (separate_actions)
+	{
+		for (int i=0; i<n_actions; i++) 
+		{
 			ANN_Reset (Ja[i]);
 		}
 	} else {
@@ -185,19 +187,27 @@ void ANN_Policy::Reset()
 
 /// Set to use confidence estimates for action selection, with
 /// variance smoothing zeta.
-bool ANN_Policy::useConfidenceEstimates (bool confidence, real zeta) {
-	this->confidence = confidence;
-	this->zeta = zeta;
-	if (separate_actions) {
-		for (int i=0; i<n_actions; i++) {
+bool ANN_Policy::useConfidenceEstimates (bool confid, real zet) 
+{
+	this->confidence = confid;
+	this->zeta = zet;
+	if (separate_actions)
+	{
+		for (int i=0; i<n_actions; i++) 
+		{
 			ANN_SetZeta(Ja[i], zeta);
 		}
-	} else {
+	} else
+	{
 		ANN_SetZeta(J, zeta);
 	}
-	if (confidence) {
+
+	if (confidence) 
+	{
 		logmsg ("#+[CONDIFENCE]\n");
-	} else {
+	} 
+	else 
+	{
 		logmsg ("#-[CONDIFENCE]\n");
 	}
 

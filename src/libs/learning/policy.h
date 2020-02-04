@@ -202,10 +202,10 @@ public:
 	virtual void setQLearning();
 	virtual void setELearning();
 	virtual void setSarsa();
-	virtual bool useConfidenceEstimates(bool confidence, real zeta=0.01, bool confidence_eligibility = false);
+	virtual bool useConfidenceEstimates(bool confidence, real zet=0.01, bool confidence_eligib = false);
 	virtual void setForcedLearning(bool forced);
 	virtual void setRandomness (real epsilon);
-	virtual void setGamma (real gamma);
+	virtual void setGamma (real gamm);
 	virtual void setPursuit (bool pursuit);
 	virtual void setReplacingTraces (bool replacing);
 	virtual void useSoftmax (bool softmax);

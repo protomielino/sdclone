@@ -607,10 +607,10 @@ void DiscretePolicy::saveFile (char* f) {
 /// variance smoothing zeta.
 /// Variance smoothing currently uses a very simple method to estimate
 /// the variance. 
-bool DiscretePolicy::useConfidenceEstimates (bool confidence, real zeta, bool confidence_eligibility) {
+bool DiscretePolicy::useConfidenceEstimates (bool confidence, real zet, bool confidence_eligib) {
 	this->confidence = confidence;
-	this->zeta = zeta;
-	this->confidence_eligibility = confidence_eligibility;
+	this->zeta = zet;
+	this->confidence_eligibility = confidence_eligib;
 	
 	if (confidence_eligibility) {
 		logmsg ("#+[ELIG_VAR]");
@@ -683,9 +683,9 @@ void DiscretePolicy::setRandomness (real epsilon)
 }
 
 /// Set the gamma of the sum to be maximised.
-void DiscretePolicy::setGamma (real gamma) 
+void DiscretePolicy::setGamma (real gamm) 
 {
-	this->gamma = gamma;
+	this->gamma = gamm;
 }
 
 /// Set action selection to softmax.
