@@ -158,6 +158,14 @@ private:
     double	ApplyAbs( tCarElt* car, double brake );
     double	ApplyTractionControl( tCarElt* car, double acc );
 
+    void	Meteorology(tTrack *t);
+    int		GetWeather(tTrack *t);
+    void	calcSkill(tSituation *s);
+
+    void	     SetRandomSeed(unsigned int seed);
+    unsigned int getRandom();
+    bool         CheckPitSharing(tCarElt *car);
+
 private:
     enum	// drive types
     {
@@ -429,30 +437,31 @@ private:
         }
     };
 
-/*
-    double			FLY_HEIGHT;
-    std::vector<double>	FACTORS;
-    int				BUMP_MOD;
-    int				SPDC_NORMAL;
-    int				SPDC_TRAFFIC;
-    double			ACC_MAX_SPIN_SPEED;
-    double			DEC_MAX_SPIN_SPEED;
-    double			STEER_K_ACC;
-    double			STEER_K_DEC;
-    double			STAY_TOGETHER;			// dist in m.
-    double			AVOID_WIDTH;			// in m.
-    double			PIT_ENTRY_OFFSET;		// dist in m.
-    double			PIT_EXIT_OFFSET;		// dist in m.
-    double			SKID_FACTOR;
-    double			SKID_FACTOR_TRAFFIC;
-    double			TCL_TARGET_SPEED;		// speed in m/s
-*/
     double			START_HOLD_LINE_TIME;	// hold inital line on track, in s.
 
     Private			m_priv[N_PATHS];
 
     int				m_driveType;
     double			m_gearUpRpm;			// for gear changing.
+
+    bool            rain;
+    double          rainintensity;
+    int             weathercode;            // Track specific weather
+
+    unsigned int    random_seed;
+    double          simtime;                // how long since the race started
+
+    double          driver_aggression;
+    double          global_skill;
+    double          skill;
+    double          skill_adjust_limit;
+    double          skill_adjust_timer;
+    double          decel_adjust_targ;
+    double          decel_adjust_perc;
+    double          brake_adjust_targ;
+    double          brake_adjust_perc;
+    bool            pitsharing;
+
     PidController	m_lineControl;			// controller for line error.
     PidController	m_velAngControl;		// controller for direction of car.
     PidController	m_angControl;			// controller for attack angle error.

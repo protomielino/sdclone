@@ -264,35 +264,35 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     if (p)
         *p = '\0';
 
-	sprintf(buffer, "drivers/%s/%s/setup.xml", MyBotName, carName);
-	//newParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-	*carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+    sprintf(buffer, "drivers/%s/%s/setup.xml", MyBotName, carName);
+    //newParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+    *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
 
-	if (*carParmHandle != NULL)
-	{
-		m_fuelPerMeter = GfParmGetNum(*carParmHandle, SECT_PRIVATE, BT_ATT_FUELPERMETER, (char*)NULL, 0.00068);
-		modeVerbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_VERBOSE, (char*)NULL, 0.0);
-		displaySetting = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_DISPLAYSETTING, (char*)NULL, 0.0);
-		m_testPitstop = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_PIT_TEST, (char*)NULL, 0.0);
-		m_testQualifTime = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_QUALIF_TEST, (char*)NULL, 0.0);
-		m_lineIndex = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_LINE_INDEX, (char*)NULL, 0.0);
-		m_strategyverbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_STRATEGY_VERBOSE, (char*)NULL, 0.0);
-		m_steerverbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_STEER_VERBOSE, (char*)NULL, 0.0);
-		newParmHandle = *carParmHandle;
-	}
-	else
-	{
-		m_fuelPerMeter = 0.00068;
-		m_fuelStrat = 1;
-		m_maxDammage = 5000;
-		m_testPitstop = 0;
-		m_testQualifTime = 0;
-		m_lineIndex = 0;
-		m_strategyverbose = 0;
-		m_steerverbose = 0;
-		modeVerbose = 0;
-		displaySetting = 0;
-	}
+    if (*carParmHandle != NULL)
+    {
+        m_fuelPerMeter = GfParmGetNum(*carParmHandle, SECT_PRIVATE, BT_ATT_FUELPERMETER, (char*)NULL, 0.00068);
+        modeVerbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_VERBOSE, (char*)NULL, 0.0);
+        displaySetting = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_DISPLAYSETTING, (char*)NULL, 0.0);
+        m_testPitstop = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_PIT_TEST, (char*)NULL, 0.0);
+        m_testQualifTime = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_QUALIF_TEST, (char*)NULL, 0.0);
+        m_lineIndex = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_LINE_INDEX, (char*)NULL, 0.0);
+        m_strategyverbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_STRATEGY_VERBOSE, (char*)NULL, 0.0);
+        m_steerverbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_STEER_VERBOSE, (char*)NULL, 0.0);
+        newParmHandle = *carParmHandle;
+    }
+    else
+    {
+        m_fuelPerMeter = 0.00068;
+        m_fuelStrat = 1;
+        m_maxDammage = 5000;
+        m_testPitstop = 0;
+        m_testQualifTime = 0;
+        m_lineIndex = 0;
+        m_strategyverbose = 0;
+        m_steerverbose = 0;
+        modeVerbose = 0;
+        displaySetting = 0;
+    }
 
     *carParmHandle = NULL;
     switch (s->_raceType)
@@ -326,9 +326,10 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     if (*carParmHandle == NULL)
     {
         std::cout << "Can't load the xml! " << buffer << std::endl;
-        sprintf(buffer, "drivers/%s/%s/setup.xml", MyBotName, carName);
+        sprintf(buffer, "drivers/%s/%s/default.xml", MyBotName, carName);
         LogUSR.info("Loading in defaut : %s\n", buffer);
         *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+
         if (*carParmHandle)
             LogUSR.info("Default XML loaded in : %s\n", buffer);
     }
@@ -433,18 +434,18 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
         raceline->setOverrides(overrideCollection);
     }
 
-	LogUSR.info("MU FACTOR        = %.3f\n", MU_FACTOR);
-	LogUSR.info("FUEL FACTOR      = %.3f\n", FUEL_FACTOR);
-	LogUSR.info("Max Damage       = %.3f\n", m_maxDammage);
-	LogUSR.info("Gear Shift       = %.3f\n", gear_shift);
+    LogUSR.info("MU FACTOR        = %.3f\n", MU_FACTOR);
+    LogUSR.info("FUEL FACTOR      = %.3f\n", FUEL_FACTOR);
+    LogUSR.info("Max Damage       = %.3f\n", m_maxDammage);
+    LogUSR.info("Gear Shift       = %.3f\n", gear_shift);
     LogUSR.info("Brake Delay      = %.3f\n", brakedelay);
     LogUSR.info("Corner Speed     = %.3f\n", CornerSpeed);
     LogUSR.info("Corner Speed mid = %.3f\n", CornerSpeedMid);
     LogUSR.info("Corner Speed Low = %.3f\n", CornerSpeedSlow);
-	LogUSR.info("TCL SLIP         = %.3f\n", tcl_slip);
-	LogUSR.info("TCL RANGE        = %.3f\n", tcl_range);
-	LogUSR.info("ABS SLIP         = %.3f\n", abs_slip);
-	LogUSR.info("ABS RANGE        = %.3f\n", abs_range);
+    LogUSR.info("TCL SLIP         = %.3f\n", tcl_slip);
+    LogUSR.info("TCL RANGE        = %.3f\n", tcl_range);
+    LogUSR.info("ABS SLIP         = %.3f\n", abs_slip);
+    LogUSR.info("ABS RANGE        = %.3f\n", abs_range);
 
     // Get skill level
 
@@ -556,7 +557,7 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 
     strategy->setOpponents(opponents);
     strategy->setTrack(track);
-	strategy->setCarData(mycardata);
+    strategy->setCarData(mycardata);
 
     // Set team mate.
     opponents->setTeamMate(car->_teamname);

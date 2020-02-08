@@ -77,10 +77,18 @@ using namespace std;
 #define PRV_SAFETY_MULTIPLIER		"safety multiplier"
 #define PRV_BRAKE_LIMIT				"brake limit"
 
+#define SECT_SKILL                  "skill"
+#define PRV_SKILL_LEVEL             "level"
+#define PRV_SKILL_AGGRO             "aggression"
+
 #define FLY_COUNT		20
 
 #define	STEER_SPD_IDX(x)	(int(floor((x) / 5)))
 #define	STEER_K_IDX(k)		(MX(0, MN(int(20 + floor((k) * 500 + 0.5)), 40)))
+
+#define RANDOM_SEED 0xfded
+#define RANDOM_A    1664525
+#define RANDOM_C    1013904223
 
 static const double	s_sgMin[] = { 0.00,  10 };
 static const double	s_sgMax[] = { 0.03, 100 };
@@ -131,17 +139,17 @@ Driver::Driver(int index)
       _lastSpd0(0)
 {
     for( int i = 0; i < 50; i++ )
-        {
-            m_brkCoeff[i] = 0.5;//0.12;
-        }
+    {
+        m_brkCoeff[i] = 0.5;//0.12;
+    }
 
     for( int i = 0; i < STEER_SPD_MAX; i++ )
+    {
+        for( int j = 0; j < STEER_K_MAX; j++ )
         {
-            for( int j = 0; j < STEER_K_MAX; j++ )
-            {
-                m_steerCoeff[i][j] = 0;
-            }
+            m_steerCoeff[i][j] = 0;
         }
+    }
 
     memset( m_angle, 0, sizeof(m_angle) );
 }
@@ -249,6 +257,8 @@ void	Driver::InitTrack(
     snprintf(buf, sizeof(buf), "drivers/%s", MyBotName);
     const char*	baseParamPath = buf;
 
+    weathercode = GetWeather(pTrack);
+
     //
     //	ok, lets read/merge the car parms.
     //
@@ -345,44 +355,44 @@ void	Driver::InitTrack(
         LogSHADOW.info( "*** KV_SCALE[%d]      : %.3f\n\n", p, m_cm[p].KV_SCALE );
 
         for( int i = 0; ; i++ )
-            {
-                snprintf( buf, sizeof(buf), "%s %d", PRV_FACTOR, i );
-                double	factor = SafeParmGetNum(hCarParm, sect.c_str(), buf, 0, -1);
-                LogSHADOW.debug( "%s: %g\n", buf, factor );
+        {
+            snprintf( buf, sizeof(buf), "%s %d", PRV_FACTOR, i );
+            double	factor = SafeParmGetNum(hCarParm, sect.c_str(), buf, 0, -1);
+            LogSHADOW.debug( "%s: %g\n", buf, factor );
 
-                if( factor == -1 )
-                    break;
+            if( factor == -1 )
+                break;
 
-                if( i == 0 )
-                    m_priv[p].FACTORS.clear();
+            if( i == 0 )
+                m_priv[p].FACTORS.clear();
 
-                m_priv[p].FACTORS.push_back( factor );
-            }
+            m_priv[p].FACTORS.push_back( factor );
+        }
 
         if( m_priv[p].FACTORS.size() == 0 )
             m_priv[p].FACTORS.push_back( 1.005 );
 
         for( int bend = 0; bend < 100; bend++ )
-            {
-                snprintf( buf, sizeof(buf), "%s %d", PRV_INNER_MOD, bend );
-                double	innerModA = SafeParmGetNum(hCarParm, sect.c_str(), buf, 0, 999);
-                double	innerModB = innerModA;
-                innerModA = SafeParmGetNum(hCarParm, sect.c_str(), (string(buf) + "a").c_str(), 0, innerModA);
-                innerModB = SafeParmGetNum(hCarParm, sect.c_str(), (string(buf) + "b").c_str(), 0, innerModA);
+        {
+            snprintf( buf, sizeof(buf), "%s %d", PRV_INNER_MOD, bend );
+            double	innerModA = SafeParmGetNum(hCarParm, sect.c_str(), buf, 0, 999);
+            double	innerModB = innerModA;
+            innerModA = SafeParmGetNum(hCarParm, sect.c_str(), (string(buf) + "a").c_str(), 0, innerModA);
+            innerModB = SafeParmGetNum(hCarParm, sect.c_str(), (string(buf) + "b").c_str(), 0, innerModA);
 
-                if( innerModA == 999 && innerModB == 999 )
-                    continue;
+            if( innerModA == 999 && innerModB == 999 )
+                continue;
 
-                LogSHADOW.debug( "%s: %g, %g\n", buf, innerModA, innerModB );
+            LogSHADOW.debug( "%s: %g, %g\n", buf, innerModA, innerModB );
 
-                while( m_priv[p].INNER_MOD.size() < bend * 2 + 2 )
-                    m_priv[p].INNER_MOD.push_back( 0 );
+            while( m_priv[p].INNER_MOD.size() < bend * 2 + 2 )
+                m_priv[p].INNER_MOD.push_back( 0 );
 
-                if( innerModA != 999 )
-                    m_priv[p].INNER_MOD[bend * 2] = innerModA;
-                if( innerModB != 999 )
-                    m_priv[p].INNER_MOD[bend * 2 + 1] = innerModB;
-            }
+            if( innerModA != 999 )
+                m_priv[p].INNER_MOD[bend * 2] = innerModA;
+            if( innerModB != 999 )
+                m_priv[p].INNER_MOD[bend * 2 + 1] = innerModB;
+        }
 
         if( m_priv[p].INNER_MOD.size() == 0 )
             m_priv[p].INNER_MOD.push_back( 0.0 );
@@ -464,12 +474,53 @@ void	Driver::InitTrack(
     GfParmSetNum( hCarParm, SECT_CAR, PRM_FUEL, (char*) NULL, fuel );
 
     m_Strategy.SetDamageLimits( m_priv[PATH_NORMAL].PIT_DAMAGE_WARN,
-                                  m_priv[PATH_NORMAL].PIT_DAMAGE_DANGER );
+                                m_priv[PATH_NORMAL].PIT_DAMAGE_DANGER );
 
     // override params for car type on track of specific race type.
     snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s",
               GfDataDir(), MyBotName, m_carName, m_trackName );
     m_pathOffsets.setBaseFilename( buf );
+
+    // Get skill level
+
+    decel_adjust_perc = global_skill = skill = driver_aggression = 0.0;
+    SetRandomSeed(10);
+
+    // load the global skill level, range 0 - 10
+    snprintf(buf, sizeof(buf), "%sconfig/raceman/extra/skill.xml", GetLocalDir());
+    void *skillHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+
+    if(!skillHandle)
+    {
+        snprintf(buf, sizeof(buf), "%sconfig/raceman/extra/skill.xml", GetDataDir());
+        skillHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+    }//if !skillHandle
+
+    if (skillHandle)
+    {
+        global_skill = GfParmGetNum(skillHandle, (char *)SECT_SKILL, (char *)PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
+    }
+
+    global_skill = MAX(0.0f, MIN(30.0f, global_skill));
+
+    LogSHADOW.info(" # Global Skill: %.3f\n", global_skill);
+
+    //load the driver skill level, range 0 - 1
+    float driver_skill = 0.0f;
+    snprintf(buf, sizeof(buf), "drivers/%s/%d/skill.xml", MyBotName, INDEX);
+    LogSHADOW.info("Path skill driver: %s\n", buf);
+    skillHandle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+
+    if (skillHandle)
+    {
+        driver_skill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
+        driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
+        driver_skill = (float)MIN(1.0, MAX(0.0, driver_skill));
+        LogSHADOW.info(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", global_skill, driver_skill, driver_aggression);
+    }
+
+    skill = (float)((global_skill + driver_skill * 2) * (1.0 + driver_skill));
+    LogSHADOW.info(" # SHADOW Driver skill = %.2f\n", skill);
 }
 
 // Start a new race.
@@ -481,12 +532,14 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
     m_myOppIdx = -1;
 
     for( int i = 0; i < m_nCars; i++ )
-        {
-            m_opp[i].Initialise( &m_track, pS->cars[i] );
+    {
+        m_opp[i].Initialise( &m_track, pS->cars[i] );
 
-            if( pS->cars[i] == pCar )
-                m_myOppIdx = i;
-        }
+        if( pS->cars[i] == pCar )
+            m_myOppIdx = i;
+    }
+
+    pitsharing = CheckPitSharing(pCar);
 
     m_cm[PATH_NORMAL].config( pCar );
     m_cm[PATH_LEFT]  = m_cm[PATH_NORMAL];
@@ -967,7 +1020,7 @@ double	Driver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi, const Pri
     double	frontSlipSide = (car->priv.wheel[0].slipSide  + car->priv.wheel[1].slipSide)  / 2;
     if( fabs(frontSlipSide) > 8 )
         LogSHADOW.debug( "slip: front(tan=%7.3f side=%7.3f) rear(tan=%7.3f side=%7.3f) acc(tan=%7.3f side=%7.3f)  steer=%g\n",
-                (car->priv.wheel[0].slipAccel + car->priv.wheel[1].slipAccel) / 2,
+                         (car->priv.wheel[0].slipAccel + car->priv.wheel[1].slipAccel) / 2,
                 frontSlipSide,
                 (car->priv.wheel[2].slipAccel + car->priv.wheel[3].slipAccel) / 2,
                 (car->priv.wheel[2].slipSide  + car->priv.wheel[3].slipSide)  / 2,
@@ -984,8 +1037,8 @@ double	Driver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi, const Pri
     }
 
     LogSHADOW.debug( "%4d o=%6.2f a=%6.3f ba=%6.3f oa=%6.3f oa2=%6.3f ada=%6.3f la=%6.3f %g,%g\n",
-            pi.idx, delta, angle, basicAngle, omegaAngle, omegaAngle2, accDecAngle, lineAngle,
-            m_avoidS, m_avoidT );
+                     pi.idx, delta, angle, basicAngle, omegaAngle, omegaAngle2, accDecAngle, lineAngle,
+                     m_avoidS, m_avoidT );
 
     return angle;
 }
@@ -1195,7 +1248,7 @@ double	Driver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     double	frontSlipSide = (car->priv.wheel[0].slipSide  + car->priv.wheel[1].slipSide)  / 2;
     if( fabs(frontSlipSide) > 8 )
         LogSHADOW.debug( "slip: front(tan=%7.3f side=%7.3f) rear(tan=%7.3f side=%7.3f) acc(tan=%7.3f side=%7.3f)  steer=%g\n",
-                (car->priv.wheel[0].slipAccel + car->priv.wheel[1].slipAccel) / 2,
+                         (car->priv.wheel[0].slipAccel + car->priv.wheel[1].slipAccel) / 2,
                 frontSlipSide,
                 (car->priv.wheel[2].slipAccel + car->priv.wheel[3].slipAccel) / 2,
                 (car->priv.wheel[2].slipSide  + car->priv.wheel[3].slipSide)  / 2,
@@ -1215,7 +1268,7 @@ double	Driver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
 
         if( s > m_cm[PATH_NORMAL].TARGET_SLIP + 0.0004 )
             LogSHADOW.debug( "acc %6.2f  zf %6.1f  s %.6f  v %6.2f  sx %.6f  sy %.6f\n",
-                   car->pub.DynGC.acc.x, zforce, s, v, sx, sy );
+                             car->pub.DynGC.acc.x, zforce, s, v, sx, sy );
     }
 
     const double steerHardFactor = 0.3;
@@ -1841,15 +1894,15 @@ void	Driver::launchControlClutch( tCarElt* car, tSituation* s )
 
     static double lastSpd = 0;
     LogSHADOW.debug( "%1.3f,%d,%6.3f,%4.0f,%5.3f,%5.3f,%6.3f,%6.3f,%6.3f,%6.3f,%6.3f\n",
-            s->currentTime,
-            car->priv.gear,
-            car->pub.speed,
-            car->priv.enginerpm * 60 / (2 * PI),
-            car->ctrl.accelCmd,
-            car->ctrl.clutchCmd,
-            (car->pub.DynGC.vel.x - lastSpd) / s->deltaTime,//car->pub.DynGC.acc.x,
-            delta,
-            car->priv.wheel[2].slipAccel,
+                     s->currentTime,
+                     car->priv.gear,
+                     car->pub.speed,
+                     car->priv.enginerpm * 60 / (2 * PI),
+                     car->ctrl.accelCmd,
+                     car->ctrl.clutchCmd,
+                     (car->pub.DynGC.vel.x - lastSpd) / s->deltaTime,//car->pub.DynGC.acc.x,
+                     delta,
+                     car->priv.wheel[2].slipAccel,
             (m_cm[PATH_NORMAL].wheel(2).slipX() + m_cm[PATH_NORMAL].wheel(3).slipX()) * 0.5,
             (wv - car->pub.DynGC.vel.x) / car->pub.DynGC.vel.x );
     lastSpd = car->pub.DynGC.vel.x;
@@ -1904,14 +1957,14 @@ void	Driver::launchControlSimple( tCarElt* car, tSituation* s )
     _prevDelta = delta;
 
     LogSHADOW.debug( "%1.3f,%d,%5.2f,%3.0f,%5.3f,%5.3f,%6.3f,%6.3f\n",
-            s->currentTime,
-            car->priv.gear,
-            car->pub.speed,
-            car->priv.enginerpm * 60 / (2 * PI),
-            car->ctrl.accelCmd,
-            car->ctrl.clutchCmd,
-            car->pub.DynGC.acc.x,
-            delta );
+                     s->currentTime,
+                     car->priv.gear,
+                     car->pub.speed,
+                     car->priv.enginerpm * 60 / (2 * PI),
+                     car->ctrl.accelCmd,
+                     car->ctrl.clutchCmd,
+                     car->pub.DynGC.acc.x,
+                     delta );
 }
 
 void	Driver::launchControlAcclerator( tCarElt* car, tSituation* s )
@@ -1979,7 +2032,7 @@ void	Driver::launchControlAcclerator( tCarElt* car, tSituation* s )
 
     if( accel )
     {
- if( s->currentTime >= 0.2 && car->priv.gear < 3 )
+        if( s->currentTime >= 0.2 && car->priv.gear < 3 )
         {
             double slipErr = 4.0 - delta;
             car->ctrl.accelCmd = MX(0, MN(car->ctrl.accelCmd + 0.013 * slipErr - 0.05 * ddiff, 1.0));
@@ -2000,15 +2053,15 @@ void	Driver::launchControlAcclerator( tCarElt* car, tSituation* s )
 
     static double lastSpd = 0;
     LogSHADOW.debug( "%1.3f,%d,%6.3f,%4.0f,%5.3f,%5.3f,%6.3f,%6.3f,%6.3f,%6.3f,%6.3f\n",
-            s->currentTime,
-            car->priv.gear,
-            car->pub.speed,
-            car->priv.enginerpm * 60 / (2 * PI),
-            car->ctrl.accelCmd,
-            car->ctrl.clutchCmd,
-            (car->pub.DynGC.vel.x - lastSpd) / s->deltaTime,//car->pub.DynGC.acc.x,
-            delta,
-            car->priv.wheel[2].slipAccel,
+                     s->currentTime,
+                     car->priv.gear,
+                     car->pub.speed,
+                     car->priv.enginerpm * 60 / (2 * PI),
+                     car->ctrl.accelCmd,
+                     car->ctrl.clutchCmd,
+                     (car->pub.DynGC.vel.x - lastSpd) / s->deltaTime,//car->pub.DynGC.acc.x,
+                     delta,
+                     car->priv.wheel[2].slipAccel,
             (m_cm[PATH_NORMAL].wheel(2).slipX() + m_cm[PATH_NORMAL].wheel(3).slipX()) * 0.5,
             (wv - car->pub.DynGC.vel.x) / car->pub.DynGC.vel.x );
     lastSpd = car->pub.DynGC.vel.x;
@@ -2080,7 +2133,7 @@ void	Driver::launchControlAccSlip( tCarElt* car, tSituation* s )
 
     if( accel )
     {
-if( s->currentTime >= 0.0 && car->priv.gear < 3 )
+        if( s->currentTime >= 0.0 && car->priv.gear < 3 )
         {
             double targSpd = 0.195 * MX(5, car->pub.DynGC.vel.x);
             double slipErr = targSpd - delta;
@@ -2500,8 +2553,8 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
         double	load = cm.calcPredictedLoad(spd0, 1.0, cm.CA, pi.k, pp.kz, pp.kv, sin(pp.ar), cos(pp.ar), cos(pp.ap));
         double	sysLoad = car->priv.reaction[0] + car->priv.reaction[1] + car->priv.reaction[2] + car->priv.reaction[3];
         LogSHADOW.debug( "[%d] load ratio %g %g path speed %g  overspeed %g  offset to path %g  engine acc %g\n",
-                pi.idx, load / opLoad, sysLoad / opLoad, pi.spd, spd0 - pi.spd, pi.offs + car->pub.trkPos.toMiddle,
-                cm.AccForceFromSpeed(pp.accSpd) / (cm.MASS + cm.FUEL) );
+                         pi.idx, load / opLoad, sysLoad / opLoad, pi.spd, spd0 - pi.spd, pi.offs + car->pub.trkPos.toMiddle,
+                         cm.AccForceFromSpeed(pp.accSpd) / (cm.MASS + cm.FUEL) );
     }
 
     double	targetSpd = pi.spd;
@@ -2517,7 +2570,7 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
     if( car->pub.speed > avoidTargetSpd && targetSpd > avoidTargetSpd )
     {
         LogSHADOW.debug( "[%d] slowing for avoidance.  curr %g  targ %g  avoid spd %g, avoid acc %g, curr acc %g\n",
-                car->index, car->pub.speed, targetSpd, avoidTargetSpd, avoidTargetAcc, car->pub.DynGC.acc.x );
+                         car->index, car->pub.speed, targetSpd, avoidTargetSpd, avoidTargetAcc, car->pub.DynGC.acc.x );
         slowing = true;
     }
 
@@ -3335,3 +3388,116 @@ double	Driver::ApplyTractionControl( tCarElt* car, double acc )
 
     return acc;
 }
+
+// Meteorology
+//--------------------------------------------------------------------------*
+void Driver::Meteorology(tTrack *t)
+{
+    tTrackSeg *Seg;
+    tTrackSurface *Surf;
+    rainintensity = 0;
+    weathercode = GetWeather(t);
+    Seg = t->seg;
+
+    for ( int I = 0; I < t->nseg; I++)
+    {
+        Surf = Seg->surface;
+        rainintensity = MAX(rainintensity, Surf->kFrictionDry / Surf->kFriction);
+        LogSHADOW.debug("# %.4f, %.4f %s\n",Surf->kFriction, Surf->kRollRes, Surf->material);
+        Seg = Seg->next;
+    }
+
+    rainintensity -= 1;
+
+    if (rainintensity > 0)
+    {
+        rain = true;
+        //mycardata->muscale *= 0.85;
+        //mycardata->basebrake *= 0.75;
+        //tcl_slip = MIN(tcl_slip, 2.0);
+    }
+    else
+        rain = false;
+}
+
+//==========================================================================*
+// Estimate weather
+//--------------------------------------------------------------------------*
+int Driver::GetWeather(tTrack *t)
+{
+    return (t->local.rain << 4) + t->local.water;
+};
+
+void Driver::calcSkill(tSituation *s)
+{
+    //if (RM_TYPE_PRACTICE != racetype)
+    if (skill_adjust_timer == -1.0 || s->currentTime - skill_adjust_timer > skill_adjust_limit)
+    {
+        double rand1 = (double) getRandom() / 65536.0;  // how long we'll change speed for
+        double rand2 = (double) getRandom() / 65536.0;  // the actual speed change
+        double rand3 = (double) getRandom() / 65536.0;  // whether change is positive or negative
+
+        // acceleration to use in current time limit
+        decel_adjust_targ = (skill/4 * rand1);
+
+        // brake to use - usually 1.0, sometimes less (more rarely on higher skill)
+        brake_adjust_targ = MAX(0.85, 1.0 - MAX(0.0, skill/15 * (rand2-0.85)));
+
+        // how long this skill mode to last for
+        skill_adjust_limit = 5.0 + rand3 * 50.0;
+        skill_adjust_timer = simtime;
+    }
+
+    /*if (decel_adjust_perc < decel_adjust_targ)
+      decel_adjust_perc += MIN(deltaTime*4, decel_adjust_targ - decel_adjust_perc);
+    else
+      decel_adjust_perc -= MIN(deltaTime*4, decel_adjust_perc - decel_adjust_targ);
+
+    if (brake_adjust_perc < brake_adjust_targ)
+      brake_adjust_perc += MIN(deltaTime*2, brake_adjust_targ - brake_adjust_perc);
+    else
+      brake_adjust_perc -= MIN(deltaTime*2, brake_adjust_perc - brake_adjust_targ);*/
+
+    LogSHADOW.debug("skill: decel %.3f - %.3f, brake %.3f - %.3f\n", decel_adjust_perc, decel_adjust_targ, brake_adjust_perc, brake_adjust_targ);
+}
+
+void Driver::SetRandomSeed(unsigned int seed)
+{
+    random_seed = seed ? seed : RANDOM_SEED;
+
+    return;
+}
+
+unsigned int Driver::getRandom()
+{
+    random_seed = RANDOM_A * random_seed + RANDOM_C;
+    LogSHADOW.debug("Random = %.3f\n", random_seed);
+
+    return (random_seed >> 16);
+}
+
+//==========================================================================*
+// Check if pit sharing is activated
+//--------------------------------------------------------------------------*
+bool Driver::CheckPitSharing(tCarElt *car)
+{
+  const tTrackOwnPit* OwnPit = car->_pit;           // Get my pit
+
+  if (OwnPit == NULL)                            // If pit is NULL
+  {                                              // nothing to do
+      LogSHADOW.info(" #Pit = NULL\n\n");                 // here
+    return false;
+  }
+
+  if (OwnPit->freeCarIndex > 1)
+  {
+      LogSHADOW.info(" #PitSharing = true\n\n");
+      return true;
+  }
+  else
+  {
+      LogSHADOW.info(" #PitSharing = false\n\n");
+      return false;
+  }
+}
+
