@@ -22,6 +22,7 @@
 #include "CarModel.h"
 #include "Quadratic.h"
 
+#include <portability.h>
 #include <math.h>
 #include "Utils.h"
 
