@@ -68,6 +68,15 @@ cGrSun::cGrSun( void )
     sun_transform = 0;
     prev_sun_angle = -9999.0;
     visibility = -9999.0;
+    rel_humidity = 0.0;
+    density_avg = 0.0;
+    prev_sun_angle = 0.0;
+    sun_angle = 0.0;
+    sun_rotation = 0.0;
+    sun_right_ascension = 0.0;
+    sun_declination = 0.0;
+    sun_dist = 0.0;
+    path_distance = 0.0;
 }
 
 // Destructor

@@ -745,10 +745,14 @@ shutdownCars(void)
         /* Delete ssg objects */
         CarsAnchor->removeAllKids();
         ShadowAnchor->removeAllKids();
-        for (i = 0; i < grNbCars; i++) {
+
+        for (i = 0; i < grNbCars; i++)
+        {
             ssgDeRefDelete(grCarInfo[i].envSelector);
             ssgDeRefDelete(grCarInfo[i].shadowBase);
-            if (grCarInfo[i].driverSelectorinsg == false) {
+
+            if (grCarInfo[i].driverSelectorinsg == false)
+            {
                 delete grCarInfo[i].driverSelector;
             }
         }
@@ -758,7 +762,8 @@ shutdownCars(void)
         free(grCarInfo);
     }
 
-    for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
+    for (i = 0; i < GR_NB_MAX_SCREEN; i++)
+    {
         grScreens[i]->setCurrentCar(NULL);
     }
 

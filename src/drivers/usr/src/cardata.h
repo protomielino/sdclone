@@ -39,17 +39,18 @@ class SingleCardata
 public:
     void init(CarElt *car);
 
-    inline float getSpeedInTrackDirection() { return speed; }
-    inline float getWidthOnTrack() { return width; }
-    inline float getLengthOnTrack() { return length; }
-    inline float getTrackangle() { return trackangle; }
-    inline float getCarAngle() { return angle; }
+    inline float  getSpeedInTrackDirection() { return speed; }
+    inline float  getWidthOnTrack() { return width; }
+    inline float  getLengthOnTrack() { return length; }
+    inline float  getTrackangle() { return trackangle; }
+    inline float  getCarAngle() { return angle; }
     inline double getAvgAccelX() { return avgAccelX; }
 
-    inline bool thisCar(tCarElt *Car) { return (Car == this->car); }
-    inline tPosd *getCorner1() { return corner1; }
-    inline tPosd *getCorner2() { return corner2; }
-    inline tPosd *getLastSpeed() { return lastspeed; }
+    inline bool   thisCar(tCarElt *Car) { return (Car == this->car); }
+
+    inline tPosd  *getCorner1() { return corner1; }
+    inline tPosd  *getCorner2() { return corner2; }
+    inline tPosd  *getLastSpeed() { return lastspeed; }
 
     void update();
     void updateModel();

@@ -563,8 +563,11 @@ RePreRace(void)
             delete[] ReStartingOrderIdx;
             ReStartingOrderIdx = NULL;
         }
+
         ReStartingOrderIdx = new int[nCars];
-        for (int i = 0; i < nCars; i++) {
+
+        for (int i = 0; i < nCars; i++)
+        {
             ReStartingOrderIdx[i] = -1;
         }
 
@@ -578,7 +581,8 @@ RePreRace(void)
                 return RM_ERROR;
             }
 
-            for (int i = 1; i < nCars + 1; i++) {
+            for (int i = 1; i < nCars + 1; i++)
+            {
                 snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
                          ReInfo->track->name, RE_SECT_RESULTS, prevRaceName, RE_SECT_RANK, i);
                 ReStartingOrderIdx[i-1] =
@@ -593,11 +597,14 @@ RePreRace(void)
             GfLogTrace("Starting grid in the reverse order of the last race\n");
 
             prevRaceName = ReGetPrevRaceName(/* bLoop = */false);
-            if (!prevRaceName) {
+
+            if (!prevRaceName)
+            {
                 return RM_ERROR;
             }
 
-            for (int i = 1; i < nCars + 1; i++) {
+            for (int i = 1; i < nCars + 1; i++)
+            {
                 snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
                         ReInfo->track->name, RE_SECT_RESULTS, prevRaceName, RE_SECT_RANK, nCars - i + 1);
                 ReStartingOrderIdx[i-1] =
@@ -615,18 +622,24 @@ RePreRace(void)
             int gridpos = 1;
             int carnr;
             const char *modulename;
-            for (int i = 0; i < nGridList; i++) {
+            for (int i = 0; i < nGridList; i++)
+            {
                 if (gridpos > nCars) {break;}
-                if (GridList[i].diffpos == -1) {//reversed
-                    for ( int j = GridList[i].startpos; j >= GridList[i].endpos; j--) {
+                if (GridList[i].diffpos == -1)
+                {//reversed
+                    for ( int j = GridList[i].startpos; j >= GridList[i].endpos; j--)
+                    {
                         if (gridpos > nCars) {break;}
                         snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
                                 ReInfo->track->name, RE_SECT_RESULTS, GridList[i].racename, RE_SECT_RANK, j);
                         idx = (int)GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0);
                         modulename = GfParmGetStr(results, path, RE_ATTR_MODULE, "");
                         carnr = ReFindDriverIdx(modulename, idx);
-                        for (int k = 0; k < gridpos-1; k++) {
-                            if ( carnr == ReStartingOrderIdx[k] ) {
+
+                        for (int k = 0; k < gridpos-1; k++)
+                        {
+                            if ( carnr == ReStartingOrderIdx[k] )
+                            {
                                 //oops: same car twice
                                 GfLogWarning("The same car appears twice in the advanced grid!\n");
                                 carnr = -1;
@@ -634,21 +647,26 @@ RePreRace(void)
                             }
                         }
                         //adding car to the list
-                        if (carnr != -1) {
+                        if (carnr != -1)
+                        {
                             ReStartingOrderIdx[gridpos-1] = carnr;
                             gridpos++;
                         }
                     }
                 } else if (GridList[i].diffpos == 1){//straight order
-                    for ( int j = GridList[i].startpos; j <= GridList[i].endpos; j++) {
+                    for ( int j = GridList[i].startpos; j <= GridList[i].endpos; j++)
+                    {
                         if (gridpos > nCars) {break;}
                         snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
                                 ReInfo->track->name, RE_SECT_RESULTS, GridList[i].racename, RE_SECT_RANK, j);
                         idx = (int)GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0);
                         modulename = GfParmGetStr(results, path, RE_ATTR_MODULE, "");
                         carnr = ReFindDriverIdx(modulename, idx);
-                        for (int k = 0; k < gridpos-1; k++) {
-                            if ( carnr == ReStartingOrderIdx[k] ) {
+
+                        for (int k = 0; k < gridpos-1; k++)
+                        {
+                            if ( carnr == ReStartingOrderIdx[k] )
+                            {
                                 //oops: same car twice
                                 GfLogWarning("The same car appears twice in the advanced grid!\n");
                                 carnr = -1;
@@ -656,7 +674,8 @@ RePreRace(void)
                             }
                         }
                         //adding car to the list
-                        if (carnr != -1) {
+                        if (carnr != -1)
+                        {
                             ReStartingOrderIdx[gridpos-1] = carnr;
                             gridpos++;
                         }
@@ -672,7 +691,8 @@ RePreRace(void)
         {
             GfLogTrace("Starting grid in the order of the driver list\n");
 
-            for (int i = 1; i < nCars + 1; i++) {
+            for (int i = 1; i < nCars + 1; i++)
+            {
                 snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS, i);
                 ReStartingOrderIdx[i-1] =
                     ReFindDriverIdx (GfParmGetStr(params, path, RE_ATTR_MODULE, ""),

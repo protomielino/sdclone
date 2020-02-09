@@ -106,7 +106,7 @@ static double grVisibility = 0.0f;
 
 static ssgBranch *SunAnchor = NULL;
 
-static ssgRoot *TheBackground = NULL;
+static ssgRoot   *TheBackground = NULL;
 static ssgTransform *TheSun = NULL;
 
 static cGrSky *TheSky = NULL;
@@ -1126,6 +1126,12 @@ grShutdownBackground(void)
     {
         delete grEnvSelector;
         grEnvSelector = 0;
+    }
+
+    if(AStarsData)
+    {
+        delete [] AStarsData;
+        AStarsData = 0;
     }
 
 }//grShutdownBackground

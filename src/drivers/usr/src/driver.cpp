@@ -2662,8 +2662,10 @@ void Driver::update(tSituation *s)
 {
     {
         deltaTime = s->deltaTime;
+
         for (int j=3; j>0; j--)
             speedAngle[j] = speedAngle[j-1];
+
         double newx = car->_corner_x(FRNT_LFT) + car->_speed_X;
         double newy = car->_corner_y(FRNT_LFT) + car->_speed_Y;
         double dx = newx - car->_corner_x(FRNT_LFT);
@@ -2675,6 +2677,7 @@ void Driver::update(tSituation *s)
     float ang = trackangle - car->_yaw;
     NORM_PI_PI(ang);
     ang = fabs(ang);
+
     if (ang > 1.6)
         ang = 1.6 - (ang - 1.6);
 

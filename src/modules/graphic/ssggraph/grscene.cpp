@@ -66,17 +66,17 @@ tTrack *grTrack;
 ssgRoot *TheScene = NULL;
 
 // TheScene kids order (but some others in background.cpp)
-ssgBranch *LandAnchor = NULL;
-ssgBranch *BackSkyAnchor = NULL;
+ssgBranch    *LandAnchor = NULL;
+ssgBranch    *BackSkyAnchor = NULL;
 ssgTransform *BackSkyLoc = NULL;
-ssgBranch *CarsAnchor = NULL;
-ssgBranch *ShadowAnchor = NULL;
-ssgBranch *PitsAnchor = NULL;
-ssgBranch *SmokeAnchor = NULL;
-ssgBranch *SkidAnchor = NULL;
-ssgBranch *CarlightAnchor = NULL;
-ssgBranch *TrackLightAnchor = NULL;
-ssgBranch *ThePits = NULL;
+ssgBranch    *CarsAnchor = NULL;
+ssgBranch    *ShadowAnchor = NULL;
+ssgBranch    *PitsAnchor = NULL;
+ssgBranch    *SmokeAnchor = NULL;
+ssgBranch    *SkidAnchor = NULL;
+ssgBranch    *CarlightAnchor = NULL;
+ssgBranch    *TrackLightAnchor = NULL;
+ssgBranch    *ThePits = NULL;
 
 
 // Must have (Question: What for ?)

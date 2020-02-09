@@ -30,15 +30,15 @@
 #include "grmultitexstate.h"
 
 
-extern int grWrldX;
-extern int grWrldY;
-extern int grWrldZ;
-extern int grWrldMaxSize;
-extern bool grSpeedway;
-extern bool grSpeedwayshort;
-extern tTrack *grTrack;
+extern int       grWrldX;
+extern int       grWrldY;
+extern int       grWrldZ;
+extern int       grWrldMaxSize;
+extern bool      grSpeedway;
+extern bool      grSpeedwayshort;
+extern tTrack    *grTrack;
 
-extern ssgRoot *TheScene;
+extern ssgRoot   *TheScene;
 extern ssgBranch *LandAnchor;
 extern ssgBranch *BackSkyAnchor;
 extern ssgTransform *BackSkyLoc;
@@ -51,8 +51,6 @@ extern ssgBranch *CarlightAnchor;
 extern ssgBranch *TrackLightAnchor;
 extern ssgBranch *ThePits;
 
-
-
 extern ssgStateSelector	*grEnvSelector;
 extern cgrMultiTexState	*grEnvState;
 extern cgrMultiTexState	*grEnvShadowState;
@@ -62,8 +60,8 @@ class cGrCamera;
 class cGrBackgroundCam;
 
 //!Public interface
-extern int grInitScene(void);
-extern int grLoadScene(tTrack *track);
+extern int  grInitScene(void);
+extern int  grLoadScene(tTrack *track);
 extern void grDrawScene();
 extern void grShutdownScene(void);
 extern void grCustomizePits(void);

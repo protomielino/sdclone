@@ -208,7 +208,7 @@ public:
 class cGrSun
 {
 private:
-    ssgTransform *sun_transform;
+    ssgTransform   *sun_transform;
     ssgSimpleState *sun_state;
     ssgSimpleState *ihalo_state;
     ssgSimpleState *ohalo_state;
@@ -302,7 +302,7 @@ class cGrStars
 {
 private:
 
-  ssgTransform *stars_transform;
+  ssgTransform   *stars_transform;
   ssgSimpleState *state;
 
   ssgColourArray *cl;
@@ -327,7 +327,7 @@ class cGrSkyDome
 {
 private:
 
-  ssgTransform *dome_transform;
+  ssgTransform   *dome_transform;
   ssgSimpleState *dome_state;
 
   ssgVertexArray *center_disk_vl;
@@ -362,11 +362,11 @@ class cGrSky
 private:
     // components of the sky
     cGrSkyDome *dome;
-    cGrSun	*sun;
-    cGrMoon	*moon;
+    cGrSun	   *sun;
+    cGrMoon	   *moon;
     cGrCloudLayerList clouds;
-    cGrStars *planets;
-    cGrStars *stars;
+    cGrStars   *planets;
+    cGrStars   *stars;
 
     ssgRoot *pre_root, *post_root;
 

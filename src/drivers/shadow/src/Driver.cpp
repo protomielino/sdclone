@@ -113,26 +113,39 @@ void	Driver::PathRange::AddLesser(
 Driver::Driver(int index)
     :	INDEX(index),
       m_Strategy(m_track, m_pitPath[PATH_NORMAL][0]),
+      _acc(0),
       m_driveType(cDT_RWD),
       m_gearUpRpm(8000),
+      rain(false),
+      rainintensity(0.0),
+      weathercode(0),
+      driver_aggression(0.0),
+      global_skill(0.0),
+      skill(0.0),
+      skill_adjust_limit(0.0),
+      skill_adjust_timer(0.0),
+      decel_adjust_targ(0.0),
+      decel_adjust_perc(0.0),
+      brake_adjust_targ(0.0),
+      brake_adjust_perc(0.0),
+      pitsharing(false),
       m_prevYawError(0),
       m_prevLineError(0),
-      m_flying(0),
       m_steerLimit(0),
       m_prevSteer(0),
+      m_flying(0),
       m_avgAY(0),
       m_raceStart(false),
       m_avoidS(1),
       m_avoidT(0),
       m_followPath(PATH_NORMAL),
+      m_stuck(NOT_STUCK),
+      m_stuckTime(0),
+      m_maxAccel(0, 150, 30, 1),
+      m_steerGraph(2, s_sgMin, s_sgMax, s_sgSteps, 0),
       m_lastB(0),
       m_lastBrk(0),
       m_lastTargV(0),
-      m_maxAccel(0, 150, 30, 1),
-      m_steerGraph(2, s_sgMin, s_sgMax, s_sgSteps, 0),
-      m_stuck(NOT_STUCK),
-      m_stuckTime(0),
-      _acc(0),
       _tctrlAcc(0),
       _deltaCounter(0),
       _prevDelta(0),
@@ -2496,6 +2509,8 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
         m_flying--;
     }
 
+    calcSkill(s);
+
     // get curret pos on track.
 
     PtInfo	pi, aheadPi;
@@ -3436,6 +3451,7 @@ void Driver::calcSkill(tSituation *s)
         double rand1 = (double) getRandom() / 65536.0;  // how long we'll change speed for
         double rand2 = (double) getRandom() / 65536.0;  // the actual speed change
         double rand3 = (double) getRandom() / 65536.0;  // whether change is positive or negative
+        LogSHADOW.info(" # Random 1 = %.3f - Random 2 = %.3f - Random 3 = %.3f\n", rand1, rand2, rand3);
 
         // acceleration to use in current time limit
         decel_adjust_targ = (skill/4 * rand1);
@@ -3458,7 +3474,7 @@ void Driver::calcSkill(tSituation *s)
     else
       brake_adjust_perc -= MIN(deltaTime*2, brake_adjust_perc - brake_adjust_targ);*/
 
-    LogSHADOW.debug("skill: decel %.3f - %.3f, brake %.3f - %.3f\n", decel_adjust_perc, decel_adjust_targ, brake_adjust_perc, brake_adjust_targ);
+    LogSHADOW.info("skill: decel %.3f - %.3f, brake %.3f - %.3f\n", decel_adjust_perc, decel_adjust_targ, brake_adjust_perc, brake_adjust_targ);
 }
 
 void Driver::SetRandomSeed(unsigned int seed)
