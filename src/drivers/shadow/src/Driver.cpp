@@ -19,6 +19,10 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+
+#include <algorithm>
+#include <string>
+
 #include "Driver.h"
 #include "Quadratic.h"
 #include "Utils.h"
@@ -27,9 +31,6 @@
 
 #include <portability.h>
 #include <robottools.h>
-
-#include <algorithm>
-#include <string>
 
 using namespace std;
 
@@ -110,8 +111,7 @@ void	Driver::PathRange::AddLesser(
 {
 }
 
-Driver::Driver(int index)
-    :	INDEX(index),
+Driver::Driver(int index) :	INDEX(index),
       m_Strategy(m_track, m_pitPath[PATH_NORMAL][0]),
       _acc(0),
       m_driveType(cDT_RWD),
@@ -173,18 +173,17 @@ Driver::~Driver()
 
 static void*	MergeParamFile( void* hParams, const char* fileName, bool relSrc = true )
 {
-    //	PRINTF( "loading: '%s'\n", fileName );
     void*	hNewParams = GfParmReadFile(fileName, GFPARM_RMODE_STD);
 
     if( hNewParams == NULL )
     {
-        LogSHADOW.info("loaded: 'hParams' \n");
+        LogSHADOW.debug("loaded: 'hParams' \n");
         return hParams;
     }
 
     if( hParams == NULL )
     {
-        LogSHADOW.info( "loaded: '%s'\n", fileName );
+        LogSHADOW.debug( "loaded: '%s'\n", fileName );
         return hNewParams;
     }
 
@@ -195,7 +194,7 @@ static void*	MergeParamFile( void* hParams, const char* fileName, bool relSrc = 
 
     GfParmCheckHandle( hParams, hNewParams );
 
-    LogSHADOW.info( "merging: '%s'\n", fileName );
+    LogSHADOW.debug( "merging: '%s'\n", fileName );
     hParams = GfParmMergeHandles(hParams, hNewParams,
                                  GFPARM_MMODE_SRC | GFPARM_MMODE_DST |
                                  (relSrc ? GFPARM_MMODE_RELSRC : 0) | GFPARM_MMODE_RELDST);
@@ -225,7 +224,7 @@ void	Driver::InitTrack(
         void**		ppCarParmHandle,
         tSituation*	pS )
 {
-    LogSHADOW.info( "Shadow : initTrack()\n" );
+    LogSHADOW.debug( "Shadow : initTrack()\n" );
 
     //
     //	get the name of the car (e.g. "clkdtm").
@@ -241,7 +240,7 @@ void	Driver::InitTrack(
     if( p )
         *p = '\0';
 
-    LogSHADOW.info( "   m_carName: '%s'\n", m_carName );
+    LogSHADOW.info( " #Shadow carName: '%s'\n", m_carName );
 
     //
     //	get the name of the track (e.g. "e-track-1")
@@ -249,7 +248,7 @@ void	Driver::InitTrack(
 
     strncpy( m_trackName, strrchr(pTrack->filename, '/') + 1, sizeof(m_trackName) );
     *strrchr(m_trackName, '.') = '\0';
-    LogSHADOW.info( "   m_trackName: '%s'\n", m_trackName );
+    LogSHADOW.debug( " # Shadow trackName: '%s'\n", m_trackName );
 
     //
     //	set up race type array.
@@ -261,7 +260,7 @@ void	Driver::InitTrack(
     if( raceType == RM_TYPE_PRACTICE && (pS->raceInfo.totLaps == 3 || pS->raceInfo.totLaps == 10) )
         raceType =  RM_TYPE_QUALIF;
 
-    LogSHADOW.info("Race type = %s \n", raceTypeStr[raceType]);
+    LogSHADOW.debug(" # Shadow Race type = %s \n", raceTypeStr[raceType]);
 
     //
     //	set up the base param path.
@@ -328,10 +327,10 @@ void	Driver::InitTrack(
 
     double rpm = GfParmGetNum(hCarParm, SECT_PRIV, PRV_GEAR_UP_RPM, "rpm", 8190);
     m_gearUpRpm = rpm * 2 * PI / 60;
-    LogSHADOW.info( "*** gear up rpm: %g (%g)\n", rpm, m_gearUpRpm );
+    LogSHADOW.debug( "*** gear up rpm: %g (%g)\n", rpm, m_gearUpRpm );
 
     START_HOLD_LINE_TIME = SafeParmGetNum(hCarParm, SECT_PRIV, "start hold line time", 0, 5.0f);
-    LogSHADOW.info( "*** Start hold line time: %g \n\n", START_HOLD_LINE_TIME );
+    LogSHADOW.debug( "*** Start hold line time: %g \n\n", START_HOLD_LINE_TIME );
 
     MyTrack::SideMod	sideMod[N_PATHS];
     string sect;
@@ -361,11 +360,11 @@ void	Driver::InitTrack(
         m_cm[p].KZ_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_KZ_SCALE, NULL, m_cm[PATH_NORMAL].KZ_SCALE);
         m_cm[p].KV_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_KV_SCALE, NULL, m_cm[PATH_NORMAL].KV_SCALE);
 
-        LogSHADOW.info( "*** FLAGS             : 0x%02X\n", m_cm[p].FLAGS );
-        LogSHADOW.info( "*** BRAKE_MU_SCALE[%d]: %.3f\n", p, m_cm[p].BRAKE_MU_SCALE );
-        LogSHADOW.info( "*** MU_SCALE[%d]      : %.3f\n", p, m_cm[p].MU_SCALE );
-        LogSHADOW.info( "*** KZ_SCALE[%d]      : %.3f\n", p, m_cm[p].KZ_SCALE );
-        LogSHADOW.info( "*** KV_SCALE[%d]      : %.3f\n\n", p, m_cm[p].KV_SCALE );
+        LogSHADOW.debug( "*** FLAGS             : 0x%02X\n", m_cm[p].FLAGS );
+        LogSHADOW.debug( "*** BRAKE_MU_SCALE[%d]: %.3f\n", p, m_cm[p].BRAKE_MU_SCALE );
+        LogSHADOW.debug( "*** MU_SCALE[%d]      : %.3f\n", p, m_cm[p].MU_SCALE );
+        LogSHADOW.debug( "*** KZ_SCALE[%d]      : %.3f\n", p, m_cm[p].KZ_SCALE );
+        LogSHADOW.debug( "*** KV_SCALE[%d]      : %.3f\n\n", p, m_cm[p].KV_SCALE );
 
         for( int i = 0; ; i++ )
         {
@@ -438,8 +437,8 @@ void	Driver::InitTrack(
         m_priv[p].SAFETY_MULTIPLIER = SafeParmGetNum(hCarParm, sect.c_str(), PRV_SAFETY_MULTIPLIER, 0, m_priv[p].SAFETY_MULTIPLIER);
         m_priv[p].BRAKE_LIMIT = SafeParmGetNum(hCarParm, sect.c_str(), PRV_BRAKE_LIMIT, 0, m_priv[p].BRAKE_LIMIT);
 
-        LogSHADOW.info( "FLY_HEIGHT %g\n", m_priv[p].FLY_HEIGHT );
-        LogSHADOW.info( "BUMP_MOD %d\n\n", m_priv[p].BUMP_MOD );
+        LogSHADOW.debug( "FLY_HEIGHT %g\n", m_priv[p].FLY_HEIGHT );
+        LogSHADOW.debug( "BUMP_MOD %d\n\n", m_priv[p].BUMP_MOD );
 
         sideMod[p].side = -1;
 
@@ -457,7 +456,7 @@ void	Driver::InitTrack(
         LogSHADOW.debug( "STAY_TOGETHER %g\n", m_priv[p].STAY_TOGETHER );
     }
 
-    LogSHADOW.info( "*** FLAGS: 0x%02X\n\n", m_cm[PATH_NORMAL].FLAGS );
+    LogSHADOW.debug( "*** FLAGS: 0x%02X\n\n", m_cm[PATH_NORMAL].FLAGS );
 
     m_track.NewTrack( pTrack, &m_priv[PATH_NORMAL].INNER_MOD, false, &sideMod[PATH_NORMAL],
                       m_priv[PATH_NORMAL].PIT_START_BUF_SEGS );
@@ -521,7 +520,7 @@ void	Driver::InitTrack(
     //load the driver skill level, range 0 - 1
     float driver_skill = 0.0f;
     snprintf(buf, sizeof(buf), "drivers/%s/%d/skill.xml", MyBotName, INDEX);
-    LogSHADOW.info("Path skill driver: %s\n", buf);
+    LogSHADOW.debug("Path skill driver: %s\n", buf);
     skillHandle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 
     if (skillHandle)
@@ -529,17 +528,17 @@ void	Driver::InitTrack(
         driver_skill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
         driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
         driver_skill = (float)MIN(1.0, MAX(0.0, driver_skill));
-        LogSHADOW.info(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", global_skill, driver_skill, driver_aggression);
+        LogSHADOW.debug(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", global_skill, driver_skill, driver_aggression);
     }
 
     skill = (float)((global_skill + driver_skill * 2) * (1.0 + driver_skill));
-    LogSHADOW.info(" # SHADOW Driver skill = %.2f\n", skill);
+    LogSHADOW.debug(" # SHADOW Driver skill = %.2f\n", skill);
 }
 
 // Start a new race.
 void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
 {
-    LogSHADOW.info( "Shadow : newRace()\n" );
+    LogSHADOW.debug( "Shadow : newRace()\n" );
 
     m_nCars = pS->_ncars;
     m_myOppIdx = -1;
@@ -2447,7 +2446,7 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
         }
 
         m_raceStart = false;
-        LogSHADOW.info( "m_avoidS = %g (race start 2)\n", 0.0 );
+        LogSHADOW.debug( "m_avoidS = %g (race start 2)\n", 0.0 );
         m_avoidS = 0;
         m_avoidSVel = 0;
         m_avoidT = CalcPathTarget(m_track.CalcPos(car), -car->_trkPos.toMiddle);
@@ -3451,7 +3450,7 @@ void Driver::calcSkill(tSituation *s)
         double rand1 = (double) getRandom() / 65536.0;  // how long we'll change speed for
         double rand2 = (double) getRandom() / 65536.0;  // the actual speed change
         double rand3 = (double) getRandom() / 65536.0;  // whether change is positive or negative
-        LogSHADOW.info(" # Random 1 = %.3f - Random 2 = %.3f - Random 3 = %.3f\n", rand1, rand2, rand3);
+        LogSHADOW.debug(" # Random 1 = %.3f - Random 2 = %.3f - Random 3 = %.3f\n", rand1, rand2, rand3);
 
         // acceleration to use in current time limit
         decel_adjust_targ = (skill/4 * rand1);
@@ -3474,7 +3473,7 @@ void Driver::calcSkill(tSituation *s)
     else
       brake_adjust_perc -= MIN(deltaTime*2, brake_adjust_perc - brake_adjust_targ);*/
 
-    LogSHADOW.info("skill: decel %.3f - %.3f, brake %.3f - %.3f\n", decel_adjust_perc, decel_adjust_targ, brake_adjust_perc, brake_adjust_targ);
+    LogSHADOW.debug("skill: decel %.3f - %.3f, brake %.3f - %.3f\n", decel_adjust_perc, decel_adjust_targ, brake_adjust_perc, brake_adjust_targ);
 }
 
 void Driver::SetRandomSeed(unsigned int seed)
