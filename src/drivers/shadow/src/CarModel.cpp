@@ -41,10 +41,13 @@ CarModel::CarModel()
     MASS(0),
     FUEL(0),
     DAMAGE(0),
+    WIDTH(2),
     TYRE_MU(0),
     TYRE_MU_F(0),
     TYRE_MU_R(0),
     MU_SCALE(1),
+    KZ_SCALE(0),
+    KV_SCALE(1),
     BRAKE_MU_SCALE(0.95),
     GRIP_SCALE_F(1),
     GRIP_SCALE_R(1),
@@ -60,9 +63,6 @@ CarModel::CarModel()
     LF_MIN(0.8),
     LF_MAX(1.6),
     LF_K(log((1.0f - LF_MIN) / (LF_MAX - LF_MIN))),
-    KZ_SCALE(0),
-    KV_SCALE(1),
-    WIDTH(2),
     POS_AZ(0),
     VEL_AZ(0),
     F_AXLE_X(1.5),
@@ -75,11 +75,11 @@ CarModel::CarModel()
     R_WING_X(-1.5),
     TARGET_SLIP(0.175),	// for defaults of 30, 0.8, 0.7
     MAX_SLIP(0.27),
-    ENGINE_REV_LIMIT(8500 * 2 * PI / 60),
     GEAR_CHANGE_REVS(8200 * 2 * PI / 60),
-    ENGINE_MAX_REVS(10000 * 2 * PI / 60),
     DIFF_RATIO(1),
     DIFF_EFF(1),
+    ENGINE_REV_LIMIT(8500 * 2 * PI / 60),
+    ENGINE_MAX_REVS(10000 * 2 * PI / 60),
     HASTYC(false),
     HASABS(false),
     HASESP(false),
@@ -974,6 +974,7 @@ double	CarModel::CalcAcceleration(
 
         // account for acceleration available from engine.
         double	Facc = AccForceFromSpeed(avgV);
+
         if( Ftanroad > Facc )
             Ftanroad = Facc;
 
@@ -984,6 +985,7 @@ double	CarModel::CalcAcceleration(
         double	inner = MX(0, u * u + 2 * acc * dist );
         double	oldV = v;
         v = sqrt(inner);
+
         if( fabs(v - oldV) < 0.001 )
             break;
     }

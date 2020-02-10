@@ -415,7 +415,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
     // make opponent car cells unavailable.
     makeOpponentsList( s, me, &_opponents );
 
-    for( int i = 0; i < _opponents.size(); i++ )
+    for( size_t i = 0; i < _opponents.size(); i++ )
     {
         const OppInfo& oppInfo = _opponents[i];
         const tCarElt* other   = oppInfo.car;
@@ -1099,7 +1099,7 @@ void Stuck::dumpGrid() const
 {
     set<unsigned int> pts;
 
-    for( int i = 0; i < _plan.size(); i++ )
+    for( size_t i = 0; i < _plan.size(); i++ )
     {
         const GridPoint& pt = _plan[i];
         pts.insert( pt.x() * 256 + pt.y() );

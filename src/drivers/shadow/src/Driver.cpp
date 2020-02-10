@@ -234,8 +234,8 @@ void	Driver::InitTrack(
     //	to come up with so far.  it basically gets the name of the car .acc
     //	file, and strips off the ".acc" part, to get the name of the car.  yuk.
     //
-    char*	path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
-    char*	key  = PRM_CAR;
+    const char*	path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
+    const char*	key  = PRM_CAR;
     strncpy( m_carName, GfParmGetStr(pCarHandle, path, key, ""), sizeof(m_carName) );
     char*	p = strrchr(m_carName, '.');
     if( p )

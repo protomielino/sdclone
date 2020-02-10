@@ -237,7 +237,7 @@ private:
                 clear();
                 return;
             }
-            else if( internalBrk = 0.0 )
+            else if( internalBrk == 0.0 )
             {
                 internalBrk = MN(-targetAcc * 0.1, 0.5);
             }
