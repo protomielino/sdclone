@@ -206,15 +206,15 @@ if(OPTION_PLIB)
 endif(OPTION_PLIB)
 
 if(OPTION_JPEG)
-   set(JPG_PROJECT jpeg-9c)
+   set(JPG_PROJECT jpeg-9d)
    ExternalProject_Add(${JPG_PROJECT}
-   URL http://ijg.org/files/jpegsrc.v9c.tar.gz
-   URL_HASH SHA256=650250979303a649e21f87b5ccd02672af1ea6954b911342ea491f351ceb7122
+   URL http://ijg.org/files/jpegsrc.v9d.tar.gz
+   URL_HASH SHA256=99cb50e48a4556bc571dadd27931955ff458aae32f68c4d9c39d624693f69c32
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    )
    ExternalProject_Add_Step(${JPG_PROJECT} jpeg_add_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/jpeg-9c.CMakeLists.txt"
+           "${CMAKE_SOURCE_DIR}/patches/jpeg-9d.CMakeLists.txt"
            "<SOURCE_DIR>/CMakeLists.txt"
    DEPENDEES update # do after update
    DEPENDERS patch  # do before patch
