@@ -205,6 +205,7 @@ void    CarModel::configCar( void* hCar )
       LogSHADOW.info("#Car has TCL no\n");
 
     MASS = GfParmGetNum(hCar, SECT_CAR, PRM_MASS, NULL, 1000.0);
+    FUEL = GfParmGetNum(hCar, SECT_CAR, PRM_FUEL, NULL, 95.0);
 
     float fwingarea	= GfParmGetNum(hCar, SECT_FRNTWING, PRM_WINGAREA,  NULL, 0.0);
     WING_ANGLE_F	= GfParmGetNum(hCar, SECT_FRNTWING, PRM_WINGANGLE, NULL, 0.0);

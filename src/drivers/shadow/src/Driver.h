@@ -32,6 +32,7 @@
 #include <portability.h>
 
 #include <vector>
+#include <algorithm>
 
 #include "MyTrack.h"
 #include "Shared.h"

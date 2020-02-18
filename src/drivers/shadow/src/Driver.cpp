@@ -67,6 +67,8 @@ using namespace std;
 #define PRV_PIT_EXIT_OFFS			"pit exit offset"
 #define PRV_PIT_DAMAGE_WARN			"pit damage warn limit"
 #define PRV_PIT_DAMAGE_DANGER		"pit damage danger limit"
+#define PRV_PRACTICE_INIT_FUEL      "practice init fuel"
+#define PRV_PIT_TEST_STOP           "pit test stop"
 #define PRV_SKID_FACTOR				"skid factor"
 #define PRV_SKID_FACTOR_TRAFFIC		"skid factor traffic"
 #define PRV_REAR_LAT_SLIP_FACTOR	"rear lat slip factor"
@@ -464,13 +466,17 @@ void	Driver::InitTrack(
     // setup initial fuel for race.
     double	fuelPerM        = SafeParmGetNum(hCarParm, SECT_PRIV, "fuel per m", 0, 0.001f);
     double	maxFuel			= SafeParmGetNum(hCarParm, SECT_CAR, PRM_TANK, (char*) NULL, 100.0f);
+    int pittest             = SafeParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_TEST_STOP, (char*) NULL, 0);
     double	fullRaceFuel	= 1.02 * pS->_totLaps * pTrack->length * fuelPerM;
     double	fuel			= fullRaceFuel;
 
     if( raceType == RM_TYPE_PRACTICE )
     {
-        fuel = SafeParmGetNum(hCarParm, SECT_PRIV, "practice init fuel", "Kg", fuel);
+        fuel = SafeParmGetNum(hCarParm, SECT_PRIV, PRV_PRACTICE_INIT_FUEL , "Kg", fuel);
         LogSHADOW.info( "practice initial fuel: %g\n", fuel );
+
+        if (pittest > 0)
+            fuel = 1.04 * pTrack->length * fuelPerM;
     }
 
     if( fuel > maxFuel )
@@ -486,7 +492,7 @@ void	Driver::InitTrack(
     GfParmSetNum( hCarParm, SECT_CAR, PRM_FUEL, (char*) NULL, fuel );
 
     m_Strategy.SetDamageLimits( m_priv[PATH_NORMAL].PIT_DAMAGE_WARN,
-                                m_priv[PATH_NORMAL].PIT_DAMAGE_DANGER );
+                                m_priv[PATH_NORMAL].PIT_DAMAGE_DANGER, m_cm[PATH_NORMAL].HASTYC );
 
     // override params for car type on track of specific race type.
     snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s",
@@ -581,8 +587,8 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
     LogSHADOW.info( "RIGHT:  MU_SC %g   KZ_SCALE %g   FLY_HEIGHT %g\n",
                     m_cm[PATH_RIGHT].MU_SCALE, m_cm[PATH_RIGHT].KZ_SCALE, m_priv[PATH_RIGHT].FLY_HEIGHT );
 
-    m_cm[PATH_NORMAL].FUEL = 0;//pCar->_fuel;
-    LogSHADOW.info("FUEL : %.5f\n",m_cm[PATH_NORMAL].FUEL);
+    m_cm[PATH_NORMAL].FUEL = pCar->_fuel;
+    LogSHADOW.info("FUEL : %.7f\n", m_cm[PATH_NORMAL].FUEL);
 
     for( int p = PATH_LEFT; p <= PATH_RIGHT; p++ )
     {

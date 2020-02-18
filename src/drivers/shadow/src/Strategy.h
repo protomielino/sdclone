@@ -43,7 +43,7 @@ public:
     Strategy( const MyTrack& track, const PitPath& pitPath );
     ~Strategy();
 
-    void	SetDamageLimits( int warnDamage, int dangerDamage );
+    void	SetDamageLimits( int warnDamage, int dangerDamage, bool tyc );
     void	Process( CarElt* pCar, TeamInfo::Item* pMyInfo );
 
     bool	WantToPit() const;
@@ -67,6 +67,10 @@ private:
 
     int				m_warnDamageLimit;
     int				m_dangerDamageLimit;
+    int             m_warnTyreLimit;
+    int             m_dangerTyreLimit;
+
+    bool            m_HasTYC;
 
     int				m_state;
 
