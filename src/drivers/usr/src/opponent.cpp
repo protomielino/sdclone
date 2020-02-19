@@ -52,8 +52,10 @@ Opponent::Opponent()
     distance = distance2 = distance3 = trueSpeedDiff = 0.0;
     prev_speed_X = prev_speed_Y = d_prev_speed_X = d_prev_speed_Y = 0.0;
     average_AX = average_AY = collspeed = 0.0;
+
     for (int i=0; i<4; i++)
         speedAngle[i] = 0;
+
     deltamult = deltaTime = speedDelta = prevSpeed = simTime = 0;
     firstTime = true;
     left_speed_y = right_speed_y = 0.0;
@@ -90,10 +92,12 @@ void Opponent::update(tSituation *s, Driver *driver)
         deltaTime = s->deltaTime;
     }
 
-    if (teammate && team == -1) {
+    if (teammate && team == -1)
+    {
         team = TEAM_FRIEND;
     }
-    else if (!teammate) {
+    else if (!teammate)
+    {
         team = TEAM_FOE;
     }
 
@@ -110,6 +114,7 @@ void Opponent::update(tSituation *s, Driver *driver)
     double angle = trackangle - car->_yaw;
     NORM_PI_PI(angle);
     angle = fabs(angle);
+
     if (angle > 1.6)
         angle = 1.6 - (angle - 1.6);
 
@@ -130,6 +135,7 @@ void Opponent::update(tSituation *s, Driver *driver)
     mySpeed = driver->getSpeed();
 
     brakedistance = (float)(distance - car->_dimension_x);
+
     if (fabs(brakedistance) < car->_dimension_x * 2)
         brakedistance = getCornerDist();
 
@@ -137,26 +143,29 @@ void Opponent::update(tSituation *s, Driver *driver)
     calcState(mySpeed, driver);
 
     // Opponent is faster mycar
-    if (oppSpeed > mySpeed + SPEED_PASS_MARGIN) {
+    if (oppSpeed > mySpeed + SPEED_PASS_MARGIN)
+    {
         oppFaster = true;
     }
 
     updateOverlapTimer(s, mycar);
 
     // Opponent is behind mycar
-    if (state & OPP_BACK) {
+    if (state & OPP_BACK)
+    {
         // Check if we should let overtake the opponent.
         if (car->_pos < mycar->_pos && oppSpeed > mySpeed - 1.0f && overlaptimer > OVERLAP_WAIT_TIME && car->_pos < mycar->_pos) {
-            fprintf(stderr, "%s: LETPASS A\n", mycar->_name); fflush(stderr);
+            LogUSR.debug("%s: LETPASS A\n", mycar->_name);
             state = OPP_LETPASS;
         }
         else if (team == TEAM_FRIEND)
         {
             double oTmp = driver->AverageTmpForCar(car);
             double myTmp = driver->AverageTmpForCar(mycar);
+
             if ((oTmp - myTmp > 30.0 && myTmp < 50) || (car->_dammage - mycar->_dammage > 3000))
             {
-                fprintf(stderr, "%s: LETPASS B\n", mycar->_name); fflush(stderr);
+                LogUSR.debug("%s: LETPASS B\n", mycar->_name);
                 state = OPP_LETPASS;
             }
         }
@@ -183,7 +192,6 @@ void Opponent::initState()
     state = OPP_IGNORE;
 }
 
-
 // Updating distance along the middle.
 void Opponent::calcDist()
 {
@@ -194,10 +202,12 @@ void Opponent::calcDist()
     //float oppToStart = car->_trkPos.seg->lgfromstart + getDistToSegStart();
     //distance = oppToStart - mycar->_distFromStartLine;
 
-    if (distance > track->length / 2.0f) {
+    if (distance > track->length / 2.0f)
+    {
         distance -= track->length;
     }
-    else if (distance < -track->length / 2.0f) {
+    else if (distance < -track->length / 2.0f)
+    {
         distance += track->length;
     }
 
@@ -208,33 +218,38 @@ void Opponent::calcDist()
     speedangle = (float)sa;
 }
 
-
 // Compute the length to the start of the segment.
 float Opponent::getDistToSegStart(tCarElt *theCar)
 {
-    if (theCar->_trkPos.seg->type == TR_STR) {
+    if (theCar->_trkPos.seg->type == TR_STR)
+    {
         return theCar->_trkPos.toStart;
     }
-    else {
+    else
+    {
         return theCar->_trkPos.toStart*theCar->_trkPos.seg->radius;
     }
 }
-
 
 void Opponent::calcSpeed()
 {
     double ra = car->_yaw - mycar->_yaw;
     NORM_PI_PI(ra);
     relativeangle = (float)ra;
-    if (fabs(distance) < 20.0) {
-        if (fabs(relativeangle) > 0.5) {
+
+    if (fabs(distance) < 20.0)
+    {
+        if (fabs(relativeangle) > 0.5)
+        {
             speed = getSpeedAngle(mycar->_yaw);
         }
-        else {
+        else
+        {
             speed = car->_speed_x;
         }
     }
-    else {
+    else
+    {
         speed = getSpeedAngle(RtTrackSideTgAngleL(&(car->_trkPos)));
     }
 
@@ -247,6 +262,7 @@ void Opponent::calcSpeed()
     {
         for (int j=3; j>0; j--)
             speedAngle[j] = speedAngle[j-1];
+
         double newx = car->_corner_x(FRNT_LFT) + car->_speed_X;
         double newy = car->_corner_y(FRNT_LFT) + car->_speed_Y;
         double dx = newx - car->_corner_x(FRNT_LFT);
@@ -262,6 +278,7 @@ double Opponent::getSpeedAngle(double angle)
     speed.y = car->_speed_Y;
     dir.x = cos(angle);
     dir.y = sin(angle);
+
     return speed * dir;
 }
 
@@ -314,6 +331,7 @@ void Opponent::calcState(float Speed, Driver *driver)
         double oA = tA - car->_yaw;
         NORM_PI_PI(oA);
         oA = fabs(oA);
+
         if (oA > 1.6)
             oA = 1.6 - (oA - 1.6);
 
@@ -327,6 +345,7 @@ void Opponent::calcState(float Speed, Driver *driver)
             if (distance < -car->_dimension_x + 1.0f)
             {
                 tPosd p1, p2, r[4];
+
                 for (int i = 0; i < 4; i++)
                 {
                     r[i].ax = mycar->_corner_x(i);
@@ -367,6 +386,7 @@ void Opponent::calcState(float Speed, Driver *driver)
                 if (distance > car->_dimension_x * 0.6 && sidedist < 5.0f) // && newdistance < 1.0 && (Speed - oppSpeed) < 2.0)
                 {
                     int coll = testLinearCollision2(driver);
+
                     if (coll > 0 && (coll & OPP_COLL))
                         state |= coll;
                 }
@@ -510,27 +530,34 @@ void Opponent::calcState(float Speed, Driver *driver)
                 state = OPP_BACK_SLOW;
         }
         // Is opponent in front and faster.
-        else if (distance >= COLLDIST && oppSpeed > Speed) {
+        else if (distance >= COLLDIST && oppSpeed > Speed)
+        {
 //fprintf(stderr, "%s FRONT FAST\n",car->_name);fflush(stderr);
             oppFaster = true;
             state = OPP_FRONT_FAST;
             distance -= MAX(car->_dimension_x, mycar->_dimension_x);
+
             if (distance < EXACT_DIST)
                 distance = getCornerDist();
+
             if (team == TEAM_FRIEND && car->_dammage - MAX_DAMAGE_DIFF < mycar->_dammage) {
                 state = OPP_FRONT_FOLLOW;
             }
+
             if (distance < 20.0 - (oppSpeed - Speed) * 4) {
                 state = OPP_FRONT;
             }
         }
     }
-    else if (distance <= -BACKCOLLDIST || distance >= FRONTCOLLDIST) {
+    else if (distance <= -BACKCOLLDIST || distance >= FRONTCOLLDIST)
+    {
 //fprintf(stderr, "%s FARAWAY\n",car->_name);fflush(stderr);
         double dist = (mycar->_distRaced - car->_distRaced) - mycar->_dimension_x;
+
         if (team != TEAM_FRIEND && car->_speed_x > mycar->_speed_x && dist > 0)
         {
             t_impact = ((dist / (car->_speed_x - mycar->_speed_x)) * (1.0 + fabs(driver->raceline->tRInverse[LINE_RL][driver->raceline->Next])*2000));
+
             if (t_impact < 10.0)
             {
                 state |= OPP_BACK_CATCHING;
@@ -555,7 +582,6 @@ void Opponent::calcState(float Speed, Driver *driver)
 #endif
 }
 
-
 float Opponent::getCornerDist()
 {
     return getCornerDist(mycar, car);
@@ -571,26 +597,31 @@ static float DistFromPoint2Line(float x, float y, float x1, float y1, float x2, 
     float dot = A * C + B * D;
     float len_sq = C * C + D * D;
     float param = -1;
+
     if (len_sq != 0) //in case of 0 length line
         param = dot / len_sq;
 
     float xx, yy;
 
-    if (param < 0) {
+    if (param < 0)
+    {
         xx = x1;
         yy = y1;
     }
-    else if (param > 1) {
+    else if (param > 1)
+    {
         xx = x2;
         yy = y2;
     }
-    else {
+    else
+    {
         xx = x1 + param * C;
         yy = y1 + param * D;
     }
 
     float dx = x - xx;
     float dy = y - yy;
+
     return (dx * dx + dy * dy);
 }
 
@@ -608,6 +639,7 @@ double DistToLineSegment(double px, double py, double vx, double vy, double wx, 
 
     double t = ((px - vx) * (wx - vx) + (py - vy) * (wy - vy)) / l2;
     t = MAX(0, MIN(1, t));
+
     return sqrt(DIST2(px, py, vx + t * (wx - vx), vy + t * (wy - vy)));
 }
 
@@ -622,10 +654,12 @@ float Opponent::getCornerDist(tCarElt *dCar, tCarElt *oCar)
         orect[i].ax = oCar->_corner_x(i);
         orect[i].ay = oCar->_corner_y(i);
     }
+
     if (polyOverlap(drect, orect))
         return -1.0;
 
     float minDist = FLT_MAX;
+
     for (int i = 0; i < 4; i++)
     {
         minDist = MIN(minDist, DistToLineSegment(dCar->_corner_x(i), dCar->_corner_y(i), oCar->_corner_x(FRNT_LFT), oCar->_corner_y(FRNT_LFT), oCar->_corner_x(FRNT_RGT), oCar->_corner_y(FRNT_RGT)));
@@ -640,6 +674,7 @@ float Opponent::getCornerDist(tCarElt *dCar, tCarElt *oCar)
 
     if (minDist > 0.0f)
         minDist = sqrt(minDist) - 1.0f;
+
     return MAX(0.0f, minDist);
 
 #if 0
@@ -732,32 +767,38 @@ void Opponent::updateOverlapTimer(tSituation *s, tCarElt *mycar)
     if (car->_pos < mycar->_pos ||
         ((team == TEAM_FRIEND) && mycar->_dammage > car->_dammage + MAX_DAMAGE_DIFF))
     {
-        if (getState() & (OPP_BACK | OPP_SIDE)) {
+        if (getState() & (OPP_BACK | OPP_SIDE))
+        {
             overlaptimer += s->deltaTime;
         }
-        else if (getState() & OPP_FRONT) {
+        else if (getState() & OPP_FRONT)
+        {
             overlaptimer = LAP_BACK_TIME_PENALTY;
         }
-        else {
-            if (overlaptimer > 0.0) {
-                if (getState() & OPP_FRONT_FAST) {
+        else
+        {
+            if (overlaptimer > 0.0)
+            {
+                if (getState() & OPP_FRONT_FAST)
+                {
                     overlaptimer = MIN(0.0, overlaptimer);
                 }
-                else {
+                else
+                {
                     overlaptimer -= s->deltaTime;
                 }
             }
-            else {
+            else
+            {
                 overlaptimer += s->deltaTime;
             }
         }
     }
-    else {
+    else
+    {
         overlaptimer = 0.0;
     }
 }
-
-
 
 int Opponent::polyOverlap(tPosd *op, tPosd *dp)
 {
@@ -790,6 +831,7 @@ int Opponent::polyOverlap(tPosd *op, tPosd *dp)
             {
                 if ((lineBx2 - lineBx1) == 0.0)
                     continue;
+
                 isX = lineAx1;
                 bM = (lineBy2 - lineBy1) / (lineBx2 - lineBx1);
                 bB = lineBy2 - bM * lineBx2;
@@ -814,6 +856,7 @@ int Opponent::polyOverlap(tPosd *op, tPosd *dp)
 
             if (isX < MIN(lineAx1, lineAx2) || isX < MIN(lineBx1, lineBx2) || isX > MAX(lineAx1, lineAx2) || isX > MAX(lineBx1, lineBx2))
                 continue;
+
             if (isY < MIN(lineAy1, lineAy2) || isY < MIN(lineBy1, lineBy2) || isY > MAX(lineAy1, lineAy2) || isY > MAX(lineBy1, lineBy2))
                 continue;
 
@@ -870,10 +913,12 @@ int Opponent::testLinearCollision2(Driver *driver)
     double myta = fabs(RtTrackSideTgAngleL(&(mycar->_trkPos))) * 180 / 3.14159;
     double ota = fabs(RtTrackSideTgAngleL(&(car->_trkPos))) * 180 / 3.14159;
     double tadiff = fabs((float)(myta - ota));
+
     if (brakedistance < 0.0)
     {
         // we have a poly overlap!!!
         collspeed = (float) MIN(collspeed, MAX(0.0, car->_speed_x-7.0));
+
         if (car->_speed_x < 0.0)
             collspeed = car->_speed_x - 2.0;
 
@@ -893,6 +938,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     }
 #endif
     double brake_coefficient = driver->getBrakeCoefficient();
+
     if (fabs(relativeangle) > 0.3f)
         brake_coefficient /= (1.0 + (fabs(relativeangle) - 0.3f));
     //if (car->_speed_x < 10 && distance < 3)
@@ -942,6 +988,7 @@ int Opponent::testLinearCollision2(Driver *driver)
     if (brakedistance > MIN(mycar->_speed_x / 3, MAX(1.0, (mycar->_speed_x - car->_speed_x) * 3)))
     {
         int div = driver->raceline->DivIndexForCar(car, timpact);
+
         if (driver->raceline->IsSlowerThanSpeedToDiv(driver->linemode, car->_speed_x + MIN(0.0, avgAccelX / 4), div, &slowSpeed))
         {
 #ifdef BRAKE_DEBUG
@@ -949,6 +996,7 @@ int Opponent::testLinearCollision2(Driver *driver)
 #endif
             if (brakedistance > MAX(1, 4.0 - fabs(driver->raceline->tRInverse[LINE_RL][driver->raceline->This]) * 1000))
                 hasSlowerSpeed = true;
+
             return -1;
         }
     }
