@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file   
-    		
+
+/** @file
+
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
     @ingroup	robotmodint
@@ -32,7 +32,7 @@
    @image	html robot_call.gif
    @ingroup	modint
 */
- 
+
 #ifndef _ROBOTV1_H_
 #define _ROBOTV1_H_
 
@@ -72,10 +72,10 @@ typedef struct RobotItf {
     tfRbEndRace  rbEndRace;	/**< End of the current race */
     tfRbDrive	 rbDrive;	/**< Drive during race */
     tfRbPitCmd	 rbPitCmd;	/**< Get the driver's pit commands.
-				 <br>Returns:
-				 - ROB_PIT_IM
-				 - ROB_PIT_MENU
-				*/
+                 <br>Returns:
+                 - ROB_PIT_IM
+                 - ROB_PIT_MENU
+                */
     tfRbShutdown rbShutdown;	/**< Called before the dll is unloaded */
     int		 index;		/**< Index used if multiple interfaces */
 } tRobotItf;
@@ -120,8 +120,9 @@ typedef struct RobotItf {
 #define ROB_VAL_FEATURE_PENALTIES       "penalties"
 #define ROB_VAL_FEATURE_TIMEDSESSION	"timed session"
 #define ROB_VAL_FEATURE_WETTRACK		"wet track"
+#define ROB_VAL_FEATURE_REALWEATHER     "real weather"
 
-#endif /* _ROBOTV1_H_ */ 
+#endif /* _ROBOTV1_H_ */
 
 
 

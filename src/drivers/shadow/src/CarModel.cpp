@@ -991,8 +991,8 @@ double	CarModel::CalcAcceleration(
             break;
     }
 
-    if( v < u )
-        int f = 1;
+    /*if( v < u )
+        int f = 1;*/
 
     return MX(u, v);
 }
@@ -1038,7 +1038,7 @@ void	CarModel::CalcSimuSpeeds(
     // max_a = M * G * MU;
     // max_spd = sqrt(max_a r) = sqrt(M * G * MU / k)
 
-    double	M  = MASS + FUEL;
+    //double	M  = MASS + FUEL;
 //	double	MU = trackMu * TYRE_MU * (GRIP_SCALE_F + GRIP_SCALE_R) * 0.5;
     double	MU = trackMu * TYRE_MU * MN(GRIP_SCALE_F, GRIP_SCALE_R);
 
@@ -1050,8 +1050,10 @@ void	CarModel::CalcSimuSpeeds(
     double	estT = dist / spd0;
 
     double	lat_acc = 2 * dy / (estT * estT);
+
     if( lat_acc > max_acc )
         lat_acc = max_acc;
+
     double	lin_acc = sqrt(max_acc * max_acc - lat_acc * lat_acc);
 
     //
@@ -1062,6 +1064,7 @@ void	CarModel::CalcSimuSpeeds(
     //	is an estimation (poor, but hopefully good enough for our purposes).
     static const Quadratic	accFromSpd(21.0/5400, -43.0/60, 30);
     double	eng_acc = accFromSpd.CalcY(spd0) * trackMu;
+
     if( eng_acc > lin_acc )
         eng_acc = lin_acc;
 
@@ -1093,7 +1096,7 @@ void	CarModel::CalcSimuSpeedRanges(
     // max_a = M * G * MU;
     // max_spd = sqrt(max_a r) = sqrt(M * G * MU / k)
 
-    double	M  = MASS + FUEL;
+    //double	M  = MASS + FUEL;
 //	double	MU = trackMu * TYRE_MU * (GRIP_SCALE_F + GRIP_SCALE_R) * 0.5;
     double	MU = trackMu * TYRE_MU * MN(GRIP_SCALE_F, GRIP_SCALE_R);
 

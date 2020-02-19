@@ -205,14 +205,14 @@ void	ClothoidPath::AnalyseBumps( const CarModel& cm, bool dumpInfo )
     double	sz = m_pts[0].pt.z;
     double	vz = 0;
     double	pz = sz;
-    double	dt = 0.1;
+    //double	dt = 0.1;
     {for( int count = 0; count < 2; count++ )
         {
             int		pi = NSEG - 1;
 
             for( int i = 0; i < NSEG; i++ )
             {
-                double	oldSz = sz;
+                //double	oldSz = sz;
                 double	oldPz = pz;
 
                 double	v = (m_pts[i].accSpd + m_pts[pi].accSpd) * 0.5;
@@ -226,6 +226,7 @@ void	ClothoidPath::AnalyseBumps( const CarModel& cm, bool dumpInfo )
                 if( sz <= pz )
                 {
                     double	newVz = (pz - oldPz) / dt;
+
                     if( vz < newVz )
                         vz = newVz;
                     sz = pz;
@@ -455,10 +456,10 @@ void ClothoidPath::Search( const CarModel& cm )
 
 void ClothoidPath::Search( const CarModel& cm, const ICalcTimeFunc& calcTimeFunc )
 {
-    const double LaneMinInt = 1.0;
+    /*const double LaneMinInt = 1.0;
     const double LaneMinExt = 1.0;
     const double LaneMaxInt = 1.0;
-    const double LaneMaxExt = 1.0;
+    const double LaneMaxExt = 1.0;*/
 
     int IndexStep = 128;
     double LaneStep = 0.02;

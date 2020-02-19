@@ -79,7 +79,8 @@ typedef struct {
     int			features;	/**< A list of features a race have (the common set of features all the robots in the race actually support) */
 #define RM_FEATURE_PENALTIES	0x01 /**< A robot with this feature implements penalties */
 #define RM_FEATURE_TIMEDSESSION 0x02 /**< A robot with this feature implements timed sessions */
-#define RM_FEATURE_WETTRACK	0x04 /**< A robot with this feature can handle wet track conditions */
+#define RM_FEATURE_WETTRACK	    0x04 /**< A robot with this feature can handle wet track conditions */
+#define RM_FEATURE_REALWEATHER  0x08 /**< A robot with this feature can handle with dynamic weather */
 } tRaceAdmInfo;
 
 #define _ncars		raceInfo.ncars

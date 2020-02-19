@@ -942,20 +942,18 @@ double	Driver::GripFactor( const CarElt* pCar, bool front ) const
 {
     const double initialTemperature	= 273.15 + 20.0;
 
-    double	gripFactor = 2.0;
-    int		wheel_base = front ? 0 : 2;
-    for( int i = 0; i < 2; i++ )
-    {
-        int w = i + wheel_base;
-        //double currentTemperature	= pCar->priv.wheel[w].currentTemperature;
-        //double idealTemperature		= pCar->info.wheel[w].idealTemperature;
-        //double currentGraining		= pCar->priv.wheel[w].currentGraining;
+    double	gripFactor = 1.0;
 
-        //tdble di = (currentTemperature - idealTemperature)/(idealTemperature - initialTemperature);
-        //gripFactor += ((1.0f-(MIN((di*di), 1.0f)))/4.0f + 3.0f/4.0f)*(1.0f - currentGraining/10.0f);
+    if(m_cm[PATH_NORMAL].HASTYC)
+    {
+        if(front)
+            gripFactor = m_cm[PATH_NORMAL].GRIP_SCALE_F;
+        else {
+            gripFactor = m_cm[PATH_NORMAL].GRIP_SCALE_R;
+        }
     }
 
-    return gripFactor * 0.5;
+    return gripFactor;
 }
 
 double	CalcMaxSlip( double fRatio )
