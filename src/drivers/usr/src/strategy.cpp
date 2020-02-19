@@ -645,12 +645,15 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
 
 	tCarPitCmd::TireChange SimpleStrategy::pitTyres(tCarElt *car, tSituation *s)
 	{
-		// called when car arrives in pits.
-		if (m_nNT || m_tHP)
+		if (cardata->HasTYC)
 		{
-			m_tROL = car->_laps;
+			// called when car arrives in pits.
+			if (m_nNT || m_tHP)
+			{
+				m_tROL = car->_laps;
 
-			return tCarPitCmd::ALL;
+				return tCarPitCmd::ALL;
+			}
 		}
 
 		return tCarPitCmd::NONE;
