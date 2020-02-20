@@ -189,8 +189,8 @@ static void*	MergeParamFile( void* hParams, const char* fileName, bool relSrc = 
         return hNewParams;
     }
 
-    const char* path = SECT_GROBJECTS "/" LST_RANGES "/1";
-    const char* ac3d_car = GfParmGetStr(hNewParams, path, "car", "");
+    //const char* path = SECT_GROBJECTS "/" LST_RANGES "/1";
+    //const char* ac3d_car = GfParmGetStr(hNewParams, path, "car", "");
 
     float fw_ang = GfParmGetNum(hNewParams, "Front Wing", "angle", NULL, 0);
 
@@ -201,7 +201,7 @@ static void*	MergeParamFile( void* hParams, const char* fileName, bool relSrc = 
                                  GFPARM_MMODE_SRC | GFPARM_MMODE_DST |
                                  (relSrc ? GFPARM_MMODE_RELSRC : 0) | GFPARM_MMODE_RELDST);
 
-    const char* ac3d_car2 = GfParmGetStr(hParams, path, "car", "");
+    //const char* ac3d_car2 = GfParmGetStr(hParams, path, "car", "");
     return hParams;
 }
 
@@ -269,7 +269,7 @@ void	Driver::InitTrack(
     //
     char	buf[1024];
     snprintf(buf, sizeof(buf), "drivers/%s", MyBotName);
-    const char*	baseParamPath = buf;
+    //const char*	baseParamPath = buf;
 
     weathercode = GetWeather(pTrack);
 
@@ -325,7 +325,7 @@ void	Driver::InitTrack(
     *ppCarParmHandle = hCarParm;
 
     // get the private parameters now.
-    const char* ac3d_car = GfParmGetStr(hCarParm, SECT_GROBJECTS "/" LST_RANGES "/1", PRM_CAR, "");
+    //const char* ac3d_car = GfParmGetStr(hCarParm, SECT_GROBJECTS "/" LST_RANGES "/1", PRM_CAR, "");
 
     double rpm = GfParmGetNum(hCarParm, SECT_PRIV, PRV_GEAR_UP_RPM, "rpm", 8190);
     m_gearUpRpm = rpm * 2 * PI / 60;
@@ -467,7 +467,7 @@ void	Driver::InitTrack(
     double	fuelPerM        = SafeParmGetNum(hCarParm, SECT_PRIV, "fuel per m", 0, 0.001f);
     double	maxFuel			= SafeParmGetNum(hCarParm, SECT_CAR, PRM_TANK, (char*) NULL, 100.0f);
     int pittest             = SafeParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_TEST_STOP, (char*) NULL, 0);
-    double	fullRaceFuel	= 1.02 * pS->_totLaps * pTrack->length * fuelPerM;
+    double	fullRaceFuel	= 1.02 * pS->_totLaps * (double)pTrack->length * fuelPerM;
     double	fuel			= fullRaceFuel;
 
     if( raceType == RM_TYPE_PRACTICE )
@@ -516,7 +516,7 @@ void	Driver::InitTrack(
 
     if (skillHandle)
     {
-        global_skill = GfParmGetNum(skillHandle, (char *)SECT_SKILL, (char *)PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
+        global_skill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
     }
 
     global_skill = MAX(0.0f, MIN(30.0f, global_skill));
@@ -940,7 +940,7 @@ void	Driver::GetPathToLeftAndRight( const CarElt* pCar, double& toL, double& toR
 
 double	Driver::GripFactor( const CarElt* pCar, bool front ) const
 {
-    const double initialTemperature	= 273.15 + 20.0;
+    //const double initialTemperature	= 273.15 + 20.0;
 
     double	gripFactor = 1.0;
 
@@ -2413,7 +2413,7 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
 {
     m_cm[PATH_NORMAL].update( car, s );
 
-#if EXPERIMENTAL
+/*#if EXPERIMENTAL
     //#if 1
     launchControlFullThrottle(car, s);
     //	launchControlClutch(car, s);
@@ -2422,7 +2422,7 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
     //	launchControlAccSlip2(car, s);
     //	launchControlSimple(car, s);
     return;
-#endif
+#endif*/
 
     double	h[4];
     for( int i = 0; i < 4; i++ )

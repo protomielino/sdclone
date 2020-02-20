@@ -67,8 +67,8 @@ private:
 
     int				m_warnDamageLimit;
     int				m_dangerDamageLimit;
-    int             m_warnTyreLimit;
-    int             m_dangerTyreLimit;
+    double          m_warnTyreLimit;
+    double          m_dangerTyreLimit;
 
     bool            m_HasTYC;
 

@@ -380,6 +380,12 @@ void	CarModel::update( const tCarElt* car, const tSituation* sit )
     POS_AZ = new_pos_az;
     VEL_AZ = new_vel_az;
 
+    if (HASTYC)
+    {
+        GRIP_SCALE_F = MN(car->priv.wheel[0].condition, car->priv.wheel[1].condition);
+        GRIP_SCALE_R = MN(car->priv.wheel[2].condition, car->priv.wheel[3].condition);
+    }
+
 //	DEBUGF( "vx %7.4f %7.4f  vy %7.4f %7.4f  vz %7.4f %7.4f  vaz %7.4f %7.4f\n",
 //			VEL_L.x, car->pub.DynGC.vel.x,
 //			VEL_L.y, car->pub.DynGC.vel.y,
@@ -492,7 +498,7 @@ double	CarModel::CalcMaxSpeedAeroOld(
         mua   = MU * MU_SCALE;// * 0.975;
     }
 
-//	mua *= (GRIP_SCALE_F + GRIP_SCALE_R) * 0.5;
+ //	mua *= (GRIP_SCALE_F + GRIP_SCALE_R) * 0.5;
     mua *= MN(GRIP_SCALE_F, GRIP_SCALE_R);
 
     double	cs = cos(trackRollAngle) * cos(trackPitchAngle);

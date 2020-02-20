@@ -44,6 +44,7 @@ Strategy::Strategy( const MyTrack& track, const PitPath& pitPath )
       m_lastFuel(0),
       m_totalFuel(0),
       m_totalLaps(0),
+      m_lastTyreWear(1.0),
       m_pitType(PT_NORMAL)
 {
 }
@@ -64,14 +65,16 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
     //
     //	update statistics.
     //
-    double tyreWear = 0;
+    double tyreWear = 1.0;
 
     if (m_HasTYC)
     {
         for( int w = 0; w < 4; w++ )
-            tyreWear = MX(tyreWear, pCar->priv.wheel[w].condition);
+            tyreWear = MN(tyreWear, pCar->priv.wheel[w].treadDepth);
 
-        if( pCar->_fuel	> m_lastFuel || pCar->_dammage < m_lastDamage || tyreWear < m_lastTyreWear )
+        LogSHADOW.info(" # Tyre wear = %.8f\n", tyreWear);
+
+        if( pCar->_fuel	> m_lastFuel || pCar->_dammage < m_lastDamage || tyreWear > m_lastTyreWear )
         {
             // been in pits... reset.
             LogSHADOW.debug( "***** Been in pits... resetting stats.\n" );
@@ -97,6 +100,7 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
             {
                 m_totalTyreWear += (tyreWear - m_lastTyreWear);
                 m_lastTyreWear = tyreWear;
+                LogSHADOW.info(" # TyreWear = %.8f - Last TyreWear = %.8f\n", tyreWear, m_lastTyreWear);
             }
         }
     }
@@ -139,9 +143,9 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
         damagePerM = m_totalDamage / pCar->_distRaced;
 
         if(m_HasTYC)
-            tyreWearPerM = m_totalTyreWear / pCar->_distRaced;
+            tyreWearPerM = (1.0 - m_lastTyreWear) / pCar->_distRaced;
 
-        LogSHADOW.debug(" # Fuel per meter = %.6f - Damage per meter = %.6f - Wear per meter = %.6f\n", fuelPerM, damagePerM, tyreWearPerM);
+        LogSHADOW.info(" # Fuel per meter = %.6f - Damage per meter = %.1f - Wear per meter = %.8f\n", fuelPerM, damagePerM, tyreWearPerM);
     }
 
     //
