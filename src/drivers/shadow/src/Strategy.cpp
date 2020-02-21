@@ -37,8 +37,8 @@ Strategy::Strategy( const MyTrack& track, const PitPath& pitPath )
       m_pitPath(pitPath),
       m_warnDamageLimit(5000),
       m_dangerDamageLimit(7000),
-      m_warnTyreLimit(0.6),
-      m_dangerTyreLimit(0.5),
+      m_warnTyreLimit(0.8),
+      m_dangerTyreLimit(0.7),
       m_HasTYC(false),
       m_state(PIT_NONE),
       m_lastFuel(0),
@@ -72,7 +72,7 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
         for( int w = 0; w < 4; w++ )
             tyreWear = MN(tyreWear, pCar->priv.wheel[w].treadDepth);
 
-        LogSHADOW.info(" # Tyre wear = %.8f\n", tyreWear);
+        LogSHADOW.debug(" # Tyre wear = %.8f\n", tyreWear);
 
         if( pCar->_fuel	> m_lastFuel || pCar->_dammage < m_lastDamage || tyreWear > m_lastTyreWear )
         {
@@ -100,7 +100,7 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
             {
                 m_totalTyreWear += (tyreWear - m_lastTyreWear);
                 m_lastTyreWear = tyreWear;
-                LogSHADOW.info(" # TyreWear = %.8f - Last TyreWear = %.8f\n", tyreWear, m_lastTyreWear);
+                LogSHADOW.debug(" # TyreWear = %.8f - Last TyreWear = %.8f\n", tyreWear, m_lastTyreWear);
             }
         }
     }
@@ -145,7 +145,7 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
         if(m_HasTYC)
             tyreWearPerM = (1.0 - m_lastTyreWear) / pCar->_distRaced;
 
-        LogSHADOW.info(" # Fuel per meter = %.6f - Damage per meter = %.1f - Wear per meter = %.8f\n", fuelPerM, damagePerM, tyreWearPerM);
+        LogSHADOW.debug(" # Fuel per meter = %.6f - Damage per meter = %.1f - Wear per meter = %.8f\n", fuelPerM, damagePerM, tyreWearPerM);
     }
 
     //
@@ -167,7 +167,7 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
     double	damagePerLap = damagePerM * trackLen;
 
     if(m_HasTYC)
-        double	tyreWearPerLap = tyreWearPerM * trackLen;
+          double tyreWearPerLap = tyreWearPerM * trackLen;
 
     bool	pitAvailable = true;
     double	minPitLaps = 1;
@@ -194,8 +194,7 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
     bool	likeToPit = pitAvailable &&
             (pCar->_dammage >= repairLimit ||
              //						 pCar->_fuel < fuelPerLap * 1.5 ||
-             pTeamInfo->lapsUntilPit < minPitLaps /*||
-                                           tyreWear > 0.95*/);
+             pTeamInfo->lapsUntilPit < minPitLaps || tyreWear < m_warnTyreLimit);
 
 #if defined(DEV) && 0  // don't want to leave this in the code by mistake for TRB races.
     likeToPit = true;
@@ -276,7 +275,7 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
 
     case PIT_ASKED:
         if(m_HasTYC)
-            pCar->pitcmd.tireChange	= tyreWear > 0.5 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
+            pCar->pitcmd.tireChange	= tyreWear < m_warnTyreLimit ? tCarPitCmd::ALL : tCarPitCmd::NONE;
 
         if( m_pitPath.CanStop(trackPos) &&
                 (pCar->ctrl.raceCmd & RM_CMD_PIT_ASKED) )
