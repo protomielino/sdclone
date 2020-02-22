@@ -1280,7 +1280,7 @@ double Opponent::CalcCollSpeed(Driver *driver)
     double rdVX = myDirX * dVX + myDirY * dVY;
     double rdVY = myDirY * dVX - myDirX * dVY;
     double oVX = car->_speed_x + rdVX;
-    double tyreFactor = 1.0 + (driver->raceline->cardata->aFTT > 80.0 ? 0.0 : 1.0 - (driver->raceline->cardata->aFTT-20) / 60.0);
+    double tyreFactor = 1.0 + (driver->raceline->cardata->GRIP_FACTOR > 80.0 ? 0.0 : 1.0 - (driver->raceline->cardata->GRIP_FACTOR - 20) / 60.0);
     double minDY = (car->_dimension_y) / 2 + 0.5 * tyreFactor;
     double minDX = (car->_dimension_x) / 2 + 0.5 * tyreFactor;
 
@@ -1419,7 +1419,7 @@ int Opponent::testCalculatedCollision(Driver *driver)
         return 0;
     }
 
-    double tyreFactor = driver->raceline->cardata->aFTT > 80.0 ? 0.0 : 1.0 - (driver->raceline->cardata->aFTT-20.0) / 60.0;
+    double tyreFactor = driver->raceline->cardata->GRIP_FACTOR > 80.0 ? 0.0 : 1.0 - (driver->raceline->cardata->GRIP_FACTOR - 20.0) / 60.0;
     if ((t_impact > 15.0 * (1.0 + tyreFactor) && colldist > MAX(safe_margin, (mycar->_speed_x - oppSpeed) * 20 * (1.0 + tyreFactor))) || collspeed > mycar->_speed_x)
     {
 #ifdef BRAKE_DEBUG

@@ -856,15 +856,15 @@ double LRaceLine::getCornerSpeed(int Div, int rl)
                 if (!(labelOverride->getOverrideValue(Div, &cornerspeed_cold_override)))
                     cornerspeed_cold_override = cornerspeed_override;
 
-            if (cardata->aFTT < 0.8)
+            if (cardata->GRIP_FACTOR < 0.8)
                 coldfactor = MIN(1.0, MAX(0.5, cornerspeed_cold_override / cornerspeed_override));
-            else if (cardata->aFTT < 0.70)
-                coldfactor = MIN(1.0, MAX(0.4, (cardata->aFTT)));
+            else if (cardata->GRIP_FACTOR < 0.70)
+                coldfactor = MIN(1.0, MAX(0.4, (cardata->GRIP_FACTOR)));
 
-            if (cardata->aFTT < 0.8)
+            if (cardata->GRIP_FACTOR < 0.8)
                 return cornerspeed_cold_override * CornerSpeedFactor;
-            else if (cardata->aFTT < 0.7)
-                return (cornerspeed_cold_override + cardata->aFTT * (cornerspeed_override - cornerspeed_cold_override)) * CornerSpeedFactor;
+            else if (cardata->GRIP_FACTOR < 0.7)
+                return (cornerspeed_cold_override + cardata->GRIP_FACTOR * (cornerspeed_override - cornerspeed_cold_override)) * CornerSpeedFactor;
             else
                 return cornerspeed_override * CornerSpeedFactor;
         }
@@ -887,10 +887,10 @@ double LRaceLine::getCornerSpeed(int Div, int rl)
                         if (!(labelOverride->getOverrideValue(Div, &cornerspeed_cold_override)))
                             cornerspeed_cold_override = cornerspeed_override;
 
-                        if (cardata->aFTT < 0.8)
+                        if (cardata->GRIP_FACTOR < 0.8)
                             coldfactor = MIN(1.0, MAX(0.5, cornerspeed_cold_override / cornerspeed_override));
-                        else if (cardata->aFTT < 0.7)
-                            coldfactor = MIN(1.0, MAX(0.4, cardata->aFTT));
+                        else if (cardata->GRIP_FACTOR < 0.7)
+                            coldfactor = MIN(1.0, MAX(0.4, cardata->GRIP_FACTOR));
                     }
 
                     return cornerspeed_override * coldfactor * CornerSpeedFactor;
@@ -919,10 +919,10 @@ double LRaceLine::getCornerSpeed(int Div, int rl)
                         if (!(labelOverride->getOverrideValue(Div, &cornerspeed_cold_override)))
                             cornerspeed_cold_override = cornerspeed_override;
 
-                        if (cardata->aFTT < 0.8)
+                        if (cardata->GRIP_FACTOR < 0.8)
                             coldfactor = MIN(1.0, MAX(0.5, cornerspeed_cold_override / cornerspeed_override));
-                        else if (cardata->aFTT < 0.7)
-                            coldfactor = MIN(1.0, MAX(0.4, (cardata->aFTT)));
+                        else if (cardata->GRIP_FACTOR < 0.7)
+                            coldfactor = MIN(1.0, MAX(0.4, (cardata->GRIP_FACTOR)));
                     }
 
                     return cornerspeed_override * coldfactor * CornerSpeedFactor;
@@ -972,10 +972,10 @@ double LRaceLine::getBrakeDist(int Div, int rl)
                 if (!(labelOverride->getOverrideValue(Div, &brakedelay_override)))
                     brakedelay_override = brakeDist;
 
-                if (cardata->HasTYC == TRUE && cardata->aFTT < 0.8)
+                if (cardata->HasTYC == TRUE && cardata->GRIP_FACTOR < 0.8)
                     coldfactor = MIN(1.0, brakedelay_cold_override / brakedelay_override);
-                else if (cardata->HasTYC == TRUE && cardata->aFTT < 0.7)
-                    coldfactor = MIN(1.0, (cardata->aFTT));
+                else if (cardata->HasTYC == TRUE && cardata->GRIP_FACTOR < 0.7)
+                    coldfactor = MIN(1.0, (cardata->GRIP_FACTOR));
             }
         }
     }
@@ -1718,7 +1718,7 @@ void LRaceLine::UpdateRacelineSpeeds(int raceType)
         {
             shouldUpdate = (fabs(car->_fuel - cardata->fuel) > (raceType == RM_TYPE_QUALIF ? 1.0 : 5.0) ||
                 fabs(car->_dammage - cardata->damage) > 100.0f ||
-                (/*(CaTT() - */cardata->aTT < 0.8 || cardata->aTT /*- CaTT()*/ > 0.9) && (cardata->lTT < cardata->CTTT + 0.50));
+                (/*(CaTT() - */cardata->GRIP_FACTOR < 0.8 || cardata->GRIP_FACTOR /*- CaTT()*/ > 0.9) && (cardata->TYREWEAR < cardata->CRITICAL_TYREWEAR + 0.50));
         }
         else
             shouldUpdate = (fabs(car->_fuel - cardata->fuel) > (raceType == RM_TYPE_QUALIF ? 1.0 : 5.0) || fabs(car->_dammage - cardata->damage) > 100.0f);
@@ -1728,7 +1728,7 @@ void LRaceLine::UpdateRacelineSpeeds(int raceType)
         if (cardata->HasTYC == true)
             shouldUpdate = (fabs(car->_fuel - cardata->fuel) > (raceType == RM_TYPE_QUALIF ? 1.0 : 5.0) ||
                 fabs(car->_dammage - cardata->damage) > 100.0f ||
-                (/*(CaTT() - */cardata->aTT < 0.8 || cardata->aTT /*- CaTT()*/ > 0.9) && (cardata->lTT < cardata->CTTT + 0.50));
+                (/*(CaTT() - */cardata->GRIP_FACTOR < 0.8 || cardata->GRIP_FACTOR /*- CaTT()*/ > 0.9) && (cardata->TYREWEAR < cardata->CRITICAL_TYREWEAR + 0.50));
         else
             shouldUpdate = (fabs(car->_fuel - cardata->fuel) > (raceType == RM_TYPE_QUALIF ? 1.0 : 5.0) || fabs(car->_dammage - cardata->damage) > 100.0f);
     }
@@ -1752,7 +1752,7 @@ void LRaceLine::UpdateRacelineSpeeds(int raceType)
             //
             // Anticipate braking
             //
-            int iter = MAX(12, MIN(25, (int)((80.0 / cardata->aFTT) * 10)));
+            int iter = MAX(12, MIN(25, (int)((80.0 / cardata->GRIP_FACTOR) * 10)));
             for (int j = iter; --j >= 0;)
             {
                 for (i = Divs; --i >= 0;)
@@ -1782,8 +1782,8 @@ void LRaceLine::ComputeRacelineBraking(int i, int rl, double **tSpeed, int speed
     //double TireAccel = turnSpeed * tFriction[i];
     double TireAccel = getCornerSpeed(i, speedrl) * tFriction[i] * cardata->carMu;
 
-    if (cardata->aFTT < 0.80)
-        TireAccel *= MAX(0.65, MIN(1.0, (0.65 * cardata->aTT) + 0.45));
+    if (cardata->GRIP_FACTOR < 0.80)
+        TireAccel *= MAX(0.65, MIN(1.0, (0.65 * cardata->GRIP_FACTOR) + 0.45));
 
     int prev = (i - 1 + Divs) % Divs;
 
@@ -1852,9 +1852,9 @@ void LRaceLine::ComputeRacelineSpeed(int i, int rl, double **tSpeed, int speedrl
         if (MaxSpeed > 25.0 && fabs(rInverse) > 0.0005)
         {
             if (rInverse < 0.0)
-                MaxSpeed = (MaxSpeed /*- 20.0)*/ * cardata->lmTT);
+                MaxSpeed = (MaxSpeed /*- 20.0)*/ * cardata->GRIP_FACTOR_LEFT);
             else if (rInverse > 0.0)
-                MaxSpeed = (MaxSpeed /*- 20.0) */* cardata->rmTT);
+                MaxSpeed = (MaxSpeed /*- 20.0) */* cardata->GRIP_FACTOR_RIGHT);
         }
         else
         {
@@ -2142,7 +2142,7 @@ double LRaceLine::getLookAhead(int rl, double leftMargin, double rightMargin, bo
     double rlfactor = 1.0 + fabs(tRInverse[rl][Next])*rlmult * (1.0 + fabs(tRInverse[rl][Next])*rlmult);
     double speedfactor = (tSpeed[rl][Next] - car->_speed_x < spdmrgn || fabs(tRInverse[rl][Next]) < 0.0005 ? 1.0 : MIN(1.0, (car->_speed_x + spdmrgn) / MIN(tSpeed[rl][Next], 80.0) / rlfactor));
 #endif
-    double trfactor = MIN(1.0, MAX(0.7, 0.7 + (cardata->aFTT / cardata->lTT)*0.3));
+    double trfactor = MIN(1.0, MAX(0.7, 0.7 + (cardata->GRIP_FACTOR / cardata->TYREWEAR)*0.3));
     double fuelCarMu = cardata->carMu;
     double gripfactor = MAX(0.3, MIN(1.0, (cardata->carMu / fuelCarMu) * (cardata->carMu / fuelCarMu)));
     if (tSpeed[rl][Next] > tSpeed[rl][(Next - 5 + Divs) % Divs]) gripfactor = 1.0;
@@ -2220,8 +2220,8 @@ double LRaceLine::getLookAhead(int rl, double leftMargin, double rightMargin, bo
     double fuel_status = (car->_fuel <= empty ? 0.0 : (MAX(0.0, car->_fuel - empty) / (maxfuel - empty)));
     double lookahead = (lookAheadEmpty - (lookAheadEmpty - lookAhead)*fuel_status) * factor * speedfactor * trfactor * gripfactor;
 
-    if (cardata->aTT < 0.90)
-        lookahead *= (lookAheadColdFactor - ((lookAheadColdFactor - 1.0) * (cardata->aTT / cardata->lTT)));
+    if (cardata->GRIP_FACTOR < 0.90)
+        lookahead *= (lookAheadColdFactor - ((lookAheadColdFactor - 1.0) * (cardata->GRIP_FACTOR / cardata->TYREWEAR)));
 
     return lookahead;
 }
@@ -3010,7 +3010,7 @@ void LRaceLine::GetRaceLineData(RaceLineDriveData *data, bool transitioning)
             if (driver->avoidCritical)
                 tiFactor *= 10.0;
             else if (data->s->currentTime - driver->pitTimer < 5.0)
-                tiFactor *= 1.0 + (5.0 - (data->s->currentTime - driver->pitTimer)) * (cardata->aTT);
+                tiFactor *= 1.0 + (5.0 - (data->s->currentTime - driver->pitTimer)) * (cardata->GRIP_FACTOR);
             else if ((targetRaceline && car->_accel_x > 0 && ((leftCurrentMargin > 0.0001 && tRInverse[LINE_RL][Next] < -0.001) ||   // recover to raceline and on the inside
                 (rightCurrentMargin < 1.0 && tRInverse[LINE_RL][Next] > 0.001))) ||                                             // on exit from a corner...
                 ((rightCurrentMargin < 1.0 && rightTargetMargin > rightCurrentMargin && tRInverse[LINE_RL][Next] < -0.001) ||   // avoiding on the outside & there's room
@@ -3037,8 +3037,8 @@ void LRaceLine::GetRaceLineData(RaceLineDriveData *data, bool transitioning)
                     tiFactor = MIN(tiFactor, MAX(0.2, 1.0 - MIN(0.6, fabs(car->ctrl.steer) - 0.4) / 0.6)); // less increment when steering sharply
             }
 
-            if (cardata->aTT < 0.9)
-                tiFactor *= MAX(0.3, 1.0 * (cardata->aTT));
+            if (cardata->GRIP_FACTOR < 0.9)
+                tiFactor *= MAX(0.3, 1.0 * (cardata->GRIP_FACTOR));
 
             data->linemode->ApplyTransition(Next, outsteerFactor * tiFactor, tRInverse[LINE_RL][Next], data->racesteer);
         }

@@ -677,8 +677,9 @@ bool Driver::calcSpeed()
         else
         {
             double factor = 30.0;
-            if (mycardata->lTT < mycardata->CTTT + 0.02)
-                factor *= 1.0 + (1.0 * mycardata->aTT);
+
+            if (mycardata->TYREWEAR < mycardata->CRITICAL_TYREWEAR + 0.02)
+                factor *= 1.0 + (1.0 * mycardata->GRIP_FACTOR);
 
             brakecmd = MIN(1.0f, factor * fabs(x));
         }
@@ -783,11 +784,13 @@ void Driver::drive(tSituation *s)
 
     if (spinDist > 0 && car->_distRaced > spinDist)
     {
-        while (mycardata->rmTT < 60.0) {
+        while (mycardata->TYREWEAR < 60.0)
+        {
             car->_accelCmd = (car->_speed_x > 5.0 ? 0.0 : 0.8);
             car->_brakeCmd = (car->_speed_x > 5.0 ? 1.0 : 0.0);
             car->_steerCmd = (spinDir > 0 ? 1 : -1);
             car->_gearCmd = 1;
+
             return;
         }
     }
@@ -2798,7 +2801,7 @@ void Driver::isAlone()
 
 double	Driver::AverageTmpForCar(CarElt *car)
 {
-    double tmp = mycardata->aTT;
+    double tmp = mycardata->GRIP_FACTOR;
 
     return tmp;
 }

@@ -41,22 +41,22 @@ void SingleCardata::update()
         corner1[i].ay = car->_corner_y(i);
 
         if (i == FRNT_LFT || i == REAR_LFT)
-            lmTT = MAX(lmTT, 1.0);
+            GRIP_FACTOR_LEFT  = MIN(GRIP_FACTOR_LEFT, 1.0);
         else
-            rmTT = MAX(rmTT, 1.0);
+            GRIP_FACTOR_RIGHT = MIN(GRIP_FACTOR_RIGHT, 1.0);
     }
 
-    aTT = aFTT = lTT = CTTT = 1.0;
+    GRIP_FACTOR = GRIP_FACTOR_F = GRIP_FACTOR_R = GRIP_FACTOR_LEFT = GRIP_FACTOR_RIGHT = TYREWEAR = CRITICAL_TYREWEAR = 1.0;
 
     if(HasTYC)
     {
-        lmTT = TyreConditionG = TyreConditionLeft();
-        rmTT = TyreConditionD = TyreConditionRight();
-        aTT = TyreCondition = MIN(TyreConditionFront(), TyreConditionRear());
-        aFTT = TyreConditionF = TyreConditionFront();
+        GRIP_FACTOR_LEFT  = TyreConditionLeft();
+        GRIP_FACTOR_RIGHT = TyreConditionRight();
+        GRIP_FACTOR = MIN(TyreConditionFront(), TyreConditionRear());
+        GRIP_FACTOR_F = TyreConditionFront();
 
-        lTT = TyreTreadDepth =  MIN(TyreTreadDepthFront(), TyreTreadDepthRear());
-        CTTT = TyreCriticalTreadDeph = MAX(MAX(car->_tyreCritTreadDepth(0), car->_tyreCritTreadDepth(1)), MAX(car->_tyreCritTreadDepth(2), car->_tyreCritTreadDepth(3)));
+        TYREWEAR = MIN(TyreTreadDepthFront(), TyreTreadDepthRear());
+        CRITICAL_TYREWEAR = MAX(MAX(car->_tyreCritTreadDepth(0), car->_tyreCritTreadDepth(1)), MAX(car->_tyreCritTreadDepth(2), car->_tyreCritTreadDepth(3)));
     }
 
     lastspeed[2].ax = lastspeed[1].ax;
@@ -66,7 +66,7 @@ void SingleCardata::update()
     lastspeed[0].ax = car->_speed_X;
     lastspeed[0].ay = car->_speed_Y;
 
-    LogUSR.debug("Tyre Condition = %.2f - Tire Thread Depth = %.2f - Tire Critical = %.2f - Mu = %.2f\n", aTT, lTT, CTTT, t_m);
+    LogUSR.debug("Tyre Condition = %.2f - Tire Thread Depth = %.2f - Tire Critical = %.2f - Mu = %.2f\n", GRIP_FACTOR, TYREWEAR, CRITICAL_TYREWEAR, t_m);
 }
 
 static double cT(double v)
@@ -185,10 +185,9 @@ void SingleCardata::init( CarElt *pcar )
 
     baseMass = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_MASS, NULL, 1000.0f);
     fuel = 0.0f;
-    aFTT = aTT = lmTT = rmTT = 0.0f;
-    lTT = CTTT = 0.0f;
+    GRIP_FACTOR = GRIP_FACTOR_F = GRIP_FACTOR_R = GRIP_FACTOR_LEFT = GRIP_FACTOR_RIGHT = 1.0;
+    TYREWEAR = CRITICAL_TYREWEAR = 1.0;
     carMu = fullCarMu = offlineFuelCarMu = 1.0f;
-    lmTT = rmTT = 0.0;
     baseCarMu = (CA_FW * t_m_f + CA_RW * t_m_r + CA_GE * t_m) / baseMass;
     CTFactor = GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_CTFACTOR, NULL, 1.0f);
 
@@ -197,40 +196,19 @@ void SingleCardata::init( CarElt *pcar )
 
 void SingleCardata::updateModel()
 {
-    aTT = aFTT = lmTT = rmTT = lTT = CTTT = 1.0f;
-    float mLTT = 1.0f, mRTT = 1.0f;
-    tdble mG = 0.0f;
+    GRIP_FACTOR = GRIP_FACTOR_F = GRIP_FACTOR_R = GRIP_FACTOR_LEFT = GRIP_FACTOR_RIGHT = TYREWEAR = CRITICAL_TYREWEAR = 1.0;
     int i;
-
-    /*for (i=0; i<4; i++)
-    {
-        double ct = CT(i);
-        aTT += (tdble)ct;
-        mG = MAX(mG, CG(i));
-        if (i < 2)
-        {
-            aFTT += (tdble)ct;
-            mFTT = MAX(mFTT, (tdble)ct);
-
-            if (i == FRNT_LFT || i == REAR_LFT)
-                mLTT = MAX(mLTT, (float)ct);
-            else
-                mRTT = MAX(mRTT, (float)ct);
-        }
-    }
-
-    aTT /= 4;
-    aFTT /= 2;*/
 
     if(HasTYC == TRUE)
     {
-        lmTT = TyreConditionG = TyreConditionLeft();
-        rmTT = TyreConditionD = TyreConditionRight();
-        aTT = TyreCondition = MIN(TyreConditionFront(), TyreConditionRear());
-        aFTT = TyreConditionF = TyreConditionFront();
+        GRIP_FACTOR_LEFT  = TyreConditionLeft();
+        GRIP_FACTOR_RIGHT = TyreConditionRight();
+        GRIP_FACTOR_F     = TyreConditionFront();
+        GRIP_FACTOR_R     = TyreConditionRear();
+        GRIP_FACTOR       = MIN(GRIP_FACTOR_F, GRIP_FACTOR_R);
 
-        lTT = TyreTreadDepth = MIN(TyreTreadDepthFront(), TyreTreadDepthRear());
-        CTTT = TyreCriticalTreadDeph = MAX(MAX(car->_tyreCritTreadDepth(0), car->_tyreCritTreadDepth(1)), MAX(car->_tyreCritTreadDepth(2), car->_tyreCritTreadDepth(3)));
+        TYREWEAR = MIN(TyreTreadDepthFront(), TyreTreadDepthRear());
+        CRITICAL_TYREWEAR = MAX(MAX(car->_tyreCritTreadDepth(0), car->_tyreCritTreadDepth(1)), MAX(car->_tyreCritTreadDepth(2), car->_tyreCritTreadDepth(3)));
     }
 
     fuel = car->_fuel;
@@ -239,23 +217,11 @@ void SingleCardata::updateModel()
 
     for (i=0; i<4; i++)
     {
-        //double ct = CT(i);
-        tdble gF = 1.0f - mG/10.0f;
-
-        //if (ct > hTT)
-        //	gF -= MIN(0.20f, ((ct - hTT) / 15.0f) / 5.0f);
-        /*if (ct < lTT)
-            gF -= (tdble) MIN(0.75f, ((lTT - ct) / (((lTT-20.0)*0.75)*CTFactor)) / 15.0f);*/
-
         if (i < 2)
-            cTMF = MIN(cTMF, t_m_f * gF);
+            cTMF = MIN(cTMF, t_m_f * GRIP_FACTOR_F);
         else
-            cTMR = MIN(cTMR, t_m_r * gF);
+            cTMR = MIN(cTMR, t_m_r * GRIP_FACTOR_R);
     }
-
-    //lftOH = (tdble)MAX(0.0f, MAX(lmTT, mLTT) - hTT);
-    //rgtOH = (tdble)MAX(0.0f, MAX(rmTT, mRTT) - hTT);
-    //lmTT = rmTT = 0.0;
 
     cTM = MIN(cTMF, cTMR);
 
@@ -287,7 +253,7 @@ double SingleCardata::TyreConditionRight()
 double SingleCardata::TyreTreadDepthFront()
 {
   double Right = (car->_tyreTreadDepth(0) - car->_tyreCritTreadDepth(0));
-  double Left = (car->_tyreTreadDepth(1) - car->_tyreCritTreadDepth(1));
+  double Left  = (car->_tyreTreadDepth(1) - car->_tyreCritTreadDepth(1));
 
   return 100 * MIN(Right, Left);
 }

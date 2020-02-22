@@ -60,14 +60,6 @@ public:
     bool   HasESP;
     bool   HasTCL;
 
-    double TyreConditionF;
-    double TyreConditionR;
-    double TyreConditionG;
-    double TyreConditionD;
-    double TyreCondition;
-    double TyreTreadDepth;
-    double TyreCriticalTreadDeph;
-
 protected:
     static float getSpeed(tCarElt *car, float trackangle);
 
@@ -109,14 +101,15 @@ protected:
 
 public:
     double lTT;
-    tdble CTTT;
-    tdble aFTT;
-    tdble aTT;
-    double hTT;
+    double GRIP_FACTOR;
+    double GRIP_FACTOR_F;
+    double GRIP_FACTOR_R;
+    double GRIP_FACTOR_LEFT;
+    double GRIP_FACTOR_RIGHT;
+    tdble  TYREWEAR;
+    tdble  CRITICAL_TYREWEAR;
     tdble lftOH;
     tdble rgtOH;
-    double lmTT;
-    double rmTT;
     tdble carMu;
     tdble fullCarMu;
     tdble offlineFuelCarMu;
