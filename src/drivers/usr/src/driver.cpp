@@ -97,17 +97,17 @@ enum { FLYING_FRONT = 1, FLYING_BACK = 2, FLYING_SIDE = 4 };
 
 void Driver::SetRandomSeed(unsigned int seed)
 {
-  random_seed = seed ? seed : RANDOM_SEED;
+    random_seed = seed ? seed : RANDOM_SEED;
 
-  return;
+    return;
 }
 
 unsigned int Driver::getRandom()
 {
-  random_seed = RANDOM_A * random_seed + RANDOM_C;
-  LogUSR.debug("Random = %.3f\n", random_seed);
+    random_seed = RANDOM_A * random_seed + RANDOM_C;
+    LogUSR.debug("Random = %.3f\n", random_seed);
 
-  return (random_seed >> 16);
+    return (random_seed >> 16);
 }
 
 
@@ -449,44 +449,44 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
     // Get skill level
 
-        decel_adjust_perc = global_skill = skill = driver_aggression = 0.0;
-        SetRandomSeed(10);
+    decel_adjust_perc = global_skill = skill = driver_aggression = 0.0;
+    SetRandomSeed(10);
 
-        // load the global skill level, range 0 - 10
-        snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetLocalDir());
-        void *skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
+    // load the global skill level, range 0 - 10
+    snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetLocalDir());
+    void *skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
 
-        if(!skillHandle)
-        {
-            snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetDataDir());
-            skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
-        }//if !skillHandle
+    if(!skillHandle)
+    {
+        snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetDataDir());
+        skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
+    }//if !skillHandle
 
-        if (skillHandle)
-        {
-            global_skill = GfParmGetNum(skillHandle, (char *)SECT_SKILL, (char *)PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
-        }
+    if (skillHandle)
+    {
+        global_skill = GfParmGetNum(skillHandle, (char *)SECT_SKILL, (char *)PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
+    }
 
-        global_skill = MAX(0.0f, MIN(30.0f, global_skill));
+    global_skill = MAX(0.0f, MIN(30.0f, global_skill));
 
-        LogUSR.info("Global Skill: %.3f\n", global_skill);
+    LogUSR.info("Global Skill: %.3f\n", global_skill);
 
-        //load the driver skill level, range 0 - 1
-        float driver_skill = 0.0f;
-        snprintf(buffer, BUFSIZE, "drivers/%s/%d/skill.xml", MyBotName, INDEX);
-        LogUSR.info("Path skill driver: %s\n", buffer);
-        skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+    //load the driver skill level, range 0 - 1
+    float driver_skill = 0.0f;
+    snprintf(buffer, BUFSIZE, "drivers/%s/%d/skill.xml", MyBotName, INDEX);
+    LogUSR.info("Path skill driver: %s\n", buffer);
+    skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
 
-        if (skillHandle)
-        {
-           driver_skill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
-           driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
-           driver_skill = (float)MIN(1.0, MAX(0.0, driver_skill));
-           LogUSR.info("Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", global_skill, driver_skill, driver_aggression);
-        }
+    if (skillHandle)
+    {
+        driver_skill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
+        driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
+        driver_skill = (float)MIN(1.0, MAX(0.0, driver_skill));
+        LogUSR.info("Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", global_skill, driver_skill, driver_aggression);
+    }
 
-        skill = (float)((global_skill + driver_skill * 2) * (1.0 + driver_skill));
-        LogUSR.debug("... USR Driver skill = %.2f\n", skill);
+    skill = (float)((global_skill + driver_skill * 2) * (1.0 + driver_skill));
+    LogUSR.debug("... USR Driver skill = %.2f\n", skill);
     LogUSR.debug("... USR Driver initrack end\n");
 }
 
@@ -678,8 +678,11 @@ bool Driver::calcSpeed()
         {
             double factor = 30.0;
 
-            if (mycardata->TYREWEAR < mycardata->CRITICAL_TYREWEAR + 0.02)
-                factor *= 1.0 + (1.0 * mycardata->GRIP_FACTOR);
+            if(mycardata->HasTYC)
+            {
+                if (mycardata->TYREWEAR < mycardata->CRITICAL_TYREWEAR + 0.02)
+                    factor *= 1.0 - (1.0 * mycardata->GRIP_FACTOR);
+            }
 
             brakecmd = MIN(1.0f, factor * fabs(x));
         }
@@ -3319,33 +3322,33 @@ int Driver::GetWeather()
 
 void Driver::calcSkill()
 {
-//if (RM_TYPE_PRACTICE != racetype)
+    //if (RM_TYPE_PRACTICE != racetype)
     if (skill_adjust_timer == -1.0 || simtime - skill_adjust_timer > skill_adjust_limit)
     {
-           double rand1 = (double) getRandom() / 65536.0;  // how long we'll change speed for
-           double rand2 = (double) getRandom() / 65536.0;  // the actual speed change
-           double rand3 = (double) getRandom() / 65536.0;  // whether change is positive or negative
+        double rand1 = (double) getRandom() / 65536.0;  // how long we'll change speed for
+        double rand2 = (double) getRandom() / 65536.0;  // the actual speed change
+        double rand3 = (double) getRandom() / 65536.0;  // whether change is positive or negative
 
-           // acceleration to use in current time limit
-           decel_adjust_targ = (skill/4 * rand1);
+        // acceleration to use in current time limit
+        decel_adjust_targ = (skill/4 * rand1);
 
-          // brake to use - usually 1.0, sometimes less (more rarely on higher skill)
-          brake_adjust_targ = MAX(0.85, 1.0 - MAX(0.0, skill/15 * (rand2-0.85)));
+        // brake to use - usually 1.0, sometimes less (more rarely on higher skill)
+        brake_adjust_targ = MAX(0.85, 1.0 - MAX(0.0, skill/15 * (rand2-0.85)));
 
-          // how long this skill mode to last for
-          skill_adjust_limit = 5.0 + rand3 * 50.0;
-          skill_adjust_timer = simtime;
+        // how long this skill mode to last for
+        skill_adjust_limit = 5.0 + rand3 * 50.0;
+        skill_adjust_timer = simtime;
     }
 
     if (decel_adjust_perc < decel_adjust_targ)
-      decel_adjust_perc += MIN(deltaTime*4, decel_adjust_targ - decel_adjust_perc);
+        decel_adjust_perc += MIN(deltaTime*4, decel_adjust_targ - decel_adjust_perc);
     else
-      decel_adjust_perc -= MIN(deltaTime*4, decel_adjust_perc - decel_adjust_targ);
+        decel_adjust_perc -= MIN(deltaTime*4, decel_adjust_perc - decel_adjust_targ);
 
     if (brake_adjust_perc < brake_adjust_targ)
-      brake_adjust_perc += MIN(deltaTime*2, brake_adjust_targ - brake_adjust_perc);
+        brake_adjust_perc += MIN(deltaTime*2, brake_adjust_targ - brake_adjust_perc);
     else
-      brake_adjust_perc -= MIN(deltaTime*2, brake_adjust_perc - brake_adjust_targ);
+        brake_adjust_perc -= MIN(deltaTime*2, brake_adjust_perc - brake_adjust_targ);
 
     LogUSR.debug("skill: decel %.3f - %.3f, brake %.3f - %.3f\n", decel_adjust_perc, decel_adjust_targ, brake_adjust_perc, brake_adjust_targ);
 }

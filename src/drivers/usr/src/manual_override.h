@@ -43,7 +43,7 @@ public:
     void saveToFile(FILE *filepointer);
     bool getOverrideValue(int dist, double *value);
     void setOverrideValue(int startdist, int enddist, double value);
-    int valueCount() { return overrideValueCount; }
+    int  valueCount() { return overrideValueCount; }
 
 private:
     OverrideValue *overrideValues;

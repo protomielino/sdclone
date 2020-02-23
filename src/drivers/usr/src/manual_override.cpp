@@ -27,10 +27,6 @@
 #include "manual_override.h"
 #include "globaldefs.h"
 
-//#if defined(WIN32)
-//#define snprintf _snprintf
-//#endif
-
 #define SECT_OVERRIDE "overrides"
 
 LManualOverride::LManualOverride(const char *theLabel)
@@ -340,21 +336,19 @@ void LManualOverrideCollection::loadFromFile(char *trackName, const char *botnam
 
 void LManualOverrideCollection::saveToFile()
 {
-#if 0
-    char buffer[1025];
-    snprintf(buffer, 1024, "%sdrivers/%s/%s/%s.dat_save", GetLocalDir(), BOT_NAME, "carName", "trackName");
+    char buffer[1024];
+    snprintf(buffer, 1024, "%sdrivers/%s/%s/%s.dat_save", GetLocalDir(), "USR", "carName", "trackName");
     FILE *filepointer = fopen(buffer, "w");
 
     if (filepointer)
     {
-        for (int i=0; i<OVERRIDE_COUNT; i++)
+        for (int i=0; i < override_count; i++)
         {
             overrides[i]->saveToFile(filepointer);
         }
 
         fclose(filepointer);
     }
-#endif
 }
 
 LManualOverride *LManualOverrideCollection::getOverrideForLabel(const char *label)

@@ -24,7 +24,6 @@
 #include "linemode.h"
 #include "raceline.h"
 #include "globaldefs.h"
-//#define LINEMODE_DEBUG
 
 //
 // Public methods
@@ -58,18 +57,11 @@ LLineMode::~LLineMode()
 double LLineMode::GetTransitionIncrement(int div)
 {
     double ti = m_TransitionIncrement;
-    /*
-    if (fabs(m_Car->_accel_x) > 3.0)
-    {
-        double tiFactor1 = MIN(8.0, fabs(m_Car->_accel_x));
-        tiFactor1 *= tiFactor1 / 2;
-        double tiFactor2 = MAX(0.0, MIN(1.0, fabs(m_Car->ctrl.steer)) - 0.5);
-        ti *= MAX(0.1, MIN(1.0 - tiFactor1 / 32.0, 1.0 - tiFactor2 / 0.5));
-    }
-    */
+
     if (m_OverrideCollection)
     {
         LManualOverride *labelOverride = m_OverrideCollection->getOverrideForLabel(PRV_TRANSITION_INC);
+
         if (labelOverride)
         {
             double tti = ti;
@@ -77,8 +69,10 @@ double LLineMode::GetTransitionIncrement(int div)
                 ti = tti;
         }
     }
+
     if (m_CurrentTime - m_TimerStarted < 0.5)
         return MAX(0.0, ti * ((m_CurrentTime - m_TimerStarted) / 0.5));
+
     return ti;
 }
 
@@ -102,9 +96,9 @@ bool LLineMode::IsOnHold(int div, bool stay_inside)
         {
             m_OnHold = false;
             m_HoldApexDiv = -1;
-#ifdef LINEMODE_DEBUG
-            fprintf(stderr, "%s: NO HOLD (A %d %d %d) = dist (%.1f > %.1f) || div %d != %d && line %s != %s\n", m_Car->_name, (distance > m_Car->_speed_x * 5), (m_HoldApexDiv < 0), (hold_div > 0 && hold_div != m_HoldApexDiv && m_PreferLine != this_prefer_line), distance, m_Car->_speed_x * 5, m_HoldApexDiv, hold_div, m_PreferLine == TR_STR ? "STR" : m_PreferLine == TR_RGT ? "RGT" : "LFT", this_prefer_line == TR_STR ? "STR" : this_prefer_line == TR_RGT ? "RGT" : "LFT"); fflush(stderr);
-#endif
+
+            LogUSR.debug("%s: NO HOLD (A %d %d %d) = dist (%.1f > %.1f) || div %d != %d && line %s != %s\n", m_Car->_name, (distance > m_Car->_speed_x * 5), (m_HoldApexDiv < 0), (hold_div > 0 && hold_div != m_HoldApexDiv && m_PreferLine != this_prefer_line), distance, m_Car->_speed_x * 5, m_HoldApexDiv, hold_div, m_PreferLine == TR_STR ? "STR" : m_PreferLine == TR_RGT ? "RGT" : "LFT", this_prefer_line == TR_STR ? "STR" : this_prefer_line == TR_RGT ? "RGT" : "LFT");
+
             return false;
         }
 
@@ -113,9 +107,9 @@ bool LLineMode::IsOnHold(int div, bool stay_inside)
         {
             m_OnHold = false;
             m_HoldApexDiv = -1;
-#ifdef LINEMODE_DEBUG
-            fprintf(stderr,"%s: NO HOLD (2)\n",m_Car->_name);fflush(stderr);
-#endif
+
+            LogUSR.debug("%s: NO HOLD (2)\n",m_Car->_name);
+
             return false;
         }
 
@@ -124,22 +118,19 @@ bool LLineMode::IsOnHold(int div, bool stay_inside)
         {
             ResetTimer();
             m_HoldApexDiv = hold_div;
-#ifdef LINEMODE_DEBUG
-            fprintf(stderr,"%s: HOLDING!!\n",m_Car->_name);fflush(stderr);
-#endif
+
+            LogUSR.debug("%s: HOLDING!!\n",m_Car->_name);
+
             return true;
         }
-#ifdef LINEMODE_DEBUG
-        fprintf(stderr, "%s: NO HOLD (C) line=%s, lftMarg=%.3f rgtMarg=%.3f\n", m_Car->_name, this_prefer_line == TR_STR ? "STR" : this_prefer_line == TR_RGT ? "RGT" : "LFT",m_LeftCurrentMargin,m_RightCurrentMargin); fflush(stderr);
-#endif
 
+        LogUSR.debug("%s: NO HOLD (C) line=%s, lftMarg=%.3f rgtMarg=%.3f\n", m_Car->_name, this_prefer_line == TR_STR ? "STR" : this_prefer_line == TR_RGT ? "RGT" : "LFT",m_LeftCurrentMargin,m_RightCurrentMargin);
     }
-#ifdef LINEMODE_DEBUG
     else
     {
-        fprintf(stderr, "%s: NO HOLD (D), threat=%d\n", m_Car->_name, m_UnderThreat); fflush(stderr);
+        LogUSR.debug("%s: NO HOLD (D), threat=%d\n", m_Car->_name, m_UnderThreat);
     }
-#endif
+
     m_HoldApexDiv = -1;
     m_OnHold = false;
 
@@ -220,16 +211,14 @@ void LLineMode::SetTargetMargins(int raceline, double leftMargin, double rightMa
         if (m_LeftTargetMargin != 0.0 || m_RightTargetMargin != 1.0)
             m_HoldApexDiv = -1;
 
-        //fprintf(stderr, "New Margins: %.3f %.3f (%d)\n", m_LeftTargetMargin, m_RightTargetMargin,force);
         m_IsTransitioning = true;
     }
 }
 
 void LLineMode::SetRecoverToRaceLine()
 {
-#ifdef LINEMODE_DEBUG
-    fprintf(stderr, "setRecoveryToRaceLine\n");fflush(stderr);
-#endif
+    LogUSR.debug("setRecoveryToRaceLine\n");
+
     if (m_LeftTargetMargin != 0.0 || m_RightTargetMargin != 1.0)
     {
         m_HoldApexDiv = -1;
@@ -272,5 +261,4 @@ void LLineMode::SetPitting()
 void LLineMode::ResetTimer()
 {
     m_TimerStarted = m_CurrentTime;
-    //prefer_line = LINE_MID;
 }
