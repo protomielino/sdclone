@@ -57,7 +57,7 @@ void SingleCardata::update()
 
         TYREWEAR = MIN(TyreTreadDepthFront(), TyreTreadDepthRear());
         CRITICAL_TYREWEAR = MAX(MAX(car->_tyreCritTreadDepth(0), car->_tyreCritTreadDepth(1)), MAX(car->_tyreCritTreadDepth(2), car->_tyreCritTreadDepth(3)));
-        LogUSR.info(" # Condition = %.7f - wear tread = %.7f - Critical tread = %.7f\n", GRIP_FACTOR, TYREWEAR, CRITICAL_TYREWEAR);
+        LogUSR.debug(" # Condition = %.7f - wear tread = %.7f - Critical tread = %.7f\n", GRIP_FACTOR, TYREWEAR, CRITICAL_TYREWEAR);
     }
 
     lastspeed[2].ax = lastspeed[1].ax;

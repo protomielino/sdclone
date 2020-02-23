@@ -508,7 +508,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
                 aFT = aFT / 2;
 
                 if (tRL < raceRemainingLaps && raceRemainingLaps > 1 &&
-                        (/*mW > m_mWL || */mW < 0.5f && cardata->TYREWEAR < 70.0f) || m_checkFuel
+                        ((cardata->TYREWEAR / 100 ) < cardata->CRITICAL_TYREWEAR)|| m_checkFuel
                         || (m_checkDamage && mW > 0.4))
                 {
                     pitNeeded = true;

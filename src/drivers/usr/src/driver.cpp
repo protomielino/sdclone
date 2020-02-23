@@ -140,9 +140,9 @@ Driver::Driver(int index)
     opponents = NULL;
     opponent = NULL;
     pit = NULL;
-    strategy = nullptr;
-    cardata = nullptr;
-    mycardata = nullptr;
+    strategy = NULL;
+    cardata = NULL;
+    mycardata = NULL;
     currentsimtime = 0.0;
     test_raceline = test_rnd_raceline = 0;
     outside_overtake_inhibitor = 1.0f;
@@ -680,7 +680,7 @@ bool Driver::calcSpeed()
 
             if(mycardata->HasTYC)
             {
-                if (mycardata->TYREWEAR < mycardata->CRITICAL_TYREWEAR + 0.02)
+                if ((mycardata->TYREWEAR / 100) < mycardata->CRITICAL_TYREWEAR + 0.05)
                     factor *= 1.0 - (1.0 * mycardata->GRIP_FACTOR);
             }
 
