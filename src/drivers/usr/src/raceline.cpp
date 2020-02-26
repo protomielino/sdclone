@@ -1718,7 +1718,7 @@ void LRaceLine::UpdateRacelineSpeeds(int raceType)
         {
             shouldUpdate = (fabs(car->_fuel - cardata->fuel) > (raceType == RM_TYPE_QUALIF ? 1.0 : 5.0) ||
                             fabs(car->_dammage - cardata->damage) > 100.0f ||
-                            (cardata->GRIP_FACTOR < 0.8 || cardata->GRIP_FACTOR > 0.97) && ((cardata->TYREWEAR / 100 ) < cardata->CRITICAL_TYREWEAR + 0.05));
+                            (cardata->GRIP_FACTOR < 0.8 || cardata->GRIP_FACTOR > 0.97) || ((cardata->TYREWEAR / 100 ) < cardata->CRITICAL_TYREWEAR + 0.05));
         }
         else
             shouldUpdate = (fabs(car->_fuel - cardata->fuel) > (raceType == RM_TYPE_QUALIF ? 1.0 : 5.0) || fabs(car->_dammage - cardata->damage) > 100.0f);
@@ -1748,6 +1748,7 @@ void LRaceLine::UpdateRacelineSpeeds(int raceType)
             for (i = Divs; --i >= 0;)
             {
                 ComputeRacelineSpeed(i, rl, tSpeed, rl);
+                LogUSR.debug(" #USR update Compute Racing Line Speed\n");
             }
             //
             // Anticipate braking
@@ -1758,6 +1759,7 @@ void LRaceLine::UpdateRacelineSpeeds(int raceType)
                 for (i = Divs; --i >= 0;)
                 {
                     ComputeRacelineBraking(i, rl, tSpeed, rl);
+                    LogUSR.debug(" # USR update Compute Rate braking\n");
                 }
             }
         }

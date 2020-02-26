@@ -272,53 +272,42 @@ void	Driver::InitTrack(
     //const char*	baseParamPath = buf;
 
     weathercode = GetWeather(pTrack);
+    LogSHADOW.info(" # Shadow weather code = %i\n\n", weathercode);
 
     //
     //	ok, lets read/merge the car parms.
     //
     void*	hCarParm = pCarHandle;
 
-    // override params for default car type.
-    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/default.xml",
-              GfDataDir(), MyBotName, m_carName);
-    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-    LogSHADOW.debug("PATH = %s \n", buf);
+    if (weathercode > 0)
+    {
+        // override params for car type on track of specific race type and driver.
+        snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s-%i.xml",
+                  GfDataDir(), MyBotName, m_carName, m_trackName, weathercode);
+        hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+        LogSHADOW.debug("PATH = %s \n", buf);
 
-    // default params for car type (e.g. clkdtm)
-    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s.xml",
-              GfDataDir(), MyBotName, m_carName, m_carName );
-    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-    LogSHADOW.debug("PATH = %s \n", buf);
+        // override params for default car type.
+        snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/default.xml",
+                  GfDataDir(), MyBotName, m_carName);
+        hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+        LogSHADOW.debug("PATH = %s \n", buf);
 
-    // override params for car type on track.
-    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s.xml",
-              GfDataDir(), MyBotName, m_carName, m_trackName );
-    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-    LogSHADOW.debug("PATH = %s \n", buf);
+    }
+    else
+    {
+        // override params for default car type.
+        snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/default.xml",
+                  GfDataDir(), MyBotName, m_carName);
+        hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+        LogSHADOW.debug("PATH = %s \n", buf);
 
-    // override params for car type on track of specific race type.
-    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s-%s.xml",
-              GfDataDir(), MyBotName, m_carName, m_trackName, raceTypeStr[raceType] );
-    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-    LogSHADOW.debug("PATH = %s \n", buf);
-
-    // override params for car type on track with specific driver.
-    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s-drv=%d.xml",
-              GfDataDir(), MyBotName, m_carName, m_trackName, index );
-    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-    LogSHADOW.debug("PATH = %s \n", buf);
-
-    // override params for car type on track of specific race type and driver.
-    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s-%s-drv=%d.xml",
-              GfDataDir(), MyBotName, m_carName, m_trackName, raceTypeStr[raceType], index );
-    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-    LogSHADOW.debug("PATH = %s \n", buf);
-
-    // override params for car type on track of specific race type and driver.
-    snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s.xml",
-              GfDataDir(), MyBotName, m_carName, m_trackName);
-    hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-    LogSHADOW.debug("PATH = %s \n", buf);
+        // override params for car type on track of specific race type and driver.
+        snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s.xml",
+                  GfDataDir(), MyBotName, m_carName, m_trackName);
+        hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+        LogSHADOW.debug("PATH = %s \n", buf);
+    }
 
     // setup the car param handle to be returned.
 

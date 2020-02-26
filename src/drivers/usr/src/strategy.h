@@ -99,6 +99,7 @@ protected:
     bool   m_checkFuel;
     float  fuelPerMeter;            // fuel consumtion.
     float  fuelPerLap;            // The maximum amount of fuel we needed for a lap.
+    float  fuelPerMeters;
     float  lastPitFuel;            // Amount refueled, special case when we refuel.
     float  lastFuel;                // The fuel available when we cross the start lane.
     float  fuelSum;                    // All the fuel used needed for the race.

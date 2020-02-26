@@ -190,6 +190,15 @@ void SimpleStrategy::update(tCarElt* car, tSituation *s)
 {
     // Fuel statistics update.
     int id = car->_trkPos.seg->id;
+
+    double	fuelPerM = 0.001;
+
+    if( car->_distRaced > 0 )
+    {
+        fuelPerM = m_FuelStart / car->_distRaced;
+        LogUSR.debug(" # Fuel per Meter = %.7f\n", fuelPerM);
+    }
+
     /* Range must include enough segments to be executed once guaranteed. */
     if (id >= 0 && id < 5 && !fuelChecked)
     {
@@ -231,14 +240,14 @@ int SimpleStrategy::calcRepair(tCarElt* car, tSituation *s)
         return car->_dammage;
     }
 
-#ifdef STRATEGY_DEBUG
     LogUSR.debug("%s calculating damage to repair...\n", car->_name);
-#endif
+
     // sort opponents behind me in order of position
     for (i = 0; i < opp->getNOpponents(); i++)
     {
         Opponent *o = opp->getOpponentPtr() + i;
         tCarElt *ocar = o->getCarPtr();
+
         if (ocar->_state > RM_CAR_STATE_PIT && ocar->_state != RM_CAR_STATE_OUTOFGAS) continue;
         if (ocar->_pos < car->_pos - 1) continue;
         if (o->getTeam() == TEAM_FRIEND) continue;
@@ -282,6 +291,7 @@ int SimpleStrategy::calcRepair(tCarElt* car, tSituation *s)
         {
             if (ocar->_fuel > fuelPerLap * 2)
                 continue;
+
             lead = mytime - (othertime - m_pittime);
         }
         else
@@ -303,6 +313,7 @@ int SimpleStrategy::calcRepair(tCarElt* car, tSituation *s)
             {
                 if (car->_dammage >= m_maxDamage)
                     return MIN(car->_dammage, car->_dammage - (m_maxDamage - 1000));
+
                 return MIN(car->_dammage, 500);
             }
 

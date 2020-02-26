@@ -330,6 +330,7 @@ reCarsApplyRaceRules(tCarElt *car)
     //          to avoid doing this again and again as long as the penalty is not cleared
     //          whereas it's only needed when the penalty reaches the _penaltyList head.
     penalty = GF_TAILQ_FIRST(&(car->_penaltyList));
+
     if (penalty)
     {
         switch (penalty->penalty)
@@ -347,9 +348,12 @@ reCarsApplyRaceRules(tCarElt *car)
                 *(car->ctrl.msg[3]) = 0;
                 break;
         }
+
         car->ctrl.msg[3][RM_CMD_MAX_MSG_SIZE - 1] = 0; // Some snprintf implementations fail to do so.
         memcpy(car->ctrl.msgColor, ctrlMsgColor, sizeof(car->ctrl.msgColor));
-    } else {
+    }
+    else
+    {
         // No penalty => no message.
         *(car->ctrl.msg[3]) = 0;
     }
@@ -362,6 +366,7 @@ reCarsApplyRaceRules(tCarElt *car)
             // The penalty was not "executed" : too late to clear => disqualified (out of race)
             reCarsAddPenalty(car, RM_PENALTY_DISQUALIFIED);
             GfLogInfo("%s disqualified (penalty not executed after 5 laps).\n", car->_name);
+
             return;
         }
     }
@@ -400,7 +405,8 @@ reCarsApplyRaceRules(tCarElt *car)
         }
 
     // 4) If in pit lane for more than 1 segment :
-    } else if (prevSeg->raceInfo & TR_PIT)
+    }
+    else if (prevSeg->raceInfo & TR_PIT)
     {
 
         if (seg->raceInfo & TR_PIT)
@@ -443,12 +449,15 @@ reCarsApplyRaceRules(tCarElt *car)
         }
 
     // 5) Still crossing pit lane exit (probably a long PITEND segment) : Nothing bad.
-    } else if (seg->raceInfo & TR_PITEND) {
-
+    }
+    else if (seg->raceInfo & TR_PITEND)
+    {
         rules->ruleState = 0;
 
     // 6) Entering the pits at a wrong place, add new stop and go penalty if possible.
-    } else if (seg->raceInfo & TR_PIT) {
+    }
+    else if (seg->raceInfo & TR_PIT)
+    {
         //GfLogDebug("%s entering pit lane by a side (bad).\n", car->_name);
         if (!(rules->ruleState & RM_PNST_STOPANDGO))
         {
