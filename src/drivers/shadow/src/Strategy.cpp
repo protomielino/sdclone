@@ -145,7 +145,7 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
         if(m_HasTYC)
             tyreWearPerM = (1.0 - m_lastTyreWear) / pCar->_distRaced;
 
-        LogSHADOW.info(" # Fuel per meter = %.6f - Damage per meter = %.1f - Wear per meter = %.8f\n", fuelPerM, damagePerM, tyreWearPerM);
+        LogSHADOW.debug(" # Fuel per meter = %.6f - Damage per meter = %.1f - Wear per meter = %.8f\n", fuelPerM, damagePerM, tyreWearPerM);
     }
 
     //
