@@ -680,8 +680,18 @@ reTrackInitRealWeather(void)
         if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
         {
             trackLocal->rain = webMetar->getRain();
+            trackLocal->water = trackLocal->rain;
+
             trackLocal->snow = webMetar->getSnow();
+
+            if (trackLocal->snow > 0)
+                trackLocal->water = trackLocal->snow;
+
             trackLocal->hail = webMetar->getHail();
+
+            if (trackLocal->hail > 0)
+                trackLocal->water = trackLocal->hail;
+
             trackLocal->relativehumidity = (tdble)(webMetar->getRelHumidity());
         }
         else
@@ -690,6 +700,7 @@ reTrackInitRealWeather(void)
             trackLocal->snow = TR_RAIN_NONE;
             trackLocal->hail = TR_RAIN_NONE;
             trackLocal->relativehumidity = TR_RAIN_NONE;
+            trackLocal->water = TR_RAIN_NONE;
         }
 
         GfLogDebug("Visibility = %.3f\n", trackLocal->visibility);
@@ -702,6 +713,7 @@ reTrackInitRealWeather(void)
         GfLogDebug("Rain = %i\n", trackLocal->rain);
         GfLogDebug("Snow = %i\n", trackLocal->snow);
         GfLogDebug("Hail = %i\n", trackLocal->hail);
+        GfLogDebug("Water track = %.3f\n", trackLocal->water);
         GfLogDebug("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
 
         ReTrackUpdate();
@@ -903,8 +915,18 @@ reTrackInitSimuWeather(void)
     if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
     {
         trackLocal->rain = webMetar->getRain();
+        trackLocal->water = trackLocal->rain;
+
         trackLocal->snow = webMetar->getSnow();
+
+        if (trackLocal->snow > 0)
+            trackLocal->water = trackLocal->snow;
+
         trackLocal->hail = webMetar->getHail();
+
+        if (trackLocal->hail > 0)
+            trackLocal->water = trackLocal->hail;
+
         trackLocal->relativehumidity = (tdble)(webMetar->getRelHumidity());
     }
     else
@@ -926,6 +948,7 @@ reTrackInitSimuWeather(void)
     GfLogDebug("Snow = %i\n", trackLocal->snow);
     GfLogDebug("Hail = %i\n", trackLocal->hail);
     GfLogDebug("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
+    GfLogDebug("Water track = %.3f\n", trackLocal->water);
 
     ReTrackUpdate();
 }

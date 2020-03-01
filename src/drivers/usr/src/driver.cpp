@@ -221,48 +221,63 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     /*     Load a custom setup if one is available.    */
     /*------------------------------------------------------*/
     // Get a pointer to the first char of the track filename.
-    char* trackname = strrchr(track->filename, '/') + 1;
+    char trackname[100];
+    strncpy( trackname, strrchr(track->filename, '/') + 1, sizeof(trackname) );
+    *strrchr(trackname, '.') = '\0';
+    LogUSR.info( " # USR trackName: '%s'\n", trackname );
 
     // Setup for this robot
     void *newParmHandle;
     *carParmHandle = NULL;
     newParmHandle = NULL;
-    /*sprintf(buffer, "drivers/%s/%d/setup.xml", MyBotName, INDEX);
-    //newParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-    *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-
-    if (*carParmHandle != NULL)
-    {
-        m_fuelPerMeter = GfParmGetNum(*carParmHandle, SECT_PRIVATE, BT_ATT_FUELPERMETER, (char*)NULL, 0.00068);
-        modeVerbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_VERBOSE, (char*)NULL, 0.0);
-        displaySetting = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_DISPLAYSETTING, (char*)NULL, 0.0);
-        m_testPitstop = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_PIT_TEST, (char*)NULL, 0.0);
-        m_testQualifTime = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_QUALIF_TEST, (char*)NULL, 0.0);
-        m_lineIndex = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_LINE_INDEX, (char*)NULL, 0.0);
-        m_strategyverbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_STRATEGY_VERBOSE, (char*)NULL, 0.0);
-        m_steerverbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_STEER_VERBOSE, (char*)NULL, 0.0);
-        newParmHandle = *carParmHandle;
-    }
-    else
-    {
-        m_fuelPerMeter = 0.00068;
-        m_fuelStrat = 1;
-        m_maxDammage = 5000;
-        m_testPitstop = 0;
-        m_testQualifTime = 0;
-        m_lineIndex = 0;
-        m_strategyverbose = 0;
-        m_steerverbose = 0;
-        modeVerbose = 0;
-        displaySetting = 0;
-    }*/
 
     const char *car_sect = SECT_GROBJECTS "/" LST_RANGES "/" "1";
     strncpy(carName, GfParmGetStr(carHandle, car_sect, PRM_CAR, ""), sizeof(carName));
     char *p = strrchr(carName, '.');
+    LogUSR.info( " # USR carName: '%s'\n", carName );
 
     if (p)
         *p = '\0';
+
+    // Get skill level
+
+    decel_adjust_perc = global_skill = skill = driver_aggression = 0.0;
+    SetRandomSeed(10);
+
+    // load the global skill level, range 0 - 10
+    snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetLocalDir());
+    void *skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
+
+    if(!skillHandle)
+    {
+        snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetDataDir());
+        skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
+    }//if !skillHandle
+
+    if (skillHandle)
+    {
+        global_skill = GfParmGetNum(skillHandle, (char *)SECT_SKILL, (char *)PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
+    }
+
+    global_skill = MAX(0.0f, MIN(30.0f, global_skill));
+
+    LogUSR.info("Global Skill: %.3f\n", global_skill);
+
+    //load the driver skill level, range 0 - 1
+    float driver_skill = 0.0f;
+    snprintf(buffer, BUFSIZE, "drivers/%s/%d/skill.xml", MyBotName, INDEX);
+    LogUSR.info("Path skill driver: %s\n", buffer);
+    skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+
+    if (skillHandle)
+    {
+        driver_skill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
+        driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
+        driver_skill = (float)MIN(1.0, MAX(0.0, driver_skill));
+        LogUSR.info("Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", global_skill, driver_skill, driver_aggression);
+    }
+
+    skill = (float)((global_skill + driver_skill * 2) * (1.0 + driver_skill));
 
     sprintf(buffer, "drivers/%s/%s/setup.xml", MyBotName, carName);
     //newParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
@@ -298,13 +313,13 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     switch (s->_raceType)
     {
     case RM_TYPE_PRACTICE:
-        sprintf(buffer, "drivers/%s/%s/practice/%s", MyBotName, carName, trackname);
+        sprintf(buffer, "drivers/%s/%s/practice/%s.xml", MyBotName, carName, trackname);
         break;
     case RM_TYPE_QUALIF:
-        sprintf(buffer, "drivers/%s/%s/qualifying/%s", MyBotName, carName, trackname);
+        sprintf(buffer, "drivers/%s/%s/qualifying/%s.xml", MyBotName, carName, trackname);
         break;
     case RM_TYPE_RACE:
-        sprintf(buffer, "drivers/%s/%s/race/%s", MyBotName, carName, trackname);
+        sprintf(buffer, "drivers/%s/%s/race/%s.xml", MyBotName, carName, trackname);
         break;
     default:
         break;
@@ -317,7 +332,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     // if no xml file in race type folder, load the parameters from  race directory
     if (*carParmHandle == NULL)
     {
-        sprintf(buffer, "drivers/%s/%s/race/%s", MyBotName, carName, trackname);
+        sprintf(buffer, "drivers/%s/%s/%s.xml", MyBotName, carName, trackname);
         LogUSR.info("Loading in defaut race directory : %s\n", buffer);
         *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
     }
@@ -446,47 +461,8 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     LogUSR.info("TCL RANGE        = %.3f\n", tcl_range);
     LogUSR.info("ABS SLIP         = %.3f\n", abs_slip);
     LogUSR.info("ABS RANGE        = %.3f\n", abs_range);
+    LogUSR.info("Driver %d skill   = %.2f\n", INDEX, skill);
 
-    // Get skill level
-
-    decel_adjust_perc = global_skill = skill = driver_aggression = 0.0;
-    SetRandomSeed(10);
-
-    // load the global skill level, range 0 - 10
-    snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetLocalDir());
-    void *skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
-
-    if(!skillHandle)
-    {
-        snprintf(buffer, BUFSIZE, "%sconfig/raceman/extra/skill.xml", GetDataDir());
-        skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
-    }//if !skillHandle
-
-    if (skillHandle)
-    {
-        global_skill = GfParmGetNum(skillHandle, (char *)SECT_SKILL, (char *)PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
-    }
-
-    global_skill = MAX(0.0f, MIN(30.0f, global_skill));
-
-    LogUSR.info("Global Skill: %.3f\n", global_skill);
-
-    //load the driver skill level, range 0 - 1
-    float driver_skill = 0.0f;
-    snprintf(buffer, BUFSIZE, "drivers/%s/%d/skill.xml", MyBotName, INDEX);
-    LogUSR.info("Path skill driver: %s\n", buffer);
-    skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-
-    if (skillHandle)
-    {
-        driver_skill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
-        driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
-        driver_skill = (float)MIN(1.0, MAX(0.0, driver_skill));
-        LogUSR.info("Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", global_skill, driver_skill, driver_aggression);
-    }
-
-    skill = (float)((global_skill + driver_skill * 2) * (1.0 + driver_skill));
-    LogUSR.debug("... USR Driver skill = %.2f\n", skill);
     LogUSR.debug("... USR Driver initrack end\n");
 }
 

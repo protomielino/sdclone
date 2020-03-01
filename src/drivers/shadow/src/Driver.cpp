@@ -272,7 +272,7 @@ void	Driver::InitTrack(
     //const char*	baseParamPath = buf;
 
     weathercode = GetWeather(pTrack);
-    LogSHADOW.info(" # Shadow weather code = %i\n\n", weathercode);
+    LogSHADOW.info(" # Shadow weather code = %d\n\n", weathercode);
 
     //
     //	ok, lets read/merge the car parms.
@@ -282,7 +282,7 @@ void	Driver::InitTrack(
     if (weathercode > 0)
     {
         // override params for car type on track of specific race type and driver.
-        snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s-%i.xml",
+        snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s-%d.xml",
                   GfDataDir(), MyBotName, m_carName, m_trackName, weathercode);
         hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
         LogSHADOW.debug("PATH = %s \n", buf);
@@ -296,17 +296,19 @@ void	Driver::InitTrack(
     }
     else
     {
+        // override params for car type on track of specific race type and driver.
+        snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s.xml",
+                  GfDataDir(), MyBotName, m_carName, m_trackName);
+        hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+        LogSHADOW.debug("PATH = %s \n", buf);
+
         // override params for default car type.
         snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/default.xml",
                   GfDataDir(), MyBotName, m_carName);
         hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
         LogSHADOW.debug("PATH = %s \n", buf);
 
-        // override params for car type on track of specific race type and driver.
-        snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s.xml",
-                  GfDataDir(), MyBotName, m_carName, m_trackName);
-        hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-        LogSHADOW.debug("PATH = %s \n", buf);
+
     }
 
     // setup the car param handle to be returned.
@@ -523,11 +525,13 @@ void	Driver::InitTrack(
         driver_skill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
         driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
         driver_skill = (float)MIN(1.0, MAX(0.0, driver_skill));
-        LogSHADOW.debug(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", global_skill, driver_skill, driver_aggression);
+        LogSHADOW.info(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", global_skill, driver_skill, driver_aggression);
     }
 
     skill = (float)((global_skill + driver_skill * 2) * (1.0 + driver_skill));
-    LogSHADOW.debug(" # SHADOW Driver skill = %.2f\n", skill);
+    Meteorology(pTrack);
+
+    LogSHADOW.info(" # SHADOW Driver skill = %.2f\n", skill);
 }
 
 // Start a new race.

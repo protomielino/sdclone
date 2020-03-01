@@ -1798,15 +1798,9 @@ void LRaceLine::ComputeRacelineBraking(int i, int rl, double **tSpeed, int speed
     double LatA = tSpeed[speedrl][i] * tSpeed[speedrl][i] *
             ((fabs(tRInverse[rl][prev])*0.2 + fabs(tRInverse[rl][i])*0.8));
 
-#if 1
     double TanA = MAX(0.0, TireAccel * TireAccel - LatA * LatA);
     double brakedelay = getBrakeDist(i, speedrl) + (rl != LINE_RL ? speedAdjust : 0.0);
     TanA = MIN(TanA, brakedelay);
-#else
-    double TanA = MAX(0.0, TireAccel * TireAccel * cardata->carMu - LatA * LatA);
-    double brakedelay = getBrakeDist(i, speedrl) + (rl != LINE_RL ? speedAdjust : 0.0) * tFriction[i];
-    TanA = MIN(TanA, brakedelay);
-#endif
 
     double time = dist / Speed;
     double MaxSpeed = tSpeed[speedrl][i] + TanA * time;
@@ -1817,6 +1811,7 @@ double LRaceLine::getFriction(int i)
 {
     double empty = 15.0f;
     double fuel_status = 1.0 - (car->_fuel <= empty ? 0.0 : (MAX(0.0, car->_fuel - 15.0f) / (maxfuel - 15.0f)));
+
     return tFriction[i] * (1.0 - fuel_status * 0.1);
 }
 
