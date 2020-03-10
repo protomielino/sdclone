@@ -197,6 +197,7 @@ static const int MAX_NBBOTS = 100;               // Number of drivers/robots
 #define PRV_PIT_EXIT_SPEED     "pit exit speed"
 #define PRV_PIT_MAX_SPEED      "pit max speed"
 #define PRV_PIT_MAX_SPEED_OFFSET "pit max speed offset"
+#define PRV_PIT_SPEED_MARGIN   "pit speed margin"
 #define PRV_PIT_LAP_BUFFER     "pit lap buffer"
 #define PRV_PIT_EXIT_TI        "pit exit ti"
 #define PRV_NO_PIT             "no pit"

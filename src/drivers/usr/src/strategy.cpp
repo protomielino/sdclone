@@ -81,11 +81,17 @@ void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void *carHandle, void **carPa
     fuelPerMeter = GfParmGetNum(*carParmHandle, SECT_PRIVATE, BT_ATT_FUELPERMETER, (char*)NULL, MAX_FUEL_PER_METER);
     fuelPerLap = GfParmGetNum(*carParmHandle, SECT_PRIVATE, BT_ATT_FUELPERLAP, (char*)NULL, t->length * fuelPerMeter);
     fuel_Strat = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_PIT_STRATEGY, (char*)NULL, 0.0);
-    test_Pitstop = (GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_PIT_TEST, (char*)NULL, 0.0) > 0.01f);
+    test_Pitstop = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_PIT_TEST, (char*)NULL, 0.0);
     test_qualifTime = (GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_QUALIF_TEST, (char*)NULL, 0.0) > 0.01f);
     strategy_verbose = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_STRATEGY_VERBOSE, (char*)NULL, 0.0);
     m_pittime = GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_PITSTOP_TIME, (char*)NULL, 30.0);
     m_lapBuffer = (int)GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_PIT_LAP_BUFFER, (char*)NULL, 1.0);
+
+    LogUSR.info("maxFuel = %.3f\n", maxFuel);
+    LogUSR.info("Initial Fuel = %.3f\n", initialFuel);
+    LogUSR.info("Fuel per meter = %.6f\n", fuelPerMeter);
+    LogUSR.info("Fuel per Lap = %.2f\n", fuelPerLap);
+    LogUSR.info("Check Pit = %i\n", test_Pitstop);
 
     if (fuel_Strat < 1)
     {
@@ -158,13 +164,7 @@ void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void *carHandle, void **carPa
 
     /* Tests in Practice mode */
     //maybe we need to check PitStop (eg. corkscrew, e-track-3)
-    if (test_Pitstop && s->_raceType == RM_TYPE_PRACTICE)
-    {
-        m_fuel = 0;
-        m_FuelStart = s->_totLaps * fuelPerLap;
-        //maybe we need to check Best Lap Time for qualifying
-    }
-    else if (test_qualifTime && s->_raceType == RM_TYPE_PRACTICE)
+    if (test_qualifTime && s->_raceType == RM_TYPE_PRACTICE)
     {
         qualifRace = true;
         m_fuel = 0;
@@ -175,9 +175,17 @@ void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void *carHandle, void **carPa
         practiceRace = true;
     }
 
+    if ((test_Pitstop > 0) && (s->_raceType == RM_TYPE_PRACTICE))
+    {
+        m_fuel = 0;
+        m_FuelStart = fuelPerLap * 1.05;
+        LogUSR.info("TEST PIT !!!!  - Fuel start = %.2f\n", m_FuelStart);
+        //maybe we need to check Best Lap Time for qualifying
+    }
+
     m_FuelStart = (float)MIN(m_FuelStart, maxFuel);
 
-    LogUSR.debug("# USR_2019 Index %d : Laps = %d, Fuel per Lap = %.2f, securityFuel = + %.2f, Fuel at Start Race = %.2f\n",
+    LogUSR.info("# USR Index %d : Laps = %d, Fuel per Lap = %.2f, securityFuel = + %.2f, Fuel at Start Race = %.2f\n",
                  index, s->_totLaps, fuelPerLap, m_fuel, m_FuelStart);
 
     if (initialFuel > 1.0)

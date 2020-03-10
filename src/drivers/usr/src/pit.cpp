@@ -41,7 +41,7 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
     usepitmaxspeed = false;
     pitmaxspeed = pitmaxspeedoffset = 0.0f;
 
-    pitspeedmargin = GfParmGetNum( car->_carHandle, "hymie_2015", "pitspeedmargin", (char*)NULL, SPEED_LIMIT_MARGIN);
+    pitspeedmargin = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_PIT_SPEED_MARGIN, (char*)NULL, SPEED_LIMIT_MARGIN);
     pitstartextralength = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_PIT_EXTRA_LENGTH, (char*)NULL, 0.0f);
     pitstartoverride0 = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_PIT_START_OVERRIDE0, (char*)NULL, -1.0f);
     pitstartoverride1 = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_PIT_START_OVERRIDE1, (char*)NULL, -1.0f);

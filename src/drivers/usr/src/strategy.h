@@ -87,7 +87,7 @@ public:
     void setTeamMate(tCarElt *tcar) { m_tmCar = tcar; }
 
 protected:
-    bool   test_Pitstop;
+    int    test_Pitstop;
     bool   test_qualifTime;
     bool   fuelChecked;            // Fuel statistics updated.
     bool   quickPitstop;            // Fast repair
