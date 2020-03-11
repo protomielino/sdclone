@@ -156,7 +156,7 @@ Driver::Driver(int index)
     rlookahead = raceoffset = avoidlftoffset = avoidrgtoffset = racespeed = 0.0f;
     avoidspeed = accelcmd = brakecmd = PitOffset = brakeratio = 0.0f;
     racetarget.x = 0.0; racetarget.y = 0.0;
-    radius = nullptr;
+    radius = NULL;
     carindex = 0;
     alone = aloneTeam = underThreat = avoidCritical = false;
     suspHeight = 0.0;
