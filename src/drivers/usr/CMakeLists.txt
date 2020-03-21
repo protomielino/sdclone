@@ -31,8 +31,8 @@ SET(ROBOT_SOURCES
   src/spline.cpp
   src/strategy.h
   src/strategy.cpp
-  src/tiresdata.cpp
-  src/tiresdata.h
+  #src/tiresdata.cpp
+  #src/tiresdata.h
   src/vec2d.h
   src/globaldefs.h)
 
