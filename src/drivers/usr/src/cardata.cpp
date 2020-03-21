@@ -95,6 +95,9 @@ void SingleCardata::init( CarElt *pcar )
 
     HasABS = HasESP = HasTCL = HasTYC = false;
     speed, angle, width, length = 0.0;
+    MAX_SLIP = 0.27;
+    TARGET_SLIP = 0.175;
+
     const char *enabling;
 
     enabling = GfParmGetStr(car->_carHandle, SECT_FEATURES, PRM_TIRETEMPDEG, VAL_NO);
@@ -266,6 +269,13 @@ double SingleCardata::TyreTreadDepthRear()
 
   return 100 * MIN(Right, Left);
 }
+
+/*double SingleCardata::FrontAxleSlipTangential() const
+{
+    double xfslip = (car->wheel(0).slipX() + car->wheel(1).slipX()) * 0.5;
+
+    return xfslip;
+}*/
 
 Cardata::Cardata(tSituation *s)
 {

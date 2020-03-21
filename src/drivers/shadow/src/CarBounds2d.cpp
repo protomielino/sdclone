@@ -24,17 +24,6 @@ static const int s_next_corner[] = {FRNT_LFT, REAR_LFT, REAR_RGT, FRNT_RGT};
 
 CarBounds2d::CarBounds2d( const tCarElt* car )
 {
-/*
-    xAxis = Vec2d(car->pub.DynGC.pos.az);
-    yAxis = xAxis.GetNormal();
-
-    Vec2d middle(car->pub.DynGC.pos.x, car->pub.DynGC.pos.y);
-
-    pts[FRNT_LFT] = middle + xAxis * car->pub.corner[FRNT_LFT].x + yAxis * car->pub.corner[FRNT_LFT].y;
-    pts[FRNT_RGT] = middle + xAxis * car->pub.corner[FRNT_RGT].x + yAxis * car->pub.corner[FRNT_RGT].y;
-    pts[REAR_LFT] = middle + xAxis * car->pub.corner[REAR_LFT].x + yAxis * car->pub.corner[REAR_LFT].y;
-    pts[REAR_RGT] = middle + xAxis * car->pub.corner[REAR_RGT].x + yAxis * car->pub.corner[REAR_RGT].y;
-*/
     pts[FRNT_LFT] = Vec2d(car->pub.corner[FRNT_LFT].ax, car->pub.corner[FRNT_LFT].ay);
     pts[FRNT_RGT] = Vec2d(car->pub.corner[FRNT_RGT].ax, car->pub.corner[FRNT_RGT].ay);
     pts[REAR_LFT] = Vec2d(car->pub.corner[REAR_LFT].ax, car->pub.corner[REAR_LFT].ay);

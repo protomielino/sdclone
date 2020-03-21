@@ -98,6 +98,7 @@ protected:
     double TyreConditionRight();
     double TyreTreadDepthFront();
     double TyreTreadDepthRear();
+    double FrontAxleSlipTangential() const;
 
 public:
     double lTT;
@@ -108,6 +109,8 @@ public:
     double GRIP_FACTOR_RIGHT;
     tdble  TYREWEAR;
     tdble  CRITICAL_TYREWEAR;
+    double TARGET_SLIP;	// amount of slip to give maximum grip.
+    double MAX_SLIP;		// amount of slip where grip level drops below 99% of maximum grip.
     tdble lftOH;
     tdble rgtOH;
     tdble carMu;

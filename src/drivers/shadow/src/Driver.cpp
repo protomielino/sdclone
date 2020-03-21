@@ -259,8 +259,8 @@ void	Driver::InitTrack(
     const char*	raceTypeStr[] = { "practice", "qualify", "race" };
     int			raceType = pS->raceInfo.type;
 
-    if( raceType == RM_TYPE_PRACTICE && (pS->raceInfo.totLaps == 3 || pS->raceInfo.totLaps == 10) )
-        raceType =  RM_TYPE_QUALIF;
+    //if( raceType == RM_TYPE_PRACTICE && (pS->raceInfo.totLaps == 3 || pS->raceInfo.totLaps == 10) )
+    //    raceType =  RM_TYPE_QUALIF;
 
     LogSHADOW.debug(" # Shadow Race type = %s \n", raceTypeStr[raceType]);
 
@@ -281,34 +281,31 @@ void	Driver::InitTrack(
 
     if (weathercode > 0)
     {
+        // override params for default car type.
+        snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/default.xml",
+                  GfDataDir(), MyBotName, m_carName);
+        hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
+        LogSHADOW.debug("PATH = %s \n", buf);
+
         // override params for car type on track of specific race type and driver.
         snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s-%d.xml",
                   GfDataDir(), MyBotName, m_carName, m_trackName, weathercode);
         hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
         LogSHADOW.debug("PATH = %s \n", buf);
-
+    }
+    else
+    {
         // override params for default car type.
         snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/default.xml",
                   GfDataDir(), MyBotName, m_carName);
         hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-        LogSHADOW.debug("PATH = %s \n", buf);
+        LogSHADOW.info("PATH = %s \n", buf);
 
-    }
-    else
-    {
         // override params for car type on track of specific race type and driver.
         snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s.xml",
                   GfDataDir(), MyBotName, m_carName, m_trackName);
         hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-        LogSHADOW.debug("PATH = %s \n", buf);
-
-        // override params for default car type.
-        snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/default.xml",
-                  GfDataDir(), MyBotName, m_carName);
-        hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-        LogSHADOW.debug("PATH = %s \n", buf);
-
-
+        LogSHADOW.info("PATH = %s \n", buf);
     }
 
     // setup the car param handle to be returned.
@@ -456,8 +453,9 @@ void	Driver::InitTrack(
 
     // setup initial fuel for race.
     double	fuelPerM        = SafeParmGetNum(hCarParm, SECT_PRIV, "fuel per m", 0, 0.001f);
-    double	maxFuel			= SafeParmGetNum(hCarParm, SECT_CAR, PRM_TANK, (char*) NULL, 100.0f);
-    int pittest             = SafeParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_TEST_STOP, (char*) NULL, 0);
+    double	maxFuel			= SafeParmGetNum(hCarParm, SECT_CAR, PRM_TANK, (char*)NULL, 100.0f);
+    int pittest             = SafeParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_TEST_STOP, (char*)NULL, 0);
+    LogSHADOW.info(" # Pit test stop = %i\n", pittest);
     double	fullRaceFuel	= 1.02 * pS->_totLaps * (double)pTrack->length * fuelPerM;
     double	fuel			= fullRaceFuel;
 
