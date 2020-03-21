@@ -379,6 +379,7 @@ static Tag object_tags [] =
   { "numsurf" , do_numsurf  },
   { "kids"    , do_kids     },
   { "crease"  , do_ignore   },
+  { "shader"  , do_ignore   },
   { 0, 0 }
 } ;
 
