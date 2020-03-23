@@ -45,48 +45,48 @@
 #define RANDOM_A    1664525
 #define RANDOM_C    1013904223
 
-const float Driver::MAX_UNSTUCK_ANGLE = (float)(15.0f / 180.0f*PI);    // [radians] If the angle of the car on the track is smaller, we assume we are not stuck.
+const float Driver::MAX_UNSTUCK_ANGLE = (float)(15.0f / 180.0f*PI);		 // [radians] If the angle of the car on the track is smaller, we assume we are not stuck.
 const float Driver::MAX_REALLYSTUCK_ANGLE = 1.6;
-const float Driver::UNSTUCK_TIME_LIMIT = 5.0f;                // [s] We try to get unstuck after this time.
-const float Driver::UNSTUCK2_TIME_LIMIT = 15.0f;                // [s] We try to get unstuck after this time.
-const float Driver::UNSTUCK3_TIME_LIMIT = 30.0f;                // [s] We try to get unstuck after this time.
-const float Driver::MAX_UNSTUCK_SPEED = 1.5f;                // [m/s] Below this speed we consider being stuck.
-const float Driver::MIN_UNSTUCK_DIST = 1.0f;                // [m] If we are closer to the middle we assume to be not stuck. <2.0>
-const float Driver::G = 9.81f;                        // [m/(s*s)] Welcome on Earth.
-const float Driver::FULL_ACCEL_MARGIN = 1.0f;                // [m/s] Margin reduce oscillation of brake/acceleration.
+const float Driver::UNSTUCK_TIME_LIMIT = 5.0f;							// [s] We try to get unstuck after this time.
+const float Driver::UNSTUCK2_TIME_LIMIT = 15.0f;						// [s] We try to get unstuck after this time.
+const float Driver::UNSTUCK3_TIME_LIMIT = 30.0f;						// [s] We try to get unstuck after this time.
+const float Driver::MAX_UNSTUCK_SPEED = 1.5f;							// [m/s] Below this speed we consider being stuck.
+const float Driver::MIN_UNSTUCK_DIST = 1.0f;							// [m] If we are closer to the middle we assume to be not stuck. <2.0>
+const float Driver::G = 9.81f;											// [m/(s*s)] Welcome on Earth.
+const float Driver::FULL_ACCEL_MARGIN = 1.0f;							// [m/s] Margin reduce oscillation of brake/acceleration.
 
-const float Driver::SHIFT = 0.98f;                    // [-] (% of rpmredline) When do we like to shift gears. <0.96>
-const float Driver::SHIFT_UP = 0.99f;                    // [-] (% of rpmredline)
+const float Driver::SHIFT = 0.98f;										// [-] (% of rpmredline) When do we like to shift gears. <0.96>
+const float Driver::SHIFT_UP = 0.99f;									// [-] (% of rpmredline)
 const float Driver::SHIFT_DOWN = 120;
-const float Driver::SHIFT_MARGIN = 4.0f;                // [m/s] Avoid oscillating gear changes.
+const float Driver::SHIFT_MARGIN = 4.0f;								// [m/s] Avoid oscillating gear changes.
 
-const float Driver::ABS_SLIP = 2.5f;                    // [m/s] range [0..10]
-const float Driver::ABS_RANGE = 5.0f;                    // [m/s] range [0..10]
-const float Driver::ABS_MINSPEED = 3.0f;                // [m/s] Below this speed the ABS is disabled (numeric, division by small numbers).
-const float Driver::TCL_SLIP = 2.0f;                    // [m/s] range [0..10]
-const float Driver::TCL_RANGE = 10.0f;                    // [m/s] range [0..10]
+const float Driver::ABS_SLIP = 2.5f;									// [m/s] range [0..10]
+const float Driver::ABS_RANGE = 5.0f;									// [m/s] range [0..10]
+const float Driver::ABS_MINSPEED = 3.0f;								// [m/s] Below this speed the ABS is disabled (numeric, division by small numbers).
+const float Driver::TCL_SLIP = 2.0f;									// [m/s] range [0..10]
+const float Driver::TCL_RANGE = 10.0f;									// [m/s] range [0..10]
 
-const float Driver::LOOKAHEAD_CONST = 15.0f;                // [m]
-const float Driver::LOOKAHEAD_FACTOR = 0.33f;                // [-]
-const float Driver::WIDTHDIV = 2.0f;                    // [-] Defines the percentage of the track to use (2/WIDTHDIV). <3.0>
-const float Driver::SIDECOLL_MARGIN = 3.0f;                // [m] Distance between car centers to avoid side collisions.
-const float Driver::BORDER_OVERTAKE_MARGIN = 0.5f;            // [m]
-const float Driver::OVERTAKE_OFFSET_SPEED = 5.0f;            // [m/s] Offset change speed.
-const float Driver::PIT_LOOKAHEAD = 10.0f;                // [m] Lookahead to stop in the pit.
-const float Driver::PIT_BRAKE_AHEAD = 200.0f;                // [m] Workaround for "broken" pitentries.
-const float Driver::PIT_MU = 0.4f;                    // [-] Friction of pit concrete.
-const float Driver::MAX_SPEED = 80.0f;                    // [m/s] Speed to compute the percentage of brake to apply.
-const float Driver::MAX_FUEL_PER_METER = 0.0007f;            // [liter/m] fuel consumtion.
-const float Driver::CLUTCH_SPEED = 5.0f;                    // [m/s]
-const float Driver::CENTERDIV = 0.1f;                        // [-] (factor) [0.01..0.6].
-const float Driver::DISTCUTOFF = 200.0f;                    // [m] How far to look, terminate while loops.
-const float Driver::MAX_INC_FACTOR = 6.0f;                    // [m] Increment faster if speed is slow [1.0..10.0].
-const float Driver::CATCH_FACTOR = 3.0f;                    // [-] select MIN(catchdist, dist*CATCH_FACTOR) to overtake.
-const float Driver::CLUTCH_FULL_MAX_TIME = 2.0f;            // [s] Time to apply full clutch.
-const float Driver::USE_LEARNED_OFFSET_RANGE = 0.2f;            // [m] if offset < this use the learned stuff
+const float Driver::LOOKAHEAD_CONST = 15.0f;							// [m]
+const float Driver::LOOKAHEAD_FACTOR = 0.33f;							// [-]
+const float Driver::WIDTHDIV = 2.0f;									// [-] Defines the percentage of the track to use (2/WIDTHDIV). <3.0>
+const float Driver::SIDECOLL_MARGIN = 3.0f;								// [m] Distance between car centers to avoid side collisions.
+const float Driver::BORDER_OVERTAKE_MARGIN = 0.5f;						// [m]
+const float Driver::OVERTAKE_OFFSET_SPEED = 5.0f;						// [m/s] Offset change speed.
+const float Driver::PIT_LOOKAHEAD = 10.0f;								// [m] Lookahead to stop in the pit.
+const float Driver::PIT_BRAKE_AHEAD = 200.0f;							// [m] Workaround for "broken" pitentries.
+const float Driver::PIT_MU = 0.4f;										// [-] Friction of pit concrete.
+const float Driver::MAX_SPEED = 80.0f;									// [m/s] Speed to compute the percentage of brake to apply.
+const float Driver::MAX_FUEL_PER_METER = 0.0007f;						// [liter/m] fuel consumtion.
+const float Driver::CLUTCH_SPEED = 5.0f;								// [m/s]
+const float Driver::CENTERDIV = 0.1f;									// [-] (factor) [0.01..0.6].
+const float Driver::DISTCUTOFF = 200.0f;								// [m] How far to look, terminate while loops.
+const float Driver::MAX_INC_FACTOR = 6.0f;								// [m] Increment faster if speed is slow [1.0..10.0].
+const float Driver::CATCH_FACTOR = 3.0f;								// [-] select MIN(catchdist, dist*CATCH_FACTOR) to overtake.
+const float Driver::CLUTCH_FULL_MAX_TIME = 2.0f;						// [s] Time to apply full clutch.
+const float Driver::USE_LEARNED_OFFSET_RANGE = 0.2f;					// [m] if offset < this use the learned stuff
 
-const float Driver::TEAM_REAR_DIST = 50.0f;                    //
-const int Driver::TEAM_DAMAGE_CHANGE_LEAD = 8000;            // When to change position in the team?
+const float Driver::TEAM_REAR_DIST = 50.0f;								//
+const int Driver::TEAM_DAMAGE_CHANGE_LEAD = 8000;						// When to change position in the team?
 
 // Static variables.
 static int pitstatus[128] = { 0 };
@@ -109,8 +109,6 @@ unsigned int Driver::getRandom()
 
     return (random_seed >> 16);
 }
-
-
 
 //==========================================================================*
 /***************************************************************************/
@@ -179,7 +177,6 @@ Driver::Driver(int index)
 }
 
 /***************************************************************************/
-
 Driver::~Driver()
 {
     delete opponents;
@@ -467,7 +464,6 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 }
 
 /***************************************************************************/
-
 // Start a new race.
 void Driver::newRace(tCarElt* car, tSituation *s)
 {
@@ -582,7 +578,6 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 }
 
 /***************************************************************************/
-
 double Driver::getBrakeMargin()
 {
     double brk = (double)brakemargin;
@@ -668,7 +663,6 @@ bool Driver::calcSpeed()
 }
 
 /***************************************************************************/
-
 // Drive during race.
 void Driver::drive(tSituation *s)
 {
