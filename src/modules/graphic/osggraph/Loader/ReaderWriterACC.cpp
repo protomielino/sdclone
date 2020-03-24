@@ -216,6 +216,10 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
             std::vector<char> tmp(len);
             stream.read(&(tmp[0]), len);
         }
+        else if (token == "shader")
+        {
+            strName = readString(stream);
+        }
         else if (token == "name")
         {
             strName = readString(stream);
