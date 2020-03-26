@@ -44,11 +44,34 @@
 #include <sstream>
 #include <iomanip> //setprecision
 
+//string constants for dashboard
+static std::string strEmpty("");
+static std::string strBrakeRep("F/R Brake Rep.");
+static std::string strFrontARB("Front ARB");
+static std::string strRearARB("Rear ARB");
+static std::string strFDiffMSB("F Pow Max Slip");
+static std::string strFDiffCMSB("F Coa Max Slip");
+static std::string strRDiffMSB("R Pow Max Slip");
+static std::string strRDiffCMSB("R Coa Max Slip");
+static std::string strCDiffMSB("C Pow Max Slip");
+static std::string strCDiffCMSB("C Coa Max Slip");
+static std::string strFuel("Fuel");
+static std::string strRepair("Repair");
+static std::string strTireSet("New tires");
+static std::string strFrontWing("Front wing");
+static std::string strRearWing("Rear wing");
+static std::string strPenalty("Next pit type");
+
+static osg::Vec4 colorRed(1.0, 0.0, 0.0, 1.0);
+static osg::Vec4 colorYellow(1.0, 0.878, 0.0, 1.0);
+static osg::Vec4 colorCyan(0.31, 0.968, 0.933, 1.0);
+
 std::map<std::string,osgText::Text* > hudTextElements;
 
 osg::Vec3 calculatePosition(osg::BoundingBox mybb, std::string objPoint,
 osg::BoundingBox bb,  std::string referenceObjPoint,
-float verticalModifier, float horizontalModifier){
+float verticalModifier, float horizontalModifier)
+{
     /*
     Possible positioning values:
     tl  //top left
@@ -75,11 +98,13 @@ float verticalModifier, float horizontalModifier){
     {
         vPoint += bb.yMax();
         vSign = 1;
-    }else if(referenceObjPoint.find("b")==0)
+    }
+    else if(referenceObjPoint.find("b")==0)
     {
         vPoint += bb.yMin();
         vSign = -1;
-    }else if(referenceObjPoint.find("m")==0)
+    }
+    else if(referenceObjPoint.find("m")==0)
     {
         vPoint += (bb.yMax() - bb.yMin())/2;
         vSign = 1;
@@ -89,10 +114,12 @@ float verticalModifier, float horizontalModifier){
     if(referenceObjPoint.find("l")==1)
     {
         hPoint += bb.xMin();
-    }else if(referenceObjPoint.find("r")==1)
+    }
+    else if(referenceObjPoint.find("r")==1)
     {
         hPoint += bb.xMax();
-    }else if(referenceObjPoint.find("c")==1)
+    }
+    else if(referenceObjPoint.find("c")==1)
     {
         hPoint += (bb.xMax() - bb.xMin())/2;
     }
@@ -103,10 +130,12 @@ float verticalModifier, float horizontalModifier){
     if(objPoint.find("t")==0)
     {
         vPoint -= (mybb.yMax() - mybb.yMin()) * vSign;//height
-    }else if(objPoint.find("b")==0)
+    }
+    else if(objPoint.find("b")==0)
     {
         //do nothing
-    }else if(objPoint.find("m")==0)
+    }
+    else if(objPoint.find("m")==0)
     {
         vPoint -= (mybb.yMax() - mybb.yMin()) * vSign/2;
     }
@@ -115,10 +144,12 @@ float verticalModifier, float horizontalModifier){
     if(objPoint.find("l")==1)
     {
         //nothing to do
-    }else if(objPoint.find("r")==1)
+    }
+    else if(objPoint.find("r")==1)
     {
         hPoint -= (mybb.xMax() - mybb.xMin());//width
-    }else if(objPoint.find("c")==1)
+    }
+    else if(objPoint.find("c")==1)
     {
         hPoint -= (mybb.xMax() - mybb.xMin())/2;
     }
@@ -1059,7 +1090,102 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     changeImageSize(this->hudImgElements["rpm-on"], rpmWidth, "left", this->hudScale);
     changeImageSize(this->hudImgElements["rpm-off"], 1.0-rpmWidth, "right", this->hudScale);
 
+// dash items
 
+    std::string &description = strEmpty;
+    if (currCar->_dashboardActiveItem < currCar->_dashboardInstantNb) {
+        const tDashboardItem *item = &(currCar->_dashboardInstant[currCar->_dashboardActiveItem]);
+        temp.str("");
+        switch (item->type) {
+        case DI_BRAKE_REPARTITION:
+            description = strBrakeRep;
+            temp << std::fixed << std::setprecision(1) << (100.0 * item->setup->value) << " %";
+            break;
+        case DI_FRONT_ANTIROLLBAR:
+            description = strFrontARB;
+            temp << std::fixed << std::setprecision(1) << (item->setup->value / 1000.0) << " kN/m";
+            break;
+        case DI_REAR_ANTIROLLBAR:
+            description = strRearARB;
+            temp << std::fixed << std::setprecision(1) << (item->setup->value / 1000.0) << " kN/m";
+            break;
+        case DI_FRONT_DIFF_MAX_SLIP_BIAS:
+            description = strFDiffMSB;
+            temp << std::fixed << std::setprecision(1) << (100.0 * item->setup->value) << " %";
+            break;
+        case DI_FRONT_DIFF_COAST_MAX_SLIP_BIAS:
+            description = strFDiffCMSB;
+            temp << std::fixed << std::setprecision(1) << (100.0 * item->setup->value) << " %";
+            break;
+        case DI_REAR_DIFF_MAX_SLIP_BIAS:
+            description = strRDiffMSB;
+            temp << std::fixed << std::setprecision(1) << (100.0 * item->setup->value) << " %";
+            break;
+        case DI_REAR_DIFF_COAST_MAX_SLIP_BIAS:
+            description = strRDiffCMSB;
+            temp << std::fixed << std::setprecision(1) << (100.0 * item->setup->value) << " %";
+            break;
+        case DI_CENTRAL_DIFF_MAX_SLIP_BIAS:
+            description = strCDiffMSB;
+            temp << std::fixed << std::setprecision(1) << (100.0 * item->setup->value) << " %";
+            break;
+        case DI_CENTRAL_DIFF_COAST_MAX_SLIP_BIAS:
+            description = strCDiffCMSB;
+            temp << std::fixed << std::setprecision(1) << (100.0 * item->setup->value) << " %";
+            break;
+        }
+        hudTextElements["dash-items-type"]->setText(description);
+        hudTextElements["dash-items-value1"]->setColor(colorRed);
+        hudTextElements["dash-items-value1"]->setText(temp.str());
+        hudTextElements["dash-items-value2"]->setText(std::string());
+    } else {
+        const tDashboardItem *item = &(currCar->_dashboardRequest[currCar->_dashboardActiveItem - currCar->_dashboardInstantNb]);
+        std::ostringstream value1;
+        std::ostringstream value2;
+        switch (item->type) {
+        case DI_FUEL:
+            description = strFuel;
+            value1 << std::fixed << std::setprecision(1) << item->setup->desired_value << " l";
+            value2 << std::fixed << std::setprecision(1) << item->setup->value << " l";
+            break;
+        case DI_REPAIR:
+            description = strRepair;
+            value1 << std::fixed << std::setprecision(1) << item->setup->desired_value;
+            value2 << std::fixed << std::setprecision(1) << item->setup->value;
+            break;
+        case DI_TYRE_SET:
+            description = strTireSet;
+            if (item->setup->desired_value > 0.9) {
+                value1 << "YES";
+            } else {
+                value1 << "NO";
+            }
+            break;
+        case DI_FRONT_WING_ANGLE:
+            description = strFrontWing;
+            value1 << std::fixed << std::setprecision(1) << RAD2DEG(item->setup->desired_value);
+            value2 << std::fixed << std::setprecision(1) << RAD2DEG(item->setup->value);
+            break;
+        case DI_REAR_WING_ANGLE:
+            description = strRearWing;
+            value1 << std::fixed << std::setprecision(1) << RAD2DEG(item->setup->desired_value);
+            value2 << std::fixed << std::setprecision(1) << RAD2DEG(item->setup->value);
+            break;
+        case DI_PENALTY:
+            description = strPenalty;
+            if (item->setup->desired_value > 0.9) {
+                value1 << "PENALTY";
+            } else {
+                value1 << "REPAIR";
+            }
+            break;
+        }
+        hudTextElements["dash-items-type"]->setText(description);
+        hudTextElements["dash-items-value1"]->setColor(colorYellow);
+        hudTextElements["dash-items-value1"]->setText(value1.str());
+        hudTextElements["dash-items-value2"]->setColor(colorCyan);
+        hudTextElements["dash-items-value2"]->setText(value2.str());
+    }
 
     //make the camera visible
     _cameraHUD->setNodeMask(NODE_MASK_ALL);
