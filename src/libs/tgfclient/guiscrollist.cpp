@@ -60,6 +60,28 @@ gfuiScroll(tScrollBarInfo *sinfo)
     }
 }
 
+static void
+gfuiScrollListUpdateScroll(tGfuiScrollList *scrollist, int showElt = -1, int elemBeforeAfter = 0)
+{
+	if (showElt >= 0) {
+		showElt = MIN(showElt, scrollist->nbElts);
+		elemBeforeAfter = MIN(elemBeforeAfter, (scrollist->nbElts-1)/2);
+		elemBeforeAfter = MAX(elemBeforeAfter, 0);
+		scrollist->firstVisible = MIN(
+			scrollist->firstVisible,
+			showElt - scrollist->nbVisible + 1 + elemBeforeAfter );
+		scrollist->firstVisible = MAX(
+			scrollist->firstVisible,
+			scrollist->selectedElt - elemBeforeAfter );
+	}
+
+	scrollist->firstVisible = MIN(scrollist->firstVisible, scrollist->nbElts - scrollist->nbVisible);
+	scrollist->firstVisible = MAX(scrollist->firstVisible, 0);
+
+	GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
+									scrollist->nbVisible, scrollist->firstVisible);
+}
+
 void
 gfuiScrollListNextElt (tGfuiObject *object)
 {
@@ -75,16 +97,7 @@ gfuiScrollListNextElt (tGfuiObject *object)
     if (scrollist->onSelect) {
 		scrollist->onSelect(scrollist->userDataOnSelect);
     }
-    if (scrollist->selectedElt == scrollist->firstVisible + scrollist->nbVisible) {
-		/* Scroll down */
-		if (scrollist->firstVisible + scrollist->nbVisible < scrollist->nbElts) {
-			scrollist->firstVisible++;
-			if (scrollist->scrollBar) {
-				GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
-									scrollist->nbVisible, scrollist->firstVisible);
-			}
-		}
-    }
+	gfuiScrollListUpdateScroll(scrollist, scrollist->selectedElt);
 }
 
 void
@@ -102,16 +115,7 @@ gfuiScrollListPrevElt (tGfuiObject *object)
     if (scrollist->onSelect) {
 		scrollist->onSelect(scrollist->userDataOnSelect);
     }
-    if (scrollist->selectedElt < scrollist->firstVisible) {
-		/* Scroll down */
-		if (scrollist->firstVisible > 0) {
-			scrollist->firstVisible--;
-			if (scrollist->scrollBar) {
-				GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
-									scrollist->nbVisible, scrollist->firstVisible);
-			}
-		}
-    }
+	gfuiScrollListUpdateScroll(scrollist, scrollist->selectedElt);
 }
 
 
@@ -276,6 +280,7 @@ GfuiScrollListSetSelectedElement(void *scr, int id, unsigned int selectElement)
     if (scrollist->onSelect)
 		scrollist->onSelect(scrollist->userDataOnSelect);
 
+	gfuiScrollListUpdateScroll(scrollist, scrollist->selectedElt);
     return true;
 }
 
@@ -451,6 +456,7 @@ GfuiScrollListExtractSelectedElement(void *scr, int id, void **userData)
     *userData = elt->userData;
     free(elt);
     
+	gfuiScrollListUpdateScroll(scrollist, scrollist->selectedElt);
     return name;
 }
 
@@ -486,6 +492,7 @@ GfuiScrollListExtractElement(void *scr, int id, int index, void **userData)
     *userData = elt->userData;
     free(elt);
     
+	gfuiScrollListUpdateScroll(scrollist);
     return name;
 }
 
@@ -505,6 +512,7 @@ GfuiScrollListClear(void *scr, int id)
 	
 	scrollist->nbElts = 0;
     scrollist->selectedElt = -1;
+	gfuiScrollListUpdateScroll(scrollist);
 }
 
 /** Insert an element in a scroll list.
@@ -535,9 +543,7 @@ GfuiScrollListInsertElement(void *scr, int id, const char *element, int index, v
     gfuiScrollListInsElt(scrollist, elt, index);
 
     scrollist->nbElts++;
-    if (scrollist->scrollBar)
-		GfuiScrollBarPosSet(scr, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
-							scrollist->nbVisible, scrollist->firstVisible);
+	gfuiScrollListUpdateScroll(scrollist, scrollist->nbElts - 1);
 
     return 0;
 }
@@ -565,15 +571,7 @@ GfuiScrollListShowElement(void *scr, int id, int index)
     else if (index >= scrollist->nbElts)
 		index = scrollist->nbElts - 1;
 
-    int oldFirstVisible = scrollist->firstVisible;
-    if (index < scrollist->firstVisible)
-        scrollist->firstVisible = index;
-    else if (index >= scrollist->firstVisible + scrollist->nbVisible)
-        scrollist->firstVisible = index - scrollist->nbVisible + 1;
-
-    if (scrollist->firstVisible != oldFirstVisible && scrollist->scrollBar)
-        GfuiScrollBarPosSet(scr, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
-							scrollist->nbVisible, scrollist->firstVisible);
+	gfuiScrollListUpdateScroll(scrollist, index);
 }
 
 void
@@ -735,26 +733,7 @@ GfuiScrollListMoveSelectedElement(void *scr, int id, int delta)
     gfuiScrollListInsElt(scrollist, elt, newPos);
     
     scrollist->selectedElt = newPos;
-
-    if (scrollist->selectedElt == scrollist->firstVisible + scrollist->nbVisible) {
-		/* Scroll down */
-		if (scrollist->firstVisible + scrollist->nbVisible < scrollist->nbElts) {
-			scrollist->firstVisible++;
-			if (scrollist->scrollBar) {
-				GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
-									scrollist->nbVisible, scrollist->firstVisible);
-			}
-		}
-    } else if (scrollist->selectedElt < scrollist->firstVisible) {
-		/* Scroll down */
-		if (scrollist->firstVisible > 0) {
-			scrollist->firstVisible--;
-			if (scrollist->scrollBar) {
-				GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
-									scrollist->nbVisible, scrollist->firstVisible);
-			}
-		}
-    }
+	gfuiScrollListUpdateScroll(scrollist, scrollist->selectedElt, abs(delta));
     
     return 0;
 }

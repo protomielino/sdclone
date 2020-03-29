@@ -32,6 +32,8 @@ public:
         int index;
         osg::ref_ptr<osg::Geode> node;
         osg::ref_ptr<osg::Texture2D> textures[3];
+        Light(): index() { }
+        void setState(int index);
     };
 
     typedef std::vector<Light> LightList;
@@ -63,6 +65,17 @@ public:
     void addLight(const osg::ref_ptr<osg::Group> &group, tGraphicLightInfo *info);
     void update(double currentTime, double totTime, int raceType);
 };
+
+void SDTrackLights::Internal::Light::setState(int index)
+{
+    osg::StateSet *stateSet = new osg::StateSet;
+    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
+    stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
+    stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
+    stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
+    stateSet->setTextureAttributeAndModes(0, textures[index], osg::StateAttribute::ON);
+    node->setStateSet(stateSet);
+}
 
 osg::ref_ptr<osg::Texture2D>
 SDTrackLights::Internal::loadLightTexture(char const *filename)
@@ -207,12 +220,7 @@ SDTrackLights::Internal::addLight(const osg::ref_ptr<osg::Group> &group, tGraphi
     new_light->node = new osg::Geode;
     new_light->node->addDrawable(geometry);
 
-    osg::StateSet *stateSet = new_light->node->getOrCreateStateSet();
-    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
-    stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
-    stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
-    stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
-    stateSet->setTextureAttributeAndModes(0, new_light->textures[0], osg::StateAttribute::ON);
+    new_light->setState(0);
 
     group->addChild( new_light->node );
 }
@@ -232,58 +240,37 @@ SDTrackLights::Internal::update(double currentTime, double totTime, int raceType
         current_index = -1;
 
     onoff = !active && raceType != RM_TYPE_RACE;
-
     if( current_index != onoff_red_index || onoff != onoff_red )
     {
         onoff_red_index = current_index;
         onoff_red = onoff;
-
         for(LightList::iterator i = red.begin(); i != red.end(); ++i)
-        {
-            int index = onoff || (current_index >= 0 && current_index < i->index) ? 1 : 0;
-            i->node->getOrCreateStateSet()->setTextureAttributeAndModes(
-                0, i->textures[index], osg::StateAttribute::ON );
-        }
+            i->setState(onoff || (current_index >= 0 && current_index < i->index) ? 1 : 0);
     }
 
     onoff = active && raceType != RM_TYPE_RACE;
-
     if( onoff_green != onoff )
     {
         onoff_green = onoff;
-
         for(LightList::iterator i = green.begin(); i != green.end(); ++i)
-        {
-            i->node->getOrCreateStateSet()->setTextureAttributeAndModes(
-                0, i->textures[onoff ? 1 : 0], osg::StateAttribute::ON );
-        }
+            i->setState(onoff ? 1 : 0);
     }
 
     onoff = active && ( raceType != RM_TYPE_RACE || currentTime < 30.0f );
-
     if( onoff_green_st != onoff )
     {
         onoff_green_st = onoff;
-
         for(LightList::iterator i = green_st.begin(); i != green_st.end(); ++i)
-        {
-            i->node->getOrCreateStateSet()->setTextureAttributeAndModes(
-                0, i->textures[onoff ? 1 : 0], osg::StateAttribute::ON );
-        }
+            i->setState(onoff ? 1 : 0);
     }
 
     onoff = false;
-
     if( onoff_yellow != onoff || ( onoff && phase != onoff_phase ) )
     {
         onoff_yellow = onoff;
-
+        int index = !onoff ? 0 : (phase ? 2 : 1);
         for(LightList::iterator i = yellow.begin(); i != yellow.end(); ++i)
-        {
-            int index = !onoff ? 0 : (phase ? 2 : 1);
-            i->node->getOrCreateStateSet()->setTextureAttributeAndModes(
-                0, i->textures[index], osg::StateAttribute::ON );
-        }
+            i->setState(index);
     }
 
     onoff_phase = phase;
@@ -312,5 +299,5 @@ void SDTrackLights::build(tTrack *track)
 
 void SDTrackLights::update(double currentTime, double totTime, int raceType)
 {
-    internal->update(currentTime, totTime, raceType);
+    if (internal) internal->update(currentTime, totTime, raceType);
 }
