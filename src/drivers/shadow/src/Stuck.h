@@ -300,7 +300,7 @@ private:
 private:
     const tCarElt*						_me;
     Vec2d								_gridOrigin;
-    std::vector<std::vector<Cell>>		_grid;
+    std::vector<std::vector<Cell> >		_grid;
     State								_stuckState;
     double								_stuckTime;
     int									_stuckCount;

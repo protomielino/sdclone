@@ -825,7 +825,7 @@ void	Stuck::fillCarCells( int carI, double carX, double carY, double carAng, dou
 void	Stuck::fillTrackCells( const MyTrack& track )
 {
     // make track cells available.
-    vector<vector<Edge>> edges(GRID_SIZE);
+    vector<vector<Edge> > edges(GRID_SIZE);
 
     _leftPoints.clear();
     _rightPoints.clear();
