@@ -125,12 +125,12 @@ endif(OPTION_SDL_1x)
 # message(WARNING "TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)")
 
 if(OPTION_SDL_2x)
-   set(SDL2_PROJECT SDL2-2.0.10)
+   set(SDL2_PROJECT SDL2-2.0.12)
    set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off -DSDL_CMAKE_DEBUG_POSTFIX=)
 #   set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off)
    ExternalProject_Add(${SDL2_PROJECT} 
-      URL https://www.libsdl.org/release/SDL2-2.0.10.tar.gz 
-   URL_HASH SHA256=b4656c13a1f0d0023ae2f4a9cf08ec92fffb464e0f24238337784159b8b91d57
+      URL https://www.libsdl.org/release/SDL2-2.0.12.tar.gz 
+   URL_HASH SHA256=349268f695c02efbc9b9148a70b85e58cefbbf704abd3e91be654db7f1e2c863
 
    CMAKE_ARGS ${SDL2_ARGS}
    DEPENDS OpenGL-headers
@@ -138,7 +138,7 @@ if(OPTION_SDL_2x)
    message(WARNING "Remove the step below when SDL2 CMake is fixed")
    ExternalProject_Add_Step(${SDL2_PROJECT} sdl2_fix_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/sdl-2.0.10.CMakeLists.txt"
+           "${CMAKE_SOURCE_DIR}/patches/sdl-2.0.12.CMakeLists.txt"
            "<SOURCE_DIR>/CMakeLists.txt"
    DEPENDEES update # do after update
    DEPENDERS patch  # do before patch
