@@ -134,6 +134,7 @@ SD_SETUP_SETTINGS_VERSION()
 SET_PROPERTY(GLOBAL PROPERTY SD_MODULE_LIST "")
 SET_PROPERTY(GLOBAL PROPERTY SD_ROBOT_LIST "")
 SET_PROPERTY(GLOBAL PROPERTY SD_OSG_PLUGIN_LIST "")
+SET_PROPERTY(GLOBAL PROPERTY SD_EXE_LIST "")
 
 # Sub-dirs to build ...
 ADD_SUBDIRECTORY(src)
@@ -146,6 +147,9 @@ SD_UPDATE_SETTINGS_VERSION()
 
 # Usefull for using an installation of SD as a robot development framework without building it.
 INSTALL_SD_CMAKE()
+
+# Must be the last ADD_SUBDIRECTORY for FIXUP_BUNDLE to work
+ADD_SUBDIRECTORY(packaging)
 
 # Generate a 'make clobber'-like clobber.sh/.bat script in case of an in-source build.
 IF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
@@ -170,4 +174,3 @@ ELSE(OPTION_PACKAGING)
 # Configure CPack.
    INCLUDE(cmake/packagemaker.cmake)
 ENDIF(OPTION_PACKAGING)
-

@@ -1,0 +1,65 @@
+#==============================================================================
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+#==============================================================================
+
+INCLUDE(BundleUtilities)
+SET(BU_CHMOD_BUNDLE_ITEMS ON)
+
+SET(bundle "@CMAKE_BINARY_DIR@/@CMAKE_INSTALL_PREFIX@/@SD_BINDIR@/@PROJECT_NAME@@CMAKE_EXECUTABLE_SUFFIX@")
+
+
+SET(loadables @SD_MODULE_LIST_ITEMS@)
+SET(robots @SD_ROBOT_LIST_ITEMS@)
+SET(osg-plugins @SD_OSG_PLUGIN_LIST_ITEMS@)
+SET(plugins ${osg-plugins})
+SET(_prefix_path @CMAKE_PREFIX_PATH@)
+
+foreach(_MODULE ${loadables})
+   #message(STATUS "${_MODULE}")
+   LIST(APPEND plugins "@CMAKE_BINARY_DIR@/@CMAKE_INSTALL_PREFIX@/${_MODULE}")
+endforeach()
+
+message(STATUS "Robots...")
+foreach(_ROBOT ${robots})
+   #message(STATUS "${_ROBOT}")
+   LIST(APPEND plugins "@CMAKE_BINARY_DIR@/@CMAKE_INSTALL_PREFIX@/${_ROBOT}")
+endforeach()
+
+#message(STATUS "plugins...")
+#foreach(_MODULE ${plugins})
+#   message(STATUS "plugins = ${_MODULE}")
+#endforeach()
+
+
+# TODO - APPLE specific ?
+SET(search_dirs )
+IF(_prefix_path)
+    LIST(APPEND search_dirs "${_prefix_path}")
+ENDIF(_prefix_path)
+LIST(APPEND search_dirs "@CMAKE_BINARY_DIR@/@CMAKE_INSTALL_PREFIX@")
+LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/Frameworks")
+LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/MacOS")
+LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/lib64/games/speed-dreams-2/lib")
+LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/games/Plugins/osgPlugins-@OSG_PLUGIN_VERSION@")
+
+
+FIXUP_BUNDLE("${bundle}" "${plugins}" "${search_dirs}")
+
+message(STATUS bundle = "${bundle}")
+message(STATUS plugins = "${plugins}")
+message(STATUS search_dirs = "${search_dirs}")
+message(STATUS _prefix_path = "${_prefix_path}")
+

@@ -206,6 +206,8 @@ MACRO(SD_ADD_EXECUTABLE TARGET_NAME)
 
   ENDIF(MSVC)
 
+  SET_PROPERTY(GLOBAL APPEND PROPERTY SD_EXE_LIST "${SD_BINDIR}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
+
   # Make the "settings_versions" target depend on this target,
   # in order settings_versions is built after them.
   ADD_DEPENDENCIES(settings_versions ${TARGET_NAME})

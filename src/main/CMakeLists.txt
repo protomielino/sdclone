@@ -48,91 +48,9 @@ ENDIF(UNIX)
 
 SD_INSTALL_FILES(BIN TARGETS ${_TARGET_NAME})
 
-GET_PROPERTY(SD_MODULE_LIST_ITEMS GLOBAL PROPERTY SD_MODULE_LIST)
-GET_PROPERTY(SD_ROBOT_LIST_ITEMS GLOBAL PROPERTY SD_ROBOT_LIST)
-GET_PROPERTY(SD_OSG_PLUGIN_LIST_ITEMS GLOBAL PROPERTY SD_OSG_PLUGIN_LIST)
-
-
-
 IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
-   SET(OSG_PLUGIN_VERSION 3.6.4)
-SET(OSG_PLUGIN_DIR /opt/local/lib/osgPlugins-${OSG_PLUGIN_VERSION})
-   message("OSG_PLUGIN_DIR = ${OSG_PLUGIN_DIR}")
    INSTALL(FILES ../../packaging/OSX/Info.plist DESTINATION ./Contents)
-INSTALL(FILES ../../packaging/OSX/sd-icon-mac-256.icns DESTINATION ./Contents/Resources)
-   SET(APPS "\${CMAKE_INSTALL_PREFIX}/games/${_TARGET_NAME}")
-   SET(DIRS )
-   SET(PlugIns )
-#SET(DIRS ${DIRS} "${OSG_PLUGIN_DIR}")
-   
-   # need to switch on CMake version 3.8.0 ??
-   # use MacOS before 3.8.0
-   # use Frameworks from 3.8.0 onward
-   SET(DIRS ${DIRS} "\${CMAKE_INSTALL_PREFIX}/MacOS")
-   SET(DIRS ${DIRS} "\${CMAKE_INSTALL_PREFIX}/Frameworks")
-
-
-   SET(DIRS ${DIRS} "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib")
-   SET(DIRS ${DIRS} /opt/local/lib)
-
-   # TODO need to fixup some of these..
-   # These should be pulled into "\${CMAKE_INSTALL_PREFIX}/MacOS" as needed by others
-IF(NOT OPTION_OFFICIAL_ONLY)
-   LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libephemeris.dylib")
-ENDIF(NOT OPTION_OFFICIAL_ONLY)
-
-LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/liblearning.dylib")
-#LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libnetworking.dylib")
-#LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libportability.dylib")
-#LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/librobottools.dylib")
-#LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libtgf.dylib")
-#LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libtgfclient.dylib")
-#LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libtgfdata.dylib")
-ENDIF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
-
-foreach(_MODULE ${SD_MODULE_LIST_ITEMS})
-   #message(STATUS "\${CMAKE_INSTALL_PREFIX}/${_MODULE}")
-   LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/${_MODULE}")
-endforeach()
-
-foreach(_ROBOT ${SD_ROBOT_LIST_ITEMS})
-   #message(STATUS "\${CMAKE_INSTALL_PREFIX}/${_ROBOT}")
-   LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/${_ROBOT}")
-endforeach()
-
-IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
-
-   IF(OPTION_OSGGRAPH)
-#SET(OSG_PLUGIN_DIR /opt/local/lib/osgPlugins-${OSG_PLUGIN_VERSION})
-#INSTALL(DIRECTORY "${OSG_PLUGIN_DIR}" DESTINATION ./MacOS FILES_MATCHING PATTERN "*.so")
-      LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/modules/graphic/osggraph.so")
-      FILE(GLOB osg_plugins "${OSG_PLUGIN_DIR}/*.so")
-message("osg_plugins = ${osg_plugins}")
-      FOREACH(pi ${osg_plugins})
-INSTALL(FILES ${pi} DESTINATION ./games/PlugIns/osgPlugins-${OSG_PLUGIN_VERSION})
-         GET_FILENAME_COMPONENT(fname ${pi} NAME)
-        message("fname = ${fname}")
-         LIST(APPEND PlugIns "\${CMAKE_INSTALL_PREFIX}/games/PlugIns/osgPlugins-${OSG_PLUGIN_VERSION}/${fname}")
-      ENDFOREACH()
-   ENDIF(OPTION_OSGGRAPH)
-
-   message("PlugIns = ${PlugIns}")
-message("DIRS = ${DIRS}")
-
-
-# These are installed by their respective CMakeLists.txt
-# Executables
-#LIST(APPEND PlugIns ${CMAKE_INSTALL_PREFIX}/games/sd2-accc)
-#LIST(APPEND PlugIns ${CMAKE_INSTALL_PREFIX}/games/sd2-menuview)
-#LIST(APPEND PlugIns ${CMAKE_INSTALL_PREFIX}/games/sd2-nfs2ac)
-#LIST(APPEND PlugIns ${CMAKE_INSTALL_PREFIX}/games/sd2-nfsperf)
-#LIST(APPEND PlugIns ${CMAKE_INSTALL_PREFIX}/games/sd2-sd2-trackgen)
-
-   INSTALL(CODE "
-   INCLUDE(BundleUtilities)
-   SET(BU_CHMOD_BUNDLE_ITEMS ON)
-   FIXUP_BUNDLE(\"${APPS}\" \"${PlugIns}\" \"${DIRS}\")")
-
+   INSTALL(FILES ../../packaging/OSX/sd-icon-mac-256.icns DESTINATION ./Contents/Resources)
 ENDIF()
 
 # Under Windows, install needed 3rd party DLLs close to Speed Dreams executable.
