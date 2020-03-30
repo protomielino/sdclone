@@ -31,7 +31,7 @@ public:
     {
         int index;
         osg::ref_ptr<osg::Geode> node;
-        osg::ref_ptr<osg::Texture2D> textures[3];
+        osg::ref_ptr<osg::StateSet> states[3];
         Light(): index() { }
         void setState(int index);
     };
@@ -61,29 +61,18 @@ public:
 
     ~Internal() { }
 
-    osg::ref_ptr<osg::Texture2D> loadLightTexture(char const *filename);
+    osg::ref_ptr<osg::StateSet> initStateSet(char const *textureFilename);
     void addLight(const osg::ref_ptr<osg::Group> &group, tGraphicLightInfo *info);
     void update(double currentTime, double totTime, int raceType);
 };
 
-void SDTrackLights::Internal::Light::setState(int index)
+osg::ref_ptr<osg::StateSet>
+SDTrackLights::Internal::initStateSet(char const *textureFilename)
 {
-    osg::StateSet *stateSet = new osg::StateSet;
-    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
-    stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
-    stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
-    stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
-    stateSet->setTextureAttributeAndModes(0, textures[index], osg::StateAttribute::ON);
-    node->setStateSet(stateSet);
-}
-
-osg::ref_ptr<osg::Texture2D>
-SDTrackLights::Internal::loadLightTexture(char const *filename)
-{
-    osg::ref_ptr<osg::Image> image = osgDB::readImageFile(filename);
+    osg::ref_ptr<osg::Image> image = osgDB::readImageFile(textureFilename);
 
     if (!image)
-        GfLogError("Failed to load track lights texture: %s\n", filename);
+        GfLogError("Failed to load track lights texture: %s\n", textureFilename);
 
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D;
     texture->setDataVariance(osg::Object::STATIC);
@@ -92,7 +81,14 @@ SDTrackLights::Internal::loadLightTexture(char const *filename)
     texture->setMaxAnisotropy(16);
     texture->setImage(image);
 
-    return texture;
+    osg::ref_ptr<osg::StateSet> stateSet = new osg::StateSet;
+    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
+    stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
+    stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
+    stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
+    stateSet->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
+
+    return stateSet;
 }
 
 void
@@ -132,7 +128,7 @@ SDTrackLights::Internal::addLight(const osg::ref_ptr<osg::Group> &group, tGraphi
 
     if (!new_light)
         return;
-
+    
     int states = 2;
 
     osg::Vec3Array *vertexArray = new osg::Vec3Array;
@@ -200,27 +196,27 @@ SDTrackLights::Internal::addLight(const osg::ref_ptr<osg::Group> &group, tGraphi
     geometry->addPrimitiveSet( new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP, 0, vertexArray->size()) );
 
 
-    osg::ref_ptr<osg::Texture2D> onTexture = loadLightTexture(info->onTexture);
-    osg::ref_ptr<osg::Texture2D> offTexture = loadLightTexture(info->offTexture);
+    osg::ref_ptr<osg::StateSet> onState = initStateSet(info->onTexture);
+    osg::ref_ptr<osg::StateSet> offState= initStateSet(info->offTexture);
 
     new_light->index = info->index;
     if (states == 3 && info->index % 2)
     {
-        new_light->textures[0] = offTexture;
-        new_light->textures[1] = offTexture;
-        new_light->textures[2] = onTexture;
+        new_light->states[0] = offState;
+        new_light->states[1] = offState;
+        new_light->states[2] = onState;
     }
     else
     {
-        new_light->textures[0] = offTexture;
-        new_light->textures[1] = onTexture;
-        new_light->textures[2] = offTexture;
+        new_light->states[0] = offState;
+        new_light->states[1] = onState;
+        new_light->states[2] = offState;
     }
 
     new_light->node = new osg::Geode;
     new_light->node->addDrawable(geometry);
 
-    new_light->setState(0);
+    new_light->node->setStateSet( new_light->states[0] );
 
     group->addChild( new_light->node );
 }
@@ -245,7 +241,10 @@ SDTrackLights::Internal::update(double currentTime, double totTime, int raceType
         onoff_red_index = current_index;
         onoff_red = onoff;
         for(LightList::iterator i = red.begin(); i != red.end(); ++i)
-            i->setState(onoff || (current_index >= 0 && current_index < i->index) ? 1 : 0);
+        {
+            int index = onoff || (current_index >= 0 && current_index < i->index) ? 1 : 0;
+            i->node->setStateSet( i->states[index] );
+        }
     }
 
     onoff = active && raceType != RM_TYPE_RACE;
@@ -253,7 +252,7 @@ SDTrackLights::Internal::update(double currentTime, double totTime, int raceType
     {
         onoff_green = onoff;
         for(LightList::iterator i = green.begin(); i != green.end(); ++i)
-            i->setState(onoff ? 1 : 0);
+            i->node->setStateSet( i->states[onoff ? 1 : 0] );
     }
 
     onoff = active && ( raceType != RM_TYPE_RACE || currentTime < 30.0f );
@@ -261,7 +260,7 @@ SDTrackLights::Internal::update(double currentTime, double totTime, int raceType
     {
         onoff_green_st = onoff;
         for(LightList::iterator i = green_st.begin(); i != green_st.end(); ++i)
-            i->setState(onoff ? 1 : 0);
+            i->node->setStateSet( i->states[onoff ? 1 : 0] );
     }
 
     onoff = false;
@@ -270,7 +269,7 @@ SDTrackLights::Internal::update(double currentTime, double totTime, int raceType
         onoff_yellow = onoff;
         int index = !onoff ? 0 : (phase ? 2 : 1);
         for(LightList::iterator i = yellow.begin(); i != yellow.end(); ++i)
-            i->setState(index);
+            i->node->setStateSet( i->states[index] );
     }
 
     onoff_phase = phase;
