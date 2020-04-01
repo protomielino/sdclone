@@ -3742,6 +3742,7 @@ tdble GfParmGetVariable(void *handle, char const *path, char const *key)
 
 	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
 		GfLogError ("GfParmGetVariable: bad handle (%p)\n", parmHandle);
+		free(pathdup);
    	    return 0.0f;
 	}
 
@@ -3789,6 +3790,7 @@ void GfParmRemoveVariable(void *handle, char const *path, char const *key)
 
 	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
 		GfLogError ("GfParmRemoveVariable: bad handle (%p)\n", parmHandle);
+		free(pathdup);
    	    return;
 	}
 
@@ -3818,6 +3820,7 @@ void GfParmSetVariable(void *handle, char const *path, char const *key, tdble va
 
 	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
 		GfLogError ("GfParmSetVariable: bad handle (%p)\n", parmHandle);
+		free(pathdup);
    	    return;
 	}
 

@@ -147,8 +147,10 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 		return;
 	}
 
-	if (!(font = (GLFONT *)malloc(sizeof(GLFONT))))
+	if (!(font = (GLFONT *)malloc(sizeof(GLFONT)))) {
+		fclose(Input);
 		return;
+	}
 
 	//Read glFont structure
 	//fread(font, sizeof(GLFONT), 1, Input);

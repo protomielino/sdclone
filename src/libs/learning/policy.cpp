@@ -508,6 +508,7 @@ void DiscretePolicy::loadFile (char* f)
 		fprintf(stderr, "Error when reading file");
 	if (strcmp (rtag, start_tag)) {
 		fprintf (stderr, "Could not find starting tag\n");
+		fclose(fh);
 		return;
 	}
 	readSize = fread((void *) &n_read_states, sizeof(int), 1, fh);

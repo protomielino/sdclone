@@ -626,6 +626,7 @@ int doMaterial(char *Line, ob_t *object, mat_t *material)
     if (p == NULL)
     {
         fprintf(stderr, "unknown MATERIAL format %s \n", Line);
+        free(materialt);
         return (-1);
     }
     sscanf(p,
@@ -664,6 +665,7 @@ int doObject(char *Line, ob_t *object, mat_t *material)
     if (p == NULL)
     {
         fprintf(stderr, "unknown OBJECT format %s \n", Line);
+        free(objectt);
         return (-1);
     }
     sscanf(p, "%s", name);
@@ -1478,11 +1480,13 @@ int loadAC(char * inputFilename, char * outputFilename)
     if (fgets(Line, 256, file) == NULL)
     {
         fprintf(stderr, "failed to read first line of the file\n");
+        fclose(file);
         return (-1);
     }
     if (strnicmp(Line, AC3D, strlen(AC3D)))
     {
         fprintf(stderr, "unknown format %s \n", Line);
+        fclose(file);
         return (-1);
     }
 
