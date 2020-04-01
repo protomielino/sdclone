@@ -24,25 +24,56 @@
 #==============================================================================
 INCLUDE(../cmake/macros.cmake)
 
+IF(OPTION_OSGGRAPH)
+   #MESSAGE(STATUS OPENSCENEGRAPH_LIBRARIES = "${OPENSCENEGRAPH_LIBRARIES}")
+
+   LIST(GET OPENSCENEGRAPH_LIBRARIES 0 _OSGLIB)
+   #MESSAGE(STATUS _OSGLIB = "${_OSGLIB}")
+
+   GET_FILENAME_COMPONENT(_OSG_LIB_PATH "${_OSGLIB}" PATH)
+   #MESSAGE(STATUS _OSG_LIB_PATH = "${_OSG_LIB_PATH}")
+
+
+   SET(OSG_PLUGIN_DIR osgPlugins-${OPENSCENEGRAPH_VERSION})
+   #MESSAGE(STATUS OSG_PLUGIN_DIR = "${OSG_PLUGIN_DIR}")
+
+   if(WIN32)
+      SET(_OSG_LIB_PATH "${_OSG_LIB_PATH}/../bin")
+      find_file(_OSG_FILE "osgversion${CMAKE_EXECUTABLE_SUFFIX}" PATHS ${_OSG_LIB_PATH})
+      GET_FILENAME_COMPONENT(_OSG_LIB_PATH "${_OSG_FILE}" PATH)
+      #MESSAGE(STATUS _OSG_FILE = "${_OSG_FILE}")
+      unset(_OSG_FILE CACHE )
+      #MESSAGE(STATUS _OSG_FILE = "${_OSG_FILE}")
+   ENDIF(WIN32)
+
+   #MESSAGE(STATUS _OSG_LIB_PATH = "${_OSG_LIB_PATH}")
+   #MESSAGE(STATUS CMAKE_SHARED_LIBRARY_SUFFIX = "${CMAKE_SHARED_LIBRARY_SUFFIX}")
+   #MESSAGE(STATUS CMAKE_SHARED_MODULE_SUFFIX = "${CMAKE_SHARED_MODULE_SUFFIX}")
+   #MESSAGE(STATUS CMAKE_EXECUTABLE_SUFFIX = "${CMAKE_EXECUTABLE_SUFFIX}")
+
+   MESSAGE(STATUS "Globbing from: ${_OSG_LIB_PATH}/${OSG_PLUGIN_DIR}/*${CMAKE_SHARED_MODULE_SUFFIX}")
+   FILE(GLOB OSG_PLUGINS "${_OSG_LIB_PATH}/${OSG_PLUGIN_DIR}/*${CMAKE_SHARED_MODULE_SUFFIX}")
+   message("OSG_PLUGINS = ${OSG_PLUGINS}")
+ENDIF(OPTION_OSGGRAPH)
+
 #==============================================================================
 IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
- # TODO get these elsewhwere...
-   SET(OSG_PLUGIN_VERSION 3.6.4)
-   SET(OSG_PLUGIN_DIR /opt/local/lib/osgPlugins-${OSG_PLUGIN_VERSION})
 
    IF(OPTION_OSGGRAPH)
-      FILE(GLOB osg_plugins "${OSG_PLUGIN_DIR}/*.so")
-      message("osg_plugins = ${osg_plugins}")
+      set(osg_plugins ${OSG_PLUGINS})
+      #FILE(GLOB osg_plugins "${_OSG_LIB_PATH}/${OSG_PLUGIN_DIR}/*${CMAKE_SHARED_MODULE_SUFFIX}")
+      #message("osg_plugins = ${osg_plugins}")
       FOREACH(pi ${osg_plugins})
-         INSTALL(FILES ${pi} DESTINATION ./games/PlugIns/osgPlugins-${OSG_PLUGIN_VERSION})
+         INSTALL(FILES ${pi} DESTINATION ./games/PlugIns/${OSG_PLUGIN_DIR})
          GET_FILENAME_COMPONENT(fname ${pi} NAME)
-         SET_PROPERTY(GLOBAL APPEND PROPERTY SD_OSG_PLUGIN_LIST "${CMAKE_INSTALL_PREFIX}/games/PlugIns/osgPlugins-${OSG_PLUGIN_VERSION}/${fname}")
+         SET_PROPERTY(GLOBAL APPEND PROPERTY SD_OSG_PLUGIN_LIST "${CMAKE_INSTALL_PREFIX}/games/PlugIns/${OSG_PLUGIN_DIR}/${fname}")
       ENDFOREACH()
    ENDIF(OPTION_OSGGRAPH)
 
 ENDIF()
 #==============================================================================
 
+Message(STATUS "Todo - Check handling of SD_OSG_PLUGIN_LIST_ITEMS in fixbundle.cmake.in")
 IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
    GET_PROPERTY(SD_MODULE_LIST_ITEMS GLOBAL PROPERTY SD_MODULE_LIST)
    GET_PROPERTY(SD_ROBOT_LIST_ITEMS GLOBAL PROPERTY SD_ROBOT_LIST)
