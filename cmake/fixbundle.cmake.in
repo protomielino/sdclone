@@ -23,8 +23,8 @@ SET(bundle "@CMAKE_BINARY_DIR@/@CMAKE_INSTALL_PREFIX@/@SD_BINDIR@/@PROJECT_NAME@
 
 SET(loadables @SD_MODULE_LIST_ITEMS@)
 SET(robots @SD_ROBOT_LIST_ITEMS@)
-SET(osg-plugins @SD_OSG_PLUGIN_LIST_ITEMS@)
-SET(plugins ${osg-plugins})
+SET(osg_plugins @SD_OSG_PLUGIN_LIST_ITEMS@)
+SET(plugins )
 SET(_prefix_path @CMAKE_PREFIX_PATH@)
 
 foreach(_MODULE ${loadables})
@@ -32,10 +32,14 @@ foreach(_MODULE ${loadables})
    LIST(APPEND plugins "@CMAKE_BINARY_DIR@/@CMAKE_INSTALL_PREFIX@/${_MODULE}")
 endforeach()
 
-message(STATUS "Robots...")
 foreach(_ROBOT ${robots})
    #message(STATUS "${_ROBOT}")
    LIST(APPEND plugins "@CMAKE_BINARY_DIR@/@CMAKE_INSTALL_PREFIX@/${_ROBOT}")
+endforeach()
+
+foreach(_PLUGIN ${osg_plugins})
+   #message(STATUS "${_PLUGIN}")
+   LIST(APPEND plugins "@CMAKE_BINARY_DIR@/@CMAKE_INSTALL_PREFIX@/${_PLUGIN}")
 endforeach()
 
 #message(STATUS "plugins...")
@@ -53,7 +57,7 @@ LIST(APPEND search_dirs "@CMAKE_BINARY_DIR@/@CMAKE_INSTALL_PREFIX@")
 LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/Frameworks")
 LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/MacOS")
 LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/lib64/games/speed-dreams-2/lib")
-LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/games/Plugins/osgPlugins-@OSG_PLUGIN_VERSION@")
+LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/games/Plugins/@OSG_PLUGIN_DIR@")
 
 
 FIXUP_BUNDLE("${bundle}" "${plugins}" "${search_dirs}")
