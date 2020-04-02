@@ -41,6 +41,7 @@ class cGrCamera
     int			id;		/* Camera Id */
     int			drawCurrent;	/* flag to draw the current car */
     int			drawDriver;	/* flag to draw the driver */
+    int         drawCockpit;
     int			drawBackground;	/* flag to draw the background */
     int			mirrorAllowed;	/* flag to allow the display of mirror */
 
@@ -53,11 +54,13 @@ class cGrCamera
     class cGrScreen	*screen;	/* screen where the camera is attached */
 
  public:
-    cGrCamera(class cGrScreen *myscreen, int myid = 0, int mydrawCurrent = 0, int mydrawdrv = 0, int mydrawBackground = 0, int mymirrorAllowed = 0) {
+    cGrCamera(class cGrScreen *myscreen, int myid = 0, int mydrawCurrent = 0, int mydrawdrv = 0, int mydrawCockpit = 0, int mydrawBackground = 0, int mymirrorAllowed = 0)
+    {
         screen = myscreen;
         id = myid;
         drawCurrent = mydrawCurrent;
         drawDriver = mydrawdrv;
+        drawCockpit = mydrawCockpit;
         drawBackground = mydrawBackground;
         mirrorAllowed = mymirrorAllowed;
         speed[0] = speed[1] = speed[2] = 0.0;
@@ -96,6 +99,7 @@ class cGrCamera
     int getId(void)		{ return id; }
     int getDrawCurrent(void)	{ return drawCurrent; }
     int getDrawDriver(void)	{ return drawDriver; }
+    int getDrawCockpit(void) { return drawCockpit; }
     int getDrawBackground(void)	{ return drawBackground; }
     int isMirrorAllowed(void)	{ return mirrorAllowed; }
 
