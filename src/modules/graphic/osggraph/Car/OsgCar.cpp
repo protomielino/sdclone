@@ -120,6 +120,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
     GfLogInfo("[gr] Init(%d) car %s for driver %s index %d\n", index, car->_carName, car->_modName, car->_driverIndex);
     GfLogInfo("[gr] Init(%d) car %s MasterModel name\n", index, car->_masterModel);
+	GfLogInfo("[gr] Init(%d) car %s CustomSkin name\n", index, car->_skinName);
 
     snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/%d/",
              GfDataDir(), car->_modName, car->_driverIndex);
@@ -174,7 +175,12 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     snprintf(path, nMaxTexPathSize, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
 
     std::string strPath = GetDataDir();
-    snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s.acc", car->_carName, car->_carName);
+
+	if(bMasterModel)
+		snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s.acc", car->_masterModel, car->_masterModel);
+	else
+		snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s.acc", car->_carName, car->_carName);
+
     strPath+=buf;
 
     std::string name = car->_carName;
@@ -200,6 +206,16 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     GfLogInfo("Chemin Textures : %s\n", strTPath.c_str());
 
     //osg::ref_ptr<osg::Node> Car = new osg::Node;
+	if (bMasterModel)
+		bSkinName = name;
+
+	if (bCustomSkin)
+	{
+		snprintf(buf, nMaxTexPathSize, "%s-%s", car->_carName, car->_skinName);
+		bSkinName = buf;
+		GfLogInfo("Car Texture = %s\n", bSkinName.c_str());
+	}
+
     pCar = loader.Load3dFile(strPath, true, bSkinName);
 
     //pCar->addChild(Car.get());
@@ -349,7 +365,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
         strPath = tmpPath + param;
 
-        osg::ref_ptr<osg::Node> steerEntityLo = loader.Load3dFile(strPath, true, bSkinName);
+        osg::ref_ptr<osg::Node> steerEntityLo = loader.Load3dFile(strPath, true, "");
         osg::ref_ptr<osg::MatrixTransform> steer_transform = new osg::MatrixTransform;
 
         tdble xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
@@ -381,7 +397,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
         strPath = tmpPath + param;
 
-        osg::ref_ptr<osg::Node> steerEntityHi = loader.Load3dFile(strPath, true, bSkinName);
+        osg::ref_ptr<osg::Node> steerEntityHi = loader.Load3dFile(strPath, true, "");
         osg::ref_ptr<osg::MatrixTransform> steer_transform = new osg::MatrixTransform;
 
         tdble xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
@@ -918,6 +934,8 @@ void SDCars::loadCars(tSituation *pSituation, bool trackType, bool subCat)
     for (int i = 0; i < s->_ncars; i++)
     {
         tCarElt* elt = s->cars[i];
+		strncpy(elt->_masterModel, GfParmGetStr(elt->_carHandle, SECT_GROBJECTS, PRM_TEMPLATE, ""), MAX_NAME_LEN - 1);
+		elt->_masterModel[MAX_NAME_LEN - 1] = 0;
         SDCar * car = new SDCar;
         this->addSDCar(car);
         this->cars_branch->addChild(car->loadCar(elt, trackType, subCat, carShader));

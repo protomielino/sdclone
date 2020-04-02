@@ -296,8 +296,12 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
             }
             else
             {
-                if (textureId == 0)
-                    texname0 = texname;
+					if (textureId == 0 && m_skinName == "")
+						texname0 = texname;
+					else if (textureId == 0)
+						texname0 = m_skinName+".png";
+
+					GfLogDebug("TexName = %s\n", texname0.c_str());
             }
             textureId++;
         }
