@@ -108,6 +108,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     int nranges = 0;
 
     _carShader = carshader;
+	GfLogInfo("Graphic options car shader = %u\n", _carShader);
 
 #if 1
     osgLoader loader;
@@ -869,11 +870,12 @@ void SDCar::updateCar()
         else
             pLightBrake->setSingleChildOn(1);
     }
+
     wheels.updateWheels();
 
     this->car_branch->setMatrix(mat);
 
-    if(_carShader == 2)
+    if(_carShader > 2)
         reflectionMapping->update();
 
     this->setReflectionMap(reflectionMapping->getReflectionMap());

@@ -102,6 +102,7 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):
     {
         SDScreens * screens = (SDScreens*)getScreens();
         screens->registerViewDependantPreRenderNode(this->getCamerasRoot());
+		GfLogInfo("Graphic options : reflectionShader = %u\n", reflectionShader);
 
         cameras[4]->setNodeMask(NODE_MASK_ALL);
     }

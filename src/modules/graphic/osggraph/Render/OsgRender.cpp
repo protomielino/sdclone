@@ -67,7 +67,7 @@ static const char* TexSizeValues[] = { GR_ATT_SHADOW_512, GR_ATT_SHADOW_1024, GR
 static const int NbTexSizeValues = sizeof(TexSizeValues) / sizeof(TexSizeValues[0]);
 static const char* QualityValues[] = { GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_ATT_AGR_FULL };
 static const int NbQualityValues = sizeof(QualityValues) / sizeof(QualityValues[0]);
-static const char* ShadersValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_ATT_AGR_FULL };
+static const char* ShadersValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_ATT_AGR_FULL, GR_ATT_AGR_HIGH, GR_ATT_AGR_ULTRA };
 static const int NbShadersValues = sizeof(ShadersValues) / sizeof(ShadersValues[0]);
 static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = {1, 3, 5, 7, 8};
 static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
@@ -258,6 +258,7 @@ void SDRender::Init(tTrack *track)
     GfLogInfo("Graphic options : Shadow Type : %u\n", ShadowIndex);
     GfLogInfo("Graphic options : Shadow Texture Size : %u\n", ShadowTexSize);
     GfLogInfo("Graphic options : Shadow Quality : %u\n", QualityIndex);
+	GfLogInfo("Graphic options : Shader Quality : %u\n", carsShader);
 
     NStars = NMaxStars;
     if (AStarsData)

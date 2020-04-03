@@ -98,6 +98,7 @@
 #define GR_ATT_AGR_MEDIUM	"medium"
 #define GR_ATT_AGR_FULL		"full"
 #define GR_ATT_AGR_HIGH		"high"
+#define GR_ATT_AGR_ULTRA	"ultra"
 #define GR_ATT_ENV_SIZE     "environment size"
 
 #define GR_ATT_NB_SCREENS	"number of screens"
