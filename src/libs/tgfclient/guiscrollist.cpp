@@ -63,16 +63,16 @@ gfuiScroll(tScrollBarInfo *sinfo)
 static void
 gfuiScrollListUpdateScroll(tGfuiScrollList *scrollist, int showElt = -1, int elemBeforeAfter = 0)
 {
-	if (showElt >= 0) {
-		showElt = MIN(showElt, scrollist->nbElts);
-		elemBeforeAfter = MIN(elemBeforeAfter, (scrollist->nbElts-1)/2);
+	if (showElt >= 0 && scrollist->nbElts > 0) {
+		showElt = MIN(showElt, scrollist->nbElts - 1);
+		elemBeforeAfter = MIN(elemBeforeAfter, (scrollist->nbVisible-1)/2);
 		elemBeforeAfter = MAX(elemBeforeAfter, 0);
 		scrollist->firstVisible = MIN(
 			scrollist->firstVisible,
-			showElt - scrollist->nbVisible + 1 + elemBeforeAfter );
+			showElt - elemBeforeAfter );
 		scrollist->firstVisible = MAX(
 			scrollist->firstVisible,
-			scrollist->selectedElt - elemBeforeAfter );
+			showElt - scrollist->nbVisible + 1 + elemBeforeAfter );
 	}
 
 	scrollist->firstVisible = MIN(scrollist->firstVisible, scrollist->nbElts - scrollist->nbVisible);
