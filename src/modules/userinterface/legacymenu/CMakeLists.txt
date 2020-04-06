@@ -39,7 +39,7 @@ SET(RACESCREENS_SOURCES ${RS}/raceselectmenu.cpp
                         ${RS}/racemanmenu.cpp ${RS}/fileselect.cpp ${RS}/networkingmenu.cpp
                         ${RS}/raceconfigstate.cpp
                         ${RS}/trackselect.cpp ${RS}/driverselect.cpp ${RS}/garagemenu.cpp
-                        ${RS}/raceparamsmenu.cpp
+                        ${RS}/raceparamsmenu.cpp ${RS}/carsetupmenu.cpp
                         ${RS}/raceloadingmenu.cpp ${RS}/racerunningmenus.cpp
                         ${RS}/raceoptimizationmenu.cpp 
                         ${RS}/racestopmenu.cpp ${RS}/racestartmenu.cpp ${RS}/racepitmenu.cpp 
@@ -50,7 +50,7 @@ IF(OPTION_CLIENT_SERVER)
                                                   ${RS}/csnetserversettings.cpp)
 ENDIF(OPTION_CLIENT_SERVER)
 
-SET(RACESCREENS_HEADERS ${RS}/racescreens.h ${RS}/garagemenu.h) #${RS}/raceweekendscreens.h)
+SET(RACESCREENS_HEADERS ${RS}/racescreens.h ${RS}/garagemenu.h ${RS}/carsetupmenu.h) #${RS}/raceweekendscreens.h)
 IF(OPTION_CLIENT_SERVER)
    SET(RACESCREENS_HEADERS ${RACESCREENS_HEADERS} ${RS}/csnetworking.h) 
 ENDIF(OPTION_CLIENT_SERVER)

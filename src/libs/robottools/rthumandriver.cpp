@@ -576,8 +576,8 @@ void HumanDriver::init_track(int index,
     speedLimit = curTrack->pits.speedLimit;
 
     // simuV4 ...
-    HCtx[idx]->brakeRep = GfParmGetNum(carHandle, (char*) SECT_BRKSYST, PRM_BRKREP, (char*)NULL, 0.5);
-    HCtx[idx]->brakeCorr = GfParmGetNum(carHandle, (char*) SECT_BRKSYST, PRM_BRKCOR_FR, (char*)NULL, 0.0f);
+    HCtx[idx]->brakeRep = GfParmGetNum(*carParmHandle, (char*) SECT_BRKSYST, PRM_BRKREP, (char*)NULL, 0.5);
+    HCtx[idx]->brakeCorr = GfParmGetNum(*carParmHandle, (char*) SECT_BRKSYST, PRM_BRKCOR_FR, (char*)NULL, 0.0f);
     HCtx[idx]->useESP = HCtx[idx]->brakeCorr != 0;
     // ... simuV4
 

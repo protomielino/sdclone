@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 
-/* Garage menu : Car selection, preview and settings */
+/* Garage menu : Car selection, preview and setup */
 
 #include <sys/stat.h>
 #include <algorithm>
@@ -33,7 +33,9 @@
 #include <drivers.h>
 
 #include "garagemenu.h"
+#include "carsetupmenu.h"
 
+static CarSetupMenu *carSetupMenu = nullptr;
 
 void RmGarageMenu::onActivateCB(void *pGarageMenu)
 {
@@ -41,6 +43,12 @@ void RmGarageMenu::onActivateCB(void *pGarageMenu)
 
 	// Get the RmGarageMenu instance.
 	RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pGarageMenu);
+
+    if (carSetupMenu)
+    {
+        delete carSetupMenu;
+        carSetupMenu = nullptr;
+    }
 
 	// Get infos about the current car for the current driver
 	const GfDriver* pDriver = pMenu->getDriver();
@@ -55,7 +63,7 @@ void RmGarageMenu::onActivateCB(void *pGarageMenu)
 	pMenu->resetSkinComboBox(pCurCar->getName(), &pDriver->getSkin());
 	pMenu->resetCarPreviewImage(pDriver->getSkin());
 
-	GfuiEnable(pMenu->getMenuHandle(), pMenu->getDynamicControlId("CarSettingsButton"), GFUI_DISABLE);
+	GfuiEnable(pMenu->getMenuHandle(), pMenu->getDynamicControlId("CarSetupButton"), GFUI_ENABLE);
 }
 
 const GfCar* RmGarageMenu::getSelectedCarModel() const
@@ -116,11 +124,23 @@ void RmGarageMenu::onChangeSkin(tComboBoxInfo *pInfo)
 	pMenu->resetCarPreviewImage(pMenu->getSelectedSkin());
 }
 
-void RmGarageMenu::onCarSettingsCB(void *pGarageMenu)
+void RmGarageMenu::onCarSetupCB(void *pGarageMenu)
 {
 	// Get the RmGarageMenu instance from call-back user data.
-	// const RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pGarageMenu);
-	// TODO.
+	RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pGarageMenu);
+
+	// Assign new skin choice to the driver.
+	GfDriver* pDriver = pMenu->getDriver();
+	pDriver->setSkin(pMenu->getSelectedSkin());
+	
+	// Assign new car choice to the driver (only human drivers can change it).
+	if (pDriver->isHuman())
+		pDriver->setCar(pMenu->getSelectedCarModel());
+
+    // Switch to setup screen.
+    carSetupMenu = new CarSetupMenu;
+    carSetupMenu->initialize(pMenu->getMenuHandle(), pMenu->getRace(), pMenu->getDriver());
+    carSetupMenu->runMenu();
 }
 
 void RmGarageMenu::onAcceptCB(void *pGarageMenu)
@@ -138,6 +158,9 @@ void RmGarageMenu::onAcceptCB(void *pGarageMenu)
 	
 	// Back to previous screen.
 	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
+
+    delete carSetupMenu;
+    carSetupMenu = nullptr;
 }
 
 void RmGarageMenu::onCancelCB(void *pGarageMenu)
@@ -147,6 +170,9 @@ void RmGarageMenu::onCancelCB(void *pGarageMenu)
 
 	// Back to previous screen.
 	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
+
+    delete carSetupMenu;
+    carSetupMenu = nullptr;
 }
 
 RmGarageMenu::RmGarageMenu()
@@ -401,7 +427,7 @@ bool RmGarageMenu::initialize()
 	createProgressbarControl("LowSpeedGripProgress");
 	createProgressbarControl("CorneringProgress");
 
-    createButtonControl("CarSettingsButton", this, onCarSettingsCB);
+    createButtonControl("CarSetupButton", this, onCarSetupCB);
 	createButtonControl("AcceptButton", this, onAcceptCB);
     createButtonControl("CancelButton", this, onCancelCB);
 

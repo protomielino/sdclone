@@ -65,7 +65,7 @@ protected:
 	static void onChangeCategory(tComboBoxInfo *pInfo);
 	static void onChangeModel(tComboBoxInfo *pInfo);
 	static void onChangeSkin(tComboBoxInfo *pInfo);
-	static void onCarSettingsCB(void *pGarageMenu);
+	static void onCarSetupCB(void *pGarageMenu);
 	static void onAcceptCB(void *pGarageMenu);
 	static void onCancelCB(void *pGarageMenu);
 
