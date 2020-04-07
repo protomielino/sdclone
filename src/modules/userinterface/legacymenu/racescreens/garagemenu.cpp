@@ -63,7 +63,8 @@ void RmGarageMenu::onActivateCB(void *pGarageMenu)
 	pMenu->resetSkinComboBox(pCurCar->getName(), &pDriver->getSkin());
 	pMenu->resetCarPreviewImage(pDriver->getSkin());
 
-	GfuiEnable(pMenu->getMenuHandle(), pMenu->getDynamicControlId("CarSetupButton"), GFUI_ENABLE);
+	GfuiEnable(pMenu->getMenuHandle(), pMenu->getDynamicControlId("CarSetupButton"),
+               pDriver->isHuman() ? GFUI_ENABLE : GFUI_DISABLE);
 }
 
 const GfCar* RmGarageMenu::getSelectedCarModel() const
