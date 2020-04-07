@@ -69,6 +69,8 @@ protected:
         tdble       minValue;
         tdble       defaultValue;
         tdble       maxValue;
+        std::string section;
+        std::string param;
         std::string units;
 
         attnum() :
@@ -83,13 +85,15 @@ protected:
                      void *hparmCar, void *hparmCarSetup, attnum &att,
                      const char *section, const char *param, const char *labelStr,
                      const char *units);
-    void storeSetting(attnum &att);
+    void storeSetting(void *hparmCarSetup, attnum &att);
 
     attnum  brakeRepartition;
     attnum  frontARB;
     attnum  rearARB;
     attnum  frontWing;
     attnum  rearWing;
+    attnum  rearDiffSlip;
+    attnum  rearDiffCoastSlip;
 };
 
 #endif /* _CARSETUPMENU_H_ */
