@@ -78,6 +78,7 @@ void CarSetupMenu::onReset(void *pMenu)
     pCarSetupMenu->rearWing.value = pCarSetupMenu->rearWing.defaultValue;
     pCarSetupMenu->rearDiffSlip.value = pCarSetupMenu->rearDiffSlip.defaultValue;
     pCarSetupMenu->rearDiffCoastSlip.value = pCarSetupMenu->rearDiffCoastSlip.defaultValue;
+    pCarSetupMenu->rearDiffRatio.value = pCarSetupMenu->rearDiffRatio.defaultValue;
 
     pCarSetupMenu->updateControls();
 }
@@ -87,7 +88,7 @@ void CarSetupMenu::updateControl(const attnum &att)
     if (att.exists)
     {
         std::ostringstream ossValue;
-        ossValue << std::fixed << std::setprecision(1) << att.value;
+        ossValue << std::fixed << std::setprecision(att.precision) << att.value;
         GfuiEditboxSetString(getMenuHandle(), att.editId, ossValue.str().c_str());
 
         if (att.minValue == att.maxValue)
@@ -111,11 +112,13 @@ void CarSetupMenu::updateControls()
     updateControl(rearWing);
     updateControl(rearDiffSlip);
     updateControl(rearDiffCoastSlip);
+    updateControl(rearDiffRatio);
 }
 
 void CarSetupMenu::loadSetting(const char *label, const char *edit, const char *defaultLabel, 
                                void *hparmCar, void *hparmCarSetup, attnum &att, 
-                               const char *section, const char *param, const char *labelStr, const char *units)
+                               const char *section, const char *param, const char *labelStr,
+                               const char *units, int precision)
 {
     att.labelId = getDynamicControlId(label);
     att.editId = getDynamicControlId(edit);
@@ -123,10 +126,14 @@ void CarSetupMenu::loadSetting(const char *label, const char *edit, const char *
     att.section = section;
     att.param = param;
     att.units = units;
+    att.precision = precision;
 
     // Set label text.
     std::ostringstream ossLabel;
-    ossLabel << labelStr << " (" << units << ")"; 
+    ossLabel << labelStr;
+    if (!att.units.empty())
+        ossLabel << " (" << att.units << ")"; 
+    ossLabel << ":";
     GfuiLabelSetText(getMenuHandle(),
                      att.labelId,
                      ossLabel.str().c_str());
@@ -144,12 +151,12 @@ void CarSetupMenu::loadSetting(const char *label, const char *edit, const char *
         // Check for missing min and max.
         if (att.minValue == att.maxValue)
         {
-            ossLabel << std::fixed << std::setprecision(1)
+            ossLabel << std::fixed << std::setprecision(att.precision)
                      << "Default: " << att.defaultValue;
         }
         else
         {
-            ossLabel << std::fixed << std::setprecision(1)
+            ossLabel << std::fixed << std::setprecision(att.precision)
                      << "Min: " << att.minValue
                      << "  Default: " << att.defaultValue
                      << "  Max: " << att.maxValue;
@@ -207,21 +214,29 @@ void CarSetupMenu::loadSettings()
         GfLogInfo("Opened car setup file: %s\n", ossCarSetupFileName.str().c_str());
 
     loadSetting("BrakeBiasLabel", "BrakeBiasEdit", "BrakeBiasDefaultLabel",
-                hparmCar, hparmCarSetup, brakeRepartition, SECT_BRKSYST, PRM_BRKREP, "Brake Bias", "%");
+                hparmCar, hparmCarSetup, brakeRepartition, SECT_BRKSYST, PRM_BRKREP,
+                "Brake Bias", "%", 1);
     loadSetting("FrontARBLabel", "FrontARBEdit", "FrontARBDefaultLabel",
-                hparmCar, hparmCarSetup, frontARB, SECT_FRNTARB, PRM_SPR, "Front Anti-Roll Bar", "kN/m");
+                hparmCar, hparmCarSetup, frontARB, SECT_FRNTARB, PRM_SPR,
+                "Front Anti-Roll Bar", "kN/m", 1);
     loadSetting("RearARBLabel", "RearARBEdit", "RearARBDefaultLabel",
-                hparmCar, hparmCarSetup, rearARB, SECT_REARARB, PRM_SPR, "Rear Anti-Roll Bar", "kN/m");
+                hparmCar, hparmCarSetup, rearARB, SECT_REARARB, PRM_SPR,
+                "Rear Anti-Roll Bar", "kN/m", 1);
     loadSetting("FrontWingLabel", "FrontWingEdit", "FrontWingDefaultLabel",
-                hparmCar, hparmCarSetup, frontWing, SECT_FRNTWING, PRM_WINGANGLE, "Front Wing Angle", "deg");
+                hparmCar, hparmCarSetup, frontWing, SECT_FRNTWING, PRM_WINGANGLE,
+                "Front Wing Angle", "deg", 1);
     loadSetting("RearWingLabel", "RearWingEdit", "RearWingDefaultLabel",
-                hparmCar, hparmCarSetup, rearWing, SECT_REARWING, PRM_WINGANGLE, "Rear Wing Angle", "deg");
+                hparmCar, hparmCarSetup, rearWing, SECT_REARWING, PRM_WINGANGLE,
+                "Rear Wing Angle", "deg", 1);
     loadSetting("RearDiffSlipLabel", "RearDiffSlipEdit", "RearDiffSlipDefaultLabel",
                 hparmCar, hparmCarSetup, rearDiffSlip, SECT_REARDIFFERENTIAL, PRM_MAX_SLIP_BIAS,
-                "Rear Diff Max Slip Bias", "%");
+                "Rear Diff Max Slip Bias", "%", 1);
     loadSetting("RearDiffCoastSlipLabel", "RearDiffCoastSlipEdit", "RearDiffCoastSlipDefaultLabel",
                 hparmCar, hparmCarSetup, rearDiffCoastSlip, SECT_REARDIFFERENTIAL, PRM_COAST_MAX_SLIP_BIAS,
-                "Rear Diff Coast Max Slip Bias", "%");
+                "Rear Diff Coast Max Slip Bias", "%", 1);
+    loadSetting("RearDiffRatioLabel", "RearDiffRatioEdit", "RearDiffRatioDefaultLabel",
+                hparmCar, hparmCarSetup, rearDiffRatio, SECT_REARDIFFERENTIAL, PRM_RATIO,
+                "Rear Diff Ratio", "", 3);
 
     // Close the XML file of the car.
     GfParmReleaseHandle(hparmCar);
@@ -286,6 +301,7 @@ void CarSetupMenu::storeSettings()
     storeSetting(hparmCarSetup, rearWing);
     storeSetting(hparmCarSetup, rearDiffSlip);
     storeSetting(hparmCarSetup, rearDiffCoastSlip);
+    storeSetting(hparmCarSetup, rearDiffRatio);
 
     // Write the XML file of the car setup.
     GfParmWriteFile(NULL, hparmCarSetup, strCarId.c_str());
@@ -342,6 +358,10 @@ bool CarSetupMenu::initialize(void *pMenu, const GfRace *pRace, const GfDriver *
     createLabelControl("RearDiffCoastSlipLabel");
     createEditControl("RearDiffCoastSlipEdit", this, NULL, NULL);
     createLabelControl("RearDiffCoastSlipDefaultLabel");
+
+    createLabelControl("RearDiffRatioLabel");
+    createEditControl("RearDiffRatioEdit", this, NULL, NULL);
+    createLabelControl("RearDiffRatioDefaultLabel");
 
     createButtonControl("ApplyButton", this, onAccept);
     createButtonControl("CancelButton", this, onCancel);

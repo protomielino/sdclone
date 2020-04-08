@@ -72,6 +72,7 @@ protected:
         std::string section;
         std::string param;
         std::string units;
+        int         precision;
 
         attnum() :
             labelId(0), editId(0), defaultLabelId(0), exists(false),
@@ -84,7 +85,7 @@ protected:
     void loadSetting(const char *label, const char *edit, const char *defaultLabel,
                      void *hparmCar, void *hparmCarSetup, attnum &att,
                      const char *section, const char *param, const char *labelStr,
-                     const char *units);
+                     const char *units, int precision);
     void storeSetting(void *hparmCarSetup, attnum &att);
 
     attnum  brakeRepartition;
@@ -94,6 +95,7 @@ protected:
     attnum  rearWing;
     attnum  rearDiffSlip;
     attnum  rearDiffCoastSlip;
+    attnum  rearDiffRatio;
 };
 
 #endif /* _CARSETUPMENU_H_ */
