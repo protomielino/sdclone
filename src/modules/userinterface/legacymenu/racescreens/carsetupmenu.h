@@ -28,6 +28,8 @@ class GfDriver;
 class GfCar;
 class GfTrack;
 
+#define ITEMS_PER_PAGE  10
+
 class CarSetupMenu : public GfuiMenuScreen
 {
 public:
@@ -52,6 +54,8 @@ protected:
 	static void onAccept(void *pMenu);
 	static void onCancel(void *pMenu);
 	static void onReset(void *pMenu);
+	static void onPrevious(void *pMenu);
+	static void onNext(void *pMenu);
 
     // The target race.
     const GfRace *_pRace;
@@ -72,30 +76,20 @@ protected:
         std::string section;
         std::string param;
         std::string units;
+        std::string label;
         int         precision;
 
         attnum() :
             labelId(0), editId(0), defaultLabelId(0), exists(false),
-            value(0), minValue(0), defaultValue(0), maxValue(0)
+            value(0), minValue(0), defaultValue(0), maxValue(0), precision(0)
         {
         }
     };
 
-    void updateControl(const attnum &att);
-    void loadSetting(const char *label, const char *edit, const char *defaultLabel,
-                     void *hparmCar, void *hparmCarSetup, attnum &att,
-                     const char *section, const char *param, const char *labelStr,
-                     const char *units, int precision);
-    void storeSetting(void *hparmCarSetup, attnum &att);
+    void readCurrentPage();
 
-    attnum  brakeRepartition;
-    attnum  frontARB;
-    attnum  rearARB;
-    attnum  frontWing;
-    attnum  rearWing;
-    attnum  rearDiffSlip;
-    attnum  rearDiffCoastSlip;
-    attnum  rearDiffRatio;
+    std::vector<std::array<attnum, ITEMS_PER_PAGE> > items;
+    size_t  currentPage;
 };
 
 #endif /* _CARSETUPMENU_H_ */

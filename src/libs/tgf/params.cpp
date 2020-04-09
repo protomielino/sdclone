@@ -2736,6 +2736,37 @@ GfParmListGetParamsNamesList (void *handle, const char *path)
 	return paramsNamesList;
 }
 
+/** Get the names of the sections 
+    @ingroup	paramslist
+    @param	handle	handle of parameters
+    @param	path	path of list
+    @return	a vector of strings containing the names of the sections in the list
+ */
+std::vector<std::string>
+GfParmListGetSectionNamesList(void *handle)
+{
+	struct parmHandle *parmHandle = (struct parmHandle *)handle;
+	struct parmHeader *conf;
+	struct section *section;
+	std::vector<std::string> sectionNamesList;
+
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmListGetSectionNamesList: bad handle (%p)\n", parmHandle);
+		return sectionNamesList;
+    }
+
+	conf = parmHandle->conf;
+	section = GF_TAILQ_FIRST (&(conf->rootSection->subSectionList));
+
+    while (section)
+    {
+		sectionNamesList.push_back(section->fullName);
+	    section = GF_TAILQ_NEXT (section, linkSection);
+	}	
+	
+	return sectionNamesList;
+}
+
 /** Get string parameter value.
     @ingroup	paramsdata
     @param	parmHandle	Configuration handle

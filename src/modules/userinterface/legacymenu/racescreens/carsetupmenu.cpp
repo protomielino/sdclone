@@ -52,8 +52,13 @@ void CarSetupMenu::onAccept(void *pMenu)
 {
     CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
 
+    // Get the current page values.
+    pCarSetupMenu->readCurrentPage();
+
+    // Save all page values.
     pCarSetupMenu->storeSettings();
 
+    // Switch back to garage menu.
     GfuiScreenActivate(pCarSetupMenu->getPreviousMenuHandle());
 }
 
@@ -71,111 +76,140 @@ void CarSetupMenu::onReset(void *pMenu)
     // Get the CarSetupMenu instance from call-back user data.
     CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
 
-    pCarSetupMenu->brakeRepartition.value = pCarSetupMenu->brakeRepartition.defaultValue;
-    pCarSetupMenu->frontARB.value = pCarSetupMenu->frontARB.defaultValue;
-    pCarSetupMenu->rearARB.value = pCarSetupMenu->rearARB.defaultValue;
-    pCarSetupMenu->frontWing.value = pCarSetupMenu->frontWing.defaultValue;
-    pCarSetupMenu->rearWing.value = pCarSetupMenu->rearWing.defaultValue;
-    pCarSetupMenu->rearDiffSlip.value = pCarSetupMenu->rearDiffSlip.defaultValue;
-    pCarSetupMenu->rearDiffCoastSlip.value = pCarSetupMenu->rearDiffCoastSlip.defaultValue;
-    pCarSetupMenu->rearDiffRatio.value = pCarSetupMenu->rearDiffRatio.defaultValue;
+    // Reset all values on current page to their defaults.
+    for (size_t index = 0; index < ITEMS_PER_PAGE; index++)
+    {
+        attnum &att = pCarSetupMenu->items[pCarSetupMenu->currentPage][index];
+        att.value = att.defaultValue;
+    }
 
+    // Update the GUI.
     pCarSetupMenu->updateControls();
 }
 
-void CarSetupMenu::updateControl(const attnum &att)
+void CarSetupMenu::readCurrentPage()
 {
-    if (att.exists)
+    for (size_t index = 0; index < ITEMS_PER_PAGE; index++)
     {
-        std::ostringstream ossValue;
-        ossValue << std::fixed << std::setprecision(att.precision) << att.value;
-        GfuiEditboxSetString(getMenuHandle(), att.editId, ossValue.str().c_str());
+        attnum &att = items[currentPage][index];
+        if (att.exists)
+        {
+            std::string strValue(GfuiEditboxGetString(getMenuHandle(), att.editId));
+            std::istringstream issValue(strValue);
+            issValue >> att.value;
+        }
+    }
+}
 
-        if (att.minValue == att.maxValue)
-            GfuiEnable(getMenuHandle(), att.editId, GFUI_DISABLE);
-        else
-            GfuiEnable(getMenuHandle(), att.editId, GFUI_ENABLE);
-    }
-    else
-    {
-        GfuiEditboxSetString(getMenuHandle(), att.editId, "----");
-        GfuiEnable(getMenuHandle(), att.editId, GFUI_DISABLE);
-    }
+void CarSetupMenu::onPrevious(void *pMenu)
+{
+    // Get the CarSetupMenu instance from call-back user data.
+    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
+
+    // Get the current page values.
+    pCarSetupMenu->readCurrentPage();
+
+    // Switch to previous page.
+    pCarSetupMenu->currentPage--;
+
+    // Update the GUI.
+    pCarSetupMenu->updateControls();
+}
+
+void CarSetupMenu::onNext(void *pMenu)
+{
+    // Get the CarSetupMenu instance from call-back user data.
+    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
+
+    // Get the current page values.
+    pCarSetupMenu->readCurrentPage();
+
+    // Switch to next page.
+    pCarSetupMenu->currentPage++;
+
+    // update the GUI.
+    pCarSetupMenu->updateControls();
 }
 
 void CarSetupMenu::updateControls()
 {
-    updateControl(brakeRepartition);
-    updateControl(frontARB);
-    updateControl(rearARB);
-    updateControl(frontWing);
-    updateControl(rearWing);
-    updateControl(rearDiffSlip);
-    updateControl(rearDiffCoastSlip);
-    updateControl(rearDiffRatio);
-}
+    GfuiEnable(getMenuHandle(), getDynamicControlId("PreviousButton"), currentPage != 0 ? GFUI_ENABLE : GFUI_DISABLE);
+    GfuiEnable(getMenuHandle(), getDynamicControlId("NextButton"), currentPage < (items.size() - 1) ? GFUI_ENABLE : GFUI_DISABLE);
 
-void CarSetupMenu::loadSetting(const char *label, const char *edit, const char *defaultLabel, 
-                               void *hparmCar, void *hparmCarSetup, attnum &att, 
-                               const char *section, const char *param, const char *labelStr,
-                               const char *units, int precision)
-{
-    att.labelId = getDynamicControlId(label);
-    att.editId = getDynamicControlId(edit);
-    att.defaultLabelId = getDynamicControlId(defaultLabel);
-    att.section = section;
-    att.param = param;
-    att.units = units;
-    att.precision = precision;
-
-    // Set label text.
-    std::ostringstream ossLabel;
-    ossLabel << labelStr;
-    if (!att.units.empty())
-        ossLabel << " (" << att.units << ")"; 
-    ossLabel << ":";
-    GfuiLabelSetText(getMenuHandle(),
-                     att.labelId,
-                     ossLabel.str().c_str());
-    
-    // Read values from car.
-    att.exists = GfParmGetNumWithLimits(hparmCar, att.section.c_str(), att.param.c_str(), att.units.c_str(),
-                                        &att.defaultValue, &att.minValue, &att.maxValue) == 0;
-
-    ossLabel.str("");
-    ossLabel.clear();
-
-    // Set default label text.
-    if (att.exists)
+    for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
     {
-        // Check for missing min and max.
-        if (att.minValue == att.maxValue)
+        attnum &att = items[currentPage][index];
+
+        // Set label text.
+        std::ostringstream ossLabel;
+        if (!att.label.empty())
         {
-            ossLabel << std::fixed << std::setprecision(att.precision)
-                     << "Default: " << att.defaultValue;
+            ossLabel << att.label;
+            if (!att.units.empty())
+                ossLabel << " (" << att.units << ")"; 
+            ossLabel << ":";
+        }
+
+        GfuiLabelSetText(getMenuHandle(),
+                         att.labelId,
+                         ossLabel.str().c_str());
+
+        ossLabel.str("");
+        ossLabel.clear();
+
+        // Set default label text.
+        if (att.exists)
+        {
+            // Check for missing min and max.
+            if (att.minValue == att.maxValue)
+            {
+                ossLabel << std::fixed << std::setprecision(att.precision)
+                         << "Default: " << att.defaultValue;
+            }
+            else
+            {
+                ossLabel << std::fixed << std::setprecision(att.precision)
+                         << "Min: " << att.minValue
+                         << "  Default: " << att.defaultValue
+                         << "  Max: " << att.maxValue;
+            }
+        }
+        GfuiLabelSetText(getMenuHandle(),
+                         att.defaultLabelId,
+                         ossLabel.str().c_str());
+    }
+
+    // Update the edit boxes.
+    for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
+    {
+        attnum &att = items[currentPage][index];
+
+        if (att.label.empty())
+        {
+            GfuiVisibilitySet(getMenuHandle(), att.editId, GFUI_INVISIBLE);
         }
         else
         {
-            ossLabel << std::fixed << std::setprecision(att.precision)
-                     << "Min: " << att.minValue
-                     << "  Default: " << att.defaultValue
-                     << "  Max: " << att.maxValue;
+            GfuiVisibilitySet(getMenuHandle(), att.editId, GFUI_VISIBLE);
+
+            if (att.exists)
+            {
+                std::ostringstream ossValue;
+                ossValue << std::fixed << std::setprecision(att.precision) << att.value;
+                GfuiEditboxSetString(getMenuHandle(), att.editId, ossValue.str().c_str());
+
+                if (att.minValue == att.maxValue)
+                    GfuiEnable(getMenuHandle(), att.editId, GFUI_DISABLE);
+                else
+                    GfuiEnable(getMenuHandle(), att.editId, GFUI_ENABLE);
+            }
+            else
+            {
+                GfuiEditboxSetString(getMenuHandle(), att.editId, "----");
+                GfuiEnable(getMenuHandle(), att.editId, GFUI_DISABLE);
+            }
         }
     }
-    GfuiLabelSetText(getMenuHandle(),
-                     att.defaultLabelId,
-                     ossLabel.str().c_str());
-
-    // Read value from car setup if avaliable.
-    if (hparmCarSetup)
-        att.value = GfParmGetNum(hparmCarSetup, att.section.c_str(), att.param.c_str(),
-                                 att.units.c_str(), att.defaultValue);
-    else
-        att.value = att.defaultValue;
-
-    GfLogDebug("section: %s param: %s value: %f min: %f default: %f max: %f\n",
-               att.section.c_str(), att.param.c_str(), att.value, att.minValue,
-               att.defaultValue, att.maxValue);
 }
 
 void CarSetupMenu::loadSettings()
@@ -206,37 +240,90 @@ void CarSetupMenu::loadSettings()
     void *hparmCarSetup = GfParmReadFile(ossCarSetupFileName.str().c_str(), GFPARM_RMODE_STD);
     if (!hparmCarSetup)
     {
-        GfLogError("Car Setup %s/%s (file %s not %s)\n",
+        GfLogInfo("Car Setup: %s/%s (file %s not %s)\n",
                    getCar()->getName().c_str(), getTrack()->getName().c_str(), ossCarSetupFileName.str().c_str(),
                    GfFileExists(ossCarSetupFileName.str().c_str()) ? "readable" : "found");
     }
     else
         GfLogInfo("Opened car setup file: %s\n", ossCarSetupFileName.str().c_str());
 
-    loadSetting("BrakeBiasLabel", "BrakeBiasEdit", "BrakeBiasDefaultLabel",
-                hparmCar, hparmCarSetup, brakeRepartition, SECT_BRKSYST, PRM_BRKREP,
-                "Brake Bias", "%", 1);
-    loadSetting("FrontARBLabel", "FrontARBEdit", "FrontARBDefaultLabel",
-                hparmCar, hparmCarSetup, frontARB, SECT_FRNTARB, PRM_SPR,
-                "Front Anti-Roll Bar", "kN/m", 1);
-    loadSetting("RearARBLabel", "RearARBEdit", "RearARBDefaultLabel",
-                hparmCar, hparmCarSetup, rearARB, SECT_REARARB, PRM_SPR,
-                "Rear Anti-Roll Bar", "kN/m", 1);
-    loadSetting("FrontWingLabel", "FrontWingEdit", "FrontWingDefaultLabel",
-                hparmCar, hparmCarSetup, frontWing, SECT_FRNTWING, PRM_WINGANGLE,
-                "Front Wing Angle", "deg", 1);
-    loadSetting("RearWingLabel", "RearWingEdit", "RearWingDefaultLabel",
-                hparmCar, hparmCarSetup, rearWing, SECT_REARWING, PRM_WINGANGLE,
-                "Rear Wing Angle", "deg", 1);
-    loadSetting("RearDiffSlipLabel", "RearDiffSlipEdit", "RearDiffSlipDefaultLabel",
-                hparmCar, hparmCarSetup, rearDiffSlip, SECT_REARDIFFERENTIAL, PRM_MAX_SLIP_BIAS,
-                "Rear Diff Max Slip Bias", "%", 1);
-    loadSetting("RearDiffCoastSlipLabel", "RearDiffCoastSlipEdit", "RearDiffCoastSlipDefaultLabel",
-                hparmCar, hparmCarSetup, rearDiffCoastSlip, SECT_REARDIFFERENTIAL, PRM_COAST_MAX_SLIP_BIAS,
-                "Rear Diff Coast Max Slip Bias", "%", 1);
-    loadSetting("RearDiffRatioLabel", "RearDiffRatioEdit", "RearDiffRatioDefaultLabel",
-                hparmCar, hparmCarSetup, rearDiffRatio, SECT_REARDIFFERENTIAL, PRM_RATIO,
-                "Rear Diff Ratio", "", 3);
+    void *hparmItems = GfuiMenuLoad("carsetupmenuitems.xml");
+    if (!hparmItems)
+    {
+        GfLogError("Car Setup Items (file %s not %s)\n",
+                   "carsetupmenuitems.xml",
+                   GfFileExists("carsetupmenuitems.xml") ? "readable" : "found");
+    }
+    else
+    {
+        GfLogInfo("Opened car setup menu items file: %s\n", "carsetupmenuitems.xml");
+
+        std::vector<std::string> sections = GfParmListGetSectionNamesList(hparmItems);
+
+        for (size_t i = 0; i < sections.size(); ++i)
+        {
+            std::string strSection = sections[i];
+
+            GfLogDebug("section %zu: %s\n", i, strSection.c_str());
+
+            size_t page = GfParmGetNum(hparmItems, strSection.c_str(), "page", "", 0);
+            size_t index = GfParmGetNum(hparmItems, strSection.c_str(), "index", "", 0);
+
+            if (page <= items.size())
+                items.resize(page + 1);
+
+            if (index >= ITEMS_PER_PAGE)
+            {
+                GfLogError("Invalid index %zu\n", index);
+                continue;
+            }
+
+            attnum &att = items[page][index];
+
+            att.labelId = getDynamicControlId(std::string("Label" + std::to_string(index)).c_str());
+            att.editId = getDynamicControlId(std::string("Edit" + std::to_string(index)).c_str());
+            att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + std::to_string(index)).c_str());
+            att.section = GfParmGetStr(hparmItems, strSection.c_str(), "section", "");
+            att.param = GfParmGetStr(hparmItems, strSection.c_str(), "param", "");
+            att.units = GfParmGetStr(hparmItems, strSection.c_str(), "unit", "");
+            att.label = GfParmGetStr(hparmItems, strSection.c_str(), "label", "");
+            att.precision = GfParmGetNum(hparmItems, strSection.c_str(), "precision", "", 0);
+
+            // Read values from car.
+            att.exists = GfParmGetNumWithLimits(hparmCar, att.section.c_str(), att.param.c_str(), att.units.c_str(),
+                                                &att.defaultValue, &att.minValue, &att.maxValue) == 0;
+
+            // Read value from car setup if avaliable.
+            if (hparmCarSetup)
+                att.value = GfParmGetNum(hparmCarSetup, att.section.c_str(), att.param.c_str(),
+                                         att.units.c_str(), att.defaultValue);
+            else
+                att.value = att.defaultValue;
+
+            GfLogDebug("section: \"%s\" param: \"%s\" units: \"%s\" label: \"%s\" page: %zu "
+                       "index: %zu precision: %d labelIs: %d editId: %d defaultLabelId: %d "
+                       "exists: %d min: %f default %f max: %f value: %f\n",
+                       att.section.c_str(), att.param.c_str(), att.units.c_str(), att.label.c_str(),
+                       page, index, att.precision, att.labelId, att.editId, att.defaultLabelId,
+                       att.exists, att.minValue, att.defaultValue, att.maxValue, att.value);
+        }
+
+        // Save the control id for all items.
+        for (size_t page = 0; page < items.size(); ++page)
+        {
+            for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
+            {
+                attnum &att = items[page][index];
+
+                if (!att.labelId)
+                    att.labelId = getDynamicControlId(std::string("Label" + std::to_string(index)).c_str());
+                if (!att.editId)
+                    att.editId = getDynamicControlId(std::string("Edit" + std::to_string(index)).c_str());
+                if (!att.defaultLabelId)
+                    att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + std::to_string(index)).c_str());
+            }
+        }
+    }
 
     // Close the XML file of the car.
     GfParmReleaseHandle(hparmCar);
@@ -244,19 +331,6 @@ void CarSetupMenu::loadSettings()
     // Close the XML file of the car setup.
     if (hparmCarSetup)
         GfParmReleaseHandle(hparmCarSetup);
-}
-
-void CarSetupMenu::storeSetting(void *hparmCarSetup, attnum &att)
-{
-    if (att.exists)
-    {
-        std::string strValue(GfuiEditboxGetString(getMenuHandle(), att.editId));
-        std::istringstream issValue(strValue);
-        issValue >> att.value;
-
-        GfParmSetNum(hparmCarSetup, att.section.c_str(), att.param.c_str(), att.units.c_str(),
-                     att.value, att.minValue, att.maxValue);
-    }
 }
 
 // Save car setup to XML file.
@@ -270,8 +344,6 @@ void CarSetupMenu::storeSettings()
     void *hparmCarSetup = GfParmReadFile(ossCarSetupFileName.str().c_str(), GFPARM_RMODE_STD);
     if (!hparmCarSetup)
     {
-        GfLogInfo("Creating car setup file: %s\n", ossCarSetupFileName.str().c_str());
-
         // Create the car setup file directory if it doesn't exist.
         std::string strDir = ossCarSetupFileName.str();
         strDir.resize(strDir.find_last_of('/'));
@@ -294,14 +366,19 @@ void CarSetupMenu::storeSettings()
     else
         GfLogInfo("Opened car setup file: %s\n", ossCarSetupFileName.str().c_str());
 
-    storeSetting(hparmCarSetup, brakeRepartition);
-    storeSetting(hparmCarSetup, frontARB);
-    storeSetting(hparmCarSetup, rearARB);
-    storeSetting(hparmCarSetup, frontWing);
-    storeSetting(hparmCarSetup, rearWing);
-    storeSetting(hparmCarSetup, rearDiffSlip);
-    storeSetting(hparmCarSetup, rearDiffCoastSlip);
-    storeSetting(hparmCarSetup, rearDiffRatio);
+    // Store all items.
+    for (size_t page = 0; page < items.size(); ++page)
+    {
+        for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
+        {
+            attnum &att = items[page][index];
+            if (att.exists)
+            {
+                GfParmSetNum(hparmCarSetup, att.section.c_str(), att.param.c_str(), att.units.c_str(),
+                             att.value, att.minValue, att.maxValue);
+            }
+        }
+    }
 
     // Write the XML file of the car setup.
     GfParmWriteFile(NULL, hparmCarSetup, strCarId.c_str());
@@ -312,6 +389,7 @@ void CarSetupMenu::storeSettings()
 
 CarSetupMenu::CarSetupMenu()
 : GfuiMenuScreen("carsetupmenu.xml")
+, currentPage(0)
 {
 }
 
@@ -331,41 +409,20 @@ bool CarSetupMenu::initialize(void *pMenu, const GfRace *pRace, const GfDriver *
 
     createLabelControl("CarNameLabel");
 
-    createLabelControl("BrakeBiasLabel");
-    createEditControl("BrakeBiasEdit", this, NULL, NULL);
-    createLabelControl("BrakeBiasDefaultLabel");
+    // Create items.
+    for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
+    {
+        createLabelControl(std::string("Label" + std::to_string(index)).c_str());
+        createEditControl(std::string("Edit" + std::to_string(index)).c_str(), this, NULL, NULL);
+        createLabelControl(std::string("DefaultLabel" + std::to_string(index)).c_str());
+    }
 
-    createLabelControl("FrontARBLabel");
-    createEditControl("FrontARBEdit", this, NULL, NULL);
-    createLabelControl("FrontARBDefaultLabel");
-
-    createLabelControl("RearARBLabel");
-    createEditControl("RearARBEdit", this, NULL, NULL);
-    createLabelControl("RearARBDefaultLabel");
-
-    createLabelControl("FrontWingLabel");
-    createEditControl("FrontWingEdit", this, NULL, NULL);
-    createLabelControl("FrontWingDefaultLabel");
-
-    createLabelControl("RearWingLabel");
-    createEditControl("RearWingEdit", this, NULL, NULL);
-    createLabelControl("RearWingDefaultLabel");
-
-    createLabelControl("RearDiffSlipLabel");
-    createEditControl("RearDiffSlipEdit", this, NULL, NULL);
-    createLabelControl("RearDiffSlipDefaultLabel");
-
-    createLabelControl("RearDiffCoastSlipLabel");
-    createEditControl("RearDiffCoastSlipEdit", this, NULL, NULL);
-    createLabelControl("RearDiffCoastSlipDefaultLabel");
-
-    createLabelControl("RearDiffRatioLabel");
-    createEditControl("RearDiffRatioEdit", this, NULL, NULL);
-    createLabelControl("RearDiffRatioDefaultLabel");
-
+    // Create buttons.
     createButtonControl("ApplyButton", this, onAccept);
     createButtonControl("CancelButton", this, onCancel);
     createButtonControl("ResetButton", this, onReset);
+    createButtonControl("PreviousButton", this, onPrevious);
+    createButtonControl("NextButton", this, onNext);
 
     closeXMLDescriptor();
 

@@ -490,6 +490,7 @@ TGF_API int GfParmGetNumBoundaries(void *handle, char *path, char *key, tdble *m
 TGF_API void GfParmRemove(void *handle, const char *path, const char *key);
 TGF_API int GfParmRemoveSection (void *handle, const char *path);
 TGF_API int GfParmExistsSection(void *handle, const char *path);
+TGF_API  std::vector<std::string> GfParmListGetSectionNamesList(void *handle);
 TGF_API int GfParmGetEltNb(void *handle, const char *path);
 TGF_API int GfParmListSeekFirst(void *handle, const char *path);
 TGF_API int GfParmListSeekNext(void *handle, const char *path);
