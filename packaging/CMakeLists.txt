@@ -69,7 +69,7 @@ IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
 
    foreach(_PLUGIN ${SD_OSG_PLUGIN_LIST_ITEMS})
       #message(STATUS "${_PLUGIN}")
-      LIST(APPEND _loadables "@CMAKE_INSTALL_PREFIX@/${_PLUGIN}")
+      LIST(APPEND _loadables "${CMAKE_INSTALL_PREFIX}/${_PLUGIN}")
    endforeach()
 
    #================
