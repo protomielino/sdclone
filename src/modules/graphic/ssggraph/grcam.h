@@ -177,7 +177,7 @@ class cGrPerspCamera : public cGrCamera
     float spanOffset;
 
  public:
-    cGrPerspCamera(class cGrScreen *myscreen, int id, int drawCurr, int drawDrv, int drawBG, int mirrorAllowed,
+    cGrPerspCamera(class cGrScreen *myscreen, int id, int drawCurr, int drawDrv, int drawCockpit, int drawBG, int mirrorAllowed,
            float myfovy, float myfovymin, float myfovymax,
            float myfnear, float myffar = 1500.0, float myfogstart = 1400.0, float myfogend = 1500.0);
 
@@ -247,7 +247,7 @@ class cGrBackgroundCam : public cGrPerspCamera
     int			mirrorBackground;
  public:
     cGrBackgroundCam(class cGrScreen *myscreen)
-    : cGrPerspCamera(myscreen, 0, 0, 0, 1, 0,
+    : cGrPerspCamera(myscreen, 0, 0, 0, 0, 1, 0,
              67.5f, 67.5f, 67.5f,
              0.1f, 2000.0f, 100000.0f, 100000.0f) {
     }

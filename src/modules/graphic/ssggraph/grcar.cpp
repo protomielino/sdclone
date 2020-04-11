@@ -528,6 +528,7 @@ grInitCar(tCarElt *car)
     int index;
     int selIndex;
     ssgEntity *carEntity;
+    ssgSelector *CarSel;
     ssgSelector *LODSel;
 
     /* ssgBranchCb		*branchCb; */
@@ -568,6 +569,7 @@ grInitCar(tCarElt *car)
     /* 1) Whole livery : <car name>.png => <car name>-<skin name>.png */
     std::string strSrcTexName(bMasterModel ? car->_masterModel : car->_carName);
     std::string strTgtTexName(car->_carName);
+
     if (bCustomSkin && car->_skinTargets & RM_CAR_SKIN_TARGET_WHOLE_LIVERY)
     {
         strTgtTexName += '-';
@@ -621,7 +623,9 @@ grInitCar(tCarElt *car)
     car->_exhaustNb = GfParmGetEltNb(handle, SECT_EXHAUST);
     car->_exhaustNb = MIN(car->_exhaustNb, 2);
     car->_exhaustPower = GfParmGetNum(handle, SECT_EXHAUST, PRM_POWER, NULL, 1.0);
-    for (i = 0; i < car->_exhaustNb; i++) {
+
+    for (i = 0; i < car->_exhaustNb; i++)
+    {
         snprintf(path, 256, "%s/%d", SECT_EXHAUST, i + 1);
         car->_exhaustPos[i].x = GfParmGetNum(handle, path, PRM_XPOS, NULL, -car->_dimension_x / 2.0);
         car->_exhaustPos[i].y = -GfParmGetNum(handle, path, PRM_YPOS, NULL, car->_dimension_y / 2.0);
@@ -630,24 +634,37 @@ grInitCar(tCarElt *car)
 
     snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_LIGHT);
     lightNum = GfParmGetEltNb(handle, path);
-    for (i = 0; i < lightNum; i++) {
+
+    for (i = 0; i < lightNum; i++)
+    {
         snprintf(path, 256, "%s/%s/%d", SECT_GROBJECTS, SECT_LIGHT, i + 1);
         lightPos[0] = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0);
         lightPos[1] = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0);
         lightPos[2] = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0);
         lightType = GfParmGetStr(handle, path, PRM_TYPE, "");
         lightTypeNum = LIGHT_NO_TYPE;
-        if (!strcmp(lightType, VAL_LIGHT_HEAD1)) {
+
+        if (!strcmp(lightType, VAL_LIGHT_HEAD1))
+        {
             lightTypeNum = LIGHT_TYPE_FRONT;
-        } else if (!strcmp(lightType, VAL_LIGHT_HEAD2)) {
+        }
+        else if (!strcmp(lightType, VAL_LIGHT_HEAD2))
+        {
             lightTypeNum = LIGHT_TYPE_FRONT2;
-        } else if (!strcmp(lightType, VAL_LIGHT_BRAKE)) {
+        }
+        else if (!strcmp(lightType, VAL_LIGHT_BRAKE))
+        {
             lightTypeNum = LIGHT_TYPE_BRAKE;
-        } else if (!strcmp(lightType, VAL_LIGHT_BRAKE2)) {
+        }
+        else if (!strcmp(lightType, VAL_LIGHT_BRAKE2))
+        {
             lightTypeNum = LIGHT_TYPE_BRAKE2;
-        } else if (!strcmp(lightType, VAL_LIGHT_REAR)) {
+        }
+        else if (!strcmp(lightType, VAL_LIGHT_REAR))
+        {
             lightTypeNum = LIGHT_TYPE_REAR;
         }
+
         grAddCarlight(car, lightTypeNum, lightPos, GfParmGetNum(handle, path, PRM_SIZE, NULL, 0.2));
     }
 
@@ -708,14 +725,23 @@ grInitCar(tCarElt *car)
     grCarInfo[index].carTransform = new ssgTransform;
     DBG_SET_NAME(grCarInfo[index].carTransform, car->_modName, index, -1);
 
+    /* Car Selector */
+    grCarInfo[index].carSelector = CarSel = new ssgSelector;
+    DBG_SET_NAME(CarSel, "CARSELECTOR", index, 0);
+    grCarInfo[index].nCar = 1;
+    grCarInfo[index].carTransform->addKid(CarSel);
+
     /* Level of details */
     grCarInfo[index].LODSelector = LODSel = new ssgSelector;
-    grCarInfo[index].carTransform->addKid(LODSel);
+    grCarInfo[index].carSelector->addKid(LODSel);
     snprintf(path, 256, "%s/%s", SECT_GROBJECTS, LST_RANGES);
     nranges = GfParmGetEltNb(handle, path) + 1;
-    if (nranges < 2) {
+
+    if (nranges < 2)
+    {
         GfOut("Error not enough levels of detail\n");
         FREEZ(grFilePath);
+
         return;
     }
 
@@ -884,7 +910,8 @@ grInitCar(tCarElt *car)
     grCarInfo[index].sy=carTrackRatioY;
 
     /* Other LODs */
-    for (i = 2; i < nranges; i++) {
+    for (i = 2; i < nranges; i++)
+    {
         carBody = new ssgBranch;
         snprintf(buf, nMaxTexPathSize, "%s/%s/%d", SECT_GROBJECTS, LST_RANGES, i);
         param = GfParmGetStr(handle, buf, PRM_CAR, "");
@@ -1091,6 +1118,22 @@ grInitCar(tCarElt *car)
             DRMSel2->select( grCarInfo[index].DRMSelectMask2[0] );
     }
 
+    /* loading cockpit  */
+    snprintf(buf, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, SECT_COCKPIT);
+    param = GfParmGetStr(handle, buf, PRM_MODELCOCKPIT, NULL);
+
+    if (param)
+    {
+        ssgEntity *cockpitEntity;
+        ssgBranch *carBody2 = new ssgBranch;
+        cockpitEntity = grssgCarLoadAC3D(param, NULL, index);
+        carBody2->addKid(cockpitEntity);
+        //grCarInfo[index].cockpitEntity = cockpitEntity;
+        grCarInfo[index].nCar = 2;
+        DBG_SET_NAME(cockpitEntity, "CARSELECTOR", index, 1);
+        grCarInfo[index].carSelector->addKid(carBody2);
+    }
+
     CarsAnchor->addKid(grCarInfo[index].carTransform);
 
     //grCarInfo[index].carTransform->print(stdout, "-", 1);
@@ -1149,7 +1192,7 @@ tdble grGetDistToStart(tCarElt *car)
 }
 
 void
-grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dispDrvFlag, double curTime, class cGrPerspCamera *curCam)
+grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dispDrvFlag, int dispCockFlag, double curTime, class cGrPerspCamera *curCam)
 {
     sgCoord wheelpos;
     int index, i, j;
@@ -1163,23 +1206,33 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
     grCarInfo[index].distFromStart=grGetDistToStart(car);
     grCarInfo[index].envAngle=RAD2DEG(car->_yaw);
 
+    if(grCarInfo[index].nCar > 1)
+        grCarInfo[index].carSelector->select(1);
+
     if (grCarInfo[index].nSteer > 0)
         grCarInfo[index].steerSelector->select(1);
 
-    if ((car == curCar) && (dispCarFlag != 1)) {
+    if ((car == curCar) && (dispCarFlag != 1))
+    {
         grCarInfo[index].LODSelector->select(0);
         if (grCarInfo[index].nDRM > 0)
             grCarInfo[index].DRMSelector->select(0);
-    } else {
+    }
+    else
+    {
         lod = curCam->getLODFactor(car->_pos_X, car->_pos_Y, car->_pos_Z);
         i = 0;
-        while (lod < grCarInfo[index].LODThreshold[i] * grLodFactorValue) {
+        while (lod < grCarInfo[index].LODThreshold[i] * grLodFactorValue)
+        {
             i++;
         }
-        if ((car->_state & RM_CAR_STATE_DNF) && (grCarInfo[index].LODThreshold[i] > 0.0)) {
+
+        if ((car->_state & RM_CAR_STATE_DNF) && (grCarInfo[index].LODThreshold[i] > 0.0))
+        {
             i++;
         }
         grCarInfo[index].LODSelector->select(grCarInfo[index].LODSelectMask[i]);
+
         if (dispDrvFlag || car != curCar)
         {
             grCarInfo[index].driverSelector->select(1);
@@ -1223,6 +1276,8 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
                 grCarInfo[index].DRMSelector->select(0);
             if (grCarInfo[index].nSteer > 1)
                 grCarInfo[index].steerSelector->select(2);
+            if((grCarInfo[index].nCar > 1) && (dispCockFlag > 0))
+                grCarInfo[index].carSelector->select(2);
         }
 
         if (dispDrvFlag || car != curCar)

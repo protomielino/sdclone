@@ -736,7 +736,9 @@ shutdownCars(void)
     int i;
 
     GfOut("-- shutdownCars\n");
-    if (grNbCars) {
+
+    if (grNbCars)
+    {
         grShutdownBoardCar();
         grShutdownSkidmarks();
         grShutdownSmoke();
@@ -752,9 +754,10 @@ shutdownCars(void)
             ssgDeRefDelete(grCarInfo[i].shadowBase);
 
             if (grCarInfo[i].driverSelectorinsg == false)
-            {
                 delete grCarInfo[i].driverSelector;
-            }
+
+            if (grCarInfo[i].rearwingSelectorinsg == false)
+                delete grCarInfo[i].rearwingSelector;
         }
 
         PitsAnchor->removeAllKids();
