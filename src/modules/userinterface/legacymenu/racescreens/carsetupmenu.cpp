@@ -372,7 +372,8 @@ void CarSetupMenu::storeSettings()
         for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
         {
             attnum &att = items[page][index];
-            if (att.exists)
+            // Only write items that exist and have been changed.
+            if (att.exists && (att.value != att.defaultValue))
             {
                 GfParmSetNum(hparmCarSetup, att.section.c_str(), att.param.c_str(), att.units.c_str(),
                              att.value, att.minValue, att.maxValue);
