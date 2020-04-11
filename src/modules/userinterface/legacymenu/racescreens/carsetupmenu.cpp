@@ -280,9 +280,9 @@ void CarSetupMenu::loadSettings()
 
             attnum &att = items[page][index];
 
-            att.labelId = getDynamicControlId(std::string("Label" + std::to_string(index)).c_str());
-            att.editId = getDynamicControlId(std::string("Edit" + std::to_string(index)).c_str());
-            att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + std::to_string(index)).c_str());
+            att.labelId = getDynamicControlId(std::string("Label" + std::to_string(static_cast<unsigned long long>(index))).c_str());
+            att.editId = getDynamicControlId(std::string("Edit" + std::to_string(static_cast<unsigned long long>(index))).c_str());
+            att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + std::to_string(static_cast<unsigned long long>(index))).c_str());
             att.section = GfParmGetStr(hparmItems, strSection.c_str(), "section", "");
             att.param = GfParmGetStr(hparmItems, strSection.c_str(), "param", "");
             att.units = GfParmGetStr(hparmItems, strSection.c_str(), "unit", "");
@@ -316,11 +316,11 @@ void CarSetupMenu::loadSettings()
                 attnum &att = items[page][index];
 
                 if (!att.labelId)
-                    att.labelId = getDynamicControlId(std::string("Label" + std::to_string(index)).c_str());
+                    att.labelId = getDynamicControlId(std::string("Label" + std::to_string(static_cast<unsigned long long>(index))).c_str());
                 if (!att.editId)
-                    att.editId = getDynamicControlId(std::string("Edit" + std::to_string(index)).c_str());
+                    att.editId = getDynamicControlId(std::string("Edit" + std::to_string(static_cast<unsigned long long>(index))).c_str());
                 if (!att.defaultLabelId)
-                    att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + std::to_string(index)).c_str());
+                    att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + std::to_string(static_cast<unsigned long long>(index))).c_str());
             }
         }
     }
@@ -412,9 +412,9 @@ bool CarSetupMenu::initialize(void *pMenu, const GfRace *pRace, const GfDriver *
     // Create items.
     for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
     {
-        createLabelControl(std::string("Label" + std::to_string(index)).c_str());
-        createEditControl(std::string("Edit" + std::to_string(index)).c_str(), this, NULL, NULL);
-        createLabelControl(std::string("DefaultLabel" + std::to_string(index)).c_str());
+        createLabelControl(std::string("Label" + std::to_string(static_cast<unsigned long long>(index))).c_str());
+        createEditControl(std::string("Edit" + std::to_string(static_cast<unsigned long long>(index))).c_str(), this, NULL, NULL);
+        createLabelControl(std::string("DefaultLabel" + std::to_string(static_cast<unsigned long long>(index))).c_str());
     }
 
     // Create buttons.

@@ -49,22 +49,6 @@ public:
     const GfCar *getCar() const { return _pDriver->getCar(); }
     const GfTrack *getTrack() const { return _pRace->getTrack(); }
 
-protected:
-
-	//callback functions must be static
-	static void onActivate(void *pMenu);
-	static void onAccept(void *pMenu);
-	static void onCancel(void *pMenu);
-	static void onReset(void *pMenu);
-	static void onPrevious(void *pMenu);
-	static void onNext(void *pMenu);
-
-    // The target race.
-    const GfRace *_pRace;
-
-    // The target driver.
-    const GfDriver *_pDriver;
-
     struct attnum
     {
         int         labelId;
@@ -87,6 +71,22 @@ protected:
         {
         }
     };
+
+protected:
+
+	//callback functions must be static
+	static void onActivate(void *pMenu);
+	static void onAccept(void *pMenu);
+	static void onCancel(void *pMenu);
+	static void onReset(void *pMenu);
+	static void onPrevious(void *pMenu);
+	static void onNext(void *pMenu);
+
+    // The target race.
+    const GfRace *_pRace;
+
+    // The target driver.
+    const GfDriver *_pDriver;
 
     void readCurrentPage();
 
