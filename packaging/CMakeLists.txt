@@ -64,13 +64,18 @@ IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
    endforeach()
 
    foreach(_ROBOT ${SD_ROBOT_LIST_ITEMS})
-      LIST(APPEND _loadables "${CMAKE_INSTALL_PREFIX}/${_MODULE}")
+      LIST(APPEND _loadables "${CMAKE_INSTALL_PREFIX}/${_ROBOT}")
+   endforeach()
+
+   foreach(_PLUGIN ${SD_OSG_PLUGIN_LIST_ITEMS})
+      #message(STATUS "${_PLUGIN}")
+      LIST(APPEND _loadables "@CMAKE_INSTALL_PREFIX@/${_PLUGIN}")
    endforeach()
 
    #================
    # TODO figure out if this is needed...
    IF(NOT OPTION_OFFICIAL_ONLY)
-      LIST(APPEND _loadables "\${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libephemeris.dylib")
+      LIST(APPEND _loadables "${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libephemeris.dylib")
    ENDIF(NOT OPTION_OFFICIAL_ONLY)
    LIST(APPEND _loadables "${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/liblearning.dylib")
    #================
