@@ -19,6 +19,8 @@
 #ifndef _CARSETUPMENU_H_
 #define _CARSETUPMENU_H_
 
+#include <array>
+
 #include <tgfclient.h>
 
 #include "confscreens.h"
