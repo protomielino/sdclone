@@ -42,7 +42,8 @@ class OSGPLOT
 		float timeFrame,
 		float referenceLineAtValue,
 		std::string Xdata,
-		std::string Ydata
+		std::string Ydata,
+		std::string title
 	);
 	~OSGPLOT();
 	float positionX;
@@ -55,6 +56,7 @@ class OSGPLOT
 	float referenceLineAtValue;
 	std::string Xdata;
 	std::string Ydata;
+	std::string title;
 
 	osg::Vec3Array* dataPoints;
 
@@ -63,6 +65,8 @@ class OSGPLOT
 
 	osg::Geometry* osgReferencePlotLineGeometry;
 	osg::Vec3Array* osgReferencePlotLineVertices;
+
+	//osgText::Text* osgTitle;
 
 	osg::ref_ptr<osg::Group> osgGroup;
 
