@@ -18,34 +18,10 @@
 INCLUDE(BundleUtilities)
 SET(BU_CHMOD_BUNDLE_ITEMS ON)
 
-SET(bundle "@_bundle@")
+SET(bundle "@SD_FU_BUNDLE@")
 
+SET(plugins "@SD_FU_PLUGINS@")
 
-#SET(loadables @SD_MODULE_LIST_ITEMS@)
-#SET(robots @SD_ROBOT_LIST_ITEMS@)
-#SET(osg_plugins @SD_OSG_PLUGIN_LIST_ITEMS@)
-
-SET(plugins "@_loadables@")
-
-SET(_prefix_path @CMAKE_PREFIX_PATH@)
-
-
-# TODO - APPLE specific ?
-SET(search_dirs )
-IF(_prefix_path)
-    LIST(APPEND search_dirs "${_prefix_path}")
-ENDIF(_prefix_path)
-LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@")
-LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/Frameworks")
-LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/MacOS")
-LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/lib64/games/@PROJECT_NAME@/lib")
-LIST(APPEND search_dirs "@CMAKE_INSTALL_PREFIX@/games/Plugins/@OSG_PLUGIN_DIR@")
-
+SET(search_dirs "@SD_FU_SEARCHDIRS@")
 
 FIXUP_BUNDLE("${bundle}" "${plugins}" "${search_dirs}")
-
-message(STATUS bundle = "${bundle}")
-message(STATUS plugins = "${plugins}")
-message(STATUS search_dirs = "${search_dirs}")
-message(STATUS _prefix_path = "${_prefix_path}")
-

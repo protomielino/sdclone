@@ -41,44 +41,62 @@ IF(OPTION_OSGGRAPH)
       FOREACH(pi ${OSG_PLUGINS})
          INSTALL(FILES ${pi} DESTINATION ./games/PlugIns/${OSG_PLUGIN_DIR})
          GET_FILENAME_COMPONENT(fname ${pi} NAME)
-         SET_PROPERTY(GLOBAL APPEND PROPERTY SD_OSG_PLUGIN_LIST "/games/PlugIns/${OSG_PLUGIN_DIR}/${fname}")
+         SET_PROPERTY(GLOBAL APPEND PROPERTY SD_OSG_PLUGIN_LIST "games/PlugIns/${OSG_PLUGIN_DIR}/${fname}")
       ENDFOREACH()
 
    ENDIF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
 ENDIF(OPTION_OSGGRAPH)
 #==============================================================================
 
-Message(STATUS "Todo - Check handling of SD_OSG_PLUGIN_LIST_ITEMS in fixbundle.cmake.in")
 IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
    GET_PROPERTY(SD_MODULE_LIST_ITEMS GLOBAL PROPERTY SD_MODULE_LIST)
    GET_PROPERTY(SD_ROBOT_LIST_ITEMS GLOBAL PROPERTY SD_ROBOT_LIST)
    GET_PROPERTY(SD_OSG_PLUGIN_LIST_ITEMS GLOBAL PROPERTY SD_OSG_PLUGIN_LIST)
    #GET_PROPERTY(SD_EXE_LIST_ITEMS GLOBAL PROPERTY SD_EXE_LIST)
 
-   SET (_bundle "${CMAKE_INSTALL_PREFIX}/${SD_BINDIR}/${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
-
+   # Loop through the GLOBAL lists and build up the 'extra libs' for FIXUP_BUNDLE()
    SET(_loadables )
 
    foreach(_MODULE ${SD_MODULE_LIST_ITEMS})
-      LIST(APPEND _loadables "${CMAKE_INSTALL_PREFIX}/${_MODULE}")
+      LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${_MODULE}")
    endforeach()
 
    foreach(_ROBOT ${SD_ROBOT_LIST_ITEMS})
-      LIST(APPEND _loadables "${CMAKE_INSTALL_PREFIX}/${_ROBOT}")
+      LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${_ROBOT}")
    endforeach()
 
    foreach(_PLUGIN ${SD_OSG_PLUGIN_LIST_ITEMS})
       #message(STATUS "${_PLUGIN}")
-      LIST(APPEND _loadables "${CMAKE_INSTALL_PREFIX}/${_PLUGIN}")
+      LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${_PLUGIN}")
    endforeach()
 
    #================
    # TODO figure out if this is needed...
+   MESSAGE(STATUS "TODO: Hard coded loadable libraries...") 
    IF(NOT OPTION_OFFICIAL_ONLY)
-      LIST(APPEND _loadables "${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/libephemeris.dylib")
+      LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/lib64/games/${PROJECT_NAME}/lib/libephemeris.dylib")
    ENDIF(NOT OPTION_OFFICIAL_ONLY)
-   LIST(APPEND _loadables "${CMAKE_INSTALL_PREFIX}/lib64/games/${_TARGET_NAME}/lib/liblearning.dylib")
+   LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/lib64/games/${PROJECT_NAME}/lib/liblearning.dylib")
    #================
+
+   # Build up the 'dirs' collection for FIXUP_BUNDLE() to use for finding dependencies
+   SET(_search_dirs )
+   IF(CMAKE_PREFIX_PATH)
+      LIST(APPEND _search_dirs "${CMAKE_PREFIX_PATH}")
+   ENDIF(CMAKE_PREFIX_PATH)
+   LIST(APPEND _search_dirs "${CMAKE_INSTALL_PREFIX}/Frameworks")
+   LIST(APPEND _search_dirs "${CMAKE_INSTALL_PREFIX}/MacOS")
+   LIST(APPEND _search_dirs "${CMAKE_INSTALL_PREFIX}/lib64/games/${PROJECT_NAME}/lib")
+   LIST(APPEND _search_dirs "${CMAKE_INSTALL_PREFIX}/games/Plugins/${OSG_PLUGIN_DIR}")
+
+
+
+   # Build up the 'app' path for FIXUP_BUNDLE()
+   SET(SD_FU_BUNDLE "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${SD_BINDIR}/${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
+   
+   SET(SD_FU_PLUGINS ${_loadables})
+
+   SET(SD_FU_SEARCHDIRS ${_search_dirs})
 
 
    CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/cmake/fixbundle.cmake.in
