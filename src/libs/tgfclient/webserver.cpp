@@ -388,7 +388,7 @@ WebServer::WebServer()
     this->handle_count = 0;
 
     //initialize the configuration
-    this->readConfiguration();
+    //this->readConfiguration();
 }
 
 WebServer::~WebServer()
@@ -697,9 +697,13 @@ int WebServer::sendGenericRequest (std::string data, std::string& serverReply)
 
 void WebServer::readConfiguration ()
 {
-    //void *configHandle;
-    //char configFileUrl[256];
-/*
+
+    GfLogInfo("WebServer prefFile is in: %s%s\n", GfLocalDir(), "config/webserver.xml");
+
+	
+    void *configHandle;
+    char configFileUrl[256];
+
     //get the preferencies file location
     sprintf(configFileUrl, "%s%s", GfLocalDir(), "config/webserver.xml");
 
@@ -708,13 +712,13 @@ void WebServer::readConfiguration ()
 
     //get webServer url from the config
     this->url = GfParmGetStr(configHandle, "WebServer Settings", "url","val");
-*/
+	
 
-    this->url ="http://www.madbad.altervista.org/speed-dreams/webserver.php";
+    //this->url ="http://www.madbad.altervista.org/speed-dreams/webserver.php";
     //this->url ="http://masterserver.speed-dreams.fr/webserver.php";
 //	this->url ="http://localhost/speed-dreams/webserver.php";
 
-    //GfLogInfo("WebServer - webserver url is: %s\n", this->url);
+    GfLogInfo("WebServer - webserver url is: %s\n", this->url);
 }
 
 int WebServer::readUserConfig (int userId)
@@ -745,44 +749,22 @@ int WebServer::sendLogin (int userId)
 {
     std::string serverReply;
 
+    //initialize the configuration
+    this->readConfiguration();
+
     //read username and password and save it in as webserver properties
     this->readUserConfig(userId);
     this->sendLogin(this->username, this->password);
-/*
-    std::string username="username";
-    std::string password="password";
 
-    //if the user has not setup the webserver login info abort the login
-    if(username==this->username && password==this->password){
-        GfLogInfo("WebServer: Send of login info aborted (the user is not correctly setup in this client).\n");
-        return 1;
-    }
-
-    //prepare the string to send
-    std::string dataToSend ("");
-    dataToSend.append(	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                        "<content>"
-                        "<request_id>{{request_id}}</request_id>"
-                        "<request>"
-                        "<login>"
-                        "<username>{{username}}</username>"
-                        "<password>{{password}}</password>"
-                        "</login>"
-                        "</request>"
-                        "</content>");
-
-    //replace the {{tags}} with the respecting values
-    replaceAll(dataToSend, "{{username}}", this->username);
-    replaceAll(dataToSend, "{{password}}", this->password);
-
-    this->addOrderedAsyncRequest(dataToSend);
-*/
     return 0;
 }
 
 int WebServer::sendLogin (const char* username, const char* password)
 {
     std::string serverReply;
+
+    //initialize the configuration
+    this->readConfiguration();
 
     //prepare the string to send
     std::string dataToSend ("");

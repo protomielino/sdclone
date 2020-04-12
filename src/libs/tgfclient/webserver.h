@@ -73,7 +73,7 @@ class NotificationManager {
 		std::clock_t animationRestStartTime; //when the animation started
 
 		float totalAnimationDuration;//how much the animation should take to fully run in one direction
-		float animationRestTime; //how much wes should wait when we a re fully displayed
+		float animationRestTime; //how much we should wait when we are fully displayed
 		int animationDirection;
 		int propertyFinalValue;
 		std::vector<std::string> messageLines;
