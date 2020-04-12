@@ -36,18 +36,18 @@ class CarSetupMenu : public GfuiMenuScreen
 {
 public:
 
-	CarSetupMenu();
-	bool initialize(void *pPrevMenu,
+    CarSetupMenu();
+    bool initialize(void *pPrevMenu,
                     const GfRace *pRace,
                     const GfDriver *pDriver);
 
-    void storeSettings();
-    void loadSettings();
-
-    void updateControls();
-
-    const GfCar *getCar() const { return _pDriver->getCar(); }
-    const GfTrack *getTrack() const { return _pRace->getTrack(); }
+    // callback functions must be static
+    static void onActivateCallback(void *pMenu);
+    static void onAcceptCallback(void *pMenu);
+    static void onCancelCallback(void *pMenu);
+    static void onResetCallback(void *pMenu);
+    static void onPreviousCallback(void *pMenu);
+    static void onNextCallback(void *pMenu);
 
     struct attnum
     {
@@ -72,23 +72,28 @@ public:
         }
     };
 
-protected:
+private:
 
-	//callback functions must be static
-	static void onActivate(void *pMenu);
-	static void onAccept(void *pMenu);
-	static void onCancel(void *pMenu);
-	static void onReset(void *pMenu);
-	static void onPrevious(void *pMenu);
-	static void onNext(void *pMenu);
+    void storeSettings();
+    void loadSettings();
+    void updateControls();
+    void readCurrentPage();
+
+    const GfCar *getCar() const { return _pDriver->getCar(); }
+    const GfTrack *getTrack() const { return _pRace->getTrack(); }
+
+    void onActivate();
+    void onAccept();
+    void onCancel();
+    void onReset();
+    void onPrevious();
+    void onNext();
 
     // The target race.
     const GfRace *_pRace;
 
     // The target driver.
     const GfDriver *_pDriver;
-
-    void readCurrentPage();
 
     std::vector<std::array<attnum, ITEMS_PER_PAGE> > items;
     size_t  currentPage;

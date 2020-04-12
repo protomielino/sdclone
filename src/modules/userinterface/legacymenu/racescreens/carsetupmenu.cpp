@@ -34,57 +34,130 @@ This file deals with car setup
 #include "carsetupmenu.h"
 
 
-void CarSetupMenu::onActivate(void *pMenu)
-{
-    GfLogInfo("Entering Car Setup menu\n");
+// callback functions
 
+void CarSetupMenu::onActivateCallback(void *pMenu)
+{
     // Get the CarSetupMenu instance.
     CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
 
+    pCarSetupMenu->onActivate();
+}
+
+void CarSetupMenu::onAcceptCallback(void *pMenu)
+{
+    // Get the CarSetupMenu instance.
+    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
+
+    pCarSetupMenu->onAccept();
+}
+
+void CarSetupMenu::onNextCallback(void *pMenu)
+{
+    // Get the CarSetupMenu instance from call-back user data.
+    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
+
+    pCarSetupMenu->onNext();
+}
+
+void CarSetupMenu::onCancelCallback(void *pMenu)
+{
+    // Get the CarSetupMenu instance from call-back user data.
+    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
+
+    pCarSetupMenu->onCancel();
+}
+
+void CarSetupMenu::onResetCallback(void *pMenu)
+{
+    // Get the CarSetupMenu instance from call-back user data.
+    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
+
+    pCarSetupMenu->onReset();
+}
+
+void CarSetupMenu::onPreviousCallback(void *pMenu)
+{
+    // Get the CarSetupMenu instance from call-back user data.
+    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
+
+    pCarSetupMenu->onPrevious();
+}
+
+// member functions
+
+void CarSetupMenu::onActivate()
+{
+    GfLogInfo("Entering Car Setup menu\n");
+
     // Load settings from XML file.
-    pCarSetupMenu->loadSettings();
+    loadSettings();
 
     // Initialize GUI from loaded values.
-    pCarSetupMenu->updateControls();
+    updateControls();
 }
 
-void CarSetupMenu::onAccept(void *pMenu)
+void CarSetupMenu::onAccept()
 {
-    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
-
     // Get the current page values.
-    pCarSetupMenu->readCurrentPage();
+    readCurrentPage();
 
     // Save all page values.
-    pCarSetupMenu->storeSettings();
+    storeSettings();
 
     // Switch back to garage menu.
-    GfuiScreenActivate(pCarSetupMenu->getPreviousMenuHandle());
+    GfuiScreenActivate(getPreviousMenuHandle());
 }
 
-void CarSetupMenu::onCancel(void *pMenu)
+void CarSetupMenu::onCancel()
 {
-    // Get the CarSetupMenu instance from call-back user data.
-    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
-
     // Back to previous screen.
-    GfuiScreenActivate(pCarSetupMenu->getPreviousMenuHandle());
+    GfuiScreenActivate(getPreviousMenuHandle());
 }
 
-void CarSetupMenu::onReset(void *pMenu)
+void CarSetupMenu::onReset()
 {
-    // Get the CarSetupMenu instance from call-back user data.
-    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
-
     // Reset all values on current page to their defaults.
     for (size_t index = 0; index < ITEMS_PER_PAGE; index++)
     {
-        attnum &att = pCarSetupMenu->items[pCarSetupMenu->currentPage][index];
+        attnum &att = items[currentPage][index];
         att.value = att.defaultValue;
     }
 
     // Update the GUI.
-    pCarSetupMenu->updateControls();
+    updateControls();
+}
+
+void CarSetupMenu::onPrevious()
+{
+    // Check if first page.
+    if (currentPage == 0)
+       return;
+
+    // Get the current page values.
+    readCurrentPage();
+
+    // Switch to previous page.
+    currentPage--;
+
+    // Update the GUI.
+    updateControls();
+}
+
+void CarSetupMenu::onNext()
+{
+    // Check if last page.
+    if (currentPage == (items.size() - 1))
+       return;
+
+    // Get the current page values.
+    readCurrentPage();
+
+    // Switch to next page.
+    currentPage++;
+
+    // update the GUI.
+    updateControls();
 }
 
 void CarSetupMenu::readCurrentPage()
@@ -99,36 +172,6 @@ void CarSetupMenu::readCurrentPage()
             issValue >> att.value;
         }
     }
-}
-
-void CarSetupMenu::onPrevious(void *pMenu)
-{
-    // Get the CarSetupMenu instance from call-back user data.
-    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
-
-    // Get the current page values.
-    pCarSetupMenu->readCurrentPage();
-
-    // Switch to previous page.
-    pCarSetupMenu->currentPage--;
-
-    // Update the GUI.
-    pCarSetupMenu->updateControls();
-}
-
-void CarSetupMenu::onNext(void *pMenu)
-{
-    // Get the CarSetupMenu instance from call-back user data.
-    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu*>(pMenu);
-
-    // Get the current page values.
-    pCarSetupMenu->readCurrentPage();
-
-    // Switch to next page.
-    pCarSetupMenu->currentPage++;
-
-    // update the GUI.
-    pCarSetupMenu->updateControls();
 }
 
 void CarSetupMenu::updateControls()
@@ -402,7 +445,7 @@ bool CarSetupMenu::initialize(void *pMenu, const GfRace *pRace, const GfDriver *
 
     GfLogDebug("Initializing Car Setup menu: \"%s\"\n", pDriver->getCar()->getName().c_str());
 
-    createMenu(NULL, this, onActivate, NULL, (tfuiCallback)NULL, 1);
+    createMenu(NULL, this, onActivateCallback, NULL, (tfuiCallback)NULL, 1);
 
     openXMLDescriptor();
     
@@ -419,19 +462,21 @@ bool CarSetupMenu::initialize(void *pMenu, const GfRace *pRace, const GfDriver *
     }
 
     // Create buttons.
-    createButtonControl("ApplyButton", this, onAccept);
-    createButtonControl("CancelButton", this, onCancel);
-    createButtonControl("ResetButton", this, onReset);
-    createButtonControl("PreviousButton", this, onPrevious);
-    createButtonControl("NextButton", this, onNext);
+    createButtonControl("ApplyButton", this, onAcceptCallback);
+    createButtonControl("CancelButton", this, onCancelCallback);
+    createButtonControl("ResetButton", this, onResetCallback);
+    createButtonControl("PreviousButton", this, onPreviousCallback);
+    createButtonControl("NextButton", this, onNextCallback);
 
     closeXMLDescriptor();
 
     // Keyboard shortcuts.
-    addShortcut(GFUIK_ESCAPE, "Cancel", this, onCancel, NULL);
-    addShortcut(GFUIK_RETURN, "Accept", this, onAccept, NULL);
+    addShortcut(GFUIK_ESCAPE, "Cancel", this, onCancelCallback, NULL);
+    addShortcut(GFUIK_RETURN, "Accept", this, onAcceptCallback, NULL);
     addShortcut(GFUIK_F1, "Help", getMenuHandle(), GfuiHelpScreen, NULL);
     addShortcut(GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    addShortcut(GFUIK_LEFT, "Previous Page", this, onPreviousCallback, NULL);
+    addShortcut(GFUIK_RIGHT, "Next Page", this, onNextCallback, NULL);
 
     return true;
 }
