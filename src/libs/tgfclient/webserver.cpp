@@ -387,6 +387,11 @@ WebServer::WebServer()
     this->multi_handle = curl_multi_init();
     this->handle_count = 0;
 
+    //todo:even if this was the appropriate place to do this, it is not working as intended
+    //i guess some of the Gf function are not available to be call that early in the game initialization process
+    //so we get a segfault.
+    // moved this call to the start of the functions 'addAsyncRequest' and 'sendGenericRequest'
+    
     //initialize the configuration
     //this->readConfiguration();
 }
@@ -562,6 +567,9 @@ int WebServer::updateAsyncStatus()
 int WebServer::addAsyncRequest(std::string const data)
 {
     GfLogInfo("WebServer: Performing ASYNC request:\n%s\n", data.c_str());
+    
+    //read the webserver configuration
+    this->readConfiguration();   
 
     CURL* curl = NULL;
     struct curl_httppost *formpost=NULL;
@@ -622,6 +630,10 @@ int WebServer::addOrderedAsyncRequest(std::string data)
 
 int WebServer::sendGenericRequest (std::string data, std::string& serverReply)
 {
+    //read the webserver configuration
+    this->readConfiguration();   
+
+	
     CURL *curl;
     CURLcode res;
 
@@ -697,26 +709,17 @@ int WebServer::sendGenericRequest (std::string data, std::string& serverReply)
 
 void WebServer::readConfiguration ()
 {
+	void *configHandle;
+	char configFileUrl[256];
 
-    GfLogInfo("WebServer prefFile is in: %s%s\n", GfLocalDir(), "config/webserver.xml");
+	//get the preferencies file location
+	sprintf(configFileUrl, "%s%s", GfLocalDir(), "config/webserver.xml");
 
-	
-    void *configHandle;
-    char configFileUrl[256];
+	//read the preferencies file
+	configHandle = GfParmReadFile(configFileUrl, GFPARM_RMODE_REREAD);
 
-    //get the preferencies file location
-    sprintf(configFileUrl, "%s%s", GfLocalDir(), "config/webserver.xml");
-
-    //read the preferencies file
-    configHandle = GfParmReadFile(configFileUrl, GFPARM_RMODE_REREAD);
-
-    //get webServer url from the config
-    this->url = GfParmGetStr(configHandle, "WebServer Settings", "url","val");
-	
-
-    //this->url ="http://www.madbad.altervista.org/speed-dreams/webserver.php";
-    //this->url ="http://masterserver.speed-dreams.fr/webserver.php";
-//	this->url ="http://localhost/speed-dreams/webserver.php";
+	//get webServer url from the config
+	this->url = GfParmGetStr(configHandle, "WebServer Settings", "url","val");
 
     GfLogInfo("WebServer - webserver url is: %s\n", this->url);
 }
@@ -749,22 +752,44 @@ int WebServer::sendLogin (int userId)
 {
     std::string serverReply;
 
-    //initialize the configuration
-    this->readConfiguration();
-
     //read username and password and save it in as webserver properties
     this->readUserConfig(userId);
     this->sendLogin(this->username, this->password);
+/*
+    std::string username="username";
+    std::string password="password";
 
+    //if the user has not setup the webserver login info abort the login
+    if(username==this->username && password==this->password){
+        GfLogInfo("WebServer: Send of login info aborted (the user is not correctly setup in this client).\n");
+        return 1;
+    }
+
+    //prepare the string to send
+    std::string dataToSend ("");
+    dataToSend.append(	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                        "<content>"
+                        "<request_id>{{request_id}}</request_id>"
+                        "<request>"
+                        "<login>"
+                        "<username>{{username}}</username>"
+                        "<password>{{password}}</password>"
+                        "</login>"
+                        "</request>"
+                        "</content>");
+
+    //replace the {{tags}} with the respecting values
+    replaceAll(dataToSend, "{{username}}", this->username);
+    replaceAll(dataToSend, "{{password}}", this->password);
+
+    this->addOrderedAsyncRequest(dataToSend);
+*/
     return 0;
 }
 
 int WebServer::sendLogin (const char* username, const char* password)
 {
     std::string serverReply;
-
-    //initialize the configuration
-    this->readConfiguration();
 
     //prepare the string to send
     std::string dataToSend ("");
