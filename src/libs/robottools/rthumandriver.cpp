@@ -260,6 +260,10 @@ static const int nbControl = sizeof(controlList) / sizeof(controlList[0]);
 
 static const std::string Yn[] = {HM_VAL_YES, HM_VAL_NO};
 
+//forcefeedback
+//we will use this as a reference to know if the race engine is paused to disable force feedback in case the pause menu is activated
+double	forceFeedbackRaceEngineTime;
+
 /*
  * Changes from original:
  *
@@ -1223,6 +1227,16 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 
 	//send force feedback effect to the wheel
 	//dont' even try to do it if steer command is on a keyboard because it somehow manage to crash (unable to identify the joystic to send FF to?)
+	
+	// Set the running flags.
+//    ReSituation::self().data()->_reRunning = 1;
+//    ReSituation::self().data()->s->_raceState &= ~RM_RACE_PAUSED;
+//	ReSituation::self().data()->_reState = RE_STATE_RACE;
+	
+//	if( s->raceInfo->_raceState != RM_RACE_PAUSED ){
+
+//_reState = RE_STATE_RACE
+
 	if(cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_KEYBOARD){
 		//                     v<-  this controller detenction does not make ->v 
 		//                     v<-  sense to me                              ->v
