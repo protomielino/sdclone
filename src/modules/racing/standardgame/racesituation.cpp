@@ -429,7 +429,6 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
     }
     webServer.updateAsyncStatus();
     #endif //WEBSERVER
-
 }
 
 int ReSituationUpdater::threadLoop(void* pUpdater)
