@@ -114,6 +114,7 @@ LoadMenuScreen()
     GfuiAddKey(menuHandle, 'Q', "Quit", 0, onQuit, NULL);
     GfuiAddKey(menuHandle, 'q', "Quit", 0, onQuit, NULL);
     GfuiAddKey(menuHandle, GFUIK_ESCAPE, "Quit", 0, onQuit, NULL);
+    GfuiAddKey(menuHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 
 	GfParmReleaseHandle(param);
 }
