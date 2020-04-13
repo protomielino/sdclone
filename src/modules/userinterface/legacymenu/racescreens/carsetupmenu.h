@@ -30,7 +30,7 @@ class GfDriver;
 class GfCar;
 class GfTrack;
 
-#define ITEMS_PER_PAGE  10
+#define ITEMS_PER_PAGE  12
 
 class CarSetupMenu : public GfuiMenuScreen
 {
