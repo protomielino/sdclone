@@ -593,7 +593,7 @@ createParmHeader (const char *file)
 }
 
 static void
-addWithin (struct param *curParam, char *s1)
+addWithin (struct param *curParam, const char *s1)
 {
 	struct within *curWithin;
 
@@ -2440,6 +2440,37 @@ GfParmExistsSection (void *handle, const char *path)
 	return section != 0 ? 1 : 0;
 }
 
+/** Check if a parameter exists.
+    @ingroup    paramsdata
+    @param  handle  handle of parameters
+    @param  path    path of param
+    @param  key key name
+    @return 1   exists
+            0   doesn't exist
+ */
+int
+GfParmExistsParam(void *handle, const char *path, const char *key)
+{
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
+    struct param      *param;
+
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+        GfLogError ("GfParmSetNum: bad handle (%p)\n", parmHandle);
+        return 0;
+    }
+
+    conf = parmHandle->conf;
+
+    param = getParamByName (conf, path, key, 0);
+    if (!param) 
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
 /** Seek the first sub-section element of a section.
     @ingroup	paramslist
     @param	handle	handle of parameters
@@ -2812,6 +2843,47 @@ GfParmGetStr (void *parmHandle, const char *path, const char *key, const char *d
 	}
 
 	return val;
+}
+
+/** Get string parameter in values.
+    @ingroup	paramsdata
+    @param	parmHandle	Configuration handle
+    @param	path		Parameter section name
+    @param	key		Parameter name
+    @return	vector of possible strings
+*/
+std::vector<std::string>
+GfParmGetStrIn(void *parmHandle, const char *path, const char *key)
+{
+    struct param      *param;
+    struct parmHandle *handle = (struct parmHandle *)parmHandle;
+    struct parmHeader *conf;
+    struct within     *curWithin;
+    std::vector<std::string> paramsInList;
+
+    if ((handle == NULL) || (handle->magic != PARM_MAGIC)) {
+        GfLogError ("GfParmListGetStrInList: bad handle (%p)\n", parmHandle);
+        return paramsInList;
+    }
+
+    conf = handle->conf;
+
+    param = getParamByName (conf, path, key, 0);
+    if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR && param->type != P_FORM)) {
+        return paramsInList;
+    }
+
+    curWithin = GF_TAILQ_FIRST (&(param->withinList));
+    if (curWithin)
+    {
+        paramsInList.push_back(curWithin->val);
+        while ((curWithin = GF_TAILQ_NEXT (curWithin, linkWithin)) != NULL)
+        {
+            paramsInList.push_back(curWithin->val);
+        }
+    }
+
+    return paramsInList;
 }
 
 /** Get string parameter value.
@@ -3430,8 +3502,6 @@ GfParmGetCurFormula (void *handle, char const *path, char const *key)
     return param->value;
 }
 
-
-
 /** Set a string parameter in a config file.
     @ingroup	paramsdata
     @param	handle	handle of parameters	
@@ -3447,33 +3517,131 @@ GfParmSetStr(void *handle, const char *path, const char *key, const char *val)
 {
     struct parmHandle *parmHandle = (struct parmHandle *)handle;
     struct parmHeader *conf;
-    struct param	*param;
+    struct param      *param;
 
-	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
-		GfLogError ("GfParmSetStr: bad handle (%p)\n", parmHandle);
-		return -1;
-	}
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+        GfLogError ("GfParmSetStr: bad handle (%p)\n", parmHandle);
+        return -1;
+    }
 
-	conf = parmHandle->conf;
+    conf = parmHandle->conf;
 
-	if (!val || !strlen (val)) {
-	/* Remove the entry */
-	removeParamByName (conf, path, key);
-	return 0;
+    if (!val || !strlen (val)) {
+        /* Remove the entry */
+        removeParamByName (conf, path, key);
+        return 0;
     }
   
     param = getParamByName (conf, path, key, PARAM_CREATE);
     if (!param) {
-	return -1;
+        return -1;
     }
     param->type = P_STR;
     freez (param->value);
     param->value = strdup (val);
     if (!param->value) {
-	GfLogError ("gfParmSetStr: strdup (%s) failed\n", val);
-	removeParamByName (conf, path, key);
-	return -1;
+        GfLogError ("gfParmSetStr: strdup (%s) failed\n", val);
+        removeParamByName (conf, path, key);
+        return -1;
     }
+
+    return 0;
+}
+
+/** Set a string parameter in vector in a config file.
+    @ingroup    paramsdata
+    @param  handle  handle of parameters
+    @param  path    path of param
+    @param  key     key name
+    @param  in      vector of possible values
+    @return 0       ok
+            <br>-1  error
+    @warning    The key is created is necessary
+ */
+int
+GfParmSetStrIn(void *handle, const char *path, const char *key, const std::vector<std::string> &in)
+{
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
+    struct param      *param;
+
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+        GfLogError ("GfParmSetStrIn: bad handle (%p)\n", parmHandle);
+        return -1;
+    }
+
+    conf = parmHandle->conf;
+    param = getParamByName (conf, path, key, PARAM_CREATE);
+    if (!param) {
+        return -1;
+    }
+    param->type = P_STR;
+
+    struct within *within;
+    while ((within = GF_TAILQ_FIRST (&param->withinList)) != GF_TAILQ_END (&param->withinList)) {
+        GF_TAILQ_REMOVE (&param->withinList, within, linkWithin);
+        freez(within->val);
+        free(within);
+    }
+
+    for (size_t i = 0; i < in.size(); ++i)
+        addWithin(param, in[i].c_str());
+
+    return 0;
+}
+
+/** Set a string parameter in a config file.
+    @ingroup    paramsdata
+    @param  handle  handle of parameters
+    @param  path    path of param
+    @param  key     key name
+    @param  val     value (NULL or empty string to remove the parameter)
+    @param  in      vector of possible values
+    @return 0   ok
+            <br>-1  error
+    @warning    The key is created is necessary
+ */
+int GfParmSetStrAndIn(void *handle, const char *path, const char *key, const char *val, const std::vector<std::string> &in)
+{
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
+    struct param      *param;
+
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+        GfLogError ("GfParmSetStrAndIn: bad handle (%p)\n", parmHandle);
+        return -1;
+    }
+
+    conf = parmHandle->conf;
+
+    if (!val || !strlen (val)) {
+        /* Remove the entry */
+        removeParamByName (conf, path, key);
+        return 0;
+    }
+  
+    param = getParamByName (conf, path, key, PARAM_CREATE);
+    if (!param) {
+        return -1;
+    }
+    param->type = P_STR;
+    freez (param->value);
+    param->value = strdup (val);
+    if (!param->value) {
+        GfLogError ("gfParmSetStrAndIn: strdup (%s) failed\n", val);
+        removeParamByName (conf, path, key);
+        return -1;
+    }
+
+    struct within *within;
+    while ((within = GF_TAILQ_FIRST (&param->withinList)) != GF_TAILQ_END (&param->withinList)) {
+        GF_TAILQ_REMOVE (&param->withinList, within, linkWithin);
+        freez(within->val);
+        free(within);
+    }
+
+    for (size_t i = 0; i < in.size(); ++i)
+        addWithin(param, in[i].c_str());
 
     return 0;
 }

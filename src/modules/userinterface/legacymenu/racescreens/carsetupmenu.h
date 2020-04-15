@@ -41,6 +41,40 @@ public:
                     const GfRace *pRace,
                     const GfDriver *pDriver);
 
+    struct attribute
+    {
+        int         labelId;
+        int         editId;
+        int         comboId;
+        int         defaultLabelId;
+        bool        exists;
+        tdble       value;
+        tdble       minValue;
+        tdble       defaultValue;
+        tdble       maxValue;
+        std::string type;
+        std::string section;
+        std::string param;
+        std::string units;
+        std::string label;
+        std::string strValue;
+        std::string defaultStrValue;
+        std::vector<std::string> in;
+        int         precision;
+
+        attribute() :
+            labelId(0), editId(0), comboId(0), defaultLabelId(0), exists(false),
+            value(0), minValue(0), defaultValue(0), maxValue(0), precision(0)
+        {
+        }
+    };
+
+    struct ComboCallbackData
+    {
+        CarSetupMenu *menu;
+        size_t index;
+    };
+
     // callback functions must be static
     static void onActivateCallback(void *pMenu);
     static void onAcceptCallback(void *pMenu);
@@ -48,29 +82,7 @@ public:
     static void onResetCallback(void *pMenu);
     static void onPreviousCallback(void *pMenu);
     static void onNextCallback(void *pMenu);
-
-    struct attnum
-    {
-        int         labelId;
-        int         editId;
-        int         defaultLabelId;
-        bool        exists;
-        tdble       value;
-        tdble       minValue;
-        tdble       defaultValue;
-        tdble       maxValue;
-        std::string section;
-        std::string param;
-        std::string units;
-        std::string label;
-        int         precision;
-
-        attnum() :
-            labelId(0), editId(0), defaultLabelId(0), exists(false),
-            value(0), minValue(0), defaultValue(0), maxValue(0), precision(0)
-        {
-        }
-    };
+    static void onComboCallback(tComboBoxInfo *pInfo);
 
 private:
 
@@ -88,6 +100,7 @@ private:
     void onReset();
     void onPrevious();
     void onNext();
+    void onCombo(tComboBoxInfo *pInfo);
 
     // The target race.
     const GfRace *_pRace;
@@ -95,8 +108,9 @@ private:
     // The target driver.
     const GfDriver *_pDriver;
 
-    std::vector<std::array<attnum, ITEMS_PER_PAGE> > items;
+    std::vector<std::array<attribute, ITEMS_PER_PAGE> > items;
     size_t  currentPage;
+    ComboCallbackData comboCallbackData[ITEMS_PER_PAGE];
 };
 
 #endif /* _CARSETUPMENU_H_ */

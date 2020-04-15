@@ -84,6 +84,14 @@ void CarSetupMenu::onPreviousCallback(void *pMenu)
     pCarSetupMenu->onPrevious();
 }
 
+void CarSetupMenu::onComboCallback(tComboBoxInfo *pInfo)
+{
+    // Get the CarSetupMenu instance from call-back user data.
+    CarSetupMenu *pCarSetupMenu = static_cast<CarSetupMenu::ComboCallbackData *>(pInfo->userData)->menu;
+
+    pCarSetupMenu->onCombo(pInfo);
+}
+
 // member functions
 
 void CarSetupMenu::onActivate()
@@ -95,6 +103,13 @@ void CarSetupMenu::onActivate()
 
     // Initialize GUI from loaded values.
     updateControls();
+
+    // Initialize combo callback user data.
+    for (size_t i = 0; i < ITEMS_PER_PAGE; ++i)
+    {
+        comboCallbackData[i].menu = this;
+        comboCallbackData[i].index = i;
+    }
 }
 
 void CarSetupMenu::onAccept()
@@ -120,9 +135,16 @@ void CarSetupMenu::onReset()
     // Reset all values on current page to their defaults.
     for (size_t index = 0; index < ITEMS_PER_PAGE; index++)
     {
-        attnum &att = items[currentPage][index];
-        att.value = att.defaultValue;
-    }
+        attribute &att = items[currentPage][index];
+        if (att.type == "edit")
+        {
+            att.value = att.defaultValue;
+        }
+        else if (att.type == "combo")
+        {
+            att.strValue = att.defaultStrValue;
+        }
+    }   
 
     // Update the GUI.
     updateControls();
@@ -160,12 +182,22 @@ void CarSetupMenu::onNext()
     updateControls();
 }
 
+void CarSetupMenu::onCombo(tComboBoxInfo *pInfo)
+{
+    ComboCallbackData *pData = static_cast<CarSetupMenu::ComboCallbackData *>(pInfo->userData);
+
+    // Use currentPage and index in callback data to find item.
+    attribute &att = items[currentPage][pData->index];
+
+    att.strValue = pInfo->vecChoices[pInfo->nPos];
+}
+
 void CarSetupMenu::readCurrentPage()
 {
     for (size_t index = 0; index < ITEMS_PER_PAGE; index++)
     {
-        attnum &att = items[currentPage][index];
-        if (att.exists)
+        attribute &att = items[currentPage][index];
+        if (att.exists && att.type == "edit")
         {
             std::string strValue(GfuiEditboxGetString(getMenuHandle(), att.editId));
             std::istringstream issValue(strValue);
@@ -181,7 +213,7 @@ void CarSetupMenu::updateControls()
 
     for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
     {
-        attnum &att = items[currentPage][index];
+        attribute &att = items[currentPage][index];
 
         // Set label text.
         std::ostringstream ossLabel;
@@ -203,53 +235,88 @@ void CarSetupMenu::updateControls()
         // Set default label text.
         if (att.exists)
         {
-            // Check for missing min and max.
-            if (att.minValue == att.maxValue)
+            if (att.type == "edit")
             {
-                ossLabel << std::fixed << std::setprecision(att.precision)
-                         << "Default: " << att.defaultValue;
+                // Check for missing min and max.
+                if (att.minValue == att.maxValue)
+                {
+                    ossLabel << std::fixed << std::setprecision(att.precision)
+                             << "Default: " << att.defaultValue;
+                }
+                else
+                {
+                    ossLabel << std::fixed << std::setprecision(att.precision)
+                             << "Min: " << att.minValue
+                             << "  Default: " << att.defaultValue
+                             << "  Max: " << att.maxValue;
+                }
             }
-            else
+            else if (att.type == "combo")
             {
-                ossLabel << std::fixed << std::setprecision(att.precision)
-                         << "Min: " << att.minValue
-                         << "  Default: " << att.defaultValue
-                         << "  Max: " << att.maxValue;
+                ossLabel << "Default: " << att.defaultStrValue;
             }
         }
         GfuiLabelSetText(getMenuHandle(),
                          att.defaultLabelId,
                          ossLabel.str().c_str());
-    }
 
-    // Update the edit boxes.
-    for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
-    {
-        attnum &att = items[currentPage][index];
-
+        // Update the edit or combo boxes.
         if (att.label.empty())
         {
             GfuiVisibilitySet(getMenuHandle(), att.editId, GFUI_INVISIBLE);
+            GfuiVisibilitySet(getMenuHandle(), att.comboId, GFUI_INVISIBLE);
         }
         else
         {
-            GfuiVisibilitySet(getMenuHandle(), att.editId, GFUI_VISIBLE);
-
-            if (att.exists)
+            if (att.type == "edit")
             {
-                std::ostringstream ossValue;
-                ossValue << std::fixed << std::setprecision(att.precision) << att.value;
-                GfuiEditboxSetString(getMenuHandle(), att.editId, ossValue.str().c_str());
-
-                if (att.minValue == att.maxValue)
-                    GfuiEnable(getMenuHandle(), att.editId, GFUI_DISABLE);
-                else
-                    GfuiEnable(getMenuHandle(), att.editId, GFUI_ENABLE);
+                GfuiVisibilitySet(getMenuHandle(), att.editId, GFUI_VISIBLE);
+                GfuiVisibilitySet(getMenuHandle(), att.comboId, GFUI_INVISIBLE);
+            }
+            else if (att.type == "combo")
+            {
+                GfuiVisibilitySet(getMenuHandle(), att.editId, GFUI_INVISIBLE);
+                GfuiVisibilitySet(getMenuHandle(), att.comboId, GFUI_VISIBLE);
             }
             else
             {
-                GfuiEditboxSetString(getMenuHandle(), att.editId, "----");
-                GfuiEnable(getMenuHandle(), att.editId, GFUI_DISABLE);
+                GfuiVisibilitySet(getMenuHandle(), att.editId, GFUI_INVISIBLE);
+                GfuiVisibilitySet(getMenuHandle(), att.comboId, GFUI_INVISIBLE);
+            }
+
+            if (att.exists)
+            {
+                if (att.type == "edit")
+                {
+                    std::ostringstream ossValue;
+                    ossValue << std::fixed << std::setprecision(att.precision) << att.value;
+                    GfuiEditboxSetString(getMenuHandle(), att.editId, ossValue.str().c_str());
+
+                    if (att.minValue == att.maxValue)
+                        GfuiEnable(getMenuHandle(), att.editId, GFUI_DISABLE);
+                    else
+                        GfuiEnable(getMenuHandle(), att.editId, GFUI_ENABLE);
+                }
+                else if (att.type == "combo")
+                {
+                    GfuiComboboxClear(getMenuHandle(), att.comboId);
+                    size_t index = 0;
+                    for (size_t i = 0; i < att.in.size(); ++i)
+                    {
+                        GfuiComboboxAddText(getMenuHandle(), att.comboId, att.in[i].c_str()); 
+                        if (att.in[i] == att.strValue)
+                            index = i;
+                    }
+                    GfuiComboboxSetSelectedIndex(getMenuHandle(), att.comboId, index);
+                }
+            }
+            else
+            {
+                if (att.type == "edit")
+                {
+                    GfuiEditboxSetString(getMenuHandle(), att.editId, "----");
+                    GfuiEnable(getMenuHandle(), att.editId, GFUI_DISABLE);
+                }
             }
         }
     }
@@ -321,34 +388,61 @@ void CarSetupMenu::loadSettings()
                 continue;
             }
 
-            attnum &att = items[page][index];
+            attribute &att = items[page][index];
+            std::string strIndex(std::to_string(static_cast<unsigned long long>(index)));
 
-            att.labelId = getDynamicControlId(std::string("Label" + std::to_string(static_cast<unsigned long long>(index))).c_str());
-            att.editId = getDynamicControlId(std::string("Edit" + std::to_string(static_cast<unsigned long long>(index))).c_str());
-            att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + std::to_string(static_cast<unsigned long long>(index))).c_str());
+            att.labelId = getDynamicControlId(std::string("Label" + strIndex).c_str());
+            att.editId = getDynamicControlId(std::string("Edit" + strIndex).c_str());
+            att.comboId = getDynamicControlId(std::string("Combo" + strIndex).c_str());
+            att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + strIndex).c_str());
+            att.type = GfParmGetStr(hparmItems, strSection.c_str(), "type", "");
             att.section = GfParmGetStr(hparmItems, strSection.c_str(), "section", "");
             att.param = GfParmGetStr(hparmItems, strSection.c_str(), "param", "");
-            att.units = GfParmGetStr(hparmItems, strSection.c_str(), "unit", "");
             att.label = GfParmGetStr(hparmItems, strSection.c_str(), "label", "");
-            att.precision = GfParmGetNum(hparmItems, strSection.c_str(), "precision", "", 0);
 
-            // Read values from car.
-            att.exists = GfParmGetNumWithLimits(hparmCar, att.section.c_str(), att.param.c_str(), att.units.c_str(),
-                                                &att.defaultValue, &att.minValue, &att.maxValue) == 0;
+            if (att.type == "edit")
+            {
+                att.units = GfParmGetStr(hparmItems, strSection.c_str(), "unit", "");
+                att.precision = GfParmGetNum(hparmItems, strSection.c_str(), "precision", "", 0);
 
-            // Read value from car setup if avaliable.
-            if (hparmCarSetup)
-                att.value = GfParmGetNum(hparmCarSetup, att.section.c_str(), att.param.c_str(),
-                                         att.units.c_str(), att.defaultValue);
-            else
-                att.value = att.defaultValue;
+                // Read values from car.
+                att.exists = GfParmGetNumWithLimits(hparmCar, att.section.c_str(), att.param.c_str(), att.units.c_str(),
+                                                    &att.defaultValue, &att.minValue, &att.maxValue) == 0;
 
-            GfLogDebug("section: \"%s\" param: \"%s\" units: \"%s\" label: \"%s\" page: %zu "
-                       "index: %zu precision: %d labelIs: %d editId: %d defaultLabelId: %d "
-                       "exists: %d min: %f default %f max: %f value: %f\n",
-                       att.section.c_str(), att.param.c_str(), att.units.c_str(), att.label.c_str(),
-                       page, index, att.precision, att.labelId, att.editId, att.defaultLabelId,
-                       att.exists, att.minValue, att.defaultValue, att.maxValue, att.value);
+                // Read value from car setup if avaliable.
+                if (hparmCarSetup)
+                    att.value = GfParmGetNum(hparmCarSetup, att.section.c_str(), att.param.c_str(),
+                                             att.units.c_str(), att.defaultValue);
+                else
+                    att.value = att.defaultValue;
+
+                GfLogDebug("section: \"%s\" param: \"%s\" units: \"%s\" label: \"%s\" page: %zu "
+                           "index: %zu precision: %d labelId: %d editId: %d defaultLabelId: %d "
+                           "exists: %d min: %f default %f max: %f value: %f\n",
+                           att.section.c_str(), att.param.c_str(), att.units.c_str(),
+                           att.label.c_str(), page, index, att.precision, att.labelId, att.editId,
+                           att.defaultLabelId, att.exists, att.minValue, att.defaultValue, att.maxValue, att.value);
+            }
+            else if (att.type == "combo")
+            {
+                att.defaultStrValue = GfParmGetStr(hparmCar, att.section.c_str(), att.param.c_str(), "");
+                att.exists = !att.defaultStrValue.empty();
+                att.in = GfParmGetStrIn(hparmCar, att.section.c_str(), att.param.c_str());
+
+                if (hparmCarSetup)
+                    att.strValue = GfParmGetStr(hparmCarSetup, att.section.c_str(), att.param.c_str(),
+                                                att.defaultStrValue.c_str());
+                else
+                    att.strValue = att.defaultStrValue;
+
+                GfLogDebug("section: \"%s\" param: \"%s\" label: \"%s\" page: %zu "
+                           "index: %zu labelId: %d comboId: %d defaultLabelId: %d "
+                           "exists: %d, in: %zu default: \"%s\" value: \"%s\"\n",
+                           att.section.c_str(), att.param.c_str(), att.label.c_str(),
+                           page, index, att.labelId, att.comboId, att.defaultLabelId,
+                           att.exists, att.in.size(), att.defaultStrValue.c_str(),
+                           att.strValue.c_str());
+            }
         }
 
         // Save the control id for all items.
@@ -356,14 +450,17 @@ void CarSetupMenu::loadSettings()
         {
             for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
             {
-                attnum &att = items[page][index];
+                attribute &att = items[page][index];
+                std::string strIndex(std::to_string(static_cast<unsigned long long>(index)));
 
                 if (!att.labelId)
-                    att.labelId = getDynamicControlId(std::string("Label" + std::to_string(static_cast<unsigned long long>(index))).c_str());
+                    att.labelId = getDynamicControlId(std::string("Label" + strIndex).c_str());
                 if (!att.editId)
-                    att.editId = getDynamicControlId(std::string("Edit" + std::to_string(static_cast<unsigned long long>(index))).c_str());
+                    att.editId = getDynamicControlId(std::string("Edit" + strIndex).c_str());
+                if (!att.comboId)
+                    att.comboId = getDynamicControlId(std::string("Combo" + strIndex).c_str());
                 if (!att.defaultLabelId)
-                    att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + std::to_string(static_cast<unsigned long long>(index))).c_str());
+                    att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + strIndex).c_str());
             }
         }
     }
@@ -414,12 +511,50 @@ void CarSetupMenu::storeSettings()
     {
         for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
         {
-            attnum &att = items[page][index];
+            attribute &att = items[page][index];
             // Only write items that exist and have been changed.
-            if (att.exists && (att.value != att.defaultValue))
+            if (att.exists)
             {
-                GfParmSetNum(hparmCarSetup, att.section.c_str(), att.param.c_str(), att.units.c_str(),
-                             att.value, att.minValue, att.maxValue);
+                if (att.type == "edit")
+                {
+                    if (att.value != att.defaultValue)
+                    {
+                        GfParmSetNum(hparmCarSetup, att.section.c_str(), att.param.c_str(),
+                                     att.units.c_str(), att.value, att.minValue, att.maxValue);
+                    }
+                    else
+                    {
+                        // Remove it if it is the same as default.
+                        if (GfParmExistsParam(hparmCarSetup, att.section.c_str(), att.param.c_str()))
+                        {
+                            // FIXME This crashes when the last section is deleted so set
+                            // the parameter to its default value.
+                            //GfParmRemove(hparmCarSetup, att.section.c_str(), att.param.c_str());
+                            GfParmSetNum(hparmCarSetup, att.section.c_str(), att.param.c_str(),
+                                         att.units.c_str(), att.value, att.minValue, att.maxValue);
+                        }
+                    }
+                }
+                else if (att.type == "combo")
+                {
+                    if (att.strValue != att.defaultStrValue)
+                    {
+                        GfParmSetStrAndIn(hparmCarSetup, att.section.c_str(), att.param.c_str(),
+                                          att.strValue.c_str(), att.in);
+                    }
+                    else
+                    {
+                        // Remove it if it is the same as default.
+                        if (GfParmExistsParam(hparmCarSetup, att.section.c_str(), att.param.c_str()))
+                        {
+                            // FIXME This crashes when the last section is deleted so set
+                            // the parameter to its default value.
+                            //GfParmRemove(hparmCarSetup, att.section.c_str(), att.param.c_str());
+                            GfParmSetStrAndIn(hparmCarSetup, att.section.c_str(), att.param.c_str(),
+                                              att.strValue.c_str(), att.in);
+                        }
+                    }
+                }
             }
         }
     }
@@ -456,9 +591,11 @@ bool CarSetupMenu::initialize(void *pMenu, const GfRace *pRace, const GfDriver *
     // Create items.
     for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
     {
-        createLabelControl(std::string("Label" + std::to_string(static_cast<unsigned long long>(index))).c_str());
-        createEditControl(std::string("Edit" + std::to_string(static_cast<unsigned long long>(index))).c_str(), this, NULL, NULL);
-        createLabelControl(std::string("DefaultLabel" + std::to_string(static_cast<unsigned long long>(index))).c_str());
+        std::string strIndex(std::to_string(static_cast<unsigned long long>(index)));
+        createLabelControl(std::string("Label" + strIndex).c_str());
+        createEditControl(std::string("Edit" + strIndex).c_str(), this, NULL, NULL);
+        createComboboxControl(std::string("Combo" + strIndex).c_str(), &comboCallbackData[index], onComboCallback);
+        createLabelControl(std::string("DefaultLabel" + strIndex).c_str());
     }
 
     // Create buttons.

@@ -429,11 +429,14 @@ TGF_API void GfParmSetDTD (void *parmHandle, char *dtd, char*header);
 /* get string parameter value */
 TGF_API const char *GfParmGetStr(void *handle, const char *path, const char *key, const char *deflt);
 TGF_API char *GfParmGetStrNC(void *handle, const char *path, const char *key, char *deflt);
+TGF_API std::vector<std::string> GfParmGetStrIn(void *handle, const char *path, const char *key);
 /* get string parameter value */
 TGF_API const char *GfParmGetCurStr(void *handle, const char *path, const char *key, const char *deflt);
 TGF_API char *GfParmGetCurStrNC(void *handle, const char *path, const char *key, char *deflt);
 /* set string parameter value */
 TGF_API int GfParmSetStr(void *handle, const char *path, const char *key, const char *val);
+TGF_API int GfParmSetStrIn(void *handle, const char *path, const char *key, const std::vector<std::string> &in);
+TGF_API int GfParmSetStrAndIn(void *handle, const char *path, const char *key, const char *val, const std::vector<std::string> &in);
 /* set string parameter value */
 TGF_API int GfParmSetCurStr(void *handle, const char *path, const char *key, const char *val);
 
@@ -491,6 +494,7 @@ TGF_API void GfParmRemove(void *handle, const char *path, const char *key);
 TGF_API int GfParmRemoveSection (void *handle, const char *path);
 TGF_API int GfParmExistsSection(void *handle, const char *path);
 TGF_API  std::vector<std::string> GfParmListGetSectionNamesList(void *handle);
+TGF_API int GfParmExistsParam(void *handle, const char *path, const char *key);
 TGF_API int GfParmGetEltNb(void *handle, const char *path);
 TGF_API int GfParmListSeekFirst(void *handle, const char *path);
 TGF_API int GfParmListSeekNext(void *handle, const char *path);
