@@ -176,8 +176,6 @@ rmForceFeedbackConfigHookActivate(void * /* dummy */)
 {
     void *prHandle;
     char buf[100];
-    const char *str;
-    tGearChangeMode gearChangeMode;
 
     sprintf(buf, "%s%s", GfLocalDir(), HM_PREF_FILE);
     prHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
