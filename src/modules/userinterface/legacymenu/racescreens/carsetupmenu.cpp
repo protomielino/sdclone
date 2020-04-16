@@ -504,7 +504,12 @@ void CarSetupMenu::storeSettings()
         GfLogInfo("Created car setup file: %s\n", ossCarSetupFileName.str().c_str());
     }
     else
+    {
+        // Remove existing content.
+        GfParmClean(hparmCarSetup);
+
         GfLogInfo("Opened car setup file: %s\n", ossCarSetupFileName.str().c_str());
+    }
 
     // Store all items.
     for (size_t page = 0; page < items.size(); ++page)
@@ -522,18 +527,6 @@ void CarSetupMenu::storeSettings()
                         GfParmSetNum(hparmCarSetup, att.section.c_str(), att.param.c_str(),
                                      att.units.c_str(), att.value, att.minValue, att.maxValue);
                     }
-                    else
-                    {
-                        // Remove it if it is the same as default.
-                        if (GfParmExistsParam(hparmCarSetup, att.section.c_str(), att.param.c_str()))
-                        {
-                            // FIXME This crashes when the last section is deleted so set
-                            // the parameter to its default value.
-                            //GfParmRemove(hparmCarSetup, att.section.c_str(), att.param.c_str());
-                            GfParmSetNum(hparmCarSetup, att.section.c_str(), att.param.c_str(),
-                                         att.units.c_str(), att.value, att.minValue, att.maxValue);
-                        }
-                    }
                 }
                 else if (att.type == "combo")
                 {
@@ -541,18 +534,6 @@ void CarSetupMenu::storeSettings()
                     {
                         GfParmSetStrAndIn(hparmCarSetup, att.section.c_str(), att.param.c_str(),
                                           att.strValue.c_str(), att.in);
-                    }
-                    else
-                    {
-                        // Remove it if it is the same as default.
-                        if (GfParmExistsParam(hparmCarSetup, att.section.c_str(), att.param.c_str()))
-                        {
-                            // FIXME This crashes when the last section is deleted so set
-                            // the parameter to its default value.
-                            //GfParmRemove(hparmCarSetup, att.section.c_str(), att.param.c_str());
-                            GfParmSetStrAndIn(hparmCarSetup, att.section.c_str(), att.param.c_str(),
-                                              att.strValue.c_str(), att.in);
-                        }
                     }
                 }
             }
