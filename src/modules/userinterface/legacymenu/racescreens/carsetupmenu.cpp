@@ -463,6 +463,9 @@ void CarSetupMenu::loadSettings()
                     att.defaultLabelId = getDynamicControlId(std::string("DefaultLabel" + strIndex).c_str());
             }
         }
+
+        // Close the XML file of the menu items.
+        GfParmReleaseHandle(hparmItems);
     }
 
     // Close the XML file of the car.
