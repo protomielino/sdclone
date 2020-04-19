@@ -174,7 +174,7 @@ bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDrive
     m_eClientAccepted = PROCESSINGCLIENT;
     SendDriverInfoPacket(pDriver);
 
-    //Wait for server to accept or reject 
+    //Wait for server to accept or reject
     // TODO don't wait forever
     GfLogInfo ("Sent local driver info to the network server : waiting ...\n");
     while(m_eClientAccepted == PROCESSINGCLIENT)
@@ -215,14 +215,14 @@ void NetClient::SetDriverReady(bool bReady)
         msg.pack_int(bReady);
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("SetDriverReady: packed buffer error\n");
     }
     GfLogTrace("SetDriverReady: packed data length=%d\n", msg.length());
 
-    ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
-            msg.length(), 
+    ENetPacket *pPacket = enet_packet_create (msg.buffer(),
+            msg.length(),
             ENET_PACKET_FLAG_RELIABLE);
 
     if (enet_peer_send (m_pServer, RELIABLECHANNEL, pPacket)==0)
@@ -273,15 +273,15 @@ bool NetClient::SendDriverInfoPacket(NetDriver *pDriver)
         msg.pack_int(pDriver->client);
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("SendDriverInfoPacket: packed buffer error\n");
     }
     GfLogTrace("SendDriverInfoPacket: packed data length=%d\n",
             msg.length());
 
-    ENetPacket * pPacket = enet_packet_create (msg.buffer(), 
-            msg.length(), 
+    ENetPacket * pPacket = enet_packet_create (msg.buffer(),
+            msg.length(),
             ENET_PACKET_FLAG_RELIABLE);
 
     if (enet_peer_send (m_pServer, RELIABLECHANNEL, pPacket)==0)
@@ -304,15 +304,15 @@ void NetClient::SendReadyToStartPacket()
         msg.pack_stdstring(strDName);
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("SendReadyToStartPacket: packed buffer error\n");
     }
     GfLogTrace("SendReadyToStartPacket: packed data length=%d\n",
             msg.length());
 
-    ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
-            msg.length(), 
+    ENetPacket *pPacket = enet_packet_create (msg.buffer(),
+            msg.length(),
             ENET_PACKET_FLAG_RELIABLE);
 
     if (enet_peer_send (m_pServer, RELIABLECHANNEL, pPacket))
@@ -322,7 +322,7 @@ void NetClient::SendReadyToStartPacket()
 
 void NetClient::SendServerTimeRequest()
 {
-    m_packetsendtime = GfTimeClock(); 
+    m_packetsendtime = GfTimeClock();
 
     PackedBuffer msg;
 
@@ -331,7 +331,7 @@ void NetClient::SendServerTimeRequest()
         msg.pack_ubyte(SERVER_TIME_REQUEST_PACKET);
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("SendServerTimeRequest: packed buffer error\n");
     }
@@ -339,8 +339,8 @@ void NetClient::SendServerTimeRequest()
             msg.length());
 
 
-    ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
-            msg.length(), 
+    ENetPacket *pPacket = enet_packet_create (msg.buffer(),
+            msg.length(),
             ENET_PACKET_FLAG_UNSEQUENCED);
 
     if (enet_peer_send (m_pServer, UNRELIABLECHANNEL, pPacket))
@@ -373,7 +373,7 @@ void NetClient::ReadStartTimePacket(ENetPacket *pPacket)
         m_racestarttime = msg.unpack_double();
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("ReadStartTimePacket: packed buffer error\n");
     }
@@ -413,7 +413,7 @@ bool NetClient::listenHost(ENetHost * pHost)
             char hostName[256];
             enet_address_get_host_ip (&event.peer->address,hostName,256);
 
-            GfLogTrace ("A new client connected from %s\n",hostName); 
+            GfLogTrace ("A new client connected from %s\n",hostName);
 
             /* Store any relevant client information here. */
             event.peer -> data = (void*)"Client information";
@@ -426,7 +426,7 @@ bool NetClient::listenHost(ENetHost * pHost)
             //        event.packet -> data,
             //        event.peer -> data,
             //        event.channelID);
-            ReadPacket(event);        
+            ReadPacket(event);
             bHasPacket = true;
             break;
 
@@ -570,7 +570,7 @@ void NetClient::ReadAllDriverReadyPacket(ENetPacket *pPacket)
         SetRaceInfoChanged(true);
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("ReadAllDriverReadyPacket: packed buffer error\n");
     }
@@ -593,7 +593,7 @@ void NetClient::ReadFinishTimePacket(ENetPacket *pPacket)
         UnlockNetworkData();
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("ReadFinishTimePacket: packed buffer error\n");
     }
@@ -619,7 +619,7 @@ void NetClient::ReadTimePacket(ENetPacket *pPacket)
         time = msg.unpack_double();
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("ReadTimePacket: packed buffer error\n");
     }
@@ -654,7 +654,7 @@ void NetClient::ReadFilePacket(ENetPacket *pPacket)
         msg.unpack_string(filedata, filesize);
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("ReadFilePacket: packed buffer error\n");
     }
@@ -678,8 +678,8 @@ void NetClient::ReadFilePacket(ENetPacket *pPacket)
 
 void NetClient::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
 {
-    ENetPacket * pHostPacket = enet_packet_create (pPacket->data, 
-            pPacket->dataLength, 
+    ENetPacket * pHostPacket = enet_packet_create (pPacket->data,
+            pPacket->dataLength,
             pPacket->flags);
 
     //Send to server

@@ -19,16 +19,16 @@ version              : $Id$
 
 /*
    Overview
-   The network file is used for networked game play. 
+   The network file is used for networked game play.
    The server computer handles all of the physics and robot AI.
    The server sends car control (steering, brake, throttle) frequently in unreliable packets.
    The client uses these values to figure out car position
-   and does its own physics calculation until the server sends the position information.  
+   and does its own physics calculation until the server sends the position information.
 
-   Every CAR_CONTROL_UPDATE seconds, the server sends out detailed position 
+   Every CAR_CONTROL_UPDATE seconds, the server sends out detailed position
    information in a reliable ENetPacket.  All cars position information is updated
    based on the server values.
- */ 
+ */
 
 // Warning this code is VERY rough and unfinished
 
@@ -64,12 +64,12 @@ NetMutexData::~NetMutexData()
     SDL_DestroyMutex ( m_networkMutex );
 }
 
-void NetMutexData::Lock() 
+void NetMutexData::Lock()
 {
     SDL_mutexP ( m_networkMutex );
 }
 
-void NetMutexData::Unlock() 
+void NetMutexData::Unlock()
 {
     SDL_mutexV ( m_networkMutex );
 }
@@ -99,12 +99,12 @@ NetServerMutexData::~NetServerMutexData()
     SDL_DestroyMutex (m_networkMutex );
 }
 
-void NetServerMutexData::Lock() 
+void NetServerMutexData::Lock()
 {
     SDL_mutexP ( m_networkMutex );
 }
 
-void NetServerMutexData::Unlock() 
+void NetServerMutexData::Unlock()
 {
     SDL_mutexV ( m_networkMutex );
 }
@@ -137,7 +137,7 @@ void NetNetwork::RaceInit(tSituation *s)
 
 
     m_mapRanks.clear();
-    for (int i = 0; i < s->_ncars; i++) 
+    for (int i = 0; i < s->_ncars; i++)
     {
         tCarElt *pCar = s->cars[i];
         m_mapRanks[i] = pCar->info.startRank;
@@ -163,7 +163,7 @@ void NetNetwork::RaceDone()
 }
 
 
-int NetNetwork::GetDriverStartRank(int idx) 
+int NetNetwork::GetDriverStartRank(int idx)
 {
     std::map<int,int>::iterator p;
     p = m_mapRanks.find(idx);
@@ -222,7 +222,7 @@ int NetNetwork::GetCarIndex(int startRank,tSituation *s)
     return -1;
 }
 
-bool NetNetwork::IsServerMode() 
+bool NetNetwork::IsServerMode()
 {
     if (m_strClass == (char*)"server")
         return true;
@@ -247,7 +247,7 @@ void NetNetwork::SetRaceInfoChanged(bool bStatus)
         GfLogDebug("raceinfo false\n");
 }
 
-bool NetNetwork::IsClientMode() 
+bool NetNetwork::IsClientMode()
 {
     if (m_strClass == "client")
         return true;
@@ -278,7 +278,7 @@ int NetNetwork::GetNetworkHumanIdx()
         {
             idx = i;
             break;
-        }	
+        }
     }
     while(pName);
 
@@ -325,7 +325,7 @@ void NetNetwork::SetCarInfo(const char *pszName)
 {
 }
 
-bool NetNetwork::FinishRace(double time) 
+bool NetNetwork::FinishRace(double time)
 {
     NetMutexData *pNData = LockNetworkData();
     double finishTime = pNData->m_finishTime;
@@ -338,10 +338,10 @@ bool NetNetwork::FinishRace(double time)
         return false;
 
     GfLogInfo("Finishing network race\n");
-    return true;	
+    return true;
 }
 
-NetMutexData * NetNetwork::LockNetworkData() 
+NetMutexData * NetNetwork::LockNetworkData()
 {
     m_NetworkData.Lock();
     return & m_NetworkData;
@@ -356,7 +356,7 @@ void NetNetwork::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
 {
 }
 
-// Get the index of the local network-human driver in the race driver list 
+// Get the index of the local network-human driver in the race driver list
 int	NetNetwork::GetDriverIdx()
 {
     int nhidx = GetNetworkHumanIdx();
@@ -448,15 +448,15 @@ void NetNetwork::SendLapStatusPacket(tCarElt *pCar)
         msg.pack_int(pCar->info.startRank);
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("SendLapStatusPacket: packed buffer error\n");
     }
-    GfLogTrace("SendLapStatusPacket: packed data length=%d\n",
-            msg.length());
 
-    ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
-            msg.length(), 
+    GfLogTrace("SendLapStatusPacket: packed data length=%d\n", msg.length());
+
+    ENetPacket *pPacket = enet_packet_create (msg.buffer(),
+            msg.length(),
             ENET_PACKET_FLAG_RELIABLE);
 
     BroadcastPacket(pPacket,RELIABLECHANNEL);
@@ -485,7 +485,7 @@ void NetNetwork::SendCarStatusPacket(tSituation *s,bool bForce)
 
 
     //Pack controls values to reduce data size of packet
-    for (int i = 0; i < s->_ncars; i++) 
+    for (int i = 0; i < s->_ncars; i++)
     {
         tCarElt *pCar = s->cars[i];
         //Only transmit local drivers to other clients
@@ -521,15 +521,15 @@ void NetNetwork::SendCarStatusPacket(tSituation *s,bool bForce)
         }
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("SendCarStatusPacket: packed buffer error\n");
     }
-    GfLogTrace("SendCarStatusPacket: packed data length=%d\n",
-            msg.length());
 
-    ENetPacket * pPacket = enet_packet_create (msg.buffer(), 
-            msg.length(), 
+    GfLogTrace("SendCarStatusPacket: packed data length=%d\n", msg.length());
+
+    ENetPacket * pPacket = enet_packet_create (msg.buffer(),
+            msg.length(),
             ENET_PACKET_FLAG_RELIABLE);
 
     BroadcastPacket(pPacket,RELIABLECHANNEL);
@@ -559,7 +559,7 @@ void NetNetwork::SendCarControlsPacket(tSituation *s)
     double time = 0.0;
 
     //Pack controls values to reduce data size of packet
-    for (int i = 0; i < s->raceInfo.ncars; i++) 
+    for (int i = 0; i < s->raceInfo.ncars; i++)
     {
         tCarElt *pCar = s->cars[i];
         //Only transmit local drivers to other clients
@@ -614,15 +614,15 @@ void NetNetwork::SendCarControlsPacket(tSituation *s)
         }
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("SendCarControlsPacket: packed buffer error\n");
     }
-    GfLogTrace("SendCarControlsPacket: packed data length=%d\n",
-            msg.length());
 
-    ENetPacket * pPacket = enet_packet_create (msg.buffer(), 
-            msg.length(), 
+    GfLogTrace("SendCarControlsPacket: packed data length=%d\n", msg.length());
+
+    ENetPacket * pPacket = enet_packet_create (msg.buffer(),
+            msg.length(),
             ENET_PACKET_FLAG_UNSEQUENCED);
 
     BroadcastPacket(pPacket,UNRELIABLECHANNEL);
@@ -646,7 +646,7 @@ void NetNetwork::ReadLapStatusPacket(ENetPacket *pPacket)
         lstatus.startRank = msg.unpack_int();
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("ReadLapStatusPacket: packed buffer error\n");
     }
@@ -726,7 +726,7 @@ void NetNetwork::ReadCarStatusPacket(ENetPacket *pPacket)
         UnlockNetworkData();
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("ReadCarStatusPacket: packed buffer error\n");
     }
@@ -765,7 +765,7 @@ void NetNetwork::ReadCarControlsPacket(ENetPacket *pPacket)
         //Car conrols values (steering,brake,gas,and etc
         for (int i=0;i<iNumCars;i++)
         {
-            CarControlsData ctrl;	
+            CarControlsData ctrl;
 
             ctrl.gear = msg.unpack_int();
             ctrl.brake = msg.unpack_float();
@@ -822,7 +822,7 @@ void NetNetwork::ReadCarControlsPacket(ENetPacket *pPacket)
         UnlockNetworkData();
     }
 //    catch (PackedBufferException &e)
-    catch (PackedBufferException)
+    catch (const PackedBufferException&)
     {
         GfLogFatal("ReadCarControlsPacket: packed buffer error\n");
     }
