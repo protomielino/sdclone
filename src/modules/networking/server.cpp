@@ -20,6 +20,7 @@ version              : $Id$
 #include <cstdio>
 #include <SDL.h>
 
+#include <portability.h>
 #include "network.h"
 #include "robotxml.h"
 #include "pack.h"
