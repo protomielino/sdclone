@@ -169,10 +169,14 @@ ENDIF(MSVC)
 ADD_CUSTOM_TARGET(${_UNINST_TGT_NAME} "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" )
 
 IF(OPTION_PACKAGING)
+   INCLUDE(cmake/packagemaker.cmake)
    IF(MSVC)
       INCLUDE(cmake/packagemaker-nsis.cmake)
    ENDIF(MSVC)
+   IF(APPLE)
+      INCLUDE(cmake/packagemaker-dmg.cmake)
+   ENDIF(APPLE)
 ELSE(OPTION_PACKAGING)
-# Configure CPack.
-   INCLUDE(cmake/packagemaker.cmake)
+   # Configure CPack.
+   INCLUDE(CPack)
 ENDIF(OPTION_PACKAGING)
