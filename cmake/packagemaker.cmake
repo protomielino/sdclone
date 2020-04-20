@@ -160,20 +160,44 @@ IF(APPLE)
     SET(CPACK_INSTALLED_DIRECTORIES "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX};${CMAKE_INSTALL_PREFIX}")
     SET(CPACK_INSTALL_CMAKE_PROJECTS "")
     SET(CPACK_DMG_DS_STORE "${CMAKE_SOURCE_DIR}/packaging/OSX/DS_Store-full")
+    SET(CPACK_DMG_VOLUME_NAME "Speed Dreams ${VERSION}")
+
+    # Configure the base package scripts...
+     # TODO use ${CPACK_PACKAGE_NAME} ${VERSION}" ??
+    SET(DMG_VOL_NAME "Speed Dreams ${VERSION} base")
+    SET(DMG_FINDER_SCRIPT "findersettingsbase.scpt")
+
+    SET(READ_WRITE_DMG_NAME "${INTERNAL_NAME}-${VERSION}-base-r${SVN_REV}-${CPACK_SYSTEM_NAME}-rw.dmg")
+    SET(READ_ONLY_DMG_NAME "${INTERNAL_NAME}-${VERSION}-base-r${SVN_REV}-${CPACK_SYSTEM_NAME}.dmg")
+
+    string(REPLACE ".app" "-base.app" SD_BASE_BUNDLE_NAME "${CMAKE_INSTALL_PREFIX}")
+    message(STATUS "SD_BASE_BUNDLE_NAME = ${SD_BASE_BUNDLE_NAME}")
+    # TODO make ${SD_BUNDLE_NAME} a CACHE variable and use it everywhere instead of ${CMAKE_INSTALL_PREFIX}??
+    SET(SD_BUNDLE_NAME "${SD_BASE_BUNDLE_NAME}")
+
+    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/packagedmg.cmake.in" 
+                   "${CMAKE_CURRENT_BINARY_DIR}/packagebasedmg.cmake" @ONLY)
+
+    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/findersettings.scpt.in" 
+                   "${CMAKE_CURRENT_BINARY_DIR}/${DMG_FINDER_SCRIPT}" @ONLY)
     
+
+    # Now configure the full package scripts...
     # TODO use ${CPACK_PACKAGE_NAME} ${VERSION}" ??
     SET(DMG_VOL_NAME "Speed Dreams ${VERSION}")
-    SET(CPACK_DMG_VOLUME_NAME "${DMG_VOL_NAME}")
+    SET(DMG_FINDER_SCRIPT "findersettingsfull.scpt")
 
     SET(READ_WRITE_DMG_NAME "${INTERNAL_NAME}-${VERSION}-r${SVN_REV}-${CPACK_SYSTEM_NAME}-rw.dmg")
     SET(READ_ONLY_DMG_NAME "${INTERNAL_NAME}-${VERSION}-r${SVN_REV}-${CPACK_SYSTEM_NAME}.dmg")
+
+    # TODO make ${SD_BUNDLE_NAME} a CACHE variable and use it everywhere instead of ${CMAKE_INSTALL_PREFIX}??
     SET(SD_BUNDLE_NAME "${CMAKE_INSTALL_PREFIX}")
 
-    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/packagefulldmg.cmake.in" 
+    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/packagedmg.cmake.in" 
                    "${CMAKE_CURRENT_BINARY_DIR}/packagefulldmg.cmake" @ONLY)
 
     CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/findersettings.scpt.in" 
-                   "${CMAKE_CURRENT_BINARY_DIR}/findersettings.scpt" @ONLY)
+                   "${CMAKE_CURRENT_BINARY_DIR}/${DMG_FINDER_SCRIPT}" @ONLY)
 
 ENDIF(APPLE)
 

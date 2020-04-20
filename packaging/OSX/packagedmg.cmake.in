@@ -42,7 +42,7 @@ message(STATUS "Result of copying the @SD_BUNDLE_NAME@ folder = ${_result}")
 
 # run the generated 'Finder' script
 message(STATUS "Running the generated 'Finder' script...")
-execute_process(COMMAND osascript findersettings.scpt
+execute_process(COMMAND osascript @DMG_FINDER_SCRIPT@
                RESULT_VARIABLE _result
                COMMAND_ECHO STDOUT )
 message(STATUS "Result of running the generated 'Finder' script = ${_result}")
