@@ -96,7 +96,7 @@ private:
 
     void onActivate();
     void onAccept();
-    void onCancel();
+    void onCancel() const;
     void onReset();
     void onPrevious();
     void onNext();

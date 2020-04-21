@@ -103,13 +103,6 @@ void CarSetupMenu::onActivate()
 
     // Initialize GUI from loaded values.
     updateControls();
-
-    // Initialize combo callback user data.
-    for (size_t i = 0; i < ITEMS_PER_PAGE; ++i)
-    {
-        comboCallbackData[i].menu = this;
-        comboCallbackData[i].index = i;
-    }
 }
 
 void CarSetupMenu::onAccept()
@@ -124,7 +117,7 @@ void CarSetupMenu::onAccept()
     GfuiScreenActivate(getPreviousMenuHandle());
 }
 
-void CarSetupMenu::onCancel()
+void CarSetupMenu::onCancel() const
 {
     // Back to previous screen.
     GfuiScreenActivate(getPreviousMenuHandle());
@@ -300,14 +293,14 @@ void CarSetupMenu::updateControls()
                 else if (att.type == "combo")
                 {
                     GfuiComboboxClear(getMenuHandle(), att.comboId);
-                    size_t index = 0;
+                    size_t selected = 0;
                     for (size_t i = 0; i < att.in.size(); ++i)
                     {
                         GfuiComboboxAddText(getMenuHandle(), att.comboId, att.in[i].c_str()); 
                         if (att.in[i] == att.strValue)
-                            index = i;
+                            selected = i;
                     }
-                    GfuiComboboxSetSelectedIndex(getMenuHandle(), att.comboId, index);
+                    GfuiComboboxSetSelectedIndex(getMenuHandle(), att.comboId, selected);
                 }
             }
             else
@@ -552,15 +545,23 @@ void CarSetupMenu::storeSettings()
 
 CarSetupMenu::CarSetupMenu()
 : GfuiMenuScreen("carsetupmenu.xml")
+, _pRace(nullptr)
+, _pDriver(nullptr)
 , currentPage(0)
 {
+    // Initialize combo callback user data.
+    for (size_t i = 0; i < ITEMS_PER_PAGE; ++i)
+    {
+        comboCallbackData[i].menu = this;
+        comboCallbackData[i].index = i;
+    }
 }
 
-bool CarSetupMenu::initialize(void *pMenu, const GfRace *pRace, const GfDriver *pDriver)
+bool CarSetupMenu::initialize(void *pPrevMenu, const GfRace *pRace, const GfDriver *pDriver)
 {
     _pRace = pRace;
     _pDriver = pDriver;
-    setPreviousMenuHandle(pMenu);
+    setPreviousMenuHandle(pPrevMenu);
 
     GfLogDebug("Initializing Car Setup menu: \"%s\"\n", pDriver->getCar()->getName().c_str());
 
