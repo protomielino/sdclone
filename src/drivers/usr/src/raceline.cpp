@@ -2151,7 +2151,7 @@ double LRaceLine::getLookAhead(int rl, double leftMargin, double rightMargin, bo
 
     if ((rl == LINE_LEFT && tRInverse[rl][Next] < 0.0) || (rl == LINE_RIGHT && tRInverse[rl][Next] > 0.0))
         factor += fabs(tRInverse[rl][Next]) * 15;
-    else if ((rl == LINE_LEFT && tRInverse[rl][Next] > 0.0 || (rl == LINE_RIGHT && tRInverse[rl][Next] < 0.0)))
+    else if ((rl == LINE_LEFT && tRInverse[rl][Next] > 0.0) || (rl == LINE_RIGHT && tRInverse[rl][Next] < 0.0))
         factor -= MIN(0.5, fabs(tRInverse[rl][Next]) * 15);
 
     if (driver->currentCollision && car->_accel_x < 0.0)

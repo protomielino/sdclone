@@ -826,8 +826,8 @@ void	Path::ModifySection( int from, int len, double delta, int important, double
         offset /= fabs(dot);
 
         double	offs = l1.offs + offset;
-        if( offset < 0 && offs < -l1.Wl() + lBuf ||
-            offset > 0 && offs > l1.Wr() - rBuf )
+        if ((offset < 0 && offs < -l1.Wl() + lBuf) ||
+            (offset > 0 && offs > l1.Wr() - rBuf))
         {
             if( i < (important - from + NSEG) % NSEG)
                 newFrom = j;
@@ -1173,9 +1173,9 @@ bool	Path::LoadPath( const char* pDataFile )
     }
 
     int		version = -1;
-    if( fgets(buf, sizeof(buf), pFile) == NULL ||
+    if (fgets(buf, sizeof(buf), pFile) == NULL ||
         sscanf(buf, "%d", &version) != 1 ||
-        version != 0 && version != 1 && version != 2 )
+        (version != 0 && version != 1 && version != 2))
     {
 //		LogSHADOW.debug( "Failed to open data file -- version\n" );
         fclose( pFile );

@@ -249,10 +249,10 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
             double	segDist = m_pSegs[i].segDist;
             double	t = (segDist - pseg->lgfromstart) / pseg->length;
 
-            bool	inPitMain  = (pitStart < pitEnd  && pitStart <= i && i <= pitEnd  ||
-                                  pitStart > pitEnd  && (i <= pitEnd  || i >= pitStart));
-            bool	inPitTotal = (pitEntry < pitExit && pitEntry <= i && i <= pitExit ||
-                                  pitEntry > pitExit && (i <= pitExit || i >= pitEntry));
+            bool	inPitMain  = ((pitStart < pitEnd  && pitStart <= i && i <= pitEnd)  ||
+                                  (pitStart > pitEnd  && (i <= pitEnd  || i >= pitStart)));
+            bool	inPitTotal = ((pitEntry < pitExit && pitEntry <= i && i <= pitExit) ||
+                                  (pitEntry > pitExit && (i <= pitExit || i >= pitEntry)));
 
             const double	MIN_MU = pseg->surface->kFriction * 0.8;
             const double	MAX_ROUGH = MX(0.005, pseg->surface->kRoughness * 1.2);
@@ -285,8 +285,8 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
 
                             // never go up a curb on the outside of a corner that has lower friction
                             // than the main track.
-                            if( (s == TR_SIDE_LFT && pseg->type == TR_RGT ||
-                                 s == TR_SIDE_RGT && pseg->type == TR_LFT) &&
+                            if( ((s == TR_SIDE_LFT && pseg->type == TR_RGT) ||
+                                 (s == TR_SIDE_RGT && pseg->type == TR_LFT)) &&
                                 pSide->surface->kFriction  < pseg->surface->kFriction )
                             {
                                 extra_w = MN(extra_w, w_so_far);
@@ -308,8 +308,8 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                             extra_w = MN(extra_w, w_so_far);
                         }
 
-                        bool	inner = s == TR_SIDE_LFT && pseg->type == TR_LFT ||
-                                        s == TR_SIDE_RGT && pseg->type == TR_RGT;
+                        bool	inner = (s == TR_SIDE_LFT && pseg->type == TR_LFT) ||
+                                        (s == TR_SIDE_RGT && pseg->type == TR_RGT);
                         bool    pitEntryOrExit = pitSide == s && inPitTotal && !inPitMain;
                         if( inner && !pitEntryOrExit )
                         {
@@ -325,9 +325,9 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                             extra_w = MN(extra_w, w_so_far);
                         }
 
-                        if( (s == TR_SIDE_LFT && pseg->type == TR_RGT ||
-                             s == TR_SIDE_RGT && pseg->type == TR_LFT) &&
-                            pSide->surface->kFriction  < pseg->surface->kFriction )
+                        if (((s == TR_SIDE_LFT && pseg->type == TR_RGT) ||
+                             (s == TR_SIDE_RGT && pseg->type == TR_LFT)) &&
+                            pSide->surface->kFriction < pseg->surface->kFriction)
                         {
                             extra_w = MN(extra_w, w_so_far);
                         }
@@ -348,8 +348,8 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
 
                 extra_w = MN(extra_w, w_so_far - WALL_MARGIN);	// there's always a wall/fence at the edge of the track.
 
-                bool	inner = s == TR_SIDE_LFT && pseg->type == TR_LFT ||
-                                s == TR_SIDE_RGT && pseg->type == TR_RGT;
+                bool	inner = (s == TR_SIDE_LFT && pseg->type == TR_LFT) ||
+                                (s == TR_SIDE_RGT && pseg->type == TR_RGT);
                 if( inner )
                 {
                     int innerId = m_pSegs[i].bendId;

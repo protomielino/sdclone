@@ -240,8 +240,8 @@ void Stuck::executeReorient( const MyTrack& track, const tSituation* s, tCarElt*
 
     double front_speed = (w1_speed + w2_speed) * 0.5;
 
-    if( gear > 0 && (w3_speed > front_speed + 2 || w4_speed > front_speed + 2) ||
-        gear < 0 && (w3_speed < front_speed - 2 || w4_speed < front_speed - 2) )
+    if ((gear > 0 && (w3_speed > front_speed + 2 || w4_speed > front_speed + 2)) ||
+        (gear < 0 && (w3_speed < front_speed - 2 || w4_speed < front_speed - 2)))
         acc = 0.1;
 
     me->ctrl.steer		= steer;
@@ -1230,7 +1230,7 @@ void	Stuck::getUnstuck( const MyTrack& track, tCarElt* me, const tSituation* s )
     int   gear = fw ? 1 : -1;
 //	me->ctrl.accelCmd	= MN(0.25f, (8 - fabs(spd)) * 0.05);
     me->ctrl.accelCmd	= MN(0.25f, (10 - fabs(spd)) * 0.25);
-    me->ctrl.brakeCmd	= fw && spd < -0.1 || !fw && spd > 0.1 ? 0.5 : 0;
+    me->ctrl.brakeCmd	= (fw && spd < -0.1) || (!fw && spd > 0.1 ? 0.5 : 0);
     me->ctrl.clutchCmd	= 0;//gear == me->ctrl.gear ? 0.0f : 0.5f;
     me->ctrl.gear		= gear;
     me->ctrl.steer		= (spd > 0 ? deltaAng : -deltaAng) * 2 / me->info.steerLock;

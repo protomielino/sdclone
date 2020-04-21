@@ -1441,7 +1441,7 @@ void	Driver::SpeedControl6(
         double&	brk,
         bool	traffic )
 {
-    if( spd0 > targetSpd || spd0 + 0.5 > targetSpd && targetAcc < -5 )
+    if (spd0 > targetSpd || (spd0 + 0.5 > targetSpd && targetAcc < -5))
     {
         double ta = MN(m_brk.adjAccForSpdError(targetAcc, spd0, targetSpd), 0);
 
@@ -3045,9 +3045,9 @@ void	Driver::AvoidOtherCars(
             double	catTime = fabs(k) > maxSpdK ? 0.5 :	2.5;
             double	cacTime = fabs(k) > maxSpdK ? 0.5 : 2.5;
             bool	catching =
-                    oi.catchTime    < colTime && fabs(oi.catchY)    < 5 && oi.GotFlags(Opponent::F_COLLIDE)  ||
-                    oi.catchTime    < catTime && fabs(oi.catchY)    < 5 && oi.GotFlags(Opponent::F_CATCHING) ||
-                    oi.catchAccTime < cacTime && fabs(oi.catchAccY) < 5 && oi.GotFlags(Opponent::F_CATCHING_ACC);
+                    (oi.catchTime    < colTime && fabs(oi.catchY)    < 5 && oi.GotFlags(Opponent::F_COLLIDE))  ||
+                    (oi.catchTime    < catTime && fabs(oi.catchY)    < 5 && oi.GotFlags(Opponent::F_CATCHING)) ||
+                    (oi.catchAccTime < cacTime && fabs(oi.catchAccY) < 5 && oi.GotFlags(Opponent::F_CATCHING_ACC));
             if(( !ignoreTeamMate && oi.avoidLatchTime > 0 )|| catching || oi.GotFlags(Opponent::F_DANGEROUS))
             {
                 LogSHADOW.debug( "%.3f catch %d (dgr %d)  catch[%d%d t %.3f y %.4g]  acc[%d t %.3f y %.4g]\n",
@@ -3177,8 +3177,8 @@ void	Driver::AvoidOtherCars(
 
     double	targetS = 1 - target.y;
 
-    if( m_avoidS != 1 && m_attractor == 0 ||
-            m_avoidS != targetS && m_attractor != 0 )
+    if ((m_avoidS != 1       && m_attractor == 0) ||
+        (m_avoidS != targetS && m_attractor != 0))
     {
         targetS = (m_attractor == 0) ? 1 : 0;//0.35;
         double	avoidA = targetS > m_avoidS ? avoidSMaxA : -avoidSMaxA;
@@ -3218,9 +3218,9 @@ void	Driver::AvoidOtherCars(
         m_avoidS = 1;
         m_avoidSVel = 0;
     }
-    else if( oldAvoidS < targetS && m_avoidS >= targetS ||
-             oldAvoidS > targetS && m_avoidS <= targetS ||
-             fabs(targetS - m_avoidS) < 0.0005 )
+    else if ((oldAvoidS < targetS && m_avoidS >= targetS) ||
+             (oldAvoidS > targetS && m_avoidS <= targetS) ||
+             fabs(targetS - m_avoidS) < 0.0005)
     {
         m_avoidS = targetS;
         m_avoidSVel = 0;
@@ -3288,8 +3288,8 @@ void	Driver::AvoidOtherCars(
         m_avoidT = 1;
         m_avoidTVel = 0;
     }
-    else if( oldAvoidT < attractT && m_avoidT >= attractT ||
-             oldAvoidT > attractT && m_avoidT <= attractT )
+    else if ((oldAvoidT < attractT && m_avoidT >= attractT) ||
+             (oldAvoidT > attractT && m_avoidT <= attractT))
     {
         m_avoidT = attractT;
         m_avoidTVel = 0;

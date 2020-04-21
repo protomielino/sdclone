@@ -1813,7 +1813,9 @@ float Driver::getOffset()
             {
                 avoidmode |= avoidright;
                 rightMargin = MAX(leftMargin, MIN(rightMargin, (oppCarTL + MIN(0.0, o->getAvgLateralMovt() * 2)) / track->width));
-                if (sidedist < car->_dimension_y + 1.0 || o->getAvgLateralMovt() < avgLateralMovt && (avgLateralMovt - o->getAvgLateralMovt()) / deltaTime * 2.0 > sidedist - 0.5)
+                if (sidedist < car->_dimension_y + 1.0 || 
+                    (o->getAvgLateralMovt() < avgLateralMovt &&
+                    (avgLateralMovt - o->getAvgLateralMovt()) / deltaTime * 2.0 > sidedist - 0.5))
                 {
                     if (rightMargin < car->_trkPos.toLeft / track->width)
                         avoidCritical = true;
