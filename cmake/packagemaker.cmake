@@ -171,7 +171,7 @@ IF(APPLE)
     SET(READ_ONLY_DMG_NAME "${INTERNAL_NAME}-${VERSION}-base-r${SVN_REV}-${CPACK_SYSTEM_NAME}.dmg")
 
     string(REPLACE ".app" "-base.app" SD_BASE_BUNDLE_NAME "${CMAKE_INSTALL_PREFIX}")
-    message(STATUS "SD_BASE_BUNDLE_NAME = ${SD_BASE_BUNDLE_NAME}")
+
     # TODO make ${SD_BUNDLE_NAME} a CACHE variable and use it everywhere instead of ${CMAKE_INSTALL_PREFIX}??
     SET(SD_BUNDLE_NAME "${SD_BASE_BUNDLE_NAME}")
 
