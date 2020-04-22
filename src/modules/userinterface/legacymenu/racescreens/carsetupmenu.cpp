@@ -597,8 +597,6 @@ bool CarSetupMenu::initialize(void *pPrevMenu, const GfRace *pRace, const GfDriv
     addShortcut(GFUIK_RETURN, "Accept", this, onAcceptCallback, NULL);
     addShortcut(GFUIK_F1, "Help", getMenuHandle(), GfuiHelpScreen, NULL);
     addShortcut(GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    addShortcut(GFUIK_LEFT, "Previous Page", this, onPreviousCallback, NULL);
-    addShortcut(GFUIK_RIGHT, "Next Page", this, onNextCallback, NULL);
 
     return true;
 }
