@@ -3936,14 +3936,14 @@ tdble GfParmGetVariable(void *handle, char const *path, char const *key)
     char *str;
     tdble *val;
     strcpy( pathdup, path );
-    if( pathdup[ 0 ] == '/' )
-    	memmove( pathdup, pathdup + sizeof( char ), sizeof( char ) * strlen( pathdup ) );
+    if ( pathdup[ 0 ] == '/' )
+        memmove( pathdup, pathdup + sizeof( char ), sizeof( char ) * strlen( pathdup ) );
 
-	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
-		GfLogError ("GfParmGetVariable: bad handle (%p)\n", parmHandle);
-		free(pathdup);
-   	    return 0.0f;
-	}
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+        GfLogError ("GfParmGetVariable: bad handle (%p)\n", parmHandle);
+        free(pathdup);
+        return 0.0f;
+    }
 
 	conf = parmHandle->conf;
 

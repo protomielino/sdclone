@@ -821,19 +821,18 @@ bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
 	// 11) Bump Mapping.
 	const std::string strBumpMapping =
 		GfParmGetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_BUMPMAPPING, "");
-    if (strTexComp == GFSCR_VAL_YES) //strTexComp ? Bug ?
+	if (strTexComp == GFSCR_VAL_YES) //strTexComp ? Bug ?
 		_mapSupportedBool[BumpMapping] = true;
 	else if (strTexComp == GFSCR_VAL_NO)
 		_mapSupportedBool[BumpMapping] = false;
 
-    // 11) Anisotropic Filtering.
-    const int nAF =
-        (int)GfParmGetNum(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_ANISOTROPICFILTERING,
-                          pszNoUnit, (tdble)0);
-    if (nMaxTexSize > 0)
-        _mapSupportedInt[AnisotropicFiltering] =nAF;
+	// 11) Anisotropic Filtering.
+	const int nAF =
+		(int)GfParmGetNum(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_ANISOTROPICFILTERING,
+						  pszNoUnit, (tdble)0);
+	if (nMaxTexSize > 0)
+		_mapSupportedInt[AnisotropicFiltering] =nAF;
 
-	
 	// Close config file if we open it.
 	if (!hparmConfig)
 		closeConfigFile(hparm);
@@ -1256,11 +1255,11 @@ void GfglFeatures::storeSelection(void* hparmConfig) const
 				 isSelected(BumpMapping)
 				 ? GFSCR_ATT_BUMPMAPPING_ENABLED : GFSCR_ATT_BUMPMAPPING_DISABLED);
 
-    if (getSupported(AnisotropicFiltering) != InvalidInt)
-        GfParmSetNum(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_ANISOTROPICFILTERING, pszNoUnit,
-                     (tdble)getSelected(AnisotropicFiltering));
-    else
-        GfParmRemove(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_ANISOTROPICFILTERING);
+	if (getSupported(AnisotropicFiltering) != InvalidInt)
+		GfParmSetNum(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_ANISOTROPICFILTERING, pszNoUnit,
+					 (tdble)getSelected(AnisotropicFiltering));
+	else
+		GfParmRemove(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_ANISOTROPICFILTERING);
 	
 	// Write new params to config file.
 	GfParmWriteFile(NULL, hparm, "Screen");

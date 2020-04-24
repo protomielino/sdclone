@@ -360,18 +360,18 @@ grSplitScreen(void *vp)
         case GR_SPLIT_ADD:
             if (grNbActiveScreens < GR_NB_MAX_SCREEN)
                 grNbActiveScreens++;
-                if (grSpanSplit)
-                    grNbArrangeScreens=1;
-                else
-                    grNbArrangeScreens=0;
+            if (grSpanSplit)
+                grNbArrangeScreens=1;
+            else
+                grNbArrangeScreens=0;
             break;
         case GR_SPLIT_REM:
             if (grNbActiveScreens > 1)
                 grNbActiveScreens--;
-                if (grSpanSplit)
-                    grNbArrangeScreens=1;
-                else
-                    grNbArrangeScreens=0;
+            if (grSpanSplit)
+                grNbArrangeScreens=1;
+            else
+                grNbArrangeScreens=0;
             break;
         case GR_SPLIT_ARR:
             grNbArrangeScreens++;

@@ -63,7 +63,7 @@ int closeGfModule()
     if (LegacyMenu::_pSelf)
         LegacyMenu::unregister(LegacyMenu::_pSelf);
 
-	DisplayMenuRelease();
+    DisplayMenuRelease();
 
     // Delete the (only) module instance.
     delete LegacyMenu::_pSelf;

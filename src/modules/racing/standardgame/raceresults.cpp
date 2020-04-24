@@ -650,11 +650,11 @@ ReUpdateRaceCurRes()
 
     ncars = ReInfo->s->_ncars;
     if (ncars > ReUI().getResultsTableRowCount())
-    	ncars = ReUI().getResultsTableRowCount();
+        ncars = ReUI().getResultsTableRowCount();
 
-	char pszTitle[128];
-	snprintf(pszTitle, sizeof(pszTitle), "%s at %s",
-			 ReInfo->_reRaceName, ReInfo->track->name);
+    char pszTitle[128];
+    snprintf(pszTitle, sizeof(pszTitle), "%s at %s",
+             ReInfo->_reRaceName, ReInfo->track->name);
 
     if (ReInfo->s->_totTime > ReInfo->s->currentTime)
     {
