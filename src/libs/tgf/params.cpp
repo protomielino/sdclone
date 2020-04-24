@@ -201,7 +201,7 @@ getFullName (const char *sectionName, const char *paramName)
 	
 	fullName = (char *) malloc (strlen (sectionName) + strlen (paramName) + 2);
 	if (!fullName) {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 1800
 		GfLogError ("getFullName: malloc (%03Iu) failed", strlen (sectionName) + strlen (paramName) + 2);
 #else //_MSC_VER
 		GfLogError ("getFullName: malloc (%zu) failed", strlen (sectionName) + strlen (paramName) + 2);
@@ -333,7 +333,7 @@ addParam (struct parmHeader *conf, struct section *section, const char *paramNam
 	
 	param = (struct param *) calloc (1, sizeof (struct param));
 	if (!param) {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 1800
 		GfLogError ("addParam: calloc (1, %03Iu) failed\n", sizeof (struct param));
 #else //_MSC_VER
 		GfLogError ("addParam: calloc (1, %zu) failed\n", sizeof (struct param));
@@ -457,7 +457,7 @@ addSection (struct parmHeader *conf, const char *sectionName)
 
 	section = (struct section *) calloc (1, sizeof (struct section));
 	if (!section) {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 1800
 		GfLogError ("addSection: calloc (1, 03Iu) failed\n", sizeof (struct section));
 #else //_MSC_VER
 		GfLogError ("addSection: calloc (1, %zu) failed\n", sizeof (struct section));
@@ -527,7 +527,7 @@ createParmHeader (const char *file)
 
     conf = (struct parmHeader *) calloc (1, sizeof (struct parmHeader));
     if (!conf) {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 1800
 	GfLogError ("gfParmReadFile: calloc (1, %03Iu) failed\n", sizeof (struct parmHeader));
 #else //_MSC_VER
 	GfLogError ("gfParmReadFile: calloc (1, %zu) failed\n", sizeof (struct parmHeader));
@@ -539,7 +539,7 @@ createParmHeader (const char *file)
 
     conf->rootSection = (struct section *) calloc (1, sizeof (struct section));
     if (!conf->rootSection) {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 1800
 	GfLogError ("gfParmReadFile: calloc (1, %03Iu) failed\n", sizeof (struct section));
 #else //_MSC_VER
 	GfLogError ("gfParmReadFile: calloc (1, %zu) failed\n", sizeof (struct section));
@@ -1135,7 +1135,7 @@ xmlExternalEntityRefHandler (XML_Parser mainparser,
 		size_t len = fread (buf, 1, sizeof(buf), in);
 		done = len < sizeof (buf);
 		if (!XML_Parse (parser, buf, len, done)) {
-			GfLogError ("file: %s -> %s at line %d\n",
+			GfLogError ("file: %s -> %s at line %lu\n",
 				systemId,
 				XML_ErrorString(XML_GetErrorCode(parser)),
 				XML_GetCurrentLineNumber(parser));
@@ -1157,7 +1157,7 @@ parseXml (struct parmHandle *parmHandle, char *buf, int len, int done)
     if (!XML_Parse(parmHandle->parser, buf, len, done))
     {
 		if (TraceLoggersAvailable)
-			GfLogError ("parseXml: %s at line %d\n",
+			GfLogError ("parseXml: %s at line %lu\n",
 				(char*)XML_ErrorString (XML_GetErrorCode (parmHandle->parser)),
 				XML_GetCurrentLineNumber (parmHandle->parser));
 		else
@@ -1211,7 +1211,7 @@ GfParmReadBuf (char *buffer)
     /* Handle creation */
     parmHandle = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandle) {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 1800
 	GfLogError ("GfParmReadBuf: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
 #else //_MSC_VER
 	GfLogError ("GfParmReadBuf: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
@@ -1308,7 +1308,7 @@ GfParmReadFile (const char *file, int mode, bool neededFile, bool trace)
     /* Handle creation */
     parmHandle = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandle) {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 1800
 		if (TraceLoggersAvailable)
 			GfLogError ("GfParmReadFile: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
 		else
@@ -4586,7 +4586,7 @@ GfParmMergeHandles(void *ref, void *tgt, int mode)
     /* Handle creation */
     parmHandleOut = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandleOut) {
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && _MSC_VER < 1800
 	GfLogError ("gfParmReadBuf: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
 #else //_MSC_VER
 	GfLogError ("gfParmReadBuf: calloc (1, %zu) failed\n", sizeof (struct parmHandle));

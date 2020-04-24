@@ -3485,7 +3485,7 @@ void Driver::SetRandomSeed(unsigned int seed)
 unsigned int Driver::getRandom()
 {
     random_seed = RANDOM_A * random_seed + RANDOM_C;
-    LogSHADOW.debug("Random = %.3f\n", random_seed);
+    LogSHADOW.debug("Random = %u\n", random_seed);
 
     return (random_seed >> 16);
 }

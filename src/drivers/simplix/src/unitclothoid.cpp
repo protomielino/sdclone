@@ -803,7 +803,11 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   if( writeSize < 1)
     error = true;
 
-  LogSimplix.debug("\n\n\nsizeof(TPathPt): %d\n\n\n",sizeof(TPathPt));
+#if defined(_MSC_VER) && _MSC_VER < 1800
+  LogSimplix.debug("\n\n\nsizeof(TPathPt): %Iu\n\n\n",sizeof(TPathPt));
+#else
+  LogSimplix.debug("\n\n\nsizeof(TPathPt): %zu\n\n\n",sizeof(TPathPt));
+#endif
   void* Start = &(oPathPoints[0]);
   void* End = &(oPathPoints[0].MaxSpeed);
   int UsedLen = ((char *) End) - ((char *) Start);

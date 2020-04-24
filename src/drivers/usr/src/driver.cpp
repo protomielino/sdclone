@@ -105,7 +105,7 @@ void Driver::SetRandomSeed(unsigned int seed)
 unsigned int Driver::getRandom()
 {
     random_seed = RANDOM_A * random_seed + RANDOM_C;
-    LogUSR.debug("Random = %.3f\n", random_seed);
+    LogUSR.debug("Random = %u\n", random_seed);
 
     return (random_seed >> 16);
 }
@@ -450,7 +450,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
     LogUSR.info("MU FACTOR        = %.3f\n", MU_FACTOR);
     LogUSR.info("FUEL FACTOR      = %.3f\n", FUEL_FACTOR);
-    LogUSR.info("Max Damage       = %.3f\n", m_maxDammage);
+    LogUSR.info("Max Damage       = %d\n", m_maxDammage);
     LogUSR.info("Gear Shift       = %.3f\n", gear_shift);
     LogUSR.info("Brake Delay      = %.3f\n", brakedelay);
     LogUSR.info("Corner Speed     = %.3f\n", CornerSpeed);
@@ -2367,7 +2367,7 @@ bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
             {
                 SetMode(avoidSide, MAX(minLeftMargin, (oppAvoidRgt+2.0)/track->width), maxRightMargin, true);
 
-                LogUSR.debug("%s: OVERTAKE to RIGHT (1)\n", car->_name, ocar->_name, oppAvoidRgt);
+                LogUSR.debug("%s >> %s: OVERTAKE to RIGHT (1)\n", car->_name, ocar->_name);
             }
             else
             {

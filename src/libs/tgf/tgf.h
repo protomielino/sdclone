@@ -559,6 +559,19 @@ TGF_API void GfParmShutdown (void);
  *    <user settings>/config/logging.xml (see source in data/config)            *
  ********************************************************************************/
 
+// Tell the compiler a function is using a printf-style format string.
+// |format_param| is the one-based index of the format string parameter;
+// |dots_param| is the one-based index of the "..." parameter.
+// For v*printf functions (which take a va_list), pass 0 for dots_param.
+// (This is undocumented but matches what the system C headers do.)
+// For member functions, the implicit this parameter counts as index 1.
+#if defined(__GNUC__)
+#define PRINTF_FORMAT(format_param, dots_param) \
+  __attribute__((format(printf, format_param, dots_param)))
+#else
+#define PRINTF_FORMAT(format_param, dots_param)
+#endif
+
 //****************************************
 // Logger class
 
@@ -592,11 +605,11 @@ class TGF_API GfLogger
 	//! Tracing functions (name gives the trace level / criticity).
 	void fatal(const char *pszFmt, ...); // Warning : This one calls exit(1) at the end !
 #ifdef TRACE_OUT
-	void error(const char *pszFmt, ...);
-	void warning(const char *pszFmt, ...);
-	void info(const char *pszFmt, ...);
-	void trace(const char *pszFmt, ...);
-	void debug(const char *pszFmt, ...);
+	void error(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
+	void warning(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
+	void info(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
+	void trace(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
+	void debug(const char *pszFmt, ...) PRINTF_FORMAT(2, 3);
 #else // TRACE_OUT
 	// The compiler should simply skip calls to these ...
 	inline void error(const char *pszFmt, ...) {};
@@ -608,7 +621,7 @@ class TGF_API GfLogger
 
 	//! Generic tracing function (you must specify the level, enum or integer if > eDebug).
 #ifdef TRACE_OUT
-	void message(int nLevel, const char *pszFmt, ...);
+	void message(int nLevel, const char *pszFmt, ...) PRINTF_FORMAT(3, 4);
 #else // TRACE_OUT
 	// The compiler should simply skip calls to this ...
 	inline void message(int nLevel, const char *pszFmt, ...) {};

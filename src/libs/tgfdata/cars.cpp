@@ -235,7 +235,11 @@ std::vector<std::string> GfCars::getCarNamesInCategory(const std::string& strCat
 
 void GfCars::print() const
 {
-	GfLogTrace("Car base : %d categories, %d cars\n",
+#if defined(_MSC_VER) && _MSC_VER < 1800
+	GfLogTrace("Car base : %Iu categories, %Iu cars\n",
+#else
+	GfLogTrace("Car base : %zu categories, %zu cars\n",
+#endif
 			   _pPrivate->vecCatIds.size(), _pPrivate->vecCars.size());
 	std::vector<std::string>::const_iterator itCatName;
 	for (itCatName = _pPrivate->vecCatNames.begin();

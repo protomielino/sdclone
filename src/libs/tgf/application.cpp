@@ -303,7 +303,11 @@ bool GfApplication::parseOptions()
     GfInitInstallDir(_lstArgs.front().c_str());
 
     // Parse args, looking for registered options.
-    GfLogInfo("Parsing command line args (%d)\n", _lstArgs.size() - 1);
+#if defined(_MSC_VER) && _MSC_VER < 1800
+    GfLogInfo("Parsing command line args (%Iu)\n", _lstArgs.size() - 1);
+#else
+    GfLogInfo("Parsing command line args (%zu)\n", _lstArgs.size() - 1);
+#endif
     std::list<std::string>::const_iterator itArg = _lstArgs.begin();
     for (itArg++; itArg != _lstArgs.end(); itArg++)
     {

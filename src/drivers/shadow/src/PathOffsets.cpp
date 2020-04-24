@@ -110,8 +110,12 @@ void    PathOffsets::save_springs( const MyTrack& track, int lap )
     fprintf( pFile, "%g\n", track.GetLength() );
 
     fprintf( pFile, "BEGIN-POINTS\n" );
-    fprintf( pFile, "%d\n", _offsets.size() );
-    for( int i = 0; i < (int)_offsets.size(); i++ )
+#if defined(_MSC_VER) && _MSC_VER < 1800
+    fprintf( pFile, "%Iu\n", _offsets.size() );
+#else
+    fprintf( pFile, "%zu\n", _offsets.size() );
+#endif
+    for( size_t i = 0; i < _offsets.size(); i++ )
     {
         fprintf( pFile, "%.20g %g\n", _offsets[i], _times[i] );
     }

@@ -268,7 +268,11 @@ std::vector<GfDriver*> GfDrivers::getDriversWithTypeAndCategory(const std::strin
 
 void GfDrivers::print() const
 {
-    GfLogTrace("Driver base : %d types, %d car categories, %d drivers\n",
+#if defined(_MSC_VER) && _MSC_VER < 1800
+    GfLogTrace("Driver base : %Iu types, %Iu car categories, %Iu drivers\n",
+#else
+    GfLogTrace("Driver base : %zu types, %zu car categories, %zu drivers\n",
+#endif
                _pPrivate->vecTypes.size(), _pPrivate->vecCarCategoryIds.size(),
                _pPrivate->vecDrivers.size());
 

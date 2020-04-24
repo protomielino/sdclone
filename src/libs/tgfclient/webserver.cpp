@@ -675,7 +675,7 @@ int WebServer::sendGenericRequest (std::string data, std::string& serverReply)
         if(res != CURLE_OK)
         {
             notifications.msglist.push_back("Failed to connect to the WebServer!");
-            GfLogInfo("WebServer: Unable to perform SYNC request some error occured:\n", data.c_str());
+            GfLogInfo("WebServer: Unable to perform SYNC request some error occured: %s\n", data.c_str());
             fprintf(stderr, "curl_easy_perform() failed: %s\n",	curl_easy_strerror(res));
         }
         else

@@ -468,7 +468,7 @@ bool ReWebMetar::scanWind()
         _gust_speed = gust * factor;
 
     _grpcount++;
-    GfLogDebug("Wind speed = %.3f - Wind Direction = %.3f\n", _wind_speed, _wind_dir);
+    GfLogDebug("Wind speed = %.3f - Wind Direction = %d\n", _wind_speed, _wind_dir);
 
     return true;
 }

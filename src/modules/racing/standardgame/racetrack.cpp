@@ -713,7 +713,7 @@ reTrackInitRealWeather(void)
         GfLogDebug("Rain = %i\n", trackLocal->rain);
         GfLogDebug("Snow = %i\n", trackLocal->snow);
         GfLogDebug("Hail = %i\n", trackLocal->hail);
-        GfLogDebug("Water track = %.3f\n", trackLocal->water);
+        GfLogDebug("Water track = %d\n", trackLocal->water);
         GfLogDebug("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
 
         ReTrackUpdate();
@@ -948,7 +948,7 @@ reTrackInitSimuWeather(void)
     GfLogDebug("Snow = %i\n", trackLocal->snow);
     GfLogDebug("Hail = %i\n", trackLocal->hail);
     GfLogDebug("Relative Humidity = %.3f\n", trackLocal->relativehumidity);
-    GfLogDebug("Water track = %.3f\n", trackLocal->water);
+    GfLogDebug("Water track = %d\n", trackLocal->water);
 
     ReTrackUpdate();
 }

@@ -744,12 +744,12 @@ linuxSetThreadAffinity(int nCPUId)
 	// Set the affinity mask for the current thread ("stick" it to the target core).
 	if (pthread_setaffinity_np(hCurrThread, sizeof(nThreadAffinityMask), &nThreadAffinityMask))
 	{
-		GfLogError("Failed to set current pthread (handle=0x%X) affinity on CPU(s) %s (%s)\n",
+		GfLogError("Failed to set current pthread (handle=0x%lX) affinity on CPU(s) %s (%s)\n",
 				   hCurrThread, cpuSet2String(&nThreadAffinityMask).c_str(), strerror(errno));
 		return false;
 	}
 	else
-		GfLogInfo("Affinity set on CPU(s) %s for current pthread (handle=0x%X)\n",
+		GfLogInfo("Affinity set on CPU(s) %s for current pthread (handle=0x%lX)\n",
 				  cpuSet2String(&nThreadAffinityMask).c_str(), hCurrThread);
 	
 	return true;

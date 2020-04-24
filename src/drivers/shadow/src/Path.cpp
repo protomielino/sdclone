@@ -1409,8 +1409,12 @@ bool	Path::SavePath( const char* pDataFile ) const
     fprintf( pFile, "%g\n", m_pTrack->GetLength() );
 
     fprintf( pFile, "BEGIN-POINTS\n" );
-    fprintf( pFile, "%d\n", m_pts.size() );
-    for( int i = 0; i < (int)m_pts.size(); i++ )
+#if defined(_MSC_VER) && _MSC_VER < 1800
+    fprintf( pFile, "%Iu\n", m_pts.size() );
+#else
+    fprintf( pFile, "%zu\n", m_pts.size() );
+#endif
+    for( size_t i = 0; i < m_pts.size(); i++ )
     {
         fprintf( pFile, "%.20g\n", m_pts[i].offs );
     }

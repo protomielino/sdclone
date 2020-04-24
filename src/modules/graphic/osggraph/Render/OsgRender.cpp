@@ -283,7 +283,7 @@ void SDRender::Init(tTrack *track)
     const int timeOfDay = (int)SDTrack->local.timeofday;
     const double domeSizeRatio = SDSkyDomeDistance / 80000.0;
 
-    GfLogInfo("  domeSizeRation : %d\n", domeSizeRatio);
+    GfLogInfo("  domeSizeRation : %f\n", domeSizeRatio);
 
     thesky->build(datapath, SDSkyDomeDistance, SDSkyDomeDistance, 2000 * domeSizeRatio,
                   SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, NPlanets,
@@ -480,7 +480,7 @@ void SDRender::Init(tTrack *track)
 
     m_RealRoot->addChild(mRoot.get());
 
-    GfOut("LE POINTEUR %d\n", mRoot.get());
+    GfOut("LE POINTEUR %p\n", mRoot.get());
 }//SDRender::Init
 
 void SDRender::ShadowedScene()

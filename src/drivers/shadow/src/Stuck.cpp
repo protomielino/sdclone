@@ -898,7 +898,11 @@ void	Stuck::fillTrackCells( const MyTrack& track )
 
 bool	Stuck::solve( const tCarElt* me )
 {
-    LogSHADOW.debug( "[%d] stuck::solve (exp=%d, qlen=%d, best time=%g)\n", me->index, _expansionsN, _pqN.size(), _bestTime );
+#if defined(_MSC_VER) && _MSC_VER < 1800
+    LogSHADOW.debug( "[%d] stuck::solve (exp=%d, qlen=%Iu, best time=%g)\n", me->index, _expansionsN, _pqN.size(), _bestTime );
+#else
+    LogSHADOW.debug( "[%d] stuck::solve (exp=%d, qlen=%zu, best time=%g)\n", me->index, _expansionsN, _pqN.size(), _bestTime );
+#endif
 
     vector<GridPoint> succs;
     GridPoint car_pt1(*this, me, true, 0);
@@ -993,7 +997,11 @@ bool	Stuck::solve( const tCarElt* me )
 // search from car to destination.
 bool	Stuck::solveR( const tCarElt* me )
 {
-    LogSHADOW.debug( "[%d] stuck::solveR (exp=%d, qlen=%d, best time=%g)\n", me->index, _expansionsR, _pqR.size(), _bestTime );
+#if defined(_MSC_VER) && _MSC_VER < 1800
+    LogSHADOW.debug( "[%d] stuck::solveR (exp=%d, qlen=%Iu, best time=%g)\n", me->index, _expansionsR, _pqR.size(), _bestTime );
+#else
+    LogSHADOW.debug( "[%d] stuck::solveR (exp=%d, qlen=%zu, best time=%g)\n", me->index, _expansionsR, _pqR.size(), _bestTime );
+#endif
 
     vector<GridPoint> succs;
 
@@ -1252,7 +1260,11 @@ void	Stuck::getUnstuck( const MyTrack& track, tCarElt* me, const tSituation* s )
         }
     }
 
-    LogSHADOW.debug( "[%d] plan index: %d/%d  acc=%.3f, gear=%d, da=%.3f, steer=%.3f, dist-ahead=%.3f\n",
+#if defined(_MSC_VER) && _MSC_VER < 1800
+    LogSHADOW.debug( "[%d] plan index: %d/%Iu  acc=%.3f, gear=%d, da=%.3f, steer=%.3f, dist-ahead=%.3f\n",
+#else
+    LogSHADOW.debug( "[%d] plan index: %d/%zu  acc=%.3f, gear=%d, da=%.3f, steer=%.3f, dist-ahead=%.3f\n",
+#endif
             me->index, _planIndex, _plan.size(), me->ctrl.accelCmd, me->ctrl.gear, deltaAng * 180 / PI,
             me->ctrl.steer * me->info.steerLock * 180 / PI, dist );
 }

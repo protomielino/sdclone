@@ -284,7 +284,7 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 	// Allocate and target memory buffers for the image.
 	row_pointers = (png_bytep*)malloc(tgt_height * sizeof(png_bytep));
 	if (row_pointers == NULL) {
-		GfError("GfTexReadImageFromPNG(%s) : Failed to allocate row pointers table (%ul bytes)\n", 
+		GfError("GfTexReadImageFromPNG(%s) : Failed to allocate row pointers table (%lu bytes)\n", 
 				filename, (unsigned long)(tgt_height * sizeof(png_bytep)));
 		fclose(fp);
 		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
@@ -293,7 +293,7 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 	
 	image_ptr = (unsigned char *)malloc(tgt_height * tgt_rowbytes);
 	if (image_ptr == NULL) {
-		GfError("GfTexReadImageFromPNG(%s) : Failed to allocate pixel buffer (%ul bytes)\n", 
+		GfError("GfTexReadImageFromPNG(%s) : Failed to allocate pixel buffer (%lu bytes)\n", 
 				filename, (unsigned long)(tgt_height * tgt_rowbytes));
 		fclose(fp);
 		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
