@@ -4,12 +4,12 @@
 // A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
-// Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
+// Zentrale Klasse fï¿½r das Fahren bzw. den Fahrer/Roboter
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
 // Last changed : 2014.11.29
-// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
+// Copyright    : ï¿½ 2007-2014 Wolf-Dieter Beelitz
 // eMail        : wdbee@users.sourceforge.net
 // Version      : 4.05.000
 //--------------------------------------------------------------------------*
@@ -44,17 +44,17 @@
 //
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
-// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
+// Wer die Dateien verwendet erkennt an, dass fï¿½r Fehler, Schï¿½den,
+// Folgefehler oder Folgeschï¿½den keine Haftung ï¿½bernommen wird.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
 //
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// Im ï¿½brigen gilt fï¿½r die Nutzung und/oder Weitergabe die
 // GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
+// Version 2 oder nach eigener Wahl eine spï¿½tere Version.
 //--------------------------------------------------------------------------*
 // THIS VERSION WAS MODIFIED TO BE USED WITH SD CAREER MODE
 // This results in some issues while using it with windows!
@@ -1270,7 +1270,8 @@ void TDriver::InitTrack
   // Get the name of the track
   strncpy(TrackNameBuffer,                       // Copy name of track file
     strrchr(oTrack->filename, '/') + 1,          // from path and filename
-	sizeof(TrackNameBuffer));                    // regarding length of buf.
+	  BUFLEN - 1);                    // regarding length of buf.
+  TrackNameBuffer[BUFLEN - 1] = '\0';
   *strrchr(TrackNameBuffer, '.') = '\0';         // Truncate at point
   oTrackName = TrackNameBuffer;                  // Set pointer to buffer
   if (strcmp(oTrackName,"monandgo") == 0)        // The force will be with
@@ -1291,7 +1292,7 @@ void TDriver::InitTrack
 
   // Read/merge car parms
   // First all params out of the common files
-  oMaxFuel = GfParmGetNum(CarHandle              // Maximal möglicher
+  oMaxFuel = GfParmGetNum(CarHandle              // Maximal mï¿½glicher
     , SECT_CAR, PRM_TANK                         //   Tankinhalt
     , (char*) NULL, 100.0);
   LogSimplix.debug("#oMaxFuel (TORCS)   = %.1f\n",oMaxFuel);
@@ -3083,7 +3084,7 @@ bool TDriver::EcoShift()
 //==========================================================================*
 
 //==========================================================================*
-// S²GCuASL ;D
+// Sï¿½GCuASL ;D
 // = Simplified sequential gear controller using adaptive shift levels
 //--------------------------------------------------------------------------*
 void TDriver::GearTronic()
@@ -4162,7 +4163,7 @@ double TDriver::FilterBrake(double Brake)
 	  oBrakeLeft = 1.0f;
 	  oBrakeFront = 1.0f;
 	  oBrakeRear = 1.0f;
-	  //LogSimplix.debug("#BR = BL %.3f°\n",oDriftAngle*180/PI);
+	  //LogSimplix.debug("#BR = BL %.3fï¿½\n",oDriftAngle*180/PI);
 	}
   }
   // ... EPS system for use with SimuV4

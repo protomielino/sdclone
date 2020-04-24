@@ -316,7 +316,8 @@ gfuiLabelDraw(tGfuiLabel *label, const GfuiColor& color)
 
     mask[0] = '\0';
 
-    strncpy(text, (char *) label->text, 128);
+    strncpy(text, (char *) label->text, 127);
+    text[127] = '\0';
 
     char *p = strtok_r(text, "\t", &save);
 

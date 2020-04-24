@@ -1925,8 +1925,8 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name, c
 			}
 			else
 			{
-				strncpy(buf,file,strlen(file));
-				buf[strlen(file)] = 0;
+				strncpy(buf, file, 254);
+				buf[254] = '\0';
 			}
 			fputs (buf, fout);
 		  }

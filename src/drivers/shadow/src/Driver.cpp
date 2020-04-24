@@ -237,7 +237,8 @@ void	Driver::InitTrack(
     //
     const char*	path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
     const char*	key  = PRM_CAR;
-    strncpy( m_carName, GfParmGetStr(pCarHandle, path, key, ""), sizeof(m_carName) );
+    strncpy(m_carName, GfParmGetStr(pCarHandle, path, key, ""), 99);
+    m_carName[99] = '\0';
     char*	p = strrchr(m_carName, '.');
     if( p )
         *p = '\0';
@@ -248,7 +249,8 @@ void	Driver::InitTrack(
     //	get the name of the track (e.g. "e-track-1")
     //
 
-    strncpy( m_trackName, strrchr(pTrack->filename, '/') + 1, sizeof(m_trackName) );
+    strncpy(m_trackName, strrchr(pTrack->filename, '/') + 1, 99);
+    m_trackName[99] = '\0';
     *strrchr(m_trackName, '.') = '\0';
     LogSHADOW.debug( " # Shadow trackName: '%s'\n", m_trackName );
 
@@ -695,14 +697,16 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
         const char*	path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
         const char*	key  = PRM_CAR;
         char	carName[256];
-        strncpy( carName, GfParmGetStr(pCar->_carHandle, path, key, ""), sizeof(carName) );
-        char*	p = strrchr(carName, '.');
+        strncpy(carName, GfParmGetStr(pCar->_carHandle, path, key, ""), 255);
+        carName[255] = '\0';
+        char* p = strrchr(carName, '.');
         if( p )
             *p = '\0';
 
         //	get the name of the track (e.g. "e-track-1")
         char	trackName[256];
-        strncpy( trackName, strrchr(m_track.GetTrack()->filename, '/') + 1, sizeof(trackName) );
+        strncpy(trackName, strrchr(m_track.GetTrack()->filename, '/') + 1, 255);
+        trackName[255] = '\0';
         *strrchr(trackName, '.') = '\0';
 
         //	set up the base param path.

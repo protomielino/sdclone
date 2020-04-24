@@ -58,8 +58,9 @@ gfuiEditboxRecalcCursor(tGfuiObject *obj)
     tGfuiLabel* label = &(editbox->label);
 
     char buf[256];
-    strncpy(buf, label->text, editbox->cursorIdx);
-    buf[editbox->cursorIdx] = '\0';
+    size_t maxlen = editbox->cursorIdx < 256 ? editbox->cursorIdx : 255;
+    strncpy(buf, label->text, maxlen);
+    buf[maxlen] = '\0';
 
     editbox->cursorx = gfuiLabelGetTextX(label) + label->font->getWidth(buf);
 }

@@ -87,18 +87,22 @@ bool RobotXml::ReadRobotDrivers(const char*pRobotName,std::vector<NetDriver> &ve
     {
         sprintf(path2, "Robots/index/%i",i);
         NetDriver driver;
-        strncpy(driver.name,GfParmGetStr(params, path2, "name",NULL),64);
+        strncpy(driver.name, GfParmGetStr(params, path2, "name", NULL), 63);
+        driver.name[63] = '\0';
         std::string strClient = GfParmGetStr(params, path2, "client",NULL);
         if (strClient == "yes")
             driver.client = true;
         else 
             driver.client = false;
 
-        strncpy(driver.car, GfParmGetStr(params, path2, "short name", NULL), 64);
+        strncpy(driver.car, GfParmGetStr(params, path2, "short name", NULL), 63);
         strncpy(driver.car, GfParmGetStr(params, path2, "code name",NULL), 3);
-        strncpy(driver.car,GfParmGetStr(params, path2, "car name",NULL),64);
-        strncpy(driver.type,GfParmGetStr(params, path2, "type",NULL),64);
-        strncpy(driver.skilllevel,GfParmGetStr(params, path2, "skill level",NULL),64);
+        strncpy(driver.car, GfParmGetStr(params, path2, "car name", NULL), 63);
+        driver.car[63] = '\0';
+        strncpy(driver.type, GfParmGetStr(params, path2, "type", NULL), 63);
+        driver.type[63] = '\0';
+        strncpy(driver.skilllevel, GfParmGetStr(params, path2, "skill level", NULL), 63);
+        driver.skilllevel[63] = '\0';
 
         driver.racenumber = (int)GfParmGetNum(params, path2, "race number",NULL,1.0);
         driver.red = GfParmGetNum(params, path2, "red",NULL,1.0);

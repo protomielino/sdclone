@@ -140,7 +140,8 @@ int GfDirCreate(const char *path)
 
 	static const int nPathBufSize = 1024;
 	char buf[nPathBufSize];
-	strncpy(buf, path, nPathBufSize);
+	strncpy(buf, path, nPathBufSize - 1);
+	buf[nPathBufSize - 1] = '\0';
 
 #ifdef WIN32
 

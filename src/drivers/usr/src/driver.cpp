@@ -219,7 +219,8 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     /*------------------------------------------------------*/
     // Get a pointer to the first char of the track filename.
     char trackname[100];
-    strncpy( trackname, strrchr(track->filename, '/') + 1, sizeof(trackname) );
+    strncpy(trackname, strrchr(track->filename, '/') + 1, 99);
+    trackname[99] = '\0';
     *strrchr(trackname, '.') = '\0';
     LogUSR.info( " # USR trackName: '%s'\n", trackname );
 
@@ -229,7 +230,8 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     newParmHandle = NULL;
 
     const char *car_sect = SECT_GROBJECTS "/" LST_RANGES "/" "1";
-    strncpy(carName, GfParmGetStr(carHandle, car_sect, PRM_CAR, ""), sizeof(carName));
+    strncpy(carName, GfParmGetStr(carHandle, car_sect, PRM_CAR, ""), BUFSIZE - 1);
+    carName[BUFSIZE - 1] = '\0';
     char *p = strrchr(carName, '.');
     LogUSR.info( " # USR carName: '%s'\n", carName );
 
