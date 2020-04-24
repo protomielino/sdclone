@@ -4,12 +4,12 @@
 // A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
-// Zentrale Klasse f�r das Fahren bzw. den Fahrer/Roboter
+// Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
 // Last changed : 2014.11.29
-// Copyright    : � 2007-2014 Wolf-Dieter Beelitz
+// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
 // eMail        : wdbee@users.sourceforge.net
 // Version      : 4.05.000
 //--------------------------------------------------------------------------*
@@ -44,17 +44,17 @@
 //
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass f�r Fehler, Sch�den,
-// Folgefehler oder Folgesch�den keine Haftung �bernommen wird.
+// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
+// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
 //
-// Im �brigen gilt f�r die Nutzung und/oder Weitergabe die
+// Im übrigen gilt für die Nutzung und/oder Weitergabe die
 // GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine sp�tere Version.
+// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 // THIS VERSION WAS MODIFIED TO BE USED WITH SD CAREER MODE
 // This results in some issues while using it with windows!
