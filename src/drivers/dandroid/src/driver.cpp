@@ -189,7 +189,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
     // Skill levels: 0 pro, 3 semi-pro, 7 amateur, 10 rookie
     globalskill = GfParmGetNum(handle, "skill", "level", (char*)NULL, 0.0);
   }
-  mSkillGlobal = MAX(0.9, 1.0 - 0.1 * globalskill / 10.0);
+  mSkillGlobal = MAX(0.7, 1.0 - 0.5 * globalskill / 10.0);
   //load the driver skill level, range 0 - 1
   handle = NULL;
   sprintf(buffer, "drivers/%s/%d/skill.xml", MyBotName, mCarIndex);

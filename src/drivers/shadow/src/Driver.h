@@ -161,11 +161,8 @@ private:
 
     void	Meteorology(tTrack *t);
     int		GetWeather(tTrack *t);
-    void	calcSkill(tSituation *s);
 
-    void	     SetRandomSeed(unsigned int seed);
-    unsigned int getRandom();
-    bool         CheckPitSharing(tCarElt *car);
+    bool    CheckPitSharing(tCarElt *car);
 
 private:
     enum	// drive types
@@ -453,14 +450,9 @@ private:
     double          simtime;                // how long since the race started
 
     double          driver_aggression;
-    double          global_skill;
-    double          skill;
-    double          skill_adjust_limit;
-    double          skill_adjust_timer;
-    double          decel_adjust_targ;
-    double          decel_adjust_perc;
-    double          brake_adjust_targ;
-    double          brake_adjust_perc;
+    double          globalskill;
+    double          driverskill;
+
     bool            pitsharing;
 
     PidController	m_lineControl;			// controller for line error.

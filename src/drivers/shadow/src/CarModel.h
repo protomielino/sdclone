@@ -83,6 +83,7 @@ public:
     double				AccForceFromSpeed( double speed ) const;
 
     double				CalcEngineTorque( double rpm ) const;
+
 private:
     void    configCar( void* hCar );
     double	CalcMaxSpeedAeroOld(double k, double kz, double kv, double kFriction,
@@ -159,6 +160,7 @@ public:
     double  DIFF_EFF;       // rear differential efficiency.
     double	ENGINE_REV_LIMIT;	// revs where limit kicks in.
     double  ENGINE_MAX_REVS;    // max revs for this engine.
+
     std::vector<double> ENGINE_REVS;    // anglular rate (in radians per second.)
     std::vector<double> ENGINE_TORQUES;
     std::vector<double> GEAR_RATIOS;    // gear ratios

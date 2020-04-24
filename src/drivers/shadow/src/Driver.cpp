@@ -122,14 +122,8 @@ Driver::Driver(int index) :	INDEX(index),
       rainintensity(0.0),
       weathercode(0),
       driver_aggression(0.0),
-      global_skill(0.0),
-      skill(0.0),
-      skill_adjust_limit(0.0),
-      skill_adjust_timer(0.0),
-      decel_adjust_targ(0.0),
-      decel_adjust_perc(0.0),
-      brake_adjust_targ(0.0),
-      brake_adjust_perc(0.0),
+      globalskill(0.0),
+      driverskill(0.0),
       pitsharing(false),
       m_prevYawError(0),
       m_prevLineError(0),
@@ -492,8 +486,8 @@ void	Driver::InitTrack(
 
     // Get skill level
 
-    decel_adjust_perc = global_skill = skill = driver_aggression = 0.0;
-    SetRandomSeed(10);
+    globalskill = driverskill = driver_aggression = 0.0;
+    //SetRandomSeed(10);
 
     // load the global skill level, range 0 - 10
     snprintf(buf, sizeof(buf), "%sconfig/raceman/extra/skill.xml", GetLocalDir());
@@ -507,12 +501,12 @@ void	Driver::InitTrack(
 
     if (skillHandle)
     {
-        global_skill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
+        globalskill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
     }
 
-    global_skill = MAX(0.0f, MIN(30.0f, global_skill));
+    globalskill = MAX(0.7, 1.0 - 0.5 * globalskill / 10.0);
 
-    LogSHADOW.info(" # Global Skill: %.3f\n", global_skill);
+    LogSHADOW.info(" # Global Skill: %.3f\n", globalskill);
 
     //load the driver skill level, range 0 - 1
     float driver_skill = 0.0f;
@@ -522,16 +516,13 @@ void	Driver::InitTrack(
 
     if (skillHandle)
     {
-        driver_skill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
+        driverskill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
         driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
-        driver_skill = (float)MIN(1.0, MAX(0.0, driver_skill));
-        LogSHADOW.info(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", global_skill, driver_skill, driver_aggression);
+        driverskill = MAX(0.95, 1.0 - 0.05 * driverskill);
+        LogSHADOW.info(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", globalskill, driverskill, driver_aggression);
     }
 
-    skill = (float)((global_skill + driver_skill * 2) * (1.0 + driver_skill));
     Meteorology(pTrack);
-
-    LogSHADOW.info(" # SHADOW Driver skill = %.2f\n", skill);
 }
 
 // Start a new race.
@@ -2507,7 +2498,7 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
         m_flying--;
     }
 
-    calcSkill(s);
+    //calcSkill(s);
 
     // get curret pos on track.
 
@@ -2590,6 +2581,9 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
 
     targetSpd = avoidTargetSpd;
     targetAcc = avoidTargetAcc;
+
+    targetSpd *= globalskill;
+    targetAcc *= driverskill;
 
     //
     // steer into the skid
@@ -3441,7 +3435,7 @@ int Driver::GetWeather(tTrack *t)
     return (t->local.rain << 4) + t->local.water;
 };
 
-void Driver::calcSkill(tSituation *s)
+/*void Driver::calcSkill(tSituation *s)
 {
     //if (RM_TYPE_PRACTICE != racetype)
     if (skill_adjust_timer == -1.0 || s->currentTime - skill_adjust_timer > skill_adjust_limit)
@@ -3462,7 +3456,7 @@ void Driver::calcSkill(tSituation *s)
         skill_adjust_timer = simtime;
     }
 
-    /*if (decel_adjust_perc < decel_adjust_targ)
+    if (decel_adjust_perc < decel_adjust_targ)
       decel_adjust_perc += MIN(deltaTime*4, decel_adjust_targ - decel_adjust_perc);
     else
       decel_adjust_perc -= MIN(deltaTime*4, decel_adjust_perc - decel_adjust_targ);
@@ -3470,12 +3464,12 @@ void Driver::calcSkill(tSituation *s)
     if (brake_adjust_perc < brake_adjust_targ)
       brake_adjust_perc += MIN(deltaTime*2, brake_adjust_targ - brake_adjust_perc);
     else
-      brake_adjust_perc -= MIN(deltaTime*2, brake_adjust_perc - brake_adjust_targ);*/
+      brake_adjust_perc -= MIN(deltaTime*2, brake_adjust_perc - brake_adjust_targ);
 
     LogSHADOW.debug("skill: decel %.3f - %.3f, brake %.3f - %.3f\n", decel_adjust_perc, decel_adjust_targ, brake_adjust_perc, brake_adjust_targ);
-}
+}*/
 
-void Driver::SetRandomSeed(unsigned int seed)
+/*void Driver::SetRandomSeed(unsigned int seed)
 {
     random_seed = seed ? seed : RANDOM_SEED;
 
@@ -3488,7 +3482,7 @@ unsigned int Driver::getRandom()
     LogSHADOW.debug("Random = %u\n", random_seed);
 
     return (random_seed >> 16);
-}
+}*/
 
 //==========================================================================*
 // Check if pit sharing is activated

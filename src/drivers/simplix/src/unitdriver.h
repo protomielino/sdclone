@@ -4,12 +4,12 @@
 // A robot for Speed Dreams-Version 2.X simuV4
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
-// Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
+// Zentrale Klasse fï¿½r das Fahren bzw. den Fahrer/Roboter
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
 // Last changed : 2014.11.29
-// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
+// Copyright    : ï¿½ 2007-2014 Wolf-Dieter Beelitz
 // eMail        : wdbee@users.sourceforge.net
 // Version      : 4.05.000
 //--------------------------------------------------------------------------*
@@ -40,12 +40,12 @@
 //--------------------------------------------------------------------------*
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
-// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
+// Wer die Dateien verwendet erkennt an, dass fï¿½r Fehler, Schï¿½den,
+// Folgefehler oder Folgeschï¿½den keine Haftung ï¿½bernommen wird.
 //
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// Im ï¿½brigen gilt fï¿½r die Nutzung und/oder Weitergabe die
 // GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
+// Version 2 oder nach eigener Wahl eine spï¿½tere Version.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -334,7 +334,7 @@ private:
 	float oFuelCons;
 
 	int oStuckCounter;                           // Tick counter
-    PSysFoo oSysFooStuckX;                       // Positionsüberwachung in X
+    PSysFoo oSysFooStuckX;                       // Positionsï¿½berwachung in X
     PSysFoo oSysFooStuckY;                       // und Y
 	float oTrackAngle;                           // Direction of track
     double oTargetSpeed;                         // Target speed for speed controller
