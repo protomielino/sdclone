@@ -43,8 +43,8 @@ Strategy::Strategy( const MyTrack& track, const PitPath& pitPath )
       m_state(PIT_NONE),
       m_lastFuel(0),
       m_totalFuel(0),
-      m_totalLaps(0),
       m_lastTyreWear(1.0),
+      m_totalLaps(0),
       m_pitType(PT_NORMAL)
 {
 }

@@ -24,8 +24,8 @@
 
 LearnedGraph::LearnedGraph()
 :	m_nAxes(0),
-    m_beta(0.5),
     m_pAxis(0),
+    m_beta(0.5),
     m_pData(0)
 {
 }
@@ -38,8 +38,8 @@ LearnedGraph::LearnedGraph(
     double			initialValue )
 :
     m_nAxes(nAxes),
-    m_beta(0.5),
     m_pAxis(0),
+    m_beta(0.5),
     m_pData(0)
 {
     m_pAxis = new Axis[nAxes];
@@ -62,8 +62,8 @@ LearnedGraph::LearnedGraph(
 
 LearnedGraph::LearnedGraph( double minX, double maxX, int xSteps, double initialY )
 :	m_nAxes(1),
-    m_beta(0.5),
     m_pAxis(0),
+    m_beta(0.5),
     m_pData(0)
 {
     m_pAxis = new Axis[1];
