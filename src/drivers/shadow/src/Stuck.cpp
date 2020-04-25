@@ -1205,7 +1205,11 @@ void	Stuck::getUnstuck( const MyTrack& track, tCarElt* me, const tSituation* s )
     {
         const GridPoint& pt = _plan[i];
         double dist = pt.dist(car_pt1);
-        LogSHADOW.debug( "[%d]=%g, ", i, dist );
+#if defined(_MSC_VER) && _MSC_VER < 1800
+        LogSHADOW.debug( "[%Iu]=%g, ", i, dist );
+#else
+        LogSHADOW.debug( "[%zu]=%g, ", i, dist );
+#endif
         if( bestDist > dist )
         {
             bestDist = dist;

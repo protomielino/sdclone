@@ -137,9 +137,9 @@ void LManualOverride::saveToFile(FILE *filepointer)
     for (int i=0; i<overrideValueCount; i++)
     {
         snprintf(str, 127, "%s<\n", label);
-        fprintf(filepointer, str);
+        fprintf(filepointer, "%s", str);
         snprintf(str, 127, "%i %i %.4f\n\n", overrideValues[i].startdist, overrideValues[i].enddist, overrideValues[i].value);
-        fprintf(filepointer, str);
+        fprintf(filepointer, "%s", str);
     }
 }
 
