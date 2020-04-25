@@ -917,7 +917,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     //float currentPrevSectorSplitTime = currCar->_curSplitTime[currCar->_currentSector - 1]; // our time in the sector we have "just" run over
     //float bestPrevSectorSplitTime = currCar->_bestSplitTime[currCar->_currentSector-1]; // the best split time of the sector we are in this moment
     float bestSplitTime = currCar->_bestSplitTime[currCar->_currentSector]; // the best split time of the sector we are in this moment
-    float splitTimeDiff = 0;
+    // float splitTimeDiff = 0;
 
     //in the first lap we count how many sector this track have
     //ReInfo->track->numberOfSectors is a better source for this but we have no access to it in this file
@@ -1019,9 +1019,11 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     }
 
     //when we have done at least one lap calculate remaining fuel
+#if 0   // dead code
     if (currCar->_laps < 1){
         float fuelConsumpionPerLap = 0.1f;
     }
+#endif
 
     if( currCar->_laps > this->carLaps && currCar->_laps > 1){
         if (currCar->_laps == 2){
@@ -1237,7 +1239,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
 
 	std::string configFileUrl= GetLocalDir();
 	configFileUrl.append("config/osghudconfig.xml");
-	int paramValue = 0;
+	// int paramValue = 0;
 
 	//open the file
 	void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
@@ -1491,11 +1493,13 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
 					std::string elementId = subSectionName;
 
 					//positioning variables
+#if 0   // dead code
 					float posFromTop = 						GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-from-top", "",0 );
 					float posFromBottom = 					GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-from-bottom", "",0 );
 					float posFromLeft = 					GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-from-left", "",0 );
 					float posFromRight = 					GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-from-right", "",0 );
 					float posHorizontalCenter = 			GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontal-center", "",0 );
+#endif
 
 					std::string positionRefObj = 			GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
 					std::string positionRefObjPoint = 		GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );

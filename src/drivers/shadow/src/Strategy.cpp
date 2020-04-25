@@ -164,10 +164,10 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
     double	repairLimit = delayRepair ? m_dangerDamageLimit : m_warnDamageLimit;
 
     double	fuelPerLap = fuelPerM * trackLen;
-    double	damagePerLap = damagePerM * trackLen;
+    // double	damagePerLap = damagePerM * trackLen;
 
-    if(m_HasTYC)
-          double tyreWearPerLap = tyreWearPerM * trackLen;
+    // if(m_HasTYC)
+    //      double tyreWearPerLap = tyreWearPerM * trackLen;
 
     bool	pitAvailable = true;
     double	minPitLaps = 1;

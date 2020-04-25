@@ -199,7 +199,7 @@ void	PitPath::MakePath(
         idx0 = m_pTrack->IndexFromPos(stopPos);
         idx1 = (idx0 + 1) % NSEG;
         int idxp = (idx0 - 1 + NSEG) % NSEG;
-        int idxp2 = (idx0 - 2 + NSEG) % NSEG;
+        // int idxp2 = (idx0 - 2 + NSEG) % NSEG;
         //m_pts[idxp2].maxSpd = m_pts[idxp2].spd = 1.5f;
         m_pts[idxp].maxSpd = m_pts[idxp].spd = 3.0f;
         m_pts[idx0].maxSpd = m_pts[idx0].spd = 3.0f;

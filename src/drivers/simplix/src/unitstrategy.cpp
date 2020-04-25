@@ -9,7 +9,7 @@
 // File         : unitstrategy.cpp
 // Created      : 2007.02.20
 // Last changed : 2014.11.29
-// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
+// Copyright    : ï¿½ 2007-2014 Wolf-Dieter Beelitz
 // eMail        : wdbee@users.sourceforge.net
 // Version      : 4.05.000
 //--------------------------------------------------------------------------*
@@ -34,17 +34,17 @@
 //
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
-// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
+// Wer die Dateien verwendet erkennt an, dass fï¿½r Fehler, Schï¿½den,
+// Folgefehler oder Folgeschï¿½den keine Haftung ï¿½bernommen wird.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
 //
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// Im ï¿½brigen gilt fï¿½r die Nutzung und/oder Weitergabe die
 // GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
+// Version 2 oder nach eigener Wahl eine spï¿½tere Version.
 //--------------------------------------------------------------------------*
 
 #include "unitglobal.h"
@@ -59,8 +59,8 @@ const float TSimpleStrategy::cMAX_FUEL_PER_METER = 0.0008f;
 const int TSimpleStrategy::cPIT_DAMMAGE = 5000;
 const short int NEEDED_MAJOR_VERSION = 1;
 const short int NEEDED_MINOR_VERSION = 1;
-static const char *WheelSect[4] = 
-{SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+// static const char *WheelSect[4] = 
+// {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 //==========================================================================*
 
 //==========================================================================*
@@ -84,7 +84,7 @@ TSimpleStrategy::TSimpleStrategy():
 //==========================================================================*
 
 //==========================================================================*
-// Aufräumen
+// Aufrï¿½umen
 //--------------------------------------------------------------------------*
 TSimpleStrategy::~TSimpleStrategy()
 {
@@ -125,7 +125,7 @@ bool TSimpleStrategy::IsPitFree()
 //==========================================================================*
 
 //==========================================================================*
-// Entscheiden, ob Boxenstopp nötig ist
+// Entscheiden, ob Boxenstopp nï¿½tig ist
 //--------------------------------------------------------------------------*
 bool TSimpleStrategy::NeedPitStop()
 {
@@ -187,7 +187,7 @@ float TSimpleStrategy::PitRefuel()
   float Fuel;                                    // Menge in kg
 
   if (oFuelPerM == 0.0)                          // Wenn kein Messwert
-    FuelConsum = oExpectedFuelPerM;              //   vorliegt, schätzen
+    FuelConsum = oExpectedFuelPerM;              //   vorliegt, schï¿½tzen
   else                                           // ansonsten
     FuelConsum = oFuelPerM;                      //   Messwert nehmen
 
@@ -197,24 +197,24 @@ float TSimpleStrategy::PitRefuel()
     oRaceDistance - DistanceRaced;               //   Rennens ermitteln
 
   Fuel =                                         // Bedarf an Treibstoff
-    (oRemainingDistance + oReserve) * FuelConsum;// für restliche Strecke
+    (oRemainingDistance + oReserve) * FuelConsum;// fï¿½r restliche Strecke
 
   if (Fuel > oMaxFuel)                           // Wenn mehr als eine Tank-
-  {                                              //   füllung benötigt wird
-    if (Fuel / 2 < oMaxFuel)                     // Bei zwei Tankfüllungen
-      Fuel = Fuel / 2;                           //   die Hälfte tanken
-    else if (Fuel / 3 < oMaxFuel)                // Bei drei Tankfüllungen.
+  {                                              //   fï¿½llung benï¿½tigt wird
+    if (Fuel / 2 < oMaxFuel)                     // Bei zwei Tankfï¿½llungen
+      Fuel = Fuel / 2;                           //   die Hï¿½lfte tanken
+    else if (Fuel / 3 < oMaxFuel)                // Bei drei Tankfï¿½llungen.
       Fuel = Fuel / 3;                           //   ein Drittel tanken
-    else if (Fuel / 4 < oMaxFuel)                // Bei vier Tankfüllungen.
+    else if (Fuel / 4 < oMaxFuel)                // Bei vier Tankfï¿½llungen.
       Fuel = Fuel / 4;                           //   ein Viertel tanken
-    else                                         // Bei fünf Tankfüllungen
-      Fuel = Fuel / 5;                           //   ein Fünftel tanken
+    else                                         // Bei fï¿½nf Tankfï¿½llungen
+      Fuel = Fuel / 5;                           //   ein Fï¿½nftel tanken
   };
 
   if (Fuel > oMaxFuel - CarFuel)                 // Menge ggf. auf freien
     Fuel = oMaxFuel - CarFuel;                   // Tankinhalt begrenzen
   else                                           // ansonsten Bedarf
-    Fuel = Fuel - CarFuel;                       // abzügl. Tankinhalt
+    Fuel = Fuel - CarFuel;                       // abzï¿½gl. Tankinhalt
 
   //Fuel = MIN(Fuel,10.0);                         // NUR ZUM TEST DES TEAMMANAGERS
 
@@ -256,15 +256,15 @@ int TSimpleStrategy::PitRepair()
 //==========================================================================*
 
 //==========================================================================*
-// Tankfüllung beim Start bestimmen
+// Tankfï¿½llung beim Start bestimmen
 //--------------------------------------------------------------------------*
 double TSimpleStrategy::SetFuelAtRaceStart
   (PTrack Track, PCarSettings *CarSettings, PSituation Situation, float Fuel)
 {
   oTrack = Track;                                // Save TORCS pointer
 
-  oTrackLength = oTrack->length;                 // Länge der Strecke merken
-  oRaceDistance =                                // Gesamtlänge des Rennens
+  oTrackLength = oTrack->length;                 // Lï¿½nge der Strecke merken
+  oRaceDistance =                                // Gesamtlï¿½nge des Rennens
     oTrackLength * Situation->_totLaps;          //   berechnen
   oRemainingDistance =                           // Restliche Strecke des
     oRaceDistance + oReserve;                    //   Rennens ermitteln
@@ -274,7 +274,7 @@ double TSimpleStrategy::SetFuelAtRaceStart
   oExpectedFuelPerM = Fuel / oRemainingDistance; // Verbrauch in kg/m
 
   oMaxFuel =            
-	  GfParmGetNum(*CarSettings,TDriver::SECT_PRIV,         // Maximal möglicher
+	  GfParmGetNum(*CarSettings,TDriver::SECT_PRIV,         // Maximal mï¿½glicher
 	PRV_MAX_FUEL,(char*) NULL,oMaxFuel);         //   Tankinhalt
   LogSimplix.debug("#oMaxFuel (private) = %.1f\n",oMaxFuel);
 
@@ -283,11 +283,11 @@ double TSimpleStrategy::SetFuelAtRaceStart
 	PRV_START_FUEL,(char*) NULL,(float) oStartFuel);          
   LogSimplix.debug("#oStartFuel (private) = %.1f\n",oStartFuel);
 
-  if ((!TDriver::Qualification)                  // Fürs Rennen 
+  if ((!TDriver::Qualification)                  // Fï¿½rs Rennen 
 	  && (oStartFuel > 0))
   {
     oLastFuel = (float) oStartFuel;              // volltanken
-    GfParmSetNum(*CarSettings,SECT_CAR,PRM_FUEL, // Gewünschte Tankfüllung
+    GfParmSetNum(*CarSettings,SECT_CAR,PRM_FUEL, // Gewï¿½nschte Tankfï¿½llung
       (char*) NULL, oLastFuel);                  //   an TORCS melden
     return oLastFuel;    
   }
@@ -295,28 +295,28 @@ double TSimpleStrategy::SetFuelAtRaceStart
   oMinLaps = (int)           
 	  GfParmGetNum(*CarSettings,TDriver::SECT_PRIV, // Mindestanzahl an Runden
 	PRV_MIN_LAPS,(char*) NULL,(float) oMinLaps); //   die mit dem Tankinhalt
-  LogSimplix.debug("#oMinLaps (private) = %d\n",oMinLaps);  //   möglich sein müssen
+  LogSimplix.debug("#oMinLaps (private) = %d\n",oMinLaps);  //   mï¿½glich sein mï¿½ssen
 
   if (Fuel == 0)                                 // Wenn nichts bekannt ist,
     Fuel = oMaxFuel;                             // Volltanken
 
   oLastFuel = Fuel;                              // Erforderlicher Treibstoff
   if (Fuel > oMaxFuel)                           // Wenn mehr als eine Tank-
-  {                                              //   füllung benötigt wird
-    if (Fuel / 2 < oMaxFuel)                     // Bei zwei Tankfüllungen
-      oLastFuel = Fuel / 2;                      //   die Hälfte tanken
-    else if (Fuel / 3 < oMaxFuel)                // Bei drei Tankfüllungen.
+  {                                              //   fï¿½llung benï¿½tigt wird
+    if (Fuel / 2 < oMaxFuel)                     // Bei zwei Tankfï¿½llungen
+      oLastFuel = Fuel / 2;                      //   die Hï¿½lfte tanken
+    else if (Fuel / 3 < oMaxFuel)                // Bei drei Tankfï¿½llungen.
       oLastFuel = Fuel / 3;                      //   ein Drittel tanken
-    else if (Fuel / 4 < oMaxFuel)                // Bei vier Tankfüllungen.
+    else if (Fuel / 4 < oMaxFuel)                // Bei vier Tankfï¿½llungen.
       oLastFuel = Fuel / 4;                      //   ein Viertel tanken
-    else                                         // Bei fünf Tankfüllungen
-      oLastFuel = Fuel / 5;                      //   ein Fünftel tanken
+    else                                         // Bei fï¿½nf Tankfï¿½llungen
+      oLastFuel = Fuel / 5;                      //   ein Fï¿½nftel tanken
   };
 
   //oLastFuel = MIN(oLastFuel,15.0);               // NUR ZUM TEST DES TEAMMANAGERS
 
-  oLastFuel = MIN(oLastFuel, oMaxFuel);          // Überlaufen verhindern
-  GfParmSetNum(*CarSettings, SECT_CAR, PRM_FUEL, // Gewünschte Tankfüllung
+  oLastFuel = MIN(oLastFuel, oMaxFuel);          // ï¿½berlaufen verhindern
+  GfParmSetNum(*CarSettings, SECT_CAR, PRM_FUEL, // Gewï¿½nschte Tankfï¿½llung
     (char*) NULL, oLastFuel);                    //   an TORCS melden
 
   return oLastFuel;

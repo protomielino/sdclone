@@ -382,8 +382,11 @@ getMovedAxis(int joy_number)
 static void
 IdleWaitForInput(void)
 {
+#ifndef SDL_JOYSTICK
     int		mask;
-    int		b, i;
+    int		b;
+#endif
+    int i;
     int		index;
     const char	*str;
     int		axis;
@@ -556,7 +559,6 @@ configure_for_joy_axis:
 static void
 onPush(void *vi)
 {
-    int		index;    
     long	i = (long)vi;
 
     /* Do nothing if mouse button clicks are to be refused */
@@ -589,7 +591,7 @@ onPush(void *vi)
     GfctrlJoyGetCurrentStates(&joyInfo);
     memcpy(&joyCenter, &joyInfo, sizeof(joyCenter));
 #else
-    for (index = 0; index < GFCTRL_JOY_NUMBER; index++)
+    for (int index = 0; index < GFCTRL_JOY_NUMBER; index++)
 	if (Joystick[index])
 	    Joystick[index]->read(&JoyButtons[index], &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
     memcpy(JoyAxisCenter, JoyAxis, sizeof(JoyAxisCenter));

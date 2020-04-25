@@ -141,7 +141,7 @@ tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSi
 	/* Build list of available screen sizes */
 	int avail;
 	SDL_DisplayMode mode;
-	Uint32 format;
+	// Uint32 format;
 	SDL_Rect bounds;
 	tScreenSize* aSuppSizes;
     tScreenSize* tmpSuppSizes;

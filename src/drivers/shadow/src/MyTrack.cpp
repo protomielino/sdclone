@@ -117,8 +117,8 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
 //			DEBUGF( "   ### segDist %g   tsend %g\n",
 //					segDist, tsend );
 
-            double	t = (segDist - pseg->lgfromstart) / pseg->length;
-            double	width = pseg->startWidth + (pseg->endWidth - pseg->startWidth) * t;
+            // double	t = (segDist - pseg->lgfromstart) / pseg->length;
+            // double	width = pseg->startWidth + (pseg->endWidth - pseg->startWidth) * t;
 
             m_pSegs[i].segDist = segDist;
             m_pSegs[i].pSeg = pseg;
@@ -171,8 +171,8 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
         double	lastK		= 0;
         int		lastSign	= 1;
 
-        const double STRAIGHT_K = 0.00005;
-        bool	increasing	= true;
+        // const double STRAIGHT_K = 0.00005;
+        // bool	increasing	= true;
 
         vector<int>	bends;
 
@@ -183,7 +183,7 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                         pseg->type == TR_RGT ? -1.0 / pseg->radius : 0;
             //if( fabs(k) < STRAIGHT_K )
             //	k = 0;
-            double absK = fabs(k);
+            // double absK = fabs(k);
 
             if( k != lastK )
             {

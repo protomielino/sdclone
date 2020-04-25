@@ -254,7 +254,7 @@ bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
 	{
 		GfLogTrace("Trying %s mode\n", nFullScreen ? "full-screen" : "windowed");
 
-		const int bfVideoMode = SDL_WINDOW_OPENGL | (nFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+		// const int bfVideoMode = SDL_WINDOW_OPENGL | (nFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
 		SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
 		nAlphaChannel = bAlpha ? 1 : 0;
@@ -506,7 +506,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 		GfLogTrace("Trying %s mode\n", nFullScreen ? "full-screen" : "windowed");
 
 #if SDL_MAJOR_VERSION >= 2
-		const int bfVideoMode = SDL_WINDOW_OPENGL | (nFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
+		// const int bfVideoMode = SDL_WINDOW_OPENGL | (nFullScreen ? SDL_WINDOW_FULLSCREEN : 0);
         SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 #else
 		const int bfVideoMode = SDL_OPENGL | (nFullScreen ? SDL_FULLSCREEN : 0);

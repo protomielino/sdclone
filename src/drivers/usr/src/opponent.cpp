@@ -426,7 +426,7 @@ void Opponent::calcState(float Speed, Driver *driver)
                 if (team == TEAM_FRIEND && car->_dammage - MAX_DAMAGE_DIFF < mycar->_dammage)
                     state |= OPP_FRONT_FOLLOW;
                 //distance -= MAX(car->_dimension_x, mycar->_dimension_x);
-                bool braking_zone = driver->raceline->InBrakingZone(LINE_RL);
+                // bool braking_zone = driver->raceline->InBrakingZone(LINE_RL);
                 float colldistance = (float)MAX(0.0, distance - car->_dimension_x - fabs(driver->raceline->tRInverse[LINE_RL][driver->raceline->Next]) * 700);
                 // If the distance is small we compute it more accurate.
                 /*
@@ -910,9 +910,9 @@ int Opponent::testLinearCollision2(Driver *driver)
         d_new2[i].ay = d_new[i].ay = d_cur[i].ay = mycar->_corner_y(i);
     }
 
-    double myta = fabs(RtTrackSideTgAngleL(&(mycar->_trkPos))) * 180 / 3.14159;
-    double ota = fabs(RtTrackSideTgAngleL(&(car->_trkPos))) * 180 / 3.14159;
-    double tadiff = fabs((float)(myta - ota));
+    // double myta = fabs(RtTrackSideTgAngleL(&(mycar->_trkPos))) * 180 / 3.14159;
+    // double ota = fabs(RtTrackSideTgAngleL(&(car->_trkPos))) * 180 / 3.14159;
+    // double tadiff = fabs((float)(myta - ota));
 
     if (brakedistance < 0.0)
     {
@@ -926,7 +926,10 @@ int Opponent::testLinearCollision2(Driver *driver)
         fprintf(stderr, "%s %d CLOSE OVERLAP COLLISION A collspeed=%.2f\n",car->_name,mycar->_dammage,collspeed);fflush(stderr);
 #endif
     }
+
+#ifdef BRAKE_DEBUG
     double trackdistance = brakedistance;
+#endif
     //distance = (tdble)findDistanceBetweenCars(o_cur, d_cur);
 #if 0
     if (distance > MAX(5.0, 6 * ((90 - tadiff) / 18)))
@@ -953,15 +956,15 @@ int Opponent::testLinearCollision2(Driver *driver)
 #else
     collspeed = (float)(car->_speed_x + (_impact * MAX(1.0, timpact/2) * (brake_coefficient*10)));
 #endif
-    double ospeed = car->_speed_x + (brakedistance < 2.0 ? MIN(0.0, car->_accel_x * t_impact * 2.0) : 0.0);
+    // double ospeed = car->_speed_x + (brakedistance < 2.0 ? MIN(0.0, car->_accel_x * t_impact * 2.0) : 0.0);
     double speedDiff = mycar->_speed_x - car->_speed_x;
     double timpact = (brakedistance) / speedDiff;
     //if (brakedistance < 5.0 && car->_accel_x < 0.0)
     //    speedDiff = mycar->_speed_x - (car->_speed_x + MAX(-2.0f, car->_accel_x) * t_impact * 4);
     timpact = (brakedistance) / speedDiff;
 
-    bool braking_zone = driver->raceline->InBrakingZone(LINE_RL);
-    double safe_margin = ((braking_zone ? 2.0 : 1.0) + fabs(driver->raceline->tRInverse[LINE_RL][driver->raceline->Next]) * 800);
+    // bool braking_zone = driver->raceline->InBrakingZone(LINE_RL);
+    // double safe_margin = ((braking_zone ? 2.0 : 1.0) + fabs(driver->raceline->tRInverse[LINE_RL][driver->raceline->Next]) * 800);
 
     /*
     if (speedDiff >= 0.0 && brakedistance <= safe_margin && fabs(car->_trkPos.toLeft - mycar->_trkPos.toLeft) < MAX(cardata->getWidthOnTrack(), driver->getWidthOnTrack()) + 0.5)

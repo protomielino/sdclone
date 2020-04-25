@@ -1249,7 +1249,7 @@ float Driver::getSteer(tSituation *s)
         return 0.0f;
 
     float targetAngle;
-    float offset = (s->currentTime < 1.0 ? car->_trkPos.toMiddle : getOffset());
+    // float offset = (s->currentTime < 1.0 ? car->_trkPos.toMiddle : getOffset());
 
     /* K1999 raceline */
     memset(racelineDrivedata, 0, sizeof(RaceLineDriveData));
@@ -1641,7 +1641,7 @@ vec2f Driver::getTargetPoint(double lane)
 /******************************************************************************/
 int Driver::checkSwitch( int side, Opponent *o, tCarElt *ocar, double catchdist)
 {
-    double radius = 0.0;
+    // double radius = 0.0;
 
     if (catchdist < 15.0)
     {
@@ -1672,7 +1672,8 @@ int Driver::checkSwitch( int side, Opponent *o, tCarElt *ocar, double catchdist)
 float Driver::getOffset()
 {
     int i;
-    float mincatchdist = 1000.0f, mindist = -1000.0f;
+    // float mincatchdist = 1000.0f;
+    float mindist = -1000.0f;
     //Opponent *ret = NULL;
     Opponent *o = NULL;
     avoidmode = 0;
@@ -1902,7 +1903,7 @@ float Driver::getOffset()
     for (i = 0; i < opponents->getNOpponents(); i++)
     {
         // check Team mate name and situation
-        Opponent *opp = &opponent[i];
+        // Opponent *opp = &opponent[i];
 
         /* Let the teammate with less damage overtake to use slipstreaming.
            The position change happens when the damage difference is greater than  TEAM_DAMAGE_CHANGE_LEAD. */
@@ -1937,7 +1938,7 @@ float Driver::getOffset()
         rightMargin = 1.0, leftMargin = 0.0;
 
         float side = car->_trkPos.toMiddle - ocar->_trkPos.toMiddle;
-        float w = car->_trkPos.seg->width / WIDTHDIV - BORDER_OVERTAKE_MARGIN;
+        // float w = car->_trkPos.seg->width / WIDTHDIV - BORDER_OVERTAKE_MARGIN;
 
         if (side > 0.0f)
         {
@@ -2050,7 +2051,7 @@ double Driver::GetOvertakeSpeedDiff()
 
 bool Driver::CheckOvertaking(double minLeftMargin, double maxRightMargin)
 {
-    Opponent *o = NULL;
+    // Opponent *o = NULL;
     tCarElt *ocar = NULL;
 
     double minSpeedDiff = GetOvertakeSpeedDiff();
@@ -2415,10 +2416,10 @@ int Driver::GetAvoidSide(Opponent *oppnt, int allowed_sides, double t_impact, do
     if (!allowed_sides) return 0;
     t_impact = MIN(2.0, t_impact);
     int avoidSide = 0;
-    float mincatchdist = getSpeed()*2;
+    // float mincatchdist = getSpeed()*2;
     tCarElt *oppCar = oppnt->getCarPtr();
     float oppLeftMovt = oppnt->getAvgLateralMovt() * t_impact / deltaTime;
-    float myLeftMovt = avgLateralMovt * t_impact / deltaTime;
+    // float myLeftMovt = avgLateralMovt * t_impact / deltaTime;
     float tA = RtTrackSideTgAngleL(&(oppCar->_trkPos));
     float oA = tA - oppCar->_yaw;
     NORM_PI_PI(oA);
@@ -2432,12 +2433,12 @@ int Driver::GetAvoidSide(Opponent *oppnt, int allowed_sides, double t_impact, do
     left_toMid = car->_trkPos.toMiddle + car->_dimension_y / 2 + extra_width;
     right_toMid = car->_trkPos.toMiddle - car->_dimension_y / 2 - extra_width;
     /* Compute the opponents distance to the middle.*/
-    float oppExtWidth = extra_width;// fabs(sin(oppCar->_yaw));
+    // float oppExtWidth = extra_width;// fabs(sin(oppCar->_yaw));
     float oppCarTL = oppCar->_trkPos.toLeft - extra_width - MIN(0.0, oppLeftMovt);
     float oppCarTR = oppCar->_trkPos.toLeft + extra_width + MAX(0.0, oppLeftMovt);
-    float myCarTL = MAX(0.5, MIN(track->width-0.5, car->_trkPos.toLeft + myLeftMovt));
-    float myCarTR = MAX(0.5, MIN(track->width-0.5, car->_trkPos.toRight - myLeftMovt));
-    float sidedist = fabs(oppCarTL - myCarTL);
+    // float myCarTL = MAX(0.5, MIN(track->width-0.5, car->_trkPos.toLeft + myLeftMovt));
+    // float myCarTR = MAX(0.5, MIN(track->width-0.5, car->_trkPos.toRight - myLeftMovt));
+    // float sidedist = fabs(oppCarTL - myCarTL);
     float base2left = track->width * raceline->tLane[LINE_LEFT][raceline->Next] + car->_dimension_y;
     float base2right = track->width * raceline->tLane[LINE_RIGHT][raceline->Next] - car->_dimension_y;
 
@@ -2848,14 +2849,16 @@ float Driver::filterBPit(float brake)
 float Driver::filterBColl(float brake)
 {
     return brake;
+
+#if 0   // dead code
     if (simtime < 1.5)
         return brake;
 
-    float mu = car->_trkPos.seg->surface->kFriction;
-    int i;
-    float thisbrake = 0.0f, collision = 0.0f;;
+    // float mu = car->_trkPos.seg->surface->kFriction;
+    float thisbrake = 0.0f;
+    // float collision = 0.0f;;
 
-    for (i = 0; i < opponents->getNOpponents(); i++)
+    for (int i = 0; i < opponents->getNOpponents(); i++)
     {
         if (opponent[i].getState() & OPP_COLL)
         {
@@ -2864,6 +2867,7 @@ float Driver::filterBColl(float brake)
     }
 
     return MIN(1.0f, MAX(thisbrake, brake));
+#endif
 }
 
 /******************************************************************************/
@@ -2872,7 +2876,7 @@ float Driver::filterABS(float brake)
 {
     if (car->_speed_x < ABS_MINSPEED) return brake;
     float origbrake = brake;
-    float rearskid = MAX(0.0f, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
+    // float rearskid = MAX(0.0f, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
     int i;
     float slip = 0.0f;
 

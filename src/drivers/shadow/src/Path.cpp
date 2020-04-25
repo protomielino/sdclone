@@ -112,7 +112,7 @@ bool	Path::GetPtInfo( double trackPos, PtInfo& pi ) const
 
     Vec2d	pp = cubic.Calc(tx);
     Vec2d	pv = cubic.CalcGradient(tx);
-    double	ck = cubic.CalcCurvature(tx);
+    // double	ck = cubic.CalcCurvature(tx);
     double	k = Utils::InterpCurvatureLin(k1, k2, tx);
 
 //	LogSHADOW.debug( "*** tx=%.3f/%d (%.3f,%.3f) (%.3f,%.3f) k=%.5f %.5f\n", tx, idx0, pp.x, pp.y, pv.x, pv.y, k, k - ck );
@@ -305,8 +305,8 @@ void	Path::CalcCurvaturesH( int start, int len, int step )
         int     ip = (i - 1 * step + NSEG) % NSEG;
         int		in = (i + 1 * step) % NSEG;
 
-        if( i == 376 )
-            int f = 2;
+        // if( i == 376 )
+        //    int f = 2;
 #if 1
         t3Dd	tn;
         tTrkLocPos	pos;
@@ -372,7 +372,7 @@ void	Path::CalcAngles( int start, int len, int step )
 void	Path::CalcLoadRatios( int start, int len, const CarModel& cm, int step )
 {
     const double	recip_op_load = 1 / (cm.MASS * G);
-    const double	mass_load = (cm.MASS + cm.FUEL) * G;
+    // const double	mass_load = (cm.MASS + cm.FUEL) * G;
     const double	Ca = cm.CA;
 
     {for( int count = 0; count < NSEG; count++ )
@@ -396,14 +396,14 @@ void	Path::CalcMaxSpeeds( int start, int len, const CarModel& carModel, int step
     // [experimental] limit in order to give the car a chance to adjust to
     // a change of curvature.  rates over this limit are penalised in speed
     // to push the optimiser to avoid them.
-    const double RATE_OF_CHANGE_OF_K_LIMIT = 0.05;
+    // const double RATE_OF_CHANGE_OF_K_LIMIT = 0.05;
 
     {for( int count = 0; count < len; count += step )
     {
         int	 i = (start + count) % NSEG;
 
-        if( i == 387 && step == 1 )
-            int ff = 5;
+        // if( i == 387 && step == 1 )
+        //    int ff = 5;
 
         // use friction from outer set of wheels.
         double  frictionOffset = m_pts[i].offs + SGN(m_pts[i].k) * 0.75;
@@ -1059,6 +1059,7 @@ void	Path::FirFilter()
         -0.002138757089494907,
         -0.002383400601468984
     };
+#if 0   // dead code
     static const double xtaps[] =
     {
         -0.02010411882885732,
@@ -1083,6 +1084,7 @@ void	Path::FirFilter()
         -0.05842798004352509,
         -0.02010411882885732,
     };
+#endif
     const int N_TAPS = sizeof(taps) / sizeof(taps[0]);
 
     vector<double>  values(NSEG);
@@ -1343,8 +1345,8 @@ bool	Path::LoadPath( const char* pDataFile )
             dist = m_pTrack->CalcPos(pt.x, pt.y, &m_pTrack->GetAt(last_s));
             int	cur_s = m_pTrack->IndexFromPos(dist);
 
-            if( cur_s == 258 )
-                int f = 1;
+            // if( cur_s == 258 )
+            //     int f = 1;
 
             tTrackSeg*	pSeg = m_pTrack->GetAt(cur_s).pSeg;
             LogSHADOW.debug( "%4d  (%8g,%8g)  seg %4d/%3d%c %d\n",

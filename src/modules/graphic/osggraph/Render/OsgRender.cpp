@@ -774,9 +774,9 @@ void SDRender::UpdateSky(double currentTime, double accelTime, double X, double 
     }
 
     // At each call, update possibly high speed objects of the sky dome : the clouds.
-    scenery = (SDScenery *)getScenery();
-    double r_WrldX = scenery->getWorldX();
-    double r_WrldY = scenery->getWorldY();
+    // scenery = (SDScenery *)getScenery();
+    // double r_WrldX = scenery->getWorldX();
+    // double r_WrldY = scenery->getWorldY();
 
     //osg::Vec3 viewPos(r_WrldX / 2, r_WrldY/ 2, 0.0 );
     osg::Vec3d viewPos(X, Y, 0.0 );

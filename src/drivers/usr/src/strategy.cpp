@@ -104,7 +104,7 @@ void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void *carHandle, void **carPa
     }
 
     m_expectedfuelperlap = fuelPerLap;
-    double raceDist = 0.0;
+    // double raceDist = 0.0;
     float fuelForRace = 0.0;
     int numPitstop = 0;
     int raceLaps = s->_totLaps;
@@ -237,11 +237,12 @@ int SimpleStrategy::calcRepair(tCarElt* car, tSituation *s)
 {
     // find out what our lead over next car is.
     float lead = FLT_MAX;
-    int pos = 1000, sortedOppCount = 0, i, j;
+    // int pos = 1000;
+    int sortedOppCount = 0, i, j;
     bool lastPit = ((car->_remainingLaps + 1) * fuelPerLap > maxFuel ? false : true);
     Opponent *sortedOpp[64];
-    Opponent *O = NULL;
-    tCarElt *m_tmCar = NULL;
+    // Opponent *O = NULL;
+    // tCarElt *m_tmCar = NULL;
 
     if (!lastPit)
     {
@@ -627,13 +628,13 @@ float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
     int lapsToEnd;
 
     lapsToEnd = car->_remainingLaps - car->_lapsBehindLeader + 1;
-    int inLap = s->_totLaps - car->_remainingLaps;
+    // int inLap = s->_totLaps - car->_remainingLaps;
     //fuelToEnd = MIN(getRefuel1(lapsToEnd), getRefuel2(lapsToEnd));
     fuelToEnd = (float)getRefuel1(lapsToEnd);
 
     //m_remainingstops = int(floor(fuelToEnd / maxFuel));
     m_remainingstops = (int)fabs(fuelToEnd / MIN(maxFuel, car->_tank));
-    int num_remStops = m_remainingstops + 1;
+    // int num_remStops = m_remainingstops + 1;
     m_fuelperstint = (float)(MIN(maxFuel, car->_tank) - car->_fuel);
     fuel = m_fuelperstint * 0.90f;
 

@@ -178,14 +178,14 @@ void	SpringsPath::AnalyseBumps( const CarModel& cm, bool dumpInfo )
     double	sz = m_pts[0].pt.z;
     double	vz = 0;
     double	pz = sz;
-    double	dt = 0.1;
+    // double	dt = 0.1;
     {for( int count = 0; count < 2; count++ )
     {
         int		pi = NSEG - 1;
 
         for( int i = 0; i < NSEG; i++ )
         {
-            double	oldSz = sz;
+            // double	oldSz = sz;
             double	oldPz = pz;
 
             double	v = (m_pts[i].accSpd + m_pts[pi].accSpd) * 0.5;
@@ -448,10 +448,10 @@ void SpringsPath::Search( const CarModel& cm )
 
 void SpringsPath::Search( const CarModel& cm, const ICalcTimeFunc& calcTimeFunc )
 {
-    const double LaneMinInt = 1.0;//SideDistInt / Track.width;
-    const double LaneMinExt = 1.0;//SideDistExt / Track.width;
-    const double LaneMaxInt = 1.0;//1 - LaneMinInt;
-    const double LaneMaxExt = 1.0;//1 - LaneMinExt;
+    // const double LaneMinInt = 1.0;//SideDistInt / Track.width;
+    // const double LaneMinExt = 1.0;//SideDistExt / Track.width;
+    // const double LaneMaxInt = 1.0;//1 - LaneMinInt;
+    // const double LaneMaxExt = 1.0;//1 - LaneMinExt;
 
     int IndexStep = 128;
     double LaneStep = 0.02;
@@ -651,7 +651,7 @@ void	SpringsPath::OptimisePtClothoid(
     }
 */
     double	t = l3->offs;
-    double	oldT = t;
+    // double	oldT = t;
     Utils::LineCrossesLineXY( l3->Pt(), l3->Norm(), p2, p4 - p2, t );
 //	if( l3->h < 0.1 )
     {

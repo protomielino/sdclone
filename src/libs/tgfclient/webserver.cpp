@@ -181,12 +181,12 @@ void NotificationManager::runAnimation(){
     if(remainingChangeNeeded != 0){
 
         //how much time is we are running the animation
-        float animationRunningTime = (currentTime - this->animationStartTime) / (float) CLOCKS_PER_SEC;
+        // float animationRunningTime = (currentTime - this->animationStartTime) / (float) CLOCKS_PER_SEC;
 
         //how much time is passed from the last run
         float animationTimeFromLastStep = (currentTime - this->animationLastExecTime) / (float) CLOCKS_PER_SEC;
         //time remaining for the animation
-        float animationTimeRemaining = this->totalAnimationDuration - animationRunningTime;
+        // float animationTimeRemaining = this->totalAnimationDuration - animationRunningTime;
 
         //
         //int propertyStepChange = remainingChangeNeeded / animationTimeRemaining * animationTimeFromLastStep;
@@ -326,7 +326,7 @@ void NotificationManager::createUi()
 
     //get first line vertical position
     int ypos=(int)GfParmGetNum(this->menuXMLDescHdle, "dynamic controls/slide", "y", "null", 0);
-    int yposmod= ypos;
+    // int yposmod= ypos;
 
     //iterate trougth lines
     for (size_t i = 0; i < this->messageLines.size(); i++)

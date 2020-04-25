@@ -70,8 +70,6 @@ static char** ParameterRanges = 0;
 
 static int NbrSelected = 0;
 static int MaxSelected = 8;
-static int LoopsDone = 0;
-static int LoopsRemaining = 1000;
 static double VariationScale = 1.0;
 static double InitialLapTime = 0;
 static double TotalLapTime = 0;

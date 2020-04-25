@@ -625,7 +625,6 @@ void	ClothoidPath::Optimise(
 
     double sc = 1.0;
     double	t = l3->offs;
-    double	oldT = t;
 
     Utils::LineCrossesLineXY( l3->Pt(), l3->Norm(), p2, p4 - p2, t );
 

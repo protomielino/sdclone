@@ -96,7 +96,7 @@ Stuck::~Stuck()
 
 bool Stuck::execute( const MyTrack& track, const tSituation* s, tCarElt* me, const Opponent::Sit& mySit )
 {
-    double start = GfTimeClock();
+    // double start = GfTimeClock();
 
     switch( _stuckState )
     {
@@ -122,7 +122,7 @@ bool Stuck::execute( const MyTrack& track, const tSituation* s, tCarElt* me, con
             break;
     }
 
-    double elapsed = GfTimeClock() - start;
+    // double elapsed = GfTimeClock() - start;
 //	LogSHADOW.debug( "[%d] stuck CPU time: %0.6f seconds.\n", me->index, elapsed );
 
     return _stuckState == EXEC_PLAN;
@@ -335,8 +335,8 @@ void	Stuck::makeOpponentsList( const tSituation* s, const tCarElt* me, vector<Op
         double	carX = other->pub.DynGCg.pos.x - _gridOrigin.x;
         double	carY = other->pub.DynGCg.pos.y - _gridOrigin.y;
 
-        int intCarX = (int)floor(carX + 0.5);
-        int intCarY = (int)floor(carY + 0.5);
+        // int intCarX = (int)floor(carX + 0.5);
+        // int intCarY = (int)floor(carY + 0.5);
 
         if( other->pub.speed > 2 ||
             carX < 0 || carX >= GRID_SIZE ||
@@ -597,7 +597,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
         {
             int		dx = delta8_x[a];
             int		dy = delta8_y[a];
-            float	dt = delta8_t[a];
+            // float	dt = delta8_t[a];
 
             int x2 = x + dx;
             int y2 = y + dy;
@@ -1024,7 +1024,7 @@ bool	Stuck::solveR( const tCarElt* me )
         generateSuccessorsR( pt, succs );
 
         // for each successor.
-        Cell& fromCell = at(pt);
+        // Cell& fromCell = at(pt);
 
         for( vector<GridPoint>::iterator it = succs.begin(); it != succs.end(); it++ )
         {

@@ -511,7 +511,7 @@ void	Driver::InitTrack(
     LogSHADOW.info(" # Global Skill: %.3f\n", globalskill);
 
     //load the driver skill level, range 0 - 1
-    float driver_skill = 0.0f;
+    // float driver_skill = 0.0f;
     snprintf(buf, sizeof(buf), "drivers/%s/%d/skill.xml", MyBotName, INDEX);
     LogSHADOW.debug("Path skill driver: %s\n", buf);
     skillHandle = GfParmReadFile(buf, GFPARM_RMODE_STD);
@@ -974,7 +974,7 @@ double	Driver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi, const Pri
     GetPosInfo( aheadOmegaPos, piOmega );
 
     // work out basic steering angle (that aligns the front wheels parallel to the racing line).
-    double	velAng = atan2(car->_speed_Y, car->_speed_X);
+    // double	velAng = atan2(car->_speed_Y, car->_speed_X);
     double	angle = aheadPi.oang - car->_yaw;
     NORM_PI_PI(angle);
     double	basicAngle = angle;
@@ -1057,7 +1057,7 @@ double	Driver::SteerAngle1( tCarElt* car, PtInfo& carPi, PtInfo& aheadPi )
 
     // calc position of car along track.
     double	carPos			= m_track.CalcPos(car);
-    double	carToMiddle		= car->pub.trkPos.toMiddle;
+    // double	carToMiddle		= car->pub.trkPos.toMiddle;
 
     // calc position of centre of fron axle along track.
     double	midPt			= m_cm[PATH_NORMAL].F_AXLE_X;
@@ -1146,12 +1146,12 @@ double	Driver::SteerAngle2( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     double	x = car->pub.DynGCg.pos.x + midPt * cos(car->_yaw);
     double	y = car->pub.DynGCg.pos.y + midPt * sin(car->_yaw);
 
-    static double	oldX = x;
-    static double	oldY = y;
-    double	velX = (x - oldX) / 0.02;
-    double	velY = (y - oldY) / 0.02;
-    oldX = x;
-    oldY = y;
+    // static double	oldX = x;
+    // static double	oldY = y;
+    // double	velX = (x - oldX) / 0.02;
+    // double	velY = (y - oldY) / 0.02;
+    // oldX = x;
+    // oldY = y;
 
     tTrkLocPos	trkPos;
     RtTrackGlobal2Local(car->_trkPos.seg, x, y, &trkPos, 0);
@@ -1225,7 +1225,7 @@ double	Driver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     double	yawU = car->_yaw_rate;
 
     // future yaw rate required ahead.
-    double	yawV = aheadPi.k * spd0;
+    // double	yawV = aheadPi.k * spd0;
 
     // future yaw required ahead (assuming current yaw to be 0).
     double	yawS = aheadPi.oang - car->_yaw;
@@ -1264,14 +1264,14 @@ double	Driver::SteerAngle3( tCarElt* car, PtInfo& pi, PtInfo& aheadPi )
     {
         double  zforce  = car->_reaction[0];
         double  s       = car->_skid[0] / (zforce * 0.0002f);
-        double  stmp	= MIN(s, 1.5f);
+        // double  stmp	= MIN(s, 1.5f);
         double  sv      = hypot(car->_wheelSlipSide(0), car->_wheelSlipAccel(0));
         double  v       = sv / s;
         double  sx      = car->_wheelSlipAccel(0) / v;
         double  sy      = car->_wheelSlipSide(0) / v;
-        double  sa      = asin(sy);
+        // double  sa      = asin(sy);
 
-        double  wrl     = car->_wheelSpinVel(0) * car->_wheelRadius(0);
+        // double  wrl     = car->_wheelSpinVel(0) * car->_wheelRadius(0);
 
         if( s > m_cm[PATH_NORMAL].TARGET_SLIP + 0.0004 )
             LogSHADOW.debug( "acc %6.2f  zf %6.1f  s %.6f  v %6.2f  sx %.6f  sy %.6f\n",
@@ -1710,10 +1710,12 @@ void	Driver::SpeedControl4(
 {
     if( m_lastBrk && m_lastTargV )
     {
+#if 0   // dead code
         if( m_lastBrk > 0 || (car->ctrl.accelCmd == -m_lastBrk) )
         {
             double	err = m_lastTargV - spd0;
         }
+#endif
 
         m_lastBrk = 0;
         m_lastTargV = 0;
@@ -1960,7 +1962,7 @@ void	Driver::launchControlSimple( tCarElt* car, tSituation* s )
     wv /= count;
 
     double delta = wv - car->pub.speed;
-    double ddiff = delta - _prevDelta;
+    // double ddiff = delta - _prevDelta;
     _prevDelta = delta;
 
     LogSHADOW.debug( "%1.3f,%d,%5.2f,%3.0f,%5.3f,%5.3f,%6.3f,%6.3f\n",
@@ -2514,9 +2516,9 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
     steer = m_prevSteer * steer_damping + steer * (1 - steer_damping);
     m_prevSteer = steer;
 
-    double	offset = -car->pub.trkPos.toMiddle - pi.offs;
+    // double	offset = -car->pub.trkPos.toMiddle - pi.offs;
     double	oangle = car->pub.DynGC.pos.az     - pi.oang;
-    double	ospeed = car->pub.DynGC.vel.x      - pi.spd;
+    // double	ospeed = car->pub.DynGC.vel.x      - pi.spd;
     double	xfslip = (m_cm[PATH_NORMAL].wheel(0).slipX() +
                       m_cm[PATH_NORMAL].wheel(1).slipX()) * 0.5;
     double	xrslip = (m_cm[PATH_NORMAL].wheel(2).slipX() +
@@ -2653,7 +2655,7 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
         m_lastAng = m_lastAng * 0.75 + angle * 0.25;
     }
 
-    const double G = 9.81;
+    // const double G = 9.81;
 
     double	acc = 1.0;
     string	accWho = "none";
@@ -2683,7 +2685,7 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
         double left_spin_speed  = w3_speed - front_speed;
         double right_spin_speed = w4_speed - front_speed;
         double max_spin_speed = MX(left_spin_speed, right_spin_speed);
-        double avg_spin_speed = (left_spin_speed + right_spin_speed) * 0.5;
+        // double avg_spin_speed = (left_spin_speed + right_spin_speed) * 0.5;
         double delta = max_spin_speed;
 
         double ddiff = delta - _prevDelta;
@@ -2762,10 +2764,9 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
             count += 2;
         }
         wr /= count;
-        double	gr = car->_gearRatio[car->_gear + car->_gearOffset];
-        double	rpmForSpd = gr * car->_speed_x / wr;
-        double	rpm = car->_enginerpm;
-
+        // double	gr = car->_gearRatio[car->_gear + car->_gearOffset];
+        // double rpmForSpd = gr * car->_speed_x / wr;
+        // double rpm = car->_enginerpm;
 
         const float dec = 0.02f;
         if( car->ctrl.clutchCmd > dec * 7.5f )
@@ -2919,8 +2920,8 @@ void	Driver::AvoidOtherCars(
 {
     m_pShared->m_teamInfo.GetAt(car->index)->damage = car->_dammage;
 
-    double	trackLen = m_track.GetLength();
-    double	myPos = RtGetDistFromStart(const_cast<tCarElt*>(car));
+    // double	trackLen = m_track.GetLength();
+    // double	myPos = RtGetDistFromStart(const_cast<tCarElt*>(car));
     double	mySpd = hypot(car->_speed_X, car->_speed_Y);
 
     double	myDirX, myDirY;
@@ -2934,8 +2935,6 @@ void	Driver::AvoidOtherCars(
         myDirX = car->_speed_X / mySpd;
         myDirY = car->_speed_Y / mySpd;
     }
-
-    int		myIdx = 0;
 
     for( int i = 0; i < m_nCars; i++ )
     {
@@ -2962,7 +2961,7 @@ void	Driver::AvoidOtherCars(
     double	minVCatTime = 99;
     *lapper = false;
 
-    double	width = m_track.GetWidth();
+    // double width = m_track.GetWidth();
 
     PtInfo	pi;
     GetPtInfo( PATH_NORMAL, car->_distFromStartLine, pi );
@@ -3302,7 +3301,7 @@ void	Driver::AvoidOtherCars(
         m_avoidTVel = 0;
     }
 
-    double	offs = CalcPathOffset(pos, m_avoidS, m_avoidT);
+    CalcPathOffset(pos, m_avoidS, m_avoidT);
 }
 
 int		Driver::CalcGear( tCarElt* car, double& acc )
@@ -3391,8 +3390,8 @@ double	Driver::ApplyTractionControl( tCarElt* car, double acc )
         tract = 0.1;
 
         wr /= count;
-        double	gr = car->_gearRatio[car->_gear + car->_gearOffset];
-        double	rpmForSpd = gr * car->_speed_x / wr;
+        // double	gr = car->_gearRatio[car->_gear + car->_gearOffset];
+        // double rpmForSpd = gr * car->_speed_x / wr;
         acc = 0;
     }
     else

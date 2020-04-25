@@ -1964,7 +1964,7 @@ int LRaceLine::findNextCorner(tCarElt *theCar, int index, int *apex_div, double 
     int prefer_side = ((tRInverse[LINE_RL][Index] > 0.003) ? TR_LFT :
                                                              ((tRInverse[LINE_RL][Index]) < -0.003 ? TR_RGT : TR_STR));
     int i = 1, div = -1;
-    double CR = tRInverse[LINE_RL][Index];
+    // double CR = tRInverse[LINE_RL][Index];
 
     if (car->_speed_x < 5.0)
     {
@@ -2234,7 +2234,7 @@ double LRaceLine::OfflineLane(int div, double leftMargin, double rightMargin)
     if (leftMargin == 1.0 - edgeLineMargin && rightMargin == 1.0)
         return tLane[LINE_RIGHT][div];
 
-    double edgeLimit = 1.0 / Width;
+    // double edgeLimit = 1.0 / Width;
 
     if (leftMargin == 0.0)
     {
@@ -2303,7 +2303,7 @@ int LRaceLine::DivIndex(RaceLineDriveData *data, double leftMargin, double right
     double indexX = AdjustTxForMargin(Index, indexLane);
     double indexY = AdjustTyForMargin(Index, indexLane);
 
-    int steer_verbose = 0;
+    // int steer_verbose = 0;
 
     if (Time < 0.0)
         Time = data->s->deltaTime * steerTimeFactor;
@@ -2365,7 +2365,7 @@ int LRaceLine::DivIndex(RaceLineDriveData *data, int raceline, double *X, double
 
     Index = (Index + Divs - 5) % Divs;
 
-    int steer_verbose = 0;
+    // int steer_verbose = 0;
 
     if (Time < 0.0)
         Time = data->s->deltaTime * steerTimeFactor;
@@ -2528,7 +2528,9 @@ double LRaceLine::CalculateOfflineSpeed(int index, int next, double leftMargin, 
     c1 /= sum;
 #endif
 
+#ifdef OLD_METHOD
     double next_speed, index_speed;
+#endif
 
     if (leftMargin == 0.0 && rightMargin == 1.0)
     {
@@ -2903,14 +2905,14 @@ void LRaceLine::GetRaceLineData(RaceLineDriveData *data, bool transitioning)
     UpdateRacelineSpeeds(data->s->_raceType);
     updateRLSpeedMode();
 
-    double target_error = 0.0;
+    // double target_error = 0.0;
 
     bool isTransitioning = data->linemode->IsTransitioning();
     bool isOnRaceLine = data->linemode->IsOnRaceLine();
 
     if (isTransitioning || !isOnRaceLine)
     {
-        double ti = data->linemode->GetTransitionIncrement(Next);
+        // double ti = data->linemode->GetTransitionIncrement(Next);
         SteerTheCarOffline(data);
 
         if (isTransitioning)
@@ -3090,7 +3092,7 @@ void LRaceLine::SteerTheCarOffline(RaceLineDriveData *data)
     double rightMargin = data->linemode->GetRightCurrentMargin();
     double targetLeftMargin = data->linemode->GetLeftTargetMargin();
     double targetRightMargin = data->linemode->GetRightTargetMargin();
-    double transitionInc = data->linemode->GetTransitionIncrement(Next);
+    // double transitionInc = data->linemode->GetTransitionIncrement(Next);
 
     if (leftMargin == targetLeftMargin && rightMargin == targetRightMargin)
     {
@@ -3248,8 +3250,9 @@ void LRaceLine::SteerTheCar(RaceLineDriveData *data, int target_raceline)
 
     NextNextNext = (Next + diff) % Divs;
     /*====================================================*/
-    double c0, TargetCurvature, transition_percentage = 0.0;
-    bool transition_required = false;
+    double c0, TargetCurvature;
+    // double transition_percentage = 0.0;
+    // bool transition_required = false;
     {
         c0 = CalculateSpeed(data, X, Y, Index, Next, tSpeed[rl], tx[rl], ty[rl]);
         data->raceoffset = (float)CalculateOffset(tx[rl], ty[rl], Next, rl);
@@ -3351,8 +3354,8 @@ double LRaceLine::getSlowestSpeedForDistance(double distance, int raceline, doub
         return 0.0;
     }
 
-    double dist = car->_trkPos.toStart + distance;
-    int distancediv = (distance > 0.0 ? DivIndexForCarDistance(car, dist) : Next);
+    // double dist = car->_trkPos.toStart + distance;
+    // int distancediv = (distance > 0.0 ? DivIndexForCarDistance(car, dist) : Next);
     int div = Next;
     double minspeed = 100000;
     double dist_covered = 0.0;
