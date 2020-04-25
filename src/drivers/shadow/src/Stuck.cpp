@@ -1188,7 +1188,7 @@ void	Stuck::getUnstuck( const MyTrack& track, tCarElt* me, const tSituation* s )
 {
     LogSHADOW.debug( "[%d] stuck::getUnstuck\n", me->index );
 
-    if( _planIndex >= _plan.size() - 1 )
+    if ( static_cast<size_t>(_planIndex) >= _plan.size() - 1 )
     {
         _stuckState = RACING;
         return;
@@ -1201,7 +1201,7 @@ void	Stuck::getUnstuck( const MyTrack& track, tCarElt* me, const tSituation* s )
     int best = -1;
     double bestDist = 9e9;
     LogSHADOW.debug( "[%d] (%d,%d) nearest pt: ",  me->index, car_pt1.x(), car_pt1.y() );
-    for( int i = _planIndex; i < _plan.size(); i++ )
+    for( size_t i = _planIndex; i < _plan.size(); i++ )
     {
         const GridPoint& pt = _plan[i];
         double dist = pt.dist(car_pt1);
@@ -1222,7 +1222,7 @@ void	Stuck::getUnstuck( const MyTrack& track, tCarElt* me, const tSituation* s )
         return;
     }
 
-    int ahead = best + 1 < _plan.size() ? best + 1 : best;
+    int ahead = best + 1 < static_cast<int>(_plan.size()) ? best + 1 : best;
     double heading = _plan[ahead].iang() * 2 * PI / 64;
     double deltaAng = heading - me->pub.DynGC.pos.az;
     NORM_PI_PI(deltaAng);

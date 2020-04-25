@@ -53,7 +53,7 @@ void	TeamInfo::Add( int index, Item* pItem )
 {
     LogSHADOW.debug( "TeamInfo::Add [%d] %s\n", index, pItem->pCar->info.carName );
 
-    if( index >= m_items.size() )
+    if( static_cast<size_t>(index) >= m_items.size() )
     {
         // expand array.
         m_items.resize( index + 1 );

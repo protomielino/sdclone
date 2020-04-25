@@ -182,7 +182,7 @@ tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSi
 				}
 			}
 			else if (SDL_GetDisplayMode(0, avail-1, &mode) == 0) {
-				if (SDL_BITSPERPIXEL(mode.format) == nColorDepth
+				if (SDL_BITSPERPIXEL(mode.format) == static_cast<Uint32>(nColorDepth)
 #if 1	// ignore multiple entries with different frequencies
 						&& (last.width != mode.w || last.height != mode.h)
 #endif

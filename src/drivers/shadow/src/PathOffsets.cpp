@@ -39,9 +39,9 @@ void    PathOffsets::setBaseFilename( const char* pBaseFilename )
 
 void    PathOffsets::update( const MyTrack& track, const tCarElt* pCar )
 {
-    const int	NSEG = track.GetSize();
+    const size_t NSEG = track.GetSize();
 
-    if( _offsets.size() != NSEG )
+    if (_offsets.size() != NSEG)
     {
         _offsets.clear();
         _offsets.resize( NSEG );

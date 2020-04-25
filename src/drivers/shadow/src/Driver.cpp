@@ -383,7 +383,7 @@ void	Driver::InitTrack(
 
             LogSHADOW.debug( "%s: %g, %g\n", buf, innerModA, innerModB );
 
-            while( m_priv[p].INNER_MOD.size() < bend * 2 + 2 )
+            while (m_priv[p].INNER_MOD.size() < static_cast<size_t>(bend * 2 + 2))
                 m_priv[p].INNER_MOD.push_back( 0 );
 
             if( innerModA != 999 )

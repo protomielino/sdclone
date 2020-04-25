@@ -307,12 +307,10 @@ void NotificationManager::removeOldUi(){
         }
 
         //iterate trougth ui and set them invisible
-        for (int i = 0; i < notifyUiId.size(); i++)
+        for (size_t i = 0; i < notifyUiId.size(); i++)
         {
-
             GfuiVisibilitySet(this->prevScreenHandle, this->notifyUiId[i], GFUI_INVISIBLE);
-
-         }
+        }
     }
 
     //delete the prev ui's
@@ -331,7 +329,7 @@ void NotificationManager::createUi()
     int yposmod= ypos;
 
     //iterate trougth lines
-    for (int i = 0; i < this->messageLines.size(); i++)
+    for (size_t i = 0; i < this->messageLines.size(); i++)
     {
         int uiId;
         uiId= GfuiMenuCreateLabelControl(this->screenHandle, this->menuXMLDescHdle, "slide");
