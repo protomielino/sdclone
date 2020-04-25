@@ -70,10 +70,12 @@ void SingleCardata::update()
     LogUSR.debug("Tyre Condition = %.2f - Tire Thread Depth = %.2f - Tire Critical = %.2f - Mu = %.2f\n", GRIP_FACTOR, TYREWEAR, CRITICAL_TYREWEAR, t_m);
 }
 
+#if 0   // dead code
 static double cT(double v)
 {
     return ((int)v%991==0?((v/7)*991):((int)v%787==0?((v/787)*2):v/317));
 }
+#endif
 
 // compute speed component parallel to the track.
 float SingleCardata::getSpeed(tCarElt *car, float ltrackangle)

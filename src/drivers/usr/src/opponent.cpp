@@ -587,6 +587,7 @@ float Opponent::getCornerDist()
     return getCornerDist(mycar, car);
 }
 
+#if 0   // dead code
 static float DistFromPoint2Line(float x, float y, float x1, float y1, float x2, float y2)
 {
     float A = x - x1;
@@ -624,7 +625,7 @@ static float DistFromPoint2Line(float x, float y, float x1, float y1, float x2, 
 
     return (dx * dx + dy * dy);
 }
-
+#endif
 
 #define SQR(x) ((x) * (x))
 #define DIST2(vx, vy, wx, wy) (SQR((vx) - (wx)) + SQR((vy) - (wy)))
@@ -867,6 +868,7 @@ int Opponent::polyOverlap(tPosd *op, tPosd *dp)
     return 0;
 }
 
+#if 0   // dead code
 static double Mag(double x, double y)
 {
     return sqrt((x*x) + (y*y));
@@ -888,6 +890,7 @@ static double findDistanceBetweenCars(tPosd *c1, tPosd *c2)
 
     return mindist;
 }
+#endif
 
 int Opponent::testLinearCollision2(Driver *driver)
 {
@@ -1503,6 +1506,7 @@ int Opponent::testCalculatedCollision(Driver *driver)
     return testRacelineCollision(driver, colldist, t_impact, my_future_left, my_future_right);
 }
 
+#if 0   // dead code
 static void centerPoint(tPosd *p1, tPosd *p2, tPosd *p3, tPosd *p4, tPosd *pt)
 {
     pt->ax = (p1->ax + p2->ax + p3->ax + p4->ax) / 4;
@@ -1555,6 +1559,7 @@ static int pointInTriangle(tPosd *pt, tPosd *v1, tPosd *v2, tPosd *v3)
     return ((i1 == i2) && (i2 == i3));
 #endif
 }
+#endif
 
 int Opponent::testRacelineCollision(Driver *driver, double colldist, double timpact, double future_left, double future_right)
 {
