@@ -832,7 +832,7 @@ void ControlPutSettings(void *prefHdle, unsigned index, tGearChangeMode gearChan
 
     /* Change current player section in the players preferences if specified */
     if (index > 0)
-        sprintf(CurrentSection, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
+        sprintf(CurrentSection, "%s/%s/%u", HM_SECT_PREF, HM_LIST_DRV, index);
 
     /* Select current player gear change mode if not specified */
     if (gearChangeMode == GEAR_MODE_NONE)

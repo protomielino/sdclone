@@ -1299,7 +1299,7 @@ int doSurf(char *Line, ob_t *object, mat_t *material)
         fprintf(stderr, "unknown SURF format %s \n", Line);
         return (-1);
     }
-    sscanf(p, "%xd", &attrSurf);
+    sscanf(p, "%x", &attrSurf);
     numvertFound = 0;
     return (0);
 }
@@ -3408,7 +3408,7 @@ void stripifyOb(ob_t * object, int writeit)
     }
 
     if (object->name != NULL)
-        printf("name=%s stripnumber =%d \n", object->name, NumStrips);
+        printf("name=%s stripnumber =%u \n", object->name, NumStrips);
     /* Allocate enough memory for what we just read */
     if ((mem = malloc(sizeof(unsigned int) * NumStripPoints)) == 0)
     {
@@ -3496,7 +3496,7 @@ void stripifyOb(ob_t * object, int writeit)
     dege = 0;
     if (writeit == 1)
     {
-        fprintf(ofile, "numsurf %d\n", NumStrips);
+        fprintf(ofile, "numsurf %u\n", NumStrips);
 
     }
     if (object->texture1 || object->texture2 || object->texture3)
@@ -3538,7 +3538,7 @@ void stripifyOb(ob_t * object, int writeit)
                 fprintf(ofile, "SURF 0x24\n");
             }
             fprintf(ofile, "mat %d\n", object->attrMat);
-            fprintf(ofile, "refs %d\n", StripLength[i]);
+            fprintf(ofile, "refs %u\n", StripLength[i]);
             if (multitex == 0)
             {
                 fprintf(ofile, "%d %.5f %.5f\n", v1, object->textarray[v1 * 2],
@@ -3662,7 +3662,7 @@ void stripifyOb(ob_t * object, int writeit)
     }
 
     printf(
-            "strips for %s : number of strips %d : average of points triangles by strips %.2f\n",
+            "strips for %s : number of strips %u : average of points triangles by strips %.2f\n",
             object->name, NumStrips,
             (float) ((float) tritotal - (float) dege) / ((float) NumStrips));
     if (writeit == 0)
