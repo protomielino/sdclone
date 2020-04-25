@@ -196,7 +196,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
     const char	*style;
     tdble	Kew;
     static char	path[BUFSIZE];
-    static char	path2[BUFSIZE];
+    static char	path2[BUFSIZE<<1];
     char	*segName;
 
     x = y = z = 0;

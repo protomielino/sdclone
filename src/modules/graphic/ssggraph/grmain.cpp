@@ -667,8 +667,10 @@ initCars(tSituation *s)
     // WARNING: This index hack on the human robot for the Career mode
     //          does no more work with the new "welcome" module system
     //          (the "normal" index has no more the 10 limit) ... TO BE FIXED !!!!!!!
-    if (elt->_driverType == RM_DRV_HUMAN && elt->_driverIndex > 10)
-        snprintf(idx, sizeof(idx), "Robots/index/%d", elt->_driverIndex - 11);
+    if (elt->_driverType == RM_DRV_HUMAN && elt->_driverIndex > 10) {
+        int clamp_driverIndex = elt->_driverIndex - 11 < 100 ? elt->_driverIndex - 11 : 99;
+        snprintf(idx, sizeof(idx), "Robots/index/%d", clamp_driverIndex);
+    }
     else
         snprintf(idx, sizeof(idx), "Robots/index/%d", elt->_driverIndex);
 

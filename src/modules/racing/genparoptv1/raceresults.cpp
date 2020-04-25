@@ -41,7 +41,7 @@
 //TODO: is it still necessary?
 //static const char *aSessionTypeNames[3] = {"Practice", "Qualifications", "Race"};
 
-static char buf[1024];
+static char buf[2048];
 static char path[1024];
 static char path2[1024];
 
