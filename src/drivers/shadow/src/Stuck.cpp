@@ -222,6 +222,9 @@ void Stuck::executeReorient( const MyTrack& track, const tSituation* s, tCarElt*
             }
 
             break;
+
+        default:
+            break;
     }
 
     double steer = 0;
