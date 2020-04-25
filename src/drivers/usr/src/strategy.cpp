@@ -548,9 +548,9 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
                 }
             }
         }
-
-        return pitNeeded;
     }
+
+    return pitNeeded;
 }
 
 bool SimpleStrategy::isPitFree(tCarElt* car)
