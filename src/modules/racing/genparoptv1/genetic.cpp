@@ -415,7 +415,7 @@ TGeneticParameterPart::TGeneticParameterPart
 		Parameter = strdup("track param count");
 
 	Active = 0 < GfParmGetNum(Handle, 
-		Section, PRM_ACTIVE, 0, (float) Active);
+		Section, PRM_ACTIVE, 0, 0.0f);
 };
 
 // Destructor
