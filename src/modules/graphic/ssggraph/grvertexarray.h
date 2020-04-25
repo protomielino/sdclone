@@ -44,7 +44,7 @@ public:
 
   virtual const char *getTypeName(void) { return ssgVtxArray::getTypeName();}
 
-  virtual void print ( FILE *fd = stderr, char *indent = "", int how_much = 2 ) { ssgVtxArray::print(fd,indent,how_much);}
+  virtual void print ( FILE *fd = stderr, char *indent = nullptr, int how_much = 2 ) { ssgVtxArray::print(fd,indent,how_much);}
   virtual int load ( FILE *fd ) {return  ssgVtxArray::load(fd);}
   virtual int save ( FILE *fd ) {return  ssgVtxArray::save(fd);}
 } ;
