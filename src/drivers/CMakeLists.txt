@@ -6,7 +6,8 @@ SD_ADD_SUBDIRECTORY(human)
 SD_ADD_SUBDIRECTORY(networkhuman)
 SD_ADD_SUBDIRECTORY(shadow)
 SD_ADD_SUBDIRECTORY(simplix)
-SD_ADD_SUBDIRECTORY(usr)
+# Temporarily disable building of usr
+#SD_ADD_SUBDIRECTORY(usr)
 
 # Work-in-progress / unofficial robots.
 IF(NOT OPTION_OFFICIAL_ONLY)
