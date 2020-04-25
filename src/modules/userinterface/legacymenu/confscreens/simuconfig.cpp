@@ -262,7 +262,7 @@ onChangeThreadAffinityScheme(void *vp)
 	GfuiLabelSetText(ScrHandle, ThreadAffinitySchemeId, ThreadAffinitySchemeList[CurThreadAffinityScheme]);
 }
 
-
+#ifdef THIRD_PARTY_SQLITE3
 /* Change the replay rate scheme */
 static void
 onChangeReplayRateScheme(void *vp)
@@ -272,6 +272,7 @@ onChangeReplayRateScheme(void *vp)
 	
 	GfuiLabelSetText(ScrHandle, ReplayRateSchemeId, ReplaySchemeDispNameList[CurReplayScheme]);
 }
+#endif
 
 /* Change the startpaused scheme */
 static void

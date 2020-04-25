@@ -79,11 +79,14 @@ ReTrackInit(void)
     reTrackInitTimeOfDay();
     reTrackInitWeather();
 
-    //reTrackDump(ReInfo->track, 0);
+#ifdef TRACK_DUMP
+    reTrackDump(ReInfo->track, 0);
+#endif
 
     return 0;
 }//ReTrackInit
 
+#ifdef TRACK_DUMP
 /** Dump the track segments on screen
     @param  track track to dump
     @param  verbose if set to 1 all the segments are described (long)
@@ -180,7 +183,7 @@ reTrackDump(const tTrack *track, int verbose)
                    track->seg->next->vertex[TR_SR].z - track->seg->vertex[TR_ER].z);
     }//if verbose
 }//reTrackDump
-
+#endif
 
 // Initialize track time of day from race settings
 void
