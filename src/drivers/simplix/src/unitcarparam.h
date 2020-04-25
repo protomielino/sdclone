@@ -46,7 +46,7 @@ class TCarParam
 {
   public:
 	TCarParam();                                 // Default constructor
-	TCarParam(const TCarParam&) = default;       // Default copy constructor
+//	TCarParam(const TCarParam&) = default;       // Default copy constructor
 	virtual ~TCarParam();                        // Destructor
 	virtual TCarParam& operator= (const TCarParam& CarParam);
 
