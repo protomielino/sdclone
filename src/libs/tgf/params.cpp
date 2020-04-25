@@ -1919,8 +1919,9 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name, c
 				}
 				else
 				{
-					strncpy(buf,file,strlen(file)-4);
-					buf[strlen(file)-4] = 0;
+					strncpy(buf, file, sizeof(buf) - 1);
+					size_t clampSize = strlen(file) - 4 < sizeof(buf) ? strlen(file) - 4 : sizeof(buf) - 1;
+					buf[clampSize] = 0;
 				}
 			}
 			else

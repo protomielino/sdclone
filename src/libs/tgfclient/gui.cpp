@@ -924,13 +924,13 @@ GfuiAddKey(void *scr, int key, int modifier, const char *descr, void *userData,
 	if (modifier)
 	{
 		if (modifier & GFUIM_SHIFT)
-			strncat(pszModString, "Shift-", sizeof(pszModString));
+			strncat(pszModString, "Shift-", sizeof(pszModString) - strlen(pszModString) - 1);
 		if (modifier & GFUIM_CTRL)
-			strncat(pszModString, "Ctrl-", sizeof(pszModString));
+			strncat(pszModString, "Ctrl-", sizeof(pszModString) - strlen(pszModString) - 1);
 		if (modifier & GFUIM_ALT)
-			strncat(pszModString, "Alt-", sizeof(pszModString));
+			strncat(pszModString, "Alt-", sizeof(pszModString) - strlen(pszModString) - 1);
 		if (modifier & GFUIM_META)
-			strncat(pszModString, "Meta-", sizeof(pszModString));
+			strncat(pszModString, "Meta-", sizeof(pszModString) - strlen(pszModString) - 1);
 	}
 
 	// 2) The key itself

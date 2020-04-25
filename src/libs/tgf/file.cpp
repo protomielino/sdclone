@@ -108,7 +108,9 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 	// Create the target local directory (and parents) if not already done
 	// (first, we have to deduce its path from the target file path-name).
 	// TODO: Use GfFileGetDirName
-	strncpy(buf, pszTgtName, strlen(pszTgtName)+1);
+	strncpy(buf, pszTgtName, sizeof(buf) - 1);
+	buf[sizeof(buf) - 1] = '\0';
+
 #ifdef WIN32
 	for (size_t i = 0; i < maxBufSize && buf[i] != '\0'; i++)
 		if (buf[i] == '\\')
