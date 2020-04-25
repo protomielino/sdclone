@@ -445,7 +445,6 @@ void NetNetwork::SendLapStatusPacket(tCarElt *pCar)
         msg.pack_int(pCar->race.laps);
         msg.pack_int(pCar->info.startRank);
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendLapStatusPacket: packed buffer error\n");
@@ -522,7 +521,6 @@ void NetNetwork::SendCarStatusPacket(tSituation *s,bool bForce)
             msg.pack_float(local[i]->priv.fuel);
         }
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendCarStatusPacket: packed buffer error\n");
@@ -619,7 +617,6 @@ void NetNetwork::SendCarControlsPacket(tSituation *s)
             msg.pack_float(local[i]->pub.DynGCg.acc.az);
         }
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendCarControlsPacket: packed buffer error\n");
@@ -659,7 +656,6 @@ void NetNetwork::ReadLapStatusPacket(ENetPacket *pPacket)
         lstatus.laps = msg.unpack_int();
         lstatus.startRank = msg.unpack_int();
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("ReadLapStatusPacket: packed buffer error\n");
@@ -743,7 +739,6 @@ void NetNetwork::ReadCarStatusPacket(ENetPacket *pPacket)
 
         UnlockNetworkData();
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("ReadCarStatusPacket: packed buffer error\n");
@@ -843,7 +838,6 @@ void NetNetwork::ReadCarControlsPacket(ENetPacket *pPacket)
 
         UnlockNetworkData();
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("ReadCarControlsPacket: packed buffer error\n");

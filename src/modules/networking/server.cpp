@@ -190,7 +190,6 @@ void NetServer::SendStartTimePacket(int &startTime)
         msg.pack_ubyte(RACESTARTTIME_PACKET);
         msg.pack_double(m_racestarttime);
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendStartTimePacket: packed buffer error\n");
@@ -512,7 +511,6 @@ bool NetServer::SendPlayerAcceptedPacket(ENetPeer * pPeer)
     {
         msg.pack_ubyte(PLAYERACCEPTED_PACKET);
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendPlayerAcceptedPacket: packed buffer error\n");
@@ -545,7 +543,6 @@ bool NetServer::SendPlayerRejectedPacket(ENetPeer * pPeer,std::string strReason)
         msg.pack_ubyte(PLAYERREJECTED_PACKET);
         msg.pack_stdstring(strReason);
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendPlayerRejectedPacket: packed buffer error\n");
@@ -585,7 +582,6 @@ void NetServer::SendDriversReadyPacket()
             msg.pack_int(pNData->m_vecReadyStatus[i]);
         }
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendDriversReadyPacket: packed buffer error\n");
@@ -615,7 +611,6 @@ void NetServer::SendRaceSetupPacket()
     {
         msg.pack_ubyte(RACEINFOCHANGE_PACKET);
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendRaceSetupPacket: packed buffer error\n");
@@ -657,7 +652,6 @@ void NetServer::ReadDriverReadyPacket(ENetPacket *pPacket)
         idx = msg.unpack_int();
         bReady = msg.unpack_int() ? true : false;
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendRaceSetupPacket: packed buffer error\n");
@@ -710,7 +704,6 @@ void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
         driver.client = msg.unpack_int() ? true : false;
         driver.active = true;
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("ReadDriverInfoPacket: packed buffer error\n");
@@ -792,7 +785,6 @@ void NetServer::SendWeatherPacket()
         msg.pack_ubyte(WEATHERCHANGE_PACKET);
         //TODO add weather data here
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendWeatherPacket: packed buffer error\n");
@@ -826,7 +818,6 @@ void NetServer::SendTimePacket(ENetPacket *pPacketRec, ENetPeer * pPeer)
         msg.pack_ubyte(SERVER_TIME_SYNC_PACKET);
         msg.pack_double(time);
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendTimePacket: packed buffer error\n");
@@ -896,7 +887,6 @@ void NetServer::SendFilePacket(const char *pszFile)
         msg.pack_uint(filesize);
         msg.pack_string(buf, size);
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendFilePacket: packed buffer error\n");
@@ -1013,7 +1003,6 @@ void NetServer::RemovePlayerFromRace(unsigned int idx)
             msg.pack_float(vecCarStatus[i].fuel);
         }
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("RemovePlayerFromRace: packed buffer error\n");
@@ -1065,7 +1054,6 @@ void NetServer::ReadPacket(ENetEvent event)
                 l = msg.unpack_int();
                 msg.unpack_string(name, l);
             }
-//            catch (PackedBufferException &e)
             catch (const PackedBufferException&)
             {
                 GfLogFatal("ReadPacket: packed buffer error\n");
@@ -1138,7 +1126,6 @@ void NetServer::SendFinishTimePacket()
         msg.pack_ubyte(FINISHTIME_PACKET);
         msg.pack_double(time);
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendFinishTimePacket: packed buffer error\n");
@@ -1181,7 +1168,6 @@ void NetServer::SendPrepareToRacePacket()
     {
         msg.pack_ubyte(PREPARETORACE_PACKET);
     }
-//    catch (PackedBufferException &e)
     catch (const PackedBufferException&)
     {
         GfLogFatal("SendPrepareToRacePacket: packed buffer error\n");
