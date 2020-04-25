@@ -212,7 +212,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     track = t;
 
     const int BUFSIZE = 1024;
-    char buffer[BUFSIZE];
+    char buffer[BUFSIZE<<1];
     char carName[BUFSIZE];
     /*------------------------------------------------------*/
     /*     Load a custom setup if one is available.    */

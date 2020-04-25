@@ -461,7 +461,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
     } while (0)
 
 #define CHECKDISPLIST2(texture, mipmap, name, id) do {		\
-	char texname[256];					\
+	char texname[300];					\
 	sprintf(texname, "%s.png", texture);			\
 	SETTEXTURE(texname, "", mipmap);			\
 	if (curTexId != prevTexId) {				\
