@@ -94,7 +94,7 @@ void SingleCardata::init( CarElt *pcar )
     car = pcar;
 
     HasABS = HasESP = HasTCL = HasTYC = false;
-    speed, angle, width, length = 0.0;
+    speed = angle = width = length = 0.0f;
     MAX_SLIP = 0.27;
     TARGET_SLIP = 0.175;
 
