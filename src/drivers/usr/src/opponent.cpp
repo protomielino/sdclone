@@ -1397,6 +1397,7 @@ int Opponent::testCalculatedCollision(Driver *driver)
 
     double colldist = brakedistance;
 
+#if 0   // dead code
     tPosd o_cur[4], d_cur[4];
     for (int i = 0; i < 4; i++)
     {
@@ -1405,6 +1406,7 @@ int Opponent::testCalculatedCollision(Driver *driver)
         d_cur[i].ax = mycar->_corner_x(i);
         d_cur[i].ay = mycar->_corner_y(i);
     }
+#endif
 
     t_impact = MAX(0.0, (colldist - 1.0)) / MAX(mycar->_speed_x - oppSpeed, 0.001);
 

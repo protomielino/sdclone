@@ -549,8 +549,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 						SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, -1, 0);
 						SDL_RenderPresent(renderer);
 
-						SDL_GLContext context;
-						context = SDL_GL_CreateContext(GfuiWindow);
+						SDL_GL_CreateContext(GfuiWindow);
 
 						pWinSurface = SDL_CreateRGBSurface(0, nWidth, nHeight, nCurrDepth,
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN 
@@ -596,8 +595,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 						SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, -1, 0);
 						SDL_RenderPresent(renderer);
 
-						SDL_GLContext context;
-						context = SDL_GL_CreateContext(GfuiWindow);
+						SDL_GL_CreateContext(GfuiWindow);
 
 						pWinSurface = SDL_CreateRGBSurface(0, nWidth, nHeight, nCurrDepth,
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN 

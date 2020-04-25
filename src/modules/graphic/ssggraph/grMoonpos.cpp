@@ -26,7 +26,7 @@ static const double MoonPositionDay[31] = { 232.25, 243.86, 255.47, 267.08, 278.
 
 double grUpdateMoonPos(double timeOfDay)
 {
-    double moonpos, actual = 0;
+    double moonpos;  //, actual = 0;
     time_t Time;
     struct tm *Date;
 
@@ -35,7 +35,9 @@ double grUpdateMoonPos(double timeOfDay)
 
     int day = Date->tm_mday;
 
+#if 0   // dead code
     actual = timeOfDay;
+#endif
     moonpos = (MoonPositionDay[day+1] - day);
     moonpos = moonpos + (15 * ((double)timeOfDay / 3600 - 90.0));
     if (moonpos > 360.0)

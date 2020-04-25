@@ -856,6 +856,9 @@ void TClothoidLane::ClearRacingline(const char* TrackLoad)
   if( writeSize < 1)
     error = true;
 
+  if (error)
+    LogSimplix.debug("TClothoidLane::ClearRacingline(%s) : Some error occurred\n", TrackLoad);
+
   fclose(F);
 }
 //==========================================================================*

@@ -460,8 +460,7 @@ SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,in
     SDL_RenderPresent(renderer);
 
     /* Create OpenGL context */
-    SDL_GLContext context;
-    context = SDL_GL_CreateContext(GfuiWindow);
+    SDL_GL_CreateContext(GfuiWindow);
 
     // If specified, try best possible settings.
     PScreenSurface = SDL_CreateRGBSurface(0, nWinWidth, nWinHeight, nTotalDepth,

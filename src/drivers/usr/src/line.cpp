@@ -141,8 +141,12 @@ void Line::scanTrack(tTrack* t, float car_width )
 
   int turn_type = 0;
   int prev_turn = 0;
+#if SCAN_VERBOSE
   int next_turn = 0;
+#endif
+#if SCAN_VERBOSE || SCAN_DEBUG
   float width = 0.0;
+#endif
   tTrackSeg *start, *end;
 
   num_lseg[0] = 0;
@@ -183,7 +187,9 @@ void Line::scanTrack(tTrack* t, float car_width )
 	  while ( currentseg->type == TR_STR )
 	    {
 	      str_len += currentseg->length;
+#if SCAN_VERBOSE || SCAN_DEBUG
 	      width = currentseg->width;
+#endif
 
 #if SCAN_DEBUG
 	      printf("%4d %-12s %d(%s) len:%7.2f W:%5.2f\n",
@@ -198,10 +204,10 @@ void Line::scanTrack(tTrack* t, float car_width )
 	    }
 	  
 	  end = currentseg->prev;
-	  next_turn = currentseg->type;
-
 
 #if SCAN_VERBOSE
+	  next_turn = currentseg->type;
+
 	  printf("END OF STR: len:%7.2f W:%5.2f prev: %d(%s) next: %d(%s)\n",
 		 str_len,
 		 width,
@@ -251,7 +257,9 @@ void Line::scanTrack(tTrack* t, float car_width )
 	    {
 	      force_transition = 0;
 	      turn_arc += currentseg->arc;
+#if SCAN_VERBOSE || SCAN_DEBUG
 	      width = currentseg->width;
+#endif
 
 	      if ( currentseg->radius < rad_min )
 		rad_min = currentseg->radius;
@@ -331,7 +339,9 @@ void Line::scanTrack(tTrack* t, float car_width )
 
 	  end = currentseg->prev;
 
+#if SCAN_VERBOSE
 	  next_turn = currentseg->type;
+#endif
 
 	  if ( (transitions == 0) && (turn_type == TURN_CR))
 	    {
@@ -1017,7 +1027,10 @@ float Line::lineRadius( int line, float fromstart )
   else if (lseg[line][lineseg].type == SEG_CL)  
     {
       float len_entry, len_exit;
-      float t_targ, t_start, t_end;
+      float t_targ, t_start;
+#if 0	// dead code
+      float t_end;
+#endif
       float a;
       float radius;
       float run_in;
@@ -1076,7 +1089,9 @@ float Line::lineRadius( int line, float fromstart )
 	  /* all in exit */
 	  a = lseg[line][lineseg].exit_a;
 
+#if 0	// dead code
 	  t_end   = lseg[line][lineseg].exit_t;
+#endif
 	  t_start = lseg[line][lineseg].apex2_t;;
 
 	  //t_targ = ( (a * t_start) - (fromstart - lseg[line][lineseg].fromstart)) / a;
@@ -1600,10 +1615,12 @@ void Line::addSegKink(int index,
 		      tTrackSeg *end,
 		      float arc )
 {
+#if 0   // dead code
   int prev_turn, next_turn;
 
   prev_turn = start->prev->type;
   next_turn = end->next->type;
+#endif
 
   lseg[index][num_lseg[index]].type     = SEG_KINK;
   lseg[index][num_lseg[index]].ttype    = start->type;

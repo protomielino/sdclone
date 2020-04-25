@@ -186,7 +186,9 @@ static void*	MergeParamFile( void* hParams, const char* fileName, bool relSrc = 
     //const char* path = SECT_GROBJECTS "/" LST_RANGES "/1";
     //const char* ac3d_car = GfParmGetStr(hNewParams, path, "car", "");
 
+#if 0   // dead code
     float fw_ang = GfParmGetNum(hNewParams, "Front Wing", "angle", NULL, 0);
+#endif
 
     GfParmCheckHandle( hParams, hNewParams );
 
@@ -700,8 +702,10 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
         trackName[255] = '\0';
         *strrchr(trackName, '.') = '\0';
 
+#if 0   // dead code
         //	set up the base param path.
         char	baseParamPath[] = "drivers/shadow";
+#endif
         //snprintf( buf, sizeof(buf), "%s/%s/track-%s-generated.spr", MyBotName, carName, trackName );
 
         //	save the generated racing line.
@@ -996,11 +1000,11 @@ double	Driver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi, const Pri
         accDecAngle = avgK * m_priv[PATH_NORMAL].STEER_K_DEC;
     angle += accDecAngle;
 
+#if 0   // dead code
     {
         double	velAng = atan2(car->_speed_Y, car->_speed_X);
         double	ang = car->_yaw - velAng;
         NORM_PI_PI(ang);
-
         int	k = int(floor((pi.k - K_MIN) / K_STEP));
         int	s = int(floor((spd0 - SPD_MIN) / SPD_STEP));
         double	ae = 0;
@@ -1009,6 +1013,7 @@ double	Driver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi, const Pri
             ae = m_angle[s][k] - ang;
         }
     }
+#endif
 
     // control offset from path.
     m_lineControl.m_p = 1.0;
@@ -2569,13 +2574,17 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
     bool	close = false;
     bool	lapper = false;
     AvoidOtherCars( index, car, s, pi.k, &avoidTargetSpd, &avoidTargetAcc, &close, &lapper );
+#if 0   // dead code
     bool	slowing = false;
+#endif
 
     if( car->pub.speed > avoidTargetSpd && targetSpd > avoidTargetSpd )
     {
         LogSHADOW.debug( "[%d] slowing for avoidance.  curr %g  targ %g  avoid spd %g, avoid acc %g, curr acc %g\n",
                          car->index, car->pub.speed, targetSpd, avoidTargetSpd, avoidTargetAcc, car->pub.DynGC.acc.x );
+#if 0   // dead code
         slowing = true;
+#endif
     }
 
 

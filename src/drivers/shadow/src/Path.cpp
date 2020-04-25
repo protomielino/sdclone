@@ -97,8 +97,10 @@ bool	Path::GetPtInfo( double trackPos, PtInfo& pi ) const
     double	k1 = Utils::CalcCurvatureXY(p0, p1, p2);
     double	k2 = Utils::CalcCurvatureXY(p1, p2, p3);
 
+#if 0   // dead code
     Vec3d	v02 = p2 - p0;
     Vec3d	v13 = p3 - p1;
+#endif
 
     ParametricCubic	cubic;
 
@@ -696,7 +698,9 @@ void	Path::GenShortest( const CarModel& cm )
     {
         {for( int j = 0; j < 5; j++ )
         {
+#if 0   // dead code
             PathPt*	l0 = 0;
+#endif
             PathPt*	l1 = &m_pts[((NSEG - step - 1) / step) * step];
             PathPt*	l2 = &m_pts[((NSEG - 1) / step) * step];
 
@@ -706,7 +710,9 @@ void	Path::GenShortest( const CarModel& cm )
 
             for( int i = 0; i < NSEG; i += step )
             {
+#if 0   // dead code
                 l0 = l1;
+#endif
                 l1 = l2;
                 l2 = &m_pts[i];
 
@@ -757,7 +763,9 @@ void	Path::Average( const CarModel& cm )
 void	Path::AverageSection( const CarModel& cm, int from, int len )
 {
     // run an averaging alg
+#if 0   // dead code
     PathPt*	l0 = 0;
+#endif
     PathPt*	l1 = &m_pts[(from - 1 + NSEG) % NSEG];
     PathPt*	l2 = &m_pts[from];
 
@@ -769,7 +777,9 @@ void	Path::AverageSection( const CarModel& cm, int from, int len )
     {
         int		j = (from + 1 + i) % NSEG;
 
+#if 0   // dead code
         l0 = l1;
+#endif
         l1 = l2;
         l2 = &m_pts[j];
 

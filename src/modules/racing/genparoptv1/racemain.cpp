@@ -339,7 +339,9 @@ RePreRace(void)
 	const char *raceName;
 	const char *raceType;
 	void *params = ReInfo->params;
+#if 0	// dead code
 	int curRaceIdx;
+#endif
 	int timedLapsReplacement = 0;
 	
 	raceName = ReInfo->_reRaceName;
@@ -351,8 +353,8 @@ RePreRace(void)
 	if (strcmp(GfParmGetStr(params, raceName, RM_ATTR_ENABLED, RM_VAL_YES), RM_VAL_NO) == 0) {
 		GfLogTrace( "Race %s disabled\n",  raceName);
 //		curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
-		curRaceIdx = 1;
 /*
+		curRaceIdx = 1;
 		if (curRaceIdx < GfParmGetEltNb(params, RM_SECT_RACES)) {
 			curRaceIdx++;
 			GfLogTrace( "Race %s is not the last one, but the #%d\n",  raceName, curRaceIdx);

@@ -510,12 +510,18 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s)
         {
             if (cardata->HasTYC)
             {
-                float mW = 0.0f, mG = 0.0f, aFT = 0.0;
+                float mW = 0.0f;
+#if 0   // dead code
+                float mG = 0.0f;
+#endif
+                float aFT = 0.0;
 
                 for (int i = 0; i < 4; i++)
                 {
                     mW = MAX(car->_tyreTreadDepth(i), car->_tyreCritTreadDepth(i));
+#if 0   // dead code
                     mG = MAX(car->_tyreCondition(i), 0.5);
+#endif
                     if (i < 2)
                         aFT += 1.0;
                 }
@@ -630,6 +636,8 @@ float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
     int num_remStops = m_remainingstops + 1;
     m_fuelperstint = (float)(MIN(maxFuel, car->_tank) - car->_fuel);
     fuel = m_fuelperstint * 0.90f;
+
+#if 0   // dead code
     double addFuel = fuelPerLap;
     double addMinFuel = fuelPerLap * 0.80;
 
@@ -638,6 +646,7 @@ float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
         addFuel = fuelPerLap * 2.0;
         addMinFuel = fuelPerLap;
     }
+#endif
 
     countPitStop++;
 
