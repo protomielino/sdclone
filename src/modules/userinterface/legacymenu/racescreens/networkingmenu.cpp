@@ -44,7 +44,6 @@
 #include <playerconfig.h>
 #include <playerpref.h>
 #include <hostsettingsmenu.h>
-#include <carsettingsmenu.h>
 
 #include "legacymenu.h"
 #include "racescreens.h"
@@ -88,7 +87,6 @@ static float white[] = {1.0, 1.0, 1.0, 1.0};
 static std::string g_strHostIP = "127.0.0.1";
 
 HostSettingsMenu g_HostMenu;
-CarSettingsMenu g_CarMenu;
 
 // The car selection menu.
 static RmGarageMenu GarageMenu;
