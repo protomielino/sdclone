@@ -409,12 +409,13 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                 double  currW = s == TR_SIDE_LFT ? m_pSegs[i].el : m_pSegs[i].er;
                 double  nextW = s == TR_SIDE_LFT ? m_pSegs[j].el : m_pSegs[j].er;
 
-                if( currW > nextW + 1 )
-
-                if( s == TR_SIDE_LFT )
-                    m_pSegs[i].el = nextW;
-                else
-                    m_pSegs[i].er = nextW;
+                if( currW > nextW + 1 ) {
+                    if( s == TR_SIDE_LFT ) {
+                        m_pSegs[i].el = nextW;
+                    } else {
+                        m_pSegs[i].er = nextW;
+                    }
+                }
             }
         }
 
@@ -427,12 +428,13 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                 double  currW = s == TR_SIDE_LFT ? m_pSegs[i].el : m_pSegs[i].er;
                 double  prevW = s == TR_SIDE_LFT ? m_pSegs[j].el : m_pSegs[j].er;
 
-                if( currW > prevW + 1 )
-
-                if( s == TR_SIDE_LFT )
-                    m_pSegs[i].el = prevW;
-                else
-                    m_pSegs[i].er = prevW;
+                if( currW > prevW + 1 ) {
+                    if( s == TR_SIDE_LFT ) {
+                        m_pSegs[i].el = prevW;
+                    } else {
+                        m_pSegs[i].er = prevW;
+                    }
+                }
             }
         }
     }
