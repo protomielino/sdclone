@@ -35,8 +35,6 @@
 #include "garagemenu.h"
 #include "carsetupmenu.h"
 
-static CarSetupMenu *carSetupMenu = nullptr;
-
 void RmGarageMenu::onActivateCB(void *pGarageMenu)
 {
 	GfLogTrace("Entering Garage menu\n");
@@ -44,10 +42,10 @@ void RmGarageMenu::onActivateCB(void *pGarageMenu)
 	// Get the RmGarageMenu instance.
 	RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pGarageMenu);
 
-    if (carSetupMenu)
+    if (pMenu->_pCarSetupMenu)
     {
-        delete carSetupMenu;
-        carSetupMenu = nullptr;
+        delete pMenu->_pCarSetupMenu;
+        pMenu->_pCarSetupMenu = nullptr;
     }
 
 	// Get infos about the current car for the current driver
@@ -139,9 +137,9 @@ void RmGarageMenu::onCarSetupCB(void *pGarageMenu)
 		pDriver->setCar(pMenu->getSelectedCarModel());
 
     // Switch to setup screen.
-    carSetupMenu = new CarSetupMenu;
-    carSetupMenu->initialize(pMenu->getMenuHandle(), pMenu->getRace(), pMenu->getDriver());
-    carSetupMenu->runMenu();
+    pMenu->_pCarSetupMenu = new CarSetupMenu;
+    pMenu->_pCarSetupMenu->initialize(pMenu->getMenuHandle(), pMenu->getRace(), pMenu->getDriver());
+    pMenu->_pCarSetupMenu->runMenu();
 }
 
 void RmGarageMenu::onAcceptCB(void *pGarageMenu)
@@ -160,24 +158,28 @@ void RmGarageMenu::onAcceptCB(void *pGarageMenu)
 	// Back to previous screen.
 	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
 
-    delete carSetupMenu;
-    carSetupMenu = nullptr;
+    delete pMenu->_pCarSetupMenu;
+    pMenu->_pCarSetupMenu = nullptr;
 }
 
 void RmGarageMenu::onCancelCB(void *pGarageMenu)
 {
 	// Get the RmGarageMenu instance from call-back user data.
-	const RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pGarageMenu);
+	RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pGarageMenu);
 
 	// Back to previous screen.
 	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
 
-    delete carSetupMenu;
-    carSetupMenu = nullptr;
+    delete pMenu->_pCarSetupMenu;
+    pMenu->_pCarSetupMenu = nullptr;
 }
 
 RmGarageMenu::RmGarageMenu()
-: GfuiMenuScreen("garagemenu.xml"), _pRace(0), _pDriver(0), _nCurSkinIndex(0)
+: GfuiMenuScreen("garagemenu.xml")
+, _pRace(nullptr)
+, _pDriver(nullptr)
+, _nCurSkinIndex(0)
+, _pCarSetupMenu(nullptr)
 {
 }
 

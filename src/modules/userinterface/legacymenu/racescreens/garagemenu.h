@@ -28,6 +28,7 @@ class GfRace;
 class GfDriverSkin;
 class GfDriver;
 class GfCar;
+class CarSetupMenu;
 
 
 class RmGarageMenu : public GfuiMenuScreen
@@ -80,6 +81,9 @@ private:
 	// Possible driver skins and the currently selected one.
 	std::vector<GfDriverSkin> _vecPossSkins;
 	size_t _nCurSkinIndex;
+
+    // The car setup menu.
+    CarSetupMenu *_pCarSetupMenu;
 
 };
 
