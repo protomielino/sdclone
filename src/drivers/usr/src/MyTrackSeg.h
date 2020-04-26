@@ -22,19 +22,15 @@
 
 #include <track.h>
 
-
-
 class MyTrackSeg
 {
 public:
   double fromStart;
   tTrackSeg* torcsSeg; // torcs track segment
-  Vec3d midPnt; // middle point
-  Vec3d normLR; // normal left to right (unit vector in xy, slope in z)
+  Vec3d  midPnt;       // middle point
+  Vec3d  normLR;       // normal left to right (unit vector in xy, slope in z)
   double yaw;
-  double k; // curvature
+  double k;            // curvature
 };
-
-
 
 #endif // _MYTRACKSEG_H_

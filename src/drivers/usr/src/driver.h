@@ -19,7 +19,7 @@
 #define _DRIVER_H_
 
 #include "datalog.h"
-#include "message.h"
+//#include "message.h"
 #include "MuFactors.h"
 #include "MyCar.h"
 #include "opponents.h"
@@ -178,8 +178,8 @@ private:
     double mOffsDerivSteer;
 
     // Message, Log
-    Message mMsg;
-    int mMsgOn;
+    //Message mMsg;
+    //int mMsgOn;
     DataLog mDataLog;
     int mDataLogOn;
 

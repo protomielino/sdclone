@@ -29,36 +29,36 @@ Message::Message()
 
 void Message::init(std::string dir, MyCar* car)
 {
-    mDir = dir;
+/*    mDir = dir;
     mFile = dir + car->car()->_name + "_msg.txt";
-    mCar = car;
+    mCar = car;*/
 }
 
 void Message::clearPanel() const
 {
-    memset((void*)&mCar->car()->_msgCmd, 0, 4 * 32);
+    //memset((void*)&mCar->car()->_msgCmd, 0, 4 * 32);
 }
 
 void Message::displayOnPanel(const std::string& line1, const std::string& line2) const
 {
-    float color[] = {1.0, 1.0, 0.0, 1.0};
+    /*float color[] = {1.0, 1.0, 0.0, 1.0};
     memcpy((void*)mCar->car()->_msgColorCmd, color, sizeof(mCar->car()->_msgColorCmd));
     memcpy((void*)mCar->car()->_msgCmd[0], line1.c_str(), line1.size());
-    memcpy((void*)mCar->car()->_msgCmd[1], line2.c_str(), line2.size());
+    memcpy((void*)mCar->car()->_msgCmd[1], line2.c_str(), line2.size());*/
 }
 
 void Message::print(const double time, const std::string& flags, const std::string& desc, const double value)
 {
-    std::stringstream msgss;
+    /*std::stringstream msgss;
     msgss << std::fixed
           << std::setprecision ( 0 ) << flags << " "
           << std::setprecision ( 3 ) << time << "s" << " "
           << std::setprecision ( 0 ) << mCar->car()->_distFromStartLine << "m" << " "
           << std::setprecision ( 0 ) << desc << " "
-          << std::setprecision ( 3 ) << value;
+          << std::setprecision ( 3 ) << value;*/
     //std::cout << msgss.str() << std::endl;
 
-    if (mMsgLog.size() < mMaxLines)
+   /* if (mMsgLog.size() < mMaxLines)
     {
         mMsgLog.push_back(msgss.str());
     }
@@ -68,7 +68,7 @@ void Message::print(const double time, const std::string& flags, const std::stri
     }
 
     mLogLine++;
-    mLogLine = mLogLine % mMaxLines;
+    mLogLine = mLogLine % mMaxLines;*/
 }
 
 void Message::write()

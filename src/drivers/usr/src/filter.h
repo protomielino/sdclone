@@ -28,9 +28,9 @@ public:
     double get() const { return mFiltered; };
 
 private:
-    unsigned mNext {};
+    unsigned mNext;
     std::vector<double> mValues;
-    double mFiltered {};
+    double mFiltered;
 };
 
 #endif // _FILTER_H_

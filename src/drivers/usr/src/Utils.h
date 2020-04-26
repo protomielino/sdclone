@@ -22,6 +22,7 @@
 #include "Vec3d.h"
 
 #include <algorithm>
+#include <cmath>
 
 
 namespace Utils

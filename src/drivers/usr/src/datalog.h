@@ -37,8 +37,9 @@ private:
     std::string mFile;
     std::vector<DataLogHead> mHead;
     std::vector<double> mData;
-    unsigned mLogLine {};
-    const unsigned mMaxLines {3000};
+
+    unsigned mLogLine;
+    const unsigned mMaxLines;
 };
 
 #endif // _DATALOG_H_

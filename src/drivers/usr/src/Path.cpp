@@ -16,12 +16,9 @@
  ***************************************************************************/
 
 #include "Path.h"
-
 #include "Utils.h"
 
 #include <iostream>
-
-
 
 Path::Path(const MyTrack* track, const std::string& datadir, const double clothfactor, const double vmaxk, const double vmaxkfactor, const PathType pathtype)
     : mTrack(track), mPathType(pathtype), mClothFactor(clothfactor), mVMaxK(vmaxk), mVMaxKFactor(vmaxkfactor), mNSEG(track->nrOfSegs())
@@ -42,7 +39,8 @@ Path::Path(const MyTrack* track, const std::string& datadir, const double clothf
     calcRollAngle();
     reverseToMidSign();
 
-    if (pathtype == PATH_O) {
+    if (pathtype == PATH_O)
+    {
         for (int i = 0; i < mNSEG; i++)
         {
             //      std::cout << mPath[i].pt.x << " " << mPath[i].pt.y << std::endl;

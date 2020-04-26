@@ -84,7 +84,7 @@ void Driver::InitTrack(const tTrack* Track, void* carHandle, void** carParmHandl
 
     Meteorology(track);
 
-    const std::string mDataDir(std::string(GetDataDir()) + "drivers/" + rName + "/" + cName + "/");
+    std::string mDataDir(std::string(GetDataDir()) + "drivers/" + rName + "/" + cName + "/");
 
     // Assign to carParmHandle my parameters file handle, it will later be merged with carHandle by TORCS
     MyParam param(carParmHandle, mDataDir, Track->internalname, weathercode);
@@ -92,7 +92,7 @@ void Driver::InitTrack(const tTrack* Track, void* carHandle, void** carParmHandl
 
     // Read the parameters
     mTestPath = (PathType)((int)param.getNum("private", "test line")); // (int) for VS 2013 compatibility
-    mMsgOn = (int)param.getNum("private", "message on"); // (int) for VS 2013 compatibility
+    //mMsgOn = (int)param.getNum("private", "message on"); // (int) for VS 2013 compatibility
     mDataLogOn = (int)param.getNum("private", "data log on");
     mPitDamage = (int)param.getNum("private", "pitdamage");
     mPitGripFactor = param.getNum("private", "pitgripfactor");
@@ -105,8 +105,11 @@ void Driver::InitTrack(const tTrack* Track, void* carHandle, void** carParmHandl
     mVMaxK = param.getNum("private", "vmaxk");
     mVMaxKFactor = param.getNum("private", "vmaxkfactor");
 
-    if (mVMaxK == 0.0) mVMaxK = 0.0018;
-    if (mVMaxKFactor == 0.0) mVMaxKFactor = 0.9;
+    if (mVMaxK == 0.0)
+        mVMaxK = 0.0018;
+
+    if (mVMaxKFactor == 0.0)
+        mVMaxKFactor = 0.9;
 
     mCar.readPrivateSection(param);
     mCar.readVarSpecs(param);
@@ -165,6 +168,7 @@ void Driver::InitTrack(const tTrack* Track, void* carHandle, void** carParmHandl
         driver_aggression = (double)GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
         LogUSR.info( "# driver skill: %.2f - driver agression: %.3f\n", SkillDriver, driver_aggression);
         SkillDriver = MAX(0.95, 1.0 - 0.05 * SkillDriver);
+        driver_aggression /= driver_aggression;
         driver_aggression = MIN(1.0, MAX(0.7, 0.99 + driver_aggression));
 
         LogUSR.info(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.3f\n", SkillGlobal, SkillDriver, driver_aggression);
@@ -204,7 +208,7 @@ void Driver::NewRace(tCarElt* car, const tSituation* situation)
     }
 
     // Messages
-    mMsg.init(mLocalDir, &mCar);
+    //mMsg.init(mLocalDir, &mCar);
 
     // Data log
     mDataLog.init(mLocalDir, mCar.car()->_name);
@@ -235,7 +239,7 @@ void Driver::Drive()
     Timer tmr;
 #endif
 
-    mMsg.clearPanel();
+    //mMsg.clearPanel();
     updateTime();
     updateBasics();
     updateOpponents();
@@ -272,10 +276,10 @@ void Driver::EndRace()
 
 void Driver::Shutdown()
 {
-    if (mMsgOn)
+    /*if (mMsgOn)
     {
         mMsg.write();
-    }
+    }*/
 
     if (mDataLogOn)
     {
@@ -453,10 +457,10 @@ void Driver::printInfos()
         mDataLog.update();
     }
 
-    if (!mMsgOn)
+    /*if (!mMsgOn)
     {
         return;
-    }
+    }*/
 
     // TORCS message panel lines 1 and 2 reserved for driver (max. 31 chars)
     std::string flagdesc = "S P  ff  cw lco  b FS";
@@ -468,7 +472,7 @@ void Driver::printInfos()
            << m[8] << " "
            << (int)mFromStart;
     std::string flagstring = flagss.str();
-    mMsg.displayOnPanel(flagdesc, flagstring);
+    //mMsg.displayOnPanel(flagdesc, flagstring);
 
     // Lap info
     if (mFromStart < 3.0)
@@ -483,9 +487,9 @@ void Driver::printInfos()
             }
 
             double laptime = lapsimtime - mLapSimTime;
-            mMsg.print(mSimTime, flagstring, "laptime", laptime);
+            LogUSR.debug("%.3f %s laptime \n", mSimTime, flagstring.c_str(), laptime);
             mLapSimTime = lapsimtime;
-            mMsg.print(mSimTime, flagstring, "avgfuelperlap", mPit.avgFuelPerLap());
+            LogUSR.debug("%.3f %s avgfuelperlap \n", mSimTime, flagstring.c_str(), mPit.avgFuelPerLap());
         }
     }
 
@@ -496,7 +500,7 @@ void Driver::printInfos()
         {
             if (m[i] != mPrev[i])
             {
-                mMsg.print(mSimTime, flagstring, mFlagNames[i], m[i]);
+                LogUSR.debug("%.3f %s %s \n", mSimTime, flagstring.c_str(), mFlagNames[i].c_str());
             }
         }
     }

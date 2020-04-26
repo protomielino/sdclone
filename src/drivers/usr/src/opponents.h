@@ -28,8 +28,6 @@
 
 #include <vector>
 
-
-
 class Opponents
 {
 public:
@@ -55,4 +53,3 @@ private:
 
 
 #endif // _OPPONENTS_H_
-

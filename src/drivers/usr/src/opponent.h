@@ -24,72 +24,70 @@
 #include <track.h>
 #include <car.h>
 
-
-
 class Opponent
 {
 public:
   Opponent(const tTrack* track, const CarElt* car, const MyCar* mycar, const Path* mypath);
-  void update();
-  bool racing() const { return mRacing; };
+  void   update();
+  bool   racing() const { return mRacing; };
   double fromStart() { return mOppCar->_distFromStartLine; };
   double v() const { return mSpeed; };
   double dist() const { return mDist; };
-  bool aside() const { return mAside; };
+  bool   aside() const { return mAside; };
   double sideDist() const { return mSideDist; };
   double toMiddle() const { return mToMiddle; };
   double angle() const { return mAngle; };
   double distToStraight() const { return mDistToStraight; };
-  bool inDrivingDirection() const { return mInDrivingDirection; };
+  bool   inDrivingDirection() const { return mInDrivingDirection; };
   double catchTime() const { return mCatchTime; };
-  bool behind() const { return mBehind; };
-  bool fastBehind() const { return mFastBehind; };
+  bool   behind() const { return mBehind; };
+  bool   fastBehind() const { return mFastBehind; };
   double borderDist() const { return mBorderDist; };
-  bool teamMate() const { return mTeamMate; };
-  bool backMarker() const { return mBackMarker; };
-  bool letPass() const { return mLetpass; };
-  bool damaged() const { return mDamaged; };
-  bool leftOfMe() const { return mLeftOfMe; };
+  bool   teamMate() const { return mTeamMate; };
+  bool   backMarker() const { return mBackMarker; };
+  bool   letPass() const { return mLetpass; };
+  bool   damaged() const { return mDamaged; };
+  bool   leftOfMe() const { return mLeftOfMe; };
 
 private:
-  void updateBasics();
-  void updateSpeed();
+  void   updateBasics();
+  void   updateSpeed();
   double speedInYawDir(double yaw) const;
-  void updateDist();
+  void   updateDist();
   double cornerDist() const;
   double calcDistToStraight() const; // dist from front to back (x) line
-  bool calcBehind() const;
+  bool   calcBehind() const;
   double calcAngle() const; // angle relative to my car
-  bool calcInDrivingDirection() const;
+  bool   calcInDrivingDirection() const;
   double calcCatchTime() const;
-  bool calcFastBehind() const;
+  bool   calcFastBehind() const;
 
-  bool mRacing;
+  bool   mRacing;
   double mSpeed; // speed in path or my yaw direction
   double mDist; // approximation of the real distance
-  bool mAside;
+  bool   mAside;
   double mSideDist; // side distance of center of gravity of the cars
   double mToMiddle;
   double mAngle;
   double mDistToStraight;
-  bool mInDrivingDirection;
+  bool   mInDrivingDirection;
   double mCatchTime;
-  bool mBehind;
-  bool mFastBehind;
+  bool   mBehind;
+  bool   mFastBehind;
   double mBorderDist;
-  bool mBackMarker;
-  bool mLetpass;
-  bool mDamaged;
-  bool mLeftOfMe;
+  bool   mBackMarker;
+  bool   mLetpass;
+  bool   mDamaged;
+  bool   mLeftOfMe;
 
   const CarElt* mOppCar; // pointer to the opponents car
   const CarElt* mCar; // pointer to my car
   const tTrack* mTrack;
-  const Path* mMyPath; // ideal race path of my car
-  const bool mTeamMate;
-  const double mCarsDim; // dist between the cars centers when they are bumper to bumper 
-  const double mFrontRange {200.0};
-  const double mBackRange {100.0};
+  const Path*   mMyPath; // ideal race path of my car
+  const bool    mTeamMate;
+  const double  mCarsDim; // dist between the cars centers when they are bumper to bumper
+  const double  mFrontRange;
+  const double  mBackRange;
 };
 
 

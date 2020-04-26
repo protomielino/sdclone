@@ -19,8 +19,6 @@
 #ifndef _SPLINE_H_
 #define _SPLINE_H_
 
-
-
 class SplinePoint
 {
 public:
@@ -37,12 +35,10 @@ public:
   Spline();
   void init(int dim, SplinePoint* spl);
   double evaluate(double z) const;
-  
+
 private:
   SplinePoint* mSpl;
   int mDim;
 };
-
-
 
 #endif // _SPLINE_H_

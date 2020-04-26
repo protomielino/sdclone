@@ -20,20 +20,16 @@
 
 #include <string>
 
-
-
 class MyParam
 {
 public:
   MyParam(void** carparmhandle, const std::string &datadir, const std::string &trackname, int weather);
 
   double getNum(const std::string& sect, const std::string& att) const;
-  void setNum(const std::string& sect, const std::string& att, double value) const;
+  void   setNum(const std::string& sect, const std::string& att, double value) const;
 
 private:
   void* mCarParmHandle;
 };
-
-
 
 #endif // _MYPARAM_H_

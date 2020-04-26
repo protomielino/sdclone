@@ -17,7 +17,9 @@
 
 #include "filter.h"
 
-Filter::Filter()
+Filter::Filter() :
+    mNext(3000),
+    mFiltered(0.0)
 {
 }
 

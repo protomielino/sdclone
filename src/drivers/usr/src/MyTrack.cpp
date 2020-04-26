@@ -16,18 +16,13 @@
  ***************************************************************************/
 
 #include "MyTrack.h"
-
 #include "Utils.h"
 
 #include <iostream>
 
-
-
 MyTrack::MyTrack() : mTorcsTrack(nullptr)
 {
 }
-
-
 
 void MyTrack::init(const tTrack* track, double roughseglen)
 {

@@ -23,7 +23,9 @@
 
 #include <tgf.h>
 
-DataLog::DataLog()
+DataLog::DataLog() :
+    mLogLine(0),
+    mMaxLines(3000)
 {
 }
 

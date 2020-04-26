@@ -550,7 +550,7 @@ bool MyCar::learningOfftrack()
     // Barrier collisions
     if (damageDiff() > 0 && wallDist() - mCar->_dimension_y / 2.0 < 0.5)
     {
-        LogUSR.info("barrier coll : %.3f\n", damageDiff());
+        LogUSR.info("barrier coll : %u\n", damageDiff());
 
         return true;
     }

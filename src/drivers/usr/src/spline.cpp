@@ -18,21 +18,15 @@
 
 #include "spline.h"
 
-
-
 Spline::Spline()
 {
 }
-
-
 
 void Spline::init(int dim, SplinePoint* spl)
 {
   mSpl = spl;
   mDim = dim;
 }
-
-
 
 double Spline::evaluate(double z) const
 {
@@ -57,4 +51,3 @@ double Spline::evaluate(double z) const
   a3 -= a2;
   return a0 + (a1 + (a2 + a3*t) * (t-1))*t;
 }
-

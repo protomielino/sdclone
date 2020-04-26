@@ -18,8 +18,8 @@ SET(ROBOT_SOURCES
     src/driver.h
     src/filter.cpp
     src/filter.h
-    src/message.cpp
-    src/message.h
+    #src/message.cpp
+    #src/message.h
     src/MuFactors.cpp
     src/MuFactors.h
     src/MuFactorsSect.h
