@@ -25,12 +25,12 @@ public:
   double sample(double error, double dt);
 
 public:
-  double mPrevError {};
-  double mAccum {};
-  double mMaxAccum {100};
-  double mP {1};
-  double mD {};
-  double mI {};
+  double mPrevError;
+  double mAccum;
+  double mMaxAccum;
+  double mP;
+  double mD;
+  double mI;
 };
 
 #endif // _PIDCONTROLLER_H_

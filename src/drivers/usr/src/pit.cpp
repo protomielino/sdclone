@@ -16,7 +16,6 @@
  ***************************************************************************/
 
 #include "pit.h"
-
 #include "Utils.h"
 
 #include <iostream>
@@ -27,7 +26,10 @@ Pit::Pit() :
     mCar(NULL),
     mTeamCar(NULL),
     mPit(NULL),
-    mPitInfo(NULL)
+    mPitInfo(NULL),
+    mMaxDamage(7000.0),
+    mMaxDamageDist(30000.0),
+    mPreEntryMargin(100.0)
 {
 }
 

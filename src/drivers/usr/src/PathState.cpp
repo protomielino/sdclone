@@ -20,8 +20,15 @@
 #include "cubic.h"
 #include "Utils.h"
 
-PathState::PathState(const Path* path, const MyCar* car, const MuFactors* mufactors)
-    : mMaxspeed(0.0), mPath(path), mCar(car), mMuFactors(mufactors), mPathType(path->pathType()), mNSEG(path->nrOfSegs())
+PathState::PathState(const Path* path, const MyCar* car, const MuFactors* mufactors):
+    mUpdatedLapData(false),
+    mMaxspeed(0.0),
+    mPath(path),
+    mCar(car),
+    mMuFactors(mufactors),
+    mPathType(path->pathType()),
+    mNSEG(path->nrOfSegs()),
+    mSeedLimit(200.0)
 {
     mData.clear();
 

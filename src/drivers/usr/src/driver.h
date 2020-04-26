@@ -208,8 +208,8 @@ private:
     unsigned int    random_seed;
 
     // Constants
-    const double mFrontCollMargin {6.0};
-    const double mOvtMargin {2.0};
+    const double mFrontCollMargin;
+    const double mOvtMargin;
 
     const tTrack* track;
 };

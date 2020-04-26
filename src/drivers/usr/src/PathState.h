@@ -48,7 +48,7 @@ private:
     int     segIdx(double fromstart) const;
 
     std::vector<PathStateData> mData;
-    bool mUpdatedLapData {false};
+    bool mUpdatedLapData;
     double mMaxspeed;
     double mAcceleration;
     double mOffset;
@@ -59,7 +59,7 @@ private:
     const MuFactors* mMuFactors;
     const PathType mPathType;
     const int mNSEG;
-    const double mSeedLimit {200.0};
+    const double mSeedLimit;
 };
 
 #endif // _PATHSTATE_H_

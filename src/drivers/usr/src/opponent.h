@@ -90,7 +90,4 @@ private:
   const double  mBackRange;
 };
 
-
-
 #endif // _OPPONENT_H_
-

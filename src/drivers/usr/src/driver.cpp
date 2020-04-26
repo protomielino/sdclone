@@ -22,6 +22,8 @@
 
 #include <sstream>
 #include <iostream>
+#include <string>
+#include <stdio.h>
 
 //#define TIME_ANALYSIS
 #ifdef TIME_ANALYSIS
@@ -36,8 +38,10 @@
 #define PRV_SKILL_LEVEL             "level"
 #define PRV_SKILL_AGGRO             "aggression"
 
-Driver::Driver(int index)
-    : INDEX(index)
+Driver::Driver(int index) :
+    INDEX(index),
+    mFrontCollMargin(6.0),
+    mOvtMargin(2.0)
 {
     // Names assigned in constructor for VS 2013 compatibility
     mFlagNames = { "STATE_CHANGE", "DRIVING_FAST", "FRICT_LR", "COLL", "WAIT",
@@ -66,9 +70,9 @@ void Driver::InitTrack(const tTrack* Track, void* carHandle, void** carParmHandl
     tName = trackname;
 
     // Setup for this robot
-    void *newParmHandle;
+    //void *newParmHandle;
     *carParmHandle = NULL;
-    newParmHandle = NULL;
+    //newParmHandle = NULL;
 
     const char *car_sect = SECT_GROBJECTS "/" LST_RANGES "/" "1";
     strncpy(carName, GfParmGetStr(carHandle, car_sect, PRM_CAR, ""), sizeof(carName));

@@ -43,9 +43,9 @@ public:
     bool   pitOnLeftSide() const { return mPitOnLeftSide; }
     double limitEntry() const { return mLimitEntry; }
     double speedLimit() const { return mSpeedLimit; }
-    double avgFuelPerLap() const { return mAvgFuelPerLap; };
+    double avgFuelPerLap() const { return mAvgFuelPerLap; }
     bool   pitstop() const { return mPitstop; }
-    int    penalty() const { return mPenalty; };
+    int    penalty() const { return mPenalty; }
 
 private:
     void   updateInPitLane(double fromstart);
@@ -89,9 +89,9 @@ private:
     int    mPitDamage;
     double mPitGripFactor;
 
-    const int mMaxDamage {7000};
-    const int mMaxDamageDist {30000};
-    const double mPreEntryMargin {100.0};
+    const int mMaxDamage;
+    const int mMaxDamageDist;
+    const double mPreEntryMargin;
 };
 
 #endif // _PIT_H_

@@ -19,7 +19,13 @@
 
 #include <algorithm>
 
-PidController::PidController()
+PidController::PidController() :
+    mPrevError(0),
+    mAccum(0),
+    mMaxAccum(100),
+    mP(1),
+    mD(0),
+    mI(0)
 {
 }
 
