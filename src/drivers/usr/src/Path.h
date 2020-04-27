@@ -30,9 +30,9 @@ class Path
 {
 public:
   Path(const MyTrack* track, const std::string& datadir, const double clothfactor, const double vmaxk, const double vmaxkfactor, const PathType pathtype);
-  PathType pathType() const { return mPathType; };
-  double segLenMid() const { return mTrack->segLenMid(); };
-  int nrOfSegs() const { return mTrack->nrOfSegs(); };
+  PathType pathType() const { return mPathType; }
+  double segLenMid() const { return mTrack->segLenMid(); }
+  int nrOfSegs() const { return mTrack->nrOfSegs(); }
   double pathLength() const;
   const PathSeg& seg(int idx) const;
   int segIdx(double fromstart) const;

@@ -20,8 +20,13 @@
 
 #include <iostream>
 
-Path::Path(const MyTrack* track, const std::string& datadir, const double clothfactor, const double vmaxk, const double vmaxkfactor, const PathType pathtype)
-    : mTrack(track), mPathType(pathtype), mClothFactor(clothfactor), mVMaxK(vmaxk), mVMaxKFactor(vmaxkfactor), mNSEG(track->nrOfSegs())
+Path::Path(const MyTrack* track, const std::string& datadir, const double clothfactor, const double vmaxk, const double vmaxkfactor, const PathType pathtype) :
+    mTrack(track),
+    mPathType(pathtype),
+    mClothFactor(clothfactor),
+    mVMaxK(vmaxk),
+    mVMaxKFactor(vmaxkfactor),
+    mNSEG(track->nrOfSegs())
 {
     // File with path margins
     std::string marginsfile = datadir + track->name() + "_margins.dat";

@@ -16,8 +16,11 @@
  ***************************************************************************/
 
 #include "opponent.h"
+#include "Vec2.h"
 #include "Vec2d.h"
 #include "Utils.h"
+
+#include <portability.h>
 
 Opponent::Opponent(const tTrack* track, const CarElt* car, const MyCar* mycar, const Path* mypath)
     : mLeftOfMe(false),
@@ -36,9 +39,9 @@ void Opponent::update()
 {
     // Init state
     mBackMarker = false;
-    mLetpass = false;
-    mDamaged = false;
-    mRacing = true;
+    mLetpass    = false;
+    mDamaged    = false;
+    mRacing     = true;
 
     // Check for cars out
     if (mOppCar->_state & RM_CAR_STATE_NO_SIMU || mOppCar->_state & RM_CAR_STATE_PIT)
@@ -128,12 +131,12 @@ void Opponent::updateDist()
         double fraction = std::max(0.0, (fabs(mDist) - 15.0) / 15.0);
         double dX = mOppCar->_pos_X - mCar->_pos_X;
         double dY = mOppCar->_pos_Y - mCar->_pos_Y;
-        mDist = fraction * mDist + (1.0 - fraction) * sqrt(dX * dX + dY * dY - mSideDist * mSideDist) * std::copysign(1.0, mDist);
+        mDist = fraction * mDist + (1.0 - fraction) * sqrt(dX * dX + dY * dY - mSideDist * mSideDist) * copysign(1.0, mDist);
 
         // If not certainly aside display a minimal dist
         if (fabs(mDist) < mCarsDim && fabs(mSideDist) < 0.9 * mOppCar->_dimension_y)
         {
-            mDist = (mCarsDim + 0.001) * std::copysign(1.0, mDist);
+            mDist = (mCarsDim + 0.001) * copysign(1.0, mDist);
         }
     }
 
@@ -210,11 +213,11 @@ double Opponent::cornerDist() const
 
     if (fabs(mindist) > 3.0)
     {
-        mindist -= std::copysign(1.0, mindist) * 2.99;
+        mindist -= copysign(1.0, mindist) * 2.99;
     }
     else
     {
-        mindist = std::copysign(1.0, mindist) * 0.01;
+        mindist = copysign(1.0, mindist) * 0.01;
     }
 
     bool lft = true;

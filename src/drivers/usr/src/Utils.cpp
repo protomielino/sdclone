@@ -113,7 +113,7 @@ double Utils::calcRadius(double curvature)
 {
     if (fabs(curvature) < 0.001)
     {
-        return std::copysign(1.0, curvature) / 0.001;
+        return copysign(1.0, curvature) / 0.001;
     }
     else
     {
