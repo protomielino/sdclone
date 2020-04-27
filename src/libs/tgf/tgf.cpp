@@ -579,6 +579,17 @@ void GfShutdown(void)
 	freez(gfLibDir);
 	freez(gfBinDir);
 
+	// Don't delete logging here because it causes use after free errors.
+	//gfTraceShutdown();
+}
+
+
+/** Shutdown the loggers.
+    @ingroup	tgf
+    @return	None
+ */
+void GfTraceShutdown(void)
+{
 	gfTraceShutdown();
 }
 

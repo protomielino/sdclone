@@ -260,10 +260,11 @@ main(int argc, char *argv[])
 
  	// That's all (but trace what we are doing).
 	if (piUserItf && piRaceEngine)
-		std::cout << "Exiting normally from " << strAppName << "." << std::endl;
+		GfLogInfo("Exiting normally from %s.\n", strAppName.c_str());
 	else
-		std::cerr << "Exiting from " << strAppName
-				  << " after some error occurred (see above)." << std::endl;
+		GfLogInfo("Exiting from %s after some error occurred (see above).\n", strAppName.c_str());
+
+	GfTraceShutdown();
 
 	// If defined in tgf.h:
 	// Use new Memory Manager ...

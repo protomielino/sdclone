@@ -182,6 +182,7 @@ typedef struct Forces
  ******************************/
 TGF_API void GfInit(bool bWithLogging = true);
 TGF_API void GfShutdown(void);
+TGF_API void GfTraceShutdown(void);
 
 
 /************************************************************************

@@ -263,6 +263,8 @@ void GfApplication::restart()
     apszArgs[nArgInd] = 0;
     GfLogInfo("...\n\n");
 
+    GfTraceShutdown();
+
     // 3) Exec the command with its args (replacing current process).
     const int retcode = execvp(_lstArgs.front().c_str(), apszArgs);
 
