@@ -19,6 +19,7 @@
 #include "Utils.h"
 
 #include <iostream>
+#include <portability.h>
 
 Path::Path(const MyTrack* track, const std::string& datadir, const double clothfactor, const double vmaxk, const double vmaxkfactor, const PathType pathtype) :
     mTrack(track),
@@ -117,7 +118,7 @@ void Path::generatePath()
 
 void Path::optimisePath(int step)
 {
-    PathSeg* l0 = nullptr;
+    PathSeg* l0 = NULL;
     PathSeg* l1 = &mPath[mNSEG - 3 * step];
     PathSeg* l2 = &mPath[mNSEG - 2 * step];
     PathSeg* l3 = &mPath[mNSEG - step];
@@ -368,7 +369,7 @@ void Path::calcRollAngle()
 {
     for (int i = 0; i < mNSEG; i++)
     {
-        mPath[i].rollAngle = atan2(seg(i).trackSeg->normLR.z, 1) * std::copysign(1.0, mPath[i].k);
+        mPath[i].rollAngle = atan2(seg(i).trackSeg->normLR.z, 1) * copysign(1.0, mPath[i].k);
     }
 }
 

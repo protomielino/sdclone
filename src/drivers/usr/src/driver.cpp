@@ -25,6 +25,8 @@
 #include <string>
 #include <stdio.h>
 
+#include <portability.h>
+
 //#define TIME_ANALYSIS
 #ifdef TIME_ANALYSIS
 #include "Timer.h"
@@ -44,8 +46,15 @@ Driver::Driver(int index) :
     mOvtMargin(2.0)
 {
     // Names assigned in constructor for VS 2013 compatibility
-    mFlagNames = { "STATE_CHANGE", "DRIVING_FAST", "FRICT_LR", "COLL", "WAIT",
-                   "LET_PASS", "CATCH", "OVERTAKE", "FAST_BEHIND" };
+    mFlagNames.push_back("STATE_CHANGE");
+    mFlagNames.push_back("DRIVING_FAST");
+    mFlagNames.push_back("FRICT_LR");
+    mFlagNames.push_back("COLL");
+    mFlagNames.push_back("WAIT");
+    mFlagNames.push_back("LET_PASS");
+    mFlagNames.push_back("CATCH");
+    mFlagNames.push_back("OVERTAKE");
+    mFlagNames.push_back("FAST_BEHIND");
 }
 
 void Driver::InitTrack(const tTrack* Track, void* carHandle, void** carParmHandle, const tSituation* situation)
@@ -193,7 +202,7 @@ void Driver::NewRace(tCarElt* car, const tSituation* situation)
     // Create paths
     mPath.clear();
 
-    for (unsigned i = 0; i < PathNames.size(); i++)
+    for (unsigned i = 0; i < sizeof(PathNames)/sizeof(PathNames[0]); i++)
     {
         mPath.push_back(Path(&mTrack, mDataDir, mClothFactor, mVMaxK, mVMaxKFactor, (PathType)i));
     }
@@ -206,7 +215,7 @@ void Driver::NewRace(tCarElt* car, const tSituation* situation)
     // Create path states
     mPathState.clear();
 
-    for (unsigned i = 0; i < PathNames.size(); i++)
+    for (unsigned i = 0; i < sizeof(PathNames)/sizeof(PathNames[0]); i++)
     {
         mPathState.push_back(PathState(&mPath[i], &mCar, &mMuFactors));
     }
@@ -327,7 +336,7 @@ void Driver::updateOpponents()
     mOpps.update();
     m[FAST_BEHIND] = mOpps.oppComingFastBehind();
     // Distances
-    if (mOpps.oppNear() != nullptr)
+    if (mOpps.oppNear() != NULL)
     {
         m[CATCH] = Utils::hysteresis(m[CATCH], 6.0 - mOpps.oppNear()->catchTime(), 3.0);
     }
@@ -335,7 +344,7 @@ void Driver::updateOpponents()
 
 void Driver::updatePathState()
 {
-    for (unsigned i = 0; i < PathNames.size(); i++)
+    for (unsigned i = 0; i < sizeof(PathNames)/sizeof(PathNames[0]); i++)
     {
         mPathState[i].update(mDeltaTime);
     }
@@ -371,7 +380,7 @@ void Driver::calcOffsetAndYaw()
     }
     else if (mDrvPath != PATH_O && fabs(mLRTargetPortion) > maxStepLR)
     {
-        double sign = std::copysign(1.0, pathOffs(PATH_O));
+        double sign = copysign(1.0, pathOffs(PATH_O));
         mLRTargetStep += stepdiff * sign;
     }
     else
@@ -414,7 +423,7 @@ void Driver::calcOffsetAndYaw()
         if (mCar.wallDist() < 0.0)
         {
             // We are on the wrong side of the pit wall
-            double toMiddle = std::copysign(1.0, mCar.toMid()) * (mCar.wallToMiddleAbs() + 2.0);
+            double toMiddle = copysign(1.0, mCar.toMid()) * (mCar.wallToMiddleAbs() + 2.0);
             mPathOffs = toMiddle - mCar.toMid();
         }
         break;
@@ -703,7 +712,7 @@ double Driver::getAccel(double maxspeed)
         accel = controlSpeed(accel, 0.98 * maxspeed);
     }
     // Save fuel when near opponent
-    if (mSimTime > 100.0 && mOpps.oppNear() != nullptr)
+    if (mSimTime > 100.0 && mOpps.oppNear() != NULL)
     {
         if (mOpps.oppNear()->dist() > 5.0 && mOpps.oppNear()->dist() < 25.0)
         {
@@ -762,7 +771,7 @@ double Driver::getSteer(double steerlock)
         }
         else
         {
-            steer = -0.5 * std::copysign(1.0, mCar.angToTrack());
+            steer = -0.5 * copysign(1.0, mCar.angToTrack());
         }
     }
 
@@ -834,7 +843,7 @@ bool Driver::statePitstop() const
     // Traffic in the way when leaving?
     if (mDrvState == STATE_PITSTOP)
     {
-        if (mOpps.oppNear() != nullptr)
+        if (mOpps.oppNear() != NULL)
         {
             if (fabs(mOpps.oppNear()->dist()) < 10.0 && mOpps.oppNear()->v() > 3.0 )
             {
@@ -842,7 +851,7 @@ bool Driver::statePitstop() const
             }
         }
 
-        if (mOpps.oppBack() != nullptr)
+        if (mOpps.oppBack() != NULL)
         {
             if (mOpps.oppBack()->dist() > -20.0 && mOpps.oppBack()->v() > 5.0 && mOpps.oppBack()->v() < 25.0)
             {
@@ -872,7 +881,7 @@ bool Driver::statePitlane()
 
     if (pitlanetomiddle != 0.0)
     {
-        if (mOpps.oppNear() != nullptr && !(mDrvState == STATE_PITLANE || mDrvState == STATE_PITSTOP))
+        if (mOpps.oppNear() != NULL && !(mDrvState == STATE_PITLANE || mDrvState == STATE_PITSTOP))
         {
             if (mOpps.oppNear()->aside())
             {
@@ -890,7 +899,7 @@ bool Driver::statePitlane()
 
 void Driver::updateLetPass()
 {
-    if (mOpps.oppLetPass() == nullptr)
+    if (mOpps.oppLetPass() == NULL)
     {
         m[LET_PASS] = false;
         return;
@@ -916,7 +925,7 @@ void Driver::updateLetPass()
     }
 
     // Check for other opponent between behind
-    if (mOpps.oppBack() != nullptr)
+    if (mOpps.oppBack() != NULL)
     {
         if (mOpps.oppBack() != mOpps.oppLetPass() && mOpps.oppBack()->dist() > mOpps.oppLetPass()->dist())
         {
@@ -926,12 +935,14 @@ void Driver::updateLetPass()
     }
 
     // Check for other opponent aside
-    if (mOpps.oppNear() != nullptr) {
+    if (mOpps.oppNear() != NULL)
+    {
         if (mOpps.oppNear() != mOpps.oppLetPass())
         {
             if (fabs(mOpps.oppNear()->dist()) < 3.0)
             {
                 m[LET_PASS] = false;
+
                 return;
             }
         }
@@ -967,8 +978,7 @@ void Driver::setDrvPath(PathType path)
     {
         if (!m[OVERTAKE])
         {
-            if (mCar.v() > pathSpeed(path)
-                    || (fabs(pathOffs(path)) > 0.1))
+            if (mCar.v() > pathSpeed(path) || (fabs(pathOffs(path)) > 0.1))
             {
                 return;
             }
@@ -977,7 +987,7 @@ void Driver::setDrvPath(PathType path)
         {
             if (mCar.v() > pathSpeed(path))
             {
-                if (mOpps.oppNear() != nullptr)
+                if (mOpps.oppNear() != NULL)
                 {
                     double dist = mOpps.oppNear()->dist();
 
@@ -999,51 +1009,82 @@ void Driver::setDrvPath(PathType path)
 void Driver::calcStateAndPath()
 {
     PathType path = PATH_O;
-    if (stateStuck()) {
+
+    if (stateStuck())
+    {
         setDrvState(STATE_STUCK);
-    } else if (statePitstop()) {
+    }
+    else if (statePitstop())
+    {
         setDrvState(STATE_PITSTOP);
-    } else if (statePitlane()) {
+    }
+    else if (statePitlane())
+    {
         setDrvState(STATE_PITLANE);
-    } else if (stateOfftrack()) {
+    }
+    else if (stateOfftrack())
+    {
         setDrvState(STATE_OFFTRACK);
-    } else {
+    }
+    else
+    {
         setDrvState(STATE_RACE);
-        if (m[LET_PASS]) {
-            if (mCar.toMid() > 0.0) {
+
+        if (m[LET_PASS])
+        {
+            if (mCar.toMid() > 0.0)
+            {
                 path = PATH_L;
-            } else {
+            }
+            else
+            {
                 path = PATH_R;
             }
         }
-        if (overtakeOpponent()) {
+
+        if (overtakeOpponent())
+        {
             path = mOvertakePath;
         }
         // Pre pit entry
-        if (mPit.pitstop()) {
-            if (mPit.pitOnLeftSide()) {
+        if (mPit.pitstop())
+        {
+            if (mPit.pitOnLeftSide())
+            {
                 path = PATH_L;
-            } else {
+            }
+            else
+            {
                 path = PATH_R;
             }
         }
         // Test paths
-        if (mTestPath != PATH_O) {
+        if (mTestPath != PATH_O)
+        {
             path = mTestPath;
         }
     }
     // Returning to track from excursion or pits
-    if (mDrvState == STATE_OFFTRACK) {
-        if (fabs(pathOffs(PATH_L)) < fabs(pathOffs(PATH_R))) {
+    if (mDrvState == STATE_OFFTRACK)
+    {
+        if (fabs(pathOffs(PATH_L)) < fabs(pathOffs(PATH_R)))
+        {
             path = PATH_L;
-        } else {
+        }
+        else
+        {
             path = PATH_R;
         }
     }
-    if (mDrvState == STATE_PITLANE) {
-        if (mPit.pitOnLeftSide()) {
+
+    if (mDrvState == STATE_PITLANE)
+    {
+        if (mPit.pitOnLeftSide())
+        {
             path = PATH_L;
-        } else {
+        }
+        else
+        {
             path = PATH_R;
         }
     }
@@ -1051,200 +1092,244 @@ void Driver::calcStateAndPath()
     setDrvPath(path);
 }
 
-
-
 bool Driver::overtakeOpponent()
 {
-    if (mOpps.oppNear() == nullptr) {
+    if (mOpps.oppNear() == NULL)
+    {
         m[OVERTAKE] = false;
+
         return m[OVERTAKE];
     }
+
     // Normal overtake
     double maxdist = std::min(50.0, mFrontCollMargin + 5.0 + mCar.v());
     double dist = mOpps.oppNear()->dist();
     if (dist < maxdist && dist > mOvtMargin / 2.0
-            && (mOpps.oppNear()->borderDist() > -3.0 || (mOpps.oppNear()->borderDist() <= -3.0 && mOpps.oppNear()->v() > 25 && fabs(mOpps.oppNear()->sideDist()) < 5.0))) {
+            && (mOpps.oppNear()->borderDist() > -3.0 || (mOpps.oppNear()->borderDist() <= -3.0 && mOpps.oppNear()->v() > 25 && fabs(mOpps.oppNear()->sideDist()) < 5.0)))
+    {
         if ((((m[CATCH] || (dist < mFrontCollMargin + 2.0 && mCar.accelFiltered() < 0.9 && mCar.v() > mOpps.oppNear()->v())) && (!mOpps.oppNear()->teamMate() || mOpps.oppNear()->backMarker()))
              || (m[OVERTAKE] && dist < mFrontCollMargin + 10.0 && mCar.v() > mOpps.oppNear()->v() - 2.0)
              || (mOpps.oppNear()->v() < 20.0 && dist < mFrontCollMargin + 20.0))
-                && (!(!m[OVERTAKE] && m[DRIVING_FAST]))) {
+                && (!(!m[OVERTAKE] && m[DRIVING_FAST])))
+        {
             m[OVERTAKE] = true;
         } else {
             m[OVERTAKE] = false;
         }
-    } else {
+    }
+    else
+    {
         m[OVERTAKE] = false;
     }
     // If aside always overtake
     if (dist >= -mOvtMargin && dist <= mOvtMargin / 2.0 && mOpps.oppNear()->borderDist() > -3.0
-            && (fabs(mOpps.oppNear()->sideDist()) < 4.0 || mDrvPath != PATH_O)) {
+            && (fabs(mOpps.oppNear()->sideDist()) < 4.0 || mDrvPath != PATH_O))
+    {
         m[OVERTAKE] = true;
     }
+
     // If in front and on raceline stay there
-    if (dist < 0.0 && mDrvPath == PATH_O) {
+    if (dist < 0.0 && mDrvPath == PATH_O)
+    {
         m[OVERTAKE] = false;
     }
+
     return m[OVERTAKE];
 }
 
-
-
 void Driver::updateOvertakePath()
 {
-    if (mOpps.oppNear() == nullptr) {
+    if (mOpps.oppNear() == NULL)
+    {
         return;
     }
+
     // Normal overtaking
     if ((mOpps.oppNear()->dist() > mOvtMargin && mOpps.oppNear()->catchTime() > 0.5)
-            || (mOpps.oppNear()->dist() > 1.0 && mCar.v() < 10.0)) {
+            || (mOpps.oppNear()->dist() > 1.0 && mCar.v() < 10.0))
+    {
         // Stay on your side when there is enough space
         double righttomiddle = mPath[PATH_R].toMiddle(mOpps.oppNear()->fromStart());
         double lefttomiddle = mPath[PATH_L].toMiddle(mOpps.oppNear()->fromStart());
         bool rightfree = fabs(righttomiddle - mOpps.oppNear()->toMiddle()) > 3.0;
         bool leftfree = fabs(lefttomiddle - mOpps.oppNear()->toMiddle()) > 3.0;
-        if (mOpps.oppNear()->leftOfMe()) {
-            if (!(rightfree || leftfree)) {
+        if (mOpps.oppNear()->leftOfMe())
+        {
+            if (!(rightfree || leftfree))
+            {
                 mOvertakePath = PATH_R;
-            } else if (rightfree) {
+            }
+            else if (rightfree)
+            {
                 mOvertakePath = PATH_R;
-            } else {
+            }
+            else
+            {
                 mOvertakePath = PATH_L;
             }
-        } else {
-            if (!(rightfree || leftfree)) {
+        }
+        else
+        {
+            if (!(rightfree || leftfree))
+            {
                 mOvertakePath = PATH_L;
-            } else if (leftfree) {
+            }
+            else if (leftfree)
+            {
                 mOvertakePath = PATH_L;
-            } else {
+            }
+            else
+            {
                 mOvertakePath = PATH_R;
             }
         }
-    } else {
+    }
+    else
+    {
         // Always stay on your side if opponent aside
-        if (mOpps.oppNear()->leftOfMe()) {
+        if (mOpps.oppNear()->leftOfMe())
+        {
             mOvertakePath = PATH_R;
-        } else {
+        }
+        else
+        {
             mOvertakePath = PATH_L;
         }
     }
 }
 
-
-
 bool Driver::stuck()
 {
-    if (mSimTime > 0.0) {
+    if (mSimTime > 0.0)
+    {
         mStuckTime += mDeltaTime;
     }
-    if (m[WAIT] || mDrvState == STATE_PITSTOP) {
+
+    if (m[WAIT] || mDrvState == STATE_PITSTOP)
+    {
         mStuckTime = 0.0;
     }
-    if (mDrvState == STATE_STUCK) {
-        if (mCar.v() > 8.0 || mStuckTime > 4.0) {
+
+    if (mDrvState == STATE_STUCK)
+    {
+        if (mCar.v() > 8.0 || mStuckTime > 4.0)
+        {
             mStuckTime = 0.0;
             return false;
         }
-    } else if (mCar.v() < 1.0) {
-        if (mStuckTime > 3.0) {
+    }
+    else if (mCar.v() < 1.0)
+    {
+        if (mStuckTime > 3.0)
+        {
             mStuckTime = 0.0;
             return true;
         }
-    } else {
+    }
+    else
+    {
         mStuckTime = 0.0;
     }
+
     return (mDrvState == STATE_STUCK);
 }
-
-
 
 bool Driver::updateOnCollision()
 {
     m[COLL] = false;
     // Check opponents
-    for (int i = 0; i < mOpps.nrOpponents(); i++) {
+    for (int i = 0; i < mOpps.nrOpponents(); i++)
+    {
         Opponent* opp = mOpps.opp(i);
         // Conditions to ignore opponents
-        if (!opp->racing() || opp->dist() < -5.0 || opp->dist() > 200.0) {
+        if (!opp->racing() || opp->dist() < -5.0 || opp->dist() > 200.0)
+        {
             continue;
         }
-        if (!oppInCollisionZone(opp)) {
+
+        if (!oppInCollisionZone(opp))
+        {
             continue;
         }
         // Collision is possible
         double brakedist = 1.3 * brakeDist(mDrvPath, mCar.v(), opp->v());
-        if (mCar.vX() < 0.0) {
+
+        if (mCar.vX() < 0.0)
+        {
             brakedist = brakeDist(mDrvPath, -mCar.v(), 0.0);
         }
+
         double colldist = std::max(0.0, fabs(opp->dist()) - frontCollFactor(opp) * mFrontCollMargin);
         // Simple way to account for the moving target
         double opptraveldist = 0.0;
         double factor = 0.0;
-        if (opp->v() > 15.0 && !m[DRIVING_FAST]) {
+
+        if (opp->v() > 15.0 && !m[DRIVING_FAST])
+        {
             factor = 0.5;
-        } else if (m[DRIVING_FAST]) {
+        }
+        else if (m[DRIVING_FAST])
+        {
             factor = 0.2;
         }
+
         opptraveldist = factor * std::min(opp->catchTime() * opp->v(), 100.0);
         double estcolldist = colldist + opptraveldist;
         bool incollmargin = colldist == 0.0;
         bool fasterthanopp = opp->v() > 15.0 && mCar.v() > fabs(opp->v()) - 0.5;
-        if (brakedist > estcolldist || (incollmargin && fasterthanopp) || ((fabs(opp->dist()) < 1.0 && opp->distToStraight() < diffSpeedMargin(opp)))) {
+
+        if (brakedist > estcolldist || (incollmargin && fasterthanopp) || ((fabs(opp->dist()) < 1.0 && opp->distToStraight() < diffSpeedMargin(opp))))
+        {
             m[COLL] = true;
         }
     }
     // Is track free to enter
     m[WAIT] = false;
-    if (m[FAST_BEHIND] && mCar.borderDist() < -2.0 && mCar.borderDist() > -5.0 && mCar.v() < 9.0) {
+
+    if (m[FAST_BEHIND] && mCar.borderDist() < -2.0 && mCar.borderDist() > -5.0 && mCar.v() < 9.0)
+    {
         m[WAIT] = true;
         m[COLL] = true;
     }
+
     // Check for wall
-    if (mCar.pointingToWall() && fabs(mCar.angToTrack()) > 1.0) {
-        if (mCar.wallDist() - 2.5 < brakeDist(PATH_O, mCar.v(), 0.0) && mDrvState != STATE_STUCK) {
+    if (mCar.pointingToWall() && fabs(mCar.angToTrack()) > 1.0)
+    {
+        if (mCar.wallDist() - 2.5 < brakeDist(PATH_O, mCar.v(), 0.0) && mDrvState != STATE_STUCK)
+        {
             m[COLL] = true;
         }
     }
-    /*
-  // Braking test
-  if (mCar.car()->race.laps == 4 ) {
-    if (mFromStart > 2550.0) {
-      m[COLL] = true;
-      std::cout << "Braking test fs=" << mFromStart << " speed=" << mCar.v() * 3.6 << " bd=" << brakeDist(mDrvPath, mCar.v(), 0.0) << std::endl;
-    } else {
-      std::cout << "fs=" << mFromStart << std::endl;
-    }
-  }
-*/
+
     return m[COLL];
 }
 
-
-
 bool Driver::oppInCollisionZone(Opponent* opp) const
 {
-    if (opp->inDrivingDirection()) {
+    if (opp->inDrivingDirection())
+    {
         if (((opp->distToStraight() < diffSpeedMargin(opp))
              || (mCar.v() - opp->v() > 10.0 && opp->dist() < 50.0 && opp->dist() > 0.0 && opp->borderDist() > -3.0))
-                && !(oppFast(opp) && opp->dist() > 50.0)) {
+                && !(oppFast(opp) && opp->dist() > 50.0))
+        {
             return true;
         }
     }
+
     return false;
 }
-
-
 
 bool Driver::oppFast(Opponent* opp) const
 {
     double oppfs = fromStart(opp->fromStart());
     if ((opp->v() > 0.8 * mPathState[PATH_O].maxSpeed(oppfs))
-            || (opp->v() > 40.0)) {
+            || (opp->v() > 40.0))
+    {
         return true;
     }
+
     return false;
 }
-
-
 
 double Driver::diffSpeedMargin(Opponent* opp) const
 {
@@ -1253,11 +1338,16 @@ double Driver::diffSpeedMargin(Opponent* opp) const
     double angle = std::min(0.3, fabs(oppangle));
     double factor = std::max(0.15, 1.0 * angle + 0.1 * m[DRIVING_FAST]);
     double diffspeedmargin = 2.5 + sin(fabs(oppangle)) + factor * speeddiff;
-    if (mCar.v() < 5.0 || oppNoDanger(opp)) {
+
+    if (mCar.v() < 5.0 || oppNoDanger(opp))
+    {
         diffspeedmargin = 2.2 + sin(fabs(oppangle));
     }
+
     double maxmargin = 15.0;
-    if (mPit.isBetween(opp->fromStart())) {
+
+    if (mPit.isBetween(opp->fromStart()))
+    {
         maxmargin = 7.0;
     }
     return std::min(diffspeedmargin, maxmargin);
@@ -1267,98 +1357,115 @@ double Driver::diffSpeedMargin(Opponent* opp) const
 
 bool Driver::oppNoDanger(Opponent* opp) const
 {
-    if ((opp->borderDist() < -3.0 && fabs(opp->v()) < 1.0 && mCar.borderDist() > 0.0 && fabs(opp->dist()) > 1.0)) {
+    if ((opp->borderDist() < -3.0 && fabs(opp->v()) < 1.0 && mCar.borderDist() > 0.0 && fabs(opp->dist()) > 1.0))
+    {
         return true;
     }
+
     return false;
 }
-
-
 
 double Driver::fromStart(double fromstart) const
 {
     double fs;
     double length = mTrack.length();
-    if (fromstart > -length && fromstart < 2.0 * length) {
-        if (fromstart > length) {
+
+    if (fromstart > -length && fromstart < 2.0 * length)
+    {
+        if (fromstart > length)
+        {
             fs = fromstart - length;
-        } else if (fromstart < 0.0) {
+        }
+        else if (fromstart < 0.0)
+        {
             fs = fromstart + length;
-        } else {
+        }
+        else
+        {
             fs = fromstart;
         }
-    } else {
+    }
+    else
+    {
         fs = 0.0;
     }
+
     return fs;
 }
-
-
 
 double Driver::pathOffs(PathType path) const
 {
     return mPathState[path].offset();
 }
 
-
-
 double Driver::pathSpeed(PathType path) const
 {
     return mPathState[path].maxSpeed();
 }
-
-
 
 double Driver::pathAcceleration(PathType path) const
 {
     return mPathState[path].acceleration();
 }
 
-
-
 void Driver::updateDrivingFast()
 {
     double factor;
-    if (m[DRIVING_FAST]) {
+
+    if (m[DRIVING_FAST])
+    {
         factor = 0.75;
-    } else {
+    }
+    else
+    {
         factor = 0.9;
     }
-    if (mDrvPath == PATH_O) {
+
+    if (mDrvPath == PATH_O)
+    {
         m[DRIVING_FAST] = mCar.v() > factor * pathSpeed(mOvertakePath);
-    } else {
+    }
+    else
+    {
         m[DRIVING_FAST] = mCar.v() > factor * pathSpeed(mDrvPath);
     }
 
     // Going fast in curve
-    if (pathAcceleration(mDrvPath) < 0.0 && mCar.v() > 0.75 * mMaxspeed) {
+    if (pathAcceleration(mDrvPath) < 0.0 && mCar.v() > 0.75 * mMaxspeed)
+    {
         m[DRIVING_FAST] = true;
     }
 }
 
-
-
 double Driver::frontCollFactor(Opponent* opp)
 {
     double factor = 1.0;
-    if (opp != nullptr) {
-        if ((m[OVERTAKE] || mCar.v() - opp->v() < 10.0) && !m[DRIVING_FAST]) {
+
+    if (opp != NULL)
+    {
+        if ((m[OVERTAKE] || mCar.v() - opp->v() < 10.0) && !m[DRIVING_FAST])
+        {
             factor = 0.5;
         }
-        if (mCar.v() - opp->v() > 10.0 && m[DRIVING_FAST]) {
+
+        if (mCar.v() - opp->v() > 10.0 && m[DRIVING_FAST])
+        {
             factor = 1.5;
         }
-        if (fabs(opp->angle()) > 1.5 || fabs(opp->v()) < 2.0) {
+
+        if (fabs(opp->angle()) > 1.5 || fabs(opp->v()) < 2.0)
+        {
             factor = 2.0;
         }
-        if (mCar.v() < 2.0) {
+
+        if (mCar.v() < 2.0)
+        {
             factor = 0.2;
         }
     }
+
     return factor;
 }
-
-
 
 void Driver::calcMaxspeed()
 {

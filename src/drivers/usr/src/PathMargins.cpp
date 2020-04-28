@@ -24,7 +24,7 @@ PathMargins::PathMargins()
 {
 }
 
-void PathMargins::read(std::string datafile)
+void PathMargins::read(const std::string &datafile)
 {
     PathMarginsSect sect;
     std::ifstream myfile(datafile);

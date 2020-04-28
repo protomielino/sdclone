@@ -20,7 +20,8 @@
 
 #include <iostream>
 
-MyTrack::MyTrack() : mTorcsTrack(nullptr)
+MyTrack::MyTrack() :
+    mTorcsTrack(NULL)
 {
 }
 
@@ -80,8 +81,8 @@ void MyTrack::init(const tTrack* track, double roughseglen)
 
     // TODO: Bezier export
     //std::cout << "Bezier export:" << std::endl;
-    std::vector<Vec3d> controlPoint;
-    std::vector<Vec3d> direction;
+    std::vector<Vec3d>  controlPoint;
+    std::vector<Vec3d>  direction;
     std::vector<double> fromstart;
     std::vector<double> radius;
     std::vector<double> arc;
