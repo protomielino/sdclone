@@ -112,7 +112,7 @@ void Driver::InitTrack(const tTrack* Track, void* carHandle, void** carParmHandl
     mPitEntryMargin = param.getNum("private", "pitentrymargin");
     mPitEntrySpeed = param.getNum("private", "pitentryspeed");
     mPitExitSpeed = param.getNum("private", "pitexitspeed");
-    mPitTest = param.getNum("private", "pittest");
+    mPitTest = (int)param.getNum("private", "pittest");
     mSegLen = param.getNum("private", "seglen");
     mClothFactor = param.getNum("private", "clothoidfactor");
     mVMaxK = param.getNum("private", "vmaxk");
