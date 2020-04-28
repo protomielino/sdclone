@@ -21,6 +21,7 @@
 #include <iostream>
 #include <robot.h>
 #include <tgf.h>
+#include <portability.h>
 
 // The "AXIOM" logger instance.
 extern GfLogger* PLogUSR;

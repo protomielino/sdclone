@@ -18,6 +18,8 @@
 #include "Utils.h"
 
 #include <tgf.h>
+#include <portability.h>
+
 
 double Utils::distPtFromLine(Vec2d start, Vec2d end, Vec2d pnt)
 {
