@@ -106,6 +106,9 @@ PORTABILITY_API char *strtok_r(char *str, const char *delim, char **nextp);
 #define isnan _isnan
 #define isfinite _finite
 #endif
+#if _MSC_VER < 1700
+#define copysign _copysign
+#endif
 
 // Ticket #663 - MSVC implementation of snprintf is not safe
 // We provide our own version of the function,
