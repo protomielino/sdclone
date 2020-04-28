@@ -757,7 +757,10 @@ char* GfPathNormalizeFile(char* pszPath, size_t nMaxPathLen)
         free(buf);
     }
     else
-        GfLogFatal("Path '%s' too long ; could not normalize\n", pszPath);
+    {
+        GfLogInfo("GfPathNormalizeFile('%s', %zu) failed: %s\n",
+                  pszPath, nMaxPathLen, strerror(errno));
+    }
 #endif
     return pszPath;
 }
