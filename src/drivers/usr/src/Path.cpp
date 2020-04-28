@@ -117,7 +117,7 @@ void Path::generatePath()
 
 void Path::optimisePath(int step)
 {
-    PathSeg* l0 = nullptr;
+    PathSeg* l0 = NULL;
     PathSeg* l1 = &mPath[mNSEG - 3 * step];
     PathSeg* l2 = &mPath[mNSEG - 2 * step];
     PathSeg* l3 = &mPath[mNSEG - step];
@@ -193,7 +193,7 @@ void Path::optimise(double factor, PathSeg* l0, PathSeg* l1, PathSeg* l2, PathSe
 
 void Path::smoothBetween(int step)
 {
-    PathSeg* l0 = nullptr;
+    PathSeg* l0 = NULL;
     PathSeg* l1 = &mPath[mNSEG - step];
     PathSeg* l2 = &mPath[0];
     PathSeg* l3 = &mPath[step];
@@ -368,7 +368,8 @@ void Path::calcRollAngle()
 {
     for (int i = 0; i < mNSEG; i++)
     {
-        mPath[i].rollAngle = atan2(seg(i).trackSeg->normLR.z, 1) * std::copysign(1.0, mPath[i].k);
+        double sign = mPath[i].k < 0.0 ? -1.0 : 1.0;
+        mPath[i].rollAngle = atan2(seg(i).trackSeg->normLR.z, 1) * sign;
     }
 }
 

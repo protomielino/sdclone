@@ -27,7 +27,7 @@ class MuFactors
 {
 public:
     MuFactors();
-    void read(std::string datadir, std::string trackname);
+    void read(const std::string& datadir, const std::string& trackname);
     double muFactor(double fromstart) const;
     double minMuFactor() const { return mMinMuFactor; }
 

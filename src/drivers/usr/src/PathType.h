@@ -25,6 +25,6 @@
 
 enum PathType{ PATH_O, PATH_L, PATH_R };
 
-static std::vector<std::string> PathNames({ "PATH_O", "PATH_L", "PATH_R" });
+static std::string PathNames[] = { "PATH_O", "PATH_L", "PATH_R" };
 
 #endif // _PATHTYPE_H_
