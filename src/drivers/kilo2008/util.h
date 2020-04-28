@@ -27,7 +27,7 @@ extern bool BetweenLoose(const double val, const double min, const double max);
 extern double sign(const double d);
 
 #if 0 // doesn't compile in Vis Studio 2010
-// until NULL is defined...
+// until nullptr is defined...
 const class {   // this is a const object...
  public:
   template<class T>           // convertible to any type
@@ -38,7 +38,7 @@ const class {   // this is a const object...
     { return 0; }
  private:                     // whose address can't be taken
   void operator&() const;     // NOLINT(runtime/operator)
-} NULL = {};               // and whose name is NULL
+} nullptr = {};               // and whose name is nullptr
 #endif
 
 

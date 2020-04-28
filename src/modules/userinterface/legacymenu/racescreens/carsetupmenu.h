@@ -19,7 +19,7 @@
 #ifndef _CARSETUPMENU_H_
 #define _CARSETUPMENU_H_
 
-//#include <array>
+#include <array>
 
 #include <tgfclient.h>
 
@@ -108,7 +108,7 @@ private:
     // The target driver.
     const GfDriver *_pDriver;
 
-    std::vector<attribute*> items;
+    std::vector<std::array<attribute, ITEMS_PER_PAGE> > items;
     size_t  currentPage;
     ComboCallbackData comboCallbackData[ITEMS_PER_PAGE];
 };

@@ -45,7 +45,7 @@ void RmGarageMenu::onActivateCB(void *pGarageMenu)
     if (pMenu->_pCarSetupMenu)
     {
         delete pMenu->_pCarSetupMenu;
-        pMenu->_pCarSetupMenu = NULL;
+        pMenu->_pCarSetupMenu = nullptr;
     }
 
 	// Get infos about the current car for the current driver
@@ -159,7 +159,7 @@ void RmGarageMenu::onAcceptCB(void *pGarageMenu)
 	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
 
     delete pMenu->_pCarSetupMenu;
-    pMenu->_pCarSetupMenu = NULL;
+    pMenu->_pCarSetupMenu = nullptr;
 }
 
 void RmGarageMenu::onCancelCB(void *pGarageMenu)
@@ -171,15 +171,15 @@ void RmGarageMenu::onCancelCB(void *pGarageMenu)
 	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
 
     delete pMenu->_pCarSetupMenu;
-    pMenu->_pCarSetupMenu = NULL;
+    pMenu->_pCarSetupMenu = nullptr;
 }
 
 RmGarageMenu::RmGarageMenu()
 : GfuiMenuScreen("garagemenu.xml")
-, _pRace(NULL)
-, _pDriver(NULL)
+, _pRace(nullptr)
+, _pDriver(nullptr)
 , _nCurSkinIndex(0)
-, _pCarSetupMenu(NULL)
+, _pCarSetupMenu(nullptr)
 {
 }
 

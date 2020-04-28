@@ -24,10 +24,10 @@ PathMargins::PathMargins()
 {
 }
 
-void PathMargins::read(const std::string& datafile)
+void PathMargins::read(std::string datafile)
 {
     PathMarginsSect sect;
-    std::ifstream myfile(datafile.c_str());
+    std::ifstream myfile(datafile);
 
     if (myfile.is_open())
     {

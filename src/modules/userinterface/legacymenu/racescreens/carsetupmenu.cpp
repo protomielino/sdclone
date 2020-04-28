@@ -390,9 +390,7 @@ void CarSetupMenu::loadSettings()
             }
 
             attribute &att = items[page][index];
-            std::ostringstream ostr;
-            ostr << index;
-            std::string strIndex = ostr.str();
+            std::string strIndex(std::to_string(static_cast<unsigned long long>(index)));
 
             att.labelId = getDynamicControlId(std::string("Label" + strIndex).c_str());
             att.editId = getDynamicControlId(std::string("Edit" + strIndex).c_str());
@@ -466,9 +464,7 @@ void CarSetupMenu::loadSettings()
             for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
             {
                 attribute &att = items[page][index];
-                std::ostringstream ostr;
-                ostr << index;
-                std::string strIndex = ostr.str();
+                std::string strIndex(std::to_string(static_cast<unsigned long long>(index)));
 
                 if (!att.labelId)
                     att.labelId = getDynamicControlId(std::string("Label" + strIndex).c_str());
@@ -569,8 +565,8 @@ void CarSetupMenu::storeSettings()
 
 CarSetupMenu::CarSetupMenu()
 : GfuiMenuScreen("carsetupmenu.xml")
-, _pRace(NULL)
-, _pDriver(NULL)
+, _pRace(nullptr)
+, _pDriver(nullptr)
 , currentPage(0)
 {
     // Initialize combo callback user data.
@@ -600,10 +596,7 @@ bool CarSetupMenu::initialize(void *pPrevMenu, const GfRace *pRace, const GfDriv
     // Create items.
     for (size_t index = 0; index < ITEMS_PER_PAGE; ++index)
     {
-        std::ostringstream ostr;
-        ostr << index;
-        std::string strIndex = ostr.str();
-
+        std::string strIndex(std::to_string(static_cast<unsigned long long>(index)));
         createLabelControl(std::string("Label" + strIndex).c_str());
         createEditControl(std::string("Edit" + strIndex).c_str(), this, NULL, NULL);
         createComboboxControl(std::string("Combo" + strIndex).c_str(), &comboCallbackData[index], onComboCallback);

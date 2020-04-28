@@ -24,12 +24,11 @@ MuFactors::MuFactors()
 {
 }
 
-void MuFactors::read(const std::string& datadir, const std::string& trackname)
+void MuFactors::read(std::string datadir, std::string trackname)
 {
     mSect.clear();
     MuFactorsSect sect;
-    std::string datFile = datadir + trackname + "_mufactors.dat";
-    std::ifstream myfile(datFile.c_str());
+    std::ifstream myfile(datadir + trackname + "_mufactors.dat");
 
     if (myfile.is_open())
     {

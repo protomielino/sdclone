@@ -39,12 +39,12 @@ void Opponents::init(const tTrack* track, const tSituation* situation, const MyC
 
 void Opponents::update()
 {
-    mOppNear = NULL;
+    mOppNear = nullptr;
     double mindist = 1000.0;
     double minside = 1000.0;
-    mOppLetPass = NULL;
+    mOppLetPass = nullptr;
     double minletpass = -1000.0;
-    mOppBack = NULL;
+    mOppBack = nullptr;
     double minback = -1000.0;
     mOppComingFastBehind = false;
 
@@ -105,7 +105,7 @@ void Opponents::update()
 
     mMateFrontAside = false;
 
-    if (mOppNear != NULL)
+    if (mOppNear != nullptr)
     {
         if (mOppNear->aside() && mOppNear->teamMate() && !mOppNear->behind() && !mOppNear->backMarker() && mOppNear->borderDist() > -3.0) {
             mMateFrontAside = true;

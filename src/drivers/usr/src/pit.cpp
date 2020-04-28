@@ -88,7 +88,7 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
         }
     }
 
-    if (mPit != NULL)
+    if (mPit != nullptr)
     {
         mSpeedLimit = mPitInfo->speedLimit - 0.2;
         // Compute pit spline points along the track
@@ -188,7 +188,7 @@ double Pit::pathToMiddle(double fromstart) const
 
 void Pit::setPitstop(bool pitstop)
 {
-    if (mPit == NULL)
+    if (mPit == nullptr)
     {
         return;
     }
@@ -271,7 +271,7 @@ bool Pit::isPitLimit(double fromstart)
 
 void Pit::update()
 {
-    if (mPit == NULL)
+    if (mPit == nullptr)
     {
         return;
     }
@@ -318,7 +318,7 @@ void Pit::update()
 
 bool Pit::pitBeforeTeammate(int remaininglaps) const
 {
-    bool teamcarrunning = (mTeamCar != NULL) && !(mTeamCar->_state & RM_CAR_STATE_OUT) && (mTeamCar->_bestLapTime > 0.0);
+    bool teamcarrunning = (mTeamCar != nullptr) && !(mTeamCar->_state & RM_CAR_STATE_OUT) && (mTeamCar->_bestLapTime > 0.0);
     double teamcarfuel;
 
     if (teamcarrunning)

@@ -44,15 +44,8 @@ Driver::Driver(int index) :
     mOvtMargin(2.0)
 {
     // Names assigned in constructor for VS 2013 compatibility
-    mFlagNames.push_back("STATE_CHANGE");
-    mFlagNames.push_back("DRIVING_FAST");
-    mFlagNames.push_back("FRICT_LR");
-    mFlagNames.push_back("COLL");
-    mFlagNames.push_back("WAIT");
-    mFlagNames.push_back("LET_PASS");
-    mFlagNames.push_back("CATCH");
-    mFlagNames.push_back("OVERTAKE");
-    mFlagNames.push_back("FAST_BEHIND");
+    mFlagNames = { "STATE_CHANGE", "DRIVING_FAST", "FRICT_LR", "COLL", "WAIT",
+                   "LET_PASS", "CATCH", "OVERTAKE", "FAST_BEHIND" };
 }
 
 void Driver::InitTrack(const tTrack* Track, void* carHandle, void** carParmHandle, const tSituation* situation)
@@ -200,7 +193,7 @@ void Driver::NewRace(tCarElt* car, const tSituation* situation)
     // Create paths
     mPath.clear();
 
-    for (unsigned i = 0; i < sizeof(PathNames)/sizeof(PathNames[0]); i++)
+    for (unsigned i = 0; i < PathNames.size(); i++)
     {
         mPath.push_back(Path(&mTrack, mDataDir, mClothFactor, mVMaxK, mVMaxKFactor, (PathType)i));
     }
@@ -213,7 +206,7 @@ void Driver::NewRace(tCarElt* car, const tSituation* situation)
     // Create path states
     mPathState.clear();
 
-    for (unsigned i = 0; i < sizeof(PathNames)/sizeof(PathNames[0]); i++)
+    for (unsigned i = 0; i < PathNames.size(); i++)
     {
         mPathState.push_back(PathState(&mPath[i], &mCar, &mMuFactors));
     }
@@ -334,7 +327,7 @@ void Driver::updateOpponents()
     mOpps.update();
     m[FAST_BEHIND] = mOpps.oppComingFastBehind();
     // Distances
-    if (mOpps.oppNear() != NULL)
+    if (mOpps.oppNear() != nullptr)
     {
         m[CATCH] = Utils::hysteresis(m[CATCH], 6.0 - mOpps.oppNear()->catchTime(), 3.0);
     }
@@ -342,7 +335,7 @@ void Driver::updateOpponents()
 
 void Driver::updatePathState()
 {
-    for (unsigned i = 0; i < sizeof(PathNames)/sizeof(PathNames[0]); i++)
+    for (unsigned i = 0; i < PathNames.size(); i++)
     {
         mPathState[i].update(mDeltaTime);
     }
@@ -378,7 +371,7 @@ void Driver::calcOffsetAndYaw()
     }
     else if (mDrvPath != PATH_O && fabs(mLRTargetPortion) > maxStepLR)
     {
-        double sign = pathOffs(PATH_O) < 0.0 ? -1.0 : 1.0;
+        double sign = std::copysign(1.0, pathOffs(PATH_O));
         mLRTargetStep += stepdiff * sign;
     }
     else
@@ -421,8 +414,7 @@ void Driver::calcOffsetAndYaw()
         if (mCar.wallDist() < 0.0)
         {
             // We are on the wrong side of the pit wall
-            double sign = mCar.toMid() < 0.0 ? -1.0 : 1.0;
-            double toMiddle = sign * (mCar.wallToMiddleAbs() + 2.0);
+            double toMiddle = std::copysign(1.0, mCar.toMid()) * (mCar.wallToMiddleAbs() + 2.0);
             mPathOffs = toMiddle - mCar.toMid();
         }
         break;
@@ -711,7 +703,7 @@ double Driver::getAccel(double maxspeed)
         accel = controlSpeed(accel, 0.98 * maxspeed);
     }
     // Save fuel when near opponent
-    if (mSimTime > 100.0 && mOpps.oppNear() != NULL)
+    if (mSimTime > 100.0 && mOpps.oppNear() != nullptr)
     {
         if (mOpps.oppNear()->dist() > 5.0 && mOpps.oppNear()->dist() < 25.0)
         {
@@ -770,8 +762,7 @@ double Driver::getSteer(double steerlock)
         }
         else
         {
-            double sign = mCar.angToTrack() < 0.0 ? -1.0 : 1.0;
-            steer = -0.5 * sign;
+            steer = -0.5 * std::copysign(1.0, mCar.angToTrack());
         }
     }
 
@@ -843,7 +834,7 @@ bool Driver::statePitstop() const
     // Traffic in the way when leaving?
     if (mDrvState == STATE_PITSTOP)
     {
-        if (mOpps.oppNear() != NULL)
+        if (mOpps.oppNear() != nullptr)
         {
             if (fabs(mOpps.oppNear()->dist()) < 10.0 && mOpps.oppNear()->v() > 3.0 )
             {
@@ -851,7 +842,7 @@ bool Driver::statePitstop() const
             }
         }
 
-        if (mOpps.oppBack() != NULL)
+        if (mOpps.oppBack() != nullptr)
         {
             if (mOpps.oppBack()->dist() > -20.0 && mOpps.oppBack()->v() > 5.0 && mOpps.oppBack()->v() < 25.0)
             {
@@ -881,7 +872,7 @@ bool Driver::statePitlane()
 
     if (pitlanetomiddle != 0.0)
     {
-        if (mOpps.oppNear() != NULL && !(mDrvState == STATE_PITLANE || mDrvState == STATE_PITSTOP))
+        if (mOpps.oppNear() != nullptr && !(mDrvState == STATE_PITLANE || mDrvState == STATE_PITSTOP))
         {
             if (mOpps.oppNear()->aside())
             {
@@ -899,7 +890,7 @@ bool Driver::statePitlane()
 
 void Driver::updateLetPass()
 {
-    if (mOpps.oppLetPass() == NULL)
+    if (mOpps.oppLetPass() == nullptr)
     {
         m[LET_PASS] = false;
         return;
@@ -925,7 +916,7 @@ void Driver::updateLetPass()
     }
 
     // Check for other opponent between behind
-    if (mOpps.oppBack() != NULL)
+    if (mOpps.oppBack() != nullptr)
     {
         if (mOpps.oppBack() != mOpps.oppLetPass() && mOpps.oppBack()->dist() > mOpps.oppLetPass()->dist())
         {
@@ -935,7 +926,7 @@ void Driver::updateLetPass()
     }
 
     // Check for other opponent aside
-    if (mOpps.oppNear() != NULL) {
+    if (mOpps.oppNear() != nullptr) {
         if (mOpps.oppNear() != mOpps.oppLetPass())
         {
             if (fabs(mOpps.oppNear()->dist()) < 3.0)
@@ -986,7 +977,7 @@ void Driver::setDrvPath(PathType path)
         {
             if (mCar.v() > pathSpeed(path))
             {
-                if (mOpps.oppNear() != NULL)
+                if (mOpps.oppNear() != nullptr)
                 {
                     double dist = mOpps.oppNear()->dist();
 
@@ -1064,7 +1055,7 @@ void Driver::calcStateAndPath()
 
 bool Driver::overtakeOpponent()
 {
-    if (mOpps.oppNear() == NULL) {
+    if (mOpps.oppNear() == nullptr) {
         m[OVERTAKE] = false;
         return m[OVERTAKE];
     }
@@ -1100,7 +1091,7 @@ bool Driver::overtakeOpponent()
 
 void Driver::updateOvertakePath()
 {
-    if (mOpps.oppNear() == NULL) {
+    if (mOpps.oppNear() == nullptr) {
         return;
     }
     // Normal overtaking
@@ -1350,7 +1341,7 @@ void Driver::updateDrivingFast()
 double Driver::frontCollFactor(Opponent* opp)
 {
     double factor = 1.0;
-    if (opp != NULL) {
+    if (opp != nullptr) {
         if ((m[OVERTAKE] || mCar.v() - opp->v() < 10.0) && !m[DRIVING_FAST]) {
             factor = 0.5;
         }

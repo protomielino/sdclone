@@ -27,7 +27,7 @@ class PathMargins
 {
 public:
     PathMargins();
-    void read(const std::string& datafile);
+    void read(std::string datafile);
     PathMarginsSect margins(double fromstart) const;
 
 private:

@@ -20,7 +20,7 @@
 
 #include <iostream>
 
-MyTrack::MyTrack() : mTorcsTrack(NULL)
+MyTrack::MyTrack() : mTorcsTrack(nullptr)
 {
 }
 
