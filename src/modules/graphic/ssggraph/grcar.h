@@ -57,12 +57,10 @@ class tgrCarInfo
 public:
     float				iconColor[4];
     ssgTransform		*carTransform;
-    ssgSelector         *carSelector;
     ssgSelector			*LODSelector;
     ssgSelector			*DRMSelector;
     ssgSelector			*DRMSelector2;
     ssgEntity			*carEntity;
-    int                 nCar;
     int                 nSteer;
     int					LODSelectMask[32];
     float				LODThreshold[32];
@@ -76,7 +74,6 @@ public:
     ssgSelector			*driverSelector;
     ssgSelector			*steerSelector;
     ssgSelector			*rearwingSelector;
-    bool                carSelectorinsg;
     bool				driverSelectorinsg;
     bool				rearwingSelectorinsg;
     ssgStateSelector	*envSelector;
@@ -112,7 +109,7 @@ extern void grPreInitCar(tCarElt *car);
 
 extern void grInitShadow(tCarElt *car);
 extern void grInitCar(tCarElt *car);
-extern void grDrawCar(tSituation *, tCarElt*, tCarElt *, int, int, int, double curTime, class cGrPerspCamera *curCam);
+extern void grDrawCar(tSituation *, tCarElt*, tCarElt *, int, int, double curTime, class cGrPerspCamera *curCam);
 extern void grInitCommonState(void);
 //extern void grPropagateDamage (ssgEntity* l, sgVec3 poc, sgVec3 force, int cnt);
 extern void grPropagateDamage (tSituation *);

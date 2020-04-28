@@ -528,7 +528,6 @@ grInitCar(tCarElt *car)
     int index;
     int selIndex;
     ssgEntity *carEntity;
-    ssgSelector *CarSel;
     ssgSelector *LODSel;
 
     /* ssgBranchCb		*branchCb; */
@@ -725,15 +724,9 @@ grInitCar(tCarElt *car)
     grCarInfo[index].carTransform = new ssgTransform;
     DBG_SET_NAME(grCarInfo[index].carTransform, car->_modName, index, -1);
 
-    /* Car Selector */
-    grCarInfo[index].carSelector = CarSel = new ssgSelector;
-    DBG_SET_NAME(CarSel, "CARSELECTOR", index, 0);
-    grCarInfo[index].nCar = 1;
-    grCarInfo[index].carTransform->addKid(CarSel);
-
     /* Level of details */
     grCarInfo[index].LODSelector = LODSel = new ssgSelector;
-    grCarInfo[index].carSelector->addKid(LODSel);
+    grCarInfo[index].carTransform->addKid(LODSel);
     snprintf(path, 256, "%s/%s", SECT_GROBJECTS, LST_RANGES);
     nranges = GfParmGetEltNb(handle, path) + 1;
 
@@ -1118,22 +1111,6 @@ grInitCar(tCarElt *car)
             DRMSel2->select( grCarInfo[index].DRMSelectMask2[0] );
     }
 
-    /* loading cockpit  */
-    snprintf(buf, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, SECT_COCKPIT);
-    param = GfParmGetStr(handle, buf, PRM_MODELCOCKPIT, NULL);
-
-    if (param)
-    {
-        ssgEntity *cockpitEntity;
-        ssgBranch *carBody2 = new ssgBranch;
-        cockpitEntity = grssgCarLoadAC3D(param, NULL, index);
-        carBody2->addKid(cockpitEntity);
-        //grCarInfo[index].cockpitEntity = cockpitEntity;
-        grCarInfo[index].nCar = 2;
-        DBG_SET_NAME(cockpitEntity, "CARSELECTOR", index, 1);
-        grCarInfo[index].carSelector->addKid(carBody2);
-    }
-
     CarsAnchor->addKid(grCarInfo[index].carTransform);
 
     //grCarInfo[index].carTransform->print(stdout, "-", 1);
@@ -1192,7 +1169,7 @@ tdble grGetDistToStart(tCarElt *car)
 }
 
 void
-grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dispDrvFlag, int dispCockFlag, double curTime, class cGrPerspCamera *curCam)
+grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dispDrvFlag, double curTime, class cGrPerspCamera *curCam)
 {
     sgCoord wheelpos;
     int index, i, j;
@@ -1205,9 +1182,6 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 
     grCarInfo[index].distFromStart=grGetDistToStart(car);
     grCarInfo[index].envAngle=RAD2DEG(car->_yaw);
-
-    if(grCarInfo[index].nCar > 1)
-        grCarInfo[index].carSelector->select(1);
 
     if (grCarInfo[index].nSteer > 0)
         grCarInfo[index].steerSelector->select(1);
@@ -1276,8 +1250,6 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
                 grCarInfo[index].DRMSelector->select(0);
             if (grCarInfo[index].nSteer > 1)
                 grCarInfo[index].steerSelector->select(2);
-            if((grCarInfo[index].nCar > 1) && (dispCockFlag > 0))
-                grCarInfo[index].carSelector->select(2);
         }
 
         if (dispDrvFlag || car != curCar)

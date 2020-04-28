@@ -339,7 +339,7 @@ void cGrScreen::camDraw(tSituation *s)
 
     for (int i = 0; i < s->_ncars; i++)
     {
-        grDrawCar(s, cars[i], curCar, dispCam->getDrawCurrent(), dispCam->getDrawDriver(), dispCam->getDrawCockpit(), s->currentTime, dispCam);
+        grDrawCar(s, cars[i], curCar, dispCam->getDrawCurrent(), dispCam->getDrawDriver(), s->currentTime, dispCam);
     }
 
     GfProfStopProfile("grDrawCar*");

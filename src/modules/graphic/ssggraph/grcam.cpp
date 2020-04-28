@@ -107,10 +107,10 @@ grMakeLookAtMat4 ( sgMat4 dst, const sgVec3 eye, const sgVec3 center, const sgVe
 
 // cGrPerspCamera ================================================================
 
-cGrPerspCamera::cGrPerspCamera(class cGrScreen *myscreen, int id, int drawCurr, int drawDrv, int drawCockpit, int drawBG, int mirrorAllowed,
+cGrPerspCamera::cGrPerspCamera(class cGrScreen *myscreen, int id, int drawCurr, int drawDrv, int drawBG, int mirrorAllowed,
                                float myfovy, float myfovymin, float myfovymax,
                                float myfnear, float myffar, float myfogstart, float myfogend)
-    : cGrCamera(myscreen, id, drawCurr, drawDrv, drawCockpit, drawBG, mirrorAllowed)
+    : cGrCamera(myscreen, id, drawCurr, drawDrv, drawBG, mirrorAllowed)
 {
     fovy     = myfovy;
     fovymin  = myfovymin;
@@ -400,11 +400,11 @@ void cGrBackgroundCam::setModelView(void)
 class cGrCarCamInsideDriverEye : public cGrPerspCamera
 {
 public:
-    cGrCarCamInsideDriverEye(class cGrScreen *myscreen, int id, int drawCurr, int drawCockpit, int drawBG,
+    cGrCarCamInsideDriverEye(class cGrScreen *myscreen, int id, int drawCurr, int drawBG,
                              float myfovy, float myfovymin, float myfovymax,
                              float myfnear, float myffar = 1500.0,
                              float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 0, drawCockpit, drawBG, 1,
+        : cGrPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
                          myfovy, myfovymin, myfovymax,
                          myfnear, myffar, myfogstart, myfogend) {
     }
@@ -463,11 +463,11 @@ private:
 #endif
 
 public:
-    cGrCarCamInsideDynDriverEye(class cGrScreen *myscreen, int id, int drawCurr, int drawCockpit, int drawBG,
+    cGrCarCamInsideDynDriverEye(class cGrScreen *myscreen, int id, int drawCurr, int drawBG,
                                 float myfovy, float myfovymin, float myfovymax,
                                 float myfnear, float myffar = 1500.0,
                                 float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrCarCamInsideDriverEye(myscreen, id, drawCurr, drawCockpit, drawBG,
+        : cGrCarCamInsideDriverEye(myscreen, id, drawCurr, drawBG,
                                    myfovy, myfovymin, myfovymax,
                                    myfnear, myffar, myfogstart, myfogend) {
 #if (CamDriverEyeDynamicBehaviour == 1)
@@ -592,7 +592,7 @@ cGrCarCamMirror::cGrCarCamMirror(cGrScreen *myscreen, int id, int drawCurr, int 
                                  float myfovy, float myfovymin, float myfovymax,
                                  float myfnear, float myffar,
                                  float myfogstart, float myfogend)
-    : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 1,
+    : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 1,
                      myfovy, myfovymin, myfovymax,
                      myfnear, myffar, myfogstart, myfogend)
     , origFovY(myfovy)
@@ -703,7 +703,7 @@ public:
                             float myfovy, float myfovymin, float myfovymax,
                             float myfnear, float myffar = 1500.0,
                             float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 0, 0, drawBG, 1,
+        : cGrPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
                          myfovy, myfovymin, myfovymax,
                          myfnear, myffar, myfogstart, myfogend) {
     }
@@ -756,7 +756,7 @@ public:
                              float myfovy, float myfovymin, float myfovymax,
                              float myfnear, float myffar = 1500.0,
                              float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 0, 0, drawBG, 1,
+        : cGrPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
                          myfovy, myfovymin, myfovymax,
                          myfnear, myffar, myfogstart, myfogend) {
     }
@@ -817,7 +817,7 @@ public:
                             float myfovy, float myfovymin, float myfovymax,
                             float myfnear, float myffar = 1500.0,
                             float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 1,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 1,
                          myfovy, myfovymin, myfovymax,
                          myfnear, myffar, myfogstart, myfogend) {
     }
@@ -869,7 +869,7 @@ public:
                             float myfovy, float myfovymin, float myfovymax,
                             float myfnear, float myffar = 1500.0,
                             float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 0, 0, drawBG, 0,
+        : cGrPerspCamera(myscreen, id, drawCurr, 0, drawBG, 0,
                          myfovy, myfovymin, myfovymax,
                          myfnear, myffar, myfogstart, myfogend) {
     }
@@ -947,7 +947,7 @@ public:
                     float fovy, float fovymin, float fovymax,
                     float mydist, float myHeight, float fnear, float ffar = 1500.0,
                     float myfogstart = 1400.0, float myfogend = 1500.0, float relaxation = 10.0f)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 0, fovy, fovymin,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
                          fovymax, fnear, ffar, myfogstart, myfogend) {
         dist = mydist;
         height = myHeight;
@@ -1048,7 +1048,7 @@ public:
                      float fovy, float fovymin, float fovymax,
                      float mydist, float fnear, float ffar = 1500.0,
                      float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 0, fovy, fovymin,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
                          fovymax, fnear, ffar, myfogstart, myfogend) {
         dist = mydist;
         PreA = 0.0;
@@ -1108,7 +1108,7 @@ public:
                    float fovy, float fovymin, float fovymax,
                    float mydist, float fnear, float ffar = 1500.0,
                    float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 0, fovy, fovymin,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
                          fovymax, fnear, ffar, myfogstart, myfogend) {
         dist = mydist;
         up[0] = 0;
@@ -1156,7 +1156,7 @@ public:
                   float mydistx, float mydisty, float mydistz,
                   float fnear, float ffar = 1500.0,
                   float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 0, fovy, fovymin,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
                          fovymax, fnear, ffar, myfogstart, myfogend) {
         distx = mydistx;
         disty = mydisty;
@@ -1200,7 +1200,7 @@ public:
                 float mydistz, int axis,
                 float fnear, float ffar = 1500.0,
                 float myfogstart = 1600.0, float myfogend = 1700.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 0, fovy, fovymin,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
                          fovymax, fnear, ffar, myfogstart, myfogend) {
         distz = mydistz;
         up[2] = 0;
@@ -1264,7 +1264,7 @@ public:
                     float mydistz,
                     float fnear, float ffar = 1500.0,
                     float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 0, fovy, fovymin,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
                          fovymax, fnear, ffar, myfogstart, myfogend) {
         distz = mydistz;
         locfar = ffar;
@@ -1334,7 +1334,7 @@ public:
                     float centerx, float centery, float centerz,
                     float fnear, float ffar = 1500.0,
                     float myfogstart = 1600.0, float myfogend = 1700.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 0, fovy, fovymin,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
                          fovymax, fnear, ffar, myfogstart, myfogend) {
 
         eye[0] = eyex;
@@ -1400,7 +1400,7 @@ public:
                     float fovy, float fovymin, float fovymax,
                     float fnear, float ffar = 1500.0,
                     float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 0, fovy, fovymin,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
                          fovymax, fnear, ffar, myfogstart, myfogend) {
     }
 
@@ -1455,7 +1455,7 @@ public:
                     float fovy, float fovymin, float fovymax,
                     float fnear, float ffar = 1500.0,
                     float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 0, fovy, fovymin,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
                          fovymax, fnear, ffar, myfogstart, myfogend) {
     }
 
@@ -1510,7 +1510,7 @@ public:
                         float fovy, float fovymin, float fovymax,
                         float fnear, float ffar = 1500.0,
                         float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 0, fovy, fovymin,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
                          fovymax, fnear, ffar, myfogstart, myfogend) {
         up[0] = 0;
         up[1] = 0;
@@ -1562,7 +1562,7 @@ public:
                      float fovy, float fovymin, float fovymax,
                      float fnear, float ffar = 1500.0,
                      float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 0, fovy, fovymin,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
                          fovymax, fnear, ffar, myfogstart, myfogend) {
         up[0] = 0;
         up[1] = 0;
@@ -1677,7 +1677,7 @@ public:
                       float fovy, float fovymin, float fovymax,
                       float fnear, float ffar = 1500.0,
                       float myfogstart = 1400.0, float myfogend = 1500.0)
-        : cGrPerspCamera(myscreen, id, drawCurr, 1, 0, drawBG, 0, fovy, fovymin,
+        : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 0, fovy, fovymin,
                          fovymax, fnear, ffar, myfogstart, myfogend) {
         locfar = ffar;
         locfovy = fovy;
@@ -1969,7 +1969,6 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     cam = new cGrCarCamInsideDynDriverEye(myscreen,
                                           id,
                                           1,	/* drawCurr */
-                                          1,    /* draw cockpit */
                                           1,	/* drawBG  */
                                           75.5,	/* fovy */
                                           10.0,	/* fovymin */
@@ -1986,7 +1985,6 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     cam = new cGrCarCamInsideDriverEye(myscreen,
                                        id,
                                        1,	/* drawCurr */
-                                       1,    /* draw cockpit */
                                        1,	/* drawBG  */
                                        75.5,	/* fovy */
                                        10.0,	/* fovymin */
