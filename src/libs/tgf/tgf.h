@@ -374,6 +374,7 @@ TGF_API bool GfFileCopy(const char* pszSrcName, const char* pszTgtName);
 TGF_API bool GfPathIsAbsolute(const char *pszPath);
 TGF_API char* GfPathNormalizeDir(char* pszPath, size_t nMaxPathLen);
 TGF_API char* GfPathMakeOSCompatible(char* path);
+TGF_API char* GfPathNormalizeFile(char* pszPath, size_t nMaxPathLen);
 
 
 /**********************************

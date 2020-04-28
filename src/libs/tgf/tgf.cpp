@@ -745,6 +745,23 @@ char* GfPathNormalizeDir(char* pszPath, size_t nMaxPathLen)
 	return pszPath;
 }
 
+// Normalize a file path in-place.
+char* GfPathNormalizeFile(char* pszPath, size_t nMaxPathLen)
+{
+#ifndef WIN32
+    char * buf = realpath(pszPath, NULL);
+    if (buf)
+    {
+        if (strlen(buf) < nMaxPathLen)
+            strcpy(pszPath, buf);
+        free(buf);
+    }
+    else
+        GfLogFatal("Path '%s' too long ; could not normalize\n", pszPath);
+#endif
+    return pszPath;
+}
+
 /* Translate a directory path into a run-time dir path :
    - ~ management, 
    - \ to / conversion, 

@@ -73,11 +73,6 @@ GfApplication::GfApplication(const char* pszName, const char* pszVersion, const 
 
 void GfApplication::initialize(bool bLoggingEnabled, int argc, char **argv)
 {
-    // Store the command line args.
-    if (argv)
-        for (int i = 0; i < argc; i++)
-            _lstArgs.push_back(argv[i]);
-
     // Initialize the gaming framework (beware: only GfLogDefault booted).
     GfInit(bLoggingEnabled);
 
@@ -86,6 +81,26 @@ void GfApplication::initialize(bool bLoggingEnabled, int argc, char **argv)
     if (!_strDesc.empty())
         GfLogInfo(" (%s)", _strDesc.c_str());
     GfLogInfo("\n");
+
+    // Store the command line args.
+    if (argv)
+    {
+        for (int i = 0; i < argc; i++)
+        {
+            if (i == 0)
+            {
+                char buf[1024];
+                strcpy(buf, argv[0]);
+                char *res = GfPathNormalizeFile(buf, sizeof(buf));
+                if (res)
+                    _lstArgs.push_back(buf);
+                else
+                    _lstArgs.push_back(argv[0]);
+            }
+            else
+                _lstArgs.push_back(argv[i]);
+        }
+    }
 
     // Register the command line options (to be parsed).
     registerOption("h",  "help", /* nHasValue = */ false);
@@ -269,7 +284,7 @@ void GfApplication::restart()
     const int retcode = execvp(_lstArgs.front().c_str(), apszArgs);
 
     // If the restart was successfull, we never get there ... But if it failed ...
-    GfLogError("Failed to restart (exit code %d, %s)\n", retcode, strerror(errno));
+    std::cerr << "Failed to restart (exit code " << retcode << ", " << strerror(errno) << ")" << std::endl;
     for (nArgInd = 0; apszArgs[nArgInd]; nArgInd++)
         free(apszArgs[nArgInd]);
     free(apszArgs);
