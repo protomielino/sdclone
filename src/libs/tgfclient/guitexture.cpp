@@ -297,6 +297,7 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 				filename, (unsigned long)(tgt_height * tgt_rowbytes));
 		fclose(fp);
 		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
+		free(row_pointers);
 		return (unsigned char *)NULL;
 	}
 
@@ -348,7 +349,7 @@ struct gfTexJPEGErrorManager {
  * Here's the routine that will replace the standard error_exit method:
  */
 
-METHODDEF(void)
+static void
 gfTexJPEGErrorExit (j_common_ptr cinfo)
 {
 	/* cinfo->err really points to a jpeg_error_mgr, so coerce pointer */
@@ -563,12 +564,14 @@ GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int he
 	
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, (png_error_ptr)NULL, (png_error_ptr)NULL);
 	if (png_ptr == NULL) {
+		fclose(fp);
 		return -1;
 	}
 	
 	info_ptr = png_create_info_struct(png_ptr);
 	if (info_ptr == NULL) {
 		png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
+		fclose(fp);
 		return -1;
 	}
 	
