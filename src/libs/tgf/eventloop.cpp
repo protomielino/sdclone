@@ -117,8 +117,8 @@ int GfEventLoop::Private::translateKeySym(int code, int modifier, int unicode)
         _mapUnicodes[keyId] = (unsigned short)keyUnicode;
         GfLogDebug("translateKeySym(c=%X, m=%X, u=%X) : '%c', id=%X, ucode=%X (nk=%d), ms=%X\n",
                    code, modifier, unicode, // Truncate high bits for MSVC 2010 bugs.
-                   (keyUnicode > 0 && keyUnicode < 128 && isprint(keyUnicode & 0x7F))
-                   ? (char)(keyUnicode & 0x7F) : ' ',
+                   (keyUnicode > 0 && keyUnicode < 128 && isprint(keyUnicode & 0x7F)
+                   ? (char)(keyUnicode & 0x7F) : ' '),
                    keyId, keyUnicode, _mapUnicodes.size(), SDL_GetModState());
     }
 
