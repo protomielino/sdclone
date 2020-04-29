@@ -500,9 +500,9 @@ void Driver::printInfos()
             }
 
             double laptime = lapsimtime - mLapSimTime;
-            LogUSR.debug("%.3f %s laptime \n", mSimTime, flagstring.c_str(), laptime);
+            LogUSR.debug("%.3f %s laptime %.3f\n", mSimTime, flagstring.c_str(), laptime);
             mLapSimTime = lapsimtime;
-            LogUSR.debug("%.3f %s avgfuelperlap \n", mSimTime, flagstring.c_str(), mPit.avgFuelPerLap());
+            LogUSR.debug("%.3f %s avgfuelperlap %.3f\n", mSimTime, flagstring.c_str(), mPit.avgFuelPerLap());
         }
     }
 
