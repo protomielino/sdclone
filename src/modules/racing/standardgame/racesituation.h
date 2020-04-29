@@ -62,6 +62,8 @@ private:
 
     //! Protected constructor to avoid instanciation outside of self().
     ReSituation();
+    ReSituation(const ReSituation &); // = delete;
+    ReSituation & operator = (const ReSituation &); // = delete;
 
     //! Lock the data when thread-safe mode activated (otherwise do nothing).
     bool lock(const char* pszCallerName = 0);

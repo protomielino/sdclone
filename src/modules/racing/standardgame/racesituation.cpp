@@ -616,8 +616,6 @@ ReSituationUpdater::~ReSituationUpdater()
 
 void ReSituationUpdater::start()
 {
-    int i;
-    tRobotItf *robot;
     tSituation *s = ReInfo->s;
 
     GfLogInfo("Starting race engine.\n");
@@ -626,8 +624,8 @@ void ReSituationUpdater::start()
     ReSituation::self().lock("ReSituationUpdater::start");
 
     // Allow robots to run their start function
-    for (i = 0; i < s->_ncars; i++) {
-        robot = s->cars[i]->robot;
+    for (int i = 0; i < s->_ncars; i++) {
+        tRobotItf *robot = s->cars[i]->robot;
         if (robot->rbResumeRace)
             robot->rbResumeRace(robot->index, s->cars[i], s);
     }
@@ -646,8 +644,6 @@ void ReSituationUpdater::start()
 
 void ReSituationUpdater::stop()
 {
-    int i;
-    tRobotItf *robot;
     tSituation *s = ReInfo->s;
 
     GfLogInfo("Stopping race engine.\n");
@@ -656,8 +652,8 @@ void ReSituationUpdater::stop()
     ReSituation::self().lock("ReSituationUpdater::stop");
 
     // Allow robots to run their stop function
-    for (i = 0; i < s->_ncars; i++) {
-        robot = s->cars[i]->robot;
+    for (int i = 0; i < s->_ncars; i++) {
+        tRobotItf *robot = s->cars[i]->robot;
         if (robot->rbPauseRace)
             robot->rbPauseRace(robot->index, s->cars[i], s);
     }

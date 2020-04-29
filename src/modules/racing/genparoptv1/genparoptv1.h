@@ -129,6 +129,8 @@ protected:
 
 	// Protected constructor to avoid instanciation outside (but friends).
 	GenParOptV1(const std::string& strShLibName, void* hShLibHandle);
+	GenParOptV1(const GenParOptV1 &); // = delete;
+	GenParOptV1 & operator = (const GenParOptV1 &); // = delete;
 	
 	// Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);

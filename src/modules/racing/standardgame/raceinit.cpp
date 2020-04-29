@@ -770,11 +770,10 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 int
 ReInitCars(void)
 {
-  char buf[512];
-  char path[512];
+  char buf[1024];
+  char path[1024];
   int nCars;
   int index;
-  int i, j;
   const char *robotModuleName;
   int robotIdx;
   void *robhdle;
@@ -796,7 +795,7 @@ ReInitCars(void)
   index = 0;
 
   /* For each car/driver : */
-  for (i = 1; i < nCars + 1; i++)
+  for (int i = 1; i < nCars + 1; i++)
   {
     /* Get the name of the module (= shared library) of the robot */
     snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i);
@@ -825,7 +824,7 @@ ReInitCars(void)
     {
       /* Search for the index of the racing driver in the list of interfaces
          of the module */
-      for (j = 0; j < (*(ReInfo->robModList))->modInfoSize; j++)
+      for (int j = 0; j < (*(ReInfo->robModList))->modInfoSize; j++)
       {
         if ((*(ReInfo->robModList))->modInfo[j].name && (*(ReInfo->robModList))->modInfo[j].index == robotIdx)
         {
@@ -889,7 +888,6 @@ ReInitCars(void)
   if (replayReplay)
     replayRecord = 0;
   else {
-        char buf[1024];
     const char *replayRateSchemeName;
         snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
 
@@ -938,7 +936,7 @@ ReInitCars(void)
   ReInfo->s->_ncars = nCars;
   FREEZ(ReInfo->s->cars);
   ReInfo->s->cars = (tCarElt **)calloc(nCars, sizeof(tCarElt *));
-  for (i = 0; i < nCars; i++)
+  for (int i = 0; i < nCars; i++)
   {
     ReInfo->s->cars[i] = &(ReInfo->carList[i]);
 

@@ -1029,7 +1029,7 @@ ReInitialiseGeneticOptimisation()
 			}
 			else		// ... else create an empty setup file.
 			{			
-				void* Handle = GfParmReadFile(Data->XmlFileName, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+				Handle = GfParmReadFile(Data->XmlFileName, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 				GfParmWriteFileSDHeader (Data->XmlFileName, Handle, Data->CarType, Data->AuthorName);
 				Data->GetInitialVal = false; // No initial setup, we cannot read it
 			}
@@ -1043,8 +1043,7 @@ ReInitialiseGeneticOptimisation()
 	{
 		snprintf(buf,FILENAME_MAX,"%sdrivers/%s/%s/default.xml",
 			GetLocalDir(),Data->RobotName,Data->CarType);
-		void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-		Data->Handle = Handle;
+		Data->Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
 	}
 
 	ReImportGeneticParameters();

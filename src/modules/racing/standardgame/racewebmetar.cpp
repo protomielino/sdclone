@@ -67,6 +67,8 @@ static size_t curl_fwrite(void *buffer, size_t size, size_t nmemb, void *stream)
 ReWebMetar::ReWebMetar() :
     _grpcount(0),
     _x_proxy(false),
+    _data(NULL),
+    _m(NULL),
     _year(-1),
     _month(-1),
     _day(-1),
@@ -95,6 +97,7 @@ ReWebMetar::ReWebMetar() :
     _cloud_altitude3(-1),
     _cavok(false)
 {
+    memset(_icao, 0, sizeof(_icao));
 }
 
 bool ReWebMetar::ReWebMetarFtp(const string& m)

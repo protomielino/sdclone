@@ -420,7 +420,7 @@ reTrackInitWeather(void)
 
     reTrackInitWeatherValues();
 
-    if ((trackLocal->visibility < 300) & (rain < 1))
+    if ((trackLocal->visibility < 300) && (rain < 1))
         trackLocal->visibility = 300;
 
     GfLogDebug("Visibility = %.3f\n", trackLocal->visibility);
@@ -770,7 +770,7 @@ reTrackInitSimuWeather(void)
 
         reTrackInitWeatherValues();
 
-        if ((trackLocal->visibility < 300) & (rain < 1))
+        if ((trackLocal->visibility < 300) && (rain < 1))
             trackLocal->visibility = 300;
 
         ReTrackUpdate();

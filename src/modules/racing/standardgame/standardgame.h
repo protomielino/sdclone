@@ -126,6 +126,8 @@ protected:
 
 	// Protected constructor to avoid instanciation outside (but friends).
 	StandardGame(const std::string& strShLibName, void* hShLibHandle);
+	StandardGame(const StandardGame &); // = delete;
+	StandardGame & operator = (const StandardGame &); // = delete;
 	
 	// Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);

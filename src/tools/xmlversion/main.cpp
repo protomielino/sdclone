@@ -127,6 +127,7 @@ static int process( const char* versionFile, const char* dataLocation,
 	if( !versionHandle )
 	{
 		fprintf( stderr, "xmlversion: Can't open or create \"%s\".\n", versionFile );
+		GfParmReleaseHandle( xmlHandle );
 		return 1;
 	}
 
