@@ -48,14 +48,6 @@ Opponent::~Opponent()
 void	Opponent::Initialise( MyTrack* pTrack, CarElt* pCar )
 {
     m_path.Initialise( pTrack, pCar );
-
-    m_info.flags = 0;
-    m_info.avoidLatchTime = 0;
-    m_info.dangerousLatchTime = 0;
-    m_info.closeAheadTime = 0;
-    m_info.closeBehindTime = 0;
-
-    memset( &m_info.sit, 0, sizeof(m_info.sit) );
 }
 
 CarElt*	Opponent::GetCar()

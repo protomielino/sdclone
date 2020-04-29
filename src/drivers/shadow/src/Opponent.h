@@ -65,6 +65,38 @@ public:
 
     struct Sit
     {
+        Sit()
+        :   spd(0.0),
+            stuckTime(0.0),
+            tVX(0.0),
+            tVY(0.0),
+            tYaw(0.0),
+            rdPX(0.0),
+            rdPY(0.0),
+            rdVX(0.0),
+            rdVY(0.0),
+            agVX(0.0),
+            agVY(0.0),
+            ragVX(0.0),
+            ragVY(0.0),
+            arAX(0.0),
+            arAY(0.0),
+            agAX(0.0),
+            agAY(0.0),
+            rAX(0.0),
+            rAY(0.0),
+            ragAX(0.0),
+            ragAY(0.0),
+            minDXa(0.0),
+            minDXb(0.0),
+            minDY(0.0),
+            decDX(0.0),
+            accDX(0.0),
+            relPos(0.0),
+            offs(0.0)
+        {
+        }
+
         // t = local track relative.
         // r = relative to velocity frame of my car.
         // g = global torcs coordinate frame.
@@ -113,9 +145,19 @@ public:
 
     struct PassInfo
     {
+        PassInfo()
+        :   isSpace(false),
+            offset(0.0),
+            mySpeed(0.0),
+            goodPath(false),
+            bestU(0.0),
+            bestV(0.0),
+            myOffset(0.0)
+        {
+        }
+
         bool	isSpace;
         double	offset;
-//		double	myOffset
         double	mySpeed;
         bool	goodPath;
         double	bestU;
@@ -125,7 +167,28 @@ public:
 
     struct Info
     {
-        Info() { memset( this, 0, sizeof(*this) ); }
+        Info()
+        :   flags(0),
+            avoidLatchTime(0.0),
+            dangerousLatchTime(0.0),
+            closeAheadTime(0.0),
+            closeBehindTime(0.0),
+            catchTime(0.0),
+            catchY(0.0),
+            catchSpd(0.0),
+            catchDecel(0.0),
+            catchAccTime(0.0),
+            catchAccY(0.0),
+            catchAccSpd(0.0),
+            newCatching(false),
+            newCatchSpd(0.0),
+            newCatchTime(0.0),
+            newAheadTime(0.0),
+            newMidPos(0.0),
+            newBestOffset(0.0),
+            tmDamage(0.0)
+        {
+        }
 
         bool		GotFlags( int f ) const	{ return (flags & f) == f; }
 
