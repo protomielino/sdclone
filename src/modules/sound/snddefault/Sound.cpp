@@ -25,6 +25,7 @@
 /// Construct a sound.
 Sound::Sound(int flags, bool loop)
 {
+	iface = nullptr;
 	this->flags = flags;
 	MAX_VOL = 1.0f;
 	volume = 0.0f;

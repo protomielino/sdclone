@@ -35,8 +35,6 @@ class PlibSoundInterface : public SoundInterface
  protected:
 	
 	slScheduler* sched;
-	std::vector<Sound*> sound_list;
-	SoundPri* engpri;
 	SoundSource* car_src;
 	SoundSource tyre_src[4];
 	void setMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap);
@@ -44,6 +42,8 @@ class PlibSoundInterface : public SoundInterface
  public:
 	
 	PlibSoundInterface(float sampling_rate, int n_channels);
+	PlibSoundInterface(const PlibSoundInterface &); // = delete;
+	PlibSoundInterface & operator = (const PlibSoundInterface &); // = delete;
 	virtual ~PlibSoundInterface();
 	virtual void setNCars(int n_cars);
 	virtual slScheduler* getScheduler();

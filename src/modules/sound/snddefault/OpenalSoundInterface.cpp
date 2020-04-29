@@ -44,6 +44,7 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels)
 {
 	int error;
 	car_src = NULL;
+	sourcepool = NULL;
 
 	ALfloat far_away[] = { 0.0f, 0.0f,  1000.0f };
 	ALfloat zeroes[] = { 0.0f, 0.0f,  0.0f };
@@ -225,8 +226,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 	ALfloat listener_orientation[6];
     static const ALfloat zeros[] = {0.0f, 0.0f, 0.0f};
 	
-	int i;
-	for (i = 0; i<3; i++) {
+	for (int i = 0; i<3; i++) {
 		listener_pos[i] = p_obs[i];
 #ifdef USE_OPENAL_DOPPLER
 		listener_speed[i] = 0;// u_obs[i]; // TODO: Try restoring this, needed !
@@ -244,7 +244,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 	alListenerfv(AL_ORIENTATION, listener_orientation );
 	alListenerf(AL_GAIN, getGlobalGain()); // Multiplier applied to the gain of each source
 
-	for (i = 0; i<n_cars; i++) {
+	for (int i = 0; i<n_cars; i++) {
 		car_sound_data[i]->copyEngPri(engpri[i]);
 		const int id = engpri[i].id;
 		sgVec3 p;
@@ -263,7 +263,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 
 	// Reverse order is important to gain free sources from stopped engine sounds
 	// before attempting to start new ones.
-	for (i = n_cars - 1; i >= 0; i--) {
+	for (int i = n_cars - 1; i >= 0; i--) {
 		const int id = engpri[i].id;
 		sgVec3 p;
 		sgVec3 u;
@@ -291,8 +291,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 	
 	float max_skid_vol[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 	int max_skid_id[4] = {0,0,0,0};
-	int id;
-	for (id = 0; id<n_cars; id++) {
+	for (int id = 0; id<n_cars; id++) {
 		CarSoundData* sound_data = car_sound_data[id];
 		for (int j=0; j<4; j++) {
 			float skvol=sound_data->attenuation*sound_data->wheel[j].skid.a;
@@ -303,7 +302,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 		}
 	}
 
-	for (i = 0; i<4; i++) {
+	for (int i = 0; i<4; i++) {
 		int id = max_skid_id[i];
 		WheelSoundData* sound_data = car_sound_data[id]->wheel;
 		skid_sound[i]->setSource(sound_data[i].p, sound_data[i].u);
@@ -344,10 +343,6 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 	sortSingleQueue (car_sound_data, &backfire_loop, n_cars);
 	setMaxSoundCar (car_sound_data, &backfire_loop);
 
-	backfire_loop.snd = backfire_loop_sound;
-	sortSingleQueue (car_sound_data, &backfire_loop, n_cars);
-	setMaxSoundCar (car_sound_data, &backfire_loop);
-
 	turbo.snd = turbo_sound;
 	sortSingleQueue (car_sound_data, &turbo, n_cars);
 	setMaxSoundCar (car_sound_data, &turbo);
@@ -358,7 +353,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 
 	// On-off sounds
 	sgVec3 p, u;
-	for (id = 0; id<n_cars; id++) {
+	for (int id = 0; id<n_cars; id++) {
 		const CarSoundData* sound_data = car_sound_data[id];
 		if (sound_data->crash) {
 			if (++curCrashSnd>=NB_CRASH_SOUND) {

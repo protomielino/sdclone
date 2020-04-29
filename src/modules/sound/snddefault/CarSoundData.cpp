@@ -22,6 +22,7 @@
 
 CarSoundData::CarSoundData(int id, SoundInterface* sound_interface)
 {
+    engine_sound = nullptr;
     eng_pri.id = id;
     eng_pri.a = 1.0f;
     engine.a = 0.0f;
@@ -36,6 +37,15 @@ CarSoundData::CarSoundData(int id, SoundInterface* sound_interface)
     turbo.a = 0.0f;
     turbo.f = 0.0f;
     engine_backfire.a=0.0f;
+    engine_backfire.f = 0.0f;
+    grass_skid.a = 0.0f;
+    grass_skid.f = 0.0f;
+    grass.a = 0.0f;
+    grass.f = 0.0f;
+    road.a = 0.0f;
+    road.f = 0.0f;
+    skid_metal.a = 0.0f;
+    skid_metal.f = 0.0f;
     prev_gear = 0;
     gear_changing = false;
     bottom_crash = false;
@@ -59,6 +69,7 @@ CarSoundData::CarSoundData(int id, SoundInterface* sound_interface)
     setListenerPosition(zeroes);
     
     attenuation = 0.0f;
+    base_frequency = 0.0f;
 }
 
 void CarSoundData::setEngineSound (Sound* engine_sound, float rpm_scale)
@@ -286,7 +297,7 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
             ride = 0.001f * car->_reaction[i];
         }
 
-        int out_of_road = false;
+        bool out_of_road = false;
 
         if ((s)
             &&((strcmp(s, TRK_VAL_GRASS)==0)

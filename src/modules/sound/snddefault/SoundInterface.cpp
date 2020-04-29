@@ -42,7 +42,38 @@ SoundInterface::SoundInterface(float sampling_rate, int n_channels)
 	curCrashSnd = 0;
 	bang_sound=NULL;
 	bottom_crash_sound=NULL;
+	backfire_sound=NULL;
 	gear_change_sound=NULL;
+	engpri=NULL;
+
+	road.schar=NULL;
+	road.snd=NULL;
+	road.max_vol=0.0f;
+	road.id=0;
+	grass.schar=NULL;
+	grass.snd=NULL;
+	grass.max_vol=0.0f;
+	grass.id=0;
+	grass_skid.schar=NULL;
+	grass_skid.snd=NULL;
+	grass_skid.max_vol=0.0f;
+	grass_skid.id=0;
+	metal_skid.schar=NULL;
+	metal_skid.snd=NULL;
+	metal_skid.max_vol=0.0f;
+	metal_skid.id=0;
+	backfire_loop.schar=NULL;
+	backfire_loop.snd=NULL;
+	backfire_loop.max_vol=0.0f;
+	backfire_loop.id=0;
+	turbo.schar=NULL;
+	turbo.snd=NULL;
+	turbo.max_vol=0.0f;
+	turbo.id=0;
+	axle.schar=NULL;
+	axle.snd=NULL;
+	axle.max_vol=0.0f;
+	axle.id=0;
 	
 	n_engine_sounds = n_channels - 12;
 

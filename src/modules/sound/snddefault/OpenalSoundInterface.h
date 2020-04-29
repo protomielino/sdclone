@@ -59,6 +59,8 @@ class OpenalSoundInterface : public SoundInterface
  public:
 	
 	OpenalSoundInterface(float sampling_rate, int n_channels);
+	OpenalSoundInterface(const OpenalSoundInterface &); // = delete;
+	OpenalSoundInterface & operator = (const OpenalSoundInterface &); // = delete;
 	virtual ~OpenalSoundInterface();
 	virtual void setNCars(int n_cars);
 	virtual Sound* addSample(const char* filename, int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
@@ -82,6 +84,8 @@ struct sharedSource {
 
 class SharedSourcePool {
 	public:
+		SharedSourcePool(const SharedSourcePool &); // = delete;
+		SharedSourcePool & operator = (const SharedSourcePool &); // = delete;
 		SharedSourcePool(int nbsources):nbsources(nbsources) {
 			pool = new sharedSource[nbsources];
 			int i;

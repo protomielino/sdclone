@@ -208,9 +208,8 @@ grRefreshSound(tSituation *s, Camera* camera)
 
 		//sgNormaliseVec3 (c_camera);
 
-		tCarElt	*car;
 		for (i = 0; i < s->_ncars; i++) {
-			car = s->cars[i];
+			tCarElt	*car = s->cars[i];
 			car_sound_data[car->index]->setListenerPosition(*p_camera);
 			car_sound_data[car->index]->update(car);
 		}

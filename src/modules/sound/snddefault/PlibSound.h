@@ -36,6 +36,8 @@ public:
 			  const char* filename,
 			  int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
 			  bool loop = false);
+	PlibSound(const PlibSound &); // = delete;
+	PlibSound & operator = (const PlibSound &); // = delete;
 	virtual ~PlibSound();
 	virtual void setVolume(float vol);
 	//virtual void setSource(sgVec3 p, sgVec3 u);
