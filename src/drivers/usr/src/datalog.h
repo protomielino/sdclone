@@ -27,8 +27,8 @@ class DataLog
 {
 public:
     DataLog();
-    void init(std::string dir, std::string carname);
-    void add(std::string name, double* data, double scale);
+    void init(const std::string &dir, const std::string &carname);
+    void add(const std::string &name, double* data, double scale);
     void update();
     void write();
 
