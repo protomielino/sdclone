@@ -458,7 +458,7 @@ void NetServer::RemoveDriver(ENetEvent event)
                 break;
             }
 
-            p++;
+            ++p;
         }
 
         if (m_vecWaitForPlayers.size()==0)
@@ -467,7 +467,7 @@ void NetServer::RemoveDriver(ENetEvent event)
 
     //look for driver id
     NetServerMutexData *pSData = LockServerData();
-    for (p = pSData->m_vecNetworkPlayers.begin();p!=pSData->m_vecNetworkPlayers.end();p++)
+    for (p = pSData->m_vecNetworkPlayers.begin();p!=pSData->m_vecNetworkPlayers.end();++p)
     {
         if (p->client)
         {
@@ -1070,7 +1070,7 @@ void NetServer::ReadPacket(ENetEvent event)
                     break;
                 }
 
-                p++;
+                ++p;
             }
 
             if (m_vecWaitForPlayers.size()==0)

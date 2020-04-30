@@ -177,7 +177,7 @@ void GfApplication::updateUserSettings()
     std::string strDefTraceStream;
 
     std::list<Option>::const_iterator itOpt;
-    for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+    for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); ++itOpt)
     {
         // Not found in the command line => ignore / default value.
         if (!itOpt->bFound)
@@ -247,7 +247,7 @@ void GfApplication::restart()
 
     unsigned nArgInd = 0;
     std::list<std::string>::const_iterator itArg;
-    for (itArg = _lstArgs.begin(); itArg != _lstArgs.end(); itArg++)
+    for (itArg = _lstArgs.begin(); itArg != _lstArgs.end(); ++itArg)
     {
 #ifdef WIN32
         // execvp will not automatically surround args with spaces inside with double quotes !
@@ -303,14 +303,14 @@ void GfApplication::printUsage(const char* pszErrMsg) const
     while (itSynLine != _optionsHelp.lstSyntaxLines.end())
     {
         std::cout << "         " << *itSynLine << std::endl;
-        itSynLine++;
+        ++itSynLine;
     }
 
     std::list<std::string>::const_iterator itExplLine = _optionsHelp.lstExplainLines.begin();
     while (itExplLine != _optionsHelp.lstExplainLines.end())
     {
         std::cout << " " << *itExplLine << std::endl;
-        itExplLine++;
+        ++itExplLine;
     }
 }
 
@@ -326,14 +326,14 @@ bool GfApplication::parseOptions()
     GfLogInfo("Parsing command line args (%zu)\n", _lstArgs.size() - 1);
 #endif
     std::list<std::string>::const_iterator itArg = _lstArgs.begin();
-    for (itArg++; itArg != _lstArgs.end(); itArg++)
+    for (++itArg; itArg != _lstArgs.end(); ++itArg)
     {
         bool bArgEaten = false;
         if (itArg->find('-') == 0)
         {
             // We've probably got an option flag : check this a bit more in depth.
             std::list<Option>::iterator itOpt;
-            for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+            for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); ++itOpt)
             {
                 if (itOpt->strShortName == itArg->substr(1, std::string::npos)
                     || itOpt->strLongName == itArg->substr(2, std::string::npos))
@@ -342,7 +342,7 @@ bool GfApplication::parseOptions()
                     if (itOpt->bHasValue)
                     {
                         const std::string strFlag(*itArg);
-                        itArg++;
+                        ++itArg;
                         if (itArg != _lstArgs.end() // Some extra arg available ...
                             && itArg->find('-') != 0) // ... and not an option flag :
                         {
@@ -388,7 +388,7 @@ bool GfApplication::parseOptions()
     bool bTrueRandom = true;
 
     std::list<Option>::const_iterator itOpt;
-    for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+    for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); ++itOpt)
     {
         // Not found in the command line => ignore / default value.
         if (!itOpt->bFound)
@@ -497,7 +497,7 @@ void GfApplication::registerOption(const std::string& strShortName,
 {
     // Check if no already registered option has same short or long name.
     std::list<Option>::const_iterator itOpt;
-    for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+    for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); ++itOpt)
     {
         try
         {
@@ -542,7 +542,7 @@ void GfApplication::addOptionsHelpExplainLine(const std::string& strTextLine)
 bool GfApplication::hasOption(const std::string& strLongName) const
 {
     std::list<Option>::const_iterator itOpt;
-    for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+    for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); ++itOpt)
         if (itOpt->bFound && itOpt->strLongName == strLongName)
             return true;
 
@@ -553,7 +553,7 @@ bool GfApplication::hasOption(const std::string& strLongName,
                               std::string& strValue) const
 {
     std::list<Option>::const_iterator itOpt;
-    for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+    for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); ++itOpt)
         if (itOpt->bFound && itOpt->strLongName == strLongName)
         {
             strValue = itOpt->strValue;

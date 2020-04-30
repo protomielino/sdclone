@@ -175,7 +175,7 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 		x0 = x = xLeft1stCol;
 		sprintf(buf, "chapters/%d/records/%d", startChapterIndex, nRecordInd);
 		std::vector<const char*>::const_iterator colIdIter;
-		for (colIdIter = orderedColumnIds.begin(); colIdIter != orderedColumnIds.end(); colIdIter++)
+		for (colIdIter = orderedColumnIds.begin(); colIdIter != orderedColumnIds.end(); ++colIdIter)
 		{
 			const char* colValue = GfParmGetStr(hparmCredits, buf, *colIdIter, "");
 			if (x >= xRightLastCol)

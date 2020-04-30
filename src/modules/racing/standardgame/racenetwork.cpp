@@ -162,7 +162,7 @@ ReNetworkOneStep()
 		if(p->time<s->currentTime)
 			p = pNData->m_vecCarCtrls.erase(p);
 		else 
-			p++;
+			++p;
 	}
 
 	//do lap status updates if needed

@@ -355,7 +355,7 @@ void RmGarageMenu::resetSkinComboBox(const std::string& strCarName,
 	GfuiComboboxClear(getMenuHandle(), nSkinComboId);
 	_nCurSkinIndex = 0;
 	std::vector<GfDriverSkin>::const_iterator itSkin;
-	for (itSkin = _vecPossSkins.begin(); itSkin != _vecPossSkins.end(); itSkin++)
+	for (itSkin = _vecPossSkins.begin(); itSkin != _vecPossSkins.end(); ++itSkin)
 	{
 		std::string strDispSkinName =
 			itSkin->getName().empty() ? "standard" : itSkin->getName();

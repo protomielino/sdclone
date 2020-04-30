@@ -476,7 +476,7 @@ void HumanDriver::terminate()
             }
             free(*itDrvCtx);
         }
-        itDrvCtx++;
+        ++itDrvCtx;
     }
     HCtx.clear();
 
@@ -485,7 +485,7 @@ void HumanDriver::terminate()
     while (itDrvName != VecNames.end())
     {
         free(*itDrvName);
-        itDrvName++;
+        ++itDrvName;
     }
     VecNames.clear();
 }

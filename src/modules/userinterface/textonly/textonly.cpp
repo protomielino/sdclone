@@ -228,7 +228,7 @@ void TextOnlyUI::onLapCompleted(int nLapIndex)
 	GfLogInfo("%s\n", _pResTable->strHeader.c_str());
 	
 	std::vector<std::string>::const_iterator itLine;
-	for (itLine = _pResTable->vecLines.begin(); itLine != _pResTable->vecLines.end(); itLine++)
+	for (itLine = _pResTable->vecLines.begin(); itLine != _pResTable->vecLines.end(); ++itLine)
 		GfLogInfo("%s\n", itLine->c_str());
 }
 

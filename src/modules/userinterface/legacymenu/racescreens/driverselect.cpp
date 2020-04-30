@@ -154,7 +154,7 @@ rmdsReloadCompetitorsScrollList()
 	// For each competitor in the race :
 	std::vector<GfDriver*> vecCompetitors = MenuData->pRace->getCompetitors();
 	std::vector<GfDriver*>::iterator itComp;
-	for (itComp = vecCompetitors.begin(); itComp != vecCompetitors.end(); itComp++)
+	for (itComp = vecCompetitors.begin(); itComp != vecCompetitors.end(); ++itComp)
 		// Add its name to the Competitors scroll list.
 		GfuiScrollListInsertElement(ScrHandle, CompetitorsScrollListId, (*itComp)->getName().c_str(),
 									MenuData->pRace->getCompetitorsCount(), (void*)(*itComp));
@@ -766,7 +766,7 @@ RmDriversSelect(void *vs)
 			VecDriverTypes.push_back(*itDrvType);
 			//GfLogDebug("Accepted type : %s\n", itDrvType->c_str());
 		}
-		itDrvType++;
+		++itDrvType;
 	}
 	if (VecDriverTypes.size() > 1)
 		VecDriverTypes.push_back(AnyDriverType);
@@ -807,7 +807,7 @@ RmDriversSelect(void *vs)
 	PCurrentDriver = 0;
 	std::vector<GfDriver*> vecCompetitors = MenuData->pRace->getCompetitors();
 	std::vector<GfDriver*>::iterator itComp;
-	for (itComp = vecCompetitors.begin(); itComp != vecCompetitors.end(); itComp++)
+	for (itComp = vecCompetitors.begin(); itComp != vecCompetitors.end(); ++itComp)
 	{
 		if ((*itComp)->isHuman())
 		{
@@ -865,7 +865,7 @@ rmdsFilterCandidatesScrollList(const std::string& strCarCatId, const std::string
 	// d) Keep only drivers accepted by the race and not already among competitors
 	//    (but don't reject humans with the wrong car category : they must be able to change it).
 	std::vector<GfDriver*>::const_iterator itCandidate;
-	for (itCandidate = vecCandidates.begin(); itCandidate != vecCandidates.end(); itCandidate++)
+	for (itCandidate = vecCandidates.begin(); itCandidate != vecCandidates.end(); ++itCandidate)
 	{
 		if (std::find(vecCompetitors.begin(), vecCompetitors.end(), *itCandidate)
 			== vecCompetitors.end()

@@ -181,7 +181,7 @@ bool Application::parseOptions()
     DoSaveElevation = -1;
 
 	std::list<Option>::const_iterator itOpt;
-	for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+	for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); ++itOpt)
 	{
 		// Not found in the command line => ignore / default value.
 		if (!itOpt->bFound)

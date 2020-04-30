@@ -80,7 +80,7 @@ gfTraceShutdown(void)
 	std::map<std::string, GfLogger*>::iterator itLog;
 
 	// Delete all instances
-	for (itLog = gfMapLoggersByName.begin(); itLog != gfMapLoggersByName.end(); itLog++)
+	for (itLog = gfMapLoggersByName.begin(); itLog != gfMapLoggersByName.end(); ++itLog)
 		delete itLog->second;	// a map<x,y> iterator "points" to a pair<x,y> value
 
 	// Empty the map

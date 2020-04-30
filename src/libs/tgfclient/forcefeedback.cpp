@@ -52,7 +52,7 @@ ForceFeedbackManager::ForceFeedbackManager(){
 ForceFeedbackManager::~ForceFeedbackManager(){
     // iterate on the first map
     typedef std::map<std::string, std::map<std::string, int> >::iterator it_type;
-    for(it_type iterator = this->effectsConfig.begin(); iterator != this->effectsConfig.end(); iterator++) {
+    for(it_type iterator = this->effectsConfig.begin(); iterator != this->effectsConfig.end(); ++iterator) {
         // iterator->first = key (effect type name)
         // iterator->second = value (second map)
 
@@ -162,13 +162,13 @@ void ForceFeedbackManager::saveConfiguration(){
 
     // iterate on the first map
     typedef std::map<std::string, std::map<std::string, int> >::iterator it_type;
-    for(it_type iterator = this->effectsConfig.begin(); iterator != this->effectsConfig.end(); iterator++) {
+    for(it_type iterator = this->effectsConfig.begin(); iterator != this->effectsConfig.end(); ++iterator) {
         // iterator->first = key (effect type name)
         // iterator->second = value (second map)
 
         // now iterate on the second map
         typedef std::map<std::string, int>::iterator it_type2;
-        for(it_type2 iterator2 = iterator->second.begin(); iterator2 != iterator->second.end(); iterator2++) {
+        for(it_type2 iterator2 = iterator->second.begin(); iterator2 != iterator->second.end(); ++iterator2) {
             // iterator2->first = key (effect parameter name)
             // iterator2->second = value (effect value)
 

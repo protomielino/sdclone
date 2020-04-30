@@ -99,7 +99,7 @@ static void playMenuMusic()
 		if (player) {
 			player->playAndManageBuffer();
 		}
-		itPlayers++;
+		++itPlayers;
 	}
 	SDL_UnlockMutex(mapMutex);
 	if(timerId == 0){
@@ -131,13 +131,13 @@ void shutdownMusic()
 		OpenALMusicPlayer* player = itPlayers->second;
 		player->stop();
 		player->rewind();
-		itPlayers++;
+		++itPlayers;
 	}
 	itPlayers = mapOpenAlPlayers.begin();
 	while(itPlayers != mapOpenAlPlayers.end()) {
 		OpenALMusicPlayer* player = itPlayers->second;
 		delete player;
-		itPlayers++;
+		++itPlayers;
 	}
 	mapOpenAlPlayers.clear();
 	SDL_UnlockMutex(mapMutex);
@@ -157,7 +157,7 @@ void pauseMenuMusic()
 		while(itPlayers != mapOpenAlPlayers.end()) {
 			OpenALMusicPlayer* player = itPlayers->second;
 			player->pause();
-			itPlayers++;
+			++itPlayers;
 		}
 		SDL_UnlockMutex(mapMutex);
 		

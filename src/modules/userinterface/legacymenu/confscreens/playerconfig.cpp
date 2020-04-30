@@ -664,7 +664,7 @@ GenPlayerList(void)
     
     /* Reset players list */
     tPlayerInfoList::iterator playerIter;
-    for (playerIter = PlayersInfo.begin(); playerIter != PlayersInfo.end(); playerIter++)
+    for (playerIter = PlayersInfo.begin(); playerIter != PlayersInfo.end(); ++playerIter)
         delete *playerIter;
     PlayersInfo.clear();
 
@@ -760,7 +760,7 @@ onQuitPlayerConfig(void * /* dummy */)
 
     // Reset player list
     tPlayerInfoList::iterator playerIter;
-    for (playerIter = PlayersInfo.begin(); playerIter != PlayersInfo.end(); playerIter++)
+    for (playerIter = PlayersInfo.begin(); playerIter != PlayersInfo.end(); ++playerIter)
         delete *playerIter;
     PlayersInfo.clear();
 

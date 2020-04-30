@@ -179,7 +179,7 @@ grUpdateSmoke(const double t)
     {
         for(std::list<cGrSmoke>::iterator it = smokeList->begin();
             it != smokeList->end();
-            it++)
+            ++it)
         {
             if (!it->smoke->isAlive())
             {

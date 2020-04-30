@@ -706,7 +706,7 @@ osgDB::ReaderWriter::WriteResult ReaderWriterACC::writeNode(const osg::Node& nod
     // output the Materials
     int iNumGeodesWithGeometry = 0;
 
-    for (itr=glist.begin();itr!= glist.end();itr++)
+    for (itr=glist.begin();itr!= glist.end();++itr)
     {
         iNumMaterials.push_back(const_cast<acc3d::Geode*>(static_cast<const acc3d::Geode*>(*itr))->ProcessMaterial(fout,itr-glist.begin()));
         unsigned int iNumDrawables = (*itr)->getNumDrawables();
@@ -733,7 +733,7 @@ osgDB::ReaderWriter::WriteResult ReaderWriterACC::writeNode(const osg::Node& nod
     fout << "OBJECT world" << std::endl;
 
     fout << "kids " << iNumGeodesWithGeometry << std::endl;
-    for (itr=glist.begin();itr!= glist.end();itr++)
+    for (itr=glist.begin();itr!= glist.end();++itr)
     {
         const_cast<acc3d::Geode*>(static_cast<const acc3d::Geode*>(*itr))->ProcessGeometry(fout,nfirstmat);
         nfirstmat+=iNumMaterials[itr-glist.begin()];

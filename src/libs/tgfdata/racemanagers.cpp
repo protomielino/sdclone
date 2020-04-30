@@ -67,7 +67,7 @@ GfRaceManagers::~GfRaceManagers()
 {
 	std::vector<GfRaceManager*>::const_iterator itRaceMan;
 	for (itRaceMan = _pPrivate->vecRaceMans.begin();
-		 itRaceMan != _pPrivate->vecRaceMans.end(); itRaceMan++)
+		 itRaceMan != _pPrivate->vecRaceMans.end(); ++itRaceMan)
 		delete *itRaceMan;
 
 	delete _pPrivate;
@@ -141,7 +141,7 @@ GfRaceManagers::GfRaceManagers()
 	// Fill the race manager type vector (=> also sorted by priority).
 	std::vector<GfRaceManager*>::const_iterator itRaceMan;
 	for (itRaceMan = _pPrivate->vecRaceMans.begin();
-		 itRaceMan != _pPrivate->vecRaceMans.end(); itRaceMan++)
+		 itRaceMan != _pPrivate->vecRaceMans.end(); ++itRaceMan)
 		if (std::find(_pPrivate->vecTypes.begin(), _pPrivate->vecTypes.end(), (*itRaceMan)->getType())
 			== _pPrivate->vecTypes.end())
 			_pPrivate->vecTypes.push_back((*itRaceMan)->getType());
@@ -169,7 +169,7 @@ GfRaceManager* GfRaceManagers::getRaceManagerWithName(const std::string& strName
 {
 	std::vector<GfRaceManager*>::iterator itRaceMan;
 	for (itRaceMan = _pPrivate->vecRaceMans.begin();
-		 itRaceMan != _pPrivate->vecRaceMans.end(); itRaceMan++)
+		 itRaceMan != _pPrivate->vecRaceMans.end(); ++itRaceMan)
 		if ((*itRaceMan)->getName() == strName)
 			return *itRaceMan;
 
@@ -181,7 +181,7 @@ std::vector<GfRaceManager*> GfRaceManagers::getRaceManagersWithType(const std::s
 	std::vector<GfRaceManager*> vecRaceMans;
 
 	std::vector<GfRaceManager*>::iterator itRaceMan;
-	for (itRaceMan = _pPrivate->vecRaceMans.begin(); itRaceMan != _pPrivate->vecRaceMans.end(); itRaceMan++)
+	for (itRaceMan = _pPrivate->vecRaceMans.begin(); itRaceMan != _pPrivate->vecRaceMans.end(); ++itRaceMan)
 		if (strType.empty() || (*itRaceMan)->getType() == strType)
 			vecRaceMans.push_back(*itRaceMan);
 
@@ -198,13 +198,13 @@ void GfRaceManagers::print(bool bVerbose) const
 			   _pPrivate->vecTypes.size(), _pPrivate->vecRaceMans.size());
 	std::vector<std::string>::const_iterator itType;
 	for (itType = _pPrivate->vecTypes.begin();
-		 itType != _pPrivate->vecTypes.end(); itType++)
+		 itType != _pPrivate->vecTypes.end(); ++itType)
 	{
 		GfLogTrace("  %s type :\n", itType->c_str());
 		const std::vector<GfRaceManager*> vecRaceMans =
 			getRaceManagersWithType(itType->c_str());
 		std::vector<GfRaceManager*>::const_iterator itRaceMan;
-		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
+		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); ++itRaceMan)
 		{
 			GfLogTrace("    %s : subtype='%s', name='%s', prio=%d, events=%d\n",
 					   (*itRaceMan)->getId().c_str(), (*itRaceMan)->getSubType().c_str(),

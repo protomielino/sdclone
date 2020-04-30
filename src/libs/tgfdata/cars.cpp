@@ -66,7 +66,7 @@ void GfCars::shutdown()
 GfCars::~GfCars()
 {
 	std::vector<GfCar*>::const_iterator itCar;
-	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); itCar++)
+	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); ++itCar)
 		delete *itCar;
 	
 	delete _pPrivate;
@@ -178,7 +178,7 @@ GfCar* GfCars::getCar(const std::string& strId) const
 GfCar* GfCars::getCarWithName(const std::string& strName) const
 {
 	std::vector<GfCar*>::iterator itCar;
-	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); itCar++)
+	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); ++itCar)
 		if ((*itCar)->getName() == strName)
 			return *itCar;
 
@@ -190,7 +190,7 @@ std::vector<GfCar*> GfCars::getCarsInCategory(const std::string& strCatId) const
 	std::vector<GfCar*> vecCarsInCat;
 
 	std::vector<GfCar*>::iterator itCar;
-	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); itCar++)
+	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); ++itCar)
 		if (strCatId.empty() || (*itCar)->getCategoryId() == strCatId)
 			vecCarsInCat.push_back(*itCar);
 
@@ -202,7 +202,7 @@ std::vector<GfCar*> GfCars::getCarsInCategoryWithName(const std::string& strCatN
 	std::vector<GfCar*> vecCarsInCat;
 
 	std::vector<GfCar*>::iterator itCar;
-	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); itCar++)
+	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); ++itCar)
 		if (strCatName.empty() || (*itCar)->getCategoryName() == strCatName)
 			vecCarsInCat.push_back(*itCar);
 
@@ -214,7 +214,7 @@ std::vector<std::string> GfCars::getCarIdsInCategory(const std::string& strCatId
 	std::vector<std::string> vecCarIds;
 
 	std::vector<GfCar*>::const_iterator itCar;
-	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); itCar++)
+	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); ++itCar)
 		if (strCatId.empty() || (*itCar)->getCategoryId() == strCatId)
 			vecCarIds.push_back((*itCar)->getId());
 
@@ -226,7 +226,7 @@ std::vector<std::string> GfCars::getCarNamesInCategory(const std::string& strCat
 	std::vector<std::string> vecCarNames;
 
 	std::vector<GfCar*>::const_iterator itCar;
-	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); itCar++)
+	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); ++itCar)
 		if (strCatId.empty() || (*itCar)->getCategoryId() == strCatId)
 			vecCarNames.push_back((*itCar)->getName());
 
@@ -243,12 +243,12 @@ void GfCars::print() const
 			   _pPrivate->vecCatIds.size(), _pPrivate->vecCars.size());
 	std::vector<std::string>::const_iterator itCatName;
 	for (itCatName = _pPrivate->vecCatNames.begin();
-		 itCatName != _pPrivate->vecCatNames.end(); itCatName++)
+		 itCatName != _pPrivate->vecCatNames.end(); ++itCatName)
 	{
 		GfLogTrace("  '%s' category :\n", itCatName->c_str());
 		const std::vector<GfCar*> vecCarsInCat = getCarsInCategoryWithName(*itCatName);
 		std::vector<GfCar*>::const_iterator itCar;
-		for (itCar = vecCarsInCat.begin(); itCar != vecCarsInCat.end(); itCar++)
+		for (itCar = vecCarsInCat.begin(); itCar != vecCarsInCat.end(); ++itCar)
 			GfLogTrace("    %-22s: %s\n", (*itCar)->getName().c_str(),
 					   (*itCar)->getDescriptorFileName().c_str());
 	}

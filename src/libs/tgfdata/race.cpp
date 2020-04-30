@@ -115,7 +115,7 @@ void GfRace::clear()
 
     std::map<std::string, Parameters*>::const_iterator itSessionParams;
     for (itSessionParams = _pPrivate->mapParametersBySession.begin();
-         itSessionParams != _pPrivate->mapParametersBySession.end(); itSessionParams++)
+         itSessionParams != _pPrivate->mapParametersBySession.end(); ++itSessionParams)
         delete itSessionParams->second;
     _pPrivate->mapParametersBySession.clear();
     _pPrivate->nMaxCompetitors = 0;
@@ -233,7 +233,7 @@ void GfRace::load(GfRaceManager* pRaceMan, bool bKeepHumans, void* hparmResults)
     // 2) Pre-load the parameters for other sessions.
     std::vector<std::string>::const_iterator itRefSessionName;
     for (itRefSessionName = vecRefSessionNames.begin();
-         itRefSessionName != vecRefSessionNames.end(); itRefSessionName++)
+         itRefSessionName != vecRefSessionNames.end(); ++itRefSessionName)
     {
         // Only non-configurable sessions actually.
         if (_pPrivate->mapParametersBySession.find(*itRefSessionName)
@@ -249,7 +249,7 @@ void GfRace::load(GfRaceManager* pRaceMan, bool bKeepHumans, void* hparmResults)
     //    (user-configurable or not, the "All Sessions" one included if needed).
     std::map<std::string, Parameters*>::iterator itSessionParams;
     for (itSessionParams = _pPrivate->mapParametersBySession.begin();
-         itSessionParams != _pPrivate->mapParametersBySession.end(); itSessionParams++)
+         itSessionParams != _pPrivate->mapParametersBySession.end(); ++itSessionParams)
     {
         const char* pszSessionName = itSessionParams->first.c_str();
         Parameters* pSessionParams = itSessionParams->second;
@@ -553,7 +553,7 @@ void GfRace::store()
     // For the parameters of the "All Sessions" session, save only if valid.
     std::map<std::string, Parameters*>::const_iterator itSessionParams;
     for (itSessionParams = _pPrivate->mapParametersBySession.begin();
-         itSessionParams != _pPrivate->mapParametersBySession.end(); itSessionParams++)
+         itSessionParams != _pPrivate->mapParametersBySession.end(); ++itSessionParams)
     {
         const char* pszSessionName = itSessionParams->first.c_str();
         const Parameters* pSessionParams = itSessionParams->second;
@@ -625,7 +625,7 @@ void GfRace::store()
     //  skin name and targets if needed).
     std::vector<GfDriver*>::const_iterator itComp;
     for (itComp = _pPrivate->vecCompetitors.begin();
-         itComp != _pPrivate->vecCompetitors.end(); itComp++)
+         itComp != _pPrivate->vecCompetitors.end(); ++itComp)
     {
         std::ostringstream ossDrvSecPath;
         ossDrvSecPath << RM_SECT_DRIVERS
@@ -723,7 +723,7 @@ int GfRace::getSupportedFeatures() const
 
     std::vector<GfDriver*>::const_iterator itComp;
     for (itComp = _pPrivate->vecCompetitors.begin();
-         itComp != _pPrivate->vecCompetitors.end(); itComp++)
+         itComp != _pPrivate->vecCompetitors.end(); ++itComp)
     {
         if (itComp == _pPrivate->vecCompetitors.begin())
             nFeatures = (*itComp)->getSupportedFeatures();
@@ -772,7 +772,7 @@ void GfRace::forceResultsOnly()
 {
     std::map<std::string, Parameters*>::iterator itSesParams;
     for (itSesParams = _pPrivate->mapParametersBySession.begin();
-         itSesParams != _pPrivate->mapParametersBySession.end(); itSesParams++)
+         itSesParams != _pPrivate->mapParametersBySession.end(); ++itSesParams)
     {
         GfRace::Parameters* pSesParams = itSesParams->second;
         if (pSesParams->bfDisplayMode != RM_DISP_MODE_UNDEFINED)
@@ -817,7 +817,7 @@ bool GfRace::hasHumanCompetitors() const
 
     std::vector<GfDriver*>::const_iterator itComp;
     for (itComp = _pPrivate->vecCompetitors.begin();
-         itComp != _pPrivate->vecCompetitors.end(); itComp++)
+         itComp != _pPrivate->vecCompetitors.end(); ++itComp)
     {
         if ((*itComp)->isHuman())
         {

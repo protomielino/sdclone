@@ -246,7 +246,7 @@ bool GfModule::unload(std::vector<GfModule*>& vecModules)
 {
 	bool bStatus = true;
 	std::vector<GfModule*>::iterator itMod;
-	for(itMod = vecModules.begin(); itMod != vecModules.end(); itMod++)
+	for(itMod = vecModules.begin(); itMod != vecModules.end(); ++itMod)
 		bStatus = bStatus && unload(*itMod);
 
 	return bStatus;

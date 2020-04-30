@@ -740,7 +740,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     //update all the graphs
     typedef std::map<std::string,OSGPLOT* >::iterator it_type;
 
-    for(it_type iterator = this->plotElements.begin(); iterator != this->plotElements.end(); iterator++)
+    for(it_type iterator = this->plotElements.begin(); iterator != this->plotElements.end(); ++iterator)
     {
         // iterator->first = key
         // iterator->second = value

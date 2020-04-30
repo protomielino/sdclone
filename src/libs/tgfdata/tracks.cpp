@@ -73,7 +73,7 @@ GfTracks::~GfTracks()
 {
 	std::vector<GfTrack*>::const_iterator itTrack;
 	for (itTrack = _pPrivate->vecTracks.begin();
-		 itTrack != _pPrivate->vecTracks.end(); itTrack++)
+		 itTrack != _pPrivate->vecTracks.end(); ++itTrack)
 		delete *itTrack;
 
 	delete _pPrivate;
@@ -204,7 +204,7 @@ const std::vector<std::string>& GfTracks::getCategoryNames() const
 	if (_pPrivate->vecCatNames.empty())
 	{
 		std::vector<std::string>::const_iterator itCatId;
-		for (itCatId = _pPrivate->vecCatIds.begin(); itCatId != _pPrivate->vecCatIds.end(); itCatId++)
+		for (itCatId = _pPrivate->vecCatIds.begin(); itCatId != _pPrivate->vecCatIds.end(); ++itCatId)
 		{
 			std::ostringstream ossFileName;
 			ossFileName << "data/tracks/" << *itCatId << '.' << TRKEXT;
@@ -229,7 +229,7 @@ const std::vector<std::string>& GfTracks::getCategoryNames() const
 			std::vector<GfTrack*> vecTracksInCat =
 				getTracksInCategory(_pPrivate->vecCatIds[nCatInd]);
 			std::vector<GfTrack*>::iterator itTrack;
-			for (itTrack = vecTracksInCat.begin(); itTrack != vecTracksInCat.end(); itTrack++)
+			for (itTrack = vecTracksInCat.begin(); itTrack != vecTracksInCat.end(); ++itTrack)
 				(*itTrack)->setCategoryName(_pPrivate->vecCatNames[nCatInd]);
 		}
 	}
@@ -250,7 +250,7 @@ GfTrack* GfTracks::getTrack(const std::string& strId) const
 GfTrack* GfTracks::getTrackWithName(const std::string& strName) const
 {
 	std::vector<GfTrack*>::iterator itTrack;
-	for (itTrack = _pPrivate->vecTracks.begin(); itTrack != _pPrivate->vecTracks.end(); itTrack++)
+	for (itTrack = _pPrivate->vecTracks.begin(); itTrack != _pPrivate->vecTracks.end(); ++itTrack)
 		if ((*itTrack)->getName() == strName)
 			return *itTrack;
 
@@ -262,7 +262,7 @@ std::vector<GfTrack*> GfTracks::getTracksInCategory(const std::string& strCatId)
 	std::vector<GfTrack*> vecTracksInCat;
 
 	std::vector<GfTrack*>::iterator itTrack;
-	for (itTrack = _pPrivate->vecTracks.begin(); itTrack != _pPrivate->vecTracks.end(); itTrack++)
+	for (itTrack = _pPrivate->vecTracks.begin(); itTrack != _pPrivate->vecTracks.end(); ++itTrack)
 		if (strCatId.empty() || (*itTrack)->getCategoryId() == strCatId)
 			vecTracksInCat.push_back(*itTrack);
 
@@ -274,7 +274,7 @@ std::vector<std::string> GfTracks::getTrackIdsInCategory(const std::string& strC
 	std::vector<std::string> vecTrackIds;
 
 	std::vector<GfTrack*>::const_iterator itTrack;
-	for (itTrack = _pPrivate->vecTracks.begin(); itTrack != _pPrivate->vecTracks.end(); itTrack++)
+	for (itTrack = _pPrivate->vecTracks.begin(); itTrack != _pPrivate->vecTracks.end(); ++itTrack)
 		if (strCatId.empty() || (*itTrack)->getCategoryId() == strCatId)
 			vecTrackIds.push_back((*itTrack)->getId());
 
@@ -286,7 +286,7 @@ std::vector<std::string> GfTracks::getTrackNamesInCategory(const std::string& st
 	std::vector<std::string> vecTrackNames;
 
 	std::vector<GfTrack*>::const_iterator itTrack;
-	for (itTrack = _pPrivate->vecTracks.begin(); itTrack != _pPrivate->vecTracks.end(); itTrack++)
+	for (itTrack = _pPrivate->vecTracks.begin(); itTrack != _pPrivate->vecTracks.end(); ++itTrack)
 		if (strCatId.empty() || (*itTrack)->getCategoryId() == strCatId)
 			vecTrackNames.push_back((*itTrack)->getName());
 
@@ -341,7 +341,7 @@ GfTrack* GfTracks::getFirstUsableTrack(const std::string& strCatId,
 				nCurTrackInd = itTrack - vecTracksInCat.begin();
 				break;
 			}
-			itTrack++;
+			++itTrack;
 		}
 	}
 	
@@ -423,12 +423,12 @@ void GfTracks::print(bool bVerbose) const
 #endif
 			   _pPrivate->vecCatIds.size(), _pPrivate->vecTracks.size());
 	std::vector<std::string>::const_iterator itCatId;
-	for (itCatId = _pPrivate->vecCatIds.begin(); itCatId != _pPrivate->vecCatIds.end(); itCatId++)
+	for (itCatId = _pPrivate->vecCatIds.begin(); itCatId != _pPrivate->vecCatIds.end(); ++itCatId)
 	{
 		GfLogTrace("  '%s' category :\n", itCatId->c_str());
 		const std::vector<GfTrack*> vecTracksInCat = getTracksInCategory(*itCatId);
 		std::vector<GfTrack*>::const_iterator itTrack;
-		for (itTrack = vecTracksInCat.begin(); itTrack != vecTracksInCat.end(); itTrack++)
+		for (itTrack = vecTracksInCat.begin(); itTrack != vecTracksInCat.end(); ++itTrack)
 			if (bVerbose)
 				GfLogTrace("    %-22s : %s\n", (*itTrack)->getName().c_str(),
 						   (*itTrack)->getDescriptorFile().c_str());

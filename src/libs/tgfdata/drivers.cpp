@@ -82,7 +82,7 @@ void GfDrivers::clear()
 
     std::vector<GfDriver*>::const_iterator itDriver;
     for (itDriver = _pPrivate->vecDrivers.begin();
-         itDriver != _pPrivate->vecDrivers.end(); itDriver++)
+         itDriver != _pPrivate->vecDrivers.end(); ++itDriver)
         delete *itDriver;
     _pPrivate->vecDrivers.clear();
 }
@@ -259,7 +259,7 @@ std::vector<GfDriver*> GfDrivers::getDriversWithTypeAndCategory(const std::strin
     std::vector<GfDriver*> vecSelDrivers;
     std::vector<GfDriver*>::iterator itDriver;
     for (itDriver = _pPrivate->vecDrivers.begin();
-         itDriver != _pPrivate->vecDrivers.end(); itDriver++)
+         itDriver != _pPrivate->vecDrivers.end(); ++itDriver)
         if ((*itDriver)->matchesTypeAndCategory(strType, strCarCatId))
             vecSelDrivers.push_back(*itDriver);
 
@@ -277,12 +277,12 @@ void GfDrivers::print() const
                _pPrivate->vecDrivers.size());
 
     std::vector<std::string>::const_iterator itType;
-    for (itType = _pPrivate->vecTypes.begin(); itType != _pPrivate->vecTypes.end(); itType++)
+    for (itType = _pPrivate->vecTypes.begin(); itType != _pPrivate->vecTypes.end(); ++itType)
     {
         GfLogTrace("  '%s' type :\n", itType->c_str());
         std::vector<std::string>::const_iterator itCarCatId;
         for (itCarCatId = _pPrivate->vecCarCategoryIds.begin();
-             itCarCatId != _pPrivate->vecCarCategoryIds.end(); itCarCatId++)
+             itCarCatId != _pPrivate->vecCarCategoryIds.end(); ++itCarCatId)
         {
             const std::vector<GfDriver*> vecDrivers =
                 getDriversWithTypeAndCategory(*itType, *itCarCatId);
@@ -290,7 +290,7 @@ void GfDrivers::print() const
                 continue;
             GfLogTrace("      '%s' car category :\n", itCarCatId->c_str());
             std::vector<GfDriver*>::const_iterator itDriver;
-            for (itDriver = vecDrivers.begin(); itDriver != vecDrivers.end(); itDriver++)
+            for (itDriver = vecDrivers.begin(); itDriver != vecDrivers.end(); ++itDriver)
                 GfLogTrace("          %-24s : %s, %02X-featured\n",
                            (*itDriver)->getName().c_str(),
                            (*itDriver)->getCar()->getName().c_str(),
@@ -546,7 +546,7 @@ std::vector<GfDriverSkin>::iterator GfDriver::findSkin(std::vector<GfDriverSkin>
                                                        const std::string& strName)
 {
     std::vector<GfDriverSkin>::iterator itSkin;
-    for (itSkin = vecSkins.begin(); itSkin != vecSkins.end(); itSkin++)
+    for (itSkin = vecSkins.begin(); itSkin != vecSkins.end(); ++itSkin)
     {
         if (itSkin->getName() == strName)
             return itSkin;
@@ -838,7 +838,7 @@ std::vector<GfDriverSkin> GfDriver::getPossibleSkins(const std::string& strAltCa
     if (!vecPossSkins.empty())
     {
         std::vector<GfDriverSkin>::iterator itSkin;
-        for (itSkin = vecPossSkins.begin(); itSkin != vecPossSkins.end(); itSkin++)
+        for (itSkin = vecPossSkins.begin(); itSkin != vecPossSkins.end(); ++itSkin)
         {
             if (itSkin->getName().empty() && itSkin != vecPossSkins.begin())
             {

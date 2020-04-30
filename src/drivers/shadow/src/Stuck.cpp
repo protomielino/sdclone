@@ -927,7 +927,7 @@ bool	Stuck::solve( const tCarElt* me )
         generateSuccessorsN( pt, succs );
 
         // for each successor.
-        for( vector<GridPoint>::iterator it = succs.begin(); it != succs.end(); it++ )
+        for( vector<GridPoint>::iterator it = succs.begin(); it != succs.end(); ++it )
         {
             // if already visited with a better time --> continue.
             Cell& succCell = at(*it);
@@ -1026,7 +1026,7 @@ bool	Stuck::solveR( const tCarElt* me )
         // for each successor.
         // Cell& fromCell = at(pt);
 
-        for( vector<GridPoint>::iterator it = succs.begin(); it != succs.end(); it++ )
+        for( vector<GridPoint>::iterator it = succs.begin(); it != succs.end(); ++it )
         {
             // if already visited with a better time --> continue.
             Cell& succCell = at(*it);

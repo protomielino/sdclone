@@ -951,7 +951,7 @@ SDCar *SDCars::getCar(tCarElt *car)
     std::vector<SDCar *>::iterator it;
     SDCar *res = new SDCar;
 
-    for(it = the_cars.begin(); it!= the_cars.end(); it++)
+    for(it = the_cars.begin(); it!= the_cars.end(); ++it)
     {
         if((*it)->isCar(car))
         {
@@ -966,7 +966,7 @@ void SDCars::updateCars()
 {
     std::vector<SDCar *>::iterator it;
 
-    for(it = the_cars.begin(); it!= the_cars.end(); it++)
+    for(it = the_cars.begin(); it!= the_cars.end(); ++it)
     {
         (*it)->updateCar();
     }
@@ -976,7 +976,7 @@ void SDCars::markCarCurrent(tCarElt *car)
 {
     std::vector<SDCar *>::iterator it;
 
-    for(it = the_cars.begin(); it!= the_cars.end(); it++)
+    for(it = the_cars.begin(); it!= the_cars.end(); ++it)
     {
         (*it)->markCarCurrent(car);
     }
@@ -986,7 +986,7 @@ void SDCars::updateShadingParameters(const osg::Matrixf &modelview)
 {
     std::vector<SDCar *>::iterator it;
 
-    for(it = the_cars.begin(); it!= the_cars.end(); it++)
+    for(it = the_cars.begin(); it!= the_cars.end(); ++it)
     {
         (*it)->updateShadingParameters(modelview);
     }

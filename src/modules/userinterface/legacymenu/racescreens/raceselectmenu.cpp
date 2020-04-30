@@ -81,7 +81,7 @@ rmOnSelectRaceMan(void *pvRaceManTypeIndex)
 		const int nSubTypeComboId = rmMapSubTypeComboIds[strRaceManType];
 		const char* pszSelSubType = GfuiComboboxGetText(RmRaceSelectMenuHandle, nSubTypeComboId);
 		std::vector<GfRaceManager*>::const_iterator itRaceMan;
-		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
+		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); ++itRaceMan)
 		{
 			if ((*itRaceMan)->getSubType() == pszSelSubType)
 			{
@@ -144,7 +144,7 @@ RmRaceSelectInit(void *prevMenu)
 	std::vector<std::string>::const_iterator itRaceManType;
 	// For each race manager type :
 	for (itRaceManType = vecRaceManTypes.begin();
-		 itRaceManType != vecRaceManTypes.end(); itRaceManType++)
+		 itRaceManType != vecRaceManTypes.end(); ++itRaceManType)
 	{
 		// Get the racemanagers with this type
 		const std::vector<GfRaceManager*> vecRaceMans =
@@ -173,7 +173,7 @@ RmRaceSelectInit(void *prevMenu)
 		// Look for sub-types : if any, we have a sub-type combo box for this type.
 		bool bCreateCombo = false;
 		std::vector<GfRaceManager*>::const_iterator itRaceMan;
-		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
+		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); ++itRaceMan)
 		{
 			if (!(*itRaceMan)->getSubType().empty())
 			{
@@ -194,7 +194,7 @@ RmRaceSelectInit(void *prevMenu)
 								  strComboCtrlName.c_str(), 0, rmOnChangeRaceMan);
 
 		// Add one item in the combo for each race manager of this type.
-		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
+		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); ++itRaceMan)
 		{
 			GfuiComboboxAddText(RmRaceSelectMenuHandle, rmMapSubTypeComboIds[*itRaceManType],
 								(*itRaceMan)->getSubType().c_str());

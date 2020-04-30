@@ -166,13 +166,13 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, const st
 
 	// iterate on the first map: the various effect config sections
 	typedef std::map<std::string, std::map<std::string, int> >::iterator it_type;
-	for(it_type iterator = forceFeedback.effectsConfig.begin(); iterator != forceFeedback.effectsConfig.end(); iterator++) {
+	for(it_type iterator = forceFeedback.effectsConfig.begin(); iterator != forceFeedback.effectsConfig.end(); ++iterator) {
 		// iterator->first = key (effect type name)
 		// iterator->second = value (second map)
 
 		// now iterate on the second map: the actuals config params of each section
 		typedef std::map<std::string, int>::iterator it_type2;
-		for(it_type2 iterator2 = iterator->second.begin(); iterator2 != iterator->second.end(); iterator2++) {
+		for(it_type2 iterator2 = iterator->second.begin(); iterator2 != iterator->second.end(); ++iterator2) {
 			// iterator2->first = key (effect parameter name)
 			// iterator2->second = value (effect value)
 	
