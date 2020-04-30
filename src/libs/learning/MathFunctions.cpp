@@ -180,7 +180,7 @@ real SquareNorm (real* a, real* b, int n)
 {
 	real sum = 0;
 	for (int i=0; i<n; i++) {
-		register real d = (*a++) - (*b++);
+		real d = (*a++) - (*b++);
 		sum += d*d;
 	}
 	return sum;
@@ -190,7 +190,7 @@ real EuclideanNorm (real* a, real* b, int n)
 {
 	real sum = 0;
 	for (int i=0; i<n; i++) {
-		register real d = (*a++) - (*b++);
+		real d = (*a++) - (*b++);
 		sum += d*d;
 	}
 	return (real) sqrt(sum);
@@ -200,7 +200,7 @@ real LNorm (real* a, real* b, int n, real p)
 {
 	real sum = 0;
 	for (int i=0; i<n; i++) {
-		register real d = (*a++) - (*b++);
+		real d = (*a++) - (*b++);
 		sum += (real) pow(d,p);
 	}
 	return (real) pow((real)sum,(real)1.0/p);
@@ -209,7 +209,7 @@ real LNorm (real* a, real* b, int n, real p)
 real Sum (real* a, int n)
 {
 	real sum = 0;
-	for (register int i=0; i<n; i++) {
+	for (int i=0; i<n; i++) {
 		sum += *a++;
 	}
 	return sum;
