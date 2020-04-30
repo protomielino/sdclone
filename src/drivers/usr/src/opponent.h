@@ -28,6 +28,9 @@ class Opponent
 {
 public:
   Opponent(const tTrack* track, const CarElt* car, const MyCar* mycar, const Path* mypath);
+#if defined(_MSC_VER) && _MSC_VER == 1600
+  Opponent & operator = (const Opponent &) { return *this; }
+#endif
   void   update();
   bool   racing() const { return mRacing; };
   double fromStart() { return mOppCar->_distFromStartLine; };

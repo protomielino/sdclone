@@ -28,7 +28,10 @@ class PathState
 {
 public:
     PathState(const Path* path, const MyCar* car, const MuFactors* mufactors);
-    void   update(double dt);
+#if defined(_MSC_VER) && _MSC_VER == 1600
+    PathState & operator = (const PathState &) { return *this; }
+#endif
+	void   update(double dt);
     double maxSpeed(double fromstart) const;
     double maxSpeed() const { return mMaxspeed; }; // path maxspeed at this point of time
     double acceleration() const { return mAcceleration; }; // path acceleration at this point of time
