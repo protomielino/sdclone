@@ -41,9 +41,9 @@ class OSGPLOT
 		float minValue,
 		float timeFrame,
 		float referenceLineAtValue,
-		std::string Xdata,
-		std::string Ydata,
-		std::string title
+		const std::string &Xdata,
+		const std::string &Ydata,
+		const std::string &title
 	);
 	~OSGPLOT();
 	float positionX;

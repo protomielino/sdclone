@@ -100,7 +100,7 @@ private:
     float *arcade_color_;
     float *background_color_;
 
-    void ReadDashColor(void *hdle, const std::string color_name, float **color);
+    void ReadDashColor(void *hdle, const std::string &color_name, float **color);
 
  public:
     explicit cGrBoard(int myid);

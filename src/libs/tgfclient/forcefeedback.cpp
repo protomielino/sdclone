@@ -64,7 +64,7 @@ ForceFeedbackManager::~ForceFeedbackManager(){
     effectsConfig.clear();
 
 }
-void ForceFeedbackManager::readConfiguration(std::string carName){
+void ForceFeedbackManager::readConfiguration(const std::string &carName){
     //use the user specified configuration for the specified car
     //or use the user specified global configuration
     //or use the default configuration for the car
@@ -104,7 +104,7 @@ void ForceFeedbackManager::readConfiguration(std::string carName){
     //now we are correctly initialized
     this->initialized = true;
 }
-void ForceFeedbackManager::readConfigurationFromFileSection(std::string configFileUrl, std::string effectsSectionPath){
+void ForceFeedbackManager::readConfigurationFromFileSection(const std::string &configFileUrl, const std::string &effectsSectionPath){
 
     std::vector<std::string> effectSectionsPath;
     std::string subSectionPath = "";

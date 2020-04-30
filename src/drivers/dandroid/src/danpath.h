@@ -61,7 +61,7 @@ class DanLine {
   public:
   DanLine();
   void init(PTrack t);
-  void addDanPoint(DanPoint danpoint);
+  void addDanPoint(const DanPoint &danpoint);
   bool calcParam();
   void createSectors(std::vector <DanSector>& sect);
   bool getDanPos(double fromstart, DanPoint& danpoint);

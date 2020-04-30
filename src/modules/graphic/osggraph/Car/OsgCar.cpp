@@ -895,7 +895,7 @@ void SDCar::updateCar()
     }*/
 }
 
-void SDCar::updateShadingParameters(osg::Matrixf modelview)
+void SDCar::updateShadingParameters(const osg::Matrixf &modelview)
 {
     shader->update(modelview);
 }
@@ -982,7 +982,7 @@ void SDCars::markCarCurrent(tCarElt *car)
     }
 }
 
-void SDCars::updateShadingParameters(osg::Matrixf modelview)
+void SDCars::updateShadingParameters(const osg::Matrixf &modelview)
 {
     std::vector<SDCar *>::iterator it;
 

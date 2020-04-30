@@ -122,7 +122,7 @@ inline bool sortByScore(const tReStandings& a, const tReStandings& b)
 }
 	
 //for find()
-inline bool operator ==(const tReStandings& a, const std::string b)
+inline bool operator ==(const tReStandings& a, const std::string &b)
 {
 	return !a.drvName.compare(b);
 }

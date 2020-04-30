@@ -107,8 +107,8 @@ class TGFCLIENT_API WebServer {
 
 		//async requests
 		int updateAsyncStatus();
-		int addAsyncRequest(std::string const data);
-		int addOrderedAsyncRequest(std::string const data);
+		int addAsyncRequest(const std::string &data);
+		int addOrderedAsyncRequest(const std::string &data);
 		int pendingAsyncRequestId;
 		std::vector<webRequest_t> orderedAsyncRequestQueque;	
 

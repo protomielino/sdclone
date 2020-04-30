@@ -37,7 +37,7 @@ void DanLine::init(PTrack t)
 }
 
 
-void DanLine::addDanPoint(DanPoint danpoint)
+void DanLine::addDanPoint(const DanPoint &danpoint)
 {
   mLine.push_back(danpoint);
 }

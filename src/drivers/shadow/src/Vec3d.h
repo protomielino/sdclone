@@ -48,7 +48,7 @@ public:
         return *this;
     }
 
-    Vec3d	operator%( const v3t<double> v ) const
+    Vec3d	operator%( const v3t<double> &v ) const
     {
         v3t<double>	temp;
         this->crossProduct(v, temp);

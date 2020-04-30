@@ -130,7 +130,7 @@ onValueChange(void * /* dummy */)
 
 
 void *
-ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, std::string carName)
+ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, const std::string &carName)
 {
 	//make the previous screen/menu value available outside of this function
     PrevScrHandle = prevMenu;

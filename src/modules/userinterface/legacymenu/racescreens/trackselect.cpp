@@ -76,7 +76,7 @@ static unsigned DescLinesMaxLen = 35;
  * @param   length  Line length limit where wrapping should occur
  */
 static void
-rmtsWordWrap(const std::string str, std::string &str1, std::string &str2, unsigned length)
+rmtsWordWrap(const std::string &str, std::string &str1, std::string &str2, unsigned length)
 {
 	//istream_iterator iterates through the container
 	//using whitespaces as delimiters, so it is an ideal tool

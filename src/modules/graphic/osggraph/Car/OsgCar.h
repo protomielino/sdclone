@@ -81,7 +81,7 @@ public :
 
     void markCarCurrent(tCarElt *Car);
     void updateCar();
-    void updateShadingParameters(osg::Matrixf modelview);
+    void updateShadingParameters(const osg::Matrixf &modelview);
 };
 
 class SDCars
@@ -103,7 +103,7 @@ public :
     void markCarCurrent(tCarElt*car);
     SDCar *getCar(tCarElt*car);
     void unLoad();
-    void updateShadingParameters(osg::Matrixf modelview);
+    void updateShadingParameters(const osg::Matrixf &modelview);
     osg::ref_ptr<osg::Node> getShadowNode() { return shadow_branch.get(); }
     osg::ref_ptr<osg::Node> getCarsNode() { return cars_branch.get(); }
 

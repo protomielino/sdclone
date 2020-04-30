@@ -562,7 +562,7 @@ int WebServer::updateAsyncStatus()
     return 0;
 }
 
-int WebServer::addAsyncRequest(std::string const data)
+int WebServer::addAsyncRequest(const std::string &data)
 {
     GfLogInfo("WebServer: Performing ASYNC request:\n%s\n", data.c_str());
     
@@ -611,7 +611,7 @@ int WebServer::addAsyncRequest(std::string const data)
     return 0;
 }
 
-int WebServer::addOrderedAsyncRequest(std::string data)
+int WebServer::addOrderedAsyncRequest(const std::string &data)
 {
     //prepare the request object
     webRequest_t request;

@@ -43,7 +43,7 @@ PreviewMenuActivate(void * /* dummy */)
 {
 }
 
-int ReadControl(void *menuHdle, void *param, std::string strType, const char *pControlName)
+int ReadControl(void *menuHdle, void *param, const std::string &strType, const char *pControlName)
 {
 	if (strType == GFMNU_TYPE_TEXT_BUTTON || strType == GFMNU_TYPE_IMAGE_BUTTON)
 		return GfuiMenuCreateButtonControl(menuHandle,param,pControlName,0,NULL);

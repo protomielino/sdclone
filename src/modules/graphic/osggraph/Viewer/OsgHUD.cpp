@@ -68,8 +68,8 @@ static osg::Vec4 colorCyan(0.31, 0.968, 0.933, 1.0);
 
 std::map<std::string,osgText::Text* > hudTextElements;
 
-osg::Vec3 calculatePosition(osg::BoundingBox mybb, std::string objPoint,
-osg::BoundingBox bb,  std::string referenceObjPoint,
+osg::Vec3 calculatePosition(osg::BoundingBox mybb, const std::string &objPoint,
+osg::BoundingBox bb,  const std::string &referenceObjPoint,
 
 float verticalModifier, float horizontalModifier){
 	/*
@@ -94,43 +94,43 @@ float verticalModifier, float horizontalModifier){
 
 	//ref object 
 	//vertical
-	if(referenceObjPoint.find("t")==0){
+	if(referenceObjPoint.find('t')==0){
 		vPoint += bb.yMax();
 		vSign = 1;
-	}else if(referenceObjPoint.find("b")==0){
+	}else if(referenceObjPoint.find('b')==0){
 		vPoint += bb.yMin();
 		vSign = -1;
-	}else if(referenceObjPoint.find("m")==0){
+	}else if(referenceObjPoint.find('m')==0){
 		vPoint += (bb.yMax() - bb.yMin())/2;
 		vSign = 1;
 	}
 
 	//horizontal
-	if(referenceObjPoint.find("l")==1){
+	if(referenceObjPoint.find('l')==1){
 		hPoint += bb.xMin();
-	}else if(referenceObjPoint.find("r")==1){
+	}else if(referenceObjPoint.find('r')==1){
 		hPoint += bb.xMax();
-	}else if(referenceObjPoint.find("c")==1){
+	}else if(referenceObjPoint.find('c')==1){
 		hPoint += (bb.xMax() - bb.xMin())/2;
 	}
 
 
 	//my obj /*todo check medium vertical alignment*/
 	//vertical
-	if(objPoint.find("t")==0){
+	if(objPoint.find('t')==0){
 		vPoint -= (mybb.yMax() - mybb.yMin()) * vSign;//height
-	}else if(objPoint.find("b")==0){
+	}else if(objPoint.find('b')==0){
 		//do nothing
-	}else if(objPoint.find("m")==0){
+	}else if(objPoint.find('m')==0){
 		vPoint -= (mybb.yMax() - mybb.yMin()) * vSign/2;
 	}
 
 	//horizontal
-	if(objPoint.find("l")==1){
+	if(objPoint.find('l')==1){
 		//nothing to do
-	}else if(objPoint.find("r")==1){
+	}else if(objPoint.find('r')==1){
 		hPoint -= (mybb.xMax() - mybb.xMin());//width
-	}else if(objPoint.find("c")==1){
+	}else if(objPoint.find('c')==1){
 		hPoint -= (mybb.xMax() - mybb.xMin())/2;
 	}
 
@@ -152,9 +152,9 @@ OSGPLOT::OSGPLOT( float positionX,
 					float minValue,
 					float timeFrame,
 					float referenceLineAtValue,
-					std::string Xdata,
-					std::string Ydata,
-					std::string title)
+					const std::string &Xdata,
+					const std::string &Ydata,
+					const std::string &title)
 {
 	//initialize variables
 	this->positionX = positionX;
@@ -563,7 +563,7 @@ std::string formatLaptime(tdble sec, int sgn)
 
 void changeImageSize(osg::Geometry *geom,
                         float newSize/*where 1.0 full image size (width or height) and 0.0 no size (width or height)*/,
-                        std::string resizeFrom/*left|right|top|bottom == this is the place that will be fixed(not modified), the other one ill be moved to fit the new size*/,
+                        const std::string &resizeFrom/*left|right|top|bottom == this is the place that will be fixed(not modified), the other one ill be moved to fit the new size*/,
                         float hudScale)
 {
 
@@ -1261,7 +1261,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
 				if (type == "text" ){
 
 					//read data into local variables
-					std::string elementId = 	subSectionName;
+					const std::string &elementId = 	subSectionName;
 					std::string textStr = 		GfParmGetStr (paramHandle, subSectionPath.c_str(),"text", "" );
 					std::string fontFileUrl = 	GfParmGetStr (paramHandle, subSectionPath.c_str(),"fontFileUrl", "" );
 					std::string colorString = 	GfParmGetStr (paramHandle, subSectionPath.c_str(),"color", "" );
@@ -1359,7 +1359,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
 						 CREATE OSG IMAGE
 					   ============================*/
 					//read data into local variables
-					std::string elementId = 				subSectionName;
+					const std::string &elementId = 			subSectionName;
 					std::string url = 						GfParmGetStr (paramHandle, subSectionPath.c_str(),"url", "" );
 
 					std::string positionRefObj = 			GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
@@ -1490,7 +1490,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
 						 CREATE OSG GRAPH
 					   ============================*/
 					//read data into local variables
-					std::string elementId = subSectionName;
+					const std::string &elementId = subSectionName;
 
 					//positioning variables
 #if 0   // dead code

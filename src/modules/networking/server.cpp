@@ -532,7 +532,7 @@ bool NetServer::SendPlayerAcceptedPacket(ENetPeer * pPeer)
     return false;
 }
 
-bool NetServer::SendPlayerRejectedPacket(ENetPeer * pPeer,std::string strReason)
+bool NetServer::SendPlayerRejectedPacket(ENetPeer * pPeer, const std::string &strReason)
 {
     //Send to client requesting connection
 

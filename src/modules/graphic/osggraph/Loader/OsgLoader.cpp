@@ -33,12 +33,12 @@ osgLoader::~osgLoader(void)
 {
 }
 
-void osgLoader::AddSearchPath(std::string strPath)
+void osgLoader::AddSearchPath(const std::string &strPath)
 {
     m_pOpt->getDatabasePathList().push_back(strPath);
 }
 
-osg::ref_ptr<osg::Image> osgLoader::LoadImageFile(std::string strFile)
+osg::ref_ptr<osg::Image> osgLoader::LoadImageFile(const std::string &strFile)
 {
     osg::ref_ptr<osg::Image> Image;
     std::string absFileName = osgDB::findDataFile(strFile, m_pOpt);
@@ -51,7 +51,7 @@ osg::ref_ptr<osg::Image> osgLoader::LoadImageFile(std::string strFile)
     return Image;
 }
 
-osg::Node *osgLoader::Load3dFile(std::string strFile, bool car, const std::string& name)
+osg::Node *osgLoader::Load3dFile(const std::string &strFile, bool car, const std::string& name)
 {
     osg::Node *pNode = NULL;
     std::string ext = osgDB::getFileExtension(strFile);

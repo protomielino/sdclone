@@ -2229,13 +2229,13 @@ bool TDriver::readSectorSpeeds()
 }
 
 
-void TDriver::driverMsg(std::string desc)
+void TDriver::driverMsg(const std::string &desc)
 {
   GfOut("%s %s\n", oCar->_name, desc.c_str());
 }
 
 
-void TDriver::driverMsgValue(int priority, std::string desc, double value)
+void TDriver::driverMsgValue(int priority, const std::string &desc, double value)
 {
   if (priority <= mDriverMsgLevel && mCarIndex == mDriverMsgCarIndex) {
     GfOut("%dm %s s:%d p:%d %s %g\n", (int)mFromStart, oCar->_name, mDrvState, mDrvPath, desc.c_str(), value);

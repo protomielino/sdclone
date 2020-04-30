@@ -622,9 +622,8 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
         }
         else
         {
-            std::string strUnknown = token;
             osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: unknown token refs line while reading object \"6"
-                <<" token:"<< strUnknown << "\"" << std::endl;
+                <<" token:"<< token << "\"" << std::endl;
         }
 
         if (!stream.good())

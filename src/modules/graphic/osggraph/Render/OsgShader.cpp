@@ -67,7 +67,7 @@ SDCarShader::SDCarShader(osg::Node *car, SDCar *c)
     stateset->addUniform(reflectionMapCube);
 }
 
-void SDCarShader::update(osg::Matrixf view)
+void SDCarShader::update(const osg::Matrixf &view)
 {
     SDRender * ren = (SDRender *)getRender();
     osg::Vec3f sun_pos= ren->getSky()->getSun()->getSunPosition();

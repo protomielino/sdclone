@@ -91,7 +91,7 @@ SDSky::~SDSky( void )
     //delete post_root;
 }
 
-void SDSky::build( std::string tex_path, double h_radius, double v_radius, double sun_size, double sun_dist,
+void SDSky::build( const std::string &tex_path, double h_radius, double v_radius, double sun_size, double sun_dist,
       double moon_size, double moon_dist, int nplanets, osg::Vec3d *planet_data,
       int nstars, osg::Vec3d *star_data )
 {

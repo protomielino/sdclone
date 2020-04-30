@@ -54,7 +54,7 @@ struct forceFeedBackEffect_t {
 class TGFCLIENT_API ForceFeedbackManager {
 
 	public:
-		void readConfiguration(std::string carName);
+		void readConfiguration(const std::string &carName);
 		void saveConfiguration();
 		int updateForce(tCarElt* car, tSituation *s);
 		bool initialized;
@@ -74,7 +74,7 @@ class TGFCLIENT_API ForceFeedbackManager {
 
 	private:
 		//std::vector<std::string> msglist;
-		void readConfigurationFromFileSection(std::string configFileUrl, std::string effectsSectionPath);
+		void readConfigurationFromFileSection(const std::string &configFileUrl, const std::string &effectsSectionPath);
 
 		std::clock_t lastExecTime; //the current time
 		

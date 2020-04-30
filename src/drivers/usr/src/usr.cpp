@@ -94,7 +94,7 @@ const char *sUndefined = "undefined";
 // Utility
 ////////////////////////////////
 // Set robots's name and xml file pathname
-static void setRobotName(const string name)
+static void setRobotName(const string &name)
 {
     char buffer[BUFSIZE];
     snprintf(buffer, BUFSIZE, "drivers/%s/%s.xml", name.c_str(), name.c_str());

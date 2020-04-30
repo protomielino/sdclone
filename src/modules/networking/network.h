@@ -394,7 +394,7 @@ public:
     void SendTimePacket(ENetPacket *pPacket, ENetPeer * pPeer);
     void SendFinishTimePacket();
     void SendWeatherPacket();
-    bool SendPlayerRejectedPacket(ENetPeer * pPeer,std::string strReason);
+    bool SendPlayerRejectedPacket(ENetPeer * pPeer, const std::string &strReason);
     bool SendPlayerAcceptedPacket(ENetPeer * pPeer);
     void SendDriversReadyPacket();
     void PingClients();

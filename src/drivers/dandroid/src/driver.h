@@ -136,8 +136,8 @@ class TDriver {
   double getFuel(double dist);
   void writeSectorSpeeds();
   bool readSectorSpeeds();
-  void driverMsg(std::string desc);
-  void driverMsgValue(int priority, std::string desc, double value);
+  void driverMsg(const std::string &desc);
+  void driverMsgValue(int priority, const std::string &desc, double value);
 
   // Per robot global data
   int mDrvPath;

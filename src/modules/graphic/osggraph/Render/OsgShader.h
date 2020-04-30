@@ -46,7 +46,7 @@ private :
 
 public :
     SDCarShader(osg::Node *car, SDCar *c);
-    void update(osg::Matrixf view);
+    void update(const osg::Matrixf &view);
 };
 
 #endif //_OSGSHADERS_H_

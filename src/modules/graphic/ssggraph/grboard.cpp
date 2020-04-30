@@ -2052,7 +2052,7 @@ cGrBoard::grDispIndicators(const bool arcade)
 }  // grDispIndicators
 
 
-void cGrBoard::ReadDashColor(void *hdle, const string color_name, float **color) {
+void cGrBoard::ReadDashColor(void *hdle, const string &color_name, float **color) {
   char buf[1024];
   snprintf(buf, sizeof(buf), "%s/%s/%s",
         GFSCR_SECT_DASHSETTINGS, GFSCR_DASH_COLORS, color_name.c_str());
