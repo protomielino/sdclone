@@ -27,6 +27,6 @@
 
 #include "confscreens.h"
 
-extern void *ForceFeedbackMenuInit(void *prevMenu, void *prefHdle, int curPlayerIdx, std::string carName);
+extern void *ForceFeedbackMenuInit(void *prevMenu, void *prefHdle, int curPlayerIdx, const std::string &carName);
 
 #endif 
