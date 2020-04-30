@@ -172,7 +172,7 @@ private:
 
     enum
     {
-        cMAX_OPP = 30,
+        cMAX_OPP = 40,
     };
 
     enum StuckAction
