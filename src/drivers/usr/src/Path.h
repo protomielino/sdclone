@@ -29,10 +29,7 @@
 class Path
 {
 public:
-  Path(const MyTrack* track, const std::string& datadir, const double clothfactor, const double vmaxk, const double vmaxkfactor, const PathType pathtype);
-#if defined(_MSC_VER) && _MSC_VER == 1600
-  Path & operator = (const Path &) { return *this; }
-#endif
+  Path(MyTrack* track, const std::string& datadir, const double clothfactor, const double vmaxk, const double vmaxkfactor, const PathType pathtype);
   PathType pathType() const { return mPathType; }
   double segLenMid() const { return mTrack->segLenMid(); }
   int nrOfSegs() const { return mTrack->nrOfSegs(); }
@@ -71,12 +68,12 @@ private:
   PathMargins mMargins;
   std::vector<PathSeg> mPath;
 
-  const MyTrack* mTrack;
-  const PathType mPathType;
-  const double mClothFactor;
-  const double mVMaxK;
-  const double mVMaxKFactor;
-  const int mNSEG;
+  MyTrack* mTrack;
+  PathType mPathType;
+  double mClothFactor;
+  double mVMaxK;
+  double mVMaxKFactor;
+  int mNSEG;
 };
 
 

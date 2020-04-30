@@ -25,7 +25,7 @@ MyTrack::MyTrack() :
 {
 }
 
-void MyTrack::init(const tTrack* track, double roughseglen)
+void MyTrack::init(tTrack* track, double roughseglen)
 {
     if (mTorcsTrack != track)
     {

@@ -76,7 +76,7 @@ public:
   double slipFront() const;
   double slipRear() const;
   double filterTCLSideSlip(double accel) const ;
-  const tCarElt* car()const { return mCar; }
+  tCarElt* car()const { return mCar; }
   const Tires* tires() const { return &mTires; }
   int    gear() const { return mCar->_gear; }
 

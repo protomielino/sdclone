@@ -22,7 +22,7 @@
 
 #include <portability.h>
 
-Opponent::Opponent(const tTrack* track, const CarElt* car, const MyCar* mycar, const Path* mypath)
+Opponent::Opponent(tTrack* track, CarElt* car, MyCar* mycar, Path* mypath)
     : mLeftOfMe(false),
       mOppCar(car),
       mCar(mycar->car()),

@@ -57,7 +57,7 @@ Driver::Driver(int index) :
     mFlagNames.push_back("FAST_BEHIND");
 }
 
-void Driver::InitTrack(const tTrack* Track, void* carHandle, void** carParmHandle, const tSituation* situation)
+void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, const tSituation* situation)
 {
     LogUSR.debug(".......... %s Driver initrack .........\n", mDriverName);
     track = Track;

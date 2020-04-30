@@ -43,7 +43,7 @@ class Driver
 public:
     Driver(int index);
 
-    void InitTrack(const tTrack *Track, void* carHandle, void** carParmHandle, const tSituation* situation);
+    void InitTrack(tTrack *Track, void* carHandle, void** carParmHandle, const tSituation* situation);
     void NewRace(tCarElt* car, const tSituation* situation);
     void Drive();
     int  PitCmd();
@@ -208,10 +208,10 @@ private:
     unsigned int    random_seed;
 
     // Constants
-    const double mFrontCollMargin;
-    const double mOvtMargin;
+    double mFrontCollMargin;
+    double mOvtMargin;
 
-    const tTrack* track;
+    tTrack* track;
 };
 
 #endif // _DRIVER_H_

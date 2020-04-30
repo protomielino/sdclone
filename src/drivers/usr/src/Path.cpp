@@ -21,7 +21,7 @@
 #include <iostream>
 #include <portability.h>
 
-Path::Path(const MyTrack* track, const std::string& datadir, const double clothfactor, const double vmaxk, const double vmaxkfactor, const PathType pathtype) :
+Path::Path(MyTrack* track, const std::string& datadir, const double clothfactor, const double vmaxk, const double vmaxkfactor, const PathType pathtype) :
     mTrack(track),
     mPathType(pathtype),
     mClothFactor(clothfactor),

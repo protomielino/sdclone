@@ -28,14 +28,14 @@ class MyTrack
 {
 public:
   MyTrack();
-  void   init(const tTrack* track, double roughseglen);
+  void   init(tTrack* track, double roughseglen);
   double yaw(double fromstart) const;
   double curvature(double fromstart) const;
   const  MyTrackSeg& seg(int idx) const;
   double yaw(int idx) const { return seg(idx).yaw; }
   int    nrOfSegs() const { return mTrack.size(); }
   double segLenMid() const { return mSegLenMid; }
-  const  tTrack* torcsTrack() const { return mTorcsTrack; }
+  tTrack* torcsTrack() const { return mTorcsTrack; }
   char*  name() const { return mTorcsTrack->internalname; }
   double length() const { return mTorcsTrack->length; }
   double width() const { return mTorcsTrack->width; }
@@ -44,7 +44,7 @@ private:
   int    segIdx(double fromstart) const;
   void   calcPtAndNormal(tTrackSeg* seg, double toStart, Vec3d& pt, Vec3d& norm);
 
-  const  tTrack* mTorcsTrack;
+  tTrack* mTorcsTrack;
   std::vector<MyTrackSeg> mTrack;
   double mSegLenMid;
 };

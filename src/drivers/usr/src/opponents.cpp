@@ -23,7 +23,7 @@ Opponents::Opponents()
 {
 }
 
-void Opponents::init(const tTrack* track, const tSituation* situation, const MyCar* mycar, const Path* mypath)
+void Opponents::init( tTrack* track,  const tSituation* situation,  MyCar* mycar,  Path* mypath)
 {
     mOpp.clear();
     int i, j = 0;

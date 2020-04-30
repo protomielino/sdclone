@@ -32,7 +32,7 @@ class Opponents
 {
 public:
   Opponents();
-  void init(const tTrack* track, const tSituation* situation, const MyCar* mycar, const Path* mypath);
+  void init( tTrack* track, const tSituation* situation,  MyCar* mycar,  Path* mypath);
   void update();
   Opponent* opp(int idx);
   Opponent* oppNear() const { return mOppNear; };

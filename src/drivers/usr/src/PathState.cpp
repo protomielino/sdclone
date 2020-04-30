@@ -20,7 +20,7 @@
 #include "cubic.h"
 #include "Utils.h"
 
-PathState::PathState(const Path* path, const MyCar* car, const MuFactors* mufactors):
+PathState::PathState(Path* path, MyCar* car, MuFactors* mufactors):
     mUpdatedLapData(false),
     mMaxspeed(0.0),
     mPath(path),

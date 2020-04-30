@@ -27,10 +27,7 @@
 class Opponent
 {
 public:
-  Opponent(const tTrack* track, const CarElt* car, const MyCar* mycar, const Path* mypath);
-#if defined(_MSC_VER) && _MSC_VER == 1600
-  Opponent & operator = (const Opponent &) { return *this; }
-#endif
+  Opponent(tTrack* track, CarElt* car, MyCar* mycar, Path* mypath);
   void   update();
   bool   racing() const { return mRacing; };
   double fromStart() { return mOppCar->_distFromStartLine; };
@@ -83,14 +80,14 @@ private:
   bool   mDamaged;
   bool   mLeftOfMe;
 
-  const CarElt* mOppCar; // pointer to the opponents car
-  const CarElt* mCar; // pointer to my car
-  const tTrack* mTrack;
-  const Path*   mMyPath; // ideal race path of my car
-  const bool    mTeamMate;
-  const double  mCarsDim; // dist between the cars centers when they are bumper to bumper
-  const double  mFrontRange;
-  const double  mBackRange;
+  CarElt* mOppCar; // pointer to the opponents car
+  CarElt* mCar; // pointer to my car
+  tTrack* mTrack;
+  Path*   mMyPath; // ideal race path of my car
+  bool    mTeamMate;
+  double  mCarsDim; // dist between the cars centers when they are bumper to bumper
+  double  mFrontRange;
+  double  mBackRange;
 };
 
 #endif // _OPPONENT_H_

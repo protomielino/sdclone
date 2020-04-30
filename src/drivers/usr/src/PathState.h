@@ -27,11 +27,8 @@
 class PathState
 {
 public:
-    PathState(const Path* path, const MyCar* car, const MuFactors* mufactors);
-#if defined(_MSC_VER) && _MSC_VER == 1600
-    PathState & operator = (const PathState &) { return *this; }
-#endif
-	void   update(double dt);
+    PathState( Path* path,  MyCar* car,  MuFactors* mufactors);
+    void   update(double dt);
     double maxSpeed(double fromstart) const;
     double maxSpeed() const { return mMaxspeed; }; // path maxspeed at this point of time
     double acceleration() const { return mAcceleration; }; // path acceleration at this point of time
@@ -57,12 +54,12 @@ private:
     double mOffset;
     PathSeg mNearestPoint;
 
-    const Path* mPath;
-    const MyCar* mCar;
-    const MuFactors* mMuFactors;
-    const PathType mPathType;
-    const int mNSEG;
-    const double mSeedLimit;
+    Path* mPath;
+    MyCar* mCar;
+    MuFactors* mMuFactors;
+    PathType mPathType;
+    int mNSEG;
+    double mSeedLimit;
 };
 
 #endif // _PATHSTATE_H_

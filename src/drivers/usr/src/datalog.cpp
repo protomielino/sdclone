@@ -29,13 +29,13 @@ DataLog::DataLog() :
 {
 }
 
-void DataLog::init(const std::string &dir, const std::string &carname)
+void DataLog::init(std::string dir, std::string carname)
 {
     mDir = dir;
     mFile = dir + carname + "_log.dat";
 }
 
-void DataLog::add(const std::string &name, double* dataptr, double scale)
+void DataLog::add(std::string name, double* dataptr, double scale)
 {
     DataLogHead hd;
     hd.name = name;
