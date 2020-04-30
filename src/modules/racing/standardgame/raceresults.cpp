@@ -51,7 +51,7 @@ static char path[1024];
 static char path2[1024];
 
 
-typedef struct
+typedef struct ReStandings
 {
 	std::string drvName;
 	std::string shortname;
