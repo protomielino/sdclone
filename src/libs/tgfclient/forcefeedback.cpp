@@ -222,24 +222,24 @@ int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
     //calculate autocenter if enabled
     if (this->effectsConfig["autocenterEffect"]["enabled"]){
         this->force = this->autocenterEffect(car, s);
-        GfLogInfo("After autocenter: (%i)\n", this->force);
+        GfLogDebug("After autocenter: (%i)\n", this->force);
     }
 
     //calculate engine revving if enabled
     if (this->effectsConfig["engineRevvingEffect"]["enabled"]){
         this->force += this->engineRevvingEffect(car, s);
-        GfLogInfo("After engineRevving: (%i)\n", this->force);
+        GfLogDebug("After engineRevving: (%i)\n", this->force);
     }
 
     //calculate engine revving if enabled
     //if (this->effectsConfig["engineRevvingEffect"]["enabled"]){
         this->force += this->lowSpeedCostantForceEffect(car, s);
-    //	GfLogInfo("After engineRevving: (%i)\n", this->force);
+    //	GfLogDebug("After engineRevving: (%i)\n", this->force);
     //}
 
     //calculate bump
     //this->force += this->bumpsEffect(car, s);
-    //GfLogInfo("After bump: (%i)\n", this->force);
+    //GfLogDebug("After bump: (%i)\n", this->force);
 
     //apply global effect multiplier
     //multiply
@@ -254,7 +254,7 @@ int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
     if (this->force > 32760) this->force = 32760;
     if (this->force < -32760) this->force = -32760;
 
-    GfLogInfo("Final force: (%i)\n", this->force);
+    GfLogDebug("Final force: (%i)\n", this->force);
 
     return this->force;
 
@@ -311,11 +311,11 @@ int ForceFeedbackManager::bumpsEffect(tCarElt* car, tSituation *s)
      * */
     int effectForce = 0;
 /*
-    GfLogInfo("\n\n");
-    GfLogInfo("(%f)\n",car->_wheelFz(0));
-    GfLogInfo("(%f)\n",car->_wheelFz(1));
-    GfLogInfo("(%f)\n",car->_wheelFz(2));
-    GfLogInfo("(%f)\n",car->_wheelFz(3));
+    GfLogDebug("\n\n");
+    GfLogDebug("(%f)\n",car->_wheelFz(0));
+    GfLogDebug("(%f)\n",car->_wheelFz(1));
+    GfLogDebug("(%f)\n",car->_wheelFz(2));
+    GfLogDebug("(%f)\n",car->_wheelFz(3));
 */
     if(this->effectsConfig["bumpsEffect"]["initialized"] == 0)
     {
@@ -346,9 +346,9 @@ int ForceFeedbackManager::bumpsEffect(tCarElt* car, tSituation *s)
     this->effectsConfig["bumpsEffect"]["_previousWheelZForce3"] = car->_wheelFz(3);
 
 
-    GfLogInfo("\n\n");
-    GfLogInfo("(%i)\n",left);
-    GfLogInfo("(%i)\n",right);
+    GfLogDebug("\n\n");
+    GfLogDebug("(%i)\n",left);
+    GfLogDebug("(%i)\n",right);
 
     if( left > 4000)
     {
@@ -360,10 +360,10 @@ int ForceFeedbackManager::bumpsEffect(tCarElt* car, tSituation *s)
     }
 
 /*
-    GfLogInfo("\n\n");
-    GfLogInfo("(%f)\n",car->_ride(0));
-    GfLogInfo("(%f)\n",car->_ride(1));
-    GfLogInfo("(%f)\n",car->_ride(2));
+    GfLogDebug("\n\n");
+    GfLogDebug("(%f)\n",car->_ride(0));
+    GfLogDebug("(%f)\n",car->_ride(1));
+    GfLogDebug("(%f)\n",car->_ride(2));
     GfLogInfo("(%f)\n",car->_ride(3));
 */
 /*
@@ -389,9 +389,9 @@ int ForceFeedbackManager::bumpsEffect(tCarElt* car, tSituation *s)
     this->effectsConfig["bumpsEffect"]["previousWheelRide3"] = (int) (car->_ride(3)*1000);
 
 
-    GfLogInfo("\n\n");
-    GfLogInfo("(%i)\n",left);
-    GfLogInfo("(%i)\n",right);
+    GfLogDebug("\n\n");
+    GfLogDebug("(%i)\n",left);
+    GfLogDebug("(%i)\n",right);
 */
     return effectForce;
 
@@ -407,18 +407,18 @@ int ForceFeedbackManager::engineRevvingEffect(tCarElt* car, tSituation *s)
         effectStart = std::clock();
         timeLogged = true;
 
-        GfLogInfo("StartTime: (%f)\n",(double)effectStart);
-        GfLogInfo("###############new time\n");
-        GfLogInfo("StartTime: (%f)\n",(double)effectStart);
+        GfLogDebug("StartTime: (%f)\n",(double)effectStart);
+        GfLogDebug("###############new time\n");
+        GfLogDebug("StartTime: (%f)\n",(double)effectStart);
     }
 
     effectCurTime = std::clock();
 
     double timeDiff = (((double)effectCurTime - (double)effectStart )) / CLOCKS_PER_SEC * 1000;
 
-    GfLogInfo("CurTime: (%f)\n", (double)effectCurTime);
-    GfLogInfo("StartTime: (%f)\n",(double)effectStart);
-    GfLogInfo("TimeDiff: (%f)\n", timeDiff);
+    GfLogDebug("CurTime: (%f)\n", (double)effectCurTime);
+    GfLogDebug("StartTime: (%f)\n",(double)effectStart);
+    GfLogDebug("TimeDiff: (%f)\n", timeDiff);
 
     if (timeDiff > 40)
     {
@@ -434,13 +434,13 @@ int ForceFeedbackManager::engineRevvingEffect(tCarElt* car, tSituation *s)
         effectStart = std::clock();
     }
 
-    GfLogInfo("Sign: (%i)\n", this->effectsConfig["engineRevvingEffect"]["_previousSign"]);
+    GfLogDebug("Sign: (%i)\n", this->effectsConfig["engineRevvingEffect"]["_previousSign"]);
 
     //force acting on the front wheels
     effectForce = 50000 / (int)car->_enginerpm * 2 * this->effectsConfig["engineRevvingEffect"]["_previousSign"] * this->effectsConfig["engineRevvingEffect"]["multiplier"] / 100;
 
-    GfLogInfo("RPM: (%i)\n", (int)car->_enginerpm);
-    GfLogInfo("Efect: (%i)\n", effectForce);
+    GfLogDebug("RPM: (%i)\n", (int)car->_enginerpm);
+    GfLogDebug("Efect: (%i)\n", effectForce);
 
     return effectForce;
 
@@ -454,13 +454,13 @@ int ForceFeedbackManager::lowSpeedCostantForceEffect(tCarElt* car, tSituation *s
     //we need to store the sign of the force
     sign = ((car->_steerTqCenter - prevSteerCmd) > 0) - ((car->_steerTqCenter - prevSteerCmd) < 0);
 
-    GfLogInfo("test: (%f)\n", car->_steerTqCenter);
-    GfLogInfo("test: (%f)\n", prevSteerCmd );
+    GfLogDebug("test: (%f)\n", car->_steerTqCenter);
+    GfLogDebug("test: (%f)\n", prevSteerCmd );
 
     int prevDirectionSign = (prevDirection > 0) - (prevDirection < 0);
 
-    GfLogInfo("Sign: (%d)\n", sign);
-    GfLogInfo("Direction sign: (%d)\n", prevDirectionSign);
+    GfLogDebug("Sign: (%d)\n", sign);
+    GfLogDebug("Direction sign: (%d)\n", prevDirectionSign);
 
 
 /*
@@ -482,7 +482,7 @@ int ForceFeedbackManager::lowSpeedCostantForceEffect(tCarElt* car, tSituation *s
 
 
 
-    GfLogInfo("Direction score: (%d)\n", prevDirection);
+    GfLogDebug("Direction score: (%d)\n", prevDirection);
 
 
     //force calculation
@@ -503,8 +503,8 @@ int ForceFeedbackManager::lowSpeedCostantForceEffect(tCarElt* car, tSituation *s
     prevSteerCmdDiff = car->_steerTqCenter - prevSteerCmd;
     prevSteerCmd = car->_steerTqCenter;
 
-    GfLogInfo("SPEED: (%i)\n", (int)car->_speed_xy);
-    GfLogInfo("Efect: (%i)\n", effectForce);
+    GfLogDebug("SPEED: (%i)\n", (int)car->_speed_xy);
+    GfLogDebug("Efect: (%i)\n", effectForce);
 
     return effectForce;
 
