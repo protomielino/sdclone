@@ -1087,7 +1087,11 @@ void ReSituationUpdater::freezSituation(tRmInfo*& pSituation)
 
         // s
         if (pSituation->s)
+        {
+            if (pSituation->s->cars)
+                free(pSituation->s->cars);
             free(pSituation->s);
+        }
 
         // rules
         if (pSituation->rules)
