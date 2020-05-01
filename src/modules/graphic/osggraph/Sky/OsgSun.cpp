@@ -36,7 +36,15 @@
 
 // Constructor
 SDSun::SDSun( void ) :
-    visibility(-9999.0), prev_sun_angle(-9999.0), path_distance(60000.0),
+    visibility(-9999.0),
+    prev_sun_angle(-9999.0),
+    sun_angle(0.0),
+    sun_rotation(0.0),
+    sun_angle_to_scene(0.0),
+    sun_right_ascension(0.0),
+    sun_declination(0.0),
+    sun_dist(0.0),
+    path_distance(60000.0),
     sun_exp2_punch_through(7.0e-06)
 {
 }

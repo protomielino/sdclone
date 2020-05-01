@@ -120,7 +120,9 @@ SDCloudLayer::SDCloudLayer( const string &tex_path ) :
     direction(0.0),
     alt(1.0),
     /*last_course(0.0),*/
-    max_alpha(1.0)
+    max_alpha(1.0),
+    last_x(0.0),
+    last_y(0.0)
 {
     cloud_root->addChild(layer_root.get(), true);
     layer_root->addChild(group_bottom.get());
