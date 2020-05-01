@@ -66,7 +66,7 @@ private: // Private data members.
 };
 
 GfEventLoop::Private::Private()
-: cbKeyboardDown(0), cbKeyboardUp(0), cbRecompute(0), cbTimer(0), bQuit(false)
+: cbKeyboardDown(0), cbKeyboardUp(0), cbRecompute(0), cbTimer(0), bQuit(false), nLockedModifiers(KMOD_NONE)
 {
     static bool bInitialized = false;
     if (!bInitialized)
