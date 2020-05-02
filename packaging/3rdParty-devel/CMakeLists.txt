@@ -261,15 +261,15 @@ ExternalProject_Add_Step(FreeSOLID-2.1.2 freesolid_add_cmake
 endif(OPTION_FREESOLID)
 
 if(OPTION_ENET)
-set(ENET_PROJECT enet-1.3.14)
+set(ENET_PROJECT enet-1.3.15)
    ExternalProject_Add(${ENET_PROJECT}
-      URL http://enet.bespin.org/download/enet-1.3.14.tar.gz
-      URL_HASH SHA256=98f6f57aab0a424469619ed3047728f0d3901ce8f0dea919c11e7966d807e870
+      URL http://enet.bespin.org/download/enet-1.3.15.tar.gz
+      URL_HASH SHA256=5abdf63346e54272344d8184b5a2f333d202d809d28123911cbd993e5772bdfb
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    )
    ExternalProject_Add_Step(${ENET_PROJECT} enet_add_cmake
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/enet-1.3.14.CMakeLists.txt"
+              "${CMAKE_SOURCE_DIR}/patches/enet-1.3.15.CMakeLists.txt"
               "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch  # do before patch
