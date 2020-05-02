@@ -204,8 +204,8 @@ ssgBranch * cGrSkyDome::build(double hscale, double vscale )
   lower_ring_cl->add( color );
 
   // force a repaint of the sky colors with ugly defaults
-  sgVec3 fog_color;
-  sgSetVec3( fog_color, 1.0, 1.0, 1.0 );
+  sgVec4 fog_color;
+  sgSetVec4( fog_color, 1.0, 1.0, 1.0, 0.0 );
   repaint( color, fog_color, 0.0, 5000.0 );
 
   // build the ssg scene graph sub tree for the sky and connected
