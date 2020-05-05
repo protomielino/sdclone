@@ -724,8 +724,8 @@ tRmInfo* ReSituationUpdater::initSituation(const tRmInfo* pSource)
         tCarElt* pTgtCar = &pTarget->carList[nCarInd];
         tCarElt* pSrcCar = &pSource->carList[nCarInd];
 
-        pTgtCar->_curSplitTime = (double*)malloc(sizeof(double) * (pSource->track->numberOfSectors - 1));
-        pTgtCar->_bestSplitTime = (double*)malloc(sizeof(double) * (pSource->track->numberOfSectors - 1));
+        pTgtCar->_curSplitTime = (double*)malloc(sizeof(double) * (pSource->track->numberOfSectors));
+        pTgtCar->_bestSplitTime = (double*)malloc(sizeof(double) * (pSource->track->numberOfSectors));
 
         GF_TAILQ_INIT(&(pTgtCar->_penaltyList)); // Not used by the graphics engine.
 
