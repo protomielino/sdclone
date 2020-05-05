@@ -242,8 +242,11 @@ void* GetFileHandle(const char* RobotName)
 {
     void* RobotSettings = NULL;
 
-    strncpy(BufName, RobotName, BUFSIZE - 1);       // Save robot's name
-    BufName[BUFSIZE - 1] = '\0';
+    if (BufName != RobotName)                    // Don't copy if same names
+    {
+        strncpy(BufName, RobotName, BUFSIZE - 1);       // Save robot's name
+        BufName[BUFSIZE - 1] = '\0';
+    }
     snprintf(BufPathDirRel, BUFSIZE,             // Robot's directory
         "drivers/%s",RobotName);                 // relative to installation
     snprintf(BufPathXMLRel, BUFSIZE,             // Robot's xml-filename
