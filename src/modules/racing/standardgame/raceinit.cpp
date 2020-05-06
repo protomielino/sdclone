@@ -715,6 +715,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
         GfParmSetStr (handle, path, RM_ATTR_CARNAME, elt->_carName);
         GfParmWriteFile (0, handle, "Car names");
         GfParmReleaseHandle (handle);
+        handle = NULL;
       }
       if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU))
       {
@@ -724,7 +725,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       }
       else
         handle = NULL;
-      if (handle && !replayReplay) {
+      if (handle && handle != carhdle && !replayReplay) {
         GfLogTrace("Checking/Merging %s specific setup into %s setup.\n",
                    curModInfo->name, elt->_carName);
         if (GfParmCheckHandle(carhdle, handle)) {
