@@ -30,7 +30,7 @@
     (no limit for "Unlimited Number of Interfaces" modules)
     @see	ModList
  */
-#define MAX_MOD_ITF 10
+#define MAX_MOD_ITF 40
 #define GfModInfoDefaultMaxItf MAX_MOD_ITF
 
 /* Name of the module function where run-time informations are exchanged (new scheme) 
