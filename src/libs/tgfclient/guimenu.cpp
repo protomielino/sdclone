@@ -1103,7 +1103,7 @@ int GfuiMenuScreen::createTextButtonControl(const char* pszName, void* userDataO
                                             void* userDataOnFocus, tfuiCallback onFocus,
                                             tfuiCallback onFocusLost,
                                             bool bFromTemplate,
-                                            const char* tip, const char* text,
+                                            const char* text, const char* tip,
                                             int x, int y, int width, int font, int textHAlign,
                                             const float* fgColor, const float* fgFocusColor, const float* fgPushedColor)
 {
