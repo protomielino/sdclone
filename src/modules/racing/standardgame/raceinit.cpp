@@ -743,9 +743,10 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 
       /* Initialize sectors */
       elt->_currentSector = 0;
-      elt->_curSplitTime = (double*)malloc( sizeof(double) * ( ReInfo->track->numberOfSectors - 1 ) );
-      elt->_bestSplitTime = (double*)malloc( sizeof(double) * ( ReInfo->track->numberOfSectors - 1 ) );
-      for (xx = 0; xx < ReInfo->track->numberOfSectors - 1; ++xx)
+      elt->_nbSectors = ReInfo->track->numberOfSectors;
+      elt->_curSplitTime = (double*)malloc( sizeof(double) * ( elt->_nbSectors - 1 ) );
+      elt->_bestSplitTime = (double*)malloc( sizeof(double) * ( elt->_nbSectors - 1 ) );
+      for (xx = 0; xx < elt->_nbSectors - 1; ++xx)
       {
         elt->_curSplitTime[xx] = -1.0f;
         elt->_bestSplitTime[xx] = -1.0f;

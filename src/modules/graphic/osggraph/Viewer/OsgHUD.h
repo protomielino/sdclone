@@ -117,10 +117,6 @@ class SDHUD
 		float timeDiffFreezeCountdown;//keep display for x seconds
 		float timeDiffFreezeTime;
 		int oldSector;
-		float oldBestLapTime;
-		float oldBestSplitTime;
-		float oldLapTime;
-		int numberOfSectors;
 		int oldLapNumber;
 
 		float hudScale;

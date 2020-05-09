@@ -676,10 +676,6 @@ SDHUD::SDHUD()
     this->timeDiffFreezeCountdown = 8.0f;    //keep display for x seconds
     this->timeDiffFreezeTime = 0.0f;
     this->oldSector = 0;
-    this->oldBestLapTime = 0.0f;
-    this->oldBestSplitTime = 0.0f;
-    this->oldLapTime = 0.0f;
-    this->numberOfSectors = 0;
     this->oldLapNumber = 0;
 
     this->hudScale = 1.0f;
@@ -914,17 +910,6 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 //laptime
 
-    //float currentPrevSectorSplitTime = currCar->_curSplitTime[currCar->_currentSector - 1]; // our time in the sector we have "just" run over
-    //float bestPrevSectorSplitTime = currCar->_bestSplitTime[currCar->_currentSector-1]; // the best split time of the sector we are in this moment
-    float bestSplitTime = currCar->_bestSplitTime[currCar->_currentSector]; // the best split time of the sector we are in this moment
-    // float splitTimeDiff = 0;
-
-    //in the first lap we count how many sector this track have
-    //ReInfo->track->numberOfSectors is a better source for this but we have no access to it in this file
-    if( this->numberOfSectors < currCar->_currentSector+1){
-        this->numberOfSectors = currCar->_currentSector+1;
-    }
-
     if( this->oldSector != currCar->_currentSector)
     {
         this->laptimeFreezeTime = GfTimeClock();
@@ -984,8 +969,6 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         temp << "S" << (this->oldSector+1);
         hudTextElements["laptime-sector-description"]->setText(temp.str());
 
-        hudTextElements["laptime-last-time"]->setText(formatLaptime(currCar->_curLapTime,0));
-
         this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_ALL);
         this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_NONE);
         this->hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
@@ -993,15 +976,15 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
 
         //show laptime
-        hudTextElements["laptime-best-time"]->setText(formatLaptime(bestSplitTime,0));
         hudTextElements["laptime-last-time"]->setText(formatLaptime(currCar->_curLapTime,0));
-        this->oldBestSplitTime = bestSplitTime;
-        this->oldBestLapTime = currCar->_bestLapTime;
-        this->oldLapTime = currCar->_curLapTime;
 
-        //on the last sector show the totallaptime
-        if(currCar->_currentSector == this->numberOfSectors-1){
+        //on the last sector show the total lap time
+        if(currCar->_currentSector == currCar->_nbSectors-1){
             hudTextElements["laptime-best-time"]->setText(formatLaptime(currCar->_bestLapTime,0));
+        }
+        else {
+            tdble bestSplitTime = currCar->_bestSplitTime[currCar->_currentSector]; // the best split time of the sector we are in this moment
+            hudTextElements["laptime-best-time"]->setText(formatLaptime(bestSplitTime,0));
         }
     }
 

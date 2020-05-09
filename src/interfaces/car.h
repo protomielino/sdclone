@@ -190,6 +190,7 @@ typedef struct
     tdble		distRaced;
     tdble		distFromStartLine;
     int			currentSector;
+    int			nbSectors;
     double		scheduledEventTime;
     tTrackOwnPit 	*pit;
     int			event;
@@ -221,6 +222,7 @@ typedef struct
 #define _distRaced              race.distRaced
 #define _distFromStartLine	race.distFromStartLine
 #define _currentSector		race.currentSector
+#define _nbSectors          race.nbSectors
 #define _pit                    race.pit
 #define _scheduledEventTime	race.scheduledEventTime
 #define _event                  race.event
