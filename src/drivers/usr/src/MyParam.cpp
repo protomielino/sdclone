@@ -41,7 +41,7 @@ MyParam::MyParam(void** carparmhandle, const std::string& datadir, const std::st
         if (*carparmhandle == NULL)
         {
             *carparmhandle = GfParmReadFile(defaultfile.c_str(), GFPARM_RMODE_STD);
-            assert(*carparmhandle != NULL && "default.xml file not found");
+            LogUSR.fatal("Couldn't load : %s", defaultfile.c_str());
         }
     }
     else
@@ -66,7 +66,7 @@ MyParam::MyParam(void** carparmhandle, const std::string& datadir, const std::st
         if (*carparmhandle == NULL)
         {
             *carparmhandle = GfParmReadFile(defaultfile.c_str(), GFPARM_RMODE_STD);
-            assert(*carparmhandle != NULL && "default.xml file not found");
+            LogUSR.fatal("Couldn't load : %s\n", defaultfile.c_str());
         }
     }
 
