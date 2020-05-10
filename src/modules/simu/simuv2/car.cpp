@@ -38,6 +38,11 @@ SimCarConfig(tCar *car)
 	int		i;
 	tCarElt	*carElt = car->carElt;
 	
+	car->fuel_time = 0.0;
+	car->fuel_consumption = 0.0;
+	car->carElt->_fuelTotal = 0.0;
+	car->carElt->_fuelInstant = 10.0;
+
 	car->dimension.x = GfParmGetNum(hdle, SECT_CAR, PRM_LEN, (char*)NULL, 4.7f);
 	car->dimension.y = GfParmGetNum(hdle, SECT_CAR, PRM_WIDTH, (char*)NULL, 1.9f);
 	overallwidth     = GfParmGetNum(hdle, SECT_CAR, PRM_OVERALLWIDTH, (char*)NULL, car->dimension.y);
@@ -63,6 +68,7 @@ SimCarConfig(tCar *car)
 	if (car->fuel > car->tank) {
 		car->fuel = car->tank;
 	}
+    car->fuel_prev = car->fuel;
 	k = k * k;
 	car->Iinv.x = (tdble) (12.0 / (car->mass * (car->dimension.y * car->dimension.y + car->dimension.z * car->dimension.z)));
 	car->Iinv.y = (tdble) (12.0 / (car->mass * (car->dimension.x * car->dimension.x + car->dimension.z * car->dimension.z)));
@@ -276,6 +282,22 @@ SimCarUpdateForces(tCar *car)
 static void
 SimCarUpdateSpeed(tCar *car)
 {
+	// fuel consumption
+	tdble delta_fuel = car->fuel_prev - car->fuel;
+	car->fuel_prev = car->fuel;
+	if (delta_fuel > 0) {
+		car->carElt->_fuelTotal += delta_fuel;
+	}
+	tdble fi;
+	tdble as = sqrt(car->airSpeed2);
+	if (as<0.1) {
+		fi = 99.9f;
+	} else {
+		fi = 100000 * delta_fuel / (as*SimDeltaTime);
+	}
+	tdble alpha = 0.1f;
+	car->carElt->_fuelInstant = (tdble)((1.0-alpha)*car->carElt->_fuelInstant + alpha*fi);
+
 	tdble	Cosz, Sinz;
 		
 	Cosz = car->Cosz;

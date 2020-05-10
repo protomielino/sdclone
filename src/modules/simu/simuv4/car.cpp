@@ -42,6 +42,12 @@ SimCarConfig(tCar *car)
 	tdble	overallwidth;
 	int		i;
 	tCarElt	*carElt = car->carElt;
+
+	car->fuel_time = 0.0;
+	car->fuel_consumption = 0.0;
+	car->carElt->_fuelTotal = 0.0;
+	car->carElt->_fuelInstant = 10.0;
+
 	const char *enabling;
 	tCarSetupItem *setupGcfr = &(car->carElt->setup.FRWeightRep);
 	tCarSetupItem *setupGcfrl = &(car->carElt->setup.FRLWeightRep);
@@ -114,6 +120,10 @@ SimCarConfig(tCar *car)
 	gcrl = gcfr * gcfrl + (1 - gcfr) * gcrrl;
 
 	car->tank        = GfParmGetNum(hdle, SECT_CAR, PRM_TANK, (char*)NULL, 80);
+	if (car->fuel > car->tank) {
+		car->fuel = car->tank;
+	}
+	car->fuel_prev = car->fuel;
 	
 	setupFuel->desired_value = setupFuel->min = setupFuel->max = 80.0;
 	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_FUEL, (char*)NULL, &(setupFuel->desired_value), &(setupFuel->min), &(setupFuel->max));
@@ -640,6 +650,22 @@ SimCarUpdateForces(tCar *car)
 static void
 SimCarUpdateSpeed(tCar *car)
 {
+	// fuel consumption
+	tdble delta_fuel = car->fuel_prev - car->fuel;
+	car->fuel_prev = car->fuel;
+	if (delta_fuel > 0) {
+		car->carElt->_fuelTotal += delta_fuel;
+	}
+	tdble fi;
+	tdble as = sqrt(car->airSpeed2);
+	if (as<0.1) {
+		fi = 99.9f;
+	} else {
+		fi = 100000 * delta_fuel / (as*SimDeltaTime);
+	}
+	tdble alpha = 0.1f;
+	car->carElt->_fuelInstant = (tdble)((1.0-alpha)*car->carElt->_fuelInstant + alpha*fi);
+
 	tdble	Cosz, Sinz;
 	//tdble	mass;
 	

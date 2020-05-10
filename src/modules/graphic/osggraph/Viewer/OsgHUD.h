@@ -106,19 +106,25 @@ class SDHUD
         float *_background_color;
 
 		//car data that need to be remembered between frames for the hud
-		int carLaps;
-		tdble lapLength;
-		float startingFuel;
-		float remainingFuelForLaps;
+        struct CarData {
+		    int carLaps;
+		    float remainingFuelForLaps;
+		    float laptimeFreezeCountdown;//keep display for x seconds
+		    float laptimeFreezeTime;
+		    float timeDiffFreezeCountdown;//keep display for x seconds
+		    float timeDiffFreezeTime;
+		    int oldSector;
+		    int oldLapNumber;
 
-		//
-		float laptimeFreezeCountdown;//keep display for x seconds
-		float laptimeFreezeTime;
-		float timeDiffFreezeCountdown;//keep display for x seconds
-		float timeDiffFreezeTime;
-		int oldSector;
-		int oldLapNumber;
-
+            CarData() : carLaps(0), remainingFuelForLaps(0), laptimeFreezeCountdown(3.0f),
+            laptimeFreezeTime(0.0f), timeDiffFreezeCountdown(8.0f), timeDiffFreezeTime(0.0f),
+            oldSector(0), oldLapNumber(0)
+            {
+            }
+        };
+        const tCarElt *lastCar;
+        std::map<const tCarElt *, CarData> carData;
+        
 		float hudScale;
 
 		//

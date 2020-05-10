@@ -667,17 +667,7 @@ SDHUD::SDHUD()
     _cameraHUD = new osg::Camera;
 
     //initialize some vars
-    this->startingFuel = 0.0;
-    this->remainingFuelForLaps = 0.0f;
-
-    //
-    this->laptimeFreezeCountdown = 3.0f;     //keep display for x seconds
-    this->laptimeFreezeTime = 0.0f;
-    this->timeDiffFreezeCountdown = 8.0f;    //keep display for x seconds
-    this->timeDiffFreezeTime = 0.0f;
-    this->oldSector = 0;
-    this->oldLapNumber = 0;
-
+    this->lastCar = NULL;
     this->hudScale = 1.0f;
 }
 
@@ -732,6 +722,17 @@ SDHUD::DispDebug(const tSituation *s, const SDFrameInfo* frame)
 void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                         const tCarElt *currCar)
 {
+    CarData &data = carData[currCar];
+
+    // reset timers if car changes
+    if (currCar != lastCar)
+    {
+        data.oldSector = currCar->_currentSector;
+        data.oldLapNumber = currCar->_laps;
+        data.laptimeFreezeTime = 0.0;
+        data.timeDiffFreezeTime = 0.0;
+        lastCar = currCar;
+    }
 
     //update all the graphs
     typedef std::map<std::string,OSGPLOT* >::iterator it_type;
@@ -848,14 +849,14 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         mapKey.str("");
         mapKey << "board-player" << id << "-timediff";
 
-        if(this->oldLapNumber != currCar->_laps)
+        if( data.oldLapNumber != currCar->_laps)
         {
-            this->timeDiffFreezeTime = GfTimeClock();
+            data.timeDiffFreezeTime = GfTimeClock();
         }
 
-        if ( GfTimeClock() < (this->timeDiffFreezeTime + this->timeDiffFreezeCountdown))
+        if ( GfTimeClock() < (data.timeDiffFreezeTime + data.timeDiffFreezeCountdown))
         {
-            this->oldLapNumber = currCar->_laps;
+            data.oldLapNumber = currCar->_laps;
 
             std::ostringstream tempStr;
             tempStr.str("");
@@ -905,21 +906,20 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     temp.str("");
     temp << currCar->_laps;
     hudTextElements["lap-container-currentlap"]->setText(temp.str());
-    //car_->_deltaBestLapTimefuel
 
 
 //laptime
 
-    if( this->oldSector != currCar->_currentSector)
+    if (data.oldSector != currCar->_currentSector)
     {
-        this->laptimeFreezeTime = GfTimeClock();
-        this->oldSector = currCar->_currentSector;
+        data.laptimeFreezeTime = GfTimeClock();
+        data.oldSector = currCar->_currentSector;
 
         if (currCar->_currentSector == 0)
         {
             hudTextElements["laptime-last-time"]->setText(formatLaptime(currCar->_lastLapTime,0));
 
-            if(currCar->_lastLapTime == currCar->_bestLapTime)
+            if (currCar->_lastLapTime == currCar->_bestLapTime)
             {
                 this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_ALL);
                 this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
@@ -935,14 +935,13 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                 this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_NONE);
                 this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
             }
-
         }
         else
         {
             float currentPrevSectorSplitTime = currCar->_curSplitTime[currCar->_currentSector - 1]; // our time in the sector we have "just" run over
             float bestPrevSectorSplitTime = currCar->_bestSplitTime[currCar->_currentSector-1]; // the best split time of the sector we are in this moment
 
-            if(currentPrevSectorSplitTime < bestPrevSectorSplitTime)
+            if (currentPrevSectorSplitTime < bestPrevSectorSplitTime)
             {
                 this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
                 this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_NONE);
@@ -961,12 +960,13 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         }
     }
 
-    if(GfTimeClock() > (this->laptimeFreezeTime + this->laptimeFreezeCountdown)){
+    if (GfTimeClock() > (data.laptimeFreezeTime + data.laptimeFreezeCountdown))
+    {
         //remember our current sector
-        this->oldSector = currCar->_currentSector;
+        data.oldSector = currCar->_currentSector;
 
         temp.str("");
-        temp << "S" << (this->oldSector+1);
+        temp << "S" << (data.oldSector+1);
         hudTextElements["laptime-sector-description"]->setText(temp.str());
 
         this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_ALL);
@@ -979,10 +979,12 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         hudTextElements["laptime-last-time"]->setText(formatLaptime(currCar->_curLapTime,0));
 
         //on the last sector show the total lap time
-        if(currCar->_currentSector == currCar->_nbSectors-1){
+        if (currCar->_currentSector == currCar->_nbSectors-1)
+        {
             hudTextElements["laptime-best-time"]->setText(formatLaptime(currCar->_bestLapTime,0));
         }
-        else {
+        else
+        {
             tdble bestSplitTime = currCar->_bestSplitTime[currCar->_currentSector]; // the best split time of the sector we are in this moment
             hudTextElements["laptime-best-time"]->setText(formatLaptime(bestSplitTime,0));
         }
@@ -997,31 +999,21 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
     temp.str("");
 
-    if (this->startingFuel == 0.0f){
-        this->startingFuel = currCar->_fuel;
-    }
-
     //when we have done at least one lap calculate remaining fuel
-#if 0   // dead code
-    if (currCar->_laps < 1){
-        float fuelConsumpionPerLap = 0.1f;
-    }
-#endif
-
-    if( currCar->_laps > this->carLaps && currCar->_laps > 1){
-        if (currCar->_laps == 2){
-            this->lapLength = this->lapLength - currCar->_distRaced;
-        }
-        float fuelConsumpionPerLap = (this->startingFuel - currCar->_fuel)  / (float)(currCar->_laps-1);
-        this->remainingFuelForLaps = currCar->_fuel / fuelConsumpionPerLap;
-        this->carLaps = currCar->_laps;
-
+    if (currCar->_laps > data.carLaps && currCar->_laps > 1)
+    {
+        float fuelConsumpionPerLap = currCar->_fuelTotal / (float)(currCar->_laps-1);
+        data.remainingFuelForLaps = currCar->_fuel / fuelConsumpionPerLap;
+        data.carLaps = currCar->_laps;
     }
 
     //if we have fuel for more than one lap display how many
-    if(this->remainingFuelForLaps > 0 ){
-        temp << std::fixed << std::setprecision(0) << this->remainingFuelForLaps;
-    }else{
+    if (data.remainingFuelForLaps > 0 )
+    {
+        temp << std::fixed << std::setprecision(0) << data.remainingFuelForLaps;
+    }
+    else
+    {
         temp << "---";
     }
 

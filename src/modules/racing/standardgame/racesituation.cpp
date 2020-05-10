@@ -725,6 +725,7 @@ tRmInfo* ReSituationUpdater::initSituation(const tRmInfo* pSource)
         tCarElt* pSrcCar = &pSource->carList[nCarInd];
 
         pTgtCar->_nbSectors = pSource->track->numberOfSectors;
+        pTgtCar->_trackLength = pSource->track->length;
         pTgtCar->_curSplitTime = (double*)malloc(sizeof(double) * (pTgtCar->_nbSectors - 1));
         pTgtCar->_bestSplitTime = (double*)malloc(sizeof(double) * (pTgtCar->_nbSectors - 1));
 
