@@ -75,7 +75,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, con
     std::string rName;
     strncpy( trackname, strrchr(track->filename, '/') + 1, sizeof(trackname) );
     *strrchr(trackname, '.') = '\0';
-    LogUSR.info( " # AXIOM trackName: '%s'\n", trackname );
+    LogUSR.info( " # USR trackName: '%s'\n", trackname );
     tName = trackname;
 
     // Setup for this robot
@@ -93,7 +93,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, con
     cName = carName;
     rName = mDriverName;
 
-    LogUSR.info( " # AXIOM carName: '%s'\n", carName );
+    LogUSR.info( " # USR carName: '%s'\n", carName );
 
     Meteorology(track);
 
