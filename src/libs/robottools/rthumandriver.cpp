@@ -146,7 +146,8 @@ static const int FuelReserve = 3;
 static const tdble MaxFuelPerMeter = 0.0008;	// [kg/m] fuel consumption.
 
 static void updateKeys(void);
-static void SetFuelAtRaceStart(tTrack *track, void **carParmHandle, tSituation *s, int idx);
+static void SetFuelAtRaceStart(tTrack *track, void *carHandle,
+                               void **carParmHandle, tSituation *s, int idx);
 static char	sstring[1024];
 static char	buf[1024];
 
@@ -571,7 +572,7 @@ void HumanDriver::init_track(int index,
     }//if-else curTrack->pits
 
     //Initial fuel fill computation
-    SetFuelAtRaceStart(track, carParmHandle, s, idx);
+    SetFuelAtRaceStart(track, carHandle, carParmHandle, s, idx);
 
     speedLimit = curTrack->pits.speedLimit;
 
@@ -2137,7 +2138,7 @@ int HumanDriver::pit_cmd(int index, tCarElt* car, tSituation *s)
 // Trivial strategy:
 // fill in as much fuel as required for the whole race,
 // or if the tank is too small, fill the tank completely.
-static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
+static void SetFuelAtRaceStart(tTrack* track, void *carHandle, void **carParmHandle,
         tSituation *s, int idx) {
     tdble fuel_requested;
     const tdble initial_fuel = GfParmGetNum(*carParmHandle, SECT_CAR,
@@ -2160,8 +2161,9 @@ static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
         // add some reserve:
         //fuel_for_race += FuelReserve;
 
-        const tdble tank_capacity =
-            GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, NULL, 100.0f);
+        const tdble tank_capacity = GfParmExistsParam(*carParmHandle, SECT_CAR, PRM_TANK) ?
+            GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, NULL, 100.0f) :
+            GfParmGetNum(carHandle, SECT_CAR, PRM_TANK, NULL, 100.0f);
         fuel_requested = MIN(fuel_for_race, tank_capacity);
     }
 
