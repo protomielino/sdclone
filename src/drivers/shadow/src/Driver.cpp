@@ -313,7 +313,14 @@ void	Driver::InitTrack(
     // get the private parameters now.
     //const char* ac3d_car = GfParmGetStr(hCarParm, SECT_GROBJECTS "/" LST_RANGES "/1", PRM_CAR, "");
 
-    double rpm = GfParmGetNum(hCarParm, SECT_PRIV, PRV_GEAR_UP_RPM, "rpm", 8190);
+    double revs_limiter = GfParmGetNum(hCarParm, SECT_ENGINE, PRM_REVSLIM, "rpm", 8000);
+    double rpm = GfParmGetNum(hCarParm, SECT_PRIV, PRV_GEAR_UP_RPM, "rpm", revs_limiter * 0.974);
+    // shift point must be less than rev limiter or car will not shift
+    if (rpm > (revs_limiter - 10.0))
+    {
+        LogSHADOW.info( "*** gear up rpm changed from : %g to : %g\n", rpm, revs_limiter * 0.974 );
+        rpm = revs_limiter * 0.974;
+    }
     m_gearUpRpm = rpm * 2 * PI / 60;
     LogSHADOW.debug( "*** gear up rpm: %g (%g)\n", rpm, m_gearUpRpm );
 
