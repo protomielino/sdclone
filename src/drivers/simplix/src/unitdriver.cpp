@@ -1093,7 +1093,7 @@ void TDriver::AdjustSkilling(PCarHandle Handle)
         CalcSkilling();
 
         Param.Tmp.oSkill = 1.0 + oSkill;
-        LogSimplix.debug("\n#>>>Skilling: Skill %g oSkillGlobal %g oSkillDriver %g oLookAhead %g oLookAheadFactor %g effSkill:%g\n\n",
+        LogSimplix.info("\n#>>>Skilling: Skill %g oSkillGlobal %g oSkillDriver %g oLookAhead %g oLookAheadFactor %g effSkill:%g\n\n",
                          oSkill,oSkillGlobal,oSkillDriver,oLookAhead,oLookAheadFactor,Param.Tmp.oSkill);
     }
     // ... Adjust skilling
@@ -4951,9 +4951,10 @@ void TDriver::CalcSkilling_simplix()
 //--------------------------------------------------------------------------*
 void TDriver::CalcSkilling_simplix_LS1()
 {
-    oSkillGlobal = oSkillGlobal/10.0;
-    oSkillDriver = oSkillDriver/3.0;
-    oSkill = oSkillScale * (oSkillGlobal + oSkillDriver) + oSkillOffset;
+    oSkillScale = oSkillScale/50.0;
+    oSkillDriver = oSkillDriver / ((50.0 - oSkillGlobal)/40.0);
+    oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2)
+            * (1.0 + oSkillDriver) + oSkillOffset;
 }
 //==========================================================================*
 

@@ -8,7 +8,7 @@
 // File         : unitmain.cpp
 // Created      : 2008.01.27
 // Last changed : 2014.11.29
-// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
+// Copyright    : ï¿½ 2007-2014 Wolf-Dieter Beelitz
 // eMail        : wdbee@users.sourceforge.net
 // Version      : 4.05.000
 //--------------------------------------------------------------------------*
@@ -71,9 +71,9 @@
 // Checks and handles pitsharing state enabled/disabled for endurance races.
 //
 // Eigenschaften des erweiterten TORCS Interfaces:
-// Die Initialisierung wird nur einmal ausgeführt, siehe dazu
+// Die Initialisierung wird nur einmal ausgefï¿½hrt, siehe dazu
 // "simplix(tModInfo *ModInfo)"
-// Die DLL gibt die Namen der Fahrer immer so an TORCS zurück, wie sie in
+// Die DLL gibt die Namen der Fahrer immer so an TORCS zurï¿½ck, wie sie in
 // der XML-Datei des Teams angegeben sind!
 // Wertet den Pitsharing-Status aus und handelt danach bei Endurance Rennen
 //--------------------------------------------------------------------------*
@@ -84,17 +84,17 @@
 //
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
-// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
+// Wer die Dateien verwendet erkennt an, dass fï¿½r Fehler, Schï¿½den,
+// Folgefehler oder Folgeschï¿½den keine Haftung ï¿½bernommen wird.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
 //
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// Im ï¿½brigen gilt fï¿½r die Nutzung und/oder Weitergabe die
 // GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
+// Version 2 oder nach eigener Wahl eine spï¿½tere Version.
 //--------------------------------------------------------------------------*
 
 #include <tgf.h>
@@ -113,8 +113,8 @@
 //==========================================================================*
 // Prototypes of routines(functions/procedures), provided
 // for communication with TORCS using the traditional Interface
-// Prototypen der Routinen(Funktionen/Prozeduren), die wir für die
-// Kommunikation mit TORCS über das traditionale Interface bereitstellen
+// Prototypen der Routinen(Funktionen/Prozeduren), die wir fï¿½r die
+// Kommunikation mit TORCS ï¿½ber das traditionale Interface bereitstellen
 //--------------------------------------------------------------------------*
 static void InitTrack
   (int index,
@@ -412,7 +412,7 @@ void SetUpSimplix_ls1()
     SetParameters(NBBOTS, "ls1-archer-r9");
     TDriver::AdvancedParameters = true;
     //TDriver::UseBrakeLimit = true;
-    TDriver::UseBrakeLimit = false;
+    TDriver::UseBrakeLimit = true;
     TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
     TDriver::UseRacinglineParameters = true;
 };
@@ -652,7 +652,7 @@ extern "C" int moduleWelcome
 // Tells TORCS, who we are, how we want to be called and
 // what we are able to do.
 // Teilt TORCS mit, wer wir sind, wie wir angesprochen werden wollen und
-// was wir können.
+// was wir kï¿½nnen.
 //--------------------------------------------------------------------------*
 extern "C" int moduleInitialize(tModInfo *ModInfo)
 {
@@ -772,11 +772,11 @@ extern "C" int simplixShut()
 // After clarification of the general calling (calling this func.),
 // we tell TORCS our functions to provide the requested services:
 //
-// Nach Klärung der generellen Ansprache (Aufruf dieser Fkt), teilen wir
+// Nach Klï¿½rung der generellen Ansprache (Aufruf dieser Fkt), teilen wir
 // TORCS nun noch mit, mit welchen Funktionen wir die angeforderten
 // Leistungen erbringen werden:
 //
-// Die geforderten Leistungen müssen erbracht werden ...
+// Die geforderten Leistungen mï¿½ssen erbracht werden ...
 // RbNewTrack: ... wenn Torcs eine neue Rennstrecke bereitstellt
 // RbNewRace:  ... wenn Torcs ein neues Rennen startet
 // RbDrive:    ... wenn das Rennen gefahren wird
@@ -1029,7 +1029,7 @@ static void NewRace(int Index, tCarElt* Car, tSituation *S)
 // Therefore we don't throw debug messages here!
 // To find basic bugs, it may be usefull to do it anyhow!
 
-// Achtung: Diese Prozedur wird sehr häufig und schnell nacheinander
+// Achtung: Diese Prozedur wird sehr hï¿½ufig und schnell nacheinander
 // aufgerufen. Deshalb geben wir hier in der Regel keine Debug-Texte aus!
 // Zur Fehlersuche kann das aber mal sinnvoll sein.
 //--------------------------------------------------------------------------*
@@ -1106,7 +1106,7 @@ static void EndRace(int Index, tCarElt *Car, tSituation *S)
 
 //==========================================================================*
 // TORCS: Cleanup
-// TOCRS: Aufräumen
+// TOCRS: Aufrï¿½umen
 //--------------------------------------------------------------------------*
 static void Shutdown(int Index)
 {
