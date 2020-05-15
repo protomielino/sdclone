@@ -636,7 +636,7 @@ void TTrackDescription::InitTrack
 		else
 		{
 		  // Wall of some sort
-		  ExtraW = (PSide->style == TR_WALL) ? -1.0 : 0.0;
+		  ExtraW = (PSide->style == TR_WALL) ? -0.5 : 0.0;
 		  Done = true;
 		}
 
