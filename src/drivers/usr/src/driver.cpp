@@ -42,6 +42,7 @@
 
 Driver::Driver(int index) :
     INDEX(index),
+    driver_aggression(0.0),
     mFrontCollMargin(6.0),
     mOvtMargin(2.0)
 {
@@ -171,7 +172,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, con
 
     //load the driver skill level, range 0 - 1
     SkillDriver = 0.0f;
-    snprintf(buffer, sizeof(buffer), "drivers/%s/%d/skill.xml", mDriverName, INDEX);
+    snprintf(buffer, sizeof(buffer), "%sdrivers/%s/%d/skill.xml", GetDataDir(), mDriverName, INDEX);
     LogUSR.info("Path skill driver: %s\n", buffer);
     skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
 
@@ -186,6 +187,8 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, con
 
         LogUSR.info(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.3f\n", SkillGlobal, SkillDriver, driver_aggression);
     }
+    else
+        LogUSR.info("Couldn't load : %s\n", buffer);
 }
 
 void Driver::NewRace(tCarElt* car, const tSituation* situation)
