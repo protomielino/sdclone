@@ -48,7 +48,7 @@ void MuFactors::read(const std::string& datadir, const std::string& trackname)
         mSect.push_back(sect);
         mMinMuFactor = 1.0;
         printMuFactors();
-        std::cout << "readMuFactors(): no data file found, using default factor" << std::endl;
+        std::cout << "readMuFactors(): data file " << datFile << " not found, using default factor" << std::endl;
     }
 }
 

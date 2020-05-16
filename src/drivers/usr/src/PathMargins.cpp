@@ -45,7 +45,7 @@ void PathMargins::read(const std::string &datafile)
         sect.left = 1.2;
         sect.right = 1.2;
         mPathMargin.push_back(sect);
-        std::cout << "readPathMargins(): no data file found, using default margins" << std::endl;
+        std::cout << "readPathMargins(): data file " << datafile << " not found, using default margins" << std::endl;
     }
 }
 
