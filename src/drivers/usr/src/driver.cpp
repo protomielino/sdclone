@@ -182,7 +182,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, con
         driver_aggression = (double)GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
         LogUSR.info( "# driver skill: %.2f - driver agression: %.3f\n", SkillDriver, driver_aggression);
         SkillDriver = MAX(0.95, 1.0 - 0.05 * SkillDriver);
-        driver_aggression /= driver_aggression;
+        //driver_aggression /= driver_aggression;
         driver_aggression = MIN(1.0, MAX(0.7, 0.99 + driver_aggression));
 
         LogUSR.info(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.3f\n", SkillGlobal, SkillDriver, driver_aggression);
