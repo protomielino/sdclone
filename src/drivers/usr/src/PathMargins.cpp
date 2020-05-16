@@ -18,7 +18,10 @@
 #include "PathMargins.h"
 
 #include <fstream>
-#include <iostream>
+#include <tgf.h>
+
+extern GfLogger* PLogUSR;
+#define LogUSR (*PLogUSR)
 
 PathMargins::PathMargins()
 {
@@ -45,7 +48,7 @@ void PathMargins::read(const std::string &datafile)
         sect.left = 1.2;
         sect.right = 1.2;
         mPathMargin.push_back(sect);
-        std::cout << "readPathMargins(): data file " << datafile << " not found, using default margins" << std::endl;
+        LogUSR.info("Couldn't load : %s, using default margins\n", datafile.c_str());
     }
 }
 

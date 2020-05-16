@@ -19,6 +19,10 @@
 
 #include <fstream>
 #include <iostream>
+#include <tgf.h>
+
+extern GfLogger* PLogUSR;
+#define LogUSR (*PLogUSR)
 
 MuFactors::MuFactors()
 {
@@ -48,7 +52,7 @@ void MuFactors::read(const std::string& datadir, const std::string& trackname)
         mSect.push_back(sect);
         mMinMuFactor = 1.0;
         printMuFactors();
-        std::cout << "readMuFactors(): data file " << datFile << " not found, using default factor" << std::endl;
+        LogUSR.info("Couldn't load : %s, using default factor\n", datFile.c_str());
     }
 }
 

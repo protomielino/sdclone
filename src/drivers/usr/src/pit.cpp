@@ -27,6 +27,7 @@ Pit::Pit() :
     mTeamCar(NULL),
     mPit(NULL),
     mPitInfo(NULL),
+    mTiresChangeTime(30.0),
     mMaxDamage(7000.0),
     mMaxDamageDist(30000.0),
     mPreEntryMargin(100.0)
@@ -39,7 +40,11 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
     void* handle = NULL;
     std::string tmpstr = std::string(GetLocalDir()) + "config/raceman/endrace.xml";
     handle = GfParmReadFile(tmpstr.c_str(), GFPARM_RMODE_STD);
-    mTiresChangeTime = GfParmGetNum(handle, "Race", "all tires change time", (char*)NULL, 30.0);
+    if (handle)
+    {
+        mTiresChangeTime = GfParmGetNum(handle, "Race", "all tires change time", (char*)NULL, 30.0);
+        GfParmReleaseHandle(handle);
+    }
 
     if (pitdamage)
     {
