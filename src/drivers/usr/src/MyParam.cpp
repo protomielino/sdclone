@@ -40,12 +40,12 @@ MyParam::MyParam(void** carparmhandle, const std::string& datadir, const std::st
 
         if (*carparmhandle == NULL)
         {
+            LogUSR.info("Couldn't load : %s\n", trackfile.c_str());
             *carparmhandle = GfParmReadFile(defaultfile.c_str(), GFPARM_RMODE_STD);
-            LogUSR.info("Couldn't load : %s", trackfile.c_str());
         }
 
-		if (*carparmhandle == NULL)
-			LogUSR.fatal("Couldn't load : %s", defaultfile.c_str());
+        if (*carparmhandle == NULL)
+            LogUSR.fatal("Couldn't load : %s\n", defaultfile.c_str());
     }
     else
     {
@@ -63,18 +63,18 @@ MyParam::MyParam(void** carparmhandle, const std::string& datadir, const std::st
 
         if (*carparmhandle == NULL)
         {
+            LogUSR.info("Couldn't load : %s\n", trackfilerain.c_str());
             *carparmhandle = GfParmReadFile(defaultfilerain.c_str(), GFPARM_RMODE_STD);
-			LogUSR.info("Couldn't load : %s\n", trackfilerain.c_str());
         }
 
         if (*carparmhandle == NULL)
         {
-            *carparmhandle = GfParmReadFile(defaultfile.c_str(), GFPARM_RMODE_STD);
             LogUSR.info("Couldn't load : %s\n", defaultfilerain.c_str());
+            *carparmhandle = GfParmReadFile(defaultfile.c_str(), GFPARM_RMODE_STD);
         }
 
-		if (*carparmhandle == NULL)
-			LogUSR.fatal("Couldn't load : %s", defaultfile.c_str());
+        if (*carparmhandle == NULL)
+            LogUSR.fatal("Couldn't load : %s\n", defaultfile.c_str());
     }
 
     mCarParmHandle = *carparmhandle;
