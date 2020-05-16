@@ -18,7 +18,6 @@
 #include "MuFactors.h"
 
 #include <fstream>
-#include <iostream>
 #include <tgf.h>
 
 extern GfLogger* PLogUSR;
@@ -98,10 +97,10 @@ double MuFactors::calcMinMuFactor() const
 
 void MuFactors::printMuFactors() const
 {
-    std::cout << "Mu factors:" << std::endl;
+    LogUSR.info("Mu factors:\n");
 
-    for (int i = 0; i < (int)mSect.size(); i++)
+    for (size_t i = 0; i < mSect.size(); i++)
     {
-        std::cout << "fs " << mSect[i].fromstart << " factor " << mSect[i].mufactor << std::endl;
+        LogUSR.info("fs %f factor %f\n", mSect[i].fromstart, mSect[i].mufactor);
     }
 }
