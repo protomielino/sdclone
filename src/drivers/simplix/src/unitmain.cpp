@@ -398,7 +398,7 @@ void SetUpSimplix_36GP()
     SetParameters(NBBOTS, "36GP-alfa12c");
     TDriver::AdvancedParameters = true;
     //TDriver::UseBrakeLimit = true;
-    //TDriver::UseGPBrakeLimit = true;
+	TDriver::UseSCSkilling = true;
     TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
 };
 //==========================================================================*

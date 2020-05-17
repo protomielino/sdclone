@@ -4933,9 +4933,10 @@ double TDriver::CalcFriction_simplix_REF(const double Crv)
 //--------------------------------------------------------------------------*
 void TDriver::CalcSkilling_simplix()
 {
-    oSkillGlobal = oSkillGlobal/10.0;
-    oSkillDriver = oSkillDriver/3.0;
-    oSkill = oSkillScale * (oSkillGlobal + oSkillDriver) + oSkillOffset;
+	oSkillScale = oSkillScale / 50.0;
+	oSkillDriver = oSkillDriver / ((50.0 - oSkillGlobal) / 40.0);
+	oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2)
+		* (1.0 + oSkillDriver) + oSkillOffset;
     /*
     oSkillScale = oSkillScale/50.0;
     oSkillDriver = oSkillDriver / (5.0 * ((50.0 - oSkillGlobal)/40.0));
