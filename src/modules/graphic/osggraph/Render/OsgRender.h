@@ -78,6 +78,7 @@ private:
     float SDMoonDeclination;
     float SDMax_Visibility;
     double SDVisibility;
+	unsigned int SDRain;
     unsigned ShadowIndex;
     unsigned TexSizeIndex;
     unsigned QualityIndex;

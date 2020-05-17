@@ -107,8 +107,9 @@ SDRender::SDRender(void) :
 
     SDSunDeclination = 0.0f;
     SDMoonDeclination = 0.0f;
-    SDMax_Visibility = 12000.0f;
-    SDVisibility = 0.0f;
+    SDMax_Visibility = 20000.0f;
+    SDVisibility = 20000.0f;
+	SDRain = 0;
     NStars = 0;
     NPlanets = 0;
     sol_angle = 0.0;
@@ -364,7 +365,7 @@ void SDRender::Init(tTrack *track)
 
     osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;
 
-    if (SDVisibility < 2000)
+    if (SDRain > 0)
     {
         sceneGroup->addChild(precipitationEffect.get());
     }
@@ -412,7 +413,8 @@ void SDRender::Init(tTrack *track)
     stateSet = new osg::StateSet;
     stateSet = m_scene->getOrCreateStateSet();
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
-    if (SDVisibility < 2000)
+
+    if (SDRain > 0)
         stateSet->setAttributeAndModes(precipitationEffect->getFog());
 
     float emis = 0.5f * sky_brightness;
@@ -854,9 +856,7 @@ void SDRender::weather(void)
     cloudsTextureIndex2 = SDTrack->local.clouds2;
     cloudsTextureIndex3 = SDTrack->local.clouds3;
 
-    unsigned int SDRain = 0;
-
-    switch (SDTrack->local.rain)
+	switch (SDTrack->local.rain)
     {
     case TR_RAIN_NONE:
         SDVisibility = SDTrack->local.visibility;
