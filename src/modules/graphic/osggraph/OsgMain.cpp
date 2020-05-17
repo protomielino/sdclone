@@ -31,6 +31,7 @@
 #include "OsgMain.h"
 //#include "OsgOptions.h"
 #include "OsgCar.h"
+#include "OsgCarLight.h"
 #include "OsgScenery.h"
 #include "OsgRender.h"
 #include "OsgMath.h"
@@ -41,6 +42,7 @@
 //extern	osg::Timer_t m_start_tick;
 
 //SDOptions *Options = 0;
+SDCarLights *carLights = 0;
 SDCars *cars = 0;
 SDScenery *scenery = 0;
 SDRender *render = 0;
@@ -67,6 +69,11 @@ void *getRender()
 void * getCars()
 {
     return cars;
+}
+
+void * getCarLights()
+{
+    return carLights;
 }
 
 void * getScenery()
@@ -248,7 +255,12 @@ void shutdownCars(void)
         GfLogInfo("Delete cars in OsgMain\n");
     }
 
-
+    if (carLights)
+    {
+        delete carLights;
+        carLights = NULL;
+        GfLogInfo("Delete carLights in OsgMain\n");
+    }
 
     // Trace final mean F/s.
     if (nFPSTotalSeconds > 0)
@@ -280,9 +292,11 @@ int  initCars(tSituation *s)
 {
     GfLogInfo("InitCars\n");
     char buf[1024];
+    carLights = new SDCarLights;
     cars = new SDCars;
+    carLights->loadStates();
     cars->loadCars(s, scenery->getSpeedWay(), scenery->getSpeedWayLong());
-    render->addCars(cars->getCarsNode());
+    render->addCars(cars->getCarsNode(), carLights->getLightsRoot());
     GfLogInfo("All cars loaded\n");
 
     screens->InitCars(s);

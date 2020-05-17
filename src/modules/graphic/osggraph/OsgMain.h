@@ -75,6 +75,7 @@ public:
 
 void * getScreens();
 void * getRender();
+void * getCarLights();
 void * getCars();
 void * getScenery();
 

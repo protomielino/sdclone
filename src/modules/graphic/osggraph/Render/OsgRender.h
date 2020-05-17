@@ -37,6 +37,7 @@ private:
     osg::ref_ptr<osg::Group> m_RealRoot;
     osg::ref_ptr<osg::Group> m_scene;
     osg::ref_ptr<osg::Group> m_CarRoot;
+    osg::ref_ptr<osg::Group> m_CarLightsRoot;
     osg::ref_ptr<osg::Group> skyGroup;
 
     osg::ref_ptr<osg::StateSet> stateSet;
@@ -78,7 +79,7 @@ private:
     float SDMoonDeclination;
     float SDMax_Visibility;
     double SDVisibility;
-	unsigned int SDRain;
+    unsigned int SDRain;
     unsigned ShadowIndex;
     unsigned TexSizeIndex;
     unsigned QualityIndex;
@@ -105,7 +106,7 @@ public:
     osg::Vec4f getSceneColor(void);
     void UpdateTime(tSituation *s);
     void UpdateLight(void);
-    void addCars(osg::Node* cars);
+    void addCars(osg::Node* cars, osg::Node* carLights);
     void UpdateFogColor(double angle);
     void UpdateSky(double currentTime, double accelTime, double X, double Y);
     void ShadowedScene(void);
@@ -117,6 +118,7 @@ public:
     osg::ref_ptr<osg::Group> getRoot() { return m_RealRoot.get(); }
     osg::ref_ptr<osg::Group> getSceneRoot() { return m_scene.get(); }
     osg::ref_ptr<osg::Group> getCarRoot() { return m_CarRoot.get(); }
+    osg::ref_ptr<osg::Group> getCarLightsRoot() { return m_CarLightsRoot.get(); }
     osg::Vec3f getFogColor() { return FogColor; }
 };
 

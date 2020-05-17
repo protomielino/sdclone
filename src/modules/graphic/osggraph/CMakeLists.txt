@@ -1,11 +1,12 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
 SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
-					 Utils/OsgAtomic.h
+                     Utils/OsgAtomic.h
                      Utils/OsgColor.h
                      Utils/OsgMath.h
                      Utils/OsgNodeMask.h
-					 #Utils/OsgOptions.h
+                     Utils/OsgLightTransform.h
+                     #Utils/OsgOptions.h
 
                      Sky/OsgSphere.h
                      Sky/OsgSun.h
@@ -20,18 +21,19 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Loader/ReaderWriterACC.h
                      Loader/OsgLoader.h
 
-					 Scenery/OsgScenery.h
+                     Scenery/OsgScenery.h
 
                      Render/OsgRender.h
                      Render/OsgReflectionMapping.h
                      Render/OsgShader.h
-					 Viewer/OsgView.h  	
+                     Viewer/OsgView.h  	
                      Viewer/OsgScreens.h 
                      Viewer/OsgCamera.h
-					 Viewer/OsgHUD.h
+                     Viewer/OsgHUD.h
                      Viewer/OsgDebugHUD.h
 
                      Car/OsgCar.h
+                     Car/OsgCarLight.h
                      Car/OsgWheel.h
                      Car/OsgBrake.h
 
@@ -44,7 +46,8 @@ IF(OPTION_SDL2)
 ENDIF(OPTION_SDL2)
 
 SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
-					 #Utils/OsgOptions.cpp
+                     Utils/OsgLightTransform.cpp
+                     #Utils/OsgOptions.cpp
 
                      Sky/OsgSphere.cpp
                      Sky/OsgSun.cpp
@@ -61,19 +64,20 @@ SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
 
                      Scenery/OsgBackground.cpp
                      Scenery/OsgPit.cpp
-					 Scenery/OsgTrackLight.cpp
+                     Scenery/OsgTrackLight.cpp
                      Scenery/OsgScenery.cpp 
 
                      Render/OsgRender.cpp
                      Render/OsgReflectionMapping.cpp
                      Render/OsgShader.cpp
-					 Viewer/OsgView.cpp 
+                     Viewer/OsgView.cpp 
                      Viewer/OsgScreens.cpp
                      Viewer/OsgCamera.cpp
-					 Viewer/OsgHUD.cpp
+                     Viewer/OsgHUD.cpp
                      Viewer/OsgDebugHUD.cpp
 
                      Car/OsgCar.cpp
+                     Car/OsgCarLight.cpp
                      Car/OsgWheel.cpp
                      Car/OsgBrake.cpp
 

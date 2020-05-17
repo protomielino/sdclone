@@ -29,6 +29,8 @@
 
 #include "OsgDriver.h"
 #include "OsgWheel.h"
+#include "OsgCarLight.h"
+
 
 class SDCarShader;
 class SDReflectionMapping;
@@ -38,6 +40,7 @@ class SDCar
 {
 private :
     osg::ref_ptr<osg::MatrixTransform> car_branch;
+    osg::ref_ptr<osg::MatrixTransform> lights_branch;
     osg::ref_ptr<osg::Group> car_shaded_body;
     osg::ref_ptr<osg::Group> car_root;
     osg::ref_ptr<osg::Switch> pLight;
@@ -49,6 +52,8 @@ private :
     //osg::ref_ptr<osg::Geometry> quad;
     //osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
 
+    std::vector<SDCarLight> lights;
+    
     tCarElt     *car;
 
     SDWheels    wheels;
@@ -58,6 +63,8 @@ private :
     int reflectionMappingMethod;
     void setReflectionMap(osg::ref_ptr<osg::Texture> map);
 
+    void loadCarLights(tCarElt *Car);
+    
 public :
     SDCar(void);
     ~SDCar(void);
@@ -77,7 +84,8 @@ public :
 
     int getReflectionMappingMethod();
 
-    tCarElt *getCar();
+    tCarElt *getCar() { return car; }
+    const tCarElt *getCar() const { return car; }
 
     void markCarCurrent(tCarElt *Car);
     void updateCar();

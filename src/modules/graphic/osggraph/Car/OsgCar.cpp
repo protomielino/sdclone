@@ -74,6 +74,9 @@ SDCar::SDCar(void) :
 
 SDCar::~SDCar(void)
 {
+    if (lights_branch)
+        ((SDCarLights*)getCarLights())->getLightsRoot()->removeChild(lights_branch);
+
     if(car_root != NULL)
     {
         car_root->removeChildren(0, car_root->getNumChildren());
@@ -82,6 +85,63 @@ SDCar::~SDCar(void)
 
     delete shader;
     delete reflectionMapping;
+}
+
+void SDCar::loadCarLights(tCarElt *Car)
+{
+    SDCarLights *carLights = (SDCarLights*)getCarLights();
+    
+    if (lights_branch)
+        carLights->getLightsRoot()->removeChild(lights_branch);
+    lights_branch = new osg::MatrixTransform;
+    
+    char path[1024] = {};
+    void *handle = Car->_carHandle;
+    snprintf(path, 1023, "%s/%s", SECT_GROBJECTS, SECT_LIGHT);
+    int lightNum = GfParmGetEltNb(handle, path);
+    for (int i = 0; i < lightNum; i++) {
+        snprintf(path, 1023, "%s/%s/%d", SECT_GROBJECTS, SECT_LIGHT, i + 1);
+        
+        osg::Vec3d position;
+        position[0] = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0);
+        position[1] = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0);
+        position[2] = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0);
+
+        osg::Vec3d normal;
+        normal[0] = position[0] > 0 ? 1 : -1;
+        
+        const char *typeName = GfParmGetStr(handle, path, PRM_TYPE, "");
+        CarLightType type = CAR_LIGHT_TYPE_NONE;
+        if (!strcmp(typeName, VAL_LIGHT_HEAD1)) {
+            type = CAR_LIGHT_TYPE_FRONT;
+        } else
+        if (!strcmp(typeName, VAL_LIGHT_HEAD2)) {
+            type = CAR_LIGHT_TYPE_FRONT2;
+        } else
+        if (!strcmp(typeName, VAL_LIGHT_BRAKE)) {
+            type = CAR_LIGHT_TYPE_BRAKE;
+        } else
+        if (!strcmp(typeName, VAL_LIGHT_BRAKE2)) {
+            type = CAR_LIGHT_TYPE_BRAKE2;
+        } else
+        if (!strcmp(typeName, VAL_LIGHT_REAR)) {
+            type = CAR_LIGHT_TYPE_REAR;
+        } else
+        if (!strcmp(typeName, VAL_LIGHT_REVERSE)) {
+            type = CAR_LIGHT_TYPE_REVERSE;
+        }
+        
+        double size = GfParmGetNum(handle, path, PRM_SIZE, NULL, 0.2);
+        
+        osg::ref_ptr<osg::StateSet> state_set = carLights->getStateSet(type);
+        
+        SDCarLight light;
+        lights_branch->addChild( light.init(type, state_set, position, normal, size, 4) );
+        lights.push_back(light);
+    }
+
+    lights_branch->setMatrix( car_branch->getMatrix() );
+    carLights->getLightsRoot()->addChild(lights_branch);
 }
 
 osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat, int carshader)
@@ -665,6 +725,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     this->reflectionMapping = new SDReflectionMapping(this);
     this->setReflectionMap(this->reflectionMapping->getReflectionMap());
 
+    loadCarLights(Car);
+    
     return this->car_root;
 }
 
@@ -680,11 +742,6 @@ SDReflectionMapping *SDCar::getReflectionMap()
 int SDCar::getReflectionMappingMethod()
 {
     return this->reflectionMappingMethod;
-}
-
-tCarElt *SDCar::getCar()
-{
-    return car;
 }
 
 /*#define GR_SHADOW_POINTS 6
@@ -775,11 +832,13 @@ void SDCar::markCarCurrent(tCarElt *Car)
     if(this->car == Car)
     {
         car_branch->setNodeMask(NODE_MASK_CURCAR);
+        lights_branch->setNodeMask(NODE_MASK_CURCAR);
         pDriver->setNodeMask(NODE_MASK_CURDRV);
     }
     else 
     {
         car_branch->setNodeMask(NODE_MASK_ALL);
+        lights_branch->setNodeMask(NODE_MASK_ALL);
         pDriver->setNodeMask(NODE_MASK_ALL);
     }
 }
@@ -855,6 +914,9 @@ void SDCar::updateCar()
         movt->addChild(pSteer);
     }
 
+    for(std::vector<SDCarLight>::iterator i = lights.begin(); i != lights.end(); ++i)
+        i->update(*this);
+    
     if(_light)
     {
         if(car->_lightCmd)
@@ -874,6 +936,7 @@ void SDCar::updateCar()
     wheels.updateWheels();
 
     this->car_branch->setMatrix(mat);
+    this->lights_branch->setMatrix(mat);
 
     if(_carShader > 2)
         reflectionMapping->update();
