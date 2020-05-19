@@ -19,11 +19,16 @@
 #include <windows.h>
 #endif
 
+#include <tgf.h>
 #include <robot.h>  // ROB_IDENT
+
 #include <string>
 #include <vector>
 #include <utility>
 #include "driver.h"
+
+// The "DANDROID" logger instance
+GfLogger* PLogDANDROID = 0;
 
 using ::std::string;
 using ::std::vector;
@@ -70,21 +75,18 @@ static int indexOffset = 0;
 // in the robot's xml-file between others, not only at the end of the list
 const char *sUndefined = "undefined";
 
-
-
 ////////////////////////////////
 // Utility
 ////////////////////////////////
-#ifdef DANDROID_SPEEDDREAMS
 
 // Set robots's name and xml file pathname
-static void setRobotName(const string &name) {
+static void setRobotName(const string &name)
+{
   char buffer[BUFSIZE];
-  snprintf(buffer, BUFSIZE, "drivers/%s/%s.xml", name.c_str(), name.c_str());      
+  snprintf(buffer, BUFSIZE, "drivers/%s/%s.xml", name.c_str(), name.c_str());
   nameBuffer = name;
   pathBuffer = buffer;
 }
-
 
 ////////////////////////////////////////////////////////////////
 // SD Interface (new, fixed name scheme, from Andrew's USR code)
@@ -94,18 +96,22 @@ static void setRobotName(const string &name) {
 // Extended for use with schismatic robots
 
 extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
-                              tModWelcomeOut* welcomeOut) {
+                              tModWelcomeOut* welcomeOut)
+{
   // Save module name and loadDir, and determine module XML file pathname.
   setRobotName(welcomeIn->name);
 
   // Filehandle for robot's xml-file
   void *pRobotSettings = GfParmReadFile(pathBuffer.c_str(), GFPARM_RMODE_STD);
 
-  if (pRobotSettings) {  // robot settings XML could be read
+  PLogDANDROID = GfLogger::instance("DANDROID");
+
+  if (pRobotSettings) // robot settings XML could be read
+  {
     NBBOTS = 0;
 
     char SectionBuffer[BUFSIZE];
-    snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);      
+    snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
 
     // Try to get first driver from index 0
     const string sDriverName = GfParmGetStrNC(pRobotSettings,
@@ -126,7 +132,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
     // save defined driver names and descriptions.
     Drivers.clear();
     for (int i = indexOffset; i < MAXNBBOTS + indexOffset; ++i) {
-      snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i);      
+      snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i);
 
       string sDriverName = GfParmGetStr(pRobotSettings, SectionBuffer,
                                           ROB_ATTR_NAME, sUndefined);
@@ -151,11 +157,10 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
 
   return 0;
 }
-#endif
-
 
 // Module entry point (new fixed name scheme).
-extern "C" int moduleInitialize(tModInfo *modInfo) {
+extern "C" int moduleInitialize(tModInfo *modInfo)
+{
   // Clear all structures.
   memset(modInfo, 0, NBBOTS * sizeof(tModInfo));
   for (int i = 0; i < NBBOTS; i++) {
@@ -199,7 +204,7 @@ extern "C" int dandroid(tModInfo *modInfo) {
   if (pRobotSettings) {  // Let's look what we have to provide here
     char SectionBuffer[BUFSIZE];
     for (int i = 0; i < NBBOTS; i++) {
-      snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i);      
+      snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i);
       string sDriverName = GfParmGetStr(pRobotSettings, SectionBuffer, ROB_ATTR_NAME, defaultBotName[i].c_str());
       string sDriverDesc = GfParmGetStr(pRobotSettings, SectionBuffer, ROB_ATTR_DESC, defaultBotDesc[i].c_str());
       Drivers.push_back(make_pair(sDriverName, sDriverDesc));
@@ -224,7 +229,7 @@ static int InitFuncPt(int index, void *pt) {
   // Create robot instance for index.
   driver[index] = new TDriver(index);
   driver[index]->MyBotName = nameBuffer.c_str();
-  
+
   itf->rbNewTrack = initTrack;    // Give the robot the track view called.
   itf->rbNewRace  = newRace;      // Start a new race.
   itf->rbDrive    = drive;        // Drive during race.

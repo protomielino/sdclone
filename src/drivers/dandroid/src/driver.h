@@ -27,8 +27,12 @@
 #include "danpath.h"
 #include "pidcontroller.h"
 
+// The "DANDROID" logger instance.
+extern GfLogger* PLogDANDROID;
+#define LogDANDROID (*PLogDANDROID)
 
-class PathInfo {
+class PathInfo
+{
   public:
   DanPoint carpos;
   DanPoint tarpos;
@@ -37,12 +41,13 @@ class PathInfo {
 };
 
 
-class TDriver {
+class TDriver
+{
   public:
   TDriver(int index);
   ~TDriver();
 
-  const char* MyBotName;                      // Name of this bot 
+  const char* MyBotName;                      // Name of this bot
 
   void InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarParmHandle, PSituation Situation);
   void NewRace(PtCarElt Car, PSituation Situation);
@@ -72,7 +77,7 @@ class TDriver {
   double getBrake(double maxspeed);
   double getAccel(double maxspeed);
   double getSteer();
-  int getGear();
+  int    getGear();
   double getClutch();
   bool stateStuck();
   bool stateOfftrack();
@@ -150,13 +155,13 @@ class TDriver {
   tSituation* oSituation;
   tCarElt* oCar;        // pointer to tCarElt struct
   double oCurrSimTime;
-  
+
   PTrack mTrack;
   int mCarIndex;
   std::string mCarType;
-  
+
   DanPath mDanPath;
-  
+
   Opponents mOpponents;  // the container for opponents
   Opponent* mOpp;         // relevant opponent for calculations
   Opponent* mOppNear;
