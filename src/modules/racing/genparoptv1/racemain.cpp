@@ -1109,7 +1109,7 @@ ReImportGeneticParameters()
 	void* MetaDataFile = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
 	if (!MetaDataFile)
 	{
-		assert( 0 );
+		ReLogOptim.fatal("Couldn't load : %s\n", buf); 
 	}
 
 	// Read table of content of meta data file
