@@ -1349,14 +1349,28 @@ void TDriver::InitTrack
     // Default params for car type (e.g. .../ROBOT_DIR/sc-petrol/default.xml)
     snprintf(Buf,sizeof(Buf),"%s/%s/default.xml",
              BaseParamPath,oCarType);
-    LogSimplix.info("#Default params for car type: %s\n", Buf);
-    Handle = TUtils::MergeParamFile(Handle,Buf);
+    if (GfFileExists(Buf))
+    {
+        LogSimplix.info("#Default params for car type: %s\n", Buf);
+        Handle = TUtils::MergeParamFile(Handle,Buf);
+    }
+    else
+    {
+        LogSimplix.info("#No default params for car type: %s\n", Buf);
+    }
 
     // Override params for track (Pitting)
     snprintf(Buf,sizeof(Buf),"%s/tracks/%s.xml",
              BaseParamPath,oTrackName);
-    LogSimplix.info("#Override params for track (Pitting): %s\n", Buf);
-    Handle = TUtils::MergeParamFile(Handle,Buf);
+    if (GfFileExists(Buf))
+    {
+        LogSimplix.info("#Override params for track (Pitting): %s\n", Buf);
+        Handle = TUtils::MergeParamFile(Handle,Buf);
+    }
+    else
+    {
+        LogSimplix.info("#No override params for track (Pitting): %s\n", Buf);
+    }
 
     double ScaleBrake = 1.0;
     double ScaleMu = 1.0;
@@ -1374,20 +1388,41 @@ void TDriver::InitTrack
     // Override params for car type with params of track
     snprintf(Buf,sizeof(Buf),"%s/%s/%s.xml",
              BaseParamPath,oCarType,oTrackName);
-    LogSimplix.info("#Override params for car type with params of track: %s\n", Buf);
-    Handle = TUtils::MergeParamFile(Handle,Buf);
+    if (GfFileExists(Buf))
+    {
+        LogSimplix.info("#Override params for car type with params of track: %s\n", Buf);
+        Handle = TUtils::MergeParamFile(Handle,Buf);
+    }
+    else
+    {
+        LogSimplix.info("#No override params for car type with params of track: %s\n", Buf);
+    }
 
     // Override params for car type with params of track and weather
     snprintf(Buf,sizeof(Buf),"%s/%s/%s-%d.xml",
              BaseParamPath,oCarType,oTrackName,oWeatherCode);
-    LogSimplix.info("#Override params for car type with params of track and weather: %s\n", Buf);
-    Handle = TUtils::MergeParamFile(Handle,Buf);
+    if (GfFileExists(Buf))
+    {
+        LogSimplix.info("#Override params for car type with params of track and weather: %s\n", Buf);
+        Handle = TUtils::MergeParamFile(Handle,Buf);
+    }
+    else
+    {
+        LogSimplix.info("#No override params for car type with params of track and weather: %s\n", Buf);
+    }
 
     // Override params for car type on track with params of specific race type
     snprintf(Buf,sizeof(Buf),"%s/%s/%s-%s.xml",
              BaseParamPath,oCarType,oTrackName,RaceType[oSituation->_raceType]);
-    LogSimplix.info("#Override params for car type on track with params of specific race type: %s\n", Buf);
-    Handle = TUtils::MergeParamFile(Handle,Buf);
+    if (GfFileExists(Buf))
+    {
+        LogSimplix.info("#Override params for car type on track with params of specific race type: %s\n", Buf);
+        Handle = TUtils::MergeParamFile(Handle,Buf);
+    }
+    else
+    {
+        LogSimplix.info("#No override params for car type on track with params of specific race type: %s\n", Buf);
+    }
 
     // Override params for car type on track with driver on track
     snprintf(Buf,sizeof(Buf),"%s/%d/%s.xml",
@@ -1397,8 +1432,15 @@ void TDriver::InitTrack
     // Override params for driver on track with params of specific race type
     snprintf(Buf,sizeof(Buf),"%s/%d/%s-%s.xml",
              BaseParamPath,oIndex,oTrackName,RaceType[oSituation->_raceType]);
-    LogSimplix.info("#Override params for driver on track with params of specific race type: %s\n", Buf);
-    Handle = TUtils::MergeParamFile(Handle,Buf);
+    if (GfFileExists(Buf))
+    {
+        LogSimplix.info("#Override params for driver on track with params of specific race type: %s\n", Buf);
+        Handle = TUtils::MergeParamFile(Handle,Buf);
+    }
+    else
+    {
+        LogSimplix.info("#No override params for driver on track with params of specific race type: %s\n", Buf);
+    }
 
     // Setup the car param handle to be returned
     *CarSettings = Handle;
