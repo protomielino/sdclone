@@ -26,9 +26,15 @@ void SimAtmosphereConfig(tTrack *track)
     SimRain = track->local.rain;
     SimTimeOfDay = track->local.timeofday;
     SimClouds = track->local.clouds;
-    Tair = track->local.airtemperature + 273.15;
+    Tair = track->local.airtemperature + 273.15f;
     SimAirPressure = track->local.airpressure;
     SimAirDensity = track->local.airdensity;
+
+    if (SimAirPressure == 0.0f)
+        SimAirPressure = 101300.0f;
+
+    if (SimAirDensity == 0.0f)
+        SimAirDensity = 1.290f;
 
     GfLogDebug("SimAirPressure = %3f - SimAirDensity = %3f\n", SimAirPressure, SimAirDensity);
 
