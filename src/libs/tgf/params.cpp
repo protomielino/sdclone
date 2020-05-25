@@ -528,9 +528,9 @@ createParmHeader (const char *file)
     conf = (struct parmHeader *) calloc (1, sizeof (struct parmHeader));
     if (!conf) {
 #if defined(_MSC_VER) && _MSC_VER < 1800
-	GfLogError ("gfParmReadFile: calloc (1, %03Iu) failed\n", sizeof (struct parmHeader));
+	GfLogError ("createParmHeader: calloc (1, %03Iu) failed\n", sizeof (struct parmHeader));
 #else //_MSC_VER
-	GfLogError ("gfParmReadFile: calloc (1, %zu) failed\n", sizeof (struct parmHeader));
+	GfLogError ("createParmHeader: calloc (1, %zu) failed\n", sizeof (struct parmHeader));
 #endif //_MSC_VER
 	return NULL;
     }
@@ -540,9 +540,9 @@ createParmHeader (const char *file)
     conf->rootSection = (struct section *) calloc (1, sizeof (struct section));
     if (!conf->rootSection) {
 #if defined(_MSC_VER) && _MSC_VER < 1800
-	GfLogError ("gfParmReadFile: calloc (1, %03Iu) failed\n", sizeof (struct section));
+	GfLogError ("createParmHeader: calloc (1, %03Iu) failed\n", sizeof (struct section));
 #else //_MSC_VER
-	GfLogError ("gfParmReadFile: calloc (1, %zu) failed\n", sizeof (struct section));
+	GfLogError ("createParmHeader: calloc (1, %zu) failed\n", sizeof (struct section));
 #endif //_MSC_VER
 	goto bailout;
     }
@@ -551,25 +551,25 @@ createParmHeader (const char *file)
 
     conf->paramHash = GfHashCreate (GF_HASH_TYPE_STR);
     if (!conf->paramHash) {
-	GfLogError ("gfParmReadFile: GfHashCreate (paramHash) failed\n");
+	GfLogError ("createParmHeader: GfHashCreate (paramHash) failed\n");
 	goto bailout;
     }
 
     conf->sectionHash = GfHashCreate (GF_HASH_TYPE_STR);
     if (!conf->sectionHash) {
-	GfLogError ("gfParmReadFile: GfHashCreate (sectionHash) failed\n");
+	GfLogError ("createParmHeader: GfHashCreate (sectionHash) failed\n");
 	goto bailout;
     }
 
     conf->filename = strdup (file);
     if (!conf->filename) {
-	GfLogError ("gfParmReadFile: strdup (%s) failed\n", file);
+	GfLogError ("createParmHeader: strdup (%s) failed\n", file);
 	goto bailout;
     }
     conf->variableHash = GfHashCreate(GF_HASH_TYPE_STR);
     if (!conf->variableHash) 
     {
-	GfLogError ("gfParmReadFile: GfHashCreate (variableHash) failed\n");
+	GfLogError ("createParmHeader: GfHashCreate (variableHash) failed\n");
 	goto bailout;
     }
 
@@ -1126,7 +1126,7 @@ xmlExternalEntityRefHandler (XML_Parser mainparser,
 	in = fopen (fin, "r");
     if (in == NULL) {
 		perror (fin);
-		GfLogError ("GfReadParmFile: file %s has pb\n", systemId);
+		GfLogError ("xmlExternalEntityRefHandler: file %s has pb\n", systemId);
 		return 0;
     }
 
@@ -1135,7 +1135,7 @@ xmlExternalEntityRefHandler (XML_Parser mainparser,
 		size_t len = fread (buf, 1, sizeof(buf), in);
 		done = len < sizeof (buf);
 		if (!XML_Parse (parser, buf, len, done)) {
-			GfLogError ("file: %s -> %s at line %lu\n",
+			GfLogError ("xmlExternalEntityRefHandler: file %s -> %s at line %lu\n",
 				systemId,
 				XML_ErrorString(XML_GetErrorCode(parser)),
 				XML_GetCurrentLineNumber(parser));
@@ -1346,9 +1346,9 @@ GfParmReadFile (const char *file, int mode, bool neededFile, bool trace)
 	    /* Parsers Initialization */
 	    if (parserXmlInit (parmHandle)) {
 			if (TraceLoggersAvailable)
-				GfLogError ("GfParmReadBuf: parserInit failed for file \"%s\"\n", file);
+				GfLogError ("GfParmReadFile: parserInit failed for file \"%s\"\n", file);
 			else
-				fprintf(stderr,"GfParmReadBuf: parserInit failed for file \"%s\"\n", file);
+				fprintf(stderr,"GfParmReadFile: parserInit failed for file \"%s\"\n", file);
 			goto bailout;
 	    }
 	    /* Parameters reading */
@@ -1781,7 +1781,7 @@ GfParmWriteFile (const char *file, void *parmHandle, const char *name)
     
     fout = safeFOpen(file, "wb");
     if (!fout) {
-	GfLogError ("gfParmWriteFile: fopen (%s, \"wb\") failed\n", file);
+	GfLogError ("GfParmWriteFile: fopen (%s, \"wb\") failed\n", file);
 	return 1;
     }
 
@@ -2430,7 +2430,7 @@ GfParmExistsSection (void *handle, const char *path)
     struct section	*section;
     
     if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
-		GfLogError ("GfParmExists: bad handle (%p)\n", parmHandle);
+		GfLogError ("GfParmExistsSection: bad handle (%p)\n", parmHandle);
 		return 0;
     }
 
@@ -2457,7 +2457,7 @@ GfParmExistsParam(void *handle, const char *path, const char *key)
     struct param      *param;
 
     if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
-        GfLogError ("GfParmSetNum: bad handle (%p)\n", parmHandle);
+        GfLogError ("GfParmExistsParam: bad handle (%p)\n", parmHandle);
         return 0;
     }
 
@@ -2679,7 +2679,7 @@ GfParmListClean (void *handle, const char *path)
     struct section	*section;
 
     if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
-		GfLogError ("GfParmListSeekNext: bad handle (%p)\n", parmHandle);
+		GfLogError ("GfParmListClean: bad handle (%p)\n", parmHandle);
 		return -1;
     }
 
@@ -2863,7 +2863,7 @@ GfParmGetStrIn(void *parmHandle, const char *path, const char *key)
     std::vector<std::string> paramsInList;
 
     if ((handle == NULL) || (handle->magic != PARM_MAGIC)) {
-        GfLogError ("GfParmListGetStrInList: bad handle (%p)\n", parmHandle);
+        GfLogError ("GfParmGetStrIn: bad handle (%p)\n", parmHandle);
         return paramsInList;
     }
 
@@ -3212,7 +3212,7 @@ GfParmGetNumWithLimits (void *handle, char const *path, const char *key, const c
 	struct param *param;
 
 	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
-		GfLogError ("GfParmGetNum: bad handle (%p)\n", parmHandle);
+		GfLogError ("GfParmGetNumWithLimits: bad handle (%p)\n", parmHandle);
 		return -1;
 	}
 
@@ -3220,7 +3220,7 @@ GfParmGetNumWithLimits (void *handle, char const *path, const char *key, const c
 
 	if (parmHandle->magic != PARM_MAGIC) 
 	{
-		GfLogFatal ("GfParmGetNum: bad handle (%p)\n", parmHandle);
+		GfLogFatal ("GfParmGetNumWithLimits: bad handle (%p)\n", parmHandle);
 		return -1;
 	}
 
@@ -3324,7 +3324,7 @@ GfParmGetCurNumMin (void *handle, const char *path, const char *key, const char 
 	tdble min;
 
 	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
-		GfLogError ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
+		GfLogError ("GfParmGetCurNumMin: bad handle (%p)\n", parmHandle);
 		return deflt;
 	}
 
@@ -3372,7 +3372,7 @@ GfParmGetCurNumMax (void *handle, const char *path, const char *key, const char 
     tdble max;
 
 	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
-		GfLogError ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
+		GfLogError ("GfParmGetCurNumMax: bad handle (%p)\n", parmHandle);
 		return deflt;
 	}
 
@@ -3541,7 +3541,7 @@ GfParmSetStr(void *handle, const char *path, const char *key, const char *val)
     freez (param->value);
     param->value = strdup (val);
     if (!param->value) {
-        GfLogError ("gfParmSetStr: strdup (%s) failed\n", val);
+        GfLogError ("GfParmSetStr: strdup (%s) failed\n", val);
         removeParamByName (conf, path, key);
         return -1;
     }
@@ -3629,7 +3629,7 @@ int GfParmSetStrAndIn(void *handle, const char *path, const char *key, const cha
     freez (param->value);
     param->value = strdup (val);
     if (!param->value) {
-        GfLogError ("gfParmSetStrAndIn: strdup (%s) failed\n", val);
+        GfLogError ("GfParmSetStrAndIn: strdup (%s) failed\n", val);
         removeParamByName (conf, path, key);
         return -1;
     }
@@ -3685,7 +3685,7 @@ GfParmSetCurStr(void *handle, const char *path, const char *key, const char *val
     freez (param->value);
     param->value = strdup (val);
     if (!param->value) {
-	GfLogError ("gfParmSetStr: strdup (%s) failed\n", val);
+	GfLogError ("gfParmSetCurStr: strdup (%s) failed\n", val);
 	removeParamByName (conf, path, key);
 	return -1;
     }
@@ -3763,7 +3763,7 @@ GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, 
     struct param	*param;
 
 	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
-		GfLogError ("GfParmSetNumEx: bad handle (%p)\n", parmHandle);
+		GfLogError ("GfParmSetNum: bad handle (%p)\n", parmHandle);
 		return -1;
 	}
 
@@ -3921,7 +3921,7 @@ GfParmSetCurFormula(void *handle, char const *path, char const *key, char const 
     freez (param->value);
     param->value = strdup (val);
     if (!param->value) {
-	GfLogError ("gfParmSetCurFormula: strdup (%s) failed\n", val);
+	GfLogError ("GfParmSetCurFormula: strdup (%s) failed\n", val);
 	removeParamByName (conf, path, key);
 	return -1;
     }
@@ -4565,12 +4565,12 @@ GfParmMergeHandles(void *ref, void *tgt, int mode)
     //GfLogTrace ("Merging \"%s\" and \"%s\" (%s - %s)\n", confRef->filename, confTgt->filename, ((mode & GFPARM_MMODE_SRC) ? "SRC" : ""), ((mode & GFPARM_MMODE_DST) ? "DST" : ""));
 
 	if ((parmHandleRef == NULL) || (parmHandleRef->magic != PARM_MAGIC)) {
-		GfLogError ("insertParam: bad handle (%p)\n", parmHandleRef);
+		GfLogError ("GfParmMergeHandles: bad handle (%p)\n", parmHandleRef);
    	    return NULL;
 	}
 
 	if ((parmHandleTgt == NULL) || (parmHandleTgt->magic != PARM_MAGIC)) {
-		GfLogError ("insertParam: bad handle (%p)\n", parmHandleTgt);
+		GfLogError ("GfParmMergeHandles: bad handle (%p)\n", parmHandleTgt);
    	    return NULL;
 	}
 
@@ -4580,7 +4580,7 @@ GfParmMergeHandles(void *ref, void *tgt, int mode)
         /* Conf Header creation */
     confOut = createParmHeader ("");
     if (!confOut) {
-	GfLogError ("gfParmReadBuf: conf header creation failed\n");
+	GfLogError ("GfParmMergeHandles: conf header creation failed\n");
 	return NULL;
     }
 
@@ -4588,9 +4588,9 @@ GfParmMergeHandles(void *ref, void *tgt, int mode)
     parmHandleOut = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandleOut) {
 #if defined(_MSC_VER) && _MSC_VER < 1800
-	GfLogError ("gfParmReadBuf: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
+	GfLogError ("GfParmMergeHandles: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
 #else //_MSC_VER
-	GfLogError ("gfParmReadBuf: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
+	GfLogError ("GfParmMergeHandles: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
 #endif //_MSC_VER
 	parmReleaseHeader (confOut);
 	return NULL;
