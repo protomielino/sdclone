@@ -1111,6 +1111,10 @@ ReImportGeneticParameters()
 	{
 		ReLogOptim.fatal("Couldn't load : %s\n", buf); 
 	}
+	else
+	{
+		ReLogOptim.info("Loaded : %s\n", buf);
+	}
 
 	// Read table of content of meta data file
 	TGeneticParameterTOC* TOC = new TGeneticParameterTOC(MetaDataFile);
@@ -1288,7 +1292,7 @@ ReImportGeneticParameters()
 
 	GfParmReleaseHandle(MetaDataFile);
 
-	ReLogOptim.info("Write parameters to initial xml file\n");
+	ReLogOptim.info("Write parameters to initial xml file : %s\n", Data->XmlFileName);
 	ReUI().addOptimizationMessage("Write parameters to initial xml file");
 	GfParmWriteFileSDHeader (Data->XmlFileName, Data->Handle, Data->CarType, Data->AuthorName);
 
