@@ -21,6 +21,9 @@
 #include <osg/Program>
 #include <osg/Node>
 #include <osg/Uniform>
+#include <osgDB/ReadFile>
+#include <osgDB/FileUtils>
+
 #include <tgf.h>
 
 #include "OsgMain.h"
@@ -31,13 +34,12 @@
 SDCarShader::SDCarShader(osg::Node *car, SDCar *c)
 {
     std::string TmpPath = GetDataDir();
-    osg::ref_ptr<osg::Shader> vertShader = new osg::Shader( osg::Shader::VERTEX);
-    osg::ref_ptr<osg::Shader> fragShader = new osg::Shader( osg::Shader::FRAGMENT);
-    vertShader->loadShaderSourceFromFile(TmpPath+"data/shaders/car.vert");
-    fragShader->loadShaderSourceFromFile(TmpPath+"data/shaders/car.frag");
+
     program = new osg::Program;
-    program->addShader( vertShader.get() );
-    program->addShader( fragShader.get() );
+    program->addShader(osgDB::readShaderFile(osg::Shader::VERTEX,
+        osgDB::findDataFile(TmpPath + "data/shaders/car.vert")));
+    program->addShader(osgDB::readShaderFile(osg::Shader::FRAGMENT,
+        osgDB::findDataFile(TmpPath + "data/shaders/car.frag")));
 
     //pCar= dynamic_cast<osg::Group *> (car);
     pCar = car;
