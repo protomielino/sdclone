@@ -380,6 +380,7 @@ WebServer::WebServer()
     this->userId = -1;
     this->previousLaps = -1;
     this->raceEndSent = false;
+    this->pendingAsyncRequestId = 0;
 
     //initialize some curl var
     this->multi_handle = curl_multi_init();
