@@ -102,16 +102,21 @@ NotificationManager::NotificationManager()
     this->animationLastExecTime = std::clock(); //the current time
 
 }
-NotificationManager::~NotificationManager(){
 
+NotificationManager::~NotificationManager()
+{
+    if (menuXMLDescHdle)
+        GfParmReleaseHandle(menuXMLDescHdle);
 }
+
 void NotificationManager::updateStatus(){
 
     //get the current screen
     this->screenHandle = GfuiGetScreen();
 
     //get the ui descriptor
-    this->menuXMLDescHdle = GfuiMenuLoad("notifications.xml");
+    if (this->menuXMLDescHdle)
+        this->menuXMLDescHdle = GfuiMenuLoad("notifications.xml");
 
     //if we are doing nothing and we have some message to display: let's do it
     if(this->busy==false && !this->msglist.empty()){

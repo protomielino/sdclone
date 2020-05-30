@@ -188,7 +188,9 @@ GfParmShutdown (void)
     struct parmHandle	*parmHandle;
 
     while ((parmHandle = GF_TAILQ_FIRST (&parmHandleList)) != GF_TAILQ_END (&parmHandleList)) {
-	parmReleaseHandle (parmHandle);
+        GfLogError("GfParmShutdown: %s not released\n",
+            parmHandle->conf->filename ? parmHandle->conf->filename : parmHandle->conf->name);
+        parmReleaseHandle (parmHandle);
     }
 }
 
