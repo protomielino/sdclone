@@ -164,6 +164,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, con
     if (skillHandle)
     {
         SkillGlobal = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
+        GfParmReleaseHandle(skillHandle);
     }
 
     SkillGlobal = MAX(0.7, 1.0 - 0.5 * SkillGlobal / 10.0);
@@ -180,6 +181,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, con
     {
         SkillDriver = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
         driver_aggression = (double)GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
+        GfParmReleaseHandle(skillHandle);
         LogUSR.info( "# driver skill: %.2f - driver agression: %.3f\n", SkillDriver, driver_aggression);
         SkillDriver = MAX(0.95, 1.0 - 0.05 * SkillDriver);
         //driver_aggression /= driver_aggression;
