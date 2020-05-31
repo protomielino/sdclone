@@ -1307,7 +1307,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
 					}else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() ) {
 						//refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
 					}else{
-						GfLogInfo("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!");
+						GfLogInfo("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
 						refObjBb = screenBB;
 					}
 
@@ -1380,7 +1380,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
 					}else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() ) {
 						//refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
 					}else{
-						GfLogInfo("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!");
+						GfLogInfo("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
 						refObjBb = screenBB;
 					}
 
@@ -1506,7 +1506,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW){
 					}else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() ) {
 						//refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
 					}else{
-						GfLogInfo("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!");
+						GfLogInfo("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
 						refObjBb = screenBB;
 					}
 
