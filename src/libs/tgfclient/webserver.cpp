@@ -428,7 +428,7 @@ int WebServer::updateAsyncStatus()
 
     if( this->handle_count > 0)
     {
-        GfLogInfo("WebServer: Number of async request waiting for a reply from the server: %i\n", this->handle_count);
+        GfLogDebug("WebServer: Number of async request waiting for a reply from the server: %i\n", this->handle_count);
         //display some UI to the user to inform him we are waiting a reply from the server
         webserverState=WEBSERVER_RECEIVING;
     }
