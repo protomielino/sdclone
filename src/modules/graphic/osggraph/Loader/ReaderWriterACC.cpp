@@ -472,6 +472,11 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                         std::string strUVs;
                         std::getline(stream,strUVs);
 
+                        // trim any trailing white space
+                        size_t endpos = strUVs.find_last_not_of(" \n\r\t");
+                        if (endpos != std::string::npos)
+                            strUVs.resize(endpos + 1);
+
                         /*while(!strUVs.empty() && isspace(strUVs[strUVs.size()-1]))
                             strUVs.pop_back();*/
                         /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: string nRefs texture vertex \""
