@@ -160,6 +160,10 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
             MaterialData mat;
             mat.readMaterial(stream);
             fileData.addMaterial(mat);
+
+            // read any trailing whitespace
+            std::string line;
+            std::getline(stream, line);
         }
         else if (token == "OBJECT")
         {
