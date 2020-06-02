@@ -105,8 +105,10 @@ NotificationManager::NotificationManager()
 
 NotificationManager::~NotificationManager()
 {
+#if 0 // enable this code when these classes are deleted in the proper order
     if (menuXMLDescHdle)
         GfParmReleaseHandle(menuXMLDescHdle);
+#endif
 }
 
 void NotificationManager::updateStatus(){
