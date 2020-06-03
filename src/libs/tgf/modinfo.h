@@ -2,7 +2,7 @@
                    modinfo.h -- Tools for module interface management
 
     created              : Fri Aug 13 22:32:14 CEST 1999
-    copyright            : (C) 2008 by Jean-Philippe Meuret                         
+    copyright            : (C) 2008 by Jean-Philippe Meuret
     email                : jpmeuret@free.fr
     version              : $Id$
  ***************************************************************************/
@@ -16,8 +16,8 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    	Tools for module interface management.
+/** @file
+        Tools for module interface management.
     @author	<a href=mailto:jpmeuret@free.fr>Jean-Philippe Meuret</a>
     @version	$Id$
 */
@@ -26,14 +26,14 @@
 #ifndef __MODINFO__H__
 #define __MODINFO__H__
 
-/** Maximum number of interfaces in one "legacy" module 
+/** Maximum number of interfaces in one "legacy" module
     (no limit for "Unlimited Number of Interfaces" modules)
     @see	ModList
  */
-#define MAX_MOD_ITF 40
+#define MAX_MOD_ITF 20
 #define GfModInfoDefaultMaxItf MAX_MOD_ITF
 
-/* Name of the module function where run-time informations are exchanged (new scheme) 
+/* Name of the module function where run-time informations are exchanged (new scheme)
    This function is called before moduleInitialize if present */
 #define GfModInfoWelcomeFuncName "moduleWelcome"
 
@@ -55,7 +55,7 @@ typedef struct ModWelcomeOut {
     unsigned int	maxNbItf;	/**< Max number of interfaces */
 } tModWelcomeOut;
 
-/** initialisation of the function table 
+/** initialisation of the function table
     @see	ModInfo
 */
 typedef int (*tfModPrivInit)(int index, void *);
@@ -71,7 +71,7 @@ typedef struct ModInfo {
     int			magic;		/**< magic number for integrity check */
 } tModInfo;
 
-/** Internal module interface information structure (see GfModInfoDuplicate) 
+/** Internal module interface information structure (see GfModInfoDuplicate)
     WARNING: Must have the same fields ; only const-ness may differ */
 typedef struct ModInfoNC {
     char		*name;		/**< name of the module (short) (NULL if no module) */
@@ -103,7 +103,7 @@ typedef struct ModList {
 } tModList;
 
 
-/* Interface of module function where run-time informations are exchanged 
+/* Interface of module function where run-time informations are exchanged
    This function is called before moduleInitialize if present */
 typedef int (*tfModInfoWelcome)(const tModWelcomeIn*, tModWelcomeOut*);
 
@@ -131,8 +131,8 @@ TGF_API void GfModInfoFreeNC(tModInfoNC *array, int maxItf);
 TGF_API tModInfoNC* GfModInfoDuplicate(const tModInfo *source, int maxItf);
 
 /* Initialize the module with given handle and library file path */
-TGF_API int GfModInitialize(tSOHandle soHandle, const char *soPath, 
-							unsigned int gfid, tModList **mod);
+TGF_API int GfModInitialize(tSOHandle soHandle, const char *soPath,
+                                                        unsigned int gfid, tModList **mod);
 
 /* Terminate the module with given handle and library file path */
 TGF_API int GfModTerminate(tSOHandle soHandle, const char *soPath);
