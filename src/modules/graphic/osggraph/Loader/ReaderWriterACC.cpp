@@ -580,6 +580,8 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
 
             unsigned num;
             stream >> num;
+            std::string line;
+            std::getline(stream, line); // read trailing whitespace
             /*osg::notify(osg::FATAL) << "osgDB SPEED DREAMS reader: kids number \""
             << num  << "\"5" << std::endl;*/
             if (num != 0)
@@ -629,7 +631,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
             }
             return group.release();
         }
-        else
+        else if (!token.empty())
         {
             osg::notify(osg::WARN) << "osgDB SPEED DREAMS reader: unknown token refs line while reading object \"6"
                 <<" token:"<< token << "\"" << std::endl;
