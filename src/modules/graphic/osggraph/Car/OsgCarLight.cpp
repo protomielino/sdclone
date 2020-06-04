@@ -172,7 +172,7 @@ void SDCarLights::loadStates()
         state_set->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
         state_set->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
         state_set->setAttributeAndModes(new osg::PolygonOffset(-15.f, -20.f), osg::StateAttribute::ON);
-        state_set->setAttributeAndModes(new osg::TexEnv(osg::TexEnv::MODULATE), osg::StateAttribute::ON);
+        state_set->setTextureAttributeAndModes(0, new osg::TexEnv(osg::TexEnv::MODULATE), osg::StateAttribute::ON);
         state_set->setAttributeAndModes(new osg::Depth(osg::Depth::LESS, 0.0, 1.0, false), osg::StateAttribute::ON);
         state_set->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 
