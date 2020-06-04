@@ -637,7 +637,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                 <<" token:"<< token << "\"" << std::endl;
         }
 
-        if (!stream.good())
+        if (!stream.eof() && !stream.good())
         {
             //bool bBad = stream.bad();
             //bool bFail = stream.fail();
