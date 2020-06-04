@@ -25,6 +25,10 @@ extern GfLogger* PLogUSR;
 #define LogUSR (*PLogUSR)
 
 MyCar::MyCar() :
+    HASTYC(false),
+    HASABS(false),
+    HASESP(false),
+    HASTCL(false),
     mCar(NULL)
 {
 }
