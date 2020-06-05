@@ -95,7 +95,7 @@ private:
     double controlSpeed(double accelerator, double maxspeed);
 
     void	Meteorology(const tTrack *t);
-    int		GetWeather(const tTrack *t);
+    unsigned int GetWeather(const tTrack *t);
 
     bool    CheckPitSharing(tCarElt *car);
 
@@ -196,7 +196,7 @@ private:
 
     bool   rain;
     double rainintensity;
-    int    weathercode;            // Track specific weather
+    unsigned int weathercode;            // Track specific weather
 
     double driver_aggression;
     double SkillGlobal;

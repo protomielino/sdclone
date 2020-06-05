@@ -38,13 +38,13 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
 {
     // Get tires change time
     void* handle = NULL;
-    std::string tmpstr = std::string(GetLocalDir()) + "config/raceman/endrace.xml";
+    /*std::string tmpstr = std::string(GetLocalDir()) + "config/raceman/endrace.xml";
     handle = GfParmReadFile(tmpstr.c_str(), GFPARM_RMODE_STD);
     if (handle)
     {
         mTiresChangeTime = GfParmGetNum(handle, "Race", "all tires change time", (char*)NULL, 30.0);
         GfParmReleaseHandle(handle);
-    }
+    }*/
 
     if (pitdamage)
     {
@@ -138,12 +138,12 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
 
         for (i = 1; i < PITPOINTS - 1; i++)
         {
-            mPitp[i].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) - 0.5 * mPitInfo->width - 2.5);
+            mPitp[i].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) - 0.3 * mPitInfo->width - 2.2);
         }
 
         for (i = 1; i < DTPOINTS - 1; i++)
         {
-            mDtp[i].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) - 0.5 * mPitInfo->width - 2.5);
+            mDtp[i].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) - 0.3 * mPitInfo->width - 2.2);
         }
 
         mPitp[3].y = sign * fabs(mPitInfo->driversPits->pos.toMiddle);
@@ -173,6 +173,7 @@ double Pit::pathToMiddle(double fromstart) const
         if (mInPitLane || ((mPitstop || mPenalty == RM_PENALTY_DRIVETHROUGH) && isBetween(fromstart)))
         {
             fromstart = toSplineCoord(fromstart);
+
             if (mPenalty == RM_PENALTY_DRIVETHROUGH)
             {
                 return mDtSpline.evaluate(fromstart);
@@ -292,12 +293,17 @@ void Pit::update()
     }
 
     mPenalty = 0; // fuel, damage and tires served before penalty
+    bool pittyres = false;
     // Check for fuel, damage and tyres
     bool pitfuel = mCar->_fuel < mAvgFuelPerLap;
     bool pitdamage = (mCar->_dammage > mPitDamage && remaininglaps * mTrack->length > mMaxDamageDist && mLastFuel > 15.0) || (mCar->_dammage > mMaxDamage);
     //bool pittyres = (mMyCar->tires()->distLeft() < 1.0 * mTrack->length && mMyCar->tires()->gripFactor() < mPitGripFactor && remaininglaps * mTrack->length > 10000.0);
-    bool pittyres = (mMyCar->tires()->gripFactor() < mPitGripFactor && remaininglaps * mTrack->length > 10000.0 && mMyCar->tires()->distLeft() < 1000);
 
+    if(mMyCar->HASTYC)
+        pittyres = (mMyCar->tires()->gripFactor() < mPitGripFactor && remaininglaps * mTrack->length > 10000.0 && mMyCar->tires()->distLeft() < 1000);
+    else {
+        pittyres = false;
+    }
     if (fs > mPitEntry - mEntryMargin - mPreEntryMargin - 3.0 && fs < mPitEntry - mEntryMargin - mPreEntryMargin && !mStopChecked)
     {
         if (pitBeforeTeammate(remaininglaps))

@@ -871,7 +871,8 @@ bool Driver::statePitstop() const
         float dl, dw;
         RtDistToPit((CarElt*)mCar.car(), (tTrack*)mTrack.torcsTrack(), &dl, &dw);
 
-        if (fabs(dw) < 1.6 && (dl < 0.5 || dl > mTrack.length() - 0.5)) {
+        if (fabs(dw) < 1.6 && (dl < 0.5 || dl > mTrack.length() - 1.0))
+        {
             return true;
         }
     }
@@ -1615,7 +1616,7 @@ void Driver::Meteorology(const tTrack *t)
 //==========================================================================*
 // Estimate weather
 //--------------------------------------------------------------------------*
-int Driver::GetWeather(const tTrack *t)
+unsigned int Driver::GetWeather(const tTrack *t)
 {
     return (t->local.rain << 4) + t->local.water;
 };

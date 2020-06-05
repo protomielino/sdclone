@@ -33,14 +33,20 @@ double Spline::evaluate(double z) const
   int i, a, b;
   double t, a0, a1, a2, a3, h;
   a = 0; b = mDim-1;
-  do {
+
+  do
+  {
     i = (a + b) / 2;
-    if (mSpl[i].x <= z) {
+    if (mSpl[i].x <= z)
+    {
       a = i;
-    } else {
+    }
+    else
+    {
       b = i;
     }
   } while ((a + 1) != b);
+
   i = a;
   h = mSpl[i+1].x - mSpl[i].x;
   t = (z-mSpl[i].x) / h;
@@ -49,5 +55,6 @@ double Spline::evaluate(double z) const
   a2 = a1 - h*mSpl[i].s;
   a3 = h * mSpl[i+1].s - a1;
   a3 -= a2;
+
   return a0 + (a1 + (a2 + a3*t) * (t-1))*t;
 }

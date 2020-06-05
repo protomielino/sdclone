@@ -23,7 +23,7 @@
 class MyParam
 {
 public:
-  MyParam(void** carparmhandle, const std::string &datadir, const std::string &trackname, int weather);
+  MyParam(void** carparmhandle, const std::string &datadir, const std::string &trackname, unsigned int weather);
 
   double getNum(const std::string& sect, const std::string& att) const;
   void   setNum(const std::string& sect, const std::string& att, double value) const;
