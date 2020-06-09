@@ -2716,7 +2716,7 @@ void computeSaveAC3D(char * OutputFilename, ob_t * object)
             continue;
         }
         fprintf(ofile,
-                "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %d trans 0 \n",
+                "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %d trans 0\n",
                 tmat->name, tmat->rgb.r, tmat->rgb.g, tmat->rgb.b, tmat->amb.r,
                 tmat->amb.g, tmat->amb.b, tmat->emis.r, tmat->emis.g,
                 tmat->emis.b, tmat->spec.r, tmat->spec.g, tmat->spec.b,
@@ -3546,21 +3546,21 @@ void stripifyOb(ob_t * object, int writeit)
             }
             else
             {
-                fprintf(ofile, "%d %.5f %.5f ", v1, object->textarray[v1 * 2],
+                fprintf(ofile, "%d %.5f %.5f", v1, object->textarray[v1 * 2],
                         object->textarray[v1 * 2 + 1]);
                 if (object->texture1)
                 {
-                    fprintf(ofile, "%.5f %.5f ", object->textarray1[v1 * 2],
+                    fprintf(ofile, " %.5f %.5f", object->textarray1[v1 * 2],
                             object->textarray1[v1 * 2 + 1]);
                 }
                 if (object->texture2)
                 {
-                    fprintf(ofile, "%.5f %.5f ", object->textarray2[v1 * 2],
+                    fprintf(ofile, " %.5f %.5f", object->textarray2[v1 * 2],
                             object->textarray2[v1 * 2 + 1]);
                 }
                 if (object->texture3)
                 {
-                    fprintf(ofile, "%.5f %.5f ", object->textarray3[v1 * 2],
+                    fprintf(ofile, " %.5f %.5f", object->textarray3[v1 * 2],
                             object->textarray3[v1 * 2 + 1]);
                 }
                 fprintf(ofile, "\n");
@@ -3572,21 +3572,21 @@ void stripifyOb(ob_t * object, int writeit)
             }
             else
             {
-                fprintf(ofile, "%d %.5f %.5f ", v2, object->textarray[v2 * 2],
+                fprintf(ofile, "%d %.5f %.5f", v2, object->textarray[v2 * 2],
                         object->textarray[v2 * 2 + 1]);
                 if (object->texture1)
                 {
-                    fprintf(ofile, "%.5f %.5f ", object->textarray1[v2 * 2],
+                    fprintf(ofile, " %.5f %.5f", object->textarray1[v2 * 2],
                             object->textarray1[v2 * 2 + 1]);
                 }
                 if (object->texture2)
                 {
-                    fprintf(ofile, "%.5f %.5f ", object->textarray2[v2 * 2],
+                    fprintf(ofile, " %.5f %.5f", object->textarray2[v2 * 2],
                             object->textarray2[v2 * 2 + 1]);
                 }
                 if (object->texture3)
                 {
-                    fprintf(ofile, "%.5f %.5f ", object->textarray3[v2 * 2],
+                    fprintf(ofile, " %.5f %.5f", object->textarray3[v2 * 2],
                             object->textarray3[v2 * 2 + 1]);
                 }
                 fprintf(ofile, "\n");
@@ -3633,22 +3633,22 @@ void stripifyOb(ob_t * object, int writeit)
                             object->textarray[v0 * 2 + 1]);
                 else
                 {
-                    fprintf(ofile, "%d %.5f %.5f ", v0,
+                    fprintf(ofile, "%d %.5f %.5f", v0,
                             object->textarray[v0 * 2],
                             object->textarray[v0 * 2 + 1]);
                     if (object->texture1)
                     {
-                        fprintf(ofile, "%.5f %.5f ", object->textarray1[v0 * 2],
+                        fprintf(ofile, " %.5f %.5f ", object->textarray1[v0 * 2],
                                 object->textarray1[v0 * 2 + 1]);
                     }
                     if (object->texture2)
                     {
-                        fprintf(ofile, "%.5f %.5f ", object->textarray2[v0 * 2],
+                        fprintf(ofile, " %.5f %.5f", object->textarray2[v0 * 2],
                                 object->textarray2[v0 * 2 + 1]);
                     }
                     if (object->texture3)
                     {
-                        fprintf(ofile, "%.5f %.5f ", object->textarray3[v0 * 2],
+                        fprintf(ofile, " %.5f %.5f", object->textarray3[v0 * 2],
                                 object->textarray3[v0 * 2 + 1]);
                     }
                     fprintf(ofile, "\n");
@@ -3712,7 +3712,7 @@ void computeSaveAC3DM(char * OutputFilename, ob_t * object)
         }
 
         fprintf(ofile,
-                "MATERIAL %s rgb %lf %lf %lf amb %lf %lf %lf emis %lf %lf %lf spec %lf %lf %lf shi %d trans0 \n",
+                "MATERIAL %s rgb %lf %lf %lf amb %lf %lf %lf emis %lf %lf %lf spec %lf %lf %lf shi %d trans 0\n",
                 tmat->name, tmat->rgb.r, tmat->rgb.g, tmat->rgb.b, tmat->amb.r,
                 tmat->amb.g, tmat->amb.b, tmat->emis.r, tmat->emis.g,
                 tmat->emis.b, tmat->spec.r, tmat->spec.g, tmat->spec.b,
@@ -4522,7 +4522,7 @@ void computeSaveAC3DStrip(char * OutputFilename, ob_t * object)
             continue;
         }
         fprintf(ofile,
-                "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %d trans 0 \n",
+                "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %d trans 0\n",
                 tmat->name, tmat->rgb.r, tmat->rgb.g, tmat->rgb.b, tmat->amb.r,
                 tmat->amb.g, tmat->amb.b, tmat->emis.r, tmat->emis.g,
                 tmat->emis.b, tmat->spec.r, tmat->spec.g, tmat->spec.b,
