@@ -2029,65 +2029,65 @@ int printOb(ob_t * ob)
             }
             else
             {
-                fprintf(ofile, "%d %.5f %.5f ", ob->vertexarray[i * 3].indice,
+                fprintf(ofile, "%d %.5f %.5f", ob->vertexarray[i * 3].indice,
                         ob->textarray[ob->vertexarray[i * 3].indice * 2],
                         ob->textarray[ob->vertexarray[i * 3].indice * 2 + 1]);
 
                 if (ob->texture1)
-                    fprintf(ofile, "%.5f %.5f ",
+                    fprintf(ofile, " %.5f %.5f",
                             ob->textarray1[ob->vertexarray[i * 3].indice * 2],
                             ob->textarray1[ob->vertexarray[i * 3].indice * 2 + 1]);
 
                 if (ob->texture2)
-                    fprintf(ofile, "%.5f %.5f ",
+                    fprintf(ofile, " %.5f %.5f",
                             ob->textarray2[ob->vertexarray[i * 3].indice * 2],
                             ob->textarray2[ob->vertexarray[i * 3].indice * 2 + 1]);
                 if (ob->texture3)
-                    fprintf(ofile, "%.5f %.5f ",
+                    fprintf(ofile, " %.5f %.5f",
                             ob->textarray3[ob->vertexarray[i * 3].indice * 2],
                             ob->textarray3[ob->vertexarray[i * 3].indice * 2 + 1]);
                 fprintf(ofile, "\n");
 
-                fprintf(ofile, "%d %.5f %.5f ",
+                fprintf(ofile, "%d %.5f %.5f",
                         ob->vertexarray[i * 3 + 1].indice,
                         ob->textarray[ob->vertexarray[i * 3 + 1].indice * 2],
                         ob->textarray[ob->vertexarray[i * 3 + 1].indice * 2 + 1]);
                 if (ob->texture1)
-                    fprintf(ofile, "%.5f %.5f ",
+                    fprintf(ofile, " %.5f %.5f",
                             ob->textarray1[ob->vertexarray[i * 3 + 1].indice * 2],
                             ob->textarray1[ob->vertexarray[i * 3 + 1].indice * 2
                                     + 1]);
 
                 if (ob->texture2)
-                    fprintf(ofile, "%.5f %.5f ",
+                    fprintf(ofile, " %.5f %.5f",
                             ob->textarray2[ob->vertexarray[i * 3 + 1].indice * 2],
                             ob->textarray2[ob->vertexarray[i * 3 + 1].indice * 2
                                     + 1]);
                 if (ob->texture3)
-                    fprintf(ofile, "%.5f %.5f ",
+                    fprintf(ofile, " %.5f %.5f",
                             ob->textarray3[ob->vertexarray[i * 3 + 1].indice * 2],
                             ob->textarray3[ob->vertexarray[i * 3 + 1].indice * 2
                                     + 1]);
                 fprintf(ofile, "\n");
 
-                fprintf(ofile, "%d %.5f %.5f ",
+                fprintf(ofile, "%d %.5f %.5f",
                         ob->vertexarray[i * 3 + 2].indice,
                         ob->textarray[ob->vertexarray[i * 3 + 2].indice * 2],
                         ob->textarray[ob->vertexarray[i * 3 + 2].indice * 2 + 1]);
                 if (ob->texture1)
-                    fprintf(ofile, "%.5f %.5f ",
+                    fprintf(ofile, " %.5f %.5f",
                             ob->textarray1[ob->vertexarray[i * 3 + 2].indice * 2],
                             ob->textarray1[ob->vertexarray[i * 3 + 2].indice * 2
                                     + 1]);
 
                 if (ob->texture2)
-                    fprintf(ofile, "%.5f %.5f ",
+                    fprintf(ofile, " %.5f %.5f",
                             ob->textarray2[ob->vertexarray[i * 3 + 2].indice * 2],
                             ob->textarray2[ob->vertexarray[i * 3 + 2].indice * 2
                                     + 1]);
                 if (ob->texture3)
                 {
-                    fprintf(ofile, "%.5f %.5f ",
+                    fprintf(ofile, " %.5f %.5f",
                             ob->textarray3[ob->vertexarray[i * 3 + 2].indice * 2],
                             ob->textarray3[ob->vertexarray[i * 3 + 2].indice * 2
                                     + 1]);
