@@ -218,7 +218,7 @@ typedef struct mat
     color_t amb;
     color_t emis;
     color_t spec;
-    int shi;
+    double shi;
     double trans;
     struct mat * next;
 } mat_t;

@@ -630,7 +630,7 @@ int doMaterial(char *Line, ob_t *object, mat_t *material)
         return (-1);
     }
     sscanf(p,
-            "%s rgb %lf %lf %lf amb %lf %lf %lf emis %lf %lf %lf spec %lf %lf %lf shi %d trans %lf",
+            "%s rgb %lf %lf %lf amb %lf %lf %lf emis %lf %lf %lf spec %lf %lf %lf shi %lf trans %lf",
             name, &(materialt->rgb.r), &(materialt->rgb.g), &(materialt->rgb.b),
             &(materialt->amb.r), &(materialt->amb.g), &(materialt->amb.b),
             &(materialt->emis.r), &(materialt->emis.g), &(materialt->emis.b),
@@ -3085,7 +3085,7 @@ void computeSaveOBJ(char * OutputFilename, ob_t * object)
                                 tmat->emis.g, tmat->emis.b);
                         fprintf(tfile, "Ks %lf %lf %lf\n", tmat->spec.r,
                                 tmat->spec.g, tmat->spec.b);
-                        fprintf(tfile, "Ns %d\n", tmat->shi);
+                        fprintf(tfile, "Ns %d\n", (int)tmat->shi);
                         fprintf(tfile, "map_kd %s\n", tmpob->texture);
                         break;
                     }
@@ -3638,7 +3638,7 @@ void stripifyOb(ob_t * object, int writeit)
                             object->textarray[v0 * 2 + 1]);
                     if (object->texture1)
                     {
-                        fprintf(ofile, " %.5f %.5f ", object->textarray1[v0 * 2],
+                        fprintf(ofile, " %.5f %.5f", object->textarray1[v0 * 2],
                                 object->textarray1[v0 * 2 + 1]);
                     }
                     if (object->texture2)
