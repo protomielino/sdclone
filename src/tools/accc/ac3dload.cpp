@@ -155,7 +155,7 @@ void copyTexCoordToTextArray(double * textarray, tcoord_t * texcoord)
 void obCreateTextArrays(ob_t * ob)
 {
     const int numEls = ob->numvertice * 2;
-    const int elSize = sizeof(tcoord_t);
+    const int elSize = sizeof(double);
 
     if(ob->vertexarray)
         ob->textarray = (double *) calloc(numEls, elSize);
@@ -4755,10 +4755,10 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     tobS->vertex = (point_t*) malloc(sizeof(point_t) * numtri * 3);
     memset(tobS->snorm, 0, sizeof(point_t) * numtri * 3);
     memset(tobS->norm, 0, sizeof(point_t) * numtri * 3);
-    tobS->textarray = (double *) malloc(sizeof(tcoord_t) * numtri * 2 * 3);
-    tobS->textarray1 = (double *) malloc(sizeof(tcoord_t) * numtri * 2 * 3);
-    tobS->textarray2 = (double *) malloc(sizeof(tcoord_t) * numtri * 2 * 3);
-    tobS->textarray3 = (double *) malloc(sizeof(tcoord_t) * numtri * 2 * 3);
+    tobS->textarray = (double *) malloc(sizeof(double) * numtri * 2 * 3);
+    tobS->textarray1 = (double *) malloc(sizeof(double) * numtri * 2 * 3);
+    tobS->textarray2 = (double *) malloc(sizeof(double) * numtri * 2 * 3);
+    tobS->textarray3 = (double *) malloc(sizeof(double) * numtri * 2 * 3);
     tobS->attrSurf = ob1->attrSurf;
     tobS->attrMat = ob1->attrMat;
     tobS->name = (char *) malloc(strlen(nameS) + 1);
@@ -4770,24 +4770,24 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     memcpy(tobS->vertexarray, ob1->vertexarray,
             ob1->numsurf * sizeof(tcoord_t) * 3);
     memcpy(tobS->textarray, ob1->textarray,
-            ob1->numvert * sizeof(tcoord_t) * 2);
+            ob1->numvert * sizeof(double) * 2);
     memcpy(tobS->norm, ob1->norm, ob1->numvert * sizeof(point_t));
     memcpy(tobS->snorm, ob1->snorm, ob1->numvert * sizeof(point_t));
 
     if (ob1->texture1)
     {
         memcpy(tobS->textarray1, ob1->textarray1,
-                ob1->numvert * 2 * sizeof(tcoord_t));
+                ob1->numvert * 2 * sizeof(double));
     }
     if (ob1->texture2)
     {
         memcpy(tobS->textarray2, ob1->textarray2,
-                ob1->numvert * 2 * sizeof(tcoord_t));
+                ob1->numvert * 2 * sizeof(double));
     }
     if (ob1->texture3)
     {
         memcpy(tobS->textarray3, ob1->textarray3,
-                ob1->numvert * 2 * sizeof(tcoord_t));
+                ob1->numvert * 2 * sizeof(double));
     }
 
     n = ob1->numvert;
@@ -5015,7 +5015,7 @@ int mergeSplitted(ob_t **object)
         tobS->vertex=(point_t*)malloc(sizeof(point_t)*numtri*3);
         memset(tobS->snorm,0,sizeof(point_t )*numtri*3);
         memset(tobS->norm,0,sizeof(point_t )*numtri*3);
-        tobS->textarray=(double *) malloc(sizeof(tcoord_t)* numtri*2*3);
+        tobS->textarray=(double *) malloc(sizeof(double)* numtri*2*3);
         tobS->attrSurf=tob->attrSurf;
         tobS->attrMat=tob->attrMat;
         tobS->name=(char *) malloc(strlen(nameS)+1);
@@ -5025,23 +5025,23 @@ int mergeSplitted(ob_t **object)
 
         memcpy(tobS->vertex, tob->vertex,tob->numvert*sizeof(point_t));
         memcpy(tobS->vertexarray, tob->vertexarray,tob->numsurf*sizeof(tcoord_t ));
-        memcpy(tobS->textarray, tob->textarray,tob->numvert*sizeof(tcoord_t )*2);
+        memcpy(tobS->textarray, tob->textarray,tob->numvert*sizeof(double)*2);
 
         if (tob->texture1)
         {
-            memcpy(tobS->textarray1, tob->textarray1,tob->numvert*2*sizeof(tcoord_t ));
+            memcpy(tobS->textarray1, tob->textarray1,tob->numvert*2*sizeof(double));
             memcpy(tobS->vertexarray1, tob->vertexarray1,tob->numsurf*sizeof(tcoord_t ));
             tobS->texture1=strdup(tob->texture1);
         }
         if (tob->texture2)
         {
-            memcpy(tobS->textarray2, tob->textarray2,tob->numvert*2*sizeof(tcoord_t ));
+            memcpy(tobS->textarray2, tob->textarray2,tob->numvert*2*sizeof(double));
             memcpy(tobS->vertexarray2, tob->vertexarray2,tob->numsurf*sizeof(tcoord_t ));
             tobS->texture2=strdup(tob->texture2);
         }
         if (tob->texture3)
         {
-            memcpy(tobS->textarray3, tob->textarray3,tob->numvert*2*sizeof(tcoord_t ));
+            memcpy(tobS->textarray3, tob->textarray3,tob->numvert*2*sizeof(double));
             memcpy(tobS->vertexarray3, tob->vertexarray3,tob->numsurf*sizeof(tcoord_t ));
             tobS->texture3=strdup(tob->texture3);
         }
