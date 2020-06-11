@@ -3017,6 +3017,7 @@ void computeSaveAC3D(char * OutputFilename, ob_t * object)
     /* do the job */
     printf("\nend\n");
 
+    fclose(ofile);
 }
 
 void computeSaveOBJ(char * OutputFilename, ob_t * object)
@@ -3313,6 +3314,8 @@ void computeSaveOBJ(char * OutputFilename, ob_t * object)
         tmpob = tmpob->next;
     }
     fprintf(ofile, "end \n");
+
+    fclose(ofile);
 }
 
 void stripifyOb(ob_t * object, int writeit)
@@ -3413,18 +3416,21 @@ void stripifyOb(ob_t * object, int writeit)
     if ((mem = malloc(sizeof(unsigned int) * NumStripPoints)) == 0)
     {
         printf("Problem mallocing while stripifying\n");
+        fclose(stripein);
         exit(-1);
     }
     StripPoint = (unsigned int *) mem;
     if ((mem = malloc(sizeof(unsigned int) * NumStrips)) == 0)
     {
         printf("Problem mallocing while stripifying\n");
+        fclose(stripein);
         exit(-1);
     }
     StripStart = (unsigned int *) mem;
     if ((mem = malloc(sizeof(unsigned int) * NumStrips)) == 0)
     {
         printf("Problem mallocing while stripifying\n");
+        fclose(stripein);
         exit(-1);
     }
     StripLength = (unsigned int *) mem;
@@ -4727,6 +4733,7 @@ void computeSaveAC3DStrip(char * OutputFilename, ob_t * object)
     /* do the job */
     printf("\nend\n");
 
+    fclose(ofile);
 }
 
 ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
