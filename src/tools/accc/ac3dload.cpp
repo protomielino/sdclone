@@ -4583,6 +4583,11 @@ void computeSaveAC3DStrip(char * OutputFilename, ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
+        if (!stricmp(tmpob->name, "group"))
+        {
+            tmpob = tmpob->next;
+            continue;
+        }
         numg++;
         tmpob->saved = 0;
         tmpob = tmpob->next;
