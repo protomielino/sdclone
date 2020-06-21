@@ -4588,6 +4588,12 @@ void computeSaveAC3DStrip(char * OutputFilename, ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
+        /* don't count empty objects */
+        if (strcmp(tmpob->type, "poly") == 0 && tmpob->numvert == 0 && tmpob->numsurf == 0 && tmpob->kids == 0)
+        {
+            tmpob = tmpob->next;
+            continue;
+        }
         numg++;
         tmpob->saved = 0;
         tmpob = tmpob->next;
