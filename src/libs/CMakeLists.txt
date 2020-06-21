@@ -12,10 +12,9 @@ ADD_SUBDIRECTORY(learning)
 ADD_SUBDIRECTORY(math)
 ADD_SUBDIRECTORY(portability)
 
-# Work-in-progress 
+# Work-in-progress
 IF(NOT OPTION_OFFICIAL_ONLY)
 	SD_ADD_SUBDIRECTORY(ephemeris)
-	#SD_ADD_SUBDIRECTORY(metar)
 ENDIF()
 
 
