@@ -106,9 +106,9 @@ ExternalProject_Add(OpenGL-headers
 endif(WIN32 AND OPTION_OPENGL_HEADERS)
 
 if(OPTION_SDL_1x)
-ExternalProject_Add(SDL-1.2.15 
-   URL https://www.libsdl.org/release/SDL-1.2.15.tar.gz 
-   URL_HASH SHA256=d6d316a793e5e348155f0dd93b979798933fb98aa1edebcc108829d6474aad00 
+ExternalProject_Add(SDL-1.2.15
+   URL https://www.libsdl.org/release/SDL-1.2.15.tar.gz
+   URL_HASH SHA256=d6d316a793e5e348155f0dd93b979798933fb98aa1edebcc108829d6474aad00
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    DEPENDS OpenGL-headers
    )
@@ -128,10 +128,9 @@ if(OPTION_SDL_2x)
    set(SDL2_PROJECT SDL2-2.0.12)
    set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off -DSDL_CMAKE_DEBUG_POSTFIX=)
 #   set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off)
-   ExternalProject_Add(${SDL2_PROJECT} 
-      URL https://www.libsdl.org/release/SDL2-2.0.12.tar.gz 
+   ExternalProject_Add(${SDL2_PROJECT}
+      URL https://www.libsdl.org/release/SDL2-2.0.12.tar.gz
    URL_HASH SHA256=349268f695c02efbc9b9148a70b85e58cefbbf704abd3e91be654db7f1e2c863
-
    CMAKE_ARGS ${SDL2_ARGS}
    DEPENDS OpenGL-headers
    )
@@ -152,8 +151,8 @@ endif(OPTION_SDL_2x)
 if(OPTION_OPENAL)
    if(MSVC_VERSION LESS 1900)
       message("openal-soft versions newer than 1.18.2 need Visual Studio 2015")
-      ExternalProject_Add(openal-soft-1.18.2 
-         URL http://www.openal-soft.org/openal-releases/openal-soft-1.18.2.tar.bz2 
+      ExternalProject_Add(openal-soft-1.18.2
+         URL http://www.openal-soft.org/openal-releases/openal-soft-1.18.2.tar.bz2
          URL_HASH SHA256=9f8ac1e27fba15a59758a13f0c7f6540a0605b6c3a691def9d420570506d7e82
          CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
       ExternalProject_Add_Step(openal-soft-1.18.2 openal_patch_cmake
@@ -164,7 +163,7 @@ if(OPTION_OPENAL)
          DEPENDERS patch  # do before patch
          )
    else(MSVC_VERSION LESS 1900)
-      ExternalProject_Add(openal-soft-1.19.1 
+      ExternalProject_Add(openal-soft-1.19.1
          URL http://www.openal-soft.org/openal-releases/openal-soft-1.19.1.tar.bz2
          URL_HASH SHA256=5c2f87ff5188b95e0dc4769719a9d89ce435b8322b4478b95dd4b427fe84b2e9
          CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
@@ -173,7 +172,7 @@ endif(OPTION_OPENAL)
 
 if(OPTION_PLIB)
    if(OPTION_PLIB_USE_HEAD)
-   ExternalProject_Add(plib-1.8.5-head 
+   ExternalProject_Add(plib-1.8.5-head
       SVN_REPOSITORY  svn://svn.code.sf.net/p/plib/code/trunk
       SVN_REVISION -r2173  #-r2173 as of 2012-08-24 can also use -rHEAD, but specific revision is supposed to prevent calling svn update
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
@@ -189,9 +188,9 @@ if(OPTION_PLIB)
 
    else(OPTION_PLIB_USE_HEAD)
 
-   ExternalProject_Add(plib-1.8.5 
-      URL http://plib.sourceforge.net/dist/plib-1.8.5.tar.gz 
-      URL_HASH SHA256=485b22bf6fdc0da067e34ead5e26f002b76326f6371e2ae006415dea6a380a32 
+   ExternalProject_Add(plib-1.8.5
+      URL http://plib.sourceforge.net/dist/plib-1.8.5.tar.gz
+      URL_HASH SHA256=485b22bf6fdc0da067e34ead5e26f002b76326f6371e2ae006415dea6a380a32
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
       DEPENDS OpenGL-headers
       )
@@ -234,21 +233,21 @@ if(OPTION_FREESOLID)
 #message(WARNING "TODO - need to decide between the patches for FreeSOLID-2.1.1 OR FreeSOLID-2.1.2")
 #ExternalProject_Add(FreeSOLID-2.1.1 
 #   DOWNLOAD_NAME FreeSOLID-2.1.1.zip
-#   URL https://sourceforge.net/projects/freesolid/files/FreeSOLID/FreeSOLID-2.1.1.zip/FreeSOLID-2.1.1.zip/download 
+#   URL https://sourceforge.net/projects/freesolid/files/FreeSOLID/FreeSOLID-2.1.1.zip/FreeSOLID-2.1.1.zip/download
 #   URL_HASH SHA256=5a4f8576e27223f03ad0add76a79b06db6cd8f15c8d2767ea35e0c540ba1bee8 
 #   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
 #   UPDATE_COMMAND ""
 #   PATCH_COMMAND ""
 #   CONFIGURE_COMMAND ""
 #   BUILD_COMMAND ""
-#   INSTALL_COMMAND ""  
+#   INSTALL_COMMAND ""
 #   )
 
 set(FreeSOLID_ARGS ${EXTERNALS_CMAKE_ARGS} -D'CMAKE_DEBUG_POSTFIX=""')
 ExternalProject_Add(FreeSOLID-2.1.2
    DOWNLOAD_NAME FreeSOLID-2.1.2.zip
-   URL https://sourceforge.net/projects/freesolid/files/FreeSOLID-2.1.2.zip/download 
-   URL_HASH SHA256=89edc6afdd9d60c8020b2b865b61558c86a8928dc6f1773b9f4708b5c28eb873 
+   URL https://sourceforge.net/projects/freesolid/files/FreeSOLID-2.1.2.zip/download
+   URL_HASH SHA256=89edc6afdd9d60c8020b2b865b61558c86a8928dc6f1773b9f4708b5c28eb873
    CMAKE_ARGS ${FreeSOLID_ARGS}
    )
 ExternalProject_Add_Step(FreeSOLID-2.1.2 freesolid_add_cmake
@@ -280,7 +279,7 @@ endif(OPTION_ENET)
 
 if(OPTION_OGG)
    set(OGG_PROJECT ogg-1.3.4)
-   set(OGG_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS=on -DBUILD_TESTING=off -DINSTALL_DOCS=off )
+   set(OGG_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS=on -DBUILD_TESTING=off -DINSTALL_DOCS=off)
    ExternalProject_Add(${OGG_PROJECT}
       URL http://downloads.xiph.org/releases/ogg/libogg-1.3.4.tar.gz
       URL_HASH SHA256=fe5670640bd49e828d64d2879c31cb4dde9758681bb664f9bdbf159a01b0c76e
@@ -319,7 +318,7 @@ ExternalProject_Add(${EXPAT_PROJECT}
    #PATCH_COMMAND ""
    #CONFIGURE_COMMAND ""
    #BUILD_COMMAND ""
-   #INSTALL_COMMAND ""  
+   #INSTALL_COMMAND ""
    )
 else(OPTION_EXPAT)
    set(EXPAT_PROJECT )
@@ -329,7 +328,7 @@ if(OPTION_ZLIB)
    set(ZLIB_PROJECT zlib-1.2.11)
    #set(ZLIB_ARGS ${EXTERNALS_CMAKE_ARGS} -DSKIP_INSTALL_LIBRARIES=On -DSKIP_INSTALL_LIBRARIES=On -D'CMAKE_DEBUG_POSTFIX=""')
    #set(ZLIB_ARGS ${EXTERNALS_CMAKE_ARGS} -D'CMAKE_BUILD_POSTFIX=hello')
-   ExternalProject_Add(${ZLIB_PROJECT} 
+   ExternalProject_Add(${ZLIB_PROJECT}
    DOWNLOAD_NAME ${ZLIB_PROJECT}.tar.gz
    URL https://sourceforge.net/projects/libpng/files/zlib/1.2.11/zlib-1.2.11.tar.gz/download
    URL_HASH SHA256=c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
@@ -342,7 +341,7 @@ if(OPTION_ZLIB)
    #INSTALL_COMMAND ${CMAKE_COMMAND} install(TARGETS zlibstatic)
    )
 ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_remove_dll
-   COMMAND "${CMAKE_COMMAND}" -E remove -f ${EXTERNALS_INSTALL_DIR}/bin/zlib${SUPER_BUILD_POSTFIX}.dll 
+   COMMAND "${CMAKE_COMMAND}" -E remove -f ${EXTERNALS_INSTALL_DIR}/bin/zlib${SUPER_BUILD_POSTFIX}.dll
    DEPENDEES install
    )
 ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_remove_lib
@@ -350,7 +349,7 @@ ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_remove_lib
    DEPENDEES sd_zlib_remove_dll
    )
 ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_rename_lib
-   COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/zlibstatic${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/zlib.lib 
+   COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/zlibstatic${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/zlib.lib
    DEPENDEES sd_zlib_remove_lib
    )
 else(OPTION_ZLIB)
@@ -360,9 +359,9 @@ endif(OPTION_ZLIB)
 if(OPTION_PNG)
    set(PNG_PROJECT libpng-1.6.37)
    set(PNG_ARGS ${EXTERNALS_CMAKE_ARGS} -DPNG_SHARED=off -DPNG_TESTS=off -DCMAKE_DEBUG_POSTFIX='')
-   ExternalProject_Add(${PNG_PROJECT} 
-      DOWNLOAD_NAME ${PNG_PROJECT}.tar.gz 
-      URL https://sourceforge.net/projects/libpng/files/libpng16/1.6.37/libpng-1.6.37.tar.gz/download 
+   ExternalProject_Add(${PNG_PROJECT}
+      DOWNLOAD_NAME ${PNG_PROJECT}.tar.gz
+      URL https://sourceforge.net/projects/libpng/files/libpng16/1.6.37/libpng-1.6.37.tar.gz/download
       URL_HASH SHA256=daeb2620d829575513e35fecc83f0d3791a620b9b93d800b763542ece9390fb4
       CMAKE_ARGS ${PNG_ARGS}
       DEPENDS ${ZLIB_PROJECT}
@@ -377,22 +376,22 @@ endif(OPTION_PNG)
 
 if(OPTION_SQLITE3)
    # may only be needed for Simon's replay stuff
-   ExternalProject_Add(sqlite3-3.30.1
-   URL https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip
-   URL_HASH SHA256=adf051d4c10781ea5cfabbbc4a2577b6ceca68590d23b58b8260a8e24cc5f081
-   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-   #UPDATE_COMMAND ""
-   #PATCH_COMMAND ""
-   #CONFIGURE_COMMAND ""
-   #BUILD_COMMAND ""
-   #INSTALL_COMMAND ""  
+      ExternalProject_Add(sqlite3-3.30.1
+      URL https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip
+      URL_HASH SHA256=adf051d4c10781ea5cfabbbc4a2577b6ceca68590d23b58b8260a8e24cc5f081
+      CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+      #UPDATE_COMMAND ""
+      #PATCH_COMMAND ""
+      #CONFIGURE_COMMAND ""
+      #BUILD_COMMAND ""
+      #INSTALL_COMMAND ""
    )
    ExternalProject_Add_Step(sqlite3-3.30.1 sqlite3_add_cmake
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
            "${CMAKE_SOURCE_DIR}/patches/sqlite3-CMakeLists.txt"
            "<SOURCE_DIR>/CMakeLists.txt"
-   DEPENDEES update # do after update
-   DEPENDERS patch  # do before patch
+      DEPENDEES update # do after update
+      DEPENDERS patch  # do before patch
    )
 endif(OPTION_SQLITE3)
 
@@ -400,19 +399,19 @@ endif(OPTION_SQLITE3)
 
 if(OPTION_FREETYPE)
    set(FREETYPE_PROJECT freetype-2.10.2)
-   set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false 
-                                             -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true 
-                                             -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE 
-                                             -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE 
-                                             -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE 
+   set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false
+                                             -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
+                                             -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
+                                             -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
+                                             -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE
                                              -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=TRUE
                                              -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=TRUE)
 
    ExternalProject_Add(${FREETYPE_PROJECT}
-   URL https://sourceforge.net/projects/freetype/files/freetype2/2.10.2/ft2102.zip/download
-   URL_HASH SHA256=d21449e30546554c975cd8ca6897d8ef1717b4c358987ddfb5bb35ebe0be2834
-   CMAKE_ARGS ${FREETYPE_ARGS}
-   DEPENDS ${ZLIB_PROJECT} ${PNG_PROJECT}
+      URL https://sourceforge.net/projects/freetype/files/freetype2/2.10.2/ft2102.zip/download
+      URL_HASH SHA256=d21449e30546554c975cd8ca6897d8ef1717b4c358987ddfb5bb35ebe0be2834
+      CMAKE_ARGS ${FREETYPE_ARGS}
+      DEPENDS ${ZLIB_PROJECT} ${PNG_PROJECT}
    )
 else(OPTION_FREETYPE)
    set(FREETYPE_PROJECT )
@@ -422,10 +421,10 @@ if(OPTION_CURL)
    set(CURL_PROJECT curl-7.71.0)
    set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off -DCMAKE_DEBUG_POSTFIX=)
    ExternalProject_Add(${CURL_PROJECT}
-   URL https://curl.haxx.se/download/curl-7.71.0.tar.bz2
-   URL_HASH SHA256=600f00ac2481a89548a4141ddf983fd9386165e1960bac91d0a1c81dca5dd341
-   CMAKE_ARGS ${CURL_ARGS}
-   DEPENDS ${ZLIB_PROJECT}
+      URL https://curl.haxx.se/download/curl-7.71.0.tar.bz2
+      URL_HASH SHA256=600f00ac2481a89548a4141ddf983fd9386165e1960bac91d0a1c81dca5dd341
+      CMAKE_ARGS ${CURL_ARGS}
+      DEPENDS ${ZLIB_PROJECT}
    )
 else(OPTION_CURL)
    set(CURL_PROJECT )
@@ -440,10 +439,10 @@ if(OPTION_OSG)
 #   endif()
 
    ExternalProject_Add(OpenSceneGraph-3.6.5
-   URL https://github.com/openscenegraph/OpenSceneGraph/archive/OpenSceneGraph-3.6.5.zip
-   URL_HASH SHA256=0e9e3e4cc6f463f21a901934a95e9264b231a1d5db90f72dcb4b8cc94b0d1b3b
-   CMAKE_ARGS ${OSG_ARGS}
-   DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
+      URL https://github.com/openscenegraph/OpenSceneGraph/archive/OpenSceneGraph-3.6.5.zip
+      URL_HASH SHA256=0e9e3e4cc6f463f21a901934a95e9264b231a1d5db90f72dcb4b8cc94b0d1b3b
+      CMAKE_ARGS ${OSG_ARGS}
+      DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
    )
 endif(OPTION_OSG)
 
