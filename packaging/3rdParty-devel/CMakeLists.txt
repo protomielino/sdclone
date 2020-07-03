@@ -3,7 +3,7 @@
 #
 #    file                 : CMakeLists.txt
 #    created              : Aug 5 2015
-#    copyright            : (C) 2015-2019 Joe Thompson
+#    copyright            : (C) 2015-2020 Joe Thompson
 #    email                : beaglejoe@users.sourceforge.net
 #    version              : $Id$
 #
@@ -187,7 +187,7 @@ if(OPTION_PLIB)
       )
 
    else(OPTION_PLIB_USE_HEAD)
-
+   # this tarball corresponds to revision 2131
    ExternalProject_Add(plib-1.8.5
       URL http://plib.sourceforge.net/dist/plib-1.8.5.tar.gz
       URL_HASH SHA256=485b22bf6fdc0da067e34ead5e26f002b76326f6371e2ae006415dea6a380a32
@@ -418,11 +418,11 @@ else(OPTION_FREETYPE)
 endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
-   set(CURL_PROJECT curl-7.71.0)
+   set(CURL_PROJECT curl-7.71.1)
    set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off -DCMAKE_DEBUG_POSTFIX=)
    ExternalProject_Add(${CURL_PROJECT}
-      URL https://curl.haxx.se/download/curl-7.71.0.tar.bz2
-      URL_HASH SHA256=600f00ac2481a89548a4141ddf983fd9386165e1960bac91d0a1c81dca5dd341
+      URL https://curl.haxx.se/download/curl-7.71.1.tar.bz2
+      URL_HASH SHA256=9d52a4d80554f9b0d460ea2be5d7be99897a1a9f681ffafe739169afd6b4f224
       CMAKE_ARGS ${CURL_ARGS}
       DEPENDS ${ZLIB_PROJECT}
    )
