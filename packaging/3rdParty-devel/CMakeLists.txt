@@ -33,6 +33,7 @@ include(ExternalProject)
 include(CMakeDependentOption)
 
 
+message(STATUS "CMAKE_VERSION = ${CMAKE_VERSION}")
 # Setup some defualts...
 
 # Setup the configuration
@@ -40,7 +41,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING
       "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
       FORCE)
-    message("No CMAKE_BUILD_TYPE specified, defaulting to ${CMAKE_BUILD_TYPE}") 
+    message(STATUS "No CMAKE_BUILD_TYPE specified, defaulting to ${CMAKE_BUILD_TYPE}")
 endif(NOT CMAKE_BUILD_TYPE)
 
 # Setup the install prefix.
@@ -55,11 +56,17 @@ if(MINGW)
 endif(MINGW)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
-message(STATUS "CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
 
-set(EXTERNALS_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/externals" CACHE PATH "")
+set(EXTERNALS_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/deps" CACHE PATH "")
 set(EXTERNALS_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/3rdParty" CACHE PATH "")
 set(EXTERNALS_CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALS_INSTALL_DIR} CACHE PATH "")
+
+set(_max_ext_path "64")
+string(LENGTH ${EXTERNALS_PREFIX} _path_length)
+if(_path_length GREATER _max_ext_path)
+   message(STATUS "The length of the EXTERNALS_PREFIX (${EXTERNALS_PREFIX}) is possibly too long (${_path_length}) to build OSG")
+   message(SEND_ERROR "The length of the EXTERNALS_PREFIX needs to be less than ${_max_ext_path} to build OSG")
+endif()
 
 set_property(DIRECTORY PROPERTY EP_BASE ${EXTERNALS_PREFIX})
 
