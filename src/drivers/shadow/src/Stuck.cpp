@@ -35,9 +35,9 @@ const float	Stuck::delta8_t[8] = {1.0f/Stuck::SPD, 1.0f/Stuck::SPD * 1.414f,
                                   1.0f/Stuck::SPD, 1.0f/Stuck::SPD * 1.414f,
                                   1.0f/Stuck::SPD, 1.0f/Stuck::SPD * 1.414f};
 
-const float	Stuck::delta64_t[64] = 
+const float	Stuck::delta64_t[64] =
 {
-	1.0f/Stuck::SPD * 1.000f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.100f, 1.0f/Stuck::SPD * 1.150f,
+    1.0f/Stuck::SPD * 1.000f, 1.0f/Stuck::SPD * 1.050f, 1.0f/Stuck::SPD * 1.100f, 1.0f/Stuck::SPD * 1.150f,
     1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.480f, 1.0f/Stuck::SPD * 1.460f, 1.0f/Stuck::SPD * 1.440f,
     1.0f/Stuck::SPD * 1.414f, 1.0f/Stuck::SPD * 1.440f, 1.0f/Stuck::SPD * 1.460f, 1.0f/Stuck::SPD * 1.480f,
     1.0f/Stuck::SPD * 1.500f, 1.0f/Stuck::SPD * 1.150f, 1.0f/Stuck::SPD * 1.100f, 1.0f/Stuck::SPD * 1.050f,

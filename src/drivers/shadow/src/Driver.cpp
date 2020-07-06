@@ -236,6 +236,7 @@ void	Driver::InitTrack(
     strncpy(m_carName, GfParmGetStr(pCarHandle, path, key, ""), 99);
     m_carName[99] = '\0';
     char*	p = strrchr(m_carName, '.');
+
     if( p )
         *p = '\0';
 
@@ -255,10 +256,7 @@ void	Driver::InitTrack(
     //
 
     const char*	raceTypeStr[] = { "practice", "qualify", "race" };
-    int			raceType = pS->raceInfo.type;
-
-    //if( raceType == RM_TYPE_PRACTICE && (pS->raceInfo.totLaps == 3 || pS->raceInfo.totLaps == 10) )
-    //    raceType =  RM_TYPE_QUALIF;
+    unsigned int raceType = pS->raceInfo.type;
 
     LogSHADOW.debug(" # Shadow Race type = %s \n", raceTypeStr[raceType]);
 
@@ -283,13 +281,13 @@ void	Driver::InitTrack(
         snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/default.xml",
                   GfDataDir(), MyBotName, m_carName);
         hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-        LogSHADOW.debug("PATH = %s \n", buf);
+        LogSHADOW.info("PATH = %s \n", buf);
 
         // override params for car type on track of specific race type and driver.
         snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s-%d.xml",
                   GfDataDir(), MyBotName, m_carName, m_trackName, weathercode);
         hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-        LogSHADOW.debug("PATH = %s \n", buf);
+        LogSHADOW.info("PATH = %s \n", buf);
     }
     else
     {
@@ -297,13 +295,13 @@ void	Driver::InitTrack(
         snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/default.xml",
                   GfDataDir(), MyBotName, m_carName);
         hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-        LogSHADOW.info("PATH = %s \n", buf);
+        LogSHADOW.info(" # Loaded default = %s \n", buf);
 
         // override params for car type on track of specific race type and driver.
         snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/%s.xml",
                   GfDataDir(), MyBotName, m_carName, m_trackName);
         hCarParm = MergeParamFile(hCarParm, buf, hCarParm != pCarHandle);
-        LogSHADOW.info("PATH = %s \n", buf);
+        LogSHADOW.info(" # Loaded = %s \n", buf);
     }
 
     // setup the car param handle to be returned.
