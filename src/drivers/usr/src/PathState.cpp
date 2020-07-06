@@ -20,6 +20,10 @@
 #include "cubic.h"
 #include "Utils.h"
 
+// The "USR" logger instance.
+extern GfLogger* PLogUSR;
+#define LogUSR (*PLogUSR)
+
 PathState::PathState(Path* path, MyCar* car, MuFactors* mufactors):
     mUpdatedLapData(false),
     mMaxspeed(0.0),
@@ -129,7 +133,7 @@ void PathState::calcMaxSpeed()
 
         if (idx >= 0 && idx < mNSEG - 1)
         {
-            //GfOut("%d %g k:%g  cs:%g  v:%g  dif:%g  \n",idx, pathseg.fromStart, pathseg.k, 3.6*cs, 3.6*speed, 3.6 * (cs - speed));
+            LogUSR.debug("%d %g k:%g  cs:%g  v:%g  dif:%g  \n",idx, pathseg.fromStart, pathseg.k, 3.6*cs, 3.6*speed, 3.6 * (cs - speed));
         }
     }
 }
