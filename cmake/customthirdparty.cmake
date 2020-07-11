@@ -124,10 +124,10 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	_FIND_3RDPARTY_DEPENDENCY(OGG ogg/ogg.h "" "ogg;libogg" ${ROOT_DIR} "")
 
 	# Vorbis.
-	_FIND_3RDPARTY_DEPENDENCY(VORBIS vorbis/vorbisfile.h "" libvorbis ${ROOT_DIR} "")
+	_FIND_3RDPARTY_DEPENDENCY(VORBIS vorbis/vorbisfile.h "" "vorbis;libvorbis" ${ROOT_DIR} "")
 
 	# VorbisFile.
-	_FIND_3RDPARTY_DEPENDENCY(VORBISFILE vorbis/vorbisfile.h "" libvorbisfile ${ROOT_DIR} "")
+	_FIND_3RDPARTY_DEPENDENCY(VORBISFILE vorbis/vorbisfile.h "" "vorbisfile;libvorbisfile" ${ROOT_DIR} "")
 	
 	# ENet.
 	_FIND_3RDPARTY_DEPENDENCY(ENET enet/enet.h "" enet ${ROOT_DIR} "")
