@@ -297,19 +297,16 @@ else(OPTION_OGG)
 endif(OPTION_OGG)
 
 if(OPTION_VORBIS)
-ExternalProject_Add(libvorbis-1.3.6
-   URL http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.6.tar.gz
-   URL_HASH SHA256=6ed40e0241089a42c48604dc00e362beee00036af2d8b3f46338031c9e0351cb
-   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-   DEPENDS ${OGG_PROJECT}
-   )
-   ExternalProject_Add_Step(libvorbis-1.3.6 libvorbis_add_cmake
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/libvorbis-1.3.6.CMakeLists.txt"
-           "<SOURCE_DIR>/CMakeLists.txt"
-   DEPENDEES update # do after update
-   DEPENDERS patch  # do before patch
-   )
+   set(VORBIS_PROJECT vorbis-1.3.7)
+   set(VORBIS_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS=on)
+   ExternalProject_Add(${VORBIS_PROJECT}
+      URL http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.gz
+      URL_HASH SHA256=0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab
+      CMAKE_ARGS ${VORBIS_ARGS}
+      DEPENDS ${OGG_PROJECT}
+      )
+else(OPTION_VORBIS)
+   set(VORBIS_PROJECT )
 endif(OPTION_VORBIS)
 
 if(OPTION_EXPAT)
