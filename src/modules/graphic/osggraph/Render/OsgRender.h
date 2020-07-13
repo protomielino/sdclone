@@ -34,19 +34,18 @@ class SDScenery;
 class SDRender
 {
 private:
-    osg::ref_ptr<osg::Group> m_RealRoot;
-    osg::ref_ptr<osg::Group> m_scene;
+    osg::ref_ptr<osg::Group> m_Root;
+    osg::ref_ptr<osg::Group> m_Scene;
+    osg::ref_ptr<osg::Group> m_ShadowSlot;
+    osg::ref_ptr<osg::Group> m_ShadowRoot;
+    osg::ref_ptr<osg::Group> m_NonShadowRoot;
     osg::ref_ptr<osg::Group> m_CarRoot;
     osg::ref_ptr<osg::Group> m_CarLightsRoot;
-    osg::ref_ptr<osg::Group> skyGroup;
 
     osg::ref_ptr<osg::StateSet> stateSet;
     osg::ref_ptr<osg::StateSet> skySS;
 
-    osg::ref_ptr<osg::LightSource> lightSource;
     osg::ref_ptr<osg::LightSource> sunLight;
-
-    osg::ref_ptr<osgShadow::ShadowedScene> shadowRoot;
 
     osg::Vec3f BaseSkyColor;
     osg::Vec3f BaseFogColor;
@@ -115,10 +114,7 @@ public:
     inline SDSky * getSky() { return thesky; }
     inline int getShader() { return carsShader; }
     inline int getShaowIndex() { return ShadowIndex; }
-    osg::ref_ptr<osg::Group> getRoot() { return m_RealRoot.get(); }
-    osg::ref_ptr<osg::Group> getSceneRoot() { return m_scene.get(); }
-    osg::ref_ptr<osg::Group> getCarRoot() { return m_CarRoot.get(); }
-    osg::ref_ptr<osg::Group> getCarLightsRoot() { return m_CarLightsRoot.get(); }
+    osg::ref_ptr<osg::Group> getRoot() { return m_Root.get(); }
     osg::Vec3f getFogColor() { return FogColor; }
 };
 

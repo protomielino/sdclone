@@ -20,7 +20,6 @@
 #include <osg/Geode>
 #include <osg/BlendFunc>
 #include <osg/Depth>
-#include <osg/PolygonOffset>
 #include <osg/MatrixTransform>
 #include <osg/Camera>
 #include <osg/RenderInfo>

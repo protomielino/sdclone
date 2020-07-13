@@ -37,20 +37,23 @@ enum NodeMask
     NODE_MASK_SHADOW_CAST_CURDRV = 1 << 10,
 
     NODE_MASK_SHADOW_RECV        = NODE_MASK_SHADOW_RECV_COMMON
-                                     | NODE_MASK_SHADOW_RECV_CURCAR
-                                     | NODE_MASK_SHADOW_RECV_CURDRV,
+                                 | NODE_MASK_SHADOW_RECV_CURCAR
+                                 | NODE_MASK_SHADOW_RECV_CURDRV,
 
     NODE_MASK_SHADOW_CAST        = NODE_MASK_SHADOW_CAST_COMMON
-                                     | NODE_MASK_SHADOW_CAST_CURCAR
-                                     | NODE_MASK_SHADOW_CAST_CURDRV,
+                                 | NODE_MASK_SHADOW_CAST_CURCAR
+                                 | NODE_MASK_SHADOW_CAST_CURDRV,
+
+    NODE_MASK_SHADOW             = NODE_MASK_SHADOW_RECV
+                                 | NODE_MASK_SHADOW_CAST,
 
     NODE_MASK_CURCAR             = NODE_MASK_COMMON_CURCAR
-                                     | NODE_MASK_SHADOW_RECV_CURCAR
-                                     | NODE_MASK_SHADOW_CAST_CURCAR,
+                                 | NODE_MASK_SHADOW_RECV_CURCAR
+                                 | NODE_MASK_SHADOW_CAST_CURCAR,
 
     NODE_MASK_CURDRV             = NODE_MASK_COMMON_CURDRV
-                                     | NODE_MASK_SHADOW_RECV_CURDRV
-                                     | NODE_MASK_SHADOW_CAST_CURDRV,
+                                 | NODE_MASK_SHADOW_RECV_CURDRV
+                                 | NODE_MASK_SHADOW_CAST_CURDRV,
 };
 
 #endif // _OSGNODEMASK_H

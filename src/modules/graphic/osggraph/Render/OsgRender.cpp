@@ -73,16 +73,16 @@ static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = {1, 3, 5, 7, 8};
 static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
 
 SDRender::SDRender(void) :
-    m_RealRoot(NULL),
-    m_scene(NULL),
+    m_Root(NULL),
+    m_Scene(NULL),
+    m_ShadowSlot(NULL),
+    m_ShadowRoot(NULL),
+    m_NonShadowRoot(NULL),
     m_CarRoot(NULL),
     m_CarLightsRoot(NULL),
-    skyGroup(NULL),
     stateSet(NULL),
     skySS(NULL),
-    lightSource(NULL),
     sunLight(NULL),
-    shadowRoot(NULL),
     AStarsData(NULL),
     APlanetsData(NULL),
     thesky(NULL),
@@ -120,25 +120,28 @@ SDRender::SDRender(void) :
 
 SDRender::~SDRender(void)
 {
-    if(m_scene != NULL)
+    if (m_Root != NULL)
     {
-        m_scene->removeChildren(0, m_scene->getNumChildren());
         m_CarRoot->removeChildren(0, m_CarRoot->getNumChildren());
         m_CarLightsRoot->removeChildren(0, m_CarLightsRoot->getNumChildren());
-        skyGroup->removeChildren(0, skyGroup->getNumChildren());
-        m_RealRoot->removeChildren(0, m_RealRoot->getNumChildren());
+        m_ShadowRoot->removeChildren(0, m_ShadowRoot->getNumChildren());
+        m_ShadowSlot->removeChildren(0, m_ShadowSlot->getNumChildren());
+        m_NonShadowRoot->removeChildren(0, m_NonShadowRoot->getNumChildren());
+        m_Scene->removeChildren(0, m_Scene->getNumChildren());
+        m_Root->removeChildren(0, m_Root->getNumChildren());
         stateSet->getTextureAttributeList().clear();
         stateSet->getTextureModeList().clear();
 
-        m_scene = NULL;
         m_CarRoot = NULL;
         m_CarLightsRoot = NULL;
-        skyGroup = NULL;
-        m_RealRoot = NULL;
+        m_ShadowRoot = NULL;
+        m_ShadowSlot = NULL;
+        m_NonShadowRoot = NULL;
+        m_Scene = NULL;
+        m_Root = NULL;
     }
 
     delete thesky;
-
     thesky = NULL;
     SDTrack = NULL;
 }
@@ -359,70 +362,55 @@ void SDRender::Init(tTrack *track)
                     APlanetsData, NStars, AStarsData);
     UpdateLight();
 
-    osg::ref_ptr<osg::Group> sceneGroup = new osg::Group;
-    osg::ref_ptr<osg::Group> mRoot = new osg::Group;
     osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
-    m_scene = new osg::Group;
+    m_Root = new osg::Group;
+    m_Scene = new osg::Group;
+    m_ShadowSlot = new osg::Group;
+    m_ShadowRoot = new osg::Group;
+    m_NonShadowRoot = new osg::Group;
     m_CarRoot = new osg::Group;
     m_CarLightsRoot = new osg::Group;
-    m_RealRoot = new osg::Group;
-    shadowRoot = new osgShadow::ShadowedScene;
 
     osg::ref_ptr<osgParticle::PrecipitationEffect> precipitationEffect = new osgParticle::PrecipitationEffect;
 
     if (SDRain > 0)
-    {
-        sceneGroup->addChild(precipitationEffect.get());
-    }
+        m_Root->addChild(precipitationEffect.get());
 
     osg::ref_ptr<osg::Group> scene = new osg::Group;
-    osg::ref_ptr<osg::Group> background = new osg::Group;
     osg::ref_ptr<osg::Group> cargroup = new osg::Group;
-    osg::ref_ptr<osg::Group> lights = new osg::Group;
-
     scene->addChild(scenery->getScene());
     cargroup->addChild(m_CarRoot.get());
-    lights->addChild(m_CarLightsRoot.get());
-    background->addChild(scenery->getBackground());
-
-    if(ShadowIndex > 0)
+    switch (QualityIndex)
     {
-        switch (QualityIndex+1)
-        {
-        case 0:
-            break;
-        case 1:
-            scene->setNodeMask(~NODE_MASK_SHADOW_CAST);
-            background->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
-            lights->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
-            cargroup->setNodeMask(~NODE_MASK_SHADOW_RECV);
-            break;
-        case 2:
-            scene->setNodeMask(~NODE_MASK_SHADOW_CAST);
-            background->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
-            lights->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
-            cargroup->setNodeMask(NODE_MASK_ALL);
-            break;
-        case 3:
-            scene->setNodeMask(NODE_MASK_ALL);
-            background->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
-            lights->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
-            cargroup->setNodeMask(NODE_MASK_ALL);
-            break;
-        default:
-            break;
-        }
+    case 0:
+        scene->setNodeMask(~NODE_MASK_SHADOW_CAST);
+        cargroup->setNodeMask(~NODE_MASK_SHADOW_RECV);
+        break;
+    case 1:
+        scene->setNodeMask(~NODE_MASK_SHADOW_CAST);
+        cargroup->setNodeMask(NODE_MASK_ALL);
+        break;
+    case 2:
+        scene->setNodeMask(NODE_MASK_ALL);
+        cargroup->setNodeMask(NODE_MASK_ALL);
+        break;
+    default:
+        break;
     }
+    
+    m_ShadowRoot->addChild( cargroup.get() );
+    m_ShadowRoot->addChild( scene.get() );
+    m_ShadowSlot->addChild( m_ShadowRoot.get() );
 
-    m_scene->addChild(cargroup.get());
-    m_scene->addChild(scene.get());
-    m_scene->addChild(lights.get());
-    m_scene->addChild(background.get());
+    m_NonShadowRoot->addChild( m_CarLightsRoot.get() );
+    m_NonShadowRoot->addChild( scenery->getBackground() );
 
-    sceneGroup->addChild(m_scene.get());
+    m_Scene->addChild( m_ShadowSlot.get() );
+    m_Scene->addChild( m_NonShadowRoot.get() );
+    m_Root->addChild(m_Scene.get());
 
     stateSet = new osg::StateSet;
-    stateSet = m_scene->getOrCreateStateSet();
+    stateSet = m_Scene->getOrCreateStateSet();
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
     if (SDRain > 0)
@@ -438,7 +426,7 @@ void SDRender::Init(tTrack *track)
     stateSet->setAttributeAndModes(material, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OVERRIDE|osg::StateAttribute::ON);
 
-    lightSource = new osg::LightSource;
+    osg::ref_ptr<osg::LightSource> lightSource = new osg::LightSource;
     lightSource->getLight()->setDataVariance(osg::Object::DYNAMIC);
     lightSource->getLight()->setLightNum(0);
     // relative because of CameraView being just a clever transform node
@@ -447,7 +435,7 @@ void SDRender::Init(tTrack *track)
     lightSource->getLight()->setAmbient(osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
     lightSource->getLight()->setDiffuse(osg::Vec4( 0.2f, 0.2f, 0.2f, 1.0f));
     lightSource->getLight()->setSpecular(osg::Vec4(0.0f, 0.0f, 0.0f, 0.0f));
-    sceneGroup->addChild(lightSource);
+    m_Root->addChild(lightSource);
 
     // we need a white diffuse light for the phase of the moon
     sunLight = new osg::LightSource;
@@ -458,7 +446,7 @@ void SDRender::Init(tTrack *track)
     sunLight->getLight()->setAmbient(SceneAmbiant);
     sunLight->getLight()->setDiffuse(SceneDiffuse);
     sunLight->getLight()->setSpecular(SceneSpecular);
-    sunLight->setStateSetModes(*stateSet,osg::StateAttribute::ON);
+    sunLight->setStateSetModes(*stateSet, osg::StateAttribute::ON);
 
     osg::Vec3f sun_position = thesky->sunposition();
     osg::Vec3f sun_direction = -sun_position;
@@ -466,74 +454,69 @@ void SDRender::Init(tTrack *track)
     sunLight->getLight()->setPosition(position);
     sunLight->getLight()->setDirection(sun_direction);
 
-    skyGroup = new osg::Group;
+    osg::ref_ptr<osg::Group> skyGroup = new osg::Group;
     skyGroup->setName("skyCloudsGroup");
     skyGroup->setNodeMask(NODE_MASK_SKY_BACKGROUND);
     skyGroup->addChild(thesky->getPreRoot());
-    skyGroup->addChild((thesky->getCloudRoot()));
+    skyGroup->addChild(thesky->getCloudRoot());
 
     skySS = new osg::StateSet;
     skySS = skyGroup->getOrCreateStateSet();
     skySS->setMode(GL_LIGHT0, osg::StateAttribute::OFF);
     skySS->setAttributeAndModes( new osg::ColorMask( true, true, true, false ), osg::StateAttribute::ON );
 
-    skyGroup->setNodeMask(~(NODE_MASK_SHADOW_RECV | NODE_MASK_SHADOW_CAST));
     sunLight->addChild(skyGroup.get());
 
-    mRoot->addChild(sceneGroup.get());
-    mRoot->setStateSet(setFogState().get());
-    mRoot->addChild(sunLight.get());
+    m_Root->setStateSet(setFogState().get());
+    m_Root->addChild(sunLight.get());
+    m_ShadowRoot->addChild(sunLight.get());
 
     // Clouds are added to the scene graph later
-    osg::ref_ptr<osg::StateSet> stateSet2 = new osg::StateSet;
-    stateSet2 = mRoot->getOrCreateStateSet();
+    osg::ref_ptr<osg::StateSet> stateSet2 = m_Root->getOrCreateStateSet();
     stateSet2->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
     stateSet2->setMode(GL_LIGHTING, osg::StateAttribute::ON);
     stateSet2->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
-
-    m_RealRoot->addChild(mRoot.get());
-
-    GfOut("LE POINTEUR %p\n", mRoot.get());
 }//SDRender::Init
 
 void SDRender::ShadowedScene()
 {
+    osg::ref_ptr<osgShadow::ShadowedScene> shadowScene = new osgShadow::ShadowedScene;
+    osg::ref_ptr<osgShadow::ShadowSettings> shadowSettings = shadowScene->getShadowSettings();
+    shadowSettings->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
+    shadowSettings->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
+    
+    osg::ref_ptr<osg::LightSource> light = new osg::LightSource;
+    light->setLight( sunLight->getLight() );
+    light->setReferenceFrame(osg::LightSource::RELATIVE_RF);
+    light->setLocalStateSetModes(osg::StateAttribute::ON);
+    shadowScene->addChild(light);
+
     if (ShadowIndex == 1)
     {
-        unsigned int shadowTexUnit = 3;
-
         osg::ref_ptr<osgShadow::ShadowMap> vdsm = new osgShadow::ShadowMap;
-        vdsm->setLight(sunLight.get());
+        vdsm->setLight(light.get());
         vdsm->setTextureSize(osg::Vec2s(ShadowTexSize, ShadowTexSize));
-        vdsm->setTextureUnit(shadowTexUnit);
-        shadowRoot = new osgShadow::ShadowedScene;
-        shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
-        shadowRoot->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
-        shadowRoot->setShadowTechnique((vdsm.get()));
+        vdsm->setPolygonOffset(osg::Vec2(-4, -2));
+        shadowScene->setShadowTechnique(vdsm);
     }
     else if (ShadowIndex  == 2)
     {
         osg::ref_ptr<osgShadow::SoftShadowMap> ssm = new osgShadow::SoftShadowMap;
-        ssm->setLight(sunLight.get());
+        ssm->setLight(light.get());
         ssm->setTextureSize(osg::Vec2s(ShadowTexSize, ShadowTexSize));
         ssm->setSoftnessWidth(1.0f);
-        shadowRoot = new osgShadow::ShadowedScene;
-        shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
-        shadowRoot->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
-        shadowRoot->setShadowTechnique((ssm.get()));
+        shadowScene->setShadowTechnique(ssm);
     }
     else if (ShadowIndex == 3)
     {
         osg::ref_ptr<osgShadow::ParallelSplitShadowMap> pssm =
                 new osgShadow::ParallelSplitShadowMap(NULL, 3);
+        pssm->setUserLight( light->getLight() );
         pssm->setTextureResolution(ShadowTexSize);
         pssm->setMinNearDistanceForSplits(0.25f);
         pssm->setMaxFarDistance(512);
         pssm->setPolygonOffset(osg::Vec2(10.0f, 20.0f));
-        shadowRoot = new osgShadow::ShadowedScene;
-        shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
-        shadowRoot->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
-        shadowRoot->setShadowTechnique((pssm.get()));
+        shadowScene->setShadowTechnique(pssm);
     }
     else if (ShadowIndex == 4)
     {
@@ -551,37 +534,22 @@ void SDRender::ShadowedScene()
         lspsm->setBaseTextureCoordIndex(baseTexUnit);
 
         lspsm->setBaseTextureUnit(baseTexUnit);
-        shadowRoot = new osgShadow::ShadowedScene;
-        shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
-        shadowRoot->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
-        shadowRoot->setShadowTechnique((lspsm.get()));
+        shadowScene->setShadowTechnique(lspsm);
     }
     else if (ShadowIndex == 5)
     {
-        osg::ref_ptr<osgShadow::ShadowSettings> shadowSettings = new osgShadow::ShadowSettings;
         shadowSettings->setTextureSize(osg::Vec2s(ShadowTexSize, ShadowTexSize));
         shadowSettings->setBaseShadowTextureUnit(3);
         shadowSettings->setLightNum(1);
         shadowSettings->setShaderHint(osgShadow::ShadowSettings::NO_SHADERS);
 
-        shadowRoot = new osgShadow::ShadowedScene;
-
         osg::ref_ptr<osgShadow::ViewDependentShadowMap> shadowTechnique = new osgShadow::ViewDependentShadowMap;
-
-        shadowRoot->setShadowSettings(shadowSettings);
-        shadowRoot->setShadowTechnique(shadowTechnique);
-        shadowRoot->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
-        shadowRoot->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
+        shadowScene->setShadowTechnique(shadowTechnique);
     }
 
-    shadowRoot->addChild(m_scene.get());
-    shadowRoot->addChild(m_CarRoot.get());
-    shadowRoot->addChild(sunLight.get());
-
-    m_RealRoot->removeChild(0, m_RealRoot->getNumChildren());
-
-    m_RealRoot->addChild(shadowRoot.get());
-    m_RealRoot->addChild(thesky->getCloudRoot());
+    m_ShadowSlot->removeChildren(0, m_ShadowSlot->getNumChildren());
+    shadowScene->addChild( m_ShadowRoot.get() );
+    m_ShadowSlot->addChild( shadowScene.get() );
 }
 
 void SDRender::addCars(osg::Node* cars, osg::Node* carLights)
@@ -589,13 +557,11 @@ void SDRender::addCars(osg::Node* cars, osg::Node* carLights)
     m_CarRoot->addChild(cars);
     m_CarLightsRoot->addChild(carLights);
 
-    osgUtil::Optimizer optimizer;
-    optimizer.optimize(m_CarRoot.get());
-    optimizer.optimize(m_CarLightsRoot.get());
-    optimizer.optimize(m_scene.get());
-
     if ((ShadowIndex > 0) & (SDVisibility > 4000) & (SDRain < 1))
         ShadowedScene();
+
+    osgUtil::Optimizer optimizer;
+    optimizer.optimize(m_Root.get());
 }
 
 void SDRender::UpdateLight( void )

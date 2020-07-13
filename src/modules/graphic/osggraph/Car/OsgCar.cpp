@@ -17,7 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <osgUtil/Optimizer>
 #include <osg/MatrixTransform>
 #include <osg/Switch>
 #include <osg/Group>
@@ -960,7 +959,7 @@ void SDCar::updateCar()
 
 void SDCar::updateShadingParameters(const osg::Matrixf &modelview)
 {
-    shader->update(modelview);
+    if (shader) shader->update(modelview);
 }
 
 void SDCar::setReflectionMap(osg::ref_ptr<osg::Texture> map)

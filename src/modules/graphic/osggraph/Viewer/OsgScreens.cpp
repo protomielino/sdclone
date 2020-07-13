@@ -64,7 +64,8 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     //intialising main screen
 
     viewer = new osgViewer::Viewer;
-    viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
+    viewer->setLightingMode( osg::View::NO_LIGHT );
+    viewer->setThreadingModel( osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext );
 #if 1 //SDL_MAJOR_VERSION < 2
     osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, width, height);
     osg::ref_ptr<osg::Camera> Camera = viewer->getCamera();

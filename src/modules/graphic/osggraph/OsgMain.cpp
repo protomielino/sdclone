@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include <osgDB/Registry>
-#include <osgUtil/Optimizer>
 #include <osg/Group>
 #include <osgViewer/View>
 #include <osgViewer/CompositeViewer>

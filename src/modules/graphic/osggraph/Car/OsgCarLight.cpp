@@ -46,25 +46,29 @@ osg::ref_ptr<osg::Node> SDCarLight::init(
     transform->setMatrix(osg::Matrix::scale(size, size, size));
     
     if (layers > 0) {
+        const double s = 1;
+        const double z = 0; // put 1 to move light bit close to camera
+        
         const osg::Vec3d vtx[] = {
-            osg::Vec3d(-0.5,-0.5, 2.0),
-            osg::Vec3d( 0.5,-0.5, 2.0),
-            osg::Vec3d(-0.5, 0.5, 2.0),
-            osg::Vec3d( 0.5, 0.5, 2.0) };
+            osg::Vec3d(-s,-s, z),
+            osg::Vec3d( s,-s, z),
+            osg::Vec3d( s, s, z),
+            osg::Vec3d(-s, s, z) };
         const osg::Vec2d tex[] = {
-            osg::Vec2d(0.0, 0.0),
-            osg::Vec2d(1.0, 0.0),
-            osg::Vec2d(0.0, 1.0),
-            osg::Vec2d(1.0, 1.0) };
+            osg::Vec2d(0, 0),
+            osg::Vec2d(1, 0),
+            osg::Vec2d(1, 1),
+            osg::Vec2d(0, 1) };
 
         // build triangle strip
         const int count = (layers+1)*2;
         osg::Vec3dArray *vertexArray = new osg::Vec3dArray;
         osg::Vec2dArray *texArray = new osg::Vec2dArray;
-        for(int i = 0; i < count; ++i) {
-            const int j = i%4;
-            vertexArray->push_back(vtx[j]);
-            texArray->push_back(tex[j]);
+        for(int l = 0; l < layers; ++l) {
+            for(int i = 0; i < 4; ++i) {
+                vertexArray->push_back(vtx[i]);
+                texArray->push_back(tex[i]);
+            }
         }
 
         osg::Vec4dArray *colorArray = new osg::Vec4dArray;
@@ -78,7 +82,7 @@ osg::ref_ptr<osg::Node> SDCarLight::init(
         geometry->setTexCoordArray(0, texArray, osg::Array::BIND_PER_VERTEX);
         geometry->setNormalArray(normalArray, osg::Array::BIND_OVERALL);
         geometry->setColorArray(colorArray, osg::Array::BIND_OVERALL);
-        geometry->addPrimitiveSet( new osg::DrawArrays(osg::PrimitiveSet::TRIANGLE_STRIP, 0, count) );
+        geometry->addPrimitiveSet( new osg::DrawArrays(osg::PrimitiveSet::QUADS, 0, count) );
 
         osg::Geode *geode = new osg::Geode;
         geode->addDrawable(geometry);
@@ -171,8 +175,8 @@ void SDCarLights::loadStates()
         state_set->setMode(GL_FOG, osg::StateAttribute::ON);
         state_set->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
         state_set->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
-        state_set->setAttributeAndModes(new osg::PolygonOffset(-15.f, -20.f), osg::StateAttribute::ON);
-        state_set->setTextureAttributeAndModes(0, new osg::TexEnv(osg::TexEnv::MODULATE), osg::StateAttribute::ON);
+        state_set->setAttributeAndModes(new osg::PolygonOffset(-10000.f, -10000.f), osg::StateAttribute::ON);
+        state_set->setAttributeAndModes(new osg::TexEnv(osg::TexEnv::MODULATE), osg::StateAttribute::ON);
         state_set->setAttributeAndModes(new osg::Depth(osg::Depth::LESS, 0.0, 1.0, false), osg::StateAttribute::ON);
         state_set->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 
