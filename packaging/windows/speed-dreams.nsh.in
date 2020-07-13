@@ -86,14 +86,14 @@ SetCompressor /SOLID lzma ; 1-block compression, smaller but longer (generation,
 !include "MUI.nsh" ; TODO: Move to MUI2
 
 !define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_BITMAP "..\..\data\data\img\header.bmp"
+!define MUI_HEADERIMAGE_BITMAP "${BUILD_INST_DIR}\data\data\img\header.bmp"
 
-!define MUI_WELCOMEFINISHPAGE_BITMAP "..\..\data\data\img\header-vert.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "${BUILD_INST_DIR}\data\data\img\header-vert.bmp"
 
 !define MUI_ABORTWARNING
 
-!define MUI_ICON "..\..\data\data\icons\icon.ico"
-!define MUI_UNICON "..\..\data\data\icons\icon.ico"
+!define MUI_ICON "${BUILD_INST_DIR}\data\data\icons\icon.ico"
+!define MUI_UNICON "${BUILD_INST_DIR}\data\data\icons\icon.ico"
 
 !define MUI_LICENSEPAGE_CHECKBOX
 

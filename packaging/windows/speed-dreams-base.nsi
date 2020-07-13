@@ -134,10 +134,7 @@ Section "!Base System" SEC01
 
   ; Documentation
   SetOutPath "$INSTDIR\doc"
-  File "..\..\doc\faq\faq.html"
-
-  SetOutPath "$INSTDIR\doc"
-  File /r /x .svn "..\..\doc\userman\*.*"
+  File /r /x .svn "${BUILD_INST_DIR}\doc\*.*"
 
   ; Base robots binaries
   SetOutPath "$INSTDIR\lib\drivers\human"

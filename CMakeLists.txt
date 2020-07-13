@@ -147,6 +147,13 @@ ADD_SUBDIRECTORY(cmake)
 # Update (and then install) version.xml from their respective version.
 SD_UPDATE_SETTINGS_VERSION()
 
+IF(MSVC)
+   INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/doc/faq/faq.html DESTINATION ./doc)
+   INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/doc/userman/how_to_drive.html DESTINATION ./doc)
+   INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc/userman/images/ DESTINATION ./doc/images/)
+ENDIF(MSVC)
+
+
 # Usefull for using an installation of SD as a robot development framework without building it.
 INSTALL_SD_CMAKE()
 
