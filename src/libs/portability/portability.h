@@ -106,7 +106,7 @@ PORTABILITY_API char *strtok_r(char *str, const char *delim, char **nextp);
 #define isnan _isnan
 #define isfinite _finite
 #endif
-#if _MSC_VER < 1700
+#if _MSC_VER < 1800
 #define copysign _copysign
 #endif
 
