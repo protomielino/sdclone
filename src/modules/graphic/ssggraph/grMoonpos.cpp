@@ -38,7 +38,7 @@ double grUpdateMoonPos(double timeOfDay)
 #if 0   // dead code
     actual = timeOfDay;
 #endif
-    moonpos = (MoonPositionDay[day+1] - day);
+    moonpos = (MoonPositionDay[day-1] - day);
     moonpos = moonpos + (15 * ((double)timeOfDay / 3600 - 90.0));
     if (moonpos > 360.0)
         moonpos = 0.0;
