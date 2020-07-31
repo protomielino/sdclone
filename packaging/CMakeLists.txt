@@ -24,6 +24,9 @@
 #==============================================================================
 INCLUDE(../cmake/macros.cmake)
 
+SET(SD_PACKAGEDIR "../packages" CACHE PATH "Location for the created installers")
+MARK_AS_ADVANCED(SD_PACKAGEDIR)
+
 IF(OPTION_OSGGRAPH)
    IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
 

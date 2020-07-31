@@ -50,7 +50,7 @@
 ; Global installer settings.
 Name "${GAME_VERSIONNED_NAME}"
 Caption "Install WIP tracks, cars & AI drivers for ${GAME_VERSIONNED_NAME}"
-OutFile "speed-dreams-${WIPCARSTRACKS_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
+OutFile "${OUT_PATH}\${GAME_SHORT_FS_NAME}-${WIPCARSTRACKS_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
 InstallDir "$PROGRAMFILES\${INST_INST_DIR_SUFFIX}" ; TODO: Detect base package install dir
 InstallDirRegKey ${GAME_ROOT_REGKEY} "${GAME_DIR_REGKEY}" ""
 ShowInstDetails show

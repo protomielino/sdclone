@@ -51,7 +51,7 @@
 ; Global installer settings.
 Name "${GAME_VERSIONNED_NAME}"
 Caption "Install HQ tracks, cars & AI drivers for ${GAME_VERSIONNED_NAME}"
-OutFile "speed-dreams-${HQCARSTRACKS_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
+OutFile "${OUT_PATH}\${GAME_SHORT_FS_NAME}-${HQCARSTRACKS_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
 InstallDir "$PROGRAMFILES\${INST_INST_DIR_SUFFIX}"
 InstallDirRegKey ${GAME_ROOT_REGKEY} "${GAME_DIR_REGKEY}" ""
 ShowInstDetails show

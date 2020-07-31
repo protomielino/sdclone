@@ -67,7 +67,7 @@ ReserveFile "speed-dreams.ini"
 Name "${GAME_VERSIONNED_NAME}"
 Caption "Install ${GAME_VERSIONNED_NAME}"
 UninstallCaption "Uninstall ${GAME_VERSIONNED_NAME}"
-OutFile "${GAME_SHORT_FS_NAME}-${BASE_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
+OutFile "${OUT_PATH}\${GAME_SHORT_FS_NAME}-${BASE_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
 InstallDir "$PROGRAMFILES\${INST_INST_DIR_SUFFIX}"
 InstallDirRegKey ${GAME_ROOT_REGKEY} "${GAME_DIR_REGKEY}" ""
 ShowInstDetails show

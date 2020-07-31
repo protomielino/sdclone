@@ -39,6 +39,10 @@
    ;!define VER_RELDATE 20131102 ; Initial guess ;-)
 !endif
 
+!ifndef OUT_PATH
+   !define OUT_PATH "."
+!endif
+
 !define GAME_SHORT_NAME "Speed Dreams"
 !define GAME_NAME "${GAME_SHORT_NAME} ${VER_MAJOR}"
 !define GAME_SHORT_FS_NAME "speed-dreams"
