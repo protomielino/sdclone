@@ -310,6 +310,10 @@ void CarSetupMenu::updateControls()
                     GfuiEditboxSetString(getMenuHandle(), att.editId, "----");
                     GfuiEnable(getMenuHandle(), att.editId, GFUI_DISABLE);
                 }
+                else if (att.type == "combo")
+                {
+                    GfuiComboboxClear(getMenuHandle(), att.comboId);
+                }
             }
         }
     }
