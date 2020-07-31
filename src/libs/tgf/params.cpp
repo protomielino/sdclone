@@ -2575,7 +2575,11 @@ GfParmListRemoveElt (void *handle, const char *path, const char *key)
     }
     fullName = (char *) malloc (strlen (path) + strlen (key) + 2);
     if (!fullName) {
+#if defined(_MSC_VER) && _MSC_VER < 1800
 	GfLogError ("GfParmListRemoveElt: malloc (%lu) failed\n", strlen (path) + strlen (key) + 2);
+#else
+	GfLogError ("GfParmListRemoveElt: malloc (%zu) failed\n", strlen (path) + strlen (key) + 2);
+#endif
 	return -1;
     }
     sprintf (fullName, "%s/%s", path, key);
@@ -2619,7 +2623,11 @@ GfParmListRenameElt (void *handle, const char *path, const char *oldKey, const c
 	// Build new element full name.
     newFullName = (char *) malloc (strlen (path) + strlen (newKey) + 2);
     if (!newFullName) {
+#if defined(_MSC_VER) && _MSC_VER < 1800
 	GfLogError ("GfParmListRenameElt: malloc (%lu) failed\n", strlen (path) + strlen (newKey) + 2);
+#else
+	GfLogError ("GfParmListRenameElt: malloc (%zu) failed\n", strlen (path) + strlen (newKey) + 2);
+#endif
 	return -1;
     }
     sprintf (newFullName, "%s/%s", path, newKey);
@@ -2634,7 +2642,11 @@ GfParmListRenameElt (void *handle, const char *path, const char *oldKey, const c
 	// Check if no other element has same fullname in the list.
     oldFullName = (char *) malloc (strlen (path) + strlen (oldKey) + 2);
     if (!oldFullName) {
+#if defined(_MSC_VER) && _MSC_VER < 1800
 	GfLogError ("GfParmListRenameElt: malloc (%lu) failed", strlen (path) + strlen (oldKey) + 2);
+#else
+	GfLogError ("GfParmListRenameElt: malloc (%zu) failed", strlen (path) + strlen (oldKey) + 2);
+#endif
 	return -1;
     }
     sprintf (oldFullName, "%s/%s", path, oldKey);
