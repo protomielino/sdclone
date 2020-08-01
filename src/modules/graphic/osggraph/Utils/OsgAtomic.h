@@ -23,7 +23,7 @@
 #if defined(__GNUC__) && ((4 < __GNUC__)||(4 == __GNUC__ && 1 <= __GNUC_MINOR__)) && (defined(__x86_64__) || defined(__powerpc64__))
 // No need to include something. Is a Compiler API ...
 # define SDATOMIC_USE_GCC4_BUILTINS
-#elif defined(__GNUC__) && defined(__i386__)
+#elif defined(__GNUC__) && (defined(__i386__) || defined(__arm__))
 # define SDATOMIC_USE_LIBRARY_FUNCTIONS
 #elif defined(__sgi) && defined(_COMPILER_VERSION) && (_COMPILER_VERSION>=730)
 // No need to include something. Is a Compiler API ...
