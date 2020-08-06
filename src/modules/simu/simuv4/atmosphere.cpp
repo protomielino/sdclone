@@ -21,7 +21,7 @@
 
 //static int SimClouds = 0;
 
-void SimAtmosphereConfig(tTrack *track)
+void SimAtmospherePreConfig(tTrack *track)
 {
     SimRain = track->local.rain;
     SimTimeOfDay = track->local.timeofday;
@@ -36,8 +36,14 @@ void SimAtmosphereConfig(tTrack *track)
     if (SimAirDensity == 0.0f)
         SimAirDensity = 1.290f;
 
-    GfLogDebug("SimAirPressure = %3f - SimAirDensity = %3f\n", SimAirPressure, SimAirDensity);
+    if (track->local.config > 0)
+        SimAtmosphereConfig(track);
 
+    GfLogDebug("SimAirPressure = %3f - SimAirDensity = %3f\n", SimAirPressure, SimAirDensity);
+}
+
+void SimAtmosphereConfig(tTrack *track)
+{
     if (SimTimeOfDay < 6.00 * 60 *60 && SimTimeOfDay > 19 * 60 * 60)
         Tair -= 6.75;
     else if (SimTimeOfDay > 6.00 * 60 * 60 && SimTimeOfDay < 10 * 60 * 60)
@@ -60,9 +66,20 @@ void SimAtmosphereConfig(tTrack *track)
         Tair -= 5.75;
 }
 
-
-void SimAtmosphereUpdate(tCar *car, tSituation *s)
+void SimAtmosphereUpdate(tSituation *s)
 {
+    double timeofday = SimTimeOfDay + s->currentTime;
+
+    if (timeofday > 6.00 * 60 * 60 && timeofday < 18.00 * 60 * 60)
+    {
+        Tair = Tair + 0.000001;
+        GfLogDebug("Tair update = %.7f\n", Tair - 273.15);
+    }
+    else
+    {
+        Tair = Tair - 0.000001;
+        GfLogDebug("Tair update = %.7f\n", Tair - 273.15);
+    }
     // TODO: get this later form the situation, weather simulation.
     //car->localTemperature = 273.15f + 20.0f;
     //car->localPressure = 101300.0f;

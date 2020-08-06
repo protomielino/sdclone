@@ -417,6 +417,7 @@ reTrackInitWeather(void)
     trackLocal->winddir = (tdble)(rand() % 359);
     trackLocal->relativehumidity = 65.0f;
     trackLocal->visibility = (tdble)(rand() % 12000);
+    trackLocal->config = 2;
 
     reTrackInitWeatherValues();
 
@@ -703,6 +704,8 @@ reTrackInitRealWeather(void)
             trackLocal->water = TR_RAIN_NONE;
         }
 
+        trackLocal->config = 0;
+
         GfLogDebug("Visibility = %.3f\n", trackLocal->visibility);
         GfLogDebug("Wind Speed = %.3f\n", trackLocal->windspeed);
         GfLogDebug("Wind direction = %.3f\n", trackLocal->winddir);
@@ -772,6 +775,8 @@ reTrackInitSimuWeather(void)
 
         if ((trackLocal->visibility < 300) && (rain < 1))
             trackLocal->visibility = 300;
+
+        trackLocal->config = 1;
 
         ReTrackUpdate();
 
@@ -891,7 +896,7 @@ reTrackInitSimuWeather(void)
 
     // temperature/pressure
     if (webMetar->getTemperature_C() == WebMetarNaN)
-        trackLocal->airtemperature = 15.0;
+        trackLocal->airtemperature = 15.0f;
     else
         trackLocal->airtemperature = (tdble)(webMetar->getTemperature_C());
 

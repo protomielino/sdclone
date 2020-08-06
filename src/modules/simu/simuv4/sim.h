@@ -110,8 +110,9 @@ extern void SimCarCollideShutdown(int nbcars);
 extern void SimCarCollideInit(tTrack *track);
 extern void SimCollideRemoveCar(tCar *car, int nbcars);
 
+extern void SimAtmospherePreConfig(tTrack *track);
 extern void SimAtmosphereConfig(tTrack *track);
-extern void SimAtmosphereUpdate(tCar *car, tSituation *s);
+extern void SimAtmosphereUpdate(tSituation *s);
 
 extern tdble SimDeltaTime;
 extern int SimTelemetry;
@@ -129,7 +130,7 @@ extern int   SimDay;
 extern tdble SimHumidity;
 extern int   SimClouds;
 
-extern tdble Tair;   //air temperature in K (K = 273.15 + degree Celsius)
+extern double Tair;   //air temperature in K (K = 273.15 + degree Celsius)
 extern tdble Ttrack; //track temperature in K
 extern float SimAirPressure;
 extern float SimAirDensity;

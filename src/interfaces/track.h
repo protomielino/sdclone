@@ -651,6 +651,7 @@ typedef struct TrackLocalInfo
     tdble windspeed;
     tdble dewp;
     tdble winddir;
+    int   config;
 } tTrackLocalInfo;
 
 /** Track structure

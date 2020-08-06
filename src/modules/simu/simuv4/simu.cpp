@@ -42,7 +42,7 @@ tdble SimRain = 0;
 tdble SimTimeOfDay = 0;
 int SimClouds = 0;
 
-tdble Tair = 273.15;
+double Tair = 273.15;
 tdble Ttrack = 220.0;
 
 float SimAirPressure = 101300.0f;
@@ -527,6 +527,9 @@ SimUpdate(tSituation *s, double deltaTime)
     tCar *car;
 
     SimDeltaTime = (tdble) deltaTime;
+
+    SimAtmosphereUpdate(s);
+
     for (ncar = 0; ncar < s->_ncars; ncar++)
     {
         SimCarTable[ncar].collision = 0;
@@ -683,7 +686,7 @@ SimInit(int nbcars, tTrack* track)
     SimNbCars = nbcars;
     SimCarTable = (tCar*)calloc(nbcars, sizeof(tCar));
     PTrack = track;
-    SimAtmosphereConfig(PTrack);
+    SimAtmospherePreConfig(PTrack);
     GfLogInfo("Tair in Simu = %3f - Air Pressure in Simu = %3f - Air Density in Simu = %3f\n", Tair, SimAirPressure, SimAirDensity);
     SimCarCollideInit(PTrack);
 }
