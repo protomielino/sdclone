@@ -99,12 +99,19 @@ void SimWheelConfig(tCar *car, int index)
 
     /* temperature and degradation */
     wheel->Tinit = GfParmGetNum(hdle, WheelSect[index], PRM_INITTEMP, (char*)NULL, Tair);
-    wheel->Ttire = wheel->Tinit;
     wheel->treadDepth = 1.0;
     wheel->Topt = GfParmGetNum(hdle, WheelSect[index], PRM_OPTTEMP, (char*)NULL, 350.0f);
+    if (car->features & FEAT_TIRETEMPDEG) 
+    {
+		wheel->Ttire = wheel->Tinit;
+	} 
+	else 
+	{
+	    wheel->Ttire = wheel->Topt;
+	}
     tdble coldmufactor = GfParmGetNum(hdle, WheelSect[index], PRM_COLDMUFACTOR, (char*)NULL, 1.0f);
     coldmufactor = MIN(MAX(coldmufactor, 0.0f), 1.0f);
-    wheel->muTmult = (1 - coldmufactor) / ((wheel->Topt - Tair) * (wheel->Topt - Tair));
+    wheel->muTmult = (1 - coldmufactor) / ((wheel->Topt - 273) * (wheel->Topt - 273));
     wheel->heatingm = GfParmGetNum(hdle, WheelSect[index], PRM_HEATINGMULT, (char*)NULL, (tdble) 6e-5);
     wheel->aircoolm = GfParmGetNum(hdle, WheelSect[index], PRM_AIRCOOLINGMULT, (char*)NULL, (tdble) 12e-4);
     wheel->speedcoolm = GfParmGetNum(hdle, WheelSect[index], PRM_SPEEDCOOLINGMULT, (char*)NULL, (tdble) 0.25);
@@ -136,13 +143,14 @@ void SimWheelConfig(tCar *car, int index)
     carElt->_brakeDiskRadius(index) = wheel->brake.radius;
     carElt->_wheelRadius(index) = wheel->radius;
 
-    if (car->features & FEAT_TIRETEMPDEG)
-    {
-        // Assume new wheels
-        carElt->_tyreCondition(index) = 1.0;
-        car->carElt->_tyreTreadDepth(index) = wheel->treadDepth;
-        car->carElt->_tyreCritTreadDepth(index) = wheel->critTreadDepth;
-    }
+    /* initialize carElt values even if tire temperature and wear feature is not enabled */
+    carElt->_tyreT_opt(index) = wheel->Topt;
+    carElt->_tyreT_in(index) = wheel->Ttire;
+    carElt->_tyreT_mid(index) = wheel->Ttire;
+    carElt->_tyreT_out(index) = wheel->Ttire;
+    carElt->_tyreCondition(index) = 1.0;
+    carElt->_tyreTreadDepth(index) = wheel->treadDepth;
+    carElt->_tyreCritTreadDepth(index) = wheel->critTreadDepth;
 
     wheel->mfC = (tdble)(2.0 - asin(RFactor) * 2.0 / PI);
     wheel->mfB = Ca / wheel->mfC;

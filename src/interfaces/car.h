@@ -307,7 +307,8 @@ typedef struct {
   int		state;			/**< wheel state */
   tTrackSeg	*seg;			/**< Track segment where the wheel is */
   tdble         rollRes;                /**< rolling resistance, useful for sound */
-  tdble         temp_in, temp_mid, temp_out;
+  tdble         temp_in, temp_mid, temp_out;    /*tire temperature inside, middle and outside of tread*/
+  tdble         temp_opt;        /*optimal tire temperature*/
   tdble         condition;      	/**< tire condition, between 0 and 1 */
   tdble         treadDepth;     	/**< tread depth, between 0 and 1 */
   tdble         critTreadDepth; 	/**< critical tread depth, when grip falls off suddenly, between 0 and treadDepth */
@@ -335,6 +336,7 @@ typedef struct {
 #define _tyreT_in(i)            priv.wheel[i].temp_in
 #define _tyreT_mid(i)           priv.wheel[i].temp_mid
 #define _tyreT_out(i)           priv.wheel[i].temp_out
+#define _tyreT_opt(i)           priv.wheel[i].temp_opt
 #define _tyreCondition(i)       priv.wheel[i].condition
 #define _tyreTreadDepth(i)      priv.wheel[i].treadDepth
 #define _tyreCritTreadDepth(i)  priv.wheel[i].critTreadDepth

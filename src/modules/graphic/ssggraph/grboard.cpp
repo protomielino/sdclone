@@ -381,9 +381,9 @@ cGrBoard::grDispGGraph()
   glVertex2f(XC + THNSS, YC + car_->ctrl.clutchCmd * 100.0f);
   glVertex2f(XC - THNSS, YC + car_->ctrl.clutchCmd * 100.0f);
   
-  // Draw the tire slip color gauges
+  // Draw the tire slip and the tire temperature & wear color gauges
   if (GFlag == 2) {
-    tdble s;
+    tdble s, height;
     // FR wheel
     s = car_->_wheelSlipNorm(0)/car_->_wheelSlipOpt(0);
     if (s > 1.0) {
@@ -396,6 +396,47 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 + 50.0f, Y1 + 30.0f);
     glVertex2f(X1 + 50.0f, Y1 + 50.0f);
     glVertex2f(X1 + 40.0f, Y1 + 50.0f);
+    
+    height = 20.0f * MAX(car_->_tyreTreadDepth(0), 0.1f);
+    s = 10.0f*(car_->_tyreT_out(0)/car_->_tyreT_opt(0)-1.0f);
+    if (s >= 0.0f) {
+      s = MIN(1.0f, s);
+      glColor4f(1.0f, s, 0.0f, 0.9f);
+    } else {
+      s = MIN(1.0f, -s);
+      glColor4f(1.0f - s, 0.0f, s, 0.9f);
+    }
+    glVertex2f(X1 + 31.67f, Y1 + 30.0f);
+    glVertex2f(X1 + 35.0f, Y1 + 30.0f);
+    glVertex2f(X1 + 35.0f, Y1 + 30.0f+height);
+    glVertex2f(X1 + 31.67f, Y1 + 30.0f+height);
+    
+    s = 10.0f*(car_->_tyreT_mid(0)/car_->_tyreT_opt(0)-1.0f);
+    if (s >= 0.0f) {
+      s = MIN(1.0f, s);
+      glColor4f(1.0f, s, 0.0f, 0.9f);
+    } else {
+      s = MIN(1.0f, -s);
+      glColor4f(1.0f - s, 0.0f, s, 0.9f);
+    }
+    glVertex2f(X1 + 28.33f, Y1 + 30.0f);
+    glVertex2f(X1 + 31.67f, Y1 + 30.0f);
+    glVertex2f(X1 + 31.67f, Y1 + 30.0f+height);
+    glVertex2f(X1 + 28.33f, Y1 + 30.0f+height);
+    
+    s = 10.0f*(car_->_tyreT_in(0)/car_->_tyreT_opt(0)-1.0f);
+    if (s >= 0.0f) {
+      s = MIN(1.0f, s);
+      glColor4f(1.0f, s, 0.0f, 0.9f);
+    } else {
+      s = MIN(1.0f, -s);
+      glColor4f(1.0f - s, 0.0f, s, 0.9f);
+    }
+    glVertex2f(X1 + 25.0f, Y1 + 30.0f);
+    glVertex2f(X1 + 28.33f, Y1 + 30.0f);
+    glVertex2f(X1 + 28.33f, Y1 + 30.0f+height);
+    glVertex2f(X1 + 25.0f, Y1 + 30.0f+height);
+    
     // FL wheel
     s = car_->_wheelSlipNorm(1)/car_->_wheelSlipOpt(1);
     if (s > 1.0) {
@@ -408,6 +449,47 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 - 40.0f, Y1 + 30.0f);
     glVertex2f(X1 - 40.0f, Y1 + 50.0f);
     glVertex2f(X1 - 50.0f, Y1 + 50.0f);
+    
+    height = 20.0f * MAX(car_->_tyreTreadDepth(1), 0.1f);
+    s = 10.0f*(car_->_tyreT_out(1)/car_->_tyreT_opt(1)-1.0f);
+    if (s >= 0.0f) {
+      s = MIN(1.0f, s);
+      glColor4f(1.0f, s, 0.0f, 0.9f);
+    } else {
+      s = MIN(1.0f, -s);
+      glColor4f(1.0f - s, 0.0f, s, 0.9f);
+    }
+    glVertex2f(X1 - 31.67f, Y1 + 30.0f);
+    glVertex2f(X1 - 35.0f, Y1 + 30.0f);
+    glVertex2f(X1 - 35.0f, Y1 + 30.0f+height);
+    glVertex2f(X1 - 31.67f, Y1 + 30.0f+height);
+    
+    s = 10.0f*(car_->_tyreT_mid(1)/car_->_tyreT_opt(1)-1.0f);
+    if (s >= 0.0f) {
+      s = MIN(1.0f, s);
+      glColor4f(1.0f, s, 0.0f, 0.9f);
+    } else {
+      s = MIN(1.0f, -s);
+      glColor4f(1.0f - s, 0.0f, s, 0.9f);
+    }
+    glVertex2f(X1 - 28.33f, Y1 + 30.0f);
+    glVertex2f(X1 - 31.67f, Y1 + 30.0f);
+    glVertex2f(X1 - 31.67f, Y1 + 30.0f+height);
+    glVertex2f(X1 - 28.33f, Y1 + 30.0f+height);
+    
+    s = 10.0f*(car_->_tyreT_in(1)/car_->_tyreT_opt(1)-1.0f);
+    if (s >= 0.0f) {
+      s = MIN(1.0f, s);
+      glColor4f(1.0f, s, 0.0f, 0.9f);
+    } else {
+      s = MIN(1.0f, -s);
+      glColor4f(1.0f - s, 0.0f, s, 0.9f);
+    }
+    glVertex2f(X1 - 25.0f, Y1 + 30.0f);
+    glVertex2f(X1 - 28.33f, Y1 + 30.0f);
+    glVertex2f(X1 - 28.33f, Y1 + 30.0f+height);
+    glVertex2f(X1 - 25.0f, Y1 + 30.0f+height);
+    
     // RR wheel
     s = car_->_wheelSlipNorm(2)/car_->_wheelSlipOpt(2);
     if (s > 1.0) {
@@ -420,6 +502,47 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 + 50.0f, Y1 - 50.0f);
     glVertex2f(X1 + 50.0f, Y1 - 30.0f);
     glVertex2f(X1 + 40.0f, Y1 - 30.0f);
+    
+    height = 20.0f * MAX(car_->_tyreTreadDepth(2), 0.1f);
+    s = 10.0f*(car_->_tyreT_out(2)/car_->_tyreT_opt(2)-1.0f);
+    if (s >= 0.0f) {
+      s = MIN(1.0f, s);
+      glColor4f(1.0f, s, 0.0f, 0.9f);
+    } else {
+      s = MIN(1.0f, -s);
+      glColor4f(1.0f - s, 0.0f, s, 0.9f);
+    }
+    glVertex2f(X1 + 31.67f, Y1 - 50.0f);
+    glVertex2f(X1 + 35.0f, Y1 - 50.0f);
+    glVertex2f(X1 + 35.0f, Y1 - 50.0f+height);
+    glVertex2f(X1 + 31.67f, Y1 - 50.0f+height);
+    
+    s = 10.0f*(car_->_tyreT_mid(2)/car_->_tyreT_opt(2)-1.0f);
+    if (s >= 0.0f) {
+      s = MIN(1.0f, s);
+      glColor4f(1.0f, s, 0.0f, 0.9f);
+    } else {
+      s = MIN(1.0f, -s);
+      glColor4f(1.0f - s, 0.0f, s, 0.9f);
+    }
+    glVertex2f(X1 + 28.33f, Y1 - 50.0f);
+    glVertex2f(X1 + 31.67f, Y1 - 50.0f);
+    glVertex2f(X1 + 31.67f, Y1 - 50.0f+height);
+    glVertex2f(X1 + 28.33f, Y1 - 50.0f+height);
+    
+    s = 10.0f*(car_->_tyreT_in(2)/car_->_tyreT_opt(2)-1.0f);
+    if (s >= 0.0f) {
+      s = MIN(1.0f, s);
+      glColor4f(1.0f, s, 0.0f, 0.9f);
+    } else {
+      s = MIN(1.0f, -s);
+      glColor4f(1.0f - s, 0.0f, s, 0.9f);
+    }
+    glVertex2f(X1 + 25.0f, Y1 - 50.0f);
+    glVertex2f(X1 + 28.33f, Y1 - 50.0f);
+    glVertex2f(X1 + 28.33f, Y1 - 50.0f+height);
+    glVertex2f(X1 + 25.0f, Y1 - 50.0f+height);
+    
     // RL wheel
     s = car_->_wheelSlipNorm(3)/car_->_wheelSlipOpt(3);
     if (s > 1.0) {
@@ -432,6 +555,46 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 - 40.0f, Y1 - 50.0f);
     glVertex2f(X1 - 40.0f, Y1 - 30.0f);
     glVertex2f(X1 - 50.0f, Y1 - 30.0f);
+    
+    height = 20.0f * MAX(car_->_tyreTreadDepth(3), 0.1f);
+    s = 10.0f*(car_->_tyreT_out(3)/car_->_tyreT_opt(3)-1.0f);
+    if (s >= 0.0f) {
+      s = MIN(1.0f, s);
+      glColor4f(1.0f, s, 0.0f, 0.9f);
+    } else {
+      s = MIN(1.0f, -s);
+      glColor4f(1.0f - s, 0.0f, s, 0.9f);
+    }
+    glVertex2f(X1 - 31.67f, Y1 - 50.0f);
+    glVertex2f(X1 - 35.0f, Y1 - 50.0f);
+    glVertex2f(X1 - 35.0f, Y1 - 50.0f+height);
+    glVertex2f(X1 - 31.67f, Y1 - 50.0f+height);
+    
+    s = 10.0f*(car_->_tyreT_mid(3)/car_->_tyreT_opt(3)-1.0f);
+    if (s >= 0.0f) {
+      s = MIN(1.0f, s);
+      glColor4f(1.0f, s, 0.0f, 0.9f);
+    } else {
+      s = MIN(1.0f, -s);
+      glColor4f(1.0f - s, 0.0f, s, 0.9f);
+    }
+    glVertex2f(X1 - 28.33f, Y1 - 50.0f);
+    glVertex2f(X1 - 31.67f, Y1 - 50.0f);
+    glVertex2f(X1 - 31.67f, Y1 - 50.0f+height);
+    glVertex2f(X1 - 28.33f, Y1 - 50.0f+height);
+    
+    s = 10.0f*(car_->_tyreT_in(3)/car_->_tyreT_opt(3)-1.0f);
+    if (s >= 0.0f) {
+      s = MIN(1.0f, s);
+      glColor4f(1.0f, s, 0.0f, 0.9f);
+    } else {
+      s = MIN(1.0f, -s);
+      glColor4f(1.0f - s, 0.0f, s, 0.9f);
+    }
+    glVertex2f(X1 - 25.0f, Y1 - 50.0f);
+    glVertex2f(X1 - 28.33f, Y1 - 50.0f);
+    glVertex2f(X1 - 28.33f, Y1 - 50.0f+height);
+    glVertex2f(X1 - 25.0f, Y1 - 50.0f+height);
   }
 
   glEnd();
