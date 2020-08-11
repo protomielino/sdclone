@@ -155,12 +155,13 @@ void SDScenery::LoadScene(tTrack *track)
         strPath+=buf;
 
         std::string strTPath = GetDataDir();
-        snprintf(buf, 256, "data/textures/");
-        strTPath += buf;
         osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
         pathList.push_back(strPath);
+        GfOut("Track Path : %s\n", pathList.back().c_str());
         pathList.push_back(strTPath+"data/objects/");
+        GfOut("Texture Path : %s\n", pathList.back().c_str());
         pathList.push_back(strTPath+"data/textures/");
+        GfOut("Texture Path : %s\n", pathList.back().c_str());
         osgDB::Registry::instance()->setDataFilePathList(pathList);
         osg::ref_ptr<osg::Node> pTrack = osgDB::readNodeFile(acname);
 
@@ -231,16 +232,15 @@ void SDScenery::ShutdownScene(void)
 
 bool SDScenery::LoadTrack(std::string& strTrack)
 {
-    char buf[256];
     std::string name = "";
-    GfOut("Chemin Track : %s\n", strTrack.c_str());
+    GfOut("Track Path : %s\n", strTrack.c_str());
     osgLoader loader;
-    GfOut("Chemin Textures : %s\n", _strTexturePath.c_str());
+    GfOut("Texture Path : %s\n", _strTexturePath.c_str());
     loader.AddSearchPath(_strTexturePath);
 
     std::string strTPath = GetDataDir();
-    snprintf(buf, 256, "data/textures/");
-    strTPath += buf;
+    strTPath += "data/textures/";
+    GfOut("Texture Path : %s\n", strTPath.c_str());
     loader.AddSearchPath(strTPath);
 
     osg::Node *pTrack = loader.Load3dFile(strTrack, false, name);
