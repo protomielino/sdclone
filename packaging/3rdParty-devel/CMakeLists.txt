@@ -141,7 +141,7 @@ if(OPTION_SDL_2x)
    CMAKE_ARGS ${SDL2_ARGS}
    DEPENDS OpenGL-headers
    )
-   message(WARNING "Remove the step below when SDL2 CMake is fixed")
+   message(STATUS "Remove the step below when SDL2 CMake is fixed")
    ExternalProject_Add_Step(${SDL2_PROJECT} sdl2_fix_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
            "${CMAKE_SOURCE_DIR}/patches/sdl-2.0.12.CMakeLists.txt"
@@ -422,11 +422,11 @@ else(OPTION_FREETYPE)
 endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
-   set(CURL_PROJECT curl-7.71.1)
+   set(CURL_PROJECT curl-7.72.0)
    set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off -DCMAKE_DEBUG_POSTFIX=)
    ExternalProject_Add(${CURL_PROJECT}
-      URL https://curl.haxx.se/download/curl-7.71.1.tar.bz2
-      URL_HASH SHA256=9d52a4d80554f9b0d460ea2be5d7be99897a1a9f681ffafe739169afd6b4f224
+      URL https://curl.haxx.se/download/curl-7.72.0.tar.bz2
+      URL_HASH SHA256=ad91970864102a59765e20ce16216efc9d6ad381471f7accceceab7d905703ef
       CMAKE_ARGS ${CURL_ARGS}
       DEPENDS ${ZLIB_PROJECT}
    )
@@ -436,6 +436,12 @@ endif(OPTION_CURL)
 
 if(OPTION_OSG)
    set(OSG_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX='' -DUSE_3RDPARTY_BIN=Off)
+
+   message(STATUS "Remove the block below when curl fixes their CURLConfig.cmake or OSG fixes it")
+   if(NOT ${CMAKE_VERSION} VERSION_LESS "3.17.0")
+      list(APPEND OSG_ARGS -DCURL_NO_CURL_CMAKE=ON)
+   endif(NOT ${CMAKE_VERSION} VERSION_LESS "3.17.0")
+   message(STATUS "OSG_ARGS = ${OSG_ARGS}")
 
 #   if(MSVC_VERSION LESS 1900)
 #      message("Disable Targa plugin, OSG newer than 3.6.3 need Visual Studio 2015")
