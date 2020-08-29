@@ -42,9 +42,9 @@ IF(OPTION_OSGGRAPH)
 
       # Loop through and install the plugins
       FOREACH(pi ${OSG_PLUGINS})
-         INSTALL(FILES ${pi} DESTINATION ./games/PlugIns/${OSG_PLUGIN_DIR})
+         INSTALL(FILES ${pi} DESTINATION ./${SD_BINDIR}/PlugIns/${OSG_PLUGIN_DIR})
          GET_FILENAME_COMPONENT(fname ${pi} NAME)
-         SET_PROPERTY(GLOBAL APPEND PROPERTY SD_OSG_PLUGIN_LIST "games/PlugIns/${OSG_PLUGIN_DIR}/${fname}")
+         SET_PROPERTY(GLOBAL APPEND PROPERTY SD_OSG_PLUGIN_LIST "${SD_BINDIR}/PlugIns/${OSG_PLUGIN_DIR}/${fname}")
       ENDFOREACH()
 
    ENDIF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
@@ -77,9 +77,9 @@ IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
    # TODO figure out if this is needed...
    MESSAGE(STATUS "TODO: Hard coded loadable libraries...") 
    IF(NOT OPTION_OFFICIAL_ONLY)
-      LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/lib64/games/${PROJECT_NAME}/lib/libephemeris.dylib")
+      LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${SD_LIBDIR}/lib/libephemeris.dylib")
    ENDIF(NOT OPTION_OFFICIAL_ONLY)
-   LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/lib64/games/${PROJECT_NAME}/lib/liblearning.dylib")
+   LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${SD_LIBDIR}/lib/liblearning.dylib")
    #================
 
    # Build up the 'dirs' collection for FIXUP_BUNDLE() to use for finding dependencies
@@ -89,8 +89,8 @@ IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
    ENDIF(CMAKE_PREFIX_PATH)
    LIST(APPEND _search_dirs "${CMAKE_INSTALL_PREFIX}/Frameworks")
    LIST(APPEND _search_dirs "${CMAKE_INSTALL_PREFIX}/MacOS")
-   LIST(APPEND _search_dirs "${CMAKE_INSTALL_PREFIX}/lib64/games/${PROJECT_NAME}/lib")
-   LIST(APPEND _search_dirs "${CMAKE_INSTALL_PREFIX}/games/Plugins/${OSG_PLUGIN_DIR}")
+   LIST(APPEND _search_dirs "${CMAKE_INSTALL_PREFIX}/${SD_LIBDIR}/lib")
+   LIST(APPEND _search_dirs "${CMAKE_INSTALL_PREFIX}/${SD_BINDIR}/Plugins/${OSG_PLUGIN_DIR}")
 
 
 
