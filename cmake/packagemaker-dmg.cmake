@@ -31,27 +31,42 @@ MESSAGE(STATUS "TODO - need to clean this up.")
       # below to make sure install is done
    ADD_CUSTOM_TARGET(packing_install)
 
+MESSAGE(STATUS "TODO - fix up the dependencies. Try to not run the install multiple times.")
 #[[
    ADD_CUSTOM_TARGET(package_all DEPENDS package_base
                                          package_full)
 
-   ADD_CUSTOM_TARGET(package_base DEPENDS packing_install)
+   ADD_CUSTOM_TARGET(package_base DEPENDS install_base)
    ADD_CUSTOM_TARGET(package_full DEPENDS packing_install)
+   ADD_CUSTOM_TARGET(install_base DEPENDS packing_install)
    ]]
 
    ADD_CUSTOM_TARGET(package_full)
+   ADD_CUSTOM_TARGET(package_base)
+   ADD_CUSTOM_TARGET(install_base)
 
    
    ADD_CUSTOM_COMMAND(TARGET packing_install
                       COMMAND "${CMAKE_COMMAND}" --build . --target install --config $<CONFIG>
                       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                       COMMENT "Building install...")
-#[[
+
+   ADD_CUSTOM_COMMAND(TARGET install_base
+                        COMMAND "${CMAKE_COMMAND}" -P createbaseapp.cmake 
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                        COMMENT "Creating base app...")
+
+
+   ADD_CUSTOM_COMMAND(TARGET package_base
+                        COMMAND "${CMAKE_COMMAND}" -P packagebasedmg.cmake 
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                        COMMENT "Building base package...")
+
    ADD_CUSTOM_COMMAND(TARGET package_base
                         COMMAND ${CMAKE_CPACK_COMMAND} -G "DragNDrop"--config ../CPackDMGBaseConfig.cmake
                         WORKING_DIRECTORY packaging
                         COMMENT "Building base package...")
-]]
+
 
 # COMMAND ${CMAKE_CPACK_COMMAND} -G "DragNDrop" --config ../CPackDMGFullConfig.cmake
    ADD_CUSTOM_COMMAND(TARGET package_full
