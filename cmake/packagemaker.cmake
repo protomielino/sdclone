@@ -199,6 +199,10 @@ IF(APPLE)
     CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/findersettings.scpt.in" 
                    "${CMAKE_CURRENT_BINARY_DIR}/${DMG_FINDER_SCRIPT}" @ONLY)
 
+   # Create a script to create the base bundle from the full bundle
+   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/OSX/createbaseapp.cmake.in"
+                   "${CMAKE_CURRENT_BINARY_DIR}/createbaseapp.cmake" @ONLY)
+
 ENDIF(APPLE)
 
 ##########################################################################################
