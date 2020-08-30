@@ -62,11 +62,6 @@ MESSAGE(STATUS "TODO - fix up the dependencies. Try to not run the install multi
                         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                         COMMENT "Building base package...")
 
-   ADD_CUSTOM_COMMAND(TARGET package_base
-                        COMMAND ${CMAKE_CPACK_COMMAND} -G "DragNDrop"--config ../CPackDMGBaseConfig.cmake
-                        WORKING_DIRECTORY packaging
-                        COMMENT "Building base package...")
-
 
 # COMMAND ${CMAKE_CPACK_COMMAND} -G "DragNDrop" --config ../CPackDMGFullConfig.cmake
    ADD_CUSTOM_COMMAND(TARGET package_full
