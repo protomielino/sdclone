@@ -310,13 +310,13 @@ else(OPTION_VORBIS)
 endif(OPTION_VORBIS)
 
 if(OPTION_EXPAT)
-   set(EXPAT_PROJECT expat-2.2.9)
+   set(EXPAT_PROJECT expat-2.2.10)
 #disable building unneeded sub projects (they failed with VS2008)
 set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off -DEXPAT_BUILD_EXAMPLES=off -DEXPAT_BUILD_TOOLS=off -DCMAKE_DEBUG_POSTFIX='')
 ExternalProject_Add(${EXPAT_PROJECT}
    DOWNLOAD_NAME ${EXPAT_PROJECT}.tar.bz2
-   URL https://sourceforge.net/projects/expat/files/expat/2.2.9/expat-2.2.9.tar.bz2/download
-   URL_HASH SHA256=f1063084dc4302a427dabcca499c8312b3a32a29b7d2506653ecc8f950a9a237
+   URL https://sourceforge.net/projects/expat/files/expat/2.2.10/expat-2.2.10.tar.bz2/download
+   URL_HASH SHA256=b2c160f1b60e92da69de8e12333096aeb0c3bf692d41c60794de278af72135a5
    CMAKE_ARGS ${EXPAT_ARGS}
    #UPDATE_COMMAND ""
    #PATCH_COMMAND ""
