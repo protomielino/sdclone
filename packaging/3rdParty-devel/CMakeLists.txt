@@ -402,7 +402,7 @@ endif(OPTION_SQLITE3)
    # ========== For OpenSceneGraph =============
 
 if(OPTION_FREETYPE)
-   set(FREETYPE_PROJECT freetype-2.10.2)
+   set(FREETYPE_PROJECT freetype-2.10.3)
    set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false
                                              -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
                                              -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
@@ -412,8 +412,8 @@ if(OPTION_FREETYPE)
                                              -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=TRUE)
 
    ExternalProject_Add(${FREETYPE_PROJECT}
-      URL https://sourceforge.net/projects/freetype/files/freetype2/2.10.2/ft2102.zip/download
-      URL_HASH SHA256=d21449e30546554c975cd8ca6897d8ef1717b4c358987ddfb5bb35ebe0be2834
+      URL https://sourceforge.net/projects/freetype/files/freetype2/2.10.3/ft2103.zip/download
+      URL_HASH SHA256=037207d6dcb414279bcc9eb20e3d0f5884ae1f58d4a31283ec0473dbc6964483
       CMAKE_ARGS ${FREETYPE_ARGS}
       DEPENDS ${ZLIB_PROJECT} ${PNG_PROJECT}
    )
@@ -422,11 +422,11 @@ else(OPTION_FREETYPE)
 endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
-   set(CURL_PROJECT curl-7.72.0)
+   set(CURL_PROJECT curl-7.73.0)
    set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off -DCMAKE_DEBUG_POSTFIX=)
    ExternalProject_Add(${CURL_PROJECT}
-      URL https://curl.haxx.se/download/curl-7.72.0.tar.bz2
-      URL_HASH SHA256=ad91970864102a59765e20ce16216efc9d6ad381471f7accceceab7d905703ef
+      URL https://curl.haxx.se/download/curl-7.73.0.tar.bz2
+      URL_HASH SHA256=cf34fe0b07b800f1c01a499a6e8b2af548f6d0e044dca4a29d88a4bee146d131
       CMAKE_ARGS ${CURL_ARGS}
       DEPENDS ${ZLIB_PROJECT}
    )
