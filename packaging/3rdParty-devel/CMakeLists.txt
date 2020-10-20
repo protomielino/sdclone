@@ -402,7 +402,7 @@ endif(OPTION_SQLITE3)
    # ========== For OpenSceneGraph =============
 
 if(OPTION_FREETYPE)
-   set(FREETYPE_PROJECT freetype-2.10.3)
+   set(FREETYPE_PROJECT freetype-2.10.4)
    set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false
                                              -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
                                              -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
@@ -412,8 +412,8 @@ if(OPTION_FREETYPE)
                                              -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=TRUE)
 
    ExternalProject_Add(${FREETYPE_PROJECT}
-      URL https://sourceforge.net/projects/freetype/files/freetype2/2.10.3/ft2103.zip/download
-      URL_HASH SHA256=037207d6dcb414279bcc9eb20e3d0f5884ae1f58d4a31283ec0473dbc6964483
+      URL https://sourceforge.net/projects/freetype/files/freetype2/2.10.4/ft2104.zip/download
+      URL_HASH SHA256=5c78216d6c5860ef694fde1418d20d69d0ac83ab346c21eb311bd45709e0d93a
       CMAKE_ARGS ${FREETYPE_ARGS}
       DEPENDS ${ZLIB_PROJECT} ${PNG_PROJECT}
    )
