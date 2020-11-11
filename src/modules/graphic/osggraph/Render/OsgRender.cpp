@@ -262,10 +262,10 @@ void SDRender::Init(tTrack *track)
         }
     }
 
-    GfLogInfo("Graphic options : Shadow Type : %u\n", ShadowIndex);
+    GfLogInfo("Graphic options : Shadow Type : %u (%s)\n", ShadowIndex, ShadowValues[ShadowIndex]);
     GfLogInfo("Graphic options : Shadow Texture Size : %u\n", ShadowTexSize);
-    GfLogInfo("Graphic options : Shadow Quality : %u\n", QualityIndex);
-    GfLogInfo("Graphic options : Shader Quality : %u\n", carsShader);
+    GfLogInfo("Graphic options : Shadow Quality : %u (%s)\n", QualityIndex, QualityValues[QualityIndex]);
+    GfLogInfo("Graphic options : Shader Quality : %u (%s)\n", carsShader, ShadersValues[carsShader]);
 
     NStars = NMaxStars;
     if (AStarsData)
