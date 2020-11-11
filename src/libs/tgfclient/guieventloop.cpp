@@ -57,6 +57,9 @@ class GfuiEventLoop::Private
 
 GfuiEventLoop::Private::Private()
 : cbMouseButton(0), cbMouseMotion(0), cbMousePassiveMotion(0),
+#if SDL_JOYSTICK
+  cbJoystickAxis(0), cbJoystickButton(0),
+#endif
   cbDisplay(0), cbReshape(0), bRedisplay(false)
 {
 }
