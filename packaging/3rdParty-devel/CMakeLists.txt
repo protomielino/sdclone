@@ -169,12 +169,26 @@ if(OPTION_OPENAL)
          DEPENDEES update # do after update
          DEPENDERS patch  # do before patch
          )
-   else(MSVC_VERSION LESS 1900)
+   elseif(MSVC_VERSION LESS 1910)
+      message("openal-soft versions newer than 1.19.1 need Visual Studio 2017 and CMAKE_SYSTEM_VERSION >= 10")
       ExternalProject_Add(openal-soft-1.19.1
          URL http://www.openal-soft.org/openal-releases/openal-soft-1.19.1.tar.bz2
          URL_HASH SHA256=5c2f87ff5188b95e0dc4769719a9d89ce435b8322b4478b95dd4b427fe84b2e9
          CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
-   endif(MSVC_VERSION LESS 1900)
+   else()
+      if(${CMAKE_SYSTEM_VERSION} VERSION_LESS "10.0")
+         message(WARNING "Version 1.21.1 of openal-soft is available for Visual Studio 2017 delete the cache and specify -D CMAKE_SYSTEM_VERSION=10.0 on the command line")
+         ExternalProject_Add(openal-soft-1.19.1
+            URL http://www.openal-soft.org/openal-releases/openal-soft-1.19.1.tar.bz2
+            URL_HASH SHA256=5c2f87ff5188b95e0dc4769719a9d89ce435b8322b4478b95dd4b427fe84b2e9
+            CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
+      else()
+         ExternalProject_Add(openal-soft-1.21.0
+            URL http://www.openal-soft.org/openal-releases/openal-soft-1.21.0.tar.bz2
+            URL_HASH SHA256=2916b4fc24e23b0271ce0b3468832ad8b6d8441b1830215b28cc4fee6cc89297
+            CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
+      endif()
+   endif()
 endif(OPTION_OPENAL)
 
 if(OPTION_PLIB)
