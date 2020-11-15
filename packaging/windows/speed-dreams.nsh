@@ -52,7 +52,7 @@
 !define GAME_VERSIONNED_NAME "${GAME_SHORT_NAME} ${GAME_VERSION}"
 !define GAME_LONG_VERSION "${GAME_VERSION}-${VER_REVISION}"
 !define GAME_LONG_NAME "${GAME_SHORT_NAME} ${GAME_LONG_VERSION}"
-!define GAME_PUBLISHER "the Speed Dreams Team"
+!define GAME_PUBLISHER "The Speed Dreams Team"
 !define GAME_WEB_SITE "http://www.speed-dreams.org"
 !define GAME_BUG_TRACKER "http://sourceforge.net/p/speed-dreams/tickets/"
 !define GAME_DOWNLOAD_URL "http://sourceforge.net/projects/speed-dreams/files/${VER_MAJOR}.${VER_MINOR}.${VER_PATCH}"

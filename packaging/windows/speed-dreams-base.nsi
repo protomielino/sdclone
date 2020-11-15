@@ -298,7 +298,7 @@ Section -Post
   WriteRegStr ${GAME_ROOT_REGKEY} "${GAME_UNINST_REGKEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${GAME_ROOT_REGKEY} "${GAME_UNINST_REGKEY}" "DisplayVersion" "${GAME_VERSION}"
   WriteRegStr ${GAME_ROOT_REGKEY} "${GAME_UNINST_REGKEY}" "UninstallString" "$INSTDIR\uninst.exe"
-  WriteRegStr ${GAME_ROOT_REGKEY} "${GAME_UNINST_REGKEY}" "DisplayIcon" "$INSTDIR\bin\speed-dreams.exe"
+  WriteRegStr ${GAME_ROOT_REGKEY} "${GAME_UNINST_REGKEY}" "DisplayIcon" "$INSTDIR\bin\${GAME_FS_NAME}.exe"
   WriteRegStr ${GAME_ROOT_REGKEY} "${GAME_UNINST_REGKEY}" "URLInfoAbout" "${GAME_WEB_SITE}"
   WriteRegStr ${GAME_ROOT_REGKEY} "${GAME_UNINST_REGKEY}" "Publisher" "${GAME_PUBLISHER}"
 
