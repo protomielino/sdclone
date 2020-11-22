@@ -45,12 +45,14 @@ CarModel::CarModel()
     TYRE_MU(0),
     TYRE_MU_F(0),
     TYRE_MU_R(0),
+    EFFECTIVEMU(0),
     MU_SCALE(1),
     KZ_SCALE(0),
     KV_SCALE(1),
     BRAKE_MU_SCALE(0.95),
     GRIP_SCALE_F(1),
     GRIP_SCALE_R(1),
+    WEARTREAD(1.0),
     WING_ANGLE_F(0),
     WING_ANGLE_R(0),
     CA(0),
@@ -384,6 +386,11 @@ void	CarModel::update( const tCarElt* car, const tSituation* sit )
     {
         GRIP_SCALE_F = MN(car->priv.wheel[0].condition, car->priv.wheel[1].condition);
         GRIP_SCALE_R = MN(car->priv.wheel[2].condition, car->priv.wheel[3].condition);
+        EFFECTIVEMU = MN(MN(car->priv.wheel[0].effectiveMu, car->priv.wheel[1].effectiveMu),
+                MN(car->priv.wheel[2].effectiveMu, car->priv.wheel[3].effectiveMu));
+        WEARTREAD = MN(MN(car->priv.wheel[0].treadDepth, car->priv.wheel[1].treadDepth),
+                MN(car->priv.wheel[2].treadDepth, car->priv.wheel[3].treadDepth));
+        LogSHADOW.info("GRIP F = %.3f - GRIP R = %.3f - EFFECTIVEMU = %.3f - WEARTREAD = %.5f\n", GRIP_SCALE_F, GRIP_SCALE_R, EFFECTIVEMU, WEARTREAD);
     }
 
 //	DEBUGF( "vx %7.4f %7.4f  vy %7.4f %7.4f  vz %7.4f %7.4f  vaz %7.4f %7.4f\n",

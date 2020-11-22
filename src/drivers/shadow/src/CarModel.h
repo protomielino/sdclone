@@ -109,12 +109,14 @@ public:
     double	TYRE_MU;		// mu value of tyres (min of those avail).
     double	TYRE_MU_F;		// mu value of front tyres.
     double	TYRE_MU_R;		// mu value of rear  tyres.
+    double  EFFECTIVEMU;    // effective MU.
     double	MU_SCALE;		// scaling of MU to use for this car.
     double	KZ_SCALE;		// bump sensitivity.
     double	KV_SCALE;		// bump sensitivity.
     double	BRAKE_MU_SCALE;	// extra scaling of MU to apply when braking.
     double	GRIP_SCALE_F;	// scaling of grip due to condition of front tyres.
     double	GRIP_SCALE_R;	// scaling of grip due to condition of rear  tyres.
+    double  WEARTREAD;      // wear tread.
     double	WING_ANGLE_F;	// front wing angle.
     double	WING_ANGLE_R;	// rear wing angle.
 

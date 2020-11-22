@@ -353,11 +353,11 @@ void	Driver::InitTrack(
         m_cm[p].KZ_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_KZ_SCALE, NULL, m_cm[PATH_NORMAL].KZ_SCALE);
         m_cm[p].KV_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_KV_SCALE, NULL, m_cm[PATH_NORMAL].KV_SCALE);
 
-        LogSHADOW.debug( "*** FLAGS             : 0x%02X\n", m_cm[p].FLAGS );
-        LogSHADOW.debug( "*** BRAKE_MU_SCALE[%d]: %.3f\n", p, m_cm[p].BRAKE_MU_SCALE );
-        LogSHADOW.debug( "*** MU_SCALE[%d]      : %.3f\n", p, m_cm[p].MU_SCALE );
-        LogSHADOW.debug( "*** KZ_SCALE[%d]      : %.3f\n", p, m_cm[p].KZ_SCALE );
-        LogSHADOW.debug( "*** KV_SCALE[%d]      : %.3f\n\n", p, m_cm[p].KV_SCALE );
+        LogSHADOW.info( "*** FLAGS             : 0x%02X\n", m_cm[p].FLAGS );
+        LogSHADOW.info( "*** BRAKE_MU_SCALE[%d]: %.3f\n", p, m_cm[p].BRAKE_MU_SCALE );
+        LogSHADOW.info( "*** MU_SCALE[%d]      : %.3f\n", p, m_cm[p].MU_SCALE );
+        LogSHADOW.info( "*** KZ_SCALE[%d]      : %.3f\n", p, m_cm[p].KZ_SCALE );
+        LogSHADOW.info( "*** KV_SCALE[%d]      : %.3f\n\n", p, m_cm[p].KV_SCALE );
 
         for( int i = 0; ; i++ )
         {

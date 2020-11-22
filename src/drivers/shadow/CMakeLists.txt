@@ -73,7 +73,7 @@ SET(ROBOT_SOURCES
 
 # Official-only shadow instances.
 SET(ROBOT_CLONES shadow_36GP shadow_67GP shadow_sc shadow_srw shadow_trb1 shadow_ls1 shadow_ls2 shadow_mp5
-			shadow_mpa1 shadow_mpa11 shadow_mpa12 shadow_lp1 shadow_ref)
+			shadow_mp1 shadow_mpa1 shadow_mpa11 shadow_mpa12 shadow_lp1 shadow_ref)
 
 # The ubiquitous robot module and its clones.
 ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.3.0 SOVERSION 1.0.0
