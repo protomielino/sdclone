@@ -552,16 +552,20 @@ void SimWheelUpdateForce(tCar *car, int index)
         wheel->Ttire += Work * wheel->heatingm;
         //air cooling
         wheel->Ttire -= wheel->aircoolm * (1 + wheel->speedcoolm * v) * (wheel->Ttire - Tair) * SimDeltaTime;
+
         //tire wear
         if(wheel->treadDepth > 0.0)
         {
-            wheel->treadDepth -= wheel->wearrate * Work;
-
-			/* For test more degradation if wheel skid */
-            if (car->carElt->_skid[index] > 0.1f)
-                wheel->treadDepth -= 0.003f * SimDeltaTime;
+            if (car->carElt->_skid[index] > 0.1f) // For test
+                wheel ->treadDepth -= 20.0 * wheel->wearrate * Work;
+            else
+                wheel->treadDepth -= wheel->wearrate * Work;
         }
-        else {wheel->treadDepth = 0.0;} //note: lets it go to slightly negative for one cycle
+        else
+        {
+            wheel->treadDepth = 0.0;
+        } //note: lets it go to slightly negative for one cycle
+
         //filling carElt
         car->carElt->_tyreT_in(index) = wheel->Ttire;
         car->carElt->_tyreT_mid(index) = wheel->Ttire;
