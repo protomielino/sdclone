@@ -107,26 +107,24 @@ endif()
 # OpenGL extensions (Windows only??)
 message(STATUS "OpenGL extensions (Windows only??)")
 if(WIN32 AND OPTION_OPENGL_HEADERS)
-ExternalProject_Add(OpenGL-headers
-   URL ${CMAKE_CURRENT_SOURCE_DIR}/patches/openglheaders.zip
-   URL_HASH SHA256=e66ae96912231de021e17c80a978765c126b26cfde1103f63e9f33e4780f7fad
-   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
+   ExternalProject_Add(OpenGL-headers
+      URL ${CMAKE_CURRENT_SOURCE_DIR}/patches/openglheaders.zip
+      URL_HASH SHA256=e66ae96912231de021e17c80a978765c126b26cfde1103f63e9f33e4780f7fad
+      CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
 endif(WIN32 AND OPTION_OPENGL_HEADERS)
 
 if(OPTION_SDL_1x)
-ExternalProject_Add(${SDL1_PROJECT}
-   URL ${SDL_1_URL}
-   URL_HASH ${SDL_1_HASH}
-   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-   DEPENDS OpenGL-headers
-   )
-ExternalProject_Add_Step(${SDL1_PROJECT} sdl1x_add_cmake
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/${SDL1_PROJECT}.CMakeLists.txt"
-           "<SOURCE_DIR>/CMakeLists.txt"
-   DEPENDEES update # do after update
-   DEPENDERS patch  # do before patch
-)
+   ExternalProject_Add(${SDL1_PROJECT}
+      URL ${SDL_1_URL}
+      URL_HASH ${SDL_1_HASH}
+      CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+      DEPENDS OpenGL-headers)
+   ExternalProject_Add_Step(${SDL1_PROJECT} sdl1x_add_cmake
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              "${CMAKE_SOURCE_DIR}/patches/${SDL1_PROJECT}.CMakeLists.txt"
+              "<SOURCE_DIR>/CMakeLists.txt"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
 endif(OPTION_SDL_1x)
 
 # TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)
@@ -138,16 +136,14 @@ if(OPTION_SDL_2x)
       URL ${SDL_2_URL}
       URL_HASH ${SDL_2_HASH}
       CMAKE_ARGS ${SDL2_ARGS}
-      DEPENDS OpenGL-headers
-      )
+      DEPENDS OpenGL-headers)
    message(STATUS "Remove the step below when SDL2 CMake is fixed")
    ExternalProject_Add_Step(${SDL2_PROJECT} sdl2_fix_cmake
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
               "${CMAKE_SOURCE_DIR}/patches/sdl-${SDL2_VERSION}.CMakeLists.txt"
               "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
-      DEPENDERS patch  # do before patch
-      )
+      DEPENDERS patch)  # do before patch
 # end  message(WARNING "Remove the step below when SDL2 CMake is fixed")
 
 else(OPTION_SDL_2x)
@@ -166,8 +162,7 @@ if(OPTION_OPENAL)
          "${CMAKE_SOURCE_DIR}/patches/${OPENAL_LEGACY_PROJECT}.CMakeLists.txt"
          "<SOURCE_DIR>/CMakeLists.txt"
          DEPENDEES update # do after update
-         DEPENDERS patch  # do before patch
-         )
+         DEPENDERS patch)  # do before patch
    elseif(MSVC_VERSION LESS 1910)
       message(WARNING "openal-soft versions newer than 1.19.1 need Visual Studio 2017 and CMAKE_SYSTEM_VERSION >= 10")
       ExternalProject_Add(${OPENAL_C11_PROJECT}
@@ -192,35 +187,30 @@ endif(OPTION_OPENAL)
 
 if(OPTION_PLIB)
    if(OPTION_PLIB_USE_HEAD)
-   ExternalProject_Add(${PLIB_HEAD_PROJECT}
-      SVN_REPOSITORY  ${PLIB_SVN_REPO} #svn://svn.code.sf.net/p/plib/code/trunk
-      SVN_REVISION -r${PLIB_SVN_REVISION}  #-r2173 as of 2012-08-24 can also use -rHEAD, but specific revision is supposed to prevent calling svn update
-      CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-      DEPENDS OpenGL-headers
-      )
-      ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_add_cmake
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
-              "<SOURCE_DIR>/CMakeLists.txt"
-      DEPENDEES update # do after update
-      DEPENDERS patch  # do before patch
-      )
-
+      ExternalProject_Add(${PLIB_HEAD_PROJECT}
+         SVN_REPOSITORY  ${PLIB_SVN_REPO} #svn://svn.code.sf.net/p/plib/code/trunk
+         SVN_REVISION -r${PLIB_SVN_REVISION}  #-r2173 as of 2012-08-24 can also use -rHEAD, but specific revision is supposed to prevent calling svn update
+         CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+         DEPENDS OpenGL-headers)
+         ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_add_cmake
+         COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                 "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
+                 "<SOURCE_DIR>/CMakeLists.txt"
+         DEPENDEES update # do after update
+         DEPENDERS patch)  # do before patch
    else(OPTION_PLIB_USE_HEAD)
-   # this tarball corresponds to revision 2131
-   ExternalProject_Add(${PLIB_PROJECT}
-      URL ${PLIB_URL}
-      URL_HASH  ${PLIB_HASH}
-      CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-      DEPENDS OpenGL-headers
-      )
+      # this tarball corresponds to revision 2131
+      ExternalProject_Add(${PLIB_PROJECT}
+         URL ${PLIB_URL}
+         URL_HASH  ${PLIB_HASH}
+         CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+         DEPENDS OpenGL-headers)
       ExternalProject_Add_Step(${PLIB_PROJECT} plib_add_cmake
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
-              "<SOURCE_DIR>/CMakeLists.txt"
-      DEPENDEES update # do after update
-      DEPENDERS patch  # do before patch
-      )
+         COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                 "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
+                 "<SOURCE_DIR>/CMakeLists.txt"
+         DEPENDEES update # do after update
+         DEPENDERS patch)  # do before patch
    endif(OPTION_PLIB_USE_HEAD)
 endif(OPTION_PLIB)
 
@@ -229,187 +219,134 @@ if(OPTION_JPEG)
    ExternalProject_Add(${JPEG_PROJECT}
    URL ${JPEG_URL}
    URL_HASH ${JPEG_HASH}
-   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-   )
+   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
    ExternalProject_Add_Step(${JPEG_PROJECT} jpeg_add_cmake
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/${JPEG_PROJECT}.CMakeLists.txt"
-           "<SOURCE_DIR>/CMakeLists.txt"
-   DEPENDEES update # do after update
-   DEPENDERS patch  # do before patch
-   )
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              "${CMAKE_SOURCE_DIR}/patches/${JPEG_PROJECT}.CMakeLists.txt"
+              "<SOURCE_DIR>/CMakeLists.txt"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
    ExternalProject_Add_Step(${JPEG_PROJECT} jpeg_config
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "<SOURCE_DIR>/jconfig.vc"
-           "<SOURCE_DIR>/jconfig.h"
-   DEPENDEES update # do after update
-   DEPENDERS patch  # do before patch
-   )
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              "<SOURCE_DIR>/jconfig.vc"
+              "<SOURCE_DIR>/jconfig.h"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
 else(OPTION_JPEG)
    set(JPG_PROJECT )
 endif(OPTION_JPEG)
 
 if(OPTION_FREESOLID)
-#message(WARNING "TODO - need to decide between the patches for FreeSOLID-2.1.1 OR FreeSOLID-2.1.2")
-#ExternalProject_Add(FreeSOLID-2.1.1 
-#   DOWNLOAD_NAME FreeSOLID-2.1.1.zip
-#   URL https://sourceforge.net/projects/freesolid/files/FreeSOLID/FreeSOLID-2.1.1.zip/FreeSOLID-2.1.1.zip/download
-#   URL_HASH SHA256=5a4f8576e27223f03ad0add76a79b06db6cd8f15c8d2767ea35e0c540ba1bee8 
-#   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-#   UPDATE_COMMAND ""
-#   PATCH_COMMAND ""
-#   CONFIGURE_COMMAND ""
-#   BUILD_COMMAND ""
-#   INSTALL_COMMAND ""
-#   )
-
-set(FreeSOLID_ARGS ${EXTERNALS_CMAKE_ARGS} -D'CMAKE_DEBUG_POSTFIX=""')
-ExternalProject_Add(${FREESOLID_PROJECT}
-   DOWNLOAD_NAME ${FREESOLID_FILE}
-   URL ${FREESOLID_URL}
-   URL_HASH ${FREESOLID_HASH}
-   CMAKE_ARGS ${FreeSOLID_ARGS}
-   )
-ExternalProject_Add_Step(${FREESOLID_PROJECT} freesolid_add_cmake
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/${FREESOLID_PROJECT}.CMakeLists.txt"
-           "<SOURCE_DIR>/CMakeLists.txt"
-   DEPENDEES update # do after update
-   DEPENDERS patch  # do before patch
-   )
+   set(FreeSOLID_ARGS ${EXTERNALS_CMAKE_ARGS} -D'CMAKE_DEBUG_POSTFIX=""')
+   ExternalProject_Add(${FREESOLID_PROJECT}
+      DOWNLOAD_NAME ${FREESOLID_FILE}
+      URL ${FREESOLID_URL}
+      URL_HASH ${FREESOLID_HASH}
+      CMAKE_ARGS ${FreeSOLID_ARGS})
+   ExternalProject_Add_Step(${FREESOLID_PROJECT} freesolid_add_cmake
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              "${CMAKE_SOURCE_DIR}/patches/${FREESOLID_PROJECT}.CMakeLists.txt"
+              "<SOURCE_DIR>/CMakeLists.txt"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
 endif(OPTION_FREESOLID)
 
 if(OPTION_ENET)
-#set(ENET_PROJECT enet-1.3.16)
    ExternalProject_Add(${ENET_PROJECT}
       URL ${ENET_URL}
       URL_HASH ${ENET_HASH}
-      CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-   )
+      CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
    ExternalProject_Add_Step(${ENET_PROJECT} enet_add_cmake
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
               "${CMAKE_SOURCE_DIR}/patches/${ENET_PROJECT}.CMakeLists.txt"
               "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
-      DEPENDERS patch  # do before patch
-   )
+      DEPENDERS patch)  # do before patch
 else(OPTION_ENET)
    set(ENET_PROJECT )
 endif(OPTION_ENET)
 
 if(OPTION_OGG)
-   #set(OGG_PROJECT ogg-1.3.4)
    set(OGG_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS=on -DBUILD_TESTING=off -DINSTALL_DOCS=off)
    ExternalProject_Add(${OGG_PROJECT}
       URL ${OGG_URL}
       URL_HASH ${OGG_HASH}
-      CMAKE_ARGS ${OGG_ARGS}
-      )
+      CMAKE_ARGS ${OGG_ARGS})
 else(OPTION_OGG)
    set(OGG_PROJECT )
 endif(OPTION_OGG)
 
 if(OPTION_VORBIS)
-   #set(VORBIS_PROJECT vorbis-1.3.7)
    set(VORBIS_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS=on)
    ExternalProject_Add(${VORBIS_PROJECT}
       URL ${VORBIS_URL}
       URL_HASH ${VORBIS_HASH}
       CMAKE_ARGS ${VORBIS_ARGS}
-      DEPENDS ${OGG_PROJECT}
-      )
+      DEPENDS ${OGG_PROJECT})
 else(OPTION_VORBIS)
    set(VORBIS_PROJECT )
 endif(OPTION_VORBIS)
 
 if(OPTION_EXPAT)
-   #set(EXPAT_PROJECT expat-2.2.10)
 #disable building unneeded sub projects (they failed with VS2008)
-set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off -DEXPAT_BUILD_EXAMPLES=off -DEXPAT_BUILD_TOOLS=off -DCMAKE_DEBUG_POSTFIX='')
-ExternalProject_Add(${EXPAT_PROJECT}
-   DOWNLOAD_NAME ${EXPAT_FILE}
-   URL ${EXPAT_URL}
-   URL_HASH ${EXPAT_HASH}
-   CMAKE_ARGS ${EXPAT_ARGS}
-   #UPDATE_COMMAND ""
-   #PATCH_COMMAND ""
-   #CONFIGURE_COMMAND ""
-   #BUILD_COMMAND ""
-   #INSTALL_COMMAND ""
-   )
+   set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off -DEXPAT_BUILD_EXAMPLES=off -DEXPAT_BUILD_TOOLS=off -DCMAKE_DEBUG_POSTFIX='')
+   ExternalProject_Add(${EXPAT_PROJECT}
+      DOWNLOAD_NAME ${EXPAT_FILE}
+      URL ${EXPAT_URL}
+      URL_HASH ${EXPAT_HASH}
+      CMAKE_ARGS ${EXPAT_ARGS})
 else(OPTION_EXPAT)
    set(EXPAT_PROJECT )
 endif(OPTION_EXPAT)
 
 if(OPTION_ZLIB)
    set(ZLIB_PROJECT zlib-1.2.11)
-   #set(ZLIB_ARGS ${EXTERNALS_CMAKE_ARGS} -DSKIP_INSTALL_LIBRARIES=On -DSKIP_INSTALL_LIBRARIES=On -D'CMAKE_DEBUG_POSTFIX=""')
-   #set(ZLIB_ARGS ${EXTERNALS_CMAKE_ARGS} -D'CMAKE_BUILD_POSTFIX=hello')
    ExternalProject_Add(${ZLIB_PROJECT}
-   DOWNLOAD_NAME ${ZLIB_FILE}
-   URL ${ZLIB_URL}
-   URL_HASH ${ZLIB_HASH}
-   #CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=on
-   CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-   #UPDATE_COMMAND ""
-   PATCH_COMMAND ${CMAKE_COMMAND} -E remove -f <SOURCE_DIR>/zconf.h
-   #CONFIGURE_COMMAND ""
-   #BUILD_COMMAND ""
-   #INSTALL_COMMAND ${CMAKE_COMMAND} install(TARGETS zlibstatic)
-   )
-ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_remove_dll
-   COMMAND "${CMAKE_COMMAND}" -E remove -f ${EXTERNALS_INSTALL_DIR}/bin/zlib${SUPER_BUILD_POSTFIX}.dll
-   DEPENDEES install
-   )
-ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_remove_lib
-   COMMAND "${CMAKE_COMMAND}" -E remove -f ${EXTERNALS_INSTALL_DIR}/lib/zlib${SUPER_BUILD_POSTFIX}.lib
-   DEPENDEES sd_zlib_remove_dll
-   )
-ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_rename_lib
-   COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/zlibstatic${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/zlib.lib
-   DEPENDEES sd_zlib_remove_lib
-   )
+      DOWNLOAD_NAME ${ZLIB_FILE}
+      URL ${ZLIB_URL}
+      URL_HASH ${ZLIB_HASH}
+      CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+      PATCH_COMMAND ${CMAKE_COMMAND} -E remove -f <SOURCE_DIR>/zconf.h)
+   ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_remove_dll
+      COMMAND "${CMAKE_COMMAND}" -E remove -f ${EXTERNALS_INSTALL_DIR}/bin/zlib${SUPER_BUILD_POSTFIX}.dll
+      DEPENDEES install)
+   ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_remove_lib
+      COMMAND "${CMAKE_COMMAND}" -E remove -f ${EXTERNALS_INSTALL_DIR}/lib/zlib${SUPER_BUILD_POSTFIX}.lib
+      DEPENDEES sd_zlib_remove_dll)
+   ExternalProject_Add_Step(${ZLIB_PROJECT} sd_zlib_rename_lib
+      COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/zlibstatic${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/zlib.lib
+      DEPENDEES sd_zlib_remove_lib)
 else(OPTION_ZLIB)
    set(ZLIB_PROJECT )
 endif(OPTION_ZLIB)
 
 if(OPTION_PNG)
-   #set(PNG_PROJECT libpng-1.6.37)
    set(PNG_ARGS ${EXTERNALS_CMAKE_ARGS} -DPNG_SHARED=off -DPNG_TESTS=off -DCMAKE_DEBUG_POSTFIX='')
    ExternalProject_Add(${PNG_PROJECT}
       DOWNLOAD_NAME ${PNG_FILE}
       URL ${PNG_URL}
       URL_HASH ${PNG_HASH}
       CMAKE_ARGS ${PNG_ARGS}
-      DEPENDS ${ZLIB_PROJECT}
-      )
+      DEPENDS ${ZLIB_PROJECT})
       ExternalProject_Add_Step(${PNG_PROJECT} sd_libpng_rename
-      COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/libpng16_static${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/libpng.lib
-      DEPENDEES install
-      )
+         COMMAND "${CMAKE_COMMAND}" -E rename ${EXTERNALS_INSTALL_DIR}/lib/libpng16_static${SUPER_BUILD_POSTFIX}.lib ${EXTERNALS_INSTALL_DIR}/lib/libpng.lib
+         DEPENDEES install)
 else(OPTION_PNG)
    set(PNG_PROJECT )
 endif(OPTION_PNG)
 
 if(OPTION_SQLITE3)
    # may only be needed for Simon's replay stuff
-      ExternalProject_Add(${SQLITE3_PROJECT}
+   ExternalProject_Add(${SQLITE3_PROJECT}
       URL ${SQLITE3_URL}
       URL_HASH ${SQLITE3_HASH}
-      CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-      #UPDATE_COMMAND ""
-      #PATCH_COMMAND ""
-      #CONFIGURE_COMMAND ""
-      #BUILD_COMMAND ""
-      #INSTALL_COMMAND ""
-   )
+      CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
    ExternalProject_Add_Step(${SQLITE3_PROJECT} sqlite3_add_cmake
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
            "${CMAKE_SOURCE_DIR}/patches/sqlite3-CMakeLists.txt"
            "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
-      DEPENDERS patch  # do before patch
-   )
+      DEPENDERS patch)  # do before patch
 else(OPTION_SQLITE3)
    set(SQLITE3_PROJECT )
 endif(OPTION_SQLITE3)
@@ -417,7 +354,6 @@ endif(OPTION_SQLITE3)
    # ========== For OpenSceneGraph =============
 
 if(OPTION_FREETYPE)
-   #set(FREETYPE_PROJECT freetype-2.10.4)
    set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false
                                              -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
                                              -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
@@ -430,21 +366,18 @@ if(OPTION_FREETYPE)
       URL ${FREETYPE_URL}
       URL_HASH ${FREETYPE_HASH}
       CMAKE_ARGS ${FREETYPE_ARGS}
-      DEPENDS ${ZLIB_PROJECT} ${PNG_PROJECT}
-   )
+      DEPENDS ${ZLIB_PROJECT} ${PNG_PROJECT})
 else(OPTION_FREETYPE)
    set(FREETYPE_PROJECT )
 endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
-   #set(CURL_PROJECT curl-7.73.0)
    set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off -DCMAKE_DEBUG_POSTFIX=)
    ExternalProject_Add(${CURL_PROJECT}
       URL ${CURL_URL}
       URL_HASH ${CURL_HASH}
       CMAKE_ARGS ${CURL_ARGS}
-      DEPENDS ${ZLIB_PROJECT}
-   )
+      DEPENDS ${ZLIB_PROJECT})
 else(OPTION_CURL)
    set(CURL_PROJECT )
 endif(OPTION_CURL)
@@ -458,20 +391,13 @@ if(OPTION_OSG)
    endif(NOT ${CMAKE_VERSION} VERSION_LESS "3.17.0")
    message(STATUS "OSG_ARGS = ${OSG_ARGS}")
 
-#   if(MSVC_VERSION LESS 1900)
-#      message("Disable Targa plugin, OSG newer than 3.6.3 need Visual Studio 2015")
-#      set(OSG_ARGS ${OSG_ARGS} -D BUILD_OSG_PLUGIN_TGA=0)
-#   endif()
-
    ExternalProject_Add(${OSG_PROJECT}
       URL ${OSG_URL}
       URL_HASH ${OSG_HASH}
       CMAKE_ARGS ${OSG_ARGS}
-      DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
-   )
+      DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT})
 endif(OPTION_OSG)
 
-#add_subdirectory(src)
 
 # no-output target, for having some files available in IDEs.
 set(DOCSOURCES COPYING LICENSE readme.txt)
@@ -507,5 +433,3 @@ set(CPACK_PACKAGE_FILE_NAME ${SD_PACKAGE_FILE_NAME} CACHE STRING "")
 set(CPACK_GENERATOR "ZIP")
 
 include(CPack)
-
-
