@@ -32,6 +32,7 @@ project(3rdParty-2.3)
 include(ExternalProject)
 include(CMakeDependentOption)
 
+include(thirdpartydefinitions.cmake)
 
 message(STATUS "CMAKE_VERSION = ${CMAKE_VERSION}")
 # Setup some defualts...
@@ -113,15 +114,15 @@ ExternalProject_Add(OpenGL-headers
 endif(WIN32 AND OPTION_OPENGL_HEADERS)
 
 if(OPTION_SDL_1x)
-ExternalProject_Add(SDL-1.2.15
-   URL https://www.libsdl.org/release/SDL-1.2.15.tar.gz
-   URL_HASH SHA256=d6d316a793e5e348155f0dd93b979798933fb98aa1edebcc108829d6474aad00
+ExternalProject_Add(${SDL1_PROJECT}
+   URL ${SDL_1_URL}
+   URL_HASH ${SDL_1_HASH}
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    DEPENDS OpenGL-headers
    )
-ExternalProject_Add_Step(SDL-1.2.15 sdl1x_add_cmake
+ExternalProject_Add_Step(${SDL1_PROJECT} sdl1x_add_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/sdl-1.2.15.CMakeLists.txt"
+           "${CMAKE_SOURCE_DIR}/patches/${SDL1_PROJECT}.CMakeLists.txt"
            "<SOURCE_DIR>/CMakeLists.txt"
    DEPENDEES update # do after update
    DEPENDERS patch  # do before patch
@@ -132,23 +133,21 @@ endif(OPTION_SDL_1x)
 # message(WARNING "TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)")
 
 if(OPTION_SDL_2x)
-   set(SDL2_PROJECT SDL2-2.0.12)
    set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off -DSDL_CMAKE_DEBUG_POSTFIX=)
-#   set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off)
    ExternalProject_Add(${SDL2_PROJECT}
-      URL https://www.libsdl.org/release/SDL2-2.0.12.tar.gz
-   URL_HASH SHA256=349268f695c02efbc9b9148a70b85e58cefbbf704abd3e91be654db7f1e2c863
-   CMAKE_ARGS ${SDL2_ARGS}
-   DEPENDS OpenGL-headers
-   )
+      URL ${SDL_2_URL}
+      URL_HASH ${SDL_2_HASH}
+      CMAKE_ARGS ${SDL2_ARGS}
+      DEPENDS OpenGL-headers
+      )
    message(STATUS "Remove the step below when SDL2 CMake is fixed")
    ExternalProject_Add_Step(${SDL2_PROJECT} sdl2_fix_cmake
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/sdl-2.0.12.CMakeLists.txt"
-           "<SOURCE_DIR>/CMakeLists.txt"
-   DEPENDEES update # do after update
-   DEPENDERS patch  # do before patch
-   )
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              "${CMAKE_SOURCE_DIR}/patches/sdl-${SDL2_VERSION}.CMakeLists.txt"
+              "<SOURCE_DIR>/CMakeLists.txt"
+      DEPENDEES update # do after update
+      DEPENDERS patch  # do before patch
+      )
 # end  message(WARNING "Remove the step below when SDL2 CMake is fixed")
 
 else(OPTION_SDL_2x)
@@ -157,35 +156,35 @@ endif(OPTION_SDL_2x)
 
 if(OPTION_OPENAL)
    if(MSVC_VERSION LESS 1900)
-      message("openal-soft versions newer than 1.18.2 need Visual Studio 2015")
-      ExternalProject_Add(openal-soft-1.18.2
-         URL http://www.openal-soft.org/openal-releases/openal-soft-1.18.2.tar.bz2
-         URL_HASH SHA256=9f8ac1e27fba15a59758a13f0c7f6540a0605b6c3a691def9d420570506d7e82
+      message(WARNING "openal-soft versions newer than 1.18.2 need Visual Studio 2015")
+      ExternalProject_Add(${OPENAL_LEGACY_PROJECT}
+         URL ${OPENAL_LEGACY_URL}
+         URL_HASH ${OPENAL_LEGACY_HASH}
          CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
-      ExternalProject_Add_Step(openal-soft-1.18.2 openal_patch_cmake
+      ExternalProject_Add_Step(${OPENAL_LEGACY_PROJECT} openal_patch_cmake
          COMMAND ${CMAKE_COMMAND} -E copy_if_different
-         "${CMAKE_SOURCE_DIR}/patches/openal-soft-1.18.2.CMakeLists.txt"
+         "${CMAKE_SOURCE_DIR}/patches/${OPENAL_LEGACY_PROJECT}.CMakeLists.txt"
          "<SOURCE_DIR>/CMakeLists.txt"
          DEPENDEES update # do after update
          DEPENDERS patch  # do before patch
          )
    elseif(MSVC_VERSION LESS 1910)
-      message("openal-soft versions newer than 1.19.1 need Visual Studio 2017 and CMAKE_SYSTEM_VERSION >= 10")
-      ExternalProject_Add(openal-soft-1.19.1
-         URL http://www.openal-soft.org/openal-releases/openal-soft-1.19.1.tar.bz2
-         URL_HASH SHA256=5c2f87ff5188b95e0dc4769719a9d89ce435b8322b4478b95dd4b427fe84b2e9
+      message(WARNING "openal-soft versions newer than 1.19.1 need Visual Studio 2017 and CMAKE_SYSTEM_VERSION >= 10")
+      ExternalProject_Add(${OPENAL_C11_PROJECT}
+         URL ${OPENAL_C11_URL}
+         URL_HASH ${OPENAL_C11_HASH}
          CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
    else()
       if(${CMAKE_SYSTEM_VERSION} VERSION_LESS "10.0")
          message(WARNING "Version 1.21.1 of openal-soft is available for Visual Studio 2017 delete the cache and specify -D CMAKE_SYSTEM_VERSION=10.0 on the command line")
-         ExternalProject_Add(openal-soft-1.19.1
-            URL http://www.openal-soft.org/openal-releases/openal-soft-1.19.1.tar.bz2
-            URL_HASH SHA256=5c2f87ff5188b95e0dc4769719a9d89ce435b8322b4478b95dd4b427fe84b2e9
+         ExternalProject_Add(${OPENAL_C11_PROJECT}
+            URL ${OPENAL_C11_URL}
+            URL_HASH ${OPENAL_C11_HASH}
             CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
       else()
-         ExternalProject_Add(openal-soft-1.21.0
-            URL http://www.openal-soft.org/openal-releases/openal-soft-1.21.0.tar.bz2
-            URL_HASH SHA256=2916b4fc24e23b0271ce0b3468832ad8b6d8441b1830215b28cc4fee6cc89297
+         ExternalProject_Add(${OPENAL_PROJECT}
+            URL ${OPENAL_URL}
+            URL_HASH ${OPENAL_HASH}
             CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
       endif()
    endif()
@@ -193,15 +192,15 @@ endif(OPTION_OPENAL)
 
 if(OPTION_PLIB)
    if(OPTION_PLIB_USE_HEAD)
-   ExternalProject_Add(plib-1.8.5-head
-      SVN_REPOSITORY  svn://svn.code.sf.net/p/plib/code/trunk
-      SVN_REVISION -r2173  #-r2173 as of 2012-08-24 can also use -rHEAD, but specific revision is supposed to prevent calling svn update
+   ExternalProject_Add(${PLIB_HEAD_PROJECT}
+      SVN_REPOSITORY  ${PLIB_SVN_REPO} #svn://svn.code.sf.net/p/plib/code/trunk
+      SVN_REVISION -r${PLIB_SVN_REVISION}  #-r2173 as of 2012-08-24 can also use -rHEAD, but specific revision is supposed to prevent calling svn update
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
       DEPENDS OpenGL-headers
       )
-      ExternalProject_Add_Step(plib-1.8.5-head plib_add_cmake
+      ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_add_cmake
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/plib-1.8.5.CMakeLists.txt"
+              "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
               "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch  # do before patch
@@ -209,15 +208,15 @@ if(OPTION_PLIB)
 
    else(OPTION_PLIB_USE_HEAD)
    # this tarball corresponds to revision 2131
-   ExternalProject_Add(plib-1.8.5
-      URL http://plib.sourceforge.net/dist/plib-1.8.5.tar.gz
-      URL_HASH SHA256=485b22bf6fdc0da067e34ead5e26f002b76326f6371e2ae006415dea6a380a32
+   ExternalProject_Add(${PLIB_PROJECT}
+      URL ${PLIB_URL}
+      URL_HASH  ${PLIB_HASH}
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
       DEPENDS OpenGL-headers
       )
-      ExternalProject_Add_Step(plib-1.8.5 plib_add_cmake
+      ExternalProject_Add_Step(${PLIB_PROJECT} plib_add_cmake
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/plib-1.8.5.CMakeLists.txt"
+              "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
               "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch  # do before patch
@@ -226,20 +225,20 @@ if(OPTION_PLIB)
 endif(OPTION_PLIB)
 
 if(OPTION_JPEG)
-   set(JPG_PROJECT jpeg-9d)
-   ExternalProject_Add(${JPG_PROJECT}
-   URL http://ijg.org/files/jpegsrc.v9d.tar.gz
-   URL_HASH SHA256=99cb50e48a4556bc571dadd27931955ff458aae32f68c4d9c39d624693f69c32
+   #set(JPG_PROJECT jpeg-9d)
+   ExternalProject_Add(${JPEG_PROJECT}
+   URL ${JPEG_URL}
+   URL_HASH ${JPEG_HASH}
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    )
-   ExternalProject_Add_Step(${JPG_PROJECT} jpeg_add_cmake
+   ExternalProject_Add_Step(${JPEG_PROJECT} jpeg_add_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/jpeg-9d.CMakeLists.txt"
+           "${CMAKE_SOURCE_DIR}/patches/${JPEG_PROJECT}.CMakeLists.txt"
            "<SOURCE_DIR>/CMakeLists.txt"
    DEPENDEES update # do after update
    DEPENDERS patch  # do before patch
    )
-   ExternalProject_Add_Step(${JPG_PROJECT} jpeg_config
+   ExternalProject_Add_Step(${JPEG_PROJECT} jpeg_config
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
            "<SOURCE_DIR>/jconfig.vc"
            "<SOURCE_DIR>/jconfig.h"
@@ -265,15 +264,15 @@ if(OPTION_FREESOLID)
 #   )
 
 set(FreeSOLID_ARGS ${EXTERNALS_CMAKE_ARGS} -D'CMAKE_DEBUG_POSTFIX=""')
-ExternalProject_Add(FreeSOLID-2.1.2
-   DOWNLOAD_NAME FreeSOLID-2.1.2.zip
-   URL https://sourceforge.net/projects/freesolid/files/FreeSOLID-2.1.2.zip/download
-   URL_HASH SHA256=89edc6afdd9d60c8020b2b865b61558c86a8928dc6f1773b9f4708b5c28eb873
+ExternalProject_Add(${FREESOLID_PROJECT}
+   DOWNLOAD_NAME ${FREESOLID_FILE}
+   URL ${FREESOLID_URL}
+   URL_HASH ${FREESOLID_HASH}
    CMAKE_ARGS ${FreeSOLID_ARGS}
    )
-ExternalProject_Add_Step(FreeSOLID-2.1.2 freesolid_add_cmake
+ExternalProject_Add_Step(${FREESOLID_PROJECT} freesolid_add_cmake
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-           "${CMAKE_SOURCE_DIR}/patches/FreeSOLID-2.1.2.CMakeLists.txt"
+           "${CMAKE_SOURCE_DIR}/patches/${FREESOLID_PROJECT}.CMakeLists.txt"
            "<SOURCE_DIR>/CMakeLists.txt"
    DEPENDEES update # do after update
    DEPENDERS patch  # do before patch
@@ -281,15 +280,15 @@ ExternalProject_Add_Step(FreeSOLID-2.1.2 freesolid_add_cmake
 endif(OPTION_FREESOLID)
 
 if(OPTION_ENET)
-set(ENET_PROJECT enet-1.3.17)
+#set(ENET_PROJECT enet-1.3.16)
    ExternalProject_Add(${ENET_PROJECT}
-      URL http://enet.bespin.org/download/enet-1.3.17.tar.gz
-      URL_HASH SHA256=a38f0f194555d558533b8b15c0c478e946310022d0ec7b34334e19e4574dcedc
+      URL ${ENET_URL}
+      URL_HASH ${ENET_HASH}
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    )
    ExternalProject_Add_Step(${ENET_PROJECT} enet_add_cmake
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/enet-1.3.17.CMakeLists.txt"
+              "${CMAKE_SOURCE_DIR}/patches/${ENET_PROJECT}.CMakeLists.txt"
               "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch  # do before patch
@@ -299,11 +298,11 @@ else(OPTION_ENET)
 endif(OPTION_ENET)
 
 if(OPTION_OGG)
-   set(OGG_PROJECT ogg-1.3.4)
+   #set(OGG_PROJECT ogg-1.3.4)
    set(OGG_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS=on -DBUILD_TESTING=off -DINSTALL_DOCS=off)
    ExternalProject_Add(${OGG_PROJECT}
-      URL http://downloads.xiph.org/releases/ogg/libogg-1.3.4.tar.gz
-      URL_HASH SHA256=fe5670640bd49e828d64d2879c31cb4dde9758681bb664f9bdbf159a01b0c76e
+      URL ${OGG_URL}
+      URL_HASH ${OGG_HASH}
       CMAKE_ARGS ${OGG_ARGS}
       )
 else(OPTION_OGG)
@@ -311,11 +310,11 @@ else(OPTION_OGG)
 endif(OPTION_OGG)
 
 if(OPTION_VORBIS)
-   set(VORBIS_PROJECT vorbis-1.3.7)
+   #set(VORBIS_PROJECT vorbis-1.3.7)
    set(VORBIS_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS=on)
    ExternalProject_Add(${VORBIS_PROJECT}
-      URL http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.gz
-      URL_HASH SHA256=0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab
+      URL ${VORBIS_URL}
+      URL_HASH ${VORBIS_HASH}
       CMAKE_ARGS ${VORBIS_ARGS}
       DEPENDS ${OGG_PROJECT}
       )
@@ -324,13 +323,13 @@ else(OPTION_VORBIS)
 endif(OPTION_VORBIS)
 
 if(OPTION_EXPAT)
-   set(EXPAT_PROJECT expat-2.2.10)
+   #set(EXPAT_PROJECT expat-2.2.10)
 #disable building unneeded sub projects (they failed with VS2008)
 set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off -DEXPAT_BUILD_EXAMPLES=off -DEXPAT_BUILD_TOOLS=off -DCMAKE_DEBUG_POSTFIX='')
 ExternalProject_Add(${EXPAT_PROJECT}
-   DOWNLOAD_NAME ${EXPAT_PROJECT}.tar.bz2
-   URL https://sourceforge.net/projects/expat/files/expat/2.2.10/expat-2.2.10.tar.bz2/download
-   URL_HASH SHA256=b2c160f1b60e92da69de8e12333096aeb0c3bf692d41c60794de278af72135a5
+   DOWNLOAD_NAME ${EXPAT_FILE}
+   URL ${EXPAT_URL}
+   URL_HASH ${EXPAT_HASH}
    CMAKE_ARGS ${EXPAT_ARGS}
    #UPDATE_COMMAND ""
    #PATCH_COMMAND ""
@@ -347,9 +346,9 @@ if(OPTION_ZLIB)
    #set(ZLIB_ARGS ${EXTERNALS_CMAKE_ARGS} -DSKIP_INSTALL_LIBRARIES=On -DSKIP_INSTALL_LIBRARIES=On -D'CMAKE_DEBUG_POSTFIX=""')
    #set(ZLIB_ARGS ${EXTERNALS_CMAKE_ARGS} -D'CMAKE_BUILD_POSTFIX=hello')
    ExternalProject_Add(${ZLIB_PROJECT}
-   DOWNLOAD_NAME ${ZLIB_PROJECT}.tar.gz
-   URL https://sourceforge.net/projects/libpng/files/zlib/1.2.11/zlib-1.2.11.tar.gz/download
-   URL_HASH SHA256=c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
+   DOWNLOAD_NAME ${ZLIB_FILE}
+   URL ${ZLIB_URL}
+   URL_HASH ${ZLIB_HASH}
    #CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=on
    CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
    #UPDATE_COMMAND ""
@@ -375,12 +374,12 @@ else(OPTION_ZLIB)
 endif(OPTION_ZLIB)
 
 if(OPTION_PNG)
-   set(PNG_PROJECT libpng-1.6.37)
+   #set(PNG_PROJECT libpng-1.6.37)
    set(PNG_ARGS ${EXTERNALS_CMAKE_ARGS} -DPNG_SHARED=off -DPNG_TESTS=off -DCMAKE_DEBUG_POSTFIX='')
    ExternalProject_Add(${PNG_PROJECT}
-      DOWNLOAD_NAME ${PNG_PROJECT}.tar.gz
-      URL https://sourceforge.net/projects/libpng/files/libpng16/1.6.37/libpng-1.6.37.tar.gz/download
-      URL_HASH SHA256=daeb2620d829575513e35fecc83f0d3791a620b9b93d800b763542ece9390fb4
+      DOWNLOAD_NAME ${PNG_FILE}
+      URL ${PNG_URL}
+      URL_HASH ${PNG_HASH}
       CMAKE_ARGS ${PNG_ARGS}
       DEPENDS ${ZLIB_PROJECT}
       )
@@ -394,9 +393,9 @@ endif(OPTION_PNG)
 
 if(OPTION_SQLITE3)
    # may only be needed for Simon's replay stuff
-      ExternalProject_Add(sqlite3-3.30.1
-      URL https://www.sqlite.org/2019/sqlite-amalgamation-3300100.zip
-      URL_HASH SHA256=adf051d4c10781ea5cfabbbc4a2577b6ceca68590d23b58b8260a8e24cc5f081
+      ExternalProject_Add(${SQLITE3_PROJECT}
+      URL ${SQLITE3_URL}
+      URL_HASH ${SQLITE3_HASH}
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
       #UPDATE_COMMAND ""
       #PATCH_COMMAND ""
@@ -404,19 +403,21 @@ if(OPTION_SQLITE3)
       #BUILD_COMMAND ""
       #INSTALL_COMMAND ""
    )
-   ExternalProject_Add_Step(sqlite3-3.30.1 sqlite3_add_cmake
+   ExternalProject_Add_Step(${SQLITE3_PROJECT} sqlite3_add_cmake
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
            "${CMAKE_SOURCE_DIR}/patches/sqlite3-CMakeLists.txt"
            "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch  # do before patch
    )
+else(OPTION_SQLITE3)
+   set(SQLITE3_PROJECT )
 endif(OPTION_SQLITE3)
 
    # ========== For OpenSceneGraph =============
 
 if(OPTION_FREETYPE)
-   set(FREETYPE_PROJECT freetype-2.10.4)
+   #set(FREETYPE_PROJECT freetype-2.10.4)
    set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false
                                              -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
                                              -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
@@ -426,8 +427,8 @@ if(OPTION_FREETYPE)
                                              -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=TRUE)
 
    ExternalProject_Add(${FREETYPE_PROJECT}
-      URL https://sourceforge.net/projects/freetype/files/freetype2/2.10.4/ft2104.zip/download
-      URL_HASH SHA256=5c78216d6c5860ef694fde1418d20d69d0ac83ab346c21eb311bd45709e0d93a
+      URL ${FREETYPE_URL}
+      URL_HASH ${FREETYPE_HASH}
       CMAKE_ARGS ${FREETYPE_ARGS}
       DEPENDS ${ZLIB_PROJECT} ${PNG_PROJECT}
    )
@@ -436,11 +437,11 @@ else(OPTION_FREETYPE)
 endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
-   set(CURL_PROJECT curl-7.73.0)
+   #set(CURL_PROJECT curl-7.73.0)
    set(CURL_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_TESTING=Off -DCMAKE_DEBUG_POSTFIX=)
    ExternalProject_Add(${CURL_PROJECT}
-      URL https://curl.haxx.se/download/curl-7.73.0.tar.bz2
-      URL_HASH SHA256=cf34fe0b07b800f1c01a499a6e8b2af548f6d0e044dca4a29d88a4bee146d131
+      URL ${CURL_URL}
+      URL_HASH ${CURL_HASH}
       CMAKE_ARGS ${CURL_ARGS}
       DEPENDS ${ZLIB_PROJECT}
    )
@@ -462,9 +463,9 @@ if(OPTION_OSG)
 #      set(OSG_ARGS ${OSG_ARGS} -D BUILD_OSG_PLUGIN_TGA=0)
 #   endif()
 
-   ExternalProject_Add(OpenSceneGraph-3.6.5
-      URL https://github.com/openscenegraph/OpenSceneGraph/archive/OpenSceneGraph-3.6.5.zip
-      URL_HASH SHA256=0e9e3e4cc6f463f21a901934a95e9264b231a1d5db90f72dcb4b8cc94b0d1b3b
+   ExternalProject_Add(${OSG_PROJECT}
+      URL ${OSG_URL}
+      URL_HASH ${OSG_HASH}
       CMAKE_ARGS ${OSG_ARGS}
       DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT}
    )
