@@ -5,7 +5,7 @@
 #    created              : June 22 2020
 #    copyright            : (C) 2020 Joe Thompson
 #    email                : beaglejoe@users.sourceforge.net
-#    version              : $Id: $
+#    version              : $Id$
 #
 #==============================================================================
 #
@@ -69,8 +69,8 @@ message(STATUS "TODO: Need special handling for PLIB")
 message(STATUS "TODO: Switch to the zip file once a download location is setup")
 set(PLIB_SVN_REPO svn://svn.code.sf.net/p/plib/code/trunk)
 set(PLIB_SVN_REVISION 2173)
-set(PLIB_HEAD_VERSION r${PLIB_SVN_REVISION}-trunk)
-set(PLIB_HEAD_PROJECT plib-code-${PLIB_HEAD_VERSION})
+set(PLIB_HEAD_VERSION r${PLIB_SVN_REVISION})
+set(PLIB_HEAD_PROJECT plib-trunk-${PLIB_HEAD_VERSION})
 set(PLIB_HEAD_FILE ${PLIB_HEAD_PROJECT}.zip)
 set(PLIB_HEAD_URL https://sourceforge.net/code-snapshots/svn/p/pl/plib/code/${PLIB_HEAD_FILE})
 set(PLIB_HEAD_HASH SHA256=f82b5bb97f975879d55785ba373d16b0e3d6ef0507dd3fd008a2aa78e0bd4aad)
