@@ -1,7 +1,7 @@
 #
 #==============================================================================
 #
-#    file                 : 3rdPartyDefinitions.cmake
+#    file                 : thirdpartydefinitions.cmake
 #    created              : June 22 2020
 #    copyright            : (C) 2020 Joe Thompson
 #    email                : beaglejoe@users.sourceforge.net
@@ -24,8 +24,14 @@
 #
 #==============================================================================
 #
-# (hashtag) starts a comment
-#cmake_minimum_required(VERSION 3.14.0 FATAL_ERROR)
+#
+#           NOTICE
+# When updating OpenSceneGraph, libPNG, or jpeg
+# Check /cmake/customthirdparty.cmake
+#  The macros 
+#     MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
+#     MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
+#  may need to be updated for the new version
 
 
 #SDL
@@ -67,11 +73,12 @@ set(OPENAL_LEGACY_HASH SHA256=9f8ac1e27fba15a59758a13f0c7f6540a0605b6c3a691def9d
 # PLIB
 message(STATUS "TODO: Need special handling for PLIB")
 message(STATUS "TODO: Switch to the zip file once a download location is setup")
+message(STATUS "NOTE: PLIB_HEAD_HASH changes every time a  new zip is generated")
 set(PLIB_SVN_REPO svn://svn.code.sf.net/p/plib/code/trunk)
 set(PLIB_SVN_REVISION 2173)
 set(PLIB_HEAD_VERSION r${PLIB_SVN_REVISION})
 set(PLIB_HEAD_PROJECT plib-trunk-${PLIB_HEAD_VERSION})
-set(PLIB_HEAD_FILE ${PLIB_HEAD_PROJECT}.zip)
+set(PLIB_HEAD_FILE plib-code-${PLIB_HEAD_VERSION}-trunk.zip)
 set(PLIB_HEAD_URL https://sourceforge.net/code-snapshots/svn/p/pl/plib/code/${PLIB_HEAD_FILE})
 set(PLIB_HEAD_HASH SHA256=f82b5bb97f975879d55785ba373d16b0e3d6ef0507dd3fd008a2aa78e0bd4aad)
 
@@ -105,8 +112,8 @@ set(ENET_HASH SHA256=a38f0f194555d558533b8b15c0c478e946310022d0ec7b34334e19e4574
 # ogg
 set(OGG_VERSION 1.3.4)
 set(OGG_PROJECT ogg-${OGG_VERSION})
-set(OGG_FILE ${OGG_PROJECT}.tar.gz)
-set(OGG_URL http://downloads.xiph.org/releases/ogg/lib${OGG_FILE})
+set(OGG_FILE lib${OGG_PROJECT}.tar.gz)
+set(OGG_URL http://downloads.xiph.org/releases/ogg/${OGG_FILE})
 set(OGG_HASH SHA256=fe5670640bd49e828d64d2879c31cb4dde9758681bb664f9bdbf159a01b0c76e)
 
 # vorbis
