@@ -226,12 +226,12 @@ if(OPTION_PLIB)
             DEPENDERS patch)  # do before patch
       else()
          # this archive corresponds to revision 2173
-         ExternalProject_Add(${PLIB_PROJECT}
+         ExternalProject_Add(${PLIB_HEAD_PROJECT}
             URL ${PLIB_HEAD_URL}
-            URL_HASH  ${PLIB_HASH}
+            URL_HASH  ${PLIB_HEAD_HASH}
             CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
             DEPENDS OpenGL-headers)
-         ExternalProject_Add_Step(${PLIB_PROJECT} plib_add_cmake
+         ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_add_cmake
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
                     "<SOURCE_DIR>/CMakeLists.txt"
