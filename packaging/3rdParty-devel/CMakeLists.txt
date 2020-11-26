@@ -93,6 +93,31 @@ option(OPTION_SQLITE3 "Download and Build sqlite3" false)
 option(OPTION_FREETYPE "Download and Build FreeType" true)
 option(OPTION_CURL "Download and Build curl" true)
 option(OPTION_OSG "Download and Build OpenSceneGraph" true)
+option(OPTION_CACHED_ARCHIVES "Download from a defined cache" false)
+
+set(CACHED_URL "" CACHE STRING "Preferred url from which to download")
+
+if(OPTION_CACHED_ARCHIVES)
+   set(SDL_1_URL "${CACHED_URL}/${SDL1_FILE}")
+   set(SDL_2_URL "${CACHED_URL}/${SDL2_FILE}")
+   set(OPENAL_URL "${CACHED_URL}/${OPENAL_FILE}")
+   set(OPENAL_C11_URL "${CACHED_URL}/${OPENAL_C11_FILE}")
+   set(OPENAL_LEGACY_URL "${CACHED_URL}/${OPENAL_LEGACY_FILE}")
+   set(PLIB_HEAD_URL "${CACHED_URL}/${PLIB_HEAD_FILE}")
+   set(PLIB_URL "${CACHED_URL}/${PLIB_FILE}")
+   set(JPEG_URL "${CACHED_URL}/${JPEG_FILE}")
+   set(FREESOLID_URL "${CACHED_URL}/${FREESOLID_FILE}")
+   set(ENET_URL "${CACHED_URL}/${ENET_FILE} ${ENET_URL}")
+   set(OGG_URL "${CACHED_URL}/${OGG_FILE}")
+   set(VORBIS_URL "${CACHED_URL}/${VORBIS_FILE}")
+   set(EXPAT_URL "${CACHED_URL}/${EXPAT_FILE}")
+   set(ZLIB_URL "${CACHED_URL}/${ZLIB_FILE}")
+   set(PNG_URL "${CACHED_URL}/${PNG_FILE}")
+   set(FREETYPE_URL "${CACHED_URL}/${FREETYPE_FILE}")
+   set(CURL_URL "${CACHED_URL}/${CURL_FILE}")
+   set(OSG_URL "${CACHED_URL}/${OSG_FILE}")
+   set(SQLITE3_URL "${CACHED_URL}/${SQLITE3_FILE}")
+endif()
 
 
 # CMAKE_BUILD_TYPE does NOT work for Visual Studio or Xcode
@@ -187,19 +212,34 @@ endif(OPTION_OPENAL)
 
 if(OPTION_PLIB)
    if(OPTION_PLIB_USE_HEAD)
-      ExternalProject_Add(${PLIB_HEAD_PROJECT}
-         SVN_REPOSITORY  ${PLIB_SVN_REPO} #svn://svn.code.sf.net/p/plib/code/trunk
-         SVN_REVISION -r${PLIB_SVN_REVISION}  #-r2173 as of 2012-08-24 can also use -rHEAD, but specific revision is supposed to prevent calling svn update
-         CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-         DEPENDS OpenGL-headers)
-         ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_add_cmake
-         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                 "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
-                 "<SOURCE_DIR>/CMakeLists.txt"
-         DEPENDEES update # do after update
-         DEPENDERS patch)  # do before patch
+      if(NOT OPTION_CACHED_ARCHIVES)
+         ExternalProject_Add(${PLIB_HEAD_PROJECT}
+            SVN_REPOSITORY  ${PLIB_SVN_REPO} #svn://svn.code.sf.net/p/plib/code/trunk
+            SVN_REVISION -r${PLIB_SVN_REVISION}  #-r2173 as of 2012-08-24 can also use -rHEAD, but specific revision is supposed to prevent calling svn update
+            CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+            DEPENDS OpenGL-headers)
+            ExternalProject_Add_Step(${PLIB_HEAD_PROJECT} plib_add_cmake
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
+                    "<SOURCE_DIR>/CMakeLists.txt"
+            DEPENDEES update # do after update
+            DEPENDERS patch)  # do before patch
+      else()
+         # this archive corresponds to revision 2173
+         ExternalProject_Add(${PLIB_PROJECT}
+            URL ${PLIB_HEAD_URL}
+            URL_HASH  ${PLIB_HASH}
+            CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+            DEPENDS OpenGL-headers)
+         ExternalProject_Add_Step(${PLIB_PROJECT} plib_add_cmake
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${CMAKE_SOURCE_DIR}/patches/${PLIB_PROJECT}.CMakeLists.txt"
+                    "<SOURCE_DIR>/CMakeLists.txt"
+            DEPENDEES update # do after update
+            DEPENDERS patch)  # do before patch
+      endif()
    else(OPTION_PLIB_USE_HEAD)
-      # this tarball corresponds to revision 2131
+      # this archive corresponds to revision 2131
       ExternalProject_Add(${PLIB_PROJECT}
          URL ${PLIB_URL}
          URL_HASH  ${PLIB_HASH}
