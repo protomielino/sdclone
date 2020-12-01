@@ -387,6 +387,8 @@ private:
         double				PIT_EXIT_OFFSET;		// dist in m.
         int					PIT_DAMAGE_WARN;		// fix damage if no extra pit stops required.
         int					PIT_DAMAGE_DANGER;		// fix damage even if extra pit stops required.
+        double              PIT_TIRE_WARN;
+        double              PIT_TIRE_DANGER;
         double				SKID_FACTOR;
         double				SKID_FACTOR_TRAFFIC;
         double				REAR_LAT_SLIP_FACTOR;

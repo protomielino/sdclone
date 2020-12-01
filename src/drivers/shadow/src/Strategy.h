@@ -44,6 +44,7 @@ public:
     ~Strategy();
 
     void	SetDamageLimits( int warnDamage, int dangerDamage, bool tyc );
+    void    SetTyreLimits( double warnTyre, double dangerTyre);
     void	Process( CarElt* pCar, TeamInfo::Item* pMyInfo );
 
     bool	WantToPit() const;

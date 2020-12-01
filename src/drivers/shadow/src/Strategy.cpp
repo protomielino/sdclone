@@ -32,13 +32,13 @@ extern GfLogger* PLogSHADOW;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-Strategy::Strategy( const MyTrack& track, const PitPath& pitPath )
-    :	m_track(track),
-      m_pitPath(pitPath),
+Strategy::Strategy( const MyTrack& track, const PitPath& pitPath ):
+    m_track(track),
+    m_pitPath(pitPath),
       m_warnDamageLimit(5000),
       m_dangerDamageLimit(7000),
-      m_warnTyreLimit(0.8),
-      m_dangerTyreLimit(0.7),
+      m_warnTyreLimit(0.3),
+      m_dangerTyreLimit(0.03),
       m_HasTYC(false),
       m_state(PIT_NONE),
       m_lastFuel(0),
@@ -58,6 +58,13 @@ void	Strategy::SetDamageLimits( int warnDamageLimit, int dangerDamageLimit, bool
     m_warnDamageLimit	= warnDamageLimit;
     m_dangerDamageLimit	= dangerDamageLimit;
     m_HasTYC = tyc;
+}
+
+void	Strategy::SetTyreLimits( double warnTireLimit, double dangerTireLimit )
+{
+    m_warnTyreLimit	= warnTireLimit;
+    m_dangerTyreLimit = dangerTireLimit;
+    LogSHADOW.info(" # Tyre warn %.2f - Tyre Danger = %.2f\n", m_warnTyreLimit, m_dangerTyreLimit);
 }
 
 void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )

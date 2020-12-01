@@ -67,6 +67,8 @@ using namespace std;
 #define PRV_PIT_EXIT_OFFS			"pit exit offset"
 #define PRV_PIT_DAMAGE_WARN			"pit damage warn limit"
 #define PRV_PIT_DAMAGE_DANGER		"pit damage danger limit"
+#define PRV_PIT_TIRE_WARN			"pit tire warn limit"
+#define PRV_PIT_TIRE_DANGER		    "pit tire danger limit"
 #define PRV_PRACTICE_INIT_FUEL      "practice init fuel"
 #define PRV_PIT_TEST_STOP           "pit test stop"
 #define PRV_SKID_FACTOR				"skid factor"
@@ -418,7 +420,9 @@ void	Driver::InitTrack(
         m_priv[p].PIT_ENTRY_OFFSET = SafeParmGetNum(hCarParm, sect.c_str(), PRV_PIT_ENTRY_OFFS, 0, m_priv[p].PIT_ENTRY_OFFSET);
         m_priv[p].PIT_EXIT_OFFSET = SafeParmGetNum(hCarParm, sect.c_str(), PRV_PIT_EXIT_OFFS, 0, m_priv[p].PIT_EXIT_OFFSET);
         m_priv[p].PIT_DAMAGE_WARN = (int)SafeParmGetNum(hCarParm, sect.c_str(), PRV_PIT_DAMAGE_WARN, 0, (float)m_priv[p].PIT_DAMAGE_WARN);
+        m_priv[p].PIT_TIRE_WARN = SafeParmGetNum(hCarParm, sect.c_str(), PRV_PIT_TIRE_WARN, 0, 0.3);
         m_priv[p].PIT_DAMAGE_DANGER = (int)SafeParmGetNum(hCarParm, sect.c_str(), PRV_PIT_DAMAGE_DANGER, 0, (float)m_priv[p].PIT_DAMAGE_DANGER);
+        m_priv[p].PIT_TIRE_DANGER = SafeParmGetNum(hCarParm, sect.c_str(), PRV_PIT_TIRE_DANGER, 0, 0.2);
         m_priv[p].SKID_FACTOR = SafeParmGetNum(hCarParm, sect.c_str(), PRV_SKID_FACTOR, 0, m_priv[p].SKID_FACTOR);
         m_priv[p].SKID_FACTOR_TRAFFIC = SafeParmGetNum(hCarParm, sect.c_str(), PRV_SKID_FACTOR_TRAFFIC, 0, m_priv[p].SKID_FACTOR_TRAFFIC);
         m_priv[p].REAR_LAT_SLIP_FACTOR = SafeParmGetNum(hCarParm, sect.c_str(), PRV_REAR_LAT_SLIP_FACTOR, 0, m_priv[p].REAR_LAT_SLIP_FACTOR);
@@ -485,6 +489,8 @@ void	Driver::InitTrack(
 
     m_Strategy.SetDamageLimits( m_priv[PATH_NORMAL].PIT_DAMAGE_WARN,
                                 m_priv[PATH_NORMAL].PIT_DAMAGE_DANGER, m_cm[PATH_NORMAL].HASTYC );
+
+    m_Strategy.SetTyreLimits( m_priv[PATH_NORMAL].PIT_TIRE_WARN, m_priv[PATH_NORMAL].PIT_TIRE_DANGER);
 
     // override params for car type on track of specific race type.
     snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s",
@@ -943,7 +949,8 @@ double	Driver::GripFactor( const CarElt* pCar, bool front ) const
     {
         if(front)
             gripFactor = m_cm[PATH_NORMAL].GRIP_SCALE_F;
-        else {
+        else
+        {
             gripFactor = m_cm[PATH_NORMAL].GRIP_SCALE_R;
         }
     }
@@ -1004,21 +1011,6 @@ double	Driver::SteerAngle0( tCarElt* car, PtInfo& pi, PtInfo& aheadPi, const Pri
     else
         accDecAngle = avgK * m_priv[PATH_NORMAL].STEER_K_DEC;
     angle += accDecAngle;
-
-#if 0   // dead code
-    {
-        double	velAng = atan2(car->_speed_Y, car->_speed_X);
-        double	ang = car->_yaw - velAng;
-        NORM_PI_PI(ang);
-        int	k = int(floor((pi.k - K_MIN) / K_STEP));
-        int	s = int(floor((spd0 - SPD_MIN) / SPD_STEP));
-        double	ae = 0;
-        if( k >= 0 && k < K_N && s >= 0 && s < SPD_N )
-        {
-            ae = m_angle[s][k] - ang;
-        }
-    }
-#endif
 
     // control offset from path.
     m_lineControl.m_p = 1.0;

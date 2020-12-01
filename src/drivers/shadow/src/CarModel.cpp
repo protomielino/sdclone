@@ -390,14 +390,9 @@ void	CarModel::update( const tCarElt* car, const tSituation* sit )
                 MN(car->priv.wheel[2].effectiveMu, car->priv.wheel[3].effectiveMu));
         WEARTREAD = MN(MN(car->priv.wheel[0].treadDepth, car->priv.wheel[1].treadDepth),
                 MN(car->priv.wheel[2].treadDepth, car->priv.wheel[3].treadDepth));
+
         LogSHADOW.info("GRIP F = %.3f - GRIP R = %.3f - EFFECTIVEMU = %.3f - WEARTREAD = %.5f\n", GRIP_SCALE_F, GRIP_SCALE_R, EFFECTIVEMU, WEARTREAD);
     }
-
-//	DEBUGF( "vx %7.4f %7.4f  vy %7.4f %7.4f  vz %7.4f %7.4f  vaz %7.4f %7.4f\n",
-//			VEL_L.x, car->pub.DynGC.vel.x,
-//			VEL_L.y, car->pub.DynGC.vel.y,
-//			VEL_L.z, car->pub.DynGC.vel.z,
-//			VEL_AZ, car->pub.DynGC.vel.az );
 
     updateWheels( car, sit );
 }
