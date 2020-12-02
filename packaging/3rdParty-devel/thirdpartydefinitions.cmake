@@ -52,14 +52,14 @@ set(SDL_2_HASH SHA256=349268f695c02efbc9b9148a70b85e58cefbbf704abd3e91be654db7f1
 set(OPENAL_PROJECT_VERSION 1.21.0)
 set(OPENAL_PROJECT openal-soft-${OPENAL_PROJECT_VERSION})
 set(OPENAL_FILE ${OPENAL_PROJECT}.tar.bz2)
-set(OPENAL_URL http://www.openal-soft.org/openal-releases/${OPENAL_FILE})
+set(OPENAL_URL https://www.openal-soft.org/openal-releases/${OPENAL_FILE})
 set(OPENAL_HASH SHA256=2916b4fc24e23b0271ce0b3468832ad8b6d8441b1830215b28cc4fee6cc89297)
 
 message(WARNING "openal-soft versions newer than 1.19.1 need Visual Studio 2017 and CMAKE_SYSTEM_VERSION >= 10")
 set(OPENAL_C11_VERSION 1.19.1)
 set(OPENAL_C11_PROJECT openal-soft-${OPENAL_C11_VERSION})
 set(OPENAL_C11_FILE ${OPENAL_C11_PROJECT}.tar.bz2)
-set(OPENAL_C11_URL http://www.openal-soft.org/openal-releases/${OPENAL_C11_FILE})
+set(OPENAL_C11_URL https://www.openal-soft.org/openal-releases/${OPENAL_C11_FILE})
 set(OPENAL_C11_HASH SHA256=5c2f87ff5188b95e0dc4769719a9d89ce435b8322b4478b95dd4b427fe84b2e9)
 
 message(STATUS "openal-soft versions newer than 1.18.2 need Visual Studio 2015 or newer")
@@ -67,7 +67,7 @@ message(STATUS "so for older versions of Visual Studio, also download this versi
 set(OPENAL_LEGACY_VERSION 1.18.2)
 set(OPENAL_LEGACY_PROJECT openal-soft-${OPENAL_LEGACY_VERSION})
 set(OPENAL_LEGACY_FILE ${OPENAL_LEGACY_PROJECT}.tar.bz2)
-set(OPENAL_LEGACY_URL http://www.openal-soft.org/openal-releases/${OPENAL_LEGACY_FILE})
+set(OPENAL_LEGACY_URL https://www.openal-soft.org/openal-releases/${OPENAL_LEGACY_FILE})
 set(OPENAL_LEGACY_HASH SHA256=9f8ac1e27fba15a59758a13f0c7f6540a0605b6c3a691def9d420570506d7e82)
 
 # PLIB
@@ -92,7 +92,7 @@ set(PLIB_HASH SHA256=485b22bf6fdc0da067e34ead5e26f002b76326f6371e2ae006415dea6a3
 set(JPEG_VERSION 9d)
 set(JPEG_PROJECT jpeg-${JPEG_VERSION})
 set(JPEG_FILE jpegsrc.v${JPEG_VERSION}.tar.gz)
-set(JPEG_URL http://ijg.org/files/${JPEG_FILE})
+set(JPEG_URL https://ijg.org/files/${JPEG_FILE})
 set(JPEG_HASH SHA256=99cb50e48a4556bc571dadd27931955ff458aae32f68c4d9c39d624693f69c32)
 
 # freeSOLID
@@ -113,14 +113,14 @@ set(ENET_HASH SHA256=a38f0f194555d558533b8b15c0c478e946310022d0ec7b34334e19e4574
 set(OGG_VERSION 1.3.4)
 set(OGG_PROJECT ogg-${OGG_VERSION})
 set(OGG_FILE lib${OGG_PROJECT}.tar.gz)
-set(OGG_URL http://downloads.xiph.org/releases/ogg/${OGG_FILE})
+set(OGG_URL https://downloads.xiph.org/releases/ogg/${OGG_FILE})
 set(OGG_HASH SHA256=fe5670640bd49e828d64d2879c31cb4dde9758681bb664f9bdbf159a01b0c76e)
 
 # vorbis
 set(VORBIS_VERSION 1.3.7)
 set(VORBIS_PROJECT vorbis-${VORBIS_VERSION})
 set(VORBIS_FILE ${VORBIS_PROJECT}.tar.gz)
-set(VORBIS_URL http://downloads.xiph.org/releases/vorbis/lib${VORBIS_FILE})
+set(VORBIS_URL https://downloads.xiph.org/releases/vorbis/lib${VORBIS_FILE})
 set(VORBIS_HASH SHA256=0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab)
 
 # expat
@@ -162,6 +162,7 @@ set(CURL_FILE ${CURL_PROJECT}.tar.bz2)
 set(CURL_URL https://curl.haxx.se/download/${CURL_FILE})
 set(CURL_HASH SHA256=cf34fe0b07b800f1c01a499a6e8b2af548f6d0e044dca4a29d88a4bee146d131)
 
+# osg
 set(OSG_VERSION 3.6.5)
 set(OSG_PROJECT OpenSceneGraph-${OSG_VERSION})
 set(OSG_FILE ${OSG_PROJECT}.zip)
