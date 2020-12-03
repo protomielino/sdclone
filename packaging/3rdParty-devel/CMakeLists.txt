@@ -150,6 +150,8 @@ if(OPTION_SDL_1x)
               "<SOURCE_DIR>/CMakeLists.txt"
       DEPENDEES update # do after update
       DEPENDERS patch)  # do before patch
+else(OPTION_SDL_1x)
+   set(SDL1_PROJECT )
 endif(OPTION_SDL_1x)
 
 # TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)
@@ -435,7 +437,7 @@ if(OPTION_OSG)
       URL ${OSG_URL}
       URL_HASH ${OSG_HASH}
       CMAKE_ARGS ${OSG_ARGS}
-      DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} SDL-1.2.15 ${SDL2_PROJECT})
+      DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} ${SDL1_PROJECT} ${SDL2_PROJECT})
 endif(OPTION_OSG)
 
 
