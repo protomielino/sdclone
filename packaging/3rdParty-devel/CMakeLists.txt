@@ -98,8 +98,8 @@ option(OPTION_CACHED_ARCHIVES "Download from a defined cache" false)
 set(CACHED_URL "" CACHE STRING "Preferred url from which to download")
 
 if(OPTION_CACHED_ARCHIVES)
-   set(SDL_1_URL "${CACHED_URL}/${SDL1_FILE}")
-   set(SDL_2_URL "${CACHED_URL}/${SDL2_FILE}")
+   set(SDL1_URL "${CACHED_URL}/${SDL1_FILE}")
+   set(SDL2_URL "${CACHED_URL}/${SDL2_FILE}")
    set(OPENAL_URL "${CACHED_URL}/${OPENAL_FILE}")
    set(OPENAL_C11_URL "${CACHED_URL}/${OPENAL_C11_FILE}")
    set(OPENAL_LEGACY_URL "${CACHED_URL}/${OPENAL_LEGACY_FILE}")
@@ -140,8 +140,8 @@ endif(WIN32 AND OPTION_OPENGL_HEADERS)
 
 if(OPTION_SDL_1x)
    ExternalProject_Add(${SDL1_PROJECT}
-      URL ${SDL_1_URL}
-      URL_HASH ${SDL_1_HASH}
+      URL ${SDL1_URL}
+      URL_HASH ${SDL1_HASH}
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
       DEPENDS OpenGL-headers)
    ExternalProject_Add_Step(${SDL1_PROJECT} sdl1x_add_cmake
@@ -160,8 +160,8 @@ endif(OPTION_SDL_1x)
 if(OPTION_SDL_2x)
    set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off -DSDL_CMAKE_DEBUG_POSTFIX=)
    ExternalProject_Add(${SDL2_PROJECT}
-      URL ${SDL_2_URL}
-      URL_HASH ${SDL_2_HASH}
+      URL ${SDL2_URL}
+      URL_HASH ${SDL2_HASH}
       CMAKE_ARGS ${SDL2_ARGS}
       DEPENDS OpenGL-headers)
    message(STATUS "Remove the step below when SDL2 CMake is fixed")
