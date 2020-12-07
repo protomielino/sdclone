@@ -111,6 +111,7 @@ public:
     double	TYRE_MU_R;		// mu value of rear  tyres.
     double  EFFECTIVEMU;    // effective MU.
     double	MU_SCALE;		// scaling of MU to use for this car.
+    double  SKILL;          // Skill Driver.
     double	KZ_SCALE;		// bump sensitivity.
     double	KV_SCALE;		// bump sensitivity.
     double	BRAKE_MU_SCALE;	// extra scaling of MU to apply when braking.

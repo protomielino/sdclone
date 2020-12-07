@@ -272,6 +272,44 @@ void	Driver::InitTrack(
     weathercode = GetWeather(pTrack);
     LogSHADOW.info(" # Shadow weather code = %d\n\n", weathercode);
 
+    // Get skill level
+
+    globalskill = driverskill = driver_aggression = 0.0;
+    //SetRandomSeed(10);
+
+    // load the global skill level, range 0 - 10
+    snprintf(buf, sizeof(buf), "%sconfig/raceman/extra/skill.xml", GetLocalDir());
+    void *skillHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+
+    if(!skillHandle)
+    {
+        snprintf(buf, sizeof(buf), "%sconfig/raceman/extra/skill.xml", GetDataDir());
+        skillHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+    }//if !skillHandle
+
+    if (skillHandle)
+    {
+        globalskill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
+    }
+
+    globalskill = MAX(0.7, 1.0 - 0.5 * globalskill / 10.0);
+
+    LogSHADOW.info(" # Global Skill: %.3f\n", globalskill);
+
+    //load the driver skill level, range 0 - 1
+    // float driver_skill = 0.0f;
+    snprintf(buf, sizeof(buf), "drivers/%s/%d/skill.xml", MyBotName, INDEX);
+    LogSHADOW.debug("Path skill driver: %s\n", buf);
+    skillHandle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+
+    if (skillHandle)
+    {
+        driverskill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
+        driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
+        driverskill = MAX(0.95, 1.0 - 0.05 * driverskill);
+        LogSHADOW.info(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", globalskill, driverskill, driver_aggression);
+    }
+
     //
     //	ok, lets read/merge the car parms.
     //
@@ -351,6 +389,7 @@ void	Driver::InitTrack(
 
         m_cm[p].FLAGS = (int)SafeParmGetNum(hCarParm, sect.c_str(), PRV_CARMODEL_FLAGS, NULL, (tdble)m_cm[PATH_NORMAL].FLAGS);
         m_cm[p].MU_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_MU_SCALE, NULL, m_cm[PATH_NORMAL].MU_SCALE);
+        m_cm[p].SKILL = driverskill;
         m_cm[p].BRAKE_MU_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_BRAKE_MU_SCALE, NULL, m_cm[PATH_NORMAL].BRAKE_MU_SCALE);
         m_cm[p].KZ_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_KZ_SCALE, NULL, m_cm[PATH_NORMAL].KZ_SCALE);
         m_cm[p].KV_SCALE = SafeParmGetNum(hCarParm, sect.c_str(), PRV_KV_SCALE, NULL, m_cm[PATH_NORMAL].KV_SCALE);
@@ -496,44 +535,6 @@ void	Driver::InitTrack(
     snprintf( buf, sizeof(buf), "%sdrivers/%s/%s/track-%s",
               GfDataDir(), MyBotName, m_carName, m_trackName );
     m_pathOffsets.setBaseFilename( buf );
-
-    // Get skill level
-
-    globalskill = driverskill = driver_aggression = 0.0;
-    //SetRandomSeed(10);
-
-    // load the global skill level, range 0 - 10
-    snprintf(buf, sizeof(buf), "%sconfig/raceman/extra/skill.xml", GetLocalDir());
-    void *skillHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-
-    if(!skillHandle)
-    {
-        snprintf(buf, sizeof(buf), "%sconfig/raceman/extra/skill.xml", GetDataDir());
-        skillHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-    }//if !skillHandle
-
-    if (skillHandle)
-    {
-        globalskill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 30.0f);
-    }
-
-    globalskill = MAX(0.7, 1.0 - 0.5 * globalskill / 10.0);
-
-    LogSHADOW.info(" # Global Skill: %.3f\n", globalskill);
-
-    //load the driver skill level, range 0 - 1
-    // float driver_skill = 0.0f;
-    snprintf(buf, sizeof(buf), "drivers/%s/%d/skill.xml", MyBotName, INDEX);
-    LogSHADOW.debug("Path skill driver: %s\n", buf);
-    skillHandle = GfParmReadFile(buf, GFPARM_RMODE_STD);
-
-    if (skillHandle)
-    {
-        driverskill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
-        driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
-        driverskill = MAX(0.95, 1.0 - 0.05 * driverskill);
-        LogSHADOW.info(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", globalskill, driverskill, driver_aggression);
-    }
 
     Meteorology(pTrack);
 }

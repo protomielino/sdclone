@@ -47,6 +47,7 @@ CarModel::CarModel()
     TYRE_MU_R(0),
     EFFECTIVEMU(0),
     MU_SCALE(1),
+    SKILL(1.0),
     KZ_SCALE(0),
     KV_SCALE(1),
     BRAKE_MU_SCALE(0.95),
@@ -540,7 +541,7 @@ double	CarModel::CalcMaxSpeedAeroOld(
     if( spd > 200 )
         spd = 200;
 
-    return spd;
+    return spd * SKILL;
 }
 
 //===========================================================================
@@ -565,7 +566,7 @@ double	CarModel::CalcMaxSpeedAeroNew(
 //	                                            (GRIP_SCALE_F + GRIP_SCALE_R) * 0.5,
                                                 TYRE_MU_R, R_AXLE_X, R_WING_X,
                                                 R_AXLE_WB, CA_RW, R_AXLE_CG);
-    return MN(maxSpeedFrontAxle, maxSpeedRearAxle);
+    return MN(maxSpeedFrontAxle, maxSpeedRearAxle) * SKILL;
 }
 
 //===========================================================================
@@ -749,7 +750,7 @@ double	CarModel::CalcBraking(
 
     double	CD = CD_BODY * (1.0 + DAMAGE / 10000.0) + CD_WING;
 
-    MU *= BRAKE_MU_SCALE;
+    MU *= BRAKE_MU_SCALE * SKILL;
 
 //	MU *= (GRIP_SCALE_F + GRIP_SCALE_R) * 0.5;
     MU *= MN(GRIP_SCALE_F, GRIP_SCALE_R);
