@@ -25,6 +25,7 @@
 #include "OsgLoader.h"
 #include "OsgWheel.h"
 #include <osgDB/WriteFile>
+#include <osgDB/FileUtils>
 
 osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)
 {
@@ -68,20 +69,38 @@ osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)
         group->addChild(wheels[i]);
     }
 
-	return group.get();
+    return group.get();
 }
 
 osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const char * wheel_mod_name)
 {
-#if 1
     osgLoader loader;
     char wheel_file_name[32];
-	static const int MaxPathSize = 512;
+    static const int MaxPathSize = 512;
     char buf[MaxPathSize];
 
-	std::string bSkinName = "";
+    const bool bCustomSkin = strlen(this->car->_skinName) != 0;
 
+    std::string bSkinName = "";
     std::string TmpPath = GetDataDir();
+
+    if (bCustomSkin)
+    {
+        snprintf(buf, MaxPathSize, "cars/models/%s/wheel3d-%s.png", car->_carName, car->_skinName);
+        bSkinName = TmpPath + buf;
+        bool exist = osgDB::fileExists(bSkinName);
+        GfLogInfo("Car Texture = %s\n", bSkinName.c_str());
+
+        if (!exist)
+                bSkinName="";
+        else
+        {
+            snprintf(buf, MaxPathSize, "wheel3d-%s", car->_skinName);
+            bSkinName = buf;
+        }
+
+        GfLogInfo("Car Texture = %s\n", bSkinName.c_str());
+    }
     std::string strTPath;
     snprintf(buf, MaxPathSize, "drivers/%s/%d/", car->_modName, car->_driverIndex);
     strTPath = TmpPath+buf;
@@ -90,7 +109,7 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
     snprintf(buf, MaxPathSize, "cars/models/%s/", car->_carName);
     strTPath = TmpPath+buf;
     loader.AddSearchPath(strTPath);
-    GfOut("Chemin Textures : %s\n", strTPath.c_str());
+    GfLogDebug("Chemin Textures : %s\n", strTPath.c_str());
 
     snprintf(buf, MaxPathSize, "data/objects/");
     strTPath = TmpPath+buf;
@@ -110,51 +129,9 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
         {
             snprintf(wheel_file_name, 32, "%s%d.acc", wheel_mod_name, j);
             wheel = loader.Load3dFile(wheel_file_name, true, bSkinName);
-			wheels_switches[wheelIndex]->addChild(wheel.get(), false);
-#if 0
-            std::string wheel_path = GetLocalDir();
-            wheel_path = wheel_path+wheel_file_name+".osg";
-            osgDB::writeNodeFile( *wheel, wheel_path );
-#endif
+            wheels_switches[wheelIndex]->addChild(wheel.get(), false);
         }
     }
-#else
-    char wheel_file_name[32];
-    char buf[MaxPathSize];
-
-    std::string LocalPath = GetDataDir();
-
-    osg::ref_ptr<osgDB::Options> options = new::osgDB::ReaderWriter::Options();
-    options->CACHE_NONE;
-    //options = new osgDB::ReaderWriter::Options;
-
-    snprintf(buf, MaxPathSize, "drivers/%s/%d/", car->_modName, car->_driverIndex);
-    options->getDatabasePathList().push_back(LocalPath+buf);
-
-    snprintf(buf, MaxPathSize, "cars/models/%s/", car->_carName);
-    options->getDatabasePathList().push_back(LocalPath+buf);
-
-    options->getDatabasePathList().push_back(LocalPath+"data/textures/");
-    options->getDatabasePathList().push_back(LocalPath+"data/objects/");
-
-    wheels_switches[wheelIndex] = new osg::Switch;
-
-    // Load speed-dependant 3D wheel model if available
-    for(int j=0;j<4;j++)
-    {
-        osg::ref_ptr<osg::Node> wheel = 0;
-        if (wheel_mod_name && strlen(wheel_mod_name))
-        {
-            snprintf(wheel_file_name, 32, "%s%d.osg", wheel_mod_name, j);
-            wheel = osgDB::readNodeFile(wheel_file_name, options);
-            wheels_switches[wheelIndex]->addChild( wheel, false);
-
-        }
-    }
-
-    options->getDatabasePathList().clear();
-    options = NULL;
-#endif
 
     osg::ref_ptr<osg::MatrixTransform> whlsize = new osg::MatrixTransform;
     float wheelRadius = car->_rimRadius(wheelIndex) + car->_tireHeight(wheelIndex);
@@ -170,8 +147,8 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
     {
         osg::ref_ptr<osg::MatrixTransform> flipright = new osg::MatrixTransform;
         flipright->setMatrix(osg::Matrix::rotate(osg::PI, osg::Z_AXIS));
-		flipright->addChild(whlsize.get());
-		whlsize = flipright.get();
+        flipright->addChild(whlsize.get());
+        whlsize = flipright.get();
     }
 
     osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
