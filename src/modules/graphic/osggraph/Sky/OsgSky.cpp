@@ -30,9 +30,9 @@
 // Used for rise/set effects (flat earth - no rotation of skydome considered here )
 void calc_celestial_angles( const osg::Vec3f& body, const osg::Vec3f& view, double& angle, double& rotation )
 {
-	osg::Vec3f pos = body - view;
-	angle = (90*SD_DEGREES_TO_RADIANS) - atan2(pos[2], sqrt(pos[0]*pos[0] + pos[1]*pos[1]));
-	rotation = (90*SD_DEGREES_TO_RADIANS) - atan2(pos[0], pos[1]);
+    osg::Vec3f pos = body - view;
+    angle = (90*SD_DEGREES_TO_RADIANS) - atan2(pos[2], sqrt(pos[0]*pos[0] + pos[1]*pos[1]));
+    rotation = (90*SD_DEGREES_TO_RADIANS) - atan2(pos[0], pos[1]);
 }
 
 
@@ -75,12 +75,6 @@ SDSky::SDSky( void )
 // Destructor
 SDSky::~SDSky( void )
 {
-    //delete dome;
-    //delete sun;
-    //delete moon;
-    //delete planets;
-    //delete stars;
-
     for(unsigned i=0;i<cloud_layers.size();i++)
     {
         delete cloud_layers[i];
@@ -177,12 +171,14 @@ bool SDSky::reposition( osg::Vec3d &view_pos, double spin, /*double gst,*/
 
   osg::Vec3f sunpos = sun->getSunPosition ();
   calc_celestial_angles( sunpos, view_pos, angle, rotation );
+  GfLogDebug("Sky sun Angle = %.3f\n", angle);
   sun->setSunAngle( angle );
   sun->setSunRotation( rotation );
   sun->update_color_angle(angle);
 
   osg::Vec3f moonpos = moon->getMoonPosition();
   calc_celestial_angles( moonpos, view_pos, angle, rotation );
+  GfLogDebug("Sky moon Angle = %.3f\n", angle);
   moon->setMoonAngle( angle );
   moon->setMoonRotation( rotation );
 

@@ -27,58 +27,58 @@
 
 class SDFrameInfo;
 
-class OSGPLOT
+/*class OSGPLOT
 {
-	private:
+    private:
 
-	public:
-	OSGPLOT(
-		float positionX,
-		float positionY,
-		float width,
-		float height,
-		float maxValue,
-		float minValue,
-		float timeFrame,
-		float referenceLineAtValue,
-		const std::string &Xdata,
-		const std::string &Ydata,
-		const std::string &title
-	);
-	~OSGPLOT();
-	float positionX;
-	float positionY;
-	float width;
-	float height;
-	float maxValue;
-	float minValue;
-	float timeFrame;
-	float referenceLineAtValue;
-	std::string Xdata;
-	std::string Ydata;
-	std::string title;
+    public:
+    OSGPLOT(
+        float positionX,
+        float positionY,
+        float width,
+        float height,
+        float maxValue,
+        float minValue,
+        float timeFrame,
+        float referenceLineAtValue,
+        const std::string &Xdata,
+        const std::string &Ydata,
+        const std::string &title
+    );
+    ~OSGPLOT();
+    float positionX;
+    float positionY;
+    float width;
+    float height;
+    float maxValue;
+    float minValue;
+    float timeFrame;
+    float referenceLineAtValue;
+    std::string Xdata;
+    std::string Ydata;
+    std::string title;
 
-	osg::Vec3Array* dataPoints;
+    osg::Vec3Array* dataPoints;
 
-	osg::Geometry* osgMainPlotLineGeometry;
-	osg::Vec3Array* osgMainPlotLineVertices;
+    osg::Geometry* osgMainPlotLineGeometry;
+    osg::Vec3Array* osgMainPlotLineVertices;
 
-	osg::Geometry* osgReferencePlotLineGeometry;
-	osg::Vec3Array* osgReferencePlotLineVertices;
+    osg::Geometry* osgReferencePlotLineGeometry;
+    osg::Vec3Array* osgReferencePlotLineVertices;
 
-	//osgText::Text* osgTitle;
+    //osgText::Text* osgTitle;
 
-	osg::ref_ptr<osg::Group> osgGroup;
+    osg::ref_ptr<osg::Group> osgGroup;
 
-	osg::ref_ptr <osg::Group> getGroup();
+    osg::ref_ptr <osg::Group> getGroup();
 
-	void appendDataPoint(float x, float y, float z);
-	void removeOldDataPoint();
-	void recalculateDrawnPoint();
-	void drawBackground();
-	void update(tSituation *s, const SDFrameInfo* frameInfo,const tCarElt *currCar);
+    void appendDataPoint(float x, float y, float z);
+    void removeOldDataPoint();
+    void recalculateDrawnPoint();
+    void drawBackground();
+    void update(tSituation *s, const SDFrameInfo* frameInfo,const tCarElt *currCar);
 
-};
+};*/
 
 class SDHUD
 {
@@ -105,16 +105,16 @@ class SDHUD
         float *_arcade_color;
         float *_background_color;
 
-		//car data that need to be remembered between frames for the hud
+        //car data that need to be remembered between frames for the hud
         struct CarData {
-		    int carLaps;
-		    float remainingFuelForLaps;
-		    float laptimeFreezeCountdown;//keep display for x seconds
-		    float laptimeFreezeTime;
-		    float timeDiffFreezeCountdown;//keep display for x seconds
-		    float timeDiffFreezeTime;
-		    int oldSector;
-		    int oldLapNumber;
+            int carLaps;
+            float remainingFuelForLaps;
+            float laptimeFreezeCountdown;//keep display for x seconds
+            float laptimeFreezeTime;
+            float timeDiffFreezeCountdown;//keep display for x seconds
+            float timeDiffFreezeTime;
+            int oldSector;
+            int oldLapNumber;
 
             CarData() : carLaps(0), remainingFuelForLaps(0), laptimeFreezeCountdown(3.0f),
             laptimeFreezeTime(0.0f), timeDiffFreezeCountdown(8.0f), timeDiffFreezeTime(0.0f),
@@ -124,16 +124,16 @@ class SDHUD
         };
         const tCarElt *lastCar;
         std::map<const tCarElt *, CarData> carData;
-        
-		float hudScale;
 
-		//
-		//std::map<std::string,osgText::Text* > hudTextElements;
-		std::map<std::string,osg::Geometry* > hudImgElements;
-		std::map<std::string,osg::ref_ptr <osg::Group> > hudGraphElements;
+        float hudScale;
 
-		std::map<std::string,OSGPLOT* > plotElements;
-     
+        //
+        //std::map<std::string,osgText::Text* > hudTextElements;
+        std::map<std::string,osg::Geometry* > hudImgElements;
+        std::map<std::string,osg::ref_ptr <osg::Group> > hudGraphElements;
+
+        //std::map<std::string,OSGPLOT* > plotElements;
+
 
     public:
         SDHUD();
@@ -155,7 +155,6 @@ class SDHUD
         void Refresh(tSituation *s, const SDFrameInfo* frameInfo, const tCarElt *currCar);
         //osg::ref_ptr <osg::Geode> generateHudFromXmlFile( int scrH, int scrW);
         osg::ref_ptr <osg::Group> generateHudFromXmlFile( int scrH, int scrW);
-
 
         inline osg::ref_ptr<osg::Camera> getRootCamera()
         {

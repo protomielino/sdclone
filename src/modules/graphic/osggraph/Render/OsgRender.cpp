@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
 
     file                 : OsgRender.cpp
     created              : Mon Aug 21 20:13:56 CEST 2012
@@ -159,7 +159,7 @@ void SDRender::Init(tTrack *track)
     std::string datapath = GetDataDir();
     //datapath +="/";
     thesky = new SDSky;
-    GfOut("SDSky class\n");
+    GfLogDebug("SDSky class\n");
 
     // Sky dome / background.
     SDSkyDomeDistance = 20000;
@@ -168,17 +168,14 @@ void SDRender::Init(tTrack *track)
 
     SDDynamicSkyDome = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), GR_ATT_DYNAMICSKYDOME_ENABLED) == 0;
 
-    GfLogInfo("Graphic options : Sky dome : distance = %u m, dynamic = %s\n",
+    GfLogDebug("Graphic options : Sky dome : distance = %u m, dynamic = %s\n",
               SDSkyDomeDistance, SDDynamicSkyDome ? "true" : "false");
-
-    // Dynamic weather.
-    //grDynamicWeather = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_grDynamicWeather, (char*)NULL, grDynamicWeather);
 
     // Cloud layers.
     SDNbCloudLayers =
             (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
 
-    GfLogInfo("Graphic options : Number of cloud layers : %u\n", SDNbCloudLayers);
+    GfLogDebug("Graphic options : Number of cloud layers : %u\n", SDNbCloudLayers);
 
     SDMax_Visibility =
             (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, 0, 0));
@@ -262,10 +259,10 @@ void SDRender::Init(tTrack *track)
         }
     }
 
-    GfLogInfo("Graphic options : Shadow Type : %u (%s)\n", ShadowIndex, ShadowValues[ShadowIndex]);
-    GfLogInfo("Graphic options : Shadow Texture Size : %u\n", ShadowTexSize);
-    GfLogInfo("Graphic options : Shadow Quality : %u (%s)\n", QualityIndex, QualityValues[QualityIndex]);
-    GfLogInfo("Graphic options : Shader Quality : %u (%s)\n", carsShader, ShadersValues[carsShader]);
+    GfLogDebug("Graphic options : Shadow Type : %u (%s)\n", ShadowIndex, ShadowValues[ShadowIndex]);
+    GfLogDebug("Graphic options : Shadow Texture Size : %u\n", ShadowTexSize);
+    GfLogDebug("Graphic options : Shadow Quality : %u (%s)\n", QualityIndex, QualityValues[QualityIndex]);
+    GfLogDebug("Graphic options : Shader Quality : %u (%s)\n", carsShader, ShadersValues[carsShader]);
 
     NStars = NMaxStars;
     if (AStarsData)
@@ -277,33 +274,33 @@ void SDRender::Init(tTrack *track)
     {
         AStarsData[i][0] = SDRandom() * PI;
         AStarsData[i][1] = SDRandom() * PI;
-        AStarsData[i][2] = SDRandom() * 7.0;
+        AStarsData[i][2] = (SDRandom() * 4.5) + 3.1;
     }
 
-    GfLogInfo("  Stars (random) : %d\n", NStars);
+    GfLogDebug("  Stars (random) : %d\n", NStars);
 
     NPlanets = 0;
     APlanetsData = NULL;
 
-    GfLogInfo("  Planets : %d\n", NPlanets);
+    GfLogDebug("  Planets : %d\n", NPlanets);
 
     const int timeOfDay = (int)SDTrack->local.timeofday;
     //SDRain = (unsigned int)SDTrack->local.rain;
     const double domeSizeRatio = SDSkyDomeDistance / 80000.0;
 
-    GfLogInfo("  domeSizeRation : %f\n", domeSizeRatio);
+    GfLogDebug("  domeSizeRation : %f\n", domeSizeRatio);
 
     thesky->build(datapath, SDSkyDomeDistance, SDSkyDomeDistance, 2000 * domeSizeRatio,
                   SDSkyDomeDistance, 2000 * domeSizeRatio, SDSkyDomeDistance, NPlanets,
                   APlanetsData, NStars, AStarsData );
-    GfOut("Build SKY\n");
+    GfLogDebug("Build SKY\n");
     GLfloat sunAscension = SDTrack->local.sunascension;
     SDSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
     thesky->setSD( DEG2RAD(SDSunDeclination));
     thesky->setSRA( sunAscension );
 
-    GfLogInfo("  Sun : time of day = %02d:%02d:%02d (declination = %.1f deg), "
+    GfLogDebug("  Sun : time of day = %02d:%02d:%02d (declination = %.1f deg), "
               "ascension = %.1f deg\n", timeOfDay / 3600, (timeOfDay % 3600) / 60, timeOfDay % 60,
               SDSunDeclination, RAD2DEG(sunAscension));
 
@@ -312,38 +309,13 @@ void SDRender::Init(tTrack *track)
     else
         SDMoonDeclination = (rand() % 270);
 
-    //SDMoonDeclination = grUpdateMoonPos(timeOfDay);
-    //SDMoonDeclination = 22.0; /*(rand() % 270);*/
-
     const float moonAscension = SDTrack->local.sunascension;
 
     thesky->setMD( DEG2RAD(SDMoonDeclination) );
     thesky->setMRA( DEG2RAD(moonAscension) );
 
-    GfLogInfo("  Moon : declination = %.1f deg, ascension = %.1f deg\n",
+    GfLogDebug("  Moon : declination = %.1f deg, ascension = %.1f deg\n",
               SDMoonDeclination, moonAscension);
-
-    /*
-
-    SDCloudLayer *layer = new SDCloudLayer(datapath);
-    layer->setCoverage(layer->SD_CLOUD_CIRRUS);
-    layer->setSpeed(30);
-    layer->setDirection(20);
-    layer->setElevation_m(3000);
-    layer->setThickness_m(400  / domeSizeRatio);
-    layer->setTransition_m(400  / domeSizeRatio);
-    layer->setSpan_m(SDSkyDomeDistance / 2);
-    thesky->add_cloud_layer(layer);
-
-    SDCloudLayer *layer2 = new SDCloudLayer(datapath);
-    layer2->setCoverage(layer2->SD_CLOUD_CIRRUS2);
-    layer2->setSpeed(60);
-    layer2->setDirection(20);
-    layer2->setElevation_m(1500);
-    layer2->setThickness_m(400  / domeSizeRatio);
-    layer2->setTransition_m(400  / domeSizeRatio);
-    layer2->setSpan_m(SDSkyDomeDistance / 2);
-    thesky->add_cloud_layer(layer2);*/
 
     // Initialize the whole sky dome.
     SDScenery * scenery = (SDScenery *)getScenery();
@@ -397,12 +369,13 @@ void SDRender::Init(tTrack *track)
     default:
         break;
     }
-    
+
     m_ShadowRoot->addChild( cargroup.get() );
     m_ShadowRoot->addChild( scene.get() );
     m_ShadowSlot->addChild( m_ShadowRoot.get() );
 
     m_NonShadowRoot->addChild( m_CarLightsRoot.get() );
+    m_NonShadowRoot->addChild( scenery->getTracklight());
     m_NonShadowRoot->addChild( scenery->getBackground() );
 
     m_Scene->addChild( m_ShadowSlot.get() );
@@ -484,7 +457,7 @@ void SDRender::ShadowedScene()
     osg::ref_ptr<osgShadow::ShadowSettings> shadowSettings = shadowScene->getShadowSettings();
     shadowSettings->setReceivesShadowTraversalMask(NODE_MASK_SHADOW_RECV);
     shadowSettings->setCastsShadowTraversalMask(NODE_MASK_SHADOW_CAST);
-    
+
     osg::ref_ptr<osg::LightSource> light = new osg::LightSource;
     light->setLight( sunLight->getLight() );
     light->setReferenceFrame(osg::LightSource::RELATIVE_RF);
@@ -717,11 +690,6 @@ void SDRender::UpdateSky(double currentTime, double accelTime, double X, double 
     static double lastTimeHighSpeed = 0;
     static int lastTimeLowSpeed = 0;
 
-    // Nothing to do if static sky dome, or race not started.
-    //if (!grDynamicSkyDome)	//TODO(kilo): find some meaning for this variable
-    /*if (!SDSkyDomeDistance || SDTrack->skyversion < 1)
-        return;*/
-
     if (currentTime < 0)
     {
         bInitialized = false;
@@ -829,7 +797,7 @@ void SDRender::weather(void)
     SDNbCloudLayers =
             (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
 
-    GfLogInfo("Graphic options : Number of cloud layers : %u\n", SDNbCloudLayers);
+    GfLogDebug("Graphic options : Number of cloud layers : %u\n", SDNbCloudLayers);
 
     cloudsTextureIndex = SDTrack->local.clouds;
     cloudsTextureIndex2 = SDTrack->local.clouds2;
@@ -854,7 +822,7 @@ void SDRender::weather(void)
         SDRain = 3;
         break;
     default:
-        GfLogWarning("Unsupported rain strength value %d (assuming none)",
+        GfLogDebug("Unsupported rain strength value %d (assuming none)",
                      SDTrack->local.rain);
         SDVisibility = SDTrack->local.visibility;
         break;

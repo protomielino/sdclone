@@ -78,7 +78,7 @@ void SDScenery::LoadScene(tTrack *track)
     const char	*acname;
     char 		buf[256];
 
-    GfOut("Initialisation class SDScenery\n");
+    GfLogDebug("Initialisation class SDScenery\n");
 
     m_background = new SDBackground;
     m_pit = new SDPit;
@@ -112,11 +112,11 @@ void SDScenery::LoadScene(tTrack *track)
     else
         _speedWay = false;
 
-    GfOut("SpeedWay = %d - SubCategorie = %d\n", _speedWay, _speedWayLong);
+    GfLogDebug("SpeedWay = %d - SubCategorie = %d\n", _speedWay, _speedWayLong);
 
     acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
 
-    GfOut("ACname = %s\n", acname);
+    GfLogDebug("ACname = %s\n", acname);
 
     if (strlen(acname) == 0)
     {
@@ -133,7 +133,7 @@ void SDScenery::LoadScene(tTrack *track)
             snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
             strPath += buf;
             m_background->build(_bgtype, grWrldX, grWrldY, grWrldZ, strPath);
-            GfOut("Background loaded\n");
+            GfLogDebug("Background loaded\n");
         }
 
     std::string strPath = GetDataDir();
@@ -143,7 +143,7 @@ void SDScenery::LoadScene(tTrack *track)
 
     if (ext == "acc")
     {
-        GfOut("Load 3D Model Scene ACC\n");
+        GfLogDebug("Load 3D Model Scene ACC\n");
         strPath+=buf;
         _strTexturePath = strPath;
         strPath+=acname;
@@ -157,11 +157,11 @@ void SDScenery::LoadScene(tTrack *track)
         std::string strTPath = GetDataDir();
         osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
         pathList.push_back(strPath);
-        GfOut("Track Path : %s\n", pathList.back().c_str());
+        GfLogDebug("Track Path : %s\n", pathList.back().c_str());
         pathList.push_back(strTPath+"data/objects/");
-        GfOut("Texture Path : %s\n", pathList.back().c_str());
+        GfLogDebug("Texture Path : %s\n", pathList.back().c_str());
         pathList.push_back(strTPath+"data/textures/");
-        GfOut("Texture Path : %s\n", pathList.back().c_str());
+        GfLogDebug("Texture Path : %s\n", pathList.back().c_str());
         osgDB::Registry::instance()->setDataFilePathList(pathList);
         osg::ref_ptr<osg::Node> pTrack = osgDB::readNodeFile(acname);
 
@@ -181,12 +181,12 @@ void SDScenery::LoadScene(tTrack *track)
             _scenery->addChild(pTrack.get());
         }
     }
-    
+
     m_pit->build(track);
-	_scenery->addChild(m_pit->getPit());
-    
+    _scenery->addChild(m_pit->getPit());
+
     m_tracklights->build(track);
-	_scenery->addChild(m_tracklights->getTrackLight());
+    //_scenery->addChild(m_tracklights->getTrackLight());
 
     osgDB::Registry::instance()->setDataFilePathList( osgDB::FilePathList() );
     osgDB::Registry::instance()->clearObjectCache();
@@ -202,7 +202,7 @@ void SDScenery::LoadSkyOptions()
     _DynamicSkyDome = _SkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED),
                                                      GR_ATT_DYNAMICSKYDOME_ENABLED) == 0;
 
-    GfLogInfo("Graphic options : Sky dome : distance = %u m, dynamic = %s\n",
+    GfLogDebug("Graphic options : Sky dome : distance = %u m, dynamic = %s\n",
               _SkyDomeDistance, _DynamicSkyDome ? "true" : "false");
 
     _max_visibility = (unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, 0, 0));
@@ -233,14 +233,14 @@ void SDScenery::ShutdownScene(void)
 bool SDScenery::LoadTrack(std::string& strTrack)
 {
     std::string name = "";
-    GfOut("Track Path : %s\n", strTrack.c_str());
+    GfLogDebug("Track Path : %s\n", strTrack.c_str());
     osgLoader loader;
-    GfOut("Texture Path : %s\n", _strTexturePath.c_str());
+    GfLogDebug("Texture Path : %s\n", _strTexturePath.c_str());
     loader.AddSearchPath(_strTexturePath);
 
     std::string strTPath = GetDataDir();
     strTPath += "data/textures/";
-    GfOut("Texture Path : %s\n", strTPath.c_str());
+    GfLogDebug("Texture Path : %s\n", strTPath.c_str());
     loader.AddSearchPath(strTPath);
 
     osg::Node *pTrack = loader.Load3dFile(strTrack, false, name);
@@ -263,7 +263,7 @@ bool SDScenery::LoadTrack(std::string& strTrack)
 
 void SDScenery::reposition(double X, double Y, double Z)
 {
-	m_background->reposition(X, Y, getWorldZ() / 2);
+    m_background->reposition(X, Y, getWorldZ() / 2);
 }
 
 void SDScenery::update_tracklights(double currentTime, double totTime, int raceType)

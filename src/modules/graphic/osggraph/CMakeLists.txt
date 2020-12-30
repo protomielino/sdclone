@@ -6,16 +6,17 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Utils/OsgMath.h
                      Utils/OsgNodeMask.h
                      Utils/OsgLightTransform.h
+                     #Utils/OsgPrecipitation.h
                      #Utils/OsgOptions.h
 
                      Sky/OsgSphere.h
                      Sky/OsgSun.h
-                     Sky/OsgMoon.h 
-                     Sky/OsgStars.h 
-                     Sky/OsgDome.h 
+                     Sky/OsgMoon.h
+                     Sky/OsgStars.h
+                     Sky/OsgDome.h
                      Sky/OsgCloud.h
                      Sky/OsgSky.h
-                     
+
                      Loader/AccGeode.h
                      Loader/AccException.h
                      Loader/ReaderWriterACC.h
@@ -26,8 +27,9 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Render/OsgRender.h
                      Render/OsgReflectionMapping.h
                      Render/OsgShader.h
-                     Viewer/OsgView.h  	
-                     Viewer/OsgScreens.h 
+
+                     Viewer/OsgView.h
+                     Viewer/OsgScreens.h
                      Viewer/OsgCamera.h
                      Viewer/OsgHUD.h
                      Viewer/OsgDebugHUD.h
@@ -36,41 +38,44 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Car/OsgCarLight.h
                      Car/OsgWheel.h
                      Car/OsgBrake.h
+                     Car/OsgCarShadow.h
 
                      OsgGraph.h
                      OsgMain.h
                      )
-			
-IF(OPTION_SDL2)                       
+
+IF(OPTION_SDL2)
    SET(OSGGRAPH_HEADERS ${OSGGRAPH_HEADERS} Viewer/OsgGraphicsWindow.h)
 ENDIF(OPTION_SDL2)
 
 SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
                      Utils/OsgLightTransform.cpp
+                     #Utils/OsgPrecipitation.cpp
                      #Utils/OsgOptions.cpp
 
                      Sky/OsgSphere.cpp
                      Sky/OsgSun.cpp
                      Sky/OsgMoon.cpp
                      Sky/OsgStars.cpp
-                     Sky/OsgDome.cpp  
-                     Sky/OsgCloud.cpp 
-                     Sky/OsgSky.cpp 
+                     Sky/OsgDome.cpp
+                     Sky/OsgCloud.cpp
+                     Sky/OsgSky.cpp
 
-                     Loader/AccGeode.cpp 
+                     Loader/AccGeode.cpp
                      Loader/AccException.cpp
-                     Loader/ReaderWriterACC.cpp 
-                     Loader/OsgLoader.cpp 
+                     Loader/ReaderWriterACC.cpp
+                     Loader/OsgLoader.cpp
 
                      Scenery/OsgBackground.cpp
                      Scenery/OsgPit.cpp
                      Scenery/OsgTrackLight.cpp
-                     Scenery/OsgScenery.cpp 
+                     Scenery/OsgScenery.cpp
 
                      Render/OsgRender.cpp
                      Render/OsgReflectionMapping.cpp
                      Render/OsgShader.cpp
-                     Viewer/OsgView.cpp 
+
+                     Viewer/OsgView.cpp
                      Viewer/OsgScreens.cpp
                      Viewer/OsgCamera.cpp
                      Viewer/OsgHUD.cpp
@@ -80,12 +85,13 @@ SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
                      Car/OsgCarLight.cpp
                      Car/OsgWheel.cpp
                      Car/OsgBrake.cpp
+                     Car/OsgCarShadow.cpp
 
                      OsgGraph.cpp
                      OsgMain.cpp
 		     )
 
-IF(OPTION_SDL2)                       
+IF(OPTION_SDL2)
    SET(OSGGRAPH_SOURCES ${OSGGRAPH_SOURCES} Viewer/OsgGraphicsWindow.cpp)
 ENDIF(OPTION_SDL2)
 
@@ -116,16 +122,16 @@ ENDIF(WIN32)
 
 IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
-    SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG 
+    SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG
         "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcmtd.lib")
-    SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE 
+    SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE
         "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmt.lib")
 ENDIF(MSVC)
 
 # Note: Other sources and headers needed for having them available in IDEs.
 SD_ADD_LIBRARY(osggraph MODULE ${OSGGRAPH_SOURCES} ${OSGGRAPH_HEADERS} ${OSGGRAPH_OTHER_SOURCES})
 
-# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose)
 #SET_TARGET_PROPERTIES(osggraph PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 ADD_OSG_LIBRARY(osggraph)

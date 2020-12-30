@@ -56,8 +56,8 @@ osg::Node *osgLoader::Load3dFile(const std::string &strFile, bool car, const std
     osg::Node *pNode = NULL;
     std::string ext = osgDB::getFileExtension(strFile);
 
-	m_ACCReader.SetCar(car);
-	m_ACCReader.SetSkin(name);
+    m_ACCReader.SetCar(car);
+    m_ACCReader.SetSkin(name);
 
     if (ext == "acc")
     {

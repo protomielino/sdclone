@@ -57,7 +57,7 @@ SDMakeState(const std::string &path, const char* colorTexture, const char* norma
 
     std::string TmpPath;
     TmpPath = path+"data/sky/"+colorTexture;
-    GfLogInfo("Path Sky cloud color texture = %s\n", TmpPath.c_str());
+    GfLogDebug("Path Sky cloud color texture = %s\n", TmpPath.c_str());
     osg::ref_ptr<osg::Image> image = osgDB::readImageFile(TmpPath);
     osg::ref_ptr<osg::Texture2D> texture = new osg::Texture2D(image.get());
     texture->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);
@@ -66,7 +66,7 @@ SDMakeState(const std::string &path, const char* colorTexture, const char* norma
     stateSet->setTextureMode(0, GL_TEXTURE_2D, osg::StateAttribute::ON);
 
     TmpPath = path+"data/sky/"+normalTexture;
-    GfLogInfo("Path Sky cloud normal texture = %s\n", TmpPath.c_str());
+    GfLogDebug("Path Sky cloud normal texture = %s\n", TmpPath.c_str());
     osg::ref_ptr<osg::Image> image2 = osgDB::readImageFile(TmpPath);
     osg::ref_ptr<osg::Texture2D> texture2 = new osg::Texture2D(image2.get());
     texture2->setWrap(osg::Texture::WRAP_S, osg::Texture::REPEAT);

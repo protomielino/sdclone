@@ -35,5 +35,4 @@ public:
 protected:
     osg::ref_ptr<osgDB::ReaderWriter::Options> m_pOpt;
     ReaderWriterACC m_ACCReader;
-	//ReaderWriterACC2 m_ACCReader2;
 };
