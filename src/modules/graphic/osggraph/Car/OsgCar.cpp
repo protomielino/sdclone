@@ -52,8 +52,6 @@ class SDRender;
 SDCar::SDCar(void) :
     car_branch(NULL),
     car_root(NULL),
-    pLight(NULL),
-    pLightBrake(NULL),
     pWing3(NULL),
     pDriver(NULL),
     pSteer(NULL),
@@ -167,9 +165,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     int nranges = 0;
 
     _carShader = carshader;
-	GfLogInfo("Graphic options car shader = %u\n", _carShader);
+    GfLogDebug("Graphic options car shader = %u\n", _carShader);
 
-#if 1
     osgLoader loader;
 
     std::string TmpPath = GetDataDir();
@@ -252,8 +249,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     osg::ref_ptr<osg::Node> pCar = new osg::Node;
     osg::ref_ptr<osg::Node> pCockpit = new osg::Node;
     osg::ref_ptr<osg::Switch> pWing = new osg::Switch;
-    pLight = new osg::Switch;
-    pLightBrake = new osg::Switch;
     pWing->setName("WING");
     pWing3 = new osg::Switch;
     pWing3->setName("WINGREAR");
@@ -263,7 +258,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     pSteer->setName("STEER");
 
     //strPath+=buf;
-    GfLogInfo("Chemin Textures : %s\n", strTPath.c_str());
+    GfLogDebug("Chemin Textures : %s\n", strTPath.c_str());
 
     //osg::ref_ptr<osg::Node> Car = new osg::Node;
 	if (bMasterModel)
@@ -273,19 +268,12 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 	{
 		snprintf(buf, nMaxTexPathSize, "%s-%s", car->_carName, car->_skinName);
 		bSkinName = buf;
-		GfLogInfo("Car Texture = %s\n", bSkinName.c_str());
+        GfLogDebug("Car Texture = %s\n", bSkinName.c_str());
 	}
 
     pCar = loader.Load3dFile(strPath, true, bSkinName);
 
-    //pCar->addChild(Car.get());
-#if 0
-    std::string pCar_path = GetLocalDir();
-    pCar_path = pCar_path+name+".osg";
-    osgDB::writeNodeFile( *pCar, pCar_path );
-#endif
-
-    GfLogInfo("Load Car ACC !\n");
+    GfLogDebug("Load Car ACC !\n");
 
     /* Set a selector on the wing type MPA*/
     snprintf(path, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, SECT_WING_MODEL);
@@ -306,19 +294,19 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         strPath=tmp+param;
         pWin1 = loader.Load3dFile(strPath, true, bSkinName);
         pWin1->setName("WING1");
-        GfLogInfo("Load Wing1 ACC ! %s\n", strPath.c_str() );
+        GfLogDebug("Load Wing1 ACC ! %s\n", strPath.c_str() );
 
         param = GfParmGetStr(handle, path, PRM_WING_2, NULL);
         strPath=tmp+param;
         pWin2 = loader.Load3dFile(strPath, true, bSkinName);
         pWin2->setName("WING2");
-        GfLogInfo("Load Wing2 ACC ! %s\n", strPath.c_str());
+        GfLogDebug("Load Wing2 ACC ! %s\n", strPath.c_str());
 
         param = GfParmGetStr(handle, path, PRM_WING_3, NULL);
         strPath=tmp+param;
         pWin3 = loader.Load3dFile(strPath, true, bSkinName);
         pWin3->setName("WING3");
-        GfLogInfo("Load Wing3 ACC ! %s\n", strPath.c_str());
+        GfLogDebug("Load Wing3 ACC ! %s\n", strPath.c_str());
 
         pWing->addChild(pWin1.get(), false);
         pWing->addChild(pWin2.get(), false);
@@ -344,11 +332,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
                 GfLogInfo("Activate Wing Long !\n");
             }
         }
-#if 0
-        std::string pWing_path = GetLocalDir();
-        pWing_path = pWing_path+"wing.osg";
-        osgDB::writeNodeFile( *pWing, pWing_path );
-#endif
     }
 
     // Separate rear wing models for animation according to rear wing angle ...
@@ -371,20 +354,14 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
             strPath = tmp+param;
             pWing1_branch = loader.Load3dFile(strPath, true, bSkinName);
-            GfLogInfo("Loading Wing animate %i - %s !\n", i, strPath.c_str());
+            GfLogDebug("Loading Wing animate %i - %s !\n", i, strPath.c_str());
 
             pWing3->addChild(pWing1_branch.get());
             strPath ="";
         }
 
         pWing3->setSingleChildOn(0);
-        GfLogInfo("Rear Wing angle Loaded\n");
-
-#if 0
-        std::string pWing3_path = GetLocalDir();
-        pWing3_path = pWing3_path+"wing3.osg";
-        osgDB::writeNodeFile( *pWing3, pWing3_path );
-#endif
+        GfLogDebug("Rear Wing angle Loaded\n");
     }
 
 
@@ -402,12 +379,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         strPath= tmp+param;
 
         pCockpit = loader.Load3dFile(strPath, true, bSkinName);
-        GfLogInfo("Cockpit loaded = %s !\n", strPath.c_str());
-#if 0
-        std::string pCockpit_path = GetLocalDir();
-        pCockpit_path = pCockpit_path+"cockpit.osg";
-        osgDB::writeNodeFile( *cock, pCockpit_path );
-#endif
+        GfLogDebug("Cockpit loaded = %s !\n", strPath.c_str());
     }
 
     pBody->addChild(pCockpit.get(), false);
@@ -441,7 +413,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         steer_transform->addChild(steerEntityLo.get());
 
         pSteer->addChild(steer_transform.get(), 1.0f, FLT_MAX);
-        GfLogTrace("Low Steer Loading \n");
+        GfLogDebug("Low Steer Loading \n");
 
     }
 
@@ -472,7 +444,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
         steer_transform->addChild(steerEntityHi.get());
         pSteer->addChild(steer_transform.get(), 0.0f, 1.0f);
-        GfLogTrace("High Steer Loading \n");
+        GfLogDebug("High Steer Loading \n");
     }
 
     // separate driver models for animation according to steering wheel angle ...
@@ -504,7 +476,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
             driver_path = tmp+param;
             driver_branch = loader.Load3dFile(driver_path, true, bSkinName);
-            GfLogInfo("Loading Animated Driver %i - %s \n", i, driver_path.c_str());
+            GfLogDebug("Loading Animated Driver %i - %s \n", i, driver_path.c_str());
 
             position->addChild(driver_branch.get());
             pDriver->addChild(position.get());
@@ -514,12 +486,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         }
 
         pDriver->setSingleChildOn(0);
-
-#if 0
-        std::string pDriver_path = GetLocalDir();
-        pDriver_path = pDriver_path+"driver.osg";
-        osgDB::writeNodeFile( *pDriver, pDriver_path );
-#endif
     }
 
     _light = false;
@@ -552,65 +518,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         }
     }
 
-    if (_light)
-    {
-        osg::ref_ptr<osg::Node> light1 = new osg::Node;
-
-        std::string tmp = GetDataDir();
-        snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
-        tmp = tmp+buf;
-        strPath=tmp+"light.ac";
-
-        light1 = loader.Load3dFile(strPath, false, bSkinName);
-        light1->setName("LIGHT");
-
-        osg::ref_ptr<osg::StateSet> light1state = light1->getOrCreateStateSet();
-        osg::ref_ptr<osg::Material> light1_material = new osg::Material;
-        light1_material->setColorMode(osg::Material::AMBIENT_AND_DIFFUSE);
-        light1_material->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(1, 1, 1, 1));
-        light1_material->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(0, 0, 0, 1));
-        light1state->setAttribute(light1_material.get());
-
-        osg::ref_ptr<osg::AlphaFunc> lightalphaFunc = new osg::AlphaFunc;
-        lightalphaFunc->setFunction(osg::AlphaFunc::ALWAYS);
-        light1state->setAttributeAndModes(lightalphaFunc);
-
-        osg::ref_ptr<osg::BlendFunc> lightblendFunc = new osg::BlendFunc;
-        lightblendFunc->setSource(osg::BlendFunc::SRC_ALPHA);
-        lightblendFunc->setDestination(osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
-        light1state->setAttributeAndModes(lightblendFunc);
-
-        light1state->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-        light1state->setMode(GL_FOG, osg::StateAttribute::ON);
-        light1state->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
-
-        pLight->addChild(light1.get(), false);
-        pLight->setSingleChildOn(1);
-        GfLogInfo("Loaded LIGHT CAR OSG !\n");
-    }
-
-    if (_lightbrake)
-    {
-        osg::ref_ptr<osg::Node> light2 = new osg::Node;
-        osg::ref_ptr<osg::StateSet> light2state = light2->getOrCreateStateSet();
-
-        light2state->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
-        light2state->setMode(GL_FOG, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED );
-        light2state->setMode(GL_CULL_FACE, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
-
-        std::string tmp = GetDataDir();
-        snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
-        tmp = tmp+buf;
-        strPath=tmp+"brakelight.ac";
-
-        light2 = loader.Load3dFile(strPath, false, bSkinName);
-        light2->setName("BRAKELIGHT");
-
-        pLightBrake->addChild(light2.get(), false);
-        pLightBrake->setSingleChildOn(1);
-        GfLogInfo("Loaded BRAKE LIGHT CAR OSG !\n");
-    }
-
     car_shaded_body->addChild(pCar.get());
 
     if(_wing1)
@@ -622,52 +529,12 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     gCar->addChild(car_shaded_body.get());
     gCar->addChild(pDriver.get());
     gCar->addChild(pSteer.get());
-#else
 
-    osg::ref_ptr<osg::Group> gCar = new osg::Group;
-    gCar->setName("CAR");
-    osg::ref_ptr<osg::Switch> pBody =new osg::Switch;
-    pBody->setName("COCK");
-    osg::ref_ptr<osg::Node> pCar = new osg::Node;
-    osg::ref_ptr<osg::Switch> pWing = new osg::Switch;
-    pWing->setName("WING");
-    osg::ref_ptr<osg::MatrixTransform> pWing3 = new osg::MatrixTransform;
-    pWing->setName("WINGREAR");
-    osg::ref_ptr<osg::Switch> pDriver = new osg::Switch;
-    pDriver->setName("DRIVER");
-    osg::ref_ptr<osg::Group> pSteer = new osg::Switch;
-    pSteer->setName("STEER");
-    osg::ref_ptr<osg::Group> pHiSteer = new osg::Switch;
-    pHiSteer->setName("HISTEER");
-
-    std::string LocalPath = GetDataDir();
-
-    osg::ref_ptr<osgDB::Options> options = new::osgDB::ReaderWriter::Options();
-    //options = new osgDB::ReaderWriter::Options;
-
-    snprintf(buf, 4096, "drivers/%s/%d/", car->_modName, car->_driverIndex);
-    options->getDatabasePathList().push_back(LocalPath+buf);
-
-    snprintf(buf, 4096, "cars/models/%s/", car->_carName);
-    options->getDatabasePathList().push_back(LocalPath+buf);
-
-    options->getDatabasePathList().push_back(LocalPath+"data/textures/");
-    options->getDatabasePathList().push_back(LocalPath+"data/objects/");
-
-    gCar->addChild( osgDB::readNodeFile("sc-cavallo-360.osg", options));
-
-    options->getDatabasePathList().clear();
-#endif
 
     pBody->addChild(gCar.get(), true);
     pBody->setSingleChildOn(1);
-#if 1
-    osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
-    if(_light)
-        transform1->addChild(pLight.get());
 
-    if(_lightbrake)
-        transform1->addChild(pLightBrake.get());
+    osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
 
     transform1->addChild(pBody.get());
 
@@ -679,40 +546,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
     this->car_root = new osg::Group;
     car_root->addChild(car_branch);
-#else
-    osg::ref_ptr<osg::Node> car_branch1 = dynamic_cast<osg::Node*>(pBody->clone( osg::CopyOp::DEEP_COPY_ALL ) );
-
-    osg::ref_ptr<osg::Node> lod1 = dynamic_cast<osg::Node*>( car_branch1->clone( osg::CopyOp::DEEP_COPY_ALL ) );
-    osg::ref_ptr<osg::Node> lod2 = dynamic_cast<osg::Node*>( car_branch1->clone( osg::CopyOp::DEEP_COPY_ALL ) );
-    osg::ref_ptr<osg::Node> lod3 = dynamic_cast<osg::Node*>( car_branch1->clone( osg::CopyOp::DEEP_COPY_ALL ) );
-
-    osgUtil::Simplifier simplifier;
-    // reduce the number of vertices and faces
-    simplifier.setSampleRatio( 0.5 );
-    lod2->accept( simplifier );
-
-    simplifier.setSampleRatio( 0.1 );
-    // this node should accept the simplifier node visitor
-    lod3->accept( simplifier );
-
-    osg::ref_ptr<osg::LOD> car_lod = new osg::LOD;
-    // add the meshes
-    car_lod->addChild( lod1.get(), 0.0f, 50.0f );
-    car_lod->addChild( lod2.get(), 50.0f, 100.0f );
-    car_lod->addChild( lod3.get(), 100.0f, FLT_MAX );
-
-    osg::ref_ptr<osg::MatrixTransform> transform1 = new osg::MatrixTransform;
-    transform1->addChild(car_lod.get());
-
-    // GfOut("loaded car %d",pCar.get());
-    this->car_branch = transform1.get();
-
-    //wheels = new SDWheels;
-    this->car_branch->addChild(wheels.initWheels(car,handle));
-
-    this->car_root = new osg::Group;
-    car_root->addChild(car_branch);
-#endif
 
     this->shader = new SDCarShader(car_shaded_body.get(), this);
 
@@ -916,22 +749,6 @@ void SDCar::updateCar()
     for(std::vector<SDCarLight>::iterator i = lights.begin(); i != lights.end(); ++i)
         i->update(*this);
     
-    if(_light)
-    {
-        if(car->_lightCmd)
-            pLight->setSingleChildOn(0);
-        else
-            pLight->setSingleChildOn(1);
-    }
-
-    if(_lightbrake)
-    {
-        if(car->_brakeCmd>0 || car->_ebrakeCmd>0)
-            pLightBrake->setSingleChildOn(0);
-        else
-            pLightBrake->setSingleChildOn(1);
-    }
-
     wheels.updateWheels();
 
     this->car_branch->setMatrix(mat);

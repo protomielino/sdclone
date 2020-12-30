@@ -43,8 +43,6 @@ private :
     osg::ref_ptr<osg::MatrixTransform> lights_branch;
     osg::ref_ptr<osg::Group> car_shaded_body;
     osg::ref_ptr<osg::Group> car_root;
-    osg::ref_ptr<osg::Switch> pLight;
-    osg::ref_ptr<osg::Switch> pLightBrake;
     osg::ref_ptr<osg::Switch> pWing3;
     osg::ref_ptr<osg::Switch> pDriver;
     osg::ref_ptr<osg::LOD> pSteer;
