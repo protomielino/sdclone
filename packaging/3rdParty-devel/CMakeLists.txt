@@ -164,15 +164,6 @@ if(OPTION_SDL_2x)
       URL_HASH ${SDL2_HASH}
       CMAKE_ARGS ${SDL2_ARGS}
       DEPENDS OpenGL-headers)
-   message(STATUS "Remove the step below when SDL2 CMake is fixed")
-   ExternalProject_Add_Step(${SDL2_PROJECT} sdl2_fix_cmake
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/sdl-${SDL2_VERSION}.CMakeLists.txt"
-              "<SOURCE_DIR>/CMakeLists.txt"
-      DEPENDEES update # do after update
-      DEPENDERS patch)  # do before patch
-# end  message(WARNING "Remove the step below when SDL2 CMake is fixed")
-
 else(OPTION_SDL_2x)
    set(SDL2_PROJECT )
 endif(OPTION_SDL_2x)
