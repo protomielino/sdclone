@@ -26,7 +26,9 @@
 
 #include "OsgView.h"
 
-//class SDDebugHUD;
+#ifdef HUDDEBUG
+class SDDebugHUD;
+#endif
 class SDReflectionMapping;
 
 class SDScreens
@@ -36,7 +38,9 @@ protected:
     std::vector<SDView *> Screens;
     osg::ref_ptr<osg::Group> root;
     osg::ref_ptr<osg::Group> prerenderRoot;
-    //SDDebugHUD * debugHUD;
+#ifdef HUDDEBUG
+    SDDebugHUD * debugHUD;
+#endif
 
     int  m_Winx;
     int  m_Winy;

@@ -143,7 +143,8 @@ float verticalModifier, float horizontalModifier){
     return position;
 }
 
-/*OSGPLOT::OSGPLOT( float positionX,
+#ifdef HUDDEBUG
+OSGPLOT::OSGPLOT( float positionX,
                     float positionY,
                     float width,
                     float height,
@@ -194,7 +195,7 @@ float verticalModifier, float horizontalModifier){
         this->osgReferencePlotLineGeometry->setDataVariance(osg::Object::DYNAMIC); /*?needed?*/
 
         // set the same color for the reference plot line
-/*        osg::Vec4Array* plotColors = new osg::Vec4Array;
+        osg::Vec4Array* plotColors = new osg::Vec4Array;
         plotColors->push_back(osg::Vec4(1.0f,0.0f,0.0f,1.0f));
         this->osgReferencePlotLineGeometry->setColorArray(plotColors, osg::Array::BIND_OVERALL);
 
@@ -225,7 +226,7 @@ float verticalModifier, float horizontalModifier){
         this->osgMainPlotLineGeometry->setVertexArray(this->osgMainPlotLineVertices);
         this->osgMainPlotLineGeometry->setDataVariance(osg::Object::DYNAMIC); /*?needed?*/
 
-/*        this->osgMainPlotLineGeometry->setUseDisplayList (false);
+        this->osgMainPlotLineGeometry->setUseDisplayList (false);
 
         // set the same color for the whole plot line
         osg::Vec4Array* plotColors = new osg::Vec4Array;
@@ -250,6 +251,7 @@ float verticalModifier, float horizontalModifier){
         geode->addDrawable(this->osgMainPlotLineGeometry);
         this->osgGroup->addChild(geode);
     }
+
     //prepare the geode for the title
     {
         osg::Geode* geode = new osg::Geode;
@@ -258,13 +260,11 @@ float verticalModifier, float horizontalModifier){
         osg::Vec4 color = osg::Vec4(0.0f,0.0f,0.0f,0.9f);
         osgTitle->setColor(color);
 
-
         std::string fontFileUrl = "/vera/Vera.ttf";
         std::string fontsMainDirectory = GetDataDir();
         fontsMainDirectory = fontsMainDirectory+"data/fonts";
         fontFileUrl = fontsMainDirectory+fontFileUrl;
         osgTitle->setFont(fontFileUrl);
-
 
         //font resolution
         osgTitle->setFontResolution(200,200);
@@ -287,10 +287,8 @@ float verticalModifier, float horizontalModifier){
     }
 }
 
-
 OSGPLOT::~OSGPLOT()
 {
-
 }
 
 osg::ref_ptr <osg::Group> OSGPLOT::getGroup()
@@ -320,12 +318,13 @@ void OSGPLOT::update(tSituation *s, const SDFrameInfo* frameInfo,
     //redraw
     this->recalculateDrawnPoint();
 }
+
 void OSGPLOT::appendDataPoint(float x, float y, float z)
 {
     //add the new element (as last of our vector)
     this->dataPoints->push_back(osg::Vec3(x, y, z));
-
 }
+
 void OSGPLOT::recalculateDrawnPoint()
 {
     //recalculate main plot line
@@ -334,7 +333,7 @@ void OSGPLOT::recalculateDrawnPoint()
         //find max and min values for our plot
         //just draw point that are in our range of time
         for(osg::Vec3Array::iterator it = this->dataPoints->begin(); it != this->dataPoints->end();)
-/*        {
+        {
             if((*it).x() <= (GfTimeClock() - this->timeFrame) || (*it).x() <= 0)
             {
                 it = this->dataPoints->erase(it);
@@ -442,6 +441,46 @@ void OSGPLOT::drawBackground()
      *      1_______2
      *          x
     * */
+    osg::Vec3 myCoords[] =
+    {
+           osg::Vec3(this->positionX, this->positionY, 0.0f),
+           osg::Vec3(this->positionX + this->width, this->positionY, 0.0f),
+           osg::Vec3(this->positionX + this->width, this->positionY + this->height, 0.0f),
+           osg::Vec3(this->positionX, this->positionY+this->height, 0.0f),
+    };
+
+        int numCoords = sizeof(myCoords)/sizeof(osg::Vec3);
+       osg::Vec3Array* vertices = new osg::Vec3Array(numCoords,myCoords);
+
+       // pass the created vertex array to the points geometry object.
+       bgGeometry->setVertexArray(vertices);
+
+       // apply the same color to the whole geometry
+       osg::Vec4Array* colors = new osg::Vec4Array;
+       colors->push_back(osg::Vec4(1.0f,1.0f,1.0f,0.5f));
+       bgGeometry->setColorArray(colors, osg::Array::BIND_OVERALL);
+
+       // setup normals
+       osg::Vec3Array* normals = new osg::Vec3Array;
+       normals->push_back(osg::Vec3(0.0f,-1.0f,0.0f));
+       bgGeometry->setNormalArray(normals, osg::Array::BIND_OVERALL);
+
+       // tell osg to draw this geometry as quads
+       bgGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUADS,0,numCoords));
+
+       // disable lighting (light is always on) and enable transparency
+       osg::StateSet* stateset = bgGeometry->getOrCreateStateSet();
+        stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
+       stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
+       stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+
+       // add the points geometry to the geode.
+       geode->addDrawable(bgGeometry);
+
+      // add the geode to the graph group
+      this->osgGroup->addChild(geode);
+}
+#endif
 
 // TODO[START]: move this to utils? /src/modules/graphic/osggraph/Utils
 void split(const std::string &s, char delim, std::vector<std::string> &elems)
@@ -687,6 +726,18 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         data.timeDiffFreezeTime = 0.0;
         lastCar = currCar;
     }
+
+#ifdef HUDDEBUG
+    //update all the graphs
+    typedef std::map<std::string,OSGPLOT* >::iterator it_type;
+
+    for(it_type iterator = this->plotElements.begin(); iterator != this->plotElements.end(); ++iterator)
+    {
+           //iterator->first = key
+           //iterator->second = value
+           iterator->second->update(s,frameInfo,currCar);
+    }
+#endif
 
 //board
     tCarElt *firstAheadCar;

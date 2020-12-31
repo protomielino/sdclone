@@ -27,7 +27,8 @@
 
 class SDFrameInfo;
 
-/*class OSGPLOT
+#ifdef HUDDEBUG
+class OSGPLOT
 {
     private:
 
@@ -78,7 +79,8 @@ class SDFrameInfo;
     void drawBackground();
     void update(tSituation *s, const SDFrameInfo* frameInfo,const tCarElt *currCar);
 
-};*/
+};
+#endif
 
 class SDHUD
 {
@@ -127,13 +129,12 @@ class SDHUD
 
         float hudScale;
 
-        //
-        //std::map<std::string,osgText::Text* > hudTextElements;
         std::map<std::string,osg::Geometry* > hudImgElements;
         std::map<std::string,osg::ref_ptr <osg::Group> > hudGraphElements;
 
-        //std::map<std::string,OSGPLOT* > plotElements;
-
+#ifdef HUDDEBUG
+        std::map<std::string,OSGPLOT* > plotElements;
+#endif
 
     public:
         SDHUD();
@@ -153,7 +154,7 @@ class SDHUD
         void CreateHUD( int scrH, int scrW);
         void DispDebug(const tSituation *s, const SDFrameInfo* frame);
         void Refresh(tSituation *s, const SDFrameInfo* frameInfo, const tCarElt *currCar);
-        //osg::ref_ptr <osg::Geode> generateHudFromXmlFile( int scrH, int scrW);
+
         osg::ref_ptr <osg::Group> generateHudFromXmlFile( int scrH, int scrW);
 
         inline osg::ref_ptr<osg::Camera> getRootCamera()
@@ -161,7 +162,5 @@ class SDHUD
             return _cameraHUD;
         }
 };
-
-
 
 #endif //_OSGHUD_H_

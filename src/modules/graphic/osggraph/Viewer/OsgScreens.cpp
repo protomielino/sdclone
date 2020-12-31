@@ -44,7 +44,9 @@ SDScreens::SDScreens() :
 
     m_CurrentScreenIndex(0)
 {
-    //debugHUD = new SDDebugHUD();
+#ifdef HUDDEBUG
+    debugHUD = new SDDebugHUD();
+#endif
 }
     extern SDHUD hud;
 
@@ -127,10 +129,6 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
 
     root->getOrCreateStateSet()->setMode( GL_CULL_FACE, osg::StateAttribute::ON );
 
-    //debugHUD->setTexture(reflectionMapping->getMap());
-    // debugHUD->setTexture(reflectionMapping->getReflectionMap());
-    //root->addChild(debugHUD->getRootCamera());
-
     //create the hud and its own camera and add it to the viewer
     hud.CreateHUD(height, width);
     hud.camera->setGraphicsContext(gw);
@@ -197,7 +195,10 @@ void SDScreens::update(tSituation * s, SDFrameInfo* fi)
 
     SDCars * cars = (SDCars *)getCars();
     tCarElt * c = this->getActiveView()->getCurrentCar();
-    //this->debugHUD->setTexture(cars->getCar(c)->getReflectionMap()->getReflectionMap());
+
+#ifdef HUDDEBUG
+    this->debugHUD->setTexture(cars->getCar(c)->getReflectionMap()->getReflectionMap());
+#endif
 
     if (!viewer->done())
         viewer->frame();
@@ -223,7 +224,9 @@ void SDScreens::changeCamera(long p)
 
 void SDScreens::toggleDebugHUD()
 {
-    //debugHUD->toggleHUD();
+#ifdef HUDDEBUG
+    debugHUD->toggleHUD();
+#endif
 }
 
 void SDScreens::registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node)
@@ -243,10 +246,7 @@ SDScreens::~SDScreens()
         delete Screens[i];
     }
 
-    //viewer->setSceneData(new osg::Group());
-
-
-    //delete viewer;
-    //delete debugHUD;
-    //viewer = NULL;
+#ifdef HUDDEBUG
+    delete debugHUD;
+#endif
 }
