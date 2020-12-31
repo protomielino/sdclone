@@ -37,7 +37,7 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Car/OsgCarLight.h
                      Car/OsgWheel.h
                      Car/OsgBrake.h
-                     Car/OsgCarShadow.h
+                     #Car/OsgCarShadow.h
 
                      OsgGraph.h
                      OsgMain.h)
@@ -86,7 +86,7 @@ SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
                      Car/OsgCarLight.cpp
                      Car/OsgWheel.cpp
                      Car/OsgBrake.cpp
-                     Car/OsgCarShadow.cpp
+                     #Car/OsgCarShadow.cpp
 
                      OsgGraph.cpp
                      OsgMain.cpp)
