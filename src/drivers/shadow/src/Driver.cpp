@@ -20,8 +20,10 @@
 //////////////////////////////////////////////////////////////////////
 
 
+#include <stdlib.h>
 #include <algorithm>
 #include <string>
+#include <time.h>
 
 #include "Driver.h"
 #include "Quadratic.h"
@@ -81,6 +83,7 @@ using namespace std;
 #define PRV_SAFETY_LIMIT			"safety limit"
 #define PRV_SAFETY_MULTIPLIER		"safety multiplier"
 #define PRV_BRAKE_LIMIT				"brake limit"
+#define PRV_LIMIT_SIDE_USE          "limit side use"
 
 #define SECT_SKILL                  "skill"
 #define PRV_SKILL_LEVEL             "level"
@@ -94,6 +97,32 @@ using namespace std;
 #define RANDOM_SEED 0xfded
 #define RANDOM_A    1664525
 #define RANDOM_C    1013904223
+
+//==========================================================================*
+
+//==========================================================================*
+// Skilling: Initialize Randomness
+//--------------------------------------------------------------------------*
+void Driver::SetRandomSeed(unsigned int Seed)
+{
+    //m_RandomSeed = Seed ? Seed : RANDOM_SEED;
+    srand(time(NULL));
+    m_RandomSeed = Seed ? Seed : RANDOM_SEED;
+
+    return;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Skilling: Get Randomness
+//--------------------------------------------------------------------------*
+unsigned int Driver::getRandom()
+{
+    m_RandomSeed = RANDOM_A * m_RandomSeed + RANDOM_C;
+    LogSHADOW.info(" # Random Seed = %d\n", m_RandomSeed);
+
+    return (m_RandomSeed >> 16);
+}
 
 static const double	s_sgMin[] = { 0.00,  10 };
 static const double	s_sgMax[] = { 0.03, 100 };
@@ -139,6 +168,7 @@ Driver::Driver(int index) :	INDEX(index),
       m_followPath(PATH_NORMAL),
       m_stuck(NOT_STUCK),
       m_stuckTime(0),
+      m_RandomSeed(0),
       m_maxAccel(0, 150, 30, 1),
       m_steerGraph(2, s_sgMin, s_sgMax, s_sgSteps, 0),
       m_lastB(0),
@@ -273,7 +303,7 @@ void	Driver::InitTrack(
     LogSHADOW.info(" # Shadow weather code = %d\n\n", weathercode);
 
     // Get skill level
-
+    SetRandomSeed(index);
     globalskill = driverskill = driver_aggression = 0.0;
     //SetRandomSeed(10);
 
@@ -306,8 +336,9 @@ void	Driver::InitTrack(
     {
         driverskill = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_LEVEL, (char *) NULL, 0.0);
         driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
-        driverskill = MAX(0.95, 1.0 - 0.05 * driverskill);
-        LogSHADOW.info(" # Global skill = %.2f - driver skill: %.2f - driver agression: %.2f\n", globalskill, driverskill, driver_aggression);
+        double Rand2 = (double) (getRandom() / 65536.0) / 100;
+        driverskill = MAX(0.95, 1.0 - 0.05 * (driverskill - Rand2));
+        LogSHADOW.info(" # Global skill = %.2f - driver skill: %.8f - driver agression: %.2f\n", globalskill, driverskill, driver_aggression);
     }
 
     //
@@ -472,9 +503,11 @@ void	Driver::InitTrack(
         m_priv[p].SAFETY_LIMIT = SafeParmGetNum(hCarParm, sect.c_str(), PRV_SAFETY_LIMIT, 0, m_priv[p].SAFETY_LIMIT);
         m_priv[p].SAFETY_MULTIPLIER = SafeParmGetNum(hCarParm, sect.c_str(), PRV_SAFETY_MULTIPLIER, 0, m_priv[p].SAFETY_MULTIPLIER);
         m_priv[p].BRAKE_LIMIT = SafeParmGetNum(hCarParm, sect.c_str(), PRV_BRAKE_LIMIT, 0, m_priv[p].BRAKE_LIMIT);
+        m_priv[p].USE_SIDE_LIMIT = SafeParmGetNum(hCarParm, sect.c_str(), PRV_LIMIT_SIDE_USE, 0, m_priv[p].USE_SIDE_LIMIT);
 
         LogSHADOW.debug( "FLY_HEIGHT %g\n", m_priv[p].FLY_HEIGHT );
         LogSHADOW.debug( "BUMP_MOD %d\n\n", m_priv[p].BUMP_MOD );
+        LogSHADOW.debug("USE SIDE LIMIT = %.2f\n", m_priv[p].USE_SIDE_LIMIT);
 
         sideMod[p].side = -1;
 
@@ -494,8 +527,9 @@ void	Driver::InitTrack(
 
     LogSHADOW.debug( "*** FLAGS: 0x%02X\n\n", m_cm[PATH_NORMAL].FLAGS );
 
+    m_track.setWidth(m_priv[PATH_NORMAL].USE_SIDE_LIMIT);
     m_track.NewTrack( pTrack, &m_priv[PATH_NORMAL].INNER_MOD, false, &sideMod[PATH_NORMAL],
-                      m_priv[PATH_NORMAL].PIT_START_BUF_SEGS );
+                      m_priv[PATH_NORMAL].PIT_START_BUF_SEGS);
 
     // setup initial fuel for race.
     double	fuelPerM        = SafeParmGetNum(hCarParm, SECT_PRIV, "fuel per m", 0, 0.001f);

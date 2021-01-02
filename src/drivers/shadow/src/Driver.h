@@ -159,6 +159,9 @@ private:
     double	ApplyAbs( tCarElt* car, double brake );
     double	ApplyTractionControl( tCarElt* car, double acc );
 
+    void    SetRandomSeed(unsigned int Seed);
+    unsigned int getRandom();
+
     void	Meteorology(tTrack *t);
     int		GetWeather(tTrack *t);
 
@@ -399,6 +402,7 @@ private:
         double				SAFETY_LIMIT;			// from edge in m.
         double				SAFETY_MULTIPLIER;		// dist = k * MULT.
         double				BRAKE_LIMIT;
+        double              USE_SIDE_LIMIT;
 
         Private() { clear(); }
 
@@ -434,6 +438,7 @@ private:
             SAFETY_LIMIT = 1.5;			// from edge in m.
             SAFETY_MULTIPLIER = 100;	// dist = k * MULT.
             BRAKE_LIMIT = 1.0;
+            USE_SIDE_LIMIT = 2.0;
         }
     };
 
@@ -481,6 +486,7 @@ private:
     Stuck			m_stuckThing;
     StuckAction		m_stuck;
     double			m_stuckTime;
+    unsigned int    m_RandomSeed;           // seed of generator
 
     LearnedGraph	m_maxAccel;
 //	LearnedGraph	m_maxDecel;

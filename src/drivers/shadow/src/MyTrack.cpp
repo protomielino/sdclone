@@ -35,11 +35,12 @@ extern GfLogger* PLogSHADOW;
 //////////////////////////////////////////////////////////////////////
 
 MyTrack::MyTrack()
-:	NSEG(0),
-    m_delta(3),
-    m_pSegs(0),
-    m_pCurTrack(0),
-    m_nBends(0)
+    :	NSEG(0),
+      m_delta(3),
+      m_pSegs(0),
+      m_pCurTrack(0),
+      m_nBends(0),
+      m_width(2.0)
 {
 }
 
@@ -56,9 +57,10 @@ void	MyTrack::Clear()
     m_pCurTrack = 0;
     m_innerMod.clear();
     m_nBends = 0;
+    m_width = 0;
 }
 
-void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool pit, SideMod* pSideMod, int pitStartBufSegs )
+void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool pit, SideMod* pSideMod, int pitStartBufSegs)
 {
     if( m_pCurTrack != pNewTrack )
     {
@@ -87,14 +89,14 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
         m_pSegs = new Seg[NSEG];
         m_delta = pNewTrack->length / NSEG;
 
-//		DEBUGF( "   ### NSEG %d\n", NSEG );
+        LogSHADOW.debug( "   ### NSEG %d\n", NSEG );
 
         tTrackSeg*	pseg = pNewTrack->seg;
         while( pseg->lgfromstart > pNewTrack->length / 2 )
             pseg = pseg->next;
         double		tsend = pseg->lgfromstart + pseg->length;
-//		DEBUGF( "   ### tsend %g len %g fromstart %g\n",
-//					tsend, pseg->length, pseg->lgfromstart );
+        LogSHADOW.debug( "   ### tsend %g len %g fromstart %g\n",
+                            tsend, pseg->length, pseg->lgfromstart );
 
         int	pitEntry = -1;
         int pitStart = -1;
@@ -102,30 +104,23 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
         int	pitExit  = -1;
         int pitSide  = pNewTrack->pits.side == TR_LFT ? TR_SIDE_LFT : TR_SIDE_RGT;
 
-        {for( int i = 0; i < NSEG; i++ )
+        for( int i = 0; i < NSEG; i++ )
         {
             double	segDist = i * m_delta;
             while( segDist >= tsend )
             {
                 pseg = pseg->next;
-//				DEBUGF( "   ### segDist %g tsend %g len %g fromstart %g\n",
-//						segDist, tsend, pseg->length, pseg->lgfromstart );
-//				tsend += pseg->length;
                 tsend = pseg->lgfromstart + pseg->length;
             }
 
-//			DEBUGF( "   ### segDist %g   tsend %g\n",
-//					segDist, tsend );
-
-            // double	t = (segDist - pseg->lgfromstart) / pseg->length;
-            // double	width = pseg->startWidth + (pseg->endWidth - pseg->startWidth) * t;
-
             m_pSegs[i].segDist = segDist;
             m_pSegs[i].pSeg = pseg;
-            m_pSegs[i].wl = pseg->width / 2;
-            m_pSegs[i].wr = pseg->width / 2;
+            m_pSegs[i].wl = pseg->width / m_width;
+            m_pSegs[i].wr = pseg->width / m_width;
             m_pSegs[i].midOffs = 0;
             m_pSegs[i].bendId = -1;
+
+            LogSHADOW.debug(" # .........m_width = %.2f\n", m_width);
 
             if( pitEntry < 0 && (pseg->raceInfo & TR_PITENTRY) )
                 pitEntry = i;
@@ -135,59 +130,22 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                 pitEnd  = (i + 1) % NSEG;
             if( (pseg->raceInfo & TR_PITEXIT) )
                 pitExit  = i;
-        }}
-
-//		DEBUGF( "pit entry %d  pit exit %d \n", pitEntry, pitExit );
-/*
-        if( pNewTrack->pits.pitStart )
-        {
-            DEBUGF( "pit entry %d  pit exit %d \n",
-                pNewTrack->pits.pitEntry->id, pNewTrack->pits.pitExit->id );
-            DEBUGF( "pit start %d  pit end  %d \n",
-                pNewTrack->pits.pitStart->id, pNewTrack->pits.pitEnd->id );
-            DEBUGF( "pit side %d   pit len %g\n", pitSide, pNewTrack->pits.len );
-            pseg = pNewTrack->pits.pitEntry->prev;
-            do
-            {
-                pseg = pseg->next;
-                DEBUGF( " %7.2fm %4d %5.1fm %4.1fm..%4.1fm",
-                        pseg->lgfromstart, pseg->id, pseg->length,
-                        pseg->startWidth, pseg->endWidth );
-
-                tTrackSeg*	pSide = pseg->side[pitSide];
-                while( pSide )
-                {
-                    DEBUGF( "  %4.1f-%4.1fm %d %d %3x", pSide->startWidth, pSide->endWidth,
-                            pSide->type2, pSide->style, pSide->raceInfo );
-                    pSide = pSide->side[pitSide];
-                }
-
-                DEBUGF( "\n" );
-            }
-            while( pseg != pNewTrack->pits.pitExit );
         }
-*/
+
         int		lastStart	= 0;
         double	lastK		= 0;
         int		lastSign	= 1;
 
-        // const double STRAIGHT_K = 0.00005;
-        // bool	increasing	= true;
-
         vector<int>	bends;
 
-        {for( int i = 0; i < NSEG; i++ )
+        for( int i = 0; i < NSEG; i++ )
         {
             const tTrackSeg* pseg = m_pSegs[i].pSeg;
             double k =  pseg->type == TR_LFT ?  1.0 / pseg->radius :
-                        pseg->type == TR_RGT ? -1.0 / pseg->radius : 0;
-            //if( fabs(k) < STRAIGHT_K )
-            //	k = 0;
-            // double absK = fabs(k);
+                                                pseg->type == TR_RGT ? -1.0 / pseg->radius : 0;
 
             if( k != lastK )
             {
-                //PRINTF("[%d] t=%d, r=%g, k=%g, s=%d\n", i, pseg->type, pseg->radius, k, lastSign );
                 if( lastSign * lastK > 0 && lastSign * k < lastSign * lastK )
                 {
                     LogSHADOW.debug("bend[%d..%d] r=%g, k=%g, s=%d\n", lastStart, i, pseg->radius, lastK, lastSign );
@@ -198,7 +156,7 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                 lastSign	= k < lastK ? -1 : 1;
                 lastK		= k;
             }
-        }}
+        }
 
         int nBends = bends.size();
         LogSHADOW.debug( "number of bends identified: %d\n", nBends );
@@ -225,6 +183,7 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
 
             type	= m_pSegs[end].pSeg->type;
             nextId  = (1 + bend * 2 + 1) % (nBends * 2);
+
             for( int j = 0; j < half; j++ )
             {
                 int index = (end - j + NSEG) % NSEG;
@@ -243,9 +202,6 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
         {
             pseg = m_pSegs[i].pSeg;
 
-//			DEBUGF( "   ### segDist %g   tsend %g\n",
-//					segDist, tsend );
-
             double	segDist = m_pSegs[i].segDist;
             double	t = (segDist - pseg->lgfromstart) / pseg->length;
 
@@ -254,8 +210,8 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
             bool	inPitTotal = ((pitEntry < pitExit && pitEntry <= i && i <= pitExit) ||
                                   (pitEntry > pitExit && (i <= pitExit || i >= pitEntry)));
 
-            const double	MIN_MU = pseg->surface->kFriction * 0.8;
-            const double	MAX_ROUGH = MX(0.005, pseg->surface->kRoughness * 1.2);
+            const double	MIN_MU = pseg->surface->kFriction * 0.9;
+            const double	MAX_ROUGH = MX(0.0025, pseg->surface->kRoughness * 1.2);
             const double	MAX_RESIST = MX(0.02, pseg->surface->kRollRes * 1.2);
             const double	SLOPE = pseg->Kzw;
             const double    WALL_MARGIN = 0.5;
@@ -270,24 +226,26 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                 while( pSide )
                 {
                     double	w = pSide->startWidth +
-                                (pSide->endWidth - pSide->startWidth) * t;
+                            (pSide->endWidth - pSide->startWidth) * t;
+                    float slope = pSide->height/pSide->width;
+                    bool outer = ((s == TR_SIDE_LFT) && (pseg->type == TR_RGT))
+                            || ((s == TR_SIDE_RGT) && (pseg->type == TR_LFT));
 
-                    if( pSide->style == TR_CURB )
+                    if (pSide->style == TR_CURB)
                     {
                         if( s == m_sideMod.side &&
-                            i >= m_sideMod.start &&
-                            i <= m_sideMod.end )
+                                i >= m_sideMod.start &&
+                                i <= m_sideMod.end )
                             ;
                         else
                         {
-                            // always keep 1 wheel on main track.
-                            extra_w = MN(extra_w, 1.5);
+                            extra_w = MN(extra_w, 1.2);
 
                             // never go up a curb on the outside of a corner that has lower friction
                             // than the main track.
                             if( ((s == TR_SIDE_LFT && pseg->type == TR_RGT) ||
                                  (s == TR_SIDE_RGT && pseg->type == TR_LFT)) &&
-                                pSide->surface->kFriction  < pseg->surface->kFriction )
+                                    pSide->surface->kFriction  < pseg->surface->kFriction )
                             {
                                 extra_w = MN(extra_w, w_so_far);
                             }
@@ -302,14 +260,13 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                     else if( pSide->style == TR_PLAN )
                     {
                         // don't go into the main pit area.
-//						if( inPitMain && pitSide == s )
                         if( inPitTotal && pitSide == s )
                         {
                             extra_w = MN(extra_w, w_so_far);
                         }
 
                         bool	inner = (s == TR_SIDE_LFT && pseg->type == TR_LFT) ||
-                                        (s == TR_SIDE_RGT && pseg->type == TR_RGT);
+                                (s == TR_SIDE_RGT && pseg->type == TR_RGT);
                         bool    pitEntryOrExit = pitSide == s && inPitTotal && !inPitMain;
                         if( inner && !pitEntryOrExit )
                         {
@@ -318,16 +275,16 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                         }
 
                         if( pSide->surface->kFriction  < MIN_MU		||  // too little grip
-                            pSide->surface->kRoughness > MAX_ROUGH	||  // too rough
-                            pSide->surface->kRollRes   > MAX_RESIST	||  // too high a rolling resistance
-                            fabs(pSide->Kzw - SLOPE)   > 0.005 )        // too large a slope difference
+                                pSide->surface->kRoughness > MAX_ROUGH	||  // too rough
+                                pSide->surface->kRollRes   > MAX_RESIST	||  // too high a rolling resistance
+                                fabs(pSide->Kzw - SLOPE)   > 0.005 )        // too large a slope difference
                         {
                             extra_w = MN(extra_w, w_so_far);
                         }
 
                         if (((s == TR_SIDE_LFT && pseg->type == TR_RGT) ||
                              (s == TR_SIDE_RGT && pseg->type == TR_LFT)) &&
-                            pSide->surface->kFriction < pseg->surface->kFriction)
+                                pSide->surface->kFriction < pseg->surface->kFriction)
                         {
                             extra_w = MN(extra_w, w_so_far);
                         }
@@ -349,7 +306,7 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                 extra_w = MN(extra_w, w_so_far - WALL_MARGIN);	// there's always a wall/fence at the edge of the track.
 
                 bool	inner = (s == TR_SIDE_LFT && pseg->type == TR_LFT) ||
-                                (s == TR_SIDE_RGT && pseg->type == TR_RGT);
+                        (s == TR_SIDE_RGT && pseg->type == TR_RGT);
                 if( inner )
                 {
                     int innerId = m_pSegs[i].bendId;
@@ -367,6 +324,7 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
 
                 double extent = pseg->width / 2;
                 pSide = pseg->side[s];
+
                 while( pSide )
                 {
                     if( pSide->style >= TR_WALL )
@@ -383,21 +341,13 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                     m_pSegs[i].er = extent;
             }
 
-//			DEBUGF( "\n" );
-
-//			m_pSegs[i].wl = 1;
-//			m_pSegs[i].wr = 1;
-//			m_pSegs[i].wl *= 0.6;
-//			m_pSegs[i].wr *= 0.6;
-
             CalcPtAndNormal( pseg, segDist - pseg->lgfromstart,
-//								m_pSegs[i].wl + m_pSegs[i].wr,
-                                m_pSegs[i].t,
-                                m_pSegs[i].pt, m_pSegs[i].norm );
+                             m_pSegs[i].t,
+                             m_pSegs[i].pt, m_pSegs[i].norm );
 
-//			DEBUGF( "%4d  p(%7.2f, %7.2f, %7.2f)  n(%7.4f, %7.4f, %7.4f)\n",
-//					i, m_pSegs[i].pt.x, m_pSegs[i].pt.y, m_pSegs[i].pt.z,
-//					m_pSegs[i].norm.x, m_pSegs[i].norm.y, m_pSegs[i].norm.z );
+            LogSHADOW.debug( "%4d  p(%7.2f, %7.2f, %7.2f)  n(%7.4f, %7.4f, %7.4f)\n",
+                                i, m_pSegs[i].pt.x, m_pSegs[i].pt.y, m_pSegs[i].pt.z,
+                                m_pSegs[i].norm.x, m_pSegs[i].norm.y, m_pSegs[i].norm.z );
         }
 
         for( int i = 0; i < NSEG; i++ )
@@ -409,10 +359,14 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                 double  currW = s == TR_SIDE_LFT ? m_pSegs[i].el : m_pSegs[i].er;
                 double  nextW = s == TR_SIDE_LFT ? m_pSegs[j].el : m_pSegs[j].er;
 
-                if( currW > nextW + 1 ) {
-                    if( s == TR_SIDE_LFT ) {
+                if( currW > nextW + 1 )
+                {
+                    if( s == TR_SIDE_LFT )
+                    {
                         m_pSegs[i].el = nextW;
-                    } else {
+                    }
+                    else
+                    {
                         m_pSegs[i].er = nextW;
                     }
                 }
@@ -428,10 +382,14 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                 double  currW = s == TR_SIDE_LFT ? m_pSegs[i].el : m_pSegs[i].er;
                 double  prevW = s == TR_SIDE_LFT ? m_pSegs[j].el : m_pSegs[j].er;
 
-                if( currW > prevW + 1 ) {
-                    if( s == TR_SIDE_LFT ) {
+                if( currW > prevW + 1 )
+                {
+                    if( s == TR_SIDE_LFT )
+                    {
                         m_pSegs[i].el = prevW;
-                    } else {
+                    }
+                    else
+                    {
                         m_pSegs[i].er = prevW;
                     }
                 }
@@ -614,11 +572,11 @@ double	MyTrack::GetFriction( int index, double offset ) const
 }
 
 void	MyTrack::CalcPtAndNormal(
-    const tTrackSeg*	pSeg,
-    double				toStart,
-    double&				t,
-    Vec3d&				pt,
-    Vec3d&				norm ) const
+        const tTrackSeg*	pSeg,
+        double				toStart,
+        double&				t,
+        Vec3d&				pt,
+        Vec3d&				norm ) const
 {
     if( pSeg->type == TR_STR )
     {
@@ -628,9 +586,9 @@ void	MyTrack::CalcPtAndNormal(
         pt = s + (e - s) * t;
 
         double hl = pSeg->vertex[TR_SL].z +
-                    (pSeg->vertex[TR_EL].z - pSeg->vertex[TR_SL].z) * t;
+                (pSeg->vertex[TR_EL].z - pSeg->vertex[TR_SL].z) * t;
         double hr = pSeg->vertex[TR_SR].z +
-                    (pSeg->vertex[TR_ER].z - pSeg->vertex[TR_SR].z) * t;
+                (pSeg->vertex[TR_ER].z - pSeg->vertex[TR_SR].z) * t;
         norm = -Vec3d(pSeg->rgtSideNormal);
         norm.z = (hr - hl) / pSeg->width;
     }
@@ -644,9 +602,9 @@ void	MyTrack::CalcPtAndNormal(
         double r = d * pSeg->radius;
         t = toStart / pSeg->length;
         double hl = pSeg->vertex[TR_SL].z +
-                    (pSeg->vertex[TR_EL].z - pSeg->vertex[TR_SL].z) * t;
+                (pSeg->vertex[TR_EL].z - pSeg->vertex[TR_SL].z) * t;
         double hr = pSeg->vertex[TR_SR].z +
-                    (pSeg->vertex[TR_ER].z - pSeg->vertex[TR_SR].z) * t;
+                (pSeg->vertex[TR_ER].z - pSeg->vertex[TR_SR].z) * t;
         pt = Vec3d(pSeg->center.x + c * r, pSeg->center.y + s * r, (hl + hr) / 2);
         norm = Vec3d(c, s, (hr - hl) / pSeg->width);
     }

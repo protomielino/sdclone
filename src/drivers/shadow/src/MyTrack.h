@@ -52,7 +52,8 @@ public:
 
     void	Clear();
     void	NewTrack( tTrack* pNewTrack, const std::vector<double>* pInnerMod = NULL, bool pit = false, SideMod* pSideMod = NULL,
-                      int pitStartBufSegs = 0 );
+                      int pitStartBufSegs = 0);
+    void    setWidth( double width ) { m_width = width; }
 
     tTrack*			GetTrack();
     const tTrack*	GetTrack() const;
@@ -91,6 +92,6 @@ private:
     SideMod				m_sideMod;
     std::vector<double>	m_innerMod;
     int					m_nBends;
+    double              m_width;
 };
-
 #endif // _MYTRACK_H_
