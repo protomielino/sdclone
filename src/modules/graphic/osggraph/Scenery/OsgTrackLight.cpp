@@ -83,7 +83,7 @@ SDTrackLights::Internal::initStateSet(char const *textureFilename)
 
     osg::ref_ptr<osg::StateSet> stateSet = new osg::StateSet;
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
-    stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::ON);
+    stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
     stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
     stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
     stateSet->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);

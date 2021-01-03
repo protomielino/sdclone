@@ -64,6 +64,7 @@ static ssgSimpleState* createState( char const *filename )
 
     current = (tStateList*)malloc( sizeof( tStateList ) );
     current->state = new ssgSimpleState();
+
     if( !current->state )
     {
         free( current );
@@ -72,7 +73,7 @@ static ssgSimpleState* createState( char const *filename )
 
     current->state->disable( GL_LIGHTING );
     current->state->enable( GL_BLEND );
-    current->state->enable( GL_CULL_FACE );
+    current->state->disable( GL_CULL_FACE );
     current->state->enable( GL_TEXTURE_2D );
     current->state->setColourMaterial( GL_AMBIENT_AND_DIFFUSE );
     current->state->setTexture( filename, TRUE, TRUE, TRUE );
