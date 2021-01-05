@@ -119,8 +119,8 @@ set(OGG_HASH SHA256=fe5670640bd49e828d64d2879c31cb4dde9758681bb664f9bdbf159a01b0
 # vorbis
 set(VORBIS_VERSION 1.3.7)
 set(VORBIS_PROJECT vorbis-${VORBIS_VERSION})
-set(VORBIS_FILE ${VORBIS_PROJECT}.tar.gz)
-set(VORBIS_URL https://downloads.xiph.org/releases/vorbis/lib${VORBIS_FILE})
+set(VORBIS_FILE lib${VORBIS_PROJECT}.tar.gz)
+set(VORBIS_URL https://downloads.xiph.org/releases/vorbis/${VORBIS_FILE})
 set(VORBIS_HASH SHA256=0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab)
 
 # expat
