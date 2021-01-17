@@ -204,7 +204,11 @@ void GfEventLoop::injectKeyboardEvent(int code, int modifier, int state,
         GfLogDebug("injectKeyboardEvent(c=%X) : lockedMod=%X (SDL says %X)\n",
                    code, _pPrivate->nLockedModifiers, SDL_GetModState());
         return;
+#if SDL_MAJOR_VERSION < 2
+    case SDLK_NUMLOCK:
+#else
     case SDLK_NUMLOCKCLEAR:
+#endif
         _pPrivate->nLockedModifiers ^= KMOD_NUM;
         GfLogDebug("injectKeyboardEvent(c=%X) : lockedMod=%X (SDL says %X)\n",
                    code, _pPrivate->nLockedModifiers, SDL_GetModState());
