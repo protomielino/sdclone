@@ -23,8 +23,6 @@ ELSE(CMAKE_SKIP_RPATH OR CMAKE_SKIP_BUILD_RPATH)
 	ADD_SDLIB_LIBRARY(xmlversion portability tgf txml)
 ENDIF(CMAKE_SKIP_RPATH OR CMAKE_SKIP_BUILD_RPATH)
 
-IF(UNIX)
-  TARGET_LINK_LIBRARIES(xmlversion dl)
-ENDIF(UNIX)
+ADD_DL_LIBRARY(xmlversion)
 
 # Note: we don't install xmlversion, as it's a only a build-time tool.

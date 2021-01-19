@@ -693,7 +693,7 @@ unsigned linuxGetNumberOfCPUs()
 * Remarks
 *    
 */
-#if !defined(USE_MACPORTS)
+#if !defined(USE_MACPORTS) && !defined(__HAIKU__)
 std::string cpuSet2String(const cpu_set_t* pCPUSet)
 {
 	std::ostringstream ossCPUSet;
@@ -712,9 +712,9 @@ bool
 linuxSetThreadAffinity(int nCPUId)
 {
 	// MacOS X, FreeBSD, OpenBSD, NetBSD, etc ...
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__HAIKU__)
 	
-	GfLogWarning("Thread affinity not yet implemented on Mac OS X or BSD.\n");
+	GfLogWarning("Thread affinity not yet implemented on Mac OS X or BSD or Haiku.\n");
 	// TODO.
 	
 	// Linux, Solaris, AIX ... with NPTL (Native POSIX Threads Library)

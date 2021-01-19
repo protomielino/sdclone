@@ -16,7 +16,7 @@ IF(NOT APPLE OR OPTION_USE_MACPORTS)
  FIND_PATH(PLIB_PLIBINCLUDE_DIR plib/ssg.h
   HINTS ENV PLIB_DIR
   PATH_SUFFIXES 
-	Headers include/plib include
+	Headers include/plib include develop/headers/plib develop/headers/x86/plib
   PATHS
 #Additional MacOS Paths
    	 ~/Library/Frameworks/plib.framework
@@ -24,6 +24,7 @@ IF(NOT APPLE OR OPTION_USE_MACPORTS)
  	 /System/Library/Frameworks/plib.framework # Tiger
 
 	/usr /usr/local
+   /system
   DOC "Location of plib")
 ENDIF(NOT APPLE OR OPTION_USE_MACPORTS)
 

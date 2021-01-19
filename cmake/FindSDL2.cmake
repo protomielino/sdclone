@@ -14,6 +14,7 @@ SET(SDL2_SEARCH_PATHS
 /Library/Frameworks
 /usr/local
 /usr
+/system
 /sw # Fink
 /opt/local # DarwinPorts
 /opt/csw # Blastwave
@@ -23,7 +24,7 @@ SET(SDL2_SEARCH_PATHS
 FIND_PATH(SDL2_INCLUDE_DIR SDL.h
 HINTS
 $ENV{SDL2DIR}
-PATH_SUFFIXES include/SDL2 include
+PATH_SUFFIXES include/SDL2 include develop/headers/SDL2 develop/headers/x86/SDL2
 PATHS ${SDL2_SEARCH_PATHS}
 )
 
