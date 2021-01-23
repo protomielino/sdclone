@@ -149,7 +149,7 @@ void SimAtmosphereUpdate(tSituation *s)
 {
     double timeofday = SimTimeOfDay + s->currentTime;
 
-    if ((timeofday > 6.00 * 60 * 60) && (timeofday < 18.00 * 60 * 60))
+    if ((timeofday > startDay) && (timeofday < endDay))
     {
         Tair = Tair + simDegree;
         GfLogDebug("Tair update = %.7f\n", Tair - 273.15);
