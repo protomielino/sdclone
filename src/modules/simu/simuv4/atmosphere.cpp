@@ -24,6 +24,8 @@
 //static int SimClouds = 0;
 static double simDegree = 0.000000023;  // Value 1 degree celsius / 24 hours
 static int simuMonth = 1;
+static double startDay = 0.0;
+static double endDay = 0.0;
 
 void SimAtmospherePreConfig(tTrack *track)
 {
@@ -51,42 +53,68 @@ void SimAtmospherePreConfig(tTrack *track)
     {
     case 1:
         simDegree *= 2.0;
+        startDay = 28872.0;
+        endDay = 63372.0;
         break;
     case 2:
         simDegree *= 3.5;
+        startDay = 26136.0;
+        endDay = 66384.0;
         break;
     case 3:
         simDegree *= 5.0;
+        startDay = 22752.0;
+        endDay = 69372.0;
         break;
     case 4:
         simDegree *= 6.0;
+        startDay = 22536.0;
+        endDay = 76140.0;
         break;
     case 5:
         simDegree *= 8.0;
+        startDay = 19080.0;
+        endDay = 79344.0;
         break;
     case 6:
         simDegree *= 9.0;
+        startDay = 18144.0;
+        endDay = 80568.0;
         break;
     case 7:
         simDegree *= 10.0;
+        startDay = 18792.0;
+        endDay = 80244.0;
         break;
     case 8:
         simDegree *= 12.0;
+        startDay = 21888.0;
+        endDay = 77040.0;
         break;
     case 9:
         simDegree *= 11.0;
+        startDay = 23580.0;
+        endDay = 73224.0;
         break;
     case 10:
         simDegree *= 8.5;
+        startDay = 26604.0;
+        endDay = 69552.0;
         break;
     case 11:
         simDegree *= 5.5;
+        startDay = 26100.0;
+        endDay = 62784.0;
         break;
     case 12:
         simDegree *= 3.0;
+        startDay = 28800.0;
+        endDay = 62316.0;
         break;
     default:
         simDegree *= 1.5;
+        startDay = 28872.0;
+        endDay = 63372.0;
         break;
     }
 
