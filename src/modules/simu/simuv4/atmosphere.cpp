@@ -17,12 +17,20 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <ctime>
+
 #include "sim.h"
 
 //static int SimClouds = 0;
+static double simDegree = 0.000000023;  // Value 1 degree celsius / 24 hours
+static int simuMonth = 1;
 
 void SimAtmospherePreConfig(tTrack *track)
 {
+    time_t simuTime = time(0);
+    tm *g = gmtime(&simuTime);
+    simuMonth = 1 + g->tm_mon;
+
     SimRain = track->local.rain;
     SimTimeOfDay = track->local.timeofday;
     SimClouds = track->local.clouds;
@@ -39,12 +47,55 @@ void SimAtmospherePreConfig(tTrack *track)
     if (track->local.config > 0)
         SimAtmosphereConfig(track);
 
+    switch(simuMonth)
+    {
+    case 1:
+        simDegree *= 2.0;
+        break;
+    case 2:
+        simDegree *= 3.5;
+        break;
+    case 3:
+        simDegree *= 5.0;
+        break;
+    case 4:
+        simDegree *= 6.0;
+        break;
+    case 5:
+        simDegree *= 8.0;
+        break;
+    case 6:
+        simDegree *= 9.0;
+        break;
+    case 7:
+        simDegree *= 10.0;
+        break;
+    case 8:
+        simDegree *= 12.0;
+        break;
+    case 9:
+        simDegree *= 11.0;
+        break;
+    case 10:
+        simDegree *= 8.5;
+        break;
+    case 11:
+        simDegree *= 5.5;
+        break;
+    case 12:
+        simDegree *= 3.0;
+        break;
+    default:
+        simDegree *= 1.5;
+        break;
+    }
+
     GfLogDebug("SimAirPressure = %3f - SimAirDensity = %3f\n", SimAirPressure, SimAirDensity);
 }
 
 void SimAtmosphereConfig(tTrack *track)
 {
-    if (SimTimeOfDay < 6.00 * 60 *60 && SimTimeOfDay > 19 * 60 * 60)
+    if (SimTimeOfDay < 21000 && SimTimeOfDay > 68400)
         Tair -= 6.75;
     else if (SimTimeOfDay > 6.00 * 60 * 60 && SimTimeOfDay < 10 * 60 * 60)
         Tair += 5.75;
@@ -70,14 +121,14 @@ void SimAtmosphereUpdate(tSituation *s)
 {
     double timeofday = SimTimeOfDay + s->currentTime;
 
-    if (timeofday > 6.00 * 60 * 60 && timeofday < 18.00 * 60 * 60)
+    if ((timeofday > 6.00 * 60 * 60) && (timeofday < 18.00 * 60 * 60))
     {
-        Tair = Tair + 0.000001;
+        Tair = Tair + simDegree;
         GfLogDebug("Tair update = %.7f\n", Tair - 273.15);
     }
     else
     {
-        Tair = Tair - 0.000001;
+        Tair = Tair - simDegree;
         GfLogDebug("Tair update = %.7f\n", Tair - 273.15);
     }
     // TODO: get this later form the situation, weather simulation.
