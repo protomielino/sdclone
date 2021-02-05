@@ -93,7 +93,7 @@ set(JPEG_VERSION 9d)
 set(JPEG_PROJECT jpeg-${JPEG_VERSION})
 set(JPEG_FILE jpegsrc.v${JPEG_VERSION}.tar.gz)
 set(JPEG_URL https://ijg.org/files/${JPEG_FILE})
-set(JPEG_HASH SHA256=99cb50e48a4556bc571dadd27931955ff458aae32f68c4d9c39d624693f69c32)
+set(JPEG_HASH SHA256=6c434a3be59f8f62425b2e3c077e785c9ce30ee5874ea1c270e843f273ba71ee)
 
 # freeSOLID
 set(FREESOLID_VERSION 2.1.2)
@@ -156,11 +156,11 @@ set(FREETYPE_URL https://sourceforge.net/projects/freetype/files/freetype2/${FRE
 set(FREETYPE_HASH SHA256=5c78216d6c5860ef694fde1418d20d69d0ac83ab346c21eb311bd45709e0d93a)
 
 # curl
-set(CURL_VERSION 7.74.0)
+set(CURL_VERSION 7.75.0)
 set(CURL_PROJECT curl-${CURL_VERSION})
 set(CURL_FILE ${CURL_PROJECT}.tar.bz2)
 set(CURL_URL https://curl.haxx.se/download/${CURL_FILE})
-set(CURL_HASH SHA256=0f4d63e6681636539dc88fa8e929f934cd3a840c46e0bf28c73be11e521b77a5)
+set(CURL_HASH SHA256=50552d4501c178e4cc68baaecc487f466a3d6d19bbf4e50a01869effb316d026)
 
 # osg
 set(OSG_VERSION 3.6.5)
