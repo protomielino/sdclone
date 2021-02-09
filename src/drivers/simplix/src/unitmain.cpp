@@ -306,6 +306,16 @@ void SetUpSimplix()
 //==========================================================================*
 // Schismatic entry point for simplix_mpa1
 //--------------------------------------------------------------------------*
+void SetUpSimplix_mp1()
+{
+    cRobotType = RTYPE_SIMPLIX_MP1;
+    SetParameters(NBBOTS, "mp1-cavallo-f2005");
+    TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
+};
+//==========================================================================*
+//==========================================================================*
+// Schismatic entry point for simplix_mpa1
+//--------------------------------------------------------------------------*
 void SetUpSimplix_mpa1()
 {
     cRobotType = RTYPE_SIMPLIX_MPA1;
@@ -611,6 +621,8 @@ int moduleWelcomeV1_00
         SetUpSimplix_36GP();
     else if (strncmp(RobName,"simplix_67GP",strlen("simplix_67GP")) == 0)
         SetUpSimplix_67GP();
+    else if (strncmp(RobName,"simplix_mp1",strlen("simplix_mp1")) == 0)
+        SetUpSimplix_mp1();
     else if (strncmp(RobName,"simplix_mpa1",strlen("simplix_mpa1")) == 0)
         SetUpSimplix_mpa1();
     else if (strncmp(RobName,"simplix_mpa11",strlen("simplix_mpa11")) == 0)
@@ -873,6 +885,17 @@ static int InitFuncPt(int Index, void *Pt)
   {
     LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_SRW\n");
     cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.30f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderInner(0.00f);
+  }
+  else if (cRobotType == RTYPE_SIMPLIX_MP1)
+  {
+    LogSimplix.debug("#cRobotType == RTYPE_SIMPLIX_MP1\n");
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
