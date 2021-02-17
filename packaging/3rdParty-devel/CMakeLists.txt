@@ -181,15 +181,15 @@ if(OPTION_OPENAL)
          "<SOURCE_DIR>/CMakeLists.txt"
          DEPENDEES update # do after update
          DEPENDERS patch)  # do before patch
-   elseif(MSVC_VERSION LESS 1910)
-      message(WARNING "openal-soft versions newer than 1.19.1 need Visual Studio 2017 and CMAKE_SYSTEM_VERSION >= 10")
+   elseif(MSVC_VERSION LESS 1920)
+      message(WARNING "openal-soft versions newer than 1.19.1 need Visual Studio 2019 and CMAKE_SYSTEM_VERSION >= 10")
       ExternalProject_Add(${OPENAL_C11_PROJECT}
          URL ${OPENAL_C11_URL}
          URL_HASH ${OPENAL_C11_HASH}
          CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
    else()
       if(${CMAKE_SYSTEM_VERSION} VERSION_LESS "10.0")
-         message(WARNING "Version 1.21.1 of openal-soft is available for Visual Studio 2017 delete the cache and specify -D CMAKE_SYSTEM_VERSION=10.0 on the command line")
+         message(WARNING "Version ${OPENAL_PROJECT_VERSION} of openal-soft is available for Visual Studio 2019 delete the cache and specify -D CMAKE_SYSTEM_VERSION=10.0 on the command line")
          ExternalProject_Add(${OPENAL_C11_PROJECT}
             URL ${OPENAL_C11_URL}
             URL_HASH ${OPENAL_C11_HASH}
