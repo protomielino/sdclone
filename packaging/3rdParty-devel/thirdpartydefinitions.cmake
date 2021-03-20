@@ -55,7 +55,7 @@ set(OPENAL_FILE ${OPENAL_PROJECT}.tar.bz2)
 set(OPENAL_URL https://www.openal-soft.org/openal-releases/${OPENAL_FILE})
 set(OPENAL_HASH SHA256=c8ad767e9a3230df66756a21cc8ebf218a9d47288f2514014832204e666af5d8)
 
-message(WARNING "openal-soft versions newer than 1.19.1 need Visual Studio 2017 and CMAKE_SYSTEM_VERSION >= 10")
+message(WARNING "openal-soft versions newer than 1.19.1 need Visual Studio 2019 and CMAKE_SYSTEM_VERSION >= 10")
 set(OPENAL_C11_VERSION 1.19.1)
 set(OPENAL_C11_PROJECT openal-soft-${OPENAL_C11_VERSION})
 set(OPENAL_C11_FILE ${OPENAL_C11_PROJECT}.tar.bz2)

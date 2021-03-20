@@ -62,6 +62,12 @@ set(EXTERNALS_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/deps" CACHE PATH "")
 set(EXTERNALS_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/3rdParty" CACHE PATH "")
 set(EXTERNALS_CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALS_INSTALL_DIR} CACHE PATH "")
 
+# Need to pass CMAKE_SYSTEM_VERSION to all the projects for the case
+# where build is targeting newer system than the build host
+if(CMAKE_SYSTEM_VERSION)
+   list(APPEND EXTERNALS_CMAKE_ARGS "-DCMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}")
+endif(CMAKE_SYSTEM_VERSION)
+
 set(_max_ext_path "64")
 string(LENGTH ${EXTERNALS_PREFIX} _path_length)
 if(_path_length GREATER _max_ext_path)
