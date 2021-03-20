@@ -76,7 +76,7 @@ if(WIN32)
 endif(WIN32)
 
 
-option(OPTION_SDL_1x "Download and Build SDL 1.x" true)
+option(OPTION_SDL_1x "Download and Build SDL 1.x" false)
 option(OPTION_SDL_2x "Download and Build SDL 2.x" true)
 option(OPTION_OPENAL "Download and Build OpenAL" true)
 option(OPTION_PLIB "Download and Build PLIB" true)
