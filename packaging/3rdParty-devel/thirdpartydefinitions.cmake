@@ -125,11 +125,18 @@ set(VORBIS_HASH SHA256=0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621
 
 # expat
 message(STATUS "Note special path handling (version in path)")
-set(EXPAT_VERSION 2.2.10)
+set(EXPAT_VERSION 2.3.0)
 set(EXPAT_PROJECT expat-${EXPAT_VERSION})
 set(EXPAT_FILE ${EXPAT_PROJECT}.tar.bz2)
 set(EXPAT_URL https://sourceforge.net/projects/expat/files/expat/${EXPAT_VERSION}/${EXPAT_FILE}/download)
-set(EXPAT_HASH SHA256=b2c160f1b60e92da69de8e12333096aeb0c3bf692d41c60794de278af72135a5)
+set(EXPAT_HASH SHA256=f122a20eada303f904d5e0513326c5b821248f2d4d2afbf5c6f1339e511c0586)
+
+message(STATUS "Note special path handling (version in path)")
+set(EXPAT_LEGACY_VERSION 2.2.10)
+set(EXPAT_LEGACY_PROJECT expat-${EXPAT_LEGACY_VERSION})
+set(EXPAT_LEGACY_FILE ${EXPAT_LEGACY_PROJECT}.tar.bz2)
+set(EXPAT_LEGACY_URL https://sourceforge.net/projects/expat/files/expat/${EXPAT_LEGACY_VERSION}/${EXPAT_LEGACY_FILE}/download)
+set(EXPAT_LEGACY_HASH SHA256=b2c160f1b60e92da69de8e12333096aeb0c3bf692d41c60794de278af72135a5)
 
 # zlib
 message(STATUS "Note special path handling (version in path)")
@@ -156,11 +163,11 @@ set(FREETYPE_URL https://sourceforge.net/projects/freetype/files/freetype2/${FRE
 set(FREETYPE_HASH SHA256=5c78216d6c5860ef694fde1418d20d69d0ac83ab346c21eb311bd45709e0d93a)
 
 # curl
-set(CURL_VERSION 7.75.0)
+set(CURL_VERSION 7.76.0)
 set(CURL_PROJECT curl-${CURL_VERSION})
 set(CURL_FILE ${CURL_PROJECT}.tar.bz2)
 set(CURL_URL https://curl.haxx.se/download/${CURL_FILE})
-set(CURL_HASH SHA256=50552d4501c178e4cc68baaecc487f466a3d6d19bbf4e50a01869effb316d026)
+set(CURL_HASH SHA256=e29bfe3633701590d75b0071bbb649ee5ca4ca73f00649268bd389639531c49a)
 
 # osg
 set(OSG_VERSION 3.6.5)

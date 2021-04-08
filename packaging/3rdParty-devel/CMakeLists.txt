@@ -327,13 +327,24 @@ else(OPTION_VORBIS)
 endif(OPTION_VORBIS)
 
 if(OPTION_EXPAT)
-#disable building unneeded sub projects (they failed with VS2008)
-   set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off -DEXPAT_BUILD_EXAMPLES=off -DEXPAT_BUILD_TOOLS=off -DCMAKE_DEBUG_POSTFIX='')
-   ExternalProject_Add(${EXPAT_PROJECT}
-      DOWNLOAD_NAME ${EXPAT_FILE}
-      URL ${EXPAT_URL}
-      URL_HASH ${EXPAT_HASH}
-      CMAKE_ARGS ${EXPAT_ARGS})
+   if(MSVC_VERSION GREATER 1900)
+      #disable building unneeded sub projects
+      set(EXPAT_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off -DEXPAT_BUILD_EXAMPLES=off -DEXPAT_BUILD_TOOLS=off -DCMAKE_DEBUG_POSTFIX='')
+      ExternalProject_Add(${EXPAT_PROJECT}
+         DOWNLOAD_NAME ${EXPAT_FILE}
+         URL ${EXPAT_URL}
+         URL_HASH ${EXPAT_HASH}
+         CMAKE_ARGS ${EXPAT_ARGS})
+    else()
+      message(WARNING "expat versions newer than 2.2.10 need Visual Studio 2017")
+      #disable building unneeded sub projects (they failed with VS2008)
+      set(EXPAT_LEGACY_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off -DEXPAT_BUILD_EXAMPLES=off -DEXPAT_BUILD_TOOLS=off -DCMAKE_DEBUG_POSTFIX='')
+      ExternalProject_Add(${EXPAT_LEGACY_PROJECT}
+         DOWNLOAD_NAME ${EXPAT_LEGACY_FILE}
+         URL ${EXPAT_LEGACY_URL}
+         URL_HASH ${EXPAT_LEGACY_HASH}
+         CMAKE_ARGS ${EXPAT_LEGACY_ARGS})
+    endif()
 else(OPTION_EXPAT)
    set(EXPAT_PROJECT )
 endif(OPTION_EXPAT)
