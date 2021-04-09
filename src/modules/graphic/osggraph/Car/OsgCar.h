@@ -74,8 +74,7 @@ public :
     bool    _wing1;
     bool    _wing3;
     bool    _steer;
-    bool	_light;
-    bool	_lightbrake;
+
     int     _carShader;
 
     SDReflectionMapping *getReflectionMap();

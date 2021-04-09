@@ -63,8 +63,6 @@ SDCar::SDCar(void) :
     _wing1 = false;
     _wing3 = false;
     _steer = false;
-    _light = false;
-    _lightbrake = false;
 
     _carShader = 0;
 }
@@ -486,36 +484,6 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         }
 
         pDriver->setSingleChildOn(0);
-    }
-
-    _light = false;
-    _lightbrake = false;
-
-    snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_LIGHT);
-    int lightNum = GfParmGetEltNb(handle, path);
-    const char *lightType;
-
-    for (int i = 0; i < lightNum; i++)
-    {
-        snprintf(path, 256, "%s/%s/%d", SECT_GROBJECTS, SECT_LIGHT, i + 1);
-        lightType = GfParmGetStr(handle, path, PRM_TYPE, "");
-
-        if (!strcmp(lightType, VAL_LIGHT_HEAD1))
-        {
-            _light = true;
-        } else if (!strcmp(lightType, VAL_LIGHT_HEAD2))
-        {
-            _light = true;
-        } else if (!strcmp(lightType, VAL_LIGHT_BRAKE))
-        {
-            _lightbrake = true;
-        } else if (!strcmp(lightType, VAL_LIGHT_BRAKE2))
-        {
-            _lightbrake = true;
-        } else if (!strcmp(lightType, VAL_LIGHT_REAR))
-        {
-            _light = true;
-        }
     }
 
     car_shaded_body->addChild(pCar.get());
