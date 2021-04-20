@@ -43,17 +43,19 @@ class Driver
 public:
     Driver(int index);
 
-    void InitTrack(tTrack *Track, void* carHandle, void** carParmHandle, const tSituation* situation);
-    void NewRace(tCarElt* car, const tSituation* situation);
+    void InitTrack(tTrack *Track, void* carHandle, void** carParmHandle, tSituation* situation);
+    void NewRace(tCarElt* car, tSituation* situation);
     void Drive();
     int  PitCmd();
     void EndRace();
     void Shutdown();
 
     const char* mDriverName;
+    int         mTeamIndex;                              // Index of car in Teams arrays;
 
 private:
     enum   DriveState {STATE_RACE, STATE_STUCK, STATE_OFFTRACK, STATE_PITLANE, STATE_PITSTOP};
+    void   TeamInfo(tCarElt* car, tSituation* situation);
     void   updateTime();
     void   updateBasics();
     void   updateOpponents();
@@ -121,7 +123,7 @@ private:
     double mDeltaTime;
     double mSimTime;
     double mLapSimTime;
-    const tSituation* mSituation;
+    tSituation* mSituation;
     MyCar mCar;
     MyTrack mTrack;
 
@@ -212,6 +214,7 @@ private:
     double mOvtMargin;
 
     tTrack* track;
+    tCarElt* car;
 };
 
 #endif // _DRIVER_H_

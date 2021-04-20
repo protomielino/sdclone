@@ -95,7 +95,7 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
 
     if (mPit != NULL)
     {
-        mSpeedLimit = mPitInfo->speedLimit - 0.2;
+        mSpeedLimit = mPitInfo->speedLimit - 0.5;
         // Compute pit spline points along the track
         mPitp[3].x = mPit->pos.seg->lgfromstart + mPit->pos.toStart;
         mPitp[2].x = mPitp[3].x - mPitInfo->len;
@@ -103,7 +103,9 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
         mPitp[0].x = mPitInfo->pitEntry->lgfromstart;
         mPitp[1].x = mPitInfo->pitStart->lgfromstart - mPitInfo->len;
         mPitp[5].x = mPitInfo->pitEnd->lgfromstart + mPitInfo->pitEnd->length + mPitInfo->len;
+        //mPitp[5].x = mPitInfo->pitEnd->lgfromstart + mPitInfo->nPitSeg * mPitInfo->len;
         mPitp[6].x = mPitInfo->pitExit->lgfromstart + mPitInfo->pitExit->length;
+        //mPitp[6].x = mPitInfo->pitExit->lgfromstart;
         mDtp[0].x = mPitp[0].x;
         mDtp[1].x = mPitp[1].x;
         mDtp[2].x = mPitp[5].x;
@@ -127,26 +129,38 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
             mDtp[i].x = toSplineCoord(mDtp[i].x);
         }
 
+        // Fix broken pit exit.
+        if (mPitp[6].x < mPitp[5].x)
+        {
+            //fprintf(stderr,"bt: Pitexit broken on track %s.\n", track->name);fflush(stderr);
+            mPitp[6].x = mPitp[5].x;// +50.0f;
+        }
+
         mPitp[1].x = std::min(mPitp[1].x, mPitp[2].x);
         mPitp[5].x = std::max(mPitp[4].x, mPitp[5].x);
+                
         mPitOnLeftSide = mPitInfo->side == TR_LFT;
         double sign = mPitOnLeftSide ? 1.0 : -1.0;
         mPitp[0].y = sign * (mTrack->width / 2.0 - 2.0);
         mPitp[6].y = sign * (mTrack->width / 2.0 - 2.0);
+        //mPitp[0].y = 0.0;
+        //mPitp[6].y = 0.0;
         mDtp[0].y = mPitp[0].y;
         mDtp[3].y = mPitp[6].y;
 
         for (i = 1; i < PITPOINTS - 1; i++)
         {
             mPitp[i].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) - 0.3 * mPitInfo->width - 2.2);
+            //mPitp[i].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) - mPitInfo->width);
         }
 
         for (i = 1; i < DTPOINTS - 1; i++)
         {
             mDtp[i].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) - 0.3 * mPitInfo->width - 2.2);
+            //mDtp[i].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) - mPitInfo->width);
         }
 
-        mPitp[3].y = sign * fabs(mPitInfo->driversPits->pos.toMiddle);
+        mPitp[3].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) + 1.0);
         mPitSpline.init(PITPOINTS, mPitp);
         mDtSpline.init(DTPOINTS, mDtp);
     }
@@ -295,7 +309,7 @@ void Pit::update()
     mPenalty = 0; // fuel, damage and tires served before penalty
     bool pittyres = false;
     // Check for fuel, damage and tyres
-    bool pitfuel = mCar->_fuel < mAvgFuelPerLap;
+    bool pitfuel = mCar->_fuel < (mAvgFuelPerLap + 2.0);
     bool pitdamage = (mCar->_dammage > mPitDamage && remaininglaps * mTrack->length > mMaxDamageDist && mLastFuel > 15.0) || (mCar->_dammage > mMaxDamage);
     //bool pittyres = (mMyCar->tires()->distLeft() < 1.0 * mTrack->length && mMyCar->tires()->gripFactor() < mPitGripFactor && remaininglaps * mTrack->length > 10000.0);
 
@@ -304,7 +318,7 @@ void Pit::update()
     else {
         pittyres = false;
     }
-    if (fs > mPitEntry - mEntryMargin - mPreEntryMargin - 3.0 && fs < mPitEntry - mEntryMargin - mPreEntryMargin && !mStopChecked)
+    if ((fs > mPitEntry - mEntryMargin - mPreEntryMargin - 3.0) && (fs < mPitEntry - mEntryMargin - mPreEntryMargin) && !mStopChecked)
     {
         if (pitBeforeTeammate(remaininglaps))
         {
@@ -321,7 +335,7 @@ void Pit::update()
 
         mStopChecked = true;
     }
-    else if (fs >= mPitEntry - mEntryMargin && fs < mPitEntry - mEntryMargin + 3.0)
+    else if ((fs >= mPitEntry - mEntryMargin) && (fs < mPitEntry - mEntryMargin + 3.0))
     {
         mStopChecked = false;
     }
@@ -337,7 +351,7 @@ bool Pit::pitBeforeTeammate(int remaininglaps) const
         teamcarfuel = mTeamCar->_fuel;
     }
 
-    if (teamcarrunning && mCar->_fuel < teamcarfuel && mCar->_fuel < remaininglaps * mAvgFuelPerLap)
+    if (teamcarrunning && (mCar->_fuel < teamcarfuel) && (mCar->_fuel < remaininglaps * mAvgFuelPerLap))
     {
         double matelaps = teamcarfuel / mAvgFuelPerLap;
         double matetoentry;
@@ -348,7 +362,7 @@ bool Pit::pitBeforeTeammate(int remaininglaps) const
         }
         else
         {
-            matetoentry = mTrack->length - mTeamCar->_distFromStartLine + (mPitEntry - mEntryMargin);
+            matetoentry = mTrack->length - (mTeamCar->_distFromStartLine + (mPitEntry - mEntryMargin));
         }
 
         double matefulllaps = floor(matelaps - matetoentry / mTrack->length);
@@ -442,7 +456,7 @@ double Pit::calcRefuel()
     int pitstops = std::max(fuelpitstops, tirespitstops);
 
     // Calc the stint fuel
-    double stintfuel = fueltoend / (pitstops + 1) + 2.0;
+    double stintfuel = fueltoend / (pitstops + 1) +2.0;
 
     if (pitstops)
     {

@@ -15,6 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <teammanager.h>
+
 #include "driver.h"
 
 #include "MyParam.h"
@@ -26,6 +28,7 @@
 #include <stdio.h>
 
 #include <portability.h>
+
 
 //#define TIME_ANALYSIS
 #ifdef TIME_ANALYSIS
@@ -58,7 +61,18 @@ Driver::Driver(int index) :
     mFlagNames.push_back("FAST_BEHIND");
 }
 
-void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, const tSituation* situation)
+//==========================================================================*
+// Get Team info
+//--------------------------------------------------------------------------*
+void Driver::TeamInfo(tCarElt* car, tSituation* situation)
+{
+    //RtTeamManagerShowInfo();
+    mTeamIndex = RtTeamManagerIndex(car, track, situation);
+    LogUSR.info("#Team index = %i\n", mTeamIndex);
+    RtTeamManagerDump();
+}
+
+void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSituation* situation)
 {
     LogUSR.debug(".......... %s Driver initrack .........\n", mDriverName);
     track = Track;
@@ -135,6 +149,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, con
     // Set initial fuel
     double distance = 0.0;
 
+
     if (mPitTest > 0)
         distance = mTrack.length() * 2 + 0.3;
     else
@@ -193,7 +208,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, con
         LogUSR.info("Couldn't load : %s\n", buffer);
 }
 
-void Driver::NewRace(tCarElt* car, const tSituation* situation)
+void Driver::NewRace(tCarElt* car, tSituation* situation)
 {
     LogUSR.info("********** %s : NewRace() **********\n", mDriverName);
 
@@ -201,6 +216,7 @@ void Driver::NewRace(tCarElt* car, const tSituation* situation)
     mSimTime = -1.0;
     initVars();
 
+    TeamInfo(car, mSituation);
     mCar.init(car, &mTrack);
     mPit.init(mTrack.torcsTrack(), situation, &mCar, mPitDamage, mPitGripFactor, mPitEntryMargin);
 
