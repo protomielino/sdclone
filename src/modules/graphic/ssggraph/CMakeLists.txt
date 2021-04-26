@@ -33,9 +33,9 @@ SET(SSGGRAPH_SOURCES grMoonpos.cpp
                      ssggraph.cpp)
 
 SET(SSGGRAPH_OTHER_SOURCES )
-IF(NOT APPLE)
+IF(NOT APPLE AND NOT HAIKU)
     SET(SSGGRAPH_HEADERS ${SSGGRAPH_HEADERS} grshader.h grshader.cpp)
-ENDIF(NOT APPLE)
+ENDIF(NOT APPLE AND NOT HAIKU)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)

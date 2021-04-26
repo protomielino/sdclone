@@ -26,7 +26,7 @@
 #include <car.h>		//tCarElt
 #include <raceman.h>	//tSituation
 #include "grcam.h"		//cGrPerspCamera
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__HAIKU__)
 #include "grshader.h"   //cGrShader
 #endif
 
@@ -97,7 +97,7 @@ public:
     tdble				py;
     tdble				sx;
     tdble				sy;
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__HAIKU__)
     cgrShader           *shader;
 #endif
 };
