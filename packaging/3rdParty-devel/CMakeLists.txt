@@ -254,7 +254,7 @@ if(OPTION_PLIB)
 endif(OPTION_PLIB)
 
 if(OPTION_JPEG)
-   #set(JPG_PROJECT jpeg-9d)
+   #set(JPEG_PROJECT jpeg-9d)
    ExternalProject_Add(${JPEG_PROJECT}
    URL ${JPEG_URL}
    URL_HASH ${JPEG_HASH}
@@ -272,7 +272,7 @@ if(OPTION_JPEG)
       DEPENDEES update # do after update
       DEPENDERS patch)  # do before patch
 else(OPTION_JPEG)
-   set(JPG_PROJECT )
+   set(JPEG_PROJECT )
 endif(OPTION_JPEG)
 
 if(OPTION_FREESOLID)
@@ -445,7 +445,7 @@ if(OPTION_OSG)
       URL ${OSG_URL}
       URL_HASH ${OSG_HASH}
       CMAKE_ARGS ${OSG_ARGS}
-      DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPG_PROJECT} ${PNG_PROJECT} ${SDL1_PROJECT} ${SDL2_PROJECT})
+      DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPEG_PROJECT} ${PNG_PROJECT} ${SDL1_PROJECT} ${SDL2_PROJECT})
 endif(OPTION_OSG)
 
 
