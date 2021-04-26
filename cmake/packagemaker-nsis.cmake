@@ -30,31 +30,31 @@ Message(STATUS "NSIS_INET_PLUGIN = ${NSIS_INET_PLUGIN}")
 
 
 if(NSIS_FOUND AND NSIS_MAKE_EXE AND NSIS_INET_PLUGIN)
-   FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}" NSIS_INSTALL_DIR)
+   FILE(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}" NSIS_INSTALL_DIR)
 
-   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/readme_for_user.txt" 
-                  "${CMAKE_CURRENT_BINARY_DIR}/packaging/readme_for_user.txt" COPYONLY)
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/readme_for_user.txt" 
+                  "${CMAKE_BINARY_DIR}/packaging/readme_for_user.txt" COPYONLY)
 
-   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/speed-dreams.ini" 
-                  "${CMAKE_CURRENT_BINARY_DIR}/packaging/speed-dreams.ini" COPYONLY)
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams.ini" 
+                  "${CMAKE_BINARY_DIR}/packaging/speed-dreams.ini" COPYONLY)
 
-   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/speed-dreams.nsh.in" 
-                  "${CMAKE_CURRENT_BINARY_DIR}/packaging/speed-dreams.nsh" @ONLY)
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams.nsh.in" 
+                  "${CMAKE_BINARY_DIR}/packaging/speed-dreams.nsh" @ONLY)
 
-   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/speed-dreams-base.nsi" 
-                  "${CMAKE_CURRENT_BINARY_DIR}/packaging/speed-dreams-base.nsi" @ONLY)
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-base.nsi" 
+                  "${CMAKE_BINARY_DIR}/packaging/speed-dreams-base.nsi" @ONLY)
 
-   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/speed-dreams-hq-cars-and-tracks.nsi" 
-                  "${CMAKE_CURRENT_BINARY_DIR}/packaging/speed-dreams-hq-cars-and-tracks.nsi" @ONLY)
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-hq-cars-and-tracks.nsi" 
+                  "${CMAKE_BINARY_DIR}/packaging/speed-dreams-hq-cars-and-tracks.nsi" @ONLY)
 
-   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/speed-dreams-more-hq-cars-and-tracks.nsi" 
-                  "${CMAKE_CURRENT_BINARY_DIR}/packaging/speed-dreams-more-hq-cars-and-tracks.nsi" @ONLY)
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-more-hq-cars-and-tracks.nsi" 
+                  "${CMAKE_BINARY_DIR}/packaging/speed-dreams-more-hq-cars-and-tracks.nsi" @ONLY)
 
-   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/speed-dreams-wip-cars-and-tracks.nsi" 
-                  "${CMAKE_CURRENT_BINARY_DIR}/packaging/speed-dreams-wip-cars-and-tracks.nsi" @ONLY)
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-wip-cars-and-tracks.nsi" 
+                  "${CMAKE_BINARY_DIR}/packaging/speed-dreams-wip-cars-and-tracks.nsi" @ONLY)
 
-   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/packaging/windows/speed-dreams-unmaintained.nsi" 
-                  "${CMAKE_CURRENT_BINARY_DIR}/packaging/speed-dreams-unmaintained.nsi" @ONLY)
+   CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/packaging/windows/speed-dreams-unmaintained.nsi" 
+                  "${CMAKE_BINARY_DIR}/packaging/speed-dreams-unmaintained.nsi" @ONLY)
 
    #ADD_CUSTOM_TARGET(PACKAGE_BASE DEPENDS INSTALL)
       # can't depend on built-in target INSTALL, so we ADD_CUSTOM_COMMAND
@@ -76,37 +76,43 @@ if(NSIS_FOUND AND NSIS_MAKE_EXE AND NSIS_INET_PLUGIN)
    
    ADD_CUSTOM_COMMAND(TARGET PACKING_INSTALL
                       COMMAND "${CMAKE_COMMAND}" --build . --target INSTALL --config $<CONFIG>
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                       COMMENT "Building INSTALL...")
 
    ADD_CUSTOM_COMMAND(TARGET PACKAGE_BASE
-                        COMMAND ${NSIS_MAKE_EXE} speed-dreams-base.nsi
-                        WORKING_DIRECTORY packaging
+                        COMMAND ${NSIS_MAKE_EXE} packaging/speed-dreams-base.nsi
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                         COMMENT "Building base package...")
 
    ADD_CUSTOM_COMMAND(TARGET PACKAGE_HQ
-                        COMMAND ${NSIS_MAKE_EXE} speed-dreams-hq-cars-and-tracks.nsi
-                        WORKING_DIRECTORY packaging
+                        COMMAND ${NSIS_MAKE_EXE} packaging/speed-dreams-hq-cars-and-tracks.nsi
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                         COMMENT "Building HQ package...")
 
    ADD_CUSTOM_COMMAND(TARGET PACKAGE_MORE_HQ
-                        COMMAND ${NSIS_MAKE_EXE} speed-dreams-more-hq-cars-and-tracks.nsi
-                        WORKING_DIRECTORY packaging
+                        COMMAND ${NSIS_MAKE_EXE} packaging/speed-dreams-more-hq-cars-and-tracks.nsi
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                         COMMENT "Building More HQ package...")
 
    ADD_CUSTOM_COMMAND(TARGET PACKAGE_WIP
-                        COMMAND ${NSIS_MAKE_EXE} speed-dreams-wip-cars-and-tracks.nsi
-                        WORKING_DIRECTORY packaging
+                        COMMAND ${NSIS_MAKE_EXE} packaging/speed-dreams-wip-cars-and-tracks.nsi
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                         COMMENT "Building WIP package...")
 
    ADD_CUSTOM_COMMAND(TARGET PACKAGE_UNMAINTAINED
-                        COMMAND ${NSIS_MAKE_EXE} speed-dreams-unmaintained.nsi
-                        WORKING_DIRECTORY packaging
+                        COMMAND ${NSIS_MAKE_EXE} packaging/speed-dreams-unmaintained.nsi
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                         COMMENT "Building unmaintained package...")
+
+   # Make sure that SD_PACKAGEDIR is not empty or PACKAGE_MKDIR will fail.
+   # Treat empty string as current directory
+   if(SD_PACKAGEDIR STREQUAL "")
+     set(SD_PACKAGEDIR "." CACHE PATH "Location for the created installers" FORCE)
+   endif(SD_PACKAGEDIR STREQUAL "")
 
    ADD_CUSTOM_COMMAND(TARGET PACKAGE_MKDIR
                         COMMAND "${CMAKE_COMMAND}" -E make_directory ${SD_PACKAGEDIR}
-                        WORKING_DIRECTORY packaging
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                         COMMENT "Create ${SD_PACKAGEDIR} directory for Packages dir")
 
 else(NSIS_FOUND AND NSIS_MAKE_EXE AND NSIS_INET_PLUGIN)

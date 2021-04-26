@@ -24,7 +24,7 @@
 #==============================================================================
 INCLUDE(../cmake/macros.cmake)
 
-SET(SD_PACKAGEDIR "../packages" CACHE PATH "Location for the created installers")
+SET(SD_PACKAGEDIR "${CMAKE_BINARY_DIR}/packages" CACHE PATH "Location for the created installers")
 MARK_AS_ADVANCED(SD_PACKAGEDIR)
 
 IF(OPTION_OSGGRAPH)
