@@ -160,6 +160,36 @@ Section -Cars
   SetOutPath "$INSTDIR\data\cars\models\mpa1-team-lynx"
   File /r "${BUILD_INST_DIR}\data\cars\models\mpa1-team-lynx\*.*"
 
+  SetOutPath "$INSTDIR\data\cars\models\mp1-aichi-ej15"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-aichi-ej15\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mp1-aichi-tf105"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-aichi-tf105\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mp1-cavallo-f2005"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-cavallo-f2005\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mp1-connor-mp420"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-connor-mp420\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mp1-diamond-r25"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-diamond-r25\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mp1-glass-fw27"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-glass-fw27\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mp1-midland-ps05"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-midland-ps05\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mp1-midland-rb1"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-midland-rb1\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mp1-murasama-007"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-murasama-007\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\mp1-vicente"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-vicente\*.*"
+
 SectionEnd
 
 Section -Tracks

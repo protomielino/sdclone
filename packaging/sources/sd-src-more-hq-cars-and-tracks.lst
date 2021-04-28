@@ -29,6 +29,17 @@ data/cars/models/trb1-taipan-rb1
 data/cars/models/trb1-vieringe-5rb
 data/cars/models/trb1-zaxxon-rb
 
+data/cars/models/mp1-aichi-ej15
+data/cars/models/mp1-aichi-tf105
+data/cars/models/mp1-cavallo-f2005
+data/cars/models/mp1-connor-mp420
+data/cars/models/mp1-diamond-r25
+data/cars/models/mp1-glass-fw27
+data/cars/models/mp1-midland-ps05
+data/cars/models/mp1-midland-rb1
+data/cars/models/mp1-murasama-007
+data/cars/models/mp1-vicente
+
 data/tracks/circuit/CMakeLists.txt
 
 data/tracks/circuit/aalborg
