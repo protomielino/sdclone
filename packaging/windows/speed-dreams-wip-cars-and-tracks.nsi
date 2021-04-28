@@ -96,6 +96,15 @@ Section -Drivers
   SetOutPath "$INSTDIR\lib\drivers\usr_rs"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_rs\*.*"
 
+  SetOutPath "$INSTDIR\lib\drivers\shadow_ls2"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_ls2\*.*"
+
+  SetOutPath "$INSTDIR\lib\drivers\shadow_rs"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_rs\*.*"
+
+  SetOutPath "$INSTDIR\lib\drivers\shadow_mp1"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_mp1\*.*"
+
   ; Robots data files (car and track setups)
   SetOutPath "$INSTDIR\data\drivers\simplix_mp5"
   File /r "${BUILD_INST_DIR}\data\drivers\simplix_mp5\*.*"
@@ -108,6 +117,15 @@ Section -Drivers
 
   SetOutPath "$INSTDIR\data\drivers\usr_rs"
   File /r "${BUILD_INST_DIR}\data\drivers\usr_rs\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\shadow_ls2"
+  File /r "${BUILD_INST_DIR}\data\drivers\shadow_ls2\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\shadow_rs"
+  File /r "${BUILD_INST_DIR}\data\drivers\shadow_rs\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\shadow_mp1"
+  File /r "${BUILD_INST_DIR}\data\drivers\shadow_mp1\*.*"
 
 SectionEnd
 
