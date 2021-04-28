@@ -80,6 +80,7 @@ data/drivers/CMakeLists.txt
 data/drivers/human
 data/drivers/networkhuman
 data/drivers/usr_sc
+data/drivers/shadow_sc
 data/drivers/simplix
 data/drivers/simplix_sc
 

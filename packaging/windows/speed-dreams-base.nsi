@@ -149,6 +149,9 @@ Section "!Base System" SEC01
   SetOutPath "$INSTDIR\lib\drivers\usr_sc"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_sc\*.*"
 
+  SetOutPath "$INSTDIR\lib\drivers\shadow_sc"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_sc\*.*"
+
   ; Base robots data files (car and track setups)
   SetOutPath "$INSTDIR\data\drivers\human"
   File /r /x *.lib "${BUILD_INST_DIR}\data\drivers\human\*.*"
@@ -161,6 +164,9 @@ Section "!Base System" SEC01
 
   SetOutPath "$INSTDIR\data\drivers\usr_sc"
   File /r /x *.lib "${BUILD_INST_DIR}\data\drivers\usr_sc\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\shadow_sc"
+  File /r /x *.lib "${BUILD_INST_DIR}\data\drivers\shadow_sc\*.*"
 
   ; Base car models (only Supercars)
   SetOutPath "$INSTDIR\data\cars\models\sc-boxer-96"
@@ -200,6 +206,9 @@ Section /o "Basic mod Tools" SEC02
 
   SetOutPath "$INSTDIR\lib\drivers\usr"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr\*.*"
+
+  SetOutPath "$INSTDIR\lib\drivers\shadow"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow\*.*"
 
   SetOutPath "$INSTDIR\lib\drivers\dandroid"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid\*.*"
