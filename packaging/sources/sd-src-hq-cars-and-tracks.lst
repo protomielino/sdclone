@@ -8,6 +8,9 @@ data/config/raceman/singleevent-ls-gt1.xml
 data/drivers/usr_ls1
 data/drivers/usr_36GP
 
+data/drivers/shadow_ls1
+data/drivers/shadow_36GP
+
 data/drivers/dandroid_36GP
 
 data/drivers/simplix_ls1

@@ -106,6 +106,12 @@ Section -Drivers
   SetOutPath "$INSTDIR\lib\drivers\usr_36GP"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_36GP\*.*"
 
+  SetOutPath "$INSTDIR\lib\drivers\shadow_ls1"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_ls1\*.*"
+
+  SetOutPath "$INSTDIR\lib\drivers\shadow_36GP"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_36GP\*.*"
+
   ; SetOutPath "$INSTDIR\lib\drivers\kilo2008"
   ; File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\kilo2008\*.*"
 
@@ -124,6 +130,12 @@ Section -Drivers
 
   SetOutPath "$INSTDIR\data\drivers\usr_36GP"
   File /r "${BUILD_INST_DIR}\data\drivers\usr_36GP\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\shadow_ls1"
+  File /r "${BUILD_INST_DIR}\data\drivers\shadow_ls1\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\shadow_36GP"
+  File /r "${BUILD_INST_DIR}\data\drivers\shadow_36GP\*.*"
 
   ; SetOutPath "$INSTDIR\data\drivers\kilo2008"
   ; File /r "${BUILD_INST_DIR}\data\drivers\kilo2008\*.*"
