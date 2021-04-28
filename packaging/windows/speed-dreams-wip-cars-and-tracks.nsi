@@ -201,11 +201,11 @@ Section -Tracks
   SetOutPath "$INSTDIR\data\tracks\circuit\goldstone-sand"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\goldstone-sand\*.*"
 
+  SetOutPath "$INSTDIR\data\tracks\circuit\tuna"
+  File /r "${BUILD_INST_DIR}\data\tracks\circuit\tuna\*.*"
+
   SetOutPath "$INSTDIR\data\tracks\road\e-track-2"
   File /r "${BUILD_INST_DIR}\data\tracks\road\e-track-2\*.*"
-
-  SetOutPath "$INSTDIR\data\tracks\road\auriac"
-  File /r "${BUILD_INST_DIR}\data\tracks\road\auriac\*.*"
 
   SetOutPath "$INSTDIR\data\tracks\road\e-track-4"
   File /r "${BUILD_INST_DIR}\data\tracks\road\e-track-4\*.*"
@@ -216,8 +216,8 @@ Section -Tracks
   SetOutPath "$INSTDIR\data\tracks\road\street-1"
   File /r "${BUILD_INST_DIR}\data\tracks\road\street-1\*.*"
 
-  SetOutPath "$INSTDIR\data\tracks\road\alicante"
-  File /r "${BUILD_INST_DIR}\data\tracks\road\alicante\*.*"
+  SetOutPath "$INSTDIR\data\tracks\road\nordschleife"
+  File /r "${BUILD_INST_DIR}\data\tracks\road\nordschleife\*.*"
 
   SetOutPath "$INSTDIR\data\tracks\dirt\dirt-1"
   File /r "${BUILD_INST_DIR}\data\tracks\dirt\dirt-1\*.*"

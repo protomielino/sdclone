@@ -206,6 +206,9 @@ Section -Tracks
   SetOutPath "$INSTDIR\data\tracks\circuit\ruudskogen"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\ruudskogen\*.*"
 
+  SetOutPath "$INSTDIR\data\tracks\circuit\sao-paulo"
+  File /r "${BUILD_INST_DIR}\data\tracks\circuit\sao-paulo\*.*"
+
   ; HQ (2) dirt tracks 
   SetOutPath "$INSTDIR\data\tracks\dirt\garguree"
   File /r "${BUILD_INST_DIR}\data\tracks\dirt\garguree\*.*"

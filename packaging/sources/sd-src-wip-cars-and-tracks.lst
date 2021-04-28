@@ -62,15 +62,15 @@ data/cars/models/srw-sector-p4
 data/tracks/circuit/CMakeLists.txt
 
 data/tracks/circuit/goldstone-sand
+data/tracks/circuit/tuna
 
 data/tracks/road/CMakeLists.txt
 
 data/tracks/road/e-track-2
-data/tracks/road/auriac
 data/tracks/road/e-track-4
 data/tracks/road/spring
 data/tracks/road/street-1
-data/tracks/road/alicante
+data/tracks/road/nordschleife
 
 data/tracks/dirt/CMakeLists.txt
 

@@ -36,10 +36,13 @@ data/tracks/circuit/chemisay
 data/tracks/circuit/corkscrew
 data/tracks/circuit/forza
 data/tracks/circuit/karwada
+data/tracks/circuit/hidden-valley
 
 data/tracks/road/CMakeLists.txt
 
 data/tracks/road/allondaz
+data/tracks/road/alicante
+data/tracks/road/auriac
 data/tracks/road/charmey
 
 data/tracks/speedway/CMakeLists.txt

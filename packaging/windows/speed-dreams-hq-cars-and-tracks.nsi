@@ -203,9 +203,18 @@ Section -Tracks
   SetOutPath "$INSTDIR\data\tracks\circuit\karwada"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\karwada\*.*"
 
+  SetOutPath "$INSTDIR\data\tracks\circuit\hidden-valley"
+  File /r "${BUILD_INST_DIR}\data\tracks\circuit\hidden-valley\*.*"
+
   ; HQ (1) road tracks 
   SetOutPath "$INSTDIR\data\tracks\road\allondaz"
   File /r "${BUILD_INST_DIR}\data\tracks\road\allondaz\*.*"
+
+  SetOutPath "$INSTDIR\data\tracks\road\alicante"
+  File /r "${BUILD_INST_DIR}\data\tracks\road\alicante\*.*"
+
+  SetOutPath "$INSTDIR\data\tracks\road\auriac"
+  File /r "${BUILD_INST_DIR}\data\tracks\road\auriac\*.*"
 
   SetOutPath "$INSTDIR\data\tracks\road\charmey"
   File /r "${BUILD_INST_DIR}\data\tracks\road\charmey\*.*"
