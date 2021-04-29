@@ -14,7 +14,7 @@ data/drivers/usr_ls2
 data/drivers/usr_rs
 
 data/drivers/shadow_ls2
-data/drivers/shadow_rs
+;data/drivers/shadow_rs
 data/drivers/shadow_mp1
 
 data/drivers/simplix_ls2

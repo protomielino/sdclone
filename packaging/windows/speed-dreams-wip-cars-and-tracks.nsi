@@ -99,8 +99,8 @@ Section -Drivers
   SetOutPath "$INSTDIR\lib\drivers\shadow_ls2"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_ls2\*.*"
 
-  SetOutPath "$INSTDIR\lib\drivers\shadow_rs"
-  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_rs\*.*"
+  ;SetOutPath "$INSTDIR\lib\drivers\shadow_rs"
+  ;File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_rs\*.*"
 
   SetOutPath "$INSTDIR\lib\drivers\shadow_mp1"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_mp1\*.*"
@@ -121,8 +121,8 @@ Section -Drivers
   SetOutPath "$INSTDIR\data\drivers\shadow_ls2"
   File /r "${BUILD_INST_DIR}\data\drivers\shadow_ls2\*.*"
 
-  SetOutPath "$INSTDIR\data\drivers\shadow_rs"
-  File /r "${BUILD_INST_DIR}\data\drivers\shadow_rs\*.*"
+  ;SetOutPath "$INSTDIR\data\drivers\shadow_rs"
+  ;File /r "${BUILD_INST_DIR}\data\drivers\shadow_rs\*.*"
 
   SetOutPath "$INSTDIR\data\drivers\shadow_mp1"
   File /r "${BUILD_INST_DIR}\data\drivers\shadow_mp1\*.*"
