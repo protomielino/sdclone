@@ -105,6 +105,27 @@ Section -Drivers
   SetOutPath "$INSTDIR\lib\drivers\shadow_mp1"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_mp1\*.*"
 
+  SetOutPath "$INSTDIR\lib\drivers\dandroid_ls1"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid_ls1\*.*"
+
+  SetOutPath "$INSTDIR\lib\drivers\dandroid_ls2"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid_ls2\*.*"
+
+  SetOutPath "$INSTDIR\lib\drivers\dandroid_mpa1"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid_mpa1\*.*"
+
+  SetOutPath "$INSTDIR\lib\drivers\dandroid_rs"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid_rs\*.*"
+
+  SetOutPath "$INSTDIR\lib\drivers\dandroid_sc"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid_sc\*.*"
+
+  SetOutPath "$INSTDIR\lib\drivers\dandroid_srw"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid_srw\*.*"
+
+  SetOutPath "$INSTDIR\lib\drivers\dandroid_trb1"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid_trb1\*.*"
+
   ; Robots data files (car and track setups)
   SetOutPath "$INSTDIR\data\drivers\simplix_mp5"
   File /r "${BUILD_INST_DIR}\data\drivers\simplix_mp5\*.*"
@@ -126,6 +147,28 @@ Section -Drivers
 
   SetOutPath "$INSTDIR\data\drivers\shadow_mp1"
   File /r "${BUILD_INST_DIR}\data\drivers\shadow_mp1\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\dandroid_ls1"
+  File /r "${BUILD_INST_DIR}\data\drivers\dandroid_ls1\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\dandroid_ls2"
+  File /r "${BUILD_INST_DIR}\data\drivers\dandroid_ls2\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\dandroid_mpa1"
+  File /r "${BUILD_INST_DIR}\data\drivers\dandroid_mpa1\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\dandroid_rs"
+  File /r "${BUILD_INST_DIR}\data\drivers\dandroid_rs\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\dandroid_sc"
+  File /r "${BUILD_INST_DIR}\data\drivers\dandroid_sc\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\dandroid_srw"
+  File /r "${BUILD_INST_DIR}\data\drivers\dandroid_srw\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\dandroid_trb1"
+  File /r "${BUILD_INST_DIR}\data\drivers\dandroid_trb1\*.*"
+
 
 SectionEnd
 
