@@ -12,6 +12,7 @@ data/config/raceman/networkrace.xml
 
 data/drivers/usr_ls2
 data/drivers/usr_rs
+data/drivers/usr_67GP
 
 data/drivers/shadow_ls2
 data/drivers/shadow_mp1
@@ -20,6 +21,7 @@ data/drivers/shadow_67GP
 data/drivers/simplix_ls2
 data/drivers/simplix_mp5
 data/drivers/simplix_srw
+data/drivers/simplix_67GP
 
 data/drivers/dandroid_ls1
 data/drivers/dandroid_ls2
