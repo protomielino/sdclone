@@ -14,8 +14,8 @@ data/drivers/usr_ls2
 data/drivers/usr_rs
 
 data/drivers/shadow_ls2
-;data/drivers/shadow_rs
 data/drivers/shadow_mp1
+data/drivers/shadow_67GP
 
 data/drivers/simplix_ls2
 data/drivers/simplix_mp5
@@ -28,6 +28,7 @@ data/drivers/dandroid_rs
 data/drivers/dandroid_sc
 data/drivers/dandroid_srw
 data/drivers/dandroid_trb1
+data/drivers/dandroid_67GP
 
 data/cars/models/67gp-upping-ut19
 data/cars/models/67gp-cavallo-123
