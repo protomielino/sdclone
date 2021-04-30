@@ -10,19 +10,19 @@
 ;        (at your option) any later version.
 
 !ifndef VER_MAJOR
-   !define VER_MAJOR 2
+   !define VER_MAJOR @PROJECT_VERSION_MAJOR@
 !endif
 
 !ifndef VER_MINOR
-   !define VER_MINOR 2
+   !define VER_MINOR @PROJECT_VERSION_MINOR@
 !endif
 
 !ifndef VER_PATCH
-   !define VER_PATCH 3
+   !define VER_PATCH @PROJECT_VERSION_PATCH@
 !endif
 
 !ifndef VER_EXTRA
-   !define VER_EXTRA ""
+   !define VER_EXTRA "@PROJECT_VERSION_METADATA@"
 !endif
 
 ;!echo "VER_EXTRA = ${VER_EXTRA}"
