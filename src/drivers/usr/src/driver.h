@@ -103,8 +103,8 @@ private:
 
     // Name, dirs
     int INDEX;
-    const std::string mDataDir;
-    const std::string mLocalDir;
+    std::string mDataDir;
+    std::string mLocalDir;
 
     // Flags
     enum Flags

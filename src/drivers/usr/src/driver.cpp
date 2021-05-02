@@ -112,7 +112,8 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
 
     Meteorology(track);
 
-    std::string mDataDir(std::string(GetDataDir()) + "drivers/" + rName + "/" + cName + "/");
+    std::string mData(std::string(GetDataDir()) + "drivers/" + rName + "/" + cName + "/");
+    mDataDir = mData;
 
     // Assign to carParmHandle my parameters file handle, it will later be merged with carHandle by TORCS
     MyParam param(carParmHandle, mDataDir, Track->internalname, weathercode);
