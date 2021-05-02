@@ -17,9 +17,12 @@ data/drivers/simplix_ls1
 data/drivers/simplix_36GP
 
 data/cars/models/ls1-archer-r9
+data/cars/models/ls1-cavallo-570s1
+data/cars/models/ls1-marisatech-gt4r
 data/cars/models/ls1-newcastle-fury
 data/cars/models/ls1-taipan-ltsr
 data/cars/models/ls1-toro-rgt
+data/cars/models/ls1-vulture-v5r
 data/cars/models/ls1-vulture-v6r
 data/cars/models/ls1-zentek-z7r
 

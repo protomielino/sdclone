@@ -15,7 +15,6 @@ data/drivers/usr_rs
 data/drivers/usr_67GP
 
 data/drivers/shadow_ls2
-data/drivers/shadow_mp1
 data/drivers/shadow_67GP
 
 data/drivers/simplix_ls2
@@ -47,8 +46,6 @@ data/cars/models/rs1-kenji-08
 data/cars/models/rs2-fai-dot
 data/cars/models/rs2-lion-2m
 
-data/cars/models/ls1-cavallo-570s1
-
 data/cars/models/ls2-bavaria-g3gtr
 data/cars/models/ls2-boxer-96rsr
 data/cars/models/ls2-cavallo-360r
@@ -57,9 +54,6 @@ data/cars/models/ls2-lynx-xkr
 data/cars/models/ls2-morley-r900
 data/cars/models/ls2-sprite-gts
 data/cars/models/ls2-vortex-gt
-
-data/cars/models/sc-kanagawa-z35gts
-data/cars/models/sc-kongei-kk8s
 
 data/cars/models/srw-boxer-ts
 data/cars/models/srw-kanagawa-gtr

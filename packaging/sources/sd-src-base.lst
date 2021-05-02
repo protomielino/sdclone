@@ -87,9 +87,12 @@ data/drivers/simplix_sc
 data/cars/CMakeLists.txt
 data/cars/categories
 data/cars/models/CMakeLists.txt
-data/cars/models/sc-boxer-96/
+data/cars/models/sc-boxer-96
 data/cars/models/sc-cavallo-360
+data/cars/models/sc-deckard-conejo
 data/cars/models/sc-fmc-gt4
+data/cars/models/sc-kanagawa-z35gts
+data/cars/models/sc-kongei-kk8s
 data/cars/models/sc-lynx-220
 data/cars/models/sc-murasama-nsx
 data/cars/models/sc-spirit-300

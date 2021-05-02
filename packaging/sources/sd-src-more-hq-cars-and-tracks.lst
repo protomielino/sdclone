@@ -3,12 +3,15 @@ data/config/raceman/championship-mpa1.xml
 data/config/raceman/championship-mpa11.xml
 data/config/raceman/championship-supercars.xml
 data/config/raceman/championship-trb1.xml
+data/config/raceman/championship-mp1.xml
 
 data/drivers/usr_mpa1
 data/drivers/usr_trb1
 
 data/drivers/simplix_mpa1
 data/drivers/simplix_trb1
+
+data/drivers/shadow_mp1
 
 data/cars/models/mpa1-furia
 data/cars/models/mpa1-ffr
@@ -38,7 +41,7 @@ data/cars/models/mp1-glass-fw27
 data/cars/models/mp1-midland-ps05
 data/cars/models/mp1-midland-rb1
 data/cars/models/mp1-murasama-007
-data/cars/models/mp1-vicente
+data/cars/models/mp1-kuala-c24
 
 data/tracks/circuit/CMakeLists.txt
 
