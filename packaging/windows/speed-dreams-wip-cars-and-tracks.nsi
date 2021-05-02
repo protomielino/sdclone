@@ -73,7 +73,7 @@ Section -CoreData
   File "${BUILD_INST_DIR}\data\config\raceman\career_ls1.xmls"
   File "${BUILD_INST_DIR}\data\config\raceman\career_36GP.xmls"
   File "${BUILD_INST_DIR}\data\config\raceman\career_MPA1.xmls"
-  
+
   ; Moved from 'speed-dreams-base.nsi' for version 2.1.0
   File "${BUILD_INST_DIR}\data\config\raceman\networkrace.xml"
 
@@ -108,8 +108,8 @@ Section -Drivers
   ;SetOutPath "$INSTDIR\lib\drivers\shadow_rs"
   ;File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_rs\*.*"
 
-  SetOutPath "$INSTDIR\lib\drivers\shadow_mp1"
-  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_mp1\*.*"
+  ;SetOutPath "$INSTDIR\lib\drivers\shadow_mp1"
+  ;File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_mp1\*.*"
 
   SetOutPath "$INSTDIR\lib\drivers\shadow_67GP"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_67GP\*.*"
@@ -163,8 +163,8 @@ Section -Drivers
   ;SetOutPath "$INSTDIR\data\drivers\shadow_rs"
   ;File /r "${BUILD_INST_DIR}\data\drivers\shadow_rs\*.*"
 
-  SetOutPath "$INSTDIR\data\drivers\shadow_mp1"
-  File /r "${BUILD_INST_DIR}\data\drivers\shadow_mp1\*.*"
+  ;SetOutPath "$INSTDIR\data\drivers\shadow_mp1"
+  ;File /r "${BUILD_INST_DIR}\data\drivers\shadow_mp1\*.*"
 
   SetOutPath "$INSTDIR\data\drivers\shadow_67GP"
   File /r "${BUILD_INST_DIR}\data\drivers\shadow_67GP\*.*"
@@ -249,8 +249,8 @@ Section -Cars
   SetOutPath "$INSTDIR\data\cars\models\ls2-vortex-gt"
   File /r "${BUILD_INST_DIR}\data\cars\models\ls2-vortex-gt\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\models\ls1-cavallo-570s1"
-  File /r "${BUILD_INST_DIR}\data\cars\models\ls1-cavallo-570s1\*.*"
+  ;SetOutPath "$INSTDIR\data\cars\models\ls1-cavallo-570s1"
+  ;File /r "${BUILD_INST_DIR}\data\cars\models\ls1-cavallo-570s1\*.*"
 
   SetOutPath "$INSTDIR\data\cars\models\srw-boxer-ts"
   File /r "${BUILD_INST_DIR}\data\cars\models\srw-boxer-ts\*.*"
@@ -282,7 +282,7 @@ Section -Tracks
 
   SetOverwrite on
 
-  ; Lower quality / work-in-progress tracks 
+  ; Lower quality / work-in-progress tracks
   SetOutPath "$INSTDIR\data\tracks\circuit\goldstone-sand"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\goldstone-sand\*.*"
 

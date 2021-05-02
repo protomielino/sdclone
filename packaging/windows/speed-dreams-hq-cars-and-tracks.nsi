@@ -153,6 +153,9 @@ Section -Cars
   SetOutPath "$INSTDIR\data\cars\models\ls1-cavallo-570s1"
   File /r "${BUILD_INST_DIR}\data\cars\models\ls1-cavallo-570s1\*.*"
 
+  SetOutPath "$INSTDIR\data\cars\models\ls1-marisatech-gt4r"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls1-marisatech-gt4r\*.*"
+
   SetOutPath "$INSTDIR\data\cars\models\ls1-newcastle-fury"
   File /r "${BUILD_INST_DIR}\data\cars\models\ls1-newcastle-fury\*.*"
 
@@ -161,6 +164,9 @@ Section -Cars
 
   SetOutPath "$INSTDIR\data\cars\models\ls1-toro-rgt"
   File /r "${BUILD_INST_DIR}\data\cars\models\ls1-toro-rgt\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\ls1-vulture-v5r"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls1-vulture-v5r\*.*"
 
   SetOutPath "$INSTDIR\data\cars\models\ls1-vulture-v6r"
   File /r "${BUILD_INST_DIR}\data\cars\models\ls1-vulture-v6r\*.*"
