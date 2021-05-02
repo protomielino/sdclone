@@ -169,8 +169,8 @@ Section -Cars
   SetOutPath "$INSTDIR\data\cars\models\mp1-cavallo-f2005"
   File /r "${BUILD_INST_DIR}\data\cars\models\mp1-cavallo-f2005\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\models\mp1-connor-mp420"
-  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-connor-mp420\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\mp1-conner-mp420"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-conner-mp420\*.*"
 
   SetOutPath "$INSTDIR\data\cars\models\mp1-diamond-r25"
   File /r "${BUILD_INST_DIR}\data\cars\models\mp1-diamond-r25\*.*"
