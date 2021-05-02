@@ -66,6 +66,7 @@ Section -CoreData
   File "${BUILD_INST_DIR}\data\config\raceman\championship.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-supercars.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-trb1.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\championship-mp1.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-mpa1.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-mpa11.xml"
 
@@ -78,31 +79,34 @@ Section -Drivers
   ; Robots binaries
   SetOutPath "$INSTDIR\lib\drivers\simplix_trb1"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\simplix_trb1\*.*"
-  
+
   ; Robots binaries
   SetOutPath "$INSTDIR\lib\drivers\simplix_mpa1"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\simplix_mpa1\*.*"
 
   SetOutPath "$INSTDIR\lib\drivers\usr_trb1"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_trb1\*.*"
-  
+
   ;SetOutPath "$INSTDIR\lib\drivers\usr_mpa1"
   ;File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\usr_mpa1\*.*"
 
   ;SetOutPath "$INSTDIR\lib\drivers\shadow_mpa1"
   ;File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_mpa1\*.*"
 
+  SetOutPath "$INSTDIR\lib\drivers\shadow_mp1"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\shadow_mp1\*.*"
+
   ; Robots data files (car and track setups)
   SetOutPath "$INSTDIR\data\drivers\simplix_trb1"
   File /r "${BUILD_INST_DIR}\data\drivers\simplix_trb1\*.*"
-  
+
   ; Robots data files (car and track setups)
   SetOutPath "$INSTDIR\data\drivers\simplix_mpa1"
   File /r "${BUILD_INST_DIR}\data\drivers\simplix_mpa1\*.*"
 
   SetOutPath "$INSTDIR\data\drivers\usr_trb1"
   File /r "${BUILD_INST_DIR}\data\drivers\usr_trb1\*.*"
-  
+
   ;SetOutPath "$INSTDIR\data\drivers\usr_mpa1"
   ;File /r "${BUILD_INST_DIR}\data\drivers\usr_mpa1\*.*"
 
@@ -143,7 +147,7 @@ Section -Cars
 
   SetOutPath "$INSTDIR\data\cars\models\trb1-zaxxon-rb"
   File /r "${BUILD_INST_DIR}\data\cars\models\trb1-zaxxon-rb\*.*"
-  
+
     ; HQ / AI driven MPA1 car models
   SetOutPath "$INSTDIR\data\cars\models\mpa1-ffr"
   File /r "${BUILD_INST_DIR}\data\cars\models\mpa1-ffr\*.*"
@@ -178,6 +182,9 @@ Section -Cars
   SetOutPath "$INSTDIR\data\cars\models\mp1-glass-fw27"
   File /r "${BUILD_INST_DIR}\data\cars\models\mp1-glass-fw27\*.*"
 
+  SetOutPath "$INSTDIR\data\cars\models\mp1-kuala-c24"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-kuala-c24\*.*"
+
   SetOutPath "$INSTDIR\data\cars\models\mp1-midland-ps05"
   File /r "${BUILD_INST_DIR}\data\cars\models\mp1-midland-ps05\*.*"
 
@@ -187,8 +194,8 @@ Section -Cars
   SetOutPath "$INSTDIR\data\cars\models\mp1-murasama-007"
   File /r "${BUILD_INST_DIR}\data\cars\models\mp1-murasama-007\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\models\mp1-vicente"
-  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-vicente\*.*"
+  ; SetOutPath "$INSTDIR\data\cars\models\mp1-vicente"
+  ; File /r "${BUILD_INST_DIR}\data\cars\models\mp1-vicente\*.*"
 
 SectionEnd
 
@@ -196,7 +203,7 @@ Section -Tracks
 
   SetOverwrite on
 
-  ; HQ (2) circuits 
+  ; HQ (2) circuits
   SetOutPath "$INSTDIR\data\tracks\circuit\aalborg"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\aalborg\*.*"
 
@@ -209,11 +216,11 @@ Section -Tracks
   SetOutPath "$INSTDIR\data\tracks\circuit\sao-paulo"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\sao-paulo\*.*"
 
-  ; HQ (2) dirt tracks 
+  ; HQ (2) dirt tracks
   SetOutPath "$INSTDIR\data\tracks\dirt\garguree"
   File /r "${BUILD_INST_DIR}\data\tracks\dirt\garguree\*.*"
 
-  ; HQ (2) road tracks 
+  ; HQ (2) road tracks
   SetOutPath "$INSTDIR\data\tracks\road\inuksuk"
   File /r "${BUILD_INST_DIR}\data\tracks\road\inuksuk\*.*"
 
@@ -222,10 +229,10 @@ Section -Tracks
 
   SetOutPath "$INSTDIR\data\tracks\road\longday"
   File /r "${BUILD_INST_DIR}\data\tracks\road\longday\*.*"
-    
+
   SetOutPath "$INSTDIR\data\tracks\road\ole-road-1"
   File /r "${BUILD_INST_DIR}\data\tracks\road\ole-road-1\*.*"
-  
+
   SetOutPath "$INSTDIR\data\tracks\road\peters"
   File /r "${BUILD_INST_DIR}\data\tracks\road\peters\*.*"
 
@@ -241,16 +248,16 @@ Section -Tracks
   ; HQ (2) speedways
   SetOutPath "$INSTDIR\data\tracks\speedway\longpond"
   File /r "${BUILD_INST_DIR}\data\tracks\speedway\longpond\*.*"
-  
+
   SetOutPath "$INSTDIR\data\tracks\speedway\alamo"
   File /r "${BUILD_INST_DIR}\data\tracks\speedway\alamo\*.*"
 
    SetOutPath "$INSTDIR\data\tracks\speedway\milky-five"
-  File /r "${BUILD_INST_DIR}\data\tracks\speedway\milky-five\*.*" 
-  
+  File /r "${BUILD_INST_DIR}\data\tracks\speedway\milky-five\*.*"
+
   SetOutPath "$INSTDIR\data\tracks\speedway\newton"
   File /r "${BUILD_INST_DIR}\data\tracks\speedway\newton\*.*"
-  
+
 SectionEnd
 
 ; This function is called at installer startup.

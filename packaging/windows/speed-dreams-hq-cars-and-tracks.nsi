@@ -150,8 +150,8 @@ Section -Cars
   SetOutPath "$INSTDIR\data\cars\models\ls1-archer-r9"
   File /r "${BUILD_INST_DIR}\data\cars\models\ls1-archer-r9\*.*"
 
-  ;SetOutPath "$INSTDIR\data\cars\models\ls1-cavallo-570s1"
-  ;File /r "${BUILD_INST_DIR}\data\cars\models\ls1-cavallo-570s1\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\ls1-cavallo-570s1"
+  File /r "${BUILD_INST_DIR}\data\cars\models\ls1-cavallo-570s1\*.*"
 
   SetOutPath "$INSTDIR\data\cars\models\ls1-newcastle-fury"
   File /r "${BUILD_INST_DIR}\data\cars\models\ls1-newcastle-fury\*.*"
@@ -199,7 +199,7 @@ Section -Tracks
 
   SetOverwrite on
 
-  ; HQ (1) circuits 
+  ; HQ (1) circuits
   SetOutPath "$INSTDIR\data\tracks\circuit\brondehach"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\brondehach\*.*"
 
@@ -218,7 +218,7 @@ Section -Tracks
   SetOutPath "$INSTDIR\data\tracks\circuit\hidden-valley"
   File /r "${BUILD_INST_DIR}\data\tracks\circuit\hidden-valley\*.*"
 
-  ; HQ (1) road tracks 
+  ; HQ (1) road tracks
   SetOutPath "$INSTDIR\data\tracks\road\allondaz"
   File /r "${BUILD_INST_DIR}\data\tracks\road\allondaz\*.*"
 
@@ -231,7 +231,7 @@ Section -Tracks
   SetOutPath "$INSTDIR\data\tracks\road\charmey"
   File /r "${BUILD_INST_DIR}\data\tracks\road\charmey\*.*"
 
-  ; HQ (1) speed ways 
+  ; HQ (1) speed ways
   SetOutPath "$INSTDIR\data\tracks\speedway\arizona"
   File /r "${BUILD_INST_DIR}\data\tracks\speedway\arizona\*.*"
 

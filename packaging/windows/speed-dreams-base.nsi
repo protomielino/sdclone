@@ -175,8 +175,17 @@ Section "!Base System" SEC01
   SetOutPath "$INSTDIR\data\cars\models\sc-cavallo-360"
   File /r /x *.lib "${BUILD_INST_DIR}\data\cars\models\sc-cavallo-360\*.*"
 
+  SetOutPath "$INSTDIR\data\cars\models\sc-deckard-conejo"
+  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\models\sc-deckard-conejo\*.*"
+
   SetOutPath "$INSTDIR\data\cars\models\sc-fmc-gt4"
   File /r /x *.lib "${BUILD_INST_DIR}\data\cars\models\sc-fmc-gt4\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\sc-kanagawa-z35gts"
+  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\models\sc-kanagawa-z35gts\*.*"
+
+  SetOutPath "$INSTDIR\data\cars\models\sc-kongei-kk8s"
+  File /r /x *.lib "${BUILD_INST_DIR}\data\cars\models\sc-kongei-kk8s\*.*"
 
   SetOutPath "$INSTDIR\data\cars\models\sc-lynx-220"
   File /r /x *.lib "${BUILD_INST_DIR}\data\cars\models\sc-lynx-220\*.*"
@@ -193,7 +202,7 @@ Section "!Base System" SEC01
 
   ; Write the install dir to the registry so that optional installs can find it.
   WriteRegStr   ${GAME_ROOT_REGKEY} "${GAME_DIR_REGKEY}" "" "$INSTDIR"
-  
+
 SectionEnd
 
 Section /o "Basic mod Tools" SEC02
@@ -229,7 +238,7 @@ Section /o "Basic mod Tools" SEC02
   ; Includes for robot developers
   SetOutPath "$INSTDIR\include"
   File /r "${BUILD_INST_DIR}\include\*.*"
-  
+
 SectionEnd
 
 Section /o "HQ cars and tracks (1)" SEC03
@@ -292,8 +301,8 @@ Section -Shortcuts
   WriteRegDWORD HKCU "Console\${GAME_VERSIONNED_NAME}" "ScreenBufferSize" 0x270f0078
   WriteRegDWORD HKCU "Console\${GAME_VERSIONNED_NAME}" "WindowSize" 0x280078
   WriteRegDWORD HKCU "Console\${GAME_VERSIONNED_NAME}" "QuickEdit" 0x1
-  
-  
+
+
 SectionEnd
 
 Section -Post
@@ -303,7 +312,7 @@ Section -Post
   ; Standard Windows-conformant (?) registry keys
   WriteRegStr ${GAME_ROOT_REGKEY} "${GAME_INST_REGKEY}" "" "$INSTDIR\bin\${GAME_FS_NAME}.exe"
   WriteRegStr ${GAME_ROOT_REGKEY} "${GAME_INST_REGKEY}" "Path" "$INSTDIR\bin"
- 
+
   WriteRegStr ${GAME_ROOT_REGKEY} "${GAME_UNINST_REGKEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${GAME_ROOT_REGKEY} "${GAME_UNINST_REGKEY}" "DisplayVersion" "${GAME_VERSION}"
   WriteRegStr ${GAME_ROOT_REGKEY} "${GAME_UNINST_REGKEY}" "UninstallString" "$INSTDIR\uninst.exe"
@@ -339,7 +348,7 @@ Section Uninstall
    SetShellVarContext all
   ;SetAutoClose true
 
-  ; Start menu entries.   
+  ; Start menu entries.
   RMDir /r "$SMPROGRAMS\${GAME_VERSIONNED_NAME}"
 
   ; Desktop shortcut.
@@ -351,7 +360,7 @@ Section Uninstall
   DeleteRegKey ${GAME_ROOT_REGKEY} "${GAME_UNINST_REGKEY}"
 
   ; The whole installation folder
-  ; (Need to be do that way - inside first, outside last - 
+  ; (Need to be do that way - inside first, outside last -
   ;  because when the uninstaller is called by LeaveReinstallPage,
   ;  $INSTDIR\uninst.exe is in the way, and  RMDir /r "$INSTDIR" fails).
   RMDir /r "$INSTDIR\bin"
