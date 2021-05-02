@@ -108,7 +108,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
 
     // Get file handles
     char* trackname = strrchr(Track->filename, '/') + 1;
-    char buffer[256];
+    char buffer[1024];
 
     // Discover the car type used
     void* handle = NULL;
@@ -119,7 +119,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
 
     // Parameters that are the same for all tracks
     handle = NULL;
-    sprintf(buffer, "drivers/%s/%s/_all_tracks.xml", MyBotName, mCarType.c_str());
+    sprintf(buffer, "%sdrivers/%s/%s/_all_tracks.xml", GetDataDir(), MyBotName, mCarType.c_str());
     handle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
 
     if (handle == NULL)
@@ -131,6 +131,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
         mDriverMsgCarIndex = 0;
         mFRONTCOLL_MARGIN = 4.0;
         mSTARTCLUTCHRATE = 0.01;
+        LogDANDROID.info("# Dandroid handle NULL\n");
     }
     else
     {
@@ -143,6 +144,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
         mDriverMsgCarIndex = (int)GfParmGetNum(handle, "private", "driver message car index", (char*)NULL, 0.0);
         mFRONTCOLL_MARGIN = GfParmGetNum(handle, "private", "frontcollmargin", (char*)NULL, 4.0);
         mSTARTCLUTCHRATE = GfParmGetNum(handle, "private", "startclutchrate", (char*)NULL, 0.01);
+        LogDANDROID.info("# Dandroid handle loaded\n");
     }
 
     LogDANDROID.info("# mLearning          = %i\n", mLearning);
@@ -159,8 +161,9 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
     switch (Situation->_raceType)
     {
     case RM_TYPE_QUALIF:
-        sprintf(buffer, "drivers/%s/%s/qualifying/%s", MyBotName, mCarType.c_str(), trackname);
+        sprintf(buffer, "%sdrivers/%s/%s/qualifying/%s", GetDataDir(), MyBotName, mCarType.c_str(), trackname);
         *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+        LogDANDROID.info("# Dandroid setting track qualify path = %s\n", buffer);
         break;
     default:
         break;
@@ -168,15 +171,19 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
 
     if (*CarParmHandle == NULL)
     {
-        sprintf(buffer, "drivers/%s/%s/%s", MyBotName, mCarType.c_str(), trackname);
+        sprintf(buffer, "%sdrivers/%s/%s/%s", GetDataDir(), MyBotName, mCarType.c_str(), trackname);
         *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+        LogDANDROID.info("# Dandroid setting track path = %s\n", buffer);
     }
 
     if (*CarParmHandle == NULL)
     {
-        sprintf(buffer, "drivers/%s/%s/default.xml", MyBotName, mCarType.c_str());
+        sprintf(buffer, "%sdrivers/%s/%s/default.xml", GetDataDir(), MyBotName, mCarType.c_str());
         *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+        LogDANDROID.info("# Dandroid setting path default = %s\n", buffer);
     }
+
+
 
     readPrivateSection(CarParmHandle);
     readConstSpecs(CarHandle);
@@ -245,8 +252,8 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
         {
             for (int i = 0; i < (int)mSect.size(); i++)
             {
-                mSect[i].brakedistfactor = 1.9;
-                mSect[i].speedfactor = 0.9;
+                mSect[i].brakedistfactor = mBRAKESCALE;
+                mSect[i].speedfactor = mMUSCALE;
             }
         }
 
@@ -1481,6 +1488,8 @@ void TDriver::readPrivateSection(PCarSettings *CarParmHandle)
 {
     mBRAKEFORCEFACTOR = GfParmGetNum(*CarParmHandle, "private", "brakeforcefactor", (char*)NULL, 1.0);
     mBRAKEFORCEMIN = GfParmGetNum(*CarParmHandle, "private", "brakeforcemin", (char*)NULL, 0.0);
+    mMUSCALE = GfParmGetNum(*CarParmHandle,"private", "muscale", (char*)NULL, 0.7);
+    mBRAKESCALE = GfParmGetNum(*CarParmHandle, "private", "brakescale", (char*)NULL, 1.9);
     mBUMPSPEEDFACTOR = GfParmGetNum(*CarParmHandle, "private", "bumpspeedfactor", (char*)NULL, 3.0);
     mFUELPERMETER = GfParmGetNum(*CarParmHandle, "private", "fuelpermeter", (char*)NULL, 0.001f);
     mFUELWEIGHTFACTOR = GfParmGetNum(*CarParmHandle, "private", "fuelweightfactor", (char*)NULL, 1.0);
@@ -1525,6 +1534,8 @@ void TDriver::printSetup()
 
         LogDANDROID.info("%s: brakeforcefactor       = %g\n", oCar->_name, mBRAKEFORCEFACTOR);
         LogDANDROID.info("%s: brakeforcemin          = %g\n", oCar->_name, mBRAKEFORCEMIN);
+        LogDANDROID.info("%s: muscale                = %g\n", oCar->_name, mMUSCALE);
+        LogDANDROID.info("%s: brakescale             = %g\n", oCar->_name, mBRAKESCALE);
         LogDANDROID.info("%s: bumpspeedfactor        = %g\n", oCar->_name, mBUMPSPEEDFACTOR);
         LogDANDROID.info("%s: fuelpermeter           = %g\n", oCar->_name, mFUELPERMETER);
         LogDANDROID.info("%s: fuelweightfactor       = %g\n", oCar->_name, mFUELWEIGHTFACTOR);

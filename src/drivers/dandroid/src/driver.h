@@ -315,6 +315,8 @@ class TDriver
   double mCW;         // aerodynamic drag coefficient
   double mBRAKEFORCEFACTOR;
   double mBRAKEFORCEMIN;
+  double mMUSCALE;
+  double mBRAKESCALE;
   double mBUMPSPEEDFACTOR;
   double mFUELPERMETER;
   double mFUELWEIGHTFACTOR;
