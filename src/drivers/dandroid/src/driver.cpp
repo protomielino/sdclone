@@ -90,6 +90,9 @@ TDriver::TDriver(int index)
     mAccelXCount = 0;
     mSkillGlobal = 1.0;
     mSkillDriver = 1.0;
+    mRain = false;
+    mRainIntensity = 0.0;
+    mWeatherCode = 0;
     mWatchdogCount = 0;
     initVars();
     setPrevVars();
@@ -157,6 +160,8 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
 
     // Parameters that are track specific
     *CarParmHandle = NULL;
+
+    Meteorology(Track);
 
     switch (Situation->_raceType)
     {
@@ -2343,3 +2348,35 @@ void TDriver::driverMsgValue(int priority, const std::string &desc, double value
         LogDANDROID.info("%dm %s s:%d p:%d %s %g\n", (int)mFromStart, oCar->_name, mDrvState, mDrvPath, desc.c_str(), value);
     }
 }
+
+void TDriver::Meteorology(const tTrack* t)
+{
+    tTrackSeg* Seg;
+    tTrackSurface* Surf;
+    mRainIntensity = 0;
+    mWeatherCode = GetWeather(t);
+    LogDANDROID.info("Meteoroly : %i\n", mWeatherCode);
+    Seg = t->seg;
+
+    for (int I = 0; I < t->nseg; I++)
+    {
+        Surf = Seg->surface;
+        mRainIntensity = MAX(mRainIntensity, Surf->kFrictionDry / Surf->kFriction);
+        LogDANDROID.debug("# %.4f, %.4f %s\n", Surf->kFriction, Surf->kRollRes, Surf->material);
+        Seg = Seg->next;
+    }
+
+    mRainIntensity -= 1;
+
+    if (mRainIntensity > 0)
+    {
+        mRain = true;
+    }
+    else
+        mRain = false;
+}
+
+unsigned int TDriver::GetWeather(const tTrack* t)
+{
+    return (t->local.rain << 4) + t->local.water;
+};

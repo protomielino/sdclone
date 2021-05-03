@@ -144,6 +144,9 @@ class TDriver
   void driverMsg(const std::string &desc);
   void driverMsgValue(int priority, const std::string &desc, double value);
 
+  void	Meteorology(const tTrack* t);
+  unsigned int GetWeather(const tTrack* t);
+
   // Per robot global data
   int mDrvPath;
   int mDrvPath_prev;
@@ -296,9 +299,14 @@ class TDriver
   int mAccelXCount;
   double mSkillGlobal;
   double mSkillDriver;
+
+  bool          mRain;
+  double        mRainIntensity;
+  unsigned int  mWeatherCode;
+
   PidController mSpeedController;
   PidController mAttackAngleController;
-  int mWatchdogCount;
+  int           mWatchdogCount;
   // Data that should stay constant after first initialization
   double mBRAKEPRESS;
   double mBRAKEREPARTITION;
