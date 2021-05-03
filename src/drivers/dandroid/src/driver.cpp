@@ -15,7 +15,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
 //#define DRIVER_PRINT_RACE_EVENTS
 //#define TIME_ANALYSIS // For Linux only
 
@@ -31,7 +30,6 @@
 #endif
 
 #define GRAVITY 9.81
-
 
 TDriver::TDriver(int index)
 {
@@ -98,11 +96,9 @@ TDriver::TDriver(int index)
     setPrevVars();
 }
 
-
 TDriver::~TDriver()
 {
 }
-
 
 void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarParmHandle, PSituation Situation)
 {
@@ -110,7 +106,9 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
     mTrack = Track;
 
     // Get file handles
-    char* trackname = strrchr(Track->filename, '/') + 1;
+    char trackname[100];
+    strncpy(trackname, strrchr(Track->filename, '/') + 1, sizeof(trackname));
+    *strrchr(trackname, '.') = '\0';
     char buffer[1024];
 
     // Discover the car type used
@@ -166,9 +164,18 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
     switch (Situation->_raceType)
     {
     case RM_TYPE_QUALIF:
-        sprintf(buffer, "%sdrivers/%s/%s/qualifying/%s", GetDataDir(), MyBotName, mCarType.c_str(), trackname);
-        *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-        LogDANDROID.info("# Dandroid setting track qualify path = %s\n", buffer);
+        if (mRain)
+        {
+            sprintf(buffer, "%sdrivers/%s/%s/qualifying/%s-%d.xml", GetDataDir(), MyBotName, mCarType.c_str(), trackname, mWeatherCode);
+            *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+            LogDANDROID.info("# Dandroid setting track qualify path = %s\n", buffer);
+        }
+        else
+        {
+            sprintf(buffer, "%sdrivers/%s/%s/qualifying/%s.xml", GetDataDir(), MyBotName, mCarType.c_str(), trackname);
+            *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+            LogDANDROID.info("# Dandroid setting track qualify path = %s\n", buffer);
+        }
         break;
     default:
         break;
@@ -176,19 +183,35 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
 
     if (*CarParmHandle == NULL)
     {
-        sprintf(buffer, "%sdrivers/%s/%s/%s", GetDataDir(), MyBotName, mCarType.c_str(), trackname);
-        *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-        LogDANDROID.info("# Dandroid setting track path = %s\n", buffer);
+        if (mRain)
+        {
+            sprintf(buffer, "%sdrivers/%s/%s/%s-%d.xml", GetDataDir(), MyBotName, mCarType.c_str(), trackname, mWeatherCode);
+            *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+            LogDANDROID.info("# Dandroid setting track path = %s\n", buffer);
+        }
+        else
+        {
+            sprintf(buffer, "%sdrivers/%s/%s/%s.xml", GetDataDir(), MyBotName, mCarType.c_str(), trackname);
+            *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+            LogDANDROID.info("# Dandroid setting track path = %s\n", buffer);
+        }
     }
 
     if (*CarParmHandle == NULL)
     {
-        sprintf(buffer, "%sdrivers/%s/%s/default.xml", GetDataDir(), MyBotName, mCarType.c_str());
-        *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-        LogDANDROID.info("# Dandroid setting path default = %s\n", buffer);
+        if (mRain)
+        {
+            sprintf(buffer, "%sdrivers/%s/%s/default-%d.xml", GetDataDir(), MyBotName, mCarType.c_str(), mWeatherCode);
+            *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+            LogDANDROID.info("# Dandroid setting path default = %s\n", buffer);
+        }
+        if (*CarParmHandle == NULL)
+        {
+            sprintf(buffer, "%sdrivers/%s/%s/default.xml", GetDataDir(), MyBotName, mCarType.c_str());
+            *CarParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+            LogDANDROID.info("# Dandroid setting path default = %s\n", buffer);
+        }
     }
-
-
 
     readPrivateSection(CarParmHandle);
     readConstSpecs(CarHandle);
@@ -231,7 +254,6 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
 
     mSkillDriver = MAX(0.95, 1.0 - 0.05 * driverskill);
 }
-
 
 void TDriver::NewRace(PtCarElt Car, PSituation Situation)
 {
@@ -299,30 +321,25 @@ void TDriver::Drive()
 #endif
 }
 
-
 int TDriver::PitCmd()                               // Handle pitstop
 {
     mPit.pitCommand();
     return ROB_PIT_IM;  // Ready to be serviced
 }
 
-
 void TDriver::EndRace()                             // Stop race
 {
     // This is never called by TORCS! Don't use it!
 }
 
-
 void TDriver::Shutdown()                            // Cleanup
 {
 }
-
 
 void TDriver::updateTime()
 {
     oCurrSimTime = oSituation->currentTime;
 }
-
 
 void TDriver::updateTimer()
 {
@@ -334,7 +351,6 @@ void TDriver::updateTimer()
         mTenthTimer = false;
     }
 }
-
 
 void TDriver::updateBasics()
 {
@@ -431,7 +447,6 @@ void TDriver::updateBasics()
     mPit.update(mFromStart);
 }
 
-
 void TDriver::updateOpponents()
 {
     mOpponents.update(oSituation, oCar);
@@ -475,7 +490,6 @@ void TDriver::updateOpponents()
     }
 }
 
-
 void TDriver::updatePath()
 {
     for (int path = 0; path < 3; path++) {
@@ -486,7 +500,6 @@ void TDriver::updatePath()
     }
 }
 
-
 void TDriver::updateUtils()
 {
     updateDrivingFast();
@@ -495,14 +508,12 @@ void TDriver::updateUtils()
     mOvertakePath = overtakeStrategy();
 }
 
-
 void TDriver::calcTarget()
 {
     calcTargetToMiddle();
     calcGlobalTarget();
     calcTargetAngle();
 }
-
 
 void TDriver::setControls()
 {
@@ -514,7 +525,6 @@ void TDriver::setControls()
     oCar->_accelCmd = (tdble) mAccel;
     oCar->_lightCmd = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 }
-
 
 void TDriver::printChangedVars()
 {
@@ -567,7 +577,6 @@ void TDriver::printChangedVars()
     }
 }
 
-
 void TDriver::setPrevVars()
 {
     prev_mDrvState = mDrvState;
@@ -583,7 +592,6 @@ void TDriver::setPrevVars()
     prev_mMaxSteerAngle = mMaxSteerAngle;
     prev_mBumpSpeed = mBumpSpeed;
 }
-
 
 void TDriver::initVars()
 {
@@ -602,7 +610,6 @@ void TDriver::initVars()
     mMaxSteerAngle = false;
     mBumpSpeed = false;
 }
-
 
 double TDriver::getPitSpeed()
 {
@@ -627,7 +634,6 @@ double TDriver::getPitSpeed()
     maxspeed = MIN(maxspeed, brakespeed);
     return maxspeed;
 }
-
 
 double TDriver::getMaxSpeed(DanPoint danpoint)
 {
@@ -666,13 +672,11 @@ double TDriver::getMaxSpeed(DanPoint danpoint)
     return maxspeed;
 }
 
-
 double TDriver::curveSpeed(double radius)
 {
     radius = fabs(radius);
     return mSectSpeedfactor * sqrt(mMu * GRAVITY * radius / (1.0 - MIN(0.99, radius * mCA * mMu / mMass)));
 }
-
 
 double TDriver::bumpSpeed(double curv_z, double curvespeed)
 {
@@ -693,7 +697,6 @@ double TDriver::bumpSpeed(double curv_z, double curvespeed)
     return speed_z;
 }
 
-
 double TDriver::brakeSpeed(double nextdist, double nextspeed)
 {
     double brakespeed = DBL_MAX;
@@ -703,7 +706,6 @@ double TDriver::brakeSpeed(double nextdist, double nextspeed)
     }
     return brakespeed;
 }
-
 
 double TDriver::brakeDist(double speed, double allowedspeed)
 {
@@ -731,7 +733,6 @@ double TDriver::brakeDist(double speed, double allowedspeed)
 
     return brakedist;
 }
-
 
 double TDriver::getBrake(double maxspeed)
 {
@@ -773,7 +774,6 @@ double TDriver::getBrake(double maxspeed)
     return brakeforce;
 }
 
-
 double TDriver::getAccel(double maxspeed)
 {
     double accel;
@@ -798,7 +798,6 @@ double TDriver::getAccel(double maxspeed)
     return accel;
 }
 
-
 double TDriver::getSteer()
 {
     if (mDrvState == STATE_STUCK) {
@@ -812,7 +811,6 @@ double TDriver::getSteer()
     controlAttackAngle(mTargetAngle);
     return mTargetAngle / oCar->_steerLock;
 }
-
 
 int TDriver::getGear()
 {
@@ -856,7 +854,6 @@ int TDriver::getGear()
     return mGear;
 }
 
-
 double TDriver::getClutch()
 {
     if (oCar->_gear > 1 || mSpeed > 15.0) {
@@ -890,7 +887,6 @@ double TDriver::getClutch()
     return mClutchtime;
 }
 
-
 bool TDriver::stateStuck()
 {
     if (mStuck) {
@@ -898,7 +894,6 @@ bool TDriver::stateStuck()
     }
     return false;
 }
-
 
 bool TDriver::stateOfftrack()
 {
@@ -909,7 +904,6 @@ bool TDriver::stateOfftrack()
     }
     return false;
 }
-
 
 bool TDriver::statePitstop()
 {
@@ -933,7 +927,6 @@ bool TDriver::statePitstop()
     return false;
 }
 
-
 bool TDriver::statePitlane()
 {
     if (mPit.getPitOffset(mFromStart)) {
@@ -941,7 +934,6 @@ bool TDriver::statePitlane()
     }
     return false;
 }
-
 
 void TDriver::updateLetPass()
 {
@@ -982,7 +974,6 @@ void TDriver::updateLetPass()
     mLetPass = true;
 }
 
-
 void TDriver::setDrvState(int state)
 {
     mDrvState = state;
@@ -994,7 +985,6 @@ void TDriver::setDrvState(int state)
     }
 }
 
-
 double TDriver::pathOffs(int path)
 {
     double offs = 0.0;
@@ -1003,7 +993,6 @@ double TDriver::pathOffs(int path)
     }
     return offs;
 }
-
 
 void TDriver::setDrvPath(int path)
 {
@@ -1052,7 +1041,6 @@ void TDriver::setDrvPath(int path)
     updateCatchedRaceLine();
 }
 
-
 void TDriver::calcDrvState()
 {
     int path = PATH_O;
@@ -1094,7 +1082,6 @@ void TDriver::calcDrvState()
     }
     setDrvPath(path);
 }
-
 
 void TDriver::calcTargetToMiddle()
 {
@@ -1175,7 +1162,6 @@ void TDriver::calcTargetToMiddle()
     }
 }
 
-
 bool TDriver::overtakeOpponent()
 {
     if (mOpp == NULL) {
@@ -1228,7 +1214,6 @@ bool TDriver::overtakeOpponent()
 
     return mOvertake;
 }
-
 
 int TDriver::overtakeStrategy()
 {
@@ -1283,7 +1268,6 @@ int TDriver::overtakeStrategy()
     return path;
 }
 
-
 void TDriver::updateStuck()
 {
     if (mTenthTimer) {
@@ -1310,7 +1294,6 @@ void TDriver::updateStuck()
         }
     }
 }
-
 
 bool TDriver::onCollision()
 {
