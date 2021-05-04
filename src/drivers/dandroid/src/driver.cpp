@@ -92,6 +92,10 @@ TDriver::TDriver(int index)
     mRainIntensity = 0.0;
     mWeatherCode = 0;
     mWatchdogCount = 0;
+    mHASTYC = false;
+    mHASABS = false;
+    mHASESP = false;
+    mHASTCL = false;
     initVars();
     setPrevVars();
 }
@@ -215,6 +219,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
 
     readPrivateSection(CarParmHandle);
     readConstSpecs(CarHandle);
+    readOptionsSpecs(CarHandle);
 
     // Set initial fuel
     double distance = Situation->_totLaps * mTrack->length;
@@ -266,7 +271,7 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
     printSetup();
     mDanPath.init(mTrack, mMAXLEFT, mMAXRIGHT, mMARGININSIDE, mMARGINOUTSIDE, mCLOTHFACTOR, mSEGLEN);
     mOpponents.init(mTrack, Situation, Car);
-    mPit.init(mTrack, Situation, Car, mPITDAMAGE, mPITENTRYMARGIN);
+    mPit.init(mTrack, Situation, Car, mPITDAMAGE, mPITENTRYMARGIN, mHASTYC);
 
     // File with speed factors
     mNewFile = false;
@@ -701,7 +706,9 @@ double TDriver::brakeSpeed(double nextdist, double nextspeed)
 {
     double brakespeed = DBL_MAX;
     double bd = brakeDist(mSpeed, nextspeed);
-    if (bd > nextdist) {
+
+    if (bd > nextdist)
+    {
         brakespeed = nextspeed;
     }
     return brakespeed;
@@ -709,7 +716,8 @@ double TDriver::brakeSpeed(double nextdist, double nextspeed)
 
 double TDriver::brakeDist(double speed, double allowedspeed)
 {
-    if (speed <= allowedspeed) {
+    if (speed <= allowedspeed)
+    {
         return -1000.0;
     }
 
@@ -719,11 +727,14 @@ double TDriver::brakeDist(double speed, double allowedspeed)
     const int step = 10;
     int diff = (speed - allowedspeed) / step;
     double rest = (speed - allowedspeed) - diff * step;
-    for (int i = 0; i < diff; i++) {
+
+    for (int i = 0; i < diff; i++)
+    {
         v1sqr = (speed - i * step) * (speed - i * step);
         v2sqr = (speed - i * step - step) * (speed - i * step - step);
         brakedist += mBrakedistfactor * mMass * (v1sqr - v2sqr) / (2.0 * (mMu * GRAVITY * mMass + v2sqr * (mCA * mMu + mCW)));
     }
+
     v1sqr = (allowedspeed + rest) * (allowedspeed + rest);
     v2sqr = allowedspeed * allowedspeed;
     brakedist += mBrakedistfactor * mMass * (v1sqr - v2sqr) / (2.0 * (mMu * GRAVITY * mMass + v2sqr * (mCA * mMu + mCW)));
@@ -738,36 +749,46 @@ double TDriver::getBrake(double maxspeed)
 {
     double brakeforce = 0.0;
 
-    if (mSpeed > maxspeed) {
+    if (mSpeed > maxspeed)
+    {
         brakeforce = mBrakeforce;
     }
 
-    if (mDrvState == STATE_OFFTRACK) {
+    if (mDrvState == STATE_OFFTRACK)
+    {
         brakeforce *= 0.2;
     }
 
-    if (mDrvState == STATE_PITLANE) {
+    if (mDrvState == STATE_PITLANE)
+    {
         // Pit speed limiter
-        if (mSpeed > maxspeed) {
+        if (mSpeed > maxspeed)
+        {
             brakeforce = mBrakeforce;
-        } else if (mSpeed > maxspeed - 0.1) {
+        }
+        else if (mSpeed > maxspeed - 0.1)
+        {
             brakeforce = 0.05;
         }
     }
 
-    if (mDrvState == STATE_PITSTOP) {
+    if (mDrvState == STATE_PITSTOP)
+    {
         brakeforce = mBrakeforce;
     }
 
     double collbrakeforce = 0.0;
-    if (onCollision()) {
+
+    if (onCollision())
+    {
         collbrakeforce = mBrakeforce + 0.05 + mCollOvershooting / 10.0;
     }
 
     brakeforce = MAX(collbrakeforce, brakeforce);
     brakeforce = MIN(1.0, brakeforce);
 
-    if (mDrvState == STATE_STUCK) {
+    if (mDrvState == STATE_STUCK)
+    {
         //brakeforce = 0.0;
     }
 
@@ -780,35 +801,48 @@ double TDriver::getAccel(double maxspeed)
 
     if (oCar->ctrl.brakeCmd > 0.0
             || fabs(mAttackAngle) > 0.3
-            || (mMaxSteerAngle && mDrivingFast)) {
+            || (mMaxSteerAngle && mDrivingFast))
+    {
         accel = 0.0;
         mAccel = 0.5;
-    } else {
+    }
+    else
+    {
         controlSpeed(mAccel, maxspeed);
         if (mLetPass) {
             mAccel *= 0.5;
         }
         accel = mSkillDriver * mAccel;
     }
-    if (oCurrSimTime < 0.0) {
-        if (oCar->_enginerpm / oCar->_enginerpmRedLine > 0.7) {
+
+    if (oCurrSimTime < 0.0)
+    {
+        if (oCar->_enginerpm / oCar->_enginerpmRedLine > 0.7)
+        {
             accel = 0.0;
         }
     }
+
     return accel;
 }
 
 double TDriver::getSteer()
 {
-    if (mDrvState == STATE_STUCK) {
-        if (fabs(mAngleToTrack) < 1.0) {
+    if (mDrvState == STATE_STUCK)
+    {
+        if (fabs(mAngleToTrack) < 1.0)
+        {
             mTargetAngle = -mAngleToTrack / 4.0;
-        } else {
+        }
+        else
+        {
             mTargetAngle = -0.5 * SIGN(mAngleToTrack);
         }
     }
+
     limitSteerAngle(mTargetAngle);
     controlAttackAngle(mTargetAngle);
+
     return mTargetAngle / oCar->_steerLock;
 }
 
@@ -819,77 +853,115 @@ int TDriver::getGear()
     int shifttime = 5;
     const int MAX_GEAR = oCar->_gearNb - 1;
 
-    if (oCurrSimTime < 0.0) {
+    if (oCurrSimTime < 0.0)
+    {
         return mGear = 0;
     }
-    if (oCurrSimTime < 0.5) {
+
+    if (oCurrSimTime < 0.5)
+    {
         // For the start
         shifttime = 0;
     }
-    if (mTenthTimer) {
-        if (mShiftTimer < shifttime) {
+
+    if (mTenthTimer)
+    {
+        if (mShiftTimer < shifttime)
+        {
             mShiftTimer++;
         }
     }
-    if (mShiftTimer < shifttime) {
+
+    if (mShiftTimer < shifttime)
+    {
         return mGear;
     }
 
-    if (mDrvState == STATE_STUCK) {
+    if (mDrvState == STATE_STUCK)
+    {
         return mGear = -1;
     }
-    if (oCar->_gear <= 0) {
+
+    if (oCar->_gear <= 0)
+    {
         return mGear = 1;
     }
-    if (oCar->_gear < MAX_GEAR && oCar->_enginerpm / oCar->_enginerpmRedLine > SHIFT_UP) {
+
+    if (oCar->_gear < MAX_GEAR && oCar->_enginerpm / oCar->_enginerpmRedLine > SHIFT_UP)
+    {
         mShiftTimer = 0;
         return mGear++;
-    } else {
+    }
+    else
+    {
         double ratiodown = oCar->_gearRatio[oCar->_gear + oCar->_gearOffset - 1] / oCar->_gearRatio[oCar->_gear + oCar->_gearOffset];
-        if (oCar->_gear > 1 && (oCar->_enginerpmRedLine - SHIFT_DOWN_MARGIN) / oCar->_enginerpm > ratiodown) {
+
+        if (oCar->_gear > 1 && (oCar->_enginerpmRedLine - SHIFT_DOWN_MARGIN) / oCar->_enginerpm > ratiodown)
+        {
             mShiftTimer = 0;
             return mGear--;
         }
     }
+
     return mGear;
 }
 
 double TDriver::getClutch()
 {
-    if (oCar->_gear > 1 || mSpeed > 15.0) {
-        if (oCar->_gear > mPrevgear) {
+    if (oCar->_gear > 1 || mSpeed > 15.0)
+    {
+        if (oCar->_gear > mPrevgear)
+        {
             mClutchtime = 0.3;
         }
-        if (mClutchtime > 0.0) {
+
+        if (mClutchtime > 0.0)
+        {
             mClutchtime -= 1.0 * RCM_MAX_DT_ROBOTS;
         }
-        if (oCar->_gear < mPrevgear) {
+
+        if (oCar->_gear < mPrevgear)
+        {
             mClutchtime = 0.0;
         }
-    } else if (oCar->_gear == 1) {
+    }
+    else if (oCar->_gear == 1)
+    {
         mClutchtime -= mSTARTCLUTCHRATE;
-        if (fabs(mAngleToTrack) > 1.0 || mDrvState == STATE_OFFTRACK) {
+
+        if (fabs(mAngleToTrack) > 1.0 || mDrvState == STATE_OFFTRACK)
+        {
             mClutchtime = 0.0;
         }
-    } else if (oCar->_gear == -1) {
+    }
+    else if (oCar->_gear == -1)
+    {
         // For the reverse gear.
-        if (oCar->_enginerpm > 500.0) {
+        if (oCar->_enginerpm > 500.0)
+        {
             mClutchtime -= 0.01;
-        } else {
+        }
+        else
+        {
             mClutchtime += 0.01;
         }
-    } else if (oCar->_gear == 0) {
+    }
+    else if (oCar->_gear == 0)
+    {
         // For a good start
         mClutchtime = 0.7;
     }
+
     mPrevgear = oCar->_gear;
     mClutchtime = MIN(MAX(0.0, mClutchtime), 1.0);
+
     return mClutchtime;
 }
 
 bool TDriver::stateStuck()
 {
-    if (mStuck) {
+    if (mStuck)
+    {
         return true;
     }
     return false;
@@ -897,80 +969,109 @@ bool TDriver::stateStuck()
 
 bool TDriver::stateOfftrack()
 {
-    if (mDrvState != STATE_PITLANE && mDrvState != STATE_PITSTOP) {
-        if (mBorderdist < -2.2 || (mSpeed < 15.0 && mBorderdist < -1.8)) {
+    if (mDrvState != STATE_PITLANE && mDrvState != STATE_PITSTOP)
+    {
+        if (mBorderdist < -2.2 || (mSpeed < 15.0 && mBorderdist < -1.8))
+        {
             return true;
         }
     }
+
     return false;
 }
 
 bool TDriver::statePitstop()
 {
-    if (mDrvState == STATE_PITLANE && !mLeavePit) {
+    if (mDrvState == STATE_PITLANE && !mLeavePit)
+    {
         float dl, dw;
         RtDistToPit(oCar, mTrack, &dl, &dw);
-        if (fabs(dw) < 1.5 && dl > mTrack->length - 1.0) {
+
+        if (fabs(dw) < 1.5 && dl > mTrack->length - 1.0)
+        {
             return true;
         }
-    } else if (mDrvState == STATE_PITSTOP) {
+    }
+    else if (mDrvState == STATE_PITSTOP)
+    {
         // Traffic in the way when leaving?
-        if (mOppBack != NULL) {
+        if (mOppBack != NULL)
+        {
             if (mOppBack->mDist > -20.0 && mOppBack->speed > 5.0 && mOppBack->speed < 25.0) {
                 return true;
             }
         }
         mLeavePit = true;
-    } else if (mDrvState == STATE_RACE) {
+    }
+    else if (mDrvState == STATE_RACE)
+    {
         mLeavePit = false;
     }
+
     return false;
 }
 
 bool TDriver::statePitlane()
 {
-    if (mPit.getPitOffset(mFromStart)) {
+    if (mPit.getPitOffset(mFromStart))
+    {
         return true;
     }
+
     return false;
 }
 
 void TDriver::updateLetPass()
 {
 
-    if (mOppLetPass == NULL || mDrvState != STATE_RACE || oCurrSimTime < 60.0) {
+    if (mOppLetPass == NULL || mDrvState != STATE_RACE || oCurrSimTime < 60.0)
+    {
         mLetPass = false;
+
         return;
     }
     // Check range
-    if (mOppLetPass->mDist < -50.0 || mOppLetPass->mDist > 0.0) {
+    if (mOppLetPass->mDist < -50.0 || mOppLetPass->mDist > 0.0)
+    {
         mLetPass = false;
+
         return;
     }
     // Check for other opponent between behind
-    if (mOppBack != NULL) {
-        if (mOppBack != mOppLetPass && mOppBack->mDist > mOppLetPass->mDist) {
+    if (mOppBack != NULL)
+    {
+        if (mOppBack != mOppLetPass && mOppBack->mDist > mOppLetPass->mDist)
+        {
             mLetPass = false;
+
             return;
         }
     }
     // Check for other opponent aside
-    if (mOppNear != NULL) {
-        if (mOppNear != mOppLetPass) {
-            if (fabs(mOppNear->mDist) < 3.0) {
+    if (mOppNear != NULL)
+    {
+        if (mOppNear != mOppLetPass)
+        {
+            if (fabs(mOppNear->mDist) < 3.0)
+            {
                 mLetPass = false;
+
                 return;
             }
         }
     }
     // Check for bad conditions
-    if (!mLetPass) {
-        if (mDrivingFast || mSpeed > mOppLetPass->speed + 5.0) {
-            if (mOppLetPass->mDist < -20.0 || mOppLetPass->mDist > 0.0) {
+    if (!mLetPass)
+    {
+        if (mDrivingFast || mSpeed > mOppLetPass->speed + 5.0)
+        {
+            if (mOppLetPass->mDist < -20.0 || mOppLetPass->mDist > 0.0)
+            {
                 return;
             }
         }
     }
+
     mLetPass = true;
 }
 
@@ -980,7 +1081,8 @@ void TDriver::setDrvState(int state)
 
     // Update state changes
     mStateChange = false;
-    if (prev_mDrvState != mDrvState) {
+    if (prev_mDrvState != mDrvState)
+    {
         mStateChange = true;
     }
 }
@@ -988,9 +1090,11 @@ void TDriver::setDrvState(int state)
 double TDriver::pathOffs(int path)
 {
     double offs = 0.0;
-    if (mDrvState == STATE_RACE) {
+    if (mDrvState == STATE_RACE)
+    {
         offs = mPath[path].offset;
     }
+
     return offs;
 }
 
@@ -1013,20 +1117,27 @@ void TDriver::setDrvPath(int path)
     }
 #endif
     // Check the conditions
-    if (mDrvPath != path || mStateChange) {
+    if (mDrvPath != path || mStateChange)
+    {
         // Don't change when dangerous or speed on limits
-        if (mDrivingFast && fabs(pathOffs(path)) > 2.0 && !mOvertake && !mTestLine) {
+        if (mDrivingFast && fabs(pathOffs(path)) > 2.0 && !mOvertake && !mTestLine)
+        {
             return;
         }
         // Don't change when opponent comes fast from behind
-        if (mOppComingFastBehind) {
+        if (mOppComingFastBehind)
+        {
             return;
         }
         // Returning to track from excursion or pits
-        if (mDrvState == STATE_OFFTRACK || mDrvState == STATE_PITLANE) {
-            if (fabs(mPath[PATH_L].offset) < fabs(mPath[PATH_R].offset)) {
+        if (mDrvState == STATE_OFFTRACK || mDrvState == STATE_PITLANE)
+        {
+            if (fabs(mPath[PATH_L].offset) < fabs(mPath[PATH_R].offset))
+            {
                 path = PATH_L;
-            } else {
+            }
+            else
+            {
                 path = PATH_R;
             }
         }
@@ -1044,42 +1155,66 @@ void TDriver::setDrvPath(int path)
 void TDriver::calcDrvState()
 {
     int path = PATH_O;
-    if (stateStuck()) {
+    if (stateStuck())
+    {
         setDrvState(STATE_STUCK);
-    } else if (statePitstop()) {
+    }
+    else if (statePitstop())
+    {
         setDrvState(STATE_PITSTOP);
-    } else if (statePitlane()) {
+    }
+    else if (statePitlane())
+    {
         setDrvState(STATE_PITLANE);
-    } else if (stateOfftrack()) {
+    }
+    else if (stateOfftrack())
+    {
         setDrvState(STATE_OFFTRACK);
-    } else {
+    }
+    else
+    {
         setDrvState(STATE_RACE);
-        if (mLetPass) {
-            if (mTargetToMiddle > 0.0) {
+        if (mLetPass)
+        {
+            if (mTargetToMiddle > 0.0)
+            {
                 path = PATH_L;
-            } else {
+            }
+            else
+            {
                 path = PATH_R;
             }
         }
-        if (overtakeOpponent()) {
+
+        if (overtakeOpponent())
+        {
             path = mOvertakePath;
         }
 #if 1
-        if (mTestLine == 1) {
+        if (mTestLine == 1)
+        {
             path = PATH_L;
         }
-        if (mTestLine == 2) {
+
+        if (mTestLine == 2)
+        {
             path = PATH_R;
         }
-        if (mTestLine == 3) {
-            if ((mDrvPath != PATH_L && mCatchedRaceLine) || (mDrvPath == PATH_L && !mCatchedRaceLine))  {
+
+        if (mTestLine == 3)
+        {
+            if ((mDrvPath != PATH_L && mCatchedRaceLine) || (mDrvPath == PATH_L && !mCatchedRaceLine))
+            {
                 path = PATH_L;
-            } else if ((mDrvPath != PATH_R && mCatchedRaceLine) || (mDrvPath == PATH_R && !mCatchedRaceLine)) {
+            }
+            else if ((mDrvPath != PATH_R && mCatchedRaceLine) || (mDrvPath == PATH_R && !mCatchedRaceLine))
+            {
                 path = PATH_R;
             }
         }
 #endif
     }
+
     setDrvPath(path);
 }
 
@@ -1089,32 +1224,46 @@ void TDriver::calcTargetToMiddle()
     mNormalTargetToMiddle = mPath[mDrvPath].tarpos.tomiddle;
     mTargetToMiddle = mNormalTargetToMiddle;
 
-    switch (mDrvState) {
-    case STATE_RACE: {
+    switch (mDrvState)
+    {
+    case STATE_RACE:
+    {
         // Path changes
-        if (!mCatchedRaceLine) {
+        if (!mCatchedRaceLine)
+        {
             double rate = 2.0;
-            if (!mDrivingFast) {
+
+            if (!mDrivingFast)
+            {
                 rate = 4.0;
             }
+
             double dist = fabs(mNormalTargetToMiddle - mPath[mDrvPath_prev].tarpos.tomiddle);
             double time = dist / rate;
             double part = 1.0;
-            if (mPathChangeTime < time) {
+
+            if (mPathChangeTime < time)
+            {
                 part = mPathChangeTime / time;
             }
+
             mTargetToMiddle = part * mNormalTargetToMiddle + (1.0 - part) * mPath[mDrvPath_prev].tarpos.tomiddle;
             // Start straight
-            if (oCurrSimTime < 4.0) {
+            if (oCurrSimTime < 4.0)
+            {
                 mTargetToMiddle = prevtargettomiddle = mToMiddle;
                 mPathChangeTime = 0.0;
             }
             // In case we change path in the middle of a path change
-            if (fabs(prevtargettomiddle - mTargetToMiddle) > 0.5) {
-                if (fabs(prevtargettomiddle - mNormalTargetToMiddle) < dist) {
+            if (fabs(prevtargettomiddle - mTargetToMiddle) > 0.5)
+            {
+                if (fabs(prevtargettomiddle - mNormalTargetToMiddle) < dist)
+                {
                     part = 1.0 - fabs(prevtargettomiddle - mNormalTargetToMiddle) / dist;
                     mPathChangeTime = part * time;
-                } else {
+                }
+                else
+                {
                     part = 0.0;
                     mPathChangeTime = 0.0;
                 }
@@ -1122,38 +1271,56 @@ void TDriver::calcTargetToMiddle()
             }
         }
         // Special cases
-        if (mDrvPath == PATH_L || mDrvPath == PATH_R)  {
-            if (mSpeed < 10.0 && fabs(mOppSidedist) < 3.5)  {
+        if (mDrvPath == PATH_L || mDrvPath == PATH_R)
+        {
+            if (mSpeed < 10.0 && fabs(mOppSidedist) < 3.5)
+            {
                 mTargetToMiddle = SIGN(mTargetToMiddle) * (mTrack->width / 2.0);
             }
         }
-        if (fabs(mOppSidedist) < 3.0) {
-            if (mBorderdist > 1.5) {
+
+        if (fabs(mOppSidedist) < 3.0)
+        {
+            if (mBorderdist > 1.5)
+            {
                 mTargetToMiddle -= 1.0 * SIGN(mOppSidedist) * (3.0 - fabs(mOppSidedist));
-            } else {
+            }
+            else
+            {
                 mTargetToMiddle = SIGN(mTargetToMiddle) * ((mTrack->width / 2.0) - 1.5);
             }
         }
-        if (mWalldist < mTARGETWALLDIST + 1.0) {
+
+        if (mWalldist < mTARGETWALLDIST + 1.0)
+        {
             mTargetToMiddle = mTargetToMiddle - SIGN(mTargetToMiddle) * mTARGETWALLDIST; // needed for Corkscrew pit wall
         }
         break;
     }
-    case STATE_STUCK: {
+    case STATE_STUCK:
+    {
         break;
     }
-    case STATE_OFFTRACK: {
+    case STATE_OFFTRACK:
+    {
         mTargetToMiddle = SIGN(mToMiddle) * ((mTrack->width / 2.0) - 1.0);
-        if (mWalldist < 0.0) {
+
+        if (mWalldist < 0.0)
+        {
             mTargetToMiddle = SIGN(mToMiddle) * (mWallToMiddleAbs + 2.0); // we are on the wrong side of the pit wall
         }
         break;
     }
-    case STATE_PITLANE: {
+    case STATE_PITLANE:
+    {
         mTargetToMiddle = mPit.getPitOffset(mTargetFromstart);
-        if (fabs(mTargetToMiddle) < mTrack->width / 2.0) {
+
+        if (fabs(mTargetToMiddle) < mTrack->width / 2.0)
+        {
             double pitentrydist = fromStart(mPit.getPitEntry() - mFromStart);
-            if (pitentrydist > 0.0 && pitentrydist < mPITENTRYMARGIN) {
+
+            if (pitentrydist > 0.0 && pitentrydist < mPITENTRYMARGIN)
+            {
                 mTargetToMiddle = mToMiddle + (mTargetToMiddle - mToMiddle) * (mPITENTRYMARGIN - pitentrydist) / mPITENTRYMARGIN;
             }
         }
@@ -1164,28 +1331,36 @@ void TDriver::calcTargetToMiddle()
 
 bool TDriver::overtakeOpponent()
 {
-    if (mOpp == NULL) {
+    if (mOpp == NULL)
+    {
         mOvertake = false;
         return mOvertake;
     }
 
     // Stay the course for some time
-    if (mOvertake) {
-        if (mTenthTimer) {
-            if (mOvertakeTimer < 5) {
+    if (mOvertake)
+    {
+        if (mTenthTimer)
+        {
+            if (mOvertakeTimer < 5)
+            {
                 mOvertakeTimer++;
                 return mOvertake;
             }
         }
-    } else {
+    }
+    else
+    {
         mOvertakeTimer = 0;
     }
 
     // Overtake conditions
     double maxdist = MIN(50, mFRONTCOLL_MARGIN + 5.0 + mSpeed);
+
     if (mOppDist < maxdist && mOppDist > 1.0
             // Watch for cars coming out of the pitlane
-            && (mOpp->borderdist > -3.0 || (mOpp->borderdist <= -3.0 && mOpp->speed > 25 && fabs(mOpp->sidedist) < 5.0))) {
+            && (mOpp->borderdist > -3.0 || (mOpp->borderdist <= -3.0 && mOpp->speed > 25 && fabs(mOpp->sidedist) < 5.0)))
+    {
         if (mOpp->mCatchtime < 2.0 || (mOppDist < mFRONTCOLL_MARGIN + 2.0 && !mDrivingFast)) mCatchingOpp = true;
         if (mOpp->mCatchtime > 10.0) mCatchingOpp = false;
         if (((mCatchingOpp || (mOpp->backmarker && mOppDist < mFRONTCOLL_MARGIN + 3.0 && mAccelAvg < 1.0)) && !mOpp->teammate && !mDrivingFast)
@@ -1193,22 +1368,28 @@ bool TDriver::overtakeOpponent()
                 || (mOvertake && mOppDist < mFRONTCOLL_MARGIN + 5.0 && !mDrivingFast)
                 || (mOvertake && mOppDist < mFRONTCOLL_MARGIN + 10.0 && mOpp->backmarker)
                 || mSpeed < 8.0
-                || (mOpp->speed < 5.0 && mOppDist < mFRONTCOLL_MARGIN + 8.0)
-                ) {
+                || (mOpp->speed < 5.0 && mOppDist < mFRONTCOLL_MARGIN + 8.0))
+        {
             mOvertake = true;
-        } else {
+        }
+        else
+        {
             mOvertake = false;
             mCatchingOpp = false;
         }
-    } else {
+    }
+    else
+    {
         mOvertake = false;
     }
     // If aside always overtake
-    if (mOppDist > -2.0 && mOppDist <= 1.0) {
+    if (mOppDist > -2.0 && mOppDist <= 1.0)
+    {
         mOvertake = true;
     }
     // Special case: if in front and on raceline stay there
-    if ((mOppDist < 0.0 && mDrvPath == PATH_O && mCatchedRaceLine)) {
+    if ((mOppDist < 0.0 && mDrvPath == PATH_O && mCatchedRaceLine))
+    {
         mOvertake = false;
     }
 
@@ -1217,54 +1398,79 @@ bool TDriver::overtakeOpponent()
 
 int TDriver::overtakeStrategy()
 {
-    if (mOpp == NULL) {
+    if (mOpp == NULL)
+    {
         return mDrvPath;
     }
 
     // Predict side of opponent
     int predict_catchtime_opp_path = PATH_O;
-    if (mOpp->mCatchtime < 10.0) {
+    if (mOpp->mCatchtime < 10.0)
+    {
         double opptomiddle_prediction = mOpp->toMiddle + mOpp->toMiddleChangeRate * mOpp->mCatchtime;
-        if (fabs(opptomiddle_prediction) > 1.0) {
+
+        if (fabs(opptomiddle_prediction) > 1.0)
+        {
             predict_catchtime_opp_path = opptomiddle_prediction > 0.0 ? PATH_L : PATH_R;
         }
     }
 
     int path = mDrvPath;
     // Normal overtaking
-    if (mOpp->mDist > 1.0) {
-        if (predict_catchtime_opp_path) {
-            if (predict_catchtime_opp_path == PATH_L) {
+    if (mOpp->mDist > 1.0)
+    {
+        if (predict_catchtime_opp_path)
+        {
+            if (predict_catchtime_opp_path == PATH_L)
+            {
                 path = PATH_R;
-            } else {
+            }
+            else
+            {
                 path = PATH_L;
             }
-        } else {
+        }
+        else
+        {
             // Generally drive on the side with more space
-            if (fabs(mPath[PATH_R].carpos.tomiddle - mOpp->toMiddle) - fabs(mPath[PATH_L].carpos.tomiddle - mOpp->toMiddle) > 0.0) {
+            if (fabs(mPath[PATH_R].carpos.tomiddle - mOpp->toMiddle) - fabs(mPath[PATH_L].carpos.tomiddle - mOpp->toMiddle) > 0.0)
+            {
                 path = PATH_R;
-            } else {
+            }
+            else
+            {
                 path = PATH_L;
             }
             // But stay on your side when there is enough space
-            if (mOppLeftOfMeHyst) {
-                if (fabs(mPath[PATH_R].carpos.tomiddle - mOpp->toMiddle) > 4.0) {
+            if (mOppLeftOfMeHyst)
+            {
+                if (fabs(mPath[PATH_R].carpos.tomiddle - mOpp->toMiddle) > 4.0)
+                {
                     path = PATH_R;
                 }
-            } else {
-                if (fabs(mPath[PATH_L].carpos.tomiddle - mOpp->toMiddle) > 4.0) {
+            }
+            else
+            {
+                if (fabs(mPath[PATH_L].carpos.tomiddle - mOpp->toMiddle) > 4.0)
+                {
                     path = PATH_L;
                 }
             }
         }
-    } else {
+    }
+    else
+    {
         // Always stay on your side if opponent aside
-        if (mOppLeftOfMe) {
+        if (mOppLeftOfMe)
+        {
             path = PATH_R;
-        } else {
+        }
+        else
+        {
             path = PATH_L;
         }
     }
+
     return path;
 }
 
@@ -1462,6 +1668,50 @@ void TDriver::readConstSpecs(PCarHandle CarHandle)
 
     mBRAKEDISKMU_FRONT = GfParmGetNum(CarHandle, SECT_FRNTRGTBRAKE, PRM_MU, (char*)NULL, 0.30f);
     mBRAKEDISKMU_REAR = GfParmGetNum(CarHandle, SECT_REARRGTBRAKE, PRM_MU, (char*)NULL, 0.30f);
+}
+
+void TDriver::readOptionsSpecs(PCarHandle CarHandle)
+{
+    const char *enabling;
+    enabling = GfParmGetStr(CarHandle, SECT_FEATURES, PRM_TIRETEMPDEG, VAL_NO);
+
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      mHASTYC = true;
+      LogDANDROID.info("#Car has TYC yes\n");
+    }
+    else
+      LogDANDROID.info("#Car has TYC no\n");
+
+    enabling = GfParmGetStr(CarHandle, SECT_FEATURES, PRM_ABSINSIMU, VAL_NO);
+
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      mHASABS = true;
+      LogDANDROID.info("#Car has ABS yes\n");
+    }
+    else
+      LogDANDROID.info("#Car has ABS no\n");
+
+    enabling = GfParmGetStr(CarHandle, SECT_FEATURES, PRM_ESPINSIMU, VAL_NO);
+
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      mHASESP = true;
+      LogDANDROID.info("#Car has ESP yes\n");
+    }
+    else
+      LogDANDROID.info("#Car has ESP no\n");
+
+    enabling = GfParmGetStr(CarHandle, SECT_FEATURES, PRM_TCLINSIMU, VAL_NO);
+
+    if (strcmp(enabling, VAL_YES) == 0)
+    {
+      mHASTCL = true;
+      LogDANDROID.info("#Car has TCL yes\n");
+    }
+    else
+      LogDANDROID.info("#Car has TCL no\n");
 }
 
 void TDriver::readVarSpecs(PCarSettings CarParmHandle)
@@ -2363,3 +2613,29 @@ unsigned int TDriver::GetWeather(const tTrack* t)
 {
     return (t->local.rain << 4) + t->local.water;
 };
+
+double TDriver::TyreConditionFront()
+{
+    return MIN(oCar->_tyreCondition(0), oCar->_tyreCondition(1));
+}
+
+double TDriver::TyreConditionRear()
+{
+    return MIN(oCar->_tyreCondition(2), oCar->_tyreCondition(3));
+}
+
+double TDriver::TyreTreadDepthFront()
+{
+    double Right = (oCar->_tyreTreadDepth(0) - oCar->_tyreCritTreadDepth(0));
+    double Left = (oCar->_tyreTreadDepth(1) - oCar->_tyreCritTreadDepth(1));
+
+    return 100 * MIN(Right,Left);
+}
+
+double TDriver::TyreTreadDepthRear()
+{
+    double Right = (oCar->_tyreTreadDepth(2) - oCar->_tyreCritTreadDepth(2));
+    double Left = (oCar->_tyreTreadDepth(3) - oCar->_tyreCritTreadDepth(3));
+
+    return 100 * MIN(Right, Left);
+}

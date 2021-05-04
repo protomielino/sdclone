@@ -129,6 +129,7 @@ class TDriver
   void readPrivateSection(PCarSettings *CarParmHandle);
   void readConstSpecs(PCarHandle CarHandle);
   void readVarSpecs(PCarSettings CarParmHandle);
+  void readOptionsSpecs(PCarHandle CarHandle);
   void initCa(PCarSettings CarParmHandle);
   void initCw(PCarSettings CarParmHandle);
   void initBrakes();
@@ -146,6 +147,11 @@ class TDriver
 
   void	Meteorology(const tTrack* t);
   unsigned int GetWeather(const tTrack* t);
+
+  double TyreConditionFront();
+  double TyreConditionRear();
+  double TyreTreadDepthFront();
+  double TyreTreadDepthRear();
 
   // Per robot global data
   int mDrvPath;
@@ -328,7 +334,7 @@ class TDriver
   double mBUMPSPEEDFACTOR;
   double mFUELPERMETER;
   double mFUELWEIGHTFACTOR;
-  int mPITDAMAGE;
+  int    mPITDAMAGE;
   double mPITENTRYMARGIN;
   double mPITENTRYSPEED;
   double mPITEXITSPEED;
@@ -346,6 +352,11 @@ class TDriver
   double mOVT_FRONTSPACE;
   double mOVT_FRONTMARGIN;
   double mSTARTCLUTCHRATE;
+
+  bool   mHASTYC;
+  bool   mHASABS;
+  bool   mHASTCL;
+  bool   mHASESP;
 };
 
 #endif // _DRIVER_H_
