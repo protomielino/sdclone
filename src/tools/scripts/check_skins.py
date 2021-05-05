@@ -5,10 +5,10 @@ from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import SubElement
 
 try:
-	import pysvn
-	_has_pysvn = True
+	import svn.local
+	_has_svn = True
 except ImportError:
-	_has_pysvn = False
+	_has_svn = False
 
 try:
 	from git import *
@@ -30,10 +30,10 @@ def check_version(myfile):
 		return None
 
 	# Return SVN revision
-	if _has_pysvn and options.svn:
-		client = pysvn.Client()
-		entry = client.info(myfile)
-		return entry.commit_revision.number
+	if _has_svn and options.svn:
+		client = svn.local.LocalClient(myfile)
+		entry = client.info()
+		return entry["commit_revision"]
 
 	# Return GIT revision
 	if _has_pygit and options.git:
@@ -60,7 +60,7 @@ def get_screenshot(module, index, car, skin, skintargets):
 	config_file = os.sep.join([options.config, "config/raceman/practice.xml"])
 
 	if not os.access(config_file, os.R_OK):
-		print "Can't find 'practice.xml' (", config_file, ","
+		print("Can't find 'practice.xml' (", config_file, ",")
 		return None
 
 	my_ele = ElementTree()
@@ -100,7 +100,7 @@ def get_screenshot(module, index, car, skin, skintargets):
 			'''
 			# dump attributes
 			for k in list(j):
-				print ":", k.attrib["name"], k.attrib["val"]
+				print(":", k.attrib["name"], k.attrib["val"])
 			'''
 
 		if i.attrib["name"] == "Driver Info":
@@ -126,7 +126,7 @@ def process_screenshot(preview):
 		screenshot_file = screenshot_files[0]
 
 		screenshot = Image.open(os.sep.join([options.config, "screenshots", screenshot_file]))
-		scaled = screenshot.resize((800,500), Image.ANTIALIAS)
+		scaled = screenshot.resize((800, 500), Image.ANTIALIAS)
 
 		scaled.save(preview, quality=95, optimize=True, subsampling='4:4:4')
 		os.remove(os.sep.join([options.config, "screenshots", screenshot_file]))
@@ -141,7 +141,8 @@ def check_car(myoptions, module, index, path, car, model):
 	model_ver = check_version(model)
 
 	if (model_ver == None):
-		print "Warning: ACC model not in directory"
+		print("Warning: ACC model not in directory")
+		return
 
 	# Checking for standard
 	standard = ".".join([os.sep.join([path, car]), "png"])
@@ -157,21 +158,21 @@ def check_car(myoptions, module, index, path, car, model):
 		preview_ver = check_version(preview)
 
 		if (model_ver > standard_ver):
-			print "Standard: ACC Model is newer"
+			print("Standard: ACC Model is newer")
 		else:
-			print "Standard: OK"
+			print("Standard: OK")
 
 		if (preview_ver == None):
-			print "Preview : Missing"
+			print("Preview : Missing")
 			screenshot = True
 		elif (preview_ver < 0):
-			print "Preview : Not in version control"
+			print("Preview : Not in version control")
 			screenshot = True
 		elif (preview_ver < standard_ver):
-			print "Preview : Out of date"
+			print("Preview : Out of date")
 			screenshot = True
 		else:
-			print "Preview : OK"
+			print("Preview : OK")
 
 		if options.config and options.run and screenshot:
 			screenshot = get_screenshot(module, index, car, None, "1")
@@ -182,8 +183,8 @@ def check_car(myoptions, module, index, path, car, model):
 			elif _has_PIL:
 				process_screenshot(preview)
 	else:
-		print "Standard: Missing"
-	print
+		print("Standard: Missing")
+	print()
 
 	# Check for alternate skins (specific for this car)
 	alternates = glob.glob("-".join([os.sep.join([path, car]), "*.png"]))
@@ -206,32 +207,32 @@ def check_car(myoptions, module, index, path, car, model):
 					continue
 
 				if (model_ver > alternate_ver):
-					print "Alternate:", os.path.basename(alternate), "(ACC Model is newer)"
+					print("Alternate:", os.path.basename(alternate), "(ACC Model is newer)")
 				else:
-					print "Alternate:", os.path.basename(alternate)
+					print("Alternate:", os.path.basename(alternate))
 
 			else:
 				continue
 
 			wheelfile = "".join([os.sep.join([path, "wheel3d-"]), skin, ".png"])
 			if os.access(wheelfile, os.R_OK):
-				print "Custom Wheel: ", os.path.basename(wheelfile)
+				print("Custom Wheel: ", os.path.basename(wheelfile))
 
 			if (alternate_ver != None):
 				preview = "-".join([filename, "preview.jpg"])
 				preview_ver = check_version(preview)
 
 				if (preview_ver == None):
-					print "Preview : Missing"
+					print("Preview : Missing")
 					screenshot = True
 				elif (preview_ver < 0):
-					print "Preview : Not in version control"
+					print("Preview : Not in version control")
 					screenshot = True
 				elif (preview_ver < standard_ver):
-					print "Preview : Out of date"
+					print("Preview : Out of date")
 					screenshot = True
 				else:
-					print "Preview : OK"
+					print("Preview : OK")
 
 			if options.config and options.run and screenshot:
 				if os.access(wheelfile, os.R_OK):
@@ -244,6 +245,6 @@ def check_car(myoptions, module, index, path, car, model):
 					os.system(" ".join([options.run, preview]))
 				elif _has_PIL:
 					process_screenshot(preview)
-			print
-	print
+			print()
+	print()
 

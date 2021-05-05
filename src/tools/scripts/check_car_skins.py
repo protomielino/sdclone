@@ -10,10 +10,10 @@ global options
 import check_skins
 
 try:
-	import pysvn
-	_has_pysvn = True
+	import svn
+	_has_svn = True
 except ImportError:
-	_has_pysvn = False
+	_has_svn = False
 
 try:
 	from git import *
@@ -30,32 +30,26 @@ parser.add_option("-r",  "--run", dest="run", help="command to run SpeedDreams")
 parser.add_option("-p",  "--proc", dest="proc", help="command to process preview images")
 parser.add_option("-a",  "--all", action="store_true", dest="all", help="process all previews regardless")
 
-if _has_pysvn:
+if _has_svn:
 	parser.add_option("-s", "--svn", action="store_true", dest="svn", help="report svn version numbers")
 if _has_pygit:
 	parser.add_option("-g", "--git", action="store_true", dest="git", help="report git verison numbers")
 
 (options, args) = parser.parse_args()
 
-#---
+# check each of the cars in turn
+for root, _, files in os.walk(options.cars):
+	car =  os.path.basename(root)
 
-def check_dir(args, dirname, names):
-
-	car =  os.path.basename(dirname)
-
-	for name in names:
-		(root, ext) = os.path.splitext(name)
-		if root == car and ext == ".xml":
+	for name in files:
+		(base, ext) = os.path.splitext(name)
+		if base == car and ext == ".xml":
 			# Found config file
-			print "checking", root
-			print "---"
+			print("checking", base)
+			print("---")
 
 			path = os.sep.join([options.cars, car])
 			model = ".".join([os.sep.join([path, car]), "acc"])
 
-			check_skins.check_car(options, "human", "1", path, root, model)
+			check_skins.check_car(options, "human", "1", path, base, model)
 
-#---
-
-# check each of the cars in turn
-os.path.walk(options.cars, check_dir, "")

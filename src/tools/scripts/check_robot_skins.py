@@ -7,10 +7,10 @@ import check_skins
 from optparse import OptionParser
 
 try:
-	import pysvn
-	_has_pysvn = True
+	import svn
+	_has_svn = True
 except ImportError:
-	_has_pysvn = False
+	_has_svn = False
 
 try:
 	from git import *
@@ -35,7 +35,7 @@ parser.add_option("-r",  "--run", dest="run", help="command to run SpeedDreams")
 parser.add_option("-p",  "--proc", dest="proc", help="command to process preview images")
 parser.add_option("-a",  "--all", action="store_true", dest="all", help="process all previews regardless")
 
-if _has_pysvn:
+if _has_svn:
 	parser.add_option("-s", "--svn", action="store_true", dest="svn", help="report svn version numbers")
 if _has_pygit:
 	parser.add_option("-g", "--git", action="store_true", dest="git", help="report git verison numbers")
@@ -43,8 +43,8 @@ if _has_pygit:
 (options, args) = parser.parse_args()
 
 
-print "Checking", args[0]
-print "---"
+print("Checking", args[0])
+print("---")
 
 tree = ElementTree().parse(os.sep.join([options.dir, args[0]]))
 
@@ -60,7 +60,7 @@ for item in list(p):
 		if (driver.attrib["name"] == "car name"):
 			car = driver.attrib["val"]
 		
-	print index, ":", name, "(", car, ")"
+	print(index, ":", name, "(", car, ")")
 
 	module = os.path.splitext(args[0])[0]
 
