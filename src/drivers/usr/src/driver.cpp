@@ -46,6 +46,7 @@
 Driver::Driver(int index) :
     INDEX(index),
     driver_aggression(0.0),
+    mGarage(false),
     mFrontCollMargin(6.0),
     mOvtMargin(2.0)
 {
@@ -92,6 +93,9 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
     *strrchr(trackname, '.') = '\0';
     LogUSR.info( " # USR trackName: '%s'\n", trackname );
     tName = trackname;
+
+    if (strcmp(trackname, "garage") == 0)
+        mGarage = true;
 
     // Setup for this robot
     //void *newParmHandle;
@@ -273,6 +277,8 @@ void Driver::Drive()
 #ifdef TIME_ANALYSIS
     Timer tmr;
 #endif
+    if (mGarage)
+        return;
 
     //mMsg.clearPanel();
     updateTime();

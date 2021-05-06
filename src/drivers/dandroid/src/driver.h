@@ -199,6 +199,7 @@ class TDriver
   double mMu;    // friction coefficient
   double mMass;  // mass of car + fuel
   double mSpeed;
+  double mTyreDegradation;
   double mClutchtime;
   int mPrevgear;
   bool mControlAttackAngle;
@@ -357,6 +358,7 @@ class TDriver
   bool   mHASABS;
   bool   mHASTCL;
   bool   mHASESP;
+  bool   mGarage;
 };
 
 #endif // _DRIVER_H_

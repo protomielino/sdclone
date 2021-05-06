@@ -55,14 +55,17 @@ public:
     double getNPitLoc() { return p[3].x; }
     double getNPitEnd() { return p[5].x; }
     double toSplineCoord(double x);
-    void   update(double fromstart);
+    void   update(double fromstart, double tyre);
     int    getRepair();
+    bool   pitForPenalty();
     double getFuel();
     double getSpeedlimit();
     double getSpeedlimit(double fromstart);
     double getDist();
     double getSideDist();
     void   pitCommand();
+    double avgWearPerMeter() const { return mAvgWearPerMeter; }
+
 
 public:
     PTrack track;
@@ -76,6 +79,7 @@ public:
     Spline dtspline;         /* spline for drive throught */
     bool pitstop;            /* pitstop planned */
     bool penalty;
+    bool pittyres;
     bool inpitlane;          /* we are still in the pit lane */
     double mFromStart;
     double pitentry;         /* distance to start line of the pit entry */
@@ -90,6 +94,8 @@ public:
     double totalfuel;        /* the total amount of fuel we needed for the race */
     int fuellapscounted;     /* the total laps we counted, maybe we miss a lap */
     double avgfuelperlap;    /* the average amount of fuel we needed for a lap */
+    double mAvgWearPerMeter; /* the average amount of tyre we needed for a lapv*/
+    double mPitGripFactor;
     int PIT_DAMAGE;
     int MAX_DAMAGE;
     int MAX_DAMAGE_DIST;

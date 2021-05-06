@@ -96,6 +96,9 @@ TDriver::TDriver(int index)
     mHASABS = false;
     mHASESP = false;
     mHASTCL = false;
+    mGarage = false;
+    mTyreDegradation = 0.0;
+
     initVars();
     setPrevVars();
 }
@@ -114,6 +117,9 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings *CarPar
     strncpy(trackname, strrchr(Track->filename, '/') + 1, sizeof(trackname));
     *strrchr(trackname, '.') = '\0';
     char buffer[1024];
+
+    if (strcmp(trackname, "garage") == 0)
+        mGarage = true;
 
     // Discover the car type used
     void* handle = NULL;
@@ -307,6 +313,9 @@ void TDriver::Drive()
     gettimeofday(&tv, NULL);
     double usec1 = tv.tv_usec;
 #endif
+    if(mGarage)
+        return;
+
     updateTime();
     updateTimer();
     updateBasics();
@@ -449,7 +458,7 @@ void TDriver::updateBasics()
     updateStuck();
     updateAttackAngle();
     updateCurveAhead();
-    mPit.update(mFromStart);
+    mPit.update(mFromStart, mTyreDegradation);
 }
 
 void TDriver::updateOpponents()
@@ -2310,6 +2319,10 @@ void TDriver::calcMaxspeed()
         }
 
         mMaxspeed = mSkillGlobal * mMaxspeed;
+
+        if (mHASTYC)
+            mMaxspeed = MIN(TyreConditionFront(), TyreConditionRear()) * mMaxspeed;
+
         // Special cases
         if (mLetPass) {
             mMaxspeed = 0.85 * maxspeed;

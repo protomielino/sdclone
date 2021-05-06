@@ -177,7 +177,8 @@ Driver::Driver(int index) :	INDEX(index),
       _tctrlAcc(0),
       _deltaCounter(0),
       _prevDelta(0),
-      _lastSpd0(0)
+      _lastSpd0(0),
+      m_garage(false)
 {
     for( int i = 0; i < 50; i++ )
     {
@@ -281,7 +282,10 @@ void	Driver::InitTrack(
     strncpy(m_trackName, strrchr(pTrack->filename, '/') + 1, 99);
     m_trackName[99] = '\0';
     *strrchr(m_trackName, '.') = '\0';
-    LogSHADOW.debug( " # Shadow trackName: '%s'\n", m_trackName );
+    LogSHADOW.info( " # Shadow trackName: '%s'\n", m_trackName );
+
+    if (strcmp(m_trackName, "garage") == 0)
+        m_garage = true;
 
     //
     //	set up race type array.
@@ -2436,6 +2440,9 @@ void	Driver::launchControlFullThrottle( tCarElt* car, tSituation* s )
 
 void	Driver::Drive( int index, tCarElt* car, tSituation* s )
 {
+    if (strcmp(m_trackName, "garage") == 0)
+        m_garage = true;
+
     m_cm[PATH_NORMAL].update( car, s );
 
 /*#if EXPERIMENTAL

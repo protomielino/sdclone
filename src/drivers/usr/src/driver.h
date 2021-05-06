@@ -204,6 +204,7 @@ private:
     double SkillGlobal;
     double SkillDriver;
     bool   pitsharing;
+    bool   mGarage;
 
     double simtime;                // how long since the race started
 

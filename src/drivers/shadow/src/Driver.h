@@ -511,6 +511,7 @@ private:
     int				_deltaCounter;
     double			_prevDelta;
     double			_lastSpd0;
+    bool            m_garage;
 };
 
 #endif // _DRIVER_H_

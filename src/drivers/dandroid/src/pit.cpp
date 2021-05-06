@@ -55,6 +55,7 @@ void Pit::init(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentr
     totalfuel = 0.0;
     fuellapscounted = 0;
     avgfuelperlap = 0.0;
+    mPitGripFactor = 0.0;
     lastpitfuel = 0.0;
     lastfuel = 0.0;
     mHASTYC = HASTYC;
@@ -251,11 +252,13 @@ bool Pit::isPitlimit(double fromstart)
 }
 
 // update pit data and strategy
-void Pit::update(double fromstart)
+void Pit::update(double fromstart, double tyre)
 {
     mFromStart = fromstart;
+
     if (mypit != NULL)
     {
+        penalty = 0;      // fuel, damage and tires served before penalty
         int remainingLaps = car->_remainingLaps - car->_lapsBehindLeader;
 
         if (isBetween(mFromStart))
@@ -269,6 +272,14 @@ void Pit::update(double fromstart)
         {
             setInPit(false);
         }
+
+        if(mHASTYC)
+            pittyres = (tyre < mPitGripFactor && remainingLaps * track->length > 10000.0 && tyre < 0.4);
+        else
+        {
+            pittyres = false;
+        }
+
         // fuel update
         int id = car->_trkPos.seg->id;
 
@@ -336,8 +347,34 @@ void Pit::update(double fromstart)
             {
                 setPitstop(true);
             }
+            else if (pitForPenalty())
+            {
+                setPitstop(true);
+            }
         }
     }
+}
+
+bool Pit::pitForPenalty()
+{
+    // Do we need to serve a penalty
+    tCarPenalty *Penalty = GF_TAILQ_FIRST(&(car->_penaltyList));
+
+    if (Penalty)
+    {
+        if (Penalty->penalty == RM_PENALTY_DRIVETHROUGH || Penalty->penalty == RM_PENALTY_STOPANDGO)
+        {
+            // Rudimentary strategy here - always serving the penalty straightaway.
+            // there's almost certainly more clever ways of doing this, as there's
+            // five laps after the penalty in which to serve it before the car is
+            // eliminated.
+            penalty = Penalty->penalty;
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 // Computes the amount of fuel
