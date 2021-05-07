@@ -31,8 +31,7 @@
 extern GfLogger* PLogDANDROID;
 #define LogDANDROID (*PLogDANDROID)
 
-class PathInfo
-{
+class PathInfo {
   public:
   DanPoint carpos;
   DanPoint tarpos;
@@ -41,8 +40,7 @@ class PathInfo
 };
 
 
-class TDriver
-{
+class TDriver {
   public:
   TDriver(int index);
   ~TDriver();
@@ -77,7 +75,7 @@ class TDriver
   double getBrake(double maxspeed);
   double getAccel(double maxspeed);
   double getSteer();
-  int    getGear();
+  int getGear();
   double getClutch();
   bool stateStuck();
   bool stateOfftrack();
@@ -129,7 +127,6 @@ class TDriver
   void readPrivateSection(PCarSettings *CarParmHandle);
   void readConstSpecs(PCarHandle CarHandle);
   void readVarSpecs(PCarSettings CarParmHandle);
-  void readOptionsSpecs(PCarHandle CarHandle);
   void initCa(PCarSettings CarParmHandle);
   void initCw(PCarSettings CarParmHandle);
   void initBrakes();
@@ -142,16 +139,8 @@ class TDriver
   double getFuel(double dist);
   void writeSectorSpeeds();
   bool readSectorSpeeds();
-  void driverMsg(const std::string &desc);
-  void driverMsgValue(int priority, const std::string &desc, double value);
-
-  void	Meteorology(const tTrack* t);
-  unsigned int GetWeather(const tTrack* t);
-
-  double TyreConditionFront();
-  double TyreConditionRear();
-  double TyreTreadDepthFront();
-  double TyreTreadDepthRear();
+  void driverMsg(std::string desc);
+  void driverMsgValue(int priority, std::string desc, double value);
 
   // Per robot global data
   int mDrvPath;
@@ -199,7 +188,6 @@ class TDriver
   double mMu;    // friction coefficient
   double mMass;  // mass of car + fuel
   double mSpeed;
-  double mTyreDegradation;
   double mClutchtime;
   int mPrevgear;
   bool mControlAttackAngle;
@@ -306,14 +294,9 @@ class TDriver
   int mAccelXCount;
   double mSkillGlobal;
   double mSkillDriver;
-
-  bool          mRain;
-  double        mRainIntensity;
-  unsigned int  mWeatherCode;
-
   PidController mSpeedController;
   PidController mAttackAngleController;
-  int           mWatchdogCount;
+  int mWatchdogCount;
   // Data that should stay constant after first initialization
   double mBRAKEPRESS;
   double mBRAKEREPARTITION;
@@ -335,7 +318,7 @@ class TDriver
   double mBUMPSPEEDFACTOR;
   double mFUELPERMETER;
   double mFUELWEIGHTFACTOR;
-  int    mPITDAMAGE;
+  int mPITDAMAGE;
   double mPITENTRYMARGIN;
   double mPITENTRYSPEED;
   double mPITEXITSPEED;
@@ -353,12 +336,6 @@ class TDriver
   double mOVT_FRONTSPACE;
   double mOVT_FRONTMARGIN;
   double mSTARTCLUTCHRATE;
-
-  bool   mHASTYC;
-  bool   mHASABS;
-  bool   mHASTCL;
-  bool   mHASESP;
-  bool   mGarage;
 };
 
 #endif // _DRIVER_H_
