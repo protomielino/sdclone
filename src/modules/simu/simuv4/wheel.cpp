@@ -130,8 +130,8 @@ void SimWheelConfig(tCar *car, int index)
     wheel->muTDmult[1] = (tdble) ((1.0 - wheel->muTDoffset[1]) / (1.0 - wheel->critTreadDepth));
     wheel->muTDoffset[1] = wheel->muTDoffset[1] - wheel->muTDmult[1] * wheel->critTreadDepth;
 
-    GfLogInfo(" # Sim heatingm = %.9f\n", wheel->heatingm);
-    GfLogInfo(" # Sim wearrate = %.9f\n", wheel->wearrate);
+    GfLogDebug(" # Sim heatingm = %.9f\n", wheel->heatingm);
+    GfLogDebug(" # Sim wearrate = %.9f\n", wheel->wearrate);
 
     /* components */
     SimSuspConfig(car, hdle, SuspSect[index], &(wheel->susp), index);
