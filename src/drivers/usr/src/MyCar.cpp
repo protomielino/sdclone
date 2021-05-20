@@ -211,6 +211,12 @@ void MyCar::update(double dt)
     mMass = mCarMass + mFuelWeightFactor * mCar->_fuel;
     mSpeedX = mCar->_speed_x;
     mTires.update();
+
+    if(HASTYC)
+    {
+        LogUSR.debug("Friction : %.8f- Tyre temperature = %.3f\n", mTires.TyreCondition(), mCar->priv.wheel[0].temp_mid);
+    }
+
     mSegMu = mTires.gripFactor() * mTireMu * mCar->_trkPos.seg->surface->kFriction;
     mCW = mBodyCW * (1.0 + mCar->_dammage / 10000.0) + mWingCW;
     mToMiddle = mCar->_trkPos.toMiddle;

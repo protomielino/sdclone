@@ -76,21 +76,11 @@ void Tires::update()
 double Tires::updateGripFactor() const
 {
     double gripFactor = 1.0 * mMuScale;
-    /*double initialTemp =  273.15 + 20.0;
-    double windowLowTemp = 273.15 + 80.0;
-    double idealTemp = mCar->info.wheel[0].idealTemperature;
 
-
-    for(int i = 0; i < 4; i++)
+    if(HasTYC)
     {
-        double currTemp = mCar->priv.wheel[i].currentTemperature;
-        double currGrain = mCar->priv.wheel[i].currentGraining;
-        double di = (currTemp >= windowLowTemp ? 1.0 : currTemp - idealTemp) / (idealTemp - initialTemp);
-        if (currTemp > mHotTemp)
-            di = ((idealTemp - (currTemp - mHotTemp) * 7) - idealTemp) / (idealTemp - initialTemp);
-
-        gripFactor += ((1.0 - (std::min((di * di), 1.0))) / 4.0 + 3.0 / 4.0) * (1.0 - currGrain / 10.0);
-    }*/
+        gripFactor *= TyreCondition();
+    }
 
     return gripFactor;
 }

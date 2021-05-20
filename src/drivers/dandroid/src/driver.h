@@ -124,6 +124,12 @@ class TDriver {
   double filterTCL_FWD();
   double filterTCL_RWD();
   double filterTCLSideSlip(double accel);
+  double TyreConditionFront();
+  double TyreConditionRear();
+  double TyreCondition();
+  double TyreTreadDepthFront();
+  double TyreTreadDepthRear();
+  double TyreTreadDepth();
   void readPrivateSection(PCarSettings *CarParmHandle);
   void readConstSpecs(PCarHandle CarHandle);
   void readVarSpecs(PCarSettings CarParmHandle);
@@ -141,6 +147,7 @@ class TDriver {
   bool readSectorSpeeds();
   void driverMsg(std::string desc);
   void driverMsgValue(int priority, std::string desc, double value);
+
 
   // Per robot global data
   int mDrvPath;
@@ -336,6 +343,10 @@ class TDriver {
   double mOVT_FRONTSPACE;
   double mOVT_FRONTMARGIN;
   double mSTARTCLUTCHRATE;
+  bool   mHASTYC;
+  bool   mHASABS;
+  bool   mHASTCL;
+  bool   mHASESP;
 };
 
 #endif // _DRIVER_H_

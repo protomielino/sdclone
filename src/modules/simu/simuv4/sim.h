@@ -124,7 +124,6 @@ extern tdble simDammageFactor[];
 extern tdble simSkidFactor[];
 
 extern tdble SimRain;
-extern tdble SimWater;
 extern tdble SimTimeOfDay;
 extern int   SimDay;
 extern tdble SimHumidity;

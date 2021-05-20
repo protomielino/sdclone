@@ -33,7 +33,7 @@ void SimAtmospherePreConfig(tTrack *track)
     tm *g = gmtime(&simuTime);
     simuMonth = 1 + g->tm_mon;
 
-    SimRain = track->local.rain;
+    SimRain = track->local.rain * 1e-9;
     SimTimeOfDay = track->local.timeofday;
     SimClouds = track->local.clouds;
     Tair = track->local.airtemperature + 273.15f;

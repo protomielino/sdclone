@@ -39,6 +39,7 @@ t3Dd vectStart[16];
 t3Dd vectEnd[16];
 
 tdble SimRain = 0;
+tdble SimWater = 0;
 tdble SimTimeOfDay = 0;
 int SimClouds = 0;
 

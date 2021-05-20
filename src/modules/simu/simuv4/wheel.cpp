@@ -113,9 +113,11 @@ void SimWheelConfig(tCar *car, int index)
     coldmufactor = MIN(MAX(coldmufactor, 0.0f), 1.0f);
     wheel->muTmult = (1 - coldmufactor) / ((wheel->Topt - 273) * (wheel->Topt - 273));
     wheel->heatingm = GfParmGetNum(hdle, WheelSect[index], PRM_HEATINGMULT, (char*)NULL, (tdble) 6e-5);
+    wheel->heatingm -=SimRain;
     wheel->aircoolm = GfParmGetNum(hdle, WheelSect[index], PRM_AIRCOOLINGMULT, (char*)NULL, (tdble) 12e-4);
     wheel->speedcoolm = GfParmGetNum(hdle, WheelSect[index], PRM_SPEEDCOOLINGMULT, (char*)NULL, (tdble) 0.25);
     wheel->wearrate = GfParmGetNum(hdle, WheelSect[index], PRM_WEARRATE, (char*)NULL, (tdble) 1.5e-8);
+    wheel->wearrate -= SimRain;
     wheel->wearrate = MIN(MAX(wheel->wearrate, 0.0f), 0.1f);
     wheel->critTreadDepth = GfParmGetNum(hdle, WheelSect[index], PRM_FALLOFFTREADDEPTH, (char*)NULL, (tdble) 0.03);
     wheel->critTreadDepth = MIN(MAX(wheel->critTreadDepth, 0.0001f), 0.9999f);
@@ -127,6 +129,9 @@ void SimWheelConfig(tCar *car, int index)
     wheel->muTDmult[0] = (wheel->muTDoffset[1] - wheel->muTDoffset[0]) / wheel->critTreadDepth;
     wheel->muTDmult[1] = (tdble) ((1.0 - wheel->muTDoffset[1]) / (1.0 - wheel->critTreadDepth));
     wheel->muTDoffset[1] = wheel->muTDoffset[1] - wheel->muTDmult[1] * wheel->critTreadDepth;
+
+    GfLogInfo(" # Sim heatingm = %.9f\n", wheel->heatingm);
+    GfLogInfo(" # Sim wearrate = %.9f\n", wheel->wearrate);
 
     /* components */
     SimSuspConfig(car, hdle, SuspSect[index], &(wheel->susp), index);

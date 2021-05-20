@@ -115,15 +115,17 @@ double TFixCarParam::CalcAcceleration(
     double TcF = oDriver->TyreConditionFront();
     double TcR = oDriver->TyreConditionRear();
     MU = MIN(TcF*MU,TcR*MU);
+    LogSimplix.info(" Friction F = %.3f - Friction R = %.3f - Tyre mu = %.3f - Tyre temperature = %.5f\n", TcF, TcR, oCar->priv.wheel[0].effectiveMu,
+            oCar->priv.wheel[0].temp_mid);
   }
 
-  double CD = oCdBody * 
-	(1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
+  double CD = oCdBody *
+    (1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
 
   double Crv = (0.25*Crv0  + 0.75*Crv1);
-  double Crvz = (0.25*Crvz0 + 0.75*Crvz1); 
+  double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
   if (Crvz > 0)
-	Crvz = 0;
+    Crvz = 0;
 
   double Gdown = G * cos(TrackRollAngle);
   double Glat = G * sin(TrackRollAngle);
@@ -139,28 +141,28 @@ double TFixCarParam::CalcAcceleration(
     double AvgV = (U + V) * 0.5;
     double AvgV2 = AvgV * AvgV;
 
-    double Fdown = oTmpCarParam->oMass * Gdown 
-	  + (oTmpCarParam->oMass * Crvz + oCa) * AvgV2;
+    double Fdown = oTmpCarParam->oMass * Gdown
+      + (oTmpCarParam->oMass * Crvz + oCa) * AvgV2;
     double Froad = Fdown * MU;
     double Flat = oTmpCarParam->oMass * Glat;
     double Ftan = oTmpCarParam->oMass * Gtan - CD * AvgV2;
 
     double Flatroad = fabs(oTmpCarParam->oMass * AvgV2 * Crv - Flat);
     if (Flatroad > Froad)
-  	  Flatroad = Froad;
+      Flatroad = Froad;
 
-	double Ftanroad = sqrt(Froad * Froad - Flatroad * Flatroad) + Ftan;
+    double Ftanroad = sqrt(Froad * Froad - Flatroad * Flatroad) + Ftan;
 
-	double Acc = Ftanroad / oTmpCarParam->oMass;
-	double MaxAcc = MIN(11.5,AccFromSpd.CalcY(AvgV));
+    double Acc = Ftanroad / oTmpCarParam->oMass;
+    double MaxAcc = MIN(11.5,AccFromSpd.CalcY(AvgV));
     if (Acc > MaxAcc)
-	  Acc = MaxAcc;
+      Acc = MaxAcc;
 
-	double Inner = MAX(0, U * U + 2 * Acc * Dist);
-	V = sqrt(Inner);
-	if (fabs(V - OldV) < 0.001)
-	  break;
-	OldV = V;
+    double Inner = MAX(0, U * U + 2 * Acc * Dist);
+    V = sqrt(Inner);
+    if (fabs(V - OldV) < 0.001)
+      break;
+    OldV = V;
   }
   return V;
 }
@@ -206,13 +208,13 @@ double TFixCarParam::CalcBraking
     Mu = MIN(MuF,MuR);
 
   // From SD:
-  double Cd = oCdBody * 
-	(1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
+  double Cd = oCdBody *
+    (1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
 
   Crv *= oDriver->CalcCrv(fabs(Crv));
 
   if (Crvz > 0)
-    Crvz = 0; 
+    Crvz = 0;
 
   double Gdown = G * cos(TrackRollAngle) * cos(TrackTiltAngle);
   double Glat  = fabs(G * sin(TrackRollAngle));
@@ -224,41 +226,41 @@ double TFixCarParam::CalcBraking
 
   for (int I = 0; I < 10; I++)
   {
-	double AvgV = (U + V) * 0.5;
-	double AvgV2 = AvgV * AvgV;
+    double AvgV = (U + V) * 0.5;
+    double AvgV2 = AvgV * AvgV;
 
-	double Froad;
-	double Fdown = oTmpCarParam->oMass * Gdown 
-		+ (oTmpCarParam->oMass * Crvz + (oCaFrontGroundEffect + oCaRearGroundEffect)) * AvgV2;
-	double Ffrnt = oCaFrontWing * AvgV2;
-	double Frear = oCaRearWing * AvgV2;
+    double Froad;
+    double Fdown = oTmpCarParam->oMass * Gdown
+        + (oTmpCarParam->oMass * Crvz + (oCaFrontGroundEffect + oCaRearGroundEffect)) * AvgV2;
+    double Ffrnt = oCaFrontWing * AvgV2;
+    double Frear = oCaRearWing * AvgV2;
 
-	Froad = 0.95 * Fdown * Mu + Ffrnt * MuF + Frear * MuR;
+    Froad = 0.95 * Fdown * Mu + Ffrnt * MuF + Frear * MuR;
 
-	double Flat  = oTmpCarParam->oMass * Glat;
-	double Ftan  = oTmpCarParam->oMass * Gtan - Cd * AvgV2;
+    double Flat  = oTmpCarParam->oMass * Glat;
+    double Ftan  = oTmpCarParam->oMass * Gtan - Cd * AvgV2;
 
-	double Flatroad = MAX(0.0,oTmpCarParam->oMass * AvgV2 * fabs(Crv) - Flat);
-	if (Flatroad > Froad)
-	  Flatroad = Froad;
+    double Flatroad = MAX(0.0,oTmpCarParam->oMass * AvgV2 * fabs(Crv) - Flat);
+    if (Flatroad > Froad)
+      Flatroad = Froad;
 
-	double Ftanroad = -sqrt(Froad * Froad - Flatroad * Flatroad) + Ftan;
+    double Ftanroad = -sqrt(Froad * Froad - Flatroad * Flatroad) + Ftan;
 
-	Acc = CarParam.oScaleBrake * Ftanroad 
-	  / (oTmpCarParam->oMass * ( 3 + oTmpCarParam->oSkill) / 4);
-    
-	if (TDriver::UseBrakeLimit)
-	{
-	  double Radius = 1.0 / fabs(Crv);
-	  double factor = MIN(1.0,MAX(0.39, (Radius - 190.0) / 100.0));
-	  Acc = MAX(Acc,TDriver::BrakeLimit * factor);
-	}
+    Acc = CarParam.oScaleBrake * Ftanroad
+      / (oTmpCarParam->oMass * ( 3 + oTmpCarParam->oSkill) / 4);
 
-	double Inner = MAX(0, V * V - 2 * Acc * Dist);
-	double OldU = U;
-	U = sqrt(Inner);
-	if (fabs(U - OldU) < 0.001)
-	  break;
+    if (TDriver::UseBrakeLimit)
+    {
+      double Radius = 1.0 / fabs(Crv);
+      double factor = MIN(1.0,MAX(0.39, (Radius - 190.0) / 100.0));
+      Acc = MAX(Acc,TDriver::BrakeLimit * factor);
+    }
+
+    double Inner = MAX(0, V * V - 2 * Acc * Dist);
+    double OldU = U;
+    U = sqrt(Inner);
+    if (fabs(U - OldU) < 0.001)
+      break;
   }
 
   double MidSpeed = (U + Speed)/2;
@@ -273,7 +275,7 @@ double TFixCarParam::CalcBraking
   else
     LogSimplix.error("U: %g < B: %g\n",U*3.6,BrakeTargetSpeed*3.6);
 */
-	// Sanity check
+    // Sanity check
   return (float) MAX(ResultTargetSpeed,Speed);
 }
 //==========================================================================*
@@ -318,13 +320,13 @@ double	TFixCarParam::CalcBrakingPit
     Mu = MIN(MuF,MuR);
 
   // From TORCS:
-  double Cd = oCdBody * 
-	(1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
+  double Cd = oCdBody *
+    (1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
 
   Crv *= oDriver->CalcCrv(fabs(Crv));
 
   if (Crvz > 0)
-	Crvz = 0; 
+    Crvz = 0;
 
   double Gdown = G * cos(TrackRollAngle);
   double Glat  = G * sin(TrackRollAngle);
@@ -335,41 +337,41 @@ double	TFixCarParam::CalcBrakingPit
 
   for (int I = 0; I < 10; I++)
   {
-	double AvgV = (U + V) * 0.5;
-	double AvgV2 = AvgV * AvgV;
+    double AvgV = (U + V) * 0.5;
+    double AvgV2 = AvgV * AvgV;
 
-	double Froad;
-	double Fdown = oTmpCarParam->oMass * Gdown 
-		+ (oTmpCarParam->oMass * Crvz + (oCaFrontGroundEffect + oCaRearGroundEffect)) * AvgV2;
-	double Ffrnt = oCaFrontWing * AvgV2;
-	double Frear = oCaRearWing * AvgV2;
+    double Froad;
+    double Fdown = oTmpCarParam->oMass * Gdown
+        + (oTmpCarParam->oMass * Crvz + (oCaFrontGroundEffect + oCaRearGroundEffect)) * AvgV2;
+    double Ffrnt = oCaFrontWing * AvgV2;
+    double Frear = oCaRearWing * AvgV2;
 
-	Froad = Fdown * Mu + Ffrnt * MuF + Frear * MuR;
+    Froad = Fdown * Mu + Ffrnt * MuF + Frear * MuR;
 
-	double Flat  = oTmpCarParam->oMass * Glat;
-	double Ftan  = oTmpCarParam->oMass * Gtan - Cd * AvgV2;
+    double Flat  = oTmpCarParam->oMass * Glat;
+    double Ftan  = oTmpCarParam->oMass * Gtan - Cd * AvgV2;
 
-	double Flatroad = fabs(oTmpCarParam->oMass * AvgV2 * Crv - Flat);
-	if (Flatroad > Froad)
-	  Flatroad = Froad;
+    double Flatroad = fabs(oTmpCarParam->oMass * AvgV2 * Crv - Flat);
+    if (Flatroad > Froad)
+      Flatroad = Froad;
 
-	double Ftanroad = -sqrt(Froad * Froad - Flatroad * Flatroad) + Ftan;
+    double Ftanroad = -sqrt(Froad * Froad - Flatroad * Flatroad) + Ftan;
 
-	double Acc = CarParam.oScaleBrakePit * Ftanroad 
-	  / oTmpCarParam->oMass;
+    double Acc = CarParam.oScaleBrakePit * Ftanroad
+      / oTmpCarParam->oMass;
 
-	//if (TDriver::UseBrakeLimit)
-	{
-	  double Radius = 1.0 / fabs(Crv);
-	  double factor = MIN(1.0,MAX(0.39, (Radius - 190.0) / 100.0));
-	  Acc = MAX(Acc,TDriver::BrakeLimit * factor);
-	}
+    //if (TDriver::UseBrakeLimit)
+    {
+      double Radius = 1.0 / fabs(Crv);
+      double factor = MIN(1.0,MAX(0.39, (Radius - 190.0) / 100.0));
+      Acc = MAX(Acc,TDriver::BrakeLimit * factor);
+    }
 
-	double Inner = MAX(0, V * V - 2 * Acc * Dist);
-	double OldU = U;
-	U = sqrt(Inner);
-	if (fabs(U - OldU) < 0.001)
-	  break;
+    double Inner = MAX(0, V * V - 2 * Acc * Dist);
+    double OldU = U;
+    U = sqrt(Inner);
+    if (fabs(U - OldU) < 0.001)
+      break;
   }
 
   double MidSpeed = (U + Speed)/2;
@@ -414,8 +416,8 @@ double TFixCarParam::CalcMaxSpeed
 
   if (oDriver->oCarNeedsSinLong)
   {
-	if (SinLat < SinLong)
-		  Sin = SinLong;
+    if (SinLat < SinLong)
+          Sin = SinLong;
   }
 
   double AbsCrv0 = MAX(0.001, fabs(Crv0));
@@ -424,17 +426,17 @@ double TFixCarParam::CalcMaxSpeed
   double factor = 1.0;
 
   if (AbsCrv < 1/200.0)
-	CrvZ *= oDriver->oCrvZScale;
+    CrvZ *= oDriver->oCrvZScale;
 
   if (AbsCrv > AbsCrv1)
   {
-	if (oDriver->oUseAccelOut)
-	  factor = 1.015; 
+    if (oDriver->oUseAccelOut)
+      factor = 1.015;
     AbsCrv *= oDriver->CalcCrv(AbsCrv);
   }
   else
   {
-	factor = 0.985;
+    factor = 0.985;
     AbsCrv *= oDriver->CalcCrv(AbsCrv);
   }
 
@@ -460,19 +462,19 @@ double TFixCarParam::CalcMaxSpeed
     Mu = MIN(MuF,MuR) / oTmpCarParam->oSkill;
 
   Den = (AbsCrv - ScaleBump * CrvZ)
-    - (oCaFrontWing * MuF + oCaRearWing * MuR 
-	+ oCaFrontGroundEffect * MuF + oCaRearGroundEffect * MuR) / oTmpCarParam->oMass;
+    - (oCaFrontWing * MuF + oCaRearWing * MuR
+    + oCaFrontGroundEffect * MuF + oCaRearGroundEffect * MuR) / oTmpCarParam->oMass;
 
   if (Den < 0.00001)
    Den = 0.00001;
 
   if (AbsCrv > 0.002)
   {
-	  if (Sin * SGN(Crv0) < 0)
-	  {
-		  Sin *= 8.0;
-		  Sin = SGN(Sin) * MIN(0.05,fabs(Sin));
-	  }
+      if (Sin * SGN(Crv0) < 0)
+      {
+          Sin *= 8.0;
+          Sin = SGN(Sin) * MIN(0.05,fabs(Sin));
+      }
   }
 
   double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(Crv0) + CrvZ) / Den);
@@ -491,8 +493,8 @@ double TFixCarParam::CalcMaxSpeed
 double TFixCarParam::CalcMaxLateralF
   (double Speed, double Friction, double Crvz) const
 {
-  double Fdown = oTmpCarParam->oMass * G 
-	+ (oTmpCarParam->oMass * Crvz + oCa) * Speed * Speed;
+  double Fdown = oTmpCarParam->oMass * G
+    + (oTmpCarParam->oMass * Crvz + oCa) * Speed * Speed;
   return Fdown * Friction * oTyreMu;
 }
 //==========================================================================*
