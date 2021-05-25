@@ -205,8 +205,10 @@ IF(MSVC)
 ENDIF(MSVC)
 
 
-# Usefull for using an installation of SD as a robot development framework without building it.
-INSTALL_SD_CMAKE()
+# Useful for using an installation of SD as a robot development framework without building it.
+IF(LINUX)
+   INSTALL_SD_CMAKE()
+ENDIF(LINUX)
 
 # Must be the last ADD_SUBDIRECTORY for FIXUP_BUNDLE to work
 ADD_SUBDIRECTORY(packaging)
