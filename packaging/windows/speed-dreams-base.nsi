@@ -281,7 +281,7 @@ Section -Shortcuts
 
   SetOutPath "$INSTDIR\bin"
 
-  CreateShortCut "$SMPROGRAMS\${GAME_VERSIONNED_NAME}\${GAME_VERSIONNED_NAME}.lnk" "$INSTDIR\bin\${GAME_FS_NAME}.exe" "" "" 0 SW_SHOWMINIMIZED
+  CreateShortCut "$SMPROGRAMS\${GAME_VERSIONNED_NAME}\${GAME_VERSIONNED_NAME}.lnk" "$INSTDIR\bin\${GAME_FS_NAME}.exe" "" "" 0 SW_SHOWNORMAL "" "an Open Motorsport Sim"
   CreateShortCut "$SMPROGRAMS\${GAME_VERSIONNED_NAME}\User Manual.lnk" "$INSTDIR\doc\how_to_drive.html"
   CreateShortCut "$SMPROGRAMS\${GAME_VERSIONNED_NAME}\Frequently Asked Questions.lnk" "$INSTDIR\doc\faq.html"
   CreateShortCut "$SMPROGRAMS\${GAME_VERSIONNED_NAME}\Read me.lnk" "$INSTDIR\readme.txt"
@@ -295,7 +295,7 @@ Section -Shortcuts
   CreateShortCut "$SMPROGRAMS\${GAME_VERSIONNED_NAME}\Uninstall.lnk" "$INSTDIR\uninst.exe"
 
   ; Desktop shortcut
-  CreateShortCut "$DESKTOP\${GAME_VERSIONNED_NAME}.lnk" "$INSTDIR\bin\${GAME_FS_NAME}.exe" "" "" 0 SW_SHOWMINIMIZED
+  CreateShortCut "$DESKTOP\${GAME_VERSIONNED_NAME}.lnk" "$INSTDIR\bin\${GAME_FS_NAME}.exe" "" "" 0 SW_SHOWNORMAL "" "an Open Motorsport Sim"
 
   ; Game shortcuts console settings for more accurate/easy bug reports (120x9999 history, 120x40 window)
   WriteRegDWORD HKCU "Console\${GAME_VERSIONNED_NAME}" "ScreenBufferSize" 0x270f0078
