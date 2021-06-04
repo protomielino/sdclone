@@ -141,8 +141,12 @@ SDRender::~SDRender(void)
         m_Root = NULL;
     }
 
-    delete thesky;
-    thesky = NULL;
+    if (thesky)
+    {
+        delete thesky;
+        thesky = NULL;
+    }
+
     SDTrack = NULL;
 }
 
