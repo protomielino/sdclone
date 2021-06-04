@@ -115,7 +115,7 @@ double TFixCarParam::CalcAcceleration(
     double TcF = oDriver->TyreConditionFront();
     double TcR = oDriver->TyreConditionRear();
     MU = MIN(TcF*MU,TcR*MU);
-    LogSimplix.info(" Friction F = %.3f - Friction R = %.3f - Tyre mu = %.3f - Tyre temperature = %.5f\n", TcF, TcR, oCar->priv.wheel[0].effectiveMu,
+    LogSimplix.debug(" Friction F = %.3f - Friction R = %.3f - Tyre mu = %.3f - Tyre temperature = %.5f\n", TcF, TcR, oCar->priv.wheel[0].effectiveMu,
             oCar->priv.wheel[0].temp_mid);
   }
 
