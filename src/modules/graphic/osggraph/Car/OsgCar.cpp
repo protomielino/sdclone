@@ -85,18 +85,18 @@ SDCar::~SDCar(void)
 void SDCar::loadCarLights(tCarElt *Car)
 {
     SDCarLights *carLights = (SDCarLights*)getCarLights();
-    
+
     if (lights_branch)
         carLights->getLightsRoot()->removeChild(lights_branch);
     lights_branch = new osg::MatrixTransform;
-    
+
     char path[1024] = {};
     void *handle = Car->_carHandle;
     snprintf(path, 1023, "%s/%s", SECT_GROBJECTS, SECT_LIGHT);
     int lightNum = GfParmGetEltNb(handle, path);
     for (int i = 0; i < lightNum; i++) {
         snprintf(path, 1023, "%s/%s/%d", SECT_GROBJECTS, SECT_LIGHT, i + 1);
-        
+
         osg::Vec3d position;
         position[0] = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0);
         position[1] = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0);
@@ -104,7 +104,7 @@ void SDCar::loadCarLights(tCarElt *Car)
 
         osg::Vec3d normal;
         normal[0] = position[0] > 0 ? 1 : -1;
-        
+
         const char *typeName = GfParmGetStr(handle, path, PRM_TYPE, "");
         CarLightType type = CAR_LIGHT_TYPE_NONE;
         if (!strcmp(typeName, VAL_LIGHT_HEAD1)) {
@@ -125,11 +125,11 @@ void SDCar::loadCarLights(tCarElt *Car)
         if (!strcmp(typeName, VAL_LIGHT_REVERSE)) {
             type = CAR_LIGHT_TYPE_REVERSE;
         }
-        
+
         double size = GfParmGetNum(handle, path, PRM_SIZE, NULL, 0.2);
-        
+
         osg::ref_ptr<osg::StateSet> state_set = carLights->getStateSet(type);
-        
+
         SDCarLight light;
         lights_branch->addChild( light.init(type, state_set, position, normal, size, 4) );
         lights.push_back(light);
@@ -175,7 +175,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
     GfLogInfo("[gr] Init(%d) car %s for driver %s index %d\n", index, car->_carName, car->_modName, car->_driverIndex);
     GfLogInfo("[gr] Init(%d) car %s MasterModel name\n", index, car->_masterModel);
-	GfLogInfo("[gr] Init(%d) car %s CustomSkin name\n", index, car->_skinName);
+    GfLogInfo("[gr] Init(%d) car %s CustomSkin name\n", index, car->_skinName);
 
     snprintf(buf, nMaxTexPathSize, "%sdrivers/%s/%d/",
              GfDataDir(), car->_modName, car->_driverIndex);
@@ -231,10 +231,10 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
     std::string strPath = GetDataDir();
 
-	if(bMasterModel)
-		snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s.acc", car->_masterModel, car->_masterModel);
-	else
-		snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s.acc", car->_carName, car->_carName);
+    if(bMasterModel)
+        snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s.acc", car->_masterModel, car->_masterModel);
+    else
+        snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s.acc", car->_carName, car->_carName);
 
     strPath+=buf;
 
@@ -254,20 +254,22 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     pDriver->setName("DRIVER");
     pSteer = new osg::LOD;
     pSteer->setName("STEER");
+    Steer_branch = new osg::MatrixTransform;
+    Steer_branch->setName("STEERBRANCHE");
 
     //strPath+=buf;
     GfLogDebug("Chemin Textures : %s\n", strTPath.c_str());
 
     //osg::ref_ptr<osg::Node> Car = new osg::Node;
-	if (bMasterModel)
-		bSkinName = name;
+    if (bMasterModel)
+        bSkinName = name;
 
-	if (bCustomSkin)
-	{
-		snprintf(buf, nMaxTexPathSize, "%s-%s", car->_carName, car->_skinName);
-		bSkinName = buf;
+    if (bCustomSkin)
+    {
+        snprintf(buf, nMaxTexPathSize, "%s-%s", car->_carName, car->_skinName);
+        bSkinName = buf;
         GfLogDebug("Car Texture = %s\n", bSkinName.c_str());
-	}
+    }
 
     pCar = loader.Load3dFile(strPath, true, bSkinName);
 
@@ -401,7 +403,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         tdble xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
         tdble ypos = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0.0);
         tdble zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
-        tdble angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
+        float angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
+        angl = SD_DEGREES_TO_RADIANS * angl;
         osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
         osg::Matrix rot = osg::Matrix::rotate(angl, osg::Y_AXIS);
 
@@ -411,6 +414,9 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         steer_transform->addChild(steerEntityLo.get());
 
         pSteer->addChild(steer_transform.get(), 1.0f, FLT_MAX);
+        osg::MatrixTransform * movt = new osg::MatrixTransform;
+        osg::Matrix rot2 = osg::Matrix::rotate(0.0, osg::X_AXIS);
+        Steer_branch->addChild(pSteer);
         GfLogDebug("Low Steer Loading \n");
 
     }
@@ -433,7 +439,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         tdble xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
         tdble ypos = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0.0);
         tdble zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
-        tdble angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
+        float angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
+        angl = SD_DEGREES_TO_RADIANS * angl;
         osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
         osg::Matrix rot = osg::Matrix::rotate(angl, osg::Y_AXIS);
 
@@ -526,7 +533,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     this->setReflectionMap(this->reflectionMapping->getReflectionMap());
 
     loadCarLights(Car);
-    
+
     return this->car_root;
 }
 
@@ -635,7 +642,7 @@ void SDCar::markCarCurrent(tCarElt *Car)
         lights_branch->setNodeMask(NODE_MASK_CURCAR);
         pDriver->setNodeMask(NODE_MASK_CURDRV);
     }
-    else 
+    else
     {
         car_branch->setNodeMask(NODE_MASK_ALL);
         lights_branch->setNodeMask(NODE_MASK_ALL);
@@ -646,12 +653,12 @@ void SDCar::markCarCurrent(tCarElt *Car)
 void SDCar::updateCar()
 {
     osg::Vec3 p;
-    float wingangle = car->_wingRCmd * 180 / PI;
-    float steerangle = car->_steerCmd;
+    float wingangle = this->car->_wingRCmd * 180 / PI;
+    float steerangle = this->car->_steerCmd * SD_RADIANS_TO_DEGREES;
 
-    p[0] = car->_pos_X;//+ car->_drvPos_x;
-    p[1] = car->_pos_Y;//+car->_drvPos_y;
-    p[2] = car->_pos_Z;//+car->_drvPos_z;
+    p[0] = this->car->_pos_X;//+ car->_drvPos_x;
+    p[1] = this->car->_pos_Y;//+car->_drvPos_y;
+    p[2] = this->car->_pos_Z;//+car->_drvPos_z;
 
     osg::Matrix mat(car->_posMat[0][0],car->_posMat[0][1],car->_posMat[0][2],car->_posMat[0][3],
             car->_posMat[1][0],car->_posMat[1][1],car->_posMat[1][2],car->_posMat[1][3],
@@ -661,11 +668,11 @@ void SDCar::updateCar()
     if (_wing3)
     {
         if ((wingangle > 0.0) && (wingangle < 10.0))
-            pWing3->setSingleChildOn(0);
+            this->pWing3->setSingleChildOn(0);
         else if ((wingangle > 10.0) && (wingangle < 35.0))
-            pWing3->setSingleChildOn(1);
+            this->pWing3->setSingleChildOn(1);
         else
-            pWing3->setSingleChildOn(2);
+            this->pWing3->setSingleChildOn(2);
     }
 
     if (_driver)
@@ -704,19 +711,21 @@ void SDCar::updateCar()
             pDriver->setSingleChildOn(0);
     }
 
-    if(_steer)
+    if(this->_steer)
     {
         steerangle = (-steerangle * 1.2);
-        osg::ref_ptr<osg::MatrixTransform> movt = new osg::MatrixTransform;
-        osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::Y_AXIS);
+        //osg::ref_ptr<osg::MatrixTransform> movt = new osg::MatrixTransform;
+        osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
 
-        movt->setMatrix(rotation);
-        movt->addChild(pSteer);
+        //osg::MatrixTransform * movt = dynamic_cast<osg::MatrixTransform *>(this->Steer_branch->getChild(0));
+        this->Steer_branch->setMatrix(rotation);
+        //movt->addChild(pSteer);
+        GfLogInfo(" # update steer branch\n");
     }
 
     for(std::vector<SDCarLight>::iterator i = lights.begin(); i != lights.end(); ++i)
         i->update(*this);
-    
+
     wheels.updateWheels();
 
     this->car_branch->setMatrix(mat);
@@ -783,8 +792,8 @@ void SDCars::loadCars(tSituation *pSituation, bool trackType, bool subCat)
     for (int i = 0; i < s->_ncars; i++)
     {
         tCarElt* elt = s->cars[i];
-		strncpy(elt->_masterModel, GfParmGetStr(elt->_carHandle, SECT_GROBJECTS, PRM_TEMPLATE, ""), MAX_NAME_LEN - 1);
-		elt->_masterModel[MAX_NAME_LEN - 1] = 0;
+        strncpy(elt->_masterModel, GfParmGetStr(elt->_carHandle, SECT_GROBJECTS, PRM_TEMPLATE, ""), MAX_NAME_LEN - 1);
+        elt->_masterModel[MAX_NAME_LEN - 1] = 0;
         SDCar * car = new SDCar;
         this->addSDCar(car);
         this->cars_branch->addChild(car->loadCar(elt, trackType, subCat, carShader));

@@ -46,12 +46,13 @@ private :
     osg::ref_ptr<osg::Switch> pWing3;
     osg::ref_ptr<osg::Switch> pDriver;
     osg::ref_ptr<osg::LOD> pSteer;
+    osg::ref_ptr<osg::MatrixTransform> Steer_branch;
     //osg::ref_ptr<osg::Vec3Array> shadowVertices;
     //osg::ref_ptr<osg::Geometry> quad;
     //osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
 
     std::vector<SDCarLight> lights;
-    
+
     tCarElt     *car;
 
     SDWheels    wheels;
@@ -62,7 +63,7 @@ private :
     void setReflectionMap(osg::ref_ptr<osg::Texture> map);
 
     void loadCarLights(tCarElt *Car);
-    
+
 public :
     SDCar(void);
     ~SDCar(void);
