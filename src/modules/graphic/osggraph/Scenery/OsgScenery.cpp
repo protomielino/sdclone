@@ -243,7 +243,7 @@ bool SDScenery::LoadTrack(std::string& strTrack)
     GfLogDebug("Texture Path : %s\n", strTPath.c_str());
     loader.AddSearchPath(strTPath);
 
-    osg::Node *pTrack = loader.Load3dFile(strTrack, false, name);
+    osg::Node *pTrack = loader.Load3dFile(strTrack, false, "", name);
 
     if (pTrack)
     {

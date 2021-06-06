@@ -110,6 +110,11 @@ void ReaderWriterACC::SetCar(bool b)
     m_bCar = b;
 }
 
+void ReaderWriterACC::SetCarName(const std::string& name)
+{
+    m_CarName = name;
+}
+
 void ReaderWriterACC::SetSkin(const std::string& name)
 {
     m_skinName = name;
@@ -300,12 +305,12 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
             }
             else
             {
-					if (textureId == 0 && m_skinName == "")
-						texname0 = texname;
-					else if (textureId == 0)
-						texname0 = m_skinName+".png";
+                    if (textureId == 0 && m_skinName == "" || texname != m_CarName)
+                        texname0 = texname;
+                    else if (textureId == 0)
+                        texname0 = m_skinName+".png";
 
-					GfLogDebug("TexName = %s\n", texname0.c_str());
+                    GfLogDebug("TexName = %s\n", texname0.c_str());
             }
             textureId++;
         }

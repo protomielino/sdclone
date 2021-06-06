@@ -488,7 +488,7 @@ private:
     unsigned mLightIndex;
 };
 
-struct RefData 
+struct RefData
 {
     RefData(const osg::Vec2& _texCoord, const osg::Vec2& _texCoord1, const osg::Vec2& _texCoord2, const osg::Vec2& _texCoord3)
     {
@@ -505,7 +505,7 @@ struct RefData
     osg::Vec3 normal;
 };
 
-struct VertexData 
+struct VertexData
 {
     VertexData(const osg::Vec3& vertex) : _vertex(vertex) {}
     unsigned addRefData(const RefData& refData)
@@ -519,7 +519,7 @@ struct VertexData
     std::vector<RefData> _refs;
 };
 
-struct VertexIndex 
+struct VertexIndex
 {
     VertexIndex(unsigned _vertexIndex = 0, unsigned _refIndex = 0) :
         vertexIndex(_vertexIndex), refIndex(_refIndex)
@@ -528,7 +528,7 @@ struct VertexIndex
     unsigned refIndex;
 };
 
-class VertexSet : public osg::Referenced 
+class VertexSet : public osg::Referenced
 {
 public:
     VertexSet() : _dirty(true)
@@ -543,7 +543,7 @@ public:
     {
         return _vertices.size();
     }
-    
+
     void addVertex(const osg::Vec3& vertex)
     {
         _dirty = true;
@@ -783,7 +783,7 @@ public:
     }
 };
 
-class SurfaceBin : public PrimitiveBin 
+class SurfaceBin : public PrimitiveBin
 {
 private:
     struct Ref
@@ -893,7 +893,7 @@ public:
 
             weightedNormal += newNormal;
         }
-        
+
         if (needTessellation)
         {
             if (isTriangleStrip())
@@ -1025,7 +1025,7 @@ public:
         shadeModel->setDataVariance(osg::Object::STATIC);
         shadeModel->setMode(osg::ShadeModel::SMOOTH);
         stateSet->setAttribute(shadeModel);
-        
+
         // Set up the arrays, allways store texture coords, may be we need them later ...
         osg::Geometry* geometry = new osg::Geometry;
         _geode->addDrawable(geometry);
@@ -1245,7 +1245,8 @@ public:
     virtual osgDB::ReaderWriter::WriteResult writeNode(const osg::Node& node,const std::string& fileName, const Options* /*options*/);
     virtual osgDB::ReaderWriter::WriteResult writeNode(const osg::Node& node,std::ostream& fout, const Options* opts);
     void SetCar(bool b);
-	void SetSkin(const std::string& name);
+    void SetSkin(const std::string& name);
+    void SetCarName(const std::string& name);
     osg::Node* readFile(std::istream& stream, const osgDB::ReaderWriter::Options* options);
     osg::Node* readObject(std::istream& stream, FileData& fileData, const osg::Matrix& parentTransform, TextureData textureData);
 
@@ -1255,5 +1256,6 @@ protected:
     osg::Group *m_opaqueGroup;
     bool m_bCar;
     bool m_bBlockTransparent;
-	std::string m_skinName;
+    std::string m_skinName;
+    std::string m_CarName;
 };

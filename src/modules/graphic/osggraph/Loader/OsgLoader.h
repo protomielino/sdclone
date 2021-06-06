@@ -28,7 +28,7 @@ public:
     osgLoader(void);
     ~osgLoader(void);
 
-    osg::Node *Load3dFile(const std::string &strFile, bool car = false, const std::string& name = std::string());
+    osg::Node *Load3dFile(const std::string &strFile, bool car = false, const std::string &carname = "", const std::string& name = "");
     osg::ref_ptr<osg::Image> LoadImageFile(const std::string &strFile);
     void AddSearchPath(const std::string &strPath);
 

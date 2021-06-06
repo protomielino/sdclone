@@ -51,12 +51,13 @@ osg::ref_ptr<osg::Image> osgLoader::LoadImageFile(const std::string &strFile)
     return Image;
 }
 
-osg::Node *osgLoader::Load3dFile(const std::string &strFile, bool car, const std::string& name)
+osg::Node *osgLoader::Load3dFile(const std::string &strFile, bool car, const std::string& carname, const std::string& name)
 {
     osg::Node *pNode = NULL;
     std::string ext = osgDB::getFileExtension(strFile);
 
     m_ACCReader.SetCar(car);
+    m_ACCReader.SetCarName(carname);
     m_ACCReader.SetSkin(name);
 
     if (ext == "acc")

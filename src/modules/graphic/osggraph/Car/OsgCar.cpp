@@ -55,6 +55,7 @@ SDCar::SDCar(void) :
     pWing3(NULL),
     pDriver(NULL),
     pSteer(NULL),
+    Steer_branch(NULL),
     shader(NULL),
     reflectionMapping(NULL)
 {
@@ -151,6 +152,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     const bool bCustomSkin = strlen(this->car->_skinName) != 0;
 
     std::string bSkinName = "";
+    std::string bCarName = "";
 
     static const int nMaxTexPathSize = 512;
     char buf[nMaxTexPathSize];
@@ -268,10 +270,12 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     {
         snprintf(buf, nMaxTexPathSize, "%s-%s", car->_carName, car->_skinName);
         bSkinName = buf;
-        GfLogDebug("Car Texture = %s\n", bSkinName.c_str());
+        snprintf(buf, nMaxTexPathSize, "%s.png", car->_carName);
+        bCarName = buf;
+        GfLogDebug("Car Texture = %s - Car Name = %s\n", bSkinName.c_str(), bCarName.c_str());
     }
 
-    pCar = loader.Load3dFile(strPath, true, bSkinName);
+    pCar = loader.Load3dFile(strPath, true, bCarName, bSkinName);
 
     GfLogDebug("Load Car ACC !\n");
 
@@ -292,19 +296,19 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
         param = GfParmGetStr(handle, path, PRM_WING_1, NULL);
         strPath=tmp+param;
-        pWin1 = loader.Load3dFile(strPath, true, bSkinName);
+        pWin1 = loader.Load3dFile(strPath, true, bCarName, bSkinName);
         pWin1->setName("WING1");
         GfLogDebug("Load Wing1 ACC ! %s\n", strPath.c_str() );
 
         param = GfParmGetStr(handle, path, PRM_WING_2, NULL);
         strPath=tmp+param;
-        pWin2 = loader.Load3dFile(strPath, true, bSkinName);
+        pWin2 = loader.Load3dFile(strPath, true, bCarName, bSkinName);
         pWin2->setName("WING2");
         GfLogDebug("Load Wing2 ACC ! %s\n", strPath.c_str());
 
         param = GfParmGetStr(handle, path, PRM_WING_3, NULL);
         strPath=tmp+param;
-        pWin3 = loader.Load3dFile(strPath, true, bSkinName);
+        pWin3 = loader.Load3dFile(strPath, true, bCarName, bSkinName);
         pWin3->setName("WING3");
         GfLogDebug("Load Wing3 ACC ! %s\n", strPath.c_str());
 
@@ -353,7 +357,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
             param = GfParmGetStr(handle, path, PRM_REARWINGMODEL, "");
 
             strPath = tmp+param;
-            pWing1_branch = loader.Load3dFile(strPath, true, bSkinName);
+            pWing1_branch = loader.Load3dFile(strPath, true, bCarName, bSkinName);
             GfLogDebug("Loading Wing animate %i - %s !\n", i, strPath.c_str());
 
             pWing3->addChild(pWing1_branch.get());
@@ -378,7 +382,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
         strPath= tmp+param;
 
-        pCockpit = loader.Load3dFile(strPath, true, bSkinName);
+        pCockpit = loader.Load3dFile(strPath, true, bCarName, bSkinName);
         GfLogDebug("Cockpit loaded = %s !\n", strPath.c_str());
     }
 
@@ -397,7 +401,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
         strPath = tmpPath + param;
 
-        osg::ref_ptr<osg::Node> steerEntityLo = loader.Load3dFile(strPath, true, "");
+        osg::ref_ptr<osg::Node> steerEntityLo = loader.Load3dFile(strPath, true, "", "");
         osg::ref_ptr<osg::MatrixTransform> steer_transform = new osg::MatrixTransform;
 
         tdble xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
@@ -433,7 +437,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
         strPath = tmpPath + param;
 
-        osg::ref_ptr<osg::Node> steerEntityHi = loader.Load3dFile(strPath, true, "");
+        osg::ref_ptr<osg::Node> steerEntityHi = loader.Load3dFile(strPath, true, "", "");
         osg::ref_ptr<osg::MatrixTransform> steer_transform = new osg::MatrixTransform;
 
         tdble xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
@@ -480,7 +484,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
             position->setMatrix(pos);
 
             driver_path = tmp+param;
-            driver_branch = loader.Load3dFile(driver_path, true, bSkinName);
+            driver_branch = loader.Load3dFile(driver_path, true, bCarName, bSkinName);
             GfLogDebug("Loading Animated Driver %i - %s \n", i, driver_path.c_str());
 
             position->addChild(driver_branch.get());
