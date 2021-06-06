@@ -206,9 +206,10 @@ ENDIF(MSVC)
 
 
 # Useful for using an installation of SD as a robot development framework without building it.
-IF(LINUX)
+# Only do for an in source tree build as INSTALL_SD_CMAKE() doesn't seem to use CMAKE_INSTALL_PREFIX
+IF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
    INSTALL_SD_CMAKE()
-ENDIF(LINUX)
+ENDIF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
 
 # Must be the last ADD_SUBDIRECTORY for FIXUP_BUNDLE to work
 ADD_SUBDIRECTORY(packaging)
