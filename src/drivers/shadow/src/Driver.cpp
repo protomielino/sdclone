@@ -2441,7 +2441,10 @@ void	Driver::launchControlFullThrottle( tCarElt* car, tSituation* s )
 void	Driver::Drive( int index, tCarElt* car, tSituation* s )
 {
     if (strcmp(m_trackName, "garage") == 0)
+    {
         m_garage = true;
+        return;
+    }
 
     m_cm[PATH_NORMAL].update( car, s );
 
