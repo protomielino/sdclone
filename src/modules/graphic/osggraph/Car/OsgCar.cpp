@@ -418,11 +418,11 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         steer_transform->addChild(steerEntityLo.get());
 
         pSteer->addChild(steer_transform.get(), 1.0f, FLT_MAX);
-        //osg::MatrixTransform * movt = new osg::MatrixTransform;
-        //osg::Matrix rot2 = osg::Matrix::rotate(0.3, osg::X_AXIS);
+        osg::MatrixTransform * movt = new osg::MatrixTransform;
+        osg::Matrix rot2 = osg::Matrix::rotate(0.3, osg::X_AXIS);
 
         Steer_branch->addChild(pSteer);
-        //Steer_branch->setMatrix(rot2);
+        Steer_branch->setMatrix(rot2);
         GfLogDebug("Low Steer Loading \n");
 
     }
@@ -456,7 +456,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         steer_transform->addChild(steerEntityHi.get());
         pSteer->addChild(steer_transform.get(), 0.0f, 1.0f);
         GfLogDebug("High Steer Loading \n");
-#if 1
+#if 0
         std::string Tpath = GetLocalDir();
         Tpath = Tpath+"/steer.osg";
         osgDB::writeNodeFile( *Steer_branch, Tpath);
@@ -725,12 +725,12 @@ void SDCar::updateCar()
     if(_steer)
     {
         steerangle = (-steerangle * 1.2);
-        //osg::ref_ptr<osg::MatrixTransform> movt = new osg::MatrixTransform;
+        osg::ref_ptr<osg::MatrixTransform> movt = new osg::MatrixTransform;
         osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
 
-        osg::MatrixTransform * movt = dynamic_cast<osg::MatrixTransform *>(Steer_branch->getChild(0));
+        //osg::MatrixTransform * movt = dynamic_cast<osg::MatrixTransform *>(Steer_branch->getChild(0));
         movt->setMatrix(rotation);
-        //movt->addChild(pSteer);
+        movt->addChild(pSteer);
         GfLogInfo(" # update steer branch\n");
     }
 
