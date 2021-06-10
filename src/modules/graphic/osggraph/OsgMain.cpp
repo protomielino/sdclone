@@ -226,15 +226,17 @@ int refresh(tSituation *s)
                       frameInfo.fInstFps, frameInfo.fAvgFps);
     }
 
-    cars->updateCars();
     cam = screens->getActiveView()->getCameras()->getSelectedCamera();
     osg::Vec3d eye = cam->getCameraPosition();
     double X = eye[0];
     double Y = eye[1];
     double Z = eye[2];
+    render->UpdateSky(s->currentTime, s->accelTime, X, Y);
+    cars->updateCars();
+
     scenery->reposition(X, Y, Z );
     scenery->update_tracklights(s->currentTime, s->_totTime, s->_raceType);
-    render->UpdateSky(s->currentTime, s->accelTime, X, Y);
+
     screens->update(s, &frameInfo);
 
     //refresh the hud

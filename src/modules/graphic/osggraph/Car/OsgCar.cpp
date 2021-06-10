@@ -408,7 +408,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         tdble ypos = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0.0);
         tdble zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
         float angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
-        angl = SD_DEGREES_TO_RADIANS * angl;
+        //angl = SD_DEGREES_TO_RADIANS * angl;
         osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
         osg::Matrix rot = osg::Matrix::rotate(angl, osg::Y_AXIS);
 
@@ -418,9 +418,11 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         steer_transform->addChild(steerEntityLo.get());
 
         pSteer->addChild(steer_transform.get(), 1.0f, FLT_MAX);
-        osg::MatrixTransform * movt = new osg::MatrixTransform;
-        osg::Matrix rot2 = osg::Matrix::rotate(0.0, osg::X_AXIS);
+        //osg::MatrixTransform * movt = new osg::MatrixTransform;
+        //osg::Matrix rot2 = osg::Matrix::rotate(0.3, osg::X_AXIS);
+
         Steer_branch->addChild(pSteer);
+        //Steer_branch->setMatrix(rot2);
         GfLogDebug("Low Steer Loading \n");
 
     }
@@ -444,7 +446,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         tdble ypos = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0.0);
         tdble zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
         float angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
-        angl = SD_DEGREES_TO_RADIANS * angl;
+        //angl = SD_DEGREES_TO_RADIANS * angl;
         osg::Matrix pos = osg::Matrix::translate(xpos, ypos, zpos);
         osg::Matrix rot = osg::Matrix::rotate(angl, osg::Y_AXIS);
 
@@ -454,6 +456,11 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         steer_transform->addChild(steerEntityHi.get());
         pSteer->addChild(steer_transform.get(), 0.0f, 1.0f);
         GfLogDebug("High Steer Loading \n");
+#if 1
+        std::string Tpath = GetLocalDir();
+        Tpath = Tpath+"/steer.osg";
+        osgDB::writeNodeFile( *Steer_branch, Tpath);
+#endif
     }
 
     // separate driver models for animation according to steering wheel angle ...
@@ -658,7 +665,7 @@ void SDCar::updateCar()
 {
     osg::Vec3 p;
     float wingangle = this->car->_wingRCmd * 180 / PI;
-    float steerangle = this->car->_steerCmd * SD_RADIANS_TO_DEGREES;
+    float steerangle = this->car->_steerCmd;
 
     p[0] = this->car->_pos_X;//+ car->_drvPos_x;
     p[1] = this->car->_pos_Y;//+car->_drvPos_y;
@@ -715,14 +722,14 @@ void SDCar::updateCar()
             pDriver->setSingleChildOn(0);
     }
 
-    if(this->_steer)
+    if(_steer)
     {
         steerangle = (-steerangle * 1.2);
         //osg::ref_ptr<osg::MatrixTransform> movt = new osg::MatrixTransform;
         osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
 
-        //osg::MatrixTransform * movt = dynamic_cast<osg::MatrixTransform *>(this->Steer_branch->getChild(0));
-        this->Steer_branch->setMatrix(rotation);
+        osg::MatrixTransform * movt = dynamic_cast<osg::MatrixTransform *>(Steer_branch->getChild(0));
+        movt->setMatrix(rotation);
         //movt->addChild(pSteer);
         GfLogInfo(" # update steer branch\n");
     }
