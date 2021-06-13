@@ -76,9 +76,9 @@ IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
    #================
    # TODO figure out if this is needed...
    MESSAGE(STATUS "TODO: Hard coded loadable libraries...") 
-   IF(NOT OPTION_OFFICIAL_ONLY)
-      LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${SD_LIBDIR}/lib/libephemeris.dylib")
-   ENDIF(NOT OPTION_OFFICIAL_ONLY)
+   #IF(NOT OPTION_OFFICIAL_ONLY)
+   #   LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${SD_LIBDIR}/lib/libephemeris.dylib")
+   #ENDIF(NOT OPTION_OFFICIAL_ONLY)
    LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${SD_LIBDIR}/lib/liblearning.dylib")
    #================
 
