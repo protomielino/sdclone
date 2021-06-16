@@ -65,7 +65,7 @@ IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
    endforeach()
 
    foreach(_ROBOT ${SD_ROBOT_LIST_ITEMS})
-      LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${_ROBOT}")
+      LIST(APPEND _loadables "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${SD_LIBDIR}/drivers/${_ROBOT}/${_ROBOT}${CMAKE_SHARED_MODULE_SUFFIX}")
    endforeach()
 
    foreach(_PLUGIN ${SD_OSG_PLUGIN_LIST_ITEMS})

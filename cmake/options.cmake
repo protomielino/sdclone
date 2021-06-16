@@ -59,7 +59,7 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     ENDIF(NOT MSVC)
 
     # CMake options.
-    SET(OPTION_CHECK_CONTENTS false CACHE BOOL "Set to On if you don't want the build to be stopped by missing optional contents folders")
+    SET(OPTION_CHECK_CONTENTS false CACHE BOOL "Set to off if you don't want the build to be stopped by missing optional contents folders")
     MARK_AS_ADVANCED(OPTION_CHECK_CONTENTS)
 
     SET(OPTION_OFFICIAL_ONLY false CACHE BOOL "Build / install only officially released contents")
