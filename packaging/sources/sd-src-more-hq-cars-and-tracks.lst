@@ -14,7 +14,6 @@ data/drivers/simplix_mpa1
 data/drivers/simplix_mpa11
 data/drivers/simplix_mpa12
 data/drivers/simplix_trb1
-data/drivers/simplix_mp1
 
 data/drivers/shadow_mpa1
 data/drivers/shadow_mpa11
