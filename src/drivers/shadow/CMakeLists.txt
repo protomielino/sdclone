@@ -73,10 +73,10 @@ SET(ROBOT_SOURCES
 
 # Official-only shadow instances.
 SET(ROBOT_CLONES shadow_36GP shadow_67GP shadow_sc shadow_trb1 shadow_ls1 shadow_ls2
-			shadow_mp1 shadow_mpa1 shadow_mpa11 shadow_mpa12 shadow_lp1 )
+			shadow_mp1 shadow_mpa1 shadow_mpa11 shadow_mpa12)
 
 IF(NOT OPTION_OFFICIAL_ONLY)
-   SET(ROBOT_CLONES ${ROBOT_CLONES} shadow_mp5 shadow_ref shadow_srw)
+   SET(ROBOT_CLONES ${ROBOT_CLONES} shadow_mp5 shadow_ref shadow_srw shadow_lp1)
 ENDIF(NOT OPTION_OFFICIAL_ONLY)
 
 # The ubiquitous robot module and its clones.
