@@ -37,7 +37,7 @@ Pit::Pit() :
 void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int pitdamage, double pitgripfactor, double pitentrymargin)
 {
     // Get tires change time
-    void* handle = NULL;
+    //void* handle = NULL;
     /*std::string tmpstr = std::string(GetLocalDir()) + "config/raceman/endrace.xml";
     handle = GfParmReadFile(tmpstr.c_str(), GFPARM_RMODE_STD);
     if (handle)
@@ -138,7 +138,7 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
 
         mPitp[1].x = std::min(mPitp[1].x, mPitp[2].x);
         mPitp[5].x = std::max(mPitp[4].x, mPitp[5].x);
-                
+
         mPitOnLeftSide = mPitInfo->side == TR_LFT;
         double sign = mPitOnLeftSide ? 1.0 : -1.0;
         mPitp[0].y = sign * (mTrack->width / 2.0 - 2.0);
