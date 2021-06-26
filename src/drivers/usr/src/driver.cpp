@@ -89,7 +89,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
     std::string tName;
     std::string cName;
     std::string rName;
-    strncpy( trackname, strrchr(track->filename, '/') + 1, sizeof(trackname) );
+    strncpy( trackname, strrchr(track->filename, '/') + 1, sizeof(trackname) - 1);
     *strrchr(trackname, '.') = '\0';
     LogUSR.info( " # USR trackName: '%s'\n", trackname );
     tName = trackname;
@@ -103,7 +103,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
     //newParmHandle = NULL;
 
     const char *car_sect = SECT_GROBJECTS "/" LST_RANGES "/" "1";
-    strncpy(carName, GfParmGetStr(carHandle, car_sect, PRM_CAR, ""), sizeof(carName));
+    strncpy(carName, GfParmGetStr(carHandle, car_sect, PRM_CAR, ""), sizeof(carName) - 1);
     char *p = strrchr(carName, '.');
 
     if (p)
