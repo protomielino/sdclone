@@ -279,6 +279,7 @@ void SDRender::Init(tTrack *track)
         AStarsData[i][0] = SDRandom() * PI;
         AStarsData[i][1] = SDRandom() * PI;
         AStarsData[i][2] = (SDRandom() * 4.5) + 3.1;
+        GfLogDebug(" # Star %i magnitude = %.2f\n", i, AStarsData[i][2]);
     }
 
     GfLogDebug("  Stars (random) : %d\n", NStars);

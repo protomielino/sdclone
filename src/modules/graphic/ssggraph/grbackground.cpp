@@ -218,6 +218,7 @@ grInitBackground()
             AStarsData[i][0] = grRandom() * PI;
             AStarsData[i][1] = grRandom() * PI;
             AStarsData[i][2] = (grRandom() * 4.5) + 3.1;
+            GfLogDebug(" # Star %i magnitude = %.2f\n", i, AStarsData[i][2]);
         }//for i
 
         GfLogInfo("  Stars (random) : %d\n", NStars);

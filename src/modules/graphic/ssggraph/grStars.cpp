@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 #include "grSky.h"
+#include <tgf.h>
 
 #define SD_2PI   6.28318530717958647692
 #define SD_PI_2  1.57079632679489661923
@@ -150,9 +151,9 @@ bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
   double mag, nmag, alpha, factor, cutoff;
   float *color;
 
-  double mag_nakedeye = 6.2;
-  double mag_twilight_astro = 5.4;
-  double mag_twilight_nautic = 4.7;
+  double mag_nakedeye = 8.2;
+  double mag_twilight_astro = 6.4;
+  double mag_twilight_nautic = 5.7;
   // sirius, brightest star (not brightest object)
   double mag_min = -1.46;
 
@@ -165,6 +166,7 @@ bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
     factor = 1.0;
     cutoff = mag_nakedeye;
     phase = 0;
+    GfLogDebug(" Phase %i\n", phase);
   }
   else if ( sol_angle > ( SD_PI_2 + 12.0 * SGD_DEGREES_TO_RADIANS ))
   {
@@ -172,42 +174,49 @@ bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
     factor = 1.0;
     cutoff = mag_twilight_astro;
     phase = 1;
+    GfLogDebug(" Phase %i\n", phase);
   }
   else if ( sol_angle > ( SD_PI_2 + 9.0 * SGD_DEGREES_TO_RADIANS ))
   {
     factor = 1.0;
     cutoff = mag_twilight_nautic;
     phase = 2;
+    GfLogDebug(" Phase %i\n", phase);
   }
   else if ( sol_angle > ( SD_PI_2 + 7.5 * SGD_DEGREES_TO_RADIANS ))
   {
     factor = 0.95;
-    cutoff = 3.1;
+    cutoff = 4.1;
     phase = 3;
+    GfLogDebug(" Phase %i\n", phase);
   }
   else if ( sol_angle > ( SD_PI_2 + 7.0 * SGD_DEGREES_TO_RADIANS ))
   {
     factor = 0.9;
-    cutoff = 2.4;
+    cutoff = 3.4;
     phase = 4;
+    GfLogDebug(" Phase %i\n", phase);
   }
   else if ( sol_angle > ( SD_PI_2 + 6.5 * SGD_DEGREES_TO_RADIANS ))
   {
     factor = 0.85;
-    cutoff = 1.8;
+    cutoff = 2.8;
     phase = 5;
+    GfLogDebug(" Phase %i\n", phase);
   }
   else if ( sol_angle > ( SD_PI_2 + 6.0 * SGD_DEGREES_TO_RADIANS ))
   {
     factor = 0.8;
     cutoff = 1.2;
     phase = 6;
+    GfLogDebug(" Phase %i\n", phase);
   }
   else if ( sol_angle > ( SD_PI_2 + 5.5 * SGD_DEGREES_TO_RADIANS ))
   {
     factor = 0.75;
     cutoff = 0.6;
     phase = 7;
+    GfLogDebug(" Phase %i\n", phase);
   }
   else
   {
@@ -215,6 +224,7 @@ bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
     factor = 0.7;
     cutoff = 0.0;
     phase = 8;
+    GfLogDebug(" Phase %i\n", phase);
   }
 
   if( phase != old_phase )
@@ -248,6 +258,8 @@ bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
 
       if (alpha > 1.0) { alpha = 1.0; }
       if (alpha < 0.0) { alpha = 0.0; }
+
+      GfLogDebug(" #stars mag = %.2f - nmag = %.2f - cutoff = %.2f - alpha = %.2f\n", mag, nmag, cutoff, alpha);
 
       color = cl->get( i );
       sgSetVec4( color, 1.0, 1.0, 1.0, (float)alpha );
