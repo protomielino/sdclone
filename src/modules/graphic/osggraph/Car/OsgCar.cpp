@@ -731,7 +731,7 @@ void SDCar::updateCar()
         //osg::MatrixTransform * movt = dynamic_cast<osg::MatrixTransform *>(Steer_branch->getChild(0));
         movt->setMatrix(rotation);
         movt->addChild(pSteer);
-        GfLogInfo(" # update steer branch\n");
+        GfLogDebug(" # update steer branch\n");
     }
 
     for(std::vector<SDCarLight>::iterator i = lights.begin(); i != lights.end(); ++i)
