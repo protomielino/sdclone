@@ -48,7 +48,7 @@ cGrStars::cGrStars( void ) :
 {
 }
 
-  
+
 cGrStars::~cGrStars( void )
 {
   ssgDeRefDelete( stars_transform );
@@ -68,10 +68,10 @@ ssgBranch * cGrStars::build( int num, sgdVec3 *star_data, double star_dist )
 
   if ( star_data == NULL )
   {
-	  if (num > 0)
-		  ulSetError(UL_WARNING, "null star data passed to cGrStars::build()");
-	  else
-		  return stars_transform;
+      if (num > 0)
+          ulSetError(UL_WARNING, "null star data passed to cGrStars::build()");
+      else
+          return stars_transform;
   }
 
   // set up the orb state
@@ -94,10 +94,10 @@ ssgBranch * cGrStars::build( int num, sgdVec3 *star_data, double star_dist )
 
   // Build ssg structure
   sgVec3 p;
-  for ( int i = 0; i < num; ++i ) 
+  for ( int i = 0; i < num; ++i )
   {
     // position seeded to arbitrary values
-    sgSetVec3( p, 
+    sgSetVec3( p,
       (float)( star_dist * cos( star_data[i][0] )
         * cos( star_data[i][1] )),
       (float)( star_dist * sin( star_data[i][0] )
@@ -110,7 +110,7 @@ ssgBranch * cGrStars::build( int num, sgdVec3 *star_data, double star_dist )
     cl->add( color );
   }
 
-  ssgLeaf *stars_obj = 
+  ssgLeaf *stars_obj =
     new ssgVtxTable ( GL_POINTS, vl, NULL, NULL, cl );
   stars_obj->setState( state );
   stars_obj->setCallback( SSG_CALLBACK_PREDRAW, grStarPreDraw );
@@ -150,64 +150,77 @@ bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
   double mag, nmag, alpha, factor, cutoff;
   float *color;
 
+  double mag_nakedeye = 6.2;
+  double mag_twilight_astro = 5.4;
+  double mag_twilight_nautic = 4.7;
+  // sirius, brightest star (not brightest object)
+  double mag_min = -1.46;
+
   int phase;
 
   // determine which star structure to draw
-  if ( sol_angle > ( SD_PI_2 + 10.0 * SGD_DEGREES_TO_RADIANS )) 
+  if ( sol_angle > ( SD_PI_2 + 18.0 * SGD_DEGREES_TO_RADIANS ))
   {
     // deep night
     factor = 1.0;
-    cutoff = 4.5;
+    cutoff = mag_nakedeye;
     phase = 0;
   }
-  else if ( sol_angle > ( SD_PI_2 + 8.8 * SGD_DEGREES_TO_RADIANS )) 
+  else if ( sol_angle > ( SD_PI_2 + 12.0 * SGD_DEGREES_TO_RADIANS ))
   {
+    // deep night
     factor = 1.0;
-    cutoff = 3.8;
+    cutoff = mag_twilight_astro;
     phase = 1;
   }
-  else if ( sol_angle > ( SD_PI_2 + 7.5 * SGD_DEGREES_TO_RADIANS )) 
+  else if ( sol_angle > ( SD_PI_2 + 9.0 * SGD_DEGREES_TO_RADIANS ))
+  {
+    factor = 1.0;
+    cutoff = mag_twilight_nautic;
+    phase = 2;
+  }
+  else if ( sol_angle > ( SD_PI_2 + 7.5 * SGD_DEGREES_TO_RADIANS ))
   {
     factor = 0.95;
     cutoff = 3.1;
-    phase = 2;
+    phase = 3;
   }
-  else if ( sol_angle > ( SD_PI_2 + 7.0 * SGD_DEGREES_TO_RADIANS )) 
+  else if ( sol_angle > ( SD_PI_2 + 7.0 * SGD_DEGREES_TO_RADIANS ))
   {
     factor = 0.9;
     cutoff = 2.4;
-    phase = 3;
+    phase = 4;
   }
-  else if ( sol_angle > ( SD_PI_2 + 6.5 * SGD_DEGREES_TO_RADIANS )) 
+  else if ( sol_angle > ( SD_PI_2 + 6.5 * SGD_DEGREES_TO_RADIANS ))
   {
     factor = 0.85;
     cutoff = 1.8;
-    phase = 4;
+    phase = 5;
   }
-  else if ( sol_angle > ( SD_PI_2 + 6.0 * SGD_DEGREES_TO_RADIANS )) 
+  else if ( sol_angle > ( SD_PI_2 + 6.0 * SGD_DEGREES_TO_RADIANS ))
   {
     factor = 0.8;
     cutoff = 1.2;
-    phase = 5;
+    phase = 6;
   }
-  else if ( sol_angle > ( SD_PI_2 + 5.5 * SGD_DEGREES_TO_RADIANS )) 
+  else if ( sol_angle > ( SD_PI_2 + 5.5 * SGD_DEGREES_TO_RADIANS ))
   {
     factor = 0.75;
     cutoff = 0.6;
-    phase = 6;
+    phase = 7;
   }
-  else 
+  else
   {
     // early dusk or late dawn
     factor = 0.7;
     cutoff = 0.0;
-    phase = 7;
+    phase = 8;
   }
 
-  if( phase != old_phase ) 
+  if( phase != old_phase )
   {
     old_phase = phase;
-    for ( int i = 0; i < num; ++i ) 
+    for ( int i = 0; i < num; ++i )
     {
       // if ( star_data[i][2] < min ) { min = star_data[i][2]; }
       // if ( star_data[i][2] > max ) { max = star_data[i][2]; }
@@ -221,14 +234,14 @@ bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
 
       // color (magnitude)
       mag = star_data[i][2];
-      if ( mag < cutoff ) 
+      if ( mag < cutoff )
       {
-        nmag = ( 4.5 - mag ) / 5.5;		// translate to 0 ... 1.0 scale
+        nmag = ( cutoff - mag ) / (cutoff - mag_min);	// translate to 0 ... 1.0 scale
         // alpha = nmag * 0.7 + 0.3;	// translate to a 0.3 ... 1.0 scale
         alpha = nmag * 0.85 + 0.15;		// translate to a 0.15 ... 1.0 scale
         alpha *= factor;				// dim when the sun is brighter
       }
-      else 
+      else
       {
         alpha = 0.0;
       }

@@ -446,6 +446,7 @@ void SDRender::Init(tTrack *track)
 
     m_Root->setStateSet(setFogState().get());
     m_Root->addChild(sunLight.get());
+
     m_ShadowRoot->addChild(sunLight.get());
 
     // Clouds are added to the scene graph later

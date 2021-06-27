@@ -58,6 +58,7 @@ osg::Node* SDStars::build( int num, const osg::Vec3d star_data[], double star_di
     blendFunc->setFunction(osg::BlendFunc::SRC_ALPHA,
                            osg::BlendFunc::ONE_MINUS_SRC_ALPHA);
     stateSet->setAttributeAndModes(blendFunc);
+
     stateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
     stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
     stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
@@ -104,59 +105,80 @@ osg::Node* SDStars::build( int num, const osg::Vec3d star_data[], double star_di
 bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
 {
     double mag, nmag, alpha, factor, cutoff;
+    double mag_nakedeye = 6.2;
+    double mag_twilight_astro = 5.4;
+    double mag_twilight_nautic = 4.7;
+    // sirius, brightest star (not brightest object)
+    double mag_min = -1.46;
+
     int phase;
 
-    if ( sun_angle > (SD_PI_2 + 10.0 * SD_DEGREES_TO_RADIANS ) )
+    if ( sun_angle > (SD_PI_2 + 18.0 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 1.0;
-        cutoff = 4.5;
+        cutoff = mag_nakedeye;
         phase = 0;
-    } else if ( sun_angle > (SD_PI_2 + 8.8 * SD_DEGREES_TO_RADIANS ) )
+    }
+    else if ( sun_angle > (SD_PI_2 + 12.0 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 1.0;
-        cutoff = 3.8;
+        cutoff = mag_twilight_astro;
         phase = 1;
-    } else if ( sun_angle > (SD_PI_2 + 7.5 * SD_DEGREES_TO_RADIANS ) )
+    }
+    else if ( sun_angle > (SD_PI_2 + 9.0 * SD_DEGREES_TO_RADIANS ) )
+    {
+        factor = 1.0;
+        cutoff = mag_twilight_nautic;
+        phase = 2;
+    }
+    else if ( sun_angle > (SD_PI_2 + 7.5 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.95;
         cutoff = 3.1;
-        phase = 2;
-    } else if ( sun_angle > (SD_PI_2 + 7.0 * SD_DEGREES_TO_RADIANS ) )
+        phase = 3;
+    }
+    else if ( sun_angle > (SD_PI_2 + 7.0 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.9;
         cutoff = 2.4;
-        phase = 3;
-    } else if ( sun_angle > (SD_PI_2 + 6.5 * SD_DEGREES_TO_RADIANS ) )
+        phase = 4;
+    }
+    else if ( sun_angle > (SD_PI_2 + 6.5 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.85;
         cutoff = 1.8;
-        phase = 4;
-    } else if ( sun_angle > (SD_PI_2 + 6.0 * SD_DEGREES_TO_RADIANS ) )
+        phase = 5;
+    }
+    else if ( sun_angle > (SD_PI_2 + 6.0 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.8;
         cutoff = 1.2;
-        phase = 5;
-     } else if ( sun_angle > (SD_PI_2 + 5.5 * SD_DEGREES_TO_RADIANS ) )
+        phase = 6;
+    }
+    else if ( sun_angle > (SD_PI_2 + 5.5 * SD_DEGREES_TO_RADIANS ) )
     {
         factor = 0.75;
         cutoff = 0.6;
-        phase = 6;
-    } else
+        phase = 7;
+    }
+    else
     {
         factor = 0.7;
         cutoff = 0.0;
-        phase = 7;
+        phase = 8;
     }
 
     if ( phase != old_phase )
     {
         old_phase = phase;
+
         for ( int i = 0; i < num; ++i )
         {
             mag = star_data[i][2];
+
             if ( mag < cutoff )
             {
-                nmag = ( 4.5 - mag ) / 5.5;
+                nmag = ( cutoff - mag ) / (cutoff - mag_min);
                 alpha = nmag * 0.85 + 0.15;
                 alpha *= factor;
             }
@@ -168,8 +190,9 @@ bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
             if (alpha > 1.0) { alpha = 1.0; }
             if (alpha < 0.0) { alpha = 0.0; }
 
-            (*stars_cl)[i] = osg::Vec4f(1.0f, 1.0f, 1.0f, (float)alpha);
+            (*stars_cl)[i] = osg::Vec4(1, 1, 1, alpha);
         }
+
         stars_cl->dirty();
     }
     else
