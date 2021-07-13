@@ -4,6 +4,7 @@ data/config/raceman/championship-mpa11.xml
 data/config/raceman/championship-supercars.xml
 data/config/raceman/championship-trb1.xml
 data/config/raceman/championship-mp1.xml
+data/config/raceman/singleevent-mpa1.xml
 
 data/drivers/usr_mpa1
 data/drivers/usr_mpa11
