@@ -64,6 +64,8 @@ Section -CoreData
   SetOutPath "$INSTDIR\data\config\raceman"
   File "${BUILD_INST_DIR}\data\config\raceman\singleevent-mp5.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\championship-24h.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\championship-67gp.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-supercars.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-mp5.xml"
   ;File "${BUILD_INST_DIR}\data\config\raceman\career.xml"
