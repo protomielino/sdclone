@@ -25,27 +25,27 @@ if [ -f CMakeLists.txt -a -f data/data/credits.xml -a -d cmake -a -d data -a -d 
   specDir="./packaging/sources"
 
   echo "* 'Base' package ..."
-  tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-base.lst -f speed-dreams-src-base-$1.tar.xz
+  tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-base.lst -f speed-dreams-src-base-$1.tar.xz --owner=root --group=root
 
   ls -l speed-dreams-src-base*.tar.xz
 
   echo "* 'HQ cars and tracks' package ..."
-tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-hq-cars-and-tracks.lst -f speed-dreams-src-hq-cars-and-tracks-$1.tar.xz
+tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-hq-cars-and-tracks.lst -f speed-dreams-src-hq-cars-and-tracks-$1.tar.xz --owner=root --group=root
 
   ls -l speed-dreams-src-hq*.tar.xz
 
   echo "* 'More HQ cars and tracks' package ..."
-tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-more-hq-cars-and-tracks.lst -f speed-dreams-src-more-hq-cars-and-tracks-$1.tar.xz
+tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-more-hq-cars-and-tracks.lst -f speed-dreams-src-more-hq-cars-and-tracks-$1.tar.xz --owner=root --group=root
 
   ls -l speed-dreams-src-more-hq*.tar.xz
 
   echo "* 'WIP cars and tracks' package ..."
-  tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-wip-cars-and-tracks.lst -f speed-dreams-src-wip-cars-and-tracks-$1.tar.xz
+  tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-wip-cars-and-tracks.lst -f speed-dreams-src-wip-cars-and-tracks-$1.tar.xz --owner=root --group=root
 
   ls -l speed-dreams-src-wip*.tar.xz
 
   echo "* 'unmaintained' package ..."
-  tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-unmaintained.lst -f speed-dreams-src-unmaintained-$1.tar.xz
+  tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-unmaintained.lst -f speed-dreams-src-unmaintained-$1.tar.xz --owner=root --group=root
 
   ls -l speed-dreams-src-unmaintained*.tar.xz
 
