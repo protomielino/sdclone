@@ -19,43 +19,45 @@
 
 #include "spline.h"
 
-
 Spline::Spline()
 {
 }
 
-
 void Spline::newSpline(int dim, SplinePoint* spl)
 {
-  mSpl = spl;
-  mDim = dim;
+    mSpl = spl;
+    mDim = dim;
 }
-
 
 double Spline::evaluate(double z)
 {
-  int i, a, b;
-  double t, a0, a1, a2, a3, h;
+    int i, a, b;
+    double t, a0, a1, a2, a3, h;
 
-  a = 0; b = mDim-1;
+    a = 0; b = mDim-1;
 
-  do {
-    i = (a + b) / 2;
-    if (mSpl[i].x <= z) {
-      a = i;
-    } else {
-      b = i;
-    }
-  } while ((a + 1) != b);
+    do
+    {
+        i = (a + b) / 2;
 
-  i = a;
-  h = mSpl[i+1].x - mSpl[i].x;
-  t = (z-mSpl[i].x) / h;
-  a0 = mSpl[i].y;
-  a1 = mSpl[i+1].y - a0;
-  a2 = a1 - h*mSpl[i].s;
-  a3 = h * mSpl[i+1].s - a1;
-  a3 -= a2;
-  return a0 + (a1 + (a2 + a3*t) * (t-1))*t;
+        if (mSpl[i].x <= z)
+        {
+            a = i;
+        }
+        else
+        {
+            b = i;
+        }
+    } while ((a + 1) != b);
+
+    i = a;
+    h = mSpl[i+1].x - mSpl[i].x;
+    t = (z-mSpl[i].x) / h;
+    a0 = mSpl[i].y;
+    a1 = mSpl[i+1].y - a0;
+    a2 = a1 - h*mSpl[i].s;
+    a3 = h * mSpl[i+1].s - a1;
+    a3 -= a2;
+
+    return a0 + (a1 + (a2 + a3*t) * (t-1))*t;
 }
-

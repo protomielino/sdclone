@@ -19,22 +19,23 @@
 #ifndef _SPLINE_H_
 #define _SPLINE_H_
 
-class SplinePoint {
-  public:
+class SplinePoint
+{
+public:
     double x;    /* x coordinate */
     double y;    /* y coordinate */
     double s;    /* slope */
 };
 
-
-class Spline {
-  public:
+class Spline
+{
+public:
     Spline();
-    
+
     void newSpline(int dim, SplinePoint* spl);
     double evaluate(double z);
 
-  private:
+private:
     SplinePoint* mSpl;
     int mDim;
 };

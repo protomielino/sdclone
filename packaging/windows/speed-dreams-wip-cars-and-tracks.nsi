@@ -128,9 +128,6 @@ Section -Drivers
   SetOutPath "$INSTDIR\lib\drivers\dandroid_rs"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid_rs\*.*"
 
-  SetOutPath "$INSTDIR\lib\drivers\dandroid_sc"
-  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid_sc\*.*"
-
   SetOutPath "$INSTDIR\lib\drivers\dandroid_srw"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid_srw\*.*"
 
@@ -182,9 +179,6 @@ Section -Drivers
 
   SetOutPath "$INSTDIR\data\drivers\dandroid_rs"
   File /r "${BUILD_INST_DIR}\data\drivers\dandroid_rs\*.*"
-
-  SetOutPath "$INSTDIR\data\drivers\dandroid_sc"
-  File /r "${BUILD_INST_DIR}\data\drivers\dandroid_sc\*.*"
 
   SetOutPath "$INSTDIR\data\drivers\dandroid_srw"
   File /r "${BUILD_INST_DIR}\data\drivers\dandroid_srw\*.*"

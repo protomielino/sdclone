@@ -143,6 +143,9 @@ Section "!Base System" SEC01
   SetOutPath "$INSTDIR\lib\drivers\networkhuman"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\networkhuman\*.*"
 
+  SetOutPath "$INSTDIR\lib\drivers\dandroid_sc"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\dandroid_sc\*.*"
+
   SetOutPath "$INSTDIR\lib\drivers\simplix_sc"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\drivers\simplix_sc\*.*"
 
@@ -158,6 +161,9 @@ Section "!Base System" SEC01
 
   SetOutPath "$INSTDIR\data\drivers\networkhuman"
   File /r /x *.lib "${BUILD_INST_DIR}\data\drivers\networkhuman\*.*"
+
+  SetOutPath "$INSTDIR\data\drivers\dandroid_sc"
+  File /r /x *.lib "${BUILD_INST_DIR}\data\drivers\dandroid_sc\*.*"
 
   SetOutPath "$INSTDIR\data\drivers\simplix_sc"
   File /r /x *.lib "${BUILD_INST_DIR}\data\drivers\simplix_sc\*.*"

@@ -79,6 +79,7 @@ data/config/raceman/singleevent-endurance.xml
 data/drivers/CMakeLists.txt
 data/drivers/human
 data/drivers/networkhuman
+data/drivers/dandroid_sc
 data/drivers/usr_sc
 data/drivers/shadow_sc
 data/drivers/simplix
