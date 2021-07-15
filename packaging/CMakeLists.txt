@@ -109,3 +109,12 @@ IF((APPLE) AND ("${CMAKE_INSTALL_PREFIX}" MATCHES "\\.app$"))
 
    #ADD_CUSTOM_TARGET(${_UNINST_TGT_NAME} "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" )
 ENDIF()
+
+#==============================================================================
+IF(NOT MSVC)
+   ADD_CUSTOM_TARGET(package_tars)
+   ADD_CUSTOM_COMMAND(TARGET package_tars
+                        COMMAND "${CMAKE_CURRENT_LIST_DIR}/sources/build.sh" "${VERSION}-r${SVN_REV}"
+                        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                        COMMENT "Create tar source archives")
+ENDIF(NOT MSVC)
