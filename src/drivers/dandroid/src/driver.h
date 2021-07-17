@@ -301,6 +301,7 @@ class TDriver {
   int mAccelXCount;
   double mSkillGlobal;
   double mSkillDriver;
+  bool   mGarage;
   PidController mSpeedController;
   PidController mAttackAngleController;
   int mWatchdogCount;

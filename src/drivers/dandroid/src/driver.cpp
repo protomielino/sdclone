@@ -88,6 +88,7 @@ TDriver::TDriver(int index)
     mAccelXCount = 0;
     mSkillGlobal = 1.0;
     mSkillDriver = 1.0;
+    mGarage = false;
     mWatchdogCount = 0;
     initVars();
     setPrevVars();
@@ -103,8 +104,17 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
     mTrack = Track;
 
     // Get file handles
-    char* trackname = strrchr(Track->filename, '/') + 1;
+    char* trackname = strrchr(mTrack->filename, '/') + 1;
+    char trackname2[100];
+    strncpy( trackname2, strrchr(Track->filename, '/') + 1, sizeof(trackname2) - 1);
+    *strrchr(trackname2, '.') = '\0';
+
     char buffer[256];
+
+    if (strcmp(trackname2, "garage") == 0)
+        mGarage = true;
+
+    LogDANDROID.info(" # Track Name = %s - mGarage = %i\n", trackname, mGarage);
 
     // Discover the car type used
     void* handle = NULL;
@@ -257,6 +267,9 @@ void TDriver::Drive()
     gettimeofday(&tv, NULL);
     double usec1 = tv.tv_usec;
 #endif
+    if (mGarage)
+        return;
+
     updateTime();
     updateTimer();
     updateBasics();
