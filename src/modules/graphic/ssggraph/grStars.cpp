@@ -148,8 +148,8 @@ bool cGrStars::reposition( sgVec3 p, double angle )
 
 bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
 {
-  double mag, nmag, alpha, factor, cutoff;
-  float *color;
+  double mag = 0.0, nmag = 0.0, alpha = 0.0, factor = 0.0, cutoff = 0.0;
+  float *color = NULL;
 
   double mag_nakedeye = 8.2;
   double mag_twilight_astro = 6.4;
@@ -157,7 +157,7 @@ bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
   // sirius, brightest star (not brightest object)
   double mag_min = -1.46;
 
-  int phase;
+  int phase = 0;
 
   // determine which star structure to draw
   if ( sol_angle > ( SD_PI_2 + 18.0 * SGD_DEGREES_TO_RADIANS ))

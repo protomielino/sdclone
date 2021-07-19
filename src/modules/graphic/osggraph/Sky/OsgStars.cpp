@@ -104,14 +104,14 @@ osg::Node* SDStars::build( int num, const osg::Vec3d star_data[], double star_di
 
 bool SDStars::repaint( double sun_angle, int num, const osg::Vec3d star_data[] )
 {
-    double mag, nmag, alpha, factor, cutoff;
+    double mag = 0.0, nmag = 0.0, alpha = 0.0, factor = 0.0, cutoff = 0.0;
     double mag_nakedeye = 7.6;
     double mag_twilight_astro = 6.4;
     double mag_twilight_nautic = 5.7;
     // sirius, brightest star (not brightest object)
     double mag_min = -1.46;
 
-    int phase;
+    int phase = 0;
 
     if ( sun_angle > (SD_PI_2 + 18.0 * SD_DEGREES_TO_RADIANS ) )
     {
