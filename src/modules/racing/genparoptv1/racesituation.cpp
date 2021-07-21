@@ -425,7 +425,7 @@ int ReSituationUpdater::threadLoop()
 }
 
 ReSituationUpdater::ReSituationUpdater()
-: _fSimuTick(RCM_MAX_DT_SIMU), _fOutputTick(0), _fLastOutputTime(0), _fRealTimeGap(0)
+: _fSimuTick(RCM_MAX_DT_SIMU), _fOutputTick(0), _fLastOutputTime(0)
 
 {
     // Save the race engine info (state + situation) pointer for the current step.
@@ -914,16 +914,9 @@ void ReSituationUpdater::computeCurrentStep()
     // Real-time but variable frame rate mode.
     else
     {
-        double realTime = GfTimeClock() - _fRealTimeGap;
-        double maxRealTime = pCurrReInfo->_reCurTime + RCM_MAX_DT_FRAME + 1e-10;
+        const double t = GfTimeClock();
 
-        if (realTime > maxRealTime)
-        {
-            _fRealTimeGap += realTime - maxRealTime;
-            realTime = maxRealTime;
-        }
-
-        while (pCurrReInfo->_reRunning && (realTime - pCurrReInfo->_reCurTime) > _fSimuTick)
+        while (pCurrReInfo->_reRunning && ((t - pCurrReInfo->_reCurTime) > RCM_MAX_DT_SIMU))
             runOneStep(_fSimuTick);
     }
 

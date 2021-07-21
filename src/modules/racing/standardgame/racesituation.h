@@ -177,9 +177,6 @@ private:
     //! Time of the last output when using the "stable but slowed-down frame rate" mode.
     double _fLastOutputTime;
 
-    //! Gap from real time produced by engine lags.
-    double _fRealTimeGap;
-
 };
 
 #endif /* _RACESITUATION_H_ */
