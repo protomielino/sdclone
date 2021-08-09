@@ -124,18 +124,18 @@ set(VORBIS_URL https://downloads.xiph.org/releases/vorbis/${VORBIS_FILE})
 set(VORBIS_HASH SHA256=0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab)
 
 # expat
-message(STATUS "Note special path handling (version in path)")
-set(EXPAT_VERSION 2.3.0)
+set(EXPAT_VERSION 2.4.1)
+string(REPLACE "." "_" EXPAT_TAG ${EXPAT_VERSION})
 set(EXPAT_PROJECT expat-${EXPAT_VERSION})
 set(EXPAT_FILE ${EXPAT_PROJECT}.tar.bz2)
-set(EXPAT_URL https://sourceforge.net/projects/expat/files/expat/${EXPAT_VERSION}/${EXPAT_FILE}/download)
-set(EXPAT_HASH SHA256=f122a20eada303f904d5e0513326c5b821248f2d4d2afbf5c6f1339e511c0586)
+set(EXPAT_URL https://github.com/libexpat/libexpat/releases/download/R_${EXPAT_TAG}/${EXPAT_FILE})
+set(EXPAT_HASH SHA256=2f9b6a580b94577b150a7d5617ad4643a4301a6616ff459307df3e225bcfbf40)
 
-message(STATUS "Note special path handling (version in path)")
 set(EXPAT_LEGACY_VERSION 2.2.10)
+string(REPLACE "." "_" EXPAT_LEGACY_TAG ${EXPAT_LEGACY_VERSION})
 set(EXPAT_LEGACY_PROJECT expat-${EXPAT_LEGACY_VERSION})
 set(EXPAT_LEGACY_FILE ${EXPAT_LEGACY_PROJECT}.tar.bz2)
-set(EXPAT_LEGACY_URL https://sourceforge.net/projects/expat/files/expat/${EXPAT_LEGACY_VERSION}/${EXPAT_LEGACY_FILE}/download)
+set(EXPAT_LEGACY_URL https://github.com/libexpat/libexpat/releases/download/R_${EXPAT_LEGACY_TAG}/${EXPAT_LEGACY_FILE})
 set(EXPAT_LEGACY_HASH SHA256=b2c160f1b60e92da69de8e12333096aeb0c3bf692d41c60794de278af72135a5)
 
 # zlib
