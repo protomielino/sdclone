@@ -110,11 +110,11 @@ set(ENET_URL http://enet.bespin.org/download/${ENET_FILE})
 set(ENET_HASH SHA256=a38f0f194555d558533b8b15c0c478e946310022d0ec7b34334e19e4574dcedc)
 
 # ogg
-set(OGG_VERSION 1.3.4)
+set(OGG_VERSION 1.3.5)
 set(OGG_PROJECT ogg-${OGG_VERSION})
 set(OGG_FILE lib${OGG_PROJECT}.tar.gz)
 set(OGG_URL https://downloads.xiph.org/releases/ogg/${OGG_FILE})
-set(OGG_HASH SHA256=fe5670640bd49e828d64d2879c31cb4dde9758681bb664f9bdbf159a01b0c76e)
+set(OGG_HASH SHA256=0eb4b4b9420a0f51db142ba3f9c64b333f826532dc0f48c6410ae51f4799b664)
 
 # vorbis
 set(VORBIS_VERSION 1.3.7)
