@@ -120,6 +120,7 @@ if(OPTION_CACHED_ARCHIVES)
    set(ZLIB_URL "${CACHED_URL}/${ZLIB_FILE}")
    set(PNG_URL "${CACHED_URL}/${PNG_FILE}")
    set(FREETYPE_URL "${CACHED_URL}/${FREETYPE_FILE}")
+   set(FREETYPE_LEGACY_URL "${CACHED_URL}/${FREETYPE_LEGACY_FILE}")
    set(CURL_URL "${CACHED_URL}/${CURL_FILE}")
    set(OSG_URL "${CACHED_URL}/${OSG_FILE}")
    set(SQLITE3_URL "${CACHED_URL}/${SQLITE3_FILE}")
@@ -337,6 +338,7 @@ if(OPTION_EXPAT)
          CMAKE_ARGS ${EXPAT_ARGS})
     else()
       message(WARNING "expat versions newer than 2.2.10 need Visual Studio 2017")
+      message(WARNING "expat no longer officially supports Visual Studio 2015 and older")
       #disable building unneeded sub projects (they failed with VS2008)
       set(EXPAT_LEGACY_ARGS ${EXTERNALS_CMAKE_ARGS} -DEXPAT_BUILD_TESTS=off -DEXPAT_BUILD_EXAMPLES=off -DEXPAT_BUILD_TOOLS=off -DCMAKE_DEBUG_POSTFIX='')
       ExternalProject_Add(${EXPAT_LEGACY_PROJECT}
@@ -404,21 +406,45 @@ endif(OPTION_SQLITE3)
    # ========== For OpenSceneGraph =============
 
 if(OPTION_FREETYPE)
-   set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false
-                                             -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
-                                             -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
-                                             -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
-                                             -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE
-                                             -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=TRUE
-                                             -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=TRUE)
+   if(MSVC_VERSION GREATER 1700) # Greater than vs2012
+      # Set FREETYPE_LEGACY_PROJECT to empty string, because we will use FREETYPE_PROJECT,
+      # OpenScenegraph DEPENDS on freetype, so only one can be defined
+      set(FREETYPE_LEGACY_PROJECT )
+      set(FREETYPE_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false
+                                                -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
+                                                -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
+                                                -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
+                                                -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE
+                                                -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=TRUE
+                                                -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=TRUE)
 
-   ExternalProject_Add(${FREETYPE_PROJECT}
-      URL ${FREETYPE_URL}
-      URL_HASH ${FREETYPE_HASH}
-      CMAKE_ARGS ${FREETYPE_ARGS}
-      DEPENDS ${ZLIB_PROJECT} ${PNG_PROJECT})
+      ExternalProject_Add(${FREETYPE_PROJECT}
+         URL ${FREETYPE_URL}
+         URL_HASH ${FREETYPE_HASH}
+         CMAKE_ARGS ${FREETYPE_ARGS}
+         DEPENDS ${ZLIB_PROJECT} ${PNG_PROJECT})
+   else()
+      # Set FREETYPE_PROJECT to empty string, because we will use FREETYPE_LEGACY_PROJECT,
+      # OpenScenegraph DEPENDS on freetype, so only one can be defined
+      set(FREETYPE_PROJECT )
+      message(WARNING "freetype versions newer than 2.10.4 need Visual Studio 2013 or newer")
+      set(FREETYPE_LEGACY_ARGS ${EXTERNALS_CMAKE_ARGS} -DBUILD_SHARED_LIBS:BOOL=false
+                                                       -DDISABLE_FORCE_DEBUG_POSTFIX:BOOL=true
+                                                       -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=TRUE
+                                                       -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE
+                                                       -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE
+                                                       -DCMAKE_DISABLE_FIND_PACKAGE_ZLIB=TRUE
+                                                       -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=TRUE)
+
+      ExternalProject_Add(${FREETYPE_LEGACY_PROJECT}
+         URL ${FREETYPE_LEGACY_URL}
+         URL_HASH ${FREETYPE_LEGACY_HASH}
+         CMAKE_ARGS ${FREETYPE_LEGACY_ARGS}
+         DEPENDS ${ZLIB_PROJECT} ${PNG_PROJECT})
+      endif()
 else(OPTION_FREETYPE)
    set(FREETYPE_PROJECT )
+   set(FREETYPE_LEGACY_PROJECT )
 endif(OPTION_FREETYPE)
 
 if(OPTION_CURL)
@@ -445,7 +471,7 @@ if(OPTION_OSG)
       URL ${OSG_URL}
       URL_HASH ${OSG_HASH}
       CMAKE_ARGS ${OSG_ARGS}
-      DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT} OpenGL-headers ${JPEG_PROJECT} ${PNG_PROJECT} ${SDL1_PROJECT} ${SDL2_PROJECT})
+      DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT}${FREETYPE_LEGACY_PROJECT} OpenGL-headers ${JPEG_PROJECT} ${PNG_PROJECT} ${SDL1_PROJECT} ${SDL2_PROJECT})
 endif(OPTION_OSG)
 
 

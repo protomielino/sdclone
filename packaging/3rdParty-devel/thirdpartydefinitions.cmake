@@ -156,11 +156,19 @@ set(PNG_HASH SHA256=daeb2620d829575513e35fecc83f0d3791a620b9b93d800b763542ece939
 
 # freetype
 message(STATUS "Note special path handling (version in path) AND hard-coded 'freetype2'")
-set(FREETYPE_VERSION 2.10.4)
+set(FREETYPE_VERSION 2.11.0)
 set(FREETYPE_PROJECT freetype-${FREETYPE_VERSION})
-set(FREETYPE_FILE ft2104.zip)
+string(REPLACE "." "" FREETYPE_TAG ${FREETYPE_VERSION})
+set(FREETYPE_FILE ft${FREETYPE_TAG}.zip)
 set(FREETYPE_URL https://sourceforge.net/projects/freetype/files/freetype2/${FREETYPE_VERSION}/${FREETYPE_FILE}/download)
-set(FREETYPE_HASH SHA256=5c78216d6c5860ef694fde1418d20d69d0ac83ab346c21eb311bd45709e0d93a)
+set(FREETYPE_HASH SHA256=b42dd7ddcb5a042001350f70658457475a371a1a7d3f46a2b7a92892a8c9a955)
+
+message(STATUS "Note special path handling (version in path) AND hard-coded 'freetype2'")
+set(FREETYPE_LEGACY_VERSION 2.10.4)
+set(FREETYPE_LEGACY_PROJECT freetype-${FREETYPE_LEGACY_VERSION})
+set(FREETYPE_LEGACY_FILE ft2104.zip)
+set(FREETYPE_LEGACY_URL https://sourceforge.net/projects/freetype/files/freetype2/${FREETYPE_LEGACY_VERSION}/${FREETYPE_LEGACY_FILE}/download)
+set(FREETYPE_LEGACY_HASH SHA256=5c78216d6c5860ef694fde1418d20d69d0ac83ab346c21eb311bd45709e0d93a)
 
 # curl
 set(CURL_VERSION 7.78.0)
