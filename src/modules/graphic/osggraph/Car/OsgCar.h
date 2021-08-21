@@ -31,7 +31,6 @@
 #include "OsgWheel.h"
 #include "OsgCarLight.h"
 
-
 class SDCarShader;
 class SDReflectionMapping;
 class SDWheels;
@@ -39,14 +38,29 @@ class SDWheels;
 class SDCar
 {
 private :
-    osg::ref_ptr<osg::MatrixTransform> car_branch;
+    osg::ref_ptr<osg::MatrixTransform> carTransform;
     osg::ref_ptr<osg::MatrixTransform> lights_branch;
-    osg::ref_ptr<osg::Group> car_shaded_body;
-    osg::ref_ptr<osg::Group> car_root;
-    osg::ref_ptr<osg::Switch> pWing3;
-    osg::ref_ptr<osg::Switch> pDriver;
-    osg::ref_ptr<osg::LOD> pSteer;
-    osg::ref_ptr<osg::MatrixTransform> Steer_branch;
+    osg::ref_ptr<osg::Switch>          LODSelector;
+    osg::ref_ptr<osg::Switch>          DRMSelector;
+    osg::ref_ptr<osg::Switch>          DRMSelector2;
+    osg::ref_ptr<osg::Switch>          DriverSelector;
+    osg::ref_ptr<osg::Switch>          SteerSelector;
+    osg::ref_ptr<osg::MatrixTransform> SteerRot;
+    osg::ref_ptr<osg::MatrixTransform> SteerRot2;
+    osg::ref_ptr<osg::Switch>          RearWingSelector;
+    osg::ref_ptr<osg::Group>           car_shaded_body;
+    osg::ref_ptr<osg::Group>           carEntity;
+    int                                nSteer;
+    int					               LODSelectMask[32];
+    float				               LODThreshold[32];
+    int					               DRMSelectMask[32];
+    int					               DRMSelectMask2[32];
+    int                                nDRM;
+    int					               nDRM2;
+    float				               DRMThreshold[32];
+    float				               DRMThreshold2[32];
+    tdble				               steerMovt;
+
     //osg::ref_ptr<osg::Vec3Array> shadowVertices;
     //osg::ref_ptr<osg::Geometry> quad;
     //osg::ref_ptr<osg::Node> initOcclusionQuad(tCarElt *car);
@@ -60,8 +74,8 @@ private :
     SDReflectionMapping *reflectionMapping;
 
     int reflectionMappingMethod;
-    void setReflectionMap(osg::ref_ptr<osg::Texture> map);
 
+    void setReflectionMap(osg::ref_ptr<osg::Texture> map);
     void loadCarLights(tCarElt *Car);
 
 public :
@@ -86,7 +100,7 @@ public :
     const tCarElt *getCar() const { return car; }
 
     void markCarCurrent(tCarElt *Car);
-    void updateCar();
+    void updateCar(tSituation *s, tCarElt *CurCar, int current, int driver);
     void updateShadingParameters(const osg::Matrixf &modelview);
 };
 
@@ -104,12 +118,12 @@ public :
     SDCars(void);
     ~SDCars(void);
 
-    void loadCars(tSituation * pSituation, bool trackType, bool subCat);
-    void updateCars();
-    void markCarCurrent(tCarElt*car);
+    void  loadCars(tSituation * pSituation, bool trackType, bool subCat);
+    void  updateCars(tSituation *s, tCarElt *CurCar, int current, int driver);
+    void  markCarCurrent(tCarElt*car);
     SDCar *getCar(tCarElt*car);
-    void unLoad();
-    void updateShadingParameters(const osg::Matrixf &modelview);
+    void  unLoad();
+    void  updateShadingParameters(const osg::Matrixf &modelview);
     osg::ref_ptr<osg::Node> getShadowNode() { return shadow_branch.get(); }
     osg::ref_ptr<osg::Node> getCarsNode() { return cars_branch.get(); }
 

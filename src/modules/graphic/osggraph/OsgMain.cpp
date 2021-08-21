@@ -120,24 +120,24 @@ static void SDNextCar(void * /* dummy */)
     screens->getActiveView()->selectNextCar();
 }
 
-void SDSelectCamera(void * vp)
+void SDSelectCamera(void *vp)
 {
     long t = (long)vp;
     screens->changeCamera(t);
 }
 
-void SDSetZoom(void * vp)
+void SDSetZoom(void *vp)
 {
     long t = (long)vp;
     screens->getActiveView()->getCameras()->getSelectedCamera()->setZoom(t);
 }
 
-void SDSwitchMirror(void * vp)
+void SDSwitchMirror(void *vp)
 {
     screens->getActiveView()->switchMirror();
 }
 
-void SDToggleHUD(void * vp)
+void SDToggleHUD(void *vp)
 {
     screens->toggleDebugHUD();
 }
@@ -232,7 +232,11 @@ int refresh(tSituation *s)
     double Y = eye[1];
     double Z = eye[2];
     render->UpdateSky(s->currentTime, s->accelTime, X, Y);
-    cars->updateCars();
+
+    tCarElt* curCar = screens->getActiveView()->getCurrentCar();
+    int drawDriver = cam->getDrawDriver();
+    int drawCurrent = cam->getDrawCurrent();
+    cars->updateCars(s, curCar, drawCurrent, drawDriver);
 
     scenery->reposition(X, Y, Z );
     scenery->update_tracklights(s->currentTime, s->_totTime, s->_raceType);
@@ -240,7 +244,7 @@ int refresh(tSituation *s)
     screens->update(s, &frameInfo);
 
     //refresh the hud
-    tCarElt* curCar = screens->getActiveView()->getCurrentCar();
+    //tCarElt* curCar = screens->getActiveView()->getCurrentCar();
     hud.Refresh(s, &frameInfo, curCar);
 
     return 0;
