@@ -84,6 +84,7 @@ endif(WIN32)
 
 option(OPTION_SDL_1x "Download and Build SDL 1.x" false)
 option(OPTION_SDL_2x "Download and Build SDL 2.x" true)
+cmake_dependent_option(OPTION_SDL2_MIXER "Download and Build SDL2_Mixer" true "OPTION_SDL_2x" false)
 option(OPTION_OPENAL "Download and Build OpenAL" true)
 option(OPTION_PLIB "Download and Build PLIB" true)
 cmake_dependent_option(OPTION_PLIB_USE_HEAD "Download and Build PLIB from the latest revision" true "OPTION_PLIB" false)
@@ -106,6 +107,7 @@ set(CACHED_URL "" CACHE STRING "Preferred url from which to download")
 if(OPTION_CACHED_ARCHIVES)
    set(SDL1_URL "${CACHED_URL}/${SDL1_FILE}")
    set(SDL2_URL "${CACHED_URL}/${SDL2_FILE}")
+   set(SDL2_MIXER_URL "${CACHED_URL}/${SDL2_MIXER_FILE}")
    set(OPENAL_URL "${CACHED_URL}/${OPENAL_FILE}")
    set(OPENAL_C11_URL "${CACHED_URL}/${OPENAL_C11_FILE}")
    set(OPENAL_LEGACY_URL "${CACHED_URL}/${OPENAL_LEGACY_FILE}")
@@ -326,6 +328,23 @@ if(OPTION_VORBIS)
 else(OPTION_VORBIS)
    set(VORBIS_PROJECT )
 endif(OPTION_VORBIS)
+
+if(OPTION_SDL2_MIXER)
+   set(SDL2_MIXER_ARGS ${EXTERNALS_CMAKE_ARGS} -DSUPPORT_OGG=True )
+   ExternalProject_Add(${SDL2_MIXER_PROJECT}
+      URL ${SDL2_MIXER_URL}
+      URL_HASH ${SDL_MIXER_HASH}
+      CMAKE_ARGS ${SDL2_MIXER_ARGS}
+      DEPENDS ${SDL2_PROJECT} ${VORBIS_PROJECT} ${OGG_PROJECT} )
+      ExternalProject_Add_Step(${SDL2_MIXER_PROJECT} sdlmixer_add_cmake
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different
+              "${CMAKE_SOURCE_DIR}/patches/${SDL2_MIXER_PROJECT}.CMakeLists.txt"
+              "<SOURCE_DIR>/CMakeLists.txt"
+      DEPENDEES update # do after update
+      DEPENDERS patch)  # do before patch
+else(OPTION_SDL2_MIXER)
+   set(SDL2_MIXER_PROJECT )
+endif(OPTION_SDL2_MIXER)
 
 if(OPTION_EXPAT)
    if(MSVC_VERSION GREATER 1900)
