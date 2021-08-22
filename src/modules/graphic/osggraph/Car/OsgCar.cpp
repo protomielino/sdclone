@@ -374,7 +374,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         this->DRMSelector2->setSingleChildOn(0);
         osg::ref_ptr<osg::Group> vide = new osg::Group;
         this->RearWingSelector->addChild(vide.get());
-        this->RearWingSelector->addChild(DRMSelector2.get());
+        this->RearWingSelector->addChild(this->DRMSelector2.get());
         this->RearWingSelector->setSingleChildOn(1);
         GfLogDebug("Rear Wing angle Loaded\n");
     }
@@ -417,11 +417,11 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
         if(steerEntityLo)
         {
-            nSteer = 1;
-            steerMovt = GfParmGetNum(handle, path, PRM_SW_MOVT, NULL, 1.0);
+            this->nSteer = 1;
+            this->steerMovt = GfParmGetNum(handle, path, PRM_SW_MOVT, NULL, 1.0);
 
-            SteerSelector = new osg::Switch;
-            SteerSelector->setName("STEER");
+            this->SteerSelector = new osg::Switch;
+            this->SteerSelector->setName("STEER");
             osg::ref_ptr<osg::Group> steerbranch = new osg::Group;
             osg::ref_ptr<osg::MatrixTransform> steerLoc = new osg::MatrixTransform;
 
@@ -430,11 +430,11 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
             tdble zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
             float angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
 
-            SteerRot = new osg::MatrixTransform;
+            this->SteerRot = new osg::MatrixTransform;
             osg::Matrix pos = osg::Matrix::translate(0.0, 0.0, 0.0);
-            SteerRot->setMatrix( pos);
-            SteerRot->setName("STEERBRANCHE");
-            SteerRot->addChild(steerEntityLo.get());
+            this->SteerRot->setMatrix( pos);
+            this->SteerRot->setName("STEERBRANCHE");
+            this->SteerRot->addChild(steerEntityLo.get());
 
             angl = SD_DEGREES_TO_RADIANS * angl;
             pos = osg::Matrix::translate(xpos, ypos, zpos);
@@ -443,8 +443,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
             steerLoc->setMatrix(pos);
             steerLoc->addChild(SteerRot.get());
             steerbranch->addChild( steerLoc );
-            SteerSelector->addChild(steerbranch);
-            SteerSelector->setSingleChildOn(0);
+            this->SteerSelector->addChild(steerbranch);
+            this->SteerSelector->setSingleChildOn(0);
 
             param = GfParmGetStr(handle, path, PRM_SW_MODELHR, NULL);
 
@@ -456,15 +456,15 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
                 strPath = tmpPath + param;
                 osg::ref_ptr<osg::Node> steerEntityHi = loader.Load3dFile(strPath, true, "", "");
-                nSteer = 2;
+                this->nSteer = 2;
 
                 steerbranch = new osg::Group;
                 steerLoc = new osg::MatrixTransform;
 
-                SteerRot2 = new osg::MatrixTransform;
+                this->SteerRot2 = new osg::MatrixTransform;
                 pos = osg::Matrix::translate(0.0, 0.0, 0.0);
-                SteerRot2->setMatrix(pos);
-                SteerRot2->addChild(steerEntityHi.get());
+                this->SteerRot2->setMatrix(pos);
+                this->SteerRot2->addChild(steerEntityHi.get());
 
                 angl = SD_DEGREES_TO_RADIANS * angl;
                 pos = osg::Matrix::translate(xpos, ypos, zpos);
@@ -473,8 +473,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
                 steerLoc->setMatrix(pos);
                 steerLoc->addChild(SteerRot2.get());
                 steerbranch->addChild( steerLoc );
-                SteerSelector->addChild(steerbranch);
-                SteerSelector->setSingleChildOn(1);
+                this->SteerSelector->addChild(steerbranch);
+                this->SteerSelector->setSingleChildOn(1);
             }
         }
 
@@ -497,7 +497,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         osg::ref_ptr<osg::Node> driverEntity = new osg::Node;
         osg::ref_ptr<osg::Switch> DRMSel = new osg::Switch;
         this->DRMSelector = new osg::Switch;
-        carTransform->addChild(DriverSelector.get());
+        this->carTransform->addChild(DriverSelector.get());
 
 
         std::string tmp = GetLocalDir();
@@ -551,18 +551,18 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
         osg::ref_ptr<osg::Group> vide = new osg::Group;
 
-        DriverSelector->addChild(vide.get());
-        DriverSelector->addChild(DRMSelector.get());
-        DriverSelector->setSingleChildOn(0);
+        this->DriverSelector->addChild(vide.get());
+        this->DriverSelector->addChild(this->DRMSelector.get());
+        this->DriverSelector->setSingleChildOn(0);
     }
 
-    car_shaded_body->addChild(pCar.get());
+    this->car_shaded_body->addChild(pCar.get());
 
     if(_wing1)
-        car_shaded_body->addChild(pWing.get());
+        this->car_shaded_body->addChild(pWing.get());
 
     if(_wing3)
-        car_shaded_body->addChild(RearWingSelector.get());
+        this->car_shaded_body->addChild(RearWingSelector.get());
 
     gCar->addChild(car_shaded_body.get());
 
@@ -705,19 +705,19 @@ void SDCar::markCarCurrent(tCarElt *Car)
 {
     if(this->car == Car)
     {
-        carTransform->setNodeMask(NODE_MASK_CURCAR);
-        lights_branch->setNodeMask(NODE_MASK_CURCAR);
+        this->carTransform->setNodeMask(NODE_MASK_CURCAR);
+        this->lights_branch->setNodeMask(NODE_MASK_CURCAR);
 
         if(_driver)
-            DriverSelector->setNodeMask(NODE_MASK_CURDRV);
+            this->DriverSelector->setNodeMask(NODE_MASK_CURDRV);
     }
     else
     {
-        carTransform->setNodeMask(NODE_MASK_ALL);
-        lights_branch->setNodeMask(NODE_MASK_ALL);
+        this->carTransform->setNodeMask(NODE_MASK_ALL);
+        this->lights_branch->setNodeMask(NODE_MASK_ALL);
 
         if(_driver)
-            DriverSelector->setNodeMask(NODE_MASK_ALL);
+            this->DriverSelector->setNodeMask(NODE_MASK_ALL);
     }
 }
 
@@ -764,92 +764,92 @@ void SDCar::updateCar(tSituation *s, tCarElt *CurCar, int current, int driver)
             if (this->nDRM > 14)
             {
                 if((steerangle > 0.0f) && (steerangle < 0.03f))
-                    DRMSelector->setSingleChildOn(0);
+                    this->DRMSelector->setSingleChildOn(0);
                 else if((steerangle > 0.03f) && (steerangle < 0.07f))
-                    DRMSelector->setSingleChildOn(1);
+                    this->DRMSelector->setSingleChildOn(1);
                 else if((steerangle > 0.07f) && (steerangle < 0.13f))
-                    DRMSelector->setSingleChildOn(2);
+                    this->DRMSelector->setSingleChildOn(2);
                 else if((steerangle > 0.13f) && (steerangle < 0.21f))
-                    DRMSelector->setSingleChildOn(3);
+                    this->DRMSelector->setSingleChildOn(3);
                 else if((steerangle > 0.21f) && (steerangle < 0.30f))
-                    DRMSelector->setSingleChildOn(4);
+                    this->DRMSelector->setSingleChildOn(4);
                 else if((steerangle > 0.30f) && (steerangle < 0.45f))
-                    DRMSelector->setSingleChildOn(5);
+                    this->DRMSelector->setSingleChildOn(5);
                 else if((steerangle > 0.45f) && (steerangle < 0.70f))
-                    DRMSelector->setSingleChildOn(6);
+                    this->DRMSelector->setSingleChildOn(6);
                 else if(steerangle > 0.70f)
-                    DRMSelector->setSingleChildOn(7);
+                    this->DRMSelector->setSingleChildOn(7);
                 else if((steerangle < 0.03f) && (steerangle > -0.07f))
-                    DRMSelector->setSingleChildOn(8);
+                    this->DRMSelector->setSingleChildOn(8);
                 else if((steerangle < -0.07f) && (steerangle > -0.13f))
-                    DRMSelector->setSingleChildOn(9);
+                    this->DRMSelector->setSingleChildOn(9);
                 else if((steerangle < -0.13f) && (steerangle > -0.21f))
-                    DRMSelector->setSingleChildOn(10);
+                    this->DRMSelector->setSingleChildOn(10);
                 else if((steerangle < -0.21f) && (steerangle > -0.30f))
-                    DRMSelector->setSingleChildOn(11);
+                    this->DRMSelector->setSingleChildOn(11);
                 else if((steerangle < -0.30f) && (steerangle > -0.45f))
-                    DRMSelector->setSingleChildOn(12);
+                    this->DRMSelector->setSingleChildOn(12);
                 else if((steerangle < -0.45f) && (steerangle > -0.70f))
-                    DRMSelector->setSingleChildOn(13);
+                    this->DRMSelector->setSingleChildOn(13);
                 else if(steerangle < -0.70f)
-                    DRMSelector->setSingleChildOn(14);
+                    this->DRMSelector->setSingleChildOn(14);
                 else
-                    DRMSelector->setSingleChildOn(0);
+                    this->DRMSelector->setSingleChildOn(0);
             }
             else
             {
                 if((steerangle > 0.0f) && (steerangle < 0.03f))
-                    DRMSelector->setSingleChildOn(0);
+                    this->DRMSelector->setSingleChildOn(0);
                 else if((steerangle > 0.03f) && (steerangle < 0.07f))
-                    DRMSelector->setSingleChildOn(1);
+                    this->DRMSelector->setSingleChildOn(1);
                 else if((steerangle > 0.07f) && (steerangle < 0.13f))
-                    DRMSelector->setSingleChildOn(2);
+                    this->DRMSelector->setSingleChildOn(2);
                 else if((steerangle > 0.13f) && (steerangle < 0.21f))
-                    DRMSelector->setSingleChildOn(3);
+                    this->DRMSelector->setSingleChildOn(3);
                 else if((steerangle > 0.21f) && (steerangle < 0.30f))
-                    DRMSelector->setSingleChildOn(4);
+                    this->DRMSelector->setSingleChildOn(4);
                 else if((steerangle > 0.30f) && (steerangle < 0.45f))
-                    DRMSelector->setSingleChildOn(5);
+                    this->DRMSelector->setSingleChildOn(5);
                 else if((steerangle > 0.45f))
-                    DRMSelector->setSingleChildOn(6);
+                    this->DRMSelector->setSingleChildOn(6);
                 else if((steerangle < 0.03f) && (steerangle > -0.07f))
-                    DRMSelector->setSingleChildOn(7);
+                    this->DRMSelector->setSingleChildOn(7);
                 else if((steerangle < -0.07f) && (steerangle > -0.13f))
-                    DRMSelector->setSingleChildOn(8);
+                    this->DRMSelector->setSingleChildOn(8);
                 else if((steerangle < -0.13f) && (steerangle > -0.21f))
-                    DRMSelector->setSingleChildOn(9);
+                    this->DRMSelector->setSingleChildOn(9);
                 else if((steerangle < -0.21f) && (steerangle > -0.30f))
-                    DRMSelector->setSingleChildOn(10);
+                    this->DRMSelector->setSingleChildOn(10);
                 else if((steerangle < -0.30f) && (steerangle > -0.45f))
-                    DRMSelector->setSingleChildOn(11);
+                    this->DRMSelector->setSingleChildOn(11);
                 else if((steerangle < -0.45f))
-                    DRMSelector->setSingleChildOn(12);
+                    this->DRMSelector->setSingleChildOn(12);
                 else
-                    DRMSelector->setSingleChildOn(0);
+                    this->DRMSelector->setSingleChildOn(0);
             }
         }
     }
 
     if(_steer)
     {
-		if (driver)
-		{
-			SteerSelector->setSingleChildOn(0);
-			steerangle = (-steerangle * 1.2);
-			osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
-			this->SteerRot->setMatrix(rotation);
-		}
-		else
-		{
-			if (nSteer > 1)
-			{
-				this->SteerSelector->setSingleChildOn(1);
-				steerangle = (-steerangle * 1.2);
-				osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
-				this->SteerRot2->setMatrix(rotation);
-				GfLogDebug(" # update steer branch\n");
-			}
-		}
+        if (driver || car != CurCar)
+        {
+            this->SteerSelector->setSingleChildOn(0);
+            steerangle = (-steerangle * 1.2);
+            osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
+            this->SteerRot->setMatrix(rotation);
+        }
+        else
+        {
+            if (nSteer > 1)
+            {
+                this->SteerSelector->setSingleChildOn(1);
+                steerangle = (-steerangle * 1.2);
+                osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
+                this->SteerRot2->setMatrix(rotation);
+                GfLogDebug(" # update steer branch\n");
+            }
+        }
     }
 
     for(std::vector<SDCarLight>::iterator i = lights.begin(); i != lights.end(); ++i)
@@ -861,9 +861,9 @@ void SDCar::updateCar(tSituation *s, tCarElt *CurCar, int current, int driver)
     this->lights_branch->setMatrix(mat);
 
     if(_carShader > 2)
-        reflectionMapping->update();
+        this->reflectionMapping->update();
 
-    this->setReflectionMap(reflectionMapping->getReflectionMap());
+    this->setReflectionMap(this->reflectionMapping->getReflectionMap());
 
     //ugly computation,
     /*if (SHADOW_TECHNIQUE == 0)
@@ -887,7 +887,7 @@ void SDCar::updateShadingParameters(const osg::Matrixf &modelview)
 
 void SDCar::setReflectionMap(osg::ref_ptr<osg::Texture> map)
 {
-    car_shaded_body->getOrCreateStateSet()->setTextureAttributeAndModes(2, map,
+    this->car_shaded_body->getOrCreateStateSet()->setTextureAttributeAndModes(2, map,
                                                                         osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 }
 
@@ -912,7 +912,7 @@ void SDCars::addSDCar(SDCar *car)
 
 void SDCars::loadCars(tSituation *pSituation, bool trackType, bool subCat)
 {
-    cars_branch = new osg::Group;
+    this->cars_branch = new osg::Group;
     SDRender *rend = (SDRender *)getRender();
     unsigned carShader = rend->getShader();
     tSituation *s = pSituation;
@@ -979,6 +979,6 @@ void SDCars::updateShadingParameters(const osg::Matrixf &modelview)
 
 void SDCars::unLoad()
 {
-    cars_branch->removeChildren(0, cars_branch->getNumChildren());
-    cars_branch = NULL;
+    this->cars_branch->removeChildren(0, cars_branch->getNumChildren());
+    this->cars_branch = NULL;
 }
