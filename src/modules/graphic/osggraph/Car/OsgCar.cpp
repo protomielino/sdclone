@@ -832,15 +832,24 @@ void SDCar::updateCar(tSituation *s, tCarElt *CurCar, int current, int driver)
 
     if(_steer)
     {
-        SteerSelector->setSingleChildOn(1);
-        steerangle = (-steerangle * 1.2);
-        //osg::ref_ptr<osg::MatrixTransform> movt = new osg::MatrixTransform;
-        osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
-
-        //osg::MatrixTransform * movt = dynamic_cast<osg::MatrixTransform *>(Steer_branch->getChild(0));
-        SteerRot2->setMatrix(rotation);
-        //movt->addChild(pSteer);
-        GfLogDebug(" # update steer branch\n");
+		if (driver)
+		{
+			SteerSelector->setSingleChildOn(0);
+			steerangle = (-steerangle * 1.2);
+			osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
+			this->SteerRot->setMatrix(rotation);
+		}
+		else
+		{
+			if (nSteer > 1)
+			{
+				this->SteerSelector->setSingleChildOn(1);
+				steerangle = (-steerangle * 1.2);
+				osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
+				this->SteerRot2->setMatrix(rotation);
+				GfLogDebug(" # update steer branch\n");
+			}
+		}
     }
 
     for(std::vector<SDCarLight>::iterator i = lights.begin(); i != lights.end(); ++i)
