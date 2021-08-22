@@ -1923,7 +1923,7 @@ SDCameras::SDCameras(SDView *c, int ncars)
     cameras[0].insert(cameras[0].end(),new SDCarCamBehindReverse(myscreen,
                                                                  id,
                                                                  0,	/* drawCurr */
-                                                                 2,	/* drawBG  */
+                                                                 1,	/* drawBG  */
                                                                  67.5,	/* fovy */
                                                                  10.0,	/* fovymin */
                                                                  95.0,	/* fovymax */

@@ -75,6 +75,7 @@ SDCar::SDCar(void) :
     _wing1 = false;
     _wing3 = false;
     _steer = false;
+    _carLOD = false;
 
     _carShader = 0;
 }
@@ -737,8 +738,6 @@ void SDCar::updateCar(tSituation *s, tCarElt *CurCar, int current, int driver)
 
     if ((car == CurCar) && (current != 1))
     {
-        this->LODSelector->setSingleChildOn(0);
-
         if(_driver)
         {
             if (this->nDRM > 0)
