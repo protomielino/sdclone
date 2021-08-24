@@ -27,13 +27,13 @@
 #include <osg/TextureCubeMap>
 #include <osg/LOD>
 
-#include "OsgDriver.h"
 #include "OsgWheel.h"
 #include "OsgCarLight.h"
 
 class SDCarShader;
 class SDReflectionMapping;
 class SDWheels;
+class SDCarLight;
 
 class SDCar
 {
