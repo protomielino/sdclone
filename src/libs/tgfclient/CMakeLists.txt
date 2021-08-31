@@ -6,13 +6,12 @@ ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(tgf math portability)
 IF(OPTION_SDL2)
 	ADD_SDL2_INCLUDEDIR()
+	ADD_SDL2_MIXER_INCLUDEDIR()
 ELSE(OPTION_SDL2)
 	ADD_SDL_INCLUDEDIR()
 ENDIF(OPTION_SDL2)
 ADD_JPEG_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
-ADD_OPENAL_INCLUDEDIR()
-ADD_VORBIS_INCLUDEDIR()
 IF(OPTION_WEBSERVER)
 	ADD_CURL_INCLUDEDIR()
 ENDIF(OPTION_WEBSERVER)
@@ -24,6 +23,7 @@ SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
             guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
             guiscreen.cpp guieventloop.cpp guiapplication.cpp 
             musicplayer.cpp musicplayer.h 
+            sdl2musicplayer.cpp sdl2musicplayer.h
             glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h)
 
 IF(OPTION_WEBSERVER)
@@ -35,11 +35,6 @@ IF(OPTION_SDL_FORCEFEEDBACK)
 ENDIF(OPTION_SDL_FORCEFEEDBACK)
 
 SET(_OTHER_SOURCES guimenutest.xml)
-
-SET(_SOURCES ${_SOURCES} 
-            soundstream.cpp soundstream.h 
-            oggsoundstream.cpp oggsoundstream.h 
-            openalmusicplayer.cpp openalmusicplayer.h )
 
 #disable developer warning
 IF (COMMAND CMAKE_POLICY)
@@ -84,24 +79,11 @@ IF(OPENGL_FOUND)
     TARGET_LINK_LIBRARIES(tgfclient ${OPENGL_LIBRARY})
 ENDIF(OPENGL_FOUND)
 
-IF(OPENAL_FOUND)
-    TARGET_LINK_LIBRARIES(tgfclient ${OPENAL_LIBRARY})
-ENDIF(OPENAL_FOUND)
-
-IF(VORBIS_FOUND)
-      TARGET_LINK_LIBRARIES(tgfclient ${VORBIS_LIBRARY})
-ENDIF(VORBIS_FOUND)
-IF(VORBISFILE_FOUND)
-      TARGET_LINK_LIBRARIES(tgfclient ${VORBISFILE_LIBRARY})
-ENDIF(VORBISFILE_FOUND)
-IF(OGG_FOUND)
-      TARGET_LINK_LIBRARIES(tgfclient ${OGG_LIBRARY})
-ENDIF(OGG_FOUND)
-
 ADD_PLIB_LIBRARY(tgfclient ul sg js)
 
 IF(OPTION_SDL2)
 	ADD_SDL2_LIBRARY(tgfclient)
+	ADD_SDL2_MIXER_LIBRARY(tgfclient)
 ELSE(OPTION_SDL2)
 	ADD_SDL_LIBRARY(tgfclient)
 ENDIF(OPTION_SDL2)

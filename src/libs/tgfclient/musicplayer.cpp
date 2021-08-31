@@ -26,11 +26,12 @@
 #include "tgfclient.h"
 #include <portability.h>
 #include <sound.h>
+#include <SDL_mixer.h>
 
 #define MAX_MUSIC_PATH 1024
+#define NOMUSIC "None"
 
-#include "oggsoundstream.h"
-#include "openalmusicplayer.h"
+#include "sdl2musicplayer.h"
  
 static const char *musicDisabledStr = SND_VAL_MUSIC_STATE_DISABLED;
 
@@ -38,169 +39,126 @@ static bool enabled = true;
 static char currentMusicfile[MAX_MUSIC_PATH] = {0};
 static char defaultMusic[MAX_MUSIC_PATH] = {0}; //"data/music/main.ogg";
 static float maxMusicVolume = 1.0;
-
-#define NOMUSIC "None"
-std::map<std::string,OpenALMusicPlayer*> mapOpenAlPlayers;
- 
 static SDL_mutex *mapMutex = NULL;
 
-static void playMenuMusic();
-static void pauseMenuMusic();
+std::map<std::string,SDL2MusicPlayer*> mapSDL2Players;
+
 static void readConfig();
 
  static bool isEnabled()
- {
+{
 	return enabled;
 }
 
-
-// Path relative to CWD, e.g "data/music/main.ogg"
-static SoundStream* getMenuSoundStream(char* oggFilePath)
+static SDL2MusicPlayer* getMusicPlayer(char* oggFilePath)
 {
-	OggSoundStream* stream = new OggSoundStream(oggFilePath);
-	return stream;
-}
-
-
-static OpenALMusicPlayer* getMusicPlayer(char* oggFilePath)
-{
-	OpenALMusicPlayer* player = NULL;
+	SDL2MusicPlayer* player = NULL;
 	
 	SDL_LockMutex(mapMutex);
-	const std::map<std::string, OpenALMusicPlayer*>::const_iterator itPlayers = mapOpenAlPlayers.find(oggFilePath);
+	const std::map<std::string, SDL2MusicPlayer*>::const_iterator itPlayers = mapSDL2Players.find(oggFilePath);
 
-	if (itPlayers == mapOpenAlPlayers.end()) {
-		player = new OpenALMusicPlayer(getMenuSoundStream(oggFilePath));
-		mapOpenAlPlayers[oggFilePath] = player;
+	if (itPlayers == mapSDL2Players.end()) {
+		player = new SDL2MusicPlayer(oggFilePath);
+		mapSDL2Players[oggFilePath] = player;
 		player->setvolume(maxMusicVolume);
-		player->start();
 	} else {
-		player = mapOpenAlPlayers[oggFilePath];
+		player = mapSDL2Players[oggFilePath];
 	}
 	SDL_UnlockMutex(mapMutex);
 	return player;
-}
-
-static Uint32 sdlTimerFunc(Uint32 interval, void* /* pEvLoopPriv */)
-{
-	playMenuMusic();
-	return 1;
-}
-
-SDL_TimerID timerId = 0;
-static void playMenuMusic()
-{
-	const int nextcallinms = 100;
-	SDL_LockMutex(mapMutex);
-	std::map<std::string, OpenALMusicPlayer*>::const_iterator itPlayers = mapOpenAlPlayers.begin();
-	while(itPlayers != mapOpenAlPlayers.end()) {
-		OpenALMusicPlayer* player = itPlayers->second;
-	
-		if (player) {
-			player->playAndManageBuffer();
-		}
-		++itPlayers;
-	}
-	SDL_UnlockMutex(mapMutex);
-	if(timerId == 0){
-		timerId = SDL_AddTimer(nextcallinms, sdlTimerFunc, (void*)NULL);
-	}
 }
 
 void initMusic()
 {
 	readConfig();
 	if (isEnabled()) {
+		GfLogInfo("(Re-)Initializing music player \n");
 		mapMutex = SDL_CreateMutex();
-		(void)getMusicPlayer(defaultMusic);
-		strcpy(currentMusicfile,defaultMusic);
-		playMenuMusic();
+		if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) >= 0 ){
+			(void)getMusicPlayer(defaultMusic);
+			strcpy(currentMusicfile,defaultMusic);
+			SDL2MusicPlayer* player = getMusicPlayer(currentMusicfile);
+			if(player){
+				player->resume();
+			}
+		}
+	}
+	else {
+		GfLogInfo("Music player is disabled \n");
 	}
 }
 
 
 void shutdownMusic()
 {
-	if(timerId != 0){
-		SDL_RemoveTimer(timerId);
-		timerId = 0;
-	}
 	SDL_LockMutex(mapMutex);
-	std::map<std::string, OpenALMusicPlayer*>::const_iterator itPlayers = mapOpenAlPlayers.begin();
-	while(itPlayers != mapOpenAlPlayers.end()) {
-		OpenALMusicPlayer* player = itPlayers->second;
+	std::map<std::string, SDL2MusicPlayer*>::const_iterator itPlayers = mapSDL2Players.begin();
+	while(itPlayers != mapSDL2Players.end()) {
+		SDL2MusicPlayer* player = itPlayers->second;
 		player->stop();
 		player->rewind();
 		++itPlayers;
 	}
-	itPlayers = mapOpenAlPlayers.begin();
-	while(itPlayers != mapOpenAlPlayers.end()) {
-		OpenALMusicPlayer* player = itPlayers->second;
+	itPlayers = mapSDL2Players.begin();
+	while(itPlayers != mapSDL2Players.end()) {
+		SDL2MusicPlayer* player = itPlayers->second;
 		delete player;
 		++itPlayers;
 	}
-	mapOpenAlPlayers.clear();
+	mapSDL2Players.clear();
 	SDL_UnlockMutex(mapMutex);
 	SDL_DestroyMutex(mapMutex);
 	mapMutex = NULL;
+	Mix_Quit();
 }
 
-void pauseMenuMusic()
-{
-
-		if(timerId != 0){
-		SDL_RemoveTimer(timerId);
-		timerId = 0;
-		}
-		SDL_LockMutex(mapMutex);
-		std::map<std::string, OpenALMusicPlayer*>::const_iterator itPlayers = mapOpenAlPlayers.begin();
-		while(itPlayers != mapOpenAlPlayers.end()) {
-			OpenALMusicPlayer* player = itPlayers->second;
-			player->pause();
-			++itPlayers;
-		}
-		SDL_UnlockMutex(mapMutex);
-		
-
-}
 
 void playMusic(char* filename)
 {
 	if (isEnabled()) {
-		OpenALMusicPlayer* player = NULL;
-		if(filename != NULL) {
-			if(0 == strcmp(NOMUSIC,filename)){
+		SDL2MusicPlayer* player = NULL;
+		if(filename != NULL)
+		{
+			if(0 == strcmp(NOMUSIC,filename))
+			{
+				player = getMusicPlayer(currentMusicfile);
+				player->stop();
 				strcpy(currentMusicfile,filename);
 				GfLogInfo("Music changing to: %s \n", filename);
-				pauseMenuMusic();
 				return;
 			}
-			if(0 != strcmp(currentMusicfile,filename)){
+			if(0 != strcmp(currentMusicfile,filename))
+			{
 				if(0 != strcmp(NOMUSIC,currentMusicfile)){
 					player = getMusicPlayer(currentMusicfile);
-					player->fadeout();
+					player->stop();
 				}
 				strcpy(currentMusicfile,filename);
 				GfLogInfo("Music changing to: %s \n", filename);
 				player = getMusicPlayer(filename);
-				player->fadein();
+				player->resume();
 			}
-		} else {
-			if(0 != strcmp(currentMusicfile,defaultMusic)){
-				if(0 != strcmp(NOMUSIC,currentMusicfile)){
+		} 
+		else 
+		{
+			if(0 != strcmp(currentMusicfile,defaultMusic))
+			{
+				if(0 != strcmp(NOMUSIC,currentMusicfile))
+				{
 					player = getMusicPlayer(currentMusicfile);
-					player->fadeout();
+					player->stop();
 				}
 				strcpy(currentMusicfile,defaultMusic);
 				GfLogInfo("Music changing to: %s \n", defaultMusic);
 				player = getMusicPlayer(defaultMusic);
-				player->fadein();
+				player->resume();
+			}
+			else
+			{
+				player = getMusicPlayer(defaultMusic);
+				player->resume();
 			}
 		}
-		if(player) {
-			player->resume();
-		}
-		playMenuMusic();
 	}
 }
 
@@ -225,6 +183,8 @@ static void readConfig()
 {
 	char fnbuf[1024];
 	sprintf(fnbuf, "%s%s", GfLocalDir(), SND_PARAM_FILE);
+
+	GfLogInfo("Reading music player config\n");
 	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	const char *musicenabled = GfParmGetStr(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_STATE, musicDisabledStr);
 
@@ -249,12 +209,11 @@ static void readConfig()
 	// Using plib for the sound effects sometimes crashes when OpenAL already has the sound device
 	const char* isplib = GfParmGetStr(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_STATE, "");
 	if (!strcmp(isplib, "plib")) {
-		enabled = false;
-		GfLogInfo("Music player disabled for PLIB\n");
+		//enabled = false;
+		GfLogInfo("Music player disabled when using PLIB for sound effects\n");
 	}
 	//TODO end of section to Remove
 
-	GfLogInfo("(Re-)Initializing music player \n");
 	GfParmReleaseHandle(paramHandle);
 	paramHandle = NULL;
 }
@@ -268,5 +227,5 @@ void setMusicVolume(float vol)
 	
 	maxMusicVolume = vol;
 
-	GfLogInfo("Music maximum volume set to %.2f\n", maxMusicVolume);
+	GfLogInfo("Music volume set to %.2f\n", maxMusicVolume);
 }

@@ -1,12 +1,12 @@
-#ifndef __OpenALMusicPlayer_h__
-#define __OpenALMusicPlayer_h__
+#ifndef __SDL2MusicPlayer_h__
+#define __SDL2MusicPlayer_h__
 
 /***************************************************************************
 
-    file                 : OpenAlMusicPlayer.h
-    created              : Fri Dec 23 17:35:18 CET 2011
-    copyright            : (C) 2011 Bernhard Wymann
-    email                : berniw@bluewin.ch
+    file                 : SDL2MusicPlayer.h
+    created              : Sat June 5 2021
+    copyright            : (C) 2021 
+    email                : 
     version              : $Id$
 
  ***************************************************************************/
@@ -20,51 +20,37 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <AL/al.h>
-#include <AL/alc.h>
-#include "soundstream.h"
+#include <SDL_mixer.h>
 
-class OpenALMusicPlayer
+class SDL2MusicPlayer
 {
 	public:
-		OpenALMusicPlayer(SoundStream* soundStream);
-		virtual ~OpenALMusicPlayer();
+		SDL2MusicPlayer(char* oggFilePath);
+		virtual ~SDL2MusicPlayer();
 		
 		virtual void start();
 		virtual void stop();
 		virtual void pause();
 		virtual void resume();
 		virtual void rewind();
-		virtual bool playAndManageBuffer();
 		virtual void setvolume(float volume);
 		virtual float getvolume();
 		virtual void fadeout();
 		virtual void fadein();
 
 	protected:
-		virtual bool initContext();
-		virtual bool initBuffers();
-		virtual bool initSource();
-		virtual bool check();
 		virtual bool startPlayback();
 		virtual bool isPlaying();
-		virtual bool streamBuffer(ALuint buffer);
 		virtual void doFade();
 		
-		ALCdevice* _device;
-		ALCcontext* _context;
-		ALCcontext* _originalcontext;
-		ALuint _source;								// audio source 
-		ALuint _buffers[2];							// front and back buffers
-		ALfloat _maxVolume;
+		Mix_Music* music;
 
 		typedef enum { NONE, FADEIN, FADEOUT } eFadeState;
 
-		eFadeState _fadestate;
+		eFadeState fadestate;
 		
-		SoundStream* _stream;
-		bool _ready;									// initialization sucessful
-		static const int BUFFERSIZE;
-		static const ALfloat FADESTEP;
+		float maxVolume;
+		bool ready;
+		bool started;
 };
-#endif // __OpenALMusicPlayer_h__
+#endif // __SDL2MusicPlayer_h__

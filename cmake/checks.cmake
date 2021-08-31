@@ -252,6 +252,17 @@ MACRO(CHECK_LIBRARIES)
 			MESSAGE(STATUS "Looking for library SDL2 - NOT found")
 		ENDIF(SDL2_FOUND)
 
+		IF(NOT SDL2_MIXER_FOUND)
+			Find_Package(SDL2_mixer)
+		ENDIF()
+
+		IF(SDL2_MIXER_FOUND)
+			SET(HAVE_LIBSDL2 1)
+			MESSAGE(STATUS "Looking for library SDL2_mixer - found")
+		ELSE(SDL2_MIXER_FOUND)
+			MESSAGE(STATUS "Looking for library SDL2_mixer - NOT found")
+		ENDIF(SDL2_MIXER_FOUND)
+
 	ELSE(OPTION_SDL2)
 			# SDL 1.x
 		Find_Package(SDL)
