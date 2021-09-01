@@ -2,8 +2,8 @@
 
     file                 : SDL2MusicPlayer.cpp
     created              : Sat June 5 2021
-    copyright            : (C) 2021 
-    email                : 
+    copyright            : (C) 2021
+    email                :
     version              : $Id$
 
  ***************************************************************************/
@@ -21,105 +21,112 @@
 #include <tgf.h>
 #include "sdl2musicplayer.h"
 
-
 SDL2MusicPlayer::SDL2MusicPlayer(char* oggFilePath):
-	music(NULL),
-	maxVolume(1.0),
-	fadestate(FADEIN),
-	started(false),
-	ready(false)
+    music(NULL),
+    fadestate(FADEIN),
+    maxVolume(1.0),
+    ready(false),
+    started(false)
+
 {
-	if(oggFilePath){
-	music =  Mix_LoadMUS(oggFilePath);
-	}
+    if(oggFilePath)
+    {
+        music =  Mix_LoadMUS(oggFilePath);
+    }
 }
 
 SDL2MusicPlayer::~SDL2MusicPlayer()
 {
-	stop();
-	if(music) {
-		Mix_FreeMusic( music );
-		music = NULL;
-	}
+    stop();
+
+    if(music)
+    {
+        Mix_FreeMusic( music );
+        music = NULL;
+    }
 }
 
 void SDL2MusicPlayer::stop()
 {
-	Mix_HaltMusic();
-	if (!ready) {
-		return;
-	}
+    Mix_HaltMusic();
 
-	ready = false;
+    if (!ready)
+    {
+        return;
+    }
+
+    ready = false;
 }
 
 bool SDL2MusicPlayer::isPlaying()
 {
-	return started;
+    return started;
 }
 
 void SDL2MusicPlayer::start()
 {
-	if(music){
-		Mix_FadeInMusic(music, -1, 1000);
-		started = true;
-	}
+    if(music)
+    {
+        Mix_FadeInMusic(music, -1, 1000);
+        started = true;
+    }
 }
 
 void SDL2MusicPlayer::pause()
 {
-		//Mix_PauseMusic();
-		Mix_FadeOutMusic(1000);
+        //Mix_PauseMusic();
+        Mix_FadeOutMusic(1000);
 }
 
 void SDL2MusicPlayer::resume()
 {
-	if((Mix_PlayingMusic() == 0) || (!started))
-	{
-		start();
-	}
-	else
-	{
-		Mix_ResumeMusic();
-	}
+    if((Mix_PlayingMusic() == 0) || (!started))
+    {
+        start();
+    }
+    else
+    {
+        Mix_ResumeMusic();
+    }
 }
 void SDL2MusicPlayer::rewind()
 {
-	//_stream->rewind();
+    //_stream->rewind();
 }
 
 bool SDL2MusicPlayer::startPlayback()
 {
-	if(isPlaying()) {
-		return true;
-	}
-	
-	
-	return true;
+    if(isPlaying())
+    {
+        return true;
+    }
+
+
+    return true;
 }
 
 void SDL2MusicPlayer::fadeout()
 {
-	fadestate = FADEOUT;
+    fadestate = FADEOUT;
 }
 
 void SDL2MusicPlayer::fadein()
 {
-	fadestate = FADEIN;
+    fadestate = FADEIN;
 }
 
 void SDL2MusicPlayer::setvolume(float volume)
 {
-	maxVolume = volume;
-	Mix_VolumeMusic(int(maxVolume * 100));
+    maxVolume = volume;
+    Mix_VolumeMusic(int(maxVolume * 100));
 }
 
 float SDL2MusicPlayer::getvolume()
 {
-	return maxVolume;
+    return maxVolume;
 }
 
 void SDL2MusicPlayer::doFade()
 {
-	
+
 }
