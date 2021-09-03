@@ -192,7 +192,7 @@ SDCloudLayer::SDCloudLayer( const string &tex_path ) :
 // Destructor
 SDCloudLayer::~SDCloudLayer()
 {
-  //delete layer3D;
+    state_initialized = false;
 }
 
 float SDCloudLayer::getSpan_m () const
