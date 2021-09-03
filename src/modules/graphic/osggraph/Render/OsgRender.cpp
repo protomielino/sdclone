@@ -357,6 +357,7 @@ void SDRender::Init(tTrack *track)
     osg::ref_ptr<osg::Group> cargroup = new osg::Group;
     scene->addChild(scenery->getScene());
     cargroup->addChild(m_CarRoot.get());
+
     switch (QualityIndex)
     {
     case 0:
@@ -449,7 +450,7 @@ void SDRender::Init(tTrack *track)
     m_Root->addChild(sunLight.get());
     m_Root->addChild(thesky->getCloudRoot());
 
-    m_ShadowRoot->addChild(sunLight.get());
+    //m_ShadowRoot->addChild(sunLight.get());
 
     // Clouds are added to the scene graph later
     osg::ref_ptr<osg::StateSet> stateSet2 = m_Root->getOrCreateStateSet();
