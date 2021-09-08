@@ -536,11 +536,17 @@ void	Driver::InitTrack(
                       m_priv[PATH_NORMAL].PIT_START_BUF_SEGS);
 
     // setup initial fuel for race.
+    double  wearPerM        = SafeParmGetNum(hCarParm, SECT_PRIV, "wear per m", 0, 0.0f);
+    double distance         = pS->_totLaps * (double)pTrack->length;
+    double tiredist         = distance / wearPerM;
+    LogSHADOW.info("Tire distance : %.7f\n", tiredist);
+    double mindist = MIN(distance, tiredist);
+    LogSHADOW.info("Minimum distance : %.3f\n", mindist);
     double	fuelPerM        = SafeParmGetNum(hCarParm, SECT_PRIV, "fuel per m", 0, 0.001f);
     double	maxFuel			= SafeParmGetNum(hCarParm, SECT_CAR, PRM_TANK, (char*)NULL, 100.0f);
     int pittest             = SafeParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_TEST_STOP, (char*)NULL, 0);
     LogSHADOW.info(" # Pit test stop = %i\n", pittest);
-    double	fullRaceFuel	= 1.02 * pS->_totLaps * (double)pTrack->length * fuelPerM;
+    double	fullRaceFuel	= 1.05 * pS->_totLaps * (double)pTrack->length * fuelPerM;
     double	fuel			= fullRaceFuel;
 
     if( raceType == RM_TYPE_PRACTICE )
@@ -549,7 +555,7 @@ void	Driver::InitTrack(
         LogSHADOW.info( "practice initial fuel: %g\n", fuel );
 
         if (pittest > 0)
-            fuel = 1.04 * pTrack->length * fuelPerM;
+            fuel = 1.05 * pTrack->length * fuelPerM;
     }
 
     if( fuel > maxFuel )
@@ -559,10 +565,15 @@ void	Driver::InitTrack(
         fuel = fullRaceFuel / nTanks + fuelPerM * pTrack->length * (nTanks - 1);
         LogSHADOW.info( "number of pitstops: %d\n", nTanks - 1 );
     }
+
+    fuel = MN(fuel, mindist * fuelPerM);
+    fuel = Util2s::clip(fuel, 0.0, maxFuel);
+
     LogSHADOW.info( "max fuel in tank: %g\n", maxFuel );
     LogSHADOW.info( "initial fuel per m: %g\n", fuelPerM );
     LogSHADOW.info( "intiial fuel: %g\n\n", fuel );
-    GfParmSetNum( hCarParm, SECT_CAR, PRM_FUEL, (char*) NULL, fuel );
+
+    GfParmSetNum(hCarParm, SECT_CAR, PRM_FUEL, (char*)NULL, (tdble)fuel);
 
     m_Strategy.SetDamageLimits( m_priv[PATH_NORMAL].PIT_DAMAGE_WARN,
                                 m_priv[PATH_NORMAL].PIT_DAMAGE_DANGER, m_cm[PATH_NORMAL].HASTYC );
@@ -2495,7 +2506,7 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
     if( car->race.laps != m_lastLap )
     {
         m_lastLap = car->race.laps;
-        LogSHADOW.debug( "[%d] Average fuel/m: %g\n", car->index, m_Strategy.FuelPerM(car) );
+        LogSHADOW.info( "[%d] Average fuel/m: %g\n", car->index, m_Strategy.FuelPerM(car) );
         double a, b;
         m_accBrkCoeff.CalcCoeffs(&a, &b);
         LogSHADOW.debug( "[%d] accbrk: a=%g, b=%g\n", car->index, a, b );

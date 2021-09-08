@@ -48,6 +48,7 @@ public:
     void	Process( CarElt* pCar, TeamInfo::Item* pMyInfo );
 
     bool	WantToPit() const;
+    double  calcRefuel(CarElt* pCar) const;
     int		PitType() const;		// type of pit requested.
 
     double	FuelPerM( const CarElt* pCar ) const;

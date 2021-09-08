@@ -209,6 +209,7 @@ void    CarModel::configCar( void* hCar )
 
     MASS = GfParmGetNum(hCar, SECT_CAR, PRM_MASS, NULL, 1000.0);
     FUEL = GfParmGetNum(hCar, SECT_CAR, PRM_FUEL, NULL, 95.0);
+    FUELTANK = GfParmGetNum(hCar, SECT_CAR, PRM_TANK, (char*)NULL, 0);
 
     float fwingarea	= GfParmGetNum(hCar, SECT_FRNTWING, PRM_WINGAREA,  NULL, 0.0);
     WING_ANGLE_F	= GfParmGetNum(hCar, SECT_FRNTWING, PRM_WINGANGLE, NULL, 0.0);
@@ -1141,3 +1142,15 @@ void	CarModel::CalcSimuSpeedRanges(
 }
 
 //===========================================================================
+
+double CarModel::CalcFuelStart(double distance) const
+{
+    double tiredist = distance / TIREWEARPERMETER;
+    LogSHADOW.info("Tire distance : %.7f\n", tiredist);
+    double mindist = MIN(distance, tiredist);
+    LogSHADOW.info("Minimum distance : %.3f\n", mindist);
+    double fuel = mindist * FUELPERMETER;
+    LogSHADOW.info("calcul fuel : %.3f\n", fuel);
+
+    return Util2s::clip(fuel, 0.0, FUELTANK);
+}

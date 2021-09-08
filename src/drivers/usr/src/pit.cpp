@@ -20,6 +20,10 @@
 
 #include <iostream>
 
+// The "USR" logger instance.
+extern GfLogger* PLogUSR;
+#define LogUSR (*PLogUSR)
+
 Pit::Pit() :
     mTrack(NULL),
     mMyCar(NULL),
@@ -480,10 +484,10 @@ double Pit::calcRefuel()
     }
 
     // Print infos
-    //std::cout << "Fuel pitstops " << fuelpitstops << std::endl;
-    //std::cout << "Fuel per meter " << mAvgFuelPerLap / mTrack->length << std::endl;
-    //std::cout << "Tire pitstops " << tirespitstops << std::endl;
-    //std::cout << "Tire wear per meter " << mMyCar->tires()->avgWearPerMeter() << std::endl;
+    LogUSR.debug("USR Fuel pitstops %i\n", fuelpitstops);
+    LogUSR.debug("USR Fuel per meter %.7f\n", mAvgFuelPerLap / mTrack->length);
+    LogUSR.debug("USR Tire pitstops %i\n", tirespitstops);
+    LogUSR.debug("USR Tire wear per meter %.7f\n", mMyCar->tires()->avgWearPerMeter());
 
     return stintfuel - mCar->_fuel;
 }

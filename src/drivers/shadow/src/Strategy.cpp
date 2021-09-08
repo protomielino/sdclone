@@ -64,7 +64,7 @@ void	Strategy::SetTyreLimits( double warnTireLimit, double dangerTireLimit )
 {
     m_warnTyreLimit	= warnTireLimit;
     m_dangerTyreLimit = dangerTireLimit;
-    LogSHADOW.info(" # Tyre warn %.2f - Tyre Danger = %.2f\n", m_warnTyreLimit, m_dangerTyreLimit);
+    LogSHADOW.debug(" # Tyre warn %.2f - Tyre Danger = %.2f\n", m_warnTyreLimit, m_dangerTyreLimit);
 }
 
 void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
@@ -167,9 +167,10 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
     int		raceLaps = pCar->_laps + pCar->_remainingLaps;
     double	trackLen = m_track.GetLength();
     double	distToRace = trackLen * raceLaps - pCar->_distRaced;
-    double	fuelForRace = 1.1 * fuelPerM * distToRace - pCar->_fuel;
+    double	fuelForRace = 1.2 * fuelPerM * distToRace - pCar->_fuel;
     int		nPitsForFuel = int(ceil(fuelForRace / pCar->_tank));
     double	fuelIfPitNow = fuelForRace - (pCar->_tank - pCar->_fuel);
+    LogSHADOW.debug(" # Shadow fuel if pit now = %g\n", fuelIfPitNow);
     int		nPitsIfPitNow = 1 + int(ceil(fuelIfPitNow / pCar->_tank));
 
     bool	delayRepair = nPitsForFuel < nPitsIfPitNow;
@@ -204,8 +205,9 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
     //	bool	likeToPit = pCar->_dammage + damagePerLap >= repairLimit ||
     m_pitType = PT_NORMAL;
     bool	likeToPit = pitAvailable && (pCar->_dammage >= repairLimit ||
-             (raceLaps > 20 &&
-             pTeamInfo->lapsUntilPit < minPitLaps) || tyreWear < m_warnTyreLimit);
+             (raceLaps > 20 && pTeamInfo->lapsUntilPit < minPitLaps)
+             || tyreWear < m_warnTyreLimit
+             || (pCar->_fuel < fuelPerLap * 1.2));
 
 #if defined(DEV) && 0  // don't want to leave this in the code by mistake for TRB races.
     likeToPit = true;
@@ -215,7 +217,7 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
     // pitting on the last lap is a silly thing to do (think about it!).
     //	DEBUGF( "******* remaining laps %d\n", pCar->race.remainingLaps );
     int	remainingLaps = pCar->race.remainingLaps + 1;
-    if( remainingLaps <= 1 )
+    if( remainingLaps <= 2 )
         likeToPit = false;
 
     // need to pit due to a penalty -- normal pitting has priority here.
@@ -279,6 +281,7 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
 
         if(m_HasTYC)
             pCar->pitcmd.tireChange	= tyreWear > 0.5 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
+
         m_state = PIT_ASKED;
         LogSHADOW.debug( "****** PIT_ASKED\n" );
 
@@ -317,7 +320,7 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
             {
                 //					double	fuel = distToRace * fuelPerM * 1.02 + fuelPerLap - pCar->_fuel;
                 //					double	fuel = distToRace * fuelPerM * 1.02 + fuelPerLap;
-                double	fuel = distToRace * fuelPerM * 1.02;
+                double	fuel = distToRace * fuelPerM * 1.5;
 
                 if( fuel > pCar->info.tank )
                 {
@@ -330,12 +333,13 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
                 int		repair = pCar->_dammage;
 
                 double	distWithMaxFuel = pCar->_tank / fuelPerM;
+                //bool pitfuel = pCar->_fuel < (fuelPerLap + 2.0);
 
                 if( nPitsForFuel <= 1 && distToRace < distWithMaxFuel / 2 )
                     repair = int(ceil(predDamage - 4000));
 
                 pCar->pitcmd.stopType	= RM_PIT_REPAIR;
-                pCar->pitcmd.fuel		= (tdble)MX(0, fuel - pCar->_fuel);
+                pCar->pitcmd.fuel		= calcRefuel(pCar);
                 pCar->pitcmd.repair		= MX(0, MN(repair, pCar->_dammage));
 
                 if(m_HasTYC)
@@ -397,4 +401,58 @@ double	Strategy::FuelPerM( const CarElt* pCar ) const
         fuelPerM = m_totalFuel / pCar->_distRaced;
 
     return fuelPerM;
+}
+
+
+double Strategy::calcRefuel(CarElt* pCar) const
+{
+    double	trackLen = m_track.GetLength();
+    double laps = pCar->_remainingLaps + (trackLen - pCar->_distFromStartLine) / trackLen;
+
+    // Calc fuel pitstops
+    double AvgFuelPerLap = FuelPerM(pCar) * trackLen;
+    double reserve = AvgFuelPerLap / 2;
+    double fueltoend = ((laps - pCar->_lapsBehindLeader) * AvgFuelPerLap) + reserve;
+    int fuelpitstops = int(floor(fueltoend / pCar->_tank));
+
+    // Calc tires pitstops
+    double disttoend = (laps - pCar->_lapsBehindLeader) * trackLen;
+    double tyreWearPerM = (1.0 - m_lastTyreWear) / pCar->_distRaced;
+    double tiresstintdist = 1.0 / tyreWearPerM + 10000.0;
+    int tirespitstops = int(floor(disttoend / tiresstintdist));
+
+    // Need fuel or tires stops?
+    int pitstops = std::max(fuelpitstops, tirespitstops);
+
+    // Calc the stint fuel
+    double stintfuel = fueltoend / (pitstops + 1) +2.0;
+
+    if (pitstops)
+    {
+        // Stay out a little longer, if possible
+        stintfuel += 0.5 * AvgFuelPerLap;
+    }
+
+    stintfuel = Util2s::clip(stintfuel, 0.0, (double)(pCar->_tank));
+
+    // Tire strategy
+    double tiresdist = disttoend / tyreWearPerM;
+    double stintdist = stintfuel * (trackLen / AvgFuelPerLap);
+
+    if (tiresdist < stintdist || (m_lastTyreWear > 0.85 - ((double)pCar->_remainingLaps / 10)))
+    {
+        pCar->pitcmd.tireChange	= tCarPitCmd::NONE;;
+    }
+    else
+    {
+        pCar->pitcmd.tireChange	= tCarPitCmd::ALL;
+    }
+
+    // Print infos
+    LogSHADOW.debug("SHADOW Fuel pitstops %i\n", fuelpitstops);
+    LogSHADOW.debug("SHADOW Fuel per meter %.7f\n", AvgFuelPerLap / trackLen);
+    LogSHADOW.debug("SHADOW Tire pitstops %i\n", tirespitstops);
+    LogSHADOW.debug("SHADOW Tire wear per meter %.7f\n", tyreWearPerM);
+
+    return stintfuel - pCar->_fuel;
 }

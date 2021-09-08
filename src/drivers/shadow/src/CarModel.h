@@ -99,11 +99,14 @@ private:
                                 double wingDownforceConst, double axleGroundEffectConst ) const;
 
     double  CalcAccForceFromSpeed( double speed ) const;
+    double  CalcFuelStart( double distance ) const;
 
 public:
     int		FLAGS;			// options that modify calculations
     double	MASS;			// fixed mass of car.
     double	FUEL;			// mass of fuel in car.
+    double  FUELPERMETER;
+    double  FUELTANK;
     double	DAMAGE;			// damage of this car.
     double	WIDTH;			// width of car (m).
     double	TYRE_MU;		// mu value of tyres (min of those avail).
@@ -111,6 +114,7 @@ public:
     double	TYRE_MU_R;		// mu value of rear  tyres.
     double  EFFECTIVEMU;    // effective MU.
     double	MU_SCALE;		// scaling of MU to use for this car.
+    double  TIREWEARPERMETER;
     double  SKILL;          // Skill Driver.
     double	KZ_SCALE;		// bump sensitivity.
     double	KV_SCALE;		// bump sensitivity.
