@@ -128,7 +128,7 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 	struct stat st;
 	if (! stat(pszTgtName, &st) && chmod( pszTgtName, 0640 ))
 	{
-		const int errnum = errno; // Get errno before it is overwritten by some system call.
+		errnum = errno; // Get errno before it is overwritten by some system call.
 		GfLogWarning("Failed to set 0640 attributes to %s (%s)\n",
 					 pszTgtName, strerror(errnum));
 	}
@@ -190,7 +190,7 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 	// Set target file access attributes to "read/write for the current user".
 	if (chmod( pszTgtName, 0640 ))
 	{
-		const int errnum = errno; // Get errno before it is overwritten by some system call.
+		errnum = errno; // Get errno before it is overwritten by some system call.
 		GfLogWarning("Failed to set 0640 attributes to %s (%s)\n",
 					 pszTgtName, strerror(errnum));
 	}
