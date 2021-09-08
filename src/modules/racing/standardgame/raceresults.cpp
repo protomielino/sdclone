@@ -495,7 +495,7 @@ ReUpdatePracticeCurRes(tCarElt *car, bool bForceNew)
 		ReUI().setResultsTableHeader(pszTableHeader);
 		char* t1 = GfTime2Str(car->_lastLapTime, 0, false, 3);
 		char* t2 = GfTime2Str(car->_bestLapTime, 0, false, 3);
-		char buf[128];
+		char row[128];
 
 		// Cancel hightlight on first line
 		if (car->_laps == 2) ReUI().setResultsTableRow(0, "");
@@ -504,14 +504,14 @@ ReUpdatePracticeCurRes(tCarElt *car, bool bForceNew)
 		static int nLastLapDamages = 0;
 		if (car->_laps <= 2)
 			nLastLapDamages = 0;
-		snprintf(buf, sizeof(buf), "%.3d  \t%-12s \t%-12s    \t%5.1f   \t%5.1f \t %.5d (%d)",
+		snprintf(row, sizeof(row), "%.3d  \t%-12s \t%-12s    \t%5.1f   \t%5.1f \t %.5d (%d)",
 				 car->_laps - 1, t1, t2, info->topSpd * 3.6, info->botSpd * 3.6,
 				 car->_dammage ? car->_dammage - nLastLapDamages : 0, car->_dammage);
 		nLastLapDamages = car->_dammage;
 		free(t1);
 		free(t2);
 		
-		ReUI().addResultsTableRow(buf);
+		ReUI().addResultsTableRow(row);
 	}
 	else
 	{
