@@ -42,13 +42,13 @@ static int NTipAlign = GFUI_ALIGN_HC;
 void
 gfuiInitLabel(void)
 {
-    char path[512];
+    char path[1024];
 
     // Get tip layout properties from the screen config file.
-    sprintf(path, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+    snprintf(path, sizeof(path), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
     void* hparmScr = GfParmReadFile(path, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-    sprintf(path, "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_TIP);
+    snprintf(path, sizeof(path), "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_TIP);
     NTipX = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_X, 0, 10.0);
     NTipY = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_Y, 0, 10.0);
     NTipWidth = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_WIDTH, 0, 620.0);

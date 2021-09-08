@@ -279,7 +279,7 @@ GfctrlGetNameByRef(int type, int index)
 	    }
 	}
 	if(index > 0 && index < 128 && isprint(index & 0x7F)) {
-		sprintf(buf, "%c", index & 0x7F);
+		snprintf(buf, sizeof(buf), "%c", index & 0x7F);
 		return buf;
 	}
 	return NULL;

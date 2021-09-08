@@ -37,20 +37,20 @@ static int NVImgPadding = 0;
 void
 gfuiInitButton(void)
 {
-	char path[512];
+	char path[1024];
 
 	// Get default layout properties from the screen config file.
 	// 1) Tips.
-	sprintf(path, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+	snprintf(path, sizeof(path), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
 	void* hparmScr = GfParmReadFile(path, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	// 2) Text buttons.
-	sprintf(path, "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_TEXTBUTTON);
+	snprintf(path, sizeof(path), "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_TEXTBUTTON);
 	NHTxtPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_HPADDING, 0, 10.0);
 	NVTxtPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_VPADDING, 0,  5.0);
 
 	// 3) Image buttons.
-	sprintf(path, "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_IMAGEBUTTON);
+	snprintf(path, sizeof(path), "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_IMAGEBUTTON);
 	NHImgPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_HPADDING, 0, 0.0);
 	NVImgPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_VPADDING, 0, 0.0);
 }

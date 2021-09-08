@@ -182,7 +182,7 @@ void setDefaultMusic(const char* filename)
 static void readConfig()
 {
 	char fnbuf[1024];
-	sprintf(fnbuf, "%s%s", GfLocalDir(), SND_PARAM_FILE);
+	snprintf(fnbuf, sizeof(fnbuf), "%s%s", GfLocalDir(), SND_PARAM_FILE);
 
 	GfLogInfo("Reading music player config\n");
 	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);

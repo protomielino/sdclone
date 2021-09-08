@@ -246,7 +246,7 @@ createStaticImage(void* hscr, void* hparm, const char* pszName)
     char pszImageFieldName[32];
     for (int i = 1; i < GFUI_MAXSTATICIMAGES;i++)
     {
-        sprintf(pszImageFieldName, GFMNU_ATTR_IMAGE" %d", i);
+        snprintf(pszImageFieldName, sizeof(pszImageFieldName), GFMNU_ATTR_IMAGE" %d", i);
         const char* pszFileName = GfParmGetStr(hparm, pszName, pszImageFieldName, 0);
         if (pszFileName)
             GfuiStaticImageSet(hscr, id, pszFileName, i);
@@ -971,8 +971,8 @@ GfuiMenuLoad(const char* pszMenuPath)
     std::string strPath("data/menu/");
     strPath += pszMenuPath;
 
-    char buf[512];
-    sprintf(buf, "%s%s", GfDataDir(), strPath.c_str());
+    char buf[1024];
+    snprintf(buf, sizeof(buf), "%s%s", GfDataDir(), strPath.c_str());
 
     return GfParmReadFile(buf, GFPARM_RMODE_STD);
 }
