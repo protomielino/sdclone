@@ -204,11 +204,12 @@ ReUpdateStandings(void)
 	}//for it
 	delete standings;
 	
-	char str1[512], str2[512];
-	snprintf(str1, sizeof(str1), "%sconfig/params.dtd", GfDataDir());
-	snprintf(str2, sizeof(str2), "<?xml-stylesheet type=\"text/xsl\" href=\"file:///%sconfig/raceresults.xsl\"?>", GfDataDir());
+	char dtd[1024];
+	char header[sizeof(dtd) + 64];
+	snprintf(dtd, sizeof(dtd), "%sconfig/params.dtd", GfDataDir());
+	snprintf(header, sizeof(header), "<?xml-stylesheet type=\"text/xsl\" href=\"file:///%sconfig/raceresults.xsl\"?>", GfDataDir());
 	
-	GfParmSetDTD (results, str1, str2);
+	GfParmSetDTD (results, dtd, header);
 	GfParmWriteFile(0, results, "Results");
 }//ReUpdateStandings
 
