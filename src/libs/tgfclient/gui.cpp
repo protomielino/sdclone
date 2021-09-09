@@ -1173,7 +1173,7 @@ GfuiScreenShot(void * /* notused */)
 	{
 		time_t t = time(NULL);
 		struct tm *stm = localtime(&t);
-		char png[sizeof(path)];
+		char png[sizeof(path) + 64];
 		snprintf(png, sizeof(png), "%s/sd-%4d%02d%02d%02d%02d%02d.png",
 				 path,
 				 stm->tm_year+1900,
