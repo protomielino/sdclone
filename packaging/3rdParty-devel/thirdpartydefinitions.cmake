@@ -120,14 +120,14 @@ set(ENET_HASH SHA256=a38f0f194555d558533b8b15c0c478e946310022d0ec7b34334e19e4574
 set(OGG_VERSION 1.3.5)
 set(OGG_PROJECT ogg-${OGG_VERSION})
 set(OGG_FILE lib${OGG_PROJECT}.tar.gz)
-set(OGG_URL https://downloads.xiph.org/releases/ogg/${OGG_FILE})
+set(OGG_URL http://downloads.xiph.org/releases/ogg/${OGG_FILE})
 set(OGG_HASH SHA256=0eb4b4b9420a0f51db142ba3f9c64b333f826532dc0f48c6410ae51f4799b664)
 
 # vorbis
 set(VORBIS_VERSION 1.3.7)
 set(VORBIS_PROJECT vorbis-${VORBIS_VERSION})
 set(VORBIS_FILE lib${VORBIS_PROJECT}.tar.gz)
-set(VORBIS_URL https://downloads.xiph.org/releases/vorbis/${VORBIS_FILE})
+set(VORBIS_URL http://downloads.xiph.org/releases/vorbis/${VORBIS_FILE})
 set(VORBIS_HASH SHA256=0e982409a9c3fc82ee06e08205b1355e5c6aa4c36bca58146ef399621b0ce5ab)
 
 # expat
