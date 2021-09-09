@@ -23,7 +23,7 @@
     @version	$Id$
     @ingroup	gui
 */
-
+#include <portability.h>
 #include "gui.h"
 
 // Text buttons padding (outside of the text label)

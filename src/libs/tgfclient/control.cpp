@@ -36,7 +36,7 @@
 //#endif
 //#endif
 
-
+#include <portability.h>
 
 #include "tgfclient.h"
 #if SDL_MAJOR_VERSION >= 2

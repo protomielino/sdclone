@@ -30,6 +30,7 @@
 #include <tgf.h>
 #include "tgfclient.h"
 #include "webserver.h"
+#include <portability.h>
 
 //string splitting utils
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
