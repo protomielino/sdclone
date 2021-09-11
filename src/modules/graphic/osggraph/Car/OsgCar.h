@@ -51,15 +51,11 @@ private :
     osg::ref_ptr<osg::Group>           car_shaded_body;
     osg::ref_ptr<osg::Group>           carEntity;
     int                                nSteer;
-    int					               LODSelectMask[32];
-    float				               LODThreshold[32];
-    int					               DRMSelectMask[32];
-    int					               DRMSelectMask2[32];
+    int                                DRMSelectMask[32];
     int                                nDRM;
-    int					               nDRM2;
-    float				               DRMThreshold[32];
-    float				               DRMThreshold2[32];
-    tdble				               steerMovt;
+    int                                nDRM2;
+    float                              DRMThreshold[32];
+    tdble                              steerMovt;
 
     //osg::ref_ptr<osg::Vec3Array> shadowVertices;
     //osg::ref_ptr<osg::Geometry> quad;

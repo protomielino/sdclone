@@ -66,6 +66,7 @@ SDCar::SDCar(void) :
     nDRM(0),
     nDRM2(0),
     steerMovt(0.0),
+    car(NULL),
     shader(NULL),
     reflectionMapping(NULL)
 
@@ -78,6 +79,12 @@ SDCar::SDCar(void) :
     _carLOD = false;
 
     _carShader = 0;
+
+    for (size_t i = 0; i < 32; ++i)
+    {
+        DRMSelectMask[i] = 0;
+        DRMThreshold[i] = 0.0f;
+    }
 }
 
 SDCar::~SDCar(void)
