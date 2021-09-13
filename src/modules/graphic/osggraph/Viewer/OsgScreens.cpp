@@ -42,6 +42,9 @@ SDScreens::SDScreens() :
     root(NULL),
     prerenderRoot(NULL),
 
+    m_NbActiveScreens(0),
+    m_NbArrangeScreens(0),
+    m_SpanSplit(false),
     m_CurrentScreenIndex(0)
 {
 #ifdef HUDDEBUG
@@ -142,15 +145,12 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
 
 void SDScreens::InitCars(tSituation *s)
 {
-    int		i;
-    tCarElt 	*elt;
-
     const char *pszSpanSplit;
     int grNbSuggestedScreens = 0;
 
-    for (i = 0; i < s->_ncars; i++)
+    for (int i = 0; i < s->_ncars; i++)
     {
-        elt = s->cars[i];
+        tCarElt *elt = s->cars[i];
 
         //  Pre-assign each human driver (if any) to a different screen
         // (set him as the "current driver" for this screen).
@@ -193,10 +193,10 @@ void SDScreens::update(tSituation * s, SDFrameInfo* fi)
         Screens[i]->update(s, fi);
     }
 
+#ifdef HUDDEBUG
     SDCars * cars = (SDCars *)getCars();
     tCarElt * c = this->getActiveView()->getCurrentCar();
 
-#ifdef HUDDEBUG
     this->debugHUD->setTexture(cars->getCar(c)->getReflectionMap()->getReflectionMap());
 #endif
 
@@ -211,11 +211,11 @@ void SDScreens::changeCamera(long p)
     // For SpanSplit ensure screens change together
     if (m_SpanSplit && getActiveView()->getViewOffset() )
     {
-        int i, camList,camNum;
+        int camList,camNum;
 
         getActiveView()->getCameras()->getIntSelectedListAndCamera(&camList,&camNum);
 
-        for (i=0; i < m_NbActiveScreens; i++)
+        for (int i=0; i < m_NbActiveScreens; i++)
             if (Screens[i]->getViewOffset() )
                 Screens[i]->getCameras()->selectCamera(camList,camNum);
 

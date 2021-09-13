@@ -42,11 +42,6 @@ protected:
     SDDebugHUD * debugHUD;
 #endif
 
-    int  m_Winx;
-    int  m_Winy;
-    int  m_Winw;
-    int  m_Winh;
-
     int  m_NbActiveScreens;
     int  m_NbArrangeScreens;
     bool m_SpanSplit;
