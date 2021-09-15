@@ -207,7 +207,7 @@ void	Strategy::Process( CarElt* pCar, TeamInfo::Item* pTeamInfo )
     bool	likeToPit = pitAvailable && (pCar->_dammage >= repairLimit ||
              (raceLaps > 20 && pTeamInfo->lapsUntilPit < minPitLaps)
              || tyreWear < m_warnTyreLimit
-             || (pCar->_fuel < fuelPerLap * 1.2));
+             || (pCar->_fuel < fuelPerLap * 2));
 
 #if defined(DEV) && 0  // don't want to leave this in the code by mistake for TRB races.
     likeToPit = true;
