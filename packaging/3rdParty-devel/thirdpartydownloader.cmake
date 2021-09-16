@@ -50,7 +50,6 @@ if(NOT CACHED_URL STREQUAL "")
    endif()
 
    if(IS_FILE_URL)
-      set(SDL1_URL "${CACHED_URL}/${SDL1_FILE}")
       set(SDL2_URL "${CACHED_URL}/${SDL2_FILE}")
       set(SDL2_MIXER_URL "${CACHED_URL}/${SDL2_MIXER_FILE}")
       set(OPENAL_URL "${CACHED_URL}/${OPENAL_FILE}")
@@ -73,7 +72,6 @@ if(NOT CACHED_URL STREQUAL "")
       set(OSG_URL "${CACHED_URL}/${OSG_FILE}")
       set(SQLITE3_URL "${CACHED_URL}/${SQLITE3_FILE}")
    else()
-      set(SDL1_URL "${CACHED_URL}/${SDL1_FILE} ${SDL1_URL}")
       set(SDL2_URL "${CACHED_URL}/${SDL2_FILE} ${SDL2_URL}")
       set(SDL2_MIXER_URL "${CACHED_URL}/${SDL2_MIXER_FILE} ${SDL2_MIXER_URL}")
       set(OPENAL_URL "${CACHED_URL}/${OPENAL_FILE} ${OPENAL_URL}")
@@ -127,7 +125,6 @@ endfunction()
 
 ################################################
 
-SD_DownloadIfNeeded(${DOWNLOAD_DIRECTORY}/${SDL1_FILE} ${SDL1_URL})
 SD_DownloadIfNeeded(${DOWNLOAD_DIRECTORY}/${SDL2_FILE} ${SDL2_URL})
 SD_DownloadIfNeeded(${DOWNLOAD_DIRECTORY}/${SDL2_MIXER_FILE} ${SDL2_MIXER_URL})
 SD_DownloadIfNeeded(${DOWNLOAD_DIRECTORY}/${OPENAL_LEGACY_FILE} ${OPENAL_LEGACY_URL})

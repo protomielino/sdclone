@@ -81,10 +81,8 @@ if(WIN32)
    set(OPTION_OPENGL_HEADERS true CACHE BOOL "Download the OpenGL headers")
 endif(WIN32)
 
-
-option(OPTION_SDL_1x "Download and Build SDL 1.x" false)
-option(OPTION_SDL_2x "Download and Build SDL 2.x" true)
-cmake_dependent_option(OPTION_SDL2_MIXER "Download and Build SDL2_Mixer" true "OPTION_SDL_2x" false)
+option(OPTION_SDL2 "Download and Build SDL2" true)
+cmake_dependent_option(OPTION_SDL2_MIXER "Download and Build SDL2_Mixer" true "OPTION_SDL2" false)
 option(OPTION_OPENAL "Download and Build OpenAL" true)
 option(OPTION_PLIB "Download and Build PLIB" true)
 cmake_dependent_option(OPTION_PLIB_USE_HEAD "Download and Build PLIB from the latest revision" true "OPTION_PLIB" false)
@@ -105,7 +103,6 @@ option(OPTION_CACHED_ARCHIVES "Download from a defined cache" false)
 set(CACHED_URL "" CACHE STRING "Preferred url from which to download")
 
 if(OPTION_CACHED_ARCHIVES)
-   set(SDL1_URL "${CACHED_URL}/${SDL1_FILE}")
    set(SDL2_URL "${CACHED_URL}/${SDL2_FILE}")
    set(SDL2_MIXER_URL "${CACHED_URL}/${SDL2_MIXER_FILE}")
    set(OPENAL_URL "${CACHED_URL}/${OPENAL_FILE}")
@@ -147,22 +144,6 @@ if(WIN32 AND OPTION_OPENGL_HEADERS)
       CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
 endif(WIN32 AND OPTION_OPENGL_HEADERS)
 
-if(OPTION_SDL_1x)
-   ExternalProject_Add(${SDL1_PROJECT}
-      URL ${SDL1_URL}
-      URL_HASH ${SDL1_HASH}
-      CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
-      DEPENDS OpenGL-headers)
-   ExternalProject_Add_Step(${SDL1_PROJECT} sdl1x_add_cmake
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/${SDL1_PROJECT}.CMakeLists.txt"
-              "<SOURCE_DIR>/CMakeLists.txt"
-      DEPENDEES update # do after update
-      DEPENDERS patch)  # do before patch
-else(OPTION_SDL_1x)
-   set(SDL1_PROJECT )
-endif(OPTION_SDL_1x)
-
 # TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)
 # message(WARNING "TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)")
 
@@ -171,7 +152,7 @@ endif(OPTION_SDL_1x)
 #  SDL2Config.cmake is broken since 2.0.16 #4661 
 #  https://github.com/libsdl-org/SDL/issues/4661
 
-if(OPTION_SDL_2x)
+if(OPTION_SDL2)
    set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off -DSDL_CMAKE_DEBUG_POSTFIX=)
    ExternalProject_Add(${SDL2_PROJECT}
       URL ${SDL2_URL}
@@ -184,9 +165,9 @@ if(OPTION_SDL_2x)
               "<SOURCE_DIR>/SDL2Config.cmake"
       DEPENDEES update # do after update
       DEPENDERS patch)  # do before patch
-else(OPTION_SDL_2x)
+else(OPTION_SDL2)
    set(SDL2_PROJECT )
-endif(OPTION_SDL_2x)
+endif(OPTION_SDL2)
 
 if(OPTION_OPENAL)
    if(MSVC_VERSION LESS 1900)
@@ -501,7 +482,7 @@ if(OPTION_OSG)
       URL ${OSG_URL}
       URL_HASH ${OSG_HASH}
       CMAKE_ARGS ${OSG_ARGS}
-      DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT}${FREETYPE_LEGACY_PROJECT} OpenGL-headers ${JPEG_PROJECT} ${PNG_PROJECT} ${SDL1_PROJECT} ${SDL2_PROJECT})
+      DEPENDS ${ZLIB_PROJECT} ${CURL_PROJECT} ${FREETYPE_PROJECT}${FREETYPE_LEGACY_PROJECT} OpenGL-headers ${JPEG_PROJECT} ${PNG_PROJECT} ${SDL2_PROJECT})
 endif(OPTION_OSG)
 
 

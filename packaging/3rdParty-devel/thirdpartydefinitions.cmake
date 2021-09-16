@@ -34,13 +34,6 @@
 #  may need to be updated for the new version
 
 
-#SDL
-set(SDL1_VERSION 1.2.15)
-set(SDL1_PROJECT SDL-${SDL1_VERSION})
-set(SDL1_FILE ${SDL1_PROJECT}.tar.gz)
-set(SDL1_URL https://www.libsdl.org/release/${SDL1_FILE})
-set(SDL1_HASH SHA256=d6d316a793e5e348155f0dd93b979798933fb98aa1edebcc108829d6474aad00)
-
 # SDL2
 set(SDL2_VERSION 2.0.16)
 set(SDL2_PROJECT SDL2-${SDL2_VERSION})
