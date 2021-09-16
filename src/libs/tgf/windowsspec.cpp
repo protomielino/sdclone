@@ -70,7 +70,7 @@ windowsModLoad(unsigned int /* gfid */, const char *soPath, tModList **modlist)
 	
 	GfLogTrace("Loading module %s\n", soPath);
 	
-	char fname[256];
+	char fname[1024];
 	const char* lastSlash = strrchr(soPath, '/');
 	if (lastSlash) 
 		strcpy(fname, lastSlash+1);
@@ -203,7 +203,7 @@ windowsModInfo(unsigned int /* gfid */, const char *soPath, tModList **modlist)
 static int
 windowsModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 {
-	char        soPath[256];        /* path of the lib[x].so */
+	char        soPath[1024];        /* path of the lib[x].so */
 	tSOHandle        handle;                /* */
 	int                modnb;                /* number on loaded modules */
 	tModList        *curMod;
@@ -214,13 +214,13 @@ windowsModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 	// Scan directory
 	_finddata_t FData;
 	char Dir_name[ 1024 ];
-	sprintf( Dir_name, "%s\\*.%s", dir, DLLEXT);
-	long Dirent = _findfirst( Dir_name, &FData );
+	snprintf(Dir_name, sizeof(Dir_name), "%s\\*.%s", dir, DLLEXT);
+	intptr_t Dirent = _findfirst( Dir_name, &FData );
 	if ( Dirent != -1 )
 	{
 		do 
 		{
-			sprintf(soPath, "%s\\%s", dir, FData.name);
+			snprintf(soPath, sizeof(soPath), "%s\\%s", dir, FData.name);
 			/* Try and avoid loading the same module twice (WARNING: Only checks soPath equality !) */
 			if (!GfModIsInList(soPath, *modlist))
 			{
@@ -287,7 +287,7 @@ windowsModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 static int
 windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **modlist)
 {
-	char        soPath[256];        /* path of the lib[x].so */
+	char        soPath[1024];        /* path of the lib[x].so */
 	tSOHandle        handle;                /* */
 	int                modnb;                /* number on loaded modules */
 	tModList        *curMod;
@@ -298,8 +298,8 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 	_finddata_t FData;
 	
 	char Dir_name[ 1024 ];
-	sprintf( Dir_name, "%s\\*.*", dir );
-	long Dirent = _findfirst( Dir_name, &FData );
+	snprintf(Dir_name, sizeof(Dir_name), "%s\\*.*", dir );
+	intptr_t Dirent = _findfirst( Dir_name, &FData );
 	if ( Dirent != -1 )
 	{
 		do 
@@ -309,9 +309,9 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 				|| (level == 1 && FData.name[0] != '.'))
 			{
 				if (level == 1) 
-					sprintf(soPath, "%s/%s/%s.%s", dir, FData.name, FData.name,DLLEXT);
+					snprintf(soPath, sizeof(soPath), "%s/%s/%s.%s", dir, FData.name, FData.name,DLLEXT);
 				else
-					sprintf(soPath, "%s/%s", dir, FData.name);
+					snprintf(soPath, sizeof(soPath), "%s/%s", dir, FData.name);
 				
 				/* Try and avoid loading the same module twice (WARNING: Only checks soPath equality !) */
 				if (!GfModIsInList(soPath, *modlist))
@@ -428,9 +428,9 @@ windowsDirGetList(const char *dir)
 	
 	_finddata_t FData;
 	char Dir_name[ 1024 ];
-	sprintf( Dir_name, "%s\\*.*", dir );
+	snprintf(Dir_name, sizeof(Dir_name), "%s\\*.*", dir );
 	//GfLogDebug("Listing directory %s\n",dir);
-	long Dirent = _findfirst( Dir_name, &FData );
+	intptr_t Dirent = _findfirst( Dir_name, &FData );
 	if ( Dirent != -1 ) {
 		do {
 			if ( strcmp(FData.name, ".") != 0 && strcmp(FData.name, "..") != 0 ) {
@@ -496,8 +496,8 @@ windowsDirGetListFiltered(const char *dir, const char *prefix, const char *suffi
 	
 	_finddata_t FData;
 	char Dir_name[1024];
-	sprintf(Dir_name, "%s\\*.*", dir);
-	long Dirent = _findfirst(Dir_name, &FData);
+	snprintf(Dir_name, sizeof(Dir_name), "%s\\*.*", dir);
+	intptr_t Dirent = _findfirst(Dir_name, &FData);
 	if (Dirent != -1) {
 		do {
 			fnameLg = strlen(FData.name);
