@@ -240,40 +240,29 @@ MACRO(CHECK_LIBRARIES)
 
 	
 	# SDL2
-	IF(OPTION_SDL2)
-		IF(NOT SDL2_FOUND)
-			Find_Package(SDL2)
-		ENDIF()
+	IF(NOT SDL2_FOUND)
+		Find_Package(SDL2)
+	ENDIF()
 
-		IF(SDL2_FOUND)
-			SET(HAVE_LIBSDL2 1)
-			MESSAGE(STATUS "Looking for library SDL2 - found")
-		ELSE(SDL2_FOUND)
-			MESSAGE(STATUS "Looking for library SDL2 - NOT found")
-		ENDIF(SDL2_FOUND)
+	IF(SDL2_FOUND)
+		SET(HAVE_LIBSDL2 1)
+		MESSAGE(STATUS "Looking for library SDL2 - found")
+	ELSE(SDL2_FOUND)
+		MESSAGE(STATUS "Looking for library SDL2 - NOT found")
+	ENDIF(SDL2_FOUND)
 
-		IF(NOT SDL2_MIXER_FOUND)
-			Find_Package(SDL2_mixer)
-		ENDIF()
+	# SDL2_Mixer
+	IF(NOT SDL2_MIXER_FOUND)
+		Find_Package(SDL2_mixer)
+	ENDIF()
 
-		IF(SDL2_MIXER_FOUND)
-			SET(HAVE_LIBSDL2 1)
-			MESSAGE(STATUS "Looking for library SDL2_mixer - found")
-		ELSE(SDL2_MIXER_FOUND)
-			MESSAGE(STATUS "Looking for library SDL2_mixer - NOT found")
-		ENDIF(SDL2_MIXER_FOUND)
+	IF(SDL2_MIXER_FOUND)
+		SET(HAVE_LIBSDL2 1)
+		MESSAGE(STATUS "Looking for library SDL2_mixer - found")
+	ELSE(SDL2_MIXER_FOUND)
+		MESSAGE(STATUS "Looking for library SDL2_mixer - NOT found")
+	ENDIF(SDL2_MIXER_FOUND)
 
-	ELSE(OPTION_SDL2)
-			# SDL 1.x
-		Find_Package(SDL)
-
-		IF(SDL_FOUND)
-			SET(HAVE_LIBSDL 1)
-			MESSAGE(STATUS "Looking for library SDL - found")
-		ELSE(SDL_FOUND)
-			MESSAGE(STATUS "Looking for library SDL - NOT found")
-		ENDIF(SDL_FOUND)
-		ENDIF(OPTION_SDL2)
 
 	IF(OPTION_WEBSERVER)
 		# CURL

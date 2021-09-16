@@ -95,13 +95,8 @@ MACRO(SD_UPDATE_SETTINGS_VERSION)
 	      LIST(APPEND _DLLS_TO_INSTALL ${_DLL_PATHNAME})
         ENDIF()
 
-        IF(OPTION_SDL2)
-           FIND_PACKAGE(SDL2)
-           SET(_LIB_PATHNAME "${SDL2_LIBRARY}")
-        ELSE(OPTION_SDL2)
-           FIND_PACKAGE(SDL)
-           SET(_LIB_PATHNAME "${SDL_LIBRARY}")
-        ENDIF(OPTION_SDL2)
+         FIND_PACKAGE(SDL2)
+         SET(_LIB_PATHNAME "${SDL2_LIBRARY}")
 
         IF(MINGW)
           # Multiple lib specs fuss ... find the one

@@ -12,11 +12,8 @@ SET(EPHEMERIS_HEADERS	celestialbody.h ephemeris.h jupiter.h mars.h mercury.h
 ADD_SDLIB_INCLUDEDIR(portability math)
 
 ADD_PLIB_INCLUDEDIR()
-IF(OPTION_SDL2)
-	ADD_SDL2_INCLUDEDIR()
-ELSE(OPTION_SDL2)
-	ADD_SDL_INCLUDEDIR()
-ENDIF(OPTION_SDL2)
+
+ADD_SDL2_INCLUDEDIR()
 
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)

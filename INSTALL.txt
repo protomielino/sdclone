@@ -243,13 +243,13 @@ The Speed Dreams Team.
             Enable debug symbols even in Release builds (def: OFF)
             (see http://sourceforge.net/p/speed-dreams/tickets/356).
 
-        - OPTION_SDL2:BOOL :
-            Use SDL2 for Window/Input management (def: ON)
-            Set to OFF to use SDL1.
-
         - OPTION_SDL_JOYSTICK:BOOL :
-            Use SDLx to read the joystick. (def: ON)
+            Use SDL to read the joystick. (def: ON)
             Set to OFF to use PLIB for joystick input.
+
+        - OPTION_SDL_FORCEFEEDBACK:BOOL :
+            Enable SDL Haptics for forcefeedback effects (def: ON)
+            Requires OPTION_SDL_JOYSTICK to be ON
 
         - OPTION_WEBSERVER:BOOL :
             Enable the WIP Webserver/Laplogger (def: ON)
