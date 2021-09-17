@@ -110,14 +110,16 @@ PORTABILITY_API char *strtok_r(char *str, const char *delim, char **nextp);
 #define copysign _copysign
 #endif
 
-// Ticket #663 - MSVC implementation of snprintf is not safe
-// We provide our own version of the function,
-// that ensures 0 ending for the string.
-PORTABILITY_API int SD_snprintf(char *str, size_t size, const char *format, ...);
-
 #include <cstdarg>
 #include <cstdio>
+
+// Ticket #663 - MSVC implementation of snprintf prior to VS 2015 is not safe
+// We provide our own version of the function,
+// that ensures 0 ending for the string.
+#if _MSC_VER < 1900
+PORTABILITY_API int SD_snprintf(char *str, size_t size, const char *format, ...);
 #define snprintf SD_snprintf
+#endif // _MSC_VER < 1900
 
 #define access _access
 

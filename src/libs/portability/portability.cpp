@@ -70,7 +70,7 @@ char *strtok_r(char *str, const char *delim, char **nextp)
 #endif // HAVE_STRTOK_R
 
 
-// Ticket #663 - MSVC implementation of snprintf is not safe
+// Ticket #663 - MSVC implementation of snprintf prior to VS 2015 is not safe
 // We provide our own version of the function,
 // that ensures 0 ending for the string.
 //
@@ -85,7 +85,7 @@ char *strtok_r(char *str, const char *delim, char **nextp)
 // then these functions return the number of characters written
 // (not including the terminating null); otherwise, these functions
 // return -1 to indicate that truncation occurred."
-#ifdef _MSC_VER
+#if _MSC_VER && _MSC_VER < 1900
 int SD_snprintf(char *str, size_t size, const char *format, ...)
 {
 	va_list vaArgs;
@@ -96,4 +96,4 @@ int SD_snprintf(char *str, size_t size, const char *format, ...)
 		str[size - 1] = 0;
 	return len;
 }
-#endif // _MSC_VER
+#endif // _MSC_VER && _MSC_VER < 1900
