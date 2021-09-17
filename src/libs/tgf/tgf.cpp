@@ -545,12 +545,10 @@ void GfInit(bool bWithLogging)
     GfLogInfo("Compiled against SDL version %d.%d.%d \n",
        compiled.major, compiled.minor, compiled.patch);
 
-#if SDL_MAJOR_VERSION >= 2
     SDL_version linked;
     SDL_GetVersion(&linked);
     GfLogInfo("Linking against SDL version %d.%d.%d.\n",
        linked.major, linked.minor, linked.patch);
-#endif
 }
 
 

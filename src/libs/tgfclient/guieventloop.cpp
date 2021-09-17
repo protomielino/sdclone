@@ -136,11 +136,10 @@ void GfuiEventLoop::injectJoystickButtonEvent(int joy, int button, int value)
 void GfuiEventLoop::operator()()
 {
 	SDL_Event event; // Event structure
-#if SDL_MAJOR_VERSION >= 2
 	static int unicode = 0;
-   static SDL_Keymod modifier = KMOD_NONE;
-   static SDL_Keycode keysym = SDLK_UNKNOWN;
-#endif
+	static SDL_Keymod modifier = KMOD_NONE;
+	static SDL_Keycode keysym = SDLK_UNKNOWN;
+
 
 	// Check for events.
 	while (!quitRequested())
@@ -152,9 +151,6 @@ void GfuiEventLoop::operator()()
 			switch(event.type)
 			{
 				case SDL_KEYDOWN:
-#if SDL_MAJOR_VERSION < 2
-					   injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 0,event.key.keysym.unicode);
-#else
 					if((event.key.keysym.sym & SDLK_SCANCODE_MASK) == SDLK_SCANCODE_MASK)
 					{
 						injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 0,0);
@@ -174,25 +170,18 @@ void GfuiEventLoop::operator()()
 						//GfLogDebug("SDL_KEYDOWN: %c\r\n",(char)event.key.keysym.sym);
 						keysym = event.key.keysym.sym;
 					}
-#endif
 					break;
 
-#if SDL_MAJOR_VERSION >= 2
 				case SDL_TEXTINPUT:
 					unicode = (int)(event.text.text[0]);
 					modifier = SDL_GetModState();
 					injectKeyboardEvent(keysym, modifier, 0, unicode);
 					//GfLogDebug("SDL_TEXTINPUT: %c %X\r\n",(char)unicode,modifier);
 					break;
-#endif
 
 				case SDL_KEYUP:
-#if SDL_MAJOR_VERSION < 2
-					injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 1,event.key.keysym.unicode);
-#else
 					injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 1,0);
 					//GfLogDebug("SDL_KEYUP: %c\r\n",(char)event.key.keysym.sym);
-#endif
 					break;
 
 				case SDL_MOUSEMOTION:
@@ -210,7 +199,6 @@ void GfuiEventLoop::operator()()
 					postQuit();
 					break;
 
-#if SDL_MAJOR_VERSION >= 2
 #if SDL_JOYSTICK
 				case SDL_JOYAXISMOTION:
 					injectJoystickAxisEvent(event.jaxis.which, event.jaxis.axis, (float) event.jaxis.value / 32768);
@@ -225,9 +213,6 @@ void GfuiEventLoop::operator()()
 					break;
 #endif
 				case SDL_WINDOWEVENT_EXPOSED:
-#else
-				case SDL_VIDEOEXPOSE:
-#endif
 					forceRedisplay();
 					break;
 			}

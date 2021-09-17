@@ -68,24 +68,6 @@ private: // Private data members.
 GfEventLoop::Private::Private()
 : cbKeyboardDown(0), cbKeyboardUp(0), cbRecompute(0), cbTimer(0), bQuit(false), nLockedModifiers(KMOD_NONE)
 {
-    static bool bInitialized = false;
-    if (!bInitialized)
-    {
-#if SDL_MAJOR_VERSION < 2
-        // Enable "key press" event unicode translation.
-        SDL_EnableUNICODE(/*enable=*/1);
-        //SDL_WM_GrabInput(SDL_GRAB_ON); // Caps-Lock bug : Not better if On.
-
-        // Caps-Lock bug
-        // Get initial state for locked modifiers (mainly Caps and Num-Lock).
-        // Note: SDL fails at taking further hits of Caps and Num-Lock keys into account,
-        //       so we have to do it ourselves (see operator ()).
-        nLockedModifiers = SDL_GetModState();
-
-        // Done once and for all.
-#endif
-        bInitialized = true;
-    }
 }
 
 // Translation function from SDL key to unicode if possible (or SDL key sym otherwise)
@@ -101,34 +83,6 @@ GfEventLoop::Private::Private()
 // below, we do not want to treat the two <Enter> keys as distinct.
 int GfEventLoop::Private::translateKeySym(int code, int modifier, int unicode)
 {
-#if SDL_MAJOR_VERSION < 2
-    // Generate the key Id from its code and modifier.
-    const Uint32 keyId = ((Uint32)code & 0x1FF) | (((Uint32)modifier) << 9);
-
-    // Search it in our unicode map.
-    const std::map<Uint32, Uint16>::const_iterator itUnicode = _mapUnicodes.find(keyId);
-
-    // If not found, update the map for next times.
-    int keyUnicode;
-    if (itUnicode == _mapUnicodes.end())
-    {
-        // Truncate unicodes above GF_MAX_KEYCODE (no need for more).
-        keyUnicode = unicode ? (unicode & GF_MAX_KEYCODE) : code;
-        _mapUnicodes[keyId] = (unsigned short)keyUnicode;
-        GfLogDebug("translateKeySym(c=%X, m=%X, u=%X) : '%c', id=%X, ucode=%X (nk=%d), ms=%X\n",
-                   code, modifier, unicode, // Truncate high bits for MSVC 2010 bugs.
-                   (keyUnicode > 0 && keyUnicode < 128 && isprint(keyUnicode & 0x7F)
-                   ? (char)(keyUnicode & 0x7F) : ' '),
-                   keyId, keyUnicode, _mapUnicodes.size(), SDL_GetModState());
-    }
-
-    // If found, get the unicode from the map.
-    else
-        keyUnicode = (*itUnicode).second;
-
-    // Done.
-    return keyUnicode;
-#else
     int keyUnicode = code; //default to returning code
 
     // Make the Numpad <Enter> key behave like the regular <Enter> key
@@ -167,7 +121,7 @@ int GfEventLoop::Private::translateKeySym(int code, int modifier, int unicode)
     }
 
     return keyUnicode;
-#endif
+
 }
 
 Uint32 GfEventLoop::Private::callTimerCB(Uint32 interval, void *pEvLoopPriv)
@@ -204,11 +158,8 @@ void GfEventLoop::injectKeyboardEvent(int code, int modifier, int state,
         GfLogDebug("injectKeyboardEvent(c=%X) : lockedMod=%X (SDL says %X)\n",
                    code, _pPrivate->nLockedModifiers, SDL_GetModState());
         return;
-#if SDL_MAJOR_VERSION < 2
-    case SDLK_NUMLOCK:
-#else
+
     case SDLK_NUMLOCKCLEAR:
-#endif
         _pPrivate->nLockedModifiers ^= KMOD_NUM;
         GfLogDebug("injectKeyboardEvent(c=%X) : lockedMod=%X (SDL says %X)\n",
                    code, _pPrivate->nLockedModifiers, SDL_GetModState());
@@ -221,15 +172,9 @@ void GfEventLoop::injectKeyboardEvent(int code, int modifier, int state,
         if (modifier & KMOD_RSHIFT) modifier |= KMOD_LSHIFT;
         if (modifier & KMOD_RCTRL) modifier |= KMOD_LCTRL;
         if (modifier & KMOD_RALT) modifier |= KMOD_LALT;
-#if SDL_MAJOR_VERSION < 2
-        if (modifier & KMOD_RMETA) modifier |= KMOD_LMETA;
-
-        modifier &= (KMOD_LSHIFT | KMOD_LCTRL | KMOD_LALT | KMOD_LMETA);
-#else
         if (modifier & KMOD_RGUI) modifier |= KMOD_LGUI;
 
         modifier &= (KMOD_LSHIFT | KMOD_LCTRL | KMOD_LALT | KMOD_LGUI);
-#endif
     }
 
     // Toggle the Shift modifier if the Caps-Lock key is on. // Caps-Lock bug
@@ -271,21 +216,11 @@ void GfEventLoop::operator()()
             switch(event.type)
             {
                 case SDL_KEYDOWN:
-                    injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 0,
-#if SDL_MAJOR_VERSION < 2
-                                        event.key.keysym.unicode);
-#else
-                                        0);
-#endif
+                    injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 0, 0);
                     break;
 
                 case SDL_KEYUP:
-                    injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 1,
-#if SDL_MAJOR_VERSION < 2
-                                        event.key.keysym.unicode);
-#else
-                                        0);
-#endif
+                    injectKeyboardEvent(event.key.keysym.sym, event.key.keysym.mod, 1, 0);
                     break;
 
                 case SDL_QUIT:

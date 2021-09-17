@@ -44,22 +44,12 @@
 #endif
 
 #include <SDL.h>
-#if 0
-#if SDL_MAJOR_VERSION >= 2
-#include <SDL_keyboard.h>
-#else
-#include <SDL_keysym.h>
-#endif
-#endif
 
 #include <tgf.hpp>
 
 #include "guiscreen.h"
 
-#if SDL_MAJOR_VERSION >= 2
 extern SDL_Window* 	GfuiWindow;
-#endif
-
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
@@ -91,9 +81,7 @@ typedef struct ScreenSize
     int height; // Height in pixels.
 } tScreenSize;
 
-#if SDL_MAJOR_VERSION >= 2
 TGFCLIENT_API SDL_Window* GfScrGetMainWindow();//{return GfuiWindow;};
-#endif
 TGFCLIENT_API bool GfScrInit(int nWinWidth = -1, int nWinHeight = -1, int nFullScreen = -1);
 TGFCLIENT_API void GfScrShutdown(void);
 TGFCLIENT_API void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH);
@@ -188,11 +176,7 @@ TGFCLIENT_API tScreenSize* GfScrGetDefaultSizes(int* pnSizes);
 #define GFUIM_CTRL       KMOD_LCTRL
 #define GFUIM_SHIFT      KMOD_LSHIFT
 #define GFUIM_ALT        KMOD_LALT
-#if SDL_MAJOR_VERSION >= 2
 #define GFUIM_META       KMOD_LGUI
-#else
-#define GFUIM_META       KMOD_LMETA
-#endif
 
 // Some keyboard key / special key codes, to avoid SDLK constants everywhere.
 #define GFUIK_BACKSPACE	SDLK_BACKSPACE
@@ -237,13 +221,6 @@ TGFCLIENT_API tScreenSize* GfScrGetDefaultSizes(int* pnSizes);
 
 // Maximun value of a key code (Has to be the least greater  2^N - 1 >= SDLK_LAST)
 #define GFUIK_MAX	GF_MAX_KEYCODE
-
-#if SDL_MAJOR_VERSION < 2 // SDLK_LAST no longer defined as of SDL2
-#if (GFUIK_MAX < SDLK_LAST)
-# error SDLK_MAX has grown too much, please increase GF_MAX_KEYCODE to the least greater power of 2 minus 1.
-#endif
-#endif
-
 
 /** Scroll bar call-back information */
 typedef struct ScrollBarInfo
@@ -702,7 +679,7 @@ TGFCLIENT_API tCtrlJoyInfo* GfctrlJoyCreate(void);
 TGFCLIENT_API void GfctrlJoyRelease(tCtrlJoyInfo* joyInfo);
 TGFCLIENT_API int GfctrlJoyGetCurrentStates(tCtrlJoyInfo* joyInfo);
 #if SDL_JOYSTICK
-#if ((SDL_MAJOR_VERSION >= 2) && (SDL_FORCEFEEDBACK))
+#if SDL_FORCEFEEDBACK
 TGFCLIENT_API void gfctrlJoyConstantForce(int index, int level, int dir);
 TGFCLIENT_API void gfctrlJoyRumble(int index, float level);
 #endif

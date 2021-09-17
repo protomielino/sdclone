@@ -131,10 +131,8 @@ class TGFCLIENT_API GfglFeatures
 	// Update supported OpenGL features according to the given frame buffer specs.
     bool detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
                            bool& bAlpha, bool& bFullScreen, bool& bBump, bool& bStereo, int& nAniFilt);
-#if SDL_MAJOR_VERSION >= 2
 	bool detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
                            bool& bAlpha, bool& bFullScreen, bool& bBump, bool& bStereo, int& nAniFilt);
-#endif
 
 	bool loadSupport(int &nWidth, int &nHeight, int &nDepth,
                      bool &bAlpha, bool &bFullScreen, bool &bBump, bool &bStereo, int &nAniFilt, void* hparmConfig = 0);
