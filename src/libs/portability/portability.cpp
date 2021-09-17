@@ -73,24 +73,17 @@ char *strtok_r(char *str, const char *delim, char **nextp)
 // Ticket #663 - MSVC implementation of snprintf prior to VS 2015 is not safe
 // We provide our own version of the function,
 // that ensures 0 ending for the string.
-//
-// See http://msdn.microsoft.com/en-us/library/d3xd30zz(v=vs.80).aspx
-//
-// "Each of these functions takes a pointer to an argument list,
-// then formats and writes up to count characters of the given data
-// to the memory pointed to by buffer and appends a terminating null.
-// If count is _TRUNCATE, then these functions write as much of the
-// string as will fit in buffer while leaving room for a terminating
-// null. If the entire string (with terminating null) fits in buffer,
-// then these functions return the number of characters written
-// (not including the terminating null); otherwise, these functions
-// return -1 to indicate that truncation occurred."
+// and returns the number of bytes written to the str
+// or if the str is not large enough, the function writes as much
+// as possible and returns the number of bytes that WOULD have 
+// been written had str been large enough. ie: the needed buffer size
+
 #if _MSC_VER && _MSC_VER < 1900
 int SD_snprintf(char *str, size_t size, const char *format, ...)
 {
 	va_list vaArgs;
 	va_start(vaArgs, format);
-	int len = _vsnprintf_s(str, size, _TRUNCATE, format, vaArgs);
+	int len = vsnprintf(str, size, format, vaArgs);
 	va_end(vaArgs);
 	if (size > 0)
 		str[size - 1] = 0;
