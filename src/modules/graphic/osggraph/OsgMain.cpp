@@ -296,7 +296,6 @@ int initTrack(tTrack *track)
 int  initCars(tSituation *s)
 {
     GfLogInfo("InitCars\n");
-    char buf[1024];
     carLights = new SDCarLights;
     cars = new SDCars;
     carLights->loadStates();
