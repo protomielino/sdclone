@@ -348,21 +348,17 @@ gfctrlJoyInit(void)
 			if (!Haptics[index]) {
 				GfLogInfo("Joystick %d does not support haptic\n", index);
 				break;
-#if 1
 			} else {
 				// add an CF effect on startup
 				gfctrlJoyConstantForce(index, 0, 0);
-#endif
 			}
 
 			// Check for Rumble capability
 			if (SDL_HapticRumbleSupported(Haptics[index]) == SDL_TRUE) {
 				if (SDL_HapticRumbleInit(Haptics[index]) != 0) 
 					GfLogError("Couldn't init rumble on joystick %d: %s\n", index, SDL_GetError());
-#if 1
 				else
 					gfctrlJoyRumble(index, 0.5);
-#endif
 			}
 #endif
                 }
@@ -567,9 +563,8 @@ GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 {
 #ifdef SDL_JOYSTICK
    return GfctrlSDL2JoyGetCurrentStates(joyInfo);
-#endif
+#else
     int			ind;
-#ifndef SDL_JOYSTICK
     int			i;
     int			b;
     unsigned int	mask;
@@ -603,37 +598,8 @@ GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
     } else {
 	return -1;
     }
-#else
-    int			i,j;
-
-    if (gfctrlJoyPresent != GFCTRL_JOY_UNTESTED) {
-    	for (ind = 0; ind < gfctrlJoyPresent; ind++) {
-
-            // This polling is missing sometimes, skiping buttons or leaving axes stuck on
-     if (Joysticks[ind]) {
-		// read each button
-		j = SDL_JoystickNumButtons(Joysticks[ind]);
-		if (j > GFCTRL_JOY_MAX_BUTTONS) j = GFCTRL_JOY_MAX_BUTTONS;
- 
-		for (i=0; i < j;i++) {
-		    // buttons are read set by events, we just pass them up when requested
-
-                    if (joyInfo->oldb[GFCTRL_JOY_MAX_BUTTONS * ind + i] == joyInfo->levelup[GFCTRL_JOY_MAX_BUTTONS * ind + i]) {
-			// already informed system of event up/down already, so clear it
- 			joyInfo->edgeup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
-         joyInfo->edgedn[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
-		   }
-
-                    // store button for next round
-                    joyInfo->oldb[GFCTRL_JOY_MAX_BUTTONS * ind + i] = joyInfo->levelup[GFCTRL_JOY_MAX_BUTTONS * ind + i];
- 		}
- 	    }
- 	}
-     } else {
- 	return -1;
-     }
-#endif
     return 0;
+#endif
 }
 
 #if SDL_JOYSTICK
