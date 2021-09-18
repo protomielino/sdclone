@@ -107,7 +107,7 @@ namespace Util2s
    // Clip VALUE to the range LOW--HIGH.
    template <typename T> T clip(T value, T low, T high)
    {
-    return std::max(std::min(value, high), low);
+    return MX(MN(value, high), low);
    }
 }
 

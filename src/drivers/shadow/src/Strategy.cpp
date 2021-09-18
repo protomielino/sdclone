@@ -422,7 +422,7 @@ double Strategy::calcRefuel(CarElt* pCar) const
     int tirespitstops = int(floor(disttoend / tiresstintdist));
 
     // Need fuel or tires stops?
-    int pitstops = std::max(fuelpitstops, tirespitstops);
+    int pitstops = MX(fuelpitstops, tirespitstops);
 
     // Calc the stint fuel
     double stintfuel = fueltoend / (pitstops + 1) +2.0;
