@@ -83,7 +83,7 @@ int RmGetFeaturesList( void* param )
 		snprintf( path, sizeof(path), "%s/%d", RM_SECT_DRIVERS, xx );
 		cardllname = GfParmGetStr( param, path, RM_ATTR_MODULE, "" );
 		caridx = (int)GfParmGetNum( param, path, RM_ATTR_IDX, NULL, 0 );
-		snprintf( buf, sizeof(buf), "%s/drivers/%s/%s.xml", GfLocalDir(), cardllname, cardllname );
+		snprintf( buf, sizeof(buf), "%sdrivers/%s/%s.xml", GfLocalDir(), cardllname, cardllname );
 		robhdle = GfParmReadFile( buf, GFPARM_RMODE_STD );
 
 		if( !robhdle )
