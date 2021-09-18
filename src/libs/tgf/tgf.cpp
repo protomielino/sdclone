@@ -774,7 +774,7 @@ char* GfPathNormalizeFile(char* pszPath, size_t nMaxPathLen)
 
 static char* makeRunTimeDirPath(const char* srcPath)
 {
-	static const size_t bufSize = 512;
+	static const size_t bufSize = 1024;
 	
 	// Allocate target buffer (must be freed by caller when useless).
 	char* tgtPath = (char *)malloc(bufSize);
@@ -865,7 +865,7 @@ void GfInitInstallDir(const char *pszExecutablePath)
 		free(gfInstallDir);
 
 	// Search for the last path separator and cut there.
-	char pszPath[512];
+	char pszPath[1024];
 	strcpy(pszPath, pszExecutablePath);
 	char* pLastPathSep = strrchr(pszPath, '/');
 #ifdef WIN32
@@ -914,7 +914,7 @@ void GfInitInstallDir(const char *pszExecutablePath)
 	// If no PATH, cannot work if we are not in the executable folder.
 	else
 	{
-		if(!getcwd(pszPath, 512))
+		if(!getcwd(pszPath, sizeof(pszPath)))
 		{
 			GfLogError("Could not get the current working directory");
 		}
@@ -933,7 +933,7 @@ void GfInitInstallDir(const char *pszExecutablePath)
 	// (quite strange : the executable is not in SD_BINDIR ? When can this happen ?).
 	else
 	{
-		if(!getcwd(pszPath, 512))
+		if(!getcwd(pszPath, sizeof(pszPath)))
 		{
 			GfLogError("Could not get the current working directory");
 		}
