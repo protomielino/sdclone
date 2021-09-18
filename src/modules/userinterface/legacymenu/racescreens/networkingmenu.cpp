@@ -977,13 +977,8 @@ ChangeIP(void * /* dummy */)
 static void
 LookupPlayerSetup(std::string & strDriver,std::string & strCar)
 {
-    	void	*drvinfo;
-	
-	char buf[255];
-	sprintf(buf, "%s", HM_DRV_FILE);
-
-	drvinfo = GfParmReadFileLocal(buf, GFPARM_RMODE_REREAD);
-		assert(drvinfo);
+	void *drvinfo = GfParmReadFileLocal(HM_DRV_FILE, GFPARM_RMODE_REREAD);
+	assert(drvinfo);
 	if (drvinfo == NULL) {
 		return;
 	}

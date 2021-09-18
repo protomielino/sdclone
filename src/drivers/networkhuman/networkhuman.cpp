@@ -451,9 +451,7 @@ int NetworkHuman::get_human_index()
     {
         const char *driver_name = NetGetNetwork()->GetDriverName();
 
-        const char *driver_file = "drivers/human/human.xml";
-        void *driver_info = GfParmReadFileLocal(driver_file,
-                GFPARM_RMODE_REREAD);
+        void *driver_info = GfParmReadFileLocal("drivers/human/human.xml", GFPARM_RMODE_REREAD);
 
         if (driver_info)
         {

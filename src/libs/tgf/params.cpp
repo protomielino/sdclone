@@ -1258,12 +1258,9 @@ void *
 GfParmReadFileLocal(const char *file, int mode, bool neededFile)
 {
 	//use local dir
-	char buf[255];
-	sprintf(buf, "%s%s", GfLocalDir(),file);
+	std::string fullPath(std::string(GfLocalDir()) + file);
 	
-	void *pResult = GfParmReadFile(buf,mode,neededFile);
-
-	return pResult;
+	return GfParmReadFile(fullPath.c_str(),mode,neededFile);
 }
 
 /** Read a configuration file.

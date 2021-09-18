@@ -259,9 +259,7 @@ int NetNetwork::GetNetworkHumanIdx()
     assert(m_strDriverName!="");
     int idx = 1;
 
-    char buf[255];
-    sprintf(buf,"drivers/networkhuman/networkhuman.xml");
-    void *params = GfParmReadFileLocal(buf,GFPARM_RMODE_REREAD);
+    void *params = GfParmReadFileLocal("drivers/networkhuman/networkhuman.xml", GFPARM_RMODE_REREAD);
     assert(params);
     char path2[256];
 
