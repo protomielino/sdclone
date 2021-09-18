@@ -1741,10 +1741,9 @@ int
 GfParmWriteFileLocal(const char *file, void *parmHandle, const char *name)
 {
 	//use local dir
-	char buf[255];
-	sprintf(buf, "%s%s", GfLocalDir(), file);
+	std::string fullPath(std::string(GfLocalDir()) + file);
 
-	return GfParmWriteFile(buf,parmHandle,name);
+	return GfParmWriteFile(fullPath.c_str(), parmHandle, name);
 }
 
 /** Write a configuration file.
