@@ -469,8 +469,8 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
     /* Retrieve and load the robotXML file :
      1) from user settings dir (local dir)
      2) from installed data dir */
-    snprintf(buf, sizeof(buf), "%sdrivers/%s/%s.xml", GfLocalDir(), cardllname, cardllname);
-    robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+    snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", cardllname, cardllname);
+    robhdle = GfParmReadFileLocal(buf, GFPARM_RMODE_STD);
     if (!robhdle) {
         snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", cardllname, cardllname);
         robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
@@ -790,9 +790,9 @@ ReInitCars(void)
         else
         {
             GfLogTrace("Loading robot %s descriptor file\n", robotModuleName );
-            snprintf(buf, sizeof(buf), "%sdrivers/%s/%s.xml",
-                     GfLocalDir(), robotModuleName, robotModuleName);
-            robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+            snprintf(buf, sizeof(buf), "drivers/%s/%s.xml",
+                     robotModuleName, robotModuleName);
+            robhdle = GfParmReadFileLocal(buf, GFPARM_RMODE_STD);
             if (!robhdle)
             {
                 snprintf(buf, sizeof(buf), "drivers/%s/%s.xml",

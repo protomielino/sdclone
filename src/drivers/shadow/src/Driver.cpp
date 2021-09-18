@@ -312,8 +312,7 @@ void	Driver::InitTrack(
     //SetRandomSeed(10);
 
     // load the global skill level, range 0 - 10
-    snprintf(buf, sizeof(buf), "%sconfig/raceman/extra/skill.xml", GetLocalDir());
-    void *skillHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+    void *skillHandle = GfParmReadFileLocal("config/raceman/extra/skill.xml", GFPARM_RMODE_REREAD);
 
     if(!skillHandle)
     {

@@ -536,12 +536,10 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
   /* Retrieve and load the robotXML file :
      1) from user settings dir (local dir)
      2) from installed data dir */
-  snprintf(buf, sizeof(buf), "%sdrivers/%s/%s.xml", GfLocalDir(), cardllname, cardllname);
-  robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
-  if (!robhdle) {
-    snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", cardllname, cardllname);
+  snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", cardllname, cardllname);
+  robhdle = GfParmReadFileLocal(buf, GFPARM_RMODE_STD);
+  if (!robhdle)
     robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
-  }
 
   if (normal_carname || isHuman)
     snprintf(path, sizeof(path), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
@@ -706,8 +704,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       /* The code below stores the carnames to a separate xml-file
          such that at newTrack it is known which car is used.
          TODO: find a better method for this */
-      snprintf (buf, sizeof(buf), "%sdrivers/curcarnames.xml", GfLocalDir());
-      handle = GfParmReadFile(buf, GFPARM_RMODE_CREAT);
+      handle = GfParmReadFileLocal("drivers/curcarnames.xml", GFPARM_RMODE_CREAT);
       if (handle) {
         snprintf(path, sizeof(path), "drivers/%s/%d", cardllname, elt->_driverIndex);
         GfParmSetStr (handle, path, RM_ATTR_CARNAME, elt->_carName);
@@ -849,13 +846,11 @@ ReInitCars(void)
     else
     {
       GfLogTrace("Loading robot %s descriptor file\n", robotModuleName );
-      snprintf(buf, sizeof(buf), "%sdrivers/%s/%s.xml", GfLocalDir(), robotModuleName, robotModuleName);
-      robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+      snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", robotModuleName, robotModuleName);
+      robhdle = GfParmReadFileLocal(buf, GFPARM_RMODE_STD);
       if (!robhdle)
-      {
-        snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", robotModuleName, robotModuleName);
         robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
-      }
+
       if (robhdle && ( strcmp( robotModuleName, "human" ) == 0 || strcmp( robotModuleName, "networkhuman" ) == 0 ) )
       {
         /* Human driver */

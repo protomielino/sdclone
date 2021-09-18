@@ -404,8 +404,8 @@ static void* ReCareerNewClass( const char* filename, void *prevParam, void **fir
 	int xx;
 
 	/* Open subfile */
-	snprintf( buf, sizeof(buf), "%sconfig/raceman/%s", GfLocalDir(), GfParmGetCurStr(ReInfo->params, RM_SECT_CLASSES, RM_ATTR_SUBFILE, "") );
-	subparam = GfParmReadFile( buf, GFPARM_RMODE_STD );
+	snprintf( buf, sizeof(buf), "config/raceman/%s", GfParmGetCurStr(ReInfo->params, RM_SECT_CLASSES, RM_ATTR_SUBFILE, "") );
+	subparam = GfParmReadFileLocal( buf, GFPARM_RMODE_STD );
 	if( !subparam ) {
 		GfLogError( "Subfile %s not found\n", buf );
 		return prevParam;

@@ -119,14 +119,12 @@ void GfDrivers::reload()
 
         // Load the module XML descriptor file (try  user settings first, and then installed one)
         std::ostringstream ossRobotFileName;
-        ossRobotFileName << GfLocalDir() << "drivers/" << strModName
+        ossRobotFileName << "drivers/" << strModName
                          << '/' << strModName << PARAMEXT;
         void *hparmRobot =
-            GfParmReadFile(ossRobotFileName.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+            GfParmReadFileLocal(ossRobotFileName.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
         if (!hparmRobot)
         {
-            ossRobotFileName.str("");
-            ossRobotFileName << "drivers/" << strModName << '/' << strModName << PARAMEXT;
             hparmRobot =
                 GfParmReadFile(ossRobotFileName.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
         }

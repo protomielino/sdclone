@@ -1019,9 +1019,9 @@ ReInitialiseGeneticOptimisation()
 		if (!Data->Handle)
 		{
 			// ... use default setup file ...
-			snprintf(buf,FILENAME_MAX,"%sdrivers/%s/%s/default.xml",
-				GetLocalDir(),Data->RobotName,Data->CarType);
-			void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+			snprintf(buf, sizeof(buf), "drivers/%s/%s/default.xml",
+				     Data->RobotName,Data->CarType);
+			void* Handle = GfParmReadFileLocal(buf, GFPARM_RMODE_REREAD);
 
 			if (Handle) // ... if existing ...
 			{			// ... use it to create a track specific setup file.
@@ -1041,9 +1041,9 @@ ReInitialiseGeneticOptimisation()
 	}
 	else
 	{
-		snprintf(buf,FILENAME_MAX,"%sdrivers/%s/%s/default.xml",
-			GetLocalDir(),Data->RobotName,Data->CarType);
-		Data->Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+		snprintf(buf, sizeof(buf), "drivers/%s/%s/default.xml",
+			Data->RobotName,Data->CarType);
+		Data->Handle = GfParmReadFileLocal(buf, GFPARM_RMODE_REREAD);
 	}
 
 	ReImportGeneticParameters();
@@ -1085,28 +1085,28 @@ ReImportGeneticParameters()
 	if (SingleTrackOptimization)
 	{
 		// Build path to meta data file
-		snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-%s.xml",
-			GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName);
+		snprintf(buf, sizeof(buf),"drivers/%s/%s/genetic-%s.xml",
+			Data->RobotName,Data->CarType,Data->TrackName);
 
 		// Read meta data file
-		void* MetaDataFile = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+		void* MetaDataFile = GfParmReadFileLocal(buf, GFPARM_RMODE_REREAD);
 		if (!MetaDataFile)
 		{
 			// Build path to meta data file
-			snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-template.xml",
-				GetLocalDir(),Data->RobotName,Data->CarType);
+			snprintf(buf, sizeof(buf),"drivers/%s/%s/genetic-template.xml",
+				Data->RobotName,Data->CarType);
 		}
 	}
 	else
 	{
         // C:\Users\wdb\Documents\speed-dreams-2.settings\drivers\simplix_srw\srw-sector-p4
 		// Build path to meta data file
-		snprintf(buf,sizeof(buf),"%sdrivers/%s/%s/genetic-template.xml",
-			GetLocalDir(),Data->RobotName,Data->CarType);
+		snprintf(buf, sizeof(buf),"drivers/%s/%s/genetic-template.xml",
+			Data->RobotName,Data->CarType);
 	}
 
 	// Read meta data file
-	void* MetaDataFile = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+	void* MetaDataFile = GfParmReadFileLocal(buf, GFPARM_RMODE_REREAD);
 	if (!MetaDataFile)
 	{
 		ReLogOptim.fatal("Couldn't load : %s\n", buf); 
@@ -1135,9 +1135,9 @@ ReImportGeneticParameters()
 		Data->GetInitialVal = false;
 
 	// Get tank capacity from car type setup file
-	snprintf(buf,sizeof(buf),"%scars/models/%s/%s.xml",
-		GetDataDir(),Data->CarType,Data->CarType);
-	void* Handle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+	snprintf(buf,sizeof(buf),"cars/models/%s/%s.xml",
+		Data->CarType,Data->CarType);
+	void* Handle = GfParmReadFileLocal(buf, GFPARM_RMODE_REREAD);
 	Data->MaxFuel = (float) GfParmGetNum(Handle, 
 		SECT_CAR, PRM_TANK, "l", (float) 60.0);
 	GfParmReleaseHandle(Handle);

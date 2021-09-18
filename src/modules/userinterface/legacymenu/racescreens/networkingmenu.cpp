@@ -359,7 +359,6 @@ UpdateNetworkPlayers()
 		if (pMod == NULL)
 		{
 			//try again in other path
-			sprintf(robpath,"drivers/%s/%s.xml",robot,robot);
 			pMod = GfParmReadFile(robpath,GFPARM_RMODE_REREAD);
 			if (pMod == NULL)
 				continue;

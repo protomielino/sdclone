@@ -172,8 +172,7 @@ void Driver::InitTrack(tTrack* Track, void* carHandle, void** carParmHandle, tSi
     param.setNum(SECT_CAR, PRM_FUEL, startfuel);
 
     // load the global skill level, range 0 - 10
-    snprintf(buffer, sizeof(buffer), "%sconfig/raceman/extra/skill.xml", GetLocalDir());
-    void *skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
+    void *skillHandle = GfParmReadFileLocal("config/raceman/extra/skill.xml", GFPARM_RMODE_REREAD);
 
     if(!skillHandle)
     {

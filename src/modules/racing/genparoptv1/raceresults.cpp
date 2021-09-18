@@ -66,8 +66,7 @@ ReInitResults(void)
 	
 	t = time(NULL);
 	stm = localtime(&t);
-	snprintf(buf, sizeof(buf), "%sresults/%s/results-%4d-%02d-%02d-%02d-%02d.xml",
-		GfLocalDir(),
+	snprintf(buf, sizeof(buf), "results/%s/results-%4d-%02d-%02d-%02d-%02d.xml",
 		ReInfo->_reFilename,
 		stm->tm_year+1900,
 		stm->tm_mon+1,
@@ -75,7 +74,7 @@ ReInitResults(void)
 		stm->tm_hour,
 		stm->tm_min);
 	
-	ReInfo->results = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	ReInfo->results = GfParmReadFileLocal(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	ReInfo->mainResults = ReInfo->results;
 	results = ReInfo->results;
 	GfParmSetNum(results, RE_SECT_HEADER, RE_ATTR_DATE, NULL, (tdble)t);

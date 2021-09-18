@@ -181,11 +181,8 @@ void setDefaultMusic(const char* filename)
 
 static void readConfig()
 {
-	char fnbuf[1024];
-	snprintf(fnbuf, sizeof(fnbuf), "%s%s", GfLocalDir(), SND_PARAM_FILE);
-
 	GfLogInfo("Reading music player config\n");
-	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFileLocal(SND_PARAM_FILE, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	const char *musicenabled = GfParmGetStr(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_STATE, musicDisabledStr);
 
 	float music_volume = GfParmGetNum(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_VOLUME, "%", 100.0f);

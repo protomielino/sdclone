@@ -195,9 +195,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
     GfParmSetNum(*CarParmHandle, SECT_CAR, PRM_FUEL, (char*)NULL, (tdble)mFuelStart);
 
     // Get skill level
-    handle = NULL;
-    sprintf(buffer, "%sconfig/raceman/extra/skill.xml", GetLocalDir());
-    handle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
+    handle = GfParmReadFileLocal("config/raceman/extra/skill.xml", GFPARM_RMODE_REREAD);
     double globalskill = 0.0;
     if (handle != NULL)
     {
