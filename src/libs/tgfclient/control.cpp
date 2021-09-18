@@ -39,9 +39,7 @@
 #include <portability.h>
 
 #include "tgfclient.h"
-#if SDL_MAJOR_VERSION >= 2
 #include "SDL_haptic.h"
-#endif
 
 
 static const char *GfJoyBtn[] = {
@@ -139,14 +137,12 @@ static int gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
 static SDL_Joystick *Joysticks[GFCTRL_JOY_NUMBER] = {NULL};
 static tCtrlJoyInfo *joyInfoCopy = NULL;
 //static tCtrlJoyInfo joyInfo;
-#if SDL_MAJOR_VERSION >= 2
 #if SDL_FORCEFEEDBACK
 static SDL_Haptic *Haptics[GFCTRL_JOY_NUMBER] = {NULL};
 static SDL_HapticEffect cfx[GFCTRL_JOY_NUMBER];
 static unsigned int	cfx_timeout[GFCTRL_JOY_NUMBER];
 static unsigned int 	rfx_timeout[GFCTRL_JOY_NUMBER];
 static int id[GFCTRL_JOY_NUMBER];
-#endif
 #endif
 #else
 static jsJoystick *Joysticks[GFCTRL_JOY_NUMBER] = {NULL};
@@ -312,7 +308,6 @@ gfctrlJoyInit(void)
 		}
     }
 #else
-#if SDL_MAJOR_VERSION >= 2
 #if SDL_FORCEFEEDBACK
     memset(&cfx, 0, sizeof(cfx));
     
@@ -325,17 +320,12 @@ gfctrlJoyInit(void)
 #else
 	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0) {
 #endif
-#else
-    if (SDL_Init(SDL_INIT_JOYSTICK) < 0) {
-#endif
         GfLogError("Couldn't initialize SDL: %s\n", SDL_GetError());
         gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
 	return;
     }
-#if SDL_MAJOR_VERSION >= 2
     // Ignore the joystick events, we will poll directly as it is faster
     SDL_JoystickEventState(SDL_IGNORE);
-#endif
     gfctrlJoyPresent = SDL_NumJoysticks();
     if (gfctrlJoyPresent > GFCTRL_JOY_NUMBER) gfctrlJoyPresent = GFCTRL_JOY_NUMBER;
 
@@ -347,7 +337,7 @@ gfctrlJoyInit(void)
 		// Don't configure the joystick if it doesn't work
 		if (Joysticks[index] ==  NULL) {
 			GfLogError("Couldn't open joystick %d: %s\n", index, SDL_GetError());
-#if ((SDL_MAJOR_VERSION >= 2) && (SDL_FORCEFEEDBACK))
+#if SDL_FORCEFEEDBACK
 		} else {
 			cfx_timeout[index] = 0;
 			rfx_timeout[index] = 0;
@@ -443,7 +433,7 @@ gfctrlJoyShutdown(void)
       for (int index = 0; index < gfctrlJoyPresent; index++) {
 			SDL_JoystickClose(Joysticks[index]);
 			Joysticks[index] = NULL;
-#if ((SDL_MAJOR_VERSION >= 2) && (SDL_FORCEFEEDBACK))
+#if SDL_FORCEFEEDBACK
 			if (Haptics[index]) {
 				SDL_HapticClose(Haptics[index]);
 				Haptics[index] = NULL;
@@ -506,7 +496,6 @@ GfctrlJoyIsAnyPresent(void)
 
     return gfctrlJoyPresent;
 }
-#if SDL_MAJOR_VERSION >= 2
 #if SDL_JOYSTICK
 int
 GfctrlSDL2JoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
@@ -566,7 +555,6 @@ GfctrlSDL2JoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
    return 0;
 }
 #endif
-#endif
 /** Get the current state of the joysticks
     @ingroup	ctrl
     @param	joyInfo	Target joystick structure
@@ -577,10 +565,8 @@ GfctrlSDL2JoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 int
 GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 {
-#if SDL_MAJOR_VERSION >= 2
 #ifdef SDL_JOYSTICK
    return GfctrlSDL2JoyGetCurrentStates(joyInfo);
-#endif
 #endif
     int			ind;
 #ifndef SDL_JOYSTICK
@@ -625,24 +611,11 @@ GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 
             // This polling is missing sometimes, skiping buttons or leaving axes stuck on
      if (Joysticks[ind]) {
-#if SDL_MAJOR_VERSION < 2
-		// poll each axis 
-		// note: for SDL2 use events, set in GfctrlJoySetAxis()
-		j = SDL_JoystickNumAxes(Joysticks[ind]);
-		if (j > GFCTRL_JOY_MAX_AXES) j = GFCTRL_JOY_MAX_AXES;
-
-		for (i=0; i < j;i++)
-                    joyInfo->ax[GFCTRL_JOY_MAX_AXES * ind + i] = ((float) SDL_JoystickGetAxis(Joysticks[ind],i)) / 32768;
-#endif
-
 		// read each button
 		j = SDL_JoystickNumButtons(Joysticks[ind]);
 		if (j > GFCTRL_JOY_MAX_BUTTONS) j = GFCTRL_JOY_MAX_BUTTONS;
  
 		for (i=0; i < j;i++) {
-#if SDL_MAJOR_VERSION < 2
-		    GfctrlJoySetButton(ind, i, (int) SDL_JoystickGetButton(Joysticks[ind], i));
-#else
 		    // buttons are read set by events, we just pass them up when requested
 
                     if (joyInfo->oldb[GFCTRL_JOY_MAX_BUTTONS * ind + i] == joyInfo->levelup[GFCTRL_JOY_MAX_BUTTONS * ind + i]) {
@@ -653,7 +626,6 @@ GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 
                     // store button for next round
                     joyInfo->oldb[GFCTRL_JOY_MAX_BUTTONS * ind + i] = joyInfo->levelup[GFCTRL_JOY_MAX_BUTTONS * ind + i];
-#endif
  		}
  	    }
  	}

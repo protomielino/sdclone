@@ -129,8 +129,6 @@ class TGFCLIENT_API GfglFeatures
 	GfglFeatures();
 
 	// Update supported OpenGL features according to the given frame buffer specs.
-    bool detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
-                           bool& bAlpha, bool& bFullScreen, bool& bBump, bool& bStereo, int& nAniFilt);
 	bool detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
                            bool& bAlpha, bool& bFullScreen, bool& bBump, bool& bStereo, int& nAniFilt);
 
