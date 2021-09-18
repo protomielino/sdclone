@@ -88,8 +88,7 @@ gfuiInitColor(void)
 		GFSCR_ELT_PROGRESSCOLOR
 	};
 
-	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-	void* hdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	void* hdle = GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	for (int i = 0; i < GFUI_COLORNB; i++) {
 		snprintf(buf, sizeof(buf), "%s/%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_LIST_COLORS, clr[i]);

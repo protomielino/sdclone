@@ -79,8 +79,7 @@ void gfuiLoadFonts(void)
 	int	i;
 	int nFontId;
 
-	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-	param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	param = GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	snprintf(buf, sizeof(buf), "%sdata/fonts/%s", GfDataDir(),
 			 GfParmGetStr(param, "Menu Font", "name", "b5.glf"));

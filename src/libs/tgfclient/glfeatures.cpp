@@ -54,10 +54,7 @@ int GfglFeatures::InvalidInt = std::numeric_limits<int>::min();
 // Config file management.
 void* GfglFeatures::openConfigFile()
 {
-	std::ostringstream ossParm;
-	ossParm << GfLocalDir() << GFSCR_CONF_FILE;
-
-	return GfParmReadFile(ossParm.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	return GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 }
 
 void GfglFeatures::closeConfigFile(void* hparmConfig, bool bWrite)

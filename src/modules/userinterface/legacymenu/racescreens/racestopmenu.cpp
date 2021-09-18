@@ -138,8 +138,7 @@ rmControlsHookActivate(void * /* dummy */)
     const char *str;
     tGearChangeMode gearChangeMode;
 
-    sprintf(buf, "%s%s", GfLocalDir(), HM_PREF_FILE);
-    prHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+    prHandle = GfParmReadFileLocal(HM_PREF_FILE, GFPARM_RMODE_REREAD);
 
     snprintf(buf, sizeof(buf), "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, curPlayerIdx);
     str = GfParmGetStr(prHandle, buf, HM_ATT_TRANS, HM_VAL_AUTO);
@@ -177,8 +176,7 @@ rmForceFeedbackConfigHookActivate(void * /* dummy */)
     void *prHandle;
     char buf[100];
 
-    sprintf(buf, "%s%s", GfLocalDir(), HM_PREF_FILE);
-    prHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+    prHandle = GfParmReadFileLocal(HM_PREF_FILE, GFPARM_RMODE_REREAD);
 
     snprintf(buf, sizeof(buf), "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, curPlayerIdx);
 
@@ -360,11 +358,9 @@ RmStopRaceMenu()
     const char *cur_name;
     const char *test_name;
 
-    sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
-    grHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+    grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_REREAD);
 
-    sprintf(buf, "%s%s", GfLocalDir(), HM_DRV_FILE);
-    hdHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+    hdHandle = GfParmReadFileLocal(HM_DRV_FILE, GFPARM_RMODE_REREAD);
 #endif
 
     // Mute sound.

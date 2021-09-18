@@ -45,9 +45,7 @@ void grInitSound(tSituation* s, int ncars)
 	char buf[256];
 
 	// Check if we want sound (sound.xml).
-	char fnbuf[1024];
-	sprintf(fnbuf, "%s%s", GfLocalDir(), SND_PARAM_FILE);
-	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFileLocal(SND_PARAM_FILE, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	const char *optionName = GfParmGetStr(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_STATE, soundOpenALStr);
 	float global_volume = GfParmGetNum(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_VOLUME, "%", 100.0f);
 	if (!strcmp(optionName, soundDisabledStr)) {

@@ -127,10 +127,8 @@ void MonitorMenu::updateControls()
 
 void MonitorMenu::loadSettings()
 {
-	std::ostringstream ossConfFile;
-	ossConfFile << GfLocalDir() << GR_PARAM_FILE;
 	void* grHandle = 
-		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+		GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	// Monitor Type : 4:3, 16:9 or 21:9
 	const char *pszMonitorType =
@@ -162,10 +160,8 @@ void MonitorMenu::loadSettings()
 // Save graphical settings to XML file.
 void MonitorMenu::storeSettings() const
 {
-	std::ostringstream ossConfFile;
-	ossConfFile << GfLocalDir() << GR_PARAM_FILE;
-	void* grHandle =
-		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	void *grHandle =
+		GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	const char* pszMonitorType =
 		(_eMonitorType == e4by3) ? GR_VAL_MONITOR_4BY3 : (_eMonitorType == e21by9) ? GR_VAL_MONITOR_21BY9 : GR_VAL_MONITOR_16BY9;

@@ -91,8 +91,7 @@ void SDScenery::LoadScene(tTrack *track)
 
     if(grHandle == NULL)
     {
-        snprintf(buf, 256, "%s%s", GetLocalDir(), GR_PARAM_FILE);
-        grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+        grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
     }//if grHandle
 
     /* Determine the world limits */
@@ -210,12 +209,9 @@ void SDScenery::LoadSkyOptions()
 
 void SDScenery::LoadGraphicsOptions()
 {
-    char buf[256];
-
     if (!grHandle)
     {
-        snprintf(buf, 256, "%s%s", GfLocalDir(), GR_PARAM_FILE);
-        grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+        grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
     }//if grHandle
 
     LoadSkyOptions();

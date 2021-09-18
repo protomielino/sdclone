@@ -162,10 +162,8 @@ void DisplayMenu::updateControls()
 void DisplayMenu::loadSettings()
 {
 	// Open screen config params file.
-	std::ostringstream ossConfFile;
-	ossConfFile << GfLocalDir() << GFSCR_CONF_FILE;
 	void* hScrConfParams =
-		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+		GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	// Select the screen properties to edit : the 'in-test' ones if present,
 	// otherwise the 'validated' ones.
@@ -211,10 +209,8 @@ void DisplayMenu::loadSettings()
 void DisplayMenu::storeSettings() const
 {
 	// Open screen config params file.
-	std::ostringstream ossConfFile;
-	ossConfFile << GfLocalDir() << GFSCR_CONF_FILE;
 	void* hScrConfParams =
-		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+		GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	// Write new screen properties to the 'in-test' section, with 'to do' test state
 	// (will become 'validated' after a succesfull restart, once we are sure they are OK :

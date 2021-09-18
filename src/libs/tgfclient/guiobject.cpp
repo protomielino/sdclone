@@ -39,8 +39,7 @@ gfuiInitObject(void)
 {
 	//Read mouse pointer settings
 	char buf[1024];
-	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-	void *param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	void *param = GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	NMouseCursorXOffset =
 		(int)GfParmGetNum(param, GFSCR_SECT_MOUSECURSOR, GFSCR_ATT_XOFFSET, (char*)NULL, 0.0);

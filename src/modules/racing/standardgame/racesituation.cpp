@@ -537,10 +537,8 @@ ReSituationUpdater::ReSituationUpdater()
 
     // Determine if we have a dedicated separate thread or not
     // (according to the user settings, and the actual number of CPUs).
-    std::ostringstream ossConfFile;
-    ossConfFile << GfLocalDir() << RACE_ENG_CFG;
     void *paramHandle =
-        GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+        GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
     const char* pszMultiThreadScheme =
         GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_MULTI_THREADING, RM_VAL_AUTO);
 

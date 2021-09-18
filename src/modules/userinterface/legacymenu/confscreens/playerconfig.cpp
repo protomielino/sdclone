@@ -425,9 +425,7 @@ PutPlayerSettings(unsigned index)
 		snprintf(drvDispSecPath, sizeof(drvDispSecPath), "%s/%s", GR_SCT_DISPMODE, pszOldDispName);
 		if (!GraphHdle) // Load graphic params file if not already done.
 		{
-			char pszGraphFileName[256];
-			snprintf(pszGraphFileName, sizeof(pszGraphFileName), "%s%s", GfLocalDir(), GR_PARAM_FILE);
-			GraphHdle = GfParmReadFile(pszGraphFileName, GFPARM_RMODE_REREAD);
+			GraphHdle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_REREAD);
 		}
 
 		if (GfParmExistsSection(GraphHdle, drvDispSecPath)) { // Change section name.
@@ -669,8 +667,7 @@ GenPlayerList(void)
     PlayersInfo.clear();
 
     /* Load players settings from human.xml file *//*was meant: preferences.xml file?*/
-    snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), HM_DRV_FILE);
-    PlayerHdle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+    PlayerHdle = GfParmReadFileLocal(HM_DRV_FILE, GFPARM_RMODE_REREAD);
     if (PlayerHdle == NULL) {
         return -1;
     }
@@ -712,8 +709,7 @@ GenPlayerList(void)
     UpdtScrollList();
 
     /* Load players settings from human/preferences.xml file*/
-    snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), HM_PREF_FILE);
-    PrefHdle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+    PrefHdle = GfParmReadFileLocal(HM_PREF_FILE, GFPARM_RMODE_REREAD);
     if (!PrefHdle) {
         return -1;
     }

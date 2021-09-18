@@ -41,8 +41,7 @@ gfuiInitButton(void)
 
 	// Get default layout properties from the screen config file.
 	// 1) Tips.
-	snprintf(path, sizeof(path), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-	void* hparmScr = GfParmReadFile(path, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	void* hparmScr = GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	// 2) Text buttons.
 	snprintf(path, sizeof(path), "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_TEXTBUTTON);

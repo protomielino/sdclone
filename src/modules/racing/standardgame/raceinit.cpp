@@ -97,9 +97,7 @@ ReReset(void)
     ReInfo->robModList = &ReRacingRobotsModList;
 
     // Load Race engine params.
-    char buf[PathLenMax];
-    snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
-    ReInfo->_reParam = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+    ReInfo->_reParam = GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 }
 
 
@@ -891,9 +889,8 @@ ReInitCars(void)
     replayRecord = 0;
   else {
     const char *replayRateSchemeName;
-        snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
 
-        void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+        void *paramHandle = GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
         replayRateSchemeName = GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_REPLAY_RATE, "0");
         GfParmReleaseHandle(paramHandle);
 

@@ -716,14 +716,8 @@ int WebServer::sendGenericRequest (std::string data, std::string& serverReply)
 
 void WebServer::readConfiguration ()
 {
-	void *configHandle;
-	char configFileUrl[1024];
-
-	//get the preferencies file location
-	snprintf(configFileUrl, sizeof(configFileUrl), "%s%s", GfLocalDir(), "config/webserver.xml");
-
 	//read the preferencies file
-	configHandle = GfParmReadFile(configFileUrl, GFPARM_RMODE_REREAD);
+    void *configHandle = GfParmReadFileLocal("config/webserver.xml", GFPARM_RMODE_REREAD);
 
 	//get webServer url from the config
 	this->url = GfParmGetStr(configHandle, "WebServer Settings", "url","val");
@@ -734,17 +728,13 @@ void WebServer::readConfiguration ()
 int WebServer::readUserConfig (int userId)
 {
     void *prHandle;
-    char prefFileUrl[1024];
     char xmlPath[1024];
 
     // find the xmlPath to our specific user in the preferencies xml file
     snprintf(xmlPath, sizeof(xmlPath), "%s%i", "Preferences/Drivers/", userId);
 
-    //get the preferencies file location
-    snprintf(prefFileUrl, sizeof(prefFileUrl), "%s%s", GfLocalDir(), HM_PREF_FILE);
-
     //read the preferencies file
-    prHandle = GfParmReadFile(prefFileUrl, GFPARM_RMODE_REREAD);
+    prHandle = GfParmReadFileLocal(HM_PREF_FILE, GFPARM_RMODE_REREAD);
 
     //get webServer user id for current user
     this->username = GfParmGetStr(prHandle, xmlPath, "WebServerUsername","val");

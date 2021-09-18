@@ -437,8 +437,7 @@ RmRaceParamsMenu(void *vrp)
     rmrpConfMask = pRaceSessionParams ? pRaceSessionParams->bfOptions : 0;
 
     // 2) According to SkyDome settings.
-    snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
-    void *grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+    void *grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD);
     const bool bSkyDomeEnabled =
             (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, 0) != 0;
     GfParmReleaseHandle(grHandle);

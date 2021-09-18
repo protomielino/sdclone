@@ -400,10 +400,7 @@ bool LegacyMenu::onRaceStartingPaused(){
    GfLogDebug("LegacyMenu::onRaceStartingPaused()\n");
 
    bool preracePauseEnabled = false;
-   char buf[256];
-   snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
-
-   void* hparmRaceEng = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+   void* hparmRaceEng = GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
    // does the config allow Prerace pause?
    const char* preracepause = GfParmGetStr(hparmRaceEng, RM_SECT_RACE_ENGINE, RM_ATTR_STARTPAUSED, RM_VAL_OFF);
@@ -448,10 +445,7 @@ void LegacyMenu::onRaceInterrupted() {
 bool LegacyMenu::onRaceCooldownStarting(){
 
    bool cooldownEnabled = false;
-   char buf[256];
-   snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
-
-   void* hparmRaceEng = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+   void* hparmRaceEng = GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
    // Does the config allow cooldown driving?
     const char* cooldown = GfParmGetStr(hparmRaceEng, RM_SECT_RACE_ENGINE, RM_ATTR_COOLDOWN, RM_VAL_OFF);

@@ -247,8 +247,7 @@ void Application::generate()
 	FILE *outfd = NULL;
 
 	// Get the trackgen paramaters.
-	sprintf(buf, "%s", CFG_FILE);
-	CfgHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	CfgHandle = GfParmReadFile(CFG_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	// Load and initialize the track loader module.
 	GfLogInfo("Loading Track Loader ...\n");

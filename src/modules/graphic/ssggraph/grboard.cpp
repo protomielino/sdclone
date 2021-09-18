@@ -108,8 +108,7 @@ cGrBoard::loadDefaults(const tCarElt *curCar)
 {
   //Load dash colours from graph.xml
   char path[1024];
-  snprintf(path, sizeof(path), "%s%s", GfLocalDir(), GR_PARAM_FILE);
-  void *hdle = GfParmReadFile(path, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+  void *hdle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
   const char *pszSpanSplit;
 
   ReadDashColor(hdle, GFSCR_ELT_NORMALCLR,      &normal_color_);

@@ -623,7 +623,6 @@ refresh(tSituation *s)
 int
 initCars(tSituation *s)
 {
-    char buf[1024];
     char	idx[16];
     int		index;
     int		i;
@@ -636,8 +635,7 @@ initCars(tSituation *s)
 
     if (!grHandle)
     {
-        snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
-        grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+        grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     }
 
     grInitCommonState();

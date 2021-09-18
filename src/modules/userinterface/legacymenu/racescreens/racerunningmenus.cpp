@@ -213,10 +213,7 @@ rmInitMovieCapture()
 		return;
 
 	// But do it the first time.
-	char buf[256];
-	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
-
-	void* hparmRaceEng = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void* hparmRaceEng = GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
 	rmMovieCapture.enabled =
 		strcmp(GfParmGetStr(hparmRaceEng, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_ENABLE,
@@ -373,9 +370,7 @@ rmScreenActivate(void * /* dummy */)
 #ifdef UseFPSLimiter
 	
 	// Get the max. refresh rate from the screen config params file.
-	std::ostringstream ossConfFile;
-	ossConfFile << GfLocalDir() << GFSCR_CONF_FILE;
-	void* hparmScrConf = GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD);
+	void* hparmScrConf = GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD);
 	FPSLimLastTime = 0.0;
 	FPSLimMaxRate =
 		GfParmGetNum(hparmScrConf, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_MAXREFRESH, NULL, 0.0);

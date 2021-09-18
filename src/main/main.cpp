@@ -208,10 +208,8 @@ main(int argc, char *argv[])
 	GfData::initialize();
 
 	// Load the race engine module (specified in the user settings : raceengine.xml file).
-	std::ostringstream ossParm;
-	ossParm << GfLocalDir() << RACE_ENG_CFG;
 	void* hREParams =
-		GfParmReadFile(ossParm.str().c_str(), GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+		GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	const char* pszModName = GfParmGetStr(hREParams, "Modules", "racing", "standardgame");
 
 	pmodRaceEngine = GfModule::load("modules/racing", pszModName);

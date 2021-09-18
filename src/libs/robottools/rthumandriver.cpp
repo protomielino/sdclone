@@ -2203,9 +2203,7 @@ void HumanDriver::human_prefs(const int robot_index, int player_index)
 
     if (!PrefHdle)
     {
-        sprintf(sstring, "%s%s", GfLocalDir(), HM_PREF_FILE);
-        PrefHdle = GfParmReadFile(sstring,
-                GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+        PrefHdle = GfParmReadFileLocal(HM_PREF_FILE, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
     }
 
     sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, player_index);

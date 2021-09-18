@@ -73,8 +73,7 @@ static void readSoundCfg(void)
 	char buf[1024];
 
 	// Sound interface.
-	sprintf(buf, "%s%s", GfLocalDir(), SND_PARAM_FILE);
-	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFileLocal(SND_PARAM_FILE, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	optionName = GfParmGetStr(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_STATE, soundOptionList[0]);
 
 	for (i = 0; i < nbOptions; i++) {
@@ -131,9 +130,7 @@ static void saveSoundOption(void *)
 	// Force current edit to loose focus (if one has it) and update associated variable.
 	GfuiUnSelectCurrent();
 
-	char buf[1024];
-	sprintf(buf, "%s%s", GfLocalDir(), SND_PARAM_FILE);
-	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFileLocal(SND_PARAM_FILE, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	GfParmSetStr(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_STATE, soundOptionList[curOption]);
 	GfParmSetNum(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_VOLUME, "%", VolumeValue);
 	GfParmSetStr(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_STATE, musicStateList[curMusicState]);

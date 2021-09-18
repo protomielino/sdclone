@@ -362,10 +362,8 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
 
     // Get selected frame buffer specs from config file
     // 1) Load the config file
-    std::ostringstream ossConfigFilename;
-    ossConfigFilename << GfLocalDir() << GFSCR_CONF_FILE;
     void* hparmScreen =
-        GfParmReadFile(ossConfigFilename.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+        GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
     // 2) Check / update test state of any 'in-test' specs.
     if (GfParmExistsSection(hparmScreen, GFSCR_SECT_INTESTPROPS))
@@ -673,9 +671,7 @@ void GfScrShutdown(void)
     // * if the test state is 'to do', do nothing (will be taken care of in next GfScrInit),
     // * if the test state is 'in progress', validate the new screen properties,
     // * if the test state is 'failed', revert to the validated screen properties.
-    std::ostringstream ossConfigFilename;
-    ossConfigFilename << GfLocalDir() << GFSCR_CONF_FILE;
-    void* hparmScreen = GfParmReadFile(ossConfigFilename.str().c_str(), GFPARM_RMODE_STD);
+    void* hparmScreen = GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD);
 
     if (GfParmExistsSection(hparmScreen, GFSCR_SECT_INTESTPROPS))
     {

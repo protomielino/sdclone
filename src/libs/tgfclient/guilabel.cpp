@@ -45,8 +45,7 @@ gfuiInitLabel(void)
     char path[1024];
 
     // Get tip layout properties from the screen config file.
-    snprintf(path, sizeof(path), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-    void* hparmScr = GfParmReadFile(path, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    void* hparmScr = GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
     snprintf(path, sizeof(path), "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_TIP);
     NTipX = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_X, 0, 10.0);

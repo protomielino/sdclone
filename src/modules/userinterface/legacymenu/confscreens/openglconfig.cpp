@@ -141,9 +141,7 @@ static void onAccept(void *)
 	// Store settings from the GL features layer to the screen.xml file.
 	GfglFeatures::self().storeSelection();
 
-	char buf[1024];
-	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
-	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
 	GfParmSetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_GRAPHIC, GraphicSchemeList[CurGraphicScheme]);
 	GfParmWriteFile(NULL, paramHandle, "raceengine");
@@ -441,10 +439,8 @@ void* OpenGLMenuInit(void *prevMenu)
 	
 	//Initialize current Graphic Engine
 	// ssggraph / OsgGraph
-	char buf[1024];
-	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
 
-	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
 	// graphic engine
 	graphicSchemeName = GfParmGetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_GRAPHIC, GraphicSchemeList[1]);

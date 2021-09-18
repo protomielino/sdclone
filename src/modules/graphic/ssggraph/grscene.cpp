@@ -100,9 +100,7 @@ grInitScene(void)
     // Load graphic options if not already done.
     if(!grHandle)
     {
-        char buf[256];
-        sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
-        grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+        grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     }//if grHandle
 
     // Initialize the background, sky ...
@@ -132,12 +130,9 @@ grInitScene(void)
 static void
 grLoadGraphicsOptions()
 {
-    char buf[256];
-
     if (!grHandle)
     {
-        sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
-        grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+        grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
     }//if grHandle
 
     grLoadBackgroundGraphicsOptions();

@@ -74,9 +74,7 @@ ReReset(void)
     ReInfo->robModList = &ReRacingRobotsModList;
 
     // Load Race engine params.
-    char buf[256];
-    snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
-    ReInfo->_reParam = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+    ReInfo->_reParam = GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 }
 
 
@@ -636,8 +634,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
             /* The code below stores the carnames to a separate xml-file
             such that at newTrack it is known which car is used.
             TODO: find a better method for this */
-            snprintf (buf, sizeof(buf), "%sdrivers/curcarnames.xml", GfLocalDir());
-            handle = GfParmReadFile(buf, GFPARM_RMODE_CREAT);
+             handle = GfParmReadFileLocal("drivers/curcarnames.xml", GFPARM_RMODE_CREAT);
             if (handle) {
                 snprintf(path, sizeof(path), "drivers/%s/%d", cardllname, elt->_driverIndex);
                 GfParmSetStr (handle, path, RM_ATTR_CARNAME, elt->_carName);
