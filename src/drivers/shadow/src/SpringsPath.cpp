@@ -722,7 +722,7 @@ void	SpringsPath::OptimisePtClothoid(
 
 void SpringsPath::ResetSpringVelocities()
 {
-    if( m_temp.size() != NSEG )
+    if( m_temp.size() != (unsigned int)NSEG )
     {
         m_temp.resize( NSEG );
     }
@@ -749,7 +749,7 @@ void SpringsPath::OptimisePathSprings(
 {
     const int	NSEG = m_pTrack->GetSize();
 
-    if( m_temp.size() != NSEG )
+    if( m_temp.size() != (unsigned int)NSEG )
     {
         m_temp.resize( NSEG );
         ResetSpringVelocities();
