@@ -86,7 +86,7 @@ Camera * SDCamera::getGenericCamera()
 
 unsigned int SDCamera::getCullMask()
 {
-    unsigned int mask = NODE_MASK_ALL;
+    int mask = NODE_MASK_ALL;
 
     if (!getDrawCurrent())
         mask &= ~NODE_MASK_CURCAR;
@@ -435,10 +435,10 @@ public:
             A = car->_yaw;
             if (fabs(PreA - A) > fabs(PreA - A + 2*PI))
             {
-                PreA += 2*PI;
+                PreA += (tdble)(2 * PI);
             } else if (fabs(PreA - A) > fabs(PreA - A - 2*PI))
             {
-                PreA -= 2*PI;
+                PreA -= (tdble)(2*PI);
             }
             RELAXATION(A, PreA, 8.0f);
             spanA = A;
@@ -450,8 +450,8 @@ public:
         {
             tdble headTurn = (A - car->_yaw)/2;
 
-            if (headTurn > PI/3) headTurn = PI/3;
-            if (headTurn < -PI/3) headTurn = -PI/3;
+            if (headTurn > PI/3) headTurn = (tdble)(PI/3);
+            if (headTurn < -PI/3) headTurn = (tdble)(-PI/3);
 
             P[0] = car->_drvPos_x + 30.0 * cos(2*PI/3 * car->_glance + offset + headTurn);
             P[1] = car->_drvPos_y - 30.0 * sin(2*PI/3 * car->_glance + offset + headTurn);
@@ -578,11 +578,11 @@ public:
                 //A = car->_yaw;
                 if (fabs(PreA - A) > fabs(PreA - A + 2*PI))
                 {
-                    PreA += 2*PI;
+                    PreA += (tdble)(2*PI);
                 }
                 else if (fabs(PreA - A) > fabs(PreA - A - 2*PI))
                 {
-                    PreA -= 2*PI;
+                    PreA -= (tdble)(2*PI);
                 }
 
                 // relaxation to `relax` percents every 0.1 second
@@ -1511,10 +1511,10 @@ public:
 
         if (fabs(PreA - A) > fabs(PreA - A + 2*PI))
         {
-            PreA += 2*PI;
+            PreA += (tdble)(2*PI);
         } else if (fabs(PreA - A) > fabs(PreA - A - 2*PI))
         {
-            PreA -= 2*PI;
+            PreA -= (tdble)(2*PI);
         }
 
         RELAXATION(A, PreA, 5.0);
@@ -1700,7 +1700,7 @@ public:
 
     void update(tCarElt *car, tSituation *s)
     {
-        int grNbCars = ncars;
+        grNbCars = ncars;
         int	i, j;
         int	curCar;
         double	curPrio;
@@ -1867,10 +1867,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                                       id,
                                                                       1,	/* drawCurr */
                                                                       1,	/* drawBG  */
-                                                                      75.5,	/* fovy */
-                                                                      10.0,	/* fovymin */
-                                                                      95.0,	/* fovymax */
-                                                                      0.03,	/* near */
+                                                                      75.5f,	/* fovy */
+                                                                      10.0f,	/* fovymin */
+                                                                      95.0f,	/* fovymax */
+                                                                      0.03f,	/* near */
                                                                       fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
                                                                       fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
                                                                       fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
@@ -1882,10 +1882,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                                    id,
                                                                    1,	/* drawCurr */
                                                                    1,	/* drawBG  */
-                                                                   75.5,	/* fovy */
-                                                                   10.0,	/* fovymin */
-                                                                   95.0,	/* fovymax */
-                                                                   0.03,	/* near */
+                                                                   75.5f,	/* fovy */
+                                                                   10.0f,	/* fovymin */
+                                                                   95.0f,	/* fovymax */
+                                                                   0.03f,	/* near */
                                                                    fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
                                                                    fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
                                                                    fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
@@ -1896,10 +1896,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                                   id,
                                                                   1,	/* drawCurr */
                                                                   1,	/* drawBG  */
-                                                                  67.5,	/* fovy */
-                                                                  10.0,	/* fovymin */
-                                                                  95.0,	/* fovymax */
-                                                                  0.3,	/* near */
+                                                                  67.5f,	/* fovy */
+                                                                  10.0f,	/* fovymin */
+                                                                  95.0f,	/* fovymax */
+                                                                  0.3f,	/* near */
                                                                   fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
                                                                   fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
                                                                   fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
@@ -1910,10 +1910,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                                    id,
                                                                    1,	/* drawCurr */
                                                                    1,	/* drawBG  */
-                                                                   67.5,	/* fovy */
-                                                                   10.0,	/* fovymin */
-                                                                   95.0,	/* fovymax */
-                                                                   0.3,	/* near */
+                                                                   67.5f,	/* fovy */
+                                                                   10.0f,	/* fovymin */
+                                                                   95.0f,	/* fovymax */
+                                                                   0.3f,	/* near */
                                                                    fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
                                                                    fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
                                                                    fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
@@ -1924,10 +1924,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                                  id,
                                                                  0,	/* drawCurr */
                                                                  1,	/* drawBG  */
-                                                                 67.5,	/* fovy */
-                                                                 10.0,	/* fovymin */
-                                                                 95.0,	/* fovymax */
-                                                                 0.3,	/* near */
+                                                                 67.5f,	/* fovy */
+                                                                 10.0f,	/* fovymin */
+                                                                 95.0f,	/* fovymax */
+                                                                 0.3f,	/* near */
                                                                  fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
                                                                  fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
                                                                  fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
@@ -1941,12 +1941,12 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                           id,
                                                           1,	/* drawCurr */
                                                           1,	/* drawBG  */
-                                                          67.5,	/* fovy */
-                                                          5.0,	/* fovymin */
-                                                          95.0,	/* fovymax */
-                                                          6.6,	/* dist */
-                                                          2.0,	/* height */
-                                                          1.0,	/* near */
+                                                          67.5f,	/* fovy */
+                                                          5.0f,	/* fovymin */
+                                                          95.0f,	/* fovymax */
+                                                          6.6f,	/* dist */
+                                                          2.0f,	/* height */
+                                                          1.0f,	/* near */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
                                                           fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* fogend */
@@ -1958,12 +1958,12 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                           id,
                                                           1,	/* drawCurr */
                                                           1,	/* drawBG  */
-                                                          67.5,	/* fovy */
-                                                          5.0,	/* fovymin */
-                                                          95.0,	/* fovymax */
-                                                          5.5,	/* dist */
-                                                          .50,	/* height */
-                                                          .50,	/* near */
+                                                          67.5f,	/* fovy */
+                                                          5.0f,	/* fovymin */
+                                                          95.0f,	/* fovymax */
+                                                          5.5f,	/* dist */
+                                                          .50f,	/* height */
+                                                          .50f,	/* near */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
                                                           fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
@@ -1975,11 +1975,11 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                          id,
                                                          1,	/* drawCurr */
                                                          1,	/* drawBG  */
-                                                         67.5,	/* fovy */
-                                                         5.0,	/* fovymin */
-                                                         95.0,	/* fovymax */
-                                                         5.5,	/* dist */
-                                                         0.5,	/* near */
+                                                         67.5f,	/* fovy */
+                                                         5.0f,	/* fovymin */
+                                                         95.0f,	/* fovymax */
+                                                         5.5f,	/* dist */
+                                                         0.5f,	/* near */
                                                          fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                          fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                          fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -1991,12 +1991,12 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                           id,
                                                           1,	/* drawCurr */
                                                           1,	/* drawBG  */
-                                                          67.5,	/* fovy */
-                                                          5.0,	/* fovymin */
-                                                          95.0,	/* fovymax */
-                                                          5.5,	/* dist */
-                                                          2.5,	/* height */
-                                                          1.0,	/* near */
+                                                          67.5f,	/* fovy */
+                                                          5.0f,	/* fovymin */
+                                                          95.0f,	/* fovymax */
+                                                          5.5f,	/* dist */
+                                                          2.5f,	/* height */
+                                                          1.0f,	/* near */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
                                                           fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* fogend */
@@ -2011,13 +2011,13 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                         id,
                                                         1,	/* drawCurr */
                                                         1,	/* drawBG  */
-                                                        30.0,	/* fovy */
-                                                        5.0,	/* fovymin */
-                                                        60.0,	/* fovymax */
-                                                        0.0,	/* distx */
-                                                        -20.0,	/* disty */
-                                                        3.0,	/* distz */
-                                                        1.0,	/* near */
+                                                        30.0f,	/* fovy */
+                                                        5.0f,	/* fovymin */
+                                                        60.0f,	/* fovymax */
+                                                        0.0f,	/* distx */
+                                                        -20.0f,	/* disty */
+                                                        3.0f,	/* distz */
+                                                        1.0f,	/* near */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2028,13 +2028,13 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                         id,
                                                         1,	/* drawCurr */
                                                         1,	/* drawBG  */
-                                                        30.0,	/* fovy */
-                                                        5.0,	/* fovymin */
-                                                        60.0,	/* fovymax */
-                                                        0.0,	/* distx */
-                                                        20.0,	/* disty */
-                                                        3.0,	/* distz */
-                                                        1.0,	/* near */
+                                                        30.0f,	/* fovy */
+                                                        5.0f,	/* fovymin */
+                                                        60.0f,	/* fovymax */
+                                                        0.0f,	/* distx */
+                                                        20.0f,	/* disty */
+                                                        3.0f,	/* distz */
+                                                        1.0f,	/* near */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2046,13 +2046,13 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                         id,
                                                         1,	/* drawCurr */
                                                         1,	/* drawBG  */
-                                                        30.0,	/* fovy */
-                                                        5.0,	/* fovymin */
-                                                        60.0,	/* fovymax */
-                                                        -20.0,	/* distx */
-                                                        0.0,	/* disty */
-                                                        3.0,	/* distz */
-                                                        1.0,	/* near */
+                                                        30.0f,	/* fovy */
+                                                        5.0f,	/* fovymin */
+                                                        60.0f,	/* fovymax */
+                                                        -20.0f,	/* distx */
+                                                        0.0f,	/* disty */
+                                                        3.0f,	/* distz */
+                                                        1.0f,	/* near */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2064,13 +2064,13 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                         id,
                                                         1,	/* drawCurr */
                                                         1,	/* drawBG  */
-                                                        30.0,	/* fovy */
-                                                        5.0,	/* fovymin */
-                                                        60.0,	/* fovymax */
-                                                        20.0,	/* distx */
-                                                        0.0,	/* disty */
-                                                        3.0,	/* distz */
-                                                        1.0,	/* near */
+                                                        30.0f,	/* fovy */
+                                                        5.0f,	/* fovymin */
+                                                        60.0f,	/* fovymax */
+                                                        20.0f,	/* distx */
+                                                        0.0f,	/* disty */
+                                                        3.0f,	/* distz */
+                                                        1.0f,	/* near */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2082,13 +2082,13 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                         id,
                                                         1,	/* drawCurr */
                                                         1,	/* drawBG  */
-                                                        30.0,	/* fovy */
-                                                        5.0,	/* fovymin */
-                                                        60.0,	/* fovymax */
-                                                        0.0,	/* distx */
-                                                        -40.0,	/* disty */
-                                                        6.0,	/* distz */
-                                                        1.0,	/* near */
+                                                        30.0f,	/* fovy */
+                                                        5.0f,	/* fovymin */
+                                                        60.0f,	/* fovymax */
+                                                        0.0f,	/* distx */
+                                                        -40.0f,	/* disty */
+                                                        6.0f,	/* distz */
+                                                        1.0f,	/* near */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2099,13 +2099,13 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                         id,
                                                         1,	/* drawCurr */
                                                         1,	/* drawBG  */
-                                                        30.0,	/* fovy */
-                                                        5.0,	/* fovymin */
-                                                        60.0,	/* fovymax */
-                                                        0.0,	/* distx */
-                                                        40.0,	/* disty */
-                                                        6.0,	/* distz */
-                                                        1.0,	/* near */
+                                                        30.0f,	/* fovy */
+                                                        5.0f,	/* fovymin */
+                                                        60.0f,	/* fovymax */
+                                                        0.0f,	/* distx */
+                                                        40.0f,	/* disty */
+                                                        6.0f,	/* distz */
+                                                        1.0f,	/* near */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2117,13 +2117,13 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                         id,
                                                         1,	/* drawCurr */
                                                         1,	/* drawBG  */
-                                                        30.0,	/* fovy */
-                                                        5.0,	/* fovymin */
-                                                        60.0,	/* fovymax */
-                                                        -40.0,	/* distx */
-                                                        0.0,	/* disty */
-                                                        6.0,	/* distz */
-                                                        1.0,	/* near */
+                                                        30.0f,	/* fovy */
+                                                        5.0f,	/* fovymin */
+                                                        60.0f,	/* fovymax */
+                                                        -40.0f,	/* distx */
+                                                        0.0f,	/* disty */
+                                                        6.0f,	/* distz */
+                                                        1.0f,	/* near */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2135,13 +2135,13 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                         id,
                                                         1,	/* drawCurr */
                                                         1,	/* drawBG  */
-                                                        30.0,	/* fovy */
-                                                        5.0,	/* fovymin */
-                                                        60.0,	/* fovymax */
-                                                        40.0,	/* distx */
-                                                        0.0,	/* disty */
-                                                        6.0,	/* distz */
-                                                        1.0,	/* near */
+                                                        30.0f,	/* fovy */
+                                                        5.0f,	/* fovymin */
+                                                        60.0f,	/* fovymax */
+                                                        40.0f,	/* distx */
+                                                        0.0f,	/* disty */
+                                                        6.0f,	/* distz */
+                                                        1.0f,	/* near */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2157,14 +2157,14 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                       1,	/* drawCurr */
                                                       1,	/* drawBG  */
                                                       //12.0,	/* fovy */
-                                                      37.5,	/* fovy */
-                                                      1.0,	/* fovymin */
-                                                      90.0,	/* fovymax */
+                                                      37.5f,	/* fovy */
+                                                      1.0f,	/* fovymin */
+                                                      90.0f,	/* fovymax */
                                                       //300.0,	/* distz */
-                                                      200.0,	/* distz */
+                                                      200.0f,	/* distz */
                                                       0,		/* axis */
                                                       //200.0,	/* near */
-                                                      100.0,	/* near */
+                                                      100.0f,	/* near */
                                                       fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
                                                       fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                       fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2177,13 +2177,13 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                       1,	/* drawCurr */
                                                       1,	/* drawBG  */
                                                       //12.0,	/* fovy */
-                                                      37.5,	/* fovy */
-                                                      1.0,	/* fovymin */
-                                                      90.0,	/* fovymax */
+                                                      37.5f,	/* fovy */
+                                                      1.0f,	/* fovymin */
+                                                      90.0f,	/* fovymax */
                                                       //300.0,	/* distz */
-                                                      250.0,	/* distz */
+                                                      250.0f,	/* distz */
                                                       1,		/* axis */
-                                                      200.0,	/* near */
+                                                      200.0f,	/* near */
                                                       fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
                                                       fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                       fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2215,13 +2215,13 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                       1,	/* drawCurr */
                                                       1,	/* drawBG  */
                                                       //12.0,	/* fovy */
-                                                      37.5,	/* fovy */
-                                                      1.0,	/* fovymin */
-                                                      90.0,	/* fovymax */
+                                                      37.5f,	/* fovy */
+                                                      1.0f,	/* fovymin */
+                                                      90.0f,	/* fovymax */
                                                       //300.0,	/* distz */
-                                                      400.0,	/* distz */
+                                                      400.0f,	/* distz */
                                                       3,		/* axis */
-                                                      200.0,	/* near */
+                                                      200.0f,	/* near */
                                                       fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
                                                       fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                       fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2236,11 +2236,11 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                           id,
                                                           1,	/* drawCurr */
                                                           1,	/* drawBG  */
-                                                          21.0,	/* fovy */
-                                                          2.0,	/* fovymin */
-                                                          60.0,	/* fovymax */
-                                                          120.0,	/* distz */
-                                                          100.0,	/* near */
+                                                          21.0f,	/* fovy */
+                                                          2.0f,	/* fovymin */
+                                                          60.0f,	/* fovymax */
+                                                          120.0f,	/* distz */
+                                                          100.0f,	/* near */
                                                           fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
                                                           fixedFar ? fixedFar/2 : 500.0 * fovFactor,/* fogstart */
                                                           fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2278,10 +2278,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                           id,
                                                           1,	/* drawCurr */
                                                           1,	/* drawBG  */
-                                                          67.5,	/* fovy */
-                                                          10.0,	/* fovymin */
-                                                          95.0,	/* fovymax */
-                                                          0.05,	/* near */
+                                                          67.5f,	/* fovy */
+                                                          10.0f,	/* fovymin */
+                                                          95.0f,	/* fovymax */
+                                                          0.05f,	/* near */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
                                                           fixedFar ? fixedFar : 300.0 * fovFactor,	/* fogstart */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
@@ -2291,10 +2291,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                           id,
                                                           1,	/* drawCurr */
                                                           1,	/* drawBG  */
-                                                          67.5,	/* fovy */
-                                                          10.0,	/* fovymin */
-                                                          95.0,	/* fovymax */
-                                                          0.05,	/* near */
+                                                          67.5f,	/* fovy */
+                                                          10.0f,	/* fovymin */
+                                                          95.0f,	/* fovymax */
+                                                          0.05f,	/* near */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
                                                           fixedFar ? fixedFar : 300.0 * fovFactor,	/* fogstart */
                                                           fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
@@ -2308,10 +2308,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                             id,
                                                             1,		/* drawCurr */
                                                             1,		/* drawBG  */
-                                                            9.0,	/* fovy */
-                                                            1.0,		/* fovymin */
-                                                            90.0,	/* fovymax */
-                                                            1.0,		/* near */
+                                                            9.0f,	/* fovy */
+                                                            1.0f,		/* fovymin */
+                                                            90.0f,	/* fovymax */
+                                                            1.0f,		/* near */
                                                             fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                             fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                             fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2323,10 +2323,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                               id,
                                                               1,		/* drawCurr */
                                                               1,		/* drawBG  */
-                                                              30.0,	/* fovy */
-                                                              5.0,	/* fovymin */
-                                                              60.0,	/* fovymax */
-                                                              1.0,	/* near */
+                                                              30.0f,	/* fovy */
+                                                              5.0f,	/* fovymin */
+                                                              60.0f,	/* fovymax */
+                                                              1.0f,	/* near */
                                                               fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
                                                               fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                               fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2339,10 +2339,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                            1,		/* drawCurr */
                                                            1,		/* drawBG  */
                                                            //17.0,	/* fovy */
-                                                           67.5,	/* fovy */
-                                                           1.0,		/* fovymin */
-                                                           90.0,	/* fovymax */
-                                                           1.0,		/* near */
+                                                           67.5f,	/* fovy */
+                                                           1.0f,		/* fovymin */
+                                                           90.0f,	/* fovymax */
+                                                           1.0f,		/* near */
                                                            fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                            fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                            fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2353,11 +2353,11 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                            id,
                                                            1,	/* drawCurr */
                                                            1,	/* drawBG  */
-                                                           40.0,	/* fovy */
-                                                           5.0,	/* fovymin */
-                                                           95.0,	/* fovymax */
-                                                           30.0,	/* dist */
-                                                           1.0,	/* near */
+                                                           40.0f,	/* fovy */
+                                                           5.0f,	/* fovymin */
+                                                           95.0f,	/* fovymax */
+                                                           30.0f,	/* dist */
+                                                           1.0f,	/* near */
                                                            fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
                                                            fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                                            fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
@@ -2369,10 +2369,10 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                                                id,
                                                                1,	// drawCurr
                                                                1,	// drawBG
-                                                               9.0,	// fovy
-                                                               1.0,	// fovymin
-                                                               90.0,	// fovymax
-                                                               1.0,	// near
+                                                               9.0f,	// fovy
+                                                               1.0f,	// fovymin
+                                                               90.0f,	// fovymax
+                                                               1.0f,	// near
                                                                ncars,
                                                                fixedFar ? fixedFar : 1000.0 * fovFactor,	// far
                                                                fixedFar ? fixedFar/2 : 500.0 * fovFactor,	// fogstart
