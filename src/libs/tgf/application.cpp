@@ -57,7 +57,11 @@ GfApplication& GfApplication::self()
 }
 
 GfApplication::GfApplication(const char* pszName, const char* pszVersion, const char* pszDesc)
-: _strName(pszName ? pszName : "GfApplication"), _strDesc(pszDesc ? pszDesc : ""),
+:
+#ifdef __DEBUG_MEMORYMANAGER__
+  ReleaseData(NULL),
+#endif
+  _strName(pszName ? pszName : "GfApplication"), _strDesc(pszDesc ? pszDesc : ""),
   _strVersion(pszVersion ? pszVersion : ""), _pEventLoop(0)
 {
     // Check that we are the only instance.

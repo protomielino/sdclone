@@ -239,7 +239,9 @@ class TGF_API GfApplication
 	virtual void restart();
 
 	// Allow clean restart
+#ifdef __DEBUG_MEMORYMANAGER__
 	void (*ReleaseData)();
+#endif
 
  protected:
 
