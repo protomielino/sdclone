@@ -24,6 +24,7 @@ class ROBOTTOOLS_API HumanDriver
 {
 public:
     HumanDriver(const char *robotname);
+    virtual ~HumanDriver() {};
 
     void shutdown(const int index);
     void init_context(int index, int updater_index=0);

@@ -489,6 +489,7 @@ void HumanDriver::terminate()
         ++itDrvName;
     }
     VecNames.clear();
+    mapKeys.clear();
 }
 
 
