@@ -94,10 +94,10 @@ public:
     osg::ref_ptr<osg::Group> getTrackLight() { return _osgtracklight.get(); }
 };
 
-static double grWrldX =		  0.0;
-static double grWrldY =		  0.0;
-static double grWrldZ =       0.0;
-static double grWrldMaxSize = 0.0;
+extern double grWrldX;
+extern double grWrldY;
+extern double grWrldZ;
+extern double grWrldMaxSize;
 
 class SDScenery
 {

@@ -33,6 +33,11 @@
 #include <robottools.h>	//RtXXX()
 #include <portability.h>
 
+double grWrldX = 0.0;
+double grWrldY = 0.0;
+double grWrldZ = 0.0;
+double grWrldMaxSize = 0.0;
+
 SDScenery::SDScenery(void) :
     m_background(NULL),
     m_pit(NULL),
