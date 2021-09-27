@@ -63,7 +63,7 @@ void SDBackground::build(bool type, int X, int Y, int Z, const std::string& Trac
     {
         osg::ref_ptr<osg::Node> m_background = osgDB::readNodeFile("background-sky.ac");
         //_background_transform->setMatrix(mat);
-        osg::Matrix t = osg::Matrix::translate(grWrldX /2, grWrldY /2, grWrldZ /2);
+        osg::Matrix t = osg::Matrix::translate(SDScenery::getWorldX() / 2, SDScenery::getWorldY() / 2, SDScenery::getWorldZ() / 2);
         mat = mat * t;
         _backgroundTransform->setMatrix(mat);
         _backgroundTransform->addChild( m_background.get() );

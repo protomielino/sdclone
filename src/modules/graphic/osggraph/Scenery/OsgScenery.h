@@ -94,11 +94,6 @@ public:
     osg::ref_ptr<osg::Group> getTrackLight() { return _osgtracklight.get(); }
 };
 
-extern double grWrldX;
-extern double grWrldY;
-extern double grWrldZ;
-extern double grWrldMaxSize;
-
 class SDScenery
 {
 private:
@@ -122,6 +117,11 @@ private:
     bool _speedWayLong;
 
     std::string _strTexturePath;
+
+    static double grWrldX;
+    static double grWrldY;
+    static double grWrldZ;
+    static double grWrldMaxSize;
 
     void LoadGraphicsOptions();
     void LoadSkyOptions();

@@ -33,10 +33,10 @@
 #include <robottools.h>	//RtXXX()
 #include <portability.h>
 
-double grWrldX = 0.0;
-double grWrldY = 0.0;
-double grWrldZ = 0.0;
-double grWrldMaxSize = 0.0;
+double SDScenery::grWrldX = 0.0;
+double SDScenery::grWrldY = 0.0;
+double SDScenery::grWrldZ = 0.0;
+double SDScenery::grWrldMaxSize = 0.0;
 
 SDScenery::SDScenery(void) :
     m_background(NULL),
@@ -45,10 +45,6 @@ SDScenery::SDScenery(void) :
     _scenery(NULL),
     SDTrack(NULL)
 {
-    grWrldX = 0;
-    grWrldY = 0;
-    grWrldZ = 0;
-    grWrldMaxSize = 0;
     _max_visibility = 0;
     _nb_cloudlayer = 0;
     _DynamicSkyDome = 0;
