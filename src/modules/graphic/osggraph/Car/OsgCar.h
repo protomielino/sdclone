@@ -78,7 +78,7 @@ public :
     SDCar(void);
     ~SDCar(void);
     osg::ref_ptr<osg::Node> loadCar(tCarElt *Car, bool tracktype, bool subcat, int carshader);
-    bool isCar(tCarElt*c);
+    bool isCar(tCarElt*c) const;
 
     bool    _cockpit;
     bool    _driver;
@@ -91,7 +91,7 @@ public :
 
     SDReflectionMapping *getReflectionMap();
 
-    int getReflectionMappingMethod();
+    int getReflectionMappingMethod() const;
 
     tCarElt *getCar() { return car; }
     const tCarElt *getCar() const { return car; }

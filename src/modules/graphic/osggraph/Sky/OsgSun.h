@@ -61,25 +61,25 @@ public:
     bool reposition( osg::Vec3d p, double angle);
     bool update_color_angle(double angle);
 
-    osg::Vec4f get_color();
-    osg::Vec4f get_scene_color();
+    osg::Vec4f get_color() const;
+    osg::Vec4f get_scene_color() const;
 
     void setSunAngle(double angle) { sun_angle = angle; }
-    double getSunAngle() { return sun_angle; }
+    double getSunAngle() const { return sun_angle; }
 
     void setSunRotation(double rotation) { sun_rotation = rotation; }
-    double getSunRotation() { return sun_rotation; }
+    double getSunRotation() const { return sun_rotation; }
 
     void setSunRightAscension(double ra) { sun_right_ascension = ra; }
-    double getSunRightAscension() { return sun_right_ascension; }
+    double getSunRightAscension() const { return sun_right_ascension; }
 
     void setSunDeclination( double decl ) { sun_declination = decl; }
-    double getSunDeclination() { return sun_declination; }
+    double getSunDeclination() const { return sun_declination; }
 
     void setSunDistance( double dist ) { sun_dist = dist; }
-    double getSunDistance() { return sun_dist; }
+    double getSunDistance() const { return sun_dist; }
 
-    osg::Vec3f getSunPosition(){return sun_position;}
+    const osg::Vec3f &getSunPosition() const {return sun_position;}
 };
 
 #endif // _OSGSUN_H_

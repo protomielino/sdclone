@@ -112,10 +112,10 @@ public:
     void weather(void);
 
     inline SDSky * getSky() { return thesky; }
-    inline int getShader() { return carsShader; }
-    inline int getShaowIndex() { return ShadowIndex; }
+    inline int getShader() const { return carsShader; }
+    inline int getShaowIndex() const { return ShadowIndex; }
     osg::ref_ptr<osg::Group> getRoot() { return m_Root.get(); }
-    osg::Vec3f getFogColor() { return FogColor; }
+    const osg::Vec3f &getFogColor() const { return FogColor; }
 };
 
 #endif //_OSGRENDER_H_

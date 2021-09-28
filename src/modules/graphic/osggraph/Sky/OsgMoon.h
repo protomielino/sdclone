@@ -53,21 +53,21 @@ public:
     bool reposition(osg::Vec3d p, double angle  );
 
     void setMoonAngle (double angle) { moon_angle = angle; }
-    double getMoonAngle () { return moon_angle; }
+    double getMoonAngle() const { return moon_angle; }
 
     void setMoonRotation (double rotation) { moon_rotation = rotation; }
-    double getMoonRotation () { return moon_rotation; }
+    double getMoonRotation() const { return moon_rotation; }
 
     void setMoonRightAscension ( double ra ) { moonAscension = ra; }
-    double getMoonRightAscension () { return moonAscension; }
+    double getMoonRightAscension() const { return moonAscension; }
 
     void setMoonDeclination ( double decl ) { moondeclination = decl; }
-    double getMoonDeclination () { return moondeclination; }
+    double getMoonDeclination() const { return moondeclination; }
 
     void setMoonDist ( double dist ) { moon_dist = dist; }
-    double getMoonDist() { return moon_dist; }
+    double getMoonDist() const { return moon_dist; }
 
-    osg::Vec3f getMoonPosition(){return moon_position;}
+    const osg::Vec3f & getMoonPosition() const { return moon_position; }
 
 };
 

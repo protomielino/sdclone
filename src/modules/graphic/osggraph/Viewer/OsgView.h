@@ -71,7 +71,7 @@ public:
 
     void setCurrentCar(tCarElt *newCurCar);
 
-    inline int getId(){return id;}
+    inline int getId() const { return id; }
     inline void selectNextCar(void) { selectNextFlag = true; }
     inline void selectPrevCar(void) { selectPrevFlag = true; }
 
@@ -81,7 +81,7 @@ public:
     inline tCarElt *getCurrentCar(void) { return curCar; }
     inline SDCameras *getCameras() { return cameras; }
 
-    inline tdble getViewRatio() { return width/(tdble)height; }
+    inline tdble getViewRatio() const { return width/(tdble)height; }
     //used for sound
     Camera* getCamera();
 
@@ -91,13 +91,13 @@ public:
     inline osg::FrontFace *  getOsgCamFrontFace(void) { return camFrontFace; }
     inline osg::FrontFace *  getOsgMirrorCamFrontFace(void) { return mirrorCamFrontFace; }
     
-    inline int  getScreenXPos(void) { return x; }
-    inline int  getScreenYPos(void) { return y; }
+    inline int  getScreenXPos(void) const { return x; }
+    inline int  getScreenYPos(void) const { return y; }
 
-    inline int  getScreenWidth(void) { return width; }
-    inline int  getScreenHeight(void) { return height; }
+    inline int  getScreenWidth(void) const { return width; }
+    inline int  getScreenHeight(void) const { return height; }
 
-    inline float getViewOffset() {return viewOffset;}
+    inline float getViewOffset() const { return viewOffset; }
 
     void saveCamera();
 

@@ -77,9 +77,9 @@ public:
 
     void loadStates();
     
-    osg::ref_ptr<osg::Group> getLightsRoot()
+    osg::ref_ptr<osg::Group> getLightsRoot() const
         { return lights_root; }
-    osg::ref_ptr<osg::StateSet> getStateSet(CarLightType type)
+    osg::ref_ptr<osg::StateSet> getStateSet(CarLightType type) const
         { return state_sets[(int)type > 0 && (int)type < CAR_LIGHT_TYPE_COUNT ? type : 0]; }
 };
 

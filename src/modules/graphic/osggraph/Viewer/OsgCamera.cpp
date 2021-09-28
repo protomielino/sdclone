@@ -84,7 +84,7 @@ Camera * SDCamera::getGenericCamera()
     return c;
 }
 
-unsigned int SDCamera::getCullMask()
+unsigned int SDCamera::getCullMask() const
 {
     int mask = NODE_MASK_ALL;
 
@@ -2146,7 +2146,6 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                           fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                           fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
                                           ));
-    id++;
 
     /* F5 - Views from above - list index 3 */
     id=0;
@@ -2226,7 +2225,6 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                         fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
                                         fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
                                         ));
-    id++;
 
     /* F6 - index 4*/
     id=0;
@@ -2245,8 +2243,6 @@ SDCameras::SDCameras(SDView *c, int ncars)
                                             fixedFar ? fixedFar/2 : 500.0 * fovFactor,/* fogstart */
                                             fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
                                             ));
-    id++;
-
 
     /* F7 -index 5*/
     id =0;

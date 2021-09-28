@@ -36,7 +36,7 @@ private:
     std::vector< osg::ref_ptr<osg::Camera> > cameras;
     osg::ref_ptr<osg::Texture> reflectionMap;
     SDCar *car;
-    inline osg::ref_ptr<osg::Group> getCamerasRoot()
+    inline osg::ref_ptr<osg::Group> const getCamerasRoot()
     {
         return camerasRoot;
     }
@@ -45,7 +45,7 @@ public:
     SDReflectionMapping(SDCar *c);
     ~SDReflectionMapping();
 
-    inline osg::ref_ptr<osg::Texture> getReflectionMap()
+    inline osg::ref_ptr<osg::Texture> const getReflectionMap()
     {
         return reflectionMap;
     }

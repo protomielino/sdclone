@@ -70,7 +70,7 @@ public:
 
     void build(tTrack *track);
 
-    osg::ref_ptr<osg::Group> getPit() { return pit_root; }
+    osg::ref_ptr<osg::Group> getPit() const { return pit_root; }
 };
 
 class SDTrackLights
@@ -144,8 +144,8 @@ public:
     inline static double getWorldY(){return grWrldY;}
     inline static double getWorldZ(){return grWrldZ;}
     inline static double getWorldMaxSize(){return grWrldMaxSize;}
-    bool getSpeedWay() { return _speedWay; }
-	bool getSpeedWayLong() { return _speedWayLong; }
+    bool getSpeedWay() const { return _speedWay; }
+    bool getSpeedWayLong() const { return _speedWayLong; }
 
     osg::ref_ptr<osg::Group> getScene() { return _scenery.get(); }
     osg::ref_ptr<osg::Group> getBackground() { return m_background->getBackground(); }

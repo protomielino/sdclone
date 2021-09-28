@@ -29,7 +29,7 @@ class Exception
 public:
     Exception(const std::string &error);
     ~Exception();
-    std::string getError(){return _error;};
+    const std::string &getError() const { return _error; };
 private:
     std::string _error;
 };

@@ -85,14 +85,14 @@ public:
         direction = dir;
     }
 
-    inline float getDirection() { return direction; }
+    inline float getDirection() const { return direction; }
     inline void  setSpeed(float sp)
     {
         //Out("cloud speed = %f\n", sp);
         speed = sp;
     }
 
-    inline float getSpeed() { return speed; }
+    inline float getSpeed() const { return speed; }
     inline void  setAlpha( float alpha )
     {
         if ( alpha < 0.0 ) { alpha = 0.0; }

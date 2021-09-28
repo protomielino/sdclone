@@ -550,37 +550,37 @@ public:
         _vertices.push_back(vertex);
     }
 
-    const osg::Vec3& getVertex(unsigned index)
+    const osg::Vec3& getVertex(unsigned index) const
     {
         return _vertices[index]._vertex;
     }
 
-    const osg::Vec3& getVertex(const VertexIndex& vertexIndex)
+    const osg::Vec3& getVertex(const VertexIndex& vertexIndex) const
     {
         return _vertices[vertexIndex.vertexIndex]._vertex;
     }
 
-    const osg::Vec3& getNormal(const VertexIndex& vertexIndex)
+    const osg::Vec3& getNormal(const VertexIndex& vertexIndex) const
     {
         return _vertices[vertexIndex.vertexIndex]._refs[vertexIndex.refIndex].normal;
     }
 
-    const osg::Vec2& getTexCoord(const VertexIndex& vertexIndex)
+    const osg::Vec2& getTexCoord(const VertexIndex& vertexIndex) const
     {
         return _vertices[vertexIndex.vertexIndex]._refs[vertexIndex.refIndex].texCoord;
     }
 
-    const osg::Vec2& getTexCoord1(const VertexIndex& vertexIndex)
+    const osg::Vec2& getTexCoord1(const VertexIndex& vertexIndex) const
     {
         return _vertices[vertexIndex.vertexIndex]._refs[vertexIndex.refIndex].texCoord1;
     }
 
-    const osg::Vec2& getTexCoord2(const VertexIndex& vertexIndex)
+    const osg::Vec2& getTexCoord2(const VertexIndex& vertexIndex) const
     {
         return _vertices[vertexIndex.vertexIndex]._refs[vertexIndex.refIndex].texCoord2;
     }
 
-    const osg::Vec2& getTexCoord3(const VertexIndex& vertexIndex)
+    const osg::Vec2& getTexCoord3(const VertexIndex& vertexIndex) const
     {
         return _vertices[vertexIndex.vertexIndex]._refs[vertexIndex.refIndex].texCoord3;
     }

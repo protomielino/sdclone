@@ -379,12 +379,12 @@ bool SDSun::update_color_angle( double angle )
     return true;
 }
 
-osg::Vec4f SDSun::get_color()
+osg::Vec4f SDSun::get_color() const
 {
     return osg::Vec4f((*ohalo_cl)[0][0], (*ohalo_cl)[0][1], (*ohalo_cl)[0][2], (*ohalo_cl)[0][3]);
 }
 
-osg::Vec4f SDSun::get_scene_color()
+osg::Vec4f SDSun::get_scene_color() const
 {
     return osg::Vec4f((*sun_cl)[0][0], (*sun_cl)[0][1], (*sun_cl)[0][2], (*sun_cl)[0][3]);
 }

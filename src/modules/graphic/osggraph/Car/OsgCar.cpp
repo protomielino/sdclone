@@ -611,7 +611,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     return this->carEntity;
 }
 
-bool SDCar::isCar(tCarElt*c)
+bool SDCar::isCar(tCarElt*c) const
 {
     return c == car;
 }
@@ -620,7 +620,7 @@ SDReflectionMapping *SDCar::getReflectionMap()
     return this->reflectionMapping;
 }
 
-int SDCar::getReflectionMappingMethod()
+int SDCar::getReflectionMappingMethod() const
 {
     return this->reflectionMappingMethod;
 }

@@ -49,11 +49,11 @@ public:
     SDCamera * getSelectedCamera();
     void nextCamera(int list);
     void update(tCarElt * car, tSituation * s);
-    inline int getIntSelectedCamera() { return selectedCamera; }
-    inline int getIntSelectedList() { return selectedList; }
+    inline int getIntSelectedCamera() const { return selectedCamera; }
+    inline int getIntSelectedList() const { return selectedList; }
     void selectCamera(int list, int cam);
 
-    inline void getIntSelectedListAndCamera(int *list,int *cam)
+    inline void getIntSelectedListAndCamera(int *list,int *cam) const
     {
         *list = selectedList;
         *cam = selectedCamera;
@@ -82,7 +82,7 @@ public:
     // Constructor
     SDCamera(SDView * screen, int myid = 0, int mydrawCurrent = 0, int mydrawdrv = 0, int mydrawBackground = 0, int mymirrorAllowed = 0);
 
-    inline int getId() { return id; }
+    inline int getId() const { return id; }
 
     virtual void update(tCarElt *car, tSituation *s) = 0;	/* Change the camera if necessary */
     virtual void setProjection(void) = 0;
@@ -94,13 +94,13 @@ public:
     virtual float getLODFactor(float x, float y, float z) = 0;	/* Get the LOD factor for an object located at x,y,z */
 
     virtual void setViewOffset(float newOffset)=0;
-    inline float getAspectRatio()		{ return 0.0; }
-    inline int   getDrawCurrent()		{ return drawCurrent; }
-    inline int   getDrawDriver()		{ return drawDriver; }
-    inline int   getMirrorAllowed()		{ return mirrorAllowed; }
-    inline osg::Vec3 getCameraPosition(){ return eye; }
+    inline float getAspectRatio() const { return 0.0; }
+    inline int   getDrawCurrent() const { return drawCurrent; }
+    inline int   getDrawDriver() const { return drawDriver; }
+    inline int   getMirrorAllowed() const { return mirrorAllowed; }
+    inline osg::Vec3 getCameraPosition() const { return eye; }
 
-    unsigned int getCullMask();
+    unsigned int getCullMask() const;
 
     //camera for sound
     Camera * getGenericCamera();
@@ -194,8 +194,8 @@ public:
     void setViewOffset(float newOffset);
     virtual void setZoom(int cmd);
     float getLODFactor(float x, float y, float z);
-    float getFogStart(void) { return fogstart; }
-    float getFogEnd(void) { return fogend; }
+    float getFogStart(void) const { return fogstart; }
+    float getFogEnd(void) const { return fogend; }
 
     virtual void limitFov(void)  {}
     void onSelect(tCarElt *car, tSituation *s) {}
