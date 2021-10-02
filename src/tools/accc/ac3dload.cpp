@@ -671,7 +671,12 @@ int doObject(char *Line, ob_t *object, mat_t *material)
         free(objectt);
         return (-1);
     }
-    sscanf(p, "%s", name);
+    if (sscanf(p, "%s", name) != 1)
+    {
+        fprintf(stderr, "invalid OBJECT format %s \n", p);
+        free(objectt);
+        return (-1);
+    }
 
     objectt->type = strdup(name);
 
@@ -1016,18 +1021,21 @@ ob_t* splitOb(ob_t *object)
     return tob0;
 }
 
-int doKids(char *Line, ob_t *object, mat_t *material)
+int doKids(char* Line, ob_t* object, mat_t* material)
 {
-    char * p;
     int kids;
-
-    p = strstr(Line, " ");
+    char *p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown Kids format %s \n", Line);
         return (-1);
     }
-    sscanf(p, "%d", &kids);
+    if (sscanf(p, "%d", &kids) != 1)
+    { 
+        fprintf(stderr, "invalid Kids format %s \n", p);
+        return (-1);
+    }
+
     if (kids == 0)
     {
         object->next->vertexarray = (tcoord_t *) malloc(
@@ -1141,23 +1149,25 @@ int doName(char *Line, ob_t *object, mat_t *material)
 
 int doLoc(char *Line, ob_t *object, mat_t *material)
 {
-    char * p;
-    p = strstr(Line, " ");
+    char * p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown Loc format %s \n", Line);
         return (-1);
     }
-    sscanf(p, "%lf %lf %lf", &(object->next->loc.x), &(object->next->loc.y),
-            &(object->next->loc.z));
+    if (sscanf(p, "%lf %lf %lf", &(object->next->loc.x), &(object->next->loc.y),
+        &(object->next->loc.z)) != 3)
+    {
+        fprintf(stderr, "invalid Loc format %s \n", p);
+        return (-1);
+    }
 
     return (0);
 }
 
 int doData(char *Line, ob_t *object, mat_t *material)
 {
-    char * p;
-    p = strstr(Line, " ");
+    char * p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown Loc format %s \n", Line);
@@ -1174,15 +1184,19 @@ int doCrease(char *Line, ob_t *object, mat_t *material)
 
 int doTexture(char *Line, ob_t *object, mat_t *material)
 {
-    char * p;
     char name[256];
-    p = strstr(Line, " ");
+    char * p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown texture format %s \n", Line);
         return (-1);
     }
-    sscanf(p, "%s", name);
+    if (sscanf(p, "%s", name) != 1)
+    {
+        fprintf(stderr, "invalid texture format %s \n", p);
+        return (-1);
+    }
+
     p = NULL;
     p = strstr(name, "\"");
     if (p != NULL)
@@ -1200,28 +1214,34 @@ int doTexture(char *Line, ob_t *object, mat_t *material)
 
 int doTexrep(char *Line, ob_t *object, mat_t *material)
 {
-    char * p;
-    p = strstr(Line, " ");
+    char * p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown Texrep format %s \n", Line);
         return (-1);
     }
-    sscanf(p, "%lf %lf", &(object->next->texrep_x), &(object->next->texrep_y));
+    if (sscanf(p, "%lf %lf", &(object->next->texrep_x), &(object->next->texrep_y)) != 2)
+    {
+        fprintf(stderr, "invalid Texrep format %s \n", p);
+        return (-1);
+    }
 
     return (0);
 }
 
 int doNumvert(char *Line, ob_t *object, mat_t *material)
 {
-    char * p;
-    p = strstr(Line, " ");
+    char * p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown numvert format %s \n", Line);
         return (-1);
     }
-    sscanf(p, "%d", &(object->next->numvert));
+    if (sscanf(p, "%d", &(object->next->numvert)) != 1)
+    {
+        fprintf(stderr, "invalid numvert format %s \n", p);
+        return (-1);
+    }
     object->next->vertex = (point_t *) malloc(
             sizeof(point_t) * object->next->numvert);
     numvertex = 0;
@@ -1231,23 +1251,30 @@ int doNumvert(char *Line, ob_t *object, mat_t *material)
 
 int doNumsurf(char *Line, ob_t *object, mat_t *material)
 {
-    char * p;
-    p = strstr(Line, " ");
+    char * p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown numsurf format %s \n", Line);
         return (-1);
     }
-    sscanf(p, "%d", &(object->next->numsurf));
+    if (sscanf(p, "%d", &(object->next->numsurf)) != 1)
+    {
+        fprintf(stderr, "invalid numsurf format %s \n", p);
+        return (-1);
+    }
     numvertFound = 0;
     return (0);
 }
 
 int doGetVertex(char *Line, ob_t *object, mat_t *material)
 {
-    sscanf(Line, "%lf %lf %lf ", &(object->next->vertex[numvertex].x),
-            &(object->next->vertex[numvertex].z),
-            &(object->next->vertex[numvertex].y));
+    if (sscanf(Line, "%lf %lf %lf ", &(object->next->vertex[numvertex].x),
+        &(object->next->vertex[numvertex].z),
+        &(object->next->vertex[numvertex].y)) != 3)
+    {
+        fprintf(stderr, "invalid vertex format %s \n", Line);
+        return (-1);
+    }
     object->next->vertex[numvertex].x += object->next->loc.x;
     object->next->vertex[numvertex].y += object->next->loc.z;
     object->next->vertex[numvertex].z += object->next->loc.y;
@@ -1277,8 +1304,12 @@ int doGetSurf(char *Line, ob_t *object, mat_t *material)
 {
     /*  double u,v;*/
 
-    sscanf(Line, "%d %lf %lf ", &(tmpva[numvertice].indice),
-            &(tmpva[numvertice].u), &(tmpva[numvertice].v));
+    if (sscanf(Line, "%d %lf %lf ", &(tmpva[numvertice].indice),
+        &(tmpva[numvertice].u), &(tmpva[numvertice].v)) != 3)
+    {
+        fprintf(stderr, "invalid surf format %s \n", Line);
+        return (-1);
+    }
     /*fprintf(stderr,"numrefs = %d \n",numrefs);*/
     /*printf("%.2lf %.2lf \n",tmpva[numvertice].u,tmpva[numvertice].v);*/
     tmpva[numvertice].saved = 0;
@@ -1292,42 +1323,51 @@ int doGetSurf(char *Line, ob_t *object, mat_t *material)
 
 int doSurf(char *Line, ob_t *object, mat_t *material)
 {
-    char * p;
-    p = strstr(Line, " ");
+    char * p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown SURF format %s \n", Line);
         return (-1);
     }
-    sscanf(p, "%x", &attrSurf);
+    if (sscanf(p, "%x", &attrSurf) != 1)
+    {
+        fprintf(stderr, "invalid SURF format %s \n", p);
+        return (-1);
+    }
     numvertFound = 0;
     return (0);
 }
 
 int doMat(char *Line, ob_t *object, mat_t *material)
 {
-    char * p;
-    p = strstr(Line, " ");
+    char * p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown mat format %s \n", Line);
         return (-1);
     }
-    sscanf(p, "%d", &attrMat);
+    if (sscanf(p, "%d", &attrMat) != 1)
+    {
+        fprintf(stderr, "invalid mat format %s \n", p);
+        return (-1);
+    }
     numvertFound = 0;
     return (0);
 }
 
 int doRefs(char *Line, ob_t *object, mat_t *material)
 {
-    char * p;
-    p = strstr(Line, " ");
+    char * p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown Refs format %s \n", Line);
         return (-1);
     }
-    sscanf(p, "%d", &refs);
+    if (sscanf(p, "%d", &refs) != 1)
+    {
+        fprintf(stderr, "invalid Refs format %s \n", p);
+        return (-1);
+    }
 
     numrefstotal += refs;
     numrefsFound = 1;
