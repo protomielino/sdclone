@@ -627,13 +627,18 @@ int doMaterial(char *Line, ob_t *object, mat_t *material)
         free(materialt);
         return (-1);
     }
-    sscanf(p,
+    if (sscanf(p,
             "%s rgb %lf %lf %lf amb %lf %lf %lf emis %lf %lf %lf spec %lf %lf %lf shi %lf trans %lf",
             name, &(materialt->rgb.r), &(materialt->rgb.g), &(materialt->rgb.b),
             &(materialt->amb.r), &(materialt->amb.g), &(materialt->amb.b),
             &(materialt->emis.r), &(materialt->emis.g), &(materialt->emis.b),
             &(materialt->spec.r), &(materialt->spec.g), &(materialt->spec.b),
-            &(materialt->shi), &(materialt->trans));
+            &(materialt->shi), &(materialt->trans)) != 15)
+    {
+        fprintf(stderr, "invalid MATERIAL format %s \n", p);
+        free(materialt);
+        return (-1);
+    }
 
     materialt->name = strdup(name);
     t1 = material->next;
