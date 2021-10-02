@@ -628,7 +628,7 @@ int doMaterial(char *Line, ob_t *object, mat_t *material)
         return (-1);
     }
     if (sscanf(p,
-            "%s rgb %lf %lf %lf amb %lf %lf %lf emis %lf %lf %lf spec %lf %lf %lf shi %lf trans %lf",
+            "%255s rgb %lf %lf %lf amb %lf %lf %lf emis %lf %lf %lf spec %lf %lf %lf shi %lf trans %lf",
             name, &(materialt->rgb.r), &(materialt->rgb.g), &(materialt->rgb.b),
             &(materialt->amb.r), &(materialt->amb.g), &(materialt->amb.b),
             &(materialt->emis.r), &(materialt->emis.g), &(materialt->emis.b),
@@ -671,7 +671,7 @@ int doObject(char *Line, ob_t *object, mat_t *material)
         free(objectt);
         return (-1);
     }
-    if (sscanf(p, "%s", name) != 1)
+    if (sscanf(p, "%255s", name) != 1)
     {
         fprintf(stderr, "invalid OBJECT format %s \n", p);
         free(objectt);
@@ -1191,7 +1191,7 @@ int doTexture(char *Line, ob_t *object, mat_t *material)
         fprintf(stderr, "unknown texture format %s \n", Line);
         return (-1);
     }
-    if (sscanf(p, "%s", name) != 1)
+    if (sscanf(p, "%255s", name) != 1)
     {
         fprintf(stderr, "invalid texture format %s \n", p);
         return (-1);
@@ -3398,7 +3398,7 @@ void stripifyOb(ob_t * object, int writeit)
     NumStrips = 0;
     NumStripPoints = 0;
 
-    while (fscanf(stripein, "%s", line) != EOF)
+    while (fscanf(stripein, "%255s", line) != EOF)
     {
         switch (line[0])
         {
@@ -3465,7 +3465,7 @@ void stripifyOb(ob_t * object, int writeit)
         StripLength[j] = 0;
     }
 
-    while (fscanf(stripein, "%s", line) != EOF)
+    while (fscanf(stripein, "%255s", line) != EOF)
     {
         switch (line[0])
         {
@@ -3482,7 +3482,7 @@ void stripifyOb(ob_t * object, int writeit)
             {
                 StripStart[CurrentStripNumber - 1] = CurrentStripStart;
                 StripLength[CurrentStripNumber - 1] = CurrentStripLength;
-                printf("striplength %d \n",
+                printf("striplength %u \n",
                         StripLength[CurrentStripNumber - 1]);
             }
             CurrentStripNumber++;

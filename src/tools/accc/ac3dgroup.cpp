@@ -500,17 +500,15 @@ void loadAndGroup(const char *OutputFileName)
 
 void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray)
 {
-    int i = 0;
-    int j = 0;
     int k = 0;
 
-    for (i = 0; i < ob->numvert; i++)
+    for (int i = 0; i < ob->numvert; i++)
     {
         if ((ob->vertex[i].x != ob2->vertex[i].x)
                 || (ob->vertex[i].y != ob2->vertex[i].y)
                 || (ob->vertex[i].z != ob2->vertex[i].z))
         {
-            for (j = 0; j < ob->numvert; j++)
+            for (int j = 0; j < ob->numvert; j++)
             {
                 if ((ob->vertex[i].x == ob2->vertex[i].x)
                         && (ob->vertex[i].y == ob2->vertex[i].y)
@@ -713,7 +711,6 @@ void collapseSkidsGrassTextures(ob_t * tarob, ob_t * skidsob)
 void collapseShadowTextures(ob_t * tarob, ob_t * shadob)
 {
     ob_t * curshadob = shadob;
-    int curvert = 0;
 
     while (curshadob != NULL)
     {
@@ -730,7 +727,7 @@ void collapseShadowTextures(ob_t * tarob, ob_t * shadob)
             copyTextureChannel(tarob, curshadob, 3);
             if (tarob->texture3)
             {
-                for (curvert = 0; curvert < tarob->numvert; curvert++)
+                for (int curvert = 0; curvert < tarob->numvert; curvert++)
                 {
                     if (tarob->textarray3[curvert * 2] != tarob->textarray[curvert * 2]
                     || tarob->textarray3[curvert * 2 + 1] != tarob->textarray[curvert * 2 + 1])
