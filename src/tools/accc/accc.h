@@ -280,7 +280,7 @@ void createSingleTexChannelArrays(ob_t * destob, ob_t * srcob, int channel);
  *  @param obsurf the surface index in the object (obsurf * 3 is the first entry in the vertexarray considered)
  *  @param out the computed centroid
  */
-void computeObSurfCentroid(ob_t * ob, int obsurf, point_t * out);
+void computeObSurfCentroid(const ob_t * ob, int obsurf, point_t * out);
 
 extern int typeConvertion;
 extern ob_t * root_ob;

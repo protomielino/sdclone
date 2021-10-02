@@ -461,9 +461,9 @@ void copySingleVertexData(ob_t * destob, ob_t * srcob,
     }
 }
 
-void clearSavedInVertexArrayEntry(ob_t * ob, int vertidx)
+void clearSavedInVertexArrayEntry(ob_t * object, int vertidx)
 {
-    ob->vertexarray[vertidx].saved = 0;
+    object->vertexarray[vertidx].saved = 0;
 }
 
 void createSingleTexChannelArrays(ob_t * destob, ob_t * srcob, int channel)
@@ -586,10 +586,10 @@ int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
     return 0;
 }
 
-void computeObSurfCentroid(ob_t * ob, int obsurf, point_t * out)
+void computeObSurfCentroid(const ob_t * object, int obsurf, point_t * out)
 {
-    tcoord_t * idx = ob->vertexarray;
-    point_t * vert = ob->vertex;
+    tcoord_t * idx = object->vertexarray;
+    point_t * vertex = object->vertex;
 
     int firstIdx = obsurf * 3;
 
@@ -599,9 +599,9 @@ void computeObSurfCentroid(ob_t * ob, int obsurf, point_t * out)
 
     for (int curVert = 0; curVert < 3; curVert++)
     {
-        out->x += vert[idx[firstIdx + curVert].indice].x;
-        out->y += vert[idx[firstIdx + curVert].indice].y;
-        out->z += vert[idx[firstIdx + curVert].indice].z;
+        out->x += vertex[idx[firstIdx + curVert].indice].x;
+        out->y += vertex[idx[firstIdx + curVert].indice].y;
+        out->z += vertex[idx[firstIdx + curVert].indice].z;
     }
 
     out->x /= 3;
@@ -885,7 +885,7 @@ ob_t* splitOb(ob_t *object)
     int mustcontinue = 1;
     ob_t * tob = NULL;
     ob_t * tob0 = NULL;
-    int numob = 0;
+    int numobject = 0;
     int firstTri = 0;
     int atleastone = 0;
     int curvert = 0;
@@ -1002,7 +1002,7 @@ ob_t* splitOb(ob_t *object)
         workob->numvertice = numptstored;
         workob->numsurf = numvertstored/3;
 
-        tob = createObjectSplitCopy(numob++, object, workob);
+        tob = createObjectSplitCopy(numobject++, object, workob);
 
         attrSurf = tob->attrSurf;
         attrMat = tob->attrMat;
@@ -1985,150 +1985,150 @@ void saveObin3DS( char * OutputFilename, ob_t * object)
 }
 #endif
 
-int printOb(ob_t * ob)
+int printOb(ob_t * object)
 {
     int multitex = 0;
 
-    if (ob->numsurf == 0)
+    if (object->numsurf == 0)
         return 0;
     if (extendedStrips == 0 && normalMapping != 1)
         if (!(isobjectacar && collapseObject))
-            stripifyOb(ob, 0);
-    ob->saved = 1;
+            stripifyOb(object, 0);
+    object->saved = 1;
     fprintf(ofile, "OBJECT poly\n");
-    fprintf(ofile, "name \"%s\"\n", ob->name);
-    if (ob->texture1 || ob->texture2 || ob->texture3)
+    fprintf(ofile, "name \"%s\"\n", object->name);
+    if (object->texture1 || object->texture2 || object->texture3)
     {
         multitex = 1;
-        fprintf(ofile, "texture \"%s\" base\n", ob->texture);
-        if (ob->texture1)
-            fprintf(ofile, "texture \"%s\" tiled\n", ob->texture1);
+        fprintf(ofile, "texture \"%s\" base\n", object->texture);
+        if (object->texture1)
+            fprintf(ofile, "texture \"%s\" tiled\n", object->texture1);
         else
             fprintf(ofile, "texture empty_texture_no_mapping tiled\n");
-        if (ob->texture2)
-            fprintf(ofile, "texture \"%s\" skids\n", ob->texture2);
+        if (object->texture2)
+            fprintf(ofile, "texture \"%s\" skids\n", object->texture2);
         else
             fprintf(ofile, "texture empty_texture_no_mapping skids\n");
-        if (ob->texture3)
-            fprintf(ofile, "texture \"%s\" shad\n", ob->texture3);
+        if (object->texture3)
+            fprintf(ofile, "texture \"%s\" shad\n", object->texture3);
         else
             fprintf(ofile, "texture empty_texture_no_mapping shad\n");
     }
     else
     {
-        fprintf(ofile, "texture \"%s\"\n", ob->texture);
+        fprintf(ofile, "texture \"%s\"\n", object->texture);
     }
-    fprintf(ofile, "numvert %d\n", ob->numvert);
-    for (int i = 0; i < ob->numvert; i++)
+    fprintf(ofile, "numvert %d\n", object->numvert);
+    for (int i = 0; i < object->numvert; i++)
     {
         if ((typeConvertion == _AC3DTOAC3DS
                 && (extendedStrips == 1 || extendedTriangles == 1))
                 || typeConvertion == _AC3DTOAC3DGROUP
                 || (typeConvertion == _AC3DTOAC3D && (extendedTriangles == 1)))
         {
-            fprintf(ofile, "%lf %lf %lf %lf %lf %lf\n", ob->vertex[i].x,
-                    ob->vertex[i].z, -ob->vertex[i].y, ob->snorm[i].x,
-                    ob->snorm[i].z, -ob->snorm[i].y);
+            fprintf(ofile, "%lf %lf %lf %lf %lf %lf\n", object->vertex[i].x,
+                object->vertex[i].z, -object->vertex[i].y, object->snorm[i].x,
+                object->snorm[i].z, -object->snorm[i].y);
         }
         else
         {
-            fprintf(ofile, "%lf %lf %lf\n", ob->vertex[i].x, ob->vertex[i].z,
-                    -ob->vertex[i].y);
+            fprintf(ofile, "%lf %lf %lf\n", object->vertex[i].x, object->vertex[i].z,
+                    -object->vertex[i].y);
         }
     }
     if (extendedStrips == 0)
     {
-        fprintf(ofile, "numsurf %d\n", ob->numsurf);
-        for (int i = 0; i < ob->numsurf; i++)
+        fprintf(ofile, "numsurf %d\n", object->numsurf);
+        for (int i = 0; i < object->numsurf; i++)
         {
-            if (ob->attrSurf != 0)
-                fprintf(ofile, "SURF 0x%2x\n", ob->attrSurf);
+            if (object->attrSurf != 0)
+                fprintf(ofile, "SURF 0x%2x\n", object->attrSurf);
             else
                 fprintf(ofile, "SURF 0x20\n");
-            fprintf(ofile, "mat %d\n", ob->attrMat);
+            fprintf(ofile, "mat %d\n", object->attrMat);
             fprintf(ofile, "refs 3\n");
             /* GUIONS */
             if (multitex == 0)
             {
-                fprintf(ofile, "%d %.5f %.5f\n", ob->vertexarray[i * 3].indice,
-                        ob->textarray[ob->vertexarray[i * 3].indice * 2],
-                        ob->textarray[ob->vertexarray[i * 3].indice * 2 + 1]);
+                fprintf(ofile, "%d %.5f %.5f\n", object->vertexarray[i * 3].indice,
+                        object->textarray[object->vertexarray[i * 3].indice * 2],
+                        object->textarray[object->vertexarray[i * 3].indice * 2 + 1]);
                 fprintf(ofile, "%d %.5f %.5f\n",
-                        ob->vertexarray[i * 3 + 1].indice,
-                        ob->textarray[ob->vertexarray[i * 3 + 1].indice * 2],
-                        ob->textarray[ob->vertexarray[i * 3 + 1].indice * 2 + 1]);
+                        object->vertexarray[i * 3 + 1].indice,
+                        object->textarray[object->vertexarray[i * 3 + 1].indice * 2],
+                        object->textarray[object->vertexarray[i * 3 + 1].indice * 2 + 1]);
                 fprintf(ofile, "%d %.5f %.5f\n",
-                        ob->vertexarray[i * 3 + 2].indice,
-                        ob->textarray[ob->vertexarray[i * 3 + 2].indice * 2],
-                        ob->textarray[ob->vertexarray[i * 3 + 2].indice * 2 + 1]);
+                        object->vertexarray[i * 3 + 2].indice,
+                        object->textarray[object->vertexarray[i * 3 + 2].indice * 2],
+                        object->textarray[object->vertexarray[i * 3 + 2].indice * 2 + 1]);
 
             }
             else
             {
-                fprintf(ofile, "%d %.5f %.5f", ob->vertexarray[i * 3].indice,
-                        ob->textarray[ob->vertexarray[i * 3].indice * 2],
-                        ob->textarray[ob->vertexarray[i * 3].indice * 2 + 1]);
+                fprintf(ofile, "%d %.5f %.5f", object->vertexarray[i * 3].indice,
+                        object->textarray[object->vertexarray[i * 3].indice * 2],
+                        object->textarray[object->vertexarray[i * 3].indice * 2 + 1]);
 
-                if (ob->texture1)
+                if (object->texture1)
                     fprintf(ofile, " %.5f %.5f",
-                            ob->textarray1[ob->vertexarray[i * 3].indice * 2],
-                            ob->textarray1[ob->vertexarray[i * 3].indice * 2 + 1]);
+                            object->textarray1[object->vertexarray[i * 3].indice * 2],
+                            object->textarray1[object->vertexarray[i * 3].indice * 2 + 1]);
 
-                if (ob->texture2)
+                if (object->texture2)
                     fprintf(ofile, " %.5f %.5f",
-                            ob->textarray2[ob->vertexarray[i * 3].indice * 2],
-                            ob->textarray2[ob->vertexarray[i * 3].indice * 2 + 1]);
-                if (ob->texture3)
+                            object->textarray2[object->vertexarray[i * 3].indice * 2],
+                            object->textarray2[object->vertexarray[i * 3].indice * 2 + 1]);
+                if (object->texture3)
                     fprintf(ofile, " %.5f %.5f",
-                            ob->textarray3[ob->vertexarray[i * 3].indice * 2],
-                            ob->textarray3[ob->vertexarray[i * 3].indice * 2 + 1]);
+                            object->textarray3[object->vertexarray[i * 3].indice * 2],
+                            object->textarray3[object->vertexarray[i * 3].indice * 2 + 1]);
                 fprintf(ofile, "\n");
 
                 fprintf(ofile, "%d %.5f %.5f",
-                        ob->vertexarray[i * 3 + 1].indice,
-                        ob->textarray[ob->vertexarray[i * 3 + 1].indice * 2],
-                        ob->textarray[ob->vertexarray[i * 3 + 1].indice * 2 + 1]);
-                if (ob->texture1)
+                        object->vertexarray[i * 3 + 1].indice,
+                        object->textarray[object->vertexarray[i * 3 + 1].indice * 2],
+                        object->textarray[object->vertexarray[i * 3 + 1].indice * 2 + 1]);
+                if (object->texture1)
                     fprintf(ofile, " %.5f %.5f",
-                            ob->textarray1[ob->vertexarray[i * 3 + 1].indice * 2],
-                            ob->textarray1[ob->vertexarray[i * 3 + 1].indice * 2
+                            object->textarray1[object->vertexarray[i * 3 + 1].indice * 2],
+                            object->textarray1[object->vertexarray[i * 3 + 1].indice * 2
                                     + 1]);
 
-                if (ob->texture2)
+                if (object->texture2)
                     fprintf(ofile, " %.5f %.5f",
-                            ob->textarray2[ob->vertexarray[i * 3 + 1].indice * 2],
-                            ob->textarray2[ob->vertexarray[i * 3 + 1].indice * 2
+                            object->textarray2[object->vertexarray[i * 3 + 1].indice * 2],
+                            object->textarray2[object->vertexarray[i * 3 + 1].indice * 2
                                     + 1]);
-                if (ob->texture3)
+                if (object->texture3)
                     fprintf(ofile, " %.5f %.5f",
-                            ob->textarray3[ob->vertexarray[i * 3 + 1].indice * 2],
-                            ob->textarray3[ob->vertexarray[i * 3 + 1].indice * 2
+                            object->textarray3[object->vertexarray[i * 3 + 1].indice * 2],
+                            object->textarray3[object->vertexarray[i * 3 + 1].indice * 2
                                     + 1]);
                 fprintf(ofile, "\n");
 
                 fprintf(ofile, "%d %.5f %.5f",
-                        ob->vertexarray[i * 3 + 2].indice,
-                        ob->textarray[ob->vertexarray[i * 3 + 2].indice * 2],
-                        ob->textarray[ob->vertexarray[i * 3 + 2].indice * 2 + 1]);
-                if (ob->texture1)
+                        object->vertexarray[i * 3 + 2].indice,
+                        object->textarray[object->vertexarray[i * 3 + 2].indice * 2],
+                        object->textarray[object->vertexarray[i * 3 + 2].indice * 2 + 1]);
+                if (object->texture1)
                     fprintf(ofile, " %.5f %.5f",
-                            ob->textarray1[ob->vertexarray[i * 3 + 2].indice * 2],
-                            ob->textarray1[ob->vertexarray[i * 3 + 2].indice * 2
+                            object->textarray1[object->vertexarray[i * 3 + 2].indice * 2],
+                            object->textarray1[object->vertexarray[i * 3 + 2].indice * 2
                                     + 1]);
 
-                if (ob->texture2)
+                if (object->texture2)
                     fprintf(ofile, " %.5f %.5f",
-                            ob->textarray2[ob->vertexarray[i * 3 + 2].indice * 2],
-                            ob->textarray2[ob->vertexarray[i * 3 + 2].indice * 2
+                            object->textarray2[object->vertexarray[i * 3 + 2].indice * 2],
+                            object->textarray2[object->vertexarray[i * 3 + 2].indice * 2
                                     + 1]);
-                if (ob->texture3)
+                if (object->texture3)
                 {
                     fprintf(ofile, " %.5f %.5f",
-                            ob->textarray3[ob->vertexarray[i * 3 + 2].indice * 2],
-                            ob->textarray3[ob->vertexarray[i * 3 + 2].indice * 2
+                            object->textarray3[object->vertexarray[i * 3 + 2].indice * 2],
+                            object->textarray3[object->vertexarray[i * 3 + 2].indice * 2
                                     + 1]);
-                    if (ob->textarray3[ob->vertexarray[i * 3 + 2].indice * 2]
-                            != ob->textarray1[ob->vertexarray[i * 3 + 2].indice
+                    if (object->textarray3[object->vertexarray[i * 3 + 2].indice * 2]
+                            != object->textarray1[object->vertexarray[i * 3 + 2].indice
                                     * 2])
                     {
                         printf("error in text\n");
@@ -2141,7 +2141,7 @@ int printOb(ob_t * ob)
     }
     else
     {
-        stripifyOb(ob, 1);
+        stripifyOb(object, 1);
     }
     fprintf(ofile, "kids 0\n");
     return 0;
