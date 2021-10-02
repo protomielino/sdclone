@@ -288,12 +288,12 @@ int doRefs(char *Line, ob_t *object, mat_t *material);
 int doCrease(char *Line, ob_t *object, mat_t *material);
 
 #ifdef _3DS
-void saveObin3DS( char * OutputFilename, ob_t * object);
+void saveObin3DS(const char * OutputFilename, ob_t * object);
 #endif
-void computeSaveAC3D(char * OutputFilename, ob_t * object);
-void computeSaveOBJ(char * OutputFilename, ob_t * object);
-void computeSaveAC3DM(char * OutputFilename, ob_t * object);
-void computeSaveAC3DStrip(char * OutputFilename, ob_t * object);
+void computeSaveAC3D(const char * OutputFilename, ob_t * object);
+void computeSaveOBJ(const char * OutputFilename, ob_t * object);
+void computeSaveAC3DM(const char * OutputFilename, ob_t * object);
+void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object);
 void stripifyOb(ob_t * object, int writeit);
 
 verbaction_t verbTab[] =
@@ -1462,7 +1462,7 @@ ob_t * splitObjects(ob_t* object)
     return newob;
 }
 
-int loadAC(char * inputFilename, char * outputFilename)
+int loadAC(const char * inputFilename, const char * outputFilename)
 {
     /* saveIn : 0= 3ds , 1= obj , 2=ac3d grouped (track) , 3 = ac3d strips (cars) */
     char Line[256];
@@ -2670,7 +2670,7 @@ void smoothObjectTriNorm(ob_t * object)
     return;
 }
 
-void computeSaveAC3D(char * OutputFilename, ob_t * object)
+void computeSaveAC3D(const char * OutputFilename, ob_t * object)
 {
 
     int i = 0;
@@ -3020,7 +3020,7 @@ void computeSaveAC3D(char * OutputFilename, ob_t * object)
     fclose(ofile);
 }
 
-void computeSaveOBJ(char * OutputFilename, ob_t * object)
+void computeSaveOBJ(const char * OutputFilename, ob_t * object)
 {
 
     int i = 0;
@@ -3690,7 +3690,7 @@ void stripifyOb(ob_t * object, int writeit)
     }
 }
 
-void computeSaveAC3DM(char * OutputFilename, ob_t * object)
+void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
 {
 
     int i = 0;
@@ -4487,7 +4487,7 @@ void normalMap01(ob_t * object)
     }
 }
 
-void computeSaveAC3DStrip(char * OutputFilename, ob_t * object)
+void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
 
 {
 

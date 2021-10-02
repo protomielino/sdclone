@@ -38,7 +38,7 @@ extern mat_t * root_material;
 extern void smoothTriNorm(ob_t * object);
 void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray);
 void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3);
-void loadAndGroup(char *OutputFileName)
+void loadAndGroup(const char *OutputFileName)
 {
     ob_t * ob0 = NULL;
     ob_t * ob1 = NULL;

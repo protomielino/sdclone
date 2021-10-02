@@ -35,8 +35,8 @@
 /* -g  g-track-2.ac -l0 g2.ac -d3 200900 -d2 200 -d1 100 -S 200 >t */
 /* +es 80 p-gt1.ac porsche-gt1.ac>t */
 int distSplit = 0;
-char *InputFileName = NULL;
-char *OutputFileName = NULL;
+static char *InputFileName = NULL;
+static char *OutputFileName = NULL;
 char * fileL0 = NULL;
 char * fileL1 = NULL;
 char * fileL2 = NULL;
@@ -343,7 +343,7 @@ int main(int argc, char **argv)
 
     init_args(argc, argv);
 #ifdef _3DS
-    extern int load3ds( char * inputFilename, char * outputFilename);
+    extern int load3ds(const char * inputFilename, const char * outputFilename);
 #endif
 
     if (typeConvertion == _AC3DTOAC3DGROUP)
@@ -353,7 +353,7 @@ int main(int argc, char **argv)
 #ifdef _3DS
     else if (typeConvertion == _3DSTOAC3D)
     {
-        load3ds( InputFileName, OutputFileName);
+        load3ds(InputFileName, OutputFileName);
     }
 #endif
     else

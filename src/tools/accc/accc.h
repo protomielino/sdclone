@@ -28,8 +28,6 @@
 #define FALSE 0
 #define TRUE 1
 
-extern char *OutputFileName;
-extern char *ReliefFileName;
 extern char * fileL0;
 extern char * fileL1;
 extern char * fileL2;
@@ -47,14 +45,14 @@ extern int normalMapping;
 extern char *OrderString;
 extern int collapseObject;
 
-extern void loadAndGroup(char *OutputFileName);
+extern void loadAndGroup(const char *OutputFileName);
 /** Loads the file with inputFilename to the global root_ob and root_material
  *  variables and optionally outputs the loaded object to outputFilename
  *  based on the current value of the global typeConvertion variable.
  *
  *  @returns 0 on success, a value != 0 on failure
  */
-int loadAC(char * inputFilename, char * outputFilename = NULL);
+int loadAC(const char * inputFilename, const char * outputFilename = NULL);
 
 #define _AC3DTO3DS 1
 #define _3DSTOAC3D 2
