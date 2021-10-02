@@ -144,7 +144,11 @@ void init_args(int argc, char **argv)
         extendedStrips = 1;
         extendedEnvCoord = 1;
         collapseObject = 1;
-        sscanf(argv[2], "%lf", &smooth_angle);
+        if (sscanf(argv[2], "%lf", &smooth_angle) != 1)
+        {
+            fprintf(stderr, "invalid +es %s\n", argv[2]);
+            exit(1);
+        }
         InputFileName = strdup(argv[3]);
         OutputFileName = strdup(argv[4]);
     }
@@ -214,7 +218,11 @@ void init_args(int argc, char **argv)
                     exit(-1);
                 }
                 i++;
-                distSplit = atoi(argv[i]);
+                if (sscanf(argv[i], "%d", &distSplit) != 1)
+                {
+                    fprintf(stderr, "invalid -S %s\n", argv[i]);
+                    exit(1);
+                }
                 continue;
             }
 
@@ -270,7 +278,11 @@ void init_args(int argc, char **argv)
                     exit(-1);
                 }
                 i++;
-                d3 = atoi(argv[i]);
+                if (sscanf(argv[i], "%d", &d3) != 1)
+                {
+                    fprintf(stderr, "invalid -d3 %s\n", argv[i]);
+                    exit(1);
+                }
                 continue;
             }
             if (!strcmp(argv[i], "-d2"))
@@ -281,7 +293,11 @@ void init_args(int argc, char **argv)
                     exit(-1);
                 }
                 i++;
-                d2 = atoi(argv[i]);
+                if (sscanf(argv[i], "%d", &d2) != 1)
+                {
+                    fprintf(stderr, "invalid -d2 %s\n", argv[i]);
+                    exit(1);
+                }
                 continue;
             }
             if (!strcmp(argv[i], "-d1"))
@@ -292,7 +308,11 @@ void init_args(int argc, char **argv)
                     exit(-1);
                 }
                 i++;
-                d1 = atoi(argv[i]);
+                if (sscanf(argv[i], "%d", &d1) != 1)
+                {
+                    fprintf(stderr, "invalid -d1 %s\n", argv[i]);
+                    exit(1);
+                }
                 continue;
             }
 
@@ -311,14 +331,18 @@ void init_args(int argc, char **argv)
                 OrderString = argv[6];
         }
         else if (typeConvertion == _AC3DTOAC3D)
+        {
             if (argc >= 5)
             {
                 if (!strcmp(argv[4], "-order"))
                     OrderString = argv[5];
-                else
-                    far_dist = atoi(argv[4]);
+                else if (sscanf(argv[4], "%d", &far_dist) != 1)
+                {
+                    fprintf(stderr, "invalid -order %s\n", argv[4]);
+                    exit(1);
+                }
             }
-
+        }
     }
 }
 

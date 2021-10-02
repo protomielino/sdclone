@@ -4510,12 +4510,12 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
     {
         mapNormalToSphere2(object);
         normalMap01(object);
-    }
-    if (isobjectacar && extendedEnvCoord)
-        mapTextureEnv(object);
-    if (isobjectacar && collapseObject)
-        mergeSplitted(&object);
 
+        if (extendedEnvCoord)
+            mapTextureEnv(object);
+        if (collapseObject)
+            mergeSplitted(&object);
+    }
     fprintf(ofile, "AC3Db\n");
     tmat = root_material;
     while (tmat != NULL)
