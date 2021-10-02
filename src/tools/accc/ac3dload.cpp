@@ -342,9 +342,8 @@ void copyVertexArraysSurface(ob_t * destob, int destSurfIdx, ob_t * srcob, int s
 void createTexCoordArray(double * destarr, tcoord_t * srcidxarr, int numidx)
 {
     tcoord_t * curidxobj = NULL;
-    int curidx = 0;
 
-    for (curidx = 0; curidx < numidx; curidx++)
+    for (int curidx = 0; curidx < numidx; curidx++)
     {
         curidxobj = &srcidxarr[curidx];
 
@@ -598,8 +597,7 @@ void computeObSurfCentroid(ob_t * ob, int obsurf, point_t * out)
     out->y = 0;
     out->z = 0;
 
-    int curVert;
-    for(curVert = 0; curVert < 3; curVert++)
+    for (int curVert = 0; curVert < 3; curVert++)
     {
         out->x += vert[idx[firstIdx + curVert].indice].x;
         out->y += vert[idx[firstIdx + curVert].indice].y;
@@ -683,8 +681,7 @@ int doObject(char *Line, ob_t *object, mat_t *material)
 
 int findIndice(int indice, int *oldva, int n)
 {
-    int i = 0;
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         if (oldva[i] == indice)
             return i;
@@ -858,7 +855,6 @@ ob_t* terrainSplitOb(ob_t * object)
 ob_t* splitOb(ob_t *object)
 {
     int *oldva = 0;
-    int curtri = 0;
     int numptstored = 0; /* number of vertices stored */
     int oldnumptstored = 0; /* temporary placeholder for numptstored */
 
@@ -869,7 +865,6 @@ ob_t* splitOb(ob_t *object)
 
     tcoord_t curvertex[3];
     int curstoredidx[3];
-    int i = 0;
 
     int touse = 0;
     int orignumtris = 0; /* number of surfaces/triangles in the source object */
@@ -910,7 +905,7 @@ ob_t* splitOb(ob_t *object)
         while (atleastone == 1)
         {
             atleastone = 0;
-            for (curtri = 0; curtri < orignumtris; curtri++)
+            for (int curtri = 0; curtri < orignumtris; curtri++)
             {
                 touse = 0;
                 if (tri[curtri] == 1)
@@ -920,7 +915,7 @@ ob_t* splitOb(ob_t *object)
                 curvert = curtri * 3;
 
                 /** find vertices of the triangle */
-                for(i = 0; i < 3; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     copyTexCoord(&curvertex[i], &(object->vertexarray[curvert+i]));
 
@@ -939,7 +934,7 @@ ob_t* splitOb(ob_t *object)
                 {
                     touse = 1;
 
-                    for(i = 0; i < 3; i++)
+                    for (int i = 0; i < 3; i++)
                     {
                         if (curstoredidx[i] != -1)
                             if(workob->textarray[curstoredidx[i] * 2] != curvertex[i].u
@@ -960,7 +955,7 @@ ob_t* splitOb(ob_t *object)
 
                     /* store the vertices of the triangle with new indice */
                     /* not yet in the array : store it at the current position */
-                    for(i = 0; i < 3; i++)
+                    for (int i = 0; i < 3; i++)
                     {
                         oldnumptstored = numptstored;
 
@@ -1590,7 +1585,6 @@ void saveIn3DSsubObject(ob_t * object,database3ds *db)
     /*material3ds *matr     = NULL;*/
     mesh3ds *mobj = NULL;
     kfmesh3ds *kobj = NULL;
-    int i=0;
 
     if (object->name==NULL && (!stricmp("world",object->type)))
     {
@@ -1626,20 +1620,20 @@ void saveIn3DSsubObject(ob_t * object,database3ds *db)
         InitMeshObj3ds(&mobj, object->numvert, object->numsurf,
                 InitNoExtras3ds|InitTextArray3ds|InitVertexArray3ds|InitFaceArray3ds);
 
-        for (i = 0; i < object->numvert; i++)
+        for (int i = 0; i < object->numvert; i++)
         {
             mobj->vertexarray[i].x = object->vertex[i].x;
             mobj->vertexarray[i].y = object->vertex[i].y;
             mobj->vertexarray[i].z = object->vertex[i].z;
         }
 
-        for (i = 0; i < object->numvert; i++)
+        for (int i = 0; i < object->numvert; i++)
         {
             mobj->textarray[i].u = object->textarray[i*2];
             mobj->textarray[i].v = object->textarray[i*2+1];
         }
 
-        for (int j=0; j<object->numsurf; j++)
+        for (int j = 0; j < object->numsurf; j++)
         {
             /* GUIONS */
             mobj->facearray[j].v1=object->vertexarray[j*3].indice;
@@ -1665,7 +1659,7 @@ void saveIn3DSsubObject(ob_t * object,database3ds *db)
             InitMatArrayIndex3ds (mobj, 0, mobj->nfaces);
             ON_ERROR_RETURN;
 
-            for (i=0; i<texnum; i++)
+            for (int i=0; i<texnum; i++)
             {
                 if (tex[i]!=NULL)
                 if (object->texture!=NULL)
@@ -1673,8 +1667,8 @@ void saveIn3DSsubObject(ob_t * object,database3ds *db)
                 sprintf(mobj->matarray[0].name,"texture%d",i);
             }
 
-            for (i=0; i<mobj->nfaces; i++)
-            mobj->matarray[0].faceindex[i] = (ushort3ds)i;
+            for (int i=0; i<mobj->nfaces; i++)
+                mobj->matarray[0].faceindex[i] = (ushort3ds)i;
             mobj->matarray[0].nfaces = mobj->nfaces;
         }
 
@@ -1718,8 +1712,6 @@ void saveObin3DS( char * OutputFilename, ob_t * object)
     meshset3ds *mesh = NULL;
     background3ds *bgnd = NULL;
     atmosphere3ds *atmo = NULL;
-    int i =0;
-    int j=0;
     char name2[256];
     char *p, *q;
     viewport3ds *view = NULL;
@@ -1802,7 +1794,7 @@ void saveObin3DS( char * OutputFilename, ob_t * object)
             continue;
         }
         texnofound=1;
-        for (i=0; i<texnum; i++)
+        for (int i=0; i<texnum; i++)
         {
             if (tmpob->texture==NULL)
             {
@@ -1833,7 +1825,7 @@ void saveObin3DS( char * OutputFilename, ob_t * object)
         tmpob=tmpob->next;
     }
 
-    for (i=0; i<texnum; i++)
+    for (int i=0; i<texnum; i++)
     {
 
         InitMaterial3ds(&matr);
@@ -1856,7 +1848,7 @@ void saveObin3DS( char * OutputFilename, ob_t * object)
             }
             p++;
         }
-        j=0;
+        int j=0;
         while (name2[j]!='\0')
         {
             if (name2[j]=='.')
@@ -1950,7 +1942,6 @@ void saveObin3DS( char * OutputFilename, ob_t * object)
 
 int printOb(ob_t * ob)
 {
-    int i = 0;
     int multitex = 0;
 
     if (ob->numsurf == 0)
@@ -1983,7 +1974,7 @@ int printOb(ob_t * ob)
         fprintf(ofile, "texture \"%s\"\n", ob->texture);
     }
     fprintf(ofile, "numvert %d\n", ob->numvert);
-    for (i = 0; i < ob->numvert; i++)
+    for (int i = 0; i < ob->numvert; i++)
     {
         if ((typeConvertion == _AC3DTOAC3DS
                 && (extendedStrips == 1 || extendedTriangles == 1))
@@ -2003,7 +1994,7 @@ int printOb(ob_t * ob)
     if (extendedStrips == 0)
     {
         fprintf(ofile, "numsurf %d\n", ob->numsurf);
-        for (i = 0; i < ob->numsurf; i++)
+        for (int i = 0; i < ob->numsurf; i++)
         {
             if (ob->attrSurf != 0)
                 fprintf(ofile, "SURF 0x%2x\n", ob->attrSurf);
@@ -2236,11 +2227,9 @@ void normalize(point_t *t)
 
 void computeTriNorm(ob_t * object)
 {
-    ob_t * tmpob = NULL;
-    int i = 0;
     point_t norm;
+    ob_t *tmpob = object;
 
-    tmpob = object;
     while (tmpob != NULL)
     {
         if (tmpob->name == NULL)
@@ -2258,7 +2247,7 @@ void computeTriNorm(ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        for (i = 0; i < tmpob->numsurf; i++)
+        for (int i = 0; i < tmpob->numsurf; i++)
         {
             /* compute the same normal for each points in the surface */
             computeNorm(&tmpob->vertex[tmpob->vertexarray[i * 3].indice],
@@ -2277,7 +2266,7 @@ void computeTriNorm(ob_t * object)
             tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice].y += norm.y;
             tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice].z += norm.z;
         }
-        for (i = 0; i < tmpob->numsurf; i++)
+        for (int i = 0; i < tmpob->numsurf; i++)
         {
             normalize(&tmpob->norm[tmpob->vertexarray[i * 3].indice]);
             normalize(&tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice]);
@@ -2291,11 +2280,9 @@ void computeTriNorm(ob_t * object)
 
 void computeObjectTriNorm(ob_t * object)
 {
-    ob_t * tmpob = NULL;
-    int i = 0;
     point_t norm;
+    ob_t *tmpob = object;
 
-    tmpob = object;
     if (tmpob->name == NULL)
     {
         tmpob = tmpob->next;
@@ -2311,7 +2298,7 @@ void computeObjectTriNorm(ob_t * object)
         tmpob = tmpob->next;
         return;
     }
-    for (i = 0; i < tmpob->numsurf; i++)
+    for (int i = 0; i < tmpob->numsurf; i++)
     {
         /* compute the same normal for each points in the surface */
         computeNorm(&tmpob->vertex[tmpob->vertexarray[i * 3].indice],
@@ -2330,7 +2317,7 @@ void computeObjectTriNorm(ob_t * object)
         tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice].y += norm.y;
         tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice].z += norm.z;
     }
-    for (i = 0; i < tmpob->numsurf; i++)
+    for (int i = 0; i < tmpob->numsurf; i++)
     {
         normalize(&tmpob->norm[tmpob->vertexarray[i * 3].indice]);
         normalize(&tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice]);
@@ -2365,11 +2352,9 @@ void smoothTriNorm(ob_t * object)
 {
     ob_t * tmpob = NULL;
     ob_t * tmpob1 = NULL;
-    int i = 0;
     double dd;
     double nx, ny, nz;
-    int j = 0;
-
+ 
     printf("Smooth called on %s\n", object->name);
     tmpob = object;
     while (tmpob != NULL)
@@ -2389,7 +2374,7 @@ void smoothTriNorm(ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             /* compute the same normal for each points in the surface */
             tmpob->snorm[i].x = tmpob->norm[i].x;
@@ -2450,9 +2435,9 @@ void smoothTriNorm(ob_t * object)
                     continue;
                 }
 
-            for (i = 0; i < tmpob->numvert; i++)
+            for (int i = 0; i < tmpob->numvert; i++)
             {
-                for (j = 0; j < tmpob1->numvert; j++)
+                for (int j = 0; j < tmpob1->numvert; j++)
                 {
                     if (checkMustSmoothVector(&tmpob->norm[i], &tmpob1->norm[j],
                             &tmpob->vertex[i], &tmpob1->vertex[j]))
@@ -2506,7 +2491,7 @@ void smoothTriNorm(ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             /* compute the same normal for each points in the surface */
             nx = tmpob->snorm[i].x;
@@ -2588,11 +2573,8 @@ void smoothTriNorm(ob_t * object)
 
 void smoothFaceTriNorm(ob_t * object)
 {
-    ob_t * tmpob = NULL;
-    int i = 0;
-    int j = 0;
+    ob_t * tmpob = object;
 
-    tmpob = object;
     if (tmpob->name == NULL)
     {
         tmpob = tmpob->next;
@@ -2609,10 +2591,10 @@ void smoothFaceTriNorm(ob_t * object)
         return;
     }
 
-    for (i = 0; i < tmpob->numvert; i++)
+    for (int i = 0; i < tmpob->numvert; i++)
     {
         /* compute the same normal for each points in the surface */
-        for (j = 0; j < tmpob->numvert; j++)
+        for (int j = 0; j < tmpob->numvert; j++)
         {
             if ((tmpob->vertex[i].x - tmpob->vertex[j].x) <= 0.01
                     && (tmpob->vertex[i].y - tmpob->vertex[j].y) <= 0.01
@@ -2629,7 +2611,7 @@ void smoothFaceTriNorm(ob_t * object)
         }
     }
 
-    for (i = 0; i < tmpob->numvert; i++)
+    for (int i = 0; i < tmpob->numvert; i++)
     {
         normalize(&tmpob->snorm[i]);
     }
@@ -2638,16 +2620,12 @@ void smoothFaceTriNorm(ob_t * object)
 
 void smoothObjectTriNorm(ob_t * object)
 {
-    ob_t * tmpob = NULL;
-    int i = 0;
-    int j = 0;
+    ob_t * tmpob = object;
 
-    tmpob = object;
-
-    for (i = 0; i < tmpob->numvert; i++)
+    for (int i = 0; i < tmpob->numvert; i++)
     {
         /* compute the same normal for each points in the surface */
-        for (j = 0; j < tmpob->numvert; j++)
+        for (int j = 0; j < tmpob->numvert; j++)
         {
             if ((tmpob->vertex[i].x - tmpob->vertex[j].x) <= 0.001
                     && (tmpob->vertex[i].y - tmpob->vertex[j].y) <= 0.001
@@ -2663,7 +2641,7 @@ void smoothObjectTriNorm(ob_t * object)
             }
         }
     }
-    for (i = 0; i < tmpob->numvert; i++)
+    for (int i = 0; i < tmpob->numvert; i++)
     {
         normalize(&tmpob->snorm[i]);
     }
@@ -2673,8 +2651,6 @@ void smoothObjectTriNorm(ob_t * object)
 void computeSaveAC3D(const char * OutputFilename, ob_t * object)
 {
 
-    int i = 0;
-    int j = 0;
     char name2[256];
     char *p, *q;
     ob_t * tmpob = NULL;
@@ -2683,7 +2659,6 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
     int lastpass = FALSE;
     int nborder = 0;
     int ordering = FALSE;
-    int ik;
 
     if (normalMapping == 1)
     {
@@ -2811,7 +2786,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
             continue;
         }
         texnofound = 1;
-        for (i = 0; i < texnum; i++)
+        for (int i = 0; i < texnum; i++)
         {
             if (tmpob->texture == NULL)
             {
@@ -2885,7 +2860,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
     p = OrderString;
     q = OrderString;
     nborder++;
-    for (ik = 0; ik < nborder; ik++)
+    for (int ik = 0; ik < nborder; ik++)
     {
         if (ordering)
         {
@@ -2973,7 +2948,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
         }
     }
 
-    for (i = 0; i < texnum; i++)
+    for (int i = 0; i < texnum; i++)
     {
         printf("analysing  %s \n", tex[i]);
         p = tex[i];
@@ -2994,7 +2969,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
             }
             p++;
         }
-        j = 0;
+        int j = 0;
         while (name2[j] != '\0')
         {
             if (name2[j] == '.')
@@ -3023,8 +2998,6 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
 void computeSaveOBJ(const char * OutputFilename, ob_t * object)
 {
 
-    int i = 0;
-    int j = 0;
     char name2[256];
     char *p, *q;
     ob_t * tmpob = NULL;
@@ -3119,7 +3092,7 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object)
             continue;
         }
         texnofound = 1;
-        for (i = 0; i < texnum; i++)
+        for (int i = 0; i < texnum; i++)
         {
             if (tmpob->texture == NULL)
             {
@@ -3152,7 +3125,7 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object)
         tmpob = tmpob->next;
     }
 
-    for (i = 0; i < texnum; i++)
+    for (int i = 0; i < texnum; i++)
     {
 
         printf("analysing  %s \n", tex[i]);
@@ -3174,7 +3147,7 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object)
             }
             p++;
         }
-        j = 0;
+        int j = 0;
         while (name2[j] != '\0')
         {
             if (name2[j] == '.')
@@ -3217,7 +3190,7 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             fprintf(ofile, "v %lf %lf %lf\n", tmpob->vertex[i].x,
                     tmpob->vertex[i].y, tmpob->vertex[i].z);
@@ -3243,7 +3216,7 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             fprintf(ofile, "vt %lf %lf 0.0\n", tmpob->textarray[i * 2],
                     tmpob->textarray[i * 2 + 1]);
@@ -3269,7 +3242,7 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             fprintf(ofile, "vn %lf %lf %lf\n", tmpob->snorm[i].x,
                     tmpob->snorm[i].y, tmpob->snorm[i].z);
@@ -3324,7 +3297,6 @@ void stripifyOb(ob_t * object, int writeit)
     char line[256];
     char filename[50];
     char command[256];
-    unsigned int j;
     unsigned int NumStrips;
     unsigned int NumStripPoints;
     void *mem;
@@ -3335,7 +3307,6 @@ void stripifyOb(ob_t * object, int writeit)
     unsigned int CurrentStripStart;
     unsigned int CurrentStripLength;
     unsigned int CurrentStripPoint;
-    int i = 0;
     int debj = 0;
     int dege = 0;
     tcoord_t * stripvertexarray;
@@ -3350,10 +3321,10 @@ void stripifyOb(ob_t * object, int writeit)
     fprintf(stderr, "stripifying %s                    \r", object->name);
     sprintf(filename, "temp.obj");
     stripeout = fopen(filename, "w");
-    for (i = 0; i < object->numvert; i++)
+    for (int i = 0; i < object->numvert; i++)
         fprintf(stripeout, "v 0.0 0.0 0.0\n");
 
-    for (i = 0; i < object->numsurf; i++)
+    for (int i = 0; i < object->numsurf; i++)
         fprintf(stripeout, "f %d %d %d\n",
                 object->vertexarray[i * 3].indice + 1,
                 object->vertexarray[i * 3 + 1].indice + 1,
@@ -3443,7 +3414,7 @@ void stripifyOb(ob_t * object, int writeit)
     CurrentStripLength = 0;
     CurrentStripPoint = 0;
 
-    for (j = 0; j < NumStrips; j++)
+    for (unsigned int j = 0; j < NumStrips; j++)
     {
         StripStart[j] = 0;
         StripLength[j] = 0;
@@ -3510,7 +3481,7 @@ void stripifyOb(ob_t * object, int writeit)
     else
         multitex = 0;
 
-    for (i = 0; i < (int) NumStrips; i++)
+    for (unsigned int i = 0; i < NumStrips; i++)
     {
         /* get the first triangle */
         v1 = StripPoint[StripStart[i]];
@@ -3600,7 +3571,7 @@ void stripifyOb(ob_t * object, int writeit)
             }
 
         }
-        for (j = debj; j < StripLength[i]; j++)
+        for (unsigned int j = debj; j < StripLength[i]; j++)
         {
             v0 = StripPoint[StripStart[i] + j];
             /*printf("adding point %d \n",v0);*/
@@ -3693,8 +3664,6 @@ void stripifyOb(ob_t * object, int writeit)
 void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
 {
 
-    int i = 0;
-    int j = 0;
     char name2[256];
     char *p, *q;
     ob_t * tmpob = NULL;
@@ -3749,7 +3718,7 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
         tmpob = tmpob->next;
     }
 
-    for (i = 0; i < texnum; i++)
+    for (int i = 0; i < texnum; i++)
     {
 
         printf("analysing  %s \n", tex[i]);
@@ -3771,7 +3740,7 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
             }
             p++;
         }
-        j = 0;
+        int j = 0;
         while (name2[j] != '\0')
         {
             if (name2[j] == '.')
@@ -3814,7 +3783,7 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             fprintf(ofile, "v %lf %lf %lf\n", tmpob->vertex[i].x,
                     tmpob->vertex[i].y, tmpob->vertex[i].z);
@@ -3840,7 +3809,7 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             fprintf(ofile, "vt %lf %lf 0.0\n", tmpob->textarray[i * 2],
                     tmpob->textarray[i * 2 + 1]);
@@ -3866,7 +3835,7 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             fprintf(ofile, "vn %lf %lf %lf\n", tmpob->snorm[i].x,
                     tmpob->snorm[i].y, tmpob->snorm[i].z);
@@ -3915,7 +3884,6 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
 
 void mapNormalToSphere(ob_t *object)
 {
-    ob_t * tmpob = NULL;
     double xmin = 9999;
     double ymin = 9999;
     double zmin = 9999;
@@ -3925,9 +3893,8 @@ void mapNormalToSphere(ob_t *object)
     double pospt = 0;
     double ddmax = 0;
     double ddmin = 10000;
-    int i = 0;
+    ob_t * tmpob = object;
 
-    tmpob = object;
     while (tmpob != NULL)
     {
         if (tmpob->name == NULL)
@@ -3959,7 +3926,7 @@ void mapNormalToSphere(ob_t *object)
         if (tmpob->z_max > zmax)
             zmax = tmpob->z_max;
 
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             /* compute the same normal for each points in the surface */
             pospt = sqrt(
@@ -3992,7 +3959,7 @@ void mapNormalToSphere(ob_t *object)
             tmpob = tmpob->next;
             continue;
         }
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             double fact = 0;
             /* compute the same normal for each points in the surface */
@@ -4015,13 +3982,11 @@ void mapNormalToSphere(ob_t *object)
 }
 void mapTextureEnv(ob_t *object)
 {
-    ob_t * tmpob = NULL;
     double x, y, z, zt, lg;
     double z_min = 10000;
     double z_max = -10000;
-    int i, j;
-
-    tmpob = object;
+    ob_t * tmpob = object;
+ 
     while (tmpob != NULL)
     {
         if (tmpob->name == NULL)
@@ -4039,7 +4004,7 @@ void mapTextureEnv(ob_t *object)
             tmpob = tmpob->next;
             continue;
         }
-        for (j = 0; j < tmpob->numvert; j++)
+        for (int j = 0; j < tmpob->numvert; j++)
         {
             z = tmpob->vertex[j].z + tmpob->snorm[j].z / 3.0;
             if (z > z_max)
@@ -4079,7 +4044,7 @@ void mapTextureEnv(ob_t *object)
                 tmpob->numvert * sizeof(double) * 2);
         tmpob->texture1 = tmpob->texture;
         tmpob->texture2 = tmpob->texture;
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             x = tmpob->vertex[i].x;
             y = tmpob->vertex[i].y;
@@ -4118,8 +4083,6 @@ void mapTextureEnv(ob_t *object)
 void mapTextureEnvOld(ob_t *object)
 {
     ob_t * tmpob = NULL;
-    int i = 0;
-    int j = 0;
     double x_min = 10000;
     double x_max = -10000;
     double y_min = 10000;
@@ -4154,7 +4117,7 @@ void mapTextureEnvOld(ob_t *object)
             tmpob = tmpob->next;
             continue;
         }
-        for (j = 0; j < tmpob->numvert; j++)
+        for (int j = 0; j < tmpob->numvert; j++)
         {
             if (tmpob->vertex[j].x > x_max)
                 x_max = tmpob->vertex[j].x;
@@ -4202,7 +4165,7 @@ void mapTextureEnvOld(ob_t *object)
                 tmpob->numvert * sizeof(double) * 2);
         tmpob->texture1 = tmpob->texture;
         tmpob->texture2 = tmpob->texture;
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
 
             tmpob->textarray1[i * 2] = (tmpob->vertex[i].x - x_min)
@@ -4262,7 +4225,7 @@ void mapTextureEnvOld(ob_t *object)
             continue;
         }
 
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             tmpob->textarray1[i * 2] = (tmpob->textarray1[i * 2] - u_min)
                     / (u_max - u_min);
@@ -4281,10 +4244,8 @@ void mapTextureEnvOld(ob_t *object)
 
 void mapNormalToSphere2(ob_t *object)
 {
-    ob_t * tmpob = NULL;
-    int i = 0;
+    ob_t * tmpob = object;
 
-    tmpob = object;
     while (tmpob != NULL)
     {
         if (tmpob->name == NULL)
@@ -4303,7 +4264,7 @@ void mapNormalToSphere2(ob_t *object)
             continue;
         }
 
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             /* compute the same normal for each points in the surface */
             /*      tmpob->norm[i].x = tmpob->vertex[i].x; */
@@ -4322,17 +4283,14 @@ void mapNormalToSphere2(ob_t *object)
 
 void normalMap(ob_t * object)
 {
-    ob_t * tmpob = NULL;
     double x_min = 99999;
     double y_min = 99999;
     double z_min = 99999;
     double x_max = -99999;
     double y_max = -99999;
     double z_max = -99999;
-    int i = 0;
-    int j = 0;
+    ob_t * tmpob = object;
 
-    tmpob = object;
     while (tmpob != NULL)
     {
         if (tmpob->name == NULL)
@@ -4351,7 +4309,7 @@ void normalMap(ob_t * object)
             continue;
         }
 
-        for (j = 0; j < tmpob->numvert; j++)
+        for (int j = 0; j < tmpob->numvert; j++)
         {
             if (tmpob->vertex[j].x > x_max)
                 x_max = tmpob->vertex[j].x;
@@ -4390,7 +4348,7 @@ void normalMap(ob_t * object)
             continue;
         }
         printf("normalMap : handling %s \n", tmpob->name);
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             tmpob->textarray[i * 2] = (tmpob->vertex[i].x - x_min)
                     / (x_max - x_min);
@@ -4405,17 +4363,14 @@ void normalMap(ob_t * object)
 
 void normalMap01(ob_t * object)
 {
-    ob_t * tmpob = NULL;
     double x_min = 99999;
     double y_min = 99999;
     double z_min = 99999;
     double x_max = -99999;
     double y_max = -99999;
     double z_max = -99999;
-    int i = 0;
-    int j = 0;
+    ob_t * tmpob = object;
 
-    tmpob = object;
     while (tmpob != NULL)
     {
         if (tmpob->name == NULL)
@@ -4433,7 +4388,7 @@ void normalMap01(ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        for (j = 0; j < tmpob->numvert; j++)
+        for (int j = 0; j < tmpob->numvert; j++)
         {
             if (tmpob->vertex[j].x > x_max)
                 x_max = tmpob->vertex[j].x;
@@ -4475,7 +4430,7 @@ void normalMap01(ob_t * object)
         tmpob->textarray3 = (double *) malloc(
                 sizeof(double) * tmpob->numvert * 2);
         printf("normalMap : handling %s \n", tmpob->name);
-        for (i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < tmpob->numvert; i++)
         {
             tmpob->textarray3[i * 2] = (tmpob->vertex[i].x - x_min)
                     / (x_max - x_min) - 0.5;
@@ -4491,8 +4446,6 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
 
 {
 
-    int i = 0;
-    int ik = 0;
     ob_t * tmpob = NULL;
     mat_t * tmat = NULL;
     int numg = 0;
@@ -4606,7 +4559,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
     p = OrderString;
     q = OrderString;
     nborder++;
-    for (ik = 0; ik < nborder; ik++)
+    for (int ik = 0; ik < nborder; ik++)
     {
         if (ordering)
         {
@@ -4644,7 +4597,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
                 continue;
             }
             texnofound = 1;
-            for (i = 0; i < texnum; i++)
+            for (int i = 0; i < texnum; i++)
             {
                 if (tmpob->texture == NULL)
                 {
@@ -4753,9 +4706,6 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     int oldva1[10000];
     int oldva2[10000];
     int n = 0;
-    int i = 0;
-    int j = 0;
-
     int numtri = (ob1)->numsurf + (ob2)->numsurf;
     ;
     printf("merging %s with %s  tri=%d\n", ob1->name, ob2->name, numtri);
@@ -4809,9 +4759,9 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     }
 
     n = ob1->numvert;
-    for (i = 0; i < ob2->numvert; i++)
+    for (int i = 0; i < ob2->numvert; i++)
     {
-        for (j = 0; j < ob1->numvert; j++)
+        for (int j = 0; j < ob1->numvert; j++)
         {
             if (ob2->vertex[i].x == ob1->vertex[j].x
                     && ob2->vertex[i].y == ob1->vertex[j].y
@@ -4824,7 +4774,7 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
         }
     }
 
-    for (i = 0; i < ob2->numvert; i++)
+    for (int i = 0; i < ob2->numvert; i++)
     {
         if (oldva1[i] == -1)
         {
@@ -4860,10 +4810,10 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
         }
     }
     tobS->numvert = n;
-    for (i = 0; i < ob2->numsurf; i++)
+    for (int i = 0; i < ob2->numsurf; i++)
     {
         int found = FALSE;
-        for (j = 0; j < ob1->numsurf; j++)
+        for (int j = 0; j < ob1->numsurf; j++)
         {
             if (tobS->vertexarray[j * 3].indice
                     == oldva1[ob2->vertexarray[i * 3].indice]
@@ -5077,14 +5027,14 @@ int mergeSplitted(ob_t **object)
                 continue;
             }
 
-            for (j=0; j<tob0->numvert; j++)
+            for (int j=0; j<tob0->numvert; j++)
             {
 
                 tobS->vertex[j].x=tob->vertex[j].x;
                 tobS->vertex[j].y=tob->vertex[j].y;
                 tobS->vertex[j].z=tob->vertex[j].z;
             }
-            for (j=0; j<tob->numsurf; j++)
+            for (int j=0; j<tob->numsurf; j++)
             {
                 tobS->vertexarray[j*3].indice=tob->vertexarray[j*3].indice;
                 tobS->vertexarray[j*3].u=tob->vertexarray[j*3].u;
@@ -5096,7 +5046,7 @@ int mergeSplitted(ob_t **object)
                 tobS->vertexarray[j*3+2].u=tob->vertexarray[j*3+2].u;
                 tobS->vertexarray[j*3+2].v=tob->vertexarray[j*3+2].v;
             }
-            for (j=0; j<tob->numsurf*3; j++)
+            for (int j=0; j<tob->numsurf*3; j++)
             {
                 tobS->textarray[tobS->vertexarray[j].indice*2]=tob->vertexarray[j].u;
                 tobS->textarray[tobS->vertexarray[j].indice*2+1]=tob->vertexarray[j].v;
@@ -5105,7 +5055,7 @@ int mergeSplitted(ob_t **object)
             }
             tob0=tob0->next;
         }
-        for (j=0; j<tobS->numvert; j++)
+        for (int j=0; j<tobS->numvert; j++)
         {
             if (tobS->vertex[j].x>tobS->x_max)
             tobS->x_max=tobS->vertex[j].x;
@@ -5144,9 +5094,8 @@ double findDistmin(ob_t * ob1, ob_t *ob2)
 
     double di[16];
     double d = 100000;
-    int i;
 
-    for (i = 0; i < ob1->numvert; i++)
+    for (int i = 0; i < ob1->numvert; i++)
         for (int j = 0; j < ob2->numvert; j++)
         {
             double a1 = ob1->vertex[i].x;
