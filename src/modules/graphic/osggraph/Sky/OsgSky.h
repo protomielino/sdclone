@@ -128,8 +128,8 @@ public:
 
     inline void enable() {  pre_selector->setValue(0, 1); }
     inline void disable() { pre_selector->setValue(0, 0); }
-    inline osg::Vec4f get_sun_color() { return sun->get_color(); }
-    inline osg::Vec4f get_scene_color() { return sun->get_scene_color(); }
+    inline osg::Vec4f get_sun_color() const { return sun->get_color(); }
+    inline osg::Vec4f get_scene_color() const { return sun->get_scene_color(); }
 
     void add_cloud_layer (SDCloudLayer * layer);
     const SDCloudLayer * get_cloud_layer (int i) const;
@@ -137,33 +137,33 @@ public:
     int get_cloud_layer_count () const;
 
     void   setMA(double angle) { moon->setMoonAngle(angle); }
-    double getMA() { return moon->getMoonAngle(); }
+    double getMA() const { return moon->getMoonAngle(); }
 
     void   setMR(double rotation) { moon->setMoonRotation( rotation); }
-    double getMR() { return moon->getMoonRotation(); }
+    double getMR() const { return moon->getMoonRotation(); }
     void   setMRA( double ra ) { moon->setMoonRightAscension( ra ); }
-    double getMRA() { return moon->getMoonRightAscension(); }
+    double getMRA() const { return moon->getMoonRightAscension(); }
 
     void   setMD( double decl ) { moon->setMoonDeclination( decl ); }
-    double getMD() { return moon->getMoonDeclination(); }
+    double getMD() const { return moon->getMoonDeclination(); }
 
     void   setMDist( double dist ) { moon->setMoonDist(dist); }
-    double getMDist() { return moon->getMoonDist(); }
+    double getMDist() const { return moon->getMoonDist(); }
 
     void   setSA(double angle) { sun->setSunAngle(angle); }
-    double getSA() { return sun->getSunAngle(); }
+    double getSA() const { return sun->getSunAngle(); }
 
     void   setSR(double rotation) { sun->setSunRotation( rotation ); }
-    double getSR() { return sun->getSunRotation(); }
+    double getSR() const { return sun->getSunRotation(); }
 
     void   setSRA(double ra) { sun->setSunRightAscension( ra ); }
-    double getSRA() { return sun->getSunRightAscension(); }
+    double getSRA() const { return sun->getSunRightAscension(); }
 
     void   setSD( double decl ) { sun->setSunDeclination( decl ); }
-    double getSD() { return sun->getSunDeclination(); }
+    double getSD() const { return sun->getSunDeclination(); }
 
     void   setSDistance( double dist ) { sun->setSunDistance( dist ); }
-    double getSDistance() { return sun->getSunDistance(); }
+    double getSDistance() const { return sun->getSunDistance(); }
 
     inline float get_visibility() const { return effective_visibility; }
     inline void set_visibility( float v ) {	effective_visibility = visibility = (v <= 25.0) ? 25.0 : v; }
