@@ -53,20 +53,6 @@
 
 #define SetPoint(p, a, b, c) (p).x = a; (p).y = b; (p).z = c;
 
-void copyPoint(point_t * dest, point_t * src)
-{
-    dest->x = src->x;
-    dest->y = src->y;
-    dest->z = src->z;
-}
-
-void copyTexCoord(tcoord_t * dest, tcoord_t * src)
-{
-    dest->indice = src->indice;
-    dest->u = src->u;
-    dest->v = src->v;
-    dest->saved = src->saved;
-}
 void storeTexCoord(tcoord_t * dest, int indice, double u, double v, int saved)
 {
     dest->indice = indice;
@@ -319,20 +305,16 @@ void copyVertexArraysSurface(ob_t * destob, int destSurfIdx, ob_t * srcob, int s
     int firstDestIdx = destSurfIdx * 3;
     int firstSrcIdx = srcSurfIdx * 3;
 
-    for(int off = 0; off < 3; off++)
+    for (int off = 0; off < 3; off++)
     {
-        copyTexCoord(&(destob->vertexarray[firstDestIdx + off]),
-                     &(srcob->vertexarray[firstSrcIdx + off]));
+        destob->vertexarray[firstDestIdx + off] = srcob->vertexarray[firstSrcIdx + off];
 
-        if(srcob->vertexarray1)
-            copyTexCoord(&(destob->vertexarray1[firstDestIdx + off]),
-                         &(srcob->vertexarray1[firstSrcIdx + off]));
-        if(srcob->vertexarray2)
-            copyTexCoord(&(destob->vertexarray2[firstDestIdx + off]),
-                         &(srcob->vertexarray2[firstSrcIdx + off]));
-        if(srcob->vertexarray3)
-            copyTexCoord(&(destob->vertexarray3[firstDestIdx + off]),
-                         &(srcob->vertexarray3[firstSrcIdx + off]));
+        if (srcob->vertexarray1)
+            destob->vertexarray1[firstDestIdx + off] = srcob->vertexarray1[firstSrcIdx + off];
+        if (srcob->vertexarray2)
+            destob->vertexarray2[firstDestIdx + off] = srcob->vertexarray2[firstSrcIdx + off];
+        if (srcob->vertexarray3)
+            destob->vertexarray3[firstDestIdx + off] = srcob->vertexarray3[firstSrcIdx + off];
     }
 }
 
@@ -823,8 +805,8 @@ ob_t* terrainSplitOb(ob_t * object)
             {
                 storedPtIdxArr[curNewPtIdx] = idx;
                 storedIdx = curNewPtIdx;
-                copyPoint(&(pttmp[curNewPtIdx]), &(object->vertex[idx]));
-                copyPoint(&(snorm[curNewPtIdx]), &(object->norm[idx]));
+                pttmp[curNewPtIdx] = object->vertex[idx];
+                snorm[curNewPtIdx] = object->norm[idx];
                 curNewPtIdx++;
             }
 
@@ -929,7 +911,7 @@ ob_t* splitOb(ob_t *object)
                 /** find vertices of the triangle */
                 for (int i = 0; i < 3; i++)
                 {
-                    copyTexCoord(&curvertex[i], &(object->vertexarray[curvert+i]));
+                    curvertex[i] = object->vertexarray[curvert+i];
 
                     curstoredidx[i] = findIndice(curvertex[i].indice, oldva, numptstored);
                 }
@@ -973,8 +955,8 @@ ob_t* splitOb(ob_t *object)
 
                         if (curstoredidx[i] == -1)
                         {
-                            copyPoint(&(workob->vertex[numptstored]), &(object->vertex[curvertex[i].indice]));
-                            copyPoint(&(workob->snorm[numptstored]), &(object->norm[curvertex[i].indice]));
+                            workob->vertex[numptstored] = object->vertex[curvertex[i].indice];
+                            workob->snorm[numptstored] = object->norm[curvertex[i].indice];
 
                             clearSavedInVertexArrayEntry(object, curvert+i);
 

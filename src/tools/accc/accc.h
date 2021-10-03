@@ -70,8 +70,6 @@ struct point_t
     double z;
 };
 
-void copyPoint(point_t * dest, point_t * src);
-
 struct tcoord_t
 {
     int indice;
@@ -80,7 +78,6 @@ struct tcoord_t
     int saved;
 };
 
-void copyTexCoord(tcoord_t * dest, tcoord_t * src);
 void storeTexCoord(tcoord_t * dest, int indice, double u, double v, int saved);
 
 struct ob_t
