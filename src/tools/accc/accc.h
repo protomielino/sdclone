@@ -95,6 +95,7 @@ typedef struct ob
     char * texture1;
     char * texture2;
     char * texture3;
+    int dataSize;
     char * data;
     double texrep_x;
     double texrep_y;

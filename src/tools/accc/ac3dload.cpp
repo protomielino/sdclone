@@ -386,6 +386,7 @@ ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj, ob_t * tmpob)
     retob->attrSurf = srcobj->attrSurf;
     retob->attrMat = srcobj->attrMat;
 
+    retob->dataSize = srcobj->dataSize;
     if (srcobj->data)
         retob->data = strdup(srcobj->data);
 
@@ -768,6 +769,7 @@ ob_t* terrainSplitOb(ob_t * object)
         tob->numsurf = numNewSurf;
         tob->attrSurf = object->attrSurf;
         tob->attrMat = object->attrMat;
+        tob->dataSize = object->dataSize;
         if (object->data)
             tob->data = strdup(object->data);
         tob->type = strdup(object->type);
@@ -1170,10 +1172,14 @@ int doData(char *Line, ob_t *object, mat_t *material)
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown Loc format %s\n", Line);
+        fprintf(stderr, "unknown data format %s\n", Line);
         return (-1);
     }
-    object->next->data = strdup(p);
+    if (sscanf(p, "%d", &object->next->dataSize) != 1)
+    {
+        fprintf(stderr, "invalid data format %s\n", p);
+        return (-1);
+    }
     return (0);
 }
 
@@ -1578,6 +1584,27 @@ int loadAC(const char * inputFilename, const char * outputFilename)
             ret = doVerb(Line, current_ob, current_material);
             if(ret != 0)
                 break;
+            // data section has the data on the following line(s)
+            if (stricmp("data", verbTab[i].verb) == 0)
+            {
+                size_t dataSize = 0;
+                char * data = (char *)calloc(1, current_ob->next->dataSize + 1);
+                while (dataSize < current_ob->next->dataSize)
+                {
+                    fgets(Line, sizeof(Line), file);
+                    size_t lineSize = strlen(Line);
+                    // the '\n' of the last line is not included
+                    if ((dataSize + lineSize) > current_ob->next->dataSize && Line[lineSize - 1] == '\n')
+                    {
+                        Line[lineSize - 1] = 0;
+                        lineSize--;
+                    }
+                    dataSize += lineSize;
+                    strcat(data, Line);
+                }
+                current_ob->next->data = strdup(data);
+                free(data);
+            }
         }
     }
     fclose(file);
@@ -2449,12 +2476,11 @@ void smoothTriNorm(ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        if (tmpob->data)
-            if (!strstr(tmpob->data, "nosmooth"))
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
+        if (tmpob->data && !strstr(tmpob->data, "nosmooth"))
+        {
+            tmpob = tmpob->next;
+            continue;
+        }
         tmpob1 = object;
         while (tmpob1 != NULL)
         {
@@ -2473,13 +2499,11 @@ void smoothTriNorm(ob_t * object)
                 tmpob1 = tmpob1->next;
                 continue;
             }
-            if (tmpob1->data)
-                if (!strstr(tmpob1->data, "nosmooth"))
-                {
-                    tmpob1 = tmpob1->next;
-                    continue;
-                }
-
+            if (tmpob1->data && !strstr(tmpob1->data, "nosmooth"))
+            {
+                tmpob1 = tmpob1->next;
+                continue;
+            }
             for (int i = 0; i < tmpob->numvert; i++)
             {
                 for (int j = 0; j < tmpob1->numvert; j++)
@@ -2577,12 +2601,11 @@ void smoothTriNorm(ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        if (tmpob->data)
-            if (!strstr(tmpob->data, "nosmooth"))
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
+        if (tmpob->data && !strstr(tmpob->data, "nosmooth"))
+        {
+            tmpob = tmpob->next;
+            continue;
+        }
         tmpob1 = object;
         while (tmpob1 != NULL)
         {
@@ -2601,13 +2624,11 @@ void smoothTriNorm(ob_t * object)
                 tmpob1 = tmpob1->next;
                 continue;
             }
-            if (tmpob1->data)
-                if (!strstr(tmpob1->data, "nosmooth"))
-                {
-                    tmpob1 = tmpob1->next;
-                    continue;
-                }
-
+            if (tmpob1->data && !strstr(tmpob1->data, "nosmooth"))
+            {
+                tmpob1 = tmpob1->next;
+                continue;
+            }
             tmpob1 = tmpob1->next;
         }
         tmpob = tmpob->next;
@@ -4777,6 +4798,7 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     tobS->name = (char *) malloc(strlen(nameS) + 1);
     tobS->texture = strdup(nameS);
     tobS->type = ob1->type ? strdup(ob1->type) : NULL;
+    tobS->dataSize = ob1->dataSize;
     tobS->data = ob1->data ? strdup(ob1->data) : NULL;
 
     memcpy(tobS->vertex, ob1->vertex, ob1->numvert * sizeof(point_t));
@@ -5010,7 +5032,7 @@ int mergeSplitted(ob_t **object)
             tob = tob->next;
             continue;
         }
-        printf("need merge for %s : %d objects found \n", tob->name, k + 1);
+        printf("need merge for %s : %d objects found\n", tob->name, k + 1);
 
         /* we know that nameS has k+1 objects and need to be merged */
 
@@ -5034,6 +5056,7 @@ int mergeSplitted(ob_t **object)
         tobS->name=(char *) malloc(strlen(nameS)+1);
         tobS->texture=strdup(nameS);
         tobS->type= tob->type ? strdup(tob->type) : NULL;
+        tobS->dataSize = tob->dataSize;
         tobS->data=strdup(tob->data);
 
         memcpy(tobS->vertex, tob->vertex,tob->numvert*sizeof(point_t));
