@@ -237,8 +237,6 @@ void mapNormalToSphere(ob_t * object);
 void mapNormalToSphere2(ob_t * object);
 void normalMap(ob_t * object);
 void mapTextureEnv(ob_t * object);
-ob_t ob[10000];
-/*mat_t  material[10000];*/
 mat_t * root_material = NULL;
 point_t tmpPoint[100000];
 tcoord_t tmpva[100000];
@@ -268,11 +266,11 @@ int numvertice = 0;
 char tex[256][256];
 int texnum = 0;
 double smooth_angle = 70.0;
-typedef struct verbaction
+struct verbaction_t
 {
     const char * verb;
     int (*doVerb)(char * Line, ob_t *object, mat_t * material);
-} verbaction_t;
+};
 
 int doMaterial(char *Line, ob_t *object, mat_t *material);
 int doObject(char *Line, ob_t *object, mat_t *material);

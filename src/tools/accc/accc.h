@@ -63,27 +63,27 @@ int loadAC(const char * inputFilename, const char * outputFilename = NULL);
 #define _AC3DTOAC3DS 6
 #define _AC3DTOAC3DGROUP 7
 
-typedef struct point
+struct point_t
 {
     double x;
     double y;
     double z;
-} point_t;
+};
 
 void copyPoint(point_t * dest, point_t * src);
 
-typedef struct tcoord
+struct tcoord_t
 {
     int indice;
     double u;
     double v;
     int saved;
-} tcoord_t;
+};
 
 void copyTexCoord(tcoord_t * dest, tcoord_t * src);
 void storeTexCoord(tcoord_t * dest, int indice, double u, double v, int saved);
 
-typedef struct ob
+struct ob_t
 {
     char * name;
     char * type;
@@ -131,7 +131,7 @@ typedef struct ob
     double * textarray2;
     double * textarray3;
     int * surfrefs;
-    struct ob * next;
+    ob_t * next;
     double x_min;
     double y_min;
     double z_min;
@@ -139,13 +139,13 @@ typedef struct ob
     double y_max;
     double z_max;
     double dist_min;
-    struct ob* ob1;
-    struct ob* ob2;
-    struct ob* ob3;
+    ob_t* ob1;
+    ob_t* ob2;
+    ob_t* ob3;
     int saved;
     int kids_o;
     int inkids_o;
-} ob_t;
+};
 
 /** Creates an instance of the ob_t struct and zeroes it.
  */
@@ -185,32 +185,31 @@ void obCopyTextureNames(ob_t * destob, ob_t * srcob);
  */
 void obSetVertexArraysIndex(ob_t * ob, int vaIdx, int newIndex);
 
-typedef struct ob_groups
+struct ob_groups_t
 {
-    struct ob * kids;
+    ob_t * kids;
     int numkids;
-    struct ob * tkmn;
+    ob_t * tkmn;
     char * name;
     int tkmnlabel;
-    struct ob * kids0;
+    ob_t * kids0;
     int numkids0;
-    struct ob * kids1;
+    ob_t * kids1;
     int numkids1;
-    struct ob * kids2;
+    ob_t * kids2;
     int numkids2;
-    struct ob * kids3;
+    ob_t * kids3;
     int numkids3;
+};
 
-} ob_groups_t;
-
-typedef struct col
+struct color_t
 {
     double r;
     double g;
     double b;
-} color_t;
+};
 
-typedef struct mat
+struct mat_t
 {
     char * name;
     color_t rgb;
@@ -219,8 +218,8 @@ typedef struct mat
     color_t spec;
     double shi;
     double trans;
-    struct mat * next;
-} mat_t;
+    mat_t * next;
+};
 
 /** Copies a single surface from the "vertexarray" attributes of srcob to the ones of destob.
  *  It decides whether to copy multitexture data based on srcob's "vertexarray" attributes.
