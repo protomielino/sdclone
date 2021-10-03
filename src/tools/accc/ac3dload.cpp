@@ -71,22 +71,22 @@ ob_t * obCreate()
 
 void obFree(ob_t *o)
 {
-    freez(o->name);
-    freez(o->type);
-    freez(o->texture);
-    freez(o->vertex);
-    freez(o->norm);
-    freez(o->snorm);
-    freez(o->vertexarray);
-    freez(o->vertexarray1);
-    freez(o->vertexarray2);
-    freez(o->vertexarray3);
-    freez(o->textarray);
-    freez(o->textarray1);
-    freez(o->textarray2);
-    freez(o->textarray3);
-    freez(o->data);
-    freez(o->surfrefs);
+    free(o->name);
+    free(o->type);
+    free(o->texture);
+    free(o->vertex);
+    free(o->norm);
+    free(o->snorm);
+    free(o->vertexarray);
+    free(o->vertexarray1);
+    free(o->vertexarray2);
+    free(o->vertexarray3);
+    free(o->textarray);
+    free(o->textarray1);
+    free(o->textarray2);
+    free(o->textarray3);
+    free(o->data);
+    free(o->surfrefs);
 }
 
 ob_t * obAppend(ob_t * destob, ob_t * srcob)
@@ -998,8 +998,8 @@ ob_t* splitOb(ob_t *object)
 
     } // while (mustcontinue == 1)
 
-    freez(tri);
-    freez(oldva);
+    free(tri);
+    free(oldva);
     obFree(workob);
 
     return tob0;
@@ -4877,21 +4877,21 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
 
     ob1->numsurf = tobS.numsurf;
     ob1->numvert = tobS.numvert;
-    freez(ob1->vertexarray);
+    free(ob1->vertexarray);
     ob1->vertexarray = tobS.vertexarray;
-    freez(ob1->norm);
+    free(ob1->norm);
     ob1->norm = tobS.norm;
-    freez(ob1->snorm);
+    free(ob1->snorm);
     ob1->snorm = tobS.snorm;
-    freez(ob1->vertex);
+    free(ob1->vertex);
     ob1->vertex = tobS.vertex;
-    freez(ob1->textarray);
+    free(ob1->textarray);
     ob1->textarray = tobS.textarray;
-    freez(ob1->textarray1);
+    free(ob1->textarray1);
     ob1->textarray1 = tobS.textarray1;
-    freez(ob1->textarray2);
+    free(ob1->textarray2);
     ob1->textarray2 = tobS.textarray2;
-    freez(ob1->textarray3);
+    free(ob1->textarray3);
     ob1->textarray3 = tobS.textarray3;
     return ob1;
 }

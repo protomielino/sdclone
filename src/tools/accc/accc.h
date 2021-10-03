@@ -312,7 +312,6 @@ extern int splitObjectsDuringLoad;
 ob_t * splitObjects(ob_t* object);
 double findDistmin(ob_t * ob1, ob_t *ob2);
 
-#define freez(x) {if ((x)) free((x)); }
 #define SPLITX 75
 #define SPLITY 75
 #define MINVAL 0.001
