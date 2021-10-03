@@ -842,7 +842,7 @@ void SDCar::updateCar(tSituation *s, tCarElt *CurCar, int current, int driver)
         if (driver || car != CurCar)
         {
             this->SteerSelector->setSingleChildOn(0);
-            steerangle = (-steerangle * 1.2);
+            steerangle = (-steerangle * steerMovt);
             osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
             this->SteerRot->setMatrix(rotation);
         }
@@ -851,7 +851,7 @@ void SDCar::updateCar(tSituation *s, tCarElt *CurCar, int current, int driver)
             if (nSteer > 1)
             {
                 this->SteerSelector->setSingleChildOn(1);
-                steerangle = (-steerangle * 1.2);
+                steerangle = (-steerangle * steerMovt);
                 osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
                 this->SteerRot2->setMatrix(rotation);
                 GfLogDebug(" # update steer branch\n");
