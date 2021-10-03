@@ -626,8 +626,7 @@ int doObject(char *Line, ob_t *object, mat_t *material)
     char name[256];
     ob_t * objectt, *t1;
 
-    objectt = (ob_t*) malloc(sizeof(ob_t));
-    memset(objectt, '\0', sizeof(ob_t));
+    objectt = obCreate();
     objectt->x_min = 1000000;
     objectt->y_min = 1000000;
     objectt->z_min = 1000000;
