@@ -4571,7 +4571,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        if (!strcmp(tmpob->name, "world"))
+        if (!strcmp(tmpob->name, "world") || (tmpob->type && !strcmp(tmpob->type, "world") && tmpob->numvert == 0 && tmpob->numsurf == 0))
         {
             tmpob = tmpob->next;
             continue;
