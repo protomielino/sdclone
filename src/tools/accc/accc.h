@@ -68,6 +68,13 @@ struct point_t
     double x;
     double y;
     double z;
+
+    void set(double _x, double _y, double _z)
+    {
+        x = _x;
+        y = _y;
+        z = _z;
+    }
 };
 
 struct tcoord_t
@@ -76,9 +83,15 @@ struct tcoord_t
     double u;
     double v;
     int saved;
-};
 
-void storeTexCoord(tcoord_t * dest, int indice, double u, double v, int saved);
+    void set(int _indice, double _u, double _v, int _saved)
+    {
+        indice = _indice;
+        u = _u;
+        v = _v;
+        saved = _saved;
+     }
+};
 
 struct ob_t
 {

@@ -51,16 +51,6 @@
 #define REFS     "refs"
 #define CREASE   "crease"
 
-#define SetPoint(p, a, b, c) (p).x = a; (p).y = b; (p).z = c;
-
-void storeTexCoord(tcoord_t * dest, int indice, double u, double v, int saved)
-{
-    dest->indice = indice;
-    dest->u = u;
-    dest->v = v;
-    dest->saved = saved;
-}
-
 ob_t * obCreate()
 {
     ob_t * ob = (ob_t *) malloc(sizeof(ob_t));
@@ -398,8 +388,7 @@ void copyTexChannel(double * desttextarray, tcoord_t * destvertexarray, tcoord_t
     desttextarray[destptidx * 2] = srcvert->u;
     desttextarray[destptidx * 2 + 1] = srcvert->v;
 
-    storeTexCoord(&(destvertexarray[destvertidx]),
-            storedptidx, srcvert->u, srcvert->v, 0);
+    destvertexarray[destvertidx].set(storedptidx, srcvert->u, srcvert->v, 0);
 }
 
 void copySingleVertexData(ob_t * destob, ob_t * srcob,
