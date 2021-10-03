@@ -1558,20 +1558,24 @@ int loadAC(const char * inputFilename, const char * outputFilename)
             // data section has the data on the following line(s)
             if (stricmp("data", verbTab[i].verb) == 0)
             {
-                size_t dataSize = 0;
+                int dataSize = 0;
                 char * data = (char *)calloc(1, current_ob->next->dataSize + 1);
                 while (dataSize < current_ob->next->dataSize)
                 {
-                    fgets(Line, sizeof(Line), file);
-                    size_t lineSize = strlen(Line);
-                    // the '\n' of the last line is not included
-                    if ((dataSize + lineSize) > current_ob->next->dataSize && Line[lineSize - 1] == '\n')
+                    if (fgets(Line, sizeof(Line), file))
                     {
-                        Line[lineSize - 1] = 0;
-                        lineSize--;
+                        int lineSize = (int)strlen(Line);
+                        // the '\n' of the last line is not included
+                        if ((dataSize + lineSize) > current_ob->next->dataSize && Line[lineSize - 1] == '\n')
+                        {
+                            Line[lineSize - 1] = 0;
+                            lineSize--;
+                        }
+                        dataSize += lineSize;
+                        strcat(data, Line);
                     }
-                    dataSize += lineSize;
-                    strcat(data, Line);
+                    else
+                        break;
                 }
                 current_ob->next->data = strdup(data);
                 free(data);
