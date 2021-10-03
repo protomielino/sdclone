@@ -91,7 +91,7 @@ void loadAndGroup(const char *OutputFileName)
 
     smoothTriNorm(ob0);
 
-    printf("collapsing textures \n");
+    printf("collapsing textures\n");
     fprintf(stderr, "\ncollapsing textures\n");
 
     collapseTextures(ob0, ob1, ob2, ob3);
@@ -237,7 +237,7 @@ void loadAndGroup(const char *OutputFileName)
         }
         if (good_group == -1)
         {
-            printf("an object in no group %s \n", tmpob->name);
+            printf("an object in no group %s\n", tmpob->name);
             tmpob = tmpob->next;
             continue;
         }

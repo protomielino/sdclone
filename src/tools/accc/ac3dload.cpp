@@ -623,7 +623,7 @@ int doMaterial(char *Line, ob_t *object, mat_t *material)
     p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown MATERIAL format %s \n", Line);
+        fprintf(stderr, "unknown MATERIAL format %s\n", Line);
         free(materialt);
         return (-1);
     }
@@ -635,7 +635,7 @@ int doMaterial(char *Line, ob_t *object, mat_t *material)
             &(materialt->spec.r), &(materialt->spec.g), &(materialt->spec.b),
             &(materialt->shi), &(materialt->trans)) != 15)
     {
-        fprintf(stderr, "invalid MATERIAL format %s \n", p);
+        fprintf(stderr, "invalid MATERIAL format %s\n", p);
         free(materialt);
         return (-1);
     }
@@ -667,13 +667,13 @@ int doObject(char *Line, ob_t *object, mat_t *material)
     p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown OBJECT format %s \n", Line);
+        fprintf(stderr, "unknown OBJECT format %s\n", Line);
         free(objectt);
         return (-1);
     }
     if (sscanf(p, "%255s", name) != 1)
     {
-        fprintf(stderr, "invalid OBJECT format %s \n", p);
+        fprintf(stderr, "invalid OBJECT format %s\n", p);
         free(objectt);
         return (-1);
     }
@@ -704,7 +704,7 @@ ob_t* terrainSplitOb(ob_t * object)
     ob_t * tob = NULL;
     ob_t * tob0 = NULL;
 
-    printf("terrain splitting %s \n", object->name);
+    printf("terrain splitting %s\n", object->name);
     if ((object->x_max - object->x_min) < 2 * distSplit)
         return 0;
     if ((object->y_max - object->y_min) < 2 * distSplit)
@@ -748,7 +748,7 @@ ob_t* terrainSplitOb(ob_t * object)
         }
 
     }
-    printf("found in %s : %d subsurfaces \n", object->name, numNewObjs);
+    printf("found in %s : %d subsurfaces\n", object->name, numNewObjs);
 
     for (int curNewObj = 0; curNewObj < numNewObjs; curNewObj++)
     {
@@ -1010,7 +1010,7 @@ ob_t* splitOb(ob_t *object)
         // prepend the new object to the list
         tob0 = obAppend(tob, tob0);
 
-        printf("numtri = %d on orignumtris =%d \n", numtristored, orignumtris);
+        printf("numtri = %d on orignumtris = %d\n", numtristored, orignumtris);
 
     } // while (mustcontinue == 1)
 
@@ -1027,12 +1027,12 @@ int doKids(char* Line, ob_t* object, mat_t* material)
     char *p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown Kids format %s \n", Line);
+        fprintf(stderr, "unknown Kids format %s\n", Line);
         return (-1);
     }
     if (sscanf(p, "%d", &kids) != 1)
     { 
-        fprintf(stderr, "invalid Kids format %s \n", p);
+        fprintf(stderr, "invalid Kids format %s\n", p);
         return (-1);
     }
 
@@ -1074,7 +1074,7 @@ int doKids(char* Line, ob_t* object, mat_t* material)
                 || typeConvertion == _AC3DTOAC3DGROUP
                 || (typeConvertion == _AC3DTOAC3D && (extendedTriangles == 1)))
         {
-            printf("Computing normals for %s \n", object->next->name);
+            printf("Computing normals for %s\n", object->next->name);
             computeObjectTriNorm(object->next);
             //smoothObjectTriNorm(object->next );
         }
@@ -1101,7 +1101,7 @@ int doName(char *Line, ob_t *object, mat_t *material)
     p = strstr(Line, "\"");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown name format %s \n", Line);
+        fprintf(stderr, "unknown name format %s\n", Line);
         return (-1);
     }
     else
@@ -1152,13 +1152,13 @@ int doLoc(char *Line, ob_t *object, mat_t *material)
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown Loc format %s \n", Line);
+        fprintf(stderr, "unknown Loc format %s\n", Line);
         return (-1);
     }
     if (sscanf(p, "%lf %lf %lf", &(object->next->loc.x), &(object->next->loc.y),
         &(object->next->loc.z)) != 3)
     {
-        fprintf(stderr, "invalid Loc format %s \n", p);
+        fprintf(stderr, "invalid Loc format %s\n", p);
         return (-1);
     }
 
@@ -1170,7 +1170,7 @@ int doData(char *Line, ob_t *object, mat_t *material)
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown Loc format %s \n", Line);
+        fprintf(stderr, "unknown Loc format %s\n", Line);
         return (-1);
     }
     object->next->data = strdup(p);
@@ -1188,12 +1188,12 @@ int doTexture(char *Line, ob_t *object, mat_t *material)
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown texture format %s \n", Line);
+        fprintf(stderr, "unknown texture format %s\n", Line);
         return (-1);
     }
     if (sscanf(p, "%255s", name) != 1)
     {
-        fprintf(stderr, "invalid texture format %s \n", p);
+        fprintf(stderr, "invalid texture format %s\n", p);
         return (-1);
     }
 
@@ -1217,12 +1217,12 @@ int doTexrep(char *Line, ob_t *object, mat_t *material)
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown Texrep format %s \n", Line);
+        fprintf(stderr, "unknown Texrep format %s\n", Line);
         return (-1);
     }
     if (sscanf(p, "%lf %lf", &(object->next->texrep_x), &(object->next->texrep_y)) != 2)
     {
-        fprintf(stderr, "invalid Texrep format %s \n", p);
+        fprintf(stderr, "invalid Texrep format %s\n", p);
         return (-1);
     }
 
@@ -1234,12 +1234,12 @@ int doNumvert(char *Line, ob_t *object, mat_t *material)
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown numvert format %s \n", Line);
+        fprintf(stderr, "unknown numvert format %s\n", Line);
         return (-1);
     }
     if (sscanf(p, "%d", &(object->next->numvert)) != 1)
     {
-        fprintf(stderr, "invalid numvert format %s \n", p);
+        fprintf(stderr, "invalid numvert format %s\n", p);
         return (-1);
     }
     object->next->vertex = (point_t *) malloc(
@@ -1254,12 +1254,12 @@ int doNumsurf(char *Line, ob_t *object, mat_t *material)
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown numsurf format %s \n", Line);
+        fprintf(stderr, "unknown numsurf format %s\n", Line);
         return (-1);
     }
     if (sscanf(p, "%d", &(object->next->numsurf)) != 1)
     {
-        fprintf(stderr, "invalid numsurf format %s \n", p);
+        fprintf(stderr, "invalid numsurf format %s\n", p);
         return (-1);
     }
     numvertFound = 0;
@@ -1272,7 +1272,7 @@ int doGetVertex(char *Line, ob_t *object, mat_t *material)
         &(object->next->vertex[numvertex].z),
         &(object->next->vertex[numvertex].y)) != 3)
     {
-        fprintf(stderr, "invalid vertex format %s \n", Line);
+        fprintf(stderr, "invalid vertex format %s\n", Line);
         return (-1);
     }
     object->next->vertex[numvertex].x += object->next->loc.x;
@@ -1307,7 +1307,7 @@ int doGetSurf(char *Line, ob_t *object, mat_t *material)
     if (sscanf(Line, "%d %lf %lf ", &(tmpva[numvertice].indice),
         &(tmpva[numvertice].u), &(tmpva[numvertice].v)) != 3)
     {
-        fprintf(stderr, "invalid surf format %s \n", Line);
+        fprintf(stderr, "invalid surf format %s\n", Line);
         return (-1);
     }
     /*fprintf(stderr,"numrefs = %d \n",numrefs);*/
@@ -1326,12 +1326,12 @@ int doSurf(char *Line, ob_t *object, mat_t *material)
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown SURF format %s \n", Line);
+        fprintf(stderr, "unknown SURF format %s\n", Line);
         return (-1);
     }
     if (sscanf(p, "%x", &attrSurf) != 1)
     {
-        fprintf(stderr, "invalid SURF format %s \n", p);
+        fprintf(stderr, "invalid SURF format %s\n", p);
         return (-1);
     }
     numvertFound = 0;
@@ -1343,12 +1343,12 @@ int doMat(char *Line, ob_t *object, mat_t *material)
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown mat format %s \n", Line);
+        fprintf(stderr, "unknown mat format %s\n", Line);
         return (-1);
     }
     if (sscanf(p, "%d", &attrMat) != 1)
     {
-        fprintf(stderr, "invalid mat format %s \n", p);
+        fprintf(stderr, "invalid mat format %s\n", p);
         return (-1);
     }
     numvertFound = 0;
@@ -1360,12 +1360,12 @@ int doRefs(char *Line, ob_t *object, mat_t *material)
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
-        fprintf(stderr, "unknown Refs format %s \n", Line);
+        fprintf(stderr, "unknown Refs format %s\n", Line);
         return (-1);
     }
     if (sscanf(p, "%d", &refs) != 1)
     {
-        fprintf(stderr, "invalid Refs format %s \n", p);
+        fprintf(stderr, "invalid Refs format %s\n", p);
         return (-1);
     }
 
@@ -1469,7 +1469,7 @@ ob_t * splitObjects(ob_t* object)
 
         if (isObjectSplit(current_ob))
         {
-            printf("Found in %s, a duplicate coord with not the same u,v, split is required\n",
+            printf("Found in %s, a duplicate coord with different u,v, split is required\n",
                    objname);
 
             splitob = splitOb(current_ob);
@@ -1525,7 +1525,7 @@ int loadAC(const char * inputFilename, const char * outputFilename)
     }
     if (strnicmp(Line, AC3D, strlen(AC3D)))
     {
-        fprintf(stderr, "unknown format %s \n", Line);
+        fprintf(stderr, "unknown format %s\n", Line);
         fclose(file);
         return (-1);
     }
@@ -1877,7 +1877,7 @@ void saveObin3DS( char * OutputFilename, ob_t * object)
         ON_ERROR_RETURN;
         sprintf(matr->name,"texture%d",i);
         /*sprintf(matr->texture.map.name,"texture%d",i);*/
-        printf("analysing  %s \n",tex[i]);
+        printf("analysing  %s\n",tex[i]);
         p=tex[i];
         q=name2;
         while (*p)
@@ -2247,7 +2247,7 @@ int foundNear(ob_t * object, ob_t *allobjects, int dist, int print)
 
     object->kids_o = numfound++;
 
-    /*printf(" object %s (dist=%d) found %d objects \n", object->name, dist, numfound);*/
+    /*printf(" object %s (dist=%d) found %d objects\n", object->name, dist, numfound);*/
     return (0);
 
 }
@@ -2995,7 +2995,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
 
     for (int i = 0; i < texnum; i++)
     {
-        printf("analysing  %s \n", tex[i]);
+        printf("analysing  %s\n", tex[i]);
         p = tex[i];
         q = name2;
         while (*p)
@@ -3173,7 +3173,7 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object)
     for (int i = 0; i < texnum; i++)
     {
 
-        printf("analysing  %s \n", tex[i]);
+        printf("analysing  %s\n", tex[i]);
         p = tex[i];
         q = name2;
         while (*p)
@@ -3316,7 +3316,7 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object)
             continue;
         }
         ind = tmpob->numvert;
-        printf("making obj face for %s \n", tmpob->name);
+        printf("making obj face for %s\n", tmpob->name);
 
         for (int i = 0; i < tmpob->numsurf; i++)
         {
@@ -3692,7 +3692,7 @@ void stripifyOb(ob_t * object, int writeit)
         if (tritotal != object->numsurf)
         {
             printf(
-                    "warning: error nb surf= %d != %d  degenerated triangles %d  tritotal=%d for %s \n",
+                    "warning: error nb surf= %d != %d  degenerated triangles %d  tritotal=%d for %s\n",
                     tritotal, object->numsurf, dege, tritotal - dege,
                     object->name);
         }
@@ -3766,7 +3766,7 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
     for (int i = 0; i < texnum; i++)
     {
 
-        printf("analysing  %s \n", tex[i]);
+        printf("analysing  %s\n", tex[i]);
         p = tex[i];
         q = name2;
         while (*p)
@@ -3909,7 +3909,7 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
             continue;
         }
         ind = tmpob->numvert;
-        printf("making obj face for %s \n", tmpob->name);
+        printf("making obj face for %s\n", tmpob->name);
 
         for (int i = 0; i < tmpob->numsurf; i++)
         {
@@ -4392,7 +4392,7 @@ void normalMap(ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        printf("normalMap : handling %s \n", tmpob->name);
+        printf("normalMap : handling %s\n", tmpob->name);
         for (int i = 0; i < tmpob->numvert; i++)
         {
             tmpob->textarray[i * 2] = (tmpob->vertex[i].x - x_min)
@@ -4474,7 +4474,7 @@ void normalMap01(ob_t * object)
         }
         tmpob->textarray3 = (double *) malloc(
                 sizeof(double) * tmpob->numvert * 2);
-        printf("normalMap : handling %s \n", tmpob->name);
+        printf("normalMap : handling %s\n", tmpob->name);
         for (int i = 0; i < tmpob->numvert; i++)
         {
             tmpob->textarray3[i * 2] = (tmpob->vertex[i].x - x_min)

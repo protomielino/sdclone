@@ -60,7 +60,7 @@ extern double smooth_angle;
 
 void usage(void)
 {
-    fprintf(stderr, "Ac3d Compiler $Revision: 1.4 $ \n");
+    fprintf(stderr, "Ac3d Compiler $Revision: 1.4 $\n");
     fprintf(stderr,
             "Usage: accc [option] <inputfile> <outputfile> [dist][-order \"orderstring\"]<\n");
     /*fprintf(stderr, "-strip : stripify any ac3d output models\n");*/
@@ -72,23 +72,23 @@ void usage(void)
     /*    fprintf(stderr, "+om: ac3d to ac3d : the result is a vertex merged unique obj\n" );
      fprintf(stderr, "                    for smooth car only\n");*/
     fprintf(stderr, "-o: ac3d to obj \n");
-    fprintf(stderr, "+s: ac3d to ac3d with strips (used for cars) \n");
+    fprintf(stderr, "+s: ac3d to ac3d with strips (used for cars)\n");
     fprintf(stderr,
-            "+es <angle_of_smooth>: ac3d to ac3d with strips (used for cars) and extended ac3d file output \n");
+            "+es <angle_of_smooth>: ac3d to ac3d with strips (used for cars) and extended ac3d file output\n");
     fprintf(stderr,
-            "    (computed normals) angle is in degrees : example : +es 80.0 clkdtm_o.ac clkdtm.ac  \n");
+            "    (computed normals) angle is in degrees : example : +es 80.0 clkdtm_o.ac clkdtm.ac\n");
     fprintf(stderr,
-            "    the output file will also contains the secondary textcoord for the env sliding \n");
+            "    the output file will also contains the secondary textcoord for the env sliding\n");
     fprintf(stderr,
-            "+et: ac3d to ac3d with triangles (used for cars) and extended ac3d file output (normals normals) \n");
+            "+et: ac3d to ac3d with triangles (used for cars) and extended ac3d file output (normals normals)\n");
     fprintf(stderr,
-            "+etn: ac3d to ac3d with triangles no split and extended ac3d file output (normals normals) \n");
+            "+etn: ac3d to ac3d with triangles no split and extended ac3d file output (normals normals)\n");
     fprintf(stderr,
-            "+shad: ac3d to ac3d with triangles, create a new ac3d file used for track shading\n   vertical mapping of a single texture \n");
+            "+shad: ac3d to ac3d with triangles, create a new ac3d file used for track shading\n   vertical mapping of a single texture\n");
     fprintf(stderr, "<inputfile>: \n");
     fprintf(stderr, "<oututfile>: \n");
     fprintf(stderr,
-            "-order \"orderstring\": only used with +es , +s and  +et  \n");
+            "-order \"orderstring\": only used with +es , +s and  +et\n");
     fprintf(stderr,
             "       \"orderstring\" is the order of the objects during the save\n");
     fprintf(stderr,
@@ -97,13 +97,13 @@ void usage(void)
     fprintf(stderr,
             "        for imported NFS cars the object name \"HB\" must be used instead\n");
     fprintf(stderr, "        of \":HB\"\n");
-    fprintf(stderr, "-g <outputfile>: for grouping multilayer ac3d track \n");
+    fprintf(stderr, "-g <outputfile>: for grouping multilayer ac3d track\n");
     fprintf(stderr, "     -l0 <input filename> : the base geometry\n");
     fprintf(stderr,
-            "     -l1 <input filename> : the base geometry map-tiled \n");
+            "     -l1 <input filename> : the base geometry map-tiled\n");
     fprintf(stderr,
-            "     -l2 <input filename> : the base geometry skids/and grass details \n");
-    fprintf(stderr, "     -l3 <input filename> : the base geometry shadows \n");
+            "     -l2 <input filename> : the base geometry skids/and grass details\n");
+    fprintf(stderr, "     -l3 <input filename> : the base geometry shadows\n");
     fprintf(stderr, "     -d3 <val> : the max distance of groups in tkmn\n");
     fprintf(stderr, "     -d2 <val> : the distance of group 2 in tkmn\n");
     fprintf(stderr, "     -d1 <val> : the distance of group 1 in tkmn\n");
