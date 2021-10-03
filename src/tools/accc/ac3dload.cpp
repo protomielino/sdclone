@@ -3700,6 +3700,8 @@ void stripifyOb(ob_t * object, int writeit)
         object->numvertice = k;
         object->numsurf = k / 3;
     }
+    else
+        free(stripvertexarray);
     free(StripPoint);
     free(StripStart);
     free(StripLength);
