@@ -99,6 +99,8 @@ void obFree(ob_t *o)
     freez(o->textarray1);
     freez(o->textarray2);
     freez(o->textarray3);
+    freez(o->data);
+    freez(o->surfrefs);
 }
 
 ob_t * obAppend(ob_t * destob, ob_t * srcob)
@@ -3365,7 +3367,6 @@ void stripifyOb(ob_t * object, int writeit)
     char command[256];
     unsigned int NumStrips;
     unsigned int NumStripPoints;
-    void *mem;
     unsigned int * StripPoint;
     unsigned int * StripStart;
     unsigned int * StripLength;
@@ -3450,27 +3451,24 @@ void stripifyOb(ob_t * object, int writeit)
     if (object->name != NULL)
         printf("name=%s stripnumber =%u \n", object->name, NumStrips);
     /* Allocate enough memory for what we just read */
-    if ((mem = malloc(sizeof(unsigned int) * NumStripPoints)) == 0)
+    if ((StripPoint = (unsigned int*)malloc(sizeof(unsigned int) * NumStripPoints)) == 0)
     {
         printf("Problem mallocing while stripifying\n");
         fclose(stripein);
         exit(-1);
     }
-    StripPoint = (unsigned int *) mem;
-    if ((mem = malloc(sizeof(unsigned int) * NumStrips)) == 0)
+    if ((StripStart = (unsigned int*)malloc(sizeof(unsigned int) * NumStrips)) == 0)
     {
         printf("Problem mallocing while stripifying\n");
         fclose(stripein);
         exit(-1);
     }
-    StripStart = (unsigned int *) mem;
-    if ((mem = malloc(sizeof(unsigned int) * NumStrips)) == 0)
+    if ((StripLength = (unsigned int*)malloc(sizeof(unsigned int) * NumStrips)) == 0)
     {
         printf("Problem mallocing while stripifying\n");
         fclose(stripein);
         exit(-1);
     }
-    StripLength = (unsigned int *) mem;
 
     /* Fill the triangle strip lists with the STRIPE data */
     rewind(stripein);
@@ -3713,18 +3711,18 @@ void stripifyOb(ob_t * object, int writeit)
         if (tritotal != object->numsurf)
         {
             printf(
-                    "warning: error nb surf= %d != %d  degenerated triangles %d  tritotal=%d for %s\n",
-                    tritotal, object->numsurf, dege, tritotal - dege,
-                    object->name);
+                "warning: error nb surf= %d != %d  degenerated triangles %d  tritotal=%d for %s\n",
+                tritotal, object->numsurf, dege, tritotal - dege,
+                object->name);
         }
         free(object->vertexarray);
         object->vertexarray = stripvertexarray;
         object->numvertice = k;
         object->numsurf = k / 3;
-        free(StripPoint);
-        free(StripStart);
-        free(StripLength);
     }
+    free(StripPoint);
+    free(StripStart);
+    free(StripLength);
 }
 
 void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
@@ -4768,7 +4766,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
 
 ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
 {
-    ob_t * tobS = NULL;
+    ob_t tobS;
     int oldva1[10000];
     int oldva2[10000];
     int n = 0;
@@ -4777,51 +4775,40 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     printf("merging %s with %s  tri=%d\n", ob1->name, ob2->name, numtri);
     memset(oldva1, -1, sizeof(oldva1));
     memset(oldva2, -1, sizeof(oldva2));
-    tobS = (ob_t *) malloc(sizeof(ob_t));
-    memset(tobS, 0, sizeof(ob_t));
-    tobS->x_min = 1000000;
-    tobS->y_min = 1000000;
-    tobS->z_min = 1000000;
-    tobS->numsurf = ob1->numsurf;
-    tobS->vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numtri * 3);
-    tobS->norm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
-    tobS->snorm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
-    tobS->vertex = (point_t*) malloc(sizeof(point_t) * numtri * 3);
-    memset(tobS->snorm, 0, sizeof(point_t) * numtri * 3);
-    memset(tobS->norm, 0, sizeof(point_t) * numtri * 3);
-    tobS->textarray = (double *) malloc(sizeof(double) * numtri * 2 * 3);
-    tobS->textarray1 = (double *) malloc(sizeof(double) * numtri * 2 * 3);
-    tobS->textarray2 = (double *) malloc(sizeof(double) * numtri * 2 * 3);
-    tobS->textarray3 = (double *) malloc(sizeof(double) * numtri * 2 * 3);
-    tobS->attrSurf = ob1->attrSurf;
-    tobS->attrMat = ob1->attrMat;
-    tobS->name = (char *) malloc(strlen(nameS) + 1);
-    tobS->texture = strdup(nameS);
-    tobS->type = ob1->type ? strdup(ob1->type) : NULL;
-    tobS->dataSize = ob1->dataSize;
-    tobS->data = ob1->data ? strdup(ob1->data) : NULL;
+    memset(&tobS, 0, sizeof(ob_t));
+    tobS.numsurf = ob1->numsurf;
+    tobS.vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numtri * 3);
+    tobS.norm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
+    tobS.snorm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
+    tobS.vertex = (point_t*) malloc(sizeof(point_t) * numtri * 3);
+    memset(tobS.snorm, 0, sizeof(point_t) * numtri * 3);
+    memset(tobS.norm, 0, sizeof(point_t) * numtri * 3);
+    tobS.textarray = (double *) malloc(sizeof(double) * numtri * 2 * 3);
+    tobS.textarray1 = (double *) malloc(sizeof(double) * numtri * 2 * 3);
+    tobS.textarray2 = (double *) malloc(sizeof(double) * numtri * 2 * 3);
+    tobS.textarray3 = (double *) malloc(sizeof(double) * numtri * 2 * 3);
 
-    memcpy(tobS->vertex, ob1->vertex, ob1->numvert * sizeof(point_t));
-    memcpy(tobS->vertexarray, ob1->vertexarray,
+    memcpy(tobS.vertex, ob1->vertex, ob1->numvert * sizeof(point_t));
+    memcpy(tobS.vertexarray, ob1->vertexarray,
             ob1->numsurf * sizeof(tcoord_t) * 3);
-    memcpy(tobS->textarray, ob1->textarray,
+    memcpy(tobS.textarray, ob1->textarray,
             ob1->numvert * sizeof(double) * 2);
-    memcpy(tobS->norm, ob1->norm, ob1->numvert * sizeof(point_t));
-    memcpy(tobS->snorm, ob1->snorm, ob1->numvert * sizeof(point_t));
+    memcpy(tobS.norm, ob1->norm, ob1->numvert * sizeof(point_t));
+    memcpy(tobS.snorm, ob1->snorm, ob1->numvert * sizeof(point_t));
 
     if (ob1->texture1)
     {
-        memcpy(tobS->textarray1, ob1->textarray1,
+        memcpy(tobS.textarray1, ob1->textarray1,
                 ob1->numvert * 2 * sizeof(double));
     }
     if (ob1->texture2)
     {
-        memcpy(tobS->textarray2, ob1->textarray2,
+        memcpy(tobS.textarray2, ob1->textarray2,
                 ob1->numvert * 2 * sizeof(double));
     }
     if (ob1->texture3)
     {
-        memcpy(tobS->textarray3, ob1->textarray3,
+        memcpy(tobS.textarray3, ob1->textarray3,
                 ob1->numvert * 2 * sizeof(double));
     }
 
@@ -4846,47 +4833,47 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
         if (oldva1[i] == -1)
         {
             oldva1[i] = n;
-            tobS->textarray[n * 2] = ob2->textarray[i * 2];
-            tobS->textarray[n * 2 + 1] = ob2->textarray[i * 2 + 1];
+            tobS.textarray[n * 2] = ob2->textarray[i * 2];
+            tobS.textarray[n * 2 + 1] = ob2->textarray[i * 2 + 1];
             if (ob2->texture1)
             {
-                tobS->textarray1[n * 2] = ob2->textarray1[i * 2];
-                tobS->textarray1[n * 2 + 1] = ob2->textarray1[i * 2 + 1];
+                tobS.textarray1[n * 2] = ob2->textarray1[i * 2];
+                tobS.textarray1[n * 2 + 1] = ob2->textarray1[i * 2 + 1];
             }
             if (ob2->texture2)
             {
-                tobS->textarray2[n * 2] = ob2->textarray2[i * 2];
-                tobS->textarray2[n * 2 + 1] = ob2->textarray2[i * 2 + 1];
+                tobS.textarray2[n * 2] = ob2->textarray2[i * 2];
+                tobS.textarray2[n * 2 + 1] = ob2->textarray2[i * 2 + 1];
             }
             if (ob2->texture3)
             {
-                tobS->textarray3[n * 2] = ob2->textarray3[i * 2];
-                tobS->textarray3[n * 2 + 1] = ob2->textarray3[i * 2 + 1];
+                tobS.textarray3[n * 2] = ob2->textarray3[i * 2];
+                tobS.textarray3[n * 2 + 1] = ob2->textarray3[i * 2 + 1];
             }
-            tobS->snorm[n].x = ob2->snorm[i].x;
-            tobS->snorm[n].y = ob2->snorm[i].y;
-            tobS->snorm[n].z = ob2->snorm[i].z;
-            tobS->norm[n].x = ob2->norm[i].x;
-            tobS->norm[n].y = ob2->norm[i].y;
-            tobS->norm[n].z = ob2->norm[i].z;
-            tobS->vertex[n].x = ob2->vertex[i].x;
-            tobS->vertex[n].y = ob2->vertex[i].y;
-            tobS->vertex[n].z = ob2->vertex[i].z;
+            tobS.snorm[n].x = ob2->snorm[i].x;
+            tobS.snorm[n].y = ob2->snorm[i].y;
+            tobS.snorm[n].z = ob2->snorm[i].z;
+            tobS.norm[n].x = ob2->norm[i].x;
+            tobS.norm[n].y = ob2->norm[i].y;
+            tobS.norm[n].z = ob2->norm[i].z;
+            tobS.vertex[n].x = ob2->vertex[i].x;
+            tobS.vertex[n].y = ob2->vertex[i].y;
+            tobS.vertex[n].z = ob2->vertex[i].z;
 
             n++;
         }
     }
-    tobS->numvert = n;
+    tobS.numvert = n;
     for (int i = 0; i < ob2->numsurf; i++)
     {
         int found = FALSE;
         for (int j = 0; j < ob1->numsurf; j++)
         {
-            if (tobS->vertexarray[j * 3].indice
+            if (tobS.vertexarray[j * 3].indice
                     == oldva1[ob2->vertexarray[i * 3].indice]
-                    && tobS->vertexarray[j * 3 + 1].indice
+                    && tobS.vertexarray[j * 3 + 1].indice
                             == oldva1[ob2->vertexarray[i * 3 + 1].indice]
-                    && tobS->vertexarray[j * 3 + 2].indice
+                    && tobS.vertexarray[j * 3 + 2].indice
                             == oldva1[ob2->vertexarray[i * 3 + 2].indice])
             {
                 /* this face is OK */
@@ -4896,36 +4883,36 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
         }
         if (found == FALSE)
         {
-            int k = tobS->numsurf;
+            int k = tobS.numsurf;
             /* add the triangle */
-            tobS->vertexarray[k * 3].indice =
+            tobS.vertexarray[k * 3].indice =
                     oldva1[ob2->vertexarray[i * 3].indice];
-            tobS->vertexarray[k * 3 + 1].indice = oldva1[ob2->vertexarray[i * 3
+            tobS.vertexarray[k * 3 + 1].indice = oldva1[ob2->vertexarray[i * 3
                     + 1].indice];
-            tobS->vertexarray[k * 3 + 2].indice = oldva1[ob2->vertexarray[i * 3
+            tobS.vertexarray[k * 3 + 2].indice = oldva1[ob2->vertexarray[i * 3
                     + 2].indice];
-            tobS->numsurf++;
+            tobS.numsurf++;
         }
     }
 
-    ob1->numsurf = tobS->numsurf;
-    ob1->numvert = tobS->numvert;
+    ob1->numsurf = tobS.numsurf;
+    ob1->numvert = tobS.numvert;
     freez(ob1->vertexarray);
-    ob1->vertexarray = tobS->vertexarray;
+    ob1->vertexarray = tobS.vertexarray;
     freez(ob1->norm);
-    ob1->norm = tobS->norm;
+    ob1->norm = tobS.norm;
     freez(ob1->snorm);
-    ob1->snorm = tobS->snorm;
+    ob1->snorm = tobS.snorm;
     freez(ob1->vertex);
-    ob1->vertex = tobS->vertex;
+    ob1->vertex = tobS.vertex;
     freez(ob1->textarray);
-    ob1->textarray = tobS->textarray;
+    ob1->textarray = tobS.textarray;
     freez(ob1->textarray1);
-    ob1->textarray1 = tobS->textarray1;
+    ob1->textarray1 = tobS.textarray1;
     freez(ob1->textarray2);
-    ob1->textarray2 = tobS->textarray2;
+    ob1->textarray2 = tobS.textarray2;
     freez(ob1->textarray3);
-    ob1->textarray3 = tobS->textarray3;
+    ob1->textarray3 = tobS.textarray3;
     return ob1;
 }
 
