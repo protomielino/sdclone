@@ -346,25 +346,8 @@ void init_args(int argc, char **argv)
     }
 }
 
-/*extern void WindowsSpecInit(void);*/
-void redraw()
-{
-}
-void reshape(int w, int h)
-{
-}
-void keyboard(unsigned char, int, int)
-{
-    exit(0);
-}
-
 int main(int argc, char **argv)
 {
-    // const char *fake_argv[3];
-    // fake_argv[0] = "ac3dto3ds";
-    // fake_argv[1] = "converter";
-    // fake_argv[2] = NULL;
-
     init_args(argc, argv);
 #ifdef _3DS
     extern int load3ds(const char * inputFilename, const char * outputFilename);
