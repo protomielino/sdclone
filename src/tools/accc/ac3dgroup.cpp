@@ -57,7 +57,7 @@ void loadAndGroup(const char *OutputFileName)
     /* disable object splitting during load. We split them
      * after merging the texture channels.
      */
-    splitObjectsDuringLoad = 0;
+    splitObjectsDuringLoad = false;
 
     if (fileL0)
     {

@@ -45,17 +45,16 @@ char * OrderString = NULL;
 int d1 = 0;
 int d2 = 0;
 int d3 = 0;
-int useStrip = 0;
-int extendedStrips = 0;
-int extendedEnvCoord = 0;
-int isobjectacar = 0;
-int extendedTriangles = 0;
-int notexturesplit = 0;
-int collapseObject = 0;
-int splitObjectsDuringLoad = 1;
+bool extendedStrips = false;
+bool extendedEnvCoord = false;
+bool isobjectacar = false;
+bool extendedTriangles = false;
+bool notexturesplit = false;
+bool collapseObject = false;
+bool splitObjectsDuringLoad = true;
 conv_t typeConvertion = _UNSPECIFIED;
 int far_dist = 10000;
-int normalMapping = 0;
+bool normalMapping = false;
 extern double smooth_angle;
 
 void usage(void)
@@ -140,10 +139,10 @@ void init_args(int argc, char **argv)
     else if (!strcmp(argv[1], "+es"))
     {
         typeConvertion = _AC3DTOAC3DS;
-        isobjectacar = 1;
-        extendedStrips = 1;
-        extendedEnvCoord = 1;
-        collapseObject = 1;
+        isobjectacar = true;
+        extendedStrips = true;
+        extendedEnvCoord = true;
+        collapseObject = true;
         if (sscanf(argv[2], "%lf", &smooth_angle) != 1)
         {
             fprintf(stderr, "invalid +es %s\n", argv[2]);
@@ -155,31 +154,31 @@ void init_args(int argc, char **argv)
     else if (!strcmp(argv[1], "+et"))
     {
         typeConvertion = _AC3DTOAC3D;
-        extendedStrips = 0;
-        isobjectacar = 1;
-        extendedEnvCoord = 1;
-        extendedTriangles = 1;
-        collapseObject = 1;
+        extendedStrips = false;
+        isobjectacar = true;
+        extendedEnvCoord = true;
+        extendedTriangles = true;
+        collapseObject = true;
     }
     else if (!strcmp(argv[1], "+etn"))
     {
         typeConvertion = _AC3DTOAC3D;
-        extendedStrips = 0;
-        isobjectacar = 1;
-        extendedEnvCoord = 1;
-        notexturesplit = 0;
-        collapseObject = 1;
-        extendedTriangles = 1;
+        extendedStrips = false;
+        isobjectacar = true;
+        extendedEnvCoord = true;
+        notexturesplit = false;
+        collapseObject = true;
+        extendedTriangles = true;
     }
     else if (!strcmp(argv[1], "+shad"))
     {
         typeConvertion = _AC3DTOAC3D;
-        extendedStrips = 0;
-        isobjectacar = 0;
-        notexturesplit = 1;
-        extendedTriangles = 0;
-        normalMapping = 1;
-        collapseObject = 1;
+        extendedStrips = false;
+        isobjectacar = false;
+        notexturesplit = true;
+        extendedTriangles = false;
+        normalMapping = true;
+        collapseObject = true;
     }
     else if (!strcmp(argv[1], "-g"))
     {
@@ -200,13 +199,13 @@ void init_args(int argc, char **argv)
         {
             if (!strcmp(argv[i], "-es"))
             {
-                extendedStrips = 1;
+                extendedStrips = true;
                 continue;
             }
 
             if (!strcmp(argv[i], "-nts"))
             {
-                notexturesplit = 1;
+                notexturesplit = true;
                 continue;
             }
 

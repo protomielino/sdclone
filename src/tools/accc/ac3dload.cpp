@@ -1041,9 +1041,9 @@ int doKids(char* Line, ob_t* object, mat_t* material)
         }
 
         if ((typeConvertion == _AC3DTOAC3DS
-                && (extendedStrips == 1 || extendedTriangles == 1))
+                && (extendedStrips || extendedTriangles))
                 || typeConvertion == _AC3DTOAC3DGROUP
-                || (typeConvertion == _AC3DTOAC3D && (extendedTriangles == 1)))
+                || (typeConvertion == _AC3DTOAC3D && extendedTriangles))
         {
             printf("Computing normals for %s\n", object->next->name);
             computeObjectTriNorm(object->next);
@@ -1356,7 +1356,7 @@ int doRefs(char *Line, ob_t *object, mat_t *material)
  */
 bool isObjectSplit(ob_t* object)
 {
-    if (notexturesplit == 1)
+    if (notexturesplit)
         return false;
 
     bool same_pt = false, diff_u = false, diff_v = false;
@@ -1991,7 +1991,7 @@ int printOb(ob_t * object)
 
     if (object->numsurf == 0)
         return 0;
-    if (extendedStrips == 0 && normalMapping != 1)
+    if (!extendedStrips && !normalMapping)
         if (!(isobjectacar && collapseObject))
             stripifyOb(object, 0);
     object->saved = 1;
@@ -2022,9 +2022,9 @@ int printOb(ob_t * object)
     for (int i = 0; i < object->numvert; i++)
     {
         if ((typeConvertion == _AC3DTOAC3DS
-                && (extendedStrips == 1 || extendedTriangles == 1))
+                && (extendedStrips || extendedTriangles))
                 || typeConvertion == _AC3DTOAC3DGROUP
-                || (typeConvertion == _AC3DTOAC3D && (extendedTriangles == 1)))
+                || (typeConvertion == _AC3DTOAC3D && extendedTriangles))
         {
             fprintf(ofile, "%lf %lf %lf %lf %lf %lf\n", object->vertex[i].x,
                 object->vertex[i].z, -object->vertex[i].y, object->snorm[i].x,
@@ -2036,7 +2036,7 @@ int printOb(ob_t * object)
                     -object->vertex[i].y);
         }
     }
-    if (extendedStrips == 0)
+    if (!extendedStrips)
     {
         fprintf(ofile, "numsurf %d\n", object->numsurf);
         for (int i = 0; i < object->numsurf; i++)
@@ -2699,7 +2699,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
     int nborder = 0;
     bool ordering = false;
 
-    if (normalMapping == 1)
+    if (normalMapping)
     {
         normalMap(object);
     }
@@ -2775,7 +2775,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        if (isobjectacar == 0)
+        if (!isobjectacar)
         {
             if (strnicmp(tmpob->name, "tkmn", 4) == 0)
             {

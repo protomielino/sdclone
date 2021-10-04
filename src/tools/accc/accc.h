@@ -32,15 +32,14 @@ extern char * fileL3;
 extern int d1;
 extern int d2;
 extern int d3;
-extern int useStrip;
-extern int extendedStrips;
-extern int extendedTriangles;
-extern int extendedEnvCoord;
-extern int notexturesplit;
-extern int isobjectacar;
-extern int normalMapping;
+extern bool extendedStrips;
+extern bool extendedTriangles;
+extern bool extendedEnvCoord;
+extern bool notexturesplit;
+extern bool isobjectacar;
+extern bool normalMapping;
 extern char *OrderString;
-extern int collapseObject;
+extern bool collapseObject;
 
 extern void loadAndGroup(const char *OutputFileName);
 /** Loads the file with inputFilename to the global root_ob and root_material
@@ -317,7 +316,7 @@ extern int distSplit;
  *  texture channels. In that case the object splitting has to be skipped in loading
  *  (splitObjectsDuringLoad == 0).
  */
-extern int splitObjectsDuringLoad;
+extern bool splitObjectsDuringLoad;
 
 /** Go through all given objects, check whether a normal split or a terrain
  *  split is necessary and execute the split.
