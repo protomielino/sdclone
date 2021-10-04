@@ -188,7 +188,7 @@ void obCreateVertexArrays(ob_t * ob);
 void obCreateTextArrays(ob_t * ob);
 
 /** copies the "texture" properties from srcob to destob. */
-void obCopyTextureNames(ob_t * destob, ob_t * srcob);
+void obCopyTextureNames(ob_t * destob, const ob_t * srcob);
 
 /** Assigns the given "newIndex" to the indice property of all active "vertexarray"s at index
  *  "vaIdx".
@@ -273,7 +273,7 @@ void clearSavedInVertexArrayEntry(ob_t * ob, int vertidx);
  *  and from numsurf and numvertice the number of points/indices are calculated.
  *  Creation means allocation and copying of the corresponding channels from srcob to destob.
  */
-void createTexChannelArrays(ob_t * destob, ob_t * srcob);
+void createTexChannelArrays(ob_t * destob, const ob_t * srcob);
 
 /** Creates vertexarray{,1,2,3} and textarray{,1,2,3} in ob based on the given channel
  *  and on the given number of vertices. Creation means allocation and copying of the
@@ -282,7 +282,7 @@ void createTexChannelArrays(ob_t * destob, ob_t * srcob);
  *  @param ob the object in which to allocate the texture channel
  *  @param channel which texture channel, value in range [0,3]
  */
-void createSingleTexChannelArrays(ob_t * destob, ob_t * srcob, int channel);
+void createSingleTexChannelArrays(ob_t * destob, const ob_t * srcob, int channel);
 
 /** Computes the centroid of a triangle surface of the given object.
  *

@@ -173,7 +173,7 @@ void obCreateVertexArrays(ob_t * ob)
         ob->vertexarray3 = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
 }
 
-void obCopyTextureNames(ob_t * destob, ob_t * srcob)
+void obCopyTextureNames(ob_t * destob, const ob_t * srcob)
 {
     if(srcob->texture)
         destob->texture = strdup(srcob->texture);
@@ -335,7 +335,7 @@ void createTexCoordArray(double * destarr, tcoord_t * srcidxarr, int numidx)
  *
  *  @return the created split object
  */
-ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj, ob_t * tmpob)
+ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpob)
 {
     int numtri = tmpob->numsurf;
     int numvert = tmpob->numvertice;
@@ -438,7 +438,7 @@ void clearSavedInVertexArrayEntry(ob_t * object, int vertidx)
     object->vertexarray[vertidx].saved = 0;
 }
 
-void createSingleTexChannelArrays(ob_t * destob, ob_t * srcob, int channel)
+void createSingleTexChannelArrays(ob_t * destob, const ob_t * srcob, int channel)
 {
     int size_va = srcob->numsurf * 3 * sizeof(tcoord_t);
     int size_ta = 2 * srcob->numvertice * sizeof(double);
@@ -482,7 +482,7 @@ void createSingleTexChannelArrays(ob_t * destob, ob_t * srcob, int channel)
     }
 }
 
-void createTexChannelArrays(ob_t * destob, ob_t * srcob)
+void createTexChannelArrays(ob_t * destob, const ob_t * srcob)
 {
 
     if(srcob->vertexarray != NULL)
@@ -843,7 +843,7 @@ ob_t* splitOb(ob_t *object)
     /* The object we use as storage during splitting.
      * Following attribs will be used: vertexarray, vertex, snorm, textarray
      */
-    ob_t * workob;
+    ob_t workob;
 
     tcoord_t curvertex[3];
     int curstoredidx[3];
@@ -855,7 +855,6 @@ ob_t* splitOb(ob_t *object)
     int numvertstored = 0; /* number of vertices stored in the object */
     int numtristored = 0; /* number of triangles stored in the object: numvertstored/3 */
     int mustcontinue = 1;
-    ob_t * tob = NULL;
     ob_t * tob0 = NULL;
     int numobject = 0;
     int firstTri = 0;
@@ -868,12 +867,12 @@ ob_t* splitOb(ob_t *object)
     tri = (int *) calloc(orignumtris, sizeof(int));
     oldva = (int *) calloc(orignumverts, sizeof(int));
 
-    workob = obCreate();
-    workob->vertex = (point_t *) calloc(orignumverts, sizeof(point_t));
-    workob->snorm = (point_t *) calloc(orignumverts, sizeof(point_t));
+    memset(&workob, 0, sizeof(workob));
+    workob.vertex = (point_t *) calloc(orignumverts, sizeof(point_t));
+    workob.snorm = (point_t *) calloc(orignumverts, sizeof(point_t));
 
     // create texture channels
-    createTexChannelArrays(workob, object);
+    createTexChannelArrays(&workob, object);
 
     while (mustcontinue == 1)
     {
@@ -919,8 +918,8 @@ ob_t* splitOb(ob_t *object)
                     for (int i = 0; i < 3; i++)
                     {
                         if (curstoredidx[i] != -1)
-                            if(workob->textarray[curstoredidx[i] * 2] != curvertex[i].u
-                            || workob->textarray[curstoredidx[i] * 2 + 1] != curvertex[i].v)
+                            if(workob.textarray[curstoredidx[i] * 2] != curvertex[i].u
+                            || workob.textarray[curstoredidx[i] * 2 + 1] != curvertex[i].v)
                             {
                                 touse = 0;
                                 /* triangle is not ok */
@@ -943,8 +942,8 @@ ob_t* splitOb(ob_t *object)
 
                         if (curstoredidx[i] == -1)
                         {
-                            workob->vertex[numptstored] = object->vertex[curvertex[i].indice];
-                            workob->snorm[numptstored] = object->norm[curvertex[i].indice];
+                            workob.vertex[numptstored] = object->vertex[curvertex[i].indice];
+                            workob.snorm[numptstored] = object->norm[curvertex[i].indice];
 
                             clearSavedInVertexArrayEntry(object, curvert+i);
 
@@ -953,7 +952,7 @@ ob_t* splitOb(ob_t *object)
                             numptstored++;
                         }
 
-                        copySingleVertexData(workob, object, curstoredidx[i],
+                        copySingleVertexData(&workob, object, curstoredidx[i],
                                 oldnumptstored, numvertstored, curvert+i);
 
                         numvertstored++;
@@ -971,10 +970,10 @@ ob_t* splitOb(ob_t *object)
             continue;
 
         /* must saved the object */
-        workob->numvertice = numptstored;
-        workob->numsurf = numvertstored/3;
+        workob.numvertice = numptstored;
+        workob.numsurf = numvertstored/3;
 
-        tob = createObjectSplitCopy(numobject++, object, workob);
+        ob_t * tob = createObjectSplitCopy(numobject++, object, &workob);
 
         attrSurf = tob->attrSurf;
         attrMat = tob->attrMat;
@@ -988,7 +987,7 @@ ob_t* splitOb(ob_t *object)
 
     free(tri);
     free(oldva);
-    obFree(workob);
+    obFree(&workob);
 
     return tob0;
 }
