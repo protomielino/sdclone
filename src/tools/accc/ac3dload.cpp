@@ -435,7 +435,7 @@ void copySingleVertexData(ob_t * destob, ob_t * srcob,
 
 void clearSavedInVertexArrayEntry(ob_t * object, int vertidx)
 {
-    object->vertexarray[vertidx].saved = 0;
+    object->vertexarray[vertidx].saved = false;
 }
 
 void createSingleTexChannelArrays(ob_t * destob, const ob_t * srcob, int channel)
@@ -1287,7 +1287,7 @@ int doGetSurf(char *Line, ob_t *object, mat_t *material)
     }
     /*fprintf(stderr,"numrefs = %d \n",numrefs);*/
     /*printf("%.2lf %.2lf \n",tmpva[numvertice].u,tmpva[numvertice].v);*/
-    tmpva[numvertice].saved = 0;
+    tmpva[numvertice].saved = false;
     tmptexa[tmpva[numvertice].indice * 2] = tmpva[numvertice].u
             * object->next->texrep_x;
     tmptexa[tmpva[numvertice].indice * 2 + 1] = tmpva[numvertice].v
@@ -1994,7 +1994,7 @@ int printOb(ob_t * object)
     if (!extendedStrips && !normalMapping)
         if (!(isobjectacar && collapseObject))
             stripifyOb(object, 0);
-    object->saved = 1;
+    object->saved = true;
     fprintf(ofile, "OBJECT poly\n");
     fprintf(ofile, "name \"%s\"\n", object->name);
     if (object->texture1 || object->texture2 || object->texture3)
@@ -2852,7 +2852,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
             }
             texnum++;
         }
-        tmpob->saved = 0;
+        tmpob->saved = false;
         printf("name=%s x_min=%.1f y_min=%.1f x_max=%.1f y_max=%.1f\n",
                 tmpob->name, tmpob->x_min, tmpob->y_min, tmpob->x_max,
                 tmpob->y_max);
@@ -2950,7 +2950,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
             }
             else
             {
-                if (tmpob->saved == 0)
+                if (!tmpob->saved)
                 {
                     if (ordering && !lastpass)
                     {
@@ -3616,17 +3616,17 @@ void stripifyOb(ob_t * object, int writeit)
                 stripvertexarray[k].indice = v1;
                 stripvertexarray[k].u = object->textarray[v1 * 2];
                 stripvertexarray[k].v = object->textarray[v1 * 2 + 1];
-                stripvertexarray[k].saved = 0;
+                stripvertexarray[k].saved = false;
                 k++;
                 stripvertexarray[k].indice = v2;
                 stripvertexarray[k].u = object->textarray[v2 * 2];
                 stripvertexarray[k].v = object->textarray[v2 * 2 + 1];
-                stripvertexarray[k].saved = 0;
+                stripvertexarray[k].saved = false;
                 k++;
                 stripvertexarray[k].indice = v0;
                 stripvertexarray[k].u = object->textarray[v0 * 2];
                 stripvertexarray[k].v = object->textarray[v0 * 2 + 1];
-                stripvertexarray[k].saved = 0;
+                stripvertexarray[k].saved = false;
                 k++;
                 if ((tri % 2) == 0)
                 {
@@ -4585,7 +4585,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
             continue;
         }
         numg++;
-        tmpob->saved = 0;
+        tmpob->saved = false;
         tmpob = tmpob->next;
     }
 
@@ -4696,7 +4696,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
                 tmpob = tmpob->next;
                 continue;
             }
-            if (tmpob->saved == 0)
+            if (!tmpob->saved)
             {
 
                 if (ordering && !lastpass)

@@ -81,9 +81,9 @@ struct tcoord_t
     int indice;
     double u;
     double v;
-    int saved;
+    bool saved;
 
-    void set(int _indice, double _u, double _v, int _saved)
+    void set(int _indice, double _u, double _v, bool _saved)
     {
         indice = _indice;
         u = _u;
@@ -151,7 +151,7 @@ struct ob_t
     ob_t* ob1;
     ob_t* ob2;
     ob_t* ob3;
-    int saved;
+    bool saved;
     int kids_o;
     int inkids_o;
 };
