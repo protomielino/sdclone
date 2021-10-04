@@ -51,14 +51,17 @@ extern void loadAndGroup(const char *OutputFileName);
  */
 int loadAC(const char * inputFilename, const char * outputFilename = NULL);
 
-#define _AC3DTO3DS 1
-#define _3DSTOAC3D 2
-/** optimized version of ac3d using groups by section */
-#define _AC3DTOAC3D 3
-#define _AC3DTOOBJ 4
-#define _AC3DTOAC3DM 5
-#define _AC3DTOAC3DS 6
-#define _AC3DTOAC3DGROUP 7
+enum conv_t {
+    _UNSPECIFIED,
+    _AC3DTO3DS,
+    _3DSTOAC3D,
+    /** optimized version of ac3d using groups by section */
+    _AC3DTOAC3D,
+    _AC3DTOOBJ,
+    _AC3DTOAC3DM,
+    _AC3DTOAC3DS,
+    _AC3DTOAC3DGROUP
+};
 
 struct point_t
 {
@@ -289,7 +292,7 @@ void createSingleTexChannelArrays(ob_t * destob, const ob_t * srcob, int channel
  */
 void computeObSurfCentroid(const ob_t * ob, int obsurf, point_t * out);
 
-extern int typeConvertion;
+extern conv_t typeConvertion;
 extern ob_t * root_ob;
 
 /** Splits the given object and returns the split objects.

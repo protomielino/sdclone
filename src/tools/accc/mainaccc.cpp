@@ -53,7 +53,7 @@ int extendedTriangles = 0;
 int notexturesplit = 0;
 int collapseObject = 0;
 int splitObjectsDuringLoad = 1;
-int typeConvertion = 0;
+conv_t typeConvertion = _UNSPECIFIED;
 int far_dist = 10000;
 int normalMapping = 0;
 extern double smooth_angle;
