@@ -2180,7 +2180,7 @@ int foundNear(ob_t * object, ob_t *allobjects, int dist, bool print)
             continue;
         }
 
-        if (tmpob->inkids_o == 1)
+        if (tmpob->inkids_o)
         {
             tmpob = tmpob->next;
             continue;
@@ -2195,7 +2195,7 @@ int foundNear(ob_t * object, ob_t *allobjects, int dist, bool print)
         {
             /*printf("object %s near object %s (dist=%d) \n", tmpob->name , object->name, dist);*/
             numfound++;
-            tmpob->inkids_o = 1;
+            tmpob->inkids_o = true;
             if (print)
             {
                 printOb(tmpob);
@@ -2208,7 +2208,7 @@ int foundNear(ob_t * object, ob_t *allobjects, int dist, bool print)
         {
             /*printf("object %s near object %s (dist=%d) \n", tmpob->name , object->name, dist);*/
             numfound++;
-            tmpob->inkids_o = 1;
+            tmpob->inkids_o = true;
             if (print)
             {
                 printOb(tmpob);
@@ -2221,7 +2221,7 @@ int foundNear(ob_t * object, ob_t *allobjects, int dist, bool print)
         {
             /*printf("object %s near object %s (dist=%d) \n", tmpob->name , object->name, dist);*/
             numfound++;
-            tmpob->inkids_o = 1;
+            tmpob->inkids_o = true;
             if (print)
             {
                 printOb(tmpob);
@@ -2234,7 +2234,7 @@ int foundNear(ob_t * object, ob_t *allobjects, int dist, bool print)
         {
             /*printf("object %s near object %s (dist=%d) \n", tmpob->name , object->name, dist);*/
             numfound++;
-            tmpob->inkids_o = 1;
+            tmpob->inkids_o = true;
             if (print)
             {
                 printOb(tmpob);
@@ -2892,7 +2892,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
     tmpob = object;
     while (tmpob != NULL)
     {
-        tmpob->inkids_o = 0;
+        tmpob->inkids_o = false;
         tmpob = tmpob->next;
     }
 
@@ -4674,7 +4674,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
         tmpob = object;
         while (tmpob != NULL)
         {
-            tmpob->inkids_o = 0;
+            tmpob->inkids_o = false;
             tmpob = tmpob->next;
         }
 

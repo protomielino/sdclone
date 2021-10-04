@@ -153,7 +153,7 @@ struct ob_t
     ob_t* ob3;
     bool saved;
     int kids_o;
-    int inkids_o;
+    bool inkids_o;
 };
 
 /** Creates an instance of the ob_t struct and zeroes it.
