@@ -208,7 +208,7 @@ void computeObjectTriNorm(ob_t * object);
 void smoothFaceTriNorm(ob_t * object);
 void smoothObjectTriNorm(ob_t * object);
 void normalize(point_t *t);
-int checkMustSmoothVector(point_t *n1, point_t *n2, point_t *t1, point_t *t2);
+bool checkMustSmoothVector(point_t *n1, point_t *n2, point_t *t1, point_t *t2);
 void mapNormalToSphere(ob_t * object);
 void mapNormalToSphere2(ob_t * object);
 void normalMap(ob_t * object);
@@ -2146,7 +2146,7 @@ int printOb(ob_t * object)
     fprintf(ofile, "kids 0\n");
     return 0;
 }
-int foundNear(ob_t * object, ob_t *allobjects, int dist, int print)
+int foundNear(ob_t * object, ob_t *allobjects, int dist, bool print)
 {
     ob_t * tmpob;
     double x;
@@ -2372,10 +2372,10 @@ void computeObjectTriNorm(ob_t * object)
     return;
 }
 
-int checkMustSmoothVector(point_t *n1, point_t *n2, point_t *t1, point_t *t2)
+bool checkMustSmoothVector(point_t *n1, point_t *n2, point_t *t1, point_t *t2)
 {
-    return FALSE;
-/*
+    return false;
+#if 0
     double dot, cos_angle;
     cos_angle = cos(smooth_angle * M_PI / 180.0);
     if (fabs(t1->x - t2->x) <= 0.05 && fabs(t1->y - t2->y) <= 0.05
@@ -2385,12 +2385,12 @@ int checkMustSmoothVector(point_t *n1, point_t *n2, point_t *t1, point_t *t2)
         dot = n1->x * n2->x + n1->y * n2->y + n1->z * n2->z;
         if (dot > cos_angle)
         {
-            return TRUE;
+            return true;
         }
 
     }
-    return FALSE;
-*/
+    return false;
+#endif
 }
 
 void smoothTriNorm(ob_t * object)
@@ -2695,9 +2695,9 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
     ob_t * tmpob = NULL;
     mat_t * tmat = NULL;
     int numg = 0;
-    int lastpass = FALSE;
+    bool lastpass = false;
     int nborder = 0;
-    int ordering = FALSE;
+    bool ordering = false;
 
     if (normalMapping == 1)
     {
@@ -2744,9 +2744,9 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
     {
         fprintf(stderr, "ordering objects according to  %s\n", OrderString);
         p = OrderString;
-        ordering = TRUE;
+        ordering = true;
         nborder = 1;
-        while (TRUE)
+        while (true)
         {
             q = strstr(p, ";");
             if (q != NULL)
@@ -2763,7 +2763,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
     }
     else
     {
-        ordering = FALSE;
+        ordering = false;
         nborder = 0;
     }
 
@@ -2882,7 +2882,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
         }
         if (!strnicmp(tmpob->name, "tkmn", 4))
         {
-            foundNear(tmpob, object, far_dist, FALSE);
+            foundNear(tmpob, object, far_dist, false);
             printf("object =%s num kids_o=%d\n", tmpob->name, tmpob->kids_o);
         }
 
@@ -2905,7 +2905,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
         {
             /* look to the current object name to save */
             if (p == NULL)
-                lastpass = TRUE;
+                lastpass = true;
             else
             {
                 q = p;
@@ -2943,7 +2943,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
                     fprintf(ofile, "name \"%s_g\"\n", tmpob->name);
                     fprintf(ofile, "kids %d\n", tmpob->kids_o + 1);
                     printOb(tmpob);
-                    foundNear(tmpob, object, far_dist, TRUE);
+                    foundNear(tmpob, object, far_dist, true);
                     printf("object =%s num kids_o=%d\n", tmpob->name,
                             tmpob->kids_o);
                 }
@@ -4488,9 +4488,9 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
     int numg = 0;
     char *p;
     char *q = NULL;
-    int lastpass = FALSE;
+    bool lastpass = false;
     int nborder = 0;
-    int ordering = FALSE;
+    bool ordering = false;
 
     if ((ofile = fopen(OutputFilename, "w")) == NULL)
     {
@@ -4532,9 +4532,9 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
     {
         fprintf(stderr, "ordering objects according to  %s\n", OrderString);
         p = OrderString;
-        ordering = TRUE;
+        ordering = true;
         nborder = 1;
-        while (TRUE)
+        while (true)
         {
             q = strstr(p, ";");
             if (q != NULL)
@@ -4551,7 +4551,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
     }
     else
     {
-        ordering = FALSE;
+        ordering = false;
         nborder = 0;
     }
 
@@ -4602,7 +4602,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
         {
             /* look to the current object name to save */
             if (p == NULL)
-                lastpass = TRUE;
+                lastpass = true;
             else
             {
                 q = p;
@@ -4839,7 +4839,7 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     tobS.numvert = n;
     for (int i = 0; i < ob2->numsurf; i++)
     {
-        int found = FALSE;
+        bool found = false;
         for (int j = 0; j < ob1->numsurf; j++)
         {
             if (tobS.vertexarray[j * 3].indice
@@ -4850,11 +4850,11 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
                             == oldva1[ob2->vertexarray[i * 3 + 2].indice])
             {
                 /* this face is OK */
-                found = TRUE;
+                found = true;
                 break;
             }
         }
-        if (found == FALSE)
+        if (!found)
         {
             int k = tobS.numsurf;
             /* add the triangle */

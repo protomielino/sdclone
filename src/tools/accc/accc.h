@@ -25,9 +25,6 @@
 #ifndef _ACCC_H_
 #define _ACCC_H_
 
-#define FALSE 0
-#define TRUE 1
-
 extern char * fileL0;
 extern char * fileL1;
 extern char * fileL2;

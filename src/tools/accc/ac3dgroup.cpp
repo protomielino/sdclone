@@ -643,7 +643,7 @@ void copyTextureChannel(ob_t * destob, ob_t * srcob, int channel)
 void collapseMapTiledTextures(ob_t * tarob, ob_t * tiledob)
 {
     ob_t * curtiledob = tiledob;
-    int notinsameorder = FALSE;
+    bool notinsameorder = false;
     int curvert = 0;
 
     while (curtiledob != NULL)
@@ -653,7 +653,7 @@ void collapseMapTiledTextures(ob_t * tarob, ob_t * tiledob)
             curtiledob = curtiledob->next;
             continue;
         }
-        notinsameorder = FALSE;
+        notinsameorder = false;
         if (!stricmp(curtiledob->name, tarob->name)
         && tarob->numvert == curtiledob->numvert)
         {
@@ -665,11 +665,11 @@ void collapseMapTiledTextures(ob_t * tarob, ob_t * tiledob)
                 || fabs(tarob->vertex[curvert].y - curtiledob->vertex[curvert].y)>MINVAL
                 || fabs(tarob->vertex[curvert].z - curtiledob->vertex[curvert].z )>MINVAL)
                 {
-                    notinsameorder=TRUE;
+                    notinsameorder = true;
                 }
             }
 
-            if (notinsameorder == TRUE)
+            if (notinsameorder)
             {
                 printf(
                         "%s : points not in the same order, reordering ...\n",
