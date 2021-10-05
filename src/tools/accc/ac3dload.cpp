@@ -537,9 +537,7 @@ int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
                     + (p1 * q2 - q1 * p2) * (p1 * q2 - q1 * p2));
     if (dd == 0.0)
     {
-        norm->x = 0;
-        norm->y = 1.0;
-        norm->z = 0;
+        norm->set(0, 1.0, 0);
         return 0;
     }
 
@@ -549,9 +547,7 @@ int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
 
     if (isnan(norm->x) || isnan(norm->y) || isnan(norm->z))
     {
-        norm->x = 0;
-        norm->y = 1.0;
-        norm->z = 0;
+        norm->set(0, 1.0, 0);
         return 0;
     }
 
@@ -565,20 +561,12 @@ void computeObSurfCentroid(const ob_t * object, int obsurf, point_t * out)
 
     int firstIdx = obsurf * 3;
 
-    out->x = 0;
-    out->y = 0;
-    out->z = 0;
+    out->set(0, 0, 0);
 
     for (int curVert = 0; curVert < 3; curVert++)
-    {
-        out->x += vertex[idx[firstIdx + curVert].indice].x;
-        out->y += vertex[idx[firstIdx + curVert].indice].y;
-        out->z += vertex[idx[firstIdx + curVert].indice].z;
-    }
+        *out += vertex[idx[firstIdx + curVert].indice];
 
-    out->x /= 3;
-    out->y /= 3;
-    out->z /= 3;
+    *out /= 3;
 }
 
 int doMaterial(char *Line, ob_t *object, mat_t *material)
@@ -2263,11 +2251,7 @@ void normalize(point_t *t)
         t->z = t->z / dd;
     }
     else
-    {
-        t->x = 0.0;
-        t->y = 1.0;
-        t->z = 0.0;
-    }
+        t->set(0.0, 1.0, 0.0);
 }
 
 void computeTriNorm(ob_t * object)
@@ -2299,17 +2283,9 @@ void computeTriNorm(ob_t * object)
                     &tmpob->vertex[tmpob->vertexarray[i * 3 + 1].indice],
                     &tmpob->vertex[tmpob->vertexarray[i * 3 + 2].indice],
                     &norm);
-            tmpob->norm[tmpob->vertexarray[i * 3].indice].x += norm.x;
-            tmpob->norm[tmpob->vertexarray[i * 3].indice].y += norm.y;
-            tmpob->norm[tmpob->vertexarray[i * 3].indice].z += norm.z;
-
-            tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice].x += norm.x;
-            tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice].y += norm.y;
-            tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice].z += norm.z;
-
-            tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice].x += norm.x;
-            tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice].y += norm.y;
-            tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice].z += norm.z;
+            tmpob->norm[tmpob->vertexarray[i * 3].indice] += norm;
+            tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice] += norm;
+            tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice] += norm;
         }
         for (int i = 0; i < tmpob->numsurf; i++)
         {
@@ -2329,38 +2305,21 @@ void computeObjectTriNorm(ob_t * object)
     ob_t *tmpob = object;
 
     if (tmpob->name == NULL)
-    {
-        tmpob = tmpob->next;
         return;
-    }
     if (!strcmp(tmpob->name, "root"))
-    {
-        tmpob = tmpob->next;
         return;
-    }
     if (!strcmp(tmpob->name, "world"))
-    {
-        tmpob = tmpob->next;
         return;
-    }
     for (int i = 0; i < tmpob->numsurf; i++)
     {
         /* compute the same normal for each points in the surface */
         computeNorm(&tmpob->vertex[tmpob->vertexarray[i * 3].indice],
-                &tmpob->vertex[tmpob->vertexarray[i * 3 + 1].indice],
-                &tmpob->vertex[tmpob->vertexarray[i * 3 + 2].indice], &norm);
+                    &tmpob->vertex[tmpob->vertexarray[i * 3 + 1].indice],
+                    &tmpob->vertex[tmpob->vertexarray[i * 3 + 2].indice], &norm);
 
-        tmpob->norm[tmpob->vertexarray[i * 3].indice].x += norm.x;
-        tmpob->norm[tmpob->vertexarray[i * 3].indice].y += norm.y;
-        tmpob->norm[tmpob->vertexarray[i * 3].indice].z += norm.z;
-
-        tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice].x += norm.x;
-        tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice].y += norm.y;
-        tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice].z += norm.z;
-
-        tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice].x += norm.x;
-        tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice].y += norm.y;
-        tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice].z += norm.z;
+        tmpob->norm[tmpob->vertexarray[i * 3].indice] += norm;
+        tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice] += norm;
+        tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice] += norm;
     }
     for (int i = 0; i < tmpob->numsurf; i++)
     {
@@ -2422,9 +2381,7 @@ void smoothTriNorm(ob_t * object)
         for (int i = 0; i < tmpob->numvert; i++)
         {
             /* compute the same normal for each points in the surface */
-            tmpob->snorm[i].x = tmpob->norm[i].x;
-            tmpob->snorm[i].y = tmpob->norm[i].y;
-            tmpob->snorm[i].z = tmpob->norm[i].z;
+            tmpob->snorm[i] = tmpob->norm[i];
         }
         tmpob = tmpob->next;
     }
@@ -2485,27 +2442,14 @@ void smoothTriNorm(ob_t * object)
                             &tmpob->vertex[i], &tmpob1->vertex[j]))
                     {
 
-                        point_t p;
-                        p.x = tmpob1->norm[j].x + tmpob->norm[i].x;
-                        p.y = tmpob1->norm[j].y + tmpob->norm[i].y;
-                        p.z = tmpob1->norm[j].z + tmpob->norm[i].z;
+                        point_t p = tmpob1->norm[j] + tmpob->norm[i];
                         normalize(&p);
 
-                        tmpob->snorm[i].x = p.x;
-                        tmpob->snorm[i].y = p.y;
-                        tmpob->snorm[i].z = p.z;
+                        tmpob->snorm[i] = p;
+                        tmpob1->snorm[j] = p;
 
-                        tmpob1->snorm[j].x = p.x;
-                        tmpob1->snorm[j].y = p.y;
-                        tmpob1->snorm[j].z = p.z;
-
-                        /*          tmpob->snorm[i].x+=tmpob1->norm[j].x; */
-                        /*          tmpob->snorm[i].y+=tmpob1->norm[j].y; */
-                        /*          tmpob->snorm[i].z+=tmpob1->norm[j].z; */
-
-                        /*          tmpob1->snorm[j].x+=tmpob->norm[i].x; */
-                        /*          tmpob1->snorm[j].y+=tmpob->norm[i].y; */
-                        /*          tmpob1->snorm[j].z+=tmpob->norm[i].z; */
+                        /* tmpob->snorm[i] += tmpob1->norm[j]; */
+                        /* tmpob1->snorm[j] += tmpob->norm[i]; */
                     }
                 }
             }
@@ -2547,11 +2491,7 @@ void smoothTriNorm(ob_t * object)
                 tmpob->snorm[i].z = nz / dd;
             }
             else
-            {
-                tmpob->snorm[i].x = 0;
-                tmpob->snorm[i].y = 0;
-                tmpob->snorm[i].z = 1;
-            }
+                tmpob->snorm[i].set(0, 0, 1);
         }
         tmpob = tmpob->next;
     }
@@ -2640,12 +2580,8 @@ void smoothFaceTriNorm(ob_t * object)
                     && (tmpob->vertex[i].z - tmpob->vertex[j].z) <= 0.1)
             {
                 /*same point */
-                tmpob->snorm[i].x += tmpob->norm[j].x;
-                tmpob->snorm[i].y += tmpob->norm[j].y;
-                tmpob->snorm[i].z += tmpob->norm[j].z;
-                tmpob->snorm[j].x = tmpob->snorm[i].x;
-                tmpob->snorm[j].y = tmpob->snorm[i].y;
-                tmpob->snorm[j].z = tmpob->snorm[i].z;
+                tmpob->snorm[i] += tmpob->norm[j];
+                tmpob->snorm[j] = tmpob->snorm[i];
             }
         }
     }
@@ -2671,12 +2607,8 @@ void smoothObjectTriNorm(ob_t * object)
                     && (tmpob->vertex[i].z - tmpob->vertex[j].z) <= 0.001)
             {
                 /*same point */
-                tmpob->snorm[i].x += tmpob->norm[j].x;
-                tmpob->snorm[i].y += tmpob->norm[j].y;
-                tmpob->snorm[i].z += tmpob->norm[j].z;
-                tmpob->snorm[j].x = tmpob->snorm[i].x;
-                tmpob->snorm[j].y = tmpob->snorm[i].y;
-                tmpob->snorm[j].z = tmpob->snorm[i].z;
+                tmpob->snorm[i] += tmpob->norm[j];
+                tmpob->snorm[j] = tmpob->snorm[i];
             }
         }
     }
@@ -4007,16 +3939,13 @@ void mapNormalToSphere(ob_t *object)
             fact = ddmin / pospt;
             if (fact > 1.0)
                 fact = 1.0;
-            tmpob->snorm[i].x *= fact;
-            tmpob->snorm[i].y *= fact;
-            tmpob->snorm[i].z *= fact;
-
+            tmpob->snorm[i] *= fact;
         }
 
         tmpob = tmpob->next;
     }
-
 }
+
 void mapTextureEnv(ob_t *object)
 {
     double x, y, z, zt, lg;
@@ -4276,7 +4205,6 @@ void mapTextureEnvOld(ob_t *object)
         }
         tmpob = tmpob->next;
     }
-
 }
 
 void mapNormalToSphere2(ob_t *object)
@@ -4304,18 +4232,13 @@ void mapNormalToSphere2(ob_t *object)
         for (int i = 0; i < tmpob->numvert; i++)
         {
             /* compute the same normal for each points in the surface */
-            /*      tmpob->norm[i].x = tmpob->vertex[i].x; */
-            /*      tmpob->norm[i].y = tmpob->vertex[i].y; */
-            /*      tmpob->norm[i].z = tmpob->vertex[i].z; */
+            /*      tmpob->norm[i] = tmpob->vertex[i]; */
             /*      normalize(&tmpob->norm[i]); */
-            /*      tmpob->snorm[i].x += tmpob->norm[i].x; */
-            /*      tmpob->snorm[i].y += tmpob->norm[i].y; */
-            /*      tmpob->snorm[i].z += tmpob->norm[i].z; */
+            /*      tmpob->snorm[i] += tmpob->norm[i]; */
             normalize(&tmpob->snorm[i]);
         }
         tmpob = tmpob->next;
     }
-
 }
 
 void normalMap(ob_t * object)
@@ -4395,7 +4318,6 @@ void normalMap(ob_t * object)
         tmpob->texture = shadowtexture;
         tmpob = tmpob->next;
     }
-
 }
 
 void normalMap01(ob_t * object)
@@ -4482,7 +4404,6 @@ void normalMap01(ob_t * object)
 void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
 
 {
-
     ob_t * tmpob = NULL;
     mat_t * tmat = NULL;
     int numg = 0;
@@ -4790,9 +4711,7 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     {
         for (int j = 0; j < ob1->numvert; j++)
         {
-            if (ob2->vertex[i].x == ob1->vertex[j].x
-                    && ob2->vertex[i].y == ob1->vertex[j].y
-                    && ob2->vertex[i].z == ob1->vertex[j].z
+            if (ob2->vertex[i] == ob1->vertex[j]
                     && ob2->textarray[i * 2] == ob1->textarray[j * 2]
                     && ob2->textarray[i * 2 + 1] == ob1->textarray[j * 2 + 1])
             {
@@ -4823,15 +4742,9 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
                 tobS.textarray3[n * 2] = ob2->textarray3[i * 2];
                 tobS.textarray3[n * 2 + 1] = ob2->textarray3[i * 2 + 1];
             }
-            tobS.snorm[n].x = ob2->snorm[i].x;
-            tobS.snorm[n].y = ob2->snorm[i].y;
-            tobS.snorm[n].z = ob2->snorm[i].z;
-            tobS.norm[n].x = ob2->norm[i].x;
-            tobS.norm[n].y = ob2->norm[i].y;
-            tobS.norm[n].z = ob2->norm[i].z;
-            tobS.vertex[n].x = ob2->vertex[i].x;
-            tobS.vertex[n].y = ob2->vertex[i].y;
-            tobS.vertex[n].z = ob2->vertex[i].z;
+            tobS.snorm[n] = ob2->snorm[i];
+            tobS.norm[n] = ob2->norm[i];
+            tobS.vertex[n] = ob2->vertex[i];
 
             n++;
         }
@@ -4998,8 +4911,7 @@ int mergeSplitted(ob_t **object)
 
         /* allocate the new object */
 #ifdef NEWSRC
-        tobS=(ob_t *)malloc(sizeof(ob_t ));
-        memset(tobS,0,sizeof(ob_t));
+        tobS = obCreate();
         tobS->x_min=1000000;
         tobS->y_min=1000000;
         tobS->z_min=1000000;
@@ -5056,12 +4968,7 @@ int mergeSplitted(ob_t **object)
             }
 
             for (int j=0; j<tob0->numvert; j++)
-            {
-
-                tobS->vertex[j].x=tob->vertex[j].x;
-                tobS->vertex[j].y=tob->vertex[j].y;
-                tobS->vertex[j].z=tob->vertex[j].z;
-            }
+                tobS->vertex[j] = tob->vertex[j];
             for (int j=0; j<tob->numsurf; j++)
             {
                 tobS->vertexarray[j*3].indice=tob->vertexarray[j*3].indice;
@@ -5111,7 +5018,6 @@ int mergeSplitted(ob_t **object)
 
 int findPoint(point_t * vertexArray, int sizeVertexArray, point_t * theVertex)
 {
-
     return -1;
 }
 

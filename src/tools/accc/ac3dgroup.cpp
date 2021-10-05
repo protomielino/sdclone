@@ -504,59 +504,31 @@ void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray)
 
     for (int i = 0; i < ob->numvert; i++)
     {
-        if ((ob->vertex[i].x != ob2->vertex[i].x)
-                || (ob->vertex[i].y != ob2->vertex[i].y)
-                || (ob->vertex[i].z != ob2->vertex[i].z))
+        if (ob->vertex[i] != ob2->vertex[i])
         {
             for (int j = 0; j < ob->numvert; j++)
             {
-                if ((ob->vertex[i].x == ob2->vertex[i].x)
-                        && (ob->vertex[i].y == ob2->vertex[i].y)
-                        && (ob->vertex[i].z == ob2->vertex[i].z))
+                if (ob->vertex[i] == ob2->vertex[i])
                 {
-                    double tx, ty, tz;
-                    double tu, tv;
-                    int tindice;
-                    int tsaved;
-                    double text;
-
                     k++;
 
-                    tx = ob2->vertex[i].x;
-                    ty = ob2->vertex[i].y;
-                    tz = ob2->vertex[i].z;
-                    ob2->vertex[i].x = ob2->vertex[j].x;
-                    ob2->vertex[i].y = ob2->vertex[j].y;
-                    ob2->vertex[i].z = ob2->vertex[j].z;
-                    ob2->vertex[j].x = tx;
-                    ob2->vertex[j].y = ty;
-                    ob2->vertex[j].z = tz;
+                    point_t p = ob2->vertex[i];
+                    ob2->vertex[i] = ob2->vertex[j];
+                    ob2->vertex[j] = p;
 
-                    tu = vertexarray[i].u;
-                    tv = vertexarray[i].v;
-                    tindice = vertexarray[i].indice;
-                    tsaved = vertexarray[i].saved;
-                    vertexarray[i].u = vertexarray[j].u;
-                    vertexarray[i].v = vertexarray[j].v;
-                    vertexarray[i].indice = vertexarray[j].indice;
-                    vertexarray[i].saved = vertexarray[j].saved;
-                    vertexarray[j].u = tu;
-                    vertexarray[j].v = tv;
-                    vertexarray[j].saved = tsaved;
-                    vertexarray[j].indice = tindice;
+                    tcoord_t t = vertexarray[i];
+                    vertexarray[i] = vertexarray[j];
+                    vertexarray[j] = t;
 
-                    text = textarray[i * 2];
+                    double text = textarray[i * 2];
                     textarray[i * 2] = textarray[j * 2];
                     textarray[j * 2] = text;
                     text = textarray[i * 2 + 1];
                     textarray[i * 2 + 1] = textarray[j * 2 + 1];
                     textarray[j * 2 + 1] = text;
-
                 }
-
             }
         }
-
     }
     printf("%s : reordered %d points\n", ob->name, k);
     return;

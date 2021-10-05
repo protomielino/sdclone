@@ -68,11 +68,57 @@ struct point_t
     double y;
     double z;
 
+    point_t() { } // = default;
+    point_t(double _x, double _y, double _z) : x(_x), y(_y), z(_z) { }
     void set(double _x, double _y, double _z)
     {
         x = _x;
         y = _y;
         z = _z;
+    }
+    bool operator == (const point_t &rhs) const
+    {
+        return x == rhs.x && y == rhs.y && z == rhs.z;
+    }
+    bool operator != (const point_t &rhs) const
+    {
+        return !(*this == rhs);
+    }
+    point_t operator + (const point_t &rhs)
+    {
+        return point_t(x + rhs.x, y + rhs.y, z + rhs.z);
+    }
+    point_t operator - (const point_t &rhs)
+    {
+        return point_t(x - rhs.x, y - rhs.y, z - rhs.z);
+    }
+    point_t &operator += (const point_t &rhs)
+    {
+        x += rhs.x;
+        y += rhs.y;
+        z += rhs.z;
+        return *this;
+    }
+    point_t &operator *= (const point_t &rhs)
+    {
+        x *= rhs.x;
+        y *= rhs.y;
+        z *= rhs.z;
+        return *this;
+    }
+    point_t &operator *= (double rhs)
+    {
+        x *= rhs;
+        y *= rhs;
+        z *= rhs;
+        return *this;
+    }
+    point_t & operator /= (double rhs)
+    {
+        x /= rhs;
+        y /= rhs;
+        z /= rhs;
+        return *this;
     }
 };
 
@@ -89,7 +135,7 @@ struct tcoord_t
         u = _u;
         v = _v;
         saved = _saved;
-     }
+    }
 };
 
 struct ob_t
