@@ -68,7 +68,11 @@ struct point_t
     double y;
     double z;
 
-    point_t() { } // = default;
+#if __cplusplus < 201103L
+    point_t() { }
+#else
+    point_t() = default;
+#endif
     point_t(double _x, double _y, double _z) : x(_x), y(_y), z(_z) { }
     void set(double _x, double _y, double _z)
     {
