@@ -127,24 +127,30 @@ void SDCar::loadCarLights(tCarElt *Car)
 
         const char *typeName = GfParmGetStr(handle, path, PRM_TYPE, "");
         CarLightType type = CAR_LIGHT_TYPE_NONE;
-        if (!strcmp(typeName, VAL_LIGHT_HEAD1)) {
+        if (!strcmp(typeName, VAL_LIGHT_HEAD1))
+        {
             type = CAR_LIGHT_TYPE_FRONT;
-        } else
-            if (!strcmp(typeName, VAL_LIGHT_HEAD2)) {
-                type = CAR_LIGHT_TYPE_FRONT2;
-            } else
-                if (!strcmp(typeName, VAL_LIGHT_BRAKE)) {
-                    type = CAR_LIGHT_TYPE_BRAKE;
-                } else
-                    if (!strcmp(typeName, VAL_LIGHT_BRAKE2)) {
-                        type = CAR_LIGHT_TYPE_BRAKE2;
-                    } else
-                        if (!strcmp(typeName, VAL_LIGHT_REAR)) {
-                            type = CAR_LIGHT_TYPE_REAR;
-                        } else
-                            if (!strcmp(typeName, VAL_LIGHT_REVERSE)) {
-                                type = CAR_LIGHT_TYPE_REVERSE;
-                            }
+        }
+        else if (!strcmp(typeName, VAL_LIGHT_HEAD2))
+        {
+            type = CAR_LIGHT_TYPE_FRONT2;
+        }
+        else if (!strcmp(typeName, VAL_LIGHT_BRAKE))
+        {
+            type = CAR_LIGHT_TYPE_BRAKE;
+        }
+        else if (!strcmp(typeName, VAL_LIGHT_BRAKE2))
+        {
+            type = CAR_LIGHT_TYPE_BRAKE2;
+        }
+        else if (!strcmp(typeName, VAL_LIGHT_REAR))
+        {
+            type = CAR_LIGHT_TYPE_REAR;
+        }
+        else if (!strcmp(typeName, VAL_LIGHT_REVERSE))
+        {
+            type = CAR_LIGHT_TYPE_REVERSE;
+        }
 
         double size = GfParmGetNum(handle, path, PRM_SIZE, NULL, 0.2);
 
@@ -287,12 +293,12 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     }
 
     pCar = loader.Load3dFile(strPath, true, bCarName, bSkinName);
-
     GfLogDebug("Load Car ACC !\n");
 
     /* Set a selector on the wing type MPA*/
     snprintf(path, nMaxTexPathSize, "%s/%s", SECT_GROBJECTS, SECT_WING_MODEL);
     param = GfParmGetStr(handle, path, PRM_WING_1, NULL);
+
     if (param)
     {
         osg::ref_ptr<osg::Node> pWin1 = new osg::Node;
@@ -327,24 +333,24 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         pWing->addChild(pWin2.get(), false);
         pWing->addChild(pWin3.get(), true);
 
-        GfLogInfo("tracktype = %d - subcat = %d\n", tracktype, subcat);
+        GfLogDebug("tracktype = %d - subcat = %d\n", tracktype, subcat);
 
         if (tracktype == false)
         {
             pWing->setSingleChildOn(2);
-            GfLogInfo("Activate Wing Road !\n");
+            GfLogDebug("Activate Wing Road !\n");
         }
         else
         {
             if(subcat == false)
             {
                 pWing->setSingleChildOn(0);
-                GfLogInfo("Activate Wing Short !\n");
+                GfLogDebug("Activate Wing Short !\n");
             }
             else
             {
                 pWing->setSingleChildOn(1);
-                GfLogInfo("Activate Wing Long !\n");
+                GfLogDebug("Activate Wing Long !\n");
             }
         }
     }
@@ -448,7 +454,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
             osg::Matrix rot = osg::Matrix::rotate(angl, osg::Y_AXIS);
             pos = rot * pos;
             steerLoc->setMatrix(pos);
-            steerLoc->addChild(SteerRot.get());
+            steerLoc->addChild(this->SteerRot.get());
             steerbranch->addChild( steerLoc );
             this->SteerSelector->addChild(steerbranch);
             this->SteerSelector->setSingleChildOn(0);
@@ -473,12 +479,11 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
                 this->SteerRot2->setMatrix(pos);
                 this->SteerRot2->addChild(steerEntityHi.get());
 
-                angl = SD_DEGREES_TO_RADIANS * angl;
                 pos = osg::Matrix::translate(xpos, ypos, zpos);
                 rot = osg::Matrix::rotate(angl, osg::Y_AXIS);
                 pos = rot * pos;
                 steerLoc->setMatrix(pos);
-                steerLoc->addChild(SteerRot2.get());
+                steerLoc->addChild(this->SteerRot2.get());
                 steerbranch->addChild( steerLoc );
                 this->SteerSelector->addChild(steerbranch);
                 this->SteerSelector->setSingleChildOn(1);
@@ -895,7 +900,7 @@ void SDCar::updateShadingParameters(const osg::Matrixf &modelview)
 void SDCar::setReflectionMap(osg::ref_ptr<osg::Texture> map)
 {
     this->car_shaded_body->getOrCreateStateSet()->setTextureAttributeAndModes(2, map,
-                                                                        osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
+                                                                              osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
 }
 
 SDCars::SDCars(void) :
