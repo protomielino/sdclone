@@ -693,7 +693,7 @@ ob_t* terrainSplitOb(ob_t * object)
         {
 
             int numTriFound = 0;
-            int found_a_tri = 0;
+            bool found_a_tri = false;
 
             for (int curObjSurf = 0; curObjSurf < object->numsurf; curObjSurf++)
             {
@@ -704,7 +704,7 @@ ob_t* terrainSplitOb(ob_t * object)
                 {
                     if (surfCentroid.y >= curYPos && surfCentroid.y < curYPos + distSplit)
                     {
-                        found_a_tri = 1;
+                        found_a_tri = true;
                         oldSurfToNewObjMap[curObjSurf] = numNewObjs;
                         numTriFound++;
                     }
