@@ -24,7 +24,7 @@
 // Code provided by Thierry Thomas.
 #ifndef HAVE_STRNDUP
 
-char *strndup(const char *str, int len)
+char *strndup(const char *str, size_t len)
 {
 	if (!str || len < 0)
 		return 0;

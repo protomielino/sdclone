@@ -353,7 +353,7 @@ ob_t* splitOb(ob_t *object);
 ob_t* terrainSplitOb(ob_t *object);
 
 extern int mergeSplitted(ob_t **object);
-extern int distSplit;
+extern double distSplit;
 
 /** Whether to split objects during loading, i.e. calls to loadAC().
  *  The default behavior is to split them during loading

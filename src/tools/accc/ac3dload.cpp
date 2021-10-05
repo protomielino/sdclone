@@ -2128,7 +2128,7 @@ int printOb(ob_t * object)
     fprintf(ofile, "kids 0\n");
     return 0;
 }
-int foundNear(ob_t * object, ob_t *allobjects, int dist, bool print)
+int foundNear(ob_t * object, ob_t *allobjects, double dist, bool print)
 {
     ob_t * tmpob;
     double x;

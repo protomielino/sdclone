@@ -34,7 +34,7 @@
 #include "accc.h"
 /* -g  g-track-2.ac -l0 g2.ac -d3 200900 -d2 200 -d1 100 -S 200 >t */
 /* +es 80 p-gt1.ac porsche-gt1.ac>t */
-int distSplit = 0;
+double distSplit = 0;
 static char *InputFileName = NULL;
 static char *OutputFileName = NULL;
 char * fileL0 = NULL;
@@ -217,7 +217,7 @@ void init_args(int argc, char **argv)
                     exit(-1);
                 }
                 i++;
-                if (sscanf(argv[i], "%d", &distSplit) != 1)
+                if (sscanf(argv[i], "%lf", &distSplit) != 1)
                 {
                     fprintf(stderr, "invalid -S %s\n", argv[i]);
                     exit(1);
