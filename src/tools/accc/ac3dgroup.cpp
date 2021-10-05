@@ -552,11 +552,11 @@ int isNamedAndPolygon(ob_t * ob)
 }
 
 /** collapse the given tiledob into the texture channel 1 of tarobj */
-void collapseMapTiledTextures(ob_t * tarobj, ob_t * tiledob);
+void collapseMapTiledTextures(ob_t * tarob, ob_t * tiledob);
 /** collapse the given skidsob into the texture channel 2 of tarobj */
-void collapseSkidsGrassTextures(ob_t * tarobj, ob_t * skidsob);
+void collapseSkidsGrassTextures(ob_t * tarob, ob_t * skidsob);
 /** collapse the given shadob into the texture channel 3 of tarobj */
-void collapseShadowTextures(ob_t * tarobj, ob_t * shadob);
+void collapseShadowTextures(ob_t * tarob, ob_t * shadob);
 
 /** Match textures from ob1, ob2 and ob3 with ob0. In case a match is found
  *  add them as additional texture channels in ob0.

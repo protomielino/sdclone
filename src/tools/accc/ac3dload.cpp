@@ -648,7 +648,7 @@ int doObject(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int findIndice(int indice, int *oldva, int n)
+int findIndice(int indice, const int *oldva, int n)
 {
     for (int i = 0; i < n; i++)
     {
@@ -825,7 +825,6 @@ ob_t* terrainSplitOb(ob_t * object)
 ob_t* splitOb(ob_t *object)
 {
     int *oldva = 0;
-    int numptstored = 0; /* number of vertices stored */
     int oldnumptstored = 0; /* temporary placeholder for numptstored */
 
     /* The object we use as storage during splitting.
@@ -836,17 +835,13 @@ ob_t* splitOb(ob_t *object)
     tcoord_t curvertex[3];
     int curstoredidx[3];
 
-    int touse = 0;
+    bool touse = false;
     int orignumtris = 0; /* number of surfaces/triangles in the source object */
     int orignumverts = 0; /* number of vertices in the source object: orignumtris * 3 */
     int * tri;
-    int numvertstored = 0; /* number of vertices stored in the object */
-    int numtristored = 0; /* number of triangles stored in the object: numvertstored/3 */
-    int mustcontinue = 1;
+    bool mustcontinue = true;
     ob_t * tob0 = NULL;
     int numobject = 0;
-    int firstTri = 0;
-    int atleastone = 0;
     int curvert = 0;
 
     orignumtris = object->numsurf;
@@ -862,21 +857,22 @@ ob_t* splitOb(ob_t *object)
     // create texture channels
     createTexChannelArrays(&workob, object);
 
-    while (mustcontinue == 1)
+    while (mustcontinue)
     {
-        numvertstored = 0;
-        numtristored = 0;
-
-        numptstored = 0;
-        mustcontinue = 0;
-        firstTri = 0;
-        atleastone = 1;
-        while (atleastone == 1)
+        mustcontinue = false;
+		
+        int numvertstored = 0; /* number of vertices stored in the object */
+        int numtristored = 0; /* number of triangles stored in the object: numvertstored/3 */
+        int numptstored = 0; /* number of vertices stored */
+        bool firstTri = false;
+        bool atleastone = true;
+		
+        while (atleastone)
         {
-            atleastone = 0;
+            atleastone = false;
             for (int curtri = 0; curtri < orignumtris; curtri++)
             {
-                touse = 0;
+                touse = false;
                 if (tri[curtri] == 1)
                     continue;
                 mustcontinue = 1;
@@ -893,15 +889,15 @@ ob_t* splitOb(ob_t *object)
 
                 if (curstoredidx[0] == -1 && curstoredidx[1] == -1 && curstoredidx[2] == -1)
                 {
-                    if (firstTri == 0)
-                        touse = 1;
+                    if (!firstTri)
+                        touse = true;
                     else
-                        touse = 0;
+                        touse = false;
                     /* triangle is ok */
                 }
                 else
                 {
-                    touse = 1;
+                    touse = true;
 
                     for (int i = 0; i < 3; i++)
                     {
@@ -909,15 +905,15 @@ ob_t* splitOb(ob_t *object)
                             if(workob.textarray[curstoredidx[i] * 2] != curvertex[i].u
                             || workob.textarray[curstoredidx[i] * 2 + 1] != curvertex[i].v)
                             {
-                                touse = 0;
+                                touse = false;
                                 /* triangle is not ok */
                             }
                     }
                 }
 
-                if (touse == 1)
+                if (touse)
                 {
-                    firstTri = 1;
+                    firstTri = true;
                     /* triangle is ok */
 
                     tri[curtri] = 1; /* mark this triangle */
@@ -947,12 +943,12 @@ ob_t* splitOb(ob_t *object)
                     }
 
                     numtristored++;
-                    atleastone = 1;
+                    atleastone = true;
 
-                } // if (touse == 1)
+                } // if (touse)
 
             } // for (curtri = 0; curtri < orignumtris; curtri++)
-        } // while (atleastone == 1)
+        } // while (atleastone)
 
         if (numtristored == 0)
             continue;
@@ -1347,17 +1343,15 @@ bool isObjectSplit(ob_t* object)
     if (notexturesplit)
         return false;
 
-    bool same_pt = false, diff_u = false, diff_v = false;
     int numverts = object->numvertice;
 
     for (int i = 0; i < numverts; i++)
     {
         for (int j = i + 1; j < numverts; j++)
         {
-            same_pt = (object->vertexarray[i].indice
-                    == object->vertexarray[j].indice);
-            diff_u = (object->vertexarray[i].u != object->vertexarray[j].u);
-            diff_v = (object->vertexarray[i].v != object->vertexarray[j].v);
+            bool same_pt = (object->vertexarray[i].indice == object->vertexarray[j].indice);
+            bool diff_u = (object->vertexarray[i].u != object->vertexarray[j].u);
+            bool diff_v = (object->vertexarray[i].v != object->vertexarray[j].v);
 
             if (same_pt && (diff_u || diff_v))
                 return true;
@@ -2555,20 +2549,11 @@ void smoothFaceTriNorm(ob_t * object)
     ob_t * tmpob = object;
 
     if (tmpob->name == NULL)
-    {
-        tmpob = tmpob->next;
         return;
-    }
     if (!strcmp(tmpob->name, "root"))
-    {
-        tmpob = tmpob->next;
         return;
-    }
     if (!strcmp(tmpob->name, "world"))
-    {
-        tmpob = tmpob->next;
         return;
-    }
 
     for (int i = 0; i < tmpob->numvert; i++)
     {
@@ -2968,9 +2953,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
 
 void computeSaveOBJ(const char * OutputFilename, ob_t * object)
 {
-
     char name2[256];
-    char *p, *q;
     ob_t * tmpob = NULL;
     mat_t * tmat = NULL;
     int deltav = 1;
@@ -3098,10 +3081,9 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object)
 
     for (int i = 0; i < texnum; i++)
     {
-
         printf("analysing  %s\n", tex[i]);
-        p = tex[i];
-        q = name2;
+        char *p = tex[i];
+        char *q = name2;
         while (*p)
         {
             if ((*p <= 'Z' && *p >= 'A'))
@@ -3632,9 +3614,7 @@ void stripifyOb(ob_t * object, int writeit)
 
 void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
 {
-
     char name2[256];
-    char *p, *q;
     ob_t * tmpob = NULL;
     mat_t * tmat = NULL;
     int deltav = 1;
@@ -3691,8 +3671,8 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
     {
 
         printf("analysing  %s\n", tex[i]);
-        p = tex[i];
-        q = name2;
+        char *p = tex[i];
+        char *q = name2;
         while (*p)
         {
             if ((*p <= 'Z' && *p >= 'A'))

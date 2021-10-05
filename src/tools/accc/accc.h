@@ -311,7 +311,7 @@ void copySingleVertexData(ob_t * destob, ob_t * srcob,
 /** Clears the saved flag for a single entry in ob's vertexarray and does so
  *  for all texture channels.
  */
-void clearSavedInVertexArrayEntry(ob_t * ob, int vertidx);
+void clearSavedInVertexArrayEntry(ob_t * object, int vertidx);
 
 /** Creates all texture channels in destob based on the texture channels present in srcob.
  *  In particular, srcob's vertexarray properties determine whether a texture channel is present
@@ -335,7 +335,7 @@ void createSingleTexChannelArrays(ob_t * destob, const ob_t * srcob, int channel
  *  @param obsurf the surface index in the object (obsurf * 3 is the first entry in the vertexarray considered)
  *  @param out the computed centroid
  */
-void computeObSurfCentroid(const ob_t * ob, int obsurf, point_t * out);
+void computeObSurfCentroid(const ob_t * object, int obsurf, point_t * out);
 
 extern conv_t typeConvertion;
 extern ob_t * root_ob;
