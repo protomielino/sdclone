@@ -1487,11 +1487,11 @@ int loadAC(const char * inputFilename, const char * outputFilename)
         return (-1);
     }
 
-    current_ob = root_ob = (ob_t*) malloc(sizeof(ob_t));
-    current_material = root_material = (mat_t *) malloc(sizeof(mat_t));
-    memset(current_ob, '\0', sizeof(ob_t));
-    memset(current_material, '\0', sizeof(mat_t));
+    current_ob = root_ob = obCreate();
     root_ob->name = strdup("root");
+
+    current_material = root_material = (mat_t *) malloc(sizeof(mat_t));
+    memset(current_material, 0, sizeof(mat_t));
     root_material->name = strdup("root");
     fprintf(stderr, "starting loading ...\n");
 
