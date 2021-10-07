@@ -1355,6 +1355,11 @@ int doRefs(char *Line, ob_t *object, mat_t *material)
         fprintf(stderr, "invalid Refs format %s\n", p);
         return (-1);
     }
+    if (refs != 3)
+    {
+        fprintf(stderr, "invalid number of Refs %d\n", refs);
+        return (-1);
+    }
 
     numrefstotal += refs;
     numrefsFound = true;
