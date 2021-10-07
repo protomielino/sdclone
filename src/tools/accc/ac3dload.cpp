@@ -227,8 +227,11 @@ FILE * ofile;
 int numob = 0;
 int nummaterial = 0;
 int numvertex = 0;
-int numvertFound = 0;
-int numrefsFound = 0;
+int dataSize = 0;
+int dataSizeRead = 0;
+bool numvertFound = false;
+bool numrefsFound = false;
+bool dataFound = false;
 int attrSurf = 0;
 int attrMat = 0;
 int numrefs = 0;
@@ -358,7 +361,6 @@ ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpo
     retob->attrSurf = srcobj->attrSurf;
     retob->attrMat = srcobj->attrMat;
 
-    retob->dataSize = srcobj->dataSize;
     if (srcobj->data)
         retob->data = strdup(srcobj->data);
 
@@ -621,7 +623,8 @@ int doObject(char *Line, ob_t *object, mat_t *material)
 
     numob++;
     numrefs = 0;
-    numvertFound = 0;
+    numvertFound = false;
+    dataFound = false;
 
     p = strstr(Line, " ");
     if (p == NULL)
@@ -727,7 +730,6 @@ ob_t* terrainSplitOb(ob_t * object)
         tob->numsurf = numNewSurf;
         tob->attrSurf = object->attrSurf;
         tob->attrMat = object->attrMat;
-        tob->dataSize = object->dataSize;
         if (object->data)
             tob->data = strdup(object->data);
         tob->type = strdup(object->type);
@@ -1035,8 +1037,9 @@ int doKids(char* Line, ob_t* object, mat_t* material)
         }
 
         numrefs = numrefstotal = 0;
-        numvertFound = 0;
-        numrefsFound = 0;
+        numvertFound = false;
+        numrefsFound = false;
+        dataFound = false;
         numvertex = 0;
         numvertice = 0;
 
@@ -1099,6 +1102,7 @@ int doName(char *Line, ob_t *object, mat_t *material)
     fprintf(stderr, "loading  %s object                             \r", name);
     printf("loading  %s object\n", name);
     tmpIndice = 0;
+    dataFound = false;
     return (0);
 }
 
@@ -1117,6 +1121,7 @@ int doLoc(char *Line, ob_t *object, mat_t *material)
         return (-1);
     }
 
+    dataFound = false;
     return (0);
 }
 
@@ -1128,16 +1133,34 @@ int doData(char *Line, ob_t *object, mat_t *material)
         fprintf(stderr, "unknown data format %s\n", Line);
         return (-1);
     }
-    if (sscanf(p, "%d", &object->next->dataSize) != 1)
+    if (sscanf(p, "%d", &dataSize) != 1)
     {
         fprintf(stderr, "invalid data format %s\n", p);
         return (-1);
     }
+    dataFound = true;
+    dataSizeRead = 0;
+    object->next->data = (char *)calloc(1, dataSize + 1);
+    return (0);
+}
+
+int doGetData(char *Line, ob_t *object, mat_t *material)
+{
+    int lineSize = (int)strlen(Line);
+    // the '\n' of the last line is not included
+    if ((dataSizeRead + lineSize) > dataSize && Line[lineSize - 1] == '\n')
+    {
+        Line[lineSize - 1] = 0;
+        lineSize--;
+    }
+    dataSizeRead += lineSize;
+    strcat(object->next->data, Line);
     return (0);
 }
 
 int doCrease(char *Line, ob_t *object, mat_t *material)
 {
+    dataFound = false;
     return (0);
 }
 
@@ -1168,6 +1191,7 @@ int doTexture(char *Line, ob_t *object, mat_t *material)
     p = strstr(object->next->texture, "\"");
     if (p != NULL)
         *p = '\0';
+    dataFound = false;
     return (0);
 }
 
@@ -1185,6 +1209,7 @@ int doTexrep(char *Line, ob_t *object, mat_t *material)
         return (-1);
     }
 
+    dataFound = false;
     return (0);
 }
 
@@ -1204,7 +1229,8 @@ int doNumvert(char *Line, ob_t *object, mat_t *material)
     object->next->vertex = (point_t *) malloc(
             sizeof(point_t) * object->next->numvert);
     numvertex = 0;
-    numvertFound = 1;
+    numvertFound = true;
+    dataFound = false;
     return (0);
 }
 
@@ -1221,7 +1247,8 @@ int doNumsurf(char *Line, ob_t *object, mat_t *material)
         fprintf(stderr, "invalid numsurf format %s\n", p);
         return (-1);
     }
-    numvertFound = 0;
+    numvertFound = false;
+    dataFound = false;
     return (0);
 }
 
@@ -1293,7 +1320,8 @@ int doSurf(char *Line, ob_t *object, mat_t *material)
         fprintf(stderr, "invalid SURF format %s\n", p);
         return (-1);
     }
-    numvertFound = 0;
+    numvertFound = false;
+    dataFound = false;
     return (0);
 }
 
@@ -1310,7 +1338,7 @@ int doMat(char *Line, ob_t *object, mat_t *material)
         fprintf(stderr, "invalid mat format %s\n", p);
         return (-1);
     }
-    numvertFound = 0;
+    numvertFound = false;
     return (0);
 }
 
@@ -1329,7 +1357,7 @@ int doRefs(char *Line, ob_t *object, mat_t *material)
     }
 
     numrefstotal += refs;
-    numrefsFound = 1;
+    numrefsFound = true;
     tmpsurf[numrefs] = refs;
     numrefs++;
     return (0);
@@ -1511,18 +1539,24 @@ int loadAC(const char * inputFilename, const char * outputFilename)
             }
             i++;
         }
-        if (numvertFound == 1 && doVerb == NULL)
+        if (numvertFound && doVerb == NULL)
         {
             ret = doGetVertex(Line, current_ob, current_material);
             if(ret != 0)
                 break;
         }
-        else if (numrefsFound == 1 && doVerb == NULL)
+        else if (numrefsFound && doVerb == NULL)
         {
             ret = doGetSurf(Line, current_ob, current_material);
             if(ret != 0)
                 break;
         }
+	else if (dataFound && doVerb == NULL)
+	{
+	    ret = doGetData(Line, current_ob, current_material);
+	    if (ret != 0)
+		break;
+	}
         else
         {
             if (doVerb == NULL)
@@ -1530,36 +1564,12 @@ int loadAC(const char * inputFilename, const char * outputFilename)
                 fprintf(stderr, " Unknown verb %s\n", Line);
                 continue;
             }
-            numvertFound = 0;
-            numrefsFound = 0;
+            numvertFound = false;
+            numrefsFound = false;
+            dataFound = false;
             ret = doVerb(Line, current_ob, current_material);
             if(ret != 0)
                 break;
-            // data section has the data on the following line(s)
-            if (stricmp("data", verbTab[i].verb) == 0)
-            {
-                int dataSize = 0;
-                char * data = (char *)calloc(1, current_ob->next->dataSize + 1);
-                while (dataSize < current_ob->next->dataSize)
-                {
-                    if (fgets(Line, sizeof(Line), file))
-                    {
-                        int lineSize = (int)strlen(Line);
-                        // the '\n' of the last line is not included
-                        if ((dataSize + lineSize) > current_ob->next->dataSize && Line[lineSize - 1] == '\n')
-                        {
-                            Line[lineSize - 1] = 0;
-                            lineSize--;
-                        }
-                        dataSize += lineSize;
-                        strcat(data, Line);
-                    }
-                    else
-                        break;
-                }
-                current_ob->next->data = strdup(data);
-                free(data);
-            }
         }
     }
     fclose(file);
@@ -4908,7 +4918,6 @@ int mergeSplitted(ob_t **object)
         tobS->name=(char *) malloc(strlen(nameS)+1);
         tobS->texture=strdup(nameS);
         tobS->type= tob->type ? strdup(tob->type) : NULL;
-        tobS->dataSize = tob->dataSize;
         tobS->data=strdup(tob->data);
 
         memcpy(tobS->vertex, tob->vertex,tob->numvert*sizeof(point_t));
