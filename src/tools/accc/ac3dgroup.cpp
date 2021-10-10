@@ -594,21 +594,27 @@ void copyTextureChannel(ob_t * destob, ob_t * srcob, int channel)
 
     if (channel == 1)
     {
-        destob->texture1 = tex;
-        destob->textarray1 = texarr;
-        destob->vertexarray1 = vertarr;
+        destob->texture1 = strdup(tex);
+        destob->textarray1 = (double*)malloc(sizeof(double) * srcob->numvertice * 2);
+        memcpy(destob->textarray1, texarr, sizeof(double) * srcob->numvertice * 2);
+        destob->vertexarray1 = (tcoord_t*)malloc(sizeof(tcoord_t) * srcob->numsurf * 3);
+        memcpy(destob->vertexarray1, vertarr, sizeof(tcoord_t) * srcob->numsurf * 3);
     }
     else if (channel == 2)
     {
-        destob->texture2 = tex;
-        destob->textarray2 = texarr;
-        destob->vertexarray2 = vertarr;
+        destob->texture2 = strdup(tex);
+        destob->textarray2 = (double*)malloc(sizeof(double) * srcob->numvertice * 2);
+        memcpy(destob->textarray2, texarr, sizeof(double) * srcob->numvertice * 2);
+        destob->vertexarray2 = (tcoord_t*)malloc(sizeof(tcoord_t) * srcob->numsurf * 3);
+        memcpy(destob->vertexarray2, vertarr, sizeof(tcoord_t) * srcob->numsurf * 3);
     }
     else if (channel == 3)
     {
-        destob->texture3 = tex;
-        destob->textarray3 = texarr;
-        destob->vertexarray3 = vertarr;
+        destob->texture3 = strdup(tex);
+        destob->textarray3 = (double*)malloc(sizeof(double) * srcob->numvertice * 2);
+        memcpy(destob->textarray3, texarr, sizeof(double) * srcob->numvertice * 2);
+        destob->vertexarray3 = (tcoord_t*)malloc(sizeof(tcoord_t) * srcob->numsurf * 3);
+        memcpy(destob->vertexarray3, vertarr, sizeof(tcoord_t) * srcob->numsurf * 3);
     }
 }
 
