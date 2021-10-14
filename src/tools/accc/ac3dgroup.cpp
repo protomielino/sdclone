@@ -332,7 +332,7 @@ void loadAndGroup(const char *OutputFileName)
                 printf("inserting %s in group 1 of %s\n", tmpob->name,
                         array_groups[i].name);
             }
-            else if (tmpob->dist_min < d2 * d1)
+            else if (tmpob->dist_min < d2 * d2)
             {
                 array_groups[i].numkids--;
                 array_groups[i].numkids2++;

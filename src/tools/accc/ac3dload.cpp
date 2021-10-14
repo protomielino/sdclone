@@ -201,7 +201,7 @@ void obSetVertexArraysIndex(ob_t * ob, int vaIdx, int newIndex)
 #ifndef M_PI
 #define M_PI 3.14159267
 #endif
-extern int far_dist;
+extern double far_dist;
 void computeTriNorm(ob_t * object);
 void smoothTriNorm(ob_t * object);
 void computeObjectTriNorm(ob_t * object);

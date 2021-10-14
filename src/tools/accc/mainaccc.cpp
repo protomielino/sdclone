@@ -42,9 +42,9 @@ char * fileL1 = NULL;
 char * fileL2 = NULL;
 char * fileL3 = NULL;
 char * OrderString = NULL;
-int d1 = 0;
-int d2 = 0;
-int d3 = 0;
+double d1 = 0;
+double d2 = 0;
+double d3 = 0;
 bool extendedStrips = false;
 bool extendedEnvCoord = false;
 bool isobjectacar = false;
@@ -53,7 +53,7 @@ bool notexturesplit = false;
 bool collapseObject = false;
 bool splitObjectsDuringLoad = true;
 conv_t typeConvertion = _UNSPECIFIED;
-int far_dist = 10000;
+double far_dist = 10000;
 bool normalMapping = false;
 extern double smooth_angle;
 
@@ -277,7 +277,7 @@ void init_args(int argc, char **argv)
                     exit(-1);
                 }
                 i++;
-                if (sscanf(argv[i], "%d", &d3) != 1)
+                if (sscanf(argv[i], "%lf", &d3) != 1)
                 {
                     fprintf(stderr, "invalid -d3 %s\n", argv[i]);
                     exit(1);
@@ -292,7 +292,7 @@ void init_args(int argc, char **argv)
                     exit(-1);
                 }
                 i++;
-                if (sscanf(argv[i], "%d", &d2) != 1)
+                if (sscanf(argv[i], "%lf", &d2) != 1)
                 {
                     fprintf(stderr, "invalid -d2 %s\n", argv[i]);
                     exit(1);
@@ -307,7 +307,7 @@ void init_args(int argc, char **argv)
                     exit(-1);
                 }
                 i++;
-                if (sscanf(argv[i], "%d", &d1) != 1)
+                if (sscanf(argv[i], "%lf", &d1) != 1)
                 {
                     fprintf(stderr, "invalid -d1 %s\n", argv[i]);
                     exit(1);
@@ -335,7 +335,7 @@ void init_args(int argc, char **argv)
             {
                 if (!strcmp(argv[4], "-order"))
                     OrderString = argv[5];
-                else if (sscanf(argv[4], "%d", &far_dist) != 1)
+                else if (sscanf(argv[4], "%lf", &far_dist) != 1)
                 {
                     fprintf(stderr, "invalid -order %s\n", argv[4]);
                     exit(1);
