@@ -363,7 +363,12 @@ int main(int argc, char **argv)
     }
 #endif
     else
-        loadAC(InputFileName, OutputFileName);
+    {
+        ob_t * objects;
+        mat_t * materials;
+
+        loadAC(InputFileName, &objects, &materials, OutputFileName);
+    }
 
     return 0;
 }

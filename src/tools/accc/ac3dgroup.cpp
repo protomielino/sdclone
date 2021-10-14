@@ -34,10 +34,43 @@
 #include "accc.h"
 
 extern int printOb(ob_t * ob);
-extern mat_t * root_material;
 extern void smoothTriNorm(ob_t * object);
 void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray);
 void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3);
+
+// count number of materials in list not including root
+int numberMaterial(mat_t* mat)
+{
+    if (!mat)
+        return 0;
+    int count = 0;
+    mat_t* tmat = mat;
+    while (tmat->next)
+    {
+        count++;
+        tmat = tmat->next;
+    }
+    return count;
+}
+// check if materials need to be merged
+bool materialNeedsMerge(mat_t * mat1, mat_t * mat2)
+{
+    int mat1_count = numberMaterial(mat1);
+    int mat2_count = numberMaterial(mat2);
+    if (mat2_count > mat1_count)
+        return true;
+    mat_t * tmat1 = mat1->next;
+    mat_t * tmat2 = mat2->next;
+    while (tmat1 && tmat2)
+    {
+        if (*tmat1 != *tmat2)
+            return true;
+        tmat1 = tmat1->next;
+        tmat2 = tmat2->next;
+    }
+    return false;
+}
+
 void loadAndGroup(const char *OutputFileName)
 {
     ob_t * ob0 = NULL;
@@ -47,6 +80,10 @@ void loadAndGroup(const char *OutputFileName)
     ob_t * tmpob = NULL;
     ob_t * tmpob2 = NULL;
     mat_t * tmat = NULL;
+    mat_t * mat0 = NULL;
+    mat_t * mat1 = NULL;
+    mat_t * mat2 = NULL;
+    mat_t * mat3 = NULL;
     extern FILE * ofile;
     int num_tkmn = 0;
     ob_groups_t * array_groups;
@@ -62,30 +99,22 @@ void loadAndGroup(const char *OutputFileName)
     if (fileL0)
     {
         fprintf(stderr, "\nloading file %s\n", fileL0);
-        loadAC(fileL0);
-        ob0 = root_ob;
-        root_ob = NULL;
+        loadAC(fileL0, &ob0, &mat0);
     }
     if (fileL1)
     {
         fprintf(stderr, "\nloading file %s\n", fileL1);
-        loadAC(fileL1);
-        ob1 = root_ob;
-        root_ob = NULL;
+        loadAC(fileL1, &ob1, &mat1);
     }
     if (fileL2)
     {
         fprintf(stderr, "\nloading file %s\n", fileL2);
-        loadAC(fileL2);
-        ob2 = root_ob;
-        root_ob = NULL;
+        loadAC(fileL2, &ob2, &mat2);
     }
     if (fileL3)
     {
         fprintf(stderr, "\nloading file %s\n", fileL3);
-        loadAC(fileL3);
-        ob3 = root_ob;
-        root_ob = NULL;
+        loadAC(fileL3, &ob3, &mat3);
     }
     /* now collapse the texture and texture  arrays of 1 2 3 in 0 */
 
@@ -95,6 +124,23 @@ void loadAndGroup(const char *OutputFileName)
     fprintf(stderr, "\ncollapsing textures\n");
 
     collapseTextures(ob0, ob1, ob2, ob3);
+
+    // todo: merge materials
+    if (mat1 && materialNeedsMerge(mat0, mat1))
+    {
+        fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL1);
+        exit(-1);
+    }
+    if (mat2 && materialNeedsMerge(mat0, mat2))
+    {
+        fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL2);
+        exit(-1);
+    }
+    if (mat3 && materialNeedsMerge(mat0, mat3))
+    {
+        fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL3);
+        exit(-1);
+    }
 
     ob0 = splitObjects(ob0);
 
@@ -402,7 +448,7 @@ void loadAndGroup(const char *OutputFileName)
         return;
     }
     fprintf(ofile, "AC3Db\n");
-    tmat = root_material;
+    tmat = mat0;
     while (tmat != NULL)
     {
         if (strcmp(tmat->name, "root") == 0)

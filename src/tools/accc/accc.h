@@ -41,15 +41,6 @@ extern bool normalMapping;
 extern char *OrderString;
 extern bool collapseObject;
 
-extern void loadAndGroup(const char *OutputFileName);
-/** Loads the file with inputFilename to the global root_ob and root_material
- *  variables and optionally outputs the loaded object to outputFilename
- *  based on the current value of the global typeConvertion variable.
- *
- *  @returns 0 on success, a value != 0 on failure
- */
-int loadAC(const char * inputFilename, const char * outputFilename = NULL);
-
 enum conv_t {
     _UNSPECIFIED,
     _AC3DTO3DS,
@@ -265,6 +256,15 @@ struct color_t
     double r;
     double g;
     double b;
+
+    bool operator == (const color_t & rhs) const
+    {
+        return r == rhs.r && g == rhs.g && b == rhs.b;
+    }
+    bool operator != (const color_t & rhs) const
+    {
+        return !(*this == rhs);
+    }
 };
 
 struct mat_t
@@ -277,7 +277,31 @@ struct mat_t
     double shi;
     double trans;
     mat_t * next;
+
+    bool operator == (const mat_t & rhs) const
+    {
+        return rgb == rhs.rgb && 
+               amb == rhs.amb &&
+               emis == rhs.emis &&
+               spec == rhs.spec &&
+               shi == rhs.shi && 
+               trans == rhs.trans;
+    }
+    bool operator != (const mat_t & rhs) const
+    {
+        return !(*this == rhs);
+    }
 };
+
+void loadAndGroup(const char* OutputFileName);
+
+/** Loads the file with inputFilename to the specified objects and materials
+ *  variables and optionally outputs the loaded object to outputFilename
+ *  based on the current value of the global typeConvertion variable.
+ *
+ *  @returns 0 on success, a value != 0 on failure
+ */
+int loadAC(const char* inputFilename, ob_t** objects, mat_t** materials, const char* outputFilename = NULL);
 
 /** Copies a single surface from the "vertexarray" attributes of srcob to the ones of destob.
  *  It decides whether to copy multitexture data based on srcob's "vertexarray" attributes.
@@ -341,7 +365,6 @@ void createSingleTexChannelArrays(ob_t * destob, const ob_t * srcob, int channel
 void computeObSurfCentroid(const ob_t * object, int obsurf, point_t * out);
 
 extern conv_t typeConvertion;
-extern ob_t * root_ob;
 
 /** Splits the given object and returns the split objects.
  *

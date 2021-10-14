@@ -213,12 +213,10 @@ void mapNormalToSphere(ob_t * object);
 void mapNormalToSphere2(ob_t * object);
 void normalMap(ob_t * object);
 void mapTextureEnv(ob_t * object);
-mat_t * root_material = NULL;
 point_t tmpPoint[100000];
 tcoord_t tmpva[100000];
 double tmptexa[200000];
 int tmpsurf[100000];
-ob_t * root_ob;
 int refs = 0;
 char * const shadowtexture = strdup("shadow2.png");
 
@@ -267,12 +265,12 @@ int doRefs(char *Line, ob_t *object, mat_t *material);
 int doCrease(char *Line, ob_t *object, mat_t *material);
 
 #ifdef _3DS
-void saveObin3DS(const char * OutputFilename, ob_t * object);
+void saveObin3DS(const char * OutputFilename, ob_t * object, mat_t * material);
 #endif
-void computeSaveAC3D(const char * OutputFilename, ob_t * object);
-void computeSaveOBJ(const char * OutputFilename, ob_t * object);
-void computeSaveAC3DM(const char * OutputFilename, ob_t * object);
-void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object);
+void computeSaveAC3D(const char * OutputFilename, ob_t * object, mat_t * material);
+void computeSaveOBJ(const char * OutputFilename, ob_t * object, mat_t * material);
+void computeSaveAC3DM(const char * OutputFilename, ob_t * object, mat_t * material);
+void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, mat_t * material);
 void stripifyOb(ob_t * object, int writeit);
 
 verbaction_t verbTab[] =
@@ -575,7 +573,7 @@ int doMaterial(char *Line, ob_t *object, mat_t *material)
 {
     char * p;
     char name[256];
-    mat_t * materialt, *t1;
+    mat_t * materialt;
 
     materialt = (mat_t*) malloc(sizeof(mat_t));
     memset(materialt, '\0', sizeof(mat_t));
@@ -603,10 +601,13 @@ int doMaterial(char *Line, ob_t *object, mat_t *material)
     }
 
     materialt->name = strdup(name);
-    t1 = material->next;
-    material->next = materialt;
-    materialt->next = t1;
 
+    // append to list
+    mat_t * tmat = material;
+    while (tmat->next)
+        tmat = tmat->next;
+    tmat->next = materialt;
+ 
     return (0);
 }
 
@@ -1492,7 +1493,7 @@ ob_t * splitObjects(ob_t* object)
     return newob;
 }
 
-int loadAC(const char * inputFilename, const char * outputFilename)
+int loadAC(const char * inputFilename, ob_t ** objects, mat_t ** materials, const char * outputFilename)
 {
     /* saveIn : 0= 3ds , 1= obj , 2=ac3d grouped (track) , 3 = ac3d strips (cars) */
     char Line[256];
@@ -1520,13 +1521,15 @@ int loadAC(const char * inputFilename, const char * outputFilename)
         return (-1);
     }
 
-    current_ob = root_ob = obCreate();
-    root_ob->name = strdup("root");
+    current_ob = obCreate();
+    current_ob->name = strdup("root");
+    *objects = current_ob;
 
-    current_material = root_material = (mat_t *) malloc(sizeof(mat_t));
+    current_material = (mat_t *) malloc(sizeof(mat_t));
     memset(current_material, 0, sizeof(mat_t));
-    root_material->name = strdup("root");
+    current_material->name = strdup("root");
     fprintf(stderr, "starting loading ...\n");
+    *materials = current_material;
 
     while (fgets(Line, sizeof(Line), file))
     {
@@ -1584,10 +1587,11 @@ int loadAC(const char * inputFilename, const char * outputFilename)
         return ret;
     }
 
-    root_ob = current_ob;
-
-    if(splitObjectsDuringLoad != 0)
-        root_ob = splitObjects(root_ob);
+    if (splitObjectsDuringLoad != 0)
+    {
+        ob_t * temp = splitObjects(current_ob);
+        current_ob = temp;
+    }
 
     // --- perform file output ---
 
@@ -1596,24 +1600,24 @@ int loadAC(const char * inputFilename, const char * outputFilename)
 
     if (typeConvertion == _AC3DTOOBJ)
     {
-        computeSaveOBJ(outputFilename, root_ob);
+        computeSaveOBJ(outputFilename, current_ob, current_material);
     }
     else if (typeConvertion == _AC3DTOAC3DM)
     {
-        computeSaveAC3DM(outputFilename, root_ob);
+        computeSaveAC3DM(outputFilename, current_ob, current_material);
     }
     else if (typeConvertion == _AC3DTOAC3DS)
     {
-        computeSaveAC3DStrip(outputFilename, root_ob);
+        computeSaveAC3DStrip(outputFilename, current_ob, current_material);
     }
     else if (typeConvertion == _AC3DTOAC3D)
     {
-        computeSaveAC3D(outputFilename, root_ob);
+        computeSaveAC3D(outputFilename, current_ob, current_material);
     }
 #ifdef _3DS
     else if (typeConvertion == _AC3DTO3DS)
     {
-        saveObin3DS(outputFilename, root_ob);
+        saveObin3DS(outputFilename, current_ob, current_material);
     }
 #endif
 
@@ -1745,7 +1749,7 @@ void saveIn3DSsubObject(ob_t * object,database3ds *db)
 
 }
 
-void saveObin3DS( char * OutputFilename, ob_t * object)
+void saveObin3DS( char * OutputFilename, ob_t * object, mat_t * material)
 {
     database3ds *db = NULL;
     file3ds *file;
@@ -1909,19 +1913,19 @@ void saveObin3DS( char * OutputFilename, ob_t * object)
         printf("texture file %s will be stored as %s.png \n",tex[i],name2);
         sprintf(matr->texture.map.name,"%s.png",name2);
 
-        if (root_material!=NULL)
+        if (material != NULL)
         {
-            matr->ambient.r = root_material->amb.r;
-            matr->ambient.g = root_material->amb.g;
-            matr->ambient.b = root_material->amb.b;
-            matr->specular.r = root_material->spec.r;
-            matr->specular.g = root_material->spec.g;
-            matr->specular.b = root_material->spec.b;
-            matr->shininess = root_material->shi;
-            matr->transparency = root_material->trans;
-            matr->diffuse.r = root_material->rgb.r;
-            matr->diffuse.g = root_material->rgb.g;
-            matr->diffuse.b = root_material->rgb.b;
+            matr->ambient.r = material->amb.r;
+            matr->ambient.g = material->amb.g;
+            matr->ambient.b = material->amb.b;
+            matr->specular.r = material->spec.r;
+            matr->specular.g = material->spec.g;
+            matr->specular.b = material->spec.b;
+            matr->shininess = material->shi;
+            matr->transparency = material->trans;
+            matr->diffuse.r = material->rgb.r;
+            matr->diffuse.g = material->rgb.g;
+            matr->diffuse.b = material->rgb.b;
         }
         else
         {
@@ -2619,7 +2623,7 @@ void smoothObjectTriNorm(ob_t * object)
     return;
 }
 
-void computeSaveAC3D(const char * OutputFilename, ob_t * object)
+void computeSaveAC3D(const char * OutputFilename, ob_t * object, mat_t * material)
 {
 
     char name2[256];
@@ -2653,7 +2657,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
     }
 
     fprintf(ofile, "AC3Db\n");
-    tmat = root_material;
+    tmat = material;
     while (tmat != NULL)
     {
         if (strcmp(tmat->name, "root") == 0)
@@ -2966,7 +2970,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object)
     fclose(ofile);
 }
 
-void computeSaveOBJ(const char * OutputFilename, ob_t * object)
+void computeSaveOBJ(const char * OutputFilename, ob_t * object, mat_t * material)
 {
     char name2[256];
     ob_t * tmpob = NULL;
@@ -2991,7 +2995,7 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object)
         return;
     }
 
-    tmat = root_material;
+    tmat = material;
     while (tmat != NULL)
     {
         if (strcmp(tmat->name, "root") != 0)
@@ -3627,7 +3631,7 @@ void stripifyOb(ob_t * object, int writeit)
     free(StripLength);
 }
 
-void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
+void computeSaveAC3DM(const char * OutputFilename, ob_t * object, mat_t * material)
 {
     char name2[256];
     ob_t * tmpob = NULL;
@@ -3641,7 +3645,7 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object)
         return;
     }
 
-    tmat = root_material;
+    tmat = material;
     while (tmat != NULL)
     {
         if (strcmp(tmat->name, "root") == 0)
@@ -4396,7 +4400,7 @@ void normalMap01(ob_t * object)
     }
 }
 
-void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
+void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, mat_t * material)
 
 {
     ob_t * tmpob = NULL;
@@ -4425,7 +4429,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object)
             mergeSplitted(&object);
     }
     fprintf(ofile, "AC3Db\n");
-    tmat = root_material;
+    tmat = material;
     while (tmat != NULL)
     {
         if (strcmp(tmat->name, "root") == 0)
