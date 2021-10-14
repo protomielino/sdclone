@@ -274,7 +274,7 @@ void loadAndGroup(const char *OutputFileName)
             {
                 if (atoi(tmpob->name + 4) == array_groups[i].tkmnlabel)
                 {
-                    printf("object %s is forced in group %d \n", tmpob->name,
+                    printf("object %s is forced in group %d\n", tmpob->name,
                             array_groups[i].tkmnlabel);
                     good_group = i;
                     break;
@@ -457,7 +457,7 @@ void loadAndGroup(const char *OutputFileName)
             continue;
         }
         fprintf(ofile,
-                "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %3d trans 0 \n",
+                "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %3d trans 0\n",
                 tmat->name, tmat->rgb.r, tmat->rgb.g, tmat->rgb.b, tmat->amb.r,
                 tmat->amb.g, tmat->amb.b, tmat->emis.r, tmat->emis.g,
                 tmat->emis.b, tmat->spec.r, tmat->spec.g, tmat->spec.b,

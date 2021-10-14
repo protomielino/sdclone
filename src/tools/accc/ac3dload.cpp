@@ -1283,7 +1283,7 @@ int doGetVertex(char *Line, ob_t *object, mat_t *material)
         object->next->z_min = object->next->vertex[numvertex].z;
 
     numvertex++;
-    /*fprintf(stderr,"numvertex = %d \n",numvertex);*/
+    /*fprintf(stderr,"numvertex = %d\n",numvertex);*/
     return (0);
 }
 
@@ -1297,8 +1297,8 @@ int doGetSurf(char *Line, ob_t *object, mat_t *material)
         fprintf(stderr, "invalid surf format %s\n", Line);
         return (-1);
     }
-    /*fprintf(stderr,"numrefs = %d \n",numrefs);*/
-    /*printf("%.2lf %.2lf \n",tmpva[numvertice].u,tmpva[numvertice].v);*/
+    /*fprintf(stderr,"numrefs = %d\n",numrefs);*/
+    /*printf("%.2lf %.2lf\n",tmpva[numvertice].u,tmpva[numvertice].v);*/
     tmpva[numvertice].saved = false;
     tmptexa[tmpva[numvertice].indice * 2] = tmpva[numvertice].u
             * object->next->texrep_x;
@@ -1910,7 +1910,7 @@ void saveObin3DS( char * OutputFilename, ob_t * object, mat_t * material)
             }
         }
 
-        printf("texture file %s will be stored as %s.png \n",tex[i],name2);
+        printf("texture file %s will be stored as %s.png\n",tex[i],name2);
         sprintf(matr->texture.map.name,"%s.png",name2);
 
         if (material != NULL)
@@ -2194,7 +2194,7 @@ int foundNear(ob_t * object, ob_t *allobjects, double dist, bool print)
         if ((tmpob->x_min - x) * (tmpob->x_min - x)
                 + (tmpob->y_min - y) * (tmpob->y_min - y) < dist * dist)
         {
-            /*printf("object %s near object %s (dist=%d) \n", tmpob->name , object->name, dist);*/
+            /*printf("object %s near object %s (dist=%d)\n", tmpob->name , object->name, dist);*/
             numfound++;
             tmpob->inkids_o = true;
             if (print)
@@ -2207,7 +2207,7 @@ int foundNear(ob_t * object, ob_t *allobjects, double dist, bool print)
         if ((tmpob->x_max - x) * (tmpob->x_max - x)
                 + (tmpob->y_max - y) * (tmpob->y_max - y) < dist * dist)
         {
-            /*printf("object %s near object %s (dist=%d) \n", tmpob->name , object->name, dist);*/
+            /*printf("object %s near object %s (dist=%d)\n", tmpob->name , object->name, dist);*/
             numfound++;
             tmpob->inkids_o = true;
             if (print)
@@ -2220,7 +2220,7 @@ int foundNear(ob_t * object, ob_t *allobjects, double dist, bool print)
         if ((tmpob->x_min - x) * (tmpob->x_min - x)
                 + (tmpob->y_max - y) * (tmpob->y_max - y) < dist * dist)
         {
-            /*printf("object %s near object %s (dist=%d) \n", tmpob->name , object->name, dist);*/
+            /*printf("object %s near object %s (dist=%d)\n", tmpob->name , object->name, dist);*/
             numfound++;
             tmpob->inkids_o = true;
             if (print)
@@ -2233,7 +2233,7 @@ int foundNear(ob_t * object, ob_t *allobjects, double dist, bool print)
         if ((tmpob->x_max - x) * (tmpob->x_max - x)
                 + (tmpob->y_min - y) * (tmpob->y_min - y) < dist * dist)
         {
-            /*printf("object %s near object %s (dist=%d) \n", tmpob->name , object->name, dist);*/
+            /*printf("object %s near object %s (dist=%d)\n", tmpob->name , object->name, dist);*/
             numfound++;
             tmpob->inkids_o = true;
             if (print)
@@ -2960,7 +2960,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object, mat_t * materia
             }
         }
 
-        printf("texture file %s will be stored as %s.png \n", tex[i], name2);
+        printf("texture file %s will be stored as %s.png\n", tex[i], name2);
     }
 
     tmpIndice = 0;
@@ -3135,7 +3135,7 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object, mat_t * material
             }
         }
 
-        printf("texture file %s will be stored as %s.png \n", tex[i], name2);
+        printf("texture file %s will be stored as %s.png\n", tex[i], name2);
     }
 
     tmpob = object;
@@ -3251,14 +3251,14 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object, mat_t * material
             v1 = tmpob->vertexarray[i * 3].indice;
             v2 = tmpob->vertexarray[i * 3 + 1].indice;
             v3 = tmpob->vertexarray[i * 3 + 2].indice;
-            fprintf(ofile, "f %d/%d/%d %d/%d/%d %d/%d/%d \n", v1 + deltav,
+            fprintf(ofile, "f %d/%d/%d %d/%d/%d %d/%d/%d\n", v1 + deltav,
                     v1 + deltav, v1 + deltav, v2 + deltav, v2 + deltav,
                     v2 + deltav, v3 + deltav, v3 + deltav, v3 + deltav);
         }
         deltav += ind;
         tmpob = tmpob->next;
     }
-    fprintf(ofile, "end \n");
+    fprintf(ofile, "end\n");
 
     fclose(ofile);
 }
@@ -3353,7 +3353,7 @@ void stripifyOb(ob_t * object, int writeit)
     }
 
     if (object->name != NULL)
-        printf("name=%s stripnumber =%u \n", object->name, NumStrips);
+        printf("name=%s stripnumber =%u\n", object->name, NumStrips);
     /* Allocate enough memory for what we just read */
     if ((StripPoint = (unsigned int*)malloc(sizeof(unsigned int) * NumStripPoints)) == 0)
     {
@@ -3405,7 +3405,7 @@ void stripifyOb(ob_t * object, int writeit)
             {
                 StripStart[CurrentStripNumber - 1] = CurrentStripStart;
                 StripLength[CurrentStripNumber - 1] = CurrentStripLength;
-                printf("striplength %u \n",
+                printf("striplength %u\n",
                         StripLength[CurrentStripNumber - 1]);
             }
             CurrentStripNumber++;
@@ -3542,7 +3542,7 @@ void stripifyOb(ob_t * object, int writeit)
         for (unsigned int j = debj; j < StripLength[i]; j++)
         {
             v0 = StripPoint[StripStart[i] + j];
-            /*printf("adding point %d \n",v0);*/
+            /*printf("adding point %d\n",v0);*/
 
             if (writeit == 0)
             {
@@ -3724,7 +3724,7 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object, mat_t * materi
             }
         }
 
-        printf("texture file %s will be stored as %s.png \n", tex[i], name2);
+        printf("texture file %s will be stored as %s.png\n", tex[i], name2);
     }
 
     tmpob = object;
@@ -3840,14 +3840,14 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object, mat_t * materi
             v1 = tmpob->vertexarray[i * 3].indice;
             v2 = tmpob->vertexarray[i * 3 + 1].indice;
             v3 = tmpob->vertexarray[i * 3 + 2].indice;
-            fprintf(ofile, "f %d/%d/%d %d/%d/%d %d/%d/%d \n", v1 + deltav,
+            fprintf(ofile, "f %d/%d/%d %d/%d/%d %d/%d/%d\n", v1 + deltav,
                     v1 + deltav, v1 + deltav, v2 + deltav, v2 + deltav,
                     v2 + deltav, v3 + deltav, v3 + deltav, v3 + deltav);
         }
         deltav += ind;
         tmpob = tmpob->next;
     }
-    fprintf(ofile, "end \n");
+    fprintf(ofile, "end\n");
 }
 
 void mapNormalToSphere(ob_t *object)

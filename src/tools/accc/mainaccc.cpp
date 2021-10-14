@@ -70,7 +70,7 @@ void usage(void)
             "                   dist is used to determine the distance of the objects\n");
     /*    fprintf(stderr, "+om: ac3d to ac3d : the result is a vertex merged unique obj\n" );
      fprintf(stderr, "                    for smooth car only\n");*/
-    fprintf(stderr, "-o: ac3d to obj \n");
+    fprintf(stderr, "-o: ac3d to obj\n");
     fprintf(stderr, "+s: ac3d to ac3d with strips (used for cars)\n");
     fprintf(stderr,
             "+es <angle_of_smooth>: ac3d to ac3d with strips (used for cars) and extended ac3d file output\n");
@@ -84,8 +84,8 @@ void usage(void)
             "+etn: ac3d to ac3d with triangles no split and extended ac3d file output (normals normals)\n");
     fprintf(stderr,
             "+shad: ac3d to ac3d with triangles, create a new ac3d file used for track shading\n   vertical mapping of a single texture\n");
-    fprintf(stderr, "<inputfile>: \n");
-    fprintf(stderr, "<oututfile>: \n");
+    fprintf(stderr, "<inputfile>:\n");
+    fprintf(stderr, "<oututfile>:\n");
     fprintf(stderr,
             "-order \"orderstring\": only used with +es , +s and  +et\n");
     fprintf(stderr,
