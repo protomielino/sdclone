@@ -122,18 +122,38 @@ struct point_t
     }
 };
 
+struct uv_t
+{
+    double u;
+    double v;
+
+    void set(double _u, double _v) { u = _u; v = _v; }
+    bool operator == (const uv_t &rhs) const
+    {
+        return u == rhs.u && v == rhs.v;
+    }
+    bool operator != (const uv_t &rhs) const
+    {
+        return !(*this == rhs);
+    }
+};
+
 struct tcoord_t
 {
     int indice;
-    double u;
-    double v;
+    uv_t uv;
     bool saved;
 
-    void set(int _indice, double _u, double _v, bool _saved)
+    void set(int _indice, const uv_t &_uv, bool _saved)
     {
         indice = _indice;
-        u = _u;
-        v = _v;
+        uv = _uv;
+        saved = _saved;
+    }
+    void set(int _indice, double u, double v, bool _saved)
+    {
+        indice = _indice;
+        uv.set(u, v);
         saved = _saved;
     }
 };
@@ -180,10 +200,10 @@ struct ob_t
     /* Holds the texture coordinates of the vertices stored in "vertex" array
      * size: numvertice * 2
      */
-    double * textarray;
-    double * textarray1;
-    double * textarray2;
-    double * textarray3;
+    uv_t * textarray;
+    uv_t * textarray1;
+    uv_t * textarray2;
+    uv_t * textarray3;
     int * surfrefs;
     ob_t * next;
     double x_min;

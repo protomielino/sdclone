@@ -123,30 +123,29 @@ void obInitSpacialExtend(ob_t * ob)
 /** Helper method for obCreateTextArrays().
  *  Copies the u/v coords of the given texcoord into the given textarray, based
  *  on texcoord->indice property. */
-void copyTexCoordToTextArray(double * textarray, tcoord_t * texcoord)
+void copyTexCoordToTextArray(uv_t * textarray, tcoord_t * texcoord)
 {
-    int fstIdx = texcoord->indice * 2;
-    textarray[fstIdx] = texcoord->u;
-    textarray[fstIdx + 1] = texcoord->v;
+    textarray[texcoord->indice] = texcoord->uv;
 }
 
 void obCreateTextArrays(ob_t * ob)
 {
-    const int numEls = ob->numvertice * 2;
-    const int elSize = sizeof(double);
+    const int numEls = ob->numvertice;
+    const int elSize = sizeof(uv_t);
 
     if(ob->vertexarray)
-        ob->textarray = (double *) calloc(numEls, elSize);
+        ob->textarray = (uv_t *) calloc(numEls, elSize);
     if(ob->vertexarray1)
-        ob->textarray1 = (double *) calloc(numEls, elSize);
+        ob->textarray1 = (uv_t*) calloc(numEls, elSize);
     if(ob->vertexarray2)
-        ob->textarray2 = (double *) calloc(numEls, elSize);
+        ob->textarray2 = (uv_t*) calloc(numEls, elSize);
     if(ob->vertexarray3)
-        ob->textarray3 = (double *) calloc(numEls, elSize);
+        ob->textarray3 = (uv_t*) calloc(numEls, elSize);
 
     for (int i = 0; i < ob->numsurf * 3; i++)
     {
-        copyTexCoordToTextArray(ob->textarray, &ob->vertexarray[i]);
+        if (ob->vertexarray)
+            copyTexCoordToTextArray(ob->textarray, &ob->vertexarray[i]);
         if(ob->vertexarray1)
             copyTexCoordToTextArray(ob->textarray1, &ob->vertexarray1[i]);
         if(ob->vertexarray2)
@@ -214,7 +213,7 @@ void normalMap(ob_t * object);
 void mapTextureEnv(ob_t * object);
 point_t tmpPoint[100000];
 tcoord_t tmpva[100000];
-double tmptexa[200000];
+uv_t tmptexa[100000];
 int tmpsurf[100000];
 int refs = 0;
 char * const shadowtexture = strdup("shadow2.png");
@@ -308,7 +307,7 @@ void copyVertexArraysSurface(ob_t * destob, int destSurfIdx, ob_t * srcob, int s
 /** copy the (u,v) coords from srcidxarr to the corresponding position in destarr.
  *  destarr needs to have 2 * number of vertices entries.
  */
-void createTexCoordArray(double * destarr, tcoord_t * srcidxarr, int numidx)
+void createTexCoordArray(uv_t * destarr, tcoord_t * srcidxarr, int numidx)
 {
     tcoord_t * curidxobj = NULL;
 
@@ -316,8 +315,7 @@ void createTexCoordArray(double * destarr, tcoord_t * srcidxarr, int numidx)
     {
         curidxobj = &srcidxarr[curidx];
 
-        destarr[curidxobj->indice * 2] = curidxobj->u;
-        destarr[curidxobj->indice * 2 + 1] = curidxobj->v;
+        destarr[curidxobj->indice] = curidxobj->uv;
     }
 }
 
@@ -378,13 +376,12 @@ ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpo
 
     return retob;
 }
-void copyTexChannel(double * desttextarray, tcoord_t * destvertexarray, tcoord_t * srcvert,
+void copyTexChannel(uv_t * desttextarray, tcoord_t * destvertexarray, tcoord_t * srcvert,
     int storedptidx, int destptidx, int destvertidx)
 {
-    desttextarray[destptidx * 2] = srcvert->u;
-    desttextarray[destptidx * 2 + 1] = srcvert->v;
-
-    destvertexarray[destvertidx].set(storedptidx, srcvert->u, srcvert->v, 0);
+    desttextarray[destptidx] = srcvert->uv;
+ 
+    destvertexarray[destvertidx].set(storedptidx, srcvert->uv, 0);
 }
 
 void copySingleVertexData(ob_t * destob, ob_t * srcob,
@@ -437,10 +434,10 @@ void clearSavedInVertexArrayEntry(ob_t * object, int vertidx)
 void createSingleTexChannelArrays(ob_t * destob, const ob_t * srcob, int channel)
 {
     int size_va = srcob->numsurf * 3 * sizeof(tcoord_t);
-    int size_ta = 2 * srcob->numvertice * sizeof(double);
+    int size_ta = srcob->numvertice * sizeof(uv_t);
 
     tcoord_t * va = (tcoord_t *) malloc(size_va);
-    double* ta = (double *) malloc(size_ta);
+    uv_t * ta = (uv_t *) malloc(size_ta);
 
     switch(channel)
     {
@@ -893,8 +890,7 @@ ob_t* splitOb(ob_t *object)
                     for (int i = 0; i < 3; i++)
                     {
                         if (curstoredidx[i] != -1)
-                            if(workob.textarray[curstoredidx[i] * 2] != curvertex[i].u
-                            || workob.textarray[curstoredidx[i] * 2 + 1] != curvertex[i].v)
+                            if(workob.textarray[curstoredidx[i]] != curvertex[i].uv)
                             {
                                 touse = false;
                                 /* triangle is not ok */
@@ -984,25 +980,19 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
 
     if (kids == 0)
     {
-        object->next->vertexarray = (tcoord_t *) malloc(
-                sizeof(tcoord_t) * numrefstotal);
-        object->next->textarray = (double *) malloc(
-                sizeof(double) * numrefstotal * 2);
+        object->next->vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numrefstotal);
+        object->next->textarray = (uv_t *) malloc(sizeof(uv_t) * numrefstotal);
         object->next->surfrefs = (int *) malloc(sizeof(int) * numrefs);
-        object->next->norm = (point_t*) malloc(
-                sizeof(point_t) * numrefstotal * 3);
-        object->next->snorm = (point_t*) malloc(
-                sizeof(point_t) * numrefstotal * 3);
+        object->next->norm = (point_t*) malloc(sizeof(point_t) * numrefstotal * 3);
+        object->next->snorm = (point_t*) malloc(sizeof(point_t) * numrefstotal * 3);
         object->next->attrSurf = attrSurf;
         object->next->attrMat = attrMat;
         attrSurf = 0x20;
         memset(object->next->snorm, 0, sizeof(point_t) * numrefstotal * 3);
         memset(object->next->norm, 0, sizeof(point_t) * numrefstotal * 3);
 
-        memcpy(object->next->vertexarray, tmpva,
-                numrefstotal * sizeof(tcoord_t));
-        memcpy(object->next->textarray, tmptexa,
-                numrefstotal * 2 * sizeof(double));
+        memcpy(object->next->vertexarray, tmpva, numrefstotal * sizeof(tcoord_t));
+        memcpy(object->next->textarray, tmptexa, numrefstotal * sizeof(uv_t));
         memcpy(object->next->surfrefs, tmpsurf, numrefs * sizeof(int));
         object->next->numvertice = numvertice;
 
@@ -1280,7 +1270,7 @@ int doGetSurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
     /*  double u,v;*/
 
     if (sscanf(Line, "%d %lf %lf ", &(tmpva[numvertice].indice),
-        &(tmpva[numvertice].u), &(tmpva[numvertice].v)) != 3)
+        &(tmpva[numvertice].uv.u), &(tmpva[numvertice].uv.v)) != 3)
     {
         fprintf(stderr, "invalid surf format %s\n", Line);
         return (-1);
@@ -1288,10 +1278,8 @@ int doGetSurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
     /*fprintf(stderr,"numrefs = %d\n",numrefs);*/
     /*printf("%.2lf %.2lf\n",tmpva[numvertice].u,tmpva[numvertice].v);*/
     tmpva[numvertice].saved = false;
-    tmptexa[tmpva[numvertice].indice * 2] = tmpva[numvertice].u
-            * object->next->texrep_x;
-    tmptexa[tmpva[numvertice].indice * 2 + 1] = tmpva[numvertice].v
-            * object->next->texrep_y;
+    tmptexa[tmpva[numvertice].indice].u = tmpva[numvertice].uv.u * object->next->texrep_x;
+    tmptexa[tmpva[numvertice].indice].v = tmpva[numvertice].uv.v * object->next->texrep_y;
     numvertice++;
     return (0);
 }
@@ -1372,8 +1360,8 @@ bool isObjectSplit(ob_t* object)
         for (int j = i + 1; j < numverts; j++)
         {
             bool same_pt = (object->vertexarray[i].indice == object->vertexarray[j].indice);
-            bool diff_u = (object->vertexarray[i].u != object->vertexarray[j].u);
-            bool diff_v = (object->vertexarray[i].v != object->vertexarray[j].v);
+            bool diff_u = (object->vertexarray[i].uv.u != object->vertexarray[j].uv.u);
+            bool diff_v = (object->vertexarray[i].uv.v != object->vertexarray[j].uv.v);
 
             if (same_pt && (diff_u || diff_v))
                 return true;
@@ -2035,85 +2023,78 @@ int printOb(FILE *ofile, ob_t * object)
             if (multitex == 0)
             {
                 fprintf(ofile, "%d %.5f %.5f\n", object->vertexarray[i * 3].indice,
-                        object->textarray[object->vertexarray[i * 3].indice * 2],
-                        object->textarray[object->vertexarray[i * 3].indice * 2 + 1]);
+                        object->textarray[object->vertexarray[i * 3].indice].u,
+                        object->textarray[object->vertexarray[i * 3].indice].v);
                 fprintf(ofile, "%d %.5f %.5f\n",
                         object->vertexarray[i * 3 + 1].indice,
-                        object->textarray[object->vertexarray[i * 3 + 1].indice * 2],
-                        object->textarray[object->vertexarray[i * 3 + 1].indice * 2 + 1]);
+                        object->textarray[object->vertexarray[i * 3 + 1].indice].u,
+                        object->textarray[object->vertexarray[i * 3 + 1].indice].v);
                 fprintf(ofile, "%d %.5f %.5f\n",
                         object->vertexarray[i * 3 + 2].indice,
-                        object->textarray[object->vertexarray[i * 3 + 2].indice * 2],
-                        object->textarray[object->vertexarray[i * 3 + 2].indice * 2 + 1]);
+                        object->textarray[object->vertexarray[i * 3 + 2].indice].u,
+                        object->textarray[object->vertexarray[i * 3 + 2].indice].v);
 
             }
             else
             {
                 fprintf(ofile, "%d %.5f %.5f", object->vertexarray[i * 3].indice,
-                        object->textarray[object->vertexarray[i * 3].indice * 2],
-                        object->textarray[object->vertexarray[i * 3].indice * 2 + 1]);
+                        object->textarray[object->vertexarray[i * 3].indice].u,
+                        object->textarray[object->vertexarray[i * 3].indice].v);
 
                 if (object->texture1)
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray1[object->vertexarray[i * 3].indice * 2],
-                            object->textarray1[object->vertexarray[i * 3].indice * 2 + 1]);
+                            object->textarray1[object->vertexarray[i * 3].indice].u,
+                            object->textarray1[object->vertexarray[i * 3].indice].v);
 
                 if (object->texture2)
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray2[object->vertexarray[i * 3].indice * 2],
-                            object->textarray2[object->vertexarray[i * 3].indice * 2 + 1]);
+                            object->textarray2[object->vertexarray[i * 3].indice].u,
+                            object->textarray2[object->vertexarray[i * 3].indice].v);
                 if (object->texture3)
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray3[object->vertexarray[i * 3].indice * 2],
-                            object->textarray3[object->vertexarray[i * 3].indice * 2 + 1]);
+                            object->textarray3[object->vertexarray[i * 3].indice].u,
+                            object->textarray3[object->vertexarray[i * 3].indice].v);
                 fprintf(ofile, "\n");
 
                 fprintf(ofile, "%d %.5f %.5f",
                         object->vertexarray[i * 3 + 1].indice,
-                        object->textarray[object->vertexarray[i * 3 + 1].indice * 2],
-                        object->textarray[object->vertexarray[i * 3 + 1].indice * 2 + 1]);
+                        object->textarray[object->vertexarray[i * 3 + 1].indice].u,
+                        object->textarray[object->vertexarray[i * 3 + 1].indice].v);
                 if (object->texture1)
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray1[object->vertexarray[i * 3 + 1].indice * 2],
-                            object->textarray1[object->vertexarray[i * 3 + 1].indice * 2
-                                    + 1]);
+                            object->textarray1[object->vertexarray[i * 3 + 1].indice].u,
+                            object->textarray1[object->vertexarray[i * 3 + 1].indice].v);
 
                 if (object->texture2)
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray2[object->vertexarray[i * 3 + 1].indice * 2],
-                            object->textarray2[object->vertexarray[i * 3 + 1].indice * 2
-                                    + 1]);
+                            object->textarray2[object->vertexarray[i * 3 + 1].indice].u,
+                            object->textarray2[object->vertexarray[i * 3 + 1].indice].v);
                 if (object->texture3)
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray3[object->vertexarray[i * 3 + 1].indice * 2],
-                            object->textarray3[object->vertexarray[i * 3 + 1].indice * 2
-                                    + 1]);
+                            object->textarray3[object->vertexarray[i * 3 + 1].indice].u,
+                            object->textarray3[object->vertexarray[i * 3 + 1].indice].v);
                 fprintf(ofile, "\n");
 
                 fprintf(ofile, "%d %.5f %.5f",
                         object->vertexarray[i * 3 + 2].indice,
-                        object->textarray[object->vertexarray[i * 3 + 2].indice * 2],
-                        object->textarray[object->vertexarray[i * 3 + 2].indice * 2 + 1]);
+                        object->textarray[object->vertexarray[i * 3 + 2].indice].u,
+                        object->textarray[object->vertexarray[i * 3 + 2].indice].v);
                 if (object->texture1)
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray1[object->vertexarray[i * 3 + 2].indice * 2],
-                            object->textarray1[object->vertexarray[i * 3 + 2].indice * 2
-                                    + 1]);
+                            object->textarray1[object->vertexarray[i * 3 + 2].indice].u,
+                            object->textarray1[object->vertexarray[i * 3 + 2].indice].v);
 
                 if (object->texture2)
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray2[object->vertexarray[i * 3 + 2].indice * 2],
-                            object->textarray2[object->vertexarray[i * 3 + 2].indice * 2
-                                    + 1]);
+                            object->textarray2[object->vertexarray[i * 3 + 2].indice].u,
+                            object->textarray2[object->vertexarray[i * 3 + 2].indice].v);
                 if (object->texture3)
                 {
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray3[object->vertexarray[i * 3 + 2].indice * 2],
-                            object->textarray3[object->vertexarray[i * 3 + 2].indice * 2
-                                    + 1]);
-                    if (object->textarray3[object->vertexarray[i * 3 + 2].indice * 2]
-                            != object->textarray1[object->vertexarray[i * 3 + 2].indice
-                                    * 2])
+                            object->textarray3[object->vertexarray[i * 3 + 2].indice].u,
+                            object->textarray3[object->vertexarray[i * 3 + 2].indice].v);
+                    if (object->textarray3[object->vertexarray[i * 3 + 2].indice].u
+                            != object->textarray1[object->vertexarray[i * 3 + 2].indice].u)
                     {
                         printf("error in text\n");
                     }
@@ -3145,8 +3126,7 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object, const std::vecto
         }
         for (int i = 0; i < tmpob->numvert; i++)
         {
-            fprintf(ofile, "vt %lf %lf 0.0\n", tmpob->textarray[i * 2],
-                    tmpob->textarray[i * 2 + 1]);
+            fprintf(ofile, "vt %lf %lf 0.0\n", tmpob->textarray[i].u, tmpob->textarray[i].v);
         }
         tmpob = tmpob->next;
     }
@@ -3442,56 +3422,45 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
             fprintf(ofile, "refs %u\n", StripLength[i]);
             if (multitex == 0)
             {
-                fprintf(ofile, "%d %.5f %.5f\n", v1, object->textarray[v1 * 2],
-                        object->textarray[v1 * 2 + 1]);
+                fprintf(ofile, "%d %.5f %.5f\n", v1, object->textarray[v1].u, object->textarray[v1].v);
             }
             else
             {
-                fprintf(ofile, "%d %.5f %.5f", v1, object->textarray[v1 * 2],
-                        object->textarray[v1 * 2 + 1]);
+                fprintf(ofile, "%d %.5f %.5f", v1, object->textarray[v1].u, object->textarray[v1].v);
                 if (object->texture1)
                 {
-                    fprintf(ofile, " %.5f %.5f", object->textarray1[v1 * 2],
-                            object->textarray1[v1 * 2 + 1]);
+                    fprintf(ofile, " %.5f %.5f", object->textarray1[v1].u, object->textarray1[v1].v);
                 }
                 if (object->texture2)
                 {
-                    fprintf(ofile, " %.5f %.5f", object->textarray2[v1 * 2],
-                            object->textarray2[v1 * 2 + 1]);
+                    fprintf(ofile, " %.5f %.5f", object->textarray2[v1].u, object->textarray2[v1].v);
                 }
                 if (object->texture3)
                 {
-                    fprintf(ofile, " %.5f %.5f", object->textarray3[v1 * 2],
-                            object->textarray3[v1 * 2 + 1]);
+                    fprintf(ofile, " %.5f %.5f", object->textarray3[v1].u, object->textarray3[v1].v);
                 }
                 fprintf(ofile, "\n");
             }
             if (multitex == 0)
             {
-                fprintf(ofile, "%d %.5f %.5f\n", v2, object->textarray[v2 * 2],
-                        object->textarray[v2 * 2 + 1]);
+                fprintf(ofile, "%d %.5f %.5f\n", v2, object->textarray[v2].u, object->textarray[v2].v);
             }
             else
             {
-                fprintf(ofile, "%d %.5f %.5f", v2, object->textarray[v2 * 2],
-                        object->textarray[v2 * 2 + 1]);
+                fprintf(ofile, "%d %.5f %.5f", v2, object->textarray[v2].u, object->textarray[v2].v);
                 if (object->texture1)
                 {
-                    fprintf(ofile, " %.5f %.5f", object->textarray1[v2 * 2],
-                            object->textarray1[v2 * 2 + 1]);
+                    fprintf(ofile, " %.5f %.5f", object->textarray1[v2].u, object->textarray1[v2].v);
                 }
                 if (object->texture2)
                 {
-                    fprintf(ofile, " %.5f %.5f", object->textarray2[v2 * 2],
-                            object->textarray2[v2 * 2 + 1]);
+                    fprintf(ofile, " %.5f %.5f", object->textarray2[v2].u, object->textarray2[v2].v);
                 }
                 if (object->texture3)
                 {
-                    fprintf(ofile, " %.5f %.5f", object->textarray3[v2 * 2],
-                            object->textarray3[v2 * 2 + 1]);
+                    fprintf(ofile, " %.5f %.5f", object->textarray3[v2].u, object->textarray3[v2].v);
                 }
                 fprintf(ofile, "\n");
-
             }
 
         }
@@ -3503,18 +3472,15 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
             if (writeit == 0)
             {
                 stripvertexarray[k].indice = v1;
-                stripvertexarray[k].u = object->textarray[v1 * 2];
-                stripvertexarray[k].v = object->textarray[v1 * 2 + 1];
+                stripvertexarray[k].uv = object->textarray[v1];
                 stripvertexarray[k].saved = false;
                 k++;
                 stripvertexarray[k].indice = v2;
-                stripvertexarray[k].u = object->textarray[v2 * 2];
-                stripvertexarray[k].v = object->textarray[v2 * 2 + 1];
+                stripvertexarray[k].uv = object->textarray[v2];
                 stripvertexarray[k].saved = false;
                 k++;
                 stripvertexarray[k].indice = v0;
-                stripvertexarray[k].u = object->textarray[v0 * 2];
-                stripvertexarray[k].v = object->textarray[v0 * 2 + 1];
+                stripvertexarray[k].uv = object->textarray[v0];
                 stripvertexarray[k].saved = false;
                 k++;
                 if ((tri % 2) == 0)
@@ -3529,28 +3495,21 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
             else
             {
                 if (multitex == 0)
-                    fprintf(ofile, "%d %.5f %.5f\n", v0,
-                            object->textarray[v0 * 2],
-                            object->textarray[v0 * 2 + 1]);
+                    fprintf(ofile, "%d %.5f %.5f\n", v0, object->textarray[v0].u, object->textarray[v0].v);
                 else
                 {
-                    fprintf(ofile, "%d %.5f %.5f", v0,
-                            object->textarray[v0 * 2],
-                            object->textarray[v0 * 2 + 1]);
+                    fprintf(ofile, "%d %.5f %.5f", v0, object->textarray[v0].u, object->textarray[v0].v);
                     if (object->texture1)
                     {
-                        fprintf(ofile, " %.5f %.5f", object->textarray1[v0 * 2],
-                                object->textarray1[v0 * 2 + 1]);
+                        fprintf(ofile, " %.5f %.5f", object->textarray1[v0].u, object->textarray1[v0].v);
                     }
                     if (object->texture2)
                     {
-                        fprintf(ofile, " %.5f %.5f", object->textarray2[v0 * 2],
-                                object->textarray2[v0 * 2 + 1]);
+                        fprintf(ofile, " %.5f %.5f", object->textarray2[v0].u, object->textarray2[v0].v);
                     }
                     if (object->texture3)
                     {
-                        fprintf(ofile, " %.5f %.5f", object->textarray3[v0 * 2],
-                                object->textarray3[v0 * 2 + 1]);
+                        fprintf(ofile, " %.5f %.5f", object->textarray3[v0].u, object->textarray3[v0].v);
                     }
                     fprintf(ofile, "\n");
                 }
@@ -3718,8 +3677,7 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object, const std::vec
         }
         for (int i = 0; i < tmpob->numvert; i++)
         {
-            fprintf(ofile, "vt %lf %lf 0.0\n", tmpob->textarray[i * 2],
-                    tmpob->textarray[i * 2 + 1]);
+            fprintf(ofile, "vt %lf %lf 0.0\n", tmpob->textarray[i].u, tmpob->textarray[i].v);
         }
         tmpob = tmpob->next;
     }
@@ -3939,14 +3897,10 @@ void mapTextureEnv(ob_t *object)
             continue;
         }
         /* create the new vertex array */
-        tmpob->textarray1 = (double *) malloc(
-                sizeof(double) * tmpob->numvert * 2);
-        tmpob->textarray2 = (double *) malloc(
-                sizeof(double) * tmpob->numvert * 2);
-        memcpy(tmpob->textarray1, tmpob->textarray,
-                tmpob->numvert * sizeof(double) * 2);
-        memcpy(tmpob->textarray2, tmpob->textarray,
-                tmpob->numvert * sizeof(double) * 2);
+        tmpob->textarray1 = (uv_t *) malloc(sizeof(uv_t) * tmpob->numvert);
+        tmpob->textarray2 = (uv_t *) malloc(sizeof(uv_t) * tmpob->numvert);
+        memcpy(tmpob->textarray1, tmpob->textarray, tmpob->numvert * sizeof(uv_t));
+        memcpy(tmpob->textarray2, tmpob->textarray, tmpob->numvert * sizeof(uv_t));
         tmpob->texture1 = tmpob->texture;
         tmpob->texture2 = tmpob->texture;
         for (int i = 0; i < tmpob->numvert; i++)
@@ -3968,18 +3922,17 @@ void mapTextureEnv(ob_t *object)
                 z = 1;
             }
             //z_min = 0;
-            tmpob->textarray1[i * 2] = 0.5 + x / 2.0;
+            tmpob->textarray1[i].u = 0.5 + x / 2.0;
             zt = (z + tmpob->snorm[i].z / 3.0 - z_min) / (z_max - z_min);
-            tmpob->textarray1[i * 2 + 1] = zt;
+            tmpob->textarray1[i].v = zt;
 
-            if (tmpob->textarray1[i * 2 + 1] > 1.0)
-                tmpob->textarray1[i * 2 + 1] = 0.999;
-            else if (tmpob->textarray1[i * 2 + 1] < 0.0)
-                tmpob->textarray1[i * 2 + 1] = 0.001;
+            if (tmpob->textarray1[i].v > 1.0)
+                tmpob->textarray1[i].v = 0.999;
+            else if (tmpob->textarray1[i].v < 0.0)
+                tmpob->textarray1[i].v = 0.001;
 
-            tmpob->textarray2[i * 2] = 0.5 + y / 2.0;
-            tmpob->textarray2[i * 2 + 1] = z;
-
+            tmpob->textarray2[i].u = 0.5 + y / 2.0;
+            tmpob->textarray2[i].v = z;
         }
         tmpob = tmpob->next;
     }
@@ -4060,51 +4013,47 @@ void mapTextureEnvOld(ob_t *object)
             continue;
         }
         /* create the new vertex array */
-        tmpob->textarray1 = (double *) malloc(
-                sizeof(double) * tmpob->numvert * 2);
-        tmpob->textarray2 = (double *) malloc(
-                sizeof(double) * tmpob->numvert * 2);
-        memcpy(tmpob->textarray1, tmpob->textarray,
-                tmpob->numvert * sizeof(double) * 2);
-        memcpy(tmpob->textarray2, tmpob->textarray,
-                tmpob->numvert * sizeof(double) * 2);
+        tmpob->textarray1 = (uv_t *) malloc(sizeof(uv_t) * tmpob->numvert);
+        tmpob->textarray2 = (uv_t *) malloc(sizeof(uv_t) * tmpob->numvert);
+        memcpy(tmpob->textarray1, tmpob->textarray, tmpob->numvert * sizeof(uv_t));
+        memcpy(tmpob->textarray2, tmpob->textarray, tmpob->numvert * sizeof(uv_t));
         tmpob->texture1 = tmpob->texture;
         tmpob->texture2 = tmpob->texture;
         for (int i = 0; i < tmpob->numvert; i++)
         {
 
-            tmpob->textarray1[i * 2] = (tmpob->vertex[i].x - x_min)
+            tmpob->textarray1[i].u = (tmpob->vertex[i].x - x_min)
                     / (x_max - x_min) + (tmpob->snorm[i].x) / 2;
-            tmpob->textarray1[i * 2 + 1] = ((tmpob->vertex[i].z - z_min)
+            tmpob->textarray1[i].v = ((tmpob->vertex[i].z - z_min)
                     / (z_max - z_min)) + (tmpob->snorm[i].z) / 2;
-            tmpob->textarray2[i * 2] = ((tmpob->vertex[i].x - x_min)
+            tmpob->textarray2[i].u = ((tmpob->vertex[i].x - x_min)
                     / (x_max - x_min)) + (tmpob->snorm[i].x) / 2;
-            tmpob->textarray2[i * 2 + 1] = ((tmpob->vertex[i].y - y_min)
+            tmpob->textarray2[i].v = ((tmpob->vertex[i].y - y_min)
                     / (x_max - x_min)) + (tmpob->snorm[i].y) / 2;
 
-            if (tmpob->textarray1[i * 2] > u_max)
-                u_max = tmpob->textarray1[i * 2];
+            if (tmpob->textarray1[i].u > u_max)
+                u_max = tmpob->textarray1[i].u;
 
-            if (tmpob->textarray1[i * 2 + 1] > v_max)
-                v_max = tmpob->textarray1[i * 2 + 1];
+            if (tmpob->textarray1[i].v > v_max)
+                v_max = tmpob->textarray1[i].v;
 
-            if (tmpob->textarray1[i * 2] < u_min)
-                u_min = tmpob->textarray1[i * 2];
+            if (tmpob->textarray1[i].u < u_min)
+                u_min = tmpob->textarray1[i].u;
 
-            if (tmpob->textarray1[i * 2] < v_min)
-                v_min = tmpob->textarray1[i * 2];
+            if (tmpob->textarray1[i].v < v_min)
+                v_min = tmpob->textarray1[i].v;
 
-            if (tmpob->textarray2[i * 2] > u2_max)
-                u2_max = tmpob->textarray2[i * 2];
+            if (tmpob->textarray2[i].u > u2_max)
+                u2_max = tmpob->textarray2[i].u;
 
-            if (tmpob->textarray2[i * 2 + 1] > v2_max)
-                v2_max = tmpob->textarray2[i * 2 + 1];
+            if (tmpob->textarray2[i].v > v2_max)
+                v2_max = tmpob->textarray2[i].v;
 
-            if (tmpob->textarray2[i * 2] < u2_min)
-                u2_min = tmpob->textarray2[i * 2];
+            if (tmpob->textarray2[i].u < u2_min)
+                u2_min = tmpob->textarray2[i].u;
 
-            if (tmpob->textarray2[i * 2] < v2_min)
-                v2_min = tmpob->textarray2[i * 2];
+            if (tmpob->textarray2[i].v < v2_min)
+                v2_min = tmpob->textarray2[i].v;
 
         }
         tmpob = tmpob->next;
@@ -4132,15 +4081,11 @@ void mapTextureEnvOld(ob_t *object)
 
         for (int i = 0; i < tmpob->numvert; i++)
         {
-            tmpob->textarray1[i * 2] = (tmpob->textarray1[i * 2] - u_min)
-                    / (u_max - u_min);
-            tmpob->textarray1[i * 2 + 1] =
-                    (tmpob->textarray1[i * 2 + 1] - v_min) / (v_max - v_min);
+            tmpob->textarray1[i].u = (tmpob->textarray1[i].u - u_min) / (u_max - u_min);
+            tmpob->textarray1[i].v = (tmpob->textarray1[i].v - v_min) / (v_max - v_min);
 
-            tmpob->textarray2[i * 2] = (tmpob->textarray2[i * 2] - u2_min)
-                    / (u2_max - u2_min) - 0.5;
-            tmpob->textarray2[i * 2 + 1] = (tmpob->textarray2[i * 2 + 1]
-                    - v2_min) / (v2_max - v2_min) - 0.5;
+            tmpob->textarray2[i].u = (tmpob->textarray2[i].u - u2_min) / (u2_max - u2_min) - 0.5;
+            tmpob->textarray2[i].v = (tmpob->textarray2[i].v - v2_min) / (v2_max - v2_min) - 0.5;
         }
         tmpob = tmpob->next;
     }
@@ -4249,10 +4194,8 @@ void normalMap(ob_t * object)
         printf("normalMap : handling %s\n", tmpob->name);
         for (int i = 0; i < tmpob->numvert; i++)
         {
-            tmpob->textarray[i * 2] = (tmpob->vertex[i].x - x_min)
-                    / (x_max - x_min);
-            tmpob->textarray[i * 2 + 1] = (tmpob->vertex[i].y - y_min)
-                    / (y_max - y_min);
+            tmpob->textarray[i].u = (tmpob->vertex[i].x - x_min) / (x_max - x_min);
+            tmpob->textarray[i].v = (tmpob->vertex[i].y - y_min) / (y_max - y_min);
         }
         tmpob->texture = shadowtexture;
         tmpob = tmpob->next;
@@ -4325,15 +4268,12 @@ void normalMap01(ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        tmpob->textarray3 = (double *) malloc(
-                sizeof(double) * tmpob->numvert * 2);
+        tmpob->textarray3 = (uv_t *) malloc(sizeof(uv_t) * tmpob->numvert);
         printf("normalMap : handling %s\n", tmpob->name);
         for (int i = 0; i < tmpob->numvert; i++)
         {
-            tmpob->textarray3[i * 2] = (tmpob->vertex[i].x - x_min)
-                    / (x_max - x_min) - 0.5;
-            tmpob->textarray3[i * 2 + 1] = (tmpob->vertex[i].y - y_min)
-                    / (y_max - y_min) - 0.5;
+            tmpob->textarray3[i].u = (tmpob->vertex[i].x - x_min) / (x_max - x_min) - 0.5;
+            tmpob->textarray3[i].v = (tmpob->vertex[i].y - y_min) / (y_max - y_min) - 0.5;
         }
         tmpob->texture3 = tmpob->texture;
         tmpob = tmpob->next;
@@ -4599,10 +4539,10 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     tobS.vertex = (point_t*) malloc(sizeof(point_t) * numtri * 3);
     memset(tobS.snorm, 0, sizeof(point_t) * numtri * 3);
     memset(tobS.norm, 0, sizeof(point_t) * numtri * 3);
-    tobS.textarray = (double *) malloc(sizeof(double) * numtri * 2 * 3);
-    tobS.textarray1 = (double *) malloc(sizeof(double) * numtri * 2 * 3);
-    tobS.textarray2 = (double *) malloc(sizeof(double) * numtri * 2 * 3);
-    tobS.textarray3 = (double *) malloc(sizeof(double) * numtri * 2 * 3);
+    tobS.textarray = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
+    tobS.textarray1 = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
+    tobS.textarray2 = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
+    tobS.textarray3 = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
 
     memcpy(tobS.vertex, ob1->vertex, ob1->numvert * sizeof(point_t));
     memcpy(tobS.vertexarray, ob1->vertexarray,
@@ -4614,18 +4554,15 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
 
     if (ob1->texture1)
     {
-        memcpy(tobS.textarray1, ob1->textarray1,
-                ob1->numvert * 2 * sizeof(double));
+        memcpy(tobS.textarray1, ob1->textarray1, ob1->numvert * sizeof(uv_t));
     }
     if (ob1->texture2)
     {
-        memcpy(tobS.textarray2, ob1->textarray2,
-                ob1->numvert * 2 * sizeof(double));
+        memcpy(tobS.textarray2, ob1->textarray2, ob1->numvert * sizeof(uv_t));
     }
     if (ob1->texture3)
     {
-        memcpy(tobS.textarray3, ob1->textarray3,
-                ob1->numvert * 2 * sizeof(double));
+        memcpy(tobS.textarray3, ob1->textarray3, ob1->numvert * sizeof(uv_t));
     }
 
     n = ob1->numvert;
@@ -4633,9 +4570,7 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     {
         for (int j = 0; j < ob1->numvert; j++)
         {
-            if (ob2->vertex[i] == ob1->vertex[j]
-                    && ob2->textarray[i * 2] == ob1->textarray[j * 2]
-                    && ob2->textarray[i * 2 + 1] == ob1->textarray[j * 2 + 1])
+            if (ob2->vertex[i] == ob1->vertex[j] && ob2->textarray[i] == ob1->textarray[j])
             {
                 oldva1[i] = j;
             }
@@ -4647,22 +4582,18 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
         if (oldva1[i] == -1)
         {
             oldva1[i] = n;
-            tobS.textarray[n * 2] = ob2->textarray[i * 2];
-            tobS.textarray[n * 2 + 1] = ob2->textarray[i * 2 + 1];
+            tobS.textarray[n] = ob2->textarray[i];
             if (ob2->texture1)
             {
-                tobS.textarray1[n * 2] = ob2->textarray1[i * 2];
-                tobS.textarray1[n * 2 + 1] = ob2->textarray1[i * 2 + 1];
+                tobS.textarray1[n] = ob2->textarray1[i];
             }
             if (ob2->texture2)
             {
-                tobS.textarray2[n * 2] = ob2->textarray2[i * 2];
-                tobS.textarray2[n * 2 + 1] = ob2->textarray2[i * 2 + 1];
+                tobS.textarray2[n] = ob2->textarray2[i];
             }
             if (ob2->texture3)
             {
-                tobS.textarray3[n * 2] = ob2->textarray3[i * 2];
-                tobS.textarray3[n * 2 + 1] = ob2->textarray3[i * 2 + 1];
+                tobS.textarray3[n] = ob2->textarray3[i];
             }
             tobS.snorm[n] = ob2->snorm[i];
             tobS.norm[n] = ob2->norm[i];

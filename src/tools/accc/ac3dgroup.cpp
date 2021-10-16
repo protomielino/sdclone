@@ -33,7 +33,7 @@
 #include <portability.h>
 #include "accc.h"
 
-void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray);
+void reorder(ob_t * ob, ob_t * ob2, uv_t *textarray, tcoord_t *vertexarray);
 void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3);
 
 // check if materials need to be merged
@@ -506,7 +506,7 @@ void loadAndGroup(const char *OutputFileName)
     return;
 }
 
-void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray)
+void reorder(ob_t * ob, ob_t * ob2, uv_t *textarray, tcoord_t *vertexarray)
 {
     int k = 0;
 
@@ -528,12 +528,9 @@ void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray)
                     vertexarray[i] = vertexarray[j];
                     vertexarray[j] = t;
 
-                    double text = textarray[i * 2];
-                    textarray[i * 2] = textarray[j * 2];
-                    textarray[j * 2] = text;
-                    text = textarray[i * 2 + 1];
-                    textarray[i * 2 + 1] = textarray[j * 2 + 1];
-                    textarray[j * 2 + 1] = text;
+                    uv_t text = textarray[i];
+                    textarray[i] = textarray[j];
+                    textarray[j] = text;
                 }
             }
         }
@@ -596,15 +593,15 @@ void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3)
 void copyTextureChannel(ob_t * destob, ob_t * srcob, int channel)
 {
     char* tex = srcob->texture;
-    double* texarr = srcob->textarray;
+    uv_t* texarr = srcob->textarray;
     tcoord_t* vertarr = srcob->vertexarray;
 
     if (channel == 1)
     {
         if (tex)
             destob->texture1 = strdup(tex);
-        destob->textarray1 = (double*)malloc(sizeof(double) * srcob->numvertice * 2);
-        memcpy(destob->textarray1, texarr, sizeof(double) * srcob->numvertice * 2);
+        destob->textarray1 = (uv_t*)malloc(sizeof(uv_t) * srcob->numvertice);
+        memcpy(destob->textarray1, texarr, sizeof(uv_t) * srcob->numvertice);
         destob->vertexarray1 = (tcoord_t*)malloc(sizeof(tcoord_t) * srcob->numsurf * 3);
         memcpy(destob->vertexarray1, vertarr, sizeof(tcoord_t) * srcob->numsurf * 3);
     }
@@ -612,8 +609,8 @@ void copyTextureChannel(ob_t * destob, ob_t * srcob, int channel)
     {
         if (tex)
             destob->texture2 = strdup(tex);
-        destob->textarray2 = (double*)malloc(sizeof(double) * srcob->numvertice * 2);
-        memcpy(destob->textarray2, texarr, sizeof(double) * srcob->numvertice * 2);
+        destob->textarray2 = (uv_t*)malloc(sizeof(uv_t) * srcob->numvertice);
+        memcpy(destob->textarray2, texarr, sizeof(uv_t) * srcob->numvertice);
         destob->vertexarray2 = (tcoord_t*)malloc(sizeof(tcoord_t) * srcob->numsurf * 3);
         memcpy(destob->vertexarray2, vertarr, sizeof(tcoord_t) * srcob->numsurf * 3);
     }
@@ -621,8 +618,8 @@ void copyTextureChannel(ob_t * destob, ob_t * srcob, int channel)
     {
         if (tex)
             destob->texture3 = strdup(tex);
-        destob->textarray3 = (double*)malloc(sizeof(double) * srcob->numvertice * 2);
-        memcpy(destob->textarray3, texarr, sizeof(double) * srcob->numvertice * 2);
+        destob->textarray3 = (uv_t*)malloc(sizeof(uv_t) * srcob->numvertice);
+        memcpy(destob->textarray3, texarr, sizeof(uv_t) * srcob->numvertice);
         destob->vertexarray3 = (tcoord_t*)malloc(sizeof(tcoord_t) * srcob->numsurf * 3);
         memcpy(destob->vertexarray3, vertarr, sizeof(tcoord_t) * srcob->numsurf * 3);
     }
@@ -717,14 +714,13 @@ void collapseShadowTextures(ob_t * tarob, ob_t * shadob)
             {
                 for (int curvert = 0; curvert < tarob->numvert; curvert++)
                 {
-                    if (tarob->textarray3[curvert * 2] != tarob->textarray[curvert * 2]
-                    || tarob->textarray3[curvert * 2 + 1] != tarob->textarray[curvert * 2 + 1])
+                    if (tarob->textarray3[curvert] != tarob->textarray[curvert])
                     {
                         printf("name=%s %.2lf!=%.2lf %.2lf!=%.2lf\n",
-                                tarob->name, tarob->textarray[curvert * 2],
-                                tarob->textarray3[curvert * 2],
-                                tarob->textarray[curvert * 2 + 1],
-                                tarob->textarray3[curvert * 2 + 1]);
+                                tarob->name, tarob->textarray[curvert].u,
+                                tarob->textarray3[curvert].u,
+                                tarob->textarray[curvert].v,
+                                tarob->textarray3[curvert].v);
                     }
                 }
             }
