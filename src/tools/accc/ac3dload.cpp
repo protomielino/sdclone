@@ -3605,16 +3605,7 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object, const std::vec
         return;
     }
 
-    for (size_t i = 0, end = materials.size(); i < end; i++) //for (const auto & material : materials)
-    {
-        const mat_t & material = materials[i];
-        fprintf(ofile,
-                "MATERIAL %s rgb %lf %lf %lf amb %lf %lf %lf emis %lf %lf %lf spec %lf %lf %lf shi %d trans 0\n",
-                material.name.c_str(), material.rgb.r, material.rgb.g, material.rgb.b, material.amb.r,
-                material.amb.g, material.amb.b, material.emis.r, material.emis.g,
-                material.emis.b, material.spec.r, material.spec.g, material.spec.b,
-                (int) material.shi);
-    }
+    printMaterials(ofile, materials);
 
     texnum = 0;
     tmpob = object;
@@ -4381,17 +4372,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, const std:
             mergeSplitted(&object);
     }
     fprintf(ofile, "AC3Db\n");
-    for (size_t i = 0, end = materials.size(); i < end; i++) //for (const auto & material : materials)
-    {
-        const mat_t & material = materials[i];
-        fprintf(ofile,
-                "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %d trans 0\n",
-                material.name.c_str(), material.rgb.r, material.rgb.g, material.rgb.b, material.amb.r,
-                material.amb.g, material.amb.b, material.emis.r, material.emis.g,
-                material.emis.b, material.spec.r, material.spec.g, material.spec.b,
-                (int) material.shi);
-    }
-
+    printMaterials(ofile, materials);
     fprintf(ofile, "OBJECT world\n");
 
     if (OrderString)
