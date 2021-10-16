@@ -43,6 +43,8 @@ extern bool isobjectacar;
 extern bool normalMapping;
 extern char *OrderString;
 extern bool collapseObject;
+extern double smooth_angle;
+extern double far_dist;
 
 enum conv_t {
     _UNSPECIFIED,
@@ -380,7 +382,7 @@ ob_t* splitOb(ob_t *object);
  */
 ob_t* terrainSplitOb(ob_t *object);
 
-extern int mergeSplitted(ob_t **object);
+int mergeSplitted(ob_t **object);
 extern double distSplit;
 
 /** Whether to split objects during loading, i.e. calls to loadAC().
@@ -402,8 +404,10 @@ double findDistmin(ob_t * ob1, ob_t *ob2);
 #define SPLITY 75
 #define MINVAL 0.001
 
-int printOb(ob_t *ob);
+int printOb(FILE *ofile, ob_t *object);
 void printMaterials(FILE *file, const std::vector<mat_t> &materials);
+
+void smoothTriNorm(ob_t *object);
 
 #ifndef WIN32
 #define stricmp strcasecmp

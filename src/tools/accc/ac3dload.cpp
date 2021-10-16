@@ -201,7 +201,6 @@ void obSetVertexArraysIndex(ob_t * ob, int vaIdx, int newIndex)
 #ifndef M_PI
 #define M_PI 3.14159267
 #endif
-extern double far_dist;
 void computeTriNorm(ob_t * object);
 void smoothTriNorm(ob_t * object);
 void computeObjectTriNorm(ob_t * object);
@@ -219,8 +218,6 @@ double tmptexa[200000];
 int tmpsurf[100000];
 int refs = 0;
 char * const shadowtexture = strdup("shadow2.png");
-
-FILE * ofile;
 
 int numob = 0;
 int nummaterial = 0;
@@ -242,7 +239,6 @@ int vert;
 int numvertice = 0;
 char tex[256][256];
 int texnum = 0;
-double smooth_angle = 70.0;
 struct verbaction_t
 {
     const char * verb;
@@ -267,11 +263,11 @@ int doCrease(char *Line, ob_t *object, std::vector<mat_t> &materials);
 #ifdef _3DS
 void saveObin3DS(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials);
 #endif
-void computeSaveAC3D(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials);
-void computeSaveOBJ(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials);
-void computeSaveAC3DM(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials);
-void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials);
-void stripifyOb(ob_t * object, int writeit);
+void computeSaveAC3D(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
+void computeSaveOBJ(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
+void computeSaveAC3DM(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
+void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
+void stripifyOb(FILE * ofile, ob_t * object, int writeit);
 
 verbaction_t verbTab[] =
 {
@@ -1973,7 +1969,7 @@ void saveObin3DS( char * OutputFilename, ob_t * object, mat_t * material)
 }
 #endif
 
-int printOb(ob_t * object)
+int printOb(FILE *ofile, ob_t * object)
 {
     int multitex = 0;
 
@@ -1981,7 +1977,7 @@ int printOb(ob_t * object)
         return 0;
     if (!extendedStrips && !normalMapping)
         if (!(isobjectacar && collapseObject))
-            stripifyOb(object, 0);
+            stripifyOb(ofile, object, 0);
     object->saved = true;
     fprintf(ofile, "OBJECT poly\n");
     fprintf(ofile, "name \"%s\"\n", object->name);
@@ -2129,12 +2125,13 @@ int printOb(ob_t * object)
     }
     else
     {
-        stripifyOb(object, 1);
+        stripifyOb(ofile, object, 1);
     }
     fprintf(ofile, "kids 0\n");
     return 0;
 }
-int foundNear(ob_t * object, ob_t *allobjects, double dist, bool print)
+
+int foundNear(FILE * ofile, ob_t * object, ob_t *allobjects, double dist, bool print)
 {
     ob_t * tmpob;
     double x;
@@ -2186,7 +2183,7 @@ int foundNear(ob_t * object, ob_t *allobjects, double dist, bool print)
             tmpob->inkids_o = true;
             if (print)
             {
-                printOb(tmpob);
+                printOb(ofile, tmpob);
             }
             tmpob = tmpob->next;
             continue;
@@ -2199,7 +2196,7 @@ int foundNear(ob_t * object, ob_t *allobjects, double dist, bool print)
             tmpob->inkids_o = true;
             if (print)
             {
-                printOb(tmpob);
+                printOb(ofile, tmpob);
             }
             tmpob = tmpob->next;
             continue;
@@ -2212,7 +2209,7 @@ int foundNear(ob_t * object, ob_t *allobjects, double dist, bool print)
             tmpob->inkids_o = true;
             if (print)
             {
-                printOb(tmpob);
+                printOb(ofile, tmpob);
             }
             tmpob = tmpob->next;
             continue;
@@ -2225,7 +2222,7 @@ int foundNear(ob_t * object, ob_t *allobjects, double dist, bool print)
             tmpob->inkids_o = true;
             if (print)
             {
-                printOb(tmpob);
+                printOb(ofile, tmpob);
             }
             tmpob = tmpob->next;
             continue;
@@ -2610,9 +2607,8 @@ void smoothObjectTriNorm(ob_t * object)
     return;
 }
 
-void computeSaveAC3D(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials)
+void computeSaveAC3D(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
 {
-
     char name2[256];
     char *p, *q;
     ob_t * tmpob = NULL;
@@ -2620,6 +2616,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object, std::vector<mat
     bool lastpass = false;
     int nborder = 0;
     bool ordering = false;
+    FILE * ofile = NULL;
 
     if (normalMapping)
     {
@@ -2788,7 +2785,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object, std::vector<mat
         }
         if (!strnicmp(tmpob->name, "tkmn", 4))
         {
-            foundNear(tmpob, object, far_dist, false);
+            foundNear(ofile, tmpob, object, far_dist, false);
             printf("object =%s num kids_o=%d\n", tmpob->name, tmpob->kids_o);
         }
 
@@ -2848,8 +2845,8 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object, std::vector<mat
                     fprintf(ofile, "OBJECT group\n");
                     fprintf(ofile, "name \"%s_g\"\n", tmpob->name);
                     fprintf(ofile, "kids %d\n", tmpob->kids_o + 1);
-                    printOb(tmpob);
-                    foundNear(tmpob, object, far_dist, true);
+                    printOb(ofile, tmpob);
+                    foundNear(ofile, tmpob, object, far_dist, true);
                     printf("object =%s num kids_o=%d\n", tmpob->name,
                             tmpob->kids_o);
                 }
@@ -2862,7 +2859,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object, std::vector<mat
                     {
                         if (!strcmp(tmpob->name, q))
                         {
-                            printOb(tmpob);
+                            printOb(ofile, tmpob);
                             printf("object =%s num kids_o=%d test with %s\n",
                                     tmpob->name, tmpob->kids_o, q);
                         }
@@ -2872,7 +2869,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object, std::vector<mat
                             sprintf(nameBuf, "%ss", q);
                             if (!strncmp(tmpob->name, nameBuf, strlen(nameBuf)))
                             {
-                                printOb(tmpob);
+                                printOb(ofile, tmpob);
                                 printf("object =%s num kids_o=%d\n",
                                         tmpob->name, tmpob->kids_o);
                             }
@@ -2881,7 +2878,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object, std::vector<mat
                     }
                     else
                     {
-                        printOb(tmpob);
+                        printOb(ofile, tmpob);
                         printf("object =%s num kids_o=%d\n", tmpob->name,
                                 tmpob->kids_o);
                     }
@@ -2940,13 +2937,14 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object, std::vector<mat
     fclose(ofile);
 }
 
-void computeSaveOBJ(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials)
+void computeSaveOBJ(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
 {
     char name2[256];
     ob_t * tmpob = NULL;
     int deltav = 1;
     int ind = 0;
     char tname[256];
+    FILE * ofile;
     FILE * tfile;
 
     if ((ofile = fopen(OutputFilename, "w")) == NULL)
@@ -2961,6 +2959,7 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object, std::vector<mat_
     if ((tfile = fopen(tname, "w")) == NULL)
     {
         fprintf(stderr, "failed to open %s\n", tname);
+		fclose(ofile);
         return;
     }
 
@@ -3221,9 +3220,10 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object, std::vector<mat_
     fprintf(ofile, "end\n");
 
     fclose(ofile);
+	fclose(tfile);
 }
 
-void stripifyOb(ob_t * object, int writeit)
+void stripifyOb(FILE * ofile, ob_t * object, int writeit)
 {
     FILE *stripeout, *stripein;
     char line[256];
@@ -3591,12 +3591,13 @@ void stripifyOb(ob_t * object, int writeit)
     free(StripLength);
 }
 
-void computeSaveAC3DM(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials)
+void computeSaveAC3DM(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
 {
     char name2[256];
     ob_t * tmpob = NULL;
     int deltav = 1;
     int ind = 0;
+    FILE * ofile;
 
     if ((ofile = fopen(OutputFilename, "w")) == NULL)
     {
@@ -3799,6 +3800,7 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object, std::vector<ma
         tmpob = tmpob->next;
     }
     fprintf(ofile, "end\n");
+    fclose(ofile);
 }
 
 void mapNormalToSphere(ob_t *object)
@@ -4351,7 +4353,7 @@ void normalMap01(ob_t * object)
     }
 }
 
-void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials)
+void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
 {
     ob_t * tmpob = NULL;
     int numg = 0;
@@ -4360,6 +4362,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, std::vecto
     bool lastpass = false;
     int nborder = 0;
     bool ordering = false;
+    FILE * ofile = NULL;
 
     if ((ofile = fopen(OutputFilename, "w")) == NULL)
     {
@@ -4566,7 +4569,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, std::vecto
                 {
                     if (!strcmp(tmpob->name, q))
                     {
-                        printOb(tmpob);
+                        printOb(ofile, tmpob);
                         printf("object =%s num kids_o=%d test with %s\n",
                                 tmpob->name, tmpob->kids_o, q);
                     }
@@ -4576,7 +4579,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, std::vecto
                         sprintf(nameBuf, "%ss", q);
                         if (!strncmp(tmpob->name, nameBuf, strlen(nameBuf)))
                         {
-                            printOb(tmpob);
+                            printOb(ofile, tmpob);
                             printf("object =%s num kids_o=%d\n", tmpob->name,
                                     tmpob->kids_o);
                         }
@@ -4585,7 +4588,7 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, std::vecto
                 }
                 else
                 {
-                    printOb(tmpob);
+                    printOb(ofile, tmpob);
                     printf("object =%s num kids_o=%d\n", tmpob->name,
                             tmpob->kids_o);
                 }

@@ -33,7 +33,6 @@
 #include <portability.h>
 #include "accc.h"
 
-extern void smoothTriNorm(ob_t * object);
 void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray);
 void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3);
 
@@ -64,7 +63,7 @@ void loadAndGroup(const char *OutputFileName)
     std::vector<mat_t> mat1;
     std::vector<mat_t> mat2;
     std::vector<mat_t> mat3;
-    extern FILE * ofile;
+    FILE * ofile;
     int num_tkmn = 0;
     ob_groups_t * array_groups;
     int good_group = 0;
@@ -453,7 +452,7 @@ void loadAndGroup(const char *OutputFileName)
             while (tmpob != NULL)
             {
 
-                printOb(tmpob);
+                printOb(ofile, tmpob);
                 printf("%s\n", tmpob->name);
                 tmpob = tmpob->next;
             }
@@ -469,7 +468,7 @@ void loadAndGroup(const char *OutputFileName)
             tmpob = array_groups[i].kids2;
             while (tmpob != NULL)
             {
-                printOb(tmpob);
+                printOb(ofile, tmpob);
                 printf("%s\n", tmpob->name);
                 tmpob = tmpob->next;
             }
@@ -483,7 +482,7 @@ void loadAndGroup(const char *OutputFileName)
             tmpob = array_groups[i].kids1;
             while (tmpob != NULL)
             {
-                printOb(tmpob);
+                printOb(ofile, tmpob);
                 printf("%s\n", tmpob->name);
                 tmpob = tmpob->next;
             }
@@ -497,11 +496,11 @@ void loadAndGroup(const char *OutputFileName)
         tmpob = array_groups[i].kids0;
         while (tmpob != NULL)
         {
-            printOb(tmpob);
+            printOb(ofile, tmpob);
             printf("%s\n", tmpob->name);
             tmpob = tmpob->next;
         }
-        printOb(array_groups[i].tkmn);
+        printOb(ofile, array_groups[i].tkmn);
     }
 
     return;

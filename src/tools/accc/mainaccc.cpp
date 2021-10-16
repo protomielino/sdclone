@@ -55,7 +55,7 @@ bool splitObjectsDuringLoad = true;
 conv_t typeConvertion = _UNSPECIFIED;
 double far_dist = 10000;
 bool normalMapping = false;
-extern double smooth_angle;
+double smooth_angle = 70.0;
 
 void usage(void)
 {
