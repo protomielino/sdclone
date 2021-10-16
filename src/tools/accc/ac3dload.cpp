@@ -2242,11 +2242,7 @@ void normalize(point_t *t)
     double dd;
     dd = sqrt(t->x * t->x + t->y * t->y + t->z * t->z);
     if (dd != 0.0)
-    {
-        t->x = t->x / dd;
-        t->y = t->y / dd;
-        t->z = t->z / dd;
-    }
+        *t /= dd;
     else
         t->set(0.0, 1.0, 0.0);
 }

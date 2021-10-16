@@ -544,19 +544,18 @@ void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray)
 
 /** Returns 0 if the given object has no name or is root, world or a group.
  */
-int isNamedAndPolygon(ob_t * ob)
+bool isNamedAndPolygon(ob_t * ob)
 {
     if (ob->name == NULL)
-        return 0;
+        return false;
     if (!strcmp(ob->name, "root"))
-        return 0;
+        return false;
     if (!strcmp(ob->name, "world"))
-        return 0;
-    if (ob->type != NULL
-    && !strcmp(ob->type, "group"))
-        return 0;
+        return false;
+    if (ob->type != NULL && !strcmp(ob->type, "group"))
+        return false;
 
-    return 1;
+    return true;
 }
 
 /** collapse the given tiledob into the texture channel 1 of tarobj */
@@ -576,7 +575,7 @@ void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3)
     tmpob = ob0;
     while (tmpob != NULL)
     {
-        if (0 == isNamedAndPolygon(tmpob))
+        if (!isNamedAndPolygon(tmpob))
         {
             tmpob = tmpob->next;
             continue;
@@ -637,7 +636,7 @@ void collapseMapTiledTextures(ob_t * tarob, ob_t * tiledob)
 
     while (curtiledob != NULL)
     {
-        if (0 == isNamedAndPolygon(curtiledob))
+        if (!isNamedAndPolygon(curtiledob))
         {
             curtiledob = curtiledob->next;
             continue;
@@ -651,8 +650,8 @@ void collapseMapTiledTextures(ob_t * tarob, ob_t * tiledob)
             for (curvert = 0; curvert < tarob->numvert; curvert++)
             {
                 if (fabs(tarob->vertex[curvert].x - curtiledob->vertex[curvert].x) > MINVAL
-                || fabs(tarob->vertex[curvert].y - curtiledob->vertex[curvert].y)>MINVAL
-                || fabs(tarob->vertex[curvert].z - curtiledob->vertex[curvert].z )>MINVAL)
+                || fabs(tarob->vertex[curvert].y - curtiledob->vertex[curvert].y) > MINVAL
+                || fabs(tarob->vertex[curvert].z - curtiledob->vertex[curvert].z) > MINVAL)
                 {
                     notinsameorder = true;
                 }
@@ -679,7 +678,7 @@ void collapseSkidsGrassTextures(ob_t * tarob, ob_t * skidsob)
 
     while (curskidsob != NULL)
     {
-        if (0 == isNamedAndPolygon(curskidsob))
+        if (!isNamedAndPolygon(curskidsob))
         {
             curskidsob = curskidsob->next;
             continue;
@@ -703,7 +702,7 @@ void collapseShadowTextures(ob_t * tarob, ob_t * shadob)
 
     while (curshadob != NULL)
     {
-        if (0 == isNamedAndPolygon(curshadob))
+        if (!isNamedAndPolygon(curshadob))
         {
             curshadob = curshadob->next;
             continue;
