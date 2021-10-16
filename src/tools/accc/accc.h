@@ -25,6 +25,9 @@
 #ifndef _ACCC_H_
 #define _ACCC_H_
 
+#include <string>
+#include <vector>
+
 extern char * fileL0;
 extern char * fileL1;
 extern char * fileL2;
@@ -269,14 +272,13 @@ struct color_t
 
 struct mat_t
 {
-    char * name;
+    std::string name;
     color_t rgb;
     color_t amb;
     color_t emis;
     color_t spec;
     double shi;
     double trans;
-    mat_t * next;
 
     bool operator == (const mat_t & rhs) const
     {
@@ -301,7 +303,7 @@ void loadAndGroup(const char* OutputFileName);
  *
  *  @returns 0 on success, a value != 0 on failure
  */
-int loadAC(const char* inputFilename, ob_t** objects, mat_t** materials, const char* outputFilename = NULL);
+int loadAC(const char* inputFilename, ob_t** objects, std::vector<mat_t> &materials, const char* outputFilename = NULL);
 
 /** Copies a single surface from the "vertexarray" attributes of srcob to the ones of destob.
  *  It decides whether to copy multitexture data based on srcob's "vertexarray" attributes.
@@ -399,6 +401,9 @@ double findDistmin(ob_t * ob1, ob_t *ob2);
 #define SPLITX 75
 #define SPLITY 75
 #define MINVAL 0.001
+
+int printOb(ob_t *ob);
+void printMaterials(FILE *file, const std::vector<mat_t> &materials);
 
 #ifndef WIN32
 #define stricmp strcasecmp

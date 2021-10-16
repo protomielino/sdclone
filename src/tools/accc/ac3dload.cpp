@@ -246,31 +246,31 @@ double smooth_angle = 70.0;
 struct verbaction_t
 {
     const char * verb;
-    int (*doVerb)(char * Line, ob_t *object, mat_t * material);
+    int (*doVerb)(char * Line, ob_t *object, std::vector<mat_t> &materials);
 };
 
-int doMaterial(char *Line, ob_t *object, mat_t *material);
-int doObject(char *Line, ob_t *object, mat_t *material);
-int doKids(char *Line, ob_t *object, mat_t *material);
-int doName(char *Line, ob_t *object, mat_t *material);
-int doLoc(char *Line, ob_t *object, mat_t *material);
-int doData(char *Line, ob_t *object, mat_t *material);
-int doTexture(char *Line, ob_t *object, mat_t *material);
-int doTexrep(char *Line, ob_t *object, mat_t *material);
-int doNumvert(char *Line, ob_t *object, mat_t *material);
-int doNumsurf(char *Line, ob_t *object, mat_t *material);
-int doSurf(char *Line, ob_t *object, mat_t *material);
-int doMat(char *Line, ob_t *object, mat_t *material);
-int doRefs(char *Line, ob_t *object, mat_t *material);
-int doCrease(char *Line, ob_t *object, mat_t *material);
+int doMaterial(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doObject(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doKids(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doName(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doLoc(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doData(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doTexture(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doTexrep(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doNumvert(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doNumsurf(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doSurf(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doMat(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doRefs(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doCrease(char *Line, ob_t *object, std::vector<mat_t> &materials);
 
 #ifdef _3DS
-void saveObin3DS(const char * OutputFilename, ob_t * object, mat_t * material);
+void saveObin3DS(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials);
 #endif
-void computeSaveAC3D(const char * OutputFilename, ob_t * object, mat_t * material);
-void computeSaveOBJ(const char * OutputFilename, ob_t * object, mat_t * material);
-void computeSaveAC3DM(const char * OutputFilename, ob_t * object, mat_t * material);
-void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, mat_t * material);
+void computeSaveAC3D(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials);
+void computeSaveOBJ(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials);
+void computeSaveAC3DM(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials);
+void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials);
 void stripifyOb(ob_t * object, int writeit);
 
 verbaction_t verbTab[] =
@@ -569,14 +569,11 @@ void computeObSurfCentroid(const ob_t * object, int obsurf, point_t * out)
     *out /= 3;
 }
 
-int doMaterial(char *Line, ob_t *object, mat_t *material)
+int doMaterial(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p;
     char name[256];
-    mat_t * materialt;
-
-    materialt = (mat_t*) malloc(sizeof(mat_t));
-    memset(materialt, '\0', sizeof(mat_t));
+    mat_t materialt;
 
     nummaterial++;
 
@@ -584,34 +581,29 @@ int doMaterial(char *Line, ob_t *object, mat_t *material)
     if (p == NULL)
     {
         fprintf(stderr, "unknown MATERIAL format %s\n", Line);
-        free(materialt);
         return (-1);
     }
     if (sscanf(p,
             "%255s rgb %lf %lf %lf amb %lf %lf %lf emis %lf %lf %lf spec %lf %lf %lf shi %lf trans %lf",
-            name, &(materialt->rgb.r), &(materialt->rgb.g), &(materialt->rgb.b),
-            &(materialt->amb.r), &(materialt->amb.g), &(materialt->amb.b),
-            &(materialt->emis.r), &(materialt->emis.g), &(materialt->emis.b),
-            &(materialt->spec.r), &(materialt->spec.g), &(materialt->spec.b),
-            &(materialt->shi), &(materialt->trans)) != 15)
+            name, &(materialt.rgb.r), &(materialt.rgb.g), &(materialt.rgb.b),
+            &(materialt.amb.r), &(materialt.amb.g), &(materialt.amb.b),
+            &(materialt.emis.r), &(materialt.emis.g), &(materialt.emis.b),
+            &(materialt.spec.r), &(materialt.spec.g), &(materialt.spec.b),
+            &(materialt.shi), &(materialt.trans)) != 15)
     {
         fprintf(stderr, "invalid MATERIAL format %s\n", p);
-        free(materialt);
         return (-1);
     }
 
-    materialt->name = strdup(name);
+    materialt.name = name;
 
     // append to list
-    mat_t * tmat = material;
-    while (tmat->next)
-        tmat = tmat->next;
-    tmat->next = materialt;
- 
+    materials.push_back(materialt); // use emplace_back someday
+
     return (0);
 }
 
-int doObject(char *Line, ob_t *object, mat_t *material)
+int doObject(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p;
     char name[256];
@@ -979,7 +971,7 @@ ob_t* splitOb(ob_t *object)
     return tob0;
 }
 
-int doKids(char* Line, ob_t* object, mat_t* material)
+int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
 {
     int kids;
     char *p = strstr(Line, " ");
@@ -1051,7 +1043,7 @@ int doKids(char* Line, ob_t* object, mat_t* material)
     return (0);
 }
 
-int doName(char *Line, ob_t *object, mat_t *material)
+int doName(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p;
     char *q;
@@ -1107,7 +1099,7 @@ int doName(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int doLoc(char *Line, ob_t *object, mat_t *material)
+int doLoc(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1126,7 +1118,7 @@ int doLoc(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int doData(char *Line, ob_t *object, mat_t *material)
+int doData(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1145,7 +1137,7 @@ int doData(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int doGetData(char *Line, ob_t *object, mat_t *material)
+int doGetData(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     int lineSize = (int)strlen(Line);
     // the '\n' of the last line is not included
@@ -1159,13 +1151,13 @@ int doGetData(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int doCrease(char *Line, ob_t *object, mat_t *material)
+int doCrease(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     dataFound = false;
     return (0);
 }
 
-int doTexture(char *Line, ob_t *object, mat_t *material)
+int doTexture(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char name[256];
     char * p = strstr(Line, " ");
@@ -1196,7 +1188,7 @@ int doTexture(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int doTexrep(char *Line, ob_t *object, mat_t *material)
+int doTexrep(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1214,7 +1206,7 @@ int doTexrep(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int doNumvert(char *Line, ob_t *object, mat_t *material)
+int doNumvert(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1235,7 +1227,7 @@ int doNumvert(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int doNumsurf(char *Line, ob_t *object, mat_t *material)
+int doNumsurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1253,7 +1245,7 @@ int doNumsurf(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int doGetVertex(char *Line, ob_t *object, mat_t *material)
+int doGetVertex(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     if (sscanf(Line, "%lf %lf %lf ", &(object->next->vertex[numvertex].x),
         &(object->next->vertex[numvertex].z),
@@ -1287,7 +1279,7 @@ int doGetVertex(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int doGetSurf(char *Line, ob_t *object, mat_t *material)
+int doGetSurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     /*  double u,v;*/
 
@@ -1308,7 +1300,7 @@ int doGetSurf(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int doSurf(char *Line, ob_t *object, mat_t *material)
+int doSurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1326,7 +1318,7 @@ int doSurf(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int doMat(char *Line, ob_t *object, mat_t *material)
+int doMat(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1343,7 +1335,7 @@ int doMat(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
-int doRefs(char *Line, ob_t *object, mat_t *material)
+int doRefs(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1493,15 +1485,14 @@ ob_t * splitObjects(ob_t* object)
     return newob;
 }
 
-int loadAC(const char * inputFilename, ob_t ** objects, mat_t ** materials, const char * outputFilename)
+int loadAC(const char * inputFilename, ob_t ** objects, std::vector<mat_t> & materials, const char * outputFilename)
 {
     /* saveIn : 0= 3ds , 1= obj , 2=ac3d grouped (track) , 3 = ac3d strips (cars) */
     char Line[256];
     int ret = 0;
-    int (*doVerb)(char * Line, ob_t *object, mat_t * material);
+    int (*doVerb)(char * Line, ob_t *object, std::vector<mat_t> &materials);
     FILE * file;
     ob_t * current_ob;
-    mat_t * current_material;
 
     if ((file = fopen(inputFilename, "r")) == NULL)
     {
@@ -1525,11 +1516,7 @@ int loadAC(const char * inputFilename, ob_t ** objects, mat_t ** materials, cons
     current_ob->name = strdup("root");
     *objects = current_ob;
 
-    current_material = (mat_t *) malloc(sizeof(mat_t));
-    memset(current_material, 0, sizeof(mat_t));
-    current_material->name = strdup("root");
     fprintf(stderr, "starting loading ...\n");
-    *materials = current_material;
 
     while (fgets(Line, sizeof(Line), file))
     {
@@ -1549,19 +1536,19 @@ int loadAC(const char * inputFilename, ob_t ** objects, mat_t ** materials, cons
         }
         if (numvertFound && doVerb == NULL)
         {
-            ret = doGetVertex(Line, current_ob, current_material);
+            ret = doGetVertex(Line, current_ob, materials);
             if(ret != 0)
                 break;
         }
         else if (numrefsFound && doVerb == NULL)
         {
-            ret = doGetSurf(Line, current_ob, current_material);
+            ret = doGetSurf(Line, current_ob, materials);
             if(ret != 0)
                 break;
         }
 	else if (dataFound && doVerb == NULL)
 	{
-	    ret = doGetData(Line, current_ob, current_material);
+	    ret = doGetData(Line, current_ob, materials);
 	    if (ret != 0)
 		break;
 	}
@@ -1575,7 +1562,7 @@ int loadAC(const char * inputFilename, ob_t ** objects, mat_t ** materials, cons
             numvertFound = false;
             numrefsFound = false;
             dataFound = false;
-            ret = doVerb(Line, current_ob, current_material);
+            ret = doVerb(Line, current_ob, materials);
             if(ret != 0)
                 break;
         }
@@ -1600,19 +1587,19 @@ int loadAC(const char * inputFilename, ob_t ** objects, mat_t ** materials, cons
 
     if (typeConvertion == _AC3DTOOBJ)
     {
-        computeSaveOBJ(outputFilename, current_ob, current_material);
+        computeSaveOBJ(outputFilename, current_ob, materials);
     }
     else if (typeConvertion == _AC3DTOAC3DM)
     {
-        computeSaveAC3DM(outputFilename, current_ob, current_material);
+        computeSaveAC3DM(outputFilename, current_ob, materials);
     }
     else if (typeConvertion == _AC3DTOAC3DS)
     {
-        computeSaveAC3DStrip(outputFilename, current_ob, current_material);
+        computeSaveAC3DStrip(outputFilename, current_ob, materials);
     }
     else if (typeConvertion == _AC3DTOAC3D)
     {
-        computeSaveAC3D(outputFilename, current_ob, current_material);
+        computeSaveAC3D(outputFilename, current_ob, materials);
     }
 #ifdef _3DS
     else if (typeConvertion == _AC3DTO3DS)
@@ -2623,13 +2610,12 @@ void smoothObjectTriNorm(ob_t * object)
     return;
 }
 
-void computeSaveAC3D(const char * OutputFilename, ob_t * object, mat_t * material)
+void computeSaveAC3D(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials)
 {
 
     char name2[256];
     char *p, *q;
     ob_t * tmpob = NULL;
-    mat_t * tmat = NULL;
     int numg = 0;
     bool lastpass = false;
     int nborder = 0;
@@ -2657,23 +2643,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object, mat_t * materia
     }
 
     fprintf(ofile, "AC3Db\n");
-    tmat = material;
-    while (tmat != NULL)
-    {
-        if (strcmp(tmat->name, "root") == 0)
-        {
-            tmat = tmat->next;
-            continue;
-        }
-        fprintf(ofile,
-                "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %d trans 0\n",
-                tmat->name, tmat->rgb.r, tmat->rgb.g, tmat->rgb.b, tmat->amb.r,
-                tmat->amb.g, tmat->amb.b, tmat->emis.r, tmat->emis.g,
-                tmat->emis.b, tmat->spec.r, tmat->spec.g, tmat->spec.b,
-                (int) tmat->shi);
-        tmat = tmat->next;
-    }
-
+    printMaterials(ofile, materials);
     fprintf(ofile, "OBJECT world\n");
 
     if (OrderString && isobjectacar)
@@ -2970,11 +2940,10 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object, mat_t * materia
     fclose(ofile);
 }
 
-void computeSaveOBJ(const char * OutputFilename, ob_t * object, mat_t * material)
+void computeSaveOBJ(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials)
 {
     char name2[256];
     ob_t * tmpob = NULL;
-    mat_t * tmat = NULL;
     int deltav = 1;
     int ind = 0;
     char tname[256];
@@ -2995,53 +2964,44 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object, mat_t * material
         return;
     }
 
-    tmat = material;
-    while (tmat != NULL)
+    for (size_t i = 0, end = materials.size(); i < end; ++i)
     {
-        if (strcmp(tmat->name, "root") != 0)
+        tmpob = object;
+        while (tmpob != NULL)
         {
-        }
-        else
-        {
-            tmpob = object;
-            while (tmpob != NULL)
+            if (tmpob->name == NULL)
             {
-                if (tmpob->name == NULL)
-                {
-                    tmpob = tmpob->next;
-                    continue;
-                }
-                if (!strcmp(tmpob->name, "root"))
-                {
-                    tmpob = tmpob->next;
-                    continue;
-                }
-                if (!strcmp(tmpob->name, "world"))
-                {
-                    tmpob = tmpob->next;
-                    continue;
-                }
-
-                if (tmpob->texture != NULL)
-                    if (*tmpob->texture != '\0')
-                    {
-                        fprintf(tfile, "newmtl default\n");
-                        fprintf(tfile, "Ka %lf %lf %lf\n", tmat->amb.r,
-                                tmat->amb.g, tmat->amb.b);
-                        fprintf(tfile, "Kd %lf %lf %lf\n", tmat->emis.r,
-                                tmat->emis.g, tmat->emis.b);
-                        fprintf(tfile, "Ks %lf %lf %lf\n", tmat->spec.r,
-                                tmat->spec.g, tmat->spec.b);
-                        fprintf(tfile, "Ns %d\n", (int)tmat->shi);
-                        fprintf(tfile, "map_kd %s\n", tmpob->texture);
-                        break;
-                    }
-
                 tmpob = tmpob->next;
+                continue;
+            }
+            if (!strcmp(tmpob->name, "root"))
+            {
+                tmpob = tmpob->next;
+                continue;
+            }
+            if (!strcmp(tmpob->name, "world"))
+            {
+                tmpob = tmpob->next;
+                continue;
             }
 
+            if (tmpob->texture != NULL)
+                if (*tmpob->texture != '\0')
+                {
+                    fprintf(tfile, "newmtl default\n");
+                    fprintf(tfile, "Ka %lf %lf %lf\n", materials[i].amb.r,
+                            materials[i].amb.g, materials[i].amb.b);
+                    fprintf(tfile, "Kd %lf %lf %lf\n", materials[i].emis.r,
+                            materials[i].emis.g, materials[i].emis.b);
+                    fprintf(tfile, "Ks %lf %lf %lf\n", materials[i].spec.r,
+                            materials[i].spec.g, materials[i].spec.b);
+                    fprintf(tfile, "Ns %d\n", (int)materials[i].shi);
+                    fprintf(tfile, "map_kd %s\n", tmpob->texture);
+                    break;
+                }
+
+            tmpob = tmpob->next;
         }
-        tmat = tmat->next;
     }
 
     texnum = 0;
@@ -3631,11 +3591,10 @@ void stripifyOb(ob_t * object, int writeit)
     free(StripLength);
 }
 
-void computeSaveAC3DM(const char * OutputFilename, ob_t * object, mat_t * material)
+void computeSaveAC3DM(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials)
 {
     char name2[256];
     ob_t * tmpob = NULL;
-    mat_t * tmat = NULL;
     int deltav = 1;
     int ind = 0;
 
@@ -3645,23 +3604,15 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object, mat_t * materi
         return;
     }
 
-    tmat = material;
-    while (tmat != NULL)
+    for (size_t i = 0, end = materials.size(); i < end; i++) //for (const auto & material : materials)
     {
-        if (strcmp(tmat->name, "root") == 0)
-        {
-            tmat = tmat->next;
-            continue;
-        }
-
+        const mat_t & material = materials[i];
         fprintf(ofile,
                 "MATERIAL %s rgb %lf %lf %lf amb %lf %lf %lf emis %lf %lf %lf spec %lf %lf %lf shi %d trans 0\n",
-                tmat->name, tmat->rgb.r, tmat->rgb.g, tmat->rgb.b, tmat->amb.r,
-                tmat->amb.g, tmat->amb.b, tmat->emis.r, tmat->emis.g,
-                tmat->emis.b, tmat->spec.r, tmat->spec.g, tmat->spec.b,
-                (int) tmat->shi);
-
-        tmat = tmat->next;
+                material.name.c_str(), material.rgb.r, material.rgb.g, material.rgb.b, material.amb.r,
+                material.amb.g, material.amb.b, material.emis.r, material.emis.g,
+                material.emis.b, material.spec.r, material.spec.g, material.spec.b,
+                (int) material.shi);
     }
 
     texnum = 0;
@@ -4400,11 +4351,9 @@ void normalMap01(ob_t * object)
     }
 }
 
-void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, mat_t * material)
-
+void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials)
 {
     ob_t * tmpob = NULL;
-    mat_t * tmat = NULL;
     int numg = 0;
     char *p;
     char *q = NULL;
@@ -4429,21 +4378,15 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, mat_t * ma
             mergeSplitted(&object);
     }
     fprintf(ofile, "AC3Db\n");
-    tmat = material;
-    while (tmat != NULL)
+    for (size_t i = 0, end = materials.size(); i < end; i++) //for (const auto & material : materials)
     {
-        if (strcmp(tmat->name, "root") == 0)
-        {
-            tmat = tmat->next;
-            continue;
-        }
+        const mat_t & material = materials[i];
         fprintf(ofile,
                 "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %d trans 0\n",
-                tmat->name, tmat->rgb.r, tmat->rgb.g, tmat->rgb.b, tmat->amb.r,
-                tmat->amb.g, tmat->amb.b, tmat->emis.r, tmat->emis.g,
-                tmat->emis.b, tmat->spec.r, tmat->spec.g, tmat->spec.b,
-                (int) tmat->shi);
-        tmat = tmat->next;
+                material.name.c_str(), material.rgb.r, material.rgb.g, material.rgb.b, material.amb.r,
+                material.amb.g, material.amb.b, material.emis.r, material.emis.g,
+                material.emis.b, material.spec.r, material.spec.g, material.spec.b,
+                (int) material.shi);
     }
 
     fprintf(ofile, "OBJECT world\n");
@@ -5041,4 +4984,18 @@ double findDistmin(ob_t * ob1, ob_t *ob2)
 
     return d;
 
+}
+
+void printMaterials(FILE *file, const std::vector<mat_t> &materials)
+{
+    for (size_t j = 0, end = materials.size(); j < end; j++) //for (const auto & material : mat0)
+    {
+        const mat_t& material = materials[j];
+        fprintf(file,
+            "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %3d trans 0\n",
+            material.name.c_str(), material.rgb.r, material.rgb.g, material.rgb.b, material.amb.r,
+            material.amb.g, material.amb.b, material.emis.r, material.emis.g,
+            material.emis.b, material.spec.r, material.spec.g, material.spec.b,
+            (int)material.shi);
+    }
 }

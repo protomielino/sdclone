@@ -365,9 +365,9 @@ int main(int argc, char **argv)
     else
     {
         ob_t * objects;
-        mat_t * materials;
+        std::vector<mat_t> materials;
 
-        loadAC(InputFileName, &objects, &materials, OutputFileName);
+        loadAC(InputFileName, &objects, materials, OutputFileName);
     }
 
     return 0;

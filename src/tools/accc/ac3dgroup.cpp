@@ -33,40 +33,21 @@
 #include <portability.h>
 #include "accc.h"
 
-extern int printOb(ob_t * ob);
 extern void smoothTriNorm(ob_t * object);
 void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray);
 void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3);
 
-// count number of materials in list not including root
-int numberMaterial(mat_t* mat)
-{
-    if (!mat)
-        return 0;
-    int count = 0;
-    mat_t* tmat = mat;
-    while (tmat->next)
-    {
-        count++;
-        tmat = tmat->next;
-    }
-    return count;
-}
 // check if materials need to be merged
-bool materialNeedsMerge(mat_t * mat1, mat_t * mat2)
+bool materialNeedsMerge(const std::vector<mat_t> &mat1, const std::vector<mat_t> &mat2)
 {
-    int mat1_count = numberMaterial(mat1);
-    int mat2_count = numberMaterial(mat2);
+    size_t mat1_count = mat1.size();
+    size_t mat2_count = mat2.size();
     if (mat2_count > mat1_count)
         return true;
-    mat_t * tmat1 = mat1->next;
-    mat_t * tmat2 = mat2->next;
-    while (tmat1 && tmat2)
+    for (size_t i = 0, end = mat2.size(); i < end; ++i)
     {
-        if (*tmat1 != *tmat2)
+        if (mat1[i] != mat2[i])
             return true;
-        tmat1 = tmat1->next;
-        tmat2 = tmat2->next;
     }
     return false;
 }
@@ -79,11 +60,10 @@ void loadAndGroup(const char *OutputFileName)
     ob_t * ob3 = NULL;
     ob_t * tmpob = NULL;
     ob_t * tmpob2 = NULL;
-    mat_t * tmat = NULL;
-    mat_t * mat0 = NULL;
-    mat_t * mat1 = NULL;
-    mat_t * mat2 = NULL;
-    mat_t * mat3 = NULL;
+    std::vector<mat_t> mat0;
+    std::vector<mat_t> mat1;
+    std::vector<mat_t> mat2;
+    std::vector<mat_t> mat3;
     extern FILE * ofile;
     int num_tkmn = 0;
     ob_groups_t * array_groups;
@@ -99,22 +79,22 @@ void loadAndGroup(const char *OutputFileName)
     if (fileL0)
     {
         fprintf(stderr, "\nloading file %s\n", fileL0);
-        loadAC(fileL0, &ob0, &mat0);
+        loadAC(fileL0, &ob0, mat0);
     }
     if (fileL1)
     {
         fprintf(stderr, "\nloading file %s\n", fileL1);
-        loadAC(fileL1, &ob1, &mat1);
+        loadAC(fileL1, &ob1, mat1);
     }
     if (fileL2)
     {
         fprintf(stderr, "\nloading file %s\n", fileL2);
-        loadAC(fileL2, &ob2, &mat2);
+        loadAC(fileL2, &ob2, mat2);
     }
     if (fileL3)
     {
         fprintf(stderr, "\nloading file %s\n", fileL3);
-        loadAC(fileL3, &ob3, &mat3);
+        loadAC(fileL3, &ob3, mat3);
     }
     /* now collapse the texture and texture  arrays of 1 2 3 in 0 */
 
@@ -126,17 +106,17 @@ void loadAndGroup(const char *OutputFileName)
     collapseTextures(ob0, ob1, ob2, ob3);
 
     // todo: merge materials
-    if (mat1 && materialNeedsMerge(mat0, mat1))
+    if (!mat1.empty() && materialNeedsMerge(mat0, mat1))
     {
         fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL1);
         exit(-1);
     }
-    if (mat2 && materialNeedsMerge(mat0, mat2))
+    if (!mat2.empty() && materialNeedsMerge(mat0, mat2))
     {
         fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL2);
         exit(-1);
     }
-    if (mat3 && materialNeedsMerge(mat0, mat3))
+    if (!mat3.empty() && materialNeedsMerge(mat0, mat3))
     {
         fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL3);
         exit(-1);
@@ -448,24 +428,7 @@ void loadAndGroup(const char *OutputFileName)
         return;
     }
     fprintf(ofile, "AC3Db\n");
-    tmat = mat0;
-    while (tmat != NULL)
-    {
-        if (strcmp(tmat->name, "root") == 0)
-        {
-            tmat = tmat->next;
-            continue;
-        }
-        fprintf(ofile,
-                "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %3d trans 0\n",
-                tmat->name, tmat->rgb.r, tmat->rgb.g, tmat->rgb.b, tmat->amb.r,
-                tmat->amb.g, tmat->amb.b, tmat->emis.r, tmat->emis.g,
-                tmat->emis.b, tmat->spec.r, tmat->spec.g, tmat->spec.b,
-                (int) tmat->shi);
-        /*(int)tmat->trans);*/
-        tmat = tmat->next;
-    }
-
+    printMaterials(ofile, mat0);
     fprintf(ofile, "OBJECT world\n");
     fprintf(ofile, "kids %d\n", num_tkmn);
 
