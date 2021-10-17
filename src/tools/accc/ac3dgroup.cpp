@@ -516,7 +516,7 @@ void reorder(ob_t * ob, ob_t * ob2, uv_t *textarray, tcoord_t *vertexarray)
         {
             for (int j = 0; j < ob->numvert; j++)
             {
-                if (ob->vertex[i] == ob2->vertex[i])
+                if (ob->vertex[i] == ob2->vertex[j])
                 {
                     k++;
 
@@ -625,45 +625,47 @@ void copyTextureChannel(ob_t * destob, ob_t * srcob, int channel)
     }
 }
 
+bool notInSameOrder(const ob_t * ob1, const ob_t * ob2)
+{
+    for (int i = 0; i < ob1->numvert; i++)
+    {
+        if (fabs(ob1->vertex[i].x - ob2->vertex[i].x) > MINVAL ||
+            fabs(ob1->vertex[i].y - ob2->vertex[i].y) > MINVAL ||
+            fabs(ob1->vertex[i].z - ob2->vertex[i].z) > MINVAL)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isSamePoly(const ob_t * ob1, const ob_t * ob2)
+{
+    return stricmp(ob1->name, ob2->name) == 0 &&
+           stricmp(ob1->type, ob2->type) == 0 &&
+           ob1->numvert == ob2->numvert && 
+           ob1->numsurf == ob2->numsurf;
+}
+
 void collapseMapTiledTextures(ob_t * tarob, ob_t * tiledob)
 {
     ob_t * curtiledob = tiledob;
-    bool notinsameorder = false;
-    int curvert = 0;
 
     while (curtiledob != NULL)
     {
-        if (!isNamedAndPolygon(curtiledob))
+        if (isNamedAndPolygon(curtiledob))
         {
-            curtiledob = curtiledob->next;
-            continue;
-        }
-        notinsameorder = false;
-        if (!stricmp(curtiledob->name, tarob->name)
-        && tarob->numvert == curtiledob->numvert)
-        {
-            /* found an ob in ob1 */
-            copyTextureChannel(tarob, curtiledob, 1);
-            for (curvert = 0; curvert < tarob->numvert; curvert++)
+            if (isSamePoly(tarob, curtiledob))
             {
-                if (fabs(tarob->vertex[curvert].x - curtiledob->vertex[curvert].x) > MINVAL
-                || fabs(tarob->vertex[curvert].y - curtiledob->vertex[curvert].y) > MINVAL
-                || fabs(tarob->vertex[curvert].z - curtiledob->vertex[curvert].z) > MINVAL)
+                copyTextureChannel(tarob, curtiledob, 1);
+                if (notInSameOrder(tarob, curtiledob))
                 {
-                    notinsameorder = true;
+                    printf("%s : points not in the same order, reordering ...\n", tarob->name);
+                    reorder(tarob, curtiledob, tarob->textarray1, tarob->vertexarray1);
+                    printf("%s : reordering ... done\n", tarob->name);
                 }
+                break;
             }
-
-            if (notinsameorder)
-            {
-                printf(
-                        "%s : points not in the same order, reordering ...\n",
-                        tarob->name);
-                reorder(tarob, curtiledob, tarob->textarray1,
-                        tarob->vertexarray1);
-                printf("%s : reordering ... done\n", tarob->name);
-            }
-            break;
         }
         curtiledob = curtiledob->next;
     }
@@ -675,20 +677,21 @@ void collapseSkidsGrassTextures(ob_t * tarob, ob_t * skidsob)
 
     while (curskidsob != NULL)
     {
-        if (!isNamedAndPolygon(curskidsob))
+        if (isNamedAndPolygon(curskidsob))
         {
-            curskidsob = curskidsob->next;
-            continue;
-        }
+            if (isSamePoly(tarob, curskidsob))
+            {
+                copyTextureChannel(tarob, curskidsob, 2);
 
-        if (!stricmp(curskidsob->name, tarob->name)
-        && tarob->numvert == curskidsob->numvert)
-        {
-            /* found an ob in ob2 */
-            copyTextureChannel(tarob, curskidsob, 2);
-            break;
+                if (notInSameOrder(tarob, curskidsob))
+                {
+                    printf("%s : points not in the same order\n", tarob->name);
+                    reorder(tarob, curskidsob, tarob->textarray2, tarob->vertexarray2);
+                    printf("%s : reordering ... done\n", tarob->name);
+                }
+                break;
+            }
         }
-
         curskidsob = curskidsob->next;
     }
 }
@@ -699,33 +702,19 @@ void collapseShadowTextures(ob_t * tarob, ob_t * shadob)
 
     while (curshadob != NULL)
     {
-        if (!isNamedAndPolygon(curshadob))
+        if (isNamedAndPolygon(curshadob))
         {
-            curshadob = curshadob->next;
-            continue;
-        }
-
-        if (!stricmp(curshadob->name, tarob->name)
-        && tarob->numvert == curshadob->numvert)
-        {
-            /* found an ob in ob2 */
-            copyTextureChannel(tarob, curshadob, 3);
-            if (tarob->texture3)
+            if (isSamePoly(tarob, curshadob))
             {
-                for (int curvert = 0; curvert < tarob->numvert; curvert++)
+                copyTextureChannel(tarob, curshadob, 3);
+                if (notInSameOrder(tarob, curshadob))
                 {
-                    if (tarob->textarray3[curvert] != tarob->textarray[curvert])
-                    {
-                        printf("name=%s %.2lf!=%.2lf %.2lf!=%.2lf\n",
-                                tarob->name, tarob->textarray[curvert].u,
-                                tarob->textarray3[curvert].u,
-                                tarob->textarray[curvert].v,
-                                tarob->textarray3[curvert].v);
-                    }
+                    printf("%s : points not in the same order\n", tarob->name);
+                    reorder(tarob, curshadob, tarob->textarray3, tarob->vertexarray3);
+                    printf("%s : reordering ... done\n", tarob->name);
                 }
+                break;
             }
-
-            break;
         }
         curshadob = curshadob->next;
     }
