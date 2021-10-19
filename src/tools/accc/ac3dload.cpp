@@ -1286,17 +1286,26 @@ int doGetSurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
 
 int doSurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
+    int surf = 0;
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown SURF format %s\n", Line);
         return (-1);
     }
-    if (sscanf(p, "%x", &attrSurf) != 1)
+    if (sscanf(p, "%x", &surf) != 1)
     {
         fprintf(stderr, "invalid SURF format %s\n", p);
         return (-1);
     }
+    // Check for an object with multiple surfaces with different SURF types.
+    // Can't convert multiple triangles with different SURF types into a triangle strip with a single SURF type.
+    if ((typeConvertion == _AC3DTOAC3DS || typeConvertion == _AC3DTOAC3DGROUP) && numrefs && surf != attrSurf)
+    {
+        fprintf(stderr, "multiple SURF in object 0x%x and 0x%x (OBJECT needs splitting by SURF type?)\n", surf, attrSurf);
+        return (-1);
+    }
+    attrSurf = surf;
     numvertFound = false;
     dataFound = false;
     return (0);
@@ -1304,17 +1313,26 @@ int doSurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
 
 int doMat(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
+    int mat = 0;
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown mat format %s\n", Line);
         return (-1);
     }
-    if (sscanf(p, "%d", &attrMat) != 1)
+    if (sscanf(p, "%d", &mat) != 1)
     {
         fprintf(stderr, "invalid mat format %s\n", p);
         return (-1);
     }
+    // Check for an object with multiple surfaces with different material types.
+    // Can't convert multiple triangles with different material types into a triangle strip with a single material type.
+    if ((typeConvertion == _AC3DTOAC3DS || typeConvertion == _AC3DTOAC3DGROUP) && numrefs && mat != attrMat)
+    {
+        fprintf(stderr, "multiple mat in object %d and %d (OBJECT needs splitting by material type?)\n", mat, attrMat);
+        return (-1);
+    }
+    attrMat = mat;
     numvertFound = false;
     return (0);
 }
@@ -1530,12 +1548,12 @@ int loadAC(const char * inputFilename, ob_t ** objects, std::vector<mat_t> & mat
             if(ret != 0)
                 break;
         }
-	else if (dataFound && doVerb == NULL)
-	{
-	    ret = doGetData(Line, current_ob, materials);
-	    if (ret != 0)
-		break;
-	}
+        else if (dataFound && doVerb == NULL)
+        {
+            ret = doGetData(Line, current_ob, materials);
+            if (ret != 0)
+                break;
+        }
         else
         {
             if (doVerb == NULL)

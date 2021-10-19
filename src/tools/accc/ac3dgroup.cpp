@@ -78,22 +78,38 @@ void loadAndGroup(const char *OutputFileName)
     if (fileL0)
     {
         fprintf(stderr, "\nloading file %s\n", fileL0);
-        loadAC(fileL0, &ob0, mat0);
+        if (loadAC(fileL0, &ob0, mat0) == -1)
+        {
+            fprintf(stderr, "\ncouldn't load file %s\n", fileL0);
+            return;
+        }
     }
     if (fileL1)
     {
         fprintf(stderr, "\nloading file %s\n", fileL1);
-        loadAC(fileL1, &ob1, mat1);
+        if (loadAC(fileL1, &ob1, mat1) == -1)
+        {
+            fprintf(stderr, "\ncouldn't load file %s\n", fileL1);
+            return;
+        }
     }
     if (fileL2)
     {
         fprintf(stderr, "\nloading file %s\n", fileL2);
-        loadAC(fileL2, &ob2, mat2);
+        if (loadAC(fileL2, &ob2, mat2) == -1)
+        {
+            fprintf(stderr, "\ncouldn't load file %s\n", fileL2);
+            return;
+        }
     }
     if (fileL3)
     {
         fprintf(stderr, "\nloading file %s\n", fileL3);
-        loadAC(fileL3, &ob3, mat3);
+        if (loadAC(fileL3, &ob3, mat3) == -1)
+        {
+            fprintf(stderr, "\ncouldn't load file %s\n", fileL3);
+            return;
+        }
     }
     /* now collapse the texture and texture  arrays of 1 2 3 in 0 */
 
