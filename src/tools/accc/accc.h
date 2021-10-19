@@ -213,9 +213,6 @@ struct ob_t
     double y_max;
     double z_max;
     double dist_min;
-    ob_t* ob1;
-    ob_t* ob2;
-    ob_t* ob3;
     bool saved;
     int kids_o;
     bool inkids_o;
