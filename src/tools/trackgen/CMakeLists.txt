@@ -5,7 +5,7 @@ PROJECT(trackgen)
 SET(_TARGET_NAME ${SD_TOOLS_EXECPREFIX}trackgen)
 
 SET(_SOURCES ac3d.cpp easymesh.cpp elevation.cpp main.cpp
-             objects.cpp relief.cpp track.cpp util.cpp)
+             objects.cpp raceline.cpp relief.cpp track.cpp util.cpp)
 SET(_HEADERS ac3d.h easymesh.h elevation.h objects.h relief.h trackgen.h util.h)
 SET(_OTHER_SOURCES trackgen.xml)
 

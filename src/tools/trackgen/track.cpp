@@ -45,6 +45,7 @@ typedef struct texElt
 {
     char		*name;
     char		*namebump;
+	char		* nameraceline;
     int         mipmap; // Not yet used.
     unsigned int	texid;
     struct texElt	*next;
@@ -246,20 +247,18 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 	Compares old end vertices and new start vertices, set startNeeded if one is different
 **/
 int
-InitScene(tTrack *Track, void *TrackHandle, int bump)
+InitScene(tTrack *Track, void *TrackHandle, int bump, int raceline)
 {
-
     int 		i, j;
-    tTrackSeg 		*seg;
-    tTrackSeg 		*lastSeg = NULL;
-    tTrackSeg 		*mseg;
+    tTrackSeg	*seg;
+    tTrackSeg	*lastSeg = NULL;
+    tTrackSeg	*mseg;
     int 		nbvert;
     tdble 		width;
-    //tdble       wi2; // Never used.
     tdble 		anz, ts = 0;
-    tdble               radiusr, radiusl;
+    tdble		radiusr, radiusl;
     tdble 		step;
-    tTrkLocPos 		trkpos;
+    tTrkLocPos	trkpos;
     tdble		x, y, z;
     tdble		x2, y2, z2;
     tdble		x3, y3, z3;
@@ -335,9 +334,20 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
     width = Track->width;
     //wi2 = width / 2.0; // Never used.
 
-    trkpos.type = TR_LPOS_MAIN;
+	double rlWidthScale = 1.0;
+	double rlOffset = 0.0;
 
-#define SETTEXTURE(texname, texnamebump, _mipmap) do {			\
+	if (raceline) {
+		double SideDistExt = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLEXT, (char*)NULL, 2.0);
+		double SideDistInt = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLINT, (char*)NULL, 2.0);
+		rlWidthScale = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLWIDTHSCALE, (char*)NULL, 1.0);
+		rlOffset = (1.0 - 1.0 / rlWidthScale) / 2.0;
+
+		generateRaceLine(Track, SideDistExt, SideDistInt);
+	}
+	trkpos.type = TR_LPOS_MAIN;
+
+#define SETTEXTURE(texname, texnamebump, texnameraceline, _mipmap) do {			\
 	int found = 0;							\
 	curTexElt = texList;						\
 	if (curTexElt == NULL) {					\
@@ -346,6 +356,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 	    texList = curTexElt;					\
 	    curTexElt->name = strdup(texname);				\
 	    curTexElt->namebump = strdup(texnamebump);			\
+        curTexElt->nameraceline = strdup(texnameraceline);	\
 	    curTexElt->mipmap = _mipmap;				\
     curTexElt->texid = GenTexId++;				\
 	} else {							\
@@ -363,6 +374,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		texList = curTexElt;					\
 		curTexElt->name = strdup(texname);			\
         curTexElt->namebump = strdup(texnamebump);		\
+        curTexElt->nameraceline = strdup(texnameraceline);	\
         curTexElt->mipmap = _mipmap;				\
         curTexElt->texid = GenTexId++;				\
 	    }								\
@@ -419,6 +431,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 #define CHECKDISPLIST(mat, name, id, off) do {									\
 	const char *texname;												\
 	const char *texnamebump;											\
+    const char *texnameraceline;								\
 	int  mipmap;												\
 	static char path_[256];											\
 	if (Track->version < 4) {										\
@@ -427,9 +440,10 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 	    sprintf(path_, "%s/%s", TRK_SECT_SURFACES, mat);							\
         }													\
 	texnamebump = GfParmGetStr(TrackHandle, path_, TRK_ATT_BUMPNAME, "");					\
+    texnameraceline = GfParmGetStr(TrackHandle, path_, TRK_ATT_RACELINENAME, "");					\
 	texname = GfParmGetStr(TrackHandle, path_, TRK_ATT_TEXTURE, "tr-asphalt.png");				\
 	mipmap = (int)GfParmGetNum(TrackHandle, path_, TRK_ATT_TEXMIPMAP, (char*)NULL, 0);			\
-	SETTEXTURE(texname, texnamebump, mipmap);										\
+	SETTEXTURE(texname, texnamebump, texnameraceline, mipmap);										\
 	if ((curTexId != prevTexId) || (startNeeded)) {								\
 	    const char *textype;											\
             if (bump) {												\
@@ -463,7 +477,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 #define CHECKDISPLIST2(texture, mipmap, name, id) do {		\
 	char texname[300];					\
 	sprintf(texname, "%s.png", texture);			\
-	SETTEXTURE(texname, "", mipmap);			\
+	SETTEXTURE(texname, "", "", mipmap);			\
 	if (curTexId != prevTexId) {				\
 	    prevTexId = curTexId;				\
 	    NEWDISPLIST(1, name, id);				\
@@ -471,7 +485,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
     }  while (0)
 
 #define CHECKDISPLIST3(texture, mipmap, name, id) do {		\
-	SETTEXTURE(texture, "", mipmap);			\
+	SETTEXTURE(texture, "", "", mipmap);			\
 	if (curTexId != prevTexId) {				\
 	    prevTexId = curTexId;				\
 	    NEWDISPLIST(1, name, id);				\
@@ -556,12 +570,24 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 	    curTexSeg = seg->lgfromstart;
 	}
 	curTexSeg += curTexOffset;
+
+    if (raceline) {
+        // Required if some smaller than width tiled texture is used.
+        curTexSize = seg->width;
+    }
+
 	texLen = curTexSeg / curTexSize;
 	if (startNeeded || (runninglentgh > LG_STEP_MAX)) {
 	    NEWDISPLIST(0, "tkMn", i);
 	    runninglentgh = 0;
 	    ts = 0;
-	    texMaxT = (curTexType == 1 ? width / curTexSize : 1.0 + floor(width / curTexSize));
+        if (raceline) {
+            // Required if some smaller than width tiled texture is used.
+            texMaxT = 1.0;
+        } else {
+            // Normal case
+            texMaxT = (curTexType == 1 ? width / curTexSize : 1.0 + floor(width / curTexSize));
+        }
 
 	    SETPOINT(texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
 	    SETPOINT(texLen, 0.0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
@@ -650,6 +676,11 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 	runninglentgh += seg->length;
     }
 
+    if (raceline) {
+        CLOSEDISPLIST();
+        printf("=== Indices really used = %d\n", nbvert);
+        return 0;
+    }
 
     /* Right Border */
     for (j = 0; j < 3; j++) {
@@ -2700,7 +2731,7 @@ saveObject(FILE *curFd, int nb, int start, char *texture, char *name, int surfTy
 
 
 static void
-SaveMainTrack(FILE *curFd, int bump)
+SaveMainTrack(FILE *curFd, int bump, int raceline)
 {
     tDispElt		*aDispElt;
     char		buf[256];
@@ -2716,9 +2747,11 @@ SaveMainTrack(FILE *curFd, int bump)
 		if (aDispElt->nb != 0) {
 		    sprintf(buf, "%s%d", aDispElt->name, aDispElt->id);
 		    if (bump) {
-			saveObject(curFd, aDispElt->nb, aDispElt->start, aDispElt->texture->namebump, buf, aDispElt->surfType);
-		    } else {
-			saveObject(curFd, aDispElt->nb, aDispElt->start, aDispElt->texture->name, buf, aDispElt->surfType);
+				saveObject(curFd, aDispElt->nb, aDispElt->start, aDispElt->texture->namebump, buf, aDispElt->surfType);
+			} else if (raceline) {
+				saveObject(curFd, aDispElt->nb, aDispElt->start, aDispElt->texture->nameraceline, buf, aDispElt->surfType);
+			} else {
+				saveObject(curFd, aDispElt->nb, aDispElt->start, aDispElt->texture->name, buf, aDispElt->surfType);
 		    }
 		}
 	    } while (aDispElt != Groups[i].dispList);
@@ -2733,12 +2766,12 @@ SaveMainTrack(FILE *curFd, int bump)
     @param	TrackHandle	handle on the track description
     @return	none
 */
-void CalculateTrack(tTrack * Track, void *TrackHandle, int bump)
+void CalculateTrack(tTrack * Track, void *TrackHandle, int bump, int raceline)
 {
 	TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, NULL, TrackStep);
 	printf("Track step: %.2f ", TrackStep);
 	
-	InitScene(Track, TrackHandle, bump);
+	InitScene(Track, TrackHandle, bump, raceline);
 	
 	printf("Calculation finished\n");
 }
@@ -2752,25 +2785,24 @@ void CalculateTrack(tTrack * Track, void *TrackHandle, int bump)
     @return	none
 */
 void
-GenerateTrack(tTrack * Track, void *TrackHandle, char *outFile, FILE *AllFd, int bump)
+GenerateTrack(tTrack * Track, void *TrackHandle, char *outFile, FILE *AllFd, int bump, int raceline)
 {
     FILE *curFd;
     
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, NULL, TrackStep);
     printf("Track step: %.2f ", TrackStep);
 
-    InitScene(Track, TrackHandle, bump);
+    InitScene(Track, TrackHandle, bump, raceline);
 
     if (outFile) {
-	curFd = Ac3dOpen(outFile, 1);
-	Ac3dGroup(curFd, "track", ActiveGroups);
-	SaveMainTrack(curFd, bump);
-	Ac3dClose(curFd);
+        curFd = Ac3dOpen(outFile, 1);
+        Ac3dGroup(curFd, "track", ActiveGroups);
+        SaveMainTrack(curFd, bump, raceline);
+        Ac3dClose(curFd);
     }
     
     if (AllFd) {
-	Ac3dGroup(AllFd, "track", ActiveGroups);
-	SaveMainTrack(AllFd, bump);
+        Ac3dGroup(AllFd, "track", ActiveGroups);
+        SaveMainTrack(AllFd, bump, raceline);
     }
-    
 }

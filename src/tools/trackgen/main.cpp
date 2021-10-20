@@ -72,6 +72,7 @@ float	ExtHeight = 5.0;
 int	HeightSteps = 30;
 
 int	Bump = 0;
+int Raceline = 0;
 int	UseBorder = 1;
 
 char		*OutputFileName;
@@ -133,6 +134,7 @@ void Application::initialize(bool bLoggingEnabled, int argc, char **argv)
 	registerOption("c", "category", /* nHasValue = */ true);
 	registerOption("n", "name", /* nHasValue = */ true);
 	registerOption("b", "bump", /* nHasValue = */ false);
+	registerOption("r", "raceline", /* nHasValue = */ false);
 	registerOption("B", "noborder", /* nHasValue = */ false);
 	registerOption("a", "all", /* nHasValue = */ false);
 	registerOption("z", "calc", /* nHasValue = */ false);
@@ -142,13 +144,14 @@ void Application::initialize(bool bLoggingEnabled, int argc, char **argv)
 	registerOption("H", "height4", /* nHasValue = */ true);
 
 	// Help on specific options.
-	addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|bump] [-B|--noborder]");
+	addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|bump] [-r|--raceline] [-B|--noborder]");
 	addOptionsHelpSyntaxLine("[-a|--all] [-z|--calc] [-s|split] [-S|splitall]");
 	addOptionsHelpSyntaxLine("[-E|--saveelev <#ef> [-H|height4 <#hs>]]");
 	
     addOptionsHelpExplainLine("<cat>    : track category (road, speedway, dirt...)");
     addOptionsHelpExplainLine("<name>   : track name");
     addOptionsHelpExplainLine("bump     : draw bump track");
+	addOptionsHelpExplainLine("raceline : draw raceline track\n");
     addOptionsHelpExplainLine("noborder : don't use terrain border "
 							  "(relief supplied int clockwise, ext CC)");
     addOptionsHelpExplainLine("all      : draw all (default is track only)");
@@ -198,6 +201,10 @@ bool Application::parseOptions()
 		else if (itOpt->strLongName == "bump")
 		{
 			Bump = 1;
+		}
+		else if (itOpt->strLongName == "raceline")
+		{
+			Raceline = 1;
 		}
 		else if (itOpt->strLongName == "split")
 		{
@@ -282,7 +289,8 @@ void Application::generate()
 		if (TrackOnly) {
 			sprintf(buf2, "%s.ac", OutputFileName);
 			// Track.
-			outfd = Ac3dOpen(buf2, 1);
+			if (!Bump && !Raceline)
+				outfd = Ac3dOpen(buf2, 1);
 		} else if (MergeAll) {
 			sprintf(buf2, "%s.ac", OutputFileName);
 			// track + terrain + objects.
@@ -292,6 +300,8 @@ void Application::generate()
 		// Main Track.
 		if (Bump) {
 			extName = "trk-bump";
+		} else if (Raceline) {
+			extName = "trk-raceline";
 		} else {
 			extName = "trk";
 		}
@@ -301,11 +311,11 @@ void Application::generate()
 	}
 
 	if (JustCalculate){
-		CalculateTrack(Track, TrackHandle, Bump);
+		CalculateTrack(Track, TrackHandle, Bump, Raceline);
 		return;
 	}
 
-	GenerateTrack(Track, TrackHandle, OutTrackName, outfd, Bump);
+	GenerateTrack(Track, TrackHandle, OutTrackName, outfd, Bump, Raceline);
 
 	if (TrackOnly) {
 		return;

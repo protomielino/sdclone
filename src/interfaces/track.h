@@ -147,6 +147,7 @@
 #define TRK_ATT_REBOUND             "rebound"
 #define TRK_ATT_TEXTURE             "texture name"
 #define TRK_ATT_BUMPNAME            "bump name"
+#define TRK_ATT_RACELINENAME        "raceline name"
 #define TRK_ATT_TEXTYPE             "texture type"
 #define TRK_ATT_TEXLINK             "texture link with previous"
 #define TRK_ATT_TEXSIZE             "texture size"
@@ -170,6 +171,9 @@
 #define TRK_SECT_MAIN               "Main Track"
 #define TRK_LST_SEGMENTS            "Track Segments"
 #define TRK_ATT_TYPE                "type"
+#define TRK_ATT_RLEXT               "raceline ext"
+#define TRK_ATT_RLINT               "raceline int"
+#define TRK_ATT_RLWIDTHSCALE        "raceline widthscale"
 
 #define TRK_VAL_STR                 "str"
 #define TRK_VAL_LFT                 "lft"
