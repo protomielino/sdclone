@@ -194,7 +194,7 @@ std::vector<GfModule*> GfModule::loadFromDir(const std::string& strDirPath,
 				continue;
 
 			// Try and load.
-			GfModule* pModule = GfModule::load(ossShLibPath.str().c_str());
+			GfModule* pModule = GfModule::load(ossShLibPath.str());
 			if (pModule)
 				vecModules.push_back(pModule);
 			else
