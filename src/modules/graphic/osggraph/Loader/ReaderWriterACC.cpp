@@ -305,7 +305,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
             }
             else
             {
-                    if (textureId == 0 && m_skinName == "" || texname != m_CarName)
+                    if (textureId == 0 && (m_skinName == "" || texname != m_CarName))
                         texname0 = texname;
                     else if (textureId == 0)
                         texname0 = m_skinName+".png";
