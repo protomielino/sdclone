@@ -160,6 +160,9 @@ struct tcoord_t
 
 struct ob_t
 {
+    ob_t();
+    ~ob_t();
+
     char * name;
     char * type;
     int kids;
@@ -217,15 +220,6 @@ struct ob_t
     int kids_o;
     bool inkids_o;
 };
-
-/** Creates an instance of the ob_t struct and zeroes it.
- */
-ob_t * obCreate();
-
-/** Free the given object. This will only free the resources of the
- * object itself. It will not touch the object->next.
- */
-void obFree(ob_t *o);
 
 /** Appends srcob to the end of the list given by destob.
  *

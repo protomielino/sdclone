@@ -113,6 +113,10 @@ PORTABILITY_API char *strtok_r(char *str, const char *delim, char **nextp);
 #include <cstdarg>
 #include <cstdio>
 
+#if _MSC_VER < 1700
+#define nullptr NULL
+#endif
+
 // Ticket #663 - MSVC implementation of snprintf prior to VS 2015 is not safe
 // We provide our own version of the function,
 // that ensures 0 ending for the string.

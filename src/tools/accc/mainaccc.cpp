@@ -348,10 +348,12 @@ int main(int argc, char **argv)
 #endif
     else
     {
-        ob_t * objects;
+        ob_t * objects = nullptr;
         std::vector<mat_t> materials;
 
         loadAC(InputFileName, &objects, materials, OutputFileName);
+
+        delete objects;
     }
 
     return 0;

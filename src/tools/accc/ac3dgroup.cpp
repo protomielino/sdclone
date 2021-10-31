@@ -53,12 +53,12 @@ bool materialNeedsMerge(const std::vector<mat_t> &mat1, const std::vector<mat_t>
 
 void loadAndGroup(const char *OutputFileName)
 {
-    ob_t * ob0 = NULL;
-    ob_t * ob1 = NULL;
-    ob_t * ob2 = NULL;
-    ob_t * ob3 = NULL;
-    ob_t * tmpob = NULL;
-    ob_t * tmpob2 = NULL;
+    ob_t * ob0 = nullptr;
+    ob_t * ob1 = nullptr;
+    ob_t * ob2 = nullptr;
+    ob_t * ob3 = nullptr;
+    ob_t * tmpob = nullptr;
+    ob_t * tmpob2 = nullptr;
     std::vector<mat_t> mat0;
     std::vector<mat_t> mat1;
     std::vector<mat_t> mat2;
@@ -81,6 +81,7 @@ void loadAndGroup(const char *OutputFileName)
         if (loadAC(fileL0, &ob0, mat0) == -1)
         {
             fprintf(stderr, "\ncouldn't load file %s\n", fileL0);
+            delete ob0;
             return;
         }
     }
@@ -90,6 +91,8 @@ void loadAndGroup(const char *OutputFileName)
         if (loadAC(fileL1, &ob1, mat1) == -1)
         {
             fprintf(stderr, "\ncouldn't load file %s\n", fileL1);
+            delete ob0;
+            delete ob1;
             return;
         }
     }
@@ -99,6 +102,9 @@ void loadAndGroup(const char *OutputFileName)
         if (loadAC(fileL2, &ob2, mat2) == -1)
         {
             fprintf(stderr, "\ncouldn't load file %s\n", fileL2);
+            delete ob0;
+            delete ob1;
+            delete ob2;
             return;
         }
     }
@@ -108,6 +114,10 @@ void loadAndGroup(const char *OutputFileName)
         if (loadAC(fileL3, &ob3, mat3) == -1)
         {
             fprintf(stderr, "\ncouldn't load file %s\n", fileL3);
+            delete ob0;
+            delete ob1;
+            delete ob2;
+            delete ob3;
             return;
         }
     }
@@ -124,16 +134,28 @@ void loadAndGroup(const char *OutputFileName)
     if (!mat1.empty() && materialNeedsMerge(mat0, mat1))
     {
         fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL1);
+        delete ob0;
+        delete ob1;
+        delete ob2;
+        delete ob3;
         exit(-1);
     }
     if (!mat2.empty() && materialNeedsMerge(mat0, mat2))
     {
         fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL2);
+        delete ob0;
+        delete ob1;
+        delete ob2;
+        delete ob3;
         exit(-1);
     }
     if (!mat3.empty() && materialNeedsMerge(mat0, mat3))
     {
         fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL3);
+        delete ob0;
+        delete ob1;
+        delete ob2;
+        delete ob3;
         exit(-1);
     }
 
@@ -176,6 +198,10 @@ void loadAndGroup(const char *OutputFileName)
     {
         fprintf(stderr,
                 "\nERROR: cannot find any object tkmn for grouping\nAborting\n");
+        delete ob0;
+        delete ob1;
+        delete ob2;
+        delete ob3;
         exit(-1);
     }
 
@@ -518,6 +544,11 @@ void loadAndGroup(const char *OutputFileName)
         }
         printOb(ofile, array_groups[i].tkmn);
     }
+
+    delete ob0;
+    delete ob1;
+    delete ob2;
+    delete ob3;
 
     return;
 }

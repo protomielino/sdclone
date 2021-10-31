@@ -51,32 +51,72 @@
 #define REFS     "refs"
 #define CREASE   "crease"
 
-ob_t * obCreate()
+ob_t::ob_t() :
+name(nullptr),
+type(nullptr),
+kids(0),
+loc(0.0, 0.0, 0.0),
+attrSurf(0),
+attrMat(0),
+texture(nullptr),
+texture1(nullptr),
+texture2(nullptr),
+texture3(nullptr),
+data(nullptr),
+texrep_x(0.0),
+texrep_y(0.0),
+numvert(0),
+numsurf(0),
+numvertice(0),
+vertex(nullptr),
+norm(nullptr),
+snorm(nullptr),
+vertexarray(nullptr),
+vertexarray1(nullptr),
+vertexarray2(nullptr),
+vertexarray3(nullptr),
+va(nullptr),
+textarray(nullptr),
+textarray1(nullptr),
+textarray2(nullptr),
+textarray3(nullptr),
+surfrefs(nullptr),
+next(nullptr),
+x_min(0.0),
+y_min(0.0),
+z_min(0.0),
+x_max(0.0),
+y_max(0.0),
+z_max(0.0),
+dist_min(0.0),
+saved(false),
+kids_o(0),
+inkids_o(false)
 {
-    ob_t * ob = (ob_t *) malloc(sizeof(ob_t));
-    memset(ob, 0, sizeof(ob_t));
-
-    return ob;
 }
 
-void obFree(ob_t *o)
+ob_t::~ob_t()
 {
-    free(o->name);
-    free(o->type);
-    free(o->texture);
-    free(o->vertex);
-    free(o->norm);
-    free(o->snorm);
-    free(o->vertexarray);
-    free(o->vertexarray1);
-    free(o->vertexarray2);
-    free(o->vertexarray3);
-    free(o->textarray);
-    free(o->textarray1);
-    free(o->textarray2);
-    free(o->textarray3);
-    free(o->data);
-    free(o->surfrefs);
+    free(name);
+    free(type);
+    free(texture);
+    free(texture1);
+    free(texture2);
+    free(texture3);
+    free(data);
+    free(vertex);
+    free(norm);
+    free(snorm);
+    free(vertexarray);
+    free(vertexarray1);
+    free(vertexarray2);
+    free(vertexarray3);
+    free(va);
+    free(textarray);
+    free(textarray1);
+    free(textarray2);
+    free(textarray3);
+    free(surfrefs);
 }
 
 ob_t * obAppend(ob_t * destob, ob_t * srcob)
@@ -338,7 +378,7 @@ ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpo
     int size_pts = sizeof(point_t) * numvert;
 
     /* allocate space */
-    ob_t * retob = obCreate();
+    ob_t * retob = new ob_t;
 
     retob->vertex = (point_t*) malloc(size_pts);
     memset(retob->vertex, 0, size_pts);
@@ -600,39 +640,36 @@ int doObject(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p;
     char name[256];
-    ob_t * objectt, *t1;
-
-    objectt = obCreate();
-    objectt->x_min = 1000000;
-    objectt->y_min = 1000000;
-    objectt->z_min = 1000000;
-
-    numob++;
-    numrefs = 0;
-    numvertFound = false;
-    dataFound = false;
 
     p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown OBJECT format %s\n", Line);
-        free(objectt);
         return (-1);
     }
     if (sscanf(p, "%255s", name) != 1)
     {
         fprintf(stderr, "invalid OBJECT format %s\n", p);
-        free(objectt);
         return (-1);
     }
 
-    objectt->type = strdup(name);
+    ob_t *objectt = new ob_t;
 
-    t1 = object->next;
+    objectt->x_min = 1000000;
+    objectt->y_min = 1000000;
+    objectt->z_min = 1000000;
+    objectt->type = strdup(name);
+    objectt->texrep_x = 1.0;
+    objectt->texrep_y = 1.0;
+
+    ob_t *t1 = object->next;
     object->next = objectt;
     objectt->next = t1;
-    object->next->texrep_x = 1.0;
-    object->next->texrep_y = 1.0;
+
+    numob++;
+    numrefs = 0;
+    numvertFound = false;
+    dataFound = false;
 
     return (0);
 }
@@ -711,7 +748,7 @@ ob_t* terrainSplitOb(ob_t * object)
 
         /* initial creation of tob */
 
-        tob = obCreate();
+        tob = new ob_t;
 
         tob->numsurf = numNewSurf;
         tob->attrSurf = object->attrSurf;
@@ -958,7 +995,6 @@ ob_t* splitOb(ob_t *object)
 
     free(tri);
     free(oldva);
-    obFree(&workob);
 
     return tob0;
 }
@@ -1468,7 +1504,7 @@ ob_t * splitObjects(ob_t* object)
 
         if(splitob != NULL)
         {
-            obFree(current_ob);
+            delete current_ob;
             newob = obAppend(newob, splitob);
         }
         else
@@ -1514,7 +1550,7 @@ int loadAC(const char * inputFilename, ob_t ** objects, std::vector<mat_t> & mat
         return (-1);
     }
 
-    current_ob = obCreate();
+    current_ob = new ob_t;
     current_ob->name = strdup("root");
     *objects = current_ob;
 
@@ -1572,7 +1608,7 @@ int loadAC(const char * inputFilename, ob_t ** objects, std::vector<mat_t> & mat
     fclose(file);
     if(ret != 0)
     {
-        obFree(current_ob);
+        delete current_ob;
         return ret;
     }
 
@@ -4763,7 +4799,7 @@ int mergeSplitted(ob_t **object)
                 tobP->next = tob0->next;
                 oo = tob0;
                 tob0 = tob0->next;
-                obFree(oo);
+                delete oo;
                 k++;
                 continue;
             }
@@ -4782,7 +4818,7 @@ int mergeSplitted(ob_t **object)
 
         /* allocate the new object */
 #ifdef NEWSRC
-        tobS = obCreate();
+        tobS = new ob_t;
         tobS->x_min=1000000;
         tobS->y_min=1000000;
         tobS->z_min=1000000;
