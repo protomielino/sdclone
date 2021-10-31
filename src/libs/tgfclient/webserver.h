@@ -92,6 +92,7 @@ class TGFCLIENT_API WebServer {
 		const char* username;
 		const char* password;
 		const char* url;
+		bool isWebServerEnabled;
 
 		//dynamic data retrieved with some request to the webserver
 		int raceId;
@@ -99,7 +100,7 @@ class TGFCLIENT_API WebServer {
 		const char* sessionId;
 		
 		//configuration readers
-		void readConfiguration();	
+		void readConfiguration();
 		int readUserConfig(int userId);
 		
 		//sync request
@@ -110,7 +111,7 @@ class TGFCLIENT_API WebServer {
 		int addAsyncRequest(const std::string &data);
 		int addOrderedAsyncRequest(const std::string &data);
 		int pendingAsyncRequestId;
-		std::vector<webRequest_t> orderedAsyncRequestQueque;	
+		std::vector<webRequest_t> orderedAsyncRequestQueque;
 
 		//specific requests
 		int sendLogin (int userId);
@@ -118,17 +119,17 @@ class TGFCLIENT_API WebServer {
 		int sendRaceStart (int user_skill, const char *track_id, char *car_id, int type, void *setup, int startposition, const char *sdversion);
 		int sendRaceEnd (int race_id, int endposition);
 		int sendLap (int race_id, double laptime, double fuel, int position, int wettness);
-		
+
 		//curl
 		CURLM* multi_handle;
 		int handle_count;
 		std::string curlServerReply;
-	
+
 		//constructor
 		WebServer();
-	
+
 		//destructor
-		~WebServer();	
+		~WebServer();
 };
 
 #endif //_SD_WEBSERVER_H_

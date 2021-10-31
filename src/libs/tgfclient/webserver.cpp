@@ -389,6 +389,7 @@ WebServer::WebServer()
     this->previousLaps = -1;
     this->raceEndSent = false;
     this->pendingAsyncRequestId = 0;
+    this->isWebServerEnabled = false;
 
     //initialize some curl var
     this->multi_handle = curl_multi_init();
@@ -540,9 +541,13 @@ int WebServer::updateAsyncStatus()
                     }
                     else
                     {
-                        GfLogInfo("WebServer: Login Failed: Wrong username or password.\n");
-                        notifications.msglist.push_back("WebServer: Login Failed: Wrong username or password.");
-
+                        GfLogInfo("WebServer: Login Failed: Wrong username or password. Disabling WebServer features.\n");
+                        //notifications.msglist.push_back("WebServer: Login Failed: Wrong username or password.");
+                        //since we cant login: disable the webserver
+                        this->isWebServerEnabled = false;
+                        
+                        //since we cant login: remove all the already registered and pending requests
+                        this->orderedAsyncRequestQueque.clear();
                         return 1;
                     }
 
@@ -751,36 +756,23 @@ int WebServer::sendLogin (int userId)
 
     //read username and password and save it in as webserver properties
     this->readUserConfig(userId);
-    this->sendLogin(this->username, this->password);
-/*
+    
     std::string username="username";
     std::string password="password";
-
+    std::string emptyString="";
+    
     //if the user has not setup the webserver login info abort the login
-    if(username==this->username && password==this->password){
+    if((username==this->username && password==this->password) || this->username==emptyString || this->password==emptyString){
         GfLogInfo("WebServer: Send of login info aborted (the user is not correctly setup in this client).\n");
+        GfLogInfo("WebServer: Disabling the webserver!.\n");
+        this->isWebServerEnabled = false;
+        
         return 1;
     }
+    
+    this->isWebServerEnabled = true;
+    this->sendLogin(this->username, this->password);
 
-    //prepare the string to send
-    std::string dataToSend ("");
-    dataToSend.append(	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                        "<content>"
-                        "<request_id>{{request_id}}</request_id>"
-                        "<request>"
-                        "<login>"
-                        "<username>{{username}}</username>"
-                        "<password>{{password}}</password>"
-                        "</login>"
-                        "</request>"
-                        "</content>");
-
-    //replace the {{tags}} with the respecting values
-    replaceAll(dataToSend, "{{username}}", this->username);
-    replaceAll(dataToSend, "{{password}}", this->password);
-
-    this->addOrderedAsyncRequest(dataToSend);
-*/
     return 0;
 }
 
@@ -812,6 +804,10 @@ int WebServer::sendLogin (const char* username, const char* password)
 
 int WebServer::sendLap (int race_id, double laptime, double fuel, int position, int wettness)
 {
+	//if the webserver is disabled exit immediately
+	if(!this->isWebServerEnabled){
+		return 1;
+	}
 /*
     //Do some sanity-checks befor proceding... If something is wrong do nothing
     //are we logged in?
@@ -856,6 +852,11 @@ int WebServer::sendLap (int race_id, double laptime, double fuel, int position, 
 
 int WebServer::sendRaceStart (int user_skill, const char *track_id, char *car_id, int type, void *setup, int startposition, const char *sdversion)
 {
+	//if the webserver is disabled exit immediately
+	if(!this->isWebServerEnabled){
+		return 1;
+	}
+	
     std::string serverReply;
     std::string mysetup;
     std::string dataToSend;
@@ -910,6 +911,11 @@ int WebServer::sendRaceStart (int user_skill, const char *track_id, char *car_id
 
 int WebServer::sendRaceEnd (int race_id, int endposition)
 {
+	//if the webserver is disabled exit immediately
+	if(!this->isWebServerEnabled){
+		return 1;
+	}
+	
     std::string serverReply;
 
     //Do some sanity-checks befor proceding... If something is wrong do nothing
