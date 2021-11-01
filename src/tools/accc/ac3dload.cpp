@@ -875,7 +875,6 @@ ob_t* splitOb(ob_t *object)
     tri = (int *) calloc(orignumtris, sizeof(int));
     oldva = (int *) calloc(orignumverts, sizeof(int));
 
-    memset(&workob, 0, sizeof(workob));
     workob.vertex = (point_t *) calloc(orignumverts, sizeof(point_t));
     workob.snorm = (point_t *) calloc(orignumverts, sizeof(point_t));
 
@@ -4207,7 +4206,6 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     printf("merging %s with %s  tri=%d\n", ob1->name, ob2->name, numtri);
     memset(oldva1, -1, sizeof(oldva1));
     memset(oldva2, -1, sizeof(oldva2));
-    memset(&tobS, 0, sizeof(ob_t));
     tobS.numsurf = ob1->numsurf;
     tobS.vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numtri * 3);
     tobS.norm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
