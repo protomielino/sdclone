@@ -1849,17 +1849,7 @@ void saveObin3DS( const std::string & OutputFilename, ob_t * object, mat_t * mat
     while (tmpob!=NULL)
     {
         int texnofound=0;
-        if (tmpob->name==NULL)
-        {
-            tmpob=tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob=tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob=tmpob->next;
             continue;
@@ -2179,17 +2169,7 @@ int foundNear(FILE * ofile, ob_t * object, ob_t *allobjects, double dist, bool p
 
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -2289,17 +2269,7 @@ void computeTriNorm(ob_t * object)
 
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -2332,11 +2302,7 @@ void computeObjectTriNorm(ob_t * object)
     point_t norm;
     ob_t *tmpob = object;
 
-    if (tmpob->name == NULL)
-        return;
-    if (!strcmp(tmpob->name, "root"))
-        return;
-    if (!strcmp(tmpob->name, "world"))
+    if (tmpob->canSkip())
         return;
     for (int i = 0; i < tmpob->numsurf; i++)
     {
@@ -2391,17 +2357,7 @@ void smoothTriNorm(ob_t * object)
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -2419,17 +2375,7 @@ void smoothTriNorm(ob_t * object)
 
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -2442,17 +2388,7 @@ void smoothTriNorm(ob_t * object)
         tmpob1 = object;
         while (tmpob1 != NULL)
         {
-            if (tmpob1->name == NULL)
-            {
-                tmpob1 = tmpob1->next;
-                continue;
-            }
-            if (!strcmp(tmpob1->name, "root"))
-            {
-                tmpob1 = tmpob1->next;
-                continue;
-            }
-            if (!strcmp(tmpob1->name, "world"))
+            if (tmpob1->canSkip())
             {
                 tmpob1 = tmpob1->next;
                 continue;
@@ -2490,17 +2426,7 @@ void smoothTriNorm(ob_t * object)
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -2527,17 +2453,7 @@ void smoothTriNorm(ob_t * object)
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -2550,17 +2466,7 @@ void smoothTriNorm(ob_t * object)
         tmpob1 = object;
         while (tmpob1 != NULL)
         {
-            if (tmpob1->name == NULL)
-            {
-                tmpob1 = tmpob1->next;
-                continue;
-            }
-            if (!strcmp(tmpob1->name, "root"))
-            {
-                tmpob1 = tmpob1->next;
-                continue;
-            }
-            if (!strcmp(tmpob1->name, "world"))
+            if (tmpob1->canSkip())
             {
                 tmpob1 = tmpob1->next;
                 continue;
@@ -2582,11 +2488,7 @@ void smoothFaceTriNorm(ob_t * object)
 {
     ob_t * tmpob = object;
 
-    if (tmpob->name == NULL)
-        return;
-    if (!strcmp(tmpob->name, "root"))
-        return;
-    if (!strcmp(tmpob->name, "world"))
+    if (tmpob->canSkip())
         return;
 
     for (int i = 0; i < tmpob->numvert; i++)
@@ -2743,17 +2645,7 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
     while (tmpob != NULL)
     {
         int texnofound = 0;
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -2799,17 +2691,7 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
     while (tmpob != NULL)
     {
         tmpob->kids_o = 0;
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -2854,17 +2736,7 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
         tmpob = object;
         while (tmpob != NULL)
         {
-            if (tmpob->name == NULL)
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
-            if (!strcmp(tmpob->name, "root"))
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
-            if (!strcmp(tmpob->name, "world"))
+            if (tmpob->canSkip())
             {
                 tmpob = tmpob->next;
                 continue;
@@ -2999,17 +2871,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
         tmpob = object;
         while (tmpob != NULL)
         {
-            if (tmpob->name == NULL)
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
-            if (!strcmp(tmpob->name, "root"))
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
-            if (!strcmp(tmpob->name, "world"))
+            if (tmpob->canSkip())
             {
                 tmpob = tmpob->next;
                 continue;
@@ -3039,17 +2901,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
     while (tmpob != NULL)
     {
         int texnofound = 0;
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3137,17 +2989,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3163,17 +3005,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3188,17 +3020,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3216,17 +3038,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3620,17 +3432,7 @@ void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const s
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3688,17 +3490,7 @@ void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const s
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3714,17 +3506,7 @@ void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const s
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3739,17 +3521,7 @@ void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const s
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3767,17 +3539,7 @@ void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const s
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3817,17 +3579,7 @@ void mapNormalToSphere(ob_t *object)
 
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3864,17 +3616,7 @@ void mapNormalToSphere(ob_t *object)
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3906,17 +3648,7 @@ void mapTextureEnv(ob_t *object)
  
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -3935,17 +3667,7 @@ void mapTextureEnv(ob_t *object)
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -4014,17 +3736,7 @@ void mapTextureEnvOld(ob_t *object)
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -4051,17 +3763,7 @@ void mapTextureEnvOld(ob_t *object)
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -4117,17 +3819,7 @@ void mapTextureEnvOld(ob_t *object)
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -4151,17 +3843,7 @@ void mapNormalToSphere2(ob_t *object)
 
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -4191,17 +3873,7 @@ void normalMap(ob_t * object)
 
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -4230,17 +3902,7 @@ void normalMap(ob_t * object)
 
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -4268,17 +3930,7 @@ void normalMap01(ob_t * object)
 
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -4307,17 +3959,7 @@ void normalMap01(ob_t * object)
 
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -4455,17 +4097,7 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
         while (tmpob != NULL)
         {
             int texnofound = 0;
-            if (tmpob->name == NULL)
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
-            if (!strcmp(tmpob->name, "root"))
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
-            if (!strcmp(tmpob->name, "world"))
+            if (tmpob->canSkip())
             {
                 tmpob = tmpob->next;
                 continue;
@@ -4518,17 +4150,7 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
         tmpob = object;
         while (tmpob != NULL)
         {
-            if (tmpob->name == NULL)
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
-            if (!strcmp(tmpob->name, "root"))
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
-            if (!strcmp(tmpob->name, "world"))
+            if (tmpob->canSkip())
             {
                 tmpob = tmpob->next;
                 continue;
@@ -4770,13 +4392,7 @@ int mergeSplitted(ob_t **object)
 #endif
         while (tob0)
         {
-            if (tob0->name == NULL)
-            {
-                tobP = tob0;
-                tob0 = tob0->next;
-                continue;
-            }
-            if (!strcmp(tob0->name, "world") || !strcmp(tob0->name, "root"))
+            if (tob0->canSkip())
             {
                 tobP = tob0;
                 tob0 = tob0->next;

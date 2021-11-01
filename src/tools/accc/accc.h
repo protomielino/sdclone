@@ -219,6 +219,11 @@ struct ob_t
     bool saved;
     int kids_o;
     bool inkids_o;
+
+    bool canSkip() const
+    {
+        return name == NULL || !strcmp(name, "root") || !strcmp(name, "world");
+    }
 };
 
 /** Appends srcob to the end of the list given by destob.

@@ -168,17 +168,7 @@ void loadAndGroup(const std::string &OutputFileName)
     num_tkmn = 0;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -210,17 +200,7 @@ void loadAndGroup(const std::string &OutputFileName)
     array_groups = (ob_groups_t *) malloc(sizeof(ob_groups_t) * num_tkmn);
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -251,17 +231,7 @@ void loadAndGroup(const std::string &OutputFileName)
     tmpob = ob0;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
+        if (tmpob->canSkip())
         {
             tmpob = tmpob->next;
             continue;
@@ -590,11 +560,7 @@ void reorder(ob_t * ob, ob_t * ob2, uv_t *textarray, tcoord_t *vertexarray)
  */
 bool isNamedAndPolygon(ob_t * ob)
 {
-    if (ob->name == NULL)
-        return false;
-    if (!strcmp(ob->name, "root"))
-        return false;
-    if (!strcmp(ob->name, "world"))
+    if (ob->canSkip())
         return false;
     if (ob->type != NULL && !strcmp(ob->type, "group"))
         return false;
