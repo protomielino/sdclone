@@ -605,7 +605,7 @@ void computeObSurfCentroid(const ob_t * object, int obsurf, point_t * out)
 int doMaterial(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p;
-    char name[256];
+    char name[256] = { 0 };
     mat_t materialt;
 
     nummaterial++;
@@ -639,7 +639,7 @@ int doMaterial(char *Line, ob_t *object, std::vector<mat_t> &materials)
 int doObject(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
     char * p;
-    char name[256];
+    char name[256] = { 0 };
 
     p = strstr(Line, " ");
     if (p == NULL)
@@ -1181,7 +1181,7 @@ int doCrease(char *Line, ob_t *object, std::vector<mat_t> &materials)
 
 int doTexture(char *Line, ob_t *object, std::vector<mat_t> &materials)
 {
-    char name[256];
+    char name[256] = { 0 };
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
@@ -1194,18 +1194,18 @@ int doTexture(char *Line, ob_t *object, std::vector<mat_t> &materials)
         return (-1);
     }
 
-    p = NULL;
     p = strstr(name, "\"");
     if (p != NULL)
     {
         p++;
+        char *q = strstr(p, "\"");
+        if (q != NULL)
+            *q = '\0';
+
         object->next->texture = strdup(p);
     }
     else
         object->next->texture = strdup(name);
-    p = strstr(object->next->texture, "\"");
-    if (p != NULL)
-        *p = '\0';
     dataFound = false;
     return (0);
 }
@@ -4058,7 +4058,7 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
             continue;
         }
         /* don't count empty objects */
-        if (strcmp(tmpob->type, "poly") == 0 && tmpob->numvert == 0 && tmpob->numsurf == 0 && tmpob->kids == 0)
+        if (tmpob->type && strcmp(tmpob->type, "poly") == 0 && tmpob->numvert == 0 && tmpob->numsurf == 0 && tmpob->kids == 0)
         {
             tmpob = tmpob->next;
             continue;
