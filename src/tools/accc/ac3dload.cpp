@@ -300,12 +300,12 @@ int doRefs(char *Line, ob_t *object, std::vector<mat_t> &materials);
 int doCrease(char *Line, ob_t *object, std::vector<mat_t> &materials);
 
 #ifdef _3DS
-void saveObin3DS(const char * OutputFilename, ob_t * object, std::vector<mat_t> &materials);
+void saveObin3DS(const std::string & OutputFilename, ob_t * object, std::vector<mat_t> &materials);
 #endif
-void computeSaveAC3D(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
-void computeSaveOBJ(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
-void computeSaveAC3DM(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
-void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
+void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
+void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
+void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
+void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
 void stripifyOb(FILE * ofile, ob_t * object, int writeit);
 
 verbaction_t verbTab[] =
@@ -1523,7 +1523,7 @@ ob_t * splitObjects(ob_t* object)
     return newob;
 }
 
-int loadAC(const char * inputFilename, ob_t ** objects, std::vector<mat_t> & materials, const char * outputFilename)
+int loadAC(const std::string & inputFilename, ob_t** objects, std::vector<mat_t>& materials, const std::string & outputFilename)
 {
     /* saveIn : 0= 3ds , 1= obj , 2=ac3d grouped (track) , 3 = ac3d strips (cars) */
     char Line[256];
@@ -1532,9 +1532,9 @@ int loadAC(const char * inputFilename, ob_t ** objects, std::vector<mat_t> & mat
     FILE * file;
     ob_t * current_ob;
 
-    if ((file = fopen(inputFilename, "r")) == NULL)
+    if ((file = fopen(inputFilename.c_str(), "r")) == NULL)
     {
-        fprintf(stderr, "failed to open %s\n", inputFilename);
+        fprintf(stderr, "failed to open %s\n", inputFilename.c_str());
         return (-1);
     }
     if (fgets(Line, 256, file) == NULL)
@@ -1620,7 +1620,7 @@ int loadAC(const char * inputFilename, ob_t ** objects, std::vector<mat_t> & mat
 
     // --- perform file output ---
 
-    if(!outputFilename)
+    if(outputFilename.empty())
         return 0;
 
     if (typeConvertion == _AC3DTOOBJ)
@@ -1774,7 +1774,7 @@ void saveIn3DSsubObject(ob_t * object,database3ds *db)
 
 }
 
-void saveObin3DS( char * OutputFilename, ob_t * object, mat_t * material)
+void saveObin3DS( const std::string & OutputFilename, ob_t * object, mat_t * material)
 {
     database3ds *db = NULL;
     file3ds *file;
@@ -1790,7 +1790,7 @@ void saveObin3DS( char * OutputFilename, ob_t * object, mat_t * material)
 
     /* Clear error list, not necessary but safe */
     ClearErrList3ds();
-    file = OpenFile3ds(OutputFilename, "w");
+    file = OpenFile3ds(OutputFilename.c_str(), "w");
     PRINT_ERRORS_EXIT(stderr);
     InitDatabase3ds(&db);
     PRINT_ERRORS_EXIT(stderr);
@@ -2638,7 +2638,7 @@ void smoothObjectTriNorm(ob_t * object)
     return;
 }
 
-void computeSaveAC3D(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
+void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
 {
     char name2[256];
     char *p, *q;
@@ -2654,9 +2654,9 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object, const std::vect
         normalMap(object);
     }
 
-    if ((ofile = fopen(OutputFilename, "w")) == NULL)
+    if ((ofile = fopen(OutputFilename.c_str(), "w")) == NULL)
     {
-        fprintf(stderr, "failed to open %s\n", OutputFilename);
+        fprintf(stderr, "failed to open %s\n", OutputFilename.c_str());
         return;
     }
     if (extendedTriangles)
@@ -2968,7 +2968,7 @@ void computeSaveAC3D(const char * OutputFilename, ob_t * object, const std::vect
     fclose(ofile);
 }
 
-void computeSaveOBJ(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
+void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
 {
     char name2[256];
     ob_t * tmpob = NULL;
@@ -2978,14 +2978,14 @@ void computeSaveOBJ(const char * OutputFilename, ob_t * object, const std::vecto
     FILE * ofile;
     FILE * tfile;
 
-    if ((ofile = fopen(OutputFilename, "w")) == NULL)
+    if ((ofile = fopen(OutputFilename.c_str(), "w")) == NULL)
     {
-        fprintf(stderr, "failed to open %s\n", OutputFilename);
+        fprintf(stderr, "failed to open %s\n", OutputFilename.c_str());
         return;
     }
 
-    fprintf(ofile, "mtllib ./%s.mtl\n", OutputFilename);
-    sprintf(tname, "%s.mtl", OutputFilename);
+    fprintf(ofile, "mtllib ./%s.mtl\n", OutputFilename.c_str());
+    sprintf(tname, "%s.mtl", OutputFilename.c_str());
 
     if ((tfile = fopen(tname, "w")) == NULL)
     {
@@ -3600,7 +3600,7 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
     free(StripLength);
 }
 
-void computeSaveAC3DM(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
+void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
 {
     char name2[256];
     ob_t * tmpob = NULL;
@@ -3608,9 +3608,9 @@ void computeSaveAC3DM(const char * OutputFilename, ob_t * object, const std::vec
     int ind = 0;
     FILE * ofile;
 
-    if ((ofile = fopen(OutputFilename, "w")) == NULL)
+    if ((ofile = fopen(OutputFilename.c_str(), "w")) == NULL)
     {
-        fprintf(stderr, "failed to open %s\n", OutputFilename);
+        fprintf(stderr, "failed to open %s\n", OutputFilename.c_str());
         return;
     }
 
@@ -4334,7 +4334,7 @@ void normalMap01(ob_t * object)
     }
 }
 
-void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
+void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
 {
     ob_t * tmpob = NULL;
     int numg = 0;
@@ -4345,9 +4345,9 @@ void computeSaveAC3DStrip(const char * OutputFilename, ob_t * object, const std:
     bool ordering = false;
     FILE * ofile = NULL;
 
-    if ((ofile = fopen(OutputFilename, "w")) == NULL)
+    if ((ofile = fopen(OutputFilename.c_str(), "w")) == NULL)
     {
-        fprintf(stderr, "failed to open %s\n", OutputFilename);
+        fprintf(stderr, "failed to open %s\n", OutputFilename.c_str());
         return;
     }
     smoothTriNorm(object);

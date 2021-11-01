@@ -51,7 +51,7 @@ bool materialNeedsMerge(const std::vector<mat_t> &mat1, const std::vector<mat_t>
     return false;
 }
 
-void loadAndGroup(const char *OutputFileName)
+void loadAndGroup(const std::string &OutputFileName)
 {
     ob_t * ob0 = nullptr;
     ob_t * ob1 = nullptr;
@@ -461,11 +461,11 @@ void loadAndGroup(const char *OutputFileName)
     }
     /*#endif*/
 
-    fprintf(stderr, "writing destination file %s\n", OutputFileName);
+    fprintf(stderr, "writing destination file %s\n", OutputFileName.c_str());
 
-    if ((ofile = fopen(OutputFileName, "w")) == NULL)
+    if ((ofile = fopen(OutputFileName.c_str(), "w")) == NULL)
     {
-        fprintf(stderr, "failed to open %s\n", OutputFileName);
+        fprintf(stderr, "failed to open %s\n", OutputFileName.c_str());
         return;
     }
     fprintf(ofile, "AC3Db\n");

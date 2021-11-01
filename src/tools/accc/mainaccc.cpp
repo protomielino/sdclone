@@ -35,8 +35,8 @@
 /* -g  g-track-2.ac -l0 g2.ac -d3 200900 -d2 200 -d1 100 -S 200 >t */
 /* +es 80 p-gt1.ac porsche-gt1.ac>t */
 double distSplit = 0;
-static char *InputFileName = NULL;
-static char *OutputFileName = NULL;
+static std::string InputFileName;
+static std::string OutputFileName;
 char * fileL0 = NULL;
 char * fileL1 = NULL;
 char * fileL2 = NULL;
@@ -132,8 +132,8 @@ void init_args(int argc, char **argv)
             fprintf(stderr, "invalid +es %s\n", argv[2]);
             exit(1);
         }
-        InputFileName = strdup(argv[3]);
-        OutputFileName = strdup(argv[4]);
+        InputFileName = argv[3];
+        OutputFileName = argv[4];
     }
     else if (!strcmp(argv[1], "+et"))
     {
@@ -178,7 +178,7 @@ void init_args(int argc, char **argv)
     {
         int i = 3;
         /* read other arguments */
-        OutputFileName = strdup(argv[2]);
+        OutputFileName = argv[2];
         for (i = 3; i < argc; i++)
         {
             if (!strcmp(argv[i], "-es"))
@@ -303,10 +303,10 @@ void init_args(int argc, char **argv)
     }
     else
     {
-        if (InputFileName == NULL)
-            InputFileName = strdup(argv[2]);
-        if (OutputFileName == NULL)
-            OutputFileName = strdup(argv[3]);
+        if (InputFileName.empty())
+            InputFileName = argv[2];
+        if (OutputFileName.empty())
+            OutputFileName = argv[3];
 
         if (argc == 7)
         {

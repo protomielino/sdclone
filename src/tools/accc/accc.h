@@ -308,7 +308,7 @@ struct mat_t
     }
 };
 
-void loadAndGroup(const char* OutputFileName);
+void loadAndGroup(const std::string &OutputFileName);
 
 /** Loads the file with inputFilename to the specified objects and materials
  *  variables and optionally outputs the loaded object to outputFilename
@@ -316,7 +316,7 @@ void loadAndGroup(const char* OutputFileName);
  *
  *  @returns 0 on success, a value != 0 on failure
  */
-int loadAC(const char* inputFilename, ob_t** objects, std::vector<mat_t> &materials, const char* outputFilename = NULL);
+int loadAC(const std::string &inputFilename, ob_t** objects, std::vector<mat_t>& materials, const std::string &outputFilename = "");
 
 /** Copies a single surface from the "vertexarray" attributes of srcob to the ones of destob.
  *  It decides whether to copy multitexture data based on srcob's "vertexarray" attributes.
