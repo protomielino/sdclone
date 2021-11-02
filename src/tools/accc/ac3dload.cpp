@@ -1606,16 +1606,10 @@ int loadAC(const std::string & inputFilename, ob_t** objects, std::vector<mat_t>
     }
     fclose(file);
     if(ret != 0)
-    {
-        delete current_ob;
         return ret;
-    }
 
     if (splitObjectsDuringLoad != 0)
-    {
-        ob_t * temp = splitObjects(current_ob);
-        current_ob = temp;
-    }
+        current_ob = splitObjects(current_ob);
 
     // --- perform file output ---
 
