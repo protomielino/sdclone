@@ -256,7 +256,7 @@ tcoord_t tmpva[100000];
 uv_t tmptexa[100000];
 int tmpsurf[100000];
 int refs = 0;
-char * const shadowtexture = strdup("shadow2.png");
+const char * const shadowtexture = "shadow2.png";
 
 int numob = 0;
 int nummaterial = 0;
@@ -3890,7 +3890,7 @@ void normalMap(ob_t * object)
             tmpob->textarray[i].u = (tmpob->vertex[i].x - x_min) / (x_max - x_min);
             tmpob->textarray[i].v = (tmpob->vertex[i].y - y_min) / (y_max - y_min);
         }
-        tmpob->texture = shadowtexture;
+        tmpob->texture = strdup(shadowtexture);
         tmpob = tmpob->next;
     }
 }
