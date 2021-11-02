@@ -705,7 +705,6 @@ ob_t* terrainSplitOb(ob_t * object)
     {
         for (double curYPos = object->y_min; curYPos < object->y_max; curYPos += distSplit)
         {
-
             int numTriFound = 0;
             bool found_a_tri = false;
 
@@ -1675,9 +1674,7 @@ void saveIn3DSsubObject(ob_t * object,database3ds *db)
             tmpIndice=0;
         }
         else
-        {
             sprintf(tmpname,"%s",object->name);
-        }
 
         printf("saving %s , numvert=%d , numsurf=%d\n",object->name,object->numvert,object->numsurf);
 
@@ -1704,7 +1701,6 @@ void saveIn3DSsubObject(ob_t * object,database3ds *db)
             mobj->facearray[j].flag=FaceABVisable3ds|FaceBCVisable3ds|FaceCAVisable3ds;
             mobj->facearray[j].v2=object->vertexarray[j*3+1].indice;
             mobj->facearray[j].v3=object->vertexarray[j*3+2].indice;
-
         }
 
         ON_ERROR_RETURN;
@@ -2070,7 +2066,6 @@ int printOb(FILE *ofile, ob_t * object)
                         object->vertexarray[i * 3 + 2].indice,
                         object->textarray[object->vertexarray[i * 3 + 2].indice].u,
                         object->textarray[object->vertexarray[i * 3 + 2].indice].v);
-
             }
             else
             {
@@ -2137,7 +2132,6 @@ int printOb(FILE *ofile, ob_t * object)
                     }
                 }
                 fprintf(ofile, "\n");
-
             }
         }
     }
@@ -2398,7 +2392,6 @@ void smoothTriNorm(ob_t * object)
                     if (checkMustSmoothVector(&tmpob->norm[i], &tmpob1->norm[j],
                             &tmpob->vertex[i], &tmpob1->vertex[j]))
                     {
-
                         point_t p = tmpob1->norm[j] + tmpob->norm[i];
                         normalize(&p);
 
@@ -2545,9 +2538,7 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
     FILE * ofile = NULL;
 
     if (normalMapping)
-    {
         normalMap(object);
-    }
 
     if ((ofile = fopen(OutputFilename.c_str(), "w")) == NULL)
     {
@@ -2558,9 +2549,11 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
     {
         smoothTriNorm(object);
         if (isobjectacar)
+        {
             mapNormalToSphere2(object);
-        if (isobjectacar && extendedEnvCoord)
-            mapTextureEnv(object);
+            if (extendedEnvCoord)
+                mapTextureEnv(object);
+        }
         if (collapseObject)
             mergeSplitted(&object);
     }
@@ -2615,12 +2608,11 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
         }
         else
         {
-            if (tmpob->type)
-                if (!strcmp(tmpob->type, "group"))
-                {
-                    tmpob = tmpob->next;
-                    continue;
-                }
+            if (tmpob->type && !strcmp(tmpob->type, "group"))
+            {
+                tmpob = tmpob->next;
+                continue;
+            }
             if (!strcmp(tmpob->name, "root"))
             {
                 tmpob = tmpob->next;
@@ -2650,13 +2642,11 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
             {
                 texnofound = 0;
                 break;
-
             }
             if (!strncmp(tex[i], tmpob->texture, 13))
             {
                 texnofound = 0;
                 break;
-
             }
             else
                 texnofound = 1;
@@ -2779,7 +2769,6 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
                                 tmpob->kids_o);
                     }
                 }
-
             }
 
             tmpob = tmpob->next;
@@ -2855,7 +2844,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
     if ((tfile = fopen(tname, "w")) == NULL)
     {
         fprintf(stderr, "failed to open %s\n", tname);
-		fclose(ofile);
+        fclose(ofile);
         return;
     }
 
@@ -2870,20 +2859,19 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
                 continue;
             }
 
-            if (tmpob->texture != NULL)
-                if (*tmpob->texture != '\0')
-                {
-                    fprintf(tfile, "newmtl default\n");
-                    fprintf(tfile, "Ka %lf %lf %lf\n", materials[i].amb.r,
-                            materials[i].amb.g, materials[i].amb.b);
-                    fprintf(tfile, "Kd %lf %lf %lf\n", materials[i].emis.r,
-                            materials[i].emis.g, materials[i].emis.b);
-                    fprintf(tfile, "Ks %lf %lf %lf\n", materials[i].spec.r,
-                            materials[i].spec.g, materials[i].spec.b);
-                    fprintf(tfile, "Ns %d\n", (int)materials[i].shi);
-                    fprintf(tfile, "map_kd %s\n", tmpob->texture);
-                    break;
-                }
+            if (tmpob->texture && *tmpob->texture != '\0')
+            {
+                fprintf(tfile, "newmtl default\n");
+                fprintf(tfile, "Ka %lf %lf %lf\n", materials[i].amb.r,
+                        materials[i].amb.g, materials[i].amb.b);
+                fprintf(tfile, "Kd %lf %lf %lf\n", materials[i].emis.r,
+                        materials[i].emis.g, materials[i].emis.b);
+                fprintf(tfile, "Ks %lf %lf %lf\n", materials[i].spec.r,
+                        materials[i].spec.g, materials[i].spec.b);
+                fprintf(tfile, "Ns %d\n", (int)materials[i].shi);
+                fprintf(tfile, "map_kd %s\n", tmpob->texture);
+                break;
+            }
 
             tmpob = tmpob->next;
         }
@@ -2906,13 +2894,11 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
             {
                 texnofound = 0;
                 break;
-
             }
             if (!strncmp(tex[i], tmpob->texture, 13))
             {
                 texnofound = 0;
                 break;
-
             }
             else
                 texnofound = 1;
@@ -3091,10 +3077,12 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
         fprintf(stripeout, "v 0.0 0.0 0.0\n");
 
     for (int i = 0; i < object->numsurf; i++)
+    {
         fprintf(stripeout, "f %d %d %d\n",
                 object->vertexarray[i * 3].indice + 1,
                 object->vertexarray[i * 3 + 1].indice + 1,
                 object->vertexarray[i * 3 + 2].indice + 1);
+    }
 
     fclose(stripeout);
 #ifdef WIN32
@@ -3230,8 +3218,7 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
 
     fclose(stripein);
 
-    stripvertexarray = (tcoord_t *) malloc(
-            sizeof(tcoord_t) * object->numvertice * 10);
+    stripvertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * object->numvertice * 10);
     k = 0;
     dege = 0;
     if (writeit == 1)
@@ -3377,21 +3364,18 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
             tri++;
         }
         tritotal += tri;
-
     }
 
-    printf(
-            "strips for %s : number of strips %u : average of points triangles by strips %.2f\n",
-            object->name, NumStrips,
-            (float) ((float) tritotal - (float) dege) / ((float) NumStrips));
+    printf("strips for %s : number of strips %u : average of points triangles by strips %.2f\n",
+           object->name, NumStrips,
+           (float) ((float) tritotal - (float) dege) / ((float) NumStrips));
     if (writeit == 0)
     {
         if (tritotal != object->numsurf)
         {
-            printf(
-                "warning: error nb surf= %d != %d  degenerated triangles %d  tritotal=%d for %s\n",
-                tritotal, object->numsurf, dege, tritotal - dege,
-                object->name);
+            printf("warning: error nb surf= %d != %d  degenerated triangles %d  tritotal=%d for %s\n",
+                   tritotal, object->numsurf, dege, tritotal - dege,
+                   object->name);
         }
         free(object->vertexarray);
         object->vertexarray = stripvertexarray;
@@ -4102,7 +4086,6 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
                 {
                     texnofound = 0;
                     break;
-
                 }
                 if (!strncmp(tex[i], tmpob->texture, 13))
                 {
@@ -4150,7 +4133,6 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
             }
             if (!tmpob->saved)
             {
-
                 if (ordering && !lastpass)
                 {
                     if (!strcmp(tmpob->name, q))
@@ -4169,7 +4151,6 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
                             printf("object =%s num kids_o=%d\n", tmpob->name,
                                     tmpob->kids_o);
                         }
-
                     }
                 }
                 else
@@ -4390,13 +4371,12 @@ int mergeSplitted(ob_t **object)
                 tob0 = tob0->next;
                 continue;
             }
-            if (tob0->type != NULL)
-                if (!strcmp(tob0->type, "group"))
-                {
-                    tobP = tob0;
-                    tob0 = tob0->next;
-                    continue;
-                }
+            if (tob0->type && !strcmp(tob0->type, "group"))
+            {
+                tobP = tob0;
+                tob0 = tob0->next;
+                continue;
+            }
 
             if (!strnicmp(tob0->name, nameS, strlen(nameS)))
             {
@@ -4474,7 +4454,6 @@ int mergeSplitted(ob_t **object)
         tob0=tob->next;
         while (tob0)
         {
-
             if (strnicmp(tob0->name,nameS,strlen(nameS)))
             {
                 tob0=tob0->next;
@@ -4520,9 +4499,7 @@ int mergeSplitted(ob_t **object)
             tobS->z_max=tobS->vertex[j].z;
             if (tobS->vertex[j].z<tobS->z_min)
             tobS->z_min=tobS->vertex[j].z;
-
         }
-
 #endif
         tob = tob->next;
     }
@@ -4539,11 +4516,11 @@ int findPoint(point_t * vertexArray, int sizeVertexArray, point_t * theVertex)
 
 double findDistmin(ob_t * ob1, ob_t *ob2)
 {
-
     double di[16];
     double d = 100000;
 
     for (int i = 0; i < ob1->numvert; i++)
+    {
         for (int j = 0; j < ob2->numvert; j++)
         {
             double a1 = ob1->vertex[i].x;
@@ -4554,9 +4531,9 @@ double findDistmin(ob_t * ob1, ob_t *ob2)
             if (di[0] < d)
                 d = di[0];
         }
+    }
 
     return d;
-
 }
 
 void printMaterials(FILE *file, const std::vector<mat_t> &materials)
