@@ -381,11 +381,13 @@ ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpo
     ob_t * retob = new ob_t;
 
     retob->vertex = (point_t*) malloc(size_pts);
-    memset(retob->vertex, 0, size_pts);
+    memcpy(retob->vertex, tmpob->vertex, size_pts);
+
     retob->norm = (point_t*) malloc(size_pts);
-    memset(retob->norm, 0, size_pts);
+    memcpy(retob->norm, tmpob->norm, size_pts);
+
     retob->snorm = (point_t*) malloc(size_pts);
-    memset(retob->snorm, 0, size_pts);
+    memcpy(retob->snorm, tmpob->snorm, size_pts);
 
     /* assign data */
     createTexChannelArrays(retob, tmpob);
@@ -395,10 +397,6 @@ ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpo
 
     if (srcobj->data)
         retob->data = strdup(srcobj->data);
-
-    memcpy(retob->vertex, tmpob->vertex, size_pts);
-    memcpy(retob->snorm, tmpob->snorm, size_pts);
-    memcpy(retob->norm, tmpob->snorm, size_pts);
 
     obCopyTextureNames(retob, srcobj);
 
@@ -420,7 +418,7 @@ void copyTexChannel(uv_t * desttextarray, tcoord_t * destvertexarray, tcoord_t *
     int storedptidx, int destptidx, int destvertidx)
 {
     desttextarray[destptidx] = srcvert->uv;
- 
+
     destvertexarray[destvertidx].set(storedptidx, srcvert->uv, 0);
 }
 
@@ -674,7 +672,7 @@ int doObject(char *Line, ob_t *object, std::vector<mat_t> &materials)
     return (0);
 }
 
-int findIndice(int indice, const int *oldva, int n)
+int findIndice(int indice, const std::vector<int> &oldva, int n)
 {
     for (int i = 0; i < n; i++)
     {
@@ -697,7 +695,7 @@ ob_t* terrainSplitOb(ob_t * object)
     printf("terrain splitting %s started\n", object->name);
 
     int numSurf = object->numsurf;
-    int *oldSurfToNewObjMap = (int *) calloc(numSurf, sizeof(int));
+    std::vector<int> oldSurfToNewObjMap(numSurf, 0);
 
     int numNewObjs = 0;
 
@@ -730,7 +728,6 @@ ob_t* terrainSplitOb(ob_t * object)
                 numNewObjs++;
             }
         }
-
     }
     printf("found in %s : %d subsurfaces\n", object->name, numNewObjs);
 
@@ -786,14 +783,14 @@ ob_t* terrainSplitOb(ob_t * object)
          * we don't know the size, so we allocate the same number as in the
          * source object.
          */
-        point_t* pttmp = (point_t*) calloc(object->numvertice, sizeof(point_t));
-        point_t* snorm = (point_t*) calloc(object->numvertice, sizeof(point_t));
+        std::vector<point_t> pttmp(object->numvertice, point_t(0.0, 0.0, 0.0));
+        std::vector<point_t> snorm(object->numvertice, point_t(0.0, 0.0, 0.0));
 
         /* storedPtIdxArr: keep a list of the indices of points stored in the new object.
          * If an index is contained in storedPtIdxArr we don't store the point itself,
          * but only the index in the vertexarray of the new object.
          */
-        int* storedPtIdxArr = (int*) calloc(object->numvertice, sizeof(int));
+        std::vector<int> storedPtIdxArr(object->numvertice, 0);
 
         int curNewPtIdx = 0;
         for (int curNewIdx = 0; curNewIdx < numNewSurf * 3; curNewIdx++)
@@ -813,8 +810,6 @@ ob_t* terrainSplitOb(ob_t * object)
             obSetVertexArraysIndex(tob, curNewIdx, storedIdx);
         }
 
-        free(storedPtIdxArr);
-
         int numNewPts = curNewPtIdx;
 
         tob->numvert = numNewPts;
@@ -822,17 +817,14 @@ ob_t* terrainSplitOb(ob_t * object)
 
         /* create and store tob's norm, snorm, vertex and textarray data */
 
-        tob->norm = (point_t*) calloc(numNewPts, sizeof(point_t));
-        memcpy(tob->norm, snorm, numNewPts * sizeof(point_t));
+        tob->norm = (point_t*) malloc(numNewPts * sizeof(point_t));
+        memcpy(tob->norm, &snorm[0], numNewPts * sizeof(point_t));
 
-        tob->snorm = (point_t*) calloc(numNewPts, sizeof(point_t));
-        memcpy(tob->snorm, snorm, numNewPts * sizeof(point_t));
+        tob->snorm = (point_t*) malloc(numNewPts * sizeof(point_t));
+        memcpy(tob->snorm, &snorm[0], numNewPts * sizeof(point_t));
 
-        tob->vertex = (point_t*) calloc(numNewPts, sizeof(point_t));
-        memcpy(tob->vertex, pttmp, numNewPts * sizeof(point_t));
-
-        free(pttmp);
-        free(snorm);
+        tob->vertex = (point_t*) malloc(numNewPts * sizeof(point_t));
+        memcpy(tob->vertex, &pttmp[0], numNewPts * sizeof(point_t));
 
         obCreateTextArrays(tob);
 
@@ -840,7 +832,6 @@ ob_t* terrainSplitOb(ob_t * object)
 
         // prepend the new object to the list
         tob0 = obAppend(tob, tob0);
-
     }
 
     return tob0;
@@ -848,7 +839,6 @@ ob_t* terrainSplitOb(ob_t * object)
 
 ob_t* splitOb(ob_t *object)
 {
-    int *oldva = 0;
     int oldnumptstored = 0; /* temporary placeholder for numptstored */
 
     /* The object we use as storage during splitting.
@@ -860,21 +850,18 @@ ob_t* splitOb(ob_t *object)
     int curstoredidx[3];
 
     bool touse = false;
-    int orignumtris = 0; /* number of surfaces/triangles in the source object */
-    int orignumverts = 0; /* number of vertices in the source object: orignumtris * 3 */
-    int * tri;
+    int orignumtris = object->numsurf; /* number of surfaces/triangles in the source object */
+    int orignumverts = orignumtris * 3; /* number of vertices in the source object: orignumtris * 3 */
     bool mustcontinue = true;
     ob_t * tob0 = NULL;
     int numobject = 0;
     int curvert = 0;
 
-    orignumtris = object->numsurf;
-    orignumverts = orignumtris * 3;
-
-    tri = (int *) calloc(orignumtris, sizeof(int));
-    oldva = (int *) calloc(orignumverts, sizeof(int));
+    std::vector<bool> tri(orignumtris, false);
+    std::vector<int> oldva(orignumverts, 0);
 
     workob.vertex = (point_t *) calloc(orignumverts, sizeof(point_t));
+    workob.norm = (point_t *) calloc(orignumverts, sizeof(point_t));
     workob.snorm = (point_t *) calloc(orignumverts, sizeof(point_t));
 
     // create texture channels
@@ -896,7 +883,7 @@ ob_t* splitOb(ob_t *object)
             for (int curtri = 0; curtri < orignumtris; curtri++)
             {
                 touse = false;
-                if (tri[curtri] == 1)
+                if (tri[curtri])
                     continue;
                 mustcontinue = 1;
 
@@ -925,11 +912,13 @@ ob_t* splitOb(ob_t *object)
                     for (int i = 0; i < 3; i++)
                     {
                         if (curstoredidx[i] != -1)
+                        {
                             if(workob.textarray[curstoredidx[i]] != curvertex[i].uv)
                             {
                                 touse = false;
                                 /* triangle is not ok */
                             }
+                        }
                     }
                 }
 
@@ -938,7 +927,7 @@ ob_t* splitOb(ob_t *object)
                     firstTri = true;
                     /* triangle is ok */
 
-                    tri[curtri] = 1; /* mark this triangle */
+                    tri[curtri] = true; /* mark this triangle */
 
                     /* store the vertices of the triangle with new indice */
                     /* not yet in the array : store it at the current position */
@@ -949,7 +938,8 @@ ob_t* splitOb(ob_t *object)
                         if (curstoredidx[i] == -1)
                         {
                             workob.vertex[numptstored] = object->vertex[curvertex[i].indice];
-                            workob.snorm[numptstored] = object->norm[curvertex[i].indice];
+                            workob.norm[numptstored] = object->norm[curvertex[i].indice];
+                            workob.snorm[numptstored] = object->snorm[curvertex[i].indice];
 
                             clearSavedInVertexArrayEntry(object, curvert+i);
 
@@ -991,9 +981,6 @@ ob_t* splitOb(ob_t *object)
 
     } // while (mustcontinue == 1)
 
-    free(tri);
-    free(oldva);
-
     return tob0;
 }
 
@@ -1007,7 +994,7 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
         return (-1);
     }
     if (sscanf(p, "%d", &kids) != 1)
-    { 
+    {
         fprintf(stderr, "invalid Kids format %s\n", p);
         return (-1);
     }
@@ -2339,7 +2326,7 @@ void smoothTriNorm(ob_t * object)
     ob_t * tmpob1 = NULL;
     double dd;
     double nx, ny, nz;
- 
+
     printf("Smooth called on %s\n", object->name);
     tmpob = object;
     while (tmpob != NULL)
@@ -3622,7 +3609,7 @@ void mapTextureEnv(ob_t *object)
     double z_min = 10000;
     double z_max = -10000;
     ob_t * tmpob = object;
- 
+
     while (tmpob != NULL)
     {
         if (tmpob->canSkip())
