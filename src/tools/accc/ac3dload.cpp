@@ -58,10 +58,6 @@ kids(0),
 loc(0.0, 0.0, 0.0),
 attrSurf(0),
 attrMat(0),
-texture(nullptr),
-texture1(nullptr),
-texture2(nullptr),
-texture3(nullptr),
 data(nullptr),
 texrep_x(0.0),
 texrep_y(0.0),
@@ -99,10 +95,6 @@ ob_t::~ob_t()
 {
     free(name);
     free(type);
-    free(texture);
-    free(texture1);
-    free(texture2);
-    free(texture3);
     free(data);
     free(vertex);
     free(norm);
@@ -199,34 +191,29 @@ void obCreateVertexArrays(ob_t * ob)
 {
     int numEls = ob->numsurf * 3;
 
-    if(ob->texture)
+    if (ob->hasTexture())
         ob->vertexarray = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
 
-    if(ob->texture1)
+    if (ob->hasTexture1())
         ob->vertexarray1 = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
 
-    if(ob->texture2)
+    if (ob->hasTexture2())
         ob->vertexarray2 = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
 
-    if(ob->texture3)
+    if (ob->hasTexture3())
         ob->vertexarray3 = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
 }
 
 void obCopyTextureNames(ob_t * destob, const ob_t * srcob)
 {
-    if(srcob->texture)
-        destob->texture = strdup(srcob->texture);
-    if(srcob->texture1)
-        destob->texture1 = strdup(srcob->texture1);
-    if(srcob->texture2)
-        destob->texture2 = strdup(srcob->texture2);
-    if(srcob->texture3)
-        destob->texture3 = strdup(srcob->texture3);
+    destob->texture = srcob->texture;
+    destob->texture1 = srcob->texture1;
+    destob->texture2 = srcob->texture2;
+    destob->texture3 = srcob->texture3;
 }
 
 void obSetVertexArraysIndex(ob_t * ob, int vaIdx, int newIndex)
 {
-
     ob->vertexarray[vaIdx].indice = newIndex;
 
     if(ob->vertexarray1)
@@ -1187,10 +1174,10 @@ int doTexture(char *Line, ob_t *object, std::vector<mat_t> &materials)
         if (q != NULL)
             *q = '\0';
 
-        object->next->texture = strdup(p);
+        object->next->texture = p;
     }
     else
-        object->next->texture = strdup(name);
+        object->next->texture = name;
     dataFound = false;
     return (0);
 }
@@ -1709,8 +1696,8 @@ void saveIn3DSsubObject(ob_t * object,database3ds *db)
             for (int i=0; i<texnum; i++)
             {
                 if (tex[i]!=NULL)
-                if (object->texture!=NULL)
-                if (!strncmp(object->texture,tex[i],13))
+                if (object->hasTexture())
+                if (!strncmp(object->texture.c_str(),tex[i],13))
                 sprintf(mobj->matarray[0].name,"texture%d",i);
             }
 
@@ -1839,7 +1826,7 @@ void saveObin3DS( const std::string & OutputFilename, ob_t * object, mat_t * mat
                 break;
 
             }
-            if (!strncmp(tex[i],tmpob->texture,13))
+            if (!strncmp(tex[i],tmpob->texture.c_str(),13))
             {
                 texnofound=0;
                 break;
@@ -1989,26 +1976,26 @@ int printOb(FILE *ofile, ob_t * object)
     object->saved = true;
     fprintf(ofile, "OBJECT poly\n");
     fprintf(ofile, "name \"%s\"\n", object->name);
-    if (object->texture1 || object->texture2 || object->texture3)
+    if (object->hasMultiTexture())
     {
         multitex = 1;
-        fprintf(ofile, "texture \"%s\" base\n", object->texture);
-        if (object->texture1)
-            fprintf(ofile, "texture \"%s\" tiled\n", object->texture1);
+        fprintf(ofile, "texture \"%s\" base\n", object->texture.c_str());
+        if (object->hasTexture1())
+            fprintf(ofile, "texture \"%s\" tiled\n", object->texture1.c_str());
         else
             fprintf(ofile, "texture empty_texture_no_mapping tiled\n");
-        if (object->texture2)
-            fprintf(ofile, "texture \"%s\" skids\n", object->texture2);
+        if (object->hasTexture2())
+            fprintf(ofile, "texture \"%s\" skids\n", object->texture2.c_str());
         else
             fprintf(ofile, "texture empty_texture_no_mapping skids\n");
-        if (object->texture3)
-            fprintf(ofile, "texture \"%s\" shad\n", object->texture3);
+        if (object->hasTexture3())
+            fprintf(ofile, "texture \"%s\" shad\n", object->texture3.c_str());
         else
             fprintf(ofile, "texture empty_texture_no_mapping shad\n");
     }
     else
     {
-        fprintf(ofile, "texture \"%s\"\n", object->texture);
+        fprintf(ofile, "texture \"%s\"\n", object->texture.c_str());
     }
     fprintf(ofile, "numvert %d\n", object->numvert);
     for (int i = 0; i < object->numvert; i++)
@@ -2060,16 +2047,16 @@ int printOb(FILE *ofile, ob_t * object)
                         object->textarray[object->vertexarray[i * 3].indice].u,
                         object->textarray[object->vertexarray[i * 3].indice].v);
 
-                if (object->texture1)
+                if (object->hasTexture1())
                     fprintf(ofile, " %.5f %.5f",
                             object->textarray1[object->vertexarray[i * 3].indice].u,
                             object->textarray1[object->vertexarray[i * 3].indice].v);
 
-                if (object->texture2)
+                if (object->hasTexture2())
                     fprintf(ofile, " %.5f %.5f",
                             object->textarray2[object->vertexarray[i * 3].indice].u,
                             object->textarray2[object->vertexarray[i * 3].indice].v);
-                if (object->texture3)
+                if (object->hasTexture3())
                     fprintf(ofile, " %.5f %.5f",
                             object->textarray3[object->vertexarray[i * 3].indice].u,
                             object->textarray3[object->vertexarray[i * 3].indice].v);
@@ -2079,16 +2066,16 @@ int printOb(FILE *ofile, ob_t * object)
                         object->vertexarray[i * 3 + 1].indice,
                         object->textarray[object->vertexarray[i * 3 + 1].indice].u,
                         object->textarray[object->vertexarray[i * 3 + 1].indice].v);
-                if (object->texture1)
+                if (object->hasTexture1())
                     fprintf(ofile, " %.5f %.5f",
                             object->textarray1[object->vertexarray[i * 3 + 1].indice].u,
                             object->textarray1[object->vertexarray[i * 3 + 1].indice].v);
 
-                if (object->texture2)
+                if (object->hasTexture2())
                     fprintf(ofile, " %.5f %.5f",
                             object->textarray2[object->vertexarray[i * 3 + 1].indice].u,
                             object->textarray2[object->vertexarray[i * 3 + 1].indice].v);
-                if (object->texture3)
+                if (object->hasTexture3())
                     fprintf(ofile, " %.5f %.5f",
                             object->textarray3[object->vertexarray[i * 3 + 1].indice].u,
                             object->textarray3[object->vertexarray[i * 3 + 1].indice].v);
@@ -2098,16 +2085,16 @@ int printOb(FILE *ofile, ob_t * object)
                         object->vertexarray[i * 3 + 2].indice,
                         object->textarray[object->vertexarray[i * 3 + 2].indice].u,
                         object->textarray[object->vertexarray[i * 3 + 2].indice].v);
-                if (object->texture1)
+                if (object->hasTexture1())
                     fprintf(ofile, " %.5f %.5f",
                             object->textarray1[object->vertexarray[i * 3 + 2].indice].u,
                             object->textarray1[object->vertexarray[i * 3 + 2].indice].v);
 
-                if (object->texture2)
+                if (object->hasTexture2())
                     fprintf(ofile, " %.5f %.5f",
                             object->textarray2[object->vertexarray[i * 3 + 2].indice].u,
                             object->textarray2[object->vertexarray[i * 3 + 2].indice].v);
-                if (object->texture3)
+                if (object->hasTexture3())
                 {
                     fprintf(ofile, " %.5f %.5f",
                             object->textarray3[object->vertexarray[i * 3 + 2].indice].u,
@@ -2625,12 +2612,12 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
         texnofound = 1;
         for (int i = 0; i < texnum; i++)
         {
-            if (tmpob->texture == NULL)
+            if (!tmpob->hasTexture())
             {
                 texnofound = 0;
                 break;
             }
-            if (!strncmp(tex[i], tmpob->texture, 13))
+            if (!strncmp(tex[i], tmpob->texture.c_str(), 13))
             {
                 texnofound = 0;
                 break;
@@ -2640,9 +2627,9 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
         }
         if (texnofound == 1)
         {
-            if (tmpob->texture != NULL)
+            if (tmpob->hasTexture())
             {
-                strcpy(tex[texnum], tmpob->texture);
+                strcpy(tex[texnum], tmpob->texture.c_str());
                 tex[texnum][13] = '\0';
                 /*sprintf(tex[texnum],"%s",tmpob->texture);*/
             }
@@ -2846,7 +2833,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
                 continue;
             }
 
-            if (tmpob->texture && *tmpob->texture != '\0')
+            if (tmpob->hasTexture())
             {
                 fprintf(tfile, "newmtl default\n");
                 fprintf(tfile, "Ka %lf %lf %lf\n", materials[i].amb.r,
@@ -2856,7 +2843,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
                 fprintf(tfile, "Ks %lf %lf %lf\n", materials[i].spec.r,
                         materials[i].spec.g, materials[i].spec.b);
                 fprintf(tfile, "Ns %d\n", (int)materials[i].shi);
-                fprintf(tfile, "map_kd %s\n", tmpob->texture);
+                fprintf(tfile, "map_kd %s\n", tmpob->texture.c_str());
                 break;
             }
 
@@ -2877,12 +2864,12 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
         texnofound = 1;
         for (int i = 0; i < texnum; i++)
         {
-            if (tmpob->texture == NULL)
+            if (!tmpob->hasTexture())
             {
                 texnofound = 0;
                 break;
             }
-            if (!strncmp(tex[i], tmpob->texture, 13))
+            if (!strncmp(tex[i], tmpob->texture.c_str(), 13))
             {
                 texnofound = 0;
                 break;
@@ -2892,9 +2879,9 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
         }
         if (texnofound == 1)
         {
-            if (tmpob->texture != NULL)
+            if (tmpob->hasTexture())
             {
-                strcpy(tex[texnum], tmpob->texture);
+                strcpy(tex[texnum], tmpob->texture.c_str());
                 tex[texnum][13] = '\0';
             }
             texnum++;
@@ -3213,7 +3200,7 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
         fprintf(ofile, "numsurf %u\n", NumStrips);
 
     }
-    if (object->texture1 || object->texture2 || object->texture3)
+    if (object->hasMultiTexture())
         multitex = 1;
     else
         multitex = 0;
@@ -3260,18 +3247,12 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
             else
             {
                 fprintf(ofile, "%d %.5f %.5f", v1, object->textarray[v1].u, object->textarray[v1].v);
-                if (object->texture1)
-                {
+                if (object->hasTexture1())
                     fprintf(ofile, " %.5f %.5f", object->textarray1[v1].u, object->textarray1[v1].v);
-                }
-                if (object->texture2)
-                {
+                if (object->hasTexture2())
                     fprintf(ofile, " %.5f %.5f", object->textarray2[v1].u, object->textarray2[v1].v);
-                }
-                if (object->texture3)
-                {
+                if (object->hasTexture3())
                     fprintf(ofile, " %.5f %.5f", object->textarray3[v1].u, object->textarray3[v1].v);
-                }
                 fprintf(ofile, "\n");
             }
             if (multitex == 0)
@@ -3281,21 +3262,14 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
             else
             {
                 fprintf(ofile, "%d %.5f %.5f", v2, object->textarray[v2].u, object->textarray[v2].v);
-                if (object->texture1)
-                {
-                    fprintf(ofile, " %.5f %.5f", object->textarray1[v2].u, object->textarray1[v2].v);
-                }
-                if (object->texture2)
-                {
+                if (object->hasTexture1())
+                     fprintf(ofile, " %.5f %.5f", object->textarray1[v2].u, object->textarray1[v2].v);
+                if (object->hasTexture2())
                     fprintf(ofile, " %.5f %.5f", object->textarray2[v2].u, object->textarray2[v2].v);
-                }
-                if (object->texture3)
-                {
+                if (object->hasTexture3())
                     fprintf(ofile, " %.5f %.5f", object->textarray3[v2].u, object->textarray3[v2].v);
-                }
                 fprintf(ofile, "\n");
             }
-
         }
         for (unsigned int j = debj; j < StripLength[i]; j++)
         {
@@ -3332,18 +3306,12 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
                 else
                 {
                     fprintf(ofile, "%d %.5f %.5f", v0, object->textarray[v0].u, object->textarray[v0].v);
-                    if (object->texture1)
-                    {
+                    if (object->hasTexture1())
                         fprintf(ofile, " %.5f %.5f", object->textarray1[v0].u, object->textarray1[v0].v);
-                    }
-                    if (object->texture2)
-                    {
+                    if (object->hasTexture2())
                         fprintf(ofile, " %.5f %.5f", object->textarray2[v0].u, object->textarray2[v0].v);
-                    }
-                    if (object->texture3)
-                    {
+                    if (object->hasTexture3())
                         fprintf(ofile, " %.5f %.5f", object->textarray3[v0].u, object->textarray3[v0].v);
-                    }
                     fprintf(ofile, "\n");
                 }
             }
@@ -3877,7 +3845,7 @@ void normalMap(ob_t * object)
             tmpob->textarray[i].u = (tmpob->vertex[i].x - x_min) / (x_max - x_min);
             tmpob->textarray[i].v = (tmpob->vertex[i].y - y_min) / (y_max - y_min);
         }
-        tmpob->texture = strdup(shadowtexture);
+        tmpob->texture = shadowtexture;
         tmpob = tmpob->next;
     }
 }
@@ -4069,25 +4037,24 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
             texnofound = 1;
             for (int i = 0; i < texnum; i++)
             {
-                if (tmpob->texture == NULL)
+                if (!tmpob->hasTexture())
                 {
                     texnofound = 0;
                     break;
                 }
-                if (!strncmp(tex[i], tmpob->texture, 13))
+                if (!strncmp(tex[i], tmpob->texture.c_str(), 13))
                 {
                     texnofound = 0;
                     break;
-
                 }
                 else
                     texnofound = 1;
             }
             if (texnofound == 1)
             {
-                if (tmpob->texture != NULL)
+                if (tmpob->hasTexture())
                 {
-                    strcpy(tex[texnum], tmpob->texture);
+                    strcpy(tex[texnum], tmpob->texture.c_str());
                     tex[texnum][13] = '\0';
                     /*sprintf(tex[texnum],"%s",tmpob->texture);*/
                 }
@@ -4181,25 +4148,19 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     tobS.textarray3 = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
 
     memcpy(tobS.vertex, ob1->vertex, ob1->numvert * sizeof(point_t));
-    memcpy(tobS.vertexarray, ob1->vertexarray,
-            ob1->numsurf * sizeof(tcoord_t) * 3);
-    memcpy(tobS.textarray, ob1->textarray,
-            ob1->numvert * sizeof(double) * 2);
+    memcpy(tobS.vertexarray, ob1->vertexarray, ob1->numsurf * sizeof(tcoord_t) * 3);
+    memcpy(tobS.textarray, ob1->textarray, ob1->numvert * sizeof(double) * 2);
     memcpy(tobS.norm, ob1->norm, ob1->numvert * sizeof(point_t));
     memcpy(tobS.snorm, ob1->snorm, ob1->numvert * sizeof(point_t));
 
-    if (ob1->texture1)
-    {
+    if (ob1->hasTexture1())
         memcpy(tobS.textarray1, ob1->textarray1, ob1->numvert * sizeof(uv_t));
-    }
-    if (ob1->texture2)
-    {
+
+    if (ob1->hasTexture2())
         memcpy(tobS.textarray2, ob1->textarray2, ob1->numvert * sizeof(uv_t));
-    }
-    if (ob1->texture3)
-    {
+
+    if (ob1->hasTexture3())
         memcpy(tobS.textarray3, ob1->textarray3, ob1->numvert * sizeof(uv_t));
-    }
 
     n = ob1->numvert;
     for (int i = 0; i < ob2->numvert; i++)
@@ -4219,18 +4180,12 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
         {
             oldva1[i] = n;
             tobS.textarray[n] = ob2->textarray[i];
-            if (ob2->texture1)
-            {
+            if (ob2->hasTexture1())
                 tobS.textarray1[n] = ob2->textarray1[i];
-            }
-            if (ob2->texture2)
-            {
+            if (ob2->hasTexture2())
                 tobS.textarray2[n] = ob2->textarray2[i];
-            }
-            if (ob2->texture3)
-            {
+            if (ob2->hasTexture3())
                 tobS.textarray3[n] = ob2->textarray3[i];
-            }
             tobS.snorm[n] = ob2->snorm[i];
             tobS.norm[n] = ob2->norm[i];
             tobS.vertex[n] = ob2->vertex[i];
@@ -4408,7 +4363,7 @@ int mergeSplitted(ob_t **object)
         tobS->attrSurf=tob->attrSurf;
         tobS->attrMat=tob->attrMat;
         tobS->name=(char *) malloc(strlen(nameS)+1);
-        tobS->texture=strdup(nameS);
+        tobS->texture=nameS;
         tobS->type= tob->type ? strdup(tob->type) : NULL;
         tobS->data=strdup(tob->data);
 
@@ -4420,19 +4375,19 @@ int mergeSplitted(ob_t **object)
         {
             memcpy(tobS->textarray1, tob->textarray1,tob->numvert*2*sizeof(double));
             memcpy(tobS->vertexarray1, tob->vertexarray1,tob->numsurf*sizeof(tcoord_t ));
-            tobS->texture1=strdup(tob->texture1);
+            tobS->texture1=tob->texture1;
         }
         if (tob->texture2)
         {
             memcpy(tobS->textarray2, tob->textarray2,tob->numvert*2*sizeof(double));
             memcpy(tobS->vertexarray2, tob->vertexarray2,tob->numsurf*sizeof(tcoord_t ));
-            tobS->texture2=strdup(tob->texture2);
+            tobS->texture2=tob->texture2;
         }
         if (tob->texture3)
         {
             memcpy(tobS->textarray3, tob->textarray3,tob->numvert*2*sizeof(double));
             memcpy(tobS->vertexarray3, tob->vertexarray3,tob->numsurf*sizeof(tcoord_t ));
-            tobS->texture3=strdup(tob->texture3);
+            tobS->texture3=tob->texture3;
         }
 
         n=tob->numvert;

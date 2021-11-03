@@ -169,10 +169,10 @@ struct ob_t
     point_t loc;
     int attrSurf;
     int attrMat;
-    char * texture;
-    char * texture1;
-    char * texture2;
-    char * texture3;
+    std::string texture;
+    std::string texture1;
+    std::string texture2;
+    std::string texture3;
     char * data;
     double texrep_x;
     double texrep_y;
@@ -223,6 +223,14 @@ struct ob_t
     bool canSkip() const
     {
         return name == NULL || !strcmp(name, "root") || !strcmp(name, "world");
+    }
+    bool hasTexture() const { return !texture.empty(); }
+    bool hasTexture1() const { return !texture1.empty(); }
+    bool hasTexture2() const { return !texture2.empty(); }
+    bool hasTexture3() const { return !texture3.empty(); }
+    bool hasMultiTexture() const 
+    {
+        return hasTexture1() || hasTexture2() || hasTexture3(); 
     }
 };
 

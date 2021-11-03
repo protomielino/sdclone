@@ -605,36 +605,29 @@ void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3)
  */
 void copyTextureChannel(ob_t * destob, ob_t * srcob, int channel)
 {
-    char* tex = srcob->texture;
-    uv_t* texarr = srcob->textarray;
-    tcoord_t* vertarr = srcob->vertexarray;
-
     if (channel == 1)
     {
-        if (tex)
-            destob->texture1 = strdup(tex);
+        destob->texture1 = srcob->texture;
         destob->textarray1 = (uv_t*)malloc(sizeof(uv_t) * srcob->numvertice);
-        memcpy(destob->textarray1, texarr, sizeof(uv_t) * srcob->numvertice);
+        memcpy(destob->textarray1, srcob->textarray, sizeof(uv_t) * srcob->numvertice);
         destob->vertexarray1 = (tcoord_t*)malloc(sizeof(tcoord_t) * srcob->numsurf * 3);
-        memcpy(destob->vertexarray1, vertarr, sizeof(tcoord_t) * srcob->numsurf * 3);
+        memcpy(destob->vertexarray1, srcob->vertexarray, sizeof(tcoord_t) * srcob->numsurf * 3);
     }
     else if (channel == 2)
     {
-        if (tex)
-            destob->texture2 = strdup(tex);
+        destob->texture2 = srcob->texture;
         destob->textarray2 = (uv_t*)malloc(sizeof(uv_t) * srcob->numvertice);
-        memcpy(destob->textarray2, texarr, sizeof(uv_t) * srcob->numvertice);
+        memcpy(destob->textarray2, srcob->textarray, sizeof(uv_t) * srcob->numvertice);
         destob->vertexarray2 = (tcoord_t*)malloc(sizeof(tcoord_t) * srcob->numsurf * 3);
-        memcpy(destob->vertexarray2, vertarr, sizeof(tcoord_t) * srcob->numsurf * 3);
+        memcpy(destob->vertexarray2, srcob->vertexarray, sizeof(tcoord_t) * srcob->numsurf * 3);
     }
     else if (channel == 3)
     {
-        if (tex)
-            destob->texture3 = strdup(tex);
+        destob->texture3 = srcob->texture;
         destob->textarray3 = (uv_t*)malloc(sizeof(uv_t) * srcob->numvertice);
-        memcpy(destob->textarray3, texarr, sizeof(uv_t) * srcob->numvertice);
+        memcpy(destob->textarray3, srcob->textarray, sizeof(uv_t) * srcob->numvertice);
         destob->vertexarray3 = (tcoord_t*)malloc(sizeof(tcoord_t) * srcob->numsurf * 3);
-        memcpy(destob->vertexarray3, vertarr, sizeof(tcoord_t) * srcob->numsurf * 3);
+        memcpy(destob->vertexarray3, srcob->vertexarray, sizeof(tcoord_t) * srcob->numsurf * 3);
     }
 }
 
