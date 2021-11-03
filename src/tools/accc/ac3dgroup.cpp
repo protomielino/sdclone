@@ -173,7 +173,7 @@ void loadAndGroup(const std::string &OutputFileName)
             tmpob = tmpob->next;
             continue;
         }
-        if (!strnicmp(tmpob->name, "tkmn", 4) && strcmp(tmpob->type, "group"))
+        if (!strnicmp(tmpob->name, "tkmn", 4) && tmpob->type != "group")
         {
             tmpob = tmpob->next;
             num_tkmn++;
@@ -205,7 +205,7 @@ void loadAndGroup(const std::string &OutputFileName)
             tmpob = tmpob->next;
             continue;
         }
-        if (!strnicmp(tmpob->name, "tkmn", 4) && strcmp(tmpob->type, "group"))
+        if (!strnicmp(tmpob->name, "tkmn", 4) && tmpob->type != "group")
         {
             array_groups[i].tkmn = tmpob;
             array_groups[i].numkids = 1;
@@ -562,7 +562,7 @@ bool isNamedAndPolygon(ob_t * ob)
 {
     if (ob->canSkip())
         return false;
-    if (ob->type != NULL && !strcmp(ob->type, "group"))
+    if (ob->type == "group")
         return false;
 
     return true;
@@ -648,7 +648,7 @@ bool notInSameOrder(const ob_t * ob1, const ob_t * ob2)
 bool isSamePoly(const ob_t * ob1, const ob_t * ob2)
 {
     return stricmp(ob1->name, ob2->name) == 0 &&
-           stricmp(ob1->type, ob2->type) == 0 &&
+           ob1->type == ob2->type &&
            ob1->numvert == ob2->numvert && 
            ob1->numsurf == ob2->numsurf;
 }

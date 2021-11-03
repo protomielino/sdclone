@@ -164,7 +164,7 @@ struct ob_t
     ~ob_t();
 
     char * name;
-    char * type;
+    std::string type;
     int kids;
     point_t loc;
     int attrSurf;

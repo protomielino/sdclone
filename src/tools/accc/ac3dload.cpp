@@ -53,7 +53,6 @@
 
 ob_t::ob_t() :
 name(nullptr),
-type(nullptr),
 kids(0),
 loc(0.0, 0.0, 0.0),
 attrSurf(0),
@@ -93,7 +92,6 @@ inkids_o(false)
 ob_t::~ob_t()
 {
     free(name);
-    free(type);
     free(vertex);
     free(norm);
     free(snorm);
@@ -388,7 +386,7 @@ ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpo
     retob->numvert = numvert;
     retob->numvertice = numvert;
 
-    retob->type = strdup(srcobj->type);
+    retob->type = srcobj->type;
 
     /* special handling of name */
     std::stringstream namestream;
@@ -734,7 +732,7 @@ ob_t* terrainSplitOb(ob_t * object)
         tob->attrSurf = object->attrSurf;
         tob->attrMat = object->attrMat;
         tob->data = object->data;
-        tob->type = strdup(object->type);
+        tob->type = object->type;
 
         /* special name handling */
         std::stringstream namestream;
@@ -2558,7 +2556,7 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
         }
         else
         {
-            if (tmpob->type && !strcmp(tmpob->type, "group"))
+            if (tmpob->type == "group")
             {
                 tmpob = tmpob->next;
                 continue;
@@ -3950,7 +3948,7 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
             tmpob = tmpob->next;
             continue;
         }
-        if (!strcmp(tmpob->name, "world") || (tmpob->type && !strcmp(tmpob->type, "world") && tmpob->numvert == 0 && tmpob->numsurf == 0))
+        if (!strcmp(tmpob->name, "world") || (tmpob->type == "world" && tmpob->numvert == 0 && tmpob->numsurf == 0))
         {
             tmpob = tmpob->next;
             continue;
@@ -3960,13 +3958,13 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
             tmpob = tmpob->next;
             continue;
         }
-        if (!stricmp(tmpob->name, "group") || (tmpob->type && !stricmp(tmpob->type, "group") && tmpob->numvert == 0 && tmpob->numsurf == 0))
+        if (!stricmp(tmpob->name, "group") || (tmpob->type == "group" && tmpob->numvert == 0 && tmpob->numsurf == 0))
         {
             tmpob = tmpob->next;
             continue;
         }
         /* don't count empty objects */
-        if (tmpob->type && strcmp(tmpob->type, "poly") == 0 && tmpob->numvert == 0 && tmpob->numsurf == 0 && tmpob->kids == 0)
+        if (tmpob->type == "poly" && tmpob->numvert == 0 && tmpob->numsurf == 0 && tmpob->kids == 0)
         {
             tmpob = tmpob->next;
             continue;
@@ -4289,7 +4287,7 @@ int mergeSplitted(ob_t **object)
                 tob0 = tob0->next;
                 continue;
             }
-            if (tob0->type && !strcmp(tob0->type, "group"))
+            if (tob0->type == "group")
             {
                 tobP = tob0;
                 tob0 = tob0->next;
