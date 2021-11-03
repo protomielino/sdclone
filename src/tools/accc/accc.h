@@ -345,7 +345,7 @@ void copyVertexArraysSurface(ob_t * destob, int destSurfIdx, ob_t * srcob, int s
  *  data from the srcvert into the destination arrays based on the given indices.
  *  @sa copySingleVertexData()
  */
-void copyTexChannel(double * desttextarray, tcoord_t * destvertexarray, tcoord_t * srcvert,
+void copyTexChannel(uv_t * desttextarray, tcoord_t * destvertexarray, tcoord_t * srcvert,
     int storedptidx, int destptidx, int destvertidx);
 
 /** Copies the data of a single vertex from srcob to destob.
