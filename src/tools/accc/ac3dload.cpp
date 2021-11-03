@@ -1121,7 +1121,6 @@ int doData(char *Line, ob_t *object, std::vector<mat_t> &materials)
     }
     dataFound = true;
     dataSizeRead = 0;
-    object->next->data = (char *)calloc(1, dataSize + 1);
     return (0);
 }
 

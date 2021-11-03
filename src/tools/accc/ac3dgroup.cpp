@@ -65,7 +65,6 @@ void loadAndGroup(const std::string &OutputFileName)
     std::vector<mat_t> mat3;
     FILE * ofile;
     int num_tkmn = 0;
-    ob_groups_t * array_groups;
     int good_group = 0;
     int i = 0;
     double dist = 0;
@@ -197,7 +196,7 @@ void loadAndGroup(const std::string &OutputFileName)
 
     i = 0;
     tmpob = ob0;
-    array_groups = (ob_groups_t *) malloc(sizeof(ob_groups_t) * num_tkmn);
+    std::vector<ob_groups_t> array_groups(num_tkmn);
     while (tmpob != NULL)
     {
         if (tmpob->canSkip())
@@ -211,15 +210,6 @@ void loadAndGroup(const std::string &OutputFileName)
             array_groups[i].numkids = 1;
             array_groups[i].name = tmpob->name;
             array_groups[i].tkmnlabel = atoi(tmpob->name + 4);
-            array_groups[i].kids = NULL;
-            array_groups[i].kids0 = NULL;
-            array_groups[i].kids1 = NULL;
-            array_groups[i].kids2 = NULL;
-            array_groups[i].kids3 = NULL;
-            array_groups[i].numkids0 = 0;
-            array_groups[i].numkids1 = 0;
-            array_groups[i].numkids2 = 0;
-            array_groups[i].numkids3 = 0;
             tmpob = tmpob->next;
             i++;
             continue;
@@ -279,7 +269,7 @@ void loadAndGroup(const std::string &OutputFileName)
             continue;
         }
         printf("object %s is going to group %s  at dist=%f\n", tmpob->name,
-                array_groups[good_group].name, sqrt(tmpob->dist_min));
+                array_groups[good_group].name.c_str(), sqrt(tmpob->dist_min));
         if (array_groups[good_group].kids == NULL)
         {
             array_groups[good_group].kids = tmpob;
@@ -311,7 +301,7 @@ void loadAndGroup(const std::string &OutputFileName)
     {
         ob_t * tmpobnext;
         tmpob = array_groups[i].kids;
-        printf("grouping level for %s\n", array_groups[i].name);
+        printf("grouping level for %s\n", array_groups[i].name.c_str());
         while (tmpob != NULL)
         {
             tmpobnext = tmpob->next;
@@ -326,7 +316,7 @@ void loadAndGroup(const std::string &OutputFileName)
                 array_groups[i].numkids0++;
                 INSERTINGROUP(array_groups[i].kids0, tmpob);
                 printf("inserting %s in group 0 of %s\n", tmpob->name,
-                        array_groups[i].name);
+                        array_groups[i].name.c_str());
                 tmpob = tmpobnext;
                 continue;
             }
@@ -336,7 +326,7 @@ void loadAndGroup(const std::string &OutputFileName)
                 array_groups[i].numkids0++;
                 INSERTINGROUP(array_groups[i].kids0, tmpob);
                 printf("inserting %s in group 0 of %s\n", tmpob->name,
-                        array_groups[i].name);
+                        array_groups[i].name.c_str());
                 tmpob = tmpobnext;
                 continue;
             }
@@ -346,7 +336,7 @@ void loadAndGroup(const std::string &OutputFileName)
                 array_groups[i].numkids0++;
                 INSERTINGROUP(array_groups[i].kids0, tmpob);
                 printf("inserting %s in group 0 of %s\n", tmpob->name,
-                        array_groups[i].name);
+                        array_groups[i].name.c_str());
                 tmpob = tmpobnext;
                 continue;
             }
@@ -356,7 +346,7 @@ void loadAndGroup(const std::string &OutputFileName)
                 array_groups[i].numkids0++;
                 INSERTINGROUP(array_groups[i].kids0, tmpob);
                 printf("inserting %s in group 0 of %s\n", tmpob->name,
-                        array_groups[i].name);
+                        array_groups[i].name.c_str());
                 tmpob = tmpobnext;
                 continue;
             }
@@ -367,7 +357,7 @@ void loadAndGroup(const std::string &OutputFileName)
                 array_groups[i].numkids1++;
                 INSERTINGROUP(array_groups[i].kids1, tmpob);
                 printf("inserting %s in group 1 of %s\n", tmpob->name,
-                        array_groups[i].name);
+                        array_groups[i].name.c_str());
             }
             else if (tmpob->dist_min < d2 * d2)
             {
@@ -375,7 +365,7 @@ void loadAndGroup(const std::string &OutputFileName)
                 array_groups[i].numkids2++;
                 INSERTINGROUP(array_groups[i].kids2, tmpob);
                 printf("inserting %s in group 2 of %s\n", tmpob->name,
-                        array_groups[i].name);
+                        array_groups[i].name.c_str());
             }
             else if (tmpob->dist_min < d3 * d3)
             {
@@ -383,12 +373,12 @@ void loadAndGroup(const std::string &OutputFileName)
                 array_groups[i].numkids3++;
                 INSERTINGROUP(array_groups[i].kids3, tmpob);
                 printf("inserting %s in group 3 of %s\n", tmpob->name,
-                        array_groups[i].name);
+                        array_groups[i].name.c_str());
             }
             else
             {
                 printf("cannot insert object %s in group %s\n", tmpob->name,
-                        array_groups[i].name);
+                        array_groups[i].name.c_str());
             }
             /*if (!strnicmp(tmpob->name, "tk",2)){
              tmpob2=tmpob;
@@ -400,7 +390,7 @@ void loadAndGroup(const std::string &OutputFileName)
         }
         if (array_groups[i].numkids == 0)
             array_groups[i].kids = NULL;
-        printf("in group %s\n", array_groups[i].name);
+        printf("in group %s\n", array_groups[i].name.c_str());
         printf("    found in l0  %d\n", array_groups[i].numkids0);
         printf("    found in l1  %d\n", array_groups[i].numkids1);
         printf("    found in l2  %d\n", array_groups[i].numkids2);

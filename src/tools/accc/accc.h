@@ -266,10 +266,28 @@ void obSetVertexArraysIndex(ob_t * ob, int vaIdx, int newIndex);
 
 struct ob_groups_t
 {
+    ob_groups_t() :
+    kids(nullptr),
+    numkids(0),
+    tkmn(nullptr),
+    tkmnlabel(0),
+    kids0(nullptr),
+    numkids0(0),
+    kids1(nullptr),
+    numkids1(0),
+    kids2(nullptr),
+    numkids2(0),
+    kids3(nullptr),
+    numkids3(0)
+    {
+    }
+
+    ~ob_groups_t() { }
+
     ob_t * kids;
     int numkids;
     ob_t * tkmn;
-    char * name;
+    std::string name;
     int tkmnlabel;
     ob_t * kids0;
     int numkids0;
