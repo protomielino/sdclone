@@ -638,7 +638,7 @@ int doObject(char *Line, ob_t *object, std::vector<mat_t> &materials)
     objectt->x_min = 1000000;
     objectt->y_min = 1000000;
     objectt->z_min = 1000000;
-    objectt->type = strdup(name);
+    objectt->type = name;
     objectt->texrep_x = 1.0;
     objectt->texrep_y = 1.0;
 
