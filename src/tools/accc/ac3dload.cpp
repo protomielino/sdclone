@@ -58,7 +58,6 @@ kids(0),
 loc(0.0, 0.0, 0.0),
 attrSurf(0),
 attrMat(0),
-data(nullptr),
 texrep_x(0.0),
 texrep_y(0.0),
 numvert(0),
@@ -95,7 +94,6 @@ ob_t::~ob_t()
 {
     free(name);
     free(type);
-    free(data);
     free(vertex);
     free(norm);
     free(snorm);
@@ -382,8 +380,7 @@ ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpo
     retob->attrSurf = srcobj->attrSurf;
     retob->attrMat = srcobj->attrMat;
 
-    if (srcobj->data)
-        retob->data = strdup(srcobj->data);
+    retob->data = srcobj->data;
 
     obCopyTextureNames(retob, srcobj);
 
@@ -736,8 +733,7 @@ ob_t* terrainSplitOb(ob_t * object)
         tob->numsurf = numNewSurf;
         tob->attrSurf = object->attrSurf;
         tob->attrMat = object->attrMat;
-        if (object->data)
-            tob->data = strdup(object->data);
+        tob->data = object->data;
         tob->type = strdup(object->type);
 
         /* special name handling */
@@ -1141,7 +1137,7 @@ int doGetData(char *Line, ob_t *object, std::vector<mat_t> &materials)
         lineSize--;
     }
     dataSizeRead += lineSize;
-    strcat(object->next->data, Line);
+    object->next->data += Line;
     return (0);
 }
 
@@ -2336,12 +2332,7 @@ void smoothTriNorm(ob_t * object)
 
     while (tmpob != NULL)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (tmpob->data && !strstr(tmpob->data, "nosmooth"))
+        if (tmpob->canSkip() || tmpob->hasNoSmooth())
         {
             tmpob = tmpob->next;
             continue;
@@ -2349,12 +2340,7 @@ void smoothTriNorm(ob_t * object)
         tmpob1 = object;
         while (tmpob1 != NULL)
         {
-            if (tmpob1->canSkip())
-            {
-                tmpob1 = tmpob1->next;
-                continue;
-            }
-            if (tmpob1->data && !strstr(tmpob1->data, "nosmooth"))
+            if (tmpob1->canSkip() || tmpob1->hasNoSmooth())
             {
                 tmpob1 = tmpob1->next;
                 continue;
@@ -2413,12 +2399,7 @@ void smoothTriNorm(ob_t * object)
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (tmpob->data && !strstr(tmpob->data, "nosmooth"))
+        if (tmpob->canSkip() || tmpob->hasNoSmooth())
         {
             tmpob = tmpob->next;
             continue;
@@ -2426,12 +2407,7 @@ void smoothTriNorm(ob_t * object)
         tmpob1 = object;
         while (tmpob1 != NULL)
         {
-            if (tmpob1->canSkip())
-            {
-                tmpob1 = tmpob1->next;
-                continue;
-            }
-            if (tmpob1->data && !strstr(tmpob1->data, "nosmooth"))
+            if (tmpob1->canSkip() || tmpob1->hasNoSmooth())
             {
                 tmpob1 = tmpob1->next;
                 continue;

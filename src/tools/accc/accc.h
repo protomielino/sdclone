@@ -173,7 +173,7 @@ struct ob_t
     std::string texture1;
     std::string texture2;
     std::string texture3;
-    char * data;
+    std::string data;
     double texrep_x;
     double texrep_y;
     int numvert;
@@ -232,6 +232,7 @@ struct ob_t
     {
         return hasTexture1() || hasTexture2() || hasTexture3(); 
     }
+    bool hasNoSmooth() const { return data.find("nosmooth") != std::string::npos; }
 };
 
 /** Appends srcob to the end of the list given by destob.
