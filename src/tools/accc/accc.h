@@ -192,15 +192,15 @@ struct ob_t
     /* the actual points, to which the entries in the vertexarray point to
      * size: numvertice
      */
-    point_t * vertex;
+    std::vector<point_t> vertex;
     /* the normals corresponding to entries in the above "vertex" array
      * size: numvertice
      */
-    point_t * norm;
+    std::vector <point_t> norm;
     /* the smoothed normals corresponding to entries in the above "vertex" array
      * size: numvertice
      */
-    point_t * snorm;
+    std::vector <point_t> snorm;
     /* array of indices into the "vertex" array, that make up surfaces. In AC3D: one line in
      * "refs" section
      * size: numsurf * 3

@@ -63,9 +63,6 @@ texrep_y(0.0),
 numvert(0),
 numsurf(0),
 numvertice(0),
-vertex(nullptr),
-norm(nullptr),
-snorm(nullptr),
 vertexarray(nullptr),
 vertexarray1(nullptr),
 vertexarray2(nullptr),
@@ -92,9 +89,6 @@ inkids_o(false)
 
 ob_t::~ob_t()
 {
-    free(vertex);
-    free(norm);
-    free(snorm);
     free(vertexarray);
     free(vertexarray1);
     free(vertexarray2);
@@ -355,44 +349,33 @@ void createTexCoordArray(uv_t * destarr, tcoord_t * srcidxarr, int numidx)
  */
 ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpob)
 {
-    int numtri = tmpob->numsurf;
-    int numvert = tmpob->numvertice;
-
-    int size_pts = sizeof(point_t) * numvert;
-
     /* allocate space */
     ob_t * retob = new ob_t;
-
-    retob->vertex = (point_t*) malloc(size_pts);
-    memcpy(retob->vertex, tmpob->vertex, size_pts);
-
-    retob->norm = (point_t*) malloc(size_pts);
-    memcpy(retob->norm, tmpob->norm, size_pts);
-
-    retob->snorm = (point_t*) malloc(size_pts);
-    memcpy(retob->snorm, tmpob->snorm, size_pts);
-
-    /* assign data */
-    createTexChannelArrays(retob, tmpob);
-
-    retob->attrSurf = srcobj->attrSurf;
-    retob->attrMat = srcobj->attrMat;
-
-    retob->data = srcobj->data;
-
-    obCopyTextureNames(retob, srcobj);
-
-    retob->numsurf = numtri;
-    retob->numvert = numvert;
-    retob->numvertice = numvert;
-
-    retob->type = srcobj->type;
 
     /* special handling of name */
     retob->name = srcobj->name + "_s_" + std::to_string(splitid);
 
+    retob->type = srcobj->type;
+    retob->attrSurf = srcobj->attrSurf;
+    retob->attrMat = srcobj->attrMat;
+    retob->texture = srcobj->texture;
+    retob->texture1 = srcobj->texture1;
+    retob->texture2 = srcobj->texture2;
+    retob->texture3 = srcobj->texture3;
+    retob->data = srcobj->data;
+    retob->numvert = tmpob->numvertice;
+    retob->numsurf = tmpob->numsurf;
+    retob->numvertice = tmpob->numvertice;
+    retob->vertex = tmpob->vertex;
+    retob->norm = tmpob->norm;
+    retob->snorm = tmpob->snorm;
+
+    /* assign data */
+    createTexChannelArrays(retob, tmpob);
+
     return retob;
 }
+
 void copyTexChannel(uv_t * desttextarray, tcoord_t * destvertexarray, tcoord_t * srcvert,
     int storedptidx, int destptidx, int destvertidx)
 {
@@ -494,7 +477,6 @@ void createSingleTexChannelArrays(ob_t * destob, const ob_t * srcob, int channel
 
 void createTexChannelArrays(ob_t * destob, const ob_t * srcob)
 {
-
     if(srcob->vertexarray != NULL)
         createSingleTexChannelArrays(destob, srcob, 0);
     if(srcob->vertexarray1 != NULL)
@@ -567,14 +549,13 @@ int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
 void computeObSurfCentroid(const ob_t * object, int obsurf, point_t * out)
 {
     tcoord_t * idx = object->vertexarray;
-    point_t * vertex = object->vertex;
 
     int firstIdx = obsurf * 3;
 
     out->set(0, 0, 0);
 
     for (int curVert = 0; curVert < 3; curVert++)
-        *out += vertex[idx[firstIdx + curVert].indice];
+        *out += object->vertex[idx[firstIdx + curVert].indice];
 
     *out /= 3;
 }
@@ -793,14 +774,9 @@ ob_t* terrainSplitOb(ob_t * object)
 
         /* create and store tob's norm, snorm, vertex and textarray data */
 
-        tob->norm = (point_t*) malloc(numNewPts * sizeof(point_t));
-        memcpy(tob->norm, &snorm[0], numNewPts * sizeof(point_t));
-
-        tob->snorm = (point_t*) malloc(numNewPts * sizeof(point_t));
-        memcpy(tob->snorm, &snorm[0], numNewPts * sizeof(point_t));
-
-        tob->vertex = (point_t*) malloc(numNewPts * sizeof(point_t));
-        memcpy(tob->vertex, &pttmp[0], numNewPts * sizeof(point_t));
+        tob->vertex = pttmp;
+        tob->norm = snorm;
+        tob->snorm = snorm;
 
         obCreateTextArrays(tob);
 
@@ -836,9 +812,9 @@ ob_t* splitOb(ob_t *object)
     std::vector<bool> tri(orignumtris, false);
     std::vector<int> oldva(orignumverts, 0);
 
-    workob.vertex = (point_t *) calloc(orignumverts, sizeof(point_t));
-    workob.norm = (point_t *) calloc(orignumverts, sizeof(point_t));
-    workob.snorm = (point_t *) calloc(orignumverts, sizeof(point_t));
+    workob.vertex.resize(orignumverts);
+    workob.norm.resize(orignumverts);
+    workob.snorm.resize(orignumverts);
 
     // create texture channels
     createTexChannelArrays(&workob, object);
@@ -980,13 +956,11 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
         object->next->vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numrefstotal);
         object->next->textarray = (uv_t *) malloc(sizeof(uv_t) * numrefstotal);
         object->next->surfrefs = (int *) malloc(sizeof(int) * numrefs);
-        object->next->norm = (point_t*) malloc(sizeof(point_t) * numrefstotal * 3);
-        object->next->snorm = (point_t*) malloc(sizeof(point_t) * numrefstotal * 3);
+        object->next->norm.assign(numrefstotal * 3, point_t(0.0, 0.0, 0.0));
+        object->next->snorm.assign(numrefstotal * 3, point_t(0.0, 0.0, 0.0));
         object->next->attrSurf = attrSurf;
         object->next->attrMat = attrMat;
         attrSurf = 0x20;
-        memset(object->next->snorm, 0, sizeof(point_t) * numrefstotal * 3);
-        memset(object->next->norm, 0, sizeof(point_t) * numrefstotal * 3);
 
         memcpy(object->next->vertexarray, tmpva, numrefstotal * sizeof(tcoord_t));
         memcpy(object->next->textarray, tmptexa, numrefstotal * sizeof(uv_t));
@@ -1199,8 +1173,7 @@ int doNumvert(char *Line, ob_t *object, std::vector<mat_t> &materials)
         fprintf(stderr, "invalid numvert format %s\n", p);
         return (-1);
     }
-    object->next->vertex = (point_t *) malloc(
-            sizeof(point_t) * object->next->numvert);
+    object->next->vertex.resize(object->next->numvert);
     numvertex = 0;
     numvertFound = true;
     dataFound = false;
@@ -4086,21 +4059,20 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     memset(oldva2, -1, sizeof(oldva2));
     tobS.numsurf = ob1->numsurf;
     tobS.vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numtri * 3);
-    tobS.norm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
-    tobS.snorm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
-    tobS.vertex = (point_t*) malloc(sizeof(point_t) * numtri * 3);
-    memset(tobS.snorm, 0, sizeof(point_t) * numtri * 3);
-    memset(tobS.norm, 0, sizeof(point_t) * numtri * 3);
+    tobS.vertex.resize(numtri * 3);
+    tobS.norm.resize(numtri * 3);
+    tobS.snorm.resize(numtri * 3);
     tobS.textarray = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
     tobS.textarray1 = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
     tobS.textarray2 = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
     tobS.textarray3 = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
 
-    memcpy(tobS.vertex, ob1->vertex, ob1->numvert * sizeof(point_t));
+    std::copy_n(ob1->vertex.begin(), ob1->vertex.size(), tobS.vertex.begin());
+    std::copy_n(ob1->norm.begin(), ob1->norm.size(), tobS.norm.begin());
+    std::copy_n(ob1->snorm.begin(), ob1->snorm.size(), tobS.snorm.begin());
+
     memcpy(tobS.vertexarray, ob1->vertexarray, ob1->numsurf * sizeof(tcoord_t) * 3);
     memcpy(tobS.textarray, ob1->textarray, ob1->numvert * sizeof(double) * 2);
-    memcpy(tobS.norm, ob1->norm, ob1->numvert * sizeof(point_t));
-    memcpy(tobS.snorm, ob1->snorm, ob1->numvert * sizeof(point_t));
 
     if (ob1->hasTexture1())
         memcpy(tobS.textarray1, ob1->textarray1, ob1->numvert * sizeof(uv_t));
@@ -4176,14 +4148,12 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
 
     ob1->numsurf = tobS.numsurf;
     ob1->numvert = tobS.numvert;
+    ob1->vertex = tobS.vertex;
+    ob1->norm = tobS.norm;
+    ob1->snorm = tobS.snorm;
+
     free(ob1->vertexarray);
     ob1->vertexarray = tobS.vertexarray;
-    free(ob1->norm);
-    ob1->norm = tobS.norm;
-    free(ob1->snorm);
-    ob1->snorm = tobS.snorm;
-    free(ob1->vertex);
-    ob1->vertex = tobS.vertex;
     free(ob1->textarray);
     ob1->textarray = tobS.textarray;
     free(ob1->textarray1);
