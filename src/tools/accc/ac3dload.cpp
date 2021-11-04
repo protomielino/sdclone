@@ -52,7 +52,6 @@
 #define CREASE   "crease"
 
 ob_t::ob_t() :
-name(nullptr),
 kids(0),
 loc(0.0, 0.0, 0.0),
 attrSurf(0),
@@ -91,7 +90,6 @@ inkids_o(false)
 
 ob_t::~ob_t()
 {
-    free(name);
     free(vertex);
     free(norm);
     free(snorm);
@@ -389,10 +387,7 @@ ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpo
     retob->type = srcobj->type;
 
     /* special handling of name */
-    std::stringstream namestream;
-
-    namestream << srcobj->name << "_s_" << splitid;
-    retob->name = strdup(namestream.str().c_str());
+    retob->name = srcobj->name + "_s_" + std::to_string(splitid);
 
     return retob;
 }
@@ -669,12 +664,12 @@ ob_t* terrainSplitOb(ob_t * object)
     ob_t * tob = NULL;
     ob_t * tob0 = NULL;
 
-    printf("terrain splitting %s\n", object->name);
+    printf("terrain splitting %s\n", object->name.c_str());
     if ((object->x_max - object->x_min) < 2 * distSplit)
         return 0;
     if ((object->y_max - object->y_min) < 2 * distSplit)
         return 0;
-    printf("terrain splitting %s started\n", object->name);
+    printf("terrain splitting %s started\n", object->name.c_str());
 
     int numSurf = object->numsurf;
     std::vector<int> oldSurfToNewObjMap(numSurf, 0);
@@ -711,7 +706,7 @@ ob_t* terrainSplitOb(ob_t * object)
             }
         }
     }
-    printf("found in %s : %d subsurfaces\n", object->name, numNewObjs);
+    printf("found in %s : %d subsurfaces\n", object->name.c_str(), numNewObjs);
 
     for (int curNewObj = 0; curNewObj < numNewObjs; curNewObj++)
     {
@@ -735,9 +730,7 @@ ob_t* terrainSplitOb(ob_t * object)
         tob->type = object->type;
 
         /* special name handling */
-        std::stringstream namestream;
-        namestream << object->name << "__split__" << curNewObj;
-        tob->name = strdup(namestream.str().c_str());
+        tob->name = object->name + "__split__" + std::to_string(curNewObj);
 
         obCopyTextureNames(tob, object);
 
@@ -998,11 +991,9 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
         memcpy(object->next->surfrefs, tmpsurf, numrefs * sizeof(int));
         object->next->numvertice = numvertice;
 
-        if ((object->next->name) == NULL)
+        if (!object->next->hasName())
         {
-            std::stringstream namestream;
-            namestream << tmpname << tmpIndice;
-            object->next->name = strdup(namestream.str().c_str());
+            object->next->name = tmpname + std::to_string(tmpIndice);
 
             tmpIndice++;
         }
@@ -1012,7 +1003,7 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
                 || typeConvertion == _AC3DTOAC3DGROUP
                 || (typeConvertion == _AC3DTOAC3D && extendedTriangles))
         {
-            printf("Computing normals for %s\n", object->next->name);
+            printf("Computing normals for %s\n", object->next->name.c_str());
             computeObjectTriNorm(object->next);
             //smoothObjectTriNorm(object->next );
         }
@@ -1077,7 +1068,7 @@ int doName(char *Line, ob_t *object, std::vector<mat_t> &materials)
     sprintf(name, "%s", name2);
 
     /*sprintf(name,"terrain%d",tmpIndice2++);*/
-    object->next->name = strdup(name);
+    object->next->name = name;
     sprintf(tmpname, "%s", name);
 
     fprintf(stderr, "loading  %s object                             \r", name);
@@ -1402,32 +1393,30 @@ bool isTerrainSplit(ob_t* object)
     if (distSplit <= 0)
         return false;
 
-    if (object->name)
+    if (object->hasName())
     {
         /* denied prefixes */
         const int num_prefixes = 17;
         const char* denied_prefixes[num_prefixes] =
         { "tkrb", "tkmn", "tkrs", "tklb", "brlt", "brrt", "tkls", "t0RB",
-                "t1RB", "t2RB", "tkRS", "t0LB", "t1LB", "t2LB", "tkLS", "BOLt",
-                "BORt" };
+          "t1RB", "t2RB", "tkRS", "t0LB", "t1LB", "t2LB", "tkLS", "BOLt",
+          "BORt" };
 
         for (int i = 0; i < num_prefixes; i++)
         {
-            if (!strnicmp(object->name, denied_prefixes[i],
-                    strlen(denied_prefixes[i])))
+            if (object->nameStartsWith(denied_prefixes[i]))
                 return false;
         }
 
         /* name contains terrain or ground */
-        if (strstr(object->name, "terrain") || strstr(object->name, "TERRAIN")
-                || strstr(object->name, "GROUND")
-                || strstr(object->name, "ground"))
+        if (object->nameHasStr("terrain") || object->nameHasStr("TERRAIN") || 
+            object->nameHasStr("GROUND") || object->nameHasStr("ground"))
             return true;
     }
 
     /* dimension within splitting distance */
-    if (((object->x_max - object->x_min) > 1.5 * distSplit)
-            || ((object->y_max - object->y_min) > 1.5 * distSplit))
+    if (((object->x_max - object->x_min) > 1.5 * distSplit) ||
+        ((object->y_max - object->y_min) > 1.5 * distSplit))
         return true;
 
     return false;
@@ -1446,35 +1435,31 @@ ob_t * splitObjects(ob_t* object)
     ob_t* current_ob = object;
     while(current_ob != NULL)
     {
-        const char* objname = current_ob->name;
-        if(!objname)
-            objname = "";
-
         ob_t* next_ob = current_ob->next; // remember next one, cuz we'll modify current_ob
         ob_t* splitob = NULL;
 
         if (isObjectSplit(current_ob))
         {
             printf("Found in %s, a duplicate coord with different u,v, split is required\n",
-                   objname);
+                   current_ob->name.c_str());
 
             splitob = splitOb(current_ob);
         }
         else if (isTerrainSplit(current_ob))
         {
-            printf("Splitting surfaces of %s\n", objname);
+            printf("Splitting surfaces of %s\n", current_ob->name.c_str());
 
             splitob = terrainSplitOb(current_ob);
         }
 
-        if(splitob != NULL)
+        if (splitob != NULL)
         {
             delete current_ob;
             newob = obAppend(newob, splitob);
         }
         else
         {
-            printf("No split required for %s\n", objname);
+            printf("No split required for %s\n", current_ob->name.c_str());
 
             // Append only the single object, not the whole list.
             // The others will be appended in this function one by one.
@@ -1516,7 +1501,7 @@ int loadAC(const std::string & inputFilename, ob_t** objects, std::vector<mat_t>
     }
 
     current_ob = new ob_t;
-    current_ob->name = strdup("root");
+    current_ob->name = "root";
     *objects = current_ob;
 
     fprintf(stderr, "starting loading ...\n");
@@ -1968,7 +1953,7 @@ int printOb(FILE *ofile, ob_t * object)
             stripifyOb(ofile, object, 0);
     object->saved = true;
     fprintf(ofile, "OBJECT poly\n");
-    fprintf(ofile, "name \"%s\"\n", object->name);
+    fprintf(ofile, "name \"%s\"\n", object->name.c_str());
     if (object->hasMultiTexture())
     {
         multitex = 1;
@@ -2128,7 +2113,7 @@ int foundNear(FILE * ofile, ob_t * object, ob_t *allobjects, double dist, bool p
             tmpob = tmpob->next;
             continue;
         }
-        if (!strnicmp(tmpob->name, "tkmn", 4))
+        if (tmpob->nameStartsWith("tkmn"))
         {
             tmpob = tmpob->next;
             continue;
@@ -2307,7 +2292,7 @@ void smoothTriNorm(ob_t * object)
     double dd;
     double nx, ny, nz;
 
-    printf("Smooth called on %s\n", object->name);
+    printf("Smooth called on %s\n", object->name.c_str());
     tmpob = object;
     while (tmpob != NULL)
     {
@@ -2539,14 +2524,14 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
+        if (!tmpob->hasName())
         {
             tmpob = tmpob->next;
             continue;
         }
         if (!isobjectacar)
         {
-            if (strnicmp(tmpob->name, "tkmn", 4) == 0)
+            if (tmpob->nameStartsWith("tkmn"))
             {
                 tmpob = tmpob->next;
                 numg++;
@@ -2555,12 +2540,7 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
         }
         else
         {
-            if (tmpob->type == "group")
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
-            if (!strcmp(tmpob->name, "root"))
+            if (tmpob->type == "group" || tmpob->name == "root")
             {
                 tmpob = tmpob->next;
                 continue;
@@ -2610,7 +2590,7 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
         }
         tmpob->saved = false;
         printf("name=%s x_min=%.1f y_min=%.1f x_max=%.1f y_max=%.1f\n",
-                tmpob->name, tmpob->x_min, tmpob->y_min, tmpob->x_max,
+                tmpob->name.c_str(), tmpob->x_min, tmpob->y_min, tmpob->x_max,
                 tmpob->y_max);
 
         tmpob = tmpob->next;
@@ -2626,10 +2606,10 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
             tmpob = tmpob->next;
             continue;
         }
-        if (!strnicmp(tmpob->name, "tkmn", 4))
+        if (tmpob->nameStartsWith("tkmn"))
         {
             foundNear(ofile, tmpob, object, far_dist, false);
-            printf("object =%s num kids_o=%d\n", tmpob->name, tmpob->kids_o);
+            printf("object =%s num kids_o=%d\n", tmpob->name.c_str(), tmpob->kids_o);
         }
 
         tmpob = tmpob->next;
@@ -2673,15 +2653,14 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
             }
             if (!isobjectacar)
             {
-                if (!strnicmp(tmpob->name, "tkmn", 4))
+                if (tmpob->nameStartsWith("tkmn"))
                 {
                     fprintf(ofile, "OBJECT group\n");
-                    fprintf(ofile, "name \"%s_g\"\n", tmpob->name);
+                    fprintf(ofile, "name \"%s_g\"\n", tmpob->name.c_str());
                     fprintf(ofile, "kids %d\n", tmpob->kids_o + 1);
                     printOb(ofile, tmpob);
                     foundNear(ofile, tmpob, object, far_dist, true);
-                    printf("object =%s num kids_o=%d\n", tmpob->name,
-                            tmpob->kids_o);
+                    printf("object =%s num kids_o=%d\n", tmpob->name.c_str(), tmpob->kids_o);
                 }
             }
             else
@@ -2690,21 +2669,19 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
                 {
                     if (ordering && !lastpass)
                     {
-                        if (!strcmp(tmpob->name, q))
+                        if (tmpob->name == q)
                         {
                             printOb(ofile, tmpob);
-                            printf("object =%s num kids_o=%d test with %s\n",
-                                    tmpob->name, tmpob->kids_o, q);
+                            printf("object =%s num kids_o=%d test with %s\n", tmpob->name.c_str(), tmpob->kids_o, q);
                         }
                         else
                         {
                             char nameBuf[1024];
                             sprintf(nameBuf, "%ss", q);
-                            if (!strncmp(tmpob->name, nameBuf, strlen(nameBuf)))
+                            if (tmpob->name == nameBuf)
                             {
                                 printOb(ofile, tmpob);
-                                printf("object =%s num kids_o=%d\n",
-                                        tmpob->name, tmpob->kids_o);
+                                printf("object =%s num kids_o=%d\n", tmpob->name.c_str(), tmpob->kids_o);
                             }
 
                         }
@@ -2712,8 +2689,7 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
                     else
                     {
                         printOb(ofile, tmpob);
-                        printf("object =%s num kids_o=%d\n", tmpob->name,
-                                tmpob->kids_o);
+                        printf("object =%s num kids_o=%d\n", tmpob->name.c_str(), tmpob->kids_o);
                     }
                 }
             }
@@ -2860,7 +2836,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
             texnum++;
         }
         printf("name=%s x_min=%.1f y_min=%.1f x_max=%.1f y_max=%.1f\n",
-                tmpob->name, tmpob->x_min, tmpob->y_min, tmpob->x_max,
+                tmpob->name.c_str(), tmpob->x_min, tmpob->y_min, tmpob->x_max,
                 tmpob->y_max);
 
         tmpob = tmpob->next;
@@ -2922,8 +2898,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
         }
         for (int i = 0; i < tmpob->numvert; i++)
         {
-            fprintf(ofile, "v %lf %lf %lf\n", tmpob->vertex[i].x,
-                    tmpob->vertex[i].y, tmpob->vertex[i].z);
+            fprintf(ofile, "v %lf %lf %lf\n", tmpob->vertex[i].x, tmpob->vertex[i].y, tmpob->vertex[i].z);
         }
         tmpob = tmpob->next;
     }
@@ -2953,8 +2928,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
         }
         for (int i = 0; i < tmpob->numvert; i++)
         {
-            fprintf(ofile, "vn %lf %lf %lf\n", tmpob->snorm[i].x,
-                    tmpob->snorm[i].y, tmpob->snorm[i].z);
+            fprintf(ofile, "vn %lf %lf %lf\n", tmpob->snorm[i].x, tmpob->snorm[i].y, tmpob->snorm[i].z);
         }
         tmpob = tmpob->next;
     }
@@ -2970,7 +2944,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
             continue;
         }
         ind = tmpob->numvert;
-        printf("making obj face for %s\n", tmpob->name);
+        printf("making obj face for %s\n", tmpob->name.c_str());
 
         for (int i = 0; i < tmpob->numsurf; i++)
         {
@@ -3017,7 +2991,7 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
 
     if (object->numsurf < 3 && writeit == 0)
         return;
-    fprintf(stderr, "stripifying %s                    \r", object->name);
+    fprintf(stderr, "stripifying %s                    \r", object->name.c_str());
     sprintf(filename, "temp.obj");
     stripeout = fopen(filename, "w");
     for (int i = 0; i < object->numvert; i++)
@@ -3082,8 +3056,8 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
         }
     }
 
-    if (object->name != NULL)
-        printf("name=%s stripnumber =%u\n", object->name, NumStrips);
+    if (object->hasName())
+        printf("name=%s stripnumber =%u\n", object->name.c_str(), NumStrips);
     /* Allocate enough memory for what we just read */
     if ((StripPoint = (unsigned int*)malloc(sizeof(unsigned int) * NumStripPoints)) == 0)
     {
@@ -3295,7 +3269,7 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
     }
 
     printf("strips for %s : number of strips %u : average of points triangles by strips %.2f\n",
-           object->name, NumStrips,
+           object->name.c_str(), NumStrips,
            (float) ((float) tritotal - (float) dege) / ((float) NumStrips));
     if (writeit == 0)
     {
@@ -3303,7 +3277,7 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
         {
             printf("warning: error nb surf= %d != %d  degenerated triangles %d  tritotal=%d for %s\n",
                    tritotal, object->numsurf, dege, tritotal - dege,
-                   object->name);
+                   object->name.c_str());
         }
         free(object->vertexarray);
         object->vertexarray = stripvertexarray;
@@ -3450,7 +3424,7 @@ void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const s
             continue;
         }
         ind = tmpob->numvert;
-        printf("making obj face for %s\n", tmpob->name);
+        printf("making obj face for %s\n", tmpob->name.c_str());
 
         for (int i = 0; i < tmpob->numsurf; i++)
         {
@@ -3812,7 +3786,7 @@ void normalMap(ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        printf("normalMap : handling %s\n", tmpob->name);
+        printf("normalMap : handling %s\n", tmpob->name.c_str());
         for (int i = 0; i < tmpob->numvert; i++)
         {
             tmpob->textarray[i].u = (tmpob->vertex[i].x - x_min) / (x_max - x_min);
@@ -3870,7 +3844,7 @@ void normalMap01(ob_t * object)
             continue;
         }
         tmpob->textarray3 = (uv_t *) malloc(sizeof(uv_t) * tmpob->numvert);
-        printf("normalMap : handling %s\n", tmpob->name);
+        printf("normalMap : handling %s\n", tmpob->name.c_str());
         for (int i = 0; i < tmpob->numvert; i++)
         {
             tmpob->textarray3[i].u = (tmpob->vertex[i].x - x_min) / (x_max - x_min) - 0.5;
@@ -3942,22 +3916,22 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
     tmpob = object;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
+        if (!tmpob->hasName())
         {
             tmpob = tmpob->next;
             continue;
         }
-        if (!strcmp(tmpob->name, "world") || (tmpob->type == "world" && tmpob->numvert == 0 && tmpob->numsurf == 0))
+        if (tmpob->name == "world" || (tmpob->type == "world" && tmpob->numvert == 0 && tmpob->numsurf == 0))
         {
             tmpob = tmpob->next;
             continue;
         }
-        if (!strcmp(tmpob->name, "root"))
+        if (tmpob->name == "root")
         {
             tmpob = tmpob->next;
             continue;
         }
-        if (!stricmp(tmpob->name, "group") || (tmpob->type == "group" && tmpob->numvert == 0 && tmpob->numsurf == 0))
+        if (tmpob->name == "group" || (tmpob->type == "group" && tmpob->numvert == 0 && tmpob->numsurf == 0))
         {
             tmpob = tmpob->next;
             continue;
@@ -4034,7 +4008,7 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
                 texnum++;
             }
             printf("name=%s x_min=%.1f y_min=%.1f x_max=%.1f y_max=%.1f\n",
-                    tmpob->name, tmpob->x_min, tmpob->y_min, tmpob->x_max,
+                    tmpob->name.c_str(), tmpob->x_min, tmpob->y_min, tmpob->x_max,
                     tmpob->y_max);
 
             tmpob = tmpob->next;
@@ -4062,28 +4036,28 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
             {
                 if (ordering && !lastpass)
                 {
-                    if (!strcmp(tmpob->name, q))
+                    if (tmpob->name == q)
                     {
                         printOb(ofile, tmpob);
-                        printf("object =%s num kids_o=%d test with %s\n",
-                                tmpob->name, tmpob->kids_o, q);
+                        printf("object =%s num kids_o=%d test with %s\n", tmpob->name.c_str(),
+                               tmpob->kids_o, q);
                     }
                     else
                     {
-                        char nameBuf[1024];
-                        sprintf(nameBuf, "%ss", q);
-                        if (!strncmp(tmpob->name, nameBuf, strlen(nameBuf)))
+                        std::string nameBuf(q);
+                        nameBuf += 's';
+                        if (tmpob->name == nameBuf)
                         {
                             printOb(ofile, tmpob);
-                            printf("object =%s num kids_o=%d\n", tmpob->name,
-                                    tmpob->kids_o);
+                            printf("object =%s num kids_o=%d\n", tmpob->name.c_str(),
+                                   tmpob->kids_o);
                         }
                     }
                 }
                 else
                 {
                     printOb(ofile, tmpob);
-                    printf("object =%s num kids_o=%d\n", tmpob->name,
+                    printf("object =%s num kids_o=%d\n", tmpob->name.c_str(),
                             tmpob->kids_o);
                 }
             }
@@ -4105,7 +4079,7 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     int n = 0;
     int numtri = (ob1)->numsurf + (ob2)->numsurf;
     ;
-    printf("merging %s with %s  tri=%d\n", ob1->name, ob2->name, numtri);
+    printf("merging %s with %s  tri=%d\n", ob1->name.c_str(), ob2->name.c_str(), numtri);
     memset(oldva1, -1, sizeof(oldva1));
     memset(oldva2, -1, sizeof(oldva2));
     tobS.numsurf = ob1->numsurf;
@@ -4238,25 +4212,20 @@ int mergeSplitted(ob_t **object)
     {
         if (isobjectacar)
         {
-            if (tob->name == NULL)
-            {
-                tob = tob->next;
-                continue;
-            }
-            if (strstr(tob->name, "_s_") == NULL)
+            if (!tob->hasName() || tob->nameHasStr("_s_"))
             {
                 tob = tob->next;
                 continue;
             }
         }
-        else if (strstr(tob->name, "__split__") == NULL)
+        else if (tob->nameHasStr("__split__"))
         {
             tob = tob->next;
             continue;
         }
         tobP = tob;
         tob0 = tob->next;
-        sprintf(nameS, "%s", tob->name);
+        sprintf(nameS, "%s", tob->name.c_str());
         if (isobjectacar)
         {
             p = strstr(nameS, "_s_");
@@ -4280,20 +4249,14 @@ int mergeSplitted(ob_t **object)
 #endif
         while (tob0)
         {
-            if (tob0->canSkip())
-            {
-                tobP = tob0;
-                tob0 = tob0->next;
-                continue;
-            }
-            if (tob0->type == "group")
+            if (tob0->canSkip() || tob0->type == "group")
             {
                 tobP = tob0;
                 tob0 = tob0->next;
                 continue;
             }
 
-            if (!strnicmp(tob0->name, nameS, strlen(nameS)))
+            if (tob0->nameStartsWith(nameS))
             {
                 ob_t *oo;
                 mergeObject(tob, tob0, nameS);
@@ -4315,7 +4278,7 @@ int mergeSplitted(ob_t **object)
             tob = tob->next;
             continue;
         }
-        printf("need merge for %s : %d objects found\n", tob->name, k + 1);
+        printf("need merge for %s : %d objects found\n", tob->name.c_str(), k + 1);
 
         /* we know that nameS has k+1 objects and need to be merged */
 
@@ -4335,10 +4298,10 @@ int mergeSplitted(ob_t **object)
         tobS->textarray=(double *) malloc(sizeof(double)* numtri*2*3);
         tobS->attrSurf=tob->attrSurf;
         tobS->attrMat=tob->attrMat;
-        tobS->name=(char *) malloc(strlen(nameS)+1);
+        tobS->name=nameS;
         tobS->texture=nameS;
-        tobS->type= tob->type ? strdup(tob->type) : NULL;
-        tobS->data=strdup(tob->data);
+        tobS->type= tob->type;
+        tobS->data=tob->data;
 
         memcpy(tobS->vertex, tob->vertex,tob->numvert*sizeof(point_t));
         memcpy(tobS->vertexarray, tob->vertexarray,tob->numsurf*sizeof(tcoord_t ));

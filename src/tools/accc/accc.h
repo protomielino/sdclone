@@ -163,7 +163,7 @@ struct ob_t
     ob_t();
     ~ob_t();
 
-    char * name;
+    std::string name;
     std::string type;
     int kids;
     point_t loc;
@@ -220,10 +220,10 @@ struct ob_t
     int kids_o;
     bool inkids_o;
 
-    bool canSkip() const
-    {
-        return name == NULL || !strcmp(name, "root") || !strcmp(name, "world");
-    }
+    bool canSkip() const { return name == "root" || name == "world"; }
+    bool hasName() const { return !name.empty(); }
+    bool nameStartsWith(const char * str) const { return !strnicmp(name.c_str(), str, strlen(str)); }
+    bool nameHasStr(const char* str) const { return name.find(str) != std::string::npos; }
     bool hasTexture() const { return !texture.empty(); }
     bool hasTexture1() const { return !texture1.empty(); }
     bool hasTexture2() const { return !texture2.empty(); }

@@ -172,7 +172,7 @@ void loadAndGroup(const std::string &OutputFileName)
             tmpob = tmpob->next;
             continue;
         }
-        if (!strnicmp(tmpob->name, "tkmn", 4) && tmpob->type != "group")
+        if (tmpob->nameStartsWith("tkmn") && tmpob->type != "group")
         {
             tmpob = tmpob->next;
             num_tkmn++;
@@ -204,12 +204,12 @@ void loadAndGroup(const std::string &OutputFileName)
             tmpob = tmpob->next;
             continue;
         }
-        if (!strnicmp(tmpob->name, "tkmn", 4) && tmpob->type != "group")
+        if (tmpob->nameStartsWith("tkmn") && tmpob->type != "group")
         {
             array_groups[i].tkmn = tmpob;
             array_groups[i].numkids = 1;
             array_groups[i].name = tmpob->name;
-            array_groups[i].tkmnlabel = atoi(tmpob->name + 4);
+            array_groups[i].tkmnlabel = atoi(tmpob->name.c_str() + 4);
             tmpob = tmpob->next;
             i++;
             continue;
@@ -221,12 +221,7 @@ void loadAndGroup(const std::string &OutputFileName)
     tmpob = ob0;
     while (tmpob != NULL)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strnicmp(tmpob->name, "tkmn", 4))
+        if (tmpob->canSkip() || tmpob->nameStartsWith("tkmn"))
         {
             tmpob = tmpob->next;
             continue;
@@ -242,20 +237,20 @@ void loadAndGroup(const std::string &OutputFileName)
                 tmpob->dist_min = dist;
                 good_group = i;
             }
-            if (!strnicmp(tmpob->name, "t0RB", 4)
-                    || !strnicmp(tmpob->name, "t1RB", 4)
-                    || !strnicmp(tmpob->name, "t2RB", 4)
-                    || !strnicmp(tmpob->name, "tkRS", 4)
-                    || !strnicmp(tmpob->name, "t0LB", 4)
-                    || !strnicmp(tmpob->name, "t1LB", 4)
-                    || !strnicmp(tmpob->name, "t2LB", 4)
-                    || !strnicmp(tmpob->name, "tkLS", 4)
-                    || !strnicmp(tmpob->name, "BOLt", 4)
-                    || !strnicmp(tmpob->name, "BORt", 4))
+            if (tmpob->nameStartsWith("t0RB") ||
+                tmpob->nameStartsWith("t1RB") ||
+                tmpob->nameStartsWith("t2RB") ||
+                tmpob->nameStartsWith("tkRS") ||
+                tmpob->nameStartsWith("t0LB") ||
+                tmpob->nameStartsWith("t1LB") ||
+                tmpob->nameStartsWith("t2LB") ||
+                tmpob->nameStartsWith("tkLS") ||
+                tmpob->nameStartsWith("BOLt") ||
+                tmpob->nameStartsWith("BORt"))
             {
-                if (atoi(tmpob->name + 4) == array_groups[i].tkmnlabel)
+                if (atoi(tmpob->name.c_str() + 4) == array_groups[i].tkmnlabel)
                 {
-                    printf("object %s is forced in group %d\n", tmpob->name,
+                    printf("object %s is forced in group %d\n", tmpob->name.c_str(),
                             array_groups[i].tkmnlabel);
                     good_group = i;
                     break;
@@ -264,11 +259,11 @@ void loadAndGroup(const std::string &OutputFileName)
         }
         if (good_group == -1)
         {
-            printf("an object in no group %s\n", tmpob->name);
+            printf("an object in no group %s\n", tmpob->name.c_str());
             tmpob = tmpob->next;
             continue;
         }
-        printf("object %s is going to group %s  at dist=%f\n", tmpob->name,
+        printf("object %s is going to group %s  at dist=%f\n", tmpob->name.c_str(),
                 array_groups[good_group].name.c_str(), sqrt(tmpob->dist_min));
         if (array_groups[good_group].kids == NULL)
         {
@@ -305,47 +300,47 @@ void loadAndGroup(const std::string &OutputFileName)
         while (tmpob != NULL)
         {
             tmpobnext = tmpob->next;
-            if (tmpob->name == NULL)
+            if (!tmpob->hasName())
             {
                 tmpob = tmpobnext;
                 continue;
             }
-            if (!strnicmp(tmpob->name, "tkrb", 4))
+            if (tmpob->nameStartsWith("tkrb"))
             {
                 array_groups[i].numkids--;
                 array_groups[i].numkids0++;
                 INSERTINGROUP(array_groups[i].kids0, tmpob);
-                printf("inserting %s in group 0 of %s\n", tmpob->name,
+                printf("inserting %s in group 0 of %s\n", tmpob->name.c_str(),
                         array_groups[i].name.c_str());
                 tmpob = tmpobnext;
                 continue;
             }
-            if (!strnicmp(tmpob->name, "tklb", 4))
+            if (tmpob->nameStartsWith("tklb"))
             {
                 array_groups[i].numkids--;
                 array_groups[i].numkids0++;
                 INSERTINGROUP(array_groups[i].kids0, tmpob);
-                printf("inserting %s in group 0 of %s\n", tmpob->name,
+                printf("inserting %s in group 0 of %s\n", tmpob->name.c_str(),
                         array_groups[i].name.c_str());
                 tmpob = tmpobnext;
                 continue;
             }
-            if (!strnicmp(tmpob->name, "tkrs", 4))
+            if (tmpob->nameStartsWith("tkrs"))
             {
                 array_groups[i].numkids--;
                 array_groups[i].numkids0++;
                 INSERTINGROUP(array_groups[i].kids0, tmpob);
-                printf("inserting %s in group 0 of %s\n", tmpob->name,
+                printf("inserting %s in group 0 of %s\n", tmpob->name.c_str(),
                         array_groups[i].name.c_str());
                 tmpob = tmpobnext;
                 continue;
             }
-            if (!strnicmp(tmpob->name, "tkls", 4))
+            if (tmpob->nameStartsWith("tkls"))
             {
                 array_groups[i].numkids--;
                 array_groups[i].numkids0++;
                 INSERTINGROUP(array_groups[i].kids0, tmpob);
-                printf("inserting %s in group 0 of %s\n", tmpob->name,
+                printf("inserting %s in group 0 of %s\n", tmpob->name.c_str(),
                         array_groups[i].name.c_str());
                 tmpob = tmpobnext;
                 continue;
@@ -356,7 +351,7 @@ void loadAndGroup(const std::string &OutputFileName)
                 array_groups[i].numkids--;
                 array_groups[i].numkids1++;
                 INSERTINGROUP(array_groups[i].kids1, tmpob);
-                printf("inserting %s in group 1 of %s\n", tmpob->name,
+                printf("inserting %s in group 1 of %s\n", tmpob->name.c_str(),
                         array_groups[i].name.c_str());
             }
             else if (tmpob->dist_min < d2 * d2)
@@ -364,7 +359,7 @@ void loadAndGroup(const std::string &OutputFileName)
                 array_groups[i].numkids--;
                 array_groups[i].numkids2++;
                 INSERTINGROUP(array_groups[i].kids2, tmpob);
-                printf("inserting %s in group 2 of %s\n", tmpob->name,
+                printf("inserting %s in group 2 of %s\n", tmpob->name.c_str(),
                         array_groups[i].name.c_str());
             }
             else if (tmpob->dist_min < d3 * d3)
@@ -372,12 +367,12 @@ void loadAndGroup(const std::string &OutputFileName)
                 array_groups[i].numkids--;
                 array_groups[i].numkids3++;
                 INSERTINGROUP(array_groups[i].kids3, tmpob);
-                printf("inserting %s in group 3 of %s\n", tmpob->name,
+                printf("inserting %s in group 3 of %s\n", tmpob->name.c_str(),
                         array_groups[i].name.c_str());
             }
             else
             {
-                printf("cannot insert object %s in group %s\n", tmpob->name,
+                printf("cannot insert object %s in group %s\n", tmpob->name.c_str(),
                         array_groups[i].name.c_str());
             }
             /*if (!strnicmp(tmpob->name, "tk",2)){
@@ -437,7 +432,7 @@ void loadAndGroup(const std::string &OutputFileName)
     {
         int numg = 0;
         fprintf(ofile, "OBJECT group\n");
-        fprintf(ofile, "name \"%s_g\"\n", array_groups[i].tkmn->name);
+        fprintf(ofile, "name \"%s_g\"\n", array_groups[i].tkmn->name.c_str());
         numg = (array_groups[i].kids3 == 0 ? 0 : 1)
                 + (array_groups[i].kids2 == 0 ? 0 : 1)
                 + (array_groups[i].kids1 == 0 ? 0 : 1) + 1;
@@ -447,15 +442,15 @@ void loadAndGroup(const std::string &OutputFileName)
         if (array_groups[i].numkids3 > 0)
         {
             fprintf(ofile, "OBJECT group\n");
-            fprintf(ofile, "name \"___%s_gl3\"\n", array_groups[i].tkmn->name);
+            fprintf(ofile, "name \"___%s_gl3\"\n", array_groups[i].tkmn->name.c_str());
             fprintf(ofile, "kids %d\n", array_groups[i].numkids3);
-            printf("writing group: ___%s_gl3\n", array_groups[i].tkmn->name);
+            printf("writing group: ___%s_gl3\n", array_groups[i].tkmn->name.c_str());
             tmpob = array_groups[i].kids3;
             while (tmpob != NULL)
             {
 
                 printOb(ofile, tmpob);
-                printf("%s\n", tmpob->name);
+                printf("%s\n", tmpob->name.c_str());
                 tmpob = tmpob->next;
             }
         }
@@ -464,42 +459,42 @@ void loadAndGroup(const std::string &OutputFileName)
         {
             fprintf(ofile, "OBJECT group\n");
             fprintf(ofile, "name \"%%___%s_gl2\"\n",
-                    array_groups[i].tkmn->name);
+                    array_groups[i].tkmn->name.c_str());
             fprintf(ofile, "kids %d\n", array_groups[i].numkids2);
-            printf("writing group: ___%s_gl2\n", array_groups[i].tkmn->name);
+            printf("writing group: ___%s_gl2\n", array_groups[i].tkmn->name.c_str());
             tmpob = array_groups[i].kids2;
             while (tmpob != NULL)
             {
                 printOb(ofile, tmpob);
-                printf("%s\n", tmpob->name);
+                printf("%s\n", tmpob->name.c_str());
                 tmpob = tmpob->next;
             }
         }
         if (array_groups[i].numkids1 > 0)
         {
             fprintf(ofile, "OBJECT group\n");
-            fprintf(ofile, "name \"___%s_gl1\"\n", array_groups[i].tkmn->name);
+            fprintf(ofile, "name \"___%s_gl1\"\n", array_groups[i].tkmn->name.c_str());
             fprintf(ofile, "kids %d\n", array_groups[i].numkids1);
-            printf("writing group: ___%s_gl1\n", array_groups[i].tkmn->name);
+            printf("writing group: ___%s_gl1\n", array_groups[i].tkmn->name.c_str());
             tmpob = array_groups[i].kids1;
             while (tmpob != NULL)
             {
                 printOb(ofile, tmpob);
-                printf("%s\n", tmpob->name);
+                printf("%s\n", tmpob->name.c_str());
                 tmpob = tmpob->next;
             }
         }
 
         /* there is always a group 0 with the tkmn at leat */
         fprintf(ofile, "OBJECT group\n");
-        fprintf(ofile, "name \"___%s_gl0\"\n", array_groups[i].tkmn->name);
+        fprintf(ofile, "name \"___%s_gl0\"\n", array_groups[i].tkmn->name.c_str());
         fprintf(ofile, "kids %d\n", array_groups[i].numkids0 + 1);
-        printf("writing group: ___%s_gl0\n", array_groups[i].tkmn->name);
+        printf("writing group: ___%s_gl0\n", array_groups[i].tkmn->name.c_str());
         tmpob = array_groups[i].kids0;
         while (tmpob != NULL)
         {
             printOb(ofile, tmpob);
-            printf("%s\n", tmpob->name);
+            printf("%s\n", tmpob->name.c_str());
             tmpob = tmpob->next;
         }
         printOb(ofile, array_groups[i].tkmn);
@@ -542,7 +537,7 @@ void reorder(ob_t * ob, ob_t * ob2, uv_t *textarray, tcoord_t *vertexarray)
             }
         }
     }
-    printf("%s : reordered %d points\n", ob->name, k);
+    printf("%s : reordered %d points\n", ob->name.c_str(), k);
     return;
 }
 
@@ -637,7 +632,7 @@ bool notInSameOrder(const ob_t * ob1, const ob_t * ob2)
 
 bool isSamePoly(const ob_t * ob1, const ob_t * ob2)
 {
-    return stricmp(ob1->name, ob2->name) == 0 &&
+    return stricmp(ob1->name.c_str(), ob2->name.c_str()) == 0 &&
            ob1->type == ob2->type &&
            ob1->numvert == ob2->numvert && 
            ob1->numsurf == ob2->numsurf;
@@ -656,9 +651,9 @@ void collapseMapTiledTextures(ob_t * tarob, ob_t * tiledob)
                 copyTextureChannel(tarob, curtiledob, 1);
                 if (notInSameOrder(tarob, curtiledob))
                 {
-                    printf("%s : points not in the same order, reordering ...\n", tarob->name);
+                    printf("%s : points not in the same order, reordering ...\n", tarob->name.c_str());
                     reorder(tarob, curtiledob, tarob->textarray1, tarob->vertexarray1);
-                    printf("%s : reordering ... done\n", tarob->name);
+                    printf("%s : reordering ... done\n", tarob->name.c_str());
                 }
                 break;
             }
@@ -681,9 +676,9 @@ void collapseSkidsGrassTextures(ob_t * tarob, ob_t * skidsob)
 
                 if (notInSameOrder(tarob, curskidsob))
                 {
-                    printf("%s : points not in the same order\n", tarob->name);
+                    printf("%s : points not in the same order\n", tarob->name.c_str());
                     reorder(tarob, curskidsob, tarob->textarray2, tarob->vertexarray2);
-                    printf("%s : reordering ... done\n", tarob->name);
+                    printf("%s : reordering ... done\n", tarob->name.c_str());
                 }
                 break;
             }
@@ -705,9 +700,9 @@ void collapseShadowTextures(ob_t * tarob, ob_t * shadob)
                 copyTextureChannel(tarob, curshadob, 3);
                 if (notInSameOrder(tarob, curshadob))
                 {
-                    printf("%s : points not in the same order\n", tarob->name);
+                    printf("%s : points not in the same order\n", tarob->name.c_str());
                     reorder(tarob, curshadob, tarob->textarray3, tarob->vertexarray3);
-                    printf("%s : reordering ... done\n", tarob->name);
+                    printf("%s : reordering ... done\n", tarob->name.c_str());
                 }
                 break;
             }
