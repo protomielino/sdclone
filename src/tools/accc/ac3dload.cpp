@@ -26,13 +26,11 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <cstring>
-#include <sstream>
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
 #include <math.h>
 #include <float.h>
-#include "portability.h"
 #include "accc.h"
 
 #define AC3D     "AC3Db"

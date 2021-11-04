@@ -30,7 +30,6 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#include <portability.h>
 #include "accc.h"
 
 void reorder(ob_t * ob, ob_t * ob2, uv_t *textarray, tcoord_t *vertexarray);

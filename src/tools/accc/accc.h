@@ -28,6 +28,16 @@
 #include <string>
 #include <vector>
 
+#include "portability.h"
+
+#ifndef WIN32
+#define stricmp strcasecmp
+#define strnicmp strncasecmp
+#else
+#include <windows.h>
+#include <float.h>
+#endif
+
 extern char * fileL0;
 extern char * fileL1;
 extern char * fileL2;
@@ -451,15 +461,6 @@ int printOb(FILE *ofile, ob_t *object);
 void printMaterials(FILE *file, const std::vector<mat_t> &materials);
 
 void smoothTriNorm(ob_t *object);
-
-#ifndef WIN32
-#define stricmp strcasecmp
-#define strnicmp strncasecmp
-#else
-#include <windows.h>
-#include <float.h>
-#endif
-
 
 #endif /* _ACCC_H_ */ 
 

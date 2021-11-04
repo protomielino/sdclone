@@ -29,9 +29,8 @@
 #define _GNU_SOURCE
 #endif
 
-#include "portability.h"
-
 #include "accc.h"
+
 /* -g  g-track-2.ac -l0 g2.ac -d3 200900 -d2 200 -d1 100 -S 200 >t */
 /* +es 80 p-gt1.ac porsche-gt1.ac>t */
 double distSplit = 0;
