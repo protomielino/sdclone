@@ -4076,8 +4076,8 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
 ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
 {
     ob_t tobS;
-    int oldva1[10000];
-    int oldva2[10000];
+    static int oldva1[10000];
+    static int oldva2[10000];
     int n = 0;
     int numtri = (ob1)->numsurf + (ob2)->numsurf;
     ;
