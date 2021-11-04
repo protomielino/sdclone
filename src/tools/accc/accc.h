@@ -222,7 +222,6 @@ struct ob_t
     std::vector<tcoord_t> vertexarray1;
     std::vector<tcoord_t> vertexarray2;
     std::vector<tcoord_t> vertexarray3;
-    int * va;
     /* Holds the texture coordinates of the vertices stored in "vertex" array
      * size: numvertice * 2
      */

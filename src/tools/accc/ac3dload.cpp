@@ -63,7 +63,6 @@ texrep_y(0.0),
 numvert(0),
 numsurf(0),
 numvertice(0),
-va(nullptr),
 next(nullptr),
 x_min(0.0),
 y_min(0.0),
@@ -80,7 +79,6 @@ inkids_o(false)
 
 ob_t::~ob_t()
 {
-    free(va);
 }
 
 ob_t * obAppend(ob_t * destob, ob_t * srcob)
