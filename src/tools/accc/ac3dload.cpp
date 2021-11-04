@@ -33,6 +33,10 @@
 #include <float.h>
 #include "accc.h"
 
+#if _MSC_VER && _MSC_VER < 1700
+#define to_string(x) to_string(static_cast<long long>(x))
+#endif
+
 #define AC3D     "AC3Db"
 #define MATERIAL "MATERIAL"
 #define OBJECT   "OBJECT"
