@@ -64,7 +64,6 @@ numvert(0),
 numsurf(0),
 numvertice(0),
 va(nullptr),
-surfrefs(nullptr),
 next(nullptr),
 x_min(0.0),
 y_min(0.0),
@@ -82,7 +81,6 @@ inkids_o(false)
 ob_t::~ob_t()
 {
     free(va);
-    free(surfrefs);
 }
 
 ob_t * obAppend(ob_t * destob, ob_t * srcob)
@@ -886,7 +884,7 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
     {
         object->next->vertexarray.resize(numrefstotal);
         object->next->textarray.resize(numrefstotal);
-        object->next->surfrefs = (int *) malloc(sizeof(int) * numrefs);
+        object->next->surfrefs.resize(numrefs);
         object->next->norm.assign(numrefstotal * 3, point_t(0.0, 0.0, 0.0));
         object->next->snorm.assign(numrefstotal * 3, point_t(0.0, 0.0, 0.0));
         object->next->attrSurf = attrSurf;
@@ -899,7 +897,9 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
             object->next->textarray[i] = tmptexa[i];
         }
 
-        memcpy(object->next->surfrefs, tmpsurf, numrefs * sizeof(int));
+        for (int i = 0; i < numrefs; i++)
+            object->next->surfrefs[i] = tmpsurf[i];
+
         object->next->numvertice = numvertice;
 
         if (!object->next->hasName())

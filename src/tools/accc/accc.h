@@ -230,7 +230,7 @@ struct ob_t
     std::vector<uv_t> textarray1;
     std::vector<uv_t> textarray2;
     std::vector<uv_t> textarray3;
-    int * surfrefs;
+    std::vector<int> surfrefs;
     ob_t * next;
     double x_min;
     double y_min;
