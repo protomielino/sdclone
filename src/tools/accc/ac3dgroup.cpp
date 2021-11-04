@@ -499,6 +499,8 @@ void loadAndGroup(const std::string &OutputFileName)
         printOb(ofile, array_groups[i].tkmn);
     }
 
+    fclose(ofile);
+
     delete ob0;
     delete ob1;
     delete ob2;
