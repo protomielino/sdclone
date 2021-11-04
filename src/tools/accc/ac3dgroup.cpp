@@ -507,7 +507,7 @@ void loadAndGroup(const std::string &OutputFileName)
     return;
 }
 
-void reorder(ob_t * ob, ob_t * ob2, uv_t *textarray, tcoord_t *vertexarray)
+void reorder(ob_t * ob, ob_t * ob2, std::vector<uv_t> & textarray, std::vector<tcoord_t> & vertexarray)
 {
     int k = 0;
 
@@ -592,26 +592,20 @@ void copyTextureChannel(ob_t * destob, ob_t * srcob, int channel)
     if (channel == 1)
     {
         destob->texture1 = srcob->texture;
-        destob->textarray1 = (uv_t*)malloc(sizeof(uv_t) * srcob->numvertice);
-        memcpy(destob->textarray1, srcob->textarray, sizeof(uv_t) * srcob->numvertice);
-        destob->vertexarray1 = (tcoord_t*)malloc(sizeof(tcoord_t) * srcob->numsurf * 3);
-        memcpy(destob->vertexarray1, srcob->vertexarray, sizeof(tcoord_t) * srcob->numsurf * 3);
+        destob->textarray1 = srcob->textarray;
+        destob->vertexarray1 = srcob->vertexarray;
     }
     else if (channel == 2)
     {
         destob->texture2 = srcob->texture;
-        destob->textarray2 = (uv_t*)malloc(sizeof(uv_t) * srcob->numvertice);
-        memcpy(destob->textarray2, srcob->textarray, sizeof(uv_t) * srcob->numvertice);
-        destob->vertexarray2 = (tcoord_t*)malloc(sizeof(tcoord_t) * srcob->numsurf * 3);
-        memcpy(destob->vertexarray2, srcob->vertexarray, sizeof(tcoord_t) * srcob->numsurf * 3);
+        destob->textarray2 = srcob->textarray;
+        destob->vertexarray2 = srcob->vertexarray;
     }
     else if (channel == 3)
     {
         destob->texture3 = srcob->texture;
-        destob->textarray3 = (uv_t*)malloc(sizeof(uv_t) * srcob->numvertice);
-        memcpy(destob->textarray3, srcob->textarray, sizeof(uv_t) * srcob->numvertice);
-        destob->vertexarray3 = (tcoord_t*)malloc(sizeof(tcoord_t) * srcob->numsurf * 3);
-        memcpy(destob->vertexarray3, srcob->vertexarray, sizeof(tcoord_t) * srcob->numsurf * 3);
+        destob->textarray3 = srcob->textarray;
+        destob->vertexarray3 = srcob->vertexarray;
     }
 }
 

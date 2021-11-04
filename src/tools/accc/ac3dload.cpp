@@ -63,15 +63,7 @@ texrep_y(0.0),
 numvert(0),
 numsurf(0),
 numvertice(0),
-vertexarray(nullptr),
-vertexarray1(nullptr),
-vertexarray2(nullptr),
-vertexarray3(nullptr),
 va(nullptr),
-textarray(nullptr),
-textarray1(nullptr),
-textarray2(nullptr),
-textarray3(nullptr),
 surfrefs(nullptr),
 next(nullptr),
 x_min(0.0),
@@ -89,15 +81,7 @@ inkids_o(false)
 
 ob_t::~ob_t()
 {
-    free(vertexarray);
-    free(vertexarray1);
-    free(vertexarray2);
-    free(vertexarray3);
     free(va);
-    free(textarray);
-    free(textarray1);
-    free(textarray2);
-    free(textarray3);
     free(surfrefs);
 }
 
@@ -142,38 +126,34 @@ void obInitSpacialExtend(ob_t * ob)
     }
 }
 
-/** Helper method for obCreateTextArrays().
- *  Copies the u/v coords of the given texcoord into the given textarray, based
- *  on texcoord->indice property. */
-void copyTexCoordToTextArray(uv_t * textarray, tcoord_t * texcoord)
-{
-    textarray[texcoord->indice] = texcoord->uv;
-}
-
 void obCreateTextArrays(ob_t * ob)
 {
-    const int numEls = ob->numvertice;
-    const int elSize = sizeof(uv_t);
-
-    if(ob->vertexarray)
-        ob->textarray = (uv_t *) calloc(numEls, elSize);
-    if(ob->vertexarray1)
-        ob->textarray1 = (uv_t*) calloc(numEls, elSize);
-    if(ob->vertexarray2)
-        ob->textarray2 = (uv_t*) calloc(numEls, elSize);
-    if(ob->vertexarray3)
-        ob->textarray3 = (uv_t*) calloc(numEls, elSize);
-
-    for (int i = 0; i < ob->numsurf * 3; i++)
+    if (!ob->vertexarray.empty())
     {
-        if (ob->vertexarray)
-            copyTexCoordToTextArray(ob->textarray, &ob->vertexarray[i]);
-        if(ob->vertexarray1)
-            copyTexCoordToTextArray(ob->textarray1, &ob->vertexarray1[i]);
-        if(ob->vertexarray2)
-            copyTexCoordToTextArray(ob->textarray2, &ob->vertexarray2[i]);
-        if(ob->vertexarray3)
-            copyTexCoordToTextArray(ob->textarray3, &ob->vertexarray3[i]);
+        ob->textarray.resize(ob->numvertice);
+        for (int i = 0; i < ob->numsurf * 3; i++)
+            ob->textarray[ob->vertexarray[i].indice] = ob->vertexarray[i].uv;
+    }
+
+    if (!ob->vertexarray1.empty())
+    {
+        ob->textarray1.resize(ob->numvertice);
+        for (int i = 0; i < ob->numsurf * 3; i++)
+            ob->textarray1[ob->vertexarray1[i].indice] = ob->vertexarray1[i].uv;
+    }
+
+    if (!ob->vertexarray2.empty())
+    {
+        ob->textarray2.resize(ob->numvertice);
+        for (int i = 0; i < ob->numsurf * 3; i++)
+            ob->textarray2[ob->vertexarray2[i].indice] = ob->vertexarray2[i].uv;
+    }
+
+    if (!ob->vertexarray3.empty())
+    {
+        ob->textarray3.resize(ob->numvertice);
+        for (int i = 0; i < ob->numsurf * 3; i++)
+            ob->textarray3[ob->vertexarray3[i].indice] = ob->vertexarray3[i].uv;
     }
 }
 
@@ -182,16 +162,16 @@ void obCreateVertexArrays(ob_t * ob)
     int numEls = ob->numsurf * 3;
 
     if (ob->hasTexture())
-        ob->vertexarray = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
+        ob->vertexarray.resize(numEls);
 
     if (ob->hasTexture1())
-        ob->vertexarray1 = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
+        ob->vertexarray1.resize(numEls);
 
     if (ob->hasTexture2())
-        ob->vertexarray2 = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
+        ob->vertexarray2.resize(numEls);
 
     if (ob->hasTexture3())
-        ob->vertexarray3 = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
+        ob->vertexarray3.resize(numEls);
 }
 
 void obCopyTextureNames(ob_t * destob, const ob_t * srcob)
@@ -206,11 +186,11 @@ void obSetVertexArraysIndex(ob_t * ob, int vaIdx, int newIndex)
 {
     ob->vertexarray[vaIdx].indice = newIndex;
 
-    if(ob->vertexarray1)
+    if (!ob->vertexarray1.empty())
         ob->vertexarray1[vaIdx].indice = newIndex;
-    if(ob->vertexarray2)
+    if (!ob->vertexarray2.empty())
         ob->vertexarray2[vaIdx].indice = newIndex;
-    if(ob->vertexarray3)
+    if (!ob->vertexarray3.empty())
         ob->vertexarray3[vaIdx].indice = newIndex;
 }
 
@@ -312,11 +292,11 @@ void copyVertexArraysSurface(ob_t * destob, int destSurfIdx, ob_t * srcob, int s
     {
         destob->vertexarray[firstDestIdx + off] = srcob->vertexarray[firstSrcIdx + off];
 
-        if (srcob->vertexarray1)
+        if (!srcob->vertexarray1.empty())
             destob->vertexarray1[firstDestIdx + off] = srcob->vertexarray1[firstSrcIdx + off];
-        if (srcob->vertexarray2)
+        if (!srcob->vertexarray2.empty())
             destob->vertexarray2[firstDestIdx + off] = srcob->vertexarray2[firstSrcIdx + off];
-        if (srcob->vertexarray3)
+        if (!srcob->vertexarray3.empty())
             destob->vertexarray3[firstDestIdx + off] = srcob->vertexarray3[firstSrcIdx + off];
     }
 }
@@ -369,14 +349,19 @@ ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpo
     retob->vertex = tmpob->vertex;
     retob->norm = tmpob->norm;
     retob->snorm = tmpob->snorm;
-
-    /* assign data */
-    createTexChannelArrays(retob, tmpob);
+    retob->vertexarray = tmpob->vertexarray;
+    retob->textarray = tmpob->textarray;
+    retob->vertexarray1 = tmpob->vertexarray1;
+    retob->textarray1 = tmpob->textarray1;
+    retob->vertexarray2 = tmpob->vertexarray2;
+    retob->textarray2 = tmpob->textarray2;
+    retob->vertexarray3 = tmpob->vertexarray3;
+    retob->textarray3 = tmpob->textarray3;
 
     return retob;
 }
 
-void copyTexChannel(uv_t * desttextarray, tcoord_t * destvertexarray, tcoord_t * srcvert,
+void copyTexChannel(std::vector<uv_t> & desttextarray, std::vector<tcoord_t> & destvertexarray, tcoord_t * srcvert,
     int storedptidx, int destptidx, int destvertidx)
 {
     desttextarray[destptidx] = srcvert->uv;
@@ -390,7 +375,7 @@ void copySingleVertexData(ob_t * destob, ob_t * srcob,
     tcoord_t * srcvert;
 
     /* channel 0 */
-    if(destob->textarray != NULL)
+    if (!destob->textarray.empty())
     {
         srcvert = &(srcob->vertexarray[srcvertidx]);
 
@@ -399,7 +384,7 @@ void copySingleVertexData(ob_t * destob, ob_t * srcob,
     }
 
     /* channel 1 */
-    if(destob->textarray1 != NULL)
+    if (!destob->textarray1.empty())
     {
         srcvert = &(srcob->vertexarray1[srcvertidx]);
 
@@ -408,7 +393,7 @@ void copySingleVertexData(ob_t * destob, ob_t * srcob,
     }
 
     /* channel 2 */
-    if(destob->textarray2 != NULL)
+    if (!destob->textarray2.empty())
     {
         srcvert = &(srcob->vertexarray2[srcvertidx]);
 
@@ -417,7 +402,7 @@ void copySingleVertexData(ob_t * destob, ob_t * srcob,
     }
 
     /* channel 3 */
-    if(destob->textarray3 != NULL)
+    if (!destob->textarray3.empty())
     {
         srcvert = &(srcob->vertexarray3[srcvertidx]);
 
@@ -430,63 +415,6 @@ void clearSavedInVertexArrayEntry(ob_t * object, int vertidx)
 {
     object->vertexarray[vertidx].saved = false;
 }
-
-void createSingleTexChannelArrays(ob_t * destob, const ob_t * srcob, int channel)
-{
-    int size_va = srcob->numsurf * 3 * sizeof(tcoord_t);
-    int size_ta = srcob->numvertice * sizeof(uv_t);
-
-    tcoord_t * va = (tcoord_t *) malloc(size_va);
-    uv_t * ta = (uv_t *) malloc(size_ta);
-
-    switch(channel)
-    {
-    case 0:
-        memcpy(va, srcob->vertexarray, size_va);
-        memcpy(ta, srcob->textarray, size_ta);
-
-        destob->vertexarray = va;
-        destob->textarray = ta;
-        break;
-
-    case 1:
-        memcpy(va, srcob->vertexarray1, size_va);
-        memcpy(ta, srcob->textarray1, size_ta);
-
-        destob->vertexarray1 = va;
-        destob->textarray1 = ta;
-        break;
-
-    case 2:
-        memcpy(va, srcob->vertexarray2, size_va);
-        memcpy(ta, srcob->textarray2, size_ta);
-
-        destob->vertexarray2 = va;
-        destob->textarray2 = ta;
-        break;
-
-    case 3:
-        memcpy(va, srcob->vertexarray3, size_va);
-        memcpy(ta, srcob->textarray3, size_ta);
-
-        destob->vertexarray3 = va;
-        destob->textarray3 = ta;
-        break;
-    }
-}
-
-void createTexChannelArrays(ob_t * destob, const ob_t * srcob)
-{
-    if(srcob->vertexarray != NULL)
-        createSingleTexChannelArrays(destob, srcob, 0);
-    if(srcob->vertexarray1 != NULL)
-        createSingleTexChannelArrays(destob, srcob, 1);
-    if(srcob->vertexarray2 != NULL)
-        createSingleTexChannelArrays(destob, srcob, 2);
-    if(srcob->vertexarray3 != NULL)
-        createSingleTexChannelArrays(destob, srcob, 3);
-}
-
 
 int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
 {
@@ -548,14 +476,12 @@ int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
 
 void computeObSurfCentroid(const ob_t * object, int obsurf, point_t * out)
 {
-    tcoord_t * idx = object->vertexarray;
-
     int firstIdx = obsurf * 3;
 
     out->set(0, 0, 0);
 
     for (int curVert = 0; curVert < 3; curVert++)
-        *out += object->vertex[idx[firstIdx + curVert].indice];
+        *out += object->vertex[object->vertexarray[firstIdx + curVert].indice];
 
     *out /= 3;
 }
@@ -815,9 +741,14 @@ ob_t* splitOb(ob_t *object)
     workob.vertex.resize(orignumverts);
     workob.norm.resize(orignumverts);
     workob.snorm.resize(orignumverts);
-
-    // create texture channels
-    createTexChannelArrays(&workob, object);
+    workob.vertexarray = object->vertexarray;
+    workob.textarray = object->textarray;
+    workob.vertexarray1 = object->vertexarray1;
+    workob.textarray1 = object->textarray1;
+    workob.vertexarray2 = object->vertexarray2;
+    workob.textarray2 = object->textarray2;
+    workob.vertexarray3 = object->vertexarray3;
+    workob.textarray3 = object->textarray3;
 
     while (mustcontinue)
     {
@@ -953,8 +884,8 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
 
     if (kids == 0)
     {
-        object->next->vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numrefstotal);
-        object->next->textarray = (uv_t *) malloc(sizeof(uv_t) * numrefstotal);
+        object->next->vertexarray.resize(numrefstotal);
+        object->next->textarray.resize(numrefstotal);
         object->next->surfrefs = (int *) malloc(sizeof(int) * numrefs);
         object->next->norm.assign(numrefstotal * 3, point_t(0.0, 0.0, 0.0));
         object->next->snorm.assign(numrefstotal * 3, point_t(0.0, 0.0, 0.0));
@@ -962,8 +893,12 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
         object->next->attrMat = attrMat;
         attrSurf = 0x20;
 
-        memcpy(object->next->vertexarray, tmpva, numrefstotal * sizeof(tcoord_t));
-        memcpy(object->next->textarray, tmptexa, numrefstotal * sizeof(uv_t));
+        for (int i = 0; i < numrefstotal; i++)
+        {
+            object->next->vertexarray[i] = tmpva[i];
+            object->next->textarray[i] = tmptexa[i];
+        }
+
         memcpy(object->next->surfrefs, tmpsurf, numrefs * sizeof(int));
         object->next->numvertice = numvertice;
 
@@ -2192,9 +2127,9 @@ void computeTriNorm(ob_t * object)
         {
             /* compute the same normal for each points in the surface */
             computeNorm(&tmpob->vertex[tmpob->vertexarray[i * 3].indice],
-                    &tmpob->vertex[tmpob->vertexarray[i * 3 + 1].indice],
-                    &tmpob->vertex[tmpob->vertexarray[i * 3 + 2].indice],
-                    &norm);
+                        &tmpob->vertex[tmpob->vertexarray[i * 3 + 1].indice],
+                        &tmpob->vertex[tmpob->vertexarray[i * 3 + 2].indice],
+                        &norm);
             tmpob->norm[tmpob->vertexarray[i * 3].indice] += norm;
             tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice] += norm;
             tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice] += norm;
@@ -2957,7 +2892,6 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
     unsigned int CurrentStripPoint;
     int debj = 0;
     int dege = 0;
-    tcoord_t * stripvertexarray;
     int k, v1, v2, v0;
     k = 0;
     int tri = 0;
@@ -3114,7 +3048,7 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
 
     fclose(stripein);
 
-    stripvertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * object->numvertice * 10);
+    std::vector<tcoord_t> stripvertexarray(object->numvertice * 10);
     k = 0;
     dege = 0;
     if (writeit == 1)
@@ -3254,13 +3188,10 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
                    tritotal, object->numsurf, dege, tritotal - dege,
                    object->name.c_str());
         }
-        free(object->vertexarray);
         object->vertexarray = stripvertexarray;
         object->numvertice = k;
         object->numsurf = k / 3;
     }
-    else
-        free(stripvertexarray);
     free(StripPoint);
     free(StripStart);
     free(StripLength);
@@ -3455,10 +3386,9 @@ void mapNormalToSphere(ob_t *object)
         for (int i = 0; i < tmpob->numvert; i++)
         {
             /* compute the same normal for each points in the surface */
-            pospt = sqrt(
-                    tmpob->vertex[i].x * tmpob->vertex[i].x
-                            + tmpob->vertex[i].y * tmpob->vertex[i].y
-                            + tmpob->vertex[i].z * tmpob->vertex[i].z);
+            pospt = sqrt(tmpob->vertex[i].x * tmpob->vertex[i].x +
+                         tmpob->vertex[i].y * tmpob->vertex[i].y +
+                         tmpob->vertex[i].z * tmpob->vertex[i].z);
             if (pospt > ddmax)
                 ddmax = pospt;
             if (pospt < ddmin)
@@ -3479,10 +3409,9 @@ void mapNormalToSphere(ob_t *object)
         {
             double fact = 0;
             /* compute the same normal for each points in the surface */
-            pospt = sqrt(
-                    tmpob->vertex[i].x * tmpob->vertex[i].x
-                            + tmpob->vertex[i].y * tmpob->vertex[i].y
-                            + tmpob->vertex[i].z * tmpob->vertex[i].z);
+            pospt = sqrt(tmpob->vertex[i].x * tmpob->vertex[i].x +
+                         tmpob->vertex[i].y * tmpob->vertex[i].y +
+                         tmpob->vertex[i].z * tmpob->vertex[i].z);
             fact = ddmin / pospt;
             if (fact > 1.0)
                 fact = 1.0;
@@ -3527,10 +3456,8 @@ void mapTextureEnv(ob_t *object)
             continue;
         }
         /* create the new vertex array */
-        tmpob->textarray1 = (uv_t *) malloc(sizeof(uv_t) * tmpob->numvert);
-        tmpob->textarray2 = (uv_t *) malloc(sizeof(uv_t) * tmpob->numvert);
-        memcpy(tmpob->textarray1, tmpob->textarray, tmpob->numvert * sizeof(uv_t));
-        memcpy(tmpob->textarray2, tmpob->textarray, tmpob->numvert * sizeof(uv_t));
+        tmpob->textarray1 = tmpob->textarray;
+        tmpob->textarray2 = tmpob->textarray;
         tmpob->texture1 = tmpob->texture;
         tmpob->texture2 = tmpob->texture;
         for (int i = 0; i < tmpob->numvert; i++)
@@ -3623,15 +3550,12 @@ void mapTextureEnvOld(ob_t *object)
             continue;
         }
         /* create the new vertex array */
-        tmpob->textarray1 = (uv_t *) malloc(sizeof(uv_t) * tmpob->numvert);
-        tmpob->textarray2 = (uv_t *) malloc(sizeof(uv_t) * tmpob->numvert);
-        memcpy(tmpob->textarray1, tmpob->textarray, tmpob->numvert * sizeof(uv_t));
-        memcpy(tmpob->textarray2, tmpob->textarray, tmpob->numvert * sizeof(uv_t));
+        tmpob->textarray1 = tmpob->textarray;
+        tmpob->textarray2 = tmpob->textarray;
         tmpob->texture1 = tmpob->texture;
         tmpob->texture2 = tmpob->texture;
         for (int i = 0; i < tmpob->numvert; i++)
         {
-
             tmpob->textarray1[i].u = (tmpob->vertex[i].x - x_min)
                     / (x_max - x_min) + (tmpob->snorm[i].x) / 2;
             tmpob->textarray1[i].v = ((tmpob->vertex[i].z - z_min)
@@ -3818,7 +3742,7 @@ void normalMap01(ob_t * object)
             tmpob = tmpob->next;
             continue;
         }
-        tmpob->textarray3 = (uv_t *) malloc(sizeof(uv_t) * tmpob->numvert);
+        tmpob->textarray3.resize(tmpob->numvert);
         printf("normalMap : handling %s\n", tmpob->name.c_str());
         for (int i = 0; i < tmpob->numvert; i++)
         {
@@ -4052,36 +3976,35 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     static int oldva1[10000];
     static int oldva2[10000];
     int n = 0;
-    int numtri = (ob1)->numsurf + (ob2)->numsurf;
-    ;
+    int numtri = ob1->numsurf + ob2->numsurf;
+
     printf("merging %s with %s  tri=%d\n", ob1->name.c_str(), ob2->name.c_str(), numtri);
     memset(oldva1, -1, sizeof(oldva1));
     memset(oldva2, -1, sizeof(oldva2));
     tobS.numsurf = ob1->numsurf;
-    tobS.vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numtri * 3);
+    tobS.vertexarray.resize(numtri * 3);
     tobS.vertex.resize(numtri * 3);
     tobS.norm.resize(numtri * 3);
     tobS.snorm.resize(numtri * 3);
-    tobS.textarray = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
-    tobS.textarray1 = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
-    tobS.textarray2 = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
-    tobS.textarray3 = (uv_t *) malloc(sizeof(uv_t) * numtri * 3);
+    tobS.textarray.resize(numtri * 3);
+    tobS.textarray1.resize(numtri * 3);
+    tobS.textarray2.resize(numtri * 3);
+    tobS.textarray3.resize(numtri * 3);
 
     std::copy_n(ob1->vertex.begin(), ob1->vertex.size(), tobS.vertex.begin());
     std::copy_n(ob1->norm.begin(), ob1->norm.size(), tobS.norm.begin());
     std::copy_n(ob1->snorm.begin(), ob1->snorm.size(), tobS.snorm.begin());
-
-    memcpy(tobS.vertexarray, ob1->vertexarray, ob1->numsurf * sizeof(tcoord_t) * 3);
-    memcpy(tobS.textarray, ob1->textarray, ob1->numvert * sizeof(double) * 2);
+    std::copy_n(ob1->vertexarray.begin(), ob1->vertexarray.size(), tobS.vertexarray.begin());
+    std::copy_n(ob1->textarray.begin(), ob1->textarray.size(), tobS.textarray.begin());
 
     if (ob1->hasTexture1())
-        memcpy(tobS.textarray1, ob1->textarray1, ob1->numvert * sizeof(uv_t));
+        std::copy_n(ob1->textarray1.begin(), ob1->textarray1.size(), tobS.textarray1.begin());
 
     if (ob1->hasTexture2())
-        memcpy(tobS.textarray2, ob1->textarray2, ob1->numvert * sizeof(uv_t));
+        std::copy_n(ob1->textarray2.begin(), ob1->textarray2.size(), tobS.textarray2.begin());
 
     if (ob1->hasTexture3())
-        memcpy(tobS.textarray3, ob1->textarray3, ob1->numvert * sizeof(uv_t));
+        std::copy_n(ob1->textarray3.begin(), ob1->textarray3.size(), tobS.textarray3.begin());
 
     n = ob1->numvert;
     for (int i = 0; i < ob2->numvert; i++)
@@ -4120,12 +4043,9 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
         bool found = false;
         for (int j = 0; j < ob1->numsurf; j++)
         {
-            if (tobS.vertexarray[j * 3].indice
-                    == oldva1[ob2->vertexarray[i * 3].indice]
-                    && tobS.vertexarray[j * 3 + 1].indice
-                            == oldva1[ob2->vertexarray[i * 3 + 1].indice]
-                    && tobS.vertexarray[j * 3 + 2].indice
-                            == oldva1[ob2->vertexarray[i * 3 + 2].indice])
+            if (tobS.vertexarray[j * 3].indice == oldva1[ob2->vertexarray[i * 3].indice] &&
+                tobS.vertexarray[j * 3 + 1].indice == oldva1[ob2->vertexarray[i * 3 + 1].indice] &&
+                tobS.vertexarray[j * 3 + 2].indice == oldva1[ob2->vertexarray[i * 3 + 2].indice])
             {
                 /* this face is OK */
                 found = true;
@@ -4136,12 +4056,9 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
         {
             int k = tobS.numsurf;
             /* add the triangle */
-            tobS.vertexarray[k * 3].indice =
-                    oldva1[ob2->vertexarray[i * 3].indice];
-            tobS.vertexarray[k * 3 + 1].indice = oldva1[ob2->vertexarray[i * 3
-                    + 1].indice];
-            tobS.vertexarray[k * 3 + 2].indice = oldva1[ob2->vertexarray[i * 3
-                    + 2].indice];
+            tobS.vertexarray[k * 3].indice = oldva1[ob2->vertexarray[i * 3].indice];
+            tobS.vertexarray[k * 3 + 1].indice = oldva1[ob2->vertexarray[i * 3 + 1].indice];
+            tobS.vertexarray[k * 3 + 2].indice = oldva1[ob2->vertexarray[i * 3 + 2].indice];
             tobS.numsurf++;
         }
     }
@@ -4151,17 +4068,12 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     ob1->vertex = tobS.vertex;
     ob1->norm = tobS.norm;
     ob1->snorm = tobS.snorm;
-
-    free(ob1->vertexarray);
     ob1->vertexarray = tobS.vertexarray;
-    free(ob1->textarray);
     ob1->textarray = tobS.textarray;
-    free(ob1->textarray1);
     ob1->textarray1 = tobS.textarray1;
-    free(ob1->textarray2);
     ob1->textarray2 = tobS.textarray2;
-    free(ob1->textarray3);
     ob1->textarray3 = tobS.textarray3;
+
     return ob1;
 }
 

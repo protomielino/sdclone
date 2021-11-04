@@ -36,6 +36,7 @@
 #else
 #include <windows.h>
 #include <float.h>
+#pragma warning(disable : 26451)
 #endif
 
 extern char * fileL0;
@@ -137,6 +138,12 @@ struct uv_t
     double u;
     double v;
 
+#if __cplusplus < 201103L
+    uv_t() { }
+#else
+    uv_t() = default;
+#endif
+    uv_t(double _u, double _v) : u(_u), v(_v) { }
     void set(double _u, double _v) { u = _u; v = _v; }
     bool operator == (const uv_t &rhs) const
     {
@@ -154,6 +161,12 @@ struct tcoord_t
     uv_t uv;
     bool saved;
 
+    tcoord_t() :
+    indice(0),
+    uv(0.0, 0.0),
+    saved(false)
+    {
+    }
     void set(int _indice, const uv_t &_uv, bool _saved)
     {
         indice = _indice;
@@ -196,27 +209,27 @@ struct ob_t
     /* the normals corresponding to entries in the above "vertex" array
      * size: numvertice
      */
-    std::vector <point_t> norm;
+    std::vector<point_t> norm;
     /* the smoothed normals corresponding to entries in the above "vertex" array
      * size: numvertice
      */
-    std::vector <point_t> snorm;
+    std::vector<point_t> snorm;
     /* array of indices into the "vertex" array, that make up surfaces. In AC3D: one line in
      * "refs" section
      * size: numsurf * 3
      */
-    tcoord_t * vertexarray;
-    tcoord_t * vertexarray1;
-    tcoord_t * vertexarray2;
-    tcoord_t * vertexarray3;
+    std::vector<tcoord_t> vertexarray;
+    std::vector<tcoord_t> vertexarray1;
+    std::vector<tcoord_t> vertexarray2;
+    std::vector<tcoord_t> vertexarray3;
     int * va;
     /* Holds the texture coordinates of the vertices stored in "vertex" array
      * size: numvertice * 2
      */
-    uv_t * textarray;
-    uv_t * textarray1;
-    uv_t * textarray2;
-    uv_t * textarray3;
+    std::vector<uv_t> textarray;
+    std::vector<uv_t> textarray1;
+    std::vector<uv_t> textarray2;
+    std::vector<uv_t> textarray3;
     int * surfrefs;
     ob_t * next;
     double x_min;
@@ -373,8 +386,8 @@ void copyVertexArraysSurface(ob_t * destob, int destSurfIdx, ob_t * srcob, int s
  *  data from the srcvert into the destination arrays based on the given indices.
  *  @sa copySingleVertexData()
  */
-void copyTexChannel(uv_t * desttextarray, tcoord_t * destvertexarray, tcoord_t * srcvert,
-    int storedptidx, int destptidx, int destvertidx);
+void copyTexChannel(std::vector<uv_t> & desttextarray, std::vector<tcoord_t> & destvertexarray,
+    tcoord_t * srcvert, int storedptidx, int destptidx, int destvertidx);
 
 /** Copies the data of a single vertex from srcob to destob.
  *  In particular the vertexarray and textarray variables of destob will be modified.
@@ -396,22 +409,6 @@ void copySingleVertexData(ob_t * destob, ob_t * srcob,
  *  for all texture channels.
  */
 void clearSavedInVertexArrayEntry(ob_t * object, int vertidx);
-
-/** Creates all texture channels in destob based on the texture channels present in srcob.
- *  In particular, srcob's vertexarray properties determine whether a texture channel is present
- *  and from numsurf and numvertice the number of points/indices are calculated.
- *  Creation means allocation and copying of the corresponding channels from srcob to destob.
- */
-void createTexChannelArrays(ob_t * destob, const ob_t * srcob);
-
-/** Creates vertexarray{,1,2,3} and textarray{,1,2,3} in ob based on the given channel
- *  and on the given number of vertices. Creation means allocation and copying of the
- *  corresponding channels from srcob to destob.
- *
- *  @param ob the object in which to allocate the texture channel
- *  @param channel which texture channel, value in range [0,3]
- */
-void createSingleTexChannelArrays(ob_t * destob, const ob_t * srcob, int channel);
 
 /** Computes the centroid of a triangle surface of the given object.
  *
