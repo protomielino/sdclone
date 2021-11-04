@@ -2881,9 +2881,6 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
     char command[256];
     unsigned int NumStrips;
     unsigned int NumStripPoints;
-    unsigned int * StripPoint;
-    unsigned int * StripStart;
-    unsigned int * StripLength;
     unsigned int CurrentStripNumber;
     unsigned int CurrentStripStart;
     unsigned int CurrentStripLength;
@@ -2966,24 +2963,9 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
     if (object->hasName())
         printf("name=%s stripnumber =%u\n", object->name.c_str(), NumStrips);
     /* Allocate enough memory for what we just read */
-    if ((StripPoint = (unsigned int*)malloc(sizeof(unsigned int) * NumStripPoints)) == 0)
-    {
-        printf("Problem mallocing while stripifying\n");
-        fclose(stripein);
-        exit(-1);
-    }
-    if ((StripStart = (unsigned int*)malloc(sizeof(unsigned int) * NumStrips)) == 0)
-    {
-        printf("Problem mallocing while stripifying\n");
-        fclose(stripein);
-        exit(-1);
-    }
-    if ((StripLength = (unsigned int*)malloc(sizeof(unsigned int) * NumStrips)) == 0)
-    {
-        printf("Problem mallocing while stripifying\n");
-        fclose(stripein);
-        exit(-1);
-    }
+    std::vector<unsigned int> StripPoint(NumStripPoints);
+    std::vector<unsigned int> StripStart(NumStrips);
+    std::vector<unsigned int> StripLength(NumStrips);
 
     /* Fill the triangle strip lists with the STRIPE data */
     rewind(stripein);
@@ -3190,9 +3172,6 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
         object->numvertice = k;
         object->numsurf = k / 3;
     }
-    free(StripPoint);
-    free(StripStart);
-    free(StripLength);
 }
 
 void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
