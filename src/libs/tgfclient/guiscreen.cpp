@@ -303,10 +303,6 @@ SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,in
         SDL_FreeSurface(surfIcon);
     }
 #endif
-    // attempt to make window operational
-    SDL_Renderer *renderer = SDL_CreateRenderer(GfuiWindow, -1, 0);
-    SDL_RenderPresent(renderer);
-
     /* Create OpenGL context */
     SDL_GL_CreateContext(GfuiWindow);
 

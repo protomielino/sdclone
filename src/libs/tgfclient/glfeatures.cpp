@@ -159,7 +159,6 @@ bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	SDL_Window* testWindow = NULL;
-	SDL_Renderer* renderer = NULL;
 	SDL_Surface* pWinSurface = 0;
 
 	int nAlphaChannel = bAlpha ? 1 : 0;
@@ -213,47 +212,39 @@ bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
 						//SDL_SetWindowSize(GfuiWindow, nWidth, nHeight);
 						if(testWindow)
 						{
-							renderer = SDL_CreateRenderer(testWindow, -1, 0);
-							SDL_RenderPresent(renderer);
-							if(renderer)
+							SDL_GLContext context = 0;
+							context = SDL_GL_CreateContext(testWindow);
+							if(context)
 							{
 
-								SDL_GLContext context = 0;
-								context = SDL_GL_CreateContext(testWindow);
-								if(context)
-								{
-
-									pWinSurface = SDL_CreateRGBSurface(0, nWidth, nHeight, nCurrDepth,
+								pWinSurface = SDL_CreateRGBSurface(0, nWidth, nHeight, nCurrDepth,
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN 
-										0x00FF0000, 0x0000FF00, 0x000000FF,
+									0x00FF0000, 0x0000FF00, 0x000000FF,
 #else 
-										0x000000FF, 0x0000FF00, 0x00FF0000,
+									0x000000FF, 0x0000FF00, 0x00FF0000,
 #endif 
-										0x00000000);
+									0x00000000);
 
-									// Now check if we have a video mode, and if it actually features
-									// what we specified.
-									int nActualSampleBuffers = 0;
-									int nActualMultiSamples = 0;
-									if (pWinSurface)
-									{
-										SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &nActualSampleBuffers);
-										SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &nActualMultiSamples);
-									}
-									GfLogDebug("nMaxMultiSamples=%d : nActualSampleBuffers=%d, nActualMultiSamples=%d\n",
-										nMaxMultiSamples, nActualSampleBuffers, nActualMultiSamples);
-
-									// If not, try a lower number of samples.
-									if (nActualSampleBuffers == 0 || nActualMultiSamples != nMaxMultiSamples)
-									{
-										SDL_FreeSurface(pWinSurface);
-										pWinSurface = 0;
-									}
-									SDL_GL_DeleteContext(context);
-									context = NULL;
+								// Now check if we have a video mode, and if it actually features
+								// what we specified.
+								int nActualSampleBuffers = 0;
+								int nActualMultiSamples = 0;
+								if (pWinSurface)
+								{
+									SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &nActualSampleBuffers);
+									SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &nActualMultiSamples);
 								}
-								SDL_DestroyRenderer(renderer);
-								renderer = NULL;
+								GfLogDebug("nMaxMultiSamples=%d : nActualSampleBuffers=%d, nActualMultiSamples=%d\n",
+									nMaxMultiSamples, nActualSampleBuffers, nActualMultiSamples);
+
+								// If not, try a lower number of samples.
+								if (nActualSampleBuffers == 0 || nActualMultiSamples != nMaxMultiSamples)
+								{
+									SDL_FreeSurface(pWinSurface);
+									pWinSurface = 0;
+								}
+								SDL_GL_DeleteContext(context);
+								context = NULL;
 							}
 							SDL_DestroyWindow(testWindow);
 							testWindow = NULL;
@@ -277,30 +268,21 @@ bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
 						if(testWindow)
 						{
 							//SDL_SetWindowSize(GfuiWindow, nWidth, nHeight);
-
-							renderer = SDL_CreateRenderer(testWindow, -1, 0);
-							if(renderer)
+							SDL_GLContext context;
+							context = SDL_GL_CreateContext(testWindow);
+							if(context)
 							{
-								SDL_RenderPresent(renderer);
 
-								SDL_GLContext context;
-								context = SDL_GL_CreateContext(testWindow);
-								if(context)
-								{
-
-									pWinSurface = SDL_CreateRGBSurface(0, nWidth, nHeight, nCurrDepth,
+								pWinSurface = SDL_CreateRGBSurface(0, nWidth, nHeight, nCurrDepth,
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN 
-										0x00FF0000, 0x0000FF00, 0x000000FF,
+									0x00FF0000, 0x0000FF00, 0x000000FF,
 #else 
-										0x000000FF, 0x0000FF00, 0x00FF0000,
+									0x000000FF, 0x0000FF00, 0x00FF0000,
 #endif
-										0x00000000);
+									0x00000000);
 
-									SDL_GL_DeleteContext(context);
-									context = NULL;
-								}
-								SDL_DestroyRenderer(renderer);
-								renderer = NULL;
+								SDL_GL_DeleteContext(context);
+								context = NULL;
 							}
 							SDL_DestroyWindow(testWindow);
 							testWindow = NULL;
@@ -350,48 +332,40 @@ bool GfglFeatures::detectBestSupportSDL2(int& nWidth, int& nHeight, int& nDepth,
 		nWidth, nHeight, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
 	if(testWindow)
 	{
-		renderer = SDL_CreateRenderer(testWindow, -1, 0);
-		if(renderer)
+		SDL_GLContext context;
+		context = SDL_GL_CreateContext(testWindow);
+		if(context)
 		{
-			SDL_RenderPresent(renderer);
+			// II) Read-out what we have from the up-and-running frame buffer
+			//     and set "supported" values accordingly.
 
-			SDL_GLContext context;
-			context = SDL_GL_CreateContext(testWindow);
-			if(context)
+			// 1) Standard features.
+			detectStandardSupport();
+
+			// 2) Multi-sampling = anti-aliasing
+			int nValue;
+			SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &nValue);
+			_mapSupportedBool[MultiSampling] = nValue != 0;
+			//GfLogDebug("SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS) = %d\n", nValue);
+			if (nValue)
 			{
-				// II) Read-out what we have from the up-and-running frame buffer
-				//     and set "supported" values accordingly.
-
-				// 1) Standard features.
-				detectStandardSupport();
-
-				// 2) Multi-sampling = anti-aliasing
-				int nValue;
-				SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &nValue);
-				_mapSupportedBool[MultiSampling] = nValue != 0;
-				//GfLogDebug("SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS) = %d\n", nValue);
-				if (nValue)
-				{
-					SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &nValue);
-					//GfLogDebug("SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES) = %d\n", nValue);
-					if (nValue > 1)
-						_mapSupportedInt[MultiSamplingSamples] = nValue;
-					else
-						_mapSupportedBool[MultiSampling] = false;
-				}
-
-				// III) Return the updated frame buffer specs.
-				//nWidth = nWidth; // Unchanged.
-				//nHeight = nHeight; // Unchanged.
-				nDepth = nCurrDepth;
-				bFullScreen = nFullScreen ? true : false;
-				bAlpha = nAlphaChannel ? true : false;
-
-				SDL_GL_DeleteContext(context);
-				context = NULL;
+				SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &nValue);
+				//GfLogDebug("SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES) = %d\n", nValue);
+				if (nValue > 1)
+					_mapSupportedInt[MultiSamplingSamples] = nValue;
+				else
+					_mapSupportedBool[MultiSampling] = false;
 			}
-			SDL_DestroyRenderer(renderer);
-			renderer = NULL;
+
+			// III) Return the updated frame buffer specs.
+			//nWidth = nWidth; // Unchanged.
+			//nHeight = nHeight; // Unchanged.
+			nDepth = nCurrDepth;
+			bFullScreen = nFullScreen ? true : false;
+			bAlpha = nAlphaChannel ? true : false;
+
+			SDL_GL_DeleteContext(context);
+			context = NULL;
 		}
 		SDL_DestroyWindow(testWindow);
 		testWindow = NULL;
