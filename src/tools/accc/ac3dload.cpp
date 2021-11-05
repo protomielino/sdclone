@@ -4102,9 +4102,6 @@ int mergeSplitted(ob_t **object)
             p = p + strlen("__split__");
         *p = '\0';
         k = 0;
-#ifdef NEWSRC
-        numtri = tob->numsurf;
-#endif
         while (tob0)
         {
             if (tob0->canSkip() || tob0->type == "group")
