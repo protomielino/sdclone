@@ -4056,7 +4056,6 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
 
 int mergeSplitted(ob_t **object)
 {
-
     int k = 0;
     char nameS[256];
     char *p;
@@ -4068,15 +4067,7 @@ int mergeSplitted(ob_t **object)
     tob = *object;
     while (tob)
     {
-        if (isobjectacar)
-        {
-            if (!tob->hasName() || tob->nameHasStr("_s_"))
-            {
-                tob = tob->next;
-                continue;
-            }
-        }
-        else if (tob->nameHasStr("__split__"))
+        if ((isobjectacar && !tob->nameHasStr("_s_")) || !tob->nameHasStr("__split__"))
         {
             tob = tob->next;
             continue;
@@ -4085,9 +4076,7 @@ int mergeSplitted(ob_t **object)
         tob0 = tob->next;
         sprintf(nameS, "%s", tob->name.c_str());
         if (isobjectacar)
-        {
             p = strstr(nameS, "_s_");
-        }
         else
             p = strstr(nameS, "__split__");
         if (p == NULL)
