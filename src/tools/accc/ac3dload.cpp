@@ -4067,7 +4067,15 @@ int mergeSplitted(ob_t **object)
     tob = *object;
     while (tob)
     {
-        if ((isobjectacar && !tob->nameHasStr("_s_")) || !tob->nameHasStr("__split__"))
+        if (isobjectacar)
+        {
+            if (!tob->nameHasStr("_s_"))
+            {
+                tob = tob->next;
+                continue;
+            }
+        }
+        else if (!tob->nameHasStr("__split__"))
         {
             tob = tob->next;
             continue;
