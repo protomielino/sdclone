@@ -52,6 +52,7 @@ static int GfViewWidth;
 static int GfViewHeight;
 static int GfScrCenX;
 static int GfScrCenY;
+static SDL_GLContext GLContext = NULL;
 
 // The screen surface.
 static SDL_Surface *PScreenSurface = NULL;
@@ -304,7 +305,7 @@ SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,in
     }
 #endif
     /* Create OpenGL context */
-    SDL_GL_CreateContext(GfuiWindow);
+    GLContext = SDL_GL_CreateContext(GfuiWindow);
 
     // If specified, try best possible settings.
     PScreenSurface = SDL_CreateRGBSurface(0, nWinWidth, nWinHeight, nTotalDepth,
@@ -659,6 +660,10 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 void GfScrShutdown(void)
 {
     GfLogTrace("Shutting down screen.\n");
+
+    SDL_GL_MakeCurrent(GfuiWindow,GLContext);
+    SDL_GL_DeleteContext(GLContext);
+    GLContext = NULL;
 
     // Shutdown SDL video sub-system.
     SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
