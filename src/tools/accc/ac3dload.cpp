@@ -4063,9 +4063,6 @@ int mergeSplitted(ob_t **object)
     ob_t * tob = NULL;
     ob_t * tob0 = NULL;
     ob_t * tobP = NULL;
-#ifdef NEWSRC
-    int numtri;
-#endif
     int reduced = 0;
 
     tob = *object;
@@ -4139,107 +4136,9 @@ int mergeSplitted(ob_t **object)
             tob = tob->next;
             continue;
         }
+        /* we know that nameS has k+1 objects and need to be merged */
         printf("need merge for %s : %d objects found\n", tob->name.c_str(), k + 1);
 
-        /* we know that nameS has k+1 objects and need to be merged */
-
-        /* allocate the new object */
-#ifdef NEWSRC
-        tobS = new ob_t;
-        tobS->x_min=1000000;
-        tobS->y_min=1000000;
-        tobS->z_min=1000000;
-        tobS->numsurf=numtri;
-        tobS->vertexarray=(tcoord_t *) malloc(sizeof(tcoord_t)*numtri*3);
-        tobS->norm=(point_t*)malloc(sizeof(point_t)*numtri*3);
-        tobS->snorm=(point_t*)malloc(sizeof(point_t)*numtri*3);
-        tobS->vertex=(point_t*)malloc(sizeof(point_t)*numtri*3);
-        memset(tobS->snorm,0,sizeof(point_t )*numtri*3);
-        memset(tobS->norm,0,sizeof(point_t )*numtri*3);
-        tobS->textarray=(double *) malloc(sizeof(double)* numtri*2*3);
-        tobS->attrSurf=tob->attrSurf;
-        tobS->attrMat=tob->attrMat;
-        tobS->name=nameS;
-        tobS->texture=nameS;
-        tobS->type= tob->type;
-        tobS->data=tob->data;
-
-        memcpy(tobS->vertex, tob->vertex,tob->numvert*sizeof(point_t));
-        memcpy(tobS->vertexarray, tob->vertexarray,tob->numsurf*sizeof(tcoord_t ));
-        memcpy(tobS->textarray, tob->textarray,tob->numvert*sizeof(double)*2);
-
-        if (tob->texture1)
-        {
-            memcpy(tobS->textarray1, tob->textarray1,tob->numvert*2*sizeof(double));
-            memcpy(tobS->vertexarray1, tob->vertexarray1,tob->numsurf*sizeof(tcoord_t ));
-            tobS->texture1=tob->texture1;
-        }
-        if (tob->texture2)
-        {
-            memcpy(tobS->textarray2, tob->textarray2,tob->numvert*2*sizeof(double));
-            memcpy(tobS->vertexarray2, tob->vertexarray2,tob->numsurf*sizeof(tcoord_t ));
-            tobS->texture2=tob->texture2;
-        }
-        if (tob->texture3)
-        {
-            memcpy(tobS->textarray3, tob->textarray3,tob->numvert*2*sizeof(double));
-            memcpy(tobS->vertexarray3, tob->vertexarray3,tob->numsurf*sizeof(tcoord_t ));
-            tobS->texture3=tob->texture3;
-        }
-
-        n=tob->numvert;
-
-        /* now add the new points */
-        tob0=tob->next;
-        while (tob0)
-        {
-            if (strnicmp(tob0->name,nameS,strlen(nameS)))
-            {
-                tob0=tob0->next;
-                continue;
-            }
-
-            for (int j=0; j<tob0->numvert; j++)
-                tobS->vertex[j] = tob->vertex[j];
-            for (int j=0; j<tob->numsurf; j++)
-            {
-                tobS->vertexarray[j*3].indice=tob->vertexarray[j*3].indice;
-                tobS->vertexarray[j*3].u=tob->vertexarray[j*3].u;
-                tobS->vertexarray[j*3].v=tob->vertexarray[j*3].v;
-                tobS->vertexarray[j*3+1].indice=tob->vertexarray[j*3+1].indice;
-                tobS->vertexarray[j*3+1].u=tob->vertexarray[j*3+1].u;
-                tobS->vertexarray[j*3+1].v=tob->vertexarray[j*3+1].v;
-                tobS->vertexarray[j*3+2].indice=tob->vertexarray[j*3+2].indice;
-                tobS->vertexarray[j*3+2].u=tob->vertexarray[j*3+2].u;
-                tobS->vertexarray[j*3+2].v=tob->vertexarray[j*3+2].v;
-            }
-            for (int j=0; j<tob->numsurf*3; j++)
-            {
-                tobS->textarray[tobS->vertexarray[j].indice*2]=tob->vertexarray[j].u;
-                tobS->textarray[tobS->vertexarray[j].indice*2+1]=tob->vertexarray[j].v;
-                tobS->textarray1[tobS->vertexarray[j].indice*2]=tob->vertexarray1[j].u;
-                tobS->textarray1[tobS->vertexarray[j].indice*2+1]=tob->vertexarray1[j].v;
-            }
-            tob0=tob0->next;
-        }
-        for (int j=0; j<tobS->numvert; j++)
-        {
-            if (tobS->vertex[j].x>tobS->x_max)
-            tobS->x_max=tobS->vertex[j].x;
-            if (tobS->vertex[j].x<tobS->x_min)
-            tobS->x_min=tobS->vertex[j].x;
-
-            if (tobS->vertex[j].y>tobS->y_max)
-            tobS->y_max=tobS->vertex[j].y;
-            if (tobS->vertex[j].y<tobS->y_min)
-            tobS->y_min=tobS->vertex[j].y;
-
-            if (tobS->vertex[j].z>tobS->z_max)
-            tobS->z_max=tobS->vertex[j].z;
-            if (tobS->vertex[j].z<tobS->z_min)
-            tobS->z_min=tobS->vertex[j].z;
-        }
-#endif
         tob = tob->next;
     }
 
