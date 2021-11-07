@@ -214,6 +214,7 @@ const char * const shadowtexture = "shadow2.png";
 int numob = 0;
 int nummaterial = 0;
 int numvertex = 0;
+int numsurf = 0;
 int dataSize = 0;
 int dataSizeRead = 0;
 bool numvertFound = false;
@@ -339,20 +340,47 @@ ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpo
     retob->texture2 = srcobj->texture2;
     retob->texture3 = srcobj->texture3;
     retob->data = srcobj->data;
-    retob->numvert = tmpob->numvertice;
+    retob->numvert = tmpob->numvert;
     retob->numsurf = tmpob->numsurf;
     retob->numvertice = tmpob->numvertice;
-    retob->vertex = tmpob->vertex;
-    retob->norm = tmpob->norm;
-    retob->snorm = tmpob->snorm;
-    retob->vertexarray = tmpob->vertexarray;
-    retob->textarray = tmpob->textarray;
-    retob->vertexarray1 = tmpob->vertexarray1;
-    retob->textarray1 = tmpob->textarray1;
-    retob->vertexarray2 = tmpob->vertexarray2;
-    retob->textarray2 = tmpob->textarray2;
-    retob->vertexarray3 = tmpob->vertexarray3;
-    retob->textarray3 = tmpob->textarray3;
+
+    retob->vertex.resize(retob->numvert);
+    std::copy_n(tmpob->vertex.begin(), retob->numvert, retob->vertex.begin());
+
+    retob->norm.resize(retob->numvert);
+    std::copy_n(tmpob->norm.begin(), retob->numvert, retob->norm.begin());
+
+    retob->snorm.resize(retob->numvert);
+    std::copy_n(tmpob->snorm.begin(), retob->numvert, retob->snorm.begin());
+
+    if (srcobj->hasTexture())
+    {
+        retob->vertexarray.resize(retob->numvertice);
+        retob->textarray.resize(retob->numvertice);
+        std::copy_n(tmpob->vertexarray.begin(), retob->numvertice, retob->vertexarray.begin());
+        std::copy_n(tmpob->textarray.begin(), retob->numvertice, retob->textarray.begin());
+    }
+    if (srcobj->hasTexture1())
+    {
+        retob->vertexarray1.resize(retob->numvertice);
+        retob->textarray1.resize(retob->numvertice);
+        std::copy_n(tmpob->vertexarray1.begin(), retob->numvertice, retob->vertexarray1.begin());
+        std::copy_n(tmpob->textarray1.begin(), retob->numvertice, retob->textarray1.begin());
+    }
+    if (srcobj->hasTexture2())
+    {
+        retob->vertexarray2.resize(retob->numvertice);
+        retob->textarray2.resize(retob->numvertice);
+        std::copy_n(tmpob->vertexarray2.begin(), retob->numvertice, retob->vertexarray2.begin());
+        std::copy_n(tmpob->textarray2.begin(), retob->numvertice, retob->textarray2.begin());
+    }
+    if (srcobj->hasTexture3())
+    {
+        retob->vertexarray3.resize(retob->numvertice);
+        retob->textarray3.resize(retob->numvertice);
+        std::copy_n(tmpob->vertexarray3.begin(), retob->numvertice, retob->vertexarray3.begin());
+        std::copy_n(tmpob->textarray3.begin(), retob->numvertice, retob->textarray3.begin());
+    }
 
     return retob;
 }
@@ -405,11 +433,6 @@ void copySingleVertexData(ob_t * destob, ob_t * srcob,
         copyTexChannel(destob->textarray3, destob->vertexarray3, srcvert,
                 storedptidx, destptidx, destvertidx);
     }
-}
-
-void clearSavedInVertexArrayEntry(ob_t * object, int vertidx)
-{
-    object->vertexarray[vertidx].saved = false;
 }
 
 int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
@@ -548,6 +571,7 @@ int doObject(char *Line, ob_t *object, std::vector<mat_t> &materials)
 
     numob++;
     numrefs = 0;
+    numsurf = 0;
     numvertFound = false;
     dataFound = false;
 
@@ -716,7 +740,8 @@ ob_t* splitOb(ob_t *object)
     int oldnumptstored = 0; /* temporary placeholder for numptstored */
 
     /* The object we use as storage during splitting.
-     * Following attribs will be used: vertexarray, vertex, snorm, textarray
+     * Following attribs will be used: vertexarray, vertex, norn, snorm, textarray,
+     * numvert, numvertice, numsurf
      */
     ob_t workob;
 
@@ -737,14 +762,26 @@ ob_t* splitOb(ob_t *object)
     workob.vertex.resize(orignumverts);
     workob.norm.resize(orignumverts);
     workob.snorm.resize(orignumverts);
-    workob.vertexarray = object->vertexarray;
-    workob.textarray = object->textarray;
-    workob.vertexarray1 = object->vertexarray1;
-    workob.textarray1 = object->textarray1;
-    workob.vertexarray2 = object->vertexarray2;
-    workob.textarray2 = object->textarray2;
-    workob.vertexarray3 = object->vertexarray3;
-    workob.textarray3 = object->textarray3;
+    if (object->hasTexture())
+    {
+        workob.vertexarray.resize(orignumverts);
+        workob.textarray.resize(orignumverts);
+    }
+    if (object->hasTexture1())
+    {
+        workob.vertexarray1.resize(orignumverts);
+        workob.textarray1.resize(orignumverts);
+    }
+    if (object->hasTexture2())
+    {
+        workob.vertexarray2.resize(orignumverts);
+        workob.textarray2.resize(orignumverts);
+    }
+    if (object->hasTexture3())
+    {
+        workob.vertexarray3.resize(orignumverts);
+        workob.textarray3.resize(orignumverts);
+    }
 
     while (mustcontinue)
     {
@@ -792,7 +829,7 @@ ob_t* splitOb(ob_t *object)
                     {
                         if (curstoredidx[i] != -1)
                         {
-                            if(workob.textarray[curstoredidx[i]] != curvertex[i].uv)
+                            if (workob.textarray[curstoredidx[i]] != curvertex[i].uv)
                             {
                                 touse = false;
                                 /* triangle is not ok */
@@ -820,15 +857,15 @@ ob_t* splitOb(ob_t *object)
                             workob.norm[numptstored] = object->norm[curvertex[i].indice];
                             workob.snorm[numptstored] = object->snorm[curvertex[i].indice];
 
-                            clearSavedInVertexArrayEntry(object, curvert+i);
+                            // clear saved in vertex array entry
+                            object->vertexarray[curvert + i].saved = false;
 
                             oldva[numptstored] = curvertex[i].indice; /* remember the value of the vertice already saved */
                             curstoredidx[i] = numptstored;
                             numptstored++;
                         }
 
-                        copySingleVertexData(&workob, object, curstoredidx[i],
-                                oldnumptstored, numvertstored, curvert+i);
+                        copySingleVertexData(&workob, object, curstoredidx[i], oldnumptstored, numvertstored, curvert+i);
 
                         numvertstored++;
                     }
@@ -845,7 +882,8 @@ ob_t* splitOb(ob_t *object)
             continue;
 
         /* must saved the object */
-        workob.numvertice = numptstored;
+        workob.numvert = numptstored;
+        workob.numvertice = numvertstored;
         workob.numsurf = numvertstored/3;
 
         ob_t * tob = createObjectSplitCopy(numobject++, object, &workob);
@@ -880,6 +918,11 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
 
     if (kids == 0)
     {
+        if (numsurf != object->next->numsurf)
+        {
+            fprintf(stderr, "only %d of %d SURF found in %s\n", numsurf, object->next->numsurf, object->next->name.c_str());
+            return (-1);
+        }
         object->next->vertexarray.resize(numrefstotal);
         object->next->textarray.resize(numrefstotal);
         object->next->surfrefs.resize(numrefs);
@@ -1205,6 +1248,7 @@ int doSurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
         fprintf(stderr, "multiple SURF in object 0x%x and 0x%x (OBJECT needs splitting by SURF type?)\n", surf, attrSurf);
         return (-1);
     }
+    numsurf++;
     attrSurf = surf;
     numvertFound = false;
     dataFound = false;

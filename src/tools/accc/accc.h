@@ -224,7 +224,7 @@ struct ob_t
     std::vector<tcoord_t> vertexarray2;
     std::vector<tcoord_t> vertexarray3;
     /* Holds the texture coordinates of the vertices stored in "vertex" array
-     * size: numvertice * 2
+     * size: numvertice
      */
     std::vector<uv_t> textarray;
     std::vector<uv_t> textarray1;
@@ -404,11 +404,6 @@ void copyTexChannel(std::vector<uv_t> & desttextarray, std::vector<tcoord_t> & d
  */
 void copySingleVertexData(ob_t * destob, ob_t * srcob,
     int storedptidx, int destptidx, int destvertidx, int srcvertidx);
-
-/** Clears the saved flag for a single entry in ob's vertexarray and does so
- *  for all texture channels.
- */
-void clearSavedInVertexArrayEntry(ob_t * object, int vertidx);
 
 /** Computes the centroid of a triangle surface of the given object.
  *
