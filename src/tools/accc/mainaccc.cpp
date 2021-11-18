@@ -297,7 +297,6 @@ void init_args(int argc, char **argv)
                 }
                 continue;
             }
-
         }
     }
     else
@@ -331,28 +330,17 @@ void init_args(int argc, char **argv)
 int main(int argc, char **argv)
 {
     init_args(argc, argv);
-#ifdef _3DS
-    extern int load3ds(const char * inputFilename, const char * outputFilename);
-#endif
 
     if (typeConvertion == _AC3DTOAC3DGROUP)
     {
         loadAndGroup(OutputFileName);
     }
-#ifdef _3DS
-    else if (typeConvertion == _3DSTOAC3D)
-    {
-        load3ds(InputFileName, OutputFileName);
-    }
-#endif
     else
     {
-        ob_t * objects = nullptr;
+        std::list<ob_t> objects;
         std::vector<mat_t> materials;
 
-        loadAC(InputFileName, &objects, materials, OutputFileName);
-
-        delete objects;
+        loadAC(InputFileName, objects, materials, OutputFileName);
     }
 
     return 0;

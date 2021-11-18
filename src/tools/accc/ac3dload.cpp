@@ -63,7 +63,6 @@ texrep_y(0.0),
 numvert(0),
 numsurf(0),
 numvertice(0),
-next(nullptr),
 x_min(0.0),
 y_min(0.0),
 z_min(0.0),
@@ -81,129 +80,123 @@ ob_t::~ob_t()
 {
 }
 
-ob_t * obAppend(ob_t * destob, ob_t * srcob)
+void ob_t::initSpacialExtend()
 {
-    if(!destob)
-        return srcob;
-    if(!srcob)
-        return destob;
+    x_min = y_min = z_min = DBL_MAX;
+    x_max = y_max = z_max = DBL_MIN;
 
-    ob_t * curob = destob;
-
-    while(curob->next != NULL)
-        curob = curob->next;
-
-    curob->next = srcob;
-
-    return destob;
-}
-
-void obInitSpacialExtend(ob_t * ob)
-{
-    ob->x_min = ob->y_min = ob->z_min = DBL_MAX;
-    ob->x_max = ob->y_max = ob->z_max = DBL_MIN;
-
-    for (int v = 0; v < ob->numvertice; v++)
+    for (int v = 0; v < numvertice; v++)
     {
-        if (ob->vertex[v].x > ob->x_max)
-            ob->x_max = ob->vertex[v].x;
-        if (ob->vertex[v].x < ob->x_min)
-            ob->x_min = ob->vertex[v].x;
+        if (vertex[v].x > x_max)
+            x_max = vertex[v].x;
+        if (vertex[v].x < x_min)
+            x_min = vertex[v].x;
 
-        if (ob->vertex[v].y > ob->y_max)
-            ob->y_max = ob->vertex[v].y;
-        if (ob->vertex[v].y < ob->y_min)
-            ob->y_min = ob->vertex[v].y;
+        if (vertex[v].y > y_max)
+            y_max = vertex[v].y;
+        if (vertex[v].y < y_min)
+            y_min = vertex[v].y;
 
-        if (ob->vertex[v].z > ob->z_max)
-            ob->z_max = ob->vertex[v].z;
-        if (ob->vertex[v].z < ob->z_min)
-            ob->z_min = ob->vertex[v].z;
+        if (vertex[v].z > z_max)
+            z_max = vertex[v].z;
+        if (vertex[v].z < z_min)
+            z_min = vertex[v].z;
     }
 }
 
-void obCreateTextArrays(ob_t * ob)
+void ob_t::createTextArrays()
 {
-    if (!ob->vertexarray.empty())
+    if (!vertexarray.empty())
     {
-        ob->textarray.resize(ob->numvertice);
-        for (int i = 0; i < ob->numsurf * 3; i++)
-            ob->textarray[ob->vertexarray[i].indice] = ob->vertexarray[i].uv;
+        textarray.resize(numvertice);
+        for (int i = 0; i < numsurf * 3; i++)
+            textarray[vertexarray[i].indice] = vertexarray[i].uv;
     }
 
-    if (!ob->vertexarray1.empty())
+    if (!vertexarray1.empty())
     {
-        ob->textarray1.resize(ob->numvertice);
-        for (int i = 0; i < ob->numsurf * 3; i++)
-            ob->textarray1[ob->vertexarray1[i].indice] = ob->vertexarray1[i].uv;
+        textarray1.resize(numvertice);
+        for (int i = 0; i < numsurf * 3; i++)
+            textarray1[vertexarray1[i].indice] = vertexarray1[i].uv;
     }
 
-    if (!ob->vertexarray2.empty())
+    if (!vertexarray2.empty())
     {
-        ob->textarray2.resize(ob->numvertice);
-        for (int i = 0; i < ob->numsurf * 3; i++)
-            ob->textarray2[ob->vertexarray2[i].indice] = ob->vertexarray2[i].uv;
+        textarray2.resize(numvertice);
+        for (int i = 0; i < numsurf * 3; i++)
+            textarray2[vertexarray2[i].indice] = vertexarray2[i].uv;
     }
 
-    if (!ob->vertexarray3.empty())
+    if (!vertexarray3.empty())
     {
-        ob->textarray3.resize(ob->numvertice);
-        for (int i = 0; i < ob->numsurf * 3; i++)
-            ob->textarray3[ob->vertexarray3[i].indice] = ob->vertexarray3[i].uv;
+        textarray3.resize(numvertice);
+        for (int i = 0; i < numsurf * 3; i++)
+            textarray3[vertexarray3[i].indice] = vertexarray3[i].uv;
     }
 }
 
-void obCreateVertexArrays(ob_t * ob)
+void ob_t::createVertexArrays()
 {
-    int numEls = ob->numsurf * 3;
+    int numEls = numsurf * 3;
 
-    if (ob->hasTexture())
-        ob->vertexarray.resize(numEls);
+    if (hasTexture())
+        vertexarray.resize(numEls);
 
-    if (ob->hasTexture1())
-        ob->vertexarray1.resize(numEls);
+    if (hasTexture1())
+        vertexarray1.resize(numEls);
 
-    if (ob->hasTexture2())
-        ob->vertexarray2.resize(numEls);
+    if (hasTexture2())
+        vertexarray2.resize(numEls);
 
-    if (ob->hasTexture3())
-        ob->vertexarray3.resize(numEls);
+    if (hasTexture3())
+        vertexarray3.resize(numEls);
 }
 
-void obCopyTextureNames(ob_t * destob, const ob_t * srcob)
+void ob_t::copyTextureNames(const ob_t &srcob)
 {
-    destob->texture = srcob->texture;
-    destob->texture1 = srcob->texture1;
-    destob->texture2 = srcob->texture2;
-    destob->texture3 = srcob->texture3;
+    texture = srcob.texture;
+    texture1 = srcob.texture1;
+    texture2 = srcob.texture2;
+    texture3 = srcob.texture3;
 }
 
-void obSetVertexArraysIndex(ob_t * ob, int vaIdx, int newIndex)
+void ob_t::setVertexArraysIndex(int vaIdx, int newIndex)
 {
-    ob->vertexarray[vaIdx].indice = newIndex;
+    vertexarray[vaIdx].indice = newIndex;
 
-    if (!ob->vertexarray1.empty())
-        ob->vertexarray1[vaIdx].indice = newIndex;
-    if (!ob->vertexarray2.empty())
-        ob->vertexarray2[vaIdx].indice = newIndex;
-    if (!ob->vertexarray3.empty())
-        ob->vertexarray3[vaIdx].indice = newIndex;
+    if (!vertexarray1.empty())
+        vertexarray1[vaIdx].indice = newIndex;
+    if (!vertexarray2.empty())
+        vertexarray2[vaIdx].indice = newIndex;
+    if (!vertexarray3.empty())
+        vertexarray3[vaIdx].indice = newIndex;
+}
+
+void ob_t::computeObSurfCentroid(int obsurf, point_t &out) const
+{
+    int firstIdx = obsurf * 3;
+
+    out.set(0, 0, 0);
+
+    for (int curVert = 0; curVert < 3; curVert++)
+        out += vertex[vertexarray[firstIdx + curVert].indice];
+
+    out /= 3;
 }
 
 #ifndef M_PI
 #define M_PI 3.14159267
 #endif
-void computeTriNorm(ob_t * object);
-void smoothTriNorm(ob_t * object);
-void computeObjectTriNorm(ob_t * object);
-void smoothFaceTriNorm(ob_t * object);
-void smoothObjectTriNorm(ob_t * object);
-void normalize(point_t *t);
-bool checkMustSmoothVector(point_t *n1, point_t *n2, point_t *t1, point_t *t2);
-void mapNormalToSphere(ob_t * object);
-void mapNormalToSphere2(ob_t * object);
-void normalMap(ob_t * object);
-void mapTextureEnv(ob_t * object);
+void computeTriNorm(std::list<ob_t> &objects);
+void computeObjectTriNorm(ob_t &object);
+void smoothFaceTriNorm(ob_t &object);
+void smoothObjectTriNorm(ob_t &object);
+void normalize(point_t &t);
+bool checkMustSmoothVector(point_t &n1, point_t &n2, point_t &t1, point_t &t2);
+void mapNormalToSphere(std::list<ob_t> &objects);
+void mapNormalToSphere2(std::list<ob_t> &objects);
+void normalMap(std::list<ob_t> &objects);
+void mapTextureEnv(std::list<ob_t> &objects);
 point_t tmpPoint[100000];
 tcoord_t tmpva[100000];
 uv_t tmptexa[100000];
@@ -211,7 +204,7 @@ int tmpsurf[100000];
 int refs = 0;
 const char * const shadowtexture = "shadow2.png";
 
-int numob = 0;
+//int numob = 0;
 int nummaterial = 0;
 int numvertex = 0;
 int numsurf = 0;
@@ -220,7 +213,7 @@ int dataSizeRead = 0;
 bool numvertFound = false;
 bool numrefsFound = false;
 bool dataFound = false;
-int attrSurf = 0;
+unsigned int attrSurf = 0;
 int attrMat = 0;
 int numrefs = 0;
 int numrefstotal = 0;
@@ -235,32 +228,32 @@ int texnum = 0;
 struct verbaction_t
 {
     const char * verb;
-    int (*doVerb)(char * Line, ob_t *object, std::vector<mat_t> &materials);
+    int (*doVerb)(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 };
 
-int doMaterial(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doObject(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doKids(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doName(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doLoc(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doData(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doTexture(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doTexrep(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doNumvert(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doNumsurf(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doSurf(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doMat(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doRefs(char *Line, ob_t *object, std::vector<mat_t> &materials);
-int doCrease(char *Line, ob_t *object, std::vector<mat_t> &materials);
+int doMaterial(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doObject(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doKids(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doName(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doLoc(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doData(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doTexture(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doTexrep(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doNumvert(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doNumsurf(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doSurf(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doMat(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doRefs(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
+int doCrease(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 
 #ifdef _3DS
 void saveObin3DS(const std::string & OutputFilename, ob_t * object, std::vector<mat_t> &materials);
 #endif
-void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
-void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
-void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
-void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials);
-void stripifyOb(FILE * ofile, ob_t * object, int writeit);
+void computeSaveAC3D(const std::string & OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials);
+void computeSaveOBJ(const std::string & OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials);
+void computeSaveAC3DM(const std::string & OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials);
+void computeSaveAC3DStrip(const std::string & OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials);
+void stripifyOb(FILE * ofile, ob_t * object, bool writeit);
 
 verbaction_t verbTab[] =
 {
@@ -280,21 +273,28 @@ verbaction_t verbTab[] =
 { CREASE, doCrease },
 { "END", NULL } };
 
-void copyVertexArraysSurface(ob_t * destob, int destSurfIdx, ob_t * srcob, int srcSurfIdx)
+/** Copies a single surface from the "vertexarray" attributes of srcob to the ones of destob.
+ *  It decides whether to copy multitexture data based on srcob's "vertexarray" attributes.
+ *
+ *  In particular it copies 3 entries starting at srcSurfIdx * 3 from srcob->vertexarray
+ *  to entries starting at destSurfIdx * 3 in destob->vertexarray. The same goes for the
+ *  multitexture entries.
+ */
+void copyVertexArraysSurface(ob_t &destob, int destSurfIdx, const ob_t &srcob, int srcSurfIdx)
 {
-    int firstDestIdx = destSurfIdx * 3;
-    int firstSrcIdx = srcSurfIdx * 3;
+    const int firstDestIdx = destSurfIdx * 3;
+    const int firstSrcIdx = srcSurfIdx * 3;
 
     for (int off = 0; off < 3; off++)
     {
-        destob->vertexarray[firstDestIdx + off] = srcob->vertexarray[firstSrcIdx + off];
+        destob.vertexarray[firstDestIdx + off] = srcob.vertexarray[firstSrcIdx + off];
 
-        if (!srcob->vertexarray1.empty())
-            destob->vertexarray1[firstDestIdx + off] = srcob->vertexarray1[firstSrcIdx + off];
-        if (!srcob->vertexarray2.empty())
-            destob->vertexarray2[firstDestIdx + off] = srcob->vertexarray2[firstSrcIdx + off];
-        if (!srcob->vertexarray3.empty())
-            destob->vertexarray3[firstDestIdx + off] = srcob->vertexarray3[firstSrcIdx + off];
+        if (!srcob.vertexarray1.empty())
+            destob.vertexarray1[firstDestIdx + off] = srcob.vertexarray1[firstSrcIdx + off];
+        if (!srcob.vertexarray2.empty())
+            destob.vertexarray2[firstDestIdx + off] = srcob.vertexarray2[firstSrcIdx + off];
+        if (!srcob.vertexarray3.empty())
+            destob.vertexarray3[firstDestIdx + off] = srcob.vertexarray3[firstSrcIdx + off];
     }
 }
 
@@ -318,147 +318,129 @@ void createTexCoordArray(uv_t * destarr, tcoord_t * srcidxarr, int numidx)
  *  @param splitid the id of this split object
  *  @param srcobj the original object, which was split
  *  @param tmpob the temporary storage object using in splitting
+ *  @param retob the split object
  *
  *  In the tmpob the following should be set: numvertice, numsurf, vertex, snorm,
  *  vertexarray, textarray
- *
- *  @return the created split object
  */
-ob_t * createObjectSplitCopy(int splitid, const ob_t * srcobj, const ob_t * tmpob)
+void createObjectSplitCopy(int splitid, const ob_t &srcobj, const ob_t &tmpob, ob_t &retob)
 {
-    /* allocate space */
-    ob_t * retob = new ob_t;
-
     /* special handling of name */
-    retob->name = srcobj->name + "_s_" + std::to_string(splitid);
+    retob.name = srcobj.name + "_s_" + std::to_string(splitid);
 
-    retob->type = srcobj->type;
-    retob->attrSurf = srcobj->attrSurf;
-    retob->attrMat = srcobj->attrMat;
-    retob->texture = srcobj->texture;
-    retob->texture1 = srcobj->texture1;
-    retob->texture2 = srcobj->texture2;
-    retob->texture3 = srcobj->texture3;
-    retob->data = srcobj->data;
-    retob->numvert = tmpob->numvert;
-    retob->numsurf = tmpob->numsurf;
-    retob->numvertice = tmpob->numvertice;
+    retob.type = srcobj.type;
+    retob.attrSurf = srcobj.attrSurf;
+    retob.attrMat = srcobj.attrMat;
+    retob.texture = srcobj.texture;
+    retob.texture1 = srcobj.texture1;
+    retob.texture2 = srcobj.texture2;
+    retob.texture3 = srcobj.texture3;
+    retob.data = srcobj.data;
+    retob.numvert = tmpob.numvert;
+    retob.numsurf = tmpob.numsurf;
+    retob.numvertice = tmpob.numvertice;
 
-    retob->vertex.resize(retob->numvert);
-    std::copy_n(tmpob->vertex.begin(), retob->numvert, retob->vertex.begin());
+    retob.vertex.resize(retob.numvert);
+    std::copy_n(tmpob.vertex.begin(), retob.numvert, retob.vertex.begin());
 
-    retob->norm.resize(retob->numvert);
-    std::copy_n(tmpob->norm.begin(), retob->numvert, retob->norm.begin());
+    retob.norm.resize(retob.numvert);
+    std::copy_n(tmpob.norm.begin(), retob.numvert, retob.norm.begin());
 
-    retob->snorm.resize(retob->numvert);
-    std::copy_n(tmpob->snorm.begin(), retob->numvert, retob->snorm.begin());
+    retob.snorm.resize(retob.numvert);
+    std::copy_n(tmpob.snorm.begin(), retob.numvert, retob.snorm.begin());
 
-    if (srcobj->hasTexture())
+    if (srcobj.hasTexture())
     {
-        retob->vertexarray.resize(retob->numvertice);
-        retob->textarray.resize(retob->numvertice);
-        std::copy_n(tmpob->vertexarray.begin(), retob->numvertice, retob->vertexarray.begin());
-        std::copy_n(tmpob->textarray.begin(), retob->numvertice, retob->textarray.begin());
+        retob.vertexarray.resize(retob.numvertice);
+        retob.textarray.resize(retob.numvertice);
+        std::copy_n(tmpob.vertexarray.begin(), retob.numvertice, retob.vertexarray.begin());
+        std::copy_n(tmpob.textarray.begin(), retob.numvertice, retob.textarray.begin());
     }
-    if (srcobj->hasTexture1())
+    if (srcobj.hasTexture1())
     {
-        retob->vertexarray1.resize(retob->numvertice);
-        retob->textarray1.resize(retob->numvertice);
-        std::copy_n(tmpob->vertexarray1.begin(), retob->numvertice, retob->vertexarray1.begin());
-        std::copy_n(tmpob->textarray1.begin(), retob->numvertice, retob->textarray1.begin());
+        retob.vertexarray1.resize(retob.numvertice);
+        retob.textarray1.resize(retob.numvertice);
+        std::copy_n(tmpob.vertexarray1.begin(), retob.numvertice, retob.vertexarray1.begin());
+        std::copy_n(tmpob.textarray1.begin(), retob.numvertice, retob.textarray1.begin());
     }
-    if (srcobj->hasTexture2())
+    if (srcobj.hasTexture2())
     {
-        retob->vertexarray2.resize(retob->numvertice);
-        retob->textarray2.resize(retob->numvertice);
-        std::copy_n(tmpob->vertexarray2.begin(), retob->numvertice, retob->vertexarray2.begin());
-        std::copy_n(tmpob->textarray2.begin(), retob->numvertice, retob->textarray2.begin());
+        retob.vertexarray2.resize(retob.numvertice);
+        retob.textarray2.resize(retob.numvertice);
+        std::copy_n(tmpob.vertexarray2.begin(), retob.numvertice, retob.vertexarray2.begin());
+        std::copy_n(tmpob.textarray2.begin(), retob.numvertice, retob.textarray2.begin());
     }
-    if (srcobj->hasTexture3())
+    if (srcobj.hasTexture3())
     {
-        retob->vertexarray3.resize(retob->numvertice);
-        retob->textarray3.resize(retob->numvertice);
-        std::copy_n(tmpob->vertexarray3.begin(), retob->numvertice, retob->vertexarray3.begin());
-        std::copy_n(tmpob->textarray3.begin(), retob->numvertice, retob->textarray3.begin());
+        retob.vertexarray3.resize(retob.numvertice);
+        retob.textarray3.resize(retob.numvertice);
+        std::copy_n(tmpob.vertexarray3.begin(), retob.numvertice, retob.vertexarray3.begin());
+        std::copy_n(tmpob.textarray3.begin(), retob.numvertice, retob.textarray3.begin());
     }
-
-    return retob;
 }
 
-void copyTexChannel(std::vector<uv_t> & desttextarray, std::vector<tcoord_t> & destvertexarray, tcoord_t * srcvert,
+void copyTexChannel(std::vector<uv_t> &desttextarray, std::vector<tcoord_t> &destvertexarray, const tcoord_t &srcvert,
     int storedptidx, int destptidx, int destvertidx)
 {
-    desttextarray[destptidx] = srcvert->uv;
+    desttextarray[destptidx] = srcvert.uv;
 
-    destvertexarray[destvertidx].set(storedptidx, srcvert->uv, 0);
+    destvertexarray[destvertidx].set(storedptidx, srcvert.uv, false);
 }
 
-void copySingleVertexData(ob_t * destob, ob_t * srcob,
+void copySingleVertexData(ob_t &destob, const ob_t &srcob,
     int storedptidx, int destptidx, int destvertidx, int srcvertidx)
 {
-    tcoord_t * srcvert;
-
     /* channel 0 */
-    if (!destob->textarray.empty())
+    if (!destob.textarray.empty())
     {
-        srcvert = &(srcob->vertexarray[srcvertidx]);
-
-        copyTexChannel(destob->textarray, destob->vertexarray, srcvert,
+        copyTexChannel(destob.textarray, destob.vertexarray, srcob.vertexarray[srcvertidx],
                 storedptidx, destptidx, destvertidx);
     }
 
     /* channel 1 */
-    if (!destob->textarray1.empty())
+    if (!destob.textarray1.empty())
     {
-        srcvert = &(srcob->vertexarray1[srcvertidx]);
-
-        copyTexChannel(destob->textarray1, destob->vertexarray1, srcvert,
+        copyTexChannel(destob.textarray1, destob.vertexarray1, srcob.vertexarray1[srcvertidx],
                 storedptidx, destptidx, destvertidx);
     }
 
     /* channel 2 */
-    if (!destob->textarray2.empty())
+    if (!destob.textarray2.empty())
     {
-        srcvert = &(srcob->vertexarray2[srcvertidx]);
-
-        copyTexChannel(destob->textarray2, destob->vertexarray2, srcvert,
+        copyTexChannel(destob.textarray2, destob.vertexarray2, srcob.vertexarray2[srcvertidx],
                 storedptidx, destptidx, destvertidx);
     }
 
     /* channel 3 */
-    if (!destob->textarray3.empty())
+    if (!destob.textarray3.empty())
     {
-        srcvert = &(srcob->vertexarray3[srcvertidx]);
-
-        copyTexChannel(destob->textarray3, destob->vertexarray3, srcvert,
+        copyTexChannel(destob.textarray3, destob.vertexarray3, srcob.vertexarray3[srcvertidx],
                 storedptidx, destptidx, destvertidx);
     }
 }
 
-int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
+int computeNorm(const point_t &pv1, const point_t &pv2, const point_t &pv3, point_t &norm)
 {
     double p1, p2, p3, q1, q2, q3, dd;
     double x1, y1, z1, x2, y2, z2, x3, y3, z3;
 
-    x1 = pv1->x;
-    y1 = pv1->y;
-    z1 = pv1->z;
+    x1 = pv1.x;
+    y1 = pv1.y;
+    z1 = pv1.z;
 
-    x2 = pv2->x;
-    y2 = pv2->y;
-    z2 = pv2->z;
+    x2 = pv2.x;
+    y2 = pv2.y;
+    z2 = pv2.z;
 
-    x3 = pv3->x;
-    y3 = pv3->y;
-    z3 = pv3->z;
+    x3 = pv3.x;
+    y3 = pv3.y;
+    z3 = pv3.z;
 
-    if (((x1 == x2) && (y1 == y2) && (z1 == z2))
-            || ((x1 == x3) && (y1 == y3) && (z1 == z3))
-            || ((x2 == x3) && (y2 == y3) && (z2 == z3)))
+    if (((x1 == x2) && (y1 == y2) && (z1 == z2)) ||
+        ((x1 == x3) && (y1 == y3) && (z1 == z3)) ||
+        ((x2 == x3) && (y2 == y3) && (z2 == z3)))
     {
-        norm->x = 0;
-        norm->y = 1.0;
-        norm->z = 0;
+        norm.set(0.0, 1.0, 0.0);
         return 0;
     }
 
@@ -470,50 +452,33 @@ int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
     q2 = y3 - y1;
     q3 = z3 - z1;
 
-    dd = sqrt(
-            (p2 * q3 - q2 * p3) * (p2 * q3 - q2 * p3)
-                    + (p3 * q1 - q3 * p1) * (p3 * q1 - q3 * p1)
-                    + (p1 * q2 - q1 * p2) * (p1 * q2 - q1 * p2));
+    dd = sqrt((p2 * q3 - q2 * p3) * (p2 * q3 - q2 * p3) +
+              (p3 * q1 - q3 * p1) * (p3 * q1 - q3 * p1) +
+              (p1 * q2 - q1 * p2) * (p1 * q2 - q1 * p2));
     if (dd == 0.0)
     {
-        norm->set(0, 1.0, 0);
+        norm.set(0.0, 1.0, 0.0);
         return 0;
     }
 
-    norm->x = (p2 * q3 - q2 * p3) / dd;
-    norm->y = (p3 * q1 - q3 * p1) / dd;
-    norm->z = (p1 * q2 - q1 * p2) / dd;
+    norm.x = (p2 * q3 - q2 * p3) / dd;
+    norm.y = (p3 * q1 - q3 * p1) / dd;
+    norm.z = (p1 * q2 - q1 * p2) / dd;
 
-    if (isnan(norm->x) || isnan(norm->y) || isnan(norm->z))
+    if (isnan(norm.x) || isnan(norm.y) || isnan(norm.z))
     {
-        norm->set(0, 1.0, 0);
+        norm.set(0.0, 1.0, 0.0);
         return 0;
     }
 
     return 0;
 }
 
-void computeObSurfCentroid(const ob_t * object, int obsurf, point_t * out)
+int doMaterial(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
-    int firstIdx = obsurf * 3;
-
-    out->set(0, 0, 0);
-
-    for (int curVert = 0; curVert < 3; curVert++)
-        *out += object->vertex[object->vertexarray[firstIdx + curVert].indice];
-
-    *out /= 3;
-}
-
-int doMaterial(char *Line, ob_t *object, std::vector<mat_t> &materials)
-{
-    char * p;
     char name[256] = { 0 };
     mat_t materialt;
-
-    nummaterial++;
-
-    p = strstr(Line, " ");
+    char *p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown MATERIAL format %s\n", Line);
@@ -536,15 +501,15 @@ int doMaterial(char *Line, ob_t *object, std::vector<mat_t> &materials)
     // append to list
     materials.push_back(materialt); // use emplace_back someday
 
+    nummaterial++;
+
     return (0);
 }
 
-int doObject(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doObject(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
-    char * p;
     char name[256] = { 0 };
-
-    p = strstr(Line, " ");
+    char *p = strstr(Line, " ");
     if (p == NULL)
     {
         fprintf(stderr, "unknown OBJECT format %s\n", Line);
@@ -556,20 +521,18 @@ int doObject(char *Line, ob_t *object, std::vector<mat_t> &materials)
         return (-1);
     }
 
-    ob_t *objectt = new ob_t;
+    objects.push_front(ob_t());
 
-    objectt->x_min = 1000000;
-    objectt->y_min = 1000000;
-    objectt->z_min = 1000000;
-    objectt->type = name;
-    objectt->texrep_x = 1.0;
-    objectt->texrep_y = 1.0;
+    ob_t &objectt = objects.front();
 
-    ob_t *t1 = object->next;
-    object->next = objectt;
-    objectt->next = t1;
+    objectt.x_min = 1000000;
+    objectt.y_min = 1000000;
+    objectt.z_min = 1000000;
+    objectt.type = name;
+    objectt.texrep_x = 1.0;
+    objectt.texrep_y = 1.0;
 
-    numob++;
+    //numob++;
     numrefs = 0;
     numsurf = 0;
     numvertFound = false;
@@ -588,34 +551,33 @@ int findIndice(int indice, const std::vector<int> &oldva, int n)
     return -1;
 }
 
-ob_t* terrainSplitOb(ob_t * object)
+void terrainSplitOb(std::list<ob_t> &objects, std::list<ob_t>::iterator &it)
 {
-    ob_t * tob = NULL;
-    ob_t * tob0 = NULL;
+    std::list<ob_t> split;
+    const ob_t &object = *it;
 
-    printf("terrain splitting %s\n", object->name.c_str());
-    if ((object->x_max - object->x_min) < 2 * distSplit)
-        return 0;
-    if ((object->y_max - object->y_min) < 2 * distSplit)
-        return 0;
-    printf("terrain splitting %s started\n", object->name.c_str());
+    printf("terrain splitting %s\n", object.name.c_str());
+    if ((object.x_max - object.x_min) < 2 * distSplit)
+        return;
+    if ((object.y_max - object.y_min) < 2 * distSplit)
+        return;
+    printf("terrain splitting %s started\n", object.name.c_str());
 
-    int numSurf = object->numsurf;
-    std::vector<int> oldSurfToNewObjMap(numSurf, 0);
+    std::vector<int> oldSurfToNewObjMap(object.numsurf, 0);
 
     int numNewObjs = 0;
 
-    for (double curXPos = object->x_min; curXPos < object->x_max; curXPos += distSplit)
+    for (double curXPos = object.x_min; curXPos < object.x_max; curXPos += distSplit)
     {
-        for (double curYPos = object->y_min; curYPos < object->y_max; curYPos += distSplit)
+        for (double curYPos = object.y_min; curYPos < object.y_max; curYPos += distSplit)
         {
             int numTriFound = 0;
             bool found_a_tri = false;
 
-            for (int curObjSurf = 0; curObjSurf < object->numsurf; curObjSurf++)
+            for (int curObjSurf = 0; curObjSurf < object.numsurf; curObjSurf++)
             {
                 point_t surfCentroid;
-                computeObSurfCentroid(object, curObjSurf, &surfCentroid);
+                object.computeObSurfCentroid(curObjSurf, surfCentroid);
 
                 if (surfCentroid.x >= curXPos && surfCentroid.x < curXPos + distSplit)
                 {
@@ -635,13 +597,13 @@ ob_t* terrainSplitOb(ob_t * object)
             }
         }
     }
-    printf("found in %s : %d subsurfaces\n", object->name.c_str(), numNewObjs);
+    printf("found in %s : %d subsurfaces\n", object.name.c_str(), numNewObjs);
 
     for (int curNewObj = 0; curNewObj < numNewObjs; curNewObj++)
     {
         int numNewSurf = 0;
         /* find the number of surface */
-        for (int curSurf = 0; curSurf < object->numsurf; curSurf++)
+        for (int curSurf = 0; curSurf < object.numsurf; curSurf++)
         {
             if (oldSurfToNewObjMap[curSurf] != curNewObj)
                 continue;
@@ -650,25 +612,25 @@ ob_t* terrainSplitOb(ob_t * object)
 
         /* initial creation of tob */
 
-        tob = new ob_t;
+        ob_t tob;
 
-        tob->numsurf = numNewSurf;
-        tob->attrSurf = object->attrSurf;
-        tob->attrMat = object->attrMat;
-        tob->data = object->data;
-        tob->type = object->type;
+        tob.numsurf = numNewSurf;
+        tob.attrSurf = object.attrSurf;
+        tob.attrMat = object.attrMat;
+        tob.data = object.data;
+        tob.type = object.type;
 
         /* special name handling */
-        tob->name = object->name + "__split__" + std::to_string(curNewObj);
+        tob.name = object.name + "__split__" + std::to_string(curNewObj);
 
-        obCopyTextureNames(tob, object);
+        tob.copyTextureNames(object);
 
         /* store the index data in tob's vertexarray */
 
-        obCreateVertexArrays(tob);
+        tob.createVertexArrays();
 
         int curNewSurf = 0;
-        for (int curSurf = 0; curSurf < object->numsurf; curSurf++)
+        for (int curSurf = 0; curSurf < object.numsurf; curSurf++)
         {
             if (oldSurfToNewObjMap[curSurf] != curNewObj)
                 continue;
@@ -686,56 +648,62 @@ ob_t* terrainSplitOb(ob_t * object)
          * we don't know the size, so we allocate the same number as in the
          * source object.
          */
-        std::vector<point_t> pttmp(object->numvertice, point_t(0.0, 0.0, 0.0));
-        std::vector<point_t> snorm(object->numvertice, point_t(0.0, 0.0, 0.0));
+        std::vector<point_t> pttmp(object.numvertice, point_t(0.0, 0.0, 0.0));
+        std::vector<point_t> snorm(object.numvertice, point_t(0.0, 0.0, 0.0));
 
         /* storedPtIdxArr: keep a list of the indices of points stored in the new object.
          * If an index is contained in storedPtIdxArr we don't store the point itself,
          * but only the index in the vertexarray of the new object.
          */
-        std::vector<int> storedPtIdxArr(object->numvertice, 0);
+        std::vector<int> storedPtIdxArr(object.numvertice, 0);
 
         int curNewPtIdx = 0;
         for (int curNewIdx = 0; curNewIdx < numNewSurf * 3; curNewIdx++)
         {
-            int idx = tob->vertexarray[curNewIdx].indice;
+            int idx = tob.vertexarray[curNewIdx].indice;
 
             int storedIdx = findIndice(idx, storedPtIdxArr, curNewPtIdx);
             if (storedIdx == -1)
             {
                 storedPtIdxArr[curNewPtIdx] = idx;
                 storedIdx = curNewPtIdx;
-                pttmp[curNewPtIdx] = object->vertex[idx];
-                snorm[curNewPtIdx] = object->norm[idx];
+                pttmp[curNewPtIdx] = object.vertex[idx];
+                snorm[curNewPtIdx] = object.norm[idx];
                 curNewPtIdx++;
             }
 
-            obSetVertexArraysIndex(tob, curNewIdx, storedIdx);
+            tob.setVertexArraysIndex(curNewIdx, storedIdx);
         }
 
         int numNewPts = curNewPtIdx;
 
-        tob->numvert = numNewPts;
-        tob->numvertice = numNewPts;
+        tob.numvert = numNewPts;
+        tob.numvertice = numNewPts;
 
         /* create and store tob's norm, snorm, vertex and textarray data */
 
-        tob->vertex = pttmp;
-        tob->norm = snorm;
-        tob->snorm = snorm;
+        tob.vertex = pttmp;
+        tob.norm = snorm;
+        tob.snorm = snorm;
 
-        obCreateTextArrays(tob);
+        tob.createTextArrays();
 
-        obInitSpacialExtend(tob);
+        tob.initSpacialExtend();
 
         // prepend the new object to the list
-        tob0 = obAppend(tob, tob0);
+        split.push_front(tob);
     }
 
-    return tob0;
+    if (!split.empty())
+    {
+        // move new objects in front of old object in list
+        objects.splice(it, split);
+        // remove old object from list
+        objects.erase(it);
+    }
 }
 
-ob_t* splitOb(ob_t *object)
+void splitOb(std::list<ob_t> &objects, std::list<ob_t>::iterator &it)
 {
     int oldnumptstored = 0; /* temporary placeholder for numptstored */
 
@@ -744,15 +712,15 @@ ob_t* splitOb(ob_t *object)
      * numvert, numvertice, numsurf
      */
     ob_t workob;
+    std::list<ob_t> split;
 
     tcoord_t curvertex[3];
     int curstoredidx[3];
 
     bool touse = false;
-    int orignumtris = object->numsurf; /* number of surfaces/triangles in the source object */
+    int orignumtris = it->numsurf; /* number of surfaces/triangles in the source object */
     int orignumverts = orignumtris * 3; /* number of vertices in the source object: orignumtris * 3 */
     bool mustcontinue = true;
-    ob_t * tob0 = NULL;
     int numobject = 0;
     int curvert = 0;
 
@@ -762,22 +730,22 @@ ob_t* splitOb(ob_t *object)
     workob.vertex.resize(orignumverts);
     workob.norm.resize(orignumverts);
     workob.snorm.resize(orignumverts);
-    if (object->hasTexture())
+    if (it->hasTexture())
     {
         workob.vertexarray.resize(orignumverts);
         workob.textarray.resize(orignumverts);
     }
-    if (object->hasTexture1())
+    if (it->hasTexture1())
     {
         workob.vertexarray1.resize(orignumverts);
         workob.textarray1.resize(orignumverts);
     }
-    if (object->hasTexture2())
+    if (it->hasTexture2())
     {
         workob.vertexarray2.resize(orignumverts);
         workob.textarray2.resize(orignumverts);
     }
-    if (object->hasTexture3())
+    if (it->hasTexture3())
     {
         workob.vertexarray3.resize(orignumverts);
         workob.textarray3.resize(orignumverts);
@@ -808,7 +776,7 @@ ob_t* splitOb(ob_t *object)
                 /** find vertices of the triangle */
                 for (int i = 0; i < 3; i++)
                 {
-                    curvertex[i] = object->vertexarray[curvert+i];
+                    curvertex[i] = it->vertexarray[curvert+i];
 
                     curstoredidx[i] = findIndice(curvertex[i].indice, oldva, numptstored);
                 }
@@ -853,19 +821,19 @@ ob_t* splitOb(ob_t *object)
 
                         if (curstoredidx[i] == -1)
                         {
-                            workob.vertex[numptstored] = object->vertex[curvertex[i].indice];
-                            workob.norm[numptstored] = object->norm[curvertex[i].indice];
-                            workob.snorm[numptstored] = object->snorm[curvertex[i].indice];
+                            workob.vertex[numptstored] = it->vertex[curvertex[i].indice];
+                            workob.norm[numptstored] = it->norm[curvertex[i].indice];
+                            workob.snorm[numptstored] = it->snorm[curvertex[i].indice];
 
                             // clear saved in vertex array entry
-                            object->vertexarray[curvert + i].saved = false;
+                            it->vertexarray[curvert + i].saved = false;
 
                             oldva[numptstored] = curvertex[i].indice; /* remember the value of the vertice already saved */
                             curstoredidx[i] = numptstored;
                             numptstored++;
                         }
 
-                        copySingleVertexData(&workob, object, curstoredidx[i], oldnumptstored, numvertstored, curvert+i);
+                        copySingleVertexData(workob, *it, curstoredidx[i], oldnumptstored, numvertstored, curvert+i);
 
                         numvertstored++;
                     }
@@ -886,22 +854,26 @@ ob_t* splitOb(ob_t *object)
         workob.numvertice = numvertstored;
         workob.numsurf = numvertstored/3;
 
-        ob_t * tob = createObjectSplitCopy(numobject++, object, &workob);
+        split.push_front(ob_t());
 
-        attrSurf = tob->attrSurf;
-        attrMat = tob->attrMat;
+        createObjectSplitCopy(numobject++, *it, workob, split.front());
 
-        // prepend the new object to the list
-        tob0 = obAppend(tob, tob0);
+        attrSurf = it->attrSurf;
+        attrMat = it->attrMat;
 
         printf("numtri = %d on orignumtris = %d\n", numtristored, orignumtris);
-
     } // while (mustcontinue == 1)
 
-    return tob0;
+    if (!split.empty())
+    {
+        // move new objects in front of old object in list
+        objects.splice(it, split);
+        // remove old object from list
+        objects.erase(it);
+    }
 }
 
-int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
+int doKids(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     int kids;
     char *p = strstr(Line, " ");
@@ -916,36 +888,37 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
         return (-1);
     }
 
+    ob_t &object = objects.front();
     if (kids == 0)
     {
-        if (numsurf != object->next->numsurf)
+        if (numsurf != object.numsurf)
         {
-            fprintf(stderr, "only %d of %d SURF found in %s\n", numsurf, object->next->numsurf, object->next->name.c_str());
+            fprintf(stderr, "only %d of %d SURF found in %s\n", numsurf, object.numsurf, object.name.c_str());
             return (-1);
         }
-        object->next->vertexarray.resize(numrefstotal);
-        object->next->textarray.resize(numrefstotal);
-        object->next->surfrefs.resize(numrefs);
-        object->next->norm.assign(numrefstotal * 3, point_t(0.0, 0.0, 0.0));
-        object->next->snorm.assign(numrefstotal * 3, point_t(0.0, 0.0, 0.0));
-        object->next->attrSurf = attrSurf;
-        object->next->attrMat = attrMat;
+        object.vertexarray.resize(numrefstotal);
+        object.textarray.resize(numrefstotal);
+        object.surfrefs.resize(numrefs);
+        object.norm.assign(numrefstotal * 3, point_t(0.0, 0.0, 0.0));
+        object.snorm.assign(numrefstotal * 3, point_t(0.0, 0.0, 0.0));
+        object.attrSurf = attrSurf;
+        object.attrMat = attrMat;
         attrSurf = 0x20;
 
         for (int i = 0; i < numrefstotal; i++)
         {
-            object->next->vertexarray[i] = tmpva[i];
-            object->next->textarray[i] = tmptexa[i];
+            object.vertexarray[i] = tmpva[i];
+            object.textarray[i] = tmptexa[i];
         }
 
         for (int i = 0; i < numrefs; i++)
-            object->next->surfrefs[i] = tmpsurf[i];
+            object.surfrefs[i] = tmpsurf[i];
 
-        object->next->numvertice = numvertice;
+        object.numvertice = numvertice;
 
-        if (!object->next->hasName())
+        if (!object.hasName())
         {
-            object->next->name = tmpname + std::to_string(tmpIndice);
+            object.name = tmpname + std::to_string(tmpIndice);
 
             tmpIndice++;
         }
@@ -955,9 +928,9 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
                 || typeConvertion == _AC3DTOAC3DGROUP
                 || (typeConvertion == _AC3DTOAC3D && extendedTriangles))
         {
-            printf("Computing normals for %s\n", object->next->name.c_str());
-            computeObjectTriNorm(object->next);
-            //smoothObjectTriNorm(object->next );
+            printf("Computing normals for %s\n", object.name.c_str());
+            computeObjectTriNorm(object);
+            //smoothObjectTriNorm(object);
         }
 
         numrefs = numrefstotal = 0;
@@ -966,15 +939,14 @@ int doKids(char* Line, ob_t* object, std::vector<mat_t> &materials)
         dataFound = false;
         numvertex = 0;
         numvertice = 0;
-
     }
     else
-        object->next->kids = kids;
+        object.kids = kids;
 
     return (0);
 }
 
-int doName(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doName(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     char * p;
     char *q;
@@ -1020,7 +992,8 @@ int doName(char *Line, ob_t *object, std::vector<mat_t> &materials)
     sprintf(name, "%s", name2);
 
     /*sprintf(name,"terrain%d",tmpIndice2++);*/
-    object->next->name = name;
+    ob_t &object = objects.front();
+    object.name = name;
     sprintf(tmpname, "%s", name);
 
     fprintf(stderr, "loading  %s object                             \r", name);
@@ -1030,7 +1003,7 @@ int doName(char *Line, ob_t *object, std::vector<mat_t> &materials)
     return (0);
 }
 
-int doLoc(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doLoc(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1038,8 +1011,8 @@ int doLoc(char *Line, ob_t *object, std::vector<mat_t> &materials)
         fprintf(stderr, "unknown Loc format %s\n", Line);
         return (-1);
     }
-    if (sscanf(p, "%lf %lf %lf", &(object->next->loc.x), &(object->next->loc.y),
-        &(object->next->loc.z)) != 3)
+    ob_t &object = objects.front();
+    if (sscanf(p, "%lf %lf %lf", &object.loc.x, &object.loc.y, &object.loc.z) != 3)
     {
         fprintf(stderr, "invalid Loc format %s\n", p);
         return (-1);
@@ -1049,7 +1022,7 @@ int doLoc(char *Line, ob_t *object, std::vector<mat_t> &materials)
     return (0);
 }
 
-int doData(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doData(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1067,7 +1040,7 @@ int doData(char *Line, ob_t *object, std::vector<mat_t> &materials)
     return (0);
 }
 
-int doGetData(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doGetData(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     int lineSize = (int)strlen(Line);
     // the '\n' of the last line is not included
@@ -1077,17 +1050,18 @@ int doGetData(char *Line, ob_t *object, std::vector<mat_t> &materials)
         lineSize--;
     }
     dataSizeRead += lineSize;
-    object->next->data += Line;
+    ob_t &object = objects.front();
+    object.data += Line;
     return (0);
 }
 
-int doCrease(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doCrease(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     dataFound = false;
     return (0);
 }
 
-int doTexture(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doTexture(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     char name[256] = { 0 };
     char * p = strstr(Line, " ");
@@ -1102,6 +1076,7 @@ int doTexture(char *Line, ob_t *object, std::vector<mat_t> &materials)
         return (-1);
     }
 
+    ob_t &object = objects.front();
     p = strstr(name, "\"");
     if (p != NULL)
     {
@@ -1110,15 +1085,15 @@ int doTexture(char *Line, ob_t *object, std::vector<mat_t> &materials)
         if (q != NULL)
             *q = '\0';
 
-        object->next->texture = p;
+        object.texture = p;
     }
     else
-        object->next->texture = name;
+        object.texture = name;
     dataFound = false;
     return (0);
 }
 
-int doTexrep(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doTexrep(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1126,7 +1101,8 @@ int doTexrep(char *Line, ob_t *object, std::vector<mat_t> &materials)
         fprintf(stderr, "unknown Texrep format %s\n", Line);
         return (-1);
     }
-    if (sscanf(p, "%lf %lf", &(object->next->texrep_x), &(object->next->texrep_y)) != 2)
+    ob_t &object = objects.front();
+    if (sscanf(p, "%lf %lf", &object.texrep_x, &object.texrep_y) != 2)
     {
         fprintf(stderr, "invalid Texrep format %s\n", p);
         return (-1);
@@ -1136,7 +1112,7 @@ int doTexrep(char *Line, ob_t *object, std::vector<mat_t> &materials)
     return (0);
 }
 
-int doNumvert(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doNumvert(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1144,19 +1120,20 @@ int doNumvert(char *Line, ob_t *object, std::vector<mat_t> &materials)
         fprintf(stderr, "unknown numvert format %s\n", Line);
         return (-1);
     }
-    if (sscanf(p, "%d", &(object->next->numvert)) != 1)
+    ob_t &object = objects.front();
+    if (sscanf(p, "%d", &object.numvert) != 1)
     {
         fprintf(stderr, "invalid numvert format %s\n", p);
         return (-1);
     }
-    object->next->vertex.resize(object->next->numvert);
+    object.vertex.resize(object.numvert);
     numvertex = 0;
     numvertFound = true;
     dataFound = false;
     return (0);
 }
 
-int doNumsurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doNumsurf(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1164,7 +1141,8 @@ int doNumsurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
         fprintf(stderr, "unknown numsurf format %s\n", Line);
         return (-1);
     }
-    if (sscanf(p, "%d", &(object->next->numsurf)) != 1)
+    ob_t &object = objects.front();
+    if (sscanf(p, "%d", &object.numsurf) != 1)
     {
         fprintf(stderr, "invalid numsurf format %s\n", p);
         return (-1);
@@ -1174,62 +1152,64 @@ int doNumsurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
     return (0);
 }
 
-int doGetVertex(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doGetVertex(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
-    if (sscanf(Line, "%lf %lf %lf ", &(object->next->vertex[numvertex].x),
-        &(object->next->vertex[numvertex].z),
-        &(object->next->vertex[numvertex].y)) != 3)
+    ob_t &object = objects.front();
+    if (sscanf(Line, "%lf %lf %lf ",
+        &object.vertex[numvertex].x,
+        &object.vertex[numvertex].z,
+        &object.vertex[numvertex].y) != 3)
     {
         fprintf(stderr, "invalid vertex format %s\n", Line);
         return (-1);
     }
-    object->next->vertex[numvertex].x += object->next->loc.x;
-    object->next->vertex[numvertex].y += object->next->loc.z;
-    object->next->vertex[numvertex].z += object->next->loc.y;
-    object->next->vertex[numvertex].y = -object->next->vertex[numvertex].y;
+    object.vertex[numvertex].x += object.loc.x;
+    object.vertex[numvertex].y += object.loc.z;
+    object.vertex[numvertex].z += object.loc.y;
+    object.vertex[numvertex].y = -object.vertex[numvertex].y;
     /* compute min/max of the vertex for this object */
-    if (object->next->vertex[numvertex].x > object->next->x_max)
-        object->next->x_max = object->next->vertex[numvertex].x;
-    if (object->next->vertex[numvertex].x < object->next->x_min)
-        object->next->x_min = object->next->vertex[numvertex].x;
+    if (object.vertex[numvertex].x > object.x_max)
+        object.x_max = object.vertex[numvertex].x;
+    if (object.vertex[numvertex].x < object.x_min)
+        object.x_min = object.vertex[numvertex].x;
 
-    if (object->next->vertex[numvertex].y > object->next->y_max)
-        object->next->y_max = object->next->vertex[numvertex].y;
-    if (object->next->vertex[numvertex].y < object->next->y_min)
-        object->next->y_min = object->next->vertex[numvertex].y;
+    if (object.vertex[numvertex].y > object.y_max)
+        object.y_max = object.vertex[numvertex].y;
+    if (object.vertex[numvertex].y < object.y_min)
+        object.y_min = object.vertex[numvertex].y;
 
-    if (object->next->vertex[numvertex].z > object->next->z_max)
-        object->next->z_max = object->next->vertex[numvertex].z;
-    if (object->next->vertex[numvertex].z < object->next->z_min)
-        object->next->z_min = object->next->vertex[numvertex].z;
+    if (object.vertex[numvertex].z > object.z_max)
+        object.z_max = object.vertex[numvertex].z;
+    if (object.vertex[numvertex].z < object.z_min)
+        object.z_min = object.vertex[numvertex].z;
 
     numvertex++;
     /*fprintf(stderr,"numvertex = %d\n",numvertex);*/
     return (0);
 }
 
-int doGetSurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doGetSurf(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
-    /*  double u,v;*/
+    const ob_t &object = objects.front();
 
-    if (sscanf(Line, "%d %lf %lf ", &(tmpva[numvertice].indice),
-        &(tmpva[numvertice].uv.u), &(tmpva[numvertice].uv.v)) != 3)
+    if (sscanf(Line, "%d %lf %lf ", &tmpva[numvertice].indice,
+        &tmpva[numvertice].uv.u, &tmpva[numvertice].uv.v) != 3)
     {
         fprintf(stderr, "invalid surf format %s\n", Line);
         return (-1);
     }
     /*fprintf(stderr,"numrefs = %d\n",numrefs);*/
-    /*printf("%.2lf %.2lf\n",tmpva[numvertice].u,tmpva[numvertice].v);*/
+    /*printf("%.2lf %.2lf\n",tmpva[numvertice].uv.u,tmpva[numvertice].uv.v);*/
     tmpva[numvertice].saved = false;
-    tmptexa[tmpva[numvertice].indice].u = tmpva[numvertice].uv.u * object->next->texrep_x;
-    tmptexa[tmpva[numvertice].indice].v = tmpva[numvertice].uv.v * object->next->texrep_y;
+    tmptexa[tmpva[numvertice].indice].u = tmpva[numvertice].uv.u * object.texrep_x;
+    tmptexa[tmpva[numvertice].indice].v = tmpva[numvertice].uv.v * object.texrep_y;
     numvertice++;
     return (0);
 }
 
-int doSurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doSurf(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
-    int surf = 0;
+    unsigned int surf = 0;
     char * p = strstr(Line, " ");
     if (p == NULL)
     {
@@ -1255,7 +1235,7 @@ int doSurf(char *Line, ob_t *object, std::vector<mat_t> &materials)
     return (0);
 }
 
-int doMat(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doMat(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     int mat = 0;
     char * p = strstr(Line, " ");
@@ -1281,7 +1261,7 @@ int doMat(char *Line, ob_t *object, std::vector<mat_t> &materials)
     return (0);
 }
 
-int doRefs(char *Line, ob_t *object, std::vector<mat_t> &materials)
+int doRefs(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 {
     char * p = strstr(Line, " ");
     if (p == NULL)
@@ -1310,20 +1290,20 @@ int doRefs(char *Line, ob_t *object, std::vector<mat_t> &materials)
 /* We need to split an object face in more faces
  * if there are common points with different texture coordinates.
  */
-bool isObjectSplit(ob_t* object)
+bool isObjectSplit(const ob_t &object)
 {
     if (notexturesplit)
         return false;
 
-    int numverts = object->numvertice;
+    int numverts = object.numvertice;
 
     for (int i = 0; i < numverts; i++)
     {
         for (int j = i + 1; j < numverts; j++)
         {
-            bool same_pt = (object->vertexarray[i].indice == object->vertexarray[j].indice);
-            bool diff_u = (object->vertexarray[i].uv.u != object->vertexarray[j].uv.u);
-            bool diff_v = (object->vertexarray[i].uv.v != object->vertexarray[j].uv.v);
+            bool same_pt = (object.vertexarray[i].indice == object.vertexarray[j].indice);
+            bool diff_u = (object.vertexarray[i].uv.u != object.vertexarray[j].uv.u);
+            bool diff_v = (object.vertexarray[i].uv.v != object.vertexarray[j].uv.v);
 
             if (same_pt && (diff_u || diff_v))
                 return true;
@@ -1336,7 +1316,7 @@ bool isObjectSplit(ob_t* object)
     return false;
 }
 
-bool isTerrainSplit(ob_t* object)
+bool isTerrainSplit(const ob_t &object)
 {
     /* general showstoppers */
     if (typeConvertion == _AC3DTOAC3DS)
@@ -1345,7 +1325,7 @@ bool isTerrainSplit(ob_t* object)
     if (distSplit <= 0)
         return false;
 
-    if (object->hasName())
+    if (object.hasName())
     {
         /* denied prefixes */
         const int num_prefixes = 17;
@@ -1356,83 +1336,55 @@ bool isTerrainSplit(ob_t* object)
 
         for (int i = 0; i < num_prefixes; i++)
         {
-            if (object->nameStartsWith(denied_prefixes[i]))
+            if (object.nameStartsWith(denied_prefixes[i]))
                 return false;
         }
 
         /* name contains terrain or ground */
-        if (object->nameHasStr("terrain") || object->nameHasStr("TERRAIN") || 
-            object->nameHasStr("GROUND") || object->nameHasStr("ground"))
+        if (object.nameHasStr("terrain") || object.nameHasStr("TERRAIN") || 
+            object.nameHasStr("GROUND") || object.nameHasStr("ground"))
             return true;
     }
 
     /* dimension within splitting distance */
-    if (((object->x_max - object->x_min) > 1.5 * distSplit) ||
-        ((object->y_max - object->y_min) > 1.5 * distSplit))
+    if (((object.x_max - object.x_min) > 1.5 * distSplit) ||
+        ((object.y_max - object.y_min) > 1.5 * distSplit))
         return true;
 
     return false;
 }
 
-ob_t * splitObjects(ob_t* object)
+void splitObjects(std::list<ob_t> &objects)
 {
-    if (NULL == object)
-        return NULL;
-
-    /* The returned object. Contains all objects from the given
-     * object, split and non-split objects.
-     */
-    ob_t* newob = NULL;
-
-    ob_t* current_ob = object;
-    while(current_ob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end();)
     {
-        ob_t* next_ob = current_ob->next; // remember next one, cuz we'll modify current_ob
-        ob_t* splitob = NULL;
-
-        if (isObjectSplit(current_ob))
+        if (isObjectSplit(*it))
         {
             printf("Found in %s, a duplicate coord with different u,v, split is required\n",
-                   current_ob->name.c_str());
+                   it->name.c_str());
 
-            splitob = splitOb(current_ob);
+            std::list<ob_t>::iterator other = it++;
+            splitOb(objects, other);
         }
-        else if (isTerrainSplit(current_ob))
+        else if (isTerrainSplit(*it))
         {
-            printf("Splitting surfaces of %s\n", current_ob->name.c_str());
+            printf("Splitting surfaces of %s\n", it->name.c_str());
 
-            splitob = terrainSplitOb(current_ob);
-        }
-
-        if (splitob != NULL)
-        {
-            delete current_ob;
-            newob = obAppend(newob, splitob);
+            std::list<ob_t>::iterator other = it++;
+            terrainSplitOb(objects, other);
         }
         else
-        {
-            printf("No split required for %s\n", current_ob->name.c_str());
-
-            // Append only the single object, not the whole list.
-            // The others will be appended in this function one by one.
-            current_ob->next = NULL;
-            newob = obAppend(newob, current_ob);
-        }
-
-        current_ob = next_ob;
+            ++it;
     }
-
-    return newob;
 }
 
-int loadAC(const std::string & inputFilename, ob_t** objects, std::vector<mat_t>& materials, const std::string & outputFilename)
+int loadAC(const std::string &inputFilename, std::list<ob_t> &objects, std::vector<mat_t> &materials, const std::string &outputFilename)
 {
     /* saveIn : 0= 3ds , 1= obj , 2=ac3d grouped (track) , 3 = ac3d strips (cars) */
     char Line[256];
     int ret = 0;
-    int (*doVerb)(char * Line, ob_t *object, std::vector<mat_t> &materials);
+    int (*doVerb)(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
     FILE * file;
-    ob_t * current_ob;
 
     if ((file = fopen(inputFilename.c_str(), "r")) == NULL)
     {
@@ -1451,10 +1403,6 @@ int loadAC(const std::string & inputFilename, ob_t** objects, std::vector<mat_t>
         fclose(file);
         return (-1);
     }
-
-    current_ob = new ob_t;
-    current_ob->name = "root";
-    *objects = current_ob;
 
     fprintf(stderr, "starting loading ...\n");
 
@@ -1476,19 +1424,19 @@ int loadAC(const std::string & inputFilename, ob_t** objects, std::vector<mat_t>
         }
         if (numvertFound && doVerb == NULL)
         {
-            ret = doGetVertex(Line, current_ob, materials);
+            ret = doGetVertex(Line, objects, materials);
             if(ret != 0)
                 break;
         }
         else if (numrefsFound && doVerb == NULL)
         {
-            ret = doGetSurf(Line, current_ob, materials);
+            ret = doGetSurf(Line, objects, materials);
             if(ret != 0)
                 break;
         }
         else if (dataFound && doVerb == NULL)
         {
-            ret = doGetData(Line, current_ob, materials);
+            ret = doGetData(Line, objects, materials);
             if (ret != 0)
                 break;
         }
@@ -1502,7 +1450,7 @@ int loadAC(const std::string & inputFilename, ob_t** objects, std::vector<mat_t>
             numvertFound = false;
             numrefsFound = false;
             dataFound = false;
-            ret = doVerb(Line, current_ob, materials);
+            ret = doVerb(Line, objects, materials);
             if(ret != 0)
                 break;
         }
@@ -1512,7 +1460,7 @@ int loadAC(const std::string & inputFilename, ob_t** objects, std::vector<mat_t>
         return ret;
 
     if (splitObjectsDuringLoad != 0)
-        current_ob = splitObjects(current_ob);
+        splitObjects(objects);
 
     // --- perform file output ---
 
@@ -1521,516 +1469,166 @@ int loadAC(const std::string & inputFilename, ob_t** objects, std::vector<mat_t>
 
     if (typeConvertion == _AC3DTOOBJ)
     {
-        computeSaveOBJ(outputFilename, current_ob, materials);
+        computeSaveOBJ(outputFilename, objects, materials);
     }
     else if (typeConvertion == _AC3DTOAC3DM)
     {
-        computeSaveAC3DM(outputFilename, current_ob, materials);
+        computeSaveAC3DM(outputFilename, objects, materials);
     }
     else if (typeConvertion == _AC3DTOAC3DS)
     {
-        computeSaveAC3DStrip(outputFilename, current_ob, materials);
+        computeSaveAC3DStrip(outputFilename, objects, materials);
     }
     else if (typeConvertion == _AC3DTOAC3D)
     {
-        computeSaveAC3D(outputFilename, current_ob, materials);
+        computeSaveAC3D(outputFilename, objects, materials);
     }
-#ifdef _3DS
-    else if (typeConvertion == _AC3DTO3DS)
-    {
-        saveObin3DS(outputFilename, current_ob, current_material);
-    }
-#endif
 
     return 0;
 }
 
-#ifdef _3DS
-void saveIn3DSsubObject(ob_t * object,database3ds *db)
-{
-
-    /*material3ds *matr     = NULL;*/
-    mesh3ds *mobj = NULL;
-    kfmesh3ds *kobj = NULL;
-
-    if (object->name==NULL && (!stricmp("world",object->type)))
-    {
-        return;
-    }
-    else if (!stricmp("world",object->name))
-    {
-        return;
-    }
-    else if (!stricmp("root",object->name))
-    {
-        if (object->next!=NULL)
-        {
-            saveIn3DSsubObject(object->next,db);
-            return;
-        }
-    }
-
-    if (object->numvert!=0)
-    {
-        if (object->name==NULL)
-        {
-            sprintf(tmpname,"TMPNAME%d",tmpIndice);
-            tmpIndice=0;
-        }
-        else
-            sprintf(tmpname,"%s",object->name);
-
-        printf("saving %s , numvert=%d , numsurf=%d\n",object->name,object->numvert,object->numsurf);
-
-        InitMeshObj3ds(&mobj, object->numvert, object->numsurf,
-                InitNoExtras3ds|InitTextArray3ds|InitVertexArray3ds|InitFaceArray3ds);
-
-        for (int i = 0; i < object->numvert; i++)
-        {
-            mobj->vertexarray[i].x = object->vertex[i].x;
-            mobj->vertexarray[i].y = object->vertex[i].y;
-            mobj->vertexarray[i].z = object->vertex[i].z;
-        }
-
-        for (int i = 0; i < object->numvert; i++)
-        {
-            mobj->textarray[i].u = object->textarray[i*2];
-            mobj->textarray[i].v = object->textarray[i*2+1];
-        }
-
-        for (int j = 0; j < object->numsurf; j++)
-        {
-            /* GUIONS */
-            mobj->facearray[j].v1=object->vertexarray[j*3].indice;
-            mobj->facearray[j].flag=FaceABVisable3ds|FaceBCVisable3ds|FaceCAVisable3ds;
-            mobj->facearray[j].v2=object->vertexarray[j*3+1].indice;
-            mobj->facearray[j].v3=object->vertexarray[j*3+2].indice;
-        }
-
-        ON_ERROR_RETURN;
-        sprintf(mobj->name, "%s", tmpname);
-        printf("generating object %s faces: %d vertex:%d             \r",
-                mobj->name,object->numsurf,object->numvert);
-        mobj->ntextverts =object->numvert;
-        mobj->usemapinfo = True3ds;
-
-        if (object->texture!=NULL)
-        {
-            mobj->nmats = 1;
-            InitMeshObjField3ds (mobj, InitMatArray3ds);
-            ON_ERROR_RETURN;
-
-            InitMatArrayIndex3ds (mobj, 0, mobj->nfaces);
-            ON_ERROR_RETURN;
-
-            for (int i=0; i<texnum; i++)
-            {
-                if (tex[i]!=NULL)
-                if (object->hasTexture())
-                if (!strncmp(object->texture.c_str(),tex[i],13))
-                sprintf(mobj->matarray[0].name,"texture%d",i);
-            }
-
-            for (int i=0; i<mobj->nfaces; i++)
-                mobj->matarray[0].faceindex[i] = (ushort3ds)i;
-            mobj->matarray[0].nfaces = mobj->nfaces;
-        }
-
-        FillMatrix3ds(mobj);
-        PutMesh3ds(db, mobj);
-        ON_ERROR_RETURN;
-        InitObjectMotion3ds(&kobj, 1, 1, 1, 0, 0);
-        ON_ERROR_RETURN;
-        sprintf(kobj->name, "%s",tmpname);
-        /* Set the pivot point to the mesh's center */
-        SetPoint(kobj->pivot, 0.0F, 0.0F, 0.0F);
-        SetBoundBox3ds (mobj, kobj);
-        ON_ERROR_RETURN;
-        kobj->pkeys[0].time = 0;
-        kobj->pos[0].x = (kobj->boundmax.x - kobj->boundmin.x) / 2.0F + kobj->boundmin.x;
-        kobj->pos[0].y = (kobj->boundmax.y - kobj->boundmin.y) / 2.0F + kobj->boundmin.y;
-        kobj->pos[0].z = (kobj->boundmax.z - kobj->boundmin.z) / 2.0F + kobj->boundmin.z;
-        kobj->rkeys[0].time = 0;
-        kobj->rot[0].angle = 0.0F;
-        kobj->rot[0].x = 0.0F;
-        kobj->rot[0].y = 0.0F;
-        kobj->rot[0].z = -1.0F;
-        PutObjectMotion3ds(db, kobj);
-        ON_ERROR_RETURN;
-        ReleaseObjectMotion3ds (&kobj);
-        ON_ERROR_RETURN;
-        RelMeshObj3ds(&mobj);
-    }
-
-    if (object->next)
-    saveIn3DSsubObject(object->next,db);
-
-}
-
-void saveObin3DS( const std::string & OutputFilename, ob_t * object, mat_t * material)
-{
-    database3ds *db = NULL;
-    file3ds *file;
-    material3ds *matr = NULL;
-
-    meshset3ds *mesh = NULL;
-    background3ds *bgnd = NULL;
-    atmosphere3ds *atmo = NULL;
-    char name2[256];
-    char *p, *q;
-    viewport3ds *view = NULL;
-    ob_t * tmpob =NULL;
-
-    /* Clear error list, not necessary but safe */
-    ClearErrList3ds();
-    file = OpenFile3ds(OutputFilename.c_str(), "w");
-    PRINT_ERRORS_EXIT(stderr);
-    InitDatabase3ds(&db);
-    PRINT_ERRORS_EXIT(stderr);
-    CreateNewDatabase3ds(db, MeshFile);
-    PRINT_ERRORS_EXIT(stderr);
-    /*--- MESH SETTINGS */
-    InitMeshSet3ds(&mesh);
-    ON_ERROR_RETURN;
-    mesh->ambientlight.r = mesh->ambientlight.g = mesh->ambientlight.b = 0.3F;
-    PutMeshSet3ds(db, mesh);
-    ON_ERROR_RETURN;
-    ReleaseMeshSet3ds(&mesh);
-    ON_ERROR_RETURN;
-    InitBackground3ds(&bgnd);
-    ON_ERROR_RETURN;
-    PutBackground3ds(db, bgnd);
-    ON_ERROR_RETURN;
-    ReleaseBackground3ds(&bgnd);
-    ON_ERROR_RETURN;
-    /*--- ATMOSPHERE */
-    InitAtmosphere3ds(&atmo);
-    ON_ERROR_RETURN;
-    PutAtmosphere3ds(db, atmo);
-    ON_ERROR_RETURN;
-    ReleaseAtmosphere3ds(&atmo);
-    ON_ERROR_RETURN;
-    /*--- MATERIAL */
-    InitMaterial3ds(&matr);
-    ON_ERROR_RETURN;
-    strcpy(matr->name, "RedSides");
-    matr->ambient.r = 0.0F;
-    matr->ambient.g = 0.0F;
-    matr->ambient.b = 0.0F;
-    matr->diffuse.r = 1.0F;
-    matr->diffuse.g = 0.0F;
-    matr->diffuse.b = 0.0F;
-    matr->specular.r = 1.0F;
-    matr->specular.g = 0.7F;
-    matr->specular.b = 0.65F;
-    matr->shininess = 0.0F;
-    matr->shinstrength = 0.0F;
-    matr->blur = 0.2F;
-    matr->transparency = 0.0F;
-    matr->transfalloff = 0.0F;
-    matr->selfillumpct = 0.0F;
-    matr->wiresize = 1.0F;
-    matr->shading = Phong;
-    matr->useblur = True3ds;
-    PutMaterial3ds(db, matr);
-    ON_ERROR_RETURN;
-    ReleaseMaterial3ds(&matr);
-    ON_ERROR_RETURN;
-
-    texnum=0;
-    tmpob=object;
-    while (tmpob!=NULL)
-    {
-        int texnofound=0;
-        if (tmpob->canSkip())
-        {
-            tmpob=tmpob->next;
-            continue;
-        }
-        texnofound=1;
-        for (int i=0; i<texnum; i++)
-        {
-            if (tmpob->texture==NULL)
-            {
-                texnofound=0;
-                break;
-
-            }
-            if (!strncmp(tex[i],tmpob->texture.c_str(),13))
-            {
-                texnofound=0;
-                break;
-
-            }
-            else
-            {
-                texnofound=1;
-            }
-        }
-        if (texnofound==1)
-        {
-            if (tmpob->texture!=NULL)
-            {
-                strcpy(tex[texnum],tmpob->texture);
-                tex[texnum][13]='\0';
-            }
-            texnum ++;
-        }
-        tmpob=tmpob->next;
-    }
-
-    for (int i=0; i<texnum; i++)
-    {
-
-        InitMaterial3ds(&matr);
-        ON_ERROR_RETURN;
-        sprintf(matr->name,"texture%d",i);
-        /*sprintf(matr->texture.map.name,"texture%d",i);*/
-        printf("analysing  %s\n",tex[i]);
-        p=tex[i];
-        q=name2;
-        while (*p)
-        {
-            if ( (*p<='Z'&&*p>='A'))
-            {
-                *p=(*p-'A')+'a';
-            }
-
-            if ( (*p>='a' && *p<='z') || (*p>='0' && *p<='9') || (*p=='.'))
-            {
-                *q=*p; q++; *q='\0';
-            }
-            p++;
-        }
-        int j=0;
-        while (name2[j]!='\0')
-        {
-            if (name2[j]=='.')
-            {
-                name2[j]='\0';
-                break;
-            }
-            j++;
-            if (j==8)
-            {
-                name2[j]='\0';
-                break;
-            }
-        }
-
-        printf("texture file %s will be stored as %s.png\n",tex[i],name2);
-        sprintf(matr->texture.map.name,"%s.png",name2);
-
-        if (material != NULL)
-        {
-            matr->ambient.r = material->amb.r;
-            matr->ambient.g = material->amb.g;
-            matr->ambient.b = material->amb.b;
-            matr->specular.r = material->spec.r;
-            matr->specular.g = material->spec.g;
-            matr->specular.b = material->spec.b;
-            matr->shininess = material->shi;
-            matr->transparency = material->trans;
-            matr->diffuse.r = material->rgb.r;
-            matr->diffuse.g = material->rgb.g;
-            matr->diffuse.b = material->rgb.b;
-        }
-        else
-        {
-            matr->ambient.r = 1.0F;
-            matr->ambient.g = 1.0F;
-            matr->ambient.b = 1.0F;
-            matr->specular.r =1.0F;
-            matr->specular.g =1.0F;
-            matr->specular.b =1.0F;
-            matr->shininess = 0.0F;
-            matr->transparency = 0.0F;
-            matr->diffuse.r = 1.0F;
-            matr->diffuse.g = 1.0F;
-            matr->diffuse.b = 1.0F;
-        }
-
-        matr->shinstrength = 0.0F;
-        matr->blur = 0.2F;
-
-        matr->transfalloff = 0.0F;
-        matr->selfillumpct = 0.0F;
-        matr->wiresize = 1.0F;
-        matr->shading = Phong;
-        matr->useblur = True3ds;
-        matr->texture.map.percent = 1.0F;
-        matr->texture.map.ignorealpha = False3ds;
-        matr->texture.map.filter = (filtertype3ds)False3ds;
-        matr->texture.map.mirror = False3ds;
-        matr->texture.map.negative =False3ds;
-        matr->texture.map.source = RGB;
-        matr->texture.map.blur = 0.07F;
-        PutMaterial3ds(db, matr);
-        ON_ERROR_RETURN;
-        ReleaseMaterial3ds(&matr);
-        ON_ERROR_RETURN;
-    }
-
-    tmpIndice=0;
-    /* do the job */
-    saveIn3DSsubObject(object,db);
-    printf("\nend\n");
-    /* Always remember to release the memory used by a mesh3ds pointer prior
-     to using the pointer again so that the values of the last mesh will
-     not be carried over. */
-    InitViewport3ds(&view);
-    ON_ERROR_RETURN;
-    PutViewport3ds(db, view);
-    ON_ERROR_RETURN;
-    ReleaseViewport3ds(&view);
-    ON_ERROR_RETURN;
-    WriteDatabase3ds(file, db);
-    PRINT_ERRORS_EXIT(stderr);
-    CloseAllFiles3ds();
-    PRINT_ERRORS_EXIT(stderr);
-    ReleaseDatabase3ds(&db);
-    PRINT_ERRORS_EXIT(stderr);
-
-}
-#endif
-
-int printOb(FILE *ofile, ob_t * object)
+int printOb(FILE *ofile, ob_t &object)
 {
     int multitex = 0;
 
-    if (object->numsurf == 0)
+    if (object.numsurf == 0)
         return 0;
+
     if (!extendedStrips && !normalMapping)
+    {
         if (!(isobjectacar && collapseObject))
-            stripifyOb(ofile, object, 0);
-    object->saved = true;
+            stripifyOb(ofile, &object, false);
+    }
+
+    object.saved = true;
     fprintf(ofile, "OBJECT poly\n");
-    fprintf(ofile, "name \"%s\"\n", object->name.c_str());
-    if (object->hasMultiTexture())
+    fprintf(ofile, "name \"%s\"\n", object.name.c_str());
+    if (object.hasMultiTexture())
     {
         multitex = 1;
-        fprintf(ofile, "texture \"%s\" base\n", object->texture.c_str());
-        if (object->hasTexture1())
-            fprintf(ofile, "texture \"%s\" tiled\n", object->texture1.c_str());
+        fprintf(ofile, "texture \"%s\" base\n", object.texture.c_str());
+        if (object.hasTexture1())
+            fprintf(ofile, "texture \"%s\" tiled\n", object.texture1.c_str());
         else
             fprintf(ofile, "texture empty_texture_no_mapping tiled\n");
-        if (object->hasTexture2())
-            fprintf(ofile, "texture \"%s\" skids\n", object->texture2.c_str());
+        if (object.hasTexture2())
+            fprintf(ofile, "texture \"%s\" skids\n", object.texture2.c_str());
         else
             fprintf(ofile, "texture empty_texture_no_mapping skids\n");
-        if (object->hasTexture3())
-            fprintf(ofile, "texture \"%s\" shad\n", object->texture3.c_str());
+        if (object.hasTexture3())
+            fprintf(ofile, "texture \"%s\" shad\n", object.texture3.c_str());
         else
             fprintf(ofile, "texture empty_texture_no_mapping shad\n");
     }
     else
     {
-        fprintf(ofile, "texture \"%s\"\n", object->texture.c_str());
+        fprintf(ofile, "texture \"%s\"\n", object.texture.c_str());
     }
-    fprintf(ofile, "numvert %d\n", object->numvert);
-    for (int i = 0; i < object->numvert; i++)
+    fprintf(ofile, "numvert %d\n", object.numvert);
+    for (int i = 0; i < object.numvert; i++)
     {
         if ((typeConvertion == _AC3DTOAC3DS
                 && (extendedStrips || extendedTriangles))
                 || typeConvertion == _AC3DTOAC3DGROUP
                 || (typeConvertion == _AC3DTOAC3D && extendedTriangles))
         {
-            fprintf(ofile, "%lf %lf %lf %lf %lf %lf\n", object->vertex[i].x,
-                object->vertex[i].z, -object->vertex[i].y, object->snorm[i].x,
-                object->snorm[i].z, -object->snorm[i].y);
+            fprintf(ofile, "%lf %lf %lf %lf %lf %lf\n", object.vertex[i].x,
+                object.vertex[i].z, -object.vertex[i].y, object.snorm[i].x,
+                object.snorm[i].z, -object.snorm[i].y);
         }
         else
         {
-            fprintf(ofile, "%lf %lf %lf\n", object->vertex[i].x, object->vertex[i].z,
-                    -object->vertex[i].y);
+            fprintf(ofile, "%lf %lf %lf\n", object.vertex[i].x, object.vertex[i].z, -object.vertex[i].y);
         }
     }
     if (!extendedStrips)
     {
-        fprintf(ofile, "numsurf %d\n", object->numsurf);
-        for (int i = 0; i < object->numsurf; i++)
+        fprintf(ofile, "numsurf %d\n", object.numsurf);
+        for (int i = 0; i < object.numsurf; i++)
         {
-            if (object->attrSurf != 0)
-                fprintf(ofile, "SURF 0x%2x\n", object->attrSurf);
+            if (object.attrSurf != 0)
+                fprintf(ofile, "SURF 0x%2x\n", object.attrSurf);
             else
                 fprintf(ofile, "SURF 0x20\n");
-            fprintf(ofile, "mat %d\n", object->attrMat);
+            fprintf(ofile, "mat %d\n", object.attrMat);
             fprintf(ofile, "refs 3\n");
             /* GUIONS */
             if (multitex == 0)
             {
-                fprintf(ofile, "%d %.5f %.5f\n", object->vertexarray[i * 3].indice,
-                        object->textarray[object->vertexarray[i * 3].indice].u,
-                        object->textarray[object->vertexarray[i * 3].indice].v);
                 fprintf(ofile, "%d %.5f %.5f\n",
-                        object->vertexarray[i * 3 + 1].indice,
-                        object->textarray[object->vertexarray[i * 3 + 1].indice].u,
-                        object->textarray[object->vertexarray[i * 3 + 1].indice].v);
+                        object.vertexarray[i * 3].indice,
+                        object.textarray[object.vertexarray[i * 3].indice].u,
+                        object.textarray[object.vertexarray[i * 3].indice].v);
                 fprintf(ofile, "%d %.5f %.5f\n",
-                        object->vertexarray[i * 3 + 2].indice,
-                        object->textarray[object->vertexarray[i * 3 + 2].indice].u,
-                        object->textarray[object->vertexarray[i * 3 + 2].indice].v);
+                        object.vertexarray[i * 3 + 1].indice,
+                        object.textarray[object.vertexarray[i * 3 + 1].indice].u,
+                        object.textarray[object.vertexarray[i * 3 + 1].indice].v);
+                fprintf(ofile, "%d %.5f %.5f\n",
+                        object.vertexarray[i * 3 + 2].indice,
+                        object.textarray[object.vertexarray[i * 3 + 2].indice].u,
+                        object.textarray[object.vertexarray[i * 3 + 2].indice].v);
             }
             else
             {
-                fprintf(ofile, "%d %.5f %.5f", object->vertexarray[i * 3].indice,
-                        object->textarray[object->vertexarray[i * 3].indice].u,
-                        object->textarray[object->vertexarray[i * 3].indice].v);
+                fprintf(ofile, "%d %.5f %.5f",
+                        object.vertexarray[i * 3].indice,
+                        object.textarray[object.vertexarray[i * 3].indice].u,
+                        object.textarray[object.vertexarray[i * 3].indice].v);
 
-                if (object->hasTexture1())
+                if (object.hasTexture1())
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray1[object->vertexarray[i * 3].indice].u,
-                            object->textarray1[object->vertexarray[i * 3].indice].v);
+                            object.textarray1[object.vertexarray[i * 3].indice].u,
+                            object.textarray1[object.vertexarray[i * 3].indice].v);
 
-                if (object->hasTexture2())
+                if (object.hasTexture2())
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray2[object->vertexarray[i * 3].indice].u,
-                            object->textarray2[object->vertexarray[i * 3].indice].v);
-                if (object->hasTexture3())
+                            object.textarray2[object.vertexarray[i * 3].indice].u,
+                            object.textarray2[object.vertexarray[i * 3].indice].v);
+                if (object.hasTexture3())
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray3[object->vertexarray[i * 3].indice].u,
-                            object->textarray3[object->vertexarray[i * 3].indice].v);
+                            object.textarray3[object.vertexarray[i * 3].indice].u,
+                            object.textarray3[object.vertexarray[i * 3].indice].v);
                 fprintf(ofile, "\n");
 
                 fprintf(ofile, "%d %.5f %.5f",
-                        object->vertexarray[i * 3 + 1].indice,
-                        object->textarray[object->vertexarray[i * 3 + 1].indice].u,
-                        object->textarray[object->vertexarray[i * 3 + 1].indice].v);
-                if (object->hasTexture1())
+                        object.vertexarray[i * 3 + 1].indice,
+                        object.textarray[object.vertexarray[i * 3 + 1].indice].u,
+                        object.textarray[object.vertexarray[i * 3 + 1].indice].v);
+                if (object.hasTexture1())
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray1[object->vertexarray[i * 3 + 1].indice].u,
-                            object->textarray1[object->vertexarray[i * 3 + 1].indice].v);
+                            object.textarray1[object.vertexarray[i * 3 + 1].indice].u,
+                            object.textarray1[object.vertexarray[i * 3 + 1].indice].v);
 
-                if (object->hasTexture2())
+                if (object.hasTexture2())
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray2[object->vertexarray[i * 3 + 1].indice].u,
-                            object->textarray2[object->vertexarray[i * 3 + 1].indice].v);
-                if (object->hasTexture3())
+                            object.textarray2[object.vertexarray[i * 3 + 1].indice].u,
+                            object.textarray2[object.vertexarray[i * 3 + 1].indice].v);
+                if (object.hasTexture3())
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray3[object->vertexarray[i * 3 + 1].indice].u,
-                            object->textarray3[object->vertexarray[i * 3 + 1].indice].v);
+                            object.textarray3[object.vertexarray[i * 3 + 1].indice].u,
+                            object.textarray3[object.vertexarray[i * 3 + 1].indice].v);
                 fprintf(ofile, "\n");
 
                 fprintf(ofile, "%d %.5f %.5f",
-                        object->vertexarray[i * 3 + 2].indice,
-                        object->textarray[object->vertexarray[i * 3 + 2].indice].u,
-                        object->textarray[object->vertexarray[i * 3 + 2].indice].v);
-                if (object->hasTexture1())
+                        object.vertexarray[i * 3 + 2].indice,
+                        object.textarray[object.vertexarray[i * 3 + 2].indice].u,
+                        object.textarray[object.vertexarray[i * 3 + 2].indice].v);
+                if (object.hasTexture1())
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray1[object->vertexarray[i * 3 + 2].indice].u,
-                            object->textarray1[object->vertexarray[i * 3 + 2].indice].v);
+                            object.textarray1[object.vertexarray[i * 3 + 2].indice].u,
+                            object.textarray1[object.vertexarray[i * 3 + 2].indice].v);
 
-                if (object->hasTexture2())
+                if (object.hasTexture2())
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray2[object->vertexarray[i * 3 + 2].indice].u,
-                            object->textarray2[object->vertexarray[i * 3 + 2].indice].v);
-                if (object->hasTexture3())
+                            object.textarray2[object.vertexarray[i * 3 + 2].indice].u,
+                            object.textarray2[object.vertexarray[i * 3 + 2].indice].v);
+                if (object.hasTexture3())
                 {
                     fprintf(ofile, " %.5f %.5f",
-                            object->textarray3[object->vertexarray[i * 3 + 2].indice].u,
-                            object->textarray3[object->vertexarray[i * 3 + 2].indice].v);
-                    if (object->textarray3[object->vertexarray[i * 3 + 2].indice].u
-                            != object->textarray1[object->vertexarray[i * 3 + 2].indice].u)
+                            object.textarray3[object.vertexarray[i * 3 + 2].indice].u,
+                            object.textarray3[object.vertexarray[i * 3 + 2].indice].v);
+                    if (object.textarray3[object.vertexarray[i * 3 + 2].indice].u
+                            != object.textarray1[object.vertexarray[i * 3 + 2].indice].u)
                     {
                         printf("error in text\n");
                     }
@@ -2041,192 +1639,157 @@ int printOb(FILE *ofile, ob_t * object)
     }
     else
     {
-        stripifyOb(ofile, object, 1);
+        stripifyOb(ofile, &object, true);
     }
     fprintf(ofile, "kids 0\n");
     return 0;
 }
 
-int foundNear(FILE * ofile, ob_t * object, ob_t *allobjects, double dist, bool print)
+int foundNear(FILE * ofile, ob_t &object, std::list<ob_t> &objects, double dist, bool print)
 {
-    ob_t * tmpob;
     double x;
     double y;
     int numfound = 0;
-    tmpob = allobjects;
 
-    x = (object->x_max - object->x_min) / 2 + object->x_min;
-    y = (object->y_max - object->y_min) / 2 + object->y_min;
+    x = (object.x_max - object.x_min) / 2 + object.x_min;
+    y = (object.y_max - object.y_min) / 2 + object.y_min;
 
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        if (tmpob->nameStartsWith("tkmn"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
 
-        if (tmpob->inkids_o)
-        {
-            tmpob = tmpob->next;
+        if (it->nameStartsWith("tkmn"))
             continue;
-        }
-        if (tmpob->numsurf == 0)
-        {
-            tmpob = tmpob->next;
+
+        if (it->inkids_o)
             continue;
-        }
-        if ((tmpob->x_min - x) * (tmpob->x_min - x)
-                + (tmpob->y_min - y) * (tmpob->y_min - y) < dist * dist)
+
+        if (it->numsurf == 0)
+            continue;
+
+        if ((it->x_min - x) * (it->x_min - x) + (it->y_min - y) * (it->y_min - y) < dist * dist)
         {
-            /*printf("object %s near object %s (dist=%d)\n", tmpob->name , object->name, dist);*/
+            /*printf("object %s near object %s (dist=%d)\n", it->name , object.name, dist);*/
             numfound++;
-            tmpob->inkids_o = true;
+            it->inkids_o = true;
             if (print)
-            {
-                printOb(ofile, tmpob);
-            }
-            tmpob = tmpob->next;
+                printOb(ofile, *it);
             continue;
         }
-        if ((tmpob->x_max - x) * (tmpob->x_max - x)
-                + (tmpob->y_max - y) * (tmpob->y_max - y) < dist * dist)
+        if ((it->x_max - x) * (it->x_max - x) + (it->y_max - y) * (it->y_max - y) < dist * dist)
         {
-            /*printf("object %s near object %s (dist=%d)\n", tmpob->name , object->name, dist);*/
+            /*printf("object %s near object %s (dist=%d)\n", it->name , object.name, dist);*/
             numfound++;
-            tmpob->inkids_o = true;
+            it->inkids_o = true;
             if (print)
-            {
-                printOb(ofile, tmpob);
-            }
-            tmpob = tmpob->next;
+                printOb(ofile, *it);
             continue;
         }
-        if ((tmpob->x_min - x) * (tmpob->x_min - x)
-                + (tmpob->y_max - y) * (tmpob->y_max - y) < dist * dist)
+        if ((it->x_min - x) * (it->x_min - x) + (it->y_max - y) * (it->y_max - y) < dist * dist)
         {
-            /*printf("object %s near object %s (dist=%d)\n", tmpob->name , object->name, dist);*/
+            /*printf("object %s near object %s (dist=%d)\n", it->name , object.name, dist);*/
             numfound++;
-            tmpob->inkids_o = true;
+            it->inkids_o = true;
             if (print)
-            {
-                printOb(ofile, tmpob);
-            }
-            tmpob = tmpob->next;
+                printOb(ofile, *it);
             continue;
         }
-        if ((tmpob->x_max - x) * (tmpob->x_max - x)
-                + (tmpob->y_min - y) * (tmpob->y_min - y) < dist * dist)
+        if ((it->x_max - x) * (it->x_max - x) + (it->y_min - y) * (it->y_min - y) < dist * dist)
         {
-            /*printf("object %s near object %s (dist=%d)\n", tmpob->name , object->name, dist);*/
+            /*printf("object %s near object %s (dist=%d)\n", it->name , object.name, dist);*/
             numfound++;
-            tmpob->inkids_o = true;
+            it->inkids_o = true;
             if (print)
-            {
-                printOb(ofile, tmpob);
-            }
-            tmpob = tmpob->next;
+                printOb(ofile, *it);
             continue;
         }
-        tmpob = tmpob->next;
     }
 
-    object->kids_o = numfound++;
+    object.kids_o = numfound++;
 
-    /*printf(" object %s (dist=%d) found %d objects\n", object->name, dist, numfound);*/
+    /*printf(" object %s (dist=%d) found %d objects\n", object.name, dist, numfound);*/
     return (0);
-
 }
 
-void normalize(point_t *t)
+void normalize(point_t &t)
 {
     double dd;
-    dd = sqrt(t->x * t->x + t->y * t->y + t->z * t->z);
+    dd = sqrt(t.x * t.x + t.y * t.y + t.z * t.z);
     if (dd != 0.0)
-        *t /= dd;
+        t /= dd;
     else
-        t->set(0.0, 1.0, 0.0);
+        t.set(0.0, 1.0, 0.0);
 }
 
-void computeTriNorm(ob_t * object)
+void computeTriNorm(std::list<ob_t> &objects)
 {
     point_t norm;
-    ob_t *tmpob = object;
 
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int i = 0; i < tmpob->numsurf; i++)
+
+        for (int i = 0; i < it->numsurf; i++)
         {
             /* compute the same normal for each points in the surface */
-            computeNorm(&tmpob->vertex[tmpob->vertexarray[i * 3].indice],
-                        &tmpob->vertex[tmpob->vertexarray[i * 3 + 1].indice],
-                        &tmpob->vertex[tmpob->vertexarray[i * 3 + 2].indice],
-                        &norm);
-            tmpob->norm[tmpob->vertexarray[i * 3].indice] += norm;
-            tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice] += norm;
-            tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice] += norm;
+            computeNorm(it->vertex[it->vertexarray[i * 3].indice],
+                        it->vertex[it->vertexarray[i * 3 + 1].indice],
+                        it->vertex[it->vertexarray[i * 3 + 2].indice],
+                        norm);
+            it->norm[it->vertexarray[i * 3].indice] += norm;
+            it->norm[it->vertexarray[i * 3 + 1].indice] += norm;
+            it->norm[it->vertexarray[i * 3 + 2].indice] += norm;
         }
-        for (int i = 0; i < tmpob->numsurf; i++)
+        for (int i = 0; i < it->numsurf; i++)
         {
-            normalize(&tmpob->norm[tmpob->vertexarray[i * 3].indice]);
-            normalize(&tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice]);
-            normalize(&tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice]);
+            normalize(it->norm[it->vertexarray[i * 3].indice]);
+            normalize(it->norm[it->vertexarray[i * 3 + 1].indice]);
+            normalize(it->norm[it->vertexarray[i * 3 + 2].indice]);
         }
-
-        tmpob = tmpob->next;
     }
     return;
 }
 
-void computeObjectTriNorm(ob_t * object)
+void computeObjectTriNorm(ob_t &object)
 {
     point_t norm;
-    ob_t *tmpob = object;
 
-    if (tmpob->canSkip())
+    if (object.canSkip())
         return;
-    for (int i = 0; i < tmpob->numsurf; i++)
+
+    for (int i = 0; i < object.numsurf; i++)
     {
         /* compute the same normal for each points in the surface */
-        computeNorm(&tmpob->vertex[tmpob->vertexarray[i * 3].indice],
-                    &tmpob->vertex[tmpob->vertexarray[i * 3 + 1].indice],
-                    &tmpob->vertex[tmpob->vertexarray[i * 3 + 2].indice], &norm);
+        computeNorm(object.vertex[object.vertexarray[i * 3].indice],
+                    object.vertex[object.vertexarray[i * 3 + 1].indice],
+                    object.vertex[object.vertexarray[i * 3 + 2].indice], norm);
 
-        tmpob->norm[tmpob->vertexarray[i * 3].indice] += norm;
-        tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice] += norm;
-        tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice] += norm;
+        object.norm[object.vertexarray[i * 3].indice] += norm;
+        object.norm[object.vertexarray[i * 3 + 1].indice] += norm;
+        object.norm[object.vertexarray[i * 3 + 2].indice] += norm;
     }
-    for (int i = 0; i < tmpob->numsurf; i++)
+    for (int i = 0; i < object.numsurf; i++)
     {
-        normalize(&tmpob->norm[tmpob->vertexarray[i * 3].indice]);
-        normalize(&tmpob->norm[tmpob->vertexarray[i * 3 + 1].indice]);
-        normalize(&tmpob->norm[tmpob->vertexarray[i * 3 + 2].indice]);
+        normalize(object.norm[object.vertexarray[i * 3].indice]);
+        normalize(object.norm[object.vertexarray[i * 3 + 1].indice]);
+        normalize(object.norm[object.vertexarray[i * 3 + 2].indice]);
     }
 
     return;
 }
 
-bool checkMustSmoothVector(point_t *n1, point_t *n2, point_t *t1, point_t *t2)
+bool checkMustSmoothVector(const point_t &n1, const point_t &n2, const point_t &t1, const point_t &t2)
 {
     return false;
 #if 0
     double dot, cos_angle;
     cos_angle = cos(smooth_angle * M_PI / 180.0);
-    if (fabs(t1->x - t2->x) <= 0.05 && fabs(t1->y - t2->y) <= 0.05
-            && fabs(t1->z - t2->z) <= 0.05)
+    if (fabs(t1.x - t2.x) <= 0.05 && fabs(t1.y - t2.y) <= 0.05 && fabs(t1.z - t2.z) <= 0.05)
     {
         // GUIONS
-        dot = n1->x * n2->x + n1->y * n2->y + n1->z * n2->z;
+        dot = n1.x * n2.x + n1.y * n2.y + n1.z * n2.z;
         if (dot > cos_angle)
         {
             return true;
@@ -2237,184 +1800,126 @@ bool checkMustSmoothVector(point_t *n1, point_t *n2, point_t *t1, point_t *t2)
 #endif
 }
 
-void smoothTriNorm(ob_t * object)
+void smoothTriNorm(std::list<ob_t> &objects)
 {
-    ob_t * tmpob = NULL;
-    ob_t * tmpob1 = NULL;
-    double dd;
-    double nx, ny, nz;
-
-    printf("Smooth called on %s\n", object->name.c_str());
-    tmpob = object;
-    while (tmpob != NULL)
+    printf("Smooth called on %s\n", objects.front().name.c_str());
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < it->numvert; i++)
         {
             /* compute the same normal for each points in the surface */
-            tmpob->snorm[i] = tmpob->norm[i];
+            it->snorm[i] = it->norm[i];
         }
-        tmpob = tmpob->next;
     }
 
-    tmpob = object;
-    tmpob1 = object;
-
-    while (tmpob != NULL)
+#if 0 // this does nothing
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip() || tmpob->hasNoSmooth())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip() || it->hasNoSmooth())
             continue;
-        }
-        tmpob1 = object;
-        while (tmpob1 != NULL)
+        for (std::list<ob_t>::iterator it1 = objects.begin(); it1 != objects.end(); ++it1)
         {
-            if (tmpob1->canSkip() || tmpob1->hasNoSmooth())
-            {
-                tmpob1 = tmpob1->next;
+            if (it1->canSkip() || it1->hasNoSmooth())
                 continue;
-            }
-            for (int i = 0; i < tmpob->numvert; i++)
+            for (int i = 0; i < it->numvert; i++)
             {
-                for (int j = 0; j < tmpob1->numvert; j++)
+                for (int j = 0; j < it1->numvert; j++)
                 {
-                    if (checkMustSmoothVector(&tmpob->norm[i], &tmpob1->norm[j],
-                            &tmpob->vertex[i], &tmpob1->vertex[j]))
+                    if (checkMustSmoothVector(it->norm[i], it1->norm[j], it->vertex[i], it1->vertex[j]))
                     {
-                        point_t p = tmpob1->norm[j] + tmpob->norm[i];
-                        normalize(&p);
+                        point_t p = it1->norm[j] + it->norm[i];
+                        normalize(p);
 
-                        tmpob->snorm[i] = p;
-                        tmpob1->snorm[j] = p;
-
-                        /* tmpob->snorm[i] += tmpob1->norm[j]; */
-                        /* tmpob1->snorm[j] += tmpob->norm[i]; */
+                        it->snorm[i] = p;
+                        it1->snorm[j] = p;
                     }
                 }
             }
-
-            tmpob1 = tmpob1->next;
         }
-        tmpob = tmpob->next;
     }
+#endif
 
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < it->numvert; i++)
         {
             /* compute the same normal for each points in the surface */
-            nx = tmpob->snorm[i].x;
-            ny = tmpob->snorm[i].y;
-            nz = tmpob->snorm[i].z;
-            dd = sqrt(nx * nx + ny * ny + nz * nz);
+            double nx = it->snorm[i].x;
+            double ny = it->snorm[i].y;
+            double nz = it->snorm[i].z;
+            double dd = sqrt(nx * nx + ny * ny + nz * nz);
             if (dd != 0.0)
             {
-                tmpob->snorm[i].x = nx / dd;
-                tmpob->snorm[i].y = ny / dd;
-                tmpob->snorm[i].z = nz / dd;
+                it->snorm[i].x = nx / dd;
+                it->snorm[i].y = ny / dd;
+                it->snorm[i].z = nz / dd;
             }
             else
-                tmpob->snorm[i].set(0, 0, 1);
+                it->snorm[i].set(0, 0, 1);
         }
-        tmpob = tmpob->next;
-    }
-
-    tmpob = object;
-    while (tmpob != NULL)
-    {
-        if (tmpob->canSkip() || tmpob->hasNoSmooth())
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        tmpob1 = object;
-        while (tmpob1 != NULL)
-        {
-            if (tmpob1->canSkip() || tmpob1->hasNoSmooth())
-            {
-                tmpob1 = tmpob1->next;
-                continue;
-            }
-            tmpob1 = tmpob1->next;
-        }
-        tmpob = tmpob->next;
     }
 
     return;
 }
 
-void smoothFaceTriNorm(ob_t * object)
+void smoothFaceTriNorm(ob_t &object)
 {
-    ob_t * tmpob = object;
-
-    if (tmpob->canSkip())
+    if (object.canSkip())
         return;
 
-    for (int i = 0; i < tmpob->numvert; i++)
+    for (int i = 0; i < object.numvert; i++)
     {
         /* compute the same normal for each points in the surface */
-        for (int j = 0; j < tmpob->numvert; j++)
+        for (int j = 0; j < object.numvert; j++)
         {
-            if ((tmpob->vertex[i].x - tmpob->vertex[j].x) <= 0.01
-                    && (tmpob->vertex[i].y - tmpob->vertex[j].y) <= 0.01
-                    && (tmpob->vertex[i].z - tmpob->vertex[j].z) <= 0.1)
+            if ((object.vertex[i].x - object.vertex[j].x) <= 0.01 &&
+                (object.vertex[i].y - object.vertex[j].y) <= 0.01 &&
+                (object.vertex[i].z - object.vertex[j].z) <= 0.1)
             {
                 /*same point */
-                tmpob->snorm[i] += tmpob->norm[j];
-                tmpob->snorm[j] = tmpob->snorm[i];
+                object.snorm[i] += object.norm[j];
+                object.snorm[j] = object.snorm[i];
             }
         }
     }
 
-    for (int i = 0; i < tmpob->numvert; i++)
-    {
-        normalize(&tmpob->snorm[i]);
-    }
+    for (int i = 0; i < object.numvert; i++)
+        normalize(object.snorm[i]);
+
     return;
 }
 
-void smoothObjectTriNorm(ob_t * object)
+void smoothObjectTriNorm(ob_t &object)
 {
-    ob_t * tmpob = object;
-
-    for (int i = 0; i < tmpob->numvert; i++)
+    for (int i = 0; i < object.numvert; i++)
     {
         /* compute the same normal for each points in the surface */
-        for (int j = 0; j < tmpob->numvert; j++)
+        for (int j = 0; j < object.numvert; j++)
         {
-            if ((tmpob->vertex[i].x - tmpob->vertex[j].x) <= 0.001
-                    && (tmpob->vertex[i].y - tmpob->vertex[j].y) <= 0.001
-                    && (tmpob->vertex[i].z - tmpob->vertex[j].z) <= 0.001)
+            if ((object.vertex[i].x - object.vertex[j].x) <= 0.001 &&
+                (object.vertex[i].y - object.vertex[j].y) <= 0.001 &&
+                (object.vertex[i].z - object.vertex[j].z) <= 0.001)
             {
                 /*same point */
-                tmpob->snorm[i] += tmpob->norm[j];
-                tmpob->snorm[j] = tmpob->snorm[i];
+                object.snorm[i] += object.norm[j];
+                object.snorm[j] = object.snorm[i];
             }
         }
     }
-    for (int i = 0; i < tmpob->numvert; i++)
-    {
-        normalize(&tmpob->snorm[i]);
-    }
+    for (int i = 0; i < object.numvert; i++)
+        normalize(object.snorm[i]);
+
     return;
 }
 
-void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
+void computeSaveAC3D(const std::string &OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials)
 {
     char name2[256];
     char *p, *q;
-    ob_t * tmpob = NULL;
     int numg = 0;
     bool lastpass = false;
     int nborder = 0;
@@ -2422,7 +1927,7 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
     FILE * ofile = NULL;
 
     if (normalMapping)
-        normalMap(object);
+        normalMap(objects);
 
     if ((ofile = fopen(OutputFilename.c_str(), "w")) == NULL)
     {
@@ -2431,15 +1936,15 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
     }
     if (extendedTriangles)
     {
-        smoothTriNorm(object);
+        smoothTriNorm(objects);
         if (isobjectacar)
         {
-            mapNormalToSphere2(object);
+            mapNormalToSphere2(objects);
             if (extendedEnvCoord)
-                mapTextureEnv(object);
+                mapTextureEnv(objects);
         }
         if (collapseObject)
-            mergeSplitted(&object);
+            mergeSplitted(objects);
     }
 
     fprintf(ofile, "AC3Db\n");
@@ -2473,56 +1978,45 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
         nborder = 0;
     }
 
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (!tmpob->hasName())
-        {
-            tmpob = tmpob->next;
+        if (!it->hasName())
             continue;
-        }
+
         if (!isobjectacar)
         {
-            if (tmpob->nameStartsWith("tkmn"))
+            if (it->nameStartsWith("tkmn"))
             {
-                tmpob = tmpob->next;
                 numg++;
                 continue;
             }
         }
         else
         {
-            if (tmpob->type == "group" || tmpob->name == "root")
-            {
-                tmpob = tmpob->next;
+            if (it->type == "group")
                 continue;
-            }
             numg++;
         }
-        tmpob = tmpob->next;
     }
 
     fprintf(ofile, "kids %d\n", numg);
 
     texnum = 0;
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
         int texnofound = 0;
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
+
         texnofound = 1;
         for (int i = 0; i < texnum; i++)
         {
-            if (!tmpob->hasTexture())
+            if (!it->hasTexture())
             {
                 texnofound = 0;
                 break;
             }
-            if (!strncmp(tex[i], tmpob->texture.c_str(), 13))
+            if (!strncmp(tex[i], it->texture.c_str(), 13))
             {
                 texnofound = 0;
                 break;
@@ -2532,46 +2026,35 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
         }
         if (texnofound == 1)
         {
-            if (tmpob->hasTexture())
+            if (it->hasTexture())
             {
-                strcpy(tex[texnum], tmpob->texture.c_str());
+                strcpy(tex[texnum], it->texture.c_str());
                 tex[texnum][13] = '\0';
-                /*sprintf(tex[texnum],"%s",tmpob->texture);*/
+                /*sprintf(tex[texnum],"%s",it->texture);*/
             }
             texnum++;
         }
-        tmpob->saved = false;
+        it->saved = false;
         printf("name=%s x_min=%.1f y_min=%.1f x_max=%.1f y_max=%.1f\n",
-                tmpob->name.c_str(), tmpob->x_min, tmpob->y_min, tmpob->x_max,
-                tmpob->y_max);
-
-        tmpob = tmpob->next;
+                it->name.c_str(), it->x_min, it->y_min, it->x_max, it->y_max);
     }
 
-    tmpob = object;
-    tmpob->kids_o = 0;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        tmpob->kids_o = 0;
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        it->kids_o = 0;
+        if (it->canSkip())
             continue;
-        }
-        if (tmpob->nameStartsWith("tkmn"))
-        {
-            foundNear(ofile, tmpob, object, far_dist, false);
-            printf("object =%s num kids_o=%d\n", tmpob->name.c_str(), tmpob->kids_o);
-        }
 
-        tmpob = tmpob->next;
+        if (it->nameStartsWith("tkmn"))
+        {
+            foundNear(ofile, *it, objects, far_dist, false);
+            printf("object =%s num kids_o=%d\n", it->name.c_str(), it->kids_o);
+        }
     }
 
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        tmpob->inkids_o = false;
-        tmpob = tmpob->next;
+        it->inkids_o = false;
     }
 
     p = OrderString;
@@ -2595,58 +2078,53 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
                 }
             }
         }
-        tmpob = object;
-        while (tmpob != NULL)
+        for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
         {
-            if (tmpob->canSkip())
-            {
-                tmpob = tmpob->next;
+            if (it->canSkip())
                 continue;
-            }
+
             if (!isobjectacar)
             {
-                if (tmpob->nameStartsWith("tkmn"))
+                if (it->nameStartsWith("tkmn"))
                 {
                     fprintf(ofile, "OBJECT group\n");
-                    fprintf(ofile, "name \"%s_g\"\n", tmpob->name.c_str());
-                    fprintf(ofile, "kids %d\n", tmpob->kids_o + 1);
-                    printOb(ofile, tmpob);
-                    foundNear(ofile, tmpob, object, far_dist, true);
-                    printf("object =%s num kids_o=%d\n", tmpob->name.c_str(), tmpob->kids_o);
+                    fprintf(ofile, "name \"%s_g\"\n", it->name.c_str());
+                    fprintf(ofile, "kids %d\n", it->kids_o + 1);
+                    printOb(ofile, *it);
+                    foundNear(ofile, *it, objects, far_dist, true);
+                    printf("object =%s num kids_o=%d\n", it->name.c_str(), it->kids_o);
                 }
             }
             else
             {
-                if (!tmpob->saved)
+                if (!it->saved)
                 {
                     if (ordering && !lastpass)
                     {
-                        if (tmpob->name == q)
+                        if (it->name == q)
                         {
-                            printOb(ofile, tmpob);
-                            printf("object =%s num kids_o=%d test with %s\n", tmpob->name.c_str(), tmpob->kids_o, q);
+                            printOb(ofile, *it);
+                            printf("object =%s num kids_o=%d test with %s\n", it->name.c_str(), it->kids_o, q);
                         }
                         else
                         {
                             char nameBuf[1024];
                             sprintf(nameBuf, "%ss", q);
-                            if (tmpob->name == nameBuf)
+                            if (it->name == nameBuf)
                             {
-                                printOb(ofile, tmpob);
-                                printf("object =%s num kids_o=%d\n", tmpob->name.c_str(), tmpob->kids_o);
+                                printOb(ofile, *it);
+                                printf("object =%s num kids_o=%d\n", it->name.c_str(), it->kids_o);
                             }
 
                         }
                     }
                     else
                     {
-                        printOb(ofile, tmpob);
-                        printf("object =%s num kids_o=%d\n", tmpob->name.c_str(), tmpob->kids_o);
+                        printOb(ofile, *it);
+                        printf("object =%s num kids_o=%d\n", it->name.c_str(), it->kids_o);
                     }
                 }
             }
-
-            tmpob = tmpob->next;
         }
     }
 
@@ -2697,10 +2175,9 @@ void computeSaveAC3D(const std::string & OutputFilename, ob_t * object, const st
     fclose(ofile);
 }
 
-void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
+void computeSaveOBJ(const std::string &OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials)
 {
     char name2[256];
-    ob_t * tmpob = NULL;
     int deltav = 1;
     int ind = 0;
     char tname[256];
@@ -2725,16 +2202,12 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
 
     for (size_t i = 0, end = materials.size(); i < end; ++i)
     {
-        tmpob = object;
-        while (tmpob != NULL)
+	for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
         {
-            if (tmpob->canSkip())
-            {
-                tmpob = tmpob->next;
+            if (it->canSkip())
                 continue;
-            }
 
-            if (tmpob->hasTexture())
+            if (it->hasTexture())
             {
                 fprintf(tfile, "newmtl default\n");
                 fprintf(tfile, "Ka %lf %lf %lf\n", materials[i].amb.r,
@@ -2744,33 +2217,28 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
                 fprintf(tfile, "Ks %lf %lf %lf\n", materials[i].spec.r,
                         materials[i].spec.g, materials[i].spec.b);
                 fprintf(tfile, "Ns %d\n", (int)materials[i].shi);
-                fprintf(tfile, "map_kd %s\n", tmpob->texture.c_str());
+                fprintf(tfile, "map_kd %s\n", it->texture.c_str());
                 break;
             }
-
-            tmpob = tmpob->next;
         }
     }
 
     texnum = 0;
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
         int texnofound = 0;
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
+
         texnofound = 1;
         for (int i = 0; i < texnum; i++)
         {
-            if (!tmpob->hasTexture())
+            if (!it->hasTexture())
             {
                 texnofound = 0;
                 break;
             }
-            if (!strncmp(tex[i], tmpob->texture.c_str(), 13))
+            if (!strncmp(tex[i], it->texture.c_str(), 13))
             {
                 texnofound = 0;
                 break;
@@ -2780,18 +2248,15 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
         }
         if (texnofound == 1)
         {
-            if (tmpob->hasTexture())
+            if (it->hasTexture())
             {
-                strcpy(tex[texnum], tmpob->texture.c_str());
+                strcpy(tex[texnum], it->texture.c_str());
                 tex[texnum][13] = '\0';
             }
             texnum++;
         }
         printf("name=%s x_min=%.1f y_min=%.1f x_max=%.1f y_max=%.1f\n",
-                tmpob->name.c_str(), tmpob->x_min, tmpob->y_min, tmpob->x_max,
-                tmpob->y_max);
-
-        tmpob = tmpob->next;
+                it->name.c_str(), it->x_min, it->y_min, it->x_max, it->y_max);
     }
 
     for (int i = 0; i < texnum; i++)
@@ -2834,82 +2299,62 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
         printf("texture file %s will be stored as %s.png\n", tex[i], name2);
     }
 
-    tmpob = object;
-    computeTriNorm(tmpob);
-    tmpob = object;
-    smoothTriNorm(tmpob);
+    computeTriNorm(objects);
+    smoothTriNorm(objects);
     fprintf(ofile, "g\n");
 
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int i = 0; i < tmpob->numvert; i++)
+
+        for (int i = 0; i < it->numvert; i++)
         {
-            fprintf(ofile, "v %lf %lf %lf\n", tmpob->vertex[i].x, tmpob->vertex[i].y, tmpob->vertex[i].z);
+            fprintf(ofile, "v %lf %lf %lf\n", it->vertex[i].x, it->vertex[i].y, it->vertex[i].z);
         }
-        tmpob = tmpob->next;
     }
 
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int i = 0; i < tmpob->numvert; i++)
-        {
-            fprintf(ofile, "vt %lf %lf 0.0\n", tmpob->textarray[i].u, tmpob->textarray[i].v);
-        }
-        tmpob = tmpob->next;
+
+        for (int i = 0; i < it->numvert; i++)
+            fprintf(ofile, "vt %lf %lf 0.0\n", it->textarray[i].u, it->textarray[i].v);
     }
 
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int i = 0; i < tmpob->numvert; i++)
+
+        for (int i = 0; i < it->numvert; i++)
         {
-            fprintf(ofile, "vn %lf %lf %lf\n", tmpob->snorm[i].x, tmpob->snorm[i].y, tmpob->snorm[i].z);
+            fprintf(ofile, "vn %lf %lf %lf\n", it->snorm[i].x, it->snorm[i].y, it->snorm[i].z);
         }
-        tmpob = tmpob->next;
     }
     fprintf(ofile, "g OB1\n");
     fprintf(ofile, "s 1\n");
     fprintf(ofile, "usemtl default\n");
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        ind = tmpob->numvert;
-        printf("making obj face for %s\n", tmpob->name.c_str());
 
-        for (int i = 0; i < tmpob->numsurf; i++)
+        ind = it->numvert;
+        printf("making obj face for %s\n", it->name.c_str());
+
+        for (int i = 0; i < it->numsurf; i++)
         {
             int v1, v2, v3;
-            v1 = tmpob->vertexarray[i * 3].indice;
-            v2 = tmpob->vertexarray[i * 3 + 1].indice;
-            v3 = tmpob->vertexarray[i * 3 + 2].indice;
+            v1 = it->vertexarray[i * 3].indice;
+            v2 = it->vertexarray[i * 3 + 1].indice;
+            v3 = it->vertexarray[i * 3 + 2].indice;
             fprintf(ofile, "f %d/%d/%d %d/%d/%d %d/%d/%d\n", v1 + deltav,
                     v1 + deltav, v1 + deltav, v2 + deltav, v2 + deltav,
                     v2 + deltav, v3 + deltav, v3 + deltav, v3 + deltav);
         }
         deltav += ind;
-        tmpob = tmpob->next;
     }
     fprintf(ofile, "end\n");
 
@@ -2917,7 +2362,7 @@ void computeSaveOBJ(const std::string & OutputFilename, ob_t * object, const std
 	fclose(tfile);
 }
 
-void stripifyOb(FILE * ofile, ob_t * object, int writeit)
+void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
 {
     FILE *stripeout, *stripein;
     char line[256];
@@ -3218,10 +2663,9 @@ void stripifyOb(FILE * ofile, ob_t * object, int writeit)
     }
 }
 
-void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
+void computeSaveAC3DM(const std::string &OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials)
 {
-    char name2[256];
-    ob_t * tmpob = NULL;
+    char name2[256] = { 0 };
     int deltav = 1;
     int ind = 0;
     FILE * ofile;
@@ -3234,21 +2678,8 @@ void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const s
 
     printMaterials(ofile, materials);
 
-    texnum = 0;
-    tmpob = object;
-    while (tmpob != NULL)
-    {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        tmpob = tmpob->next;
-    }
-
     for (int i = 0; i < texnum; i++)
     {
-
         printf("analysing  %s\n", tex[i]);
         char *p = tex[i];
         char *q = name2;
@@ -3287,90 +2718,64 @@ void computeSaveAC3DM(const std::string & OutputFilename, ob_t * object, const s
         printf("texture file %s will be stored as %s.png\n", tex[i], name2);
     }
 
-    tmpob = object;
-    computeTriNorm(tmpob);
-    tmpob = object;
-    smoothTriNorm(tmpob);
+    computeTriNorm(objects);
+    smoothTriNorm(objects);
     fprintf(ofile, "g\n");
 
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int i = 0; i < tmpob->numvert; i++)
-        {
-            fprintf(ofile, "v %lf %lf %lf\n", tmpob->vertex[i].x,
-                    tmpob->vertex[i].y, tmpob->vertex[i].z);
-        }
-        tmpob = tmpob->next;
+
+        for (int i = 0; i < it->numvert; i++)
+            fprintf(ofile, "v %lf %lf %lf\n", it->vertex[i].x, it->vertex[i].y, it->vertex[i].z);
     }
 
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int i = 0; i < tmpob->numvert; i++)
-        {
-            fprintf(ofile, "vt %lf %lf 0.0\n", tmpob->textarray[i].u, tmpob->textarray[i].v);
-        }
-        tmpob = tmpob->next;
+
+        for (int i = 0; i < it->numvert; i++)
+            fprintf(ofile, "vt %lf %lf 0.0\n", it->textarray[i].u, it->textarray[i].v);
     }
 
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int i = 0; i < tmpob->numvert; i++)
-        {
-            fprintf(ofile, "vn %lf %lf %lf\n", tmpob->snorm[i].x,
-                    tmpob->snorm[i].y, tmpob->snorm[i].z);
-        }
-        tmpob = tmpob->next;
+
+        for (int i = 0; i < it->numvert; i++)
+            fprintf(ofile, "vn %lf %lf %lf\n", it->snorm[i].x, it->snorm[i].y, it->snorm[i].z);
     }
     fprintf(ofile, "g OB1\n");
     fprintf(ofile, "s 1\n");
     fprintf(ofile, "usemtl default\n");
-    tmpob = object;
-    while (tmpob != NULL)
-    {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        ind = tmpob->numvert;
-        printf("making obj face for %s\n", tmpob->name.c_str());
 
-        for (int i = 0; i < tmpob->numsurf; i++)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
+    {
+        if (it->canSkip())
+            continue;
+
+        ind = it->numvert;
+        printf("making obj face for %s\n", it->name.c_str());
+
+        for (int i = 0; i < it->numsurf; i++)
         {
-            int v1, v2, v3;
-            v1 = tmpob->vertexarray[i * 3].indice;
-            v2 = tmpob->vertexarray[i * 3 + 1].indice;
-            v3 = tmpob->vertexarray[i * 3 + 2].indice;
+            const int v1 = it->vertexarray[i * 3].indice;
+            const int v2 = it->vertexarray[i * 3 + 1].indice;
+            const int v3 = it->vertexarray[i * 3 + 2].indice;
             fprintf(ofile, "f %d/%d/%d %d/%d/%d %d/%d/%d\n", v1 + deltav,
                     v1 + deltav, v1 + deltav, v2 + deltav, v2 + deltav,
                     v2 + deltav, v3 + deltav, v3 + deltav, v3 + deltav);
         }
         deltav += ind;
-        tmpob = tmpob->next;
     }
     fprintf(ofile, "end\n");
     fclose(ofile);
 }
 
-void mapNormalToSphere(ob_t *object)
+void mapNormalToSphere(std::list<ob_t> &objects)
 {
     double xmin = 9999;
     double ymin = 9999;
@@ -3381,111 +2786,95 @@ void mapNormalToSphere(ob_t *object)
     double pospt = 0;
     double ddmax = 0;
     double ddmin = 10000;
-    ob_t * tmpob = object;
 
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        if (tmpob->x_min < xmin)
-            xmin = tmpob->x_min;
-        if (tmpob->y_min < ymin)
-            ymin = tmpob->y_min;
-        if (tmpob->z_min < zmin)
-            zmin = tmpob->z_min;
 
-        if (tmpob->x_max > xmax)
-            xmax = tmpob->x_max;
-        if (tmpob->y_max > ymax)
-            ymax = tmpob->y_max;
-        if (tmpob->z_max > zmax)
-            zmax = tmpob->z_max;
+        if (it->x_min < xmin)
+            xmin = it->x_min;
+        if (it->y_min < ymin)
+            ymin = it->y_min;
+        if (it->z_min < zmin)
+            zmin = it->z_min;
 
-        for (int i = 0; i < tmpob->numvert; i++)
+        if (it->x_max > xmax)
+            xmax = it->x_max;
+        if (it->y_max > ymax)
+            ymax = it->y_max;
+        if (it->z_max > zmax)
+            zmax = it->z_max;
+
+        for (int i = 0; i < it->numvert; i++)
         {
             /* compute the same normal for each points in the surface */
-            pospt = sqrt(tmpob->vertex[i].x * tmpob->vertex[i].x +
-                         tmpob->vertex[i].y * tmpob->vertex[i].y +
-                         tmpob->vertex[i].z * tmpob->vertex[i].z);
+            pospt = sqrt(it->vertex[i].x * it->vertex[i].x +
+                         it->vertex[i].y * it->vertex[i].y +
+                         it->vertex[i].z * it->vertex[i].z);
             if (pospt > ddmax)
                 ddmax = pospt;
             if (pospt < ddmin)
                 ddmin = pospt;
         }
-        tmpob = tmpob->next;
     }
     ddmin = (ddmax - ddmin) / 2 + ddmin;
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int i = 0; i < tmpob->numvert; i++)
+
+        for (int i = 0; i < it->numvert; i++)
         {
             double fact = 0;
             /* compute the same normal for each points in the surface */
-            pospt = sqrt(tmpob->vertex[i].x * tmpob->vertex[i].x +
-                         tmpob->vertex[i].y * tmpob->vertex[i].y +
-                         tmpob->vertex[i].z * tmpob->vertex[i].z);
+            pospt = sqrt(it->vertex[i].x * it->vertex[i].x +
+                         it->vertex[i].y * it->vertex[i].y +
+                         it->vertex[i].z * it->vertex[i].z);
             fact = ddmin / pospt;
             if (fact > 1.0)
                 fact = 1.0;
-            tmpob->snorm[i] *= fact;
+            it->snorm[i] *= fact;
         }
-
-        tmpob = tmpob->next;
     }
 }
 
-void mapTextureEnv(ob_t *object)
+void mapTextureEnv(std::list<ob_t> &objects)
 {
     double x, y, z, zt, lg;
     double z_min = 10000;
     double z_max = -10000;
-    ob_t * tmpob = object;
 
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int j = 0; j < tmpob->numvert; j++)
+
+        for (int j = 0; j < it->numvert; j++)
         {
-            z = tmpob->vertex[j].z + tmpob->snorm[j].z / 3.0;
+            z = it->vertex[j].z + it->snorm[j].z / 3.0;
             if (z > z_max)
                 z_max = z;
             if (z < z_min)
                 z_min = z;
         }
-        tmpob = tmpob->next;
     }
 
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
+
         /* create the new vertex array */
-        tmpob->textarray1 = tmpob->textarray;
-        tmpob->textarray2 = tmpob->textarray;
-        tmpob->texture1 = tmpob->texture;
-        tmpob->texture2 = tmpob->texture;
-        for (int i = 0; i < tmpob->numvert; i++)
+        it->textarray1 = it->textarray;
+        it->textarray2 = it->textarray;
+        it->texture1 = it->texture;
+        it->texture2 = it->texture;
+        for (int i = 0; i < it->numvert; i++)
         {
-            x = tmpob->vertex[i].x;
-            y = tmpob->vertex[i].y;
-            z = tmpob->vertex[i].z;
+            x = it->vertex[i].x;
+            y = it->vertex[i].y;
+            z = it->vertex[i].z;
             lg = sqrt(x * x + y * y + z * z);
             if (lg != 0.0)
             {
@@ -3500,25 +2889,23 @@ void mapTextureEnv(ob_t *object)
                 z = 1;
             }
             //z_min = 0;
-            tmpob->textarray1[i].u = 0.5 + x / 2.0;
-            zt = (z + tmpob->snorm[i].z / 3.0 - z_min) / (z_max - z_min);
-            tmpob->textarray1[i].v = zt;
+            it->textarray1[i].u = 0.5 + x / 2.0;
+            zt = (z + it->snorm[i].z / 3.0 - z_min) / (z_max - z_min);
+            it->textarray1[i].v = zt;
 
-            if (tmpob->textarray1[i].v > 1.0)
-                tmpob->textarray1[i].v = 0.999;
-            else if (tmpob->textarray1[i].v < 0.0)
-                tmpob->textarray1[i].v = 0.001;
+            if (it->textarray1[i].v > 1.0)
+                it->textarray1[i].v = 0.999;
+            else if (it->textarray1[i].v < 0.0)
+                it->textarray1[i].v = 0.001;
 
-            tmpob->textarray2[i].u = 0.5 + y / 2.0;
-            tmpob->textarray2[i].v = z;
+            it->textarray2[i].u = 0.5 + y / 2.0;
+            it->textarray2[i].v = z;
         }
-        tmpob = tmpob->next;
     }
 }
 
-void mapTextureEnvOld(ob_t *object)
+void mapTextureEnvOld(std::list<ob_t> &objects)
 {
-    ob_t * tmpob = NULL;
     double x_min = 10000;
     double x_max = -10000;
     double y_min = 10000;
@@ -3535,132 +2922,112 @@ void mapTextureEnvOld(ob_t *object)
     double v2_min = 10000;
     double v2_max = -10000;
 
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int j = 0; j < tmpob->numvert; j++)
+
+        for (int j = 0; j < it->numvert; j++)
         {
-            if (tmpob->vertex[j].x > x_max)
-                x_max = tmpob->vertex[j].x;
-            if (tmpob->vertex[j].x < x_min)
-                x_min = tmpob->vertex[j].x;
+            if (it->vertex[j].x > x_max)
+                x_max = it->vertex[j].x;
+            if (it->vertex[j].x < x_min)
+                x_min = it->vertex[j].x;
 
-            if (tmpob->vertex[j].y > y_max)
-                y_max = tmpob->vertex[j].y;
-            if (tmpob->vertex[j].y < y_min)
-                y_min = tmpob->vertex[j].y;
+            if (it->vertex[j].y > y_max)
+                y_max = it->vertex[j].y;
+            if (it->vertex[j].y < y_min)
+                y_min = it->vertex[j].y;
 
-            if (tmpob->vertex[j].z > z_max)
-                z_max = tmpob->vertex[j].z;
-            if (tmpob->vertex[j].z < z_min)
-                z_min = tmpob->vertex[j].z;
+            if (it->vertex[j].z > z_max)
+                z_max = it->vertex[j].z;
+            if (it->vertex[j].z < z_min)
+                z_min = it->vertex[j].z;
         }
-        tmpob = tmpob->next;
     }
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
+
         /* create the new vertex array */
-        tmpob->textarray1 = tmpob->textarray;
-        tmpob->textarray2 = tmpob->textarray;
-        tmpob->texture1 = tmpob->texture;
-        tmpob->texture2 = tmpob->texture;
-        for (int i = 0; i < tmpob->numvert; i++)
+        it->textarray1 = it->textarray;
+        it->textarray2 = it->textarray;
+        it->texture1 = it->texture;
+        it->texture2 = it->texture;
+        for (int i = 0; i < it->numvert; i++)
         {
-            tmpob->textarray1[i].u = (tmpob->vertex[i].x - x_min)
-                    / (x_max - x_min) + (tmpob->snorm[i].x) / 2;
-            tmpob->textarray1[i].v = ((tmpob->vertex[i].z - z_min)
-                    / (z_max - z_min)) + (tmpob->snorm[i].z) / 2;
-            tmpob->textarray2[i].u = ((tmpob->vertex[i].x - x_min)
-                    / (x_max - x_min)) + (tmpob->snorm[i].x) / 2;
-            tmpob->textarray2[i].v = ((tmpob->vertex[i].y - y_min)
-                    / (x_max - x_min)) + (tmpob->snorm[i].y) / 2;
+            it->textarray1[i].u = (it->vertex[i].x - x_min)
+                    / (x_max - x_min) + (it->snorm[i].x) / 2;
+            it->textarray1[i].v = ((it->vertex[i].z - z_min)
+                    / (z_max - z_min)) + (it->snorm[i].z) / 2;
+            it->textarray2[i].u = ((it->vertex[i].x - x_min)
+                    / (x_max - x_min)) + (it->snorm[i].x) / 2;
+            it->textarray2[i].v = ((it->vertex[i].y - y_min)
+                    / (x_max - x_min)) + (it->snorm[i].y) / 2;
 
-            if (tmpob->textarray1[i].u > u_max)
-                u_max = tmpob->textarray1[i].u;
+            if (it->textarray1[i].u > u_max)
+                u_max = it->textarray1[i].u;
 
-            if (tmpob->textarray1[i].v > v_max)
-                v_max = tmpob->textarray1[i].v;
+            if (it->textarray1[i].v > v_max)
+                v_max = it->textarray1[i].v;
 
-            if (tmpob->textarray1[i].u < u_min)
-                u_min = tmpob->textarray1[i].u;
+            if (it->textarray1[i].u < u_min)
+                u_min = it->textarray1[i].u;
 
-            if (tmpob->textarray1[i].v < v_min)
-                v_min = tmpob->textarray1[i].v;
+            if (it->textarray1[i].v < v_min)
+                v_min = it->textarray1[i].v;
 
-            if (tmpob->textarray2[i].u > u2_max)
-                u2_max = tmpob->textarray2[i].u;
+            if (it->textarray2[i].u > u2_max)
+                u2_max = it->textarray2[i].u;
 
-            if (tmpob->textarray2[i].v > v2_max)
-                v2_max = tmpob->textarray2[i].v;
+            if (it->textarray2[i].v > v2_max)
+                v2_max = it->textarray2[i].v;
 
-            if (tmpob->textarray2[i].u < u2_min)
-                u2_min = tmpob->textarray2[i].u;
+            if (it->textarray2[i].u < u2_min)
+                u2_min = it->textarray2[i].u;
 
-            if (tmpob->textarray2[i].v < v2_min)
-                v2_min = tmpob->textarray2[i].v;
-
+            if (it->textarray2[i].v < v2_min)
+                v2_min = it->textarray2[i].v;
         }
-        tmpob = tmpob->next;
     }
 
     /* clamp the texture coord */
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
 
-        for (int i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < it->numvert; i++)
         {
-            tmpob->textarray1[i].u = (tmpob->textarray1[i].u - u_min) / (u_max - u_min);
-            tmpob->textarray1[i].v = (tmpob->textarray1[i].v - v_min) / (v_max - v_min);
+            it->textarray1[i].u = (it->textarray1[i].u - u_min) / (u_max - u_min);
+            it->textarray1[i].v = (it->textarray1[i].v - v_min) / (v_max - v_min);
 
-            tmpob->textarray2[i].u = (tmpob->textarray2[i].u - u2_min) / (u2_max - u2_min) - 0.5;
-            tmpob->textarray2[i].v = (tmpob->textarray2[i].v - v2_min) / (v2_max - v2_min) - 0.5;
+            it->textarray2[i].u = (it->textarray2[i].u - u2_min) / (u2_max - u2_min) - 0.5;
+            it->textarray2[i].v = (it->textarray2[i].v - v2_min) / (v2_max - v2_min) - 0.5;
         }
-        tmpob = tmpob->next;
     }
 }
 
-void mapNormalToSphere2(ob_t *object)
+void mapNormalToSphere2(std::list<ob_t> &objects)
 {
-    ob_t * tmpob = object;
-
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
 
-        for (int i = 0; i < tmpob->numvert; i++)
+        for (int i = 0; i < it->numvert; i++)
         {
             /* compute the same normal for each points in the surface */
             /*      tmpob->norm[i] = tmpob->vertex[i]; */
             /*      normalize(&tmpob->norm[i]); */
             /*      tmpob->snorm[i] += tmpob->norm[i]; */
-            normalize(&tmpob->snorm[i]);
+            normalize(it->snorm[i]);
         }
-        tmpob = tmpob->next;
     }
 }
 
-void normalMap(ob_t * object)
+void normalMap(std::list<ob_t> &objects)
 {
     double x_min = 99999;
     double y_min = 99999;
@@ -3668,56 +3035,46 @@ void normalMap(ob_t * object)
     double x_max = -99999;
     double y_max = -99999;
     double z_max = -99999;
-    ob_t * tmpob = object;
 
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
 
-        for (int j = 0; j < tmpob->numvert; j++)
+        for (int j = 0; j < it->numvert; j++)
         {
-            if (tmpob->vertex[j].x > x_max)
-                x_max = tmpob->vertex[j].x;
-            if (tmpob->vertex[j].x < x_min)
-                x_min = tmpob->vertex[j].x;
+            if (it->vertex[j].x > x_max)
+                x_max = it->vertex[j].x;
+            if (it->vertex[j].x < x_min)
+                x_min = it->vertex[j].x;
 
-            if (tmpob->vertex[j].y > y_max)
-                y_max = tmpob->vertex[j].y;
-            if (tmpob->vertex[j].y < y_min)
-                y_min = tmpob->vertex[j].y;
+            if (it->vertex[j].y > y_max)
+                y_max = it->vertex[j].y;
+            if (it->vertex[j].y < y_min)
+                y_min = it->vertex[j].y;
 
-            if (tmpob->vertex[j].z > z_max)
-                z_max = tmpob->vertex[j].z;
-            if (tmpob->vertex[j].z < z_min)
-                z_min = tmpob->vertex[j].z;
+            if (it->vertex[j].z > z_max)
+                z_max = it->vertex[j].z;
+            if (it->vertex[j].z < z_min)
+                z_min = it->vertex[j].z;
         }
-        tmpob = tmpob->next;
     }
-    tmpob = object;
 
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        printf("normalMap : handling %s\n", tmpob->name.c_str());
-        for (int i = 0; i < tmpob->numvert; i++)
+        printf("normalMap : handling %s\n", it->name.c_str());
+        for (int i = 0; i < it->numvert; i++)
         {
-            tmpob->textarray[i].u = (tmpob->vertex[i].x - x_min) / (x_max - x_min);
-            tmpob->textarray[i].v = (tmpob->vertex[i].y - y_min) / (y_max - y_min);
+            it->textarray[i].u = (it->vertex[i].x - x_min) / (x_max - x_min);
+            it->textarray[i].v = (it->vertex[i].y - y_min) / (y_max - y_min);
         }
-        tmpob->texture = shadowtexture;
-        tmpob = tmpob->next;
+        it->texture = shadowtexture;
     }
 }
 
-void normalMap01(ob_t * object)
+void normalMap01(std::list<ob_t> &objects)
 {
     double x_min = 99999;
     double y_min = 99999;
@@ -3725,61 +3082,51 @@ void normalMap01(ob_t * object)
     double x_max = -99999;
     double y_max = -99999;
     double z_max = -99999;
-    ob_t * tmpob = object;
 
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        for (int j = 0; j < tmpob->numvert; j++)
+
+        for (int j = 0; j < it->numvert; j++)
         {
-            if (tmpob->vertex[j].x > x_max)
-                x_max = tmpob->vertex[j].x;
-            if (tmpob->vertex[j].x < x_min)
-                x_min = tmpob->vertex[j].x;
+            if (it->vertex[j].x > x_max)
+                x_max = it->vertex[j].x;
+            if (it->vertex[j].x < x_min)
+                x_min = it->vertex[j].x;
 
-            if (tmpob->vertex[j].y > y_max)
-                y_max = tmpob->vertex[j].y;
-            if (tmpob->vertex[j].y < y_min)
-                y_min = tmpob->vertex[j].y;
+            if (it->vertex[j].y > y_max)
+                y_max = it->vertex[j].y;
+            if (it->vertex[j].y < y_min)
+                y_min = it->vertex[j].y;
 
-            if (tmpob->vertex[j].z > z_max)
-                z_max = tmpob->vertex[j].z;
-            if (tmpob->vertex[j].z < z_min)
-                z_min = tmpob->vertex[j].z;
+            if (it->vertex[j].z > z_max)
+                z_max = it->vertex[j].z;
+            if (it->vertex[j].z < z_min)
+                z_min = it->vertex[j].z;
         }
-
-        tmpob = tmpob->next;
     }
-    tmpob = object;
 
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        tmpob->textarray3.resize(tmpob->numvert);
-        printf("normalMap : handling %s\n", tmpob->name.c_str());
-        for (int i = 0; i < tmpob->numvert; i++)
+
+        it->textarray3.resize(it->numvert);
+        printf("normalMap : handling %s\n", it->name.c_str());
+        for (int i = 0; i < it->numvert; i++)
         {
-            tmpob->textarray3[i].u = (tmpob->vertex[i].x - x_min) / (x_max - x_min) - 0.5;
-            tmpob->textarray3[i].v = (tmpob->vertex[i].y - y_min) / (y_max - y_min) - 0.5;
+            it->textarray3[i].u = (it->vertex[i].x - x_min) / (x_max - x_min) - 0.5;
+            it->textarray3[i].v = (it->vertex[i].y - y_min) / (y_max - y_min) - 0.5;
         }
-        tmpob->texture3 = tmpob->texture;
-        tmpob = tmpob->next;
+        it->texture3 = it->texture;
     }
 }
 
-void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, const std::vector<mat_t> &materials)
+void computeSaveAC3DStrip(const std::string &OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials)
 {
-    ob_t * tmpob = NULL;
     int numg = 0;
-    char *p;
+    char *p = NULL;
     char *q = NULL;
     bool lastpass = false;
     int nborder = 0;
@@ -3791,16 +3138,16 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
         fprintf(stderr, "failed to open %s\n", OutputFilename.c_str());
         return;
     }
-    smoothTriNorm(object);
+    smoothTriNorm(objects);
     if (isobjectacar)
     {
-        mapNormalToSphere2(object);
-        normalMap01(object);
+        mapNormalToSphere2(objects);
+        normalMap01(objects);
 
         if (extendedEnvCoord)
-            mapTextureEnv(object);
+            mapTextureEnv(objects);
         if (collapseObject)
-            mergeSplitted(&object);
+            mergeSplitted(objects);
     }
     fprintf(ofile, "AC3Db\n");
     printMaterials(ofile, materials);
@@ -3833,38 +3180,23 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
         nborder = 0;
     }
 
-    tmpob = object;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
     {
-        if (!tmpob->hasName())
-        {
-            tmpob = tmpob->next;
+        if (!it->hasName())
             continue;
-        }
-        if (tmpob->name == "world" || (tmpob->type == "world" && tmpob->numvert == 0 && tmpob->numsurf == 0))
-        {
-            tmpob = tmpob->next;
+
+        if (it->name == "world" || (it->type == "world" && it->numvert == 0 && it->numsurf == 0))
             continue;
-        }
-        if (tmpob->name == "root")
-        {
-            tmpob = tmpob->next;
+
+        if (it->name == "group" || (it->type == "group" && it->numvert == 0 && it->numsurf == 0))
             continue;
-        }
-        if (tmpob->name == "group" || (tmpob->type == "group" && tmpob->numvert == 0 && tmpob->numsurf == 0))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
+
         /* don't count empty objects */
-        if (tmpob->type == "poly" && tmpob->numvert == 0 && tmpob->numsurf == 0 && tmpob->kids == 0)
-        {
-            tmpob = tmpob->next;
+        if (it->type == "poly" && it->numvert == 0 && it->numsurf == 0 && it->kids == 0)
             continue;
-        }
+
         numg++;
-        tmpob->saved = false;
-        tmpob = tmpob->next;
+        it->saved = false;
     }
 
     fprintf(ofile, "kids %d\n", numg);
@@ -3892,24 +3224,21 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
                 }
             }
         }
-        tmpob = object;
-        while (tmpob != NULL)
+        for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
         {
             int texnofound = 0;
-            if (tmpob->canSkip())
-            {
-                tmpob = tmpob->next;
+            if (it->canSkip())
                 continue;
-            }
+
             texnofound = 1;
             for (int i = 0; i < texnum; i++)
             {
-                if (!tmpob->hasTexture())
+                if (!it->hasTexture())
                 {
                     texnofound = 0;
                     break;
                 }
-                if (!strncmp(tex[i], tmpob->texture.c_str(), 13))
+                if (!strncmp(tex[i], it->texture.c_str(), 13))
                 {
                     texnofound = 0;
                     break;
@@ -3919,69 +3248,56 @@ void computeSaveAC3DStrip(const std::string & OutputFilename, ob_t * object, con
             }
             if (texnofound == 1)
             {
-                if (tmpob->hasTexture())
+                if (it->hasTexture())
                 {
-                    strcpy(tex[texnum], tmpob->texture.c_str());
+                    strcpy(tex[texnum], it->texture.c_str());
                     tex[texnum][13] = '\0';
-                    /*sprintf(tex[texnum],"%s",tmpob->texture);*/
+                    /*sprintf(tex[texnum],"%s",it->texture);*/
                 }
                 texnum++;
             }
             printf("name=%s x_min=%.1f y_min=%.1f x_max=%.1f y_max=%.1f\n",
-                    tmpob->name.c_str(), tmpob->x_min, tmpob->y_min, tmpob->x_max,
-                    tmpob->y_max);
-
-            tmpob = tmpob->next;
+                    it->name.c_str(), it->x_min, it->y_min, it->x_max, it->y_max);
         }
 
-        tmpob = object;
+#if 0 // ????????????
         tmpob->kids_o = 0;
+#endif
 
-        tmpob = object;
-        while (tmpob != NULL)
-        {
-            tmpob->inkids_o = false;
-            tmpob = tmpob->next;
-        }
+        for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
+            it->inkids_o = false;
 
-        tmpob = object;
-        while (tmpob != NULL)
+        for (std::list<ob_t>::iterator it = objects.begin(); it != objects.end(); ++it)
         {
-            if (tmpob->canSkip())
-            {
-                tmpob = tmpob->next;
+            if (it->canSkip())
                 continue;
-            }
-            if (!tmpob->saved)
+
+            if (!it->saved)
             {
                 if (ordering && !lastpass)
                 {
-                    if (tmpob->name == q)
+                    if (it->name == q)
                     {
-                        printOb(ofile, tmpob);
-                        printf("object =%s num kids_o=%d test with %s\n", tmpob->name.c_str(),
-                               tmpob->kids_o, q);
+                        printOb(ofile, *it);
+                        printf("object =%s num kids_o=%d test with %s\n", it->name.c_str(), it->kids_o, q);
                     }
                     else
                     {
                         std::string nameBuf(q);
                         nameBuf += 's';
-                        if (tmpob->name == nameBuf)
+                        if (it->name == nameBuf)
                         {
-                            printOb(ofile, tmpob);
-                            printf("object =%s num kids_o=%d\n", tmpob->name.c_str(),
-                                   tmpob->kids_o);
+                            printOb(ofile, *it);
+                            printf("object =%s num kids_o=%d\n", it->name.c_str(), it->kids_o);
                         }
                     }
                 }
                 else
                 {
-                    printOb(ofile, tmpob);
-                    printf("object =%s num kids_o=%d\n", tmpob->name.c_str(),
-                            tmpob->kids_o);
+                    printOb(ofile, *it);
+                    printf("object =%s num kids_o=%d\n", it->name.c_str(), it->kids_o);
                 }
             }
-            tmpob = tmpob->next;
         }
     }
     tmpIndice = 0;
@@ -3997,7 +3313,7 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     static int oldva1[10000];
     static int oldva2[10000];
     int n = 0;
-    int numtri = ob1->numsurf + ob2->numsurf;
+    const int numtri = ob1->numsurf + ob2->numsurf;
 
     printf("merging %s with %s  tri=%d\n", ob1->name.c_str(), ob2->name.c_str(), numtri);
     memset(oldva1, -1, sizeof(oldva1));
@@ -4075,7 +3391,7 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
         }
         if (!found)
         {
-            int k = tobS.numsurf;
+            const int k = tobS.numsurf;
             /* add the triangle */
             tobS.vertexarray[k * 3].indice = oldva1[ob2->vertexarray[i * 3].indice];
             tobS.vertexarray[k * 3 + 1].indice = oldva1[ob2->vertexarray[i * 3 + 1].indice];
@@ -4098,114 +3414,89 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     return ob1;
 }
 
-int mergeSplitted(ob_t **object)
+int mergeSplitted(std::list<ob_t> &objects)
 {
     int k = 0;
-    char nameS[256];
-    char *p;
-    ob_t * tob = NULL;
-    ob_t * tob0 = NULL;
-    ob_t * tobP = NULL;
     int reduced = 0;
 
-    tob = *object;
-    while (tob)
+    for (std::list<ob_t>::iterator tob = objects.begin(); tob != objects.end(); ++tob)
     {
+        // skip objects that are not split
         if (isobjectacar)
         {
             if (!tob->nameHasStr("_s_"))
-            {
-                tob = tob->next;
                 continue;
-            }
         }
         else if (!tob->nameHasStr("__split__"))
-        {
-            tob = tob->next;
             continue;
-        }
-        tobP = tob;
-        tob0 = tob->next;
+
+        // get base name of split object
+        char nameS[256];
+        char* p;
         sprintf(nameS, "%s", tob->name.c_str());
         if (isobjectacar)
             p = strstr(nameS, "_s_");
         else
             p = strstr(nameS, "__split__");
         if (p == NULL)
-        {
-            tob = tob->next;
             continue;
-        }
         printf("looking for merge : %s\n", nameS);
         if (isobjectacar)
             p = p + strlen("_s_");
         else
             p = p + strlen("__split__");
         *p = '\0';
+
         k = 0;
-        while (tob0)
+        std::list<ob_t>::iterator tob0 = tob;
+        for (++tob0; tob0 != objects.end();) 
         {
             if (tob0->canSkip() || tob0->type == "group")
             {
-                tobP = tob0;
-                tob0 = tob0->next;
+                ++tob0;
                 continue;
             }
 
             if (tob0->nameStartsWith(nameS))
             {
-                ob_t *oo;
-                mergeObject(tob, tob0, nameS);
-                /*printf("merging %s with %s\n",nameS, tob0->name);*/
+                mergeObject(&(*tob), &(*tob0), nameS);
+                printf("merging %s with %s\n",nameS, tob0->name.c_str());
                 reduced++;
-                tobP->next = tob0->next;
-                oo = tob0;
-                tob0 = tob0->next;
-                delete oo;
+                tob0 = objects.erase(tob0);
                 k++;
                 continue;
             }
-            tobP = tob0;
-            tob0 = tob0->next;
+            ++tob0;
         }
 
         if (k == 0)
-        {
-            tob = tob->next;
             continue;
-        }
+
         /* we know that nameS has k+1 objects and need to be merged */
         printf("need merge for %s : %d objects found\n", tob->name.c_str(), k + 1);
-
-        tob = tob->next;
     }
 
     return reduced;
 }
 
-int findPoint(point_t * vertexArray, int sizeVertexArray, point_t * theVertex)
-{
-    return -1;
-}
-
 #define P2(x) ((x)*(x))
 
-double findDistmin(ob_t * ob1, ob_t *ob2)
+double findDistmin(const ob_t &ob1, const ob_t &ob2)
 {
-    double di[16];
+    double di;
     double d = 100000;
 
-    for (int i = 0; i < ob1->numvert; i++)
+    for (int i = 0; i < ob1.numvert; i++)
     {
-        for (int j = 0; j < ob2->numvert; j++)
+        for (int j = 0; j < ob2.numvert; j++)
         {
-            double a1 = ob1->vertex[i].x;
-            double b1 = ob1->vertex[i].y;
-            double a2 = ob2->vertex[j].x;
-            double b2 = ob2->vertex[j].y;
-            di[0] = P2(a1-a2) + P2(b1-b2);
-            if (di[0] < d)
-                d = di[0];
+            const double a1 = ob1.vertex[i].x;
+            const double b1 = ob1.vertex[i].y;
+            const double a2 = ob2.vertex[j].x;
+            const double b2 = ob2.vertex[j].y;
+            di = P2(a1-a2) + P2(b1-b2);
+            if (di < d)
+                d = di;
         }
     }
 
@@ -4214,9 +3505,9 @@ double findDistmin(ob_t * ob1, ob_t *ob2)
 
 void printMaterials(FILE *file, const std::vector<mat_t> &materials)
 {
-    for (size_t j = 0, end = materials.size(); j < end; j++) //for (const auto & material : mat0)
+    for (size_t j = 0, end = materials.size(); j < end; j++) //for (const auto & material : materials)
     {
-        const mat_t& material = materials[j];
+        const mat_t &material = materials[j];
         fprintf(file,
             "MATERIAL %s rgb %1.2f %1.2f %1.2f amb %1.2f %1.2f %1.2f emis %1.2f %1.2f %1.2f spec %1.2f %1.2f %1.2f shi %3d trans 0\n",
             material.name.c_str(), material.rgb.r, material.rgb.g, material.rgb.b, material.amb.r,

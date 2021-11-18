@@ -32,15 +32,12 @@
 #endif
 #include "accc.h"
 
-void reorder(ob_t * ob, ob_t * ob2, uv_t *textarray, tcoord_t *vertexarray);
-void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3);
+void collapseTextures(std::list<ob_t> &ob0, std::list<ob_t> &ob1, std::list<ob_t> &ob2, std::list<ob_t> &ob3);
 
 // check if materials need to be merged
 bool materialNeedsMerge(const std::vector<mat_t> &mat1, const std::vector<mat_t> &mat2)
 {
-    size_t mat1_count = mat1.size();
-    size_t mat2_count = mat2.size();
-    if (mat2_count > mat1_count)
+    if (mat2.size() > mat1.size())
         return true;
     for (size_t i = 0, end = mat2.size(); i < end; ++i)
     {
@@ -52,17 +49,15 @@ bool materialNeedsMerge(const std::vector<mat_t> &mat1, const std::vector<mat_t>
 
 void loadAndGroup(const std::string &OutputFileName)
 {
-    ob_t * ob0 = nullptr;
-    ob_t * ob1 = nullptr;
-    ob_t * ob2 = nullptr;
-    ob_t * ob3 = nullptr;
-    ob_t * tmpob = nullptr;
-    ob_t * tmpob2 = nullptr;
+    std::list<ob_t> ob0;
+    std::list<ob_t> ob1;
+    std::list<ob_t> ob2;
+    std::list<ob_t> ob3;
     std::vector<mat_t> mat0;
     std::vector<mat_t> mat1;
     std::vector<mat_t> mat2;
     std::vector<mat_t> mat3;
-    FILE * ofile;
+    FILE * ofile = NULL;
     int num_tkmn = 0;
     int good_group = 0;
     int i = 0;
@@ -76,109 +71,84 @@ void loadAndGroup(const std::string &OutputFileName)
     if (fileL0)
     {
         fprintf(stderr, "\nloading file %s\n", fileL0);
-        if (loadAC(fileL0, &ob0, mat0) == -1)
+        if (loadAC(fileL0, ob0, mat0) == -1)
         {
             fprintf(stderr, "\ncouldn't load file %s\n", fileL0);
-            delete ob0;
             return;
         }
     }
     if (fileL1)
     {
         fprintf(stderr, "\nloading file %s\n", fileL1);
-        if (loadAC(fileL1, &ob1, mat1) == -1)
+        if (loadAC(fileL1, ob1, mat1) == -1)
         {
             fprintf(stderr, "\ncouldn't load file %s\n", fileL1);
-            delete ob0;
-            delete ob1;
             return;
         }
     }
     if (fileL2)
     {
         fprintf(stderr, "\nloading file %s\n", fileL2);
-        if (loadAC(fileL2, &ob2, mat2) == -1)
+        if (loadAC(fileL2, ob2, mat2) == -1)
         {
             fprintf(stderr, "\ncouldn't load file %s\n", fileL2);
-            delete ob0;
-            delete ob1;
-            delete ob2;
             return;
         }
     }
     if (fileL3)
     {
         fprintf(stderr, "\nloading file %s\n", fileL3);
-        if (loadAC(fileL3, &ob3, mat3) == -1)
+        if (loadAC(fileL3, ob3, mat3) == -1)
         {
             fprintf(stderr, "\ncouldn't load file %s\n", fileL3);
-            delete ob0;
-            delete ob1;
-            delete ob2;
-            delete ob3;
             return;
         }
     }
-    /* now collapse the texture and texture  arrays of 1 2 3 in 0 */
+
+    printf("smoothing triangle normals\n");
+    fprintf(stderr, "\nsmoothing triangle normals\n");
 
     smoothTriNorm(ob0);
 
     printf("collapsing textures\n");
-    fprintf(stderr, "\ncollapsing textures\n");
+    fprintf(stderr, "collapsing textures\n");
 
+    /* now collapse the texture and texture arrays of 1 2 3 in 0 */
     collapseTextures(ob0, ob1, ob2, ob3);
 
     // todo: merge materials
     if (!mat1.empty() && materialNeedsMerge(mat0, mat1))
     {
         fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL1);
-        delete ob0;
-        delete ob1;
-        delete ob2;
-        delete ob3;
         exit(-1);
     }
     if (!mat2.empty() && materialNeedsMerge(mat0, mat2))
     {
         fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL2);
-        delete ob0;
-        delete ob1;
-        delete ob2;
-        delete ob3;
         exit(-1);
     }
     if (!mat3.empty() && materialNeedsMerge(mat0, mat3))
     {
         fprintf(stderr, "materials in %s and %s need merging\n", fileL0, fileL3);
-        delete ob0;
-        delete ob1;
-        delete ob2;
-        delete ob3;
         exit(-1);
     }
 
-    ob0 = splitObjects(ob0);
+    fprintf(stderr, "splitting objects\n");
+    splitObjects(ob0);
 
     /* now make groups from ob0 */
 
     fprintf(stderr, "making groups\n");
-    tmpob = ob0;
     num_tkmn = 0;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = ob0.begin(); it != ob0.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        if (tmpob->nameStartsWith("tkmn") && tmpob->type != "group")
+        if (it->nameStartsWith("tkmn") && it->type != "group")
         {
-            tmpob = tmpob->next;
             num_tkmn++;
             continue;
         }
-
-        tmpob = tmpob->next;
     }
 
     printf("found %d tkmn\n", num_tkmn);
@@ -186,70 +156,58 @@ void loadAndGroup(const std::string &OutputFileName)
     {
         fprintf(stderr,
                 "\nERROR: cannot find any object tkmn for grouping\nAborting\n");
-        delete ob0;
-        delete ob1;
-        delete ob2;
-        delete ob3;
         exit(-1);
     }
 
     i = 0;
-    tmpob = ob0;
     std::vector<ob_groups_t> array_groups(num_tkmn);
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = ob0.begin(); it != ob0.end(); ++it)
     {
-        if (tmpob->canSkip())
-        {
-            tmpob = tmpob->next;
+        if (it->canSkip())
             continue;
-        }
-        if (tmpob->nameStartsWith("tkmn") && tmpob->type != "group")
+        if (it->nameStartsWith("tkmn") && it->type != "group")
         {
-            array_groups[i].tkmn = tmpob;
-            array_groups[i].numkids = 1;
-            array_groups[i].name = tmpob->name;
-            array_groups[i].tkmnlabel = atoi(tmpob->name.c_str() + 4);
-            tmpob = tmpob->next;
+            array_groups[i].tkmn = &(*it);
+            array_groups[i].name = it->name;
+            array_groups[i].tkmnlabel = atoi(it->name.c_str() + 4);
             i++;
             continue;
         }
-        tmpob = tmpob->next;
     }
 
     fprintf(stderr, "dispatching objects in groups\n");
-    tmpob = ob0;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = ob0.begin(); it != ob0.end();)
     {
-        if (tmpob->canSkip() || tmpob->nameStartsWith("tkmn"))
+        if (it->canSkip() || it->nameStartsWith("tkmn"))
         {
-            tmpob = tmpob->next;
+            ++it;
             continue;
         }
 
         good_group = -1;
-        tmpob->dist_min = 1000000;
+        it->dist_min = 1000000;
         for (i = 0; i < num_tkmn; i++)
         {
-            dist = findDistmin(array_groups[i].tkmn, tmpob);
-            if (dist < tmpob->dist_min)
+            dist = findDistmin(*array_groups[i].tkmn, *it);
+            if (dist < it->dist_min)
             {
-                tmpob->dist_min = dist;
+                it->dist_min = dist;
                 good_group = i;
             }
-            if (tmpob->nameStartsWith("t0RB") ||
-                tmpob->nameStartsWith("t1RB") ||
-                tmpob->nameStartsWith("t2RB") ||
-                tmpob->nameStartsWith("tkRS") ||
-                tmpob->nameStartsWith("t0LB") ||
-                tmpob->nameStartsWith("t1LB") ||
-                tmpob->nameStartsWith("t2LB") ||
-                tmpob->nameStartsWith("tkLS") ||
-                tmpob->nameStartsWith("BOLt") ||
-                tmpob->nameStartsWith("BORt"))
+            if (it->nameStartsWith("t0RB") ||
+                it->nameStartsWith("t1RB") ||
+                it->nameStartsWith("t2RB") ||
+                it->nameStartsWith("tkRS") ||
+                it->nameStartsWith("t0LB") ||
+                it->nameStartsWith("t1LB") ||
+                it->nameStartsWith("t2LB") ||
+                it->nameStartsWith("tkLS") ||
+                it->nameStartsWith("BOLt") ||
+                it->nameStartsWith("BORt"))
             {
-                if (atoi(tmpob->name.c_str() + 4) == array_groups[i].tkmnlabel)
+                if (atoi(it->name.c_str() + 4) == array_groups[i].tkmnlabel)
                 {
-                    printf("object %s is forced in group %d\n", tmpob->name.c_str(),
+                    printf("object %s is forced in group %d\n", it->name.c_str(),
                             array_groups[i].tkmnlabel);
                     good_group = i;
                     break;
@@ -258,162 +216,99 @@ void loadAndGroup(const std::string &OutputFileName)
         }
         if (good_group == -1)
         {
-            printf("an object in no group %s\n", tmpob->name.c_str());
-            tmpob = tmpob->next;
+            printf("an object in no group %s\n", it->name.c_str());
+            ++it;
             continue;
         }
-        printf("object %s is going to group %s  at dist=%f\n", tmpob->name.c_str(),
-                array_groups[good_group].name.c_str(), sqrt(tmpob->dist_min));
-        if (array_groups[good_group].kids == NULL)
-        {
-            array_groups[good_group].kids = tmpob;
-            tmpob = tmpob->next;
-            array_groups[good_group].numkids++;
-            array_groups[good_group].kids->next = NULL;
-        }
-        else
-        {
-            tmpob2 = array_groups[good_group].kids;
-            array_groups[good_group].kids = tmpob;
-            tmpob = tmpob->next;
-            array_groups[good_group].kids->next = tmpob2;
-            array_groups[good_group].numkids++;
-        }
+        printf("object %s is going to group %s  at dist=%f\n", it->name.c_str(),
+                array_groups[good_group].name.c_str(), sqrt(it->dist_min));
 
-        /*tmpob=tmpob->next;*/
+        // move object from ob0 to array_group
+        std::list<ob_t>::iterator other = it++;
+        array_groups[good_group].kids.splice(array_groups[good_group].kids.begin(), ob0, other);
     }
     /* now each tkmn group contains the list of its kids */
 
     /* for all tkmn groups the kids are dispatched in the different group levels */
 
-#define INSERTINGROUP(kids,ob)   {\
-     ob->next=kids;\
-     kids=ob;\
-   }
-
     for (i = 0; i < num_tkmn; i++)
     {
-        ob_t * tmpobnext;
-        tmpob = array_groups[i].kids;
         printf("grouping level for %s\n", array_groups[i].name.c_str());
-        while (tmpob != NULL)
+        for (std::list<ob_t>::iterator it = array_groups[i].kids.begin(); it != array_groups[i].kids.end();)
         {
-            tmpobnext = tmpob->next;
-            if (!tmpob->hasName())
+            std::list<ob_t>::iterator other = it++;
+            if (!other->hasName())
+                continue;
+            if (other->nameStartsWith("tkrb"))
             {
-                tmpob = tmpobnext;
+                printf("inserting %s in group 0 of %s\n", other->name.c_str(),
+                       array_groups[i].name.c_str());
+                array_groups[i].kids0.splice(array_groups[i].kids0.begin(), array_groups[i].kids, other);
                 continue;
             }
-            if (tmpob->nameStartsWith("tkrb"))
+            if (other->nameStartsWith("tklb"))
             {
-                array_groups[i].numkids--;
-                array_groups[i].numkids0++;
-                INSERTINGROUP(array_groups[i].kids0, tmpob);
-                printf("inserting %s in group 0 of %s\n", tmpob->name.c_str(),
-                        array_groups[i].name.c_str());
-                tmpob = tmpobnext;
+                printf("inserting %s in group 0 of %s\n", other->name.c_str(),
+                       array_groups[i].name.c_str());
+                array_groups[i].kids0.splice(array_groups[i].kids0.begin(), array_groups[i].kids, other);
                 continue;
             }
-            if (tmpob->nameStartsWith("tklb"))
+            if (other->nameStartsWith("tkrs"))
             {
-                array_groups[i].numkids--;
-                array_groups[i].numkids0++;
-                INSERTINGROUP(array_groups[i].kids0, tmpob);
-                printf("inserting %s in group 0 of %s\n", tmpob->name.c_str(),
+                printf("inserting %s in group 0 of %s\n", other->name.c_str(),
                         array_groups[i].name.c_str());
-                tmpob = tmpobnext;
+                array_groups[i].kids0.splice(array_groups[i].kids0.begin(), array_groups[i].kids, other);
                 continue;
             }
-            if (tmpob->nameStartsWith("tkrs"))
+            if (other->nameStartsWith("tkls"))
             {
-                array_groups[i].numkids--;
-                array_groups[i].numkids0++;
-                INSERTINGROUP(array_groups[i].kids0, tmpob);
-                printf("inserting %s in group 0 of %s\n", tmpob->name.c_str(),
-                        array_groups[i].name.c_str());
-                tmpob = tmpobnext;
-                continue;
-            }
-            if (tmpob->nameStartsWith("tkls"))
-            {
-                array_groups[i].numkids--;
-                array_groups[i].numkids0++;
-                INSERTINGROUP(array_groups[i].kids0, tmpob);
-                printf("inserting %s in group 0 of %s\n", tmpob->name.c_str(),
-                        array_groups[i].name.c_str());
-                tmpob = tmpobnext;
+                printf("inserting %s in group 0 of %s\n", other->name.c_str(),
+                       array_groups[i].name.c_str());
+                array_groups[i].kids0.splice(array_groups[i].kids0.begin(), array_groups[i].kids, other);
                 continue;
             }
 
-            if (tmpob->dist_min < d1 * d1)
+            if (other->dist_min < d1 * d1)
             {
-                array_groups[i].numkids--;
-                array_groups[i].numkids1++;
-                INSERTINGROUP(array_groups[i].kids1, tmpob);
-                printf("inserting %s in group 1 of %s\n", tmpob->name.c_str(),
-                        array_groups[i].name.c_str());
+                printf("inserting %s in group 1 of %s\n", other->name.c_str(),
+                       array_groups[i].name.c_str());
+                array_groups[i].kids1.splice(array_groups[i].kids1.begin(), array_groups[i].kids, other);
             }
-            else if (tmpob->dist_min < d2 * d2)
+            else if (other->dist_min < d2 * d2)
             {
-                array_groups[i].numkids--;
-                array_groups[i].numkids2++;
-                INSERTINGROUP(array_groups[i].kids2, tmpob);
-                printf("inserting %s in group 2 of %s\n", tmpob->name.c_str(),
-                        array_groups[i].name.c_str());
+                printf("inserting %s in group 2 of %s\n", other->name.c_str(),
+                       array_groups[i].name.c_str());
+                array_groups[i].kids2.splice(array_groups[i].kids2.begin(), array_groups[i].kids, other);
             }
-            else if (tmpob->dist_min < d3 * d3)
+            else if (other->dist_min < d3 * d3)
             {
-                array_groups[i].numkids--;
-                array_groups[i].numkids3++;
-                INSERTINGROUP(array_groups[i].kids3, tmpob);
-                printf("inserting %s in group 3 of %s\n", tmpob->name.c_str(),
-                        array_groups[i].name.c_str());
+                printf("inserting %s in group 3 of %s\n", other->name.c_str(),
+                       array_groups[i].name.c_str());
+                array_groups[i].kids3.splice(array_groups[i].kids3.begin(), array_groups[i].kids, other);
             }
             else
             {
-                printf("cannot insert object %s in group %s\n", tmpob->name.c_str(),
-                        array_groups[i].name.c_str());
+                printf("cannot insert object %s in group %s\n", other->name.c_str(), array_groups[i].name.c_str());
             }
-            /*if (!strnicmp(tmpob->name, "tk",2)){
-             tmpob2=tmpob;
-             tmpob=tmpob->next;
-             continue;
-             }*/
-
-            tmpob = tmpobnext;
         }
-        if (array_groups[i].numkids == 0)
-            array_groups[i].kids = NULL;
-        printf("in group %s\n", array_groups[i].name.c_str());
-        printf("    found in l0  %d\n", array_groups[i].numkids0);
-        printf("    found in l1  %d\n", array_groups[i].numkids1);
-        printf("    found in l2  %d\n", array_groups[i].numkids2);
-        printf("    found in l3  %d\n", array_groups[i].numkids3);
-        printf("    staying kids  %d\n", array_groups[i].numkids - 1); /* because of the tkmn not moved */
 
+        printf("in group %s\n", array_groups[i].name.c_str());
+        printf("    found in l0  %d\n", static_cast<int>(array_groups[i].kids0.size()));
+        printf("    found in l1  %d\n", static_cast<int>(array_groups[i].kids1.size()));
+        printf("    found in l2  %d\n", static_cast<int>(array_groups[i].kids2.size()));
+        printf("    found in l3  %d\n", static_cast<int>(array_groups[i].kids3.size()));
+        printf("    staying kids  %d\n", static_cast<int>(array_groups[i].kids.size()) - 1); /* because of the tkmn not moved */
     }
 
-    /*#ifdef NEWSRC*/
     for (i = 0; i < num_tkmn; i++)
     {
-        int red = 0;
-        if (array_groups[i].numkids3 > 0)
-        {
-            red = mergeSplitted(&(array_groups[i].kids3));
-            array_groups[i].numkids3 -= red;
-        }
-        if (array_groups[i].numkids2 > 0)
-        {
-            red = mergeSplitted(&(array_groups[i].kids2));
-            array_groups[i].numkids2 -= red;
-        }
-        if (array_groups[i].numkids1 > 0)
-        {
-            red = mergeSplitted(&(array_groups[i].kids1));
-            array_groups[i].numkids1 -= red;
-        }
+        if (array_groups[i].kids3.size() > 0)
+            mergeSplitted(array_groups[i].kids3);
+        if (array_groups[i].kids2.size() > 0)
+            mergeSplitted(array_groups[i].kids2);
+        if (array_groups[i].kids1.size() > 0)
+            mergeSplitted(array_groups[i].kids1);
     }
-    /*#endif*/
 
     fprintf(stderr, "writing destination file %s\n", OutputFileName.c_str());
 
@@ -432,100 +327,84 @@ void loadAndGroup(const std::string &OutputFileName)
         int numg = 0;
         fprintf(ofile, "OBJECT group\n");
         fprintf(ofile, "name \"%s_g\"\n", array_groups[i].tkmn->name.c_str());
-        numg = (array_groups[i].kids3 == 0 ? 0 : 1)
-                + (array_groups[i].kids2 == 0 ? 0 : 1)
-                + (array_groups[i].kids1 == 0 ? 0 : 1) + 1;
+        numg = (array_groups[i].kids3.empty() ? 0 : 1) +
+               (array_groups[i].kids2.empty() ? 0 : 1) +
+               (array_groups[i].kids1.empty() ? 0 : 1) + 1;
         fprintf(ofile, "kids %d\n", numg);
-        /*printOb(array_groups[i].tkmn);*/
 
-        if (array_groups[i].numkids3 > 0)
+        if (array_groups[i].kids3.size() > 0)
         {
             fprintf(ofile, "OBJECT group\n");
             fprintf(ofile, "name \"___%s_gl3\"\n", array_groups[i].tkmn->name.c_str());
-            fprintf(ofile, "kids %d\n", array_groups[i].numkids3);
+            fprintf(ofile, "kids %d\n", static_cast<int>(array_groups[i].kids3.size()));
             printf("writing group: ___%s_gl3\n", array_groups[i].tkmn->name.c_str());
-            tmpob = array_groups[i].kids3;
-            while (tmpob != NULL)
+            for (std::list<ob_t>::iterator it = array_groups[i].kids3.begin(); it != array_groups[i].kids3.end(); ++it)
             {
-
-                printOb(ofile, tmpob);
-                printf("%s\n", tmpob->name.c_str());
-                tmpob = tmpob->next;
+                printOb(ofile, *it);
+                printf("%s\n", it->name.c_str());
             }
         }
 
-        if (array_groups[i].numkids2 > 0)
+        if (array_groups[i].kids2.size() > 0)
         {
             fprintf(ofile, "OBJECT group\n");
-            fprintf(ofile, "name \"%%___%s_gl2\"\n",
-                    array_groups[i].tkmn->name.c_str());
-            fprintf(ofile, "kids %d\n", array_groups[i].numkids2);
+            fprintf(ofile, "name \"%%___%s_gl2\"\n", array_groups[i].tkmn->name.c_str());
+            fprintf(ofile, "kids %d\n", static_cast<int>(array_groups[i].kids2.size()));
             printf("writing group: ___%s_gl2\n", array_groups[i].tkmn->name.c_str());
-            tmpob = array_groups[i].kids2;
-            while (tmpob != NULL)
+            for (std::list<ob_t>::iterator it = array_groups[i].kids2.begin(); it != array_groups[i].kids2.end(); ++it)
             {
-                printOb(ofile, tmpob);
-                printf("%s\n", tmpob->name.c_str());
-                tmpob = tmpob->next;
+                printOb(ofile, *it);
+                printf("%s\n", it->name.c_str());
             }
         }
-        if (array_groups[i].numkids1 > 0)
+        if (array_groups[i].kids1.size() > 0)
         {
             fprintf(ofile, "OBJECT group\n");
             fprintf(ofile, "name \"___%s_gl1\"\n", array_groups[i].tkmn->name.c_str());
-            fprintf(ofile, "kids %d\n", array_groups[i].numkids1);
+            fprintf(ofile, "kids %d\n", static_cast<int>(array_groups[i].kids1.size()));
             printf("writing group: ___%s_gl1\n", array_groups[i].tkmn->name.c_str());
-            tmpob = array_groups[i].kids1;
-            while (tmpob != NULL)
+            for (std::list<ob_t>::iterator it = array_groups[i].kids1.begin(); it != array_groups[i].kids1.end(); ++it)
             {
-                printOb(ofile, tmpob);
-                printf("%s\n", tmpob->name.c_str());
-                tmpob = tmpob->next;
+                printOb(ofile, *it);
+                printf("%s\n", it->name.c_str());
             }
         }
 
         /* there is always a group 0 with the tkmn at leat */
         fprintf(ofile, "OBJECT group\n");
         fprintf(ofile, "name \"___%s_gl0\"\n", array_groups[i].tkmn->name.c_str());
-        fprintf(ofile, "kids %d\n", array_groups[i].numkids0 + 1);
+        fprintf(ofile, "kids %d\n", static_cast<int>(array_groups[i].kids0.size() + 1));
         printf("writing group: ___%s_gl0\n", array_groups[i].tkmn->name.c_str());
-        tmpob = array_groups[i].kids0;
-        while (tmpob != NULL)
+        for (std::list<ob_t>::iterator it = array_groups[i].kids0.begin(); it != array_groups[i].kids0.end(); ++it)
         {
-            printOb(ofile, tmpob);
-            printf("%s\n", tmpob->name.c_str());
-            tmpob = tmpob->next;
+            printOb(ofile, *it);
+            printf("%s\n", it->name.c_str());
         }
-        printOb(ofile, array_groups[i].tkmn);
+        printOb(ofile, *array_groups[i].tkmn);
     }
 
     fclose(ofile);
 
-    delete ob0;
-    delete ob1;
-    delete ob2;
-    delete ob3;
-
     return;
 }
 
-void reorder(ob_t * ob, ob_t * ob2, std::vector<uv_t> & textarray, std::vector<tcoord_t> & vertexarray)
+void reorder(ob_t &ob, ob_t &ob2, std::vector<uv_t> &textarray, std::vector<tcoord_t> &vertexarray)
 {
     int k = 0;
 
-    for (int i = 0; i < ob->numvert; i++)
+    for (int i = 0; i < ob.numvert; i++)
     {
-        if (ob->vertex[i] != ob2->vertex[i])
+        if (ob.vertex[i] != ob2.vertex[i])
         {
-            for (int j = 0; j < ob->numvert; j++)
+            for (int j = 0; j < ob.numvert; j++)
             {
-                if (ob->vertex[i] == ob2->vertex[j])
+                if (ob.vertex[i] == ob2.vertex[j])
                 {
                     k++;
 
-                    point_t p = ob2->vertex[i];
-                    ob2->vertex[i] = ob2->vertex[j];
-                    ob2->vertex[j] = p;
+                    point_t p = ob2.vertex[i];
+                    ob2.vertex[i] = ob2.vertex[j];
+                    ob2.vertex[j] = p;
 
                     tcoord_t t = vertexarray[i];
                     vertexarray[i] = vertexarray[j];
@@ -538,50 +417,30 @@ void reorder(ob_t * ob, ob_t * ob2, std::vector<uv_t> & textarray, std::vector<t
             }
         }
     }
-    printf("%s : reordered %d points\n", ob->name.c_str(), k);
+    printf("%s : reordered %d points\n", ob.name.c_str(), k);
     return;
 }
 
-/** Returns 0 if the given object has no name or is root, world or a group.
- */
-bool isNamedAndPolygon(ob_t * ob)
-{
-    if (ob->canSkip())
-        return false;
-    if (ob->type == "group")
-        return false;
-
-    return true;
-}
-
 /** collapse the given tiledob into the texture channel 1 of tarobj */
-void collapseMapTiledTextures(ob_t * tarob, ob_t * tiledob);
+void collapseMapTiledTextures(ob_t &tarob, std::list<ob_t> &tiledob);
 /** collapse the given skidsob into the texture channel 2 of tarobj */
-void collapseSkidsGrassTextures(ob_t * tarob, ob_t * skidsob);
+void collapseSkidsGrassTextures(ob_t &tarob, std::list<ob_t> &skidsob);
 /** collapse the given shadob into the texture channel 3 of tarobj */
-void collapseShadowTextures(ob_t * tarob, ob_t * shadob);
+void collapseShadowTextures(ob_t &tarob, std::list<ob_t> &shadob);
 
 /** Match textures from ob1, ob2 and ob3 with ob0. In case a match is found
  *  add them as additional texture channels in ob0.
  */
-void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3)
+void collapseTextures(std::list<ob_t> &ob0, std::list<ob_t> &ob1, std::list<ob_t> &ob2, std::list<ob_t> &ob3)
 {
-    ob_t * tmpob = NULL;
-
-    tmpob = ob0;
-    while (tmpob != NULL)
+    for (std::list<ob_t>::iterator it = ob0.begin(); it != ob0.end(); ++it)
     {
-        if (!isNamedAndPolygon(tmpob))
-        {
-            tmpob = tmpob->next;
+        if (!it->isNamedAndPolygon())
             continue;
-        }
 
-        collapseMapTiledTextures(tmpob, ob1);
-        collapseSkidsGrassTextures(tmpob, ob2);
-        collapseShadowTextures(tmpob, ob3);
-
-        tmpob = tmpob->next;
+        collapseMapTiledTextures(*it, ob1);
+        collapseSkidsGrassTextures(*it, ob2);
+        collapseShadowTextures(*it, ob3);
     }
 }
 
@@ -589,35 +448,35 @@ void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3)
  *  into the corresponding places in destob based on the given channel.
  *  The channel may be 1,2 or 3.
  */
-void copyTextureChannel(ob_t * destob, ob_t * srcob, int channel)
+void copyTextureChannel(ob_t &destob, const ob_t &srcob, int channel)
 {
     if (channel == 1)
     {
-        destob->texture1 = srcob->texture;
-        destob->textarray1 = srcob->textarray;
-        destob->vertexarray1 = srcob->vertexarray;
+        destob.texture1 = srcob.texture;
+        destob.textarray1 = srcob.textarray;
+        destob.vertexarray1 = srcob.vertexarray;
     }
     else if (channel == 2)
     {
-        destob->texture2 = srcob->texture;
-        destob->textarray2 = srcob->textarray;
-        destob->vertexarray2 = srcob->vertexarray;
+        destob.texture2 = srcob.texture;
+        destob.textarray2 = srcob.textarray;
+        destob.vertexarray2 = srcob.vertexarray;
     }
     else if (channel == 3)
     {
-        destob->texture3 = srcob->texture;
-        destob->textarray3 = srcob->textarray;
-        destob->vertexarray3 = srcob->vertexarray;
+        destob.texture3 = srcob.texture;
+        destob.textarray3 = srcob.textarray;
+        destob.vertexarray3 = srcob.vertexarray;
     }
 }
 
-bool notInSameOrder(const ob_t * ob1, const ob_t * ob2)
+bool notInSameOrder(const ob_t &ob1, const ob_t &ob2)
 {
-    for (int i = 0; i < ob1->numvert; i++)
+    for (int i = 0; i < ob1.numvert; i++)
     {
-        if (fabs(ob1->vertex[i].x - ob2->vertex[i].x) > MINVAL ||
-            fabs(ob1->vertex[i].y - ob2->vertex[i].y) > MINVAL ||
-            fabs(ob1->vertex[i].z - ob2->vertex[i].z) > MINVAL)
+        if (fabs(ob1.vertex[i].x - ob2.vertex[i].x) > MINVAL ||
+            fabs(ob1.vertex[i].y - ob2.vertex[i].y) > MINVAL ||
+            fabs(ob1.vertex[i].z - ob2.vertex[i].z) > MINVAL)
         {
             return true;
         }
@@ -625,83 +484,65 @@ bool notInSameOrder(const ob_t * ob1, const ob_t * ob2)
     return false;
 }
 
-bool isSamePoly(const ob_t * ob1, const ob_t * ob2)
+void collapseMapTiledTextures(ob_t &tarob, std::list<ob_t> &tiledob)
 {
-    return stricmp(ob1->name.c_str(), ob2->name.c_str()) == 0 &&
-           ob1->type == ob2->type &&
-           ob1->numvert == ob2->numvert && 
-           ob1->numsurf == ob2->numsurf;
-}
-
-void collapseMapTiledTextures(ob_t * tarob, ob_t * tiledob)
-{
-    ob_t * curtiledob = tiledob;
-
-    while (curtiledob != NULL)
+    for (std::list<ob_t>::iterator it = tiledob.begin(); it != tiledob.end(); ++it)
     {
-        if (isNamedAndPolygon(curtiledob))
+        if (it->isNamedAndPolygon())
         {
-            if (isSamePoly(tarob, curtiledob))
+            if (it->isSamePoly(tarob))
             {
-                copyTextureChannel(tarob, curtiledob, 1);
-                if (notInSameOrder(tarob, curtiledob))
+                copyTextureChannel(tarob, *it, 1);
+                if (notInSameOrder(tarob, *it))
                 {
-                    printf("%s : points not in the same order, reordering ...\n", tarob->name.c_str());
-                    reorder(tarob, curtiledob, tarob->textarray1, tarob->vertexarray1);
-                    printf("%s : reordering ... done\n", tarob->name.c_str());
+                    printf("%s : points not in the same order, reordering ...\n", tarob.name.c_str());
+                    reorder(tarob, *it, tarob.textarray1, tarob.vertexarray1);
+                    printf("%s : reordering ... done\n", tarob.name.c_str());
                 }
                 break;
             }
         }
-        curtiledob = curtiledob->next;
     }
 }
 
-void collapseSkidsGrassTextures(ob_t * tarob, ob_t * skidsob)
+void collapseSkidsGrassTextures(ob_t &tarob, std::list<ob_t> &skidsob)
 {
-    ob_t * curskidsob = skidsob;
-
-    while (curskidsob != NULL)
+    for (std::list<ob_t>::iterator it = skidsob.begin(); it != skidsob.end(); ++it)
     {
-        if (isNamedAndPolygon(curskidsob))
+        if (it->isNamedAndPolygon())
         {
-            if (isSamePoly(tarob, curskidsob))
+            if (it->isSamePoly(tarob))
             {
-                copyTextureChannel(tarob, curskidsob, 2);
-
-                if (notInSameOrder(tarob, curskidsob))
+                copyTextureChannel(tarob, *it, 2);
+                if (notInSameOrder(tarob, *it))
                 {
-                    printf("%s : points not in the same order\n", tarob->name.c_str());
-                    reorder(tarob, curskidsob, tarob->textarray2, tarob->vertexarray2);
-                    printf("%s : reordering ... done\n", tarob->name.c_str());
+                    printf("%s : points not in the same order\n", tarob.name.c_str());
+                    reorder(tarob, *it, tarob.textarray2, tarob.vertexarray2);
+                    printf("%s : reordering ... done\n", tarob.name.c_str());
                 }
                 break;
             }
         }
-        curskidsob = curskidsob->next;
     }
 }
 
-void collapseShadowTextures(ob_t * tarob, ob_t * shadob)
+void collapseShadowTextures(ob_t &tarob, std::list<ob_t> &shadob)
 {
-    ob_t * curshadob = shadob;
-
-    while (curshadob != NULL)
+    for (std::list<ob_t>::iterator it = shadob.begin(); it != shadob.end(); ++it)
     {
-        if (isNamedAndPolygon(curshadob))
+        if (it->isNamedAndPolygon())
         {
-            if (isSamePoly(tarob, curshadob))
+            if (it->isSamePoly(tarob))
             {
-                copyTextureChannel(tarob, curshadob, 3);
-                if (notInSameOrder(tarob, curshadob))
+                copyTextureChannel(tarob, *it, 3);
+                if (notInSameOrder(tarob, *it))
                 {
-                    printf("%s : points not in the same order\n", tarob->name.c_str());
-                    reorder(tarob, curshadob, tarob->textarray3, tarob->vertexarray3);
-                    printf("%s : reordering ... done\n", tarob->name.c_str());
+                    printf("%s : points not in the same order\n", tarob.name.c_str());
+                    reorder(tarob, *it, tarob.textarray3, tarob.vertexarray3);
+                    printf("%s : reordering ... done\n", tarob.name.c_str());
                 }
                 break;
             }
         }
-        curshadob = curshadob->next;
     }
 }

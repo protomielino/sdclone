@@ -27,6 +27,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <algorithm>
 
 #include "portability.h"
@@ -38,6 +39,7 @@
 #include <windows.h>
 #include <float.h>
 #pragma warning(disable : 26451)
+#pragma warning(disable : 26812)
 #endif
 
 extern char * fileL0;
@@ -60,8 +62,6 @@ extern double far_dist;
 
 enum conv_t {
     _UNSPECIFIED,
-    _AC3DTO3DS,
-    _3DSTOAC3D,
     /** optimized version of ac3d using groups by section */
     _AC3DTOAC3D,
     _AC3DTOOBJ,
@@ -231,7 +231,6 @@ struct ob_t
     std::vector<uv_t> textarray2;
     std::vector<uv_t> textarray3;
     std::vector<int> surfrefs;
-    ob_t * next;
     double x_min;
     double y_min;
     double z_min;
@@ -243,7 +242,7 @@ struct ob_t
     int kids_o;
     bool inkids_o;
 
-    bool canSkip() const { return name == "root" || name == "world"; }
+    bool canSkip() const { return name == "world"; }
     bool hasName() const { return !name.empty(); }
     bool nameStartsWith(const char * str) const { return !strnicmp(name.c_str(), str, strlen(str)); }
     bool nameHasStr(const char* str) const { return name.find(str) != std::string::npos; }
@@ -256,70 +255,75 @@ struct ob_t
         return hasTexture1() || hasTexture2() || hasTexture3(); 
     }
     bool hasNoSmooth() const { return data.find("nosmooth") != std::string::npos; }
+
+    /** Returns 0 if the given object has no name or is world or a group.
+     */
+    bool isNamedAndPolygon() const
+    {
+        if (canSkip() || type == "group")
+            return false;
+
+        return true;
+    }
+
+    bool isSamePoly(const ob_t &ob) const
+    {
+        return stricmp(name.c_str(), ob.name.c_str()) == 0 &&
+               type == ob.type &&
+               numvert == ob.numvert &&
+               numsurf == ob.numsurf;
+    }
+
+    /** Initializes the min and max properties of the given object
+     *  must be set: numvertice, vertex
+     */
+    void initSpacialExtend();
+
+    /** Creates and zeroes the "vertexarray" properties.
+     *  must be set: "texture" properties (decide whether to create arrays), numsurf
+     */
+    void createVertexArrays();
+
+    /** Creates and initializes ob's textarray properties, based on the "vertexarray" data
+     *  must be set: numsurf, numvertice, vertexarray
+     */
+    void createTextArrays();
+
+    /** copies the "texture" properties from srcob to destob. */
+    void copyTextureNames(const ob_t &srcob);
+
+    /** Assigns the given "newIndex" to the indice property of all active "vertexarray"s at index
+     *  "vaIdx".
+     */
+    void setVertexArraysIndex(int vaIdx, int newIndex);
+
+    /** Computes the centroid of a triangle surface of the given object.
+     *
+     *  @param ob the object from which to take the surface
+     *  @param obsurf the surface index in the object (obsurf * 3 is the first entry in the vertexarray considered)
+     *  @param out the computed centroid
+     */
+    void computeObSurfCentroid(int obsurf, point_t &out) const;
 };
-
-/** Appends srcob to the end of the list given by destob.
- *
- * @return the new list: destob if it exists, else srcob itself.
- */
-ob_t * obAppend(ob_t * destob, ob_t * srcob);
-
-/** Initializes the min and max properties of the given object
- *  must be set: numvertice, vertex
- */
-void obInitSpacialExtend(ob_t * ob);
-
-/** Creates and zeroes the "vertexarray" properties.
- *  must be set: "texture" properties (decide whether to create arrays), numsurf
- */
-void obCreateVertexArrays(ob_t * ob);
-
-/** Creates and initializes ob's textarray properties, based on the "vertexarray" data
- *  must be set: numsurf, numvertice, vertexarray
- */
-void obCreateTextArrays(ob_t * ob);
-
-/** copies the "texture" properties from srcob to destob. */
-void obCopyTextureNames(ob_t * destob, const ob_t * srcob);
-
-/** Assigns the given "newIndex" to the indice property of all active "vertexarray"s at index
- *  "vaIdx".
- */
-void obSetVertexArraysIndex(ob_t * ob, int vaIdx, int newIndex);
 
 struct ob_groups_t
 {
     ob_groups_t() :
-    kids(nullptr),
-    numkids(0),
     tkmn(nullptr),
-    tkmnlabel(0),
-    kids0(nullptr),
-    numkids0(0),
-    kids1(nullptr),
-    numkids1(0),
-    kids2(nullptr),
-    numkids2(0),
-    kids3(nullptr),
-    numkids3(0)
+    tkmnlabel(0)
     {
     }
 
     ~ob_groups_t() { }
 
-    ob_t * kids;
-    int numkids;
+    std::list<ob_t> kids;
     ob_t * tkmn;
     std::string name;
     int tkmnlabel;
-    ob_t * kids0;
-    int numkids0;
-    ob_t * kids1;
-    int numkids1;
-    ob_t * kids2;
-    int numkids2;
-    ob_t * kids3;
-    int numkids3;
+    std::list<ob_t> kids0;
+    std::list<ob_t> kids1;
+    std::list<ob_t> kids2;
+    std::list<ob_t> kids3;
 };
 
 struct color_t
@@ -371,16 +375,7 @@ void loadAndGroup(const std::string &OutputFileName);
  *
  *  @returns 0 on success, a value != 0 on failure
  */
-int loadAC(const std::string &inputFilename, ob_t** objects, std::vector<mat_t>& materials, const std::string &outputFilename = "");
-
-/** Copies a single surface from the "vertexarray" attributes of srcob to the ones of destob.
- *  It decides whether to copy multitexture data based on srcob's "vertexarray" attributes.
- *
- *  In particular it copies 3 entries starting at srcSurfIdx * 3 from srcob->vertexarray
- *  to entries starting at destSurfIdx * 3 in destob->vertexarray. The same goes for the
- *  multitexture entries.
- */
-void copyVertexArraysSurface(ob_t * destob, int destSurfIdx, ob_t * srcob, int srcSurfIdx);
+int loadAC(const std::string &inputFilename, std::list<ob_t> &objects, std::vector<mat_t> &materials, const std::string &outputFilename = "");
 
 /** Helper function for copySingleVertexData(). Stores a single texture channel, i.e. copies
  *  data from the srcvert into the destination arrays based on the given indices.
@@ -402,32 +397,12 @@ void copyTexChannel(std::vector<uv_t> & desttextarray, std::vector<tcoord_t> & d
  *  @param destvertidx the index in the destination's vertexarray to be modified
  *  @param srcvertidx the index in the vertexarray in the source object to take the data from
  */
-void copySingleVertexData(ob_t * destob, ob_t * srcob,
+void copySingleVertexData(ob_t &destob, const ob_t &srcob,
     int storedptidx, int destptidx, int destvertidx, int srcvertidx);
-
-/** Computes the centroid of a triangle surface of the given object.
- *
- *  @param ob the object from which to take the surface
- *  @param obsurf the surface index in the object (obsurf * 3 is the first entry in the vertexarray considered)
- *  @param out the computed centroid
- */
-void computeObSurfCentroid(const ob_t * object, int obsurf, point_t * out);
 
 extern conv_t typeConvertion;
 
-/** Splits the given object and returns the split objects.
- *
- * The original object will not be modified.
- */
-ob_t* splitOb(ob_t *object);
-
-/** Performs a terrain split on the given object and returns the split objects.
- *
- * The original object will not be modified.
- */
-ob_t* terrainSplitOb(ob_t *object);
-
-int mergeSplitted(ob_t **object);
+int mergeSplitted(std::list<ob_t> &objects);
 extern double distSplit;
 
 /** Whether to split objects during loading, i.e. calls to loadAC().
@@ -442,17 +417,17 @@ extern bool splitObjectsDuringLoad;
 /** Go through all given objects, check whether a normal split or a terrain
  *  split is necessary and execute the split.
  */
-ob_t * splitObjects(ob_t* object);
-double findDistmin(ob_t * ob1, ob_t *ob2);
+void splitObjects(std::list<ob_t> &objects);
+double findDistmin(const ob_t &ob1, const ob_t &ob2);
 
 #define SPLITX 75
 #define SPLITY 75
 #define MINVAL 0.001
 
-int printOb(FILE *ofile, ob_t *object);
 void printMaterials(FILE *file, const std::vector<mat_t> &materials);
+int printOb(FILE *ofile, ob_t &object);
 
-void smoothTriNorm(ob_t *object);
+void smoothTriNorm(std::list<ob_t> &objects);
 
 #endif /* _ACCC_H_ */ 
 
