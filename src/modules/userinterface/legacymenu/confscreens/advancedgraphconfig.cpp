@@ -33,10 +33,6 @@
 
 #include "advancedgraphconfig.h"
 
-static const char* BackgroundTypeValues[] = { GR_ATT_BGSKY_RING, GR_ATT_BGSKY_LAND };
-static const int NbBackgroundTypeValues = sizeof(BackgroundTypeValues) / sizeof(BackgroundTypeValues[0]);
-//static const char* SpectatorValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_ATT_AGR_FULL, GR_ATT_AGR_HIGH };
-//static const int NbSpectatorValues = sizeof(SpectatorValues) / sizeof(SpectatorValues[0]);
 static const char* ShadowValues[] = { GR_ATT_SHADOW_NONE, GR_ATT_SHADOW_SM, GR_ATT_SHADOW_SSM, GR_ATT_SHADOW_PSSM, GR_ATT_SHADOW_LSPM, GR_ATT_SHADOW_VDSM};
 static const int NbShadowValues = sizeof(ShadowValues) / sizeof(ShadowValues[0]);
 static const char* TexSizeValues[] = { GR_ATT_SHADOW_512, GR_ATT_SHADOW_1024, GR_ATT_SHADOW_2048, GR_ATT_SHADOW_4096, GR_ATT_SHADOW_8192 };
@@ -52,7 +48,6 @@ static const int NbMonitorValues = sizeof(MonitorValues) / sizeof(MonitorValues[
 
 static void	*ScrHandle = NULL;
 
-static int	BackgroundTypeLabelId, BackgroundTypeLeftButtonId, BackgroundTypeRightButtonId;
 static int	ShadowLabelId, ShadowLeftButtonId, ShadowRightButtonId;
 static int	TexSizeLabelId, TexSizeLeftButtonId, TexSizeRightButtonId;
 static int	QualityLabelId, QualityLeftButtonId, QualityRightButtonId;
@@ -60,8 +55,6 @@ static int	ShadersLabelId, ShadersLeftButtonId, ShadersRightButtonId;
 static int	SpansplitLabelId, SpansplitLeftButtonId, SpansplitRightButtonId;
 static int	MonitorLabelId, MonitorLeftButtonId, MonitorRightButtonId;
 
-static int	BackgroundTypeIndex = 0;
-//static int	SpectatorsIndex = 0;
 static int	ShadowIndex = 0;
 static int	TexSizeIndex = 0;
 static int	QualityIndex = 0;
@@ -77,7 +70,6 @@ static int	MonitorIndex = 0;
 
 static char	buf[512];
 
-
 // Options IO functions ===================================================================
 
 static void
@@ -85,21 +77,9 @@ loadOptions()
 {
     void* grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-    BackgroundTypeIndex = 0; // Default value index, in case file value not found in list.
-    const char* pszBackgroundType =
-        GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING);
-    for (int i = 0; i < NbBackgroundTypeValues; i++)
-    {
-        if (!strcmp(pszBackgroundType, BackgroundTypeValues[i]))
-        {
-            BackgroundTypeIndex = i;
-            break;
-        }
-    }
-
     ShadowIndex = 0; // Default value index, in case file value not found in list.
-    const char* pszShadow =
-        GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SHADOW_TYPE, GR_ATT_SHADOW_NONE);
+    const char* pszShadow = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SHADOW_TYPE, GR_ATT_SHADOW_NONE);
+
     for (int i = 0; i < NbShadowValues; i++)
     {
         if (!strcmp(pszShadow, ShadowValues[i]))
@@ -110,8 +90,8 @@ loadOptions()
     }
 
     TexSizeIndex = 0; // Default value index, in case file value not found in list.
-    const char* pszTexSize =
-        GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SHADOW_SIZE, GR_ATT_SHADOW_1024);
+    const char* pszTexSize = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SHADOW_SIZE, GR_ATT_SHADOW_1024);
+
     for (int i = 0; i < NbTexSizeValues; i++)
     {
         if (!strcmp(pszTexSize, TexSizeValues[i]))
@@ -122,8 +102,8 @@ loadOptions()
     }
 
     QualityIndex = 0; // Default value index, in case file value not found in list.
-    const char* pszQuality =
-        GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_AGR_QUALITY, GR_ATT_AGR_NULL);
+    const char* pszQuality = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_AGR_QUALITY, GR_ATT_AGR_NULL);
+
     for (int i = 0; i < NbQualityValues; i++)
     {
         if (!strcmp(pszQuality, QualityValues[i]))
@@ -134,8 +114,8 @@ loadOptions()
     }
 
     ShadersIndex = 0; // Default value index, in case file value not found in list.
-    const char* pszShaders =
-        GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SHADERS, GR_VAL_NO);
+    const char* pszShaders = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SHADERS, GR_VAL_NO);
+
     for (int i = 0; i < NbShadersValues; i++)
     {
         if (!strcmp(pszShaders, ShadersValues[i]))
@@ -146,8 +126,8 @@ loadOptions()
     }
 
     SpansplitIndex = 0; // Default value index, in case file value not found in list.
-    const char* pszSpansplit =
-        GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
+    const char* pszSpansplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
+
     for (int i = 0; i < NbSpansplitValues; i++)
     {
         if (!strcmp(pszSpansplit, SpansplitValues[i]))
@@ -169,10 +149,12 @@ loadOptions()
     GfuiEditboxSetString(ScrHandle, BezelCompId, buf);
 
     ScreenDist = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SCREENDIST, NULL, 1.0f);
-    if (ScreenDist > 5.0f) {
+    if (ScreenDist > 5.0f)
+    {
         ScreenDist = 5.0f;
     }
-    else if (ScreenDist < 0.0f) {
+    else if (ScreenDist < 0.0f)
+    {
         ScreenDist = 0.0f;
     }
 
@@ -180,10 +162,12 @@ loadOptions()
     GfuiEditboxSetString(ScrHandle, ScreenDistId, buf);
 
     ArcRatio = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_ARCRATIO, NULL, 1.0f);
-    if (ArcRatio > 2.0f) {
+    if (ArcRatio > 2.0f)
+    {
         ArcRatio = 2.0f;
     }
-    else if (ArcRatio < 0.0f) {
+    else if (ArcRatio < 0.0f)
+    {
         ArcRatio = 0.0f;
     }
 
@@ -191,8 +175,8 @@ loadOptions()
     GfuiEditboxSetString(ScrHandle, ArcRatioId, buf);
 
     MonitorIndex = 0; // Default value index, in case file value not found in list.
-    const char* pszMonitor =
-        GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_MONITOR, GR_VAL_MONITOR_16BY9);
+    const char* pszMonitor = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_MONITOR, GR_VAL_MONITOR_16BY9);
+
     for (int i = 0; i < NbMonitorValues; i++)
     {
         if (!strcmp(pszMonitor, MonitorValues[i]))
@@ -213,7 +197,6 @@ saveOptions()
 
     void* grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-    GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, BackgroundTypeValues[BackgroundTypeIndex]);
     GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SHADOW_TYPE, ShadowValues[ShadowIndex]);
     GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SHADOW_SIZE, TexSizeValues[TexSizeIndex]);
     GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_AGR_QUALITY, QualityValues[QualityIndex]);
@@ -230,14 +213,6 @@ saveOptions()
 }
 
 // GUI callback functions ===================================================================
-
-static void
-onChangeBackgroundType(void* vp)
-{
-    const long delta = (long)vp;
-    BackgroundTypeIndex = (BackgroundTypeIndex + NbBackgroundTypeValues + delta) % NbBackgroundTypeValues;
-    GfuiLabelSetText(ScrHandle, BackgroundTypeLabelId, BackgroundTypeValues[BackgroundTypeIndex]);
-}
 
 static void
 onChangeShadow(void* vp)
@@ -342,7 +317,6 @@ onActivate(void* /* dummy */)
     loadOptions();
 
     // Load GUI control values.
-    onChangeBackgroundType(0);
     onChangeShadow(0);
     onChangeTexSize(0);
     onChangeQuality(0);
@@ -383,12 +357,6 @@ AdvancedGraphMenuInit(void* prevMenu)
     void* param = GfuiMenuLoad("advancedgraphconfigmenu.xml");
 
     GfuiMenuCreateStaticControls(ScrHandle, param);
-
-    BackgroundTypeLeftButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "bgskyleftarrow", (void*)-1, onChangeBackgroundType);
-    BackgroundTypeRightButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "bgskyrightarrow", (void*)1, onChangeBackgroundType);
-    BackgroundTypeLabelId =	GfuiMenuCreateLabelControl(ScrHandle, param, "bgskydomelabel");
 
     ShadowLeftButtonId =
         GfuiMenuCreateButtonControl(ScrHandle, param, "shadowleftarrow", (void*)-1, onChangeShadow);

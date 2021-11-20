@@ -58,8 +58,6 @@ int grWrldZ;
 int grWrldMaxSize;
 bool grSpeedway;
 bool grSpeedwayshort;
-static bool grBGSky = false;
-static bool grBGType = false;
 tTrack *grTrack;
 
 // TheScene
@@ -226,17 +224,7 @@ grLoadScene(tTrack *track)
     }
 
     if ( grSkyDomeDistance > 0 )
-    {
-        grBGSky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
-        if (grBGSky)
-        {
-            grBGType = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), GR_ATT_BGSKY_LAND) == 0;
-            if (grBGType)
-                grLoadBackgroundLand();
-            else
-                grLoadBackgroundSky();
-        }
-    }
+        grLoadBackgroundSky();
 
     snprintf(buf, sizeof(buf), "tracks/%s/%s;data/textures;data/img;.", grTrack->category, grTrack->internalname);
     ssgTexturePath(buf);

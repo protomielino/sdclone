@@ -39,7 +39,7 @@ class   osgLoader;
 class SDBackground
 {
     osg::ref_ptr<osg::Group>				_background;
-	osg::ref_ptr < osg::MatrixTransform>	_backgroundTransform;
+    osg::ref_ptr < osg::MatrixTransform>	_backgroundTransform;
 
     bool	_type;
 
@@ -50,7 +50,7 @@ public:
     // Destructor
     ~SDBackground(void);
 
-    void build(bool type, int X, int Y, int Z, const std::string& strTrack);
+    void build(int X, int Y, int Z, const std::string& strTrack);
     void reposition(double X, double Y, double Z);
 
     osg::ref_ptr<osg::Group> getBackground() { return _background.get(); }
@@ -78,7 +78,7 @@ class SDTrackLights
 private:
     class Internal;
     Internal *internal;
-    
+
     osg::ref_ptr<osg::Group> _osgtracklight;
 
 public:
@@ -111,7 +111,6 @@ private:
     int _SkyDomeDistance;
     int _SkyDomeDistThresh;
 
-    bool _bgtype;
     bool _bgsky;
     bool _speedWay;
     bool _speedWayLong;
@@ -137,8 +136,8 @@ public:
 
     void LoadScene(tTrack *track);
     void ShutdownScene(void);
-	void reposition(double X, double Y, double Z);
-	void update_tracklights(double currentTime, double totTime, int raceType);
+    void reposition(double X, double Y, double Z);
+    void update_tracklights(double currentTime, double totTime, int raceType);
 
     inline static double getWorldX(){return grWrldX;}
     inline static double getWorldY(){return grWrldY;}

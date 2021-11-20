@@ -796,11 +796,15 @@ grLoadBackground()
     bool bUseEnvPng = false;   // Avoid crash with missing env.rgb files (i.e. Wheel-1)
     bool bDoNotUseEnv = false; // Avoid crash with missing env.png
     grEnvSelector = new ssgStateSelector(graphic->envnb);
-    for (i = 0; i < graphic->envnb; i++) {
+
+    for (i = 0; i < graphic->envnb; i++)
+    {
         GfLogTrace("Loading #%d track-specific env. mapping image :\n", i+1);
         envst = (ssgSimpleState*)grSsgLoadTexState(graphic->env[i]);
+
         // Avoid crash with missing env.rgb files (i.e. Wheel-1)
-        if (!envst) {
+        if (!envst)
+        {
             GfLogWarning("Failed : trying fallback env.png\n");
             envst = (ssgSimpleState*)grSsgLoadTexState("env.png");
             if (!envst) {
@@ -848,6 +852,7 @@ grLoadBackground()
         else if (grTrack->local.clouds < NEnvShadowIndices)
             nEnvShadowIndex = EnvShadowIndices[ grTrack->local.clouds ];
     }
+
     if (nEnvShadowIndex >= 0)
     {
         char pszEnvFile[64];
@@ -857,9 +862,12 @@ grLoadBackground()
             GfLogWarning("%s not found ; falling back to weather-independant sky shadows"
                          " from envshadow.png\n", pszEnvFile);
     }
+
     if (!grEnvShadowState)
         grEnvShadowState = grSsgEnvTexState("envshadow.png", cgrMultiTexState::addColorModulateAlpha);
-    if (!grEnvShadowState) {
+
+    if (!grEnvShadowState)
+    {
         GfLogError("envshadow.png not found ; exiting !\n");
         GfLogError("(mandatory for top env mapping (should be in <track>.xml or data/textures ;\n");
         GfLogError(" copy the envshadow.png from 'chemisay' to the track you selected ;\n");
@@ -871,6 +879,7 @@ grLoadBackground()
     // 3) Vertical shadows of track objects on the cars (shadow2.png)
     GfLogTrace("Loading track shadows mapping image :\n");
     grEnvShadowStateOnCars = grSsgEnvTexState("shadow2.png", cgrMultiTexState::modulate);
+
     if(!grEnvShadowStateOnCars)
         grEnvShadowStateOnCars = grSsgEnvTexState("shadow2.rgb", cgrMultiTexState::modulate);
 
@@ -898,22 +907,6 @@ void grLoadBackgroundSky(void)
     sgSetCoord(&BackSkypos, grWrldX/2, grWrldY/2, 0, 0, 0, 0);
     BackSkyLoc->setTransform(&BackSkypos);
     BackSkyAnchor->addKid(BackSkyLoc);
-}
-
-void grLoadBackgroundLand(void)
-{
-    char buf2[256];
-    const char		*bgsky;
-    ssgEntity		*desc2;
-
-    bgsky = "land.ac";
-    snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/textures;.", grTrack->category, grTrack->internalname);
-    ssgTexturePath(buf2);
-    snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/objects;.", grTrack->category, grTrack->internalname);
-    ssgModelPath(buf2);
-
-    desc2 = grssgLoadAC3D(bgsky, NULL);
-    BackSkyAnchor->addKid(desc2);
 }
 
 void

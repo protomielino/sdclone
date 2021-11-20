@@ -51,7 +51,6 @@ SDScenery::SDScenery(void) :
     _SkyDomeDistance = 0;
     _SkyDomeDistThresh = 12000;
 
-    _bgtype = false;
     _bgsky =  false;
     _speedWay = false;
     _speedWayLong = false;
@@ -128,11 +127,10 @@ void SDScenery::LoadScene(tTrack *track)
         _bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
         if (_bgsky)
         {
-            _bgtype = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING), GR_ATT_BGSKY_LAND) == 0;
             std::string strPath = PathTmp;
             snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
             strPath += buf;
-            m_background->build(_bgtype, grWrldX, grWrldY, grWrldZ, strPath);
+            m_background->build(grWrldX, grWrldY, grWrldZ, strPath);
             GfLogDebug("Background loaded\n");
         }
 

@@ -33,7 +33,6 @@ void grUpdateFogColor(double sol_angle);
 extern void grLoadBackgroundGraphicsOptions();
 extern void grLoadBackground();
 extern void grLoadBackgroundSky(void);
-extern void grLoadBackgroundLand(void);
 extern void grInitBackground();
 extern void grUpdateSky(double currentTime, double accelTime);
 extern void grPreDrawSky(struct Situation* s, float fogStart, float fogEnd, class cGrCamera *cam);

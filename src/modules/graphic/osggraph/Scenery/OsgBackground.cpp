@@ -26,7 +26,7 @@
 
 SDBackground::SDBackground(void) :
     _background(NULL),
-	_backgroundTransform(NULL)
+    _backgroundTransform(NULL)
 {
 }
 
@@ -39,9 +39,8 @@ SDBackground::~SDBackground(void)
     }
 }
 
-void SDBackground::build(bool type, int X, int Y, int Z, const std::string& TrackPath)
+void SDBackground::build(int X, int Y, int Z, const std::string& TrackPath)
 {
-    bool land = type;
     osgDB::Registry::instance()->clearObjectCache();
 
     std::string LocalPath = GetDataDir();
@@ -57,23 +56,15 @@ void SDBackground::build(bool type, int X, int Y, int Z, const std::string& Trac
     osg::Matrix mat( 1.0f,  0.0f, 0.0f, 0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
                      0.0f, -1.0f, 0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f);
 
-	_backgroundTransform = new osg::MatrixTransform;
+    _backgroundTransform = new osg::MatrixTransform;
 
-    if (!land)
-    {
-        osg::ref_ptr<osg::Node> m_background = osgDB::readNodeFile("background-sky.ac");
-        //_background_transform->setMatrix(mat);
-        osg::Matrix t = osg::Matrix::translate(SDScenery::getWorldX() / 2, SDScenery::getWorldY() / 2, SDScenery::getWorldZ() / 2);
-        mat = mat * t;
-        _backgroundTransform->setMatrix(mat);
-        _backgroundTransform->addChild( m_background.get() );
-    }
-    else
-    {
-        osg::ref_ptr<osg::Node> m_background = osgDB::readNodeFile("land.ac");
-        _backgroundTransform->setMatrix(mat);
-        _backgroundTransform->addChild( m_background.get() );
-    }
+
+    osg::ref_ptr<osg::Node> m_background = osgDB::readNodeFile("background-sky.ac");
+    //_background_transform->setMatrix(mat);
+    osg::Matrix t = osg::Matrix::translate(SDScenery::getWorldX() / 2, SDScenery::getWorldY() / 2, SDScenery::getWorldZ() / 2);
+    mat = mat * t;
+    _backgroundTransform->setMatrix(mat);
+    _backgroundTransform->addChild( m_background.get() );
 
     osgDB::Registry::instance()->setDataFilePathList( osgDB::FilePathList() );
 
@@ -88,10 +79,10 @@ void SDBackground::build(bool type, int X, int Y, int Z, const std::string& Trac
 
 void SDBackground::reposition(double X, double Y, double Z)
 {
-	osg::Matrix T;
-	osg::Matrix mat(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+    osg::Matrix T;
+    osg::Matrix mat(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 
-	T.makeTranslate(X, Y, Z);
-   if(_backgroundTransform)
-	   _backgroundTransform->setMatrix(mat * T);
+    T.makeTranslate(X, Y, Z);
+    if(_backgroundTransform)
+        _backgroundTransform->setMatrix(mat * T);
 }
