@@ -1200,6 +1200,11 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     this->hudImgRotableElements["driverinput-wheel"]->setMatrix(curMatrix);
 
     prevSteerAngle = angle;
+    
+// debug info
+    temp.str("");
+    temp << "FPS: " << frameInfo->fInstFps << " (Inst: " << frameInfo->fAvgFps << ")";
+    hudTextElements["debug-info"]->setText(temp.str());
 
     //make the camera visible
     _cameraHUD->setNodeMask(NODE_MASK_ALL);
