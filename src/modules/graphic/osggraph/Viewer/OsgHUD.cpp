@@ -65,6 +65,8 @@ static osg::Vec4 colorRed(1.0, 0.0, 0.0, 1.0);
 static osg::Vec4 colorYellow(1.0, 0.878, 0.0, 1.0);
 static osg::Vec4 colorCyan(0.31, 0.968, 0.933, 1.0);
 
+float prevSteerAngle = 0.0f;
+
 std::map<std::string,osgText::Text* > hudTextElements;
 
 osg::Vec3 calculatePosition(osg::BoundingBox mybb, const std::string &objPoint,
@@ -1177,6 +1179,28 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         hudTextElements["dash-items-value2"]->setText(value2.str());
     }
 
+// driver inputs 
+    changeImageSize(this->hudImgElements["driverinput-clutch"], currCar->ctrl.clutchCmd, "bottom", this->hudScale);
+    changeImageSize(this->hudImgElements["driverinput-brake"], currCar->ctrl.brakeCmd, "bottom", this->hudScale);
+    changeImageSize(this->hudImgElements["driverinput-throttle"], currCar->ctrl.accelCmd, "bottom", this->hudScale);
+    
+    const osg::Vec3d axis(0, 0, 1);
+    //wheel
+    
+    double angle = currCar->ctrl.steer * 4;
+    
+    osg::Vec3d center = this->hudImgRotableElements["driverinput-wheel"]->getBound().center();//Save the center point coordinates of the object first
+    osg::Matrix curMatrix = this->hudImgRotableElements["driverinput-wheel"]->getMatrix();
+    
+    curMatrix *= osg::Matrix::translate(-center);//Move the object to the origin of the world coordinate system
+    curMatrix *= osg::Matrix::rotate(-prevSteerAngle, axis);//rotate
+    curMatrix *= osg::Matrix::rotate(angle, axis);//rotate
+    curMatrix *= osg::Matrix::translate(center);//move back to the original position of the object
+    
+    this->hudImgRotableElements["driverinput-wheel"]->setMatrix(curMatrix);
+
+    prevSteerAngle = angle;
+
     //make the camera visible
     _cameraHUD->setNodeMask(NODE_MASK_ALL);
 }
@@ -1338,7 +1362,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                     geode->addDrawable( text );
 
                 }
-                else if( type == "image")
+                else if( type == "image" || type == "imagerotable")
                 {
                     /* ============================
                          CREATE OSG IMAGE
@@ -1461,6 +1485,13 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                     osg::StateSet* state = geom->getOrCreateStateSet();
                     state->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
 
+                    //Conversely, disable write depth cache,
+                    //Make objects behind transparent polygons visible
+                    //OSG draws transparent polygons first, then draws opaque polygons
+                    osg :: Depth * imgDepth = new osg :: Depth;
+                    imgDepth-> setWriteMask (false);
+                    state-> setAttributeAndModes (imgDepth, osg :: StateAttribute :: ON);
+
                     // setup material
                     osg::TexMat* texmat = new osg::TexMat;
                     texmat->setScaleByTextureRectangleSize(true);
@@ -1474,9 +1505,21 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                     // turn off lighting (light always on)
                     state->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
-                    //add the image geometry to the hud
-                    geode->addDrawable(geom);
-
+                    if (type == "image")
+                    {
+                        //add the image geometry to the hud
+                        geode->addDrawable(geom);
+                    }
+                    else if(type == "imagerotable")
+                    {
+                        osg::MatrixTransform* transform = new osg::MatrixTransform;
+                        const double angle = 0.0;
+                        const osg::Vec3d axis(0, 0, 1);
+                        transform->setMatrix(osg::Matrix::rotate(angle, axis)); 
+                        transform->addChild(geom);
+                        group->addChild(transform);
+                        this->hudImgRotableElements[elementId] =  transform;
+                    }
                 }
                 else if( type == "graph")
                 {

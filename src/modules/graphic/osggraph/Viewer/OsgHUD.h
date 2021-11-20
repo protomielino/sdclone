@@ -130,6 +130,7 @@ class SDHUD
         float hudScale;
 
         std::map<std::string,osg::Geometry* > hudImgElements;
+        std::map<std::string,osg::MatrixTransform* > hudImgRotableElements;
         std::map<std::string,osg::ref_ptr <osg::Group> > hudGraphElements;
 
 #ifdef HUDDEBUG
