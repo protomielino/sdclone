@@ -213,6 +213,7 @@ int refresh(tSituation *s)
     frameInfo.nTotalFrames++;
     const double dCurTime = GfTimeClock();
     const double dDeltaTime = dCurTime - fFPSPrevInstTime;
+
     if (dDeltaTime > 1.0)
     {
         ++nFPSTotalSeconds;
@@ -220,9 +221,10 @@ int refresh(tSituation *s)
         frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
         frameInfo.nInstFrames = 0;
         frameInfo.fAvgFps = (double)frameInfo.nTotalFrames / nFPSTotalSeconds;
+
         // Trace F/S every 5 seconds.
         if (nFPSTotalSeconds % 5 == 2)
-            GfLogInfo("Frame rate (F/s) : Instant = %.1f (Average %.1f)\n",
+            GfLogDebug("Frame rate (F/s) : Instant = %.1f (Average %.1f)\n",
                       frameInfo.fInstFps, frameInfo.fAvgFps);
     }
 
