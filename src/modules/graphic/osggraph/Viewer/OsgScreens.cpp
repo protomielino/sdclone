@@ -48,9 +48,10 @@ SDScreens::SDScreens() :
     m_CurrentScreenIndex(0)
 {
 #ifdef HUDDEBUG
-    debugHUD = new SDDebugHUD();
+     debugHUD = new SDDebugHUD();
 #endif
 }
+
     extern SDHUD hud;
 
 class CameraDrawnCallback : public osg::Camera::DrawCallback
@@ -222,12 +223,35 @@ void SDScreens::changeCamera(long p)
     }
 }
 
-void SDScreens::toggleDebugHUD()
+void SDScreens::toggleHUD()
 {
-#ifdef HUDDEBUG
-    debugHUD->toggleHUD();
-#endif
+    hud.ToggleHUD();
 }
+void SDScreens::toggleHUDboard()
+{
+    hud.ToggleHUDboard();
+}
+void SDScreens::toggleHUDraceinfo()
+{
+    hud.ToggleHUDraceinfo();
+}
+void SDScreens::toggleHUDlaptime()
+{
+    hud.ToggleHUDlaptime();
+}
+void SDScreens::toggleHUDcarinfo()
+{
+    hud.ToggleHUDcarinfo();
+}
+void SDScreens::toggleHUDdriverinput()
+{
+    hud.ToggleHUDdriverinput();
+}
+void SDScreens::toggleHUDdebug()
+{
+    hud.ToggleHUDdebug();
+}
+
 
 void SDScreens::registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node)
 {

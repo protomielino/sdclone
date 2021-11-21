@@ -56,7 +56,13 @@ public:
     void update(tSituation *s,SDFrameInfo* fi);
     void changeCamera(long p);
     void registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node);
-    void toggleDebugHUD();
+    void toggleHUD();
+    void toggleHUDboard();
+    void toggleHUDraceinfo();
+    void toggleHUDlaptime();
+    void toggleHUDcarinfo();
+    void toggleHUDdriverinput();
+    void toggleHUDdebug();
 
     inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}
 };

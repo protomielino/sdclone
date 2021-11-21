@@ -306,10 +306,10 @@ void OSGPLOT::update(tSituation *s, const SDFrameInfo* frameInfo,
 
     //get y value
     float y = 0;
-    if(this->Ydata.compare("fps") == 0)					y = (float)frameInfo->fInstFps;
-    else if(this->Ydata.compare("carspeed") == 0) 		y = (float)currCar->_speed_x * 3.6;
-    else if(this->Ydata.compare("fpsavverrange") == 0) 	y = (float)frameInfo->fAvgFps;
-    else if(this->Ydata.compare("carbracketemp") == 0) 	y = (float)currCar->_brakeTemp(0);
+    if(this->Ydata.compare("fps") == 0)                    y = (float)frameInfo->fInstFps;
+    else if(this->Ydata.compare("carspeed") == 0)         y = (float)currCar->_speed_x * 3.6;
+    else if(this->Ydata.compare("fpsavverrange") == 0)     y = (float)frameInfo->fAvgFps;
+    else if(this->Ydata.compare("carbracketemp") == 0)     y = (float)currCar->_brakeTemp(0);
 
     //get z value
     float z=(float)0;
@@ -662,7 +662,7 @@ void changeImageSize(osg::Geometry *geom,
 
 SDHUD::SDHUD()
 {
-    _cameraHUD = new osg::Camera;
+    //_cameraHUD = new osg::Camera;
 
     //initialize some vars
     this->lastCar = NULL;
@@ -672,23 +672,23 @@ SDHUD::SDHUD()
 void SDHUD::CreateHUD(int scrH, int scrW)
 {
     // create a camera to set up the projection and model view matrices, and the subgraph to draw in the HUD
-    camera = new osg::Camera;
+    this->camera = new osg::Camera;
 
     // set the projection matrix
-    camera->setProjectionMatrix(osg::Matrix::ortho2D(0,scrW,0,scrH));
+    this->camera->setProjectionMatrix(osg::Matrix::ortho2D(0,scrW,0,scrH));
 
     // set the view matrix
-    camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-    camera->setViewMatrix(osg::Matrix::identity());
+    this->camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+    this->camera->setViewMatrix(osg::Matrix::identity());
 
     // only clear the depth buffer
-    camera->setClearMask(GL_DEPTH_BUFFER_BIT);
+    this->camera->setClearMask(GL_DEPTH_BUFFER_BIT);
 
     // draw subgraph after main camera view.
-    camera->setRenderOrder(osg::Camera::POST_RENDER);
+    this->camera->setRenderOrder(osg::Camera::POST_RENDER);
 
     // we don't want the camera to grab event focus from the viewers main camera(s).
-    camera->setAllowEventFocus(false);
+    this->camera->setAllowEventFocus(false);
 
     //calculate optimal hud scale (choose the minor scale from the vertical and horizontal scale)
     float scaleH = (float)scrH/1024;
@@ -705,7 +705,9 @@ void SDHUD::CreateHUD(int scrH, int scrW)
     GfLogDebug("OSGHUD: Hud Scale is: %f\n", this->hudScale);
 
     //generate the hud from the relative xml file
-    camera->addChild(this->generateHudFromXmlFile(scrH, scrW));
+    this->camera->addChild(this->generateHudFromXmlFile(scrH, scrW));
+    
+//    GfuiAddKey(0, 'z', "do somethig with the OSG widgets", (void*)0, this::ToggleHUD2, NULL);
 
 }
 
@@ -1203,35 +1205,77 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     
 // debug info
     temp.str("");
-    temp << "FPS: " << frameInfo->fInstFps << " (Inst: " << frameInfo->fAvgFps << ")";
+    temp << "FPS: " << frameInfo->fAvgFps << " (Inst: " << frameInfo->fInstFps << ")";
     hudTextElements["debug-info"]->setText(temp.str());
 
-    //make the camera visible
-    _cameraHUD->setNodeMask(NODE_MASK_ALL);
 }
 
-void SDHUD::ToggleHUD1()
+void SDHUD::ToggleHUD()
 {
-    _cameraHUD->setNodeMask(_cameraHUD->getNodeMask() ? NODE_MASK_NONE : NODE_MASK_ALL);
+    this->hudWidgets["boardWidget"]->setNodeMask(0);
+    this->hudWidgets["racepositionWidget"]->setNodeMask(0);
+    this->hudWidgets["racelapsWidget"]->setNodeMask(0);
+    this->hudWidgets["laptimeWidget"]->setNodeMask(0);
+    this->hudWidgets["carinfoWidget"]->setNodeMask(0);
+    this->hudWidgets["carstatusWidget"]->setNodeMask(0);
+    this->hudWidgets["driverinputWidget"]->setNodeMask(0);
+    this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
+    this->hudWidgets["debugWidget"]->setNodeMask(0);
 }
+void SDHUD::ToggleHUDboard()
+{
+    this->hudWidgets["boardWidget"]->setNodeMask(1 - this->hudWidgets["boardWidget"]->getNodeMask());
+}
+void SDHUD::ToggleHUDraceinfo()
+{
+    this->hudWidgets["racepositionWidget"]->setNodeMask(1 - this->hudWidgets["racepositionWidget"]->getNodeMask());
+    this->hudWidgets["racelapsWidget"]->setNodeMask(1 - this->hudWidgets["racelapsWidget"]->getNodeMask());
+}
+void SDHUD::ToggleHUDlaptime()
+{
+    this->hudWidgets["laptimeWidget"]->setNodeMask(1 - this->hudWidgets["laptimeWidget"]->getNodeMask());
+}
+void SDHUD::ToggleHUDcarinfo()
+{
+    this->hudWidgets["carinfoWidget"]->setNodeMask(1 - this->hudWidgets["carinfoWidget"]->getNodeMask());
+    this->hudWidgets["carstatusWidget"]->setNodeMask(1 - this->hudWidgets["carstatusWidget"]->getNodeMask());
+}
+void SDHUD::ToggleHUDdriverinput()
+{
+    this->hudWidgets["driverinputWidget"]->setNodeMask(1 - this->hudWidgets["driverinputWidget"]->getNodeMask());
+    this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(1 - this->hudImgRotableElements["driverinput-wheel"]->getNodeMask());
+
+}
+void SDHUD::ToggleHUDdebug()
+{
+    this->hudWidgets["debugWidget"]->setNodeMask(1 - this->hudWidgets["debugWidget"]->getNodeMask());
+}
+
 
 osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 {
-    osg::ref_ptr<osg::Group> group = new osg::Group;
-    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+    this->osgGroupHud = new osg::Group;
+    osg::ref_ptr<osg::Group> osgGroupWidgets = new osg::Group;
 
-    group->addChild(geode);
+    /*
+    osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+    osgGroupHud->addChild(geode);
 
     // turn lighting off for the text and disable depth test to ensure it's always ontop.
     osg::StateSet* stateset = geode->getOrCreateStateSet();
     stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
+    */
+    this->osgGroupHud->addChild(osgGroupWidgets);
 
     //screen bounding box
     osg::BoundingBox screenBB;
     screenBB.expandBy(osg::Vec3(0.0f,0.0f,0.0f));
     screenBB.expandBy(osg::Vec3(scrW,scrH,0.0f));
 
-    std::string sectionPath= "board";
+    std::string mainSection= "widgets";
+    std::string widgetsSectionPath= "";
+    std::string widgetsSectionName= "widgets";
+    std::string sectionPath= "";
     std::string subSectionPath = "";
     std::string subSectionName = "";
 
@@ -1242,358 +1286,387 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
     //open the file
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
 
-    //for each section on the
-    if (GfParmListSeekFirst(paramHandle, sectionPath.c_str()) == 0)
+
+    //GfLogInfo("OSGHUD: Try to find all mains sections: %s \n", subSectionName.c_str());
+
+    //cicle throught the widget sections
+    if (GfParmListSeekFirst(paramHandle, mainSection.c_str()) == 0)
     {
         do
         {
-                subSectionName = GfParmListGetCurEltName(paramHandle, sectionPath.c_str());
-                subSectionPath = sectionPath + "/" + subSectionName;
+            widgetsSectionName = GfParmListGetCurEltName(paramHandle, mainSection.c_str());
+            widgetsSectionPath = mainSection + "/" + widgetsSectionName;
 
-                //get a list of the params in this section
-                std::vector<std::string> paramsInSection = GfParmListGetParamsNamesList(paramHandle, subSectionPath.c_str());
+            osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+            geode->setName(widgetsSectionName);
+            osgGroupWidgets->addChild(geode);
+            this->hudWidgets[widgetsSectionName.c_str()] = geode;
 
-                std::string type = GfParmGetStr (paramHandle, subSectionPath.c_str(),"type", "no default value" );
+            // turn lighting off for the text and disable depth test to ensure it's always ontop.
+            osg::StateSet* stateset = geode->getOrCreateStateSet();
+            stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
 
-                /* ============================
-                     CREATE OSG TEXT
-                   ============================*/
-                if (type == "text" )
+            //read enabled disabled status for this widget from the config file
+            int widgetEnabled = GfParmGetNum (paramHandle, widgetsSectionPath.c_str(),"enabled", "",0);
+
+            //cicle throught each element of the widget
+            if (GfParmListSeekFirst(paramHandle, widgetsSectionPath.c_str()) == 0)
+            {
+                do
                 {
-                    //read data into local variables
-                    const std::string &elementId = 	subSectionName;
-                    std::string textStr = 		GfParmGetStr (paramHandle, subSectionPath.c_str(),"text", "" );
-                    std::string fontFileUrl = 	GfParmGetStr (paramHandle, subSectionPath.c_str(),"fontFileUrl", "" );
-                    std::string colorString = 	GfParmGetStr (paramHandle, subSectionPath.c_str(),"color", "" );
-                    float fontSize = 			GfParmGetNum (paramHandle, subSectionPath.c_str(),"fontSize", "",0 ) * this->hudScale;
-                    std::string textAlign = 	GfParmGetStr (paramHandle, subSectionPath.c_str(),"textAlign", "" );
+                        subSectionName = GfParmListGetCurEltName(paramHandle, widgetsSectionPath.c_str());
+                        subSectionPath = widgetsSectionPath + "/" + subSectionName;
 
-                    std::string positionRefObj = 			GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
-                    std::string positionRefObjPoint = 		GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
-                    std::string positionMyPoint = 			GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
-                    float positionVerticalModifier = 		GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * this->hudScale;
-                    float positionHorizontalModifier = 		GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * this->hudScale;
+                        //get a list of the params in this section
+                        std::vector<std::string> paramsInSection = GfParmListGetParamsNamesList(paramHandle, subSectionPath.c_str());
+                        std::string type = GfParmGetStr (paramHandle, subSectionPath.c_str(),"type", "no default value" );
 
-                    GfLogDebug("OSGHUD: Generate text object: %s \n", elementId.c_str());
+                        /* ============================
+                             CREATE OSG TEXT
+                           ============================*/
+                        if (type == "text" )
+                        {
+                            //read data into local variables
+                            const std::string &elementId =     subSectionName;
+                            std::string textStr =         GfParmGetStr (paramHandle, subSectionPath.c_str(),"text", "" );
+                            std::string fontFileUrl =     GfParmGetStr (paramHandle, subSectionPath.c_str(),"fontFileUrl", "" );
+                            std::string colorString =     GfParmGetStr (paramHandle, subSectionPath.c_str(),"color", "" );
+                            float fontSize =             GfParmGetNum (paramHandle, subSectionPath.c_str(),"fontSize", "",0 ) * this->hudScale;
+                            std::string textAlign =     GfParmGetStr (paramHandle, subSectionPath.c_str(),"textAlign", "" );
 
-                    //create the osg::text object
-                    osgText::Text* text = new  osgText::Text;
+                            std::string positionRefObj =             GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
+                            std::string positionRefObjPoint =         GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
+                            std::string positionMyPoint =             GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
+                            float positionVerticalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * this->hudScale;
+                            float positionHorizontalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * this->hudScale;
 
-                    //add the text obj to our pool (we willl need it later)
-                    hudTextElements[elementId] = text;
+                            GfLogDebug("OSGHUD: Generate text object: %s \n", elementId.c_str());
 
-                    //extract and apply the color
-                    {
-                        std::vector<std::string> colorStringVector = split(colorString.c_str(), '#');
+                            //create the osg::text object
+                            osgText::Text* text = new  osgText::Text;
 
-                        osg::Vec4 color = osg::Vec4(
-                            std::atof(colorStringVector[0].c_str()),
-                            std::atof(colorStringVector[1].c_str()),
-                            std::atof(colorStringVector[2].c_str()),
-                            std::atof(colorStringVector[3].c_str())
-                        );
+                            //add the text obj to our pool (we willl need it later)
+                            hudTextElements[elementId] = text;
 
-                        text->setColor(color);
-                    }
+                            //extract and apply the color
+                            {
+                                std::vector<std::string> colorStringVector = split(colorString.c_str(), '#');
 
-                    //set the font
-                    {
-                        std::string fontsMainDirectory = GetDataDir();
-                        fontsMainDirectory = fontsMainDirectory+"data/fonts";
-                        fontFileUrl = fontsMainDirectory+fontFileUrl;
-                        text->setFont(fontFileUrl);
+                                osg::Vec4 color = osg::Vec4(
+                                    std::atof(colorStringVector[0].c_str()),
+                                    std::atof(colorStringVector[1].c_str()),
+                                    std::atof(colorStringVector[2].c_str()),
+                                    std::atof(colorStringVector[3].c_str())
+                                );
 
-                        //font resolution
-                        text->setFontResolution(200,200);
+                                text->setColor(color);
+                            }
 
-                        //set the font size
-                        text->setCharacterSize(fontSize);
-                    }
+                            //set the font
+                            {
+                                std::string fontsMainDirectory = GetDataDir();
+                                fontsMainDirectory = fontsMainDirectory+"data/fonts";
+                                fontFileUrl = fontsMainDirectory+fontFileUrl;
+                                text->setFont(fontFileUrl);
 
-                    //set alignement
-                    if (textAlign=="")
-                    {
-                        text->setAlignment(osgText::Text::LEFT_BOTTOM_BASE_LINE );
-                    }
-                    else if (textAlign=="LEFT_BOTTOM")
-                    {
-                        text->setAlignment(osgText::Text::LEFT_BOTTOM_BASE_LINE );
-                    }
-                    else if (textAlign=="RIGHT_BOTTOM")
-                    {
-                        text->setAlignment(osgText::Text::RIGHT_BOTTOM_BASE_LINE );
-                    }
+                                //font resolution
+                                text->setFontResolution(200,200);
 
-                    //set the text string
-                    text->setText(textStr.c_str());
+                                //set the font size
+                                text->setCharacterSize(fontSize);
+                            }
 
-                    //set the position
-                    //find the referenceObj pointer and then get his bounding box
-                    osg::BoundingBox refObjBb;
+                            //set alignement
+                            if (textAlign=="")
+                            {
+                                text->setAlignment(osgText::Text::LEFT_BOTTOM_BASE_LINE );
+                            }
+                            else if (textAlign=="LEFT_BOTTOM")
+                            {
+                                text->setAlignment(osgText::Text::LEFT_BOTTOM_BASE_LINE );
+                            }
+                            else if (textAlign=="RIGHT_BOTTOM")
+                            {
+                                text->setAlignment(osgText::Text::RIGHT_BOTTOM_BASE_LINE );
+                            }
 
-                    if ( hudTextElements.find(positionRefObj.c_str()) != hudTextElements.end() )
-                    {
-                        refObjBb = hudTextElements[positionRefObj.c_str()]->getBoundingBox();
-                    }
-                    else if ( this->hudImgElements.find(positionRefObj.c_str()) != this->hudImgElements.end() )
-                    {
-                        refObjBb = this->hudImgElements[positionRefObj.c_str()]->getBoundingBox();
-                    }
-                    else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() )
-                    {
-                        //refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
-                    }
-                    else
-                    {
-                        GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
-                        refObjBb = screenBB;
-                    }
+                            //set the text string
+                            text->setText(textStr.c_str());
 
-                    //calculate the positioning
-                    osg::Vec3 position = calculatePosition(text->getBoundingBox(),positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
+                            //set the position
+                            //find the referenceObj pointer and then get his bounding box
+                            osg::BoundingBox refObjBb;
 
-                    //asign the position
-                    text->setPosition(position);
+                            if ( hudTextElements.find(positionRefObj.c_str()) != hudTextElements.end() )
+                            {
+                                refObjBb = hudTextElements[positionRefObj.c_str()]->getBoundingBox();
+                            }
+                            else if ( this->hudImgElements.find(positionRefObj.c_str()) != this->hudImgElements.end() )
+                            {
+                                refObjBb = this->hudImgElements[positionRefObj.c_str()]->getBoundingBox();
+                            }
+                            else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() )
+                            {
+                                //refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
+                            }
+                            else
+                            {
+                                GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
+                                refObjBb = screenBB;
+                            }
 
-                    //TODO: enable shadows for texts?
-                    //text->setBackdropType(osgText::Text::DROP_SHADOW_BOTTOM_RIGHT); //OUTLINE //DROP_SHADOW_BOTTOM_RIGHT
-                    /*
-                    text->setBackdropOffset(0.07f);
-                    color = osg::Vec4(0.57f,0.57f,0.57f,0.6f);
-                    text->setBackdropColor(color);
-                    */
+                            //calculate the positioning
+                            osg::Vec3 position = calculatePosition(text->getBoundingBox(),positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
 
-                    //add the text to the hud
-                    geode->addDrawable( text );
+                            //asign the position
+                            text->setPosition(position);
 
-                }
-                else if( type == "image" || type == "imagerotable")
-                {
-                    /* ============================
-                         CREATE OSG IMAGE
-                       ============================*/
-                    //read data into local variables
-                    const std::string &elementId = 			subSectionName;
-                    std::string url = 						GfParmGetStr (paramHandle, subSectionPath.c_str(),"url", "" );
+                            //TODO: enable shadows for texts?
+                            //text->setBackdropType(osgText::Text::DROP_SHADOW_BOTTOM_RIGHT); //OUTLINE //DROP_SHADOW_BOTTOM_RIGHT
+                            /*
+                            text->setBackdropOffset(0.07f);
+                            color = osg::Vec4(0.57f,0.57f,0.57f,0.6f);
+                            text->setBackdropColor(color);
+                            */
 
-                    std::string positionRefObj = 			GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
-                    std::string positionRefObjPoint = 		GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
-                    std::string positionMyPoint = 			GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
-                    float positionVerticalModifier = 		GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * this->hudScale;
-                    float positionHorizontalModifier = 		GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * this->hudScale;
+                            //add the text to the hud
+                            geode->addDrawable( text );
 
-                    GfLogDebug("OSGHUD: Generate image object: %s \n", elementId.c_str());
+                        }
+                        else if( type == "image" || type == "imagerotable")
+                        {
+                            /* ============================
+                                 CREATE OSG IMAGE
+                               ============================*/
+                            //read data into local variables
+                            const std::string &elementId =             subSectionName;
+                            std::string url =                         GfParmGetStr (paramHandle, subSectionPath.c_str(),"url", "" );
 
-                    //start preparing the image
-                    std::string filename = GetDataDir();
-                    filename = filename+url;
+                            std::string positionRefObj =             GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
+                            std::string positionRefObjPoint =         GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
+                            std::string positionMyPoint =             GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
+                            float positionVerticalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * this->hudScale;
+                            float positionHorizontalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * this->hudScale;
 
-                    //get the bounding box
-                    osg::BoundingBox bb;
+                            GfLogDebug("OSGHUD: Generate image object: %s \n", elementId.c_str());
 
-                    for(unsigned int i=0;i<geode->getNumDrawables();++i)
-                    {
-                        bb.expandBy(geode->getDrawable(i)->getBoundingBox());
-                    }
+                            //start preparing the image
+                            std::string filename = GetDataDir();
+                            filename = filename+url;
 
-                    //check that the image file exist
-                    if (!GfFileExists(filename.c_str()))
-                    {
-                        GfLogError ("OSGHUD: Specified image file does not exist: %s.\n", filename.c_str());
-                    }
+                            //get the bounding box
+                            osg::BoundingBox bb;
 
-                    osg::Image* img = osgDB::readImageFile(filename);
+                            for(unsigned int i=0;i<geode->getNumDrawables();++i)
+                            {
+                                bb.expandBy(geode->getDrawable(i)->getBoundingBox());
+                            }
 
-                    //correct the image size to match the hud scale
-                    float imgWidth = img->s() *  this->hudScale;
-                    float imgHeight = img->t() * this->hudScale;
+                            //check that the image file exist
+                            if (!GfFileExists(filename.c_str()))
+                            {
+                                GfLogError ("OSGHUD: Specified image file does not exist: %s.\n", filename.c_str());
+                            }
 
-                    // create geometry
-                    osg::Geometry* geom = new osg::Geometry;
-                    this->hudImgElements[elementId] =  geom;
+                            osg::Image* img = osgDB::readImageFile(filename);
 
-                    //set the position
-                    //find the referenceObj pointer and then get his bounding box
-                    osg::BoundingBox refObjBb;
-                    if ( hudTextElements.find(positionRefObj.c_str()) != hudTextElements.end() )
-                    {
-                        refObjBb = hudTextElements[positionRefObj.c_str()]->getBoundingBox();
-                    }
-                    else if ( this->hudImgElements.find(positionRefObj.c_str()) != this->hudImgElements.end() )
-                    {
-                        refObjBb = this->hudImgElements[positionRefObj.c_str()]->getBoundingBox();
-                    }
-                    else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() )
-                    {
-                        //refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
-                    }
-                    else
-                    {
-                        GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
-                        refObjBb = screenBB;
-                    }
+                            //correct the image size to match the hud scale
+                            float imgWidth = img->s() *  this->hudScale;
+                            float imgHeight = img->t() * this->hudScale;
 
-                    //get object bounding box
-                    osg::BoundingBox myObjBb;
-                    myObjBb.expandBy(osg::Vec3(0.0f,0.0f,0.0f));
-                    myObjBb.expandBy(osg::Vec3(imgWidth,imgHeight,0.0f));
+                            // create geometry
+                            osg::Geometry* geom = new osg::Geometry;
+                            this->hudImgElements[elementId] =  geom;
 
-                    //calculate the positioning
-                    osg::Vec3 position = calculatePosition(myObjBb,positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
+                            //set the position
+                            //find the referenceObj pointer and then get his bounding box
+                            osg::BoundingBox refObjBb;
+                            if ( hudTextElements.find(positionRefObj.c_str()) != hudTextElements.end() )
+                            {
+                                refObjBb = hudTextElements[positionRefObj.c_str()]->getBoundingBox();
+                            }
+                            else if ( this->hudImgElements.find(positionRefObj.c_str()) != this->hudImgElements.end() )
+                            {
+                                refObjBb = this->hudImgElements[positionRefObj.c_str()]->getBoundingBox();
+                            }
+                            else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() )
+                            {
+                                //refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
+                            }
+                            else
+                            {
+                                GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
+                                refObjBb = screenBB;
+                            }
 
-                    //asign the position
-                    float positionLeft =   position.x();
-                    float positionBottom = position.y();
+                            //get object bounding box
+                            osg::BoundingBox myObjBb;
+                            myObjBb.expandBy(osg::Vec3(0.0f,0.0f,0.0f));
+                            myObjBb.expandBy(osg::Vec3(imgWidth,imgHeight,0.0f));
 
-                    //create the vertices for the image geometry and assign them
-                    osg::Vec3Array* vertices = new osg::Vec3Array;
-                    float depth = 0.0f-0.1f;
-                    vertices->push_back(osg::Vec3( positionLeft			,positionBottom,depth)); //bottom left
-                    vertices->push_back(osg::Vec3( positionLeft+imgWidth,positionBottom,depth)); //bottom right
-                    vertices->push_back(osg::Vec3( positionLeft+imgWidth,positionBottom+imgHeight	 ,depth)); //top right
-                    vertices->push_back(osg::Vec3( positionLeft			,positionBottom+imgHeight	 ,depth)); //topleft
-                    geom->setVertexArray(vertices);
+                            //calculate the positioning
+                            osg::Vec3 position = calculatePosition(myObjBb,positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
 
-                    // texture the geometry and apply material
-                    // calculate textures coordinates
-                    osg::Vec2Array* texcoords = new osg::Vec2Array(4);
-                    (*texcoords)[0].set(0.0f, 0.0f);
-                    (*texcoords)[1].set(1.0f, 0.0f);
-                    (*texcoords)[2].set(1.0f, 1.0f);
-                    (*texcoords)[3].set(0.0f, 1.0f);
-                    geom->setTexCoordArray(0,texcoords);
+                            //asign the position
+                            float positionLeft =   position.x();
+                            float positionBottom = position.y();
 
-                    // calculate normals
-                    osg::Vec3Array* normals = new osg::Vec3Array(1);
-                    (*normals)[0].set(0.0f,-1.0f,0.0f);
-                    geom->setNormalArray(normals);
-                    geom->setNormalBinding(osg::Geometry::BIND_OVERALL);
+                            //create the vertices for the image geometry and assign them
+                            osg::Vec3Array* vertices = new osg::Vec3Array;
+                            float depth = 0.0f-0.1f;
+                            vertices->push_back(osg::Vec3( positionLeft            ,positionBottom,depth)); //bottom left
+                            vertices->push_back(osg::Vec3( positionLeft+imgWidth,positionBottom,depth)); //bottom right
+                            vertices->push_back(osg::Vec3( positionLeft+imgWidth,positionBottom+imgHeight     ,depth)); //top right
+                            vertices->push_back(osg::Vec3( positionLeft            ,positionBottom+imgHeight     ,depth)); //topleft
+                            geom->setVertexArray(vertices);
 
-                    // assign colors
-                    osg::Vec4Array* colors = new osg::Vec4Array(1);
-                    (*colors)[0].set(1.0f,1.0f,1.0f,1.0f);
-                    geom->setColorArray(colors);
-                    geom->setColorBinding(osg::Geometry::BIND_OVERALL);
+                            // texture the geometry and apply material
+                            // calculate textures coordinates
+                            osg::Vec2Array* texcoords = new osg::Vec2Array(4);
+                            (*texcoords)[0].set(0.0f, 0.0f);
+                            (*texcoords)[1].set(1.0f, 0.0f);
+                            (*texcoords)[2].set(1.0f, 1.0f);
+                            (*texcoords)[3].set(0.0f, 1.0f);
+                            geom->setTexCoordArray(0,texcoords);
 
-                    // draw the vertices as quads
-                    geom->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));
+                            // calculate normals
+                            osg::Vec3Array* normals = new osg::Vec3Array(1);
+                            (*normals)[0].set(0.0f,-1.0f,0.0f);
+                            geom->setNormalArray(normals);
+                            geom->setNormalBinding(osg::Geometry::BIND_OVERALL);
 
-                    // disable display list so our modified tex coordinates show up
-                    geom->setUseDisplayList(false);
+                            // assign colors
+                            osg::Vec4Array* colors = new osg::Vec4Array(1);
+                            (*colors)[0].set(1.0f,1.0f,1.0f,1.0f);
+                            geom->setColorArray(colors);
+                            geom->setColorBinding(osg::Geometry::BIND_OVERALL);
 
-                    // setup texture
-                    osg::TextureRectangle* texture = new osg::TextureRectangle;
+                            // draw the vertices as quads
+                            geom->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));
 
-                    texture->setImage(img);
+                            // disable display list so our modified tex coordinates show up
+                            geom->setUseDisplayList(false);
 
-                    // setup stateset
-                    osg::StateSet* state = geom->getOrCreateStateSet();
-                    state->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
+                            // setup texture
+                            osg::TextureRectangle* texture = new osg::TextureRectangle;
 
-                    //Conversely, disable write depth cache,
-                    //Make objects behind transparent polygons visible
-                    //OSG draws transparent polygons first, then draws opaque polygons
-                    osg :: Depth * imgDepth = new osg :: Depth;
-                    imgDepth-> setWriteMask (false);
-                    state-> setAttributeAndModes (imgDepth, osg :: StateAttribute :: ON);
+                            texture->setImage(img);
 
-                    // setup material
-                    osg::TexMat* texmat = new osg::TexMat;
-                    texmat->setScaleByTextureRectangleSize(true);
-                    state->setTextureAttributeAndModes(0, texmat, osg::StateAttribute::ON);
+                            // setup stateset
+                            osg::StateSet* state = geom->getOrCreateStateSet();
+                            state->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
 
-                    //enable gl_blending (for texture transparency)
-                    state->setMode(GL_BLEND, osg::StateAttribute::ON);
-                    osg::BlendFunc* blend = new osg::BlendFunc;
-                    blend->setFunction(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_DST_ALPHA);
+                            //Conversely, disable write depth cache,
+                            //Make objects behind transparent polygons visible
+                            //OSG draws transparent polygons first, then draws opaque polygons
+                            osg :: Depth * imgDepth = new osg :: Depth;
+                            imgDepth-> setWriteMask (false);
+                            state-> setAttributeAndModes (imgDepth, osg :: StateAttribute :: ON);
 
-                    // turn off lighting (light always on)
-                    state->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+                            // setup material
+                            osg::TexMat* texmat = new osg::TexMat;
+                            texmat->setScaleByTextureRectangleSize(true);
+                            state->setTextureAttributeAndModes(0, texmat, osg::StateAttribute::ON);
 
-                    if (type == "image")
-                    {
-                        //add the image geometry to the hud
-                        geode->addDrawable(geom);
-                    }
-                    else if(type == "imagerotable")
-                    {
-                        osg::MatrixTransform* transform = new osg::MatrixTransform;
-                        const double angle = 0.0;
-                        const osg::Vec3d axis(0, 0, 1);
-                        transform->setMatrix(osg::Matrix::rotate(angle, axis)); 
-                        transform->addChild(geom);
-                        group->addChild(transform);
-                        this->hudImgRotableElements[elementId] =  transform;
-                    }
-                }
-                else if( type == "graph")
-                {
-                    /* ============================
-                         CREATE OSG GRAPH
-                       ============================*/
-                    //read data into local variables
-                    const std::string &elementId = subSectionName;
+                            //enable gl_blending (for texture transparency)
+                            state->setMode(GL_BLEND, osg::StateAttribute::ON);
+                            osg::BlendFunc* blend = new osg::BlendFunc;
+                            blend->setFunction(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_DST_ALPHA);
 
-                    //positioning variables
-                    std::string positionRefObj = 			GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
-                    std::string positionRefObjPoint = 		GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
-                    std::string positionMyPoint = 			GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
-                    float positionVerticalModifier = 		GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * this->hudScale;
-                    float positionHorizontalModifier = 		GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * this->hudScale;
+                            // turn off lighting (light always on)
+                            state->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
-                    //graph variables
-                    float width =  							GfParmGetNum (paramHandle, subSectionPath.c_str(),"width", "",0 );
-                    float height =  						GfParmGetNum (paramHandle, subSectionPath.c_str(),"height", "",0 );
-                    float maxValue =  						GfParmGetNum (paramHandle, subSectionPath.c_str(),"maxValue", "",0 );
-                    float minValue =  						GfParmGetNum (paramHandle, subSectionPath.c_str(),"minValue", "",0 );
-                    float timeFrame =  						GfParmGetNum (paramHandle, subSectionPath.c_str(),"timeFrame", "",0 );
-                    float referenceLineAtValue =			GfParmGetNum (paramHandle, subSectionPath.c_str(),"referenceLineAtValue", "",0 );
-                    std::string Xdata =						GfParmGetStr (paramHandle, subSectionPath.c_str(),"Xdata", "" );
-                    std::string Ydata =						GfParmGetStr (paramHandle, subSectionPath.c_str(),"Ydata", "" );
-                    std::string title =						GfParmGetStr (paramHandle, subSectionPath.c_str(),"title", "" );
+                            if (type == "image")
+                            {
+                                //add the image geometry to the hud
+                                geode->addDrawable(geom);
+                            }
+                            else if(type == "imagerotable")
+                            {
+                                osg::MatrixTransform* transform = new osg::MatrixTransform;
+                                const double angle = 0.0;
+                                const osg::Vec3d axis(0, 0, 1);
+                                transform->setMatrix(osg::Matrix::rotate(angle, axis)); 
+                                transform->addChild(geom);
+                                this->osgGroupHud->addChild(transform);
+                                this->hudImgRotableElements[elementId] =  transform;
+                            }
+                        }
+                        else if( type == "graph")
+                        {
+                            /* ============================
+                                 CREATE OSG GRAPH
+                               ============================*/
+                            //read data into local variables
+                            const std::string &elementId = subSectionName;
 
-                    GfLogDebug("OSGHUD: Generate graph object: %s \n", elementId.c_str());
+                            //positioning variables
+                            std::string positionRefObj =       GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
+                            std::string positionRefObjPoint =  GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
+                            std::string positionMyPoint =      GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
+                            float positionVerticalModifier =   GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * this->hudScale;
+                            float positionHorizontalModifier = GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * this->hudScale;
 
-                    //calculate position
-                    //find the referenceObj pointer and then get his bounding box
-                    osg::BoundingBox refObjBb;
-                    if ( hudTextElements.find(positionRefObj.c_str()) != hudTextElements.end() )
-                    {
-                        refObjBb = hudTextElements[positionRefObj.c_str()]->getBoundingBox();
-                    }
-                    else if ( this->hudImgElements.find(positionRefObj.c_str()) != this->hudImgElements.end() )
-                    {
-                        refObjBb = this->hudImgElements[positionRefObj.c_str()]->getBoundingBox();
-                    }
-                    else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() )
-                    {
-                        //refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
-                    }
-                    else
-                    {
-                        GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
-                        refObjBb = screenBB;
-                    }
-                }
-                else
-                {
-                /* ============================
-                     NO MORE HUD TYPE OPTIONS...??
-                   ============================*/
-                    GfLogDebug("OSG-HUD object type not recognized: %s", type.c_str());
-                }
+                            //graph variables
+                            float width =                      GfParmGetNum (paramHandle, subSectionPath.c_str(),"width", "",0 );
+                            float height =                     GfParmGetNum (paramHandle, subSectionPath.c_str(),"height", "",0 );
+                            float maxValue =                   GfParmGetNum (paramHandle, subSectionPath.c_str(),"maxValue", "",0 );
+                            float minValue =                   GfParmGetNum (paramHandle, subSectionPath.c_str(),"minValue", "",0 );
+                            float timeFrame =                  GfParmGetNum (paramHandle, subSectionPath.c_str(),"timeFrame", "",0 );
+                            float referenceLineAtValue =       GfParmGetNum (paramHandle, subSectionPath.c_str(),"referenceLineAtValue", "",0 );
+                            std::string Xdata =                GfParmGetStr (paramHandle, subSectionPath.c_str(),"Xdata", "" );
+                            std::string Ydata =                GfParmGetStr (paramHandle, subSectionPath.c_str(),"Ydata", "" );
+                            std::string title =                GfParmGetStr (paramHandle, subSectionPath.c_str(),"title", "" );
 
-        } while (GfParmListSeekNext(paramHandle, sectionPath.c_str()) == 0);
+                            GfLogDebug("OSGHUD: Generate graph object: %s \n", elementId.c_str());
+
+                            //calculate position
+                            //find the referenceObj pointer and then get his bounding box
+                            osg::BoundingBox refObjBb;
+                            if ( hudTextElements.find(positionRefObj.c_str()) != hudTextElements.end() )
+                            {
+                                refObjBb = hudTextElements[positionRefObj.c_str()]->getBoundingBox();
+                            }
+                            else if ( this->hudImgElements.find(positionRefObj.c_str()) != this->hudImgElements.end() )
+                            {
+                                refObjBb = this->hudImgElements[positionRefObj.c_str()]->getBoundingBox();
+                            }
+                            else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() )
+                            {
+                                //refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
+                            }
+                            else
+                            {
+                                GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
+                                refObjBb = screenBB;
+                            }
+                        }
+                        else
+                        {
+                        /* ============================
+                             NO MORE HUD TYPE OPTIONS...??
+                           ============================*/
+                            GfLogDebug("OSG-HUD object type not recognized: %s", type.c_str());
+                        }
+
+                } while (GfParmListSeekNext(paramHandle, widgetsSectionPath.c_str()) == 0);
+            }
+            
+            //only display the widget element if the widget is enabled
+            if(widgetEnabled > 0){
+                geode->setNodeMask(1);
+            }else{
+                geode->setNodeMask(0);
+            }
+
+        } while (GfParmListSeekNext(paramHandle, mainSection.c_str()) == 0);
     }
 
     //release the xml file
     GfParmReleaseHandle(paramHandle);
 
-    //make the hud visible
-    geode->setNodeMask(1-geode->getNodeMask());
-
     //return the hud object
-    return (*group).asGroup();
+    return (*this->osgGroupHud).asGroup();
 }
 
 SDHUD::~SDHUD()
@@ -1604,3 +1677,20 @@ SDHUD::~SDHUD()
     this->hudImgElements.clear();
     this->hudGraphElements.clear();
 }
+
+
+/*
+ * 
+    mirrorFlag = 1 - mirrorFlag;
+    sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
+    GfParmSetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
+
+    // save also as user's preference if human 
+    if (curCar->_driverType == RM_DRV_HUMAN) {
+        sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
+        GfParmSetNum(grHandle, path2, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
+    }
+    GfParmWriteFile(NULL, grHandle, "Graph");
+}
+ * 
+ * */

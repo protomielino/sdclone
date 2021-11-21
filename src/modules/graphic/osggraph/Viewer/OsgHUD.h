@@ -128,7 +128,8 @@ class SDHUD
         std::map<const tCarElt *, CarData> carData;
 
         float hudScale;
-
+        osg::ref_ptr <osg::Group> osgGroupHud;
+        std::map<std::string,osg::Geode* > hudWidgets;
         std::map<std::string,osg::Geometry* > hudImgElements;
         std::map<std::string,osg::MatrixTransform* > hudImgRotableElements;
         std::map<std::string,osg::ref_ptr <osg::Group> > hudGraphElements;
@@ -140,16 +141,15 @@ class SDHUD
     public:
         SDHUD();
         ~SDHUD();
+        
+        void ToggleHUD();
+        void ToggleHUDboard();
+        void ToggleHUDraceinfo();
+        void ToggleHUDlaptime();
+        void ToggleHUDcarinfo();
+        void ToggleHUDdriverinput();
+        void ToggleHUDdebug();
 
-        void ToggleHUD1();
-        void ToggleHUD2();
-        void ToggleHUD3();
-        void ToggleHUD4();
-        void ToogleFPS();
-        void ToogleHudBoard();
-
-        osg::Geode* HUDGeode;
-        osg::Projection* HUDProjectionMatrix;
         osg::ref_ptr<osg::Camera> camera;
 
         void CreateHUD( int scrH, int scrW);
@@ -160,7 +160,7 @@ class SDHUD
 
         inline osg::ref_ptr<osg::Camera> getRootCamera()
         {
-            return _cameraHUD;
+            return this->camera;
         }
 };
 
