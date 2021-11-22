@@ -1221,6 +1221,7 @@ void SDHUD::ToggleHUD()
     this->hudWidgets["driverinputWidget"]->setNodeMask(0);
     this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
     this->hudWidgets["debugWidget"]->setNodeMask(0);
+    this->hudWidgets["dashitemsWidget"]->setNodeMask(0);
 }
 void SDHUD::ToggleHUDboard()
 {
@@ -1340,6 +1341,24 @@ void SDHUD::ToggleHUDdebug()
 
 }
 
+void SDHUD::ToggleHUDdashitems()
+{
+    //toggle the visibility
+    this->hudWidgets["dashitemsWidget"]->setNodeMask(1 - this->hudWidgets["dashitemsWidget"]->getNodeMask());
+    
+    //save the current status in the config file
+    std::string configFileUrl= GetLocalDir();
+    configFileUrl.append("config/osghudconfig.xml");
+    std::string path= "widgets/dashitemsWidget";
+    std::string attribute= "enabled";
+    int value = this->hudWidgets["dashitemsWidget"]->getNodeMask();
+    
+    //read the config file, update the value and write it back
+    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
+    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
+    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
+
+}
 
 osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 {

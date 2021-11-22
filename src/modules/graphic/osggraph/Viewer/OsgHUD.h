@@ -149,6 +149,7 @@ class SDHUD
         void ToggleHUDcarinfo();
         void ToggleHUDdriverinput();
         void ToggleHUDdebug();
+        void ToggleHUDdashitems();
 
         osg::ref_ptr<osg::Camera> camera;
 

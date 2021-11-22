@@ -251,7 +251,10 @@ void SDScreens::toggleHUDdebug()
 {
     hud.ToggleHUDdebug();
 }
-
+void SDScreens::toggleHUDdashitems()
+{
+    hud.ToggleHUDdashitems();
+}
 
 void SDScreens::registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node)
 {

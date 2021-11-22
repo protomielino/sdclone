@@ -63,6 +63,7 @@ public:
     void toggleHUDcarinfo();
     void toggleHUDdriverinput();
     void toggleHUDdebug();
+    void toggleHUDdashitems();
 
     inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}
 };

@@ -165,6 +165,10 @@ void SDToggleHUDdebug(void *vp)
 {
     screens->toggleHUDdebug();
 }
+void SDToggleHUDdashitems(void *vp)
+{
+    screens->toggleHUDdashitems();
+}
 
 int initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
@@ -205,13 +209,14 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_F10,      "Follow Car Zoomed", (void*)8, SDSelectCamera, NULL);
     GfuiAddKey(screen, GFUIK_F11,      "TV Director View",  (void*)9, SDSelectCamera, NULL);
 
-    GfuiAddKey(screen, '3',            "Toggle HUD boardWidget",       (void*)0, SDToggleHUDboard, NULL);
-    GfuiAddKey(screen, '8',            "Toggle HUD raceinfoWidget",    (void*)0, SDToggleHUDraceinfo, NULL);
     GfuiAddKey(screen, '1',            "Toggle HUD laptimeWidget",     (void*)0, SDToggleHUDlaptime, NULL);
     GfuiAddKey(screen, '2',            "Toggle HUD carinfoWidget",     (void*)0, SDToggleHUDcarinfo, NULL);
-    GfuiAddKey(screen, '6',            "Toggle HUD driverinputWidget", (void*)0, SDToggleHUDdriverinput, NULL);
+    GfuiAddKey(screen, '3',            "Toggle HUD boardWidget",       (void*)0, SDToggleHUDboard, NULL);
+    GfuiAddKey(screen, '4',            "Toggle HUD driverinputWidget", (void*)0, SDToggleHUDdriverinput, NULL);
     GfuiAddKey(screen, '5',            "Toggle HUD debugWidget",       (void*)0, SDToggleHUDdebug, NULL);
-    GfuiAddKey(screen, '7',            "Toggle HUD",                   (void*)0, SDToggleHUD, NULL);
+    GfuiAddKey(screen, '6',            "Toggle HUD dashitemsWidget",   (void*)0, SDToggleHUDdashitems, NULL);
+    GfuiAddKey(screen, '7',            "Toggle HUD raceinfoWidget",    (void*)0, SDToggleHUDraceinfo, NULL);
+    GfuiAddKey(screen, '8',            "Toggle HUD",                   (void*)0, SDToggleHUD, NULL);
 
 
     /*GfuiAddKey(screen, '5',            "Debug Info",        (void*)3, grSelectBoard, NULL);
