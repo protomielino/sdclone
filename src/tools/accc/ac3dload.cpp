@@ -3301,18 +3301,18 @@ void computeSaveAC3DStrip(const std::string &OutputFilename, std::list<ob_t> &ob
     fclose(ofile);
 }
 
-ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
+void mergeObject(ob_t &ob1, const ob_t &ob2, char * nameS)
 {
     ob_t tobS;
     static int oldva1[10000];
     static int oldva2[10000];
     int n = 0;
-    const int numtri = ob1->numsurf + ob2->numsurf;
+    const int numtri = ob1.numsurf + ob2.numsurf;
 
-    printf("merging %s with %s  tri=%d\n", ob1->name.c_str(), ob2->name.c_str(), numtri);
+    printf("merging %s with %s  tri=%d\n", ob1.name.c_str(), ob2.name.c_str(), numtri);
     memset(oldva1, -1, sizeof(oldva1));
     memset(oldva2, -1, sizeof(oldva2));
-    tobS.numsurf = ob1->numsurf;
+    tobS.numsurf = ob1.numsurf;
     tobS.vertexarray.resize(numtri * 3);
     tobS.vertex.resize(numtri * 3);
     tobS.norm.resize(numtri * 3);
@@ -3322,61 +3322,61 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     tobS.textarray2.resize(numtri * 3);
     tobS.textarray3.resize(numtri * 3);
 
-    std::copy_n(ob1->vertex.begin(), ob1->vertex.size(), tobS.vertex.begin());
-    std::copy_n(ob1->norm.begin(), ob1->norm.size(), tobS.norm.begin());
-    std::copy_n(ob1->snorm.begin(), ob1->snorm.size(), tobS.snorm.begin());
-    std::copy_n(ob1->vertexarray.begin(), ob1->vertexarray.size(), tobS.vertexarray.begin());
-    std::copy_n(ob1->textarray.begin(), ob1->textarray.size(), tobS.textarray.begin());
+    std::copy_n(ob1.vertex.begin(), ob1.vertex.size(), tobS.vertex.begin());
+    std::copy_n(ob1.norm.begin(), ob1.norm.size(), tobS.norm.begin());
+    std::copy_n(ob1.snorm.begin(), ob1.snorm.size(), tobS.snorm.begin());
+    std::copy_n(ob1.vertexarray.begin(), ob1.vertexarray.size(), tobS.vertexarray.begin());
+    std::copy_n(ob1.textarray.begin(), ob1.textarray.size(), tobS.textarray.begin());
 
-    if (ob1->hasTexture1())
-        std::copy_n(ob1->textarray1.begin(), ob1->textarray1.size(), tobS.textarray1.begin());
+    if (ob1.hasTexture1())
+        std::copy_n(ob1.textarray1.begin(), ob1.textarray1.size(), tobS.textarray1.begin());
 
-    if (ob1->hasTexture2())
-        std::copy_n(ob1->textarray2.begin(), ob1->textarray2.size(), tobS.textarray2.begin());
+    if (ob1.hasTexture2())
+        std::copy_n(ob1.textarray2.begin(), ob1.textarray2.size(), tobS.textarray2.begin());
 
-    if (ob1->hasTexture3())
-        std::copy_n(ob1->textarray3.begin(), ob1->textarray3.size(), tobS.textarray3.begin());
+    if (ob1.hasTexture3())
+        std::copy_n(ob1.textarray3.begin(), ob1.textarray3.size(), tobS.textarray3.begin());
 
-    n = ob1->numvert;
-    for (int i = 0; i < ob2->numvert; i++)
+    n = ob1.numvert;
+    for (int i = 0; i < ob2.numvert; i++)
     {
-        for (int j = 0; j < ob1->numvert; j++)
+        for (int j = 0; j < ob1.numvert; j++)
         {
-            if (ob2->vertex[i] == ob1->vertex[j] && ob2->textarray[i] == ob1->textarray[j])
+            if (ob2.vertex[i] == ob1.vertex[j] && ob2.textarray[i] == ob1.textarray[j])
             {
                 oldva1[i] = j;
             }
         }
     }
 
-    for (int i = 0; i < ob2->numvert; i++)
+    for (int i = 0; i < ob2.numvert; i++)
     {
         if (oldva1[i] == -1)
         {
             oldva1[i] = n;
-            tobS.textarray[n] = ob2->textarray[i];
-            if (ob2->hasTexture1())
-                tobS.textarray1[n] = ob2->textarray1[i];
-            if (ob2->hasTexture2())
-                tobS.textarray2[n] = ob2->textarray2[i];
-            if (ob2->hasTexture3())
-                tobS.textarray3[n] = ob2->textarray3[i];
-            tobS.snorm[n] = ob2->snorm[i];
-            tobS.norm[n] = ob2->norm[i];
-            tobS.vertex[n] = ob2->vertex[i];
+            tobS.textarray[n] = ob2.textarray[i];
+            if (ob2.hasTexture1())
+                tobS.textarray1[n] = ob2.textarray1[i];
+            if (ob2.hasTexture2())
+                tobS.textarray2[n] = ob2.textarray2[i];
+            if (ob2.hasTexture3())
+                tobS.textarray3[n] = ob2.textarray3[i];
+            tobS.snorm[n] = ob2.snorm[i];
+            tobS.norm[n] = ob2.norm[i];
+            tobS.vertex[n] = ob2.vertex[i];
 
             n++;
         }
     }
     tobS.numvert = n;
-    for (int i = 0; i < ob2->numsurf; i++)
+    for (int i = 0; i < ob2.numsurf; i++)
     {
         bool found = false;
-        for (int j = 0; j < ob1->numsurf; j++)
+        for (int j = 0; j < ob1.numsurf; j++)
         {
-            if (tobS.vertexarray[j * 3].indice == oldva1[ob2->vertexarray[i * 3].indice] &&
-                tobS.vertexarray[j * 3 + 1].indice == oldva1[ob2->vertexarray[i * 3 + 1].indice] &&
-                tobS.vertexarray[j * 3 + 2].indice == oldva1[ob2->vertexarray[i * 3 + 2].indice])
+            if (tobS.vertexarray[j * 3].indice == oldva1[ob2.vertexarray[i * 3].indice] &&
+                tobS.vertexarray[j * 3 + 1].indice == oldva1[ob2.vertexarray[i * 3 + 1].indice] &&
+                tobS.vertexarray[j * 3 + 2].indice == oldva1[ob2.vertexarray[i * 3 + 2].indice])
             {
                 /* this face is OK */
                 found = true;
@@ -3387,25 +3387,23 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
         {
             const int k = tobS.numsurf;
             /* add the triangle */
-            tobS.vertexarray[k * 3].indice = oldva1[ob2->vertexarray[i * 3].indice];
-            tobS.vertexarray[k * 3 + 1].indice = oldva1[ob2->vertexarray[i * 3 + 1].indice];
-            tobS.vertexarray[k * 3 + 2].indice = oldva1[ob2->vertexarray[i * 3 + 2].indice];
+            tobS.vertexarray[k * 3].indice = oldva1[ob2.vertexarray[i * 3].indice];
+            tobS.vertexarray[k * 3 + 1].indice = oldva1[ob2.vertexarray[i * 3 + 1].indice];
+            tobS.vertexarray[k * 3 + 2].indice = oldva1[ob2.vertexarray[i * 3 + 2].indice];
             tobS.numsurf++;
         }
     }
 
-    ob1->numsurf = tobS.numsurf;
-    ob1->numvert = tobS.numvert;
-    ob1->vertex = tobS.vertex;
-    ob1->norm = tobS.norm;
-    ob1->snorm = tobS.snorm;
-    ob1->vertexarray = tobS.vertexarray;
-    ob1->textarray = tobS.textarray;
-    ob1->textarray1 = tobS.textarray1;
-    ob1->textarray2 = tobS.textarray2;
-    ob1->textarray3 = tobS.textarray3;
-
-    return ob1;
+    ob1.numsurf = tobS.numsurf;
+    ob1.numvert = tobS.numvert;
+    ob1.vertex = tobS.vertex;
+    ob1.norm = tobS.norm;
+    ob1.snorm = tobS.snorm;
+    ob1.vertexarray = tobS.vertexarray;
+    ob1.textarray = tobS.textarray;
+    ob1.textarray1 = tobS.textarray1;
+    ob1.textarray2 = tobS.textarray2;
+    ob1.textarray3 = tobS.textarray3;
 }
 
 int mergeSplitted(std::list<ob_t> &objects)
@@ -3453,7 +3451,7 @@ int mergeSplitted(std::list<ob_t> &objects)
 
             if (tob0->nameStartsWith(nameS))
             {
-                mergeObject(&(*tob), &(*tob0), nameS);
+                mergeObject(*tob, *tob0, nameS);
                 printf("merging %s with %s\n",nameS, tob0->name.c_str());
                 reduced++;
                 tob0 = objects.erase(tob0);
