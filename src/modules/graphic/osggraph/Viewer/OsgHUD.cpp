@@ -68,6 +68,9 @@ static osg::Vec4 colorCyan(0.31, 0.968, 0.933, 1.0);
 float prevSteerAngle = 0.0f;
 
 std::map<std::string,osgText::Text* > hudTextElements;
+std::map<std::string,int> hudElementsVisibilityStatus;
+int hudElementsVisibilityStatusEnabled = 1;
+
 
 osg::Vec3 calculatePosition(osg::BoundingBox mybb, const std::string &objPoint,
 osg::BoundingBox bb,  const std::string &referenceObjPoint,
@@ -1212,16 +1215,42 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 void SDHUD::ToggleHUD()
 {
-    this->hudWidgets["boardWidget"]->setNodeMask(0);
-    this->hudWidgets["racepositionWidget"]->setNodeMask(0);
-    this->hudWidgets["racelapsWidget"]->setNodeMask(0);
-    this->hudWidgets["laptimeWidget"]->setNodeMask(0);
-    this->hudWidgets["carinfoWidget"]->setNodeMask(0);
-    this->hudWidgets["carstatusWidget"]->setNodeMask(0);
-    this->hudWidgets["driverinputWidget"]->setNodeMask(0);
-    this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
-    this->hudWidgets["debugWidget"]->setNodeMask(0);
-    this->hudWidgets["dashitemsWidget"]->setNodeMask(0);
+    if (hudElementsVisibilityStatusEnabled > 0){
+        hudElementsVisibilityStatus["boardWidget"] =        (int)this->hudWidgets["boardWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["racepositionWidget"] = (int)this->hudWidgets["racepositionWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["racelapsWidget"] =     (int)this->hudWidgets["racelapsWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["laptimeWidget"] =      (int)this->hudWidgets["laptimeWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["carinfoWidget"] =      (int)this->hudWidgets["carinfoWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["carstatusWidget"] =    (int)this->hudWidgets["carstatusWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["driverinputWidget"] =  (int)this->hudWidgets["driverinputWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["driverinput-wheel"] =  (int)this->hudImgRotableElements["driverinput-wheel"]->getNodeMask();
+        hudElementsVisibilityStatus["debugWidget"] =        (int)this->hudWidgets["debugWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["dashitemsWidget"] =    (int)this->hudWidgets["dashitemsWidget"]->getNodeMask();
+        
+        this->hudWidgets["boardWidget"]->setNodeMask(0);
+        this->hudWidgets["racepositionWidget"]->setNodeMask(0);
+        this->hudWidgets["racelapsWidget"]->setNodeMask(0);
+        this->hudWidgets["laptimeWidget"]->setNodeMask(0);
+        this->hudWidgets["carinfoWidget"]->setNodeMask(0);
+        this->hudWidgets["carstatusWidget"]->setNodeMask(0);
+        this->hudWidgets["driverinputWidget"]->setNodeMask(0);
+        this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
+        this->hudWidgets["debugWidget"]->setNodeMask(0);
+        this->hudWidgets["dashitemsWidget"]->setNodeMask(0);
+        hudElementsVisibilityStatusEnabled = 0;
+    }else{
+        this->hudWidgets["boardWidget"]->setNodeMask(hudElementsVisibilityStatus["boardWidget"]);
+        this->hudWidgets["racepositionWidget"]->setNodeMask(hudElementsVisibilityStatus["racepositionWidget"]);
+        this->hudWidgets["racelapsWidget"]->setNodeMask(hudElementsVisibilityStatus["racelapsWidget"]);
+        this->hudWidgets["laptimeWidget"]->setNodeMask(hudElementsVisibilityStatus["laptimeWidget"]);
+        this->hudWidgets["carinfoWidget"]->setNodeMask(hudElementsVisibilityStatus["carinfoWidget"]);
+        this->hudWidgets["carstatusWidget"]->setNodeMask(hudElementsVisibilityStatus["carstatusWidget"]);
+        this->hudWidgets["driverinputWidget"]->setNodeMask(hudElementsVisibilityStatus["driverinputWidget"]);
+        this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(hudElementsVisibilityStatus["driverinput-wheel"]);
+        this->hudWidgets["debugWidget"]->setNodeMask(hudElementsVisibilityStatus["debugWidget"]);
+        this->hudWidgets["dashitemsWidget"]->setNodeMask(hudElementsVisibilityStatus["dashitemsWidget"]);
+        hudElementsVisibilityStatusEnabled = 1;
+    }
 }
 void SDHUD::ToggleHUDboard()
 {
