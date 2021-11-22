@@ -1307,7 +1307,7 @@ void SDHUD::ToggleHUDcarinfo()
 void SDHUD::ToggleHUDdriverinput()
 {
     this->hudWidgets["driverinputWidget"]->setNodeMask(1 - this->hudWidgets["driverinputWidget"]->getNodeMask());
-    this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(1 - this->hudImgRotableElements["driverinput-wheel"]->getNodeMask());
+    this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(this->hudWidgets["driverinputWidget"]->getNodeMask());
 
     //save the current status in the config file
     std::string configFileUrl= GetLocalDir();
