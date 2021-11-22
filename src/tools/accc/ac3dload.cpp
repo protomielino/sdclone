@@ -200,7 +200,6 @@ void mapTextureEnv(std::list<ob_t> &objects);
 point_t tmpPoint[100000];
 tcoord_t tmpva[100000];
 uv_t tmptexa[100000];
-int tmpsurf[100000];
 int refs = 0;
 const char * const shadowtexture = "shadow2.png";
 
@@ -898,7 +897,6 @@ int doKids(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
         }
         object.vertexarray.resize(numrefstotal);
         object.textarray.resize(numrefstotal);
-        object.surfrefs.resize(numrefs);
         object.norm.assign(numrefstotal * 3, point_t(0.0, 0.0, 0.0));
         object.snorm.assign(numrefstotal * 3, point_t(0.0, 0.0, 0.0));
         object.attrSurf = attrSurf;
@@ -910,9 +908,6 @@ int doKids(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
             object.vertexarray[i] = tmpva[i];
             object.textarray[i] = tmptexa[i];
         }
-
-        for (int i = 0; i < numrefs; i++)
-            object.surfrefs[i] = tmpsurf[i];
 
         object.numvertice = numvertice;
 
@@ -1282,7 +1277,6 @@ int doRefs(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials)
 
     numrefstotal += refs;
     numrefsFound = true;
-    tmpsurf[numrefs] = refs;
     numrefs++;
     return (0);
 }
