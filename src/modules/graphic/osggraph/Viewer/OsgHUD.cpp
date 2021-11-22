@@ -1698,6 +1698,11 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                                 transform->addChild(geom);
                                 this->osgGroupHud->addChild(transform);
                                 this->hudImgRotableElements[elementId] =  transform;
+                                if(widgetEnabled>0){
+                                    this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(1);
+                                }else{
+                                    this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
+                                }
                             }
                         }
                         else if( type == "graph")
