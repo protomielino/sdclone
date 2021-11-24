@@ -1541,7 +1541,7 @@ int printOb(FILE *ofile, ob_t &object)
         for (int i = 0; i < object.numsurf; i++)
         {
             if (object.attrSurf != 0)
-                fprintf(ofile, "SURF 0x%2x\n", object.attrSurf);
+                fprintf(ofile, "SURF 0x%02x\n", object.attrSurf);
             else
                 fprintf(ofile, "SURF 0x20\n");
             fprintf(ofile, "mat %d\n", object.attrMat);
@@ -2539,7 +2539,7 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
              *  Thus, instead of the whole if-condition the actual code for outputting
              *  this attribute should simply be:
              *
-             *  fprintf(ofile, "SURF 0x%2x\n", object->attrSurf)
+             *  fprintf(ofile, "SURF 0x%02x\n", object->attrSurf)
              *
              *  However this causes huge artifacts in the generated tracks. Thus, the
              *  following is not correct behavior but works for whatever reason.
@@ -2550,7 +2550,7 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
              */
             if (object->attrSurf)
             {
-                fprintf(ofile, "SURF 0x%2x\n",
+                fprintf(ofile, "SURF 0x%02x\n",
                         (object->attrSurf & 0xF0) | 0x04);
             }
             else
