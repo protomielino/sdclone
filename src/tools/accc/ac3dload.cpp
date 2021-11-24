@@ -2376,7 +2376,7 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
     int tritotal = 0;
     int multitex = 0;
 
-    if (object->numsurf < 3 && writeit == 0)
+    if (object->numsurf < 3 && !writeit)
         return;
     fprintf(stderr, "stripifying %s                    \r", object->name.c_str());
     sprintf(filename, "temp.obj");
@@ -2514,7 +2514,7 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
     std::vector<tcoord_t> stripvertexarray(object->numvertice * 10);
     k = 0;
     dege = 0;
-    if (writeit == 1)
+    if (writeit)
     {
         fprintf(ofile, "numsurf %u\n", NumStrips);
 
@@ -2531,7 +2531,7 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
         v2 = StripPoint[StripStart[i] + 1];
         debj = 2;
         tri = 0;
-        if (writeit == 1)
+        if (writeit)
         {
             /** For some reason the surf attribute is modified for the output.
              *  The surfaces are made double-sided, although stripification doesn't
@@ -2595,7 +2595,7 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
             v0 = StripPoint[StripStart[i] + j];
             /*printf("adding point %d\n",v0);*/
 
-            if (writeit == 0)
+            if (!writeit)
             {
                 stripvertexarray[k].indice = v1;
                 stripvertexarray[k].uv = object->textarray[v1];
@@ -2643,7 +2643,7 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
     printf("strips for %s : number of strips %u : average of points triangles by strips %.2f\n",
            object->name.c_str(), NumStrips,
            (float) ((float) tritotal - (float) dege) / ((float) NumStrips));
-    if (writeit == 0)
+    if (!writeit)
     {
         if (tritotal != object->numsurf)
         {
