@@ -3304,14 +3304,12 @@ void computeSaveAC3DStrip(const std::string &OutputFilename, std::list<ob_t> &ob
 void mergeObject(ob_t &ob1, const ob_t &ob2, char * nameS)
 {
     ob_t tobS;
-    static int oldva1[10000];
-    static int oldva2[10000];
+    static int oldva[10000];
     int n = 0;
     const int numtri = ob1.numsurf + ob2.numsurf;
 
     printf("merging %s with %s  tri=%d\n", ob1.name.c_str(), ob2.name.c_str(), numtri);
-    memset(oldva1, -1, sizeof(oldva1));
-    memset(oldva2, -1, sizeof(oldva2));
+    memset(oldva, -1, sizeof(oldva));
     tobS.numsurf = ob1.numsurf;
     tobS.vertexarray.resize(numtri * 3);
     tobS.vertex.resize(numtri * 3);
@@ -3344,16 +3342,16 @@ void mergeObject(ob_t &ob1, const ob_t &ob2, char * nameS)
         {
             if (ob2.vertex[i] == ob1.vertex[j] && ob2.textarray[i] == ob1.textarray[j])
             {
-                oldva1[i] = j;
+                oldva[i] = j;
             }
         }
     }
 
     for (int i = 0; i < ob2.numvert; i++)
     {
-        if (oldva1[i] == -1)
+        if (oldva[i] == -1)
         {
-            oldva1[i] = n;
+            oldva[i] = n;
             tobS.textarray[n] = ob2.textarray[i];
             if (ob2.hasTexture1())
                 tobS.textarray1[n] = ob2.textarray1[i];
@@ -3374,9 +3372,9 @@ void mergeObject(ob_t &ob1, const ob_t &ob2, char * nameS)
         bool found = false;
         for (int j = 0; j < ob1.numsurf; j++)
         {
-            if (tobS.vertexarray[j * 3].indice == oldva1[ob2.vertexarray[i * 3].indice] &&
-                tobS.vertexarray[j * 3 + 1].indice == oldva1[ob2.vertexarray[i * 3 + 1].indice] &&
-                tobS.vertexarray[j * 3 + 2].indice == oldva1[ob2.vertexarray[i * 3 + 2].indice])
+            if (tobS.vertexarray[j * 3].indice == oldva[ob2.vertexarray[i * 3].indice] &&
+                tobS.vertexarray[j * 3 + 1].indice == oldva[ob2.vertexarray[i * 3 + 1].indice] &&
+                tobS.vertexarray[j * 3 + 2].indice == oldva[ob2.vertexarray[i * 3 + 2].indice])
             {
                 /* this face is OK */
                 found = true;
@@ -3387,9 +3385,9 @@ void mergeObject(ob_t &ob1, const ob_t &ob2, char * nameS)
         {
             const int k = tobS.numsurf;
             /* add the triangle */
-            tobS.vertexarray[k * 3].indice = oldva1[ob2.vertexarray[i * 3].indice];
-            tobS.vertexarray[k * 3 + 1].indice = oldva1[ob2.vertexarray[i * 3 + 1].indice];
-            tobS.vertexarray[k * 3 + 2].indice = oldva1[ob2.vertexarray[i * 3 + 2].indice];
+            tobS.vertexarray[k * 3].indice = oldva[ob2.vertexarray[i * 3].indice];
+            tobS.vertexarray[k * 3 + 1].indice = oldva[ob2.vertexarray[i * 3 + 1].indice];
+            tobS.vertexarray[k * 3 + 2].indice = oldva[ob2.vertexarray[i * 3 + 2].indice];
             tobS.numsurf++;
         }
     }
