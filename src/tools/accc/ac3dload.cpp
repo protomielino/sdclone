@@ -245,9 +245,6 @@ int doMat(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 int doRefs(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 int doCrease(char *Line, std::list<ob_t> &objects, std::vector<mat_t> &materials);
 
-#ifdef _3DS
-void saveObin3DS(const std::string & OutputFilename, ob_t * object, std::vector<mat_t> &materials);
-#endif
 void computeSaveAC3D(const std::string & OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials);
 void computeSaveOBJ(const std::string & OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials);
 void computeSaveAC3DM(const std::string & OutputFilename, std::list<ob_t> &objects, const std::vector<mat_t> &materials);
