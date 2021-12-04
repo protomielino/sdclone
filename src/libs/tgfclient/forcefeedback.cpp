@@ -227,11 +227,11 @@ int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
         GfLogDebug("After engineRevving: (%i)\n", this->force);
     }
 
-    //calculate engine revving if enabled
-    //if (this->effectsConfig["engineRevvingEffect"]["enabled"]){
-        this->force += this->lowSpeedCostantForceEffect(car, s);
-    //	GfLogDebug("After engineRevving: (%i)\n", this->force);
-    //}
+    //calculate low speed constant force if enabled
+    if (this->effectsConfig["lowSpeedConstantForceEffect"]["enabled"]){
+        this->force += this->lowSpeedConstantForceEffect(car, s);
+        GfLogDebug("After lowSpeedConstantForce: (%i)\n", this->force);
+    }
 
     //calculate bump
     //this->force += this->bumpsEffect(car, s);
@@ -442,7 +442,7 @@ int ForceFeedbackManager::engineRevvingEffect(tCarElt* car, tSituation *s)
 
 }
 
-int ForceFeedbackManager::lowSpeedCostantForceEffect(tCarElt* car, tSituation *s){
+int ForceFeedbackManager::lowSpeedConstantForceEffect(tCarElt* car, tSituation *s){
 
     int effectForce;
     int sign;
@@ -482,11 +482,11 @@ int ForceFeedbackManager::lowSpeedCostantForceEffect(tCarElt* car, tSituation *s
 
 
     //force calculation
-    if (car->_speed_xy < this->effectsConfig["lowSpeedCostantForceEffect"]["maxSpeedAtWithcForceIsApplied"]
+    if (car->_speed_xy < this->effectsConfig["lowSpeedConstantForceEffect"]["maxSpeedAtWhichForceIsApplied"]
 //		&& abs(prevDirection) > 8
             )
     {
-        effectForce = this->effectsConfig["lowSpeedCostantForceEffect"]["maxForce"] / 8 * abs(prevDirection) /
+        effectForce = this->effectsConfig["lowSpeedConstantForceEffect"]["maxForce"] / 8 * abs(prevDirection) /
                 //(car->_speed_xy  + 1) *
                 (pow(car->_speed_xy, (float) 1/2) + 1) * prevDirectionSign;
 

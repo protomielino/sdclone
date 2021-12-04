@@ -86,7 +86,7 @@ class TGFCLIENT_API ForceFeedbackManager {
 		int autocenterEffect(tCarElt* car, tSituation *s);
 		int engineRevvingEffect(tCarElt* car, tSituation *s);
 		int bumpsEffect(tCarElt* car, tSituation *s);
-		int lowSpeedCostantForceEffect(tCarElt* car, tSituation *s);
+		int lowSpeedConstantForceEffect(tCarElt* car, tSituation *s);
 		int globalMultiplier;
 
 };
