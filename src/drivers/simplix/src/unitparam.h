@@ -1,39 +1,39 @@
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
+ï»¿//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // unitparam.h
 //--------------------------------------------------------------------------*
-// A robot for Speed Dreams-Version 2.X simuV4
+// A robot for Speed Dreams-Version	2.X	simuV4
 //--------------------------------------------------------------------------*
-// Container for parameters of car, lane, pit ...
-// Container für Parameter des Fahrzeugs, der Fahrspuren, der Box usw.
+// Container for parameters	of car,	lane, pit ...
+// Container fÃ¼r Parameter des Fahrzeugs, der Fahrspuren, der Box usw.
 //
-// File         : unitparam.h
-// Created      : 2007.04.11
-// Last changed : 2014.11.29
-// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
-// eMail        : wdbee@users.sourceforge.net
-// Version      : 4.05.000
+// File			:	unitparam.h
+// Created		: 2007.04.11
+// Last	changed	: 2014.11.29
+// Copyright	: Â© 2007-2014 Wolf-Dieter Beelitz
+// eMail		:	wdbee@users.sourceforge.net
+// Version		: 4.05.000
 //--------------------------------------------------------------------------*
-// This program was developed and tested on windows XP
-// There are no known Bugs, but:
-// Who uses the files accepts, that no responsibility is adopted
-// for bugs, dammages, aftereffects or consequential losses.
+// This	program	was	developed and tested on	windows	XP
+// There are no	known Bugs,	but:
+// Who uses	the	files accepts, that	no responsibility is adopted
+// for bugs, dammages, aftereffects	or consequential losses.
 //
-// Das Programm wurde unter Windows XP entwickelt und getestet.
+// Das Programm	wurde unter	Windows	XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
-// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
+// Wer die Dateien verwendet erkennt an, dass fÃ¼r Fehler, SchÃ¤den,
+// Folgefehler oder	FolgeschÃ¤den keine Haftung Ã¼bernommen wird.
 //--------------------------------------------------------------------------*
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
+// This	program	is free	software; you can redistribute it and/or modify
+// it under	the	terms of the GNU General Public	License	as published by
+// the Free	Software Foundation; either	version	2 of the License, or
+// (at your	option)	any	later version.
 //
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
-// GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
+// Im Ã¼brigen gilt fÃ¼r die Nutzung und/oder	Weitergabe die
+// GNU GPL (General	Public License)
+// Version 2 oder nach eigener Wahl	eine spÃ¤tere Version.
 //--------------------------------------------------------------------------*
-#ifndef _UNITPARAM_H_
-#define _UNITPARAM_H_
+#ifndef	_UNITPARAM_H_
+#define	_UNITPARAM_H_
 
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -49,23 +49,23 @@
 class TParam  
 {
   public:
-	TParam();                                    // Default constructor 
-    ~TParam();                                   // Destructor
+	TParam();									  //	Default	constructor	
+	~TParam();									  // Destructor
 
 	void Initialize
-	  (PDriver Driver, PtCarElt Car);
+	  (PDriver	Driver,	PtCarElt Car);
 	void SetEmptyMass(float EmptyMass);
-    void Update();
+	void Update();
 
-    PtCarElt oCar;                               // Pointer to TORCS data of car
+	PtCarElt oCar;								  //	Pointer	to TORCS data of car
 
-	TCarParam oCarParam;                         // Main parameter set
-	TCarParam oCarParam2;                        // Avoiding parameter set
-	TCarParam oCarParam3;                        // Pitting parameter set
+	TCarParam oCarParam;						  //	Main parameter set
+	TCarParam oCarParam2;						  // Avoiding parameter	set
+	TCarParam oCarParam3;						  // Pitting parameter set
 
-	TPitParam Pit;                               // Parameters of the pit
-	TTmpCarParam Tmp;                            // State of the car
-	TFixCarParam Fix;                            // Data of the car
+	TPitParam Pit;								  //	Parameters of the pit
+	TTmpCarParam Tmp;							  // State	of the car
+	TFixCarParam Fix;							  // Data of the car
 };
 //==========================================================================*
 #endif // _UNITPARAM_H_

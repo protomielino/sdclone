@@ -1,59 +1,59 @@
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
+ï»¿//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // unitlane.h
 //--------------------------------------------------------------------------*
-// A robot for Speed Dreams-Version 2.X simuV4
+// A robot for Speed Dreams-Version	2.X	simuV4
 //--------------------------------------------------------------------------*
 // Lane
 // Fahrspur
 //
-// File         : unitlane.h
-// Created      : 2007.11.17
-// Last changed : 2014.11.29
-// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
-// eMail        : wdbee@users.sourceforge.net
-// Version      : 4.05.000
+// File			:	unitlane.h
+// Created		: 2007.11.17
+// Last	changed	: 2014.11.29
+// Copyright	: Â© 2007-2014 Wolf-Dieter Beelitz
+// eMail		:	wdbee@users.sourceforge.net
+// Version		: 4.05.000
 //--------------------------------------------------------------------------*
-// Teile diese Unit basieren auf diversen Header-Dateien von TORCS
+// Teile diese Unit	basieren auf diversen Header-Dateien von TORCS
 //
-//    Copyright: (C) 2000 by Eric Espie
-//    eMail    : torcs@free.fr
+//	  Copyright:	(C)	2000 by	Eric Espie
+//	  eMail	  : torcs@free.fr
 //
 // dem erweiterten Robot-Tutorial bt
 //
-//    Copyright: (C) 2002-2004 Bernhard Wymann
-//    eMail    : berniw@bluewin.ch
+//	  Copyright:	(C)	2002-2004 Bernhard Wymann
+//	  eMail	  : berniw@bluewin.ch
 //
 // dem Roboter mouse_2006
 //
-//    Copyright: (C) 2006-2007 Tim Foden
+//	  Copyright:	(C)	2006-2007 Tim Foden
 //
 // dem Roboter wdbee_2007
 //
-//    Copyright: (C) 2006-2007 Wolf-Dieter Beelitz
-//    eMail    : wdbee@users.sourceforge.net
+//	  Copyright:	(C)	2006-2007 Wolf-Dieter Beelitz
+//	  eMail	  : wdbee@users.sourceforge.net
 //
 // und dem Roboter delphin
 //
-//    Copyright: (C) 2006-2007 Wolf-Dieter Beelitz
-//    eMail    : wdbee@users.sourceforge.net
+//	  Copyright:	(C)	2006-2007 Wolf-Dieter Beelitz
+//	  eMail	  : wdbee@users.sourceforge.net
 //
 //--------------------------------------------------------------------------*
-// Das Programm wurde unter Windows XP entwickelt und getestet.
+// Das Programm	wurde unter	Windows	XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
-// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
+// Wer die Dateien verwendet erkennt an, dass fÃ¼r Fehler, SchÃ¤den,
+// Folgefehler oder	FolgeschÃ¤den keine Haftung Ã¼bernommen wird.
 //
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
-// GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
+// Im Ã¼brigen gilt fÃ¼r die Nutzung und/oder	Weitergabe die
+// GNU GPL (General	Public License)
+// Version 2 oder nach eigener Wahl	eine spÃ¤tere Version.
 //--------------------------------------------------------------------------*
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
+// This	program	is free	software; you can redistribute it and/or modify
+// it under	the	terms of the GNU General Public	License	as published by
+// the Free	Software Foundation; either	version	2 of the License, or
+// (at your	option)	any	later version.
 //--------------------------------------------------------------------------*
-#ifndef _UNITLANE_H_
-#define _UNITLANE_H_
+#ifndef	_UNITLANE_H_
+#define	_UNITLANE_H_
 
 #include "unittrack.h"
 #include "unitcarparam.h"
@@ -63,114 +63,114 @@
 //==========================================================================*
 // Class TLane
 //--------------------------------------------------------------------------*
-class TLane 
+class TLane	
 {
   public:
-	struct TPathPt
+	struct	TPathPt
 	{
-		// Part 1: These data will be stored and reused from others as well
-		TVec3d Center;                           // Lane specific center
-		TVec3d Point;                            // Actual point (same as CalcPt())
-		float Offset;                            // Offset from centre point
-		float Crv;	 		                     // Curvature in xy
-		float CrvZ;			                     // Curvature in z direction... e.g. bumps
-		float NextCrv;                           // Cuvature comming next
-		float WToL;                              // Lane specfic width to left
-		float WToR;                              // Lane specfic width to right 
-		float WPitToL;                           // Lane specfic width to left
-		float WPitToR;                           // Lane specfic width to right 
+		// Part 1: These data	will be	stored and reused from others as well
+		TVec3d Center;						   //	Lane specific center
+		TVec3d Point;							   //	Actual point (same as CalcPt())
+		float	Offset;							   //	Offset from	centre point
+		float	Crv;	 							 // Curvature in xy
+		float	CrvZ;								 // Curvature in z	direction... e.g. bumps
+		float	NextCrv;						   //	Cuvature comming next
+		float	WToL;							   // Lane specfic width to	left
+		float	WToR;							   // Lane specfic width to	right 
+		float	WPitToL;						   //	Lane specfic width to left
+		float	WPitToR;						   //	Lane specfic width to right	
 		bool Fix;
 
-		// Part 2: These data could be stored, but is recalculated from others
-		// (So we don't have to store it)
-		double MaxSpeed;                         // Max speed through this point
-		double AccSpd;                           // Speed through this point, with modelled accel
-		double Speed;                            // Speed through this point (braking only)
-		double FlyHeight;                        // Predicted height of car above track (flying)
+		// Part 2: These data	could be stored, but is	recalculated from others
+		// (So we	don't have to store	it)
+		double MaxSpeed;						   // Max speed	through	this point
+		double AccSpd;						   //	Speed through this point, with modelled	accel
+		double Speed;							   //	Speed through this point (braking only)
+		double FlyHeight;						   // Predicted height	of car above track (flying)
 
-		// Part 3: These data may not be used from others (pointers)
-		const TSection*	Sec;		             // Track seg that contains this Seg
+		// Part 3: These data	may	not	be used	from others	(pointers)
+		const	TSection*	Sec;					 // Track seg that contains this	Seg
 
-		double Dist() const {return Sec->DistFromStart;}
-		double WtoL() const {return WToL;}
-		double WtoR() const {return WToR;}
-		const TVec3d& Pt() const {return Center;}
-		const TVec3d& Norm() const {return Sec->ToRight;}
-		TVec3d CalcPt() const {return Center + Sec->ToRight * Offset;}
+		double Dist()	const {return Sec->DistFromStart;}
+		double WtoL()	const {return WToL;}
+		double WtoR()	const {return WToR;}
+		const	TVec3d&	Pt() const {return Center;}
+		const	TVec3d&	Norm() const {return Sec->ToRight;}
+		TVec3d CalcPt() const	{return	Center + Sec->ToRight *	Offset;}
 	};
 
   public:
-    static const int TA_N = 10;                  // Nbr of points
-    double TA_X[TA_N];                           // X-coordinates
-    double TA_Y[TA_N];                           // Y-coordinates
-    double TA_S[TA_N];                           // Directions
+	static	const int TA_N = 10;				  // Nbr of	points
+	double	TA_X[TA_N];							  // X-coordinates
+	double	TA_Y[TA_N];							  // Y-coordinates
+	double	TA_S[TA_N];							  // Directions
 
-	TPathPt* oPathPoints;                        // Points in this lane
+	TPathPt* oPathPoints;						  // Points	in this	lane
 
 	TLane();
 	virtual ~TLane();
 
-	virtual TLane& operator= (const TLane& Lane);
+	virtual TLane&	operator= (const TLane&	Lane);
 
 	virtual bool ContainsPos
 	  (double TrackPos) const;
 	virtual bool GetLanePoint
-	  (double TrackPos, TLanePoint& LanePoint) const;
+	  (double TrackPos, TLanePoint& LanePoint)	const;
 
-	void SetLane(const TLane& Lane);
+	void SetLane(const	TLane& Lane);
 	void Initialise
 	  (TTrackDescription* pTrack,
-      const TFixCarParam& FixCarParam,
-	  const TCarParam& CarParam,
-	  double MaxLeft = FLT_MAX,
+	  const TFixCarParam& FixCarParam,
+	  const TCarParam&	CarParam,
+	  double MaxLeft =	FLT_MAX,
 	  double MaxRight = FLT_MAX);
 	void SmmothLane();
 
-	const TPathPt& PathPoints(int Index) const;
+	const TPathPt&	PathPoints(int Index) const;
 
 	void Dump();
 	void SmoothSpeeds();
 	void CalcCurvaturesXY
-	  (int Start, int Step = 1);
+	  (int	Start, int Step	= 1);
 	void CalcCurvaturesZ
-	  (int Start, int Step = 1);
+	  (int	Start, int Step	= 1);
 	void CalcMaxSpeeds
-	  (int Start, int Len, int Step = 1);
+	  (int	Start, int Len,	int	Step = 1);
 	void PropagateBreaking
-	  (int Start, int Len, int Step = 1);
+	  (int	Start, int Len,	int	Step = 1);
 	void PropagatePitBreaking
-	  (int Start, int Len, float PitStopPos, float ScaleMu);
+	  (int	Start, int Len,	float PitStopPos, float	ScaleMu);
 	void PropagateAcceleration
-	  (int Start, int Len, int Step = 1);
+	  (int	Start, int Len,	int	Step = 1);
 
 	void CalcCurvaturesXY
-	  (int Step = 1);
+	  (int	Step = 1);
 	void CalcCurvaturesZ
-	  (int Step = 1);
+	  (int	Step = 1);
 	void CalcMaxSpeeds
-	  (int Step = 1);
+	  (int	Step = 1);
 	void PropagateBreaking
-	  (int Step = 1);
+	  (int	Step = 1);
 	void PropagatePitBreaking
-	  (int Start, float PitStopPos, float ScaleMu);
+	  (int	Start, float PitStopPos, float ScaleMu);
 	void PropagateAcceleration
-	  (int Step = 1);
+	  (int	Step = 1);
 	void CalcFwdAbsCrv
-	  (int Range, int Step = 1);
+	  (int	Range, int Step	= 1);
 
-	double CalcEstimatedTime
-	  (int Start, int Len) const;
-	double CalcEstimatedLapTime() const;
-	double CalcTrackRollangle(double TrackPos);
-	double CalcTrackTurnangle(int P, int Q);
+	double	CalcEstimatedTime
+	  (int	Start, int Len)	const;
+	double	CalcEstimatedLapTime() const;
+	double	CalcTrackRollangle(double TrackPos);
+	double	CalcTrackTurnangle(int P, int Q);
 
 
   protected:
-	TTrackDescription* oTrack;                   // TORCS track data
-	TFixCarParam oFixCarParam;                   // Copy of car params
-	TCarParam oCarParam;                         // Copy of car params
-	TCubicSpline oTurnScale;                     // Scale of turns
-    int Dummy;
+	TTrackDescription*	oTrack;					  // TORCS track data
+	TFixCarParam oFixCarParam;					  // Copy of car params
+	TCarParam oCarParam;						  //	Copy of	car	params
+	TCubicSpline oTurnScale;					  // Scale of	turns
+	int Dummy;
 };
 //==========================================================================*
 #endif // _UNITLANE_H_

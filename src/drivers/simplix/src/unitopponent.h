@@ -1,58 +1,58 @@
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
+ï»¿//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // unitopponent.h
 //--------------------------------------------------------------------------*
-// A robot for Speed Dreams-Version 2.X simuV4
+// A robot for Speed Dreams-Version	2.X	simuV4
 //--------------------------------------------------------------------------*
-// Rivalen (und Teammitglieder)
+// Rivalen (und	Teammitglieder)
 //
-// File         : unitopponent.h
-// Created      : 2007.11.17
-// Last changed : 2014.11.29
-// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
-// eMail        : wdbee@users.sourceforge.net
-// Version      : 4.05.000
+// File			:	unitopponent.h
+// Created		: 2007.11.17
+// Last	changed	: 2014.11.29
+// Copyright	: Â© 2007-2014 Wolf-Dieter Beelitz
+// eMail		:	wdbee@users.sourceforge.net
+// Version		: 4.05.000
 //--------------------------------------------------------------------------*
-// Teile diese Unit basieren auf diversen Header-Dateien von TORCS
+// Teile diese Unit	basieren auf diversen Header-Dateien von TORCS
 //
-//    Copyright: (C) 2000 by Eric Espie
-//    eMail    : torcs@free.fr
+//	  Copyright:	(C)	2000 by	Eric Espie
+//	  eMail	  : torcs@free.fr
 //
 // dem erweiterten Robot-Tutorial bt
 //
-//    Copyright: (C) 2002-2004 Bernhard Wymann
-//    eMail    : berniw@bluewin.ch
+//	  Copyright:	(C)	2002-2004 Bernhard Wymann
+//	  eMail	  : berniw@bluewin.ch
 //
 // dem Roboter mouse_2006
 //
-//    Copyright: (C) 2006-2007 Tim Foden
+//	  Copyright:	(C)	2006-2007 Tim Foden
 //
 // dem Roboter wdbee_2007
 //
-//    Copyright: (C) 2006-2007 Wolf-Dieter Beelitz
-//    eMail    : wdbee@users.sourceforge.net
+//	  Copyright:	(C)	2006-2007 Wolf-Dieter Beelitz
+//	  eMail	  : wdbee@users.sourceforge.net
 //
 // und dem Roboter delphin
 //
-//    Copyright: (C) 2006-2007 Wolf-Dieter Beelitz
-//    eMail    : wdbee@users.sourceforge.net
+//	  Copyright:	(C)	2006-2007 Wolf-Dieter Beelitz
+//	  eMail	  : wdbee@users.sourceforge.net
 //
 //--------------------------------------------------------------------------*
-// Das Programm wurde unter Windows XP entwickelt und getestet.
+// Das Programm	wurde unter	Windows	XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
-// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
+// Wer die Dateien verwendet erkennt an, dass fÃ¼r Fehler, SchÃ¤den,
+// Folgefehler oder	FolgeschÃ¤den keine Haftung Ã¼bernommen wird.
 //
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
-// GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
+// Im Ã¼brigen gilt fÃ¼r die Nutzung und/oder	Weitergabe die
+// GNU GPL (General	Public License)
+// Version 2 oder nach eigener Wahl	eine spÃ¤tere Version.
 //--------------------------------------------------------------------------*
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
+// This	program	is free	software; you can redistribute it and/or modify
+// it under	the	terms of the GNU General Public	License	as published by
+// the Free	Software Foundation; either	version	2 of the License, or
+// (at your	option)	any	later version.
 //--------------------------------------------------------------------------*
-#ifndef _UNITOPPONENT_H_
-#define _UNITOPPONENT_H_
+#ifndef	_UNITOPPONENT_H_
+#define	_UNITOPPONENT_H_
 
 #include <car.h>
 #include <raceman.h>
@@ -66,20 +66,20 @@
 class TOpponent
 {
   public:
-	struct TState
+	struct	TState
 	{
 	  double Speed;
 
-	  double TrackVelLong;	// Vel. longitudinal to track.
+	  double TrackVelLong;	// Vel.	longitudinal to	track.
 	  double TrackVelLat;	// Vel. lateral to track.
 	  double TrackYaw;
 
-	  double CarDistLong;                        // Longitudinal dist. to. opp.
+	  double CarDistLong;						  // Longitudinal dist.	to.	opp.
 
 	  // Lateral distance to opponent
-	  double CarDistLat;                          
-	  // CarDistLat > 0: Opponent is a the left side
-	  // CarDistLat < 0: Opponent is a the right
+	  double CarDistLat;						   
+	  // CarDistLat > 0: Opponent is a	the	left side
+	  // CarDistLat < 0: Opponent is a	the	right
 
 	  double CarDiffVelLong;
 	  double CarDiffVelLat;
@@ -92,18 +92,18 @@ class TOpponent
 	  double CarAvgAccLong;
 	  double CarAvgAccLat;
 
-	  double MinDistLong;                        // Minimum distance longitudinal
-	  double MinDistLat;                         // Minimum distance lateral
+	  double MinDistLong;						  // Minimum distance longitudinal
+	  double MinDistLat;						  //	Minimum	distance lateral
 
-	  double RelPos;                             // Relative position along track
-	  double Offset;                             // Offset to center line of track
+	  double RelPos;							  // Relative position along track
+	  double Offset;							  // Offset	to center line of track
 	};
 
-	struct TInfo
+	struct	TInfo
 	{
 	  TInfo() {Clear();}
-	  void Clear() {memset(this, 0, sizeof(*this));}
-	  bool GotFlags(int F) const {return (Flags & F) == F;}
+	  void	Clear()	{memset(this, 0, sizeof(*this));}
+	  bool	GotFlags(int F)	const {return (Flags & F) == F;}
 
 	  TState State;
 
@@ -121,29 +121,29 @@ class TOpponent
 	  double DangerousLatchTime;
 	  double TeamMateDamage;
 	  double AvoidSide;
-	  bool Blocked[9];
+	  bool	Blocked[9];
 	};
 
   public:
-	TOpponent();                                 // Default constructor
-	~TOpponent();                                // Destructor
+	TOpponent();								  // Default constructor
+	~TOpponent();								  // Destructor
 
-	void Initialise                              // Initialize opponent
+	void Initialise							  //	Initialize opponent
 	  (PTrackDescription Track,
-	  const PSituation Situation,
+	  const PSituation	Situation,
 	  int Index);
 
-	PCarElt Car();                               // Get car pointer of opponent
-	const TInfo& Info() const;                   // Get info as const
-	TInfo& Info();                               // Get info
+	PCarElt Car();								  //	Get	car	pointer	of opponent
+	const TInfo& Info() const;					  // Get info as const
+	TInfo&	Info();								  //	Get	info
 
-	void Update                                  // Update
+	void Update								  // Update
 	  (const PCarElt MyCar,
-      double MyDirX, double MyDirY,
-      float &MinDistBack,
-      double &MinTimeSlot);
+	  double MyDirX, double MyDirY,
+	  float &MinDistBack,
+	  double &MinTimeSlot);
 
-	bool Classify                                // Classification of opponents
+	bool Classify								  // Classification of opponents
 	  (const PCarElt MyCar,
 	  const TState& MyState,
 	  double& MinDistToCarInFront,
@@ -151,12 +151,12 @@ class TOpponent
 	  double MyMaxAccX);
 
   private:
-    PTrackDescription oTrack;                    // Track description
-	PCarElt oCar;                                // Opponents car
-	double oDeltaTime;                           // Simulation delta time
-    int oIndex;                                  // Opponents cars index
-	TInfo oInfo;                                 // info of this opponent
-	double oMinCarDistLong;                      // Min dist to car in front
+	PTrackDescription oTrack;					  //	Track description
+	PCarElt oCar;								  // Opponents car
+	double	oDeltaTime;							  // Simulation delta	time
+	int oIndex;								  // Opponents cars	index
+	TInfo oInfo;								  // info of this opponent
+	double	oMinCarDistLong;					  // Min dist to car in front
 
 };
 //==========================================================================*

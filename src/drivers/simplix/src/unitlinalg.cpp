@@ -1,31 +1,31 @@
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
+ï»¿//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*
 // unitlinalg.cpp
 //--------------------------------------------------------------------------*
-// A robot for Speed Dreams-Version 2.X simuV4
+// A robot for Speed Dreams-Version	2.X	simuV4
 //--------------------------------------------------------------------------*
-// Hilfsfunktionen für 2D- und 3D-Vektoren
-// (C++-Portierung der Unit UnitLinAlg.pas)
+// Hilfsfunktionen fÃ¼r 2D- und 3D-Vektoren
+// (C++-Portierung der Unit	UnitLinAlg.pas)
 // 
-// File         : unitlinalg.cpp
-// Created      : 2007.02.20
-// Last changed : 2014.11.29
-// Copyright    : © 2007-2014 Wolf-Dieter Beelitz
-// eMail        : wdbee@users.sourceforge.net
-// Version      : 4.05.000
+// File			:	unitlinalg.cpp
+// Created		: 2007.02.20
+// Last	changed	: 2014.11.29
+// Copyright	: Â© 2007-2014 Wolf-Dieter Beelitz
+// eMail		:	wdbee@users.sourceforge.net
+// Version		: 4.05.000
 //--------------------------------------------------------------------------*
-// Das Programm wurde unter Windows XP entwickelt und getestet.
+// Das Programm	wurde unter	Windows	XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
-// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
+// Wer die Dateien verwendet erkennt an, dass fÃ¼r Fehler, SchÃ¤den,
+// Folgefehler oder	FolgeschÃ¤den keine Haftung Ã¼bernommen wird.
 //
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
-// GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
+// Im Ã¼brigen gilt fÃ¼r die Nutzung und/oder	Weitergabe die
+// GNU GPL (General	Public License)
+// Version 2 oder nach eigener Wahl	eine spÃ¤tere Version.
 //--------------------------------------------------------------------------*
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
+// This	program	is free	software; you can redistribute it and/or modify
+// it under	the	terms of the GNU General Public	License	as published by
+// the Free	Software Foundation; either	version	2 of the License, or
+// (at your	option)	any	later version.
 //--------------------------------------------------------------------------*
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -35,7 +35,7 @@
 //==========================================================================*
 // Result := Value * Value
 //--------------------------------------------------------------------------*
-Tdble Sqr(const double Value)
+Tdble Sqr(const	double Value)
 {
   return (Tdble)(Value * Value);
 };
@@ -44,7 +44,7 @@ Tdble Sqr(const double Value)
 //==========================================================================*
 // 2D: Result := LHS + RHS
 //--------------------------------------------------------------------------*
-TV2D Add(const TV2D &LHS, const TV2D &RHS)
+TV2D Add(const TV2D	&LHS, const	TV2D &RHS)
 {
   TV2D Result;
   Result.x = LHS.x + RHS.x;
@@ -68,7 +68,7 @@ TV2D Assign(const TV2D &Vector)
 //==========================================================================*
 // 2D: Result := CosAlpha(LHS,RHS)
 //--------------------------------------------------------------------------*
-Tdble CosAlpha(const TV2D &LHS, const TV2D &RHS)
+Tdble CosAlpha(const TV2D &LHS,	const TV2D &RHS)
 {
   return Mult(LHS,RHS) / (Len(LHS) * Len(RHS));
 };
@@ -77,20 +77,20 @@ Tdble CosAlpha(const TV2D &LHS, const TV2D &RHS)
 //==========================================================================*
 // 2D: Result := CosAlpha(LHS-C,RHS-C)
 //--------------------------------------------------------------------------*
-Tdble CosAlpha(const TV2D &LHS, const TV2D &RHS, const TV2D &C)
+Tdble CosAlpha(const TV2D &LHS,	const TV2D &RHS, const TV2D	&C)
 {
   TV2D DLHS, DRHS;
 
   DLHS = Sub(LHS,C);
   DRHS = Sub(RHS,C);
-  return Mult(DLHS,DRHS) / (Len(DLHS) * Len(DRHS));
+  return Mult(DLHS,DRHS) / (Len(DLHS) *	Len(DRHS));
 };
 //==========================================================================*
 
 //==========================================================================*
 // 2D: Result := Dir(LHS,RHS);
 //--------------------------------------------------------------------------*
-Tdble Dir(const TV2D &LHS, const TV2D &RHS)
+Tdble Dir(const	TV2D &LHS, const TV2D &RHS)
 {
   return (Tdble) atan2(LHS.y - RHS.y,LHS.x - RHS.x);
 };
@@ -99,37 +99,37 @@ Tdble Dir(const TV2D &LHS, const TV2D &RHS)
 //==========================================================================*
 // 2D: Result := Dist(LHS,RHS)
 //--------------------------------------------------------------------------*
-Tdble Dist(const TV2D &LHS, const TV2D &RHS)
+Tdble Dist(const TV2D &LHS,	const TV2D &RHS)
 {
-  return (Tdble) sqrt(Sqr(LHS.x - RHS.x) + Sqr(LHS.y - RHS.y));
+  return (Tdble) sqrt(Sqr(LHS.x	- RHS.x) + Sqr(LHS.y - RHS.y));
 };
 //==========================================================================*
 
 //==========================================================================*
 // 2D: Result := Divide(Vector,Value);
 //--------------------------------------------------------------------------*
-TV2D Divide(const TV2D &Vector, const Tdble &Value)
+TV2D Divide(const TV2D &Vector,	const Tdble	&Value)
 {
   TV2D Result;
-  Result.x = Vector.x / Value;
-  Result.y = Vector.y / Value;
+  Result.x = Vector.x /	Value;
+  Result.y = Vector.y /	Value;
   return Result;
 };
 //==========================================================================*
 
 //==========================================================================*
-// 2D: Result := Len(Vector) (Länge des Vectors)
+// 2D: Result := Len(Vector) (LÃ¤nge	des	Vectors)
 //--------------------------------------------------------------------------*
-Tdble Len(const TV2D &Vector)
+Tdble Len(const	TV2D &Vector)
 {
-  return (Tdble) sqrt(Vector.x * Vector.x + Vector.y * Vector.y);
+  return (Tdble) sqrt(Vector.x * Vector.x +	Vector.y * Vector.y);
 };
 //==========================================================================*
 
 //==========================================================================*
 // 2D: Result := Neg(Vector)
 //--------------------------------------------------------------------------*
-TV2D Neg(const TV2D &Vector)
+TV2D Neg(const TV2D	&Vector)
 {
   TV2D Result;
   Result.x = -Vector.x;
@@ -139,28 +139,28 @@ TV2D Neg(const TV2D &Vector)
 //==========================================================================*
 
 //==========================================================================*
-// 2D: Result := Normalize(Vector) (Vektor mit Länge 1, Richtung wie Vector)
+// 2D: Result := Normalize(Vector) (Vektor mit LÃ¤nge 1,	Richtung wie Vector)
 //--------------------------------------------------------------------------*
 TV2D Normalize(const TV2D &Vector)
 {
   TV2D Result;
-  Tdble L;
+  Tdble	L;
 
-  L = Len(Vector);
-  Result.x = Vector.x / L;
-  Result.y = Vector.y / L;
+  L	= Len(Vector);
+  Result.x = Vector.x /	L;
+  Result.y = Vector.y /	L;
   return Result;
 };
 //==========================================================================*
 
 //==========================================================================*/
-// 2D: Result := Factor * Vector
+// 2D: Result := Factor	* Vector
 //--------------------------------------------------------------------------*
-TV2D Mult(Tdble &Factor, const TV2D &Vector)
+TV2D Mult(Tdble	&Factor, const TV2D	&Vector)
 {
   TV2D Result;
-  Result.x = Factor * Vector.x;
-  Result.y = Factor * Vector.y;
+  Result.x = Factor	* Vector.x;
+  Result.y = Factor	* Vector.y;
   return Result;
 };
 //==========================================================================*
@@ -168,27 +168,27 @@ TV2D Mult(Tdble &Factor, const TV2D &Vector)
 //==========================================================================*
 // 2D: Result := LHS * RHS
 //--------------------------------------------------------------------------*
-Tdble Mult(const TV2D &LHS, const TV2D &RHS)
+Tdble Mult(const TV2D &LHS,	const TV2D &RHS)
 {
-  return (Tdble) (LHS.x * RHS.x + LHS.y * RHS.y);
+  return (Tdble) (LHS.x	* RHS.x	+ LHS.y	* RHS.y);
 };
 //==========================================================================*
 
 //==========================================================================*
 // 2D: Result := Rot(Vector,Center,Arc)
 //--------------------------------------------------------------------------*
-TV2D Rot(const TV2D &Vector, const TV2D &Center, Tdble &Arc)
+TV2D Rot(const TV2D	&Vector, const TV2D	&Center, Tdble &Arc)
 {
   TV2D Tmp;
   TV2D D;
-  Tdble SinA;
-  Tdble CosA;
+  Tdble	SinA;
+  Tdble	CosA;
 
-  D = Sub(Vector,Center);
+  D	= Sub(Vector,Center);
   SinA = sin(Arc);
   CosA = cos(Arc);
-  Tmp.x = (D.x * CosA - D.y * SinA);
-  Tmp.y = (D.x * SinA + D.y * CosA);
+  Tmp.x	= (D.x * CosA -	D.y	* SinA);
+  Tmp.y	= (D.x * SinA +	D.y	* CosA);
   return Add(Center,Tmp);
 };
 //==========================================================================*
@@ -198,29 +198,29 @@ TV2D Rot(const TV2D &Vector, const TV2D &Center, Tdble &Arc)
 //--------------------------------------------------------------------------*
 Tdble Sign(Tdble &Value)
 {
-  if (Value < 0.0)
-    return +1.0;
+  if (Value	< 0.0)
+	return	+1.0;
   else
-    return -1.0;
+	return	-1.0;
 };
 //==========================================================================*
 
 //==========================================================================*
 // Vorzeichen
 //--------------------------------------------------------------------------*
-Int Sign(Int &Value)
+Int	Sign(Int &Value)
 {
-  if (Value < 0)
-    return +1;
+  if (Value	< 0)
+	return	+1;
   else
-    return -1;
+	return	-1;
 };
 //==========================================================================*
 
 //==========================================================================*
 // 2D: Result := LHS - RHS
 //--------------------------------------------------------------------------*
-TV2D Sub(const TV2D &LHS, const TV2D &RHS)
+TV2D Sub(const TV2D	&LHS, const	TV2D &RHS)
 {
   TV2D Result;
   Result.x = LHS.x - RHS.x;
@@ -236,7 +236,7 @@ TV2D Sub(const TV2D &LHS, const TV2D &RHS)
 //==========================================================================*
 // 3D: Result := LHS + RHS
 //--------------------------------------------------------------------------*
-TV3D Add(const TV3D &LHS, const TV3D &RHS)
+TV3D Add(const TV3D	&LHS, const	TV3D &RHS)
 {
   TV3D Result;
   Result.x = LHS.x + RHS.x;
@@ -262,7 +262,7 @@ TV3D Assign(const TV3D &Vector)
 //==========================================================================*
 // 3D: Result := LHS x RHS
 //--------------------------------------------------------------------------*
-TV3D CrossProd(const TV3D &LHS, const TV3D &RHS)
+TV3D CrossProd(const TV3D &LHS,	const TV3D &RHS)
 {
   TV3D Result;
   Result.x = LHS.y * RHS.z - LHS.z * RHS.y;
@@ -275,42 +275,42 @@ TV3D CrossProd(const TV3D &LHS, const TV3D &RHS)
 //==========================================================================*
 // 3D: Result := Dist(LHS,RHS)
 //--------------------------------------------------------------------------*
-Tdble Dist(const TV3D &LHS, const TV3D &RHS)
+Tdble Dist(const TV3D &LHS,	const TV3D &RHS)
 {
-  return sqrt(Sqr(LHS.x - RHS.x)
-    + Sqr(LHS.y - RHS.y)
-    + Sqr(LHS.z - RHS.z));
+  return sqrt(Sqr(LHS.x	- RHS.x)
+	+ Sqr(LHS.y - RHS.y)
+	+ Sqr(LHS.z - RHS.z));
 };
 //==========================================================================*
 
 //==========================================================================*
 // 3D: Result := Divide(Vector,Value);
 //--------------------------------------------------------------------------*
-TV3D Divide(const TV3D &Vector, const Tdble &Value)
+TV3D Divide(const TV3D &Vector,	const Tdble	&Value)
 {
   TV3D Result;
-  Result.x = Vector.x / Value;
-  Result.y = Vector.y / Value;
-  Result.z = Vector.z / Value;
+  Result.x = Vector.x /	Value;
+  Result.y = Vector.y /	Value;
+  Result.z = Vector.z /	Value;
   return Result;
 };
 //==========================================================================*
 
 //==========================================================================*
-// 3D: Result := Len(Vector) (Länge des Vectors)
+// 3D: Result := Len(Vector) (LÃ¤nge	des	Vectors)
 //--------------------------------------------------------------------------*
-Tdble Len(const TV3D &Vector)
+Tdble Len(const	TV3D &Vector)
 {
   return sqrt(Vector.x * Vector.x
-    + Vector.y * Vector.y
-    + Vector.z * Vector.z);
+	+ Vector.y	* Vector.y
+	+ Vector.z	* Vector.z);
 };
 //==========================================================================*
 
 //==========================================================================*
 // 3D: Result := Neg(Vector)
 //--------------------------------------------------------------------------*
-TV3D Neg(const TV3D &Vector)
+TV3D Neg(const TV3D	&Vector)
 {
   TV3D Result;
   Result.x = -Vector.x;
@@ -321,30 +321,30 @@ TV3D Neg(const TV3D &Vector)
 //==========================================================================*
 
 //==========================================================================*
-// 3D: Result := Normalize(Vector) (Vektor mit Länge 1, Richtung wie Vector)
+// 3D: Result := Normalize(Vector) (Vektor mit LÃ¤nge 1,	Richtung wie Vector)
 //--------------------------------------------------------------------------*
 TV3D Normalize(const TV3D &Vector)
 {
   TV3D Result;
-  Tdble L;
+  Tdble	L;
 
-  L = Len(Vector);
-  Result.x = Vector.x / L;
-  Result.y = Vector.y / L;
-  Result.z = Vector.z / L;
+  L	= Len(Vector);
+  Result.x = Vector.x /	L;
+  Result.y = Vector.y /	L;
+  Result.z = Vector.z /	L;
   return Result;
 };
 //==========================================================================*
 
 //==========================================================================*/
-// 3D: Result := Factor * Vector
+// 3D: Result := Factor	* Vector
 //--------------------------------------------------------------------------*
-TV3D Mult(Tdble &Factor, const TV3D &Vector)
+TV3D Mult(Tdble	&Factor, const TV3D	&Vector)
 {
   TV3D Result;
-  Result.x = Factor * Vector.x;
-  Result.y = Factor * Vector.y;
-  Result.z = Factor * Vector.z;
+  Result.x = Factor	* Vector.x;
+  Result.y = Factor	* Vector.y;
+  Result.z = Factor	* Vector.z;
   return Result;
 };
 //==========================================================================*
@@ -352,7 +352,7 @@ TV3D Mult(Tdble &Factor, const TV3D &Vector)
 //==========================================================================*
 // 3D: Result := LHS * RHS
 //--------------------------------------------------------------------------*
-Tdble Mult(const TV3D &LHS, const TV3D &RHS)
+Tdble Mult(const TV3D &LHS,	const TV3D &RHS)
 {
   return LHS.x * RHS.x + LHS.y * RHS.y + LHS.z * RHS.z;
 };
@@ -361,19 +361,19 @@ Tdble Mult(const TV3D &LHS, const TV3D &RHS)
 //==========================================================================*
 // 3D: Result := RotZ(Vector,Center,Arc)
 //--------------------------------------------------------------------------*
-TV3D RotZ(const TV3D &Vector, const TV3D &Center, Tdble &Arc, Tdble &DZ)
+TV3D RotZ(const	TV3D &Vector, const	TV3D &Center, Tdble	&Arc, Tdble	&DZ)
 {
   TV3D Tmp;
   TV3D D;
-  Tdble SinA;
-  Tdble CosA;
+  Tdble	SinA;
+  Tdble	CosA;
 
-  D = Sub(Vector,Center);
+  D	= Sub(Vector,Center);
   SinA = sin(Arc);
   CosA = cos(Arc);
-  Tmp.x = (D.x * CosA - D.y * SinA);
-  Tmp.y = (D.x * SinA + D.y * CosA);
-  Tmp.z = D.z + DZ;
+  Tmp.x	= (D.x * CosA -	D.y	* SinA);
+  Tmp.y	= (D.x * SinA +	D.y	* CosA);
+  Tmp.z	= D.z +	DZ;
   return Add(Center,Tmp);
 };
 //==========================================================================*
@@ -381,7 +381,7 @@ TV3D RotZ(const TV3D &Vector, const TV3D &Center, Tdble &Arc, Tdble &DZ)
 //==========================================================================*
 // 3D: Result := LHS - RHS
 //--------------------------------------------------------------------------*
-TV3D Sub(const TV3D &LHS, const TV3D &RHS)
+TV3D Sub(const TV3D	&LHS, const	TV3D &RHS)
 {
   TV3D Result;
   Result.x = LHS.x - RHS.x;
@@ -392,95 +392,95 @@ TV3D Sub(const TV3D &LHS, const TV3D &RHS)
 //==========================================================================*
 
 //==========================================================================*
-// Mixed: Result := Dist(LHS,RHS)
+// Mixed: Result :=	Dist(LHS,RHS)
 //--------------------------------------------------------------------------*
-Tdble Dist(const TV3D &LHS, const TV2D &RHS)
+Tdble Dist(const TV3D &LHS,	const TV2D &RHS)
 {
-  return sqrt(Sqr(LHS.x - RHS.x)
-    + Sqr(LHS.y - RHS.y));
+  return sqrt(Sqr(LHS.x	- RHS.x)
+	+ Sqr(LHS.y - RHS.y));
 };
 //==========================================================================*
 
 //==========================================================================*
-// Mixed: Result := Dist(LHS,RHS)
+// Mixed: Result :=	Dist(LHS,RHS)
 //--------------------------------------------------------------------------*
-Tdble Dist(const TVec3d &LHS, const TVec3d &RHS)
+Tdble Dist(const TVec3d	&LHS, const	TVec3d &RHS)
 {
-  return sqrt(Sqr(LHS.x - RHS.x)
-    + Sqr(LHS.y - RHS.y));
+  return sqrt(Sqr(LHS.x	- RHS.x)
+	+ Sqr(LHS.y - RHS.y));
 };
 //==========================================================================*
 
 //==========================================================================*
-// Random number generator: Internal constants
-// Works if integer overflow is at 2^31 or heigher
+// Random number generator:	Internal constants
+// Works if	integer	overflow is	at 2^31	or heigher
 //--------------------------------------------------------------------------*
 //#define SD_RANDOM_SEED 0xfded
-//#define SD_RANDOM_A    9301
-//#define SD_RANDOM_C    49297
-//#define SD_RANDOM_M    233280
+//#define SD_RANDOM_A	 9301
+//#define SD_RANDOM_C	 49297
+//#define SD_RANDOM_M	 233280
 //--------------------------------------------------------------------------*
-// Works if integer overflow is at 2^30 or heigher
+// Works if	integer	overflow is	at 2^30	or heigher
 //--------------------------------------------------------------------------*
-#define SD_RANDOM_SEED 0xfded
-#define SD_RANDOM_A    8121
-#define SD_RANDOM_C    28411
-#define SD_RANDOM_M    134456
+#define	SD_RANDOM_SEED 0xfded
+#define	SD_RANDOM_A	   8121
+#define	SD_RANDOM_C	   28411
+#define	SD_RANDOM_M	   134456
 unsigned int sd_randomSeed;
 //--------------------------------------------------------------------------*
-// For normally distributed random numbers
+// For normally	distributed	random numbers
 //--------------------------------------------------------------------------*
-static int sd_flagHaveOne = 0;
+static int sd_flagHaveOne =	0;
 static double sd_secondRandomNumber;
 //==========================================================================*
 
 //==========================================================================*
-// Random number generator: Init. (Use seed = 0 to get always same sequence)
+// Random number generator:	Init. (Use seed	= 0	to get always same sequence)
 //--------------------------------------------------------------------------*
 void sd_srand(unsigned int seed)
 {
-	sd_randomSeed = seed ? seed : SD_RANDOM_SEED;
+	sd_randomSeed = seed ?	seed : SD_RANDOM_SEED;
 	return;
 }
 //==========================================================================*
 
 //==========================================================================*
-// Random number generator: Get a random number [0 .. SD_RANDOM_M - 1]
+// Random number generator:	Get	a random number	[0 .. SD_RANDOM_M -	1]
 //--------------------------------------------------------------------------*
 unsigned int sd_randInt()
 {
 	sd_randomSeed = SD_RANDOM_A * sd_randomSeed + SD_RANDOM_C;
-	return (sd_randomSeed % SD_RANDOM_C);
+	return	(sd_randomSeed % SD_RANDOM_C);
 }
 //==========================================================================*
 
 //==========================================================================*
-// Random number generator: Get a random number [0 .. 1)
+// Random number generator:	Get	a random number	[0 .. 1)
 //--------------------------------------------------------------------------*
 float sd_randFloat()
 {
 	sd_randomSeed = SD_RANDOM_A * sd_randomSeed + SD_RANDOM_C;
-	return ((float)(sd_randomSeed % SD_RANDOM_C) / (float) SD_RANDOM_C);
+	return	((float)(sd_randomSeed % SD_RANDOM_C) /	(float)	SD_RANDOM_C);
 }
 //==========================================================================*
 
 //==========================================================================*
-// Random number generator: Normally distributed random numbers
+// Random number generator:	Normally distributed random	numbers
 //--------------------------------------------------------------------------*
 float sd_randNormalFloat()
 {
-	double fac, radius, val1, val2;
+	double	fac, radius, val1, val2;
 
-	if (sd_flagHaveOne == 0)
+	if	(sd_flagHaveOne	== 0)
 	{
 		do
 		{
-			val1 = 2.0 * sd_randFloat() - 1.0;
-			val2 = 2.0 * sd_randFloat() - 1.0;
-			radius = val1 * val1 + val2 * val2;
-		} while (radius >= 1.0);
-		fac = sqrt(-2.0 * log(radius)/radius);
-		sd_secondRandomNumber = val1 * fac;
+			val1	= 2.0 *	sd_randFloat() - 1.0;
+			val2	= 2.0 *	sd_randFloat() - 1.0;
+			radius =	val1 * val1	+ val2 * val2;
+		}	while (radius >= 1.0);
+		fac =	sqrt(-2.0 *	log(radius)/radius);
+		sd_secondRandomNumber	= val1 * fac;
 		sd_flagHaveOne = 1;
 		return (float)(val2*fac);
 	}
