@@ -32,7 +32,6 @@ clock_t effectStart = std::clock();
 clock_t effectCurTime = std::clock();
 
 float prevSteerCmd;
-float prevSteerCmdDiff;
 int prevDirection = 1;
 
 int filterPositiveNumbers (int number){
@@ -442,68 +441,41 @@ int ForceFeedbackManager::engineRevvingEffect(tCarElt* car, tSituation *s)
 
 }
 
-int ForceFeedbackManager::lowSpeedConstantForceEffect(tCarElt* car, tSituation *s){
-
-    int effectForce;
-    int sign;
-
+int ForceFeedbackManager::lowSpeedConstantForceEffect(tCarElt *car, tSituation *s)
+{
     //we need to store the sign of the force
-    sign = ((car->_steerTqCenter - prevSteerCmd) > 0) - ((car->_steerTqCenter - prevSteerCmd) < 0);
+    int sign = ((car->_steerTqCenter - prevSteerCmd) > 0) - ((car->_steerTqCenter - prevSteerCmd) < 0);
 
-    GfLogDebug("test: (%f)\n", car->_steerTqCenter);
-    GfLogDebug("test: (%f)\n", prevSteerCmd );
+    GfLogDebug("steerTqCenter: (%f)\n", car->_steerTqCenter);
+    GfLogDebug("prevSteerCmd: (%f)\n", prevSteerCmd);
 
     int prevDirectionSign = (prevDirection > 0) - (prevDirection < 0);
 
     GfLogDebug("Sign: (%d)\n", sign);
     GfLogDebug("Direction sign: (%d)\n", prevDirectionSign);
 
-
-/*
-    if(prevDirectionSign == sign || sign == 0){
-
-        prevDirection = prevDirection + sign;
-
-    }else{
-
-        prevDirection = sign;
-
-    }
-*/
-
     prevDirection = prevDirection + sign;
-    if (prevDirection > 7) prevDirection =7;
-    if (prevDirection < -7) prevDirection =-7;
-
-
-
+    if (prevDirection > 7) prevDirection = 7;
+    if (prevDirection < -7) prevDirection = -7;
 
     GfLogDebug("Direction score: (%d)\n", prevDirection);
 
+    int effectForce = 0;
 
     //force calculation
-    if (car->_speed_xy < this->effectsConfig["lowSpeedConstantForceEffect"]["maxSpeedAtWhichForceIsApplied"]
-//		&& abs(prevDirection) > 8
-            )
+    if (car->_speed_xy < this->effectsConfig["lowSpeedConstantForceEffect"]["maxSpeedAtWhichForceIsApplied"])
     {
         effectForce = this->effectsConfig["lowSpeedConstantForceEffect"]["maxForce"] / 8 * abs(prevDirection) /
-                //(car->_speed_xy  + 1) *
-                (pow(car->_speed_xy, (float) 1/2) + 1) * prevDirectionSign;
-
-    }
-    else
-    {
-        effectForce = 1;
+                (pow(car->_speed_xy, 0.5f) + 1) * prevDirectionSign;
     }
 
-    prevSteerCmdDiff = car->_steerTqCenter - prevSteerCmd;
     prevSteerCmd = car->_steerTqCenter;
 
     GfLogDebug("SPEED: (%i)\n", (int)car->_speed_xy);
     GfLogDebug("Efect: (%i)\n", effectForce);
 
     return effectForce;
-
 }
+
 //initialize the force feedback
 TGFCLIENT_API ForceFeedbackManager forceFeedback;
