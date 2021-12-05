@@ -255,47 +255,47 @@ int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
 
 }
 
-int ForceFeedbackManager::autocenterEffect(tCarElt* car, tSituation *s){
-
-
-    if(car->_speed_xy < 4){
+int ForceFeedbackManager::autocenterEffect(tCarElt *car, tSituation *s)
+{
+    if (car->_speed_xy < 4)
         return 0;
-    }
+
     /*
      * car->steerLock
      * */
 
-    int effectForce;
-    //int sign;
-    tdble TqAlign;
-
     //force acting on the front wheels
-    tdble H = 450.0;
-    TqAlign = car->_steerTqAlign;
+    const tdble H = 450.0;
+    tdble TqAlign = car->_steerTqAlign;
     TqAlign = H * TqAlign / (fabs(TqAlign) + H);
-    effectForce = TqAlign * this->effectsConfig["autocenterEffect"]["frontwheelsmultiplier"] / 100;
+    const int frontwheelsmultiplier = this->effectsConfig["autocenterEffect"]["frontwheelsmultiplier"];
+    int effectForce = TqAlign * frontwheelsmultiplier / 100;
 
     //force action on the back wheels
-    effectForce += car->_wheelFy(REAR_RGT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 100;
-    effectForce += car->_wheelFy(REAR_LFT) * this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"] / 100;
+    int rearwheelsmultiplier = this->effectsConfig["autocenterEffect"]["rearwheelsmultiplier"];
+    effectForce += car->_wheelFy(REAR_RGT) * rearwheelsmultiplier / 100;
+    effectForce += car->_wheelFy(REAR_LFT) * rearwheelsmultiplier / 100;
 
     //smooth
-    effectForce = (effectForce + (this->effectsConfig["autocenterEffect"]["_previousValue"] * this->effectsConfig["autocenterEffect"]["smoothing"] / 100)) / ((this->effectsConfig["autocenterEffect"]["smoothing"]/100)+1);
+    const int previousValue = this->effectsConfig["autocenterEffect"]["_previousValue"];
+    const int smoothing = this->effectsConfig["autocenterEffect"]["smoothing"];
+    effectForce = (effectForce + (previousValue * smoothing / 100)) / ((smoothing / 100) + 1);
 
     //remember the current value for the next run
     this->effectsConfig["autocenterEffect"]["_previousValue"] = effectForce;
 
+#if 0
     //we need to store the sign of the force
-    //sign = (effectForce > 0) - (effectForce < 0); not used for the moment (by Xavier 11/11/2017
+    int sign = (effectForce > 0) - (effectForce < 0); //not used for the moment (by Xavier 11/11/2017
 
     //be sure this is a positive number
-    //effectForce = effectForce * sign;
+    effectForce = effectForce * sign;
 
     //we use an inverse exponential function to have a stronger force at low values and a lighetr one a bigger values
-    //effectForce = (int)((pow((double) effectForce, (double) 1/2) * 120) * sign);
+    effectForce = (int)((pow((double) effectForce, (double) 1/2) * 120) * sign);
+#endif
 
     return effectForce;
-
 }
 
 int ForceFeedbackManager::bumpsEffect(tCarElt* car, tSituation *s)
