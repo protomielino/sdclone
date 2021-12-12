@@ -812,7 +812,7 @@ void HumanDriver::resume_race(int index, tCarElt* car, tSituation *s)
 #if SDL_FORCEFEEDBACK
     //restore force feedback effect to the wheel (if was set)
     if(HCtx[idx]->lastForceFeedbackLevel) {
-        if(cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_KEYBOARD){
+        if(cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_KEYBOARD && cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_MOUSE_AXIS){
             HCtx[idx]->lastForceFeedbackIndex = int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER);
             gfctrlJoyConstantForce(
                 HCtx[idx]->lastForceFeedbackIndex,
@@ -1225,7 +1225,7 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 
 	//send force feedback effect to the wheel
 	//dont' even try to do it if steer command is on a keyboard because it somehow manage to crash (unable to identify the joystic to send FF to?)
-	if(cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_KEYBOARD){
+	if(cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_KEYBOARD && cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_MOUSE_AXIS){
 		//                     v<-  this controller detenction does not make ->v 
 		//                     v<-  sense to me                              ->v
         HCtx[idx]->lastForceFeedbackIndex = int((cmd[CMD_LEFTSTEER].val) / GFCTRL_JOY_NUMBER);
