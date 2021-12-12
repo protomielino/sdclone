@@ -1219,7 +1219,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
     prevSteerAngle = angle;
     
-// tires
+// tires temps
 
 
 	for (int i = 0; i < 4; i++) { //for each tires
@@ -1309,7 +1309,11 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 	
 	}
 
-
+// tire wear
+	changeImageSize(this->hudImgElements["tire-degradation-fr-on"], currCar->_tyreTreadDepth(0), "bottom", this->hudScale);
+	changeImageSize(this->hudImgElements["tire-degradation-fl-on"], currCar->_tyreTreadDepth(1), "bottom", this->hudScale);
+	changeImageSize(this->hudImgElements["tire-degradation-rr-on"], currCar->_tyreTreadDepth(2), "bottom", this->hudScale);
+	changeImageSize(this->hudImgElements["tire-degradation-rl-on"], currCar->_tyreTreadDepth(3), "bottom", this->hudScale);
 
 // debug info
     temp.str("");
