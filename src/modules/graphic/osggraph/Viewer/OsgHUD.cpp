@@ -662,6 +662,61 @@ void changeImageSize(osg::Geometry *geom,
     }
 }
 
+void changeImagePosition(osg::Geometry *geom,
+                        float newX,
+                        float newY,
+                        float hudScale)
+{
+    osg::TextureRectangle* texture;
+
+    //get the texture data of this object
+    texture = dynamic_cast<osg::TextureRectangle*>(geom->getStateSet()->getTextureAttribute(0,osg::StateAttribute::TEXTURE));
+
+    //get the image from the texture data
+    osg::Image* img;
+    img = texture->getImage();
+
+    //get image dimensions
+    float imgWidth = img->s() * hudScale;
+    float imgHeight = img->t() * hudScale;
+
+    //adapt the geometry
+    {
+        //osg::Vec3Array* vertices = new osg::Vec3Array;
+        osg::Vec3Array* vertices = dynamic_cast<osg::Vec3Array*>(geom->getVertexArray());
+
+        /*
+         * how vertices are arranged:
+         *      3_______2
+         *      |       |
+         *    y |       |
+         *      |       |
+         *      0_______1
+         *          x
+         *
+         * [vertices(0-3)][0]=x
+         * [vertices(0-3)][1]=y
+        * */
+
+        //change the position
+        (*vertices)[0][0] = newX;
+        (*vertices)[0][1] = newY;
+
+        (*vertices)[1][0] = newX+imgWidth;
+        (*vertices)[1][1] = newY;
+
+        (*vertices)[2][0] = newX+imgWidth;
+        (*vertices)[2][1] = newY+imgHeight;
+        
+        (*vertices)[3][0] = newX;
+        (*vertices)[3][1] = newY+imgHeight;
+
+        vertices->dirty();
+
+        geom->setVertexArray(vertices);
+    }
+}
+
 void changeImageAlpha(osg::Geometry *geom,
                         float newAlpha/*where 1.0 fully visible and 0.0 completely hidden*/
 )
@@ -1327,6 +1382,17 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 	changeImageAlpha(this->hudImgElements["tire-rr-slip"], slip);
 	slip = currCar->_wheelSlipNorm(3)/currCar->_wheelSlipOpt(3);
 	changeImageAlpha(this->hudImgElements["tire-rl-slip"], slip);
+
+//gforces
+	osg::BoundingBox gforcegraphbb =hudImgElements["gforces-graph"]->getBoundingBox();
+	osg::BoundingBox gforcedotbb = hudImgElements["gforces-dot"]->getBoundingBox();
+	osg::Vec3f position = calculatePosition(gforcedotbb,"mc",gforcegraphbb,"mc", 0.0f, 0.0f);
+	changeImagePosition(
+		this->hudImgElements["gforces-dot"],
+		gforcegraphbb.xMin()+position.x()+currCar->_DynGC.acc.y * 5 * 1,//horizontal
+		gforcegraphbb.yMin()+position.y()+currCar->_DynGC.acc.x * 5 * -1,//vertical
+		this->hudScale
+	);
 
 // debug info
     temp.str("");
