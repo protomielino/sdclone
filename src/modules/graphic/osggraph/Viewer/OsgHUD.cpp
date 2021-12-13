@@ -1303,7 +1303,6 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 		temp.str("");
 		//internally the tire temp is in KELVIN
 		int tireTempInCelsius = currCar->_tyreT_mid(i)- 273.15;
-//		temp << tireTempInCelsius << " °C";
 		temp << tireTempInCelsius << " C";
 
 		std::ostringstream tireNameText;
@@ -1317,6 +1316,17 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 	changeImageSize(this->hudImgElements["tire-degradation-fl-on"], currCar->_tyreTreadDepth(1), "bottom", this->hudScale);
 	changeImageSize(this->hudImgElements["tire-degradation-rr-on"], currCar->_tyreTreadDepth(2), "bottom", this->hudScale);
 	changeImageSize(this->hudImgElements["tire-degradation-rl-on"], currCar->_tyreTreadDepth(3), "bottom", this->hudScale);
+
+//tire slip
+	float slip = 0.0f;
+	slip = currCar->_wheelSlipNorm(0)/currCar->_wheelSlipOpt(0);
+	changeImageAlpha(this->hudImgElements["tire-fr-slip"], slip);
+	slip = currCar->_wheelSlipNorm(1)/currCar->_wheelSlipOpt(1);
+	changeImageAlpha(this->hudImgElements["tire-fl-slip"], slip);
+	slip = currCar->_wheelSlipNorm(2)/currCar->_wheelSlipOpt(2);
+	changeImageAlpha(this->hudImgElements["tire-rr-slip"], slip);
+	slip = currCar->_wheelSlipNorm(3)/currCar->_wheelSlipOpt(3);
+	changeImageAlpha(this->hudImgElements["tire-rl-slip"], slip);
 
 // debug info
     temp.str("");
