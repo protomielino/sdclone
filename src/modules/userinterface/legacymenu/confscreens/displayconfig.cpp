@@ -22,6 +22,7 @@
 #include <sstream>
 
 #include <tgfclient.h>
+#include <graphic.h>
 
 #include "legacymenu.h"
 #include "displayconfig.h"
@@ -29,8 +30,8 @@
 
 // Some consts.
 static const char* ADisplayModes[DisplayMenu::nDisplayModes] = { "Full-screen", "Windowed" };
-static const char* AVideoDetectModes[DisplayMenu::nVideoDetectModes] = { "Auto", "Manual" };
-static const char* AVideoInitModes[DisplayMenu::nVideoInitModes] = { "Compatible", "Best possible" };
+static const char* MonitorTypes[DisplayMenu::nDisplayTypes] = { "None", "4:3", "16:9", "21:9" };
+static const char* SpansplitValues[] = { GR_VAL_NO, GR_VAL_YES };
 #ifndef NoMaxRefreshRate
 static const int AMaxRefreshRates[] = { 0, 30, 40, 50, 60, 75, 85, 100, 120, 150, 200 };
 static const int NMaxRefreshRates = sizeof(AMaxRefreshRates) / sizeof(AMaxRefreshRates[0]);
@@ -38,6 +39,9 @@ static const int NMaxRefreshRates = sizeof(AMaxRefreshRates) / sizeof(AMaxRefres
 
 // The unique DisplayMenu instance.
 static DisplayMenu* PDisplayMenu = 0;
+
+static int sBezelCompID;
+static int sArcRatioID;
 
 
 // Call-backs ================================================================
@@ -51,14 +55,6 @@ void DisplayMenu::onActivate(void *pDisplayMenu)
 
 	// Initialize GUI from loaded values.
 	pMenu->updateControls();
-}
-
-void DisplayMenu::onChangeColorDepth(tComboBoxInfo *pInfo)
-{
- 	// Get the DisplayMenu instance from call-back user data.
-	DisplayMenu* pMenu = static_cast<DisplayMenu*>(pInfo->userData);
-
-	pMenu->setColorDepthIndex(pInfo->nPos);
 }
 
 void DisplayMenu::onChangeDisplayMode(tComboBoxInfo *pInfo)
@@ -77,20 +73,33 @@ void DisplayMenu::onChangeScreenSize(tComboBoxInfo *pInfo)
 	pMenu->setScreenSizeIndex(pInfo->nPos);
 }
 
-void DisplayMenu::onChangeVideoDetectMode(tComboBoxInfo *pInfo)
+void DisplayMenu::onChangeMonitorType(tComboBoxInfo *pInfo)
 {
  	// Get the DisplayMenu instance from call-back user data.
 	DisplayMenu* pMenu = static_cast<DisplayMenu*>(pInfo->userData);
 
-	pMenu->setVideoDetectMode((EVideoDetectMode)pInfo->nPos);
+	pMenu->setMonitorType((EDisplayType)pInfo->nPos);
 }
 
-void DisplayMenu::onChangeVideoInitMode(tComboBoxInfo *pInfo)
+void DisplayMenu::onChangeArcRatio(void *pDisplayMenu)
 {
- 	// Get the DisplayMenu instance from call-back user data.
-	DisplayMenu* pMenu = static_cast<DisplayMenu*>(pInfo->userData);
+    printf("DisplayMenu::onChangeArcRatio() \n");
+    DisplayMenu* pMenu = static_cast<DisplayMenu*>(pDisplayMenu);
+    //printf("this = %p \n", this);
+    printf("pMenu->getMenuHandle() = %p \n", pMenu->getMenuHandle());
+    printf("PDisplayMenu->getMenuHandle() = %p \n", PDisplayMenu->getMenuHandle());
 
-	pMenu->setVideoInitMode((EVideoInitMode)pInfo->nPos);
+    char* val = GfuiEditboxGetString(PDisplayMenu->getMenuHandle(), sArcRatioID);
+    sscanf(val, "%g", &pMenu->_fArcRatio);
+    if (PDisplayMenu->_fArcRatio > 2.0f)
+        PDisplayMenu->_fArcRatio = 2.0f;
+    else if (PDisplayMenu->_fArcRatio < 0.0f)
+        PDisplayMenu->_fArcRatio = 0.0f;
+
+    char buf[32];
+    sprintf(buf, "%g", PDisplayMenu->_fArcRatio);
+    GfuiEditboxSetString(PDisplayMenu->getMenuHandle(), sArcRatioID, buf);
+
 }
 
 #ifndef NoMaxRefreshRate
@@ -133,18 +142,10 @@ void DisplayMenu::onCancel(void *pDisplayMenu)
 
 void DisplayMenu::updateControls()
 {
-	resetColorDepths();
-	
 	int nControlId = getDynamicControlId("DisplayModeCombo");
 	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _eDisplayMode);
 	
 	resetScreenSizes();
-	
-	nControlId = getDynamicControlId("VideoDetectModeCombo");
-	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _eVideoDetectMode);
-
-	nControlId = getDynamicControlId("VideoInitModeCombo");
-	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _eVideoInitMode);
 
 #ifndef NoMaxRefreshRate
 	nControlId = getDynamicControlId("MaxRefreshRateCombo");
@@ -170,15 +171,6 @@ void DisplayMenu::loadSettings()
 	const char* pszScrPropSec =
 		GfParmExistsSection(hScrConfParams, GFSCR_SECT_INTESTPROPS)
 		? GFSCR_SECT_INTESTPROPS : GFSCR_SECT_VALIDPROPS;
-	
-	// Video detection mode : Auto or Manual.
-	const char *pszVideoDetectMode =
-		GfParmGetStr(hScrConfParams, pszScrPropSec, GFSCR_ATT_VDETECT, GFSCR_VAL_VDETECT_AUTO);
-	_eVideoDetectMode =
-		strcmp(pszVideoDetectMode, GFSCR_VAL_VDETECT_AUTO) ? eManual : eAuto;
-
-	// Color depth (bits per pixel, alpha included).
-	_nColorDepth = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_BPP, NULL, 32);
 
 	// Display mode : Full-screen or Windowed.
 	const char *pszFullScreen =
@@ -188,12 +180,6 @@ void DisplayMenu::loadSettings()
 	// Screen / window size.
 	_nScreenWidth = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_WIN_X, NULL, 800);
 	_nScreenHeight = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_WIN_Y, NULL, 600);
-	
-	// Video initialization mode : Compatible or Best.
-	const char *pszVideoInitMode =
-		GfParmGetStr(hScrConfParams, pszScrPropSec, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_COMPATIBLE);
-	_eVideoInitMode =
-		strcmp(pszVideoInitMode, GFSCR_VAL_VINIT_COMPATIBLE) ? eBestPossible : eCompatible;
 
 #ifndef NoMaxRefreshRate
 	// Max. refresh rate (Hz).
@@ -219,29 +205,14 @@ void DisplayMenu::storeSettings() const
 	
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_X, (char*)NULL, _nScreenWidth);
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_Y, (char*)NULL, _nScreenHeight);
-	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_BPP, (char*)NULL, _nColorDepth);
 #ifndef NoMaxRefreshRate
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_MAXREFRESH, (char*)NULL, _nMaxRefreshRate);
-#endif	
-
-	const char* pszVDetectMode =
-		(_eVideoDetectMode == eAuto) ? GFSCR_VAL_VDETECT_AUTO : GFSCR_VAL_VDETECT_MANUAL;
-	GfParmSetStr(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_VDETECT, pszVDetectMode);
-
-	const char* pszVInitMode =
-		(_eVideoInitMode == eCompatible) ? GFSCR_VAL_VINIT_COMPATIBLE : GFSCR_VAL_VINIT_BEST;
-	GfParmSetStr(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_VINIT, pszVInitMode);
+#endif
 
 	const char* pszDisplMode =
 		(_eDisplayMode == eFullScreen) ? GFSCR_VAL_YES : GFSCR_VAL_NO;
 	GfParmSetStr(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_FSCR, pszDisplMode);
 
-	// Deselect anti-aliasing from the Open GL settings if 'compatible' mode selected
-	// for the video initialization (anti-aliasing not supported in this mode).
-	if (_eVideoInitMode == eCompatible)
-		GfParmSetStr(hScrConfParams, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_MULTISAMPLING,
-					 GFSCR_ATT_MULTISAMPLING_DISABLED);
-	
 	// Write and release screen config params file.
 	GfParmWriteFile(NULL, hScrConfParams, "Screen");
 	GfParmReleaseHandle(hScrConfParams);
@@ -257,59 +228,6 @@ void DisplayMenu::setDisplayMode(EDisplayMode eMode)
 	}
 }
 
-void DisplayMenu::setColorDepthIndex(int nIndex)
-{
-	if (_nColorDepth != _aColorDepths[nIndex])
-	{
-		_nColorDepth = _aColorDepths[nIndex];
-		
-		resetScreenSizes();
-	}
-}
-
-void DisplayMenu::resetColorDepths()
-{
-	// Determine possible / supported color depths
-	// (possible, or only supported ones, whether auto. or manual video features detection mode).
-	int nDefColorDepths;
-	int* aDefColorDepths = GfScrGetDefaultColorDepths(&nDefColorDepths);
-	if (_aColorDepths && _aColorDepths != aDefColorDepths)
-		free(_aColorDepths);
-	if (_eVideoDetectMode == eAuto)
-		_aColorDepths = GfScrGetSupportedColorDepths(&_nNbColorDepths);
-	else
-	{
-		_aColorDepths = aDefColorDepths;
-		_nNbColorDepths = nDefColorDepths;
-	}
-	
-	// Update combo-box with new possible color depths.
-	const int nComboId = getDynamicControlId("ColorDepthCombo");
-	GfuiComboboxClear(getMenuHandle(), nComboId);
-	std::ostringstream ossColorDepth;
-	for (int nColorDepthInd = 0; nColorDepthInd < _nNbColorDepths; nColorDepthInd++)
-	{
-		ossColorDepth.str("");
-		ossColorDepth << _aColorDepths[nColorDepthInd];
-		GfuiComboboxAddText(getMenuHandle(), nComboId, ossColorDepth.str().c_str());
-	}
-	
-	// Try and find the closest color depth to the current choice in the new list.
-	int nColorDepthIndex = _nNbColorDepths-1; // Defaults to the max possible value.
-	for (int nDepthInd = 0; nDepthInd < _nNbColorDepths; nDepthInd++)
-		if (_nColorDepth == _aColorDepths[nDepthInd])
-		{
-			nColorDepthIndex = nDepthInd;
-			break;
-		}
-
-	// Store the new current color depth (in case it changed).
-	_nColorDepth = _aColorDepths[nColorDepthIndex];
-	
-	// Select the found one in the combo-box.
-	GfuiComboboxSetSelectedIndex(getMenuHandle(), nComboId, nColorDepthIndex);
-}
-
 void DisplayMenu::resetScreenSizes()
 {
 	// Determine possible / supported screen sizes for the current display mode, color depth,
@@ -318,14 +236,15 @@ void DisplayMenu::resetScreenSizes()
 	tScreenSize* aDefScreenSizes = GfScrGetDefaultSizes(&nDefScreenSizes);
 	if (_aScreenSizes && _aScreenSizes != aDefScreenSizes)
 		free(_aScreenSizes);
-	if (_eVideoDetectMode == eAuto)
-		_aScreenSizes =
-			GfScrGetSupportedSizes(_nColorDepth, _eDisplayMode == eFullScreen, &_nNbScreenSizes);
-	if (_eVideoDetectMode == eManual || _aScreenSizes == (tScreenSize*)-1 || _aScreenSizes == 0)
+
+	_aScreenSizes =
+		GfScrGetSupportedSizes(32, _eDisplayMode == eFullScreen, &_nNbScreenSizes);
+	if (_eDisplayMode != eFullScreen || _aScreenSizes == (tScreenSize*)-1 || _aScreenSizes == 0)
 	{
 		_aScreenSizes = aDefScreenSizes;
 		_nNbScreenSizes = nDefScreenSizes;
 	}
+
 
 	// Update combo-box with new possible sizes.
 	const int nComboId = getDynamicControlId("ScreenSizeCombo");
@@ -377,20 +296,28 @@ void DisplayMenu::setScreenSizeIndex(int nIndex)
 	_nScreenHeight = _aScreenSizes[nIndex].height;
 }
 
-void DisplayMenu::setVideoDetectMode(EVideoDetectMode eMode)
+void DisplayMenu::setMonitorType(EDisplayType eType)
 {
-	if (_eVideoDetectMode != eMode)
+	if (_eDisplayType != eType)
 	{
-		_eVideoDetectMode = eMode;
-		
-		resetColorDepths();
-		resetScreenSizes();
+		_eDisplayType = eType;
 	}
 }
 
-void DisplayMenu::setVideoInitMode(EVideoInitMode eMode)
+void DisplayMenu::setArcRatio(float ratio)
 {
-	_eVideoInitMode = eMode;
+    printf("DisplayMenu::setArcRatio() \n");
+    printf("this = %p \n", this);
+
+    _fArcRatio = ratio;
+    if (_fArcRatio > 2.0f)
+    {
+        _fArcRatio = 2.0f;
+    }
+    else if (_fArcRatio < 0.0f)
+    {
+        _fArcRatio = 0.0f;
+    }
 }
 
 #ifndef NoMaxRefreshRate
@@ -405,28 +332,21 @@ DisplayMenu::DisplayMenu()
 {
 	_nNbScreenSizes = -1;
 	_aScreenSizes = 0;
-
-	_nNbColorDepths = -1;
-	_aColorDepths = 0;
-
-	_nColorDepth = 24;
 	_eDisplayMode = eWindowed;
 	_nScreenWidth = 800;
 	_nScreenHeight = 600;
-	_eVideoDetectMode = eAuto;
-	_eVideoInitMode = eCompatible;
+	_eDisplayType = eNone;
+	_fArcRatio = 1.0f;
+	_fBezelComp = 110.0f;
+	_fScreenDist = 1.0f;
 #ifndef NoMaxRefreshRate
 	_nMaxRefreshRate = 0;
 #endif	
+    printf("this = %p \n", this);
 }
 
 DisplayMenu::~DisplayMenu()
 {
-	int nDefColorDepths;
-	int* aDefColorDepths = GfScrGetDefaultColorDepths(&nDefColorDepths);
-	if (_aColorDepths && _aColorDepths != aDefColorDepths)
-		free(_aColorDepths);
-
 	int nDefScreenSizes;
 	tScreenSize* aDefScreenSizes = GfScrGetDefaultSizes(&nDefScreenSizes);
 	if (_aScreenSizes && _aScreenSizes != aDefScreenSizes)
@@ -447,21 +367,24 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
     
 	createComboboxControl("ScreenSizeCombo", this, onChangeScreenSize);
 
-	createComboboxControl("ColorDepthCombo", this, onChangeColorDepth);
-
 	const int nDisplayModeComboId =
 		createComboboxControl("DisplayModeCombo", this, onChangeDisplayMode);
+
+	const int nDisplayTypeComboId =
+		createComboboxControl("MonitorTypeCombo", this, onChangeMonitorType);
+
+	const int nSpanSplitsComboId =
+		createComboboxControl("SpanSplitsCombo", this, NULL);
+
+	sBezelCompID = createEditControl("bezelcompedit", this, NULL, NULL);
+	createEditControl("screendistedit", this, NULL, NULL);
+	sArcRatioID = createEditControl("arcratioedit", this, NULL, onChangeArcRatio);
+
 
 #ifndef NoMaxRefreshRate
 	const int nMaxRefRateComboId =
 		createComboboxControl("MaxRefreshRateCombo", this, onChangeMaxRefreshRate);
 #endif	
-
-	const int nVideoDetectComboId =
-		createComboboxControl("VideoDetectModeCombo", this, onChangeVideoDetectMode);
-
-	const int nVideoInitComboId =
-		createComboboxControl("VideoInitModeCombo", this, onChangeVideoInitMode);
 
 	createButtonControl("ApplyButton", this, onAccept);
 	createButtonControl("CancelButton", this, onCancel);
@@ -483,15 +406,13 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 	for (int nDispModeInd = 0; nDispModeInd < nDisplayModes; nDispModeInd++)
 		GfuiComboboxAddText(getMenuHandle(), nDisplayModeComboId, ADisplayModes[nDispModeInd]);
 
-	// 3) Video detection modes combo.
-	for (int nVDetectModeInd = 0; nVDetectModeInd < nVideoDetectModes; nVDetectModeInd++)
-		GfuiComboboxAddText(getMenuHandle(), nVideoDetectComboId, AVideoDetectModes[nVDetectModeInd]);
+	// 3) Monitor type combo.
+	for (int nDisplayTypeInd = 0; nDisplayTypeInd < nDisplayTypes; nDisplayTypeInd++)
+		GfuiComboboxAddText(getMenuHandle(), nDisplayTypeComboId, MonitorTypes[nDisplayTypeInd]);
 
-	// 4) Video initialization modes combo.
-	for (int nVInitModeInd = 0; nVInitModeInd < nVideoInitModes; nVInitModeInd++)
-		GfuiComboboxAddText(getMenuHandle(), nVideoInitComboId, AVideoInitModes[nVInitModeInd]);
+	for (int index = 0; index < 2; index++)
+		GfuiComboboxAddText(getMenuHandle(), nSpanSplitsComboId, SpansplitValues[index]);
 
-	// 5) Screen sizes combo : not constant, as depends on selected color depth and display mode.
 
 #ifndef NoMaxRefreshRate
 	// 6) Max refresh rate combo.

@@ -21,6 +21,7 @@
 #define _DISPLAYCONFIG_H_
 
 #include <tgfclient.h>
+#include <gui.h>
 
 #include "confscreens.h"
 
@@ -38,14 +39,13 @@ public:
 	bool initialize(void* pPreviousMenu);
 	
 	enum EDisplayMode { eFullScreen = 0, eWindowed = 1, nDisplayModes };
-	enum EVideoDetectMode { eAuto = 0, eManual = 1, nVideoDetectModes };
-	enum EVideoInitMode { eCompatible = 0, eBestPossible = 1, nVideoInitModes };
+	enum EDisplayType { eNone = 0, e4by3, e16by9, e21by9, nDisplayTypes };
+	enum ESpanSplit { eDisabled = 0, eEnabled = 1, nSpanSplits };
 
 	void setDisplayMode(EDisplayMode eMode);
-	void setColorDepthIndex(int nIndex);
 	void setScreenSizeIndex(int nIndex);
-	void setVideoDetectMode(EVideoDetectMode eMode);
-	void setVideoInitMode(EVideoInitMode eMode);
+	void setMonitorType(EDisplayType eType);
+	void setArcRatio(float ratio);
 #ifndef NoMaxRefreshRate
 	void setMaxRefreshRateIndex(int nIndex);
 #endif	
@@ -62,15 +62,13 @@ protected:
 	// Control callback functions (must be static).
 	static void onActivate(void *pDisplayMenu);
 	static void onChangeScreenSize(tComboBoxInfo *pInfo);
-	static void onChangeColorDepth(tComboBoxInfo *pInfo);
 	static void onChangeDisplayMode(tComboBoxInfo *pInfo);
-	static void onChangeVideoDetectMode(tComboBoxInfo *pInfo);
-	static void onChangeVideoInitMode(tComboBoxInfo *pInfo);
+	static void onChangeMonitorType(tComboBoxInfo *pInfo);
+	static void onChangeArcRatio(void *pDisplayMenu);
 #ifndef NoMaxRefreshRate
 	static void onChangeMaxRefreshRate(tComboBoxInfo *pInfo);
 #endif	
 
-	static void onGarage(void *pDisplayMenu);
 	static void onAccept(void *pDisplayMenu);
 	static void onCancel(void *pDisplayMenu);
 
@@ -80,25 +78,18 @@ private:
 	int _nNbScreenSizes;
 	tScreenSize* _aScreenSizes;
 
-	//! Possible color depths (bits per pixel).
-	int _nNbColorDepths;
-	int* _aColorDepths;
-
-	//! Currently selected color depth (inside _aColorDepths).
-	int _nColorDepth;
-
 	//! Currently selected display mode.
 	EDisplayMode _eDisplayMode;
 
 	//! Currently selected screen size.
 	int _nScreenWidth;
 	int _nScreenHeight;
-	
-	//! Currently selected video features detection mode.
-	EVideoDetectMode _eVideoDetectMode;
 
-	//! Currently selected video initialization mode.
-	EVideoInitMode _eVideoInitMode;
+	EDisplayType _eDisplayType;
+	float	_fArcRatio;
+	float	_fBezelComp;
+	float	_fScreenDist;
+
 
 #ifndef NoMaxRefreshRate
 	//! Currently selected max. refresh rate (Hz).

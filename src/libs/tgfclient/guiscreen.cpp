@@ -425,10 +425,6 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
         std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_STEREOVISION,
                                  GFSCR_VAL_NO))
         == GFSCR_VAL_YES;
-    bool bTryBestVInitMode =
-        std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_VINIT,
-                                 GFSCR_VAL_VINIT_BEST))
-        == GFSCR_VAL_VINIT_BEST;
 
     if(bFullScreen)
         bfVideoMode |= SDL_WINDOW_FULLSCREEN;
@@ -437,88 +433,6 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
     // Add new values to the config OpenGL Major and Minor
     // and setup GL Major/Minor before window creation
     // SDL_GL_SetSwapInterval(1) for for vsync (may have to go AFTER window creation)
-
-    if (bTryBestVInitMode)
-    {
-        GfLogInfo("Trying 'best possible mode' for video initialization.\n");
-
-        // Detect best supported features for the specified frame buffer specs.
-        // Warning: Restarts the game if the frame buffer specs changed since last call.
-        // If specified and possible, setup the best possible settings.
-        if (GfglFeatures::self().checkBestSupport(nWinWidth, nWinHeight, nTotalDepth,
-                                                  bAlphaChannel, bFullScreen, bBumpMap, bStereo,nAniFilt,hparmScreen))
-        {
-            // Load Open GL user settings from the config file.
-            GfglFeatures::self().loadSelection();
-
-            // Setup the video mode parameters.
-            const int nColorDepth =
-                GfglFeatures::self().getSelected(GfglFeatures::ColorDepth);
-            SDL_GL_SetAttribute(SDL_GL_RED_SIZE, nColorDepth/3);
-            SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, nColorDepth/3);
-            SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, nColorDepth/3);
-            SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, nColorDepth);
-
-            const int nAlphaDepth =
-                GfglFeatures::self().getSelected(GfglFeatures::AlphaDepth);
-            SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, nAlphaDepth);
-
-            const int nDoubleBuffer =
-                GfglFeatures::self().isSelected(GfglFeatures::DoubleBuffer) ? 1 : 0;
-            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, nDoubleBuffer);
-
-            const int nMultiSampling =
-                GfglFeatures::self().isSelected(GfglFeatures::MultiSampling) ? 1 : 0;
-            SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, nMultiSampling);
-            if (nMultiSampling)
-            {
-                const int nMaxMultiSamples =
-                    GfglFeatures::self().getSelected(GfglFeatures::MultiSamplingSamples);
-                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, nMaxMultiSamples);
-            }
-
-            const int nStereoVision =
-                GfglFeatures::self().isSelected(GfglFeatures::StereoVision) ? 1 : 0;
-            SDL_GL_SetAttribute(SDL_GL_STEREO, nStereoVision);
-
-            // Try the video mode with these parameters : should always work
-            // (unless you downgraded you hardware / OS and didn't clear your config file).
-            PScreenSurface = gfScrCreateWindow(nWinWidth, nWinHeight, nTotalDepth,bfVideoMode);
-        }
-
-        // If best mode not supported, or test actually failed,
-        // revert to a supported mode (restart the game).
-        if (!PScreenSurface)
-        {
-            GfLogWarning("Failed to setup best supported video mode "
-                         "whereas previously detected !\n");
-            GfLogWarning("Tip: You should remove your %s%s file and restart,\n",
-                         GfLocalDir(), GFSCR_CONF_FILE);
-            GfLogWarning("     if something changed in your OS"
-                         " or video hardware/driver configuration.\n");
-
-            // If testing new screen specs, remember that the test failed
-            // in order to revert to the previous validated specs on restart.
-            if (std::string(pszScrPropSec) == GFSCR_SECT_INTESTPROPS)
-            {
-                GfParmSetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_TESTSTATE,
-                             GFSCR_VAL_FAILED);
-            }
-
-            // Force compatible video init. mode if not testing a new video mode.
-            else
-            {
-                GfLogWarning("Falling back to a more compatible default mode ...\n");
-                GfParmSetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_VINIT,
-                             GFSCR_VAL_VINIT_COMPATIBLE);
-            }
-            GfParmWriteFile(NULL, hparmScreen, "Screen");
-            GfParmReleaseHandle(hparmScreen);
-
-            // And restart the game.
-            GfuiApp().restart(); // Never returns.
-        }
-    }
 
     // Video initialization with generic compatible settings.
     if (!PScreenSurface)
@@ -591,14 +505,10 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
 
     // If we get here, that's because we succeeded in getting a valid video mode :-)
 
-    // If 'compatible mode' selected, detect only standard Open GL features
-    // and load OpenGL settings from the config file.
-    if (!bTryBestVInitMode)
-    {
-        GfglFeatures::self().detectStandardSupport();
-        GfglFeatures::self().dumpSupport();
-        GfglFeatures::self().loadSelection();
-    }
+    GfglFeatures::self().detectStandardSupport();
+    GfglFeatures::self().dumpSupport();
+    GfglFeatures::self().loadSelection();
+
 
     // Save view geometry and screen center.
     GfViewWidth = nWinWidth;
