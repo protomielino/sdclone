@@ -41,10 +41,6 @@ static const char* QualityValues[] = { GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_
 static const int NbQualityValues = sizeof(QualityValues) / sizeof(QualityValues[0]);
 static const char* ShadersValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_ATT_AGR_FULL, GR_ATT_AGR_HIGH, GR_ATT_AGR_ULTRA };
 static const int NbShadersValues = sizeof(ShadersValues) / sizeof(ShadersValues[0]);
-static const char* SpansplitValues[] = { GR_VAL_NO, GR_VAL_YES };
-static const int NbSpansplitValues = sizeof(SpansplitValues) / sizeof(SpansplitValues[0]);
-static const char* MonitorValues[] = { GR_VAL_MONITOR_16BY9, GR_VAL_MONITOR_4BY3, GR_VAL_MONITOR_21BY9, GR_VAL_MONITOR_NONE };
-static const int NbMonitorValues = sizeof(MonitorValues) / sizeof(MonitorValues[0]);
 
 static void	*ScrHandle = NULL;
 
@@ -52,21 +48,11 @@ static int	ShadowLabelId, ShadowLeftButtonId, ShadowRightButtonId;
 static int	TexSizeLabelId, TexSizeLeftButtonId, TexSizeRightButtonId;
 static int	QualityLabelId, QualityLeftButtonId, QualityRightButtonId;
 static int	ShadersLabelId, ShadersLeftButtonId, ShadersRightButtonId;
-static int	SpansplitLabelId, SpansplitLeftButtonId, SpansplitRightButtonId;
-static int	MonitorLabelId, MonitorLeftButtonId, MonitorRightButtonId;
 
 static int	ShadowIndex = 0;
 static int	TexSizeIndex = 0;
 static int	QualityIndex = 0;
 static int  ShadersIndex = 0;
-static int	SpansplitIndex = 0;
-static float	BezelComp = 110.0f;
-static int	BezelCompId;
-static float	ScreenDist = 1.0f;
-static int	ScreenDistId;
-static float	ArcRatio = 1.0f;
-static int	ArcRatioId;
-static int	MonitorIndex = 0;
 
 static char	buf[512];
 
@@ -125,67 +111,6 @@ loadOptions()
         }
     }
 
-    SpansplitIndex = 0; // Default value index, in case file value not found in list.
-    const char* pszSpansplit = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, GR_VAL_NO);
-
-    for (int i = 0; i < NbSpansplitValues; i++)
-    {
-        if (!strcmp(pszSpansplit, SpansplitValues[i]))
-        {
-            SpansplitIndex = i;
-            break;
-        }
-    }
-
-    BezelComp = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_BEZELCOMP, "%", 110.0f);
-    if (BezelComp > 150.0f) {
-        BezelComp = 150.0f;
-    }
-    else if (BezelComp < 50.0f) {
-        BezelComp = 50.0f;
-    }
-
-    sprintf(buf, "%g", BezelComp);
-    GfuiEditboxSetString(ScrHandle, BezelCompId, buf);
-
-    ScreenDist = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SCREENDIST, NULL, 1.0f);
-    if (ScreenDist > 5.0f)
-    {
-        ScreenDist = 5.0f;
-    }
-    else if (ScreenDist < 0.0f)
-    {
-        ScreenDist = 0.0f;
-    }
-
-    sprintf(buf, "%g", ScreenDist);
-    GfuiEditboxSetString(ScrHandle, ScreenDistId, buf);
-
-    ArcRatio = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_ARCRATIO, NULL, 1.0f);
-    if (ArcRatio > 2.0f)
-    {
-        ArcRatio = 2.0f;
-    }
-    else if (ArcRatio < 0.0f)
-    {
-        ArcRatio = 0.0f;
-    }
-
-    sprintf(buf, "%g", ArcRatio);
-    GfuiEditboxSetString(ScrHandle, ArcRatioId, buf);
-
-    MonitorIndex = 0; // Default value index, in case file value not found in list.
-    const char* pszMonitor = GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_MONITOR, GR_VAL_MONITOR_16BY9);
-
-    for (int i = 0; i < NbMonitorValues; i++)
-    {
-        if (!strcmp(pszMonitor, MonitorValues[i]))
-        {
-            MonitorIndex = i;
-            break;
-        }
-    }
-
     GfParmReleaseHandle(grHandle);
 }
 
@@ -201,11 +126,6 @@ saveOptions()
     GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SHADOW_SIZE, TexSizeValues[TexSizeIndex]);
     GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_AGR_QUALITY, QualityValues[QualityIndex]);
     GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SHADERS, ShadersValues[ShadersIndex]);
-    GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_SPANSPLIT, SpansplitValues[SpansplitIndex]);
-    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_BEZELCOMP, "%", BezelComp);
-    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SCREENDIST, NULL, ScreenDist);
-    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_ARCRATIO, NULL, ArcRatio);
-    GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_MONITOR, MonitorValues[MonitorIndex]);
 
     GfParmWriteFile(NULL, grHandle, "graph");
 
@@ -246,70 +166,6 @@ onChangeShaders(void* vp)
     GfuiLabelSetText(ScrHandle, ShadersLabelId, ShadersValues[ShadersIndex]);
 }
 
-static void
-onChangeSpansplit(void* vp)
-{
-    const long delta = (long)vp;
-    SpansplitIndex = (SpansplitIndex + NbSpansplitValues + delta) % NbSpansplitValues;
-    GfuiLabelSetText(ScrHandle, SpansplitLabelId, SpansplitValues[SpansplitIndex]);
-
-    GfuiEnable(ScrHandle, BezelCompId, SpansplitIndex ? GFUI_ENABLE : GFUI_DISABLE);
-    GfuiEnable(ScrHandle, ScreenDistId, SpansplitIndex ? GFUI_ENABLE : GFUI_DISABLE);
-    GfuiEnable(ScrHandle, ArcRatioId, SpansplitIndex ? GFUI_ENABLE : GFUI_DISABLE);
-}
-
-static void
-onChangeBezelComp(void * )
-{
-    char* val = GfuiEditboxGetString(ScrHandle, BezelCompId);
-    sscanf(val, "%g", &BezelComp);
-    if (BezelComp > 150.0f)
-        BezelComp = 150.0f;
-    else if (BezelComp < 50.0f)
-        BezelComp = 50.0f;
-
-    char buf[32];
-    sprintf(buf, "%g", BezelComp);
-    GfuiEditboxSetString(ScrHandle, BezelCompId, buf);
-}
-
-static void
-onChangeScreenDist(void * )
-{
-    char* val = GfuiEditboxGetString(ScrHandle, ScreenDistId);
-    sscanf(val, "%g", &ScreenDist);
-    if (ScreenDist > 25.0f)
-        ScreenDist = 25.0f;
-    else if (ScreenDist < 0.1f)
-        ScreenDist = 0.1f;
-
-    char buf[32];
-    sprintf(buf, "%g", ScreenDist);
-    GfuiEditboxSetString(ScrHandle, ScreenDistId, buf);
-}
-
-static void
-onChangeArcRatio(void * )
-{
-    char* val = GfuiEditboxGetString(ScrHandle, ArcRatioId);
-    sscanf(val, "%g", &ArcRatio);
-    if (ArcRatio > 2.0f)
-        ArcRatio = 2.0f;
-    else if (ArcRatio < 0.0f)
-        ArcRatio = 0.0f;
-
-    char buf[32];
-    sprintf(buf, "%g", ArcRatio);
-    GfuiEditboxSetString(ScrHandle, ArcRatioId, buf);
-}
-
-static void
-onChangeMonitor(void* vp)
-{
-    const long delta = (long)vp;
-    MonitorIndex = (MonitorIndex + NbMonitorValues + delta) % NbMonitorValues;
-    GfuiLabelSetText(ScrHandle, MonitorLabelId, MonitorValues[MonitorIndex]);
-}
 
 static void
 onActivate(void* /* dummy */)
@@ -321,11 +177,6 @@ onActivate(void* /* dummy */)
     onChangeTexSize(0);
     onChangeQuality(0);
     onChangeShaders(0);
-    onChangeSpansplit(0);
-    onChangeBezelComp(0);
-    onChangeScreenDist(0);
-    onChangeArcRatio(0);
-    onChangeMonitor(0);
 }
 
 static void
@@ -381,24 +232,6 @@ AdvancedGraphMenuInit(void* prevMenu)
     ShadersRightButtonId =
         GfuiMenuCreateButtonControl(ScrHandle, param, "carrightarrow", (void*)1, onChangeShaders);
     ShadersLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "carlabel");
-
-    SpansplitLeftButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "spansplitleftarrow", (void*)-1, onChangeSpansplit);
-    SpansplitRightButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "spansplitrightarrow", (void*)1, onChangeSpansplit);
-    SpansplitLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "spansplitlabel");
-
-    BezelCompId = GfuiMenuCreateEditControl(ScrHandle, param, "bezelcompedit", NULL, NULL, onChangeBezelComp);
-
-    ScreenDistId = GfuiMenuCreateEditControl(ScrHandle, param, "screendistedit", NULL, NULL, onChangeScreenDist);
-
-    ArcRatioId = GfuiMenuCreateEditControl(ScrHandle, param, "arcratioedit", NULL, NULL, onChangeArcRatio);
-
-    MonitorLeftButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "monitorleftarrow", (void*)-1, onChangeMonitor);
-    MonitorRightButtonId =
-        GfuiMenuCreateButtonControl(ScrHandle, param, "monitorrightarrow", (void*)1, onChangeMonitor);
-    MonitorLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "monitorlabel");
 
     GfuiMenuCreateButtonControl(ScrHandle, param, "ApplyButton", prevMenu, onAccept);
     GfuiMenuCreateButtonControl(ScrHandle, param, "CancelButton", prevMenu, onCancel);
