@@ -62,6 +62,8 @@ protected:
 	void resetColorDepths();
 	void resetScreenSizes();
 
+	bool restartNeeded();
+
 	// Control callback functions (must be static).
 	static void onActivate(void *pDisplayMenu);
 	static void onChangeScreenSize(tComboBoxInfo *pInfo);
@@ -86,10 +88,13 @@ private:
 
 	//! Currently selected display mode.
 	EDisplayMode _eDisplayMode;
+	EDisplayMode _eOriginalDisplayMode;
 
 	//! Currently selected screen size.
 	int _nScreenWidth;
 	int _nScreenHeight;
+	int _nOriginalScreenWidth;
+	int _nOriginalScreenHeight;
 
 	EDisplayType _eDisplayType;
 	float	_fArcRatio;

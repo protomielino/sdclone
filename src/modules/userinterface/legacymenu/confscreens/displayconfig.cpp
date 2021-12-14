@@ -167,11 +167,24 @@ void DisplayMenu::onAccept(void *pDisplayMenu)
 	// Save some settings to graph.xml
 	pMenu->storeGraphicSettings();
 
-    // Shutdown the user interface.
-	LegacyMenu::self().shutdown();
+	if(pMenu->restartNeeded())
+	{
+		// Shutdown the user interface.
+		LegacyMenu::self().shutdown();
 
-    // Restart the game.
-    GfuiApp().restart();
+		// Restart the game.
+		GfuiApp().restart();
+	}
+	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
+}
+
+bool DisplayMenu::restartNeeded()
+{
+	bool needRestart = ((_eDisplayMode != _eOriginalDisplayMode) 
+						|| (_nScreenWidth !=_nOriginalScreenWidth)
+						|| (_nScreenHeight != _nOriginalScreenHeight));
+
+	return needRestart;
 }
 
 void DisplayMenu::onCancel(void *pDisplayMenu)
@@ -235,11 +248,11 @@ void DisplayMenu::loadSettings()
 	// Display mode : Full-screen or Windowed.
 	const char *pszFullScreen =
 		GfParmGetStr(hScrConfParams, pszScrPropSec, GFSCR_ATT_FSCR, GFSCR_VAL_NO);
-	_eDisplayMode = strcmp(pszFullScreen, GFSCR_VAL_YES) ? eWindowed : eFullScreen;
+	_eOriginalDisplayMode = _eDisplayMode = strcmp(pszFullScreen, GFSCR_VAL_YES) ? eWindowed : eFullScreen;
 
 	// Screen / window size.
-	_nScreenWidth = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_WIN_X, NULL, 800);
-	_nScreenHeight = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_WIN_Y, NULL, 600);
+	_nOriginalScreenWidth =_nScreenWidth = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_WIN_X, NULL, 800);
+	_nOriginalScreenHeight = _nScreenHeight = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_WIN_Y, NULL, 600);
 
 #ifndef NoMaxRefreshRate
 	// Max. refresh rate (Hz).
@@ -486,10 +499,12 @@ DisplayMenu::DisplayMenu()
 	_fArcRatio = 1.0f;
 	_fBezelComp = 110.0f;
 	_fScreenDist = 1.0f;
+	_nOriginalScreenWidth = 800;
+	_nOriginalScreenHeight = 600;
+	_eOriginalDisplayMode = eWindowed;
 #ifndef NoMaxRefreshRate
 	_nMaxRefreshRate = 0;
 #endif	
-    printf("this = %p \n", this);
 }
 
 DisplayMenu::~DisplayMenu()
