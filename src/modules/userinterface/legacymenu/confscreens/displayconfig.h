@@ -52,6 +52,9 @@ public:
 	void storeSettings() const;
 	void loadSettings();
 
+	void storeGraphicSettings() const;
+	void loadGraphicSettings();
+
 	void updateControls();
 
 protected:
@@ -64,6 +67,9 @@ protected:
 	static void onChangeScreenSize(tComboBoxInfo *pInfo);
 	static void onChangeDisplayMode(tComboBoxInfo *pInfo);
 	static void onChangeMonitorType(tComboBoxInfo *pInfo);
+	static void onChangeSpansplit(tComboBoxInfo *pInfo);
+	static void onChangeBezelComp(void *pDisplayMenu);
+	static void onChangeScreenDist(void *pDisplayMenu);
 	static void onChangeArcRatio(void *pDisplayMenu);
 #ifndef NoMaxRefreshRate
 	static void onChangeMaxRefreshRate(tComboBoxInfo *pInfo);
