@@ -40,6 +40,10 @@
 #include "OsgMain.h"
 #include "tgfclient.h"
 
+#include "forcefeedback.h"
+extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
+
+
 #include <sstream>
 #include <iomanip> //setprecision
 
@@ -275,7 +279,7 @@ OSGPLOT::OSGPLOT( float positionX,
         osgTitle->setFontResolution(200,200);
 
         //set the font size
-        osgTitle->setCharacterSize(15);
+        osgTitle->setCharacterSize(20);
         osgTitle->setAlignment(osgText::Text::LEFT_BOTTOM_BASE_LINE );
 
         //asign the position
@@ -313,6 +317,7 @@ void OSGPLOT::update(tSituation *s, const SDFrameInfo* frameInfo,
     else if(this->Ydata.compare("carspeed") == 0)         y = (float)currCar->_speed_x * 3.6;
     else if(this->Ydata.compare("fpsavverrange") == 0)     y = (float)frameInfo->fAvgFps;
     else if(this->Ydata.compare("carbracketemp") == 0)     y = (float)currCar->_brakeTemp(0);
+    else if(this->Ydata.compare("forcefeedback") == 0)     y = (float)forceFeedback.force;
 
     //get z value
     float z=(float)0;
@@ -721,11 +726,11 @@ void changeImageAlpha(osg::Geometry *geom,
                         float newAlpha/*where 1.0 fully visible and 0.0 completely hidden*/
 )
 {
-	// assign colors
-	osg::Vec4Array* colors = new osg::Vec4Array(1);
-	(*colors)[0].set(1.0f,1.0f,1.0f,newAlpha);
-	geom->setColorArray(colors);
-	geom->setColorBinding(osg::Geometry::BIND_OVERALL);
+    // assign colors
+    osg::Vec4Array* colors = new osg::Vec4Array(1);
+    (*colors)[0].set(1.0f,1.0f,1.0f,newAlpha);
+    geom->setColorArray(colors);
+    geom->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 }
 
@@ -804,14 +809,16 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 #ifdef HUDDEBUG
     //update all the graphs
-    typedef std::map<std::string,OSGPLOT* >::iterator it_type;
 
-    for(it_type iterator = this->plotElements.begin(); iterator != this->plotElements.end(); ++iterator)
+    typedef std::map<std::string,OSGPLOT* >::iterator it_type;
+    for(it_type iterator = this->hudGraphElements.begin(); iterator != this->hudGraphElements.end(); ++iterator)
+
     {
            //iterator->first = key
            //iterator->second = value
            iterator->second->update(s,frameInfo,currCar);
     }
+
 #endif
 
 //board
@@ -1277,122 +1284,122 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 // tires temps
 
 
-	for (int i = 0; i < 4; i++) { //for each tires
-		
-		std::ostringstream tireName;
-		switch(i) {
-			case 0:
-				tireName << "fr-";
-			break;
-			case 1:
-				tireName << "fl-";
-			break;
-			case 2:
-				tireName << "rr-";
-			break;
-			case 3:
-				tireName <<  "rl-";
-			break;
-			default:
-				tireName << "";
-		}
-		
-		for (int h = 0; h < 3; h++) { //for each part of the tire (in-mid-out)
-			float currentTemp = 0;
-			std::string tirePartName = "";
-			switch(h) {
-				case 0:
-					tirePartName = "in";
-					currentTemp = currCar->_tyreT_in(i);
-				break;
-				case 1:
-					tirePartName = "mid";
-					currentTemp = currCar->_tyreT_mid(i);
-				break;
-				case 2:
-					tirePartName = "out";
-					currentTemp = currCar->_tyreT_out(i);
-				break;
-				default:
-					tirePartName = "";
-			}
-			
-			std::ostringstream tireNameCold;
-			std::ostringstream tireNameOptimal;
-			std::ostringstream tireNameHot;
-			
-			tireNameCold << "tire-" << tireName.str().c_str() << tirePartName.c_str() << "-cold";
-			tireNameOptimal << "tire-" << tireName.str().c_str() << tirePartName.c_str() << "-optimal";
-			tireNameHot << "tire-" << tireName.str().c_str() << tirePartName.c_str() << "-hot";
+    for (int i = 0; i < 4; i++) { //for each tires
+        
+        std::ostringstream tireName;
+        switch(i) {
+            case 0:
+                tireName << "fr-";
+            break;
+            case 1:
+                tireName << "fl-";
+            break;
+            case 2:
+                tireName << "rr-";
+            break;
+            case 3:
+                tireName <<  "rl-";
+            break;
+            default:
+                tireName << "";
+        }
+        
+        for (int h = 0; h < 3; h++) { //for each part of the tire (in-mid-out)
+            float currentTemp = 0;
+            std::string tirePartName = "";
+            switch(h) {
+                case 0:
+                    tirePartName = "in";
+                    currentTemp = currCar->_tyreT_in(i);
+                break;
+                case 1:
+                    tirePartName = "mid";
+                    currentTemp = currCar->_tyreT_mid(i);
+                break;
+                case 2:
+                    tirePartName = "out";
+                    currentTemp = currCar->_tyreT_out(i);
+                break;
+                default:
+                    tirePartName = "";
+            }
+            
+            std::ostringstream tireNameCold;
+            std::ostringstream tireNameOptimal;
+            std::ostringstream tireNameHot;
+            
+            tireNameCold << "tire-" << tireName.str().c_str() << tirePartName.c_str() << "-cold";
+            tireNameOptimal << "tire-" << tireName.str().c_str() << tirePartName.c_str() << "-optimal";
+            tireNameHot << "tire-" << tireName.str().c_str() << tirePartName.c_str() << "-hot";
 
-			float optimalAlpha = 0.0f;
-			float hotAlpha = 0.0f;
+            float optimalAlpha = 0.0f;
+            float hotAlpha = 0.0f;
 
-			float tempOptimal = currCar->_tyreT_opt(i);
-			float tempMaxCold = tempOptimal - ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun cold
-			float tempMaxHot = tempOptimal + ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun hot
+            float tempOptimal = currCar->_tyreT_opt(i);
+            float tempMaxCold = tempOptimal - ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun cold
+            float tempMaxHot = tempOptimal + ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun hot
 
 
-			changeImageAlpha(this->hudImgElements[tireNameCold.str().c_str()], 1.0f);
-			optimalAlpha = (currentTemp-tempMaxCold) / (tempOptimal-tempMaxCold);
-			if (optimalAlpha > 1.0f){
-				optimalAlpha = 1.0f;
-			}
-			if (optimalAlpha < 0.0f){
-				optimalAlpha = 0.0f;
-			}
-			changeImageAlpha(this->hudImgElements[tireNameOptimal.str().c_str()], optimalAlpha);
-			
-			
-			hotAlpha = (tempMaxHot-currentTemp) / (tempMaxHot-tempOptimal);
-			if (hotAlpha > 1.0f){
-				hotAlpha = 1.0f;
-			}
-			if (hotAlpha < 0.0f){
-				hotAlpha = 0.0f;
-			}
+            changeImageAlpha(this->hudImgElements[tireNameCold.str().c_str()], 1.0f);
+            optimalAlpha = (currentTemp-tempMaxCold) / (tempOptimal-tempMaxCold);
+            if (optimalAlpha > 1.0f){
+                optimalAlpha = 1.0f;
+            }
+            if (optimalAlpha < 0.0f){
+                optimalAlpha = 0.0f;
+            }
+            changeImageAlpha(this->hudImgElements[tireNameOptimal.str().c_str()], optimalAlpha);
+            
+            
+            hotAlpha = (tempMaxHot-currentTemp) / (tempMaxHot-tempOptimal);
+            if (hotAlpha > 1.0f){
+                hotAlpha = 1.0f;
+            }
+            if (hotAlpha < 0.0f){
+                hotAlpha = 0.0f;
+            }
 
-			changeImageAlpha(this->hudImgElements[tireNameHot.str().c_str()], 1.0-hotAlpha);
-		}
-		//temps string only do this for middle temps?
-		temp.str("");
-		//internally the tire temp is in KELVIN
-		int tireTempInCelsius = currCar->_tyreT_mid(i)- 273.15;
-		temp << tireTempInCelsius << " C";
+            changeImageAlpha(this->hudImgElements[tireNameHot.str().c_str()], 1.0-hotAlpha);
+        }
+        //temps string only do this for middle temps?
+        temp.str("");
+        //internally the tire temp is in KELVIN
+        int tireTempInCelsius = currCar->_tyreT_mid(i)- 273.15;
+        temp << tireTempInCelsius << " C";
 
-		std::ostringstream tireNameText;
-		tireNameText << "tire-" << tireName.str().c_str()  << "temps";
-		hudTextElements[tireNameText.str().c_str()]->setText(temp.str());
-	
-	}
+        std::ostringstream tireNameText;
+        tireNameText << "tire-" << tireName.str().c_str()  << "temps";
+        hudTextElements[tireNameText.str().c_str()]->setText(temp.str());
+    
+    }
 
 // tire wear
-	changeImageSize(this->hudImgElements["tire-degradation-fr-on"], currCar->_tyreTreadDepth(0), "bottom", this->hudScale);
-	changeImageSize(this->hudImgElements["tire-degradation-fl-on"], currCar->_tyreTreadDepth(1), "bottom", this->hudScale);
-	changeImageSize(this->hudImgElements["tire-degradation-rr-on"], currCar->_tyreTreadDepth(2), "bottom", this->hudScale);
-	changeImageSize(this->hudImgElements["tire-degradation-rl-on"], currCar->_tyreTreadDepth(3), "bottom", this->hudScale);
+    changeImageSize(this->hudImgElements["tire-degradation-fr-on"], currCar->_tyreTreadDepth(0), "bottom", this->hudScale);
+    changeImageSize(this->hudImgElements["tire-degradation-fl-on"], currCar->_tyreTreadDepth(1), "bottom", this->hudScale);
+    changeImageSize(this->hudImgElements["tire-degradation-rr-on"], currCar->_tyreTreadDepth(2), "bottom", this->hudScale);
+    changeImageSize(this->hudImgElements["tire-degradation-rl-on"], currCar->_tyreTreadDepth(3), "bottom", this->hudScale);
 
 //tire slip
-	float slip = 0.0f;
-	slip = currCar->_wheelSlipNorm(0)/currCar->_wheelSlipOpt(0);
-	changeImageAlpha(this->hudImgElements["tire-fr-slip"], slip);
-	slip = currCar->_wheelSlipNorm(1)/currCar->_wheelSlipOpt(1);
-	changeImageAlpha(this->hudImgElements["tire-fl-slip"], slip);
-	slip = currCar->_wheelSlipNorm(2)/currCar->_wheelSlipOpt(2);
-	changeImageAlpha(this->hudImgElements["tire-rr-slip"], slip);
-	slip = currCar->_wheelSlipNorm(3)/currCar->_wheelSlipOpt(3);
-	changeImageAlpha(this->hudImgElements["tire-rl-slip"], slip);
+    float slip = 0.0f;
+    slip = currCar->_wheelSlipNorm(0)/currCar->_wheelSlipOpt(0);
+    changeImageAlpha(this->hudImgElements["tire-fr-slip"], slip);
+    slip = currCar->_wheelSlipNorm(1)/currCar->_wheelSlipOpt(1);
+    changeImageAlpha(this->hudImgElements["tire-fl-slip"], slip);
+    slip = currCar->_wheelSlipNorm(2)/currCar->_wheelSlipOpt(2);
+    changeImageAlpha(this->hudImgElements["tire-rr-slip"], slip);
+    slip = currCar->_wheelSlipNorm(3)/currCar->_wheelSlipOpt(3);
+    changeImageAlpha(this->hudImgElements["tire-rl-slip"], slip);
 
 //gforces
-	osg::BoundingBox gforcegraphbb =hudImgElements["gforces-graph"]->getBoundingBox();
-	osg::BoundingBox gforcedotbb = hudImgElements["gforces-dot"]->getBoundingBox();
-	osg::Vec3f position = calculatePosition(gforcedotbb,"mc",gforcegraphbb,"mc", 0.0f, 0.0f);
-	changeImagePosition(
-		this->hudImgElements["gforces-dot"],
-		gforcegraphbb.xMin()+position.x()+currCar->_DynGC.acc.y * 5 * 1,//horizontal
-		gforcegraphbb.yMin()+position.y()+currCar->_DynGC.acc.x * 5 * -1,//vertical
-		this->hudScale
-	);
+    osg::BoundingBox gforcegraphbb =hudImgElements["gforces-graph"]->getBoundingBox();
+    osg::BoundingBox gforcedotbb = hudImgElements["gforces-dot"]->getBoundingBox();
+    osg::Vec3f position = calculatePosition(gforcedotbb,"mc",gforcegraphbb,"mc", 0.0f, 0.0f);
+    changeImagePosition(
+        this->hudImgElements["gforces-dot"],
+        gforcegraphbb.xMin()+position.x()+currCar->_DynGC.acc.y * 5 * 1,//horizontal
+        gforcegraphbb.yMin()+position.y()+currCar->_DynGC.acc.x * 5 * -1,//vertical
+        this->hudScale
+    );
 
 // debug info
     temp.str("");
@@ -1971,6 +1978,35 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                                 GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
                                 refObjBb = screenBB;
                             }
+                            
+                            //calculate our bounding box
+                            osg::BoundingBox plotBB;
+                            plotBB.expandBy(osg::Vec3(0.0f,0.0f,0.0f));
+                            plotBB.expandBy(osg::Vec3(width,height,0.0f));
+
+                              //calculate the positioning
+                            osg::Vec3 position = calculatePosition(plotBB,positionMyPoint,refObjBb,positionRefObjPoint, positionVerticalModifier, positionHorizontalModifier);
+
+                            float positionX = position.x();
+                            float positionY = position.y();
+
+                            //istantiate the graph
+                            this->hudGraphElements[elementId] = new OSGPLOT(
+                                positionX,
+                                positionY,
+                                width,
+                                height,
+                                maxValue,
+                                minValue,
+                                timeFrame,
+                                referenceLineAtValue,
+                                Xdata.c_str(),
+                                Ydata.c_str(),
+                                title.c_str()
+                            );
+
+                            this->osgGroupHud->addChild(this->hudGraphElements[elementId]->getGroup());
+
                         }
                         else
                         {

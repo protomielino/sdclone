@@ -23,7 +23,6 @@
 #include <raceman.h>    // tSituation
 
 #include <osg/Camera>
-//#include <osgText/Text>
 
 class SDFrameInfo;
 
@@ -66,8 +65,6 @@ class OSGPLOT
 
     osg::Geometry* osgReferencePlotLineGeometry;
     osg::Vec3Array* osgReferencePlotLineVertices;
-
-    //osgText::Text* osgTitle;
 
     osg::ref_ptr<osg::Group> osgGroup;
 
@@ -132,8 +129,8 @@ class SDHUD
         std::map<std::string,osg::Geode* > hudWidgets;
         std::map<std::string,osg::Geometry* > hudImgElements;
         std::map<std::string,osg::MatrixTransform* > hudImgRotableElements;
-        std::map<std::string,osg::ref_ptr <osg::Group> > hudGraphElements;
-
+        std::map<std::string,OSGPLOT* > hudGraphElements;
+        
 #ifdef HUDDEBUG
         std::map<std::string,OSGPLOT* > plotElements;
 #endif
