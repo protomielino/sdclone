@@ -1738,10 +1738,12 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             {
                                 refObjBb = this->hudImgElements[positionRefObj.c_str()]->getBoundingBox();
                             }
+#ifdef HUDDEBUG
                             else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() )
                             {
                                 //refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
                             }
+#endif
                             else
                             {
                                 GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
@@ -1822,10 +1824,12 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             {
                                 refObjBb = this->hudImgElements[positionRefObj.c_str()]->getBoundingBox();
                             }
+#ifdef HUDDEBUG
                             else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() )
                             {
                                 //refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
                             }
+#endif
                             else
                             {
                                 GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
@@ -1932,6 +1936,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                         }
                         else if( type == "graph")
                         {
+#ifdef HUDDEBUG
                             /* ============================
                                  CREATE OSG GRAPH
                                ============================*/
@@ -1969,10 +1974,12 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             {
                                 refObjBb = this->hudImgElements[positionRefObj.c_str()]->getBoundingBox();
                             }
+
                             else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() )
                             {
                                 //refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
                             }
+
                             else
                             {
                                 GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
@@ -2006,7 +2013,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             );
 
                             this->osgGroupHud->addChild(this->hudGraphElements[elementId]->getGroup());
-
+#endif
                         }
                         else
                         {
@@ -2042,5 +2049,7 @@ SDHUD::~SDHUD()
     //do some cleanup
     hudTextElements.clear();
     this->hudImgElements.clear();
+#ifdef HUDDEBUG
     this->hudGraphElements.clear();
+#endif
 }

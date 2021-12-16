@@ -129,10 +129,9 @@ class SDHUD
         std::map<std::string,osg::Geode* > hudWidgets;
         std::map<std::string,osg::Geometry* > hudImgElements;
         std::map<std::string,osg::MatrixTransform* > hudImgRotableElements;
-        std::map<std::string,OSGPLOT* > hudGraphElements;
         
 #ifdef HUDDEBUG
-        std::map<std::string,OSGPLOT* > plotElements;
+        std::map<std::string,OSGPLOT* > hudGraphElements;
 #endif
 
     public:
