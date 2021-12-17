@@ -106,8 +106,8 @@ void ForceFeedbackManager::readConfiguration(const std::string &carName){
 void ForceFeedbackManager::readConfigurationFromFileSection(const std::string &configFileUrl, const std::string &effectsSectionPath){
 
     std::vector<std::string> effectSectionsPath;
-    std::string subSectionPath = "";
-    std::string subSectionName = "";
+    std::string subSectionPath;
+    std::string subSectionName;
     int paramValue = 0;
 
     //open the file
@@ -167,7 +167,7 @@ void ForceFeedbackManager::saveConfiguration(){
             // iterator2->first = key (effect parameter name)
             // iterator2->second = value (effect value)
 
-            std::string effectPath = "";
+            std::string effectPath;
 
             //if the param name start with a "_" it is an internal one and so should not be saved on the pref file
             if ( iterator2->first.compare(0,1,"_") == 0){

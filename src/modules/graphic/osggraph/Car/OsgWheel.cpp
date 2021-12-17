@@ -81,7 +81,7 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
 
     const bool bCustomSkin = strlen(this->car->_skinName) != 0;
 
-    std::string bSkinName = "";
+    std::string bSkinName;
     std::string TmpPath = GetDataDir();
 
     if (bCustomSkin)

@@ -181,7 +181,7 @@ rmForceFeedbackConfigHookActivate(void * /* dummy */)
     snprintf(buf, sizeof(buf), "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, curPlayerIdx);
 
 
-    std::string carName = "";
+    std::string carName;
 
     //Find human cars
     tRmInfo* pCurrReInfo = LmRaceEngine().inData();

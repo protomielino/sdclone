@@ -48,7 +48,7 @@ extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
 #include <iomanip> //setprecision
 
 //string constants for dashboard
-static std::string strEmpty("");
+static std::string strEmpty;
 static std::string strBrakeRep("F/R Brake Rep.");
 static std::string strFrontARB("Front ARB");
 static std::string strRearARB("Rear ARB");
@@ -1306,7 +1306,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         
         for (int h = 0; h < 3; h++) { //for each part of the tire (in-mid-out)
             float currentTemp = 0;
-            std::string tirePartName = "";
+            std::string tirePartName;
             switch(h) {
                 case 0:
                     tirePartName = "in";
@@ -1606,11 +1606,11 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
     screenBB.expandBy(osg::Vec3(scrW,scrH,0.0f));
 
     std::string mainSection= "widgets";
-    std::string widgetsSectionPath= "";
+    std::string widgetsSectionPath;
     std::string widgetsSectionName= "widgets";
-    std::string sectionPath= "";
-    std::string subSectionPath = "";
-    std::string subSectionName = "";
+    std::string sectionPath;
+    std::string subSectionPath;
+    std::string subSectionName;
 
     std::string configFileUrl= GetLocalDir();
     configFileUrl.append("config/osghudconfig.xml");

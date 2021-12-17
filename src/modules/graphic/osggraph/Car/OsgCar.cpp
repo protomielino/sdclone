@@ -176,8 +176,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     const bool bMasterModel = strlen(this->car->_masterModel) != 0;
     const bool bCustomSkin = strlen(this->car->_skinName) != 0;
 
-    std::string bSkinName = "";
-    std::string bCarName = "";
+    std::string bSkinName;
+    std::string bCarName;
 
     static const int nMaxTexPathSize = 512;
     char buf[nMaxTexPathSize];

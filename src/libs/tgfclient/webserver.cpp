@@ -759,7 +759,7 @@ int WebServer::sendLogin (int userId)
     
     std::string username="username";
     std::string password="password";
-    std::string emptyString="";
+    std::string emptyString;
     
     //if the user has not setup the webserver login info abort the login
     if((username==this->username && password==this->password) || this->username==emptyString || this->password==emptyString){
@@ -781,17 +781,16 @@ int WebServer::sendLogin (const char* username, const char* password)
     std::string serverReply;
 
     //prepare the string to send
-    std::string dataToSend ("");
-    dataToSend.append(	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                        "<content>"
-                        "<request_id>{{request_id}}</request_id>"
-                        "<request>"
-                        "<login>"
-                        "<username>{{username}}</username>"
-                        "<password>{{password}}</password>"
-                        "</login>"
-                        "</request>"
-                        "</content>");
+    std::string dataToSend("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                           "<content>"
+                           "<request_id>{{request_id}}</request_id>"
+                           "<request>"
+                           "<login>"
+                           "<username>{{username}}</username>"
+                           "<password>{{password}}</password>"
+                           "</login>"
+                           "</request>"
+                           "</content>");
 
     //replace the {{tags}} with the respecting values
     replaceAll(dataToSend, "{{username}}", username);
@@ -823,20 +822,19 @@ int WebServer::sendLap (int race_id, double laptime, double fuel, int position, 
     }
 */
     //prepare the string to send
-    std::string dataToSend ("");
-    dataToSend.append(	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                        "<content>"
-                        "<request_id>{{request_id}}</request_id>"
-                        "<request>"
-                        "<laps>"
-                        "<race_id>{{race_id}}</race_id>"
-                        "<laptime>{{laptime}}</laptime>"
-                        "<fuel>{{fuel}}</fuel>"
-                        "<position>{{position}}</position>"
-                        "<wettness>{{wettness}}</wettness>"
-                        "</laps>"
-                        "</request>"
-                        "</content>");
+    std::string dataToSend("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                           "<content>"
+                           "<request_id>{{request_id}}</request_id>"
+                           "<request>"
+                           "<laps>"
+                           "<race_id>{{race_id}}</race_id>"
+                           "<laptime>{{laptime}}</laptime>"
+                           "<fuel>{{fuel}}</fuel>"
+                           "<position>{{position}}</position>"
+                           "<wettness>{{wettness}}</wettness>"
+                           "</laps>"
+                           "</request>"
+                           "</content>");
 
     //replace the {{tags}} with the respecting values
     //The following tags will be replaced later because some other request must be done before: {{race_id}}
@@ -934,17 +932,16 @@ int WebServer::sendRaceEnd (int race_id, int endposition)
 */
     //Sanity-checks passed we continue
     //prepare the string to send
-    std::string dataToSend ("");
-    dataToSend.append(	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                        "<content>"
-                        "<request_id>{{request_id}}</request_id>"
-                        "<request>"
-                        "<races>"
-                        "<id>{{race_id}}</id>"
-                        "<endposition>{{endposition}}</endposition>"
-                        "</races>"
-                        "</request>"
-                        "</content>");
+    std::string dataToSend("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                           "<content>"
+                           "<request_id>{{request_id}}</request_id>"
+                           "<request>"
+                           "<races>"
+                           "<id>{{race_id}}</id>"
+                           "<endposition>{{endposition}}</endposition>"
+                           "</races>"
+                           "</request>"
+                           "</content>");
 
     //replace the {{tags}} with the respecting values
     //The following tags will be replaced later because some other request must be done before: {{race_id}}

@@ -254,7 +254,7 @@ void GfLogger::setup()
 }
 
 GfLogger::GfLogger()
-  : _strName(""), _bfHdrCols(0), _pStream(0), _nLvlThresh(0), _bNeedsHeader(true)
+  : _bfHdrCols(0), _pStream(0), _nLvlThresh(0), _bNeedsHeader(true)
 {
 }
 

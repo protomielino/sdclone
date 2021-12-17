@@ -227,7 +227,7 @@ void SDScenery::ShutdownScene(void)
 
 bool SDScenery::LoadTrack(std::string& strTrack)
 {
-    std::string name = "";
+    std::string name;
     GfLogDebug("Track Path : %s\n", strTrack.c_str());
     osgLoader loader;
     GfLogDebug("Texture Path : %s\n", _strTexturePath.c_str());
