@@ -177,7 +177,7 @@ GetTrackName(const char *category, const char *trackName)
         name = GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_NAME, trackName);
     } else {
         GfTrace("Could not read file %s\n", buf);
-        return 0;
+        return name;
     }
 
     GfParmReleaseHandle(trackHandle);
