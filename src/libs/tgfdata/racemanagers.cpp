@@ -196,7 +196,7 @@ void GfRaceManagers::print(bool bVerbose) const
 	{
 		GfLogTrace("  %s type :\n", itType->c_str());
 		const std::vector<GfRaceManager*> vecRaceMans =
-			getRaceManagersWithType(itType->c_str());
+			getRaceManagersWithType(*itType);
 		std::vector<GfRaceManager*>::const_iterator itRaceMan;
 		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); ++itRaceMan)
 		{

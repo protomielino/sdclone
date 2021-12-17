@@ -152,10 +152,10 @@ void NotificationManager::startNewNotification(){
     this->animationDirection=1;
 
     //retrieve the message to display
-    std::string newText = this->msglist.front().c_str();
+    std::string newText = this->msglist.front();
 
     //divide the current message in lines
-    this->messageLines = split(this->msglist.front().c_str(), '\n');
+    this->messageLines = split(this->msglist.front(), '\n');
 
     //reset the start time(s)
     this->animationStartTime = this->animationLastExecTime = std::clock();

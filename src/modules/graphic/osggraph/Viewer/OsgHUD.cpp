@@ -1683,7 +1683,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 
                             //extract and apply the color
                             {
-                                std::vector<std::string> colorStringVector = split(colorString.c_str(), '#');
+                                std::vector<std::string> colorStringVector = split(colorString, '#');
 
                                 osg::Vec4 color = osg::Vec4(
                                     std::atof(colorStringVector[0].c_str()),
@@ -1724,24 +1724,24 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             }
 
                             //set the text string
-                            text->setText(textStr.c_str());
+                            text->setText(textStr);
 
                             //set the position
                             //find the referenceObj pointer and then get his bounding box
                             osg::BoundingBox refObjBb;
 
-                            if ( hudTextElements.find(positionRefObj.c_str()) != hudTextElements.end() )
+                            if ( hudTextElements.find(positionRefObj) != hudTextElements.end() )
                             {
-                                refObjBb = hudTextElements[positionRefObj.c_str()]->getBoundingBox();
+                                refObjBb = hudTextElements[positionRefObj]->getBoundingBox();
                             }
-                            else if ( this->hudImgElements.find(positionRefObj.c_str()) != this->hudImgElements.end() )
+                            else if ( this->hudImgElements.find(positionRefObj) != this->hudImgElements.end() )
                             {
-                                refObjBb = this->hudImgElements[positionRefObj.c_str()]->getBoundingBox();
+                                refObjBb = this->hudImgElements[positionRefObj]->getBoundingBox();
                             }
 #ifdef HUDDEBUG
-                            else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() )
+                            else if ( this->hudGraphElements.find(positionRefObj) != this->hudGraphElements.end() )
                             {
-                                //refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
+                                //refObjBb = this->hudGraphElements[positionRefObj]->getBoundingBox();
                             }
 #endif
                             else
@@ -1816,18 +1816,18 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             //set the position
                             //find the referenceObj pointer and then get his bounding box
                             osg::BoundingBox refObjBb;
-                            if ( hudTextElements.find(positionRefObj.c_str()) != hudTextElements.end() )
+                            if ( hudTextElements.find(positionRefObj) != hudTextElements.end() )
                             {
-                                refObjBb = hudTextElements[positionRefObj.c_str()]->getBoundingBox();
+                                refObjBb = hudTextElements[positionRefObj]->getBoundingBox();
                             }
-                            else if ( this->hudImgElements.find(positionRefObj.c_str()) != this->hudImgElements.end() )
+                            else if ( this->hudImgElements.find(positionRefObj) != this->hudImgElements.end() )
                             {
-                                refObjBb = this->hudImgElements[positionRefObj.c_str()]->getBoundingBox();
+                                refObjBb = this->hudImgElements[positionRefObj]->getBoundingBox();
                             }
 #ifdef HUDDEBUG
-                            else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() )
+                            else if ( this->hudGraphElements.find(positionRefObj) != this->hudGraphElements.end() )
                             {
-                                //refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
+                                //refObjBb = this->hudGraphElements[positionRefObj]->getBoundingBox();
                             }
 #endif
                             else
@@ -1966,18 +1966,18 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             //calculate position
                             //find the referenceObj pointer and then get his bounding box
                             osg::BoundingBox refObjBb;
-                            if ( hudTextElements.find(positionRefObj.c_str()) != hudTextElements.end() )
+                            if ( hudTextElements.find(positionRefObj) != hudTextElements.end() )
                             {
-                                refObjBb = hudTextElements[positionRefObj.c_str()]->getBoundingBox();
+                                refObjBb = hudTextElements[positionRefObj]->getBoundingBox();
                             }
-                            else if ( this->hudImgElements.find(positionRefObj.c_str()) != this->hudImgElements.end() )
+                            else if ( this->hudImgElements.find(positionRefObj) != this->hudImgElements.end() )
                             {
-                                refObjBb = this->hudImgElements[positionRefObj.c_str()]->getBoundingBox();
+                                refObjBb = this->hudImgElements[positionRefObj]->getBoundingBox();
                             }
 
-                            else if ( this->hudGraphElements.find(positionRefObj.c_str()) != this->hudGraphElements.end() )
+                            else if ( this->hudGraphElements.find(positionRefObj) != this->hudGraphElements.end() )
                             {
-                                //refObjBb = this->hudGraphElements[positionRefObj.c_str()]->getBoundingBox();
+                                //refObjBb = this->hudGraphElements[positionRefObj]->getBoundingBox();
                             }
 
                             else
@@ -2007,9 +2007,9 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                                 minValue,
                                 timeFrame,
                                 referenceLineAtValue,
-                                Xdata.c_str(),
-                                Ydata.c_str(),
-                                title.c_str()
+                                Xdata,
+                                Ydata,
+                                title
                             );
 
                             this->osgGroupHud->addChild(this->hudGraphElements[elementId]->getGroup());

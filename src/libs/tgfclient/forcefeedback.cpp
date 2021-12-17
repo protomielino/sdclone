@@ -179,21 +179,21 @@ void ForceFeedbackManager::saveConfiguration(){
                 //global settings
                 //save global setting in the default section
                 effectPath.append("/forceFeedback/default/effectsConfig/");
-                effectPath.append(iterator->first.c_str());
+                effectPath.append(iterator->first);
             }else{
                 //car specific settings
 
                 //is the value the same as the global default config?
                 //if yes do not save in the car specific (it is already stored in the gloabl config)
                 //so if in the future we change the global value the change will be used by all cars that has no (different) specific value
-                if(	this->effectsConfigDefault[iterator->first.c_str()][iterator2->first.c_str()] == iterator2->second){
+                if(	this->effectsConfigDefault[iterator->first][iterator2->first] == iterator2->second){
                     continue;
                 }
 
                 //save other settings in car specific section
                 effectPath.append(effectsSectionPathSpecific);
                 effectPath.append("/");
-                effectPath.append(iterator->first.c_str());
+                effectPath.append(iterator->first);
             }
 
 

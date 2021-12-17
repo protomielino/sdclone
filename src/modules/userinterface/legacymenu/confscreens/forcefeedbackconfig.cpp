@@ -177,8 +177,8 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, const st
 			// iterator2->second = value (effect value)
 	
 			editBoxName.clear();
-			editBoxName.append(iterator->first.c_str());
-			editBoxName.append(iterator2->first.c_str());
+			editBoxName.append(iterator->first);
+			editBoxName.append(iterator2->first);
 
 			sectionName = "dynamic controls/";
 			sectionName.append(editBoxName);
@@ -206,8 +206,8 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, const st
 					//save this data for later use
 					EditBox editbox;
 					editbox.id = checkboxId;
-					editbox.effectTypeName = iterator->first.c_str();
-					editbox.effectParameterName = iterator2->first.c_str();
+					editbox.effectTypeName = iterator->first;
+					editbox.effectParameterName = iterator2->first;
 
 					//add it to our list
 					EditBoxes.push_back(editbox);	
@@ -229,8 +229,8 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, const st
 					//save this data for later use
 					EditBox editbox;
 					editbox.id = editBoxId;
-					editbox.effectTypeName = iterator->first.c_str();
-					editbox.effectParameterName = iterator2->first.c_str();
+					editbox.effectTypeName = iterator->first;
+					editbox.effectParameterName = iterator2->first;
 					
 					//add it to our list
 					EditBoxes.push_back(editbox);					

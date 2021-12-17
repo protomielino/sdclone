@@ -148,7 +148,7 @@ RmRaceSelectInit(void *prevMenu)
 	{
 		// Get the racemanagers with this type
 		const std::vector<GfRaceManager*> vecRaceMans =
-			GfRaceManagers::self()->getRaceManagersWithType(itRaceManType->c_str());
+			GfRaceManagers::self()->getRaceManagersWithType(*itRaceManType);
 
 		// Create the race manager type button.
 		std::string strButtonCtrlName(*itRaceManType);

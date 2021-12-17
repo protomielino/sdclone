@@ -318,7 +318,7 @@ bool StandardGame::loadPhysicsEngine()
 
 	// 2) Check if the module is really there, and fall back to the default one if not
 	//    Note : The default module is supposed to be always there.
-	if (!GfModule::isPresent("simu", strModName.c_str()))
+	if (!GfModule::isPresent("simu", strModName))
 	{
 		GfLogWarning("User settings %s physics engine module not found ; "
 					 "falling back to %s\n", strModName.c_str(), pszDefaultModName);
@@ -331,7 +331,7 @@ bool StandardGame::loadPhysicsEngine()
 	if (_piUserItf)
 		_piUserItf->addLoadingMessage(ossLoadMsg.str().c_str());
 
-	GfModule* pmodPhysEngine = GfModule::load("modules/simu", strModName.c_str());
+	GfModule* pmodPhysEngine = GfModule::load("modules/simu", strModName);
 	if (pmodPhysEngine)
 		_piPhysEngine = pmodPhysEngine->getInterface<IPhysicsEngine>();
 	if (pmodPhysEngine && !_piPhysEngine)
