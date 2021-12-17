@@ -175,7 +175,7 @@ void ForceFeedbackManager::saveConfiguration(){
             }
 
             //are we saving car specific settings o global ones?
-            if ( iterator->first.compare("globalEffect") == 0 ){
+            if ( iterator->first == "globalEffect"){
                 //global settings
                 //save global setting in the default section
                 effectPath.append("/forceFeedback/default/effectsConfig/");

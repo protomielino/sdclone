@@ -309,15 +309,15 @@ void OSGPLOT::update(tSituation *s, const SDFrameInfo* frameInfo,
 {
     //get x value
     float x = 0;
-    if(this->Xdata.compare("time") == 0) x = (float)GfTimeClock();
+    if(this->Xdata == "time") x = (float)GfTimeClock();
 
     //get y value
     float y = 0;
-    if(this->Ydata.compare("fps") == 0)                    y = (float)frameInfo->fInstFps;
-    else if(this->Ydata.compare("carspeed") == 0)         y = (float)currCar->_speed_x * 3.6;
-    else if(this->Ydata.compare("fpsavverrange") == 0)     y = (float)frameInfo->fAvgFps;
-    else if(this->Ydata.compare("carbracketemp") == 0)     y = (float)currCar->_brakeTemp(0);
-    else if(this->Ydata.compare("forcefeedback") == 0)     y = (float)forceFeedback.force;
+    if(this->Ydata == "fps")                    y = (float)frameInfo->fInstFps;
+    else if(this->Ydata == "carspeed")          y = (float)currCar->_speed_x * 3.6;
+    else if(this->Ydata == "fpsavverrange")     y = (float)frameInfo->fAvgFps;
+    else if(this->Ydata == "carbracketemp")     y = (float)currCar->_brakeTemp(0);
+    else if(this->Ydata == "forcefeedback")     y = (float)forceFeedback.force;
 
     //get z value
     float z=(float)0;
