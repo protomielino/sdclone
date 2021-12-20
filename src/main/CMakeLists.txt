@@ -54,3 +54,13 @@ IF(WIN32)
 	INCLUDE(customthirdparty)
 	SD_INSTALL_CUSTOM_3RDPARTY(${_TARGET_NAME})
 ENDIF(WIN32)
+
+# To avoid 'undefined reference to glActiveTextureARB [--no-allow-shlib-undefined]'
+IF(UNIX AND NOT APPLE)
+	IF(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		 target_link_options(${_TARGET_NAME} PRIVATE -Wl,--allow-shlib-undefined)
+	ENDIF(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	target_link_options(${_TARGET_NAME} PRIVATE -Wl,-E)
+ENDIF(UNIX AND NOT APPLE)
+
+

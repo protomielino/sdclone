@@ -54,6 +54,12 @@
 
 #include "os.h"
 
+#if defined(__FreeBSD__)
+#include <sys/cpuset.h>
+typedef cpuset_t cpu_set_t;
+#include <pthread_np.h>
+#endif
+
 static const size_t SOFileExtLen = strlen("." DLLEXT);
 static const size_t SOPathLenMax = 1024;
 
@@ -632,8 +638,8 @@ unsigned linuxGetNumberOfCPUs()
 	if (nCPUs == 0)
 	{
 		
-		// MacOS X, FreeBSD, OpenBSD, NetBSD, etc ...
-#if (defined(__APPLE__) && !defined(USE_MACPORTS)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+		// MacOS X, OpenBSD, NetBSD, etc ...
+#if (defined(__APPLE__) && !defined(USE_MACPORTS)) || defined(__OpenBSD__) || defined(__NetBSD__)
 		
 		nt mib[4];
 		size_t len; 
@@ -653,8 +659,8 @@ unsigned linuxGetNumberOfCPUs()
 			sysctl(mib, 2, &nCPUs, &len, NULL, 0);
 		}
 		
-		// Linux, Solaris, AIX
-#elif defined(linux) || defined(__linux__) || defined(USE_MACPORTS)
+		// Linux, FreeBSD, Solaris, AIX
+#elif defined(__FreeBSD__) || defined(linux) || defined(__linux__) || defined(USE_MACPORTS)
 		
 		nCPUs = (unsigned)sysconf(_SC_NPROCESSORS_ONLN);
 		
@@ -711,14 +717,14 @@ std::string cpuSet2String(const cpu_set_t* pCPUSet)
 bool
 linuxSetThreadAffinity(int nCPUId)
 {
-	// MacOS X, FreeBSD, OpenBSD, NetBSD, etc ...
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__HAIKU__)
+	// MacOS X, OpenBSD, NetBSD, etc ...
+#if defined(__APPLE__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__HAIKU__)
 	
 	GfLogWarning("Thread affinity not yet implemented on Mac OS X or BSD or Haiku.\n");
 	// TODO.
 	
-	// Linux, Solaris, AIX ... with NPTL (Native POSIX Threads Library)
-#elif defined(linux) || defined(__linux__)
+	// Linux, FreeBSD, Solaris, AIX ... with NPTL (Native POSIX Threads Library)
+#elif defined(linux) || defined(__linux__) || defined(__FreeBSD__)
 	
 	// Get the handle for the current thread.
 	pthread_t hCurrThread = pthread_self();

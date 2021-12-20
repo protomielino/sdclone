@@ -103,3 +103,10 @@ ENDIF(UNIX)
 
 SD_INSTALL_FILES(INCLUDE FILES glfeatures.h guiscreen.h tgfclient.h)
 
+# To avoid 'undefined reference to glActiveTextureARB [--no-allow-shlib-undefined]'
+IF(UNIX AND NOT APPLE)
+	IF(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		 target_link_options(tgfclient PRIVATE -Wl,--allow-shlib-undefined)
+	ENDIF(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+ENDIF(UNIX AND NOT APPLE)
+
