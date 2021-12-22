@@ -334,15 +334,9 @@ InitScene(tTrack *Track, void *TrackHandle, int bump, int raceline)
     width = Track->width;
     //wi2 = width / 2.0; // Never used.
 
-	double rlWidthScale = 1.0;
-	double rlOffset = 0.0;
-
 	if (raceline) {
 		double SideDistExt = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLEXT, (char*)NULL, 2.0);
 		double SideDistInt = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLINT, (char*)NULL, 2.0);
-		rlWidthScale = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLWIDTHSCALE, (char*)NULL, 1.0);
-		rlOffset = (1.0 - 1.0 / rlWidthScale) / 2.0;
-
 		generateRaceLine(Track, SideDistExt, SideDistInt);
 	}
 	trkpos.type = TR_LPOS_MAIN;

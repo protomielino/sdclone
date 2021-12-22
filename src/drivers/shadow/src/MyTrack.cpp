@@ -227,10 +227,6 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
                 {
                     double	w = pSide->startWidth +
                             (pSide->endWidth - pSide->startWidth) * t;
-                    float slope = pSide->height/pSide->width;
-                    bool outer = ((s == TR_SIDE_LFT) && (pseg->type == TR_RGT))
-                            || ((s == TR_SIDE_RGT) && (pseg->type == TR_LFT));
-
                     if (pSide->style == TR_CURB)
                     {
                         if( s == m_sideMod.side &&

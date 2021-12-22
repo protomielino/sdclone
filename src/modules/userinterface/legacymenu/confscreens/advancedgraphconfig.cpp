@@ -54,8 +54,6 @@ static int	TexSizeIndex = 0;
 static int	QualityIndex = 0;
 static int  ShadersIndex = 0;
 
-static char	buf[512];
-
 // Options IO functions ===================================================================
 
 static void
