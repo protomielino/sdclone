@@ -362,6 +362,7 @@ void NotificationManager::updateWebserverStatusUi()
     if(this->notifyUiIdBusyIcon > 0 && this->screenHandle == this->prevScreenHandle)
     {
         GfuiVisibilitySet(this->prevScreenHandle, this->notifyUiIdBusyIcon, GFUI_INVISIBLE);
+        this->notifyUiIdBusyIcon = -1;
     }
 
     if(this->screenHandle != NULL)
