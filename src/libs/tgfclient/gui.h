@@ -364,6 +364,7 @@ extern void GfuiDraw(tGfuiObject *obj);;
 extern void gfuiUpdateFocus();
 extern void gfuiDrawString(int x, int y, GfuiFontClass *font, const char *string);
 extern void gfuiMouseAction(void *action);
+extern void gfuiMouseWheelAction(int x, int y, unsigned int direction);
 extern void gfuiSelectNext(void *);
 extern void gfuiSelectPrev(void *);
 extern void gfuiSelectId(void *scr, int id);
@@ -376,6 +377,7 @@ extern void gfuiButtonAction(int action);
 extern void gfuiEditboxAction(int action);
 extern void gfuiGrButtonAction(int action);
 extern void gfuiScrollListAction(int mouse);
+extern void gfuiScrollListWheelAction(int x, int y, unsigned int direction);
 extern void gfuiComboboxAction(int mouse);
 
 extern void gfuiDrawLabel(tGfuiObject *obj);
@@ -422,6 +424,9 @@ extern void gfuiEditboxKey(tGfuiObject *obj, int key, int modifier);
 
 extern void gfuiScrollListNextElt (tGfuiObject *object);
 extern void gfuiScrollListPrevElt (tGfuiObject *object);
+
+extern void gfuiScrollBarPlus(tGfuiObject *object);
+extern void gfuiScrollBarMinus(tGfuiObject *object);
 
 extern void gfuiReleaseImage(tGfuiObject *obj);
 extern void gfuiDrawImage(tGfuiObject *obj);

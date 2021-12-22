@@ -593,6 +593,14 @@ gfuiMousePassiveMotion(int x, int y)
 	GfuiApp().eventLoop().postRedisplay();
 }
 
+static void
+gfuiMouseWheel(int x, int y, unsigned int direction)
+{
+	gfuiUpdateFocus();
+	gfuiMouseWheelAction(x, y, direction);
+	GfuiApp().eventLoop().postRedisplay();
+}
+
 /** Tell if the screen is active or not.
     @ingroup	gui
     @param	screen	Screen to activate
@@ -635,6 +643,7 @@ GfuiScreenActivate(void *screen)
    	GfuiApp().eventLoop().setMouseButtonCB(gfuiMouseButton);
 	GfuiApp().eventLoop().setMouseMotionCB(gfuiMouseMotion);
 	GfuiApp().eventLoop().setMousePassiveMotionCB(gfuiMousePassiveMotion);
+	GfuiApp().eventLoop().setMouseWheelCB(gfuiMouseWheel);
 	GfuiApp().eventLoop().setRecomputeCB(0);
 
 	if (GfuiScreen->onlyCallback == 0) 
@@ -692,7 +701,8 @@ GfuiScreenDeactivate(void)
 	GfuiApp().eventLoop().setMouseButtonCB(0);
   	GfuiApp().eventLoop().setMouseMotionCB(0);
 	GfuiApp().eventLoop().setMousePassiveMotionCB(0);
- 	GfuiApp().eventLoop().setRecomputeCB(0);
+	GfuiApp().eventLoop().setMouseWheelCB(0);
+	GfuiApp().eventLoop().setRecomputeCB(0);
  	GfuiApp().eventLoop().setRedisplayCB(GfuiDisplayNothing);
 }
 

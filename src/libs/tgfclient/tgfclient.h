@@ -731,6 +731,9 @@ class TGFCLIENT_API GfuiEventLoop : public GfEventLoop
     //! Set the "mouse motion without button pressed" callback function.
     void setMousePassiveMotionCB(void (*func)(int x, int y));
 
+    //! Set the "mouse wheel moved" callback function.
+    void setMouseWheelCB(void (*func)(int x, int y, unsigned int direction));
+
 #if SDL_JOYSTICK
     //! Set the "joystick axis moved" callback function.
     void setJoystickAxisCB(void (*func)(int joy, int axis, float value));
@@ -762,6 +765,9 @@ class TGFCLIENT_API GfuiEventLoop : public GfEventLoop
 
     //! Process a mouse button event.
     void injectMouseButtonEvent(int button, int state, int x, int y);
+
+    //! Process a mouse wheel event.
+    void injectMouseWheelEvent(int x, int y, unsigned int direction);
 
 #if SDL_JOYSTICK
     //! Process a joystick axis event.

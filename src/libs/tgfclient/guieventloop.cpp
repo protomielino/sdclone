@@ -43,6 +43,7 @@ class GfuiEventLoop::Private
 	void (*cbMouseButton)(int button, int state, int x, int y);
 	void (*cbMouseMotion)(int x, int y);
 	void (*cbMousePassiveMotion)(int x, int y);
+	void (*cbMouseWheel)(int x, int y, unsigned int direction);
 #if SDL_JOYSTICK
 	void (*cbJoystickAxis)(int joy, int axis, float value);
 	void (*cbJoystickButton)(int joy, int button, int value);
@@ -56,7 +57,7 @@ class GfuiEventLoop::Private
 };
 
 GfuiEventLoop::Private::Private()
-: cbMouseButton(0), cbMouseMotion(0), cbMousePassiveMotion(0),
+: cbMouseButton(0), cbMouseMotion(0), cbMousePassiveMotion(0), cbMouseWheel(0),
 #if SDL_JOYSTICK
   cbJoystickAxis(0), cbJoystickButton(0),
 #endif
@@ -118,6 +119,13 @@ void GfuiEventLoop::injectMouseButtonEvent(int button, int state, int x, int y)
 	if (_pPrivate->cbMouseButton)
 		_pPrivate->cbMouseButton(button, state, x, y);
 }
+
+void GfuiEventLoop::injectMouseWheelEvent(int x, int y, unsigned int direction)
+{
+	if (_pPrivate->cbMouseWheel)
+		_pPrivate->cbMouseWheel(x, y, direction);
+}
+
 #if SDL_JOYSTICK
 void GfuiEventLoop::injectJoystickAxisEvent(int joy, int axis, float value)
 {
@@ -188,11 +196,14 @@ void GfuiEventLoop::operator()()
 					injectMouseMotionEvent(event.motion.state, event.motion.x, event.motion.y);
 					break;
 
-
 				case SDL_MOUSEBUTTONDOWN:
 				case SDL_MOUSEBUTTONUP:
 					injectMouseButtonEvent(event.button.button, event.button.state,
 										   event.button.x, event.button.y);
+					break;
+
+				case SDL_MOUSEWHEEL:
+					injectMouseWheelEvent(event.wheel.x, event.wheel.y, event.wheel.direction);
 					break;
 
 				case SDL_QUIT:
@@ -239,6 +250,11 @@ void GfuiEventLoop::setMouseButtonCB(void (*func)(int button, int state, int x, 
 void GfuiEventLoop::setMouseMotionCB(void (*func)(int x, int y))
 {
 	_pPrivate->cbMouseMotion = func;
+}
+
+void GfuiEventLoop::setMouseWheelCB(void (*func)(int x, int y, unsigned int direction))
+{
+	_pPrivate->cbMouseWheel = func;
 }
 
 void GfuiEventLoop::setMousePassiveMotionCB(void (*func)(int x, int y))

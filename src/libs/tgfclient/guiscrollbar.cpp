@@ -36,48 +36,56 @@ gfuiInitScrollBar(void)
 {
 }
 
-static void
-gfuiScrollPlus(void *idv)
+void gfuiScrollBarPlus(tGfuiObject *object)
 {
-    tGfuiObject		*object;
-    tGfuiScrollBar	*scrollbar;
+    tGfuiScrollBar *scrollbar;
     tScrollBarInfo	info;
 
-    object = gfuiGetObject(GfuiScreen, (long)idv);
     if (object == NULL) {
-	return;
+        return;
     }
     scrollbar = &(object->u.scrollbar);
     scrollbar->pos++;
     if (scrollbar->pos > scrollbar->max) {
-	scrollbar->pos = scrollbar->max;
-    } else if (scrollbar->onScroll != NULL) {
-	info.pos = scrollbar->pos;
-	info.userData = scrollbar->userData;
-	scrollbar->onScroll(&info);
+        scrollbar->pos = scrollbar->max;
     }
+    else if (scrollbar->onScroll != NULL) {
+        info.pos = scrollbar->pos;
+        info.userData = scrollbar->userData;
+        scrollbar->onScroll(&info);
+    }
+}
+
+void gfuiScrollBarMinus(tGfuiObject *object)
+{
+    tGfuiScrollBar *scrollbar;
+    tScrollBarInfo	info;
+
+    if (object == NULL) {
+        return;
+    }
+    scrollbar = &(object->u.scrollbar);
+    scrollbar->pos--;
+    if (scrollbar->pos < scrollbar->min) {
+        scrollbar->pos = scrollbar->min;
+    }
+    else if (scrollbar->onScroll != NULL) {
+        info.pos = scrollbar->pos;
+        info.userData = scrollbar->userData;
+        scrollbar->onScroll(&info);
+    }
+}
+
+static void
+gfuiScrollPlus(void *idv)
+{
+    gfuiScrollBarPlus(gfuiGetObject(GfuiScreen, (long)idv));
 }
 
 static void
 gfuiScrollMinus(void *idv)
 {
-    tGfuiObject		*object;
-    tGfuiScrollBar	*scrollbar;
-    tScrollBarInfo	info;
-
-    object = gfuiGetObject(GfuiScreen, (long)idv);
-    if (object == NULL) {
-	return;
-    }
-    scrollbar = &(object->u.scrollbar);
-    scrollbar->pos--;
-    if (scrollbar->pos < scrollbar->min) {
-	scrollbar->pos = scrollbar->min;
-    } else if (scrollbar->onScroll != NULL) {
-	info.pos = scrollbar->pos;
-	info.userData = scrollbar->userData;
-	scrollbar->onScroll(&info);
-    }
+    gfuiScrollBarMinus(gfuiGetObject(GfuiScreen, (long)idv));
 }
 
 /** Create a new scroll bar.

@@ -579,6 +579,21 @@ gfuiMouseAction(void *vaction)
 }
 
 void
+gfuiMouseWheelAction(int x, int y, unsigned int direction)
+{
+	tGfuiObject *curObject;
+
+	curObject = GfuiScreen->hasFocus;
+	if (curObject != NULL) {
+		switch (curObject->widget) {
+		case GFUI_SCROLLIST:
+			gfuiScrollListWheelAction(x, y, direction);
+			break;
+		}
+	}
+}
+
+void
 gfuiAddObject(tGfuiScreen *screen, tGfuiObject *object)
 {
     if (screen->objects == NULL) {

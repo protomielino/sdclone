@@ -698,6 +698,27 @@ gfuiScrollListAction(int mouse)
 		scrollist->onSelect(scrollist->userDataOnSelect);
 }
 
+void
+gfuiScrollListWheelAction(int x, int y, unsigned int direction)
+{
+    tGfuiObject *object = GfuiScreen->hasFocus;
+    tGfuiObject *scrollBarObj = gfuiGetObject(GfuiScreen, object->u.scrollist.scrollBar);
+
+    if (!scrollBarObj)
+        return;
+
+    if (y != 0)
+    {
+        // flip direction if needed
+        if (direction == SDL_MOUSEWHEEL_FLIPPED)
+            y *= -1;
+        if (y > 0)
+            gfuiScrollBarMinus(scrollBarObj);
+        else
+            gfuiScrollBarPlus(scrollBarObj);
+    }
+}
+
 /** Move the selected element within the scroll list.
     @ingroup	gui
     @param	scr		Current screen
