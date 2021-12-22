@@ -2,7 +2,7 @@
 
     file                 : trackgen.h
     created              : Sun Dec 24 16:00:03 CET 2000
-    copyright            : (C) 2000 by Eric Espié
+    copyright            : (C) 2000 by Eric EspiÃ©
     email                : Eric.Espie@torcs.org
     version              : $Id$
 
@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -35,12 +35,13 @@
 extern void GenerateTrack(tTrack * Track, void *TrackHandle, char *outFile, FILE *AllFd, int bump, int raceline);
 extern void CalculateTrack(tTrack * Track, void *TrackHandle, int bump, int trackline);
 extern void generateRaceLine(tTrack* pTrack, const double SideDistExt, const double SideDistInt);
+extern double getTexureOffset(double length);
 
 extern char	*OutputFileName;
 extern int	HeightSteps;
 extern int	UseBorder;
 
-#endif /* _TRACKGEN_H_ */ 
+#endif /* _TRACKGEN_H_ */
 
 
 
