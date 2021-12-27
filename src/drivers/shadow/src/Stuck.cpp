@@ -96,7 +96,7 @@ Stuck::~Stuck()
 
 bool Stuck::execute( const MyTrack& track, const tSituation* s, tCarElt* me, const Opponent::Sit& mySit )
 {
-    // double start = GfTimeClock();
+    double start = GfTimeClock();
 
     switch( _stuckState )
     {
@@ -122,8 +122,8 @@ bool Stuck::execute( const MyTrack& track, const tSituation* s, tCarElt* me, con
             break;
     }
 
-    // double elapsed = GfTimeClock() - start;
-//	LogSHADOW.debug( "[%d] stuck CPU time: %0.6f seconds.\n", me->index, elapsed );
+    double elapsed = GfTimeClock() - start;
+    LogSHADOW.debug( "[%d] stuck CPU time: %0.6f seconds.\n", me->index, elapsed );
 
     return _stuckState == EXEC_PLAN;
 }
@@ -335,9 +335,6 @@ void	Stuck::makeOpponentsList( const tSituation* s, const tCarElt* me, vector<Op
         double	carX = other->pub.DynGCg.pos.x - _gridOrigin.x;
         double	carY = other->pub.DynGCg.pos.y - _gridOrigin.y;
 
-        // int intCarX = (int)floor(carX + 0.5);
-        // int intCarY = (int)floor(carY + 0.5);
-
         if( other->pub.speed > 2 ||
             carX < 0 || carX >= GRID_SIZE ||
             carY < 0 || carY >= GRID_SIZE )
@@ -481,8 +478,10 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
     // figure out position behind for cut-off.
     LogSHADOW.debug( "car behind: %g\n", behindCar->race.distFromStartLine );
     double behindPos = behindCar->race.distFromStartLine - 10;
+
     if( behindPos < me->race.distFromStartLine - GRID_RAD * 9 / 10 )
         behindPos = me->race.distFromStartLine - GRID_RAD * 9 / 10;
+
     LogSHADOW.debug( "behind pos: %g\n", behindPos );
 
     // draw lines ahead and behind to help limit the search.
@@ -579,6 +578,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
 
     // fill in distances from cars and walls.
     deque<GridPoint> dq;
+
     for( int x = 0; x < GRID_SIZE; x++ )
         for( int y = 0; y < GRID_SIZE; y++ )
             if( !at(x, y).isAvailable() )
@@ -715,6 +715,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
         LogSHADOW.debug( "[%d] stuck::init -- no solution -- reinit.\n", me->index );
         _stuckState = RACING;
         _stuckTime  = 0.0;
+
         return;
     }
 
@@ -1134,6 +1135,7 @@ void Stuck::dumpGrid() const
                     {
                         int count  = 0;
                         int ctimes = 0;
+
                         for( int i = 0; i < N_ANGLES * 2; i++ )
                         {
                             if( cell.from[i] != -1 )
@@ -1141,6 +1143,7 @@ void Stuck::dumpGrid() const
                             if( cell.times[i] < 0 )
                                 ctimes += 1;
                         }
+
                         line[x] = count == N_ANGLES * 2 ? '~' :
                                   count ? (count < 10 ? count + '0' : count - 10 + 'A') :
                                   cell.est_time_to_dest <  0 ? '-' :
@@ -1153,6 +1156,7 @@ void Stuck::dumpGrid() const
             else
                 line[x] = '#';
         }
+
         LogSHADOW.debug( "%s\n", line );
     }
 
@@ -1243,19 +1247,19 @@ void	Stuck::getUnstuck( const MyTrack& track, tCarElt* me, const tSituation* s )
     bool  fw  = _plan[best].fw();
     float spd = me->pub.DynGC.vel.x;
     int   gear = fw ? 1 : -1;
-//	me->ctrl.accelCmd	= MN(0.25f, (8 - fabs(spd)) * 0.05);
     me->ctrl.accelCmd	= MN(0.25f, (10 - fabs(spd)) * 0.25);
-    me->ctrl.brakeCmd	= (fw && spd < -0.1) || (!fw && spd > 0.1 ? 0.5 : 0);
-    me->ctrl.clutchCmd	= 0;//gear == me->ctrl.gear ? 0.0f : 0.5f;
+    me->ctrl.brakeCmd	= (((fw && spd < -0.1) || (!fw && spd > 0.1)) ? 0.5f : 0.0f);
+    me->ctrl.clutchCmd	= 0;
     me->ctrl.gear		= gear;
     me->ctrl.steer		= (spd > 0 ? deltaAng : -deltaAng) * 2 / me->info.steerLock;
+    LogSHADOW.debug(" # BrakeCmd in Stuck = %.3f\n", me->ctrl.brakeCmd);
 
     double dist = calcCarDist(fw, 10, me, s);
     LogSHADOW.debug( "[%d] dir=%d  dist=%g\n", me->index, fw, dist );
+
     if( dist < 0.2 )
     {
         me->ctrl.accelCmd = 0;
-        //me->ctrl.brakeCmd = 1;
         me->ctrl.gear = -me->ctrl.gear;
         _stuckTime += s->deltaTime;
 
@@ -1312,21 +1316,11 @@ void	Stuck::generateSuccessorsN( const GridPoint& from, vector<GridPoint>& succs
 
         int		dx = delta8_x[oct_ang];
         int		dy = delta8_y[oct_ang];
-//		float	dt = delta8_t[oct_ang];
         float	dt = delta64_t[af];
 
         // forwards direction.
         const Cell&	fSuccCell1 = at(x - dx, y - dy);
-/*		if( fSuccCell1.isAvailable() )
-        {
-            const Cell&	fSuccCell2 = at(x - 2 * dx, y - 2 * dy);
-            if( fSuccCell2.isAvailable() )
-            {
-                float	fSuccTime = from.time + dt + from.bw() * 1.5f;
-                float	fSuccEst  = fSuccTime + fSuccCell1.est_time_to_car;
-                succs.push_back( GridPoint(x - dx, y - dy, af, true, fSuccTime, fSuccEst) );
-            }
-        }*/
+
         if( fSuccCell1.isAvailable(fwang(af, true)) )
         {
             float	fSuccTime = from.time + dt + from.bw() * 1.5f;
@@ -1336,16 +1330,7 @@ void	Stuck::generateSuccessorsN( const GridPoint& from, vector<GridPoint>& succs
 
         // backwards direction.
         const Cell&	bSuccCell1 = at(x + dx, y + dy);
-/*		if( bSuccCell1.isAvailable() )
-        {
-            const Cell&	bSuccCell2 = at(x + 2 * dx, y + 2 * dy);
-            if( bSuccCell2.isAvailable() )
-            {
-                float	bSuccTime = from.time + dt + from.fw() * 1.5f;
-                float	bSuccEst  = bSuccTime + bSuccCell1.est_time_to_car;
-                succs.push_back( GridPoint(x + dx, y + dy, af, false, bSuccTime, bSuccEst) );
-            }
-        }*/
+
         if( bSuccCell1.isAvailable(fwang(af, false)) )
         {
             float	bSuccTime = from.time + dt + from.fw() * 1.5f;
@@ -1366,12 +1351,10 @@ void	Stuck::generateSuccessorsR( const GridPoint& from, vector<GridPoint>& succs
     for( int da = -1; da <= 1; da++ )
     {
         int		af = (a + da) & ANGLE_MASK;
-//		int		oct_ang = ((af + HALF_OCTANT) / OCTANT) & 7;
         int		oct_ang = ((a + HALF_OCTANT) / OCTANT) & 7;
 
         int		dx = delta8_x[oct_ang];
         int		dy = delta8_y[oct_ang];
-//		float	dt = delta8_t[oct_ang];
         float	dt = delta64_t[af];
 
         // forwards direction.
