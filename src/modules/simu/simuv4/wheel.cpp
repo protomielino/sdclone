@@ -554,9 +554,9 @@ void SimWheelUpdateForce(tCar *car, int index)
         //heat from the work of friction
         Work = (wheel->forces.x * (wrl * CosA - wheel->bodyVel.x)
                 + wheel->forces.y * (wrl * SinA - wheel->bodyVel.y)) * SimDeltaTime;
-        wheel->Ttire += Work * wheel->heatingm;
+        wheel->Ttire += Work * wheel->heatingm + (car->carElt->_speed_X * 0.000036f);
         //air cooling
-        wheel->Ttire -= wheel->aircoolm * (1 + wheel->speedcoolm * v) * (wheel->Ttire - Tair) * SimDeltaTime;
+        wheel->Ttire -= wheel->aircoolm * (1 + wheel->speedcoolm * v) * (wheel->Ttire - (Tair + 30)) * SimDeltaTime;
 
         //tire wear
         if(wheel->treadDepth > 0.0)
