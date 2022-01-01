@@ -290,7 +290,7 @@ SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,in
     ossCaption << GfuiApp().name() << ' ' << GfuiApp().version();
 
     GfuiWindow = SDL_CreateWindow(ossCaption.str().c_str(),
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED_DISPLAY(GfScrStartDisplayId), SDL_WINDOWPOS_CENTERED_DISPLAY(GfScrStartDisplayId),
         nWinWidth, nWinHeight, SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL);
 
 
@@ -339,13 +339,15 @@ int GfScrGetAttachedDisplays()
     int nDisplays = SDL_GetNumVideoDisplays();
 
     for(int i = 0;i < nDisplays;i++)
-    if(SDL_GetDisplayBounds(i,&rect) == 0)
     {
-        printf("   Display (%s) : %d\n", SDL_GetDisplayName(i), i);
-        printf("   %-8.8s: %d\n","left", rect.x);
-        printf("   %-8.8s: %d\n","top", rect.y);
-        printf("   %-8.8s: %d\n","width", rect.w);
-        printf("   %-8.8s: %d\n","height", rect.h);
+        if(SDL_GetDisplayBounds(i,&rect) == 0)
+        {
+            printf("   Display (%s) : %d\n", SDL_GetDisplayName(i), i);
+            printf("   %-8.8s: %d\n","left", rect.x);
+            printf("   %-8.8s: %d\n","top", rect.y);
+            printf("   %-8.8s: %d\n","width", rect.w);
+            printf("   %-8.8s: %d\n","height", rect.h);
+        }
     }
     return nDisplays;
 }
