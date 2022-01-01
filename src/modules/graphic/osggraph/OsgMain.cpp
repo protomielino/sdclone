@@ -137,6 +137,7 @@ void SDSwitchMirror(void *vp)
     screens->getActiveView()->switchMirror();
 }
 
+/*OSG hud widgets toggle*/
 void SDToggleHUD(void *vp)
 {
     screens->toggleHUD();
@@ -169,6 +170,48 @@ void SDToggleHUDdashitems(void *vp)
 {
     screens->toggleHUDdashitems();
 }
+/*Driver position change*/
+void SDMoveSeatUpDown(void *move)
+{
+    //if positive up if negative down
+    float movement = 0.005;
+    if((long)move == 1){
+        movement = movement*1; 
+    }
+    if((long)move == -1){
+        movement = movement*-1; 
+    }
+    tCarElt* curCar = screens->getActiveView()->getCurrentCar();
+    curCar->_drvPos_z+=movement;
+}
+void SDMoveSeatLeftRight(void *move)
+{
+    //if positive left if negative right
+    float movement = 0.005;
+    if((long)move == 1){
+        movement = movement*1; 
+    }
+    if((long)move == -1){
+        movement = movement*-1; 
+    }
+    tCarElt* curCar = screens->getActiveView()->getCurrentCar();
+    curCar->_drvPos_y+=movement;
+}
+void SDMoveSeatForwardBackward(void *move)
+{
+    //if positive forward if negative backward
+    float movement = 0.005;
+    if((long)move == 1){
+        movement = movement*1; 
+    }
+    if((long)move == -1){
+        movement = movement*-1; 
+    }
+    tCarElt* curCar = screens->getActiveView()->getCurrentCar();
+    curCar->_drvPos_x+=movement;
+}
+
+
 
 int initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
@@ -236,6 +279,13 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     //GfuiAddKey(screen, '_',            "Split Screen Arrangement", (void*)SD_SPLIT_ARR, SDSplitScreen, NULL);
     //GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)SD_NEXT_SCREEN, SDChangeScreen, NULL);
     /*GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);*/
+
+    GfuiAddKey(screen, '+',        GFUIM_ALT,   "Move seat up",         (void*)1,  SDMoveSeatUpDown, NULL);
+    GfuiAddKey(screen, '-',        GFUIM_ALT,   "Move seat down",       (void*)-1, SDMoveSeatUpDown, NULL);
+    GfuiAddKey(screen, GFUIK_LEFT, GFUIM_ALT,   "Move seat left",       (void*)1,  SDMoveSeatLeftRight, NULL);
+    GfuiAddKey(screen, GFUIK_RIGHT,GFUIM_ALT,   "Move seat right",      (void*)-1, SDMoveSeatLeftRight, NULL);
+    GfuiAddKey(screen, GFUIK_UP,   GFUIM_ALT,   "Move seat forward",    (void*)1,  SDMoveSeatForwardBackward, NULL);
+    GfuiAddKey(screen, GFUIK_DOWN, GFUIM_ALT,   "Move seat backward",   (void*)-1, SDMoveSeatForwardBackward, NULL);
 
     GfLogInfo("Current screen is #%d (out of %d)\n", m_CurrentScreenIndex, m_NbActiveScreens);
 
