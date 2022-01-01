@@ -20,7 +20,7 @@
 /* Display configuration menu */
 
 #include <sstream>
-
+#include <portability.h>
 #include <tgfclient.h>
 #include <graphic.h>
 
@@ -142,6 +142,14 @@ void DisplayMenu::onChangeArcRatio(void *pDisplayMenu)
 	GfuiEditboxSetString(PDisplayMenu->getMenuHandle(), sArcRatioID, buf);
 }
 
+void DisplayMenu::onChangeMenuDisplay(tComboBoxInfo *pInfo)
+{
+	// Get the DisplayMenu instance from call-back user data.
+	DisplayMenu* pMenu = static_cast<DisplayMenu*>(pInfo->userData);
+
+	pMenu->setMenuDisplay(pInfo->nPos);
+}
+
 #ifndef NoMaxRefreshRate
 void DisplayMenu::onChangeMaxRefreshRate(tComboBoxInfo *pInfo)
 {
@@ -211,6 +219,9 @@ void DisplayMenu::updateControls()
 	nControlId = getDynamicControlId("SpanSplitsCombo");
 	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, SpansplitIndex);
 
+	nControlId = getDynamicControlId("StartupDisplayCombo");
+	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _nMenuDisplay);
+
 	sprintf(buf, "%g", PDisplayMenu->_fBezelComp);
 	GfuiEditboxSetString(getMenuHandle(), sBezelCompID, buf);
 
@@ -254,6 +265,14 @@ void DisplayMenu::loadSettings()
 	_nOriginalScreenWidth =_nScreenWidth = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_WIN_X, NULL, 800);
 	_nOriginalScreenHeight = _nScreenHeight = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_WIN_Y, NULL, 600);
 
+
+	_nOriginalMenuDisplay = _nMenuDisplay = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_STARTUPDISPLAY, NULL, 0);
+	if(_nMenuDisplay >= _nAttachedDisplays)
+	{
+		_nMenuDisplay = 0;
+	}
+
+
 #ifndef NoMaxRefreshRate
 	// Max. refresh rate (Hz).
 	_nMaxRefreshRate =
@@ -278,6 +297,7 @@ void DisplayMenu::storeSettings() const
 	
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_X, (char*)NULL, _nScreenWidth);
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_Y, (char*)NULL, _nScreenHeight);
+	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_STARTUPDISPLAY, (char*)NULL, _nMenuDisplay);
 #ifndef NoMaxRefreshRate
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_MAXREFRESH, (char*)NULL, _nMaxRefreshRate);
 #endif
@@ -480,6 +500,13 @@ void DisplayMenu::setArcRatio(float ratio)
     }
 }
 
+void DisplayMenu::setMenuDisplay(int nIndex)
+{
+	//_nScreenWidth = _aScreenSizes[nIndex].width;
+	//_nScreenHeight = _aScreenSizes[nIndex].height;
+	_nMenuDisplay = nIndex;
+}
+
 #ifndef NoMaxRefreshRate
 void DisplayMenu::setMaxRefreshRateIndex(int nIndex)
 {
@@ -495,12 +522,15 @@ DisplayMenu::DisplayMenu()
 	_eDisplayMode = eWindowed;
 	_nScreenWidth = 800;
 	_nScreenHeight = 600;
+	_nMenuDisplay = 0;
+	_nAttachedDisplays = 0;
 	_eDisplayType = eNone;
 	_fArcRatio = 1.0f;
 	_fBezelComp = 110.0f;
 	_fScreenDist = 1.0f;
 	_nOriginalScreenWidth = 800;
 	_nOriginalScreenHeight = 600;
+	_nOriginalMenuDisplay = 0;
 	_eOriginalDisplayMode = eWindowed;
 #ifndef NoMaxRefreshRate
 	_nMaxRefreshRate = 0;
@@ -537,6 +567,23 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 
 	const int nSpanSplitsComboId =
 		createComboboxControl("SpanSplitsCombo", this, onChangeSpansplit);
+
+	const int nMenuDisplayComboId =
+		createComboboxControl("StartupDisplayCombo", this, onChangeMenuDisplay);
+
+
+
+	_nAttachedDisplays = GfScrGetAttachedDisplays();
+	for (int i = 0; i < _nAttachedDisplays; i++)
+	{
+		char buf[64];
+		snprintf(buf, sizeof(buf), "Display %d", i + 1);
+		GfuiComboboxAddText(getMenuHandle(), nMenuDisplayComboId, buf);
+	}
+	if(_nAttachedDisplays < 2)
+	{
+		GfuiEnable(getMenuHandle(),nMenuDisplayComboId,GFUI_DISABLE);
+	}
 
 	sBezelCompID = createEditControl("bezelcompedit", this, NULL, onChangeBezelComp);
 	sScreenDistId = createEditControl("screendistedit", this, NULL, onChangeScreenDist);

@@ -54,6 +54,8 @@
 #define GFSCR_VAL_VINIT_COMPATIBLE                  "compatible"
 #define GFSCR_VAL_VINIT_BEST                        "best"
 
+#define GFSCR_ATT_STARTUPDISPLAY                    "startup display"
+
 // Default settngs or menus / controls
 #define GFSCR_SECT_MENUSETTINGS                     "Menu Settings"
 

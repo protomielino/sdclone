@@ -46,6 +46,7 @@ public:
 	void setScreenSizeIndex(int nIndex);
 	void setMonitorType(EDisplayType eType);
 	void setArcRatio(float ratio);
+	void setMenuDisplay(int nIndex);
 #ifndef NoMaxRefreshRate
 	void setMaxRefreshRateIndex(int nIndex);
 #endif	
@@ -73,6 +74,7 @@ protected:
 	static void onChangeBezelComp(void *pDisplayMenu);
 	static void onChangeScreenDist(void *pDisplayMenu);
 	static void onChangeArcRatio(void *pDisplayMenu);
+	static void onChangeMenuDisplay(tComboBoxInfo *pInfo);
 #ifndef NoMaxRefreshRate
 	static void onChangeMaxRefreshRate(tComboBoxInfo *pInfo);
 #endif	
@@ -93,8 +95,12 @@ private:
 	//! Currently selected screen size.
 	int _nScreenWidth;
 	int _nScreenHeight;
+	int _nMenuDisplay;
 	int _nOriginalScreenWidth;
 	int _nOriginalScreenHeight;
+	int _nOriginalMenuDisplay;
+
+	int _nAttachedDisplays;
 
 	EDisplayType _eDisplayType;
 	float	_fArcRatio;

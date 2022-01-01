@@ -94,6 +94,8 @@ TGFCLIENT_API int* GfScrGetDefaultColorDepths(int* pnDepths);
 TGFCLIENT_API tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSizes);
 TGFCLIENT_API tScreenSize* GfScrGetDefaultSizes(int* pnSizes);
 
+TGFCLIENT_API int GfScrGetAttachedDisplays();
+
 /*****************************
  * GUI interface (low-level) *
  *****************************/

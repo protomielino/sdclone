@@ -54,6 +54,9 @@ static int GfScrCenX;
 static int GfScrCenY;
 static SDL_GLContext GLContext = NULL;
 
+static int GfScrNumDisplays = 0;
+static int GfScrStartDisplayId = 0;
+
 // The screen surface.
 static SDL_Surface *PScreenSurface = NULL;
 
@@ -151,14 +154,14 @@ tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSi
     last.height = 0;
 
     if (bFullScreen)
-        avail = SDL_GetNumDisplayModes(0);
+        avail = SDL_GetNumDisplayModes(GfScrStartDisplayId);
     else
         avail = NDefScreenSizes;
 
     GfLogInfo("SDL2: modes availabled %d\n", avail);
     *pnSizes = 0;
 
-    if(SDL_GetDisplayBounds(0, &bounds) == 0)
+    if(SDL_GetDisplayBounds(GfScrStartDisplayId, &bounds) == 0)
         GfLogInfo("Display bounds %dx%d\n", bounds.w , bounds.h );
     else {
         bounds.w = 0;
@@ -181,7 +184,7 @@ tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSi
                     (*pnSizes)++;
                 }
             }
-            else if (SDL_GetDisplayMode(0, avail-1, &mode) == 0) {
+            else if (SDL_GetDisplayMode(GfScrStartDisplayId, avail-1, &mode) == 0) {
                 if (SDL_BITSPERPIXEL(mode.format) == static_cast<Uint32>(nColorDepth)
 #if 1	// ignore multiple entries with different frequencies
                         && (last.width != mode.w || last.height != mode.h)
@@ -321,13 +324,30 @@ SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,in
         SDL_Rect bounds;
 
         /* Work around SDL2 bug */
-        if (SDL_GetDisplayBounds(0, &bounds) == 0) {
+        if (SDL_GetDisplayBounds(GfScrStartDisplayId, &bounds) == 0) {
             if (bounds.w == nWinWidth && bounds.h == nWinHeight)
                 SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
             else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
         } else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
     }
     return PScreenSurface;
+}
+
+int GfScrGetAttachedDisplays()
+{
+    SDL_Rect rect;
+    int nDisplays = SDL_GetNumVideoDisplays();
+
+    for(int i = 0;i < nDisplays;i++)
+    if(SDL_GetDisplayBounds(i,&rect) == 0)
+    {
+        printf("   Display (%s) : %d\n", SDL_GetDisplayName(i), i);
+        printf("   %-8.8s: %d\n","left", rect.x);
+        printf("   %-8.8s: %d\n","top", rect.y);
+        printf("   %-8.8s: %d\n","width", rect.w);
+        printf("   %-8.8s: %d\n","height", rect.h);
+    }
+    return nDisplays;
 }
 
 bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
@@ -356,6 +376,8 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
 #if ((SDL_MAJOR_VERSION >= 2) && (SDL_PATCHLEVEL >= 5))
     SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
 #endif
+
+    GfScrNumDisplays = GfScrGetAttachedDisplays();
 
     // Get selected frame buffer specs from config file
     // 1) Load the config file
@@ -401,6 +423,13 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
             (int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_Y, (char*)NULL, 600);
     int nTotalDepth =
         (int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_BPP, (char*)NULL, 32);
+    GfScrStartDisplayId =
+        (int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_STARTUPDISPLAY, (char*)NULL, 0);
+    if(GfScrStartDisplayId >= GfScrNumDisplays)
+    {
+        GfScrStartDisplayId = 0;
+    }
+
     bool bAlphaChannel =
         std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_ALPHACHANNEL,
                                  GFSCR_VAL_YES))
@@ -527,10 +556,12 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
 
     if(GfuiWindow)
     {
+        SDL_SetWindowPosition(GfuiWindow, SDL_WINDOWPOS_CENTERED_DISPLAY(GfScrStartDisplayId), SDL_WINDOWPOS_CENTERED_DISPLAY(GfScrStartDisplayId));
         SDL_ShowWindow(GfuiWindow);
         SDL_RestoreWindow(GfuiWindow);
     }
 
+/*
 #ifdef WIN32
     // Under Windows, give an initial position to the window if not full-screen mode
     // (under Linux/Mac OS X, no need, the window manager smartly takes care of this).
@@ -547,6 +578,7 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
         GfuiInitWindowPositionAndSize(nWMWinXPos, nWMWinYPos, nWinWidth, nWinHeight);
     }
 #endif
+*/
 
 
 
@@ -598,8 +630,8 @@ void GfScrShutdown(void)
                          GfParmGetNum(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_Y, 0, 600));
             GfParmSetNum(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_BPP, 0,
                          GfParmGetNum(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_BPP, 0, 32));
-            // GfParmSetNum(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_MAXREFRESH, 0,
-            // 			 GfParmGetNum(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_MAXREFRESH, 0, 0));
+            GfParmSetNum(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_STARTUPDISPLAY, 0,
+                         GfParmGetNum(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_STARTUPDISPLAY, 0, 0));
             GfParmSetStr(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_VDETECT,
                          GfParmGetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_VDETECT, GFSCR_VAL_VDETECT_AUTO));
             const  char* pszVInitMode =
@@ -667,7 +699,7 @@ bool GfScrToggleFullScreen()
         SDL_Rect bounds;
 
         /* Work around SDL2 bug */
-        if (SDL_GetDisplayBounds(0, &bounds) == 0) {
+        if (SDL_GetDisplayBounds(GfScrStartDisplayId, &bounds) == 0) {
             if (SDL_FALSE) //(bounds.w == nWinWidth && bounds.h == nWinHeight)
                 SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
             else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
