@@ -44,11 +44,8 @@ class GfuiEventLoop::Private
 	void (*cbMouseMotion)(int x, int y);
 	void (*cbMousePassiveMotion)(int x, int y);
 	void (*cbMouseWheel)(int x, int y, unsigned int direction);
-#if SDL_JOYSTICK
 	void (*cbJoystickAxis)(int joy, int axis, float value);
 	void (*cbJoystickButton)(int joy, int button, int value);
-#endif
-
 	void (*cbDisplay)(void);
 	void (*cbReshape)(int width, int height);
 
@@ -58,9 +55,7 @@ class GfuiEventLoop::Private
 
 GfuiEventLoop::Private::Private()
 : cbMouseButton(0), cbMouseMotion(0), cbMousePassiveMotion(0), cbMouseWheel(0),
-#if SDL_JOYSTICK
   cbJoystickAxis(0), cbJoystickButton(0),
-#endif
   cbDisplay(0), cbReshape(0), bRedisplay(false)
 {
 }
@@ -126,7 +121,6 @@ void GfuiEventLoop::injectMouseWheelEvent(int x, int y, unsigned int direction)
 		_pPrivate->cbMouseWheel(x, y, direction);
 }
 
-#if SDL_JOYSTICK
 void GfuiEventLoop::injectJoystickAxisEvent(int joy, int axis, float value)
 {
 	if (_pPrivate->cbJoystickAxis)
@@ -138,7 +132,6 @@ void GfuiEventLoop::injectJoystickButtonEvent(int joy, int button, int value)
 	if (_pPrivate->cbJoystickButton)
 		_pPrivate->cbJoystickButton(joy, button, value);
 }
-#endif
 
 // The event loop itself.
 void GfuiEventLoop::operator()()
@@ -210,7 +203,6 @@ void GfuiEventLoop::operator()()
 					postQuit();
 					break;
 
-#if SDL_JOYSTICK
 				case SDL_JOYAXISMOTION:
 					injectJoystickAxisEvent(event.jaxis.which, event.jaxis.axis, (float) event.jaxis.value / 32768);
 					break;
@@ -222,7 +214,7 @@ void GfuiEventLoop::operator()()
 				case SDL_JOYBUTTONUP:
 					injectJoystickButtonEvent(event.jbutton.which, event.jbutton.button, 0);
 					break;
-#endif
+
 				case SDL_WINDOWEVENT_EXPOSED:
 					forceRedisplay();
 					break;
@@ -266,7 +258,7 @@ void GfuiEventLoop::setRedisplayCB(void (*func)(void))
 {
 	_pPrivate->cbDisplay = func;
 }
-#if SDL_JOYSTICK
+
 void GfuiEventLoop::setJoystickAxisCB(void (*func)(int joy, int axis, float value))
 {
 	_pPrivate->cbJoystickAxis = func;
@@ -276,7 +268,6 @@ void GfuiEventLoop::setJoystickButtonCB(void (*func)(int joy, int button, int va
 {
 	_pPrivate->cbJoystickButton = func;
 }
-#endif
 
 void GfuiEventLoop::setReshapeCB(void (*func)(int width, int height))
 {

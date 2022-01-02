@@ -59,15 +59,8 @@ static tCmdInfo *Cmd;
 static int MaxCmd;
 
 // Joystick info.
-#if SDL_JOYSTICK
 static tCtrlJoyInfo joyInfo;// = NULL;
 static tCtrlJoyInfo joyCenter;
-#else
-static jsJoystick* Joystick[GFCTRL_JOY_NUMBER];
-static float       JoyAxis[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
-static float       JoyAxisCenter[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
-static int         JoyButtons[GFCTRL_JOY_NUMBER];
-#endif
 
 // Menu screen handle.
 static void *ScrHandle = NULL;
@@ -99,16 +92,7 @@ static void
 onNext(void * /* dummy */)
 {
     /* Release up and running joysticks */
-#if SDL_JOYSTICK
     //GfctrlJoyRelease(joyInfo);
-#else
-    int index;
-    for (index = 0; index < GFCTRL_JOY_NUMBER; index++)
-	if (Joystick[index]) {
-	    delete Joystick[index];
-	    Joystick[index] = 0;
-	}
-#endif
 
     /* Back to previous screen */
     if (CalState == NbCalSteps && NextMenuHandle != NULL)
@@ -184,11 +168,7 @@ JoyCalAutomaton(void)
     switch (CalState) {
     case 0:
 	/* Grab snapshot of 'NULL' position */
-#if SDL_JOYSTICK
    memcpy(&joyCenter, &joyInfo, sizeof(joyCenter));
-#else
-	memcpy(JoyAxisCenter, JoyAxis, sizeof(JoyAxisCenter));
-#endif
 
 	advanceStep();
 	break;
@@ -198,11 +178,7 @@ JoyCalAutomaton(void)
 	AtobList = (linked_item_t*)malloc(sizeof(linked_item_t));
 	AtobList->next = NULL;
 	AtobList->command = -1;
-#if SDL_JOYSTICK
    AtobList->value = joyCenter.ax[AtobAxis];
-#else
-	AtobList->value = JoyAxisCenter[AtobAxis];
-#endif
 
 	CalState = 2;
 
@@ -213,11 +189,7 @@ JoyCalAutomaton(void)
 
 	new_in_list = (linked_item_t*)malloc(sizeof(linked_item_t));
 	new_in_list->command = AtobCount;
-#if SDL_JOYSTICK
    new_in_list->value = joyInfo.ax[AtobAxis];
-#else
-	new_in_list->value = JoyAxis[AtobAxis];
-#endif
 		
 	if (new_in_list->value < item_in_list->value) {
 	    /* insert first position*/
@@ -290,7 +262,6 @@ static void
 Idle2(void)
 {
    int		index;
-#if SDL_JOYSTICK
    /* Check for activity on Joystick buttons */
    GfctrlJoyGetCurrentStates(&joyInfo);
    for (index = 0; index < GFCTRL_JOY_NUMBER * GFCTRL_JOY_MAX_BUTTONS; index++) {
@@ -307,35 +278,6 @@ Idle2(void)
          GfuiApp().eventLoop().postRedisplay();
          return;
       }
-#else
-    int		mask;
-    int		b, i;
-    
-
-    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
-	if (Joystick[index]) {
-	    Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
-	    
-	    /* Joystick buttons */
-	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
-		if (((b & mask) != 0) && ((JoyButtons[index] & mask) == 0)) {
-		    /* Check whether to ignore */
-		    if(Cmd[CalState + CmdOffset].butIgnore == i + 32 * index)
-			break;
-
-		    /* Button fired */
-		    JoyCalAutomaton();
-		    if (CalState >= NbCalSteps) {
-			GfuiApp().eventLoop().setRecomputeCB(0);
-		    }
-		    GfuiApp().eventLoop().postRedisplay();
-		    JoyButtons[index] = b;
-		    return;
-		}
-	    }
-	    JoyButtons[index] = b;
-	}
-#endif
     }
 
     /* Let CPU take breath (and fans stay at low and quite speed) */
@@ -348,21 +290,8 @@ onActivate(void * /* dummy */)
 {
     int i;
     
-#if SDL_JOYSTICK
     //joyInfo = GfctrlJoyCreate();
     GfctrlJoyGetCurrentStates(&joyInfo);
-#else
-    int index;
-    // Create and test joysticks ; only keep the up and running ones.
-    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
-	Joystick[index] = new jsJoystick(index);
-	if (Joystick[index]->notWorking()) {
-	    /* don't configure the joystick */
-	    delete Joystick[index];
-	    Joystick[index] = 0;
-	}
-    }
-#endif
 
     CalState = 0;
     AtobAxis = GFCTRL_JOY_NUMBER * GFCTRL_JOY_MAX_AXES;
@@ -384,14 +313,6 @@ onActivate(void * /* dummy */)
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
     GfuiApp().eventLoop().setRecomputeCB(Idle2);
     GfuiApp().eventLoop().postRedisplay();
-
-#ifndef SDL_JOYSTICK
-    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
-	if (Joystick[index]) {
-	    Joystick[index]->read(&JoyButtons[index], &JoyAxis[index * GFCTRL_JOY_MAX_AXES]); /* initial value */
-	}
-    }
-#endif
 
     GfuiEnable(ScrHandle, CancelBut, GFUI_ENABLE);
     if (DoneBut)

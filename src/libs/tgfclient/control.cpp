@@ -28,14 +28,6 @@
 #include <stdio.h>
 #include <cstring>
 
-//#ifndef SDL_JOYSTICK
-//#ifdef __APPLE__
-//#include <js.h>
-//#else
-//#include <plib/js.h>
-//#endif
-//#endif
-
 #include <portability.h>
 
 #include "tgfclient.h"
@@ -133,20 +125,14 @@ static int gfmaxKey		= sizeof(GfKey)		/ sizeof(GfKey[0]);
 static int gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
 
 
-#if SDL_JOYSTICK
 static SDL_Joystick *Joysticks[GFCTRL_JOY_NUMBER] = {NULL};
 static tCtrlJoyInfo *joyInfoCopy = NULL;
 //static tCtrlJoyInfo joyInfo;
-#if SDL_FORCEFEEDBACK
 static SDL_Haptic *Haptics[GFCTRL_JOY_NUMBER] = {NULL};
 static SDL_HapticEffect cfx[GFCTRL_JOY_NUMBER];
 static unsigned int	cfx_timeout[GFCTRL_JOY_NUMBER];
 static unsigned int 	rfx_timeout[GFCTRL_JOY_NUMBER];
 static int id[GFCTRL_JOY_NUMBER];
-#endif
-#else
-static jsJoystick *Joysticks[GFCTRL_JOY_NUMBER] = {NULL};
-#endif
 
 
 /** Get a control reference by its name
@@ -291,24 +277,6 @@ GfctrlGetNameByRef(int type, int index)
 void
 gfctrlJoyInit(void)
 {
-#ifndef SDL_JOYSTICK
-    gfctrlJoyPresent = GFCTRL_JOY_NONE;
-
-    for (int index = 0; index < GFCTRL_JOY_NUMBER; index++) {
-		if (!Joysticks[index]) {
-			Joysticks[index] = new jsJoystick(index);
-		}
-    
-		// Don't configure the joystick if it doesn't work
-		if (Joysticks[index]->notWorking()) {
-			delete Joysticks[index];
-			Joysticks[index] = 0;
-		} else {
-			gfctrlJoyPresent = GFCTRL_JOY_PRESENT;
-		}
-    }
-#else
-#if SDL_FORCEFEEDBACK
     memset(&cfx, 0, sizeof(cfx));
     
     for(int i = 0;i<GFCTRL_JOY_NUMBER;i++)
@@ -317,9 +285,6 @@ gfctrlJoyInit(void)
     }    
 
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC) < 0) {
-#else
-	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0) {
-#endif
         GfLogError("Couldn't initialize SDL: %s\n", SDL_GetError());
         gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
 	return;
@@ -337,7 +302,6 @@ gfctrlJoyInit(void)
 		// Don't configure the joystick if it doesn't work
 		if (Joysticks[index] ==  NULL) {
 			GfLogError("Couldn't open joystick %d: %s\n", index, SDL_GetError());
-#if SDL_FORCEFEEDBACK
 		} else {
 			cfx_timeout[index] = 0;
 			rfx_timeout[index] = 0;
@@ -360,13 +324,10 @@ gfctrlJoyInit(void)
 				else
 					gfctrlJoyRumble(index, 0.5);
 			}
-#endif
                 }
      }
-#endif
 }
 
-#if SDL_FORCEFEEDBACK
 void
 gfctrlJoyConstantForce(int index, int level, int dir)
 {
@@ -412,31 +373,20 @@ gfctrlJoyRumble(int index, float level)
 
 	rfx_timeout[index] = SDL_GetTicks() + 100;
 }
-#endif
 
 // Shutdown time.
 void
 gfctrlJoyShutdown(void)
 {
    if (gfctrlJoyPresent != GFCTRL_JOY_UNTESTED)
-#ifndef SDL_JOYSTICK
-	
-		for (int index = 0; index < GFCTRL_JOY_NUMBER; index++)
-			delete Joysticks[index];
-
-	
-#else
       for (int index = 0; index < gfctrlJoyPresent; index++) {
 			SDL_JoystickClose(Joysticks[index]);
 			Joysticks[index] = NULL;
-#if SDL_FORCEFEEDBACK
 			if (Haptics[index]) {
 				SDL_HapticClose(Haptics[index]);
 				Haptics[index] = NULL;
 			}			
-#endif
 		}
-#endif
       gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
 }
 
@@ -456,9 +406,7 @@ GfctrlJoyCreate(void)
 
     tCtrlJoyInfo* joyInfo = (tCtrlJoyInfo *)calloc(1, sizeof(tCtrlJoyInfo));
 
-#if SDL_JOYSTICK
     joyInfoCopy = joyInfo;
-#endif
 
     return joyInfo;
 }
@@ -483,16 +431,12 @@ GfctrlJoyRelease(tCtrlJoyInfo *joyInfo)
 int
 GfctrlJoyIsAnyPresent(void)
 {
-#if SDL_JOYSTICK
    if (gfctrlJoyPresent == 0)
-#else
-    if (gfctrlJoyPresent == GFCTRL_JOY_UNTESTED)
-#endif
 		gfctrlJoyInit();
 
     return gfctrlJoyPresent;
 }
-#if SDL_JOYSTICK
+
 int
 GfctrlSDL2JoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 {
@@ -550,7 +494,7 @@ GfctrlSDL2JoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
    }
    return 0;
 }
-#endif
+
 /** Get the current state of the joysticks
     @ingroup	ctrl
     @param	joyInfo	Target joystick structure
@@ -561,48 +505,9 @@ GfctrlSDL2JoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 int
 GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 {
-#ifdef SDL_JOYSTICK
    return GfctrlSDL2JoyGetCurrentStates(joyInfo);
-#else
-    int			ind;
-    int			i;
-    int			b;
-    unsigned int	mask;
-
-    if (gfctrlJoyPresent == GFCTRL_JOY_PRESENT) {
-    	for (ind = 0; ind < GFCTRL_JOY_NUMBER; ind++) {
-	    if (Joysticks[ind]) {
-		Joysticks[ind]->read(&b, &(joyInfo->ax[GFCTRL_JOY_MAX_AXES * ind]));
-
-		/* Joystick buttons */
-		for (i = 0, mask = 1; i < GFCTRL_JOY_MAX_BUTTONS; i++, mask *= 2) {
-		    if (((b & mask) != 0) && ((joyInfo->oldb[ind] & mask) == 0)) {
-			joyInfo->edgeup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 1;
-		    } else {
-			joyInfo->edgeup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
-		    }
-		    if (((b & mask) == 0) && ((joyInfo->oldb[ind] & mask) != 0)) {
-			joyInfo->edgedn[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 1;
-		    } else {
-			joyInfo->edgedn[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
-		    }
-		    if ((b & mask) != 0) {
-			joyInfo->levelup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 1;
-		    } else {
-			joyInfo->levelup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
-		    }
-		}
-		joyInfo->oldb[ind] = b;
-	    }
-	}
-    } else {
-	return -1;
-    }
-    return 0;
-#endif
 }
 
-#if SDL_JOYSTICK
 void
 GfctrlJoySetAxis(int joy, int axis, float value)
 {
@@ -635,7 +540,6 @@ GfctrlJoySetButton(int joy, int button, int value)
 	    joyInfoCopy->levelup[GFCTRL_JOY_MAX_BUTTONS * joy + button] = 0;
 	}
 }
-#endif
 
 /** Initialize the mouse control
     @ingroup	ctrl

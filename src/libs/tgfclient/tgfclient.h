@@ -37,11 +37,7 @@
 #  pragma warning (disable:4251) // class XXX needs a DLL interface ...
 #endif
 
-#if defined(__APPLE__) && !defined(USE_MACPORTS)
-#  include <js.h>
-#else
-#  include <plib/js.h>
-#endif
+#include <climits>
 
 #include <SDL.h>
 
@@ -656,20 +652,12 @@ typedef struct
 
 #define GFCTRL_JOY_NUMBER       8 /* Max number of managed joysticks */
 #define GFCTRL_JOY_MAX_BUTTONS  32       /* Size of integer so don't change please */
-#if SDL_JOYSTICK
 #define GFCTRL_JOY_MAX_AXES     12
-#else
-#define GFCTRL_JOY_MAX_AXES      _JS_MAX_AXES
-#endif
 
 /** Joystick Information Structure */
 typedef struct
 {
-#if SDL_JOYSTICK
     int         oldb[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER];
-#else
-    int         oldb[GFCTRL_JOY_NUMBER];
-#endif
     float       ax[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];         /**< Axis values */
     int         edgeup[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER];  /**< Button transition from down (pressed) to up */
     int         edgedn[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER];  /**< Button transition from up to down */
@@ -680,14 +668,10 @@ TGFCLIENT_API int GfctrlJoyIsAnyPresent(void);
 TGFCLIENT_API tCtrlJoyInfo* GfctrlJoyCreate(void);
 TGFCLIENT_API void GfctrlJoyRelease(tCtrlJoyInfo* joyInfo);
 TGFCLIENT_API int GfctrlJoyGetCurrentStates(tCtrlJoyInfo* joyInfo);
-#if SDL_JOYSTICK
-#if SDL_FORCEFEEDBACK
 TGFCLIENT_API void gfctrlJoyConstantForce(int index, int level, int dir);
 TGFCLIENT_API void gfctrlJoyRumble(int index, float level);
-#endif
 TGFCLIENT_API void GfctrlJoySetAxis(int joy, int axis, float value);
 TGFCLIENT_API void GfctrlJoySetButton(int joy, int button, int value);
-#endif
 
 
 /** Mouse information structure */
@@ -736,13 +720,11 @@ class TGFCLIENT_API GfuiEventLoop : public GfEventLoop
     //! Set the "mouse wheel moved" callback function.
     void setMouseWheelCB(void (*func)(int x, int y, unsigned int direction));
 
-#if SDL_JOYSTICK
     //! Set the "joystick axis moved" callback function.
     void setJoystickAxisCB(void (*func)(int joy, int axis, float value));
 
     //! Set the "joystick button pressed" callback function.
     void setJoystickButtonCB(void (*func)(int joy, int button, int value));
-#endif
 
     //! Set the "redisplay/refresh" callback function.
     void setRedisplayCB(void (*func)(void));
@@ -771,13 +753,11 @@ class TGFCLIENT_API GfuiEventLoop : public GfEventLoop
     //! Process a mouse wheel event.
     void injectMouseWheelEvent(int x, int y, unsigned int direction);
 
-#if SDL_JOYSTICK
     //! Process a joystick axis event.
     void injectJoystickAxisEvent(int joy, int axis, float value);
 
     //! Process a joystick button event.
     void injectJoystickButtonEvent(int joy, int button, int value);
-#endif
 
     //! Process a redisplay event.
     void redisplay();
