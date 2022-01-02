@@ -111,13 +111,15 @@ void TLane::SetLane(const TLane& Lane)
   delete []	oPathPoints;
   oPathPoints =	new	TPathPt[Count];
 
-  memcpy(oPathPoints, Lane.oPathPoints,	Count *	sizeof(*oPathPoints));
+  for (int i = 0; i < Count; ++i)
+    oPathPoints[i] = Lane.oPathPoints[i];
+  //memcpy(oPathPoints, Lane.oPathPoints,	Count *	sizeof(*oPathPoints));
 
   for (int I = 0; I	< TA_N;	I++)
   {
-	TA_X[I] = Lane.TA_X[I];
-	TA_Y[I] = Lane.TA_Y[I];
-	TA_S[I] = Lane.TA_S[I];
+    TA_X[I] = Lane.TA_X[I];
+    TA_Y[I] = Lane.TA_Y[I];
+    TA_S[I] = Lane.TA_S[I];
   }
   oTurnScale.Init(TA_N,TA_X,TA_Y,TA_S);
 }
@@ -129,9 +131,9 @@ void TLane::SetLane(const TLane& Lane)
 bool TLane::ContainsPos(double TrackPos) const
 {
   if (TrackPos > 0.0)
-	return	true;								  // Allways true because
+    return	true;								  // Allways true because
   else											 // this lane type
-	return	true;								  // contains all points
+    return	true;								  // contains all points
 }
 //==========================================================================*
 
@@ -150,7 +152,7 @@ bool TLane::GetLanePoint(double	TrackPos, TLanePoint& LanePoint) const
   double Dist0 = oPathPoints[Idx0].Dist();
   double Dist1 = oPathPoints[Idx1].Dist();
   if (Idx1 == 0)
-	Dist1 = oTrack->Length();
+    Dist1 = oTrack->Length();
 
   TVec3d P0	= oPathPoints[Idxp].CalcPt();
   TVec3d P1	= oPathPoints[Idx0].CalcPt();
@@ -172,13 +174,13 @@ bool TLane::GetLanePoint(double	TrackPos, TLanePoint& LanePoint) const
 
   LanePoint.T =	Tx;
   LanePoint.Offset =
-	(oPathPoints[Idx0].Offset)
-	+ Tx *	(oPathPoints[Idx1].Offset -	oPathPoints[Idx0].Offset);
+    (oPathPoints[Idx0].Offset)
+    + Tx *	(oPathPoints[Idx1].Offset -	oPathPoints[Idx0].Offset);
 
   double Ang0 =	TUtils::VecAngXY(oPathPoints[Idx1].CalcPt()	-
-	oPathPoints[Idx0].CalcPt());
+    oPathPoints[Idx0].CalcPt());
   double Ang1 =	TUtils::VecAngXY(oPathPoints[Idx2].CalcPt()	-
-	oPathPoints[Idx1].CalcPt());
+    oPathPoints[Idx1].CalcPt());
 
   double DeltaAng =	Ang1 - Ang0;
   DOUBLE_NORM_PI_PI(DeltaAng);
@@ -195,9 +197,9 @@ bool TLane::GetLanePoint(double	TrackPos, TLanePoint& LanePoint) const
   DOUBLE_NORM_PI_PI(DeltaAng);
 
   LanePoint.Speed =	oPathPoints[LanePoint.Index].Speed + (oPathPoints[Idx1].Speed
-	- oPathPoints[LanePoint.Index].Speed) * LanePoint.T;
+    - oPathPoints[LanePoint.Index].Speed) * LanePoint.T;
   LanePoint.AccSpd = oPathPoints[LanePoint.Index].AccSpd + (oPathPoints[Idx1].AccSpd
-	- oPathPoints[LanePoint.Index].AccSpd)	* LanePoint.T;
+    - oPathPoints[LanePoint.Index].AccSpd)	* LanePoint.T;
 
   return true;
 }
@@ -218,93 +220,95 @@ void TLane::Initialise
   oCarParam	= CarParam;							 // Copy car params
   oFixCarParam = FixCarParam;					 // Copy car params
 
-  // To	avoid uninitialized	alignment bytes	within the allocated memory	for	
-  // linux compilers not doing this	initialization without our explizit	
+  // To	avoid uninitialized	alignment bytes	within the allocated memory	for
+  // linux compilers not doing this	initialization without our explizit
   // request we	should fill	it with	zeros. Otherwise we	would get valgrind
   // warnings writing the data to file using only one memory block per
   // path point.
-  memset(oPathPoints, 0, Track->Count()	* sizeof(*oPathPoints));
+  //memset(oPathPoints, 0, Track->Count()	* sizeof(*oPathPoints));
+  for (int i = 0; i < static_cast<int>(Track->Count()); ++i)
+    oPathPoints[i].Sec = nullptr;
 
   if (MaxLeft <	999.0)
   {
-	for (int I	= 0; I < Track->Count(); I++)
-	{
-	  const TSection& Sec = (*oTrack)[I];
-	  oPathPoints[I].Sec =	&Sec;
-	  oPathPoints[I].Center = Sec.Center;
-	  oPathPoints[I].Crv =	0;
-	  oPathPoints[I].CrvZ	= 0;
-	  oPathPoints[I].Offset = 0.0;
-	  oPathPoints[I].Point	= oPathPoints[I].CalcPt();
-	  oPathPoints[I].MaxSpeed	= 10;
-	  oPathPoints[I].Speed	= 10;
-	  oPathPoints[I].AccSpd = 10;
-	  oPathPoints[I].FlyHeight	= 0;
+    for (int I	= 0; I < Track->Count(); I++)
+    {
+      const TSection& Sec = (*oTrack)[I];
+      oPathPoints[I].Sec =	&Sec;
+      oPathPoints[I].Center = Sec.Center;
+      oPathPoints[I].Crv =	0;
+      oPathPoints[I].CrvZ	= 0;
+      oPathPoints[I].Offset = 0.0;
+      oPathPoints[I].Point	= oPathPoints[I].CalcPt();
+      oPathPoints[I].MaxSpeed	= 10;
+      oPathPoints[I].Speed	= 10;
+      oPathPoints[I].AccSpd = 10;
+      oPathPoints[I].FlyHeight	= 0;
 //		 oPathPoints[I].BufL	= 0;
 //		 oPathPoints[I].BufR	= 0;
-	  oPathPoints[I].NextCrv =	0.0;
-	  oPathPoints[I].WToL = (float) MaxLeft;
-  		 oPathPoints[I].WToR = (float) Sec.WidthToRight;
-	  oPathPoints[I].WPitToL =	(float)	Sec.PitWidthToLeft;
-	  oPathPoints[I].WPitToR =	(float)	Sec.PitWidthToRight;
-	  oPathPoints[I].Fix =	false;
-	}
-	oPathPoints[0].WToL = oPathPoints[1].WToL;
-	oPathPoints[0].WToR = oPathPoints[1].WToR;
+      oPathPoints[I].NextCrv =	0.0;
+      oPathPoints[I].WToL = (float) MaxLeft;
+         oPathPoints[I].WToR = (float) Sec.WidthToRight;
+      oPathPoints[I].WPitToL =	(float)	Sec.PitWidthToLeft;
+      oPathPoints[I].WPitToR =	(float)	Sec.PitWidthToRight;
+      oPathPoints[I].Fix =	false;
+    }
+    oPathPoints[0].WToL = oPathPoints[1].WToL;
+    oPathPoints[0].WToR = oPathPoints[1].WToR;
   }
   else if (MaxRight	< 999.0)
   {
-	for (int I	= 0; I < Track->Count(); I++)
-	{
-	  const TSection& Sec = (*oTrack)[I];
-	  oPathPoints[I].Sec =	&Sec;
-	  oPathPoints[I].Center	= Sec.Center;
-	  oPathPoints[I].Crv =	0;
-	  oPathPoints[I].CrvZ = 0;
-	  oPathPoints[I].Offset = 0.0;
-	  oPathPoints[I].Point	= oPathPoints[I].CalcPt();
-	  oPathPoints[I].MaxSpeed = 10;
-	  oPathPoints[I].Speed	= 10;
-	  oPathPoints[I].AccSpd	= 10;
-	  oPathPoints[I].FlyHeight	= 0;
+    for (int I	= 0; I < Track->Count(); I++)
+    {
+      const TSection& Sec = (*oTrack)[I];
+      oPathPoints[I].Sec =	&Sec;
+      oPathPoints[I].Center	= Sec.Center;
+      oPathPoints[I].Crv =	0;
+      oPathPoints[I].CrvZ = 0;
+      oPathPoints[I].Offset = 0.0;
+      oPathPoints[I].Point	= oPathPoints[I].CalcPt();
+      oPathPoints[I].MaxSpeed = 10;
+      oPathPoints[I].Speed	= 10;
+      oPathPoints[I].AccSpd	= 10;
+      oPathPoints[I].FlyHeight	= 0;
 //		 oPathPoints[I].BufL = 0;
 //		 oPathPoints[I].BufR = 0;
-	  oPathPoints[I].NextCrv =	0.0;
-	  oPathPoints[I].WToL = (float) Sec.WidthToLeft;
-	  oPathPoints[I].WToR = (float) MaxRight;
-	  oPathPoints[I].WPitToL =	(float)	Sec.PitWidthToLeft;
-	  oPathPoints[I].WPitToR =	(float)	Sec.PitWidthToRight;
-	  oPathPoints[I].Fix =	false;
-	}
-	oPathPoints[0].WToL = oPathPoints[1].WToL;
-	oPathPoints[0].WToR = oPathPoints[1].WToR;
+      oPathPoints[I].NextCrv =	0.0;
+      oPathPoints[I].WToL = (float) Sec.WidthToLeft;
+      oPathPoints[I].WToR = (float) MaxRight;
+      oPathPoints[I].WPitToL =	(float)	Sec.PitWidthToLeft;
+      oPathPoints[I].WPitToR =	(float)	Sec.PitWidthToRight;
+      oPathPoints[I].Fix =	false;
+    }
+    oPathPoints[0].WToL = oPathPoints[1].WToL;
+    oPathPoints[0].WToR = oPathPoints[1].WToR;
   }
   else
   {
-	for (int I	= 0; I < Track->Count(); I++)
-	{
-	  const TSection& Sec = (*oTrack)[I];
-	  oPathPoints[I].Sec =	&Sec;
-	  oPathPoints[I].Center = Sec.Center;
-	  oPathPoints[I].Crv =	0;
-	  oPathPoints[I].CrvZ = 0;
-	  oPathPoints[I].Offset = 0.0;
-	  oPathPoints[I].Point	= oPathPoints[I].CalcPt();
-	  oPathPoints[I].MaxSpeed	= 10;
-	  oPathPoints[I].Speed	= 10;
-	  oPathPoints[I].AccSpd = 10;
-	  oPathPoints[I].FlyHeight	= 0;
+    for (int I	= 0; I < Track->Count(); I++)
+    {
+      const TSection& Sec = (*oTrack)[I];
+      oPathPoints[I].Sec =	&Sec;
+      oPathPoints[I].Center = Sec.Center;
+      oPathPoints[I].Crv =	0;
+      oPathPoints[I].CrvZ = 0;
+      oPathPoints[I].Offset = 0.0;
+      oPathPoints[I].Point	= oPathPoints[I].CalcPt();
+      oPathPoints[I].MaxSpeed	= 10;
+      oPathPoints[I].Speed	= 10;
+      oPathPoints[I].AccSpd = 10;
+      oPathPoints[I].FlyHeight	= 0;
 //		 oPathPoints[I].BufL	= 0;
 //		 oPathPoints[I].BufR	= 0;
-	  oPathPoints[I].NextCrv =	0.0;
-	  oPathPoints[I].WToL = (float) Sec.WidthToLeft;
-	  oPathPoints[I].WToR = (float) Sec.WidthToRight;
-	  oPathPoints[I].WPitToL =	(float)	Sec.PitWidthToLeft;
-	  oPathPoints[I].WPitToR =	(float)	Sec.PitWidthToRight;
-	  oPathPoints[I].Fix =	false;
-	}
-	oPathPoints[0].WToL = oPathPoints[1].WToL;
-	oPathPoints[0].WToR = oPathPoints[1].WToR;
+      oPathPoints[I].NextCrv =	0.0;
+      oPathPoints[I].WToL = (float) Sec.WidthToLeft;
+      oPathPoints[I].WToR = (float) Sec.WidthToRight;
+      oPathPoints[I].WPitToL =	(float)	Sec.PitWidthToLeft;
+      oPathPoints[I].WPitToR =	(float)	Sec.PitWidthToRight;
+      oPathPoints[I].Fix =	false;
+    }
+    oPathPoints[0].WToL = oPathPoints[1].WToL;
+    oPathPoints[0].WToR = oPathPoints[1].WToR;
 
   }
   CalcCurvaturesXY();
@@ -346,7 +350,7 @@ void TLane::Initialise
   TA_S[0] =	0.0;
   TA_S[9] =	0.0;
 
-  oTurnScale.Init(TA_N,TA_X,TA_Y,TA_S);			
+  oTurnScale.Init(TA_N,TA_X,TA_Y,TA_S);
 }
 //==========================================================================*
 
@@ -368,22 +372,22 @@ void TLane::CalcCurvaturesXY(int Start,	int	Step)
 
   for (int I = 0; I	< N; I++)
   {
-	int	P	= (Start	+ I) % N;					 // Point
-	int	Pp	= (P - Step	+ N) % N;				  // Prev Point
-	int	Pn	= (P + Step) % N;					  // Next	Point
+    int	P	= (Start	+ I) % N;					 // Point
+    int	Pp	= (P - Step	+ N) % N;				  // Prev Point
+    int	Pn	= (P + Step) % N;					  // Next	Point
 
-	oPathPoints[P].Crv	= (float)
-	  TUtils::CalcCurvatureXY(
-		 oPathPoints[Pp].CalcPt(),
-		 oPathPoints[P].CalcPt(),
- 		  oPathPoints[Pn].CalcPt());
+    oPathPoints[P].Crv	= (float)
+      TUtils::CalcCurvatureXY(
+         oPathPoints[Pp].CalcPt(),
+         oPathPoints[P].CalcPt(),
+          oPathPoints[Pn].CalcPt());
   }
 
   // Overwrite values at start to avoid	slowdown caused	by track errors
   for (int I = 0; I	<= Step; I++)
   {
-	oPathPoints[I].Crv	= 0.0;
-	oPathPoints[N-1-I].Crv	= 0.0;
+    oPathPoints[I].Crv	= 0.0;
+    oPathPoints[N-1-I].Crv	= 0.0;
   }
 }
 //==========================================================================*
@@ -399,21 +403,21 @@ void TLane::CalcCurvaturesZ(int	Start, int Step)
 
   for (int I = 0; I	< N; I++)
   {
-	int	P	= (Start	+ I) % N;					 // Point
-	int	Pp	= (P - Step	+ N) % N;				  // Prev Point
-	int	Pn	= (P + Step) % N;					  // Next	Point
+    int	P	= (Start	+ I) % N;					 // Point
+    int	Pp	= (P - Step	+ N) % N;				  // Prev Point
+    int	Pn	= (P + Step) % N;					  // Next	Point
 
-	oPathPoints[P].CrvZ = 6 * (float) TUtils::CalcCurvatureZ(
-	  oPathPoints[Pp].CalcPt(),
-	  oPathPoints[P].CalcPt(),
-	  oPathPoints[Pn].CalcPt());
+    oPathPoints[P].CrvZ = 6 * (float) TUtils::CalcCurvatureZ(
+      oPathPoints[Pp].CalcPt(),
+      oPathPoints[P].CalcPt(),
+      oPathPoints[Pn].CalcPt());
   }
 
   // Overwrite values at start to avoid	slowdown caused	by track errors
   for (int I = 0; I	<= Step; I++)
   {
-	oPathPoints[I].CrvZ = 0.0;
-	oPathPoints[N-1-I].CrvZ = 0.0;
+    oPathPoints[I].CrvZ = 0.0;
+    oPathPoints[N-1-I].CrvZ = 0.0;
   }
 }
 //==========================================================================*
@@ -428,48 +432,48 @@ void TLane::CalcMaxSpeeds
 
   for (int I = 0; I	< Len; I +=	Step)
   {
-	int P = (Start	+ I) % N;
-	int Q = (P	+ 1) % N;
-	TVec3d	Delta =	oPathPoints[P].CalcPt()	- oPathPoints[Q].CalcPt();
-	double	Dist = TUtils::VecLenXY(Delta);
-	double	TrackRollAngle = atan2(oPathPoints[P].Norm().z,	1);
-	double	TrackTiltAngle = 1.1 * atan2(Delta.z, Dist);
-	double	CrvZ = oPathPoints[Q].CrvZ;
-		 
-	double	Speed =	oFixCarParam.CalcMaxSpeed(
-	  oCarParam,
-	  oPathPoints[P].Crv,
-	  oPathPoints[Q].Crv,
-	  CrvZ,
-	  oTrack->Friction(P),
-  		 TrackRollAngle,
-  		 TrackTiltAngle);
+    int P = (Start	+ I) % N;
+    int Q = (P	+ 1) % N;
+    TVec3d	Delta =	oPathPoints[P].CalcPt()	- oPathPoints[Q].CalcPt();
+    double	Dist = TUtils::VecLenXY(Delta);
+    double	TrackRollAngle = atan2(oPathPoints[P].Norm().z,	1);
+    double	TrackTiltAngle = 1.1 * atan2(Delta.z, Dist);
+    double	CrvZ = oPathPoints[Q].CrvZ;
 
-	if	(TDriver::UseGPBrakeLimit)
-	{
+    double	Speed =	oFixCarParam.CalcMaxSpeed(
+      oCarParam,
+      oPathPoints[P].Crv,
+      oPathPoints[Q].Crv,
+      CrvZ,
+      oTrack->Friction(P),
+         TrackRollAngle,
+         TrackTiltAngle);
 
-	  //double	TrackTurnangle1	= CalcTrackTurnangle(P,	(P + 30) % N);
-	  //double	TrackTurnangle2	= 0.7 *	CalcTrackTurnangle((P +	N -	30)	% N, P);
-	  //double	TrackTurnangle = MAX(fabs(TrackTurnangle1),fabs(TrackTurnangle2));
-	  //Speed *= oTurnScale.CalcOffset(TrackTurnangle);
-	}
-	else
-	{
-	  double TrackTurnangle = CalcTrackTurnangle(P, (P	+ 50) %	N);
-	  if (TrackTurnangle >	0.7)
-		 Speed *=	0.75;
-	  if (TrackTurnangle <	0.2)
-		 Speed *=	1.05;
-	}
+    if	(TDriver::UseGPBrakeLimit)
+    {
 
-	if	(Speed < 5)
-		Speed	= 5.0;
+      //double	TrackTurnangle1	= CalcTrackTurnangle(P,	(P + 30) % N);
+      //double	TrackTurnangle2	= 0.7 *	CalcTrackTurnangle((P +	N -	30)	% N, P);
+      //double	TrackTurnangle = MAX(fabs(TrackTurnangle1),fabs(TrackTurnangle2));
+      //Speed *= oTurnScale.CalcOffset(TrackTurnangle);
+    }
+    else
+    {
+      double TrackTurnangle = CalcTrackTurnangle(P, (P	+ 50) %	N);
+      if (TrackTurnangle >	0.7)
+         Speed *=	0.75;
+      if (TrackTurnangle <	0.2)
+         Speed *=	1.05;
+    }
 
-	oPathPoints[P].MaxSpeed = Speed;
-	oPathPoints[P].Speed =	Speed;
-	oPathPoints[P].AccSpd = Speed;
-	if	(TDriver::FirstPropagation)
-	  oTrack->InitialTargetSpeed(P,Speed);
+    if	(Speed < 5)
+        Speed	= 5.0;
+
+    oPathPoints[P].MaxSpeed = Speed;
+    oPathPoints[P].Speed =	Speed;
+    oPathPoints[P].AccSpd = Speed;
+    if	(TDriver::FirstPropagation)
+      oTrack->InitialTargetSpeed(P,Speed);
   }
 }
 //==========================================================================*
@@ -483,17 +487,17 @@ void TLane::SmoothSpeeds()
 
   for (int I = 0; I	< N; I++)
   {
-	int P = I % N;
-	int Q = (P	+ 2) % N;
+    int P = I % N;
+    int Q = (P	+ 2) % N;
 
-	double	Speed =	oPathPoints[Q].Speed;
-	if	(oPathPoints[P].Speed <	Speed)
-	{
-	  LogSimplix.error("# Speed %g	<= %g\n",oPathPoints[P].Speed,Speed);
-  		 oPathPoints[P].MaxSpeed = Speed;
-	  oPathPoints[P].Speed	= Speed;
-	  oPathPoints[P].AccSpd = Speed;
-	}
+    double	Speed =	oPathPoints[Q].Speed;
+    if	(oPathPoints[P].Speed <	Speed)
+    {
+      LogSimplix.error("# Speed %g	<= %g\n",oPathPoints[P].Speed,Speed);
+         oPathPoints[P].MaxSpeed = Speed;
+      oPathPoints[P].Speed	= Speed;
+      oPathPoints[P].AccSpd = Speed;
+    }
   }
 }
 //==========================================================================*
@@ -507,8 +511,8 @@ void TLane::Dump()
 
   for (int I = 0; I	< N; I++)
   {
-	int P = I % N;
-	LogSimplix.error("#%d %.3f\n",I,oPathPoints[P].CrvZ);
+    int P = I % N;
+    LogSimplix.error("#%d %.3f\n",I,oPathPoints[P].CrvZ);
   }
 }
 //==========================================================================*
@@ -523,40 +527,40 @@ void TLane::PropagateBreaking
 
   for (int I = Step	* ((2*Len -	1) / Step);	I >= 0;	I -= Step )
   {
-	int	P = (Start	+ I) % N;
-	int Q = (P	+ Step)	% N;
+    int	P = (Start	+ I) % N;
+    int Q = (P	+ Step)	% N;
 
-	if	(oPathPoints[P].Speed >	oPathPoints[Q].Speed)
-	{
-	  // see if we	need to	adjust spd[i] to make it possible
-	  //	to slow to spd[j]	by the next	seg.
-	  TVec3d Delta	= oPathPoints[P].CalcPt() -	oPathPoints[Q].CalcPt();
-	  double Dist = TUtils::VecLenXY(Delta);
-	  double K	= (oPathPoints[P].Crv +	oPathPoints[Q].Crv)	* 0.5;
-	  if (fabs(K) > 0.0001)
-		 Dist	= 2	* asin(0.5 * Dist *	K) / K;
-	  double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
-	  double TrackTiltAngle = 1.1 * atan2(Delta.z,	Dist);
+    if	(oPathPoints[P].Speed >	oPathPoints[Q].Speed)
+    {
+      // see if we	need to	adjust spd[i] to make it possible
+      //	to slow to spd[j]	by the next	seg.
+      TVec3d Delta	= oPathPoints[P].CalcPt() -	oPathPoints[Q].CalcPt();
+      double Dist = TUtils::VecLenXY(Delta);
+      double K	= (oPathPoints[P].Crv +	oPathPoints[Q].Crv)	* 0.5;
+      if (fabs(K) > 0.0001)
+         Dist	= 2	* asin(0.5 * Dist *	K) / K;
+      double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
+      double TrackTiltAngle = 1.1 * atan2(Delta.z,	Dist);
 
-	  double U	= oFixCarParam.CalcBraking(
-		oCarParam,
-  		oPathPoints[P].Crv,
-		oPathPoints[P].CrvZ,
-		oPathPoints[Q].Crv,
-		oPathPoints[Q].CrvZ,
-		oPathPoints[Q].Speed,
-		Dist,
-		oTrack->Friction(P),
-		TrackRollAngle,
-		TrackTiltAngle);
+      double U	= oFixCarParam.CalcBraking(
+        oCarParam,
+        oPathPoints[P].Crv,
+        oPathPoints[P].CrvZ,
+        oPathPoints[Q].Crv,
+        oPathPoints[Q].CrvZ,
+        oPathPoints[Q].Speed,
+        Dist,
+        oTrack->Friction(P),
+        TrackRollAngle,
+        TrackTiltAngle);
 
-	  if (oPathPoints[P].Speed	> U)
-		oPathPoints[P].Speed = oPathPoints[P].AccSpd = U;
+      if (oPathPoints[P].Speed	> U)
+        oPathPoints[P].Speed = oPathPoints[P].AccSpd = U;
 
-	  if (oPathPoints[P].FlyHeight	> 0.1)
-		oPathPoints[P].Speed = oPathPoints[Q].Speed;
+      if (oPathPoints[P].FlyHeight	> 0.1)
+        oPathPoints[P].Speed = oPathPoints[Q].Speed;
 
-	}
+    }
   }
 }
 //==========================================================================*
@@ -577,60 +581,60 @@ void TLane::PropagatePitBreaking
 
   for (int I = M; I	>= 0; I	-= Step	)
   {
-	int	P = (Start	- 1	+ I	- M	+ N) % N;
-	int Q = (P	+ Step)	% N; 
+    int	P = (Start	- 1	+ I	- M	+ N) % N;
+    int Q = (P	+ Step)	% N;
 
-	if	(oPathPoints[P].Speed >	oPathPoints[Q].Speed)
-	{
-	  // see if we	need to	adjust spd[i] to make it possible
-	  //	to slow to spd[j]	by the next	seg.
-	  TVec3d Delta	= oPathPoints[P].CalcPt() -	oPathPoints[Q].CalcPt();
-	  double Dist = TUtils::VecLenXY(Delta);
-	  double K	= (oPathPoints[P].Crv +	oPathPoints[Q].Crv)	* 0.5;
-	  if (fabs(K) > 0.0001)
-		 Dist	= 2	* asin(0.5 * Dist *	K) / K;
-	  double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
-	  double TrackTiltAngle = 1.1 * atan2(Delta.z,	Dist);
+    if	(oPathPoints[P].Speed >	oPathPoints[Q].Speed)
+    {
+      // see if we	need to	adjust spd[i] to make it possible
+      //	to slow to spd[j]	by the next	seg.
+      TVec3d Delta	= oPathPoints[P].CalcPt() -	oPathPoints[Q].CalcPt();
+      double Dist = TUtils::VecLenXY(Delta);
+      double K	= (oPathPoints[P].Crv +	oPathPoints[Q].Crv)	* 0.5;
+      if (fabs(K) > 0.0001)
+         Dist	= 2	* asin(0.5 * Dist *	K) / K;
+      double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
+      double TrackTiltAngle = 1.1 * atan2(Delta.z,	Dist);
 
-	  double Factor = MIN(1.0,fabs(oPathPoints[Q].Dist() -	PitStopPos)	/ oFixCarParam.oPitBrakeDist);
-	  double Friction = oTrack->Friction(P) * (Factor * ScaleMu + (1 -	Factor)	* oCarParam.oScaleBrakePit * ScaleMu);
-	  if (L)
-		Friction *= 0.5;
+      double Factor = MIN(1.0,fabs(oPathPoints[Q].Dist() -	PitStopPos)	/ oFixCarParam.oPitBrakeDist);
+      double Friction = oTrack->Friction(P) * (Factor * ScaleMu + (1 -	Factor)	* oCarParam.oScaleBrakePit * ScaleMu);
+      if (L)
+        Friction *= 0.5;
 
-	  //LogSimplix.debug("F %g: %g/%g )",Factor,oTrack->Friction(P),Friction);
-	  //LogSimplix.debug("SQ %g )",oPathPoints[Q].Speed);
+      //LogSimplix.debug("F %g: %g/%g )",Factor,oTrack->Friction(P),Friction);
+      //LogSimplix.debug("SQ %g )",oPathPoints[Q].Speed);
 
-	  double U	= oFixCarParam.CalcBrakingPit(
-		oCarParam,
-  		oPathPoints[P].Crv,
-		oPathPoints[P].CrvZ,
-		oPathPoints[Q].Crv,
-		oPathPoints[Q].CrvZ,
-		oPathPoints[Q].Speed,
-		Dist,
-		Friction,
-		TrackRollAngle,
-		TrackTiltAngle); 
+      double U	= oFixCarParam.CalcBrakingPit(
+        oCarParam,
+        oPathPoints[P].Crv,
+        oPathPoints[P].CrvZ,
+        oPathPoints[Q].Crv,
+        oPathPoints[Q].CrvZ,
+        oPathPoints[Q].Speed,
+        Dist,
+        Friction,
+        TrackRollAngle,
+        TrackTiltAngle);
 
-	  if (L) 
-	  {
-			L--;
-			double DeltaSpeed = (U -	oPathPoints[Q].Speed);
-			if (DeltaSpeed >	0.5)
-				 U = 0.5 + oPathPoints[Q].Speed;
-	  }
+      if (L)
+      {
+            L--;
+            double DeltaSpeed = (U -	oPathPoints[Q].Speed);
+            if (DeltaSpeed >	0.5)
+                 U = 0.5 + oPathPoints[Q].Speed;
+      }
 
-	  if (oPathPoints[P].Speed	> U)
-		oPathPoints[P].Speed = oPathPoints[P].AccSpd = U;
+      if (oPathPoints[P].Speed	> U)
+        oPathPoints[P].Speed = oPathPoints[P].AccSpd = U;
 
-	  if (!L) 
-		 if (oPathPoints[P].FlyHeight	> 0.1)
-		   oPathPoints[P].Speed =	oPathPoints[Q].Speed;
+      if (!L)
+         if (oPathPoints[P].FlyHeight	> 0.1)
+           oPathPoints[P].Speed =	oPathPoints[Q].Speed;
 
-	  //LogSimplix.debug("SP %g\n)",oPathPoints[P].Speed);
-	  //LogSimplix.debug("I:%d	P:%d Q:%d F:%.3f U:%.2f	S:%.2f\n",I,P,Q,Factor,U*3.6,oPathPoints[P].Speed*3.6);
+      //LogSimplix.debug("SP %g\n)",oPathPoints[P].Speed);
+      //LogSimplix.debug("I:%d	P:%d Q:%d F:%.3f U:%.2f	S:%.2f\n",I,P,Q,Factor,U*3.6,oPathPoints[P].Speed*3.6);
 
-	}
+    }
   }
 }
 //==========================================================================*
@@ -645,40 +649,40 @@ void TLane::PropagateAcceleration
 
   for (int I = 0; I	< 2*Len; I += Step )
   {
-	int Q = (Start	+ I	+ N) % N;
-	int	P = (Q	- Step + N)	% N;
+    int Q = (Start	+ I	+ N) % N;
+    int	P = (Q	- Step + N)	% N;
 
-	if	(Q == 0)
-	  P = (N -	3);
+    if	(Q == 0)
+      P = (N -	3);
 
-	if	(oPathPoints[P].AccSpd < oPathPoints[Q].AccSpd)
-	{
-	  // see if we	need to	adjust spd[Q] to make it possible
-	  //	to speed up to spd[P]	from spd[Q].
-	  TVec3d Delta	= oPathPoints[P].CalcPt() -	oPathPoints[Q].CalcPt();
-	  double Dist = TUtils::VecLenXY(Delta);
+    if	(oPathPoints[P].AccSpd < oPathPoints[Q].AccSpd)
+    {
+      // see if we	need to	adjust spd[Q] to make it possible
+      //	to speed up to spd[P]	from spd[Q].
+      TVec3d Delta	= oPathPoints[P].CalcPt() -	oPathPoints[Q].CalcPt();
+      double Dist = TUtils::VecLenXY(Delta);
 
-	  double K	= (oPathPoints[P].Crv +	oPathPoints[Q].Crv)	* 0.5;
-	  if (fabs(K) > 0.0001)
-		 Dist	= 2	* asin(0.5 * Dist *	K) / K;
+      double K	= (oPathPoints[P].Crv +	oPathPoints[Q].Crv)	* 0.5;
+      if (fabs(K) > 0.0001)
+         Dist	= 2	* asin(0.5 * Dist *	K) / K;
 
-	  double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
-	  double TrackTiltAngle = 1.1 * atan2(Delta.z,	Dist);
+      double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
+      double TrackTiltAngle = 1.1 * atan2(Delta.z,	Dist);
 
-	  double V	= oFixCarParam.CalcAcceleration(
-		 oPathPoints[P].Crv,
-		oPathPoints[P].CrvZ,
-		oPathPoints[Q].Crv,
-		oPathPoints[Q].CrvZ,
-		oPathPoints[P].AccSpd,
-		Dist,
-		oTrack->Friction(P),
-		TrackRollAngle,
-		TrackTiltAngle);
+      double V	= oFixCarParam.CalcAcceleration(
+         oPathPoints[P].Crv,
+        oPathPoints[P].CrvZ,
+        oPathPoints[Q].Crv,
+        oPathPoints[Q].CrvZ,
+        oPathPoints[P].AccSpd,
+        Dist,
+        oTrack->Friction(P),
+        TrackRollAngle,
+        TrackTiltAngle);
 
-		//if (oPathPoints[Q].AccSpd >	V)
-		oPathPoints[Q].AccSpd	= MIN(V,oPathPoints[Q].Speed);
-	}
+        //if (oPathPoints[Q].AccSpd >	V)
+        oPathPoints[Q].AccSpd	= MIN(V,oPathPoints[Q].Speed);
+    }
   }
 }
 //==========================================================================*
@@ -754,8 +758,8 @@ void TLane::CalcFwdAbsCrv(int Range, int Step)
 
   while	(P > 0)
   {
-	TotalCrv += oPathPoints[P].Crv;
-	P -= Step;
+    TotalCrv += oPathPoints[P].Crv;
+    P -= Step;
   }
 
   oPathPoints[0].NextCrv = (float) (TotalCrv / Count);
@@ -765,18 +769,18 @@ void TLane::CalcFwdAbsCrv(int Range, int Step)
   P	= (N / Step) * Step;
   Q	-= Step;
   if (Q	< 0)
-	Q = (N	/ Step)	* Step;
+    Q = (N	/ Step)	* Step;
 
   while	(P > 0)
   {
-	oPathPoints[P].NextCrv	= (float) (TotalCrv	/ Count);
-	TotalCrv += fabs(oPathPoints[P].Crv);
-	TotalCrv -= fabs(oPathPoints[Q].Crv);
+    oPathPoints[P].NextCrv	= (float) (TotalCrv	/ Count);
+    TotalCrv += fabs(oPathPoints[P].Crv);
+    TotalCrv -= fabs(oPathPoints[Q].Crv);
 
-	P -= Step;
-	Q -= Step;
-	if	(Q < 0)
-	  Q = (N /	Step) *	Step;
+    P -= Step;
+    Q -= Step;
+    if	(Q < 0)
+      Q = (N /	Step) *	Step;
   }
 }
 //==========================================================================*
@@ -791,12 +795,12 @@ double TLane::CalcEstimatedTime(int	Start, int Len)	const
   const	int	N =	oTrack->Count();
   for (int I = 0; I	< Len; I++)
   {
-	int	P = (Start	+ I) % N;
-	int	Q = (P	+ 1) % N;
-	double	Dist = TUtils::VecLenXY(
-	  oPathPoints[P].CalcPt() - oPathPoints[Q].CalcPt());
+    int	P = (Start	+ I) % N;
+    int	Q = (P	+ 1) % N;
+    double	Dist = TUtils::VecLenXY(
+      oPathPoints[P].CalcPt() - oPathPoints[Q].CalcPt());
 
-	TotalTime += Dist / ((oPathPoints[P].AccSpd + oPathPoints[Q].AccSpd) *	0.5);
+    TotalTime += Dist / ((oPathPoints[P].AccSpd + oPathPoints[Q].AccSpd) *	0.5);
   }
 
   return TotalTime;
@@ -813,10 +817,10 @@ double	TLane::CalcEstimatedLapTime() const
   const	int	N =	oTrack->Count();
   for (int I = 0; I	< N; I++)
   {
-	int	Q = (I	+ 1) % N;
-	double	Dist = TUtils::VecLenXY(
-	  oPathPoints[I].CalcPt() - oPathPoints[Q].CalcPt());
-	LapTime +=	Dist / ((oPathPoints[I].AccSpd + oPathPoints[Q].AccSpd)	* 0.5);
+    int	Q = (I	+ 1) % N;
+    double	Dist = TUtils::VecLenXY(
+      oPathPoints[I].CalcPt() - oPathPoints[Q].CalcPt());
+    LapTime +=	Dist / ((oPathPoints[I].AccSpd + oPathPoints[Q].AccSpd)	* 0.5);
   }
 
   return LapTime;
@@ -840,7 +844,7 @@ double TLane::CalcTrackTurnangle(int P,	int	Q)
 {
   double TotalCrv =	0;
   while	(P < Q)
-	TotalCrv += oPathPoints[P++].Crv;
+    TotalCrv += oPathPoints[P++].Crv;
 
   return fabs(TotalCrv);
 }
