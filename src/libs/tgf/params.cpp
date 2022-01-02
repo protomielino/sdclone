@@ -2418,9 +2418,9 @@ GfParmGetEltNb (void *handle, const char *path)
     @ingroup	paramsdata
     @param	handle	handle of parameters
     @param	path	path of section
-    @return	0 if doesn't exist, 1 otherwise.
+    @return	false if doesn't exist, true otherwise.
  */
-int
+bool
 GfParmExistsSection (void *handle, const char *path)
 {
     struct parmHandle *parmHandle = (struct parmHandle *)handle;
@@ -2429,14 +2429,14 @@ GfParmExistsSection (void *handle, const char *path)
     
     if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
 		GfLogError ("GfParmExistsSection: bad handle (%p)\n", parmHandle);
-		return 0;
+		return false;
     }
 
 	conf = parmHandle->conf;
 
     section = (struct section *)GfHashGetStr (conf->sectionHash, path);
 
-	return section != 0 ? 1 : 0;
+	return section != 0;
 }
 
 /** Check if a parameter exists.
@@ -2444,10 +2444,10 @@ GfParmExistsSection (void *handle, const char *path)
     @param  handle  handle of parameters
     @param  path    path of param
     @param  key key name
-    @return 1   exists
-            0   doesn't exist
+    @return true   exists
+            false  doesn't exist
  */
-int
+bool
 GfParmExistsParam(void *handle, const char *path, const char *key)
 {
     struct parmHandle *parmHandle = (struct parmHandle *)handle;
@@ -2456,7 +2456,7 @@ GfParmExistsParam(void *handle, const char *path, const char *key)
 
     if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
         GfLogError ("GfParmExistsParam: bad handle (%p)\n", parmHandle);
-        return 0;
+        return false;
     }
 
     conf = parmHandle->conf;
@@ -2464,10 +2464,10 @@ GfParmExistsParam(void *handle, const char *path, const char *key)
     param = getParamByName (conf, path, key, 0);
     if (!param) 
     {
-        return 0;
+        return false;
     }
 
-    return 1;
+    return true;
 }
 
 /** Seek the first sub-section element of a section.
