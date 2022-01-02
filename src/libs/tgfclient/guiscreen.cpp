@@ -432,10 +432,6 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
         GfScrStartDisplayId = 0;
     }
 
-    bool bAlphaChannel =
-        std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_ALPHACHANNEL,
-                                 GFSCR_VAL_YES))
-        == GFSCR_VAL_YES;
     bool bFullScreen;
     if (nFullScreen < 0)
         bFullScreen =
@@ -443,6 +439,15 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
             == GFSCR_VAL_YES;
     else
         bFullScreen = nFullScreen ? true : false;
+
+    if(bFullScreen)
+        bfVideoMode |= SDL_WINDOW_FULLSCREEN;
+
+/* TODO : move and re-implement these? 
+    bool bAlphaChannel =
+        std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_ALPHACHANNEL,
+        GFSCR_VAL_YES))
+        == GFSCR_VAL_YES;
 
     bool bBumpMap =
         std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_BUMPMAPPING,
@@ -456,9 +461,8 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
         std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_STEREOVISION,
                                  GFSCR_VAL_NO))
         == GFSCR_VAL_YES;
+*/
 
-    if(bFullScreen)
-        bfVideoMode |= SDL_WINDOW_FULLSCREEN;
 
     // TODO ?
     // Add new values to the config OpenGL Major and Minor
