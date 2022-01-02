@@ -60,13 +60,9 @@
 #include <car.h>
 
 #include "humandriver.h"
-#if SDL_FORCEFEEDBACK
 #include "forcefeedback.h"
 
-
 extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
-
-#endif
 
 typedef enum { eTransAuto, eTransSeq, eTransGrid, eTransHbox } eTransmission;
 
@@ -124,11 +120,9 @@ typedef struct HumanContext
     bool		mouseControlUsed;
     int			lightCmd;
     int         dashboardCounter;
-#if SDL_FORCEFEEDBACK
     int			lastForceFeedbackIndex;
     int			lastForceFeedbackLevel;
     int			lastForceFeedbackDir;
-#endif
 
     // simuV4 ...
     bool		useESP;
@@ -754,22 +748,18 @@ void HumanDriver::new_race(int index, tCarElt* car, tSituation *s)
 
     }//for i
     
-#if SDL_FORCEFEEDBACK
    	//initialize the force feedback
 	forceFeedback.readConfiguration(car->_carName);
-#endif
 }
 
 void HumanDriver::pause_race(int index, tCarElt* /*car*/, tSituation* /*s*/)
 {
-#if SDL_FORCEFEEDBACK
     const int idx = index - 1;
 
     //reset force feedback to zero (if set)
     if(HCtx[idx]->lastForceFeedbackLevel){
         gfctrlJoyConstantForce(HCtx[idx]->lastForceFeedbackIndex, 0, 0);
     }
-#endif
 }
 
 /*
@@ -809,7 +799,6 @@ void HumanDriver::resume_race(int index, tCarElt* car, tSituation *s)
 
     }//for i
 
-#if SDL_FORCEFEEDBACK
     //restore force feedback effect to the wheel (if was set)
     if(HCtx[idx]->lastForceFeedbackLevel) {
         if(cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_KEYBOARD && cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_MOUSE_AXIS){
@@ -822,12 +811,10 @@ void HumanDriver::resume_race(int index, tCarElt* car, tSituation *s)
             HCtx[idx]->lastForceFeedbackLevel = 0; // forget force feedback level
         }
     }
-#endif
 }
 
 void HumanDriver::end_race(int index, tCarElt* /*car*/, tSituation* /*s*/)
 {
-#if SDL_FORCEFEEDBACK
     const int idx = index - 1;
 
     //reset force feedback to zero (if set)
@@ -835,7 +822,6 @@ void HumanDriver::end_race(int index, tCarElt* /*car*/, tSituation* /*s*/)
         gfctrlJoyConstantForce(HCtx[idx]->lastForceFeedbackIndex, 0, 0);
         HCtx[idx]->lastForceFeedbackLevel = 0; // forget force feedback level
     }
-#endif
 }
 
 
@@ -1221,8 +1207,6 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
 
     car->_steerCmd = leftSteer + rightSteer;
     
-#if SDL_FORCEFEEDBACK
-
 	//send force feedback effect to the wheel
 	//dont' even try to do it if steer command is on a keyboard because it somehow manage to crash (unable to identify the joystic to send FF to?)
 	if(cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_KEYBOARD && cmd[CMD_LEFTSTEER].type != GFCTRL_TYPE_MOUSE_AXIS){
@@ -1236,8 +1220,6 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
             HCtx[idx]->lastForceFeedbackLevel,
             HCtx[idx]->lastForceFeedbackDir );
 	}
-
-#endif
 
 #define GLANCERATE 3 	// speed at which the driver turns his head, ~1/3s to full glance
     newGlance = car->_glance;

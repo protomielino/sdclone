@@ -22,15 +22,12 @@ SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
             guiscreen.cpp guieventloop.cpp guiapplication.cpp 
             musicplayer.cpp musicplayer.h 
             sdl2musicplayer.cpp sdl2musicplayer.h
-            glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h)
+            glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h
+            forcefeedback.cpp forcefeedback.h)
 
 IF(OPTION_WEBSERVER)
    SET(_SOURCES ${_SOURCES} webserver.cpp webserver.h)
 ENDIF(OPTION_WEBSERVER)
-
-IF(OPTION_SDL_FORCEFEEDBACK)
-   SET(_SOURCES ${_SOURCES} forcefeedback.cpp forcefeedback.h)
-ENDIF(OPTION_SDL_FORCEFEEDBACK)
 
 SET(_OTHER_SOURCES guimenutest.xml)
 

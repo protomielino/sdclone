@@ -31,9 +31,7 @@
 #include <playerpref.h>
 #include <robot.h>
 
-#if SDL_FORCEFEEDBACK
 #include <forcefeedbackconfig.h>
-#endif
 
 
 extern RmProgressiveTimeModifier rmProgressiveTimeModifier;
@@ -168,7 +166,6 @@ rmControlsHookInit()
     return pvControlsHookHandle;
 }
 
-#if SDL_FORCEFEEDBACK
 // ForceFeedbackConfig hook ********************************************
 static void
 rmForceFeedbackConfigHookActivate(void * /* dummy */)
@@ -205,7 +202,6 @@ rmForceFeedbackConfigHookInit()
 
     return pvForceFeedbackConfigHookHandle;
 }
-#endif
 
 // Quit race hook ******************************************************
 static void	*rmStopScrHandle = 0;
@@ -413,11 +409,9 @@ RmStopRaceMenu()
             buttonRole[i] = "controls";
             screen[i++] = rmControlsHookInit();
 
-#if SDL_FORCEFEEDBACK
             buttonRole[i] = "forcefeedback";
             screen[i++] = rmForceFeedbackConfigHookInit();
             break;
-#endif
         }
     }
 #endif
