@@ -56,37 +56,37 @@ SimDifferentialConfig(tCar *car, int index)
     
     setupDRatio->desired_value = setupDRatio->min = setupDRatio->max = 1.0f;
     GfParmGetNumWithLimits(hdle, section, PRM_RATIO, (char*)NULL, &(setupDRatio->desired_value), &(setupDRatio->min), &(setupDRatio->max));
-    setupDRatio->changed = TRUE;
+    setupDRatio->changed = true;
     setupDRatio->stepsize = 0.1f;
     
     setupDMinTB->desired_value = setupDMinTB->min = setupDMinTB->max = 0.05f;
     GfParmGetNumWithLimits(hdle, section, PRM_MIN_TQ_BIAS, (char*)NULL, &(setupDMinTB->desired_value), &(setupDMinTB->min), &(setupDMinTB->max));
-    setupDMinTB->changed = TRUE;
+    setupDMinTB->changed = true;
     setupDMinTB->stepsize = 0.01f;
     
     setupDMaxTB->desired_value = setupDMaxTB->min = setupDMaxTB->max = 0.80f;
     GfParmGetNumWithLimits(hdle, section, PRM_MAX_TQ_BIAS, (char*)NULL, &(setupDMaxTB->desired_value), &(setupDMaxTB->min), &(setupDMaxTB->max));
-    setupDMaxTB->changed = TRUE;
+    setupDMaxTB->changed = true;
     setupDMaxTB->stepsize = 0.01f;
     
     setupDVisc->desired_value = setupDVisc->min = setupDVisc->max = 2.0f;
     GfParmGetNumWithLimits(hdle, section, PRM_VISCOSITY_FACTOR, (char*)NULL, &(setupDVisc->desired_value), &(setupDVisc->min), &(setupDVisc->max));
-    setupDVisc->changed = TRUE;
+    setupDVisc->changed = true;
     setupDVisc->stepsize = 0.1f;
     
     setupDLT->desired_value = setupDLT->min = setupDLT->max = 300.0f;
     GfParmGetNumWithLimits(hdle, section, PRM_LOCKING_TQ, (char*)NULL, &(setupDLT->desired_value), &(setupDLT->min), &(setupDLT->max));
-    setupDLT->changed = TRUE;
+    setupDLT->changed = true;
     setupDLT->stepsize = 10.0f;
     
     setupDMaxSB->desired_value = setupDMaxSB->min = setupDMaxSB->max = 0.75f;
     GfParmGetNumWithLimits(hdle, section, PRM_MAX_SLIP_BIAS, (char*)NULL, &(setupDMaxSB->desired_value), &(setupDMaxSB->min), &(setupDMaxSB->max));
-    setupDMaxSB->changed = TRUE;
+    setupDMaxSB->changed = true;
     setupDMaxSB->stepsize = 0.01f;
     
     setupDCMaxSB->desired_value = setupDCMaxSB->min = setupDCMaxSB->max = setupDMaxSB->desired_value;
     GfParmGetNumWithLimits(hdle, section, PRM_COAST_MAX_SLIP_BIAS, (char*)NULL, &(setupDCMaxSB->desired_value), &(setupDCMaxSB->min), &(setupDCMaxSB->max));
-    setupDCMaxSB->changed = TRUE;
+    setupDCMaxSB->changed = true;
     setupDCMaxSB->stepsize = 0.01f;
 
     type = GfParmGetStr(hdle, section, PRM_TYPE, VAL_DIFF_NONE);
@@ -134,43 +134,43 @@ SimDifferentialReConfig(tCar *car, int index)
     if (setupDRatio->changed) {
         differential->ratio = MIN(setupDRatio->max, MAX(setupDRatio->min, setupDRatio->desired_value));
         setupDRatio->value = differential->ratio;
-        setupDRatio->changed = FALSE;
+        setupDRatio->changed = false;
     }
     
     if (setupDMinTB->changed) {
         differential->dTqMin = MIN(setupDMinTB->max, MAX(setupDMinTB->min, setupDMinTB->desired_value));
         setupDMinTB->value = differential->dTqMin;
-        setupDMinTB->changed = FALSE;
+        setupDMinTB->changed = false;
     }
     
     if (setupDMaxTB->changed) {
         differential->dTqMax = MIN(setupDMaxTB->max, MAX(setupDMaxTB->min, setupDMaxTB->desired_value));
         setupDMaxTB->value = differential->dTqMax;
-        setupDMaxTB->changed = FALSE;
+        setupDMaxTB->changed = false;
     }
     
     if (setupDVisc->changed) {
         differential->viscosity = MIN(setupDVisc->max, MAX(setupDVisc->min, setupDVisc->desired_value));
         setupDVisc->value = differential->viscosity;
-        setupDVisc->changed = FALSE;
+        setupDVisc->changed = false;
         differential->viscomax  = 1 - exp(-differential->viscosity);
     }
     
     if (setupDLT->changed) {
         differential->lockInputTq = MIN(setupDLT->max, MAX(setupDLT->min, setupDLT->desired_value));
         setupDLT->value = differential->lockInputTq;
-        setupDLT->changed = FALSE;
+        setupDLT->changed = false;
     }
     
     if (setupDMaxSB->changed) {
         differential->dSlipMax = MIN(setupDMaxSB->max, MAX(setupDMaxSB->min, setupDMaxSB->desired_value));
         setupDMaxSB->value = differential->dSlipMax;
-        setupDMaxSB->changed = FALSE;
+        setupDMaxSB->changed = false;
     }
     
      if (setupDCMaxSB->changed) {
         differential->dCoastSlipMax = MIN(setupDCMaxSB->max, MAX(setupDCMaxSB->min, setupDCMaxSB->desired_value));
-        setupDCMaxSB->changed = FALSE;
+        setupDCMaxSB->changed = false;
     }
     if ( (differential->type != DIFF_15WAY_LSD) && (differential->type != DIFF_ELECTRONIC_LSD) ) {
         differential->dCoastSlipMax = differential->dSlipMax;

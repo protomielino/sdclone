@@ -161,58 +161,58 @@ void SimSuspConfig(tCar *car, void *hdle, const char *section, tSuspension *susp
 		setupSpring->desired_value = setupSpring->min = setupSpring-> max = 0.0f;
 	}
 	GfParmGetNumWithLimits(hdle, section, PRM_SPR, (char*)NULL, &(setupSpring->desired_value), &(setupSpring->min), &(setupSpring->max));
-	setupSpring->changed = TRUE;
+	setupSpring->changed = true;
 	setupSpring->stepsize = 1000;
 	
 	setupBellcrank->desired_value = setupBellcrank->min = setupBellcrank-> max = 1.0f;
 	GfParmGetNumWithLimits(hdle, section, PRM_BELLCRANK, (char*)NULL, &(setupBellcrank->desired_value), &(setupBellcrank->min), &(setupBellcrank->max));
-	setupBellcrank->changed = TRUE;
+	setupBellcrank->changed = true;
 	setupBellcrank->stepsize = 0.1f;
 	
 	setupInertance->desired_value = setupInertance->min = setupInertance-> max = 0.0f;
 	//Inertance is not yet used in car setup files.
-	setupInertance->changed = TRUE;
+	setupInertance->changed = true;
 	setupInertance->stepsize = 0.0;
 	
 	setupSlowBump->desired_value = setupSlowBump->min = setupSlowBump->max = 0.0f;
 	GfParmGetNumWithLimits(hdle, section, PRM_SLOWBUMP, (char*)NULL, &(setupSlowBump->desired_value), &(setupSlowBump->min), &(setupSlowBump->max));
-	setupSlowBump->changed = TRUE;
+	setupSlowBump->changed = true;
 	setupSlowBump->stepsize = 100;
 	
 	setupSlowReb->desired_value = setupSlowReb->min = setupSlowReb->max = 0.0f;
 	GfParmGetNumWithLimits(hdle, section, PRM_SLOWREBOUND, (char*)NULL, &(setupSlowReb->desired_value), &(setupSlowReb->min), &(setupSlowReb->max));
-	setupSlowReb->changed = TRUE;
+	setupSlowReb->changed = true;
 	setupSlowReb->stepsize = 100;
 	
 	setupFastBump->desired_value = setupFastBump->min = setupFastBump->max = 0.0f;
 	GfParmGetNumWithLimits(hdle, section, PRM_FASTBUMP, (char*)NULL, &(setupFastBump->desired_value), &(setupFastBump->min), &(setupFastBump->max));
-	setupFastBump->changed = TRUE;
+	setupFastBump->changed = true;
 	setupFastBump->stepsize = 100;
 	
 	setupFastReb->desired_value = setupFastReb->min = setupFastReb->max = 0.0f;
 	GfParmGetNumWithLimits(hdle, section, PRM_FASTREBOUND, (char*)NULL, &(setupFastReb->desired_value), &(setupFastReb->min), &(setupFastReb->max));
-	setupFastReb->changed = TRUE;
+	setupFastReb->changed = true;
 	setupFastReb->stepsize = 100;
 	
 	setupBumpLvel->desired_value = setupBumpLvel->min = setupBumpLvel->max = 0.5f;
 	GfParmGetNumWithLimits(hdle, section, PRM_BUMPLVEL, (char*)NULL, &(setupBumpLvel->desired_value), &(setupBumpLvel->min), &(setupBumpLvel->max));
-	setupBumpLvel->changed = TRUE;
+	setupBumpLvel->changed = true;
 	setupBumpLvel->stepsize = 0.01f;
 	
 	setupRebLvel->desired_value = setupRebLvel->min = setupRebLvel->max = 0.5f;
 	GfParmGetNumWithLimits(hdle, section, PRM_REBOUNDLVEL, (char*)NULL, &(setupRebLvel->desired_value), &(setupRebLvel->min), &(setupRebLvel->max));
-	setupRebLvel->changed = TRUE;
+	setupRebLvel->changed = true;
 	setupRebLvel->stepsize = 0.01f;
 	
 	if (index<4) {
 		setupCourse->desired_value = setupCourse->min = setupCourse->max = 0.5f;
 		GfParmGetNumWithLimits(hdle, section, PRM_SUSPCOURSE, (char*)NULL, &(setupCourse->desired_value), &(setupCourse->min), &(setupCourse->max));
-		setupCourse->changed = TRUE;
+		setupCourse->changed = true;
 		setupCourse->stepsize = 0.001f;
 		
 		setupPacker->desired_value = setupPacker->min = setupPacker->max = 0.0f;
 		GfParmGetNumWithLimits(hdle, section, PRM_PACKERS, (char*)NULL, &(setupPacker->desired_value), &(setupPacker->min), &(setupPacker->max));
-		setupPacker->changed = TRUE;
+		setupPacker->changed = true;
 		setupPacker->stepsize = 0.001f;
 	}
 }
@@ -224,7 +224,7 @@ void SimSuspReConfig(tCar *car, tSuspension *susp, int index, tdble F0, tdble X0
 	tCarSetupItem *setupFastBump, *setupSlowBump, *setupBumpLvel;
 	tCarSetupItem *setupFastReb, *setupSlowReb, *setupRebLvel;
 	tCarSetupItem *setupCourse, *setupPacker;
-	bool damperchanged = FALSE;
+	bool damperchanged = false;
 	
 	if (index < 4) {//corner springs
 		setupSpring = &(car->carElt->setup.suspSpring[index]);
@@ -255,13 +255,13 @@ void SimSuspReConfig(tCar *car, tSuspension *susp, int index, tdble F0, tdble X0
 	if (setupSpring->changed) {
 		susp->spring.K = - MIN(setupSpring->max, MAX(setupSpring->min, setupSpring->desired_value));
 		setupSpring->value = - susp->spring.K;
-		setupSpring->changed = FALSE;
+		setupSpring->changed = false;
 	}
 	
 	if (setupBellcrank->changed) {
 		susp->spring.bellcrank = MIN(setupBellcrank->max, MAX(setupBellcrank->min, setupBellcrank->desired_value));
 		setupBellcrank->value = susp->spring.bellcrank;
-		setupBellcrank->changed = FALSE;
+		setupBellcrank->changed = false;
 	}
 	susp->spring.x0 = susp->spring.bellcrank * X0;
 	susp->spring.F0 = F0 / susp->spring.bellcrank;
@@ -269,49 +269,49 @@ void SimSuspReConfig(tCar *car, tSuspension *susp, int index, tdble F0, tdble X0
 	if (setupInertance->changed) {
 		susp->inertance = MIN(setupInertance->max, MAX(setupInertance->min, setupInertance->desired_value));
 		setupInertance->value = susp->inertance;
-		setupInertance->changed = FALSE;
+		setupInertance->changed = false;
 	}
 	
 	if (setupSlowBump->changed) {
 		susp->damper.bump.C1 = MIN(setupSlowBump->max, MAX(setupSlowBump->min, setupSlowBump->desired_value));
 		setupSlowBump->value = susp->damper.bump.C1;
-		setupSlowBump->changed = FALSE;
-		damperchanged = TRUE;
+		setupSlowBump->changed = false;
+		damperchanged = true;
 	}
 	
 	if (setupSlowReb->changed) {
 		susp->damper.rebound.C1 = MIN(setupSlowReb->max, MAX(setupSlowReb->min, setupSlowReb->desired_value));
 		setupSlowReb->value = susp->damper.rebound.C1;
-		setupSlowReb->changed = FALSE;
-		damperchanged = TRUE;
+		setupSlowReb->changed = false;
+		damperchanged = true;
 	}
 	
 	if (setupFastBump->changed) {
 		susp->damper.bump.C2 = MIN(setupFastBump->max, MAX(setupFastBump->min, setupFastBump->desired_value));
 		setupFastBump->value = susp->damper.bump.C2;
-		setupFastBump->changed = FALSE;
-		damperchanged = TRUE;
+		setupFastBump->changed = false;
+		damperchanged = true;
 	}
 	
 	if (setupFastReb->changed) {
 		susp->damper.rebound.C2 = MIN(setupFastReb->max, MAX(setupFastReb->min, setupFastReb->desired_value));
 		setupFastReb->value = susp->damper.rebound.C2;
-		setupFastReb->changed = FALSE;
-		damperchanged = TRUE;
+		setupFastReb->changed = false;
+		damperchanged = true;
 	}
 	
 	if (setupBumpLvel->changed) {
 		susp->damper.bump.v1 = MIN(setupBumpLvel->max, MAX(setupBumpLvel->min, setupBumpLvel->desired_value));
 		setupBumpLvel->value = susp->damper.bump.v1;
-		setupBumpLvel->changed = FALSE;
-		damperchanged = TRUE;
+		setupBumpLvel->changed = false;
+		damperchanged = true;
 	}
 	
 	if (setupRebLvel->changed) {
 		susp->damper.rebound.v1 = MIN(setupRebLvel->max, MAX(setupRebLvel->min, setupRebLvel->desired_value));
 		setupRebLvel->value = susp->damper.rebound.v1;
-		setupRebLvel->changed = FALSE;
-		damperchanged = TRUE;
+		setupRebLvel->changed = false;
+		damperchanged = true;
 	}
 	
 	if (damperchanged) {
@@ -325,12 +325,12 @@ void SimSuspReConfig(tCar *car, tSuspension *susp, int index, tdble F0, tdble X0
 		if (setupCourse->changed) {
 			susp->spring.xMax = MIN(setupCourse->max, MAX(setupCourse->min, setupCourse->desired_value));
 			setupCourse->value = susp->spring.xMax;
-			setupCourse->changed = FALSE;
+			setupCourse->changed = false;
 		}
 		if (setupPacker->changed) {
 			susp->spring.packers = MIN(setupPacker->max, MAX(setupPacker->min, setupPacker->desired_value));
 			setupPacker->value = susp->spring.packers;
-			setupPacker->changed = FALSE;
+			setupPacker->changed = false;
 		}
 	}
 }

@@ -302,7 +302,7 @@ SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,in
     SDL_Surface* surfIcon = SDL_LoadBMP(ossIconFilename.str().c_str());
     if (surfIcon)
     {
-        SDL_SetColorKey(surfIcon, TRUE, SDL_MapRGB(surfIcon->format, 0, 0, 0));
+        SDL_SetColorKey(surfIcon, SDL_TRUE, SDL_MapRGB(surfIcon->format, 0, 0, 0));
         SDL_SetWindowIcon(GfuiWindow, surfIcon);
         SDL_FreeSurface(surfIcon);
     }
@@ -696,7 +696,7 @@ bool GfScrToggleFullScreen()
 
     if ((flags & SDL_WINDOW_FULLSCREEN) || (flags & SDL_WINDOW_FULLSCREEN_DESKTOP)) {
         SDL_SetWindowFullscreen(GfuiWindow, 0);
-        return FALSE;
+        return false;
     } else {
         SDL_Rect bounds;
 
@@ -707,7 +707,7 @@ bool GfScrToggleFullScreen()
             else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
         } else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
 
-        return TRUE;
+        return true;
     }
 }
 

@@ -93,12 +93,12 @@ SimBrakeSystemConfig(tCar *car)
     
     setupBrkRep->desired_value = setupBrkRep->min = setupBrkRep->max = 0.5;
     GfParmGetNumWithLimits(hdle, SECT_BRKSYST, PRM_BRKREP, (char*)NULL, &(setupBrkRep->desired_value), &(setupBrkRep->min), &(setupBrkRep->max));
-    setupBrkRep->changed = TRUE;
+    setupBrkRep->changed = true;
     setupBrkRep->stepsize = 0.005f;
     
     setupBrkPress->desired_value = setupBrkPress->min = setupBrkPress->max = 1000000;
     GfParmGetNumWithLimits(hdle, SECT_BRKSYST, PRM_BRKPRESS, (char*)NULL, &(setupBrkPress->desired_value), &(setupBrkPress->min), &(setupBrkPress->max));
-    setupBrkPress->changed = TRUE;
+    setupBrkPress->changed = true;
     setupBrkPress->stepsize = 1000;
     
     car->brkSyst.ebrake_pressure = GfParmGetNum(hdle, SECT_BRKSYST, PRM_EBRKPRESS, (char*)NULL, 0.0);

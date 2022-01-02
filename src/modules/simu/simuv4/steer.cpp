@@ -27,7 +27,7 @@ SimSteerConfig(tCar *car)
 
 	setupStLock->desired_value = setupStLock->min = setupStLock->max = 0.43f;
 	GfParmGetNumWithLimits(hdle, SECT_STEER, PRM_STEERLOCK, (char*)NULL, &(setupStLock->desired_value), &(setupStLock->min), &(setupStLock->max));
-	setupStLock->changed = TRUE;
+	setupStLock->changed = true;
 	setupStLock->stepsize = DEG2RAD(1.0);
 	car->steer.maxSpeed  = GfParmGetNum(hdle, SECT_STEER, PRM_STEERSPD, (char*)NULL, 1.0f);
 }
@@ -42,7 +42,7 @@ SimSteerReConfig(tCar *car)
 		car->steer.steerLock = MIN(setupStLock->max, MAX(setupStLock->min, setupStLock->desired_value));
 		car->carElt->_steerLock = car->steer.steerLock;
 		setupStLock->value = car->steer.steerLock;
-		setupStLock->changed = FALSE;
+		setupStLock->changed = false;
 	}
 }
 

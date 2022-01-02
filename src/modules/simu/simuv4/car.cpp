@@ -101,19 +101,19 @@ SimCarConfig(tCar *car)
 	/* continue with car parameters */
 	setupGcfr->desired_value = setupGcfr->min = setupGcfr->max = 0.5;
 	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_FRWEIGHTREP, (char*)NULL, &(setupGcfr->desired_value), &(setupGcfr->min), &(setupGcfr->max));
-	setupGcfr->changed = TRUE;
+	setupGcfr->changed = true;
 	setupGcfr->stepsize = 0.005f;
 	gcfr = setupGcfr->desired_value;
 	
 	setupGcfrl->desired_value = setupGcfrl->min = setupGcfrl->max = 0.5;
 	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_FRLWEIGHTREP, (char*)NULL, &(setupGcfrl->desired_value), &(setupGcfrl->min), &(setupGcfrl->max));
-	setupGcfrl->changed = TRUE;
+	setupGcfrl->changed = true;
 	setupGcfrl->stepsize = 0.005f;
 	gcfrl = setupGcfrl->desired_value;
 	
 	setupGcrrl->desired_value = setupGcrrl->min = setupGcrrl->max = 0.5;
 	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_RRLWEIGHTREP, (char*)NULL, &(setupGcrrl->desired_value), &(setupGcrrl->min), &(setupGcrrl->max));
-	setupGcrrl->changed = TRUE;
+	setupGcrrl->changed = true;
 	setupGcrrl->stepsize = 0.005f;
 	gcrrl = setupGcrrl->desired_value;
 	
@@ -129,7 +129,7 @@ SimCarConfig(tCar *car)
 	GfParmGetNumWithLimits(hdle, SECT_CAR, PRM_FUEL, (char*)NULL, &(setupFuel->desired_value), &(setupFuel->min), &(setupFuel->max));
 	setupFuel->min = 0.0;
 	setupFuel->max = car->tank;
-	setupFuel->changed = TRUE;
+	setupFuel->changed = true;
 	setupFuel->stepsize = 1.0;
 	
 	car->dimension.x = GfParmGetNum(hdle, SECT_CAR, PRM_LEN, (char*)NULL, 4.7f);
@@ -167,20 +167,20 @@ SimCarConfig(tCar *car)
 		setupSpring = &(car->carElt->setup.suspSpring[i]);
 		setupSpring->desired_value = setupSpring->min = setupSpring-> max = 175000.0f;
 		GfParmGetNumWithLimits(hdle, SuspSect[i], PRM_SPR, (char*)NULL, &(setupSpring->desired_value), &(setupSpring->min), &(setupSpring->max));
-		setupSpring->changed = TRUE;
+		setupSpring->changed = true;
 		setupSpring->stepsize = 1000;
 		K[i] = setupSpring->desired_value;
 	}
 	setupSpring = &(car->carElt->setup.heaveSpring[0]);
 	setupSpring->desired_value = setupSpring->min = setupSpring-> max = 0.0f;
 	GfParmGetNumWithLimits(hdle, SECT_FRNTHEAVE, PRM_SPR, (char*)NULL, &(setupSpring->desired_value), &(setupSpring->min), &(setupSpring->max));
-	setupSpring->changed = TRUE;
+	setupSpring->changed = true;
 	setupSpring->stepsize = 1000;
 	Kfheave = setupSpring->desired_value;
 	setupSpring = &(car->carElt->setup.heaveSpring[1]);
 	setupSpring->desired_value = setupSpring->min = setupSpring-> max = 0.0f;
 	GfParmGetNumWithLimits(hdle, SECT_REARHEAVE, PRM_SPR, (char*)NULL, &(setupSpring->desired_value), &(setupSpring->min), &(setupSpring->max));
-	setupSpring->changed = TRUE;
+	setupSpring->changed = true;
 	setupSpring->stepsize = 1000;
 	Krheave = setupSpring->desired_value;
 
@@ -336,21 +336,21 @@ SimCarConfig(tCar *car)
 	setup->reqRepair.min = setup->reqRepair.value = setup->reqRepair.max = 0.0;
 	setup->reqRepair.desired_value = 0.0;
 	setup->reqRepair.stepsize = 500;
-	setup->reqRepair.changed = FALSE;
+	setup->reqRepair.changed = false;
 	
 	setup->reqTireset.min = 0.0;
 	setup->reqTireset.max = 1.0;
 	setup->reqTireset.value = 1.0;
 	setup->reqTireset.desired_value = 1.0; //1.0 means change tires, 0.0 keep old tires
 	setup->reqTireset.stepsize = 1.0;
-	setup->reqTireset.changed = FALSE;
+	setup->reqTireset.changed = false;
 	
 	setup->reqPenalty.min = 0.0;
 	setup->reqPenalty.max = 1.0;
 	setup->reqPenalty.value = 0.0;
 	setup->reqPenalty.desired_value = 0.0; //0.0 means refuel/repair next, 1.0 means serve penalty next
 	setup->reqPenalty.stepsize = 1.0;
-	setup->reqPenalty.changed = FALSE;
+	setup->reqPenalty.changed = false;
 	
 	priv->dashboardRequest[0].type = DI_FUEL;
 	priv->dashboardRequest[0].setup = &(setup->fuel);
@@ -444,13 +444,13 @@ SimCarReConfig(tCar *car)
 		car->fuel = MIN(setupFuel->max, MAX(setupFuel->min, setupFuel->desired_value));
 		if (car->fuel > car->tank) {car->fuel = car->tank;}
 		setupFuel->value = car->fuel;
-		setupFuel->changed = FALSE;
+		setupFuel->changed = false;
 	}
 	
 	if (setupGcfr->changed) {
 		gcfr = MIN(setupGcfr->max, MAX(setupGcfr->min, setupGcfr->desired_value));
 		setupGcfr->value = gcfr;
-		setupGcfr->changed = FALSE;
+		setupGcfr->changed = false;
 	} else {
 		gcfr = setupGcfr->value;
 	}
@@ -458,7 +458,7 @@ SimCarReConfig(tCar *car)
 	if (setupGcfrl->changed) {
 		gcfrl = MIN(setupGcfrl->max, MAX(setupGcfrl->min, setupGcfrl->desired_value));
 		setupGcfrl->value = gcfrl;
-		setupGcfrl->changed = FALSE;
+		setupGcfrl->changed = false;
 	} else {
 		gcfrl = setupGcfrl->value;
 	}
@@ -466,7 +466,7 @@ SimCarReConfig(tCar *car)
 	if (setupGcrrl->changed) {
 		gcrrl = MIN(setupGcrrl->max, MAX(setupGcrrl->min, setupGcrrl->desired_value));
 		setupGcrrl->value = gcrrl;
-		setupGcrrl->changed = FALSE;
+		setupGcrrl->changed = false;
 	} else {
 		gcrrl = setupGcrrl->value;
 	}

@@ -82,7 +82,7 @@ SimTransmissionConfig(tCar *car)
 		setupGear = &(car->carElt->setup.gearRatio[i]);
 		setupGear->desired_value = setupGear->min = setupGear->max = 0.0f;
 		GfParmGetNumWithLimits(hdle, path, PRM_RATIO, (char*)NULL, &(setupGear->desired_value), &(setupGear->min), &(setupGear->max));
-		setupGear->changed = TRUE;
+		setupGear->changed = true;
 		setupGear->stepsize = 0.01f;
 		gRatio = setupGear->desired_value;
 		if ((trans->gearbox.gearMax == 0) && (gRatio != 0.0f)) {
@@ -183,7 +183,7 @@ SimTransmissionReConfig(tCar *car)
 	if (setupGear->changed) {
 	    gRatio = MIN(setupGear->max, MAX(setupGear->min, setupGear->desired_value));
 	    setupGear->value = gRatio;
-	    setupGear->changed = FALSE;
+	    setupGear->changed = false;
 	}else {gRatio = setupGear->value;}
 	if (gRatio == 0.0f) {
 	    carElt->priv.gearRatio[i] = trans->overallRatio[i] = 0;

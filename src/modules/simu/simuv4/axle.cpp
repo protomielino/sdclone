@@ -35,24 +35,24 @@ void SimAxleConfig(tCar *car, int index)
 	
 	setupRideHeightR->desired_value = setupRideHeightR->min = setupRideHeightR->max = 0.20f;
 	GfParmGetNumWithLimits(hdle, WheelSect[index*2], PRM_RIDEHEIGHT, (char*)NULL, &(setupRideHeightR->desired_value), &(setupRideHeightR->min), &(setupRideHeightR->max));
-	setupRideHeightR->changed = TRUE;
+	setupRideHeightR->changed = true;
 	setupRideHeightR->stepsize = 0.001f;
 	
 	setupRideHeightL->desired_value = setupRideHeightL->min = setupRideHeightL->max = 0.20f;
 	GfParmGetNumWithLimits(hdle, WheelSect[index*2+1], PRM_RIDEHEIGHT, (char*)NULL, &(setupRideHeightL->desired_value), &(setupRideHeightL->min), &(setupRideHeightL->max));
-	setupRideHeightL->changed = TRUE;
+	setupRideHeightL->changed = true;
 	setupRideHeightL->stepsize = 0.001f;
 	
 	if (index == 0) {
 		setupArbK->desired_value = setupArbK->min = setupArbK->max = 175000.0f;
 		GfParmGetNumWithLimits(hdle, SECT_FRNTARB, PRM_SPR, (char*)NULL, &(setupArbK->desired_value), &(setupArbK->min), &(setupArbK->max));
-		setupArbK->changed = TRUE;
+		setupArbK->changed = true;
 		setupArbK->stepsize = 1000;
 		SimSuspConfig(car, hdle, SECT_FRNTHEAVE, &(axle->heaveSusp), 4);
 	} else {
 		setupArbK->desired_value = setupArbK->min = setupArbK->max = 175000.0f;
 		GfParmGetNumWithLimits(hdle, SECT_REARARB, PRM_SPR, (char*)NULL, &(setupArbK->desired_value), &(setupArbK->min), &(setupArbK->max));
-		setupArbK->changed = TRUE;
+		setupArbK->changed = true;
 		setupArbK->stepsize = 1000;
 		SimSuspConfig(car, hdle, SECT_REARHEAVE, &(axle->heaveSusp), 5);
 	}
@@ -68,7 +68,7 @@ void SimArbReConfig(tCar *car, int index)
 	if (setupArbK->changed) {
 		arb->spring.K = MIN(setupArbK->max, MAX(setupArbK->min, setupArbK->desired_value));
 		setupArbK->value = arb->spring.K;
-		setupArbK->changed = FALSE;
+		setupArbK->changed = false;
 	}
 }
 
@@ -84,14 +84,14 @@ void SimAxleReConfig(tCar *car, int index, tdble weight0)
 	if (setupRideHeightR->changed) {
 		x0r = MIN(setupRideHeightR->max, MAX(setupRideHeightR->min, setupRideHeightR->desired_value));
 		setupRideHeightR->value = x0r;
-		setupRideHeightR->changed = FALSE;
+		setupRideHeightR->changed = false;
 	} else {
 		x0r = setupRideHeightR->value;
 	}
 	if (setupRideHeightL->changed) {
 		x0l = MIN(setupRideHeightL->max, MAX(setupRideHeightL->min, setupRideHeightL->desired_value));
 		setupRideHeightL->value = x0l;
-		setupRideHeightL->changed = FALSE;
+		setupRideHeightL->changed = false;
 	} else {
 		x0l = setupRideHeightL->value;
 	}

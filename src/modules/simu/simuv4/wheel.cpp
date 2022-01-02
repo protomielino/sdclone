@@ -43,22 +43,22 @@ void SimWheelConfig(tCar *car, int index)
 
     setupToe->desired_value = setupToe->min = setupToe->max = 0.0f;
     GfParmGetNumWithLimits(hdle, WheelSect[index], PRM_TOE, (char*)NULL, &(setupToe->desired_value), &(setupToe->min), &(setupToe->max));
-    setupToe->changed = TRUE;
+    setupToe->changed = true;
     setupToe->stepsize = (tdble) DEG2RAD(0.1);
 
     setupCamber->desired_value = setupCamber->min = setupCamber->max = 0.0f;
     GfParmGetNumWithLimits(hdle, WheelSect[index], PRM_CAMBER, (char*)NULL, &(setupCamber->desired_value), &(setupCamber->min), &(setupCamber->max));
-    setupCamber->changed = TRUE;
+    setupCamber->changed = true;
     setupCamber->stepsize = (tdble) DEG2RAD(0.1);
 
     setupPressure->desired_value = setupPressure->min = setupPressure->max = 275600;
     GfParmGetNumWithLimits(hdle, WheelSect[index], PRM_PRESSURE, (char*)NULL, &(setupPressure->desired_value), &(setupPressure->min), &(setupPressure->max));
-    setupPressure->changed = TRUE;
+    setupPressure->changed = true;
     setupPressure->stepsize = 10000;
 
     setupOpLoad->desired_value = setupOpLoad->min = setupOpLoad->max = wheel->weight0 * 1.2f;
     GfParmGetNumWithLimits(hdle, WheelSect[index], PRM_OPLOAD, (char*)NULL, &(setupOpLoad->desired_value), &(setupOpLoad->min), &(setupOpLoad->max));
-    setupOpLoad->changed = TRUE;
+    setupOpLoad->changed = true;
     setupOpLoad->stepsize = 100;
 
     rimdiam               = GfParmGetNum(hdle, WheelSect[index], PRM_RIMDIAM, (char*)NULL, 0.33f);
@@ -220,7 +220,7 @@ void SimWheelReConfig(tCar *car, int index)
     {
         wheel->staticPos.az = MIN(setupToe->max, MAX(setupToe->min, setupToe->desired_value));
         setupToe->value = wheel->staticPos.az;
-        setupToe->changed = FALSE;
+        setupToe->changed = false;
     }
 
     if (setupCamber->changed)
@@ -238,7 +238,7 @@ void SimWheelReConfig(tCar *car, int index)
         wheel->cosax = cos(wheel->relPos.ax);
         wheel->sinax = sin(wheel->relPos.ax);
         setupCamber->value = wheel->staticPos.ax;
-        setupCamber -> changed = FALSE;
+        setupCamber -> changed = false;
     }
 
     if ( setupPressure->changed ||car->carElt->setup.FRWeightRep.changed )
@@ -248,14 +248,14 @@ void SimWheelReConfig(tCar *car, int index)
         patchLen = wheel->weight0 / (carElt->_tireWidth(index) * pressure);
         wheel->tireSpringRate = wheel->weight0 / (wheel->radius * (1.0f - cos(asin(patchLen / (2.0f * wheel->radius)))));
         setupPressure->value = pressure;
-        setupPressure->changed = FALSE;
+        setupPressure->changed = false;
     }
 
     if (setupOpLoad->changed)
     {
         wheel->opLoad = MIN(setupOpLoad->max, MAX(setupOpLoad->min, setupOpLoad->desired_value));
         setupOpLoad->value = wheel->opLoad;
-        setupOpLoad->changed = FALSE;
+        setupOpLoad->changed = false;
     }
 
     x0 = setupRideHeight->value;

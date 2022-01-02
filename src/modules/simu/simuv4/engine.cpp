@@ -37,7 +37,7 @@ SimEngineConfig(tCar *car)
 
 	setupRevLimit->desired_value = setupRevLimit->min = setupRevLimit->max = 800;
 	GfParmGetNumWithLimits(hdle, SECT_ENGINE, PRM_REVSLIM, (char*)NULL, &(setupRevLimit->desired_value), &(setupRevLimit->min), &(setupRevLimit->max));
-	setupRevLimit->changed = TRUE;
+	setupRevLimit->changed = true;
 	setupRevLimit->stepsize = (tdble) RPM2RADS(100.0);
 	car->engine.revsLimiter = setupRevLimit->desired_value;
 	car->carElt->_enginerpmRedLine = car->engine.revsLimiter;
