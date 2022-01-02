@@ -37,7 +37,7 @@
 #  pragma warning (disable:4251) // class XXX needs a DLL interface ...
 #endif
 
-#include <climits>
+#include <limits.h>
 
 #include <SDL.h>
 
