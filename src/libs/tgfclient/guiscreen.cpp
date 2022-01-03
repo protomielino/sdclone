@@ -319,17 +319,6 @@ SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,in
 #endif
         0x00000000);
 
-    if (bfVideoMode & SDL_WINDOW_FULLSCREEN)
-    {
-        SDL_Rect bounds;
-
-        /* Work around SDL2 bug */
-        if (SDL_GetDisplayBounds(GfScrStartDisplayId, &bounds) == 0) {
-            if (bounds.w == nWinWidth && bounds.h == nWinHeight)
-                SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-            else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
-        } else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
-    }
     return PScreenSurface;
 }
 
@@ -441,7 +430,7 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
         bFullScreen = nFullScreen ? true : false;
 
     if(bFullScreen)
-        bfVideoMode |= SDL_WINDOW_FULLSCREEN;
+        bfVideoMode |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
 /* TODO : move and re-implement these? 
     bool bAlphaChannel =
@@ -486,7 +475,7 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
     // Failed : Try and remove the full-screen requirement if present ...
     if (!PScreenSurface && bFullScreen)
     {
-        bfVideoMode &= ~SDL_WINDOW_FULLSCREEN;
+        bfVideoMode &= ~SDL_WINDOW_FULLSCREEN_DESKTOP;
         PScreenSurface = gfScrCreateWindow(nWinWidth, nWinHeight, nTotalDepth,bfVideoMode);
         if (!PScreenSurface)
             GfLogTrace("Can't get a non-full-screen %dx%dx%d compatible video mode\n",
@@ -553,7 +542,7 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
 
     // Report about selected SDL video mode.
     GfLogInfo("Selected SDL video mode :\n");
-    GfLogInfo("  Full screen : %s\n", (bfVideoMode & SDL_WINDOW_FULLSCREEN) ? "Yes" : "No");
+    GfLogInfo("  Full screen : %s\n", (bfVideoMode & SDL_WINDOW_FULLSCREEN_DESKTOP) ? "Yes" : "No");
     GfLogInfo("  Size        : %dx%d\n", nWinWidth, nWinHeight);
     GfLogInfo("  Color depth : %d bits\n", nTotalDepth);
 
@@ -566,27 +555,6 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
         SDL_ShowWindow(GfuiWindow);
         SDL_RestoreWindow(GfuiWindow);
     }
-
-/*
-#ifdef WIN32
-    // Under Windows, give an initial position to the window if not full-screen mode
-    // (under Linux/Mac OS X, no need, the window manager smartly takes care of this).
-    if (!(bfVideoMode & SDL_WINDOW_FULLSCREEN))
-    {
-        // Try to center the game Window on the desktop, but keep the title bar visible if any.
-        const HWND hDesktop = GetDesktopWindow();
-        RECT rectDesktop;
-        GetWindowRect(hDesktop, &rectDesktop);
-        const int nWMWinXPos =
-            nWinWidth >= rectDesktop.right ? 0 : (rectDesktop.right - nWinWidth) / 2;
-        const int nWMWinYPos =
-            nWinHeight >= rectDesktop.bottom ? 0 : (rectDesktop.bottom - nWinHeight) / 2;
-        GfuiInitWindowPositionAndSize(nWMWinXPos, nWMWinYPos, nWinWidth, nWinHeight);
-    }
-#endif
-*/
-
-
 
     // Initialize the Open GL viewport.
     gfScrReshapeViewport(nWinWidth, nWinHeight);
@@ -698,19 +666,11 @@ bool GfScrToggleFullScreen()
 {
     Uint32 flags = SDL_GetWindowFlags(GfuiWindow);
 
-    if ((flags & SDL_WINDOW_FULLSCREEN) || (flags & SDL_WINDOW_FULLSCREEN_DESKTOP)) {
+    if (flags & SDL_WINDOW_FULLSCREEN_DESKTOP) {
         SDL_SetWindowFullscreen(GfuiWindow, 0);
         return false;
     } else {
-        SDL_Rect bounds;
-
-        /* Work around SDL2 bug */
-        if (SDL_GetDisplayBounds(GfScrStartDisplayId, &bounds) == 0) {
-            if (SDL_FALSE) //(bounds.w == nWinWidth && bounds.h == nWinHeight)
-                SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-            else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
-        } else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
-
+        SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
         return true;
     }
 }
