@@ -138,7 +138,9 @@ grAdaptScreenSize(void)
             switch (grNbArrangeScreens) {
             default:
                 grNbArrangeScreens = 0;
+#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
                 [[fallthrough]];
+#endif
             case 0:
                 // Top & Bottom half of the window
                 grScreens[0]->activate(grWinx, grWiny + grWinh / 2, grWinw, grWinh / 2, 0.0);
@@ -233,7 +235,10 @@ grAdaptScreenSize(void)
 #endif
             default:
                 grNbArrangeScreens = 0;
+#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
                 [[fallthrough]];
+#endif
+
             case 0:
                 // Top/Bottom Left/Rigth Quarters
                 grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
