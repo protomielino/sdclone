@@ -428,7 +428,7 @@ void TSimpleStrategy::Update(PtCarElt Car,
 //==========================================================================*
 // State (Sequential logic system)
 //--------------------------------------------------------------------------*
-void TSimpleStrategy::CheckPitState(float PitScaleBrake)
+void TSimpleStrategy::CheckPitState(float /*PitScaleBrake*/)
 {
   if (oPit == NULL)								 // No Pit no service
     return;
@@ -485,8 +485,10 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
       // We reached the poit to stopp
       oState =	PIT_ASKED;
       LogSimplix.debug("#PIT_ENTER: %g\n", TrackPos);
-
-        // falls	through...
+      // falls	through...
+#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
+      [[fallthrough]];
+#endif
 
     case PIT_ASKED:
       // We are still going to	the	pit
@@ -496,7 +498,7 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
         oDriver->oStanding = true;			   // For motion	survey!
         oPitTicker = 0;						   // Start service timer
          CarAccelCmd = 0;							// release throttle
-         CarBrakeCmd = 1.0 * PitScaleBrake;			// Start	braking
+         CarBrakeCmd = 1.0;			// Start	braking
          CarRaceCmd =	RM_CMD_PIT_ASKED;			// Tell	TORCS to service us! To	test oPitTicker	comment	out
          oState =	PIT_SERVICE;
       }
