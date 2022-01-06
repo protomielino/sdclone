@@ -524,20 +524,19 @@ void DiscretePolicy::loadFile (char* f)
 		return;
 	}
 
-	int i, j;
-	for (i=0; i<n_states; i++) {
+	for (int i=0; i<n_states; i++) {
 		readSize = fread((void *) Q[i], sizeof(real), n_actions, fh);
 		if( readSize < (int unsigned)n_actions )
 			fprintf(stderr, "Error when reading file");
-		for (j=0; j<n_actions; j++) {
+		for (int j=0; j<n_actions; j++) {
 			if ((fabs (Q[i][j])>100.0)||(isnan(Q[i][j]))) {
 				printf ("l: %d %d %f\n", i,j,Q[i][j]);
 				Q[i][j] = 0.0;
 			}
 		}
 	}
-	for (i=0; i<n_states; i++) {
-		for (j=0; j<n_actions; j++) {
+	for (int i=0; i<n_states; i++) {
+		for (int j=0; j<n_actions; j++) {
 			{
 				P[i][j] = 1.0f/((real) n_actions);
 			}
