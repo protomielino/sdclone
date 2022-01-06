@@ -712,15 +712,15 @@ void NetNetwork::ReadCarStatusPacket(ENetPacket *pPacket)
             status.time = packettime;
 
             bool bFound = false;
-            for (unsigned int i=0;i<pNData->m_vecCarStatus.size();i++)
+            for (size_t j=0;j<pNData->m_vecCarStatus.size();j++)
             {
-                if (pNData->m_vecCarStatus[i].startRank == status.startRank)
+                if (pNData->m_vecCarStatus[j].startRank == status.startRank)
                 {
                     bFound = true;
                     //Only use the data if the time is newer.  Prevent out of order packet
-                    if (pNData->m_vecCarStatus[i].time < status.time)
+                    if (pNData->m_vecCarStatus[j].time < status.time)
                     {
-                        pNData->m_vecCarStatus[i] = status;
+                        pNData->m_vecCarStatus[j] = status;
                     }
                     else
                     {
@@ -813,15 +813,15 @@ void NetNetwork::ReadCarControlsPacket(ENetPacket *pPacket)
             ctrl.time = packettime;
 
             bool bFound = false;
-            for (unsigned int i=0;i<pNData->m_vecCarCtrls.size();i++)
+            for (size_t j=0;j<pNData->m_vecCarCtrls.size();j++)
             {
-                if (pNData->m_vecCarCtrls[i].startRank == ctrl.startRank)
+                if (pNData->m_vecCarCtrls[j].startRank == ctrl.startRank)
                 {
                     bFound = true;
                     //Only use the data if the time is newer.  Prevent out of order packet
-                    if (pNData->m_vecCarCtrls[i].time < ctrl.time)
+                    if (pNData->m_vecCarCtrls[j].time < ctrl.time)
                     {
-                        pNData->m_vecCarCtrls[i] = ctrl;
+                        pNData->m_vecCarCtrls[j] = ctrl;
                     }
                     else
                     {
