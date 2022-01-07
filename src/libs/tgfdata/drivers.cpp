@@ -112,7 +112,7 @@ void GfDrivers::reload()
 
         // Determine the module name.
         std::string strModName(pCurModule->sopath);
-        strModName.erase(strlen(pCurModule->sopath) - strlen(DLLEXT) - 1); // Truncate file ext.
+        strModName.erase(strlen(pCurModule->sopath) - strlen(DLLEXT)); // Truncate file ext.
         const size_t nLastSlashInd = strModName.rfind('/');
         if (nLastSlashInd != std::string::npos)
             strModName = strModName.substr(nLastSlashInd+1); // Remove heading folder path.

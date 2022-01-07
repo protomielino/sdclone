@@ -259,7 +259,7 @@ void Application::generate()
     // Load and initialize the track loader module.
     GfLogInfo("Loading Track Loader ...\n");
     std::ostringstream ossModLibName;
-    ossModLibName << GfLibDir() << "modules/track/" << "trackv1" << '.' << DLLEXT;
+    ossModLibName << GfLibDir() << "modules/track/" << "trackv1" << DLLEXT;
     GfModule* pmodTrkLoader = GfModule::load(ossModLibName.str());
 
     // Check that it implements ITrackLoader.

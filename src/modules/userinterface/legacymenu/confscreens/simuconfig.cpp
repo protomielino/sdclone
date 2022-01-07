@@ -118,7 +118,7 @@ static void loadSimuCfg(void)
 	}
 
 	// Check if the selected simulation module is there, and fall back to the default one if not.
-	snprintf(buf, sizeof(buf), "%smodules/simu/%s.%s", GfLibDir(), SimuVersionList[CurSimuVersion], DLLEXT);
+	snprintf(buf, sizeof(buf), "%smodules/simu/%s%s", GfLibDir(), SimuVersionList[CurSimuVersion], DLLEXT);
 	if (!GfFileExists(buf))
 	{
 		GfLogWarning("User settings %s physics engine module not found ; falling back to %s\n",
@@ -232,7 +232,7 @@ onChangeSimuVersion(void *vp)
 	{
 		CurSimuVersion = (CurSimuVersion + NbSimuVersions + (int)(long)vp) % NbSimuVersions;
 	
-		snprintf(buf, sizeof(buf), "%smodules/simu/%s.%s", GfLibDir(), SimuVersionList[CurSimuVersion], DLLEXT);
+		snprintf(buf, sizeof(buf), "%smodules/simu/%s%s", GfLibDir(), SimuVersionList[CurSimuVersion], DLLEXT);
 	}
 	while (!GfFileExists(buf) && CurSimuVersion != oldSimuVersion);
 

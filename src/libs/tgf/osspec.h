@@ -34,13 +34,13 @@
 #endif
 
 // File name extensions
-#define DLLEXT	"dll"
+#define DLLEXT	".dll"
 
 // Linux -------------------------------------------------------------------
 #else // WIN32
 
 // File name extensions
-#define DLLEXT	 "so"
+#define DLLEXT	 ".so"
 
 #endif // WIN32
 

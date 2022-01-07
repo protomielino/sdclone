@@ -233,7 +233,7 @@ onChangeGraphicVersion(void *vp)
 	{
 		CurGraphicScheme = (CurGraphicScheme + NbGraphicScheme + (int)(long)vp) % NbGraphicScheme;
 	
-		snprintf(buf, sizeof(buf), "%smodules/graphic/%s.%s", GfLibDir(), GraphicSchemeList[CurGraphicScheme], DLLEXT);
+		snprintf(buf, sizeof(buf), "%smodules/graphic/%s%s", GfLibDir(), GraphicSchemeList[CurGraphicScheme], DLLEXT);
 	}
 	while (!GfFileExists(buf) && CurGraphicScheme != oldGraphicVersion);
 

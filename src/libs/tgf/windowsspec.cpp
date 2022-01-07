@@ -31,7 +31,7 @@
 #include "tgf.h"
 #include "os.h"
 
-static const size_t SOFileExtLen = strlen(".") + strlen(DLLEXT);
+static const size_t SOFileExtLen = strlen(DLLEXT);
 
 /*
 * Function
@@ -214,7 +214,7 @@ windowsModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 	// Scan directory
 	_finddata_t FData;
 	char Dir_name[ 1024 ];
-	snprintf(Dir_name, sizeof(Dir_name), "%s\\*.%s", dir, DLLEXT);
+	snprintf(Dir_name, sizeof(Dir_name), "%s\\*%s", dir, DLLEXT);
 	intptr_t Dirent = _findfirst( Dir_name, &FData );
 	if ( Dirent != -1 )
 	{
@@ -305,11 +305,11 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 		do 
 		{
 			if (((strlen(FData.name) > SOFileExtLen + 1) && 
-				 (strcmp('.' + DLLEXT, FData.name+strlen(FData.name)-SOFileExtLen) == 0)) /* xxxx.dll */
+				 (strcmp(DLLEXT, FData.name+strlen(FData.name)-SOFileExtLen) == 0)) /* xxxx.dll */
 				|| (level == 1 && FData.name[0] != '.'))
 			{
 				if (level == 1) 
-					snprintf(soPath, sizeof(soPath), "%s/%s/%s.%s", dir, FData.name, FData.name,DLLEXT);
+					snprintf(soPath, sizeof(soPath), "%s/%s/%s%s", dir, FData.name, FData.name, DLLEXT);
 				else
 					snprintf(soPath, sizeof(soPath), "%s/%s", dir, FData.name);
 				

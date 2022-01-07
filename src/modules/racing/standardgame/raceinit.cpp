@@ -802,10 +802,10 @@ ReInitCars(void)
 #if 0 // SDW
     if (replayReplay)
       // Register against the Replay driver
-      snprintf(path, sizeof(path), "%sdrivers/replay/replay.%s", GfLibDir(), DLLEXT);
+      snprintf(path, sizeof(path), "%sdrivers/replay/replay%s", GfLibDir(), DLLEXT);
     else
 #endif
-      snprintf(path, sizeof(path), "%sdrivers/%s/%s.%s", GfLibDir(), robotModuleName, robotModuleName, DLLEXT);
+      snprintf(path, sizeof(path), "%sdrivers/%s/%s%s", GfLibDir(), robotModuleName, robotModuleName, DLLEXT);
 
     /* Load the robot shared library */
     if (GfModLoad(CAR_IDENT, path, ReInfo->robModList))

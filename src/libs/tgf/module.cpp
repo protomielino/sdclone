@@ -146,7 +146,7 @@ bool GfModule::isPresent(const std::string& strModCatName, const std::string& st
 	std::ostringstream ossModLibPathName;
 	
 	ossModLibPathName << GfLibDir() << "modules/" << strModCatName << "/"
-					  <<  strModName << '.' << DLLEXT;
+					  <<  strModName << DLLEXT;
 
 	return GfFileExists(ossModLibPathName.str().c_str());
 }
@@ -155,7 +155,7 @@ GfModule* GfModule::load(const std::string& strModPathName, const std::string& s
 {
 	std::ostringstream ossModLibPathName;
 	
-	ossModLibPathName << GfLibDir() << strModPathName << "/" <<  strModName << '.' << DLLEXT;
+	ossModLibPathName << GfLibDir() << strModPathName << "/" <<  strModName << DLLEXT;
 
 	return load(ossModLibPathName.str());
 }

@@ -749,7 +749,7 @@ ReInitCars(void)
         snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i);
         robotModuleName = GfParmGetStr(ReInfo->params, path, RM_ATTR_MODULE, "");
         robotIdx = (int)GfParmGetNum(ReInfo->params, path, RM_ATTR_IDX, NULL, 0);
-        snprintf(path, sizeof(path), "%sdrivers/%s/%s.%s", GfLibDir(), robotModuleName, robotModuleName, DLLEXT);
+        snprintf(path, sizeof(path), "%sdrivers/%s/%s%s", GfLibDir(), robotModuleName, robotModuleName, DLLEXT);
 
         /* Load the robot shared library */
         if (GfModLoad(CAR_IDENT, path, ReInfo->robModList))
