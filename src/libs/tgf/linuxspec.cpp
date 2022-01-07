@@ -60,7 +60,7 @@ typedef cpuset_t cpu_set_t;
 #include <pthread_np.h>
 #endif
 
-static const size_t SOFileExtLen = strlen("." DLLEXT);
+static const size_t SOFileExtLen = strlen(DLLEXT);
 static const size_t SOPathLenMax = 1024;
 
 /*
@@ -252,7 +252,7 @@ linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 		while ((ep = readdir (dp)) != 0) 
 		{
 			if ((strlen(ep->d_name) > SOFileExtLen + 1) &&
-				(strcmp("." DLLEXT, ep->d_name+strlen(ep->d_name)-SOFileExtLen) == 0)) /* xxxx.so */
+				(strcmp(DLLEXT, ep->d_name+strlen(ep->d_name)-SOFileExtLen) == 0)) /* xxxx.so */
 			{
 				snprintf(sopath, sizeof(sopath), "%s/%s", dir, ep->d_name);
 				/* Try and avoid loading the same module twice (WARNING: Only checks sopath equality !) */
@@ -344,11 +344,11 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
 		while ((ep = readdir (dp)) != 0) 
 		{
 			if (((strlen(ep->d_name) >  SOFileExtLen + 1) && 
-				 (strcmp("." DLLEXT, ep->d_name+strlen(ep->d_name)-SOFileExtLen) == 0)) /* xxxx.so */
+				 (strcmp(DLLEXT, ep->d_name+strlen(ep->d_name)-SOFileExtLen) == 0)) /* xxxx.so */
 				|| ((level == 1) && (ep->d_name[0] != '.')))
 			{
 				if (level == 1)
-					snprintf(sopath, sizeof(sopath), "%s/%s/%s.%s", dir, ep->d_name, ep->d_name,DLLEXT);
+					snprintf(sopath, sizeof(sopath), "%s/%s/%s%s", dir, ep->d_name, ep->d_name, DLLEXT);
 				else
 					snprintf(sopath, sizeof(sopath), "%s/%s", dir, ep->d_name);
 				
