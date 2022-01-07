@@ -185,6 +185,7 @@ void TDriver::InterpolatePointInfo
 // Constructor
 //--------------------------------------------------------------------------*
 TDriver::TDriver(int Index):
+	oRobotTyp(0),
 	oCommonData(NULL),
 	//	TrackDesc
 	//	Racingline
@@ -204,7 +205,7 @@ TDriver::TDriver(int Index):
 	oFlying(0),
 	oNbrCars(0),
 	oOwnOppIdx(0),
-	//	oOpponents
+	oOpponents(NULL),
 	oAvoidRange(0.99),
 	oAvoidRangeDelta(0.0),
 	oAvoidOffset(0.0),
@@ -232,8 +233,8 @@ TDriver::TDriver(int Index):
 	oAngle(0),
 	oAngleSpeed(0),
 	oBotName(NULL),
-	//	oTeamName
-	//	oRaceNumber
+	oTeamName(NULL),
+	oRaceNumber(0),
 	oWingControl(false),
 	oWingAngleFront(0),
 	oWingAngleRear(0),
@@ -510,7 +511,7 @@ void TDriver::SetBotName(void* RobotSettings, char*	Value)
 			 , (char	*) NULL, (tdble) oIndex	+ 1);	   //	section, index as default
 
 	LogSimplix.debug("#Bot	name	: %s\n",oBotName);
-	LogSimplix.debug("#Team name	:	%s\n",oTeamName);
+	LogSimplix.debug("#Team name	: %s\n",oTeamName);
 	LogSimplix.debug("#Car	type	: %s\n",oCarType);
 	LogSimplix.debug("#Race number	: %d\n",oRaceNumber);
 };
