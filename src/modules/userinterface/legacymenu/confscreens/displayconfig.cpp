@@ -190,7 +190,8 @@ bool DisplayMenu::restartNeeded()
 {
 	bool needRestart = ((_eDisplayMode != _eOriginalDisplayMode) 
 						|| (_nScreenWidth !=_nOriginalScreenWidth)
-						|| (_nScreenHeight != _nOriginalScreenHeight));
+						|| (_nScreenHeight != _nOriginalScreenHeight)
+						|| (_nOriginalMenuDisplay != _nMenuDisplay));
 
 	return needRestart;
 }
@@ -410,49 +411,41 @@ void DisplayMenu::setDisplayMode(EDisplayMode eMode)
 
 void DisplayMenu::resetScreenSizes()
 {
-	// Determine possible / supported screen sizes for the current display mode, color depth,
-	// and video features detection mode.
-	int nDefScreenSizes;
-	tScreenSize* aDefScreenSizes = GfScrGetDefaultSizes(&nDefScreenSizes);
-	if (_aScreenSizes && _aScreenSizes != aDefScreenSizes)
-		free(_aScreenSizes);
-
-	_aScreenSizes =
-		GfScrGetSupportedSizes(32, _eDisplayMode == eFullScreen, &_nNbScreenSizes);
-	if (_eDisplayMode != eFullScreen || _aScreenSizes == (tScreenSize*)-1 || _aScreenSizes == 0)
-	{
-		_aScreenSizes = aDefScreenSizes;
-		_nNbScreenSizes = nDefScreenSizes;
-	}
+	// Either show the sizes supported by the current display (Full screen
+	// or the Default/Custom sizes
+	if (_eDisplayMode == eFullScreen)
+		_vScreenSizes = GfScrGetSupportedSizes(_nMenuDisplay);
+	else
+		_vScreenSizes = GfScrGetWindowSizes();
 
 
 	// Update combo-box with new possible sizes.
 	const int nComboId = getDynamicControlId("ScreenSizeCombo");
 	GfuiComboboxClear(getMenuHandle(), nComboId);
 	std::ostringstream ossSize;
-	for (int nSizeIndex = 0; nSizeIndex < _nNbScreenSizes; nSizeIndex++)
+	for (unsigned int nSizeIndex = 0; nSizeIndex < _vScreenSizes.size(); nSizeIndex++)
 	{
 		ossSize.str("");
-		ossSize << _aScreenSizes[nSizeIndex].width << " x " << _aScreenSizes[nSizeIndex].height;
+		ossSize << _vScreenSizes[nSizeIndex].width << " x " << _vScreenSizes[nSizeIndex].height;
 		GfuiComboboxAddText(getMenuHandle(), nComboId, ossSize.str().c_str());
 	}
 	
 	// Try and find the closest screen size to the current choice in the new list.
 	// 1) Is there an exact match ?
 	int nScreenSizeIndex = -1;
-	for (int nSizeInd = 0; nSizeInd < _nNbScreenSizes; nSizeInd++)
-		if (_nScreenWidth == _aScreenSizes[nSizeInd].width
-			&& _nScreenHeight == _aScreenSizes[nSizeInd].height)
+	for (unsigned int nSizeInd = 0; nSizeInd < _vScreenSizes.size(); nSizeInd++)
+		if (_nScreenWidth == _vScreenSizes[nSizeInd].width
+			&& _nScreenHeight == _vScreenSizes[nSizeInd].height)
 		{
 			nScreenSizeIndex = nSizeInd;
 			break;
 		}
 
-	// 2) Is there an approximative match ?
+	// 2) Is there an approximate match ?
 	if (nScreenSizeIndex < 0)
-		for (int nSizeInd = 0; nSizeInd < _nNbScreenSizes; nSizeInd++)
-			if (_nScreenWidth <= _aScreenSizes[nSizeInd].width
-				&& _nScreenHeight <= _aScreenSizes[nSizeInd].height)
+		for (unsigned int nSizeInd = 0; nSizeInd < _vScreenSizes.size(); nSizeInd++)
+			if (_nScreenWidth <= _vScreenSizes[nSizeInd].width
+				&& _nScreenHeight <= _vScreenSizes[nSizeInd].height)
 			{
 				nScreenSizeIndex = nSizeInd;
 				break;
@@ -460,11 +453,11 @@ void DisplayMenu::resetScreenSizes()
 
 	// 3) Not found : the closest is the biggest.
 	if (nScreenSizeIndex < 0)
-		nScreenSizeIndex = _nNbScreenSizes - 1;
+		nScreenSizeIndex = _vScreenSizes.size() - 1;
 
 	// 4) Store new screen size.
-	_nScreenWidth = _aScreenSizes[nScreenSizeIndex].width;
-	_nScreenHeight = _aScreenSizes[nScreenSizeIndex].height;
+	_nScreenWidth = _vScreenSizes[nScreenSizeIndex].width;
+	_nScreenHeight = _vScreenSizes[nScreenSizeIndex].height;
 	
 	// Select the found one in the combo-box.
 	GfuiComboboxSetSelectedIndex(getMenuHandle(), nComboId, nScreenSizeIndex);
@@ -472,8 +465,8 @@ void DisplayMenu::resetScreenSizes()
 
 void DisplayMenu::setScreenSizeIndex(int nIndex)
 {
-	_nScreenWidth = _aScreenSizes[nIndex].width;
-	_nScreenHeight = _aScreenSizes[nIndex].height;
+	_nScreenWidth = _vScreenSizes[nIndex].width;
+	_nScreenHeight = _vScreenSizes[nIndex].height;
 }
 
 void DisplayMenu::setMonitorType(EDisplayType eType)
@@ -502,9 +495,12 @@ void DisplayMenu::setArcRatio(float ratio)
 
 void DisplayMenu::setMenuDisplay(int nIndex)
 {
-	//_nScreenWidth = _aScreenSizes[nIndex].width;
-	//_nScreenHeight = _aScreenSizes[nIndex].height;
-	_nMenuDisplay = nIndex;
+	if (_nMenuDisplay != nIndex)
+	{
+		_nMenuDisplay = nIndex;
+
+		resetScreenSizes();
+	}
 }
 
 #ifndef NoMaxRefreshRate
@@ -517,8 +513,6 @@ void DisplayMenu::setMaxRefreshRateIndex(int nIndex)
 DisplayMenu::DisplayMenu()
 : GfuiMenuScreen("displayconfigmenu.xml")
 {
-	_nNbScreenSizes = -1;
-	_aScreenSizes = 0;
 	_eDisplayMode = eWindowed;
 	_nScreenWidth = 800;
 	_nScreenHeight = 600;
@@ -535,14 +529,6 @@ DisplayMenu::DisplayMenu()
 #ifndef NoMaxRefreshRate
 	_nMaxRefreshRate = 0;
 #endif	
-}
-
-DisplayMenu::~DisplayMenu()
-{
-	int nDefScreenSizes;
-	tScreenSize* aDefScreenSizes = GfScrGetDefaultSizes(&nDefScreenSizes);
-	if (_aScreenSizes && _aScreenSizes != aDefScreenSizes)
-		free(_aScreenSizes);
 }
 
 bool DisplayMenu::initialize(void *pPreviousMenu)

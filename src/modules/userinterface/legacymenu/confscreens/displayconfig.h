@@ -34,7 +34,6 @@ class DisplayMenu : public GfuiMenuScreen
 public:
 
 	DisplayMenu();
-	~DisplayMenu();
 	
 	bool initialize(void* pPreviousMenu);
 	
@@ -84,9 +83,8 @@ protected:
 
 private:
 
-	//! Possible screen sizes according to the current color depth and display mode.
-	int _nNbScreenSizes;
-	tScreenSize* _aScreenSizes;
+	// Holds screen size choices for the current display mode.
+	ScreenSizeVector _vScreenSizes;
 
 	//! Currently selected display mode.
 	EDisplayMode _eDisplayMode;

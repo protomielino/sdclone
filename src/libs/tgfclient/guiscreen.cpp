@@ -27,6 +27,7 @@
 #include <cstring>
 #include <cmath>
 #include <sstream>
+#include <algorithm>
 
 #ifdef WIN32
 #include <windows.h>
@@ -119,119 +120,85 @@ static tScreenSize ADefScreenSizes[] =
 static const int NDefScreenSizes =
     sizeof(ADefScreenSizes) / sizeof(ADefScreenSizes[0]);
 
-/** Get the default / fallback screen / window sizes (pixels).
+/** Get a list of (common?) window sizes (pixels)
     @ingroup	screen
-    @param	pnSizes	Address of number of default sizes (output).
-    @return	Array of detected supported sizes (static data, never free).
+    @return	ScreenSizeVector of sizes
  */
-tScreenSize* GfScrGetDefaultSizes(int* pnSizes)
+ScreenSizeVector GfScrGetWindowSizes()
 {
-    *pnSizes = NDefScreenSizes;
-
-    return ADefScreenSizes;
+    ScreenSizeVector vecSizes;
+    for(int i = 0; i < NDefScreenSizes; i++)
+    {
+        vecSizes.push_back(ADefScreenSizes[i]);
+    }
+    return vecSizes;
 }
 
-/** Get the supported screen / window sizes (pixels) for the given color depth and display mode.
+/** Get the supported screen / window sizes (pixels) for the current display mode.
     @ingroup	screen
-    @param	nColorDepth	Requested color depth (bits)
-    @param	bFullScreen	Requested display mode : full-screeen mode if true, windowed otherwise.
-    @param	pnSizes	Address of number of detected supported sizes (output) (-1 if any size is supported).
-    @return	Array of detected supported sizes (allocated on the heap, must use free at the end), or 0 if no detected supported size, or -1 if any size is supported.
-    @note   The vertical refresh rate is not taken into account as a parameter for detection here, due to SDL API not supporting this ; fortunately, when selecting a given video mode, SDL ensures to (silently) select a safe refresh rate for the selected mode, which may be of some importantce especially in full-screen modes.
+    @param	nDisplayIndex	Index of the display from which to get the sizes
+    @return	ScreenSizeVector of detected supported sizes
  */
-tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSizes)
+ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex)
 {
     /* Build list of available screen sizes */
-    int avail;
+    int numModes;
     SDL_DisplayMode mode;
-    // Uint32 format;
     SDL_Rect bounds;
-    tScreenSize* aSuppSizes;
-    tScreenSize* tmpSuppSizes;
+    ScreenSizeVector vecSizes;
     tScreenSize last;
-
     last.width = 0;
     last.height = 0;
 
-    if (bFullScreen)
-        avail = SDL_GetNumDisplayModes(GfScrStartDisplayId);
-    else
-        avail = NDefScreenSizes;
+    // make sure nDisplayIndex is valid (less than Number of displays)
+    if(nDisplayIndex < GfScrGetAttachedDisplays())
+    {
+        if(SDL_GetDesktopDisplayMode(nDisplayIndex, &mode) == 0)
+        {
+            bounds.w = mode.w;
+            bounds.h = mode.h;
+            GfLogInfo("Display %d : %d x %d x %d @ %d hz\n", nDisplayIndex + 1, mode.w,mode.h,SDL_BITSPERPIXEL(mode.format),mode.refresh_rate);
+        }
+        else
+        {
+            GfLogError("Could not get the Display mode for Display %d \n", nDisplayIndex);
+            bounds.w = 0;
+            bounds.h = 0;
+        }
 
-    GfLogInfo("SDL2: modes availabled %d\n", avail);
-    *pnSizes = 0;
+        numModes = SDL_GetNumDisplayModes(nDisplayIndex);
+        GfLogInfo("Display %d : modes available %d\n", nDisplayIndex + 1, numModes);
 
-    if(SDL_GetDisplayBounds(GfScrStartDisplayId, &bounds) == 0)
-        GfLogInfo("Display bounds %dx%d\n", bounds.w , bounds.h );
-    else {
-        bounds.w = 0;
-        bounds.h = 0;
-    }
-
-    if (avail) {
-        /* Overzealous malloc */
-        tmpSuppSizes = (tScreenSize*)malloc((avail+1) * sizeof(tScreenSize));
-
-        while (avail) {
-            if (bFullScreen == 0) {
-                /* list any size <= desktop size */
-                if (ADefScreenSizes[avail-1].width <= bounds.w
-                        &&  ADefScreenSizes[avail-1].height <= bounds.h) {
-                    tmpSuppSizes[*pnSizes].width  = ADefScreenSizes[avail-1].width;
-                    tmpSuppSizes[*pnSizes].height = ADefScreenSizes[avail-1].height;
-
-                    GfLogInfo(" %dx%d,", tmpSuppSizes[*pnSizes].width, tmpSuppSizes[*pnSizes].height);
-                    (*pnSizes)++;
-                }
-            }
-            else if (SDL_GetDisplayMode(GfScrStartDisplayId, avail-1, &mode) == 0) {
-                if (SDL_BITSPERPIXEL(mode.format) == static_cast<Uint32>(nColorDepth)
-#if 1	// ignore multiple entries with different frequencies
-                        && (last.width != mode.w || last.height != mode.h)
-#endif
-                        ) {
-                    tmpSuppSizes[*pnSizes].width  = mode.w;
-                    tmpSuppSizes[*pnSizes].height = mode.h;
-
-                    GfLogInfo(" %dx%d,", tmpSuppSizes[*pnSizes].width, tmpSuppSizes[*pnSizes].height);
-                    (*pnSizes)++;
-
+        for(int i = 0; i < numModes; i++)
+        {
+            if(SDL_GetDisplayMode(nDisplayIndex, i, &mode) == 0)
+            {
+                // Make sure it fits on the display
+                // && no duplicate entries
+                if(((mode.w <= bounds.w) && (mode.h <= bounds.h))
+                    && ((mode.w != last.width) || (mode.h != last.height)))
+                {
+                    GfLogDebug("  %d x %d x %d @ %d hz\n",mode.w,mode.h,SDL_BITSPERPIXEL(mode.format),mode.refresh_rate);
                     last.width = mode.w;
                     last.height = mode.h;
+                    vecSizes.push_back(last);
                 }
             }
-            avail--;
         }
-
-        /* work around SDL2 bug, add desktop bounds as option */
-        if (bFullScreen && (bounds.w != last.width || bounds.h != last.height)) {
-            tmpSuppSizes[*pnSizes].width  = bounds.w;
-            tmpSuppSizes[*pnSizes].height = bounds.h;
-
-            GfLogInfo(" %dx%d,", tmpSuppSizes[*pnSizes].width, tmpSuppSizes[*pnSizes].height);
-            (*pnSizes)++;
-        }
-
-    } else {
-        GfLogInfo(" None.");
-        tmpSuppSizes = (tScreenSize*) NULL;
+        // Reverse the order for combobox GUI
+        std::reverse(vecSizes.begin(), vecSizes.end());
     }
-    GfLogInfo("\nModes selected %d\n", *pnSizes);
+    else
+    {
+        GfLogError("Invalid Display index passed to GfScrGetSupportedSizes()\n");
+    }
 
-   // reverse the array so they appear in correct order in GUI...
-   if(*pnSizes > 0) {
-      aSuppSizes = (tScreenSize*)malloc((*pnSizes) * sizeof(tScreenSize));
-      int maxindex = *pnSizes - 1;
-      for(int i = maxindex; i >= 0; i--) {
-         aSuppSizes[i] = tmpSuppSizes[maxindex - i];
-      }
-      // ...and free the temporary array
-      free(tmpSuppSizes);
-   }
-   else {
-      aSuppSizes = NULL;
-   }
-    return aSuppSizes;
+    if(vecSizes.empty())
+    {
+        GfLogInfo("No supported sizes for Display .\n");
+    }
+
+    return vecSizes;
 }
 
 /** Get the default / fallback screen / window color depths (bits per pixels, alpha included).
@@ -378,6 +345,7 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
 #if ((SDL_MAJOR_VERSION >= 2) && (SDL_PATCHLEVEL >= 5))
     SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
 #endif
+    SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
 
     GfScrNumDisplays = GfScrGetAttachedDisplays();
 

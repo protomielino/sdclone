@@ -77,6 +77,8 @@ typedef struct ScreenSize
     int height; // Height in pixels.
 } tScreenSize;
 
+typedef std::vector<tScreenSize> ScreenSizeVector;
+
 TGFCLIENT_API SDL_Window* GfScrGetMainWindow();//{return GfuiWindow;};
 TGFCLIENT_API bool GfScrInit(int nWinWidth = -1, int nWinHeight = -1, int nFullScreen = -1);
 TGFCLIENT_API void GfScrShutdown(void);
@@ -87,8 +89,8 @@ TGFCLIENT_API int GfScrCaptureAsPNG(const char *filename);
 
 TGFCLIENT_API int* GfScrGetSupportedColorDepths(int* pnDepths);
 TGFCLIENT_API int* GfScrGetDefaultColorDepths(int* pnDepths);
-TGFCLIENT_API tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSizes);
-TGFCLIENT_API tScreenSize* GfScrGetDefaultSizes(int* pnSizes);
+TGFCLIENT_API ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex);
+TGFCLIENT_API ScreenSizeVector GfScrGetWindowSizes();
 
 TGFCLIENT_API int GfScrGetAttachedDisplays();
 
