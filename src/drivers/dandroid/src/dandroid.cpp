@@ -114,7 +114,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn * welcomeIn,
 		snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
 
 		// Try to get first driver from index 0
-		const string sDriverName = GfParmGetStrNC(pRobotSettings,
+		string sDriverName = GfParmGetStrNC(pRobotSettings,
 			SectionBuffer,
 			ROB_ATTR_NAME,
 			const_cast<char*>(sUndefined));
@@ -139,7 +139,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn * welcomeIn,
 		{
 			snprintf(SectionBuffer, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i);
 
-			string sDriverName = GfParmGetStr(pRobotSettings, SectionBuffer,
+			sDriverName = GfParmGetStr(pRobotSettings, SectionBuffer,
 				ROB_ATTR_NAME, sUndefined);
 
 			if (sDriverName != sUndefined)

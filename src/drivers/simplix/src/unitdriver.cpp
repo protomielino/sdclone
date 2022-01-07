@@ -3515,8 +3515,8 @@ void TDriver::EvaluateCollisionFlags(
 
 	Coll.Flags	|= OppInfo.Flags;					// subsume collision flags
 	Coll.MinOppDistance = MIN(Coll.MinOppDistance,OppInfo.MinOppDistance);
-	for (int I	= 0; I < MAXBLOCKED; I++)
-		Coll.Blocked[I] |= OppInfo.Blocked[I];	   // subsume blocked flags
+	for (int i = 0; i < MAXBLOCKED; i++)
+		Coll.Blocked[i] |= OppInfo.Blocked[i];	   // subsume blocked flags
 
 	double	ToL	= 0.0;
 	double	ToR	= 0.0;
@@ -3832,24 +3832,23 @@ void TDriver::AvoidOtherCars(double	K, bool& IsClose, bool&	IsLapper)
 	const TOpponent::TState& MyState =				// Get my own state
 			oOpponents[oOwnOppIdx].Info().State;
 
-	int I;
-	for (I	= 0; I < oNbrCars; I++)					// All opponents
-		for (int J = 0; J	< MAXBLOCKED; J++)		 //	  all lanes
-			oOpponents[I].Info().Blocked[J] = false;
+	for (int i = 0; i < oNbrCars; i++)					// All opponents
+		for (int j = 0; j< MAXBLOCKED; j++)		 //	  all lanes
+			oOpponents[i].Info().Blocked[j] = false;
 
 	double	OppToMiddle	= -1000;
 	double	MinDistToCarInFront	= TrackLength;
 
-	for (I	= 0; I < oNbrCars; I++)					// Get info	about imminent
+	for (int i	= 0; i < oNbrCars; i++)					// Get info	about imminent
 	{												//   collisions from
-		bool CarInFront =	oOpponents[I].Classify(	 //	  all opponents	depending
+		bool CarInFront =	oOpponents[i].Classify(	 //	  all opponents	depending
 												   oCar,									  //	on data of own car
 												   MyState,									  //   my own state,
 												   MinDistToCarInFront,
 												   /*oStrategy->OutOfPitlane(),*/			  //   In pitlane?
 												   oMaxAccel.Estimate(CarSpeedLong));		  //	  Estimate accelleration
 		if (CarInFront)
-			OppToMiddle = oOpponents[I].Car()->pub.trkPos.toMiddle;
+			OppToMiddle = oOpponents[i].Car()->pub.trkPos.toMiddle;
 	}
 
 	//	Place to subsume the collision flags from all opponents
@@ -3867,10 +3866,10 @@ void TDriver::AvoidOtherCars(double	K, bool& IsClose, bool&	IsLapper)
 	int SecIndex =
 			oTrackDesc.IndexFromPos(DistanceFromStartLine);
 
-	for (I	= 0; I < oNbrCars; I++)					// Loop	all	opponents
+	for (int i = 0; i < oNbrCars; i++)					// Loop	all	opponents
 	{
 		EvaluateCollisionFlags(					   //	Evaluate collision flags
-													 I, Coll, K,
+													 i, Coll, K,
 													 MinCatchTime,
 													 MinCatchAccTime,
 													 MinVCatTime,
@@ -3881,38 +3880,37 @@ void TDriver::AvoidOtherCars(double	K, bool& IsClose, bool&	IsLapper)
 			&& (DistanceRaced > 1000))
 	{
 		Coll.AvoidSide = 0;
-		int I;
-		int K	= 0;
+		int k = 0;
 		if (Coll.Blocked[0] || Coll.Blocked[1] ||	Coll.Blocked[2])
 		{
-			for (I =	MAXBLOCKED - 1;	I >	1; I--)
+			for (int i = MAXBLOCKED - 1; i > 1; i--)
 			{
-				K++;
-				if (Coll.Blocked[I]	|| Coll.Blocked[I-1] ||	Coll.Blocked[I-2])
+				k++;
+				if (Coll.Blocked[i]	|| Coll.Blocked[i-1] ||	Coll.Blocked[i-2])
 					continue;
 				else
 				{
-					Coll.AvoidSide	= ((I-1) * 2.0/(MAXBLOCKED - 1.0) -	1);
+					Coll.AvoidSide	= ((i-1) * 2.0/(MAXBLOCKED - 1.0) -	1);
 					break;
 				}
 			}
 		}
 		else
 		{
-			for (I =	0; I < MAXBLOCKED -	2; I++)
+			for (int i = 0; i < MAXBLOCKED - 2; i++)
 			{
-				K++;
-				if (Coll.Blocked[I]	|| Coll.Blocked[I+1] ||	Coll.Blocked[I+2])
+				k++;
+				if (Coll.Blocked[i]	|| Coll.Blocked[i+1] ||	Coll.Blocked[i+2])
 					continue;
 				else
 				{
-					Coll.AvoidSide	= ((I+1) * 2.0/(MAXBLOCKED - 1.0) -	1);
+					Coll.AvoidSide	= ((i+1) * 2.0/(MAXBLOCKED - 1.0) -	1);
 					break;
 				}
 			}
 		}
 
-		if (K	== MAXBLOCKED -	2)
+		if (k == MAXBLOCKED -	2)
 		{
 			oSpeedScale += 0.00025;
 			Coll.TargetSpeed	= MIN(Coll.TargetSpeed,	MAX(0.8,(1 - oSpeedScale))
@@ -4015,8 +4013,8 @@ void TDriver::AvoidOtherCars(double	K, bool& IsClose, bool&	IsLapper)
 		char buf[BULEN];
 		char buf2[2*BULEN];
 
-		for (I = 0; I	< BULEN; I++)
-			buf[I] =	' ';
+		for (int i = 0; i < BULEN; i++)
+			buf[i] =	' ';
 
 		buf[BULEN	- 1] = 0;	// Terminate string
 
@@ -4030,7 +4028,7 @@ void TDriver::AvoidOtherCars(double	K, bool& IsClose, bool&	IsLapper)
 	buf[I]	= 'R';		   // Right	racingline
 */
 		double Delta = (O	- OL) *	oAvoidRange;
-		I	= (int)	MAX(0,MIN(BLEN - 2,(B -	B*(O-Delta)/HalfWidth)));
+		int I = (int)	MAX(0,MIN(BLEN - 2,(B -	B*(O-Delta)/HalfWidth)));
 		buf[I] = 'L';			// Racingline
 
 		Delta	= (O - OR) * oAvoidRange;

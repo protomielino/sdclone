@@ -572,7 +572,7 @@ int	moduleWelcomeV1_00
 		{
 			snprintf(Section, BUFSIZE, "%s/%s/%d",
 				ROB_SECT_ROBOTS, ROB_LIST_INDEX, I + IndexOffset );
-			const char *DriverName =	GfParmGetStr( RobotSettings, Section,
+			DriverName = GfParmGetStr( RobotSettings, Section,
 				(char *) ROB_ATTR_NAME,undefined);
 
 			if (strncmp(DriverName,undefined,strlen(undefined)) != 0)

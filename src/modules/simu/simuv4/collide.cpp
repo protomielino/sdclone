@@ -210,7 +210,6 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 	sgNormaliseVec2(n);
 
 	sgVec2 rg[2];	// radius oriented in global coordinates, still relative to CG (rotated aroung CG).
-	tCarElt *carElt;
 
 	for (i = 0; i < 2; i++) {
 		// vector GP (Center of gravity to collision point). p1 and p2 are delivered from solid as
@@ -219,7 +218,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 
 		// Speed of collision points, linear motion of center of gravity (CG) plus rotational
 		// motion around the CG.
-		carElt = car[i]->carElt;
+		tCarElt *carElt = car[i]->carElt;
 		float sina = sin(carElt->_yaw);
 		float cosa = cos(carElt->_yaw);
 		rg[i][0] = r[i][0]*cosa - r[i][1]*sina;
@@ -283,7 +282,8 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 		rpn[0] * rpn[0] * car[0]->Iinv.z + rpn[1] * rpn[1] * car[1]->Iinv.z);
 
 	for (i = 0; i < 2; i++) {
-		if (car[i]->carElt->_state & RM_CAR_STATE_NO_SIMU) {
+		tCarElt *carElt = car[i]->carElt;
+		if (carElt->_state & RM_CAR_STATE_NO_SIMU) {
 			continue;
 		}
 
@@ -298,8 +298,8 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 			damFactor = 1.0f;
 		}
 
-		if ((car[i]->carElt->_state & RM_CAR_STATE_FINISH) == 0) {
-			float dammage = (float)((CAR_DAMMAGE * fabs(j) * damFactor * simDammageFactor[car[i]->carElt->_skillLevel]));
+		if ((carElt->_state & RM_CAR_STATE_FINISH) == 0) {
+			float dammage = (float)((CAR_DAMMAGE * fabs(j) * damFactor * simDammageFactor[carElt->_skillLevel]));
 			dammage *= (float)(MIN(1.5, dammage / 500.0));
 			if (dammage < 10)
 				dammage = 0;
@@ -329,7 +329,6 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 		sgCopyVec2((float*)&(car[i]->VelColl.x), v2a);
 
 		// Move the car for the collision lib.
-		tCarElt *carElt = car[i]->carElt;
 		sgMakeCoordMat4(carElt->pub.posMat, car[i]->DynGCg.pos.x, car[i]->DynGCg.pos.y,
 						car[i]->DynGCg.pos.z - carElt->_statGC_z, (float) RAD2DEG(carElt->_yaw),
 						(float) RAD2DEG(carElt->_roll), (float) RAD2DEG(carElt->_pitch));

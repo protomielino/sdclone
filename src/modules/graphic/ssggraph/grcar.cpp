@@ -337,10 +337,10 @@ initWheel(tCarElt *car, int wheel_index, const char *wheel_mod_name)
         }
 
         for (k = 0; k < 2; k++) {
-            ssgVertexArray	*whl_vtx = new ssgVertexArray(wheelBranch + 1);
+            whl_vtx = new ssgVertexArray(wheelBranch + 1);
             ssgTexCoordArray	*whl_tex = new ssgTexCoordArray(wheelBranch + 1);
-            ssgColourArray	*whl_clr = new ssgColourArray(1);
-            ssgNormalArray	*whl_nrm = new ssgNormalArray(1);
+            whl_clr = new ssgColourArray(1);
+            whl_nrm = new ssgNormalArray(1);
 
             clr[0] = 0.8f*colorfactor[k];
             clr[1] = 0.8f*colorfactor[k];
@@ -365,7 +365,7 @@ initWheel(tCarElt *car, int wheel_index, const char *wheel_mod_name)
             tex[1] = 0.25 + 0.25 * sin(alpha) + toffset[j][1];
             whl_tex->add(tex);
             }
-            ssgVtxTable *whl = new ssgVtxTable(GL_TRIANGLE_FAN, whl_vtx, whl_nrm, whl_tex, whl_clr);
+            whl = new ssgVtxTable(GL_TRIANGLE_FAN, whl_vtx, whl_nrm, whl_tex, whl_clr);
             whl->setState(grCarInfo[grCarIndex].wheelTexture);
             whl->setCullFace(0);
             whl_branch->addKid(whl);

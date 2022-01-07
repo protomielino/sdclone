@@ -309,7 +309,6 @@ SimWheelUpdateForce(tCar *car, int index)
     tdble	mu;
     tdble       reaction_force;
     tdble f_z = 0.0;
-    t3Dd angles;
     t3Dd normal;
     t3Dd rel_normal;
     bool right_way_up = true;
@@ -339,9 +338,9 @@ SimWheelUpdateForce(tCar *car, int index)
     
     // now rel_normal.x is the effective camber angle
 	if (USE_QUATERNIONS==0) {
-		angles.x = car->DynGCg.pos.ax + wheel->relPos.ax;
-		angles.y = car->DynGCg.pos.ay;
-		angles.z = car->DynGCg.pos.az + waz;
+		t3Dd angles = { car->DynGCg.pos.ax + wheel->relPos.ax,
+						car->DynGCg.pos.ay,
+						car->DynGCg.pos.az + waz };
 		NaiveRotate (normal, angles, &rel_normal);
 	} else {
 		sgQuat Q;
@@ -529,9 +528,9 @@ SimWheelUpdateForce(tCar *car, int index)
     F = dynamic_grip * static_grip;
     // This is the steering torque
 	{
-		tdble Bx = wheel->mfB * (sa);// + camber_shift);
+		tdble sBx = wheel->mfB * (sa);// + camber_shift);
         //printf ("%f %f\n", sa, camber_shift);
-		car->carElt->_wheelFy(index) =  (tdble)(cos(sa)*wheel->mfT * sin(wheel->mfC * atan(Bx * (1 - wheel->mfE) + wheel->mfE * atan(Bx))) * (1.0 + stmp * simSkidFactor[car->carElt->_skillLevel]) * static_grip);
+		car->carElt->_wheelFy(index) =  (tdble)(cos(sa)*wheel->mfT * sin(wheel->mfC * atan(sBx * (1 - wheel->mfE) + wheel->mfE * atan(sBx))) * (1.0 + stmp * simSkidFactor[car->carElt->_skillLevel]) * static_grip);
 	}
 	END_PROFILE(timer_friction);
 
@@ -658,9 +657,7 @@ SimWheelUpdateForce(tCar *car, int index)
 		f.z = wheel->forces.z;
 
 		// TODO: Check whether this is correct.
-		angles.x = wheel->relPos.ax + asin(rel_normal.x);
-		angles.y = asin(rel_normal.y);
-		angles.z = waz;
+		t3Dd angles = { wheel->relPos.ax + asin(rel_normal.x), asin(rel_normal.y), waz };
 		NaiveInverseRotate (f, angles, &wheel->forces);
 		// transmit reaction forces to the car	
 		wheel->forces.x +=(Ft* CosA - Fn * SinA);

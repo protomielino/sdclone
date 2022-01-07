@@ -665,8 +665,7 @@ void cGrTrackMap::drawTrackPanningAligned(
 	glDisable(GL_TEXTURE_2D);
 
 	if (viewmode & TRACK_MAP_PAN_ALIGNED_WITH_OPPONENTS) {
-		int i;
-		for (i = 0; i < s->_ncars; i++) {
+		for (int i = 0; i < s->_ncars; i++) {
 			if ((s->cars[i] != currentCar) && !(s->cars[i]->_state & (RM_CAR_STATE_DNF | RM_CAR_STATE_PULLUP | RM_CAR_STATE_PULLSIDE | RM_CAR_STATE_PULLDN))) {
 				if (s->cars[i]->race.pos > currentCar->race.pos) {
 					glColor4fv(behindCarColor);
@@ -683,8 +682,8 @@ void cGrTrackMap::drawTrackPanningAligned(
 				if (fabs(xrc) < map_size/2.0 && fabs(yrc) < map_size/2.0) {
 					glPushMatrix();
 					glTranslatef(x + xrc + map_size/2.0, y + yrc + map_size/2.0, 0.0);
-					float factor = tracksize/(2.0*radius);
-		        	glScalef(factor, factor, 1.0);
+					float factor1 = tracksize/(2.0*radius);
+		        	glScalef(factor1, factor1, 1.0);
 					glCallList(cardot);
 					glPopMatrix();
 				}

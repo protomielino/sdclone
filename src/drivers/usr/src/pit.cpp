@@ -84,9 +84,8 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
     mLastFuel = 0.0;
     mPenalty = 0;
     // Get teammates car
-    int i;
 
-    for (i = 0; i < situation->_ncars; i++)
+    for (int i = 0; i < situation->_ncars; i++)
     {
         if (situation->cars[i] != mCar)
         {
@@ -119,15 +118,14 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
         mLimitEntry = mPitp[1].x;
         mLimitExit = mPitp[5].x;
         // Normalizing spline segments to <= 0.0
-        int i;
 
-        for (i = 0; i < PITPOINTS; i++)
+        for (int i = 0; i < PITPOINTS; i++)
         {
             mPitp[i].s = 0.0;
             mPitp[i].x = toSplineCoord(mPitp[i].x);
         }
 
-        for (i = 0; i < DTPOINTS; i++)
+        for (int i = 0; i < DTPOINTS; i++)
         {
             mDtp[i].s = 0.0;
             mDtp[i].x = toSplineCoord(mDtp[i].x);
@@ -152,13 +150,13 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
         mDtp[0].y = mPitp[0].y;
         mDtp[3].y = mPitp[6].y;
 
-        for (i = 1; i < PITPOINTS - 1; i++)
+        for (int i = 1; i < PITPOINTS - 1; i++)
         {
             mPitp[i].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) - 0.3 * mPitInfo->width - 2.2);
             //mPitp[i].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) - mPitInfo->width);
         }
 
-        for (i = 1; i < DTPOINTS - 1; i++)
+        for (int i = 1; i < DTPOINTS - 1; i++)
         {
             mDtp[i].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) - 0.3 * mPitInfo->width - 2.2);
             //mDtp[i].y = sign * (fabs(mPitInfo->driversPits->pos.toMiddle) - mPitInfo->width);

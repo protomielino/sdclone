@@ -619,11 +619,11 @@ NetworkRaceInfo()
 		// Add the humans which are already in the race
 		char	dname[256];
 
-		for (i = 1; i < nCars+1; i++) {
-			sprintf(dname, "%s/%d", RM_SECT_DRIVERS, i);
+		for (int j = 1; j < nCars+1; j++) {
+			sprintf(dname, "%s/%d", RM_SECT_DRIVERS, j);
 
 			if(strcmp(NETWORKROBOT, GfParmGetStr(reInfo->params, dname, RM_ATTR_MODULE, "")) == 0) {
-				if (GetHumanDriver(driver,i) > -1) {
+				if (GetHumanDriver(driver,j) > -1) {
 					driver.client = false;
 					driver.active = true;
 					NetGetServer()->UpdateDriver(driver);
@@ -636,8 +636,8 @@ NetworkRaceInfo()
 
 	// make sure nobody is 'ready to race'
 	NetMutexData *pNData = NetGetNetwork()->LockNetworkData();
-	for (unsigned int i=0; i < pNData->m_vecReadyStatus.size(); i++)
-		pNData->m_vecReadyStatus[i] = false;
+	for (size_t j=0; j < pNData->m_vecReadyStatus.size(); j++)
+		pNData->m_vecReadyStatus[j] = false;
 	NetGetNetwork()->UnlockNetworkData();
 	bRobotsReady = false;
 

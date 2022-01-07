@@ -249,7 +249,7 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 int
 InitScene(tTrack *Track, void *TrackHandle, int bump, int raceline)
 {
-    int 		i, j;
+    int 		i;
     tTrackSeg	*seg;
     tTrackSeg	*lastSeg = NULL;
     tTrackSeg	*mseg;
@@ -695,7 +695,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump, int raceline)
     }
 
     /* Right Border */
-    for (j = 0; j < 3; j++) {
+    for (int j = 0; j < 3; j++) {
     prevTexId = 0;
     texLen = 0;
     startNeeded = 1;
@@ -1229,7 +1229,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump, int raceline)
 
 
     /* Left Border */
-    for (j = 0; j < 3; j++) {
+    for (int j = 0; j < 3; j++) {
     prevTexId = 0;
     texLen = 0;
     startNeeded = 1;
@@ -1756,7 +1756,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump, int raceline)
 
 
     /* Right barrier */
-    for (j = 0; j < 3; j++) {
+    for (int j = 0; j < 3; j++) {
     prevTexId = 0;
     texLen = 0;
     startNeeded = 1;
@@ -2026,7 +2026,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump, int raceline)
     }
 
     /* Left Barrier */
-    for (j = 0; j < 3; j++) {
+    for (int j = 0; j < 3; j++) {
     prevTexId = 0;
     texLen = 0;
     startNeeded = 1;

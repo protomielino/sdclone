@@ -259,8 +259,8 @@ bool SDSkyDome::repaint( const Vec3f& sky_color,
         for (int l = 0; j < halfRings; j++, l++)
             colors(j, i) = (colors(upperRings + middleRings, i) * (1 - l / (float)(halfRings - upperRings - middleRings))) + (toOsg(fog_color + outer_amt) * l / (float)(halfRings - upperRings - middleRings));
 
-        for (int j = 0; j < numRings - 1; ++j)
-            sd_clampColor(colors(j, i));
+        for (int k = 0; k < numRings - 1; ++k)
+            sd_clampColor(colors(k, i));
 
         outer_amt -= outer_diff;
         middle_amt -= middle_diff;

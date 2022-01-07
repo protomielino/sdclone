@@ -311,10 +311,10 @@ SimCarCollideZ(tCar *car)
                 car->rot_mom[SG_X] -= rot_mom_scale * Mx;// * car->Iinv.x;
                 car->rot_mom[SG_Y] -= rot_mom_scale * My;// * car->Iinv.y; 
                 car->rot_mom[SG_Z] -= rot_mom_scale * Mz;// * car->Iinv.z; 
-          for (int i=0; i<3; i++) {
-              if (fabs(car->rot_mom[i]) >500.0) {
-                  //printf ("rot_mom: %f\n", (car->rot_mom[i]));
-                    car->rot_mom[i] = (float)(250*SIGN(car->rot_mom[i]));
+          for (int k=0; k<3; k++) {
+              if (fabs(car->rot_mom[k]) >500.0) {
+                  //printf ("rot_mom: %f\n", (car->rot_mom[k]));
+                    car->rot_mom[k] = (float)(250*SIGN(car->rot_mom[k]));
                 }
             }
 #ifdef DEBUG_COLLIDE_Z
@@ -582,10 +582,10 @@ SimCarCollideXYScene(tCar *car)
             car->rot_mom[SG_Z] -= rot_mom_scale * Mz; //* car->Iinv.z;
             //printf ("M_w:%f J:%f M_c:%g\n", car->rot_acc[SG_Z], car->rot_mom[SG_Z], rot_mom_scale * Mz);
             
-            for (int i=0; i<3; i++) {
-                if (fabs(car->rot_mom[i]) > 2000.0) {
-                    //printf ("rot_mom: %f\n", (car->rot_mom[i]));
-                    car->rot_mom[i] = (float)(2000*SIGN(car->rot_mom[i]));
+            for (int j=0; j<3; j++) {
+                if (fabs(car->rot_mom[j]) > 2000.0) {
+                    //printf ("rot_mom: %f\n", (car->rot_mom[j]));
+                    car->rot_mom[j] = (float)(2000*SIGN(car->rot_mom[j]));
                 }
             }
             // transform velocity to global frame
@@ -793,7 +793,6 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
     sgNormaliseVec2(n);
 
     sgVec2 rg[2];   // raduis oriented in global coordinates, still relative to CG (rotated aroung CG).
-    tCarElt *carElt;
 
     for (i = 0; i < 2; i++) {
         // vector GP (Center of gravity to collision point). p1 and p2 are delivered from solid as
@@ -802,7 +801,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 
         // Speed of collision points, linear motion of center of gravity (CG) plus rotational
         // motion around the CG.
-        carElt = car[i]->carElt;
+        tCarElt *carElt = car[i]->carElt;
         float sina = sin(carElt->_yaw);
         float cosa = cos(carElt->_yaw);
         rg[i][0] = r[i][0]*cosa - r[i][1]*sina;

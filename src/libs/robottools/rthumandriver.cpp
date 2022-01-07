@@ -892,7 +892,6 @@ static int onKeyAction(int key, int modifier, int state)
  */
 static void common_drive(const int index, tCarElt* car, tSituation *s)
 {
-    tdble slip;
     tdble ax0;
     tdble brake;
     tdble clutch;
@@ -1571,7 +1570,7 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
             const tdble abs_range = 9.0;
 
             // reduce brake if wheels are slipping
-            slip = 0;
+            tdble slip = 0;
             for (i = 0; i < 4; i++) {
                 slip = MAX(slip, car->_speed_x - (car->_wheelSpinVel(i) * car->_wheelRadius(i)));
             }

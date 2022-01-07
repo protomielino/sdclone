@@ -54,8 +54,7 @@ void Pit::init(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentr
   lastpitfuel = 0.0;
   lastfuel = 0.0;
   // Get teammates car
-  int i;
-  for (i = 0; i < s->_ncars; i++) {
+  for (int i = 0; i < s->_ncars; i++) {
     if (s->cars[i] != car) {
       if (!strncmp(car->_teamname, s->cars[i]->_teamname, 10)) {
         teamcar = s->cars[i];
@@ -77,8 +76,7 @@ void Pit::init(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentr
     limitentry = p[1].x;
     limitexit = p[5].x;
     // normalizing spline segments to <= 0.0
-    int i;
-    for (i = 0; i < NPOINTS; i++) {
+    for (int i = 0; i < NPOINTS; i++) {
       p[i].s = 0.0;
       p[i].x = toSplineCoord(p[i].x);
     }
@@ -87,7 +85,7 @@ void Pit::init(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentr
     double sign = (pitinfo->side == TR_LFT) ? 1.0 : -1.0;
     p[0].y = sign * (track->width / 2.0 - 2.0);
     p[6].y = sign * (track->width / 2.0 - 2.0);
-    for (i = 1; i < NPOINTS - 1; i++) {
+    for (int i = 1; i < NPOINTS - 1; i++) {
       p[i].y = fabs(pitinfo->driversPits->pos.toMiddle) - pitinfo->width - 1.0;
       p[i].y *= sign;
     }

@@ -140,7 +140,7 @@ void	MyTrack::NewTrack( tTrack* pNewTrack, const vector<double>* pInnerMod, bool
 
         for( int i = 0; i < NSEG; i++ )
         {
-            const tTrackSeg* pseg = m_pSegs[i].pSeg;
+            pseg = m_pSegs[i].pSeg;
             double k =  pseg->type == TR_LFT ?  1.0 / pseg->radius :
                                                 pseg->type == TR_RGT ? -1.0 / pseg->radius : 0;
 

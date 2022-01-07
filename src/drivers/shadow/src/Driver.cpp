@@ -268,10 +268,10 @@ void	Driver::InitTrack(
     const char*	key  = PRM_CAR;
     strncpy(m_carName, GfParmGetStr(pCarHandle, path, key, ""), 99);
     m_carName[99] = '\0';
-    char*	p = strrchr(m_carName, '.');
+    char*	period = strrchr(m_carName, '.');
 
-    if( p )
-        *p = '\0';
+    if(period)
+        *period = '\0';
 
     LogSHADOW.info( " #Shadow carName: '%s'\n", m_carName );
 
@@ -3042,9 +3042,9 @@ void	Driver::AvoidOtherCars(
             {
             }
 
-            bool dangerous = oi.GotFlags(Opponent::F_DANGEROUS);
             if( oi.GotFlags(Opponent::F_COLLIDE) && true )
             {
+                bool dangerous = oi.GotFlags(Opponent::F_DANGEROUS);
                 LogSHADOW.debug( "[%d] catching: (%s) cdec %g (dgr %d), cspd %g (in %g s)\n",
                                  car->index, oCar->info.name, oi.catchDecel, dangerous, oi.catchSpd, oi.catchTime );
 
@@ -3055,7 +3055,6 @@ void	Driver::AvoidOtherCars(
                         oi.sit.rdPX < oi.sit.minDXa + 3 &&
                         fabs(oi.sit.rdPY) < oi.sit.minDY;
 
-                bool dangerous = oi.GotFlags(Opponent::F_DANGEROUS);
                 const double MIN_DECEL = 15.0;
                 double decel =  (car->pub.speed - oi.catchSpd) / MX(oi.catchTime, 0.1);
                 LogSHADOW.debug( "[%d] catching: (%s) decel %g (dgr %d)\n", car->index, oCar->info.name, oi.catchDecel, dangerous );

@@ -434,10 +434,10 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
     fillCarCells( -1, 0, 0, me->pub.DynGC.pos.az, 1.5, 0.5, 0.0, false );
 
     double	width = track.GetWidth();
-    double	offs = -me->pub.trkPos.toMiddle;
-    LogSHADOW.debug( "offs=%.2f width=%.2f\n", offs, width );
+    double	offset = -me->pub.trkPos.toMiddle;
+    LogSHADOW.debug( "offset=%.2f width=%.2f\n", offset, width );
 
-    bool onMainRaceway = offs > -width / 2 && offs < width / 2;
+    bool onMainRaceway = offset > -width / 2 && offset < width / 2;
 
     if( onMainRaceway &&
         (aheadCar == NULL ||
@@ -737,7 +737,7 @@ void	Stuck::init( const MyTrack& track, const tSituation* s, const tCarElt* me )
         if( !cell.isAvailable() )
             continue;
 
-        int mid_ang = to_iang(destSeg.norm.GetXY().GetAngle() + PI / 2);
+        mid_ang = to_iang(destSeg.norm.GetXY().GetAngle() + PI / 2);
 
         if( cell.times[fwang(mid_ang, true)] > 0 )
         {
