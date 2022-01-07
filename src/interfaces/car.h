@@ -75,6 +75,7 @@ typedef struct {
     char	name[MAX_NAME_LEN];         /**< Driver's name */
     char	sname[MAX_NAME_LEN];        /**< Driver's short name */
     char	codename[3+1];              /**< Driver's 3-letter codename */
+    char    nationname[2+1];            /**< Driver's nationality 2-letter codename */
     char	teamname[MAX_NAME_LEN];     /**< Team name */
     char	carName[MAX_NAME_LEN];      /**< Car object name */
     char	category[MAX_NAME_LEN];     /**< Car's category */
@@ -115,6 +116,7 @@ typedef struct {
 #define _name		info.name               /**< short cut to tInitCar#name */
 #define _sname		info.sname              /**< short cut to tInitCar#sname */
 #define _cname		info.codename           /**< short cut to tInitCar#codename */
+#define _nationname info.nationname         /**< short cut to tInitCar#nationname */
 #define _teamname	info.teamname           /**< short cut to tInitCar#teamname */
 #define _carName	info.carName		/**< short cut to tInitCar#carName */
 #define _category	info.category		/**< short cut to tInitCar#category */
@@ -169,7 +171,7 @@ GF_TAILQ_HEAD(CarPenaltyHead, struct CarPenalty);
 typedef struct
 {
     double		bestLapTime;
-    bool                commitBestLapTime;  /**< If a rule violation happens (e.g. cutting a corner) the laptime is not commited (false) */
+    bool        commitBestLapTime;  /**< If a rule violation happens (e.g. cutting a corner) the laptime is not commited (false) */
     double*		bestSplitTime;
     double		deltaBestLapTime;
     double		curLapTime;
@@ -196,7 +198,7 @@ typedef struct
     tTrackOwnPit 	*pit;
     int			event;
     tCarPenaltyHead	penaltyList;	/**< List of current penalties */
-    tdble               penaltyTime;
+    tdble       penaltyTime;
     tdble		prevFromStartLine;
     double		wrongWayTime;
 } tCarRaceInfo;

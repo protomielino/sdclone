@@ -16,9 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
+
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -209,7 +209,4 @@
 
 #define CMD_END_OF_LIST 27	/* Change this to same value as last item */
 
-#endif /* _PLAYERPREF_H_ */ 
-
-
-
+#endif /* _PLAYERPREF_H_ */
