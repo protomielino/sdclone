@@ -609,8 +609,20 @@ cGrBoard::grDispGGraph()
   glVertex2f(X2, Y2);
 
   glEnd();
-}
 
+  if (GFlag == 2)
+  {
+	  char buf[BUFSIZE];
+	  snprintf(buf, sizeof(buf), "T: %3.2f°", car_->_tyreT_mid(0) - 273.0);
+	  GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 50.00, Y1 + 5.0);
+	  snprintf(buf, sizeof(buf), "T: %3.2f°", car_->_tyreT_mid(1) - 273.0);
+	  GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 10.00, Y1 + 5.0);
+	  snprintf(buf, sizeof(buf), "T: %3.2f°", car_->_tyreT_mid(2) - 273.0);
+	  GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 50.00, Y1 - 15.0);
+	  snprintf(buf, sizeof(buf), "T: %3.2f°", car_->_tyreT_mid(3) - 273.0);
+	  GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 10.00, Y1 - 15.0);
+  }
+}
 
 void
 cGrBoard::grDrawGauge(tdble X1, tdble Y1, tdble H,
