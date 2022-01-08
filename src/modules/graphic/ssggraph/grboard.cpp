@@ -1,4 +1,4 @@
-/***************************************************************************
+ï»¿/***************************************************************************
 
     file                 : grboard.cpp
     created              : Thu Aug 17 23:52:20 CEST 2000
@@ -40,7 +40,7 @@ static const string rgba[4] =
 
 static const int NB_BOARDS = 3;
 static const int NB_LBOARDS = 5;    // # of leaderboard states
-static const int NB_GFLAG = 3;
+static const int NB_GFLAG = 4;
 static const int NB_DEBUG = 4;
 
 // Boards work on a OrthoCam with fixed height of 600, width flows
@@ -128,11 +128,11 @@ cGrBoard::loadDefaults(const tCarElt *curCar)
   snprintf(path, sizeof(path), "%s/%d", GR_SCT_DISPMODE, id);
 
   debugFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_DEBUG, NULL, 1);
-  boardFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARD, NULL, 2);
+  boardFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARD, NULL, 3);
   leaderFlag  = (int)GfParmGetNum(grHandle, path, GR_ATT_LEADER, NULL, 1);
   leaderNb  = (int)GfParmGetNum(grHandle, path, GR_ATT_NBLEADER, NULL, 10);
   counterFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_COUNTER, NULL, 1);
-  GFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_GGRAPH, NULL, 2);
+  GFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_GGRAPH, NULL, 3);
   dashboardFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_DASHBOARD, NULL, 1);
   arcadeFlag  = (int)GfParmGetNum(grHandle, path, GR_ATT_ARCADE, NULL, 0);
   boardWidth  = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARDWIDTH, NULL, 100);
@@ -379,9 +379,9 @@ cGrBoard::grDispGGraph()
   glVertex2f(XC + THNSS, YC);
   glVertex2f(XC + THNSS, YC + car_->ctrl.clutchCmd * 100.0f);
   glVertex2f(XC - THNSS, YC + car_->ctrl.clutchCmd * 100.0f);
-  
+
   // Draw the tire slip and the tire temperature & wear color gauges
-  if (GFlag == 2) {
+  if (GFlag >= 2) {
     tdble s, height;
     // FR wheel
     s = car_->_wheelSlipNorm(0)/car_->_wheelSlipOpt(0);
@@ -395,7 +395,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 + 50.0f, Y1 + 30.0f);
     glVertex2f(X1 + 50.0f, Y1 + 50.0f);
     glVertex2f(X1 + 40.0f, Y1 + 50.0f);
-    
+
     height = 20.0f * MAX(car_->_tyreTreadDepth(0), 0.1f);
     s = 10.0f*(car_->_tyreT_out(0)/car_->_tyreT_opt(0)-1.0f);
     if (s >= 0.0f) {
@@ -409,7 +409,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 + 35.0f, Y1 + 30.0f);
     glVertex2f(X1 + 35.0f, Y1 + 30.0f+height);
     glVertex2f(X1 + 31.67f, Y1 + 30.0f+height);
-    
+
     s = 10.0f*(car_->_tyreT_mid(0)/car_->_tyreT_opt(0)-1.0f);
     if (s >= 0.0f) {
       s = MIN(1.0f, s);
@@ -422,7 +422,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 + 31.67f, Y1 + 30.0f);
     glVertex2f(X1 + 31.67f, Y1 + 30.0f+height);
     glVertex2f(X1 + 28.33f, Y1 + 30.0f+height);
-    
+
     s = 10.0f*(car_->_tyreT_in(0)/car_->_tyreT_opt(0)-1.0f);
     if (s >= 0.0f) {
       s = MIN(1.0f, s);
@@ -435,7 +435,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 + 28.33f, Y1 + 30.0f);
     glVertex2f(X1 + 28.33f, Y1 + 30.0f+height);
     glVertex2f(X1 + 25.0f, Y1 + 30.0f+height);
-    
+
     // FL wheel
     s = car_->_wheelSlipNorm(1)/car_->_wheelSlipOpt(1);
     if (s > 1.0) {
@@ -448,7 +448,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 - 40.0f, Y1 + 30.0f);
     glVertex2f(X1 - 40.0f, Y1 + 50.0f);
     glVertex2f(X1 - 50.0f, Y1 + 50.0f);
-    
+
     height = 20.0f * MAX(car_->_tyreTreadDepth(1), 0.1f);
     s = 10.0f*(car_->_tyreT_out(1)/car_->_tyreT_opt(1)-1.0f);
     if (s >= 0.0f) {
@@ -462,7 +462,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 - 35.0f, Y1 + 30.0f);
     glVertex2f(X1 - 35.0f, Y1 + 30.0f+height);
     glVertex2f(X1 - 31.67f, Y1 + 30.0f+height);
-    
+
     s = 10.0f*(car_->_tyreT_mid(1)/car_->_tyreT_opt(1)-1.0f);
     if (s >= 0.0f) {
       s = MIN(1.0f, s);
@@ -475,7 +475,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 - 31.67f, Y1 + 30.0f);
     glVertex2f(X1 - 31.67f, Y1 + 30.0f+height);
     glVertex2f(X1 - 28.33f, Y1 + 30.0f+height);
-    
+
     s = 10.0f*(car_->_tyreT_in(1)/car_->_tyreT_opt(1)-1.0f);
     if (s >= 0.0f) {
       s = MIN(1.0f, s);
@@ -488,7 +488,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 - 28.33f, Y1 + 30.0f);
     glVertex2f(X1 - 28.33f, Y1 + 30.0f+height);
     glVertex2f(X1 - 25.0f, Y1 + 30.0f+height);
-    
+
     // RR wheel
     s = car_->_wheelSlipNorm(2)/car_->_wheelSlipOpt(2);
     if (s > 1.0) {
@@ -501,7 +501,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 + 50.0f, Y1 - 50.0f);
     glVertex2f(X1 + 50.0f, Y1 - 30.0f);
     glVertex2f(X1 + 40.0f, Y1 - 30.0f);
-    
+
     height = 20.0f * MAX(car_->_tyreTreadDepth(2), 0.1f);
     s = 10.0f*(car_->_tyreT_out(2)/car_->_tyreT_opt(2)-1.0f);
     if (s >= 0.0f) {
@@ -515,7 +515,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 + 35.0f, Y1 - 50.0f);
     glVertex2f(X1 + 35.0f, Y1 - 50.0f+height);
     glVertex2f(X1 + 31.67f, Y1 - 50.0f+height);
-    
+
     s = 10.0f*(car_->_tyreT_mid(2)/car_->_tyreT_opt(2)-1.0f);
     if (s >= 0.0f) {
       s = MIN(1.0f, s);
@@ -528,7 +528,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 + 31.67f, Y1 - 50.0f);
     glVertex2f(X1 + 31.67f, Y1 - 50.0f+height);
     glVertex2f(X1 + 28.33f, Y1 - 50.0f+height);
-    
+
     s = 10.0f*(car_->_tyreT_in(2)/car_->_tyreT_opt(2)-1.0f);
     if (s >= 0.0f) {
       s = MIN(1.0f, s);
@@ -541,7 +541,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 + 28.33f, Y1 - 50.0f);
     glVertex2f(X1 + 28.33f, Y1 - 50.0f+height);
     glVertex2f(X1 + 25.0f, Y1 - 50.0f+height);
-    
+
     // RL wheel
     s = car_->_wheelSlipNorm(3)/car_->_wheelSlipOpt(3);
     if (s > 1.0) {
@@ -554,7 +554,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 - 40.0f, Y1 - 50.0f);
     glVertex2f(X1 - 40.0f, Y1 - 30.0f);
     glVertex2f(X1 - 50.0f, Y1 - 30.0f);
-    
+
     height = 20.0f * MAX(car_->_tyreTreadDepth(3), 0.1f);
     s = 10.0f*(car_->_tyreT_out(3)/car_->_tyreT_opt(3)-1.0f);
     if (s >= 0.0f) {
@@ -568,7 +568,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 - 35.0f, Y1 - 50.0f);
     glVertex2f(X1 - 35.0f, Y1 - 50.0f+height);
     glVertex2f(X1 - 31.67f, Y1 - 50.0f+height);
-    
+
     s = 10.0f*(car_->_tyreT_mid(3)/car_->_tyreT_opt(3)-1.0f);
     if (s >= 0.0f) {
       s = MIN(1.0f, s);
@@ -581,7 +581,7 @@ cGrBoard::grDispGGraph()
     glVertex2f(X1 - 31.67f, Y1 - 50.0f);
     glVertex2f(X1 - 31.67f, Y1 - 50.0f+height);
     glVertex2f(X1 - 28.33f, Y1 - 50.0f+height);
-    
+
     s = 10.0f*(car_->_tyreT_in(3)/car_->_tyreT_opt(3)-1.0f);
     if (s >= 0.0f) {
       s = MIN(1.0f, s);
@@ -610,17 +610,17 @@ cGrBoard::grDispGGraph()
 
   glEnd();
 
-  if (GFlag == 2)
+  if (GFlag == 3)
   {
-	  char buf[BUFSIZE];
-	  snprintf(buf, sizeof(buf), "T: %3.2f°", car_->_tyreT_mid(0) - 273.0);
-	  GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 50.00, Y1 + 5.0);
-	  snprintf(buf, sizeof(buf), "T: %3.2f°", car_->_tyreT_mid(1) - 273.0);
-	  GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 10.00, Y1 + 5.0);
-	  snprintf(buf, sizeof(buf), "T: %3.2f°", car_->_tyreT_mid(2) - 273.0);
-	  GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 50.00, Y1 - 15.0);
-	  snprintf(buf, sizeof(buf), "T: %3.2f°", car_->_tyreT_mid(3) - 273.0);
-	  GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 10.00, Y1 - 15.0);
+      char buf[BUFSIZE];
+      snprintf(buf, sizeof(buf), "T: %3.2f", car_->_tyreT_mid(0) - 273.0);
+      GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 50.00, Y1 + 5.0);
+      snprintf(buf, sizeof(buf), "T: %3.2f", car_->_tyreT_mid(1) - 273.0);
+      GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 10.00, Y1 + 5.0);
+      snprintf(buf, sizeof(buf), "T: %3.2f", car_->_tyreT_mid(2) - 273.0);
+      GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 - 50.00, Y1 - 15.0);
+      snprintf(buf, sizeof(buf), "T: %3.2f", car_->_tyreT_mid(3) - 273.0);
+      GfuiDrawString(buf, normal_color_, GFUI_FONT_SMALL_C, X1 + 10.00, Y1 - 15.0);
   }
 }
 
@@ -2115,7 +2115,7 @@ cGrBoard::grDispDashboard()
         break;
     }
   }
-  
+
   // Background
   if (dashboardFlag == 2) {
     y1  = TOP_ANCHOR - dym; //bottom of scrolling line leaderboard
@@ -2123,15 +2123,15 @@ cGrBoard::grDispDashboard()
     y1 = 128 + dy; //in top of speedo
   }
   grSetupDrawingArea(x1, y1, x1 + 32 * dx, y1 - dy);
-  
+
   // Write information
   if (car_->_dashboardActiveItem < car_->_dashboardInstantNb) {
-	if (buf1)
-		GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
+    if (buf1)
+        GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
     GfuiDrawString(buf2, danger_color_, GFUI_FONT_LARGE_C, x1 + 16 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
   } else {
-	if (buf1)
-	    GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
+    if (buf1)
+        GfuiDrawString(buf1, normal_color_, GFUI_FONT_LARGE_C, x1, y1 - dy, 16 * dx, GFUI_ALIGN_HR);
     GfuiDrawString(buf2, emphasized_color_, GFUI_FONT_LARGE_C, x1 + 16 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
     GfuiDrawString(buf3, ahead_color_, GFUI_FONT_LARGE_C, x1 + 24 * dx, y1 - dy, 8 * dx, GFUI_ALIGN_HR);
   }
