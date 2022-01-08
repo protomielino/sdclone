@@ -83,8 +83,10 @@ void GfuiEventLoop::injectKeyboardEvent(int code, int modifier, int state,
 	// its WM keyboard shortcuts (didn't find any other way yet).
 	if (code == SDLK_RETURN	&& (modifier & KMOD_ALT) && state == 0)
 	{
-		if (!GfScrToggleFullScreen())
-			GfLogError("Failed to toggle on/off the full-screen mode\n");
+		if (GfScrToggleFullScreen())
+			GfLogDebug("Toggle full-screen mode ON \n");
+		else
+			GfLogDebug("Toggle full-screen mode OFF \n");
 	}
 	else
 #endif
