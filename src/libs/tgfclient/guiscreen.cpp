@@ -240,6 +240,28 @@ static void gfScrReshapeViewport(int width, int height)
     GfScrCenY = height / 2;
 }
 
+static void gfuiInitialWindowedPosition(int displayId, SDL_Window* window )
+{
+    SDL_DisplayMode mode;
+    if(SDL_GetCurrentDisplayMode(displayId, &mode) == 0)
+    {
+        int top = 0, left = 0, bottom = 0, right = 0, width = 0, height = 0, x = 0, y = 0;
+        SDL_Rect rect;
+        SDL_GetDisplayBounds(displayId, &rect);
+
+        SDL_GetWindowPosition(window, &x, &y);
+
+        SDL_GetWindowBordersSize(window, &top, &left, &bottom, &right);
+
+        if(y < rect.y + top)
+            y = rect.y + top;
+        if(x < rect.x)
+            x = rect.x;
+
+        SDL_SetWindowPosition(window, x, y);
+    }
+}
+
 SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,int bfVideoMode)
 {
     if(GfuiWindow)
@@ -535,25 +557,11 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
         SDL_RestoreWindow(GfuiWindow);
     }
 
-/*
-#ifdef WIN32
-    // Under Windows, give an initial position to the window if not full-screen mode
-    // (under Linux/Mac OS X, no need, the window manager smartly takes care of this).
+    // Position Window if not full screen
     if (!(bfVideoMode & SDL_WINDOW_FULLSCREEN))
     {
-        // Try to center the game Window on the desktop, but keep the title bar visible if any.
-        const HWND hDesktop = GetDesktopWindow();
-        RECT rectDesktop;
-        GetWindowRect(hDesktop, &rectDesktop);
-        const int nWMWinXPos =
-            nWinWidth >= rectDesktop.right ? 0 : (rectDesktop.right - nWinWidth) / 2;
-        const int nWMWinYPos =
-            nWinHeight >= rectDesktop.bottom ? 0 : (rectDesktop.bottom - nWinHeight) / 2;
-        GfuiInitWindowPositionAndSize(nWMWinXPos, nWMWinYPos, nWinWidth, nWinHeight);
+        gfuiInitialWindowedPosition(GfScrStartDisplayId, GfuiWindow);
     }
-#endif
-*/
-
 
 
     // Initialize the Open GL viewport.
@@ -674,7 +682,7 @@ bool GfScrToggleFullScreen()
 
         /* Work around SDL2 bug */
         if (SDL_GetDisplayBounds(GfScrStartDisplayId, &bounds) == 0) {
-            if (SDL_FALSE) //(bounds.w == nWinWidth && bounds.h == nWinHeight)
+            if (bounds.w == GfScrWidth && bounds.h == GfScrHeight)
                 SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
             else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
         } else SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN);
