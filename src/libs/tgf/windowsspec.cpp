@@ -461,7 +461,8 @@ windowsDirGetList(const char *dir)
 			}
 		} while ( _findnext( Dirent, &FData ) != -1 );
 	}
-	
+	_findclose(Dirent);
+
 	return flist;
 }
 
@@ -536,7 +537,8 @@ windowsDirGetListFiltered(const char *dir, const char *prefix, const char *suffi
 			}
 		} while (_findnext( Dirent, &FData ) != -1);
 	}
-	
+	_findclose(Dirent);
+
 	return flist;
 }
 
