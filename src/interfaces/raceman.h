@@ -223,15 +223,15 @@ typedef struct RmCarRules
  */
 typedef struct RmInfo
 {
-    tCarElt		    *carList;	/**< List of all the cars racing */
-    tSituation		*s;		/**< Situation during race */
-    tTrack		    *track;		/**< Current track */
-    void		    *params;	/**< Raceman parameters */
+    tCarElt		    *carList;	    /**< List of all the cars racing */
+    tSituation		*s;		        /**< Situation during race */
+    tTrack		    *track;		    /**< Current track */
+    void		    *params;	    /**< Raceman parameters */
     void		    *mainParams;    /**< Stays the same even if params change because of more xml-files per raceman */
-    void		    *results;	/**< Race results */
+    void		    *results;	    /**< Race results */
     void		    *mainResults;   /**< Stays the same even if params change because of more xml-files per raceman */
     tModList		**robModList;	/**< robot modules loaded */
-    tRmCarRules		*rules;		/**< by car rules */
+    tRmCarRules		*rules;		    /**< by car rules */
     tRaceEngineInfo	raceEngineInfo;
     tRmRaceRules    raceRules;
 } tRmInfo;
@@ -534,6 +534,7 @@ typedef struct RmInfo
 
 #define RE_ATTR_NAME		"name"
 #define RE_ATTR_SNAME		"short name"
+#define RE_ATTR_NATION      "nation"
 #define RE_ATTR_CAR		"car"
 #define RE_ATTR_MODULE		"module"
 #define RE_ATTR_IDX		"idx"

@@ -538,6 +538,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
      2) from installed data dir */
   snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", cardllname, cardllname);
   robhdle = GfParmReadFileLocal(buf, GFPARM_RMODE_STD);
+
   if (!robhdle)
     robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 
@@ -578,14 +579,20 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       strncpy(elt->_name, GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "none"), MAX_NAME_LEN - 1);
       strncpy(elt->_sname, GfParmGetStr(robhdle, path, ROB_ATTR_SNAME, "none"), MAX_NAME_LEN - 1);
       strncpy(elt->_cname, GfParmGetStr(robhdle, path, ROB_ATTR_CODE, "---"), 3);
-    } else {
+      strncpy(elt->_nationname, GfParmGetStr(robhdle, path, ROB_ATTR_NATION, "none"), 2);
+    }
+    else
+    {
       strncpy(elt->_name, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_NAME, "none"), MAX_NAME_LEN - 1);
       strncpy(elt->_sname, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_SNAME, "none"), MAX_NAME_LEN - 1);
       strncpy(elt->_cname, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_CODE, "---"), 3);
+      strncpy(elt->_nationname, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_NATION, "EU"), 2);
     }
+
     elt->_name[MAX_NAME_LEN - 1] = 0;
     elt->_sname[MAX_NAME_LEN - 1] = 0;
     elt->_cname[3] = 0;
+    elt->_nationname[2] = 0;
 
     teamname = GfParmGetStr(robhdle, path, ROB_ATTR_TEAM, "none");
     teamname = GfParmGetStr(ReInfo->params, path2, ROB_ATTR_TEAM, teamname ); //Use the name in params if it has a team name
@@ -720,20 +727,28 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       }
       else
         handle = NULL;
-      if (handle && handle != carhdle && !replayReplay) {
+
+      if (handle && handle != carhdle && !replayReplay)
+      {
         GfLogTrace("Checking/Merging %s specific setup into %s setup.\n",
                    curModInfo->name, elt->_carName);
-        if (GfParmCheckHandle(carhdle, handle)) {
+
+        if (GfParmCheckHandle(carhdle, handle))
+        {
           GfLogError("Bad Car parameters for driver %s\n", elt->_name);
           return NULL;
         }
+
         handle = GfParmMergeHandles(carhdle, handle,
                                     GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
-      } else {
+      }
+      else
+      {
         GfLogTrace("Keeping %s setup as is for %s (no specific setup).\n",
                    elt->_carName, curModInfo->name);
         handle = carhdle;
       }
+
       elt->_carHandle = handle;
 
       /* Initialize sectors */
@@ -746,16 +761,22 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
         elt->_curSplitTime[xx] = -1.0f;
         elt->_bestSplitTime[xx] = -1.0f;
       }
-    } else {
+    }
+    else
+    {
       elt->_category[ 0 ] = '\0';
       GfLogError("Bad Car category for driver %s\n", elt->_name);
+
       return NULL;
     }
 
     return elt;
-  } else {
+  }
+  else
+  {
     GfLogError("No description file for robot %s\n", cardllname);
   }
+
   return NULL;
 }
 
@@ -882,7 +903,8 @@ ReInitCars(void)
 
   if (replayReplay)
     replayRecord = 0;
-  else {
+  else
+  {
     const char *replayRateSchemeName;
 
         void *paramHandle = GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
@@ -892,7 +914,8 @@ ReInitCars(void)
     replayRecord = atoi(replayRateSchemeName);
   }
 
-  if (replayRecord || replayReplay) {
+  if (replayRecord || replayReplay)
+  {
 #ifdef THIRD_PARTY_SQLITE3
     int result;
 
@@ -965,9 +988,10 @@ ReInitCars(void)
     #ifdef WEBSERVER
     // webServer lap logger.
     //Find human cars
-    for (int i = 0; i < ReInfo->s->_ncars; i++) {
-        if(ReInfo->s->cars[i]->_driverType == RM_DRV_HUMAN){
-
+    for (int i = 0; i < ReInfo->s->_ncars; i++)
+    {
+        if(ReInfo->s->cars[i]->_driverType == RM_DRV_HUMAN)
+        {
             //login
             webServer.sendLogin(ReInfo->s->cars[i]->_driverIndex);
 
@@ -1032,20 +1056,24 @@ ReRaceCleanDrivers(void)
   tMemoryPool oldPool = NULL;
 
   nCars = ReInfo->s->_ncars;
+
   for (i = 0; i < nCars; i++)
   {
     robot = ReInfo->s->cars[i]->robot;
     GfPoolMove( &ReInfo->s->cars[i]->_shutdownMemPool, &oldPool );
+
     if (robot->rbShutdown && !(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU))
     {
       robot->rbShutdown(robot->index);
     }
+
     GfPoolFreePool( &oldPool );
     GfParmReleaseHandle(ReInfo->s->cars[i]->_paramsHandle);
     free(robot);
     free(ReInfo->s->cars[i]->_curSplitTime);
     free(ReInfo->s->cars[i]->_bestSplitTime);
   }
+
   RtTeamManagerRelease();
 
   FREEZ(ReInfo->s->cars);
@@ -1080,6 +1108,7 @@ ReGetPrevRaceName(bool bLoop)
     void  *results = ReInfo->results;
 
     curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1) - 1;
+
     if (bLoop && curRaceIdx <= 0)
         curRaceIdx = (int)GfParmGetEltNb(params, RM_SECT_RACES);
     snprintf(path, sizeof(path), "%s/%d", RM_SECT_RACES, curRaceIdx);
