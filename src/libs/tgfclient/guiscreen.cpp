@@ -245,7 +245,7 @@ static void gfuiInitialWindowedPosition(int displayId, SDL_Window* window )
     SDL_DisplayMode mode;
     if(SDL_GetCurrentDisplayMode(displayId, &mode) == 0)
     {
-        int top = 0, left = 0, bottom = 0, right = 0, width = 0, height = 0, x = 0, y = 0;
+        int top = 0, left = 0, bottom = 0, right = 0, x = 0, y = 0;
         SDL_Rect rect;
         SDL_GetDisplayBounds(displayId, &rect);
 
