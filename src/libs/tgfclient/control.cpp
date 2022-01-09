@@ -379,15 +379,21 @@ void
 gfctrlJoyShutdown(void)
 {
    if (gfctrlJoyPresent != GFCTRL_JOY_UNTESTED)
-      for (int index = 0; index < gfctrlJoyPresent; index++) {
+   {
+      for (int index = 0; index < gfctrlJoyPresent; index++)
+      {
 			SDL_JoystickClose(Joysticks[index]);
 			Joysticks[index] = NULL;
-			if (Haptics[index]) {
+
+            if (Haptics[index])
+            {
 				SDL_HapticClose(Haptics[index]);
 				Haptics[index] = NULL;
 			}			
 		}
+
       gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
+   }
 }
 
 /** Create the joystick control
