@@ -75,9 +75,7 @@ ReStateManage(void)
                 GfMemoryManagerSetGroup(1);
                 #endif
                 // ... Use new Memory Manager
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-                [[fallthrough]];
-#endif
+                SD_FALLTHROUGH // [[fallthrough]]
 
             case RE_STATE_EVENT_LOOP:
                 GfLogInfo("%s now in EVENT_INIT_LOOP state\n", ReInfo->_reName);

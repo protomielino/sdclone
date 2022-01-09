@@ -23,6 +23,7 @@
 #include <GL/glext.h>
 #endif
 
+#include <portability.h>
 #include <plib/ssg.h>
 #include <glfeatures.h> // GfglFeatures
 #include <robot.h>	//ROB_SECT_ARBITRARY
@@ -138,9 +139,7 @@ grAdaptScreenSize(void)
             switch (grNbArrangeScreens) {
             default:
                 grNbArrangeScreens = 0;
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-                [[fallthrough]];
-#endif
+                SD_FALLTHROUGH // [[fallthrough]]
             case 0:
                 // Top & Bottom half of the window
                 grScreens[0]->activate(grWinx, grWiny + grWinh / 2, grWinw, grWinh / 2, 0.0);
@@ -170,9 +169,7 @@ grAdaptScreenSize(void)
             switch (grNbArrangeScreens) {
             default:
                 grNbArrangeScreens = 0;
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-                [[fallthrough]];
-#endif
+                SD_FALLTHROUGH // [[fallthrough]]
             case 0:
                 // Left/Right below wide
                 grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw,     grWinh / 2, 0.0);
@@ -230,14 +227,10 @@ grAdaptScreenSize(void)
                     grScreens[3]->activate(grWinx + grWinw * 3/4, grWiny, grWinw / 4,   grWinh, 0.0);
                     break;
                 }
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-                [[fallthrough]];
-#endif
+                SD_FALLTHROUGH // [[fallthrough]]
             default:
                 grNbArrangeScreens = 0;
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-                [[fallthrough]];
-#endif
+                SD_FALLTHROUGH // [[fallthrough]]
 
             case 0:
                 // Top/Bottom Left/Rigth Quarters
@@ -303,9 +296,7 @@ grAdaptScreenSize(void)
             switch (grNbArrangeScreens) {
             default:
                 grNbArrangeScreens = 0;
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-                [[fallthrough]];
-#endif
+                SD_FALLTHROUGH // [[fallthrough]]
             case 0:
                 // Top/Bottom Left/Middle/Rigth Matrix
                 grScreens[0]->activate(grWinx,                grWiny + grWinh / 2, grWinw / 2, grWinh / 2, 0.0);
@@ -339,14 +330,10 @@ grAdaptScreenSize(void)
                     grScreens[5]->activate(grWinx + grWinw * 5/6, grWiny, grWinw / 6,   grWinh, 0.0);
                     break;
                 }
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-                [[fallthrough]];
-#endif
+                SD_FALLTHROUGH // [[fallthrough]]
             default:
                 grNbArrangeScreens = 0;
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-                [[fallthrough]];
-#endif
+                SD_FALLTHROUGH // [[fallthrough]]
             case 0:
                 // Top/Bottom Left/Middle/Rigth Matrix
                 grScreens[0]->activate(grWinx,                grWiny + grWinh / 2, grWinw / 3, grWinh / 2, 0.0);

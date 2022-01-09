@@ -26,6 +26,12 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
+#define SD_FALLTHROUGH [[fallthrough]];
+#else
+#define SD_FALLTHROUGH // [[fallthrough]]
+#endif
+
 #ifdef _MSC_VER
 #include <direct.h>
 #include <process.h>

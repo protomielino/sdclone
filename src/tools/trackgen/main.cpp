@@ -347,27 +347,21 @@ void Application::generate()
                 if (DoSaveElevation) {
                     break;
                 }
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-                [[fallthrough]];
-#endif
+                SD_FALLTHROUGH // [[fallthrough]]
             case 2:
                 sprintf(buf, "%s-elv2.png", OutputFileName);
                 SaveElevation(Track, TrackHandle, buf, OutMeshName, 1);
                 if (DoSaveElevation) {
                     break;
                 }
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-                [[fallthrough]];
-#endif
+                SD_FALLTHROUGH // [[fallthrough]]
             case 3:
                 sprintf(buf, "%s-elv3.png", OutputFileName);
                 SaveElevation(Track, TrackHandle, buf, OutMeshName, 0);
                 if (DoSaveElevation) {
                     break;
                 }
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-                [[fallthrough]];
-#endif
+                SD_FALLTHROUGH // [[fallthrough]]
             case 4:
                 sprintf(buf, "%s-elv4.png", OutputFileName);
                 SaveElevation(Track, TrackHandle, buf, OutTrackName, 2);

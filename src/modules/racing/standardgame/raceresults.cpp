@@ -337,9 +337,7 @@ ReStoreRaceResults(const char *race)
                 break;
             }
 
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-			[[fallthrough]];
-#endif
+            SD_FALLTHROUGH // [[fallthrough]]
             /* Otherwise, fall through */
 
         case RM_TYPE_QUALIF:

@@ -51,6 +51,7 @@
 #include "unitcommon.h"
 
 #include "unitstrategy.h"
+#include <portability.h>
 
 //==========================================================================*
 // Konstanten
@@ -486,9 +487,7 @@ void TSimpleStrategy::CheckPitState(float /*PitScaleBrake*/)
       oState =	PIT_ASKED;
       LogSimplix.debug("#PIT_ENTER: %g\n", TrackPos);
       // falls	through...
-#if ( __GNUC__ >= 5 || _MSVC_VER >= 1910)
-      [[fallthrough]];
-#endif
+      SD_FALLTHROUGH // [[fallthrough]]
 
     case PIT_ASKED:
       // We are still going to	the	pit
