@@ -151,11 +151,6 @@ endif(WIN32 AND OPTION_OPENGL_HEADERS)
 # TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)
 # message(WARNING "TODO - need to disable SDL2 static (it is overwritten by dll's SDL2.lib)")
 
-# TODO remove ExternalProject_Add_Step(${SDL2_PROJECT} sdl2config_fix_cmake ...)
-# when SDL issue #4661 is fixed
-#  SDL2Config.cmake is broken since 2.0.16 #4661 
-#  https://github.com/libsdl-org/SDL/issues/4661
-
 if(OPTION_SDL2)
    set(SDL2_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL_STATIC=Off -DSDL_CMAKE_DEBUG_POSTFIX=)
    ExternalProject_Add(${SDL2_PROJECT}
@@ -163,12 +158,6 @@ if(OPTION_SDL2)
       URL_HASH ${SDL2_HASH}
       CMAKE_ARGS ${SDL2_ARGS}
       DEPENDS OpenGL-headers)
-      ExternalProject_Add_Step(${SDL2_PROJECT} sdl2config_fix_cmake
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/${SDL2_PROJECT}.SDL2Config.cmake"
-              "<SOURCE_DIR>/SDL2Config.cmake"
-      DEPENDEES update # do after update
-      DEPENDERS patch)  # do before patch
 else(OPTION_SDL2)
    set(SDL2_PROJECT )
 endif(OPTION_SDL2)
