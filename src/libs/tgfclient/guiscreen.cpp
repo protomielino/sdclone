@@ -150,6 +150,9 @@ ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex)
     last.width = 0;
     last.height = 0;
 
+    bounds.w = 0;
+    bounds.h = 0;
+
     // make sure nDisplayIndex is valid (less than Number of displays)
     if(nDisplayIndex < GfScrGetAttachedDisplays())
     {
@@ -161,7 +164,7 @@ ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex)
         }
         else
         {
-            GfLogError("Could not get the Display mode for Display %d \n", nDisplayIndex);
+            GfLogError("Could not get the Display mode for Display %d \n", nDisplayIndex + 1);
             bounds.w = 0;
             bounds.h = 0;
         }
@@ -192,10 +195,18 @@ ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex)
     {
         GfLogError("Invalid Display index passed to GfScrGetSupportedSizes()\n");
     }
-
+    // TODO Remove HACK below
+    // clear the vector so the only choice for Full-screen is current display mode
+    vecSizes.clear();
+    // TODO Remove HACK above
     if(vecSizes.empty())
     {
         GfLogInfo("No supported sizes for Display .\n");
+
+        // Desperation stick the Display Bounds into the vector
+        last.width = bounds.w;
+        last.height = bounds.h;
+        vecSizes.push_back(last);
     }
 
     return vecSizes;
