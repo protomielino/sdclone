@@ -23,9 +23,9 @@
 
 //static int SimClouds = 0;
 static double simDegree = 0.000000023;  // Value 1 degree celsius / 24 hours
-static int simuMonth = 1;
-static double startDay = 0.0;
-static double endDay = 0.0;
+static int    simuMonth = 1;
+static double startDay  = 0.0;
+static double endDay    = 0.0;
 
 void SimAtmospherePreConfig(tTrack *track)
 {
