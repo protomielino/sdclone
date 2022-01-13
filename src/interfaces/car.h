@@ -303,19 +303,19 @@ typedef struct {
 
 /** Dynamic wheel information */
 typedef struct {
-  tPosd	        relPos;			/**< position relative to GC */
-  tdble	        spinVel;		/**< spin velocity rad/s */
-  tdble	        brakeTemp;		/**< brake temperature from 0 (cool) to 1.0 (hot) */
-  int		state;			/**< wheel state */
-  tTrackSeg	*seg;			/**< Track segment where the wheel is */
-  tdble         rollRes;                /**< rolling resistance, useful for sound */
-  tdble         temp_in, temp_mid, temp_out;    /*tire temperature inside, middle and outside of tread*/
-  tdble         temp_opt;        /*optimal tire temperature*/
-  tdble         condition;      	/**< tire condition, between 0 and 1 */
-  tdble         treadDepth;     	/**< tread depth, between 0 and 1 */
-  tdble         critTreadDepth; 	/**< critical tread depth, when grip falls off suddenly, between 0 and treadDepth */
-  tdble         slipNorm; 		/**< normalized slip, the variable of Magic Formula */
-  tdble         slipOpt;		/**< the value of slipNorm giving maximal grip */
+  tPosd	        relPos;			                /**< position relative to GC */
+  tdble	        spinVel;		                /**< spin velocity rad/s */
+  tdble	        brakeTemp;		                /**< brake temperature from 0 (cool) to 1.0 (hot) */
+  int		    state;			                    /**< wheel state */
+  tTrackSeg	    *seg;			                    /**< Track segment where the wheel is */
+  tdble         rollRes;                        /**< rolling resistance, useful for sound */
+  tdble         temp_in, temp_mid, temp_out;    /**< tire temperature inside, middle and outside of tread */
+  tdble         temp_opt;                       /**< optimal tire temperature */
+  tdble         condition;      	            /**< tire condition, between 0 and 1 */
+  tdble         treadDepth;     	            /**< tread depth, between 0 and 1 */
+  tdble         critTreadDepth; 	            /**< critical tread depth, when grip falls off suddenly, between 0 and treadDepth */
+  tdble         slipNorm; 		                /**< normalized slip, the variable of Magic Formula */
+  tdble         slipOpt;		                /**< the value of slipNorm giving maximal grip */
   tdble         slipSide;
   tdble         slipAccel;
   tdble         Fx;
@@ -421,8 +421,8 @@ typedef struct
     int		gear;                   /**< current gear */
     int		gearNext;               /**< next gear while shiting */
     tdble	fuel;                   /**< remaining fuel (liters) */
-    tdble   fuel_consumption_total; // l
-    tdble   fuel_consumption_instant; // l/100km (>100 means infinity)
+    tdble   fuel_consumption_total; /**< l */
+    tdble   fuel_consumption_instant; /**< l/100km (>100 means infinity) */
     tdble	enginerpm;
     tdble	enginerpmRedLine;
     tdble	enginerpmMax;
@@ -442,17 +442,18 @@ typedef struct
     t3Dd	collpos;                /**< Collision position, useful for sound ; Simu V2 only */
     int		dammage;
     int		debug;
-    tCollisionState collision_state;    /**< collision state ; Simu V3 only  */
-    tdble   localPressure;	// Environment pressure at cars location
+    tdble   air_temp;                /** < air temperature in race */
+    tCollisionState collision_state; /**< collision state ; Simu V3 only  */
+    tdble   localPressure;	         /**< Environment pressure at cars location */
     tMemPoolCar	memoryPool;
-    tdble       driveSkill;             /**< Skill level for robots: 0.0 means as fast as possible; 10.0 means at a slower speed so players can easier win */
-    tdble       steerTqCenter;          /**< torques on steering wheel for force feedback, this is the centering torque, linear with steering angle */
-    tdble	steerTqAlign;		/**< force feedback torque: tire aligning torque from magic formula */
+    tdble       driveSkill;          /**< Skill level for robots: 0.0 means as fast as possible; 10.0 means at a slower speed so players can easier win */
+    tdble       steerTqCenter;       /**< torques on steering wheel for force feedback, this is the centering torque, linear with steering angle */
+    tdble	steerTqAlign;		     /**< force feedback torque: tire aligning torque from magic formula */
     tDashboardItem dashboardInstant[NR_DI_INSTANT];
-    int		dashboardInstantNb;	/**< number and list of immediately changing items in dashboard */
+    int		dashboardInstantNb;	     /**< number and list of immediately changing items in dashboard */
     tDashboardItem dashboardRequest[NR_DI_REQUEST];
-    int		dashboardRequestNb;	/**< number and list of items requested to change during next pit stop */
-    int		dashboardActiveItem;	/**< active item in dashboard, 0 .. dashboardInstantNb+dashboardRequestNb-1 */
+    int		dashboardRequestNb;	     /**< number and list of items requested to change during next pit stop */
+    int		dashboardActiveItem;	 /**< active item in dashboard, 0 .. dashboardInstantNb+dashboardRequestNb-1 */
 } tPrivCar;
 /* structure access */
 #define _fuelTotal      priv.fuel_consumption_total
@@ -476,6 +477,7 @@ typedef struct
 #define _gear           priv.gear
 #define _gearNext       priv.gearNext
 #define _debug          priv.debug
+#define _airtemp        priv.air_temp
 #define _skid           priv.skid
 #define _reaction       priv.reaction
 #define _dammage        priv.dammage
