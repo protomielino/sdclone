@@ -385,21 +385,22 @@ int	NetNetwork::GetDriverIdx()
 }
 
 // Get the Driver instance with given index in the race driver list (= the race XML file)
-void NetNetwork::ReadDriverData(NetDriver &driver,int index,void *params)
+void NetNetwork::ReadDriverData(NetDriver &driver,int index, void *params)
 {
     char path2[256];
     sprintf(path2, "%s/%d", RM_SECT_DRIVERS, index);
     const char *pMod = GfParmGetStr(params, path2, RM_ATTR_MODULE,NULL);
-    strncpy(&driver.module[0], pMod, 64);
-    driver.idx = (int)GfParmGetNum(params, path2, RM_ATTR_IDX, NULL,-1);
+    strncpy(&driver.module[0], pMod, 63);
+    driver.module[63] = '\0';
+    driver.idx = (int)GfParmGetNum(params, path2, RM_ATTR_IDX, NULL, -1);
 }
 
 void NetNetwork::WriteDriverData(NetDriver driver,int index,void *params)
 {
     char path2[256];
     sprintf(path2, "%s/%d", RM_SECT_DRIVERS, index);
-    GfParmSetStr(params, path2, RM_ATTR_MODULE,driver.module);
-    GfParmSetNum(params, path2, RM_ATTR_IDX, NULL,(tdble)driver.idx);
+    GfParmSetStr(params, path2, RM_ATTR_MODULE, driver.module);
+    GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, (tdble)driver.idx);
 }
 
 std::string NetNetwork::GetNetworkDriverName()
