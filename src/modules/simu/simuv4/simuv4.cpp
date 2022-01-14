@@ -27,35 +27,35 @@ Simuv4* Simuv4::_pSelf = 0;
 
 int openGfModule(const char* pszShLibName, void* hShLibHandle)
 {
-	// Instanciate the (only) module instance.
-	Simuv4::_pSelf = new Simuv4(pszShLibName, hShLibHandle);
+    // Instanciate the (only) module instance.
+    Simuv4::_pSelf = new Simuv4(pszShLibName, hShLibHandle);
 
-	// Register it to the GfModule module manager if OK.
-	if (Simuv4::_pSelf)
-		GfModule::register_(Simuv4::_pSelf);
+    // Register it to the GfModule module manager if OK.
+    if (Simuv4::_pSelf)
+        GfModule::register_(Simuv4::_pSelf);
 
-	// Report about success or error.
-	return Simuv4::_pSelf ? 0 : 1;
+    // Report about success or error.
+    return Simuv4::_pSelf ? 0 : 1;
 }
 
 int closeGfModule()
 {
-	// Unregister it from the GfModule module manager.
-	if (Simuv4::_pSelf)
-		Simuv4::unregister(Simuv4::_pSelf);
-	
-	// Delete the (only) module instance.
-	delete Simuv4::_pSelf;
-	Simuv4::_pSelf = 0;
+    // Unregister it from the GfModule module manager.
+    if (Simuv4::_pSelf)
+        Simuv4::unregister(Simuv4::_pSelf);
 
-	// Report about success or error.
-	return 0;
+    // Delete the (only) module instance.
+    delete Simuv4::_pSelf;
+    Simuv4::_pSelf = 0;
+
+    // Report about success or error.
+    return 0;
 }
 
 Simuv4& Simuv4::self()
 {
-	// Pre-condition : 1 successfull openGfModule call.
-	return *_pSelf;
+    // Pre-condition : 1 successfull openGfModule call.
+    return *_pSelf;
 }
 
 Simuv4::Simuv4(const std::string& strShLibName, void* hShLibHandle)
@@ -70,45 +70,45 @@ Simuv4::~Simuv4()
 // Implementation of IPhysicsEngine.
 void Simuv4::initialize(int nCars, struct Track* pTrack)
 {
-	::SimInit(nCars, pTrack);
+    ::SimInit(nCars, pTrack);
 }
 
 void Simuv4::configureCar(struct CarElt* pCar)
 {
-	::SimConfig(pCar);
+    ::SimConfig(pCar);
 }
 
 void Simuv4::reconfigureCar(struct CarElt* pCar)
 {
-	::SimReConfig(pCar);
+    ::SimReConfig(pCar);
 }
 
 void Simuv4::toggleCarTelemetry(int nCarIndex, bool bOn)
 {
-	::SimCarTelemetry(nCarIndex, bOn);
+    ::SimCarTelemetry(nCarIndex, bOn);
 }
 
 void Simuv4::updateSituation(struct Situation *pSituation, double fDeltaTime)
 {
-	::SimUpdate(pSituation, fDeltaTime);
+    ::SimUpdate(pSituation, fDeltaTime);
 }
 
 void Simuv4::updateCar(struct Situation *pSituation, double fDeltaTime, int nCarIndex)
 {
-	::SimUpdateSingleCar(nCarIndex, fDeltaTime, pSituation);
+    ::SimUpdateSingleCar(nCarIndex, fDeltaTime, pSituation);
 }
 
 void Simuv4::setCar(const struct DynPt& dynGCG, int nCarIndex)
 {
-	::UpdateSimCarTable(dynGCG, nCarIndex);
+    ::UpdateSimCarTable(dynGCG, nCarIndex);
 }
 
 tDynPt* Simuv4::getCar(int nCarIndex)
 {
-	return ::GetSimCarTable(nCarIndex);
+    return ::GetSimCarTable(nCarIndex);
 }
 
 void Simuv4::shutdown()
 {
-	::SimShutdown();
+    ::SimShutdown();
 }

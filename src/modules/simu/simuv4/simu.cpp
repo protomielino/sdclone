@@ -268,13 +268,20 @@ SimReConfig(tCarElt *carElt)
     }
 
     carElt->setup.reqRepair.desired_value = 0.0;
+    carElt->priv.air_temp = Tair;
 
     if (carElt->setup.reqTireset.desired_value > 0.9)
     {
         for(i=0; i<4; i++)
         {
-            car->wheel[i].treadDepth = 1.0;
-            car->wheel[i].Ttire = car->wheel[i].Tinit;
+            car->wheel[i].treadDepth = 1.01f;
+
+            if (car->features & FEAT_TIRETEMPDEG)
+                car->wheel[i].Ttire = car->wheel[i].Tinit;
+            else
+                car->wheel[i].Ttire = car->wheel[i].Topt;
+
+            carElt->priv.air_temp = car->wheel[i].Ttire;
         }
     }
 
