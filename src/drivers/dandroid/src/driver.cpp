@@ -230,6 +230,7 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
     mDanPath.init(mTrack, mMAXLEFT, mMAXRIGHT, mMARGININSIDE, mMARGINOUTSIDE, mCLOTHFACTOR, mSEGLEN);
     mOpponents.init(mTrack, Situation, Car);
     mPit.init(mTrack, Situation, Car, mPITDAMAGE, mPITENTRYMARGIN);
+    mPit.setTYC(mHASTYC);
 
     // File with speed factors
     mNewFile = false;
@@ -2488,7 +2489,8 @@ void TDriver::calcMaxspeed()
 
         if(mHASTYC)
         {
-            mMaxspeed *= TyreCondition();
+            mMaxspeed *= mPit.tyreCondition();
+            LogDANDROID.info(" # Max Speed = %.3f - Tire condition = %.3f\n", mMaxspeed, mPit.tyreCondition());
         }
 
         // Special cases
@@ -2765,41 +2767,4 @@ void TDriver::driverMsgValue(int priority, std::string desc, double value)
     {
         LogDANDROID.debug("%dm %s s:%d p:%d %s %g\n", (int)mFromStart, oCar->_name, mDrvState, mDrvPath, desc.c_str(), value);
     }
-}
-
-double TDriver::TyreConditionFront()
-{
-    return MIN(oCar->_tyreCondition(0), oCar->_tyreCondition(1));
-}
-
-double TDriver::TyreConditionRear()
-{
-    return MIN(oCar->_tyreCondition(2), oCar->_tyreCondition(3));
-}
-
-double TDriver::TyreCondition()
-{
-    LogDANDROID.debug("# DanDroid (%i) Tyre condition = %.8f - Tyre temperature = %.8f\n", mCarIndex, MIN(TyreConditionFront(), TyreConditionRear()), oCar->_tyreT_mid(0));
-    return MIN(TyreConditionFront(), TyreConditionRear());
-}
-
-double TDriver::TyreTreadDepthFront()
-{
-    double Right = (oCar->_tyreTreadDepth(0) - oCar->_tyreCritTreadDepth(0));
-    double Left = (oCar->_tyreTreadDepth(1) - oCar->_tyreCritTreadDepth(1));
-
-    return 100 * MIN(Right,Left);
-}
-
-double TDriver::TyreTreadDepthRear()
-{
-    double Right = (oCar->_tyreTreadDepth(2) - oCar->_tyreCritTreadDepth(2));
-    double Left = (oCar->_tyreTreadDepth(3) - oCar->_tyreCritTreadDepth(3));
-
-    return 100 * MIN(Right,Left);
-}
-
-double TDriver::TyreTreadDepth()
-{
-    return MIN(TyreTreadDepthFront(), TyreTreadDepthRear());
 }

@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
 
     file                 : driver.h
     created              : 2006-08-31 01:21:49 UTC
@@ -124,12 +124,6 @@ class TDriver {
   double filterTCL_FWD();
   double filterTCL_RWD();
   double filterTCLSideSlip(double accel);
-  double TyreConditionFront();
-  double TyreConditionRear();
-  double TyreCondition();
-  double TyreTreadDepthFront();
-  double TyreTreadDepthRear();
-  double TyreTreadDepth();
   void readPrivateSection(PCarSettings *CarParmHandle);
   void readConstSpecs(PCarHandle CarHandle);
   void readVarSpecs(PCarSettings CarParmHandle);
