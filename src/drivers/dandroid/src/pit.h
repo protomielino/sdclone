@@ -55,7 +55,6 @@ public:
     void   update(double fromstart);
     int    getRepair();
     double getFuel();
-    double getWear();
     double getSpeedlimit();
     double getSpeedlimit(double fromstart);
     double getDist();

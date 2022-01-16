@@ -2490,7 +2490,7 @@ void TDriver::calcMaxspeed()
         if(mHASTYC)
         {
             mMaxspeed *= mPit.tyreCondition();
-            LogDANDROID.info(" # Max Speed = %.3f - Tire condition = %.3f\n", mMaxspeed, mPit.tyreCondition());
+            LogDANDROID.debug(" # Max Speed = %.3f - Tire condition = %.3f\n", mMaxspeed, mPit.tyreCondition());
         }
 
         // Special cases

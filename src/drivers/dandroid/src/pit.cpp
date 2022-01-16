@@ -309,7 +309,7 @@ void Pit::update(double fromstart)
                 setPitstop(true);
             }
 
-            if(getWear() < 30.0)
+            if(tyreTreadDepth() < 30.0)
                 setPitstop(true);
         }
     }
@@ -342,11 +342,6 @@ int Pit::getRepair()
     }
 
     return car->_dammage;
-}
-
-double Pit::getWear()
-{
-    return tyreTreadDepth();
 }
 
 double Pit::getSpeedlimit()
@@ -432,7 +427,6 @@ void Pit::pitCommand()
     car->_pitRepair = getRepair();
     lastpitfuel = getFuel();
     car->_pitFuel = (tdble) lastpitfuel;
-    car->pitcmd.tireChange	= getWear() > 30.0 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
-
+    car->pitcmd.tireChange	= tyreTreadDepth() > 30.0 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
     setPitstop(false);
 }
