@@ -320,7 +320,7 @@ void OSGPLOT::update(tSituation *s, const SDFrameInfo* frameInfo,
     else if(this->Ydata == "forcefeedback")     y = (float)forceFeedback.force;
 
     //get z value
-    float z=(float)0;
+    float z = 0.1f;
 
     //add the new point
     this->appendDataPoint(x,y,z);
@@ -413,12 +413,12 @@ void OSGPLOT::recalculateDrawnPoint()
             osg::Vec3(
                 this->positionX,
                 ((this->referenceLineAtValue - this->minValue) / (this->maxValue - this->minValue) * this->height) + this->positionY,
-                0.0f
+                0.1f
             ),
             osg::Vec3(
                 this->positionX + this->width,
                 ((this->referenceLineAtValue - this->minValue) / (this->maxValue-this->minValue) * this->height) + this->positionY,
-                0.0f
+                0.1f
             ),
         };
 
