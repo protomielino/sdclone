@@ -71,7 +71,7 @@ void ForceFeedbackManager::readConfiguration(const std::string &carName){
     this->carName = carName;
 
     std::string configFileUrl = GfLocalDir();
-    configFileUrl.append("/drivers/human/preferences.xml");
+    configFileUrl.append("drivers/human/preferences.xml");
 
     std::string effectsSectionPathDefault = "forceFeedback/default/effectsConfig";
 
@@ -238,7 +238,17 @@ int ForceFeedbackManager::updateForce(tCarElt* car, tSituation *s){
 
     //apply global effect multiplier
     //multiply
-    this->force = this->force * this->effectsConfig["globalEffect"]["multiplier"] / 100;
+    int multiplier = this->effectsConfig["globalEffect"]["multiplier"];
+    this->force = (this->force * multiplier) / 100;
+
+    //apply global minimum effect
+    // minimum force will be percentage of maximum force
+    int minimum = ((multiplier * this->effectsConfig["globalEffect"]["minimum"]) / 100) * 32760 / 100;
+
+    if (this->force > 0)
+        this->force += minimum;
+    else if (this->force < 0)
+        this->force -= minimum;
 
     //reverse if needed
     if(this->effectsConfig["globalEffect"]["reverse"] == 1){
