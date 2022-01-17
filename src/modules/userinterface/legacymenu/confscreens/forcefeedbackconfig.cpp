@@ -227,7 +227,9 @@ ForceFeedbackMenuInit(void *prevMenu, void *nextMenu, int curPlayerIdx, const st
 					editbox.effectParameterName = iterator2->first;
 					
 					//add it to our list
-					EditBoxes.push_back(editbox);					
+					EditBoxes.push_back(editbox);	
+
+					GfLogInfo("Generated editbox for (%s)\n", editBoxName.c_str());
 				}
 				
 			}else{
