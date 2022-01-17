@@ -317,7 +317,7 @@ void OSGPLOT::update(tSituation *s, const SDFrameInfo* frameInfo,
     else if(this->Ydata == "carspeed")          y = (float)currCar->_speed_x * 3.6;
     else if(this->Ydata == "fpsavverrange")     y = (float)frameInfo->fAvgFps;
     else if(this->Ydata == "carbracketemp")     y = (float)currCar->_brakeTemp(0);
-    else if(this->Ydata == "forcefeedback")     y = (float)forceFeedback.force;
+    else if(this->Ydata == "forcefeedback")     y = fabs((float)forceFeedback.force);
 
     //get z value
     float z = 0.1f;
