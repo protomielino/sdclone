@@ -340,15 +340,6 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 			ENDFOREACH()
 			LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 		ENDFOREACH()
-
-		# Other needed DLLs we don't link with.
-		# We use _LIB_NAME_ as a template, and _NAME_HINT_ as the string to replace inside. 
-		SET(_EXTRA_OSG_DLLS_NAME_HINTS "osgText") # ';'-separated list
-		FOREACH(_NAME_HINT ${_EXTRA_OSG_DLLS_NAME_HINTS})
-			STRING(REPLACE "${_NAME_HINT_}" "${_NAME_HINT}" _LIB_NAME "${_LIB_NAME_}")
-			_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" ";lib;ot12-;ot20-;ot21-;osg80-;osg97-;osg100-;osg118-;osg123-;osg130-;osg131-;osg158-;osg160-;osg161-" _DLL_PATHNAME)
-			LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
-		ENDFOREACH()
 		
 		# Plugins : Complete the list right below according to the actual needs.
 		# TODO: Find a way to install them in the osgPlugins-xxx subdir (works as is, but ...)
