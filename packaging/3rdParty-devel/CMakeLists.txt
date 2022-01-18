@@ -463,7 +463,25 @@ else(OPTION_CURL)
 endif(OPTION_CURL)
 
 if(OPTION_OSG)
-   set(OSG_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX='' -DUSE_3RDPARTY_BIN=Off)
+   set(OSG_ARGS ${EXTERNALS_CMAKE_ARGS} -DCMAKE_DEBUG_POSTFIX='' 
+                                        -DUSE_3RDPARTY_BIN=Off
+                                        -DBUILD_OSG_DEPRECATED_SERIALIZERS=OFF
+                                        -DBUILD_OSG_APPLICATIONS=OFF
+                                        -DBUILD_OSG_PLUGINS_BY_DEFAULT=OFF
+                                        -DBUILD_OSG_PLUGIN_OSG=ON
+                                        -DBUILD_OSG_PLUGIN_AC=ON
+                                        -DBUILD_OSG_PLUGIN_CURL=ON
+                                        -DBUILD_OSG_PLUGIN_DDS=ON
+                                        -DBUILD_OSG_PLUGIN_FREETYPE=ON
+                                        -DBUILD_OSG_PLUGIN_GLSL=ON
+                                        -DBUILD_OSG_PLUGIN_IVE=ON
+                                        -DBUILD_OSG_PLUGIN_JPEG=ON
+                                        -DBUILD_OSG_PLUGIN_OSG=ON
+                                        -DBUILD_OSG_PLUGIN_OSGA=ON
+                                        -DBUILD_OSG_PLUGIN_OSGTGZ=ON
+                                        -DBUILD_OSG_PLUGIN_PNG=ON
+                                        -DBUILD_OSG_PLUGIN_RGB=ON
+                                        -DBUILD_OSG_PLUGIN_SHADOW=ON )
 
    message(STATUS "Remove the block below when curl fixes their CURLConfig.cmake or OSG fixes it")
    if(NOT ${CMAKE_VERSION} VERSION_LESS "3.17.0")
