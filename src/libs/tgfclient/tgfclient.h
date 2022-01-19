@@ -373,7 +373,7 @@ typedef struct MouseInfo
 {
     int X;
     int Y;
-    int button[7];
+    int button[5];
 } tMouseInfo;
 
 TGFCLIENT_API tMouseInfo* GfuiMouseInfo(void);

@@ -539,35 +539,27 @@ static void
 gfuiMouseButton(int button, int state, int x, int y)
 {
 	/* Consider all SDL supported buttons */
-	if (button >= 1 && button <= 7) 
+	if (button >= SDL_BUTTON_LEFT && button <= SDL_BUTTON_X2)
 	{
 		GfuiMouse.X = (x - (ScrW - ViewW)/2) * (int)GfuiScreen->width / ViewW;
 		GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
 
-		if (button == SDL_MOUSEWHEEL) {
-			// Up/down happens very quickly, leaving no time for the system to see them 
-			// this just toggle every down event
-			if (state == SDL_PRESSED) {
-				GfuiMouse.button[button-1] = (GfuiMouse.button[button-1] == 0);
-			}
-		} else {
-			GfuiMouse.button[button-1] = (state == SDL_PRESSED); /* SDL 1st button has index 1 */
+		GfuiMouse.button[button-1] = (state == SDL_PRESSED); /* SDL 1st button has index 1 */
 	
-			DelayRepeat = REPEAT1;
-			LastTimeClick = GfTimeClock();
+		DelayRepeat = REPEAT1;
+		LastTimeClick = GfTimeClock();
 
-			if (state == SDL_PRESSED)
-			{
-				GfuiScreen->mouse = 1;
-				gfuiUpdateFocus();
-				gfuiMouseAction((void*)0);
-			} 
-			else 
-			{
-				GfuiScreen->mouse = 0;
-				gfuiUpdateFocus();
-				gfuiMouseAction((void*)1);
-			}
+		if (state == SDL_PRESSED)
+		{
+			GfuiScreen->mouse = 1;
+			gfuiUpdateFocus();
+			gfuiMouseAction((void*)0);
+		} 
+		else 
+		{
+			GfuiScreen->mouse = 0;
+			gfuiUpdateFocus();
+			gfuiMouseAction((void*)1);
 		}
 		GfuiApp().eventLoop().postRedisplay();
 	}

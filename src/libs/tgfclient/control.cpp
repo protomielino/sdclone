@@ -75,7 +75,7 @@ static const char *GfJoyAtob[] = {
     "ATOB0-7", "ATOB1-7", "ATOB2-7", "ATOB3-7", "ATOB4-7", "ATOB5-7", "ATOB6-7", "ATOB7-7", "ATOB8-7", "ATOB9-7", "ATOB10-7", "ATOB11-7"
 };
 
-static const char *GfMouseBtn[] = {"MOUSE_LEFT_BTN", "MOUSE_MIDDLE_BTN", "MOUSE_RIGHT_BTN", "MOUSE_WHEEL_UP", "MOUSE_ WHEEL_DN", "MOUSE_X1", "MOUSE_X2"};
+static const char *GfMouseBtn[] = {"MOUSE_LEFT_BTN", "MOUSE_MIDDLE_BTN", "MOUSE_RIGHT_BTN", "MOUSE_X1", "MOUSE_X2"};
 
 static const char *GfMouseAxis[] = {"MOUSE_LEFT", "MOUSE_RIGHT", "MOUSE_UP", "MOUSE_DOWN"};
 
