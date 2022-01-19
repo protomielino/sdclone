@@ -180,7 +180,7 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	ENDIF(OPTION_3RDPARTY_SOLID)
 	
 	# JPEG.
-	_FIND_3RDPARTY_DEPENDENCY(JPEG jpeglib.h "" "jpeg_s;jpeg;jpeg-8;jpeg-9" ${ROOT_DIR} "")
+	_FIND_3RDPARTY_DEPENDENCY(JPEG jpeglib.h "" "jpeg_s;jpeg;jpeg-9;jpeg-8" ${ROOT_DIR} "")
 
 	IF(OPTION_WEBSERVER)
 		# CURL.
@@ -188,12 +188,12 @@ MACRO(_FIND_3RDPARTY_DEPENDENCIES ROOT_DIR)
 	ENDIF(OPTION_WEBSERVER)
 
 	# ZLib.
-	_FIND_3RDPARTY_DEPENDENCY(ZLIB zlib.h "" "z;zlib;zlib1" ${ROOT_DIR} "D")
+	_FIND_3RDPARTY_DEPENDENCY(ZLIB zlib.h "" "z;zlib;zlib1" ${ROOT_DIR} "")
 	
 	IF(ZLIB_FOUND)
 
 		# PNG.	
-		_FIND_3RDPARTY_DEPENDENCY(PNG png.h "" "libpng;png13;png14;png15;png16" ${ROOT_DIR} "D")
+		_FIND_3RDPARTY_DEPENDENCY(PNG png.h "" "libpng;png16;png15;png14;png13" ${ROOT_DIR} "")
 		
 		IF(PNG_FOUND)
 			# Force subsequent FindPNG stuff not to search for other variables ... kind of a hack 
@@ -331,7 +331,7 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 		FOREACH(_LIB_NAME ${OPENSCENEGRAPH_LIBRARIES})
 			FOREACH(_NAME_HINT ${_OSG_DLLS_NAME_HINTS})
 				IF("${_LIB_NAME}" MATCHES "${_NAME_HINT}\\.")
-					_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" "lib;ot12-;ot20-;ot21-;osg80-;osg97-;osg100-;osg118-;osg123-;osg130-;osg131-;osg158-;osg160-;osg161-" _DLL_PATHNAME)
+					_FIND_3RDPARTY_DLL("${_LIB_NAME}" "${_NAME_HINT}" "lib;ot21-;ot20-;ot12-;osg161-;osg160-;osg158-" _DLL_PATHNAME)
 					SET(_NAME_HINT_ "${_NAME_HINT}") # For later (see below DLLs we don't link with).
 					SET(_LIB_NAME_ "${_LIB_NAME}") # For later (see below DLLs we don't link with).
 					SET(_DLL_PATHNAME_ "${_DLL_PATHNAME}") # For later (see below plugins).
@@ -375,10 +375,10 @@ MACRO(SD_INSTALL_CUSTOM_3RDPARTY TARGET_NAME)
 	_FIND_3RDPARTY_DLL("${ZLIB_LIBRARY}" "zlib;zlib1" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
-	_FIND_3RDPARTY_DLL("${PNG_LIBRARY}" "png;png15;png16" "lib" _DLL_PATHNAME)
+	_FIND_3RDPARTY_DLL("${PNG_LIBRARY}" "png;png16;png15" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
-	_FIND_3RDPARTY_DLL("${JPEG_LIBRARY}" "jpeg;jpeg-8;jpeg-9" "lib" _DLL_PATHNAME)
+	_FIND_3RDPARTY_DLL("${JPEG_LIBRARY}" "jpeg;jpeg-9;jpeg-8" "lib" _DLL_PATHNAME)
 	LIST(APPEND _THIRDPARTY_DLL_PATHNAMES "${_DLL_PATHNAME}")
 
 	IF(OPTION_WEBSERVER)
