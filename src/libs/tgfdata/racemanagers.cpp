@@ -80,6 +80,8 @@ static bool hasHigherPriority(const GfRaceManager* pLeft, const GfRaceManager* p
 }
 
 GfRaceManagers::GfRaceManagers()
+    :CLIENT_SERVER_OFF_DISALLOWED_NETWORK_RACEMANAGER_TYPE("Network"),
+    CLIENT_SERVER_ON_DISALLOWED_NETWORK_RACEMANAGER_TYPE("Online")
 {
     _pPrivate = new Private;
 

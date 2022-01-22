@@ -144,8 +144,8 @@ protected:
 
 private:
     bool cmakeConfigurationPermits(const std::string& raceManagerType) const;
-    static constexpr const char *const CLIENT_SERVER_OFF_DISALLOWED_NETWORK_RACEMANAGER_TYPE = "Network";
-    static constexpr const char *const CLIENT_SERVER_ON_DISALLOWED_NETWORK_RACEMANAGER_TYPE = "Online";
+    std::string CLIENT_SERVER_OFF_DISALLOWED_NETWORK_RACEMANAGER_TYPE;
+    std::string CLIENT_SERVER_ON_DISALLOWED_NETWORK_RACEMANAGER_TYPE;
 };
 
 #endif /* __TGFRACEMANAGERS__H__ */
