@@ -91,6 +91,7 @@ TGFCLIENT_API int* GfScrGetSupportedColorDepths(int* pnDepths);
 TGFCLIENT_API int* GfScrGetDefaultColorDepths(int* pnDepths);
 TGFCLIENT_API ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex);
 TGFCLIENT_API ScreenSizeVector GfScrGetWindowSizes();
+TGFCLIENT_API ScreenSizeVector GfScrGetCustomWindowSizes();
 
 TGFCLIENT_API int GfScrGetAttachedDisplays();
 TGFCLIENT_API tScreenSize GfScrGetCurrentDisplaySize(int nDisplayIndex);

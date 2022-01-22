@@ -131,7 +131,45 @@ ScreenSizeVector GfScrGetWindowSizes()
     {
         vecSizes.push_back(ADefScreenSizes[i]);
     }
+    ScreenSizeVector custSizes = GfScrGetCustomWindowSizes();
+
+    for (unsigned i = 0; i < custSizes.size(); i++)
+    {
+       vecSizes.push_back(custSizes[i]);
+    }
     return vecSizes;
+}
+
+/** Get any custom screen / window sizes (pixels) from screen.xml
+    @ingroup	screen
+    @param	none
+    @return	ScreenSizeVector of custom sizes
+ */
+ScreenSizeVector GfScrGetCustomWindowSizes()
+{
+   ScreenSizeVector vecSizes;
+
+   void* hparmScreen =
+      GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+   if (GfParmExistsSection(hparmScreen, GFSCR_SECT_WIN_MODES))
+   {
+      tScreenSize last;
+      last.width = 0;
+      last.height = 0;
+
+      GfParmListSeekFirst(hparmScreen, GFSCR_SECT_WIN_MODES);
+      do
+      {
+         last.width = GfParmGetCurNum(hparmScreen, GFSCR_SECT_WIN_MODES, GFSCR_ATT_WIN_X, NULL, 0);
+         last.height = GfParmGetCurNum(hparmScreen, GFSCR_SECT_WIN_MODES, GFSCR_ATT_WIN_Y, NULL, 0);
+
+         if ((last.height != 0) && (last.width != 0))
+            vecSizes.push_back(last);
+      }
+      while (GfParmListSeekNext(hparmScreen, GFSCR_SECT_WIN_MODES) == 0);
+   }
+   return vecSizes;
 }
 
 /** Get the supported screen / window sizes (pixels) for the current display mode.

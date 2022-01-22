@@ -31,6 +31,7 @@
 #define GFSCR_SECT_VALIDPROPS                       "Validated Screen Properties"
 #define GFSCR_SECT_INTESTPROPS                      "In-Test Screen Properties"
 
+#define GFSCR_SECT_WIN_MODES                        "Windowed Modes"
 #define GFSCR_ATT_BPP                               "bpp"
 #define GFSCR_ATT_WIN_X                             "window width"
 #define GFSCR_ATT_WIN_Y                             "window height"
