@@ -93,6 +93,7 @@ TGFCLIENT_API ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex);
 TGFCLIENT_API ScreenSizeVector GfScrGetWindowSizes();
 
 TGFCLIENT_API int GfScrGetAttachedDisplays();
+TGFCLIENT_API tScreenSize GfScrGetCurrentDisplaySize(int nDisplayIndex);
 
 /*****************************
  * GUI interface (low-level) *

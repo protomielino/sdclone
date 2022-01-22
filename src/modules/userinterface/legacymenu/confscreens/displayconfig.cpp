@@ -414,9 +414,19 @@ void DisplayMenu::resetScreenSizes()
 	// Either show the sizes supported by the current display (Full screen
 	// or the Default/Custom sizes
 	if (_eDisplayMode == eFullScreen)
+	{
 		_vScreenSizes = GfScrGetSupportedSizes(_nMenuDisplay);
+		tScreenSize _currSize = GfScrGetCurrentDisplaySize( _nMenuDisplay);
+		_nScreenWidth = _currSize.width;
+		_nScreenHeight = _currSize.height;
+	}
 	else
+	{
 		_vScreenSizes = GfScrGetWindowSizes();
+		int vw = 0;
+		int vh = 0;
+		GfScrGetSize(&_nScreenWidth, &_nScreenHeight, &vw, &vh);
+	}
 
 
 	// Update combo-box with new possible sizes.

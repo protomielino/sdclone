@@ -176,10 +176,8 @@ ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex)
         {
             if(SDL_GetDisplayMode(nDisplayIndex, i, &mode) == 0)
             {
-                // Make sure it fits on the display
-                // && no duplicate entries
-                if(((mode.w <= bounds.w) && (mode.h <= bounds.h))
-                    && ((mode.w != last.width) || (mode.h != last.height)))
+                // Don't allow duplicate entries
+                if((mode.w != last.width) || (mode.h != last.height))
                 {
                     GfLogDebug("  %d x %d x %d @ %d hz\n",mode.w,mode.h,SDL_BITSPERPIXEL(mode.format),mode.refresh_rate);
                     last.width = mode.w;
@@ -195,10 +193,7 @@ ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex)
     {
         GfLogError("Invalid Display index passed to GfScrGetSupportedSizes()\n");
     }
-    // TODO Remove HACK below
-    // clear the vector so the only choice for Full-screen is current display mode
-    vecSizes.clear();
-    // TODO Remove HACK above
+
     if(vecSizes.empty())
     {
         GfLogInfo("No supported sizes for Display .\n");
@@ -210,6 +205,27 @@ ScreenSizeVector GfScrGetSupportedSizes(int nDisplayIndex)
     }
 
     return vecSizes;
+}
+
+/** Get the screen dimensions 
+    @ingroup	screen
+    @param	nDisplayIndex	Index of the display from which to get the size
+    @return	tScreenSize containing the current size
+ */
+tScreenSize GfScrGetCurrentDisplaySize(int nDisplayIndex)
+{
+    tScreenSize size;
+
+    size.width = 0;
+    size.height = 0;
+
+    SDL_DisplayMode mode;
+    if(SDL_GetCurrentDisplayMode(nDisplayIndex, &mode) == 0)
+    {
+        size.width = mode.w;
+        size.height = mode.h;
+    }
+    return size;
 }
 
 /** Get the default / fallback screen / window color depths (bits per pixels, alpha included).
