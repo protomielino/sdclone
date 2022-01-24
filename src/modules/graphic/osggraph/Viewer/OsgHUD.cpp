@@ -302,7 +302,7 @@ OSGPLOT::~OSGPLOT()
 
 void OSGPLOT::setNodeMask(int mask)
 {
-    for (int i = 0; i < this->osgGroup->getNumChildren(); i++)
+    for (unsigned int i = 0; i < this->osgGroup->getNumChildren(); i++)
         this->osgGroup->getChild(i)->setNodeMask(mask);
 }
 osg::ref_ptr <osg::Group> OSGPLOT::getGroup()
