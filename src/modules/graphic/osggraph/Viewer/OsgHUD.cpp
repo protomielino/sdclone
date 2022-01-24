@@ -2059,6 +2059,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             );
 
                             this->osgGroupHud->addChild(this->hudGraphElements[elementId]->getGroup());
+                            this->hudGraphElements[elementId]->setNodeMask(widgetEnabled);
 #endif
                         }
                         else
