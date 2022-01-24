@@ -75,6 +75,7 @@ class OSGPLOT
     void recalculateDrawnPoint();
     void drawBackground();
     void update(tSituation *s, const SDFrameInfo* frameInfo,const tCarElt *currCar);
+    void setNodeMask(int mask);
 
 };
 #endif
@@ -132,6 +133,7 @@ class SDHUD
         
 #ifdef HUDDEBUG
         std::map<std::string,OSGPLOT* > hudGraphElements;
+        void setGraphNodeMask(int mask);
 #endif
 
     public:
@@ -146,6 +148,9 @@ class SDHUD
         void ToggleHUDdriverinput();
         void ToggleHUDdebug();
         void ToggleHUDdashitems();
+#ifdef HUDDEBUG
+        void ToggleHUDgraph();
+#endif
 
         osg::ref_ptr<osg::Camera> camera;
 

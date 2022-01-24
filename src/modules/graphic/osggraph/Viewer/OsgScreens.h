@@ -64,6 +64,9 @@ public:
     void toggleHUDdriverinput();
     void toggleHUDdebug();
     void toggleHUDdashitems();
+#ifdef HUDDEBUG
+    void toggleHUDgraph();
+#endif
 
     inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}
 };

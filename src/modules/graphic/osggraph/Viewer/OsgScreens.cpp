@@ -255,6 +255,12 @@ void SDScreens::toggleHUDdashitems()
 {
     hud.ToggleHUDdashitems();
 }
+#ifdef HUDDEBUG
+void SDScreens::toggleHUDgraph()
+{
+    hud.ToggleHUDgraph();
+}
+#endif
 
 void SDScreens::registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node)
 {

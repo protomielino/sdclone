@@ -300,6 +300,11 @@ OSGPLOT::~OSGPLOT()
 {
 }
 
+void OSGPLOT::setNodeMask(int mask)
+{
+    for (int i = 0; i < this->osgGroup->getNumChildren(); i++)
+        this->osgGroup->getChild(i)->setNodeMask(mask);
+}
 osg::ref_ptr <osg::Group> OSGPLOT::getGroup()
 {
     return (*this->osgGroup).asGroup();
@@ -1422,7 +1427,10 @@ void SDHUD::ToggleHUD()
         hudElementsVisibilityStatus["driverinput-wheel"] =  (int)this->hudImgRotableElements["driverinput-wheel"]->getNodeMask();
         hudElementsVisibilityStatus["debugWidget"] =        (int)this->hudWidgets["debugWidget"]->getNodeMask();
         hudElementsVisibilityStatus["dashitemsWidget"] =    (int)this->hudWidgets["dashitemsWidget"]->getNodeMask();
-        
+#ifdef HUDDEBUG
+        hudElementsVisibilityStatus["graphWidget"] =        (int)this->hudWidgets["graphWidget"]->getNodeMask();
+#endif
+
         this->hudWidgets["boardWidget"]->setNodeMask(0);
         this->hudWidgets["racepositionWidget"]->setNodeMask(0);
         this->hudWidgets["racelapsWidget"]->setNodeMask(0);
@@ -1433,6 +1441,10 @@ void SDHUD::ToggleHUD()
         this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
         this->hudWidgets["debugWidget"]->setNodeMask(0);
         this->hudWidgets["dashitemsWidget"]->setNodeMask(0);
+#ifdef HUDDEBUG
+        this->hudWidgets["graphWidget"]->setNodeMask(0);
+        this->setGraphNodeMask(0);
+#endif
         hudElementsVisibilityStatusEnabled = 0;
     }else{
         this->hudWidgets["boardWidget"]->setNodeMask(hudElementsVisibilityStatus["boardWidget"]);
@@ -1445,6 +1457,10 @@ void SDHUD::ToggleHUD()
         this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(hudElementsVisibilityStatus["driverinput-wheel"]);
         this->hudWidgets["debugWidget"]->setNodeMask(hudElementsVisibilityStatus["debugWidget"]);
         this->hudWidgets["dashitemsWidget"]->setNodeMask(hudElementsVisibilityStatus["dashitemsWidget"]);
+#ifdef HUDDEBUG
+        this->hudWidgets["graphWidget"]->setNodeMask(hudElementsVisibilityStatus["graphWidget"]);
+        this->setGraphNodeMask(hudElementsVisibilityStatus["graphWidget"]);
+#endif
         hudElementsVisibilityStatusEnabled = 1;
     }
 }
@@ -1584,6 +1600,36 @@ void SDHUD::ToggleHUDdashitems()
     GfParmWriteFile(NULL, paramHandle, "osghudconfig");
 
 }
+
+#ifdef HUDDEBUG
+void SDHUD::setGraphNodeMask(int mask)
+{
+    for (std::map<std::string, OSGPLOT *>::iterator it = hudGraphElements.begin(); it != hudGraphElements.end(); ++it)
+    {
+        it->second->setNodeMask(mask);
+    }
+}
+
+void SDHUD::ToggleHUDgraph()
+{
+    //toggle the visibility
+    this->hudWidgets["graphWidget"]->setNodeMask(1 - this->hudWidgets["graphWidget"]->getNodeMask());
+
+    int value = this->hudWidgets["graphWidget"]->getNodeMask();
+    setGraphNodeMask(value);
+
+    //save the current status in the config file
+    std::string configFileUrl = GetLocalDir();
+    configFileUrl.append("config/osghudconfig.xml");
+    std::string path = "widgets/graphWidget";
+    std::string attribute = "enabled";
+
+    //read the config file, update the value and write it back
+    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
+    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
+    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
+    }
+#endif
 
 osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 {
