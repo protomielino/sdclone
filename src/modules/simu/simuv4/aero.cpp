@@ -327,7 +327,7 @@ SimWingConfig(tCar *car, int index)
         wing->AR = GfParmGetNum(hdle, WingSect[index], PRM_ASPECTRATIO, (char*)NULL, 0);
     }
 
-    wing->Kx = -1.23f * area;
+    wing->Kx = -rho * area;
 
     if (wing->WingType == 0)
     {
