@@ -97,7 +97,6 @@ tdble grLodFactorValue = 1.0;
 static SDFrameInfo frameInfo;
 static double fFPSPrevInstTime;   // Last "instant" FPS refresh time
 static unsigned nFPSTotalSeconds; // Total duration since initView
-double ratio = 0.0f;
 
 // Mouse coords graphics backend to screen ratios.
 static float fMouseRatioX, fMouseRatioY;

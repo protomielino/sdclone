@@ -28,7 +28,7 @@ extern int m_Winx, m_Winy, m_Winw, m_Winh;
 extern int grVectFlag;
 extern int grVectDispFlag[];
 
-extern double grCurTime, ratio;
+extern double grCurTime;
 
 extern void *grHandle;
 extern void *grTrackHandle;
