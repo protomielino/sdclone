@@ -28,6 +28,7 @@
 
 #include <tgfclient.h>
 #include <sound.h>
+#include <musicplayer.h>
 
 #include "soundconfig.h"
 
@@ -52,12 +53,14 @@ static const char *musicStateList[] = {SND_VAL_MUSIC_STATE_ENABLED,
 								  SND_VAL_MUSIC_STATE_DISABLED};
 static const int nbMusicStates = sizeof(musicStateList) / sizeof(musicStateList[0]);
 static int curMusicState = 0;
+static int OriginalMusicState = 0;
 
 // gui label id.
 static int MusicStateId;
 
 // volume
 static float MusicVolumeValue = 100.0f;
+static float OriginalMusicVolumeValue = 100.0f;
 static int MusicVolumeValueId;
 
 // gui screen handles.
@@ -105,6 +108,7 @@ static void readSoundCfg(void)
 			break;
 		}
 	}
+	OriginalMusicState = curMusicState;
 
 	GfuiLabelSetText(scrHandle, MusicStateId, musicStateList[curMusicState]);
 
@@ -116,16 +120,26 @@ static void readSoundCfg(void)
 	else if (MusicVolumeValue < 0.0f) {
 		MusicVolumeValue = 0.0f;
 	}
+	OriginalMusicVolumeValue = MusicVolumeValue;
 
-		sprintf(buf, "%g", MusicVolumeValue);
+	sprintf(buf, "%g", MusicVolumeValue);
 	GfuiEditboxSetString(scrHandle, MusicVolumeValueId, buf);
 
 	GfParmReleaseHandle(paramHandle);
 }
 
+static void saveMusicSettings()
+{
+	void *paramHandle = GfParmReadFileLocal(SND_PARAM_FILE, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	GfParmSetStr(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_STATE, musicStateList[curMusicState]);
+	GfParmSetNum(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_VOLUME, "%", MusicVolumeValue);
+
+	GfParmWriteFile(NULL, paramHandle, "sound");
+	GfParmReleaseHandle(paramHandle);
+}
 
 // Save the choosen values in the corresponding parameter file.
-static void saveSoundOption(void *)
+static void saveSoundOption()
 {
 	// Force current edit to loose focus (if one has it) and update associated variable.
 	GfuiUnSelectCurrent();
@@ -138,17 +152,39 @@ static void saveSoundOption(void *)
 
 	GfParmWriteFile(NULL, paramHandle, "sound");
 	GfParmReleaseHandle(paramHandle);
+}
 
-	 // Shutdown the user interface.
-	LegacyMenu::self().shutdown();
 
-    // Restart the game.
-    GfuiApp().restart();
+
+static void onAccept(void *)
+{
+	saveSoundOption();
+
+	// Shutdown the user interface.
+	//LegacyMenu::self().shutdown();
+
+	// Restart the game.
+	//GfuiApp().restart();
 
 	// Return to previous screen.
 	GfuiScreenActivate(prevHandle);
 }
 
+// Reset any changes 
+static void onCancel(void *)
+{
+	enableMusic(1 - OriginalMusicState);
+	curMusicState = OriginalMusicState;
+
+	setMusicVolume(OriginalMusicVolumeValue);
+	MusicVolumeValue = OriginalMusicVolumeValue;
+
+	saveMusicSettings();
+
+
+	// Return to previous screen.
+	GfuiScreenActivate(prevHandle);
+}
 
 // Toggle sound state openal/plib/disabled.
 static void changeSoundState(void *vp)
@@ -179,6 +215,11 @@ static void changeMusicState(void *vp)
 	curMusicState = (curMusicState + (int)(long)vp + nbMusicStates) % nbMusicStates;
 
 	GfuiLabelSetText(scrHandle, MusicStateId, musicStateList[curMusicState]);
+
+	saveMusicSettings();
+
+	enableMusic(1 - curMusicState);
+
 }
 
 // Music Volume
@@ -194,6 +235,8 @@ static void changeMusicVolume(void * )
     char buf[32];
     sprintf(buf, "%g", MusicVolumeValue);
     GfuiEditboxSetString(scrHandle, MusicVolumeValueId, buf);
+
+    setMusicVolume(MusicVolumeValue);
 }
 
 static void onActivate(void * /* dummy */)
@@ -221,8 +264,8 @@ void* SoundMenuInit(void *prevMenu)
 	GfuiMenuCreateButtonControl(scrHandle,param,"soundrightarrow",(void*)1,changeSoundState);
 
 	SoundOptionId = GfuiMenuCreateLabelControl(scrHandle,param,"soundlabel");
-	GfuiMenuCreateButtonControl(scrHandle,param,"ApplyButton",NULL,saveSoundOption);
-	GfuiMenuCreateButtonControl(scrHandle,param,"CancelButton",prevMenu,GfuiScreenActivate);
+	GfuiMenuCreateButtonControl(scrHandle,param,"ApplyButton",NULL,onAccept);
+	GfuiMenuCreateButtonControl(scrHandle,param,"CancelButton",NULL,onCancel);
 
 	VolumeValueId = GfuiMenuCreateEditControl(scrHandle,param,"volumeedit",NULL,NULL,changeVolume);
 
@@ -235,8 +278,8 @@ void* SoundMenuInit(void *prevMenu)
 
 	GfParmReleaseHandle(param);
     
-	GfuiAddKey(scrHandle, GFUIK_RETURN, "Apply", NULL, saveSoundOption, NULL);
-	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
+	GfuiAddKey(scrHandle, GFUIK_RETURN, "Apply", NULL, onAccept, NULL);
+	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel", NULL, onCancel, NULL);
 	GfuiAddKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
 	GfuiAddKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 	GfuiAddKey(scrHandle, GFUIK_LEFT, "Previous Option in list", (void*)-1, changeSoundState, NULL);

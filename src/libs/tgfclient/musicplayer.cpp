@@ -215,14 +215,39 @@ static void readConfig()
 	paramHandle = NULL;
 }
 
-void setMusicVolume(float vol)
+void setMusicVolume(float vol /* 100.0f */)
 {
-	if (vol < 0)
+
+	if (vol>100.0f)
+	{
+		vol = 100.0f;
+	} 
+	else if (vol < 0.0f)
+	{
 		vol = 0.0f;
-	else if (vol > 1.0f)
-		vol = 1.0f;
-	
-	maxMusicVolume = vol;
+	}
+	maxMusicVolume = vol/100.0f;
+
+	for(std::map<std::string, SDL2MusicPlayer*>::iterator itPlayers = mapSDL2Players.begin(); itPlayers != mapSDL2Players.end(); ++itPlayers)
+	{
+		SDL2MusicPlayer* player = itPlayers->second;
+		player->setvolume(maxMusicVolume);
+	}
 
 	GfLogInfo("Music volume set to %.2f\n", maxMusicVolume);
+}
+
+void enableMusic(bool enable /* true */)
+{
+	if (isEnabled()) 
+	{
+		if(enable == false)
+			shutdownMusic();
+	}
+	else 
+	{
+		 if(enable == true)
+			 initMusic();
+	}
+	enabled = enable;
 }
