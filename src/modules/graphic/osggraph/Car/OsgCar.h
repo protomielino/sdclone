@@ -72,7 +72,7 @@ private :
     int reflectionMappingMethod;
 
     void setReflectionMap(osg::ref_ptr<osg::Texture> map);
-    void loadCarLights(tCarElt *Car);
+    void loadCarLights();
 
 public :
     SDCar(void);

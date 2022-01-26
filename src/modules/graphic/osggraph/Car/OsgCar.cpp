@@ -102,7 +102,7 @@ SDCar::~SDCar(void)
     delete reflectionMapping;
 }
 
-void SDCar::loadCarLights(tCarElt *Car)
+void SDCar::loadCarLights()
 {
     SDCarLights *carLights = getCarLights();
 
@@ -111,7 +111,7 @@ void SDCar::loadCarLights(tCarElt *Car)
     lights_branch = new osg::MatrixTransform;
 
     char path[1024] = {};
-    void *handle = Car->_carHandle;
+    void *handle = car->_carHandle;
     snprintf(path, 1023, "%s/%s", SECT_GROBJECTS, SECT_LIGHT);
     int lightNum = GfParmGetEltNb(handle, path);
     for (int i = 0; i < lightNum; i++) {
@@ -611,7 +611,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     this->reflectionMapping = new SDReflectionMapping(this);
     this->setReflectionMap(this->reflectionMapping->getReflectionMap());
 
-    loadCarLights(Car);
+    loadCarLights();
 
     return this->carEntity;
 }
