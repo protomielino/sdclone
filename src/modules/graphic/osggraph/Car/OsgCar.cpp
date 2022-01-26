@@ -68,8 +68,8 @@ SDCar::SDCar(void) :
     steerMovt(0.0),
     car(NULL),
     shader(NULL),
-    reflectionMapping(NULL)
-
+    reflectionMapping(NULL),
+    reflectionMappingMethod(REFLECTIONMAPPING_OFF)
 {
     _cockpit = false;
     _driver = false;
@@ -616,7 +616,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     return this->carEntity;
 }
 
-bool SDCar::isCar(tCarElt*c) const
+bool SDCar::isCar(const tCarElt*c) const
 {
     return c == car;
 }
@@ -713,7 +713,7 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car)
     return root.get();
 }*/
 
-void SDCar::markCarCurrent(tCarElt *Car)
+void SDCar::markCarCurrent(const tCarElt *Car)
 {
     if(this->car == Car)
     {
@@ -904,7 +904,9 @@ void SDCar::setReflectionMap(osg::ref_ptr<osg::Texture> map)
 }
 
 SDCars::SDCars(void) :
-    cars_branch(NULL)
+    cars_branch(nullptr),
+    shadow_branch(nullptr),
+    situation(nullptr)
 {
 
 }
@@ -968,7 +970,7 @@ void SDCars::updateCars(tSituation *s, tCarElt *CurCar, int current, int driver)
     }
 }
 
-void SDCars::markCarCurrent(tCarElt *car)
+void SDCars::markCarCurrent(const tCarElt *car)
 {
     std::vector<SDCar *>::iterator it;
 

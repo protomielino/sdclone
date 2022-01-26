@@ -25,9 +25,9 @@
 #include "OsgBrake.h"
 #include "OsgMath.h"
 
-void SDBrakes::setCar(tCarElt * car)
+void SDBrakes::setCar(tCarElt * car_elt)
 {
-    this->car = car;
+    this->car = car_elt;
 }
 
 osg::Node *SDBrakes::initBrake(int wheelIndex)

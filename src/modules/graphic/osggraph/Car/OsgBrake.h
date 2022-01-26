@@ -30,7 +30,8 @@ private :
     osg::ref_ptr<osg::Vec4Array> brake_colors[4];
 
 public :
-    void setCar(tCarElt * car);
+    SDBrakes() : car(nullptr) { }
+    void setCar(tCarElt * car_elt);
     osg::Node *initBrake(int wheelIndex);
     void updateBrakes();
 };

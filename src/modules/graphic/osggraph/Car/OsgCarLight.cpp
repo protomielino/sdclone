@@ -29,7 +29,7 @@
 
 
 osg::ref_ptr<osg::Node> SDCarLight::init(
-    CarLightType type,
+    CarLightType car_light_type,
     osg::ref_ptr<osg::StateSet> state_set,
     const osg::Vec3d &position,
     const osg::Vec3d &normal,
@@ -38,7 +38,7 @@ osg::ref_ptr<osg::Node> SDCarLight::init(
 {
     if (layers < 0) layers = 0;
     
-    this->type = type;
+    this->type = car_light_type;
     
     osg::ref_ptr<SDLightTransform> transform = new SDLightTransform;
     transform->setPosition(position);

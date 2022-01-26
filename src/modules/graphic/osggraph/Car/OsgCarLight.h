@@ -48,13 +48,13 @@ private:
     osg::ref_ptr<osg::Node> node;
 
 public:
-    SDCarLight() {}
+    SDCarLight() : type(CAR_LIGHT_TYPE_NONE) {}
     ~SDCarLight() {}
     
     CarLightType get_type() const { return type; }
 
     osg::ref_ptr<osg::Node> init(
-        CarLightType type,
+        CarLightType car_light_type,
         osg::ref_ptr<osg::StateSet> state_set,
         const osg::Vec3d &position,
         const osg::Vec3d &normal,

@@ -37,10 +37,11 @@ private :
     osg::ref_ptr<osg::Switch> wheels_switches[4];
     osg::ref_ptr<osg::MatrixTransform> wheels[4];
     SDBrakes brakes;
-    osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndec, const char *wheel_mod_name);
+    osg::ref_ptr<osg::MatrixTransform> initWheel(int wheelIndex, const char *wheel_mod_name);
 
 public :
-    osg::ref_ptr<osg::Node> initWheels(tCarElt *car,void * handle);
+    SDWheels() : car(nullptr) { }
+    osg::ref_ptr<osg::Node> initWheels(tCarElt *car_elt,void * handle);
     void updateWheels();
 };
 

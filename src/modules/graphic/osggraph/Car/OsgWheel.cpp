@@ -27,9 +27,9 @@
 #include <osgDB/WriteFile>
 #include <osgDB/FileUtils>
 
-osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car,void *handle)
+osg::ref_ptr<osg::Node> SDWheels::initWheels(tCarElt *car_elt,void *handle)
 {
-    this->car = car;
+    this->car = car_elt;
 
     this->brakes.setCar(car);
 
@@ -166,7 +166,7 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
 void SDWheels::updateWheels()
 {
     int j;
-    static float maxVel[3] = { 20.0, 40.0, 70.0 };
+    static const float maxVel[3] = { 20.0, 40.0, 70.0 };
 
     brakes.updateBrakes();
 

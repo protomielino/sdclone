@@ -78,7 +78,7 @@ public :
     SDCar(void);
     ~SDCar(void);
     osg::ref_ptr<osg::Node> loadCar(tCarElt *Car, bool tracktype, bool subcat, int carshader);
-    bool isCar(tCarElt*c) const;
+    bool isCar(const tCarElt*c) const;
 
     bool    _cockpit;
     bool    _driver;
@@ -96,7 +96,7 @@ public :
     tCarElt *getCar() { return car; }
     const tCarElt *getCar() const { return car; }
 
-    void markCarCurrent(tCarElt *Car);
+    void markCarCurrent(const tCarElt *Car);
     void updateCar(tSituation *s, tCarElt *CurCar, int current, int driver);
     void updateShadingParameters(const osg::Matrixf &modelview);
 };
@@ -117,7 +117,7 @@ public :
 
     void  loadCars(tSituation * pSituation, bool trackType, bool subCat);
     void  updateCars(tSituation *s, tCarElt *CurCar, int current, int driver);
-    void  markCarCurrent(tCarElt*car);
+    void  markCarCurrent(const tCarElt*car);
     SDCar *getCar(tCarElt*car);
     void  unLoad();
     void  updateShadingParameters(const osg::Matrixf &modelview);
