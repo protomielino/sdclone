@@ -1693,7 +1693,6 @@ public:
 
     void update(tCarElt *car, tSituation *s)
     {
-        int grNbCars = ncars;
         int	i, j;
         int	curCar;
         double	curPrio;
