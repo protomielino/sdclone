@@ -33,8 +33,6 @@ extern double grCurTime, ratio;
 extern void *grHandle;
 extern void *grTrackHandle;
 
-extern int grNbCars;
-
 extern int  initTrack(tTrack *track);
 extern int  initCars(tSituation *s);
 #define GR_VIEW_STD  0 /* full screen view mode */

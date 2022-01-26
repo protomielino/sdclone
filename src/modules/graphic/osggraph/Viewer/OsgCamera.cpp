@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <vector>
 
 #include <osg/Camera>
 #include <osg/Matrix>
@@ -1652,16 +1653,17 @@ GetDistToStart(tCarElt *car)
     return lg;
 }
 
-typedef struct
-{
-    double	prio;
-    int		viewable;
-    int		event;
-} tSchedView;
-
 class SDCarCamRoadZoomTVD : public SDCarCamRoadZoom
 {
-    tSchedView *schedView;
+    struct SchedView
+    {
+        SchedView() : prio(0.0), viewable(false), event(false) { }
+        double	prio;
+        bool	viewable;
+        bool	event;
+    };
+
+    std::vector<SchedView> schedView;
     double camChangeInterval;
     double camEventInterval;
     double lastEventTime;
@@ -1679,14 +1681,7 @@ public:
                            fovymax, fnear, ffar, myfogstart, myfogend)
     {
         this->ncars = ncars;
-        schedView = (tSchedView *)calloc(ncars, sizeof(tSchedView));
-        if (!schedView)
-        {
-            GfTrace("malloc error");
-            //GfScrShutdown();
-            exit (1);
-        }
-
+        schedView.resize(ncars);
         lastEventTime = 0;
         lastViewTime = 0;
         current = -1;
@@ -1696,11 +1691,9 @@ public:
         proximityThld     = GfParmGetNum(grHandle, GR_SCT_TVDIR, GR_ATT_PROXTHLD, (char*)NULL, 10.0);
     }
 
-    ~SDCarCamRoadZoomTVD() { free(schedView); }
-
     void update(tCarElt *car, tSituation *s)
     {
-        grNbCars = ncars;
+        int grNbCars = ncars;
         int	i, j;
         int	curCar;
         double	curPrio;
@@ -1724,27 +1717,28 @@ public:
         /* Track events*/
         if (deltaEventTime > camEventInterval)
         {
-            memset(schedView, 0, ncars * sizeof(tSchedView));
-            for (i = 0; i < grNbCars; i++)
+            for (i = 0; i < ncars; i++)
             {
-                schedView[i].viewable = 1;
+                schedView[i].prio = 0.0;
+                schedView[i].viewable = true;
+                schedView[i].event = false;
             }
 
             car = screen->getCurrentCar();
-            schedView[car->index].viewable = 0;
+            schedView[car->index].viewable = false;
             schedView[car->index].prio -= 10000;
 
-            for (i = 0; i < grNbCars; i++)
+            for (i = 0; i < ncars; i++)
             {
                 tdble dist, fs;
 
                 car = s->cars[i];
-                schedView[car->index].prio += grNbCars - i;
+                schedView[car->index].prio += ncars - i;
                 fs = GetDistToStart(car);
 
                 if ((car->_state & RM_CAR_STATE_NO_SIMU) != 0)
                 {
-                    schedView[car->index].viewable = 0;
+                    schedView[car->index].viewable = false;
                 } else
                 {
                 }
@@ -1755,15 +1749,15 @@ public:
                     /* out of track*/
                     if (dist > 0)
                     {
-                        schedView[car->index].prio += grNbCars;
+                        schedView[car->index].prio += ncars;
                         if (car->ctrl.raceCmd & RM_CMD_PIT_ASKED)
                         {
-                            schedView[car->index].prio += grNbCars;
-                            event = 1;
+                            schedView[car->index].prio += ncars;
+                            event = true;
                         }
                     }
 
-                    for (j = i+1; j < grNbCars; j++)
+                    for (j = i+1; j < ncars; j++)
                     {
                         tCarElt *car2 = s->cars[j];
                         tdble fs2 = GetDistToStart(car2);
@@ -1774,11 +1768,11 @@ public:
                             if (d < proximityThld)
                             {
                                 d = proximityThld - d;
-                                schedView[car->index].prio  += d * grNbCars / proximityThld;
-                                schedView[car2->index].prio += d * (grNbCars - 1) / proximityThld;
+                                schedView[car->index].prio  += d * ncars / proximityThld;
+                                schedView[car2->index].prio += d * (ncars - 1) / proximityThld;
                                 if (i == 0)
                                 {
-                                    event = 1;
+                                    event = true;
                                 }
                             }
                         }
@@ -1786,14 +1780,14 @@ public:
 
                     if (car->priv.collision)
                     {
-                        schedView[car->index].prio += grNbCars;
-                        event = 1;
+                        schedView[car->index].prio += ncars;
+                        event = true;
                     }
                 } else
                 {
                     if (i == current)
                     {
-                        event = 1;	/* update view*/
+                        event = true;	/* update view*/
                     }
                 }
             }
@@ -1805,16 +1799,16 @@ public:
 
                 curCar = 0;
                 curPrio = -1000000.0;
-                for (i = 0; i < grNbCars; i++)
+                for (i = 0; i < ncars; i++)
                 {
-                    if ((schedView[i].prio > curPrio) && (schedView[i].viewable))
+                    if ((schedView[i].prio > curPrio) && schedView[i].viewable)
                     {
                         curPrio = schedView[i].prio;
                         curCar = i;
                     }
                 }
 
-                for (i = 0; i < grNbCars; i++)
+                for (i = 0; i < ncars; i++)
                 {
                     if (s->cars[i]->index == curCar)
                     {

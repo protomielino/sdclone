@@ -85,7 +85,6 @@ static osg::Timer m_timer;
 int grMaxTextureUnits = 0;
 
 tdble grMaxDammage = 10000.0;
-int grNbCars = 0;
 
 void *grHandle = 0;
 void *grTrackHandle = 0;
