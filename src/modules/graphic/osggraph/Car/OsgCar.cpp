@@ -190,7 +190,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     int nranges = 0;
 
     _carShader = carshader;
-    GfLogDebug("Graphic options car shader = %u\n", _carShader);
+    GfLogDebug("Graphic options car shader = %d\n", _carShader);
 
     osgLoader loader;
 
@@ -927,7 +927,7 @@ void SDCars::addSDCar(SDCar *car)
 void SDCars::loadCars(tSituation *pSituation, bool trackType, bool subCat)
 {
     this->cars_branch = new osg::Group;
-    unsigned carShader = getRender()->getShader();
+    int carShader = getRender()->getShader();
     tSituation *s = pSituation;
     this->situation = pSituation;
 

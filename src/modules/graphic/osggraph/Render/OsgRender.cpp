@@ -266,7 +266,7 @@ void SDRender::Init(tTrack *track)
     GfLogDebug("Graphic options : Shadow Type : %u (%s)\n", ShadowIndex, ShadowValues[ShadowIndex]);
     GfLogDebug("Graphic options : Shadow Texture Size : %u\n", ShadowTexSize);
     GfLogDebug("Graphic options : Shadow Quality : %u (%s)\n", QualityIndex, QualityValues[QualityIndex]);
-    GfLogDebug("Graphic options : Shader Quality : %u (%s)\n", carsShader, ShadersValues[carsShader]);
+    GfLogDebug("Graphic options : Shader Quality : %d (%s)\n", carsShader, ShadersValues[carsShader]);
 
     NStars = NMaxStars;
     if (AStarsData)

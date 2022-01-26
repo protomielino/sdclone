@@ -36,7 +36,7 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):
     car(c)
 {
     SDRender *render = getRender();
-    unsigned reflectionShader = render->getShader();
+    int reflectionShader = render->getShader();
     osg::ref_ptr<osg::Node> m_sceneroot =  render->getRoot();
 
     osg::ref_ptr<osg::Image> imagePosX = new osg::Image;
@@ -101,7 +101,7 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):
     if (reflectionShader > 1)
     {
         getScreens()->registerViewDependantPreRenderNode(this->getCamerasRoot());
-        GfLogDebug("Graphic options : reflectionShader = %u\n", reflectionShader);
+        GfLogDebug("Graphic options : reflectionShader = %d\n", reflectionShader);
 
         cameras[4]->setNodeMask(NODE_MASK_ALL);
     }
