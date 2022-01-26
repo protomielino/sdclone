@@ -64,6 +64,12 @@ extern int m_NbActiveScreens;
 
 extern tdble grLodFactorValue;
 
+class SDScreens;
+class SDRender;
+class SDCars;
+class SDCarLights;
+class SDScenery;
+
 class SDFrameInfo
 {
 public:
@@ -73,10 +79,10 @@ public:
     unsigned nTotalFrames;  // Total nb of frames since initView
 };
 
-void * getScreens();
-void * getRender();
-void * getCarLights();
-void * getCars();
-void * getScenery();
+SDScreens * getScreens();
+SDRender * getRender();
+SDCarLights * getCarLights();
+SDCars * getCars();
+SDScenery * getScenery();
 
 #endif /* _OSGMAIN_H_ */

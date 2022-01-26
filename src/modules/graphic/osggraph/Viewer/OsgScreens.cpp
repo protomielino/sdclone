@@ -59,9 +59,7 @@ class CameraDrawnCallback : public osg::Camera::DrawCallback
 public:
     virtual void operator()(const osg::Camera& cam) const
     {
-        SDCars * cars = (SDCars*)getCars();
-        osg::Matrixf mat = cam.getViewMatrix();
-        cars->updateShadingParameters(mat);
+        getCars()->updateShadingParameters(cam.getViewMatrix());
     }
 };
 
@@ -195,7 +193,7 @@ void SDScreens::update(tSituation * s, SDFrameInfo* fi)
     }
 
 #ifdef HUDDEBUG
-    SDCars * cars = (SDCars *)getCars();
+    SDCars * cars = getCars();
     tCarElt * c = this->getActiveView()->getCurrentCar();
 
     this->debugHUD->setTexture(cars->getCar(c)->getReflectionMap()->getReflectionMap());

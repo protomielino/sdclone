@@ -90,7 +90,7 @@ SDCar::SDCar(void) :
 SDCar::~SDCar(void)
 {
     if (lights_branch)
-        ((SDCarLights*)getCarLights())->getLightsRoot()->removeChild(lights_branch);
+        getCarLights()->getLightsRoot()->removeChild(lights_branch);
 
     if(carEntity != NULL)
     {
@@ -104,7 +104,7 @@ SDCar::~SDCar(void)
 
 void SDCar::loadCarLights(tCarElt *Car)
 {
-    SDCarLights *carLights = (SDCarLights*)getCarLights();
+    SDCarLights *carLights = getCarLights();
 
     if (lights_branch)
         carLights->getLightsRoot()->removeChild(lights_branch);
@@ -925,8 +925,7 @@ void SDCars::addSDCar(SDCar *car)
 void SDCars::loadCars(tSituation *pSituation, bool trackType, bool subCat)
 {
     this->cars_branch = new osg::Group;
-    SDRender *rend = (SDRender *)getRender();
-    unsigned carShader = rend->getShader();
+    unsigned carShader = getRender()->getShader();
     tSituation *s = pSituation;
     this->situation = pSituation;
 

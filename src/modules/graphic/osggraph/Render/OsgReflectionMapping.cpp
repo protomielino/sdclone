@@ -35,7 +35,7 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):
     reflectionMap(NULL),
     car(c)
 {
-    SDRender *render = (SDRender *)getRender();
+    SDRender *render = getRender();
     unsigned reflectionShader = render->getShader();
     osg::ref_ptr<osg::Node> m_sceneroot =  render->getRoot();
 
@@ -100,8 +100,7 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):
     //ACTIVATE to enable Environment MApping <= temporary hack.
     if (reflectionShader > 1)
     {
-        SDScreens * screens = (SDScreens*)getScreens();
-        screens->registerViewDependantPreRenderNode(this->getCamerasRoot());
+        getScreens()->registerViewDependantPreRenderNode(this->getCamerasRoot());
         GfLogDebug("Graphic options : reflectionShader = %u\n", reflectionShader);
 
         cameras[4]->setNodeMask(NODE_MASK_ALL);
@@ -111,8 +110,7 @@ SDReflectionMapping::SDReflectionMapping(SDCar *c):
 void SDReflectionMapping::update()
 {
     //TODO support for multi screen
-    SDScreens *screens = (SDScreens*)getScreens();
-    osg::Camera * viewCam = screens->getActiveView()->getOsgCam();
+    osg::Camera * viewCam = getScreens()->getActiveView()->getOsgCam();
 
     tCarElt *Car = this->car->getCar();
 

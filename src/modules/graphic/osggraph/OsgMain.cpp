@@ -55,27 +55,27 @@ SDHUD hud;
     return Options;
 }*/
 
-void *getScreens()
+SDScreens *getScreens()
 {
     return screens;
 }
 
-void *getRender()
+SDRender *getRender()
 {
     return render;
 }
 
-void * getCars()
+SDCars * getCars()
 {
     return cars;
 }
 
-void * getCarLights()
+SDCarLights * getCarLights()
 {
     return carLights;
 }
 
-void * getScenery()
+SDScenery * getScenery()
 {
     return scenery;
 }

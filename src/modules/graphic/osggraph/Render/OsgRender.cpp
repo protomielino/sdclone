@@ -323,7 +323,7 @@ void SDRender::Init(tTrack *track)
               SDMoonDeclination, moonAscension);
 
     // Initialize the whole sky dome.
-    SDScenery * scenery = (SDScenery *)getScenery();
+    SDScenery * scenery = getScenery();
     double r_WrldX = scenery->getWorldX();
     double r_WrldY = scenery->getWorldY();
     //double r_WrldZ = SDScenery::getWorldZ();
@@ -731,7 +731,7 @@ void SDRender::UpdateSky(double currentTime, double accelTime, double X, double 
     }
 
     // At each call, update possibly high speed objects of the sky dome : the clouds.
-    // scenery = (SDScenery *)getScenery();
+    // scenery = getScenery();
     // double r_WrldX = scenery->getWorldX();
     // double r_WrldY = scenery->getWorldY();
 

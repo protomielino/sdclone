@@ -71,7 +71,7 @@ SDCarShader::SDCarShader(osg::Node *car, SDCar *c)
 
 void SDCarShader::update(const osg::Matrixf &view)
 {
-    SDRender * ren = (SDRender *)getRender();
+    SDRender * ren = getRender();
     osg::Vec3f sun_pos= ren->getSky()->getSun()->getSunPosition();
     osg::Vec4f sun_color = ren->getSky()->get_sun_color();
     osg::Vec4f scene_color = ren->getSceneColor();
