@@ -153,7 +153,7 @@ void SDCar::loadCarLights()
         }
         else
         {
-            GfLogError("Invalid light type '%s' (%s: %s)", typeName, car->_carName, path);
+            GfLogError("Invalid light type '%s' (%s: %s)\n", typeName, car->_carName, path);
             continue;
         }
 
