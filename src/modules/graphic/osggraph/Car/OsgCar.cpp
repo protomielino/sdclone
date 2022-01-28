@@ -151,6 +151,11 @@ void SDCar::loadCarLights()
         {
             type = CAR_LIGHT_TYPE_REVERSE;
         }
+        else
+        {
+            GfLogError("Invalid light type '%s' (%s: %s)", typeName, car->_carName, path);
+            continue;
+        }
 
         double size = GfParmGetNum(handle, path, PRM_SIZE, NULL, 0.2);
 
