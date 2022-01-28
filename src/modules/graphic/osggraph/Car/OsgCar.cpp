@@ -601,12 +601,12 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     this->carEntity = new osg::Group;
     this->carEntity->addChild(carTransform);
 
-    this->shader = new SDCarShader(car_shaded_body.get(), this);
-
     if (_carShader > 1)
         this->reflectionMappingMethod = REFLECTIONMAPPING_DYNAMIC;
     else
         this->reflectionMappingMethod = REFLECTIONMAPPING_OFF;
+
+    this->shader = new SDCarShader(car_shaded_body.get(), this);
 
     this->reflectionMapping = new SDReflectionMapping(this);
     this->setReflectionMap(this->reflectionMapping->getReflectionMap());
