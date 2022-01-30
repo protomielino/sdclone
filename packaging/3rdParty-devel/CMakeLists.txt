@@ -168,7 +168,8 @@ if(OPTION_OPENAL)
       ExternalProject_Add(${OPENAL_LEGACY_PROJECT}
          URL ${OPENAL_LEGACY_URL}
          URL_HASH ${OPENAL_LEGACY_HASH}
-         CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
+         CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+         DEPENDS ${SDL2_PROJECT})
       ExternalProject_Add_Step(${OPENAL_LEGACY_PROJECT} openal_patch_cmake
          COMMAND ${CMAKE_COMMAND} -E copy_if_different
          "${CMAKE_SOURCE_DIR}/patches/${OPENAL_LEGACY_PROJECT}.CMakeLists.txt"
@@ -180,14 +181,16 @@ if(OPTION_OPENAL)
       ExternalProject_Add(${OPENAL_C11_PROJECT}
          URL ${OPENAL_C11_URL}
          URL_HASH ${OPENAL_C11_HASH}
-         CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
+         CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+         DEPENDS ${SDL2_PROJECT})
    else()
       if(${CMAKE_SYSTEM_VERSION} VERSION_LESS "10.0")
          message(WARNING "Version ${OPENAL_PROJECT_VERSION} of openal-soft is available for Visual Studio 2019 delete the cache and specify -D CMAKE_SYSTEM_VERSION=10.0 on the command line")
          ExternalProject_Add(${OPENAL_C11_PROJECT}
             URL ${OPENAL_C11_URL}
             URL_HASH ${OPENAL_C11_HASH}
-            CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS})
+            CMAKE_ARGS ${EXTERNALS_CMAKE_ARGS}
+            DEPENDS ${SDL2_PROJECT})
       else()
          ExternalProject_Add(${OPENAL_PROJECT}
             URL ${OPENAL_URL}
