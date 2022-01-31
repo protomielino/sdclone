@@ -2973,9 +2973,11 @@ void TDriver::InitAdaptiveShiftLevels()
 		Edesc[I].tq =	GfParmGetNum(oCarHandle, idx,
 								   PRM_TQ, (char*) NULL, 0.0f);
 	}
-
-	Edesc[IMax].rpm = Edesc[IMax -	1].rpm;
-	Edesc[IMax].tq	 = Edesc[IMax -	1].tq;
+	if (IMax > 0)
+	{
+		Edesc[IMax].rpm = Edesc[IMax - 1].rpm;
+		Edesc[IMax].tq = Edesc[IMax - 1].tq;
+	}
 
 	double	ToRpm[MAX_GEARS];
 	double	maxTq =	0;

@@ -168,8 +168,10 @@ SimEngineConfig(tCar *car)
 		edesc[i].rpm = GfParmGetNum(hdle, idx, PRM_RPM, (char*)NULL, car->engine.revsMax);
 		edesc[i].tq  = GfParmGetNum(hdle, idx, PRM_TQ, (char*)NULL, 0);
     }
-    edesc[i].rpm = edesc[i - 1].rpm;
-    edesc[i].tq  = edesc[i].tq;
+    if (i > 0) {
+        edesc[i].rpm = edesc[i - 1].rpm;
+        edesc[i].tq = edesc[i - 1].tq;
+    }
 
     maxTq = 0;
 	car->engine.curve.maxPw = 0;
@@ -209,7 +211,7 @@ SimEngineConfig(tCar *car)
     car->engine.rads = X*car->engine.tickover+(1-X)*car->engine.revsMax;
     
     /*sanity check of rev limits*/
-    if (car->engine.revsMax > car->engine.curve.data[car->engine.curve.nbPts-1].rads) {
+    if (car->engine.curve.nbPts > 0 && car->engine.revsMax > car->engine.curve.data[car->engine.curve.nbPts-1].rads) {
         car->engine.revsMax = car->engine.curve.data[car->engine.curve.nbPts-1].rads;
         GfLogWarning("Revs maxi bigger than the maximum RPM in the curve data.\nIt is set to %g.\n",car->engine.revsMax);
     }
