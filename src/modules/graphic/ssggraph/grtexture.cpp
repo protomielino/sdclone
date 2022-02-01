@@ -494,7 +494,7 @@ bool grLoadJpegTexture (const char *fname, ssgTextureInfo* info)
         info -> alpha  = true;
     }
 
-    TRACE_GL("Load: loadPngTexture stop");
+    TRACE_GL("Load: loadJpegTexture stop");
 
     mipmap = doMipMap(fname, mipmap);
 
