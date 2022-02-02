@@ -283,7 +283,7 @@ OSGPLOT::OSGPLOT( float positionX,
         osgTitle->setAlignment(osgText::Text::LEFT_BOTTOM_BASE_LINE );
 
         //asign the position
-        osgTitle->setPosition(osg::Vec3(this->positionX+5.0f, this->positionY+height+5.0f, 0.0f));
+        osgTitle->setPosition(osg::Vec3(this->positionX+5.0f, this->positionY+height-25.0f, 0.05f));
 
         //GfLogInfo("OSGHUD: Plot Title: %s \n", this->title.c_str());
         //GfLogInfo("OSGHUD: Position: %f %f \n", this->positionX+100.0f, this->positionY+100);
