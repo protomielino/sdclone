@@ -152,148 +152,98 @@ float verticalModifier, float horizontalModifier){
     return position;
 }
 
-#ifdef HUDDEBUG
-OSGPLOT::OSGPLOT( float positionX,
-                    float positionY,
-                    float width,
-                    float height,
-                    float maxValue,
-                    float minValue,
-                    float timeFrame,
-                    float referenceLineAtValue,
-                    const std::string &Xdata,
-                    const std::string &Ydata,
-                    const std::string &title)
+// TODO[START]: move this to utils? /src/modules/graphic/osggraph/Utils
+void split(const std::string &s, char delim, std::vector<std::string> &elems)
 {
-    //initialize variables
-    this->positionX = positionX;
-    this->positionY = positionY;
-    this->width = width;
-    this->height = height;
-    this->maxValue = maxValue;
-    this->minValue = minValue;
-    this->timeFrame = timeFrame;
-    this->referenceLineAtValue = referenceLineAtValue;
-    this->Xdata = Xdata;
-    this->Ydata = Ydata;
-    this->title = title;
+    std::stringstream ss;
+    ss.str(s);
+    std::string item;
 
-    this->osgGroup = new osg::Group;
+    while (getline(ss, item, delim))
+    {
+        elems.push_back(item);
+    }
+}
 
-    this->osgMainPlotLineGeometry = new osg::Geometry();
-    this->osgMainPlotLineVertices =  new osg::Vec3Array(2);
+std::vector<std::string> split(const std::string &s, char delim)
+{
+    std::vector<std::string> elems;
+    split(s, delim, elems);
+    return elems;
+}
 
-    this->osgReferencePlotLineGeometry = new osg::Geometry();
-    this->osgReferencePlotLineVertices =  new osg::Vec3Array(2);
+osg::Vec4 colorStringToVec4(const std::string & colorString)
+{
+    std::vector<std::string> colorStringVector = split(colorString, '#');
 
-    osgText::Text* osgTitle = new  osgText::Text;
+    return osg::Vec4(
+        std::atof(colorStringVector[0].c_str()),
+        std::atof(colorStringVector[1].c_str()),
+        std::atof(colorStringVector[2].c_str()),
+        std::atof(colorStringVector[3].c_str())
+        );
+}
 
-    this->dataPoints =  new osg::Vec3Array(0);
+#ifdef HUDDEBUG
+OSGPLOT::OSGPLOT(
+    float positionX,
+    float positionY,
+    float width,
+    float height,
+    const std::string &title,
+    std::vector<PlotLineConfig> lines) :
+    positionX(positionX),
+    positionY(positionY),
+    width(width),
+    height(height),
+    title(title)
+{
+    osgGroup = new osg::Group;
+
+    for (size_t i = 0; i < lines.size(); i++)
+    {
+        plotLines.push_back(lines[i]);
+
+        osg::Geode *geode = new osg::Geode;
+
+        // add the points geometry to the geode.
+        geode->addDrawable(plotLines.back().geometry);
+        osgGroup->addChild(geode);
+    }
+
+    osgText::Text* osgTitle = new osgText::Text;
 
     //draw the background of the chart
-    this->drawBackground();
-
-    //prepare the geode for the "osgReferencePlotLine"
-    {
-        osg::Geode* geode = new osg::Geode;
-
-        // pass the created vertex array to the points geometry object.
-        this->osgReferencePlotLineGeometry->setVertexArray(this->osgReferencePlotLineVertices);
-        this->osgReferencePlotLineGeometry->setUseDisplayList (false);
-        this->osgReferencePlotLineGeometry->setUseVertexBufferObjects(true);
-        this->osgReferencePlotLineGeometry->setDataVariance(osg::Object::DYNAMIC); /*?needed?*/
-
-        // set the same color for the reference plot line
-        osg::Vec4Array* plotColors = new osg::Vec4Array;
-        plotColors->push_back(osg::Vec4(1.0f,0.0f,0.0f,1.0f));
-        this->osgReferencePlotLineGeometry->setColorArray(plotColors, osg::Array::BIND_OVERALL);
-
-        // set the normal
-        osg::Vec3Array* normals = new osg::Vec3Array;
-        normals->push_back(osg::Vec3(0.0f,-1.0f,0.0f));
-        this->osgReferencePlotLineGeometry->setNormalArray(normals, osg::Array::BIND_OVERALL);
-
-        // tell osg to draw our geometry as lines
-        this->osgReferencePlotLineGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP,0,this->osgReferencePlotLineVertices->size()));
-
-        // disable lighting (light is always on) and enalbe transparency
-        osg::StateSet* stateset = osgReferencePlotLineGeometry->getOrCreateStateSet();
-        stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
-        stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
-        stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-
-        // add the points geometry to the geode.
-        geode->addDrawable(this->osgReferencePlotLineGeometry);
-        this->osgGroup->addChild(geode);
-    }
-
-    //prepare the geode for the "osgMainPlotLine"
-    {
-        osg::Geode* geode = new osg::Geode;
-
-        // pass the created vertex array to the points geometry object.
-        this->osgMainPlotLineGeometry->setVertexArray(this->osgMainPlotLineVertices);
-        this->osgMainPlotLineGeometry->setDataVariance(osg::Object::DYNAMIC); /*?needed?*/
-
-        this->osgMainPlotLineGeometry->setUseDisplayList (false);
-
-        // set the same color for the whole plot line
-        osg::Vec4Array* plotColors = new osg::Vec4Array;
-        plotColors->push_back(osg::Vec4(0.0f,0.0f,0.0f,0.5f));
-        this->osgMainPlotLineGeometry->setColorArray(plotColors, osg::Array::BIND_OVERALL);
-
-        // set the normal
-        osg::Vec3Array* normals = new osg::Vec3Array;
-        normals->push_back(osg::Vec3(0.0f,-1.0f,0.0f));
-        this->osgMainPlotLineGeometry->setNormalArray(normals, osg::Array::BIND_OVERALL);
-
-        // tell osg to draw our geometry as lines
-        this->osgMainPlotLineGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP,0,this->osgMainPlotLineVertices->size()));
-
-        // disable lighting (light is always on) and enalbe transparency
-        osg::StateSet* stateset = osgMainPlotLineGeometry->getOrCreateStateSet();
-        stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
-        stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
-        stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-
-        // add the points geometry to the geode.
-        geode->addDrawable(this->osgMainPlotLineGeometry);
-        this->osgGroup->addChild(geode);
-    }
+    drawBackground();
 
     //prepare the geode for the title
-    {
-        osg::Geode* geode = new osg::Geode;
+    osg::Geode* geode = new osg::Geode;
 
-        //color
-        osg::Vec4 color = osg::Vec4(0.0f,0.0f,0.0f,0.9f);
-        osgTitle->setColor(color);
+    //color
+    osg::Vec4 color = osg::Vec4(0.0f,0.0f,0.0f,0.9f);
+    osgTitle->setColor(color);
 
-        std::string fontFileUrl = "/vera/Vera.ttf";
-        std::string fontsMainDirectory = GetDataDir();
-        fontsMainDirectory = fontsMainDirectory+"data/fonts";
-        fontFileUrl = fontsMainDirectory+fontFileUrl;
-        osgTitle->setFont(fontFileUrl);
+    std::string fontFileUrl = "/vera/Vera.ttf";
+    std::string fontsMainDirectory = GetDataDir();
+    fontsMainDirectory = fontsMainDirectory+"data/fonts";
+    fontFileUrl = fontsMainDirectory+fontFileUrl;
+    osgTitle->setFont(fontFileUrl);
 
-        //font resolution
-        osgTitle->setFontResolution(200,200);
+    //font resolution
+    osgTitle->setFontResolution(200,200);
 
-        //set the font size
-        osgTitle->setCharacterSize(20);
-        osgTitle->setAlignment(osgText::Text::LEFT_BOTTOM_BASE_LINE );
+    //set the font size
+    osgTitle->setCharacterSize(20);
+    osgTitle->setAlignment(osgText::Text::LEFT_BOTTOM_BASE_LINE );
 
-        //asign the position
-        osgTitle->setPosition(osg::Vec3(this->positionX+5.0f, this->positionY+height-25.0f, 0.05f));
+    //asign the position
+    osgTitle->setPosition(osg::Vec3(positionX + 5.0f, positionY + height - 25.0f, 0.05f));
 
-        //GfLogInfo("OSGHUD: Plot Title: %s \n", this->title.c_str());
-        //GfLogInfo("OSGHUD: Position: %f %f \n", this->positionX+100.0f, this->positionY+100);
+    osgTitle->setText(title);
+    osgTitle->setNodeMask(1);
 
-        osgTitle->setText(this->title);
-        osgTitle->setNodeMask(1);
-
-        geode->addDrawable(osgTitle);
-        this->osgGroup->addChild(geode);
-    }
+    geode->addDrawable(osgTitle);
+    osgGroup->addChild(geode);   
 }
 
 OSGPLOT::~OSGPLOT()
@@ -302,70 +252,112 @@ OSGPLOT::~OSGPLOT()
 
 void OSGPLOT::setNodeMask(int mask)
 {
-    for (unsigned int i = 0; i < this->osgGroup->getNumChildren(); i++)
-        this->osgGroup->getChild(i)->setNodeMask(mask);
+    for (unsigned int i = 0; i < osgGroup->getNumChildren(); i++)
+        osgGroup->getChild(i)->setNodeMask(mask);
 }
+
 osg::ref_ptr <osg::Group> OSGPLOT::getGroup()
 {
-    return (*this->osgGroup).asGroup();
+    return (*osgGroup).asGroup();
 }
-void OSGPLOT::update(tSituation *s, const SDFrameInfo* frameInfo,
-                        const tCarElt *currCar)
+
+void OSGPLOT::update(tSituation *s, const SDFrameInfo* frameInfo, const tCarElt *currCar)
 {
-    //get x value
-    float x = 0;
-    if(this->Xdata == "time") x = (float)GfTimeClock();
+    float currentTime = GfTimeClock();
 
-    //get y value
-    float y = 0;
-    if(this->Ydata == "fps")                    y = (float)frameInfo->fInstFps;
-    else if(this->Ydata == "carspeed")          y = (float)currCar->_speed_x * 3.6;
-    else if(this->Ydata == "fpsavverrange")     y = (float)frameInfo->fAvgFps;
-    else if(this->Ydata == "carbracketemp")     y = (float)currCar->_brakeTemp(0);
-    else if(this->Ydata == "forcefeedback")     y = fabs((float)forceFeedback.force);
+    for (std::list<PlotLine>::iterator it = plotLines.begin(); it != plotLines.end(); ++it)
+    {
+        if (!it->reference)
+        {
+            //get x value
+            float x = 0;
+            if (it->Xdata == "time") x = currentTime;
 
-    //get z value
-    float z = 0.1f;
+            //get y value
+            float y = 0;
+            if (it->Ydata == "fps")                    y = (float)frameInfo->fInstFps;
+            else if (it->Ydata == "carspeed")          y = (float)currCar->_speed_x * 3.6;
+            else if (it->Ydata == "fpsavverrange")     y = (float)frameInfo->fAvgFps;
+            else if (it->Ydata == "carbracketemp")     y = (float)currCar->_brakeTemp(0);
+            else if (it->Ydata == "forcefeedback")     y = fabs((float)forceFeedback.force);
+            else if (it->Ydata == "brake")             y = (float)currCar->_brakeCmd;
+            else if (it->Ydata == "accel")             y = (float)currCar->_accelCmd;
+            else if (it->Ydata == "clutch")            y = (float)currCar->_clutchCmd;
+            else if (it->Ydata == "steering")          y = (float)currCar->_steerCmd;
 
-    //add the new point
-    this->appendDataPoint(x,y,z);
+            //get z value
+            float z = 0.1f;
 
-    //redraw
-    this->recalculateDrawnPoint();
+            //add the new point
+            it->appendDataPoint(x, y, z);
+        }
+
+        //redraw
+        it->recalculateDrawnPoint(currentTime, positionX, positionY, width, height);
+    }
 }
 
-void OSGPLOT::appendDataPoint(float x, float y, float z)
+OSGPLOT::PlotLine::PlotLine(const PlotLineConfig &config) :
+    PlotLineConfig(config),
+    dataPoints(nullptr),
+    geometry(nullptr),
+    vertices(nullptr)
 {
-    //add the new element (as last of our vector)
-    this->dataPoints->push_back(osg::Vec3(x, y, z));
+    geometry = new osg::Geometry();
+    vertices = new osg::Vec3Array(2);
+    dataPoints = new osg::Vec3Array(0);
+
+    // pass the created vertex array to the points geometry object.
+    geometry->setVertexArray(vertices);
+    geometry->setUseDisplayList(false);
+    if (config.reference)
+        geometry->setUseVertexBufferObjects(true);
+
+    // set the same color for the reference plot line
+    osg::Vec4Array *plotColors = new osg::Vec4Array;
+    plotColors->push_back(color);
+    geometry->setColorArray(plotColors, osg::Array::BIND_OVERALL);
+
+    // set the normal
+    osg::Vec3Array *normals = new osg::Vec3Array;
+    normals->push_back(osg::Vec3(0.0f, -1.0f, 0.0f));
+    geometry->setNormalArray(normals, osg::Array::BIND_OVERALL);
+
+    // tell osg to draw our geometry as lines
+    geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP, 0, vertices->size()));
+
+    // disable lighting (light is always on) and enalbe transparency
+    osg::StateSet *stateset = geometry->getOrCreateStateSet();
+    stateset->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+    stateset->setMode(GL_BLEND, osg::StateAttribute::ON);
+    stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 }
 
-void OSGPLOT::recalculateDrawnPoint()
+void OSGPLOT::PlotLine::recalculateDrawnPoint(float currentTime, float positionX, float positionY, float width, float height)
 {
     //recalculate main plot line
+    if (!reference)
     {
-
         //find max and min values for our plot
         //just draw point that are in our range of time
-        for(osg::Vec3Array::iterator it = this->dataPoints->begin(); it != this->dataPoints->end();)
+        for(osg::Vec3Array::iterator it = dataPoints->begin(); it != dataPoints->end();)
         {
-            if((*it).x() <= (GfTimeClock() - this->timeFrame) || (*it).x() <= 0)
+            if ((*it).x() <= (currentTime - timeFrame) || (*it).x() <= 0)
             {
-                it = this->dataPoints->erase(it);
-
+                it = dataPoints->erase(it);
             }
             else
             {
                 //find max
-                if ((*it).y() > this->maxValue)
+                if ((*it).y() > maxValue)
                 {
-                    this->maxValue = (float)(*it).y();
+                    maxValue = (float)(*it).y();
                 }
 
                 //find min
-                if ((*it).y() < this->minValue)
+                if ((*it).y() < minValue)
                 {
-                    this->minValue = (float)(*it).y();
+                    minValue = (float)(*it).y();
                 }
 
                 ++it;
@@ -374,66 +366,65 @@ void OSGPLOT::recalculateDrawnPoint()
 
         //cicle trounght data point and calculate correct display position
         int counter = 0;
-        this->osgMainPlotLineVertices->resize(this->dataPoints->size());
+        vertices->resize(dataPoints->size());
 
-        for(osg::Vec3Array::iterator it = this->dataPoints->begin(); it != this->dataPoints->end(); ++it, counter++) {
-
+        for(osg::Vec3Array::iterator it = dataPoints->begin(); it != dataPoints->end(); ++it, counter++)
+        {
             //copy data
-            (*this->osgMainPlotLineVertices)[counter].set(
-                ((float)(*it).x() - (GfTimeClock() - this->timeFrame))* (this->width / this->timeFrame),
+            (*vertices)[counter].set(
+                ((float)(*it).x() - (currentTime - timeFrame))* (width / timeFrame),
                 (float)(*it).y(),
                 (float)(*it).z()
             );
 
             //scale to fit plot area
-            (*this->osgMainPlotLineVertices)[counter].set(
-                (*this->osgMainPlotLineVertices)[counter].x(),
-                ((*this->osgMainPlotLineVertices)[counter].y() - this->minValue) / (this->maxValue-this->minValue) * this->height,
-                (*this->osgMainPlotLineVertices)[counter].z()
+            (*vertices)[counter].set(
+                (*vertices)[counter].x(),
+                ((*vertices)[counter].y() - minValue) / (maxValue - minValue) * height,
+                (*vertices)[counter].z()
             );
 
             //move to correct position
-            (*this->osgMainPlotLineVertices)[counter].set(
-                (*this->osgMainPlotLineVertices)[counter].x() + this->positionX,
-                (*this->osgMainPlotLineVertices)[counter].y() + this->positionY,
-                (*this->osgMainPlotLineVertices)[counter].z()
+            (*vertices)[counter].set(
+                (*vertices)[counter].x() + positionX,
+                (*vertices)[counter].y() + positionY,
+                (*vertices)[counter].z()
             );
-
         }
 
         //pass the new vertices to the geometry
-        this->osgMainPlotLineGeometry->setVertexArray(this->osgMainPlotLineVertices);
+        geometry->setVertexArray(vertices);
 
         //update the drawing instructions (for the different number of vertices)
-        this->osgMainPlotLineGeometry->removePrimitiveSet(0,1);
-        this->osgMainPlotLineGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP,0,this->osgMainPlotLineVertices->size()));
-
+        geometry->removePrimitiveSet(0,1);
+        geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP, 0, vertices->size()));
     }
 
     //recalculate reference plot line
+    else
     {
         // note, anticlockwise ordering.
         osg::Vec3 myCoords[] =
         {
             osg::Vec3(
-                this->positionX,
-                ((this->referenceLineAtValue - this->minValue) / (this->maxValue - this->minValue) * this->height) + this->positionY,
+                positionX,
+                ((referenceLineAtValue - minValue) / (maxValue - minValue) * height) + positionY,
                 0.1f
             ),
             osg::Vec3(
-                this->positionX + this->width,
-                ((this->referenceLineAtValue - this->minValue) / (this->maxValue-this->minValue) * this->height) + this->positionY,
+                positionX + width,
+                ((referenceLineAtValue - minValue) / (maxValue - minValue) * height) + positionY,
                 0.1f
             ),
         };
 
         int numCoords = sizeof(myCoords)/sizeof(osg::Vec3);
 
-        this->osgReferencePlotLineVertices = new osg::Vec3Array(numCoords,myCoords);
+        vertices = new osg::Vec3Array(numCoords,myCoords);
 
         //tell osg that our vertices has changed
-        this->osgReferencePlotLineVertices->dirty();
-        this->osgReferencePlotLineGeometry->setVertexArray(this->osgReferencePlotLineVertices);
+        vertices->dirty();
+        geometry->setVertexArray(vertices);
     }
 }
 
@@ -458,10 +449,10 @@ void OSGPLOT::drawBackground()
     * */
     osg::Vec3 myCoords[] =
     {
-           osg::Vec3(this->positionX, this->positionY, 0.0f),
-           osg::Vec3(this->positionX + this->width, this->positionY, 0.0f),
-           osg::Vec3(this->positionX + this->width, this->positionY + this->height, 0.0f),
-           osg::Vec3(this->positionX, this->positionY+this->height, 0.0f),
+           osg::Vec3(positionX, positionY, 0.0f),
+           osg::Vec3(positionX + width, positionY, 0.0f),
+           osg::Vec3(positionX + width, positionY + height, 0.0f),
+           osg::Vec3(positionX, positionY+height, 0.0f),
     };
 
         int numCoords = sizeof(myCoords)/sizeof(osg::Vec3);
@@ -485,7 +476,7 @@ void OSGPLOT::drawBackground()
 
        // disable lighting (light is always on) and enable transparency
        osg::StateSet* stateset = bgGeometry->getOrCreateStateSet();
-        stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
+       stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
        stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
        stateset->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 
@@ -493,29 +484,9 @@ void OSGPLOT::drawBackground()
        geode->addDrawable(bgGeometry);
 
       // add the geode to the graph group
-      this->osgGroup->addChild(geode);
+      osgGroup->addChild(geode);
 }
 #endif
-
-// TODO[START]: move this to utils? /src/modules/graphic/osggraph/Utils
-void split(const std::string &s, char delim, std::vector<std::string> &elems)
-{
-    std::stringstream ss;
-    ss.str(s);
-    std::string item;
-
-    while (getline(ss, item, delim))
-    {
-        elems.push_back(item);
-    }
-}
-
-std::vector<std::string> split(const std::string &s, char delim)
-{
-    std::vector<std::string> elems;
-    split(s, delim, elems);
-    return elems;
-}
 
 std::string formatLaptime(tdble sec, int sgn)
 {
@@ -746,47 +717,47 @@ SDHUD::SDHUD()
     //_cameraHUD = new osg::Camera;
 
     //initialize some vars
-    this->lastCar = NULL;
-    this->hudScale = 1.0f;
+    lastCar = NULL;
+    hudScale = 1.0f;
 }
 
 void SDHUD::CreateHUD(int scrH, int scrW)
 {
     // create a camera to set up the projection and model view matrices, and the subgraph to draw in the HUD
-    this->camera = new osg::Camera;
+    camera = new osg::Camera;
 
     // set the projection matrix
-    this->camera->setProjectionMatrix(osg::Matrix::ortho2D(0,scrW,0,scrH));
+    camera->setProjectionMatrix(osg::Matrix::ortho2D(0,scrW,0,scrH));
 
     // set the view matrix
-    this->camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-    this->camera->setViewMatrix(osg::Matrix::identity());
+    camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+    camera->setViewMatrix(osg::Matrix::identity());
 
     // only clear the depth buffer
-    this->camera->setClearMask(GL_DEPTH_BUFFER_BIT);
+    camera->setClearMask(GL_DEPTH_BUFFER_BIT);
 
     // draw subgraph after main camera view.
-    this->camera->setRenderOrder(osg::Camera::POST_RENDER);
+    camera->setRenderOrder(osg::Camera::POST_RENDER);
 
     // we don't want the camera to grab event focus from the viewers main camera(s).
-    this->camera->setAllowEventFocus(false);
+    camera->setAllowEventFocus(false);
 
     //calculate optimal hud scale (choose the minor scale from the vertical and horizontal scale)
     float scaleH = (float)scrH/1024;
     float scaleW = (float)scrW/1280;
 
     if(scaleH < scaleW){
-        this->hudScale = scaleH;
+        hudScale = scaleH;
     }
     else
     {
-        this->hudScale = scaleW;
+        hudScale = scaleW;
     }
 
-    GfLogDebug("OSGHUD: Hud Scale is: %f\n", this->hudScale);
+    GfLogDebug("OSGHUD: Hud Scale is: %f\n", hudScale);
 
     //generate the hud from the relative xml file
-    this->camera->addChild(this->generateHudFromXmlFile(scrH, scrW));
+    camera->addChild(generateHudFromXmlFile(scrH, scrW));
     
 //    GfuiAddKey(0, 'z', "do somethig with the OSG widgets", (void*)0, this::ToggleHUD2, NULL);
 
@@ -816,7 +787,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     //update all the graphs
 
     typedef std::map<std::string,OSGPLOT* >::iterator it_type;
-    for(it_type iterator = this->hudGraphElements.begin(); iterator != this->hudGraphElements.end(); ++iterator)
+    for(it_type iterator = hudGraphElements.begin(); iterator != hudGraphElements.end(); ++iterator)
 
     {
            //iterator->first = key
@@ -866,13 +837,13 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         //hide board number
         mapKey.str("");
         mapKey << "board-player" << id << "-background";
-        this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
+        hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
         mapKey.str("");
         mapKey << "board-player" << id << "-background-first";
-        this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
+        hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
         mapKey.str("");
         mapKey << "board-player" << id << "-background-current";
-        this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
+        hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
 
         mapKey.str("");
         mapKey << "board-player" << id << "-number";
@@ -895,20 +866,20 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
         mapKey.str("");
         mapKey << "board-player" << id << "-background";
-        this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
+        hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
 
         //select special background for current and/or first player
         if ((*car) == currCar)
         {
-            this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
+            hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
             mapKey << "-current";
-            this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
+            hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
         }
         else if ((*car)->_pos == 1)
         {
-            this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
+            hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_NONE);
             mapKey << "-first";
-            this->hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
+            hudImgElements[mapKey.str()]->setNodeMask(NODE_MASK_ALL);
         }
 
         std::ostringstream position;
@@ -995,19 +966,19 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
             if (currCar->_lastLapTime == currCar->_bestLapTime)
             {
-                this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_ALL);
-                this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
-                this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_NONE);
-                this->hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
-                this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_ALL);
+                hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
             }
             else
             {
-                this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
-                this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_ALL);
-                this->hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
-                this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_NONE);
-                this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_ALL);
+                hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
             }
         }
         else
@@ -1017,19 +988,19 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
             if (currentPrevSectorSplitTime < bestPrevSectorSplitTime)
             {
-                this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
-                this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_NONE);
-                this->hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
-                this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_ALL);
-                this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_ALL);
+                hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
             }
             else
             {
-                this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
-                this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_ALL);
-                this->hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
-                this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_NONE);
-                this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_ALL);
+                hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_NONE);
+                hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
             }
         }
     }
@@ -1043,11 +1014,11 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         temp << "S" << (data.oldSector+1);
         hudTextElements["laptime-sector-description"]->setText(temp.str());
 
-        this->hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_ALL);
-        this->hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_NONE);
-        this->hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
-        this->hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_NONE);
-        this->hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
+        hudImgElements["laptime-last-background-normal"]->setNodeMask(NODE_MASK_ALL);
+        hudImgElements["laptime-last-background-grey"]->setNodeMask(NODE_MASK_NONE);
+        hudImgElements["laptime-last-background-violet"]->setNodeMask(NODE_MASK_NONE);
+        hudImgElements["laptime-last-background-green"]->setNodeMask(NODE_MASK_NONE);
+        hudImgElements["laptime-last-background-red"]->setNodeMask(NODE_MASK_NONE);
 
         //show laptime
         hudTextElements["laptime-last-time"]->setText(formatLaptime(currCar->_curLapTime,0));
@@ -1094,8 +1065,8 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     float carFuel = (float)((float)currCar->_fuel / (float)currCar->_tank);
 
     //update fuel bar
-    changeImageSize(this->hudImgElements["fuel-icon-empty"], 1.0-carFuel, "top", this->hudScale);
-    changeImageSize(this->hudImgElements["fuel-icon-full"], carFuel, "bottom", this->hudScale);
+    changeImageSize(hudImgElements["fuel-icon-empty"], 1.0-carFuel, "top", hudScale);
+    changeImageSize(hudImgElements["fuel-icon-full"], carFuel, "bottom", hudScale);
 
 
 //abs
@@ -1117,8 +1088,8 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         }
     }
 
-    this->hudImgElements["abs-icon"]->setNodeMask(abs ? NODE_MASK_ALL : NODE_MASK_NONE);
-    this->hudImgElements["tcs-icon"]->setNodeMask(tcs ? NODE_MASK_ALL : NODE_MASK_NONE);
+    hudImgElements["abs-icon"]->setNodeMask(abs ? NODE_MASK_ALL : NODE_MASK_NONE);
+    hudImgElements["tcs-icon"]->setNodeMask(tcs ? NODE_MASK_ALL : NODE_MASK_NONE);
 
 //gear
     // show gear: "N" for neutral, "R" for retro, "gearnumber" for all the others
@@ -1147,14 +1118,14 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 //damage
     float carDamage = (float)((currCar->_dammage) / (float)s->_maxDammage);
-    changeImageSize(this->hudImgElements["engine-icon"], 1.0-carDamage, "top", this->hudScale);
-    changeImageSize(this->hudImgElements["engine-icon-damaged"], carDamage, "bottom", this->hudScale);
+    changeImageSize(hudImgElements["engine-icon"], 1.0-carDamage, "top", hudScale);
+    changeImageSize(hudImgElements["engine-icon-damaged"], carDamage, "bottom", hudScale);
 
 
 //rpm
     float rpmWidth = 1.0 / currCar->_enginerpmMax * currCar->_enginerpm;
-    changeImageSize(this->hudImgElements["rpm-on"], rpmWidth, "left", this->hudScale);
-    changeImageSize(this->hudImgElements["rpm-off"], 1.0-rpmWidth, "right", this->hudScale);
+    changeImageSize(hudImgElements["rpm-on"], rpmWidth, "left", hudScale);
+    changeImageSize(hudImgElements["rpm-off"], 1.0-rpmWidth, "right", hudScale);
 
 // dash items
     std::string &description = strEmpty;
@@ -1265,24 +1236,24 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     }
 
 // driver inputs 
-    changeImageSize(this->hudImgElements["driverinput-clutch"], currCar->ctrl.clutchCmd, "bottom", this->hudScale);
-    changeImageSize(this->hudImgElements["driverinput-brake"], currCar->ctrl.brakeCmd, "bottom", this->hudScale);
-    changeImageSize(this->hudImgElements["driverinput-throttle"], currCar->ctrl.accelCmd, "bottom", this->hudScale);
+    changeImageSize(hudImgElements["driverinput-clutch"], currCar->ctrl.clutchCmd, "bottom", hudScale);
+    changeImageSize(hudImgElements["driverinput-brake"], currCar->ctrl.brakeCmd, "bottom", hudScale);
+    changeImageSize(hudImgElements["driverinput-throttle"], currCar->ctrl.accelCmd, "bottom", hudScale);
     
     const osg::Vec3d axis(0, 0, 1);
     //wheel
     
     double angle = currCar->ctrl.steer * 4;
     
-    osg::Vec3d center = this->hudImgRotableElements["driverinput-wheel"]->getBound().center();//Save the center point coordinates of the object first
-    osg::Matrix curMatrix = this->hudImgRotableElements["driverinput-wheel"]->getMatrix();
+    osg::Vec3d center = hudImgRotableElements["driverinput-wheel"]->getBound().center();//Save the center point coordinates of the object first
+    osg::Matrix curMatrix = hudImgRotableElements["driverinput-wheel"]->getMatrix();
     
     curMatrix *= osg::Matrix::translate(-center);//Move the object to the origin of the world coordinate system
     curMatrix *= osg::Matrix::rotate(-prevSteerAngle, axis);//rotate
     curMatrix *= osg::Matrix::rotate(angle, axis);//rotate
     curMatrix *= osg::Matrix::translate(center);//move back to the original position of the object
     
-    this->hudImgRotableElements["driverinput-wheel"]->setMatrix(curMatrix);
+    hudImgRotableElements["driverinput-wheel"]->setMatrix(curMatrix);
 
     prevSteerAngle = angle;
     
@@ -1345,7 +1316,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
             float tempMaxHot = tempOptimal + ( tempOptimal * 10 / 100 ); //temp at witch we will conside the tire maximun hot
 
 
-            changeImageAlpha(this->hudImgElements[tireNameCold.str().c_str()], 1.0f);
+            changeImageAlpha(hudImgElements[tireNameCold.str().c_str()], 1.0f);
             optimalAlpha = (currentTemp-tempMaxCold) / (tempOptimal-tempMaxCold);
             if (optimalAlpha > 1.0f){
                 optimalAlpha = 1.0f;
@@ -1353,7 +1324,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
             if (optimalAlpha < 0.0f){
                 optimalAlpha = 0.0f;
             }
-            changeImageAlpha(this->hudImgElements[tireNameOptimal.str().c_str()], optimalAlpha);
+            changeImageAlpha(hudImgElements[tireNameOptimal.str().c_str()], optimalAlpha);
             
             
             hotAlpha = (tempMaxHot-currentTemp) / (tempMaxHot-tempOptimal);
@@ -1364,7 +1335,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                 hotAlpha = 0.0f;
             }
 
-            changeImageAlpha(this->hudImgElements[tireNameHot.str().c_str()], 1.0-hotAlpha);
+            changeImageAlpha(hudImgElements[tireNameHot.str().c_str()], 1.0-hotAlpha);
         }
         //temps string only do this for middle temps?
         temp.str("");
@@ -1379,31 +1350,31 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     }
 
 // tire wear
-    changeImageSize(this->hudImgElements["tire-degradation-fr-on"], currCar->_tyreTreadDepth(0), "bottom", this->hudScale);
-    changeImageSize(this->hudImgElements["tire-degradation-fl-on"], currCar->_tyreTreadDepth(1), "bottom", this->hudScale);
-    changeImageSize(this->hudImgElements["tire-degradation-rr-on"], currCar->_tyreTreadDepth(2), "bottom", this->hudScale);
-    changeImageSize(this->hudImgElements["tire-degradation-rl-on"], currCar->_tyreTreadDepth(3), "bottom", this->hudScale);
+    changeImageSize(hudImgElements["tire-degradation-fr-on"], currCar->_tyreTreadDepth(0), "bottom", hudScale);
+    changeImageSize(hudImgElements["tire-degradation-fl-on"], currCar->_tyreTreadDepth(1), "bottom", hudScale);
+    changeImageSize(hudImgElements["tire-degradation-rr-on"], currCar->_tyreTreadDepth(2), "bottom", hudScale);
+    changeImageSize(hudImgElements["tire-degradation-rl-on"], currCar->_tyreTreadDepth(3), "bottom", hudScale);
 
 //tire slip
     float slip = 0.0f;
     slip = currCar->_wheelSlipNorm(0)/currCar->_wheelSlipOpt(0);
-    changeImageAlpha(this->hudImgElements["tire-fr-slip"], slip);
+    changeImageAlpha(hudImgElements["tire-fr-slip"], slip);
     slip = currCar->_wheelSlipNorm(1)/currCar->_wheelSlipOpt(1);
-    changeImageAlpha(this->hudImgElements["tire-fl-slip"], slip);
+    changeImageAlpha(hudImgElements["tire-fl-slip"], slip);
     slip = currCar->_wheelSlipNorm(2)/currCar->_wheelSlipOpt(2);
-    changeImageAlpha(this->hudImgElements["tire-rr-slip"], slip);
+    changeImageAlpha(hudImgElements["tire-rr-slip"], slip);
     slip = currCar->_wheelSlipNorm(3)/currCar->_wheelSlipOpt(3);
-    changeImageAlpha(this->hudImgElements["tire-rl-slip"], slip);
+    changeImageAlpha(hudImgElements["tire-rl-slip"], slip);
 
 //gforces
     osg::BoundingBox gforcegraphbb =hudImgElements["gforces-graph"]->getBoundingBox();
     osg::BoundingBox gforcedotbb = hudImgElements["gforces-dot"]->getBoundingBox();
     osg::Vec3f position = calculatePosition(gforcedotbb,"mc",gforcegraphbb,"mc", 0.0f, 0.0f);
     changeImagePosition(
-        this->hudImgElements["gforces-dot"],
+        hudImgElements["gforces-dot"],
         gforcegraphbb.xMin()+position.x()+currCar->_DynGC.acc.y * 5 * 1,//horizontal
         gforcegraphbb.yMin()+position.y()+currCar->_DynGC.acc.x * 5 * -1,//vertical
-        this->hudScale
+        hudScale
     );
 
 // debug info
@@ -1417,63 +1388,63 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 void SDHUD::ToggleHUD()
 {
     if (hudElementsVisibilityStatusEnabled > 0){
-        hudElementsVisibilityStatus["boardWidget"] =        (int)this->hudWidgets["boardWidget"]->getNodeMask();
-        hudElementsVisibilityStatus["racepositionWidget"] = (int)this->hudWidgets["racepositionWidget"]->getNodeMask();
-        hudElementsVisibilityStatus["racelapsWidget"] =     (int)this->hudWidgets["racelapsWidget"]->getNodeMask();
-        hudElementsVisibilityStatus["laptimeWidget"] =      (int)this->hudWidgets["laptimeWidget"]->getNodeMask();
-        hudElementsVisibilityStatus["carinfoWidget"] =      (int)this->hudWidgets["carinfoWidget"]->getNodeMask();
-        hudElementsVisibilityStatus["carstatusWidget"] =    (int)this->hudWidgets["carstatusWidget"]->getNodeMask();
-        hudElementsVisibilityStatus["driverinputWidget"] =  (int)this->hudWidgets["driverinputWidget"]->getNodeMask();
-        hudElementsVisibilityStatus["driverinput-wheel"] =  (int)this->hudImgRotableElements["driverinput-wheel"]->getNodeMask();
-        hudElementsVisibilityStatus["debugWidget"] =        (int)this->hudWidgets["debugWidget"]->getNodeMask();
-        hudElementsVisibilityStatus["dashitemsWidget"] =    (int)this->hudWidgets["dashitemsWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["boardWidget"] =        (int)hudWidgets["boardWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["racepositionWidget"] = (int)hudWidgets["racepositionWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["racelapsWidget"] =     (int)hudWidgets["racelapsWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["laptimeWidget"] =      (int)hudWidgets["laptimeWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["carinfoWidget"] =      (int)hudWidgets["carinfoWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["carstatusWidget"] =    (int)hudWidgets["carstatusWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["driverinputWidget"] =  (int)hudWidgets["driverinputWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["driverinput-wheel"] =  (int)hudImgRotableElements["driverinput-wheel"]->getNodeMask();
+        hudElementsVisibilityStatus["debugWidget"] =        (int)hudWidgets["debugWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["dashitemsWidget"] =    (int)hudWidgets["dashitemsWidget"]->getNodeMask();
 #ifdef HUDDEBUG
-        hudElementsVisibilityStatus["graphWidget"] =        (int)this->hudWidgets["graphWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["graphWidget"] =        (int)hudWidgets["graphWidget"]->getNodeMask();
 #endif
 
-        this->hudWidgets["boardWidget"]->setNodeMask(0);
-        this->hudWidgets["racepositionWidget"]->setNodeMask(0);
-        this->hudWidgets["racelapsWidget"]->setNodeMask(0);
-        this->hudWidgets["laptimeWidget"]->setNodeMask(0);
-        this->hudWidgets["carinfoWidget"]->setNodeMask(0);
-        this->hudWidgets["carstatusWidget"]->setNodeMask(0);
-        this->hudWidgets["driverinputWidget"]->setNodeMask(0);
-        this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
-        this->hudWidgets["debugWidget"]->setNodeMask(0);
-        this->hudWidgets["dashitemsWidget"]->setNodeMask(0);
+        hudWidgets["boardWidget"]->setNodeMask(0);
+        hudWidgets["racepositionWidget"]->setNodeMask(0);
+        hudWidgets["racelapsWidget"]->setNodeMask(0);
+        hudWidgets["laptimeWidget"]->setNodeMask(0);
+        hudWidgets["carinfoWidget"]->setNodeMask(0);
+        hudWidgets["carstatusWidget"]->setNodeMask(0);
+        hudWidgets["driverinputWidget"]->setNodeMask(0);
+        hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
+        hudWidgets["debugWidget"]->setNodeMask(0);
+        hudWidgets["dashitemsWidget"]->setNodeMask(0);
 #ifdef HUDDEBUG
-        this->hudWidgets["graphWidget"]->setNodeMask(0);
-        this->setGraphNodeMask(0);
+        hudWidgets["graphWidget"]->setNodeMask(0);
+        setGraphNodeMask(0);
 #endif
         hudElementsVisibilityStatusEnabled = 0;
     }else{
-        this->hudWidgets["boardWidget"]->setNodeMask(hudElementsVisibilityStatus["boardWidget"]);
-        this->hudWidgets["racepositionWidget"]->setNodeMask(hudElementsVisibilityStatus["racepositionWidget"]);
-        this->hudWidgets["racelapsWidget"]->setNodeMask(hudElementsVisibilityStatus["racelapsWidget"]);
-        this->hudWidgets["laptimeWidget"]->setNodeMask(hudElementsVisibilityStatus["laptimeWidget"]);
-        this->hudWidgets["carinfoWidget"]->setNodeMask(hudElementsVisibilityStatus["carinfoWidget"]);
-        this->hudWidgets["carstatusWidget"]->setNodeMask(hudElementsVisibilityStatus["carstatusWidget"]);
-        this->hudWidgets["driverinputWidget"]->setNodeMask(hudElementsVisibilityStatus["driverinputWidget"]);
-        this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(hudElementsVisibilityStatus["driverinput-wheel"]);
-        this->hudWidgets["debugWidget"]->setNodeMask(hudElementsVisibilityStatus["debugWidget"]);
-        this->hudWidgets["dashitemsWidget"]->setNodeMask(hudElementsVisibilityStatus["dashitemsWidget"]);
+        hudWidgets["boardWidget"]->setNodeMask(hudElementsVisibilityStatus["boardWidget"]);
+        hudWidgets["racepositionWidget"]->setNodeMask(hudElementsVisibilityStatus["racepositionWidget"]);
+        hudWidgets["racelapsWidget"]->setNodeMask(hudElementsVisibilityStatus["racelapsWidget"]);
+        hudWidgets["laptimeWidget"]->setNodeMask(hudElementsVisibilityStatus["laptimeWidget"]);
+        hudWidgets["carinfoWidget"]->setNodeMask(hudElementsVisibilityStatus["carinfoWidget"]);
+        hudWidgets["carstatusWidget"]->setNodeMask(hudElementsVisibilityStatus["carstatusWidget"]);
+        hudWidgets["driverinputWidget"]->setNodeMask(hudElementsVisibilityStatus["driverinputWidget"]);
+        hudImgRotableElements["driverinput-wheel"]->setNodeMask(hudElementsVisibilityStatus["driverinput-wheel"]);
+        hudWidgets["debugWidget"]->setNodeMask(hudElementsVisibilityStatus["debugWidget"]);
+        hudWidgets["dashitemsWidget"]->setNodeMask(hudElementsVisibilityStatus["dashitemsWidget"]);
 #ifdef HUDDEBUG
-        this->hudWidgets["graphWidget"]->setNodeMask(hudElementsVisibilityStatus["graphWidget"]);
-        this->setGraphNodeMask(hudElementsVisibilityStatus["graphWidget"]);
+        hudWidgets["graphWidget"]->setNodeMask(hudElementsVisibilityStatus["graphWidget"]);
+        setGraphNodeMask(hudElementsVisibilityStatus["graphWidget"]);
 #endif
         hudElementsVisibilityStatusEnabled = 1;
     }
 }
 void SDHUD::ToggleHUDboard()
 {
-    this->hudWidgets["boardWidget"]->setNodeMask(1 - this->hudWidgets["boardWidget"]->getNodeMask());
+    hudWidgets["boardWidget"]->setNodeMask(1 - hudWidgets["boardWidget"]->getNodeMask());
     
     //save the current status in the config file
     std::string configFileUrl= GetLocalDir();
     configFileUrl.append("config/osghudconfig.xml");
     std::string path= "widgets/boardWidget";
     std::string attribute= "enabled";
-    int value = this->hudWidgets["boardWidget"]->getNodeMask();
+    int value = hudWidgets["boardWidget"]->getNodeMask();
     
     //read the config file, update the value and write it back
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
@@ -1482,15 +1453,15 @@ void SDHUD::ToggleHUDboard()
 }
 void SDHUD::ToggleHUDraceinfo()
 {
-    this->hudWidgets["racepositionWidget"]->setNodeMask(1 - this->hudWidgets["racepositionWidget"]->getNodeMask());
-    this->hudWidgets["racelapsWidget"]->setNodeMask(1 - this->hudWidgets["racelapsWidget"]->getNodeMask());
+    hudWidgets["racepositionWidget"]->setNodeMask(1 - hudWidgets["racepositionWidget"]->getNodeMask());
+    hudWidgets["racelapsWidget"]->setNodeMask(1 - hudWidgets["racelapsWidget"]->getNodeMask());
 
     //save the current status in the config file
     std::string configFileUrl= GetLocalDir();
     configFileUrl.append("config/osghudconfig.xml");
     std::string path= "widgets/racepositionWidget";
     std::string attribute= "enabled";
-    int value = this->hudWidgets["racepositionWidget"]->getNodeMask();
+    int value = hudWidgets["racepositionWidget"]->getNodeMask();
     
     //read the config file, update the value and write it back
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
@@ -1498,7 +1469,7 @@ void SDHUD::ToggleHUDraceinfo()
     
     //save the current status in the config file
     path.assign("widgets/racelapsWidget");
-    value = this->hudWidgets["racelapsWidget"]->getNodeMask();
+    value = hudWidgets["racelapsWidget"]->getNodeMask();
     GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
  
     //write
@@ -1507,14 +1478,14 @@ void SDHUD::ToggleHUDraceinfo()
 }
 void SDHUD::ToggleHUDlaptime()
 {
-    this->hudWidgets["laptimeWidget"]->setNodeMask(1 - this->hudWidgets["laptimeWidget"]->getNodeMask());
+    hudWidgets["laptimeWidget"]->setNodeMask(1 - hudWidgets["laptimeWidget"]->getNodeMask());
     
     //save the current status in the config file
     std::string configFileUrl= GetLocalDir();
     configFileUrl.append("config/osghudconfig.xml");
     std::string path= "widgets/laptimeWidget";
     std::string attribute= "enabled";
-    int value = this->hudWidgets["laptimeWidget"]->getNodeMask();
+    int value = hudWidgets["laptimeWidget"]->getNodeMask();
     
     //read the config file, update the value and write it back
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
@@ -1523,22 +1494,22 @@ void SDHUD::ToggleHUDlaptime()
 }
 void SDHUD::ToggleHUDcarinfo()
 {
-    this->hudWidgets["carinfoWidget"]->setNodeMask(1 - this->hudWidgets["carinfoWidget"]->getNodeMask());
-    this->hudWidgets["carstatusWidget"]->setNodeMask(1 - this->hudWidgets["carstatusWidget"]->getNodeMask());
+    hudWidgets["carinfoWidget"]->setNodeMask(1 - hudWidgets["carinfoWidget"]->getNodeMask());
+    hudWidgets["carstatusWidget"]->setNodeMask(1 - hudWidgets["carstatusWidget"]->getNodeMask());
     
     //save the current status in the config file
     std::string configFileUrl= GetLocalDir();
     configFileUrl.append("config/osghudconfig.xml");
     std::string path= "widgets/carinfoWidget";
     std::string attribute= "enabled";
-    int value = this->hudWidgets["carinfoWidget"]->getNodeMask();
+    int value = hudWidgets["carinfoWidget"]->getNodeMask();
     
     //read the config file, update the value and write it back
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
     GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
     
     path.assign("widgets/carstatusWidget");
-    value = this->hudWidgets["carstatusWidget"]->getNodeMask();
+    value = hudWidgets["carstatusWidget"]->getNodeMask();
     GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
 
     //write the file
@@ -1547,15 +1518,15 @@ void SDHUD::ToggleHUDcarinfo()
 }
 void SDHUD::ToggleHUDdriverinput()
 {
-    this->hudWidgets["driverinputWidget"]->setNodeMask(1 - this->hudWidgets["driverinputWidget"]->getNodeMask());
-    this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(this->hudWidgets["driverinputWidget"]->getNodeMask());
+    hudWidgets["driverinputWidget"]->setNodeMask(1 - hudWidgets["driverinputWidget"]->getNodeMask());
+    hudImgRotableElements["driverinput-wheel"]->setNodeMask(hudWidgets["driverinputWidget"]->getNodeMask());
 
     //save the current status in the config file
     std::string configFileUrl= GetLocalDir();
     configFileUrl.append("config/osghudconfig.xml");
     std::string path= "widgets/driverinputWidget";
     std::string attribute= "enabled";
-    int value = this->hudWidgets["driverinputWidget"]->getNodeMask();
+    int value = hudWidgets["driverinputWidget"]->getNodeMask();
     
     //read the config file, update the value and write it back
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
@@ -1566,14 +1537,14 @@ void SDHUD::ToggleHUDdriverinput()
 void SDHUD::ToggleHUDdebug()
 {
     //toggle the visibility
-    this->hudWidgets["debugWidget"]->setNodeMask(1 - this->hudWidgets["debugWidget"]->getNodeMask());
+    hudWidgets["debugWidget"]->setNodeMask(1 - hudWidgets["debugWidget"]->getNodeMask());
     
     //save the current status in the config file
     std::string configFileUrl= GetLocalDir();
     configFileUrl.append("config/osghudconfig.xml");
     std::string path= "widgets/debugWidget";
     std::string attribute= "enabled";
-    int value = this->hudWidgets["debugWidget"]->getNodeMask();
+    int value = hudWidgets["debugWidget"]->getNodeMask();
     
     //read the config file, update the value and write it back
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
@@ -1585,14 +1556,14 @@ void SDHUD::ToggleHUDdebug()
 void SDHUD::ToggleHUDdashitems()
 {
     //toggle the visibility
-    this->hudWidgets["dashitemsWidget"]->setNodeMask(1 - this->hudWidgets["dashitemsWidget"]->getNodeMask());
+    hudWidgets["dashitemsWidget"]->setNodeMask(1 - hudWidgets["dashitemsWidget"]->getNodeMask());
     
     //save the current status in the config file
     std::string configFileUrl= GetLocalDir();
     configFileUrl.append("config/osghudconfig.xml");
     std::string path= "widgets/dashitemsWidget";
     std::string attribute= "enabled";
-    int value = this->hudWidgets["dashitemsWidget"]->getNodeMask();
+    int value = hudWidgets["dashitemsWidget"]->getNodeMask();
     
     //read the config file, update the value and write it back
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
@@ -1613,9 +1584,9 @@ void SDHUD::setGraphNodeMask(int mask)
 void SDHUD::ToggleHUDgraph()
 {
     //toggle the visibility
-    this->hudWidgets["graphWidget"]->setNodeMask(1 - this->hudWidgets["graphWidget"]->getNodeMask());
+    hudWidgets["graphWidget"]->setNodeMask(1 - hudWidgets["graphWidget"]->getNodeMask());
 
-    int value = this->hudWidgets["graphWidget"]->getNodeMask();
+    int value = hudWidgets["graphWidget"]->getNodeMask();
     setGraphNodeMask(value);
 
     //save the current status in the config file
@@ -1633,7 +1604,7 @@ void SDHUD::ToggleHUDgraph()
 
 osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 {
-    this->osgGroupHud = new osg::Group;
+    osgGroupHud = new osg::Group;
     osg::ref_ptr<osg::Group> osgGroupWidgets = new osg::Group;
 
     /*
@@ -1644,7 +1615,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
     osg::StateSet* stateset = geode->getOrCreateStateSet();
     stateset->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
     */
-    this->osgGroupHud->addChild(osgGroupWidgets);
+    osgGroupHud->addChild(osgGroupWidgets);
 
     //screen bounding box
     osg::BoundingBox screenBB;
@@ -1679,7 +1650,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
             osg::ref_ptr<osg::Geode> geode = new osg::Geode;
             geode->setName(widgetsSectionName);
             osgGroupWidgets->addChild(geode);
-            this->hudWidgets[widgetsSectionName.c_str()] = geode;
+            hudWidgets[widgetsSectionName.c_str()] = geode;
 
             // turn lighting off for the text and disable depth test to ensure it's always ontop.
             osg::StateSet* stateset = geode->getOrCreateStateSet();
@@ -1710,14 +1681,14 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             std::string textStr =         GfParmGetStr (paramHandle, subSectionPath.c_str(),"text", "" );
                             std::string fontFileUrl =     GfParmGetStr (paramHandle, subSectionPath.c_str(),"fontFileUrl", "" );
                             std::string colorString =     GfParmGetStr (paramHandle, subSectionPath.c_str(),"color", "" );
-                            float fontSize =             GfParmGetNum (paramHandle, subSectionPath.c_str(),"fontSize", "",0 ) * this->hudScale;
+                            float fontSize =             GfParmGetNum (paramHandle, subSectionPath.c_str(),"fontSize", "",0 ) * hudScale;
                             std::string textAlign =     GfParmGetStr (paramHandle, subSectionPath.c_str(),"textAlign", "" );
 
                             std::string positionRefObj =             GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
                             std::string positionRefObjPoint =         GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
                             std::string positionMyPoint =             GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
-                            float positionVerticalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * this->hudScale;
-                            float positionHorizontalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * this->hudScale;
+                            float positionVerticalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
+                            float positionHorizontalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
 
                             GfLogDebug("OSGHUD: Generate text object: %s \n", elementId.c_str());
 
@@ -1728,18 +1699,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             hudTextElements[elementId] = text;
 
                             //extract and apply the color
-                            {
-                                std::vector<std::string> colorStringVector = split(colorString, '#');
-
-                                osg::Vec4 color = osg::Vec4(
-                                    std::atof(colorStringVector[0].c_str()),
-                                    std::atof(colorStringVector[1].c_str()),
-                                    std::atof(colorStringVector[2].c_str()),
-                                    std::atof(colorStringVector[3].c_str())
-                                );
-
-                                text->setColor(color);
-                            }
+                            text->setColor(colorStringToVec4(colorString));
 
                             //set the font
                             {
@@ -1780,14 +1740,14 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             {
                                 refObjBb = hudTextElements[positionRefObj]->getBoundingBox();
                             }
-                            else if ( this->hudImgElements.find(positionRefObj) != this->hudImgElements.end() )
+                            else if ( hudImgElements.find(positionRefObj) != hudImgElements.end() )
                             {
-                                refObjBb = this->hudImgElements[positionRefObj]->getBoundingBox();
+                                refObjBb = hudImgElements[positionRefObj]->getBoundingBox();
                             }
 #ifdef HUDDEBUG
-                            else if ( this->hudGraphElements.find(positionRefObj) != this->hudGraphElements.end() )
+                            else if ( hudGraphElements.find(positionRefObj) != hudGraphElements.end() )
                             {
-                                //refObjBb = this->hudGraphElements[positionRefObj]->getBoundingBox();
+                                //refObjBb = hudGraphElements[positionRefObj]->getBoundingBox();
                             }
 #endif
                             else
@@ -1826,8 +1786,8 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             std::string positionRefObj =             GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
                             std::string positionRefObjPoint =         GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
                             std::string positionMyPoint =             GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
-                            float positionVerticalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * this->hudScale;
-                            float positionHorizontalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * this->hudScale;
+                            float positionVerticalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
+                            float positionHorizontalModifier =         GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
 
                             GfLogDebug("OSGHUD: Generate image object: %s \n", elementId.c_str());
 
@@ -1852,12 +1812,12 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             osg::Image* img = osgDB::readImageFile(filename);
 
                             //correct the image size to match the hud scale
-                            float imgWidth = img->s() *  this->hudScale;
-                            float imgHeight = img->t() * this->hudScale;
+                            float imgWidth = img->s() *  hudScale;
+                            float imgHeight = img->t() * hudScale;
 
                             // create geometry
                             osg::Geometry* geom = new osg::Geometry;
-                            this->hudImgElements[elementId] =  geom;
+                            hudImgElements[elementId] =  geom;
 
                             //set the position
                             //find the referenceObj pointer and then get his bounding box
@@ -1866,14 +1826,14 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             {
                                 refObjBb = hudTextElements[positionRefObj]->getBoundingBox();
                             }
-                            else if ( this->hudImgElements.find(positionRefObj) != this->hudImgElements.end() )
+                            else if ( hudImgElements.find(positionRefObj) != hudImgElements.end() )
                             {
-                                refObjBb = this->hudImgElements[positionRefObj]->getBoundingBox();
+                                refObjBb = hudImgElements[positionRefObj]->getBoundingBox();
                             }
 #ifdef HUDDEBUG
-                            else if ( this->hudGraphElements.find(positionRefObj) != this->hudGraphElements.end() )
+                            else if ( hudGraphElements.find(positionRefObj) != hudGraphElements.end() )
                             {
-                                //refObjBb = this->hudGraphElements[positionRefObj]->getBoundingBox();
+                                //refObjBb = hudGraphElements[positionRefObj]->getBoundingBox();
                             }
 #endif
                             else
@@ -1971,12 +1931,12 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                                 const osg::Vec3d axis(0, 0, 1);
                                 transform->setMatrix(osg::Matrix::rotate(angle, axis)); 
                                 transform->addChild(geom);
-                                this->osgGroupHud->addChild(transform);
-                                this->hudImgRotableElements[elementId] =  transform;
+                                osgGroupHud->addChild(transform);
+                                hudImgRotableElements[elementId] =  transform;
                                 if(widgetEnabled>0){
-                                    this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(1);
+                                    hudImgRotableElements["driverinput-wheel"]->setNodeMask(1);
                                 }else{
-                                    this->hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
+                                    hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
                                 }
                             }
                         }
@@ -1993,19 +1953,39 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             std::string positionRefObj =       GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObj", "" );
                             std::string positionRefObjPoint =  GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-refObjPoint", "tl" );
                             std::string positionMyPoint =      GfParmGetStr (paramHandle, subSectionPath.c_str(),"position-myPoint", "tl" );
-                            float positionVerticalModifier =   GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * this->hudScale;
-                            float positionHorizontalModifier = GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * this->hudScale;
+                            float positionVerticalModifier =   GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-verticalModifier", "",0 ) * hudScale;
+                            float positionHorizontalModifier = GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
 
                             //graph variables
                             float width =                      GfParmGetNum (paramHandle, subSectionPath.c_str(),"width", "",0 );
                             float height =                     GfParmGetNum (paramHandle, subSectionPath.c_str(),"height", "",0 );
-                            float maxValue =                   GfParmGetNum (paramHandle, subSectionPath.c_str(),"maxValue", "",0 );
-                            float minValue =                   GfParmGetNum (paramHandle, subSectionPath.c_str(),"minValue", "",0 );
-                            float timeFrame =                  GfParmGetNum (paramHandle, subSectionPath.c_str(),"timeFrame", "",0 );
-                            float referenceLineAtValue =       GfParmGetNum (paramHandle, subSectionPath.c_str(),"referenceLineAtValue", "",0 );
-                            std::string Xdata =                GfParmGetStr (paramHandle, subSectionPath.c_str(),"Xdata", "" );
-                            std::string Ydata =                GfParmGetStr (paramHandle, subSectionPath.c_str(),"Ydata", "" );
                             std::string title =                GfParmGetStr (paramHandle, subSectionPath.c_str(),"title", "" );
+
+                            // line variables
+                            std::vector<OSGPLOT::PlotLineConfig> lines;
+
+                            //get a list of the sections in this section
+                            std::string linesSectionPath = subSectionPath + "/lines/";
+                            std::string lineSectionPath = linesSectionPath + std::to_string(lines.size() + 1);
+
+                            //cicle throught each element of the widget
+                            while (GfParmExistsSection(paramHandle, lineSectionPath.c_str()))
+                            {
+                                 OSGPLOT::PlotLineConfig config;
+
+                                 config.reference = GfParmGetNum(paramHandle, lineSectionPath.c_str(), "reference", "", 0) != 0;
+                                 config.maxValue = GfParmGetNum(paramHandle, lineSectionPath.c_str(), "maxValue", "", 0);
+                                 config.minValue = GfParmGetNum(paramHandle, lineSectionPath.c_str(), "minValue", "", 0);
+                                 config.timeFrame = GfParmGetNum(paramHandle, lineSectionPath.c_str(), "timeFrame", "", 0);
+                                 config.referenceLineAtValue = GfParmGetNum(paramHandle, lineSectionPath.c_str(), "referenceLineAtValue", "", 0);
+                                 config.Xdata = GfParmGetStr(paramHandle, lineSectionPath.c_str(), "Xdata", "");
+                                 config.Ydata = GfParmGetStr(paramHandle, lineSectionPath.c_str(), "Ydata", "");
+                                 config.color = colorStringToVec4(GfParmGetStr(paramHandle, lineSectionPath.c_str(), "color", ""));
+
+                                 lines.push_back(config);
+
+                                 lineSectionPath = linesSectionPath + std::to_string(lines.size() + 1);
+                            }
 
                             GfLogDebug("OSGHUD: Generate graph object: %s \n", elementId.c_str());
 
@@ -2016,14 +1996,14 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             {
                                 refObjBb = hudTextElements[positionRefObj]->getBoundingBox();
                             }
-                            else if ( this->hudImgElements.find(positionRefObj) != this->hudImgElements.end() )
+                            else if ( hudImgElements.find(positionRefObj) != hudImgElements.end() )
                             {
-                                refObjBb = this->hudImgElements[positionRefObj]->getBoundingBox();
+                                refObjBb = hudImgElements[positionRefObj]->getBoundingBox();
                             }
 
-                            else if ( this->hudGraphElements.find(positionRefObj) != this->hudGraphElements.end() )
+                            else if ( hudGraphElements.find(positionRefObj) != hudGraphElements.end() )
                             {
-                                //refObjBb = this->hudGraphElements[positionRefObj]->getBoundingBox();
+                                //refObjBb = hudGraphElements[positionRefObj]->getBoundingBox();
                             }
 
                             else
@@ -2044,22 +2024,9 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             float positionY = position.y();
 
                             //istantiate the graph
-                            this->hudGraphElements[elementId] = new OSGPLOT(
-                                positionX,
-                                positionY,
-                                width,
-                                height,
-                                maxValue,
-                                minValue,
-                                timeFrame,
-                                referenceLineAtValue,
-                                Xdata,
-                                Ydata,
-                                title
-                            );
-
-                            this->osgGroupHud->addChild(this->hudGraphElements[elementId]->getGroup());
-                            this->hudGraphElements[elementId]->setNodeMask(widgetEnabled);
+                            hudGraphElements[elementId] = new OSGPLOT(positionX, positionY, width, height, title, lines);
+                            osgGroupHud->addChild(hudGraphElements[elementId]->getGroup());
+                            hudGraphElements[elementId]->setNodeMask(widgetEnabled);
 #endif
                         }
                         else
@@ -2087,7 +2054,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
     GfParmReleaseHandle(paramHandle);
 
     //return the hud object
-    return (*this->osgGroupHud).asGroup();
+    return (*osgGroupHud).asGroup();
 }
 
 SDHUD::~SDHUD()
@@ -2095,8 +2062,8 @@ SDHUD::~SDHUD()
     //TODO: check we may have something more to clean up
     //do some cleanup
     hudTextElements.clear();
-    this->hudImgElements.clear();
+    hudImgElements.clear();
 #ifdef HUDDEBUG
-    this->hudGraphElements.clear();
+    hudGraphElements.clear();
 #endif
 }

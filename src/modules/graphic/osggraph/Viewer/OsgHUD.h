@@ -19,6 +19,9 @@
 #ifndef _OSGHUD_H_
 #define _OSGHUD_H_
 
+#include <vector>
+#include <list>
+
 #include <car.h>        // tCarElt
 #include <raceman.h>    // tSituation
 
@@ -29,54 +32,59 @@ class SDFrameInfo;
 #ifdef HUDDEBUG
 class OSGPLOT
 {
-    private:
+public:
+    struct PlotLineConfig
+    {
+        bool reference;
+        float referenceLineAtValue;
+        osg::Vec4 color;
+        float maxValue;
+        float minValue;
+        float timeFrame;
+        std::string Xdata;
+        std::string Ydata;
+    };
+
+private:
+    struct PlotLine : public PlotLineConfig
+    {
+    public:
+        osg::Vec3Array *dataPoints;
+        osg::Geometry *geometry;
+        osg::Vec3Array *vertices;
 
     public:
-    OSGPLOT(
-        float positionX,
-        float positionY,
-        float width,
-        float height,
-        float maxValue,
-        float minValue,
-        float timeFrame,
-        float referenceLineAtValue,
-        const std::string &Xdata,
-        const std::string &Ydata,
-        const std::string &title
-    );
+        PlotLine(const PlotLineConfig &config);
+
+        void appendDataPoint(float x, float y, float z)
+        {
+            //add the new element (as last of our vector)
+            dataPoints->push_back(osg::Vec3(x, y, z));
+        }
+        void recalculateDrawnPoint(float currentTime, float positionX, float positionY, float width, float height);
+    };
+
+public:
+    OSGPLOT(float positionX,
+            float positionY,
+            float width,
+            float height,
+            const std::string &title,
+            std::vector<PlotLineConfig> lines);
+
     ~OSGPLOT();
     float positionX;
     float positionY;
     float width;
     float height;
-    float maxValue;
-    float minValue;
-    float timeFrame;
-    float referenceLineAtValue;
-    std::string Xdata;
-    std::string Ydata;
     std::string title;
-
-    osg::Vec3Array* dataPoints;
-
-    osg::Geometry* osgMainPlotLineGeometry;
-    osg::Vec3Array* osgMainPlotLineVertices;
-
-    osg::Geometry* osgReferencePlotLineGeometry;
-    osg::Vec3Array* osgReferencePlotLineVertices;
-
+    std::list<PlotLine> plotLines;
     osg::ref_ptr<osg::Group> osgGroup;
 
     osg::ref_ptr <osg::Group> getGroup();
-
-    void appendDataPoint(float x, float y, float z);
-    void removeOldDataPoint();
-    void recalculateDrawnPoint();
     void drawBackground();
     void update(tSituation *s, const SDFrameInfo* frameInfo,const tCarElt *currCar);
     void setNodeMask(int mask);
-
 };
 #endif
 
