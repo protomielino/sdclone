@@ -313,13 +313,17 @@ void Pit::update()
     // Check for fuel, damage and tyres
     bool pitfuel = mCar->_fuel < (mAvgFuelPerLap + 2.0);
     bool pitdamage = (mCar->_dammage > mPitDamage && remaininglaps * mTrack->length > mMaxDamageDist && mLastFuel > 15.0) || (mCar->_dammage > mMaxDamage);
-    //bool pittyres = (mMyCar->tires()->distLeft() < 1.0 * mTrack->length && mMyCar->tires()->gripFactor() < mPitGripFactor && remaininglaps * mTrack->length > 10000.0);
 
     if(mMyCar->HASTYC)
-        pittyres = (mMyCar->tires()->gripFactor() < mPitGripFactor && remaininglaps * mTrack->length > 10000.0 && mMyCar->tires()->distLeft() < 1000);
-    else {
+    {
+        pittyres = (mMyCar->tires()->TyreTreadDepth() < 30.00 && remaininglaps  > 3.0);
+        LogUSR.debug(" # Tyre depth = %.2f\n", mMyCar->tires()->TyreTreadDepth());
+    }
+    else
+    {
         pittyres = false;
     }
+
     if ((fs > mPitEntry - mEntryMargin - mPreEntryMargin - 3.0) && (fs < mPitEntry - mEntryMargin - mPreEntryMargin) && !mStopChecked)
     {
         if (pitBeforeTeammate(remaininglaps))
@@ -472,7 +476,7 @@ double Pit::calcRefuel()
     double tiresdist = mMyCar->tires()->distLeft() - 1000.0;
     double stintdist = stintfuel * (mTrack->length / mAvgFuelPerLap);
 
-    if (tiresdist < stintdist || (mMyCar->tires()->wear() > 1.03 - ((double)mCar->_remainingLaps / 10)))
+    if (tiresdist < stintdist || (mMyCar->tires()->TyreTreadDepth() > 0.99 - ((double)mCar->_remainingLaps / 10)))
     {
         mTireChange = false;
     }
