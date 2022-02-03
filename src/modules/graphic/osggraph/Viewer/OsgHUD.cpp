@@ -1957,8 +1957,8 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             float positionHorizontalModifier = GfParmGetNum (paramHandle, subSectionPath.c_str(),"position-horizontalModifier", "",0 ) * hudScale;
 
                             //graph variables
-                            float width =                      GfParmGetNum (paramHandle, subSectionPath.c_str(),"width", "",0 );
-                            float height =                     GfParmGetNum (paramHandle, subSectionPath.c_str(),"height", "",0 );
+                            float width =                      GfParmGetNum (paramHandle, subSectionPath.c_str(),"width", "",0 ) * hudScale;
+                            float height =                     GfParmGetNum (paramHandle, subSectionPath.c_str(),"height", "",0 ) * hudScale;
                             std::string title =                GfParmGetStr (paramHandle, subSectionPath.c_str(),"title", "" );
 
                             // line variables
