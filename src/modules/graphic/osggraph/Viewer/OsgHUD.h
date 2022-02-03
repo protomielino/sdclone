@@ -62,6 +62,10 @@ private:
             dataPoints->push_back(osg::Vec3(x, y, z));
         }
         void recalculateDrawnPoint(float currentTime, float positionX, float positionY, float width, float height);
+    	void clearDataPoints()
+    	{
+    	    dataPoints->clear();
+    	}
     };
 
 public:
@@ -85,6 +89,7 @@ public:
     void drawBackground();
     void update(tSituation *s, const SDFrameInfo* frameInfo,const tCarElt *currCar);
     void setNodeMask(int mask);
+    void clearDataPoints();
 };
 #endif
 

@@ -297,6 +297,15 @@ void OSGPLOT::update(tSituation *s, const SDFrameInfo* frameInfo, const tCarElt 
     }
 }
 
+void OSGPLOT::clearDataPoints()
+{
+    for (std::list<PlotLine>::iterator it = plotLines.begin(); it != plotLines.end(); ++it)
+    {
+        if (!it->reference)
+            it->clearDataPoints();
+    }
+}
+
 OSGPLOT::PlotLine::PlotLine(const PlotLineConfig &config) :
     PlotLineConfig(config),
     dataPoints(nullptr),
@@ -771,6 +780,10 @@ SDHUD::DispDebug(const tSituation *s, const SDFrameInfo* frame)
 void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                         const tCarElt *currCar)
 {
+#ifdef HUDDEBUG
+    typedef std::map<std::string,OSGPLOT* >::iterator it_type;
+#endif
+    
     CarData &data = carData[currCar];
 
     // reset timers if car changes
@@ -779,16 +792,19 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         data.oldSector = currCar->_currentSector;
         data.oldLapNumber = currCar->_laps;
         data.laptimeFreezeTime = 0.0;
-        data.timeDiffFreezeTime = 0.0;
+        data.timeDiffFreezeTime = 0.0; 
+      
+#ifdef HUDDEBUG
+        for(it_type iterator = hudGraphElements.begin(); iterator != hudGraphElements.end(); ++iterator)
+    	    iterator->second->clearDataPoints();
+#endif        
         lastCar = currCar;
     }
 
 #ifdef HUDDEBUG
     //update all the graphs
 
-    typedef std::map<std::string,OSGPLOT* >::iterator it_type;
     for(it_type iterator = hudGraphElements.begin(); iterator != hudGraphElements.end(); ++iterator)
-
     {
            //iterator->first = key
            //iterator->second = value
