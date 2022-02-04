@@ -621,11 +621,11 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     car->_exhaustNb = MIN(car->_exhaustNb, 2);
     car->_exhaustPower = GfParmGetNum(handle, SECT_EXHAUST, PRM_POWER, NULL, 1.0);
 
-    if (car->_exhaustNb > 0)
+    /*if (car->_exhaustNb > 0)
     {
         this->backfire = new SDBackFire();
         backfire->init(handle, path, car, transform1.get());
-    }
+    }*/
 
     loadCarLights();
 

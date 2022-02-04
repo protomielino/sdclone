@@ -28,14 +28,14 @@
 #include <osg/LOD>
 
 #include "OsgWheel.h"
-#include "OsgBackFire.h"
+//#include "OsgBackFire.h"
 #include "OsgCarLight.h"
 
 class SDCarShader;
 class SDReflectionMapping;
 class SDWheels;
 class SDBackFire;
-class SDCarLight;
+//class SDCarLight;
 
 class SDCar
 {
@@ -70,7 +70,7 @@ private :
     SDWheels    wheels;
     SDCarShader *shader;
     SDReflectionMapping *reflectionMapping;
-    SDBackFire *backfire;
+    //SDBackFire *backfire;
 
     int reflectionMappingMethod;
 
