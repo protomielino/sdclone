@@ -601,7 +601,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     this->carTransform = transform1.get();
 
     //wheels = new SDWheels;
-    this->carTransform->addChild(wheels.initWheels(car,handle));
+    this->carTransform->addChild(wheels.initWheels(car, handle));
 
     this->carEntity = new osg::Group;
     this->carEntity->addChild(carTransform);
@@ -615,6 +615,17 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
     this->reflectionMapping = new SDReflectionMapping(this);
     this->setReflectionMap(this->reflectionMapping->getReflectionMap());
+
+    /* Load visual attributes */
+    car->_exhaustNb = GfParmGetEltNb(handle, SECT_EXHAUST);
+    car->_exhaustNb = MIN(car->_exhaustNb, 2);
+    car->_exhaustPower = GfParmGetNum(handle, SECT_EXHAUST, PRM_POWER, NULL, 1.0);
+
+    if (car->_exhaustNb > 0)
+    {
+        this->backfire = new SDBackFire();
+        backfire->init(handle, path, car, transform1.get());
+    }
 
     loadCarLights();
 
@@ -877,10 +888,17 @@ void SDCar::updateCar(tSituation *s, tCarElt *CurCar, int current, int driver)
     this->carTransform->setMatrix(mat);
     this->lights_branch->setMatrix(mat);
 
-    if(_carShader > 2)
+    if(_carShader > 3)
+    {
         this->reflectionMapping->update();
+        this->setReflectionMap(this->reflectionMapping->getReflectionMap());
+    }
+    else if(_carShader > 2 && car == CurCar)
+    {
+        this->reflectionMapping->update();
+        this->setReflectionMap(this->reflectionMapping->getReflectionMap());
+    }
 
-    this->setReflectionMap(this->reflectionMapping->getReflectionMap());
 
     //ugly computation,
     /*if (SHADOW_TECHNIQUE == 0)
