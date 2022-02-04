@@ -88,7 +88,6 @@ public:
     osg::ref_ptr <osg::Group> getGroup();
     void drawBackground();
     void update(tSituation *s, const SDFrameInfo* frameInfo,const tCarElt *currCar);
-    void setNodeMask(int mask);
     void clearDataPoints();
 };
 #endif
@@ -127,7 +126,6 @@ class SDHUD
         
 #ifdef HUDDEBUG
         std::map<std::string,OSGPLOT* > hudGraphElements;
-        void setGraphNodeMask(int mask);
 #endif
 
     public:
@@ -143,7 +141,10 @@ class SDHUD
         void ToggleHUDdebug();
         void ToggleHUDdashitems();
 #ifdef HUDDEBUG
-        void ToggleHUDgraph();
+        void ToggleHUDgraphFPS();
+        void ToggleHUDgraphSpeed();
+        void ToggleHUDgraphFFB();
+        void ToggleHUDgraphInputs();
 #endif
 
         osg::ref_ptr<osg::Camera> camera;

@@ -254,9 +254,21 @@ void SDScreens::toggleHUDdashitems()
     hud.ToggleHUDdashitems();
 }
 #ifdef HUDDEBUG
-void SDScreens::toggleHUDgraph()
+void SDScreens::toggleHUDgraphFPS()
 {
-    hud.ToggleHUDgraph();
+    hud.ToggleHUDgraphFPS();
+}
+void SDScreens::toggleHUDgraphSpeed()
+{
+    hud.ToggleHUDgraphSpeed();
+}
+void SDScreens::toggleHUDgraphFFB()
+{
+    hud.ToggleHUDgraphFFB();
+}
+void SDScreens::toggleHUDgraphInputs()
+{
+    hud.ToggleHUDgraphInputs();
 }
 #endif
 

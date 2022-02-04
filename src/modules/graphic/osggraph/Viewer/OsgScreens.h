@@ -65,7 +65,10 @@ public:
     void toggleHUDdebug();
     void toggleHUDdashitems();
 #ifdef HUDDEBUG
-    void toggleHUDgraph();
+    void toggleHUDgraphFPS();
+    void toggleHUDgraphSpeed();
+    void toggleHUDgraphFFB();
+    void toggleHUDgraphInputs();
 #endif
 
     inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}

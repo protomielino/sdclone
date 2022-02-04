@@ -250,12 +250,6 @@ OSGPLOT::~OSGPLOT()
 {
 }
 
-void OSGPLOT::setNodeMask(int mask)
-{
-    for (unsigned int i = 0; i < osgGroup->getNumChildren(); i++)
-        osgGroup->getChild(i)->setNodeMask(mask);
-}
-
 osg::ref_ptr <osg::Group> OSGPLOT::getGroup()
 {
     return (*osgGroup).asGroup();
@@ -1413,7 +1407,10 @@ void SDHUD::ToggleHUD()
         hudElementsVisibilityStatus["debugWidget"] =        (int)hudWidgets["debugWidget"]->getNodeMask();
         hudElementsVisibilityStatus["dashitemsWidget"] =    (int)hudWidgets["dashitemsWidget"]->getNodeMask();
 #ifdef HUDDEBUG
-        hudElementsVisibilityStatus["graphWidget"] =        (int)hudWidgets["graphWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["graphFPSWidget"] =     (int)hudWidgets["graphFPSWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["graphSpeedWidget"] =   (int)hudWidgets["graphSpeedWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["graphFFBWidget"] =     (int)hudWidgets["graphFFBWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["graphInputsWidget"] =  (int)hudWidgets["graphInputsWidget"]->getNodeMask();
 #endif
 
         hudWidgets["boardWidget"]->setNodeMask(0);
@@ -1427,8 +1424,10 @@ void SDHUD::ToggleHUD()
         hudWidgets["debugWidget"]->setNodeMask(0);
         hudWidgets["dashitemsWidget"]->setNodeMask(0);
 #ifdef HUDDEBUG
-        hudWidgets["graphWidget"]->setNodeMask(0);
-        setGraphNodeMask(0);
+        hudWidgets["graphFPSWidget"]->setNodeMask(0);
+        hudWidgets["graphSpeedWidget"]->setNodeMask(0);
+        hudWidgets["graphFFBWidget"]->setNodeMask(0);
+        hudWidgets["graphInputsWidget"]->setNodeMask(0);
 #endif
         hudElementsVisibilityStatusEnabled = 0;
     }else{
@@ -1443,8 +1442,10 @@ void SDHUD::ToggleHUD()
         hudWidgets["debugWidget"]->setNodeMask(hudElementsVisibilityStatus["debugWidget"]);
         hudWidgets["dashitemsWidget"]->setNodeMask(hudElementsVisibilityStatus["dashitemsWidget"]);
 #ifdef HUDDEBUG
-        hudWidgets["graphWidget"]->setNodeMask(hudElementsVisibilityStatus["graphWidget"]);
-        setGraphNodeMask(hudElementsVisibilityStatus["graphWidget"]);
+        hudWidgets["graphFPSWidget"]->setNodeMask(hudElementsVisibilityStatus["graphFPSWidget"]);
+        hudWidgets["graphSpeedWidget"]->setNodeMask(hudElementsVisibilityStatus["graphSpeedWidget"]);
+        hudWidgets["graphFFBWidget"]->setNodeMask(hudElementsVisibilityStatus["graphFFBWidget"]);
+        hudWidgets["graphInputsWidget"]->setNodeMask(hudElementsVisibilityStatus["graphInputsWidget"]);
 #endif
         hudElementsVisibilityStatusEnabled = 1;
     }
@@ -1587,33 +1588,77 @@ void SDHUD::ToggleHUDdashitems()
 }
 
 #ifdef HUDDEBUG
-void SDHUD::setGraphNodeMask(int mask)
-{
-    for (std::map<std::string, OSGPLOT *>::iterator it = hudGraphElements.begin(); it != hudGraphElements.end(); ++it)
-    {
-        it->second->setNodeMask(mask);
-    }
-}
-
-void SDHUD::ToggleHUDgraph()
+void SDHUD::ToggleHUDgraphFPS()
 {
     //toggle the visibility
-    hudWidgets["graphWidget"]->setNodeMask(1 - hudWidgets["graphWidget"]->getNodeMask());
-
-    int value = hudWidgets["graphWidget"]->getNodeMask();
-    setGraphNodeMask(value);
+    hudWidgets["graphFPSWidget"]->setNodeMask(1 - hudWidgets["graphFPSWidget"]->getNodeMask());
 
     //save the current status in the config file
     std::string configFileUrl = GetLocalDir();
     configFileUrl.append("config/osghudconfig.xml");
-    std::string path = "widgets/graphWidget";
+    std::string path = "widgets/graphFPSWidget";
     std::string attribute = "enabled";
+    int value = hudWidgets["graphFPSWidget"]->getNodeMask();
 
     //read the config file, update the value and write it back
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
     GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
     GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-    }
+}
+
+void SDHUD::ToggleHUDgraphSpeed()
+{
+    //toggle the visibility
+    hudWidgets["graphSpeedWidget"]->setNodeMask(1 - hudWidgets["graphSpeedWidget"]->getNodeMask());
+
+    //save the current status in the config file
+    std::string configFileUrl = GetLocalDir();
+    configFileUrl.append("config/osghudconfig.xml");
+    std::string path = "widgets/graphSpeedWidget";
+    std::string attribute = "enabled";
+    int value = hudWidgets["graphSpeedWidget"]->getNodeMask();
+
+    //read the config file, update the value and write it back
+    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
+    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
+    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
+}
+
+void SDHUD::ToggleHUDgraphFFB()
+{
+    //toggle the visibility
+    hudWidgets["graphFFBWidget"]->setNodeMask(1 - hudWidgets["graphFFBWidget"]->getNodeMask());
+
+    //save the current status in the config file
+    std::string configFileUrl = GetLocalDir();
+    configFileUrl.append("config/osghudconfig.xml");
+    std::string path = "widgets/graphFFBWidget";
+    std::string attribute = "enabled";
+    int value = hudWidgets["graphFFBWidget"]->getNodeMask();
+
+    //read the config file, update the value and write it back
+    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
+    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
+    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
+}
+
+void SDHUD::ToggleHUDgraphInputs()
+{
+    //toggle the visibility
+    hudWidgets["graphInputsWidget"]->setNodeMask(1 - hudWidgets["graphInputsWidget"]->getNodeMask());
+
+    //save the current status in the config file
+    std::string configFileUrl = GetLocalDir();
+    configFileUrl.append("config/osghudconfig.xml");
+    std::string path = "widgets/graphInputsWidget";
+    std::string attribute = "enabled";
+    int value = hudWidgets["graphInputsWidget"]->getNodeMask();
+
+    //read the config file, update the value and write it back
+    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
+    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
+    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
+}
 #endif
 
 osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
@@ -2034,8 +2079,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 
                             //istantiate the graph
                             hudGraphElements[elementId] = new OSGPLOT(positionX, positionY, width, height, title, lines);
-                            osgGroupHud->addChild(hudGraphElements[elementId]->getGroup());
-                            hudGraphElements[elementId]->setNodeMask(widgetEnabled);
+                            geode->addChild(hudGraphElements[elementId]->getGroup());
 #endif
                         }
                         else

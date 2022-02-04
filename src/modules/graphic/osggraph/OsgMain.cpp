@@ -169,9 +169,21 @@ void SDToggleHUDdashitems(void *vp)
     screens->toggleHUDdashitems();
 }
 #ifdef HUDDEBUG
-void SDToggleHUDgraph(void *vp)
+void SDToggleHUDgraphFPS(void *vp)
 {
-    screens->toggleHUDgraph();
+    screens->toggleHUDgraphFPS();
+}
+void SDToggleHUDgraphSpeed(void *vp)
+{
+    screens->toggleHUDgraphSpeed();
+}
+void SDToggleHUDgraphFFB(void *vp)
+{
+    screens->toggleHUDgraphFFB();
+}
+void SDToggleHUDgraphInputs(void *vp)
+{
+    screens->toggleHUDgraphInputs();
 }
 #endif
 /*Driver position change*/
@@ -265,7 +277,10 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, '7',            "Toggle HUD raceinfoWidget",    (void*)0, SDToggleHUDraceinfo, NULL);
     GfuiAddKey(screen, '8',            "Toggle HUD",                   (void*)0, SDToggleHUD, NULL);
 #ifdef HUDDEBUG
-    GfuiAddKey(screen, '0',            "Toggle HUD graphWidget",       (void*)0, SDToggleHUDgraph, NULL);
+    GfuiAddKey(screen, '!',            "Toggle HUD graphFPSWidget",    (void*)0, SDToggleHUDgraphFPS, NULL);
+    GfuiAddKey(screen, '@',            "Toggle HUD graphSpeedWidget",  (void*)0, SDToggleHUDgraphSpeed, NULL);
+    GfuiAddKey(screen, '#',            "Toggle HUD graphFFBWidget",    (void*)0, SDToggleHUDgraphFFB, NULL);
+    GfuiAddKey(screen, '$',            "Toggle HUD graphInputsWidget", (void*)0, SDToggleHUDgraphInputs, NULL);
 #endif
 
     /*GfuiAddKey(screen, '5',            "Debug Info",        (void*)3, grSelectBoard, NULL);
