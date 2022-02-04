@@ -608,7 +608,7 @@ GfctrlMouseGetCurrentState(tCtrlMouseInfo *mouseInfo)
 	mouseInfo->ax[3] = mouseMove;
 	mouseInfo->ax[2] = 0;
     }
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < GFCTRL_MOUSE_MAX_BUTTONS; i++) {
 	if (mouseInfo->button[i] != mouse->button[i]) {
 	    if (mouse->button[i]) {
 		mouseInfo->edgedn[i] = 1;
