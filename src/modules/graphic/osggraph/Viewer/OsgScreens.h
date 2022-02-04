@@ -26,9 +26,7 @@
 
 #include "OsgView.h"
 
-#ifdef HUDDEBUG
 class SDDebugHUD;
-#endif
 class SDReflectionMapping;
 
 class SDScreens
@@ -38,9 +36,7 @@ protected:
     std::vector<SDView *> Screens;
     osg::ref_ptr<osg::Group> root;
     osg::ref_ptr<osg::Group> prerenderRoot;
-#ifdef HUDDEBUG
     SDDebugHUD * debugHUD;
-#endif
 
     int  m_NbActiveScreens;
     int  m_NbArrangeScreens;
@@ -64,12 +60,10 @@ public:
     void toggleHUDdriverinput();
     void toggleHUDdebug();
     void toggleHUDdashitems();
-#ifdef HUDDEBUG
     void toggleHUDgraphFPS();
     void toggleHUDgraphSpeed();
     void toggleHUDgraphFFB();
     void toggleHUDgraphInputs();
-#endif
 
     inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}
 };

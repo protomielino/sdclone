@@ -29,7 +29,6 @@
 
 class SDFrameInfo;
 
-#ifdef HUDDEBUG
 class OSGPLOT
 {
 public:
@@ -90,7 +89,6 @@ public:
     void update(tSituation *s, const SDFrameInfo* frameInfo,const tCarElt *currCar);
     void clearDataPoints();
 };
-#endif
 
 class SDHUD
 {
@@ -123,10 +121,7 @@ class SDHUD
         std::map<std::string,osg::Geode* > hudWidgets;
         std::map<std::string,osg::Geometry* > hudImgElements;
         std::map<std::string,osg::MatrixTransform* > hudImgRotableElements;
-        
-#ifdef HUDDEBUG
         std::map<std::string,OSGPLOT* > hudGraphElements;
-#endif
 
     public:
         SDHUD();
@@ -140,12 +135,10 @@ class SDHUD
         void ToggleHUDdriverinput();
         void ToggleHUDdebug();
         void ToggleHUDdashitems();
-#ifdef HUDDEBUG
         void ToggleHUDgraphFPS();
         void ToggleHUDgraphSpeed();
         void ToggleHUDgraphFFB();
         void ToggleHUDgraphInputs();
-#endif
 
         osg::ref_ptr<osg::Camera> camera;
 

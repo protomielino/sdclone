@@ -80,8 +80,6 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_OSGGRAPH true CACHE BOOL "Build OpenScenGraph-based WIP osggraph graphics module")
 
-    SET(OPTION_HUDDEBUG false CACHE BOOL "Build with HUD Debug in OsgGraph")
-
     SET(OPTION_WEBSERVER true CACHE BOOL "Build with WebServer functionality")
 
     SET(OPTION_CLIENT_SERVER false CACHE BOOL "Build with Client/Server network architecture")
@@ -198,10 +196,6 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     IF(OPTION_WEBSERVER)
           ADD_DEFINITIONS(-DWEBSERVER)
     ENDIF(OPTION_WEBSERVER)
-
-    IF(OPTION_HUDDEBUG)
-    	ADD_DEFINITIONS(-DHUDDEBUG)
-    ENDIF(OPTION_HUDDEBUG)
 
     IF(OPTION_CLIENT_SERVER)
           ADD_DEFINITIONS(-DCLIENT_SERVER)

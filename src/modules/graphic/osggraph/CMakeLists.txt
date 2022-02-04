@@ -32,6 +32,7 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
                      Viewer/OsgScreens.h
                      Viewer/OsgCamera.h
                      Viewer/OsgHUD.h
+                     Viewer/OsgDebugHUD.h
                      Viewer/OsgGraphicsWindow.h
 
                      Car/OsgCar.h
@@ -42,10 +43,6 @@ SET(OSGGRAPH_HEADERS Utils/OsgVectorArrayAdapter.h
 
                      OsgGraph.h
                      OsgMain.h)
-
-IF(OPTION_HUDDEBUG)
-   SET(OSGGRAPH_HEADERS ${OSGGRAPH_HEADERS} Viewer/OsgDebugHUD.h)
-ENDIF(OPTION_HUDDEBUG)
 
 SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
                      Utils/OsgLightTransform.cpp
@@ -78,6 +75,7 @@ SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
                      Viewer/OsgScreens.cpp
                      Viewer/OsgCamera.cpp
                      Viewer/OsgHUD.cpp
+                     Viewer/OsgDebugHUD.cpp
                      Viewer/OsgGraphicsWindow.cpp
 
                      Car/OsgCar.cpp
@@ -88,10 +86,6 @@ SET(OSGGRAPH_SOURCES Utils/OsgMath.cpp
 
                      OsgGraph.cpp
                      OsgMain.cpp)
-
-IF(OPTION_HUDDEBUG)
-   SET(OSGGRAPH_SOURCES ${OSGGRAPH_SOURCES} Viewer/OsgDebugHUD.cpp)
-ENDIF(OPTION_HUDDEBUG)
 
 INCLUDE_DIRECTORIES(Utils Sky Loader Scenery Render Viewer Car .)
 

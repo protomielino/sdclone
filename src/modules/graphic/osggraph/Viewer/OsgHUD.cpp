@@ -184,7 +184,6 @@ osg::Vec4 colorStringToVec4(const std::string & colorString)
         );
 }
 
-#ifdef HUDDEBUG
 OSGPLOT::OSGPLOT(
     float positionX,
     float positionY,
@@ -489,7 +488,6 @@ void OSGPLOT::drawBackground()
       // add the geode to the graph group
       osgGroup->addChild(geode);
 }
-#endif
 
 std::string formatLaptime(tdble sec, int sgn)
 {
@@ -772,9 +770,7 @@ SDHUD::DispDebug(const tSituation *s, const SDFrameInfo* frame)
 void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
                         const tCarElt *currCar)
 {
-#ifdef HUDDEBUG
     typedef std::map<std::string,OSGPLOT* >::iterator it_type;
-#endif
     
     CarData &data = carData[currCar];
 
@@ -786,14 +782,12 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         data.laptimeFreezeTime = 0.0;
         data.timeDiffFreezeTime = 0.0; 
       
-#ifdef HUDDEBUG
         for(it_type iterator = hudGraphElements.begin(); iterator != hudGraphElements.end(); ++iterator)
     	    iterator->second->clearDataPoints();
-#endif        
+     
         lastCar = currCar;
     }
 
-#ifdef HUDDEBUG
     //update all the graphs
 
     for(it_type iterator = hudGraphElements.begin(); iterator != hudGraphElements.end(); ++iterator)
@@ -802,8 +796,6 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
            //iterator->second = value
            iterator->second->update(s,frameInfo,currCar);
     }
-
-#endif
 
 //board
     tCarElt *firstAheadCar;
@@ -1406,12 +1398,10 @@ void SDHUD::ToggleHUD()
         hudElementsVisibilityStatus["driverinput-wheel"] =  (int)hudImgRotableElements["driverinput-wheel"]->getNodeMask();
         hudElementsVisibilityStatus["debugWidget"] =        (int)hudWidgets["debugWidget"]->getNodeMask();
         hudElementsVisibilityStatus["dashitemsWidget"] =    (int)hudWidgets["dashitemsWidget"]->getNodeMask();
-#ifdef HUDDEBUG
         hudElementsVisibilityStatus["graphFPSWidget"] =     (int)hudWidgets["graphFPSWidget"]->getNodeMask();
         hudElementsVisibilityStatus["graphSpeedWidget"] =   (int)hudWidgets["graphSpeedWidget"]->getNodeMask();
         hudElementsVisibilityStatus["graphFFBWidget"] =     (int)hudWidgets["graphFFBWidget"]->getNodeMask();
         hudElementsVisibilityStatus["graphInputsWidget"] =  (int)hudWidgets["graphInputsWidget"]->getNodeMask();
-#endif
 
         hudWidgets["boardWidget"]->setNodeMask(0);
         hudWidgets["racepositionWidget"]->setNodeMask(0);
@@ -1423,12 +1413,10 @@ void SDHUD::ToggleHUD()
         hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
         hudWidgets["debugWidget"]->setNodeMask(0);
         hudWidgets["dashitemsWidget"]->setNodeMask(0);
-#ifdef HUDDEBUG
         hudWidgets["graphFPSWidget"]->setNodeMask(0);
         hudWidgets["graphSpeedWidget"]->setNodeMask(0);
         hudWidgets["graphFFBWidget"]->setNodeMask(0);
         hudWidgets["graphInputsWidget"]->setNodeMask(0);
-#endif
         hudElementsVisibilityStatusEnabled = 0;
     }else{
         hudWidgets["boardWidget"]->setNodeMask(hudElementsVisibilityStatus["boardWidget"]);
@@ -1441,12 +1429,10 @@ void SDHUD::ToggleHUD()
         hudImgRotableElements["driverinput-wheel"]->setNodeMask(hudElementsVisibilityStatus["driverinput-wheel"]);
         hudWidgets["debugWidget"]->setNodeMask(hudElementsVisibilityStatus["debugWidget"]);
         hudWidgets["dashitemsWidget"]->setNodeMask(hudElementsVisibilityStatus["dashitemsWidget"]);
-#ifdef HUDDEBUG
         hudWidgets["graphFPSWidget"]->setNodeMask(hudElementsVisibilityStatus["graphFPSWidget"]);
         hudWidgets["graphSpeedWidget"]->setNodeMask(hudElementsVisibilityStatus["graphSpeedWidget"]);
         hudWidgets["graphFFBWidget"]->setNodeMask(hudElementsVisibilityStatus["graphFFBWidget"]);
         hudWidgets["graphInputsWidget"]->setNodeMask(hudElementsVisibilityStatus["graphInputsWidget"]);
-#endif
         hudElementsVisibilityStatusEnabled = 1;
     }
 }
@@ -1587,7 +1573,6 @@ void SDHUD::ToggleHUDdashitems()
 
 }
 
-#ifdef HUDDEBUG
 void SDHUD::ToggleHUDgraphFPS()
 {
     //toggle the visibility
@@ -1659,7 +1644,6 @@ void SDHUD::ToggleHUDgraphInputs()
     GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
     GfParmWriteFile(NULL, paramHandle, "osghudconfig");
 }
-#endif
 
 osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 {
@@ -1798,12 +1782,10 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             {
                                 refObjBb = hudImgElements[positionRefObj]->getBoundingBox();
                             }
-#ifdef HUDDEBUG
                             else if ( hudGraphElements.find(positionRefObj) != hudGraphElements.end() )
                             {
                                 //refObjBb = hudGraphElements[positionRefObj]->getBoundingBox();
                             }
-#endif
                             else
                             {
                                 GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
@@ -1884,12 +1866,10 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             {
                                 refObjBb = hudImgElements[positionRefObj]->getBoundingBox();
                             }
-#ifdef HUDDEBUG
                             else if ( hudGraphElements.find(positionRefObj) != hudGraphElements.end() )
                             {
                                 //refObjBb = hudGraphElements[positionRefObj]->getBoundingBox();
                             }
-#endif
                             else
                             {
                                 GfLogDebug("OSGHUD: No (valid) reference object given for the current element alignement: Assuming Screen!\n");
@@ -1996,7 +1976,6 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                         }
                         else if( type == "graph")
                         {
-#ifdef HUDDEBUG
                             /* ============================
                                  CREATE OSG GRAPH
                                ============================*/
@@ -2080,7 +2059,6 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             //istantiate the graph
                             hudGraphElements[elementId] = new OSGPLOT(positionX, positionY, width, height, title, lines);
                             geode->addChild(hudGraphElements[elementId]->getGroup());
-#endif
                         }
                         else
                         {
@@ -2116,7 +2094,5 @@ SDHUD::~SDHUD()
     //do some cleanup
     hudTextElements.clear();
     hudImgElements.clear();
-#ifdef HUDDEBUG
     hudGraphElements.clear();
-#endif
 }

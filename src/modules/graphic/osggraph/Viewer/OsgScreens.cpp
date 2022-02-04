@@ -47,9 +47,7 @@ SDScreens::SDScreens() :
     m_SpanSplit(false),
     m_CurrentScreenIndex(0)
 {
-#ifdef HUDDEBUG
      debugHUD = new SDDebugHUD();
-#endif
 }
 
     extern SDHUD hud;
@@ -192,12 +190,10 @@ void SDScreens::update(tSituation * s, SDFrameInfo* fi)
         Screens[i]->update(s, fi);
     }
 
-#ifdef HUDDEBUG
     SDCars * cars = getCars();
     tCarElt * c = this->getActiveView()->getCurrentCar();
 
     this->debugHUD->setTexture(cars->getCar(c)->getReflectionMap()->getReflectionMap());
-#endif
 
     if (!viewer->done())
         viewer->frame();
@@ -253,7 +249,6 @@ void SDScreens::toggleHUDdashitems()
 {
     hud.ToggleHUDdashitems();
 }
-#ifdef HUDDEBUG
 void SDScreens::toggleHUDgraphFPS()
 {
     hud.ToggleHUDgraphFPS();
@@ -270,7 +265,6 @@ void SDScreens::toggleHUDgraphInputs()
 {
     hud.ToggleHUDgraphInputs();
 }
-#endif
 
 void SDScreens::registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node)
 {
@@ -289,7 +283,5 @@ SDScreens::~SDScreens()
         delete Screens[i];
     }
 
-#ifdef HUDDEBUG
     delete debugHUD;
-#endif
 }
