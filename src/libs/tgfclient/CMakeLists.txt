@@ -9,6 +9,7 @@ ADD_SDL2_INCLUDEDIR()
 ADD_SDL2_MIXER_INCLUDEDIR()
 
 ADD_JPEG_INCLUDEDIR()
+ADD_PLIB_INCLUDEDIR()
 IF(OPTION_WEBSERVER)
 	ADD_CURL_INCLUDEDIR()
 ENDIF(OPTION_WEBSERVER)
@@ -53,6 +54,8 @@ SD_ADD_LIBRARY(tgfclient SHARED ${_SOURCES} ${_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(tgfclient PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
+
+ADD_PLIB_LIBRARY(tgfclient ul sg)
 
 #ADD_SDLIB_LIBRARY(tgfclient portability tgf networking)
 ADD_SDLIB_LIBRARY(tgfclient portability tgf)
