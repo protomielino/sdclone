@@ -68,11 +68,7 @@ SD_ADD_LIBRARY(ssggraph MODULE ${SSGGRAPH_SOURCES} ${SSGGRAPH_HEADERS} ${SSGGRAP
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(ssggraph PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
-IF(OPTION_USE_MACPORTS)
-   ADD_PLIB_LIBRARY(ssggraph ul sg ssg ssgaux)
-ELSE(OPTION_USE_MACPORTS)
-   ADD_PLIB_LIBRARY(ssggraph ul sg sl ssg ssgaux)
-ENDIF(OPTION_USE_MACPORTS)
+ADD_PLIB_LIBRARY(ssggraph ul sg ssg ssgaux)
 
 ADD_SDL2_LIBRARY(ssggraph)
 
