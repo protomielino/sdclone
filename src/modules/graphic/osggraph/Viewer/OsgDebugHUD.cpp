@@ -13,7 +13,7 @@ SDDebugHUD::SDDebugHUD()
     osg::Geometry* geom;
     osg::ref_ptr<osg::Vec3Array> texcoords;
 
-      osg::ref_ptr<osg::Geode> quad = new osg::Geode;
+    osg::ref_ptr<osg::Geode> quad = new osg::Geode;
 
     float zoom = 0.5f;
 

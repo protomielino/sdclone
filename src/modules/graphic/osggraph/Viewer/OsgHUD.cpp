@@ -301,7 +301,7 @@ void OSGPLOT::clearDataPoints()
 {
     for (std::list<PlotLine>::iterator it = plotLines.begin(); it != plotLines.end(); ++it)
     {
-        if (!it->reference)
+        if (!it->reference && it->Ydata != "fps")
             it->clearDataPoints();
     }
 }
@@ -721,13 +721,11 @@ void changeImageAlpha(osg::Geometry *geom,
 
 // TODO[END]: move this to utils? /src/modules/graphic/osggraph/Utils
 
-SDHUD::SDHUD()
+SDHUD::SDHUD() :
+    _car(nullptr),
+    lastCar(nullptr),
+    hudScale(1.0f)
 {
-    //_cameraHUD = new osg::Camera;
-
-    //initialize some vars
-    lastCar = NULL;
-    hudScale = 1.0f;
 }
 
 void SDHUD::CreateHUD(int scrH, int scrW)
@@ -1640,8 +1638,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 
     std::string mainSection= "widgets";
     std::string widgetsSectionPath;
-    std::string widgetsSectionName= "widgets";
-    std::string sectionPath;
+    std::string widgetsSectionName;
     std::string subSectionPath;
     std::string subSectionName;
 
@@ -1732,11 +1729,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             }
 
                             //set alignement
-                            if (textAlign=="")
-                            {
-                                text->setAlignment(osgText::Text::LEFT_BOTTOM_BASE_LINE );
-                            }
-                            else if (textAlign=="LEFT_BOTTOM")
+                            if (textAlign.empty() || textAlign=="LEFT_BOTTOM")
                             {
                                 text->setAlignment(osgText::Text::LEFT_BOTTOM_BASE_LINE );
                             }
