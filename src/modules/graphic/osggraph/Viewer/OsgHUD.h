@@ -99,25 +99,6 @@ class SDHUD
         osg::ref_ptr<osg::Camera> _cameraHUD;
         tCarElt *_car;
 
-        bool    _debugFlag;
-        bool    _arcadeFlag;
-        bool    _boardFlag;
-        bool    _leaderFlag;
-        bool    _counterFlag;
-        bool    _GFlag;
-
-        //Dash colour handling
-        float *_normal_color;
-        float *_danger_color;
-        float *_ok_color;
-        float *_error_color;
-        float *_inactive_color_;
-        float *_emphasized_color;
-        float *_ahead_color;
-        float *_behind_color;
-        float *_arcade_color;
-        float *_background_color;
-
         //car data that need to be remembered between frames for the hud
         struct CarData {
             int carLaps;
