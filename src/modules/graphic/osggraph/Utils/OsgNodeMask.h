@@ -20,7 +20,11 @@
 #ifndef _OSGNODEMASK_H
 #define _OSGNODEMASK_H 1
 
+#if _MSC_VER && _MSC_VER < 1700
 enum NodeMask
+#else
+enum NodeMask : osg::Node::NodeMask
+#endif
 {
     NODE_MASK_NONE               = 0,
     NODE_MASK_ALL                = 0xffffffff,
