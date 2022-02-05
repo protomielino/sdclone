@@ -1997,9 +1997,10 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             // line variables
                             std::vector<OSGPLOT::PlotLineConfig> lines;
 
+                            long double numLines = lines.size();
                             //get a list of the sections in this section
                             std::string linesSectionPath = subSectionPath + "/lines/";
-                            std::string lineSectionPath = linesSectionPath + std::to_string(lines.size() + 1);
+                            std::string lineSectionPath = linesSectionPath + std::to_string(numLines + 1);
 
                             //cicle throught each element of the widget
                             while (GfParmExistsSection(paramHandle, lineSectionPath.c_str()))
@@ -2016,8 +2017,8 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                                  config.color = colorStringToVec4(GfParmGetStr(paramHandle, lineSectionPath.c_str(), "color", ""));
 
                                  lines.push_back(config);
-
-                                 lineSectionPath = linesSectionPath + std::to_string(lines.size() + 1);
+                                 numLines = lines.size();
+                                 lineSectionPath = linesSectionPath + std::to_string(numLines + 1);
                             }
 
                             GfLogDebug("OSGHUD: Generate graph object: %s \n", elementId.c_str());
