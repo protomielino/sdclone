@@ -58,7 +58,9 @@ public:
     void toggleHUDlaptime();
     void toggleHUDcarinfo();
     void toggleHUDdriverinput();
-    void toggleHUDdebug();
+    void toggleHUDtextFPS();
+    void toggleHUDtires();
+    void toggleHUDgforce();
     void toggleHUDdashitems();
     void toggleHUDgraphFPS();
     void toggleHUDgraphSpeed();

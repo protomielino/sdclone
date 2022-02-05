@@ -133,7 +133,9 @@ class SDHUD
         void ToggleHUDlaptime();
         void ToggleHUDcarinfo();
         void ToggleHUDdriverinput();
-        void ToggleHUDdebug();
+        void ToggleHUDtextFPS();
+        void ToggleHUDtires();
+        void ToggleHUDgforce();
         void ToggleHUDdashitems();
         void ToggleHUDgraphFPS();
         void ToggleHUDgraphSpeed();

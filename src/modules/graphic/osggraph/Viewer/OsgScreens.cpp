@@ -241,9 +241,17 @@ void SDScreens::toggleHUDdriverinput()
 {
     hud.ToggleHUDdriverinput();
 }
-void SDScreens::toggleHUDdebug()
+void SDScreens::toggleHUDtextFPS()
 {
-    hud.ToggleHUDdebug();
+    hud.ToggleHUDtextFPS();
+}
+void SDScreens::toggleHUDtires()
+{
+    hud.ToggleHUDtires();
+}
+void SDScreens::toggleHUDgforce()
+{
+    hud.ToggleHUDgforce();
 }
 void SDScreens::toggleHUDdashitems()
 {

@@ -1396,7 +1396,9 @@ void SDHUD::ToggleHUD()
         hudElementsVisibilityStatus["carstatusWidget"] =    (int)hudWidgets["carstatusWidget"]->getNodeMask();
         hudElementsVisibilityStatus["driverinputWidget"] =  (int)hudWidgets["driverinputWidget"]->getNodeMask();
         hudElementsVisibilityStatus["driverinput-wheel"] =  (int)hudImgRotableElements["driverinput-wheel"]->getNodeMask();
-        hudElementsVisibilityStatus["debugWidget"] =        (int)hudWidgets["debugWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["textFPSWidget"] =      (int)hudWidgets["textFPSWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["tiresWidget"] =         (int)hudWidgets["tiresWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["gforceWidget"] =       (int)hudWidgets["gforceWidget"]->getNodeMask();
         hudElementsVisibilityStatus["dashitemsWidget"] =    (int)hudWidgets["dashitemsWidget"]->getNodeMask();
         hudElementsVisibilityStatus["graphFPSWidget"] =     (int)hudWidgets["graphFPSWidget"]->getNodeMask();
         hudElementsVisibilityStatus["graphSpeedWidget"] =   (int)hudWidgets["graphSpeedWidget"]->getNodeMask();
@@ -1411,7 +1413,9 @@ void SDHUD::ToggleHUD()
         hudWidgets["carstatusWidget"]->setNodeMask(0);
         hudWidgets["driverinputWidget"]->setNodeMask(0);
         hudImgRotableElements["driverinput-wheel"]->setNodeMask(0);
-        hudWidgets["debugWidget"]->setNodeMask(0);
+        hudWidgets["textFPSWidget"]->setNodeMask(0);
+        hudWidgets["tiresWidget"]->setNodeMask(0);
+        hudWidgets["gforceWidget"]->setNodeMask(0);
         hudWidgets["dashitemsWidget"]->setNodeMask(0);
         hudWidgets["graphFPSWidget"]->setNodeMask(0);
         hudWidgets["graphSpeedWidget"]->setNodeMask(0);
@@ -1427,7 +1431,9 @@ void SDHUD::ToggleHUD()
         hudWidgets["carstatusWidget"]->setNodeMask(hudElementsVisibilityStatus["carstatusWidget"]);
         hudWidgets["driverinputWidget"]->setNodeMask(hudElementsVisibilityStatus["driverinputWidget"]);
         hudImgRotableElements["driverinput-wheel"]->setNodeMask(hudElementsVisibilityStatus["driverinput-wheel"]);
-        hudWidgets["debugWidget"]->setNodeMask(hudElementsVisibilityStatus["debugWidget"]);
+        hudWidgets["textFPSWidget"]->setNodeMask(hudElementsVisibilityStatus["textFPSWidget"]);
+        hudWidgets["tiresWidget"]->setNodeMask(hudElementsVisibilityStatus["tiresWidget"]);
+        hudWidgets["gforceWidget"]->setNodeMask(hudElementsVisibilityStatus["gforceWidget"]);
         hudWidgets["dashitemsWidget"]->setNodeMask(hudElementsVisibilityStatus["dashitemsWidget"]);
         hudWidgets["graphFPSWidget"]->setNodeMask(hudElementsVisibilityStatus["graphFPSWidget"]);
         hudWidgets["graphSpeedWidget"]->setNodeMask(hudElementsVisibilityStatus["graphSpeedWidget"]);
@@ -1533,25 +1539,60 @@ void SDHUD::ToggleHUDdriverinput()
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
     GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
     GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-
 }
-void SDHUD::ToggleHUDdebug()
+
+void SDHUD::ToggleHUDtextFPS()
 {
     //toggle the visibility
-    hudWidgets["debugWidget"]->setNodeMask(1 - hudWidgets["debugWidget"]->getNodeMask());
+    hudWidgets["textFPSWidget"]->setNodeMask(1 - hudWidgets["textFPSWidget"]->getNodeMask());
     
     //save the current status in the config file
     std::string configFileUrl= GetLocalDir();
     configFileUrl.append("config/osghudconfig.xml");
-    std::string path= "widgets/debugWidget";
+    std::string path= "widgets/textFPSWidget";
     std::string attribute= "enabled";
-    int value = hudWidgets["debugWidget"]->getNodeMask();
+    int value = hudWidgets["textFPSWidget"]->getNodeMask();
     
     //read the config file, update the value and write it back
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
     GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
     GfParmWriteFile(NULL, paramHandle, "osghudconfig");
+}
 
+void SDHUD::ToggleHUDtires()
+{
+    //toggle the visibility
+    hudWidgets["tiresWidget"]->setNodeMask(1 - hudWidgets["tiresWidget"]->getNodeMask());
+
+    //save the current status in the config file
+    std::string configFileUrl = GetLocalDir();
+    configFileUrl.append("config/osghudconfig.xml");
+    std::string path = "widgets/tiresWidget";
+    std::string attribute = "enabled";
+    int value = hudWidgets["tiresWidget"]->getNodeMask();
+
+    //read the config file, update the value and write it back
+    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
+    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
+    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
+}
+
+void SDHUD::ToggleHUDgforce()
+{
+    //toggle the visibility
+    hudWidgets["gforceWidget"]->setNodeMask(1 - hudWidgets["gforceWidget"]->getNodeMask());
+
+    //save the current status in the config file
+    std::string configFileUrl = GetLocalDir();
+    configFileUrl.append("config/osghudconfig.xml");
+    std::string path = "widgets/gforceWidget";
+    std::string attribute = "enabled";
+    int value = hudWidgets["gforceWidget"]->getNodeMask();
+
+    //read the config file, update the value and write it back
+    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
+    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
+    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
 }
 
 void SDHUD::ToggleHUDdashitems()
