@@ -1472,20 +1472,8 @@ void SDHUD::ToggleHUDwidgets(const std::string &widgets)
 
 void SDHUD::ToggleHUDdriverinput()
 {
-    hudWidgets["driverinputWidget"]->setNodeMask(1 - hudWidgets["driverinputWidget"]->getNodeMask());
+    ToggleHUDwidget("driverinputWidget");
     hudImgRotableElements["driverinput-wheel"]->setNodeMask(hudWidgets["driverinputWidget"]->getNodeMask());
-
-    //save the current status in the config file
-    std::string configFileUrl= GetLocalDir();
-    configFileUrl.append("config/osghudconfig.xml");
-    std::string path= "widgets/driverinputWidget";
-    std::string attribute= "enabled";
-    int value = hudWidgets["driverinputWidget"]->getNodeMask();
-    
-    //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
-    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
 }
 
 osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
