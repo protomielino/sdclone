@@ -748,6 +748,14 @@ int WebServer::readUserConfig (int userId)
     //get webServer user password for current user
     this->password = GfParmGetStr(prHandle, xmlPath, "WebServerPassword","val");
 
+    //get webServer enabled/disabled status
+    this->isWebServerEnabled = GfParmGetStr(prHandle, xmlPath, "WebServerEnabled","val");
+    if (!this->isWebServerEnabled){
+        GfLogInfo("WebServer - Webserver is disabled as per user setting");
+    }
+
+
+
     return 0;
 }
 
@@ -771,7 +779,6 @@ int WebServer::sendLogin (int userId)
         return 1;
     }
     
-    this->isWebServerEnabled = true;
     this->sendLogin(this->username, this->password);
 
     return 0;

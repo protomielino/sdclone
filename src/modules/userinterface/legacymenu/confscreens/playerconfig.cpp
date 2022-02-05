@@ -77,6 +77,7 @@ static int AutoReverseLabelId;
 #ifdef WEBSERVER
 static int WebUsernameEditId;
 static int WebPasswordEditId;
+static int WebServerCheckboxId;
 #endif //WEBSERVER
 
 /* Struct to define a generic ("internal name / id", "displayable name") pair */
@@ -99,7 +100,8 @@ public:
                 #ifdef WEBSERVER
                 ,
                 const char *webserverusername = 0,
-                const char *webserverpassword = 0
+                const char *webserverpassword = 0,
+                int webserverenabled = 0
                 #endif //WEBSERVER
                 )
     {
@@ -119,6 +121,7 @@ public:
         setWebserverusername(webserverusername);
         _webserverpassword = 0;
         setWebserverpassword(webserverpassword);
+        _webserverenabled = webserverenabled;
         #endif //WEBSERVER
         _color[0] = color ? color[0] : 1.0;
         _color[1] = color ? color[1] : 1.0;
@@ -144,6 +147,7 @@ public:
         setWebserverusername(src._webserverusername);
         _webserverpassword = 0;
         setWebserverpassword(src._webserverpassword);
+        _webserverenabled = src._webserverenabled;
         #endif //WEBSERVER
         _color[0] = src._color[0];
         _color[1] = src._color[1];
@@ -163,6 +167,7 @@ public:
     #ifdef WEBSERVER
     const char *webserverusername()  const { return _webserverusername; }
     const char *webserverpassword()  const { return _webserverpassword; }
+    int webserverenabled() const { return _webserverenabled; }
     #endif //WEBSERVER
 
     void setName(const char *name)
@@ -212,6 +217,7 @@ public:
         _webserverpassword = new char[strlen(webserverpassword)+1];
         strcpy(_webserverpassword, webserverpassword); // Can't use strdup : free crashes in destructor !?
     }
+    void setWebserverEnabled(int webserverenabled) { _webserverenabled = webserverenabled; }
     #endif //WEBSERVER
 
     void setRaceNumber(int raceNumber) { _racenumber = raceNumber; }
@@ -269,6 +275,7 @@ private:
     #ifdef WEBSERVER
     char*			_webserverusername;
     char*			_webserverpassword;
+    int 			_webserverenabled;
     #endif //WEBSERVER
 };
 
@@ -320,6 +327,9 @@ refreshEditVal(void)
 
         GfuiEditboxSetString(ScrHandle, WebPasswordEditId, "");
         GfuiEnable(ScrHandle, WebPasswordEditId, GFUI_DISABLE);
+        
+        GfuiCheckboxSetChecked(ScrHandle, WebServerCheckboxId, 0);
+        GfuiEnable(ScrHandle, WebPasswordEditId, GFUI_DISABLE);
         #endif //WEBSERVER
 
     } else {
@@ -356,6 +366,9 @@ refreshEditVal(void)
         snprintf(buf, sizeof(buf), "%s", (*CurrPlayer)->webserverpassword());
         GfuiEditboxSetString(ScrHandle, WebPasswordEditId, buf);
         GfuiEnable(ScrHandle, WebPasswordEditId, GFUI_ENABLE);
+        
+        GfuiCheckboxSetChecked(ScrHandle, WebServerCheckboxId, (*CurrPlayer)->webserverenabled());
+        GfuiEnable(ScrHandle, WebServerCheckboxId, GFUI_DISABLE);
         #endif //WEBSERVER
 
 
@@ -461,6 +474,7 @@ PutPlayerSettings(unsigned index)
     #ifdef WEBSERVER
     GfParmSetStr(PrefHdle, drvSectionPath, "WebServerUsername", player->webserverusername());
     GfParmSetStr(PrefHdle, drvSectionPath, "WebServerPassword", player->webserverpassword());
+    GfParmSetNum(PrefHdle, drvSectionPath, "WebServerEnabled", (char*)NULL, player->webserverenabled());
     #endif //WEBSERVER
 
 
@@ -654,6 +668,7 @@ GenPlayerList(void)
     const char *str;
     int racenumber;
     float color[4];
+    int webserverenabledval;
 
     /* Reset players list */
     tPlayerInfoList::iterator playerIter;
@@ -734,6 +749,10 @@ GenPlayerList(void)
 
         str = GfParmGetStr(PrefHdle, sstring, "WebServerPassword", 0);
         PlayersInfo[i]->setWebserverpassword(str);
+        
+        webserverenabledval = GfParmGetNum(PrefHdle, sstring, "WebServerEnabled", (char*)NULL, (int)0);
+        PlayersInfo[i]->setWebserverEnabled(webserverenabledval);
+
         #endif //WEBSERVER
 
 
@@ -866,6 +885,21 @@ onChangeWebserverpassword(void * /* dummy */)
         (*CurrPlayer)->setWebserverpassword(strIn.c_str());
     }
 
+    UpdtScrollList();
+}
+
+static void
+onChangeWebserverenabled(tCheckBoxInfo* pInfo)
+{
+    int isChecked;
+
+    if (CurrPlayer != PlayersInfo.end()) {
+        isChecked = GfuiCheckboxIsChecked(ScrHandle, WebServerCheckboxId);
+        (*CurrPlayer)->setWebserverEnabled(isChecked);
+        //GfLogInfo("WebServer features: %i\n", isChecked);
+        //GfLogInfo("WebServer features: %i\n", (*CurrPlayer)->webserverenabled());
+
+    }
     UpdtScrollList();
 }
 
@@ -1094,6 +1128,11 @@ PlayerConfigMenuInit(void *prevMenu)
 
     /* Web test button */
     GfuiMenuCreateButtonControl(ScrHandle, param, "weblogintest", NULL, onWebserverLoginTest);
+    
+   	WebServerCheckboxId =
+	GfuiMenuCreateCheckboxControl(ScrHandle, param, "webservercheckbox", NULL, onChangeWebserverenabled);
+    
+    
     #endif //WEBSERVER
 
 
