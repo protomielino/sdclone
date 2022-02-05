@@ -566,6 +566,27 @@ onCopyPlayer(void * /* dummy */)
 
         // Get new (copy) player index (= identification number in params).
         newPlayerIdx = (unsigned)(CurrPlayer - PlayersInfo.begin()) + 1;
+        
+        //ovverryde the copied WebServer data (username password and enabled status) with the default settings
+        
+        #ifdef WEBSERVER
+        const char *str;
+        char sstring[128];
+        int webserverenabledval;
+        /* Load players settings from human/preferences.xml file*/
+        PrefHdle = GfParmReadFileLocal(HM_PREF_FILE, GFPARM_RMODE_REREAD);
+        if (!PrefHdle) {
+            return;
+        }
+        str = GfParmGetStr(PrefHdle, sstring, "WebServerUsername", 0);
+        (*CurrPlayer)->setWebserverusername(str);
+
+        str = GfParmGetStr(PrefHdle, sstring, "WebServerPassword", 0);
+        (*CurrPlayer)->setWebserverpassword(str);
+        
+        webserverenabledval = GfParmGetNum(PrefHdle, sstring, "WebServerEnabled", (char*)NULL, (int)0);
+        (*CurrPlayer)->setWebserverEnabled(webserverenabledval);
+        #endif //WEBSERVER
 
         // Update preferences and drivers params (rename those after, add new).
         snprintf(sectionPath, sizeof(sectionPath), "%s/%s", HM_SECT_PREF, HM_LIST_DRV);
