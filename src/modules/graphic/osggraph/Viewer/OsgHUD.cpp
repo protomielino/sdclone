@@ -1827,8 +1827,12 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 
                             // line variables
                             std::vector<OSGPLOT::PlotLineConfig> lines;
+#if _MSC_VER &&_MSC_VER < 1700
+                            long long lineNum = 1;
+#else
+                            int lineNum = 1;
+#endif
 
-                            int numLines = 1;
                             //get a list of the sections in this section
                             std::string linesSectionPath = subSectionPath + "/lines/";
                             std::string lineSectionPath = linesSectionPath + "1";
@@ -1848,7 +1852,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                                  config.color = colorStringToVec4(GfParmGetStr(paramHandle, lineSectionPath.c_str(), "color", ""));
 
                                  lines.push_back(config);
-                                 lineSectionPath = linesSectionPath + std::to_string(++numLines);
+                                 lineSectionPath = linesSectionPath + std::to_string(++lineNum);
                             }
 
                             GfLogDebug("OSGHUD: Generate graph object: %s \n", elementId.c_str());
