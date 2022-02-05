@@ -123,24 +123,15 @@ class SDHUD
         std::map<std::string,osg::MatrixTransform* > hudImgRotableElements;
         std::map<std::string,OSGPLOT* > hudGraphElements;
 
-    public:
+public:
         SDHUD();
         ~SDHUD();
         
         void ToggleHUD();
-        void ToggleHUDboard();
-        void ToggleHUDraceinfo();
-        void ToggleHUDlaptime();
-        void ToggleHUDcarinfo();
+        void ToggleHUDwidget(const std::string &widget);
+        void ToggleHUDwidgets(const std::string &widgets);
+
         void ToggleHUDdriverinput();
-        void ToggleHUDtextFPS();
-        void ToggleHUDtires();
-        void ToggleHUDgforce();
-        void ToggleHUDdashitems();
-        void ToggleHUDgraphFPS();
-        void ToggleHUDgraphSpeed();
-        void ToggleHUDgraphFFB();
-        void ToggleHUDgraphInputs();
 
         osg::ref_ptr<osg::Camera> camera;
 

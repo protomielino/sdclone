@@ -53,19 +53,10 @@ public:
     void changeCamera(long p);
     void registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node);
     void toggleHUD();
-    void toggleHUDboard();
-    void toggleHUDraceinfo();
-    void toggleHUDlaptime();
-    void toggleHUDcarinfo();
+    void toggleHUDwidget(const std::string &widget);
+    void toggleHUDwidgets(const std::string &widgets);
+
     void toggleHUDdriverinput();
-    void toggleHUDtextFPS();
-    void toggleHUDtires();
-    void toggleHUDgforce();
-    void toggleHUDdashitems();
-    void toggleHUDgraphFPS();
-    void toggleHUDgraphSpeed();
-    void toggleHUDgraphFFB();
-    void toggleHUDgraphInputs();
 
     inline SDView * getActiveView(){return Screens[m_CurrentScreenIndex];}
 };

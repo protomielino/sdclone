@@ -221,57 +221,20 @@ void SDScreens::toggleHUD()
 {
     hud.ToggleHUD();
 }
-void SDScreens::toggleHUDboard()
+
+void SDScreens::toggleHUDwidget(const std::string &widget)
 {
-    hud.ToggleHUDboard();
+    hud.ToggleHUDwidget(widget);
 }
-void SDScreens::toggleHUDraceinfo()
+
+void SDScreens::toggleHUDwidgets(const std::string & widgets)
 {
-    hud.ToggleHUDraceinfo();
+    hud.ToggleHUDwidgets(widgets);
 }
-void SDScreens::toggleHUDlaptime()
-{
-    hud.ToggleHUDlaptime();
-}
-void SDScreens::toggleHUDcarinfo()
-{
-    hud.ToggleHUDcarinfo();
-}
+
 void SDScreens::toggleHUDdriverinput()
 {
     hud.ToggleHUDdriverinput();
-}
-void SDScreens::toggleHUDtextFPS()
-{
-    hud.ToggleHUDtextFPS();
-}
-void SDScreens::toggleHUDtires()
-{
-    hud.ToggleHUDtires();
-}
-void SDScreens::toggleHUDgforce()
-{
-    hud.ToggleHUDgforce();
-}
-void SDScreens::toggleHUDdashitems()
-{
-    hud.ToggleHUDdashitems();
-}
-void SDScreens::toggleHUDgraphFPS()
-{
-    hud.ToggleHUDgraphFPS();
-}
-void SDScreens::toggleHUDgraphSpeed()
-{
-    hud.ToggleHUDgraphSpeed();
-}
-void SDScreens::toggleHUDgraphFFB()
-{
-    hud.ToggleHUDgraphFFB();
-}
-void SDScreens::toggleHUDgraphInputs()
-{
-    hud.ToggleHUDgraphInputs();
 }
 
 void SDScreens::registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node)

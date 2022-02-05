@@ -1442,87 +1442,34 @@ void SDHUD::ToggleHUD()
         hudElementsVisibilityStatusEnabled = 1;
     }
 }
-void SDHUD::ToggleHUDboard()
+
+void SDHUD::ToggleHUDwidget(const std::string &widget)
 {
-    hudWidgets["boardWidget"]->setNodeMask(1 - hudWidgets["boardWidget"]->getNodeMask());
-    
-    //save the current status in the config file
-    std::string configFileUrl= GetLocalDir();
-    configFileUrl.append("config/osghudconfig.xml");
-    std::string path= "widgets/boardWidget";
-    std::string attribute= "enabled";
-    int value = hudWidgets["boardWidget"]->getNodeMask();
-    
-    //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
-    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-}
-void SDHUD::ToggleHUDraceinfo()
-{
-    hudWidgets["racepositionWidget"]->setNodeMask(1 - hudWidgets["racepositionWidget"]->getNodeMask());
-    hudWidgets["racelapsWidget"]->setNodeMask(1 - hudWidgets["racelapsWidget"]->getNodeMask());
+    hudWidgets[widget]->setNodeMask(1 - hudWidgets[widget]->getNodeMask());
 
     //save the current status in the config file
-    std::string configFileUrl= GetLocalDir();
+    std::string configFileUrl = GetLocalDir();
     configFileUrl.append("config/osghudconfig.xml");
-    std::string path= "widgets/racepositionWidget";
-    std::string attribute= "enabled";
-    int value = hudWidgets["racepositionWidget"]->getNodeMask();
-    
-    //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
-    
-    //save the current status in the config file
-    path.assign("widgets/racelapsWidget");
-    value = hudWidgets["racelapsWidget"]->getNodeMask();
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
- 
-    //write
-    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
+    std::string path = "widgets/" + widget;
+    std::string attribute = "enabled";
+    int value = hudWidgets[widget]->getNodeMask();
 
-}
-void SDHUD::ToggleHUDlaptime()
-{
-    hudWidgets["laptimeWidget"]->setNodeMask(1 - hudWidgets["laptimeWidget"]->getNodeMask());
-    
-    //save the current status in the config file
-    std::string configFileUrl= GetLocalDir();
-    configFileUrl.append("config/osghudconfig.xml");
-    std::string path= "widgets/laptimeWidget";
-    std::string attribute= "enabled";
-    int value = hudWidgets["laptimeWidget"]->getNodeMask();
-    
     //read the config file, update the value and write it back
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
     GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
     GfParmWriteFile(NULL, paramHandle, "osghudconfig");
 }
-void SDHUD::ToggleHUDcarinfo()
-{
-    hudWidgets["carinfoWidget"]->setNodeMask(1 - hudWidgets["carinfoWidget"]->getNodeMask());
-    hudWidgets["carstatusWidget"]->setNodeMask(1 - hudWidgets["carstatusWidget"]->getNodeMask());
-    
-    //save the current status in the config file
-    std::string configFileUrl= GetLocalDir();
-    configFileUrl.append("config/osghudconfig.xml");
-    std::string path= "widgets/carinfoWidget";
-    std::string attribute= "enabled";
-    int value = hudWidgets["carinfoWidget"]->getNodeMask();
-    
-    //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
-    
-    path.assign("widgets/carstatusWidget");
-    value = hudWidgets["carstatusWidget"]->getNodeMask();
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
 
-    //write the file
-    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-    
+void SDHUD::ToggleHUDwidgets(const std::string &widgets)
+{
+    std::vector<std::string> split_widgets;
+
+    split(widgets, ',', split_widgets);
+
+    for (size_t i = 0; i < split_widgets.size(); ++i)
+        ToggleHUDwidget(split_widgets[i]);
 }
+
 void SDHUD::ToggleHUDdriverinput()
 {
     hudWidgets["driverinputWidget"]->setNodeMask(1 - hudWidgets["driverinputWidget"]->getNodeMask());
@@ -1535,151 +1482,6 @@ void SDHUD::ToggleHUDdriverinput()
     std::string attribute= "enabled";
     int value = hudWidgets["driverinputWidget"]->getNodeMask();
     
-    //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
-    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-}
-
-void SDHUD::ToggleHUDtextFPS()
-{
-    //toggle the visibility
-    hudWidgets["textFPSWidget"]->setNodeMask(1 - hudWidgets["textFPSWidget"]->getNodeMask());
-    
-    //save the current status in the config file
-    std::string configFileUrl= GetLocalDir();
-    configFileUrl.append("config/osghudconfig.xml");
-    std::string path= "widgets/textFPSWidget";
-    std::string attribute= "enabled";
-    int value = hudWidgets["textFPSWidget"]->getNodeMask();
-    
-    //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
-    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-}
-
-void SDHUD::ToggleHUDtires()
-{
-    //toggle the visibility
-    hudWidgets["tiresWidget"]->setNodeMask(1 - hudWidgets["tiresWidget"]->getNodeMask());
-
-    //save the current status in the config file
-    std::string configFileUrl = GetLocalDir();
-    configFileUrl.append("config/osghudconfig.xml");
-    std::string path = "widgets/tiresWidget";
-    std::string attribute = "enabled";
-    int value = hudWidgets["tiresWidget"]->getNodeMask();
-
-    //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
-    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-}
-
-void SDHUD::ToggleHUDgforce()
-{
-    //toggle the visibility
-    hudWidgets["gforceWidget"]->setNodeMask(1 - hudWidgets["gforceWidget"]->getNodeMask());
-
-    //save the current status in the config file
-    std::string configFileUrl = GetLocalDir();
-    configFileUrl.append("config/osghudconfig.xml");
-    std::string path = "widgets/gforceWidget";
-    std::string attribute = "enabled";
-    int value = hudWidgets["gforceWidget"]->getNodeMask();
-
-    //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
-    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-}
-
-void SDHUD::ToggleHUDdashitems()
-{
-    //toggle the visibility
-    hudWidgets["dashitemsWidget"]->setNodeMask(1 - hudWidgets["dashitemsWidget"]->getNodeMask());
-    
-    //save the current status in the config file
-    std::string configFileUrl= GetLocalDir();
-    configFileUrl.append("config/osghudconfig.xml");
-    std::string path= "widgets/dashitemsWidget";
-    std::string attribute= "enabled";
-    int value = hudWidgets["dashitemsWidget"]->getNodeMask();
-    
-    //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
-    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-
-}
-
-void SDHUD::ToggleHUDgraphFPS()
-{
-    //toggle the visibility
-    hudWidgets["graphFPSWidget"]->setNodeMask(1 - hudWidgets["graphFPSWidget"]->getNodeMask());
-
-    //save the current status in the config file
-    std::string configFileUrl = GetLocalDir();
-    configFileUrl.append("config/osghudconfig.xml");
-    std::string path = "widgets/graphFPSWidget";
-    std::string attribute = "enabled";
-    int value = hudWidgets["graphFPSWidget"]->getNodeMask();
-
-    //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
-    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-}
-
-void SDHUD::ToggleHUDgraphSpeed()
-{
-    //toggle the visibility
-    hudWidgets["graphSpeedWidget"]->setNodeMask(1 - hudWidgets["graphSpeedWidget"]->getNodeMask());
-
-    //save the current status in the config file
-    std::string configFileUrl = GetLocalDir();
-    configFileUrl.append("config/osghudconfig.xml");
-    std::string path = "widgets/graphSpeedWidget";
-    std::string attribute = "enabled";
-    int value = hudWidgets["graphSpeedWidget"]->getNodeMask();
-
-    //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
-    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-}
-
-void SDHUD::ToggleHUDgraphFFB()
-{
-    //toggle the visibility
-    hudWidgets["graphFFBWidget"]->setNodeMask(1 - hudWidgets["graphFFBWidget"]->getNodeMask());
-
-    //save the current status in the config file
-    std::string configFileUrl = GetLocalDir();
-    configFileUrl.append("config/osghudconfig.xml");
-    std::string path = "widgets/graphFFBWidget";
-    std::string attribute = "enabled";
-    int value = hudWidgets["graphFFBWidget"]->getNodeMask();
-
-    //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
-    GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
-    GfParmWriteFile(NULL, paramHandle, "osghudconfig");
-}
-
-void SDHUD::ToggleHUDgraphInputs()
-{
-    //toggle the visibility
-    hudWidgets["graphInputsWidget"]->setNodeMask(1 - hudWidgets["graphInputsWidget"]->getNodeMask());
-
-    //save the current status in the config file
-    std::string configFileUrl = GetLocalDir();
-    configFileUrl.append("config/osghudconfig.xml");
-    std::string path = "widgets/graphInputsWidget";
-    std::string attribute = "enabled";
-    int value = hudWidgets["graphInputsWidget"]->getNodeMask();
-
     //read the config file, update the value and write it back
     void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
     GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
@@ -2038,10 +1840,10 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             // line variables
                             std::vector<OSGPLOT::PlotLineConfig> lines;
 
-                            int numLines = 0;
+                            int numLines = 1;
                             //get a list of the sections in this section
                             std::string linesSectionPath = subSectionPath + "/lines/";
-                            std::string lineSectionPath = linesSectionPath + std::to_string(numLines + 1);
+                            std::string lineSectionPath = linesSectionPath + "1";
 
                             //cicle throught each element of the widget
                             while (GfParmExistsSection(paramHandle, lineSectionPath.c_str()))
@@ -2058,8 +1860,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                                  config.color = colorStringToVec4(GfParmGetStr(paramHandle, lineSectionPath.c_str(), "color", ""));
 
                                  lines.push_back(config);
-                                 numLines++;
-                                 lineSectionPath = linesSectionPath + std::to_string(numLines + 1);
+                                 lineSectionPath = linesSectionPath + std::to_string(++numLines);
                             }
 
                             GfLogDebug("OSGHUD: Generate graph object: %s \n", elementId.c_str());
