@@ -431,6 +431,8 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         strPath = tmpPath + param;
 
         osg::ref_ptr<osg::Node> steerEntityLo = loader.Load3dFile(strPath, true, "", "");
+        if (steerEntityLo == nullptr)
+            GfLogError("Failed to load: %s\n", strPath.c_str());
         osg::ref_ptr<osg::MatrixTransform> steer_transform = new osg::MatrixTransform;
 
         if(steerEntityLo)
@@ -586,7 +588,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     if(_driver)
         gCar->addChild(DriverSelector.get());
 
-    if(_steer)
+    if(_steer && SteerSelector)
         gCar->addChild(SteerSelector.get());
 
 
@@ -858,7 +860,7 @@ void SDCar::updateCar(tSituation *s, tCarElt *CurCar, int current, int driver)
         }
     }
 
-    if(_steer)
+    if(_steer && SteerSelector)
     {
         if (driver || car != CurCar)
         {
