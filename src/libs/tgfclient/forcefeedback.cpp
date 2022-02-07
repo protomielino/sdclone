@@ -71,7 +71,7 @@ void ForceFeedbackManager::readConfiguration(const std::string &carName){
     this->carName = carName;
 
     std::string configFileUrl = GfLocalDir();
-    configFileUrl.append("drivers/human/preferences.xml");
+    configFileUrl.append(HM_PREF_FILE);
 
     std::string effectsSectionPathDefault = "forceFeedback/default/effectsConfig";
 
@@ -143,7 +143,7 @@ void ForceFeedbackManager::saveConfiguration(){
     effectsSectionPathSpecific.append(carName);
 
     //open the file
-    void *paramHandle = GfParmReadFileLocal("/drivers/human/preferences.xml", GFPARM_RMODE_STD);
+    void *paramHandle = GfParmReadFileLocal(HM_PREF_FILE, GFPARM_RMODE_STD);
 
     //delette the current car specific section if it exist
     if(GfParmExistsSection(paramHandle, effectsSectionPathSpecific.c_str())){
