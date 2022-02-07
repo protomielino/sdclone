@@ -34,6 +34,7 @@
 #include <network.h>
 #endif
 #include <humandriver.h>
+#include <playerpref.h>
 
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
 static void drive_mt(int index, tCarElt* car, tSituation *s);
@@ -451,7 +452,7 @@ int NetworkHuman::get_human_index()
     {
         const char *driver_name = NetGetNetwork()->GetDriverName();
 
-        void *driver_info = GfParmReadFileLocal("drivers/human/human.xml", GFPARM_RMODE_REREAD);
+        void *driver_info = GfParmReadFileLocal(HM_DRV_FILE, GFPARM_RMODE_REREAD);
 
         if (driver_info)
         {

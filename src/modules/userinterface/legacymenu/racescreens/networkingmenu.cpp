@@ -1087,7 +1087,7 @@ ServerPrepareStartNetworkRace(void * /* dummy */)
 static int
 GetHumanDriver(NetDriver &driver,int index)
 {
-	void *params = GfParmReadFileLocal("drivers/human/human.xml", GFPARM_RMODE_STD);
+	void *params = GfParmReadFileLocal(HM_DRV_FILE, GFPARM_RMODE_STD);
 	assert(params);
 	char path2[256];
 	sprintf(path2, "Robots/index/%d",index);
