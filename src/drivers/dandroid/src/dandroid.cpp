@@ -102,7 +102,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn * welcomeIn,
 	setRobotName(welcomeIn->name);
 
 	// Filehandle for robot's xml-file
-	void* pRobotSettings = GfParmReadFile(pathBuffer.c_str(), GFPARM_RMODE_STD);
+	void* pRobotSettings = GfParmReadFile(pathBuffer, GFPARM_RMODE_STD);
 
 	PLogDANDROID = GfLogger::instance("DANDROID");
 
@@ -209,7 +209,7 @@ extern "C" int dandroid(tModInfo * modInfo)
 	nameBuffer = "dandroid";
 
 	// Filehandle for robot's xml-file
-	void* pRobotSettings = GfParmReadFile(pathBuffer.c_str(), GFPARM_RMODE_STD);
+	void* pRobotSettings = GfParmReadFile(pathBuffer, GFPARM_RMODE_STD);
 
 	if (pRobotSettings)
 	{  // Let's look what we have to provide here

@@ -102,9 +102,9 @@ LoadMenuScreen()
 								  NULL, (tfuiCallback)NULL,
 								  1);
 
-	void *param = GfParmReadFile(g_strFile.c_str(), GFPARM_RMODE_REREAD);
+	void *param = GfParmReadFile(g_strFile, GFPARM_RMODE_REREAD);
 	if (!param)
-		param = GfParmReadFileLocal(g_strFile.c_str(), GFPARM_RMODE_REREAD);
+		param = GfParmReadFileLocal(g_strFile, GFPARM_RMODE_REREAD);
 
     GfuiMenuCreateStaticControls(menuHandle, param);
 

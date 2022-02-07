@@ -163,7 +163,7 @@ void GfLogger::setup()
 	// 1) Open and load the logger settings file.
 	std::ostringstream ossParm;
 	ossParm << GfLocalDir() << LOGGING_CFG;
-	void* hparmlogSettings = GfParmReadFile(ossParm.str().c_str(), GFPARM_RMODE_STD);
+	void* hparmlogSettings = GfParmReadFile(ossParm.str(), GFPARM_RMODE_STD);
 	if(!hparmlogSettings)
 	{
 		GfLogDefault.warning("Failed to open or parse logger settings file %s\n",

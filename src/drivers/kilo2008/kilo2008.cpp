@@ -114,7 +114,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
   setRobotName(welcomeIn->name);
 
   // Filehandle for robot's xml-file
-  void *pRobotSettings = GfParmReadFile(pathBuffer.c_str(), GFPARM_RMODE_STD);
+  void *pRobotSettings = GfParmReadFile(pathBuffer, GFPARM_RMODE_STD);
 
   if (pRobotSettings) {  // robot settings XML could be read
     NBBOTS = 0;
@@ -207,7 +207,7 @@ extern "C" int kilo2008(tModInfo *modInfo) {
   nameBuffer = "kilo2008";
 
   // Filehandle for robot's xml-file
-  void *pRobotSettings = GfParmReadFile(pathBuffer.c_str(), GFPARM_RMODE_STD);
+  void *pRobotSettings = GfParmReadFile(pathBuffer, GFPARM_RMODE_STD);
 
   if (pRobotSettings) {  // Let's look what we have to provide here
     ssBuf.str(string());

@@ -94,7 +94,7 @@ void ForceFeedbackManager::readConfiguration(const std::string &carName){
 
     //merge the current configuration with the read car specific configuration
     //if there is one
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
+    void *paramHandle = GfParmReadFile(configFileUrl, GFPARM_RMODE_STD);
     if(GfParmExistsSection(paramHandle, effectsSectionPathSpecific.c_str())){
         this->readConfigurationFromFileSection(configFileUrl, effectsSectionPathSpecific);
     }
@@ -111,7 +111,7 @@ void ForceFeedbackManager::readConfigurationFromFileSection(const std::string &c
     int paramValue = 0;
 
     //open the file
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
+    void *paramHandle = GfParmReadFile(configFileUrl, GFPARM_RMODE_STD);
 
     //for each section on the effectConfig section
     if (GfParmListSeekFirst(paramHandle, effectsSectionPath.c_str()) == 0) {

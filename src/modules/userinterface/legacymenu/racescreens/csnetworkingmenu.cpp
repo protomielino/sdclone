@@ -246,7 +246,7 @@ UpdateNetworkPlayers()
 	pNetwork->SetCurrentDriver();
 
 	//reload xml file
-	reInfo->params = GfParmReadFileLocal(g_strTempConfig.c_str(),GFPARM_RMODE_REREAD);
+	reInfo->params = GfParmReadFileLocal(g_strTempConfig,GFPARM_RMODE_REREAD);
 	assert(reInfo->params);
 
 	// Scan each of the human drivers to see if they're active in this race
@@ -745,7 +745,7 @@ static void rmConvertDriversForNetwork()
 
 	tRmInfo* reInfo = LmRaceEngine().inData();
 	// ensure the system knows about 'new' network drivers
-	reInfo->params = GfParmReadFileLocal(g_strTempConfig.c_str(),GFPARM_RMODE_REREAD);
+	reInfo->params = GfParmReadFileLocal(g_strTempConfig,GFPARM_RMODE_REREAD);
 	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 	
 }
@@ -851,7 +851,7 @@ rmCarSettingsMenu(void *pMenu)
 		assert(g_strTempConfig != "");
 
 		tRmInfo* reInfo = LmRaceEngine().inData();
-		reInfo->params = GfParmReadFileLocal(g_strTempConfig.c_str(),GFPARM_RMODE_REREAD);
+		reInfo->params = GfParmReadFileLocal(g_strTempConfig,GFPARM_RMODE_REREAD);
 		reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 
 		sprintf(dname, "%s/%d", RM_SECT_DRIVERS, nDriverIdx);

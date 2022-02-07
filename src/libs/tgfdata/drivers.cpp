@@ -122,11 +122,11 @@ void GfDrivers::reload()
         ossRobotFileName << "drivers/" << strModName
                          << '/' << strModName << PARAMEXT;
         void *hparmRobot =
-            GfParmReadFileLocal(ossRobotFileName.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+            GfParmReadFileLocal(ossRobotFileName.str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
         if (!hparmRobot)
         {
             hparmRobot =
-                GfParmReadFile(ossRobotFileName.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+                GfParmReadFile(ossRobotFileName.str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
         }
         if (!hparmRobot)
         {

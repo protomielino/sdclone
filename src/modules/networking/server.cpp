@@ -233,20 +233,20 @@ void NetServer::SetHostSettings(const char *pszCarCat, bool bCollisions)
 {
     assert(m_strRaceXMLFile!="");
 
-    void *params = GfParmReadFileLocal(m_strRaceXMLFile.c_str(),GFPARM_RMODE_STD);
+    void *params = GfParmReadFileLocal(m_strRaceXMLFile,GFPARM_RMODE_STD);
     assert(params);
     const char *pName =GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 
 
     GfParmSetStr(params, RM_SECT_HEADER,RM_ATTR_CAR_CATEGORY, pszCarCat);
-    GfParmWriteFileLocal(m_strRaceXMLFile.c_str(), params, pName);
+    GfParmWriteFileLocal(m_strRaceXMLFile, params, pName);
 }
 
 void NetServer::GenerateDriversForXML()
 {
     assert(m_strRaceXMLFile!="");
 
-    void *params = GfParmReadFileLocal(m_strRaceXMLFile.c_str(),GFPARM_RMODE_STD);
+    void *params = GfParmReadFileLocal(m_strRaceXMLFile,GFPARM_RMODE_STD);
     assert(params);
 
     const char *pName =GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
@@ -290,7 +290,7 @@ void NetServer::GenerateDriversForXML()
     UnlockServerData();
 
     //Save our changes
-    GfParmWriteFileLocal(m_strRaceXMLFile.c_str(), params, pName);
+    GfParmWriteFileLocal(m_strRaceXMLFile, params, pName);
 }
 
 void NetServer::SetLocalDrivers()
@@ -314,7 +314,7 @@ void NetServer::SetLocalDrivers()
 
     assert(m_strRaceXMLFile!="");
 
-    void *params = GfParmReadFileLocal(m_strRaceXMLFile.c_str(),GFPARM_RMODE_STD);
+    void *params = GfParmReadFileLocal(m_strRaceXMLFile,GFPARM_RMODE_STD);
     assert(params);
 
     //const char *pName =GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");

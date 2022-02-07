@@ -359,7 +359,7 @@ int	NetNetwork::GetDriverIdx()
 
     assert(m_strRaceXMLFile!="");
 
-    void *params = GfParmReadFileLocal(m_strRaceXMLFile.c_str(),GFPARM_RMODE_STD);
+    void *params = GfParmReadFileLocal(m_strRaceXMLFile,GFPARM_RMODE_STD);
     assert(params);
 
     int nDriverIdx = -1;
@@ -748,7 +748,7 @@ void NetNetwork::GetHostSettings(std::string &strCarCat,bool &bCollisions)
 {
     assert(m_strRaceXMLFile!="");
 
-    void *params = GfParmReadFileLocal(m_strRaceXMLFile.c_str(),GFPARM_RMODE_STD);
+    void *params = GfParmReadFileLocal(m_strRaceXMLFile,GFPARM_RMODE_STD);
     assert(params);
 
     strCarCat = GfParmGetStr(params, RM_SECT_HEADER,RM_ATTR_CAR_CATEGORY,"All");

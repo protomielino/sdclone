@@ -100,14 +100,14 @@ GfRaceManagers::GfRaceManagers()
         // Open the XML descriptor file (look first in user settings, then in the install folder).
         std::string strRaceManFileName("config/raceman/");
         strRaceManFileName.append(pFile->name);
-        void* hparmRaceMan = GfParmReadFileLocal(strRaceManFileName.c_str(), GFPARM_RMODE_STD);
+        void* hparmRaceMan = GfParmReadFileLocal(strRaceManFileName, GFPARM_RMODE_STD);
         if (!hparmRaceMan)
         {
-            hparmRaceMan = GfParmReadFile(strRaceManFileName.c_str(), GFPARM_RMODE_STD);
+            hparmRaceMan = GfParmReadFile(strRaceManFileName, GFPARM_RMODE_STD);
 
             // We got if from the data folder : write it to the user settings.
             if (hparmRaceMan)
-                GfParmWriteFileLocal(strRaceManFileName.c_str(), hparmRaceMan, NULL);
+                GfParmWriteFileLocal(strRaceManFileName, hparmRaceMan, NULL);
         }
 
         std::string strRaceManId(pFile->name);
@@ -339,7 +339,7 @@ void GfRaceManager::load() const
         {
             std::ostringstream ossSubFilePath;
             ossSubFilePath << "config/raceman/" << psz1stSubFileName;
-            hparmHandle = GfParmReadFileLocal(ossSubFilePath.str().c_str(), GFPARM_RMODE_STD);
+            hparmHandle = GfParmReadFileLocal(ossSubFilePath.str(), GFPARM_RMODE_STD);
         }
         if (!psz1stSubFileName || !hparmHandle)
         {

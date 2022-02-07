@@ -42,8 +42,7 @@ void Pit::init(const tTrack* track, const tSituation* situation, MyCar* car, int
 {
     // Get tires change time
     //void* handle = NULL;
-    /*std::string tmpstr = std::string(GetLocalDir()) + "config/raceman/endrace.xml";
-    handle = GfParmReadFile(tmpstr.c_str(), GFPARM_RMODE_STD);
+    /*handle = GfParmReadFileLocal("config/raceman/endrace.xml", GFPARM_RMODE_STD);
     if (handle)
     {
         mTiresChangeTime = GfParmGetNum(handle, "Race", "all tires change time", (char*)NULL, 30.0);

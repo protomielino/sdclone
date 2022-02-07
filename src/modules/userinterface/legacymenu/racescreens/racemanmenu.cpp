@@ -131,7 +131,7 @@ rmLoadRaceFromConfigFile(const char *filename)
 	
 	// Update the race manager.
 	void* hparmRaceMan =
-		GfParmReadFile(strMainFileName.c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+		GfParmReadFile(strMainFileName, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 	if (hparmRaceMan)
 	{
 		pRaceMan->reset(hparmRaceMan, /* bClosePrevHdle= */ true);
@@ -160,7 +160,7 @@ rmLoadRaceFromResultsFile(const char *filename)
 
 	// (Re-)initialize the race from the selected race manager and results params.
 	void* hparmResults =
-		GfParmReadFile(ossResFileName.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+		GfParmReadFile(ossResFileName.str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 	if (hparmResults)
 	{
 		LmRaceEngine().race()->load(pRaceMan, /*bKeepHumans=*/true, hparmResults);

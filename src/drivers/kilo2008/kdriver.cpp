@@ -646,7 +646,7 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
   // Try to load the default setup
   botPath << "drivers/" << bot << "/";  // << INDEX << "/";
   buf << botPath.str() << "default.xml";
-  *carParmHandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
+  *carParmHandle = GfParmReadFile(buf.str(), GFPARM_RMODE_STD);
 #ifdef KDRIVER_DEBUG
   GfLogInfo("KILO Default: %s\n", buf.str().c_str());
   if (carParmHandle)
@@ -656,7 +656,7 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
   // Try to load the track-based informations
   buf.str(string());
   buf << botPath.str() << "tracks/" << trackname;
-  void *newhandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
+  void *newhandle = GfParmReadFile(buf.str(), GFPARM_RMODE_STD);
 #ifdef KDRIVER_DEBUG
   GfLogInfo("KILO track-based: %s\n", buf.str().c_str());
   if (newhandle)
@@ -688,7 +688,7 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
   // Load setup tailored for car+track
   buf.str(string());
   buf << botPath.str() << car_type_ << "/" << trackname;
-  newhandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
+  newhandle = GfParmReadFile(buf.str(), GFPARM_RMODE_STD);
 #ifdef KDRIVER_DEBUG
   GfLogInfo("KILO custom setup: %s\n", buf.str().c_str());
   if (newhandle)
@@ -995,7 +995,7 @@ void* KDriver::LoadDefaultSetup() const {
     buf << "/def-fast.xml";
   }  // if dRatio
 
-  ret = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
+  ret = GfParmReadFile(buf.str(), GFPARM_RMODE_STD);
 #ifdef KDRIVER_DEBUG
   GfLogInfo("KILO Decision of setup: %s\n", buf.str().c_str());
   if (ret)
@@ -1854,11 +1854,11 @@ double KDriver::InitSkill(tSituation * s) {
     stringstream buf;
     // load the global skill level, range 0 - 10
     buf << GetLocalDir() << "config/raceman/extra/skill.xml";
-    void *skillHandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_REREAD);
+    void *skillHandle = GfParmReadFile(buf.str(), GFPARM_RMODE_REREAD);
     if (!skillHandle) {
       buf.str(string());
       buf << GetDataDir() << "config/raceman/extra/skill.xml";
-      skillHandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_REREAD);
+      skillHandle = GfParmReadFile(buf.str(), GFPARM_RMODE_REREAD);
     }  // if !skillHandle
 
     if (skillHandle) {
@@ -1871,7 +1871,7 @@ double KDriver::InitSkill(tSituation * s) {
     double driverSkill = 0.0;
     buf.str(string());
     buf << "drivers/" << bot << "/" << INDEX << "/skill.xml";
-    skillHandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
+    skillHandle = GfParmReadFile(buf.str(), GFPARM_RMODE_STD);
     if (skillHandle) {
       driverSkill = GfParmGetNum(skillHandle, KILO_SECT_SKILL,
                                  KILO_SKILL_LEVEL, NULL, 0.0);

@@ -1253,6 +1253,11 @@ GfParmReadBuf (char *buffer)
 
 
 
+void *
+GfParmReadFileLocal(const std::string &file, int mode, bool neededFile)
+{
+	return GfParmReadFileLocal(file.c_str(), mode, neededFile);
+}
 
 void * 
 GfParmReadFileLocal(const char *file, int mode, bool neededFile)
@@ -1260,7 +1265,7 @@ GfParmReadFileLocal(const char *file, int mode, bool neededFile)
 	//use local dir
 	std::string fullPath(std::string(GfLocalDir()) + file);
 	
-	return GfParmReadFile(fullPath.c_str(),mode,neededFile);
+	return GfParmReadFile(fullPath,mode,neededFile);
 }
 
 /** Read a configuration file.
@@ -1275,6 +1280,12 @@ GfParmReadFileLocal(const char *file, int mode, bool neededFile)
     @return	handle on the configuration data
     <br>0 if Error
 */
+void *
+GfParmReadFile(const std::string &file, int mode, bool neededFile, bool trace)
+{
+	return GfParmReadFile(file.c_str(), mode, neededFile, trace);
+}
+
 void *
 GfParmReadFile (const char *file, int mode, bool neededFile, bool trace)
 {
@@ -1738,12 +1749,17 @@ GfParmSetDTD (void *parmHandle, char *dtd, char*header)
 
 
 int
+GfParmWriteFileLocal(const std::string &file, void *parmHandle, const char *name)
+{
+	return GfParmWriteFileLocal(file.c_str(), parmHandle, name);
+}
+int
 GfParmWriteFileLocal(const char *file, void *parmHandle, const char *name)
 {
 	//use local dir
 	std::string fullPath(std::string(GfLocalDir()) + file);
 
-	return GfParmWriteFile(fullPath.c_str(), parmHandle, name);
+	return GfParmWriteFile(fullPath, parmHandle, name);
 }
 
 /** Write a configuration file.
@@ -1754,6 +1770,11 @@ GfParmWriteFileLocal(const char *file, void *parmHandle, const char *name)
     @return	0 if OK
     <br>1 if Error
 */
+int
+GfParmWriteFile(const std::string &file, void *parmHandle, const char *name)
+{
+	return GfParmWriteFile(file.c_str(), parmHandle, name);
+}
 int
 GfParmWriteFile (const char *file, void *parmHandle, const char *name)
 {

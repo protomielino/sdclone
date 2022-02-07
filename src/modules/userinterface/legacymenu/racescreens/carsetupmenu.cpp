@@ -329,7 +329,7 @@ void CarSetupMenu::loadSettings()
     std::ostringstream ossCarFileName;
     std::string strCarId = getCar()->getId();
     ossCarFileName << "cars/models/" << strCarId << '/' << strCarId << PARAMEXT;
-    void *hparmCar = GfParmReadFile(ossCarFileName.str().c_str(), GFPARM_RMODE_STD);
+    void *hparmCar = GfParmReadFile(ossCarFileName.str(), GFPARM_RMODE_STD);
     if (!hparmCar)
     {
         GfLogError("Car %s (file %s not %s)\n",
@@ -344,7 +344,7 @@ void CarSetupMenu::loadSettings()
     std::ostringstream ossCarSetupFileName;
     std::string strTrackId = getTrack()->getId();
     ossCarSetupFileName << GfLocalDir() << "drivers/human/cars/" << strCarId << '/' << strTrackId << PARAMEXT;
-    void *hparmCarSetup = GfParmReadFile(ossCarSetupFileName.str().c_str(), GFPARM_RMODE_STD);
+    void *hparmCarSetup = GfParmReadFile(ossCarSetupFileName.str(), GFPARM_RMODE_STD);
     if (!hparmCarSetup)
     {
         GfLogInfo("Car Setup: %s/%s (file %s not %s)\n",
@@ -501,7 +501,7 @@ void CarSetupMenu::storeSettings()
     std::string strCarId = getCar()->getId();
     std::string strTrackId = getTrack()->getId();
     ossCarSetupFileName << GfLocalDir() << "drivers/human/cars/" << strCarId << '/' << strTrackId << PARAMEXT;
-    void *hparmCarSetup = GfParmReadFile(ossCarSetupFileName.str().c_str(), GFPARM_RMODE_STD);
+    void *hparmCarSetup = GfParmReadFile(ossCarSetupFileName.str(), GFPARM_RMODE_STD);
     if (!hparmCarSetup)
     {
         // Create the car setup file directory if it doesn't exist.
@@ -510,7 +510,7 @@ void CarSetupMenu::storeSettings()
         if (!GfDirExists(strDir.c_str()))
             GfDirCreate(strDir.c_str());
 
-        hparmCarSetup = GfParmReadFile(ossCarSetupFileName.str().c_str(),
+        hparmCarSetup = GfParmReadFile(ossCarSetupFileName.str(),
                                        GFPARM_RMODE_STD | GFPARM_RMODE_CREAT | GFPARM_TEMPLATE);
         if (!hparmCarSetup)
         {

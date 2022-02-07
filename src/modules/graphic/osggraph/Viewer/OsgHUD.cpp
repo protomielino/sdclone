@@ -1455,7 +1455,7 @@ void SDHUD::ToggleHUDwidget(const std::string &widget)
     int value = hudWidgets[widget]->getNodeMask();
 
     //read the config file, update the value and write it back
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
+    void *paramHandle = GfParmReadFile(configFileUrl, GFPARM_RMODE_STD);
     GfParmSetNum(paramHandle, path.c_str(), attribute.c_str(), NULL, (int)value);
     GfParmWriteFile(NULL, paramHandle, "osghudconfig");
 }
@@ -1507,7 +1507,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
     // int paramValue = 0;
 
     //open the file
-    void *paramHandle = GfParmReadFile(configFileUrl.c_str(), GFPARM_RMODE_STD);
+    void *paramHandle = GfParmReadFile(configFileUrl, GFPARM_RMODE_STD);
 
 
     //GfLogInfo("OSGHUD: Try to find all mains sections: %s \n", subSectionName.c_str());

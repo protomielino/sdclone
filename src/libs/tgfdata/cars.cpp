@@ -101,7 +101,7 @@ GfCars::GfCars()
 			
 		std::ostringstream ossCarFileName;
 		ossCarFileName << "cars/models/" << pszCarId << '/' << pszCarId << PARAMEXT;
-		void* hparmCar = GfParmReadFile(ossCarFileName.str().c_str(), GFPARM_RMODE_STD);
+		void* hparmCar = GfParmReadFile(ossCarFileName.str(), GFPARM_RMODE_STD);
 		if (!hparmCar)
 		{
 			GfLogInfo("Ignoring car %s (file %s not %s)\n",
@@ -117,7 +117,7 @@ GfCars::GfCars()
 			// Little optimization : don't load category file if same as the previous car's.
 			std::ostringstream ossCatFileName;
 			ossCatFileName << "cars/categories/" << strCatId << PARAMEXT;
-			void* hparmCat = GfParmReadFile(ossCatFileName.str().c_str(), GFPARM_RMODE_STD);
+			void* hparmCat = GfParmReadFile(ossCatFileName.str(), GFPARM_RMODE_STD);
 			if (!hparmCat)
 			{
 				GfLogInfo("Ignoring car %s (category file %s not %s)\n",

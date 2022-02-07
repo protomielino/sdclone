@@ -655,7 +655,7 @@ void GfRace::store()
             std::ostringstream ossFilePath;
             ossFilePath << "drivers/" << (*itComp)->getModuleName()
                         << '/' << (*itComp)->getModuleName() << PARAMEXT;
-            void* hparmRobot = GfParmReadFileLocal(ossFilePath.str().c_str(), GFPARM_RMODE_STD);
+            void* hparmRobot = GfParmReadFileLocal(ossFilePath.str(), GFPARM_RMODE_STD);
             ossDrvSecPath.str("");
             ossDrvSecPath << ROB_SECT_ROBOTS << '/' << ROB_LIST_INDEX
                            << '/' << (*itComp)->getInterfaceIndex();

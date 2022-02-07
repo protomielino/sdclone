@@ -208,7 +208,7 @@ const std::vector<std::string>& GfTracks::getCategoryNames() const
 		{
 			std::ostringstream ossFileName;
 			ossFileName << "data/tracks/" << *itCatId << '.' << TRKEXT;
-			void* hparmCat = GfParmReadFile(ossFileName.str().c_str(), GFPARM_RMODE_STD);
+			void* hparmCat = GfParmReadFile(ossFileName.str(), GFPARM_RMODE_STD);
 			const char* pszCatName;
 			if (!hparmCat)
 			{
