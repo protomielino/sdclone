@@ -646,7 +646,7 @@ int WebServer::sendGenericRequest (std::string data, std::string& serverReply)
     //read the webserver configuration
     this->readConfiguration();   
 
-	
+    
     CURL *curl;
     CURLcode res;
 
@@ -689,7 +689,7 @@ int WebServer::sendGenericRequest (std::string data, std::string& serverReply)
         {
             notifications.msglist.push_back("Failed to connect to the WebServer!");
             GfLogInfo("WebServer: Unable to perform SYNC request some error occured: %s\n", data.c_str());
-            fprintf(stderr, "curl_easy_perform() failed: %s\n",	curl_easy_strerror(res));
+            fprintf(stderr, "curl_easy_perform() failed: %s\n",    curl_easy_strerror(res));
         }
         else
         {
@@ -722,11 +722,11 @@ int WebServer::sendGenericRequest (std::string data, std::string& serverReply)
 
 void WebServer::readConfiguration ()
 {
-	//read the preferencies file
+    //read the preferencies file
     void *configHandle = GfParmReadFileLocal("config/webserver.xml", GFPARM_RMODE_REREAD);
 
-	//get webServer url from the config
-	this->url = GfParmGetStr(configHandle, "WebServer Settings", "url","val");
+    //get webServer url from the config
+    this->url = GfParmGetStr(configHandle, "WebServer Settings", "url","val");
 
     GfLogInfo("WebServer - webserver url is: %s\n", this->url);
 }
@@ -749,7 +749,7 @@ int WebServer::readUserConfig (int userId)
     this->password = GfParmGetStr(prHandle, xmlPath, "WebServerPassword","val");
 
     //get webServer enabled/disabled status
-    this->isWebServerEnabled = GfParmGetStr(prHandle, xmlPath, "WebServerEnabled","val");
+    this->isWebServerEnabled = (bool)GfParmGetNum(prHandle, xmlPath, "WebServerEnabled", (char*)NULL, (int)0);
     if (!this->isWebServerEnabled){
         GfLogInfo("WebServer - Webserver is disabled as per user setting");
     }
@@ -761,11 +761,15 @@ int WebServer::readUserConfig (int userId)
 
 int WebServer::sendLogin (int userId)
 {
-    std::string serverReply;
-
     //read username and password and save it in as webserver properties
     this->readUserConfig(userId);
-    
+
+    //if the webserver is disabled exit immediately
+    if(!this->isWebServerEnabled){
+        return 1;
+    }
+
+    std::string serverReply;    
     std::string username="username";
     std::string password="password";
     std::string emptyString;
@@ -786,6 +790,10 @@ int WebServer::sendLogin (int userId)
 
 int WebServer::sendLogin (const char* username, const char* password)
 {
+    //if the webserver is disabled exit immediately
+    if(!this->isWebServerEnabled){
+        return 1;
+    }
     std::string serverReply;
 
     //prepare the string to send
@@ -811,10 +819,10 @@ int WebServer::sendLogin (const char* username, const char* password)
 
 int WebServer::sendLap (int race_id, double laptime, double fuel, int position, int wettness)
 {
-	//if the webserver is disabled exit immediately
-	if(!this->isWebServerEnabled){
-		return 1;
-	}
+    //if the webserver is disabled exit immediately
+    if(!this->isWebServerEnabled){
+        return 1;
+    }
 /*
     //Do some sanity-checks befor proceding... If something is wrong do nothing
     //are we logged in?
@@ -858,11 +866,11 @@ int WebServer::sendLap (int race_id, double laptime, double fuel, int position, 
 
 int WebServer::sendRaceStart (int user_skill, const char *track_id, char *car_id, int type, void *setup, int startposition, const char *sdversion)
 {
-	//if the webserver is disabled exit immediately
-	if(!this->isWebServerEnabled){
-		return 1;
-	}
-	
+    //if the webserver is disabled exit immediately
+    if(!this->isWebServerEnabled){
+        return 1;
+    }
+    
     std::string serverReply;
     std::string mysetup;
     std::string dataToSend;
@@ -883,7 +891,7 @@ int WebServer::sendRaceStart (int user_skill, const char *track_id, char *car_id
     GfParmWriteString(setup, mysetup);
 
     //prepare the string to send
-    dataToSend.append(	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+    dataToSend.append(  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                         "<content>"
                         "<request_id>{{request_id}}</request_id>"
                         "<request>"
@@ -917,11 +925,11 @@ int WebServer::sendRaceStart (int user_skill, const char *track_id, char *car_id
 
 int WebServer::sendRaceEnd (int race_id, int endposition)
 {
-	//if the webserver is disabled exit immediately
-	if(!this->isWebServerEnabled){
-		return 1;
-	}
-	
+    //if the webserver is disabled exit immediately
+    if(!this->isWebServerEnabled){
+        return 1;
+    }
+    
     std::string serverReply;
 
     //Do some sanity-checks befor proceding... If something is wrong do nothing
