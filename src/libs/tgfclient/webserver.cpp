@@ -737,7 +737,7 @@ int WebServer::readUserConfig (int userId)
     char xmlPath[1024];
 
     // find the xmlPath to our specific user in the preferencies xml file
-    snprintf(xmlPath, sizeof(xmlPath), "%s%i", "Preferences/Drivers/", userId);
+    snprintf(xmlPath, sizeof(xmlPath), "%s/%i", HM_SECT_DRVPREF, userId);
 
     //read the preferencies file
     prHandle = GfParmReadFileLocal(HM_PREF_FILE, GFPARM_RMODE_REREAD);
