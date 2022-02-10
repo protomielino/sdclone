@@ -78,7 +78,7 @@ typedef struct CareerInfo
 
 static int ReCareerUtilRand( int min, int max )
 {
-	return min + (int)floor( (double)( max - min + 1 ) * (double)( rand() / ( RAND_MAX + 1.0f ) ) );
+	return min + (int)floor( (double)( max - min + 1 ) * (double)( rand() / ( (double)RAND_MAX + 1.0 ) ) );
 }
 
 static void ReCareerUtilManipString( char* string, int number, int bufLength )
@@ -196,7 +196,7 @@ static double ReCareerNewSkill( int nbGroups, int groupNb )
 	double min = 9.0f * (double)(MAX(0, nbGroups - groupNb - 1))/(double)(MAX(1, nbGroups));
 	double max = MIN( 10.0f, 11.0f * (double)(MAX(1, nbGroups - groupNb))/(double)(MAX(1,nbGroups)) );
 
-	return min + (double)( max - min ) * (double)( rand() / ( RAND_MAX + 1.0f ) );
+	return min + (double)( max - min ) * (double)( rand() / ( (double)RAND_MAX + 1.0) );
 }
 
 static void ReCareerNewAddDrivers( void *curParam, void *curResult, char *humans, int classNb )
@@ -960,7 +960,7 @@ static void ReCareerNextWrite( tCareerInfo *info )
 		GfParmListClean( curParam, RM_SECT_DRIVERINFO );
 		GfParmListClean( curParam, RM_SECT_TRACKS );
 		xx = 0;
-		while( xx < info->nbClasses && !strcmp( info->classes[ xx ].suffix, GfParmGetStr( curParam, RM_SECT_SUBFILES, RM_ATTR_SUFFIX, "" ) ) == 0 ) {
+		while( xx < info->nbClasses && strcmp( info->classes[ xx ].suffix, GfParmGetStr( curParam, RM_SECT_SUBFILES, RM_ATTR_SUFFIX, "" ) ) != 0 ) {
 			++xx;
 		}
 		if( xx >= info->nbClasses ) {
@@ -1018,7 +1018,7 @@ static void ReCareerNextWrite( tCareerInfo *info )
 		GfParmReleaseHandle( curParam );
 		curParam = tmp;
 		++curGroup[ xx ];
-	} while( !strcmp( GfParmGetFileName( curParam ), firstfile ) == 0 );
+	} while( strcmp( GfParmGetFileName( curParam ), firstfile ) != 0 );
 	GfParmReleaseHandle( curParam );
 	
 	free( firstfile );

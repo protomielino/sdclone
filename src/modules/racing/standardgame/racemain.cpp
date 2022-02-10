@@ -1224,7 +1224,7 @@ ReRaceEventShutdown(void)
             /* Check if it is free */
             snprintf( buf, sizeof(buf), "%s/%d", RM_SECT_TRACKS,
                       (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1) );
-            if( !strcmp(GfParmGetStr(params, buf, RM_ATTR_NAME, "free"), "free") == 0) {
+            if( strcmp(GfParmGetStr(params, buf, RM_ATTR_NAME, "free"), "free") != 0) {
                 /* Not a free weekend */
                 GfParmReleaseHandle( results );
                 GfParmReleaseHandle( params );

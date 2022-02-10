@@ -95,7 +95,7 @@ RmNextEventMenu(void)
 	for (xx = 1; xx < (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1); ++xx) 
 	{
 		snprintf(buf, sizeof(buf), "%s/%d", RM_SECT_TRACKS, xx);
-		if (!strcmp( GfParmGetStr(reInfo->params, buf, RM_ATTR_NAME, "free"), "free") == 0)
+		if (strcmp( GfParmGetStr(reInfo->params, buf, RM_ATTR_NAME, "free"), "free") != 0)
 			++raceNumber;
 	}
 

@@ -274,9 +274,6 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
         if (car==NULL) {
             fprintf (stderr, "Error: (grsound.c) no car\n");
             continue;
-        } else if (car->priv.wheel==NULL) {
-            fprintf (stderr, "Error: (grsound.c) no wheels\n");
-            continue;
         } else if (car->priv.wheel[i].seg==NULL) {
             fprintf (stderr, "Error: (grsound.c) no seg\n");
             continue;
