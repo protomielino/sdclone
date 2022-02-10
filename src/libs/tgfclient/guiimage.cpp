@@ -70,7 +70,7 @@ int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *nam
 	image->texture[0] =
 		GfTexReadTexture(name, &image->srcWidth, &image->srcHeight, &pow2Width, &pow2Height);
 
-	if (!image->texture) {
+	if (!image->texture[0]) {
 		free(object);
 		return -1;
 	}
