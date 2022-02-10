@@ -293,6 +293,7 @@ typedef struct GfuiKey
     void		*userData;
     tfuiCallback	onPress;
     tfuiCallback	onRelease;
+    tGuiHelpColumn  helpColumn;
     struct GfuiKey	*next;
 } tGfuiKey;
 

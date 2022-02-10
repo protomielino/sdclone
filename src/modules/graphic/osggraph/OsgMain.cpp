@@ -246,14 +246,13 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, '7',            "Toggle HUD raceinfoWidget",    (void*)"racepositionWidget,racelapsWidget", SDToggleHUDwidgets, NULL);
     GfuiAddKey(screen, '8',            "Toggle HUD",                   (void*)0, SDToggleHUD, NULL);
 
-    GfuiAddKey(screen, '!',            "Toggle HUD textFPSWidget",     (void*)"textFPSWidget",     SDToggleHUDwidget, NULL);
-    GfuiAddKey(screen, '@',            "Toggle HUD tiresWidget",       (void*)"tiresWidget",       SDToggleHUDwidget, NULL);
-    GfuiAddKey(screen, '#',            "Toggle HUD gforceWidget",      (void*)"gforceWidget",      SDToggleHUDwidget, NULL);
-
-    GfuiAddKey(screen, '$',            "Toggle HUD graphFPSWidget",    (void*)"graphFPSWidget",    SDToggleHUDwidget, NULL);
-    GfuiAddKey(screen, '%',            "Toggle HUD graphSpeedWidget",  (void*)"graphSpeedWidget",  SDToggleHUDwidget, NULL);
-    GfuiAddKey(screen, '^',            "Toggle HUD graphFFBWidget",    (void*)"graphFFBWidget",    SDToggleHUDwidget, NULL);
-    GfuiAddKey(screen, '&',            "Toggle HUD graphInputsWidget", (void*)"graphInputsWidget", SDToggleHUDwidget, NULL);
+    GfuiAddKey(screen, '1', GFUIM_CTRL, "Toggle HUD textFPSWidget",     (void*)"textFPSWidget",     SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
+    GfuiAddKey(screen, '2', GFUIM_CTRL, "Toggle HUD tiresWidget",       (void*)"tiresWidget",       SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
+    GfuiAddKey(screen, '3', GFUIM_CTRL, "Toggle HUD gforceWidget",      (void*)"gforceWidget",      SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
+    GfuiAddKey(screen, '4', GFUIM_CTRL, "Toggle HUD graphFPSWidget",    (void*)"graphFPSWidget",    SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
+    GfuiAddKey(screen, '5', GFUIM_CTRL, "Toggle HUD graphSpeedWidget",  (void*)"graphSpeedWidget",  SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
+    GfuiAddKey(screen, '6', GFUIM_CTRL, "Toggle HUD graphFFBWidget",    (void*)"graphFFBWidget",    SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
+    GfuiAddKey(screen, '7', GFUIM_CTRL, "Toggle HUD graphInputsWidget", (void*)"graphInputsWidget", SDToggleHUDwidget, NULL, GFUI_HELP_RIGHT);
 
     /*GfuiAddKey(screen, '5',            "Debug Info",        (void*)3, grSelectBoard, NULL);
     GfuiAddKey(screen, '4',            "G/Cmd Graph",       (void*)4, grSelectBoard, NULL);

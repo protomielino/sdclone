@@ -865,17 +865,18 @@ GfuiRegisterKey(int key, const char *descr, void *userData,
     @param	userData	Parameter to the callback function
     @param	onKeyPressed	Callback function
     @param	onKeyReleased	Callback function
+	@param  column	Help menu column (GFUI_HELP_AUTO or GFUI_HELP_LEFT or GFUI_HELP_RIGHT)
  */
 void
 GfuiAddKey(void *scr, int key, const char *descr, void *userData,
-		   tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
+		   tfuiCallback onKeyPressed, tfuiCallback onKeyReleased, tGuiHelpColumn column)
 {
-	GfuiAddKey(scr, key, GFUIM_NONE, descr, userData, onKeyPressed, onKeyReleased);
+	GfuiAddKey(scr, key, GFUIM_NONE, descr, userData, onKeyPressed, onKeyReleased, column);
 }
 
 void
 GfuiAddKey(void *scr, int key, int modifier, const char *descr, void *userData,
-		   tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
+		   tfuiCallback onKeyPressed, tfuiCallback onKeyReleased, tGuiHelpColumn column)
 {
 	if (!scr)
 		return;
@@ -887,6 +888,7 @@ GfuiAddKey(void *scr, int key, int modifier, const char *descr, void *userData,
 	curKey->userData = userData;
 	curKey->onPress = onKeyPressed;
 	curKey->onRelease = onKeyReleased;
+	curKey->helpColumn = column;
 
 	// Set the key description.
 	curKey->descr = descr ? strdup(descr) : strdup("");

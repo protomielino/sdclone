@@ -95,10 +95,12 @@ GfuiHelpScreen(void *targetScreen, void *returnScreen)
 	while (curKey)
 	{
 		curKey = curKey->next;
-		
-		// Decide if this key goes on the left of right column.
+
+		// Decide if this key goes on the left or right column.
 		bool bLeft;
-		switch(curKey->key) {
+		if (curKey->helpColumn == GFUI_HELP_AUTO)
+		{
+			switch (curKey->key) {
 			case GFUIK_BACKSPACE:
 			case GFUIK_F1:
 			case GFUIK_F2:
@@ -130,7 +132,10 @@ GfuiHelpScreen(void *targetScreen, void *returnScreen)
 			default:
 				bLeft = curKey->modifier != GFUIM_NONE;
 				break;
+			}
 		}
+		else
+			bLeft = curKey->helpColumn == GFUI_HELP_LEFT;
 
 		// Determine control coordinates, whether left or right column.
 		int x, y;

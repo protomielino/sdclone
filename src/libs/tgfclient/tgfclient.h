@@ -219,6 +219,14 @@ TGFCLIENT_API tScreenSize GfScrGetCurrentDisplaySize(int nDisplayIndex);
 #define GFUIK_RSHIFT	SDLK_RSHIFT
 #define GFUIK_LSHIFT	SDLK_LSHIFT
 
+/** Help menu column */
+enum tGuiHelpColumn
+{
+    GFUI_HELP_AUTO,
+    GFUI_HELP_LEFT,
+    GFUI_HELP_RIGHT
+};
+
 // Add needed other GFUIK_* here or above.
 
 // Maximun value of a key code (Has to be the least greater  2^N - 1 >= SDLK_LAST)
@@ -279,9 +287,11 @@ TGFCLIENT_API void GfuiScreenDeactivate(void);
 TGFCLIENT_API void* GfuiHookCreate(void *userDataOnActivate, tfuiCallback onActivate);
 TGFCLIENT_API void GfuiHookRelease(void *hook);
 TGFCLIENT_API void GfuiAddKey(void *scr, int key, const char *descr,
-                              void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
+                              void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased,
+                              tGuiHelpColumn column = GFUI_HELP_AUTO);
 TGFCLIENT_API void GfuiAddKey(void *scr, int key, int modifier, const char *descr,
-                              void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
+                              void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased,
+                              tGuiHelpColumn column = GFUI_HELP_AUTO);
 TGFCLIENT_API void GfuiRegisterKey(int key, const char *descr,
                                    void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
 TGFCLIENT_API void GfuiSetKeyAutoRepeat(void *scr, int on);
