@@ -160,11 +160,10 @@ static void onAccept(void *)
 {
 	saveSoundOption();
 
-	// Shutdown the user interface.
-	//LegacyMenu::self().shutdown();
+	saveMusicSettings();
 
-	// Restart the game.
-	//GfuiApp().restart();
+	enableMusic(1 - curMusicState);
+	setMusicVolume(MusicVolumeValue);
 
 	// Return to previous screen.
 	GfuiScreenActivate(prevHandle);
@@ -173,15 +172,6 @@ static void onAccept(void *)
 // Reset any changes 
 static void onCancel(void *)
 {
-	enableMusic(1 - OriginalMusicState);
-	curMusicState = OriginalMusicState;
-
-	setMusicVolume(OriginalMusicVolumeValue);
-	MusicVolumeValue = OriginalMusicVolumeValue;
-
-	saveMusicSettings();
-
-
 	// Return to previous screen.
 	GfuiScreenActivate(prevHandle);
 }
@@ -216,10 +206,6 @@ static void changeMusicState(void *vp)
 
 	GfuiLabelSetText(scrHandle, MusicStateId, musicStateList[curMusicState]);
 
-	saveMusicSettings();
-
-	enableMusic(1 - curMusicState);
-
 }
 
 // Music Volume
@@ -235,8 +221,6 @@ static void changeMusicVolume(void * )
     char buf[32];
     sprintf(buf, "%g", MusicVolumeValue);
     GfuiEditboxSetString(scrHandle, MusicVolumeValueId, buf);
-
-    setMusicVolume(MusicVolumeValue);
 }
 
 static void onActivate(void * /* dummy */)
