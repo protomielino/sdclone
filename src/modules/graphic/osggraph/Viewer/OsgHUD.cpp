@@ -1080,11 +1080,11 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     // Parse control messages if they include ABS / TCS / SPD
     for (int i = 0; i < 4; i++)
     {
-        if (currCar->ctrl.msg[i])
+        if (currCar->_msgCmd[i])
         {
-            abs = abs || strstr(currCar->ctrl.msg[i], "ABS");
-            tcs = tcs || strstr(currCar->ctrl.msg[i], "TCS");
-            spd = spd || strstr(currCar->ctrl.msg[i], "Speed Limiter On");
+            abs = abs || strstr(currCar->_msgCmd[i], "ABS");
+            tcs = tcs || strstr(currCar->_msgCmd[i], "TCS");
+            spd = spd || strstr(currCar->_msgCmd[i], "Speed Limiter On");
         }
     }
 
@@ -1236,14 +1236,14 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     }
 
 // driver inputs 
-    changeImageSize(hudImgElements["driverinput-clutch"], currCar->ctrl.clutchCmd, "bottom", hudScale);
-    changeImageSize(hudImgElements["driverinput-brake"], currCar->ctrl.brakeCmd, "bottom", hudScale);
-    changeImageSize(hudImgElements["driverinput-throttle"], currCar->ctrl.accelCmd, "bottom", hudScale);
+    changeImageSize(hudImgElements["driverinput-clutch"], currCar->_clutchCmd, "bottom", hudScale);
+    changeImageSize(hudImgElements["driverinput-brake"], currCar->_brakeCmd, "bottom", hudScale);
+    changeImageSize(hudImgElements["driverinput-throttle"], currCar->_accelCmd, "bottom", hudScale);
     
     const osg::Vec3d axis(0, 0, 1);
     //wheel
     
-    double angle = currCar->ctrl.steer * 4;
+    double angle = currCar->_steerCmd * 4;
     
     osg::Vec3d center = hudImgRotableElements["driverinput-wheel"]->getBound().center();//Save the center point coordinates of the object first
     osg::Matrix curMatrix = hudImgRotableElements["driverinput-wheel"]->getMatrix();
