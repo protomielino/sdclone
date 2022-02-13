@@ -29,6 +29,11 @@
 
 class SDFrameInfo;
 
+namespace osgText
+{
+    class Text;
+}
+
 class OSGPLOT
 {
 public:
@@ -122,6 +127,12 @@ class SDHUD
         std::map<std::string,osg::Geometry* > hudImgElements;
         std::map<std::string,osg::MatrixTransform* > hudImgRotableElements;
         std::map<std::string,OSGPLOT* > hudGraphElements;
+
+        float prevSteerAngle;
+
+        std::map<std::string, osgText::Text * > hudTextElements;
+        std::map<std::string, int> hudElementsVisibilityStatus;
+        bool hudElementsVisibilityStatusEnabled;
 
 public:
         SDHUD();

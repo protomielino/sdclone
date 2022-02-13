@@ -65,15 +65,9 @@ static std::string strFrontWing("Front wing");
 static std::string strRearWing("Rear wing");
 static std::string strPenalty("Next pit type");
 
-static osg::Vec4 colorRed(1.0, 0.0, 0.0, 1.0);
-static osg::Vec4 colorYellow(1.0, 0.878, 0.0, 1.0);
-static osg::Vec4 colorCyan(0.31, 0.968, 0.933, 1.0);
-
-float prevSteerAngle = 0.0f;
-
-std::map<std::string,osgText::Text* > hudTextElements;
-std::map<std::string,int> hudElementsVisibilityStatus;
-int hudElementsVisibilityStatusEnabled = 1;
+static const osg::Vec4 colorRed(1.0, 0.0, 0.0, 1.0);
+static const osg::Vec4 colorYellow(1.0, 0.878, 0.0, 1.0);
+static const osg::Vec4 colorCyan(0.31, 0.968, 0.933, 1.0);
 
 
 osg::Vec3 calculatePosition(osg::BoundingBox mybb, const std::string &objPoint,
@@ -716,7 +710,9 @@ void changeImageAlpha(osg::Geometry *geom,
 SDHUD::SDHUD() :
     _car(nullptr),
     lastCar(nullptr),
-    hudScale(1.0f)
+    hudScale(1.0f),
+    prevSteerAngle(0.0f),
+    hudElementsVisibilityStatusEnabled(true)
 {
 }
 
@@ -1387,7 +1383,8 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 void SDHUD::ToggleHUD()
 {
-    if (hudElementsVisibilityStatusEnabled > 0){
+    if (hudElementsVisibilityStatusEnabled)
+    {
         hudElementsVisibilityStatus["boardWidget"] =        (int)hudWidgets["boardWidget"]->getNodeMask();
         hudElementsVisibilityStatus["racepositionWidget"] = (int)hudWidgets["racepositionWidget"]->getNodeMask();
         hudElementsVisibilityStatus["racelapsWidget"] =     (int)hudWidgets["racelapsWidget"]->getNodeMask();
@@ -1421,7 +1418,7 @@ void SDHUD::ToggleHUD()
         hudWidgets["graphSpeedWidget"]->setNodeMask(0);
         hudWidgets["graphFFBWidget"]->setNodeMask(0);
         hudWidgets["graphInputsWidget"]->setNodeMask(0);
-        hudElementsVisibilityStatusEnabled = 0;
+        hudElementsVisibilityStatusEnabled = false;
     }else{
         hudWidgets["boardWidget"]->setNodeMask(hudElementsVisibilityStatus["boardWidget"]);
         hudWidgets["racepositionWidget"]->setNodeMask(hudElementsVisibilityStatus["racepositionWidget"]);
@@ -1439,7 +1436,7 @@ void SDHUD::ToggleHUD()
         hudWidgets["graphSpeedWidget"]->setNodeMask(hudElementsVisibilityStatus["graphSpeedWidget"]);
         hudWidgets["graphFFBWidget"]->setNodeMask(hudElementsVisibilityStatus["graphFFBWidget"]);
         hudWidgets["graphInputsWidget"]->setNodeMask(hudElementsVisibilityStatus["graphInputsWidget"]);
-        hudElementsVisibilityStatusEnabled = 1;
+        hudElementsVisibilityStatusEnabled = true;
     }
 }
 
@@ -1918,9 +1915,6 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 
 SDHUD::~SDHUD()
 {
-    //TODO: check we may have something more to clean up
-    //do some cleanup
-    hudTextElements.clear();
-    hudImgElements.clear();
-    hudGraphElements.clear();
+    for (std::map<std::string, OSGPLOT * >::iterator it = hudGraphElements.begin(); it != hudGraphElements.end(); ++it)
+        delete(it->second);
 }
