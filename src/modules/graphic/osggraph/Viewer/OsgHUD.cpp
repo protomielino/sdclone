@@ -70,84 +70,8 @@ static const osg::Vec4 colorYellow(1.0, 0.878, 0.0, 1.0);
 static const osg::Vec4 colorCyan(0.31, 0.968, 0.933, 1.0);
 
 
-osg::Vec3 calculatePosition(osg::BoundingBox mybb, const std::string &objPoint,
-osg::BoundingBox bb,  const std::string &referenceObjPoint,
-
-float verticalModifier, float horizontalModifier){
-    /*
-    Possible positioning values:
-    tl  //top left
-    tr  //top right
-    tc  //top center
-    bl  //bottom left
-    br  //bottom right
-    bc  //bottom center
-    ml  //middle left
-    mr  //middle right
-    mc  //middle center
-    */
-
-    float vPoint=0;
-    float hPoint=0;
-    float vSign = 0;
-
-    //my starting point
-    osg::Vec3 position = osg::Vec3(0.0f,0.0f,0.0f);
-
-    //ref object
-    //vertical
-    if(referenceObjPoint.find('t')==0){
-        vPoint += bb.yMax();
-        vSign = 1;
-    }else if(referenceObjPoint.find('b')==0){
-        vPoint += bb.yMin();
-        vSign = -1;
-    }else if(referenceObjPoint.find('m')==0){
-        vPoint += (bb.yMax() - bb.yMin())/2;
-        vSign = 1;
-    }
-
-    //horizontal
-    if(referenceObjPoint.find('l')==1){
-        hPoint += bb.xMin();
-    }else if(referenceObjPoint.find('r')==1){
-        hPoint += bb.xMax();
-    }else if(referenceObjPoint.find('c')==1){
-        hPoint += (bb.xMax() - bb.xMin())/2;
-    }
-
-
-    //my obj /*todo check medium vertical alignment*/
-    //vertical
-    if(objPoint.find('t')==0){
-        vPoint -= (mybb.yMax() - mybb.yMin()) * vSign;//height
-    }else if(objPoint.find('b')==0){
-        //do nothing
-    }else if(objPoint.find('m')==0){
-        vPoint -= (mybb.yMax() - mybb.yMin()) * vSign/2;
-    }
-
-    //horizontal
-    if(objPoint.find('l')==1){
-        //nothing to do
-    }else if(objPoint.find('r')==1){
-        hPoint -= (mybb.xMax() - mybb.xMin());//width
-    }else if(objPoint.find('c')==1){
-        hPoint -= (mybb.xMax() - mybb.xMin())/2;
-    }
-
-    //modifier
-    hPoint += horizontalModifier;
-    vPoint += verticalModifier;
-
-    // apply the modifiers
-    position += osg::Vec3(hPoint,vPoint,0.0f);
-
-    return position;
-}
-
 // TODO[START]: move this to utils? /src/modules/graphic/osggraph/Utils
-void split(const std::string &s, char delim, std::vector<std::string> &elems)
+static void split(const std::string &s, char delim, std::vector<std::string> &elems)
 {
     std::stringstream ss;
     ss.str(s);
@@ -159,14 +83,14 @@ void split(const std::string &s, char delim, std::vector<std::string> &elems)
     }
 }
 
-std::vector<std::string> split(const std::string &s, char delim)
+static std::vector<std::string> split(const std::string &s, char delim)
 {
     std::vector<std::string> elems;
     split(s, delim, elems);
     return elems;
 }
 
-osg::Vec4 colorStringToVec4(const std::string & colorString)
+static osg::Vec4 colorStringToVec4(const std::string & colorString)
 {
     std::vector<std::string> colorStringVector = split(colorString, '#');
 
@@ -483,7 +407,102 @@ void OSGPLOT::drawBackground()
       osgGroup->addChild(geode);
 }
 
-std::string formatLaptime(tdble sec, int sgn)
+osg::Vec3 SDHUD::calculatePosition(osg::BoundingBox mybb, const std::string &objPoint,
+                                   osg::BoundingBox bb,  const std::string &referenceObjPoint,
+                                   float verticalModifier, float horizontalModifier)
+{
+    /*
+    Possible positioning values:
+    tl  //top left
+    tr  //top right
+    tc  //top center
+    bl  //bottom left
+    br  //bottom right
+    bc  //bottom center
+    ml  //middle left
+    mr  //middle right
+    mc  //middle center
+    */
+
+    float vPoint = 0;
+    float hPoint = 0;
+    float vSign = 0;
+
+    //my starting point
+    osg::Vec3 position = osg::Vec3(0.0f,0.0f,0.0f);
+
+    //ref object
+    //vertical
+    if (referenceObjPoint.find('t') == 0)
+    {
+        vPoint += bb.yMax();
+        vSign = 1;
+    }
+    else if (referenceObjPoint.find('b') == 0)
+    {
+        vPoint += bb.yMin();
+        vSign = -1;
+    }
+    else if (referenceObjPoint.find('m') == 0)
+    {
+        vPoint += (bb.yMax() - bb.yMin()) / 2;
+        vSign = 1;
+    }
+
+    //horizontal
+    if (referenceObjPoint.find('l') == 1)
+    {
+        hPoint += bb.xMin();
+    }
+    else if (referenceObjPoint.find('r') == 1)
+    {
+        hPoint += bb.xMax();
+    }
+    else if (referenceObjPoint.find('c') == 1)
+    {
+        hPoint += (bb.xMax() - bb.xMin()) / 2;
+    }
+
+    //my obj /*todo check medium vertical alignment*/
+    //vertical
+    if (objPoint.find('t') == 0)
+    {
+        vPoint -= (mybb.yMax() - mybb.yMin()) * vSign;//height
+    }
+    else if(objPoint.find('b') == 0)
+    {
+        //do nothing
+    }
+    else if (objPoint.find('m') == 0)
+    {
+        vPoint -= (mybb.yMax() - mybb.yMin()) * vSign  /2;
+    }
+
+    //horizontal
+    if (objPoint.find('l') == 1)
+    {
+        //nothing to do
+    }
+    else if (objPoint.find('r') == 1)
+    {
+        hPoint -= (mybb.xMax() - mybb.xMin());//width
+    }
+    else if(objPoint.find('c') == 1)
+    {
+        hPoint -= (mybb.xMax() - mybb.xMin()) / 2;
+    }
+
+    //modifier
+    hPoint += horizontalModifier;
+    vPoint += verticalModifier;
+
+    // apply the modifiers
+    position += osg::Vec3(hPoint,vPoint,0.0f);
+
+    return position;
+}
+
+std::string SDHUD::formatLaptime(tdble sec, int sgn)
 {
     std::ostringstream lapTimeString;
 
@@ -540,10 +559,10 @@ std::string formatLaptime(tdble sec, int sgn)
     return lapTimeString.str();
 }
 
-void changeImageSize(osg::Geometry *geom,
-                        float newSize/*where 1.0 full image size (width or height) and 0.0 no size (width or height)*/,
-                        const std::string &resizeFrom/*left|right|top|bottom == this is the place that will be fixed(not modified), the other one ill be moved to fit the new size*/,
-                        float hudScale)
+void SDHUD::changeImageSize(osg::Geometry *geom,
+                            float newSize/*where 1.0 full image size (width or height) and 0.0 no size (width or height)*/,
+                            const std::string &resizeFrom/*left|right|top|bottom == this is the place that will be fixed(not modified), the other one ill be moved to fit the new size*/,
+                            float hudScale)
 {
     osg::TextureRectangle* texture;
 
@@ -638,10 +657,10 @@ void changeImageSize(osg::Geometry *geom,
     }
 }
 
-void changeImagePosition(osg::Geometry *geom,
-                        float newX,
-                        float newY,
-                        float hudScale)
+void SDHUD::changeImagePosition(osg::Geometry *geom,
+                                float newX,
+                                float newY,
+                                float hudScale)
 {
     osg::TextureRectangle* texture;
 
@@ -693,9 +712,8 @@ void changeImagePosition(osg::Geometry *geom,
     }
 }
 
-void changeImageAlpha(osg::Geometry *geom,
-                        float newAlpha/*where 1.0 fully visible and 0.0 completely hidden*/
-)
+void SDHUD::changeImageAlpha(osg::Geometry *geom,
+                            float newAlpha) /*where 1.0 fully visible and 0.0 completely hidden*/
 {
     // assign colors
     osg::Vec4Array* colors = new osg::Vec4Array(1);

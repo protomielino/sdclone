@@ -134,6 +134,20 @@ class SDHUD
         std::map<std::string, int> hudElementsVisibilityStatus;
         bool hudElementsVisibilityStatusEnabled;
 
+        static osg::Vec3 calculatePosition(osg::BoundingBox mybb, const std::string &objPoint,
+                                           osg::BoundingBox bb, const std::string &referenceObjPoint,
+                                           float verticalModifier, float horizontalModifier);
+        static std::string formatLaptime(tdble sec, int sgn);
+        static void changeImageSize(osg::Geometry *geom,
+                                    float newSize,
+                                    const std::string &resizeFrom,
+                                    float hudScale);
+        static void changeImagePosition(osg::Geometry *geom,
+                                        float newX,
+                                        float newY,
+                                        float hudScale);
+        static void changeImageAlpha(osg::Geometry *geom, float newAlpha);
+
 public:
         SDHUD();
         ~SDHUD();
