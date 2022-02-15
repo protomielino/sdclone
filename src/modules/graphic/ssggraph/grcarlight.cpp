@@ -153,7 +153,7 @@ void ssgVtxTableCarlight::draw_geometry ()
 	axis[2] = 1;
 
 	if (grMaxTextureUnits > 1) {
-		glActiveTextureARB (GL_TEXTURE0_ARB);
+		glActiveTexture (GL_TEXTURE0_ARB);
 	}
 
 	sgMakeRotMat4(mat, ((float)rand()/(float)RAND_MAX)*45, axis);
@@ -191,7 +191,7 @@ void ssgVtxTableCarlight::draw_geometry ()
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
 	if (grMaxTextureUnits > 1) {
-		glActiveTextureARB (GL_TEXTURE0_ARB);
+		glActiveTexture (GL_TEXTURE0_ARB);
 	}
 
 	glMatrixMode(GL_TEXTURE);

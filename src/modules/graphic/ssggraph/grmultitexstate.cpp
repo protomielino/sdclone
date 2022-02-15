@@ -22,7 +22,7 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 ////// Multitexturing Info
-extern PFNGLACTIVETEXTUREARBPROC glActiveTextureARB ;
+extern PFNGLACTIVETEXTUREPROC glActiveTexture ;
 #endif
 
 #include <tgf.h>
@@ -48,7 +48,7 @@ void cgrMultiTexState::setTexScheme(tfnTexScheme fnTexScheme)
 // Apply the texture state to the given texture unit GL_TEXTURE<nUnit>_ARB
 void cgrMultiTexState::apply(GLint nUnit)
 {
-	glActiveTextureARB(nUnit);
+	glActiveTexture(nUnit);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, ssgSimpleState::getTextureHandle());
 	_fnTexScheme(); // There MUST be a texturing scheme function, so no need to check.

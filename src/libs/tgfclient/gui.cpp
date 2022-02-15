@@ -43,7 +43,7 @@
 
 #ifdef WIN32
 PFNGLUSEPROGRAMOBJECTARBPROC glUseProgram = NULL;
-PFNGLACTIVETEXTUREARBPROC   glActiveTextureARB ;
+PFNGLACTIVETEXTUREARBPROC   glActiveTexture ;
 #endif
 
 
@@ -125,7 +125,7 @@ gfuiInit(void)
 
 #ifdef WIN32
 	glUseProgram = (PFNGLUSEPROGRAMOBJECTARBPROC)wglGetProcAddress("glUseProgram");
-    glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
+    glActiveTexture = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTexture");
 #endif
 	gfctrlJoyInit(); // Not here ; done later on the fly, when really needed.
 }
@@ -262,7 +262,7 @@ GfuiRedraw(void)
 	tGfuiObject	*curObj;
 	
 	glUseProgram(0);
-	glActiveTextureARB(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);

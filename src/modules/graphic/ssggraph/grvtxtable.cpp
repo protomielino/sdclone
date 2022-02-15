@@ -201,7 +201,7 @@ void cgrVtxTable::draw_geometry_array ()
 	}
 
 	if (grMaxTextureUnits > 1) {
-		glActiveTextureARB(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0_ARB);
 	}
 
 	glEnable (GL_TEXTURE_2D);
@@ -266,17 +266,17 @@ void cgrVtxTable::draw_geometry_array ()
 
 	glPopClientAttrib ();
 	if (_mTexStates[0]) {
-		glActiveTextureARB(GL_TEXTURE1_ARB);
+		glActiveTexture(GL_TEXTURE1_ARB);
 		glDisable(GL_TEXTURE_2D);
 	}
 
 	if (_mTexStates[1]) {
-		glActiveTextureARB(GL_TEXTURE2_ARB);
+		glActiveTexture(GL_TEXTURE2_ARB);
 		glDisable(GL_TEXTURE_2D);
 	}
 
 	if (grMaxTextureUnits > 1) {
-		glActiveTextureARB(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0_ARB);
 	}
 	
 	TRACE_GL("cgrVtxTable::draw_geometry_array: end");
@@ -385,17 +385,17 @@ void cgrVtxTableTrackPart::draw_geometry ()
 	glEnd ();
 
 	if (_mTexStates[0]) {
-		glActiveTextureARB(GL_TEXTURE1_ARB);
+		glActiveTexture(GL_TEXTURE1_ARB);
 		glDisable(GL_TEXTURE_2D);
 	}
 
 	if (_mTexStates[1]) {
-		glActiveTextureARB(GL_TEXTURE2_ARB);
+		glActiveTexture(GL_TEXTURE2_ARB);
 		glDisable(GL_TEXTURE_2D);
 	}
 
 	if (grMaxTextureUnits > 1) {
-		glActiveTextureARB(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0_ARB);
 	}
 	TRACE_GL("cgrVtxTableTrackPart::draw_geometry: end");
 }
@@ -480,7 +480,7 @@ void cgrVtxTableCarPart::draw_geometry ()
 		axis[1] = 0;
 		axis[2] = 1;
 
-		glActiveTextureARB(GL_TEXTURE2_ARB);
+		glActiveTexture(GL_TEXTURE2_ARB);
 		sgMakeRotMat4(mat, grCarInfo[_carIndex].envAngle, axis);
 		glMatrixMode(GL_TEXTURE);
 		glLoadIdentity();
@@ -492,7 +492,7 @@ void cgrVtxTableCarPart::draw_geometry ()
 	if (_nTexMaps > 1 && grEnvState) {
 		grEnvState->apply(GL_TEXTURE1_ARB);
 	
-		glActiveTextureARB(GL_TEXTURE1_ARB);
+		glActiveTexture(GL_TEXTURE1_ARB);
 		glEnable(GL_TEXTURE_2D);
 		glMatrixMode(GL_TEXTURE);
 		glLoadIdentity();
@@ -550,7 +550,7 @@ void cgrVtxTableCarPart::draw_geometry ()
 	glEnd ();
 
 	if (_nTexMaps > 1 && grEnvState) {
-		glActiveTextureARB(GL_TEXTURE1_ARB);
+		glActiveTexture(GL_TEXTURE1_ARB);
 		glDisable(GL_TEXTURE_2D);
 		glMatrixMode(GL_TEXTURE);
 		glLoadIdentity();
@@ -558,11 +558,11 @@ void cgrVtxTableCarPart::draw_geometry ()
 	}
 	
 	if (_nTexMaps > 2 && grEnvShadowState) {
-		glActiveTextureARB(GL_TEXTURE2_ARB);
+		glActiveTexture(GL_TEXTURE2_ARB);
 		glDisable(GL_TEXTURE_2D);
 	}
 	
-	glActiveTextureARB(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 
 	TRACE_GL("cgrVtxTableCarPart::draw_geometry: end");
 }
@@ -591,7 +591,7 @@ void cgrVtxTableCarPart::draw_geometry_array ()
 		axis[1] = 0;
 		axis[2] = 1;
 
-		glActiveTextureARB(GL_TEXTURE2_ARB);
+		glActiveTexture(GL_TEXTURE2_ARB);
 		sgMakeRotMat4(mat, grCarInfo[_carIndex].envAngle, axis);
 		glMatrixMode(GL_TEXTURE);
 		glLoadIdentity();
@@ -631,7 +631,7 @@ void cgrVtxTableCarPart::draw_geometry_array ()
 		mat2[3][3] = 1;
 
 
-		glActiveTextureARB(GL_TEXTURE3_ARB);
+		glActiveTexture(GL_TEXTURE3_ARB);
 		sgMakeRotMat4(mat, grCarInfo[_carIndex].envAngle, axis);
 		glMatrixMode(GL_TEXTURE);
 		glLoadIdentity();
@@ -649,7 +649,7 @@ void cgrVtxTableCarPart::draw_geometry_array ()
 	if (_nTexMaps > 1 && grEnvState) {
 		grEnvState->apply(GL_TEXTURE1_ARB);
 		
-		glActiveTextureARB(GL_TEXTURE1_ARB);
+		glActiveTexture(GL_TEXTURE1_ARB);
 		glEnable(GL_TEXTURE_2D);
 		glMatrixMode(GL_TEXTURE);
 		glLoadIdentity();
@@ -660,7 +660,7 @@ void cgrVtxTableCarPart::draw_geometry_array ()
 		glMatrixMode(GL_MODELVIEW);
 	}
 
-	glActiveTextureARB(GL_TEXTURE0_ARB);
+	glActiveTexture(GL_TEXTURE0_ARB);
 	glEnable(GL_TEXTURE_2D);
 
 	if (num_colours == 0) {
@@ -725,14 +725,14 @@ void cgrVtxTableCarPart::draw_geometry_array ()
 
 	glPopClientAttrib();
 	
-	glActiveTextureARB(GL_TEXTURE1_ARB);
+	glActiveTexture(GL_TEXTURE1_ARB);
 	glDisable (GL_TEXTURE_2D);
 	glMatrixMode(GL_TEXTURE);
 	glLoadIdentity();
 	glMatrixMode(GL_MODELVIEW);
 
 	if (_nTexMaps > 2 && grEnvShadowState) {
-		glActiveTextureARB(GL_TEXTURE2_ARB);
+		glActiveTexture(GL_TEXTURE2_ARB);
 		glMatrixMode(GL_TEXTURE);
 		glLoadIdentity();
 		glMatrixMode(GL_MODELVIEW);
@@ -740,14 +740,14 @@ void cgrVtxTableCarPart::draw_geometry_array ()
 	}
 
 	if (_nTexMaps > 3 && grEnvShadowStateOnCars) {
-		glActiveTextureARB(GL_TEXTURE3_ARB);
+		glActiveTexture(GL_TEXTURE3_ARB);
 		glMatrixMode(GL_TEXTURE);
 		glLoadIdentity();
 		glMatrixMode(GL_MODELVIEW);
 		glDisable(GL_TEXTURE_2D);
 	}
 
-	glActiveTextureARB (GL_TEXTURE0_ARB);
+	glActiveTexture (GL_TEXTURE0_ARB);
 	
 	TRACE_GL("cgrVtxTableCarPart::draw_geometry_array");
 }

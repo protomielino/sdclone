@@ -38,7 +38,7 @@
 // you can only get them through a call to wglGetProcAddress at run-time.
 extern PFNGLMULTITEXCOORD2FARBPROC     glMultiTexCoord2fARB ;
 extern PFNGLMULTITEXCOORD2FVARBPROC    glMultiTexCoord2fvARB;
-extern PFNGLACTIVETEXTUREARBPROC       glActiveTextureARB ;
+extern PFNGLACTIVETEXTUREPROC       glActiveTexture ;
 extern PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB ;
 #endif
 
