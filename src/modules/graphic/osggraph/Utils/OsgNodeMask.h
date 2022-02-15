@@ -20,7 +20,7 @@
 #ifndef _OSGNODEMASK_H
 #define _OSGNODEMASK_H 1
 
-#if _MSC_VER && _MSC_VER < 1700
+#if ((_MSC_VER && _MSC_VER < 1700) || (__APPLE__))
 enum NodeMask
 #else
 enum NodeMask : osg::Node::NodeMask
