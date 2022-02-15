@@ -1393,10 +1393,45 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 
 // debug info
     temp.str("");
-    temp << "FPS: " << frameInfo->fAvgFps << " (Inst: " << frameInfo->fInstFps << ")";
+    temp << "FPS: " << frameInfo->fInstFps << " (AVG: " << frameInfo->fAvgFps << ")";
     hudTextElements["debug-info"]->setText(temp.str());
 
+// delta best
 
+    if (currCar->_bestLapTime != 0){
+		float deltabest = currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine] - currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine];
+
+    GfLogInfo("OSGHUD curr: %f \n", currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
+
+    GfLogInfo("OSGHUD best: %f \n", currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
+
+
+		if(deltabest > 0){//we are slower
+			float scale = 0.0f;
+			if (deltabest > 10.0f){
+				scale = 1.0f;
+			}else{
+				scale = deltabest/10;
+			}
+			changeImageSize(hudImgElements["delta-gaining"], 0, "left", hudScale);
+			changeImageSize(hudImgElements["delta-losing"], scale, "right", hudScale);
+		}else if(deltabest < 0){//we are faster
+			float scale = 0.0f;
+			if (deltabest < -10.0f){
+				scale = 1.0f;
+			}else{
+				scale = -1*deltabest/10;
+			}
+			changeImageSize(hudImgElements["delta-gaining"], scale, "left", hudScale);
+			changeImageSize(hudImgElements["delta-losing"], 0, "right", hudScale);
+		}
+		temp.str("");
+		temp << std::setprecision(3) << deltabest;
+		hudTextElements["delta-time"]->setText(temp.str());
+    }else{
+		changeImageSize(hudImgElements["delta-gaining"], 0, "left", hudScale);
+		changeImageSize(hudImgElements["delta-losing"], 0, "right", hudScale);
+	}
 }
 
 void SDHUD::ToggleHUD()

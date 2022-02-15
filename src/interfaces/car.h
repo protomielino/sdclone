@@ -178,6 +178,8 @@ typedef struct
     double*		curSplitTime;
     double		lastLapTime;
     double		curTime;
+    float* bestLapTimeAtTrackPosition; /** here we will store for the best laptime the current laptime for each meter of track */
+    float* currLapTimeAtTrackPosition; /** here we will store for the current laptime the current laptime for each meter of track */
     tdble		topSpeed;
     tdble		currentMinSpeedForLap;	// Min speed on current lap, reset on start line crossing
     int			laps;
@@ -211,6 +213,8 @@ typedef struct
 #define _curSplitTime		race.curSplitTime
 #define _lastLapTime		race.lastLapTime
 #define _curTime                race.curTime
+#define _bestLapTimeAtTrackPosition race.bestLapTimeAtTrackPosition
+#define _currLapTimeAtTrackPosition race.currLapTimeAtTrackPosition
 #define _topSpeed               race.topSpeed
 #define _currentMinSpeedForLap	race.currentMinSpeedForLap
 #define _laps                   race.laps
