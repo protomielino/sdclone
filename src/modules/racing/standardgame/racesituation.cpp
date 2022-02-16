@@ -722,8 +722,9 @@ tRmInfo* ReSituationUpdater::initSituation(const tRmInfo* pSource)
         pTgtCar->_trackLength = pSource->track->length;
         pTgtCar->_curSplitTime = (double*)malloc(sizeof(double) * (pTgtCar->_nbSectors - 1));
         pTgtCar->_bestSplitTime = (double*)malloc(sizeof(double) * (pTgtCar->_nbSectors - 1));
-        pTgtCar->_currLapTimeAtTrackPosition = (float *)malloc((int)ReInfo->track->length * sizeof(float));
-        pTgtCar->_bestLapTimeAtTrackPosition = (float *)malloc((int)ReInfo->track->length * sizeof(float));
+	pTgtCar->_trackPositionCount = pSrcCar->_trackPositionCount;
+        pTgtCar->_currLapTimeAtTrackPosition = (float *)malloc(pTgtCar->_trackPositionCount * sizeof(float));
+        pTgtCar->_bestLapTimeAtTrackPosition = (float *)malloc(pTgtCar->_trackPositionCount * sizeof(float));
 
         GF_TAILQ_INIT(&(pTgtCar->_penaltyList)); // Not used by the graphics engine.
 
@@ -776,10 +777,11 @@ tRmInfo* ReSituationUpdater::copySituation(tRmInfo*& pTarget, const tRmInfo* pSo
                sizeof(double) * (pSource->track->numberOfSectors - 1));
         pTgtCar->_lastLapTime = pSrcCar->_lastLapTime;
         pTgtCar->_curTime = pSrcCar->_curTime;
+	pTgtCar->_trackPositionCount = pSrcCar->_trackPositionCount;
         memcpy(pTgtCar->_bestLapTimeAtTrackPosition, pSrcCar->_bestLapTimeAtTrackPosition,
-            (int)ReInfo->track->length * sizeof(float));
+            pSrcCar->_trackPositionCount * sizeof(float));
         memcpy(pTgtCar->_currLapTimeAtTrackPosition, pSrcCar->_currLapTimeAtTrackPosition,
-            (int)ReInfo->track->length * sizeof(float));
+            pSrcCar->_trackPositionCount * sizeof(float));
         pTgtCar->_topSpeed = pSrcCar->_topSpeed;
         pTgtCar->_laps = pSrcCar->_laps;
         pTgtCar->_bestLap = pSrcCar->_bestLap;

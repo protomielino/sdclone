@@ -763,7 +763,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
                                         car->_timeBeforeNext = 0;
                                 }
                                 //remeber the new valid best laptime (for the deltabest widget)
-                                memcpy(car->_bestLapTimeAtTrackPosition, car->_currLapTimeAtTrackPosition, (int)ReInfo->track->length * sizeof(float));
+                                memcpy(car->_bestLapTimeAtTrackPosition, car->_currLapTimeAtTrackPosition, car->_trackPositionCount * sizeof(float));
                             }
 
                         }
@@ -921,7 +921,18 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
     car->_distRaced = (car->_laps - 1) * ReInfo->track->length + car->_distFromStartLine;
     
     // Remember current laptime at current track position
-    car->_currLapTimeAtTrackPosition[(int)car->_distFromStartLine] = (float)car->_curLapTime;
+    int distFromStartLine = (int)car->_distFromStartLine;
+    if (distFromStartLine < 0)
+    {
+        distFromStartLine = 0;
+        GfLogError("distFromStartLine = %d trackPositionCount = %d\n", distFromStartLine, car->_trackPositionCount);
+    }
+    else if (distFromStartLine>= car->_trackPositionCount)
+    {
+        distFromStartLine = car->_trackPositionCount - 1;
+        GfLogError("distFromStartLine = %d trackPositionCount = %d\n", distFromStartLine, car->_trackPositionCount);
+    }
+    car->_currLapTimeAtTrackPosition[distFromStartLine] = (float)car->_curLapTime;
 }
 
 void

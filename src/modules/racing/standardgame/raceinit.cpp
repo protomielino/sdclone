@@ -770,8 +770,9 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       return NULL;
     }
     //since we now know how much space we need (track lenght) we can now alloc the memory for these variables
-    elt->_currLapTimeAtTrackPosition = (float *)malloc((int)ReInfo->track->length * sizeof(float));
-    elt->_bestLapTimeAtTrackPosition = (float *)malloc((int)ReInfo->track->length * sizeof(float));
+    elt->_trackPositionCount = (int)(ReInfo->track->length + 1); // round up
+    elt->_currLapTimeAtTrackPosition = (float *)malloc(elt->_trackPositionCount * sizeof(float));
+    elt->_bestLapTimeAtTrackPosition = (float *)malloc(elt->_trackPositionCount * sizeof(float));
     
     return elt;
   }
