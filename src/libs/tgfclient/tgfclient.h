@@ -381,7 +381,7 @@ private:
 };
 
 /* Mouse management */
-#define GFCTRL_MOUSE_MAX_BUTTONS    5
+#define GFCTRL_MOUSE_MAX_BUTTONS    7
 
 typedef struct MouseInfo
 {
