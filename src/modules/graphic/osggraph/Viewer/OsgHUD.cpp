@@ -1454,6 +1454,7 @@ void SDHUD::ToggleHUD()
         hudElementsVisibilityStatus["graphSpeedWidget"] =   (int)hudWidgets["graphSpeedWidget"]->getNodeMask();
         hudElementsVisibilityStatus["graphFFBWidget"] =     (int)hudWidgets["graphFFBWidget"]->getNodeMask();
         hudElementsVisibilityStatus["graphInputsWidget"] =  (int)hudWidgets["graphInputsWidget"]->getNodeMask();
+        hudElementsVisibilityStatus["deltaWidget"] =        (int)hudWidgets["deltaWidget"]->getNodeMask();
 
         hudWidgets["boardWidget"]->setNodeMask(0);
         hudWidgets["racepositionWidget"]->setNodeMask(0);
@@ -1471,6 +1472,7 @@ void SDHUD::ToggleHUD()
         hudWidgets["graphSpeedWidget"]->setNodeMask(0);
         hudWidgets["graphFFBWidget"]->setNodeMask(0);
         hudWidgets["graphInputsWidget"]->setNodeMask(0);
+        hudWidgets["deltaWidget"]->setNodeMask(0);
         hudElementsVisibilityStatusEnabled = false;
     }else{
         hudWidgets["boardWidget"]->setNodeMask(hudElementsVisibilityStatus["boardWidget"]);
@@ -1489,6 +1491,7 @@ void SDHUD::ToggleHUD()
         hudWidgets["graphSpeedWidget"]->setNodeMask(hudElementsVisibilityStatus["graphSpeedWidget"]);
         hudWidgets["graphFFBWidget"]->setNodeMask(hudElementsVisibilityStatus["graphFFBWidget"]);
         hudWidgets["graphInputsWidget"]->setNodeMask(hudElementsVisibilityStatus["graphInputsWidget"]);
+        hudWidgets["deltaWidget"]->setNodeMask(hudElementsVisibilityStatus["deltaWidget"]);
         hudElementsVisibilityStatusEnabled = true;
     }
 }

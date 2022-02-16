@@ -242,6 +242,7 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, '2',            "Toggle HUD carinfoWidget",     (void*)"carinfoWidget,carstatusWidget", SDToggleHUDwidgets, NULL);
     GfuiAddKey(screen, '3',            "Toggle HUD boardWidget",       (void*)"boardWidget",       SDToggleHUDwidget, NULL);
     GfuiAddKey(screen, '4',            "Toggle HUD driverinputWidget", (void*)0, SDToggleHUDdriverinput, NULL);
+    GfuiAddKey(screen, '5',            "Toggle HUD deltaWidget",       (void*)"deltaWidget",       SDToggleHUDwidget, NULL);
     GfuiAddKey(screen, '6',            "Toggle HUD dashitemsWidget",   (void*)"dashitemsWidget",   SDToggleHUDwidget, NULL);
     GfuiAddKey(screen, '7',            "Toggle HUD raceinfoWidget",    (void*)"racepositionWidget,racelapsWidget", SDToggleHUDwidgets, NULL);
     GfuiAddKey(screen, '8',            "Toggle HUD",                   (void*)0, SDToggleHUD, NULL);
