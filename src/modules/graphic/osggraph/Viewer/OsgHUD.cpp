@@ -1401,9 +1401,9 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     if (currCar->_bestLapTime != 0){
 		float deltabest = currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine] - currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine];
 
-    GfLogInfo("OSGHUD curr: %f \n", currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
+    GfLogDebug("OSGHUD curr: %f \n", currCar->_currLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
 
-    GfLogInfo("OSGHUD best: %f \n", currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
+    GfLogDebug("OSGHUD best: %f \n", currCar->_bestLapTimeAtTrackPosition[(int)currCar->_distFromStartLine]);
 
 
 		if(deltabest > 0){//we are slower
