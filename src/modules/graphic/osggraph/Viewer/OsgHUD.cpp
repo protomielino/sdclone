@@ -814,12 +814,19 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
 //board
     tCarElt *firstAheadCar;
     tCarElt *secondAheadCar;
+    tCarElt *thirdAheadCar;
     tCarElt *firstBehindCar;
     tCarElt *secondBehindCar;
+    tCarElt *thirdBehindCar;
 
     std::vector<tCarElt *> boardCars;
 
     // get pointers for previous and behind cars from us
+    if (currCar->_pos > 3)
+    {
+        thirdAheadCar = s->cars[currCar->_pos - 4];
+        boardCars.push_back(thirdAheadCar);
+    }
     if (currCar->_pos > 2)
     {
         secondAheadCar = s->cars[currCar->_pos - 3];
@@ -844,8 +851,14 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
         boardCars.push_back(secondBehindCar);
     }
 
+    if (currCar->_pos < (s->_ncars - 2))
+    {
+        thirdBehindCar = s->cars[currCar->_pos + 2];
+        boardCars.push_back(thirdBehindCar);
+    }
+
     //hide all board slots... we will enable later what we will use
-    for (int id = 1; id <= 5; id++)
+    for (int id = 1; id <= 7; id++)
     {
         std::ostringstream mapKey;
         //hide board number
