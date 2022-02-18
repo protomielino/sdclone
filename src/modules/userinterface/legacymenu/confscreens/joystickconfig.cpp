@@ -183,7 +183,7 @@ Idle2(void)
    for (index = 0; index < GFCTRL_JOY_NUMBER * GFCTRL_JOY_MAX_BUTTONS; index++) {
       if (joyInfo.edgedn[index]) {
          /* Check whether to ignore */
-         if(Cmd[CalState + CmdOffset].butIgnore == index)
+         if(CalState && Cmd[CalState + CmdOffset].butIgnore == index)
             break;
 
          /* Button fired */
