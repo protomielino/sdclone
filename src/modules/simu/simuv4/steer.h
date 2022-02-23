@@ -25,6 +25,7 @@ typedef struct
     tdble	steerLock;	/* in rad */
     tdble	maxSpeed;	/* in rad/s */
     tdble	steer;		/* current steer value */
+    tdble	steerWheelRot;	/* in rad */
     
 } tSteer;
 

@@ -92,7 +92,7 @@ public:
     tdble				distFromStart;
     tdble				envAngle;
     int					fireCount;
-    tdble				steerMovt;
+    tdble				steerWheelRot;
     tdble				px;
     tdble				py;
     tdble				sx;

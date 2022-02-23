@@ -57,7 +57,7 @@ private :
     int                                nDRM;
     int                                nDRM2;
     float                              DRMThreshold[32];
-    tdble                              steerMovt;
+    tdble                              steerWheelRot;
 
     //osg::ref_ptr<osg::Vec3Array> shadowVertices;
     //osg::ref_ptr<osg::Geometry> quad;

@@ -937,7 +937,7 @@ grInitCar(tCarElt *car)
         if (steerEntityLo)
         {
             grCarInfo[index].nSteer = 1;
-            grCarInfo[index].steerMovt = GfParmGetNum(handle, path, PRM_SW_MOVT, NULL, 1.0);
+            grCarInfo[index].steerWheelRot = RAD2DEG(GfParmGetNum(handle, SECT_STEER, PRM_STEERROT, NULL, 2.0) / 2.0);
 
             grCarInfo[index].steerSelector = new ssgSelector;
             ssgBranch *steerBranch = new ssgBranch;
@@ -1304,7 +1304,7 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 
     if (grCarInfo[index].nSteer)
     {
-        sgSetCoord( &wheelpos, 0, 0, 0, 0, RAD2DEG(-car->_steerCmd * grCarInfo[index].steerMovt), 0 );
+        sgSetCoord( &wheelpos, 0, 0, 0, 0, -car->_steerCmd * grCarInfo[index].steerWheelRot, 0 );
         grCarInfo[index].steerRot[0]->setTransform( &wheelpos );
         if (grCarInfo[index].nSteer > 1)
             grCarInfo[index].steerRot[1]->setTransform( &wheelpos );

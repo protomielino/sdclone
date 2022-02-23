@@ -29,6 +29,14 @@ SimSteerConfig(tCar *car)
 	GfParmGetNumWithLimits(hdle, SECT_STEER, PRM_STEERLOCK, (char*)NULL, &(setupStLock->desired_value), &(setupStLock->min), &(setupStLock->max));
 	setupStLock->changed = true;
 	setupStLock->stepsize = DEG2RAD(1.0);
+
+	tCarSetupItem *setupStWheelRot = &(car->carElt->setup.steerWheelRot);
+
+	setupStWheelRot->desired_value = setupStWheelRot->min = setupStWheelRot->max = 2.0f;
+	GfParmGetNumWithLimits(hdle, SECT_STEER, PRM_STEERROT, (char *)NULL, &(setupStWheelRot->desired_value), &(setupStWheelRot->min), &(setupStWheelRot->max));
+	setupStWheelRot->changed = true;
+	setupStWheelRot->stepsize = DEG2RAD(1.0);
+
 	car->steer.maxSpeed  = GfParmGetNum(hdle, SECT_STEER, PRM_STEERSPD, (char*)NULL, 1.0f);
 }
 
@@ -43,6 +51,15 @@ SimSteerReConfig(tCar *car)
 		car->carElt->_steerLock = car->steer.steerLock;
 		setupStLock->value = car->steer.steerLock;
 		setupStLock->changed = false;
+	}
+
+	tCarSetupItem *setupStWheelRot = &(car->carElt->setup.steerWheelRot);
+
+	if (setupStWheelRot->changed) {
+		car->steer.steerWheelRot = MIN(setupStWheelRot->max, MAX(setupStWheelRot->min, setupStWheelRot->desired_value));
+		car->carElt->_steerWheelRot = car->steer.steerWheelRot;
+		setupStWheelRot->value = car->steer.steerWheelRot;
+		setupStWheelRot->changed = false;
 	}
 }
 

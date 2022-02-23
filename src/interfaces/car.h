@@ -90,6 +90,7 @@ typedef struct {
     t3Dd	bonnetPos;                  /**< Bonnet's position */
     tdble	tank;                       /**< Fuel tank capa */
     tdble	steerLock;                  /**< Steer lock angle */
+    tdble	steerWheelRot;              /**< Steering wheel rotation (lock to lock) */
     t3Dd	statGC;                     /**< Static pos of GC (should be the origin of car axis) */
     tWheelSpec	wheel[4];               /**< Wheels specifications */
     tVisualAttributes visualAttr;       /**< Visual attributes */
@@ -142,6 +143,7 @@ typedef struct {
 #define _iconColor	info.iconColor		/**< short cut to tInitCar#iconColor */
 #define _tank		info.tank               /**< short cut to tInitCar#tank */
 #define _steerLock	info.steerLock			/**< short cut to tInitCar#steerLock */
+#define _steerWheelRot	info.steerWheelRot	/**< short cut to tInitCar#steerWheelRot */
 #define _exhaustNb	info.visualAttr.exhaustNb	/**< short cut to tVisualAttributes#exhaustNb */
 #define _exhaustPos	info.visualAttr.exhaustPos	/**< short cut to tVisualAttributes#exhaustPos */
 #define _exhaustPower	info.visualAttr.exhaustPower	/**< short cut to tVisualAttributes#exhaustPower */
@@ -590,7 +592,7 @@ typedef struct
     tCarSetupItem differentialRatio[3];
     tCarSetupItem differentialMinTqBias[3], differentialMaxTqBias[3], differentialViscosity[3];
     tCarSetupItem differentialLockingTq[3], differentialMaxSlipBias[3], differentialCoastMaxSlipBias[3];
-    tCarSetupItem steerLock;
+    tCarSetupItem steerLock, steerWheelRot;
     tCarSetupItem brakeRepartition, brakePressure;
     tCarSetupItem rideHeight[4], toe[4], camber[4];
     tCarSetupItem tirePressure[4], tireOpLoad[4]; //note: pressure is unused now
@@ -761,6 +763,7 @@ typedef struct CarElt
 
 #define PRM_STEERLOCK		"steer lock"
 #define PRM_STEERSPD		"max steer speed"
+#define PRM_STEERROT		"steering wheel rotation"
 
 #define PRM_BRKDIAM			"disk diameter"
 #define PRM_BRKAREA			"piston area"

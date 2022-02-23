@@ -65,7 +65,7 @@ SDCar::SDCar(void) :
     nSteer(0),
     nDRM(0),
     nDRM2(0),
-    steerMovt(0.0),
+    steerWheelRot(0.0),
     car(NULL),
     shader(NULL),
     reflectionMapping(NULL),
@@ -467,7 +467,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         else
         {
             this->nSteer = 1;
-            this->steerMovt = GfParmGetNum(handle, path, PRM_SW_MOVT, NULL, 1.0);
+            this->steerWheelRot = GfParmGetNum(handle, SECT_STEER, PRM_STEERROT, NULL, 2.0) / 2.0;
 
             this->SteerSelector = new osg::Switch;
             this->SteerSelector->setName("STEER");
@@ -897,7 +897,7 @@ void SDCar::updateCar(tSituation *s, tCarElt *CurCar, int current, int driver)
         if (driver || car != CurCar)
         {
             this->SteerSelector->setSingleChildOn(0);
-            steerangle = (-steerangle * steerMovt);
+            steerangle = (-steerangle * steerWheelRot);
             osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
             this->SteerRot->setMatrix(rotation);
         }
@@ -906,7 +906,7 @@ void SDCar::updateCar(tSituation *s, tCarElt *CurCar, int current, int driver)
             if (nSteer > 1)
             {
                 this->SteerSelector->setSingleChildOn(1);
-                steerangle = (-steerangle * steerMovt);
+                steerangle = (-steerangle * steerWheelRot);
                 osg::Matrix rotation = osg::Matrix::rotate(steerangle, osg::X_AXIS);
                 this->SteerRot2->setMatrix(rotation);
                 GfLogDebug(" # update steer branch\n");

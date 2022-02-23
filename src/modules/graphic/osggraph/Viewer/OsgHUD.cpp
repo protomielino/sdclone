@@ -1270,7 +1270,7 @@ void SDHUD::Refresh(tSituation *s, const SDFrameInfo* frameInfo,
     const osg::Vec3d axis(0, 0, 1);
     //wheel
     
-    double angle = currCar->_steerCmd * 4;
+    double angle = currCar->_steerCmd * currCar->_steerWheelRot / 2.0f;
     
     osg::Vec3d center = hudImgRotableElements["driverinput-wheel"]->getBound().center();//Save the center point coordinates of the object first
     osg::Matrix curMatrix = hudImgRotableElements["driverinput-wheel"]->getMatrix();
