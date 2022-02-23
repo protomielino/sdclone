@@ -622,10 +622,12 @@ osg::ref_ptr< osg::StateSet> SDRender::setFogState()
 
     SceneFog = osg::Vec4f(FogColor, 1.0f);
 
-    osg::ref_ptr<osg::Fog> fog = new osg::Fog();    //The fog object
-    fog->setMode(osg::Fog::EXP2);                   //Fog type
-    fog->setDensity(fog_exp2_density);              //Fog density
-    fog->setColor(SceneFog);                        //Fog color
+    osg::ref_ptr<osg::Fog> fog = new osg::Fog();    // The fog object
+    fog->setStart(SDVisibility);                    // Fog start
+    fog->setEnd(20000.0);                           // Fog End
+    fog->setMode(osg::Fog::EXP2);                   // Fog type
+    fog->setDensity(fog_exp2_density);              // Fog density
+    fog->setColor(SceneFog);                        // Fog color
     fog->setFogCoordinateSource(osg::Fog::FRAGMENT_DEPTH);
     osg::ref_ptr< osg::StateSet> fogState (new osg::StateSet);
     fogState->setAttributeAndModes(fog.get(), osg::StateAttribute::ON);
