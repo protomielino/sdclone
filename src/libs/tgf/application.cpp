@@ -384,10 +384,10 @@ bool GfApplication::parseOptions()
     }
 
     // Interpret the detected command line options.
-    const char *pszLocalDir = 0;
-    const char *pszLibDir = 0;
-    const char *pszDataDir = 0;
-    const char *pszBinDir = 0;
+    std::string strLocalDir;
+    std::string strLibDir;
+    std::string strDataDir;
+    std::string strBinDir;
 
     bool bTrueRandom = true;
 
@@ -413,22 +413,22 @@ bool GfApplication::parseOptions()
         // Local dir (root dir of the tree where user settings files are stored)
         else if (itOpt->strLongName == "localdir")
         {
-            pszLocalDir = GfSetLocalDir(itOpt->strValue.c_str());
+            strLocalDir = GfSetLocalDir(itOpt->strValue.c_str());
         }
         // Libraries dir (root dir of the tree where loadable modules are installed)
         else if (itOpt->strLongName == "libdir")
         {
-            pszLibDir = GfSetLibDir(itOpt->strValue.c_str());
+            strLibDir = GfSetLibDir(itOpt->strValue.c_str());
         }
         // Binaries dir (the dir where the game exe and DLLs are installed)
         else if (itOpt->strLongName == "bindir")
         {
-            pszBinDir = GfSetBinDir(itOpt->strValue.c_str());
+            strBinDir = GfSetBinDir(itOpt->strValue.c_str());
         }
         // Data dir (root dir of the data tree)
         else if (itOpt->strLongName == "datadir")
         {
-            pszDataDir = GfSetDataDir(itOpt->strValue.c_str());
+            strDataDir = GfSetDataDir(itOpt->strValue.c_str());
         }
         // Initialize random generator or not.
         else if (itOpt->strLongName == "norandom")
@@ -444,30 +444,29 @@ bool GfApplication::parseOptions()
 
     // If any of the Speed-Dreams dirs not run-time specified / empty,
     // use associated compile-time variable SD_XXDIR to get default value
-    if (!(pszLocalDir && strlen(pszLocalDir)))
-        pszLocalDir = GfSetLocalDir(SD_LOCALDIR);
-    if (!(pszLibDir && strlen(pszLibDir)))
-        pszLibDir = GfSetLibDir(SD_LIBDIR);
-    if (!(pszBinDir && strlen(pszBinDir)))
-        pszBinDir = GfSetBinDir(SD_BINDIR);
-    if (!(pszDataDir && strlen(pszDataDir)))
-        pszDataDir = GfSetDataDir(SD_DATADIR);
+    if (strLocalDir.empty())
+        strLocalDir = GfSetLocalDir(SD_LOCALDIR);
+    if (strLibDir.empty())
+        strLibDir = GfSetLibDir(SD_LIBDIR);
+    if (strBinDir.empty())
+        strBinDir = GfSetBinDir(SD_BINDIR);
+    if (strDataDir.empty())
+        strDataDir = GfSetDataDir(SD_DATADIR);
 
     // If the data dir. is not a run-time usable one, may be it's because we are running
     // without installing : try and use the _source_ data dir (it _is_ run-time usable).
-    std::string strDataDirProof(pszDataDir);
+    std::string strDataDirProof(strDataDir);
     // A run-time usable data dir has a "config/logging.xml" file inside.
     strDataDirProof += LOGGING_CFG;
-    if (pszDataDir && strlen(pszDataDir) && !GfFileExists(strDataDirProof.c_str()))
+    if (!strDataDir.empty() && !GfFileExists(strDataDirProof.c_str()))
     {
         GfLogTrace("Data dir. '%s' not run-time usable, trying source data dir.\n",
-                   pszDataDir);
-        pszDataDir = GfSetDataDir(SD_DATADIR_SRC);
+                   strDataDir.c_str());
+        strDataDir = GfSetDataDir(SD_DATADIR_SRC);
     }
 
     // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
-    if (!(pszLocalDir && strlen(pszLocalDir)) || !(pszLibDir && strlen(pszLibDir))
-        || !(pszBinDir && strlen(pszBinDir)) || !(pszDataDir && strlen(pszDataDir)))
+    if (strLocalDir.empty() || strLibDir.empty() || strBinDir.empty() || strDataDir.empty())
     {
         GfLogTrace("User settings dir. : '%s'\n", GfLocalDir());
         GfLogTrace("Libraries dir.     : '%s'\n", GfLibDir());
