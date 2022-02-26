@@ -459,35 +459,41 @@ GfctrlSDL2JoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
          if (Joysticks[ind])
          {
             j = SDL_JoystickNumAxes(Joysticks[ind]);
-            if (j > GFCTRL_JOY_MAX_AXES) j = GFCTRL_JOY_MAX_AXES;
+            if (j > GFCTRL_JOY_MAX_AXES)
+                j = GFCTRL_JOY_MAX_AXES;
 
             for (i=0; i < j;i++)
                joyInfo->ax[GFCTRL_JOY_MAX_AXES * ind + i] = ((float) SDL_JoystickGetAxis(Joysticks[ind],i)) / 32768;
 
+            j = SDL_JoystickNumButtons(Joysticks[ind]);
+            if (j > GFCTRL_JOY_MAX_BUTTONS)
+                j = GFCTRL_JOY_MAX_BUTTONS;
+
             b = 0;
-            for (i=0; i < GFCTRL_JOY_MAX_BUTTONS;i++) 
+            for (i=0; i < j;i++) 
             {
                mask = (unsigned int)SDL_JoystickGetButton(Joysticks[ind], i);
                b |= (mask << i);
             }
 
             /* Joystick buttons */
-            for (i = 0, mask = 1; i < GFCTRL_JOY_MAX_BUTTONS; i++, mask *= 2) 
+            for (i = 0, mask = 1; i < j; i++, mask *= 2)
             {
+               int index = i + GFCTRL_JOY_MAX_BUTTONS * ind;
                if (((b & mask) != 0) && ((joyInfo->oldb[ind] & mask) == 0)) {
-                  joyInfo->edgeup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 1;
+                  joyInfo->edgeup[index] = 1;
                } else {
-                  joyInfo->edgeup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
+                  joyInfo->edgeup[index] = 0;
                }
                if (((b & mask) == 0) && ((joyInfo->oldb[ind] & mask) != 0)) {
-                  joyInfo->edgedn[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 1;
+                  joyInfo->edgedn[index] = 1;
                } else {
-                  joyInfo->edgedn[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
+                  joyInfo->edgedn[index] = 0;
                }
                if ((b & mask) != 0) {
-                  joyInfo->levelup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 1;
+                  joyInfo->levelup[index] = 1;
                } else {
-                  joyInfo->levelup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
+                  joyInfo->levelup[index] = 0;
                }
             }
             joyInfo->oldb[ind] = b;
