@@ -112,30 +112,25 @@ void GfDrivers::reload()
 
         // Determine the module name.
         std::string strModName(pCurModule->sopath);
-        strModName.erase(strlen(pCurModule->sopath) - strlen(DLLEXT)); // Truncate file ext.
+        strModName.erase(strModName.size() - DLLEXTLEN); // Truncate file ext.
         const size_t nLastSlashInd = strModName.rfind('/');
         if (nLastSlashInd != std::string::npos)
             strModName = strModName.substr(nLastSlashInd+1); // Remove heading folder path.
 
         // Load the module XML descriptor file (try  user settings first, and then installed one)
-        std::ostringstream ossRobotFileName;
-        ossRobotFileName << "drivers/" << strModName
-                         << '/' << strModName << PARAMEXT;
-        void *hparmRobot =
-            GfParmReadFileLocal(ossRobotFileName.str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+        std::string strRobotFileName = "drivers/" + strModName + '/' + strModName + PARAMEXT;
+        void *hparmRobot = GfParmReadFileLocal(strRobotFileName, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
         if (!hparmRobot)
-        {
-            hparmRobot =
-                GfParmReadFile(ossRobotFileName.str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
-        }
+            hparmRobot = GfParmReadFile(strRobotFileName, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+
         if (!hparmRobot)
         {
             // Do not waste log with drivers that do not exists or do not have to exist!
-            if (strncmp("dandroid",strModName.c_str(),8) == 0)
+            if (strModName.compare(0, 8, "dandroid") == 0)
                 continue;
-            else if (strncmp("usr",strModName.c_str(),3) == 0)
+            else if (strModName.compare(0, 3, "usr") == 0)
                 continue;
-            else if (strncmp("replay",strModName.c_str(),6) == 0)
+            else if (strModName.compare(0, 6, "replay") == 0)
                 continue;
 
             GfLogError("No usable '%s' driver (%s.xml not found or not readable)\n",

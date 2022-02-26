@@ -31,7 +31,7 @@
 #include "tgf.h"
 #include "os.h"
 
-static const size_t SOFileExtLen = strlen(DLLEXT);
+static const size_t SOFileExtLen = DLLEXTLEN;
 
 /*
 * Function

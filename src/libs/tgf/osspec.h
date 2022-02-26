@@ -24,6 +24,7 @@
 // Common file name extensions
 #define TRKEXT	 "xml"
 #define PARAMEXT ".xml"
+#define PARAMEXTLEN 4
 #define RESULTEXT ".xml"
 
 // Windows -----------------------------------------------------------------
@@ -35,12 +36,14 @@
 
 // File name extensions
 #define DLLEXT	".dll"
+#define DLLEXTLEN 4
 
 // Linux -------------------------------------------------------------------
 #else // WIN32
 
 // File name extensions
 #define DLLEXT	 ".so"
+#define DLLEXTLEN 3
 
 #endif // WIN32
 

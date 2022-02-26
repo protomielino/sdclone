@@ -111,7 +111,7 @@ GfRaceManagers::GfRaceManagers()
         }
 
         std::string strRaceManId(pFile->name);
-        strRaceManId.erase(strlen(pFile->name) - strlen(PARAMEXT));
+        strRaceManId.erase(strlen(pFile->name) - PARAMEXTLEN);
         if (!hparmRaceMan)
         {
             GfLogInfo("GfRaceManagers : Ignoring race manager %s (failed to read from config/raceman/%s in %s and %s)\n",

@@ -42,7 +42,7 @@
 #define dlerror GetLastError
 #endif
 
-static const size_t SOFileExtLen = strlen(DLLEXT);
+static const size_t SOFileExtLen = DLLEXTLEN;
 
 /* Allocate the module interfaces info array */
 tModInfo *GfModInfoAllocate(int maxItf)

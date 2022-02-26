@@ -100,7 +100,7 @@ rmSaveRaceToConfigFile(const char *filename)
 	// Determine the full path-name of the target race config file (add .xml ext. if not there).
 	std::ostringstream ossTgtFileName;
 	ossTgtFileName << GfLocalDir() << "config/raceman/" << pRaceMan->getId() << '/' << filename;
-	if (ossTgtFileName.str().rfind(PARAMEXT) != ossTgtFileName.str().length() - strlen(PARAMEXT))
+	if (ossTgtFileName.str().rfind(PARAMEXT) != ossTgtFileName.str().length() - PARAMEXTLEN)
 		ossTgtFileName << PARAMEXT;
 
 	// Copy the main file to the selected one (overwrite if already there).
