@@ -652,10 +652,9 @@ void GfRace::store()
 
             // Save also the chosen car as the default one for this human driver
             // (may be needed later for races where it is not specified in <race>.xml)
-            std::ostringstream ossFilePath;
-            ossFilePath << "drivers/" << (*itComp)->getModuleName()
-                        << '/' << (*itComp)->getModuleName() << PARAMEXT;
-            void* hparmRobot = GfParmReadFileLocal(ossFilePath.str(), GFPARM_RMODE_STD);
+            std::string strFilePath = "drivers/" + (*itComp)->getModuleName() + '/' +
+                (*itComp)->getModuleName() + PARAMEXT;
+            void* hparmRobot = GfParmReadFileLocal(strFilePath, GFPARM_RMODE_STD);
             ossDrvSecPath.str("");
             ossDrvSecPath << ROB_SECT_ROBOTS << '/' << ROB_LIST_INDEX
                            << '/' << (*itComp)->getInterfaceIndex();
