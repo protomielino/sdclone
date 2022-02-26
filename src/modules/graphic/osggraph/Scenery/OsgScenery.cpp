@@ -122,7 +122,7 @@ void SDScenery::LoadScene(tTrack *track)
         GfLogError("No specified track 3D model file\n");
     }
 
-    std::string PathTmp = GetDataDir();
+    std::string PathTmp = GfDataDir();
 
         _bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
         if (_bgsky)
@@ -134,7 +134,7 @@ void SDScenery::LoadScene(tTrack *track)
             GfLogDebug("Background loaded\n");
         }
 
-    std::string strPath = GetDataDir();
+    std::string strPath = GfDataDir();
     snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
 
     std::string ext = osgDB::getFileExtension(acname);
@@ -152,7 +152,7 @@ void SDScenery::LoadScene(tTrack *track)
     {
         strPath+=buf;
 
-        std::string strTPath = GetDataDir();
+        std::string strTPath = GfDataDir();
         osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
         pathList.push_back(strPath);
         GfLogDebug("Track Path : %s\n", pathList.back().c_str());
@@ -233,7 +233,7 @@ bool SDScenery::LoadTrack(std::string& strTrack)
     GfLogDebug("Texture Path : %s\n", _strTexturePath.c_str());
     loader.AddSearchPath(_strTexturePath);
 
-    std::string strTPath = GetDataDir();
+    std::string strTPath = GfDataDir();
     strTPath += "data/textures/";
     GfLogDebug("Texture Path : %s\n", strTPath.c_str());
     loader.AddSearchPath(strTPath);
@@ -245,7 +245,7 @@ bool SDScenery::LoadTrack(std::string& strTrack)
         pTrack->getOrCreateStateSet()->setRenderBinDetails(TRACKBIN,"RenderBin");
         _scenery->addChild(pTrack);
 #if 0
-        std::string Tpath = GetLocalDir();
+        std::string Tpath = GfLocalDir();
         Tpath = Tpath+"/track.osg";
         osgDB::writeNodeFile( *pTrack, Tpath);
 #endif

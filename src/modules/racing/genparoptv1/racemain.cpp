@@ -929,12 +929,12 @@ const char* SetupGlobalFileName(char* buf, int size, tgenData* Data, const char*
 		if (Data->WeatherCode == 0)
 		{
 			snprintf(buf,size,"%sdrivers/%s/%s/%s%s",
-				GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName,Ext);
+				GfLocalDir(),Data->RobotName,Data->CarType,Data->TrackName,Ext);
 		}
 		else
 		{
 			snprintf(buf,size,"%sdrivers/%s/%s/%s-%d%s",
-				GetLocalDir(),Data->RobotName,Data->CarType,Data->TrackName,Data->WeatherCode,Ext);
+				GfLocalDir(),Data->RobotName,Data->CarType,Data->TrackName,Data->WeatherCode,Ext);
 		}
 	}
 	else
@@ -942,12 +942,12 @@ const char* SetupGlobalFileName(char* buf, int size, tgenData* Data, const char*
 		if (Data->WeatherCode == 0)
 		{	
 			snprintf(buf,size,"%sdrivers/%s/%s/default%s",
-				GetLocalDir(),Data->RobotName,Data->CarType,Ext);
+				GfLocalDir(),Data->RobotName,Data->CarType,Ext);
 		}
 		else
 		{
 			snprintf(buf,size,"%sdrivers/%s/%s/default-%d%s",
-				GetLocalDir(),Data->RobotName,Data->CarType,Data->WeatherCode,Ext);
+				GfLocalDir(),Data->RobotName,Data->CarType,Data->WeatherCode,Ext);
 		}
 	}
 

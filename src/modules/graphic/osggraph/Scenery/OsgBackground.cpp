@@ -43,7 +43,7 @@ void SDBackground::build(int X, int Y, int Z, const std::string& TrackPath)
 {
     osgDB::Registry::instance()->clearObjectCache();
 
-    std::string LocalPath = GetDataDir();
+    std::string LocalPath = GfDataDir();
 
     osgDB::FilePathList pathList = osgDB::Registry::instance()->getDataFilePathList();
 

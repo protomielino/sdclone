@@ -160,7 +160,7 @@ void SDRender::Init(tTrack *track)
 {
     SDTrack = track;
 
-    std::string datapath = GetDataDir();
+    std::string datapath = GfDataDir();
     //datapath +="/";
     thesky = new SDSky;
     GfLogDebug("SDSky class\n");
@@ -798,7 +798,7 @@ void SDRender::UpdateSky(double currentTime, double accelTime, double X, double 
 
 void SDRender::weather(void)
 {
-    std::string datapath = GetDataDir();
+    std::string datapath = GfDataDir();
     double domeSizeRatio = SDSkyDomeDistance / 80000.0;
 
     // Cloud layers.

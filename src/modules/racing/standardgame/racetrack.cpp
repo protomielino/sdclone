@@ -530,7 +530,7 @@ reTrackInitRealWeather(void)
     else
     {
         char buffer[1024];
-        snprintf(buffer, sizeof(buffer), "%sconfig/weather.txt", GetLocalDir());
+        snprintf(buffer, sizeof(buffer), "%sconfig/weather.txt", GfLocalDir());
 
         std::string data = buffer;
         GfLogDebug("Path weather.txt : %s\n", data.c_str());
@@ -739,7 +739,7 @@ reTrackInitSimuWeather(void)
 #endif
 
     std::ostringstream weatherfile;
-    weatherfile << GetDataDir() << "data/weather/" << trackLocal->station << "/"
+    weatherfile << GfDataDir() << "data/weather/" << trackLocal->station << "/"
                 << std::setw(2) << std::setfill('0') << std::right << now.tm_mday << "-"
                 << std::setw(2) << std::setfill('0') << std::right << (now.tm_mon + 1) << ".txt";
 

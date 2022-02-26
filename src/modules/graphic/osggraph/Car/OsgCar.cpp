@@ -199,7 +199,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
     osgLoader loader;
 
-    std::string TmpPath = GetDataDir();
+    std::string TmpPath = GfDataDir();
     std::string strTPath;
 
     index = car->index;	/* current car's index */
@@ -261,7 +261,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
              car->_carName); /* default car 3D model file */
     snprintf(path, nMaxTexPathSize, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
 
-    std::string strPath = GetDataDir();
+    std::string strPath = GfDataDir();
 
     if(bMasterModel)
         snprintf(buf, nMaxTexPathSize, "cars/models/%s/%s.acc", car->_masterModel, car->_masterModel);
@@ -313,7 +313,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     {
         _wing1 = true;
 
-        std::string tmp = GetDataDir();
+        std::string tmp = GfDataDir();
         snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
         tmp = tmp+buf;
 
@@ -391,7 +391,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         this->DRMSelector2 = new osg::Switch;
         this->RearWingSelector = new osg::Switch;
         this->RearWingSelector->setName("WINGREAR");
-        std::string tmp = GetDataDir();
+        std::string tmp = GfDataDir();
         snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
         tmp = tmp+buf;
 
@@ -430,7 +430,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     if (param)
     {
         _cockpit = true;
-        std::string tmp = GetDataDir();
+        std::string tmp = GfDataDir();
         snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
         tmp = tmp+buf;
 
@@ -455,7 +455,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
     if (param)
     {
         _steer = true;
-        std::string tmpPath = GetDataDir();
+        std::string tmpPath = GfDataDir();
         snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
         tmpPath = tmpPath+buf;
 
@@ -499,7 +499,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
             if (param)
             {
-                tmpPath = GetDataDir();
+                tmpPath = GfDataDir();
                 snprintf(buf, nMaxTexPathSize, "cars/models/%s/", car->_carName);
                 tmpPath = tmpPath+buf;
 
@@ -552,7 +552,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
         this->DRMSelector = new osg::Switch;
         this->carTransform->addChild(DriverSelector.get());
 
-        std::string tmp = GetLocalDir();
+        std::string tmp = GfLocalDir();
         std::string driver_path;
 
         // add the drivers
@@ -690,7 +690,7 @@ osg::ref_ptr<osg::Node> SDCar::initOcclusionQuad(tCarElt *car)
     int i;
 
     char buf[512];
-    std::string TmpPath = GetDataDir();
+    std::string TmpPath = GfDataDir();
 
     //  GfOut("\n################## LOADING SHADOW ###############################\n");
     std::string shadowTextureName = GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_SHADOW_TEXTURE, "");

@@ -106,7 +106,7 @@ bool ReWebMetar::ReWebMetarFtp(const string& m)
     CURLcode res;
 
     char buffer[1024];
-    snprintf(buffer, sizeof(buffer), "%sconfig/weather.txt", GetLocalDir());
+    snprintf(buffer, sizeof(buffer), "%sconfig/weather.txt", GfLocalDir());
     GfLogDebug("Save Weather file in = %s\n", buffer);
     GfLogDebug("URL WebMetar = %s\n", m.c_str());
 

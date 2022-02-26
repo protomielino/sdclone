@@ -33,7 +33,7 @@
 
 SDCarShader::SDCarShader(osg::Node *car, SDCar *c)
 {
-    std::string TmpPath = GetDataDir();
+    std::string TmpPath = GfDataDir();
 
     program = new osg::Program;
     program->addShader(osgDB::readShaderFile(osg::Shader::VERTEX,

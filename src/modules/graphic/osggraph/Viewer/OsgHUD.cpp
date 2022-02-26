@@ -141,7 +141,7 @@ OSGPLOT::OSGPLOT(
     osgTitle->setColor(color);
 
     std::string fontFileUrl = "/vera/Vera.ttf";
-    std::string fontsMainDirectory = GetDataDir();
+    std::string fontsMainDirectory = GfDataDir();
     fontsMainDirectory = fontsMainDirectory+"data/fonts";
     fontFileUrl = fontsMainDirectory+fontFileUrl;
     osgTitle->setFont(fontFileUrl);
@@ -1635,7 +1635,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
 
                             //set the font
                             {
-                                std::string fontsMainDirectory = GetDataDir();
+                                std::string fontsMainDirectory = GfDataDir();
                                 fontsMainDirectory = fontsMainDirectory+"data/fonts";
                                 fontFileUrl = fontsMainDirectory+fontFileUrl;
                                 text->setFont(fontFileUrl);
@@ -1718,7 +1718,7 @@ osg::ref_ptr <osg::Group> SDHUD::generateHudFromXmlFile(int scrH, int scrW)
                             GfLogDebug("OSGHUD: Generate image object: %s \n", elementId.c_str());
 
                             //start preparing the image
-                            std::string filename = GetDataDir();
+                            std::string filename = GfDataDir();
                             filename = filename+url;
 
                             //get the bounding box
