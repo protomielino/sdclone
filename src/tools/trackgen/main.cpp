@@ -266,14 +266,24 @@ void Application::generate()
     ITrackLoader* PiTrackLoader = 0;
     if (pmodTrkLoader)
         PiTrackLoader = pmodTrkLoader->getInterface<ITrackLoader>();
-    if (!PiTrackLoader)
+    else {
+        fprintf(stderr, "Cannot find %s\n", ossModLibName.str().c_str());
+        GfParmReleaseHandle(CfgHandle);
         return;
+    }
+
+    if (!PiTrackLoader) {
+        fprintf(stderr, "Cannot find ITrackLoader interface\n");
+        GfParmReleaseHandle(CfgHandle);
+        return;
+    }
 
     // This is the track definition.
     sprintf(trackdef, "%stracks/%s/%s/%s.xml", GfDataDir(), TrackCategory, TrackName, TrackName);
     TrackHandle = GfParmReadFile(trackdef, GFPARM_RMODE_STD);
     if (!TrackHandle) {
         fprintf(stderr, "Cannot find %s\n", trackdef);
+        GfParmReleaseHandle(CfgHandle);
         ::exit(1);
     }
 
@@ -371,6 +381,9 @@ void Application::generate()
     }
 
     GenerateObjects(Track, TrackHandle, CfgHandle, outfd, OutMeshName);
+
+    GfParmReleaseHandle(TrackHandle);
+    GfParmReleaseHandle(CfgHandle);
 }
 
 
