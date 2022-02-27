@@ -47,19 +47,19 @@ extern void ControlPutSettings(void *prefHdle = 0, unsigned index = 0, tGearChan
 
 typedef struct
 {
-    const char	*name;
-    tCtrlRef	ref;
-    int		Id;
+    const char  *name;
+    tCtrlRef    ref;
+    int	        Id;
     int         labelId;
-    const char	*minName;
-    float	min;
-    const char	*maxName;
-    float	max;
-    const char	*powName;
-    float	pow;
-    int		keyboardPossible;
-    int		pref;
-    int		butIgnore;
+    const char  *minName;
+    float       min;
+    const char  *maxName;
+    float       max;
+    const char  *powName;
+    float       pow;
+    int         keyboardPossible;
+    int         pref;
+    int         butIgnore;
 } tCmdInfo;
 
 #endif /* _CONTROLCONFIG_H_ */ 

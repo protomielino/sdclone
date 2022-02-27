@@ -244,7 +244,7 @@ updateButtonText(void)
         if (str) {
             GfuiButtonSetText (ScrHandle, Cmd[cmdInd].Id, str);
         } else {
-        GfuiButtonSetText (ScrHandle, Cmd[cmdInd].Id, "---");
+            GfuiButtonSetText (ScrHandle, Cmd[cmdInd].Id, "---");
         }
 
         /* According to detected action, update the "calibration needed" flags */
@@ -591,8 +591,6 @@ DevCalibrate(void * /* dummy */)
 void *
 ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode, int saveOnExit)
 {
-    int i;
-
     ReloadValues = 1;
     PrefHdle = prefHdle;
     SaveOnExit = saveOnExit;
@@ -624,7 +622,7 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     GfuiMenuDefaultKeysAdd(ScrHandle);
 
     /* For each control (in Cmd array), create the associated label and editbox */
-    for (i = 0; i < MaxCmd; i++)
+    for (int i = 0; i < MaxCmd; i++)
     {
         Cmd[i].labelId = GfuiMenuCreateLabelControl(ScrHandle,param,Cmd[i].name);
         std::string strCmdEdit(Cmd[i].name);
