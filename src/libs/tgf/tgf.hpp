@@ -207,7 +207,7 @@ class TGF_API GfApplication
 	void addOptionsHelpExplainLine(const std::string& strTextLine);
 	
 	//! Parse the command line for registered options.
-	bool parseOptions();
+	virtual bool parseOptions();
 
 	//! Check if we have the specified regsitered option in the command line.
 	bool hasOption(const std::string& strLongName) const; // No leading '--'
