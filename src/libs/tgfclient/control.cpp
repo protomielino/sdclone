@@ -133,6 +133,7 @@ static SDL_HapticEffect cfx[GFCTRL_JOY_NUMBER];
 static unsigned int	cfx_timeout[GFCTRL_JOY_NUMBER];
 static unsigned int 	rfx_timeout[GFCTRL_JOY_NUMBER];
 static int id[GFCTRL_JOY_NUMBER];
+static std::string names[GFCTRL_JOY_NUMBER];
 
 
 /** Get a control reference by its name
@@ -272,6 +273,15 @@ GfctrlGetNameByRef(int type, int index)
     return NULL;
 }
 
+std::string &GfctrlJoyName(int joy)
+{
+    static std::string empty;
+
+    if (joy < 0 || joy >= GFCTRL_JOY_NUMBER)
+        return empty;
+
+    return names[joy];
+}
 
 // First time (lazy) initialization.
 void
@@ -281,13 +291,14 @@ gfctrlJoyInit(void)
     
     for(int i = 0;i<GFCTRL_JOY_NUMBER;i++)
     {
-      id[i] = -1;
+        id[i] = -1;
+        names[i].clear();
     }    
 
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC) < 0) {
         GfLogError("Couldn't initialize SDL: %s\n", SDL_GetError());
         gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
-	return;
+	    return;
     }
     // Ignore the joystick events, we will poll directly as it is faster
     SDL_JoystickEventState(SDL_IGNORE);
@@ -303,6 +314,8 @@ gfctrlJoyInit(void)
 		if (Joysticks[index] ==  NULL) {
 			GfLogError("Couldn't open joystick %d: %s\n", index, SDL_GetError());
 		} else {
+			names[index] = SDL_JoystickName(Joysticks[index]);
+
 			cfx_timeout[index] = 0;
 			rfx_timeout[index] = 0;
 			
@@ -439,6 +452,19 @@ GfctrlJoyIsAnyPresent(void)
 {
    if (gfctrlJoyPresent == 0)
 		gfctrlJoyInit();
+
+    return gfctrlJoyPresent;
+}
+
+/** Get number of joysticks available
+    @ingroup	ctrl
+    @return	number of joysticks
+*/
+int
+GfctrlJoyNumber(void)
+{
+    if (gfctrlJoyPresent <= 0)
+        gfctrlJoyInit();
 
     return gfctrlJoyPresent;
 }

@@ -688,7 +688,8 @@ TGFCLIENT_API void gfctrlJoyConstantForce(int index, int level, int dir);
 TGFCLIENT_API void gfctrlJoyRumble(int index, float level);
 TGFCLIENT_API void GfctrlJoySetAxis(int joy, int axis, float value);
 TGFCLIENT_API void GfctrlJoySetButton(int joy, int button, int value);
-
+TGFCLIENT_API std::string & GfctrlJoyName(int joy);
+TGFCLIENT_API int GfctrlJoyNumber(void);
 
 /** Mouse information structure */
 typedef struct
