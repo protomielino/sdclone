@@ -469,8 +469,15 @@ GfctrlJoyNumber(void)
     return gfctrlJoyPresent;
 }
 
+/** Get the current state of the joysticks
+    @ingroup	ctrl
+    @param	joyInfo	Target joystick structure
+    @return	<tt>0 ... </tt>Ok
+        <br><tt>-1 .. </tt>Error
+    @note	The tCtrlJoyInfo structure is updated with the new values
+*/
 int
-GfctrlSDL2JoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
+GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 {
    int			ind;
    int			i,j;
@@ -531,19 +538,6 @@ GfctrlSDL2JoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
       return -1;
    }
    return 0;
-}
-
-/** Get the current state of the joysticks
-    @ingroup	ctrl
-    @param	joyInfo	Target joystick structure
-    @return	<tt>0 ... </tt>Ok
-		<br><tt>-1 .. </tt>Error
-    @note	The tCtrlJoyInfo structure is updated with the new values
-*/
-int
-GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
-{
-   return GfctrlSDL2JoyGetCurrentStates(joyInfo);
 }
 
 void
