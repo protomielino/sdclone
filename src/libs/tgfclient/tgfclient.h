@@ -382,6 +382,7 @@ private:
 
 /* Mouse management */
 #define GFCTRL_MOUSE_MAX_BUTTONS    7
+#define GFCTRL_MOUSE_MAX_AXES       4
 
 typedef struct MouseInfo
 {
@@ -697,7 +698,7 @@ typedef struct
     int         edgeup[GFCTRL_MOUSE_MAX_BUTTONS];      /**< Button transition from down (pressed) to up */
     int         edgedn[GFCTRL_MOUSE_MAX_BUTTONS];      /**< Button transition from up to down */
     int         button[GFCTRL_MOUSE_MAX_BUTTONS];      /**< Button state (1 = up) */
-    float       ax[4];          /**< mouse axis position (mouse considered as a joystick) */
+    float       ax[GFCTRL_MOUSE_MAX_AXES];             /**< mouse axis position (mouse considered as a joystick) */
 } tCtrlMouseInfo;
 
 TGFCLIENT_API tCtrlMouseInfo* GfctrlMouseCreate(void);

@@ -157,7 +157,7 @@ Idle2(void)
     GfctrlMouseGetCurrentState(&MouseInfo);
 
     /* Check for a mouse button pressed */
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < GFCTRL_MOUSE_MAX_BUTTONS; i++) {
 	if (MouseInfo.edgedn[i]) {
 	    MouseCalAutomaton();
 	    return;

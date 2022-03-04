@@ -367,7 +367,7 @@ IdleWaitForInput(void)
     GfctrlMouseGetCurrentState(&MouseInfo);
 
     /* Check for a mouse button pressed */
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < GFCTRL_MOUSE_MAX_BUTTONS; i++) {
         if (MouseInfo.edgedn[i]) {
             AcceptMouseClicks = 0;
             GfuiApp().eventLoop().setRecomputeCB(0);
@@ -383,7 +383,7 @@ IdleWaitForInput(void)
     }
 
     /* Check for a mouse axis moved */
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < GFCTRL_MOUSE_MAX_AXES; i++) {
         if (MouseInfo.ax[i] > 20.0) {
             GfuiApp().eventLoop().setRecomputeCB(0);
             InputWaited = 0;
