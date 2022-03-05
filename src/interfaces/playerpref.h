@@ -158,6 +158,12 @@
 #define HM_ATT_ASR	"ASR on"
 #define HM_ATT_NBPITS	"programmed pit stops"
 
+/* Gear change mode */
+typedef enum {
+    GEAR_MODE_NONE = 0, GEAR_MODE_AUTO = 1,
+    GEAR_MODE_SEQ = 2, GEAR_MODE_GRID = 4, GEAR_MODE_HBOX = 8
+} tGearChangeMode;
+
 #define HM_VAL_AUTO	"auto"
 #define HM_VAL_SEQ	"sequential"
 #define HM_VAL_GRID	"grid"

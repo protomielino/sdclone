@@ -64,8 +64,6 @@
 
 extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
 
-typedef enum { eTransAuto, eTransSeq, eTransGrid, eTransHbox } eTransmission;
-
 typedef struct {
     const char	*name;		/* Name of the control */
     int		type;		/* Type of control (analog, joy button, keyboard) */
@@ -104,7 +102,7 @@ typedef struct HumanContext
     float		paccel;
     float		pbrake;
     bool		manual;
-    eTransmission	transmission;
+    tGearChangeMode	transmission;
     int			nbPitStopProg;
     bool		paramAsr;
     bool		paramAbs;
@@ -957,7 +955,7 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
     }
 
     // Allow Grid Gearbox to freely change as race starts
-    if (s->currentTime <= 0 && HCtx[idx]->transmission == eTransGrid)
+    if (s->currentTime <= 0 && HCtx[idx]->transmission == GEAR_MODE_GRID)
     {
         /* default to neutral gear */
         preGear = 0;
@@ -1766,7 +1764,7 @@ void HumanDriver::drive_mt(int index, tCarElt* car, tSituation *s)
 
     //Can it be left out? car->_gearCmd = car->_gear;
     /* manual shift sequential */
-    if (HCtx[idx]->transmission == eTransSeq)
+    if (HCtx[idx]->transmission == GEAR_MODE_SEQ)
     {
         /* Up shifting command */
         if ((cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_UP_SHFT].val])
@@ -1819,7 +1817,7 @@ void HumanDriver::drive_mt(int index, tCarElt* car, tSituation *s)
     }
 
     /* manual shift direct (button for each gear) */
-    else if (HCtx[idx]->transmission == eTransGrid)
+    else if (HCtx[idx]->transmission == GEAR_MODE_GRID)
     {
         /* Go to neutral gear if any gear command released (edge down) */
         if (HCtx[idx]->relButNeutral) {
@@ -1845,7 +1843,7 @@ void HumanDriver::drive_mt(int index, tCarElt* car, tSituation *s)
     }
 
     /* H-Box selector using XY axis of joy/thumbstick */
-    else if (HCtx[idx]->transmission == eTransHbox)
+    else if (HCtx[idx]->transmission == GEAR_MODE_HBOX)
     {
         // Used to test bitfield of allowable changes
         int hboxGearTest = 1 << (car->_gear + 1);
@@ -2189,13 +2187,13 @@ void HumanDriver::human_prefs(const int robot_index, int player_index)
     sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, player_index);
     prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_TRANS, HM_VAL_AUTO);
     if (!strcmp(prm, HM_VAL_AUTO))
-        HCtx[idx]->transmission = eTransAuto;
+        HCtx[idx]->transmission = GEAR_MODE_AUTO;
     else if (!strcmp(prm, HM_VAL_SEQ))
-        HCtx[idx]->transmission = eTransSeq;
+        HCtx[idx]->transmission = GEAR_MODE_SEQ;
     else if (!strcmp(prm, HM_VAL_HBOX))
-        HCtx[idx]->transmission = eTransHbox;
+        HCtx[idx]->transmission = GEAR_MODE_HBOX;
     else
-        HCtx[idx]->transmission = eTransGrid;
+        HCtx[idx]->transmission = GEAR_MODE_GRID;
 
     /* Parameters Settings */
     //ABS on/off
@@ -2313,19 +2311,19 @@ void HumanDriver::human_prefs(const int robot_index, int player_index)
     prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_AUTOREVERSE, Yn[HCtx[idx]->autoReverse].c_str());
     HCtx[idx]->autoReverse = (prm == Yn[0]);
 
-    if (HCtx[idx]->transmission != eTransGrid) {
+    if (HCtx[idx]->transmission != GEAR_MODE_GRID) {
        for (int k = CMD_GEAR_2; k <= CMD_GEAR_6; k++) {
           cmdCtrl[k].type = GFCTRL_TYPE_NOT_AFFECTED;
        }
     }
-    if (HCtx[idx]->transmission != eTransHbox) {
+    if (HCtx[idx]->transmission != GEAR_MODE_HBOX) {
        cmdCtrl[CMD_HBOX_X].type = GFCTRL_TYPE_NOT_AFFECTED;
        cmdCtrl[CMD_HBOX_Y].type = GFCTRL_TYPE_NOT_AFFECTED;
     }
-    if (HCtx[idx]->transmission == eTransHbox)
+    if (HCtx[idx]->transmission == GEAR_MODE_HBOX)
        cmdCtrl[CMD_GEAR_1].type = GFCTRL_TYPE_NOT_AFFECTED;
 
-    if (HCtx[idx]->transmission == eTransAuto &&  HCtx[idx]->autoReverse) {
+    if (HCtx[idx]->transmission == GEAR_MODE_AUTO &&  HCtx[idx]->autoReverse) {
        cmdCtrl[CMD_GEAR_R].type = GFCTRL_TYPE_NOT_AFFECTED;
        cmdCtrl[CMD_GEAR_N].type = GFCTRL_TYPE_NOT_AFFECTED;
        cmdCtrl[CMD_GEAR_1].type = GFCTRL_TYPE_NOT_AFFECTED;
@@ -2355,7 +2353,7 @@ HumanDriver::HumanDriver(const char *robotname)
 
 bool HumanDriver::uses_at(int index)
 {
-    return HCtx[index-1]->transmission == eTransAuto;
+    return HCtx[index-1]->transmission == GEAR_MODE_AUTO;
 }
 
 void HumanDriver::read_prefs(int index)
