@@ -24,6 +24,7 @@
 #include <vector>
 
 #include <tgf.h>
+#include <car.h>
 
 #include "tgfdata.h"
 
@@ -46,8 +47,7 @@ public:
 	const std::string& getCategoryName() const;
 	const std::string& getDescriptorFileName() const;
 
-	enum EDriveTrain { eRWD, eFWD, e4WD, eNDriveTrains };
-	EDriveTrain getDriveTrain() const;
+	tDriveType getDriveTrain() const;
 	
 	unsigned getGearsCount() const;
 	
@@ -85,7 +85,7 @@ protected:
 	std::string _strCatName; // User friendly category name (ex: "Long day Series GT1").
 	std::string _strDescFile; // Path-name of the XML descriptor file.
 
-	EDriveTrain _eDriveTrain;
+	tDriveType _eDriveTrain;
 	unsigned _nGears; // Number of gears.
 	bool _bTurboCharged; // TODO: Move to an enum (Turbo, Compressor, ...)
 	tdble _fEngineCapacity; // litres

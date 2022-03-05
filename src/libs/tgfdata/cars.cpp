@@ -280,15 +280,13 @@ void GfCar::load(void* hparmCar)
 	
 	// Drive train.
 	const std::string strDriveTrain =
-		GfParmGetStr(hparmCar, SECT_DRIVETRAIN, PRM_TYPE, "");
+		GfParmGetStr(hparmCar, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
 	if (strDriveTrain == VAL_TRANS_RWD)
-		_eDriveTrain = eRWD;
+		_eDriveTrain = TRANS_RWD;
 	else if (strDriveTrain == VAL_TRANS_FWD)
-		_eDriveTrain = eFWD;
+		_eDriveTrain = TRANS_FWD;
 	else if (strDriveTrain == VAL_TRANS_4WD)
-		_eDriveTrain = e4WD;
-	else
-		_eDriveTrain = eNDriveTrains;
+		_eDriveTrain = TRANS_4WD;
 
 	// Number of gears.
 	std::ostringstream ossSpecPath;
@@ -488,7 +486,7 @@ const std::string& GfCar::getDescriptorFileName() const
 	return _strDescFile;
 }
 
-GfCar::EDriveTrain GfCar::getDriveTrain() const
+tDriveType GfCar::getDriveTrain() const
 {
 	return _eDriveTrain;
 }

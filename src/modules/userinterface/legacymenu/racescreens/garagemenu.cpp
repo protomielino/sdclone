@@ -261,8 +261,8 @@ GfCar* RmGarageMenu::resetCarModelComboBox(const std::string& strCatName,
 
 void RmGarageMenu::resetCarDataSheet(const std::string& strSelCarId)
 {
-	static const char* pszDriveWheels[GfCar::eNDriveTrains+1] =
-		{ "Rear", "Front", "4", "?" };
+	static const char* pszDriveWheels[3] =
+		{ "Rear", "Front", "4" };
 	static const char* pszEnginePosition[GfCar::eNEnginePositions+1] =
 		{ "Front", "Front-mid", "Mid", "Rear-mid", "Rear", "?" };
 	static const char* pszEngineShape[GfCar::eNEngineShapes+1] =
