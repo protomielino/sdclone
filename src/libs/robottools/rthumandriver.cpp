@@ -66,8 +66,6 @@ extern TGFCLIENT_API ForceFeedbackManager forceFeedback;
 
 typedef enum { eTransAuto, eTransSeq, eTransGrid, eTransHbox } eTransmission;
 
-typedef enum { eRWD, eFWD, e4WD } eDriveTrain;
-
 typedef struct {
     const char	*name;		/* Name of the control */
     int		type;		/* Type of control (analog, joy button, keyboard) */
@@ -114,7 +112,7 @@ typedef struct HumanContext
     bool		seqShftAllowNeutral;
     bool		seqShftAllowReverse;
     bool		autoReverse;
-    eDriveTrain	driveTrain;
+    tDriveType	driveTrain;
     bool		autoClutch;
     tControlCmd		*cmdControl;
     bool		mouseControlUsed;
@@ -698,11 +696,11 @@ void HumanDriver::new_race(int index, tCarElt* car, tSituation *s)
 
     const std::string traintype = GfParmGetStr(car->_carHandle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
     if (traintype == VAL_TRANS_RWD) {
-        HCtx[idx]->driveTrain = eRWD;
+        HCtx[idx]->driveTrain = TRANS_RWD;
     } else if (traintype == VAL_TRANS_FWD) {
-        HCtx[idx]->driveTrain = eFWD;
+        HCtx[idx]->driveTrain = TRANS_FWD;
     } else if (traintype == VAL_TRANS_4WD) {
-        HCtx[idx]->driveTrain = e4WD;
+        HCtx[idx]->driveTrain = TRANS_4WD;
     }//if traintype
 
     // Set up the autoclutch
@@ -1590,17 +1588,17 @@ static void common_drive(const int index, tCarElt* car, tSituation *s)
         tdble drivespeed = 0.0;
         switch (HCtx[idx]->driveTrain)
         {
-        case e4WD:
+        case TRANS_4WD:
             drivespeed = ((car->_wheelSpinVel(FRNT_RGT) + car->_wheelSpinVel(FRNT_LFT)) *
                     car->_wheelRadius(FRNT_LFT) +
                     (car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) *
                     car->_wheelRadius(REAR_LFT)) / 4.0;
             break;
-        case eFWD:
+        case TRANS_FWD:
             drivespeed = (car->_wheelSpinVel(FRNT_RGT) + car->_wheelSpinVel(FRNT_LFT)) *
                 car->_wheelRadius(FRNT_LFT) / 2.0;
             break;
-        case eRWD:
+        case TRANS_RWD:
             // ADJUSTMENTS TO RWD Asr:-
             // Originally this purely returned the speed of the wheels, which when the speed of
             // the car is subtracted below provides the degree of slip, which is then used to

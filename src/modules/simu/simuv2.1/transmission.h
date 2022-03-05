@@ -51,10 +51,7 @@ typedef struct
 {
     tGearbox	gearbox;
     tClutch	clutch;
-    int		type;
-#define TRANS_RWD	0
-#define TRANS_FWD	1
-#define TRANS_4WD	2
+    tDriveType	type;
     tdble	overallRatio[MAX_GEARS];	/* including final drive ratio */
     tdble	driveI[MAX_GEARS];		/* Inertia (including engine) */
     tdble	freeI[MAX_GEARS];		/* Inertia when clutch is applied (wheels side) */

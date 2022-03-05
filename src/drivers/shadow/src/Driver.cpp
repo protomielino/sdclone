@@ -147,7 +147,7 @@ void	Driver::PathRange::AddLesser(
 Driver::Driver(int index) :	INDEX(index),
       m_Strategy(m_track, m_pitPath[PATH_NORMAL][0]),
       _acc(0),
-      m_driveType(cDT_RWD),
+      m_driveType(TRANS_RWD),
       m_gearUpRpm(8000),
       rain(false),
       rainintensity(0.0),
@@ -780,14 +780,14 @@ void	Driver::NewRace( int index, tCarElt* pCar, tSituation* pS )
 
     const char* traintype = GfParmGetStr(pCar->_carHandle,
                                          SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
-    m_driveType = cDT_RWD;
+    m_driveType = TRANS_RWD;
 
     if( strcmp(traintype, VAL_TRANS_RWD) == 0 )
-        m_driveType = cDT_RWD;
+        m_driveType = TRANS_RWD;
     else if( strcmp(traintype, VAL_TRANS_FWD) == 0 )
-        m_driveType = cDT_FWD;
+        m_driveType = TRANS_FWD;
     else if( strcmp(traintype, VAL_TRANS_4WD) == 0 )
-        m_driveType = cDT_4WD;
+        m_driveType = TRANS_4WD;
 
     m_flying = 0;
     m_raceStart = true;
@@ -1891,14 +1891,14 @@ void	Driver::launchControlClutch( tCarElt* car, tSituation* s )
     double	wv = 0;
     int		count = 0;
 
-    if( m_driveType == cDT_FWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_FWD || m_driveType == TRANS_4WD )
     {
         wv +=	car->_wheelRadius(FRNT_LFT) * car->priv.wheel[FRNT_LFT].spinVel +
                 car->_wheelRadius(FRNT_RGT) * car->priv.wheel[FRNT_RGT].spinVel;
         count += 2;
     }
 
-    if( m_driveType == cDT_RWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_RWD || m_driveType == TRANS_4WD )
     {
         wv +=	car->_wheelRadius(REAR_LFT) * car->priv.wheel[REAR_LFT].spinVel +
                 car->_wheelRadius(REAR_RGT) * car->priv.wheel[REAR_RGT].spinVel;
@@ -1992,14 +1992,14 @@ void	Driver::launchControlSimple( tCarElt* car, tSituation* s )
     double	wv = 0;
     int		count = 0;
 
-    if( m_driveType == cDT_FWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_FWD || m_driveType == TRANS_4WD )
     {
         wv +=	car->_wheelRadius(FRNT_LFT) * car->priv.wheel[FRNT_LFT].spinVel +
                 car->_wheelRadius(FRNT_RGT) * car->priv.wheel[FRNT_RGT].spinVel;
         count += 2;
     }
 
-    if( m_driveType == cDT_RWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_RWD || m_driveType == TRANS_4WD )
     {
         wv +=	car->_wheelRadius(REAR_LFT) * car->priv.wheel[REAR_LFT].spinVel +
                 car->_wheelRadius(REAR_RGT) * car->priv.wheel[REAR_RGT].spinVel;
@@ -2054,14 +2054,14 @@ void	Driver::launchControlAcclerator( tCarElt* car, tSituation* s )
     double	wv = 0;
     int		count = 0;
 
-    if( m_driveType == cDT_FWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_FWD || m_driveType == TRANS_4WD )
     {
         wv +=	car->_wheelRadius(FRNT_LFT) * car->priv.wheel[FRNT_LFT].spinVel +
                 car->_wheelRadius(FRNT_RGT) * car->priv.wheel[FRNT_RGT].spinVel;
         count += 2;
     }
 
-    if( m_driveType == cDT_RWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_RWD || m_driveType == TRANS_4WD )
     {
         wv +=	car->_wheelRadius(REAR_LFT) * car->priv.wheel[REAR_LFT].spinVel +
                 car->_wheelRadius(REAR_RGT) * car->priv.wheel[REAR_RGT].spinVel;
@@ -2154,14 +2154,14 @@ void	Driver::launchControlAccSlip( tCarElt* car, tSituation* s )
     double	wv = 0;
     int		count = 0;
 
-    if( m_driveType == cDT_FWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_FWD || m_driveType == TRANS_4WD )
     {
         wv +=	car->_wheelRadius(FRNT_LFT) * car->priv.wheel[FRNT_LFT].spinVel +
                 car->_wheelRadius(FRNT_RGT) * car->priv.wheel[FRNT_RGT].spinVel;
         count += 2;
     }
 
-    if( m_driveType == cDT_RWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_RWD || m_driveType == TRANS_4WD )
     {
         wv +=	car->_wheelRadius(REAR_LFT) * car->priv.wheel[REAR_LFT].spinVel +
                 car->_wheelRadius(REAR_RGT) * car->priv.wheel[REAR_RGT].spinVel;
@@ -2259,14 +2259,14 @@ void	Driver::launchControlAccSlip2( tCarElt* car, tSituation* s )
     double	wv = 0;
     int		count = 0;
 
-    if( m_driveType == cDT_FWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_FWD || m_driveType == TRANS_4WD )
     {
         wv +=	car->_wheelRadius(FRNT_LFT) * car->priv.wheel[FRNT_LFT].spinVel +
                 car->_wheelRadius(FRNT_RGT) * car->priv.wheel[FRNT_RGT].spinVel;
         count += 2;
     }
 
-    if( m_driveType == cDT_RWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_RWD || m_driveType == TRANS_4WD )
     {
         wv +=	car->_wheelRadius(REAR_LFT) * car->priv.wheel[REAR_LFT].spinVel +
                 car->_wheelRadius(REAR_RGT) * car->priv.wheel[REAR_RGT].spinVel;
@@ -2383,14 +2383,14 @@ void	Driver::launchControlFullThrottle( tCarElt* car, tSituation* s )
     double	wv = 0;
     int		count = 0;
 
-    if( m_driveType == cDT_FWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_FWD || m_driveType == TRANS_4WD )
     {
         wv +=	car->_wheelRadius(FRNT_LFT) * car->priv.wheel[FRNT_LFT].spinVel +
                 car->_wheelRadius(FRNT_RGT) * car->priv.wheel[FRNT_RGT].spinVel;
         count += 2;
     }
 
-    if( m_driveType == cDT_RWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_RWD || m_driveType == TRANS_4WD )
     {
         wv +=	car->_wheelRadius(REAR_LFT) * car->priv.wheel[REAR_LFT].spinVel +
                 car->_wheelRadius(REAR_RGT) * car->priv.wheel[REAR_RGT].spinVel;
@@ -2804,13 +2804,13 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
         double	wr = 0;
         int		count = 0;
 
-        if( m_driveType == cDT_FWD || m_driveType == cDT_4WD )
+        if( m_driveType == TRANS_FWD || m_driveType == TRANS_4WD )
         {
             wr += car->_wheelRadius(FRNT_LFT) + car->_wheelRadius(FRNT_RGT);
             count += 2;
         }
 
-        if( m_driveType == cDT_RWD || m_driveType == cDT_4WD )
+        if( m_driveType == TRANS_RWD || m_driveType == TRANS_4WD )
         {
             wr += car->_wheelRadius(REAR_LFT) + car->_wheelRadius(REAR_RGT);
             count += 2;
@@ -3411,7 +3411,7 @@ double	Driver::ApplyTractionControl( tCarElt* car, double acc )
     double	wr = 0;
     int		count = 0;
 
-    if( m_driveType == cDT_FWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_FWD || m_driveType == TRANS_4WD )
     {
         spin += car->_wheelSpinVel(FRNT_LFT) * car->_wheelRadius(FRNT_LFT);
         spin += car->_wheelSpinVel(FRNT_RGT) * car->_wheelRadius(FRNT_RGT);
@@ -3419,7 +3419,7 @@ double	Driver::ApplyTractionControl( tCarElt* car, double acc )
         count += 2;
     }
 
-    if( m_driveType == cDT_RWD || m_driveType == cDT_4WD )
+    if( m_driveType == TRANS_RWD || m_driveType == TRANS_4WD )
     {
         spin += car->_wheelSpinVel(REAR_LFT) * car->_wheelRadius(REAR_LFT);
         spin += car->_wheelSpinVel(REAR_RGT) * car->_wheelRadius(REAR_RGT);

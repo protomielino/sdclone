@@ -199,7 +199,7 @@ TDriver::TDriver(int Index):
 	oAvoidWidth(0.5),
 	oGoToPit(false),
 	oCloseYourEyes(false),
-	oDriveTrainType(cDT_RWD),
+	oDriveTrainType(TRANS_RWD),
 	//	oPIDCBrake;
 	//	oPIDCLine;
 	oFlying(0),
@@ -1947,15 +1947,15 @@ void TDriver::InitDriveTrain()
 {
 	LogSimplix.debug("\n#InitDriveTrain >>>\n\n");
 
-	oDriveTrainType = cDT_RWD;						//	Assume rear	wheel drive
+	oDriveTrainType = TRANS_RWD;						//	Assume rear	wheel drive
 	const char* TrainType =						// but check it
 			GfParmGetStr(oCarHandle,
 						 SECT_DRIVETRAIN,	PRM_TYPE, VAL_TRANS_RWD);
 
 	if	(strcmp(TrainType, VAL_TRANS_FWD) == 0)		//	If front wheel drive
-		oDriveTrainType =	cDT_FWD;				   //	change mode
+		oDriveTrainType =	TRANS_FWD;				   //	change mode
 	else if (strcmp(TrainType,	VAL_TRANS_4WD) == 0)// and if all wheel	drive
-		oDriveTrainType =	cDT_4WD;				   //	too
+		oDriveTrainType =	TRANS_4WD;				   //	too
 
 	LogSimplix.debug("\n#<<< InitDriveTrain\n\n");
 }

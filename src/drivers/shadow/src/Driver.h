@@ -168,11 +168,6 @@ private:
     bool    CheckPitSharing(tCarElt *car);
 
 private:
-    enum	// drive types
-    {
-        cDT_RWD, cDT_FWD, cDT_4WD,
-    };
-
     enum
     {
         cMAX_OPP = 40,
@@ -446,7 +441,7 @@ private:
 
     Private			m_priv[N_PATHS];
 
-    int				m_driveType;
+    tDriveType		m_driveType;
     double			m_gearUpRpm;			// for gear changing.
 
     bool            rain;

@@ -209,11 +209,6 @@ private:
 
 
 private:
-    enum // drive types
-    {
-        cDT_RWD, cDT_FWD,	cDT_4WD,
-    };
-
     int oRobotTyp;
     TCommonData* oCommonData;					  //	Pointer	to common data
     TTrackDescription oTrackDesc;				  // Track description
@@ -232,7 +227,7 @@ private:
     bool oGoToPit;								  //	Enter pit flag
     bool oCloseYourEyes;						  //	Close your eyes	for	a while
 
-    int	oDriveTrainType;						  //	Drive train	type
+    tDriveType	oDriveTrainType;				  //	Drive train	type
 
     TPidController	oPIDCBrake;						   // Controller for brake	error
     TPidController	oPIDCLine;						  // Controller	for	line error

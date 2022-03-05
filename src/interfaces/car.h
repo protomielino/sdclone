@@ -892,6 +892,13 @@ typedef struct CarElt
 #define VAL_DIFF_15WAY_LSD	"1.5 WAY LSD"
 #define VAL_DIFF_ELECTRONIC_LSD	"ELECTRONIC LSD"
 
+typedef enum
+{
+    TRANS_RWD,
+    TRANS_FWD,
+    TRANS_4WD,
+} tDriveType;
+
 #define VAL_TRANS_RWD		"RWD"
 #define VAL_TRANS_FWD		"FWD"
 #define VAL_TRANS_4WD		"4WD"
