@@ -317,7 +317,7 @@ void RmGarageMenu::resetCarDataSheet(const std::string& strSelCarId)
 		if (pSelCar->getEngineCapacity() >= 1)
 			ossSpecValue << std::setprecision(1) << pSelCar->getEngineCapacity() << " l ";
 		else
-			ossSpecValue << std::setprecision(1) << (pSelCar->getEngineCapacity() * 1000.0) << " cc ";
+			ossSpecValue << (pSelCar->getEngineCapacity() * 1000.0) << " cc ";
 	}
 	if (pSelCar->isTurboCharged())
 		ossSpecValue << "turbo";
