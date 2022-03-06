@@ -903,10 +903,28 @@ typedef enum
 #define VAL_TRANS_FWD		"FWD"
 #define VAL_TRANS_4WD		"4WD"
 
+typedef enum
+{
+    ENGSHAPE_V,
+    ENGSHAPE_L,
+    ENGSHAPE_H,
+    ENGSHAPE_W
+
+} tEngineShape;
+
 #define VAL_ENGSHAPE_V		"v"
 #define VAL_ENGSHAPE_L		"l"
 #define VAL_ENGSHAPE_H		"h"
 #define VAL_ENGSHAPE_W		"w"
+
+typedef enum
+{
+    ENGPOS_FRONT,
+    ENGPOS_FRONTMID,
+    ENGPOS_MID,
+    ENGPOS_REARMID,
+    ENGPOS_REAR,
+} tEnginePosition;
 
 #define VAL_ENGPOS_FRONT		"front"
 #define VAL_ENGPOS_FRONTMID		"front-mid"

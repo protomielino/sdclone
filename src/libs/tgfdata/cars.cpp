@@ -259,6 +259,7 @@ void GfCars::print() const
 GfCar::GfCar(const std::string& strId, const std::string& strCatId,
 			 const std::string& strCatName, void* hparmCar)
 : _strId(strId), _strCatId(strCatId), _strCatName(strCatName)
+, _eDriveTrain(TRANS_RWD), _eEngineShape(ENGSHAPE_L), _eEnginePosition(ENGPOS_FRONT)
 {
 	load(hparmCar);
 }
@@ -279,14 +280,20 @@ void GfCar::load(void* hparmCar)
 	_fFrontRearMassRatio = GfParmGetNum(hparmCar, SECT_CAR, PRM_FRWEIGHTREP, 0, .5);
 	
 	// Drive train.
-	const std::string strDriveTrain =
-		GfParmGetStr(hparmCar, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
-	if (strDriveTrain == VAL_TRANS_RWD)
-		_eDriveTrain = TRANS_RWD;
-	else if (strDriveTrain == VAL_TRANS_FWD)
-		_eDriveTrain = TRANS_FWD;
-	else if (strDriveTrain == VAL_TRANS_4WD)
-		_eDriveTrain = TRANS_4WD;
+	if (GfParmExistsParam(hparmCar, SECT_DRIVETRAIN, PRM_TYPE))
+	{
+		const std::string strDriveTrain = GfParmGetStr(hparmCar, SECT_DRIVETRAIN, PRM_TYPE, "");
+		if (strDriveTrain == VAL_TRANS_RWD)
+			_eDriveTrain = TRANS_RWD;
+		else if (strDriveTrain == VAL_TRANS_FWD)
+			_eDriveTrain = TRANS_FWD;
+		else if (strDriveTrain == VAL_TRANS_4WD)
+			_eDriveTrain = TRANS_4WD;
+		else
+			GfLogError("Unknown drive train type: %s - (%s)\n", strDriveTrain.c_str(), _strDescFile.c_str());
+	}
+	else
+		GfLogError("Missing drive train type - (%s)\n", _strDescFile.c_str());
 
 	// Number of gears.
 	std::ostringstream ossSpecPath;
@@ -336,34 +343,42 @@ void GfCar::load(void* hparmCar)
 	}
 
 	// Engine shape.
-	const std::string strEngShape =
-		GfParmGetStr(hparmCar, SECT_ENGINE, PRM_ENGSHAPE, "");
-	if (strEngShape == VAL_ENGSHAPE_V)
-		_eEngineShape = eV;
-	else if (strEngShape == VAL_ENGSHAPE_H)
-		_eEngineShape = eH;
-	else if (strEngShape == VAL_ENGSHAPE_L)
-		_eEngineShape = eL;
-	else if (strEngShape == VAL_ENGSHAPE_W)
-		_eEngineShape = eW;
+	if (GfParmExistsParam(hparmCar, SECT_ENGINE, PRM_ENGSHAPE))
+	{
+		const std::string strEngShape = GfParmGetStr(hparmCar, SECT_ENGINE, PRM_ENGSHAPE, "");
+		if (strEngShape == VAL_ENGSHAPE_V)
+			_eEngineShape = ENGSHAPE_V;
+		else if (strEngShape == VAL_ENGSHAPE_H)
+			_eEngineShape = ENGSHAPE_H;
+		else if (strEngShape == VAL_ENGSHAPE_L)
+			_eEngineShape = ENGSHAPE_L;
+		else if (strEngShape == VAL_ENGSHAPE_W)
+			_eEngineShape = ENGSHAPE_W;
+		else
+			GfLogError("Unknown engine shape: %s - (%s)\n", strEngShape.c_str(), _strDescFile.c_str());
+	}
 	else
-		_eEngineShape = eNEngineShapes;
-	
+		GfLogError("Missing engine shape - (%s)\n", _strDescFile.c_str());
+
 	// Engine position.
-	const std::string strEngPos =
-		GfParmGetStr(hparmCar, SECT_ENGINE, PRM_ENGPOS, "");
-	if (strEngPos == VAL_ENGPOS_REAR)
-		_eEnginePosition = eRear;
-	else if (strEngPos == VAL_ENGPOS_REARMID)
-		_eEnginePosition = eRearMid;
-	else if (strEngPos == VAL_ENGPOS_MID)
-		_eEnginePosition = eMid;
-	else if (strEngPos == VAL_ENGPOS_FRONTMID)
-		_eEnginePosition = eFrontMid;
-	else if (strEngPos == VAL_ENGPOS_FRONT)
-		_eEnginePosition = eFront;
+	if (GfParmExistsParam(hparmCar, SECT_ENGINE, PRM_ENGPOS))
+	{
+		const std::string strEngPos = GfParmGetStr(hparmCar, SECT_ENGINE, PRM_ENGPOS, "");
+		if (strEngPos == VAL_ENGPOS_REAR)
+			_eEnginePosition = ENGPOS_REAR;
+		else if (strEngPos == VAL_ENGPOS_REARMID)
+			_eEnginePosition = ENGPOS_REARMID;
+		else if (strEngPos == VAL_ENGPOS_MID)
+			_eEnginePosition = ENGPOS_MID;
+		else if (strEngPos == VAL_ENGPOS_FRONTMID)
+			_eEnginePosition = ENGPOS_FRONTMID;
+		else if (strEngPos == VAL_ENGPOS_FRONT)
+			_eEnginePosition = ENGPOS_FRONT;
+		else
+			GfLogError("Unknown engine position: %s - (%s)\n", strEngPos.c_str(), _strDescFile.c_str());
+	}
 	else
-		_eEnginePosition = eNEnginePositions;
+		GfLogError("Missing engine position - (%s)\n", _strDescFile.c_str());
 
 	// Engine capacity.
 	_fEngineCapacity =
@@ -438,12 +453,11 @@ void GfCar::load(void* hparmCar)
 		GfParmGetNum(hparmCar, ossSpecPath.str().c_str(), PRM_EFFICIENCY, 0, 1.0f);
 	// calculate differential efficiency
 	tdble fDiffEff = 0.95f;
-	const char *fTransType = GfParmGetStr(hparmCar, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
-	if (strcmp(VAL_TRANS_RWD, fTransType) == 0) {
+	if (_eDriveTrain == TRANS_RWD) {
 		fDiffEff = GfParmGetNum(hparmCar, SECT_REARDIFFERENTIAL, PRM_EFFICIENCY, 0, 1.0f);
-	} else if (strcmp(VAL_TRANS_FWD, fTransType) == 0) {
+	} else if (_eDriveTrain == TRANS_FWD) {
 		fDiffEff = GfParmGetNum(hparmCar, SECT_FRNTDIFFERENTIAL, PRM_EFFICIENCY, 0, 1.0f);
-	} else if (strcmp(VAL_TRANS_4WD, fTransType) == 0) {
+	} else if (_eDriveTrain == TRANS_4WD) {
 		fDiffEff = ( GfParmGetNum(hparmCar, SECT_REARDIFFERENTIAL, PRM_EFFICIENCY, 0, 1.0f)
 			+ GfParmGetNum(hparmCar, SECT_FRNTDIFFERENTIAL, PRM_EFFICIENCY, 0, 1.0f) ) * 0.5f
 			* GfParmGetNum(hparmCar, SECT_CENTRALDIFFERENTIAL, PRM_EFFICIENCY, 0, 1.0f);
@@ -511,12 +525,12 @@ tdble GfCar::getEngineCapacity() const
 	return _fEngineCapacity;
 }
 
-GfCar::EEngineShape GfCar::getEngineShape() const
+tEngineShape GfCar::getEngineShape() const
 {
 	return _eEngineShape;
 }
 
-GfCar::EEnginePosition GfCar::getEnginePosition() const
+tEnginePosition GfCar::getEnginePosition() const
 {
 	return _eEnginePosition;
 }

@@ -57,11 +57,9 @@ public:
 	
 	tdble getEngineCapacity() const;
 	
-	enum EEngineShape { eV, eL, eH, eW, eNEngineShapes };
-	EEngineShape getEngineShape() const;
+	tEngineShape getEngineShape() const;
 	
-	enum EEnginePosition { eFront, eFrontMid, eMid, eRearMid, eRear, eNEnginePositions };
-	EEnginePosition getEnginePosition() const;
+	tEnginePosition getEnginePosition() const;
 	
 	tdble getMaxPower() const;
 	tdble getMaxPowerSpeed() const;
@@ -90,8 +88,8 @@ protected:
 	bool _bTurboCharged; // TODO: Move to an enum (Turbo, Compressor, ...)
 	tdble _fEngineCapacity; // litres
 	unsigned _nCylinders;
-	EEngineShape _eEngineShape;
-	EEnginePosition _eEnginePosition;
+	tEngineShape _eEngineShape;
+	tEnginePosition _eEnginePosition;
 	tdble _fMaxPower, _fMaxPowerSpeed; // Engine max power (SI) and associated engine speed.
 	tdble _fMaxTorque, _fMaxTorqueSpeed; // Engine max torque (Nm) and associated engine speed.
 	tdble _fMass; // Total mass (kg).

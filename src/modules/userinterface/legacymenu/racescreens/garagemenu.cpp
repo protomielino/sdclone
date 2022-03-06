@@ -263,10 +263,10 @@ void RmGarageMenu::resetCarDataSheet(const std::string& strSelCarId)
 {
 	static const char* pszDriveWheels[3] =
 		{ "Rear", "Front", "4" };
-	static const char* pszEnginePosition[GfCar::eNEnginePositions+1] =
-		{ "Front", "Front-mid", "Mid", "Rear-mid", "Rear", "?" };
-	static const char* pszEngineShape[GfCar::eNEngineShapes+1] =
-		{ "V", "L", "H", "W", "?" };
+	static const char* pszEnginePosition[5] =
+		{ "Front", "Front-mid", "Mid", "Rear-mid", "Rear" };
+	static const char* pszEngineShape[4] =
+		{ "V", "L", "H", "W" };
 	
 	// Retrieve selected car.
 	const GfCar* pSelCar = GfCars::self()->getCar(strSelCarId);
@@ -303,14 +303,13 @@ void RmGarageMenu::resetCarDataSheet(const std::string& strSelCarId)
 					 ossSpecValue.str().c_str());
 
 	ossSpecValue.str("");
-	if (pSelCar->getEnginePosition() != GfCar::eNEnginePositions)
-		ossSpecValue << pszEnginePosition[pSelCar->getEnginePosition()] << ' ';
-	if (pSelCar->getEngineShape() != GfCar::eNEngineShapes)
+	ossSpecValue << pszEnginePosition[pSelCar->getEnginePosition()] << ' ';
+	if (pSelCar->getCylinders() > 1)
 		ossSpecValue << pszEngineShape[pSelCar->getEngineShape()];
 	if (pSelCar->getCylinders() > 0)
 	{
 		ossSpecValue << pSelCar->getCylinders() << " ";
-		if (pSelCar->getEngineShape() == GfCar::eNEngineShapes)
+		if (pSelCar->getCylinders() == 1)
 			ossSpecValue << "cyl. ";
 	}
 	if (pSelCar->getEngineCapacity() > 0)
