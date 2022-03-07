@@ -164,11 +164,11 @@ IF(APPLE)
 
     # Configure the base package scripts...
      # TODO use ${CPACK_PACKAGE_NAME} ${VERSION}" ??
-    SET(DMG_VOL_NAME "Speed Dreams ${VERSION} base")
+    SET(DMG_VOL_NAME "Speed Dreams base ${VERSION}")
     SET(DMG_FINDER_SCRIPT "findersettingsbase.scpt")
 
-    SET(READ_WRITE_DMG_NAME "${INTERNAL_NAME}-${VERSION}-base-r${SVN_REV}-${CPACK_SYSTEM_NAME}-rw.dmg")
-    SET(READ_ONLY_DMG_NAME "${INTERNAL_NAME}-${VERSION}-base-r${SVN_REV}-${CPACK_SYSTEM_NAME}.dmg")
+    SET(READ_WRITE_DMG_NAME "${INTERNAL_NAME}-base-${VERSION}-r${SVN_REV}-${CPACK_SYSTEM_NAME}-rw.dmg")
+    SET(READ_ONLY_DMG_NAME "${INTERNAL_NAME}-base-${VERSION}-r${SVN_REV}-${CPACK_SYSTEM_NAME}.dmg")
 
     string(REPLACE ".app" "-base.app" SD_BASE_BUNDLE_NAME "${CMAKE_INSTALL_PREFIX}")
 
