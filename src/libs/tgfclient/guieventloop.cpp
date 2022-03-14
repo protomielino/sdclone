@@ -217,8 +217,16 @@ void GfuiEventLoop::operator()()
 					injectJoystickButtonEvent(event.jbutton.which, event.jbutton.button, 0);
 					break;
 
-				case SDL_WINDOWEVENT_EXPOSED:
-					forceRedisplay();
+				case SDL_WINDOWEVENT:
+					switch(event.window.event)
+					{
+						case SDL_WINDOWEVENT_SIZE_CHANGED:
+							if(_pPrivate->cbReshape)
+							{
+								_pPrivate->cbReshape(event.window.data1,event.window.data2);
+							}
+							break;
+					}
 					break;
 			}
 		}

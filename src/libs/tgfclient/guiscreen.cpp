@@ -292,17 +292,17 @@ int* GfScrGetSupportedColorDepths(int* pnDepths)
 
 static void gfScrReshapeViewport(int width, int height)
 {
+    GfViewWidth = GfScrWidth = width;
+    GfViewHeight = GfScrHeight = height;
+    GfScrCenX = width / 2;
+    GfScrCenY = height / 2;
+
     glViewport((width-GfViewWidth)/2, (height-GfViewHeight)/2, GfViewWidth,  GfViewHeight);
     glMatrixMode(GL_PROJECTION );
     glLoadIdentity();
     glOrtho(0.0, 640.0, 0.0, 480.0, -1.0, 1.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
-    GfScrWidth = width;
-    GfScrHeight = height;
-    GfScrCenX = width / 2;
-    GfScrCenY = height / 2;
 }
 
 static void gfuiInitialWindowedPosition(int displayId, SDL_Window* window )
