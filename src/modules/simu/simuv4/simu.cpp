@@ -567,7 +567,7 @@ SimUpdate(tSituation *s, double deltaTime)
         }
 
         if (s->_raceState & RM_RACE_PRESTART &&
-                (car->carElt->_skillLevel < 3 || !(s->_features & RM_FEATURE_PENALTIES)))
+                (car->carElt->_skillLevel < PRO || !(s->_features & RM_FEATURE_PENALTIES)))
         {
             car->ctrl->brakeCmd = 1.0;
             car->ctrl->clutchCmd = 1.0;
@@ -590,7 +590,7 @@ SimUpdate(tSituation *s, double deltaTime)
         SimEngineUpdateTq(car);
         CHECK(car);
 
-        if (!(s->_raceState & RM_RACE_PRESTART) || car->carElt->_skillLevel == 3)
+        if (!(s->_raceState & RM_RACE_PRESTART) || car->carElt->_skillLevel == PRO)
         {
             SimCarUpdateWheelPos(car);
             CHECK(car);

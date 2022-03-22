@@ -707,17 +707,18 @@ void HumanDriver::new_race(int index, tCarElt* car, tSituation *s)
 
     HCtx[idx]->maxClutchTime = GfParmGetNum(car->_carHandle, SECT_GEARBOX, PRM_SHIFTTIME, (char*)NULL, 0.2f);
     switch (car->_skillLevel) {
-    case 0: // Rookie
+    case ARCADE:
+    case SEMI_ROOKIE:
+    case ROOKIE: // Rookie
         HCtx[idx]->maxClutchTime *= 2;
         break;
-    case 1: // Amateur
+    case AMATEUR: // Amateur
         HCtx[idx]->maxClutchTime *= 1.6;
         break;
-    case 2: // Semi-Pro
+    case SEMI_PRO: // Semi-Pro
         HCtx[idx]->maxClutchTime *= 1.2;
         break;
-    default:
-    case 3: // Pro
+    case PRO: // Pro
         break;
     }
 

@@ -540,11 +540,11 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
         elt->_raceNumber = (int)GfParmGetNum(robhdle, path, ROB_ATTR_RACENUM, (char*)NULL, 0);
         if (!normal_carname && elt->_driverType != RM_DRV_HUMAN) // Increase racenumber if needed
             elt->_raceNumber += elt->_moduleIndex;
-        elt->_skillLevel = 0;
+        elt->_skillLevel = ARCADE;
         str = GfParmGetStr(robhdle, path, ROB_ATTR_LEVEL, ROB_VAL_SEMI_PRO);
         for(k = 0; k < NSkillLevels; k++) {
             if (strcmp(aPszSkillLevelNames[k], str) == 0) {
-                elt->_skillLevel = k;
+                elt->_skillLevel = static_cast<tSkillLevel>(k);
                 break;
             }
         }

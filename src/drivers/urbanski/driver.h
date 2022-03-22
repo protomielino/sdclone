@@ -51,7 +51,7 @@ private:
 	static const double GRAVITY;
 	static const double INF_SPEED;
 	static const double SHIFT_RPM_MARGIN;
-	static const double SKILL_LEVEL;
+	static const tSkillLevel SKILL_LEVEL;
 	static const double SLIP_SPEED_MARGIN;
 	static const double SMOOTH_STEER_FACTOR;
 	static const double SPEED_LIMIT_MULTIPLIER;

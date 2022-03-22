@@ -93,7 +93,7 @@ struct tPlayerInfo
 public:
 
     tPlayerInfo(const char *name = HumanDriverModuleName, const char *dispname = 0,
-                const char *defcarname = 0, int racenumber = 0, int skilllevel = 0,
+                const char *defcarname = 0, int racenumber = 0, tSkillLevel skilllevel = ARCADE,
                 float *color = 0,
                 tGearChangeMode gearchangemode = GEAR_MODE_AUTO, int autoreverse = 0,
                 int nbpitstops = 0
@@ -162,7 +162,7 @@ public:
     tGearChangeMode gearChangeMode() const { return _gearchangemode; }
     int nbPitStops() const { return _nbpitstops; }
     float color(int idx) const { return (idx >= 0 && idx < 4) ? _color[idx] : 0.0; }
-    int skillLevel() const { return _skilllevel; }
+    tSkillLevel skillLevel() const { return _skilllevel; }
     int autoReverse() const { return _autoreverse; }
     #ifdef WEBSERVER
     const char *webserverusername()  const { return _webserverusername; }
@@ -223,7 +223,7 @@ public:
     void setRaceNumber(int raceNumber) { _racenumber = raceNumber; }
     void setGearChangeMode(tGearChangeMode gearChangeMode) { _gearchangemode = gearChangeMode; }
     void setNbPitStops(int nbPitStops) { _nbpitstops = nbPitStops; }
-    void setSkillLevel(int skillLevel) { _skilllevel = skillLevel; }
+    void setSkillLevel(tSkillLevel skillLevel) { _skilllevel = skillLevel; }
     void setAutoReverse(int autoReverse) { _autoreverse = autoReverse; }
 
     ~tPlayerInfo()
@@ -270,7 +270,7 @@ private:
     tGearChangeMode	_gearchangemode;
     int				_nbpitstops;
     float			_color[4];
-    int				_skilllevel;
+    tSkillLevel		_skilllevel;
     int				_autoreverse;
     #ifdef WEBSERVER
     char*			_webserverusername;
@@ -685,7 +685,7 @@ GenPlayerList(void)
     int j;
     const char *driver;
     const char *defaultCar;
-    int skilllevel;
+    tSkillLevel skilllevel;
     const char *str;
     int racenumber;
     float color[4];
@@ -710,10 +710,10 @@ GenPlayerList(void)
             break; // Exit at end of driver list.
         } else {
             str = GfParmGetStr(PlayerHdle, sstring, ROB_ATTR_LEVEL, SkillLevelString[0]);
-            skilllevel = 0;
+            skilllevel = ARCADE;
             for(j = 0; j < NbSkillLevels; j++) {
                 if (strcmp(SkillLevelString[j], str) == 0) {
-                    skilllevel = j;
+                    skilllevel = static_cast<tSkillLevel>(j);
                     break;
                 }
             }
@@ -995,17 +995,17 @@ onChangeLevel(void *vp)
         return;
     }
 
-    int skillLevel = (*CurrPlayer)->skillLevel();
+    tSkillLevel skillLevel = (*CurrPlayer)->skillLevel();
     if (vp == 0) {
-        skillLevel--;
-        if (skillLevel < 0) {
-            skillLevel = NbSkillLevels - 1;
-        }
+        if (skillLevel == ARCADE)
+            skillLevel = PRO;
+        else
+            skillLevel = static_cast<tSkillLevel>(int(skillLevel) - 1);
     } else {
-        skillLevel++;
-        if (skillLevel == NbSkillLevels) {
-            skillLevel = 0;
-        }
+       if (skillLevel == PRO)
+            skillLevel = ARCADE;
+       else
+           skillLevel = static_cast<tSkillLevel>(int(skillLevel) + 1);
     }
     (*CurrPlayer)->setSkillLevel(skillLevel);
 

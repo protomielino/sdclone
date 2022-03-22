@@ -30,6 +30,7 @@
 #include <string>
 #include <ctime>
 #include <curl/curl.h>
+#include <car.h>
 
 struct webRequest_t {
   int id;
@@ -116,7 +117,7 @@ class TGFCLIENT_API WebServer {
 		//specific requests
 		int sendLogin (int userId);
 		int sendLogin (const char* username, const char* password);
-		int sendRaceStart (int user_skill, const char *track_id, char *car_id, int type, void *setup, int startposition, const char *sdversion);
+		int sendRaceStart (tSkillLevel user_skill, const char *track_id, char *car_id, int type, void *setup, int startposition, const char *sdversion);
 		int sendRaceEnd (int race_id, int endposition);
 		int sendLap (int race_id, double laptime, double fuel, int position, int wettness);
 

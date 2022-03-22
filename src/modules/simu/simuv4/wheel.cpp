@@ -561,7 +561,7 @@ void SimWheelUpdateForce(tCar *car, int index)
         //tire wear
         if(wheel->treadDepth > 0.0)
         {
-            if (/*(car->carElt->_skillLevel < 2) && */(car->carElt->_skid[index] > 0.1f)) // For test
+            if (/*(car->carElt->_skillLevel < AMATEUR) && */(car->carElt->_skid[index] > 0.1f)) // For test
                 wheel ->treadDepth -= 20.0 * car->carElt->_skid[index] * wheel->wearrate * Work;
             else
                 wheel->treadDepth -= wheel->wearrate * Work;

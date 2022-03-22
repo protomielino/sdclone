@@ -5,7 +5,7 @@ SET(_SOURCES SimulationOptions.cpp aero.cpp axle.cpp brake.cpp
              engine.cpp simu.cpp steer.cpp susp.cpp
              transmission.cpp wheel.cpp
              simuv30.cpp)
-SET(_HEADERS aero.h axle.h brake.h carstruct.h differential.h engine.h
+SET(_HEADERS SimulationOptions.h aero.h axle.h brake.h carstruct.h differential.h engine.h
              Options.h sim.h steer.h susp.h transmission.h wheel.h
              simuv30.h)
 SET(_OTHER_SOURCES ChangeLog)

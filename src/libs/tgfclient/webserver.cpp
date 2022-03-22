@@ -864,7 +864,7 @@ int WebServer::sendLap (int race_id, double laptime, double fuel, int position, 
     return 0;
 }
 
-int WebServer::sendRaceStart (int user_skill, const char *track_id, char *car_id, int type, void *setup, int startposition, const char *sdversion)
+int WebServer::sendRaceStart (tSkillLevel user_skill, const char *track_id, char *car_id, int type, void *setup, int startposition, const char *sdversion)
 {
     //if the webserver is disabled exit immediately
     if(!this->isWebServerEnabled){

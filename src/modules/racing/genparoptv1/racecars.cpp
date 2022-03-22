@@ -181,7 +181,7 @@ reCarsApplyRaceRules(tCarElt *car)
     }
 
     // Stop here (no more rules) if not in "Pro" skill level.
-    if (car->_skillLevel < 3)
+    if (car->_skillLevel < PRO)
         return;
 
     // Stop here (no more rules) if "penalties" feature not enables for this race.

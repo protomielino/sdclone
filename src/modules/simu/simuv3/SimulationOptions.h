@@ -13,6 +13,7 @@
 #define SIMULATION_OPTIONS_H
 
 #include "Options.h"
+#include <car.h>
 
 ///	Aerodynamic flow model
 enum AeroFlowModel {
@@ -42,7 +43,7 @@ public:
 
 	SimulationOptions();
 	/// Set the appropriate values for the driver's skill
-	void SetFromSkill (int skill);
+	void SetFromSkill (tSkillLevel skill);
 	/**
 	   After setting defaults, you can customise by loading values from a file.
 	   If values are not contained in the file then we just use the previously

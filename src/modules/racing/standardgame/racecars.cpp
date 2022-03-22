@@ -71,7 +71,7 @@ ReCarsUpdateCarPitTime(tCarElt *car)
                     (tdble)(fabs((double)(car->_pitRepair))) * ReInfo->raceRules.damageRepairFactor + car->_penaltyTime;
 
             // Add time for tire change
-            if (car->pitcmd.tireChange == tCarPitCmd::ALL && car->info.skillLevel == 3 && ReInfo->raceRules.tireFactor > 0.0f)
+            if (car->pitcmd.tireChange == tCarPitCmd::ALL && car->info.skillLevel == PRO && ReInfo->raceRules.tireFactor > 0.0f)
             {
                 info->totalPitTime += ReInfo->raceRules.allTiresChangeTime;
             }
@@ -217,7 +217,7 @@ reCarsApplyRaceRules(tCarElt *car)
         return;
     }
 
-    if (car->_skillLevel < 5)
+    if (car->_skillLevel < PRO)
         return;
 
     // Ignore some rules after the car has finished the race
@@ -237,7 +237,7 @@ reCarsApplyRaceRules(tCarElt *car)
         }
     }
 
-    if (car->_skillLevel < 2)
+    if (car->_skillLevel < AMATEUR)
         return;
 
     // If the car cuts a corner the lap time is invalidated. Cutting a corner means: the center of gravity is more than 0.7 times the car width
@@ -317,7 +317,7 @@ reCarsApplyRaceRules(tCarElt *car)
     }
 
     // Stop here (no more rules) if not in "Pro" skill level.
-    if (car->_skillLevel < 3)
+    if (car->_skillLevel < PRO)
         return;
 
     // Stop here (no more rules) if "penalties" feature not enables for this race.

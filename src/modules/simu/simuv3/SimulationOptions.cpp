@@ -24,10 +24,10 @@ SimulationOptions::SimulationOptions()
     option_list.AddOption (PRM_MODEL_AERO_FACTOR, &aero_factor, 4.0f);
 }
 
-void SimulationOptions::SetFromSkill (int skill)
+void SimulationOptions::SetFromSkill (tSkillLevel skill)
 {
     switch (skill) {
-    case 0:
+    case ARCADE:
         option_list.Set(PRM_DAMAGE_TYRES, 0.0f);
         option_list.Set(PRM_DAMAGE_SUSPENSION, false);
         option_list.Set(PRM_DAMAGE_ALIGNMENT, true);
@@ -35,7 +35,8 @@ void SimulationOptions::SetFromSkill (int skill)
         option_list.Set(PRM_MODEL_TYRE_TEMPERATURE, false);
         option_list.Set(PRM_MODEL_AERO_FACTOR, 4.0f);
         break;
-    case 1:
+    case SEMI_ROOKIE:
+    case ROOKIE:
         option_list.Set(PRM_DAMAGE_TYRES, 0.0f);
         option_list.Set(PRM_DAMAGE_SUSPENSION, false);
         option_list.Set(PRM_DAMAGE_ALIGNMENT, true);
@@ -45,7 +46,7 @@ void SimulationOptions::SetFromSkill (int skill)
         option_list.Set(PRM_MODEL_TYRE_TEMPERATURE, false);
         option_list.Set(PRM_MODEL_AERO_FACTOR, 3.0f);
         break;
-    case 2:
+    case AMATEUR:
         option_list.Set(PRM_DAMAGE_TYRES, 0.0f);
         option_list.Set(PRM_DAMAGE_SUSPENSION, false);
         option_list.Set(PRM_DAMAGE_ALIGNMENT, true);
@@ -55,7 +56,8 @@ void SimulationOptions::SetFromSkill (int skill)
         option_list.Set(PRM_MODEL_TYRE_TEMPERATURE, false);
         option_list.Set(PRM_MODEL_AERO_FACTOR, 2.0f);
         break;
-    case 3:
+    case SEMI_PRO:
+    case PRO:
         option_list.Set(PRM_DAMAGE_TYRES, 0.0f);
         option_list.Set(PRM_DAMAGE_SUSPENSION, true);
         option_list.Set(PRM_DAMAGE_ALIGNMENT, true);
