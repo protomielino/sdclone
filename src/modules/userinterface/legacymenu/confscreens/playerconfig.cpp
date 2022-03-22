@@ -50,7 +50,7 @@ static const char *DefaultWebserverusername  = "username";
 static const char *DefaultWebserverpassword  = "password";
 #endif //WEBSERVER
 
-static const char *SkillLevelString[] = { ROB_VAL_ARCADE, ROB_VAL_SEMI_ROOKIE, ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
+static const char *SkillLevelString[] = ROB_VALS_LEVEL;
 static const int NbSkillLevels = sizeof(SkillLevelString) / sizeof(SkillLevelString[0]);
 
 static char buf[1024];

@@ -337,8 +337,7 @@ void GfDriverSkin::setCarPreviewFileName(const std::string& strFileName)
 // GfDriver class -------------------------------------------------------------------
 
 // Skill level related constants.
-static const char *ASkillLevelStrings[] =
-    { ROB_VAL_ARCADE, ROB_VAL_SEMI_ROOKIE, ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
+static const char *ASkillLevelStrings[] = ROB_VALS_LEVEL;
 static const int NbSkillLevels = sizeof(ASkillLevelStrings) / sizeof(ASkillLevelStrings[0]);
 static const double ASkillLevelValues[NbSkillLevels] = { 30.0, 20.0, 10.0, 7.0, 3.0, 0.0 };
 

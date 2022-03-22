@@ -69,8 +69,7 @@ extern TGFCLIENT_API WebServer webServer;
 #endif //WEBSERVER
 
 
-static const char *aPszSkillLevelNames[] =
-    { ROB_VAL_ARCADE, ROB_VAL_SEMI_ROOKIE, ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
+static const char *aPszSkillLevelNames[] = ROB_VALS_LEVEL;
 static const int NSkillLevels = (int)(sizeof(aPszSkillLevelNames)/sizeof(char*));
 
 static const size_t PathLenMax = 1024;
