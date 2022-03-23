@@ -94,7 +94,7 @@ typedef struct {
     int		startRank;                  /**< Car's starting position */
     int		driverType;                 /**< Driver type */
     int		networkplayer;              /**< Network player */
-    tSkillLevel	skillLevel;                 /**< Driver's skill level (0=rookie -> 3=pro) */
+    tSkillLevel	skillLevel;                 /**< Driver's skill level */
     tdble	iconColor[3];               /**< Car color in leaders board */
     t3Dd	dimension;                  /**< Car's mesures */
     t3Dd	drvPos;                     /**< Driver's position */
