@@ -104,8 +104,10 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     IF(UNIX)
       SET(OPTION_XRANDR true CACHE BOOL "XrandR")
       SET(OPTION_GLEXTPROTOTYPES true CACHE BOOL "Enable prototypes in glext.h")
-      SET(OPTION_UNLOAD_SSGGRAPH true CACHE BOOL "If false, never unload ssggraph module (useful on some Linuxes to avoid XOrg crashes)")
+      #SET(OPTION_UNLOAD_SSGGRAPH true CACHE BOOL "If false, never unload ssggraph module (useful on some Linuxes to avoid XOrg crashes)")
     ENDIF(UNIX)
+
+    SET(OPTION_UNLOAD_SSGGRAPH true CACHE BOOL "If false, never unload ssggraph module (useful on some Linuxes to avoid XOrg crashes)")
 
 
     IF(OPTION_USE_MACPORTS)
