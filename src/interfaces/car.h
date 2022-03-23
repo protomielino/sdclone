@@ -70,6 +70,17 @@ typedef struct {
     tdble	exhaustPower;	/**< Power of the flames (from 1 to 3) */
 } tVisualAttributes;
 
+/** skill levels */
+enum tSkillLevel
+{
+    ARCADE,
+    SEMI_ROOKIE,
+    ROOKIE,
+    AMATEUR,
+    SEMI_PRO,
+    PRO
+};
+
 /** Static Public info */
 typedef struct {
     char	name[MAX_NAME_LEN];         /**< Driver's name */
@@ -83,7 +94,7 @@ typedef struct {
     int		startRank;                  /**< Car's starting position */
     int		driverType;                 /**< Driver type */
     int		networkplayer;              /**< Network player */
-    int		skillLevel;                 /**< Driver's skill level (0=rookie -> 3=pro) */
+    tSkillLevel	skillLevel;                 /**< Driver's skill level (0=rookie -> 3=pro) */
     tdble	iconColor[3];               /**< Car color in leaders board */
     t3Dd	dimension;                  /**< Car's mesures */
     t3Dd	drvPos;                     /**< Driver's position */
