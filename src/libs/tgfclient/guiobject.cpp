@@ -568,23 +568,28 @@ gfuiMouseAction(void *vaction)
 	switch (curObject->widget) {
 	case GFUI_BUTTON:
 	    gfuiButtonAction((int)action);
-		playMenuSfx(SFX_CLICK);
+		if(action)
+			playMenuSfx(SFX_CLICK);
 		break;
 	case GFUI_GRBUTTON:
 		gfuiGrButtonAction((int)action);
-		playMenuSfx(SFX_CLICK);
+		if(action)
+			playMenuSfx(SFX_CLICK);
 		break;
 	case GFUI_SCROLLIST:
 		gfuiScrollListAction((int)action);
-		playMenuSfx(SFX_CLICK);
+		if(action)
+			playMenuSfx(SFX_CLICK);
 		break;
 	case GFUI_EDITBOX:
 		gfuiEditboxAction((int)action);
-		playMenuSfx(SFX_CLICK);
+		if(action)
+			playMenuSfx(SFX_CLICK);
 		break;
 	case GFUI_COMBOBOX:
 		gfuiComboboxAction((int)action);
-		playMenuSfx(SFX_CLICK);
+		if(action)
+			playMenuSfx(SFX_CLICK);
 	    break;
 	}
     }
