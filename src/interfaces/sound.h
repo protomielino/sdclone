@@ -43,6 +43,13 @@
 #define SND_VAL_MUSIC_STATE_DISABLED   "disabled"
 #define SND_ATT_MUSIC_DEFAULT_MUSIC    "default music"
 
+#define SND_SCT_MENUSFX                "Menu SFX Settings"
+
+#define SND_ATT_MENUSFX_VOLUME         "menusfx volume"
+#define SND_ATT_MENUSFX_STATE          "menusfx state"
+#define SND_VAL_MENUSFX_STATE_ENABLED  "enabled"
+#define SND_VAL_MENUSFX_STATE_DISABLED "disabled"
+
 #endif /* _SOUND_H_ */ 
 
 

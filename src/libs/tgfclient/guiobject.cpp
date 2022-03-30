@@ -24,6 +24,7 @@
 
 #include "tgfclient.h"
 #include "gui.h"
+#include "guimenusfx.h"
 
 
 // Mouse cursor graphic properties.
@@ -310,6 +311,7 @@ gfuiSetFocus(tGfuiObject *obj)
 			tGfuiButton* button = &(obj->u.button);
 			if (button->onFocus)
 				button->onFocus(button->userDataOnFocus);
+			playMenuSfx(SFX_FOCUS);
 		}
 		break;
 
@@ -318,6 +320,7 @@ gfuiSetFocus(tGfuiObject *obj)
 			tGfuiGrButton* grbutton = &(obj->u.grbutton);
 			if (grbutton->onFocus)
 				grbutton->onFocus(grbutton->userDataOnFocus);
+			playMenuSfx(SFX_FOCUS);
 		}
 		break;
 
@@ -326,6 +329,7 @@ gfuiSetFocus(tGfuiObject *obj)
 			tGfuiEditbox* editbox = &(obj->u.editbox);
 			if (editbox->onFocus)
 				editbox->onFocus(editbox->userDataOnFocus);
+			playMenuSfx(SFX_FOCUS);
 		}
 		break;
 
@@ -334,6 +338,7 @@ gfuiSetFocus(tGfuiObject *obj)
 			tGfuiProgressbar* progress = &(obj->u.progressbar);
 			if (progress->onFocus)
 				progress->onFocus(progress->userDataOnFocus);
+			playMenuSfx(SFX_FOCUS);
 		}
 		break;
 		
@@ -342,6 +347,7 @@ gfuiSetFocus(tGfuiObject *obj)
 			tGfuiLabel* label = &(obj->u.label);
 			if (label->onFocus)
 				label->onFocus(label->userDataOnFocus);
+			//playMenuSfx(SFX_FOCUS);
 		}
 		break;
 		
@@ -350,6 +356,7 @@ gfuiSetFocus(tGfuiObject *obj)
 			tGfuiCombobox* combo = &(obj->u.combobox);
 			if (combo->onFocus)
 				combo->onFocus(combo->userDataOnFocus);
+			playMenuSfx(SFX_FOCUS);
 		}
 		break;
     }
@@ -561,18 +568,23 @@ gfuiMouseAction(void *vaction)
 	switch (curObject->widget) {
 	case GFUI_BUTTON:
 	    gfuiButtonAction((int)action);
-	    break;
+		playMenuSfx(SFX_CLICK);
+		break;
 	case GFUI_GRBUTTON:
-	    gfuiGrButtonAction((int)action);
-	    break;
+		gfuiGrButtonAction((int)action);
+		playMenuSfx(SFX_CLICK);
+		break;
 	case GFUI_SCROLLIST:
-	    gfuiScrollListAction((int)action);
-	    break;
+		gfuiScrollListAction((int)action);
+		playMenuSfx(SFX_CLICK);
+		break;
 	case GFUI_EDITBOX:
-	    gfuiEditboxAction((int)action);
-	    break;
+		gfuiEditboxAction((int)action);
+		playMenuSfx(SFX_CLICK);
+		break;
 	case GFUI_COMBOBOX:
-	    gfuiComboboxAction((int)action);
+		gfuiComboboxAction((int)action);
+		playMenuSfx(SFX_CLICK);
 	    break;
 	}
     }

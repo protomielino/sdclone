@@ -40,6 +40,7 @@
 #include "gui.h"
 #include "guimenu.h"
 #include "musicplayer.h"
+#include "guimenusfx.h"
 
 #ifdef WIN32
 PFNGLUSEPROGRAMOBJECTARBPROC glUseProgram = NULL;
@@ -121,6 +122,7 @@ gfuiInit(void)
 	gfuiInitLabel();
 	gfuiInitHelp();
 	gfuiInitMenu();
+	gfuiInitMenuSfx();
 	initMusic();
 
 #ifdef WIN32
@@ -135,6 +137,7 @@ gfuiShutdown(void)
 {
 	gfctrlJoyShutdown();
 	gfuiFreeFonts();
+	gfuiShutdownMenuSfx();
 	shutdownMusic();
 }
 

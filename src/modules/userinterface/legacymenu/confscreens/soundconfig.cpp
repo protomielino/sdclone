@@ -29,6 +29,7 @@
 #include <tgfclient.h>
 #include <sound.h>
 #include <musicplayer.h>
+#include <guimenusfx.h>
 
 #include "soundconfig.h"
 
@@ -62,6 +63,22 @@ static int MusicStateId;
 static float MusicVolumeValue = 100.0f;
 static float OriginalMusicVolumeValue = 100.0f;
 static int MusicVolumeValueId;
+
+
+// list of MenuSfx states.
+static const char *menusfxStateList[] = {SND_VAL_MENUSFX_STATE_ENABLED,
+								  SND_VAL_MENUSFX_STATE_DISABLED};
+static const int nbMenuSfxStates = sizeof(menusfxStateList) / sizeof(menusfxStateList[0]);
+static int curMenuSfxState = 0;
+static int OriginalMenuSfxState = 0;
+
+// gui label id.
+static int MenuSfxStateId;
+
+// volume
+static float MenuSfxVolumeValue = 100.0f;
+static float OriginalMenuSfxVolumeValue = 100.0f;
+static int MenuSfxVolumeValueId;
 
 // gui screen handles.
 static void *scrHandle = NULL;
@@ -125,6 +142,41 @@ static void readSoundCfg(void)
 	sprintf(buf, "%g", MusicVolumeValue);
 	GfuiEditboxSetString(scrHandle, MusicVolumeValueId, buf);
 
+	optionName = GfParmGetStr(paramHandle, SND_SCT_MENUSFX, SND_ATT_MENUSFX_STATE, menusfxStateList[0]);
+
+	for (i = 0; i < nbMenuSfxStates; i++) {
+		if (strcmp(optionName, menusfxStateList[i]) == 0) {
+			curMenuSfxState = i;
+			break;
+		}
+	}
+	OriginalMenuSfxState = curMenuSfxState;
+
+	GfuiLabelSetText(scrHandle, MenuSfxStateId, menusfxStateList[curMenuSfxState]);
+
+	// Music volume.
+	MenuSfxVolumeValue = GfParmGetNum(paramHandle, SND_SCT_MENUSFX, SND_ATT_MENUSFX_VOLUME, "%", 100.0f);
+	if (MenuSfxVolumeValue>100.0f) {
+		MenuSfxVolumeValue = 100.0f;
+	} 
+	else if (MenuSfxVolumeValue < 0.0f) {
+		MenuSfxVolumeValue = 0.0f;
+	}
+	OriginalMenuSfxVolumeValue = MenuSfxVolumeValue;
+
+	sprintf(buf, "%g", MenuSfxVolumeValue);
+	GfuiEditboxSetString(scrHandle, MenuSfxVolumeValueId, buf);
+
+	GfParmReleaseHandle(paramHandle);
+}
+
+static void saveMenuSfxSettings()
+{
+	void *paramHandle = GfParmReadFileLocal(SND_PARAM_FILE, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	GfParmSetStr(paramHandle, SND_SCT_MENUSFX, SND_ATT_MENUSFX_STATE, menusfxStateList[curMenuSfxState]);
+	GfParmSetNum(paramHandle, SND_SCT_MENUSFX, SND_ATT_MENUSFX_VOLUME, "%", MenuSfxVolumeValue);
+
+	GfParmWriteFile(NULL, paramHandle, "sound");
 	GfParmReleaseHandle(paramHandle);
 }
 
@@ -149,6 +201,8 @@ static void saveSoundOption()
 	GfParmSetNum(paramHandle, SND_SCT_SOUND, SND_ATT_SOUND_VOLUME, "%", VolumeValue);
 	GfParmSetStr(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_STATE, musicStateList[curMusicState]);
 	GfParmSetNum(paramHandle, SND_SCT_MUSIC, SND_ATT_MUSIC_VOLUME, "%", MusicVolumeValue);
+	GfParmSetStr(paramHandle, SND_SCT_MENUSFX, SND_ATT_MENUSFX_STATE, menusfxStateList[curMenuSfxState]);
+	GfParmSetNum(paramHandle, SND_SCT_MENUSFX, SND_ATT_MENUSFX_VOLUME, "%", MenuSfxVolumeValue);
 
 	GfParmWriteFile(NULL, paramHandle, "sound");
 	GfParmReleaseHandle(paramHandle);
@@ -162,8 +216,13 @@ static void onAccept(void *)
 
 	saveMusicSettings();
 
+	saveMenuSfxSettings();
+
 	enableMusic(1 - curMusicState);
 	setMusicVolume(MusicVolumeValue);
+
+	enableMenuSfx(1 - curMenuSfxState);
+	setMenuSfxVolume(MenuSfxVolumeValue);
 
 	// Return to previous screen.
 	GfuiScreenActivate(prevHandle);
@@ -223,6 +282,30 @@ static void changeMusicVolume(void * )
     GfuiEditboxSetString(scrHandle, MusicVolumeValueId, buf);
 }
 
+// Toggle Menu SFX state enabled/disabled.
+static void changeMenuSfxState(void *vp)
+{
+	curMenuSfxState = (curMenuSfxState + (int)(long)vp + nbMenuSfxStates) % nbMenuSfxStates;
+
+	GfuiLabelSetText(scrHandle, MenuSfxStateId, menusfxStateList[curMenuSfxState]);
+
+}
+
+//  Menu SFX Volume
+static void changeMenuSfxVolume(void * )
+{
+	char* val = GfuiEditboxGetString(scrHandle, MenuSfxVolumeValueId);
+	sscanf(val, "%g", &MenuSfxVolumeValue);
+	if (MenuSfxVolumeValue > 100.0f)
+		MenuSfxVolumeValue = 100.0f;
+	else if (MenuSfxVolumeValue < 0.0f)
+		MenuSfxVolumeValue = 0.0f;
+	
+	char buf[32];
+	sprintf(buf, "%g", MenuSfxVolumeValue);
+	GfuiEditboxSetString(scrHandle, MenuSfxVolumeValueId, buf);
+}
+
 static void onActivate(void * /* dummy */)
 {
 	readSoundCfg();
@@ -260,8 +343,15 @@ void* SoundMenuInit(void *prevMenu)
 
 	MusicVolumeValueId = GfuiMenuCreateEditControl(scrHandle,param,"musicvolumeedit",NULL,NULL,changeMusicVolume);
 
+	GfuiMenuCreateButtonControl(scrHandle,param,"menusfxleftarrow",(void*)-1,changeMenuSfxState);
+	GfuiMenuCreateButtonControl(scrHandle,param,"menusfxrightarrow",(void*)1,changeMenuSfxState);
+
+	MenuSfxStateId = GfuiMenuCreateLabelControl(scrHandle,param,"menusfxlabel");
+
+	MenuSfxVolumeValueId = GfuiMenuCreateEditControl(scrHandle,param,"menusfxvolumeedit",NULL,NULL,changeMenuSfxVolume);
+
 	GfParmReleaseHandle(param);
-    
+
 	GfuiAddKey(scrHandle, GFUIK_RETURN, "Apply", NULL, onAccept, NULL);
 	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel", NULL, onCancel, NULL);
 	GfuiAddKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);

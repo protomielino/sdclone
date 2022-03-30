@@ -23,7 +23,8 @@ SET(_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
             musicplayer.cpp musicplayer.h 
             sdl2musicplayer.cpp sdl2musicplayer.h
             glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h
-            forcefeedback.cpp forcefeedback.h)
+            forcefeedback.cpp forcefeedback.h
+            guimenusfx.cpp guimenusfx.h)
 
 IF(OPTION_WEBSERVER)
    SET(_SOURCES ${_SOURCES} webserver.cpp webserver.h)
