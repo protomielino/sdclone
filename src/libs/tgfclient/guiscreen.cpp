@@ -686,6 +686,23 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
         GfglFeatures::self().detectStandardSupport();
         GfglFeatures::self().dumpSupport();
         GfglFeatures::self().loadSelection();
+        if (GfglFeatures::self().isSupported(GfglFeatures::MultiSampling))
+        {
+            bool MultiSamplingWasSelected =
+                GfglFeatures::self().isSelected(GfglFeatures::MultiSampling);
+            int MultiSamplingSamples =
+                GfglFeatures::self().getSelected(GfglFeatures::MultiSamplingSamples);
+            if(MultiSamplingWasSelected)
+            {
+                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, MultiSamplingSamples);
+            }
+            else
+            {
+                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+                SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+            }
+        }
     }
 
     // Save view geometry and screen center.
