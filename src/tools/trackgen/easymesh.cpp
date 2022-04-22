@@ -722,13 +722,13 @@ void erase()
     
 
     for (e = 0; e < Ne; e++) {
-	if (elem[elem[e].ei].mark == OFF) {
+	if (elem[e].ei != OFF && elem[elem[e].ei].mark == OFF) {
 	    elem[e].ei = OFF;
 	}
-	if (elem[elem[e].ej].mark == OFF) {
+	if (elem[e].ej != OFF && elem[elem[e].ej].mark == OFF) {
 	    elem[e].ej = OFF;
 	}
-	if (elem[elem[e].ek].mark == OFF) {
+	if (elem[e].ek != OFF && elem[elem[e].ek].mark == OFF) {
 	    elem[e].ek = OFF;
 	}
     }
@@ -787,6 +787,8 @@ void diamond(void)
 	if (side[s].mark != OFF) {
 	    ea = side[s].ea;
 	    eb = side[s].eb;
+	    if (ea == OFF || eb == OFF)
+	        continue;
 
 	    if (elem[ea].ei == eb) {
 		ead = elem[ea].ej;
