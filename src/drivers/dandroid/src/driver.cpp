@@ -43,6 +43,7 @@ TDriver::TDriver(int index)
 
     // Variables
     mTrack = NULL;
+    mTirecondition = 1.0;
     mPrevgear = 0;
     mAccel = 0.0;
     mAccelAvg = 0.0;
@@ -203,7 +204,7 @@ void TDriver::InitTrack(PTrack Track, PCarHandle CarHandle, PCarSettings* CarPar
         globalskill = GfParmGetNum(handle, "skill", "level", (char*)NULL, 0.0);
     }
 
-    mSkillGlobal = MAX(0.9, 1.0 - 0.1 * globalskill / 10.0);
+    mSkillGlobal = MAX(0.7, 1.0 - 0.5 * globalskill / 10.0);
     //load the driver skill level, range 0 - 1
     handle = NULL;
     sprintf(buffer, "drivers/%s/%d/skill.xml", MyBotName, mCarIndex);
@@ -436,7 +437,21 @@ void TDriver::updateBasics()
     updateStuck();
     updateAttackAngle();
     updateCurveAhead();
+
+    if (mHASTYC)
+        updateWheels();
+
     mPit.update(mFromStart);
+}
+
+void TDriver::updateWheels()
+{
+    double tireF;
+    double tireR;
+
+    tireF = MIN(oCar->_tyreCondition(0), oCar->_tyreCondition(1));
+    tireR = MIN(oCar->_tyreCondition(2), oCar->_tyreCondition(3));
+    mTirecondition = MIN(tireF, tireR);
 }
 
 void TDriver::updateOpponents()
@@ -2268,35 +2283,37 @@ void TDriver::increaseSpeedFactor(int sect, double inc)
 
 void TDriver::getBrakedistfactor()
 {
-    double factor = (1.0 - mPit.tyreCondition()) + 1.0;
-    LogDANDROID.debug(" # brake factor = %.3f\n", factor);
+    //double factor = (1.0 - mPit.tyreCondition()) + 1.0;
+    //LogDANDROID.debug(" # brake factor = %.3f\n", factor);
     mBrakedistfactor = mSect[mSector].brakedistfactor;
     if (mCatchedRaceLine && mDrvPath == PATH_O)
     {
-        mBrakedistfactor *= 1.0 * factor;
+        mBrakedistfactor *= 1.0 /* factor*/;
     }
     else if (mCatchedRaceLine)
     {
         if (mTargetOnCurveInside)
         {
-            mBrakedistfactor *= 1.0 * factor;
+            mBrakedistfactor *= 1.0 /* factor*/;
         }
         else
         {
-            mBrakedistfactor *= 2.0 * factor;
+            mBrakedistfactor *= 2.0 /* factor*/;
         }
     }
     else
     {
         if (mTargetOnCurveInside)
         {
-            mBrakedistfactor *= 1.5 * factor;
+            mBrakedistfactor *= 1.5 /* factor*/;
         }
         else
         {
-            mBrakedistfactor *= 2.5 * factor;
+            mBrakedistfactor *= 2.5 /* factor*/;
         }
     }
+
+    //mBrakedistfactor *= mSkillDriver;
 }
 
 void TDriver::getSpeedFactors()
@@ -2487,7 +2504,7 @@ void TDriver::calcMaxspeed()
             }
         }
 
-        mMaxspeed = mSkillGlobal * mMaxspeed;
+        mMaxspeed = mSkillGlobal * mMaxspeed * mTirecondition;
 
         if(mHASTYC)
         {
