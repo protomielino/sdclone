@@ -55,7 +55,7 @@ struct seg
 
 extern struct seg *segment;
 
-extern void GenerateTerrain(tTrack *track, void *TrackHandle, char *outfile, FILE *AllFd, int noElevation);
+extern void GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FILE *AllFd, int noElevation);
 
 extern int Nc;
 extern int Fl;

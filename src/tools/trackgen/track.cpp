@@ -2797,7 +2797,7 @@ void CalculateTrack(tTrack * Track, void *TrackHandle, int bump, int raceline)
     @return	none
 */
 void
-GenerateTrack(tTrack * Track, void *TrackHandle, char *outFile, FILE *AllFd, int bump, int raceline)
+GenerateTrack(tTrack * Track, void *TrackHandle, const std::string &outFile, FILE *AllFd, int bump, int raceline)
 {
     FILE *curFd;
 
@@ -2806,7 +2806,7 @@ GenerateTrack(tTrack * Track, void *TrackHandle, char *outFile, FILE *AllFd, int
 
     InitScene(Track, TrackHandle, bump, raceline);
 
-    if (outFile) {
+    if (!outFile.empty()) {
         curFd = Ac3dOpen(outFile, 1);
         Ac3dGroup(curFd, "track", ActiveGroups);
         SaveMainTrack(curFd, bump, raceline);

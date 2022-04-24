@@ -51,17 +51,17 @@ static int	width, height;
 
 #define MAX_CLR	255.0
 
-void LoadElevation(tTrack *track, void *TrackHandle, char *imgFile)
+void LoadElevation(tTrack *track, void *TrackHandle, const std::string &imgFile)
 {
 	tdble zmin, zmax;
 	tdble xmin, xmax, ymin, ymax;
 
-	ElvImage = GfTexReadImageFromPNG(imgFile, 2.2, &width, &height, 0, 0, false);
+	ElvImage = GfTexReadImageFromPNG(imgFile.c_str(), 2.2, &width, &height, 0, 0, false);
 	if (!ElvImage) {
 		return;
 	}
 
-	printf("Loading Elevation Map %s\n", imgFile);
+	printf("Loading Elevation Map %s\n", imgFile.c_str());
 
 	Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, NULL, Margin);
 
@@ -101,7 +101,7 @@ tdble GetElevation(tdble x, tdble y, tdble z)
 }
 
 
-void SaveElevation(tTrack *track, void *TrackHandle, char *imgFile, char *meshFile, int dispf)
+void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile, const std::string &meshFile, int dispf)
 {
 	ssgLoaderOptionsEx options;
 	float zmin, zmax;
@@ -132,7 +132,7 @@ void SaveElevation(tTrack *track, void *TrackHandle, char *imgFile, char *meshFi
 	width = 1024;
 	height = (int)((ymax - ymin) * width / (xmax - xmin));
 
-	printf("Generating Elevation Map %s (%d, %d)\n", imgFile, width, height);
+	printf("Generating Elevation Map %s (%d, %d)\n", imgFile.c_str(), width, height);
 	kX = (xmax - xmin) / width;
 	dX = xmin;
 	kY = (ymax - ymin) / height;
@@ -159,10 +159,10 @@ void SaveElevation(tTrack *track, void *TrackHandle, char *imgFile, char *meshFi
 	ssgTexturePath(buf);
 	sprintf(buf, ".;tracks/%s/%s", track->category, track->internalname);
 	ssgModelPath(buf);
-	root = (ssgRoot*)ssgLoadAC(meshFile);
+	root = (ssgRoot*)ssgLoadAC(meshFile.c_str());
 
 	if (root == NULL) {
-		printf("Could not load %s, ", meshFile);
+		printf("Could not load %s, ", meshFile.c_str());
 		printf("please generate it with \"trackgen -c %s -n %s -a\"\n", track->category, track->internalname);
 		return;
 	}
@@ -212,5 +212,5 @@ void SaveElevation(tTrack *track, void *TrackHandle, char *imgFile, char *meshFi
 	}
 
 	printf("\n");
-	GfTexWriteImageToPNG(ElvImage, imgFile, width, height);
+	GfTexWriteImageToPNG(ElvImage, imgFile.c_str(), width, height);
 }

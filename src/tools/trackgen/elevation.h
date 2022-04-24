@@ -26,9 +26,9 @@
 #ifndef _ELEVATION_H_
 #define _ELEVATION_H_
 
-extern void LoadElevation(tTrack *track, void *TrackHandle, char *imgFile);
+extern void LoadElevation(tTrack *track, void *TrackHandle, const std::string &imgFile);
 extern tdble GetElevation(tdble x, tdble y, tdble z);
-extern void SaveElevation(tTrack *track, void *TrackHandle, char *imgFile, char *meshFile, int disp);
+extern void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile, const std::string &meshFile, int disp);
 
 
 #endif /* _ELEVATION_H_ */ 

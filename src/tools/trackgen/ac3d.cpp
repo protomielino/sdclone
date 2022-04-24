@@ -38,14 +38,14 @@
 
 
 FILE *
-Ac3dOpen(char *filename, int nbObjects)
+Ac3dOpen(const std::string &filename, int nbObjects)
 {
     FILE *save_fd;
 
-    save_fd = fopen(filename, "w"); //save_fd = fopen(filename, "wa");
+    save_fd = fopen(filename.c_str(), "w"); //save_fd = fopen(filename.c_str(), "wa");
 
     if (save_fd == NULL) {
-	    GfOut("Failed to open '%s' for writing (%s)", filename, strerror(errno));
+	    GfOut("Failed to open '%s' for writing (%s)", filename.c_str(), strerror(errno));
 	    return NULL;
     }
 

@@ -70,30 +70,18 @@ int	Bump = 0;
 int Raceline = 0;
 int	UseBorder = 1;
 
-char		*OutputFileName;
 char		*TrackName;
 char		*TrackCategory;
 
 void		*TrackHandle;
 void		*CfgHandle;
 
-tTrack		*Track;
-ITrackLoader*	PiTrackLoader;
-
 int		TrackOnly;
 int		JustCalculate;
 int		MergeAll;
 int		MergeTerrain;
 
-static char	buf[1024];
-static char	buf2[1024];
-static char	trackdef[1024];
-
-char		*OutTrackName;
-char		*OutMeshName;
-
 int		DoSaveElevation;
-char		*ElevationFile;
 
 class Application : public GfApplication
 {
@@ -243,9 +231,6 @@ bool Application::parseOptions()
 
 void Application::generate()
 {
-    const char *extName;
-    FILE *outfd = NULL;
-
     // Get the trackgen paramaters.
     CfgHandle = GfParmReadFile(CFG_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
@@ -272,6 +257,7 @@ void Application::generate()
     }
 
     // This is the track definition.
+    char	trackdef[1024];
     sprintf(trackdef, "%stracks/%s/%s/%s.xml", GfDataDir(), TrackCategory, TrackName, TrackName);
     TrackHandle = GfParmReadFile(trackdef, GFPARM_RMODE_STD);
     if (!TrackHandle) {
@@ -281,42 +267,41 @@ void Application::generate()
     }
 
     // Build the track structure with graphic extensions.
-    Track = PiTrackLoader->load(trackdef, true);
+    tTrack *Track = PiTrackLoader->load(trackdef, true);
 
-    if (!JustCalculate) {
-        // Get the output file radix.
-        sprintf(buf2, "%stracks/%s/%s/%s", GfDataDir(), Track->category, Track->internalname, Track->internalname);
-        OutputFileName = strdup(buf2);
-
-        // Number of groups for the complete track.
-        if (TrackOnly) {
-            sprintf(buf2, "%s.ac", OutputFileName);
-            // Track.
-            if (!Bump && !Raceline)
-                outfd = Ac3dOpen(buf2, 1);
-        } else if (MergeAll) {
-            sprintf(buf2, "%s.ac", OutputFileName);
-            // track + terrain + objects.
-            outfd = Ac3dOpen(buf2, 2 + GetObjectsNb(TrackHandle));
-        }
-
-        // Main Track.
-        if (Bump) {
-            extName = "trk-bump";
-        } else if (Raceline) {
-            extName = "trk-raceline";
-        } else {
-            extName = "trk";
-        }
-
-        sprintf(buf2, "%s-%s.ac", OutputFileName, extName);
-        OutTrackName = strdup(buf2);
-    }
-
-    if (JustCalculate){
+    if (JustCalculate) {
         CalculateTrack(Track, TrackHandle, Bump, Raceline);
         return;
     }
+
+    // Get the output file radix.
+    char	buf2[1024];
+    sprintf(buf2, "%stracks/%s/%s/%s", GfDataDir(), Track->category, Track->internalname, Track->internalname);
+    std::string OutputFileName(buf2);
+
+    // Number of groups for the complete track.
+    FILE *outfd = NULL;
+    if (TrackOnly) {
+        // Track.
+        if (!Bump && !Raceline)
+            outfd = Ac3dOpen(OutputFileName + ".ac", 1);
+    } else if (MergeAll) {
+        // track + terrain + objects.
+        outfd = Ac3dOpen(OutputFileName + ".ac", 2 + GetObjectsNb(TrackHandle));
+    }
+
+    // Main Track.
+    const char *extName;
+    if (Bump) {
+        extName = "trk-bump";
+    } else if (Raceline) {
+        extName = "trk-raceline";
+    } else {
+        extName = "trk";
+    }
+
+    sprintf(buf2, "%s-%s.ac", OutputFileName.c_str(), extName);
+    std::string OutTrackName(buf2);
 
     GenerateTrack(Track, TrackHandle, OutTrackName, outfd, Bump, Raceline);
 
@@ -326,14 +311,11 @@ void Application::generate()
 
     // Terrain.
     if (MergeTerrain && !MergeAll) {
-        sprintf(buf2, "%s.ac", OutputFileName);
         /* terrain + objects  */
-        outfd = Ac3dOpen(buf2, 1 + GetObjectsNb(TrackHandle));
+        outfd = Ac3dOpen(OutputFileName + ".ac", 1 + GetObjectsNb(TrackHandle));
     }
 
-    extName = "msh";
-    sprintf(buf2, "%s-%s.ac", OutputFileName, extName);
-    OutMeshName = strdup(buf2);
+    std::string OutMeshName(OutputFileName + "-msh.ac");
 
     GenerateTerrain(Track, TrackHandle, OutMeshName, outfd, DoSaveElevation);
 
@@ -344,36 +326,31 @@ void Application::generate()
         switch (DoSaveElevation) {
             case 0:
             case 1:
-                sprintf(buf2, "%s.ac", OutputFileName);
-                sprintf(buf, "%s-elv.png", OutputFileName);
-                SaveElevation(Track, TrackHandle, buf, buf2, 1);
+                SaveElevation(Track, TrackHandle, OutputFileName + "-elv.png", OutputFileName + ".ac", 1);
                 if (DoSaveElevation) {
                     break;
                 }
                 SD_FALLTHROUGH // [[fallthrough]]
             case 2:
-                sprintf(buf, "%s-elv2.png", OutputFileName);
-                SaveElevation(Track, TrackHandle, buf, OutMeshName, 1);
+                SaveElevation(Track, TrackHandle, OutputFileName + "-elv2.png", OutMeshName, 1);
                 if (DoSaveElevation) {
                     break;
                 }
                 SD_FALLTHROUGH // [[fallthrough]]
             case 3:
-                sprintf(buf, "%s-elv3.png", OutputFileName);
-                SaveElevation(Track, TrackHandle, buf, OutMeshName, 0);
+                SaveElevation(Track, TrackHandle, OutputFileName + "-elv3.png", OutMeshName, 0);
                 if (DoSaveElevation) {
                     break;
                 }
                 SD_FALLTHROUGH // [[fallthrough]]
             case 4:
-                sprintf(buf, "%s-elv4.png", OutputFileName);
-                SaveElevation(Track, TrackHandle, buf, OutTrackName, 2);
+                SaveElevation(Track, TrackHandle, OutputFileName + "-elv4.png", OutTrackName, 2);
                 break;
         }
         return;
     }
 
-    GenerateObjects(Track, TrackHandle, CfgHandle, outfd, OutMeshName);
+    GenerateObjects(Track, TrackHandle, CfgHandle, outfd, OutMeshName, OutputFileName);
 
     GfParmReleaseHandle(TrackHandle);
     GfParmReleaseHandle(CfgHandle);

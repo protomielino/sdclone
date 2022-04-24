@@ -2217,7 +2217,7 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
 
 
 void
-GenerateTerrain(tTrack *track, void *TrackHandle, char *outfile, FILE *AllFd, int noElevation)
+GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FILE *AllFd, int noElevation)
 {
     const char	*FileName;
     const char	*mat;
@@ -2266,7 +2266,7 @@ GenerateTerrain(tTrack *track, void *TrackHandle, char *outfile, FILE *AllFd, in
 	}
     }
     
-	if (outfile) {
+	if (!outfile.empty()) {
 		// Attempt to fix AC3D (the application) segfault on opening the msh file.
 		//curFd = Ac3dOpen(outfile, 2);
 		curFd = Ac3dOpen(outfile, 1);

@@ -26,7 +26,7 @@
 #ifndef _AC3D_H_
 #define _AC3D_H_
 
-extern FILE *Ac3dOpen(char *filename, int nbObjects);
+extern FILE *Ac3dOpen(const std::string &filename, int nbObjects);
 extern int Ac3dGroup(FILE *save_fd, const char *name, int nbObjects);
 extern void Ac3dClose(FILE *save_fd);
 

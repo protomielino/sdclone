@@ -32,12 +32,11 @@
 #define CFG_FILE	"tools/trackgen/trackgen.xml"
 
 
-extern void GenerateTrack(tTrack * Track, void *TrackHandle, char *outFile, FILE *AllFd, int bump, int raceline);
+extern void GenerateTrack(tTrack * Track, void *TrackHandle, const std::string &outFile, FILE *AllFd, int bump, int raceline);
 extern void CalculateTrack(tTrack * Track, void *TrackHandle, int bump, int trackline);
 extern void generateRaceLine(tTrack* pTrack, const double SideDistExt, const double SideDistInt);
 extern double getTexureOffset(double length);
 
-extern char	*OutputFileName;
 extern int	HeightSteps;
 extern int	UseBorder;
 

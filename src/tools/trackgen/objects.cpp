@@ -523,7 +523,7 @@ Group(tTrack *track, void *TrackHandle, ssgEntity *ent)
 
 
 void
-GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd, char *meshFile)
+GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd, const std::string &meshFile, const std::string &outputFile)
 {
     ssgLoaderOptionsEx	options;
     int			i, j;
@@ -543,7 +543,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
     ssgTexturePath(buf);
     sprintf(buf, ".;tracks/%s/%s", track->category, track->internalname);
     ssgModelPath(buf);
-    TrackRoot = (ssgRoot*)ssgLoadAC(meshFile);
+    TrackRoot = (ssgRoot*)ssgLoadAC(meshFile.c_str());
 
     InitObjects(track, TrackHandle);
 
@@ -601,7 +601,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
         Group(track, TrackHandle, Root);
 
         extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
-        sprintf(buf, "%s-%s-%d.ac", OutputFileName, extName, index);
+        sprintf(buf, "%s-%s-%d.ac", outputFile.c_str(), extName, index);
         curFd = Ac3dOpen(buf, 1);
         ssgSaveACInner(GroupRoot, curFd);
         Ac3dClose(curFd);
