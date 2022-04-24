@@ -64,11 +64,6 @@
 #include "trackgen.h"
 
 
-float	GridStep = 40.0;
-float	TrackStep = 5.0;
-float	Margin = 100.0;
-float	ExtHeight = 5.0;
-
 int	HeightSteps = 30;
 
 int	Bump = 0;
@@ -96,8 +91,6 @@ static char	trackdef[1024];
 
 char		*OutTrackName;
 char		*OutMeshName;
-
-tModList	*modlist = NULL;
 
 int		DoSaveElevation;
 char		*ElevationFile;
