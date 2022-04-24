@@ -82,7 +82,7 @@ hookNode(char *s)
   Load a simple database
 */
 void
-LoadRelief(void *TrackHandle, char *reliefFile)
+LoadRelief(void *TrackHandle, const char *reliefFile)
 {
     GF_TAILQ_INIT(&InteriorList);
     GF_TAILQ_INIT(&ExteriorList);

@@ -26,7 +26,7 @@
 #ifndef _RELIEF_H_
 #define _RELIEF_H_
 
-extern void LoadRelief(void * TrackHandle, char *reliefFile);
+extern void LoadRelief(void * TrackHandle, const char *reliefFile);
 extern void CountRelief(int interior, int *nb_vert, int *nb_seg);
 extern void GenRelief(int interior);
 
