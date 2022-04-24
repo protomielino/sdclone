@@ -28,7 +28,7 @@
 
 extern void LoadElevation(tTrack *track, void *TrackHandle, const std::string &imgFile);
 extern tdble GetElevation(tdble x, tdble y, tdble z);
-extern void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile, const std::string &meshFile, int disp);
+extern void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile, const std::string &meshFile, int disp, int heightSteps);
 
 
 #endif /* _ELEVATION_H_ */ 

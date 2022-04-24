@@ -247,7 +247,7 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
     Compares old end vertices and new start vertices, set startNeeded if one is different
 **/
 int
-InitScene(tTrack *Track, void *TrackHandle, int bump, int raceline)
+InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
 {
     int 		i;
     tTrackSeg	*seg;
@@ -2743,7 +2743,7 @@ saveObject(FILE *curFd, int nb, int start, char *texture, char *name, int surfTy
 
 
 static void
-SaveMainTrack(FILE *curFd, int bump, int raceline)
+SaveMainTrack(FILE *curFd, bool bump, bool raceline)
 {
     tDispElt		*aDispElt;
     char		buf[256];
@@ -2778,7 +2778,7 @@ SaveMainTrack(FILE *curFd, int bump, int raceline)
     @param	TrackHandle	handle on the track description
     @return	none
 */
-void CalculateTrack(tTrack * Track, void *TrackHandle, int bump, int raceline)
+void CalculateTrack(tTrack * Track, void *TrackHandle, bool bump, bool raceline)
 {
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, NULL, TrackStep);
     printf("Track step: %.2f ", TrackStep);
@@ -2797,7 +2797,7 @@ void CalculateTrack(tTrack * Track, void *TrackHandle, int bump, int raceline)
     @return	none
 */
 void
-GenerateTrack(tTrack * Track, void *TrackHandle, const std::string &outFile, FILE *AllFd, int bump, int raceline)
+GenerateTrack(tTrack * Track, void *TrackHandle, const std::string &outFile, FILE *AllFd, bool bump, bool raceline)
 {
     FILE *curFd;
 

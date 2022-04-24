@@ -1942,7 +1942,7 @@ do {							\
     @return	None.
 */
 static void
-GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
+GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exterior, bool useBorder)
 {
     int		startNeeded;
     int		i, j, nbvert, maxVert;
@@ -1983,7 +1983,7 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
     if (rightside) {
 	nbvert = 0;
 
-	if (exterior && !reverse && UseBorder) {
+	if (exterior && !reverse && useBorder) {
 	    ADD_POINT(-Margin, -Margin, ExtHeight, GridStep, 100000);
 	    ADD_POINT(Track->max.x + Margin, -Margin, ExtHeight, GridStep, 100000);
 	    ADD_POINT(Track->max.x + Margin, Track->max.y + Margin, ExtHeight, GridStep, 100000);
@@ -2055,7 +2055,7 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
 	    }
 	}
 
-	if (exterior && reverse && UseBorder) {
+	if (exterior && reverse && useBorder) {
 	    ADD_POINT(-Margin,Track->max.y + Margin, ExtHeight, GridStep, 100000);
 	    ADD_POINT(Track->max.x + Margin, Track->max.y + Margin, ExtHeight, GridStep, 100000);
 	    ADD_POINT(Track->max.x + Margin, -Margin, ExtHeight, GridStep, 100000);
@@ -2065,7 +2065,7 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
     } else {
 	nbvert = 0;
 
-	if (exterior && !reverse && UseBorder) {
+	if (exterior && !reverse && useBorder) {
 	    ADD_POINT(-Margin, -Margin, ExtHeight, GridStep, 100000);
 	    ADD_POINT(Track->max.x + Margin, -Margin, ExtHeight, GridStep, 100000);
 	    ADD_POINT(Track->max.x + Margin, Track->max.y + Margin, ExtHeight, GridStep, 100000);
@@ -2138,7 +2138,7 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
 	    }
 	}
 
-	if (exterior && reverse && UseBorder) {
+	if (exterior && reverse && useBorder) {
 	    ADD_POINT(-Margin, Track->max.y + Margin, ExtHeight, GridStep, 100000);
 	    ADD_POINT(Track->max.x + Margin, Track->max.y + Margin, ExtHeight, GridStep, 100000);
 	    ADD_POINT(Track->max.x + Margin, -Margin, ExtHeight, GridStep, 100000);
@@ -2162,10 +2162,10 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
     }
 
     Fl = 0;
-    if (exterior && !UseBorder) {
+    if (exterior && !useBorder) {
 	GenRelief(0);
     }
-    if (exterior && UseBorder) {
+    if (exterior && useBorder) {
 	segment[0].n0 = 0;
 	segment[0].n1 = 1;
 	segment[0].mark = 100000;
@@ -2202,7 +2202,7 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
 	Fl = j;
     }
     if (exterior) {
-	if (UseBorder) {
+	if (useBorder) {
 	    Fl = Nc;
 	    GenRelief(0);
 	}
@@ -2217,7 +2217,7 @@ GenerateMesh(tTrack *Track, int rightside, int reverse, int exterior)
 
 
 void
-GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FILE *AllFd, int noElevation)
+GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FILE *AllFd, int noElevation, bool useBorder)
 {
     const char	*FileName;
     const char	*mat;
@@ -2273,9 +2273,9 @@ GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FI
 	}
 
     if (GetTrackOrientation(track) == CLOCKWISE) {
-
-	GenerateMesh(track, 1 /* right */, 1 /* reverse */, 0 /* interior */);
-	GenerateMesh(track, 0 /* left */,  0 /* normal */,  1 /* exterior */);
+		 
+	GenerateMesh(track, true  /* right */, true  /* reverse */, false /* interior */, useBorder);
+	GenerateMesh(track, false /* left */,  false /* normal */,  true  /* exterior */, useBorder);
 	if (curFd) {
 	    draw_ac(curFd, "TERR");
 	}
@@ -2283,8 +2283,8 @@ GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FI
 	    draw_ac(AllFd, "TERR");
 	}
     } else {
-	GenerateMesh(track, 0 /* left */,  0 /* normal */,  0 /* interior */);
-	GenerateMesh(track, 1 /* right */, 1 /* reverse */, 1 /* exterior */);
+	GenerateMesh(track, false /* left */,  false /* normal */,  false /* interior */, useBorder);
+	GenerateMesh(track, true  /* right */, true  /* reverse */, true  /* exterior */, useBorder);
 	if (curFd) {
 	    draw_ac(curFd, "TERR");
 	}

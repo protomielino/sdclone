@@ -101,7 +101,7 @@ tdble GetElevation(tdble x, tdble y, tdble z)
 }
 
 
-void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile, const std::string &meshFile, int dispf)
+void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile, const std::string &meshFile, int dispf, int heightSteps)
 {
 	ssgLoaderOptionsEx options;
 	float zmin, zmax;
@@ -141,7 +141,7 @@ void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile,
 	zmin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ALT_MIN, NULL, track->min.z);
 	zmax = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ALT_MAX, NULL, track->max.z);
 
-	heightStep = (float)(zmax - zmin) / (float)HeightSteps;
+	heightStep = (float)(zmax - zmin) / (float)heightSteps;
 	if (dispf == 2) {
 		printf("Height of steps = %f\n", heightStep);
 	}

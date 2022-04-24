@@ -64,27 +64,22 @@
 #include "trackgen.h"
 
 
-int	HeightSteps = 30;
-
-int	Bump = 0;
-int Raceline = 0;
-int	UseBorder = 1;
-
-char		*TrackName;
-char		*TrackCategory;
-
-void		*TrackHandle;
-void		*CfgHandle;
-
-int		TrackOnly;
-int		JustCalculate;
-int		MergeAll;
-int		MergeTerrain;
-
-int		DoSaveElevation;
-
 class Application : public GfApplication
 {
+    int HeightSteps;
+    bool Bump;
+    bool Raceline;
+    bool UseBorder;
+    std::string TrackName;
+    std::string TrackCategory;
+    void *TrackHandle;
+    void *CfgHandle;
+    bool TrackOnly;
+    bool JustCalculate;
+    bool MergeAll;
+    bool MergeTerrain;
+    int DoSaveElevation;
+
 public:
 
     //! Constructor.
@@ -103,6 +98,17 @@ public:
 //! Constructor.
 Application::Application()
 : GfApplication("TrackGen", "1.5.2.1", "Terrain generator for tracks")
+, HeightSteps(30)
+, Bump(false)
+, Raceline(false)
+, UseBorder(true)
+, TrackHandle(nullptr)
+, CfgHandle(nullptr)
+, TrackOnly(true)
+, JustCalculate(false)
+, MergeAll(true)
+, MergeTerrain(true)
+, DoSaveElevation(-1)
 {
 }
 
@@ -155,15 +161,6 @@ bool Application::parseOptions()
     if (!GfApplication::parseOptions())
         return false;
 
-    // Then interpret the specific ones.
-    TrackName = NULL;
-    TrackCategory = NULL;
-    TrackOnly = 1;
-    JustCalculate = 0;
-    MergeAll = 1;
-    MergeTerrain = 1;
-    DoSaveElevation = -1;
-
     std::list<Option>::const_iterator itOpt;
     for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); ++itOpt)
     {
@@ -173,46 +170,46 @@ bool Application::parseOptions()
 
         if (itOpt->strLongName == "all")
         {
-            TrackOnly = 0;
+            TrackOnly = false;
         }
         else if (itOpt->strLongName == "calc")
         {
-            JustCalculate = 1;
+            JustCalculate = true;
         }
         else if (itOpt->strLongName == "bump")
         {
-            Bump = 1;
+            Bump = true;
         }
         else if (itOpt->strLongName == "raceline")
         {
-            Raceline = 1;
+            Raceline = true;
         }
         else if (itOpt->strLongName == "split")
         {
-            MergeAll = 0;
-            MergeTerrain = 1;
+            MergeAll = false;
+            MergeTerrain = true;
         }
         else if (itOpt->strLongName == "splitall")
         {
-            MergeAll = 0;
-            MergeTerrain = 0;
+            MergeAll = false;
+            MergeTerrain = false;
         }
         else if (itOpt->strLongName == "noborder")
         {
-            UseBorder = 0;
+            UseBorder = false;
         }
         else if (itOpt->strLongName == "name")
         {
-            TrackName = strdup(itOpt->strValue.c_str());
+            TrackName = itOpt->strValue.c_str();
         }
         else if (itOpt->strLongName == "saveelev")
         {
             DoSaveElevation = strtol(itOpt->strValue.c_str(), NULL, 0);
-            TrackOnly = 0;
+            TrackOnly = false;
         }
         else if (itOpt->strLongName == "category")
         {
-            TrackCategory = strdup(itOpt->strValue.c_str());
+            TrackCategory = itOpt->strValue.c_str();
         }
         else if (itOpt->strLongName == "steps4")
         {
@@ -220,7 +217,7 @@ bool Application::parseOptions()
         }
     }
 
-    if (!TrackName || !TrackCategory)
+    if (TrackName.empty() || TrackCategory.empty())
     {
         printUsage("No track name or category specified");
         return false;
@@ -258,7 +255,7 @@ void Application::generate()
 
     // This is the track definition.
     char	trackdef[1024];
-    sprintf(trackdef, "%stracks/%s/%s/%s.xml", GfDataDir(), TrackCategory, TrackName, TrackName);
+    sprintf(trackdef, "%stracks/%s/%s/%s.xml", GfDataDir(), TrackCategory.c_str(), TrackName.c_str(), TrackName.c_str());
     TrackHandle = GfParmReadFile(trackdef, GFPARM_RMODE_STD);
     if (!TrackHandle) {
         fprintf(stderr, "Cannot find %s\n", trackdef);
@@ -317,7 +314,7 @@ void Application::generate()
 
     std::string OutMeshName(OutputFileName + "-msh.ac");
 
-    GenerateTerrain(Track, TrackHandle, OutMeshName, outfd, DoSaveElevation);
+    GenerateTerrain(Track, TrackHandle, OutMeshName, outfd, DoSaveElevation, UseBorder);
 
     if (DoSaveElevation != -1) {
         if (outfd) {
@@ -326,25 +323,25 @@ void Application::generate()
         switch (DoSaveElevation) {
             case 0:
             case 1:
-                SaveElevation(Track, TrackHandle, OutputFileName + "-elv.png", OutputFileName + ".ac", 1);
+                SaveElevation(Track, TrackHandle, OutputFileName + "-elv.png", OutputFileName + ".ac", 1, HeightSteps);
                 if (DoSaveElevation) {
                     break;
                 }
                 SD_FALLTHROUGH // [[fallthrough]]
             case 2:
-                SaveElevation(Track, TrackHandle, OutputFileName + "-elv2.png", OutMeshName, 1);
+                SaveElevation(Track, TrackHandle, OutputFileName + "-elv2.png", OutMeshName, 1, HeightSteps);
                 if (DoSaveElevation) {
                     break;
                 }
                 SD_FALLTHROUGH // [[fallthrough]]
             case 3:
-                SaveElevation(Track, TrackHandle, OutputFileName + "-elv3.png", OutMeshName, 0);
+                SaveElevation(Track, TrackHandle, OutputFileName + "-elv3.png", OutMeshName, 0, HeightSteps);
                 if (DoSaveElevation) {
                     break;
                 }
                 SD_FALLTHROUGH // [[fallthrough]]
             case 4:
-                SaveElevation(Track, TrackHandle, OutputFileName + "-elv4.png", OutTrackName, 2);
+                SaveElevation(Track, TrackHandle, OutputFileName + "-elv4.png", OutTrackName, 2, HeightSteps);
                 break;
         }
         return;
