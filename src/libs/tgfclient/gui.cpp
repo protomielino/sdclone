@@ -128,7 +128,9 @@ gfuiInit(void)
 	gfuiInitMenu();
 	gfuiInitMenuSfx();
 	initMusic();
+#ifdef WEBSERVER
 	gfuiInitWebStats();
+#endif
 
 #ifdef WIN32
 	glUseProgram = (PFNGLUSEPROGRAMOBJECTARBPROC)wglGetProcAddress("glUseProgram");
@@ -144,7 +146,9 @@ gfuiShutdown(void)
 	gfuiFreeFonts();
 	gfuiShutdownMenuSfx();
 	shutdownMusic();
+#ifdef WEBSERVER
 	gfuiShutdownWebStats();
+#endif
 }
 
 GfuiColor 
