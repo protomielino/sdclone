@@ -22,9 +22,6 @@
 
 #ifdef WEBSERVER
 #include "webserver.h"
-
-extern NotificationManager notifications;
-extern TGFCLIENT_API WebServer webServer;
 #endif //WEBSERVER
 
 

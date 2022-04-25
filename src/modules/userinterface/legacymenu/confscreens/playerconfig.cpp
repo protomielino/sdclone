@@ -931,7 +931,6 @@ static void onWebserverLoginTest(void * /* dummy */)
         std::string username = (*CurrPlayer)->webserverusername();
         std::string password = (*CurrPlayer)->webserverpassword();
 
-        extern TGFCLIENT_API WebServer webServer;
         webServer.sendLogin(username.c_str(),password.c_str());
 
         //request a redisplay

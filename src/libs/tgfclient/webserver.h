@@ -23,14 +23,20 @@
 */
 #ifdef WEBSERVER
 
-#ifndef _SD_WEBSERVER_H_
-#define _SD_WEBSERVER_H_
+#ifndef __SD_WEBSERVER_H__
+#define __SD_WEBSERVER_H__
 #include "tgfclient.h"
 #include <vector>
 #include <string>
 #include <ctime>
 #include <curl/curl.h>
 #include <car.h>
+
+class NotificationManager;
+class TGFCLIENT_API WebServer;
+
+extern NotificationManager notifications;
+extern TGFCLIENT_API WebServer webServer;
 
 struct webRequest_t {
   int id;
@@ -133,7 +139,7 @@ class TGFCLIENT_API WebServer {
 		~WebServer();
 };
 
-#endif //_SD_WEBSERVER_H_
+#endif //__SD_WEBSERVER_H__
 #endif //WEBSERVER
 
 

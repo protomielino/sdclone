@@ -64,10 +64,6 @@
 
 #include "raceinit.h"
 
-#ifdef WEBSERVER
-extern TGFCLIENT_API WebServer webServer;
-#endif //WEBSERVER
-
 
 static const char *aPszSkillLevelNames[] = ROB_VALS_LEVEL;
 static const int NSkillLevels = (int)(sizeof(aPszSkillLevelNames)/sizeof(char*));

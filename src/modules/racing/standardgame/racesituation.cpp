@@ -380,8 +380,6 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
     }
 
     #ifdef WEBSERVER
-    // webServer lap logger.
-    extern TGFCLIENT_API WebServer webServer;
     //Find human cars
     for (int i = 0; i < pCurrReInfo->s->_ncars; i++) {
         if(pCurrReInfo->s->cars[i]->_driverType == RM_DRV_HUMAN){
