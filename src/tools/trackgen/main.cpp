@@ -66,6 +66,7 @@
 
 class Application : public GfApplication
 {
+    //! Command line options.
     int HeightSteps;
     bool Bump;
     bool Raceline;
