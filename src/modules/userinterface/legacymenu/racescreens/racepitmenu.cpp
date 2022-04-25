@@ -103,7 +103,7 @@ RmPitMenuStart(tCarElt *car, tSituation *s, tfuiCallback callback)
     if (menuHandle)
         GfuiScreenRelease(menuHandle);
 
-	GfLogInfo("Entering Pit menu\n");
+    GfLogInfo("Entering Pit menu\n");
 
     // Create screen, load menu XML descriptor and create static controls.
     menuHandle = GfuiScreenCreate(NULL, NULL, NULL, NULL, NULL, 1);
@@ -117,20 +117,20 @@ RmPitMenuStart(tCarElt *car, tSituation *s, tfuiCallback callback)
     snprintf(buf, sizeof(buf), "Pit Stop for %s", car->_name);
     GfuiLabelSetText(menuHandle, titleId, buf);
 
-   // Create labels for remaining laps and remaining fuel.
+    // Create labels for remaining laps and remaining fuel.
     int remainLapsTimeId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remaininglapstimelabel");
     if( s->_totTime > 0 && s->_totTime > s->currentTime ) // Timed part of the timed session
     {
-		GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remainingtimelabel");
+        GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remainingtimelabel");
     	if( s->_extraLaps > 0)
-    	    snprintf(buf, sizeof(buf), "%s + %d laps", GfTime2Str( s->_totTime - s->currentTime, NULL, true, 0 ), s->_extraLaps);
-		else
-    	    snprintf(buf, sizeof(buf), "%s", GfTime2Str( s->_totTime - s->currentTime, NULL, true, 0 ) );
+            snprintf(buf, sizeof(buf), "%s + %d laps", GfTime2Str( s->_totTime - s->currentTime, NULL, true, 0 ), s->_extraLaps);
+        else
+            snprintf(buf, sizeof(buf), "%s", GfTime2Str( s->_totTime - s->currentTime, NULL, true, 0 ) );
     }
     else
     {
-		GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remaininglapslabel");
-    	snprintf(buf, sizeof(buf), "%d", car->_remainingLaps); //Laps tot drive to win the race
+        GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remaininglapslabel");
+        snprintf(buf, sizeof(buf), "%d", car->_remainingLaps); //Laps tot drive to win the race
     }
     GfuiLabelSetText(menuHandle, remainLapsTimeId, buf);
 
