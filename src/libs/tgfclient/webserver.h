@@ -35,7 +35,6 @@
 class NotificationManager;
 class TGFCLIENT_API WebServer;
 
-extern NotificationManager notifications;
 extern TGFCLIENT_API WebServer webServer;
 
 struct webRequest_t {
@@ -104,6 +103,8 @@ class TGFCLIENT_API WebServer {
 		const char* url;
 		bool isWebServerEnabled;
 
+		NotificationManager notifications;
+
 		//curl
 		CURLM* multi_handle;
 		int handle_count;
@@ -126,6 +127,7 @@ class TGFCLIENT_API WebServer {
 
 	public:
 		int updateAsyncStatus();
+		void updateStatus();
 
 		//specific requests
 		int sendLogin (int userId);

@@ -379,9 +379,6 @@ void NotificationManager::updateWebserverStatusUi()
     }
 }
 
-//initialize the notification manager
-NotificationManager notifications;
-
 WebServer::WebServer()
 {
     //set some default
@@ -409,6 +406,19 @@ WebServer::~WebServer()
 {
     //cleanup curl
     curl_multi_cleanup(this->multi_handle);
+}
+
+void WebServer::updateStatus()
+{
+    std::clock_t currentTime =  std::clock();
+
+    //run the webserver update process and ui at 30 FPS
+    if( ( currentTime - notifications.animationLastExecTime ) > 0.033333333 ){
+
+        updateAsyncStatus();
+        notifications.updateStatus();
+
+    }
 }
 
 int WebServer::updateAsyncStatus()

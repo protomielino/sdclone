@@ -288,17 +288,9 @@ void GfuiEventLoop::postRedisplay(void)
 
 void GfuiEventLoop::forceRedisplay()
 {
-	#ifdef WEBSERVER
-	std::clock_t currentTime =  std::clock();
-	
-	//run the webserver update process and ui at 30 FPS
-	if( ( currentTime - notifications.animationLastExecTime ) > 0.033333333 ){
-
-		webServer.updateAsyncStatus();
-		notifications.updateStatus();		
-
-	}
-	#endif //WEBSERVER
+#ifdef WEBSERVER
+	webServer.updateStatus();
+#endif //WEBSERVER
 	
 	if (_pPrivate->cbDisplay)
 		_pPrivate->cbDisplay();
