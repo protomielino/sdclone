@@ -117,7 +117,7 @@ countRec(ssgEntity *e, int *nb_vert, int *nb_seg)
 }
 
 void
-CountRelief(int interior, int *nb_vert, int *nb_seg)
+CountRelief(bool interior, int *nb_vert, int *nb_seg)
 {
     tLine		*curLine;
     tRingListHead	*curHead;
@@ -194,7 +194,7 @@ genRec(ssgEntity *e)
 
 
 void
-GenRelief(int interior)
+GenRelief(bool interior)
 {
     tLine		*curLine;
     tRingListHead	*curHead;

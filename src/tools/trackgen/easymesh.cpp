@@ -1972,7 +1972,7 @@ GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exterior, bool us
 	printf("interior\n");
     }
 
-    CountRelief(1 - exterior, &nb_relief_vtx, &nb_relief_seg);
+    CountRelief(!exterior, &nb_relief_vtx, &nb_relief_seg);
 
     printf("Relief: %d vtx, %d seg\n", nb_relief_vtx, nb_relief_seg);
     
@@ -2163,7 +2163,7 @@ GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exterior, bool us
 
     Fl = 0;
     if (exterior && !useBorder) {
-	GenRelief(0);
+	GenRelief(false);
     }
     if (exterior && useBorder) {
 	segment[0].n0 = 0;
@@ -2204,11 +2204,11 @@ GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exterior, bool us
     if (exterior) {
 	if (useBorder) {
 	    Fl = Nc;
-	    GenRelief(0);
+	    GenRelief(false);
 	}
     } else {
 	Fl = Nc;
-	GenRelief(1);
+	GenRelief(true);
     }
     segment[Fl].n0 = -1;
     segment[Fl].n1 = -1;
