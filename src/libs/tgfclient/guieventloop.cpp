@@ -289,7 +289,7 @@ void GfuiEventLoop::postRedisplay(void)
 void GfuiEventLoop::forceRedisplay()
 {
 #ifdef WEBSERVER
-	webServer.updateStatus();
+	webServer().updateStatus();
 #endif //WEBSERVER
 	
 	if (_pPrivate->cbDisplay)

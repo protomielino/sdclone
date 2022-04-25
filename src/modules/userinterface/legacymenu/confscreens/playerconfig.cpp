@@ -931,7 +931,7 @@ static void onWebserverLoginTest(void * /* dummy */)
         std::string username = (*CurrPlayer)->webserverusername();
         std::string password = (*CurrPlayer)->webserverpassword();
 
-        webServer.sendLogin(username.c_str(),password.c_str());
+        webServer().sendLogin(username.c_str(),password.c_str());
 
         //request a redisplay
         GfuiApp().eventLoop().postRedisplay();

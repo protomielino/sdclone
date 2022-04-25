@@ -35,7 +35,10 @@
 class NotificationManager;
 class TGFCLIENT_API WebServer;
 
-extern TGFCLIENT_API WebServer webServer;
+TGFCLIENT_API WebServer& webServer();
+
+TGFCLIENT_API void gfuiInitWebStats();
+TGFCLIENT_API void gfuiShutdownWebStats();
 
 struct webRequest_t {
   int id;

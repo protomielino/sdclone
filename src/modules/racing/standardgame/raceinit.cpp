@@ -992,10 +992,10 @@ ReInitCars(void)
         if(ReInfo->s->cars[i]->_driverType == RM_DRV_HUMAN)
         {
             //login
-            webServer.sendLogin(ReInfo->s->cars[i]->_driverIndex);
+            webServer().sendLogin(ReInfo->s->cars[i]->_driverIndex);
 
             //send race data
-            webServer.sendRaceStart (
+            webServer().sendRaceStart (
                 ReInfo->s->cars[i]->_skillLevel,	//user_skill,
                 ReInfo->track->internalname,		//track_id,
                 ReInfo->s->cars[i]->_carName,		//car_id

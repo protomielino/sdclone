@@ -32,6 +32,28 @@
 #include "webserver.h"
 #include <portability.h>
 
+WebServer* pStatsServer = NULL;
+
+WebServer& webServer()
+{
+    if(pStatsServer == NULL)
+        pStatsServer = new WebServer;
+    return *pStatsServer;
+}
+
+void gfuiInitWebStats()
+{
+	if(pStatsServer == NULL)
+		pStatsServer = new WebServer;
+}
+
+void gfuiShutdownWebStats()
+{
+	if(pStatsServer != NULL)
+		delete pStatsServer;
+	pStatsServer = NULL;
+}
+
 //string splitting utils
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
     std::stringstream ss(s);
@@ -86,8 +108,6 @@ const int WEBSERVER_RECEIVING = 2;
 int webserverState = WEBSERVER_IDLE;
 
 
-
-
 NotificationManager::NotificationManager()
 : screenHandle(NULL),
   prevScreenHandle(NULL),
@@ -106,10 +126,8 @@ NotificationManager::NotificationManager()
 
 NotificationManager::~NotificationManager()
 {
-#if 0 // enable this code when these classes are deleted in the proper order
     if (menuXMLDescHdle)
         GfParmReleaseHandle(menuXMLDescHdle);
-#endif
 }
 
 void NotificationManager::updateStatus(){
@@ -903,6 +921,4 @@ int WebServer::sendRaceEnd (int race_id, int endposition)
     return 0;
 }
 
-//initialize the web server
-TGFCLIENT_API WebServer webServer;
 #endif //WEBSERVER

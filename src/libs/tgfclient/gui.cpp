@@ -31,6 +31,10 @@
 #include <SDL.h>
 #include <SDL_syswm.h>
 
+#ifdef WEBSERVER
+#include "webserver.h"
+#endif //WEBSERVER
+
 #include <raceman.h>
 
 #include <portability.h>
@@ -124,6 +128,7 @@ gfuiInit(void)
 	gfuiInitMenu();
 	gfuiInitMenuSfx();
 	initMusic();
+	gfuiInitWebStats();
 
 #ifdef WIN32
 	glUseProgram = (PFNGLUSEPROGRAMOBJECTARBPROC)wglGetProcAddress("glUseProgram");
@@ -139,6 +144,7 @@ gfuiShutdown(void)
 	gfuiFreeFonts();
 	gfuiShutdownMenuSfx();
 	shutdownMusic();
+	gfuiShutdownWebStats();
 }
 
 GfuiColor 
