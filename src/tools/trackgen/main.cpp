@@ -72,8 +72,6 @@ class Application : public GfApplication
     bool UseBorder;
     std::string TrackName;
     std::string TrackCategory;
-    void *TrackHandle;
-    void *CfgHandle;
     bool TrackOnly;
     bool JustCalculate;
     bool MergeAll;
@@ -102,8 +100,6 @@ Application::Application()
 , Bump(false)
 , Raceline(false)
 , UseBorder(true)
-, TrackHandle(nullptr)
-, CfgHandle(nullptr)
 , TrackOnly(true)
 , JustCalculate(false)
 , MergeAll(true)
@@ -229,7 +225,7 @@ bool Application::parseOptions()
 void Application::generate()
 {
     // Get the trackgen paramaters.
-    CfgHandle = GfParmReadFile(CFG_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    void *CfgHandle = GfParmReadFile(CFG_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
     // Load and initialize the track loader module.
     GfLogInfo("Loading Track Loader ...\n");
@@ -256,7 +252,7 @@ void Application::generate()
     // This is the track definition.
     char	trackdef[1024];
     sprintf(trackdef, "%stracks/%s/%s/%s.xml", GfDataDir(), TrackCategory.c_str(), TrackName.c_str(), TrackName.c_str());
-    TrackHandle = GfParmReadFile(trackdef, GFPARM_RMODE_STD);
+    void *TrackHandle = GfParmReadFile(trackdef, GFPARM_RMODE_STD);
     if (!TrackHandle) {
         fprintf(stderr, "Cannot find %s\n", trackdef);
         GfParmReleaseHandle(CfgHandle);
