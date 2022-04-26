@@ -1691,7 +1691,6 @@ GfParmWriteBuf (void *handle, char *buf, int size) /* Never used in current code
     return 0; // Success
 }
 
-#ifdef WEBSERVER
 /** Write a configuration string.
     @ingroup	conf
     @param	handle	Configuration handle
@@ -1721,7 +1720,6 @@ GfParmWriteString (void *handle, std::string& str)
    
     return 0; // Success
 }
-#endif //WEBSERVER
 
 /** Set the dtd path and header if necessary
     @ingroup	conf

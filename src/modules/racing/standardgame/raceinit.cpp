@@ -46,8 +46,8 @@
 #include <tgf.hpp>
 #ifdef WEBSERVER
 #include <webserver.h>
-#include "racewebmetar.h"
 #endif //WEBSERVER
+#include "racewebmetar.h"
 #include <portability.h>
 
 #include <racemanagers.h>

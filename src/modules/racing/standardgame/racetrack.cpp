@@ -38,7 +38,6 @@
 #include "raceinit.h"
 #include "racetrack.h"
 
-#ifdef WEBSERVER
 #include <iomanip>
 #include <fstream>
 #include <sstream>
@@ -48,7 +47,6 @@ static ReWebMetarCloud      webMetarCloud;
 static ReWebMetarRunway     webMetarRunway;
 static ReWebMetarVisibility webMetarVisibility;
 static ReWebMetar           *webMetar = NULL;
-#endif //WEBSERVER
 
 // portability.h must be after curl.h (included by racewebmetar.h)
 #include <portability.h>
@@ -59,10 +57,8 @@ static void reTrackInitTimeOfDay(void);
 static void reTrackInitWeather(void);
 static void reTrackInitWeatherValues(void);
 
-#ifdef WEBSERVER
 static void reTrackInitRealWeather(void);
 static void reTrackInitSimuWeather(void);
-#endif //WEBSERVER
 
 static void reTrackUpdatePhysics(void);
 
@@ -102,13 +98,11 @@ ReTrackInit(void)
 
     if (!pszWeather)
          pszWeather = GfParmGetStr(ReInfo->params, RM_VAL_ANYRACE, RM_ATTR_WEATHER, RM_VAL_WEATHER_CONFIG);
-#ifdef WEBSERVER
     if (!strcmp(pszWeather, RM_VAL_WEATHER_REAL))
         reTrackInitRealWeather();
     else if (!strcmp(pszWeather, RM_VAL_WEATHER_RECORDED))
         reTrackInitSimuWeather();
     else
-#endif
         reTrackInitWeather();
 
     reTrackDump(ReInfo->track, 0);
@@ -510,7 +504,6 @@ reTrackInitWeatherValues(void)
     trackLocal->airtemperature = temp;
 }
 
-#ifdef WEBSERVER
 // Initialize track weather info from race settings
 void
 reTrackInitRealWeather(void)
@@ -957,7 +950,6 @@ reTrackInitSimuWeather(void)
 
     ReTrackUpdate();
 }
-#endif //WEBSERVER
 
 // Update track info ...
 void
@@ -1015,12 +1007,10 @@ reTrackUpdatePhysics(void)
 int
 ReTrackShutdown(void)
 {
-#ifdef WEBSERVER
     if(webMetar)
     {
         delete webMetar;
         webMetar = 0;
     }
-#endif //WEBSERVER
     return 0;
 }

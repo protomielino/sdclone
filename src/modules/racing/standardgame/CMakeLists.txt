@@ -7,19 +7,14 @@ SET(_SOURCES standardgame.cpp
              raceinit.cpp racemain.cpp
              racetrack.cpp raceresults.cpp racesimusimu.cpp 
              racestate.cpp racesituation.cpp racemessage.cpp
-             raceutil.cpp)
+             raceutil.cpp racewebmetar.cpp)
 SET(_HEADERS standardgame.h 
              racecareer.h raceupdate.h racenetwork.h racecars.h
              raceinit.h racemain.h
              racetrack.h raceresults.h racesimusimu.h 
              racestate.h racesituation.h racemessage.h
-             raceutil.h)
+             raceutil.h racewebmetar.h)
 SET(_OTHER_SOURCES )
-
-IF(OPTION_WEBSERVER)
-   SET(_SOURCES ${_SOURCES} racewebmetar.cpp )
-   SET(_HEADERS ${_HEADERS} racewebmetar.h )
-ENDIF(OPTION_WEBSERVER)
 
 IF(OPTION_CLIENT_SERVER)
    SET(NETWORKING_INC csnetworking)
@@ -31,23 +26,17 @@ ENDIF(OPTION_CLIENT_SERVER)
 
 ADD_INTERFACE_INCLUDEDIR()
 
-IF(OPTION_WEBSERVER)
-	ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfdata ${NETWORKING_INC} tgfclient)
-ELSE(OPTION_WEBSERVER)
-	ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfdata ${NETWORKING_INC})
-ENDIF(OPTION_WEBSERVER)
+ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfdata ${NETWORKING_INC} tgfclient)
 
 ADD_PLIB_INCLUDEDIR()
 
 ADD_SDL2_INCLUDEDIR()
 
+ADD_CURL_INCLUDEDIR()
+
 IF(OPTION_3RDPARTY_SQLITE3)
     ADD_SQLITE3_INCLUDEDIR()
 ENDIF(OPTION_3RDPARTY_SQLITE3)
-
-IF(OPTION_WEBSERVER)
-	ADD_CURL_INCLUDEDIR()
-ENDIF(OPTION_WEBSERVER)
 
 # Disable developer warning
 IF (COMMAND CMAKE_POLICY)
@@ -69,18 +58,13 @@ SD_ADD_LIBRARY(standardgame MODULE ${_SOURCES} ${_HEADERS} ${_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(standardgame PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
-IF(OPTION_WEBSERVER)
-	ADD_SDLIB_LIBRARY(standardgame portability tgf tgfdata robottools ${NETWORKING_LIB} tgfclient)
-ELSE(OPTION_WEBSERVER)
-	ADD_SDLIB_LIBRARY(standardgame portability tgf tgfdata robottools ${NETWORKING_LIB})
-ENDIF(OPTION_WEBSERVER)
+
+ADD_SDLIB_LIBRARY(standardgame portability tgf tgfdata robottools ${NETWORKING_LIB} tgfclient)
+
+ADD_CURL_LIBRARY(standardgame)
 
 IF(OPTION_3RDPARTY_SQLITE3)
     ADD_SQLITE3_LIBRARY(standardgame)
 ENDIF(OPTION_3RDPARTY_SQLITE3)
-
-IF(OPTION_WEBSERVER)
-	ADD_CURL_LIBRARY(standardgame)
-ENDIF(OPTION_WEBSERVER)
 
 SD_INSTALL_FILES(LIB modules/racing TARGETS standardgame)

@@ -270,7 +270,6 @@ rmChangeWeather(void *vp)
         // Make clouds state compatible if needed.
         int cloudsComboEnabled = GFUI_ENABLE;
 
-#ifdef WEBSERVER
         if ((rmrpWeather == GfRace::eWeatherRecorded) || (rmrpWeather == GfRace::eWeatherReal)) // Random rain => Random clouds.
         {
             cloudsComboEnabled = GFUI_DISABLE;
@@ -281,7 +280,6 @@ rmChangeWeather(void *vp)
             cloudsComboEnabled = GFUI_ENABLE;
             //rmrpClouds = GfRace::eCloudsNone;
         }
-#endif //WEBSERVER
 
         GfuiLabelSetText(ScrHandle, rmrpCloudsEditId, CloudsValues[rmrpClouds]);
         // Show / hide clouds combo arrow buttons (any rain => no sky choice).
@@ -293,7 +291,6 @@ rmChangeWeather(void *vp)
     {
         int rainComboEnabled = GFUI_ENABLE;
 
-#ifdef WEBSERVER
         if ((rmrpWeather == GfRace::eWeatherRecorded) || (rmrpWeather == GfRace::eWeatherReal)) // Random rain => Random clouds.
         {
             rainComboEnabled = GFUI_DISABLE;
@@ -304,7 +301,6 @@ rmChangeWeather(void *vp)
             rainComboEnabled = GFUI_ENABLE;
             //rmrpRain = GfRace::eRainNone;
         }
-#endif // WEBSERVER
 
         GfuiLabelSetText(ScrHandle, rmrpRainEditId, RainValues[rmrpRain]);
         // Show / hide clouds combo arrow buttons (any rain => no sky choice).
@@ -392,12 +388,10 @@ rmrpValidate(void * /* dummy */)
             pRaceSessionParams->eRainSpec = (GfRace::ERainSpec)rmrpRain;
         }
 
-#ifdef WEBSERVER
         if (rmrpConfMask & RM_CONF_WEATHER)
         {
             pRaceSessionParams->eWeatherSpec = (GfRace::EWeatherSpec)rmrpWeather;
         }
-#endif //WEBSERVER
 
         if (rmrpConfMask & RM_CONF_DISP_MODE)
         {
@@ -462,14 +456,12 @@ RmRaceParamsMenu(void *vrp)
         rmrpConfMask &= ~RM_CONF_RAIN_FALL;
     }
 
-#ifdef WEBSERVER
     if (!bSkyDomeEnabled && (rmrpConfMask & RM_CONF_WEATHER))
     {
         GfLogTrace("Will not configure Weather as Sky Dome is disabled\n");
         rmrpWeather = GfRace::eWeatherConfig;
         rmrpConfMask &= ~RM_CONF_WEATHER;
     }
-#endif // WEBSERVER
 
     // 5) According to the competitors.
     if ((rmrpConfMask & RM_CONF_DISP_MODE) && MenuData->pRace->hasHumanCompetitors())
@@ -659,7 +651,6 @@ RmRaceParamsMenu(void *vrp)
         rmChangeRain(0); // Make cloud cover settings compatible if needed.
     }
 
-#ifdef WEBSERVER
     // Create and initialize Weather combo box (2 arrow buttons and a variable label).
     if (rmrpConfMask & RM_CONF_WEATHER)
     {
@@ -681,7 +672,6 @@ RmRaceParamsMenu(void *vrp)
         GfuiLabelSetText(ScrHandle, rmrpWeatherEditId, WeatherValues[rmrpWeather]);
         rmChangeWeather(0); // Make cloud cover settings compatible if needed.
     }
-#endif //WEBSERVER
 
     // Create and initialize Display mode combo-box-like control.
     if (rmrpConfMask & RM_CONF_DISP_MODE)

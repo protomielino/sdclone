@@ -16,7 +16,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef WEBSERVER
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -1676,4 +1675,3 @@ void ReWebMetarVisibility::set(double dist, int dir, int mod, int tend)
         _tendency = tend;
 }
 
-#endif //WEBMETAR

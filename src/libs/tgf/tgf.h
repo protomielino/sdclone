@@ -420,9 +420,7 @@ TGF_API int GfParmWriteFile(const std::string &file, void *handle, const char *n
 TGF_API int GfParmWriteFileSDHeader(const char *file, void* handle, const char *name, const char *author, bool trace = true);
 /* write a parameter file to a supplied buffer */
 TGF_API int GfParmWriteBuf(void *handle, char *buf, int size);/* Never used in current codebase: to be removed? */
-#ifdef WEBSERVER
 TGF_API int GfParmWriteString(void *handle, std::string& str);
-#endif //WEBSERVER
 
 TGF_API char *GfParmGetName(void *handle);
 TGF_API char *GfParmGetFileName(void *handle);

@@ -263,19 +263,15 @@ MACRO(CHECK_LIBRARIES)
 		MESSAGE(STATUS "Looking for library SDL2_mixer - NOT found")
 	ENDIF(SDL2_MIXER_FOUND)
 
+	# CURL
+	Find_Package(CURL)
 
-	IF(OPTION_WEBSERVER)
-		# CURL
-		Find_Package(CURL)
-
-		IF(CURL_FOUND)
-			SET(HAVE_CURL 1)
-			MESSAGE(STATUS "Looking for library CURL - found")
-		ELSE(CURL_FOUND)
-			MESSAGE(STATUS "Looking for library CURL - NOT found")
-		ENDIF(CURL_FOUND)
-	ENDIF(OPTION_WEBSERVER)
-
+	IF(CURL_FOUND)
+		SET(HAVE_CURL 1)
+		MESSAGE(STATUS "Looking for library CURL - found")
+	ELSE(CURL_FOUND)
+		MESSAGE(STATUS "Looking for library CURL - NOT found")
+	ENDIF(CURL_FOUND)
 	
 	# OSG
 	IF(OPTION_OSGGRAPH)

@@ -16,10 +16,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef WEBSERVER
-
-#ifndef _SD_REWEBMETAR_H_
-#define _SD_REWEBMETAR_H_
+#ifndef __SD_REWEBMETAR_H__
+#define __SD_REWEBMETAR_H__
 
 #include <vector>
 #include <string>
@@ -337,5 +335,4 @@ protected:
     void    density();
 };
 
-#endif //_SD_REWEBMETAR_H_
-#endif //WEBSERVER
+#endif //__SD_REWEBMETAR_H__
