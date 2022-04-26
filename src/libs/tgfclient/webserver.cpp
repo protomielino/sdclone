@@ -740,9 +740,13 @@ int WebServer::sendLogin (int userId)
 int WebServer::sendLogin (const char* username, const char* password)
 {
     //if the webserver is disabled exit immediately
+    /*
     if(!this->isWebServerEnabled){
         return 1;
     }
+    */
+    // Commented out above to allow the 'Test login' button from Player config menu to work
+    // for pre-race loginthe above check has already been done in WebServer::sendLogin (int userId)
     std::string serverReply;
 
     //prepare the string to send

@@ -78,6 +78,7 @@ static int AutoReverseLabelId;
 static int WebUsernameEditId;
 static int WebPasswordEditId;
 static int WebServerCheckboxId;
+static int WebServerTestLoginId;
 #endif //WEBSERVER
 
 /* Struct to define a generic ("internal name / id", "displayable name") pair */
@@ -292,6 +293,21 @@ static const char *Yn[] = {HM_VAL_YES, HM_VAL_NO};
 
 static int ReloadValues = 1;
 
+#ifdef WEBSERVER
+static void
+updateWebserverControls(int enabled)
+{
+    int flag = GFUI_DISABLE;
+    if(enabled)
+    {
+        flag = GFUI_ENABLE;
+    }
+    GfuiEnable(ScrHandle, WebServerTestLoginId, flag);
+    GfuiEnable(ScrHandle, WebPasswordEditId, flag);
+    GfuiEnable(ScrHandle, WebUsernameEditId, flag);
+}
+#endif //WEBSERVER
+
 /* Load screen editable fields with relevant values :
    - all empty if no player selected,
    - from selected player current settings otherwise
@@ -330,6 +346,9 @@ refreshEditVal(void)
         
         GfuiCheckboxSetChecked(ScrHandle, WebServerCheckboxId, 0);
         GfuiEnable(ScrHandle, WebPasswordEditId, GFUI_DISABLE);
+
+        GfuiEnable(ScrHandle, WebServerTestLoginId, GFUI_DISABLE);
+
         #endif //WEBSERVER
 
     } else {
@@ -368,7 +387,10 @@ refreshEditVal(void)
         GfuiEnable(ScrHandle, WebPasswordEditId, GFUI_ENABLE);
         
         GfuiCheckboxSetChecked(ScrHandle, WebServerCheckboxId, (*CurrPlayer)->webserverenabled());
-        GfuiEnable(ScrHandle, WebServerCheckboxId, GFUI_DISABLE);
+        GfuiEnable(ScrHandle, WebServerCheckboxId, GFUI_ENABLE);
+
+        updateWebserverControls((*CurrPlayer)->webserverenabled());
+
         #endif //WEBSERVER
 
 
@@ -917,6 +939,7 @@ onChangeWebserverenabled(tCheckBoxInfo* pInfo)
     if (CurrPlayer != PlayersInfo.end()) {
         isChecked = GfuiCheckboxIsChecked(ScrHandle, WebServerCheckboxId);
         (*CurrPlayer)->setWebserverEnabled(isChecked);
+        updateWebserverControls(isChecked);
         //GfLogInfo("WebServer features: %i\n", isChecked);
         //GfLogInfo("WebServer features: %i\n", (*CurrPlayer)->webserverenabled());
 
@@ -1147,7 +1170,7 @@ PlayerConfigMenuInit(void *prevMenu)
     WebPasswordEditId = GfuiMenuCreateEditControl(ScrHandle, param, "webpasswordedit", NULL, NULL, onChangeWebserverpassword);
 
     /* Web test button */
-    GfuiMenuCreateButtonControl(ScrHandle, param, "weblogintest", NULL, onWebserverLoginTest);
+    WebServerTestLoginId = GfuiMenuCreateButtonControl(ScrHandle, param, "weblogintest", NULL, onWebserverLoginTest);
     
    	WebServerCheckboxId =
 	GfuiMenuCreateCheckboxControl(ScrHandle, param, "webservercheckbox", NULL, onChangeWebserverenabled);
