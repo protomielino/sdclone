@@ -63,20 +63,6 @@ static int		XGroupNb;
 static int		GroupNb;
 static int		ObjUniqId = 0;
 
-class myLoaderOptions : public ssgLoaderOptions
-{
-public:
-    virtual void makeModelPath ( char* path, const char *fname ) const
-    {
-        ulFindFile ( path, model_dir, fname, NULL ) ;
-    }
-
-    virtual void makeTexturePath ( char* path, const char *fname ) const
-    {
-        ulFindFile ( path, texture_dir, fname, NULL ) ;
-    }
-} ;
-
 
 typedef struct objdef
 {
@@ -128,7 +114,7 @@ InitObjects(tTrack *track, void *TrackHandle)
     struct objdef	*curObj;
     const char		*objName;
     static char		*search;
-    myLoaderOptions	options ;
+    ssgLoaderOptionsEx	options ;
     sgMat4		m;
 
     ObjUniqId = 0;
