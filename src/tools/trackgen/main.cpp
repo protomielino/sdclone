@@ -88,10 +88,10 @@ public:
     virtual void initialize(bool bLoggingEnabled, int argc = 0, char **argv = 0);
 
     //! Parse the command line options.
-    // TODO: Move to the GfApplication way of parsing options ?
     bool parseOptions();
 
-    void generate();
+    //! Generate the track.
+    int generate();
 };
 
 //! Constructor.
@@ -223,7 +223,7 @@ bool Application::parseOptions()
     return true;
 }
 
-void Application::generate()
+int Application::generate()
 {
     // Get the trackgen paramaters.
     void *CfgHandle = GfParmReadFile(CFG_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
@@ -232,22 +232,19 @@ void Application::generate()
     GfLogInfo("Loading Track Loader ...\n");
     std::ostringstream ossModLibName;
     ossModLibName << GfLibDir() << "modules/track/" << "trackv1" << DLLEXT;
-    GfModule* pmodTrkLoader = GfModule::load(ossModLibName.str());
-
-    // Check that it implements ITrackLoader.
-    ITrackLoader* PiTrackLoader = 0;
-    if (pmodTrkLoader)
-        PiTrackLoader = pmodTrkLoader->getInterface<ITrackLoader>();
-    else {
-        fprintf(stderr, "Cannot find %s\n", ossModLibName.str().c_str());
+    GfModule *pmodTrkLoader = GfModule::load(ossModLibName.str());
+    if (!pmodTrkLoader) {
+        GfLogError("Cannot find %s\n", ossModLibName.str().c_str());
         GfParmReleaseHandle(CfgHandle);
-        return;
+        return EXIT_FAILURE;
     }
 
+    // Check that it implements ITrackLoader.
+    ITrackLoader* PiTrackLoader = pmodTrkLoader->getInterface<ITrackLoader>();
     if (!PiTrackLoader) {
-        fprintf(stderr, "Cannot find ITrackLoader interface\n");
+        GfLogError("Cannot find ITrackLoader interface\n");
         GfParmReleaseHandle(CfgHandle);
-        return;
+        return EXIT_FAILURE;
     }
 
     // This is the track definition.
@@ -255,9 +252,9 @@ void Application::generate()
     sprintf(trackdef, "%stracks/%s/%s/%s.xml", GfDataDir(), TrackCategory.c_str(), TrackName.c_str(), TrackName.c_str());
     void *TrackHandle = GfParmReadFile(trackdef, GFPARM_RMODE_STD);
     if (!TrackHandle) {
-        fprintf(stderr, "Cannot find %s\n", trackdef);
+        GfLogError("Cannot find %s\n", trackdef);
         GfParmReleaseHandle(CfgHandle);
-        ::exit(1);
+        return EXIT_FAILURE;
     }
 
     // Build the track structure with graphic extensions.
@@ -265,7 +262,9 @@ void Application::generate()
 
     if (JustCalculate) {
         CalculateTrack(Track, TrackHandle, Bump, Raceline);
-        return;
+        GfParmReleaseHandle(CfgHandle);
+        GfParmReleaseHandle(TrackHandle);
+        return EXIT_SUCCESS;
     }
 
     // Get the output file radix.
@@ -300,7 +299,9 @@ void Application::generate()
     GenerateTrack(Track, TrackHandle, OutTrackName, outfd, Bump, Raceline);
 
     if (TrackOnly) {
-        return;
+        GfParmReleaseHandle(CfgHandle);
+        GfParmReleaseHandle(TrackHandle);
+        return EXIT_SUCCESS;
     }
 
     // Terrain.
@@ -341,13 +342,19 @@ void Application::generate()
                 SaveElevation(Track, TrackHandle, OutputFileName + "-elv4.png", OutTrackName, 2, HeightSteps);
                 break;
         }
-        return;
+
+        GfParmReleaseHandle(TrackHandle);
+        GfParmReleaseHandle(CfgHandle);
+
+        return EXIT_SUCCESS;
     }
 
     GenerateObjects(Track, TrackHandle, CfgHandle, outfd, OutMeshName, OutputFileName);
 
     GfParmReleaseHandle(TrackHandle);
     GfParmReleaseHandle(CfgHandle);
+
+    return EXIT_SUCCESS;
 }
 
 
@@ -359,19 +366,16 @@ int main(int argc, char **argv)
 
     // Parse the command line options
     if (!app.parseOptions())
-        return 1;
+        return EXIT_FAILURE;
 
     // If "data dir" specified in any way, cd to it.
-    if(chdir(GfDataDir()))
+    if (chdir(GfDataDir()))
     {
         GfLogError("Could not start %s : failed to cd to the datadir '%s' (%s)\n",
                    app.name().c_str(), GfDataDir(), strerror(errno));
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // Do the requested job.
-    app.generate();
-
-    // That's all.
-    return 0;
+    return app.generate();
 }
