@@ -79,7 +79,7 @@
 #define GR_ATT_SHADOW_NONE  "shadow static"
 #define GR_ATT_SHADOW_SM    "shadowmap"
 #define GR_ATT_SHADOW_SSM   "soft shadowmap"
-#define GR_ATT_SHADOW_PSSM  "paralele shadowmap"
+#define GR_ATT_SHADOW_PSSM  "parallel shadowmap"
 #define GR_ATT_SHADOW_LSPM  "light shadowmap"
 #define GR_ATT_SHADOW_VDSM  "view dependent shadowmap"
 
