@@ -135,8 +135,13 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
                 }
             }
 
-            if (pitBuildingsStart == NULL)
+            if (pitBuildingsStart == NULL) {
+                if (pits->pitStart == NULL) {
+                    GfLogError("Can't find pit start\n");
+                    exit(1);
+                }
                 pitBuildingsStart = pits->pitStart;
+            }
 
             curMainSeg = pitBuildingsStart->prev;
 
