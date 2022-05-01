@@ -538,9 +538,9 @@ void	Driver::InitTrack(
     double  wearPerM        = SafeParmGetNum(hCarParm, SECT_PRIV, "wear per m", 0, 0.0f);
     double distance         = pS->_totLaps * (double)pTrack->length;
     double tiredist         = distance / wearPerM;
-    LogSHADOW.info("Tire distance : %.7f\n", tiredist);
+    LogSHADOW.info("Tire distance : %.7g\n", tiredist);
     double mindist = MIN(distance, tiredist);
-    LogSHADOW.info("Minimum distance : %.3f\n", mindist);
+    LogSHADOW.info("Minimum distance : %.2g\n", mindist);
     double	fuelPerM        = SafeParmGetNum(hCarParm, SECT_PRIV, "fuel per m", 0, 0.001f);
     double	maxFuel			= SafeParmGetNum(hCarParm, SECT_CAR, PRM_TANK, (char*)NULL, 100.0f);
     int pittest             = SafeParmGetNum(hCarParm, SECT_PRIV, PRV_PIT_TEST_STOP, (char*)NULL, 0);
@@ -1756,13 +1756,6 @@ void	Driver::SpeedControl4(
 {
     if( m_lastBrk && m_lastTargV )
     {
-#if 0   // dead code
-        if( m_lastBrk > 0 || (car->ctrl.accelCmd == -m_lastBrk) )
-        {
-            double	err = m_lastTargV - spd0;
-        }
-#endif
-
         m_lastBrk = 0;
         m_lastTargV = 0;
     }
@@ -2506,6 +2499,10 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
     {
         m_lastLap = car->race.laps;
         LogSHADOW.info( "[%d] Average fuel/m: %g\n", car->index, m_Strategy.FuelPerM(car) );
+
+        if (m_cm[PATH_NORMAL].HASTYC)
+            LogSHADOW.info( "[%d] Average wear/m: %.15f\n", car->index, m_Strategy.WearPerM(car) );
+
         double a, b;
         m_accBrkCoeff.CalcCoeffs(&a, &b);
         LogSHADOW.debug( "[%d] accbrk: a=%g, b=%g\n", car->index, a, b );
@@ -2636,9 +2633,6 @@ void	Driver::Drive( int index, tCarElt* car, tSituation* s )
     {
         LogSHADOW.debug( "[%d] slowing for avoidance.  curr %g  targ %g  avoid spd %g, avoid acc %g, curr acc %g\n",
                          car->index, car->pub.speed, targetSpd, avoidTargetSpd, avoidTargetAcc, car->pub.DynGC.acc.x );
-#if 0   // dead code
-        slowing = true;
-#endif
     }
 
 

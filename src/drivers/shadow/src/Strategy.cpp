@@ -403,6 +403,16 @@ double	Strategy::FuelPerM( const CarElt* pCar ) const
     return fuelPerM;
 }
 
+double	Strategy::WearPerM( const CarElt* pCar ) const
+{
+    double	wearPerM = 0.001;
+
+    if( pCar->_distRaced > 0 )
+        wearPerM = 1.0 / pCar->_distRaced;
+
+    return wearPerM;
+}
+
 
 double Strategy::calcRefuel(CarElt* pCar) const
 {

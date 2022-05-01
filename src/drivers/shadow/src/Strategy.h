@@ -52,6 +52,7 @@ public:
     int		PitType() const;		// type of pit requested.
 
     double	FuelPerM( const CarElt* pCar ) const;
+    double  WearPerM( const CarElt* pCar ) const;
 
 private:
     enum

@@ -1084,7 +1084,7 @@ void	CarModel::CalcSimuSpeedRanges(
 double CarModel::CalcFuelStart(double distance) const
 {
     double tiredist = distance / TIREWEARPERMETER;
-    LogSHADOW.info("Tire distance : %.7f\n", tiredist);
+    LogSHADOW.info("Tire distance : %.7g\n", tiredist);
     double mindist = MIN(distance, tiredist);
     LogSHADOW.info("Minimum distance : %.3f\n", mindist);
     double fuel = mindist * FUELPERMETER;
