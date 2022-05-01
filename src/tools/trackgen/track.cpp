@@ -446,7 +446,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
         sprintf(path_, "%s/%s", TRK_SECT_SURFACES, mat);							\
         }													\
     texnamebump = GfParmGetStr(TrackHandle, path_, TRK_ATT_BUMPNAME, "");					\
-    texnameraceline = GfParmGetStr(TrackHandle, path_, TRK_ATT_RACELINENAME, "");					\
+    texnameraceline = GfParmGetStr(TrackHandle, path_, TRK_ATT_RACELINENAME, "raceline.png");					\
     texname = GfParmGetStr(TrackHandle, path_, TRK_ATT_TEXTURE, "tr-asphalt.png");				\
     mipmap = (int)GfParmGetNum(TrackHandle, path_, TRK_ATT_TEXMIPMAP, (char*)NULL, 0);			\
     SETTEXTURE(texname, texnamebump, texnameraceline, mipmap);										\
