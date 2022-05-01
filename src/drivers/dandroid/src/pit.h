@@ -32,6 +32,11 @@
 
 #define NPOINTS 7
 
+// The "DANDROID" logger instance.
+extern GfLogger* PLogDANDROID;
+#define LogDANDROID (*PLogDANDROID)
+
+
 class Pit
 {
 public:

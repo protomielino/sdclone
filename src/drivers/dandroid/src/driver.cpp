@@ -451,6 +451,7 @@ void TDriver::updateWheels()
 
     tireF = MIN(oCar->_tyreCondition(0), oCar->_tyreCondition(1));
     tireR = MIN(oCar->_tyreCondition(2), oCar->_tyreCondition(3));
+
     mTirecondition = MIN(tireF, tireR);
 }
 
@@ -1815,6 +1816,7 @@ void TDriver::readPrivateSection(PCarSettings* CarParmHandle)
     mBRAKESCALE = GfParmGetNum(*CarParmHandle, "private", "brakescale", (char*)NULL, 1.9);
     mBUMPSPEEDFACTOR = GfParmGetNum(*CarParmHandle, "private", "bumpspeedfactor", (char*)NULL, 3.0);
     mFUELPERMETER = GfParmGetNum(*CarParmHandle, "private", "fuelpermeter", (char*)NULL, 0.001f);
+    mWEARPERMETER = GfParmGetNum(*CarParmHandle, "private", "wearpermeter", (char*)NULL, 0.001f);
     mFUELWEIGHTFACTOR = GfParmGetNum(*CarParmHandle, "private", "fuelweightfactor", (char*)NULL, 1.0);
     mPITDAMAGE = (int)GfParmGetNum(*CarParmHandle, "private", "pitdamage", (char*)NULL, 5000);
     mPITENTRYMARGIN = GfParmGetNum(*CarParmHandle, "private", "pitentrymargin", (char*)NULL, 200.0);
@@ -2367,7 +2369,8 @@ void TDriver::updateCurveAhead()
 
     if (!mCurveAhead)
     {
-        if (mTrackType != TR_STR && mTrackRadius < 200.0) {
+        if (mTrackType != TR_STR && mTrackRadius < 200.0)
+        {
             mCurveAheadFromStart = fromStart(mFromStart + 5);
             mCurveAhead = true;
         }
@@ -2504,7 +2507,7 @@ void TDriver::calcMaxspeed()
             }
         }
 
-        mMaxspeed = mSkillGlobal * mMaxspeed * mTirecondition;
+        mMaxspeed = mSkillGlobal * mMaxspeed;
 
         if(mHASTYC)
         {
@@ -2698,10 +2701,22 @@ bool TDriver::hysteresis(bool lastout, double in, double hyst)
 
 double TDriver::getFuel(double dist)
 {
-    double fuel = dist * mFUELPERMETER;
-    if (mTestpitstop) {
+    if (mHASTYC)
+    {
+        double tiredist = dist / mWEARPERMETER;
+        LogDANDROID.info("Distance : %.2f - Tire distance : %.7g\n", dist, tiredist);
+        double mindist = MIN(dist, tiredist);
+        LogDANDROID.info("Minimum distance : %.3f\n", mindist);
+        dist = mindist;
+    }
+
+    double fuel = 1.2 * dist * mFUELPERMETER;
+
+    if (mTestpitstop)
+    {
         fuel = 1.0 * mTrack->length * mFUELPERMETER;
     }
+
     return fuel = MAX(MIN(fuel, mTANKVOL), 0.0);
 }
 

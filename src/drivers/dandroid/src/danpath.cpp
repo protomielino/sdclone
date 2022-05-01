@@ -140,13 +140,13 @@ void DanLine::createSectors(std::vector <DanSector>& sect)
                     dansect.fromstart = mLine[i].fromstart;
                     lastfromstart = dansect.fromstart;
                     sect.push_back(dansect);
-                    //GfOut("fs:%g radius:%g\n", mLine[i].fromstart, fabs(mLine[i].radius));
+                    LogDANDROID.debug("fs:%g radius:%g\n", mLine[i].fromstart, fabs(mLine[i].radius));
                 }
                 else
                 {
                     sect[sector].fromstart = mLine[i].fromstart;
                     lastfromstart = mLine[i].fromstart;
-                    //GfOut("overwrite fs:%g radius:%g\n", mLine[i].fromstart, fabs(mLine[i].radius));
+                    LogDANDROID.debug("overwrite fs:%g radius:%g\n", mLine[i].fromstart, fabs(mLine[i].radius));
                 }
             }
 

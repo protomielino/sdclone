@@ -255,7 +255,7 @@ void Pit::update(double fromstart)
                 totalfuel += lastfuel + lastpitfuel - car->priv.fuel;
                 fuellapscounted++;
                 avgfuelperlap = totalfuel / fuellapscounted;
-                //GfOut("Car:%s fuelpermeter:%g\n", car->_name, avgfuelperlap / track->length);
+                LogDANDROID.info("Car:%s fuelpermeter:%g\n", car->_name, avgfuelperlap / track->length);
             }
 
             lastfuel = car->priv.fuel;
@@ -309,7 +309,7 @@ void Pit::update(double fromstart)
                 setPitstop(true);
             }
 
-            if(tyreTreadDepth() < 30.0)
+            if(tyreTreadDepth() < 20.0)
                 setPitstop(true);
         }
     }
@@ -329,7 +329,8 @@ double Pit::getFuel()
     }
 
     double fuel = MAX(MIN(stintfuel - car->_fuel, car->_tank - car->_fuel), 0.0);
-    //GfOut("fromStart:%g laps:%g lapsBehindLeader:%d fueltoend:%g pitstops:%d stintfuel:%g fuel:%g\n", mFromStart, laps, car->_lapsBehindLeader, fueltoend, pitstops, stintfuel, fuel);
+    LogDANDROID.debug("fromStart:%g laps:%g lapsBehindLeader:%d fueltoend:%g pitstops:%d stintfuel:%g fuel:%g\n", mFromStart, laps, car->_lapsBehindLeader, fueltoend, pitstops, stintfuel, fuel);
+
     return fuel;
 }
 
@@ -427,6 +428,6 @@ void Pit::pitCommand()
     car->_pitRepair = getRepair();
     lastpitfuel = getFuel();
     car->_pitFuel = (tdble) lastpitfuel;
-    car->pitcmd.tireChange	= tyreTreadDepth() > 30.0 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
+    car->pitcmd.tireChange	= tyreTreadDepth() > 10.0 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
     setPitstop(false);
 }
