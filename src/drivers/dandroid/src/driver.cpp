@@ -439,7 +439,15 @@ void TDriver::updateBasics()
     updateCurveAhead();
 
     if (mHASTYC)
+    {
         updateWheels();
+        double	wearPerM = 0.001;
+
+        if( oCar->_distRaced > 0 )
+            wearPerM = 1.0 / oCar->_distRaced;
+
+        LogDANDROID.debug("%s Wear per meter : %.15f\n", oCar->_name, wearPerM);
+    }
 
     mPit.update(mFromStart);
 }
