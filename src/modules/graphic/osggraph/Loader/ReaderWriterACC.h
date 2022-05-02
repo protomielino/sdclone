@@ -232,7 +232,7 @@ public:
         // Use a shared modulate TexEnv
         mModulateTexEnv = modulateTexEnv;
 
-        if (name1!="")
+        if (!name1.empty())
         {
             std::string absFileName1 = osgDB::findDataFile(name1, options);
             i = TextureData::mTextureImageMap.find(absFileName1);
@@ -271,7 +271,7 @@ public:
             mTexture2DClamp1->setImage(mImage1.get());
         }
 
-        if (name2!="")
+        if (!name2.empty())
         {
             std::string absFileName2 = osgDB::findDataFile(name2, options);
             i = TextureData::mTextureImageMap.find(absFileName2);
@@ -310,7 +310,7 @@ public:
             mTexture2DClamp2->setImage(mImage2.get());
         }
 
-        if (name3!="")
+        if (!name3.empty())
         {
             std::string absFileName3 = osgDB::findDataFile(name3, options);
             i = TextureData::mTextureImageMap.find(absFileName3);

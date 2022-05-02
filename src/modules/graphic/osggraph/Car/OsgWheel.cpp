@@ -92,7 +92,7 @@ osg::ref_ptr<osg::MatrixTransform> SDWheels::initWheel(int wheelIndex, const cha
         GfLogInfo("Car Texture = %s\n", bSkinName.c_str());
 
         if (!exist)
-                bSkinName="";
+                bSkinName.clear();
         else
         {
             snprintf(buf, MaxPathSize, "wheel3d-%s", car->_skinName);

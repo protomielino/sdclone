@@ -412,7 +412,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
             }
 
             this->DRMSelector2->addChild(pWing1_branch.get());
-            strPath ="";
+            strPath.clear();
         }
 
         this->DRMSelector2->setSingleChildOn(0);
@@ -581,7 +581,7 @@ osg::ref_ptr<osg::Node> SDCar::loadCar(tCarElt *Car, bool tracktype, bool subcat
 
             this->DRMSelectMask[i-1] = 1 << selIndex;
             GfLogDebug(" # DRMSelectMask = %i - nDRM = %i\n", DRMSelectMask[i-1], nDRM);
-            driver_path ="";
+            driver_path.clear();
 
             selIndex++;
         }
