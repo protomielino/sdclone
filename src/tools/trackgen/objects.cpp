@@ -67,7 +67,7 @@ static int		ObjUniqId = 0;
 typedef struct objdef
 {
     GF_TAILQ_ENTRY(objdef)	link;
-    int			random, trackOriented, terrainOriented, borderOriented;
+    bool			random, trackOriented, terrainOriented, borderOriented;
     unsigned int	color;
     ssgEntity		*obj;
     tdble		deltaHeight;
@@ -154,11 +154,11 @@ InitObjects(tTrack *track, void *TrackHandle)
         {
             curObj->deltaHeight = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_DH, NULL, 0);
             curObj->deltaVert = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_DV, NULL, 5.0);
-            curObj->random = 1;
+            curObj->random = true;
         }
         else
         {
-            curObj->random = 0;
+            curObj->random = false;
             sgMat4 m;
             sgMakeRotMat4(m, GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION, "deg", 0), 0.0, 0.0);
             ApplyTransform(m, curObj->obj);
@@ -166,27 +166,30 @@ InitObjects(tTrack *track, void *TrackHandle)
 
         if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION_TYPE, ""), "track") == 0)
         {
-            curObj->trackOriented = 1;
-        }
-        else {curObj->trackOriented =0;}
-
-        if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION_TYPE, ""), "terrain") == 0)
-        {
-            curObj->terrainOriented = 1;
+            curObj->trackOriented = true;
         }
         else
         {
-            curObj->terrainOriented = 0;
+            curObj->trackOriented = false;
+        }
+
+        if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION_TYPE, ""), "terrain") == 0)
+        {
+            curObj->terrainOriented = true;
+        }
+        else
+        {
+            curObj->terrainOriented = false;
         }
 
         if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION_TYPE, ""), "border") == 0)
         {
-            curObj->borderOriented = 1;
+            curObj->borderOriented = true;
             curObj->distance = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_BORDER_DISTANCE, NULL, 1.0);
         }
         else
         {
-            curObj->borderOriented =0;
+            curObj->borderOriented = false;
         }
 
         GF_TAILQ_INSERT_HEAD(&objhead, curObj, link);
