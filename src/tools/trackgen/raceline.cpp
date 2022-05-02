@@ -121,7 +121,7 @@ static void SplitTrack(tTrack *ptrack)
     } while (first != seg);
 }
 
-static double GetRInverse(int prev, vec2d p, int next)
+static double GetRInverse(int prev, const vec2d &p, int next)
 {
 
     double x1 = rlseg[next].t.x - p.x;

@@ -89,18 +89,15 @@ GetObjectsNb(void *TrackHandle)
 static void
 ApplyTransform(sgMat4 m, ssgBase *node)
 {
-    int		i;
-    ssgBranch	*br;
-
     if (node->isAKindOf(ssgTypeLeaf()))
     {
         ((ssgLeaf *)node)->transform(m);
     }
     else
     {
-        br = (ssgBranch *)node;
+        ssgBranch *br = (ssgBranch *)node;
 
-        for (i = 0; i < br->getNumKids(); i++)
+        for (int i = 0; i < br->getNumKids(); i++)
         {
             ApplyTransform(m, br->getKid(i));
         }
@@ -110,12 +107,8 @@ ApplyTransform(sgMat4 m, ssgBase *node)
 static void
 InitObjects(tTrack *track, void *TrackHandle)
 {
-    int			objnb, i;
-    struct objdef	*curObj;
-    const char		*objName;
     static char		*search;
     ssgLoaderOptionsEx	options ;
-    sgMat4		m;
 
     ObjUniqId = 0;
 
@@ -132,14 +125,14 @@ InitObjects(tTrack *track, void *TrackHandle)
     ssgTexturePath(path);
     ssgModelPath(path);
 
-    objnb = GfParmGetEltNb(TrackHandle, TRK_SECT_OBJECTS);
+    int objnb = GfParmGetEltNb(TrackHandle, TRK_SECT_OBJECTS);
     GfParmListSeekFirst(TrackHandle, TRK_SECT_OBJECTS);
 
-    for (i = 0; i < objnb; i++)
+    for (int i = 0; i < objnb; i++)
     {
-        curObj = (struct objdef *)malloc(sizeof(struct objdef));
+        objdef	*curObj = (struct objdef *)malloc(sizeof(struct objdef));
         curObj->color = (unsigned int)GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_COLOR, NULL, 0);
-        objName = GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_OBJECT, NULL);
+        const char *objName = GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_OBJECT, NULL);
 
         if (!objName)
         {
@@ -166,6 +159,7 @@ InitObjects(tTrack *track, void *TrackHandle)
         else
         {
             curObj->random = 0;
+            sgMat4 m;
             sgMakeRotMat4(m, GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION, "deg", 0), 0.0, 0.0);
             ApplyTransform(m, curObj->obj);
         }
@@ -180,7 +174,10 @@ InitObjects(tTrack *track, void *TrackHandle)
         {
             curObj->terrainOriented = 1;
         }
-        else {curObj->terrainOriented =0;}
+        else
+        {
+            curObj->terrainOriented = 0;
+        }
 
         if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION_TYPE, ""), "border") == 0)
         {
@@ -203,18 +200,15 @@ InitObjects(tTrack *track, void *TrackHandle)
 static void
 AddToRoot(ssgEntity *node)
 {
-    int		i;
-    ssgBranch	*br;
-
     if (node->isAKindOf(ssgTypeLeaf()))
     {
         Root->addKid(node);
     }
     else
     {
-        br = (ssgBranch *)node;
+        ssgBranch *br = (ssgBranch *)node;
 
-        for (i = 0; i < br->getNumKids(); i++)
+        for (int i = 0; i < br->getNumKids(); i++)
         {
             AddToRoot(br->getKid(i));
         }
@@ -399,7 +393,7 @@ ssgSaveLeaf (ssgEntity *ent, FILE *save_fd)
     fprintf (save_fd, "kids 0\n");
 
     delete[] vlist;
-    delete   tlist;
+    delete[] tlist;
 
     return TRUE;
 }

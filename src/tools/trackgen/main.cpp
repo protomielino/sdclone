@@ -115,17 +115,17 @@ void Application::initialize(bool bLoggingEnabled, int argc, char **argv)
     GfApplication::initialize(bLoggingEnabled, argc, argv);
 
     // Specific options.
-    registerOption("c", "category", /* nHasValue = */ true);
-    registerOption("n", "name", /* nHasValue = */ true);
-    registerOption("b", "bump", /* nHasValue = */ false);
-    registerOption("r", "raceline", /* nHasValue = */ false);
-    registerOption("B", "noborder", /* nHasValue = */ false);
-    registerOption("a", "all", /* nHasValue = */ false);
-    registerOption("z", "calc", /* nHasValue = */ false);
-    registerOption("s", "split", /* nHasValue = */ false);
-    registerOption("S", "splitall", /* nHasValue = */ false);
-    registerOption("E", "saveelev", /* nHasValue = */ true);
-    registerOption("H", "height4", /* nHasValue = */ true);
+    registerOption("c", "category", /* bHasValue = */ true);
+    registerOption("n", "name", /* bHasValue = */ true);
+    registerOption("b", "bump", /* bHasValue = */ false);
+    registerOption("r", "raceline", /* bHasValue = */ false);
+    registerOption("B", "noborder", /* bHasValue = */ false);
+    registerOption("a", "all", /* bHasValue = */ false);
+    registerOption("z", "calc", /* bHasValue = */ false);
+    registerOption("s", "split", /* bHasValue = */ false);
+    registerOption("S", "splitall", /* bHasValue = */ false);
+    registerOption("E", "saveelev", /* bHasValue = */ true);
+    registerOption("H", "height4", /* bHasValue = */ true);
 
     // Help on specific options.
     addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|bump] [-r|--raceline] [-B|--noborder]");

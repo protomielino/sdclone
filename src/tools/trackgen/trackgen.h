@@ -33,7 +33,7 @@
 
 
 extern void GenerateTrack(tTrack * Track, void *TrackHandle, const std::string &outFile, FILE *AllFd, bool bump, bool raceline);
-extern void CalculateTrack(tTrack * Track, void *TrackHandle, bool bump, bool trackline);
+extern void CalculateTrack(tTrack * Track, void *TrackHandle, bool bump, bool raceline);
 extern void generateRaceLine(tTrack* pTrack, const double SideDistExt, const double SideDistInt);
 extern double getTexureOffset(double length);
 

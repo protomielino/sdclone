@@ -44,29 +44,27 @@ tdble Distance(tdble x0, tdble y0, tdble z0, tdble x1, tdble y1, tdble z1)
     return sqrt((x0-x1)*(x0-x1)+(y0-y1)*(y0-y1)+(z0-z1)*(z0-z1));
 }
 
-int
+bool
 GetFilename(const char *filename, const char *filepath, char *buf)
 {
-    const char	*c1, *c2;
-    int		found = 0;
-    int		lg;
+    bool found = false;
 
     if (filepath)
     {
-        c1 = filepath;
-        c2 = c1;
+        const char *c1 = filepath;
+        const char *c2 = c1;
 
-        while ((!found) && (c2 != NULL))
+        while ((!found) && (c2 != nullptr))
         {
             c2 = strchr(c1, ';');
 
-            if (c2 == NULL)
+            if (c2 == nullptr)
             {
                 sprintf(buf, "%s/%s", c1, filename);
             }
             else
             {
-                lg = c2 - c1;
+                size_t lg = c2 - c1;
                 strncpy(buf, c1, lg);
                 buf[lg] = '/';
                 strcpy(buf + lg + 1, filename);
@@ -74,7 +72,7 @@ GetFilename(const char *filename, const char *filepath, char *buf)
 
             if (ulFileExists(buf))
             {
-                found = 1;
+                found = true;
             }
             c1 = c2 + 1;
         }
@@ -84,7 +82,7 @@ GetFilename(const char *filename, const char *filepath, char *buf)
         strcpy(buf, filename);
         if (ulFileExists(buf))
         {
-            found = 1;
+            found = true;
         }
     }
 
@@ -92,11 +90,9 @@ GetFilename(const char *filename, const char *filepath, char *buf)
     {
         printf("File %s not found\n", filename);
         printf("File Path was %s\n", filepath);
-
-        return 0;
     }
 
-    return 1;
+    return found;
 }
 
 float

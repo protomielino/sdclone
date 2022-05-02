@@ -40,13 +40,11 @@
 FILE *
 Ac3dOpen(const std::string &filename, int nbObjects)
 {
-    FILE *save_fd;
-
-    save_fd = fopen(filename.c_str(), "w"); //save_fd = fopen(filename.c_str(), "wa");
+    FILE *save_fd = fopen(filename.c_str(), "w");
 
     if (save_fd == NULL) {
-	    GfOut("Failed to open '%s' for writing (%s)", filename.c_str(), strerror(errno));
-	    return NULL;
+        GfOut("Failed to open '%s' for writing (%s)", filename.c_str(), strerror(errno));
+        return NULL;
     }
 
     fprintf(save_fd, "AC3Db\n");

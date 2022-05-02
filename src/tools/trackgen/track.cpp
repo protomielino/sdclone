@@ -2804,15 +2804,13 @@ void CalculateTrack(tTrack * Track, void *TrackHandle, bool bump, bool raceline)
 void
 GenerateTrack(tTrack * Track, void *TrackHandle, const std::string &outFile, FILE *AllFd, bool bump, bool raceline)
 {
-    FILE *curFd;
-
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, NULL, TrackStep);
     printf("Track step: %.2f ", TrackStep);
 
     InitScene(Track, TrackHandle, bump, raceline);
 
     if (!outFile.empty()) {
-        curFd = Ac3dOpen(outFile, 1);
+        FILE *curFd = Ac3dOpen(outFile, 1);
         Ac3dGroup(curFd, "track", ActiveGroups);
         SaveMainTrack(curFd, bump, raceline);
         Ac3dClose(curFd);
