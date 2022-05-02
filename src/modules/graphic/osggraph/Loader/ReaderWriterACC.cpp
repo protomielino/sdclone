@@ -272,7 +272,7 @@ osg::Node* ReaderWriterACC::readObject(std::istream& stream, FileData& fileData,
                     texname = texname.substr(p+1, std::string::npos);
             }
             if (texname == "empty_texture_no_mapping")
-                texname = "";
+                texname.clear();
 
             if (!m_bCar)
             {
