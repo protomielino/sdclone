@@ -124,15 +124,15 @@ void SDScenery::LoadScene(tTrack *track)
 
     std::string PathTmp = GfDataDir();
 
-        _bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
-        if (_bgsky)
-        {
-            std::string strPath = PathTmp;
-            snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
-            strPath += buf;
-            m_background->build(grWrldX, grWrldY, grWrldZ, strPath);
-            GfLogDebug("Background loaded\n");
-        }
+    _bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
+    if (_bgsky)
+    {
+        std::string strPath = PathTmp;
+        snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
+        strPath += buf;
+        m_background->build(grWrldX, grWrldY, grWrldZ, strPath);
+        GfLogDebug("Background loaded\n");
+    }
 
     std::string strPath = GfDataDir();
     snprintf(buf, 256, "tracks/%s/%s/", SDTrack->category, SDTrack->internalname);
