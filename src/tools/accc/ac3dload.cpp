@@ -1480,7 +1480,7 @@ int loadAC(const std::string &inputFilename, std::list<ob_t> &objects, std::vect
 
 int printOb(FILE *ofile, ob_t &object)
 {
-    int multitex = 0;
+    bool multitex = false;
 
     if (object.numsurf == 0)
         return 0;
@@ -1496,7 +1496,7 @@ int printOb(FILE *ofile, ob_t &object)
     fprintf(ofile, "name \"%s\"\n", object.name.c_str());
     if (object.hasMultiTexture())
     {
-        multitex = 1;
+        multitex = true;
         fprintf(ofile, "texture \"%s\" base\n", object.texture.c_str());
         if (object.hasTexture1())
             fprintf(ofile, "texture \"%s\" tiled\n", object.texture1.c_str());
@@ -1544,7 +1544,7 @@ int printOb(FILE *ofile, ob_t &object)
             fprintf(ofile, "mat %d\n", object.attrMat);
             fprintf(ofile, "refs 3\n");
             /* GUIONS */
-            if (multitex == 0)
+            if (!multitex)
             {
                 fprintf(ofile, "%d %.5f %.5f\n",
                         object.vertexarray[i * 3].indice,
@@ -1570,11 +1570,16 @@ int printOb(FILE *ofile, ob_t &object)
                     fprintf(ofile, " %.5f %.5f",
                             object.textarray1[object.vertexarray[i * 3].indice].u,
                             object.textarray1[object.vertexarray[i * 3].indice].v);
+                else if (object.hasTexture2() || object.hasTexture3())
+                    fprintf(ofile, " 0.000000 0.000000");
 
                 if (object.hasTexture2())
                     fprintf(ofile, " %.5f %.5f",
                             object.textarray2[object.vertexarray[i * 3].indice].u,
                             object.textarray2[object.vertexarray[i * 3].indice].v);
+                else if (object.hasTexture3())
+                    fprintf(ofile, " 0.000000 0.000000");
+
                 if (object.hasTexture3())
                     fprintf(ofile, " %.5f %.5f",
                             object.textarray3[object.vertexarray[i * 3].indice].u,
@@ -1585,34 +1590,47 @@ int printOb(FILE *ofile, ob_t &object)
                         object.vertexarray[i * 3 + 1].indice,
                         object.textarray[object.vertexarray[i * 3 + 1].indice].u,
                         object.textarray[object.vertexarray[i * 3 + 1].indice].v);
+
                 if (object.hasTexture1())
                     fprintf(ofile, " %.5f %.5f",
                             object.textarray1[object.vertexarray[i * 3 + 1].indice].u,
                             object.textarray1[object.vertexarray[i * 3 + 1].indice].v);
+                else if (object.hasTexture2() || object.hasTexture3())
+                    fprintf(ofile, " 0.000000 0.000000");
 
                 if (object.hasTexture2())
                     fprintf(ofile, " %.5f %.5f",
                             object.textarray2[object.vertexarray[i * 3 + 1].indice].u,
                             object.textarray2[object.vertexarray[i * 3 + 1].indice].v);
+                else if (object.hasTexture3())
+                    fprintf(ofile, " 0.000000 0.000000");
+
                 if (object.hasTexture3())
                     fprintf(ofile, " %.5f %.5f",
                             object.textarray3[object.vertexarray[i * 3 + 1].indice].u,
                             object.textarray3[object.vertexarray[i * 3 + 1].indice].v);
+
                 fprintf(ofile, "\n");
 
                 fprintf(ofile, "%d %.5f %.5f",
                         object.vertexarray[i * 3 + 2].indice,
                         object.textarray[object.vertexarray[i * 3 + 2].indice].u,
                         object.textarray[object.vertexarray[i * 3 + 2].indice].v);
+
                 if (object.hasTexture1())
                     fprintf(ofile, " %.5f %.5f",
                             object.textarray1[object.vertexarray[i * 3 + 2].indice].u,
                             object.textarray1[object.vertexarray[i * 3 + 2].indice].v);
+                else if (object.hasTexture2() || object.hasTexture3())
+                    fprintf(ofile, " 0.000000 0.000000");
 
                 if (object.hasTexture2())
                     fprintf(ofile, " %.5f %.5f",
                             object.textarray2[object.vertexarray[i * 3 + 2].indice].u,
                             object.textarray2[object.vertexarray[i * 3 + 2].indice].v);
+                else if (object.hasTexture3())
+                    fprintf(ofile, " 0.000000 0.000000");
+
                 if (object.hasTexture3())
                 {
                     fprintf(ofile, " %.5f %.5f",
@@ -1624,6 +1642,7 @@ int printOb(FILE *ofile, ob_t &object)
                         printf("error in text\n");
                     }
                 }
+
                 fprintf(ofile, "\n");
             }
         }
@@ -2371,7 +2390,7 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
     k = 0;
     int tri = 0;
     int tritotal = 0;
-    int multitex = 0;
+    bool multitex = false;
 
     if (object->numsurf < 3 && !writeit)
         return;
@@ -2517,9 +2536,9 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
 
     }
     if (object->hasMultiTexture())
-        multitex = 1;
+        multitex = true;
     else
-        multitex = 0;
+        multitex = false;
 
     for (unsigned int i = 0; i < NumStrips; i++)
     {
@@ -2556,34 +2575,46 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
             }
             fprintf(ofile, "mat %d\n", object->attrMat);
             fprintf(ofile, "refs %u\n", StripLength[i]);
-            if (multitex == 0)
-            {
+            if (!multitex)
                 fprintf(ofile, "%d %.5f %.5f\n", v1, object->textarray[v1].u, object->textarray[v1].v);
-            }
             else
             {
                 fprintf(ofile, "%d %.5f %.5f", v1, object->textarray[v1].u, object->textarray[v1].v);
+
                 if (object->hasTexture1())
                     fprintf(ofile, " %.5f %.5f", object->textarray1[v1].u, object->textarray1[v1].v);
+                else if (object->hasTexture2() || object->hasTexture3())
+                    fprintf(ofile, " 0.000000 0.000000");
+
                 if (object->hasTexture2())
                     fprintf(ofile, " %.5f %.5f", object->textarray2[v1].u, object->textarray2[v1].v);
+                else if (object->hasTexture3())
+                    fprintf(ofile, " 0.000000 0.000000");
+
                 if (object->hasTexture3())
                     fprintf(ofile, " %.5f %.5f", object->textarray3[v1].u, object->textarray3[v1].v);
+
                 fprintf(ofile, "\n");
             }
-            if (multitex == 0)
-            {
+            if (!multitex)
                 fprintf(ofile, "%d %.5f %.5f\n", v2, object->textarray[v2].u, object->textarray[v2].v);
-            }
             else
             {
                 fprintf(ofile, "%d %.5f %.5f", v2, object->textarray[v2].u, object->textarray[v2].v);
+
                 if (object->hasTexture1())
                      fprintf(ofile, " %.5f %.5f", object->textarray1[v2].u, object->textarray1[v2].v);
+                else if (object->hasTexture2() || object->hasTexture3())
+                    fprintf(ofile, " 0.000000 0.000000");
+
                 if (object->hasTexture2())
                     fprintf(ofile, " %.5f %.5f", object->textarray2[v2].u, object->textarray2[v2].v);
+                else if (object->hasTexture3())
+                    fprintf(ofile, " 0.000000 0.000000");
+
                 if (object->hasTexture3())
                     fprintf(ofile, " %.5f %.5f", object->textarray3[v2].u, object->textarray3[v2].v);
+
                 fprintf(ofile, "\n");
             }
         }
@@ -2617,17 +2648,25 @@ void stripifyOb(FILE * ofile, ob_t * object, bool writeit)
             }
             else
             {
-                if (multitex == 0)
+                if (!multitex)
                     fprintf(ofile, "%d %.5f %.5f\n", v0, object->textarray[v0].u, object->textarray[v0].v);
                 else
                 {
                     fprintf(ofile, "%d %.5f %.5f", v0, object->textarray[v0].u, object->textarray[v0].v);
+
                     if (object->hasTexture1())
                         fprintf(ofile, " %.5f %.5f", object->textarray1[v0].u, object->textarray1[v0].v);
+                    else if (object->hasTexture2() || object->hasTexture3())
+                        fprintf(ofile, " 0.000000 0.000000");
+
                     if (object->hasTexture2())
                         fprintf(ofile, " %.5f %.5f", object->textarray2[v0].u, object->textarray2[v0].v);
+                    else if (object->hasTexture3())
+                        fprintf(ofile, " 0.000000 0.000000");
+
                     if (object->hasTexture3())
                         fprintf(ofile, " %.5f %.5f", object->textarray3[v0].u, object->textarray3[v0].v);
+
                     fprintf(ofile, "\n");
                 }
             }
