@@ -1736,7 +1736,7 @@ groups(void)
     r_node = (struct nod *)calloc(Nn, sizeof(struct nod));
     r_elem = (struct ele *)calloc(Ne, sizeof(struct ele));
     r_side = (struct sid *)calloc(Ns, sizeof(struct sid));
-    if (r_side == NULL) {
+    if (r_side == nullptr) {
 	fprintf(stderr, "Sorry, cannot allocate enough memory !\n");
 	return ;
     }
@@ -1993,9 +1993,9 @@ GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exterior, bool us
 	/* Right side */
 	startNeeded = 1;
 	for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next) {
-	    if (mseg->rside != NULL) {
+	    if (mseg->rside != nullptr) {
 		seg = mseg->rside;
-		if (seg->rside != NULL) {
+		if (seg->rside != nullptr) {
 		    seg = seg->rside;
 		}
 	    } else {
@@ -2221,16 +2221,16 @@ GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FI
 {
     const char	*FileName;
     const char	*mat;
-    FILE	*curFd = NULL;
+    FILE	*curFd = nullptr;
 
-    TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, NULL, 10.0);
+    TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, 10.0);
     GfOut("Track step: %.2f\n", TrackStep);
-    Margin    = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, NULL, 100.0);
-    GridStep  = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BSTEP, NULL, 10.0);
-    ExtHeight = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BHEIGHT, NULL, 0.0);
+    Margin    = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, 100.0);
+    GridStep  = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BSTEP, nullptr, 10.0);
+    ExtHeight = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BHEIGHT, nullptr, 0.0);
     GfOut("Border margin: %.2f    step: %.2f    height: %.2f\n", Margin, GridStep, ExtHeight);
     
-    GroupSize = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_GRPSZ, NULL, 100.0);
+    GroupSize = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_GRPSZ, nullptr, 100.0);
     XGroupOffset = track->min.x - Margin;
     YGroupOffset = track->min.y - Margin;
 
@@ -2250,16 +2250,16 @@ GenerateTerrain(tTrack *track, void *TrackHandle, const std::string &outfile, FI
 	sprintf(buf, "%s/%s", TRK_SECT_SURFACES, mat);
     }
     TexName = GfParmGetStr(TrackHandle, buf, TRK_ATT_TEXTURE, "grass.png");
-    TexSize = GfParmGetNum(TrackHandle, buf, TRK_ATT_TEXSIZE, (char*)NULL, 20.0f);
-    TexRand = GfParmGetNum(TrackHandle, buf, TRK_ATT_SURFRAND, (char*)NULL, (tdble)(TexSize / 10.0));
+    TexSize = GfParmGetNum(TrackHandle, buf, TRK_ATT_TEXSIZE, nullptr, 20.0f);
+    TexRand = GfParmGetNum(TrackHandle, buf, TRK_ATT_SURFRAND, nullptr, (tdble)(TexSize / 10.0));
 
-    FileName = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_RELIEF, NULL);
+    FileName = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_RELIEF, nullptr);
     if (FileName) {
 	sprintf(buf, "tracks/%s/%s/%s", track->category, track->internalname, FileName);
 	LoadRelief(TrackHandle, buf);
     }
     if (noElevation == -1) {
-	FileName = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ELEVATION, NULL);
+	FileName = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ELEVATION, nullptr);
 	if (FileName) {
 	    sprintf(buf, "tracks/%s/%s/%s", track->category, track->internalname, FileName);
 	    LoadElevation(track, TrackHandle, buf);

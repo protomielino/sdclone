@@ -86,8 +86,8 @@ static tdble		TrackStep;
 
 static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
     tTrackSeg	*curMainSeg;
-    tTrackSeg	*curPitSeg = NULL;
-    tTrackSeg	*pitBuildingsStart = NULL;
+    tTrackSeg	*curPitSeg = nullptr;
+    tTrackSeg	*pitBuildingsStart = nullptr;
     const char	*segName;
     tTrkLocPos	curPos;
     int		i;
@@ -112,7 +112,7 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
             curPos.type = TR_TOMIDDLE;
             //TR_LPOS_MAIN; //NB: TR_LPOS_MAIN not handled by RtTrackLocal2Global!
 
-            segName = GfParmGetStr(TrackHandle, path2, TRK_ATT_BUILDINGS_START, NULL);
+            segName = GfParmGetStr(TrackHandle, path2, TRK_ATT_BUILDINGS_START, nullptr);
             if (segName != 0) {
                 pitBuildingsStart = theTrack->seg;
                 found = false;
@@ -131,12 +131,12 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 
                 if (!found)
                 {
-                    pitBuildingsStart = NULL;
+                    pitBuildingsStart = nullptr;
                 }
             }
 
-            if (pitBuildingsStart == NULL) {
-                if (pits->pitStart == NULL) {
+            if (pitBuildingsStart == nullptr) {
+                if (pits->pitStart == nullptr) {
                     GfLogError("Can't find pit start\n");
                     exit(1);
                 }
@@ -256,7 +256,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
 {
     int 		i;
     tTrackSeg	*seg;
-    tTrackSeg	*lastSeg = NULL;
+    tTrackSeg	*lastSeg = nullptr;
     tTrackSeg	*mseg;
     int 		nbvert;
     tdble 		width;
@@ -272,7 +272,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
     tdble xprev = 0;
     tdble yprev = 0;
 
-    tDispElt		*aDispElt = NULL;
+    tDispElt		*aDispElt = nullptr;
     unsigned int	prevTexId;
     unsigned int	curTexId = 0;
     int			curTexType = 0;
@@ -281,8 +281,8 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
     tdble		curTexSeg;
     tdble		curTexSize = 0;
     tdble		curHeight;
-    tTexElt		*texList = (tTexElt*)NULL;
-    tTexElt		*curTexElt = NULL;
+    tTexElt		*texList = nullptr;
+    tTexElt		*curTexElt = nullptr;
     tTrackBarrier	*curBarrier;
     tdble		texLen;
     tdble		texStep;
@@ -297,7 +297,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
     tdble		tmHSpace = Track->graphic.turnMarksInfo.hSpace;
     char		buf[256];
     int			hasBorder;
-    tDispElt		*theCurDispElt = NULL;
+    tDispElt		*theCurDispElt = nullptr;
     char		sname[256];
 //	float		dmax = 0;
 
@@ -344,9 +344,9 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
 
     if (raceline)
     {
-        double SideDistExt = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLEXT, (char*)NULL, 2.0);
-        double SideDistInt = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLINT, (char*)NULL, 2.0);
-        rlWidthScale = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLWIDTHSCALE, (char*)NULL, 1.0);
+        double SideDistExt = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLEXT, nullptr, 2.0);
+        double SideDistInt = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLINT, nullptr, 2.0);
+        rlWidthScale = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_RLWIDTHSCALE, nullptr, 1.0);
         rlOffset = (1.0 - 1.0/rlWidthScale)/2.0;
         generateRaceLine(Track, SideDistExt, SideDistInt);
     }
@@ -356,7 +356,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
 #define SETTEXTURE(texname, texnamebump, texnameraceline, _mipmap) do {			\
     int found = 0;							\
     curTexElt = texList;						\
-    if (curTexElt == NULL) {					\
+    if (curTexElt == nullptr) {					\
         curTexElt = (tTexElt*)calloc(1, sizeof(tTexElt));		\
         curTexElt->next = curTexElt;				\
         texList = curTexElt;					\
@@ -392,7 +392,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
 
 #define NEWDISPLIST(texchange, _name, _id) do {						\
     if (!bump || (*(curTexElt->namebump) != 0)) {						\
-        if (theCurDispElt != NULL) {						\
+        if (theCurDispElt != nullptr) {						\
         startNeeded = texchange;						\
         if (theCurDispElt->start != nbvert) {					\
             theCurDispElt->nb = nbvert - theCurDispElt->start;			\
@@ -448,7 +448,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
     texnamebump = GfParmGetStr(TrackHandle, path_, TRK_ATT_BUMPNAME, "");					\
     texnameraceline = GfParmGetStr(TrackHandle, path_, TRK_ATT_RACELINENAME, "raceline.png");					\
     texname = GfParmGetStr(TrackHandle, path_, TRK_ATT_TEXTURE, "tr-asphalt.png");				\
-    mipmap = (int)GfParmGetNum(TrackHandle, path_, TRK_ATT_TEXMIPMAP, (char*)NULL, 0);			\
+    mipmap = (int)GfParmGetNum(TrackHandle, path_, TRK_ATT_TEXMIPMAP, nullptr, 0);			\
     SETTEXTURE(texname, texnamebump, texnameraceline, mipmap);										\
     if ((curTexId != prevTexId) || (startNeeded)) {								\
         const char *textype;											\
@@ -456,7 +456,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
         curTexType = 1;											\
         curTexLink = 1;											\
         curTexOffset = -off;										\
-        curTexSize = GfParmGetNum(TrackHandle, path_, TRK_ATT_BUMPSIZE, (char*)NULL, 20.0);		\
+        curTexSize = GfParmGetNum(TrackHandle, path_, TRK_ATT_BUMPSIZE, nullptr, 20.0);		\
         } else {												\
         textype = GfParmGetStr(TrackHandle, path_, TRK_ATT_TEXTYPE, "continuous");			\
         if (strcmp(textype, "continuous") == 0)								\
@@ -473,7 +473,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
             curTexOffset = -off;									\
         else												\
             curTexOffset = 0;										\
-        curTexSize = GfParmGetNum(TrackHandle, path_, TRK_ATT_TEXSIZE, (char*)NULL, 20.0);		\
+        curTexSize = GfParmGetNum(TrackHandle, path_, TRK_ATT_TEXSIZE, nullptr, 20.0);		\
         }													\
         prevTexId = curTexId;										\
         NEWDISPLIST(1, name, id);										\
@@ -707,7 +707,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
     runninglentgh = 0;
     sprintf(sname, "t%dRB", j);
     for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next) {
-        if ((mseg->rside != NULL) && (mseg->rside->type2 == TR_RBORDER)) {
+        if ((mseg->rside != nullptr) && (mseg->rside->type2 == TR_RBORDER)) {
         seg = mseg->rside;
         CHECKDISPLIST(seg->surface->material, sname, i, mseg->lgfromstart);
         if (!curTexLink) {
@@ -1086,10 +1086,10 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
     runninglentgh = 0;
     hasBorder = 0;
     for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next) {
-    if ((mseg->rside != NULL) &&
-        ((mseg->rside->type2 == TR_RSIDE) || (mseg->rside->rside != NULL))) {
+    if ((mseg->rside != nullptr) &&
+        ((mseg->rside->type2 == TR_RSIDE) || (mseg->rside->rside != nullptr))) {
         seg = mseg->rside;
-        if (seg->rside != NULL) {
+        if (seg->rside != nullptr) {
         seg = seg->rside;
         if (hasBorder == 0) {
             startNeeded = 1;
@@ -1241,7 +1241,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
     runninglentgh = 0;
     sprintf(sname, "t%dLB", j);
     for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next) {
-        if ((mseg->lside != NULL) && (mseg->lside->type2 == TR_LBORDER)) {
+        if ((mseg->lside != nullptr) && (mseg->lside->type2 == TR_LBORDER)) {
         seg = mseg->lside;
         CHECKDISPLIST(seg->surface->material, sname, i, mseg->lgfromstart);
         if (!curTexLink) {
@@ -1614,8 +1614,8 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
     runninglentgh = 0;
     hasBorder = 0;
     for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next) {
-    if ((mseg->lside != NULL) &&
-        ((mseg->lside->type2 == TR_LSIDE) || (mseg->lside->lside != NULL))) {
+    if ((mseg->lside != nullptr) &&
+        ((mseg->lside->type2 == TR_LSIDE) || (mseg->lside->lside != nullptr))) {
         seg = mseg->lside;
         if (seg->lside) {
         seg = seg->lside;
@@ -1768,7 +1768,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
     runninglentgh = 0;
     sprintf(sname, "B%dRt", j);
     for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next) {
-        if ((mseg->rside != NULL) && (mseg->rside->raceInfo & TR_PITBUILD)) {
+        if ((mseg->rside != nullptr) && (mseg->rside->raceInfo & TR_PITBUILD)) {
         startNeeded = 1;
         runninglentgh = 0;
         NEWDISPLIST(0, sname, i);
@@ -2038,7 +2038,7 @@ InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
     runninglentgh = 0;
     sprintf(sname, "B%dLt", j);
     for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next) {
-        if ((mseg->lside != NULL) && (mseg->lside->raceInfo & TR_PITBUILD)) {
+        if ((mseg->lside != nullptr) && (mseg->lside->raceInfo & TR_PITBUILD)) {
         runninglentgh = 0;
         startNeeded = 1;
         NEWDISPLIST(0, sname, i);
@@ -2785,7 +2785,7 @@ SaveMainTrack(FILE *curFd, bool bump, bool raceline)
 */
 void CalculateTrack(tTrack * Track, void *TrackHandle, bool bump, bool raceline)
 {
-    TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, NULL, TrackStep);
+    TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, TrackStep);
     printf("Track step: %.2f ", TrackStep);
 
     InitScene(Track, TrackHandle, bump, raceline);
@@ -2804,7 +2804,7 @@ void CalculateTrack(tTrack * Track, void *TrackHandle, bool bump, bool raceline)
 void
 GenerateTrack(tTrack * Track, void *TrackHandle, const std::string &outFile, FILE *AllFd, bool bump, bool raceline)
 {
-    TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, NULL, TrackStep);
+    TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, TrackStep);
     printf("Track step: %.2f ", TrackStep);
 
     InitScene(Track, TrackHandle, bump, raceline);

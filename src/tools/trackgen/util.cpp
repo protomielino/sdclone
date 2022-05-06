@@ -225,11 +225,10 @@ float
 getBorderAngle(tTrack *Track, void *TrackHandle, float x, float y, float distance, float *xRet, float *yRet, float *zRet )
 {
     float angle=0, dst=100000, shDst=100000;
-    int 		i;
     tTrackSeg 		*seg = Track->seg;
     tTrkLocPos		curPos, closePos, objPos;
     float x2, y2, x3, y3;
-    for(i = 0; i < Track->nseg; i++)
+    for(int i = 0; i < Track->nseg; i++)
     {
         seg=seg->next;
         curPos.seg=seg;
@@ -300,7 +299,7 @@ getBorderAngle(tTrack *Track, void *TrackHandle, float x, float y, float distanc
         curPos.toStart+=0.001;
         RtTrackLocal2Global(&curPos, &x2, &y2, TR_TORIGHT);
         angle=-90.0-atan2f(x2-x3,y2-y3)*180/PI;
-        RtTrackLocal2Global(&objPos, &*xRet, &*yRet, TR_TORIGHT);
+        RtTrackLocal2Global(&objPos, xRet, yRet, TR_TORIGHT);
     }
     else
         // left side
@@ -310,7 +309,7 @@ getBorderAngle(tTrack *Track, void *TrackHandle, float x, float y, float distanc
         curPos.toStart+=0.001;
         RtTrackLocal2Global(&curPos, &x2, &y2, TR_TOLEFT);
         angle=90.0-atan2f(x2-x3,y2-y3)*180/PI;
-        RtTrackLocal2Global(&objPos, &*xRet, &*yRet, TR_TOLEFT);
+        RtTrackLocal2Global(&objPos, xRet, yRet, TR_TOLEFT);
     }
 
     *zRet=RtTrackHeightG(seg, *xRet, *yRet);

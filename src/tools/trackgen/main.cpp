@@ -201,7 +201,7 @@ bool Application::parseOptions()
         }
         else if (itOpt->strLongName == "saveelev")
         {
-            DoSaveElevation = strtol(itOpt->strValue.c_str(), NULL, 0);
+            DoSaveElevation = strtol(itOpt->strValue.c_str(), nullptr, 0);
             TrackOnly = false;
         }
         else if (itOpt->strLongName == "category")
@@ -210,7 +210,7 @@ bool Application::parseOptions()
         }
         else if (itOpt->strLongName == "steps4")
         {
-            HeightSteps = strtol(itOpt->strValue.c_str(), NULL, 0);
+            HeightSteps = strtol(itOpt->strValue.c_str(), nullptr, 0);
         }
     }
 
@@ -273,7 +273,7 @@ int Application::generate()
     std::string OutputFileName(buf2);
 
     // Number of groups for the complete track.
-    FILE *outfd = NULL;
+    FILE *outfd = nullptr;
     if (TrackOnly) {
         // Track.
         if (!Bump && !Raceline)

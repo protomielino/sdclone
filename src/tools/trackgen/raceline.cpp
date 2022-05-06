@@ -33,7 +33,7 @@ struct RacelineSegment
 };
 
 static const double SegLength = 2.0;
-static RacelineSegment* rlseg = NULL;
+static RacelineSegment* rlseg = nullptr;
 static int nSegments = 0;
 static double SideDistExt = 2.0; // Security distance wrt outside
 static double SideDistInt = 2.0; // Security distance wrt inside
@@ -43,7 +43,7 @@ static const double SecurityR = 100.0; // Security radius
 static void SplitTrack(tTrack *ptrack)
 {
     const tTrackSeg *seg = ptrack->seg;
-    const tTrackSeg *first = NULL;
+    const tTrackSeg *first = nullptr;
     // Find pointer to start (seems not to start at the "start" all the time, e.g e-track-1)
     do {
         if (seg->lgfromstart == 0.0)

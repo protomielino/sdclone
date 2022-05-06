@@ -46,9 +46,9 @@
 static char		path[1024];
 static char		buf[1024];
 
-static ssgRoot	*Root = NULL;
-static ssgRoot	*GroupRoot = NULL;
-static ssgRoot	*TrackRoot = NULL;
+static ssgRoot	*Root = nullptr;
+static ssgRoot	*GroupRoot = nullptr;
+static ssgRoot	*TrackRoot = nullptr;
 
 struct group
 {
@@ -112,7 +112,7 @@ InitObjects(tTrack *track, void *TrackHandle)
 
     ObjUniqId = 0;
 
-    srand((unsigned int)GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_SEED, NULL, 1));
+    srand((unsigned int)GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_SEED, nullptr, 1));
 
     ssgSetCurrentOptions ( &options ) ;
 
@@ -131,8 +131,8 @@ InitObjects(tTrack *track, void *TrackHandle)
     for (int i = 0; i < objnb; i++)
     {
         objdef	*curObj = (struct objdef *)malloc(sizeof(struct objdef));
-        curObj->color = (unsigned int)GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_COLOR, NULL, 0);
-        const char *objName = GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_OBJECT, NULL);
+        curObj->color = (unsigned int)GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_COLOR, nullptr, 0);
+        const char *objName = GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_OBJECT, nullptr);
 
         if (!objName)
         {
@@ -152,8 +152,8 @@ InitObjects(tTrack *track, void *TrackHandle)
 
         if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION_TYPE, ""), "random") == 0)
         {
-            curObj->deltaHeight = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_DH, NULL, 0);
-            curObj->deltaVert = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_DV, NULL, 5.0);
+            curObj->deltaHeight = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_DH, nullptr, 0);
+            curObj->deltaVert = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_DV, nullptr, 5.0);
             curObj->random = true;
         }
         else
@@ -185,7 +185,7 @@ InitObjects(tTrack *track, void *TrackHandle)
         if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION_TYPE, ""), "border") == 0)
         {
             curObj->borderOriented = true;
-            curObj->distance = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_BORDER_DISTANCE, NULL, 1.0);
+            curObj->distance = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_BORDER_DISTANCE, nullptr, 1.0);
         }
         else
         {
@@ -343,18 +343,18 @@ ssgSaveLeaf (ssgEntity *ent, FILE *save_fd)
         {
             const char* tfname = ss->getTextureFilename ();
 
-            if ((tfname != NULL) && (tfname[0] != 0))
+            if ((tfname != nullptr) && (tfname[0] != 0))
             {
                 if (writeTextureWithoutPath)
                 {
                     char *s = strrchr ((char *)tfname, '\\');
 
-                    if (s == NULL)
+                    if (s == nullptr)
                     {
                         s = strrchr ((char *)tfname, '/');
                     }
 
-                    if (s == NULL)
+                    if (s == nullptr)
                     {
                         fprintf (save_fd, "texture \"%s\"\n", tfname);
                     }
@@ -485,8 +485,8 @@ Group(tTrack *track, void *TrackHandle, ssgEntity *ent)
 
     GroupRoot = new ssgRoot();
 
-    Margin    = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, NULL, 100.0);
-    GroupSize = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_GRPSZ, NULL, 100.0);
+    Margin    = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, 100.0);
+    GroupSize = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_GRPSZ, nullptr, 100.0);
     XGroupOffset = track->min.x - Margin;
     YGroupOffset = track->min.y - Margin;
 
@@ -509,17 +509,12 @@ void
 GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd, const std::string &meshFile, const std::string &outputFile)
 {
     ssgLoaderOptionsEx	options;
-    int			i, j;
-    const char		*map;
-    unsigned char	*MapImage;
     int			width, height;
     tdble		xmin, xmax, ymin, ymax;
     tdble 		Margin;
     tdble		kX, kY, dX, dY;
     unsigned int	clr;
     int			index;
-    const char		*extName;
-    FILE		*curFd;
 
     ssgSetCurrentOptions(&options);
     sprintf(buf, "tracks/%s/%s;data/textures;data/img;.", track->category, track->internalname);
@@ -530,7 +525,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 
     InitObjects(track, TrackHandle);
 
-    Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, NULL, 0);
+    Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, 0);
 
     xmin = track->min.x - Margin;
     xmax = track->max.x + Margin;
@@ -552,11 +547,11 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
         Root = new ssgRoot();
 
         index++;
-        map = GfParmGetCurStr(TrackHandle, path, TRK_ATT_OBJMAP, "");
+        const char *map = GfParmGetCurStr(TrackHandle, path, TRK_ATT_OBJMAP, "");
         sprintf(buf, "tracks/%s/%s/%s", track->category, track->internalname, map);
 
         printf("Processing object map %s\n", buf);
-        MapImage = GfTexReadImageFromPNG(buf, 2.2, &width, &height, 0, 0, false);
+        unsigned char *MapImage = GfTexReadImageFromPNG(buf, 2.2, &width, &height, 0, 0, false);
 
         if (!MapImage)
         {
@@ -568,9 +563,9 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
         kY = (ymax - ymin) / height;
         dY = ymin;
 
-        for (j = 0; j < height; j++)
+        for (int j = 0; j < height; j++)
         {
-            for (i = 0; i < width; i++)
+            for (int i = 0; i < width; i++)
             {
                 clr = (MapImage[4 * (i + width * j)] << 16) + (MapImage[4 * (i + width * j) + 1] << 8) + MapImage[4 * (i + width * j) + 2];
 
@@ -583,9 +578,9 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 
         Group(track, TrackHandle, Root);
 
-        extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
+        const char *extName = GfParmGetStr(CfgHandle, "Files", "object", "obj");
         sprintf(buf, "%s-%s-%d.ac", outputFile.c_str(), extName, index);
-        curFd = Ac3dOpen(buf, 1);
+        FILE *curFd = Ac3dOpen(buf, 1);
         ssgSaveACInner(GroupRoot, curFd);
         Ac3dClose(curFd);
 

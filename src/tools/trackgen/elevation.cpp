@@ -63,7 +63,7 @@ void LoadElevation(tTrack *track, void *TrackHandle, const std::string &imgFile)
 
 	printf("Loading Elevation Map %s\n", imgFile.c_str());
 
-	Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, NULL, Margin);
+	Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, Margin);
 
 	xmin = track->min.x - Margin;
 	xmax = track->max.x + Margin;
@@ -76,8 +76,8 @@ void LoadElevation(tTrack *track, void *TrackHandle, const std::string &imgFile)
 	dY = -ymin * kY;
 	ElvOk = 1;
 
-	zmin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ALT_MIN, NULL, track->min.z);
-	zmax = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ALT_MAX, NULL, track->max.z);
+	zmin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ALT_MIN, nullptr, track->min.z);
+	zmax = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ALT_MAX, nullptr, track->max.z);
 
 	dZ = zmin;
 	kZ = (zmax - dZ) / MAX_CLR;
@@ -86,14 +86,11 @@ void LoadElevation(tTrack *track, void *TrackHandle, const std::string &imgFile)
 
 tdble GetElevation(tdble x, tdble y, tdble z)
 {
-	int iX, iY;
-	int clr;
-
 	if (ElvOk) {
-		iX = (int)(x * kX + dX);
-		iY = (int)(y * kY + dY);
+		int iX = (int)(x * kX + dX);
+		int iY = (int)(y * kY + dY);
 		/* RGBA */
-		clr = ElvImage[4 * (iY * width + iX)];
+		int clr = ElvImage[4 * (iY * width + iX)];
 		return (tdble)clr * kZ + dZ;
 	}
 
@@ -101,7 +98,7 @@ tdble GetElevation(tdble x, tdble y, tdble z)
 }
 
 
-void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile, const std::string &meshFile, int dispf, int heightSteps)
+void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile, const std::string &meshFile, int disp, int heightSteps)
 {
 	ssgLoaderOptionsEx options;
 	float zmin, zmax;
@@ -117,12 +114,12 @@ void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile,
 
 	s = getenv("COLUMNS");
 	if (s) {
-		columns = strtol(getenv("COLUMNS"), NULL, 0);
+		columns = strtol(getenv("COLUMNS"), nullptr, 0);
 	} else {
 		columns = 80;
 	}
 
-	Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, NULL, Margin);
+	Margin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, nullptr, Margin);
 
 	xmin = track->min.x - Margin;
 	xmax = track->max.x + Margin;
@@ -138,11 +135,11 @@ void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile,
 	kY = (ymax - ymin) / height;
 	dY = ymin;
 
-	zmin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ALT_MIN, NULL, track->min.z);
-	zmax = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ALT_MAX, NULL, track->max.z);
+	zmin = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ALT_MIN, nullptr, track->min.z);
+	zmax = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_ALT_MAX, nullptr, track->max.z);
 
 	heightStep = (float)(zmax - zmin) / (float)heightSteps;
-	if (dispf == 2) {
+	if (disp == 2) {
 		printf("Height of steps = %f\n", heightStep);
 	}
 
@@ -161,7 +158,7 @@ void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile,
 	ssgModelPath(buf);
 	root = (ssgRoot*)ssgLoadAC(meshFile.c_str());
 
-	if (root == NULL) {
+	if (root == nullptr) {
 		printf("Could not load %s, ", meshFile.c_str());
 		printf("please generate it with \"trackgen -c %s -n %s -a\"\n", track->category, track->internalname);
 		return;
@@ -187,7 +184,7 @@ void SaveElevation(tTrack *track, void *TrackHandle, const std::string &imgFile,
 			y = j * kY + dY;
 			z = getHOT(root, x, y);
 			if (z != -1000000.0f) {
-				switch (dispf) {
+				switch (disp) {
 					case 0:
 						clr = 0;
 						break;
