@@ -420,6 +420,19 @@ static void onActivate(void * /* dummy */)
         GfuiLabelSetText(ScrHandle, AnisotropicFilteringLabelId, "Not supported");
     }
 
+    // Initialize current Graphic Engine from the raceengine config file
+    // ssggraph / OsgGraph
+    void *paramHandle = GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+    const char *graphicSchemeName = GfParmGetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_GRAPHIC, GraphicSchemeList[1]);
+    for (int i = 0; i < NbGraphicScheme; i++) 
+    {
+        if (strcmp(graphicSchemeName, GraphicSchemeList[i]) == 0)
+        {
+            CurGraphicScheme = i;
+            break;
+        }
+    }
+
 	GfuiLabelSetText(ScrHandle, GraphicSchemeId, GraphicDispNameList[CurGraphicScheme]);
 }
 
@@ -439,22 +452,7 @@ void* OpenGLMenuInit(void *prevMenu)
 	
 	//Initialize current Graphic Engine
 	// ssggraph / OsgGraph
-
-	void *paramHandle = GfParmReadFileLocal(RACE_ENG_CFG, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-
-	// graphic engine
-	graphicSchemeName = GfParmGetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_GRAPHIC, GraphicSchemeList[1]);
-	for (int i = 0; i < NbGraphicScheme; i++) 
-	{
-		if (strcmp(graphicSchemeName, GraphicSchemeList[i]) == 0)
-		{
-			CurGraphicScheme = i;
-			break;
-		}
-	}
-
-	GfParmWriteFile(NULL, paramHandle, "raceengine");
-	GfParmReleaseHandle(paramHandle);
+	// See onActivate()
 
 	// Texture compression.
 	TextureCompLeftButtonId =
