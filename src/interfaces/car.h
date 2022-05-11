@@ -191,7 +191,7 @@ typedef struct
     double*		curSplitTime;
     double		lastLapTime;
     double		curTime;
-    int                 trackPositionCount; /** number of track positions */ 
+    int                 trackPositionCount; /** number of track positions */
     float* bestLapTimeAtTrackPosition; /** here we will store for the best laptime the current laptime for each meter of track */
     float* currLapTimeAtTrackPosition; /** here we will store for the current laptime the current laptime for each meter of track */
     tdble		topSpeed;
@@ -1021,6 +1021,11 @@ typedef enum
 #define PRM_ABSINSIMU           "enable abs"
 #define PRM_ESPINSIMU           "enable esp"
 #define PRM_LIMITEDGROUNDEFFECT	"enable cliftlimit"
+#define PRM_TCLBRAKESCALE       "tcl brake scale"
+#define PRM_TCLACCELSCALE       "tcl accel scale"
+#define PRM_TCLSLIPSCALE        "tcl slip scale"
+#define PRM_ABSBRAKESCALE       "abs brake scale"
+#define PRM_ABSSLIPSCALE        "abs slip scale"
 #define VAL_YES                 "yes"
 #define VAL_NO                  "no"
 #define FEAT_AEROTOCG               0x01        //shift aero coordinates with the CG
