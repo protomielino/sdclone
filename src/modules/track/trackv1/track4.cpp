@@ -986,7 +986,7 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
                         pits->nPitSeg = (int)((theTrack->length - pitBuildingsStart->lgfromstart
                             + pitBuildingsEnd->lgfromstart + pitBuildingsEnd->length + pits->len / 2.0) / pits->len);
                     } else {
-                        pits->nPitSeg = (int)((pitEnd->lgfromstart + pitBuildingsEnd->length
+                        pits->nPitSeg = (int)((pitBuildingsEnd->lgfromstart + pitBuildingsEnd->length
                             - pitBuildingsStart->lgfromstart + pits->len / 2.0) / pits->len);
                     }
                     pits->nMaxPits = MIN(pits->nPitSeg,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nPitSeg));
