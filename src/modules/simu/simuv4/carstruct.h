@@ -86,7 +86,12 @@ typedef struct
     int		dammage;
 
     /* enabling features */
-    int features;
+    int     features;
+    tdble   TCL_BrakeScale;
+    tdble   TCL_SlipScale;
+    tdble   TCL_AccelScale;
+    tdble   ABS_SlipScale;
+    tdble   ABS_BrakeScale;
 
     tDynPt	restPos;	/* target rest position after the car is broken */
 

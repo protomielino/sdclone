@@ -583,16 +583,16 @@ void SimWheelUpdateForce(tCar *car, int index)
     // Option TCL ...
     if (car->features & FEAT_TCLINSIMU)
     {
-        tdble TCL_SlipScale = 1.00f;	// Make it be a parameter later
-        tdble TCL_AccelScale = 0.9f;	// Make it be a parameter later
+        //tdble TCL_SlipScale = 1.00f;	// Make it be a parameter later
+        //tdble TCL_AccelScale = 0.9f;	// Make it be a parameter later
 
         tEngine	*engine = &(car->engine); // Get engine
 
-        if (sx < -TCL_SlipScale)          // Slip is over our limit
+        if (sx < -car->TCL_SlipScale)          // Slip is over our limit
         {	// Store the TCL_Brake command for this wheel
             wheel->brake.TCL = -sx;
             // Store the minimum TCL_Accel command for the engine
-            engine->TCL = (tdble) MIN(TCL_AccelScale * wheel->brake.TCL,engine->TCL);
+            engine->TCL = (tdble) MIN(car->TCL_AccelScale * wheel->brake.TCL,engine->TCL);
             // fprintf(stderr,"sx: %.1f TCL: %.3f %%\n",sx,wheel->brake.TCL);
         };
     }
@@ -601,12 +601,12 @@ void SimWheelUpdateForce(tCar *car, int index)
     // Option ABS ...
     if (car->features & FEAT_ABSINSIMU)
     {
-        tdble ABS_SlipScale = 0.1f;		// Make it be a parameter later
-        tdble ABS_BrakeScale = 1.0f;	// Make it be a parameter later
+        //tdble ABS_SlipScale = 0.1f;		// Make it be a parameter later
+        //tdble ABS_BrakeScale = 1.0f;	// Make it be a parameter later
 
         // If slip is over the limit, reduce brake command for this wheel
-        if (sx > ABS_SlipScale)
-            wheel->brake.ABS = (tdble) MAX(0.0,MIN(1.0,1 - ABS_BrakeScale * sx));
+        if (sx > car->ABS_SlipScale)
+            wheel->brake.ABS = (tdble) MAX(0.0,MIN(1.0,1 - car->ABS_BrakeScale * sx));
         else
             wheel->brake.ABS = 1.0f;
     }
