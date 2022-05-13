@@ -31,6 +31,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef __APPLE__
+#include <sys/errno.h>
+#endif
+
 #include <tgf.h>
 
 #include "ac3d.h"
@@ -46,7 +50,11 @@ Ac3dOpen(const std::string &filename, int nbObjects)
         GfOut("Failed to open '%s' for writing (%s)", filename.c_str(), strerror(errno));
         return nullptr;
     }
-
+/*
+/Users/joe/source/sd-head/src/tools/trackgen/ac3d.cpp:46:82: error: use of
+      undeclared identifier 'errno'
+  ...to open '%s' for writing (%s)", filename.c_str(), strerror(errno));
+*/
     fprintf(save_fd, "AC3Db\n");
     fprintf(save_fd, "MATERIAL \"\" rgb 0.4 0.4 0.4  amb 0.8 0.8 0.8  emis 0.4 0.4 0.4  spec 0.5 0.5 0.5  shi 50  trans 0\n");
     
