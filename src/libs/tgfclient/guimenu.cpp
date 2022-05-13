@@ -84,6 +84,8 @@ GfuiMenuDefaultKeysAdd(void* scr)
     GfuiAddKey(scr, GFUIK_PAGEDOWN, "Select Next Entry", NULL, gfuiSelectNext, NULL);
     GfuiAddKey(scr, GFUIK_F1, "Help", scr, GfuiHelpScreen, NULL);
     GfuiAddKey(scr, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    if(GfScrUsingResizableWindow())
+        GfuiAddKey(scr, GFUIK_RETURN, GFUIM_ALT, "Toggle Full-screen", (void*)0, GfScrToggleFullScreen, NULL);
 }
 
 // Font size map : Gives the integer size from the size name.

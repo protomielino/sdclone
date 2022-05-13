@@ -150,16 +150,19 @@ static void onAccept(void *)
     // Return to previous screen.
     GfuiScreenActivate(PrevHandle);
 
-    // But actually restart the game if the multi-sampling feature settings changed
-    // (we can't change this without re-initializing the video mode).
-    if (GfglFeatures::self().isSelected(GfglFeatures::MultiSampling) != BMultiSamplingWasSelected
-        || GfglFeatures::self().getSelected(GfglFeatures::MultiSamplingSamples) != BPrevMultiSamplingSamples)
+    if(GfScrUsingResizableWindow() == false)
     {
-        // Shutdown the user interface.
-        LegacyMenu::self().shutdown();
+        // But actually restart the game if the multi-sampling feature settings changed
+        // (we can't change this without re-initializing the video mode).
+        if (GfglFeatures::self().isSelected(GfglFeatures::MultiSampling) != BMultiSamplingWasSelected
+            || GfglFeatures::self().getSelected(GfglFeatures::MultiSamplingSamples) != BPrevMultiSamplingSamples)
+        {
+            // Shutdown the user interface.
+            LegacyMenu::self().shutdown();
 
-        // Restart the game.
-        GfuiApp().restart();
+            // Restart the game.
+            GfuiApp().restart();
+        }
     }
 }
 
@@ -517,10 +520,9 @@ void* OpenGLMenuInit(void *prevMenu)
 
     GfParmReleaseHandle(hparmMenu);
 
+    GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Apply", NULL, onAccept, NULL);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     GfuiAddKey(ScrHandle, GFUIK_LEFT, "Decrease Texture Size Limit", (void*)-1, changeMaxTextureSizeState, NULL);
     GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Increase Texture Size Limit", (void*)1, changeMaxTextureSizeState, NULL);
     GfuiAddKey(ScrHandle, ' ', "Toggle Texture Compression", (void*)1, changeTextureCompressionState, NULL);

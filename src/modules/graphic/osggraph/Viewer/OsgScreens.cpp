@@ -41,7 +41,7 @@
 SDScreens::SDScreens() :
     root(NULL),
     prerenderRoot(NULL),
-
+    m_gw(NULL),
     m_NbActiveScreens(0),
     m_NbArrangeScreens(0),
     m_SpanSplit(false),
@@ -69,7 +69,8 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     viewer->setLightingMode( osg::View::NO_LIGHT );
     viewer->setThreadingModel( osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext );
 #if 1 //SDL_MAJOR_VERSION < 2
-    osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, width, height);
+    m_gw = viewer->setUpViewerAsEmbeddedInWindow(0, 0, width, height);
+    osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> gw = m_gw;
     osg::ref_ptr<osg::Camera> Camera = viewer->getCamera();
     //Camera->setGraphicsContext(gw);
     //Camera->setViewport(new osg::Viewport(0, 0, width, height));
@@ -185,6 +186,15 @@ void SDScreens::InitCars(tSituation *s)
 
 void SDScreens::update(tSituation * s, SDFrameInfo* fi)
 {
+    if(GfScrUsingResizableWindow())
+    {
+        int width = 0;
+        int height = 0;
+        int grWinx = 0;
+        int grWiny = 0;
+        GfScrGetSize(&grWinx, &grWiny, &width, &height);
+        m_gw->resized(grWinx,grWiny,width,height);
+    }
     for (unsigned i=0; i< Screens.size(); i++)
     {
         Screens[i]->update(s, fi);

@@ -38,6 +38,8 @@ protected:
     osg::ref_ptr<osg::Group> prerenderRoot;
     SDDebugHUD * debugHUD;
 
+    osg::ref_ptr<osgViewer::GraphicsWindowEmbedded> m_gw;
+
     int  m_NbActiveScreens;
     int  m_NbArrangeScreens;
     bool m_SpanSplit;

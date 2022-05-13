@@ -29,7 +29,7 @@
 
 
 // Some consts.
-static const char* ADisplayModes[DisplayMenu::nDisplayModes] = { "Full-screen", "Windowed" };
+static const char* ADisplayModes[DisplayMenu::nDisplayModes] = { "Full-screen", "Windowed", "Resizable" };
 static const char* MonitorTypes[DisplayMenu::nDisplayTypes] = { "none", "4:3", "16:9", "21:9" };
 static const char* SpansplitValues[] = { GR_VAL_NO, GR_VAL_YES };
 static const int NbSpansplitValues = sizeof(SpansplitValues) / sizeof(SpansplitValues[0]);
@@ -59,6 +59,11 @@ void DisplayMenu::onActivate(void *pDisplayMenu)
 
 	// Load some settings from graph.xml
 	pMenu->loadGraphicSettings();
+
+	if(GfScrUsingResizableWindow())
+	{
+		pMenu->_eOriginalDisplayMode = pMenu->_eDisplayMode = eResizable;
+	}
 
 	// Initialize GUI from loaded values.
 	pMenu->updateControls();
@@ -169,11 +174,16 @@ void DisplayMenu::onAccept(void *pDisplayMenu)
     // Force current control to loose focus (if one had it) and update associated variable.
     GfuiUnSelectCurrent();
 
-	// Save some settings to screen.xml
-	pMenu->storeSettings();
+	pMenu->storeWindowSettings();
 
-	// Save some settings to graph.xml
-	pMenu->storeGraphicSettings();
+	if (pMenu->_eDisplayMode != eResizable)
+	{
+		// Save some settings to screen.xml
+		pMenu->storeSettings();
+
+		// Save some settings to graph.xml
+		pMenu->storeGraphicSettings();
+	}
 
 	if(pMenu->restartNeeded())
 	{
@@ -192,6 +202,9 @@ bool DisplayMenu::restartNeeded()
 						|| (_nScreenWidth !=_nOriginalScreenWidth)
 						|| (_nScreenHeight != _nOriginalScreenHeight)
 						|| (_nOriginalMenuDisplay != _nMenuDisplay));
+
+	if(GfScrUsingResizableWindow() && (_eDisplayMode == eResizable))
+		needRestart = false;
 
 	return needRestart;
 }
@@ -242,7 +255,7 @@ void DisplayMenu::updateControls()
 			break;
 		}
 	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, nMaxRefRateIndex);
-#endif	
+#endif
 }
 
 void DisplayMenu::loadSettings()
@@ -384,7 +397,7 @@ void DisplayMenu::loadGraphicSettings()
 // Save graphical settings to XML file.
 void DisplayMenu::storeGraphicSettings() const
 {
-	// Open screen config params file.
+	// Open graph config params file.
     void* grHandle = GfParmReadFileLocal(GR_PARAM_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
     GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_MONITOR, MonitorTypes[_eDisplayType]);
@@ -399,6 +412,21 @@ void DisplayMenu::storeGraphicSettings() const
 
 }
 
+void DisplayMenu::storeWindowSettings() const
+{
+	// Open screen config params file.
+	void* hScrConfParams = GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+	if(_eDisplayMode == eResizable)
+		GfParmSetStr(hScrConfParams, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_RESIZABLE, GFSCR_VAL_YES);
+	else
+		GfParmSetStr(hScrConfParams, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_RESIZABLE, GFSCR_VAL_NO);
+
+	// Write and release screen config params file.
+	GfParmWriteFile(NULL, hScrConfParams, "Screen");
+	GfParmReleaseHandle(hScrConfParams);
+}
+
 void DisplayMenu::setDisplayMode(EDisplayMode eMode)
 {
 	if (_eDisplayMode != eMode)
@@ -411,6 +439,11 @@ void DisplayMenu::setDisplayMode(EDisplayMode eMode)
 
 void DisplayMenu::resetScreenSizes()
 {
+	if (_eDisplayMode == eResizable)
+	{
+		return;
+	}
+
 	// Either show the sizes supported by the current display (Full screen
 	// or the Default/Custom sizes
 	if (_eDisplayMode == eFullScreen)
@@ -594,13 +627,13 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 	createButtonControl("ApplyButton", this, onAccept);
 	createButtonControl("CancelButton", this, onCancel);
 
+	// Keyboard shortcuts.
+	addDefaultShortcuts();
 	addShortcut(GFUIK_RETURN, "Apply", this, onAccept, 0);
 	addShortcut(GFUIK_ESCAPE, "Cancel", this, onCancel, 0);
-    // TODO Keyboard shortcuts: Add support for shortcuts in GfuiCombobox ?
+	// TODO Keyboard shortcuts: Add support for shortcuts in GfuiCombobox ?
 	//addShortcut(GFUIK_LEFT, "Previous Resolution", this, onChangeScreenSize, 0);
 	//addShortcut(GFUIK_RIGHT, "Next Resolution", this, onChangeScreenSize, 0);
-	addShortcut(GFUIK_F1, "Help", getMenuHandle(), GfuiHelpScreen, 0);
-	addShortcut(GFUIK_F12, "Screen-Shot", 0, GfuiScreenShot, 0);
 
     closeXMLDescriptor();
 

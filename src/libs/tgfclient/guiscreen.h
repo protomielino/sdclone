@@ -30,6 +30,7 @@
 
 #define GFSCR_SECT_VALIDPROPS                       "Validated Screen Properties"
 #define GFSCR_SECT_INTESTPROPS                      "In-Test Screen Properties"
+#define GFSCR_SECT_WINDOWPROPS                      "Window Properties"
 
 #define GFSCR_SECT_WIN_MODES                        "Windowed Modes"
 #define GFSCR_ATT_BPP                               "bpp"
@@ -56,6 +57,12 @@
 #define GFSCR_VAL_VINIT_BEST                        "best"
 
 #define GFSCR_ATT_STARTUPDISPLAY                    "startup display"
+
+#define GFSCR_ATT_RESIZABLE                         "Resizable"
+#define GFSCR_ATT_FULLSCREEN                        "fullscreen"
+#define GFSCR_ATT_MAXIMIZED                         "maximized"
+#define GFSCR_ATT_WIN_LEFT                          "window left"
+#define GFSCR_ATT_WIN_TOP                           "window top"
 
 // Default settngs or menus / controls
 #define GFSCR_SECT_MENUSETTINGS                     "Menu Settings"

@@ -37,7 +37,7 @@ public:
 	
 	bool initialize(void* pPreviousMenu);
 	
-	enum EDisplayMode { eFullScreen = 0, eWindowed = 1, nDisplayModes };
+	enum EDisplayMode { eFullScreen = 0, eWindowed = 1, eResizable = 2, nDisplayModes };
 	enum EDisplayType { eNone = 0, e4by3, e16by9, e21by9, nDisplayTypes };
 	enum ESpanSplit { eDisabled = 0, eEnabled = 1, nSpanSplits };
 
@@ -54,6 +54,8 @@ public:
 
 	void storeGraphicSettings() const;
 	void loadGraphicSettings();
+
+	void storeWindowSettings() const;
 
 	void updateControls();
 

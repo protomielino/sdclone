@@ -46,6 +46,23 @@
 
 #include "glfeatures.h"
 
+// The resizable properties.
+static bool GfScrResizable = false;
+
+// The resizable functions.
+bool GfScrInitSDL2();
+bool GfScrGetResizable();
+void GfScrSetFullscreen(bool bFullScreen = true);
+void gfScrShutdown();
+void gfScrBaseOpenGLSetup();
+void gfScrOpenGlFeatures();
+bool GfScrCreateMenuWindow();
+bool GfScrValidateWindowPosition(int X, int Y);
+void GfScrInitialWindowedPosition();
+void gfScrSaveWindowState();
+bool gfScrAAOpenGLSetup();
+
+
 // The screen properties.
 static int GfScrWidth;
 static int GfScrHeight;
@@ -744,7 +761,11 @@ bool GfScrInitSDL2(int nWinWidth, int nWinHeight, int nFullScreen)
 }
 bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 {
-    return GfScrInitSDL2(nWinWidth,nWinHeight,nFullScreen);
+    GfScrResizable = GfScrGetResizable();
+    if (GfScrResizable)
+        return GfScrInitSDL2();
+    else
+        return GfScrInitSDL2(nWinWidth,nWinHeight,nFullScreen);
 }
 
 /** Shutdown the screen
@@ -753,11 +774,18 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 */
 void GfScrShutdown(void)
 {
+    if (GfScrResizable)
+    {
+        return gfScrShutdown();
+    }
+
     GfLogTrace("Shutting down screen.\n");
 
     SDL_GL_MakeCurrent(GfuiWindow,GLContext);
     SDL_GL_DeleteContext(GLContext);
     GLContext = NULL;
+    SDL_DestroyWindow(GfuiWindow);
+    GfuiWindow = NULL;
 
     // Shutdown SDL video sub-system.
     SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
@@ -926,4 +954,407 @@ int GfScrCaptureAsPNG(const char *filename)
 SDL_Window* GfScrGetMainWindow()
 {
     return GfuiWindow;
+}
+
+// ===========
+bool GfScrUsingResizableWindow()
+{
+    return GfScrResizable;
+}
+
+bool GfScrGetResizable()
+{
+     GfScrResizable = false;
+    // Read from screen.xml
+    void* hparmScreen = GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+    const char *resizable;
+    resizable = GfParmGetStr(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_RESIZABLE, GFSCR_VAL_NO);
+    if (strcmp(resizable, GFSCR_VAL_YES) == 0)
+    {
+        GfScrResizable = true;
+    }
+    // Close the config file.
+    GfParmReleaseHandle(hparmScreen);
+
+    return GfScrResizable;
+}
+
+bool gfScrAAOpenGLSetup()
+{
+    bool bSupported = false;
+    // TODO read this from config
+    int samplesWanted = 8;
+
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+
+    SDL_Window* testWindow = SDL_CreateWindow("AA test",
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        640, 480, 
+        SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+
+    if(testWindow)
+    {
+        SDL_GLContext context = 0;
+        context = SDL_GL_CreateContext(testWindow);
+        if(context)
+        {
+            int buffers = -1;
+            SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &buffers);
+            if(buffers)
+            {
+                int samples = -1;
+                glGetIntegerv(GL_MAX_SAMPLES_EXT, &samples);
+                if(samples > 0)
+                {
+                    bSupported = true;
+                    if(samples > samplesWanted)
+                        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, samplesWanted);
+                    else
+                        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, samples);
+                }
+            }
+            SDL_GL_DeleteContext(context);
+            context = NULL;
+        }
+        SDL_DestroyWindow(testWindow);
+        testWindow = NULL;
+    }
+
+    if(bSupported == false)
+    {
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+    }
+
+
+    return bSupported;
+}
+
+void gfScrBaseOpenGLSetup()
+{
+
+    // Will need for multi-window support
+    SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+
+    // Setup Anti-aliasing (if available)
+    gfScrAAOpenGLSetup();
+
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+
+#if ((SDL_MAJOR_VERSION >= 2) && (SDL_PATCHLEVEL >= 5))
+    SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
+#endif
+    SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+}
+
+bool GfScrCreateMenuWindow()
+{
+    SDL_Rect bounds;
+    SDL_GetDisplayBounds(GfScrStartDisplayId, &bounds);
+
+    float percentage = 0.90;
+
+    // TODO remove EXPERIMENTAL from title
+    // Set window/icon captions
+    std::ostringstream ossCaption;
+    ossCaption << GfuiApp().name() << " EXPERIMENTAL " << GfuiApp().version();
+
+    GfuiWindow = SDL_CreateWindow(ossCaption.str().c_str(),
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        bounds.w * percentage,
+        bounds.h * percentage, 
+        SDL_WINDOW_HIDDEN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+
+    if (!GfuiWindow)
+    {
+        char buf[1024];
+        sprintf(buf, "SDL Error: %s", SDL_GetError());
+
+        GfLogError("Unable to create an OpenGL window %s\n\n",buf);
+
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GfuiApp().name().c_str(), buf, NULL);
+        return false;
+    }
+
+#if !defined(__APPLE__)
+    // Set window icon (MUST be a 32x32 icon for Windows, and with black pixels as alpha ones,
+    // as BMP doesn't support transparency).
+    std::ostringstream ossIconFilename;
+    ossIconFilename << GfDataDir() << "data/icons/icon.bmp";
+    SDL_Surface* surfIcon = SDL_LoadBMP(ossIconFilename.str().c_str());
+    if (surfIcon)
+    {
+        SDL_SetColorKey(surfIcon, SDL_TRUE, SDL_MapRGB(surfIcon->format, 0, 0, 0));
+        SDL_SetWindowIcon(GfuiWindow, surfIcon);
+        SDL_FreeSurface(surfIcon);
+    }
+#endif
+    // Create OpenGL context
+    GLContext = SDL_GL_CreateContext(GfuiWindow);
+
+    int doublebuffer = -1;
+    int shared = -1;
+    int samples = -1;
+
+    SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &doublebuffer);
+    SDL_GL_GetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, &shared);
+    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &samples);
+
+    if ((!GLContext) || (!doublebuffer)) // || (!shared))
+    {
+        char buf[1024];
+        sprintf(buf, "SDL Error: %s", SDL_GetError());
+
+        GfLogError("Unable to create an OpenGL context %s\n\n",buf);
+
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GfuiApp().name().c_str(), buf, NULL);
+        return false;
+    }
+    else
+    {
+        SDL_GL_MakeCurrent(GfuiWindow,GLContext);
+    }
+    return true;
+}
+
+void gfScrOpenGlFeatures()
+{
+    GfglFeatures::self().detectStandardSupport();
+    GfglFeatures::self().dumpSupport();
+
+    if (SDL_GL_ExtensionSupported("GL_EXT_texture_filter_anisotropic"))
+        GfglFeatures::self().select(GfglFeatures::AnisotropicFiltering, 2);
+    else
+        GfglFeatures::self().select(GfglFeatures::AnisotropicFiltering, GfglFeatures::InvalidInt);
+
+    if (SDL_GL_ExtensionSupported("GL_ARB_multitexture"))
+    {
+        int nValue = 0;
+        GfglFeatures::self().select(GfglFeatures::MultiTexturing, true);
+        glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &nValue);
+        GfglFeatures::self().select(GfglFeatures::MultiTexturingUnits, nValue);
+    }
+    else
+    {
+        GfglFeatures::self().select(GfglFeatures::MultiTexturing, false);
+        GfglFeatures::self().select(GfglFeatures::MultiTexturingUnits, 1);
+    }
+    if(SDL_GL_ExtensionSupported("GL_ARB_texture_compression"))
+    {
+        int nValue = 0;
+        glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB, &nValue);
+        if(nValue)
+            GfglFeatures::self().select(GfglFeatures::TextureCompression, true);
+    }
+    else
+    {
+        GfglFeatures::self().select(GfglFeatures::TextureCompression, false);
+    }
+    int maxTex = 0;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTex);
+    if (maxTex > 16384) // Max in-game supported value (must be consistent with openglconfig.cpp)
+        maxTex = 16384;
+    GfglFeatures::self().select(GfglFeatures::TextureMaxSize, maxTex);
+}
+
+bool GfScrValidateWindowPosition(int X, int Y)
+{
+    SDL_Rect rect;
+    int numDisplays = SDL_GetNumVideoDisplays();
+
+    for(int i = 0;i < numDisplays;i++)
+    {
+        if(SDL_GetDisplayBounds(i,&rect) == 0)
+        {
+            if(X >= rect.x && X < rect.x + rect.w && Y >= rect.y && Y < rect.y + rect.h)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+void GfScrInitialWindowedPosition()
+{
+    int x = SDL_WINDOWPOS_UNDEFINED;
+    int y = SDL_WINDOWPOS_UNDEFINED;
+    int w = 800;
+    int h = 600;
+    int full = 0;
+    int max = 0;
+
+    void* hparmScreen =
+        GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    if (GfParmExistsSection(hparmScreen, GFSCR_SECT_WINDOWPROPS))
+    {
+
+         x = (int)GfParmGetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_WIN_LEFT, (char*)NULL, x);
+         y = (int)GfParmGetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_WIN_TOP, (char*)NULL, y);
+         w = (int)GfParmGetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_WIN_X, (char*)NULL, w);
+         h = (int)GfParmGetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_WIN_Y, (char*)NULL, h);
+         full = (int)GfParmGetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_FULLSCREEN, (char*)NULL, full);
+         max = (int)GfParmGetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_MAXIMIZED, (char*)NULL, max);
+    }
+    GfParmReleaseHandle(hparmScreen);
+
+    // Make sure these are valid
+    if(GfScrValidateWindowPosition(x, y) == false)
+    {
+        SDL_Rect rect;
+        if(SDL_GetDisplayBounds(0,&rect) == 0)
+        {
+            w = rect.w * 0.9;
+            h = rect.h * 0.9;
+        }
+        x = SDL_WINDOWPOS_UNDEFINED;
+        y = SDL_WINDOWPOS_UNDEFINED;
+    }
+
+    SDL_SetWindowPosition(GfuiWindow, x, y);
+    SDL_SetWindowSize(GfuiWindow, w, h);
+
+    if(max)
+        SDL_MaximizeWindow(GfuiWindow);
+
+    if(full)
+        SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+}
+
+bool GfScrInitSDL2()
+{
+    GfLogTrace("Initializing resizable screen.\n");
+    // Initialize SDL video subsystem (and exit if not supported).
+    if (SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
+    {
+        // TODO try MessageBox ??
+        GfLogError("Couldn't initialize SDL audio/video sub-system (%s)\n", SDL_GetError());
+        return false;
+    }
+
+    // Get system info
+
+    // Read saved info
+
+    // Setup OpenGL
+    gfScrBaseOpenGLSetup();
+
+    // Create Window
+    if(GfScrCreateMenuWindow())
+    {
+        // Only needed for ssggraph
+        gfScrOpenGlFeatures();
+
+        GfScrInitialWindowedPosition();
+
+        SDL_ShowWindow(GfuiWindow);
+
+        // Initialize the Open GL viewport.
+        SDL_GetWindowSize(GfuiWindow, &GfScrWidth, &GfScrHeight);
+        gfScrReshapeViewport(GfScrWidth, GfScrHeight);
+
+        // Setup the event loop about the new display.
+        GfuiApp().eventLoop().setReshapeCB(gfScrReshapeViewport);
+        GfuiApp().eventLoop().postRedisplay();
+        return true;
+    }
+    return false;
+}
+
+void GfScrSetFullscreen(bool bFullScreen /* = true */)
+{
+    if(bFullScreen == false)
+    {
+        SDL_SetWindowFullscreen(GfuiWindow, 0);
+    }
+    else
+    {
+        SDL_SetWindowFullscreen(GfuiWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    }
+}
+
+void GfScrToggleFullScreen(void* unused)
+{
+    Uint32 flags = SDL_GetWindowFlags(GfuiWindow);
+
+    if ((flags & SDL_WINDOW_FULLSCREEN) || (flags & SDL_WINDOW_FULLSCREEN_DESKTOP))
+    {
+        GfScrSetFullscreen(false);
+    }
+    else
+    {
+        GfScrSetFullscreen(true);
+    }
+    return;
+}
+
+void gfScrSaveWindowState()
+{
+    GfLogTrace("Saving resizable window state.\n");
+
+    // TODO this has some problems on Linux
+    int x = 0;
+    int y = 0;
+    int w = 0;
+    int h = 0; 
+    int full = 0;
+    int max = 0;
+    int dispIndex = SDL_GetWindowDisplayIndex(GfuiWindow);
+
+    Uint32 flags = SDL_GetWindowFlags(GfuiWindow);
+    if ((flags & SDL_WINDOW_FULLSCREEN) || (flags & SDL_WINDOW_FULLSCREEN_DESKTOP))
+    {
+        full = 1;
+        SDL_SetWindowFullscreen(GfuiWindow, 0);
+    }
+
+    flags = SDL_GetWindowFlags(GfuiWindow);
+    if (flags & SDL_WINDOW_MAXIMIZED)
+    {
+        max = 1;
+        SDL_RestoreWindow(GfuiWindow);
+    }
+    else if (flags & SDL_WINDOW_MINIMIZED)
+    {
+        SDL_RestoreWindow(GfuiWindow);
+    }
+    SDL_GetWindowPosition(GfuiWindow, &x, &y);
+    SDL_GetWindowSize(GfuiWindow, &w, &h);
+
+    void* hparmScreen =
+        GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    if (GfParmExistsSection(hparmScreen, GFSCR_SECT_WINDOWPROPS))
+    {
+        GfParmSetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_STARTUPDISPLAY, (char*)NULL, dispIndex);
+        GfParmSetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_FULLSCREEN, (char*)NULL, full);
+        GfParmSetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_MAXIMIZED, (char*)NULL, max);
+        GfParmSetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_WIN_LEFT, (char*)NULL, x);
+        GfParmSetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_WIN_TOP, (char*)NULL, y);
+        GfParmSetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_WIN_X, (char*)NULL, w);
+        GfParmSetNum(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_WIN_Y, (char*)NULL, h);
+    }
+
+    // Write and release screen config params file.
+    GfParmWriteFile(NULL, hparmScreen, "Screen");
+    GfParmReleaseHandle(hparmScreen);
+}
+
+void gfScrShutdown()
+{
+    GfLogTrace("Shutting down resizable screen.\n");
+
+    SDL_GL_MakeCurrent(GfuiWindow,GLContext);
+
+    // save the window state and position
+    gfScrSaveWindowState();
+
+    SDL_GL_DeleteContext(GLContext);
+    GLContext = NULL;
+    SDL_DestroyWindow(GfuiWindow);
+    GfuiWindow = NULL;
+
+    // Shutdown SDL video sub-system.
+    SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 }

@@ -548,8 +548,7 @@ rmOpenHelpScreen(void * /* dummy */)
 static void
 rmAddKeys()
 {
-    GfuiAddKey(rmScreenHandle, GFUIK_F1,  "Help", NULL, rmOpenHelpScreen, NULL);
-    GfuiAddKey(rmScreenHandle, GFUIK_F12, "Screen shot", NULL, GfuiScreenShot, NULL);
+    GfuiMenuDefaultKeysAdd(rmScreenHandle);
 
     GfuiAddKey(rmScreenHandle, '-', "Slow down time",    (void*)-1, rmTimeMod, NULL);
     GfuiAddKey(rmScreenHandle, '+', "Accelerate time",   (void*)+1, rmTimeMod, NULL);
@@ -859,10 +858,7 @@ RmResScreenInit()
     // Close menu XML descriptor.
     GfParmReleaseHandle(hmenu);
     
-    // Register keyboard shortcuts.
-    GfuiAddKey(rmResScreenHdle, GFUIK_F1, "Help", rmResScreenHdle, GfuiHelpScreen, NULL);
-    GfuiAddKey(rmResScreenHdle, GFUIK_F12, "Screen shot", NULL, GfuiScreenShot, NULL);
-
+    // Register keyboard shortcuts
     GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE, "Stop current race",
 			   (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
     GfuiAddKey(rmResScreenHdle, 'q', GFUIM_ALT, "Quit game now, save nothing",

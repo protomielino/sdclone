@@ -279,10 +279,19 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_RIGHT,GFUIM_ALT,   "Move seat right",      (void*)-1, SDMoveSeatLeftRight, NULL);
     GfuiAddKey(screen, GFUIK_UP,   GFUIM_ALT,   "Move seat forward",    (void*)1,  SDMoveSeatForwardBackward, NULL);
     GfuiAddKey(screen, GFUIK_DOWN, GFUIM_ALT,   "Move seat backward",   (void*)-1, SDMoveSeatForwardBackward, NULL);
+    
+    if(GfScrUsingResizableWindow())
+        GfuiAddKey(screen, GFUIK_RETURN, GFUIM_ALT, "Toggle Full-screen", (void*)0, GfScrToggleFullScreen, NULL);
 
     GfLogInfo("Current screen is #%d (out of %d)\n", m_CurrentScreenIndex, m_NbActiveScreens);
 
     return 0; // true;
+}
+
+void adaptScreenSize()
+{
+    // TODO need to resize 'screens'
+    //GfScrGetSize(&grWinx, &grWiny, &grWinw, &grWinh);
 }
 
 int refresh(tSituation *s)
@@ -306,7 +315,7 @@ int refresh(tSituation *s)
             GfLogDebug("Frame rate (F/s) : Instant = %.1f (Average %.1f)\n",
                       frameInfo.fInstFps, frameInfo.fAvgFps);
     }
-
+    adaptScreenSize();
     cam = screens->getActiveView()->getCameras()->getSelectedCamera();
     osg::Vec3d eye = cam->getCameraPosition();
     double X = eye[0];

@@ -122,7 +122,8 @@ static void
 grAdaptScreenSize(void)
 {
     int i;
-
+    GfScrGetSize(&grWinx, &grWiny, &grWinw, &grWinh);
+    grWinx = 0; grWiny = 0;
     switch (grNbActiveScreens)
     {
         default:
@@ -615,6 +616,8 @@ refresh(tSituation *s)
     glDepthFunc(GL_LEQUAL);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GfProfStopProfile("grDrawBackground/glClear");
+
+    grAdaptScreenSize();
 
     for (i = 0; i < grNbActiveScreens; i++)
     {

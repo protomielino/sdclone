@@ -73,25 +73,33 @@ GfuiEventLoop::~GfuiEventLoop()
 void GfuiEventLoop::injectKeyboardEvent(int code, int modifier, int state,
 										int unicode, int x, int y)
 {
-#ifndef WIN32
-	// Hard-coded Alt+Enter shortcut, to enable the user to quit/re-enter
-	// the full-screen mode ; as in SDL's full screen mode, events never reach
-	// the Window Manager, we need this trick for the user to enjoy
-	// its WM keyboard shortcuts (didn't find any other way yet).
-	if (code == SDLK_RETURN	&& (modifier & KMOD_ALT) && state == 0)
-	{
-		if (GfScrToggleFullScreen())
-			GfLogDebug("Toggle full-screen mode ON \n");
-		else
-			GfLogDebug("Toggle full-screen mode OFF \n");
-	}
-	else
-#endif
+	if(GfScrUsingResizableWindow())
 	{
 		SDL_GetMouseState(&x, &y);
 		GfEventLoop::injectKeyboardEvent(code, modifier, state, unicode, x, y);
 	}
-	//printf("Key %x State %x mod %x\n", code, state, modifier);
+	else
+	{
+#ifndef WIN32
+		// Hard-coded Alt+Enter shortcut, to enable the user to quit/re-enter
+		// the full-screen mode ; as in SDL's full screen mode, events never reach
+		// the Window Manager, we need this trick for the user to enjoy
+		// its WM keyboard shortcuts (didn't find any other way yet).
+		if (code == SDLK_RETURN	&& (modifier & KMOD_ALT) && state == 0)
+		{
+			if (GfScrToggleFullScreen())
+				GfLogDebug("Toggle full-screen mode ON \n");
+			else
+				GfLogDebug("Toggle full-screen mode OFF \n");
+		}
+		else
+#endif
+		{
+			SDL_GetMouseState(&x, &y);
+			GfEventLoop::injectKeyboardEvent(code, modifier, state, unicode, x, y);
+		}
+		//printf("Key %x State %x mod %x\n", code, state, modifier);
+	}
 }
 
 void GfuiEventLoop::injectMouseMotionEvent(int state, int x, int y)
