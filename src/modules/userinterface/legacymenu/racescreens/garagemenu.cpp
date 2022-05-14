@@ -441,10 +441,9 @@ bool RmGarageMenu::initialize()
     closeXMLDescriptor();
 
     // Keyboard shortcuts.
+    addDefaultShortcuts();
     addShortcut(GFUIK_ESCAPE, "Cancel", this, onCancelCB, NULL);
     addShortcut(GFUIK_RETURN, "Accept", this, onAcceptCB, NULL);
-    addShortcut(GFUIK_F1, "Help", getMenuHandle(), GfuiHelpScreen, NULL);
-    addShortcut(GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     // TODO Keyboard shortcuts: Add support for shortcuts in GfuiCombobox ?
     //GfuiAddKey(ScrHandle, GFUIK_UP, "Move Up", this, onChangeModel, NULL);
 

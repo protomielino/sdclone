@@ -230,12 +230,11 @@ rmtsSelect(void * /* dummy */)
 static void
 rmtsAddKeys(void)
 {
+	GfuiMenuDefaultKeysAdd(ScrHandle);
 	GfuiAddKey(ScrHandle, GFUIK_RETURN, "Select Track", NULL, rmtsSelect, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", MenuData->prevScreen, rmtsDeactivate, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Track", (void*)-1, rmtsTrackPrevNext, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next Track", (void*)+1, rmtsTrackPrevNext, NULL);
-	GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
-	GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_UP, "Previous Track Category", (void*)-1, rmtsTrackCatPrevNext, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_DOWN, "Next Track Category", (void*)+1, rmtsTrackCatPrevNext, NULL);
 }

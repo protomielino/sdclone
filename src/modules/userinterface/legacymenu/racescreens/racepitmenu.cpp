@@ -112,6 +112,8 @@ RmPitMenuStart(tCarElt *car, tSituation *s, tfuiCallback callback)
 
     GfuiMenuCreateStaticControls(menuHandle, menuXMLDescHdle);
 
+    GfuiMenuDefaultKeysAdd(menuHandle);
+
     // Create variable title label.
     int titleId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "titlelabel");
     snprintf(buf, sizeof(buf), "Pit Stop for %s", car->_name);

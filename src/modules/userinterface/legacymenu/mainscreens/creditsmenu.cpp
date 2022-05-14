@@ -109,6 +109,9 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 
 	GfuiMenuCreateStaticControls(hscrPage, hmenu);
 
+	// Add standard keyboard shortcuts.
+	GfuiMenuDefaultKeysAdd(hscrPage);
+
 	// Create title label from chapter name
 	const int titleId = GfuiMenuCreateLabelControl(hscrPage, hmenu, "subtitle");
 	GfuiLabelSetText(hscrPage, titleId, chapName);
@@ -258,10 +261,6 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 			   RetScrHdle, GfuiScreenReplace, NULL);
 	GfuiAddKey(hscrPage, GFUIK_RETURN, "Return to previous menu",
 			   RetScrHdle, GfuiScreenReplace, NULL);
-	GfuiAddKey(hscrPage, GFUIK_F1, "Help",
-			   hscrPage, GfuiHelpScreen, NULL);
-	GfuiAddKey(hscrPage, GFUIK_F12, "Take a Screen Shot",
-			   NULL, GfuiScreenShot, NULL);
 
 	return hscrPage;
 }

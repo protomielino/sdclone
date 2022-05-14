@@ -258,6 +258,7 @@ RmOptimizationScreenStart(const char *title, const char *bgimg)
     GfParmReleaseHandle(hmenu);
     
     // Link key handlers
+    GfuiMenuDefaultKeysAdd(HScreen);
 	//GfuiAddKey(HScreen, GFUIK_ESCAPE, "Back to the Main menu", RmRaceSelectMenuHandle, GfuiScreenActivate, NULL);
     GfuiAddKey(HScreen, GFUIK_ESCAPE, "Continue", HScreen, onEscape, NULL);
 

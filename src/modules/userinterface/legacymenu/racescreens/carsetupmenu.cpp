@@ -617,10 +617,9 @@ bool CarSetupMenu::initialize(void *pPrevMenu, const GfRace *pRace, const GfDriv
     closeXMLDescriptor();
 
     // Keyboard shortcuts.
+    addDefaultShortcuts();
     addShortcut(GFUIK_ESCAPE, "Cancel", this, onCancelCallback, NULL);
     addShortcut(GFUIK_RETURN, "Accept", this, onAcceptCallback, NULL);
-    addShortcut(GFUIK_F1, "Help", getMenuHandle(), GfuiHelpScreen, NULL);
-    addShortcut(GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 
     return true;
 }

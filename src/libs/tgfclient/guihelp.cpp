@@ -176,13 +176,11 @@ GfuiHelpScreen(void *targetScreen, void *returnScreen)
     GfParmReleaseHandle(hmenu);
     
     // Add keyboard shortcuts.
+    GfuiMenuDefaultKeysAdd(scrHandle);
     GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Back to the menu", returnScreen, GfuiScreenReplace, NULL);
     GfuiAddKey(scrHandle, GFUIK_RETURN, "Back to the menu", returnScreen, GfuiScreenReplace, NULL);
-	if (NRecursions == 0)
-		GfuiAddKey(scrHandle, GFUIK_F1, "Help on Help menu", scrHandle, GfuiHelpScreen, NULL);
-    GfuiAddKey(scrHandle, GFUIK_F12, "Screen-shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddKey(scrHandle, GFUIK_UP, "Select previous entry", NULL, gfuiSelectPrev, NULL);
-    GfuiAddKey(scrHandle, GFUIK_DOWN, "Select next entry", NULL, gfuiSelectNext, NULL);
+    if (NRecursions == 0)
+        GfuiAddKey(scrHandle, GFUIK_F1, "Help on Help menu", scrHandle, GfuiHelpScreen, NULL);
 
     GfuiScreenActivate(scrHandle);
 }

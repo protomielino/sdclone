@@ -405,10 +405,9 @@ rmrpValidate(void * /* dummy */)
 static void
 rmrpAddKeys(void)
 {
+    GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Accept", NULL, rmrpValidate, NULL);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", MenuData->prevScreen, rmrpDeactivate, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 }
 
 void

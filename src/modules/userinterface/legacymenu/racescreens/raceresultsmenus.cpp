@@ -135,6 +135,8 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
     void *hmenu = GfuiMenuLoad("practiceresultsmenu.xml");
     GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
+    GfuiMenuDefaultKeysAdd(rmScrHdle);
+
     // Create variable title labels.
     snprintf(buf, sizeof(buf), "%s at %s", race, info->track->name);
     const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Title");
@@ -242,8 +244,6 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 
     GfuiAddKey(rmScrHdle, GFUIK_ESCAPE, "Continue", prevHdle, GfuiScreenReplace, NULL);
     GfuiAddKey(rmScrHdle, GFUIK_RETURN, "Continue", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
 
     GfuiScreenActivate(rmScrHdle);
 }
@@ -412,10 +412,9 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     }//if i
 
     //Link key handlers
+    GfuiMenuDefaultKeysAdd(rmScrHdle);
     GfuiAddKey(rmScrHdle, GFUIK_ESCAPE, "Continue", prevHdle, GfuiScreenReplace, NULL);
     GfuiAddKey(rmScrHdle, GFUIK_RETURN, "Continue", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
 
     //Show!
     GfuiScreenActivate(rmScrHdle);
@@ -534,11 +533,9 @@ rmQualifResults(void *prevHdle, tRmInfo *info, const char* pszTitle, int start)
                                     (void*)&RmNextRace, rmChgQualifScreen);
         GfuiAddKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgQualifScreen, NULL);
     }
-
+    GfuiMenuDefaultKeysAdd(rmScrHdle);
     GfuiAddKey(rmScrHdle, GFUIK_ESCAPE, "Continue", prevHdle, GfuiScreenReplace, NULL);
     GfuiAddKey(rmScrHdle, GFUIK_RETURN, "Continue", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
 
     GfuiScreenActivate(rmScrHdle);
 }
@@ -682,10 +679,9 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
         GfuiAddKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgStandingScreen, NULL);
     }//if i
 
+    GfuiMenuDefaultKeysAdd(rmScrHdle);
     GfuiAddKey(rmScrHdle, GFUIK_ESCAPE, "Continue", prevHdle, GfuiScreenReplace, NULL);
     GfuiAddKey(rmScrHdle, GFUIK_RETURN, "Continue", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
-    GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 
     GfuiScreenActivate(rmScrHdle);
 }//RmShowStandings

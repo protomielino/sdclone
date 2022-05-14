@@ -648,10 +648,11 @@ rmdsShuffleCompetitors(void * /* dummy */ )
 static void
 rmdsAddKeys(void)
 {
+    // Add standard keyboard shortcuts.
+    GfuiMenuDefaultKeysAdd(ScrHandle);
+
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Previous menu", MenuData->prevScreen, rmdsPreviousMenu, NULL);
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Next menu", NULL, rmdsNextMenu, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     GfuiAddKey(ScrHandle, '-', "Move Up", (void*)-1, rmdsMoveCompetitor, NULL);
     GfuiAddKey(ScrHandle, '+', "Move Down", (void*)+1, rmdsMoveCompetitor, NULL);
     GfuiAddKey(ScrHandle, ' ', "Select/Deselect", NULL, rmdsSelectDeselectDriver, NULL);

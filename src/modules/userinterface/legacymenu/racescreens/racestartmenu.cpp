@@ -112,6 +112,8 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
     void *hmenu = GfuiMenuLoad("startracemenu.xml");
     GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
+    GfuiMenuDefaultKeysAdd(rmScrHdle);
+
     // Create variable title label.
     const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "TitleLabel");
 	if (LmRaceEngine().race()->getManager()->hasSubFiles())
@@ -257,9 +259,7 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
     // Register keyboard shortcuts.
     GfuiAddKey(rmScrHdle, GFUIK_RETURN, "Start", startScr, GfuiScreenReplace, NULL);
     GfuiAddKey(rmScrHdle, GFUIK_ESCAPE, "Abandon", abortScr, GfuiScreenReplace, NULL);
-    GfuiAddKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
-    GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
-        
+
     // Activate the created screen.
     GfuiScreenActivate(rmScrHdle);
 }

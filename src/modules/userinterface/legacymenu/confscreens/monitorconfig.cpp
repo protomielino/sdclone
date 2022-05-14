@@ -227,13 +227,12 @@ bool MonitorMenu::initialize(void *pPreviousMenu)
 	createButtonControl("ApplyButton", this, onAccept);
 	createButtonControl("CancelButton", this, onCancel);
 
+	addDefaultShortcuts();
 	addShortcut(GFUIK_RETURN, "Apply", this, onAccept, 0);
 	addShortcut(GFUIK_ESCAPE, "Cancel", this, onCancel, 0);
-    // TODO Keyboard shortcuts: Add support for shortcuts in GfuiCombobox ?
+	// TODO Keyboard shortcuts: Add support for shortcuts in GfuiCombobox ?
 	//addShortcut(GFUIK_LEFT, "Previous Resolution", this, onChangeScreenSize, 0);
 	//addShortcut(GFUIK_RIGHT, "Next Resolution", this, onChangeScreenSize, 0);
-	addShortcut(GFUIK_F1, "Help", getMenuHandle(), GfuiHelpScreen, 0);
-	addShortcut(GFUIK_F12, "Screen-Shot", 0, GfuiScreenShot, 0);
 
 	closeXMLDescriptor();
 
