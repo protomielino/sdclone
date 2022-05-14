@@ -221,9 +221,24 @@ void DisplayMenu::onCancel(void *pDisplayMenu)
 void DisplayMenu::updateControls()
 {
 	char buf[32];
+	int enable = GFUI_ENABLE;
 
 	int nControlId = getDynamicControlId("DisplayModeCombo");
 	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _eDisplayMode);
+
+	if(_eDisplayMode == eResizable)
+	{
+		enable = GFUI_DISABLE;
+	}
+	nControlId = getDynamicControlId("MonitorTypeCombo");
+	GfuiEnable(getMenuHandle(),nControlId,enable);
+
+	nControlId = getDynamicControlId("StartupDisplayCombo");
+	GfuiEnable(getMenuHandle(),nControlId,enable);
+
+	nControlId = getDynamicControlId("ScreenSizeCombo");
+	GfuiEnable(getMenuHandle(),nControlId,enable);
+
 	
 	resetScreenSizes();
 
@@ -433,7 +448,7 @@ void DisplayMenu::setDisplayMode(EDisplayMode eMode)
 	{
 		_eDisplayMode = eMode;
 		
-		resetScreenSizes();
+		updateControls();
 	}
 }
 
