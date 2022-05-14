@@ -402,20 +402,7 @@ SDL_Surface* gfScrCreateWindow(int nWinWidth, int nWinHeight, int nTotalDepth,in
 
 int GfScrGetAttachedDisplays()
 {
-    SDL_Rect rect;
     int nDisplays = SDL_GetNumVideoDisplays();
-
-    for(int i = 0;i < nDisplays;i++)
-    {
-        if(SDL_GetDisplayBounds(i,&rect) == 0)
-        {
-            printf("   Display (%s) : %d\n", SDL_GetDisplayName(i), i);
-            printf("   %-8.8s: %d\n","left", rect.x);
-            printf("   %-8.8s: %d\n","top", rect.y);
-            printf("   %-8.8s: %d\n","width", rect.w);
-            printf("   %-8.8s: %d\n","height", rect.h);
-        }
-    }
     return nDisplays;
 }
 
