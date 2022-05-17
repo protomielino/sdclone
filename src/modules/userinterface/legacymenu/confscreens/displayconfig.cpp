@@ -176,13 +176,14 @@ void DisplayMenu::onAccept(void *pDisplayMenu)
 
 	pMenu->storeWindowSettings();
 
+	// Save some settings to graph.xml
+	pMenu->storeGraphicSettings();
+
 	if (pMenu->_eDisplayMode != eResizable)
 	{
 		// Save some settings to screen.xml
 		pMenu->storeSettings();
 
-		// Save some settings to graph.xml
-		pMenu->storeGraphicSettings();
 	}
 
 	if(pMenu->restartNeeded())
