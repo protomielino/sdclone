@@ -131,10 +131,9 @@ AddTrackSurface(void *TrackHandle, tTrack *theTrack, const char *material)
 static void
 InitSides(void *TrackHandle, tTrack *theTrack)
 {
-    int side;
     const char *style;
 
-    for (side = 0; side < 2; side++) {
+    for (int side = 0; side < 2; side++) {
 	sideMaterial[side] = GfParmGetStr(TrackHandle, TRK_SECT_MAIN, KeySideSurface[side], TRK_VAL_GRASS);
 	sideSurface[side] = AddTrackSurface(TrackHandle, theTrack, sideMaterial[side]);
 	sideEndWidth[side] = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, KeySideWidth[side], (char*)NULL, 0.0);
@@ -182,13 +181,11 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
     tTrackBarrier *curBarrier;
     tdble	x, y, z;
     tdble	al, alfl;
-    int		j;
     tdble	x1, x2, y1, y2;
     tdble	sw, ew, bw;
     tdble	minWidth;
     tdble	maxWidth;
     int		type;
-    int		side;
     const char	*style;
     tdble	Kew;
     static char	path[BUFSIZE];
@@ -197,7 +194,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
     mSeg = curSeg;
 
     snprintf(path, sizeof(path), "%s/%s", TRK_SECT_MAIN, TRK_LST_SEG);
-    for (side = 0; side < 2; side++) {
+    for (int side = 0; side < 2; side++) {
 	curSeg = mSeg;
 	if (curStep == 0) {
 	    /* Side parameters */
@@ -345,7 +342,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    al = (tdble)((curBorder->angle[TR_ZE] - curBorder->angle[TR_ZS])/36.0);
 		    alfl = curBorder->angle[TR_ZS];
 
-		    for (j = 0; j < 36; j++) {
+		    for (int j = 0; j < 36; j++) {
 			alfl += al;
 			x1 = curBorder->center.x + (curBorder->radiusl) * sin(alfl);   /* location of end */
 			y1 = curBorder->center.y - (curBorder->radiusl) * cos(alfl);
@@ -382,7 +379,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    al = (tdble)((curBorder->angle[TR_ZE] - curBorder->angle[TR_ZS])/36.0);
 		    alfl = curBorder->angle[TR_ZS];
 
-		    for (j = 0; j < 36; j++) {
+		    for (int j = 0; j < 36; j++) {
 			alfl += al;
 			x2 = curBorder->center.x + (curBorder->radiusr) * sin(alfl);   /* location of end */
 			y2 = curBorder->center.y - (curBorder->radiusr) * cos(alfl);
@@ -426,7 +423,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    al = (tdble)((curBorder->angle[TR_ZE] - curBorder->angle[TR_ZS])/36.0);
 		    alfl = curBorder->angle[TR_ZS];
 
-		    for (j = 0; j < 36; j++) {
+		    for (int j = 0; j < 36; j++) {
 			alfl += al;
 			x1 = curBorder->center.x - (curBorder->radiusl) * sin(alfl);   /* location of end */
 			y1 = curBorder->center.y + (curBorder->radiusl) * cos(alfl);
@@ -463,7 +460,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    al = (tdble)((curBorder->angle[TR_ZE] - curBorder->angle[TR_ZS])/36.0);
 		    alfl = curBorder->angle[TR_ZS];
 
-		    for (j = 0; j < 36; j++) {
+		    for (int j = 0; j < 36; j++) {
 			alfl += al;
 			x2 = curBorder->center.x - (curBorder->radiusr) * sin(alfl);   /* location of end */
 			y2 = curBorder->center.y - (curBorder->radiusr) * cos(alfl);
@@ -580,7 +577,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    al = (tdble)((curSide->angle[TR_ZE] - curSide->angle[TR_ZS])/36.0);
 		    alfl = curSide->angle[TR_ZS];
 
-		    for (j = 0; j < 36; j++) {
+		    for (int j = 0; j < 36; j++) {
 			alfl += al;
 			x1 = curSide->center.x + (curSide->radiusl) * sin(alfl);   /* location of end */
 			y1 = curSide->center.y - (curSide->radiusl) * cos(alfl);
@@ -617,7 +614,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    al = (tdble)((curSide->angle[TR_ZE] - curSide->angle[TR_ZS])/36.0);
 		    alfl = curSide->angle[TR_ZS];
 
-		    for (j = 0; j < 36; j++) {
+		    for (int j = 0; j < 36; j++) {
 			alfl += al;
 			x2 = curSide->center.x + (curSide->radiusr) * sin(alfl);   /* location of end */
 			y2 = curSide->center.y - (curSide->radiusr) * cos(alfl);
@@ -661,7 +658,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    al = (tdble)((curSide->angle[TR_ZE] - curSide->angle[TR_ZS])/36.0);
 		    alfl = curSide->angle[TR_ZS];
 
-		    for (j = 0; j < 36; j++) {
+		    for (int j = 0; j < 36; j++) {
 			alfl += al;
 			x1 = curSide->center.x - (curSide->radiusl) * sin(alfl);   /* location of end */
 			y1 = curSide->center.y + (curSide->radiusl) * cos(alfl);
@@ -698,7 +695,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    al = (tdble)((curSide->angle[TR_ZE] - curSide->angle[TR_ZS])/36.0);
 		    alfl = curSide->angle[TR_ZS];
 
-		    for (j = 0; j < 36; j++) {
+		    for (int j = 0; j < 36; j++) {
 			alfl += al;
 			x2 = curSide->center.x - (curSide->radiusr) * sin(alfl);   /* location of end */
 			y2 = curSide->center.y - (curSide->radiusr) * cos(alfl);
@@ -776,7 +773,6 @@ normSeg(tTrackSeg *curSeg)
 static void
 CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *end, int ext)
 {
-    int		j;
     int		segread, curindex;
     tdble	radius, radiusend = 0, dradius;
     tdble	innerradius;
@@ -1179,7 +1175,7 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
 			al = (tdble)((curSeg->angle[TR_ZE] - curSeg->angle[TR_ZS])/36.0);
 			alfl = curSeg->angle[TR_ZS];
 
-			for (j = 0; j < 36; j++) {
+			for (int j = 0; j < 36; j++) {
 				alfl += al;
 				x1 = curSeg->center.x + (innerradius) * sin(alfl);   /* location of end */
 				y1 = curSeg->center.y - (innerradius) * cos(alfl);
@@ -1247,7 +1243,7 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
 			al = (tdble)((curSeg->angle[TR_ZE] - curSeg->angle[TR_ZS])/36.0);
 			alfl = curSeg->angle[TR_ZS];
 
-			for (j = 0; j < 36; j++) {
+			for (int j = 0; j < 36; j++) {
 				alfl += al;
 				x1 = curSeg->center.x - (innerradius + width) * sin(alfl);   /* location of end */
 				y1 = curSeg->center.y + (innerradius + width) * cos(alfl);

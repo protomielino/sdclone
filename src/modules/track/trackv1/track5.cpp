@@ -210,13 +210,11 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
     tTrackBarrier *curBarrier;
     tdble	x, y, z;
     tdble	al, alfl;
-    int		j;
     tdble	x1, x2, y1, y2;
     tdble	w, sw, ew, bw;
     tdble	minWidth;
     tdble	maxWidth;
     int		type;
-    int		side;
     const char	*style;
     tdble	Kew;
     static char	path[BUFSIZE];
@@ -229,7 +227,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
     snprintf(path, sizeof(path), "%s/%s", TRK_SECT_MAIN, TRK_LST_SEGMENTS);
     segName = GfParmListGetCurEltName(TrackHandle, path);
     snprintf(path, sizeof(path), "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEGMENTS, segName);
-    for (side = 0; side < 2; side++) {
+    for (int side = 0; side < 2; side++) {
     curSeg = mSeg;
     if (curStep == 0) {
         /* Side parameters */
@@ -382,7 +380,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
             al = (tdble)(curBorder->arc / 36.0);
             alfl = curBorder->angle[TR_CS];
 
-            for (j = 0; j < 36; j++) {
+            for (int j = 0; j < 36; j++) {
             alfl += al;
             x1 = curBorder->center.x + (curBorder->radiusl) * cos(alfl);   /* location of end */
             y1 = curBorder->center.y + (curBorder->radiusl) * sin(alfl);
@@ -419,7 +417,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
             al = (tdble)(curBorder->arc / 36.0);
             alfl = curBorder->angle[TR_CS];
 
-            for (j = 0; j < 36; j++) {
+            for (int j = 0; j < 36; j++) {
             alfl += al;
             x2 = curBorder->center.x + (curBorder->radiusr) * cos(alfl);   /* location of end */
             y2 = curBorder->center.y + (curBorder->radiusr) * sin(alfl);
@@ -463,7 +461,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
             al = (tdble)(curBorder->arc / 36.0);
             alfl = curBorder->angle[TR_CS];
 
-            for (j = 0; j < 36; j++) {
+            for (int j = 0; j < 36; j++) {
             alfl -= al;
             x1 = curBorder->center.x + (curBorder->radiusl) * cos(alfl);   /* location of end */
             y1 = curBorder->center.y + (curBorder->radiusl) * sin(alfl);
@@ -500,7 +498,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
             al = (tdble)(curBorder->arc / 36.0);
             alfl = curBorder->angle[TR_CS];
 
-            for (j = 0; j < 36; j++) {
+            for (int j = 0; j < 36; j++) {
             alfl -= al;
             x2 = curBorder->center.x + (curBorder->radiusr) * cos(alfl);   /* location of end */
             y2 = curBorder->center.y + (curBorder->radiusr) * sin(alfl);
@@ -618,7 +616,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
             al = (tdble)(curSide->arc / 36.0);
             alfl = curSide->angle[TR_CS];
 
-            for (j = 0; j < 36; j++) {
+            for (int j = 0; j < 36; j++) {
             alfl += al;
             x2 = curSide->center.x + (curSide->radiusl) * cos(alfl);
             y2 = curSide->center.y + (curSide->radiusl) * sin(alfl);
@@ -655,7 +653,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
             al = (tdble)(curSide->arc / 36.0);
             alfl = curSide->angle[TR_CS];
 
-            for (j = 0; j < 36; j++) {
+            for (int j = 0; j < 36; j++) {
             alfl += al;
             x2 = curSide->center.x + (curSide->radiusr) * cos(alfl);
             y2 = curSide->center.y + (curSide->radiusr) * sin(alfl);
@@ -699,7 +697,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
             al = (tdble)(curSide->arc / 36.0);
             alfl = curSide->angle[TR_CS];
 
-            for (j = 0; j < 36; j++) {
+            for (int j = 0; j < 36; j++) {
             alfl -= al;
             x1 = curSide->center.x + (curSide->radiusl) * cos(alfl);   /* location of end */
             y1 = curSide->center.y + (curSide->radiusl) * sin(alfl);
@@ -736,7 +734,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
             al = (tdble)(curSide->arc / 36.0);
             alfl = curSide->angle[TR_CS];
 
-            for (j = 0; j < 36; j++) {
+            for (int j = 0; j < 36; j++) {
             alfl -= al;
             x2 = curSide->center.x + (curSide->radiusr) * cos(alfl);   /* location of end */
             y2 = curSide->center.y + (curSide->radiusr) * sin(alfl);
@@ -801,9 +799,6 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 // @param TrackHandle handle of the track XML file
 // @return true on success
 static bool InitPits(tTrack *theTrack, void *TrackHandle) {
-    int i;
-    int			segId;
-
     //Set each pit-related ptr to initial value
     pitEntrySeg = NULL;
     pitExitSeg = NULL;
@@ -823,9 +818,9 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
     if (segName != 0) {
         //Search for pit entry
         snprintf(path, sizeof(path), "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEGMENTS, segName);
-        segId = (int)GfParmGetNum(TrackHandle, path, TRK_ATT_ID, (char*)NULL, -1);
+        int segId = (int)GfParmGetNum(TrackHandle, path, TRK_ATT_ID, (char*)NULL, -1);
         pitEntrySeg = theTrack->seg;
-        for(i = 0; i <= theTrack->nseg; i++) {
+        for (int i = 0; i <= theTrack->nseg; i++) {
             if (pitEntrySeg->id == segId) {
                 found = true;
             } else if (found) {
@@ -846,7 +841,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
             /* Search backward the last segment with that name */
             pitExitSeg = theTrack->seg; /* last track segment */
             found = false;
-            for(i = 0; i <= theTrack->nseg; i++) {
+            for (int i = 0; i <= theTrack->nseg; i++) {
                 /* set the flag on the last segment of pit_exit */
                 if (!strcmp(segName, pitExitSeg->name)) {
                     found = true;
@@ -865,7 +860,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
         if (segName != 0) {
             pitStart = theTrack->seg;
             found = false;
-            for(i = 0; i <= theTrack->nseg; i++) {
+            for (int i = 0; i <= theTrack->nseg; i++) {
                 if (!strcmp(segName, pitStart->name)) {
                     found = true;
                 } else if (found) {
@@ -886,7 +881,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 			if (segName != 0) {
 				pitBuildingsStart = theTrack->seg;
 	            found = false;
-		        for(i = 0; i <= theTrack->nseg; i++) {
+		        for (int i = 0; i <= theTrack->nseg; i++) {
 			        if (!strcmp(segName, pitBuildingsStart->name)) {
 				        found = true;
 					} else if (found) {
@@ -911,7 +906,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
             /* Search backward the last segment with that name */
             pitEnd = theTrack->seg; /* last track segment */
             found = false;
-            for(i = 0; i <= theTrack->nseg; i++)
+            for (int i = 0; i <= theTrack->nseg; i++)
             {
                 if (!strcmp(segName, pitEnd->name))
                 {
@@ -936,7 +931,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 				/* Search backward the last segment with that name */
 	            pitBuildingsEnd = theTrack->seg; /* last track segment */
 		        found = false;
-			    for(i = 0; i <= theTrack->nseg; i++) {
+			    for (int i = 0; i <= theTrack->nseg; i++) {
 				    if (!strcmp(segName, pitBuildingsEnd->name)) {
 					    found = true;
 						break;
@@ -1219,7 +1214,6 @@ normSeg(tTrackSeg *curSeg)
 static void
 CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *end, int ext)
 {
-    int		j;
     int		segread, curindex;
     tdble	radius, radiusend = 0, dradius;
     tdble	innerradius;
@@ -1644,7 +1638,7 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
                     al = (tdble)(curArc / 36.0);
                     alfl = curSeg->angle[TR_CS];
 
-                    for (j = 0; j < 36; j++) {
+                    for (int j = 0; j < 36; j++) {
                         alfl += al;
                         x1 = curSeg->center.x + (innerradius) * cos(alfl);   /* location of end */
                         y1 = curSeg->center.y + (innerradius) * sin(alfl);
@@ -1712,7 +1706,7 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
                     al = (tdble)(curSeg->arc / 36.0);
                     alfl = curSeg->angle[TR_CS];
 
-                    for (j = 0; j < 36; j++) {
+                    for (int j = 0; j < 36; j++) {
                         alfl -= al;
                         x1 = curSeg->center.x + (innerradius + width) * cos(alfl);   /* location of end */
                         y1 = curSeg->center.y + (innerradius + width) * sin(alfl);
@@ -1761,7 +1755,6 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
  */
 void ReadTrack5(tTrack *theTrack, void *TrackHandle,
                                     tRoadCam **camList, int ext) {
-    int			i;
     tTrackSeg		*curSeg = NULL;
     int			segId;
     tRoadCam		*curCam;
@@ -1806,7 +1799,7 @@ void ReadTrack5(tTrack *theTrack, void *TrackHandle,
         snprintf(path2, sizeof(path2), "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEGMENTS, segName);
         segId = (int)GfParmGetNum(TrackHandle, path2, TRK_ATT_ID, (char*)NULL, 0);
         curSeg = theTrack->seg;
-        for(i=0; i<theTrack->nseg; i++)  {
+        for (int i=0; i<theTrack->nseg; i++)  {
         if (curSeg->id == segId) {
             break;
         }
@@ -1826,7 +1819,7 @@ void ReadTrack5(tTrack *theTrack, void *TrackHandle,
         snprintf(path2, sizeof(path2), "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEGMENTS, segName);
         segId = (int)GfParmGetNum(TrackHandle, path2, TRK_ATT_ID, (char*)NULL, 0);
         curSeg = theTrack->seg;
-        for(i=0; i<theTrack->nseg; i++)  {
+        for (int i=0; i<theTrack->nseg; i++)  {
         if (curSeg->id == segId) {
             break;
         }
@@ -1862,7 +1855,7 @@ void ReadTrack5(tTrack *theTrack, void *TrackHandle,
     theTrack->max.z = zmax - zmin;
 
     curSeg = theTrack->seg;
-    for(i=0; i<theTrack->nseg; i++)  {         /* read the segment data: */
+    for (int i=0; i<theTrack->nseg; i++)  {         /* read the segment data: */
     if ((curSeg->lgfromstart + curSeg->length) > (theTrack->length - 50.0)) {
         curSeg->raceInfo |= TR_LAST;
     } else if (curSeg->lgfromstart < 50.0) {

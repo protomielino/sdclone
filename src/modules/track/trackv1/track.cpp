@@ -249,7 +249,6 @@ FinishTrackLoading(void* TrackHandle)
     double currentDistance;
     double tmpDistance;
     int currentLength;
-    int xx;
 
     theTrack->numberOfSectors = GfParmGetEltNb(TrackHandle, TRK_SECT_SECTORS);
 
@@ -281,7 +280,7 @@ FinishTrackLoading(void* TrackHandle)
         if (theTrack->numberOfSectors > 0)
         {
             distances = (double*)malloc( sizeof( double ) * theTrack->numberOfSectors );
-            for( xx = 0; xx < theTrack->numberOfSectors; ++xx )
+            for (int xx = 0; xx < theTrack->numberOfSectors; ++xx )
                 distances[ xx ] = theTrack->length * (double)(xx + 1) / (double)(theTrack->numberOfSectors + 1);
         }
     }
@@ -297,7 +296,7 @@ FinishTrackLoading(void* TrackHandle)
                 currentDistance = GfParmGetCurNum( TrackHandle, TRK_SECT_SECTORS, TRK_ATT_SECTOR_DFS, NULL, 0.0f);
                 if (currentDistance <= 0.0f || currentDistance >= theTrack->length)
                     continue; /* Don't add the startline as sector */
-                for (xx = 0; xx < currentLength; ++xx)
+                for (int xx = 0; xx < currentLength; ++xx)
                 {
                     if (distances[xx] > currentDistance)
                     {
@@ -320,7 +319,7 @@ FinishTrackLoading(void* TrackHandle)
     {
         theTrack->sectors = (double*)malloc( sizeof(double) * theTrack->numberOfSectors );
 
-        for( xx = 0; xx < theTrack->numberOfSectors; ++xx )
+        for (int xx = 0; xx < theTrack->numberOfSectors; ++xx )
             theTrack->sectors[xx] = distances[xx];
     }
     else
@@ -367,7 +366,6 @@ TrackShutdown(void)
     tTrackSurface *nextSurf;
     tRoadCam *curCam;
     tRoadCam *nextCam;
-    int xx;
 
     if (!theTrack) {
         return;
@@ -401,7 +399,7 @@ TrackShutdown(void)
     free(theTrack->graphic.env);
     if(theTrack->graphic.nb_lights > 0)
     {
-        for (xx = 0; xx < theTrack->graphic.nb_lights; ++xx)
+        for (int xx = 0; xx < theTrack->graphic.nb_lights; ++xx)
         {
             free(theTrack->graphic.lights[ xx ].onTexture);
             free(theTrack->graphic.lights[ xx ].offTexture);
