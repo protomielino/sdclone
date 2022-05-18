@@ -37,7 +37,7 @@
 #define strnicmp strncasecmp
 #else
 #include <windows.h>
-#include <float.h>
+#include <cfloat>
 #pragma warning(disable : 26451)
 #pragma warning(disable : 26812)
 #endif

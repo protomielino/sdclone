@@ -24,7 +24,7 @@
 
 
 #include <cstdio>
-#include <ctype.h>
+#include <cctype>
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif

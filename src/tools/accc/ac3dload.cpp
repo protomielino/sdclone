@@ -22,15 +22,15 @@
  @version    $Id$
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cctype>
 #include <cstring>
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#include <math.h>
-#include <float.h>
+#include <cmath>
+#include <cfloat>
 #include "accc.h"
 
 #if _MSC_VER && _MSC_VER < 1700
