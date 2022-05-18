@@ -25,7 +25,7 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <ctype.h>
+#include <cctype>
 #include <cstring>
 #ifndef WIN32
 #include <unistd.h>

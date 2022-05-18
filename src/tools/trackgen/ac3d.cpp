@@ -23,9 +23,9 @@
     @version	$Id$
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cctype>
 #include <cstring>
 #ifndef WIN32
 #include <unistd.h>

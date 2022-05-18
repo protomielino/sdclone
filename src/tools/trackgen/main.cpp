@@ -23,7 +23,7 @@
     @version	$Id$
 */
 #include <cstdio>
-#include <ctype.h>
+#include <cctype>
 
 #include <sstream>
 

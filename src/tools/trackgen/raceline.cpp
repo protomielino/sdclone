@@ -21,7 +21,7 @@
 #include <track.h>
 #include <robottools.h>
 #include <portability.h>
-#include <math.h>
+#include <cmath>
 #include <linalg_t.h>
 
 struct RacelineSegment

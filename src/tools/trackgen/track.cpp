@@ -23,14 +23,14 @@
     @version	$Id$
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cctype>
 #include <cstring>
 #ifndef WIN32
 #include <unistd.h>
 #endif
-#include <math.h>
+#include <cmath>
 
 #include <tgfclient.h>
 #include <track.h>
