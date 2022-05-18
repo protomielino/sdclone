@@ -461,7 +461,7 @@ int computeNorm(const point_t &pv1, const point_t &pv2, const point_t &pv3, poin
     norm.y = (p3 * q1 - q3 * p1) / dd;
     norm.z = (p1 * q2 - q1 * p2) / dd;
 
-    if (isnan(norm.x) || isnan(norm.y) || isnan(norm.z))
+    if (std::isnan(norm.x) || std::isnan(norm.y) || std::isnan(norm.z))
     {
         norm.set(0.0, 1.0, 0.0);
         return 0;
