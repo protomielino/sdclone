@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 #include <portability.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include <osg/Vec2f>
 #include <osg/Vec2d>

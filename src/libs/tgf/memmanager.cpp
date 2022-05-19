@@ -32,15 +32,15 @@
 	// MinGW ...
 		#include <windows.h>
 		#include <crtdbg.h>
-		#include <assert.h>
+		#include <cassert>
 		#define GetRetAddrs GCCRetAddrs
 	// ... MinGW
 	#else
 	// VC++ ...
 		#include <windows.h>
 		#include <crtdbg.h>
-		#include <assert.h>
-		#include <stdio.h>
+		#include <cassert>
+		#include <cstdio>
 		#include <intrin.h>
 		#pragma intrinsic(_ReturnAddress)
 		#undef ANSI_ISO	// Old VC++ versions returning NULL instead of exception

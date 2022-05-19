@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 
-#include <string.h>
+#include <cstring>
 #include <map>
 
 #include <osgDB/FileNameUtils>

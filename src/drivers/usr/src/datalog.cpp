@@ -18,7 +18,7 @@
 #include "datalog.h"
 
 #include <iostream>
-#include <string.h>
+#include <cstring>
 #include <fstream>
 
 #include <tgf.h>

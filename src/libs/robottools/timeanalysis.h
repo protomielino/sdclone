@@ -30,7 +30,7 @@
 
 #ifdef WIN32
 #include <windows.h>
-#include <time.h>
+#include <ctime>
 #else
 #include <sys/time.h>
 #endif

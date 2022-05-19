@@ -20,7 +20,7 @@
 
 
 #include <cstring>
-#include <stdio.h>
+#include <cstdio>
 
 #include "sim.h"
 #include "timeanalysis.h"

@@ -27,7 +27,7 @@
 #include <portability.h>
 
 #include <robot.h>
-#include <time.h>
+#include <ctime>
 #include <car.h>
 
 #include "genparoptv1.h"

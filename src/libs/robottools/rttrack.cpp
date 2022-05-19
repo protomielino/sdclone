@@ -28,7 +28,7 @@
     @ingroup	robottools
 */
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <math.h>
 #ifdef WIN32
 #include <windows.h>

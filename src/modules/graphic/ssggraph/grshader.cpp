@@ -17,9 +17,9 @@ version              : $Id: grshader.cpp 4374 2015-10-10 23:20:37Z torcs-ng $
 ***************************************************************************/
 
 #include <cstring>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstdarg>
 
 #include <tgf.h>
 #include <glfeatures.h>

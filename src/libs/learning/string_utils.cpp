@@ -14,9 +14,9 @@
  ***************************************************************************/
 
 #include "string_utils.h"
-#include <stdarg.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdarg>
+#include <cstdlib>
+#include <cstdio>
 #include <portability.h>
 
 static char msgbuf[10000];

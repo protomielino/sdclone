@@ -72,12 +72,12 @@
 // ... VC++	6.0
 
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 
-#include <string.h>
+#include <cstring>
 #include <math.h>
-#include <time.h>
+#include <ctime>
 
 #include <tgf.h>	 // TORCS
 #include <track.h>	 // TORCS

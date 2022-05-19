@@ -23,7 +23,7 @@
     @version	$Id: categories.cpp 4029 2011-11-01 19:40:49Z kakukri $
 */
 
-#include <stdio.h>
+#include <cstdio>
 #include "sim.h"
 
 

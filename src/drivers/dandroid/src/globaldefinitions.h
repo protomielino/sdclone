@@ -18,9 +18,9 @@
 #ifndef _GLOBAL_DEFINITIONS_H_
 #define _GLOBAL_DEFINITIONS_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <math.h>
 
 #include <tgf.h>

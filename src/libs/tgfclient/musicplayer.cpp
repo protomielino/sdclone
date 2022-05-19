@@ -19,7 +19,7 @@
 
 #include "musicplayer.h"
 
-#include <string.h>
+#include <cstring>
 #include <string>
 #include <map>
 #include <tgf.h>

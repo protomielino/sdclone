@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
+#include <cstdio>
 #include "sim.h"
 
 static const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};

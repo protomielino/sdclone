@@ -21,7 +21,7 @@
 #include "torcs_or_sd.h"
 #include "globaldefinitions.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <math.h>
 #include <vector>
 

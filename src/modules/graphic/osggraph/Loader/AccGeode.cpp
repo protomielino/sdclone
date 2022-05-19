@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <assert.h>
+#include <cassert>
 #include <list>
 #include <osg/Material>
 #include <osg/Texture2D>

@@ -16,7 +16,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <cstring>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "portability.h"
 

@@ -33,8 +33,8 @@
     @ingroup	robottools
 */
     
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #ifdef WIN32
 #include <windows.h>

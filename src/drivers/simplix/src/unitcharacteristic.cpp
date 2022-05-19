@@ -33,7 +33,7 @@
 //--------------------------------------------------------------------------*
 
 #include <math.h>
-#include <stdio.h>
+#include <cstdio>
 #include <memory.h>
 
 #include "unitglobal.h"

@@ -20,10 +20,10 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <algorithm>
 #include <string>
-#include <time.h>
+#include <ctime>
 
 #include "Driver.h"
 #include "Quadratic.h"

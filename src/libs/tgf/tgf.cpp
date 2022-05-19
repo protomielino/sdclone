@@ -384,7 +384,7 @@ void GfPoolMove(tMemoryPool* oldpool, tMemoryPool* newpool)
 #if (defined(WIN32) && defined(TGF_ALLOC_DEBUG))
 
 #include <crtdbg.h>
-#include <assert.h>
+#include <cassert>
 
 void * _tgf_win_malloc(size_t size)
 {

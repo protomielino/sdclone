@@ -25,7 +25,7 @@
 #include <sstream>
 #include <iostream>
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 
 #include <portability.h>
 

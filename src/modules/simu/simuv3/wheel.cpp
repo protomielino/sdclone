@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
+#include <cstdio>
 #include "sim.h"
 
 #define USE_QUATERNIONS 1
