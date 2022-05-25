@@ -27,12 +27,9 @@
 #include <cstdlib>
 #include <cctype>
 #include <cstring>
+#include <cerrno>
 #ifndef WIN32
 #include <unistd.h>
-#endif
-
-#ifdef __APPLE__
-#include <sys/errno.h>
 #endif
 
 #include <tgf.h>
