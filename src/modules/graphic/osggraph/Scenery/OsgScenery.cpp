@@ -124,7 +124,7 @@ void SDScenery::LoadScene(tTrack *track)
 
     std::string PathTmp = GfDataDir();
 
-    _bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
+    _bgsky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), GR_ATT_DYNAMICSKYDOME_ENABLED) == 0;
     if (_bgsky)
     {
         std::string strPath = PathTmp;
