@@ -61,6 +61,7 @@ bool GfScrValidateWindowPosition(int X, int Y);
 void GfScrInitialWindowedPosition();
 void gfScrSaveWindowState();
 bool gfScrAAOpenGLSetup();
+void gfScrDisableResizable();
 
 
 // The screen properties.
@@ -1057,12 +1058,7 @@ bool GfScrCreateMenuWindow()
 
     if (!GfuiWindow)
     {
-        char buf[1024];
-        sprintf(buf, "SDL Error: %s", SDL_GetError());
-
-        GfLogError("Unable to create an OpenGL window %s\n\n",buf);
-
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GfuiApp().name().c_str(), buf, NULL);
+        GfLogError("Unable to create an OpenGL window: SDL Error: %s\n", SDL_GetError());
         return false;
     }
 
@@ -1092,12 +1088,11 @@ bool GfScrCreateMenuWindow()
 
     if ((!GLContext) || (!doublebuffer)) // || (!shared))
     {
-        char buf[1024];
-        sprintf(buf, "SDL Error: %s", SDL_GetError());
-
-        GfLogError("Unable to create an OpenGL context %s\n\n",buf);
-
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GfuiApp().name().c_str(), buf, NULL);
+        GfLogError("Unable to create an OpenGL context: SDL Error: %s\n", SDL_GetError());
+        GfLogError("\t GLContext = %d\n",GLContext);
+        GfLogError("\t doublebuffer = %d\n",doublebuffer);
+        GfLogError("\t shared = %d\n",shared);
+        GfLogError("\t samples = %d\n",samples);
         return false;
     }
     else
@@ -1216,8 +1211,9 @@ bool GfScrInitSDL2()
     // Initialize SDL video subsystem (and exit if not supported).
     if (SDL_InitSubSystem(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
     {
-        // TODO try MessageBox ??
         GfLogError("Couldn't initialize SDL audio/video sub-system (%s)\n", SDL_GetError());
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GfuiApp().name().c_str(), 
+            "SDL2 initialization failed.\nPlease verify that all prerequistes are installed.\n", NULL);
         return false;
     }
 
@@ -1246,6 +1242,13 @@ bool GfScrInitSDL2()
         GfuiApp().eventLoop().setReshapeCB(gfScrReshapeViewport);
         GfuiApp().eventLoop().postRedisplay();
         return true;
+    }
+    else
+    {
+        gfScrDisableResizable();
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, GfuiApp().name().c_str(), 
+            "Unable to create a resizable openGL window.\nThe Display Mode has been reset.", NULL);
+        GfuiApp().restart();
     }
     return false;
 }
@@ -1344,4 +1347,21 @@ void gfScrShutdown()
 
     // Shutdown SDL video sub-system.
     SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+}
+
+void gfScrDisableResizable()
+{
+    void* hparmScreen =
+        GfParmReadFileLocal(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    if(hparmScreen)
+    {
+        if (GfParmExistsSection(hparmScreen, GFSCR_SECT_WINDOWPROPS))
+        {
+            GfParmSetStr(hparmScreen, GFSCR_SECT_WINDOWPROPS, GFSCR_ATT_RESIZABLE, GFSCR_VAL_NO);
+        }
+
+        // Write and release screen config params file.
+        GfParmWriteFile(NULL, hparmScreen, "Screen");
+        GfParmReleaseHandle(hparmScreen);
+    }
 }
