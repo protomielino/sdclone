@@ -1005,12 +1005,21 @@ bool gfScrAAOpenGLSetup()
             SDL_GL_DeleteContext(context);
             context = NULL;
         }
+        else
+        {
+            GfLogTrace("Unable to create an OpenGL AA test context: SDL Error: %s\n", SDL_GetError());
+        }
         SDL_DestroyWindow(testWindow);
         testWindow = NULL;
+    }
+    else
+    {
+        GfLogTrace("Unable to create an OpenGL AA test window: SDL Error: %s\n", SDL_GetError());
     }
 
     if(bSupported == false)
     {
+        GfLogTrace("Disabling Anti-aliasing\n");
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
         SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
     }
