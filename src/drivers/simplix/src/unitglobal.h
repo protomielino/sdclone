@@ -98,22 +98,18 @@ extern GfLogger* PLogSimplix;
 //==========================================================================*
 // Global constants, to	be changed for different wdbee-bots
 //--------------------------------------------------------------------------*
-#define	RTYPE_SIMPLIX	   0					   // Robot type	simplix
+#define	RTYPE_SIMPLIX	   0					 // Robot type	simplix
 #define	RTYPE_SIMPLIX_TRB1 1					 // Robot type	simplix_trb1
 #define	RTYPE_SIMPLIX_SC   2					 // Robot type	simplix_sc
 #define	RTYPE_SIMPLIX_36GP 3					 // Robot type	simplix_36GP
-#define	RTYPE_SIMPLIX_MPA1 4					 // Robot type	simplix_mpa1
-#define	RTYPE_SIMPLIX_LS1  5					 // Robot type	simplix_ls1
-#define	RTYPE_SIMPLIX_LS2  6					 // Robot type	simplix_ls2
-#define	RTYPE_SIMPLIX_MP5  7					 // Robot type	simplix_mp5
-#define	RTYPE_SIMPLIX_LP1  8					 // Robot type	simplix_lp1
-#define	RTYPE_SIMPLIX_REF  9					 // Robot type	simplix_ref
-#define	RTYPE_SIMPLIX_SRW  10					 // Robot	type simplix_srw
-#define	RTYPE_SIMPLIX_MPA11	11					 // Robot type simplix_mpa11
-#define	RTYPE_SIMPLIX_MPA12	12					 // Robot type simplix_mpa12
-#define	RTYPE_SIMPLIX_STOCK	13					 // Robot type simplix_stock
-#define	RTYPE_SIMPLIX_67GP	14
-#define	RTYPE_SIMPLIX_MP1	15				   // Robot	type simplix_mp1
+#define	RTYPE_SIMPLIX_LS1  4					 // Robot type	simplix_ls1
+#define	RTYPE_SIMPLIX_LS2  5					 // Robot type	simplix_ls2
+#define	RTYPE_SIMPLIX_MP5  6					 // Robot type	simplix_mp5
+#define	RTYPE_SIMPLIX_LP1  7					 // Robot type	simplix_lp1
+#define	RTYPE_SIMPLIX_REF  8					 // Robot type	simplix_ref
+#define	RTYPE_SIMPLIX_SRW  9					 // Robot	type simplix_srw
+#define	RTYPE_SIMPLIX_STOCK	10					 // Robot type simplix_stock
+#define	RTYPE_SIMPLIX_67GP	11					 // Robot type simplix_67GP
 //==========================================================================*
 
 //==========================================================================*
