@@ -49,11 +49,11 @@ set(SDL2_MIXER_URL https://www.libsdl.org/projects/SDL_mixer/release/${SDL2_MIXE
 set(SDL2_MIXER_HASH SHA256=b4cf5a382c061cd75081cf246c2aa2f9df8db04bdda8dcdc6b6cca55bede2419)
 
 # OpenAL-soft
-set(OPENAL_PROJECT_VERSION 1.21.1)
+set(OPENAL_PROJECT_VERSION 1.22.0)
 set(OPENAL_PROJECT openal-soft-${OPENAL_PROJECT_VERSION})
 set(OPENAL_FILE ${OPENAL_PROJECT}.tar.bz2)
 set(OPENAL_URL https://www.openal-soft.org/openal-releases/${OPENAL_FILE})
-set(OPENAL_HASH SHA256=c8ad767e9a3230df66756a21cc8ebf218a9d47288f2514014832204e666af5d8)
+set(OPENAL_HASH SHA256=ce0f9300de3de7bc737b0be2a995619446e493521d070950eea53eddd533fc9b)
 
 message(WARNING "openal-soft versions newer than 1.19.1 need Visual Studio 2019 and CMAKE_SYSTEM_VERSION >= 10")
 set(OPENAL_C11_VERSION 1.19.1)
