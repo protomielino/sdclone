@@ -1054,10 +1054,9 @@ bool GfScrCreateMenuWindow()
 
     float percentage = 0.90;
 
-    // TODO remove EXPERIMENTAL from title
     // Set window/icon captions
     std::ostringstream ossCaption;
-    ossCaption << GfuiApp().name() << " EXPERIMENTAL " << GfuiApp().version();
+    ossCaption << GfuiApp().name() << " " << GfuiApp().version();
 
     GfuiWindow = SDL_CreateWindow(ossCaption.str().c_str(),
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
