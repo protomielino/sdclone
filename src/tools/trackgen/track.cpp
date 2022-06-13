@@ -78,7 +78,7 @@ static float		*trackvertices;
 static float		*tracktexcoord;
 static unsigned int	*trackindices;
 
-static tdble		TrackStep;
+static tdble		TrackStep = 10.0;
 
 #ifndef sqr
 #define sqr(x) ((x)*(x))
