@@ -1737,7 +1737,8 @@ void ReadTrack4(tTrack *theTrack, void *TrackHandle,
     /*
      * camera definitions
      */
-    if (GfParmListSeekFirst(TrackHandle, TRK_SECT_CAM) == 0) {
+    if (GfParmListSeekFirst(TrackHandle, TRK_SECT_CAM) == 0 && 
+        GfParmGetEltNb(TrackHandle, TRK_SECT_CAM) > 0) {
     do {
         curCam = (tRoadCam*)calloc(1, sizeof(tRoadCam));
         if (!curCam) {
