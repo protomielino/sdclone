@@ -80,7 +80,7 @@ public class TrackLightProperties extends PropertyPanel
 		if (addTrackLightButton == null)
 		{
 			addTrackLightButton = new JButton();
-			addTrackLightButton.setBounds(10, 410, 120, 25);
+			addTrackLightButton.setBounds(10, 410, 140, 25);
 			addTrackLightButton.setText("Add Track Light");
 			addTrackLightButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -109,7 +109,7 @@ public class TrackLightProperties extends PropertyPanel
 		if (deleteTrackLightButton == null)
 		{
 			deleteTrackLightButton = new JButton();
-			deleteTrackLightButton.setBounds(170, 410, 120, 25);
+			deleteTrackLightButton.setBounds(170, 410, 140, 25);
 			deleteTrackLightButton.setText("Delete Track Light");
 			deleteTrackLightButton.addActionListener(new java.awt.event.ActionListener()
 			{

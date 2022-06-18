@@ -64,11 +64,11 @@ public class ImageProperties extends PropertyPanel
 		setLayout(null);
 		setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 
-		addLabel(this, 0, imageScaleLabel, "Path", 60);
-		addLabel(this, 1, pathLabel, "Image scale", 60);
+		addLabel(this, 0, imageScaleLabel, "Path", 80);
+		addLabel(this, 1, pathLabel, "Image scale", 80);
 
-		addTextField(this, 0, pathTextField, Editor.getProperties().getImage(), 90, 295);
-		addTextField(this, 1, imageScaleTextField, Editor.getProperties().getImageScale(), 90, 50);
+		addTextField(this, 0, pathTextField, Editor.getProperties().getImage(), 100, 285);
+		addTextField(this, 1, imageScaleTextField, Editor.getProperties().getImageScale(), 100, 50);
 
 		this.add(getBrowseButton(), null);
 	}

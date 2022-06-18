@@ -81,7 +81,7 @@ public class SurfaceProperties extends PropertyPanel
 		if (addSurfaceButton == null)
 		{
 			addSurfaceButton = new JButton();
-			addSurfaceButton.setBounds(10, 610, 100, 25);
+			addSurfaceButton.setBounds(10, 610, 120, 25);
 			addSurfaceButton.setText("Add Surface");
 			addSurfaceButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -110,7 +110,7 @@ public class SurfaceProperties extends PropertyPanel
 		if (deleteSurfaceButton == null)
 		{
 			deleteSurfaceButton = new JButton();
-			deleteSurfaceButton.setBounds(130, 610, 120, 25);
+			deleteSurfaceButton.setBounds(150, 610, 120, 25);
 			deleteSurfaceButton.setText("Delete Surface");
 			deleteSurfaceButton.addActionListener(new java.awt.event.ActionListener()
 			{
