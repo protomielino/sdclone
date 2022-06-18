@@ -89,7 +89,7 @@ public class TrackProperties extends PropertyPanel
 		addLabel(this, 2, profilStepsLengthLabel, "Profil Steps Length", 130);
 		addLabel(this, 3, racelineWidthscaleLabel, "Raceline Width Scale", 130);
 		addLabel(this, 4, racelineIntLabel, "Raceline Int", 130);
-		addLabel(this, 5, racelineExtLabel, "Racelin Ext", 130);
+		addLabel(this, 5, racelineExtLabel, "Raceline Ext", 130);
 
 		addTextField(this, 0, widthTextField, Editor.getProperties().getMainTrack().getWidth(), 140, 50);
 
