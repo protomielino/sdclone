@@ -611,7 +611,7 @@ public class XmlWriter
 	{
 		String tmp = "\n";
 		tmp += "file                : " + Editor.getProperties().getHeader().getName() + ".xml\n";
-		tmp += "auto generated      : by Track Editor\n";
+		tmp += "auto generated      : by " + Editor.getProperties().title + "\n";
 		tmp += "version             : " + Editor.getProperties().version + "\n";
 		tmp += "copyright           : (C) 2005 by Charalampos Alexopoulos\n";
 		tmp += "email               : \n";
