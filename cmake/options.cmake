@@ -86,6 +86,8 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_PACKAGING true CACHE BOOL "Enable Packaging for distribution")
 
+    SET(OPTION_TRACKEDITOR true CACHE BOOL "Build the TrackEditor (Requires Java)")
+
     IF(APPLE)
       # Automatically set OPTION_USE_MACPORTS (at least until someone fixes the regular APPLE build)
       MESSAGE(STATUS "Automatically set OPTION_USE_MACPORTS (at least until someone fixes the regular APPLE build)")
