@@ -195,7 +195,8 @@ public class SurfaceProperties extends PropertyPanel
 		private JTextField 			damageTextField					= new JTextField();
 		private JLabel				reboundLabel					= new JLabel();
 		private JTextField 			reboundTextField				= new JTextField();
-		private JButton				browseButton					= null;
+		private JButton				textureNameButton				= null;
+		private JButton				racelineNameButton				= null;
 
 		private final String sep = System.getProperty("file.separator");
 
@@ -264,11 +265,12 @@ public class SurfaceProperties extends PropertyPanel
 			addTextField(this, 16, bumpSizeTextField, getString(surface.getBumpSize()), 180, 100);
 			addTextField(this, 17, roughnessTextField, getString(surface.getRoughness()), 180, 100);
 			addTextField(this, 18, roughnessWavelengthTextField, getString(surface.getRoughnessWavelength()), 180, 100);
-			addTextField(this, 19, racelineNameTextField, surface.getRacelineName(), 180, 100);
+			addTextField(this, 19, racelineNameTextField, surface.getRacelineName(), 180, 180);
 			addTextField(this, 20, damageTextField, surface.getDammage(), 180, 100);
 			addTextField(this, 21, reboundTextField, getString(surface.getRebound()), 180, 100);
 
-			add(getBrowseButton(), null);
+			add(getTextureNameButton(), null);
+			add(getRacelineNameButton(), null);
 		}
 
 		private String getString(double value)
@@ -320,29 +322,29 @@ public class SurfaceProperties extends PropertyPanel
 		}
 
 		/**
-		 * This method initializes browseButton
+		 * This method initializes textureNameButton
 		 *
 		 * @return javax.swing.JButton
 		 */
-		private JButton getBrowseButton()
+		private JButton getTextureNameButton()
 		{
-			if (browseButton == null)
+			if (textureNameButton == null)
 			{
-				browseButton = new JButton();
-				browseButton.setBounds(370, 183, 80, 25);
-				browseButton.setText("Browse");
-				browseButton.addActionListener(new java.awt.event.ActionListener()
+				textureNameButton = new JButton();
+				textureNameButton.setBounds(370, 183, 80, 25);
+				textureNameButton.setText("Browse");
+				textureNameButton.addActionListener(new java.awt.event.ActionListener()
 				{
 					public void actionPerformed(java.awt.event.ActionEvent e)
 					{
-						selectFile();
+						textureNameFile();
 					}
 				});
 			}
-			return browseButton;
+			return textureNameButton;
 		}
 
-		protected void selectFile()
+		protected void textureNameFile()
 		{
 			JFileChooser fc = new JFileChooser();
 			fc.setSelectedFiles(null);
@@ -364,6 +366,54 @@ public class SurfaceProperties extends PropertyPanel
 				if (pathToFile.equals(Editor.getProperties().getPath()))
 					fileName = fileName.substring(index + 1);
 				textureNameTextField.setText(fileName);
+			}
+		}
+		
+		/**
+		 * This method initializes racelineNameButton
+		 *
+		 * @return javax.swing.JButton
+		 */
+		private JButton getRacelineNameButton()
+		{
+			if (racelineNameButton == null)
+			{
+				racelineNameButton = new JButton();
+				racelineNameButton.setBounds(370, 482, 80, 25);
+				racelineNameButton.setText("Browse");
+				racelineNameButton.addActionListener(new java.awt.event.ActionListener()
+				{
+					public void actionPerformed(java.awt.event.ActionEvent e)
+					{
+						racelineNameFile();
+					}
+				});
+			}
+			return racelineNameButton;
+		}
+
+		protected void racelineNameFile()
+		{
+			JFileChooser fc = new JFileChooser();
+			fc.setSelectedFiles(null);
+			fc.setSelectedFile(null);
+			fc.rescanCurrentDirectory();
+			fc.setApproveButtonMnemonic(0);
+			fc.setDialogTitle("Surface texture image file selection");
+			fc.setVisible(true);
+			fc.setAcceptAllFileFilterUsed(false);
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
+			fc.addChoosableFileFilter(filter);
+			fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
+			int result = fc.showDialog(this, "Ok");
+			if (result == JFileChooser.APPROVE_OPTION)
+			{
+				String fileName = fc.getSelectedFile().toString();
+				int index = fileName.lastIndexOf(sep);
+				String pathToFile = fileName.substring(0, index);
+				if (pathToFile.equals(Editor.getProperties().getPath()))
+					fileName = fileName.substring(index + 1);
+				racelineNameTextField.setText(fileName);
 			}
 		}
 	}
