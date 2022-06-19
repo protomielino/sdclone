@@ -54,9 +54,9 @@ public class TrackgenPanel extends JDialog implements Runnable
 	private JLabel			xSizeLabel		= null;
 	private JLabel			ySizeLabel		= null;
 	private JTextField		nodesTextField	= null;
-	private JPanel jPanel1 = null;
-	private JLabel trackgenLabel = null;
-	private JLabel waitLabel = null;
+	private JPanel			jPanel1			= null;
+	private JLabel			trackgenLabel	= null;
+	private JLabel			waitLabel		= null;
 	
 	public TrackgenPanel(Frame parent)
 	{
@@ -92,7 +92,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 			String ls_str;
 			String tmp = "";
 
-			Process ls_proc = Runtime.getRuntime().exec("trackgen" + args);
+			Process ls_proc = Runtime.getRuntime().exec("sd2-trackgen" + args);
 			// get its output (your input) stream
 			BufferedReader ls_in = new BufferedReader(new InputStreamReader(ls_proc.getInputStream()));
 
