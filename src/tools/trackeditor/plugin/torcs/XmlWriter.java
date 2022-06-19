@@ -509,7 +509,7 @@ public class XmlWriter
 			cameras.addContent(el);
 		}
 
-		return cameras;
+		return root;
 	}
 
 	private synchronized static Element getLights()
@@ -573,7 +573,7 @@ public class XmlWriter
 			lights.addContent(el);
 		}
 
-		return lights;
+		return root;
 	}
 
 	private synchronized static Element getObjects()

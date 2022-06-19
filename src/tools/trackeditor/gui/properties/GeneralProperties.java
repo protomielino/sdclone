@@ -39,14 +39,16 @@ import utils.Editor;
  */
 public class GeneralProperties extends PropertyPanel
 {
-	private JTextField			nameTextField			= new JTextField();
 	private JLabel				nameLabel				= new JLabel();
-	private JComboBox<String>	categoryComboBox		= null;
+	private JTextField			nameTextField			= new JTextField();
 	private JLabel				categoryLabel			= new JLabel();
-	private JComboBox<String>	subcategoryComboBox		= null;
+	private JComboBox<String>	categoryComboBox		= null;
 	private JLabel				subcategoryLabel		= new JLabel();
-	private JComboBox<String>	versionComboBox			= null;
+	private JComboBox<String>	subcategoryComboBox		= null;
 	private JLabel				versionLabel			= new JLabel();
+	private JComboBox<String>	versionComboBox			= null;
+	private JLabel				skyVersionLabel			= new JLabel();
+	private JComboBox<String>	skyVersionComboBox		= null;
 	private JLabel				pathLabel				= new JLabel();
 	private JTextField			pathTextField			= new JTextField();
 	private JButton				browseButton			= null;
@@ -74,23 +76,25 @@ public class GeneralProperties extends PropertyPanel
 		setLayout(null);
 		setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 
-		addLabel(this, 0, nameLabel, "Track Name", 110);
-		addLabel(this, 1, categoryLabel, "Track Category", 110);
-		addLabel(this, 2, subcategoryLabel, "Track Subcategory", 110);
-		addLabel(this, 3, versionLabel, "Track Version", 110);
-		addLabel(this, 4, pathLabel, "Path", 80);
-		addLabel(this, 5, authorLabel, "Author", 80);
-		addLabel(this, 6, descriptionLabel, "Description", 80);
+		addLabel(this, 0, nameLabel, "Name", 110);
+		addLabel(this, 1, categoryLabel, "Category", 110);
+		addLabel(this, 2, subcategoryLabel, "Subcategory", 110);
+		addLabel(this, 3, versionLabel, "Version", 110);
+		addLabel(this, 4, skyVersionLabel, "Sky Version", 110);
+		addLabel(this, 5, pathLabel, "Path", 80);
+		addLabel(this, 6, authorLabel, "Author", 80);
+		addLabel(this, 7, descriptionLabel, "Description", 80);
 
 		addTextField(this, 0, nameTextField, Editor.getProperties().getHeader().getName(), 130, 150);
 
 		add(getCategoryComboBox(), null);
 		add(getSubcategoryComboBox(), null);
 		add(getVersionComboBox(), null);
+		add(getSkyVersionComboBox(), null);
 
-		addTextField(this, 4, pathTextField, Editor.getProperties().getPath(), 80, 305);
-		addTextField(this, 5, authorTextField, Editor.getProperties().getHeader().getAuthor(), 80, 390);
-		addTextField(this, 6, descriptionTextField, Editor.getProperties().getHeader().getDescription(), 80, 390);
+		addTextField(this, 5, pathTextField, Editor.getProperties().getPath(), 80, 305);
+		addTextField(this, 6, authorTextField, Editor.getProperties().getHeader().getAuthor(), 80, 390);
+		addTextField(this, 7, descriptionTextField, Editor.getProperties().getHeader().getDescription(), 80, 390);
 
 		add(getBrowseButton(), null);
 	}
@@ -150,6 +154,29 @@ public class GeneralProperties extends PropertyPanel
 	}
 
 	/**
+	 * This method initializes skyVersionComboBox
+	 *
+	 * @return javax.swing.JComboBox
+	 */
+	public JComboBox<String> getSkyVersionComboBox()
+	{
+		if (skyVersionComboBox == null)
+		{
+			String[] items = {"none", "1"};
+			skyVersionComboBox = new JComboBox<String>(items);
+			skyVersionComboBox.setBounds(130, 110, 100, 20);
+			int version = Editor.getProperties().getHeader().getSkyVersion();
+			String stringVersion;
+			if (version == Integer.MAX_VALUE)
+				stringVersion = "none";
+			else
+				stringVersion = version + "";
+			skyVersionComboBox.setSelectedItem(stringVersion);
+		}
+		return skyVersionComboBox;
+	}
+
+	/**
 	 * This method initializes browseButton
 	 *
 	 * @return javax.swing.JButton
@@ -159,7 +186,7 @@ public class GeneralProperties extends PropertyPanel
 		if (browseButton == null)
 		{
 			browseButton = new JButton();
-			browseButton.setBounds(390, 107, 80, 25);
+			browseButton.setBounds(390, 132, 80, 25);
 			browseButton.setText("Browse");
 			browseButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -258,6 +285,18 @@ public class GeneralProperties extends PropertyPanel
 		if (version != Editor.getProperties().getHeader().getVersion())
 		{
 			Editor.getProperties().getHeader().setVersion(version);
+			frame.documentIsModified = true;
+		}
+
+		String skyVersionString = (String) getSkyVersionComboBox().getSelectedItem();
+		int skyVersion;
+		if (skyVersionString == "none")
+			skyVersion = Integer.MAX_VALUE;
+		else
+			skyVersion = Integer.parseInt(skyVersionString);
+		if (skyVersion != Editor.getProperties().getHeader().getSkyVersion())
+		{
+			Editor.getProperties().getHeader().setSkyVersion(skyVersion);
 			frame.documentIsModified = true;
 		}
 

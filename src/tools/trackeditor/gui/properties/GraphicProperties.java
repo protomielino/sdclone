@@ -134,7 +134,7 @@ public class GraphicProperties extends PropertyPanel
 		addTextField(this, 0, descriptionTextField, Editor.getProperties().getGraphic().getDescription(), 140, 150);
 		addTextField(this, 1, descriptionNightTextField, Editor.getProperties().getGraphic().getDescriptionNight(), 140, 150);
 		addTextField(this, 2, descriptionRainNightTextField, Editor.getProperties().getGraphic().getDescriptionRainNight(), 140, 150);
-		addTextField(this, 3, backgroundImageTextField, Editor.getProperties().getGraphic().getBackgroundImage(), 140, 255);
+		addTextField(this, 3, backgroundImageTextField, Editor.getProperties().getGraphic().getBackgroundImage(), 140, 245);
 
 		add(getBackgroundTypeComboBox(), null);
 
@@ -189,7 +189,7 @@ public class GraphicProperties extends PropertyPanel
 		if (browseButton == null)
 		{
 			browseButton = new JButton();
-			browseButton.setBounds(400, 82, 80, 25);
+			browseButton.setBounds(390, 82, 80, 25);
 			browseButton.setText("Browse");
 			browseButton.addActionListener(new java.awt.event.ActionListener()
 			{

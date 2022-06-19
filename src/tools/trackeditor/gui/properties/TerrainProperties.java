@@ -134,8 +134,8 @@ public class TerrainProperties extends PropertyPanel
 		addTextField(this, 5, maximumAltitudeTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getMaximumAltitude(), 120, 100);
 		addTextField(this, 6, minimumAltitudeTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getMinimumAltitude(), 120, 100);
 		addTextField(this, 7, groupSizeTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getGroupSize(), 120, 100);
-		addTextField(this, 8, elevationMapTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getElevationMap(), 120, 250);
-		addTextField(this, 9, reliefFileTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getReliefFile(), 120, 250);
+		addTextField(this, 8, elevationMapTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getElevationMap(), 120, 265);
+		addTextField(this, 9, reliefFileTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getReliefFile(), 120, 265);
 
 		this.add(getSurfaceComboBox(), null);
 		this.add(getDefaultButton(), null);
