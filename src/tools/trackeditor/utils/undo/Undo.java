@@ -1,6 +1,6 @@
 /*
  *   Undo.java
- *   Created on 29 Απρ 2005
+ *   Created on 29 ΓΓ°Γ± 2005
  *
  *    The Undo.java is part of TrackEditor-0.6.0.
  *

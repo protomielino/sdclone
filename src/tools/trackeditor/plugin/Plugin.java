@@ -1,6 +1,6 @@
 /*
  *   Plugin.java
- *   Created on 9 Απρ 2005
+ *   Created on 9 ΓΓ°Γ± 2005
  *
  *    The Plugin.java is part of TrackEditor-0.6.0.
  *

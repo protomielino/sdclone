@@ -1,6 +1,6 @@
 /*
  *   StatusBar.java
- *   Created on 5 Δεκ 2004
+ *   Created on 5 Γ„Γ¥Γª 2004
  *
  *    The StatusBar.java is part of TrackEditor-0.3.0.
  *

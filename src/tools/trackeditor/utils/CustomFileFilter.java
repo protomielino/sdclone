@@ -1,6 +1,6 @@
 /*
  *   CustomFileFilter.java
- *   Created on 1 Απρ 2005
+ *   Created on 1 ΓΓ°Γ± 2005
  *
  *    The CustomFileFilter.java is part of TrackEditor-0.5.0.
  *

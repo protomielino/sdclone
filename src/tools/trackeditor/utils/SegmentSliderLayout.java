@@ -1,6 +1,6 @@
 /*
  *   SegmentSliderLayout.java
- *   Created on 28 Ã·Ò 2005
+ *   Created on 28 √å√°√± 2005
  *
  *    The SegmentSliderLayout.java is part of TrackEditor-0.3.1.
  *

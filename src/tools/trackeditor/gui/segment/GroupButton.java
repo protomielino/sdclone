@@ -1,6 +1,6 @@
 /*
  *   GroupButton.java
- *   Created on 27 Απρ 2005
+ *   Created on 27 ΓΓ°Γ± 2005
  *
  *    The GroupButton.java is part of TrackEditor-0.6.0.
  *

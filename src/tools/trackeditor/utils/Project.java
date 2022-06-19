@@ -1,6 +1,6 @@
 /*
  *   Project.java
- *   Created on 1 Ìáú 2005
+ *   Created on 1 ÃŒÃ¡Ãº 2005
  *
  *    The Project.java is part of TrackEditor-0.6.0.
  *
