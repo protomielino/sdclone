@@ -143,6 +143,12 @@ public class XmlReader
         if (cameras == null)
             return;
 
+        if (Editor.getProperties().getHeader().getVersion() == 3)
+        	cameras = getChildWithName(cameras, "list");
+        
+        if (cameras == null)
+            return;
+
         Vector<Camera> cameraData = new Vector<Camera>();
         List<Element> sections = cameras.getChildren();
         Iterator<Element> it = sections.iterator();
@@ -171,6 +177,12 @@ public class XmlReader
     {
         Element lights = getChildWithName(root, "Track Lights");
 
+        if (lights == null)
+            return;
+
+        if (Editor.getProperties().getHeader().getVersion() == 3)
+        	lights = getChildWithName(lights, "List");
+        
         if (lights == null)
             return;
 

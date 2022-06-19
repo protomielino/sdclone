@@ -478,11 +478,19 @@ public class XmlWriter
 	{
 		Element cameras = new Element("section");
 		cameras.setAttribute(new Attribute("name", "Cameras"));
+		Element root = cameras;
 
 		Vector<Camera> cameraData = Editor.getProperties().getCameras();
 
 		if (cameraData == null)
 			return cameras;
+
+		if (Editor.getProperties().getHeader().getVersion() == 3)
+		{
+			cameras = new Element("section");
+			cameras.setAttribute(new Attribute("name", "list"));
+			root.addContent(cameras);
+		}
 
 		for (int i = 0; i < cameraData.size(); i++)
 		{
@@ -508,11 +516,19 @@ public class XmlWriter
 	{
 		Element lights = new Element("section");
 		lights.setAttribute(new Attribute("name", "Track Lights"));
+		Element root = lights;
 
 		Vector<TrackLight> lightData = Editor.getProperties().getTrackLights();
 
 		if (lightData == null)
 			return lights;
+
+		if (Editor.getProperties().getHeader().getVersion() == 3)
+		{
+			lights = new Element("section");
+			lights.setAttribute(new Attribute("name", "List"));
+			root.addContent(lights);
+		}
 
 		for (int i = 0; i < lightData.size(); i++)
 		{
