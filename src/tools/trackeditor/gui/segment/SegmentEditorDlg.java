@@ -322,7 +322,6 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			if (!shape.getType().equals("str"))
 			{
 				radiusEndSlider.setMethod("RadiusEnd");
-				//radiusEndSlider.setValue(167);
 			}
 		}
 		return radiusEndSlider;

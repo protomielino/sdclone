@@ -343,6 +343,12 @@ public class SegmentSlider extends JPanel
 		else
 		{
 			this.value = val * this.realToTextCoeff;
+			if (value > getSlider().getMaximum())
+			{
+				int newMaximum = (int) Math.ceil(value);
+				System.out.println("Increasing slider maximum to " + newMaximum + " was " + getSlider().getMaximum());
+				getSlider().setMaximum(newMaximum);
+			}
 			getTextField().setText(value + "");
 			getTextField().setEnabled(true);
 			getSlider().setValue((int) value);
