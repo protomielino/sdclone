@@ -23,7 +23,6 @@ package gui;
 import gui.properties.PropertiesDialog;
 import gui.splash.SplashScreen;
 import gui.view.CircuitView;
-import miscel.NoNewFolderFileChooser;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
@@ -48,6 +47,7 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -57,6 +57,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import plugin.Plugin;
@@ -223,7 +224,9 @@ public class EditorFrame extends JFrame
 	{
 		String tmp = "";
 		String filename = Editor.getProperties().getPath() +sep+"project.xml";
-		NoNewFolderFileChooser fc = new NoNewFolderFileChooser();
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+		JFileChooser fc = new JFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
@@ -236,7 +239,8 @@ public class EditorFrame extends JFrame
 		filter.setDescription("*.prj.xml");
 		fc.setFileFilter(filter);
 		int result = fc.showOpenDialog(this);
-		if (result == NoNewFolderFileChooser.APPROVE_OPTION)
+		UIManager.put("FileChooser.readOnly", old);
+		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			tmp = fc.getSelectedFile().toString();
 			filename = tmp;
@@ -1303,7 +1307,9 @@ public class EditorFrame extends JFrame
 		{
 			String tmp = "";
 			//			String filename = Editor.getProperties().getPath();
-			NoNewFolderFileChooser fc = new NoNewFolderFileChooser();
+			Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
+			UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+			JFileChooser fc = new JFileChooser();
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
 			fc.rescanCurrentDirectory();
@@ -1315,7 +1321,8 @@ public class EditorFrame extends JFrame
 			fc.addChoosableFileFilter(filter);
 			fc.setCurrentDirectory(new File(System.getProperty("user.dir") + "/tracks"));
 			int result = fc.showOpenDialog(this);
-			if (result == NoNewFolderFileChooser.APPROVE_OPTION)
+			UIManager.put("FileChooser.readOnly", old);
+			if (result == JFileChooser.APPROVE_OPTION)
 			{
 				tmp = fc.getSelectedFile().toString();
 				//Editor.getProperties().setImage(tmp);

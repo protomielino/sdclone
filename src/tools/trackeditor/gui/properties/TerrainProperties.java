@@ -28,14 +28,15 @@ import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import gui.EditorFrame;
-import miscel.NoNewFolderFileChooser;
 import utils.Editor;
 import utils.circuit.ObjectMap;
 import utils.circuit.Surface;
@@ -270,7 +271,9 @@ public class TerrainProperties extends PropertyPanel
 
 	protected void elevationMapFile()
 	{
-		NoNewFolderFileChooser fc = new NoNewFolderFileChooser();
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+		JFileChooser fc = new JFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
@@ -282,7 +285,8 @@ public class TerrainProperties extends PropertyPanel
 		fc.addChoosableFileFilter(filter);
 		fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
 		int result = fc.showOpenDialog(this);
-		if (result == NoNewFolderFileChooser.APPROVE_OPTION)
+		UIManager.put("FileChooser.readOnly", old);
+		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			String fileName = fc.getSelectedFile().toString();
 			int index = fileName.lastIndexOf(sep);
@@ -295,7 +299,9 @@ public class TerrainProperties extends PropertyPanel
 
 	protected void reliefFile()
 	{
-		NoNewFolderFileChooser fc = new NoNewFolderFileChooser();
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+		JFileChooser fc = new JFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
@@ -307,7 +313,8 @@ public class TerrainProperties extends PropertyPanel
 		fc.addChoosableFileFilter(filter);
 		fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
 		int result = fc.showOpenDialog(this);
-		if (result == NoNewFolderFileChooser.APPROVE_OPTION)
+		UIManager.put("FileChooser.readOnly", old);
+		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			String fileName = fc.getSelectedFile().toString();
 			int index = fileName.lastIndexOf(sep);
@@ -517,7 +524,9 @@ public class TerrainProperties extends PropertyPanel
 
 		protected void objectMapFile()
 		{
-			NoNewFolderFileChooser fc = new NoNewFolderFileChooser();
+			Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
+			UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+			JFileChooser fc = new JFileChooser();
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
 			fc.rescanCurrentDirectory();
@@ -529,7 +538,8 @@ public class TerrainProperties extends PropertyPanel
 			fc.addChoosableFileFilter(filter);
 			fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
 			int result = fc.showOpenDialog(this);
-			if (result == NoNewFolderFileChooser.APPROVE_OPTION)
+			UIManager.put("FileChooser.readOnly", old);
+			if (result == JFileChooser.APPROVE_OPTION)
 			{
 				String fileName = fc.getSelectedFile().toString();
 				int index = fileName.lastIndexOf(sep);

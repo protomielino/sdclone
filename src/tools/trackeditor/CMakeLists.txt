@@ -45,7 +45,6 @@ IF(Java_Development_FOUND AND Java_FOUND)
          gui/view/CircuitViewSelectionEvent.java
          gui/view/CircuitViewSelectionListener.java
          miscel/EPMath.java
-         miscel/NoNewFolderFileChooser.java
          plugin/Plugin.java
          plugin/torcs/NoOpEntityResolver.java
          plugin/torcs/TorcsPlugin.java

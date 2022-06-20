@@ -21,13 +21,14 @@
 package plugin.torcs;
 
 import gui.EditorFrame;
-import miscel.NoNewFolderFileChooser;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
+import javax.swing.UIManager;
 
 import plugin.Plugin;
 import utils.CustomFileFilter;
@@ -64,7 +65,9 @@ public class TorcsPlugin implements Plugin
 	public void importTrack()
 	{
 		String tmp = "";
-		NoNewFolderFileChooser fc = new NoNewFolderFileChooser();
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+		JFileChooser fc = new JFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
@@ -80,7 +83,8 @@ public class TorcsPlugin implements Plugin
 		filter.setDescription("*.xml");
 		fc.setFileFilter(filter);
 		int result = fc.showOpenDialog(editor);
-		if (result == NoNewFolderFileChooser.APPROVE_OPTION)
+		UIManager.put("FileChooser.readOnly", old);
+		if (result ==JFileChooser.APPROVE_OPTION)
 		{
 			tmp = fc.getSelectedFile().toString();
 			Editor.getProperties().getHeader().setName(tmp.substring(tmp.lastIndexOf(sep) + 1, tmp.lastIndexOf(".")));
