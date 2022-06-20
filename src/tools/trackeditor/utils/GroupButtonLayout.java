@@ -1,6 +1,6 @@
 /*
  *   GroupButtonLayout.java
- *   Created on 27 Áðñ 2005
+ *   Created on 27 ??? 2005
  *
  *    The GroupButtonLayout.java is part of TrackEditor-0.6.0.
  *

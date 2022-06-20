@@ -1,6 +1,6 @@
 /*
  *   XMLOutput.java
- *   Created on 2 Ìáú 2005
+ *   Created on 2 ??? 2005
  *
  *    The XMLOutput.java is part of TrackEditor-0.6.0.
  *

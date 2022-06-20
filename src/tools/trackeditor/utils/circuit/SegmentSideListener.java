@@ -1,6 +1,6 @@
 /*
  *   SegmentSideListener.java
- *   Created on 25 Áðñ 2005
+ *   Created on 25 ??? 2005
  *
  *    The SegmentSideListener.java is part of TrackEditor-0.6.0.
  *
