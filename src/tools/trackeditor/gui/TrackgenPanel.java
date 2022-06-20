@@ -76,7 +76,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 	{
 		this.setContentPane(getJPanel());
 		this.setTitle("Trackgen");
-		this.setSize(465, 320);
+		this.setSize(475, 320);
 
 	}
 	public void run()
@@ -106,7 +106,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 						if (tmp.equals("name"))
 						{
 							nameLabel.setText(ls_str);
-						} else if (tmp.equals("author"))
+						} else if (tmp.equals("authors"))
 						{
 							this.authorLabel.setText(ls_str);
 						} else if (tmp.equals("filename"))
