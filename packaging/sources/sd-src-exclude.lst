@@ -7,3 +7,4 @@
 *.psd
 *.svg*
 *-src.ac
+*.class

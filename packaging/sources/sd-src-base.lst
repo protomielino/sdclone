@@ -41,6 +41,7 @@ src/tools/accc
 src/tools/blender
 src/tools/nfs2ac
 src/tools/nfsperf
+src/tools/trackeditor
 src/tools/trackgen
 src/tools/xmlversion
 
