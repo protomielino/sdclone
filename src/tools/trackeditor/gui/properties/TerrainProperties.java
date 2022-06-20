@@ -275,7 +275,7 @@ public class TerrainProperties extends PropertyPanel
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
 		fc.setApproveButtonMnemonic(0);
-		fc.setDialogTitle("Surface texture image file selection");
+		fc.setDialogTitle("Elevation map image file selection");
 		fc.setVisible(true);
 		fc.setAcceptAllFileFilterUsed(false);
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
@@ -300,7 +300,7 @@ public class TerrainProperties extends PropertyPanel
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
 		fc.setApproveButtonMnemonic(0);
-		fc.setDialogTitle("Surface texture image file selection");
+		fc.setDialogTitle("Relief image file selection");
 		fc.setVisible(true);
 		fc.setAcceptAllFileFilterUsed(false);
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
@@ -461,11 +461,11 @@ public class TerrainProperties extends PropertyPanel
 
 	private class ObjectMapPanel extends JPanel
 	{
-		private JLabel		nameLabel			= null;
-		private JTextField 	nameTextField		= null;
-		private JLabel		objectMapLabel		= null;
-		private JTextField	objectMapTextField	= null;
-		private JButton		browseButton		= null;
+		private JLabel		nameLabel			= new JLabel();
+		private JTextField 	nameTextField		= new JTextField();
+		private JLabel		objectMapLabel		= new JLabel();
+		private JTextField	objectMapTextField	= new JTextField();
+		private JButton		objectMapButton		= null;
 
 		/**
 		 *
@@ -481,76 +481,41 @@ public class TerrainProperties extends PropertyPanel
 		 */
 		private void initialize(String name, String objectMap)
 		{
-			nameLabel = new JLabel();
-			objectMapLabel = new JLabel();
-			nameLabel.setBounds(15, 15, 90, 20);
-			nameLabel.setText("Name");
-			objectMapLabel.setBounds(15, 40, 90, 20);
-			objectMapLabel.setText("Object Map");
-			add(nameLabel);
-			add(objectMapLabel);
 			setLayout(null);
-			add(getNameTextField(), null);
-			add(getObjectMapTextField(), null);
-			add(getBrowseButton(), null);
+			
+			addLabel(this, 0, nameLabel, "Name", 90);
+			addLabel(this, 1, objectMapLabel, "Environment Map", 90);
 
-			getNameTextField().setText(name);
-			getObjectMapTextField().setText(objectMap);
+			addTextField(this, 0, nameTextField, name, 115, 60);
+			addTextField(this, 1, objectMapTextField, objectMap, 115, 250);
+
+			add(getObjectMapButton(), null);
 		}
 
 		/**
-		 * This method initializes nameTextField
-		 *
-		 * @return javax.swing.JTextField
-		 */
-		public JTextField getNameTextField()
-		{
-			if (nameTextField == null)
-			{
-				nameTextField = new JTextField();
-				nameTextField.setBounds(105, 15, 60, 20);
-			}
-			return nameTextField;
-		}
-
-		/**
-		 * This method initializes objectMapTextField
-		 *
-		 * @return javax.swing.JTextField
-		 */
-		public JTextField getObjectMapTextField()
-		{
-			if (objectMapTextField == null)
-			{
-				objectMapTextField = new JTextField();
-				objectMapTextField.setBounds(105, 40, 260, 20);
-			}
-			return objectMapTextField;
-		}
-		/**
-		 * This method initializes browseButton
+		 * This method initializes objectMapButton
 		 *
 		 * @return javax.swing.JButton
 		 */
-		private JButton getBrowseButton()
+		private JButton getObjectMapButton()
 		{
-			if (browseButton == null)
+			if (objectMapButton == null)
 			{
-				browseButton = new JButton();
-				browseButton.setBounds(370, 37, 80, 25);
-				browseButton.setText("Browse");
-				browseButton.addActionListener(new java.awt.event.ActionListener()
+				objectMapButton = new JButton();
+				objectMapButton.setBounds(370, 32, 80, 25);
+				objectMapButton.setText("Browse");
+				objectMapButton.addActionListener(new java.awt.event.ActionListener()
 				{
 					public void actionPerformed(java.awt.event.ActionEvent e)
 					{
-						selectFile();
+						objectMapFile();
 					}
 				});
 			}
-			return browseButton;
+			return objectMapButton;
 		}
 
-		protected void selectFile()
+		protected void objectMapFile()
 		{
 			JFileChooser fc = new JFileChooser();
 			fc.setSelectedFiles(null);
@@ -571,7 +536,7 @@ public class TerrainProperties extends PropertyPanel
 				String pathToFile = fileName.substring(0, index);
 				if (pathToFile.equals(Editor.getProperties().getPath()))
 					fileName = fileName.substring(index + 1);
-				getObjectMapTextField().setText(fileName);
+				objectMapTextField.setText(fileName);
 			}
 		}
 	}
@@ -671,12 +636,12 @@ public class TerrainProperties extends PropertyPanel
         {
             utils.circuit.ObjectMap objectMap = objectMaps.elementAt(i);
             ObjectMapPanel panel = (ObjectMapPanel) tabbedPane.getComponentAt(i);
-            if (isDifferent(panel.getNameTextField().getText(), objectMap.getName(), stringResult))
+            if (isDifferent(panel.nameTextField.getText(), objectMap.getName(), stringResult))
             {
                 objectMap.setName(stringResult.getValue());
                 frame.documentIsModified = true;
             }
-            if (isDifferent(panel.getObjectMapTextField().getText(), objectMap.getObjectMap(), stringResult))
+            if (isDifferent(panel.objectMapTextField.getText(), objectMap.getObjectMap(), stringResult))
             {
                 objectMap.setObjectMap(stringResult.getValue());
                 frame.documentIsModified = true;
@@ -697,8 +662,8 @@ public class TerrainProperties extends PropertyPanel
 			{
 	            ObjectMapPanel panel = (ObjectMapPanel) tabbedPane.getComponentAt(objectMaps.size());
 				ObjectMap objectMap = new ObjectMap();
-				objectMap.setName(panel.getNameTextField().getText());
-				objectMap.setObjectMap(panel.getObjectMapTextField().getText());
+				objectMap.setName(panel.nameTextField.getText());
+				objectMap.setObjectMap(panel.objectMapTextField.getText());
 				objectMaps.add(objectMap);
 			}
 		}

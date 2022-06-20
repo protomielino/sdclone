@@ -51,7 +51,7 @@ public class GeneralProperties extends PropertyPanel
 	private JComboBox<String>	skyVersionComboBox		= null;
 	private JLabel				pathLabel				= new JLabel();
 	private JTextField			pathTextField			= new JTextField();
-	private JButton				browseButton			= null;
+	private JButton				pathButton				= null;
 	private JLabel				authorLabel				= new JLabel();
 	private JTextField			authorTextField			= new JTextField();
 	private JLabel				descriptionLabel		= new JLabel();
@@ -96,7 +96,7 @@ public class GeneralProperties extends PropertyPanel
 		addTextField(this, 6, authorTextField, Editor.getProperties().getHeader().getAuthor(), 80, 390);
 		addTextField(this, 7, descriptionTextField, Editor.getProperties().getHeader().getDescription(), 80, 390);
 
-		add(getBrowseButton(), null);
+		add(getPathButton(), null);
 	}
 
 	/**
@@ -177,18 +177,18 @@ public class GeneralProperties extends PropertyPanel
 	}
 
 	/**
-	 * This method initializes browseButton
+	 * This method initializes pathButton
 	 *
 	 * @return javax.swing.JButton
 	 */
-	public JButton getBrowseButton()
+	public JButton getPathButton()
 	{
-		if (browseButton == null)
+		if (pathButton == null)
 		{
-			browseButton = new JButton();
-			browseButton.setBounds(390, 132, 80, 25);
-			browseButton.setText("Browse");
-			browseButton.addActionListener(new java.awt.event.ActionListener()
+			pathButton = new JButton();
+			pathButton.setBounds(390, 132, 80, 25);
+			pathButton.setText("Browse");
+			pathButton.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
 				{
@@ -196,7 +196,7 @@ public class GeneralProperties extends PropertyPanel
 				}
 			});
 		}
-		return browseButton;
+		return pathButton;
 	}
 
 	/**

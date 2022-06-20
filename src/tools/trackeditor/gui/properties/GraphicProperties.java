@@ -85,7 +85,7 @@ public class GraphicProperties extends PropertyPanel
     private JTextField			shininessTextField				= new JTextField();
     private JLabel				fovFactorLabel					= new JLabel();
     private JTextField			fovFactorTextField				= new JTextField();
-	private JButton				browseButton					= null;
+	private JButton				backgroundImageButton			= null;
 
 	private final String sep = System.getProperty("file.separator");
 
@@ -156,7 +156,7 @@ public class GraphicProperties extends PropertyPanel
 		addTextField(this, 20, shininessTextField, Editor.getProperties().getGraphic().getShininess(), 140, 80);
 		addTextField(this, 21, fovFactorTextField, Editor.getProperties().getGraphic().getFovFactor(), 140, 80);
 
-		add(getBrowseButton(), null);
+		add(getBackgroundImageButton(), null);
 	}
 
 	/**
@@ -180,36 +180,36 @@ public class GraphicProperties extends PropertyPanel
 	}
 
 	/**
-	 * This method initializes browseButton
+	 * This method initializes backgroundImageButton
 	 *
 	 * @return javax.swing.JButton
 	 */
-	private JButton getBrowseButton()
+	private JButton getBackgroundImageButton()
 	{
-		if (browseButton == null)
+		if (backgroundImageButton == null)
 		{
-			browseButton = new JButton();
-			browseButton.setBounds(390, 82, 80, 25);
-			browseButton.setText("Browse");
-			browseButton.addActionListener(new java.awt.event.ActionListener()
+			backgroundImageButton = new JButton();
+			backgroundImageButton.setBounds(390, 82, 80, 25);
+			backgroundImageButton.setText("Browse");
+			backgroundImageButton.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
 				{
-					selectFile();
+					backgroundImageFile();
 				}
 			});
 		}
-		return browseButton;
+		return backgroundImageButton;
 	}
 
-	protected void selectFile()
+	protected void backgroundImageFile()
 	{
 		JFileChooser fc = new JFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
 		fc.setApproveButtonMnemonic(0);
-		fc.setDialogTitle("Surface texture image file selection");
+		fc.setDialogTitle("Background image file selection");
 		fc.setVisible(true);
 		fc.setAcceptAllFileFilterUsed(false);
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");

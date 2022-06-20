@@ -41,7 +41,7 @@ public class ImageProperties extends PropertyPanel
 {
 	private JLabel		pathLabel				= new JLabel();
 	private JTextField	pathTextField			= new JTextField();
-	private JButton		browseButton			= null;
+	private JButton		pathButton				= null;
 	private JLabel 		imageScaleLabel			= new JLabel();
 	private JTextField	imageScaleTextField		= new JTextField();
 
@@ -70,22 +70,22 @@ public class ImageProperties extends PropertyPanel
 		addTextField(this, 0, pathTextField, Editor.getProperties().getImage(), 100, 285);
 		addTextField(this, 1, imageScaleTextField, Editor.getProperties().getImageScale(), 100, 50);
 
-		this.add(getBrowseButton(), null);
+		this.add(getPathButton(), null);
 	}
 
 	/**
-	 * This method initializes browseButton
+	 * This method initializes pathButton
 	 *
 	 * @return javax.swing.JButton
 	 */
-	public JButton getBrowseButton()
+	public JButton getPathButton()
 	{
-		if (browseButton == null)
+		if (pathButton == null)
 		{
-			browseButton = new JButton();
-			browseButton.setBounds(390, 7, 80, 25);
-			browseButton.setText("Browse");
-			browseButton.addActionListener(new java.awt.event.ActionListener()
+			pathButton = new JButton();
+			pathButton.setBounds(390, 7, 80, 25);
+			pathButton.setText("Browse");
+			pathButton.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
 				{
@@ -93,7 +93,7 @@ public class ImageProperties extends PropertyPanel
 				}
 			});
 		}
-		return browseButton;
+		return pathButton;
 	}
 
 	/**

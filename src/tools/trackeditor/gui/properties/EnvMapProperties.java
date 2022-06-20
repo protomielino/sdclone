@@ -151,7 +151,7 @@ public class EnvMapProperties extends PropertyPanel
 		private JTextField 	nameTextField	= new JTextField();
 		private JLabel		envMapLabel		= new JLabel();
 		private JTextField	envMapTextField	= new JTextField();
-		private JButton		browseButton	= null;
+		private JButton		envMapButton	= null;
 
 		private final String sep = System.getProperty("file.separator");
 
@@ -177,40 +177,40 @@ public class EnvMapProperties extends PropertyPanel
 			addTextField(this, 0, nameTextField, name, 115, 60);
 			addTextField(this, 1, envMapTextField, environmentMap, 115, 250);
 
-			add(getBrowseButton(), null);
+			add(getEnvMapButton(), null);
 		}
 
 		/**
-		 * This method initializes browseButton
+		 * This method initializes envMapButton
 		 *
 		 * @return javax.swing.JButton
 		 */
-		private JButton getBrowseButton()
+		private JButton getEnvMapButton()
 		{
-			if (browseButton == null)
+			if (envMapButton == null)
 			{
-				browseButton = new JButton();
-				browseButton.setBounds(370, 33, 80, 25);
-				browseButton.setText("Browse");
-				browseButton.addActionListener(new java.awt.event.ActionListener()
+				envMapButton = new JButton();
+				envMapButton.setBounds(370, 33, 80, 25);
+				envMapButton.setText("Browse");
+				envMapButton.addActionListener(new java.awt.event.ActionListener()
 				{
 					public void actionPerformed(java.awt.event.ActionEvent e)
 					{
-						selectFile();
+						envMapFile();
 					}
 				});
 			}
-			return browseButton;
+			return envMapButton;
 		}
 
-		protected void selectFile()
+		protected void envMapFile()
 		{
 			JFileChooser fc = new JFileChooser();
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
 			fc.rescanCurrentDirectory();
 			fc.setApproveButtonMnemonic(0);
-			fc.setDialogTitle("Enfironment Mapping image file selection");
+			fc.setDialogTitle("Environment Mapping image file selection");
 			fc.setVisible(true);
 			fc.setAcceptAllFileFilterUsed(false);
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG images", "png");
