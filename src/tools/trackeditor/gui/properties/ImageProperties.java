@@ -112,7 +112,7 @@ public class ImageProperties extends PropertyPanel
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
 		fc.setApproveButtonMnemonic(0);
-		fc.setDialogTitle("Background image selection");
+		fc.setDialogTitle("Background image file selection");
 		fc.setVisible(true);
 		if(Editor.getProperties().getImage().equals(""))
 		{

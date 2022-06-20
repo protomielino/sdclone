@@ -58,6 +58,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import plugin.Plugin;
 import plugin.torcs.TorcsPlugin;
@@ -1312,8 +1313,11 @@ public class EditorFrame extends JFrame
 			fc.setSelectedFile(null);
 			fc.rescanCurrentDirectory();
 			fc.setApproveButtonMnemonic(0);
-			fc.setDialogTitle("Background image selection");
+			fc.setDialogTitle("Background image file selection");
 			fc.setVisible(true);
+			fc.setAcceptAllFileFilterUsed(false);
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
+			fc.addChoosableFileFilter(filter);
 			fc.setCurrentDirectory(new File(System.getProperty("user.dir") + "/tracks"));
 			int result = fc.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION)
