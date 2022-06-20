@@ -281,7 +281,7 @@ public class TerrainProperties extends PropertyPanel
 		fc.setDialogTitle("Elevation map image file selection");
 		fc.setVisible(true);
 		fc.setAcceptAllFileFilterUsed(false);
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG images", "png");
 		fc.addChoosableFileFilter(filter);
 		fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
 		int result = fc.showOpenDialog(this);
