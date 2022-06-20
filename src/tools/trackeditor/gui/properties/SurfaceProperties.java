@@ -23,6 +23,7 @@ package gui.properties;
 import java.io.File;
 import java.util.Vector;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -347,6 +348,8 @@ public class SurfaceProperties extends PropertyPanel
 		protected void textureNameFile()
 		{
 			JFileChooser fc = new JFileChooser();
+			Action folder = fc.getActionMap().get("New Folder");
+			folder.setEnabled(false);
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
 			fc.rescanCurrentDirectory();
@@ -357,7 +360,7 @@ public class SurfaceProperties extends PropertyPanel
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
 			fc.addChoosableFileFilter(filter);
 			fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
-			int result = fc.showDialog(this, "Ok");
+			int result = fc.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION)
 			{
 				String fileName = fc.getSelectedFile().toString();
@@ -395,6 +398,8 @@ public class SurfaceProperties extends PropertyPanel
 		protected void racelineNameFile()
 		{
 			JFileChooser fc = new JFileChooser();
+			Action folder = fc.getActionMap().get("New Folder");
+			folder.setEnabled(false);
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
 			fc.rescanCurrentDirectory();
@@ -405,7 +410,7 @@ public class SurfaceProperties extends PropertyPanel
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
 			fc.addChoosableFileFilter(filter);
 			fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
-			int result = fc.showDialog(this, "Ok");
+			int result = fc.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION)
 			{
 				String fileName = fc.getSelectedFile().toString();

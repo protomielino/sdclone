@@ -45,6 +45,7 @@ import java.io.FileOutputStream;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -223,6 +224,8 @@ public class EditorFrame extends JFrame
 		String tmp = "";
 		String filename = Editor.getProperties().getPath() +sep+"project.xml";
 		JFileChooser fc = new JFileChooser();
+		Action folder = fc.getActionMap().get("New Folder");
+		folder.setEnabled(false);
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
@@ -234,7 +237,7 @@ public class EditorFrame extends JFrame
 		filter.addValid(".prj.xml");
 		filter.setDescription("*.prj.xml");
 		fc.setFileFilter(filter);
-		int result = fc.showDialog(this, "Ok");
+		int result = fc.showOpenDialog(this);
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			tmp = fc.getSelectedFile().toString();
@@ -1303,6 +1306,8 @@ public class EditorFrame extends JFrame
 			String tmp = "";
 			//			String filename = Editor.getProperties().getPath();
 			JFileChooser fc = new JFileChooser();
+			Action folder = fc.getActionMap().get("New Folder");
+			folder.setEnabled(false);
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
 			fc.rescanCurrentDirectory();
@@ -1310,7 +1315,7 @@ public class EditorFrame extends JFrame
 			fc.setDialogTitle("Background image selection");
 			fc.setVisible(true);
 			fc.setCurrentDirectory(new File(System.getProperty("user.dir") + "/tracks"));
-			int result = fc.showDialog(this, "Ok");
+			int result = fc.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION)
 			{
 				tmp = fc.getSelectedFile().toString();

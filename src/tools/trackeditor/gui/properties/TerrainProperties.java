@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Vector;
 
+import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -271,6 +272,8 @@ public class TerrainProperties extends PropertyPanel
 	protected void elevationMapFile()
 	{
 		JFileChooser fc = new JFileChooser();
+		Action folder = fc.getActionMap().get("New Folder");
+		folder.setEnabled(false);
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
@@ -281,7 +284,7 @@ public class TerrainProperties extends PropertyPanel
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
 		fc.addChoosableFileFilter(filter);
 		fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
-		int result = fc.showDialog(this, "Ok");
+		int result = fc.showOpenDialog(this);
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			String fileName = fc.getSelectedFile().toString();
@@ -296,6 +299,8 @@ public class TerrainProperties extends PropertyPanel
 	protected void reliefFile()
 	{
 		JFileChooser fc = new JFileChooser();
+		Action folder = fc.getActionMap().get("New Folder");
+		folder.setEnabled(false);
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
@@ -306,7 +311,7 @@ public class TerrainProperties extends PropertyPanel
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
 		fc.addChoosableFileFilter(filter);
 		fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
-		int result = fc.showDialog(this, "Ok");
+		int result = fc.showOpenDialog(this);
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			String fileName = fc.getSelectedFile().toString();
@@ -518,6 +523,8 @@ public class TerrainProperties extends PropertyPanel
 		protected void objectMapFile()
 		{
 			JFileChooser fc = new JFileChooser();
+			Action folder = fc.getActionMap().get("New Folder");
+			folder.setEnabled(false);
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
 			fc.rescanCurrentDirectory();
@@ -525,10 +532,10 @@ public class TerrainProperties extends PropertyPanel
 			fc.setDialogTitle("Object Map image file selection");
 			fc.setVisible(true);
 			fc.setAcceptAllFileFilterUsed(false);
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG images", "png");
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
 			fc.addChoosableFileFilter(filter);
 			fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
-			int result = fc.showDialog(this, "Ok");
+			int result = fc.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION)
 			{
 				String fileName = fc.getSelectedFile().toString();

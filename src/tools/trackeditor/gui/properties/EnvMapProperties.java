@@ -23,6 +23,7 @@ package gui.properties;
 import java.io.File;
 import java.util.Vector;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -206,6 +207,8 @@ public class EnvMapProperties extends PropertyPanel
 		protected void envMapFile()
 		{
 			JFileChooser fc = new JFileChooser();
+			Action folder = fc.getActionMap().get("New Folder");
+			folder.setEnabled(false);
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
 			fc.rescanCurrentDirectory();
@@ -213,10 +216,10 @@ public class EnvMapProperties extends PropertyPanel
 			fc.setDialogTitle("Environment Mapping image file selection");
 			fc.setVisible(true);
 			fc.setAcceptAllFileFilterUsed(false);
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG images", "png");
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
 			fc.addChoosableFileFilter(filter);
 			fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
-			int result = fc.showDialog(this, "Ok");
+			int result = fc.showOpenDialog(this);
 			if (result == JFileChooser.APPROVE_OPTION)
 			{
 				String fileName = fc.getSelectedFile().toString();

@@ -25,6 +25,7 @@ import gui.EditorFrame;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
@@ -64,6 +65,8 @@ public class TorcsPlugin implements Plugin
 	{
 		String tmp = "";
 		JFileChooser fc = new JFileChooser();
+		Action folder = fc.getActionMap().get("New Folder");
+		folder.setEnabled(false);
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
@@ -78,7 +81,7 @@ public class TorcsPlugin implements Plugin
 		filter.addInvalid(".prj.xml");
 		filter.setDescription("*.xml");
 		fc.setFileFilter(filter);
-		int result = fc.showDialog(editor, "Ok");
+		int result = fc.showOpenDialog(editor);
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			tmp = fc.getSelectedFile().toString();

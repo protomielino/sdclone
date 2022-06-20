@@ -22,6 +22,7 @@ package gui.properties;
 
 import java.io.File;
 
+import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -205,6 +206,8 @@ public class GraphicProperties extends PropertyPanel
 	protected void backgroundImageFile()
 	{
 		JFileChooser fc = new JFileChooser();
+		Action folder = fc.getActionMap().get("New Folder");
+		folder.setEnabled(false);
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
@@ -215,7 +218,7 @@ public class GraphicProperties extends PropertyPanel
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
 		fc.addChoosableFileFilter(filter);
 		fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
-		int result = fc.showDialog(this, "Ok");
+		int result = fc.showOpenDialog(this);
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			String fileName = fc.getSelectedFile().toString();
