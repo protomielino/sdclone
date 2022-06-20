@@ -1097,7 +1097,7 @@ bool GfScrCreateMenuWindow()
     if ((!GLContext) || (!doublebuffer)) // || (!shared))
     {
         GfLogError("Unable to create an OpenGL context: SDL Error: %s\n", SDL_GetError());
-        GfLogError("\t GLContext = %d\n",GLContext);
+        GfLogError("\t GLContext = %p\n",GLContext);
         GfLogError("\t doublebuffer = %d\n",doublebuffer);
         GfLogError("\t shared = %d\n",shared);
         GfLogError("\t samples = %d\n",samples);
