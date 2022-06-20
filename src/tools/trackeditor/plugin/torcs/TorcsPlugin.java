@@ -21,13 +21,12 @@
 package plugin.torcs;
 
 import gui.EditorFrame;
+import miscel.NoNewFolderFileChooser;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 
 import plugin.Plugin;
@@ -60,13 +59,12 @@ public class TorcsPlugin implements Plugin
 		importAction = new ImportAction("Speed Dreams", null, "Speed Dreams xml file", null);
 		exportAction = new ExportAction("Speed Dreams", null, "Speed Dreams xml file", null);
 	}
+	
 
 	public void importTrack()
 	{
 		String tmp = "";
-		JFileChooser fc = new JFileChooser();
-		Action folder = fc.getActionMap().get("New Folder");
-		folder.setEnabled(false);
+		NoNewFolderFileChooser fc = new NoNewFolderFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
@@ -82,7 +80,7 @@ public class TorcsPlugin implements Plugin
 		filter.setDescription("*.xml");
 		fc.setFileFilter(filter);
 		int result = fc.showOpenDialog(editor);
-		if (result == JFileChooser.APPROVE_OPTION)
+		if (result == NoNewFolderFileChooser.APPROVE_OPTION)
 		{
 			tmp = fc.getSelectedFile().toString();
 			Editor.getProperties().getHeader().setName(tmp.substring(tmp.lastIndexOf(sep) + 1, tmp.lastIndexOf(".")));

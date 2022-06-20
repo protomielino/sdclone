@@ -25,7 +25,7 @@ import javax.swing.filechooser.FileFilter;
  * Example - create a new filter that filerts out all files
  * but gif and jpg image files:
  *
- *     JFileChooser chooser = new JFileChooser();
+ *     NoNewFolderFileChooser chooser = new NoNewFolderFileChooser();
  *     TorcsTuneFileFilter filter = new TorcsTuneFileFilter(
  *                   new String{"gif", "jpg"}, "JPEG & GIF Images")
  *     chooser.addChoosableFileFilter(filter);

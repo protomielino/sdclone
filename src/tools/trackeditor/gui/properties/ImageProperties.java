@@ -22,15 +22,13 @@ package gui.properties;
 
 import java.io.File;
 
-import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.border.EtchedBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import gui.EditorFrame;
+import miscel.NoNewFolderFileChooser;
 import utils.Editor;
 
 /**
@@ -105,9 +103,7 @@ public class ImageProperties extends PropertyPanel
 	{
 		String tmp = "";
 		String filename = Editor.getProperties().getImage();
-		JFileChooser fc = new JFileChooser();
-		Action folder = fc.getActionMap().get("New Folder");
-		folder.setEnabled(false);
+		NoNewFolderFileChooser fc = new NoNewFolderFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
@@ -128,7 +124,7 @@ public class ImageProperties extends PropertyPanel
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
 		fc.addChoosableFileFilter(filter);
 		int result = fc.showOpenDialog(this);
-		if (result == JFileChooser.APPROVE_OPTION)
+		if (result == NoNewFolderFileChooser.APPROVE_OPTION)
 		{
 			pathTextField.setText(fc.getSelectedFile().toString());
 		}

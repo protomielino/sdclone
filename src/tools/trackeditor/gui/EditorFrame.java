@@ -23,6 +23,7 @@ package gui;
 import gui.properties.PropertiesDialog;
 import gui.splash.SplashScreen;
 import gui.view.CircuitView;
+import miscel.NoNewFolderFileChooser;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
@@ -45,10 +46,8 @@ import java.io.FileOutputStream;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -224,9 +223,7 @@ public class EditorFrame extends JFrame
 	{
 		String tmp = "";
 		String filename = Editor.getProperties().getPath() +sep+"project.xml";
-		JFileChooser fc = new JFileChooser();
-		Action folder = fc.getActionMap().get("New Folder");
-		folder.setEnabled(false);
+		NoNewFolderFileChooser fc = new NoNewFolderFileChooser();
 		fc.setSelectedFiles(null);
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
@@ -239,7 +236,7 @@ public class EditorFrame extends JFrame
 		filter.setDescription("*.prj.xml");
 		fc.setFileFilter(filter);
 		int result = fc.showOpenDialog(this);
-		if (result == JFileChooser.APPROVE_OPTION)
+		if (result == NoNewFolderFileChooser.APPROVE_OPTION)
 		{
 			tmp = fc.getSelectedFile().toString();
 			filename = tmp;
@@ -1306,9 +1303,7 @@ public class EditorFrame extends JFrame
 		{
 			String tmp = "";
 			//			String filename = Editor.getProperties().getPath();
-			JFileChooser fc = new JFileChooser();
-			Action folder = fc.getActionMap().get("New Folder");
-			folder.setEnabled(false);
+			NoNewFolderFileChooser fc = new NoNewFolderFileChooser();
 			fc.setSelectedFiles(null);
 			fc.setSelectedFile(null);
 			fc.rescanCurrentDirectory();
@@ -1320,7 +1315,7 @@ public class EditorFrame extends JFrame
 			fc.addChoosableFileFilter(filter);
 			fc.setCurrentDirectory(new File(System.getProperty("user.dir") + "/tracks"));
 			int result = fc.showOpenDialog(this);
-			if (result == JFileChooser.APPROVE_OPTION)
+			if (result == NoNewFolderFileChooser.APPROVE_OPTION)
 			{
 				tmp = fc.getSelectedFile().toString();
 				//Editor.getProperties().setImage(tmp);
