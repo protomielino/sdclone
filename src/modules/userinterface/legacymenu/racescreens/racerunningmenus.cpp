@@ -550,6 +550,8 @@ rmAddKeys()
 {
     GfuiMenuDefaultKeysAdd(rmScreenHandle);
 
+    GfuiAddKey(rmScreenHandle, GFUIK_F1,  "Help", NULL, rmOpenHelpScreen, NULL);
+
     GfuiAddKey(rmScreenHandle, '-', "Slow down time",    (void*)-1, rmTimeMod, NULL);
     GfuiAddKey(rmScreenHandle, '+', "Accelerate time",   (void*)+1, rmTimeMod, NULL);
     GfuiAddKey(rmScreenHandle, '.', "Restore real time", (void*)0, rmTimeMod, NULL);
