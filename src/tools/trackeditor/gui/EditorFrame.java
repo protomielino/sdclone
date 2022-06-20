@@ -417,7 +417,7 @@ public class EditorFrame extends JFrame
 	{
 		String title = Editor.getProperties().title + " " + Editor.getProperties().version;
 		this.setTitle(title);
-		Image image = new ImageIcon("trackeditor/icon.png").getImage();
+		Image image = new ImageIcon("icon.png").getImage();
 		this.setIconImage(image);
 		setSize(new Dimension(800, 600));
 		Point p = new Point();
