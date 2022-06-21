@@ -306,10 +306,10 @@ public class TerrainProperties extends PropertyPanel
 		fc.setSelectedFile(null);
 		fc.rescanCurrentDirectory();
 		fc.setApproveButtonMnemonic(0);
-		fc.setDialogTitle("Relief image file selection");
+		fc.setDialogTitle("Relief file selection");
 		fc.setVisible(true);
 		fc.setAcceptAllFileFilterUsed(false);
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("RGB and PNG images", "rgb", "png");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("AC", "ac");
 		fc.addChoosableFileFilter(filter);
 		fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
 		int result = fc.showOpenDialog(this);
