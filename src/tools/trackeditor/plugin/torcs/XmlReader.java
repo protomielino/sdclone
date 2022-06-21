@@ -846,9 +846,21 @@ public class XmlReader
                 	{
                 		if (!actualUnit.equals(expectedUnit))
                 		{
-                			if (expectedUnit.equals("m") && actualUnit.equals("ft"))
+                			if (expectedUnit.equals("m") && (actualUnit.equals("ft") || actualUnit.equals("feet")))
                 			{
                 				out = out * 0.304801;
+                			}
+                			else if (expectedUnit.equals("m") && (actualUnit.equals("in") || actualUnit.equals("inch") || actualUnit.equals("inches")))
+                			{
+                				out = out * 0.0254;
+                			}
+                			else if (expectedUnit.equals("m") && actualUnit.equals("cm"))
+                			{
+                				out = out * 0.01;
+                			}
+                			else if (expectedUnit.equals("m") && actualUnit.equals("mm"))
+                			{
+                				out = out * 0.001;
                 			}
                 			else
                 			{
