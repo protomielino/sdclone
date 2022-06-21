@@ -92,9 +92,9 @@ public class XmlReader
         if (mainTrack == null)
             return;
 
-        Editor.getProperties().getMainTrack().setWidth(getAttrNumValue(mainTrack, "width"));
+        Editor.getProperties().getMainTrack().setWidth(getAttrNumValue(mainTrack, "width", "m"));
         Editor.getProperties().getMainTrack().setSurface(getAttrStrValue(mainTrack, "surface"));
-        Editor.getProperties().getMainTrack().setProfilStepsLength(getAttrNumValue(mainTrack, "profil steps length"));
+        Editor.getProperties().getMainTrack().setProfilStepsLength(getAttrNumValue(mainTrack, "profil steps length", "m"));
         Editor.getProperties().getMainTrack().setRacelineWidthscale(getAttrNumValue(mainTrack, "raceline widthscale"));
         Editor.getProperties().getMainTrack().setRacelineInt(getAttrNumValue(mainTrack, "raceline int"));
         Editor.getProperties().getMainTrack().setRacelineExt(getAttrNumValue(mainTrack, "raceline ext"));
@@ -396,8 +396,8 @@ public class XmlReader
 
         if (marks != null)
         {
-            data.getTurnMarks().setWidth(getAttrNumValue(marks, "width"));
-            data.getTurnMarks().setHeight(getAttrNumValue(marks, "height"));
+            data.getTurnMarks().setWidth(getAttrNumValue(marks, "width", "m"));
+            data.getTurnMarks().setHeight(getAttrNumValue(marks, "height", "m"));
             data.getTurnMarks().setVerticalSpace(getAttrNumValue(marks, "vertical space"));
             data.getTurnMarks().setHorizontalSpace(getAttrNumValue(marks, "horizontal space"));
         }
@@ -409,7 +409,7 @@ public class XmlReader
 	        data.getTerrainGeneration().setTrackStep(getAttrNumValue(terrain, "track step"));
 	        data.getTerrainGeneration().setBorderMargin(getAttrNumValue(terrain, "border margin"));
 	        data.getTerrainGeneration().setBorderStep(getAttrNumValue(terrain, "border step"));
-	        data.getTerrainGeneration().setBorderHeight(getAttrNumValue(terrain, "border height"));
+	        data.getTerrainGeneration().setBorderHeight(getAttrNumValue(terrain, "border height", "m"));
 	        data.getTerrainGeneration().setOrientation(getAttrStrValue(terrain, "orientation"));
 	        data.getTerrainGeneration().setMaximumAltitude(getAttrNumValue(terrain, "maximum altitude"));
 	        data.getTerrainGeneration().setMinimumAltitude(getAttrNumValue(terrain, "minimum altitude"));
@@ -481,8 +481,8 @@ public class XmlReader
         Editor.getProperties().getMainTrack().getPits().setMaxPits(getAttrIntValue(pits, "max pits"));
         Editor.getProperties().getMainTrack().getPits().setEnd(getAttrStrValue(pits, "end"));
         Editor.getProperties().getMainTrack().getPits().setExit(getAttrStrValue(pits, "exit"));
-        Editor.getProperties().getMainTrack().getPits().setLength(getAttrNumValue(pits, "length"));
-        Editor.getProperties().getMainTrack().getPits().setWidth(getAttrNumValue(pits, "width"));
+        Editor.getProperties().getMainTrack().getPits().setLength(getAttrNumValue(pits, "length", "m"));
+        Editor.getProperties().getMainTrack().getPits().setWidth(getAttrNumValue(pits, "width", "m"));
         Editor.getProperties().getMainTrack().getPits().setIndicator(getAttrIntValue(pits, "pit indicator"));
         Editor.getProperties().getMainTrack().getPits().setSpeedLimit(getAttrNumValue(pits, "speed limit"));
     }
@@ -500,18 +500,18 @@ public class XmlReader
        Editor.getProperties().getMainTrack().getPits().setStopBuildings(getAttrStrValue(mainTrack, "stop buildings"));
        Editor.getProperties().getMainTrack().getPits().setEnd(getAttrStrValue(mainTrack, "pit end"));
        Editor.getProperties().getMainTrack().getPits().setExit(getAttrStrValue(mainTrack, "pit exit"));
-       Editor.getProperties().getMainTrack().getPits().setLength(getAttrNumValue(mainTrack, "pit length"));
-       Editor.getProperties().getMainTrack().getPits().setWidth(getAttrNumValue(mainTrack, "pit width"));
+       Editor.getProperties().getMainTrack().getPits().setLength(getAttrNumValue(mainTrack, "pit length", "m"));
+       Editor.getProperties().getMainTrack().getPits().setWidth(getAttrNumValue(mainTrack, "pit width", "m"));
        Editor.getProperties().getMainTrack().getPits().setSpeedLimit(getAttrNumValue(mainTrack, "speed limit"));
    }
 
     private static void setSideV3(Element seg, SegmentSide part, String sPart)
     {
-        double width = getAttrNumValue(seg, sPart + "side width");
+        double width = getAttrNumValue(seg, sPart + "side width", "m");
         if (Double.isNaN(width))
         {
-            part.setSideStartWidth(getAttrNumValue(seg, sPart + "side start width"));
-            part.setSideEndWidth(getAttrNumValue(seg, sPart + "side end width"));
+            part.setSideStartWidth(getAttrNumValue(seg, sPart + "side start width", "m"));
+            part.setSideEndWidth(getAttrNumValue(seg, sPart + "side end width", "m"));
         }
         else
         {
@@ -521,8 +521,8 @@ public class XmlReader
         part.setSideSurface(getAttrStrValue(seg, sPart + "side surface"));
         part.setSideBankingType(getAttrStrValue(seg, sPart + "side type"));
         part.setBorderStyle(getAttrStrValue(seg, sPart + "border style"));
-        part.setBorderWidth(getAttrNumValue(seg, sPart + "border width"));
-        part.setBorderHeight(getAttrNumValue(seg, sPart + "border height"));
+        part.setBorderWidth(getAttrNumValue(seg, sPart + "border width", "m"));
+        part.setBorderHeight(getAttrNumValue(seg, sPart + "border height", "m"));
         part.setBorderSurface(getAttrStrValue(seg, sPart + "border surface"));
         part.setBarrierWidth(0);
         part.setBarrierHeight(0);
@@ -585,15 +585,15 @@ public class XmlReader
 
         if (shape.getType().equals("str"))
         {
-            shape.setLength(getAttrNumValue(seg, "lg"));
+            shape.setLength(getAttrNumValue(seg, "lg", "m"));
         } else
         {
             double arc = getAttrNumValue(seg, "arc");
             arc = (arc * Math.PI) / 180;
             ((Curve) shape).setArc(arc);
-            double startRad = getAttrNumValue(seg, "radius");
+            double startRad = getAttrNumValue(seg, "radius", "m");
             ((Curve) shape).setRadiusStart(startRad);
-            double endRad = getAttrNumValue(seg, "end radius");
+            double endRad = getAttrNumValue(seg, "end radius", "m");
             if (Double.isNaN(endRad))
             {
                 ((Curve) shape).setRadiusEnd(startRad);
@@ -642,22 +642,22 @@ public class XmlReader
 
         shape.setSurface(getAttrStrValue(seg, "surface"));
 
-        double z = getAttrNumValue(seg, "z start");
+        double z = getAttrNumValue(seg, "z start", "m");
         if (Double.isNaN(z))
         {
-            shape.setHeightStartLeft(getAttrNumValue(seg, "z start left"));
-            shape.setHeightStartRight(getAttrNumValue(seg, "z start right"));
+            shape.setHeightStartLeft(getAttrNumValue(seg, "z start left", "m"));
+            shape.setHeightStartRight(getAttrNumValue(seg, "z start right", "m"));
         }
         else
         {
             shape.setHeightStartLeft(z);
             shape.setHeightStartRight(z);
         }
-        z = getAttrNumValue(seg, "z end");
+        z = getAttrNumValue(seg, "z end", "m");
         if (Double.isNaN(z))
         {
-            shape.setHeightEndLeft(getAttrNumValue(seg, "z end left"));
-            shape.setHeightEndRight(getAttrNumValue(seg, "z end right"));
+            shape.setHeightEndLeft(getAttrNumValue(seg, "z end left", "m"));
+            shape.setHeightEndRight(getAttrNumValue(seg, "z end right", "m"));
         }
         else
         {
@@ -670,7 +670,7 @@ public class XmlReader
         shape.setBankingEnd(getAttrNumValue(seg, "banking end"));
         shape.setProfil(getAttrStrValue(seg, "profil"));
         shape.setProfilSteps(getAttrNumValue(seg, "profil steps"));
-        shape.setProfilStepsLength(getAttrNumValue(seg, "profil steps length"));
+        shape.setProfilStepsLength(getAttrNumValue(seg, "profil steps length", "m"));
         shape.setProfilStartTangent(getAttrNumValue(seg, "profil start tangent"));
         shape.setProfilEndTangent(getAttrNumValue(seg, "profil end tangent"));
         shape.setProfilStartTangentLeft(getAttrNumValue(seg, "profil start tangent left"));
@@ -696,11 +696,11 @@ public class XmlReader
         if (el != null)
         {
             part.setHasSide(true);
-            double width = getAttrNumValue(el, "width");
+            double width = getAttrNumValue(el, "width", "m");
             if (Double.isNaN(width))
             {
-                part.setSideStartWidth(getAttrNumValue(el, "start width"));
-                part.setSideEndWidth(getAttrNumValue(el, "end width"));
+                part.setSideStartWidth(getAttrNumValue(el, "start width", "m"));
+                part.setSideEndWidth(getAttrNumValue(el, "end width", "m"));
             }
             else
             {
@@ -717,8 +717,8 @@ public class XmlReader
         if (el != null)
         {
             part.setHasBorder(true);
-            part.setBorderWidth(getAttrNumValue(el, "width"));
-            part.setBorderHeight(getAttrNumValue(el, "height"));
+            part.setBorderWidth(getAttrNumValue(el, "width", "m"));
+            part.setBorderHeight(getAttrNumValue(el, "height", "m"));
             part.setBorderSurface(getAttrStrValue(el, "surface"));
             part.setBorderStyle(getAttrStrValue(el, "style"));
         }
@@ -729,8 +729,8 @@ public class XmlReader
         if (el != null)
         {
             part.setHasBarrier(true);
-            part.setBarrierWidth(getAttrNumValue(el, "width"));
-            part.setBarrierHeight(getAttrNumValue(el, "height"));
+            part.setBarrierWidth(getAttrNumValue(el, "width", "m"));
+            part.setBarrierHeight(getAttrNumValue(el, "height", "m"));
             part.setBarrierSurface(getAttrStrValue(el, "surface"));
             part.setBarrierStyle(getAttrStrValue(el, "style"));
         }
@@ -800,8 +800,7 @@ public class XmlReader
         return out;
     }
 
-    public synchronized static double getAttrNumValue(Element element,
-            String name)
+    public synchronized static double getAttrNumValue(Element element, String name)
     {
         double out = Double.NaN;
         Element e = getChildWithName(element, name);
@@ -816,6 +815,47 @@ public class XmlReader
                 catch (NumberFormatException exception)
                 {
                     exception.printStackTrace();
+                }
+            }
+        }
+        return out;
+    }
+
+    public synchronized static double getAttrNumValue(Element element, String name, String expectedUnit)
+    {
+        double out = Double.NaN;
+        Element e = getChildWithName(element, name);
+        if (e != null)
+        {
+            if (e.getName().equals("attnum"))
+            {
+                try
+                {
+                    out = Double.parseDouble(e.getAttributeValue("val"));
+                }
+                catch (NumberFormatException exception)
+                {
+                    exception.printStackTrace();
+                }
+                
+                if (!Double.isNaN(out))
+                {               
+                	String actualUnit = e.getAttributeValue("unit");
+               
+                	if (actualUnit != null && !actualUnit.isEmpty())
+                	{
+                		if (!actualUnit.equals(expectedUnit))
+                		{
+                			if (expectedUnit.equals("m") && actualUnit.equals("ft"))
+                			{
+                				out = out * 0.3048;
+                			}
+                			else
+                			{
+                				System.out.println("can't convert " + expectedUnit +" to " + actualUnit);
+                			}
+                		}
+                	}
                 }
             }
         }
