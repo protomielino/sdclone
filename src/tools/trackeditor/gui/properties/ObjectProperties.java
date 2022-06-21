@@ -20,14 +20,18 @@
  */
 package gui.properties;
 
+import java.io.File;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import gui.EditorFrame;
 import utils.Editor;
@@ -162,6 +166,9 @@ public class ObjectProperties extends PropertyPanel
 		private JTextField			deltaHeightTextField	= new JTextField();
 		private JLabel				deltaVertLabel			= new JLabel();
 		private JTextField			deltaVertTextField		= new JTextField();
+		private JButton				objectButton			= null;
+
+		private final String sep = System.getProperty("file.separator");
 
 		/**
 		 *
@@ -188,7 +195,7 @@ public class ObjectProperties extends PropertyPanel
 			addLabel(this, 6, deltaVertLabel, "Delta Vert", 160);
 
 			addTextField(this, 0, nameTextField, object.getName(), 120, 100);
-			addTextField(this, 1, objectTextField, object.getObject(), 120, 100);
+			addTextField(this, 1, objectTextField, object.getObject(), 120, 240);
 			addTextField(this, 2, colorTextField, getString(object.getColor()), 120, 100);
 
 			add(getOrientationTypeComboBox(), null);
@@ -197,6 +204,8 @@ public class ObjectProperties extends PropertyPanel
 			addTextField(this, 4, orientationTextField, getString(object.getOrientation()), 120, 100);
 			addTextField(this, 5, deltaHeightTextField, getString(object.getDeltaHeight()), 120, 100);
 			addTextField(this, 6, deltaVertTextField, getString(object.getDeltaVert()), 120, 100);
+			
+			add(getObjectButton(), null);
 		}
 
 		private String getString(double value)
@@ -230,6 +239,57 @@ public class ObjectProperties extends PropertyPanel
 				orientationTypeComboBox.setBounds(120, 85, 120, 20);
 			}
 			return orientationTypeComboBox;
+		}
+
+		/**
+		 * This method initializes objectButton
+		 *
+		 * @return javax.swing.JButton
+		 */
+		private JButton getObjectButton()
+		{
+			if (objectButton == null)
+			{
+				objectButton = new JButton();
+				objectButton.setBounds(370, 32, 80, 25);
+				objectButton.setText("Browse");
+				objectButton.addActionListener(new java.awt.event.ActionListener()
+				{
+					public void actionPerformed(java.awt.event.ActionEvent e)
+					{
+						objectFile();
+					}
+				});
+			}
+			return objectButton;
+		}
+
+		protected void objectFile()
+		{
+			Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
+			UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+			JFileChooser fc = new JFileChooser();
+			fc.setSelectedFiles(null);
+			fc.setSelectedFile(null);
+			fc.rescanCurrentDirectory();
+			fc.setApproveButtonMnemonic(0);
+			fc.setDialogTitle("Object file selection");
+			fc.setVisible(true);
+			fc.setAcceptAllFileFilterUsed(false);
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("AC and ACC models", "ac", "acc");
+			fc.addChoosableFileFilter(filter);
+			fc.setCurrentDirectory(new File(Editor.getProperties().getPath()));
+			int result = fc.showOpenDialog(this);
+			UIManager.put("FileChooser.readOnly", old);
+			if (result == JFileChooser.APPROVE_OPTION)
+			{
+				String fileName = fc.getSelectedFile().toString();
+				int index = fileName.lastIndexOf(sep);
+				String pathToFile = fileName.substring(0, index);
+				if (pathToFile.equals(Editor.getProperties().getPath()))
+					fileName = fileName.substring(index + 1);
+				objectTextField.setText(fileName);
+			}
 		}
 	}
 
