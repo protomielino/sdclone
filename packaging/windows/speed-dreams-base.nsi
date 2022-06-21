@@ -87,7 +87,6 @@ Section "!Base System" SEC01
   ; Executable and DLLs ... but no mod tool (see later)
   SetOutPath "$INSTDIR\bin"
   File /x sd2-*.* /x *.lib "${BUILD_INST_DIR}\bin\*.*"
-  File /x libzlib.dll /x zlib1.dll "${BUILD_INST_DIR}\bin\*.*"
 
   ; Core loadable modules (physics and graphics engines, track loader, ...)
   SetOutPath "$INSTDIR\lib\modules\graphic"
