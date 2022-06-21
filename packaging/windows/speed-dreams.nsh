@@ -63,6 +63,10 @@
 !define GAME_UNINST_REGKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${GAME_NAME}"
 !define GAME_DIR_REGKEY "Software\${GAME_PUBLISHER}\${GAME_NAME}"
 
+; TrackEditor Items
+!define TRACKEDITOR_JAR_NAME "sd2-trackeditor"
+!define TRACKEDITOR_VERSIONNED_NAME "SD2 TrackEditor"
+
 ; Folder where the build system installed everything
 !ifndef BUILD_INST_DIR
    !define BUILD_INST_DIR "\${GAME_FS_NAME}-build"

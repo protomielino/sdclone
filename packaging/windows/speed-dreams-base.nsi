@@ -86,7 +86,7 @@ Section "!Base System" SEC01
 
   ; Executable and DLLs ... but no mod tool (see later)
   SetOutPath "$INSTDIR\bin"
-  File /x sd2-*.* /x *.lib "${BUILD_INST_DIR}\bin\*.*"
+  File /x sd2-*.* /x *.lib /x *.jar "${BUILD_INST_DIR}\bin\*.*"
 
   ; Core loadable modules (physics and graphics engines, track loader, ...)
   SetOutPath "$INSTDIR\lib\modules\graphic"
@@ -235,6 +235,14 @@ Section /o "Basic mod Tools" SEC02
   SetOutPath "$INSTDIR\bin"
   File "${BUILD_INST_DIR}\bin\sd2-*.*"
   File "${BUILD_INST_DIR}\bin\*.lib"
+
+  ; Java trackeditor
+  File "${BUILD_INST_DIR}\bin\*.jar"
+
+  SetShellVarContext all
+  ; Start menu entries
+  CreateDirectory "$SMPROGRAMS\${GAME_VERSIONNED_NAME}"
+  CreateShortCut "$SMPROGRAMS\${GAME_VERSIONNED_NAME}\${TRACKEDITOR_VERSIONNED_NAME}.lnk" "$INSTDIR\bin\${TRACKEDITOR_JAR_NAME}.jar" "" "" 0 SW_SHOWNORMAL "" "Track Editor"
 
   ; Cmake macros for robot developers
   SetOutPath "$INSTDIR\data\cmake"
