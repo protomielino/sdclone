@@ -886,7 +886,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		frame.documentIsModified = true;
 	}
 
-	public void windowClosing(java.awt.event.WindowEvent anEvent)
+	public void windowClosing(WindowEvent anEvent)
 	{
 		System.out.println("JDialog is closing");
 	}

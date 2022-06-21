@@ -459,7 +459,7 @@ public class TerrainProperties extends PropertyPanel
 
 			for (int i = 0; i < objectMaps.size(); i++)
 	        {
-                utils.circuit.ObjectMap objectMap = objectMaps.elementAt(i);
+                ObjectMap objectMap = objectMaps.elementAt(i);
 				tabbedPane.addTab(objectMap.getName(), null, new ObjectMapPanel(objectMap.getName(), objectMap.getObjectMap()), null);
 			}
 		}
@@ -644,7 +644,7 @@ public class TerrainProperties extends PropertyPanel
 		}
 		for (int i = 0; i < minCount; i++)
         {
-            utils.circuit.ObjectMap objectMap = objectMaps.elementAt(i);
+            ObjectMap objectMap = objectMaps.elementAt(i);
             ObjectMapPanel panel = (ObjectMapPanel) tabbedPane.getComponentAt(i);
             if (isDifferent(panel.nameTextField.getText(), objectMap.getName(), stringResult))
             {

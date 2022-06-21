@@ -123,7 +123,7 @@ public class SegmentSlider extends JPanel
 		if (slider == null)
 		{
 			slider = new JSlider();
-			slider.setOrientation(javax.swing.JSlider.VERTICAL);
+			slider.setOrientation(JSlider.VERTICAL);
 		}
 		return slider;
 	}

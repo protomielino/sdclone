@@ -247,7 +247,7 @@ public class EnvMapProperties extends PropertyPanel
 		}
 		for (int i = 0; i < minCount; i++)
         {
-            utils.circuit.EnvironmentMapping envMap = envMaps.elementAt(i);
+            EnvironmentMapping envMap = envMaps.elementAt(i);
             EnvMapPanel panel = (EnvMapPanel) tabbedPane.getComponentAt(i);
             if (isDifferent(panel.nameTextField.getText(), envMap.getName(), stringResult))
             {

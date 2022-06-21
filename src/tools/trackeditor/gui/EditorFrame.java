@@ -431,7 +431,7 @@ public class EditorFrame extends JFrame
 		this.setLocation(p);
 		menuFile.setText("File");
 		itemCloseCircuit.setText("Exit");
-		itemCloseCircuit.addActionListener(new java.awt.event.ActionListener()
+		itemCloseCircuit.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -456,7 +456,7 @@ public class EditorFrame extends JFrame
 		{
 		}
 		menuItemAddBackground.setText("Add ...");
-		menuItemAddBackground.addActionListener(new java.awt.event.ActionListener()
+		menuItemAddBackground.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -464,7 +464,7 @@ public class EditorFrame extends JFrame
 			}
 		});
 		menuItemShoStartPoint.setText("Show start point");
-		menuItemShoStartPoint.addActionListener(new java.awt.event.ActionListener()
+		menuItemShoStartPoint.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -1167,9 +1167,9 @@ public class EditorFrame extends JFrame
 		{
 			jContentPane = new JPanel();
 			jContentPane.setLayout(new BorderLayout());
-			jContentPane.add(mainScrollPane, java.awt.BorderLayout.CENTER);
-			jContentPane.add(getJToolBar(), java.awt.BorderLayout.NORTH);
-			//jContentPane.add(getDeltaPanel(), java.awt.BorderLayout.SOUTH);
+			jContentPane.add(mainScrollPane, BorderLayout.CENTER);
+			jContentPane.add(getJToolBar(), BorderLayout.NORTH);
+			//jContentPane.add(getDeltaPanel(), BorderLayout.SOUTH);
 		}
 		return jContentPane;
 	}
@@ -1179,9 +1179,9 @@ public class EditorFrame extends JFrame
 //	    if (deltaPanel == null)
 //		{
 //	        deltaPanel = new DeltaPanel();
-//	        //deltaPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
-//	        //deltaPanel.setBackground(new java.awt.Color(0,204,204));
-//	        deltaPanel.setPreferredSize(new java.awt.Dimension(140,24));
+//	        //deltaPanel.setBorder(javax.swing.BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+//	        //deltaPanel.setBackground(new Color(0,204,204));
+//	        deltaPanel.setPreferredSize(new Dimension(140,24));
 //		}
 //		return deltaPanel;
 //	}
@@ -1190,29 +1190,29 @@ public class EditorFrame extends JFrame
 	{
 		if (documentIsModified)
 		{
-			// ask wether to save or not
+			// ask whether to save or not
 			int Res = JOptionPane.showConfirmDialog(this, "The circuit was modified. Do you want to save it ?",
 					"Closing circuit", JOptionPane.YES_NO_CANCEL_OPTION);
 			if (Res == JOptionPane.CANCEL_OPTION)
 			{
 				// can't close
-				return (false);
+				return false;
 			} else if (Res == JOptionPane.YES_OPTION)
 			{
 				// save
 				saveProject();
 
 				// can close
-				return (true);
+				return true;
 			} else
 			{
 				// don't save, but can close
-				return (true);
+				return true;
 			}
 		} else
 		{
 			// can close
-			return (true);
+			return true;
 		}
 	}
 
@@ -1422,38 +1422,29 @@ public class EditorFrame extends JFrame
 	 */
 	private void createActions()
 	{
-		undoAction = new UndoAction("Undo", createNavigationIcon("Undo24"), "Undo.", new Integer(KeyEvent.VK_Z));
-		redoAction = new RedoAction("Redo", createNavigationIcon("Redo24"), "Redo.", new Integer(KeyEvent.VK_R));
-		deleteAction = new DeleteAction("Delete", createNavigationIcon("Cut24"), "Delete.", new Integer(KeyEvent.VK_L));
-		zoomPlusAction = new ZoomPlusAction("Zoom in", createNavigationIcon("ZoomIn24"), "Zoom in.", new Integer(
-				KeyEvent.VK_M));
-		zoomOneAction = new ZoomOneAction("Zoom 1:1", createNavigationIcon("Zoom24"), "Zoom 1:1.", new Integer(
-				KeyEvent.VK_N));
-		zoomMinusAction = new ZoomMinusAction("Zoom out", createNavigationIcon("ZoomOut24"), "Zoom out.", new Integer(
-				KeyEvent.VK_O));
+		undoAction = new UndoAction("Undo", createNavigationIcon("Undo24"), "Undo.", KeyEvent.VK_Z);
+		redoAction = new RedoAction("Redo", createNavigationIcon("Redo24"), "Redo.", KeyEvent.VK_R);
+		deleteAction = new DeleteAction("Delete", createNavigationIcon("Cut24"), "Delete.", KeyEvent.VK_L);
+		zoomPlusAction = new ZoomPlusAction("Zoom in", createNavigationIcon("ZoomIn24"), "Zoom in.", KeyEvent.VK_M);
+		zoomOneAction = new ZoomOneAction("Zoom 1:1", createNavigationIcon("Zoom24"), "Zoom 1:1.", KeyEvent.VK_N);
+		zoomMinusAction = new ZoomMinusAction("Zoom out", createNavigationIcon("ZoomOut24"), "Zoom out.", KeyEvent.VK_O);
 		straightAction = new StraightAction("Add straight", createNavigationIcon("Straight24"),
-				"Add a straight segment.", new Integer(KeyEvent.VK_P));
-		rightAction = new RightAction("Add right", createNavigationIcon("TurnRight24"), "Add a right turn segment.",
-				new Integer(KeyEvent.VK_Q));
-		leftAction = new LeftAction("Add left", createNavigationIcon("TurnLeft24"), "Add a left turn segment.",
-				new Integer(KeyEvent.VK_S));
-		newAction = new NewAction("New", createNavigationIcon("New24"), "New circuit.", new Integer(KeyEvent.VK_S));
-		openAction = new OpenAction("Open", createNavigationIcon("Open24"), "Open existing circuit.", new Integer(
-				KeyEvent.VK_S));
-		saveAction = new SaveAction("Save", createNavigationIcon("Save24"), "Save the circuit.", new Integer(
-				KeyEvent.VK_S));
-		moveAction = new MoveAction("Move", createNavigationIcon("Export24"), "Move.", new Integer(KeyEvent.VK_S));
-		showArrowsAction = new ShowArrowsAction("Show arrows", createNavigationIcon("FindAgain24"), "Show arrows.",
-				new Integer(KeyEvent.VK_S));
+				"Add a straight segment.", KeyEvent.VK_P);
+		rightAction = new RightAction("Add right", createNavigationIcon("TurnRight24"), "Add a right turn segment.", KeyEvent.VK_Q);
+		leftAction = new LeftAction("Add left", createNavigationIcon("TurnLeft24"), "Add a left turn segment.",	KeyEvent.VK_S);
+		newAction = new NewAction("New", createNavigationIcon("New24"), "New circuit.", KeyEvent.VK_S);
+		openAction = new OpenAction("Open", createNavigationIcon("Open24"), "Open existing circuit.", KeyEvent.VK_S);
+		saveAction = new SaveAction("Save", createNavigationIcon("Save24"), "Save the circuit.", KeyEvent.VK_S);
+		moveAction = new MoveAction("Move", createNavigationIcon("Export24"), "Move.", KeyEvent.VK_S);
+		showArrowsAction = new ShowArrowsAction("Show arrows", createNavigationIcon("FindAgain24"), "Show arrows.", KeyEvent.VK_S);
 		showBackgroundAction = new ShowBackgroundAction("Show background", createNavigationIcon("Search24"),
-				"Show background image.", new Integer(KeyEvent.VK_S));
-		helpAction = new HelpAction("Help", createNavigationIcon("Help24"), "Help.", new Integer(KeyEvent.VK_S));
+				"Show background image.", KeyEvent.VK_S);
+		helpAction = new HelpAction("Help", createNavigationIcon("Help24"), "Help.", KeyEvent.VK_S);
 		/** ******************************************************************* */
-		allAction = new ExportAllAction("All", null, "Export both XML file and AC3 file.", new Integer(KeyEvent.VK_S));
-		ac3Action = new ExportAC3Action("AC3", null, "Create AC3 file.", new Integer(KeyEvent.VK_S));
-		propertiesAction = new PropertiesAction("Properties", null, "Properties dialog.", new Integer(KeyEvent.VK_S));
-		calcDeltaAction = new CalcDeltaAction("Delta's", createNavigationIcon("Calc24"), "Calculate Delta's for x,y,z and angle.", new Integer(KeyEvent.VK_S));
-
+		allAction = new ExportAllAction("All", null, "Export both XML file and AC3 file.", KeyEvent.VK_S);
+		ac3Action = new ExportAC3Action("AC3", null, "Create AC3 file.", KeyEvent.VK_S);
+		propertiesAction = new PropertiesAction("Properties", null, "Properties dialog.", KeyEvent.VK_S);
+		calcDeltaAction = new CalcDeltaAction("Delta's", createNavigationIcon("Calc24"), "Calculate Delta's for x,y,z and angle.", KeyEvent.VK_S);
 	}
 
 	public class UndoAction extends AbstractAction

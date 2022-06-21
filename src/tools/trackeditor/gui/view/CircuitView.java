@@ -199,7 +199,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	}
 
 	/**
-	 * blank construtor
+	 * blank constructor
 	 */
 	public CircuitView()
 	{
@@ -213,7 +213,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	 */
 	public boolean isFocusTraversable()
 	{
-		return (true);
+		return true;
 	}
 
 	public void screenToReal(MouseEvent e, Point2D.Double point)

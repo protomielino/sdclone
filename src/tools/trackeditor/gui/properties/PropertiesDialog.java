@@ -21,6 +21,7 @@
 package gui.properties;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -134,8 +135,8 @@ public class PropertiesDialog extends JDialog
 		{
 			pane = new JPanel();
 			pane.setLayout(new BorderLayout());
-			pane.add(getTabbedPane(), java.awt.BorderLayout.CENTER);
-			pane.add(getFooterPanel(), java.awt.BorderLayout.SOUTH);
+			pane.add(getTabbedPane(), BorderLayout.CENTER);
+			pane.add(getFooterPanel(), BorderLayout.SOUTH);
 		}
 		return pane;
 	}
@@ -151,7 +152,7 @@ public class PropertiesDialog extends JDialog
 			footerPanel = new JPanel();
 			footerPanel.setLayout(null);
 			footerPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
-			footerPanel.setPreferredSize(new java.awt.Dimension(14, 35));
+			footerPanel.setPreferredSize(new Dimension(14, 35));
 			footerPanel.add(getOkButton(), null);
 			footerPanel.add(getCancelButton(), null);
 		}

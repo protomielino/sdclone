@@ -217,7 +217,7 @@ public class ObjectProperties extends PropertyPanel
 		}
 		private String getString(int value)
 		{
-			if (value != (Integer.MAX_VALUE))
+			if (value != Integer.MAX_VALUE)
 				return "0x" + Integer.toHexString(value).toUpperCase();
 
 			return null;

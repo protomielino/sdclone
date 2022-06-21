@@ -190,7 +190,7 @@ public class Segment implements Cloneable
 		shape.xToDraw = (int[]) xToDraw.clone();
 		shape.yToDraw = (int[]) yToDraw.clone();
 
-		return (shape);
+		return shape;
 	}
 
 	public boolean contains(double x, double y)
@@ -243,10 +243,10 @@ public class Segment implements Cloneable
 			}
 
 			if (found)
-				return (true);
+				return true;
 		}
 
-		return (false);
+		return false;
 	}
 
 	public Rectangle2D.Double getBounds()

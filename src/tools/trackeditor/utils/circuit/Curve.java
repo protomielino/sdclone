@@ -63,7 +63,7 @@ public class Curve extends Segment implements Cloneable
 
 		shape.nbSteps = nbSteps;
 
-		return (shape);
+		return shape;
 	}
 
 	public void calcShape(Segment previousShape) throws Exception
