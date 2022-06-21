@@ -848,7 +848,7 @@ public class XmlReader
                 		{
                 			if (expectedUnit.equals("m") && actualUnit.equals("ft"))
                 			{
-                				out = out * 0.3048;
+                				out = out * 0.304801;
                 			}
                 			else
                 			{
