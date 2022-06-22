@@ -71,7 +71,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			"b-asphalt-grass6", "b-asphalt-grass6-l1", "b-asphalt-sand3", "b-asphalt-sand3-l1", "barrier", "barrier2",
 			"barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
 	private Vector<String>		sideSurfaceVector		= new Vector<String>(Arrays.asList(sideSurfaceItems));
-	private String[]			fenceSurfaceItems		=
+	private String[]			barrierSurfaceItems		=
 														{"barrier", "barrier2", "barrier-turn", "barrier-grille",
 			"wall", "wall2", "tire-wall", "asphalt-lines", "asphalt-l-left", "asphalt-l-right", "asphalt-l-both",
 			"asphalt-pits", "asphalt", "dirt", "dirt-b", "asphalt2", "road1", "road1-pits", "road1-asphalt",
@@ -81,7 +81,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			"b-road1-grass6", "b-road1-grass6-l2", "b-road1-gravel-l2", "b-road1-sand3", "b-road1-sand3-l2",
 			"b-asphalt-grass7", "b-asphalt-grass7-l1", "b-asphalt-grass6", "b-asphalt-grass6-l1", "b-asphalt-sand3",
 			"b-asphalt-sand3-l1", "grass", "grass3", "grass5", "grass6", "grass7", "gravel", "sand3", "sand"};
-	private Vector<String>		fenceSurfaceVector		= new Vector<String>(Arrays.asList(fenceSurfaceItems));
+	private Vector<String>		barrierSurfaceVector		= new Vector<String>(Arrays.asList(barrierSurfaceItems));
 
 	public JPanel				panel					= null;
 	private JLabel				borderLabel				= null;
@@ -112,6 +112,12 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	public SegmentSideProperties(SegmentEditorDlg parent, SegmentSide side)
 	{
 		this.parent = parent;
+		
+		// add new surfaces from Surfaces
+		addDefaultSurfaces(sideSurfaceVector);
+		addDefaultSurfaces(borderSurfaceVector);
+		addDefaultSurfaces(barrierSurfaceVector);
+		
 		setSide(side);
 		initialize();
 	}
@@ -133,9 +139,6 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		titleLabel.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 18));
 		this.add(getPanel(), null);
 		this.add(titleLabel, null);
-		addDefaultSurfaces(borderSurfaceVector);
-		addDefaultSurfaces(sideSurfaceVector);
-		addDefaultSurfaces(fenceSurfaceVector);
 	}
 
 	private void addDefaultSurfaces(Vector<String> surfaceVector)
@@ -144,18 +147,21 @@ public class SegmentSideProperties extends JPanel implements SliderListener
         for (int i = 0; i < surfaces.size(); i++)
         {
 			String surface = surfaces.elementAt(i).getName();
-			boolean found = false;
-			for (int j = 0; j < surfaceVector.size(); j++)
+			if (surface != null)
 			{
-				if (surfaceVector.elementAt(i).equals(surfaces.elementAt(i).getName()))
+				boolean found = false;
+				for (int j = 0; j < surfaceVector.size(); j++)
 				{
-					found = true;
-					break;
+					if (surfaceVector.elementAt(i).equals(surfaces.elementAt(i).getName()))
+					{
+						found = true;
+						break;
+					}
 				}
-			}
-			if (!found)
-			{
-				surfaceVector.add(surface);
+				if (!found)
+				{
+					surfaceVector.add(surface);
+				}
 			}
         }
 		Collections.sort(surfaceVector);
@@ -241,14 +247,13 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			borderSurfaceComboBox.setBounds(270, 350, 120, 20);
 			borderSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(borderSurfaceVector));
 			borderSurfaceComboBox.addActionListener(new ActionListener()
-					{
-
-						public void actionPerformed(ActionEvent e)
-						{
-							side.setBorderSurface(borderSurfaceComboBox.getSelectedItem()+"");
-						}
-					});
-
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					if (borderSurfaceComboBox.getSelectedItem() != null)
+						side.setBorderSurface(borderSurfaceComboBox.getSelectedItem()+"");
+				}
+			});
 		}
 		return borderSurfaceComboBox;
 	}
@@ -265,15 +270,12 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			borderStyleComboBox.setBounds(270, 400, 120, 20);
 			borderStyleComboBox.setModel(new DefaultComboBoxModel<String>(styleItems));
 			borderStyleComboBox.addActionListener(new ActionListener()
-					{
-
-						public void actionPerformed(ActionEvent e)
-						{
-							side.setBorderStyle(borderStyleComboBox.getSelectedItem()+"");
-						}
-
-					});
-
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					side.setBorderStyle(borderStyleComboBox.getSelectedItem()+"");
+				}
+			});
 		}
 		return borderStyleComboBox;
 	}
@@ -290,14 +292,13 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			sideSurfaceComboBox.setBounds(137, 350, 120, 20);
 			sideSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(sideSurfaceVector));
 			sideSurfaceComboBox.addActionListener(new ActionListener()
-					{
-
-						public void actionPerformed(ActionEvent e)
-						{
-							side.setSideSurface(sideSurfaceComboBox.getSelectedItem()+"");
-						}
-
-					});
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					if (sideSurfaceComboBox.getSelectedItem() != null)
+						side.setSideSurface(sideSurfaceComboBox.getSelectedItem()+"");
+				}
+			});
 		}
 		return sideSurfaceComboBox;
 	}
@@ -315,17 +316,15 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			sideBankingTypeComboBox.setBounds(137, 400, 120, 20);
 			sideBankingTypeComboBox.setModel(new DefaultComboBoxModel<String>(items));
 			sideBankingTypeComboBox.addActionListener(new ActionListener()
-					{
-
-						public void actionPerformed(ActionEvent e)
-						{
-							String type = (String) sideBankingTypeComboBox.getSelectedItem();
-							if (type == "none")
-								type = "";
-							side.setSideBankingType(type);
-						}
-
-					});
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					String type = (String) sideBankingTypeComboBox.getSelectedItem();
+					if (type == "none")
+						type = "";
+					side.setSideBankingType(type);
+				}
+			});
 		}
 		return sideBankingTypeComboBox;
 	}
@@ -340,16 +339,15 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			barrierSurfaceComboBox = new SegmentComboBox();
 			barrierSurfaceComboBox.setBounds(5, 350, 120, 20);
-			barrierSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(fenceSurfaceVector));
+			barrierSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(barrierSurfaceVector));
 			barrierSurfaceComboBox.addActionListener(new ActionListener()
-					{
-
-						public void actionPerformed(ActionEvent e)
-						{
-							side.setBarrierSurface(barrierSurfaceComboBox.getSelectedItem()+"");
-						}
-
-					});
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					if (barrierSurfaceComboBox.getSelectedItem() != null)
+						side.setBarrierSurface(barrierSurfaceComboBox.getSelectedItem()+"");
+				}
+			});
 		}
 		return barrierSurfaceComboBox;
 	}
@@ -366,15 +364,12 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			barrierStyleComboBox.setBounds(5, 400, 120, 20);
 			barrierStyleComboBox.setModel(new DefaultComboBoxModel<String>(styleItems));
 			barrierStyleComboBox.addActionListener(new ActionListener()
-					{
-
-						public void actionPerformed(ActionEvent e)
-						{
-						    side.setBarrierStyle(barrierStyleComboBox.getSelectedItem()+"");
-						}
-
-					});
-
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					side.setBarrierStyle(barrierStyleComboBox.getSelectedItem()+"");
+				}
+			});
 		}
 		return barrierStyleComboBox;
 	}
@@ -667,26 +662,74 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		this.titleLabel.setText(title);
 	}
 
+	private void addSurface(Vector<String> surfaceVector, String surface)
+	{
+		// add this surface if it's not found in default list
+		if (surface != null)
+		{
+			boolean found = false;
+			for (int i = 0; i < surfaceVector.size(); i++)
+			{
+				if (surfaceVector.elementAt(i).equals(surface))
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				surfaceVector.add(surface);
+				Collections.sort(surfaceVector);
+			}
+		}
+	}
+
 	public void setSide(SegmentSide side)
 	{
 		this.side = side;
 
-		// update all fields
-		this.getBorderSurfaceComboBox().setSelectedItem(side.getBorderSurface());
-		this.getBorderStyleComboBox().setSelectedItem(side.getBorderStyle());
-		this.getSideSurfaceComboBox().setSelectedItem(side.getSideSurface());
-		String bankingType = side.getSideBankingType();
+		// update side
+		String surface = this.side.getSideSurface();
+		addSurface(sideSurfaceVector, surface);
+		
+		if (surface != null)
+			this.getSideSurfaceComboBox().setSelectedItem(surface);
+		else
+			this.getSideSurfaceComboBox().setSelectedIndex(-1);
+		
+		String bankingType = this.side.getSideBankingType();
 		if (bankingType == null || bankingType.isEmpty())
 			bankingType = "none";
 		this.getSideBankingTypeComboBox().setSelectedItem(bankingType);
-		this.getBarrierSurfaceComboBox().setSelectedItem(side.getBarrierSurface());
+
+		this.getSideStartWidthSlider().setValue(side.getSideStartWidth());
+		this.getSideEndWidthSlider().setValue(side.getSideEndWidth());
+
+		// update border
+		surface = this.side.getBorderSurface();
+		addSurface(borderSurfaceVector, surface);	
+
+		if (surface != null)
+			this.getBorderSurfaceComboBox().setSelectedItem(surface);
+		else
+			this.getBorderSurfaceComboBox().setSelectedIndex(-1);
+		
+		this.getBorderStyleComboBox().setSelectedItem(side.getBorderStyle());
+		this.getBorderWidthSlider().setValue(side.getBorderWidth());
+		this.getBorderHeightSlider().setValue(side.getBorderHeight());
+
+		// update barrier
+		surface = this.side.getBarrierSurface();
+		addSurface(barrierSurfaceVector, surface);
+
+		if (surface != null)
+			this.getBarrierSurfaceComboBox().setSelectedItem(surface);
+		else
+			this.getBarrierSurfaceComboBox().setSelectedIndex(-1);
+		
 		this.getBarrierStyleComboBox().setSelectedItem(side.getBarrierStyle());
 		this.getBarrierHeightSlider().setValue(side.getBarrierHeight());
 		this.getBarrierWidthSlider().setValue(side.getBarrierWidth());
-		this.getSideStartWidthSlider().setValue(side.getSideStartWidth());
-		this.getSideEndWidthSlider().setValue(side.getSideEndWidth());
-		this.getBorderWidthSlider().setValue(side.getBorderWidth());
-		this.getBorderHeightSlider().setValue(side.getBorderHeight());
 
 		this.validate();
 		this.repaint();

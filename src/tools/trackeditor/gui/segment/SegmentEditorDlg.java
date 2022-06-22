@@ -129,16 +129,16 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		{
 			this.view = view;
 			this.frame = frame;
-			setShape(shape);
 
-			// add this surface if it't not found in default list
-			String surface = shape.getSurface();
-			if (surface != null)
-			{
+			// add new surfaces from Surfaces
+	        Vector<Surface> surfaces = Editor.getProperties().getSurfaces();
+	        for (int i = 0; i < surfaces.size(); i++)
+	        {
+				String surface = surfaces.elementAt(i).getName();
 				boolean found = false;
-				for (int i = 0; i < roadSurfaceVector.size(); i++)
+				for (int j = 0; j < roadSurfaceVector.size(); j++)
 				{
-					if (roadSurfaceVector.elementAt(i).equals(surface))
+					if (roadSurfaceVector.elementAt(i).equals(surfaces.elementAt(i).getName()))
 					{
 						found = true;
 						break;
@@ -148,7 +148,10 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 				{
 					roadSurfaceVector.add(surface);
 				}
-			}
+	        }
+			Collections.sort(roadSurfaceVector);
+			
+			setShape(shape);
 
 			initialize();
 			//			pack();
@@ -172,27 +175,6 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		this.setLocation(p);
 		this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		this.setContentPane(getJContentPane());
-
-		// add new surfaces from Surfaces
-        Vector<Surface> surfaces = Editor.getProperties().getSurfaces();
-        for (int i = 0; i < surfaces.size(); i++)
-        {
-			String surface = surfaces.elementAt(i).getName();
-			boolean found = false;
-			for (int j = 0; j < roadSurfaceVector.size(); j++)
-			{
-				if (roadSurfaceVector.elementAt(i).equals(surfaces.elementAt(i).getName()))
-				{
-					found = true;
-					break;
-				}
-			}
-			if (!found)
-			{
-				roadSurfaceVector.add(surface);
-			}
-        }
-		Collections.sort(roadSurfaceVector);
 	}
 
 	/**
@@ -763,7 +745,32 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 				this.getMarksTextField().setText("");
 			}
 			getNameTextField().setText(shape.getName());
-			getSurfaceComboBox().setSelectedItem(shape.getSurface());
+
+			// add this surface if it's not found in default list
+			String surface = shape.getSurface();
+			if (surface != null)
+			{
+				boolean found = false;
+				for (int i = 0; i < roadSurfaceVector.size(); i++)
+				{
+					if (roadSurfaceVector.elementAt(i).equals(surface))
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+				{
+					roadSurfaceVector.add(surface);
+					Collections.sort(roadSurfaceVector);
+				}
+			}
+
+			if (shape.getSurface() != null)
+				getSurfaceComboBox().setSelectedItem(shape.getSurface());
+			else
+				getSurfaceComboBox().setSelectedIndex(-1);
+			
 			this.getGradeSlider().setValue(shape.getGrade());
 			this.getStartTangentSlider().setValue(shape.getProfilStartTangent());
 			this.getEndTangentSlider().setValue(shape.getProfilEndTangent());
