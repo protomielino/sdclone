@@ -273,7 +273,8 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					side.setBorderStyle(borderStyleComboBox.getSelectedItem()+"");
+					if (borderStyleComboBox.getSelectedItem() != null)
+						side.setBorderStyle(borderStyleComboBox.getSelectedItem()+"");
 				}
 			});
 		}
@@ -319,7 +320,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					String type = (String) sideBankingTypeComboBox.getSelectedItem();
+					String type = sideBankingTypeComboBox.getSelectedItem().toString();
 					if (type == "none")
 						type = "";
 					side.setSideBankingType(type);
@@ -367,6 +368,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			{
 				public void actionPerformed(ActionEvent e)
 				{
+					if (barrierStyleComboBox.getSelectedItem() != null)
 					side.setBarrierStyle(barrierStyleComboBox.getSelectedItem()+"");
 				}
 			});
@@ -714,7 +716,12 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		else
 			this.getBorderSurfaceComboBox().setSelectedIndex(-1);
 		
-		this.getBorderStyleComboBox().setSelectedItem(side.getBorderStyle());
+		String style = side.getBorderStyle();
+		if (style != null)
+			this.getBorderStyleComboBox().setSelectedItem(style);
+		else
+			this.getBorderStyleComboBox().setSelectedIndex(-1);
+		
 		this.getBorderWidthSlider().setValue(side.getBorderWidth());
 		this.getBorderHeightSlider().setValue(side.getBorderHeight());
 
@@ -727,7 +734,12 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		else
 			this.getBarrierSurfaceComboBox().setSelectedIndex(-1);
 		
-		this.getBarrierStyleComboBox().setSelectedItem(side.getBarrierStyle());
+		style = side.getBarrierStyle();
+		if (style != null)
+			this.getBarrierStyleComboBox().setSelectedItem(style);
+		else
+			this.getBarrierStyleComboBox().setSelectedIndex(-1);
+		
 		this.getBarrierHeightSlider().setValue(side.getBarrierHeight());
 		this.getBarrierWidthSlider().setValue(side.getBarrierWidth());
 
