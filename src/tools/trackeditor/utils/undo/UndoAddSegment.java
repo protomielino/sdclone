@@ -1,6 +1,6 @@
 /*
  *   UndoAddSegment.java
- *   Created on 29 ��� 2005
+ *   Created on 29 ??? 2005
  *
  *    The UndoAddSegment.java is part of TrackEditor-0.6.0.
  *

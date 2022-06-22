@@ -1,6 +1,6 @@
 /*
  *   SegmentComboBox.java
- *   Created on 31 ��� 2005
+ *   Created on 31 ??? 2005
  *
  *    The SegmentComboBox.java is part of TrackEditor-0.3.1.
  *

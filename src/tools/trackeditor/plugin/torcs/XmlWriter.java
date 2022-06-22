@@ -1,6 +1,6 @@
 /*
  *   XmlWriter.java
- *   Created on 14 ��� 2005
+ *   Created on 14 ??? 2005
  *
  *    The XmlWriter.java is part of TrackEditor-0.6.0.
  *

@@ -1,6 +1,6 @@
 /*
  *   SegmentSide.java
- *   Created on 24 ��� 2005
+ *   Created on 24 ??? 2005
  *
  *    The SegmentSide.java is part of TrackEditor-0.6.0.
  *

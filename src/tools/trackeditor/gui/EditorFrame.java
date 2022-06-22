@@ -1,6 +1,6 @@
 /*
  *   EditorFrame.java
- *   Created on 9 ��� 2005
+ *   Created on 9 ??? 2005
  *
  *    The EditorFrame.java is part of TrackEditor-0.6.0.
  *

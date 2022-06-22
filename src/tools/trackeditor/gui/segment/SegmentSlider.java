@@ -1,6 +1,6 @@
 /*
  *   SegmentSlider.java
- *   Created on 28 ��� 2005
+ *   Created on 28 ??? 2005
  *
  *    The SegmentSlider.java is part of TrackEditor-0.3.1.
  *

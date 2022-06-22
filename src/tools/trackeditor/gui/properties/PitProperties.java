@@ -1,6 +1,6 @@
 /*
  *   PitProperties.java
- *   Created on 27 ��� 2005
+ *   Created on 27 ??? 2005
  *
  *    The PitProperties.java is part of TrackEditor-0.3.1.
  *

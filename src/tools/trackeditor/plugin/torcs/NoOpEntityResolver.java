@@ -1,6 +1,6 @@
 /*
  *   NoOpEntityResolver.java
- *   Created on 1 ��� 2005
+ *   Created on 1 ??? 2005
  *
  *    The NoOpEntityResolver.java is part of TrackEditor-0.6.0.
  *

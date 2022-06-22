@@ -1,6 +1,6 @@
 /*
  *   Curve.java
- *   Created on 9 ��� 2005
+ *   Created on 9 ??? 2005
  *
  *    The Curve.java is part of TrackEditor-0.6.0.
  *
