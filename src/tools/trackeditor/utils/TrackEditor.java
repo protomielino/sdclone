@@ -20,6 +20,12 @@
  */
 package utils;
 
+import javax.swing.UIManager;
+
+import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
+import com.jgoodies.looks.plastic.PlasticLookAndFeel;
+import com.jgoodies.looks.plastic.theme.DesertBlue;
+
 import gui.EditorFrame;
 
 
@@ -35,6 +41,13 @@ public class TrackEditor
 
 	public static void main(String[] args)
 	{
+		PlasticLookAndFeel.setCurrentTheme(new DesertBlue());
+		try
+		{
+			UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
+		} catch (Exception e)
+		{
+		}
 		System.out.println("Java version    : "+System.getProperty("java.version"));
 		System.out.println("OS              : "+System.getProperty("os.name"));
 		System.out.println("OS architecture : "+System.getProperty("os.arch"));

@@ -119,7 +119,9 @@ IF(Java_Development_FOUND AND Java_FOUND)
    )
 
    SET(JAVA_JARS bsh-2.0b4.jar
-                  jdom-1.1.3.jar )
+                  jdom-1.1.3.jar
+				  jgoodies-looks-2.5.3.jar
+				  jgoodies-common-1.6.0.jar )
 
    # ========= Debug
    #message(STATUS "JAVA_JARS = ${JAVA_JARS}")
@@ -170,6 +172,8 @@ IF(Java_Development_FOUND AND Java_FOUND)
 
    # https://github.com/beanshell/beanshell/releases
    # http://www.jdom.org/dist/binary/archive/jdom-1.1.3.zip
+   # http://www.java2s.com/Code/JarDownload/jgoodies/jgoodies-common-1.6.0.jar.zip
+   # http://www.java2s.com/Code/JarDownload/jgoodies/jgoodies-looks-2.5.3.jar.zip
 
 ELSE(Java_Development_FOUND AND Java_FOUND)
    MESSAGE(WARNING "Java_FOUND = ${Java_FOUND}")
