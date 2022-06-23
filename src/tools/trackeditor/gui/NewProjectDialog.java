@@ -106,13 +106,13 @@ public class NewProjectDialog extends JDialog
 			trackVersionLabel = new JLabel();
 			jPanel = new JPanel();
 			jPanel.setLayout(null);
-			projectNameLabel.setBounds(15, 15, 100, 30);
+			projectNameLabel.setBounds(15, 15, 120, 30);
 			projectNameLabel.setText("Track Name");
-			trackCategoryLabel.setBounds(15, 60, 100, 30);
+			trackCategoryLabel.setBounds(15, 60, 120, 30);
 			trackCategoryLabel.setText("Track Category");
-			trackSubcategoryLabel.setBounds(15, 105, 100, 30);
+			trackSubcategoryLabel.setBounds(15, 105, 120, 30);
 			trackSubcategoryLabel.setText("Track Subcategory");
-			trackVersionLabel.setBounds(15, 150, 100, 30);
+			trackVersionLabel.setBounds(15, 150, 120, 30);
 			trackVersionLabel.setText("Track Version");
 			pathLabel.setBounds(15, 195, 60, 30);
 			pathLabel.setText("Path");
@@ -150,7 +150,7 @@ public class NewProjectDialog extends JDialog
 		if (projectNameTextField == null)
 		{
 			projectNameTextField = new JTextField();
-			projectNameTextField.setBounds(135, 15, 170, 30);
+			projectNameTextField.setBounds(145, 15, 170, 30);
 			projectNameTextField.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
@@ -174,7 +174,7 @@ public class NewProjectDialog extends JDialog
 			{"circuit", "development", "dirt", "gprix", "karting", "oval", "road", "speedway", "test"};
 			trackCategoryComboBox = new JComboBox<String>(items);
 			trackCategoryComboBox.setSelectedItem(Editor.getProperties().getHeader().getCategory());
-			trackCategoryComboBox.setBounds(135, 60, 170, 30);
+			trackCategoryComboBox.setBounds(145, 60, 170, 30);
 			trackCategoryComboBox.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
@@ -201,7 +201,7 @@ public class NewProjectDialog extends JDialog
 			if (subcategory == null)
 				subcategory = "none";
 			trackSubcategoryComboBox.setSelectedItem(subcategory);
-			trackSubcategoryComboBox.setBounds(135, 105, 170, 30);
+			trackSubcategoryComboBox.setBounds(145, 105, 170, 30);
 			trackSubcategoryComboBox.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
@@ -225,7 +225,7 @@ public class NewProjectDialog extends JDialog
 			{"3", "4", "5"};
 			trackVersionComboBox = new JComboBox<String>(items);
 			trackVersionComboBox.setSelectedItem(Editor.getProperties().getHeader().getVersion() + "");
-			trackVersionComboBox.setBounds(135, 150, 170, 30);
+			trackVersionComboBox.setBounds(145, 150, 170, 30);
 			trackVersionComboBox.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
@@ -302,7 +302,7 @@ public class NewProjectDialog extends JDialog
 	private JTextField getDescriptionTextField() {
 		if (descriptionTextField == null) {
 			descriptionTextField = new JTextField();
-			descriptionTextField.setBounds(85, 285, 330, 30);
+			descriptionTextField.setBounds(95, 285, 320, 30);
 		}
 		return descriptionTextField;
 	}
