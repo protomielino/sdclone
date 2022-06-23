@@ -194,7 +194,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			borderSurfaceLabel.setText("Surface");
 			borderStyleLabel.setBounds(305, 375, 55, 20);
 			borderStyleLabel.setText("Style");
-			sideBankingTypeLabel.setBounds(165, 375, 80, 20);
+			sideBankingTypeLabel.setBounds(165, 375, 90, 20);
 			sideBankingTypeLabel.setText("Banking Type");
 			panel.add(borderSurfaceLabel, null);
 			panel.add(borderStyleLabel, null);
@@ -215,9 +215,9 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			barrierLabel.setText("Barrier");
 			barrierLabel.setBounds(35, 2, 50, 20);
 			barrierStyleLabel.setText("Style");
-			barrierStyleLabel.setBounds(40, 375, 45, 20);
+			barrierStyleLabel.setBounds(40, 375, 55, 20);
 			barrierSurfaceLabel.setText("Surface");
-			barrierSurfaceLabel.setBounds(44, 325, 45, 20);
+			barrierSurfaceLabel.setBounds(44, 325, 55, 20);
 			panel.add(getBarrierHeightSlider(), null);
 			panel.add(getBorderSurfaceComboBox(), null);
 			panel.add(getBorderStyleComboBox(), null);

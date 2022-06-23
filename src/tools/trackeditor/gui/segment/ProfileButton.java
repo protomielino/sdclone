@@ -60,7 +60,7 @@ public class ProfileButton extends JPanel
 	private void initialize()
 	{
 		setLayout(null);
-		setBounds(0, 0, 70, 48);
+		setBounds(0, 0, 80, 48);
 		setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 		add(getNoneButton(), null);
 		add(getLinearButton(), null);
@@ -85,7 +85,7 @@ public class ProfileButton extends JPanel
 				}
 
 			});
-			noneButton.setBounds(5, 2, 50, 15);
+			noneButton.setBounds(5, 2, 60, 15);
 		}
 		return noneButton;
 	}
@@ -104,7 +104,7 @@ public class ProfileButton extends JPanel
 				}
 
 			});
-			linearButton.setBounds(5, 16, 50, 15);
+			linearButton.setBounds(5, 16, 60, 15);
 		}
 		return linearButton;
 	}
@@ -123,7 +123,7 @@ public class ProfileButton extends JPanel
 				}
 
 			});
-			splineButton.setBounds(5, 30, 50, 15);
+			splineButton.setBounds(5, 30, 60, 15);
 		}
 		return splineButton;
 	}

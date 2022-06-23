@@ -224,12 +224,12 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			marksLabel = new JLabel();
 			centerPanel = new JPanel();
 			centerPanel.setLayout(null);
-			nameLabel.setBounds(10, 5, 45, 20);
+			nameLabel.setBounds(10, 5, 55, 23);
 			nameLabel.setText("Name");
-			surfaceLabel.setBounds(10, 30, 45, 20);
+			surfaceLabel.setBounds(10, 33, 55, 23);
 			surfaceLabel.setText("Surface");
 	        marksLabel.setText("Marks");
-	        marksLabel.setBounds(480, 10, 60, 20);
+	        marksLabel.setBounds(480, 10, 60, 23);
 	        centerPanel.add(nameLabel, null);
 	        centerPanel.add(surfaceLabel, null);
 			centerPanel.add(marksLabel, null);
@@ -266,7 +266,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (radiusStartSlider == null)
 		{
 			radiusStartSlider = new SegmentSlider();
-			radiusStartSlider.setBounds(115, 56, 50, 390);
+			radiusStartSlider.setBounds(115, 64, 50, 390);
 			radiusStartSlider.setSection("Radius");
 			radiusStartSlider.setAttr("Start");
 			radiusStartSlider.setMin(1);
@@ -292,7 +292,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (radiusEndSlider == null)
 		{
 			radiusEndSlider = new SegmentSlider();
-			radiusEndSlider.setBounds(170, 56, 50, 390);
+			radiusEndSlider.setBounds(170, 64, 50, 390);
 			radiusEndSlider.setSection("Radius");
 			radiusEndSlider.setAttr("End");
 			radiusEndSlider.setMin(1);
@@ -318,7 +318,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (arcSlider == null)
 		{
 			arcSlider = new SegmentSlider();
-			arcSlider.setBounds(60, 56, 50, 390);
+			arcSlider.setBounds(60, 64, 50, 390);
 			arcSlider.setSection("Arc");
 			arcSlider.setAttr("");
 			arcSlider.setMin(1);
@@ -344,7 +344,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (lengthSlider == null)
 		{
 			lengthSlider = new SegmentSlider();
-			lengthSlider.setBounds(5, 56, 50, 390);
+			lengthSlider.setBounds(5, 64, 50, 390);
 			lengthSlider.setSection("Length");
 			lengthSlider.setAttr("");
 			lengthSlider.setMin(0.001);
@@ -368,7 +368,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (gradeSlider == null)
 		{
 			gradeSlider = new SegmentSlider();
-			gradeSlider.setBounds(225, 56, 50, 390);
+			gradeSlider.setBounds(225, 64, 50, 390);
 			gradeSlider.setSection("Grade");
 			gradeSlider.setAttr("");
 			gradeSlider.setMin(-45);
@@ -393,7 +393,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (startTangentSlider == null)
 		{
 			startTangentSlider = new SegmentSlider();
-			startTangentSlider.setBounds(280, 56, 50, 390);
+			startTangentSlider.setBounds(280, 64, 50, 390);
 			startTangentSlider.setSection("Tangent");
 			startTangentSlider.setAttr("Start");
 			startTangentSlider.setMin(-45);
@@ -418,7 +418,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (endTangentSlider == null)
 		{
 			endTangentSlider = new SegmentSlider();
-			endTangentSlider.setBounds(335, 56, 50, 390);
+			endTangentSlider.setBounds(335, 64, 50, 390);
 			endTangentSlider.setSection("Tangent");
 			endTangentSlider.setAttr("End");
 			endTangentSlider.setMin(-45);
@@ -443,7 +443,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (profilStepsSlider == null)
 		{
 			profilStepsSlider = new SegmentSlider();
-			profilStepsSlider.setBounds(390, 56, 50, 390);
+			profilStepsSlider.setBounds(390, 64, 50, 390);
 			profilStepsSlider.setSection("Steps");
 			profilStepsSlider.setAttr("");
 			profilStepsSlider.setMin(0);
@@ -467,7 +467,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (profilStepsLengthSlider == null)
 		{
 			profilStepsLengthSlider = new SegmentSlider();
-			profilStepsLengthSlider.setBounds(445, 56, 50, 390);
+			profilStepsLengthSlider.setBounds(445, 64, 50, 390);
 			profilStepsLengthSlider.setSection("Steps");
 			profilStepsLengthSlider.setAttr("Len");
 			profilStepsLengthSlider.setMin(0);
@@ -491,7 +491,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (bankingStartSlider == null)
 		{
 			bankingStartSlider = new SegmentSlider();
-			bankingStartSlider.setBounds(500, 56, 50, 390);
+			bankingStartSlider.setBounds(500, 64, 50, 390);
 			bankingStartSlider.setSection("Banking");
 			bankingStartSlider.setAttr("Start");
 			bankingStartSlider.setMin(-45);
@@ -516,7 +516,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (bankingEndSlider == null)
 		{
 			bankingEndSlider = new SegmentSlider();
-			bankingEndSlider.setBounds(555, 56, 50, 390);
+			bankingEndSlider.setBounds(555, 64, 50, 390);
 			bankingEndSlider.setSection("Banking");
 			bankingEndSlider.setAttr("End");
 			bankingEndSlider.setMin(-45);
@@ -541,7 +541,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightStartLeftSlider == null)
 		{
 			heightStartLeftSlider = new SegmentSlider();
-			heightStartLeftSlider.setBounds(610, 56, 50, 390);
+			heightStartLeftSlider.setBounds(610, 64, 50, 390);
 			heightStartLeftSlider.setSection("L Height");
 			heightStartLeftSlider.setAttr("Start");
 			heightStartLeftSlider.setMin(0);
@@ -565,7 +565,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightStartRightSlider == null)
 		{
 			heightStartRightSlider = new SegmentSlider();
-			heightStartRightSlider.setBounds(665, 56, 50, 390);
+			heightStartRightSlider.setBounds(665, 64, 50, 390);
 			heightStartRightSlider.setSection("R Height");
 			heightStartRightSlider.setAttr("Start");
 			heightStartRightSlider.setMin(0);
@@ -589,7 +589,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightEndLeftSlider == null)
 		{
 			heightEndLeftSlider = new SegmentSlider();
-			heightEndLeftSlider.setBounds(720, 56, 50, 390);
+			heightEndLeftSlider.setBounds(720, 64, 50, 390);
 			heightEndLeftSlider.setSection("L Height");
 			heightEndLeftSlider.setAttr("End");
 			heightEndLeftSlider.setMin(0);
@@ -613,7 +613,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (heightEndRightSlider == null)
 		{
 			heightEndRightSlider = new SegmentSlider();
-			heightEndRightSlider.setBounds(775, 56, 50, 390);
+			heightEndRightSlider.setBounds(775, 64, 50, 390);
 			heightEndRightSlider.setSection("R Height");
 			heightEndRightSlider.setAttr("End");
 			heightEndRightSlider.setMin(0);
@@ -638,7 +638,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (nameTextField == null)
 		{
 			nameTextField = new JTextField();
-			nameTextField.setBounds(75, 5, 110, 20);
+			nameTextField.setBounds(75, 5, 180, 23);
 			nameTextField.setText(shape.getName());
 			nameTextField.addKeyListener(new KeyAdapter()
 			{
@@ -660,7 +660,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (marksTextField == null)
 		{
 			marksTextField = new JTextField();
-			marksTextField.setBounds(530, 10, 295, 20);
+			marksTextField.setBounds(530, 10, 295, 23);
 			marksTextField.addKeyListener(new KeyAdapter()
 			{
 				public void keyReleased(KeyEvent e)
@@ -685,7 +685,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		{
 			surfaceComboBox = new JComboBox<String>();
 			surfaceComboBox.setModel(new DefaultComboBoxModel<String>(roadSurfaceVector));
-			surfaceComboBox.setBounds(74, 30, 120, 20);
+			surfaceComboBox.setBounds(75, 33, 180, 23);
 			surfaceComboBox.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
