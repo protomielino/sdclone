@@ -84,7 +84,7 @@ public class ImageProperties extends PropertyPanel
 		if (pathButton == null)
 		{
 			pathButton = new JButton();
-			pathButton.setBounds(390, 7, 80, 25);
+			pathButton.setBounds(390, 9, 80, 25);
 			pathButton.setText("Browse");
 			pathButton.addActionListener(new java.awt.event.ActionListener()
 			{

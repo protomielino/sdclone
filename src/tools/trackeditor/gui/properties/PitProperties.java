@@ -91,37 +91,37 @@ public class PitProperties extends PropertyPanel
 		setLayout(null);
 		setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 
-		addLabel(this, 0, styleLabel, "Type", 130);
-		addLabel(this, 1, sideLabel, "Side", 130);
-		addLabel(this, 2, entryLabel, "Entry", 130);
-		addLabel(this, 3, startLabel, "Start", 130);
-		addLabel(this, 4, startBuildingsLabel, "Start Buildings", 130);
-		addLabel(this, 5, stopBuildingsLabel, "Stop Buildings", 130);
-		addLabel(this, 6, maxPitsLabel, "Max Pits", 130);
-		addLabel(this, 7, endLabel, "End", 130);
-		addLabel(this, 8, exitLabel, "Exit", 130);
-		addLabel(this, 9, widthLabel, "Width", 130);
-		addLabel(this, 10, lengthLabel, "Length", 130);
-		addLabel(this, 11, indicatorLabel, "Indicator", 130);
-		addLabel(this, 12, speedLimitLabel, "Speed Limit", 130);
-		addLabel(this, 0, generatePitsLabel, "Generate Pits", 240, 100);
+		addLabel(this, 0, styleLabel, "Type", 110);
+		addLabel(this, 1, sideLabel, "Side", 110);
+		addLabel(this, 2, entryLabel, "Entry", 110);
+		addLabel(this, 3, startLabel, "Start", 110);
+		addLabel(this, 4, startBuildingsLabel, "Start Buildings", 110);
+		addLabel(this, 5, stopBuildingsLabel, "Stop Buildings", 110);
+		addLabel(this, 6, maxPitsLabel, "Max Pits", 110);
+		addLabel(this, 7, endLabel, "End", 110);
+		addLabel(this, 8, exitLabel, "Exit", 110);
+		addLabel(this, 9, widthLabel, "Width", 110);
+		addLabel(this, 10, lengthLabel, "Length", 110);
+		addLabel(this, 11, indicatorLabel, "Indicator", 110);
+		addLabel(this, 12, speedLimitLabel, "Speed Limit", 110);
+		addLabel(this, 0, generatePitsLabel, "Generate Pits", 280, 100);
 
 		add(getStyleComboBox(), null);
 		add(getSideComboBox(), null);
 
-		addTextField(this, 2, entryTextField, Editor.getProperties().getMainTrack().getPits().getEntry(), 100, 100);
-		addTextField(this, 3, startTextField, Editor.getProperties().getMainTrack().getPits().getStart(), 100, 100);
-		addTextField(this, 4, startBuildingsTextField, Editor.getProperties().getMainTrack().getPits().getStartBuildings(), 100, 100);
-		addTextField(this, 5, stopBuildingsTextField, Editor.getProperties().getMainTrack().getPits().getStopBuildings(), 100, 100);
-		addTextField(this, 6, maxPitsTextField, Editor.getProperties().getMainTrack().getPits().getMaxPits(), 100, 100);
-		addTextField(this, 7, endTextField, Editor.getProperties().getMainTrack().getPits().getEnd(), 100, 100);
-		addTextField(this, 8, exitTextField, Editor.getProperties().getMainTrack().getPits().getExit(), 100, 100);
-		addTextField(this, 9, widthTextField, Editor.getProperties().getMainTrack().getPits().getWidth(), 100, 40);
-		addTextField(this, 10, lengthTextField, Editor.getProperties().getMainTrack().getPits().getLength(), 100, 40);
+		addTextField(this, 2, entryTextField, Editor.getProperties().getMainTrack().getPits().getEntry(), 120, 100);
+		addTextField(this, 3, startTextField, Editor.getProperties().getMainTrack().getPits().getStart(), 120, 100);
+		addTextField(this, 4, startBuildingsTextField, Editor.getProperties().getMainTrack().getPits().getStartBuildings(), 120, 100);
+		addTextField(this, 5, stopBuildingsTextField, Editor.getProperties().getMainTrack().getPits().getStopBuildings(), 120, 100);
+		addTextField(this, 6, maxPitsTextField, Editor.getProperties().getMainTrack().getPits().getMaxPits(), 120, 100);
+		addTextField(this, 7, endTextField, Editor.getProperties().getMainTrack().getPits().getEnd(), 120, 100);
+		addTextField(this, 8, exitTextField, Editor.getProperties().getMainTrack().getPits().getExit(), 120, 100);
+		addTextField(this, 9, widthTextField, Editor.getProperties().getMainTrack().getPits().getWidth(), 120, 40);
+		addTextField(this, 10, lengthTextField, Editor.getProperties().getMainTrack().getPits().getLength(), 120, 40);
 
 		add(getIndicatorComboBox(), null);
 
-		addTextField(this, 12, speedLimitTextField, Editor.getProperties().getMainTrack().getPits().getSpeedLimit(), 100, 40);
+		addTextField(this, 12, speedLimitTextField, Editor.getProperties().getMainTrack().getPits().getSpeedLimit(), 120, 40);
 
 		add(getGeneratePitsCheckBox(), null);
 	}
@@ -136,7 +136,7 @@ public class PitProperties extends PropertyPanel
 		{
 			String[] items = {"none", "no pits", "on track side", "on separate path", "no building"};
 			styleComboBox = new JComboBox<String>(items);
-			styleComboBox.setBounds(100, 10, 120, 20);
+			styleComboBox.setBounds(120, 10, 120, 23);
 			int style = Editor.getProperties().getMainTrack().getPits().getStyle();
 			if (style == Integer.MAX_VALUE)
 				style = 0;
@@ -157,7 +157,7 @@ public class PitProperties extends PropertyPanel
 		{
 			String[] items = {"none", "right", "left"};
 			sideComboBox = new JComboBox<String>(items);
-			sideComboBox.setBounds(100, 35, 80, 20);
+			sideComboBox.setBounds(120, 37, 80, 23);
 			String side = Editor.getProperties().getMainTrack().getPits().getSide();
 			if (side == null || side.isEmpty())
 				side = "none";
@@ -177,7 +177,7 @@ public class PitProperties extends PropertyPanel
 		{
 			String[] items = {"none", "no", "yes"};
 			indicatorComboBox = new JComboBox<String>(items);
-			indicatorComboBox.setBounds(100, 285, 80, 20);
+			indicatorComboBox.setBounds(120, 307, 80, 23);
 			int indicator = Editor.getProperties().getMainTrack().getPits().getIndicator();
 			if (indicator == Integer.MAX_VALUE)
 				indicator = 0;
@@ -444,7 +444,7 @@ public class PitProperties extends PropertyPanel
 	private JCheckBox getGeneratePitsCheckBox() {
 		if (generatePitsCheckBox == null) {
 			generatePitsCheckBox = new JCheckBox();
-			generatePitsCheckBox.setBounds(328, 10, 20, 20);
+			generatePitsCheckBox.setBounds(388, 10, 20, 20);
 			generatePitsCheckBox.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e)
 				{

@@ -82,7 +82,7 @@ public class ObjectProperties extends PropertyPanel
 		if (addObjectButton == null)
 		{
 			addObjectButton = new JButton();
-			addObjectButton.setBounds(10, 230, 100, 25);
+			addObjectButton.setBounds(10, 250, 100, 25);
 			addObjectButton.setText("Add Object");
 			addObjectButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -111,7 +111,7 @@ public class ObjectProperties extends PropertyPanel
 		if (deleteObjectButton == null)
 		{
 			deleteObjectButton = new JButton();
-			deleteObjectButton.setBounds(130, 230, 120, 25);
+			deleteObjectButton.setBounds(140, 250, 120, 25);
 			deleteObjectButton.setText("Delete Object");
 			deleteObjectButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -138,7 +138,7 @@ public class ObjectProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 460, 210);
+			tabbedPane.setBounds(10, 10, 460, 230);
 
 			Vector<TrackObject> objects = Editor.getProperties().getObjects();
 
@@ -237,7 +237,7 @@ public class ObjectProperties extends PropertyPanel
 			{
 				String[] items = {"none", "random", "standard"};
 				orientationTypeComboBox = new JComboBox<String>(items);
-				orientationTypeComboBox.setBounds(120, 85, 120, 20);
+				orientationTypeComboBox.setBounds(120, 91, 120, 23);
 			}
 			return orientationTypeComboBox;
 		}
@@ -252,7 +252,7 @@ public class ObjectProperties extends PropertyPanel
 			if (objectButton == null)
 			{
 				objectButton = new JButton();
-				objectButton.setBounds(370, 32, 80, 25);
+				objectButton.setBounds(370, 36, 80, 25);
 				objectButton.setText("Browse");
 				objectButton.addActionListener(new java.awt.event.ActionListener()
 				{

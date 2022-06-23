@@ -173,11 +173,11 @@ public class EnvMapProperties extends PropertyPanel
 		{
 			setLayout(null);
 
-			addLabel(this, 0, nameLabel, "Name", 100);
-			addLabel(this, 1, envMapLabel, "Environment Map", 100);
+			addLabel(this, 0, nameLabel, "Name", 120);
+			addLabel(this, 1, envMapLabel, "Environment Map", 120);
 
-			addTextField(this, 0, nameTextField, name, 115, 60);
-			addTextField(this, 1, envMapTextField, environmentMap, 115, 250);
+			addTextField(this, 0, nameTextField, name, 130, 60);
+			addTextField(this, 1, envMapTextField, environmentMap, 130, 230);
 
 			add(getEnvMapButton(), null);
 		}
@@ -192,7 +192,7 @@ public class EnvMapProperties extends PropertyPanel
 			if (envMapButton == null)
 			{
 				envMapButton = new JButton();
-				envMapButton.setBounds(370, 33, 80, 25);
+				envMapButton.setBounds(370, 36, 80, 25);
 				envMapButton.setText("Browse");
 				envMapButton.addActionListener(new java.awt.event.ActionListener()
 				{

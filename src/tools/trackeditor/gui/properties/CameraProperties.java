@@ -78,7 +78,7 @@ public class CameraProperties extends PropertyPanel
 		if (addCameraButton == null)
 		{
 			addCameraButton = new JButton();
-			addCameraButton.setBounds(10, 230, 120, 25);
+			addCameraButton.setBounds(10, 250, 120, 25);
 			addCameraButton.setText("Add Camera");
 			addCameraButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -107,7 +107,7 @@ public class CameraProperties extends PropertyPanel
 		if (deleteCameraButton == null)
 		{
 			deleteCameraButton = new JButton();
-			deleteCameraButton.setBounds(150, 230, 120, 25);
+			deleteCameraButton.setBounds(150, 250, 120, 25);
 			deleteCameraButton.setText("Delete Camera");
 			deleteCameraButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -134,7 +134,7 @@ public class CameraProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 460, 210);
+			tabbedPane.setBounds(10, 10, 460, 230);
 
 			Vector<Camera> cameras = Editor.getProperties().getCameras();
 

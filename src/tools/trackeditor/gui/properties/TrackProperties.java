@@ -84,21 +84,21 @@ public class TrackProperties extends PropertyPanel
         this.setLayout(null);
         this.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 
-		addLabel(this, 0, widthLabel, "Width", 130);
-		addLabel(this, 1, surfaceLabel, "Surface", 130);
-		addLabel(this, 2, profilStepsLengthLabel, "Profil Steps Length", 130);
-		addLabel(this, 3, racelineWidthscaleLabel, "Raceline Width Scale", 130);
-		addLabel(this, 4, racelineIntLabel, "Raceline Int", 130);
-		addLabel(this, 5, racelineExtLabel, "Raceline Ext", 130);
+		addLabel(this, 0, widthLabel, "Width", 140);
+		addLabel(this, 1, surfaceLabel, "Surface", 140);
+		addLabel(this, 2, profilStepsLengthLabel, "Profil Steps Length", 140);
+		addLabel(this, 3, racelineWidthscaleLabel, "Raceline Width Scale", 140);
+		addLabel(this, 4, racelineIntLabel, "Raceline Int", 140);
+		addLabel(this, 5, racelineExtLabel, "Raceline Ext", 140);
 
-		addTextField(this, 0, widthTextField, Editor.getProperties().getMainTrack().getWidth(), 140, 50);
+		addTextField(this, 0, widthTextField, Editor.getProperties().getMainTrack().getWidth(), 150, 50);
 
         this.add(getSurfaceComboBox(), null);
 
-		addTextField(this, 2, profilStepsLengthTextField, Editor.getProperties().getMainTrack().getProfilStepsLength(), 140, 50);
-		addTextField(this, 3, racelineWidthscaleTextField, Editor.getProperties().getMainTrack().getRacelineWidthscale(), 140, 50);
-		addTextField(this, 4, racelineIntTextField, Editor.getProperties().getMainTrack().getRacelineInt(), 140, 50);
-		addTextField(this, 5, racelineExtTextField, Editor.getProperties().getMainTrack().getRacelineExt(), 140, 50);
+		addTextField(this, 2, profilStepsLengthTextField, Editor.getProperties().getMainTrack().getProfilStepsLength(), 150, 50);
+		addTextField(this, 3, racelineWidthscaleTextField, Editor.getProperties().getMainTrack().getRacelineWidthscale(), 150, 50);
+		addTextField(this, 4, racelineIntTextField, Editor.getProperties().getMainTrack().getRacelineInt(), 150, 50);
+		addTextField(this, 5, racelineExtTextField, Editor.getProperties().getMainTrack().getRacelineExt(), 150, 50);
 
         Vector<Surface> surfaces = Editor.getProperties().getSurfaces();
         for (int i = 0; i < surfaces.size(); i++)
@@ -131,7 +131,7 @@ public class TrackProperties extends PropertyPanel
 		if (surfaceComboBox == null)
 		{
 			surfaceComboBox = new JComboBox<String>();
-			surfaceComboBox.setBounds(140, 35, 140, 20);
+			surfaceComboBox.setBounds(150, 37, 180, 23);
 			String surface = Editor.getProperties().getMainTrack().getSurface();
 			if (surface != null)
 			{

@@ -92,9 +92,9 @@ public class GeneralProperties extends PropertyPanel
 		add(getVersionComboBox(), null);
 		add(getSkyVersionComboBox(), null);
 
-		addTextField(this, 5, pathTextField, Editor.getProperties().getPath(), 80, 305);
-		addTextField(this, 6, authorTextField, Editor.getProperties().getHeader().getAuthor(), 80, 390);
-		addTextField(this, 7, descriptionTextField, Editor.getProperties().getHeader().getDescription(), 80, 390);
+		addTextField(this, 5, pathTextField, Editor.getProperties().getPath(), 85, 300);
+		addTextField(this, 6, authorTextField, Editor.getProperties().getHeader().getAuthor(), 85, 385);
+		addTextField(this, 7, descriptionTextField, Editor.getProperties().getHeader().getDescription(), 85, 385);
 
 		add(getPathButton(), null);
 	}
@@ -110,7 +110,7 @@ public class GeneralProperties extends PropertyPanel
 		{
 			String[] items = {"circuit", "development", "dirt", "gprix", "karting", "oval", "road", "speedway", "test"};
 			categoryComboBox = new JComboBox<String>(items);
-			categoryComboBox.setBounds(130, 35, 100, 20);
+			categoryComboBox.setBounds(130, 37, 100, 23);
 			categoryComboBox.setSelectedItem(Editor.getProperties().getHeader().getCategory());
 		}
 		return categoryComboBox;
@@ -127,7 +127,7 @@ public class GeneralProperties extends PropertyPanel
 		{
 			String[] items = {"none", "short", "long"};
 			subcategoryComboBox = new JComboBox<String>(items);
-			subcategoryComboBox.setBounds(130, 60, 100, 20);
+			subcategoryComboBox.setBounds(130, 64, 100, 23);
 			String subcategory = Editor.getProperties().getHeader().getSubcategory();
 			if (subcategory == null)
 				subcategory = "none";
@@ -147,7 +147,7 @@ public class GeneralProperties extends PropertyPanel
 		{
 			String[] items = {"3", "4", "5"};
 			versionComboBox = new JComboBox<String>(items);
-			versionComboBox.setBounds(130, 85, 100, 20);
+			versionComboBox.setBounds(130, 91, 100, 23);
 			versionComboBox.setSelectedItem(Editor.getProperties().getHeader().getVersion() + "");
 		}
 		return versionComboBox;
@@ -164,7 +164,7 @@ public class GeneralProperties extends PropertyPanel
 		{
 			String[] items = {"none", "1"};
 			skyVersionComboBox = new JComboBox<String>(items);
-			skyVersionComboBox.setBounds(130, 110, 100, 20);
+			skyVersionComboBox.setBounds(130, 118, 100, 23);
 			int version = Editor.getProperties().getHeader().getSkyVersion();
 			String stringVersion;
 			if (version == Integer.MAX_VALUE)
@@ -186,7 +186,7 @@ public class GeneralProperties extends PropertyPanel
 		if (pathButton == null)
 		{
 			pathButton = new JButton();
-			pathButton.setBounds(390, 132, 80, 25);
+			pathButton.setBounds(390, 144, 80, 25);
 			pathButton.setText("Browse");
 			pathButton.addActionListener(new java.awt.event.ActionListener()
 			{

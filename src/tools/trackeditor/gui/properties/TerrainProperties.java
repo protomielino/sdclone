@@ -113,30 +113,30 @@ public class TerrainProperties extends PropertyPanel
 		setLayout(null);
 		setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 
-		addLabel(this, 0, trackStepLabel, "Track Step", 100);
-		addLabel(this, 1, borderMarginLabel, "Border Margin", 100);
-		addLabel(this, 2, borderStepLabel, "Border Step", 100);
-		addLabel(this, 3, borderHeightLabel, "Border Height", 100);
-		addLabel(this, 4, orientationLabel, "Orientation", 100);
-		addLabel(this, 5, maximumAltitudeLabel, "Maximum Altitude", 100);
-		addLabel(this, 6, minimumAltitudeLabel, "Minimum Altitude", 100);
-		addLabel(this, 7, groupSizeLabel, "Group Size", 100);
-		addLabel(this, 8, elevationMapLabel, "Elevation Map", 100);
-		addLabel(this, 9, reliefFileLabel, "Reliefe File", 100);
-		addLabel(this, 10, surfaceLabel, "Surface", 100);
+		addLabel(this, 0, trackStepLabel, "Track Step", 120);
+		addLabel(this, 1, borderMarginLabel, "Border Margin", 120);
+		addLabel(this, 2, borderStepLabel, "Border Step", 120);
+		addLabel(this, 3, borderHeightLabel, "Border Height", 120);
+		addLabel(this, 4, orientationLabel, "Orientation", 120);
+		addLabel(this, 5, maximumAltitudeLabel, "Maximum Altitude", 120);
+		addLabel(this, 6, minimumAltitudeLabel, "Minimum Altitude", 120);
+		addLabel(this, 7, groupSizeLabel, "Group Size", 120);
+		addLabel(this, 8, elevationMapLabel, "Elevation Map", 120);
+		addLabel(this, 9, reliefFileLabel, "Reliefe File", 120);
+		addLabel(this, 10, surfaceLabel, "Surface", 120);
 
-		addTextField(this, 0, trackStepTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getTrackStep(), 120, 100);
-		addTextField(this, 1, borderMarginTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getBorderMargin(), 120, 100);
-		addTextField(this, 2, borderStepTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getBorderStep(), 120, 100);
-		addTextField(this, 3, borderHeightTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getBorderHeight(), 120, 100);
+		addTextField(this, 0, trackStepTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getTrackStep(), 140, 100);
+		addTextField(this, 1, borderMarginTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getBorderMargin(), 140, 100);
+		addTextField(this, 2, borderStepTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getBorderStep(), 140, 100);
+		addTextField(this, 3, borderHeightTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getBorderHeight(), 140, 100);
 
 		this.add(getOrientationComboBox(), null);
 
-		addTextField(this, 5, maximumAltitudeTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getMaximumAltitude(), 120, 100);
-		addTextField(this, 6, minimumAltitudeTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getMinimumAltitude(), 120, 100);
-		addTextField(this, 7, groupSizeTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getGroupSize(), 120, 100);
-		addTextField(this, 8, elevationMapTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getElevationMap(), 120, 265);
-		addTextField(this, 9, reliefFileTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getReliefFile(), 120, 265);
+		addTextField(this, 5, maximumAltitudeTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getMaximumAltitude(), 140, 100);
+		addTextField(this, 6, minimumAltitudeTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getMinimumAltitude(), 140, 100);
+		addTextField(this, 7, groupSizeTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getGroupSize(), 140, 100);
+		addTextField(this, 8, elevationMapTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getElevationMap(), 140, 245);
+		addTextField(this, 9, reliefFileTextField, Editor.getProperties().getGraphic().getTerrainGeneration().getReliefFile(), 140, 245);
 
 		this.add(getSurfaceComboBox(), null);
 		this.add(getDefaultButton(), null);
@@ -180,7 +180,7 @@ public class TerrainProperties extends PropertyPanel
 			String[] items =
 			{"none", "clockwise", "counter-clockwise"};
 			orientationComboBox = new JComboBox<String>(items);
-			orientationComboBox.setBounds(120, 110, 120, 20);
+			orientationComboBox.setBounds(140, 118, 120, 23);
 			String orientation = Editor.getProperties().getGraphic().getTerrainGeneration().getOrientation();
 			if (orientation == null || orientation.isEmpty())
 				orientation = "none";
@@ -199,7 +199,7 @@ public class TerrainProperties extends PropertyPanel
 		if (surfaceComboBox == null)
 		{
 			surfaceComboBox = new JComboBox<String>();
-			surfaceComboBox.setBounds(120, 260, 140, 20);
+			surfaceComboBox.setBounds(140, 280, 180, 23);
 			String surface = Editor.getProperties().getGraphic().getTerrainGeneration().getSurface();
 			if (surface != null)
 			{
@@ -233,7 +233,7 @@ public class TerrainProperties extends PropertyPanel
 		if (elevationMapButton == null)
 		{
 			elevationMapButton = new JButton();
-			elevationMapButton.setBounds(390, 207, 80, 25);
+			elevationMapButton.setBounds(390, 225, 80, 25);
 			elevationMapButton.setText("Browse");
 			elevationMapButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -256,7 +256,7 @@ public class TerrainProperties extends PropertyPanel
 		if (reliefFileButton == null)
 		{
 			reliefFileButton = new JButton();
-			reliefFileButton.setBounds(390, 232, 80, 25);
+			reliefFileButton.setBounds(390, 252, 80, 25);
 			reliefFileButton.setText("Browse");
 			reliefFileButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -401,7 +401,7 @@ public class TerrainProperties extends PropertyPanel
 		if (addObjectMapButton == null)
 		{
 			addObjectMapButton = new JButton();
-			addObjectMapButton.setBounds(10, 400, 130, 25);
+			addObjectMapButton.setBounds(10, 420, 130, 25);
 			addObjectMapButton.setText("Add Object Map");
 			addObjectMapButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -427,7 +427,7 @@ public class TerrainProperties extends PropertyPanel
 		if (deleteObjectMapButton == null)
 		{
 			deleteObjectMapButton = new JButton();
-			deleteObjectMapButton.setBounds(155, 400, 140, 25);
+			deleteObjectMapButton.setBounds(155, 420, 140, 25);
 			deleteObjectMapButton.setText("Delete Object Map");
 			deleteObjectMapButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -454,7 +454,7 @@ public class TerrainProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 285, 460, 100);
+			tabbedPane.setBounds(10, 312, 460, 100);
 
 			Vector<ObjectMap> objectMaps = Editor.getProperties().getGraphic().getTerrainGeneration().getObjectMaps();
 
@@ -491,11 +491,11 @@ public class TerrainProperties extends PropertyPanel
 		{
 			setLayout(null);
 			
-			addLabel(this, 0, nameLabel, "Name", 90);
-			addLabel(this, 1, objectMapLabel, "Environment Map", 90);
+			addLabel(this, 0, nameLabel, "Name", 120);
+			addLabel(this, 1, objectMapLabel, "Environment Map", 120);
 
-			addTextField(this, 0, nameTextField, name, 115, 60);
-			addTextField(this, 1, objectMapTextField, objectMap, 115, 250);
+			addTextField(this, 0, nameTextField, name, 130, 60);
+			addTextField(this, 1, objectMapTextField, objectMap, 130, 235);
 
 			add(getObjectMapButton(), null);
 		}
@@ -510,7 +510,7 @@ public class TerrainProperties extends PropertyPanel
 			if (objectMapButton == null)
 			{
 				objectMapButton = new JButton();
-				objectMapButton.setBounds(370, 32, 80, 25);
+				objectMapButton.setBounds(370, 36, 80, 25);
 				objectMapButton.setText("Browse");
 				objectMapButton.addActionListener(new java.awt.event.ActionListener()
 				{

@@ -81,7 +81,7 @@ public class TrackLightProperties extends PropertyPanel
 		if (addTrackLightButton == null)
 		{
 			addTrackLightButton = new JButton();
-			addTrackLightButton.setBounds(10, 410, 140, 25);
+			addTrackLightButton.setBounds(10, 435, 140, 25);
 			addTrackLightButton.setText("Add Track Light");
 			addTrackLightButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -110,7 +110,7 @@ public class TrackLightProperties extends PropertyPanel
 		if (deleteTrackLightButton == null)
 		{
 			deleteTrackLightButton = new JButton();
-			deleteTrackLightButton.setBounds(170, 410, 140, 25);
+			deleteTrackLightButton.setBounds(170, 435, 140, 25);
 			deleteTrackLightButton.setText("Delete Track Light");
 			deleteTrackLightButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -137,7 +137,7 @@ public class TrackLightProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 460, 390);
+			tabbedPane.setBounds(10, 10, 460, 415);
 
 			Vector<TrackLight> lights = Editor.getProperties().getTrackLights();
 
@@ -255,7 +255,7 @@ public class TrackLightProperties extends PropertyPanel
 			if (textureOnButton == null)
 			{
 				textureOnButton = new JButton();
-				textureOnButton.setBounds(370, 208, 80, 25);
+				textureOnButton.setBounds(370, 225, 80, 25);
 				textureOnButton.setText("Browse");
 				textureOnButton.addActionListener(new java.awt.event.ActionListener()
 				{
@@ -273,7 +273,7 @@ public class TrackLightProperties extends PropertyPanel
 			if (textureOffButton == null)
 			{
 				textureOffButton = new JButton();
-				textureOffButton.setBounds(370, 233, 80, 25);
+				textureOffButton.setBounds(370, 252, 80, 25);
 				textureOffButton.setText("Browse");
 				textureOffButton.addActionListener(new java.awt.event.ActionListener()
 				{
