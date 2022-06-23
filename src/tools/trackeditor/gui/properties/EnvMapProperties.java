@@ -133,6 +133,7 @@ public class EnvMapProperties extends PropertyPanel
 		if (tabbedPane == null)
 		{
 			tabbedPane = new JTabbedPane();
+			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 10, 460, 100);
 
 			Vector<EnvironmentMapping> envMaps = Editor.getProperties().getGraphic().getEnvironmentMapping();

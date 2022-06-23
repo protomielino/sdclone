@@ -119,8 +119,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
    )
 
    SET(JAVA_JARS bsh-2.0b4.jar
-                  jdom-1.1.3.jar
-                  looks-1.2.2.jar )
+                  jdom-1.1.3.jar )
 
    # ========= Debug
    #message(STATUS "JAVA_JARS = ${JAVA_JARS}")
@@ -171,7 +170,6 @@ IF(Java_Development_FOUND AND Java_FOUND)
 
    # https://github.com/beanshell/beanshell/releases
    # http://www.jdom.org/dist/binary/archive/jdom-1.1.3.zip
-   # http://www.java2s.com/Code/JarDownload/looks/looks-1.2.2.jar.zip
 
 ELSE(Java_Development_FOUND AND Java_FOUND)
    MESSAGE(WARNING "Java_FOUND = ${Java_FOUND}")

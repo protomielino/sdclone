@@ -453,6 +453,7 @@ public class TerrainProperties extends PropertyPanel
 		if (tabbedPane == null)
 		{
 			tabbedPane = new JTabbedPane();
+			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 285, 460, 100);
 
 			Vector<ObjectMap> objectMaps = Editor.getProperties().getGraphic().getTerrainGeneration().getObjectMaps();

@@ -137,6 +137,7 @@ public class ObjectProperties extends PropertyPanel
 		if (tabbedPane == null)
 		{
 			tabbedPane = new JTabbedPane();
+			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 10, 460, 210);
 
 			Vector<TrackObject> objects = Editor.getProperties().getObjects();

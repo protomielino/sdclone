@@ -137,6 +137,7 @@ public class SurfaceProperties extends PropertyPanel
 		if (tabbedPane == null)
 		{
 			tabbedPane = new JTabbedPane();
+			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 10, 460, 590);
 
 			Vector<Surface> surfaces = Editor.getProperties().getSurfaces();

@@ -136,6 +136,7 @@ public class TrackLightProperties extends PropertyPanel
 		if (tabbedPane == null)
 		{
 			tabbedPane = new JTabbedPane();
+			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 10, 460, 390);
 
 			Vector<TrackLight> lights = Editor.getProperties().getTrackLights();

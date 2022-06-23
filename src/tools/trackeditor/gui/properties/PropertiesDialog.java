@@ -94,6 +94,7 @@ public class PropertiesDialog extends JDialog
 		if (tabbedPane == null)
 		{
 			tabbedPane = new JTabbedPane();
+			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.addTab("General", null, getGeneralProperties(), null);
 			tabbedPane.addTab("Track", null, getTrackProperties(), null);
 			tabbedPane.addTab("Pit", null, getPitProperties(), null);
