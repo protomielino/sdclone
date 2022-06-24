@@ -120,8 +120,8 @@ IF(Java_Development_FOUND AND Java_FOUND)
 
    SET(JAVA_JARS bsh-2.0b4.jar
                   jdom-1.1.3.jar
-				  jgoodies-looks-2.5.3.jar
-				  jgoodies-common-1.6.0.jar )
+                  jgoodies-looks-2.5.3.jar
+                  jgoodies-common-1.6.0.jar )
 
    # ========= Debug
    #message(STATUS "JAVA_JARS = ${JAVA_JARS}")
@@ -135,9 +135,9 @@ IF(Java_Development_FOUND AND Java_FOUND)
    SET(_TGT_DIR "${CMAKE_BINARY_DIR}/${SD_BINDIR}")
 
    ADD_JAR(${_TARGET_NAME} 
-            SOURCES ${_JAVA_SRC} gui/splash/Splash.png icon.png ${_ICONS} 
+            SOURCES ${_JAVA_SRC} gui/splash/Splash.png icon.png ${_ICONS} META-INF/MANIFEST.MF
             INCLUDE_JARS ${JAVA_JARS}
-            MANIFEST ./META-INF/MANIFEST.MF
+            MANIFEST META-INF/MANIFEST.MF
             OUTPUT_DIR  ${_TGT_DIR}
             )
 
