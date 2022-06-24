@@ -284,6 +284,12 @@ public class EditorFrame extends JFrame
 	 */
 	protected void saveProject()
 	{
+		if (TrackData.getTrackData() == null)
+		{
+			message("No track", "Nothing to save");
+			return;
+		}
+
 //		if (documentIsModified)
 		if(true)
 		{
@@ -1670,7 +1676,13 @@ public class EditorFrame extends JFrame
 		}
 		public void actionPerformed(ActionEvent e)
 		{
-			System.out.println("TODO : I have to write some code for this.");
+			if (TrackData.getTrackData() == null)
+			{
+				message("No track", "Nothing to export");
+				return;
+			}			
+			exportAc3d();
+			torcsPlugin.exportTrack();
 		}
 	}
 	public class ExportAC3Action extends AbstractAction
@@ -1683,6 +1695,11 @@ public class EditorFrame extends JFrame
 		}
 		public void actionPerformed(ActionEvent e)
 		{
+			if (TrackData.getTrackData() == null)
+			{
+				message("No track", "Nothing to export");
+				return;
+			}			
 			exportAc3d();
 		}
 	}
@@ -1754,7 +1771,7 @@ public class EditorFrame extends JFrame
 		}
 	}
 
-	private void message(String title, String msg)
+	public void message(String title, String msg)
 	{
 		if (title == null)
 		{

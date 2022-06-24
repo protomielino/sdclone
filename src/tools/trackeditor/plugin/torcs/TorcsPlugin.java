@@ -33,6 +33,7 @@ import javax.swing.UIManager;
 import plugin.Plugin;
 import utils.CustomFileFilter;
 import utils.Editor;
+import utils.TrackData;
 
 /**
  * @author Charalampos Alexopoulos
@@ -116,6 +117,11 @@ public class TorcsPlugin implements Plugin
 
 	public void exportTrack()
 	{
+		if (TrackData.getTrackData() == null)
+		{
+			editor.message("No track", "Nothing to export");
+			return;
+		}
 		XmlWriter.writeXml();
 	}
 	/**

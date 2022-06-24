@@ -400,6 +400,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		}
 		if (e.getButton() == 1)
 		{
+			if (TrackData.getTrackData() == null)
+				return;
+
 			try
 			{
 				screenToReal(e, clickPoint);
@@ -1326,7 +1329,11 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	public void redrawCircuit()
 	{
-		Vector track = TrackData.getTrackData();
+		Vector<Segment> track = TrackData.getTrackData();
+		
+		if (track == null)
+			return;
+		
 		int size = track.size();
 		
 		Editor.getProperties().setCurrentA(0);
@@ -1335,7 +1342,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		
 		for(int i=0; i<size; i++)
 		{
-			Segment obj = (Segment) track.get(i);
+			Segment obj = track.get(i);
 			obj.setCount(i+1);
 			try
 			{
@@ -1353,7 +1360,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 		for(int i=0; i<size; i++)
 		{
-			Rectangle2D.Double r = ((Segment) track.get(i)).getBounds();
+			Rectangle2D.Double r = track.get(i).getBounds();
 
 			if (boundingRectangle == null)
 				boundingRectangle = r;
