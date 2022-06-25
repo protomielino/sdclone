@@ -1,4 +1,16 @@
-INCLUDE(../../../cmake/macros.cmake)
+# If the OPTION_TRACKEDITOR exists, then this is being built as part of
+# the Speed-Dreams build. To allow building the trackeditor without
+# building all of SD, set the _STANDALONE flag which is used to skip 
+# the SD specific calls
+
+IF(OPTION_TRACKEDITOR)
+   INCLUDE(../../../cmake/macros.cmake)
+   SET(_STANDALONE False)
+ELSE(OPTION_TRACKEDITOR)
+   SET(_STANDALONE True)
+   SET(SD_TOOLS_EXECPREFIX sd2-)
+   SET(SD_BINDIR bin)
+ENDIF(OPTION_TRACKEDITOR)
 
 FIND_PACKAGE(Java)
 FIND_PACKAGE(Java COMPONENTS Development)
@@ -155,8 +167,12 @@ IF(Java_Development_FOUND AND Java_FOUND)
 
    INSTALL_JAR(${_TARGET_NAME} DESTINATION ${SD_BINDIR})
 
-   # install the jar dependencies
-   SD_INSTALL_FILES(BIN FILES ${JAVA_JARS})
+   IF(_STANDALONE)
+      INSTALL(FILES ${JAVA_JARS} DESTINATION ${SD_BINDIR})
+   ELSE(_STANDALONE)
+      # install the jar dependencies
+      SD_INSTALL_FILES(BIN FILES ${JAVA_JARS})
+   ENDIF(_STANDALONE)
 
    # ========= Debug
    #get_target_property(_jarFile TrackEditor JAR_FILE)
