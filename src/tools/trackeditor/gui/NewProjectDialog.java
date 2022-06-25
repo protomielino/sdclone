@@ -80,7 +80,7 @@ public class NewProjectDialog extends JDialog
 	 */
 	private void initialize()
 	{
-		this.setSize(440, 455);
+		this.setSize(440, 285);
 		this.setContentPane(getJPanel());
 		this.setModal(true);
 		this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -106,19 +106,19 @@ public class NewProjectDialog extends JDialog
 			trackVersionLabel = new JLabel();
 			jPanel = new JPanel();
 			jPanel.setLayout(null);
-			projectNameLabel.setBounds(15, 15, 120, 30);
+			projectNameLabel.setBounds(10, 10, 120, 23);
 			projectNameLabel.setText("Track Name");
-			trackCategoryLabel.setBounds(15, 60, 120, 30);
+			trackCategoryLabel.setBounds(10, 37, 120, 23);
 			trackCategoryLabel.setText("Track Category");
-			trackSubcategoryLabel.setBounds(15, 105, 120, 30);
+			trackSubcategoryLabel.setBounds(10, 64, 120, 23);
 			trackSubcategoryLabel.setText("Track Subcategory");
-			trackVersionLabel.setBounds(15, 150, 120, 30);
+			trackVersionLabel.setBounds(10, 91, 120, 23);
 			trackVersionLabel.setText("Track Version");
-			pathLabel.setBounds(15, 195, 60, 30);
+			pathLabel.setBounds(10, 118, 60, 23);
 			pathLabel.setText("Path");
-			authorLabel.setBounds(15, 240, 60, 30);
+			authorLabel.setBounds(10, 145, 60, 23);
 			authorLabel.setText("Author");
-			descriptionLabel.setBounds(15, 285, 80, 30);
+			descriptionLabel.setBounds(10, 172, 80, 23);
 			descriptionLabel.setText("Description");
 			jPanel.add(getPathTextField(), null);
 			jPanel.add(getBrowseButton(), null);
@@ -150,7 +150,7 @@ public class NewProjectDialog extends JDialog
 		if (projectNameTextField == null)
 		{
 			projectNameTextField = new JTextField();
-			projectNameTextField.setBounds(145, 15, 170, 30);
+			projectNameTextField.setBounds(145, 10, 170, 23);
 			projectNameTextField.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
@@ -174,7 +174,7 @@ public class NewProjectDialog extends JDialog
 			{"circuit", "development", "dirt", "gprix", "karting", "oval", "road", "speedway", "test"};
 			trackCategoryComboBox = new JComboBox<String>(items);
 			trackCategoryComboBox.setSelectedItem(Editor.getProperties().getHeader().getCategory());
-			trackCategoryComboBox.setBounds(145, 60, 170, 30);
+			trackCategoryComboBox.setBounds(145, 37, 170, 23);
 			trackCategoryComboBox.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
@@ -201,7 +201,7 @@ public class NewProjectDialog extends JDialog
 			if (subcategory == null)
 				subcategory = "none";
 			trackSubcategoryComboBox.setSelectedItem(subcategory);
-			trackSubcategoryComboBox.setBounds(145, 105, 170, 30);
+			trackSubcategoryComboBox.setBounds(145, 64, 170, 23);
 			trackSubcategoryComboBox.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
@@ -225,7 +225,7 @@ public class NewProjectDialog extends JDialog
 			{"3", "4", "5"};
 			trackVersionComboBox = new JComboBox<String>(items);
 			trackVersionComboBox.setSelectedItem(Editor.getProperties().getHeader().getVersion() + "");
-			trackVersionComboBox.setBounds(145, 150, 170, 30);
+			trackVersionComboBox.setBounds(145, 91, 170, 23);
 			trackVersionComboBox.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
@@ -246,7 +246,7 @@ public class NewProjectDialog extends JDialog
 		if (pathTextField == null)
 		{
 			pathTextField = new JTextField();
-			pathTextField.setBounds(65, 195, 240, 30);
+			pathTextField.setBounds(65, 118, 260, 23);
 			pathTextField.addActionListener(new java.awt.event.ActionListener()
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
@@ -270,7 +270,7 @@ public class NewProjectDialog extends JDialog
 		if (browseButton == null)
 		{
 			browseButton = new JButton();
-			browseButton.setBounds(320, 195, 95, 30);
+			browseButton.setBounds(335, 117, 80, 25);
 			browseButton.setText("Browse");
 			browseButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -290,7 +290,7 @@ public class NewProjectDialog extends JDialog
 	private JTextField getAuthorTextField() {
 		if (authorTextField == null) {
 			authorTextField = new JTextField();
-			authorTextField.setBounds(65, 240, 240, 30);
+			authorTextField.setBounds(65, 145, 260, 23);
 		}
 		return authorTextField;
 	}
@@ -302,7 +302,7 @@ public class NewProjectDialog extends JDialog
 	private JTextField getDescriptionTextField() {
 		if (descriptionTextField == null) {
 			descriptionTextField = new JTextField();
-			descriptionTextField.setBounds(95, 285, 320, 30);
+			descriptionTextField.setBounds(95, 172, 320, 23);
 		}
 		return descriptionTextField;
 	}
@@ -336,7 +336,7 @@ public class NewProjectDialog extends JDialog
 		if (okButton == null)
 		{
 			okButton = new JButton();
-			okButton.setBounds(105, 375, 78, 30);
+			okButton.setBounds(105, 210, 78, 25);
 			okButton.setText("Ok");
 			okButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -358,7 +358,7 @@ public class NewProjectDialog extends JDialog
 		if (cancelButton == null)
 		{
 			cancelButton = new JButton();
-			cancelButton.setBounds(250, 375, 78, 30);
+			cancelButton.setBounds(240, 210, 78, 25);
 			cancelButton.setText("Cancel");
 			cancelButton.addActionListener(new java.awt.event.ActionListener()
 			{

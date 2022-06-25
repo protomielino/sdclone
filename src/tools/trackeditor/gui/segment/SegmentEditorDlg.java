@@ -168,7 +168,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	private void initialize()
 	{
 		this.setTitle("Segment Editor");
-		this.setSize(850, 533);
+		this.setSize(850, 536);
 		Point p = frame.getLocation();
 		p.x = frame.getProject().getSegmentEditorX();
 		p.y = frame.getProject().getSegmentEditorY();
