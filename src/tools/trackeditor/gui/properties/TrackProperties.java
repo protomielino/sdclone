@@ -27,10 +27,13 @@ import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
 import utils.Editor;
+import utils.circuit.SegmentSide;
 import utils.circuit.Surface;
 /**
  * @author babis
@@ -52,6 +55,7 @@ public class TrackProperties extends PropertyPanel
 	private JTextField			racelineIntTextField		= new JTextField();
 	private JLabel				racelineExtLabel			= new JLabel();
 	private JTextField			racelineExtTextField		= new JTextField();
+	private JTabbedPane			tabbedPane					= null;
 
 	private String[]			roadSurfaceItems		=
 	{"asphalt-lines", "asphalt-l-left", "asphalt-l-right",
@@ -100,7 +104,9 @@ public class TrackProperties extends PropertyPanel
 		addTextField(this, 4, racelineIntTextField, Editor.getProperties().getMainTrack().getRacelineInt(), 150, 50);
 		addTextField(this, 5, racelineExtTextField, Editor.getProperties().getMainTrack().getRacelineExt(), 150, 50);
 
-        Vector<Surface> surfaces = Editor.getProperties().getSurfaces();
+		this.add(getTabbedPane(), null);
+
+		Vector<Surface> surfaces = Editor.getProperties().getSurfaces();
         for (int i = 0; i < surfaces.size(); i++)
         {
 			String surface = surfaces.elementAt(i).getName();
@@ -156,6 +162,86 @@ public class TrackProperties extends PropertyPanel
 	}
 
 	/**
+	 * This method initializes tabbedPane
+	 *
+	 * @return javax.swing.JTabbedPane
+	 */
+	private JTabbedPane getTabbedPane()
+	{
+		if (tabbedPane == null)
+		{
+			tabbedPane = new JTabbedPane();
+			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+			tabbedPane.setBounds(10, 172, 460, 370);
+
+			tabbedPane.addTab("Left", null, new SidePanel(Editor.getProperties().getMainTrack().getLeft()), null);
+			tabbedPane.addTab("Right", null, new SidePanel(Editor.getProperties().getMainTrack().getRight()), null);
+		}
+		return tabbedPane;
+	}
+
+	private class SidePanel extends JPanel
+	{
+		private JLabel		sideStartWidthLabel			= new JLabel();
+		private JTextField 	sideStartWidthTextField		= new JTextField();
+		private JLabel		sideEndWidthLabel			= new JLabel();
+		private JTextField 	sideEndWidthTextField		= new JTextField();
+		private JLabel		sideSurfaceLabel			= new JLabel();
+		private JLabel		sideBankingTypeLabel		= new JLabel();
+		private JLabel		borderWidthLabel			= new JLabel();
+		private JTextField	borderWidthTextField		= new JTextField();
+		private JLabel		borderHeightLabel			= new JLabel();
+		private JTextField	borderHeightTextField		= new JTextField();
+		private JLabel		borderSurfaceLabel			= new JLabel();
+		private JLabel		borderStyleLabel			= new JLabel();
+		private JLabel		barrierWidthLabel			= new JLabel();
+		private JTextField	barrierWidthTextField		= new JTextField();
+		private JLabel		barrierHeightLabel			= new JLabel();
+		private JTextField	barrierHeightTextField		= new JTextField();
+		private JLabel		barrierSurfaceLabel			= new JLabel();
+		private JLabel		barrierStyleLabel			= new JLabel();
+
+		/**
+		 *
+		 */
+		public SidePanel(SegmentSide side)
+		{
+			super();
+			initialize(side);
+		}
+
+		/**
+		 *
+		 */
+		private void initialize(SegmentSide side)
+		{
+			setLayout(null);
+			
+			addLabel(this, 0, sideStartWidthLabel, "Side Start Width", 120);
+			addLabel(this, 1, sideEndWidthLabel, "Side End Width", 120);
+			addLabel(this, 2, sideSurfaceLabel, "Side Surface", 120);
+			addLabel(this, 3, sideBankingTypeLabel, "Side Type", 120);
+			addLabel(this, 4, borderWidthLabel, "Border Width", 120);
+			addLabel(this, 5, borderHeightLabel, "Border Height", 120);
+			addLabel(this, 6, borderSurfaceLabel, "Border Surface", 120);
+			addLabel(this, 7, borderStyleLabel, "Border Style", 120);
+			addLabel(this, 8, barrierWidthLabel, "Barrier Width", 120);
+			addLabel(this, 9, barrierHeightLabel, "Barrier Height", 120);
+			addLabel(this, 10, barrierSurfaceLabel, "Barrier Surface", 120);
+			addLabel(this, 11, barrierStyleLabel, "Barrier Style", 120);
+			
+			addTextField(this, 0, sideStartWidthTextField, side.getSideStartWidth(), 130, 60);
+			addTextField(this, 1, sideEndWidthTextField, side.getSideEndWidth(), 130, 60);
+
+			addTextField(this, 4, borderWidthTextField, side.getBorderWidth(), 130, 60);
+			addTextField(this, 5, borderHeightTextField, side.getBorderHeight(), 130, 60);
+
+			addTextField(this, 8, barrierWidthTextField, side.getBarrierWidth(), 130, 60);
+			addTextField(this, 9, barrierHeightTextField, side.getBarrierHeight(), 130, 60);		
+		}
+	}
+	
+	/**
 	 *
 	 */
 	public void exit()
@@ -203,6 +289,84 @@ public class TrackProperties extends PropertyPanel
         {
             Editor.getProperties().getMainTrack().setRacelineExt(doubleResult.getValue());
             frame.documentIsModified = true;
+        }
+
+        SidePanel left = (SidePanel) tabbedPane.getComponentAt(0);
+
+        if (isDifferent(left.sideStartWidthTextField.getText(),
+        	Editor.getProperties().getMainTrack().getLeft().getSideStartWidth(), doubleResult))
+        {
+            Editor.getProperties().getMainTrack().getLeft().setSideStartWidth(doubleResult.getValue());
+            frame.documentIsModified = true;        	
+        }
+        if (isDifferent(left.sideEndWidthTextField.getText(),
+            Editor.getProperties().getMainTrack().getLeft().getSideEndWidth(), doubleResult))
+        {
+            Editor.getProperties().getMainTrack().getLeft().setSideEndWidth(doubleResult.getValue());
+            frame.documentIsModified = true;        	
+        }
+        if (isDifferent(left.borderWidthTextField.getText(),
+            Editor.getProperties().getMainTrack().getLeft().getBorderWidth(), doubleResult))
+        {
+            Editor.getProperties().getMainTrack().getLeft().setBorderWidth(doubleResult.getValue());
+            frame.documentIsModified = true;        	
+        }
+        if (isDifferent(left.borderHeightTextField.getText(),
+            Editor.getProperties().getMainTrack().getLeft().getBorderHeight(), doubleResult))
+        {
+            Editor.getProperties().getMainTrack().getLeft().setBorderHeight(doubleResult.getValue());
+            frame.documentIsModified = true;        	
+        }
+        if (isDifferent(left.barrierWidthTextField.getText(),
+            Editor.getProperties().getMainTrack().getLeft().getBarrierWidth(), doubleResult))
+        {
+            Editor.getProperties().getMainTrack().getLeft().setBarrierWidth(doubleResult.getValue());
+            frame.documentIsModified = true;        	
+        }
+        if (isDifferent(left.barrierHeightTextField.getText(),
+            Editor.getProperties().getMainTrack().getLeft().getBarrierHeight(), doubleResult))
+        {
+            Editor.getProperties().getMainTrack().getLeft().setBarrierHeight(doubleResult.getValue());
+            frame.documentIsModified = true;        	
+        }
+
+        SidePanel right = (SidePanel) tabbedPane.getComponentAt(1);
+
+        if (isDifferent(right.sideStartWidthTextField.getText(),
+        	Editor.getProperties().getMainTrack().getRight().getSideStartWidth(), doubleResult))
+        {
+            Editor.getProperties().getMainTrack().getRight().setSideStartWidth(doubleResult.getValue());
+            frame.documentIsModified = true;        	
+        }
+        if (isDifferent(right.sideEndWidthTextField.getText(),
+            Editor.getProperties().getMainTrack().getRight().getSideEndWidth(), doubleResult))
+        {
+            Editor.getProperties().getMainTrack().getRight().setSideEndWidth(doubleResult.getValue());
+            frame.documentIsModified = true;        	
+        }
+        if (isDifferent(right.borderWidthTextField.getText(),
+            Editor.getProperties().getMainTrack().getRight().getBorderWidth(), doubleResult))
+        {
+            Editor.getProperties().getMainTrack().getRight().setBorderWidth(doubleResult.getValue());
+            frame.documentIsModified = true;        	
+        }
+        if (isDifferent(right.borderHeightTextField.getText(),
+            Editor.getProperties().getMainTrack().getRight().getBorderHeight(), doubleResult))
+        {
+            Editor.getProperties().getMainTrack().getRight().setBorderHeight(doubleResult.getValue());
+            frame.documentIsModified = true;        	
+        }
+        if (isDifferent(right.barrierWidthTextField.getText(),
+            Editor.getProperties().getMainTrack().getRight().getBarrierWidth(), doubleResult))
+        {
+            Editor.getProperties().getMainTrack().getRight().setBarrierWidth(doubleResult.getValue());
+            frame.documentIsModified = true;        	
+        }
+        if (isDifferent(right.barrierHeightTextField.getText(),
+            Editor.getProperties().getMainTrack().getRight().getBarrierHeight(), doubleResult))
+        {
+            Editor.getProperties().getMainTrack().getRight().setBarrierHeight(doubleResult.getValue());
+            frame.documentIsModified = true;        	
         }
 	}
  }  //  @jve:decl-index=0:visual-constraint="10,10"
