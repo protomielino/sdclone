@@ -3,6 +3,8 @@
 # building all of SD, set the _STANDALONE flag which is used to skip 
 # the SD specific calls
 
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12 FATAL_ERROR)
+
 IF(OPTION_TRACKEDITOR)
    INCLUDE(../../../cmake/macros.cmake)
    SET(_STANDALONE False)
@@ -150,7 +152,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
             SOURCES ${_JAVA_SRC} gui/splash/Splash.png icon.png ${_ICONS} META-INF/MANIFEST.MF
             INCLUDE_JARS ${JAVA_JARS}
             MANIFEST META-INF/MANIFEST.MF
-            OUTPUT_DIR  ${_TGT_DIR}
+            OUTPUT_DIR ${_TGT_DIR}
             )
 
    # Copy each jar dependency to the bin folder (for running without installing).
@@ -174,9 +176,17 @@ IF(Java_Development_FOUND AND Java_FOUND)
       SD_INSTALL_FILES(BIN FILES ${JAVA_JARS})
    ENDIF(_STANDALONE)
 
+   # TODO remove this when CMake issue 23668 is fixed
+   # INSTALL(PROGRAMS ...) will make the jar executable
+   # which is needed on some systems
+   # https://gitlab.kitware.com/cmake/cmake/-/issues/23668
+   get_target_property(_jarFile ${_TARGET_NAME} JAR_FILE)
+   INSTALL(PROGRAMS ${_jarFile} DESTINATION ${SD_BINDIR})
+   # ========= end of TODO section
+
    # ========= Debug
-   #get_target_property(_jarFile TrackEditor JAR_FILE)
-   #get_target_property(_classDir TrackEditor CLASSDIR)
+   #get_target_property(_jarFile ${_TARGET_NAME} JAR_FILE)
+   #get_target_property(_classDir ${_TARGET_NAME} CLASSDIR)
 
    #message(STATUS "Jar file ${_jarFile}")
    #message(STATUS "Class compiled to ${_classDir}")
