@@ -857,6 +857,7 @@ public class SegmentSide implements Cloneable
 			s.borderStyle = this.borderStyle;
 			s.borderSurface = this.borderSurface;
 			s.borderWidth = this.borderWidth;
+			s.sideBankingType = this.sideBankingType;
 			s.sideEndWidth = this.sideEndWidth;
 			s.sideStartWidth = this.sideStartWidth;
 			s.sideSurface = this.sideSurface;
