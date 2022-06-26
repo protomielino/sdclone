@@ -524,8 +524,10 @@ public class XmlReader
         part.setBorderWidth(getAttrNumValue(seg, sPart + "border width", "m"));
         part.setBorderHeight(getAttrNumValue(seg, sPart + "border height", "m"));
         part.setBorderSurface(getAttrStrValue(seg, sPart + "border surface"));
-        part.setBarrierWidth(0);
-        part.setBarrierHeight(0);
+        part.setBarrierStyle(getAttrStrValue(seg, sPart + "barrier style"));
+        part.setBarrierWidth(getAttrNumValue(seg, sPart + "barrier width", "m"));
+        part.setBarrierHeight(getAttrNumValue(seg, sPart + "barrier height", "m"));
+        part.setBarrierSurface(getAttrStrValue(seg, sPart + "barrier surface"));
     }
 
     private synchronized static void setSegments(Element mainTrack)

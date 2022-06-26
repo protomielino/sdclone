@@ -389,8 +389,14 @@ public class XmlWriter
 		addContent(side, sPart + "side type", part.getSideBankingType());
 
 		addContent(side, sPart + "border start width", "m", part.getBorderWidth());
+		addContent(side, sPart + "border start height", "m", part.getBorderHeight());
 		addContent(side, sPart + "border surface", part.getBorderSurface());
 		addContent(side, sPart + "border type", part.getBorderStyle());
+
+		addContent(side, sPart + "barrier start width", "m", part.getBarrierWidth());
+		addContent(side, sPart + "barrier start height", "m", part.getBarrierHeight());
+		addContent(side, sPart + "barrier surface", part.getBarrierSurface());
+		addContent(side, sPart + "barrier type", part.getBarrierStyle());
 	}
 
 	/**
