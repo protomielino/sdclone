@@ -22,6 +22,7 @@ package utils.undo;
 
 import java.util.Vector;
 
+import utils.Editor;
 import utils.TrackData;
 import utils.circuit.Segment;
 
@@ -54,8 +55,21 @@ public class UndoDeleteSegment implements UndoInterface
 	 */
 	public void undo()
 	{
-		Vector<Segment> data = TrackData.getTrackData();
-		System.out.println(pos);
+		Vector<Segment> data = TrackData.getTrackData();	
+		Segment prevSeg = undo.getPreviousShape();
+		Segment nextSeg = undo.getNextShape();
+		if (undo.getType() == "str")
+		{
+			int count = Editor.getProperties().getStraightNameCount() + 1;
+			Editor.getProperties().setStraightNameCount(count);
+		}
+		else
+		{
+			int count = Editor.getProperties().getCurveNameCount() + 1;
+			Editor.getProperties().setCurveNameCount(count);			
+		}		
+		undo.addToPrevious(prevSeg);
+		undo.addToNext(nextSeg);				
 		data.insertElementAt(undo,pos);
 		redo = undo;
 		undo = null;
@@ -67,10 +81,23 @@ public class UndoDeleteSegment implements UndoInterface
 	public void redo()
 	{
 		Vector<Segment> data = TrackData.getTrackData();
-		pos = data.indexOf(undo);
-		data.remove(undo);
+		pos = data.indexOf(redo);
+		if (redo.getType() == "str")
+		{
+			int count = Editor.getProperties().getStraightNameCount() - 1;
+			Editor.getProperties().setStraightNameCount(count);
+		}
+		else
+		{
+			int count = Editor.getProperties().getCurveNameCount() - 1;
+			Editor.getProperties().setCurveNameCount(count);			
+		}		
+		if (redo.getPreviousShape() != null)
+			redo.getPreviousShape().setNextShape(redo.getNextShape());
+		if (redo.getNextShape() != null)
+			redo.getNextShape().setPreviousShape(redo.getPreviousShape());
+		data.remove(redo);
 		undo = redo;
 		redo = null;
 	}
-
 }

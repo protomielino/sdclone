@@ -84,5 +84,4 @@ public class Undo
 		undoSegments.add(undo);
 		redoSegments.clear();
 	}
-
 }

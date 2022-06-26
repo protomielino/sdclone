@@ -324,7 +324,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						Segment next = handledShape.getNextShape();
 						newShape.addToPrevious(handledShape);
 						newShape.addToNext(next);
-						data.insertElementAt(newShape,pos+1);
+						data.insertElementAt(newShape, pos + 1);
 						Undo.add(new UndoAddSegment(newShape));
 						selectedShape = newShape;
 						openSegmentDialog(newShape);
@@ -335,6 +335,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 					case STATE_DELETE :
 					{
+						if (handledShape == null)
+							return;
+
 						try
 						{
 							boolean mustFireEvent = (selectedShape != null);
@@ -358,8 +361,10 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 							// must check for a segment under the mouse
 							Vector<Segment> data = TrackData.getTrackData();
 							int pos = data.indexOf(handledShape);
-							handledShape.getPreviousShape().setNextShape(handledShape.getNextShape());
-							handledShape.getNextShape().setPreviousShape(handledShape.getPreviousShape());
+							if (handledShape.getPreviousShape() != null)
+								handledShape.getPreviousShape().setNextShape(handledShape.getNextShape());
+							if (handledShape.getNextShape() != null)
+								handledShape.getNextShape().setPreviousShape(handledShape.getPreviousShape());
 							Undo.add(new UndoDeleteSegment(handledShape));
 							data.remove(pos);
 							handledShape = null;
@@ -892,6 +897,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	 */
 	protected Segment findObjAtMousePos()
 	{
+		if (TrackData.getTrackData() == null)
+			return null;
+		
 		Segment out = null;
 		// must look for an object under the mouse
 		int count = 0;
