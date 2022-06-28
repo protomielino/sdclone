@@ -20,6 +20,8 @@
  */
 package utils;
 
+import java.awt.Toolkit;
+
 import javax.swing.UIManager;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
@@ -27,6 +29,7 @@ import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import com.jgoodies.looks.plastic.theme.DesertBlue;
 
 import gui.EditorFrame;
+import miscel.TCPopupEventQueue;
 
 
 /**
@@ -41,6 +44,8 @@ public class TrackEditor
 
 	public static void main(String[] args)
 	{
+		Toolkit.getDefaultToolkit().getSystemEventQueue().push(new TCPopupEventQueue());
+		
 		PlasticLookAndFeel.setCurrentTheme(new DesertBlue());
 		try
 		{
