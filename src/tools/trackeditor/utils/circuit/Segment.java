@@ -958,4 +958,59 @@ public class Segment implements Cloneable
         if (next != null)
             next.previousShape = this;
     }
+    
+    public void inheritProperties(Segment previousShape)
+    {
+		setSurface(previousShape.getSurface());
+		if (!Double.isNaN(previousShape.getHeightEndLeft()))
+		{
+			setHeightStartLeft(previousShape.getHeightEndLeft());
+			setHeightEndLeft(previousShape.getHeightEndLeft());
+		}
+
+		if (!Double.isNaN(previousShape.getHeightEndRight()))
+		{
+			setHeightStartRight(previousShape.getHeightEndRight());
+			setHeightEndRight(previousShape.getHeightEndRight());
+		}
+
+		setGrade(previousShape.getGrade());
+		if (!Double.isNaN(bankingEnd))
+		{
+			setBankingStart(previousShape.getBankingEnd());
+			setBankingEnd(previousShape.getBankingEnd());
+		}
+
+		setProfil(previousShape.getProfil());
+
+		getLeft().setSideStartWidth(previousShape.getLeft().getSideEndWidth());
+		getLeft().setSideEndWidth(previousShape.getLeft().getSideEndWidth());
+		getLeft().setSideSurface(previousShape.getLeft().getSideSurface());
+		getLeft().setSideBankingType(previousShape.getLeft().getSideBankingType());
+
+		getLeft().setBarrierWidth(previousShape.getLeft().getBarrierWidth());
+		getLeft().setBarrierHeight(previousShape.getLeft().getBarrierHeight());
+		getLeft().setBarrierSurface(previousShape.getLeft().getBarrierSurface());
+		getLeft().setBarrierStyle(previousShape.getLeft().getBarrierStyle());
+
+		getLeft().setBorderWidth(previousShape.getLeft().getBorderWidth());
+		getLeft().setBorderHeight(previousShape.getLeft().getBorderHeight());
+		getLeft().setBorderSurface(previousShape.getLeft().getBorderSurface());
+		getLeft().setBorderStyle(previousShape.getLeft().getBorderStyle());
+
+		getRight().setSideStartWidth(previousShape.getRight().getSideEndWidth());
+		getRight().setSideEndWidth(previousShape.getRight().getSideEndWidth());
+		getRight().setSideSurface(previousShape.getRight().getSideSurface());
+		getRight().setSideBankingType(previousShape.getRight().getSideBankingType());
+
+		getRight().setBarrierWidth(previousShape.getRight().getBarrierWidth());
+		getRight().setBarrierHeight(previousShape.getRight().getBarrierHeight());
+		getRight().setBarrierSurface(previousShape.getRight().getBarrierSurface());
+		getRight().setBarrierStyle(previousShape.getRight().getBarrierStyle());
+
+		getRight().setBorderWidth(previousShape.getRight().getBorderWidth());
+		getRight().setBorderHeight(previousShape.getRight().getBorderHeight());
+		getRight().setBorderSurface(previousShape.getRight().getBorderSurface());
+		getRight().setBorderStyle(previousShape.getRight().getBorderStyle());
+    }
 }

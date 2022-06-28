@@ -265,6 +265,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						newShape.setArc(Math.PI/2);
 						newShape.setRadiusStart(50);
 						newShape.setRadiusEnd(50);
+						newShape.inheritProperties(handledShape);
 						int count = Editor.getProperties().getCurveNameCount()+1;
 						Editor.getProperties().setCurveNameCount(count);
 						newShape.setName("curve "+count);
@@ -292,6 +293,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						newShape.setArc(Math.PI/2);
 						newShape.setRadiusStart(50);
 						newShape.setRadiusEnd(50);
+						newShape.inheritProperties(handledShape);
 						int count = Editor.getProperties().getCurveNameCount()+1;
 						Editor.getProperties().setCurveNameCount(count);
 						newShape.setName("curve "+count);
@@ -318,6 +320,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						int pos = data.indexOf(handledShape);
 						Straight newShape = new Straight();
 						newShape.setLength(50);
+						newShape.inheritProperties(handledShape);
 						int count = Editor.getProperties().getStraightNameCount()+1;
 						Editor.getProperties().setStraightNameCount(count);
 						newShape.setName("straight "+count);
