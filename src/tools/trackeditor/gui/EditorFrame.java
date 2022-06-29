@@ -42,7 +42,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
+import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -92,6 +95,7 @@ public class EditorFrame extends JFrame
 	LeftAction					leftAction							= null;
 	NewAction					newAction							= null;
 	OpenAction					openAction							= null;
+	RecentAction				recentAction						= null;
 	SaveAction					saveAction							= null;
 	ShowArrowsAction			showArrowsAction					= null;
 	ShowBackgroundAction		showBackgroundAction				= null;
@@ -131,6 +135,7 @@ public class EditorFrame extends JFrame
 	private JToolBar			jToolBar							= null;
 	private JMenuItem			newMenuItem							= null;
 	private JMenuItem			openMenuItem						= null;
+	private JMenu				recentFilesMenu							= null;
 	private JButton				saveButton							= null;
 	private JButton				openButton							= null;
 	private JButton				helpButton							= null;
@@ -169,11 +174,17 @@ public class EditorFrame extends JFrame
 	private JMenuItem			propertiesMenuItem					= null;
 
 	public Plugin				torcsPlugin							= new TorcsPlugin(this);
-	private Project	prj;
+	private Project				prj;
 
-	private String sep = System.getProperty("file.separator");
+	private String 				sep									= System.getProperty("file.separator");
 
-	private JButton calculateDeltaButton = null;
+	private JButton 			calculateDeltaButton				= null;
+	
+	private Preferences			preferences							= Preferences.userNodeForPackage(EditorFrame.class);
+	private List<String>		recentFiles							= new ArrayList<String>();
+	private final static String	RECENT_FILES_STRING					= "recent.files.";
+	private final static int	RECENT_FILES_MAX					= 5;
+
 	public EditorFrame()
 	{
 		boolean doSplash = true;
@@ -217,6 +228,29 @@ public class EditorFrame extends JFrame
 		_splash.dispose();
 	}
 
+	private void updateRecentFiles(String filename)
+	{
+		recentFiles.remove(filename);
+		recentFiles.add(0, filename);
+    
+		if (recentFiles.size() > RECENT_FILES_MAX)
+		{
+			recentFiles.remove(recentFiles.size() - 1);
+		}
+    
+		for (int i = 0; i < RECENT_FILES_MAX; i++)
+		{
+			if (i < recentFiles.size())
+			{
+				preferences.put(RECENT_FILES_STRING+i, recentFiles.get(i));
+			}
+			else
+			{
+				preferences.remove(RECENT_FILES_STRING+i);
+			}
+		}
+	}
+
 	/**
 	 *
 	 */
@@ -242,33 +276,37 @@ public class EditorFrame extends JFrame
 		UIManager.put("FileChooser.readOnly", old);
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
-			tmp = fc.getSelectedFile().toString();
-			filename = tmp;
-			tmp = tmp.substring(0, tmp.lastIndexOf(sep));
-			Editor.getProperties().setPath(tmp);
-			tmp = Editor.getProperties().getPath().substring(0, tmp.lastIndexOf(sep));
-			Editor.getProperties().getHeader().setCategory(tmp.substring(tmp.lastIndexOf(sep) + 1));
-			tmp = Editor.getProperties().getPath();
-			tmp = tmp.substring(tmp.lastIndexOf(sep)+1);
-			Editor.getProperties().getHeader().setName(tmp);
-			try
-			{
-				XMLDecoder decoder = new XMLDecoder(new FileInputStream(filename));
-				//setProject((Project) decoder.readObject());
-				Editor.setProperties((Properties)decoder.readObject());
-			} catch (FileNotFoundException ex)
-			{
-				System.out.println("not found");
-			} catch (ClassCastException e)
-			{
-				//e.printStackTrace();
-				System.out.println("This file can't be read");
-			}
-			tmp = Editor.getProperties().getPath()+sep+Editor.getProperties().getHeader().getName()+".xml";
-			File file = new File(tmp);
-			torcsPlugin.readFile(file);
+			openProject(fc.getSelectedFile().toString());
 		}
-
+	}
+	
+	private void openProject(String filename)
+	{
+		String tmp = filename;
+		tmp = tmp.substring(0, tmp.lastIndexOf(sep));
+		Editor.getProperties().setPath(tmp);
+		tmp = Editor.getProperties().getPath().substring(0, tmp.lastIndexOf(sep));
+		Editor.getProperties().getHeader().setCategory(tmp.substring(tmp.lastIndexOf(sep) + 1));
+		tmp = Editor.getProperties().getPath();
+		tmp = tmp.substring(tmp.lastIndexOf(sep)+1);
+		Editor.getProperties().getHeader().setName(tmp);
+		try
+		{
+			XMLDecoder decoder = new XMLDecoder(new FileInputStream(filename));
+			//setProject((Project) decoder.readObject());
+			Editor.setProperties((Properties)decoder.readObject());
+		} catch (FileNotFoundException ex)
+		{
+			JOptionPane.showMessageDialog(this, "Project not found : " + filename, "Project Open", JOptionPane.ERROR_MESSAGE);
+		} catch (ClassCastException e)
+		{
+			//e.printStackTrace();
+			System.out.println("This file can't be read");
+		}
+		tmp = Editor.getProperties().getPath()+sep+Editor.getProperties().getHeader().getName()+".xml";
+		File file = new File(tmp);
+		torcsPlugin.readFile(file);
+		updateRecentFiles(filename);	
 	}
 
 	/**
@@ -312,6 +350,7 @@ public class EditorFrame extends JFrame
 			}
 			torcsPlugin.exportTrack();
 			documentIsModified = false;
+			updateRecentFiles(filename);
 		}
 	}
 
@@ -341,8 +380,6 @@ public class EditorFrame extends JFrame
 			refresh();
 		}
 	}
-
-
 
 	/**
      *
@@ -486,6 +523,7 @@ public class EditorFrame extends JFrame
 		mainMenuBar.add(getHelpMenu());
 		menuFile.add(getNewMenuItem());
 		menuFile.add(getOpenMenuItem());
+		menuFile.add(getRecentMenu());
 		menuFile.add(getItemSaveCircuit());
 		menuFile.addSeparator();
 		menuFile.add(getImportMenu());
@@ -543,6 +581,45 @@ public class EditorFrame extends JFrame
 		}
 		return openMenuItem;
 	}
+	/**
+	 * This method initializes recentFilesMenu
+	 *
+	 * @return javax.swing.JMenuItem
+	 */
+	private JMenuItem getRecentMenu()
+	{
+		if (recentFilesMenu == null)
+		{
+			recentFilesMenu = new JMenu();
+			recentFilesMenu.setAction(recentAction);
+			recentFilesMenu.setIcon(null);
+
+			for (int i = 0; i < RECENT_FILES_MAX; i++)
+			{
+				String file = preferences.get(RECENT_FILES_STRING + i, "");
+
+				if (!file.equals(""))
+				{
+					recentFiles.add(file);
+					JMenuItem recentFileMenuItem = new JMenuItem(file);
+					recentFileMenuItem.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							openProject(((JMenuItem) e.getSource()).getText());
+						}
+					});
+					recentFilesMenu.add(recentFileMenuItem);
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+		return recentFilesMenu;
+	}
+
 	/**
 	 * This method initializes itemSaveCircuit
 	 *
@@ -1440,6 +1517,7 @@ public class EditorFrame extends JFrame
 		leftAction = new LeftAction("Add left", createNavigationIcon("TurnLeft24"), "Add a left turn segment.",	KeyEvent.VK_S);
 		newAction = new NewAction("New", createNavigationIcon("New24"), "New circuit.", KeyEvent.VK_S);
 		openAction = new OpenAction("Open", createNavigationIcon("Open24"), "Open existing circuit.", KeyEvent.VK_S);
+		recentAction = new RecentAction("Recent", null, "Recently opened circuits.", KeyEvent.VK_S);
 		saveAction = new SaveAction("Save", createNavigationIcon("Save24"), "Save the circuit.", KeyEvent.VK_S);
 		moveAction = new MoveAction("Move", createNavigationIcon("Export24"), "Move.", KeyEvent.VK_S);
 		showArrowsAction = new ShowArrowsAction("Show arrows", createNavigationIcon("FindAgain24"), "Show arrows.", KeyEvent.VK_S);
@@ -1596,6 +1674,18 @@ public class EditorFrame extends JFrame
 			openProject();
 		}
 	}
+	public class RecentAction extends AbstractAction
+	{
+		public RecentAction(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+		}
+	}
 
 	public class SaveAction extends AbstractAction
 	{
@@ -1683,6 +1773,8 @@ public class EditorFrame extends JFrame
 			}			
 			exportAc3d();
 			torcsPlugin.exportTrack();
+			String fileName = Editor.getProperties().getPath() + sep + Editor.getProperties().getHeader().getName() + ".xml";
+			updateRecentFiles(fileName);
 		}
 	}
 	public class ExportAC3Action extends AbstractAction
