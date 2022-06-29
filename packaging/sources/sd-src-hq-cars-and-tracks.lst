@@ -43,6 +43,7 @@ data/tracks/circuit/corkscrew
 data/tracks/circuit/forza
 data/tracks/circuit/karwada
 data/tracks/circuit/hidden-valley
+data/tracks/circuit/melbourne
 
 data/tracks/road/CMakeLists.txt
 

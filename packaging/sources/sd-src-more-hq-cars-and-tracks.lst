@@ -57,7 +57,6 @@ data/cars/models/mp1-kuala-c24
 data/tracks/circuit/CMakeLists.txt
 
 data/tracks/circuit/aalborg
-data/tracks/circuit/melbourne
 data/tracks/circuit/migrants
 data/tracks/circuit/ruudskogen
 data/tracks/circuit/sao-paulo
