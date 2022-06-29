@@ -252,6 +252,9 @@ Section -Tracks
   SetOutPath "$INSTDIR\data\tracks\road\salty"
   File /r "${BUILD_INST_DIR}\data\tracks\road\salty\*.*"
 
+  SetOutPath "$INSTDIR\data\tracks\road\torino"
+  File /r "${BUILD_INST_DIR}\data\tracks\road\torino\*.*"
+
   ; HQ (2) speedways
   SetOutPath "$INSTDIR\data\tracks\speedway\longpond"
   File /r "${BUILD_INST_DIR}\data\tracks\speedway\longpond\*.*"
