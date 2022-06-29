@@ -69,7 +69,6 @@ data/tracks/circuit/tuna
 
 data/tracks/road/CMakeLists.txt
 
-data/tracks/road/torino
 data/tracks/road/e-track-4
 data/tracks/road/spring
 data/tracks/road/street-1
