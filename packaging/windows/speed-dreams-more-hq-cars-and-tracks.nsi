@@ -64,7 +64,6 @@ Section -CoreData
   ; Game core data files (racemanagers, ...)
   SetOutPath "$INSTDIR\data\config\raceman"
   File "${BUILD_INST_DIR}\data\config\raceman\championship.xml"
-  File "${BUILD_INST_DIR}\data\config\raceman\championship-mpa1.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-supercars.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-trb1.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-mp1.xml"
@@ -116,9 +115,6 @@ Section -Drivers
 
   ;SetOutPath "$INSTDIR\data\drivers\shadow_mpa1"
   ;File /r "${BUILD_INST_DIR}\data\drivers\shadow_mpa1\*.*"
-
-  ;SetOutPath "$INSTDIR\data\drivers\shadow_mp1"
-  ;File /r "${BUILD_INST_DIR}\data\drivers\shadow_mp1\*.*"
 
 
   ; Warning: Must be here because kilo2008 also drivers the TRB1 cars.
