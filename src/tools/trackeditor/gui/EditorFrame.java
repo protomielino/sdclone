@@ -564,6 +564,7 @@ public class EditorFrame extends JFrame
 			newMenuItem = new JMenuItem();
 			newMenuItem.setAction(newAction);
 			newMenuItem.setIcon(null);
+			newMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
 		}
 		return newMenuItem;
 	}
@@ -579,6 +580,7 @@ public class EditorFrame extends JFrame
 			openMenuItem = new JMenuItem();
 			openMenuItem.setAction(openAction);
 			openMenuItem.setIcon(null);
+			openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
 		}
 		return openMenuItem;
 	}
@@ -633,6 +635,7 @@ public class EditorFrame extends JFrame
 			itemSaveCircuit = new JMenuItem();
 			itemSaveCircuit.setAction(saveAction);
 			itemSaveCircuit.setIcon(null);
+			itemSaveCircuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
 		}
 		return itemSaveCircuit;
 	}
