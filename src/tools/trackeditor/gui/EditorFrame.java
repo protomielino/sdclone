@@ -60,6 +60,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -865,6 +866,7 @@ public class EditorFrame extends JFrame
 			undoMenuItem = new JMenuItem();
 			undoMenuItem.setAction(undoAction);
 			undoMenuItem.setIcon(null);
+			undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK));
 		}
 		return undoMenuItem;
 	}
@@ -880,6 +882,7 @@ public class EditorFrame extends JFrame
 			redoMenuItem = new JMenuItem();
 			redoMenuItem.setAction(redoAction);
 			redoMenuItem.setIcon(null);
+			redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK));
 		}
 		return redoMenuItem;
 	}
