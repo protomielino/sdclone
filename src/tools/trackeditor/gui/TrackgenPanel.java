@@ -24,10 +24,14 @@ import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Vector;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -41,9 +45,8 @@ import utils.Editor;
 public class TrackgenPanel extends JDialog implements Runnable
 {
 	public static Vector	args			= new Vector();
-	//private Properties properties = Properties.getInstance();
 	public EditorFrame		parent;
-	Thread ac3d = new Thread(this);
+	private Thread 			ac3d 			= new Thread(this);
 
 	private JPanel			jPanel			= null;
 	private JLabel			nameLabel		= null;
@@ -66,7 +69,6 @@ public class TrackgenPanel extends JDialog implements Runnable
 		ac3d.start();
 	}
 
-
 	/**
 	 * This method initializes this
 	 * 
@@ -77,8 +79,8 @@ public class TrackgenPanel extends JDialog implements Runnable
 		this.setContentPane(getJPanel());
 		this.setTitle("Trackgen");
 		this.setSize(475, 320);
-
 	}
+
 	public void run()
 	{
 		String category = " -c " + Editor.getProperties().getHeader().getCategory();
@@ -89,8 +91,24 @@ public class TrackgenPanel extends JDialog implements Runnable
 
 		try
 		{
+			String trackgen = "sd2-trackgen";
 			String ls_str;
 			String tmp = "";
+			
+			Path path = Paths.get(trackgen);
+			
+			if (!Files.isExecutable(path))
+			{
+				if (!Files.exists(path))
+				{
+					JOptionPane.showMessageDialog(this, "Can't find : " + trackgen +
+						"\n\nMake sure " + trackgen + " is installed or can be found using the path environment variable.",
+						"Export AC3D", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				JOptionPane.showMessageDialog(this, "Can't execute : " + path.getFileName(), "Export AC3D", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 
 			Process ls_proc = Runtime.getRuntime().exec("sd2-trackgen" + args);
 			// get its output (your input) stream
