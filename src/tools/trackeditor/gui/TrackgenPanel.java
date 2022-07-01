@@ -91,25 +91,9 @@ public class TrackgenPanel extends JDialog implements Runnable
 
 		try
 		{
-			String trackgen = "sd2-trackgen";
 			String ls_str;
 			String tmp = "";
 			
-			Path path = Paths.get(trackgen);
-			
-			if (!Files.isExecutable(path))
-			{
-				if (!Files.exists(path))
-				{
-					JOptionPane.showMessageDialog(this, "Can't find : " + trackgen +
-						"\n\nMake sure " + trackgen + " is installed or can be found using the path environment variable.",
-						"Export AC3D", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				JOptionPane.showMessageDialog(this, "Can't execute : " + path.getFileName(), "Export AC3D", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-
 			Process ls_proc = Runtime.getRuntime().exec("sd2-trackgen" + args);
 			// get its output (your input) stream
 			BufferedReader ls_in = new BufferedReader(new InputStreamReader(ls_proc.getInputStream()));
