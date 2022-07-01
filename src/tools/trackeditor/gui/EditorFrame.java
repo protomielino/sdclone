@@ -136,7 +136,7 @@ public class EditorFrame extends JFrame
 	private JToolBar			jToolBar							= null;
 	private JMenuItem			newMenuItem							= null;
 	private JMenuItem			openMenuItem						= null;
-	private JMenu				recentFilesMenu							= null;
+	private JMenu				recentFilesMenu						= null;
 	private JButton				saveButton							= null;
 	private JButton				openButton							= null;
 	private JButton				helpButton							= null;
@@ -250,6 +250,34 @@ public class EditorFrame extends JFrame
 				preferences.remove(RECENT_FILES_STRING+i);
 			}
 		}
+		
+		for (int i = 0; i < recentFiles.size(); i++)
+		{
+			if (recentFilesMenu.getItem(i) != null)
+			{
+				if (recentFilesMenu.getItem(i).getText() != recentFiles.get(i))
+				{
+					recentFilesMenu.getItem(i).setText(recentFiles.get(i));
+				}
+			}
+			else
+			{
+				addRecentFilesMenuItem(recentFiles.get(i));
+			}
+		}
+	}
+
+	private void addRecentFilesMenuItem(String filename)
+	{
+		JMenuItem recentFileMenuItem = new JMenuItem(filename);
+		recentFileMenuItem.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				openProject(((JMenuItem) e.getSource()).getText());
+			}
+		});
+		recentFilesMenu.add(recentFileMenuItem);
 	}
 
 	/**
@@ -625,15 +653,7 @@ public class EditorFrame extends JFrame
 				if (!file.equals(""))
 				{
 					recentFiles.add(file);
-					JMenuItem recentFileMenuItem = new JMenuItem(file);
-					recentFileMenuItem.addActionListener(new ActionListener()
-					{
-						public void actionPerformed(ActionEvent e)
-						{
-							openProject(((JMenuItem) e.getSource()).getText());
-						}
-					});
-					recentFilesMenu.add(recentFileMenuItem);
+					addRecentFilesMenuItem(file);
 				}
 				else
 				{
