@@ -305,8 +305,29 @@ public class EditorFrame extends JFrame
 			System.out.println("This file can't be read");
 		}
 		tmp = Editor.getProperties().getPath()+sep+Editor.getProperties().getHeader().getName()+".xml";
+		boolean fromProjectName = false;
 		File file = new File(tmp);
+		if (!file.exists())
+		{
+			// couldn't read xml file from project file information
+			// get xml file from project file name
+			tmp = filename.replaceAll(".prj.xml", ".xml");
+			file = new File(tmp);
+			if (!file.exists())
+			{
+				JOptionPane.showMessageDialog(this, "File not found : " + tmp, "Project Open", JOptionPane.ERROR_MESSAGE);				
+				return;
+			}
+			fromProjectName = true;
+		}
 		torcsPlugin.readFile(file);
+		if (fromProjectName)
+		{
+			// fix path
+			int index = tmp.lastIndexOf(sep);
+			tmp = tmp.substring(0, index);
+			Editor.getProperties().setPath(tmp);
+		}
 		updateRecentFiles(filename);	
 	}
 
