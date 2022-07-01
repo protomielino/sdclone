@@ -139,7 +139,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 			}
 		} catch (IOException e1)
 		{
-			System.err.println(e1);
+			JOptionPane.showMessageDialog(this, e1.getLocalizedMessage(), "Export AC3D", JOptionPane.ERROR_MESSAGE);
 		}
 		this.waitLabel.setText("Track finished");
 	}
