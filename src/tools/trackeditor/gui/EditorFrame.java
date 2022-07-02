@@ -253,7 +253,7 @@ public class EditorFrame extends JFrame
 		
 		for (int i = 0; i < recentFiles.size(); i++)
 		{
-			if (recentFilesMenu.getItem(i) != null)
+			if (i < recentFilesMenu.getItemCount())
 			{
 				if (recentFilesMenu.getItem(i).getText() != recentFiles.get(i))
 				{
@@ -1820,7 +1820,7 @@ public class EditorFrame extends JFrame
 			}			
 			exportAc3d();
 			torcsPlugin.exportTrack();
-			String fileName = Editor.getProperties().getPath() + sep + Editor.getProperties().getHeader().getName() + ".xml";
+			String fileName = Editor.getProperties().getPath() + sep + Editor.getProperties().getHeader().getName() + ".prj.xml";
 			updateRecentFiles(fileName);
 		}
 	}
