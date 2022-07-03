@@ -64,9 +64,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          gui/view/CircuitViewSelectionListener.java
          miscel/EPMath.java
          miscel/TCPopupEventQueue.java
-         plugin/Plugin.java
          plugin/torcs/NoOpEntityResolver.java
-         plugin/torcs/TorcsPlugin.java
          plugin/torcs/XMLOutput.java
          plugin/torcs/XmlReader.java
          plugin/torcs/XmlWriter.java
