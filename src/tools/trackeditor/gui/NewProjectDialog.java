@@ -20,7 +20,6 @@
  */
 package gui;
 
-import java.awt.Frame;
 import java.io.File;
 
 import javax.swing.JButton;
@@ -31,7 +30,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import utils.Editor;
 /**
  * @author babis
  * 
@@ -62,15 +60,18 @@ public class NewProjectDialog extends JDialog
 	private JLabel 				descriptionLabel 			= null;
 	private JTextField 			descriptionTextField		= null;
 	
+	private EditorFrame.NewProjectInfo	newProjectInfo;
+	
 	private final String sep = System.getProperty("file.separator");
 	
 	/**
 	 *  
 	 */
-	public NewProjectDialog(Frame editorFrame)
+	public NewProjectDialog(EditorFrame editorFrame, EditorFrame.NewProjectInfo newProjectInfo)
 	{
 		super();
-		this.editorFrame = (EditorFrame) editorFrame;
+		this.editorFrame = editorFrame;
+		this.newProjectInfo = newProjectInfo;
 		initialize();
 	}
 	/**
@@ -173,7 +174,7 @@ public class NewProjectDialog extends JDialog
 			String[] items =
 			{"circuit", "development", "dirt", "gprix", "karting", "oval", "road", "speedway", "test"};
 			trackCategoryComboBox = new JComboBox<String>(items);
-			trackCategoryComboBox.setSelectedItem(editorFrame.getTrackData().getHeader().getCategory());
+			trackCategoryComboBox.setSelectedItem("road");
 			trackCategoryComboBox.setBounds(145, 37, 170, 23);
 			trackCategoryComboBox.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -197,10 +198,7 @@ public class NewProjectDialog extends JDialog
 			String[] items =
 			{"none", "short", "long"};
 			trackSubcategoryComboBox = new JComboBox<String>(items);
-			String subcategory = editorFrame.getTrackData().getHeader().getSubcategory();
-			if (subcategory == null)
-				subcategory = "none";
-			trackSubcategoryComboBox.setSelectedItem(subcategory);
+			trackSubcategoryComboBox.setSelectedItem("none");
 			trackSubcategoryComboBox.setBounds(145, 64, 170, 23);
 			trackSubcategoryComboBox.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -224,7 +222,7 @@ public class NewProjectDialog extends JDialog
 			String[] items =
 			{"3", "4", "5"};
 			trackVersionComboBox = new JComboBox<String>(items);
-			trackVersionComboBox.setSelectedItem(editorFrame.getTrackData().getHeader().getVersion() + "");
+			trackVersionComboBox.setSelectedItem("4");
 			trackVersionComboBox.setBounds(145, 91, 170, 23);
 			trackVersionComboBox.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -375,29 +373,25 @@ public class NewProjectDialog extends JDialog
 	 */
 	protected void exit()
 	{
+		String tmpName = getProjectNameTextField().getText();	
 		String tmpPath = getPathTextField().getText();
-		String tmpName = getProjectNameTextField().getText();
-		editorFrame.getTrackData().getHeader().setName(tmpName);
-		Editor.getProperties().setPath(tmpPath + sep + tmpName);
-		int index = tmpPath.lastIndexOf(sep) + 1;
-		String category = tmpPath.substring(index);
 
-		if (category == getTrackCategoryComboBox().getSelectedItem())
-			editorFrame.getTrackData().getHeader().setCategory((String) getTrackCategoryComboBox().getSelectedItem());
-
-		File path = new File(tmpPath + sep + tmpName);
-		if (!path.exists())
+		File projectPath = new File(tmpPath + sep + tmpName);
+		if (!projectPath.exists())
 		{
-			path.mkdirs();
+			projectPath.mkdirs();
 		}
+
+		newProjectInfo.name = tmpName;
+		newProjectInfo.category = (String) getTrackCategoryComboBox().getSelectedItem();
 		String subcategory = (String) getTrackSubcategoryComboBox().getSelectedItem();
 		if (subcategory != "none")
-			editorFrame.getTrackData().getHeader().setSubcategory(subcategory);
-		else
-			editorFrame.getTrackData().getHeader().setSubcategory(null);
-		editorFrame.getTrackData().getHeader().setAuthor(this.getAuthorTextField().getText());
-		editorFrame.getTrackData().getHeader().setDescription(this.getDescriptionTextField().getText());
-		editorFrame.getTrackData().getHeader().setVersion(Integer.parseInt((String) getTrackVersionComboBox().getSelectedItem()));
+			newProjectInfo.subcategory = subcategory;
+		newProjectInfo.version = Integer.parseInt((String) getTrackVersionComboBox().getSelectedItem());
+		newProjectInfo.path = tmpPath + sep + tmpName;
+		newProjectInfo.author = getAuthorTextField().getText();
+		newProjectInfo.description = getDescriptionTextField().getText();
+
 		APPROVE = true;
 		cancel();
 	}

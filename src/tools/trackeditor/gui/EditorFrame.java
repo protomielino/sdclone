@@ -188,6 +188,17 @@ public class EditorFrame extends JFrame
 	
 	private TrackData			trackData							= null;
 	
+	public class NewProjectInfo
+	{
+		public String	name;
+		public String	category;
+		public String	subcategory;
+		public int		version;
+		public String	path;
+		public String	author;
+		public String	description;
+	}
+	
 	public TrackData getTrackData()
 	{
 		return trackData;
@@ -406,13 +417,15 @@ public class EditorFrame extends JFrame
 	 */
 	protected void newProjectDialog()
 	{
-		NewProjectDialog newProject = new NewProjectDialog(this);
+		NewProjectInfo	newProjectInfo = new NewProjectInfo();
+		
+		NewProjectDialog newProject = new NewProjectDialog(this, newProjectInfo);
 		newProject.setVisible(true);
 		if (NewProjectDialog.APPROVE)
 		{
 			try
 			{
-				createNewCircuit();
+				createNewCircuit(newProjectInfo);
 			} catch (Exception e1)
 			{
 				e1.printStackTrace();
@@ -424,7 +437,7 @@ public class EditorFrame extends JFrame
 	/**
      *
      */
-    private void createNewCircuit()
+    private void createNewCircuit(NewProjectInfo newProjectInfo)
     {
         Segment shape;
         Segment previous = null;
@@ -480,14 +493,25 @@ public class EditorFrame extends JFrame
         shape.addToPrevious(previous);
         track.add(shape);
 
-        trackData.setSegments(track);
+        trackData = null;
+        trackData = new TrackData();
+        
+        trackData.getHeader().setName(newProjectInfo.name);
+        trackData.getHeader().setCategory(newProjectInfo.category);
+        trackData.getHeader().setSubcategory(newProjectInfo.subcategory);
+        trackData.getHeader().setVersion(newProjectInfo.version);
+        Editor.getProperties().setPath(newProjectInfo.path);
+        trackData.getHeader().setAuthor(newProjectInfo.author);
+        trackData.getHeader().setDescription(newProjectInfo.description);
 
-        getTrackData().getMainTrack().setProfilStepsLength(MainTrack.DEFAULT_PROFIL_STEPS_LENGTH);
-        getTrackData().getMainTrack().setWidth(MainTrack.DEFAULT_WIDTH);
-        getTrackData().getMainTrack().setSurface(MainTrack.DEFAULT_SURFACE);
-        getTrackData().getMainTrack().getLeft().setNewTrackDefaults();
-        getTrackData().getMainTrack().getRight().setNewTrackDefaults();
-    }
+        trackData.getMainTrack().setProfilStepsLength(MainTrack.DEFAULT_PROFIL_STEPS_LENGTH);
+        trackData.getMainTrack().setWidth(MainTrack.DEFAULT_WIDTH);
+        trackData.getMainTrack().setSurface(MainTrack.DEFAULT_SURFACE);
+        trackData.getMainTrack().getLeft().setNewTrackDefaults();
+        trackData.getMainTrack().getRight().setNewTrackDefaults();
+
+        trackData.setSegments(track);
+   }
 
     /**
 	 * @return Returns the prj.
