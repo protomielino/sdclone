@@ -420,7 +420,7 @@ public class DeltaPanel extends JDialog implements Runnable
     protected void startTrackgen()
     {
         
-        editorFrame.torcsPlugin.exportTrack();
+        editorFrame.exportTrack();
         ac3d = new Thread(this);
         ac3d.start();
     }

@@ -64,8 +64,8 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import plugin.Plugin;
-import plugin.torcs.TorcsPlugin;
+import plugin.torcs.XmlReader;
+import plugin.torcs.XmlWriter;
 import utils.CustomFileFilter;
 import utils.Editor;
 import utils.Project;
@@ -102,6 +102,8 @@ public class EditorFrame extends JFrame
 	ShowBackgroundAction		showBackgroundAction				= null;
 	MoveAction					moveAction							= null;
 	HelpAction					helpAction							= null;
+	ImportAction				importAction						= null;
+	ExportAction				exportAction						= null;
 	ExportAllAction				allAction							= null;
 	ExportAC3Action				ac3Action							= null;
 	PropertiesAction			propertiesAction					= null;
@@ -168,13 +170,14 @@ public class EditorFrame extends JFrame
 	private JMenuItem			undoMenuItem						= null;
 	private JMenuItem			redoMenuItem						= null;
 	private JMenu				importMenu							= null;
+	private JMenuItem			importMenuItem						= null;
 	private JMenu				exportMenu							= null;
+	private JMenuItem			exportMenuItem						= null;
 	private JMenuItem			exportAllMenuItem					= null;
 	private JMenuItem			exportXmlMenuItem					= null;
 	private JMenuItem			exportAC3MenuItem					= null;
 	private JMenuItem			propertiesMenuItem					= null;
 
-	public Plugin				torcsPlugin							= new TorcsPlugin(this);
 	private Project				prj;
 
 	private String 				sep									= System.getProperty("file.separator");
@@ -355,7 +358,7 @@ public class EditorFrame extends JFrame
 		}
 		trackData = null;
 		trackData = new TrackData();		
-		torcsPlugin.readFile(file);
+		readFile(file);
 		Editor.getProperties().setPath(projectFileName.substring(0, projectFileName.lastIndexOf(sep)));
 		updateRecentFiles(projectFileName);	
 	}
@@ -399,7 +402,7 @@ public class EditorFrame extends JFrame
 				ex.printStackTrace();
 				System.out.println(ex.getMessage());
 			}
-			torcsPlugin.exportTrack();
+			exportTrack();
 			documentIsModified = false;
 			updateRecentFiles(filename);
 		}
@@ -955,9 +958,24 @@ public class EditorFrame extends JFrame
 		{
 			importMenu = new JMenu();
 			importMenu.setText("Import");
-			importMenu.add(torcsPlugin.getImportMenuItem());
+			importMenu.add(getImportMenuItem());
 		}
 		return importMenu;
+	}
+	/**
+	 * This method initializes importMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	public JMenuItem getImportMenuItem()
+	{
+		if (importMenuItem == null)
+		{
+			importMenuItem = new JMenuItem();
+			importMenuItem.setAction(importAction);
+			importMenuItem.setIcon(null);
+		}
+		return importMenuItem;
 	}
 	/**
 	 * This method initializes exportMenu
@@ -972,11 +990,25 @@ public class EditorFrame extends JFrame
 			exportMenu.setText("Export");
 			exportMenu.add(getExportAllMenuItem());
 			exportMenu.addSeparator();
-			exportMenu.add(torcsPlugin.getExportMenuItem());
-			//			exportMenu.add(getExportXmlMenuItem());
+			exportMenu.add(getExportMenuItem());
 			exportMenu.add(getExportAC3MenuItem());
 		}
 		return exportMenu;
+	}
+	/**
+	 * This method initializes exportMenuItem
+	 * 
+	 * @return javax.swing.JMenuItem
+	 */
+	public JMenuItem getExportMenuItem()
+	{
+		if (exportMenuItem == null)
+		{
+			exportMenuItem = new JMenuItem();
+			exportMenuItem.setAction(exportAction);
+			exportMenuItem.setIcon(null);
+		}
+		return exportMenuItem;
 	}
 	/**
 	 * This method initializes exportAllMenuItem
@@ -1534,7 +1566,7 @@ public class EditorFrame extends JFrame
 	 */
 	protected void propertiesDialog()
 	{
-		if (trackData.getSegments() != null)
+		if (trackData != null)
 		{
 			PropertiesDialog properties = new PropertiesDialog(this);
 			properties.setVisible(true);
@@ -1590,6 +1622,8 @@ public class EditorFrame extends JFrame
 		ac3Action = new ExportAC3Action("AC3", null, "Create AC3 file.", KeyEvent.VK_S);
 		propertiesAction = new PropertiesAction("Properties", null, "Properties dialog.", KeyEvent.VK_S);
 		calcDeltaAction = new CalcDeltaAction("Delta's", createNavigationIcon("Calc24"), "Calculate Delta's for x,y,z and angle.", KeyEvent.VK_S);
+		importAction = new ImportAction("Speed Dreams", null, "Speed Dreams xml file", null);
+		exportAction = new ExportAction("Speed Dreams", null, "Speed Dreams xml file", null);
 	}
 
 	public class UndoAction extends AbstractAction
@@ -1817,6 +1851,33 @@ public class EditorFrame extends JFrame
 		    JOptionPane.showMessageDialog(null,msg,"About",type);
 		}
 	}
+	private class ExportAction extends AbstractAction
+	{
+		public ExportAction(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			System.out.println("Call exportXml");
+			exportTrack();
+		}
+	}
+	public void exportTrack()
+	{
+		if (trackData == null)
+		{
+			message("No track", "Nothing to export");
+			return;
+		}
+		XmlWriter xmlWriter = new XmlWriter(this);
+		
+		xmlWriter.writeXml();
+		String fileName = Editor.getProperties().getPath() + sep + getTrackData().getHeader().getName() + ".prj.xml";
+		updateRecentFiles(fileName);
+	}
 	public class ExportAllAction extends AbstractAction
 	{
 		public ExportAllAction(String text, ImageIcon icon, String desc, Integer mnemonic)
@@ -1827,15 +1888,13 @@ public class EditorFrame extends JFrame
 		}
 		public void actionPerformed(ActionEvent e)
 		{
-			if (trackData.getSegments() == null)
+			if (trackData == null)
 			{
 				message("No track", "Nothing to export");
 				return;
 			}			
 			exportAc3d();
-			torcsPlugin.exportTrack();
-			String fileName = Editor.getProperties().getPath() + sep + getTrackData().getHeader().getName() + ".prj.xml";
-			updateRecentFiles(fileName);
+			exportTrack();
 		}
 	}
 	public class ExportAC3Action extends AbstractAction
@@ -1848,7 +1907,7 @@ public class EditorFrame extends JFrame
 		}
 		public void actionPerformed(ActionEvent e)
 		{
-			if (trackData.getSegments() == null)
+			if (trackData == null)
 			{
 				message("No track", "Nothing to export");
 				return;
@@ -1884,6 +1943,76 @@ public class EditorFrame extends JFrame
 		}
 	}
 
+	public class ImportAction extends AbstractAction
+	{
+		public ImportAction(String text, ImageIcon icon, String desc, Integer mnemonic)
+		{
+			super(text, icon);
+			putValue(SHORT_DESCRIPTION, desc);
+			putValue(MNEMONIC_KEY, mnemonic);
+		}
+		public void actionPerformed(ActionEvent e)
+		{
+			importTrack();
+		}
+	}
+
+	public void importTrack()
+	{
+		if (trackData != null)
+		{
+			if (canClose())
+				trackData = null;
+		}
+		
+		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
+		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
+		JFileChooser fc = new JFileChooser();
+		fc.setSelectedFiles(null);
+		fc.setSelectedFile(null);
+		fc.rescanCurrentDirectory();
+		fc.setApproveButtonMnemonic(0);
+		fc.setDialogTitle("Import track from Xml");
+		fc.setVisible(true);
+		fc.setCurrentDirectory(new File(System.getProperty("user.dir") + "/tracks"));
+		//fc.setCurrentDirectory(new File("/usr/share/games/torcs/tracks"));
+		CustomFileFilter filter = new CustomFileFilter();
+		
+		filter.addValid(".xml");
+		filter.addInvalid(".prj.xml");
+		filter.setDescription("*.xml");
+		fc.setFileFilter(filter);
+		int result = fc.showOpenDialog(this);
+		UIManager.put("FileChooser.readOnly", old);
+		if (result ==JFileChooser.APPROVE_OPTION)
+		{
+			String xmlFileName = fc.getSelectedFile().toString();
+			String path = xmlFileName;
+			path = path.substring(0, path.lastIndexOf(sep));
+			Editor.getProperties().setPath(path);
+			File file = new File(xmlFileName);
+			trackData = null;
+			trackData = new TrackData();
+			readFile(file);
+		}
+	}
+	
+	public void readFile(File file)
+	{
+		try
+		{
+			XmlReader xmlReader = new XmlReader(this);
+			
+			xmlReader.readXml(file.getAbsolutePath());
+		} catch (Exception e)
+		{
+			//				message(e.getMessage(), "The file " + file.getAbsolutePath()
+			// + " is not valid");
+			e.printStackTrace();
+		}
+		refresh();
+	}
+
     /**
      *
      */
@@ -1892,8 +2021,6 @@ public class EditorFrame extends JFrame
         DeltaPanel tg = new DeltaPanel(this, "", false);
 		//tg.setModal(false);
 		tg.setVisible(true);
-
-
     }
 
 
