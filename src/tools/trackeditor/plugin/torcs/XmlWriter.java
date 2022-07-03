@@ -31,8 +31,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 
+import gui.EditorFrame;
 import utils.Editor;
-import utils.TrackData;
 import utils.circuit.Camera;
 import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
@@ -52,13 +52,19 @@ import utils.circuit.TrackObject;
  */
 public class XmlWriter
 {
-	//private static Properties	properties	= Properties.getInstance();
-	static Document					doc;
+	private EditorFrame			editorFrame;
+	
+	static Document				doc;
 	private boolean				optimize	= true;
-	static boolean job;
-	private static String sep = System.getProperty("file.separator");
+	static boolean 				job;
+	private static String 		sep = System.getProperty("file.separator");
 
-	public static void writeXml()
+	public XmlWriter(EditorFrame editorFrame)
+	{
+		this.editorFrame = editorFrame;
+	}
+	
+	public void writeXml()
 	{
 		job = false;
 		getXml();
@@ -69,7 +75,7 @@ public class XmlWriter
 	 * @param segments
 	 * @return
 	 */
-	private static void getXml()
+	private void getXml()
 	{
 		Comment com;
 		Element root = getRoot();
@@ -99,7 +105,7 @@ public class XmlWriter
 	/**
 	 * @return
 	 */
-	private synchronized static Element getRoot()
+	private synchronized Element getRoot()
 	{
 		Attribute name = new Attribute("name", "test");
 		Attribute val = new Attribute("type", "param");
@@ -116,45 +122,45 @@ public class XmlWriter
 	/**
 	 * @return
 	 */
-	private synchronized static Element getTrack()
+	private synchronized Element getTrack()
 	{
 		Attribute name = new Attribute("name", "Main Track");
 		Element track = new Element("section");
 		Comment com = null;
 		track.setAttribute(name);
-		addContent(track, "width", "m", Editor.getProperties().getMainTrack().getWidth());
-		addContent(track, "profil steps length", "m", Editor.getProperties().getMainTrack().getProfilStepsLength());
-		addContent(track, "surface", Editor.getProperties().getMainTrack().getSurface());
-		addContent(track, "raceline widthscale", null, Editor.getProperties().getMainTrack().getRacelineWidthscale());
-		addContent(track, "raceline int", null, Editor.getProperties().getMainTrack().getRacelineInt());
-		addContent(track, "raceline ext", null, Editor.getProperties().getMainTrack().getRacelineExt());
+		addContent(track, "width", "m", editorFrame.getTrackData().getMainTrack().getWidth());
+		addContent(track, "profil steps length", "m", editorFrame.getTrackData().getMainTrack().getProfilStepsLength());
+		addContent(track, "surface", editorFrame.getTrackData().getMainTrack().getSurface());
+		addContent(track, "raceline widthscale", null, editorFrame.getTrackData().getMainTrack().getRacelineWidthscale());
+		addContent(track, "raceline int", null, editorFrame.getTrackData().getMainTrack().getRacelineInt());
+		addContent(track, "raceline ext", null, editorFrame.getTrackData().getMainTrack().getRacelineExt());
 
-		if (Editor.getProperties().getHeader().getVersion() == 3)
+		if (editorFrame.getTrackData().getHeader().getVersion() == 3)
 		{
-			getSideV3(track, Editor.getProperties().getMainTrack().getLeft(), "l");
-			getSideV3(track, Editor.getProperties().getMainTrack().getLeft(), "r");
+			getSideV3(track, editorFrame.getTrackData().getMainTrack().getLeft(), "l");
+			getSideV3(track, editorFrame.getTrackData().getMainTrack().getLeft(), "r");
 			getPitsV3(track);
 		}
 		else
 		{
 			com = new Comment("Left part of track");
 			track.addContent(com);
-			if (Editor.getProperties().getMainTrack().getLeft().getHasSide())
-				track.addContent(getSide(Editor.getProperties().getMainTrack().getLeft(), "Left"));
-			if (Editor.getProperties().getMainTrack().getLeft().getHasBorder())
-				track.addContent(getBorder(Editor.getProperties().getMainTrack().getLeft(), "Left"));
-			if (Editor.getProperties().getMainTrack().getLeft().getHasBarrier())
-				track.addContent(getBarrier(Editor.getProperties().getMainTrack().getLeft(), "Left"));
+			if (editorFrame.getTrackData().getMainTrack().getLeft().getHasSide())
+				track.addContent(getSide(editorFrame.getTrackData().getMainTrack().getLeft(), "Left"));
+			if (editorFrame.getTrackData().getMainTrack().getLeft().getHasBorder())
+				track.addContent(getBorder(editorFrame.getTrackData().getMainTrack().getLeft(), "Left"));
+			if (editorFrame.getTrackData().getMainTrack().getLeft().getHasBarrier())
+				track.addContent(getBarrier(editorFrame.getTrackData().getMainTrack().getLeft(), "Left"));
 			com = new Comment("End of left part");
 			track.addContent(com);
 			com = new Comment("Right part of track");
 			track.addContent(com);
-			if (Editor.getProperties().getMainTrack().getRight().getHasSide())
-				track.addContent(getSide(Editor.getProperties().getMainTrack().getRight(), "Right"));
-			if (Editor.getProperties().getMainTrack().getRight().getHasBorder())
-				track.addContent(getBorder(Editor.getProperties().getMainTrack().getRight(), "Right"));
-			if (Editor.getProperties().getMainTrack().getRight().getHasBarrier())
-				track.addContent(getBarrier(Editor.getProperties().getMainTrack().getRight(), "Right"));
+			if (editorFrame.getTrackData().getMainTrack().getRight().getHasSide())
+				track.addContent(getSide(editorFrame.getTrackData().getMainTrack().getRight(), "Right"));
+			if (editorFrame.getTrackData().getMainTrack().getRight().getHasBorder())
+				track.addContent(getBorder(editorFrame.getTrackData().getMainTrack().getRight(), "Right"));
+			if (editorFrame.getTrackData().getMainTrack().getRight().getHasBarrier())
+				track.addContent(getBarrier(editorFrame.getTrackData().getMainTrack().getRight(), "Right"));
 			com = new Comment("End of right part");
 			track.addContent(com);
 			track.addContent(getPits());
@@ -167,24 +173,24 @@ public class XmlWriter
 	/**
 	 * @return
 	 */
-	private synchronized static Element getPits()
+	private synchronized Element getPits()
 	{
 		Element pits = new Element("section");
 		pits.setAttribute(new Attribute("name", "Pits"));
 
-		addContent(pits, "pit style", null, Editor.getProperties().getMainTrack().getPits().getStyle());
-		addContent(pits, "side", Editor.getProperties().getMainTrack().getPits().getSide());
-		addContent(pits, "entry", Editor.getProperties().getMainTrack().getPits().getEntry());
-		addContent(pits, "start", Editor.getProperties().getMainTrack().getPits().getStart());
-		addContent(pits, "start buildings", Editor.getProperties().getMainTrack().getPits().getStartBuildings());
-		addContent(pits, "stop buildings", Editor.getProperties().getMainTrack().getPits().getStopBuildings());
-		addContent(pits, "max pits", null, Editor.getProperties().getMainTrack().getPits().getMaxPits());
-		addContent(pits, "end", Editor.getProperties().getMainTrack().getPits().getEnd());
-		addContent(pits, "exit", Editor.getProperties().getMainTrack().getPits().getExit());
-		addContent(pits, "length", "m", Editor.getProperties().getMainTrack().getPits().getLength());
-		addContent(pits, "width", "m", Editor.getProperties().getMainTrack().getPits().getWidth());
-		addContent(pits, "pit indicator", null, Editor.getProperties().getMainTrack().getPits().getIndicator());
-		addContent(pits, "speed limit", "m", Editor.getProperties().getMainTrack().getPits().getSpeedLimit());
+		addContent(pits, "pit style", null, editorFrame.getTrackData().getMainTrack().getPits().getStyle());
+		addContent(pits, "side", editorFrame.getTrackData().getMainTrack().getPits().getSide());
+		addContent(pits, "entry", editorFrame.getTrackData().getMainTrack().getPits().getEntry());
+		addContent(pits, "start", editorFrame.getTrackData().getMainTrack().getPits().getStart());
+		addContent(pits, "start buildings", editorFrame.getTrackData().getMainTrack().getPits().getStartBuildings());
+		addContent(pits, "stop buildings", editorFrame.getTrackData().getMainTrack().getPits().getStopBuildings());
+		addContent(pits, "max pits", null, editorFrame.getTrackData().getMainTrack().getPits().getMaxPits());
+		addContent(pits, "end", editorFrame.getTrackData().getMainTrack().getPits().getEnd());
+		addContent(pits, "exit", editorFrame.getTrackData().getMainTrack().getPits().getExit());
+		addContent(pits, "length", "m", editorFrame.getTrackData().getMainTrack().getPits().getLength());
+		addContent(pits, "width", "m", editorFrame.getTrackData().getMainTrack().getPits().getWidth());
+		addContent(pits, "pit indicator", null, editorFrame.getTrackData().getMainTrack().getPits().getIndicator());
+		addContent(pits, "speed limit", "m", editorFrame.getTrackData().getMainTrack().getPits().getSpeedLimit());
 
 		return pits;
 	}
@@ -192,30 +198,30 @@ public class XmlWriter
 	/**
 	 * @return
 	 */
-	private synchronized static void getPitsV3(Element pits)
+	private synchronized void getPitsV3(Element pits)
 	{
-		addContent(pits, "pit type", null, Editor.getProperties().getMainTrack().getPits().getStyle());
-		addContent(pits, "pit side", Editor.getProperties().getMainTrack().getPits().getSide());
-		addContent(pits, "pit entry", Editor.getProperties().getMainTrack().getPits().getEntry());
-		addContent(pits, "pit start", Editor.getProperties().getMainTrack().getPits().getStart());
-		addContent(pits, "start buildings", Editor.getProperties().getMainTrack().getPits().getStartBuildings());
-		addContent(pits, "stop buildings", Editor.getProperties().getMainTrack().getPits().getStopBuildings());
-		addContent(pits, "pit end", Editor.getProperties().getMainTrack().getPits().getEnd());
-		addContent(pits, "pit exit", Editor.getProperties().getMainTrack().getPits().getExit());
-		addContent(pits, "pit length", "m", Editor.getProperties().getMainTrack().getPits().getLength());
-		addContent(pits, "pit width", "m", Editor.getProperties().getMainTrack().getPits().getWidth());
-		addContent(pits, "speed limit", "m", Editor.getProperties().getMainTrack().getPits().getSpeedLimit());
+		addContent(pits, "pit type", null, editorFrame.getTrackData().getMainTrack().getPits().getStyle());
+		addContent(pits, "pit side", editorFrame.getTrackData().getMainTrack().getPits().getSide());
+		addContent(pits, "pit entry", editorFrame.getTrackData().getMainTrack().getPits().getEntry());
+		addContent(pits, "pit start", editorFrame.getTrackData().getMainTrack().getPits().getStart());
+		addContent(pits, "start buildings", editorFrame.getTrackData().getMainTrack().getPits().getStartBuildings());
+		addContent(pits, "stop buildings", editorFrame.getTrackData().getMainTrack().getPits().getStopBuildings());
+		addContent(pits, "pit end", editorFrame.getTrackData().getMainTrack().getPits().getEnd());
+		addContent(pits, "pit exit", editorFrame.getTrackData().getMainTrack().getPits().getExit());
+		addContent(pits, "pit length", "m", editorFrame.getTrackData().getMainTrack().getPits().getLength());
+		addContent(pits, "pit width", "m", editorFrame.getTrackData().getMainTrack().getPits().getWidth());
+		addContent(pits, "speed limit", "m", editorFrame.getTrackData().getMainTrack().getPits().getSpeedLimit());
 	}
 
 	/**
 	 * @return
 	 */
-	private synchronized static Element getSegments()
+	private synchronized Element getSegments()
 	{
-		Vector<Segment> segments = TrackData.getTrackData();
+		Vector<Segment> segments = editorFrame.getTrackData().getSegments();
 		Segment prev = null;
 		Attribute name = null;
-		if (Editor.getProperties().getHeader().getVersion() == 3)
+		if (editorFrame.getTrackData().getHeader().getVersion() == 3)
 			name = new Attribute("name", "segments");
 		else
 			name = new Attribute("name", "Track Segments");
@@ -244,7 +250,7 @@ public class XmlWriter
 	 * @param shape
 	 * @return
 	 */
-	private synchronized static Element getSegment(Segment shape)
+	private synchronized Element getSegment(Segment shape)
 	{
 		Attribute name = null;
 		Comment com = null;
@@ -337,7 +343,7 @@ public class XmlWriter
 	 * @param string
 	 * @return
 	 */
-	private synchronized static Element getBorder(SegmentSide part, String sPart)
+	private synchronized Element getBorder(SegmentSide part, String sPart)
 	{
 		Element side = new Element("section");
 		side.setAttribute(new Attribute("name", sPart + " Border"));
@@ -355,7 +361,7 @@ public class XmlWriter
 	 * @param string
 	 * @return
 	 */
-	private synchronized static Element getBarrier(SegmentSide part, String sPart)
+	private synchronized Element getBarrier(SegmentSide part, String sPart)
 	{
 		Element side = new Element("section");
 		side.setAttribute(new Attribute("name", sPart + " Barrier"));
@@ -372,7 +378,7 @@ public class XmlWriter
 	 * @param left
 	 * @return
 	 */
-	private synchronized static void getSideV3(Element side, SegmentSide part, String sPart)
+	private synchronized void getSideV3(Element side, SegmentSide part, String sPart)
 	{
 		if (!Double.isNaN(part.getSideStartWidth()) &&
 			!Double.isNaN(part.getSideEndWidth()) &&
@@ -403,7 +409,7 @@ public class XmlWriter
 	 * @param left
 	 * @return
 	 */
-	private synchronized static Element getSide(SegmentSide part, String sPart)
+	private synchronized Element getSide(SegmentSide part, String sPart)
 	{
 		Element side = new Element("section");
 		side.setAttribute(new Attribute("name", sPart + " Side"));
@@ -425,13 +431,13 @@ public class XmlWriter
 		return side;
 	}
 
-	private synchronized static Element getSurfaces()
+	private synchronized Element getSurfaces()
 	{
 		Element surfaces = new Element("section");
 		surfaces.setAttribute(new Attribute("name", "Surfaces"));
 		Element root = surfaces;
 
-		if (Editor.getProperties().getHeader().getVersion() == 3)
+		if (editorFrame.getTrackData().getHeader().getVersion() == 3)
 		{
 			surfaces = new Element("section");
 			surfaces.setAttribute(new Attribute("name", "List"));
@@ -440,7 +446,7 @@ public class XmlWriter
 
 		surfaces.setText("&default-surfaces;");
 
-		Vector<Surface> surfaceData = Editor.getProperties().getSurfaces();
+		Vector<Surface> surfaceData = editorFrame.getTrackData().getSurfaces();
 
 		if (surfaceData == null)
 			return surfaces;
@@ -480,18 +486,18 @@ public class XmlWriter
 		return root;
 	}
 
-	private synchronized static Element getCameras()
+	private synchronized Element getCameras()
 	{
 		Element cameras = new Element("section");
 		cameras.setAttribute(new Attribute("name", "Cameras"));
 		Element root = cameras;
 
-		Vector<Camera> cameraData = Editor.getProperties().getCameras();
+		Vector<Camera> cameraData = editorFrame.getTrackData().getCameras();
 
 		if (cameraData == null)
 			return cameras;
 
-		if (Editor.getProperties().getHeader().getVersion() == 3)
+		if (editorFrame.getTrackData().getHeader().getVersion() == 3)
 		{
 			cameras = new Element("section");
 			cameras.setAttribute(new Attribute("name", "list"));
@@ -518,18 +524,18 @@ public class XmlWriter
 		return root;
 	}
 
-	private synchronized static Element getLights()
+	private synchronized Element getLights()
 	{
 		Element lights = new Element("section");
 		lights.setAttribute(new Attribute("name", "Track Lights"));
 		Element root = lights;
 
-		Vector<TrackLight> lightData = Editor.getProperties().getTrackLights();
+		Vector<TrackLight> lightData = editorFrame.getTrackData().getTrackLights();
 
 		if (lightData == null)
 			return lights;
 
-		if (Editor.getProperties().getHeader().getVersion() == 3)
+		if (editorFrame.getTrackData().getHeader().getVersion() == 3)
 		{
 			lights = new Element("section");
 			lights.setAttribute(new Attribute("name", "List"));
@@ -582,13 +588,13 @@ public class XmlWriter
 		return root;
 	}
 
-	private synchronized static Element getObjects()
+	private synchronized Element getObjects()
 	{
 		Element objects = new Element("section");
 		objects.setAttribute(new Attribute("name", "Objects"));
 		objects.setText("&default-objects;");
 
-		Vector<TrackObject> objectData = Editor.getProperties().getObjects();
+		Vector<TrackObject> objectData = editorFrame.getTrackData().getObjects();
 
 		if (objectData == null)
 			return objects;
@@ -613,10 +619,10 @@ public class XmlWriter
 		return objects;
 	}
 
-	private synchronized static String getCredit()
+	private synchronized String getCredit()
 	{
 		String tmp = "\n";
-		tmp += "file                : " + Editor.getProperties().getHeader().getName() + ".xml\n";
+		tmp += "file                : " + editorFrame.getTrackData().getHeader().getName() + ".xml\n";
 		tmp += "auto generated      : by " + Editor.getProperties().title + "\n";
 		tmp += "version             : " + Editor.getProperties().version + "\n";
 		tmp += "copyright           : (C) 2005 by Charalampos Alexopoulos\n";
@@ -625,7 +631,7 @@ public class XmlWriter
 		return tmp;
 	}
 
-	private synchronized static String getLicence()
+	private synchronized String getLicence()
 	{
 		String tmp = "\n";
 		tmp += "This program is free software; you can redistribute it and/or modify it\n";
@@ -637,7 +643,7 @@ public class XmlWriter
 		return tmp;
 	}
 
-	private synchronized static Element getHeader()
+	private synchronized Element getHeader()
 	{
 		Attribute name = new Attribute("name", "Header");
 		String tmp = "";
@@ -645,32 +651,32 @@ public class XmlWriter
 		Element header = new Element("section");
 		header.setAttribute(name);
 
-		addContent(header, "name", Editor.getProperties().getHeader().getName());
+		addContent(header, "name", editorFrame.getTrackData().getHeader().getName());
 
-		if (Editor.getProperties().getHeader().getCategory() != null)
+		if (editorFrame.getTrackData().getHeader().getCategory() != null)
 		{
-			tmp = Editor.getProperties().getHeader().getCategory();
+			tmp = editorFrame.getTrackData().getHeader().getCategory();
 		} else
 		{
 			tmp = "road";
 		}
 		addContent(header, "category", tmp);
-		addContent(header, "subcategory", Editor.getProperties().getHeader().getSubcategory());
-		addContent(header, "version", null, Editor.getProperties().getHeader().getVersion());
-		addContent(header, "sky version", null, Editor.getProperties().getHeader().getSkyVersion());
+		addContent(header, "subcategory", editorFrame.getTrackData().getHeader().getSubcategory());
+		addContent(header, "version", null, editorFrame.getTrackData().getHeader().getVersion());
+		addContent(header, "sky version", null, editorFrame.getTrackData().getHeader().getSkyVersion());
 
-		if (Editor.getProperties().getHeader().getAuthor() != null)
+		if (editorFrame.getTrackData().getHeader().getAuthor() != null)
 		{
-			tmp = Editor.getProperties().getHeader().getAuthor();
+			tmp = editorFrame.getTrackData().getHeader().getAuthor();
 		} else
 		{
 			tmp = "Anonymous";
 		}
 		addContent(header, "author", tmp);
 
-		if (Editor.getProperties().getHeader().getDescription() != null)
+		if (editorFrame.getTrackData().getHeader().getDescription() != null)
 		{
-			tmp = Editor.getProperties().getHeader().getDescription();
+			tmp = editorFrame.getTrackData().getHeader().getDescription();
 		} else
 		{
 			tmp = "No description provided";
@@ -683,34 +689,34 @@ public class XmlWriter
 	/**
 	 * @return
 	 */
-	private synchronized static Element getLocal()
+	private synchronized Element getLocal()
 	{
 		Element element = new Element("section");
 		element.setAttribute(new Attribute("name", "Local Info"));
 
-		addContent(element, "station", Editor.getProperties().getLocalInfo().getStation());
-		addContent(element, "timezone", null, Editor.getProperties().getLocalInfo().getTimezone());
-		addContent(element, "overall rain likelyhood", "%", Editor.getProperties().getLocalInfo().getOverallRainLikelyhood());
-		addContent(element, "little rain likelyhood", "%", Editor.getProperties().getLocalInfo().getLittleRainLikelyhood());
-		addContent(element, "medium rain likelyhood", "%", Editor.getProperties().getLocalInfo().getMediumRainLikelyhood());
-		addContent(element, "time of day", "hour", Editor.getProperties().getLocalInfo().getTimeOfDay());
-		addContent(element, "sun ascension", "deg", Editor.getProperties().getLocalInfo().getSunAscension());
-		addContent(element, "altitude", "m", Editor.getProperties().getLocalInfo().getAltitude());
+		addContent(element, "station", editorFrame.getTrackData().getLocalInfo().getStation());
+		addContent(element, "timezone", null, editorFrame.getTrackData().getLocalInfo().getTimezone());
+		addContent(element, "overall rain likelyhood", "%", editorFrame.getTrackData().getLocalInfo().getOverallRainLikelyhood());
+		addContent(element, "little rain likelyhood", "%", editorFrame.getTrackData().getLocalInfo().getLittleRainLikelyhood());
+		addContent(element, "medium rain likelyhood", "%", editorFrame.getTrackData().getLocalInfo().getMediumRainLikelyhood());
+		addContent(element, "time of day", "hour", editorFrame.getTrackData().getLocalInfo().getTimeOfDay());
+		addContent(element, "sun ascension", "deg", editorFrame.getTrackData().getLocalInfo().getSunAscension());
+		addContent(element, "altitude", "m", editorFrame.getTrackData().getLocalInfo().getAltitude());
 
 		return element;
 	}
 
-	private synchronized static Element getGrid()
+	private synchronized Element getGrid()
 	{
 		Element element = new Element("section");
 		element.setAttribute(new Attribute("name", "Starting Grid"));
 
-		addContent(element, "rows", null, Editor.getProperties().getStartingGrid().getRows());
-		addContent(element, "pole position side", Editor.getProperties().getStartingGrid().getPolePositionSide());
-		addContent(element, "distance to start", "m", Editor.getProperties().getStartingGrid().getDistanceToStart());
-		addContent(element, "distance between columns", "m", Editor.getProperties().getStartingGrid().getDistanceBetweenColumns());
-		addContent(element, "offset within a column", "m", Editor.getProperties().getStartingGrid().getOffsetWithinAColumn());
-		addContent(element, "initial height", "m", Editor.getProperties().getStartingGrid().getInitialHeight());
+		addContent(element, "rows", null, editorFrame.getTrackData().getStartingGrid().getRows());
+		addContent(element, "pole position side", editorFrame.getTrackData().getStartingGrid().getPolePositionSide());
+		addContent(element, "distance to start", "m", editorFrame.getTrackData().getStartingGrid().getDistanceToStart());
+		addContent(element, "distance between columns", "m", editorFrame.getTrackData().getStartingGrid().getDistanceBetweenColumns());
+		addContent(element, "offset within a column", "m", editorFrame.getTrackData().getStartingGrid().getOffsetWithinAColumn());
+		addContent(element, "initial height", "m", editorFrame.getTrackData().getStartingGrid().getInitialHeight());
 
 		return element;
 	}
@@ -718,33 +724,33 @@ public class XmlWriter
 	/**
 	 * @return
 	 */
-	private synchronized static Element getGraphic()
+	private synchronized Element getGraphic()
 	{
 		Element element = new Element("section");
 		element.setAttribute(new Attribute("name", "Graphic"));
 
-		addContent(element, "3d description", Editor.getProperties().getHeader().getName() + ".ac");	// TODO
-		addContent(element, "3d description night", Editor.getProperties().getGraphic().getDescriptionNight());
-		addContent(element, "3d description rain+night", Editor.getProperties().getGraphic().getDescriptionRainNight());
-		addContent(element, "background image", Editor.getProperties().getGraphic().getBackgroundImage());
-		addContent(element, "background type", null, Editor.getProperties().getGraphic().getBackgroundType());
-		addContent(element, "background color R", null, Editor.getProperties().getGraphic().getBackgroundColorR());
-		addContent(element, "background color G", null, Editor.getProperties().getGraphic().getBackgroundColorG());
-		addContent(element, "background color B", null, Editor.getProperties().getGraphic().getBackgroundColorB());
-		addContent(element, "ambient color R", null, Editor.getProperties().getGraphic().getAmbientColorR());
-		addContent(element, "ambient color G", null, Editor.getProperties().getGraphic().getAmbientColorG());
-		addContent(element, "ambient color B", null, Editor.getProperties().getGraphic().getAmbientColorB());
-		addContent(element, "diffuse color R", null, Editor.getProperties().getGraphic().getDiffuseColorR());
-		addContent(element, "diffuse color G", null, Editor.getProperties().getGraphic().getDiffuseColorG());
-		addContent(element, "diffuse color B", null, Editor.getProperties().getGraphic().getDiffuseColorB());
-		addContent(element, "specular color R", null, Editor.getProperties().getGraphic().getSpecularColorR());
-		addContent(element, "specular color G", null, Editor.getProperties().getGraphic().getSpecularColorG());
-		addContent(element, "specular color B", null, Editor.getProperties().getGraphic().getSpecularColorB());
-		addContent(element, "light position x", null, Editor.getProperties().getGraphic().getLightPositionX());
-		addContent(element, "light position y", null, Editor.getProperties().getGraphic().getLightPositionY());
-		addContent(element, "light position z", null, Editor.getProperties().getGraphic().getLightPositionZ());
-		addContent(element, "shininess", null, Editor.getProperties().getGraphic().getShininess());
-		addContent(element, "fov factor", null, Editor.getProperties().getGraphic().getFovFactor());
+		addContent(element, "3d description", editorFrame.getTrackData().getHeader().getName() + ".ac");	// TODO
+		addContent(element, "3d description night", editorFrame.getTrackData().getGraphic().getDescriptionNight());
+		addContent(element, "3d description rain+night", editorFrame.getTrackData().getGraphic().getDescriptionRainNight());
+		addContent(element, "background image", editorFrame.getTrackData().getGraphic().getBackgroundImage());
+		addContent(element, "background type", null, editorFrame.getTrackData().getGraphic().getBackgroundType());
+		addContent(element, "background color R", null, editorFrame.getTrackData().getGraphic().getBackgroundColorR());
+		addContent(element, "background color G", null, editorFrame.getTrackData().getGraphic().getBackgroundColorG());
+		addContent(element, "background color B", null, editorFrame.getTrackData().getGraphic().getBackgroundColorB());
+		addContent(element, "ambient color R", null, editorFrame.getTrackData().getGraphic().getAmbientColorR());
+		addContent(element, "ambient color G", null, editorFrame.getTrackData().getGraphic().getAmbientColorG());
+		addContent(element, "ambient color B", null, editorFrame.getTrackData().getGraphic().getAmbientColorB());
+		addContent(element, "diffuse color R", null, editorFrame.getTrackData().getGraphic().getDiffuseColorR());
+		addContent(element, "diffuse color G", null, editorFrame.getTrackData().getGraphic().getDiffuseColorG());
+		addContent(element, "diffuse color B", null, editorFrame.getTrackData().getGraphic().getDiffuseColorB());
+		addContent(element, "specular color R", null, editorFrame.getTrackData().getGraphic().getSpecularColorR());
+		addContent(element, "specular color G", null, editorFrame.getTrackData().getGraphic().getSpecularColorG());
+		addContent(element, "specular color B", null, editorFrame.getTrackData().getGraphic().getSpecularColorB());
+		addContent(element, "light position x", null, editorFrame.getTrackData().getGraphic().getLightPositionX());
+		addContent(element, "light position y", null, editorFrame.getTrackData().getGraphic().getLightPositionY());
+		addContent(element, "light position z", null, editorFrame.getTrackData().getGraphic().getLightPositionZ());
+		addContent(element, "shininess", null, editorFrame.getTrackData().getGraphic().getShininess());
+		addContent(element, "fov factor", null, editorFrame.getTrackData().getGraphic().getFovFactor());
 
 		element.addContent(getTurnMarks());
 		element.addContent(getTerrainGeneration());
@@ -753,47 +759,47 @@ public class XmlWriter
 		return element;
 	}
 
-	private synchronized static Element getTurnMarks()
+	private synchronized Element getTurnMarks()
 	{
 		Element element = new Element("section");
 		element.setAttribute(new Attribute("name", "Turn Marks"));
 
-		addContent(element, "width", "m", Editor.getProperties().getGraphic().getTurnMarks().getWidth());
-		addContent(element, "height", "m", Editor.getProperties().getGraphic().getTurnMarks().getHeight());
-		addContent(element, "vertical space", "m", Editor.getProperties().getGraphic().getTurnMarks().getVerticalSpace());
-		addContent(element, "horizontal space", "m", Editor.getProperties().getGraphic().getTurnMarks().getHorizontalSpace());
+		addContent(element, "width", "m", editorFrame.getTrackData().getGraphic().getTurnMarks().getWidth());
+		addContent(element, "height", "m", editorFrame.getTrackData().getGraphic().getTurnMarks().getHeight());
+		addContent(element, "vertical space", "m", editorFrame.getTrackData().getGraphic().getTurnMarks().getVerticalSpace());
+		addContent(element, "horizontal space", "m", editorFrame.getTrackData().getGraphic().getTurnMarks().getHorizontalSpace());
 
 		return element;
 	}
 
-	private synchronized static Element getTerrainGeneration()
+	private synchronized Element getTerrainGeneration()
 	{
 		Element element = new Element("section");
 		element.setAttribute(new Attribute("name", "Terrain Generation"));
 
-		addContent(element, "track step", "m", Editor.getProperties().getGraphic().getTerrainGeneration().getTrackStep());
-		addContent(element, "border margin", "m", Editor.getProperties().getGraphic().getTerrainGeneration().getBorderMargin());
-		addContent(element, "border step", "m", Editor.getProperties().getGraphic().getTerrainGeneration().getBorderStep());
-		addContent(element, "border height", "m", Editor.getProperties().getGraphic().getTerrainGeneration().getBorderHeight());
-		addContent(element, "orientation", Editor.getProperties().getGraphic().getTerrainGeneration().getOrientation());
-		addContent(element, "maximum altitude", "m", Editor.getProperties().getGraphic().getTerrainGeneration().getMaximumAltitude());
-		addContent(element, "minimum altitude", "m", Editor.getProperties().getGraphic().getTerrainGeneration().getMinimumAltitude());
-		addContent(element, "group size", "m", Editor.getProperties().getGraphic().getTerrainGeneration().getGroupSize());
-		addContent(element, "elevation map", Editor.getProperties().getGraphic().getTerrainGeneration().getElevationMap());
-		addContent(element, "relief file", Editor.getProperties().getGraphic().getTerrainGeneration().getReliefFile());
-		addContent(element, "surface", Editor.getProperties().getGraphic().getTerrainGeneration().getSurface());
+		addContent(element, "track step", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getTrackStep());
+		addContent(element, "border margin", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderMargin());
+		addContent(element, "border step", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderStep());
+		addContent(element, "border height", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getBorderHeight());
+		addContent(element, "orientation", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getOrientation());
+		addContent(element, "maximum altitude", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getMaximumAltitude());
+		addContent(element, "minimum altitude", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getMinimumAltitude());
+		addContent(element, "group size", "m", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getGroupSize());
+		addContent(element, "elevation map", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getElevationMap());
+		addContent(element, "relief file", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getReliefFile());
+		addContent(element, "surface", editorFrame.getTrackData().getGraphic().getTerrainGeneration().getSurface());
 
 		element.addContent(getObjectMaps());
 
 		return element;
 	}
 
-	private synchronized static Element getEnvironmentMapping()
+	private synchronized Element getEnvironmentMapping()
 	{
 		Element element = new Element("section");
 		element.setAttribute(new Attribute("name", "Environment Mapping"));
 
-		Vector<EnvironmentMapping> environment = Editor.getProperties().getGraphic().getEnvironmentMapping();
+		Vector<EnvironmentMapping> environment = editorFrame.getTrackData().getGraphic().getEnvironmentMapping();
 
 		for (int i = 0; i < environment.size(); i++)
 		{
@@ -810,12 +816,12 @@ public class XmlWriter
 		return element;
 	}
 
-	private synchronized static Element getObjectMaps()
+	private synchronized Element getObjectMaps()
 	{
 		Element element = new Element("section");
 		element.setAttribute(new Attribute("name", "Object Maps"));
 
-		Vector<ObjectMap> objMaps = Editor.getProperties().getGraphic().getTerrainGeneration().getObjectMaps();
+		Vector<ObjectMap> objMaps = editorFrame.getTrackData().getGraphic().getTerrainGeneration().getObjectMaps();
 
 		for (int i = 0; i < objMaps.size(); i++)
 		{
@@ -832,7 +838,7 @@ public class XmlWriter
 		return element;
 	}
 
-	private synchronized static Element attstrElement(String attname, String attval)
+	private synchronized Element attstrElement(String attname, String attval)
 	{
 		Attribute name = null;
 		Attribute val = null;
@@ -850,7 +856,7 @@ public class XmlWriter
 		return el;
 	}
 
-	private synchronized static Element attnumElement(String attname, String attunit, String attval)
+	private synchronized Element attnumElement(String attname, String attunit, String attval)
 	{
 		Attribute name = null;
 		Attribute unit = null;
@@ -870,7 +876,7 @@ public class XmlWriter
 		return el;
 	}
 
-	private synchronized static void addContent(Element section, String attribute, String units, double value)
+	private synchronized void addContent(Element section, String attribute, String units, double value)
 	{
 		if (!Double.isNaN(value))
 		{
@@ -878,7 +884,7 @@ public class XmlWriter
 		}
 	}
 
-	private synchronized static void addContent(Element section, String attribute, String units, int value)
+	private synchronized void addContent(Element section, String attribute, String units, int value)
 	{
 		if (value != Integer.MAX_VALUE)
 		{
@@ -886,7 +892,7 @@ public class XmlWriter
 		}
 	}
 
-	private synchronized static void addHexContent(Element section, String attribute, String units, int value)
+	private synchronized void addHexContent(Element section, String attribute, String units, int value)
 	{
 		if (value != Integer.MAX_VALUE)
 		{
@@ -894,7 +900,7 @@ public class XmlWriter
 		}
 	}
 
-	private synchronized static void addContent(Element section, String attribute, String string)
+	private synchronized void addContent(Element section, String attribute, String string)
 	{
 		if (string != null && !string.isEmpty())
 		{
@@ -902,9 +908,9 @@ public class XmlWriter
 		}
 	}
 
-	private synchronized static void writeToFile()
+	private synchronized void writeToFile()
 	{
-		String fileName = Editor.getProperties().getPath() + sep + Editor.getProperties().getHeader().getName() + ".xml";
+		String fileName = Editor.getProperties().getPath() + sep + editorFrame.getTrackData().getHeader().getName() + ".xml";
 		try
 		{
 			FileOutputStream out = new FileOutputStream(fileName);

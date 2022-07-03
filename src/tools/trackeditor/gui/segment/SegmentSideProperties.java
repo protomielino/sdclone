@@ -30,7 +30,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import utils.Editor;
 import utils.circuit.SegmentSide;
 import utils.circuit.Surface;
 import bsh.EvalError;
@@ -106,6 +105,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	private SegmentSlider		sideEndWidthSlider		= null;
 	private SegmentSlider		barrierWidthSlider		= null;
 	private SegmentSlider		borderHeightSlider		= null;
+
 	/**
 	 *
 	 */
@@ -143,7 +143,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 
 	private void addDefaultSurfaces(Vector<String> surfaceVector)
 	{
-        Vector<Surface> surfaces = Editor.getProperties().getSurfaces();
+        Vector<Surface> surfaces =parent.editorFrame.getTrackData().getSurfaces();
         for (int i = 0; i < surfaces.size(); i++)
         {
 			String surface = surfaces.elementAt(i).getName();

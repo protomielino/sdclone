@@ -31,8 +31,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import utils.Editor;
-import utils.TrackData;
 import utils.circuit.Curve;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
@@ -48,7 +46,7 @@ import javax.swing.JTextField;
 public class DeltaPanel extends JDialog implements Runnable
 {
     public static Vector args = new Vector();
-    private EditorFrame parent;
+    private EditorFrame editorFrame;
     //private Properties properties = Properties.getInstance();
     Thread ac3d;
 
@@ -85,7 +83,7 @@ public class DeltaPanel extends JDialog implements Runnable
     public DeltaPanel(EditorFrame frame,String title, boolean modal)
     {
         super(frame,title,modal);
-        parent = frame;
+        editorFrame = frame;
         initialize();
     }
 
@@ -108,8 +106,8 @@ public class DeltaPanel extends JDialog implements Runnable
         //while(!finish);
         finish = false;
         waitLabel.setText("Calculating track data. Please wait...");
-        String category = " -c " + Editor.getProperties().getHeader().getCategory();
-        String name = " -n " + Editor.getProperties().getHeader().getName();
+        String category = " -c " + editorFrame.getTrackData().getHeader().getCategory();
+        String name = " -n " + editorFrame.getTrackData().getHeader().getName();
         String args = " -z" + category + name;
 
         //System.out.println(args);
@@ -422,7 +420,7 @@ public class DeltaPanel extends JDialog implements Runnable
     protected void startTrackgen()
     {
         
-        parent.torcsPlugin.exportTrack();
+        editorFrame.torcsPlugin.exportTrack();
         ac3d = new Thread(this);
         ac3d.start();
     }
@@ -456,7 +454,7 @@ public class DeltaPanel extends JDialog implements Runnable
 	        return;
 	    }
 	    co = newLength/length;
-		Vector<Segment> track = TrackData.getTrackData();
+		Vector<Segment> track = editorFrame.getTrackData().getSegments();
 		int size = track.size();
 
 		for(int i=0; i<size; i++)
@@ -483,7 +481,7 @@ public class DeltaPanel extends JDialog implements Runnable
 		finish = false;
 		startTrackgen();
 		waitTrackgen();
-		parent.refresh();
+		editorFrame.refresh();
 		this.getCalcButton().setEnabled(true);
         this.getAdjustButton().setEnabled(true);
         this.getLengthButton().setEnabled(true);		
@@ -496,7 +494,7 @@ public class DeltaPanel extends JDialog implements Runnable
 	    waitTrackgen();
 	    double co = 360/(360+angle);
 	    
-		Vector<Segment> track = TrackData.getTrackData();
+		Vector<Segment> track = editorFrame.getTrackData().getSegments();
 		int size = track.size();
 
 		for(int i=0; i<size; i++)
@@ -621,7 +619,7 @@ public class DeltaPanel extends JDialog implements Runnable
 		finish = false;
 		startTrackgen();
 		waitTrackgen();
-		parent.refresh();
+		editorFrame.refresh();
 		
         this.getCalcButton().setEnabled(true);
         this.getAdjustButton().setEnabled(true);

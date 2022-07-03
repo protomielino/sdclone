@@ -8,12 +8,17 @@ import gui.EditorFrame;
 
 public class PropertyPanel extends JPanel
 {
-	public EditorFrame			frame;
+	private EditorFrame			editorFrame;
+	
+	protected EditorFrame getEditorFrame()
+	{
+		return editorFrame;
+	}
 
-	public PropertyPanel(EditorFrame frame)
+	public PropertyPanel(EditorFrame editorFrame)
 	{
 		super();
-		this.frame = frame;
+		this.editorFrame = editorFrame;
 	}
 
 	public void setTextField(JTextField field, int value)

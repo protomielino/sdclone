@@ -24,9 +24,6 @@ import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Vector;
 
 import javax.swing.JDialog;
@@ -35,7 +32,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import utils.Editor;
 /**
  * @author babis
  * 
@@ -45,7 +41,7 @@ import utils.Editor;
 public class TrackgenPanel extends JDialog implements Runnable
 {
 	public static Vector	args			= new Vector();
-	public EditorFrame		parent;
+	public EditorFrame		editorFrame;
 	private Thread 			ac3d 			= new Thread(this);
 
 	private JPanel			jPanel			= null;
@@ -61,10 +57,10 @@ public class TrackgenPanel extends JDialog implements Runnable
 	private JLabel			trackgenLabel	= null;
 	private JLabel			waitLabel		= null;
 	
-	public TrackgenPanel(Frame parent)
+	public TrackgenPanel(Frame editorFrame)
 	{
 		super();
-		this.parent = (EditorFrame) parent;
+		this.editorFrame = (EditorFrame) editorFrame;
 		initialize();
 		ac3d.start();
 	}
@@ -83,8 +79,8 @@ public class TrackgenPanel extends JDialog implements Runnable
 
 	public void run()
 	{
-		String category = " -c " + Editor.getProperties().getHeader().getCategory();
-		String name = " -n " + Editor.getProperties().getHeader().getName();
+		String category = " -c " + editorFrame.getTrackData().getHeader().getCategory();
+		String name = " -n " + editorFrame.getTrackData().getHeader().getName();
 		String args = " -a" + category + name;
 
 		System.out.println(args);

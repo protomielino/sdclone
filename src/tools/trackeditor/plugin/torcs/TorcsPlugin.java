@@ -33,7 +33,6 @@ import javax.swing.UIManager;
 import plugin.Plugin;
 import utils.CustomFileFilter;
 import utils.Editor;
-import utils.TrackData;
 
 /**
  * @author Charalampos Alexopoulos
@@ -44,7 +43,7 @@ import utils.TrackData;
 public class TorcsPlugin implements Plugin
 {
 	//private Properties		properties	= Properties.getInstance();
-	protected EditorFrame	editor;
+	protected EditorFrame	editorFrame;
 	private ImportAction	importAction;
 	private ExportAction	exportAction;
 	private JMenuItem		importMenuItem;
@@ -55,9 +54,9 @@ public class TorcsPlugin implements Plugin
 	/**
 	 *  
 	 */
-	public TorcsPlugin(EditorFrame editor)
+	public TorcsPlugin(EditorFrame editorFrame)
 	{
-		this.editor = editor;
+		this.editorFrame = editorFrame;
 		importAction = new ImportAction("Speed Dreams", null, "Speed Dreams xml file", null);
 		exportAction = new ExportAction("Speed Dreams", null, "Speed Dreams xml file", null);
 	}
@@ -83,19 +82,19 @@ public class TorcsPlugin implements Plugin
 		filter.addInvalid(".prj.xml");
 		filter.setDescription("*.xml");
 		fc.setFileFilter(filter);
-		int result = fc.showOpenDialog(editor);
+		int result = fc.showOpenDialog(editorFrame);
 		UIManager.put("FileChooser.readOnly", old);
 		if (result ==JFileChooser.APPROVE_OPTION)
 		{
 			tmp = fc.getSelectedFile().toString();
-			Editor.getProperties().getHeader().setName(tmp.substring(tmp.lastIndexOf(sep) + 1, tmp.lastIndexOf(".")));
+			editorFrame.getTrackData().getHeader().setName(tmp.substring(tmp.lastIndexOf(sep) + 1, tmp.lastIndexOf(".")));
 			tmp = tmp.substring(0, tmp.lastIndexOf(sep));
 			Editor.getProperties().setPath(tmp);
 			tmp = Editor.getProperties().getPath().substring(0,tmp.lastIndexOf(sep));
 			tmp = tmp.substring(tmp.lastIndexOf(sep)+1,tmp.length());
-			Editor.getProperties().getHeader().setCategory(tmp.substring(tmp.lastIndexOf(sep) + 1));
+			editorFrame.getTrackData().getHeader().setCategory(tmp.substring(tmp.lastIndexOf(sep) + 1));
 			File file;
-			file = new File(Editor.getProperties().getPath() + sep + Editor.getProperties().getHeader().getName() + ".xml");
+			file = new File(Editor.getProperties().getPath() + sep + editorFrame.getTrackData().getHeader().getName() + ".xml");
 			readFile(file);
 			
 		}
@@ -105,24 +104,28 @@ public class TorcsPlugin implements Plugin
 	{
 		try
 		{
-			XmlReader.readXml(file.getAbsolutePath());
+			XmlReader xmlReader = new XmlReader(editorFrame);
+			
+			xmlReader.readXml(file.getAbsolutePath());
 		} catch (Exception e)
 		{
 			//				message(e.getMessage(), "The file " + file.getAbsolutePath()
 			// + " is not valid");
 			e.printStackTrace();
 		}
-		editor.refresh();
+		editorFrame.refresh();
 	}
 
 	public void exportTrack()
 	{
-		if (TrackData.getTrackData() == null)
+		if (editorFrame.getTrackData().getSegments() == null)
 		{
-			editor.message("No track", "Nothing to export");
+			editorFrame.message("No track", "Nothing to export");
 			return;
 		}
-		XmlWriter.writeXml();
+		XmlWriter xmlWriter = new XmlWriter(editorFrame);
+		
+		xmlWriter.writeXml();
 	}
 	/**
 	 * This method initializes importMenuItem

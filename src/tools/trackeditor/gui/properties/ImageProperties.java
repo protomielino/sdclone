@@ -51,9 +51,9 @@ public class ImageProperties extends PropertyPanel
 	/**
 	 *
 	 */
-	public ImageProperties(EditorFrame frame)
+	public ImageProperties(EditorFrame editorFrame)
 	{
-		super(frame);
+		super(editorFrame);
 		initialize();
 	}
 
@@ -142,14 +142,14 @@ public class ImageProperties extends PropertyPanel
 		if (isDifferent(pathTextField.getText(), Editor.getProperties().getImage(), stringResult))
 		{
 			Editor.getProperties().setImage(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(imageScaleTextField.getText(),
 			Editor.getProperties().getImageScale(), doubleResult))
 		{
 			Editor.getProperties().setImageScale(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().documentIsModified = true;
 		}
 	}
 }  //  @jve:decl-index=0:visual-constraint="10,10"

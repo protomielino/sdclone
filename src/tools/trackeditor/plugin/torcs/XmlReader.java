@@ -31,8 +31,8 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
+import gui.EditorFrame;
 import utils.Editor;
-import utils.TrackData;
 import utils.circuit.Camera;
 import utils.circuit.Curve;
 import utils.circuit.EnvironmentMapping;
@@ -55,10 +55,14 @@ import utils.circuit.ObjectMap;
  */
 public class XmlReader
 {
-    //private static Properties properties = Properties.getInstance();
-    private static List<Element> segments;
-
-    public static void readXml(String filename)
+	private EditorFrame		editorFrame = null;
+	
+	public XmlReader(EditorFrame editorFrame)
+	{
+		this.editorFrame = editorFrame;
+	}
+	
+    public void readXml(String filename)
     {
         Document doc;
         try
@@ -72,7 +76,7 @@ public class XmlReader
         }
     }
 
-    private static synchronized void setTrackData(Element root)
+    private synchronized void setTrackData(Element root)
     {
         setTrackLights(root);
         setHeader(root);
@@ -85,30 +89,30 @@ public class XmlReader
         setMainTrack(root);
     }
 
-    private static synchronized void setMainTrack(Element root)
+    private synchronized void setMainTrack(Element root)
     {
         Element mainTrack = getChildWithName(root, "Main Track");
 
         if (mainTrack == null)
             return;
 
-        Editor.getProperties().getMainTrack().setWidth(getAttrNumValue(mainTrack, "width", "m"));
-        Editor.getProperties().getMainTrack().setSurface(getAttrStrValue(mainTrack, "surface"));
-        Editor.getProperties().getMainTrack().setProfilStepsLength(getAttrNumValue(mainTrack, "profil steps length", "m"));
-        Editor.getProperties().getMainTrack().setRacelineWidthscale(getAttrNumValue(mainTrack, "raceline widthscale"));
-        Editor.getProperties().getMainTrack().setRacelineInt(getAttrNumValue(mainTrack, "raceline int"));
-        Editor.getProperties().getMainTrack().setRacelineExt(getAttrNumValue(mainTrack, "raceline ext"));
+        editorFrame.getTrackData().getMainTrack().setWidth(getAttrNumValue(mainTrack, "width", "m"));
+        editorFrame.getTrackData().getMainTrack().setSurface(getAttrStrValue(mainTrack, "surface"));
+        editorFrame.getTrackData().getMainTrack().setProfilStepsLength(getAttrNumValue(mainTrack, "profil steps length", "m"));
+        editorFrame.getTrackData().getMainTrack().setRacelineWidthscale(getAttrNumValue(mainTrack, "raceline widthscale"));
+        editorFrame.getTrackData().getMainTrack().setRacelineInt(getAttrNumValue(mainTrack, "raceline int"));
+        editorFrame.getTrackData().getMainTrack().setRacelineExt(getAttrNumValue(mainTrack, "raceline ext"));
 
-        if (Editor.getProperties().getHeader().getVersion() == 3)
+        if (editorFrame.getTrackData().getHeader().getVersion() == 3)
         {
-            setSideV3(mainTrack, Editor.getProperties().getMainTrack().getLeft(), "l");
-            setSideV3(mainTrack, Editor.getProperties().getMainTrack().getRight(), "r");
+            setSideV3(mainTrack, editorFrame.getTrackData().getMainTrack().getLeft(), "l");
+            setSideV3(mainTrack, editorFrame.getTrackData().getMainTrack().getRight(), "r");
             setPitsV3(mainTrack);
         }
         else
         {
-            setSide(mainTrack, Editor.getProperties().getMainTrack().getLeft(), "Left");
-            setSide(mainTrack, Editor.getProperties().getMainTrack().getRight(), "Right");
+            setSide(mainTrack, editorFrame.getTrackData().getMainTrack().getLeft(), "Left");
+            setSide(mainTrack, editorFrame.getTrackData().getMainTrack().getRight(), "Right");
             setPits(mainTrack);
         }
 
@@ -118,33 +122,33 @@ public class XmlReader
     /**
      * @param header
      */
-    private static void setHeader(Element root)
+    private void setHeader(Element root)
     {
         Element header = getChildWithName(root, "Header");
 
         if (header == null)
             return;
 
-        Editor.getProperties().getHeader().setName(getAttrStrValue(header, "name"));
-        Editor.getProperties().getHeader().setCategory(getAttrStrValue(header, "category"));
-        Editor.getProperties().getHeader().setSubcategory(getAttrStrValue(header, "subcategory"));
-        Editor.getProperties().getHeader().setVersion(getAttrIntValue(header, "version"));
-        Editor.getProperties().getHeader().setSkyVersion(getAttrIntValue(header, "sky version"));
-        Editor.getProperties().getHeader().setAuthor(getAttrStrValue(header, "author"));
-        Editor.getProperties().getHeader().setDescription(getAttrStrValue(header, "description"));
+        editorFrame.getTrackData().getHeader().setName(getAttrStrValue(header, "name"));
+        editorFrame.getTrackData().getHeader().setCategory(getAttrStrValue(header, "category"));
+        editorFrame.getTrackData().getHeader().setSubcategory(getAttrStrValue(header, "subcategory"));
+        editorFrame.getTrackData().getHeader().setVersion(getAttrIntValue(header, "version"));
+        editorFrame.getTrackData().getHeader().setSkyVersion(getAttrIntValue(header, "sky version"));
+        editorFrame.getTrackData().getHeader().setAuthor(getAttrStrValue(header, "author"));
+        editorFrame.getTrackData().getHeader().setDescription(getAttrStrValue(header, "description"));
     }
 
     /**
      * @param root
      */
-    private static void setCameras(Element root)
+    private void setCameras(Element root)
     {
         Element cameras = getChildWithName(root, "Cameras");
 
         if (cameras == null)
             return;
 
-        if (Editor.getProperties().getHeader().getVersion() == 3)
+        if (editorFrame.getTrackData().getHeader().getVersion() == 3)
         	cameras = getChildWithName(cameras, "list");
         
         if (cameras == null)
@@ -168,20 +172,20 @@ public class XmlReader
 
             cameraData.add(cam);
         }
-        Editor.getProperties().setCameras(cameraData);
+        editorFrame.getTrackData().setCameras(cameraData);
     }
 
     /**
      * @param root
      */
-    private static void setTrackLights(Element root)
+    private void setTrackLights(Element root)
     {
         Element lights = getChildWithName(root, "Track Lights");
 
         if (lights == null)
             return;
 
-        if (Editor.getProperties().getHeader().getVersion() == 3)
+        if (editorFrame.getTrackData().getHeader().getVersion() == 3)
         	lights = getChildWithName(lights, "List");
         
         if (lights == null)
@@ -225,13 +229,13 @@ public class XmlReader
 
             lightData.add(lit);
         }
-        Editor.getProperties().setTrackLights(lightData);
+        editorFrame.getTrackData().setTrackLights(lightData);
     }
 
     /**
      * @param root
      */
-    private static void setStartingGrid(Element root)
+    private void setStartingGrid(Element root)
     {
         Element element = getChildWithName(root, "Starting Grid");
 
@@ -247,13 +251,13 @@ public class XmlReader
         data.setOffsetWithinAColumn(getAttrNumValue(element, "offset within a column"));
         data.setInitialHeight(getAttrNumValue(element, "initial height"));
 
-        Editor.getProperties().setStartingGrid(data);
+        editorFrame.getTrackData().setStartingGrid(data);
     }
 
     /**
      * @param root
      */
-    private static void setLocalInfo(Element root)
+    private void setLocalInfo(Element root)
     {
         Element element = getChildWithName(root, "Local Info");
 
@@ -271,20 +275,20 @@ public class XmlReader
         data.setSunAscension(getAttrNumValue(element, "sun ascension"));
         data.setAltitude(getAttrNumValue(element, "altitude"));
 
-        Editor.getProperties().setLocalInfo(data);
+        editorFrame.getTrackData().setLocalInfo(data);
     }
 
     /**
      * @param root
      */
-    private static void setSurfaces(Element root)
+    private void setSurfaces(Element root)
     {
         Element surfaces = getChildWithName(root, "Surfaces");
 
         if (surfaces == null)
             return;
 
-        if (Editor.getProperties().getHeader().getVersion() == 3)
+        if (editorFrame.getTrackData().getHeader().getVersion() == 3)
             surfaces = getChildWithName(surfaces, "List");
 
         if (surfaces == null)
@@ -323,13 +327,13 @@ public class XmlReader
 
             surfaceData.add(surf);
         }
-        Editor.getProperties().setSurfaces(surfaceData);
+        editorFrame.getTrackData().setSurfaces(surfaceData);
     }
 
     /**
      * @param root
      */
-    private static void setObjects(Element root)
+    private void setObjects(Element root)
     {
         Element objects = getChildWithName(root, "Objects");
 
@@ -354,13 +358,13 @@ public class XmlReader
 
             objectData.add(obj);
         }
-        Editor.getProperties().setObjects(objectData);
+        editorFrame.getTrackData().setObjects(objectData);
     }
 
     /**
      *
      */
-    private static void setGraphic(Element root)
+    private void setGraphic(Element root)
     {
         Element graphic = getChildWithName(root, "Graphic");
 
@@ -459,53 +463,53 @@ public class XmlReader
 	        data.setEnvironmentMapping(envMap);
         }
 
-	    Editor.getProperties().setGraphic(data);
+	    editorFrame.getTrackData().setGraphic(data);
     }
 
     /**
      *
      */
-    private static void setPits(Element track)
+    private void setPits(Element track)
     {
         Element pits = getChildWithName(track, "Pits");
 
         if (pits == null)
             return;
 
-        Editor.getProperties().getMainTrack().getPits().setStyle(getAttrIntValue(pits, "pit style"));
-        Editor.getProperties().getMainTrack().getPits().setSide(getAttrStrValue(pits, "side"));
-        Editor.getProperties().getMainTrack().getPits().setEntry(getAttrStrValue(pits, "entry"));
-        Editor.getProperties().getMainTrack().getPits().setStart(getAttrStrValue(pits, "start"));
-        Editor.getProperties().getMainTrack().getPits().setStartBuildings(getAttrStrValue(pits, "start buildings"));
-        Editor.getProperties().getMainTrack().getPits().setStopBuildings(getAttrStrValue(pits, "stop buildings"));
-        Editor.getProperties().getMainTrack().getPits().setMaxPits(getAttrIntValue(pits, "max pits"));
-        Editor.getProperties().getMainTrack().getPits().setEnd(getAttrStrValue(pits, "end"));
-        Editor.getProperties().getMainTrack().getPits().setExit(getAttrStrValue(pits, "exit"));
-        Editor.getProperties().getMainTrack().getPits().setLength(getAttrNumValue(pits, "length", "m"));
-        Editor.getProperties().getMainTrack().getPits().setWidth(getAttrNumValue(pits, "width", "m"));
-        Editor.getProperties().getMainTrack().getPits().setIndicator(getAttrIntValue(pits, "pit indicator"));
-        Editor.getProperties().getMainTrack().getPits().setSpeedLimit(getAttrNumValue(pits, "speed limit"));
+        editorFrame.getTrackData().getMainTrack().getPits().setStyle(getAttrIntValue(pits, "pit style"));
+        editorFrame.getTrackData().getMainTrack().getPits().setSide(getAttrStrValue(pits, "side"));
+        editorFrame.getTrackData().getMainTrack().getPits().setEntry(getAttrStrValue(pits, "entry"));
+        editorFrame.getTrackData().getMainTrack().getPits().setStart(getAttrStrValue(pits, "start"));
+        editorFrame.getTrackData().getMainTrack().getPits().setStartBuildings(getAttrStrValue(pits, "start buildings"));
+        editorFrame.getTrackData().getMainTrack().getPits().setStopBuildings(getAttrStrValue(pits, "stop buildings"));
+        editorFrame.getTrackData().getMainTrack().getPits().setMaxPits(getAttrIntValue(pits, "max pits"));
+        editorFrame.getTrackData().getMainTrack().getPits().setEnd(getAttrStrValue(pits, "end"));
+        editorFrame.getTrackData().getMainTrack().getPits().setExit(getAttrStrValue(pits, "exit"));
+        editorFrame.getTrackData().getMainTrack().getPits().setLength(getAttrNumValue(pits, "length", "m"));
+        editorFrame.getTrackData().getMainTrack().getPits().setWidth(getAttrNumValue(pits, "width", "m"));
+        editorFrame.getTrackData().getMainTrack().getPits().setIndicator(getAttrIntValue(pits, "pit indicator"));
+        editorFrame.getTrackData().getMainTrack().getPits().setSpeedLimit(getAttrNumValue(pits, "speed limit"));
     }
 
     /**
     *
     */
-   private static void setPitsV3(Element mainTrack)
+   private void setPitsV3(Element mainTrack)
    {
-       Editor.getProperties().getMainTrack().getPits().setStyle(getAttrIntValue(mainTrack, "pit type"));
-       Editor.getProperties().getMainTrack().getPits().setSide(getAttrStrValue(mainTrack, "pit side"));
-       Editor.getProperties().getMainTrack().getPits().setEntry(getAttrStrValue(mainTrack, "pit entry"));
-       Editor.getProperties().getMainTrack().getPits().setStart(getAttrStrValue(mainTrack, "pit start"));
-       Editor.getProperties().getMainTrack().getPits().setStartBuildings(getAttrStrValue(mainTrack, "start buildings"));
-       Editor.getProperties().getMainTrack().getPits().setStopBuildings(getAttrStrValue(mainTrack, "stop buildings"));
-       Editor.getProperties().getMainTrack().getPits().setEnd(getAttrStrValue(mainTrack, "pit end"));
-       Editor.getProperties().getMainTrack().getPits().setExit(getAttrStrValue(mainTrack, "pit exit"));
-       Editor.getProperties().getMainTrack().getPits().setLength(getAttrNumValue(mainTrack, "pit length", "m"));
-       Editor.getProperties().getMainTrack().getPits().setWidth(getAttrNumValue(mainTrack, "pit width", "m"));
-       Editor.getProperties().getMainTrack().getPits().setSpeedLimit(getAttrNumValue(mainTrack, "speed limit"));
+       editorFrame.getTrackData().getMainTrack().getPits().setStyle(getAttrIntValue(mainTrack, "pit type"));
+       editorFrame.getTrackData().getMainTrack().getPits().setSide(getAttrStrValue(mainTrack, "pit side"));
+       editorFrame.getTrackData().getMainTrack().getPits().setEntry(getAttrStrValue(mainTrack, "pit entry"));
+       editorFrame.getTrackData().getMainTrack().getPits().setStart(getAttrStrValue(mainTrack, "pit start"));
+       editorFrame.getTrackData().getMainTrack().getPits().setStartBuildings(getAttrStrValue(mainTrack, "start buildings"));
+       editorFrame.getTrackData().getMainTrack().getPits().setStopBuildings(getAttrStrValue(mainTrack, "stop buildings"));
+       editorFrame.getTrackData().getMainTrack().getPits().setEnd(getAttrStrValue(mainTrack, "pit end"));
+       editorFrame.getTrackData().getMainTrack().getPits().setExit(getAttrStrValue(mainTrack, "pit exit"));
+       editorFrame.getTrackData().getMainTrack().getPits().setLength(getAttrNumValue(mainTrack, "pit length", "m"));
+       editorFrame.getTrackData().getMainTrack().getPits().setWidth(getAttrNumValue(mainTrack, "pit width", "m"));
+       editorFrame.getTrackData().getMainTrack().getPits().setSpeedLimit(getAttrNumValue(mainTrack, "speed limit"));
    }
 
-    private static void setSideV3(Element seg, SegmentSide part, String sPart)
+    private void setSideV3(Element seg, SegmentSide part, String sPart)
     {
         double width = getAttrNumValue(seg, sPart + "side width", "m");
         if (Double.isNaN(width))
@@ -530,9 +534,11 @@ public class XmlReader
         part.setBarrierSurface(getAttrStrValue(seg, sPart + "barrier surface"));
     }
 
-    private synchronized static void setSegments(Element mainTrack)
+    private synchronized void setSegments(Element mainTrack)
     {
-        if (Editor.getProperties().getHeader().getVersion() == 3)
+    	List<Element> segments;
+    	
+        if (editorFrame.getTrackData().getHeader().getVersion() == 3)
             segments = getChildWithName(mainTrack, "segments").getChildren();
         else
             segments = getChildWithName(mainTrack, "Track Segments").getChildren();
@@ -560,7 +566,7 @@ public class XmlReader
             shape = setSegment(e, shape, prev);
             try
             {
-                shape.calcShape(prev);
+                shape.calcShape(editorFrame, prev);
             } catch (Exception e1)
             {
                 // TODO Auto-generated catch block
@@ -569,10 +575,10 @@ public class XmlReader
             trackData.add(shape);
             prev = shape;
         }
-        TrackData.setTrackData(trackData);
+        editorFrame.getTrackData().setSegments(trackData);
     }
 
-    private synchronized static Segment setSegment(Element seg, Segment shape,
+    private synchronized Segment setSegment(Element seg, Segment shape,
             Segment prev)
     {
         shape.addToPrevious(prev);
@@ -691,7 +697,7 @@ public class XmlReader
      * @param left
      * @param string
      */
-    private synchronized static void setSide(Element seg, SegmentSide part,
+    private synchronized void setSide(Element seg, SegmentSide part,
             String sPart)
     {
         Element el = getChildWithName(seg, sPart + " Side");
@@ -740,7 +746,7 @@ public class XmlReader
             part.setHasBarrier(false);
     }
 
-    private synchronized static Element getChildWithName(Element element,
+    private synchronized Element getChildWithName(Element element,
             String name)
     {
         Element out = null;
@@ -762,7 +768,7 @@ public class XmlReader
         return out;
     }
 
-    public synchronized static String getSegmentName(Element element)
+    public synchronized String getSegmentName(Element element)
     {
         String out = null;
 
@@ -772,7 +778,7 @@ public class XmlReader
         }
 
         String tmp = element.getParentElement().getAttribute("name").getValue();
-        if (Editor.getProperties().getHeader().getVersion() == 3 && tmp.equals("segments"))
+        if (editorFrame.getTrackData().getHeader().getVersion() == 3 && tmp.equals("segments"))
         {
             out = element.getAttribute("name").getValue();
         }
@@ -783,7 +789,7 @@ public class XmlReader
         return out;
     }
 
-    public synchronized static String getAttrStrValue(Element element,
+    public synchronized String getAttrStrValue(Element element,
             String name)
     {
         String out = null;
@@ -802,7 +808,7 @@ public class XmlReader
         return out;
     }
 
-    public synchronized static double getAttrNumValue(Element element, String name)
+    public synchronized double getAttrNumValue(Element element, String name)
     {
         double out = Double.NaN;
         Element e = getChildWithName(element, name);
@@ -823,7 +829,7 @@ public class XmlReader
         return out;
     }
 
-    public synchronized static double getAttrNumValue(Element element, String name, String expectedUnit)
+    public synchronized double getAttrNumValue(Element element, String name, String expectedUnit)
     {
         double out = Double.NaN;
         Element e = getChildWithName(element, name);
@@ -876,7 +882,7 @@ public class XmlReader
         return out;
     }
 
-    public synchronized static int getAttrIntValue(Element element,
+    public synchronized int getAttrIntValue(Element element,
             String name)
     {
         int out = Integer.MAX_VALUE;
@@ -901,12 +907,12 @@ public class XmlReader
     /**
      * @return Returns the segments.
      */
-    public List<Element> getSegments()
-    {
-        return segments;
-    }
+//    public List<Element> getSegments()
+//    {
+//        return segments;
+//    }
 
-    private static Document readFromFile(String fname) throws JDOMException
+    private Document readFromFile(String fname) throws JDOMException
     {
         Document d = null;
         SAXBuilder sxb = new SAXBuilder(false);

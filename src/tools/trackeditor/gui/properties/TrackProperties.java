@@ -34,7 +34,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
-import utils.Editor;
 import utils.circuit.SegmentSide;
 import utils.circuit.Surface;
 /**
@@ -110,9 +109,9 @@ public class TrackProperties extends PropertyPanel
 	/**
 	 *
 	 */
-	public TrackProperties(EditorFrame frame)
+	public TrackProperties(EditorFrame editorFrame)
 	{
-		super(frame);
+		super(editorFrame);
 		initialize();
 	}
 
@@ -133,14 +132,14 @@ public class TrackProperties extends PropertyPanel
 		addLabel(this, 4, racelineIntLabel, "Raceline Int", 140);
 		addLabel(this, 5, racelineExtLabel, "Raceline Ext", 140);
 
-		addTextField(this, 0, widthTextField, Editor.getProperties().getMainTrack().getWidth(), 150, 50);
+		addTextField(this, 0, widthTextField, getEditorFrame().getTrackData().getMainTrack().getWidth(), 150, 50);
 
         this.add(getSurfaceComboBox(), null);
 
-		addTextField(this, 2, profilStepsLengthTextField, Editor.getProperties().getMainTrack().getProfilStepsLength(), 150, 50);
-		addTextField(this, 3, racelineWidthscaleTextField, Editor.getProperties().getMainTrack().getRacelineWidthscale(), 150, 50);
-		addTextField(this, 4, racelineIntTextField, Editor.getProperties().getMainTrack().getRacelineInt(), 150, 50);
-		addTextField(this, 5, racelineExtTextField, Editor.getProperties().getMainTrack().getRacelineExt(), 150, 50);
+		addTextField(this, 2, profilStepsLengthTextField, getEditorFrame().getTrackData().getMainTrack().getProfilStepsLength(), 150, 50);
+		addTextField(this, 3, racelineWidthscaleTextField, getEditorFrame().getTrackData().getMainTrack().getRacelineWidthscale(), 150, 50);
+		addTextField(this, 4, racelineIntTextField, getEditorFrame().getTrackData().getMainTrack().getRacelineInt(), 150, 50);
+		addTextField(this, 5, racelineExtTextField, getEditorFrame().getTrackData().getMainTrack().getRacelineExt(), 150, 50);
 
 		this.add(getTabbedPane(), null);
 
@@ -152,7 +151,7 @@ public class TrackProperties extends PropertyPanel
 
 	private void addDefaultSurfaces(Vector<String> surfaceVector)
 	{
-        Vector<Surface> surfaces = Editor.getProperties().getSurfaces();
+        Vector<Surface> surfaces = getEditorFrame().getTrackData().getSurfaces();
         for (int i = 0; i < surfaces.size(); i++)
         {
 			String surface = surfaces.elementAt(i).getName();
@@ -209,7 +208,7 @@ public class TrackProperties extends PropertyPanel
 		{
 			surfaceComboBox = new JComboBox<String>();
 			surfaceComboBox.setBounds(150, 37, 180, 23);
-			String surface = Editor.getProperties().getMainTrack().getSurface();
+			String surface = getEditorFrame().getTrackData().getMainTrack().getSurface();
 			addSurface(roadSurfaceVector, surface);
 			surfaceComboBox.setModel(new DefaultComboBoxModel<String>(roadSurfaceVector));
 			surfaceComboBox.setSelectedItem(surface);
@@ -230,8 +229,8 @@ public class TrackProperties extends PropertyPanel
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 172, 460, 370);
 
-			tabbedPane.addTab("Left", null, new SidePanel(Editor.getProperties().getMainTrack().getLeft()), null);
-			tabbedPane.addTab("Right", null, new SidePanel(Editor.getProperties().getMainTrack().getRight()), null);
+			tabbedPane.addTab("Left", null, new SidePanel(getEditorFrame().getTrackData().getMainTrack().getLeft()), null);
+			tabbedPane.addTab("Right", null, new SidePanel(getEditorFrame().getTrackData().getMainTrack().getRight()), null);
 		}
 		return tabbedPane;
 	}
@@ -322,7 +321,7 @@ public class TrackProperties extends PropertyPanel
 		{
 			if (sideSurfaceComboBox == null)
 			{
-				sideSurfaceComboBox = new JComboBox();
+				sideSurfaceComboBox = new JComboBox<String>();
 				sideSurfaceComboBox.setBounds(140, 64, 180, 23);
 				addSurface(sideSurfaceVector, side.getSideSurface());
 				sideSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(sideSurfaceVector));
@@ -349,7 +348,7 @@ public class TrackProperties extends PropertyPanel
 			if (sideBankingTypeComboBox == null)
 			{
 				String[] items = {"none", "level", "tangent"};
-				sideBankingTypeComboBox = new JComboBox();
+				sideBankingTypeComboBox = new JComboBox<String>();
 				sideBankingTypeComboBox.setBounds(140, 91, 100, 23);
 				sideBankingTypeComboBox.setModel(new DefaultComboBoxModel<String>(items));
 				String type = side.getSideBankingType();
@@ -379,7 +378,7 @@ public class TrackProperties extends PropertyPanel
 		{
 			if (borderSurfaceComboBox == null)
 			{
-				borderSurfaceComboBox = new JComboBox();
+				borderSurfaceComboBox = new JComboBox<String>();
 				borderSurfaceComboBox.setBounds(140, 172, 180, 23);
 				addSurface(borderSurfaceVector, side.getBorderSurface());
 				borderSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(borderSurfaceVector));
@@ -405,7 +404,7 @@ public class TrackProperties extends PropertyPanel
 		{
 			if (borderStyleComboBox == null)
 			{
-				borderStyleComboBox = new JComboBox();
+				borderStyleComboBox = new JComboBox<String>();
 				borderStyleComboBox.setBounds(140, 199, 100, 23);
 				borderStyleComboBox.setModel(new DefaultComboBoxModel<String>(styleItems));
 				String style = side.getBorderStyle();
@@ -435,7 +434,7 @@ public class TrackProperties extends PropertyPanel
 		{
 			if (barrierSurfaceComboBox == null)
 			{
-				barrierSurfaceComboBox = new JComboBox();
+				barrierSurfaceComboBox = new JComboBox<String>();
 				barrierSurfaceComboBox.setBounds(140, 280, 180, 23);
 				addSurface(barrierSurfaceVector, side.getBarrierSurface());
 				barrierSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(barrierSurfaceVector));
@@ -461,7 +460,7 @@ public class TrackProperties extends PropertyPanel
 		{
 			if (barrierStyleComboBox == null)
 			{
-				barrierStyleComboBox = new JComboBox();
+				barrierStyleComboBox = new JComboBox<String>();
 				barrierStyleComboBox.setBounds(140, 307, 100, 23);
 				barrierStyleComboBox.setModel(new DefaultComboBoxModel<String>(styleItems));
 				String style = side.getBarrierStyle();
@@ -492,195 +491,195 @@ public class TrackProperties extends PropertyPanel
 		MutableDouble doubleResult = new MutableDouble();
 
         if (isDifferent(widthTextField.getText(),
-            Editor.getProperties().getMainTrack().getWidth(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getWidth(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().setWidth(doubleResult.getValue());
-            frame.documentIsModified = true;
+            getEditorFrame().getTrackData().getMainTrack().setWidth(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;
         }
 
 		if (isDifferent((String) surfaceComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getSurface(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getSurface(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().setSurface(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().setSurface(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
         if (isDifferent(profilStepsLengthTextField.getText(),
-            Editor.getProperties().getMainTrack().getProfilStepsLength(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getProfilStepsLength(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().setProfilStepsLength(doubleResult.getValue());
-            frame.documentIsModified = true;
+            getEditorFrame().getTrackData().getMainTrack().setProfilStepsLength(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;
         }
 
         if (isDifferent(racelineWidthscaleTextField.getText(),
-            Editor.getProperties().getMainTrack().getRacelineWidthscale(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getRacelineWidthscale(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().setRacelineWidthscale(doubleResult.getValue());
-            frame.documentIsModified = true;
+            getEditorFrame().getTrackData().getMainTrack().setRacelineWidthscale(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;
         }
 
         if (isDifferent(racelineIntTextField.getText(),
-            Editor.getProperties().getMainTrack().getRacelineInt(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getRacelineInt(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().setRacelineInt(doubleResult.getValue());
-            frame.documentIsModified = true;
+            getEditorFrame().getTrackData().getMainTrack().setRacelineInt(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;
         }
 
         if (isDifferent(racelineExtTextField.getText(),
-            Editor.getProperties().getMainTrack().getRacelineExt(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getRacelineExt(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().setRacelineExt(doubleResult.getValue());
-            frame.documentIsModified = true;
+            getEditorFrame().getTrackData().getMainTrack().setRacelineExt(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;
         }
 
         SidePanel left = (SidePanel) tabbedPane.getComponentAt(0);
 
         if (isDifferent(left.sideStartWidthTextField.getText(),
-        	Editor.getProperties().getMainTrack().getLeft().getSideStartWidth(), doubleResult))
+        	getEditorFrame().getTrackData().getMainTrack().getLeft().getSideStartWidth(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().getLeft().setSideStartWidth(doubleResult.getValue());
-            frame.documentIsModified = true;        	
+            getEditorFrame().getTrackData().getMainTrack().getLeft().setSideStartWidth(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;        	
         }
         if (isDifferent(left.sideEndWidthTextField.getText(),
-            Editor.getProperties().getMainTrack().getLeft().getSideEndWidth(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getLeft().getSideEndWidth(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().getLeft().setSideEndWidth(doubleResult.getValue());
-            frame.documentIsModified = true;        	
+            getEditorFrame().getTrackData().getMainTrack().getLeft().setSideEndWidth(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;        	
         }
 		if (isDifferent((String) left.sideSurfaceComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getLeft().getSideSurface(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getLeft().getSideSurface(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().getLeft().setSideSurface(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().getLeft().setSideSurface(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 		if (isDifferent((String) left.sideBankingTypeComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getLeft().getSideBankingType(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getLeft().getSideBankingType(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().getLeft().setSideBankingType(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().getLeft().setSideBankingType(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
         if (isDifferent(left.borderWidthTextField.getText(),
-            Editor.getProperties().getMainTrack().getLeft().getBorderWidth(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getLeft().getBorderWidth(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().getLeft().setBorderWidth(doubleResult.getValue());
-            frame.documentIsModified = true;        	
+            getEditorFrame().getTrackData().getMainTrack().getLeft().setBorderWidth(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;        	
         }
         if (isDifferent(left.borderHeightTextField.getText(),
-            Editor.getProperties().getMainTrack().getLeft().getBorderHeight(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getLeft().getBorderHeight(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().getLeft().setBorderHeight(doubleResult.getValue());
-            frame.documentIsModified = true;        	
+            getEditorFrame().getTrackData().getMainTrack().getLeft().setBorderHeight(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;        	
         }
 		if (isDifferent((String) left.borderSurfaceComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getLeft().getBorderSurface(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getLeft().getBorderSurface(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().getLeft().setBorderSurface(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().getLeft().setBorderSurface(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 		if (isDifferent((String) left.borderStyleComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getLeft().getBorderStyle(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getLeft().getBorderStyle(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().getLeft().setBorderStyle(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().getLeft().setBorderStyle(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
         if (isDifferent(left.barrierWidthTextField.getText(),
-            Editor.getProperties().getMainTrack().getLeft().getBarrierWidth(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getLeft().getBarrierWidth(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().getLeft().setBarrierWidth(doubleResult.getValue());
-            frame.documentIsModified = true;        	
+            getEditorFrame().getTrackData().getMainTrack().getLeft().setBarrierWidth(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;        	
         }
         if (isDifferent(left.barrierHeightTextField.getText(),
-            Editor.getProperties().getMainTrack().getLeft().getBarrierHeight(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getLeft().getBarrierHeight(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().getLeft().setBarrierHeight(doubleResult.getValue());
-            frame.documentIsModified = true;        	
+            getEditorFrame().getTrackData().getMainTrack().getLeft().setBarrierHeight(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;        	
         }
 		if (isDifferent((String) left.barrierSurfaceComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getLeft().getBarrierSurface(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getLeft().getBarrierSurface(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().getLeft().setBarrierSurface(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().getLeft().setBarrierSurface(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 		if (isDifferent((String) left.barrierStyleComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getLeft().getBarrierStyle(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getLeft().getBarrierStyle(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().getLeft().setBarrierStyle(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().getLeft().setBarrierStyle(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
         SidePanel right = (SidePanel) tabbedPane.getComponentAt(1);
 
         if (isDifferent(right.sideStartWidthTextField.getText(),
-        	Editor.getProperties().getMainTrack().getRight().getSideStartWidth(), doubleResult))
+        	getEditorFrame().getTrackData().getMainTrack().getRight().getSideStartWidth(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().getRight().setSideStartWidth(doubleResult.getValue());
-            frame.documentIsModified = true;        	
+            getEditorFrame().getTrackData().getMainTrack().getRight().setSideStartWidth(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;        	
         }
         if (isDifferent(right.sideEndWidthTextField.getText(),
-            Editor.getProperties().getMainTrack().getRight().getSideEndWidth(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getRight().getSideEndWidth(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().getRight().setSideEndWidth(doubleResult.getValue());
-            frame.documentIsModified = true;        	
+            getEditorFrame().getTrackData().getMainTrack().getRight().setSideEndWidth(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;        	
         }
 		if (isDifferent((String) right.sideSurfaceComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getRight().getSideSurface(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getRight().getSideSurface(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().getRight().setSideSurface(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().getRight().setSideSurface(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 		if (isDifferent((String) right.sideBankingTypeComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getRight().getSideBankingType(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getRight().getSideBankingType(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().getRight().setSideBankingType(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().getRight().setSideBankingType(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
         if (isDifferent(right.borderWidthTextField.getText(),
-            Editor.getProperties().getMainTrack().getRight().getBorderWidth(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getRight().getBorderWidth(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().getRight().setBorderWidth(doubleResult.getValue());
-            frame.documentIsModified = true;        	
+            getEditorFrame().getTrackData().getMainTrack().getRight().setBorderWidth(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;        	
         }
         if (isDifferent(right.borderHeightTextField.getText(),
-            Editor.getProperties().getMainTrack().getRight().getBorderHeight(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getRight().getBorderHeight(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().getRight().setBorderHeight(doubleResult.getValue());
-            frame.documentIsModified = true;        	
+            getEditorFrame().getTrackData().getMainTrack().getRight().setBorderHeight(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;        	
         }
 		if (isDifferent((String) right.borderSurfaceComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getRight().getBorderSurface(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getRight().getBorderSurface(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().getRight().setBorderSurface(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().getRight().setBorderSurface(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 		if (isDifferent((String) right.borderStyleComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getRight().getBorderStyle(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getRight().getBorderStyle(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().getRight().setBorderStyle(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().getRight().setBorderStyle(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
         if (isDifferent(right.barrierWidthTextField.getText(),
-            Editor.getProperties().getMainTrack().getRight().getBarrierWidth(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getRight().getBarrierWidth(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().getRight().setBarrierWidth(doubleResult.getValue());
-            frame.documentIsModified = true;        	
+            getEditorFrame().getTrackData().getMainTrack().getRight().setBarrierWidth(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;        	
         }
         if (isDifferent(right.barrierHeightTextField.getText(),
-            Editor.getProperties().getMainTrack().getRight().getBarrierHeight(), doubleResult))
+            getEditorFrame().getTrackData().getMainTrack().getRight().getBarrierHeight(), doubleResult))
         {
-            Editor.getProperties().getMainTrack().getRight().setBarrierHeight(doubleResult.getValue());
-            frame.documentIsModified = true;        	
+            getEditorFrame().getTrackData().getMainTrack().getRight().setBarrierHeight(doubleResult.getValue());
+            getEditorFrame().documentIsModified = true;        	
         }
 		if (isDifferent((String) right.barrierSurfaceComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getRight().getBarrierSurface(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getRight().getBarrierSurface(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().getRight().setBarrierSurface(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().getRight().setBarrierSurface(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 		if (isDifferent((String) right.barrierStyleComboBox.getSelectedItem(),
-            Editor.getProperties().getMainTrack().getRight().getBarrierStyle(), stringResult))
+            getEditorFrame().getTrackData().getMainTrack().getRight().getBarrierStyle(), stringResult))
 		{
-			Editor.getProperties().getMainTrack().getRight().setBarrierStyle(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getMainTrack().getRight().setBarrierStyle(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 	}
 }  //  @jve:decl-index=0:visual-constraint="10,10"

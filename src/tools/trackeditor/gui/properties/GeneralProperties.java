@@ -49,9 +49,6 @@ public class GeneralProperties extends PropertyPanel
 	private JComboBox<String>	versionComboBox			= null;
 	private JLabel				skyVersionLabel			= new JLabel();
 	private JComboBox<String>	skyVersionComboBox		= null;
-	private JLabel				pathLabel				= new JLabel();
-	private JTextField			pathTextField			= new JTextField();
-	private JButton				pathButton				= null;
 	private JLabel				authorLabel				= new JLabel();
 	private JTextField			authorTextField			= new JTextField();
 	private JLabel				descriptionLabel		= new JLabel();
@@ -62,9 +59,9 @@ public class GeneralProperties extends PropertyPanel
 	/**
 	 *
 	 */
-	public GeneralProperties(EditorFrame frame)
+	public GeneralProperties(EditorFrame editorFrame)
 	{
-		super(frame);
+		super(editorFrame);
 		initialize();
 	}
 
@@ -81,22 +78,18 @@ public class GeneralProperties extends PropertyPanel
 		addLabel(this, 2, subcategoryLabel, "Subcategory", 110);
 		addLabel(this, 3, versionLabel, "Version", 110);
 		addLabel(this, 4, skyVersionLabel, "Sky Version", 110);
-		addLabel(this, 5, pathLabel, "Path", 80);
-		addLabel(this, 6, authorLabel, "Author", 80);
-		addLabel(this, 7, descriptionLabel, "Description", 80);
+		addLabel(this, 5, authorLabel, "Author", 80);
+		addLabel(this, 6, descriptionLabel, "Description", 80);
 
-		addTextField(this, 0, nameTextField, Editor.getProperties().getHeader().getName(), 130, 150);
+		addTextField(this, 0, nameTextField, getEditorFrame().getTrackData().getHeader().getName(), 130, 150);
 
 		add(getCategoryComboBox(), null);
 		add(getSubcategoryComboBox(), null);
 		add(getVersionComboBox(), null);
 		add(getSkyVersionComboBox(), null);
 
-		addTextField(this, 5, pathTextField, Editor.getProperties().getPath(), 85, 300);
-		addTextField(this, 6, authorTextField, Editor.getProperties().getHeader().getAuthor(), 85, 385);
-		addTextField(this, 7, descriptionTextField, Editor.getProperties().getHeader().getDescription(), 85, 385);
-
-		add(getPathButton(), null);
+		addTextField(this, 5, authorTextField, getEditorFrame().getTrackData().getHeader().getAuthor(), 85, 385);
+		addTextField(this, 6, descriptionTextField, getEditorFrame().getTrackData().getHeader().getDescription(), 85, 385);
 	}
 
 	/**
@@ -111,7 +104,7 @@ public class GeneralProperties extends PropertyPanel
 			String[] items = {"circuit", "development", "dirt", "gprix", "karting", "oval", "road", "speedway", "test"};
 			categoryComboBox = new JComboBox<String>(items);
 			categoryComboBox.setBounds(130, 37, 100, 23);
-			categoryComboBox.setSelectedItem(Editor.getProperties().getHeader().getCategory());
+			categoryComboBox.setSelectedItem(getEditorFrame().getTrackData().getHeader().getCategory());
 		}
 		return categoryComboBox;
 	}
@@ -128,7 +121,7 @@ public class GeneralProperties extends PropertyPanel
 			String[] items = {"none", "short", "long"};
 			subcategoryComboBox = new JComboBox<String>(items);
 			subcategoryComboBox.setBounds(130, 64, 100, 23);
-			String subcategory = Editor.getProperties().getHeader().getSubcategory();
+			String subcategory = getEditorFrame().getTrackData().getHeader().getSubcategory();
 			if (subcategory == null)
 				subcategory = "none";
 			subcategoryComboBox.setSelectedItem(subcategory);
@@ -148,7 +141,7 @@ public class GeneralProperties extends PropertyPanel
 			String[] items = {"3", "4", "5"};
 			versionComboBox = new JComboBox<String>(items);
 			versionComboBox.setBounds(130, 91, 100, 23);
-			versionComboBox.setSelectedItem(Editor.getProperties().getHeader().getVersion() + "");
+			versionComboBox.setSelectedItem(getEditorFrame().getTrackData().getHeader().getVersion() + "");
 		}
 		return versionComboBox;
 	}
@@ -165,7 +158,7 @@ public class GeneralProperties extends PropertyPanel
 			String[] items = {"none", "1"};
 			skyVersionComboBox = new JComboBox<String>(items);
 			skyVersionComboBox.setBounds(130, 118, 100, 23);
-			int version = Editor.getProperties().getHeader().getSkyVersion();
+			int version = getEditorFrame().getTrackData().getHeader().getSkyVersion();
 			String stringVersion;
 			if (version == Integer.MAX_VALUE)
 				stringVersion = "none";
@@ -176,75 +169,25 @@ public class GeneralProperties extends PropertyPanel
 		return skyVersionComboBox;
 	}
 
-	/**
-	 * This method initializes pathButton
-	 *
-	 * @return javax.swing.JButton
-	 */
-	public JButton getPathButton()
-	{
-		if (pathButton == null)
-		{
-			pathButton = new JButton();
-			pathButton.setBounds(390, 144, 80, 25);
-			pathButton.setText("Browse");
-			pathButton.addActionListener(new java.awt.event.ActionListener()
-			{
-				public void actionPerformed(java.awt.event.ActionEvent e)
-				{
-					selectPath();
-				}
-			});
-		}
-		return pathButton;
-	}
-
-	/**
-	 *
-	 */
-	protected void selectPath()
-	{
-		JFileChooser fc = new JFileChooser();
-		fc.setSelectedFiles(null);
-		fc.setSelectedFile(null);
-		fc.rescanCurrentDirectory();
-		fc.setApproveButtonMnemonic(0);
-		fc.setDialogTitle("Project path selection");
-		fc.setVisible(true);
-		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		fc.setCurrentDirectory(new File(System.getProperty("user.dir") + sep + "tracks"));
-		int result = fc.showDialog(this, "Ok");
-		if (result == JFileChooser.APPROVE_OPTION)
-		{
-			pathTextField.setText(fc.getSelectedFile().toString());
-		}
-	}
-
 	public void exit()
 	{
 		MutableString stringResult = new MutableString();
 
 		// the path is something/category/track
-		String tmpPath = pathTextField.getText();
+		String tmpPath = Editor.getProperties().getPath();
 		String tmpName = nameTextField.getText();
 		String tmpCategory = (String) getCategoryComboBox().getSelectedItem();
 
-		if (isDifferent(tmpName, Editor.getProperties().getHeader().getName(), stringResult))
+		if (isDifferent(nameTextField.getText(), getEditorFrame().getTrackData().getHeader().getName(), stringResult))
 		{
-			Editor.getProperties().getHeader().setName(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getHeader().setName(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
-		if (isDifferent(tmpPath, Editor.getProperties().getPath(), stringResult))
+		if (isDifferent((String) getCategoryComboBox().getSelectedItem(), getEditorFrame().getTrackData().getHeader().getCategory(), stringResult))
 		{
-			Editor.getProperties().setPath(stringResult.getValue());
-			frame.documentIsModified = true;
-		}
-
-		if (isDifferent(tmpCategory, Editor.getProperties().getHeader().getCategory(), stringResult))
-		{
-			Editor.getProperties().getHeader().setCategory(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getHeader().setCategory(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		// get the track name from the path
@@ -275,17 +218,17 @@ public class GeneralProperties extends PropertyPanel
 		}
 
 		if (isDifferent((String) getSubcategoryComboBox().getSelectedItem(),
-			Editor.getProperties().getHeader().getSubcategory(), stringResult))
+			getEditorFrame().getTrackData().getHeader().getSubcategory(), stringResult))
 		{
-			Editor.getProperties().getHeader().setSubcategory(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getHeader().setSubcategory(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		int version = Integer.parseInt((String) getVersionComboBox().getSelectedItem());
-		if (version != Editor.getProperties().getHeader().getVersion())
+		if (version != getEditorFrame().getTrackData().getHeader().getVersion())
 		{
-			Editor.getProperties().getHeader().setVersion(version);
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getHeader().setVersion(version);
+			getEditorFrame().documentIsModified = true;
 		}
 
 		String skyVersionString = (String) getSkyVersionComboBox().getSelectedItem();
@@ -294,24 +237,24 @@ public class GeneralProperties extends PropertyPanel
 			skyVersion = Integer.MAX_VALUE;
 		else
 			skyVersion = Integer.parseInt(skyVersionString);
-		if (skyVersion != Editor.getProperties().getHeader().getSkyVersion())
+		if (skyVersion != getEditorFrame().getTrackData().getHeader().getSkyVersion())
 		{
-			Editor.getProperties().getHeader().setSkyVersion(skyVersion);
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getHeader().setSkyVersion(skyVersion);
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(authorTextField.getText(),
-			Editor.getProperties().getHeader().getAuthor(), stringResult))
+			getEditorFrame().getTrackData().getHeader().getAuthor(), stringResult))
 		{
-			Editor.getProperties().getHeader().setAuthor(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getHeader().setAuthor(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(descriptionTextField.getText(),
-			Editor.getProperties().getHeader().getDescription(), stringResult))
+			getEditorFrame().getTrackData().getHeader().getDescription(), stringResult))
 		{
-			Editor.getProperties().getHeader().setDescription(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getHeader().setDescription(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"

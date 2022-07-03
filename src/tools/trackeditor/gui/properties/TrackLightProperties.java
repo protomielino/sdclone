@@ -51,9 +51,9 @@ public class TrackLightProperties extends PropertyPanel
 	/**
 	 *
 	 */
-	public TrackLightProperties(EditorFrame frame)
+	public TrackLightProperties(EditorFrame editorFrame)
 	{
-		super(frame);
+		super(editorFrame);
 		initialize();
     }
 
@@ -139,7 +139,7 @@ public class TrackLightProperties extends PropertyPanel
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 10, 460, 415);
 
-			Vector<TrackLight> lights = Editor.getProperties().getTrackLights();
+			Vector<TrackLight> lights = getEditorFrame().getTrackData().getTrackLights();
 
 			for (int i = 0; i < lights.size(); i++)
 	        {
@@ -352,11 +352,11 @@ public class TrackLightProperties extends PropertyPanel
 		MutableDouble doubleResult = new MutableDouble();
 		MutableInteger integerResult = new MutableInteger();
 
-		Vector<TrackLight> lights = Editor.getProperties().getTrackLights();
+		Vector<TrackLight> lights = getEditorFrame().getTrackData().getTrackLights();
 		int minCount = Math.min(lights.size(), tabbedPane.getTabCount());
 		if (lights.size() != tabbedPane.getTabCount())
 		{
-			frame.documentIsModified = true;
+			getEditorFrame().documentIsModified = true;
 		}
 		for (int i = 0; i < minCount; i++)
         {
@@ -366,85 +366,85 @@ public class TrackLightProperties extends PropertyPanel
             if (isDifferent(panel.nameTextField.getText(), light.getName(), stringResult))
             {
                 light.setName(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.roleTextField.getText(), light.getRole(), stringResult))
             {
                 light.setRole(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.topLeftXTextField.getText(), light.getTopLeftX(), doubleResult))
             {
                 light.setTopLeftX(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.topLeftYTextField.getText(), light.getTopLeftY(), doubleResult))
             {
                 light.setTopLeftY(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.topLeftZTextField.getText(), light.getTopLeftZ(), doubleResult))
             {
                 light.setTopLeftZ(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.bottomRightXTextField.getText(), light.getBottomRightX(), doubleResult))
             {
                 light.setBottomRightX(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.bottomRightYTextField.getText(), light.getBottomRightY(), doubleResult))
             {
                 light.setBottomRightY(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.bottomRightZTextField.getText(), light.getBottomRightZ(), doubleResult))
             {
                 light.setBottomRightZ(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.textureOnTextField.getText(), light.getTextureOn(), stringResult))
             {
                 light.setTextureOn(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.textureOffTextField.getText(), light.getTextureOff(), stringResult))
             {
                 light.setTextureOff(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.indexTextField.getText(), light.getIndex(), integerResult))
             {
                 light.setIndex(integerResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.redTextField.getText(), light.getRed(), doubleResult))
             {
                 light.setRed(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.greenTextField.getText(), light.getGreen(), doubleResult))
             {
                 light.setGreen(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.blueTextField.getText(), light.getBlue(), doubleResult))
             {
                 light.setBlue(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 		}
 		if (lights.size() > tabbedPane.getTabCount())

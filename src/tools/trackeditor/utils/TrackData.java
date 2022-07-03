@@ -22,7 +22,16 @@ package utils;
 
 import java.util.Vector;
 
+import utils.circuit.Camera;
+import utils.circuit.Graphic;
+import utils.circuit.Header;
+import utils.circuit.LocalInfo;
+import utils.circuit.MainTrack;
 import utils.circuit.Segment;
+import utils.circuit.StartingGrid;
+import utils.circuit.Surface;
+import utils.circuit.TrackLight;
+import utils.circuit.TrackObject;
 
 
 /**
@@ -33,29 +42,165 @@ import utils.circuit.Segment;
  */
 public final class TrackData
 {
-    private static Vector<Segment>				trackData;
+	private Header				header					= new Header();
+    private LocalInfo			localInfo				= new LocalInfo();
+    private StartingGrid		startingGrid			= new StartingGrid();
+    private Graphic				graphic					= new Graphic();
+    private Vector<Surface> 	surfaces				= new Vector<Surface>();
+    private Vector<Camera> 		cameras					= new Vector<Camera>();
+    private Vector<TrackObject> trackObjects			= new Vector<TrackObject>();
+    private Vector<TrackLight> 	trackLights				= new Vector<TrackLight>();
+    private MainTrack			mainTrack				= new MainTrack();
+    private Vector<Segment>		segments				= null;
 
 	/**
+	 * @return Returns the header.
+	 */
+	public Header getHeader()
+	{
+		return header;
+	}
+	/**
+	 * @param header
+	 *            The header to set.
+	 */
+	public void setHeader(Header header)
+	{
+		this.header = header;
+	}
+
+    /**
+     * @return Returns the localInfo.
+     */
+    public LocalInfo getLocalInfo()
+    {
+        return localInfo;
+    }
+    /**
+     * @param localInfo The localInfo to set.
+     */
+    public void setLocalInfo(LocalInfo localInfo)
+    {
+        this.localInfo = localInfo;
+    }
+
+    /**
+     * @return Returns the startingGrid.
+     */
+    public StartingGrid getStartingGrid()
+    {
+        return startingGrid;
+    }
+    /**
+     * @param startingGrid The startingGrid to set.
+     */
+    public void setStartingGrid(StartingGrid startingGrid)
+    {
+        this.startingGrid = startingGrid;
+    }
+
+    /**
+     * @return Returns the surfaces.
+     */
+    public Vector<Surface> getSurfaces()
+    {
+        return surfaces;
+    }
+    /**
+     * @param trackData The surfaces to set.
+     */
+    public void setSurfaces(Vector<Surface> data)
+    {
+        surfaces = data;
+    }
+
+    /**
+     * @return Returns the cameras.
+     */
+    public Vector<Camera> getCameras()
+    {
+        return cameras;
+    }
+    /**
+     * @param cameras The cameras to set.
+     */
+    public void setCameras(Vector<Camera> data)
+    {
+        cameras = data;
+    }
+
+    /**
+     * @return Returns the trackObjects.
+     */
+    public Vector<TrackObject> getObjects()
+    {
+        return trackObjects;
+    }
+    /**
+     * @param objects The trackObjects to set.
+     */
+    public void setObjects(Vector<TrackObject> data)
+    {
+        trackObjects = data;
+    }
+
+    /**
+     * @return Returns the trackLights.
+     */
+    public Vector<TrackLight> getTrackLights()
+    {
+        return trackLights;
+    }
+    /**
+     * @param trackLights The trackLights to set.
+     */
+    public void setTrackLights(Vector<TrackLight> data)
+    {
+        trackLights = data;
+    }
+
+    /**
+     * @return Returns the graphic.
+     */
+    public Graphic getGraphic()
+    {
+		return graphic;
+	}
+    /**
+     * @param graphic The graphics to set.
+     */
+	public void setGraphic(Graphic data)
+	{
+		graphic = data;
+	}
+
+    /**
+     * @return Returns the mainTrack.
+     */
+    public MainTrack getMainTrack()
+    {
+		return mainTrack;
+	}
+    /**
+     * @param mainTrack The mainTrack to set.
+     */
+	public void setMainTrack(MainTrack data)
+	{
+		mainTrack = data;
+	}
+
+    /**
      * @return Returns the trackData.
      */
-    public static Vector<Segment> getTrackData()
+    public Vector<Segment> getSegments()
     {
-        return trackData;
+        return segments;
     }
     /**
      * @param trackData The trackData to set.
      */
-    public static void setTrackData(Vector<Segment> data)
+    public void setSegments(Vector<Segment> segments)
     {
-        trackData = data;
-    }
-
-	/**
-     * 
-     */
-    public TrackData()
-    {
-        super();
-        // TODO Auto-generated constructor stub
+        this.segments = segments;
     }
 }

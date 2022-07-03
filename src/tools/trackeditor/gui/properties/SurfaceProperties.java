@@ -52,9 +52,9 @@ public class SurfaceProperties extends PropertyPanel
 	/**
 	 *
 	 */
-	public SurfaceProperties(EditorFrame frame)
+	public SurfaceProperties(EditorFrame editorFrame)
 	{
-		super(frame);
+		super(editorFrame);
 		initialize();
     }
 
@@ -140,7 +140,7 @@ public class SurfaceProperties extends PropertyPanel
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 10, 460, 630);
 
-			Vector<Surface> surfaces = Editor.getProperties().getSurfaces();
+			Vector<Surface> surfaces = getEditorFrame().getTrackData().getSurfaces();
 
 			for (int i = 0; i < surfaces.size(); i++)
 	        {
@@ -434,11 +434,11 @@ public class SurfaceProperties extends PropertyPanel
 		MutableString stringResult = new MutableString();
 		MutableDouble doubleResult = new MutableDouble();
 
-		Vector<Surface> surfaces = Editor.getProperties().getSurfaces();
+		Vector<Surface> surfaces = getEditorFrame().getTrackData().getSurfaces();
 		int minCount = Math.min(surfaces.size(), tabbedPane.getTabCount());
 		if (surfaces.size() != tabbedPane.getTabCount())
 		{
-			frame.documentIsModified = true;
+			getEditorFrame().documentIsModified = true;
 		}
 		for (int i = 0; i < minCount; i++)
         {
@@ -448,133 +448,133 @@ public class SurfaceProperties extends PropertyPanel
             if (isDifferent(panel.nameTextField.getText(), surface.getName(), stringResult))
             {
                 surface.setName(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.colorR1TextField.getText(), surface.getColorR1(), doubleResult))
             {
                 surface.setColorR1(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.colorG1TextField.getText(), surface.getColorG1(), doubleResult))
             {
                 surface.setColorG1(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.colorB1TextField.getText(), surface.getColorB1(), doubleResult))
             {
                 surface.setColorB1(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.colorR2TextField.getText(), surface.getColorR2(), doubleResult))
             {
                 surface.setColorR2(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.colorG2TextField.getText(), surface.getColorG2(), doubleResult))
             {
                 surface.setColorG2(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.colorB2TextField.getText(), surface.getColorB2(), doubleResult))
             {
                 surface.setColorB2(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.textureNameTextField.getText(), surface.getTextureName(), stringResult))
             {
                 surface.setTextureName(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.getTextureTypeComboBox().getSelectedItem().toString(), surface.getTextureType(), stringResult))
             {
                 surface.setTextureName(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.textureSizeTextField.getText(), surface.getTextureSize(), doubleResult))
             {
                 surface.setTextureSize(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.getTextureLinkWithPreviousComboBox().getSelectedItem().toString(), surface.getTextureLinkWithPrevious(), stringResult))
             {
                 surface.setTextureLinkWithPrevious(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.getTextureStartOnBoundaryComboBox().getSelectedItem().toString(), surface.getTextureStartOnBoundary(), stringResult))
             {
                 surface.setTextureStartOnBoundary(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.textureMipMapTextField.getText(), surface.getTextureMipMap(), doubleResult))
             {
                 surface.setTextureMipMap(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.frictionTextField.getText(), surface.getFriction(), doubleResult))
             {
                 surface.setFriction(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.rollingResistanceTextField.getText(), surface.getRollingResistance(), doubleResult))
             {
                 surface.setRollingResistance(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.bumpNameTextField.getText(), surface.getBumpName(), stringResult))
             {
                 surface.setBumpName(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.bumpSizeTextField.getText(), surface.getBumpSize(), doubleResult))
             {
                 surface.setBumpSize(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.roughnessTextField.getText(), surface.getRoughness(), doubleResult))
             {
                 surface.setRoughness(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.roughnessWavelengthTextField.getText(), surface.getRoughnessWavelength(), doubleResult))
             {
                 surface.setRoughnessWavelength(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.racelineNameTextField.getText(), surface.getRacelineName(), stringResult))
             {
                 surface.setRacelineName(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.damageTextField.getText(), surface.getDammage(), doubleResult))
             {
                 surface.setDammage(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.reboundTextField.getText(), surface.getRebound(), doubleResult))
             {
                 surface.setRebound(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 		}
 		if (surfaces.size() > tabbedPane.getTabCount())

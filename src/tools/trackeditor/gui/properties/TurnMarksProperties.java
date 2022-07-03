@@ -25,7 +25,6 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
-import utils.Editor;
 import utils.circuit.TurnMarks;
 
 /**
@@ -50,9 +49,9 @@ public class TurnMarksProperties extends PropertyPanel
 	/**
 	 *
 	 */
-	public TurnMarksProperties(EditorFrame frame)
+	public TurnMarksProperties(EditorFrame editorFrame)
 	{
-		super(frame);
+		super(editorFrame);
 		initialize();
 	}
 
@@ -71,10 +70,10 @@ public class TurnMarksProperties extends PropertyPanel
 		addLabel(this, 2, verticalSpaceLabel, "Vertical Space", 120);
 		addLabel(this, 3, horizontalSpaceLabel, "Horizontal Space", 120);
 
-		addTextField(this, 0, widthTextField, Editor.getProperties().getGraphic().getTurnMarks().getWidth(), 130, 100);
-		addTextField(this, 1, heightTextField, Editor.getProperties().getGraphic().getTurnMarks().getHeight(), 130, 100);
-		addTextField(this, 2, verticalSpaceTextField, Editor.getProperties().getGraphic().getTurnMarks().getVerticalSpace(), 130, 100);
-		addTextField(this, 3, horizontalSpaceTextField, Editor.getProperties().getGraphic().getTurnMarks().getHorizontalSpace(), 130, 100);
+		addTextField(this, 0, widthTextField, getEditorFrame().getTrackData().getGraphic().getTurnMarks().getWidth(), 130, 100);
+		addTextField(this, 1, heightTextField, getEditorFrame().getTrackData().getGraphic().getTurnMarks().getHeight(), 130, 100);
+		addTextField(this, 2, verticalSpaceTextField, getEditorFrame().getTrackData().getGraphic().getTurnMarks().getVerticalSpace(), 130, 100);
+		addTextField(this, 3, horizontalSpaceTextField, getEditorFrame().getTrackData().getGraphic().getTurnMarks().getHorizontalSpace(), 130, 100);
 
 		add(getDefaultButton(), null);
 		add(getDeleteButton(), null);
@@ -139,31 +138,31 @@ public class TurnMarksProperties extends PropertyPanel
 		MutableDouble doubleResult = new MutableDouble();
 
 		if (isDifferent(widthTextField.getText(),
-			Editor.getProperties().getGraphic().getTurnMarks().getWidth(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getTurnMarks().getWidth(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().getTurnMarks().setWidth(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().getTurnMarks().setWidth(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(heightTextField.getText(),
-			Editor.getProperties().getGraphic().getTurnMarks().getHeight(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getTurnMarks().getHeight(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().getTurnMarks().setHeight(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().getTurnMarks().setHeight(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(verticalSpaceTextField.getText(),
-			Editor.getProperties().getGraphic().getTurnMarks().getVerticalSpace(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getTurnMarks().getVerticalSpace(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().getTurnMarks().setVerticalSpace(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().getTurnMarks().setVerticalSpace(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(horizontalSpaceTextField.getText(),
-			Editor.getProperties().getGraphic().getTurnMarks().getHorizontalSpace(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getTurnMarks().getHorizontalSpace(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().getTurnMarks().setHorizontalSpace(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().getTurnMarks().setHorizontalSpace(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"

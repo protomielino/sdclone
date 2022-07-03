@@ -24,7 +24,6 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
-import utils.Editor;
 
 /**
  * @author Robert Reif
@@ -79,14 +78,14 @@ public class LocalInfoProperties extends PropertyPanel
 		addLabel(this, 6, sunAscensionLabel, "Sun Ascension", 150);
 		addLabel(this, 7, altitudeLabel, "Altitude", 150);
 
-		addTextField(this, 0, stationTextField, Editor.getProperties().getLocalInfo().getStation(), 170, 100);
-		addTextField(this, 1, timezoneTextField, Editor.getProperties().getLocalInfo().getTimezone(), 170, 100);
-		addTextField(this, 2, overallRainLikelyhoodTextField, Editor.getProperties().getLocalInfo().getOverallRainLikelyhood(), 170, 100);
-		addTextField(this, 3, littleRainLikelyhoodTextField, Editor.getProperties().getLocalInfo().getLittleRainLikelyhood(), 170, 100);
-		addTextField(this, 4, mediumRainLikelyhoodTextField, Editor.getProperties().getLocalInfo().getMediumRainLikelyhood(), 170, 100);
-		addTextField(this, 5, timeOfDayTextField, Editor.getProperties().getLocalInfo().getTimeOfDay(), 170, 100);
-		addTextField(this, 6, sunAscensionTextField, Editor.getProperties().getLocalInfo().getSunAscension(), 170, 100);
-		addTextField(this, 7, altitudeTextField, Editor.getProperties().getLocalInfo().getAltitude(), 170, 100);
+		addTextField(this, 0, stationTextField, getEditorFrame().getTrackData().getLocalInfo().getStation(), 170, 100);
+		addTextField(this, 1, timezoneTextField, getEditorFrame().getTrackData().getLocalInfo().getTimezone(), 170, 100);
+		addTextField(this, 2, overallRainLikelyhoodTextField, getEditorFrame().getTrackData().getLocalInfo().getOverallRainLikelyhood(), 170, 100);
+		addTextField(this, 3, littleRainLikelyhoodTextField, getEditorFrame().getTrackData().getLocalInfo().getLittleRainLikelyhood(), 170, 100);
+		addTextField(this, 4, mediumRainLikelyhoodTextField, getEditorFrame().getTrackData().getLocalInfo().getMediumRainLikelyhood(), 170, 100);
+		addTextField(this, 5, timeOfDayTextField, getEditorFrame().getTrackData().getLocalInfo().getTimeOfDay(), 170, 100);
+		addTextField(this, 6, sunAscensionTextField, getEditorFrame().getTrackData().getLocalInfo().getSunAscension(), 170, 100);
+		addTextField(this, 7, altitudeTextField, getEditorFrame().getTrackData().getLocalInfo().getAltitude(), 170, 100);
 	}
 
 	/**
@@ -98,59 +97,59 @@ public class LocalInfoProperties extends PropertyPanel
 		MutableDouble doubleResult = new MutableDouble();
 
 		if (isDifferent(stationTextField.getText(),
-			Editor.getProperties().getLocalInfo().getStation(), stringResult))
+			getEditorFrame().getTrackData().getLocalInfo().getStation(), stringResult))
 		{
-			Editor.getProperties().getLocalInfo().setStation(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getLocalInfo().setStation(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(timezoneTextField.getText(),
-			Editor.getProperties().getLocalInfo().getTimezone(), doubleResult))
+			getEditorFrame().getTrackData().getLocalInfo().getTimezone(), doubleResult))
 		{
-			Editor.getProperties().getLocalInfo().setTimezone(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getLocalInfo().setTimezone(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(overallRainLikelyhoodTextField.getText(),
-			Editor.getProperties().getLocalInfo().getOverallRainLikelyhood(), doubleResult))
+			getEditorFrame().getTrackData().getLocalInfo().getOverallRainLikelyhood(), doubleResult))
 		{
-			Editor.getProperties().getLocalInfo().setOverallRainLikelyhood(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getLocalInfo().setOverallRainLikelyhood(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(littleRainLikelyhoodTextField.getText(),
-			Editor.getProperties().getLocalInfo().getLittleRainLikelyhood(), doubleResult))
+			getEditorFrame().getTrackData().getLocalInfo().getLittleRainLikelyhood(), doubleResult))
 		{
-			Editor.getProperties().getLocalInfo().setLittleRainLikelyhood(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getLocalInfo().setLittleRainLikelyhood(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(mediumRainLikelyhoodTextField.getText(),
-			Editor.getProperties().getLocalInfo().getMediumRainLikelyhood(), doubleResult))
+			getEditorFrame().getTrackData().getLocalInfo().getMediumRainLikelyhood(), doubleResult))
 		{
-			Editor.getProperties().getLocalInfo().setMediumRainLikelyhood(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getLocalInfo().setMediumRainLikelyhood(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(timeOfDayTextField.getText(),
-			Editor.getProperties().getLocalInfo().getTimeOfDay(), doubleResult))
+			getEditorFrame().getTrackData().getLocalInfo().getTimeOfDay(), doubleResult))
 		{
-			Editor.getProperties().getLocalInfo().setTimeOfDay(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getLocalInfo().setTimeOfDay(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(sunAscensionTextField.getText(),
-			Editor.getProperties().getLocalInfo().getSunAscension(), doubleResult))
+			getEditorFrame().getTrackData().getLocalInfo().getSunAscension(), doubleResult))
 		{
-			Editor.getProperties().getLocalInfo().setSunAscension(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getLocalInfo().setSunAscension(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(altitudeTextField.getText(),
-			Editor.getProperties().getLocalInfo().getAltitude(), doubleResult))
+			getEditorFrame().getTrackData().getLocalInfo().getAltitude(), doubleResult))
 		{
-			Editor.getProperties().getLocalInfo().setAltitude(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getLocalInfo().setAltitude(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"

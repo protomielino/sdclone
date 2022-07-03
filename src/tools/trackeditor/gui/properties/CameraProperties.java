@@ -29,7 +29,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
-import utils.Editor;
 import utils.circuit.Camera;
 
 /**
@@ -47,9 +46,9 @@ public class CameraProperties extends PropertyPanel
 	/**
 	 *
 	 */
-	public CameraProperties(EditorFrame frame)
+	public CameraProperties(EditorFrame editorFrame)
 	{
-		super(frame);
+		super(editorFrame);
 		initialize();
     }
 
@@ -136,7 +135,7 @@ public class CameraProperties extends PropertyPanel
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 10, 460, 230);
 
-			Vector<Camera> cameras = Editor.getProperties().getCameras();
+			Vector<Camera> cameras = getEditorFrame().getTrackData().getCameras();
 
 			for (int i = 0; i < cameras.size(); i++)
 	        {
@@ -214,11 +213,11 @@ public class CameraProperties extends PropertyPanel
 		MutableString stringResult = new MutableString();
 		MutableDouble doubleResult = new MutableDouble();
 
-		Vector<Camera> cameras = Editor.getProperties().getCameras();
+		Vector<Camera> cameras = getEditorFrame().getTrackData().getCameras();
 		int minCount = Math.min(cameras.size(), tabbedPane.getTabCount());
 		if (cameras.size() != tabbedPane.getTabCount())
 		{
-			frame.documentIsModified = true;
+			getEditorFrame().documentIsModified = true;
 		}
 		for (int i = 0; i < minCount; i++)
         {
@@ -228,43 +227,43 @@ public class CameraProperties extends PropertyPanel
             if (isDifferent(panel.nameTextField.getText(), camera.getName(), stringResult))
             {
                 camera.setName(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.segmentTextField.getText(), camera.getSegment(), stringResult))
             {
                 camera.setSegment(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.toRightTextField.getText(), camera.getToRight(), doubleResult))
             {
                 camera.setToRight(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.toStartTextField.getText(), camera.getToStart(), doubleResult))
             {
                 camera.setToStart(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.heightTextField.getText(), camera.getHeight(), doubleResult))
             {
                 camera.setHeight(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.fovStartTextField.getText(), camera.getFovStart(), stringResult))
             {
                 camera.setFovStart(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.fovEndTextField.getText(), camera.getFovEnd(), stringResult))
             {
                 camera.setFovEnd(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 		}
 		if (cameras.size() > tabbedPane.getTabCount())

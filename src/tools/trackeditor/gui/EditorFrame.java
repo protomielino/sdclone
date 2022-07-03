@@ -185,6 +185,18 @@ public class EditorFrame extends JFrame
 	private List<String>		recentFiles							= new ArrayList<String>();
 	private final static String	RECENT_FILES_STRING					= "recent.files.";
 	private final static int	RECENT_FILES_MAX					= 5;
+	
+	private TrackData			trackData							= null;
+	
+	public TrackData getTrackData()
+	{
+		return trackData;
+	}
+	
+	public void setTrackData(TrackData trackData)
+	{
+		this.trackData = trackData;
+	}
 
 	public EditorFrame()
 	{
@@ -285,8 +297,6 @@ public class EditorFrame extends JFrame
 	 */
 	protected void openProject()
 	{
-		String tmp = "";
-		String filename = Editor.getProperties().getPath() +sep+"project.xml";
 		Boolean old = UIManager.getBoolean("FileChooser.readOnly");  
 		UIManager.put("FileChooser.readOnly", Boolean.TRUE);  
 		JFileChooser fc = new JFileChooser();
@@ -309,54 +319,34 @@ public class EditorFrame extends JFrame
 		}
 	}
 	
-	private void openProject(String filename)
+	private void openProject(String projectFileName)
 	{
-		String tmp = filename;
-		tmp = tmp.substring(0, tmp.lastIndexOf(sep));
-		Editor.getProperties().setPath(tmp);
-		tmp = Editor.getProperties().getPath().substring(0, tmp.lastIndexOf(sep));
-		Editor.getProperties().getHeader().setCategory(tmp.substring(tmp.lastIndexOf(sep) + 1));
-		tmp = Editor.getProperties().getPath();
-		tmp = tmp.substring(tmp.lastIndexOf(sep)+1);
-		Editor.getProperties().getHeader().setName(tmp);
 		try
 		{
-			XMLDecoder decoder = new XMLDecoder(new FileInputStream(filename));
+			XMLDecoder decoder = new XMLDecoder(new FileInputStream(projectFileName));
 			//setProject((Project) decoder.readObject());
 			Editor.setProperties((Properties)decoder.readObject());
 		} catch (FileNotFoundException ex)
 		{
-			JOptionPane.showMessageDialog(this, "Project not found : " + filename, "Project Open", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Project not found : " + projectFileName, "Project Open", JOptionPane.ERROR_MESSAGE);
 		} catch (ClassCastException e)
 		{
 			//e.printStackTrace();
 			System.out.println("This file can't be read");
 		}
-		tmp = Editor.getProperties().getPath()+sep+Editor.getProperties().getHeader().getName()+".xml";
-		boolean fromProjectName = false;
-		File file = new File(tmp);
+		
+		String trackFileName = projectFileName.replaceAll(".prj.xml", ".xml");
+		File file = new File(trackFileName);
 		if (!file.exists())
 		{
-			// couldn't read xml file from project file information
-			// get xml file from project file name
-			tmp = filename.replaceAll(".prj.xml", ".xml");
-			file = new File(tmp);
-			if (!file.exists())
-			{
-				JOptionPane.showMessageDialog(this, "File not found : " + tmp, "Project Open", JOptionPane.ERROR_MESSAGE);				
-				return;
-			}
-			fromProjectName = true;
+			JOptionPane.showMessageDialog(this, "File not found : " + trackFileName, "Project Open", JOptionPane.ERROR_MESSAGE);				
+			return;
 		}
+		trackData = null;
+		trackData = new TrackData();		
 		torcsPlugin.readFile(file);
-		if (fromProjectName)
-		{
-			// fix path
-			int index = tmp.lastIndexOf(sep);
-			tmp = tmp.substring(0, index);
-			Editor.getProperties().setPath(tmp);
-		}
-		updateRecentFiles(filename);	
+		Editor.getProperties().setPath(projectFileName.substring(0, projectFileName.lastIndexOf(sep)));
+		updateRecentFiles(projectFileName);	
 	}
 
 	/**
@@ -372,7 +362,7 @@ public class EditorFrame extends JFrame
 	 */
 	protected void saveProject()
 	{
-		if (TrackData.getTrackData() == null)
+		if (getTrackData() == null)
 		{
 			message("No track", "Nothing to save");
 			return;
@@ -381,7 +371,7 @@ public class EditorFrame extends JFrame
 //		if (documentIsModified)
 		if(true)
 		{
-			String filename = Editor.getProperties().getPath() + sep + Editor.getProperties().getHeader().getName() + ".prj.xml";
+			String filename = Editor.getProperties().getPath() + sep + getTrackData().getHeader().getName() + ".prj.xml";
 			try
 			{
 				XMLEncoder encoder = new XMLEncoder(new FileOutputStream(filename));
@@ -490,13 +480,13 @@ public class EditorFrame extends JFrame
         shape.addToPrevious(previous);
         track.add(shape);
 
-        TrackData.setTrackData(track);
+        trackData.setSegments(track);
 
-        Editor.getProperties().getMainTrack().setProfilStepsLength(MainTrack.DEFAULT_PROFIL_STEPS_LENGTH);
-        Editor.getProperties().getMainTrack().setWidth(MainTrack.DEFAULT_WIDTH);
-        Editor.getProperties().getMainTrack().setSurface(MainTrack.DEFAULT_SURFACE);
-        Editor.getProperties().getMainTrack().getLeft().setNewTrackDefaults();
-        Editor.getProperties().getMainTrack().getRight().setNewTrackDefaults();
+        getTrackData().getMainTrack().setProfilStepsLength(MainTrack.DEFAULT_PROFIL_STEPS_LENGTH);
+        getTrackData().getMainTrack().setWidth(MainTrack.DEFAULT_WIDTH);
+        getTrackData().getMainTrack().setSurface(MainTrack.DEFAULT_SURFACE);
+        getTrackData().getMainTrack().getLeft().setNewTrackDefaults();
+        getTrackData().getMainTrack().getRight().setNewTrackDefaults();
     }
 
     /**
@@ -1520,7 +1510,7 @@ public class EditorFrame extends JFrame
 	 */
 	protected void propertiesDialog()
 	{
-		if (TrackData.getTrackData() != null)
+		if (trackData.getSegments() != null)
 		{
 			PropertiesDialog properties = new PropertiesDialog(this);
 			properties.setVisible(true);
@@ -1813,14 +1803,14 @@ public class EditorFrame extends JFrame
 		}
 		public void actionPerformed(ActionEvent e)
 		{
-			if (TrackData.getTrackData() == null)
+			if (trackData.getSegments() == null)
 			{
 				message("No track", "Nothing to export");
 				return;
 			}			
 			exportAc3d();
 			torcsPlugin.exportTrack();
-			String fileName = Editor.getProperties().getPath() + sep + Editor.getProperties().getHeader().getName() + ".prj.xml";
+			String fileName = Editor.getProperties().getPath() + sep + getTrackData().getHeader().getName() + ".prj.xml";
 			updateRecentFiles(fileName);
 		}
 	}
@@ -1834,7 +1824,7 @@ public class EditorFrame extends JFrame
 		}
 		public void actionPerformed(ActionEvent e)
 		{
-			if (TrackData.getTrackData() == null)
+			if (trackData.getSegments() == null)
 			{
 				message("No track", "Nothing to export");
 				return;

@@ -56,7 +56,7 @@ public class NewProjectDialog extends JDialog
 	private JButton				okButton					= null;
 	private JButton				cancelButton				= null;
 
-	private EditorFrame			parent;
+	private EditorFrame			editorFrame;
 	private JLabel 				authorLabel 				= null;
 	private JTextField 			authorTextField 			= null;
 	private JLabel 				descriptionLabel 			= null;
@@ -67,10 +67,10 @@ public class NewProjectDialog extends JDialog
 	/**
 	 *  
 	 */
-	public NewProjectDialog(Frame parent)
+	public NewProjectDialog(Frame editorFrame)
 	{
 		super();
-		this.parent = (EditorFrame) parent;
+		this.editorFrame = (EditorFrame) editorFrame;
 		initialize();
 	}
 	/**
@@ -173,7 +173,7 @@ public class NewProjectDialog extends JDialog
 			String[] items =
 			{"circuit", "development", "dirt", "gprix", "karting", "oval", "road", "speedway", "test"};
 			trackCategoryComboBox = new JComboBox<String>(items);
-			trackCategoryComboBox.setSelectedItem(Editor.getProperties().getHeader().getCategory());
+			trackCategoryComboBox.setSelectedItem(editorFrame.getTrackData().getHeader().getCategory());
 			trackCategoryComboBox.setBounds(145, 37, 170, 23);
 			trackCategoryComboBox.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -197,7 +197,7 @@ public class NewProjectDialog extends JDialog
 			String[] items =
 			{"none", "short", "long"};
 			trackSubcategoryComboBox = new JComboBox<String>(items);
-			String subcategory = Editor.getProperties().getHeader().getSubcategory();
+			String subcategory = editorFrame.getTrackData().getHeader().getSubcategory();
 			if (subcategory == null)
 				subcategory = "none";
 			trackSubcategoryComboBox.setSelectedItem(subcategory);
@@ -224,7 +224,7 @@ public class NewProjectDialog extends JDialog
 			String[] items =
 			{"3", "4", "5"};
 			trackVersionComboBox = new JComboBox<String>(items);
-			trackVersionComboBox.setSelectedItem(Editor.getProperties().getHeader().getVersion() + "");
+			trackVersionComboBox.setSelectedItem(editorFrame.getTrackData().getHeader().getVersion() + "");
 			trackVersionComboBox.setBounds(145, 91, 170, 23);
 			trackVersionComboBox.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -377,13 +377,13 @@ public class NewProjectDialog extends JDialog
 	{
 		String tmpPath = getPathTextField().getText();
 		String tmpName = getProjectNameTextField().getText();
-		Editor.getProperties().getHeader().setName(tmpName);
+		editorFrame.getTrackData().getHeader().setName(tmpName);
 		Editor.getProperties().setPath(tmpPath + sep + tmpName);
 		int index = tmpPath.lastIndexOf(sep) + 1;
 		String category = tmpPath.substring(index);
 
 		if (category == getTrackCategoryComboBox().getSelectedItem())
-			Editor.getProperties().getHeader().setCategory((String) getTrackCategoryComboBox().getSelectedItem());
+			editorFrame.getTrackData().getHeader().setCategory((String) getTrackCategoryComboBox().getSelectedItem());
 
 		File path = new File(tmpPath + sep + tmpName);
 		if (!path.exists())
@@ -392,12 +392,12 @@ public class NewProjectDialog extends JDialog
 		}
 		String subcategory = (String) getTrackSubcategoryComboBox().getSelectedItem();
 		if (subcategory != "none")
-			Editor.getProperties().getHeader().setSubcategory(subcategory);
+			editorFrame.getTrackData().getHeader().setSubcategory(subcategory);
 		else
-			Editor.getProperties().getHeader().setSubcategory(null);
-		Editor.getProperties().getHeader().setAuthor(this.getAuthorTextField().getText());
-		Editor.getProperties().getHeader().setDescription(this.getDescriptionTextField().getText());
-		Editor.getProperties().getHeader().setVersion(Integer.parseInt((String) getTrackVersionComboBox().getSelectedItem()));
+			editorFrame.getTrackData().getHeader().setSubcategory(null);
+		editorFrame.getTrackData().getHeader().setAuthor(this.getAuthorTextField().getText());
+		editorFrame.getTrackData().getHeader().setDescription(this.getDescriptionTextField().getText());
+		editorFrame.getTrackData().getHeader().setVersion(Integer.parseInt((String) getTrackVersionComboBox().getSelectedItem()));
 		APPROVE = true;
 		cancel();
 	}

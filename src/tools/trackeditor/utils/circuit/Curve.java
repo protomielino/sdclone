@@ -22,6 +22,7 @@ package utils.circuit;
 
 import java.awt.geom.Point2D;
 
+import gui.EditorFrame;
 import utils.Editor;
 
 import miscel.EPMath;
@@ -66,21 +67,21 @@ public class Curve extends Segment implements Cloneable
 		return shape;
 	}
 
-	public void calcShape(Segment previousShape) throws Exception
+	public void calcShape(EditorFrame editorFrame, Segment previousShape) throws Exception
 	{
 		double	currentX	= Editor.getProperties().getCurrentX();
 		double	currentY	= Editor.getProperties().getCurrentY();
 		double	currentA	= Editor.getProperties().getCurrentA();
 		double 	showArrows = Editor.getProperties().getShowArrows();
 		double	trackStartDist = Editor.getProperties().getTrackStartDist();
-		double	profilStepsLength = getValidProfilStepsLength();
-		double	trackWidth = Editor.getProperties().getMainTrack().getWidth();
-		double	leftBorderWidth = getValidLeftBorderWidth();
-		double	rightBorderWidth = getValidRightBorderWidth();
-		double	leftSideStartWidth = getValidLeftSideStartWidth();
-		double	leftSideEndWidth = getValidLeftSideEndWidth();
-		double	rightSideStartWidth = getValidRightSideStartWidth();
-		double	rightSideEndWidth = getValidRightSideEndWidth();
+		double	profilStepsLength = getValidProfilStepsLength(editorFrame);
+		double	trackWidth = editorFrame.getTrackData().getMainTrack().getWidth();
+		double	leftBorderWidth = getValidLeftBorderWidth(editorFrame);
+		double	rightBorderWidth = getValidRightBorderWidth(editorFrame);
+		double	leftSideStartWidth = getValidLeftSideStartWidth(editorFrame);
+		double	leftSideEndWidth = getValidLeftSideEndWidth(editorFrame);
+		double	rightSideStartWidth = getValidRightSideStartWidth(editorFrame);
+		double	rightSideEndWidth = getValidRightSideEndWidth(editorFrame);
 		
 		/**  
 		 * 

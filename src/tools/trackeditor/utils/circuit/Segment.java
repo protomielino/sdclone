@@ -28,7 +28,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Vector;
 
-import utils.Editor;
+import gui.EditorFrame;
 
 /**
  * @author Patrice Espie , Charalampos Alexopoulos
@@ -39,8 +39,7 @@ import utils.Editor;
 
 public class Segment implements Cloneable
 {
-	//protected Properties	properties			= Properties.getInstance();
-	private Vector			segmentListeners	= new Vector();
+	private Vector			segmentListeners		= new Vector();
 
 	// neighbours
 	public Segment			previousShape;
@@ -167,12 +166,7 @@ public class Segment implements Cloneable
 	 */
 	public String getSurface()
 	{
-		String tmp = Editor.getProperties().getMainTrack().getSurface();
-		if (surface != null)
-		{
-			tmp = surface;
-		}
-		return tmp;
+		return surface;
 	}
 	/**
 	 * @param surface
@@ -274,7 +268,7 @@ public class Segment implements Cloneable
 		return (new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY));
 	}
 
-	public void calcShape(Segment previousShape) throws Exception
+	public void calcShape(EditorFrame editorFrame, Segment previousShape) throws Exception
 	{
 		System.out.println("Segment.calcShape : Start ...");
 	}
@@ -733,7 +727,7 @@ public class Segment implements Cloneable
         return dy;
     }
 
-    public double getValidProfilStepsLength()
+    public double getValidProfilStepsLength(EditorFrame editorFrame)
     {
         Segment previous = this;
         double	length;
@@ -747,7 +741,7 @@ public class Segment implements Cloneable
 			previous = previous.previousShape;
 		}
 
-        length = Editor.getProperties().getMainTrack().getProfilStepsLength();
+        length = editorFrame.getTrackData().getMainTrack().getProfilStepsLength();
         if (Double.isNaN(length))
         {
             length = MainTrack.DEFAULT_PROFIL_STEPS_LENGTH;
@@ -755,7 +749,7 @@ public class Segment implements Cloneable
         return length;
     }
 
-    public double getValidLeftBorderWidth()
+    public double getValidLeftBorderWidth(EditorFrame editorFrame)
     {
         Segment previous = this;
         double	value;
@@ -775,7 +769,7 @@ public class Segment implements Cloneable
     	}
 
     	// get it from main track when all else fails
-        value = Editor.getProperties().getMainTrack().getLeft().getBorderWidth();
+        value = editorFrame.getTrackData().getMainTrack().getLeft().getBorderWidth();
         if (Double.isNaN(value))
     	{
             value = SegmentSide.DEFAULT_BORDER_WIDTH;
@@ -784,7 +778,7 @@ public class Segment implements Cloneable
         return value;
     }
 
-    public double getValidRightBorderWidth()
+    public double getValidRightBorderWidth(EditorFrame editorFrame)
     {
     	Segment previous = this;
         double	value;
@@ -804,7 +798,7 @@ public class Segment implements Cloneable
     	}
 
     	// get it from main track when all else fails
-        value = Editor.getProperties().getMainTrack().getRight().getBorderWidth();
+        value = editorFrame.getTrackData().getMainTrack().getRight().getBorderWidth();
         if (Double.isNaN(value))
     	{
             value = SegmentSide.DEFAULT_BORDER_WIDTH;
@@ -813,7 +807,7 @@ public class Segment implements Cloneable
         return value;
     }
 
-    public double getValidLeftSideStartWidth()
+    public double getValidLeftSideStartWidth(EditorFrame editorFrame)
     {
     	Segment previous = this;
 		double	value;
@@ -839,7 +833,7 @@ public class Segment implements Cloneable
     	}
 
     	// get it from main track when all else fails
-        value = Editor.getProperties().getMainTrack().getLeft().getSideStartWidth();
+        value = editorFrame.getTrackData().getMainTrack().getLeft().getSideStartWidth();
         if (Double.isNaN(value))
     	{
             value = SegmentSide.DEFAULT_SIDE_START_WIDTH;
@@ -848,7 +842,7 @@ public class Segment implements Cloneable
         return value;
     }
 
-    public double getValidLeftSideEndWidth()
+    public double getValidLeftSideEndWidth(EditorFrame editorFrame)
     {
     	Segment previous = this;
 		double	value;
@@ -870,7 +864,7 @@ public class Segment implements Cloneable
         }
 
     	// get it from main track when all else fails
-        value = Editor.getProperties().getMainTrack().getLeft().getSideEndWidth();
+        value = editorFrame.getTrackData().getMainTrack().getLeft().getSideEndWidth();
         if (Double.isNaN(value))
     	{
             value = SegmentSide.DEFAULT_SIDE_END_WIDTH;
@@ -879,7 +873,7 @@ public class Segment implements Cloneable
         return value;
     }
 
-    public double getValidRightSideStartWidth()
+    public double getValidRightSideStartWidth(EditorFrame editorFrame)
     {
     	Segment previous = this;
 		double	value;
@@ -905,7 +899,7 @@ public class Segment implements Cloneable
     	}
 
     	// get it from main track when all else fails
-        value = Editor.getProperties().getMainTrack().getRight().getSideStartWidth();
+        value = editorFrame.getTrackData().getMainTrack().getRight().getSideStartWidth();
         if (Double.isNaN(value))
         {
             value = SegmentSide.DEFAULT_SIDE_START_WIDTH;
@@ -914,7 +908,7 @@ public class Segment implements Cloneable
         return value;
     }
 
-    public double getValidRightSideEndWidth()
+    public double getValidRightSideEndWidth(EditorFrame editorFrame)
     {
     	Segment previous = this;
 		double	value;
@@ -936,7 +930,7 @@ public class Segment implements Cloneable
     	}
 
     	// get it from main track when all else fails
-        value = Editor.getProperties().getMainTrack().getRight().getSideEndWidth();
+        value = editorFrame.getTrackData().getMainTrack().getRight().getSideEndWidth();
         if (Double.isNaN(value))
     	{
             value = SegmentSide.DEFAULT_SIDE_END_WIDTH;

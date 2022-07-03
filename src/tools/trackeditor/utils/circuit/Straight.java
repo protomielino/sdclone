@@ -22,6 +22,7 @@ package utils.circuit;
 
 import java.awt.geom.Point2D;
 
+import gui.EditorFrame;
 import utils.Editor;
 
 
@@ -45,19 +46,19 @@ public class Straight extends Segment implements Cloneable
 		this.previousShape = prev;
 	}
 
-	public void calcShape(Segment previousShape) throws Exception
+	public void calcShape(EditorFrame editorFrame, Segment previousShape) throws Exception
 	{
 		double currentX = Editor.getProperties().getCurrentX();
 		double currentY = Editor.getProperties().getCurrentY();
 		double currentA = Editor.getProperties().getCurrentA();
 		double showArrows = Editor.getProperties().getShowArrows();
-		double trackWidth = Editor.getProperties().getMainTrack().getWidth();
-		double leftBorderWidth = getValidLeftBorderWidth();
-		double rightBorderWidth = getValidRightBorderWidth();
-		double leftSideStartWidth = getValidLeftSideStartWidth();
-		double leftSideEndWidth = getValidLeftSideEndWidth();
-		double rightSideStartWidth = getValidRightSideStartWidth();
-		double rightSideEndWidth = getValidRightSideEndWidth();
+		double trackWidth = editorFrame.getTrackData().getMainTrack().getWidth();
+		double leftBorderWidth = getValidLeftBorderWidth(editorFrame);
+		double rightBorderWidth = getValidRightBorderWidth(editorFrame);
+		double leftSideStartWidth = getValidLeftSideStartWidth(editorFrame);
+		double leftSideEndWidth = getValidLeftSideEndWidth(editorFrame);
+		double rightSideStartWidth = getValidRightSideStartWidth(editorFrame);
+		double rightSideEndWidth = getValidRightSideEndWidth(editorFrame);
 
 		if (points == null || points.length != 4 * (5 + (showArrows > 0.0 ? 1 : 0)))
 		{

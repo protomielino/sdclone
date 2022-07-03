@@ -44,7 +44,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import utils.Editor;
 import utils.circuit.Curve;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
@@ -62,7 +61,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	//private Properties			properties						= Properties.getInstance();
 	private Segment					shape;
 	CircuitView						view;
-	EditorFrame						frame;
+	EditorFrame						editorFrame;
 	public boolean					dirty						= false;
 
 	private JPanel					jContentPane				= null;	//  @jve:decl-index=0:visual-constraint="377,10"
@@ -119,19 +118,19 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		super((Frame) null, "", true);
 	}
 
-	public SegmentEditorDlg(CircuitView view, EditorFrame frame, String title, boolean modal, Segment shape)
+	public SegmentEditorDlg(CircuitView view, EditorFrame editorFrame, String title, boolean modal, Segment shape)
 	{
-		super(frame, title, modal);
+		super(editorFrame, title, modal);
 
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 
 		try
 		{
 			this.view = view;
-			this.frame = frame;
+			this.editorFrame = editorFrame;
 
 			// add new surfaces from Surfaces
-	        Vector<Surface> surfaces = Editor.getProperties().getSurfaces();
+	        Vector<Surface> surfaces = editorFrame.getTrackData().getSurfaces();
 	        for (int i = 0; i < surfaces.size(); i++)
 	        {
 				String surface = surfaces.elementAt(i).getName();
@@ -169,9 +168,9 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		this.setTitle("Segment Editor");
 		this.setSize(850, 536);
-		Point p = frame.getLocation();
-		p.x = frame.getProject().getSegmentEditorX();
-		p.y = frame.getProject().getSegmentEditorY();
+		Point p = editorFrame.getLocation();
+		p.x = editorFrame.getProject().getSegmentEditorX();
+		p.y = editorFrame.getProject().getSegmentEditorY();
 		this.setLocation(p);
 		this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		this.setContentPane(getJContentPane());
@@ -698,7 +697,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 					{
 						e1.printStackTrace();
 					}
-					frame.documentIsModified = true;
+					editorFrame.documentIsModified = true;
 				}
 			});
 
@@ -805,7 +804,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		frame.documentIsModified = true;
+		editorFrame.documentIsModified = true;
 		dirty = true;
 	}
 	/**
@@ -842,7 +841,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	public void sideChanged()
 	{
 		view.redrawCircuit();
-		frame.documentIsModified = true;
+		editorFrame.documentIsModified = true;
 		dirty = true;
 	}
 	/**
@@ -864,7 +863,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	public void groupChanged()
 	{
 		shape.setType(getGroupButton().getSelected());
-		frame.documentIsModified = true;
+		editorFrame.documentIsModified = true;
 		view.redrawCircuit();
 	}
 
@@ -890,7 +889,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			shape.setProfil("");
 		else
 			shape.setProfil(getProfileButton().getSelected());
-		frame.documentIsModified = true;
+		editorFrame.documentIsModified = true;
 	}
 
 	public void windowClosing(WindowEvent anEvent)
@@ -936,7 +935,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			e.printStackTrace();
 		}
 		view.redrawCircuit();
-		frame.documentIsModified = true;
+		editorFrame.documentIsModified = true;
 		dirty = true;
 	}
 
@@ -954,8 +953,8 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 
 	private void exit()
 	{
-		frame.getProject().setSegmentEditorX(this.getX());
-		frame.getProject().setSegmentEditorY(this.getY());
+		editorFrame.getProject().setSegmentEditorX(this.getX());
+		editorFrame.getProject().setSegmentEditorY(this.getY());
 	}
 
 

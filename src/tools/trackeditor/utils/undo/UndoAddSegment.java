@@ -22,8 +22,8 @@ package utils.undo;
 
 import java.util.Vector;
 
+import gui.EditorFrame;
 import utils.Editor;
-import utils.TrackData;
 import utils.circuit.Segment;
 
 
@@ -35,16 +35,17 @@ import utils.circuit.Segment;
  */
 public class UndoAddSegment implements UndoInterface
 {
-	//private Properties			properties						= Properties.getInstance();
-	private Segment undo;
-	private Segment redo;
-	private int pos;
+	private EditorFrame	editorFrame;
+	private Segment 	undo;
+	private Segment 	redo;
+	private int 		pos;
 
 	/**
 	 * 
 	 */
-	public UndoAddSegment(Segment segment)
+	public UndoAddSegment(EditorFrame editorFrame, Segment segment)
 	{
+		this.editorFrame = editorFrame;
 		this.undo = segment;
 		this.redo = null;
 	}
@@ -54,7 +55,7 @@ public class UndoAddSegment implements UndoInterface
 	 */
 	public void undo()
 	{
-		Vector<Segment> data = TrackData.getTrackData();
+		Vector<Segment> data = editorFrame.getTrackData().getSegments();
 		pos = data.indexOf(undo);
 		if (undo.getType() == "str")
 		{
@@ -80,7 +81,7 @@ public class UndoAddSegment implements UndoInterface
 	 */
 	public void redo()
 	{
-		Vector<Segment> data = TrackData.getTrackData();
+		Vector<Segment> data = editorFrame.getTrackData().getSegments();
 		Segment prevSeg = redo.getPreviousShape();
 		Segment nextSeg = redo.getNextShape();
 		if (redo.getType() == "str")

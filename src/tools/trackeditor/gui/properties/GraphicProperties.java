@@ -93,9 +93,9 @@ public class GraphicProperties extends PropertyPanel
 	/**
 	 *
 	 */
-	public GraphicProperties(EditorFrame frame)
+	public GraphicProperties(EditorFrame editorFrame)
 	{
-		super(frame);
+		super(editorFrame);
 		initialize();
 	}
 
@@ -132,30 +132,30 @@ public class GraphicProperties extends PropertyPanel
 		addLabel(this, 20, shininessLabel, "Shininess", 150);
 		addLabel(this, 21, fovFactorLabel, "Fov Factor", 150);
 
-		addTextField(this, 0, descriptionTextField, Editor.getProperties().getGraphic().getDescription(), 160, 150);
-		addTextField(this, 1, descriptionNightTextField, Editor.getProperties().getGraphic().getDescriptionNight(), 160, 150);
-		addTextField(this, 2, descriptionRainNightTextField, Editor.getProperties().getGraphic().getDescriptionRainNight(), 160, 150);
-		addTextField(this, 3, backgroundImageTextField, Editor.getProperties().getGraphic().getBackgroundImage(), 160, 225);
+		addTextField(this, 0, descriptionTextField, getEditorFrame().getTrackData().getGraphic().getDescription(), 160, 150);
+		addTextField(this, 1, descriptionNightTextField, getEditorFrame().getTrackData().getGraphic().getDescriptionNight(), 160, 150);
+		addTextField(this, 2, descriptionRainNightTextField, getEditorFrame().getTrackData().getGraphic().getDescriptionRainNight(), 160, 150);
+		addTextField(this, 3, backgroundImageTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundImage(), 160, 225);
 
 		add(getBackgroundTypeComboBox(), null);
 
-		addTextField(this, 5, backgroundColorRTextField, Editor.getProperties().getGraphic().getBackgroundColorR(), 160, 80);
-		addTextField(this, 6, backgroundColorGTextField, Editor.getProperties().getGraphic().getBackgroundColorG(), 160, 80);
-		addTextField(this, 7, backgroundColorBTextField, Editor.getProperties().getGraphic().getBackgroundColorB(), 160, 80);
-		addTextField(this, 8, ambientColorRTextField, Editor.getProperties().getGraphic().getAmbientColorR(), 160, 80);
-		addTextField(this, 9, ambientColorGTextField, Editor.getProperties().getGraphic().getAmbientColorG(), 160, 80);
-		addTextField(this, 10, ambientColorBTextField, Editor.getProperties().getGraphic().getAmbientColorB(), 160, 80);
-		addTextField(this, 11, diffuseColorRTextField, Editor.getProperties().getGraphic().getDiffuseColorR(), 160, 80);
-		addTextField(this, 12, diffuseColorGTextField, Editor.getProperties().getGraphic().getDiffuseColorG(), 160, 80);
-		addTextField(this, 13, diffuseColorBTextField, Editor.getProperties().getGraphic().getDiffuseColorB(), 160, 80);
-		addTextField(this, 14, specularColorRTextField, Editor.getProperties().getGraphic().getSpecularColorR(), 160, 80);
-		addTextField(this, 15, specularColorGTextField, Editor.getProperties().getGraphic().getSpecularColorG(), 160, 80);
-		addTextField(this, 16, specularColorBTextField, Editor.getProperties().getGraphic().getSpecularColorB(), 160, 80);
-		addTextField(this, 17, lightPositionXTextField, Editor.getProperties().getGraphic().getLightPositionX(), 160, 80);
-		addTextField(this, 18, lightPositionYTextField, Editor.getProperties().getGraphic().getLightPositionY(), 160, 80);
-		addTextField(this, 19, lightPositionZTextField, Editor.getProperties().getGraphic().getLightPositionZ(), 160, 80);
-		addTextField(this, 20, shininessTextField, Editor.getProperties().getGraphic().getShininess(), 160, 80);
-		addTextField(this, 21, fovFactorTextField, Editor.getProperties().getGraphic().getFovFactor(), 160, 80);
+		addTextField(this, 5, backgroundColorRTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorR(), 160, 80);
+		addTextField(this, 6, backgroundColorGTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorG(), 160, 80);
+		addTextField(this, 7, backgroundColorBTextField, getEditorFrame().getTrackData().getGraphic().getBackgroundColorB(), 160, 80);
+		addTextField(this, 8, ambientColorRTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorR(), 160, 80);
+		addTextField(this, 9, ambientColorGTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorG(), 160, 80);
+		addTextField(this, 10, ambientColorBTextField, getEditorFrame().getTrackData().getGraphic().getAmbientColorB(), 160, 80);
+		addTextField(this, 11, diffuseColorRTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorR(), 160, 80);
+		addTextField(this, 12, diffuseColorGTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorG(), 160, 80);
+		addTextField(this, 13, diffuseColorBTextField, getEditorFrame().getTrackData().getGraphic().getDiffuseColorB(), 160, 80);
+		addTextField(this, 14, specularColorRTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorR(), 160, 80);
+		addTextField(this, 15, specularColorGTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorG(), 160, 80);
+		addTextField(this, 16, specularColorBTextField, getEditorFrame().getTrackData().getGraphic().getSpecularColorB(), 160, 80);
+		addTextField(this, 17, lightPositionXTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionX(), 160, 80);
+		addTextField(this, 18, lightPositionYTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionY(), 160, 80);
+		addTextField(this, 19, lightPositionZTextField, getEditorFrame().getTrackData().getGraphic().getLightPositionZ(), 160, 80);
+		addTextField(this, 20, shininessTextField, getEditorFrame().getTrackData().getGraphic().getShininess(), 160, 80);
+		addTextField(this, 21, fovFactorTextField, getEditorFrame().getTrackData().getGraphic().getFovFactor(), 160, 80);
 
 		add(getBackgroundImageButton(), null);
 	}
@@ -173,7 +173,7 @@ public class GraphicProperties extends PropertyPanel
 			backgroundTypeComboBox = new JComboBox<String>();
 			backgroundTypeComboBox.setModel(new DefaultComboBoxModel<String>(types));
 			backgroundTypeComboBox.setBounds(160, 118, 80, 23);
-			int value = Editor.getProperties().getGraphic().getBackgroundType();
+			int value = getEditorFrame().getTrackData().getGraphic().getBackgroundType();
 			if (value != Integer.MAX_VALUE)
 				backgroundTypeComboBox.setSelectedItem(String.valueOf(value));
 		}
@@ -240,178 +240,178 @@ public class GraphicProperties extends PropertyPanel
 		MutableDouble doubleResult = new MutableDouble();
 
 		if (isDifferent(descriptionTextField.getText(),
-			Editor.getProperties().getGraphic().getDescription(), stringResult))
+			getEditorFrame().getTrackData().getGraphic().getDescription(), stringResult))
 		{
-			Editor.getProperties().getGraphic().setDescription(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setDescription(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(descriptionNightTextField.getText(),
-			Editor.getProperties().getGraphic().getDescriptionNight(), stringResult))
+			getEditorFrame().getTrackData().getGraphic().getDescriptionNight(), stringResult))
 		{
-			Editor.getProperties().getGraphic().setDescriptionNight(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setDescriptionNight(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(descriptionRainNightTextField.getText(),
-			Editor.getProperties().getGraphic().getDescriptionRainNight(), stringResult))
+			getEditorFrame().getTrackData().getGraphic().getDescriptionRainNight(), stringResult))
 		{
-			Editor.getProperties().getGraphic().setDescriptionRainNight(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setDescriptionRainNight(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(backgroundImageTextField.getText(),
-			Editor.getProperties().getGraphic().getBackgroundImage(), stringResult))
+			getEditorFrame().getTrackData().getGraphic().getBackgroundImage(), stringResult))
 		{
-			Editor.getProperties().getGraphic().setBackgroundImage(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setBackgroundImage(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		int index = getBackgroundTypeComboBox().getSelectedIndex();
-		int type = Editor.getProperties().getGraphic().getBackgroundType();
+		int type = getEditorFrame().getTrackData().getGraphic().getBackgroundType();
 		if (index == 0)
 		{
 			if (type != Integer.MAX_VALUE)
 			{
-				Editor.getProperties().getGraphic().setBackgroundType(Integer.MAX_VALUE);
-				frame.documentIsModified = true;
+				getEditorFrame().getTrackData().getGraphic().setBackgroundType(Integer.MAX_VALUE);
+				getEditorFrame().documentIsModified = true;
 			}
 		}
 		else
 		{
 			if (type == Integer.MAX_VALUE)
 			{
-				Editor.getProperties().getGraphic().setBackgroundType(Integer.MAX_VALUE);
-				frame.documentIsModified = true;
+				getEditorFrame().getTrackData().getGraphic().setBackgroundType(Integer.MAX_VALUE);
+				getEditorFrame().documentIsModified = true;
 			}
 			else
 			{
 				int value = Integer.parseInt((String) getBackgroundTypeComboBox().getSelectedItem());
 				if (value != type)
 				{
-					Editor.getProperties().getGraphic().setBackgroundType(value);
-					frame.documentIsModified = true;
+					getEditorFrame().getTrackData().getGraphic().setBackgroundType(value);
+					getEditorFrame().documentIsModified = true;
 				}
 			}
 		}
 
 		if (isDifferent(backgroundColorRTextField.getText(),
-			Editor.getProperties().getGraphic().getBackgroundColorR(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getBackgroundColorR(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setBackgroundColorR(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setBackgroundColorR(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(backgroundColorGTextField.getText(),
-			Editor.getProperties().getGraphic().getBackgroundColorG(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getBackgroundColorG(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setBackgroundColorG(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setBackgroundColorG(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(backgroundColorBTextField.getText(),
-			Editor.getProperties().getGraphic().getBackgroundColorB(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getBackgroundColorB(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setBackgroundColorB(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setBackgroundColorB(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(ambientColorRTextField.getText(),
-			Editor.getProperties().getGraphic().getAmbientColorR(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getAmbientColorR(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setAmbientColorR(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setAmbientColorR(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(ambientColorGTextField.getText(),
-			Editor.getProperties().getGraphic().getAmbientColorG(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getAmbientColorG(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setAmbientColorG(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setAmbientColorG(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(ambientColorBTextField.getText(),
-			Editor.getProperties().getGraphic().getAmbientColorB(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getAmbientColorB(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setAmbientColorB(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setAmbientColorB(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(diffuseColorRTextField.getText(),
-			Editor.getProperties().getGraphic().getDiffuseColorR(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getDiffuseColorR(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setDiffuseColorR(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setDiffuseColorR(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(diffuseColorGTextField.getText(),
-			Editor.getProperties().getGraphic().getDiffuseColorG(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getDiffuseColorG(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setDiffuseColorG(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setDiffuseColorG(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(diffuseColorBTextField.getText(),
-			Editor.getProperties().getGraphic().getDiffuseColorB(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getDiffuseColorB(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setDiffuseColorB(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setDiffuseColorB(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(specularColorRTextField.getText(),
-			Editor.getProperties().getGraphic().getSpecularColorR(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getSpecularColorR(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setSpecularColorR(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setSpecularColorR(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(specularColorGTextField.getText(),
-			Editor.getProperties().getGraphic().getSpecularColorG(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getSpecularColorG(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setSpecularColorG(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setSpecularColorG(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(specularColorBTextField.getText(),
-			Editor.getProperties().getGraphic().getSpecularColorB(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getSpecularColorB(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setSpecularColorB(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setSpecularColorB(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(lightPositionXTextField.getText(),
-			Editor.getProperties().getGraphic().getLightPositionX(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getLightPositionX(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setLightPositionX(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setLightPositionX(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(lightPositionYTextField.getText(),
-			Editor.getProperties().getGraphic().getLightPositionY(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getLightPositionY(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setLightPositionY(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setLightPositionY(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(lightPositionZTextField.getText(),
-			Editor.getProperties().getGraphic().getLightPositionZ(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getLightPositionZ(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setLightPositionZ(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setLightPositionZ(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(shininessTextField.getText(),
-			Editor.getProperties().getGraphic().getShininess(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getShininess(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setShininess(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setShininess(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(fovFactorTextField.getText(),
-			Editor.getProperties().getGraphic().getFovFactor(), doubleResult))
+			getEditorFrame().getTrackData().getGraphic().getFovFactor(), doubleResult))
 		{
-			Editor.getProperties().getGraphic().setFovFactor(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getGraphic().setFovFactor(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 	}
  } //  @jve:decl-index=0:visual-constraint="10,10"

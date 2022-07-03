@@ -51,9 +51,9 @@ public class EnvMapProperties extends PropertyPanel
 	/**
 	 *
 	 */
-	public EnvMapProperties(EditorFrame frame)
+	public EnvMapProperties(EditorFrame editorFrame)
 	{
-		super(frame);
+		super(editorFrame);
 		initialize();
     }
 
@@ -136,7 +136,7 @@ public class EnvMapProperties extends PropertyPanel
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 10, 460, 100);
 
-			Vector<EnvironmentMapping> envMaps = Editor.getProperties().getGraphic().getEnvironmentMapping();
+			Vector<EnvironmentMapping> envMaps = getEditorFrame().getTrackData().getGraphic().getEnvironmentMapping();
 
 			for (int i = 0; i < envMaps.size(); i++)
 	        {
@@ -240,11 +240,11 @@ public class EnvMapProperties extends PropertyPanel
 	public void exit()
 	{
 		MutableString stringResult = new MutableString();
-		Vector<EnvironmentMapping> envMaps = Editor.getProperties().getGraphic().getEnvironmentMapping();
+		Vector<EnvironmentMapping> envMaps = getEditorFrame().getTrackData().getGraphic().getEnvironmentMapping();
 		int minCount = Math.min(envMaps.size(), tabbedPane.getTabCount());
 		if (envMaps.size() != tabbedPane.getTabCount())
 		{
-			frame.documentIsModified = true;
+			getEditorFrame().documentIsModified = true;
 		}
 		for (int i = 0; i < minCount; i++)
         {
@@ -253,12 +253,12 @@ public class EnvMapProperties extends PropertyPanel
             if (isDifferent(panel.nameTextField.getText(), envMap.getName(), stringResult))
             {
                 envMap.setName(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
             if (isDifferent(panel.envMapTextField.getText(), envMap.getEnvMapImage(), stringResult))
             {
                 envMap.setEnvMapImage(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 		}
 		if (envMaps.size() > tabbedPane.getTabCount())

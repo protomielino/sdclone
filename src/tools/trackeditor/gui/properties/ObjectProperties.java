@@ -52,9 +52,9 @@ public class ObjectProperties extends PropertyPanel
 	/**
 	 *
 	 */
-	public ObjectProperties(EditorFrame frame)
+	public ObjectProperties(EditorFrame editorFrame)
 	{
-		super(frame);
+		super(editorFrame);
 		initialize();
     }
 
@@ -140,7 +140,7 @@ public class ObjectProperties extends PropertyPanel
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 10, 460, 230);
 
-			Vector<TrackObject> objects = Editor.getProperties().getObjects();
+			Vector<TrackObject> objects = getEditorFrame().getTrackData().getObjects();
 
 			for (int i = 0; i < objects.size(); i++)
 	        {
@@ -303,11 +303,11 @@ public class ObjectProperties extends PropertyPanel
 		MutableDouble doubleResult = new MutableDouble();
 		MutableInteger integerResult = new MutableInteger();
 
-		Vector<TrackObject> objects = Editor.getProperties().getObjects();
+		Vector<TrackObject> objects = getEditorFrame().getTrackData().getObjects();
 		int minCount = Math.min(objects.size(), tabbedPane.getTabCount());
 		if (objects.size() != tabbedPane.getTabCount())
 		{
-			frame.documentIsModified = true;
+			getEditorFrame().documentIsModified = true;
 		}
 		for (int i = 0; i < minCount; i++)
         {
@@ -317,43 +317,43 @@ public class ObjectProperties extends PropertyPanel
             if (isDifferent(panel.nameTextField.getText(), object.getName(), stringResult))
             {
                 object.setName(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.objectTextField.getText(), object.getObject(), stringResult))
             {
                 object.setObject(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.colorTextField.getText(), object.getColor(), integerResult))
             {
                 object.setColor(integerResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.getOrientationTypeComboBox().getSelectedItem().toString(), object.getOrientationType(), stringResult))
             {
                 object.setOrientationType(stringResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.orientationTextField.getText(), object.getOrientation(), doubleResult))
             {
                 object.setOrientation(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.deltaHeightTextField.getText(), object.getDeltaHeight(), doubleResult))
             {
                 object.setDeltaHeight(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 
             if (isDifferent(panel.deltaVertTextField.getText(), object.getDeltaVert(), doubleResult))
             {
                 object.setDeltaVert(doubleResult.getValue());
-                frame.documentIsModified = true;
+                getEditorFrame().documentIsModified = true;
             }
 		}
 		if (objects.size() > tabbedPane.getTabCount())

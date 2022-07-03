@@ -23,17 +23,6 @@ package utils;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 
-import utils.circuit.Camera;
-import utils.circuit.Graphic;
-import utils.circuit.Header;
-import utils.circuit.LocalInfo;
-import utils.circuit.MainTrack;
-import utils.circuit.StartingGrid;
-import utils.circuit.Surface;
-import utils.circuit.TrackLight;
-import utils.circuit.TrackObject;
-
-
 /**
  * @author babis
  * 
@@ -44,7 +33,6 @@ public  class Properties
 {
 	private static Properties	instance				= new Properties();
 	private Vector				propertiesListeners		= new Vector();
-	//private Vector				trackData;
 	public final String			title					= "sd2-trackeditor";
 	public final String			version					= "Beta";
 	private String				path;
@@ -66,16 +54,6 @@ public  class Properties
 	private int					curveNameCount			= 0;
 	private int					straightNameCount		= 0;
 
-	private Header				header					= new Header();
-    private LocalInfo			localInfo				= new LocalInfo();
-    private StartingGrid		startingGrid			= new StartingGrid();
-    private Graphic				graphic					= new Graphic();
-    private Vector<Surface> 	surfaces				= new Vector<Surface>();
-    private Vector<Camera> 		cameras					= new Vector<Camera>();
-    private Vector<TrackObject> trackObjects			= new Vector<TrackObject>();
-    private Vector<TrackLight> 	trackLights				= new Vector<TrackLight>();
-    private MainTrack			mainTrack				= new MainTrack();
-
 	/**
 	 *  
 	 */
@@ -96,36 +74,6 @@ public  class Properties
 	{
 		Properties.instance = instance;
 	}
-//	/**
-//	 * @return Returns the trackData.
-//	 */
-//	public Vector getTrackData()
-//	{
-//		return trackData;
-//	}
-//	/**
-//	 * @param trackData The trackData to set.
-//	 */
-//	public void setTrackData(Vector trackData)
-//	{
-//		this.trackData = trackData;
-//		this.valueChanged();
-//	}
-	/**
-	 * @return Returns the header.
-	 */
-	public Header getHeader()
-	{
-		return header;
-	}
-	/**
-	 * @param header
-	 *            The header to set.
-	 */
-	public void setHeader(Header header)
-	{
-		this.header = header;
-	}
 	/**
 	 * @return Returns the path.
 	 */
@@ -141,6 +89,7 @@ public  class Properties
 	{
 		this.path = path;
 	}
+
 	/**
 	 * @return Returns the image.
 	 */
@@ -156,6 +105,7 @@ public  class Properties
 	{
 		this.image = image;
 	}
+
 	/**
 	 * @return Returns the imageScale.
 	 */
@@ -171,6 +121,7 @@ public  class Properties
 	{
 		this.imageScale = imageScale;
 	}
+
 	/**
 	 * @return Returns the initx.
 	 */
@@ -186,6 +137,7 @@ public  class Properties
 	{
 		this.initx = initx;
 	}
+
 	/**
 	 * @return Returns the inity.
 	 */
@@ -370,124 +322,4 @@ public  class Properties
     {
         this.straightNameCount = straightNameCount;
     }
-
-    /**
-     * @return Returns the localInfo.
-     */
-    public LocalInfo getLocalInfo()
-    {
-        return localInfo;
-    }
-    /**
-     * @param localInfo The localInfo to set.
-     */
-    public void setLocalInfo(LocalInfo localInfo)
-    {
-        this.localInfo = localInfo;
-    }
-
-    /**
-     * @return Returns the startingGrid.
-     */
-    public StartingGrid getStartingGrid()
-    {
-        return startingGrid;
-    }
-    /**
-     * @param startingGrid The startingGrid to set.
-     */
-    public void setStartingGrid(StartingGrid startingGrid)
-    {
-        this.startingGrid = startingGrid;
-    }
-
-    /**
-     * @return Returns the surfaces.
-     */
-    public Vector<Surface> getSurfaces()
-    {
-        return surfaces;
-    }
-    /**
-     * @param trackData The surfaces to set.
-     */
-    public void setSurfaces(Vector<Surface> data)
-    {
-        surfaces = data;
-    }
-
-    /**
-     * @return Returns the cameras.
-     */
-    public Vector<Camera> getCameras()
-    {
-        return cameras;
-    }
-    /**
-     * @param cameras The cameras to set.
-     */
-    public void setCameras(Vector<Camera> data)
-    {
-        cameras = data;
-    }
-
-    /**
-     * @return Returns the trackObjects.
-     */
-    public Vector<TrackObject> getObjects()
-    {
-        return trackObjects;
-    }
-    /**
-     * @param objects The trackObjects to set.
-     */
-    public void setObjects(Vector<TrackObject> data)
-    {
-        trackObjects = data;
-    }
-
-    /**
-     * @return Returns the trackLights.
-     */
-    public Vector<TrackLight> getTrackLights()
-    {
-        return trackLights;
-    }
-    /**
-     * @param trackLights The trackLights to set.
-     */
-    public void setTrackLights(Vector<TrackLight> data)
-    {
-        trackLights = data;
-    }
-
-    /**
-     * @return Returns the graphic.
-     */
-    public Graphic getGraphic()
-    {
-		return graphic;
-	}
-    /**
-     * @param graphic The graphics to set.
-     */
-	public void setGraphic(Graphic data)
-	{
-		graphic = data;
-	}
-
-    /**
-     * @return Returns the mainTrack.
-     */
-    public MainTrack getMainTrack()
-    {
-		return mainTrack;
-	}
-    /**
-     * @param mainTrack The mainTrack to set.
-     */
-	public void setMainTrack(MainTrack data)
-	{
-		mainTrack = data;
-	}
 }

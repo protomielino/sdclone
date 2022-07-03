@@ -25,7 +25,6 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
-import utils.Editor;
 
 /**
  * @author Robert Reif
@@ -51,9 +50,9 @@ public class StartingGridProperties extends PropertyPanel
 	/**
 	 *
 	 */
-	public StartingGridProperties(EditorFrame frame)
+	public StartingGridProperties(EditorFrame editorFrame)
 	{
-		super(frame);
+		super(editorFrame);
 		initialize();
 	}
 
@@ -74,14 +73,14 @@ public class StartingGridProperties extends PropertyPanel
 		addLabel(this, 4, offsetWithinAColumnLabel, "Offset Within A Column", 180);
 		addLabel(this, 5, initialHeightLabel, "Initial Height", 180);
 
-		addTextField(this, 0, rowsTextField, Editor.getProperties().getStartingGrid().getRows(), 190, 100);
+		addTextField(this, 0, rowsTextField, getEditorFrame().getTrackData().getStartingGrid().getRows(), 190, 100);
 
 		add(getPolePositionSideComboBox(), null);
 
-		addTextField(this, 2, distanceToStartTextField, Editor.getProperties().getStartingGrid().getDistanceToStart(), 190, 100);
-		addTextField(this, 3, distanceBetweenColumnsTextField, Editor.getProperties().getStartingGrid().getDistanceBetweenColumns(), 190, 100);
-		addTextField(this, 4, offsetWithinAColumnTextField, Editor.getProperties().getStartingGrid().getOffsetWithinAColumn(), 190, 100);
-		addTextField(this, 5, initialHeightTextField, Editor.getProperties().getStartingGrid().getInitialHeight(), 190, 100);
+		addTextField(this, 2, distanceToStartTextField, getEditorFrame().getTrackData().getStartingGrid().getDistanceToStart(), 190, 100);
+		addTextField(this, 3, distanceBetweenColumnsTextField, getEditorFrame().getTrackData().getStartingGrid().getDistanceBetweenColumns(), 190, 100);
+		addTextField(this, 4, offsetWithinAColumnTextField, getEditorFrame().getTrackData().getStartingGrid().getOffsetWithinAColumn(), 190, 100);
+		addTextField(this, 5, initialHeightTextField, getEditorFrame().getTrackData().getStartingGrid().getInitialHeight(), 190, 100);
 	}
 
 	/**
@@ -96,7 +95,7 @@ public class StartingGridProperties extends PropertyPanel
 			String[] items = {"none", "right", "left"};
 			polePositionSideComboBox = new JComboBox<String>(items);
 			polePositionSideComboBox.setBounds(190, 37, 80, 23);
-			String side = Editor.getProperties().getStartingGrid().getPolePositionSide();
+			String side = getEditorFrame().getTrackData().getStartingGrid().getPolePositionSide();
 			if (side == null || side.isEmpty())
 				side = "none";
 			polePositionSideComboBox.setSelectedItem(side);
@@ -114,45 +113,45 @@ public class StartingGridProperties extends PropertyPanel
 		MutableInteger integerResult = new MutableInteger();
 
 		if (isDifferent(rowsTextField.getText(),
-			Editor.getProperties().getStartingGrid().getRows(), integerResult))
+			getEditorFrame().getTrackData().getStartingGrid().getRows(), integerResult))
 		{
-			Editor.getProperties().getStartingGrid().setRows(integerResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getStartingGrid().setRows(integerResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent((String) getPolePositionSideComboBox().getSelectedItem(),
-			Editor.getProperties().getStartingGrid().getPolePositionSide(), stringResult))
+			getEditorFrame().getTrackData().getStartingGrid().getPolePositionSide(), stringResult))
 		{
-			Editor.getProperties().getStartingGrid().setPolePositionSide(stringResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getStartingGrid().setPolePositionSide(stringResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(distanceToStartTextField.getText(),
-			Editor.getProperties().getStartingGrid().getDistanceToStart(), doubleResult))
+			getEditorFrame().getTrackData().getStartingGrid().getDistanceToStart(), doubleResult))
 		{
-			Editor.getProperties().getStartingGrid().setDistanceToStart(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getStartingGrid().setDistanceToStart(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(distanceBetweenColumnsTextField.getText(),
-			Editor.getProperties().getStartingGrid().getDistanceBetweenColumns(), doubleResult))
+			getEditorFrame().getTrackData().getStartingGrid().getDistanceBetweenColumns(), doubleResult))
 		{
-			Editor.getProperties().getStartingGrid().setDistanceBetweenColumns(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getStartingGrid().setDistanceBetweenColumns(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(offsetWithinAColumnTextField.getText(),
-			Editor.getProperties().getStartingGrid().getOffsetWithinAColumn(), doubleResult))
+			getEditorFrame().getTrackData().getStartingGrid().getOffsetWithinAColumn(), doubleResult))
 		{
-			Editor.getProperties().getStartingGrid().setOffsetWithinAColumn(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getStartingGrid().setOffsetWithinAColumn(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 
 		if (isDifferent(initialHeightTextField.getText(),
-			Editor.getProperties().getStartingGrid().getInitialHeight(), doubleResult))
+			getEditorFrame().getTrackData().getStartingGrid().getInitialHeight(), doubleResult))
 		{
-			Editor.getProperties().getStartingGrid().setInitialHeight(doubleResult.getValue());
-			frame.documentIsModified = true;
+			getEditorFrame().getTrackData().getStartingGrid().setInitialHeight(doubleResult.getValue());
+			getEditorFrame().documentIsModified = true;
 		}
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"

@@ -22,7 +22,7 @@ package utils.undo;
 
 import java.util.Vector;
 
-import utils.TrackData;
+import gui.EditorFrame;
 import utils.circuit.Segment;
 
 /**
@@ -33,17 +33,18 @@ import utils.circuit.Segment;
  */
 public class UndoSegmentChange implements UndoInterface
 {
-	//private Properties			properties	= Properties.getInstance();
-	private Segment original;
-	private Segment clone;
-	private int pos;
+	private EditorFrame	editorFrame;
+	private Segment 	original;
+	private Segment 	clone;
+	private int 	pos;
 
 
 	/**
 	 * 
 	 */
-	public UndoSegmentChange(Segment segment)
+	public UndoSegmentChange(EditorFrame editorFrame, Segment segment)
 	{
+		this.editorFrame = editorFrame;
 		clone = (Segment) segment.clone();
 		this.original = segment;
 	}
@@ -53,7 +54,7 @@ public class UndoSegmentChange implements UndoInterface
 	 */
 	public void undo()
 	{
-		Vector<Segment> data = TrackData.getTrackData();
+		Vector<Segment> data = editorFrame.getTrackData().getSegments();
 		if (data != null)
 		{
 			pos = data.indexOf(original);
@@ -66,7 +67,7 @@ public class UndoSegmentChange implements UndoInterface
 	 */
 	public void redo()
 	{
-		Vector<Segment> data = TrackData.getTrackData();
+		Vector<Segment> data = editorFrame.getTrackData().getSegments();
 		pos = data.indexOf(clone);
 		data.set(pos,original);
 	}
