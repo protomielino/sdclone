@@ -40,7 +40,6 @@ import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -335,18 +334,20 @@ public class EditorFrame extends JFrame
 	
 	private void openProject(String projectFileName)
 	{
+		//System.out.println("openProject reading : " + projectFileName);
+		
 		try
 		{
 			XMLDecoder decoder = new XMLDecoder(new FileInputStream(projectFileName));
-			//setProject((Project) decoder.readObject());
 			Editor.setProperties((Properties)decoder.readObject());
-		} catch (FileNotFoundException ex)
+			
+			// update path from project file location
+			Editor.getProperties().setPath(projectFileName.substring(0, projectFileName.lastIndexOf(sep)));
+		}
+		catch (Exception ex)
 		{
-			JOptionPane.showMessageDialog(this, "Project not found : " + projectFileName, "Project Open", JOptionPane.ERROR_MESSAGE);
-		} catch (ClassCastException e)
-		{
-			//e.printStackTrace();
-			System.out.println("This file can't be read");
+			JOptionPane.showMessageDialog(this, "Opening project file : " + projectFileName + "\n\n" + ex.getLocalizedMessage(), "Project Open", JOptionPane.ERROR_MESSAGE);
+			return;
 		}
 		
 		String trackFileName = projectFileName.replaceAll(".prj.xml", ".xml");
@@ -359,7 +360,6 @@ public class EditorFrame extends JFrame
 		trackData = null;
 		trackData = new TrackData();		
 		readFile(file);
-		Editor.getProperties().setPath(projectFileName.substring(0, projectFileName.lastIndexOf(sep)));
 		updateRecentFiles(projectFileName);	
 	}
 
@@ -383,9 +383,12 @@ public class EditorFrame extends JFrame
 		}
 
 //		if (documentIsModified)
-		if(true)
+		if (true)
 		{
 			String filename = Editor.getProperties().getPath() + sep + getTrackData().getHeader().getName() + ".prj.xml";
+			
+			//System.out.println("saveProject writing : " + filename);
+			
 			try
 			{
 				XMLEncoder encoder = new XMLEncoder(new FileOutputStream(filename));
@@ -397,10 +400,11 @@ public class EditorFrame extends JFrame
 				});
 				encoder.writeObject(Editor.getProperties());
 				encoder.close();
-			} catch (Exception ex)
+			} catch (Exception e)
 			{
-				ex.printStackTrace();
-				System.out.println(ex.getMessage());
+				JOptionPane.showMessageDialog(this,
+					"Couldn't write : " + filename + "\n\n" + e.getLocalizedMessage(),
+					"Save Project", JOptionPane.ERROR_MESSAGE);
 			}
 			exportTrack();
 			documentIsModified = false;
@@ -1861,7 +1865,6 @@ public class EditorFrame extends JFrame
 		}
 		public void actionPerformed(ActionEvent e)
 		{
-			System.out.println("Call exportXml");
 			exportTrack();
 		}
 	}
@@ -1872,11 +1875,22 @@ public class EditorFrame extends JFrame
 			message("No track", "Nothing to export");
 			return;
 		}
+		String fileName = Editor.getProperties().getPath() + sep + getTrackData().getHeader().getName() + ".xml";
+		
+		//System.out.println("exportTrack writing : " + fileName);
+	
 		XmlWriter xmlWriter = new XmlWriter(this);
 		
-		xmlWriter.writeXml();
-		String fileName = Editor.getProperties().getPath() + sep + getTrackData().getHeader().getName() + ".prj.xml";
-		updateRecentFiles(fileName);
+		try
+		{
+			xmlWriter.writeXml(fileName);
+		}
+		catch (Exception e)
+		{
+			JOptionPane.showMessageDialog(this,
+				"Couldn't write : " + fileName + "\n\n" + e.getLocalizedMessage(),
+				"Export track", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	public class ExportAllAction extends AbstractAction
 	{
@@ -1999,16 +2013,19 @@ public class EditorFrame extends JFrame
 	
 	public void readFile(File file)
 	{
+		//System.out.println("readFile : " + file.getAbsolutePath());
+		
 		try
 		{
 			XmlReader xmlReader = new XmlReader(this);
 			
 			xmlReader.readXml(file.getAbsolutePath());
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
-			//				message(e.getMessage(), "The file " + file.getAbsolutePath()
-			// + " is not valid");
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(this,
+				"Read file : " + file.getAbsolutePath() + "\n\n" + e.getLocalizedMessage(),
+				"Read Track", JOptionPane.ERROR_MESSAGE);				
 		}
 		refresh();
 	}

@@ -20,6 +20,7 @@
  */
 package plugin.torcs;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Vector;
@@ -54,28 +55,24 @@ public class XmlWriter
 {
 	private EditorFrame			editorFrame;
 	
-	static Document				doc;
-	private boolean				optimize	= true;
-	static boolean 				job;
-	private static String 		sep = System.getProperty("file.separator");
-
 	public XmlWriter(EditorFrame editorFrame)
 	{
 		this.editorFrame = editorFrame;
 	}
 	
-	public void writeXml()
+	public void writeXml(String fileName) throws FileNotFoundException, IOException, SecurityException
 	{
-		job = false;
-		getXml();
-		writeToFile();
+		Document doc = new Document();
+
+		getXml(doc);
+		writeToFile(fileName, doc);
 	}
 
 	/**
 	 * @param segments
 	 * @return
 	 */
-	private void getXml()
+	private synchronized void getXml(Document doc)
 	{
 		Comment com;
 		Element root = getRoot();
@@ -85,7 +82,6 @@ public class XmlWriter
 		entity += "<!ENTITY default-surfaces SYSTEM \"../../../data/tracks/surfaces.xml\">\n";
 		entity += "<!ENTITY default-objects SYSTEM \"../../../data/tracks/objects.xml\">\n";
 		type.setInternalSubset(entity);
-		doc = new Document();
 		com = new Comment(getCredit());
 		doc.addContent(com);
 		com = new Comment(getLicence());
@@ -102,6 +98,16 @@ public class XmlWriter
 		root.addContent(getTrack());
 		root.addContent(getCameras());
 	}
+
+	private synchronized void writeToFile(String fileName, Document doc) throws FileNotFoundException, IOException, SecurityException
+	{
+		FileOutputStream out = new FileOutputStream(fileName);
+		XMLOutput op = new XMLOutput(Format.getPrettyFormat());
+		op.output(doc, out);
+		out.flush();
+		out.close();
+	}
+
 	/**
 	 * @return
 	 */
@@ -905,22 +911,6 @@ public class XmlWriter
 		if (string != null && !string.isEmpty())
 		{
 			section.addContent(attstrElement(attribute, string));
-		}
-	}
-
-	private synchronized void writeToFile()
-	{
-		String fileName = Editor.getProperties().getPath() + sep + editorFrame.getTrackData().getHeader().getName() + ".xml";
-		try
-		{
-			FileOutputStream out = new FileOutputStream(fileName);
-			XMLOutput op = new XMLOutput(Format.getPrettyFormat());
-			op.output(doc, out);
-			out.flush();
-			out.close();
-		} catch (IOException e)
-		{
-			System.err.println(e);
 		}
 	}
 }

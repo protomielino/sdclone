@@ -62,18 +62,21 @@ public class XmlReader
 		this.editorFrame = editorFrame;
 	}
 	
-    public void readXml(String filename)
+    public void readXml(String filename) throws JDOMException, IOException
     {
-        Document doc;
-        try
-        {
-            doc = readFromFile(filename);
-            Element element = doc.getRootElement();
-            setTrackData(element);
-        } catch (JDOMException e)
-        {
-            e.printStackTrace();
-        }
+        Document doc = readFromFile(filename);
+        Element element = doc.getRootElement();
+        setTrackData(element);
+    }
+
+    private Document readFromFile(String fname) throws JDOMException, IOException
+    {
+        Document d = null;
+        SAXBuilder sxb = new SAXBuilder(false);
+
+        sxb.setEntityResolver(new NoOpEntityResolver());
+        d = sxb.build(new File(fname));
+        return d;
     }
 
     private synchronized void setTrackData(Element root)
@@ -903,36 +906,4 @@ public class XmlReader
         }
         return out;
     }
-
-    /**
-     * @return Returns the segments.
-     */
-//    public List<Element> getSegments()
-//    {
-//        return segments;
-//    }
-
-    private Document readFromFile(String fname) throws JDOMException
-    {
-        Document d = null;
-        SAXBuilder sxb = new SAXBuilder(false);
-
-        try
-        {
-            sxb.setEntityResolver(new NoOpEntityResolver());
-            //sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",
-            // false);
-            d = sxb.build(new File(fname));
-        } catch (JDOMException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return d;
-    }
-
 }
