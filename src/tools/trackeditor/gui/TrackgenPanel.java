@@ -20,11 +20,9 @@
  */
 package gui;
 
-import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Vector;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -40,8 +38,7 @@ import javax.swing.JTextField;
  */
 public class TrackgenPanel extends JDialog implements Runnable
 {
-	public static Vector	args			= new Vector();
-	public EditorFrame		editorFrame;
+	private EditorFrame		editorFrame;
 	private Thread 			ac3d 			= new Thread(this);
 
 	private JPanel			jPanel			= null;
@@ -57,10 +54,10 @@ public class TrackgenPanel extends JDialog implements Runnable
 	private JLabel			trackgenLabel	= null;
 	private JLabel			waitLabel		= null;
 	
-	public TrackgenPanel(Frame editorFrame)
+	public TrackgenPanel(EditorFrame editorFrame)
 	{
 		super();
-		this.editorFrame = (EditorFrame) editorFrame;
+		this.editorFrame = editorFrame;
 		initialize();
 		ac3d.start();
 	}
@@ -138,26 +135,6 @@ public class TrackgenPanel extends JDialog implements Runnable
 			JOptionPane.showMessageDialog(this, e1.getLocalizedMessage(), "Export AC3D", JOptionPane.ERROR_MESSAGE);
 		}
 		this.waitLabel.setText("Track finished");
-	}
-	/**
-	 * @return
-	 */
-	private static String getArgs()
-	{
-		String tmp = "";
-
-		for (int i = 0; i < args.size(); i++)
-		{
-			tmp += args.get(i);
-		}
-		return tmp;
-	}
-	/**
-	 * @param vector
-	 */
-	public static void setArgs(Vector vector)
-	{
-		args = vector;
 	}
 
 	/**

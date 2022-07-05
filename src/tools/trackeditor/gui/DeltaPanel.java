@@ -45,10 +45,8 @@ import javax.swing.JTextField;
  */
 public class DeltaPanel extends JDialog implements Runnable
 {
-    public static Vector args = new Vector();
     private EditorFrame editorFrame;
-    //private Properties properties = Properties.getInstance();
-    Thread ac3d;
+    private Thread ac3d;
 
     private JPanel jPanel = null;
     private JLabel nameLabel = null;
@@ -80,10 +78,10 @@ public class DeltaPanel extends JDialog implements Runnable
     /**
      *  
      */
-    public DeltaPanel(EditorFrame frame,String title, boolean modal)
+    public DeltaPanel(EditorFrame editorFrame, String title, boolean modal)
     {
-        super(frame,title,modal);
-        editorFrame = frame;
+        super(editorFrame, title, modal);
+        this.editorFrame = editorFrame;
         initialize();
     }
 
@@ -185,28 +183,6 @@ public class DeltaPanel extends JDialog implements Runnable
         this.waitLabel.setText("Calculation finished");
         finish = true;
         notifyAll();
-    }
-
-    /**
-     * @return
-     */
-    private static String getArgs()
-    {
-        String tmp = "";
-
-        for (int i = 0; i < args.size(); i++)
-        {
-            tmp += args.get(i);
-        }
-        return tmp;
-    }
-
-    /**
-     * @param vector
-     */
-    public static void setArgs(Vector vector)
-    {
-        args = vector;
     }
 
     /**
@@ -418,8 +394,7 @@ public class DeltaPanel extends JDialog implements Runnable
      * 
      */
     protected void startTrackgen()
-    {
-        
+    {       
         editorFrame.exportTrack();
         ac3d = new Thread(this);
         ac3d.start();
