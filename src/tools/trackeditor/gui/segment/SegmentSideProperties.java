@@ -369,7 +369,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 				public void actionPerformed(ActionEvent e)
 				{
 					if (barrierStyleComboBox.getSelectedItem() != null)
-					side.setBarrierStyle(barrierStyleComboBox.getSelectedItem()+"");
+						side.setBarrierStyle(barrierStyleComboBox.getSelectedItem()+"");
 				}
 			});
 		}

@@ -58,7 +58,6 @@ import bsh.Interpreter;
  */
 public class SegmentEditorDlg extends JDialog implements SliderListener
 {
-	//private Properties			properties						= Properties.getInstance();
 	private Segment					shape;
 	CircuitView						view;
 	EditorFrame						editorFrame;
@@ -817,6 +816,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		if (rightPanel == null)
 		{
 			rightPanel = new SegmentSideProperties(this, shape.getRight());
+			rightPanel.setTitle("Right");
 		}
 		return rightPanel;
 	}

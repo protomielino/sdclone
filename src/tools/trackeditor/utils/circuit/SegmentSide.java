@@ -156,6 +156,7 @@ public class SegmentSide implements Cloneable
 		{
 			this.barrierHeight = barrierHeight;
 			barrierHeightChanged();
+			hasBarrier = true;
 		}
 	}
 	/**
@@ -189,6 +190,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.barrierStyle = barrierStyle;
 		barrierStyleChanged();
+		hasBarrier = true;
 	}
 	/**
 	 *  
@@ -221,6 +223,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.barrierSurface = barrierSurface;
 		barrierSurfaceChanged();
+		hasBarrier = true;
 	}
 	/**
 	 *  
@@ -255,6 +258,7 @@ public class SegmentSide implements Cloneable
 		{
 			this.barrierWidth = barrierWidth;
 			barrierWidthChanged();
+			hasBarrier = true;
 		}
 	}
 	/**
@@ -306,6 +310,7 @@ public class SegmentSide implements Cloneable
 		{
 			this.borderHeight = borderHeight;
 			borderHeightChanged();
+			hasBorder = true;
 		}
 	}
 	/**
@@ -339,6 +344,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.borderStyle = borderStyle;
 		borderStyleChanged();
+		hasBorder = true;
 	}
 	/**
 	 *  
@@ -371,6 +377,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.borderSurface = borderSurface;
 		borderSurfaceChanged();
+		hasBorder = true;
 	}
 	/**
 	 *  
@@ -405,6 +412,7 @@ public class SegmentSide implements Cloneable
 		{
 			this.borderWidth = borderWidth;
 			borderWidthChanged();
+			hasBorder = true;
 		}
 	}
 	/**
@@ -455,6 +463,7 @@ public class SegmentSide implements Cloneable
 		{
 			this.sideEndWidth = sideEndWidth;
 			sideEndWidthChanged();
+			hasSide = true;
 		}
 	}
 	/**
@@ -490,6 +499,7 @@ public class SegmentSide implements Cloneable
 		{
 			this.sideStartWidth = sideStartWidth;
 			sideStartWidthChanged();
+			hasSide = true;
 		}
 	}
 	/**
@@ -523,6 +533,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.sideSurface = sideSurface;
 		sideSurfaceChanged();
+		hasSide = true;
 	}
 
 	/**
@@ -556,6 +567,7 @@ public class SegmentSide implements Cloneable
 	{
 		this.sideBankingType = sideBankingType;
 		sideBankingTypeChanged();
+		hasSide = true;
 	}
 
 	/**
