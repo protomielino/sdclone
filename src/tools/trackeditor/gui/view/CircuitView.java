@@ -60,7 +60,6 @@ import utils.undo.UndoSegmentChange;
 
 public class CircuitView extends JComponent implements KeyListener, MouseListener, MouseMotionListener,WindowListener //,Scrollable
 {
-	//private Properties			properties						= Properties.getInstance();
 	/** zooming factor */
 	double						zoomFactor						= 1.0;
 	/** affine transformation */
@@ -86,9 +85,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** event to fire when selection has changed */
 	CircuitViewSelectionEvent	selectionChangedEvent			= new CircuitViewSelectionEvent(this);
 	/** current selected shape */
-	public Segment			selectedShape					= null;
+	public Segment				selectedShape					= null;
 	/** current handled shape */
-	public Segment			handledShape					= null;
+	public Segment				handledShape					= null;
 	/** current dragging state */
 	boolean						dragging						= false;
 	/** mouse pressed point, in meters */
@@ -102,7 +101,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** dragging handle index */
 	int							handleDragging					= -1;
 	/** current moved shape, for undo management */
-	Segment				currentMovedShape				= null;
+	Segment						currentMovedShape				= null;
 
 	/** flag for skipping recurrent events */
 	boolean						isAncestorResizing				= false;
@@ -140,8 +139,8 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	//private double				imgCo							= 1.0; //3.4;
 	//private Point2D.Double		imgOffset						= new Point2D.Double(0, 0);
-	private EditorPoint		imgOffsetPrev					= new EditorPoint();
-	private EditorPoint		imgOffsetStart					= new EditorPoint();
+	private EditorPoint			imgOffsetPrev					= new EditorPoint();
+	private EditorPoint			imgOffsetStart					= new EditorPoint();
 	/** background image */
 	ImageIcon					backgroundImg					= null;
 	/** background image position, in meters */
@@ -149,7 +148,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** background image showing state */
 	public boolean				showBackground					= true;
 	
-	private int currentCount	= 0;
+	private int 				currentCount					= 0;
 
 	/** upward link to parent frame */
 	EditorFrame					editorFrame;
@@ -397,7 +396,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	/** input events management */
 	public void mousePressed(MouseEvent e)
 	{
-		if (e.getButton() == 3)
+		if (e.getButton() == MouseEvent.BUTTON3)
 		{
 		    Point2D.Double tmp = new Point2D.Double(imgOffsetStart.getX(),imgOffsetStart.getY());
 			screenToReal(e, tmp);
@@ -405,9 +404,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 			imgOffsetPrev.setLocation(Editor.getProperties().getImgOffset());
 
 		}
-		if (e.getButton() == 1)
+		if (e.getButton() == MouseEvent.BUTTON1)
 		{
-			if (editorFrame.getTrackData().getSegments() == null)
+			if (editorFrame.getTrackData() == null)
 				return;
 
 			try
@@ -899,7 +898,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 	 */
 	protected Segment findObjAtMousePos()
 	{
-		if (editorFrame.getTrackData().getSegments() == null)
+		if (editorFrame.getTrackData() == null)
 			return null;
 		
 		Segment out = null;
@@ -1339,6 +1338,9 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 
 	public void redrawCircuit()
 	{
+		if (editorFrame.getTrackData() == null)
+			return;
+
 		Vector<Segment> track = editorFrame.getTrackData().getSegments();
 		
 		if (track == null)
