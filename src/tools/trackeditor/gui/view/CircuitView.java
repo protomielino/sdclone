@@ -906,16 +906,16 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 		int count = 0;
 		try
 		{
-			Iterator i = editorFrame.getTrackData().getSegments().iterator();
+			Iterator<Segment> i = editorFrame.getTrackData().getSegments().iterator();
 			while (i.hasNext())
 			{
-				Segment obj = (Segment) i.next();
+				Segment obj = i.next();
 
 				if (Class.forName("utils.circuit.Segment").isAssignableFrom(obj.getClass())
 						&& obj.contains(mousePoint.getX(), mousePoint.getY()))
 				{
 					// object found !
-					out = ((Segment) obj);
+					out = obj;
 					currentCount = count;
 				}
 				count++;
