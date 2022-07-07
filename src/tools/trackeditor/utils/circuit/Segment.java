@@ -749,6 +749,238 @@ public class Segment implements Cloneable
         return length;
     }
 
+    public double getValidLeftBarrierWidth(EditorFrame editorFrame)
+    {
+        Segment previous = this;
+        double	value;
+
+        // try to get missing attribute from previous segments first
+        while (previous != null)
+        {
+            value = previous.left.barrierWidth;
+            if (!Double.isNaN(value))
+            {
+                return value;
+            }
+            else
+            {
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getLeft().getBarrierWidth();
+        if (Double.isNaN(value))
+    	{
+            value = SegmentSide.DEFAULT_BARRIER_WIDTH;
+    	}
+
+        return value;
+    }
+
+    public double getValidRightBarrierWidth(EditorFrame editorFrame)
+    {
+    	Segment previous = this;
+        double	value;
+
+    	// try to get missing attribute from previous segments first
+        while (previous != null)
+    	{
+            value = previous.right.barrierWidth;
+            if (!Double.isNaN(value))
+    		{
+                return value;
+    		}
+    		else
+    		{
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getRight().getBarrierWidth();
+        if (Double.isNaN(value))
+    	{
+            value = SegmentSide.DEFAULT_BARRIER_WIDTH;
+    	}
+
+        return value;
+    }
+
+    public double getValidLeftBarrierHeight(EditorFrame editorFrame)
+    {
+        Segment previous = this;
+        double	value;
+
+        // try to get missing attribute from previous segments first
+        while (previous != null)
+        {
+            value = previous.left.barrierHeight;
+            if (!Double.isNaN(value))
+            {
+                return value;
+            }
+            else
+            {
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getLeft().getBarrierHeight();
+        if (Double.isNaN(value))
+    	{
+            value = SegmentSide.DEFAULT_BARRIER_HEIGHT;
+    	}
+
+        return value;
+    }
+
+    public double getValidRightBarrierHeight(EditorFrame editorFrame)
+    {
+    	Segment previous = this;
+        double	value;
+
+    	// try to get missing attribute from previous segments first
+        while (previous != null)
+    	{
+            value = previous.right.barrierHeight;
+            if (!Double.isNaN(value))
+    		{
+                return value;
+    		}
+    		else
+    		{
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getRight().getBarrierHeight();
+        if (Double.isNaN(value))
+    	{
+            value = SegmentSide.DEFAULT_BARRIER_HEIGHT;
+    	}
+
+        return value;
+    }
+
+    public String getValidLeftBarrierSurface(EditorFrame editorFrame)
+    {
+        Segment previous = this;
+        String	value;
+
+        // try to get missing attribute from previous segments first
+        while (previous != null)
+        {
+            value = previous.left.barrierSurface;
+            if (value != null && !value.isEmpty())
+            {
+                return value;
+            }
+            else
+            {
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getLeft().getBarrierSurface();
+        if (value == null || value.isEmpty())
+    	{
+            value = SegmentSide.DEFAULT_BARRIER_SURFACE;
+    	}
+
+        return value;
+    }
+
+    public String getValidRightBarrierSurface(EditorFrame editorFrame)
+    {
+    	Segment previous = this;
+        String	value;
+
+    	// try to get missing attribute from previous segments first
+        while (previous != null)
+    	{
+            value = previous.right.barrierSurface;
+            if (value != null && !value.isEmpty())
+    		{
+                return value;
+    		}
+    		else
+    		{
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getRight().getBarrierSurface();
+        if (value == null || value.isEmpty())
+    	{
+            value = SegmentSide.DEFAULT_BARRIER_SURFACE;
+    	}
+
+        return value;
+    }
+
+    public String getValidLeftBarrierStyle(EditorFrame editorFrame)
+    {
+        Segment previous = this;
+        String	value;
+
+        // try to get missing attribute from previous segments first
+        while (previous != null)
+        {
+            value = previous.left.barrierStyle;
+            if (value != null && !value.isEmpty())
+            {
+                return value;
+            }
+            else
+            {
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getLeft().getBarrierStyle();
+        if (value == null || value.isEmpty())
+    	{
+            value = SegmentSide.DEFAULT_BARRIER_STYLE;
+    	}
+
+        return value;
+    }
+
+    public String getValidRightBarrierStyle(EditorFrame editorFrame)
+    {
+    	Segment previous = this;
+        String	value;
+
+    	// try to get missing attribute from previous segments first
+        while (previous != null)
+    	{
+            value = previous.right.barrierStyle;
+            if (value != null && !value.isEmpty())
+    		{
+                return value;
+    		}
+    		else
+    		{
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getRight().getBarrierStyle();
+        if (value == null || value.isEmpty())
+    	{
+            value = SegmentSide.DEFAULT_BARRIER_STYLE;
+    	}
+
+        return value;
+    }
+
     public double getValidLeftBorderWidth(EditorFrame editorFrame)
     {
         Segment previous = this;
@@ -802,6 +1034,180 @@ public class Segment implements Cloneable
         if (Double.isNaN(value))
     	{
             value = SegmentSide.DEFAULT_BORDER_WIDTH;
+    	}
+
+        return value;
+    }
+
+    public double getValidLeftBorderHeight(EditorFrame editorFrame)
+    {
+        Segment previous = this;
+        double	value;
+
+        // try to get missing attribute from previous segments first
+        while (previous != null)
+        {
+            value = previous.left.borderHeight;
+            if (!Double.isNaN(value))
+            {
+                return value;
+            }
+            else
+            {
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getLeft().getBorderHeight();
+        if (Double.isNaN(value))
+    	{
+            value = SegmentSide.DEFAULT_BORDER_HEIGHT;
+    	}
+
+        return value;
+    }
+
+    public double getValidRightBorderHeight(EditorFrame editorFrame)
+    {
+    	Segment previous = this;
+        double	value;
+
+    	// try to get missing attribute from previous segments first
+        while (previous != null)
+    	{
+            value = previous.right.borderHeight;
+            if (!Double.isNaN(value))
+    		{
+                return value;
+    		}
+    		else
+    		{
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getRight().getBorderHeight();
+        if (Double.isNaN(value))
+    	{
+            value = SegmentSide.DEFAULT_BORDER_HEIGHT;
+    	}
+
+        return value;
+    }
+
+    public String getValidLeftBorderSurface(EditorFrame editorFrame)
+    {
+        Segment previous = this;
+        String	value;
+
+        // try to get missing attribute from previous segments first
+        while (previous != null)
+        {
+            value = previous.left.borderSurface;
+            if (value != null && !value.isEmpty())
+            {
+                return value;
+            }
+            else
+            {
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getLeft().getBorderSurface();
+        if (value == null || value.isEmpty())
+    	{
+            value = SegmentSide.DEFAULT_BORDER_SURFACE;
+    	}
+
+        return value;
+    }
+
+    public String getValidRightBorderSurface(EditorFrame editorFrame)
+    {
+    	Segment previous = this;
+        String	value;
+
+    	// try to get missing attribute from previous segments first
+        while (previous != null)
+    	{
+            value = previous.right.borderSurface;
+            if (value != null && !value.isEmpty())
+    		{
+                return value;
+    		}
+    		else
+    		{
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getRight().getBorderSurface();
+        if (value == null || value.isEmpty())
+    	{
+            value = SegmentSide.DEFAULT_BORDER_SURFACE;
+    	}
+
+        return value;
+    }
+
+    public String getValidLeftBorderStyle(EditorFrame editorFrame)
+    {
+        Segment previous = this;
+        String	value;
+
+        // try to get missing attribute from previous segments first
+        while (previous != null)
+        {
+            value = previous.left.borderStyle;
+            if (value != null && !value.isEmpty())
+            {
+                return value;
+            }
+            else
+            {
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getLeft().getBorderStyle();
+        if (value == null || value.isEmpty())
+    	{
+            value = SegmentSide.DEFAULT_BORDER_STYLE;
+    	}
+
+        return value;
+    }
+
+    public String getValidRightBorderStyle(EditorFrame editorFrame)
+    {
+    	Segment previous = this;
+        String	value;
+
+    	// try to get missing attribute from previous segments first
+        while (previous != null)
+    	{
+            value = previous.right.borderStyle;
+            if (value != null && !value.isEmpty())
+    		{
+                return value;
+    		}
+    		else
+    		{
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getRight().getBorderStyle();
+        if (value == null || value.isEmpty())
+    	{
+            value = SegmentSide.DEFAULT_BORDER_STYLE;
     	}
 
         return value;
@@ -938,7 +1344,123 @@ public class Segment implements Cloneable
 
         return value;
 	}
+    
+    public String getValidLeftSideSurface(EditorFrame editorFrame)
+    {
+        Segment previous = this;
+        String	value;
 
+        // try to get missing attribute from previous segments first
+        while (previous != null)
+        {
+            value = previous.left.sideSurface;
+            if (value != null && !value.isEmpty())
+            {
+                return value;
+            }
+            else
+            {
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getLeft().getSideSurface();
+        if (value == null || value.isEmpty())
+    	{
+            value = SegmentSide.DEFAULT_SIDE_SURFACE;
+    	}
+
+        return value;
+    }
+
+    public String getValidRightSideSurface(EditorFrame editorFrame)
+    {
+    	Segment previous = this;
+        String	value;
+
+    	// try to get missing attribute from previous segments first
+        while (previous != null)
+    	{
+            value = previous.right.sideSurface;
+            if (value != null && !value.isEmpty())
+    		{
+                return value;
+    		}
+    		else
+    		{
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getRight().getSideSurface();
+        if (value == null || value.isEmpty())
+    	{
+            value = SegmentSide.DEFAULT_SIDE_SURFACE;
+    	}
+
+        return value;
+    }
+
+    public String getValidLeftSideBankingType(EditorFrame editorFrame)
+    {
+        Segment previous = this;
+        String	value;
+
+        // try to get missing attribute from previous segments first
+        while (previous != null)
+        {
+            value = previous.left.sideBankingType;
+            if (value != null && !value.isEmpty())
+            {
+                return value;
+            }
+            else
+            {
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getLeft().getSideBankingType();
+        if (value == null || value.isEmpty())
+    	{
+            value = SegmentSide.DEFAULT_SIDE_BANKING_TYPE;
+    	}
+
+        return value;
+    }
+
+    public String getValidRightSideBankingType(EditorFrame editorFrame)
+    {
+    	Segment previous = this;
+        String	value;
+
+    	// try to get missing attribute from previous segments first
+        while (previous != null)
+    	{
+            value = previous.right.sideBankingType;
+            if (value != null && !value.isEmpty())
+    		{
+                return value;
+    		}
+    		else
+    		{
+                previous = previous.previousShape;
+    		}
+    	}
+
+    	// get it from main track when all else fails
+        value = editorFrame.getTrackData().getMainTrack().getRight().getSideBankingType();
+        if (value == null || value.isEmpty())
+    	{
+            value = SegmentSide.DEFAULT_SIDE_BANKING_TYPE;
+    	}
+
+        return value;
+    }
+   
     public void addToPrevious(Segment previous)
     {
         previousShape = previous;

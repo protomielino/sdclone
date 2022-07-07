@@ -35,6 +35,7 @@ public class SegmentSide implements Cloneable
 	public static final double	DEFAULT_SIDE_START_WIDTH	= 4.0;
 	public static final double	DEFAULT_SIDE_END_WIDTH		= 4.0;
 	public static final String	DEFAULT_SIDE_SURFACE		= "grass";
+	public static final String	DEFAULT_SIDE_BANKING_TYPE	= null;
 	public static final double	DEFAULT_BARRIER_HEIGHT		= 1.0;
 	public static final double	DEFAULT_BARRIER_WIDTH		= 0.1;
 	public static final String	DEFAULT_BARRIER_SURFACE		= "barrier";
