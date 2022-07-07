@@ -885,7 +885,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 
 	public void profileChanged()
 	{
-		if (getProfileButton().getSelected().isEmpty())
+		if (getProfileButton().getSelected().isEmpty() || getProfileButton().getSelected() == "none")
 			shape.setProfil("");
 		else
 			shape.setProfil(getProfileButton().getSelected());
