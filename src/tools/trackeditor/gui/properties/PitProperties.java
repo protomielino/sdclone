@@ -78,6 +78,14 @@ public class PitProperties extends PropertyPanel
 	private JComboBox<String>	entrySurfaceComboBox	= null;
 	private JLabel				pitSurfaceLabel			= new JLabel();
 	private JComboBox<String>	pitSurfaceComboBox		= null;
+	private JLabel				pitWallLabel			= new JLabel();
+	private JCheckBox			pitWallCheckBox			= null;
+	private JLabel				pitWallHeightLabel		= new JLabel();
+	private JTextField			pitWallHeightTextField	= new JTextField();
+	private JLabel				pitWallWidthLabel		= new JLabel();
+	private JTextField			pitWallWidthTextField	= new JTextField();
+	private JLabel				pitWallSurfaceLabel		= new JLabel();
+	private JComboBox<String>	pitWallSurfaceComboBox	= null;
 	private JLabel				exitSurfaceLabel		= new JLabel();
 	private JComboBox<String>	exitSurfaceComboBox		= null;
 	private JLabel 				generatePitsLabel 		= new JLabel();
@@ -132,7 +140,11 @@ public class PitProperties extends PropertyPanel
 		addLabel(this, 14, generatePitsLabel, "Generate Pits", 110);
 		addLabel(this, 16, entrySurfaceLabel, "Entry Surface", 110);
 		addLabel(this, 17, pitSurfaceLabel, "Pit Surface", 110);
-		addLabel(this, 18, exitSurfaceLabel, "Exit Surface", 110);
+		addLabel(this, 18, pitWallLabel, "Pit Wall", 110);
+		addLabel(this, 19, pitWallHeightLabel, "Wall Height", 110);
+		addLabel(this, 20, pitWallWidthLabel, "Wall Width", 110);
+		addLabel(this, 21, pitWallSurfaceLabel, "Wall Surface", 110);
+		addLabel(this, 22, exitSurfaceLabel, "Exit Surface", 110);
 
 		add(getStyleComboBox(), null);
 		add(getSideComboBox(), null);
@@ -155,7 +167,11 @@ public class PitProperties extends PropertyPanel
 
 		add(getGeneratePitsCheckBox(), null);
 		add(getEntrySurfaceComboBox(), null);
-		add(getPitSurfaceComboBox(), null);
+		add(getPitSurfaceComboBox(), null);		
+		add(getPitWallCheckBox(), null);
+		addTextField(this, 19, pitWallHeightTextField, null, 120, 100);
+		addTextField(this, 20, pitWallWidthTextField, null, 120, 100);
+		add(getPitWallSurfaceComboBox(), null);
 		add(getExitSurfaceComboBox(), null);
 	}
 	
@@ -272,6 +288,8 @@ public class PitProperties extends PropertyPanel
 						pitSurfaceComboBox.setSelectedItem("road1-pits");
 						exitSurfaceComboBox.setEnabled(true);
 						exitSurfaceComboBox.setSelectedItem("road1");
+						pitWallCheckBox.setEnabled(true);
+						pitWallCheckBox.setSelected(false);
 						generatePits = true;
 					}
 					else
@@ -282,6 +300,14 @@ public class PitProperties extends PropertyPanel
 						pitSurfaceComboBox.setSelectedItem("");
 						exitSurfaceComboBox.setEnabled(false);
 						exitSurfaceComboBox.setSelectedItem("");
+						pitWallCheckBox.setEnabled(false);
+						pitWallCheckBox.setSelected(false);
+						pitWallHeightTextField.setEnabled(false);
+						pitWallHeightTextField.setText(null);
+						pitWallWidthTextField.setEnabled(false);
+						pitWallWidthTextField.setText(null);
+						pitWallSurfaceComboBox.setEnabled(false);
+						pitWallSurfaceComboBox.setSelectedItem("");
 						generatePits = false;
 					}
 				}
@@ -326,6 +352,65 @@ public class PitProperties extends PropertyPanel
 		return pitSurfaceComboBox;
 	}
 
+ 	/**
+	 * This method initializes pitWallCheckBox
+ 	 *
+	 * @return javax.swing.JCheckBox
+ 	 */
+	private JCheckBox getPitWallCheckBox()
+	{
+		if (pitWallCheckBox == null)
+		{
+			pitWallCheckBox = new JCheckBox();
+			pitWallCheckBox.setBounds(120, 496, 20, 20);
+			pitWallCheckBox.setEnabled(false);
+			pitWallCheckBox.setSelected(false);
+			pitWallCheckBox.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					if (pitWallCheckBox.isSelected())
+					{
+						pitWallHeightTextField.setEnabled(true);
+						pitWallHeightTextField.setText("1.0");
+						pitWallWidthTextField.setEnabled(true);
+						pitWallWidthTextField.setText("0.5");
+						pitWallSurfaceComboBox.setEnabled(true);
+						pitWallSurfaceComboBox.setSelectedItem("wall");
+					}
+					else
+					{
+						pitWallHeightTextField.setEnabled(false);
+						pitWallHeightTextField.setText(null);
+						pitWallWidthTextField.setEnabled(false);
+						pitWallWidthTextField.setText(null);
+						pitWallSurfaceComboBox.setEnabled(false);
+						pitWallSurfaceComboBox.setSelectedItem("");
+					}
+				}
+			});
+		}
+		return pitWallCheckBox;
+	}
+	
+	/**
+	 * This method initializes pitWallSurfaceComboBox
+	 *
+	 * @return javax.swing.JComboBox
+	 */
+	private JComboBox<String> getPitWallSurfaceComboBox()
+	{
+		if (pitWallSurfaceComboBox == null)
+		{
+			pitWallSurfaceComboBox = new JComboBox<String>();
+			pitWallSurfaceComboBox.setBounds(120, 577, 180, 23);
+			pitWallSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(sideSurfaceVector));
+			pitWallSurfaceComboBox.setEnabled(false);
+			pitWallSurfaceComboBox.setSelectedItem(null);
+		}
+		return pitWallSurfaceComboBox;
+	}
+
 	/**
 	 * This method initializes exitSurfaceComboBox
 	 *
@@ -336,7 +421,7 @@ public class PitProperties extends PropertyPanel
 		if (exitSurfaceComboBox == null)
 		{
 			exitSurfaceComboBox = new JComboBox<String>();
-			exitSurfaceComboBox.setBounds(120, 496, 180, 23);
+			exitSurfaceComboBox.setBounds(120, 604, 180, 23);
 			exitSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(sideSurfaceVector));
 			exitSurfaceComboBox.setEnabled(false);
 			exitSurfaceComboBox.setSelectedItem(null);
@@ -584,19 +669,19 @@ public class PitProperties extends PropertyPanel
 			nextSegment.getLeft().setBorderHeight(nextSegment.getValidLeftBorderHeight(getEditorFrame()));
 			nextSegment.getLeft().setBorderSurface(nextSegment.getValidLeftBorderSurface(getEditorFrame()));
 			nextSegment.getLeft().setBorderStyle(nextSegment.getValidLeftBorderStyle(getEditorFrame()));
-			
+
 			nextSegment.getLeft().setSideStartWidth(nextSegment.getValidLeftSideStartWidth(getEditorFrame()));
 			nextSegment.getLeft().setSideSurface(nextSegment.getValidLeftSideSurface(getEditorFrame()));
 			nextSegment.getLeft().setSideBankingType(nextSegment.getValidLeftSideBankingType(getEditorFrame()));
-			
+
 			nextSegment.getLeft().setBarrierWidth(nextSegment.getValidLeftBarrierWidth(getEditorFrame()));
 			nextSegment.getLeft().setBarrierHeight(nextSegment.getValidLeftBarrierHeight(getEditorFrame()));
 			nextSegment.getLeft().setBarrierSurface(nextSegment.getValidLeftBarrierSurface(getEditorFrame()));
 			nextSegment.getLeft().setBarrierStyle(nextSegment.getValidLeftBarrierStyle(getEditorFrame()));
-		
+
 			side = pitExit.getLeft();
-			borderWidth = pitExit.getValidLeftBorderWidth(getEditorFrame());
-			sideWidth = pitExit.getValidLeftSideEndWidth(getEditorFrame());
+			borderWidth = nextSegment.getLeft().getBorderWidth();
+			sideWidth = nextSegment.getLeft().getSideStartWidth();
 		}
 		else
 		{
@@ -604,19 +689,19 @@ public class PitProperties extends PropertyPanel
 			nextSegment.getRight().setBorderHeight(nextSegment.getValidRightBorderHeight(getEditorFrame()));
 			nextSegment.getRight().setBorderSurface(nextSegment.getValidRightBorderSurface(getEditorFrame()));
 			nextSegment.getRight().setBorderStyle(nextSegment.getValidRightBorderStyle(getEditorFrame()));
-			
+
 			nextSegment.getRight().setSideStartWidth(nextSegment.getValidRightSideStartWidth(getEditorFrame()));
 			nextSegment.getRight().setSideSurface(nextSegment.getValidRightSideSurface(getEditorFrame()));
 			nextSegment.getRight().setSideBankingType(nextSegment.getValidRightSideBankingType(getEditorFrame()));
-			
+
 			nextSegment.getRight().setBarrierWidth(nextSegment.getValidRightBarrierWidth(getEditorFrame()));
 			nextSegment.getRight().setBarrierHeight(nextSegment.getValidRightBarrierHeight(getEditorFrame()));
 			nextSegment.getRight().setBarrierSurface(nextSegment.getValidRightBarrierSurface(getEditorFrame()));
 			nextSegment.getRight().setBarrierStyle(nextSegment.getValidRightBarrierStyle(getEditorFrame()));
-		
+
 			side = pitExit.getRight();
-			borderWidth = pitExit.getValidRightBorderWidth(getEditorFrame());
-			sideWidth = pitExit.getValidRightSideEndWidth(getEditorFrame());
+			borderWidth = nextSegment.getRight().getBorderWidth();
+			sideWidth = nextSegment.getRight().getSideStartWidth();
 		}
 		side.setBorderHeight(0);
 		side.setBorderWidth(0);
@@ -626,17 +711,48 @@ public class PitProperties extends PropertyPanel
 		side.setBarrierHeight(1);
 		side.setBarrierWidth(0.1);
 
+		Segment previousSegment = pitEntry.getPreviousShape();
+		if (previousSegment == null)
+			previousSegment = data.get(data.size() - 1);			
 		if (pits.getSide().equals("left"))
 		{
+			previousSegment.getLeft().setBorderWidth(previousSegment.getValidLeftBorderWidth(getEditorFrame()));
+			previousSegment.getLeft().setBorderHeight(previousSegment.getValidLeftBorderHeight(getEditorFrame()));
+			previousSegment.getLeft().setBorderSurface(previousSegment.getValidLeftBorderSurface(getEditorFrame()));
+			previousSegment.getLeft().setBorderStyle(previousSegment.getValidLeftBorderStyle(getEditorFrame()));
+
+			previousSegment.getLeft().setSideStartWidth(previousSegment.getValidLeftSideStartWidth(getEditorFrame()));
+			previousSegment.getLeft().setSideSurface(previousSegment.getValidLeftSideSurface(getEditorFrame()));
+			previousSegment.getLeft().setSideBankingType(previousSegment.getValidLeftSideBankingType(getEditorFrame()));
+
+			previousSegment.getLeft().setBarrierWidth(previousSegment.getValidLeftBarrierWidth(getEditorFrame()));
+			previousSegment.getLeft().setBarrierHeight(previousSegment.getValidLeftBarrierHeight(getEditorFrame()));
+			previousSegment.getLeft().setBarrierSurface(previousSegment.getValidLeftBarrierSurface(getEditorFrame()));
+			previousSegment.getLeft().setBarrierStyle(previousSegment.getValidLeftBarrierStyle(getEditorFrame()));
+
 			side = pitEntry.getLeft();
-			borderWidth = pitEntry.getValidLeftBorderWidth(getEditorFrame());
-			sideWidth = pitEntry.getValidLeftSideStartWidth(getEditorFrame());
+			borderWidth = previousSegment.getLeft().getBorderWidth();
+			sideWidth = previousSegment.getLeft().getSideStartWidth();
 		}
 		else
 		{
+			previousSegment.getRight().setBorderWidth(previousSegment.getValidRightBorderWidth(getEditorFrame()));
+			previousSegment.getRight().setBorderHeight(previousSegment.getValidRightBorderHeight(getEditorFrame()));
+			previousSegment.getRight().setBorderSurface(previousSegment.getValidRightBorderSurface(getEditorFrame()));
+			previousSegment.getRight().setBorderStyle(previousSegment.getValidRightBorderStyle(getEditorFrame()));
+
+			previousSegment.getRight().setSideStartWidth(previousSegment.getValidRightSideStartWidth(getEditorFrame()));
+			previousSegment.getRight().setSideSurface(previousSegment.getValidRightSideSurface(getEditorFrame()));
+			previousSegment.getRight().setSideBankingType(previousSegment.getValidRightSideBankingType(getEditorFrame()));
+
+			previousSegment.getRight().setBarrierWidth(previousSegment.getValidRightBarrierWidth(getEditorFrame()));
+			previousSegment.getRight().setBarrierHeight(previousSegment.getValidRightBarrierHeight(getEditorFrame()));
+			previousSegment.getRight().setBarrierSurface(previousSegment.getValidRightBarrierSurface(getEditorFrame()));
+			previousSegment.getRight().setBarrierStyle(previousSegment.getValidRightBarrierStyle(getEditorFrame()));
+
 			side = pitEntry.getRight();
-			borderWidth = pitEntry.getValidRightBorderWidth(getEditorFrame());
-			sideWidth = pitEntry.getValidRightSideStartWidth(getEditorFrame());
+			borderWidth = previousSegment.getRight().getBorderWidth();
+			sideWidth = previousSegment.getRight().getSideStartWidth();
 		}
 		side.setBorderHeight(0);
 		side.setBorderWidth(0);
@@ -665,10 +781,24 @@ public class PitProperties extends PropertyPanel
 			{
 				side = ((Segment) data.get(index)).getRight();
 			}
-			side.setBorderHeight(1);
-			side.setBorderWidth(0.1);
-			side.setSideStartWidth(pits.getWidth()*3);
-			side.setSideEndWidth(pits.getWidth()*3);
+			double width = pits.getWidth()*3;
+			if (pitWallCheckBox.isSelected())
+			{
+				side.setBorderHeight(getDouble(pitWallHeightTextField.getText()));
+				side.setBorderWidth(getDouble(pitWallWidthTextField.getText()));
+				side.setBorderSurface(pitWallSurfaceComboBox.getSelectedItem().toString());
+				side.setBorderStyle("wall");
+				width -= side.getBorderWidth();
+			}
+			else
+			{
+				side.setBorderHeight(0);
+				side.setBorderWidth(0);
+				side.setBorderSurface(null);
+				side.setBorderStyle(null);
+			}
+			side.setSideStartWidth(width);
+			side.setSideEndWidth(width);
 			side.setSideSurface(pitSurfaceComboBox.getSelectedItem().toString());
 			side.setBarrierHeight(1);
 			side.setBarrierWidth(0.1);
