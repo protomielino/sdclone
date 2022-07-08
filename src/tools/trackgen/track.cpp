@@ -41,36 +41,36 @@
 
 #include "trackgen.h"
 
-typedef struct texElt
+struct tTexElt
 {
-    char		*name;
-    char		*namebump;
-    char		* nameraceline;
-    int         mipmap; // Not yet used.
-    unsigned int	texid;
-    struct texElt	*next;
-} tTexElt;
+    char            *name;
+    char            *namebump;
+    char            *nameraceline;
+    int             mipmap; // Not yet used.
+    unsigned int    texid;
+    tTexElt         *next;
+};
 
-typedef struct dispElt
+struct tDispElt
 {
-    int			start;
-    int			nb;
-    int			surfType;
-    char		*name;
-    int			id;
-    tTexElt		*texture;
-    struct dispElt	*next;
-} tDispElt;
+    int         start;
+    int         nb;
+    int         surfType;
+    char        *name;
+    int         id;
+    tTexElt     *texture;
+    tDispElt    *next;
+};
 
-typedef struct group
+struct tGroup
 {
-    int		nb;
-    tDispElt	*dispList;
-} tGroup;
+    int         nb;
+    tDispElt    *dispList;
+};
 
-static tGroup		*Groups;
-static int		ActiveGroups;
-static int		GroupNb;
+static tGroup   *Groups;
+static int      ActiveGroups;
+static int      GroupNb;
 
 #define LMAX TrackStep
 
