@@ -186,7 +186,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
     tdble	x, y, z;
     tdble	al, alfl;
     tdble	x1, x2, y1, y2;
-    tdble	w, sw, ew, bw;
+    tdble	sw, ew, bw;
     tdble	minWidth;
     tdble	maxWidth;
     int		type;
@@ -207,9 +207,13 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
     if (curStep == 0) {
         /* Side parameters */
         snprintf(path2, sizeof(path2), "%s/%s", path, SectSide[side]);
-        sw = GfParmGetNum(TrackHandle, path2, TRK_ATT_SWIDTH, (char*)NULL, sideEndWidth[side]);
-        w = GfParmGetNum(TrackHandle, path2, TRK_ATT_WIDTH, (char*)NULL, sw);
-        ew = GfParmGetNum(TrackHandle, path2, TRK_ATT_EWIDTH, (char*)NULL, w);
+        // use TRK_ATT_WIDTH if it exists
+        if (GfParmExistsParam(TrackHandle, path2, TRK_ATT_WIDTH)) {
+            sw = ew = GfParmGetNum(TrackHandle, path2, TRK_ATT_WIDTH, (char *)NULL, 0.0);
+        } else {
+            sw = GfParmGetNum(TrackHandle, path2, TRK_ATT_SWIDTH, (char *)NULL, sideEndWidth[side]);
+            ew = GfParmGetNum(TrackHandle, path2, TRK_ATT_EWIDTH, (char *)NULL, sw);
+        }
         sideStartWidth[side] = sw;
         sideEndWidth[side] = ew;
         sideMaterial[side] = GfParmGetStr(TrackHandle, path2, TRK_ATT_SURF, sideMaterial[side]);
