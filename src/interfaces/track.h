@@ -309,12 +309,19 @@ typedef struct trackSurface
 
 } tTrackSurface;
 
-
+enum tSegStyle
+{
+    TR_PLAN        = 0,      /**< Flat (border only) */
+    TR_CURB        = 1,      /**< Curb (border only) */
+    TR_WALL        = 2,      /**< Wall (border and barrier) */
+    TR_FENCE       = 3,      /**< Fence (no width) (barrier only) */
+    TR_PITBUILDING = 4       /**< Pit building wall (barrier only) */
+};
 
 /** Barrier */
 typedef struct trackBarrier
 {
-    int			style;          /**< Barrier style */
+    tSegStyle	style;          /**< Barrier style */
     tdble		width;          /**< Barrier width */
     tdble		height;         /**< Barrier height */
     tTrackSurface	*surface;   /**< Barrier surface */
@@ -330,45 +337,48 @@ typedef struct trackBarrier
     The reference angle is the orientation of the first segment of the track.
     @ingroup trackstruct
 */
+enum tSegType
+{
+    TR_RGT = 1,          /**< Right curve */
+    TR_LFT = 2,          /**< Left curve */
+    TR_STR = 3           /**< Straight */
+};
+
+enum tSegType2
+{
+    TR_MAIN    = 1,          /**< Main track segment (ie road part) */
+    TR_LSIDE   = 2,          /**< Left side segment (outer segment) */
+    TR_RSIDE   = 3,          /**< Right side segment (outer segment) */
+    TR_LBORDER = 4,          /**< Left border segment (inner segment) */
+    TR_RBORDER = 5           /**< Right border segment (inner segment) */
+};
+
 typedef struct trackSeg
 {
     char *name;                 /**< Segment name */
     int	id;                     /**< Segment number */
 
-    int type;                   /**< Geometrical type:
+    tSegType type;              /**< Geometrical type:
                                         - TR_RGT
                                         - TR_LFT
                                         - TR_STR
                                 */
-#define TR_RGT	    1           /**< Right curve */
-#define TR_LFT	    2           /**< Left curve */
-#define TR_STR	    3           /**< Straight */
 
-    int type2;                  /**< Position type:
+    tSegType2 type2;            /**< Position type:
                                         - TR_MAIN
                                         - TR_LSIDE
                                         - TR_RSIDE
                                         - TR_LBORDER
                                         - TR_RBORDER
                                 */
-#define TR_MAIN	    1           /**< Main track segment (ie road part) */
-#define TR_LSIDE    2           /**< Left side segment (outer segment) */
-#define TR_RSIDE    3           /**< Right side segment (outer segment) */
-#define TR_LBORDER  4           /**< Left border segment (inner segment) */
-#define TR_RBORDER  5           /**< Right border segment (inner segment) */
 
-    int style;                  /**< Border and barrier segments style:
+    tSegStyle style;            /**< Border and barrier segments style:
                                         - TR_PLAN
                                         - TR_CURB
                                         - TR_WALL
                                         - TR_FENCE
                                         - TR_PITBUILDING
                                 */
-#define TR_PLAN		0           /**< Flat (border only) */
-#define TR_CURB		1           /**< Curb (border only) */
-#define TR_WALL		2           /**< Wall (barrier only) */
-#define TR_FENCE	3           /**< Fence (no width) (barrier only) */
-#define TR_PITBUILDING	4       /**< Pit building wall (barrier only) */
 
     tdble length;               /**< Length in meters of the middle of the track */
     tdble width;                /**< Width of the segment (if constant width) */

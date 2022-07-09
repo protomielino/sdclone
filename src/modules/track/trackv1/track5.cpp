@@ -66,13 +66,13 @@ static tdble DoVfactor=1.0;
 
 static tdble borderWidth[2];
 static tdble borderHeight[2];
-static int borderStyle[2];
+static tSegStyle borderStyle[2];
 static const char *borderMaterial[2];
 static tTrackSurface *borderSurface[2];
 
 static tdble barrierWidth[2];
 static tdble barrierHeight[2];
-static int barrierStyle[2];
+static tSegStyle barrierStyle[2];
 static const char *barrierMaterial[2];
 static tTrackSurface *barrierSurface[2];
 
