@@ -57,6 +57,7 @@ void Pit::init(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentr
     avgwearpermeter = 0.0;
     lastpitfuel = 0.0;
     lastfuel = 0.0;
+    penalty = 0;
 
 
     // Get teammates car
@@ -82,6 +83,10 @@ void Pit::init(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentr
         p[1].x = pitinfo->pitStart->lgfromstart - pitinfo->len;
         p[5].x = pitinfo->pitEnd->lgfromstart + pitinfo->pitEnd->length + pitinfo->len;
         p[6].x = pitinfo->pitExit->lgfromstart + pitinfo->pitExit->length;
+        p2[0].x = p[0].x;
+        p2[1].x = p[1].x;
+        p2[2].x = p[5].x;
+        p2[3].x = p[6].x;
         pitentry = p[0].x;
         pitexit = p[6].x;
         limitentry = p[1].x;
@@ -94,20 +99,34 @@ void Pit::init(PTrack t, PSituation s, PtCarElt c, int pitdamage, double pitentr
             p[i].x = toSplineCoord(p[i].x);
         }
 
+        for (int i = 0; i < DTPOINTS; i++)
+        {
+            p2[i].s = 0.0;
+            p2[i].x = toSplineCoord(p2[i].x);
+        }
+
         if (p[1].x > p[2].x) p[1].x = p[2].x;
         if (p[4].x > p[5].x) p[5].x = p[4].x;
         double sign = (pitinfo->side == TR_LFT) ? 1.0 : -1.0;
         p[0].y = sign * (track->width / 2.0 - 2.0);
         p[6].y = sign * (track->width / 2.0 - 2.0);
+        p2[0].y = p[0].y;
+        p2[3].y = p[6].y;
 
         for (int i = 1; i < NPOINTS - 1; i++)
         {
-            p[i].y = fabs(pitinfo->driversPits->pos.toMiddle) - pitinfo->width - 1.0;
+            p[i].y = fabs(pitinfo->driversPits->pos.toMiddle) - 0.3 * pitinfo->width - 2.4;
             p[i].y *= sign;
+        }
+
+        for (int i = 1; i < DTPOINTS - 1; i++)
+        {
+            p2[i].y = sign * (fabs(pitinfo->driversPits->pos.toMiddle) - 0.3 * pitinfo->width - 2.3);
         }
 
         p[3].y = fabs(pitinfo->driversPits->pos.toMiddle) * sign;
         spline.newSpline(NPOINTS, p);
+        spline2.newSpline(DTPOINTS, p2);
     }
 }
 
@@ -128,12 +147,19 @@ double Pit::getPitOffset(double fromstart)
 {
     if (mypit != NULL)
     {
-        if (getInPit() || (getPitstop() && isBetween(fromstart)))
+        if (getInPit() || ((getPitstop() || penalty == RM_PENALTY_DRIVETHROUGH) && isBetween(fromstart)))
         {
             fromstart = toSplineCoord(fromstart);
-            return spline.evaluate(fromstart);
+            if (penalty == RM_PENALTY_DRIVETHROUGH)
+            {
+                return spline2.evaluate(fromstart);
+            }
+            else
+            {
+                return spline.evaluate(fromstart);
+            }
         }
-        else if (getPitstop() && isBetween(fromstart + ENTRY_MARGIN))
+        else if ((getPitstop() || penalty == RM_PENALTY_DRIVETHROUGH) && isBetween(fromstart + ENTRY_MARGIN))
         {
             return p[0].y;
         }
@@ -245,6 +271,8 @@ void Pit::update(double fromstart)
             setInPit(false);
         }
 
+        penalty = 0; // fuel, damage and tires served before penalty
+
         // fuel update
         int id = car->_trkPos.seg->id;
         if (id >= 0 && id <= 5 && !fuelchecked)
@@ -311,6 +339,11 @@ void Pit::update(double fromstart)
 
             if(tyreTreadDepth() < 20.0)
                 setPitstop(true);
+
+            if (pitForPenalty())
+            {
+                setPitstop(true);
+            }
         }
     }
 }
@@ -422,12 +455,42 @@ double Pit::tyreTreadDepth()
     return MIN(tyreTreadDepthFront(), tyreTreadDepthRear());
 }
 
+bool Pit::pitForPenalty()
+{
+    // Do we need to serve a penalty
+    tCarPenalty *Penalty = GF_TAILQ_FIRST(&(car->_penaltyList));
+
+    if (Penalty)
+    {
+        if (Penalty->penalty == RM_PENALTY_DRIVETHROUGH || Penalty->penalty == RM_PENALTY_STOPANDGO)
+        {
+            // Rudimentary strategy here - always serving the penalty straightaway.
+            // there's almost certainly more clever ways of doing this, as there's
+            // five laps after the penalty in which to serve it before the car is
+            // eliminated.
+            penalty = Penalty->penalty;
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 // callback from driver
 void Pit::pitCommand()
 {
-    car->_pitRepair = getRepair();
-    lastpitfuel = getFuel();
-    car->_pitFuel = (tdble) lastpitfuel;
-    car->pitcmd.tireChange	= tyreTreadDepth() > 10.0 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
-    setPitstop(false);
+    if (penalty == RM_PENALTY_STOPANDGO)
+    {
+        // No repairs or fuel as we're serving a penalty
+        car->pitcmd.stopType = RM_PIT_STOPANDGO;
+    }
+    else
+    {
+        car->_pitRepair = getRepair();
+        lastpitfuel = getFuel();
+        car->_pitFuel = (tdble) lastpitfuel;
+        car->pitcmd.tireChange	= tyreTreadDepth() > 10.0 ? tCarPitCmd::ALL : tCarPitCmd::NONE;
+        setPitstop(false);
+    }
 }

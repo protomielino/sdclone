@@ -51,13 +51,13 @@ double Spline::evaluate(double z)
     } while ((a + 1) != b);
 
     i = a;
-    h = mSpl[i+1].x - mSpl[i].x;
+    h = mSpl[i + 1].x - mSpl[i].x;
     t = (z-mSpl[i].x) / h;
     a0 = mSpl[i].y;
-    a1 = mSpl[i+1].y - a0;
-    a2 = a1 - h*mSpl[i].s;
-    a3 = h * mSpl[i+1].s - a1;
+    a1 = mSpl[i + 1].y - a0;
+    a2 = a1 - h * mSpl[i].s;
+    a3 = h * mSpl[i + 1].s - a1;
     a3 -= a2;
 
-    return a0 + (a1 + (a2 + a3*t) * (t-1))*t;
+    return a0 + (a1 + (a2 + a3 * t) * (t - 1)) * t;
 }

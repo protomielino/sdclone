@@ -30,12 +30,12 @@
 
 #include "spline.h"
 
-#define NPOINTS 7
+#define NPOINTS  7
+#define DTPOINTS 4 // drive through
 
 // The "DANDROID" logger instance.
 extern GfLogger* PLogDANDROID;
 #define LogDANDROID (*PLogDANDROID)
-
 
 class Pit
 {
@@ -50,6 +50,7 @@ public:
     double getPitOffset(double fromstart);
     bool   isBetween(double fromstart);
     bool   isPitlimit(double fromstart);
+    bool   pitForPenalty();
     double getPitEntry() { return pitentry; }
     double getLimitEntry() { return limitentry; }
     double getLimitExit() { return limitexit; }
@@ -81,6 +82,9 @@ public:
     tTrackPitInfo* pitinfo;          /* general pit info */
     SplinePoint    p[NPOINTS];       /* spline points */
     Spline         spline;           /* spline */
+    SplinePoint    p2[DTPOINTS];
+    Spline         spline2;
+    int            penalty;
     bool           pitstop;          /* pitstop planned */
     bool           inpitlane;        /* we are still in the pit lane */
     double         mFromStart;
