@@ -538,11 +538,8 @@ public class EditorFrame extends JFrame
 		this.setTitle(title);
 		Image image = new ImageIcon(getClass().getResource("/icon.png")).getImage();
 		this.setIconImage(image);
-		setSize(new Dimension(800, 600));
-		Point p = new Point();
-		p.x = getProject().getFrameX();
-		p.y = getProject().getFrameY();
-		this.setLocation(p);
+		setSize(new Dimension(preferences.getInt("Width", 800), preferences.getInt("Height", 600)));
+		setLocation(new Point(preferences.getInt("X", 0), preferences.getInt("Y", 0)));
 		menuFile.setText("File");
 		itemCloseCircuit.setText("Exit");
 		itemCloseCircuit.addActionListener(new ActionListener()
@@ -2081,6 +2078,12 @@ public class EditorFrame extends JFrame
 	{
 		getProject().setFrameX(this.getX());
 		getProject().setFrameY(this.getY());
+		
+		preferences.putInt("X", this.getX());
+		preferences.putInt("Y", this.getY());
+		preferences.putInt("Width", this.getWidth());
+		preferences.putInt("Height", this.getHeight());
+
 		System.exit(0);
 	}
 
