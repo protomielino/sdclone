@@ -22,6 +22,8 @@ package gui.properties;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -38,7 +40,7 @@ import utils.Editor;
  */
 public class PropertiesDialog extends JDialog
 {
-	private EditorFrame				frame;
+	private EditorFrame				editorFrame;
 	public static boolean			APPROVE					= false;
 	private JTabbedPane				tabbedPane				= null;
 	private GeneralProperties		generalProperties		= null;
@@ -63,10 +65,10 @@ public class PropertiesDialog extends JDialog
 	/**
 	 *
 	 */
-	public PropertiesDialog(EditorFrame frame)
+	public PropertiesDialog(EditorFrame editorFrame)
 	{
 		super();
-		this.frame = frame;
+		this.editorFrame = editorFrame;
 		initialize();
 	}
 	/**
@@ -78,11 +80,14 @@ public class PropertiesDialog extends JDialog
 	{
 		this.setContentPane(getPane());
 		this.setSize(500, 780);
+		Point p = editorFrame.getLocation();
+		p.x = editorFrame.getProject().getPropertiesEditorX();
+		p.y = editorFrame.getProject().getPropertiesEditorY();
+		this.setLocation(p);
 		this.setModal(true);
 		this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		this.setResizable(false);
 		this.setTitle("Properties");
-//		this.getPane().setSize(447, 531);
 	}
 	/**
 	 * This method initializes tabbedPane
@@ -121,7 +126,7 @@ public class PropertiesDialog extends JDialog
 	{
 		if (generalProperties == null)
 		{
-			generalProperties = new GeneralProperties(frame);
+			generalProperties = new GeneralProperties(editorFrame);
 		}
 		return generalProperties;
 	}
@@ -210,7 +215,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private TrackProperties getTrackProperties() {
 		if (trackProperties == null) {
-			trackProperties = new TrackProperties(frame);
+			trackProperties = new TrackProperties(editorFrame);
 		}
 		return trackProperties;
 	}
@@ -221,7 +226,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private PitProperties getPitProperties() {
 		if (pitProperties == null) {
-			pitProperties = new PitProperties(frame);
+			pitProperties = new PitProperties(editorFrame);
 		}
 		return pitProperties;
 	}
@@ -232,7 +237,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private ImageProperties getImageProperties() {
 		if (imageProperties == null) {
-			imageProperties = new ImageProperties(frame);
+			imageProperties = new ImageProperties(editorFrame);
 		}
 		return imageProperties;
 	}
@@ -243,7 +248,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private TurnMarksProperties getTurnMarksProperties() {
 		if (turnMarksProperties == null) {
-			turnMarksProperties = new TurnMarksProperties(frame);
+			turnMarksProperties = new TurnMarksProperties(editorFrame);
 		}
 		return turnMarksProperties;
 	}
@@ -254,7 +259,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private TerrainProperties getTerrainProperties() {
 		if (terrainProperties == null) {
-			terrainProperties = new TerrainProperties(frame);
+			terrainProperties = new TerrainProperties(editorFrame);
 		}
 		return terrainProperties;
 	}
@@ -265,7 +270,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private LocalInfoProperties getLocalInfoProperties() {
 		if (localInfoProperties == null) {
-			localInfoProperties = new LocalInfoProperties(frame);
+			localInfoProperties = new LocalInfoProperties(editorFrame);
 		}
 		return localInfoProperties;
 	}
@@ -276,7 +281,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private StartingGridProperties getStartingGridProperties() {
 		if (startingGridProperties == null) {
-			startingGridProperties = new StartingGridProperties(frame);
+			startingGridProperties = new StartingGridProperties(editorFrame);
 		}
 		return startingGridProperties;
 	}
@@ -287,7 +292,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private GraphicProperties getGraphicProperties() {
 		if (graphicProperties == null) {
-			graphicProperties = new GraphicProperties(frame);
+			graphicProperties = new GraphicProperties(editorFrame);
 		}
 		return graphicProperties;
 	}
@@ -298,7 +303,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private EnvMapProperties getEnvMapProperties() {
 		if (envMapProperties == null) {
-			envMapProperties = new EnvMapProperties(frame);
+			envMapProperties = new EnvMapProperties(editorFrame);
 		}
 		return envMapProperties;
 	}
@@ -310,7 +315,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private SurfaceProperties getSurfaceProperties() {
 		if (surfaceProperties == null) {
-			surfaceProperties = new SurfaceProperties(frame);
+			surfaceProperties = new SurfaceProperties(editorFrame);
 		}
 		return surfaceProperties;
 	}
@@ -322,7 +327,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private ObjectProperties getObjectProperties() {
 		if (objectProperties == null) {
-			objectProperties = new ObjectProperties(frame);
+			objectProperties = new ObjectProperties(editorFrame);
 		}
 		return objectProperties;
 	}
@@ -334,7 +339,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private CameraProperties getCameraProperties() {
 		if (cameraProperties == null) {
-			cameraProperties = new CameraProperties(frame);
+			cameraProperties = new CameraProperties(editorFrame);
 		}
 		return cameraProperties;
 	}
@@ -346,9 +351,21 @@ public class PropertiesDialog extends JDialog
 	 */
 	private TrackLightProperties getTrackLightProperties() {
 		if (trackLightProperties == null) {
-			trackLightProperties = new TrackLightProperties(frame);
+			trackLightProperties = new TrackLightProperties(editorFrame);
 		}
 		return trackLightProperties;
+	}
+
+	//	 Exit when window close
+
+	protected void processWindowEvent(WindowEvent e)
+	{
+		super.processWindowEvent(e);
+		if (e.getID() == WindowEvent.WINDOW_CLOSING)
+		{
+			editorFrame.getProject().setPropertiesEditorX(this.getX());
+			editorFrame.getProject().setPropertiesEditorY(this.getY());
+		}
 	}
 
 	/**
@@ -380,6 +397,8 @@ public class PropertiesDialog extends JDialog
 	 */
 	protected void cancel()
 	{
+		editorFrame.getProject().setPropertiesEditorX(this.getX());
+		editorFrame.getProject().setPropertiesEditorY(this.getY());
 		this.dispose();
 	}
 } //  @jve:decl-index=0:visual-constraint="6,6"

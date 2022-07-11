@@ -32,6 +32,8 @@ public class Project
 	private int frameY = 0;
 	private int segmentEditorX =0;
 	private int segmentEditorY =0;
+	private int propertiesEditorX =0;
+	private int propertiesEditorY =0;
 	
 	public Project()
 	{
@@ -93,5 +95,25 @@ public class Project
 	public void setSegmentEditorY(int segmentEditorY)
 	{
 		this.segmentEditorY = segmentEditorY;
+	}
+
+	public int getPropertiesEditorX()
+	{
+		return propertiesEditorX;
+	}
+
+	public void setPropertiesEditorX(int propertiesEditorX)
+	{
+		this.propertiesEditorX = propertiesEditorX;
+	}
+
+	public int getPropertiesEditorY()
+	{
+		return propertiesEditorY;
+	}
+
+	public void setPropertiesEditorY(int propertiesEditorY)
+	{
+		this.propertiesEditorY = propertiesEditorY;
 	}
 }

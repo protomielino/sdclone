@@ -620,6 +620,8 @@ public class EditorFrame extends JFrame
 		
 		getProject().setSegmentEditorX(preferences.getInt("SegmentEditorX", 0));
 		getProject().setSegmentEditorY(preferences.getInt("SegmentEditorY", 0));
+		getProject().setPropertiesEditorX(preferences.getInt("PropertiesEditorX", 0));
+		getProject().setPropertiesEditorY(preferences.getInt("PropertiesEditorY", 0));
 	}
 
 	/**
@@ -2088,6 +2090,8 @@ public class EditorFrame extends JFrame
 		preferences.putInt("Height", this.getHeight());
 		preferences.putInt("SegmentEditorX", getProject().getSegmentEditorX());
 		preferences.putInt("SegmentEditorY", getProject().getSegmentEditorY());
+		preferences.putInt("PropertiesEditorX", getProject().getPropertiesEditorX());
+		preferences.putInt("PropertiesEditorY", getProject().getPropertiesEditorY());
 
 		System.exit(0);
 	}
