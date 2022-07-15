@@ -3,7 +3,7 @@
 #
 #    file                 : CMakeLists.txt
 #    created              : Aug 5 2015
-#    copyright            : (C) 2015-2020 Joe Thompson
+#    copyright            : (C) 2015-2022 Joe Thompson
 #    email                : beaglejoe@users.sourceforge.net
 #    version              : $Id$
 #
@@ -324,18 +324,18 @@ else(OPTION_VORBIS)
 endif(OPTION_VORBIS)
 
 if(OPTION_SDL2_MIXER)
-   set(SDL2_MIXER_ARGS ${EXTERNALS_CMAKE_ARGS} -DSUPPORT_OGG=True )
+   set(SDL2_MIXER_ARGS ${EXTERNALS_CMAKE_ARGS} -DSDL2MIXER_DEBUG_POSTFIX:STRING=''
+                                               -DSDL2MIXER_VENDORED:BOOL=OFF
+                                               -DSDL2MIXER_SAMPLES:BOOL=OFF
+                                               -DSDL2MIXER_OPUS:BOOL=OFF 
+                                               -DSDL2MIXER_FLAC:BOOL=OFF
+                                               -DSDL2MIXER_MOD:BOOL=OFF
+                                               -DSDL2MIXER_MIDI_FLUIDSYNTH:BOOL=OFF)
    ExternalProject_Add(${SDL2_MIXER_PROJECT}
       URL ${SDL2_MIXER_URL}
       URL_HASH ${SDL2_MIXER_HASH}
       CMAKE_ARGS ${SDL2_MIXER_ARGS}
       DEPENDS ${SDL2_PROJECT} ${VORBIS_PROJECT} ${OGG_PROJECT} )
-      ExternalProject_Add_Step(${SDL2_MIXER_PROJECT} sdlmixer_add_cmake
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${CMAKE_SOURCE_DIR}/patches/${SDL2_MIXER_PROJECT}.CMakeLists.txt"
-              "<SOURCE_DIR>/CMakeLists.txt"
-      DEPENDEES update # do after update
-      DEPENDERS patch)  # do before patch
 else(OPTION_SDL2_MIXER)
    set(SDL2_MIXER_PROJECT )
 endif(OPTION_SDL2_MIXER)
