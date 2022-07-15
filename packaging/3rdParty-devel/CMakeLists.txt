@@ -68,6 +68,12 @@ if(CMAKE_SYSTEM_VERSION)
    list(APPEND EXTERNALS_CMAKE_ARGS "-DCMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}")
 endif(CMAKE_SYSTEM_VERSION)
 
+# CMake's built-in FindCURL.cmake module doesn't set CURL_INCLUDE_DIR and CURL_LIBRARIES
+# if it finds CURLConfig.cmake it just returns after setting CURL_FOUND and CURL_DIR
+if(NOT ${CMAKE_VERSION} VERSION_LESS "3.17.0")
+   list(APPEND EXTERNALS_CMAKE_ARGS -DCURL_NO_CURL_CMAKE=ON)
+endif(NOT ${CMAKE_VERSION} VERSION_LESS "3.17.0")
+
 if(WIN32)
    set(_max_ext_path "64")
    string(LENGTH ${EXTERNALS_PREFIX} _path_length)
@@ -485,12 +491,6 @@ if(OPTION_OSG)
                                         -DBUILD_OSG_PLUGIN_PNG=ON
                                         -DBUILD_OSG_PLUGIN_RGB=ON
                                         -DBUILD_OSG_PLUGIN_SHADOW=ON )
-
-   message(STATUS "Remove the block below when curl fixes their CURLConfig.cmake or OSG fixes it")
-   if(NOT ${CMAKE_VERSION} VERSION_LESS "3.17.0")
-      list(APPEND OSG_ARGS -DCURL_NO_CURL_CMAKE=ON)
-   endif(NOT ${CMAKE_VERSION} VERSION_LESS "3.17.0")
-   #message(STATUS "OSG_ARGS = ${OSG_ARGS}")
 
    ExternalProject_Add(${OSG_PROJECT}
       URL ${OSG_URL}
