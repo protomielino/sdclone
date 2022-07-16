@@ -177,14 +177,14 @@ Section -Cars
   SetOutPath "$INSTDIR\data\cars\models\mp1-cavallo-f2005"
   File /r "${BUILD_INST_DIR}\data\cars\models\mp1-cavallo-f2005\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\models\mp1-conner-mp420"
-  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-conner-mp420\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\mp1-sector-mp420"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-sector-mp420\*.*"
 
   SetOutPath "$INSTDIR\data\cars\models\mp1-diamond-r25"
   File /r "${BUILD_INST_DIR}\data\cars\models\mp1-diamond-r25\*.*"
 
-  SetOutPath "$INSTDIR\data\cars\models\mp1-glass-fw27"
-  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-glass-fw27\*.*"
+  SetOutPath "$INSTDIR\data\cars\models\mp1-bavaria-fw27"
+  File /r "${BUILD_INST_DIR}\data\cars\models\mp1-bavaria-fw27\*.*"
 
   SetOutPath "$INSTDIR\data\cars\models\mp1-kuala-c24"
   File /r "${BUILD_INST_DIR}\data\cars\models\mp1-kuala-c24\*.*"
