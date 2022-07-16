@@ -174,7 +174,7 @@
 #  define SD_BUILD_INFO_COMPILER_NAME "GCC"
 # endif
 #else
-# define SD_BUILD_INFO_COMPILER_NAME "Unkown"
+# define SD_BUILD_INFO_COMPILER_NAME "Unknown"
 #endif
 
 /* Run-time directories */
