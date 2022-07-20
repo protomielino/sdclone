@@ -13,7 +13,7 @@ SET(INTERNAL_NAME "speed-dreams")
 
 SET(CPACK_PACKAGE_NAME "Speed Dreams")
 SET(CPACK_PACKAGE_VENDOR "The Speed Dreams team")
-SET(CPACK_PACKAGE_CONTACT "http:\\\\\\\\www.speed-dreams.org")
+SET(CPACK_PACKAGE_CONTACT "https://www.speed-dreams.org")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Speed Dreams (an Open Motorsport Sim) is a racing simulation that allows you to drive in races against opponents simulated by the computer ; it is GPL 2+ and has been forked from TORCS in late 2008")
 SET(CPACK_RESOURCE_FILE_LICENSE "${SOURCE_DIR}/COPYING.txt")
 SET(CPACK_RESOURCE_FILE_README "${SOURCE_DIR}/README.txt")
@@ -120,7 +120,7 @@ IF(WIN32)
     Set(CPACK_NSIS_INSTALLED_ICON_NAME "${EXECUTABLE_PATHNAME}")
 
     # Executable to (optionally) run after install
-    SET(CPACK_NSIS_MUI_FINISHPAGE_RUN "${EXECUTABLE_PATHNAME}")
+    SET(CPACK_NSIS_MUI_FINISHPAGE_RUN "${EXECUTABLE_NAME}")
 
     SET(CPACK_NSIS_URL_INFO_ABOUT "${CPACK_PACKAGE_CONTACT}")
     SET(CPACK_NSIS_HELP_LINK "${CPACK_PACKAGE_CONTACT}")
