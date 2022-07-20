@@ -107,9 +107,16 @@ IF(WIN32)
     SET(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\icons\\\\icon.ico")
     SET(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\icons\\\\icon.ico")
     SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\img\\\\header.bmp")
-    SET(CPACK_NSIS_MUI_WELCOMEFINISHPAGE_BITMAP "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\img\\\\header-vert.bmp")
-    SET(CPACK_NSIS_MUI_UNWELCOMEFINISHPAGE_BITMAP "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\img\\\\header-vert.bmp")
-    SET(CPACK_NSIS_MUI_HEADERIMAGE "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\img\\\\header.bmp")
+
+    IF(NOT ${CMAKE_VERSION} VERSION_LESS "3.5")
+       SET(CPACK_NSIS_MUI_WELCOMEFINISHPAGE_BITMAP "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\img\\\\header-vert.bmp")
+       SET(CPACK_NSIS_MUI_UNWELCOMEFINISHPAGE_BITMAP "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\img\\\\header-vert.bmp")
+    ENDIF(NOT ${CMAKE_VERSION} VERSION_LESS "3.5")
+    
+    IF(NOT ${CMAKE_VERSION} VERSION_LESS "3.17")
+      SET(CPACK_NSIS_MUI_HEADERIMAGE "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\img\\\\header.bmp")
+    ENDIF(NOT ${CMAKE_VERSION} VERSION_LESS "3.17")
+
     
     # Extra shortcuts to add in the start menu (a list of pairs : URL, Menu label).
     SET(CPACK_NSIS_MENU_LINKS 
