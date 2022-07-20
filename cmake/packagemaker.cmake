@@ -70,7 +70,11 @@ IF(UNIX AND NOT APPLE)
     MARK_AS_ADVANCED(PACKAGERS_SOURCE)
 
     # 9.10 ubuntu depends
-    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "freeglut3,libc6(>=2.7),libgcc1(>=1:4.1.1),libgl1-mesa-glx | libgl1,libglu1-mesa | libglu1,libice6(>=1:1.0.0),libopenal1(>=1:1.3.253),libpng12-0(>=1.2.13-4),libsm6,libstdc++6(>=4.2.1),libx11-6,libxext6,libxi6(>=2:1.1.3-1ubuntu1),libxmu6,libxrandr2,libxrender1,libxt6,libxxf86vm1,plib1.8.4c2(>=1.2.4),zlib1g(>=1:1.1.4)")
+    
+    SET(CPACK_PACKAGE_NAME ${PACKAGE_FILE_PREFIX} CACHE STRING "" FORCE)
+    SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    
+    #SET(CPACK_DEBIAN_PACKAGE_DEPENDS "freeglut3,libc6(>=2.7),libgcc1(>=1:4.1.1),libgl1-mesa-glx | libgl1,libglu1-mesa | libglu1,libice6(>=1:1.0.0),libopenal1(>=1:1.3.253),libpng12-0(>=1.2.13-4),libsm6,libstdc++6(>=4.2.1),libx11-6,libxext6,libxi6(>=2:1.1.3-1ubuntu1),libxmu6,libxrandr2,libxrender1,libxt6,libxxf86vm1,plib1.8.4c2(>=1.2.4),zlib1g(>=1:1.1.4)")
 
     # Put other Debian-based distros settings here.
 
