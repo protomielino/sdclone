@@ -135,6 +135,11 @@ IF(WIN32)
 
     SET(CPACK_NSIS_URL_INFO_ABOUT "${CPACK_PACKAGE_CONTACT}")
     SET(CPACK_NSIS_HELP_LINK "${CPACK_PACKAGE_CONTACT}")
+
+    # Override Start menu entry
+    SET(CPACK_PACKAGE_EXECUTABLES 
+         "${EXECUTABLE_NAME}" "${CPACK_NSIS_DISPLAY_NAME}" 
+         CACHE STRING "" FORCE)
     
     # Add a page in the install wizard for options :
     # - adding the installation path in the PATH,
@@ -142,11 +147,11 @@ IF(WIN32)
     #SET(CPACK_NSIS_MODIFY_PATH "ON")
     
     # Another way to add a shortcut to start the installed app on the desktop :
-    # This doesn't work.
+    # This ONLY works if SET(CPACK_NSIS_MODIFY_PATH "ON") which also enables the whole modify PATH page
     #SET(CPACK_CREATE_DESKTOP_LINKS "${EXECUTABLE_NAME}")
     
     # But this works.
-    SET(SHORTCUT_TARGET "$DESKTOP\\\\${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}.lnk")
+    SET(SHORTCUT_TARGET "$DESKTOP\\\\${CPACK_NSIS_DISPLAY_NAME}.lnk")
 
     SET(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
          CreateShortCut \\\"${SHORTCUT_TARGET}\\\" \\\"${EXECUTABLE_PATHNAME}\\\"
