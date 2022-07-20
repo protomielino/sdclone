@@ -120,8 +120,12 @@ IF(WIN32)
     
     # Extra shortcuts to add in the start menu (a list of pairs : URL, Menu label).
     SET(CPACK_NSIS_MENU_LINKS 
-        "${CPACK_PACKAGE_CONTACT}" "Project Homepage")
-        #"$INSTDIR\\\\share\\\\doc\\\\userman\\\\how_to_drive.html" "User manual")
+        "${CPACK_PACKAGE_CONTACT}" "Project Homepage"
+        "https://sourceforge.net/p/speed-dreams/discussion/" "Community"
+        "https://sourceforge.net/p/speed-dreams/tickets/" "Bug tracker"
+        "/data/COPYING.txt" "License"
+        "/data/README.txt" "Read me"
+        "/doc/how_to_drive.html" "User manual")
 
     # Icon in the add/remove control panel. Must be an .exe file
     Set(CPACK_NSIS_INSTALLED_ICON_NAME "${EXECUTABLE_PATHNAME}")
