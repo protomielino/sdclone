@@ -68,13 +68,17 @@ IF(UNIX AND NOT APPLE)
     MARK_AS_ADVANCED(PACKAGERS_BINARY)
     SET(PACKAGERS_SOURCE "TBZ2" CACHE STRING "CPack source package generators to use (separated with ';', among TGZ, TBZ2, TZ, ZIP)")
     MARK_AS_ADVANCED(PACKAGERS_SOURCE)
-
-    # 9.10 ubuntu depends
     
     SET(CPACK_PACKAGE_NAME ${PACKAGE_FILE_PREFIX} CACHE STRING "" FORCE)
+
+    # On debian, auto-detect dependencies
     SET(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-    
-    #SET(CPACK_DEBIAN_PACKAGE_DEPENDS "freeglut3,libc6(>=2.7),libgcc1(>=1:4.1.1),libgl1-mesa-glx | libgl1,libglu1-mesa | libglu1,libice6(>=1:1.0.0),libopenal1(>=1:1.3.253),libpng12-0(>=1.2.13-4),libsm6,libstdc++6(>=4.2.1),libx11-6,libxext6,libxi6(>=2:1.1.3-1ubuntu1),libxmu6,libxrandr2,libxrender1,libxt6,libxxf86vm1,plib1.8.4c2(>=1.2.4),zlib1g(>=1:1.1.4)")
+    # Or manually set the dependencies
+    # from Linux Mint 20 (Ubuntu 20.04)
+    #SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.29), libcurl4 (>= 7.16.2), libenet7, libexpat1 (>= 2.0.1), libgcc-s1 (>= 3.0), libglu1-mesa | libglu1, libglx0, libjpeg8 (>= 8c), libopenal1 (>= 1.14), libopengl0, libopenscenegraph160, libopenthreads21, libplib1, libpng16-16 (>= 1.6.2-1), libsdl2-2.0-0 (>= 2.0.10), libsdl2-mixer-2.0-0 (>= 2.0.2), libstdc++6 (>= 9), zlib1g (>= 1:1.1.4)")
+
+    # This causes package name to have undersocres connecting the name, version, and arch
+    set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
 
     # Put other Debian-based distros settings here.
 
