@@ -269,7 +269,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (borderStyleComboBox == null)
 		{
-			borderStyleComboBox = new SegmentComboBox();
+			borderStyleComboBox = new JComboBox<String>();
 			borderStyleComboBox.setBounds(658, 400, 120, 20);
 			borderStyleComboBox.setModel(new DefaultComboBoxModel<String>(styleItems));
 			borderStyleComboBox.addActionListener(new ActionListener()
@@ -315,7 +315,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		if (sideBankingTypeComboBox == null)
 		{
 			String[] items = {"none", "level", "tangent"};
-			sideBankingTypeComboBox = new SegmentComboBox();
+			sideBankingTypeComboBox = new JComboBox<String>();
 			sideBankingTypeComboBox.setBounds(351, 400, 120, 20);
 			sideBankingTypeComboBox.setModel(new DefaultComboBoxModel<String>(items));
 			sideBankingTypeComboBox.addActionListener(new ActionListener()
@@ -362,7 +362,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 	{
 		if (barrierStyleComboBox == null)
 		{
-			barrierStyleComboBox = new SegmentComboBox();
+			barrierStyleComboBox = new JComboBox<String>();
 			barrierStyleComboBox.setBounds(45, 400, 120, 20);
 			barrierStyleComboBox.setModel(new DefaultComboBoxModel<String>(styleItems));
 			barrierStyleComboBox.addActionListener(new ActionListener()
@@ -533,120 +533,6 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 
 	public void update()
 	{
-		//		String tmp;
-		//		borderSurfaceComboBox.setAttType("attstr");
-		//		borderSurfaceComboBox.setAttName("surface");
-		//		borderSurfaceComboBox.setEditor(editor);
-		//		borderSurfaceComboBox.setShape(shape);
-		//
-		//		borderStyleComboBox.setAttType("attstr");
-		//		borderStyleComboBox.setAttName("style");
-		//		borderStyleComboBox.setEditor(editor);
-		//		borderStyleComboBox.setShape(shape);
-		//
-		//		sideSurfaceComboBox.setAttType("attstr");
-		//		sideSurfaceComboBox.setAttName("surface");
-		//		sideSurfaceComboBox.setEditor(editor);
-		//		sideSurfaceComboBox.setShape(shape);
-		//
-		//		barrierSurfaceComboBox.setAttType("attstr");
-		//		barrierSurfaceComboBox.setAttName("surface");
-		//		barrierSurfaceComboBox.setEditor(editor);
-		//		barrierSurfaceComboBox.setShape(shape);
-		//
-		//		barrierStyleComboBox.setAttType("attstr");
-		//		barrierStyleComboBox.setAttName("style");
-		//		barrierStyleComboBox.setEditor(editor);
-		//		barrierStyleComboBox.setShape(shape);
-		//
-		//		switch (side)
-		//		{
-		//			case 1 :
-		//				borderSurfaceComboBox.setSectionName("Left Border");
-		//				borderSurfaceComboBox.setDataIdx(Segment.leftBorderSurface);
-		//				tmp = shape.strAllDatas[Segment.leftBorderSurface];
-		//				if (tmp != null)
-		//				{
-		//					borderSurfaceComboBox.setSelectedItem(tmp);
-		//				}
-		//
-		//				borderStyleComboBox.setSectionName("Left Border");
-		//				borderStyleComboBox.setDataIdx(Segment.leftBorderStyle);
-		//				tmp = shape.strAllDatas[Segment.leftBorderStyle];
-		//				if (tmp != null)
-		//				{
-		//					borderStyleComboBox.setSelectedItem(tmp);
-		//				}
-		//
-		//				sideSurfaceComboBox.setSectionName("Left Side");
-		//				sideSurfaceComboBox.setDataIdx(Segment.leftSideSurface);
-		//				tmp = shape.strAllDatas[Segment.leftSideSurface];
-		//				if (tmp != null)
-		//				{
-		//					sideSurfaceComboBox.setSelectedItem(tmp);
-		//				}
-		//
-		//				barrierSurfaceComboBox.setSectionName("Left Barrier");
-		//				barrierSurfaceComboBox.setDataIdx(Segment.leftBarrierSurface);
-		//				tmp = shape.strAllDatas[Segment.leftBarrierSurface];
-		//				System.out.println(tmp);
-		//				if (tmp != null)
-		//				{
-		//					barrierSurfaceComboBox.setSelectedItem(tmp);
-		//				}
-		//
-		//				barrierStyleComboBox.setSectionName("Left Barrier");
-		//				barrierStyleComboBox.setDataIdx(Segment.leftBarrierStyle);
-		//				tmp = shape.strAllDatas[Segment.leftBarrierStyle];
-		//				System.out.println(tmp);
-		//				if (tmp != null)
-		//				{
-		//					barrierStyleComboBox.setSelectedItem(tmp);
-		//				}
-		//				break;
-		//			case 2 :
-		//				borderSurfaceComboBox.setSectionName("Right Border");
-		//				borderSurfaceComboBox.setDataIdx(Segment.rightBorderSurface);
-		//				tmp = shape.strAllDatas[Segment.rightBorderSurface];
-		//				if (tmp != null)
-		//				{
-		//					borderSurfaceComboBox.setSelectedItem(tmp);
-		//				}
-		//
-		//				borderStyleComboBox.setSectionName("Right Border");
-		//				borderStyleComboBox.setDataIdx(Segment.rightBorderStyle);
-		//				tmp = shape.strAllDatas[Segment.rightBorderStyle];
-		//				if (tmp != null)
-		//				{
-		//					borderStyleComboBox.setSelectedItem(tmp);
-		//				}
-		//
-		//				sideSurfaceComboBox.setSectionName("Right Side");
-		//				sideSurfaceComboBox.setDataIdx(Segment.rightSideSurface);
-		//				tmp = shape.strAllDatas[Segment.rightSideSurface];
-		//				if (tmp != null)
-		//				{
-		//					sideSurfaceComboBox.setSelectedItem(tmp);
-		//				}
-		//
-		//				barrierSurfaceComboBox.setSectionName("Right Barrier");
-		//				barrierSurfaceComboBox.setDataIdx(Segment.rightBarrierSurface);
-		//				tmp = shape.strAllDatas[Segment.rightBarrierSurface];
-		//				if (tmp != null)
-		//				{
-		//					barrierSurfaceComboBox.setSelectedItem(tmp);
-		//				}
-		//
-		//				barrierStyleComboBox.setSectionName("Right Barrier");
-		//				barrierStyleComboBox.setDataIdx(Segment.rightBarrierStyle);
-		//				tmp = shape.strAllDatas[Segment.rightBarrierStyle];
-		//				if (tmp != null)
-		//				{
-		//					barrierStyleComboBox.setSelectedItem(tmp);
-		//				}
-		//				break;
-		//
-		//		}
 	}
 
 	/**
