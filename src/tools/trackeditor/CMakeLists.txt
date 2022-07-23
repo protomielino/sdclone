@@ -51,7 +51,6 @@ IF(Java_Development_FOUND AND Java_FOUND)
          gui/properties/TurnMarksProperties.java
          gui/segment/GroupButton.java
          gui/segment/ProfileButton.java
-         gui/segment/SegmentComboBox.java
          gui/segment/SegmentEditorDlg.java
          gui/segment/SegmentSideProperties.java
          gui/segment/SegmentSlider.java
@@ -75,6 +74,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          utils/Project.java
          utils/Properties.java
          utils/SegmentSliderLayout.java
+         utils/SurfaceComboBox.java
          utils/TrackData.java
          utils/TrackEditor.java
          utils/circuit/Camera.java
