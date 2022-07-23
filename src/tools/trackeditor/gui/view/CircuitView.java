@@ -271,6 +271,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						newShape.addToPrevious(handledShape);
 						newShape.addToNext(next);
 						data.insertElementAt(newShape,pos+1);
+						newShape.setCount(data.indexOf(newShape) + 1);
 						Undo.add(new UndoAddSegment(editorFrame, newShape));
 						selectedShape = newShape;
 						openSegmentDialog(newShape);
@@ -299,6 +300,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						newShape.addToPrevious(handledShape);
 						newShape.addToNext(next);
 						data.insertElementAt(newShape,pos+1);
+						newShape.setCount(data.indexOf(newShape) + 1);
 						Undo.add(new UndoAddSegment(editorFrame, newShape));
 						selectedShape = newShape;
 						openSegmentDialog(newShape);
@@ -326,6 +328,7 @@ public class CircuitView extends JComponent implements KeyListener, MouseListene
 						newShape.addToPrevious(handledShape);
 						newShape.addToNext(next);
 						data.insertElementAt(newShape, pos + 1);
+						newShape.setCount(data.indexOf(newShape) + 1);
 						Undo.add(new UndoAddSegment(editorFrame, newShape));
 						selectedShape = newShape;
 						openSegmentDialog(newShape);

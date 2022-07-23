@@ -35,6 +35,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
+import utils.SurfaceComboBox;
 import utils.circuit.Pits;
 import utils.circuit.Segment;
 import utils.circuit.SegmentSide;
@@ -77,7 +78,7 @@ public class PitProperties extends PropertyPanel
 	private JLabel				entrySurfaceLabel		= new JLabel();
 	private JComboBox<String>	entrySurfaceComboBox	= null;
 	private JLabel				pitSurfaceLabel			= new JLabel();
-	private JComboBox<String>	pitSurfaceComboBox		= null;
+	private SurfaceComboBox		pitSurfaceComboBox		= null;
 	private JLabel				pitWallLabel			= new JLabel();
 	private JCheckBox			pitWallCheckBox			= null;
 	private JLabel				pitWallHeightLabel		= new JLabel();
@@ -85,9 +86,9 @@ public class PitProperties extends PropertyPanel
 	private JLabel				pitWallWidthLabel		= new JLabel();
 	private JTextField			pitWallWidthTextField	= new JTextField();
 	private JLabel				pitWallSurfaceLabel		= new JLabel();
-	private JComboBox<String>	pitWallSurfaceComboBox	= null;
+	private SurfaceComboBox		pitWallSurfaceComboBox	= null;
 	private JLabel				exitSurfaceLabel		= new JLabel();
-	private JComboBox<String>	exitSurfaceComboBox		= null;
+	private SurfaceComboBox		exitSurfaceComboBox		= null;
 	private JLabel 				generatePitsLabel 		= new JLabel();
 	private JCheckBox 			generatePitsCheckBox 	= null;
 	private boolean 			generatePits			= false;
@@ -343,9 +344,8 @@ public class PitProperties extends PropertyPanel
 	{
 		if (pitSurfaceComboBox == null)
 		{
-			pitSurfaceComboBox = new JComboBox<String>();
+			pitSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
 			pitSurfaceComboBox.setBounds(120, 469, 180, 23);
-			pitSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(sideSurfaceVector));
 			pitSurfaceComboBox.setEnabled(false);
 			pitSurfaceComboBox.setSelectedItem(null);
 		}
@@ -402,9 +402,8 @@ public class PitProperties extends PropertyPanel
 	{
 		if (pitWallSurfaceComboBox == null)
 		{
-			pitWallSurfaceComboBox = new JComboBox<String>();
+			pitWallSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
 			pitWallSurfaceComboBox.setBounds(120, 577, 180, 23);
-			pitWallSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(sideSurfaceVector));
 			pitWallSurfaceComboBox.setEnabled(false);
 			pitWallSurfaceComboBox.setSelectedItem(null);
 		}
@@ -420,9 +419,8 @@ public class PitProperties extends PropertyPanel
 	{
 		if (exitSurfaceComboBox == null)
 		{
-			exitSurfaceComboBox = new JComboBox<String>();
+			exitSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
 			exitSurfaceComboBox.setBounds(120, 604, 180, 23);
-			exitSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(sideSurfaceVector));
 			exitSurfaceComboBox.setEnabled(false);
 			exitSurfaceComboBox.setSelectedItem(null);
 		}

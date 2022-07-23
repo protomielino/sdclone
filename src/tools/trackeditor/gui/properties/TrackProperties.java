@@ -34,8 +34,10 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
+import utils.SurfaceComboBox;
 import utils.circuit.SegmentSide;
 import utils.circuit.Surface;
+
 /**
  * @author babis
  *
@@ -47,7 +49,7 @@ public class TrackProperties extends PropertyPanel
 	private JLabel				widthLabel					= new JLabel();
 	private JTextField			widthTextField				= new JTextField();
 	private JLabel				surfaceLabel				= new JLabel();
-	private JComboBox<String>	surfaceComboBox				= null;
+	private SurfaceComboBox		surfaceComboBox				= null;
 	private JLabel				profilStepsLengthLabel		= new JLabel();
 	private JTextField			profilStepsLengthTextField	= new JTextField();
 	private JLabel				racelineWidthscaleLabel		= new JLabel();
@@ -122,8 +124,13 @@ public class TrackProperties extends PropertyPanel
 	 */
 	private void initialize()
 	{
-        this.setLayout(null);
-        this.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
+		addDefaultSurfaces(roadSurfaceVector);
+		addDefaultSurfaces(sideSurfaceVector);
+		addDefaultSurfaces(borderSurfaceVector);
+		addDefaultSurfaces(barrierSurfaceVector);
+		
+		this.setLayout(null);
+		this.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 
 		addLabel(this, 0, widthLabel, "Width", 140);
 		addLabel(this, 1, surfaceLabel, "Surface", 140);
@@ -134,7 +141,7 @@ public class TrackProperties extends PropertyPanel
 
 		addTextField(this, 0, widthTextField, getEditorFrame().getTrackData().getMainTrack().getWidth(), 150, 50);
 
-        this.add(getSurfaceComboBox(), null);
+		this.add(getSurfaceComboBox(), null);
 
 		addTextField(this, 2, profilStepsLengthTextField, getEditorFrame().getTrackData().getMainTrack().getProfilStepsLength(), 150, 50);
 		addTextField(this, 3, racelineWidthscaleTextField, getEditorFrame().getTrackData().getMainTrack().getRacelineWidthscale(), 150, 50);
@@ -142,11 +149,6 @@ public class TrackProperties extends PropertyPanel
 		addTextField(this, 5, racelineExtTextField, getEditorFrame().getTrackData().getMainTrack().getRacelineExt(), 150, 50);
 
 		this.add(getTabbedPane(), null);
-
-		addDefaultSurfaces(roadSurfaceVector);
-		addDefaultSurfaces(sideSurfaceVector);
-		addDefaultSurfaces(borderSurfaceVector);
-		addDefaultSurfaces(barrierSurfaceVector);
 	}
 
 	private void addDefaultSurfaces(Vector<String> surfaceVector)
@@ -206,12 +208,11 @@ public class TrackProperties extends PropertyPanel
 	{
 		if (surfaceComboBox == null)
 		{
-			surfaceComboBox = new JComboBox<String>();
-			surfaceComboBox.setBounds(150, 37, 180, 23);
-			String surface = getEditorFrame().getTrackData().getMainTrack().getSurface();
-			addSurface(roadSurfaceVector, surface);
-			surfaceComboBox.setModel(new DefaultComboBoxModel<String>(roadSurfaceVector));
-			surfaceComboBox.setSelectedItem(surface);
+			String newSurface = getEditorFrame().getTrackData().getMainTrack().getSurface();
+			addSurface(roadSurfaceVector, newSurface);			
+			surfaceComboBox = new SurfaceComboBox(getEditorFrame(), roadSurfaceVector);
+			surfaceComboBox.setBounds(150, 37, 180, 23);						
+			surfaceComboBox.setSelectedItem(newSurface);
 		}
 		return surfaceComboBox;
 	}
@@ -243,7 +244,7 @@ public class TrackProperties extends PropertyPanel
 		private JLabel				sideEndWidthLabel			= new JLabel();
 		private JTextField 			sideEndWidthTextField		= new JTextField();
 		private JLabel				sideSurfaceLabel			= new JLabel();
-		private JComboBox<String>	sideSurfaceComboBox			= null;
+		private SurfaceComboBox		sideSurfaceComboBox			= null;
 		private JLabel				sideBankingTypeLabel		= new JLabel();
 		private JComboBox<String>	sideBankingTypeComboBox		= null;
 		private JLabel				borderWidthLabel			= new JLabel();
@@ -251,7 +252,7 @@ public class TrackProperties extends PropertyPanel
 		private JLabel				borderHeightLabel			= new JLabel();
 		private JTextField			borderHeightTextField		= new JTextField();
 		private JLabel				borderSurfaceLabel			= new JLabel();
-		private JComboBox<String>	borderSurfaceComboBox		= null;
+		private SurfaceComboBox		borderSurfaceComboBox		= null;
 		private JLabel				borderStyleLabel			= new JLabel();
 		private JComboBox<String>	borderStyleComboBox			= null;
 		private JLabel				barrierWidthLabel			= new JLabel();
@@ -259,7 +260,7 @@ public class TrackProperties extends PropertyPanel
 		private JLabel				barrierHeightLabel			= new JLabel();
 		private JTextField			barrierHeightTextField		= new JTextField();
 		private JLabel				barrierSurfaceLabel			= new JLabel();
-		private JComboBox<String>	barrierSurfaceComboBox		= null;
+		private SurfaceComboBox		barrierSurfaceComboBox		= null;
 		private JLabel				barrierStyleLabel			= new JLabel();
 		private JComboBox<String>	barrierStyleComboBox		= null;
 
@@ -315,16 +316,15 @@ public class TrackProperties extends PropertyPanel
 		/**
 		 * This method initializes sideSurfaceComboBox
 		 *
-		 * @return gui.segment.SegmentComboBox
+		 * @return utils.SurfaceComboBox
 		 */
-		private JComboBox<String> getSideSurfaceComboBox()
+		private SurfaceComboBox getSideSurfaceComboBox()
 		{
 			if (sideSurfaceComboBox == null)
 			{
-				sideSurfaceComboBox = new JComboBox<String>();
-				sideSurfaceComboBox.setBounds(140, 64, 180, 23);
 				addSurface(sideSurfaceVector, side.getSideSurface());
-				sideSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(sideSurfaceVector));
+				sideSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
+				sideSurfaceComboBox.setBounds(140, 64, 180, 23);
 				sideSurfaceComboBox.setSelectedItem(side.getSideSurface());
 				sideSurfaceComboBox.addActionListener(new ActionListener()
 				{
@@ -341,7 +341,7 @@ public class TrackProperties extends PropertyPanel
 		/**
 		 * This method initializes sideBankingTypeComboBox
 		 *
-		 * @return gui.segment.SegmentComboBox
+		 * @return javax.swing.JComboBox
 		 */
 		private JComboBox<String> getSideBankingTypeComboBox()
 		{
@@ -372,16 +372,15 @@ public class TrackProperties extends PropertyPanel
 		/**
 		 * This method initializes borderSurfaceComboBox
 		 *
-		 * @return gui.segment.SegmentComboBox
+		 * @return utils.SurfaceComboBox
 		 */
-		private JComboBox<String> getBorderSurfaceComboBox()
+		private SurfaceComboBox getBorderSurfaceComboBox()
 		{
 			if (borderSurfaceComboBox == null)
 			{
-				borderSurfaceComboBox = new JComboBox<String>();
-				borderSurfaceComboBox.setBounds(140, 172, 180, 23);
 				addSurface(borderSurfaceVector, side.getBorderSurface());
-				borderSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(borderSurfaceVector));
+				borderSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), borderSurfaceVector);
+				borderSurfaceComboBox.setBounds(140, 172, 180, 23);
 				borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
 				borderSurfaceComboBox.addActionListener(new ActionListener()
 				{
@@ -398,7 +397,7 @@ public class TrackProperties extends PropertyPanel
 		/**
 		 * This method initializes borderStyleComboBox
 		 *
-		 * @return gui.segment.SegmentComboBox
+		 * @return javax.swing.JComboBox
 		 */
 		private JComboBox<String> getBorderStyleComboBox()
 		{
@@ -428,16 +427,15 @@ public class TrackProperties extends PropertyPanel
 		/**
 		 * This method initializes barrierSurfaceComboBox
 		 *
-		 * @return gui.segment.SegmentComboBox
+		 * @return utils.SurfaceComboBox
 		 */
-		private JComboBox<String> getBarrierSurfaceComboBox()
+		private SurfaceComboBox getBarrierSurfaceComboBox()
 		{
 			if (barrierSurfaceComboBox == null)
 			{
-				barrierSurfaceComboBox = new JComboBox<String>();
-				barrierSurfaceComboBox.setBounds(140, 280, 180, 23);
 				addSurface(barrierSurfaceVector, side.getBarrierSurface());
-				barrierSurfaceComboBox.setModel(new DefaultComboBoxModel<String>(barrierSurfaceVector));
+				barrierSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), barrierSurfaceVector);
+				barrierSurfaceComboBox.setBounds(140, 280, 180, 23);
 				barrierSurfaceComboBox.setSelectedItem(side.getBarrierSurface());
 				barrierSurfaceComboBox.addActionListener(new ActionListener()
 				{
@@ -454,7 +452,7 @@ public class TrackProperties extends PropertyPanel
 		/**
 		 * This method initializes barrierStyleComboBox
 		 *
-		 * @return gui.segment.SegmentComboBox
+		 * @return javax.swing.JComboBox
 		 */
 		private JComboBox<String> getBarrierStyleComboBox()
 		{

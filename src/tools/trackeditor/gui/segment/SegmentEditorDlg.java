@@ -36,20 +36,23 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Vector;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
+import utils.SurfaceComboBox;
 import utils.circuit.Curve;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
 import utils.circuit.Surface;
 import bsh.EvalError;
 import bsh.Interpreter;
+
 /**
  * @author babis
  *
@@ -74,7 +77,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	private JLabel					nameLabel					= null;
 	private JTextField				nameTextField				= null;
 	private JLabel					surfaceLabel				= null;
-	private JComboBox<String>		surfaceComboBox				= null;
+	private SurfaceComboBox			surfaceComboBox				= null;
 
 	private SegmentSlider			gradeSlider					= null;
 	private SegmentSlider			startTangentSlider			= null;
@@ -129,25 +132,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			this.editorFrame = editorFrame;
 
 			// add new surfaces from Surfaces
-	        Vector<Surface> surfaces = editorFrame.getTrackData().getSurfaces();
-	        for (int i = 0; i < surfaces.size(); i++)
-	        {
-				String surface = surfaces.elementAt(i).getName();
-				boolean found = false;
-				for (int j = 0; j < roadSurfaceVector.size(); j++)
-				{
-					if (roadSurfaceVector.elementAt(i).equals(surfaces.elementAt(i).getName()))
-					{
-						found = true;
-						break;
-					}
-				}
-				if (!found)
-				{
-					roadSurfaceVector.add(surface);
-				}
-	        }
-			Collections.sort(roadSurfaceVector);
+			addDefaultSurfaces(roadSurfaceVector);
 			
 			setShape(shape);
 
@@ -160,12 +145,59 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		}
 	}
 
+	private void addDefaultSurfaces(Vector<String> surfaceVector)
+	{
+        Vector<Surface> surfaces = editorFrame.getTrackData().getSurfaces();
+        for (int i = 0; i < surfaces.size(); i++)
+        {
+			String surface = surfaces.elementAt(i).getName();
+			if (surface != null)
+			{
+				boolean found = false;
+				for (int j = 0; j < surfaceVector.size(); j++)
+				{
+					if (surfaceVector.elementAt(i).equals(surfaces.elementAt(i).getName()))
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+				{
+					surfaceVector.add(surface);
+				}
+			}
+        }
+		Collections.sort(surfaceVector);
+	}
+
+	private void addSurface(Vector<String> surfaceVector, String surface)
+	{
+		// add this surface if it's not found in default list
+		if (surface != null)
+		{
+			boolean found = false;
+			for (int i = 0; i < surfaceVector.size(); i++)
+			{
+				if (surfaceVector.elementAt(i).equals(surface))
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				surfaceVector.add(surface);
+				Collections.sort(surfaceVector);
+			}
+		}
+	}
+
 	/**
 	 *
 	 */
 	private void initialize()
 	{
-		this.setTitle("Segment Editor");
 		this.setSize(850, 536);
 		Point p = editorFrame.getLocation();
 		p.x = editorFrame.getProject().getSegmentEditorX();
@@ -638,11 +670,20 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 			nameTextField = new JTextField();
 			nameTextField.setBounds(75, 5, 180, 23);
 			nameTextField.setText(shape.getName());
-			nameTextField.addKeyListener(new KeyAdapter()
+			nameTextField.getDocument().addDocumentListener(new DocumentListener()
 			{
-				public void keyReleased(KeyEvent e)
+				public void removeUpdate(DocumentEvent e)
 				{
 					shape.setName(nameTextField.getText());
+					updateTitle();
+				}
+				public void insertUpdate(DocumentEvent e)
+				{
+					shape.setName(nameTextField.getText());
+					updateTitle();
+				}
+				public void changedUpdate(DocumentEvent e)
+				{
 				}
 			});
 		}
@@ -681,8 +722,7 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 	{
 		if (surfaceComboBox == null)
 		{
-			surfaceComboBox = new JComboBox<String>();
-			surfaceComboBox.setModel(new DefaultComboBoxModel<String>(roadSurfaceVector));
+			surfaceComboBox = new SurfaceComboBox(editorFrame, roadSurfaceVector);
 			surfaceComboBox.setBounds(75, 33, 180, 23);
 			surfaceComboBox.addActionListener(new ActionListener()
 			{
@@ -704,9 +744,15 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 		return surfaceComboBox;
 	}
 
+	public void updateTitle()
+	{
+		this.setTitle("Segment " + shape.getCount() + " : " + shape.getName());
+	}
+
 	public void setShape(Segment shape)
 	{
 		this.shape = shape;
+		addSurface(roadSurfaceVector, shape.getSurface());
 		this.getRightPanel().setSide(shape.getRight());
 		this.getLeftPanel().setSide(shape.getLeft());
 
@@ -743,6 +789,8 @@ public class SegmentEditorDlg extends JDialog implements SliderListener
 				this.getMarksTextField().setText("");
 			}
 			getNameTextField().setText(shape.getName());
+
+			this.updateTitle();
 
 			// add this surface if it's not found in default list
 			String surface = shape.getSurface();
