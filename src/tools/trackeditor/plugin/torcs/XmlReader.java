@@ -249,10 +249,10 @@ public class XmlReader
 
         data.setRows(getAttrIntValue(element, "rows"));
         data.setPolePositionSide(getAttrStrValue(element, "pole position side"));
-        data.setDistanceToStart(getAttrNumValue(element, "distance to start"));
-        data.setDistanceBetweenColumns(getAttrNumValue(element, "distance between columns"));
-        data.setOffsetWithinAColumn(getAttrNumValue(element, "offset within a column"));
-        data.setInitialHeight(getAttrNumValue(element, "initial height"));
+        data.setDistanceToStart(getAttrNumValue(element, "distance to start", "m"));
+        data.setDistanceBetweenColumns(getAttrNumValue(element, "distance between columns", "m"));
+        data.setOffsetWithinAColumn(getAttrNumValue(element, "offset within a column", "m"));
+        data.setInitialHeight(getAttrNumValue(element, "initial height", "m"));
 
         editorFrame.getTrackData().setStartingGrid(data);
     }
@@ -271,12 +271,12 @@ public class XmlReader
 
         data.setStation(getAttrStrValue(element, "station"));
         data.setTimezone(getAttrNumValue(element, "timezone"));
-        data.setOverallRainLikelyhood(getAttrNumValue(element, "overall rain likelyhood"));
-        data.setLittleRainLikelyhood(getAttrNumValue(element, "little rain likelyhood"));
-        data.setMediumRainLikelyhood(getAttrNumValue(element, "medium rain likelyhood"));
-        data.setTimeOfDay(getAttrNumValue(element, "time of day"));
-        data.setSunAscension(getAttrNumValue(element, "sun ascension"));
-        data.setAltitude(getAttrNumValue(element, "altitude"));
+        data.setOverallRainLikelyhood(getAttrNumValue(element, "overall rain likelyhood", "%"));
+        data.setLittleRainLikelyhood(getAttrNumValue(element, "little rain likelyhood", "%"));
+        data.setMediumRainLikelyhood(getAttrNumValue(element, "medium rain likelyhood", "%"));
+        data.setTimeOfDay(getAttrNumValue(element, "time of day", "hour"));
+        data.setSunAscension(getAttrNumValue(element, "sun ascension", "deg"));
+        data.setAltitude(getAttrNumValue(element, "altitude", "m"));
 
         editorFrame.getTrackData().setLocalInfo(data);
     }
@@ -314,16 +314,16 @@ public class XmlReader
             surf.setColorB2(getAttrNumValue(surface, "color B2"));
             surf.setTextureName(getAttrStrValue(surface, "texture name"));
             surf.setTextureType(getAttrStrValue(surface, "texture type"));
-            surf.setTextureSize(getAttrNumValue(surface, "texture size"));
+            surf.setTextureSize(getAttrNumValue(surface, "texture size", "m"));
             surf.setTextureLinkWithPrevious(getAttrStrValue(surface, "texture link with previous"));
             surf.setTextureStartOnBoundary(getAttrStrValue(surface, "texture start on boundary"));
-            surf.setTextureMipMap(getAttrNumValue(surface, "texture mipmap"));
+            surf.setTextureMipMap(getAttrNumValue(surface, "texture mipmap", "m"));
             surf.setFriction(getAttrNumValue(surface, "friction"));
             surf.setRollingResistance(getAttrNumValue(surface, "rolling resistance"));
             surf.setBumpName(getAttrStrValue(surface, "bump name"));
-            surf.setBumpSize(getAttrNumValue(surface, "bump size"));
-            surf.setRoughness(getAttrNumValue(surface, "roughness"));
-            surf.setRoughnessWavelength(getAttrNumValue(surface, "roughness wavelength"));
+            surf.setBumpSize(getAttrNumValue(surface, "bump size", "m"));
+            surf.setRoughness(getAttrNumValue(surface, "roughness", "m"));
+            surf.setRoughnessWavelength(getAttrNumValue(surface, "roughness wavelength", "m"));
             surf.setRacelineName(getAttrStrValue(surface, "raceline name"));
             surf.setDammage(getAttrNumValue(surface, "dammage"));
             surf.setRebound(getAttrNumValue(surface, "rebound"));
@@ -405,22 +405,22 @@ public class XmlReader
         {
             data.getTurnMarks().setWidth(getAttrNumValue(marks, "width", "m"));
             data.getTurnMarks().setHeight(getAttrNumValue(marks, "height", "m"));
-            data.getTurnMarks().setVerticalSpace(getAttrNumValue(marks, "vertical space"));
-            data.getTurnMarks().setHorizontalSpace(getAttrNumValue(marks, "horizontal space"));
+            data.getTurnMarks().setVerticalSpace(getAttrNumValue(marks, "vertical space", "m"));
+            data.getTurnMarks().setHorizontalSpace(getAttrNumValue(marks, "horizontal space", "m"));
         }
 
         Element terrain = getChildWithName(graphic, "Terrain Generation");
 
         if (terrain != null)
         {
-	        data.getTerrainGeneration().setTrackStep(getAttrNumValue(terrain, "track step"));
-	        data.getTerrainGeneration().setBorderMargin(getAttrNumValue(terrain, "border margin"));
-	        data.getTerrainGeneration().setBorderStep(getAttrNumValue(terrain, "border step"));
+	        data.getTerrainGeneration().setTrackStep(getAttrNumValue(terrain, "track step", "m"));
+	        data.getTerrainGeneration().setBorderMargin(getAttrNumValue(terrain, "border margin", "m"));
+	        data.getTerrainGeneration().setBorderStep(getAttrNumValue(terrain, "border step", "m"));
 	        data.getTerrainGeneration().setBorderHeight(getAttrNumValue(terrain, "border height", "m"));
 	        data.getTerrainGeneration().setOrientation(getAttrStrValue(terrain, "orientation"));
-	        data.getTerrainGeneration().setMaximumAltitude(getAttrNumValue(terrain, "maximum altitude"));
-	        data.getTerrainGeneration().setMinimumAltitude(getAttrNumValue(terrain, "minimum altitude"));
-	        data.getTerrainGeneration().setGroupSize(getAttrNumValue(terrain, "group size"));
+	        data.getTerrainGeneration().setMaximumAltitude(getAttrNumValue(terrain, "maximum altitude", "m"));
+	        data.getTerrainGeneration().setMinimumAltitude(getAttrNumValue(terrain, "minimum altitude", "m"));
+	        data.getTerrainGeneration().setGroupSize(getAttrNumValue(terrain, "group size", "m"));
 	        data.getTerrainGeneration().setElevationMap(getAttrStrValue(terrain, "elevation map"));
 	        data.getTerrainGeneration().setReliefFile(getAttrStrValue(terrain, "relief file"));
 	        data.getTerrainGeneration().setSurface(getAttrStrValue(terrain, "surface"));
@@ -872,6 +872,14 @@ public class XmlReader
                 			else if (expectedUnit.equals("m") && actualUnit.equals("mm"))
                 			{
                 				out = out * 0.001;
+                			}
+                			else if (expectedUnit.equals("rad") && actualUnit.equals("deg"))
+                			{
+                				out = out * Math.PI / 180.0;
+                			}
+                			else if (expectedUnit.equals("s") && (actualUnit.equals("hour") || actualUnit.equals("hours")))
+                			{
+                				out = out * 3600.0;
                 			}
                 			else
                 			{

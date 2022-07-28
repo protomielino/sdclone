@@ -472,16 +472,16 @@ public class XmlWriter
 			addContent(el, "color B2", null, surface.getColorB2());
 			addContent(el, "texture name", surface.getTextureName());
 			addContent(el, "texture type", surface.getTextureType());
-			addContent(el, "texture size", null, surface.getTextureSize());
+			addContent(el, "texture size", "m", surface.getTextureSize());
 			addContent(el, "texture link with previous", surface.getTextureLinkWithPrevious());
 			addContent(el, "texture start on boundary", surface.getTextureStartOnBoundary());
 			addContent(el, "texture mipmap", "m", surface.getTextureMipMap());
 			addContent(el, "friction", null, surface.getFriction());
 			addContent(el, "rolling resistance", null, surface.getRollingResistance());
 			addContent(el, "bump name", surface.getBumpName());
-			addContent(el, "bump size", null, surface.getBumpSize());
-			addContent(el, "roughness", null, surface.getRoughness());
-			addContent(el, "roughness wavelength", null, surface.getRoughnessWavelength());
+			addContent(el, "bump size", "m", surface.getBumpSize());
+			addContent(el, "roughness", "m", surface.getRoughness());
+			addContent(el, "roughness wavelength", "m", surface.getRoughnessWavelength());
 			addContent(el, "raceline name", surface.getRacelineName());
 			addContent(el, "dammage", null, surface.getDammage());
 			addContent(el, "rebound", null, surface.getRebound());
@@ -752,9 +752,9 @@ public class XmlWriter
 		addContent(element, "specular color R", null, editorFrame.getTrackData().getGraphic().getSpecularColorR());
 		addContent(element, "specular color G", null, editorFrame.getTrackData().getGraphic().getSpecularColorG());
 		addContent(element, "specular color B", null, editorFrame.getTrackData().getGraphic().getSpecularColorB());
-		addContent(element, "light position x", null, editorFrame.getTrackData().getGraphic().getLightPositionX());
-		addContent(element, "light position y", null, editorFrame.getTrackData().getGraphic().getLightPositionY());
-		addContent(element, "light position z", null, editorFrame.getTrackData().getGraphic().getLightPositionZ());
+		addContent(element, "light position x", "m", editorFrame.getTrackData().getGraphic().getLightPositionX());
+		addContent(element, "light position y", "m", editorFrame.getTrackData().getGraphic().getLightPositionY());
+		addContent(element, "light position z", "m", editorFrame.getTrackData().getGraphic().getLightPositionZ());
 		addContent(element, "shininess", null, editorFrame.getTrackData().getGraphic().getShininess());
 		addContent(element, "fov factor", null, editorFrame.getTrackData().getGraphic().getFovFactor());
 
