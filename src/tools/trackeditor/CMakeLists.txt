@@ -32,6 +32,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
          gui/DeltaPanel.java
          gui/EditorFrame.java
          gui/NewProjectDialog.java
+         gui/PreferencesDialog.java
          gui/TrackgenPanel.java
          gui/properties/CameraProperties.java
          gui/properties/EnvMapProperties.java

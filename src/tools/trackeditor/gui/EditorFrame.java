@@ -258,17 +258,23 @@ public class EditorFrame extends JFrame
 		_splash.dispose();
 
 		dataDirectory = preferences.get(SD_DATA_DIRECTORY, null);
-
-		if (dataDirectory != null)
+		
+		readDefaultSurfaces();
+	}
+	
+	private void readDefaultSurfaces()
+	{
+		if (dataDirectory != null && !dataDirectory.isEmpty())
 		{
+			String defaultSurfaceFile = dataDirectory + sep + "data" + sep + "tracks" + sep + "surfaces.xml";
 			try
 			{
 				XmlReader xmlreader = new XmlReader(this);
-				xmlreader.readDefaultSurfaces(dataDirectory + sep + "data" + sep + "tracks" + sep + "surfaces.xml", defaultSurfaces);
+				xmlreader.readDefaultSurfaces(defaultSurfaceFile, defaultSurfaces);
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Opening Default Surfaces", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -281,6 +287,13 @@ public class EditorFrame extends JFrame
 	public String getDataDirectory()
 	{
 		return dataDirectory;
+	}
+	
+	public void setDataDirectory(String dataDirectory)
+	{
+		this.dataDirectory = dataDirectory;
+		
+		preferences.put(SD_DATA_DIRECTORY, this.dataDirectory);
 	}
 
 	private void updateRecentFiles(String filename)
@@ -963,9 +976,31 @@ public class EditorFrame extends JFrame
 			editMenu.setText("Edit");
 			editMenu.add(getUndoMenuItem());
 			editMenu.add(getRedoMenuItem());
+			editMenu.addSeparator();
+			JMenuItem preferenceItem = new JMenuItem("Preferences");
+			preferenceItem.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					newPreferencesDialog();
+				}
+			});
+			editMenu.add(preferenceItem);
 		}
 		return editMenu;
 	}
+	
+	private void newPreferencesDialog()
+	{
+		PreferencesDialog preferencesDialog = new PreferencesDialog(this);
+		preferencesDialog.setVisible(true);
+		if (PreferencesDialog.APPROVE)
+		{
+			setDataDirectory(preferencesDialog.getDataDirectory());
+			readDefaultSurfaces();
+		}
+	}
+	
 	/**
 	 * This method initializes undoMenuItem
 	 *
