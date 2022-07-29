@@ -186,7 +186,7 @@ public class EditorFrame extends JFrame
 	private Preferences			preferences							= Preferences.userNodeForPackage(EditorFrame.class);
 	private List<String>		recentFiles							= new ArrayList<String>();
 	private final static String	RECENT_FILES_STRING					= "recent.files.";
-	private final static int	RECENT_FILES_MAX					= 5;
+	private final static int	RECENT_FILES_MAX					= 10;
 	
 	private TrackData			trackData							= null;
 	
@@ -278,7 +278,7 @@ public class EditorFrame extends JFrame
 		
 		for (int i = 0; i < recentFiles.size(); i++)
 		{
-			if (i < recentFilesMenu.getItemCount())
+			if (i < (recentFilesMenu.getItemCount() - 2))
 			{
 				if (recentFilesMenu.getItem(i).getText() != recentFiles.get(i))
 				{
@@ -302,7 +302,7 @@ public class EditorFrame extends JFrame
 				openProject(((JMenuItem) e.getSource()).getText());
 			}
 		});
-		recentFilesMenu.add(recentFileMenuItem);
+		recentFilesMenu.insert(recentFileMenuItem, recentFilesMenu.getItemCount() - 2);
 	}
 
 	/**
@@ -668,6 +668,22 @@ public class EditorFrame extends JFrame
 			recentFilesMenu = new JMenu();
 			recentFilesMenu.setAction(recentAction);
 			recentFilesMenu.setIcon(null);
+			recentFilesMenu.addSeparator();
+			JMenuItem clearHistory = new JMenuItem("Clear History");
+			clearHistory.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					int count = recentFilesMenu.getItemCount() - 2;
+					for (int i = 0; i < count; i++)
+					{
+						preferences.remove(RECENT_FILES_STRING + i);
+						recentFilesMenu.remove(0);
+					}
+					recentFiles.clear();
+				}
+			});
+			recentFilesMenu.add(clearHistory);
 
 			for (int i = 0; i < RECENT_FILES_MAX; i++)
 			{
