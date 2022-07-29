@@ -94,6 +94,10 @@ public class XmlReader
     		"</section>" +
     		"</params>";
     	SAXBuilder sxb = new SAXBuilder(false);
+    	sxb.setValidation(false);
+    	sxb.setFeature("http://xml.org/sax/features/validation", false);
+    	sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+    	sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);    	
     	Document doc = sxb.build(new InputSource(new StringReader(xml)));
     	Element root = doc.getRootElement();
     	Element surfaces = getChildWithName(root, "Surfaces");
