@@ -63,39 +63,55 @@ public class SurfaceComboBox extends JComboBox<String>
 		}
 	};
 
+	private String getTextureName(String surfaceName, Vector<Surface> surfaces, String path)
+	{
+		String tooltipText = null;
+
+		for (int j = 0; j < surfaces.size(); j++)
+		{
+			Surface surface = surfaces.get(j);
+			if (surface.getName().equals(surfaceName))
+			{
+				String textureName = surface.getTextureName();
+				if (textureName != null && !textureName.isEmpty())
+				{
+					String fileName = path + sep + textureName;
+					File file = new File(fileName);
+					if (file.canRead())
+					{
+						try
+						{
+							URL url = file.toURI().toURL();
+							tooltipText = "<html><img src=" + url + "></html>";
+						}
+						catch (MalformedURLException e)
+						{
+							System.out.println("tooltipText " + tooltipText);
+						}
+					}
+				}
+				break;
+			}
+		}
+		return tooltipText;
+	}
+
 	private List<String> getSurfaceImages()
 	{
 		List<String> tooltips = new ArrayList<String>();
+		Vector<Surface> defaultSurfaces = editorFrame.getDefaultSurfaces();
 		Vector<Surface>	surfaces = editorFrame.getTrackData().getSurfaces();
 		for (int i = 0; i < surfaceVector.size(); i++)
 		{
 			String tooltipText = null;
 			String surfaceName = surfaceVector.get(i);
-			for (int j = 0; j < surfaces.size(); j++)
+			if (editorFrame.getDataDirectory() != null)
 			{
-				Surface surface = surfaces.get(j);					
-				if (surface.getName().equals(surfaceName))
-				{
-					String textureName = surface.getTextureName();
-					if (textureName != null && !textureName.isEmpty())
-					{
-						String fileName = Editor.getProperties().getPath() + sep + textureName;
-						File file = new File(fileName);							
-						if (file.canRead())
-						{
-							try
-							{
-								URL url = file.toURI().toURL();
-								tooltipText = "<html><img src=" + url + "></html>";
-							}
-							catch (MalformedURLException e)
-							{
-								System.out.println("tooltipText " + tooltipText);
-							}
-						}
-					}
-					break;
-				}
+				tooltipText = getTextureName(surfaceName, defaultSurfaces, editorFrame.getDataDirectory() + sep + "data" + sep + "textures");
+			}
+			if (tooltipText == null)
+			{
+				tooltipText = getTextureName(surfaceName, surfaces, Editor.getProperties().getPath());
 			}
 			tooltips.add(tooltipText);
 		}

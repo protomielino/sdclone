@@ -74,6 +74,7 @@ import utils.circuit.Curve;
 import utils.circuit.MainTrack;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
+import utils.circuit.Surface;
 import utils.undo.Undo;
 
 /**
@@ -189,6 +190,9 @@ public class EditorFrame extends JFrame
 	private final static int	RECENT_FILES_MAX					= 10;
 	
 	private TrackData			trackData							= null;
+	private Vector<Surface>		defaultSurfaces						= new Vector<Surface>();
+	private String				dataDirectory						= null;
+	private final static String	SD_DATA_DIRECTORY					= "DataDirectory";
 	
 	public class NewProjectInfo
 	{
@@ -252,6 +256,31 @@ public class EditorFrame extends JFrame
 			e.printStackTrace();
 		}
 		_splash.dispose();
+
+		dataDirectory = preferences.get(SD_DATA_DIRECTORY, null);
+
+		if (dataDirectory != null)
+		{
+			try
+			{
+				XmlReader xmlreader = new XmlReader(this);
+				xmlreader.readDefaultSurfaces(dataDirectory + sep + "data" + sep + "tracks" + sep + "surfaces.xml", defaultSurfaces);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public Vector<Surface> getDefaultSurfaces()
+	{
+		return defaultSurfaces;
+	}
+
+	public String getDataDirectory()
+	{
+		return dataDirectory;
 	}
 
 	private void updateRecentFiles(String filename)

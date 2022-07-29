@@ -22,6 +22,7 @@ package plugin.torcs;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -30,6 +31,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.xml.sax.InputSource;
 
 import gui.EditorFrame;
 import utils.Editor;
@@ -77,6 +79,29 @@ public class XmlReader
         sxb.setEntityResolver(new NoOpEntityResolver());
         d = sxb.build(new File(fname));
         return d;
+    }
+
+    public void readDefaultSurfaces(String filename, Vector<Surface> surfaceData) throws JDOMException, IOException
+    {
+    	String xml =
+    		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+    		"<!DOCTYPE params SYSTEM \"../../../src/libs/tgf/params.dtd\" [" +
+    		"<!ENTITY default-surfaces SYSTEM \"" + filename + "\">" +
+    		"]>" +
+    		"<params name=\"test\" type=\"param\" mode=\"mw\">" +
+    		"<section name=\"Surfaces\">" +
+    		"&default-surfaces;" +
+    		"</section>" +
+    		"</params>";
+    	SAXBuilder sxb = new SAXBuilder(false);
+    	Document doc = sxb.build(new InputSource(new StringReader(xml)));
+    	Element root = doc.getRootElement();
+    	Element surfaces = getChildWithName(root, "Surfaces");
+
+    	if (surfaces != null)
+    	{
+    		getSurfaces(surfaces, surfaceData);
+    	}
     }
 
     private synchronized void setTrackData(Element root)
@@ -298,6 +323,12 @@ public class XmlReader
             return;
 
         Vector<Surface> surfaceData = new Vector<Surface>();
+        getSurfaces(surfaces, surfaceData);
+        editorFrame.getTrackData().setSurfaces(surfaceData);
+    }
+
+    private void getSurfaces(Element surfaces, Vector<Surface> surfaceData)
+    {
         List<Element> sections = surfaces.getChildren();
         Iterator<Element> it = sections.iterator();
         while (it.hasNext())
@@ -330,7 +361,6 @@ public class XmlReader
 
             surfaceData.add(surf);
         }
-        editorFrame.getTrackData().setSurfaces(surfaceData);
     }
 
     /**
