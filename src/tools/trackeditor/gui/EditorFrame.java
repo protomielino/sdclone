@@ -192,7 +192,11 @@ public class EditorFrame extends JFrame
 	private TrackData			trackData							= null;
 	private Vector<Surface>		defaultSurfaces						= new Vector<Surface>();
 	private String				dataDirectory						= null;
+	private String				binDirectory						= null;
+	private String				libDirectory						= null;
 	private final static String	SD_DATA_DIRECTORY					= "DataDirectory";
+	private final static String	SD_BIN_DIRECTORY					= "BinDirectory";
+	private final static String	SD_LIB_DIRECTORY					= "LibDirectory";
 	
 	public class NewProjectInfo
 	{
@@ -258,6 +262,8 @@ public class EditorFrame extends JFrame
 		_splash.dispose();
 
 		dataDirectory = preferences.get(SD_DATA_DIRECTORY, null);
+		binDirectory = preferences.get(SD_BIN_DIRECTORY, null);
+		libDirectory = preferences.get(SD_LIB_DIRECTORY, null);
 		
 		readDefaultSurfaces();
 	}
@@ -294,6 +300,30 @@ public class EditorFrame extends JFrame
 		this.dataDirectory = dataDirectory;
 		
 		preferences.put(SD_DATA_DIRECTORY, this.dataDirectory);
+	}
+
+	public String getBinDirectory()
+	{
+		return binDirectory;
+	}
+	
+	public void setBinDirectory(String binDirectory)
+	{
+		this.binDirectory = binDirectory;
+		
+		preferences.put(SD_BIN_DIRECTORY, this.binDirectory);
+	}
+
+	public String getLibDirectory()
+	{
+		return libDirectory;
+	}
+	
+	public void setLibDirectory(String libDirectory)
+	{
+		this.libDirectory = libDirectory;
+		
+		preferences.put(SD_LIB_DIRECTORY, this.libDirectory);
 	}
 
 	private void updateRecentFiles(String filename)
@@ -997,6 +1027,8 @@ public class EditorFrame extends JFrame
 		if (PreferencesDialog.APPROVE)
 		{
 			setDataDirectory(preferencesDialog.getDataDirectory());
+			setBinDirectory(preferencesDialog.getBinDirectory());
+			setLibDirectory(preferencesDialog.getLibDirectory());
 			readDefaultSurfaces();
 		}
 	}
