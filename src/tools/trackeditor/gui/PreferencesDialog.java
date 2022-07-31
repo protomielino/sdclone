@@ -50,13 +50,13 @@ public class PreferencesDialog extends JDialog
 		if (jPanel == null)
 		{
 			dataDirectoryLabel = new JLabel();
-			dataDirectoryLabel.setBounds(10, 10, 160, 23);
+			dataDirectoryLabel.setBounds(10, 10, 190, 23);
 			dataDirectoryLabel.setText("Speed Dreams Data Directory");
 			binDirectoryLabel = new JLabel();
-			binDirectoryLabel.setBounds(10, 43, 160, 23);
+			binDirectoryLabel.setBounds(10, 43, 190, 23);
 			binDirectoryLabel.setText("Speed Dreams Bin Directory");
 			libDirectoryLabel = new JLabel();
-			libDirectoryLabel.setBounds(10, 76, 160, 23);
+			libDirectoryLabel.setBounds(10, 76, 190, 23);
 			libDirectoryLabel.setText("Speed Dreams Lib Directory");
 			jPanel = new JPanel();
 			jPanel.setLayout(null);
@@ -80,7 +80,7 @@ public class PreferencesDialog extends JDialog
 		if (dataDirectoryTextField == null)
 		{
 			dataDirectoryTextField = new JTextField();
-			dataDirectoryTextField.setBounds(170, 10, 320, 23);
+			dataDirectoryTextField.setBounds(200, 10, 290, 23);
 			dataDirectoryTextField.setText(editorFrame.getDataDirectory());
 		}
 		return dataDirectoryTextField;
@@ -130,7 +130,7 @@ public class PreferencesDialog extends JDialog
 		if (binDirectoryTextField == null)
 		{
 			binDirectoryTextField = new JTextField();
-			binDirectoryTextField.setBounds(170, 43, 320, 23);
+			binDirectoryTextField.setBounds(200, 43, 290, 23);
 			binDirectoryTextField.setText(editorFrame.getBinDirectory());
 		}
 		return binDirectoryTextField;
@@ -180,7 +180,7 @@ public class PreferencesDialog extends JDialog
 		if (libDirectoryTextField == null)
 		{
 			libDirectoryTextField = new JTextField();
-			libDirectoryTextField.setBounds(170, 76, 320, 23);
+			libDirectoryTextField.setBounds(200, 76, 190, 23);
 			libDirectoryTextField.setText(editorFrame.getLibDirectory());
 		}
 		return libDirectoryTextField;

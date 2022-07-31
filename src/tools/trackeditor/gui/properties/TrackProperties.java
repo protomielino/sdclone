@@ -281,33 +281,33 @@ public class TrackProperties extends PropertyPanel
 		{
 			setLayout(null);
 			
-			addLabel(this, 0, sideStartWidthLabel, "Side Start Width", 130);
-			addLabel(this, 1, sideEndWidthLabel, "Side End Width", 130);
-			addLabel(this, 2, sideSurfaceLabel, "Side Banking Surface", 130);
-			addLabel(this, 3, sideBankingTypeLabel, "Side Type", 130);
-			addLabel(this, 4, borderWidthLabel, "Border Width", 130);
-			addLabel(this, 5, borderHeightLabel, "Border Height", 130);
-			addLabel(this, 6, borderSurfaceLabel, "Border Surface", 130);
-			addLabel(this, 7, borderStyleLabel, "Border Style", 130);
-			addLabel(this, 8, barrierWidthLabel, "Barrier Width", 130);
-			addLabel(this, 9, barrierHeightLabel, "Barrier Height", 130);
-			addLabel(this, 10, barrierSurfaceLabel, "Barrier Surface", 130);
-			addLabel(this, 11, barrierStyleLabel, "Barrier Style", 130);
+			addLabel(this, 0, sideStartWidthLabel, "Side Start Width", 140);
+			addLabel(this, 1, sideEndWidthLabel, "Side End Width", 140);
+			addLabel(this, 2, sideSurfaceLabel, "Side Banking Surface", 140);
+			addLabel(this, 3, sideBankingTypeLabel, "Side Type", 140);
+			addLabel(this, 4, borderWidthLabel, "Border Width", 140);
+			addLabel(this, 5, borderHeightLabel, "Border Height", 140);
+			addLabel(this, 6, borderSurfaceLabel, "Border Surface", 140);
+			addLabel(this, 7, borderStyleLabel, "Border Style", 140);
+			addLabel(this, 8, barrierWidthLabel, "Barrier Width", 140);
+			addLabel(this, 9, barrierHeightLabel, "Barrier Height", 140);
+			addLabel(this, 10, barrierSurfaceLabel, "Barrier Surface", 140);
+			addLabel(this, 11, barrierStyleLabel, "Barrier Style", 140);
 			
-			addTextField(this, 0, sideStartWidthTextField, side.getSideStartWidth(), 140, 60);
-			addTextField(this, 1, sideEndWidthTextField, side.getSideEndWidth(), 140, 60);
+			addTextField(this, 0, sideStartWidthTextField, side.getSideStartWidth(), 150, 60);
+			addTextField(this, 1, sideEndWidthTextField, side.getSideEndWidth(), 150, 60);
 
 			add(getSideSurfaceComboBox(), null);
 			add(getSideBankingTypeComboBox(), null);
 
-			addTextField(this, 4, borderWidthTextField, side.getBorderWidth(), 140, 60);
-			addTextField(this, 5, borderHeightTextField, side.getBorderHeight(), 140, 60);
+			addTextField(this, 4, borderWidthTextField, side.getBorderWidth(), 150, 60);
+			addTextField(this, 5, borderHeightTextField, side.getBorderHeight(), 150, 60);
 
 			add(getBorderSurfaceComboBox(), null);
 			add(getBorderStyleComboBox(), null);
 
-			addTextField(this, 8, barrierWidthTextField, side.getBarrierWidth(), 140, 60);
-			addTextField(this, 9, barrierHeightTextField, side.getBarrierHeight(), 140, 60);
+			addTextField(this, 8, barrierWidthTextField, side.getBarrierWidth(), 150, 60);
+			addTextField(this, 9, barrierHeightTextField, side.getBarrierHeight(), 150, 60);
 			
 			add(getBarrierSurfaceComboBox(), null);
 			add(getBarrierStyleComboBox(), null);
@@ -324,7 +324,7 @@ public class TrackProperties extends PropertyPanel
 			{
 				addSurface(sideSurfaceVector, side.getSideSurface());
 				sideSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
-				sideSurfaceComboBox.setBounds(140, 64, 180, 23);
+				sideSurfaceComboBox.setBounds(150, 64, 180, 23);
 				sideSurfaceComboBox.setSelectedItem(side.getSideSurface());
 				sideSurfaceComboBox.addActionListener(new ActionListener()
 				{
@@ -349,7 +349,7 @@ public class TrackProperties extends PropertyPanel
 			{
 				String[] items = {"none", "level", "tangent"};
 				sideBankingTypeComboBox = new JComboBox<String>();
-				sideBankingTypeComboBox.setBounds(140, 91, 100, 23);
+				sideBankingTypeComboBox.setBounds(150, 91, 100, 23);
 				sideBankingTypeComboBox.setModel(new DefaultComboBoxModel<String>(items));
 				String type = side.getSideBankingType();
 				if (type == null || type.isEmpty())
@@ -380,7 +380,7 @@ public class TrackProperties extends PropertyPanel
 			{
 				addSurface(borderSurfaceVector, side.getBorderSurface());
 				borderSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), borderSurfaceVector);
-				borderSurfaceComboBox.setBounds(140, 172, 180, 23);
+				borderSurfaceComboBox.setBounds(150, 172, 180, 23);
 				borderSurfaceComboBox.setSelectedItem(side.getBorderSurface());
 				borderSurfaceComboBox.addActionListener(new ActionListener()
 				{
@@ -404,7 +404,7 @@ public class TrackProperties extends PropertyPanel
 			if (borderStyleComboBox == null)
 			{
 				borderStyleComboBox = new JComboBox<String>();
-				borderStyleComboBox.setBounds(140, 199, 100, 23);
+				borderStyleComboBox.setBounds(150, 199, 100, 23);
 				borderStyleComboBox.setModel(new DefaultComboBoxModel<String>(styleItems));
 				String style = side.getBorderStyle();
 				if (style == null || style.isEmpty())
@@ -435,7 +435,7 @@ public class TrackProperties extends PropertyPanel
 			{
 				addSurface(barrierSurfaceVector, side.getBarrierSurface());
 				barrierSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), barrierSurfaceVector);
-				barrierSurfaceComboBox.setBounds(140, 280, 180, 23);
+				barrierSurfaceComboBox.setBounds(150, 280, 180, 23);
 				barrierSurfaceComboBox.setSelectedItem(side.getBarrierSurface());
 				barrierSurfaceComboBox.addActionListener(new ActionListener()
 				{
@@ -459,7 +459,7 @@ public class TrackProperties extends PropertyPanel
 			if (barrierStyleComboBox == null)
 			{
 				barrierStyleComboBox = new JComboBox<String>();
-				barrierStyleComboBox.setBounds(140, 307, 100, 23);
+				barrierStyleComboBox.setBounds(150, 307, 100, 23);
 				barrierStyleComboBox.setModel(new DefaultComboBoxModel<String>(styleItems));
 				String style = side.getBarrierStyle();
 				if (style == null || style.isEmpty())
