@@ -38,6 +38,7 @@ import javax.swing.JTextField;
  */
 public class TrackgenPanel extends JDialog implements Runnable
 {
+	private String 			sep				= System.getProperty("file.separator");
 	private EditorFrame		editorFrame;
 	private Thread 			ac3d 			= new Thread(this);
 
@@ -86,8 +87,13 @@ public class TrackgenPanel extends JDialog implements Runnable
 		{
 			String ls_str;
 			String tmp = "";
+			String trackgen = "sd2-trackgen";
+            if (editorFrame.getBinDirectory() != null && !editorFrame.getBinDirectory().isEmpty())
+            {
+            	trackgen = editorFrame.getBinDirectory() + sep + trackgen;
+            }
 			
-			Process ls_proc = Runtime.getRuntime().exec("sd2-trackgen" + args);
+			Process ls_proc = Runtime.getRuntime().exec(trackgen + args);
 			// get its output (your input) stream
 			BufferedReader ls_in = new BufferedReader(new InputStreamReader(ls_proc.getInputStream()));
 			BufferedReader ls_err = new BufferedReader(new InputStreamReader(ls_proc.getErrorStream()));
