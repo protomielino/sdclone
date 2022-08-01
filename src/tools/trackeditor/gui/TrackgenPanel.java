@@ -90,39 +90,61 @@ public class TrackgenPanel extends JDialog implements Runnable
 			Process ls_proc = Runtime.getRuntime().exec("sd2-trackgen" + args);
 			// get its output (your input) stream
 			BufferedReader ls_in = new BufferedReader(new InputStreamReader(ls_proc.getInputStream()));
+			BufferedReader ls_err = new BufferedReader(new InputStreamReader(ls_proc.getErrorStream()));
 
 			try
 			{
-				while ((ls_str = ls_in.readLine()) != null)
+				while (true)
 				{
-					if (ls_str.indexOf(" ") != -1)
+					// done when process terminated and nothing to read
+					if (!ls_proc.isAlive() && !ls_in.ready() && !ls_err.ready())
+						break;
+					
+					if (ls_err.ready())
 					{
-						tmp = ls_str.substring(0, ls_str.indexOf(" "));
-						if (tmp.equals("name"))
+						String str = ls_err.readLine();
+						int index = str.indexOf("Error");
+						if (index != -1)
 						{
-							nameLabel.setText(ls_str);
-						} else if (tmp.equals("authors"))
-						{
-							this.authorLabel.setText(ls_str);
-						} else if (tmp.equals("filename"))
-						{
-							this.fileNameLabel.setText(ls_str);
-						}else if (tmp.equals("length"))
-						{
-							this.lengthLabel.setText(ls_str);
-						}else if (tmp.equals("width"))
-						{
-							this.widthLabel.setText(ls_str);
+							if (!str.contains("not released"))
+							{
+								JOptionPane.showMessageDialog(this, str.substring(index + 6), "Export AC3D", JOptionPane.ERROR_MESSAGE);
+							}
 						}
-						else if (tmp.equals("XSize"))
+					}
+				
+					if (ls_in.ready()) 
+					{
+						ls_str = ls_in.readLine();
+						if (ls_str.indexOf(" ") != -1)
 						{
-							this.xSizeLabel.setText(ls_str);
-						}else if (tmp.equals("YSize"))
-						{
-							this.ySizeLabel.setText(ls_str);
-						}else
-						{
-							this.nodesTextField.setText(ls_str);
+							tmp = ls_str.substring(0, ls_str.indexOf(" "));
+							if (tmp.equals("name"))
+							{
+								nameLabel.setText(ls_str);
+							} else if (tmp.equals("authors"))
+							{
+								this.authorLabel.setText(ls_str);
+							} else if (tmp.equals("filename"))
+							{
+								this.fileNameLabel.setText(ls_str);
+							}else if (tmp.equals("length"))
+							{
+								this.lengthLabel.setText(ls_str);
+							}else if (tmp.equals("width"))
+							{
+								this.widthLabel.setText(ls_str);
+							}
+							else if (tmp.equals("XSize"))
+							{
+								this.xSizeLabel.setText(ls_str);
+							}else if (tmp.equals("YSize"))
+							{
+								this.ySizeLabel.setText(ls_str);
+							}else
+							{
+								this.nodesTextField.setText(ls_str);
+							}
 						}
 					}
 				}
@@ -173,7 +195,7 @@ public class TrackgenPanel extends JDialog implements Runnable
 		if (nodesTextField == null)
 		{
 			nodesTextField = new JTextField();
-			nodesTextField.setBounds(10, 230, 220, 25);
+			nodesTextField.setBounds(10, 230, 440, 25);
 			nodesTextField.setEditable(false);
 			nodesTextField.setText("");
 		}
