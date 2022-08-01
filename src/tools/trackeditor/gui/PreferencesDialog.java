@@ -180,7 +180,7 @@ public class PreferencesDialog extends JDialog
 		if (libDirectoryTextField == null)
 		{
 			libDirectoryTextField = new JTextField();
-			libDirectoryTextField.setBounds(200, 76, 190, 23);
+			libDirectoryTextField.setBounds(200, 76, 290, 23);
 			libDirectoryTextField.setText(editorFrame.getLibDirectory());
 		}
 		return libDirectoryTextField;
