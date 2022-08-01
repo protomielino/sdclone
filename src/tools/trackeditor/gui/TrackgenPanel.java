@@ -88,10 +88,10 @@ public class TrackgenPanel extends JDialog implements Runnable
 			String ls_str;
 			String tmp = "";
 			String trackgen = "sd2-trackgen";
-            if (editorFrame.getBinDirectory() != null && !editorFrame.getBinDirectory().isEmpty())
-            {
-            	trackgen = editorFrame.getBinDirectory() + sep + trackgen;
-            }
+			if (editorFrame.getBinDirectory() != null && !editorFrame.getBinDirectory().isEmpty())
+			{
+				trackgen = editorFrame.getBinDirectory() + sep + trackgen;
+			}
 			
 			Process ls_proc = Runtime.getRuntime().exec(trackgen + args);
 			// get its output (your input) stream
