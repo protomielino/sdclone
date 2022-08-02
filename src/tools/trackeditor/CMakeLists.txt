@@ -18,8 +18,7 @@ ELSE(OPTION_TRACKEDITOR)
    SET(SD_BINDIR bin)
 ENDIF(OPTION_TRACKEDITOR)
 
-FIND_PACKAGE(Java)
-FIND_PACKAGE(Java COMPONENTS Development)
+FIND_PACKAGE(Java 1.8 COMPONENTS Development)
 IF(Java_Development_FOUND AND Java_FOUND)
    INCLUDE(UseJava)
 
@@ -148,7 +147,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
    #message(STATUS "_ICONS = ${_ICONS}")
    # ========= Debug
 
-   SET(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.7" "-target" "1.7")
+   #SET(CMAKE_JAVA_COMPILE_FLAGS "-source" "1.8" "-target" "1.8")
 
    SET(_TGT_DIR "${CMAKE_BINARY_DIR}/${SD_BINDIR}")
 
