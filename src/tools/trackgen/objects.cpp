@@ -571,6 +571,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 
                 if (clr)
                 {
+                    printf("found color: 0x%X x: %d y: %d\n", clr, i, j);
                     AddObject(track, TrackHandle, clr, i * kX + dX, j * kY + dY);
                 }
             }
