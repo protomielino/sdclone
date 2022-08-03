@@ -68,7 +68,7 @@ public class ImageProperties extends PropertyPanel
 		addLabel(this, 0, imageScaleLabel, "Path", 80);
 		addLabel(this, 1, pathLabel, "Image scale", 80);
 
-		addTextField(this, 0, pathTextField, Editor.getProperties().getImage(), 100, 285);
+		addTextField(this, 0, pathTextField, Editor.getProperties().getImage(), 100, 335);
 		addTextField(this, 1, imageScaleTextField, Editor.getProperties().getImageScale(), 100, 50);
 
 		this.add(getPathButton(), null);
@@ -84,7 +84,7 @@ public class ImageProperties extends PropertyPanel
 		if (pathButton == null)
 		{
 			pathButton = new JButton();
-			pathButton.setBounds(390, 9, 80, 25);
+			pathButton.setBounds(440, 9, 80, 25);
 			pathButton.setText("Browse");
 			pathButton.addActionListener(new java.awt.event.ActionListener()
 			{

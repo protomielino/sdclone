@@ -134,7 +134,7 @@ public class EnvMapProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 460, 100);
+			tabbedPane.setBounds(10, 10, 510, 100);
 
 			Vector<EnvironmentMapping> envMaps = getEditorFrame().getTrackData().getGraphic().getEnvironmentMapping();
 
@@ -177,7 +177,7 @@ public class EnvMapProperties extends PropertyPanel
 			addLabel(this, 1, envMapLabel, "Environment Map", 120);
 
 			addTextField(this, 0, nameTextField, name, 130, 60);
-			addTextField(this, 1, envMapTextField, environmentMap, 130, 230);
+			addTextField(this, 1, envMapTextField, environmentMap, 130, 280);
 
 			add(getEnvMapButton(), null);
 		}
@@ -192,7 +192,7 @@ public class EnvMapProperties extends PropertyPanel
 			if (envMapButton == null)
 			{
 				envMapButton = new JButton();
-				envMapButton.setBounds(370, 36, 80, 25);
+				envMapButton.setBounds(420, 36, 80, 25);
 				envMapButton.setText("Browse");
 				envMapButton.addActionListener(new java.awt.event.ActionListener()
 				{

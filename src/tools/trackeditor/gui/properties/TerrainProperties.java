@@ -135,8 +135,8 @@ public class TerrainProperties extends PropertyPanel
 		addTextField(this, 5, maximumAltitudeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getMaximumAltitude(), 140, 100);
 		addTextField(this, 6, minimumAltitudeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getMinimumAltitude(), 140, 100);
 		addTextField(this, 7, groupSizeTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getGroupSize(), 140, 100);
-		addTextField(this, 8, elevationMapTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getElevationMap(), 140, 245);
-		addTextField(this, 9, reliefFileTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getReliefFile(), 140, 245);
+		addTextField(this, 8, elevationMapTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getElevationMap(), 140, 295);
+		addTextField(this, 9, reliefFileTextField, getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getReliefFile(), 140, 295);
 
 		this.add(getSurfaceComboBox(), null);
 		this.add(getDefaultButton(), null);
@@ -233,7 +233,7 @@ public class TerrainProperties extends PropertyPanel
 		if (elevationMapButton == null)
 		{
 			elevationMapButton = new JButton();
-			elevationMapButton.setBounds(390, 225, 80, 25);
+			elevationMapButton.setBounds(440, 225, 80, 25);
 			elevationMapButton.setText("Browse");
 			elevationMapButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -256,7 +256,7 @@ public class TerrainProperties extends PropertyPanel
 		if (reliefFileButton == null)
 		{
 			reliefFileButton = new JButton();
-			reliefFileButton.setBounds(390, 252, 80, 25);
+			reliefFileButton.setBounds(440, 252, 80, 25);
 			reliefFileButton.setText("Browse");
 			reliefFileButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -454,7 +454,7 @@ public class TerrainProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 312, 460, 100);
+			tabbedPane.setBounds(10, 312, 510, 100);
 
 			Vector<ObjectMap> objectMaps = getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getObjectMaps();
 
@@ -495,7 +495,7 @@ public class TerrainProperties extends PropertyPanel
 			addLabel(this, 1, objectMapLabel, "Environment Map", 120);
 
 			addTextField(this, 0, nameTextField, name, 130, 100);
-			addTextField(this, 1, objectMapTextField, objectMap, 130, 235);
+			addTextField(this, 1, objectMapTextField, objectMap, 130, 285);
 
 			add(getObjectMapButton(), null);
 		}
@@ -510,7 +510,7 @@ public class TerrainProperties extends PropertyPanel
 			if (objectMapButton == null)
 			{
 				objectMapButton = new JButton();
-				objectMapButton.setBounds(370, 36, 80, 25);
+				objectMapButton.setBounds(420, 36, 80, 25);
 				objectMapButton.setText("Browse");
 				objectMapButton.addActionListener(new java.awt.event.ActionListener()
 				{

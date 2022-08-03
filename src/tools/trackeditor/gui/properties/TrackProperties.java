@@ -228,7 +228,7 @@ public class TrackProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 172, 460, 370);
+			tabbedPane.setBounds(10, 172, 510, 370);
 
 			tabbedPane.addTab("Left", null, new SidePanel(getEditorFrame().getTrackData().getMainTrack().getLeft()), null);
 			tabbedPane.addTab("Right", null, new SidePanel(getEditorFrame().getTrackData().getMainTrack().getRight()), null);

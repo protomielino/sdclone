@@ -138,7 +138,7 @@ public class ObjectProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 460, 230);
+			tabbedPane.setBounds(10, 10, 510, 230);
 
 			Vector<TrackObject> objects = getEditorFrame().getTrackData().getObjects();
 
@@ -196,7 +196,7 @@ public class ObjectProperties extends PropertyPanel
 			addLabel(this, 6, deltaVertLabel, "Delta Vert", 160);
 
 			addTextField(this, 0, nameTextField, object.getName(), 120, 100);
-			addTextField(this, 1, objectTextField, object.getObject(), 120, 240);
+			addTextField(this, 1, objectTextField, object.getObject(), 120, 290);
 			addTextField(this, 2, colorTextField, getString(object.getColor()), 120, 100);
 
 			add(getOrientationTypeComboBox(), null);
@@ -252,7 +252,7 @@ public class ObjectProperties extends PropertyPanel
 			if (objectButton == null)
 			{
 				objectButton = new JButton();
-				objectButton.setBounds(370, 36, 80, 25);
+				objectButton.setBounds(420, 36, 80, 25);
 				objectButton.setText("Browse");
 				objectButton.addActionListener(new java.awt.event.ActionListener()
 				{

@@ -137,7 +137,7 @@ public class TrackLightProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 460, 415);
+			tabbedPane.setBounds(10, 10, 510, 415);
 
 			Vector<TrackLight> lights = getEditorFrame().getTrackData().getTrackLights();
 
@@ -224,8 +224,8 @@ public class TrackLightProperties extends PropertyPanel
 			addTextField(this, 5, bottomRightXTextField, getString(light.getBottomRightX()), 120, 100);
 			addTextField(this, 6, bottomRightYTextField, getString(light.getBottomRightY()), 120, 100);
 			addTextField(this, 7, bottomRightZTextField, getString(light.getBottomRightZ()), 120, 100);
-			addTextField(this, 8, textureOnTextField, light.getTextureOn(), 120, 240);
-			addTextField(this, 9, textureOffTextField, light.getTextureOff(), 120, 240);
+			addTextField(this, 8, textureOnTextField, light.getTextureOn(), 120, 290);
+			addTextField(this, 9, textureOffTextField, light.getTextureOff(), 120, 290);
 			addTextField(this, 10, indexTextField, getString(light.getIndex()), 120, 100);
 			addTextField(this, 11, redTextField, getString(light.getRed()), 120, 100);
 			addTextField(this, 12, greenTextField, getString(light.getGreen()), 120, 100);
@@ -255,7 +255,7 @@ public class TrackLightProperties extends PropertyPanel
 			if (textureOnButton == null)
 			{
 				textureOnButton = new JButton();
-				textureOnButton.setBounds(370, 225, 80, 25);
+				textureOnButton.setBounds(420, 225, 80, 25);
 				textureOnButton.setText("Browse");
 				textureOnButton.addActionListener(new java.awt.event.ActionListener()
 				{
@@ -273,7 +273,7 @@ public class TrackLightProperties extends PropertyPanel
 			if (textureOffButton == null)
 			{
 				textureOffButton = new JButton();
-				textureOffButton.setBounds(370, 252, 80, 25);
+				textureOffButton.setBounds(420, 252, 80, 25);
 				textureOffButton.setText("Browse");
 				textureOffButton.addActionListener(new java.awt.event.ActionListener()
 				{

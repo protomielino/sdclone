@@ -79,7 +79,7 @@ public class PropertiesDialog extends JDialog
 	private void initialize()
 	{
 		this.setContentPane(getPane());
-		this.setSize(500, 780);
+		this.setSize(550, 780);
 		Point p = editorFrame.getLocation();
 		p.x = editorFrame.getProject().getPropertiesEditorX();
 		p.y = editorFrame.getProject().getPropertiesEditorY();

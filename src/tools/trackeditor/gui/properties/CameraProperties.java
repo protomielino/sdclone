@@ -133,7 +133,7 @@ public class CameraProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 460, 230);
+			tabbedPane.setBounds(10, 10, 510, 230);
 
 			Vector<Camera> cameras = getEditorFrame().getTrackData().getCameras();
 

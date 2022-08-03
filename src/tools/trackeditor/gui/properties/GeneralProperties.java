@@ -86,8 +86,8 @@ public class GeneralProperties extends PropertyPanel
 		add(getVersionComboBox(), null);
 		add(getSkyVersionComboBox(), null);
 
-		addTextField(this, 5, authorTextField, getEditorFrame().getTrackData().getHeader().getAuthor(), 85, 385);
-		addTextField(this, 6, descriptionTextField, getEditorFrame().getTrackData().getHeader().getDescription(), 85, 385);
+		addTextField(this, 5, authorTextField, getEditorFrame().getTrackData().getHeader().getAuthor(), 85, 435);
+		addTextField(this, 6, descriptionTextField, getEditorFrame().getTrackData().getHeader().getDescription(), 85, 435);
 	}
 
 	/**

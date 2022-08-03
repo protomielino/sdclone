@@ -138,7 +138,7 @@ public class SurfaceProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 460, 630);
+			tabbedPane.setBounds(10, 10, 510, 630);
 
 			Vector<Surface> surfaces = getEditorFrame().getTrackData().getSurfaces();
 
@@ -248,7 +248,7 @@ public class SurfaceProperties extends PropertyPanel
 			addTextField(this, 4, colorR2TextField, getString(surface.getColorR2()), 190, 100);
 			addTextField(this, 5, colorG2TextField, getString(surface.getColorG2()), 190, 100);
 			addTextField(this, 6, colorB2TextField, getString(surface.getColorB2()), 190, 100);
-			addTextField(this, 7, textureNameTextField, surface.getTextureName(), 190, 170);
+			addTextField(this, 7, textureNameTextField, surface.getTextureName(), 190, 220);
 
 			add(getTextureTypeComboBox(), null);
 			getTextureTypeComboBox().setSelectedItem(getString(surface.getTextureType()));
@@ -267,7 +267,7 @@ public class SurfaceProperties extends PropertyPanel
 			addTextField(this, 16, bumpSizeTextField, getString(surface.getBumpSize()), 190, 100);
 			addTextField(this, 17, roughnessTextField, getString(surface.getRoughness()), 190, 100);
 			addTextField(this, 18, roughnessWavelengthTextField, getString(surface.getRoughnessWavelength()), 190, 100);
-			addTextField(this, 19, racelineNameTextField, surface.getRacelineName(), 190, 170);
+			addTextField(this, 19, racelineNameTextField, surface.getRacelineName(), 190, 220);
 			addTextField(this, 20, damageTextField, surface.getDammage(), 190, 100);
 			addTextField(this, 21, reboundTextField, getString(surface.getRebound()), 190, 100);
 
@@ -333,7 +333,7 @@ public class SurfaceProperties extends PropertyPanel
 			if (textureNameButton == null)
 			{
 				textureNameButton = new JButton();
-				textureNameButton.setBounds(370, 198, 80, 25);
+				textureNameButton.setBounds(420, 198, 80, 25);
 				textureNameButton.setText("Browse");
 				textureNameButton.addActionListener(new java.awt.event.ActionListener()
 				{
@@ -384,7 +384,7 @@ public class SurfaceProperties extends PropertyPanel
 			if (racelineNameButton == null)
 			{
 				racelineNameButton = new JButton();
-				racelineNameButton.setBounds(370, 522, 80, 25);
+				racelineNameButton.setBounds(420, 522, 80, 25);
 				racelineNameButton.setText("Browse");
 				racelineNameButton.addActionListener(new java.awt.event.ActionListener()
 				{
