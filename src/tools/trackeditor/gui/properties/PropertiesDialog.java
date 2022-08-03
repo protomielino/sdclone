@@ -315,7 +315,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private SurfaceProperties getSurfaceProperties() {
 		if (surfaceProperties == null) {
-			surfaceProperties = new SurfaceProperties(editorFrame);
+			surfaceProperties = new SurfaceProperties(editorFrame, false);
 		}
 		return surfaceProperties;
 	}

@@ -45,6 +45,7 @@ import utils.circuit.Surface;
  */
 public class SurfaceProperties extends PropertyPanel
 {
+	private Boolean				defaultSurfaces		= false;
 	private JButton				addSurfaceButton	= null;
 	private JButton				deleteSurfaceButton	= null;
 	private JTabbedPane			tabbedPane			= null;
@@ -52,9 +53,10 @@ public class SurfaceProperties extends PropertyPanel
 	/**
 	 *
 	 */
-	public SurfaceProperties(EditorFrame editorFrame)
+	public SurfaceProperties(EditorFrame editorFrame, Boolean defaultSurfaces)
 	{
 		super(editorFrame);
+		this.defaultSurfaces = defaultSurfaces;
 		initialize();
     }
 
@@ -68,8 +70,11 @@ public class SurfaceProperties extends PropertyPanel
 		this.setLayout(null);
 		this.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 		this.add(getTabbedPane(), null);
-		this.add(getAddSurfaceButton(), null);
-		this.add(getDeleteSurfaceButton(), null);
+		if (!defaultSurfaces)
+		{
+			this.add(getAddSurfaceButton(), null);
+			this.add(getDeleteSurfaceButton(), null);
+		}
 	}
 
 	/**
@@ -140,7 +145,15 @@ public class SurfaceProperties extends PropertyPanel
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 10, 510, 630);
 
-			Vector<Surface> surfaces = getEditorFrame().getTrackData().getSurfaces();
+			Vector<Surface> surfaces;
+			if (defaultSurfaces)
+			{
+				surfaces = getEditorFrame().getDefaultSurfaces();
+			}
+			else
+			{
+				surfaces = getEditorFrame().getTrackData().getSurfaces();
+			}
 
 			for (int i = 0; i < surfaces.size(); i++)
 	        {
@@ -271,8 +284,36 @@ public class SurfaceProperties extends PropertyPanel
 			addTextField(this, 20, damageTextField, surface.getDammage(), 190, 100);
 			addTextField(this, 21, reboundTextField, getString(surface.getRebound()), 190, 100);
 
-			add(getTextureNameButton(), null);
-			add(getRacelineNameButton(), null);
+			if (defaultSurfaces)
+			{
+				nameTextField.setEnabled(false);
+				colorR1TextField.setEnabled(false);
+				colorG1TextField.setEnabled(false);
+				colorB1TextField.setEnabled(false);
+				colorR2TextField.setEnabled(false);
+				colorG2TextField.setEnabled(false);
+				colorB2TextField.setEnabled(false);
+				textureNameTextField.setEnabled(false);
+				textureTypeComboBox.setEnabled(false);
+				textureSizeTextField.setEnabled(false);
+				textureLinkWithPreviousComboBox.setEnabled(false);
+				textureStartOnBoundaryComboBox.setEnabled(false);
+				textureMipMapTextField.setEnabled(false);
+				frictionTextField.setEnabled(false);
+				rollingResistanceTextField.setEnabled(false);
+				bumpNameTextField.setEnabled(false);
+				bumpSizeTextField.setEnabled(false);
+				roughnessTextField.setEnabled(false);
+				roughnessWavelengthTextField.setEnabled(false);
+				racelineNameTextField.setEnabled(false);
+				damageTextField.setEnabled(false);
+				reboundTextField.setEnabled(false);
+			}
+			else
+			{
+				add(getTextureNameButton(), null);
+				add(getRacelineNameButton(), null);
+			}
 		}
 
 		private String getString(double value)

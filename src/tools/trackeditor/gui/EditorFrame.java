@@ -155,6 +155,7 @@ public class EditorFrame extends JFrame
 	private JMenuItem			deleteMenuItem						= null;
 	private JMenuItem			showArrowsMenuItem					= null;
 	private JMenuItem			showBackgroundMenuItem				= null;
+	private JMenuItem			defaultSurfacesItem					= null;
 	private JToggleButton		moveButton							= null;
 	private JToggleButton		showArrowsButton					= null;
 	private JToggleButton		showBackgroundButton				= null;
@@ -681,6 +682,8 @@ public class EditorFrame extends JFrame
 		viewMenu.add(getShowBackgroundMenuItem());
 		viewMenu.add(menuItemShoStartPoint);
 		viewMenu.add(menuItemAddBackground);
+		viewMenu.addSeparator();
+		viewMenu.add(getDefaultSurfacesMenuItem());
 		_splash.incProgress(20);
 		try
 		{
@@ -993,6 +996,28 @@ public class EditorFrame extends JFrame
 		return showBackgroundMenuItem;
 	}
 
+	private JMenuItem getDefaultSurfacesMenuItem()
+	{
+		if (defaultSurfacesItem == null)
+		{
+			defaultSurfacesItem = new JMenuItem("Default Surfaces");
+			defaultSurfacesItem.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					defaultSurfacesDialog();
+				}
+			});
+		}
+		return defaultSurfacesItem;
+	}
+		
+	private void defaultSurfacesDialog()
+	{
+		DefaultSurfacesDialog surfacesDialog = new DefaultSurfacesDialog(this);
+		surfacesDialog.setVisible(true);
+	}
+	
 	/**
 	 * This method initializes editMenu
 	 *
