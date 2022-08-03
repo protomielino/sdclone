@@ -198,6 +198,8 @@ public class EditorFrame extends JFrame
 	private final static String	SD_DATA_DIRECTORY					= "DataDirectory";
 	private final static String	SD_BIN_DIRECTORY					= "BinDirectory";
 	private final static String	SD_LIB_DIRECTORY					= "LibDirectory";
+
+	private DefaultSurfacesDialog	defaultSurfacesDialog			= null;
 	
 	public class NewProjectInfo
 	{
@@ -697,6 +699,8 @@ public class EditorFrame extends JFrame
 		getProject().setSegmentEditorY(preferences.getInt("SegmentEditorY", 0));
 		getProject().setPropertiesEditorX(preferences.getInt("PropertiesEditorX", 0));
 		getProject().setPropertiesEditorY(preferences.getInt("PropertiesEditorY", 0));
+		getProject().setDefaultSurfacesDialogX(preferences.getInt("DefaultSurfacesDialogX", 0));
+		getProject().setDefaultSurfacesDialogY(preferences.getInt("DefaultSurfacesDialogY", 0));
 	}
 
 	/**
@@ -1014,8 +1018,11 @@ public class EditorFrame extends JFrame
 		
 	private void defaultSurfacesDialog()
 	{
-		DefaultSurfacesDialog surfacesDialog = new DefaultSurfacesDialog(this);
-		surfacesDialog.setVisible(true);
+		if (defaultSurfacesDialog == null)
+		{
+			defaultSurfacesDialog = new DefaultSurfacesDialog(this);
+			defaultSurfacesDialog.setVisible(true);
+		}
 	}
 	
 	/**
@@ -2218,6 +2225,13 @@ public class EditorFrame extends JFrame
 
 	public void exit()
 	{
+		if (defaultSurfacesDialog != null)
+		{
+			getProject().setDefaultSurfacesDialogX(defaultSurfacesDialog.getX());
+			getProject().setDefaultSurfacesDialogY(defaultSurfacesDialog.getY());
+			defaultSurfacesDialog.setVisible(false);
+		}
+		
 		getProject().setFrameX(this.getX());
 		getProject().setFrameY(this.getY());
 		
@@ -2229,6 +2243,8 @@ public class EditorFrame extends JFrame
 		preferences.putInt("SegmentEditorY", getProject().getSegmentEditorY());
 		preferences.putInt("PropertiesEditorX", getProject().getPropertiesEditorX());
 		preferences.putInt("PropertiesEditorY", getProject().getPropertiesEditorY());
+		preferences.putInt("DefaultSurfacesDialogX", getProject().getDefaultSurfacesDialogX());
+		preferences.putInt("DefaultSurfacesDialogY", getProject().getDefaultSurfacesDialogY());
 
 		System.exit(0);
 	}
@@ -2304,5 +2320,10 @@ public class EditorFrame extends JFrame
 			}
 		}
 		return calculateDeltaButton;
+	}
+	
+	public void clearDefaultSurfacesDialog()
+	{
+		defaultSurfacesDialog = null;
 	}
  }

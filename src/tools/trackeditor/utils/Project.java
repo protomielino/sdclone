@@ -30,10 +30,12 @@ public class Project
 {
 	private int frameX = 0;
 	private int frameY = 0;
-	private int segmentEditorX =0;
-	private int segmentEditorY =0;
-	private int propertiesEditorX =0;
-	private int propertiesEditorY =0;
+	private int segmentEditorX = 0;
+	private int segmentEditorY = 0;
+	private int propertiesEditorX = 0;
+	private int propertiesEditorY = 0;
+	private int defaultSurfacesDialogX = 0;
+	private int defaultSurfacesDialogY = 0;
 	
 	public Project()
 	{
@@ -115,5 +117,25 @@ public class Project
 	public void setPropertiesEditorY(int propertiesEditorY)
 	{
 		this.propertiesEditorY = propertiesEditorY;
+	}
+
+	public int getDefaultSurfacesDialogX()
+	{
+		return defaultSurfacesDialogX;
+	}
+
+	public void setDefaultSurfacesDialogX(int defaultSurfacesDialogX)
+	{
+		this.defaultSurfacesDialogX = defaultSurfacesDialogX;
+	}
+
+	public int getDefaultSurfacesDialogY()
+	{
+		return defaultSurfacesDialogY;
+	}
+
+	public void setDefaultSurfacesDialogY(int defaultSurfacesDialogY)
+	{
+		this.defaultSurfacesDialogY = defaultSurfacesDialogY;
 	}
 }
