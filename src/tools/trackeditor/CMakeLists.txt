@@ -28,6 +28,7 @@ IF(Java_Development_FOUND AND Java_FOUND)
    SET(_TARGET_NAME ${SD_TOOLS_EXECPREFIX}trackeditor)
 
    SET(_JAVA_SRC 
+         gui/DefaultSurfacesDialog.java
          gui/DeltaPanel.java
          gui/EditorFrame.java
          gui/NewProjectDialog.java
