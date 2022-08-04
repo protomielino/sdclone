@@ -327,7 +327,7 @@ public class PropertiesDialog extends JDialog
 	 */
 	private ObjectProperties getObjectProperties() {
 		if (objectProperties == null) {
-			objectProperties = new ObjectProperties(editorFrame);
+			objectProperties = new ObjectProperties(editorFrame, false);
 		}
 		return objectProperties;
 	}

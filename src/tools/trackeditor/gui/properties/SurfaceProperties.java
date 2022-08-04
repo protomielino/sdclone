@@ -45,14 +45,14 @@ import utils.circuit.Surface;
  */
 public class SurfaceProperties extends PropertyPanel
 {
-	static private	Surface		surfaceCopy			= null;
+	static private Surface	surfaceCopy			= null;
 	
-	private			Boolean		defaultSurfaces		= false;
-	private			JButton		addSurfaceButton	= null;
-	private			JButton		deleteSurfaceButton	= null;
-	private			JButton		copySurfaceButton	= null;
-	private			JButton		pasteSurfaceButton	= null;
-	private			JTabbedPane	tabbedPane			= null;
+	private	Boolean			defaultSurfaces		= false;
+	private	JButton			addSurfaceButton	= null;
+	private	JButton			deleteSurfaceButton	= null;
+	private	JButton			copySurfaceButton	= null;
+	private	JButton			pasteSurfaceButton	= null;
+	private	JTabbedPane		tabbedPane			= null;
 
 	/**
 	 *
@@ -723,7 +723,6 @@ public class SurfaceProperties extends PropertyPanel
 
 	private void setPanelFromSurface(Surface surface, SurfacePanel panel)
 	{
-		System.out.println("setPanelFromSurface");
 		panel.nameTextField.setText(new String(surface.getName()));
 		panel.colorR1TextField.setText(setDouble(surface.getColorR1()));
 		panel.colorG1TextField.setText(setDouble(surface.getColorG1()));

@@ -108,6 +108,33 @@ public class XmlReader
     	}
     }
 
+    public void readDefaultObjects(String filename, Vector<TrackObject> objectData) throws JDOMException, IOException
+    {
+    	String xml =
+    		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+    		"<!DOCTYPE params SYSTEM \"../../../src/libs/tgf/params.dtd\" [" +
+    		"<!ENTITY default-objects SYSTEM \"" + filename + "\">" +
+    		"]>" +
+    		"<params name=\"test\" type=\"param\" mode=\"mw\">" +
+    		"<section name=\"Objects\">" +
+    		"&default-objects;" +
+    		"</section>" +
+    		"</params>";
+    	SAXBuilder sxb = new SAXBuilder(false);
+    	sxb.setValidation(false);
+    	sxb.setFeature("http://xml.org/sax/features/validation", false);
+    	sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+    	sxb.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);    	
+    	Document doc = sxb.build(new InputSource(new StringReader(xml)));
+    	Element root = doc.getRootElement();
+    	Element surfaces = getChildWithName(root, "Objects");
+
+    	if (surfaces != null)
+    	{
+    		getObjects(surfaces, objectData);
+    	}
+    }
+
     private synchronized void setTrackData(Element root)
     {
         setTrackLights(root);
@@ -378,6 +405,15 @@ public class XmlReader
             return;
 
         Vector<TrackObject> objectData = new Vector<TrackObject>();
+        getObjects(objects, objectData);
+        editorFrame.getTrackData().setObjects(objectData);
+    }
+   
+    /**
+     * @param root
+     */
+    private void getObjects(Element objects, Vector<TrackObject> objectData)
+    {
         List<Element> sections = objects.getChildren();
         Iterator<Element> it = sections.iterator();
         while (it.hasNext())
@@ -395,7 +431,6 @@ public class XmlReader
 
             objectData.add(obj);
         }
-        editorFrame.getTrackData().setObjects(objectData);
     }
 
     /**

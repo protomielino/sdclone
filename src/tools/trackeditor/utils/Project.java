@@ -36,6 +36,8 @@ public class Project
 	private int propertiesEditorY = 0;
 	private int defaultSurfacesDialogX = 0;
 	private int defaultSurfacesDialogY = 0;
+	private int defaultObjectsDialogX = 0;
+	private int defaultObjectsDialogY = 0;
 	
 	public Project()
 	{
@@ -137,5 +139,25 @@ public class Project
 	public void setDefaultSurfacesDialogY(int defaultSurfacesDialogY)
 	{
 		this.defaultSurfacesDialogY = defaultSurfacesDialogY;
+	}
+
+	public int getDefaultObjectsDialogX()
+	{
+		return defaultObjectsDialogX;
+	}
+
+	public void setDefaultObjectsDialogX(int defaultObjectsDialogX)
+	{
+		this.defaultObjectsDialogX = defaultObjectsDialogX;
+	}
+
+	public int getDefaultObjectsDialogY()
+	{
+		return defaultObjectsDialogY;
+	}
+
+	public void setDefaultObjectsDialogY(int defaultObjectsDialogY)
+	{
+		this.defaultObjectsDialogY = defaultObjectsDialogY;
 	}
 }

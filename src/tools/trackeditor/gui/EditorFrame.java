@@ -75,6 +75,7 @@ import utils.circuit.MainTrack;
 import utils.circuit.Segment;
 import utils.circuit.Straight;
 import utils.circuit.Surface;
+import utils.circuit.TrackObject;
 import utils.undo.Undo;
 
 /**
@@ -156,6 +157,7 @@ public class EditorFrame extends JFrame
 	private JMenuItem			showArrowsMenuItem					= null;
 	private JMenuItem			showBackgroundMenuItem				= null;
 	private JMenuItem			defaultSurfacesItem					= null;
+	private JMenuItem			defaultObjectsItem					= null;
 	private JToggleButton		moveButton							= null;
 	private JToggleButton		showArrowsButton					= null;
 	private JToggleButton		showBackgroundButton				= null;
@@ -192,6 +194,7 @@ public class EditorFrame extends JFrame
 	
 	private TrackData			trackData							= null;
 	private Vector<Surface>		defaultSurfaces						= new Vector<Surface>();
+	private Vector<TrackObject>	defaultObjects						= new Vector<TrackObject>();
 	private String				dataDirectory						= null;
 	private String				binDirectory						= null;
 	private String				libDirectory						= null;
@@ -200,6 +203,7 @@ public class EditorFrame extends JFrame
 	private final static String	SD_LIB_DIRECTORY					= "LibDirectory";
 
 	private DefaultSurfacesDialog	defaultSurfacesDialog			= null;
+	private DefaultObjectsDialog	defaultObjectsDialog			= null;
 	
 	public class NewProjectInfo
 	{
@@ -269,6 +273,7 @@ public class EditorFrame extends JFrame
 		libDirectory = preferences.get(SD_LIB_DIRECTORY, null);
 		
 		readDefaultSurfaces();
+		readDefaultObjects();
 	}
 	
 	private void readDefaultSurfaces()
@@ -291,6 +296,28 @@ public class EditorFrame extends JFrame
 	public Vector<Surface> getDefaultSurfaces()
 	{
 		return defaultSurfaces;
+	}
+
+	private void readDefaultObjects()
+	{
+		if (dataDirectory != null && !dataDirectory.isEmpty())
+		{
+			String defaultSurfaceFile = dataDirectory + sep + "data" + sep + "tracks" + sep + "objects.xml";
+			try
+			{
+				XmlReader xmlreader = new XmlReader(this);
+				xmlreader.readDefaultObjects(defaultSurfaceFile, defaultObjects);
+			}
+			catch (Exception e)
+			{
+				JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), "Opening Default Objects", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
+	public Vector<TrackObject> getDefaultObjects()
+	{
+		return defaultObjects;
 	}
 
 	public String getDataDirectory()
@@ -686,6 +713,7 @@ public class EditorFrame extends JFrame
 		viewMenu.add(menuItemAddBackground);
 		viewMenu.addSeparator();
 		viewMenu.add(getDefaultSurfacesMenuItem());
+		viewMenu.add(getDefaultObjectsMenuItem());
 		_splash.incProgress(20);
 		try
 		{
@@ -701,6 +729,8 @@ public class EditorFrame extends JFrame
 		getProject().setPropertiesEditorY(preferences.getInt("PropertiesEditorY", 0));
 		getProject().setDefaultSurfacesDialogX(preferences.getInt("DefaultSurfacesDialogX", 0));
 		getProject().setDefaultSurfacesDialogY(preferences.getInt("DefaultSurfacesDialogY", 0));
+		getProject().setDefaultObjectsDialogX(preferences.getInt("DefaultObjectsDialogX", 0));
+		getProject().setDefaultObjectsDialogY(preferences.getInt("DefaultObjectsDialogY", 0));
 	}
 
 	/**
@@ -1025,6 +1055,31 @@ public class EditorFrame extends JFrame
 		}
 	}
 	
+	private JMenuItem getDefaultObjectsMenuItem()
+	{
+		if (defaultObjectsItem == null)
+		{
+			defaultObjectsItem = new JMenuItem("Default Objects");
+			defaultObjectsItem.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					defaultObjectsDialog();
+				}
+			});
+		}
+		return defaultObjectsItem;
+	}
+		
+	private void defaultObjectsDialog()
+	{
+		if (defaultObjectsDialog == null)
+		{
+			defaultObjectsDialog = new DefaultObjectsDialog(this);
+			defaultObjectsDialog.setVisible(true);
+		}
+	}
+	
 	/**
 	 * This method initializes editMenu
 	 *
@@ -1062,6 +1117,7 @@ public class EditorFrame extends JFrame
 			setBinDirectory(preferencesDialog.getBinDirectory());
 			setLibDirectory(preferencesDialog.getLibDirectory());
 			readDefaultSurfaces();
+			readDefaultObjects();
 		}
 	}
 	
@@ -2232,6 +2288,13 @@ public class EditorFrame extends JFrame
 			defaultSurfacesDialog.setVisible(false);
 		}
 		
+		if (defaultObjectsDialog != null)
+		{
+			getProject().setDefaultObjectsDialogX(defaultObjectsDialog.getX());
+			getProject().setDefaultObjectsDialogY(defaultObjectsDialog.getY());
+			defaultObjectsDialog.setVisible(false);
+		}
+		
 		getProject().setFrameX(this.getX());
 		getProject().setFrameY(this.getY());
 		
@@ -2245,6 +2308,8 @@ public class EditorFrame extends JFrame
 		preferences.putInt("PropertiesEditorY", getProject().getPropertiesEditorY());
 		preferences.putInt("DefaultSurfacesDialogX", getProject().getDefaultSurfacesDialogX());
 		preferences.putInt("DefaultSurfacesDialogY", getProject().getDefaultSurfacesDialogY());
+		preferences.putInt("DefaultObjectsDialogX", getProject().getDefaultObjectsDialogX());
+		preferences.putInt("DefaultObjectsDialogY", getProject().getDefaultObjectsDialogY());
 
 		System.exit(0);
 	}
@@ -2326,4 +2391,9 @@ public class EditorFrame extends JFrame
 	{
 		defaultSurfacesDialog = null;
 	}
- }
+
+	public void clearDefaultObjectsDialog()
+	{
+		defaultObjectsDialog = null;
+	}
+}

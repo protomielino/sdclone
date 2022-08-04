@@ -45,16 +45,22 @@ import utils.circuit.TrackObject;
  */
 public class ObjectProperties extends PropertyPanel
 {
+	static private TrackObject	objectCopy			= null;
+	
+	private	Boolean				defaultObjects		= false;
 	private JButton				addObjectButton		= null;
 	private JButton				deleteObjectButton	= null;
+	private	JButton				copyObjectButton	= null;
+	private	JButton				pasteObjectButton	= null;
 	private JTabbedPane			tabbedPane			= null;
 
 	/**
 	 *
 	 */
-	public ObjectProperties(EditorFrame editorFrame)
+	public ObjectProperties(EditorFrame editorFrame, Boolean defaultObjects)
 	{
 		super(editorFrame);
+		this.defaultObjects = defaultObjects;
 		initialize();
     }
 
@@ -68,8 +74,14 @@ public class ObjectProperties extends PropertyPanel
 		this.setLayout(null);
 		this.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 		this.add(getTabbedPane(), null);
-		this.add(getAddObjectButton(), null);
-		this.add(getDeleteObjectButton(), null);
+		
+		if (!defaultObjects)
+		{
+			this.add(getAddObjectButton(), null);
+			this.add(getDeleteObjectButton(), null);
+			this.add(getPasteObjectButton(), null);
+		}
+		this.add(getCopyObjectButton(), null);
 	}
 
 	/**
@@ -82,7 +94,7 @@ public class ObjectProperties extends PropertyPanel
 		if (addObjectButton == null)
 		{
 			addObjectButton = new JButton();
-			addObjectButton.setBounds(10, 250, 100, 25);
+			addObjectButton.setBounds(10, 250, 120, 25);
 			addObjectButton.setText("Add Object");
 			addObjectButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -128,6 +140,56 @@ public class ObjectProperties extends PropertyPanel
 	}
 
 	/**
+	 * This method initializes copyObjectButton
+	 *
+	 * @return javax.swing.JButton
+	 */
+	private JButton getCopyObjectButton()
+	{
+		if (copyObjectButton == null)
+		{
+			copyObjectButton = new JButton();
+			copyObjectButton.setBounds(270, 250, 120, 25);
+			copyObjectButton.setText("Copy Object");
+			copyObjectButton.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed(java.awt.event.ActionEvent e)
+				{
+					objectCopy = new TrackObject();
+					setObjectFromPanel(objectCopy, (ObjectPanel) getTabbedPane().getSelectedComponent());
+				}
+			});
+		}
+		return copyObjectButton;
+	}
+
+	/**
+	 * This method initializes pasteObjectButton
+	 *
+	 * @return javax.swing.JButton
+	 */
+	private JButton getPasteObjectButton()
+	{
+		if (pasteObjectButton == null)
+		{
+			pasteObjectButton = new JButton();
+			pasteObjectButton.setBounds(400, 250, 120, 25);
+			pasteObjectButton.setText("Paste Object");
+			pasteObjectButton.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed(java.awt.event.ActionEvent e)
+				{
+					if (objectCopy != null)
+					{
+						setPanelFromObject(objectCopy, (ObjectPanel) getTabbedPane().getSelectedComponent());
+					}
+				}
+			});
+		}
+		return pasteObjectButton;
+	}
+
+	/**
 	 * This method initializes tabbedPane
 	 *
 	 * @return javax.swing.JTabbedPane
@@ -140,7 +202,15 @@ public class ObjectProperties extends PropertyPanel
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 			tabbedPane.setBounds(10, 10, 510, 230);
 
-			Vector<TrackObject> objects = getEditorFrame().getTrackData().getObjects();
+			Vector<TrackObject> objects = null;
+			if (defaultObjects)
+			{
+				objects = getEditorFrame().getDefaultObjects();
+			}
+			else
+			{
+				objects = getEditorFrame().getTrackData().getObjects();	
+			}
 
 			for (int i = 0; i < objects.size(); i++)
 	        {
@@ -205,8 +275,21 @@ public class ObjectProperties extends PropertyPanel
 			addTextField(this, 4, orientationTextField, getString(object.getOrientation()), 120, 100);
 			addTextField(this, 5, deltaHeightTextField, getString(object.getDeltaHeight()), 120, 100);
 			addTextField(this, 6, deltaVertTextField, getString(object.getDeltaVert()), 120, 100);
-			
-			add(getObjectButton(), null);
+
+			if (defaultObjects)
+			{
+				nameTextField.setEnabled(false);
+				objectTextField.setEnabled(false);
+				colorTextField.setEnabled(false);
+				orientationTypeComboBox.setEnabled(false);
+				orientationTextField.setEnabled(false);
+				deltaHeightTextField.setEnabled(false);
+				deltaVertTextField.setEnabled(false);
+			}
+			else
+			{
+				add(getObjectButton(), null);
+			}
 		}
 
 		private String getString(double value)
@@ -371,17 +454,53 @@ public class ObjectProperties extends PropertyPanel
 			{
 	            ObjectPanel panel = (ObjectPanel) tabbedPane.getComponentAt(objects.size());
 				TrackObject object = new TrackObject();
-
-				object.setName(panel.nameTextField.getText());
-				object.setObject(panel.objectTextField.getText());
-				object.setColor(getInteger(panel.colorTextField.getText()));
-				object.setOrientationType(getString(panel.orientationTypeComboBox.getSelectedItem().toString()));
-				object.setOrientation(getDouble(panel.orientationTextField.getText()));
-				object.setDeltaHeight(getDouble(panel.deltaHeightTextField.getText()));
-				object.setDeltaVert(getDouble(panel.deltaVertTextField.getText()));
-
+				setObjectFromPanel(object, panel);
 				objects.add(object);
 			}
 		}
+	}
+	
+	private void setObjectFromPanel(TrackObject object, ObjectPanel panel)
+	{
+		object.setName(panel.nameTextField.getText());
+		object.setObject(panel.objectTextField.getText());
+		object.setColor(getInteger(panel.colorTextField.getText()));
+		object.setOrientationType(getString(panel.orientationTypeComboBox.getSelectedItem().toString()));
+		object.setOrientation(getDouble(panel.orientationTextField.getText()));
+		object.setDeltaHeight(getDouble(panel.deltaHeightTextField.getText()));
+		object.setDeltaVert(getDouble(panel.deltaVertTextField.getText()));
+	}
+
+	private void setPanelFromObject(TrackObject object, ObjectPanel panel)
+	{
+		panel.nameTextField.setText(new String(object.getName()));
+		panel.objectTextField.setText(new String(object.getObject()));
+		panel.colorTextField.setText(setInteger(object.getColor()));
+		panel.orientationTypeComboBox.setSelectedItem(getString(object.getOrientationType()));		
+		panel.orientationTextField.setText(setDouble(object.getOrientation()));
+		panel.deltaHeightTextField.setText(setDouble(object.getDeltaHeight()));
+		panel.deltaVertTextField.setText(setDouble(object.getDeltaVert()));
+	}
+
+	private String setInteger(int value)
+	{
+		if (value != Integer.MAX_VALUE)
+			return "0x" + Integer.toHexString(value).toUpperCase();
+
+		return null;
+	}
+
+	private String setDouble(double value)
+	{
+		if (Double.isNaN(value))
+			return null;
+		return "" + value;
+	}
+
+	private String setString(String value)
+	{
+		if (value == null || value.isEmpty())
+			return "none";
+		return value;
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"
