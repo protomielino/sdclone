@@ -38,6 +38,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import gui.EditorFrame;
 import utils.Editor;
+import utils.SurfaceComboBox;
 import utils.circuit.ObjectMap;
 import utils.circuit.Surface;
 import utils.circuit.TerrainGeneration;
@@ -71,7 +72,7 @@ public class TerrainProperties extends PropertyPanel
 	private JLabel				reliefFileLabel				= new JLabel();
 	private JTextField			reliefFileTextField			= new JTextField();
 	private JLabel				surfaceLabel				= new JLabel();
-	private JComboBox<String>	surfaceComboBox				= null;
+	private SurfaceComboBox		surfaceComboBox				= null;
 	private JButton				defaultButton				= null;
 	private JButton				deleteButton				= null;
 	private JButton				addObjectMapButton			= null;
@@ -110,6 +111,8 @@ public class TerrainProperties extends PropertyPanel
 	 */
 	private void initialize()
 	{
+		addDefaultSurfaces(roadSurfaceVector);
+
 		setLayout(null);
 		setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
 
@@ -146,26 +149,6 @@ public class TerrainProperties extends PropertyPanel
 		this.add(getDeleteObjectMapButton(), null);
 		this.add(getElevationMapButton(), null);
 		this.add(getReliefFileButton(), null);
-
-        Vector<Surface> surfaces = getEditorFrame().getTrackData().getSurfaces();
-        for (int i = 0; i < surfaces.size(); i++)
-        {
-			String surface = surfaces.elementAt(i).getName();
-			boolean found = false;
-			for (int j = 0; j < roadSurfaceVector.size(); j++)
-			{
-				if (roadSurfaceVector.elementAt(i).equals(surfaces.elementAt(i).getName()))
-				{
-					found = true;
-					break;
-				}
-			}
-			if (!found)
-			{
-				roadSurfaceVector.add(surface);
-			}
-        }
-		Collections.sort(roadSurfaceVector);
 	}
 
 	/**
@@ -194,19 +177,31 @@ public class TerrainProperties extends PropertyPanel
 	 *
 	 * @return javax.swing.JComboBox
 	 */
-	private JComboBox<String> getSurfaceComboBox()
+	private SurfaceComboBox getSurfaceComboBox()
 	{
 		if (surfaceComboBox == null)
 		{
-			surfaceComboBox = new JComboBox<String>();
-			surfaceComboBox.setBounds(140, 280, 180, 23);
 			String surface = getEditorFrame().getTrackData().getGraphic().getTerrainGeneration().getSurface();
+			addSurface(roadSurfaceVector, surface);
+			surfaceComboBox = new SurfaceComboBox(getEditorFrame(), roadSurfaceVector);
+			surfaceComboBox.setBounds(140, 280, 180, 23);
+			surfaceComboBox.setSelectedItem(surface);
+		}
+		return surfaceComboBox;
+	}
+
+	private void addDefaultSurfaces(Vector<String> surfaceVector)
+	{
+        Vector<Surface> surfaces = getEditorFrame().getTrackData().getSurfaces();
+        for (int i = 0; i < surfaces.size(); i++)
+        {
+			String surface = surfaces.elementAt(i).getName();
 			if (surface != null)
 			{
 				boolean found = false;
-				for (int i = 0; i < roadSurfaceVector.size(); i++)
+				for (int j = 0; j < surfaceVector.size(); j++)
 				{
-					if (roadSurfaceVector.elementAt(i).equals(surface))
+					if (surfaceVector.elementAt(i).equals(surfaces.elementAt(i).getName()))
 					{
 						found = true;
 						break;
@@ -214,13 +209,33 @@ public class TerrainProperties extends PropertyPanel
 				}
 				if (!found)
 				{
-					roadSurfaceVector.add(surface);
+					surfaceVector.add(surface);
 				}
 			}
-			surfaceComboBox.setModel(new DefaultComboBoxModel<String>(roadSurfaceVector));
-			surfaceComboBox.setSelectedItem(surface);
+        }
+		Collections.sort(surfaceVector);
+	}
+
+	private void addSurface(Vector<String> surfaceVector, String surface)
+	{
+		// add this surface if it's not found in default list
+		if (surface != null)
+		{
+			boolean found = false;
+			for (int i = 0; i < surfaceVector.size(); i++)
+			{
+				if (surfaceVector.elementAt(i).equals(surface))
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				surfaceVector.add(surface);
+				Collections.sort(surfaceVector);
+			}
 		}
-		return surfaceComboBox;
 	}
 
 	/**

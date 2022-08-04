@@ -176,7 +176,7 @@ public class EnvMapProperties extends PropertyPanel
 			addLabel(this, 0, nameLabel, "Name", 120);
 			addLabel(this, 1, envMapLabel, "Environment Map", 120);
 
-			addTextField(this, 0, nameTextField, name, 130, 60);
+			addTextField(this, 0, nameTextField, name, 130, 100);
 			addTextField(this, 1, envMapTextField, environmentMap, 130, 280);
 
 			add(getEnvMapButton(), null);

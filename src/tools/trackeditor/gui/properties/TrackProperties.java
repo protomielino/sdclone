@@ -204,7 +204,7 @@ public class TrackProperties extends PropertyPanel
 	 *
 	 * @return javax.swing.JComboBox
 	 */
-	private JComboBox<String> getSurfaceComboBox()
+	private SurfaceComboBox getSurfaceComboBox()
 	{
 		if (surfaceComboBox == null)
 		{

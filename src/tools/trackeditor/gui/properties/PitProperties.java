@@ -76,7 +76,7 @@ public class PitProperties extends PropertyPanel
 	private JLabel				speedLimitLabel			= new JLabel();
 	private JTextField			speedLimitTextField		= new JTextField();
 	private JLabel				entrySurfaceLabel		= new JLabel();
-	private JComboBox<String>	entrySurfaceComboBox	= null;
+	private SurfaceComboBox		entrySurfaceComboBox	= null;
 	private JLabel				pitSurfaceLabel			= new JLabel();
 	private SurfaceComboBox		pitSurfaceComboBox		= null;
 	private JLabel				pitWallLabel			= new JLabel();
@@ -322,13 +322,12 @@ public class PitProperties extends PropertyPanel
 	 *
 	 * @return javax.swing.JComboBox
 	 */
-	private JComboBox<String> getEntrySurfaceComboBox()
+	private SurfaceComboBox getEntrySurfaceComboBox()
 	{
 		if (entrySurfaceComboBox == null)
 		{
-			entrySurfaceComboBox = new JComboBox<String>();
+			entrySurfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
 			entrySurfaceComboBox.setBounds(120, 442, 180, 23);
-			entrySurfaceComboBox.setModel(new DefaultComboBoxModel<String>(sideSurfaceVector));
 			entrySurfaceComboBox.setEnabled(false);
 			entrySurfaceComboBox.setSelectedItem(null);
 		}
@@ -398,7 +397,7 @@ public class PitProperties extends PropertyPanel
 	 *
 	 * @return javax.swing.JComboBox
 	 */
-	private JComboBox<String> getPitWallSurfaceComboBox()
+	private SurfaceComboBox getPitWallSurfaceComboBox()
 	{
 		if (pitWallSurfaceComboBox == null)
 		{
@@ -415,7 +414,7 @@ public class PitProperties extends PropertyPanel
 	 *
 	 * @return javax.swing.JComboBox
 	 */
-	private JComboBox<String> getExitSurfaceComboBox()
+	private SurfaceComboBox getExitSurfaceComboBox()
 	{
 		if (exitSurfaceComboBox == null)
 		{
