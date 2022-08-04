@@ -45,10 +45,14 @@ import utils.circuit.Surface;
  */
 public class SurfaceProperties extends PropertyPanel
 {
-	private Boolean				defaultSurfaces		= false;
-	private JButton				addSurfaceButton	= null;
-	private JButton				deleteSurfaceButton	= null;
-	private JTabbedPane			tabbedPane			= null;
+	static private	Surface		surfaceCopy			= null;
+	
+	private			Boolean		defaultSurfaces		= false;
+	private			JButton		addSurfaceButton	= null;
+	private			JButton		deleteSurfaceButton	= null;
+	private			JButton		copySurfaceButton	= null;
+	private			JButton		pasteSurfaceButton	= null;
+	private			JTabbedPane	tabbedPane			= null;
 
 	/**
 	 *
@@ -74,7 +78,9 @@ public class SurfaceProperties extends PropertyPanel
 		{
 			this.add(getAddSurfaceButton(), null);
 			this.add(getDeleteSurfaceButton(), null);
+			this.add(getPasteSurfaceButton(), null);
 		}
+		this.add(getCopySurfaceButton(), null);
 	}
 
 	/**
@@ -116,7 +122,7 @@ public class SurfaceProperties extends PropertyPanel
 		if (deleteSurfaceButton == null)
 		{
 			deleteSurfaceButton = new JButton();
-			deleteSurfaceButton.setBounds(150, 650, 120, 25);
+			deleteSurfaceButton.setBounds(140, 650, 120, 25);
 			deleteSurfaceButton.setText("Delete Surface");
 			deleteSurfaceButton.addActionListener(new java.awt.event.ActionListener()
 			{
@@ -133,6 +139,56 @@ public class SurfaceProperties extends PropertyPanel
 	}
 
 	/**
+	 * This method initializes copySurfaceButton
+	 *
+	 * @return javax.swing.JButton
+	 */
+	private JButton getCopySurfaceButton()
+	{
+		if (copySurfaceButton == null)
+		{
+			copySurfaceButton = new JButton();
+			copySurfaceButton.setBounds(270, 650, 120, 25);
+			copySurfaceButton.setText("Copy Surface");
+			copySurfaceButton.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed(java.awt.event.ActionEvent e)
+				{
+					surfaceCopy = new Surface();
+					setSurfaceFromPanel(surfaceCopy, (SurfacePanel) getTabbedPane().getSelectedComponent());
+				}
+			});
+		}
+		return copySurfaceButton;
+	}
+
+	/**
+	 * This method initializes pasteSurfaceButton
+	 *
+	 * @return javax.swing.JButton
+	 */
+	private JButton getPasteSurfaceButton()
+	{
+		if (pasteSurfaceButton == null)
+		{
+			pasteSurfaceButton = new JButton();
+			pasteSurfaceButton.setBounds(400, 650, 120, 25);
+			pasteSurfaceButton.setText("Paste Surface");
+			pasteSurfaceButton.addActionListener(new java.awt.event.ActionListener()
+			{
+				public void actionPerformed(java.awt.event.ActionEvent e)
+				{
+					if (surfaceCopy != null)
+					{
+						setPanelFromSurface(surfaceCopy, (SurfacePanel) getTabbedPane().getSelectedComponent());
+					}
+				}
+			});
+		}
+		return pasteSurfaceButton;
+	}
+
+	/**
 	 * This method initializes tabbedPane
 	 *
 	 * @return javax.swing.JTabbedPane
@@ -143,7 +199,7 @@ public class SurfaceProperties extends PropertyPanel
 		{
 			tabbedPane = new JTabbedPane();
 			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-			tabbedPane.setBounds(10, 10, 510, 630);
+			tabbedPane.setBounds(10, 10, 510, 632);
 
 			Vector<Surface> surfaces;
 			if (defaultSurfaces)
@@ -536,7 +592,7 @@ public class SurfaceProperties extends PropertyPanel
 
             if (isDifferent(panel.getTextureTypeComboBox().getSelectedItem().toString(), surface.getTextureType(), stringResult))
             {
-                surface.setTextureName(stringResult.getValue());
+                surface.setTextureType(stringResult.getValue());
                 getEditorFrame().documentIsModified = true;
             }
 
@@ -633,32 +689,76 @@ public class SurfaceProperties extends PropertyPanel
 			{
 	            SurfacePanel panel = (SurfacePanel) tabbedPane.getComponentAt(surfaces.size());
 				Surface surface = new Surface();
-
-				surface.setName(panel.nameTextField.getText());
-				surface.setColorR1(getDouble(panel.colorR1TextField.getText()));
-				surface.setColorG1(getDouble(panel.colorG1TextField.getText()));
-				surface.setColorB1(getDouble(panel.colorB1TextField.getText()));
-				surface.setColorR2(getDouble(panel.colorR2TextField.getText()));
-				surface.setColorG2(getDouble(panel.colorG2TextField.getText()));
-				surface.setColorB2(getDouble(panel.colorB2TextField.getText()));
-				surface.setTextureName(panel.textureNameTextField.getText());
-				surface.setTextureType(getString(panel.getTextureTypeComboBox().getSelectedItem().toString()));
-				surface.setTextureSize(getDouble(panel.textureSizeTextField.getText()));
-				surface.setTextureLinkWithPrevious(getString(panel.getTextureLinkWithPreviousComboBox().getSelectedItem().toString()));
-				surface.setTextureStartOnBoundary(getString(panel.getTextureStartOnBoundaryComboBox().getSelectedItem().toString()));
-				surface.setTextureMipMap(getDouble(panel.textureMipMapTextField.getText()));
-				surface.setFriction(getDouble(panel.frictionTextField.getText()));
-				surface.setRollingResistance(getDouble(panel.rollingResistanceTextField.getText()));
-				surface.setBumpName(panel.bumpNameTextField.getText());
-				surface.setBumpSize(getDouble(panel.bumpSizeTextField.getText()));
-				surface.setRoughness(getDouble(panel.roughnessTextField.getText()));
-				surface.setRoughnessWavelength(getDouble(panel.roughnessWavelengthTextField.getText()));
-				surface.setRacelineName(panel.racelineNameTextField.getText());
-				surface.setDammage(getDouble(panel.damageTextField.getText()));
-				surface.setRebound(getDouble(panel.reboundTextField.getText()));
-
+				setSurfaceFromPanel(surface, panel);
 				surfaces.add(surface);
 			}
 		}
+	}
+
+	private void setSurfaceFromPanel(Surface surface, SurfacePanel panel)
+	{
+		surface.setName(panel.nameTextField.getText());
+		surface.setColorR1(getDouble(panel.colorR1TextField.getText()));
+		surface.setColorG1(getDouble(panel.colorG1TextField.getText()));
+		surface.setColorB1(getDouble(panel.colorB1TextField.getText()));
+		surface.setColorR2(getDouble(panel.colorR2TextField.getText()));
+		surface.setColorG2(getDouble(panel.colorG2TextField.getText()));
+		surface.setColorB2(getDouble(panel.colorB2TextField.getText()));
+		surface.setTextureName(panel.textureNameTextField.getText());
+		surface.setTextureType(getString(panel.getTextureTypeComboBox().getSelectedItem().toString()));
+		surface.setTextureSize(getDouble(panel.textureSizeTextField.getText()));
+		surface.setTextureLinkWithPrevious(getString(panel.getTextureLinkWithPreviousComboBox().getSelectedItem().toString()));
+		surface.setTextureStartOnBoundary(getString(panel.getTextureStartOnBoundaryComboBox().getSelectedItem().toString()));
+		surface.setTextureMipMap(getDouble(panel.textureMipMapTextField.getText()));
+		surface.setFriction(getDouble(panel.frictionTextField.getText()));
+		surface.setRollingResistance(getDouble(panel.rollingResistanceTextField.getText()));
+		surface.setBumpName(panel.bumpNameTextField.getText());
+		surface.setBumpSize(getDouble(panel.bumpSizeTextField.getText()));
+		surface.setRoughness(getDouble(panel.roughnessTextField.getText()));
+		surface.setRoughnessWavelength(getDouble(panel.roughnessWavelengthTextField.getText()));
+		surface.setRacelineName(panel.racelineNameTextField.getText());
+		surface.setDammage(getDouble(panel.damageTextField.getText()));
+		surface.setRebound(getDouble(panel.reboundTextField.getText()));
+	}
+
+	private void setPanelFromSurface(Surface surface, SurfacePanel panel)
+	{
+		System.out.println("setPanelFromSurface");
+		panel.nameTextField.setText(new String(surface.getName()));
+		panel.colorR1TextField.setText(setDouble(surface.getColorR1()));
+		panel.colorG1TextField.setText(setDouble(surface.getColorG1()));
+		panel.colorB1TextField.setText(setDouble(surface.getColorB1()));
+		panel.colorR2TextField.setText(setDouble(surface.getColorR2()));
+		panel.colorG2TextField.setText(setDouble(surface.getColorG2()));
+		panel.colorB2TextField.setText(setDouble(surface.getColorB2()));
+		panel.textureNameTextField.setText(new String(surface.getTextureName()));		
+		panel.textureTypeComboBox.setSelectedItem(getString(surface.getTextureType()));		
+		panel.textureSizeTextField.setText(setDouble(surface.getTextureSize()));
+		panel.textureLinkWithPreviousComboBox.setSelectedItem(setString(surface.getTextureLinkWithPrevious()));
+		panel.getTextureStartOnBoundaryComboBox().setSelectedItem(setString(surface.getTextureStartOnBoundary()));
+		panel.textureMipMapTextField.setText(setDouble(surface.getTextureMipMap()));
+		panel.frictionTextField.setText(setDouble(surface.getFriction()));
+		panel.rollingResistanceTextField.setText(setDouble(surface.getRollingResistance()));
+		panel.bumpNameTextField.setText(surface.getBumpName());
+		panel.bumpSizeTextField.setText(setDouble(surface.getBumpSize()));
+		panel.roughnessTextField.setText(setDouble(surface.getRoughness()));
+		panel.roughnessWavelengthTextField.setText(setDouble(surface.getRoughnessWavelength()));
+		panel.racelineNameTextField.setText(new String(surface.getRacelineName()));
+		panel.damageTextField.setText(setDouble(surface.getDammage()));
+		panel.reboundTextField.setText(setDouble(surface.getRebound()));
+	}
+
+	private String setDouble(double value)
+	{
+		if (Double.isNaN(value))
+			return null;
+		return "" + value;
+	}
+
+	private String setString(String value)
+	{
+		if (value == null || value.isEmpty())
+			return "none";
+		return value;
 	}
 } //  @jve:decl-index=0:visual-constraint="10,10"

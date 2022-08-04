@@ -79,7 +79,7 @@ public class PropertiesDialog extends JDialog
 	private void initialize()
 	{
 		this.setContentPane(getPane());
-		this.setSize(550, 780);
+		this.setSize(550, 785);
 		Point p = editorFrame.getLocation();
 		p.x = editorFrame.getProject().getPropertiesEditorX();
 		p.y = editorFrame.getProject().getPropertiesEditorY();
@@ -196,7 +196,7 @@ public class PropertiesDialog extends JDialog
 		if (cancelButton == null)
 		{
 			cancelButton = new JButton();
-			cancelButton.setBounds(270, 5, 80, 25);
+			cancelButton.setBounds(315, 5, 80, 25);
 			cancelButton.setText("Cancel");
 			cancelButton.addActionListener(new java.awt.event.ActionListener()
 			{
