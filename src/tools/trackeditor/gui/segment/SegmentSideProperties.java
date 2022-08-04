@@ -138,7 +138,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		this.setLayout(null);
 		this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 		this.setLocation(0, 0);
-		titleLabel.setBounds(396, 5, 70, 20);
+		titleLabel.setBounds(396, 5, 70, 23);
 		titleLabel.setText("Right");
 		titleLabel.setFont(new Font("Dialog", Font.BOLD, 18));
 		this.add(getPanel(), null);
@@ -192,13 +192,13 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			barrierLabel = new JLabel();
 			panel.setLayout(null);
 			panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-			borderLabel.setBounds(698, 2, 50, 20);
+			borderLabel.setBounds(698, 2, 50, 23);
 			borderLabel.setText("Border");
-			borderSurfaceLabel.setBounds(698, 325, 55, 20);
+			borderSurfaceLabel.setBounds(698, 325, 55, 23);
 			borderSurfaceLabel.setText("Surface");
-			borderStyleLabel.setBounds(703, 375, 55, 20);
+			borderStyleLabel.setBounds(703, 375, 55, 23);
 			borderStyleLabel.setText("Style");
-			sideBankingTypeLabel.setBounds(376, 375, 90, 20);
+			sideBankingTypeLabel.setBounds(376, 375, 90, 23);
 			sideBankingTypeLabel.setText("Banking Type");
 			panel.add(borderSurfaceLabel, null);
 			panel.add(borderStyleLabel, null);
@@ -212,16 +212,16 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 			panel.setLocation(3, 35);
 			panel.setSize(823, 431);
 			sideLabel.setText("Side");
-			sideLabel.setSize(45, 20);
+			sideLabel.setSize(45, 23);
 			sideLabel.setLocation(401, 2);
 			sideSurfaceLabel.setText("Surface");
-			sideSurfaceLabel.setBounds(391, 325, 55, 20);
+			sideSurfaceLabel.setBounds(391, 325, 55, 23);
 			barrierLabel.setText("Barrier");
-			barrierLabel.setBounds(85, 2, 50, 20);
+			barrierLabel.setBounds(85, 2, 50, 23);
 			barrierStyleLabel.setText("Style");
-			barrierStyleLabel.setBounds(90, 375, 55, 20);
+			barrierStyleLabel.setBounds(90, 375, 55, 23);
 			barrierSurfaceLabel.setText("Surface");
-			barrierSurfaceLabel.setBounds(85, 325, 55, 20);
+			barrierSurfaceLabel.setBounds(85, 325, 55, 23);
 			panel.add(getBarrierHeightSlider(), null);
 			panel.add(getBorderSurfaceComboBox(), null);
 			panel.add(getBorderStyleComboBox(), null);
@@ -248,7 +248,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		if (borderSurfaceComboBox == null)
 		{
 			borderSurfaceComboBox = new SurfaceComboBox(parent.editorFrame, borderSurfaceVector);
-			borderSurfaceComboBox.setBounds(618, 350, 200, 20);
+			borderSurfaceComboBox.setBounds(618, 350, 200, 23);
 			borderSurfaceComboBox.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -270,7 +270,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		if (borderStyleComboBox == null)
 		{
 			borderStyleComboBox = new JComboBox<String>();
-			borderStyleComboBox.setBounds(658, 400, 120, 20);
+			borderStyleComboBox.setBounds(658, 400, 120, 23);
 			borderStyleComboBox.setModel(new DefaultComboBoxModel<String>(styleItems));
 			borderStyleComboBox.addActionListener(new ActionListener()
 			{
@@ -293,7 +293,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		if (sideSurfaceComboBox == null)
 		{
 			sideSurfaceComboBox = new SurfaceComboBox(parent.editorFrame, sideSurfaceVector);
-			sideSurfaceComboBox.setBounds(311, 350, 200, 20);
+			sideSurfaceComboBox.setBounds(311, 350, 200, 23);
 			sideSurfaceComboBox.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -316,7 +316,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		{
 			String[] items = {"none", "level", "tangent"};
 			sideBankingTypeComboBox = new JComboBox<String>();
-			sideBankingTypeComboBox.setBounds(351, 400, 120, 20);
+			sideBankingTypeComboBox.setBounds(351, 400, 120, 23);
 			sideBankingTypeComboBox.setModel(new DefaultComboBoxModel<String>(items));
 			sideBankingTypeComboBox.addActionListener(new ActionListener()
 			{
@@ -341,7 +341,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		if (barrierSurfaceComboBox == null)
 		{
 			barrierSurfaceComboBox = new SurfaceComboBox(parent.editorFrame, barrierSurfaceVector);
-			barrierSurfaceComboBox.setBounds(5, 350, 200, 20);
+			barrierSurfaceComboBox.setBounds(5, 350, 200, 23);
 			barrierSurfaceComboBox.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -363,7 +363,7 @@ public class SegmentSideProperties extends JPanel implements SliderListener
 		if (barrierStyleComboBox == null)
 		{
 			barrierStyleComboBox = new JComboBox<String>();
-			barrierStyleComboBox.setBounds(45, 400, 120, 20);
+			barrierStyleComboBox.setBounds(45, 400, 120, 23);
 			barrierStyleComboBox.setModel(new DefaultComboBoxModel<String>(styleItems));
 			barrierStyleComboBox.addActionListener(new ActionListener()
 			{

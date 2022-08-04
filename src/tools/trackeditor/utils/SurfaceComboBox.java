@@ -1,5 +1,7 @@
 package utils;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,14 +39,39 @@ public class SurfaceComboBox extends JComboBox<String>
 		ComboboxToolTipRenderer	renderer = new ComboboxToolTipRenderer();
 		renderer.setTooltips(getSurfaceImages());
 		setRenderer(renderer);
+		addItemListener(new ItemChangeListener());
 	}
 
+	private class ItemChangeListener implements ItemListener
+	{
+	    @Override
+	    public void itemStateChanged(ItemEvent event)
+	    {
+	    	if (event.getStateChange() == ItemEvent.SELECTED)
+	    	{
+	    		String surfaceName = getSelectedItem().toString();
+	    		String tooltipText = null;
+	    		Vector<Surface> defaultSurfaces = editorFrame.getDefaultSurfaces();
+	    		Vector<Surface>	surfaces = editorFrame.getTrackData().getSurfaces();
+	    		if (editorFrame.getDataDirectory() != null)
+	    		{
+	    			tooltipText = getTextureName(surfaceName, defaultSurfaces, editorFrame.getDataDirectory() + sep + "data" + sep + "textures");
+	    		}
+	    		if (tooltipText == null)
+	    		{
+	    			tooltipText = getTextureName(surfaceName, surfaces, Editor.getProperties().getPath());
+	    		}
+	    		setToolTipText(tooltipText);
+	    	}
+	    }       
+	}
+	
 	private class ComboboxToolTipRenderer extends DefaultListCellRenderer
 	{
 		List<String> tooltips;
 
 		@Override
-		public JComponent getListCellRendererComponent(JList list, Object value,
+		public JComponent getListCellRendererComponent(JList<?> list, Object value,
 			int index, boolean isSelected, boolean cellHasFocus)
 		{
 			JComponent comp = (JComponent) super.getListCellRendererComponent(
