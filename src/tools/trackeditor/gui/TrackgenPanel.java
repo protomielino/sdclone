@@ -117,6 +117,11 @@ public class TrackgenPanel extends JDialog implements Runnable
 								JOptionPane.showMessageDialog(this, str.substring(index + 6), "Export AC3D", JOptionPane.ERROR_MESSAGE);
 							}
 						}
+						index = str.indexOf("FATAL:");
+						if (index != -1)
+						{
+							JOptionPane.showMessageDialog(this, str.substring(index + 6), "Export AC3D", JOptionPane.ERROR_MESSAGE);
+						}
 					}
 				
 					if (ls_in.ready()) 
@@ -147,6 +152,9 @@ public class TrackgenPanel extends JDialog implements Runnable
 							}else if (tmp.equals("YSize"))
 							{
 								this.ySizeLabel.setText(ls_str);
+							}else if (tmp.equals("FATAL:"))
+							{
+								JOptionPane.showMessageDialog(this, ls_str, "Export AC3D", JOptionPane.ERROR_MESSAGE);
 							}else
 							{
 								this.nodesTextField.setText(ls_str);
