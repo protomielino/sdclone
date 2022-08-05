@@ -224,6 +224,7 @@ TDriver::TDriver(int Index):
 	oLastLap(1),
 	oClutch(0.5),
 	oGear(0),
+	oUsedGear(0),
 	oSteer(0),
 	oLastSteer(0),
 
