@@ -2050,7 +2050,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     GF_TAILQ_INIT(&cams[c]);
     id = 0;
 
-    /* cam F2 = behind the car, near, looking forward */
+    /* cam F3 = behind the car, near, looking forward */
     cam = new cGrCarCamBehind(myscreen,
                               id,
                               1,	/* drawCurr */
@@ -2104,7 +2104,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     cam->add(&cams[c]);
     id++;
 
-    /* cam F2 = behind the car, very near, looking forward */
+    /* cam F3 = behind the car, very near, looking forward */
     cam = new cGrCarCamBehind(myscreen,
                               id,
                               1,	/* drawCurr */
