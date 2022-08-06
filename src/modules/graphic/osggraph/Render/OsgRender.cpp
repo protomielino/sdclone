@@ -82,6 +82,7 @@ SDRender::SDRender(void) :
     m_CarLightsRoot(NULL),
     stateSet(NULL),
     skySS(NULL),
+    m_Fog(NULL),
     sunLight(NULL),
     AStarsData(NULL),
     APlanetsData(NULL),
@@ -139,6 +140,7 @@ SDRender::~SDRender(void)
         m_NonShadowRoot = NULL;
         m_Scene = NULL;
         m_Root = NULL;
+        m_Fog = NULL;
     }
 
     if (thesky)
@@ -392,9 +394,6 @@ void SDRender::Init(tTrack *track)
     stateSet = m_Scene->getOrCreateStateSet();
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
 
-    if (SDRain > 0)
-        stateSet->setAttributeAndModes(precipitationEffect->getFog());
-
     float emis = 0.5f * sky_brightness;
     float ambian = 0.8f * sky_brightness;
     osg::ref_ptr<osg::Material> material = new osg::Material;
@@ -450,6 +449,9 @@ void SDRender::Init(tTrack *track)
     m_Root->addChild(sunLight.get());
     m_Root->addChild(thesky->getCloudRoot());
 
+    if (SDRain > 0)
+        precipitationEffect->setFog(m_Fog.get());
+
     //m_ShadowRoot->addChild(sunLight.get());
 
     // Clouds are added to the scene graph later
@@ -457,6 +459,7 @@ void SDRender::Init(tTrack *track)
     stateSet2->setMode(GL_ALPHA_TEST, osg::StateAttribute::ON);
     stateSet2->setMode(GL_LIGHTING, osg::StateAttribute::ON);
     stateSet2->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
+    //stateSet2->setMode(GL_FOG, osg::StateAttribute::ON);
 }//SDRender::Init
 
 void SDRender::ShadowedScene()
@@ -538,7 +541,7 @@ void SDRender::addCars(osg::Node* cars, osg::Node* carLights)
     m_CarRoot->addChild(cars);
     m_CarLightsRoot->addChild(carLights);
 
-    if ((ShadowIndex > 0) & (SDVisibility > 4000) & (SDRain < 1))
+    if ((ShadowIndex > 0) & (SDVisibility > 100))
         ShadowedScene();
 
     osgUtil::Optimizer optimizer;
@@ -618,19 +621,20 @@ osg::ref_ptr< osg::StateSet> SDRender::setFogState()
 {
     static const double m_log01 = -log( 0.01 );
     static const double sqrt_m_log01 = sqrt( m_log01 );
-    const GLfloat fog_exp2_density = sqrt_m_log01 / thesky->get_visibility();
+    //const GLfloat fog_exp2_density = sqrt_m_log01 / thesky->get_visibility();
+    const GLfloat fog_exp2_density = sqrt_m_log01 / SDVisibility;
 
     SceneFog = osg::Vec4f(FogColor, 1.0f);
 
-    osg::ref_ptr<osg::Fog> fog = new osg::Fog();    // The fog object
-    fog->setStart(SDVisibility);                    // Fog start
-    fog->setEnd(20000.0);                           // Fog End
-    fog->setMode(osg::Fog::EXP2);                   // Fog type
-    fog->setDensity(fog_exp2_density);              // Fog density
-    fog->setColor(SceneFog);                        // Fog color
-    fog->setFogCoordinateSource(osg::Fog::FRAGMENT_DEPTH);
+    m_Fog = new osg::Fog();    // The fog object
+    m_Fog->setStart(SDVisibility);                    // Fog start
+    m_Fog->setEnd(12000.0);                           // Fog End
+    m_Fog->setMode(osg::Fog::EXP2);                   // Fog type
+    m_Fog->setDensity(fog_exp2_density);              // Fog density
+    m_Fog->setColor(SceneFog);                        // Fog color
+    m_Fog->setFogCoordinateSource(osg::Fog::FRAGMENT_DEPTH);
     osg::ref_ptr< osg::StateSet> fogState (new osg::StateSet);
-    fogState->setAttributeAndModes(fog.get(), osg::StateAttribute::ON);
+    fogState->setAttributeAndModes(m_Fog.get(), osg::StateAttribute::ON);
 
     fogState->setMode(GL_FOG, osg::StateAttribute::ON);
 
@@ -825,11 +829,11 @@ void SDRender::weather(void)
         SDRain = 1;
         break;
     case TR_RAIN_MEDIUM:
-        SDVisibility = 300.0;
+        SDVisibility = 200.0;
         SDRain = 2;
         break;
     case TR_RAIN_HEAVY:
-        SDVisibility = 200.0;
+        SDVisibility = 120.0;
         SDRain = 3;
         break;
     default:

@@ -76,6 +76,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
     //Camera->setViewport(new osg::Viewport(0, 0, width, height));
     Camera->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
     Camera->setPreDrawCallback(new CameraDrawnCallback);
+    Camera->setClearColor(osg::Vec4f(0.3f,0.3f,0.4f,1.0f));
 #else
     SDL_Window* GfuiWindow = GfScrGetMainWindow();
     //viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
@@ -110,6 +111,7 @@ void SDScreens::Init(int x,int y, int width, int height, osg::ref_ptr<osg::Node>
 
     osg::ref_ptr<osg::Camera> mirrorCam = new osg::Camera;
     mirrorCam->setGraphicsContext(gw);
+    mirrorCam->setClearColor(osg::Vec4f(0.3f,0.3f,0.4f,1.0f));
     mirrorCam->setClearMask( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     mirrorCam->setReferenceFrame( osg::Camera::ABSOLUTE_RF );
 
@@ -184,7 +186,7 @@ void SDScreens::InitCars(tSituation *s)
     }
 }
 
-void SDScreens::update(tSituation * s, SDFrameInfo* fi)
+void SDScreens::update(tSituation * s, SDFrameInfo* fi,osg::Vec4f(colorfog))
 {
     if(GfScrUsingResizableWindow())
     {
@@ -194,6 +196,7 @@ void SDScreens::update(tSituation * s, SDFrameInfo* fi)
         int grWiny = 0;
         GfScrGetSize(&grWinx, &grWiny, &width, &height);
         m_gw->resized(grWinx,grWiny,width,height);
+        m_gw->setClearColor(colorfog);
     }
     for (unsigned i=0; i< Screens.size(); i++)
     {

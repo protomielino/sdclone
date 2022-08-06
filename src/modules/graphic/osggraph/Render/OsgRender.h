@@ -21,6 +21,8 @@
 #define _OSGRENDER_H_
 
 #include <osg/Group>
+#include <osg/Fog>
+
 #include <osgShadow/ShadowedScene>
 
 #include <track.h>	 //tTrack
@@ -44,6 +46,7 @@ private:
 
     osg::ref_ptr<osg::StateSet> stateSet;
     osg::ref_ptr<osg::StateSet> skySS;
+    osg::ref_ptr<osg::Fog>      m_Fog;
 
     osg::ref_ptr<osg::LightSource> sunLight;
 

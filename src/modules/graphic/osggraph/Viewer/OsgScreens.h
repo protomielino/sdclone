@@ -51,7 +51,7 @@ public:
 
     void Init(int x, int y, int width, int height, osg::ref_ptr<osg::Node> m_sceneroot, osg::Vec3f fogcolor);
     void InitCars(tSituation *s);
-    void update(tSituation *s,SDFrameInfo* fi);
+    void update(tSituation *s,SDFrameInfo* fi, osg::Vec4f(colorfog));
     void changeCamera(long p);
     void registerViewDependantPreRenderNode(osg::ref_ptr<osg::Node> node);
     void toggleHUD();

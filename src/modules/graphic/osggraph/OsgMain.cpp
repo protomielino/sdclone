@@ -162,10 +162,10 @@ void SDMoveSeatUpDown(void *move)
     //if positive up if negative down
     float movement = 0.005;
     if((long)move == 1){
-        movement = movement*1; 
+        movement = movement*1;
     }
     if((long)move == -1){
-        movement = movement*-1; 
+        movement = movement*-1;
     }
     tCarElt* curCar = screens->getActiveView()->getCurrentCar();
     curCar->_drvPos_z+=movement;
@@ -175,10 +175,10 @@ void SDMoveSeatLeftRight(void *move)
     //if positive left if negative right
     float movement = 0.005;
     if((long)move == 1){
-        movement = movement*1; 
+        movement = movement*1;
     }
     if((long)move == -1){
-        movement = movement*-1; 
+        movement = movement*-1;
     }
     tCarElt* curCar = screens->getActiveView()->getCurrentCar();
     curCar->_drvPos_y+=movement;
@@ -188,10 +188,10 @@ void SDMoveSeatForwardBackward(void *move)
     //if positive forward if negative backward
     float movement = 0.005;
     if((long)move == 1){
-        movement = movement*1; 
+        movement = movement*1;
     }
     if((long)move == -1){
-        movement = movement*-1; 
+        movement = movement*-1;
     }
     tCarElt* curCar = screens->getActiveView()->getCurrentCar();
     curCar->_drvPos_x+=movement;
@@ -279,7 +279,7 @@ int initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_RIGHT,GFUIM_ALT,   "Move seat right",      (void*)-1, SDMoveSeatLeftRight, NULL);
     GfuiAddKey(screen, GFUIK_UP,   GFUIM_ALT,   "Move seat forward",    (void*)1,  SDMoveSeatForwardBackward, NULL);
     GfuiAddKey(screen, GFUIK_DOWN, GFUIM_ALT,   "Move seat backward",   (void*)-1, SDMoveSeatForwardBackward, NULL);
-    
+
     if(GfScrUsingResizableWindow())
         GfuiAddKey(screen, GFUIK_RETURN, GFUIM_ALT, "Toggle Full-screen", (void*)0, GfScrToggleFullScreen, NULL);
 
@@ -331,7 +331,7 @@ int refresh(tSituation *s)
     scenery->reposition(X, Y, Z );
     scenery->update_tracklights(s->currentTime, s->_totTime, s->_raceType);
 
-    screens->update(s, &frameInfo);
+    screens->update(s, &frameInfo, osg::Vec4f(render->getFogColor(),1.0f));
 
     //refresh the hud
     //tCarElt* curCar = screens->getActiveView()->getCurrentCar();
