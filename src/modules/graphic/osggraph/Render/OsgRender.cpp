@@ -541,7 +541,7 @@ void SDRender::addCars(osg::Node* cars, osg::Node* carLights)
     m_CarRoot->addChild(cars);
     m_CarLightsRoot->addChild(carLights);
 
-    if ((ShadowIndex > 0) & (SDVisibility > 100))
+    if ((ShadowIndex > 0) & (SDVisibility > 500))
         ShadowedScene();
 
     osgUtil::Optimizer optimizer;
