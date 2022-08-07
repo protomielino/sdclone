@@ -45,6 +45,7 @@
 #include "guimenu.h"
 #include "musicplayer.h"
 #include "guimenusfx.h"
+#include <SDL_mixer.h>
 
 #ifdef WIN32
 PFNGLUSEPROGRAMOBJECTARBPROC glUseProgram = NULL;
@@ -146,6 +147,7 @@ gfuiShutdown(void)
 	gfuiFreeFonts();
 	gfuiShutdownMenuSfx();
 	shutdownMusic();
+	Mix_Quit();
 #ifdef WEBSERVER
 	gfuiShutdownWebStats();
 #endif

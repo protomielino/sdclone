@@ -141,7 +141,6 @@ void gfuiShutdownMenuSfx()
 	if (mixerInitialized)
 	{
 		unloadMenuSfx();
-		Mix_Quit();
 		mixerInitialized = false;
 	}
 }

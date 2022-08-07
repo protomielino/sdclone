@@ -109,7 +109,6 @@ void shutdownMusic()
 	SDL_UnlockMutex(mapMutex);
 	SDL_DestroyMutex(mapMutex);
 	mapMutex = NULL;
-	Mix_Quit();
 }
 
 
