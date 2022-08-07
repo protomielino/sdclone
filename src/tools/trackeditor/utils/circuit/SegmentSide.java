@@ -44,6 +44,14 @@ public class SegmentSide implements Cloneable
 	public static final double	DEFAULT_BORDER_HEIGHT		= 0.05;
 	public static final String	DEFAULT_BORDER_SURFACE		= "curb-5cm-r";
 	public static final String	DEFAULT_BORDER_STYLE		= "curb";
+	
+	public static final String	DEFAULT_PIT_ENTRY_SURFACE	= "asphalt";
+	public static final String	DEFAULT_PIT_PITS_SURFACE	= "asphalt-pits";
+	public static final String	DEFAULT_PIT_EXIT_SURFACE	= "asphalt";
+	public static final double	DEFAULT_PIT_BORDER_WIDTH	= 0.5;
+	public static final double	DEFAULT_PIT_BORDER_HEIGHT	= 1.0;
+	public static final String	DEFAULT_PIT_BORDER_SURFACE	= "wall";
+	public static final String	DEFAULT_PIT_BORDER_STYLE	= "wall";
 
 	private Vector				sideListeners				= new Vector();
 	private SegmentSide			prev						= null;

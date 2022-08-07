@@ -1,7 +1,7 @@
 package utils;
 
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,33 +39,33 @@ public class SurfaceComboBox extends JComboBox<String>
 		ComboboxToolTipRenderer	renderer = new ComboboxToolTipRenderer();
 		renderer.setTooltips(getSurfaceImages());
 		setRenderer(renderer);
-		addItemListener(new ItemChangeListener());
+		addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (getSelectedIndex() != -1)
+				{
+					String surfaceName = getSelectedItem().toString();
+					if (surfaceName != null && !surfaceName.isEmpty())
+					{
+						String tooltipText = null;
+						Vector<Surface> defaultSurfaces = editorFrame.getDefaultSurfaces();
+						Vector<Surface>	surfaces = editorFrame.getTrackData().getSurfaces();
+						if (editorFrame.getDataDirectory() != null)
+						{
+							tooltipText = getTextureName(surfaceName, defaultSurfaces, editorFrame.getDataDirectory() + sep + "data" + sep + "textures");
+						}
+						if (tooltipText == null)
+						{
+							tooltipText = getTextureName(surfaceName, surfaces, Editor.getProperties().getPath());
+						}
+						setToolTipText(tooltipText);
+					}
+				}
+			}
+		});
 	}
 
-	private class ItemChangeListener implements ItemListener
-	{
-	    @Override
-	    public void itemStateChanged(ItemEvent event)
-	    {
-	    	if (event.getStateChange() == ItemEvent.SELECTED)
-	    	{
-	    		String surfaceName = getSelectedItem().toString();
-	    		String tooltipText = null;
-	    		Vector<Surface> defaultSurfaces = editorFrame.getDefaultSurfaces();
-	    		Vector<Surface>	surfaces = editorFrame.getTrackData().getSurfaces();
-	    		if (editorFrame.getDataDirectory() != null)
-	    		{
-	    			tooltipText = getTextureName(surfaceName, defaultSurfaces, editorFrame.getDataDirectory() + sep + "data" + sep + "textures");
-	    		}
-	    		if (tooltipText == null)
-	    		{
-	    			tooltipText = getTextureName(surfaceName, surfaces, Editor.getProperties().getPath());
-	    		}
-	    		setToolTipText(tooltipText);
-	    	}
-	    }       
-	}
-	
 	private class ComboboxToolTipRenderer extends DefaultListCellRenderer
 	{
 		List<String> tooltips;
@@ -109,7 +109,7 @@ public class SurfaceComboBox extends JComboBox<String>
 						try
 						{
 							URL url = file.toURI().toURL();
-							tooltipText = "<html><img src=" + url + "></html>";
+							tooltipText = "<html><img src=" + url + "><br>" + textureName + "</html>";
 						}
 						catch (MalformedURLException e)
 						{

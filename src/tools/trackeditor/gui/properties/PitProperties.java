@@ -31,6 +31,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import gui.EditorFrame;
@@ -48,6 +50,21 @@ import utils.circuit.Surface;
  */
 public class PitProperties extends PropertyPanel
 {
+	private class PitInfo
+	{
+		public String	name			= null;
+		public String	surface			= null;
+		public String	borderType		= null;
+		public String	borderSurface	= null;
+		public double	borderWidth		= Double.NaN;
+		public double	borderHeight	= Double.NaN;
+		
+		PitInfo(String name)
+		{
+			this.name = name;
+		}
+	}
+	
 	private JLabel				styleLabel				= new JLabel();
 	private JComboBox<String>	styleComboBox			= null;
 	private JLabel				sideLabel				= new JLabel();
@@ -74,23 +91,14 @@ public class PitProperties extends PropertyPanel
 	private JComboBox<String>	indicatorComboBox		= null;
 	private JLabel				speedLimitLabel			= new JLabel();
 	private JTextField			speedLimitTextField		= new JTextField();
-	private JLabel				entrySurfaceLabel		= new JLabel();
-	private SurfaceComboBox		entrySurfaceComboBox	= null;
-	private JLabel				pitSurfaceLabel			= new JLabel();
-	private SurfaceComboBox		pitSurfaceComboBox		= null;
-	private JLabel				pitWallLabel			= new JLabel();
-	private JCheckBox			pitWallCheckBox			= null;
-	private JLabel				pitWallHeightLabel		= new JLabel();
-	private JTextField			pitWallHeightTextField	= new JTextField();
-	private JLabel				pitWallWidthLabel		= new JLabel();
-	private JTextField			pitWallWidthTextField	= new JTextField();
-	private JLabel				pitWallSurfaceLabel		= new JLabel();
-	private SurfaceComboBox		pitWallSurfaceComboBox	= null;
-	private JLabel				exitSurfaceLabel		= new JLabel();
-	private SurfaceComboBox		exitSurfaceComboBox		= null;
-	private JLabel 				generatePitsLabel 		= new JLabel();
 	private JCheckBox 			generatePitsCheckBox 	= null;
+	private JLabel 				generatePitsLabel 		= new JLabel();
+	private JTabbedPane			tabbedPane				= null;
 	private boolean 			generatePits			= false;
+
+	private PitInfo				entryPitInfo			= new PitInfo("Entry");
+	private PitInfo				pitsPitInfo				= new PitInfo("Pit");
+	private PitInfo				exitPitInfo				= new PitInfo("Exit");
 
 	private String[]			sideSurfaceItems		=
 														{"grass", "grass3", "grass5", "grass6", "grass7", "gravel",
@@ -103,7 +111,7 @@ public class PitProperties extends PropertyPanel
 			"b-asphalt-grass6", "b-asphalt-grass6-l1", "b-asphalt-sand3", "b-asphalt-sand3-l1", "barrier", "barrier2",
 			"barrier-turn", "barrier-grille", "wall", "wall2", "tire-wall"};
 	private Vector<String>		sideSurfaceVector		= new Vector<String>(Arrays.asList(sideSurfaceItems));
-
+	
 	/**
 	 *
 	 */
@@ -138,13 +146,6 @@ public class PitProperties extends PropertyPanel
 		addLabel(this, 11, indicatorLabel, "Indicator", 110);
 		addLabel(this, 12, speedLimitLabel, "Speed Limit", 110);
 		addLabel(this, 14, generatePitsLabel, "Generate Pits", 110);
-		addLabel(this, 16, entrySurfaceLabel, "Entry Surface", 110);
-		addLabel(this, 17, pitSurfaceLabel, "Pit Surface", 110);
-		addLabel(this, 18, pitWallLabel, "Pit Wall", 110);
-		addLabel(this, 19, pitWallHeightLabel, "Wall Height", 110);
-		addLabel(this, 20, pitWallWidthLabel, "Wall Width", 110);
-		addLabel(this, 21, pitWallSurfaceLabel, "Wall Surface", 110);
-		addLabel(this, 22, exitSurfaceLabel, "Exit Surface", 110);
 
 		add(getStyleComboBox(), null);
 		add(getSideComboBox(), null);
@@ -166,13 +167,7 @@ public class PitProperties extends PropertyPanel
 		addTextField(this, 12, speedLimitTextField, pits.getSpeedLimit(), 120, 40);
 
 		add(getGeneratePitsCheckBox(), null);
-		add(getEntrySurfaceComboBox(), null);
-		add(getPitSurfaceComboBox(), null);		
-		add(getPitWallCheckBox(), null);
-		addTextField(this, 19, pitWallHeightTextField, null, 120, 100);
-		addTextField(this, 20, pitWallWidthTextField, null, 120, 100);
-		add(getPitWallSurfaceComboBox(), null);
-		add(getExitSurfaceComboBox(), null);
+		add(getTabbedPane(), null);		
 	}
 	
 	private void addDefaultSurfaces(Vector<String> surfaceVector)
@@ -280,151 +275,215 @@ public class PitProperties extends PropertyPanel
 			{
 				public void actionPerformed(ActionEvent e)
 				{
-					if (generatePitsCheckBox.isSelected())
-					{
-						entrySurfaceComboBox.setEnabled(true);
-						entrySurfaceComboBox.setSelectedItem("road1");
-						pitSurfaceComboBox.setEnabled(true);
-						pitSurfaceComboBox.setSelectedItem("road1-pits");
-						exitSurfaceComboBox.setEnabled(true);
-						exitSurfaceComboBox.setSelectedItem("road1");
-						pitWallCheckBox.setEnabled(true);
-						pitWallCheckBox.setSelected(false);
-						generatePits = true;
-					}
-					else
-					{
-						entrySurfaceComboBox.setEnabled(false);
-						entrySurfaceComboBox.setSelectedItem("");
-						pitSurfaceComboBox.setEnabled(false);
-						pitSurfaceComboBox.setSelectedItem("");
-						exitSurfaceComboBox.setEnabled(false);
-						exitSurfaceComboBox.setSelectedItem("");
-						pitWallCheckBox.setEnabled(false);
-						pitWallCheckBox.setSelected(false);
-						pitWallHeightTextField.setEnabled(false);
-						pitWallHeightTextField.setText(null);
-						pitWallWidthTextField.setEnabled(false);
-						pitWallWidthTextField.setText(null);
-						pitWallSurfaceComboBox.setEnabled(false);
-						pitWallSurfaceComboBox.setSelectedItem("");
-						generatePits = false;
-					}
+					generatePits();
 				}
 			});
 		}
 		return generatePitsCheckBox;
 	}
 	
-	/**
-	 * This method initializes entrySurfaceComboBox
-	 *
-	 * @return javax.swing.JComboBox
-	 */
-	private SurfaceComboBox getEntrySurfaceComboBox()
+	private void generatePits()
 	{
-		if (entrySurfaceComboBox == null)
+		if (generatePitsCheckBox.isSelected())
 		{
-			entrySurfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
-			entrySurfaceComboBox.setBounds(120, 442, 180, 23);
-			entrySurfaceComboBox.setEnabled(false);
-			entrySurfaceComboBox.setSelectedItem(null);
+			entryPitInfo.surface = SegmentSide.DEFAULT_PIT_ENTRY_SURFACE;
+			entryPitInfo.borderType = SegmentSide.DEFAULT_PIT_BORDER_STYLE;
+			entryPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_BORDER_SURFACE;
+			entryPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_BORDER_HEIGHT;
+			entryPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_BORDER_WIDTH;
+			PitPanel entryPitPanel = new PitPanel(entryPitInfo);
+			tabbedPane.addTab(entryPitInfo.name, null, entryPitPanel, null);
+			
+			pitsPitInfo.surface = SegmentSide.DEFAULT_PIT_PITS_SURFACE;
+			pitsPitInfo.borderType = SegmentSide.DEFAULT_PIT_BORDER_STYLE;
+			pitsPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_BORDER_SURFACE;
+			pitsPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_BORDER_HEIGHT;
+			pitsPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_BORDER_WIDTH;
+			PitPanel pitsPitPanel = new PitPanel(pitsPitInfo);
+			tabbedPane.addTab(pitsPitInfo.name, null, pitsPitPanel, null);
+			
+			exitPitInfo.surface = SegmentSide.DEFAULT_PIT_EXIT_SURFACE;
+			exitPitInfo.borderType = SegmentSide.DEFAULT_PIT_BORDER_STYLE;
+			exitPitInfo.borderSurface = SegmentSide.DEFAULT_PIT_BORDER_SURFACE;
+			exitPitInfo.borderHeight = SegmentSide.DEFAULT_PIT_BORDER_HEIGHT;
+			exitPitInfo.borderWidth = SegmentSide.DEFAULT_PIT_BORDER_WIDTH;
+			PitPanel exitPitPanel = new PitPanel(exitPitInfo);
+			tabbedPane.addTab(exitPitInfo.name, null, exitPitPanel, null);
+			
+			generatePits = true;
 		}
-		return entrySurfaceComboBox;
-	}
-
-	/**
-	 * This method initializes pitSurfaceComboBox
-	 *
-	 * @return javax.swing.JComboBox
-	 */
-	private JComboBox<String> getPitSurfaceComboBox()
-	{
-		if (pitSurfaceComboBox == null)
+		else
 		{
-			pitSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
-			pitSurfaceComboBox.setBounds(120, 469, 180, 23);
-			pitSurfaceComboBox.setEnabled(false);
-			pitSurfaceComboBox.setSelectedItem(null);
-		}
-		return pitSurfaceComboBox;
-	}
-
- 	/**
-	 * This method initializes pitWallCheckBox
- 	 *
-	 * @return javax.swing.JCheckBox
- 	 */
-	private JCheckBox getPitWallCheckBox()
-	{
-		if (pitWallCheckBox == null)
-		{
-			pitWallCheckBox = new JCheckBox();
-			pitWallCheckBox.setBounds(120, 496, 20, 20);
-			pitWallCheckBox.setEnabled(false);
-			pitWallCheckBox.setSelected(false);
-			pitWallCheckBox.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					if (pitWallCheckBox.isSelected())
-					{
-						pitWallHeightTextField.setEnabled(true);
-						pitWallHeightTextField.setText("1.0");
-						pitWallWidthTextField.setEnabled(true);
-						pitWallWidthTextField.setText("0.5");
-						pitWallSurfaceComboBox.setEnabled(true);
-						pitWallSurfaceComboBox.setSelectedItem("wall");
-					}
-					else
-					{
-						pitWallHeightTextField.setEnabled(false);
-						pitWallHeightTextField.setText(null);
-						pitWallWidthTextField.setEnabled(false);
-						pitWallWidthTextField.setText(null);
-						pitWallSurfaceComboBox.setEnabled(false);
-						pitWallSurfaceComboBox.setSelectedItem("");
-					}
-				}
-			});
-		}
-		return pitWallCheckBox;
+			tabbedPane.removeAll();
+			generatePits = false;
+		}	
 	}
 	
 	/**
-	 * This method initializes pitWallSurfaceComboBox
+	 * This method initializes tabbedPane
 	 *
-	 * @return javax.swing.JComboBox
+	 * @return javax.swing.JTabbedPane
 	 */
-	private SurfaceComboBox getPitWallSurfaceComboBox()
+	private JTabbedPane getTabbedPane()
 	{
-		if (pitWallSurfaceComboBox == null)
+		if (tabbedPane == null)
 		{
-			pitWallSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
-			pitWallSurfaceComboBox.setBounds(120, 577, 180, 23);
-			pitWallSurfaceComboBox.setEnabled(false);
-			pitWallSurfaceComboBox.setSelectedItem(null);
+			tabbedPane = new JTabbedPane();
+			tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+			tabbedPane.setBounds(10, 442, 510, 200);
 		}
-		return pitWallSurfaceComboBox;
+		return tabbedPane;
 	}
 
-	/**
-	 * This method initializes exitSurfaceComboBox
-	 *
-	 * @return javax.swing.JComboBox
-	 */
-	private SurfaceComboBox getExitSurfaceComboBox()
+	private class PitPanel extends JPanel
 	{
-		if (exitSurfaceComboBox == null)
+		private PitInfo				pitInfo					= null;
+		private JLabel				surfaceLabel			= new JLabel();
+		private SurfaceComboBox		surfaceComboBox			= null;
+		private JLabel				borderTypeLabel			= new JLabel();
+		private JComboBox<String>	borderTypeComboBox		= null;
+		private JLabel				borderSurfaceLabel		= new JLabel();
+		private SurfaceComboBox		borderSurfaceComboBox	= null;
+		private JLabel				borderHeightLabel		= new JLabel();
+		private JTextField			borderHeightTextField	= new JTextField();
+		private JLabel				borderWidthLabel		= new JLabel();
+		private JTextField			borderWidthTextField	= new JTextField();
+		
+		/**
+		 *
+		 */
+		public PitPanel(PitInfo pitInfo)
 		{
-			exitSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
-			exitSurfaceComboBox.setBounds(120, 604, 180, 23);
-			exitSurfaceComboBox.setEnabled(false);
-			exitSurfaceComboBox.setSelectedItem(null);
+			super();
+			initialize(pitInfo);
 		}
-		return exitSurfaceComboBox;
-	}
 
+		/**
+		 *
+		 */
+		private void initialize(PitInfo pitInfo)
+		{
+			setLayout(null);
+
+			addLabel(this, 0, surfaceLabel, "Surface", 120);
+			addLabel(this, 1, borderTypeLabel, "Border Type", 120);
+			addLabel(this, 2, borderSurfaceLabel, "Border Surface", 120);
+			addLabel(this, 3, borderHeightLabel, "Border Height", 120);
+			addLabel(this, 4, borderWidthLabel, "Border Width", 120);
+
+			add(getSurfaceComboBox(), null);
+			add(getBorderTypeComboBox(), null);
+			add(getBorderSurfaceComboBox(), null);
+			addTextField(this, 3, borderHeightTextField, 0, 130, 100);
+			addTextField(this, 4, borderWidthTextField, 0, 130, 280);
+			
+			setPitInfo(pitInfo);
+		}
+		
+		private void setPitInfo(PitInfo pitInfo)
+		{
+			this.pitInfo = pitInfo;
+			
+			surfaceComboBox.setSelectedItem(this.pitInfo.surface);
+			borderTypeComboBox.setSelectedItem(this.pitInfo.borderType);		
+		}
+
+		/**
+		 * This method initializes entrySurfaceComboBox
+		 *
+		 * @return javax.swing.JComboBox
+		 */
+		public SurfaceComboBox getSurfaceComboBox()
+		{
+			if (surfaceComboBox == null)
+			{
+				surfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
+				surfaceComboBox.setBounds(130, 10, 180, 23);
+			}
+			return surfaceComboBox;
+		}
+
+		/**
+		 * This method initializes borderTypeComboBox
+		 *
+		 * @return javax.swing.JComboBox
+		 */
+		public JComboBox<String> getBorderTypeComboBox()
+		{
+			if (borderTypeComboBox == null)
+			{
+				String[] types = { "none", "curb", "wall" };
+				borderTypeComboBox = new JComboBox<String>(types);
+				borderTypeComboBox.setBounds(130, 38, 180, 23);
+				borderTypeComboBox.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						borderTypeChanged();
+					}
+				});
+			}
+			return borderTypeComboBox;
+		}
+		
+		private void borderTypeChanged()
+		{
+			if (pitInfo.borderType.equals("none"))
+			{
+				borderSurfaceComboBox.setEnabled(false);
+				borderSurfaceComboBox.setSelectedItem(null);
+				borderHeightTextField.setEnabled(false);
+				setTextField(borderHeightTextField, Double.NaN);
+				borderWidthTextField.setEnabled(false);
+				setTextField(borderWidthTextField, Double.NaN);
+			}
+			else
+			{
+				borderSurfaceComboBox.setEnabled(true);
+				borderSurfaceComboBox.setSelectedItem(pitInfo.borderSurface);
+				borderHeightTextField.setEnabled(true);				
+				setTextField(borderHeightTextField, pitInfo.borderHeight);
+				borderWidthTextField.setEnabled(true);
+				setTextField(borderWidthTextField, pitInfo.borderWidth);
+			}
+		}
+		
+		/**
+		 * This method initializes borderSurfaceComboBox
+		 *
+		 * @return javax.swing.JComboBox
+		 */
+		public JComboBox<String> getBorderSurfaceComboBox()
+		{
+			if (borderSurfaceComboBox == null)
+			{
+				borderSurfaceComboBox = new SurfaceComboBox(getEditorFrame(), sideSurfaceVector);
+				borderSurfaceComboBox.setBounds(130, 65, 180, 23);
+			}
+			return borderSurfaceComboBox;
+		}
+		
+		/**
+		 * This method initializes borderSurfaceComboBox
+		 *
+		 * @return javax.swing.JComboBox
+		 */
+		public JTextField getBorderHeightTextField()
+		{
+			return borderHeightTextField;
+		}
+		
+		/**
+		 * This method initializes borderSurfaceComboBox
+		 *
+		 * @return javax.swing.JComboBox
+		 */
+		public JTextField getBorderWidthTextField()
+		{
+			return borderWidthTextField;
+		}
+	}
+	
 	/**
 	 *
 	 */
@@ -699,17 +758,64 @@ public class PitProperties extends PropertyPanel
 			borderWidth = nextSegment.getRight().getBorderWidth();
 			sideWidth = nextSegment.getRight().getSideStartWidth();
 		}
-		side.setBorderHeight(0);
-		side.setBorderWidth(0);
-		side.setSideStartWidth(pits.getWidth()*3);
-		side.setSideEndWidth(borderWidth + sideWidth);
-		side.setSideSurface(exitSurfaceComboBox.getSelectedItem().toString());
-		side.setBarrierHeight(1);
-		side.setBarrierWidth(0.1);
+
+		PitPanel exitPanel = (PitPanel) tabbedPane.getComponentAt(2);
+		int start = data.indexOf(pitExit);
+		int end = data.indexOf(pitEnd);
+		int count;
+		if (start < end)
+			count = start + data.size() - end;
+		else
+			count = start - end;
+
+		for (int i = 0; i < count; i++)
+		{
+			int index = (start - i) % data.size();
+			if (pits.getSide().equals("left"))
+			{
+				side = ((Segment) data.get(index)).getLeft();
+			}
+			else
+			{
+				side = ((Segment) data.get(index)).getRight();
+			}
+			String borderType = exitPanel.getBorderTypeComboBox().getSelectedItem().toString();
+			if (i == 0 || borderType.equals("none"))
+			{
+				// no border on last segment
+				side.setBorderStyle(null);
+				side.setBorderSurface(null);
+				side.setBorderHeight(Double.NaN);
+				side.setBorderWidth(Double.NaN);
+				if (i == 0)
+				{
+					side.setSideStartWidth(pits.getWidth() * 3);
+					side.setSideEndWidth(borderWidth + sideWidth);
+				}
+				else
+				{
+					side.setSideStartWidth((pits.getWidth() * 3));				
+					side.setSideEndWidth(side.getSideStartWidth());
+				}
+			}
+			else
+			{
+				side.setBorderStyle(borderType);
+				side.setBorderSurface(exitPanel.getBorderSurfaceComboBox().getSelectedItem().toString());			
+				side.setBorderHeight(getDouble(exitPanel.getBorderHeightTextField().getText()));
+				side.setBorderWidth(getDouble(exitPanel.getBorderWidthTextField().getText()));
+				side.setSideStartWidth((pits.getWidth() * 3) - side.getBorderWidth());				
+				side.setSideEndWidth(side.getSideStartWidth());
+			}
+			side.setSideSurface(exitPanel.getSurfaceComboBox().getSelectedItem().toString());
+			side.setBarrierHeight(1);
+			side.setBarrierWidth(0.1);
+		}
 
 		Segment previousSegment = pitEntry.getPreviousShape();
 		if (previousSegment == null)
-			previousSegment = data.get(data.size() - 1);			
+			previousSegment = data.get(data.size() - 1);
+
 		if (pits.getSide().equals("left"))
 		{
 			previousSegment.getLeft().setBorderWidth(previousSegment.getValidLeftBorderWidth(getEditorFrame()));
@@ -750,17 +856,62 @@ public class PitProperties extends PropertyPanel
 			borderWidth = previousSegment.getRight().getBorderWidth();
 			sideWidth = previousSegment.getRight().getSideStartWidth();
 		}
-		side.setBorderHeight(0);
-		side.setBorderWidth(0);
-		side.setSideStartWidth(borderWidth + sideWidth);
-		side.setSideEndWidth(pits.getWidth()*3);
-		side.setSideSurface(entrySurfaceComboBox.getSelectedItem().toString());
-		side.setBarrierHeight(1);
-		side.setBarrierWidth(0.1);
 
-		int start = data.indexOf(pitStart);
-		int end = data.indexOf(pitEnd);
-		int count;
+		PitPanel entryPanel = (PitPanel) tabbedPane.getComponentAt(0);
+		start = data.indexOf(pitEntry);
+		end = data.indexOf(pitStart);
+		if (start > end)
+			count = end + data.size() - start;
+		else
+			count = end - start;
+
+		for (int i = 0; i < count; i++)
+		{
+			int index = (start + i) % data.size();
+			if (pits.getSide().equals("left"))
+			{
+				side = ((Segment) data.get(index)).getLeft();
+			}
+			else
+			{
+				side = ((Segment) data.get(index)).getRight();
+			}
+			String borderType = entryPanel.getBorderTypeComboBox().getSelectedItem().toString();
+			if (i == 0 || borderType.equals("none"))
+			{
+				// no border on first segment
+				side.setBorderStyle(null);
+				side.setBorderSurface(null);
+				side.setBorderHeight(Double.NaN);
+				side.setBorderWidth(Double.NaN);
+				if (i == 0)
+				{
+					side.setSideStartWidth(borderWidth + sideWidth);
+					side.setSideEndWidth(pits.getWidth() * 3);
+				}
+				else
+				{
+					side.setSideStartWidth((pits.getWidth() * 3));				
+					side.setSideEndWidth(side.getSideEndWidth());
+				}
+			}
+			else
+			{
+				side.setBorderStyle(borderType);
+				side.setBorderSurface(entryPanel.getBorderSurfaceComboBox().getSelectedItem().toString());			
+				side.setBorderHeight(getDouble(entryPanel.getBorderHeightTextField().getText()));
+				side.setBorderWidth(getDouble(entryPanel.getBorderWidthTextField().getText()));
+				side.setSideStartWidth((pits.getWidth() * 3) - side.getBorderWidth());				
+				side.setSideEndWidth(side.getSideStartWidth());
+			}
+			side.setSideSurface(entryPanel.getSurfaceComboBox().getSelectedItem().toString());
+			side.setBarrierHeight(1);
+			side.setBarrierWidth(0.1);
+		}
+
+		PitPanel pitPanel = (PitPanel) tabbedPane.getComponentAt(1);
+		start = data.indexOf(pitStart);
+		end = data.indexOf(pitEnd);
 		if (start > end)
 			count = end + data.size() - start + 1;
 		else
@@ -778,24 +929,26 @@ public class PitProperties extends PropertyPanel
 				side = ((Segment) data.get(index)).getRight();
 			}
 			double width = pits.getWidth()*3;
-			if (pitWallCheckBox.isSelected())
-			{
-				side.setBorderHeight(getDouble(pitWallHeightTextField.getText()));
-				side.setBorderWidth(getDouble(pitWallWidthTextField.getText()));
-				side.setBorderSurface(pitWallSurfaceComboBox.getSelectedItem().toString());
-				side.setBorderStyle("wall");
-				width -= side.getBorderWidth();
-			}
-			else
+			String borderType = pitPanel.getBorderTypeComboBox().getSelectedItem().toString();
+			System.out.println(borderType);
+			if (borderType.equals("none"))
 			{
 				side.setBorderHeight(0);
 				side.setBorderWidth(0);
 				side.setBorderSurface(null);
 				side.setBorderStyle(null);
 			}
+			else
+			{
+				side.setBorderHeight(getDouble(pitPanel.getBorderHeightTextField().getText()));
+				side.setBorderWidth(getDouble(pitPanel.getBorderWidthTextField().getText()));
+				side.setBorderSurface(pitPanel.getBorderSurfaceComboBox().getSelectedItem().toString());
+				side.setBorderStyle(borderType);
+				width -= side.getBorderWidth();
+			}
 			side.setSideStartWidth(width);
 			side.setSideEndWidth(width);
-			side.setSideSurface(pitSurfaceComboBox.getSelectedItem().toString());
+			side.setSideSurface(pitPanel.getSurfaceComboBox().getSelectedItem().toString());
 			side.setBarrierHeight(1);
 			side.setBarrierWidth(0.1);
 		}
