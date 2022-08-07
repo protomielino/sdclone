@@ -69,8 +69,8 @@ static const char* QualityValues[] = { GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_
 static const int NbQualityValues = sizeof(QualityValues) / sizeof(QualityValues[0]);
 static const char* ShadersValues[] = { GR_ATT_AGR_NULL, GR_ATT_AGR_LITTLE, GR_ATT_AGR_MEDIUM, GR_ATT_AGR_FULL, GR_ATT_AGR_HIGH, GR_ATT_AGR_ULTRA };
 static const int NbShadersValues = sizeof(ShadersValues) / sizeof(ShadersValues[0]);
-static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = {1, 3, 5, 7, 8};
-static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
+//static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = {1, 3, 5, 7, 8};
+//static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
 
 SDRender::SDRender(void) :
     m_Root(NULL),
