@@ -61,7 +61,16 @@ void grInitSound(tSituation* s, int ncars)
 
 	switch (sound_mode) {
 	case OPENAL_MODE:
-		sound_interface = new OpenalSoundInterface (44100, 32);
+		try
+		{
+			sound_interface = new OpenalSoundInterface (44100, 32);
+		}
+		catch(...)
+		{
+			GfLogError("Unable to create OpenAL device, disabling sound \n");
+			sound_mode = DISABLED;
+			return;
+		}
 		break;
 	case PLIB_MODE:
 #if !defined(USE_MACPORTS)
