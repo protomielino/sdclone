@@ -146,6 +146,10 @@ class SoundInterface {
 
 	virtual void setGlobalGain(float g);
 
+	virtual float getVolume() const;
+
+	virtual void setVolume(float vol);
+
 	virtual void mute(bool bOn = true);
 };
 

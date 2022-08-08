@@ -463,6 +463,40 @@ rmSkipPreStart(void * /* dummy */)
 		reInfo->_reLastRobTime = -1.0;
     }
 }
+static void
+rmToggleSound(void * /* dummy */)
+{
+	static bool muteToggle = true;
+	if (LegacyMenu::self().soundEngine())
+	{
+		LegacyMenu::self().soundEngine()->mute(muteToggle);
+		muteToggle = !muteToggle;
+	}
+}
+
+static void
+rmVolumeMod (void *pvCmd)
+{
+	// If not paused ...
+	if ((!rmRacePaused)&&(!rmPreRacePause))
+	{
+		if (LegacyMenu::self().soundEngine())
+		{
+			float curr = LegacyMenu::self().soundEngine()->getVolume();
+
+			if ((long)pvCmd > 0)
+			{
+				curr += 0.1f;
+				LegacyMenu::self().soundEngine()->setVolume(curr);
+			}
+			else if ((long)pvCmd < 0)
+			{
+				curr -= 0.1f;
+				LegacyMenu::self().soundEngine()->setVolume(curr);
+			}
+		}
+	}
+}
 
 static void
 rmTimeMod (void *pvCmd)
@@ -560,6 +594,10 @@ rmAddKeys()
     GfuiAddKey(rmScreenHandle, GFUIK_ESCAPE,  "Stop current race", (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
     GfuiAddKey(rmScreenHandle, 'q', GFUIM_ALT, "Quit (without saving)",    (void*)RE_STATE_EXIT, rmApplyState, NULL);
     GfuiAddKey(rmScreenHandle, ' ', "Skip pre-start",    (void*)0, rmSkipPreStart, NULL);
+
+    GfuiAddKey(rmScreenHandle, '>', "SFX volume up", (void*)+1, rmVolumeMod, NULL);
+    GfuiAddKey(rmScreenHandle, '<', "SFX volume down", (void*)-1, rmVolumeMod, NULL);
+    //GfuiAddKey(rmScreenHandle, '?', "Toggle Sound FX",     (void*)0, rmToggleSound, NULL);
 	
 	// WARNING: Sure this won't work with multi-threading On/Auto ...
     //GfuiAddKey(rmScreenHandle, '0', "One step simulation",    (void*)1, rmOneStep, NULL);

@@ -30,6 +30,8 @@ public:
     virtual void shutdown() = 0;
     virtual void refresh(struct Situation *s, Camera *camera) = 0;
     virtual void mute(bool bOn = true) = 0;
+    virtual float getVolume() const = 0;
+    virtual void setVolume(float g) = 0;
 };
  
  #endif // __ISOUNDENGINE__H__

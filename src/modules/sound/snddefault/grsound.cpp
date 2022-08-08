@@ -218,6 +218,30 @@ grRefreshSound(tSituation *s, Camera* camera)
 
 }
 
+float grGetVolume()
+{
+    if (sound_mode == DISABLED) {
+        return 0.0f;
+    }
+
+    if (!soundInitialized) {
+        return 0.0f;
+    }
+    return sound_interface->getVolume();
+}
+
+void grSetVolume(float vol)
+{
+    if (sound_mode == DISABLED) {
+        return;
+    }
+
+    if (!soundInitialized) {
+        return;
+    }
+    sound_interface->setVolume(vol);
+}
+
 void grMuteSound(bool bOn)
 {
     if (sound_mode == DISABLED) {

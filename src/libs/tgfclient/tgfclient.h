@@ -99,6 +99,14 @@ TGFCLIENT_API tScreenSize GfScrGetCurrentDisplaySize(int nDisplayIndex);
 TGFCLIENT_API bool GfScrUsingResizableWindow();
 TGFCLIENT_API void GfScrToggleFullScreen(void* unused);
 
+/********************
+ * Music Interface *
+ ********************/
+
+TGFCLIENT_API void GfuiToggleMenuSound(void*);
+TGFCLIENT_API void GfuiMenuVolumeUp(void*);
+TGFCLIENT_API void GfuiMenuVolumeDown(void*);
+
 /*****************************
  * GUI interface (low-level) *
  *****************************/

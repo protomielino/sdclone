@@ -1260,3 +1260,51 @@ GfuiSwapBuffers(void)
 {
 	SDL_GL_SwapWindow(GfuiWindow);
 }
+
+void 
+GfuiToggleMenuSound(void*)
+{
+	static bool muteToggle = true;
+
+	static float musicVol = 0.0f;
+	static float sfxVol = 0.0f;
+
+	if(muteToggle)
+	{
+		musicVol = getMusicVolume();
+		setMusicVolume(0.0f);
+
+		sfxVol = getMenuSfxVolume();
+		setMenuSfxVolume(0.0f);
+	}
+	else
+	{
+		setMusicVolume(musicVol);
+		setMenuSfxVolume(sfxVol);
+	}
+	muteToggle = !muteToggle;
+}
+
+void 
+GfuiMenuVolumeUp(void*)
+{
+	float musicVol = getMusicVolume();
+	musicVol += 10.0f;
+	setMusicVolume(musicVol);
+
+	float sfxVol = getMenuSfxVolume();
+	sfxVol += 10.0f;
+	setMenuSfxVolume(sfxVol);
+}
+
+void 
+GfuiMenuVolumeDown(void*)
+{
+	float musicVol = getMusicVolume();
+	musicVol -= 10.0f;
+	setMusicVolume(musicVol);
+
+	float sfxVol = getMenuSfxVolume();
+	sfxVol -= 10.0f;
+	setMenuSfxVolume(sfxVol);
+}

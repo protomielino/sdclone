@@ -55,6 +55,8 @@ class SNDDEFAULT_API SndDefault : public GfModule, public ISoundEngine
         virtual void shutdown();
         virtual void refresh(Situation* s, Camera* camera);
         virtual void mute(bool bOn = true);
+        virtual float getVolume() const;
+        virtual void setVolume(float vol);
 
 	// Accessor to the singleton.
 	static SndDefault& self();

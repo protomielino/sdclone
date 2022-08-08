@@ -36,6 +36,7 @@ TGFCLIENT_API void gfuiInitMenuSfx();
 TGFCLIENT_API void gfuiShutdownMenuSfx();
 TGFCLIENT_API void enableMenuSfx(bool enable = true);
 TGFCLIENT_API void setMenuSfxVolume(float volume = 100.0f);
+TGFCLIENT_API float getMenuSfxVolume();
 TGFCLIENT_API void playMenuSfx(int sfxIndex);
 
 #define SFX_CLICK 0

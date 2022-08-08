@@ -28,5 +28,7 @@ extern void grInitSound(tSituation* s, int ncars);
 extern void grShutdownSound();
 extern void grRefreshSound(tSituation *s, Camera *camera);
 extern void grMuteSound(bool bOn = true);
+extern float grGetVolume();
+extern void grSetVolume(float vol);
 
 #endif /* _GRSOUND_H_ */ 

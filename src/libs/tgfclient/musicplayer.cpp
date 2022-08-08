@@ -236,6 +236,11 @@ void setMusicVolume(float vol /* 100.0f */)
 	GfLogInfo("Music volume set to %.2f\n", maxMusicVolume);
 }
 
+float getMusicVolume()
+{
+	return (maxMusicVolume * 100.0f);
+}
+
 void enableMusic(bool enable /* true */)
 {
 	if (isEnabled()) 

@@ -226,6 +226,16 @@ void SoundInterface::setGlobalGain(float g)
 	GfLogInfo("Sound global gain set to %.2f\n", global_gain);
 }
 
+float SoundInterface::getVolume() const
+{ 
+	return getGlobalGain();
+}
+
+void SoundInterface::setVolume(float g)
+{
+	setGlobalGain(g);
+}
+
 void SoundInterface::mute(bool bOn)
 {
 	silent = bOn;

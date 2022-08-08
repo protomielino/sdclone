@@ -83,3 +83,11 @@ void SndDefault::mute(bool bOn)
 {
 	::grMuteSound(bOn);
 }
+float SndDefault::getVolume() const
+{
+	return grGetVolume();
+}
+void SndDefault::setVolume(float vol)
+{
+	::grSetVolume(vol);
+}

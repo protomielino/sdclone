@@ -165,6 +165,12 @@ void setMenuSfxVolume(float vol /* 100.0f */)
 	GfLogInfo("Menu SFX volume set to %.2f\n", vol);
 }
 
+float getMenuSfxVolume()
+{
+	float divisor = MIX_MAX_VOLUME/100.0f;
+	return (sfxVolume / divisor);
+}
+
 void enableMenuSfx(bool enable /* true */)
 {
 	if (isSfxEnabled())
