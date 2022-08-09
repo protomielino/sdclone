@@ -256,7 +256,7 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits)
     Implementation:
     Compares old end vertices and new start vertices, set startNeeded if one is different
 **/
-int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
+int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool bridge)
 {
     int i;
     tTrackSeg *seg;
@@ -2606,179 +2606,182 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
         }
 
         /* Start Bridge */
-        CHECKDISPLIST2("pylon1", 4, "S0Bg", 0);
+        if (bridge)
+        {
+            CHECKDISPLIST2("pylon1", 4, "S0Bg", 0);
 #define BR_HEIGHT_1 8.0
 #define BR_HEIGHT_2 6.0
 #define BR_WIDTH_0 2.0
 #define BR_WIDTH_1 2.0
-        mseg = Track->seg->next;
-        if (mseg->rside)
-        {
-            seg = mseg->rside;
-            if (seg->rside)
+            mseg = Track->seg->next;
+            if (mseg->rside)
             {
-                seg = seg->rside;
+                seg = mseg->rside;
+                if (seg->rside)
+                {
+                    seg = seg->rside;
+                }
             }
-        }
-        else
-        {
-            seg = mseg;
-        }
-
-        x = seg->vertex[TR_SR].x;
-        y = seg->vertex[TR_SR].y - 0.1;
-        z = seg->vertex[TR_SR].z;
-
-        SETPOINT(0, 0, x, y, z);
-        SETPOINT(0, 1, x, y, z + BR_HEIGHT_2);
-
-        x += BR_WIDTH_0;
-
-        SETPOINT(1, 0, x, y, z);
-        SETPOINT(1, 1, x, y, z + BR_HEIGHT_2);
-
-        y -= BR_WIDTH_1;
-
-        SETPOINT(2, 0, x, y, z);
-        SETPOINT(2, 1, x, y, z + BR_HEIGHT_2);
-
-        x -= BR_WIDTH_0;
-
-        SETPOINT(3, 0, x, y, z);
-        SETPOINT(3, 1, x, y, z + BR_HEIGHT_2);
-
-        y += BR_WIDTH_1;
-
-        SETPOINT(4, 0, x, y, z);
-        SETPOINT(4, 1, x, y, z + BR_HEIGHT_2);
-
-        NEWDISPLIST(0, "S1Bg", 0);
-
-        if (mseg->lside)
-        {
-            seg = mseg->lside;
-            if (seg->lside)
+            else
             {
-                seg = seg->lside;
+                seg = mseg;
             }
+
+            x = seg->vertex[TR_SR].x;
+            y = seg->vertex[TR_SR].y - 0.1;
+            z = seg->vertex[TR_SR].z;
+
+            SETPOINT(0, 0, x, y, z);
+            SETPOINT(0, 1, x, y, z + BR_HEIGHT_2);
+
+            x += BR_WIDTH_0;
+
+            SETPOINT(1, 0, x, y, z);
+            SETPOINT(1, 1, x, y, z + BR_HEIGHT_2);
+
+            y -= BR_WIDTH_1;
+
+            SETPOINT(2, 0, x, y, z);
+            SETPOINT(2, 1, x, y, z + BR_HEIGHT_2);
+
+            x -= BR_WIDTH_0;
+
+            SETPOINT(3, 0, x, y, z);
+            SETPOINT(3, 1, x, y, z + BR_HEIGHT_2);
+
+            y += BR_WIDTH_1;
+
+            SETPOINT(4, 0, x, y, z);
+            SETPOINT(4, 1, x, y, z + BR_HEIGHT_2);
+
+            NEWDISPLIST(0, "S1Bg", 0);
+
+            if (mseg->lside)
+            {
+                seg = mseg->lside;
+                if (seg->lside)
+                {
+                    seg = seg->lside;
+                }
+            }
+            else
+            {
+                seg = mseg;
+            }
+            x2 = seg->vertex[TR_SL].x;
+            y2 = seg->vertex[TR_SL].y + 0.1;
+            z2 = seg->vertex[TR_SL].z;
+
+            SETPOINT(0, 1, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(0, 0, x2, y2, z2);
+
+            x2 += BR_WIDTH_0;
+
+            SETPOINT(1, 1, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(1, 0, x2, y2, z2);
+
+            y2 += BR_WIDTH_1;
+
+            SETPOINT(2, 1, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(2, 0, x2, y2, z2);
+
+            x2 -= BR_WIDTH_0;
+
+            SETPOINT(3, 1, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(3, 0, x2, y2, z2);
+
+            y2 -= BR_WIDTH_1;
+
+            SETPOINT(4, 1, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(4, 0, x2, y2, z2);
+
+            CHECKDISPLIST2("pylon2", 4, "S2Bg", 0);
+
+            SETPOINT(0, 1, x, y, z + BR_HEIGHT_1);
+            SETPOINT(0, 0, x, y, z + BR_HEIGHT_2);
+
+            y -= BR_WIDTH_1;
+
+            SETPOINT(1, 1, x, y, z + BR_HEIGHT_1);
+            SETPOINT(1, 0, x, y, z + BR_HEIGHT_2);
+
+            x += BR_WIDTH_0;
+
+            SETPOINT(2, 1, x, y, z + BR_HEIGHT_1);
+            SETPOINT(2, 0, x, y, z + BR_HEIGHT_2);
+
+            y += BR_WIDTH_1;
+
+            SETPOINT(3, 1, x, y, z + BR_HEIGHT_1);
+            SETPOINT(3, 0, x, y, z + BR_HEIGHT_2);
+
+            x -= BR_WIDTH_0;
+
+            SETPOINT(3, 1, x + BR_WIDTH_0, y, z + BR_HEIGHT_1);
+            SETPOINT(3, 0, x, y, z + BR_HEIGHT_1);
+
+            y -= BR_WIDTH_1;
+
+            SETPOINT(4, 1, x + BR_WIDTH_0, y, z + BR_HEIGHT_1);
+            SETPOINT(4, 0, x, y, z + BR_HEIGHT_1);
+
+            y += BR_WIDTH_1; /* back to origin */
+
+            NEWDISPLIST(0, "S3Bg", 0);
+
+            y2 += BR_WIDTH_1;
+
+            SETPOINT(0, 1, x2 + BR_WIDTH_0, y2, z + BR_HEIGHT_1);
+            SETPOINT(0, 0, x2, y2, z + BR_HEIGHT_1);
+
+            y2 -= BR_WIDTH_1;
+
+            SETPOINT(1, 1, x2 + BR_WIDTH_0, y2, z + BR_HEIGHT_1);
+            SETPOINT(1, 0, x2, y2, z + BR_HEIGHT_1);
+
+            x2 += BR_WIDTH_0;
+
+            SETPOINT(1, 1, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(1, 0, x2, y2, z + BR_HEIGHT_2);
+
+            y2 += BR_WIDTH_1;
+
+            SETPOINT(2, 1, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(2, 0, x2, y2, z + BR_HEIGHT_2);
+
+            x2 -= BR_WIDTH_0;
+
+            SETPOINT(3, 1, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(3, 0, x2, y2, z + BR_HEIGHT_2);
+
+            y2 -= BR_WIDTH_1;
+
+            SETPOINT(4, 1, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(4, 0, x2, y2, z + BR_HEIGHT_2);
+
+            /* Middle on the bridge */
+            CHECKDISPLIST2("pylon3", 4, "S4Bg", 2);
+
+            SETPOINT(0, 0, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(1, 0, x, y, z + BR_HEIGHT_2);
+            SETPOINT(0, 0.25, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(1, 0.25, x, y, z + BR_HEIGHT_1);
+
+            x += BR_WIDTH_0;
+            x2 += BR_WIDTH_0;
+
+            SETPOINT(0, 0.5, x2, y2, z + BR_HEIGHT_1);
+            SETPOINT(1, 0.5, x, y, z + BR_HEIGHT_1);
+
+            SETPOINT(0, 0.75, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(1, 0.75, x, y, z + BR_HEIGHT_2);
+
+            x -= BR_WIDTH_0;
+            x2 -= BR_WIDTH_0;
+
+            SETPOINT(0, 1, x2, y2, z + BR_HEIGHT_2);
+            SETPOINT(1, 1, x, y, z + BR_HEIGHT_2);
         }
-        else
-        {
-            seg = mseg;
-        }
-        x2 = seg->vertex[TR_SL].x;
-        y2 = seg->vertex[TR_SL].y + 0.1;
-        z2 = seg->vertex[TR_SL].z;
-
-        SETPOINT(0, 1, x2, y2, z + BR_HEIGHT_2);
-        SETPOINT(0, 0, x2, y2, z2);
-
-        x2 += BR_WIDTH_0;
-
-        SETPOINT(1, 1, x2, y2, z + BR_HEIGHT_2);
-        SETPOINT(1, 0, x2, y2, z2);
-
-        y2 += BR_WIDTH_1;
-
-        SETPOINT(2, 1, x2, y2, z + BR_HEIGHT_2);
-        SETPOINT(2, 0, x2, y2, z2);
-
-        x2 -= BR_WIDTH_0;
-
-        SETPOINT(3, 1, x2, y2, z + BR_HEIGHT_2);
-        SETPOINT(3, 0, x2, y2, z2);
-
-        y2 -= BR_WIDTH_1;
-
-        SETPOINT(4, 1, x2, y2, z + BR_HEIGHT_2);
-        SETPOINT(4, 0, x2, y2, z2);
-
-        CHECKDISPLIST2("pylon2", 4, "S2Bg", 0);
-
-        SETPOINT(0, 1, x, y, z + BR_HEIGHT_1);
-        SETPOINT(0, 0, x, y, z + BR_HEIGHT_2);
-
-        y -= BR_WIDTH_1;
-
-        SETPOINT(1, 1, x, y, z + BR_HEIGHT_1);
-        SETPOINT(1, 0, x, y, z + BR_HEIGHT_2);
-
-        x += BR_WIDTH_0;
-
-        SETPOINT(2, 1, x, y, z + BR_HEIGHT_1);
-        SETPOINT(2, 0, x, y, z + BR_HEIGHT_2);
-
-        y += BR_WIDTH_1;
-
-        SETPOINT(3, 1, x, y, z + BR_HEIGHT_1);
-        SETPOINT(3, 0, x, y, z + BR_HEIGHT_2);
-
-        x -= BR_WIDTH_0;
-
-        SETPOINT(3, 1, x + BR_WIDTH_0, y, z + BR_HEIGHT_1);
-        SETPOINT(3, 0, x, y, z + BR_HEIGHT_1);
-
-        y -= BR_WIDTH_1;
-
-        SETPOINT(4, 1, x + BR_WIDTH_0, y, z + BR_HEIGHT_1);
-        SETPOINT(4, 0, x, y, z + BR_HEIGHT_1);
-
-        y += BR_WIDTH_1; /* back to origin */
-
-        NEWDISPLIST(0, "S3Bg", 0);
-
-        y2 += BR_WIDTH_1;
-
-        SETPOINT(0, 1, x2 + BR_WIDTH_0, y2, z + BR_HEIGHT_1);
-        SETPOINT(0, 0, x2, y2, z + BR_HEIGHT_1);
-
-        y2 -= BR_WIDTH_1;
-
-        SETPOINT(1, 1, x2 + BR_WIDTH_0, y2, z + BR_HEIGHT_1);
-        SETPOINT(1, 0, x2, y2, z + BR_HEIGHT_1);
-
-        x2 += BR_WIDTH_0;
-
-        SETPOINT(1, 1, x2, y2, z + BR_HEIGHT_1);
-        SETPOINT(1, 0, x2, y2, z + BR_HEIGHT_2);
-
-        y2 += BR_WIDTH_1;
-
-        SETPOINT(2, 1, x2, y2, z + BR_HEIGHT_1);
-        SETPOINT(2, 0, x2, y2, z + BR_HEIGHT_2);
-
-        x2 -= BR_WIDTH_0;
-
-        SETPOINT(3, 1, x2, y2, z + BR_HEIGHT_1);
-        SETPOINT(3, 0, x2, y2, z + BR_HEIGHT_2);
-
-        y2 -= BR_WIDTH_1;
-
-        SETPOINT(4, 1, x2, y2, z + BR_HEIGHT_1);
-        SETPOINT(4, 0, x2, y2, z + BR_HEIGHT_2);
-
-        /* Middle on the bridge */
-        CHECKDISPLIST2("pylon3", 4, "S4Bg", 2);
-
-        SETPOINT(0, 0, x2, y2, z + BR_HEIGHT_2);
-        SETPOINT(1, 0, x, y, z + BR_HEIGHT_2);
-        SETPOINT(0, 0.25, x2, y2, z + BR_HEIGHT_1);
-        SETPOINT(1, 0.25, x, y, z + BR_HEIGHT_1);
-
-        x += BR_WIDTH_0;
-        x2 += BR_WIDTH_0;
-
-        SETPOINT(0, 0.5, x2, y2, z + BR_HEIGHT_1);
-        SETPOINT(1, 0.5, x, y, z + BR_HEIGHT_1);
-
-        SETPOINT(0, 0.75, x2, y2, z + BR_HEIGHT_2);
-        SETPOINT(1, 0.75, x, y, z + BR_HEIGHT_2);
-
-        x -= BR_WIDTH_0;
-        x2 -= BR_WIDTH_0;
-
-        SETPOINT(0, 1, x2, y2, z + BR_HEIGHT_2);
-        SETPOINT(1, 1, x, y, z + BR_HEIGHT_2);
 
         /* draw the pits */
 #define PIT_HEIGHT 5.0
@@ -3033,12 +3036,12 @@ static void SaveMainTrack(FILE *curFd, bool bump, bool raceline)
     @param	TrackHandle	handle on the track description
     @return	none
 */
-void CalculateTrack(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
+void CalculateTrack(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool bridge)
 {
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, TrackStep);
     printf("Track step: %.2f ", TrackStep);
 
-    InitScene(Track, TrackHandle, bump, raceline);
+    InitScene(Track, TrackHandle, bump, raceline, bridge);
 
     printf("Calculation finished\n");
 }
@@ -3050,12 +3053,12 @@ void CalculateTrack(tTrack *Track, void *TrackHandle, bool bump, bool raceline)
     @param	AllFd	fd of the merged file
     @return	none
 */
-void GenerateTrack(tTrack *Track, void *TrackHandle, const std::string &outFile, FILE *AllFd, bool bump, bool raceline)
+void GenerateTrack(tTrack *Track, void *TrackHandle, const std::string &outFile, FILE *AllFd, bool bump, bool raceline, bool bridge)
 {
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, nullptr, TrackStep);
     printf("Track step: %.2f ", TrackStep);
 
-    InitScene(Track, TrackHandle, bump, raceline);
+    InitScene(Track, TrackHandle, bump, raceline, bridge);
 
     if (!outFile.empty())
     {

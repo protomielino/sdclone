@@ -78,6 +78,7 @@ class Application : public GfApplication
     bool MergeAll;
     bool MergeTerrain;
     int DoSaveElevation;
+    bool Bridge;
 
 public:
 
@@ -106,6 +107,7 @@ Application::Application()
 , MergeAll(true)
 , MergeTerrain(true)
 , DoSaveElevation(-1)
+, Bridge(true)
 {
 }
 
@@ -126,9 +128,10 @@ void Application::initialize(bool bLoggingEnabled, int argc, char **argv)
     registerOption("S", "splitall", /* bHasValue = */ false);
     registerOption("E", "saveelev", /* bHasValue = */ true);
     registerOption("H", "height4", /* bHasValue = */ true);
+    registerOption("N", "nobridge", /* bHasValue = */ false);
 
     // Help on specific options.
-    addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|bump] [-r|--raceline] [-B|--noborder]");
+    addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|bump] [-r|--raceline] [-B|--noborder] [-N|--nobridge]");
     addOptionsHelpSyntaxLine("[-a|--all] [-z|--calc] [-s|split] [-S|splitall]");
     addOptionsHelpSyntaxLine("[-E|--saveelev <#ef> [-H|height4 <#hs>]]");
 
@@ -212,6 +215,10 @@ bool Application::parseOptions()
         {
             HeightSteps = strtol(itOpt->strValue.c_str(), nullptr, 0);
         }
+        else if (itOpt->strLongName == "nobridge")
+        {
+            Bridge = false;
+        }
     }
 
     if (TrackName.empty() || TrackCategory.empty())
@@ -261,7 +268,7 @@ int Application::generate()
     tTrack *Track = PiTrackLoader->load(trackdef, true);
 
     if (JustCalculate) {
-        CalculateTrack(Track, TrackHandle, Bump, Raceline);
+        CalculateTrack(Track, TrackHandle, Bump, Raceline, Bridge);
         GfParmReleaseHandle(CfgHandle);
         GfParmReleaseHandle(TrackHandle);
         return EXIT_SUCCESS;
@@ -296,7 +303,7 @@ int Application::generate()
     sprintf(buf2, "%s-%s.ac", OutputFileName.c_str(), extName);
     std::string OutTrackName(buf2);
 
-    GenerateTrack(Track, TrackHandle, OutTrackName, outfd, Bump, Raceline);
+    GenerateTrack(Track, TrackHandle, OutTrackName, outfd, Bump, Raceline, Bridge);
 
     if (TrackOnly) {
         GfParmReleaseHandle(CfgHandle);
