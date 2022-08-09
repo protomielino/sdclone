@@ -273,6 +273,8 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
         }
 
         type = sideBankType[side];
+        curBorder->name = curSeg->name;
+        curBorder->id = curSeg->id;
         curBorder->startWidth = bw;
         curBorder->endWidth = bw;
         curBorder->width = bw;
@@ -510,6 +512,8 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
         }
 
         type = sideBankType[side];
+        curSide->name = curSeg->name;
+        curSide->id = curSeg->id;
         curSide->startWidth = sw;
         curSide->endWidth = ew;
         curSide->width = minWidth = MIN(sw, ew);
