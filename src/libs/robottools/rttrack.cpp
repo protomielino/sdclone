@@ -17,7 +17,7 @@
  ***************************************************************************/
 
 /** @file
-    		This is a collection of useful functions for programming a robot.
+            This is a collection of useful functions for programming a robot.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
     @ingroup	robottools
@@ -33,8 +33,8 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <tgf.h>
 #include <car.h>
+#include <tgf.h>
 #include <track.h>
 
 #include "robottools.h"
@@ -43,18 +43,16 @@
     @ingroup	tracktools
     @param	seg	Segment
     @param	toStart	Distance from the beginning of the segment.
-    		<br>The units are:
-		- meters for straights
-		- radians for turns
+            <br>The units are:
+        - meters for straights
+        - radians for turns
     @return	Width of the track at this point.
     @note	The Pit lane and the track have different width, and the side segments have variable width.
  */
-tdble
-RtTrackGetWidth(tTrackSeg *seg, tdble toStart)
+tdble RtTrackGetWidth(tTrackSeg *seg, tdble toStart)
 {
     return fabs(seg->startWidth + toStart * seg->Kyl);
 }
-
 
 /** Convert a Local position (segment, toRight, toStart)
     @ingroup	tracktools
@@ -68,129 +66,135 @@ RtTrackGetWidth(tTrackSeg *seg, tdble toStart)
     @param	X	returned X position
     @param	Y	returned Y position
     @param	flag	Local position use:
-			- TR_TOMIDDLE the toMiddle field is used
-			- TR_TORIGHT the toRight field is used
-			- TR_TOLEFT the toLeft field is used
+            - TR_TOMIDDLE the toMiddle field is used
+            - TR_TORIGHT the toRight field is used
+            - TR_TOLEFT the toLeft field is used
 */
-void
-RtTrackLocal2Global(tTrkLocPos *p, tdble *X, tdble *Y, int flag)
+void RtTrackLocal2Global(tTrkLocPos *p, tdble *X, tdble *Y, int flag)
 {
     tdble r, a;
     tdble tr;
 
     tTrackSeg *seg = p->seg;
-    switch (flag) {
+    switch (flag)
+    {
     case TR_TOMIDDLE:
-	switch(seg->type){
-	case TR_STR:
-	    /* Jussi Pajala: must be divided by two to get middle of the track ! */
-	    tr = p->toMiddle + seg->startWidth / 2.0f;
-	    *X = seg->vertex[TR_SR].x + p->toStart * seg->cos - tr * seg->sin;
-	    *Y = seg->vertex[TR_SR].y + p->toStart * seg->sin + tr * seg->cos;
-	    break;
+        switch (seg->type)
+        {
+        case TR_STR:
+            /* Jussi Pajala: must be divided by two to get middle of the track ! */
+            tr = p->toMiddle + seg->startWidth / 2.0f;
+            *X = seg->vertex[TR_SR].x + p->toStart * seg->cos - tr * seg->sin;
+            *Y = seg->vertex[TR_SR].y + p->toStart * seg->sin + tr * seg->cos;
+            break;
 
-	case TR_LFT:
-	    a = seg->angle[TR_ZS] + p->toStart;
-	    r = seg->radius - p->toMiddle;
-	    *X = seg->center.x + r * sin(a);
-	    *Y = seg->center.y - r * cos(a);
-	    break;
+        case TR_LFT:
+            a = seg->angle[TR_ZS] + p->toStart;
+            r = seg->radius - p->toMiddle;
+            *X = seg->center.x + r * sin(a);
+            *Y = seg->center.y - r * cos(a);
+            break;
 
-	case TR_RGT:
-	    a = seg->angle[TR_ZS] - p->toStart;
-	    r = seg->radius + p->toMiddle;
-	    *X = seg->center.x - r * sin(a);
-	    *Y = seg->center.y + r * cos(a);
-	    break;
-	}
-	break;
+        case TR_RGT:
+            a = seg->angle[TR_ZS] - p->toStart;
+            r = seg->radius + p->toMiddle;
+            *X = seg->center.x - r * sin(a);
+            *Y = seg->center.y + r * cos(a);
+            break;
+        }
+        break;
 
     case TR_TORIGHT:
-	switch(seg->type){
-	case TR_STR:
-	    switch (seg->type2) {
-	    case TR_MAIN:
-	    case TR_LSIDE:
-	    case TR_LBORDER:
-		tr = p->toRight;
-		break;
-	    case TR_RSIDE:
-	    case TR_RBORDER:
-		tr = p->toRight - seg->Kyl * p->toStart;
-		break;
-	    default:
-		tr = 0;
-		break;
-	    }
-	    *X = seg->vertex[TR_SR].x + p->toStart * seg->cos - tr * seg->sin;
-	    *Y = seg->vertex[TR_SR].y + p->toStart * seg->sin + tr * seg->cos;
-	    break;
+        switch (seg->type)
+        {
+        case TR_STR:
+            switch (seg->type2)
+            {
+            case TR_MAIN:
+            case TR_LSIDE:
+            case TR_LBORDER:
+                tr = p->toRight;
+                break;
+            case TR_RSIDE:
+            case TR_RBORDER:
+                tr = p->toRight - seg->Kyl * p->toStart;
+                break;
+            default:
+                tr = 0;
+                break;
+            }
+            *X = seg->vertex[TR_SR].x + p->toStart * seg->cos - tr * seg->sin;
+            *Y = seg->vertex[TR_SR].y + p->toStart * seg->sin + tr * seg->cos;
+            break;
 
-	case TR_LFT:
-	    a = seg->angle[TR_ZS] + p->toStart;
-	    switch (seg->type2) {
-	    case TR_MAIN:
-	    case TR_LSIDE:
-	    case TR_LBORDER:
-		r = seg->radiusr - p->toRight ;
-		break;
-	    case TR_RSIDE:
-	    case TR_RBORDER:
-		r = seg->radiusl + seg->startWidth + seg->Kyl * p->toStart - p->toRight ;
-		break;
-	    default:
-		r = 0;
-		break;
-	    }
-	    *X = seg->center.x + r * sin(a);
-	    *Y = seg->center.y - r * cos(a);
-	    break;
+        case TR_LFT:
+            a = seg->angle[TR_ZS] + p->toStart;
+            switch (seg->type2)
+            {
+            case TR_MAIN:
+            case TR_LSIDE:
+            case TR_LBORDER:
+                r = seg->radiusr - p->toRight;
+                break;
+            case TR_RSIDE:
+            case TR_RBORDER:
+                r = seg->radiusl + seg->startWidth + seg->Kyl * p->toStart - p->toRight;
+                break;
+            default:
+                r = 0;
+                break;
+            }
+            *X = seg->center.x + r * sin(a);
+            *Y = seg->center.y - r * cos(a);
+            break;
 
-	case TR_RGT:
-	    a = seg->angle[TR_ZS] - p->toStart;
-	    switch (seg->type2) {
-	    case TR_MAIN:
-	    case TR_LSIDE:
-	    case TR_LBORDER:
-		r = seg->radiusr + p->toRight ;
-		break;
-	    case TR_RSIDE:
-	    case TR_RBORDER:
-		r = seg->radiusl - seg->startWidth - seg->Kyl * p->toStart + p->toRight ;
-		break;
-	    default:
-		r = 0;
-		break;
-	    }
-	    *X = seg->center.x - r * sin(a);
-	    *Y = seg->center.y + r * cos(a);
-	    break;
-	}
-	break;
+        case TR_RGT:
+            a = seg->angle[TR_ZS] - p->toStart;
+            switch (seg->type2)
+            {
+            case TR_MAIN:
+            case TR_LSIDE:
+            case TR_LBORDER:
+                r = seg->radiusr + p->toRight;
+                break;
+            case TR_RSIDE:
+            case TR_RBORDER:
+                r = seg->radiusl - seg->startWidth - seg->Kyl * p->toStart + p->toRight;
+                break;
+            default:
+                r = 0;
+                break;
+            }
+            *X = seg->center.x - r * sin(a);
+            *Y = seg->center.y + r * cos(a);
+            break;
+        }
+        break;
 
     case TR_TOLEFT:
-	switch(seg->type){
-	case TR_STR:
-	    tr = seg->startWidth + seg->Kyl * p->toStart - p->toLeft;
-	    *X = seg->vertex[TR_SR].x + p->toStart * seg->cos - tr * seg->sin;
-	    *Y = seg->vertex[TR_SR].y + p->toStart * seg->sin + tr * seg->cos;
-	    break;
+        switch (seg->type)
+        {
+        case TR_STR:
+            tr = seg->startWidth + seg->Kyl * p->toStart - p->toLeft;
+            *X = seg->vertex[TR_SR].x + p->toStart * seg->cos - tr * seg->sin;
+            *Y = seg->vertex[TR_SR].y + p->toStart * seg->sin + tr * seg->cos;
+            break;
 
-	case TR_LFT:
-	    a = seg->angle[TR_ZS] + p->toStart;
-	    r = seg->radiusl + p->toLeft;
-	    *X = seg->center.x + r * sin(a);
-	    *Y = seg->center.y - r * cos(a);
-	    break;
+        case TR_LFT:
+            a = seg->angle[TR_ZS] + p->toStart;
+            r = seg->radiusl + p->toLeft;
+            *X = seg->center.x + r * sin(a);
+            *Y = seg->center.y - r * cos(a);
+            break;
 
-	case TR_RGT:
-	    a = seg->angle[TR_ZS] - p->toStart;
-	    r = seg->radiusr + seg->startWidth + seg->Kyl * p->toStart - p->toLeft;
-	    *X = seg->center.x - r * sin(a);
-	    *Y = seg->center.y + r * cos(a);
-	    break;
-	}
-	break;
+        case TR_RGT:
+            a = seg->angle[TR_ZS] - p->toStart;
+            r = seg->radiusr + seg->startWidth + seg->Kyl * p->toStart - p->toLeft;
+            *X = seg->center.x - r * sin(a);
+            *Y = seg->center.y + r * cos(a);
+            break;
+        }
+        break;
     }
 }
 
@@ -207,92 +211,108 @@ RtTrackLocal2Global(tTrkLocPos *p, tdble *X, tdble *Y, int flag)
     @param	Y	Current Y position
     @param	p	Returned local position
     @param	type	Type of local position desired:
-    			- TR_LPOS_MAIN relative to the main segment
-			- TR_LPOS_SEGMENT if the point is on a side, relative to this side
-			- TR_LPOS_TRACK local pos includes all the track width
+                - TR_LPOS_MAIN relative to the main segment
+            - TR_LPOS_SEGMENT if the point is on a side, relative to this side
+            - TR_LPOS_TRACK local pos includes all the track width
  */
 
-void
-RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int type)
+void RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int type)
 {
-    int 	segnotfound = 1;
-    tdble 	x, y;
-    tTrackSeg 	*seg = segment;
-    tTrackSeg 	*sseg;
-    tdble 	theta, a2;
-    int 	depl = 0;
-    tdble	curWidth;
+    int segnotfound = 1;
+    tdble x, y;
+    tTrackSeg *seg = segment;
+    tTrackSeg *sseg;
+    tdble theta, a2;
+    int depl = 0;
+    tdble curWidth;
 
     p->type = type;
 
-    while (segnotfound) {
+    while (segnotfound)
+    {
 
-	switch(seg->type) {
-	case TR_STR:
-	    /* rotation */
-	    tdble ts;
+        switch (seg->type)
+        {
+        case TR_STR:
+            /* rotation */
+            tdble ts;
 
-	    x = X - seg->vertex[TR_SR].x;
-	    y = Y - seg->vertex[TR_SR].y;
-	    ts = x * seg->cos + y * seg->sin;
-	    p->seg = seg;
-	    p->toStart = ts;
-	    p->toRight = y * seg->cos - x * seg->sin;
-	    if ((ts < 0) && (depl < 1)) {
-		/* get back */
-		seg = seg->prev;
-		depl = -1;
-	    } else if ((ts > seg->length) && (depl > -1)) {
-		seg = seg->next;
-		depl = 1;
-	    } else {
-		segnotfound = 0;
-	    }
-	    break;
+            x = X - seg->vertex[TR_SR].x;
+            y = Y - seg->vertex[TR_SR].y;
+            ts = x * seg->cos + y * seg->sin;
+            p->seg = seg;
+            p->toStart = ts;
+            p->toRight = y * seg->cos - x * seg->sin;
+            if ((ts < 0) && (depl < 1))
+            {
+                /* get back */
+                seg = seg->prev;
+                depl = -1;
+            }
+            else if ((ts > seg->length) && (depl > -1))
+            {
+                seg = seg->next;
+                depl = 1;
+            }
+            else
+            {
+                segnotfound = 0;
+            }
+            break;
 
-	case TR_LFT:
-	    /* rectangular to polar */
-	    x = X - seg->center.x;
-	    y = Y - seg->center.y;
-	    a2 = seg->arc / 2.0f;
-	    theta = atan2(y, x) - (seg->angle[TR_CS] + a2);
-	    FLOAT_NORM_PI_PI(theta);
-	    p->seg = seg;
-	    p->toStart = theta + a2;
-	    p->toRight = seg->radiusr - sqrt(x*x + y*y);
-	    if ((theta < -a2) && (depl < 1)) {
-		seg = seg->prev;
-		depl = -1;
-	    } else if ((theta > a2) && (depl > -1)) {
-		seg = seg->next;
-		depl = 1;
-	    } else {
-		segnotfound = 0;
-	    }
-	    break;
+        case TR_LFT:
+            /* rectangular to polar */
+            x = X - seg->center.x;
+            y = Y - seg->center.y;
+            a2 = seg->arc / 2.0f;
+            theta = atan2(y, x) - (seg->angle[TR_CS] + a2);
+            FLOAT_NORM_PI_PI(theta);
+            p->seg = seg;
+            p->toStart = theta + a2;
+            p->toRight = seg->radiusr - sqrt(x * x + y * y);
+            if ((theta < -a2) && (depl < 1))
+            {
+                seg = seg->prev;
+                depl = -1;
+            }
+            else if ((theta > a2) && (depl > -1))
+            {
+                seg = seg->next;
+                depl = 1;
+            }
+            else
+            {
+                segnotfound = 0;
+            }
+            break;
 
-	case TR_RGT:
-	    /* rectangular to polar */
+        case TR_RGT:
+            /* rectangular to polar */
 
-	    x = X - seg->center.x;
-	    y = Y - seg->center.y;
-	    a2 = seg->arc / 2.0f;
-	    theta = seg->angle[TR_CS] - a2 - atan2(y, x);
-	    FLOAT_NORM_PI_PI(theta);
-	    p->seg = seg;
-	    p->toStart = theta + a2;
-	    p->toRight = sqrt(x*x + y*y) - seg->radiusr;
-	    if ((theta < -a2) && (depl < 1)) {
-		seg = seg->prev;
-		depl = -1;
-	    } else if ((theta > a2) && (depl > -1)) {
-		seg = seg->next;
-		depl = 1;
-	    } else {
-		segnotfound = 0;
-	    }
-	    break;
-	}
+            x = X - seg->center.x;
+            y = Y - seg->center.y;
+            a2 = seg->arc / 2.0f;
+            theta = seg->angle[TR_CS] - a2 - atan2(y, x);
+            FLOAT_NORM_PI_PI(theta);
+            p->seg = seg;
+            p->toStart = theta + a2;
+            p->toRight = sqrt(x * x + y * y) - seg->radiusr;
+            if ((theta < -a2) && (depl < 1))
+            {
+                seg = seg->prev;
+                depl = -1;
+            }
+            else if ((theta > a2) && (depl > -1))
+            {
+                seg = seg->next;
+                depl = 1;
+            }
+            else
+            {
+                segnotfound = 0;
+            }
+            break;
+        }
     }
 
     /* The track is of constant width */
@@ -302,62 +322,73 @@ RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int typ
 
     /* Consider all the track with the sides */
     /* Stay on main segment */
-    if (type == TR_LPOS_TRACK) {
-	if (seg->rside != NULL) {
-	    sseg = seg->rside;
-	    p->toRight += RtTrackGetWidth(sseg, p->toStart);
-	    sseg = sseg->rside;
-	    if (sseg) {
-		p->toRight += RtTrackGetWidth(sseg, p->toStart);
-	    }
-	}
-	if (seg->lside != NULL) {
-	    sseg = seg->lside;
-	    p->toLeft += RtTrackGetWidth(sseg, p->toStart);
-	    sseg = sseg->lside;
-	    if (sseg) {
-		p->toLeft += RtTrackGetWidth(sseg, p->toStart);
-	    }
-	}
+    if (type == TR_LPOS_TRACK)
+    {
+        if (seg->rside != NULL)
+        {
+            sseg = seg->rside;
+            p->toRight += RtTrackGetWidth(sseg, p->toStart);
+            sseg = sseg->rside;
+            if (sseg)
+            {
+                p->toRight += RtTrackGetWidth(sseg, p->toStart);
+            }
+        }
+        if (seg->lside != NULL)
+        {
+            sseg = seg->lside;
+            p->toLeft += RtTrackGetWidth(sseg, p->toStart);
+            sseg = sseg->lside;
+            if (sseg)
+            {
+                p->toLeft += RtTrackGetWidth(sseg, p->toStart);
+            }
+        }
     }
 
     /* Relative to a segment, change to the side segment if necessary */
-    if (type == TR_LPOS_SEGMENT) {
-	if ((p->toRight < 0) && (seg->rside != NULL)) {
-	    sseg = seg->rside;
-	    p->seg = sseg;
-	    curWidth = RtTrackGetWidth(sseg, p->toStart);
-	    p->toRight +=  curWidth;
-	    p->toLeft -= seg->width;
-	    p->toMiddle += (seg->width + curWidth) / 2.0f;
-	    if ((p->toRight < 0) && (sseg->rside != NULL)) {
-		p->toLeft -= curWidth;
-		p->toMiddle += curWidth / 2.0f;
-		seg = sseg;
-		sseg = seg->rside;
-		curWidth = RtTrackGetWidth(sseg, p->toStart);
-		p->seg = sseg;
-		p->toRight +=  curWidth;
-		p->toMiddle += curWidth / 2.0f;
-	    }
-	} else if ((p->toLeft < 0) && (seg->lside != NULL)) {
-	    sseg = seg->lside;
-	    p->seg = sseg;
-	    curWidth = RtTrackGetWidth(sseg, p->toStart);
-	    p->toRight += -seg->width;
-	    p->toMiddle -= (seg->width + curWidth) / 2.0f;
-	    p->toLeft += curWidth;
-	    if ((p->toLeft < 0) && (sseg->lside != NULL)) {
-		p->toRight -= curWidth;
-		p->toMiddle -= curWidth / 2.0f;
-		seg = sseg;
-		sseg = seg->lside;
-		curWidth = RtTrackGetWidth(sseg, p->toStart);
-		p->seg = sseg;
-		p->toMiddle -= curWidth / 2.0f;
-		p->toLeft += curWidth;
-	    }
-	}
+    if (type == TR_LPOS_SEGMENT)
+    {
+        if ((p->toRight < 0) && (seg->rside != NULL))
+        {
+            sseg = seg->rside;
+            p->seg = sseg;
+            curWidth = RtTrackGetWidth(sseg, p->toStart);
+            p->toRight += curWidth;
+            p->toLeft -= seg->width;
+            p->toMiddle += (seg->width + curWidth) / 2.0f;
+            if ((p->toRight < 0) && (sseg->rside != NULL))
+            {
+                p->toLeft -= curWidth;
+                p->toMiddle += curWidth / 2.0f;
+                seg = sseg;
+                sseg = seg->rside;
+                curWidth = RtTrackGetWidth(sseg, p->toStart);
+                p->seg = sseg;
+                p->toRight += curWidth;
+                p->toMiddle += curWidth / 2.0f;
+            }
+        }
+        else if ((p->toLeft < 0) && (seg->lside != NULL))
+        {
+            sseg = seg->lside;
+            p->seg = sseg;
+            curWidth = RtTrackGetWidth(sseg, p->toStart);
+            p->toRight += -seg->width;
+            p->toMiddle -= (seg->width + curWidth) / 2.0f;
+            p->toLeft += curWidth;
+            if ((p->toLeft < 0) && (sseg->lside != NULL))
+            {
+                p->toRight -= curWidth;
+                p->toMiddle -= curWidth / 2.0f;
+                seg = sseg;
+                sseg = seg->lside;
+                curWidth = RtTrackGetWidth(sseg, p->toStart);
+                p->seg = sseg;
+                p->toMiddle -= curWidth / 2.0f;
+                p->toLeft += curWidth;
+            }
+        }
     }
 }
 
@@ -383,87 +414,96 @@ RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int typ
     @param	p	Local position
     @return	Height in meters
  */
-tdble
-RtTrackHeightL(tTrkLocPos *p)
+tdble RtTrackHeightL(tTrkLocPos *p)
 {
-    tdble	lg;
-    tdble	tr = p->toRight;
-    tTrackSeg	*seg = p->seg;
-    //bool left_side = true; // Never used.
-    if ((tr < 0) && (seg->rside != NULL)) {
-    //    left_side = false; // Never used.
+    tdble lg;
+    tdble tr = p->toRight;
+    tTrackSeg *seg = p->seg;
+    // bool left_side = true; // Never used.
+    if ((tr < 0) && (seg->rside != NULL))
+    {
+        //    left_side = false; // Never used.
 
-	seg = seg->rside;
- 	tr += seg->width;
+        seg = seg->rside;
+        tr += seg->width;
 
-	if ((tr < 0) && (seg->rside != NULL)) {
-	    seg = seg->rside;
-	    tr += RtTrackGetWidth(seg, p->toStart);
-	}
-    } else if ((tr > seg->width) && (seg->lside != NULL)) {
-	tr -= seg->width;
-	seg = seg->lside;
-	if ((tr > seg->width) && (seg->lside != NULL)) {
-	    tr -= RtTrackGetWidth(seg, p->toStart);
-	    seg = seg->lside;
-	}
+        if ((tr < 0) && (seg->rside != NULL))
+        {
+            seg = seg->rside;
+            tr += RtTrackGetWidth(seg, p->toStart);
+        }
+    }
+    else if ((tr > seg->width) && (seg->lside != NULL))
+    {
+        tr -= seg->width;
+        seg = seg->lside;
+        if ((tr > seg->width) && (seg->lside != NULL))
+        {
+            tr -= RtTrackGetWidth(seg, p->toStart);
+            seg = seg->lside;
+        }
     }
 
-    switch (seg->type) {
+    switch (seg->type)
+    {
     case TR_STR:
-	lg = p->toStart;
-	break;
+        lg = p->toStart;
+        break;
     default:
-	lg = p->toStart * seg->radius;
-	break;
+        lg = p->toStart * seg->radius;
+        break;
     }
-    if (seg->style == TR_CURB) {
+    if (seg->style == TR_CURB)
+    {
         // The final height = starting height + height difference due
         // to track angle + height difference due to curb (this seems
         // to be the way it is implemented in the graphics too: the
         // curb does not adding an angle to the main track, but a
         // height in global coords).
-	if (seg->type2 == TR_RBORDER) {
+        if (seg->type2 == TR_RBORDER)
+        {
             // alpha shows how far we've moved into this segment.
             tdble alpha = seg->width - tr;
             tdble angle = seg->angle[TR_XS] + p->toStart * seg->Kzw;
             tdble noise = seg->surface->kRoughness * sin(seg->surface->kRoughWaveLen * lg) * alpha / seg->width;
             tdble start_height = seg->vertex[TR_SR].z + p->toStart * seg->Kzl;
             return start_height + tr * tan(angle) + alpha * atan2(seg->height, seg->width) + noise;
+        }
 
-	}
-
-	return seg->vertex[TR_SR].z + p->toStart * seg->Kzl +
-	    tr * (tan(seg->angle[TR_XS] + p->toStart * seg->Kzw)
-                  + atan2(seg->height, seg->width)) +
-	    seg->surface->kRoughness * sin(seg->surface->kRoughWaveLen * lg) * tr / seg->width;
+        return seg->vertex[TR_SR].z + p->toStart * seg->Kzl +
+               tr * (tan(seg->angle[TR_XS] + p->toStart * seg->Kzw) + atan2(seg->height, seg->width)) +
+               seg->surface->kRoughness * sin(seg->surface->kRoughWaveLen * lg) * tr / seg->width;
     }
 
     return seg->vertex[TR_SR].z + p->toStart * seg->Kzl + tr * tan(seg->angle[TR_XS] + p->toStart * seg->Kzw) +
-	seg->surface->kRoughness * sin(seg->surface->kRoughWaveLen * tr) * sin(seg->surface->kRoughWaveLen * lg);
+           seg->surface->kRoughness * sin(seg->surface->kRoughWaveLen * tr) * sin(seg->surface->kRoughWaveLen * lg);
 }
 
 /* get the real segment */
-tTrackSeg *
-RtTrackGetSeg(tTrkLocPos *p)
+tTrackSeg *RtTrackGetSeg(tTrkLocPos *p)
 {
     tdble tr = p->toRight;
     tTrackSeg *seg = p->seg;
 
-    if ((tr < 0) && (seg->rside != NULL)) {
-	seg = seg->rside;
- 	tr += seg->width;
-	if ((tr < 0) && (seg->rside != NULL)) {
-	    seg = seg->rside;
-	    tr += RtTrackGetWidth(seg, p->toStart);
-	}
-    } else if ((tr > seg->width) && (seg->lside != NULL)) {
-	tr -= seg->width;
-	seg = seg->lside;
-	if ((tr > seg->width) && (seg->lside != NULL)) {
-	    tr -= RtTrackGetWidth(seg, p->toStart);
-	    seg = seg->lside;
-	}
+    if ((tr < 0) && (seg->rside != NULL))
+    {
+        seg = seg->rside;
+        tr += seg->width;
+        if ((tr < 0) && (seg->rside != NULL))
+        {
+            seg = seg->rside;
+            tr += RtTrackGetWidth(seg, p->toStart);
+        }
+    }
+    else if ((tr > seg->width) && (seg->lside != NULL))
+    {
+        tr -= seg->width;
+        seg = seg->lside;
+        if ((tr > seg->width) && (seg->lside != NULL))
+        {
+            tr -= RtTrackGetWidth(seg, p->toStart);
+            seg = seg->lside;
+        }
     }
     return seg;
 }
@@ -476,8 +516,7 @@ RtTrackGetSeg(tTrkLocPos *p)
     @param	Y	Global Y position
     @return	Height in meters
  */
-tdble
-RtTrackHeightG(tTrackSeg *seg, tdble X, tdble Y)
+tdble RtTrackHeightG(tTrackSeg *seg, tdble X, tdble Y)
 {
     tTrkLocPos p;
 
@@ -498,50 +537,59 @@ RtTrackHeightG(tTrackSeg *seg, tdble X, tdble Y)
     @param	X	Global X position
     @param	Y	Global Y position
     @param	side	Side where the normal is wanted
-			- TR_LFT for left side
-			- TR_RGT for right side
+            - TR_LFT for left side
+            - TR_RGT for right side
     @param	norm	Returned normalized side normal vector
     @todo	RtTrackSideNormalG: Give the correct normal for variable width sides.
  */
-void
-RtTrackSideNormalG(tTrackSeg *seg, tdble X, tdble Y, int side, t3Dd *norm)
+void RtTrackSideNormalG(tTrackSeg *seg, tdble X, tdble Y, int side, t3Dd *norm)
 {
     tdble lg;
 
-    switch (seg->type) {
+    switch (seg->type)
+    {
     case TR_STR:
-	if (side == TR_RGT) {
-	    norm->x = seg->rgtSideNormal.x;
-	    norm->y = seg->rgtSideNormal.y;
-	} else {
-	    norm->x = -seg->rgtSideNormal.x;
-	    norm->y = -seg->rgtSideNormal.y;
-	}
-	break;
+        if (side == TR_RGT)
+        {
+            norm->x = seg->rgtSideNormal.x;
+            norm->y = seg->rgtSideNormal.y;
+        }
+        else
+        {
+            norm->x = -seg->rgtSideNormal.x;
+            norm->y = -seg->rgtSideNormal.y;
+        }
+        break;
     case TR_RGT:
-	if (side == TR_LFT) {
-	    norm->x = seg->center.x - X;
-	    norm->y = seg->center.y - Y;
-	} else {
-	    norm->x = X - seg->center.x;
-	    norm->y = Y - seg->center.y;
-	}
-	lg = 1.0f / sqrt(norm->x * norm->x + norm->y * norm->y);
-	norm->x *= lg;
-	norm->y *= lg;
-	break;
+        if (side == TR_LFT)
+        {
+            norm->x = seg->center.x - X;
+            norm->y = seg->center.y - Y;
+        }
+        else
+        {
+            norm->x = X - seg->center.x;
+            norm->y = Y - seg->center.y;
+        }
+        lg = 1.0f / sqrt(norm->x * norm->x + norm->y * norm->y);
+        norm->x *= lg;
+        norm->y *= lg;
+        break;
     case TR_LFT:
-	if (side == TR_RGT) {
-	    norm->x = seg->center.x - X;
-	    norm->y = seg->center.y - Y;
-	} else {
-	    norm->x = X - seg->center.x;
-	    norm->y = Y - seg->center.y;
-	}
-	lg = 1.0f / sqrt(norm->x * norm->x + norm->y * norm->y);
-	norm->x *= lg;
-	norm->y *= lg;
-	break;
+        if (side == TR_RGT)
+        {
+            norm->x = seg->center.x - X;
+            norm->y = seg->center.y - Y;
+        }
+        else
+        {
+            norm->x = X - seg->center.x;
+            norm->y = Y - seg->center.y;
+        }
+        lg = 1.0f / sqrt(norm->x * norm->x + norm->y * norm->y);
+        norm->x *= lg;
+        norm->y *= lg;
+        break;
     }
 }
 
@@ -554,23 +602,22 @@ RtTrackSideNormalG(tTrackSeg *seg, tdble X, tdble Y, int side, t3Dd *norm)
     @note	For side segment, the track side is used for the tangent.
  */
 
-tdble
-RtTrackSideTgAngleL(tTrkLocPos *p)
+tdble RtTrackSideTgAngleL(tTrkLocPos *p)
 {
-    switch (p->seg->type) {
+    switch (p->seg->type)
+    {
     case TR_STR:
-	return p->seg->angle[TR_ZS];
-	break;
+        return p->seg->angle[TR_ZS];
+        break;
     case TR_RGT:
-	return p->seg->angle[TR_ZS] - p->toStart;
-	break;
+        return p->seg->angle[TR_ZS] - p->toStart;
+        break;
     case TR_LFT:
-	return p->seg->angle[TR_ZS] + p->toStart;
-	break;
+        return p->seg->angle[TR_ZS] + p->toStart;
+        break;
     }
     return 0;
 }
-
 
 /** Used to get the normal vector of the road (pointing upward).
     Local coordinates are used to locate the point where to
@@ -580,13 +627,12 @@ RtTrackSideTgAngleL(tTrkLocPos *p)
     @param	p	Local position
     @param	norm	Returned normalized road normal vector
  */
-void
-RtTrackSurfaceNormalL(tTrkLocPos *p, t3Dd *norm)
+void RtTrackSurfaceNormalL(tTrkLocPos *p, t3Dd *norm)
 {
-    tTrkLocPos	p1;
-    t3Dd	px1, px2, py1, py2;
-    t3Dd	v1, v2;
-    tdble	lg;
+    tTrkLocPos p1;
+    t3Dd px1, px2, py1, py2;
+    t3Dd v1, v2;
+    tdble lg;
 
     p1.seg = p->seg;
 
@@ -595,10 +641,13 @@ RtTrackSurfaceNormalL(tTrkLocPos *p, t3Dd *norm)
     RtTrackLocal2Global(&p1, &px1.x, &px1.y, TR_TORIGHT);
     px1.z = RtTrackHeightL(&p1);
 
-    if (p1.seg->type == TR_STR) {
-	p1.toStart = p1.seg->length;
-    } else {
-	p1.toStart = p1.seg->arc;
+    if (p1.seg->type == TR_STR)
+    {
+        p1.toStart = p1.seg->length;
+    }
+    else
+    {
+        p1.toStart = p1.seg->arc;
     }
     RtTrackLocal2Global(&p1, &px2.x, &px2.y, TR_TORIGHT);
     px2.z = RtTrackHeightL(&p1);
@@ -612,7 +661,6 @@ RtTrackSurfaceNormalL(tTrkLocPos *p, t3Dd *norm)
     RtTrackLocal2Global(&p1, &py2.x, &py2.y, TR_TORIGHT);
     py2.z = RtTrackHeightL(&p1);
 
-
     v1.x = px2.x - px1.x;
     v1.y = px2.y - px1.y;
     v1.z = px2.z - px1.z;
@@ -624,24 +672,25 @@ RtTrackSurfaceNormalL(tTrkLocPos *p, t3Dd *norm)
     norm->y = v2.x * v1.z - v1.x * v2.z;
     norm->z = v1.x * v2.y - v2.x * v1.y;
     lg = sqrt(norm->x * norm->x + norm->y * norm->y + norm->z * norm->z);
-    if (lg == 0.0) {
-	lg = 1.0f;
-    } else {
-	lg = 1.0f / lg;
+    if (lg == 0.0)
+    {
+        lg = 1.0f;
+    }
+    else
+    {
+        lg = 1.0f / lg;
     }
     norm->x *= lg;
     norm->y *= lg;
     norm->z *= lg;
 }
 
-
 /** Get the distance from the start lane.
     @ingroup	tracktools
     @param	car 	the concerned car.
     @return	The distance between the start lane and the car.
  */
-tdble
-RtGetDistFromStart(tCarElt *car)
+tdble RtGetDistFromStart(tCarElt *car)
 {
     tTrkLocPos *p = &(car->_trkPos);
     return RtGetDistFromStart2(p);
@@ -652,26 +701,25 @@ RtGetDistFromStart(tCarElt *car)
     @param	p	Local position
     @return	The distance between the start lane and the car.
  */
-tdble
-RtGetDistFromStart2(tTrkLocPos *p)
+tdble RtGetDistFromStart2(tTrkLocPos *p)
 {
-    tTrackSeg	*seg;
-    tdble	lg;
+    tTrackSeg *seg;
+    tdble lg;
 
     seg = p->seg;
     lg = seg->lgfromstart;
 
-    switch (seg->type) {
+    switch (seg->type)
+    {
     case TR_STR:
-	lg += p->toStart;
-	break;
+        lg += p->toStart;
+        break;
     default:
-	lg += p->toStart * seg->radius;
-	break;
+        lg += p->toStart * seg->radius;
+        break;
     }
     return lg;
 }
-
 
 /** Get the distance to the pit stop.
     @ingroup	tracktools
@@ -682,36 +730,43 @@ RtGetDistFromStart2(tTrkLocPos *p)
     @return	0
     @note	dW > 0 if the pit is on the right
 */
-int
-RtDistToPit(struct CarElt *car, tTrack *track, tdble *dL, tdble *dW)
+int RtDistToPit(struct CarElt *car, tTrack *track, tdble *dL, tdble *dW)
 {
-    tTrkLocPos	*pitpos;
-    tTrkLocPos	*carpos;
-    tdble	pitts;
-    tdble	carts;
+    tTrkLocPos *pitpos;
+    tTrkLocPos *carpos;
+    tdble pitts;
+    tdble carts;
 
-	// In case there is no pit initialize the output variables
-	*dL = 99999.0; // Means far far away
-	*dW = 0.0;     // Any side
-    if (car->_pit == NULL) return 1;
+    // In case there is no pit initialize the output variables
+    *dL = 99999.0; // Means far far away
+    *dW = 0.0;     // Any side
+    if (car->_pit == NULL)
+        return 1;
 
     pitpos = &(car->_pit->pos);
     carpos = &(car->_trkPos);
 
-    if (carpos->seg->radius) {
-	carts = carpos->toStart * carpos->seg->radius;
-    } else {
-	carts = carpos->toStart;
+    if (carpos->seg->radius)
+    {
+        carts = carpos->toStart * carpos->seg->radius;
     }
-    if (pitpos->seg->radius) {
-	pitts = pitpos->toStart * pitpos->seg->radius;
-    } else {
-	pitts = pitpos->toStart;
+    else
+    {
+        carts = carpos->toStart;
+    }
+    if (pitpos->seg->radius)
+    {
+        pitts = pitpos->toStart * pitpos->seg->radius;
+    }
+    else
+    {
+        pitts = pitpos->toStart;
     }
 
     *dL = pitpos->seg->lgfromstart - carpos->seg->lgfromstart + pitts - carts;
-    if (*dL < 0) {
-	*dL += track->length;
+    if (*dL < 0)
+    {
+        *dL += track->length;
     }
 
     *dW = pitpos->toRight - carpos->toRight;
