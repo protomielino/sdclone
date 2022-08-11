@@ -838,6 +838,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             break;
                         }
                         break;
+                    case TR_FENCE:
+                    case TR_PITBUILDING:
+                        // not supported
+                        break;
                     }
                 }
 
@@ -912,6 +916,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 SETPOINT(texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
+                            break;
+                        case TR_FENCE:
+                        case TR_PITBUILDING:
+                            // not supported
                             break;
                         }
 
@@ -999,6 +1007,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 SETPOINT(texLen, 1.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
+                            break;
+                        case TR_FENCE:
+                        case TR_PITBUILDING:
+                            // not supported
                             break;
                         }
 
@@ -1088,6 +1100,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 break;
                             }
                             break;
+                        case TR_FENCE:
+                        case TR_PITBUILDING:
+                            // not supported
+                            break;
                         }
 
                         ts += step;
@@ -1155,6 +1171,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         }
                         break;
                     }
+                    break;
+                case TR_FENCE:
+                case TR_PITBUILDING:
+                    // not supported
                     break;
                 }
 
@@ -1419,6 +1439,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             break;
                         }
                         break;
+                    case TR_FENCE:
+                    case TR_PITBUILDING:
+                        // not supported
+                        break;
                     }
                 }
 
@@ -1493,6 +1517,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 SETPOINT(texLen, 0.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
+                            break;
+                        case TR_FENCE:
+                        case TR_PITBUILDING:
+                            // not supported
                             break;
                         }
 
@@ -1580,6 +1608,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 SETPOINT(texLen, 0.0, x, y, RtTrackHeightL(&trkpos));
                                 break;
                             }
+                            break;
+                        case TR_FENCE:
+                        case TR_PITBUILDING:
+                            // not supported
                             break;
                         }
 
@@ -1669,6 +1701,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 break;
                             }
                             break;
+                        case TR_FENCE:
+                        case TR_PITBUILDING:
+                            // not supported
+                            break;
                         }
 
                         ts += step;
@@ -1733,6 +1769,10 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         SETPOINT(texLen, 0.0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
                         break;
                     }
+                    break;
+                case TR_FENCE:
+                case TR_PITBUILDING:
+                    // not supported
                     break;
                 }
 
@@ -2000,6 +2040,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             break;
                         }
                         break;
+                    case TR_CURB:
+                    case TR_PLAN:
+                        // not supported
+                        break;
+                    case TR_PITBUILDING:
+                        // nothing to do
+                        break;
                     }
                 }
                 switch (seg->type)
@@ -2047,6 +2094,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 SETPOINT(texLen, 1.0, x, y, curHeight);
                                 break;
                             }
+                            break;
+                        case TR_CURB:
+                        case TR_PLAN:
+                            // not supported
+                            break;
+                        case TR_PITBUILDING:
+                            // nothing to do
                             break;
                         }
 
@@ -2102,6 +2156,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 SETPOINT(texLen, 1.0, x, y, curHeight);
                                 break;
                             }
+                            break;
+                        case TR_CURB:
+                        case TR_PLAN:
+                            // not supported
+                            break;
+                        case TR_PITBUILDING:
+                            // nothing to do
                             break;
                         }
 
@@ -2160,6 +2221,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 break;
                             }
                             break;
+                        case TR_CURB:
+                        case TR_PLAN:
+                            // not supported
+                            break;
+                        case TR_PITBUILDING:
+                            // nothing to do
+                            break;
                         }
                         ts += step;
                         anz -= step;
@@ -2207,6 +2275,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         }
                         break;
                     }
+                    break;
+                case TR_CURB:
+                case TR_PLAN:
+                    // not supported
+                    break;
+                case TR_PITBUILDING:
+                    // nothing to do
                     break;
                 }
                 startNeeded = 0;
@@ -2302,6 +2377,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                             break;
                         }
                         break;
+                    case TR_CURB:
+                    case TR_PLAN:
+                        // not supported
+                        break;
+                    case TR_PITBUILDING:
+                        // nothing to do
+                        break;
                     }
                 }
 
@@ -2352,6 +2434,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 SETPOINT(texLen, 0, x, y, curHeight);
                                 break;
                             }
+                            break;
+                        case TR_CURB:
+                        case TR_PLAN:
+                            // not supported
+                            break;
+                        case TR_PITBUILDING:
+                            // nothing to do
                             break;
                         }
 
@@ -2409,6 +2498,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 SETPOINT(texLen, 0, x, y, curHeight);
                                 break;
                             }
+                            break;
+                        case TR_CURB:
+                        case TR_PLAN:
+                            // not supported
+                            break;
+                        case TR_PITBUILDING:
+                            // nothing to do
                             break;
                         }
 
@@ -2468,6 +2564,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                                 break;
                             }
                             break;
+                        case TR_CURB:
+                            case TR_PLAN:
+                            // not supported
+                            break;
+                        case TR_PITBUILDING:
+                            // nothing to do
+                            break;
                         }
 
                         ts += step;
@@ -2518,6 +2621,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                         SETPOINT(texLen, 0.0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
                         break;
                     }
+                    break;
+                case TR_CURB:
+                case TR_PLAN:
+                    // not supported
+                    break;
+                case TR_PITBUILDING:
+                    // nothing to do
                     break;
                 }
 
