@@ -232,6 +232,10 @@ bool Application::parseOptions()
 
 int Application::generate()
 {
+    ssgAddTextureFormat(".png", ssgLoadPNG);
+    ssgAddTextureFormat(".rgb", ssgLoadSGI);
+    ssgAddTextureFormat(".rgba", ssgLoadSGI);
+
     // Get the trackgen paramaters.
     void *CfgHandle = GfParmReadFile(CFG_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 

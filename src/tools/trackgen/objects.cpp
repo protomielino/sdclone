@@ -118,10 +118,10 @@ InitObjects(tTrack *track, void *TrackHandle)
 
     GF_TAILQ_INIT(&objhead);
 
-    sprintf(buf, "tracks/%s/%s;data/objects", track->category, track->internalname);
+    sprintf(buf, "%stracks/%s/%s;%sdata/objects", GfDataDir(), track->category, track->internalname, GfDataDir());
     search = strdup(buf);
 
-    sprintf(path, "tracks/%s/%s;data/objects;data/textures;.", track->category, track->internalname);
+    sprintf(path, "%stracks/%s/%s;%sdata/objects;%sdata/textures;.", GfDataDir(), track->category, track->internalname, GfDataDir(), GfDataDir());
     ssgTexturePath(path);
     ssgModelPath(path);
 
@@ -517,9 +517,9 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
     int			index;
 
     ssgSetCurrentOptions(&options);
-    sprintf(buf, "tracks/%s/%s;data/textures;data/img;.", track->category, track->internalname);
+    sprintf(buf, "%stracks/%s/%s;%sdata/textures;%sdata/img;.", GfDataDir(), track->category, track->internalname, GfDataDir(), GfDataDir());
     ssgTexturePath(buf);
-    sprintf(buf, ".;tracks/%s/%s", track->category, track->internalname);
+    sprintf(buf, ".;%stracks/%s/%s;%sdata/objects", GfDataDir(), track->category, track->internalname, GfDataDir());
     ssgModelPath(buf);
     TrackRoot = (ssgRoot*)ssgLoadAC(meshFile.c_str());
 

@@ -39,6 +39,7 @@
 #include <track.h>
 #include "trackgen.h"
 #include "easymesh.h"
+#include "util.h"
 
 #include "relief.h"
 
@@ -82,20 +83,27 @@ hookNode(char *s)
   Load a simple database
 */
 void
-LoadRelief(void *TrackHandle, const char *reliefFile)
+LoadRelief(tTrack *track, void *TrackHandle, const char *reliefFile)
 {
     GF_TAILQ_INIT(&InteriorList);
     GF_TAILQ_INIT(&ExteriorList);
     
     GridStep  = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BSTEP, nullptr, GridStep);
 
-    ssgLoaderOptions *loaderopt = new ssgLoaderOptions();
- 
-    loaderopt->setCreateBranchCallback(hookNode);
+    ssgLoaderOptionsEx options;
+
+    ssgSetCurrentOptions(&options);
+
+    options.setCreateBranchCallback(hookNode);
+
+    char path[1024];
+    sprintf(path, "tracks/%s/%s;data/objects;data/textures;.", track->category, track->internalname);
+    ssgTexturePath(path);
+    ssgModelPath(path);
 
     printf("\nLoading relief file %s\n", reliefFile);
     
-    Root = ssgLoadAC(reliefFile, loaderopt);
+    Root = ssgLoadAC(reliefFile);
 }
 
 static void
