@@ -558,6 +558,7 @@ public class EditorFrame extends JFrame
         shape.setHeightStartRight(0);
         shape.setHeightEndLeft(0);
         shape.setHeightEndRight(0);
+        shape.setSurface(MainTrack.DEFAULT_SURFACE);
         shape.getLeft().setNewTrackDefaults();
         shape.getRight().setNewTrackDefaults();
         track.add(shape);
@@ -571,6 +572,7 @@ public class EditorFrame extends JFrame
         shape.setHeightStartRight(0);
         shape.setHeightEndLeft(0);
         shape.setHeightEndRight(0);
+        shape.setSurface(MainTrack.DEFAULT_SURFACE);
         shape.getLeft().setNewTrackDefaults();
         shape.getRight().setNewTrackDefaults();
         shape.addToPrevious(previous);
@@ -583,6 +585,7 @@ public class EditorFrame extends JFrame
         shape.setHeightStartRight(0);
         shape.setHeightEndLeft(0);
         shape.setHeightEndRight(0);
+        shape.setSurface(MainTrack.DEFAULT_SURFACE);
         shape.getLeft().setNewTrackDefaults();
         shape.getRight().setNewTrackDefaults();
         shape.addToPrevious(previous);
@@ -597,6 +600,7 @@ public class EditorFrame extends JFrame
         shape.setHeightStartRight(0);
         shape.setHeightEndLeft(0);
         shape.setHeightEndRight(0);
+        shape.setSurface(MainTrack.DEFAULT_SURFACE);
         shape.getLeft().setNewTrackDefaults();
         shape.getRight().setNewTrackDefaults();
         shape.addToPrevious(previous);
