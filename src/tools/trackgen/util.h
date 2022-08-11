@@ -51,6 +51,7 @@ class ssgLoaderOptionsEx : public ssgLoaderOptions
     virtual void makeTexturePath ( char* path, const char *fname ) const
 	{
 	    ulFindFile ( path, texture_dir, fname, nullptr ) ;
+        //printf("texture: %s found: %s\n", fname, path);
 	}
 
 };

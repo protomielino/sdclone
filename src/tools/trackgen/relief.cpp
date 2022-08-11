@@ -97,7 +97,7 @@ LoadRelief(tTrack *track, void *TrackHandle, const char *reliefFile)
     options.setCreateBranchCallback(hookNode);
 
     char path[1024];
-    sprintf(path, "tracks/%s/%s;data/objects;data/textures;.", track->category, track->internalname);
+    sprintf(path, "%stracks/%s/%s;%sdata/objects;%sdata/textures;.", GfDataDir(), track->category, track->internalname, GfDataDir(), GfDataDir());
     ssgTexturePath(path);
     ssgModelPath(path);
 
