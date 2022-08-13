@@ -34,6 +34,8 @@ extern float getTerrainAngle(ssgRoot *root, float x, float y);
 extern float getTrackAngle(tTrack *Track, void *TrackHandle, float x, float y);
 extern float getBorderAngle(tTrack *Track, void *TrackHandle, float x, float y, float distance, float *xRet, float *yRet, float *zRet);
 extern tdble Distance(tdble x0, tdble y0, tdble z0, tdble x1, tdble y1, tdble z1);
+extern bool loadPngTexture(const char *fname, ssgTextureInfo *info);
+extern bool loadJpegTexture(const char *fname, ssgTextureInfo *info);
 
 /* Use the texture name to select options like mipmap */
 class ssgLoaderOptionsEx : public ssgLoaderOptions
@@ -51,7 +53,6 @@ class ssgLoaderOptionsEx : public ssgLoaderOptions
     virtual void makeTexturePath ( char* path, const char *fname ) const
 	{
 	    ulFindFile ( path, texture_dir, fname, nullptr ) ;
-        //printf("texture: %s found: %s\n", fname, path);
 	}
 
 };

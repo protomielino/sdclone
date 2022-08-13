@@ -62,6 +62,7 @@
 #include "objects.h"
 #include "elevation.h"
 #include "trackgen.h"
+#include "util.h"
 
 
 class Application : public GfApplication
@@ -232,9 +233,13 @@ bool Application::parseOptions()
 
 int Application::generate()
 {
-    ssgAddTextureFormat(".png", ssgLoadPNG);
     ssgAddTextureFormat(".rgb", ssgLoadSGI);
     ssgAddTextureFormat(".rgba", ssgLoadSGI);
+    ssgAddTextureFormat(".int", ssgLoadSGI);
+    ssgAddTextureFormat(".inta", ssgLoadSGI);
+    ssgAddTextureFormat(".bw", ssgLoadSGI);
+    ssgAddTextureFormat(".png", loadPngTexture);
+    ssgAddTextureFormat(".jpg", loadJpegTexture);
 
     // Get the trackgen paramaters.
     void *CfgHandle = GfParmReadFile(CFG_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);

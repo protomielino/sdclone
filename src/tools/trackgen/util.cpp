@@ -356,3 +356,43 @@ getTerrainAngle(ssgRoot *root, float x, float y)
 
     return angle;
 }
+
+bool loadPngTexture(const char *fname, ssgTextureInfo *info)
+{
+    GLubyte *tex;
+    int w, h;
+
+    tex = (GLubyte *)GfTexReadImageFromPNG(fname, 2.0, &w, &h, 0, 0);
+    if (!tex) {
+        return false;
+    }
+
+    if (info) {
+        info->width = w;
+        info->height = h;
+        info->depth = 4;
+        info->alpha = true;
+    }
+
+    return true;
+}
+
+bool loadJpegTexture(const char *fname, ssgTextureInfo *info)
+{
+    GLubyte *tex;
+    int w, h;
+
+    tex = (GLubyte *)GfTexReadImageFromJPEG(fname, 2.0, &w, &h, 0, 0);
+    if (!tex) {
+        return false;
+    }
+
+    if (info) {
+        info->width = w;
+        info->height = h;
+        info->depth = 4;
+        info->alpha = true;
+    }
+
+    return true;
+}
