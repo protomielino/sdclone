@@ -3109,6 +3109,14 @@ static void SaveMainTrack(FILE *curFd, bool bump, bool raceline)
                 if (aDispElt->nb != 0)
                 {
                     sprintf(buf, "%s%d", aDispElt->name, aDispElt->id);
+
+                     // skip bad display lists
+                    if (aDispElt->nb > 0 && aDispElt->nb < 3)
+                    {
+                        GfLogWarning("Bug: Display list %s has %d vertices!\n", buf, aDispElt->nb);
+                        continue;
+                    }
+
                     if (bump)
                     {
                         saveObject(curFd, aDispElt->nb, aDispElt->start, aDispElt->texture->namebump, buf, aDispElt->surfType);
