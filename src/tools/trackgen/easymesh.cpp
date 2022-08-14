@@ -2117,7 +2117,7 @@ static int GetTrackOrientation(tTrack *track)
 */
 static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exterior, bool useBorder)
 {
-    int startNeeded;
+    bool startNeeded;
     int i, j, nbvert, maxVert;
     tdble ts, step, anz;
     tTrackSeg *seg;
@@ -2175,7 +2175,7 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
         }
 
         /* Right side */
-        startNeeded = 1;
+        startNeeded = true;
         for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
         {
             if (mseg->rside != nullptr)
@@ -2246,7 +2246,7 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
             if (i != (Track->nseg - 1))
             {
                 ADD_POINT(seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z, GridStep, i + 1);
-                startNeeded = 0;
+                startNeeded = false;
             }
         }
 
@@ -2271,7 +2271,7 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
         }
 
         /* Left Side */
-        startNeeded = 1;
+        startNeeded = true;
         for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
         {
             if (mseg->lside)
@@ -2343,7 +2343,7 @@ static void GenerateMesh(tTrack *Track, bool rightside, bool reverse, bool exter
             if (i != (Track->nseg - 1))
             {
                 ADD_POINT(seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z, GridStep, i + 1);
-                startNeeded = 0;
+                startNeeded = false;
             }
         }
 
