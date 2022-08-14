@@ -1973,7 +1973,6 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             {
                 startNeeded = 1;
                 runninglentgh = 0;
-                NEWDISPLIST(0, sname, i);
             }
             else
             {
@@ -2304,7 +2303,6 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             {
                 runninglentgh = 0;
                 startNeeded = 1;
-                NEWDISPLIST(0, sname, i);
             }
             else
             {
