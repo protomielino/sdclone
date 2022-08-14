@@ -271,7 +271,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     tdble x, y, z;
     tdble x2, y2, z2;
     tdble x3, y3, z3;
-    int startNeeded;
+    bool startNeeded;
 
     tdble xprev = 0;
     tdble yprev = 0;
@@ -509,7 +509,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 curTexSize = GfParmGetNum(TrackHandle, path_, TRK_ATT_TEXSIZE, nullptr, 20.0);                      \
             }                                                                                                       \
             prevTexId = curTexId;                                                                                   \
-            NEWDISPLIST(1, name, id);                                                                               \
+            NEWDISPLIST(true, name, id);                                                                               \
         }                                                                                                           \
     } while (0)
 
@@ -522,7 +522,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         if (curTexId != prevTexId)                                                                                  \
         {                                                                                                           \
             prevTexId = curTexId;                                                                                   \
-            NEWDISPLIST(1, name, id);                                                                               \
+            NEWDISPLIST(true, name, id);                                                                               \
         }                                                                                                           \
     } while (0)
 
@@ -533,7 +533,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         if (curTexId != prevTexId)                                                                                  \
         {                                                                                                           \
             prevTexId = curTexId;                                                                                   \
-            NEWDISPLIST(1, name, id);                                                                               \
+            NEWDISPLIST(true, name, id);                                                                               \
         }                                                                                                           \
     } while (0)
 
@@ -611,7 +611,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     /* Main track */
     prevTexId = 0;
     texLen = 0;
-    startNeeded = 1;
+    startNeeded = true;
     runninglentgh = 0;
     for (i = 0, seg = Track->seg->next; i < Track->nseg; i++, seg = seg->next)
     {
@@ -635,7 +635,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         texLen = curTexSeg / curTexSize;
         if (startNeeded || (runninglentgh > LG_STEP_MAX))
         {
-            NEWDISPLIST(0, "tkMn", i);
+            NEWDISPLIST(false, "tkMn", i);
             runninglentgh = 0;
             ts = 0;
             if (raceline)
@@ -743,7 +743,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
         SETPOINT(texLen, texMaxT - rlOffset + rlto, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
         SETPOINT(texLen, 0 + rlOffset + rlto, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
 
-        startNeeded = 0;
+        startNeeded = false;
         runninglentgh += seg->length;
     }
 
@@ -759,7 +759,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     {
         prevTexId = 0;
         texLen = 0;
-        startNeeded = 1;
+        startNeeded = true;
         runninglentgh = 0;
         sprintf(sname, "t%dRB", j);
         for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
@@ -780,7 +780,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 texLen = curTexSeg / curTexSize;
                 if (startNeeded || (runninglentgh > LG_STEP_MAX))
                 {
-                    NEWDISPLIST(0, sname, i);
+                    NEWDISPLIST(false, sname, i);
                     runninglentgh = 0;
                     ts = 0;
 
@@ -1178,12 +1178,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     break;
                 }
 
-                startNeeded = 0;
+                startNeeded = false;
                 runninglentgh += seg->length;
             }
             else
             {
-                startNeeded = 1;
+                startNeeded = true;
             }
         }
     }
@@ -1191,7 +1191,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     /* Right Side */
     prevTexId = 0;
     texLen = 0;
-    startNeeded = 1;
+    startNeeded = true;
     runninglentgh = 0;
     hasBorder = 0;
     for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
@@ -1204,7 +1204,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 seg = seg->rside;
                 if (hasBorder == 0)
                 {
-                    startNeeded = 1;
+                    startNeeded = true;
                     hasBorder = 1;
                 }
             }
@@ -1212,7 +1212,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             {
                 if (hasBorder)
                 {
-                    startNeeded = 1;
+                    startNeeded = true;
                     hasBorder = 0;
                 }
             }
@@ -1222,7 +1222,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 tdble d0 = Distance(lastSeg->vertex[TR_EL].x, lastSeg->vertex[TR_EL].y, lastSeg->vertex[TR_EL].z, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
                 tdble d1 = Distance(lastSeg->vertex[TR_ER].x, lastSeg->vertex[TR_ER].y, lastSeg->vertex[TR_ER].z, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                 if ((d0 > 0.01) || (d1 > 0.01))
-                    startNeeded = 1;
+                    startNeeded = true;
             }
 
             CHECKDISPLIST(seg->surface->material, "tkRS", i, mseg->lgfromstart);
@@ -1238,7 +1238,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             texLen = curTexSeg / curTexSize;
             if (startNeeded || (runninglentgh > LG_STEP_MAX))
             {
-                NEWDISPLIST(0, "tkRS", i);
+                NEWDISPLIST(false, "tkRS", i);
                 runninglentgh = 0;
                 ts = 0;
 
@@ -1347,13 +1347,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             SETPOINT(texLen, 0, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
             SETPOINT(texLen, texMaxT, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
 
-            startNeeded = 0;
+            startNeeded = false;
             runninglentgh += seg->length;
             lastSeg = seg;
         }
         else
         {
-            startNeeded = 1;
+            startNeeded = true;
         }
     }
 
@@ -1362,7 +1362,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     {
         prevTexId = 0;
         texLen = 0;
-        startNeeded = 1;
+        startNeeded = true;
         runninglentgh = 0;
         sprintf(sname, "t%dLB", j);
         for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
@@ -1383,7 +1383,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 texLen = curTexSeg / curTexSize;
                 if (startNeeded || (runninglentgh > LG_STEP_MAX))
                 {
-                    NEWDISPLIST(0, sname, i);
+                    NEWDISPLIST(false, sname, i);
                     runninglentgh = 0;
                     ts = 0;
                     width = RtTrackGetWidth(seg, ts);
@@ -1776,12 +1776,12 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                     break;
                 }
 
-                startNeeded = 0;
+                startNeeded = false;
                 runninglentgh += seg->length;
             }
             else
             {
-                startNeeded = 1;
+                startNeeded = true;
             }
         }
     }
@@ -1789,7 +1789,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     /* Left Side */
     prevTexId = 0;
     texLen = 0;
-    startNeeded = 1;
+    startNeeded = true;
     runninglentgh = 0;
     hasBorder = 0;
     for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
@@ -1802,7 +1802,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 seg = seg->lside;
                 if (hasBorder == 0)
                 {
-                    startNeeded = 1;
+                    startNeeded = true;
                     hasBorder = 1;
                 }
             }
@@ -1810,7 +1810,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             {
                 if (hasBorder)
                 {
-                    startNeeded = 1;
+                    startNeeded = true;
                     hasBorder = 0;
                 }
             }
@@ -1820,7 +1820,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 tdble d0 = Distance(lastSeg->vertex[TR_EL].x, lastSeg->vertex[TR_EL].y, lastSeg->vertex[TR_EL].z, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
                 tdble d1 = Distance(lastSeg->vertex[TR_ER].x, lastSeg->vertex[TR_ER].y, lastSeg->vertex[TR_ER].z, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
                 if ((d0 > 0.01) || (d1 > 0.01))
-                    startNeeded = 1;
+                    startNeeded = true;
             }
 
             CHECKDISPLIST(seg->surface->material, "tkLS", i, mseg->lgfromstart);
@@ -1836,7 +1836,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             texLen = curTexSeg / curTexSize;
             if (startNeeded || (runninglentgh > LG_STEP_MAX))
             {
-                NEWDISPLIST(0, "tkLS", i);
+                NEWDISPLIST(false, "tkLS", i);
                 runninglentgh = 0;
 
                 ts = 0;
@@ -1944,13 +1944,13 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             SETPOINT(texLen, texMaxT, seg->vertex[TR_EL].x, seg->vertex[TR_EL].y, seg->vertex[TR_EL].z);
             SETPOINT(texLen, 0, seg->vertex[TR_ER].x, seg->vertex[TR_ER].y, seg->vertex[TR_ER].z);
 
-            startNeeded = 0;
+            startNeeded = false;
             runninglentgh += seg->length;
             lastSeg = seg;
         }
         else
         {
-            startNeeded = 1;
+            startNeeded = true;
         }
     }
 
@@ -1959,7 +1959,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     {
         prevTexId = 0;
         texLen = 0;
-        startNeeded = 1;
+        startNeeded = true;
         runninglentgh = 0;
         sprintf(sname, "B%dRt", j);
         for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
@@ -1971,7 +1971,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
             if (seg->raceInfo & TR_PITBUILD)
             {
-                startNeeded = 1;
+                startNeeded = true;
                 runninglentgh = 0;
                 continue;
             }
@@ -1990,7 +1990,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             trkpos.seg = seg;
             if (startNeeded || (runninglentgh > LG_STEP_MAX))
             {
-                NEWDISPLIST(0, sname, i);
+                NEWDISPLIST(false, sname, i);
                 if (curTexType == 0)
                     texLen = 0;
                 runninglentgh = 0;
@@ -2278,7 +2278,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 // nothing to do
                 break;
             }
-            startNeeded = 0;
+            startNeeded = false;
             runninglentgh += seg->length;
         }
     }
@@ -2288,7 +2288,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
     {
         prevTexId = 0;
         texLen = 0;
-        startNeeded = 1;
+        startNeeded = true;
         runninglentgh = 0;
         sprintf(sname, "B%dLt", j);
         for (i = 0, mseg = Track->seg->next; i < Track->nseg; i++, mseg = mseg->next)
@@ -2301,7 +2301,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             if (seg->raceInfo & TR_PITBUILD)
             {
                 runninglentgh = 0;
-                startNeeded = 1;
+                startNeeded = true;
                 continue;
             }
             
@@ -2319,7 +2319,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             trkpos.seg = seg;
             if (startNeeded || (runninglentgh > LG_STEP_MAX))
             {
-                NEWDISPLIST(0, sname, i);
+                NEWDISPLIST(false, sname, i);
                 runninglentgh = 0;
                 if (curTexType == 0)
                     texLen = 0;
@@ -2619,7 +2619,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 break;
             }
             
-            startNeeded = 0;
+            startNeeded = false;
             runninglentgh += seg->length;
         }
     }
@@ -2751,7 +2751,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             SETPOINT(4, 0, x, y, z);
             SETPOINT(4, 1, x, y, z + BR_HEIGHT_2);
 
-            NEWDISPLIST(0, "S1Bg", 0);
+            NEWDISPLIST(false, "S1Bg", 0);
 
             if (mseg->lside)
             {
@@ -2824,7 +2824,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
             y += BR_WIDTH_1; /* back to origin */
 
-            NEWDISPLIST(0, "S3Bg", 0);
+            NEWDISPLIST(false, "S3Bg", 0);
 
             y2 += BR_WIDTH_1;
 
@@ -2894,7 +2894,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
             static int uid = 1;
             t3Dd normvec;
 
-            startNeeded = 1;
+            startNeeded = true;
             sprintf(sname, "P%dts", uid++);
             CHECKDISPLIST3("concrete2.png", 4, sname, pits->driversPits[0].pos.seg->id);
 
@@ -2925,7 +2925,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
 
             for (i = 0; i < pits->driversPitsNb; i++)
             {
-                startNeeded = 1;
+                startNeeded = true;
                 sprintf(sname, "P%dts", uid++);
                 CHECKDISPLIST3("concrete.png", 4, sname, pits->driversPits[i].pos.seg->id);
 
@@ -2966,7 +2966,7 @@ int InitScene(tTrack *Track, void *TrackHandle, bool bump, bool raceline, bool b
                 SETPOINT(0, 2 * PIT_TOP + PIT_DEEP + PIT_HEIGHT, x3 + dx, y3 + dy, z3);
             } // for i
 
-            startNeeded = 1;
+            startNeeded = true;
             i--;
             sprintf(sname, "P%dts", uid++);
             CHECKDISPLIST3("concrete2.png", 4, sname, pits->driversPits[i].pos.seg->id);
